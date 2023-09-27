@@ -32,7 +32,7 @@ export abstract class InputEventEngine<HoveredItemType> extends InputEngineBase<
   }
 
   protected onInputStart(identifier: number, sample: InputSample<HoveredItemType>, target: EventTarget, isFromTouch: boolean) {
-    const touchpoint = new GestureSource<HoveredItemType>(identifier, isFromTouch);
+    const touchpoint = new GestureSource<HoveredItemType>(identifier, this.config, isFromTouch);
     touchpoint.update(sample);
 
     this.addTouchpoint(touchpoint);

@@ -31,6 +31,18 @@ export abstract class InputEngineBase<HoveredItemType> extends EventEmitter<Even
     return this._activeTouchpoints.find((point) => point.rawIdentifier == identifier);
   }
 
+  /**
+   * During the lifetime of a GestureSource (a continuous path for a single touchpoint),
+   * it is possible that the legal area for the path may change.  This function allows
+   * us to find the appropriate set of constraints for the path if any changes have been
+   * requested - say, for a subkey menu after a longpress.
+   * @param identifier
+   * @returns
+   */
+  protected getConfigForId(identifier: number) {
+    return this.getTouchpointWithId(identifier).currentRecognizerConfig;
+  }
+
   public dropTouchpointWithId(identifier: number) {
     this._activeTouchpoints = this._activeTouchpoints.filter((point) => point.rawIdentifier != identifier);
   }

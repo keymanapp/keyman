@@ -23,7 +23,7 @@ export class HeadlessInputEngine<Type = any> extends InputEngineBase<Type> {
     const tailSamples = originalSamples.slice(1);
 
     const pathID = this.PATH_ID_SEED++;
-    let replayPoint = new GestureSource<Type>(pathID, recordedPoint.isFromTouch);
+    let replayPoint = new GestureSource<Type>(pathID, null, recordedPoint.isFromTouch);
     replayPoint.update(headSample); // is included before the point is made available.
 
     // Build promises designed to reproduce the events at the correct times.

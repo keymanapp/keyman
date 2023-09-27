@@ -3,6 +3,9 @@
 // after configuration.
 
 import { InputSample } from "../headless/inputSample.js";
+import { Mutable } from "../mutable.js";
+import { Nonoptional } from "../nonoptional.js";
+import { PaddedZoneSource } from "./paddedZoneSource.js";
 import { RecognitionZoneSource } from "./recognitionZoneSource.js";
 
 // For example, customization of a longpress timer's length need not be readonly.
@@ -81,4 +84,34 @@ export interface GestureRecognizerConfiguration<HoveredItemType> {
    * @returns
    */
   readonly itemIdentifier?: (coord: Omit<InputSample<any>, 'item'>, target: EventTarget) => HoveredItemType;
+}
+
+export function preprocessRecognizerConfig<HoveredItemType>(
+  config: GestureRecognizerConfiguration<HoveredItemType>
+): Nonoptional<GestureRecognizerConfiguration<HoveredItemType>> {
+  // Allows configuration pre-processing during this method.
+  let processingConfig: Mutable<Nonoptional<GestureRecognizerConfiguration<HoveredItemType>>> = {...config} as Nonoptional<GestureRecognizerConfiguration<HoveredItemType>>;
+  processingConfig.mouseEventRoot = processingConfig.mouseEventRoot ?? processingConfig.targetRoot;
+  processingConfig.touchEventRoot = processingConfig.touchEventRoot ?? processingConfig.targetRoot;
+
+  processingConfig.inputStartBounds = processingConfig.inputStartBounds ?? processingConfig.targetRoot;
+  processingConfig.maxRoamingBounds = processingConfig.maxRoamingBounds ?? processingConfig.targetRoot;
+  processingConfig.safeBounds       = processingConfig.safeBounds       ?? new PaddedZoneSource([2]);
+
+  processingConfig.itemIdentifier   = processingConfig.itemIdentifier   ?? (() => null);
+
+  if(!config.paddedSafeBounds) {
+    let paddingArray = config.safeBoundPadding;
+    if(typeof paddingArray == 'number') {
+      paddingArray = [ paddingArray ];
+    }
+    paddingArray = paddingArray ?? [3];
+
+    processingConfig.paddedSafeBounds = new PaddedZoneSource(processingConfig.safeBounds, paddingArray);
+  } else {
+    // processingConfig.paddedSafeBounds is already set via the spread operator above.
+    delete processingConfig.safeBoundPadding;
+  }
+
+  return processingConfig;
 }

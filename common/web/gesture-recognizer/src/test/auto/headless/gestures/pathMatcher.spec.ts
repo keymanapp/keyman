@@ -67,7 +67,7 @@ describe("PathMatcher", function() {
 
   describe("Instant fulfillment modeling", function() {
     it("resolve", async function() {
-      const emulatedContactPoint = new GestureSource<string>(1, true);
+      const emulatedContactPoint = new GestureSource<string>(1, null, true);
       const modelMatcher = new gestures.matchers.PathMatcher(InstantResolutionModel, emulatedContactPoint);
 
       const startSample = {
@@ -86,7 +86,7 @@ describe("PathMatcher", function() {
     });
 
     it("reject", async function() {
-      const emulatedContactPoint = new GestureSource<string>(1, true);
+      const emulatedContactPoint = new GestureSource<string>(1, null, true);
       const modelMatcher = new gestures.matchers.PathMatcher(InstantRejectionModel, emulatedContactPoint);
 
       const startSample = {
@@ -107,7 +107,7 @@ describe("PathMatcher", function() {
 
   describe("Longpress: primary path modeling", function() {
     it("resolve: path completed (long wait)", async function() {
-      const emulatedContactPoint = new GestureSource<string>(1, true);
+      const emulatedContactPoint = new GestureSource<string>(1, null, true);
       const modelMatcher = new gestures.matchers.PathMatcher(MainLongpressSourceModel, emulatedContactPoint);
 
       const startSample = {
@@ -133,7 +133,7 @@ describe("PathMatcher", function() {
     });
 
     it("resolve: path not completed (long wait)", async function() {
-      const emulatedContactPoint = new GestureSource<string>(1, true);
+      const emulatedContactPoint = new GestureSource<string>(1, null, true);
       const modelMatcher = new gestures.matchers.PathMatcher(MainLongpressSourceModel, emulatedContactPoint);
 
       const startSample = {
@@ -159,7 +159,7 @@ describe("PathMatcher", function() {
     });
 
     it("reject: path completed (short wait)", async function() {
-      const emulatedContactPoint = new GestureSource<string>(1, true);
+      const emulatedContactPoint = new GestureSource<string>(1, null, true);
       const modelMatcher = new gestures.matchers.PathMatcher(MainLongpressSourceModel, emulatedContactPoint);
 
       const startSample = {
@@ -185,7 +185,7 @@ describe("PathMatcher", function() {
     });
 
     it("reject: path cancelled", async function() {
-      const emulatedContactPoint = new GestureSource<string>(1, true);
+      const emulatedContactPoint = new GestureSource<string>(1, null, true);
       const modelMatcher = new gestures.matchers.PathMatcher(MainLongpressSourceModel, emulatedContactPoint);
 
       const startSample = {
@@ -218,7 +218,7 @@ describe("PathMatcher", function() {
     });
 
     it("reject: distance moved", async function() {
-      const emulatedContactPoint = new GestureSource<string>(1, true);
+      const emulatedContactPoint = new GestureSource<string>(1, null, true);
       const modelMatcher = new gestures.matchers.PathMatcher(MainLongpressSourceModel, emulatedContactPoint);
 
       const startSample = {
@@ -253,7 +253,7 @@ describe("PathMatcher", function() {
     });
 
     it("reject: item changed", async function() {
-      const emulatedContactPoint = new GestureSource<string>(1, true);
+      const emulatedContactPoint = new GestureSource<string>(1, null, true);
       const modelMatcher = new gestures.matchers.PathMatcher(MainLongpressSourceModel, emulatedContactPoint);
 
       const startSample = {
@@ -287,7 +287,7 @@ describe("PathMatcher", function() {
     });
 
     it("reject: disabled up-flick shortcut", async function() {
-      const emulatedContactPoint = new GestureSource<string>(1, true);
+      const emulatedContactPoint = new GestureSource<string>(1, null, true);
       const modelMatcher = new gestures.matchers.PathMatcher(MainLongpressSourceModel, emulatedContactPoint);
 
       const startSample = {
@@ -313,7 +313,7 @@ describe("PathMatcher", function() {
     });
 
     it("resolve: enabled up-flick shortcut", async function() {
-      const emulatedContactPoint = new GestureSource<string>(1, true);
+      const emulatedContactPoint = new GestureSource<string>(1, null, true);
       const modelMatcher = new gestures.matchers.PathMatcher(MainLongpressSourceModelWithShortcut, emulatedContactPoint);
 
       const startSample = {
@@ -341,7 +341,7 @@ describe("PathMatcher", function() {
 
   describe("Modipress: primary path modeling", function () {
     it("push: on path start", async function() {
-      const emulatedContactPoint = new GestureSource<string>(1, true);
+      const emulatedContactPoint = new GestureSource<string>(1, null, true);
       const modelMatcher = new gestures.matchers.PathMatcher(ModipressStartModel, emulatedContactPoint);
 
       const startSample = {
@@ -360,7 +360,7 @@ describe("PathMatcher", function() {
     });
 
     it("pop: released", async function() {
-      const emulatedContactPoint = new GestureSource<string>(1, true);
+      const emulatedContactPoint = new GestureSource<string>(1, null, true);
       const modelMatcher = new gestures.matchers.PathMatcher(ModipressEndModel, emulatedContactPoint);
 
       const startSample = {
@@ -379,7 +379,7 @@ describe("PathMatcher", function() {
     });
 
     it("pop: item changed", async function() {
-      const emulatedContactPoint = new GestureSource<string>(1, true);
+      const emulatedContactPoint = new GestureSource<string>(1, null, true);
       const modelMatcher = new gestures.matchers.PathMatcher(ModipressEndModel, emulatedContactPoint);
 
       const startSample = {
@@ -407,7 +407,7 @@ describe("PathMatcher", function() {
 
   describe("Simple Tap: primary path modeling", function() {
     it("resolve: path completed (long wait)", async function() {
-      const emulatedContactPoint = new GestureSource<string>(1, true);
+      const emulatedContactPoint = new GestureSource<string>(1, null, true);
       const modelMatcher = new gestures.matchers.PathMatcher(SimpleTapModel, emulatedContactPoint);
 
       const startSample = {
@@ -433,7 +433,7 @@ describe("PathMatcher", function() {
     });
 
     it("resolve: path completed (short wait)", async function() {
-      const emulatedContactPoint = new GestureSource<string>(1, true);
+      const emulatedContactPoint = new GestureSource<string>(1, null, true);
       const modelMatcher = new gestures.matchers.PathMatcher(SimpleTapModel, emulatedContactPoint);
 
       const startSample = {
@@ -459,7 +459,7 @@ describe("PathMatcher", function() {
     });
 
     it("reject: path cancelled", async function() {
-      const emulatedContactPoint = new GestureSource<string>(1, true);
+      const emulatedContactPoint = new GestureSource<string>(1, null, true);
       const modelMatcher = new gestures.matchers.PathMatcher(SimpleTapModel, emulatedContactPoint);
 
       const startSample = {
@@ -492,7 +492,7 @@ describe("PathMatcher", function() {
     });
 
     it("resolve: significant movement, but no item change", async function() {
-      const emulatedContactPoint = new GestureSource<string>(1, true);
+      const emulatedContactPoint = new GestureSource<string>(1, null, true);
       const modelMatcher = new gestures.matchers.PathMatcher(SimpleTapModel, emulatedContactPoint);
 
       const startSample = {
@@ -527,7 +527,7 @@ describe("PathMatcher", function() {
     });
 
     it("reject: little movement, but item changed", async function() {
-      const emulatedContactPoint = new GestureSource<string>(1, true);
+      const emulatedContactPoint = new GestureSource<string>(1, null, true);
       const modelMatcher = new gestures.matchers.PathMatcher(SimpleTapModel, emulatedContactPoint);
 
       const startSample = {

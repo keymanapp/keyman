@@ -45,7 +45,7 @@ function mockedPredecessor<Type>(
   lastSample: InputSample<Type>,
   baseItem?: Type
 ): MockedPredecessor<Type> {
-  const mockedSrc = new GestureSource<Type>(simSourceIdSeed++, true);
+  const mockedSrc = new GestureSource<Type>(simSourceIdSeed++, null, true);
   mockedSrc.path.extend(lastSample);
   mockedSrc.terminate(false);
 
@@ -97,7 +97,7 @@ function prepareSourceForTimer<Type> (
   timerSpec: SimSpecTimer<Type>,
   startTime: number
 ): ReturnType<typeof prepareSimContact<Type>> {
-  const simpleSource = new GestureSource<Type>(simSourceIdSeed++, true);
+  const simpleSource = new GestureSource<Type>(simSourceIdSeed++, null, true);
 
   const promise = timedPromise(startTime).then(() => {
     // We're simulating a previously-completed contact point's path..
@@ -124,7 +124,7 @@ function prepareSourceForRawSequence<Type>(
   contactSpec: SimSpecSequence<Type>,
   startTime: number
 ): ReturnType<typeof prepareSimContact<Type>> {
-  const simpleSource = new GestureSource<Type>(simSourceIdSeed++, true);
+  const simpleSource = new GestureSource<Type>(simSourceIdSeed++, null, true);
 
   const promise = timedPromise(startTime).then(() => {
     if(startTime != 0) {

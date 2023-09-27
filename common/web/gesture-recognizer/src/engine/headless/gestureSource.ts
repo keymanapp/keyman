@@ -1,5 +1,7 @@
 import { InputSample } from "./inputSample.js";
 import { SerializedGesturePath, GesturePath } from "./gesturePath.js";
+import { GestureRecognizerConfiguration, preprocessRecognizerConfig } from "../configuration/gestureRecognizerConfiguration.js";
+import { Nonoptional } from "../nonoptional.js";
 
 /**
  * Documents the expected typing of serialized versions of the `GestureSource` class.
@@ -47,6 +49,9 @@ export class GestureSource<HoveredItemType> {
 
   private static _jsonIdSeed: -1;
 
+  // Assertion:  must always contain an index 0 - the base recognizer config.
+  protected recognizerConfigStack: Nonoptional<GestureRecognizerConfiguration<HoveredItemType>>[];
+
   /**
    * Tracks the coordinates and timestamps of each update for the lifetime of this `GestureSource`.
    */
@@ -60,10 +65,16 @@ export class GestureSource<HoveredItemType> {
    * @param initialHoveredItem  The initiating event's original target element
    * @param isFromTouch    `true` if sourced from a `TouchEvent`; `false` otherwise.
    */
-  constructor(identifier: number, isFromTouch: boolean) {
+  constructor(
+    identifier: number,
+    recognizerConfig: Nonoptional<GestureRecognizerConfiguration<HoveredItemType>> | Nonoptional<GestureRecognizerConfiguration<HoveredItemType>>[],
+    isFromTouch: boolean
+  ) {
     this.rawIdentifier = identifier;
     this.isFromTouch = isFromTouch;
     this._path = new GesturePath();
+
+    this.recognizerConfigStack = Array.isArray(recognizerConfig) ? recognizerConfig : [recognizerConfig];
   }
 
   /**
@@ -76,7 +87,7 @@ export class GestureSource<HoveredItemType> {
     const isFromTouch = jsonObj.isFromTouch;
     const path = GesturePath.deserialize(jsonObj.path);
 
-    const instance = new GestureSource(id, isFromTouch);
+    const instance = new GestureSource(id, null, isFromTouch);
     instance._path = path;
     return instance;
   }
@@ -112,7 +123,7 @@ export class GestureSource<HoveredItemType> {
    * @returns
    */
   public constructSubview(startAtEnd: boolean, preserveBaseItem: boolean): GestureSourceSubview<HoveredItemType> {
-    return new GestureSourceSubview(this, startAtEnd, preserveBaseItem);
+    return new GestureSourceSubview(this, this.recognizerConfigStack, startAtEnd, preserveBaseItem);
   }
 
   /**
@@ -142,10 +153,31 @@ export class GestureSource<HoveredItemType> {
     return `${prefix}:${this.rawIdentifier}`;
   }
 
+  public pushRecognizerConfig(config: Omit<GestureRecognizerConfiguration<HoveredItemType>, 'touchEventRoot'| 'mouseEventRoot'>) {
+    const configToProcess = {...config,
+      mouseEventRoot: this.recognizerConfigStack[0].mouseEventRoot,
+      touchEventRoot: this.recognizerConfigStack[0].touchEventRoot
+    }
+    this.recognizerConfigStack.push(preprocessRecognizerConfig(configToProcess));
+  }
+
+  public popRecognizerConfig() {
+    if(this.recognizerConfigStack.length == 1) {
+      throw new Error("Cannot 'pop' the original recognizer-configuration for this GestureSource.")
+    }
+
+    return this.recognizerConfigStack.pop();
+  }
+
+  public get currentRecognizerConfig() {
+    return this.recognizerConfigStack[this.recognizerConfigStack.length-1];
+  }
+
   /**
    * Creates a serialization-friendly version of this instance for use by
    * `JSON.stringify`.
    */
+  /* c8 ignore start */
   toJSON(): SerializedGestureSource {
     let jsonClone: SerializedGestureSource = {
       isFromTouch: this.isFromTouch,
@@ -153,11 +185,15 @@ export class GestureSource<HoveredItemType> {
     }
 
     return jsonClone;
+    /* c8 ignore stop */
+    /* c8 ignore next 2 */
+    // esbuild or tsc seems to mangle the 'ignore stop' if put outside the ending brace.
   }
 }
 
 export class GestureSourceSubview<HoveredItemType> extends GestureSource<HoveredItemType> {
   private _baseSource: GestureSource<HoveredItemType>
+  private _baseStartIndex: number;
   private subviewDisconnector: () => void;
 
   /**
@@ -167,10 +203,40 @@ export class GestureSourceSubview<HoveredItemType> extends GestureSource<Hovered
    * @param initialHoveredItem  The initiating event's original target element
    * @param isFromTouch    `true` if sourced from a `TouchEvent`; `false` otherwise.
    */
-  constructor(source: GestureSource<HoveredItemType>, startAtEnd: boolean, preserveBaseItem: boolean) {
-    super(source.rawIdentifier, source.isFromTouch);
+  constructor(
+    source: GestureSource<HoveredItemType>,
+    configStack: typeof GestureSource.prototype['recognizerConfigStack'],
+    startAtEnd: boolean,
+    preserveBaseItem: boolean
+  ) {
+    let mayUpdate = true;
+    let start = 0;
+    let length = source.path.coords.length;
+    if(source instanceof GestureSourceSubview) {
+      start = source._baseStartIndex;
+      const expectedLength = start + length;
+      // Check against the full remaining length of the original source; does
+      // the subview provided to us include its source's most recent point?
+      const sampleCountSinceStart = source.baseSource.path.coords.length;
+      if(expectedLength != start + sampleCountSinceStart) {
+        mayUpdate = false;
+      }
+    }
+
+    super(source.rawIdentifier, configStack, source.isFromTouch);
 
     const baseSource = this._baseSource = source instanceof GestureSourceSubview ? source._baseSource : source;
+
+    /**
+     * Provides a coordinate-system translation for source subviews.
+     * The base version still needs to use the original coord system, though.
+     */
+    const translateSample = (sample: InputSample<HoveredItemType>) => {
+      const translation = this.recognizerTranslation;
+      // Provide a coordinate-system translation for source subviews.
+      // The base version still needs to use the original coord system, though.
+      return {...sample, targetX: sample.targetX - translation.x, targetY: sample.targetY - translation.y};
+    }
 
     // Note: we don't particularly need subviews to track the actual coords aside from
     // tracking related stats data.  But... we don't have an "off-switch" for that yet.
@@ -179,13 +245,18 @@ export class GestureSourceSubview<HoveredItemType> extends GestureSource<Hovered
     // Will hold the last sample _even if_ we don't save every coord that comes through.
     const lastSample = source.path.stats.lastSample;
 
+    // Are we 'chop'ping off the existing path or preserving it?  This sets the sample-copying
+    // configuration accordingly.
     if(startAtEnd) {
-      subpath = new GesturePath<HoveredItemType>();
-      if(lastSample) {
-        subpath.extend(lastSample);
-      }
+      this._baseStartIndex = start = Math.max(start + length - 1, 0);
+      length = length > 0 ? 1 : 0;
     } else {
-      subpath = source.path.clone();
+      this._baseStartIndex = start;
+    }
+
+    subpath = new GesturePath<HoveredItemType>();
+    for(let i=0; i < length; i++) {
+      subpath.extend(translateSample(baseSource.path.coords[start + i]));
     }
 
     this._path = subpath;
@@ -196,25 +267,51 @@ export class GestureSourceSubview<HoveredItemType> extends GestureSource<Hovered
       this._baseItem = lastSample?.item;
     }
 
-    // Ensure that this 'subview' is updated whenever the "source of truth" is.
-    const completeHook    = ()       => this.path.terminate(false);
-    const invalidatedHook = ()       => this.path.terminate(true);
-    const stepHook        = (sample) => this.update(sample);
-    baseSource.path.on('complete',    completeHook);
-    baseSource.path.on('invalidated', invalidatedHook);
-    baseSource.path.on('step',        stepHook);
+    if(mayUpdate) {
+      // Ensure that this 'subview' is updated whenever the "source of truth" is.
+      const completeHook    = ()       => this.path.terminate(false);
+      const invalidatedHook = ()       => this.path.terminate(true);
+      const stepHook        = (sample: InputSample<HoveredItemType>) => {
+        super.update(translateSample(sample));
+      };
+      baseSource.path.on('complete',    completeHook);
+      baseSource.path.on('invalidated', invalidatedHook);
+      baseSource.path.on('step',        stepHook);
 
-    // But make sure we can "disconnect" it later once the gesture being matched
-    // with the subview has fully matched; it's good to have a snapshot left over.
-    this.subviewDisconnector = () => {
-      baseSource.path.off('complete',    completeHook);
-      baseSource.path.off('invalidated', invalidatedHook);
-      baseSource.path.off('step',        stepHook);
+      // But make sure we can "disconnect" it later once the gesture being matched
+      // with the subview has fully matched; it's good to have a snapshot left over.
+      this.subviewDisconnector = () => {
+        baseSource.path.off('complete',    completeHook);
+        baseSource.path.off('invalidated', invalidatedHook);
+        baseSource.path.off('step',        stepHook);
+      }
+    }
+  }
+
+  private get recognizerTranslation() {
+    // Allowing a 'null' config greatly simplifies many of our unit-test specs.
+    if(this.recognizerConfigStack.length == 1 || !this.currentRecognizerConfig) {
+      return {
+        x: 0,
+        y: 0
+      };
+    }
+
+    // Could compute all of this a single time & cache the value whenever a recognizer-config is pushed or popped.
+    const currentRecognizer = this.currentRecognizerConfig;
+    const currentClientRect = currentRecognizer.targetRoot.getBoundingClientRect();
+    const baseClientRect = this.recognizerConfigStack[0].targetRoot.getBoundingClientRect();
+
+    return {
+      x: currentClientRect.x - baseClientRect.x,
+      y: currentClientRect.y - baseClientRect.y
     }
   }
 
   /**
-   * The original GestureSource this subview is based upon.
+   * The original GestureSource this subview is based upon.  Note that the coordinate system may
+   * differ if a gesture stage/component has occurred that triggered a change to the active
+   * recognizer configuration.  (e.g. a subkey menu is being displayed for a longpress interaction)
    */
   public get baseSource() {
     return this._baseSource;
@@ -229,6 +326,18 @@ export class GestureSourceSubview<HoveredItemType> extends GestureSource<Hovered
       this.subviewDisconnector();
       this.subviewDisconnector = null;
     }
+  }
+
+  public pushRecognizerConfig(config: Omit<GestureRecognizerConfiguration<HoveredItemType>, "touchEventRoot" | "mouseEventRoot">): void {
+    throw new Error("Pushing and popping of recognizer configurations should only be called on the base GestureSource");
+  }
+
+  public popRecognizerConfig(): Nonoptional<GestureRecognizerConfiguration<HoveredItemType>> {
+    throw new Error("Pushing and popping of recognizer configurations should only be called on the base GestureSource");
+  }
+
+  public update(sample: InputSample<HoveredItemType>): void {
+    throw new Error("Updates should be provided through the base GestureSource.")
   }
 
   /**
