@@ -106,7 +106,9 @@ export class PathMatcher<Type> {
       return this.finalize(false, 'path');
     }
 
-    if(model.itemChangeAction && source.currentSample.item != source.baseItem) {
+    // For certain unit-test setups, we may have a zero-length path when this is called during test init.
+    // It's best to have that path-coord-length check in place, just in case.
+    if(model.itemChangeAction && source.path.coords.length > 0 && source.currentSample.item != source.baseItem) {
       const result = model.itemChangeAction == 'resolve';
 
       return this.finalize(result, 'item');

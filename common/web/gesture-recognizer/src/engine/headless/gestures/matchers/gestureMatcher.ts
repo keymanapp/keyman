@@ -20,12 +20,10 @@ export class GestureMatcher<Type> {
   public readonly model: GestureModel<Type>;
 
   public readonly pathMatchers: PathMatcher<Type>[];
-  private predecessor?: GestureMatcher<Type>;
+  private readonly predecessor?: GestureMatcher<Type>;
 
   private readonly publishedPromise: ManagedPromise<MatchResult<Type>>; // unsure on the actual typing at the moment.
   private _result: MatchResult<Type>;
-
-  private baseSources: GestureSource<Type>[];
 
   public get promise() {
     return this.publishedPromise.corePromise;
@@ -44,8 +42,6 @@ export class GestureMatcher<Type> {
     const predecessor = sourceObj instanceof GestureSource<Type> ? null : sourceObj;
     const source = predecessor ? null : (sourceObj as GestureSource<Type>);
 
-    this.baseSources = predecessor?.baseSources || [source];
-
     this.predecessor = predecessor;
     this.publishedPromise = new ManagedPromise();
 
@@ -60,35 +56,45 @@ export class GestureMatcher<Type> {
 
     this.pathMatchers = [];
 
-    const sourceTouchpoints: GestureSource<Type>[] = source
+    const unfilteredSourceTouchpoints: GestureSource<Type>[] = source
       ? [ source ]
       : predecessor.pathMatchers.map((matcher) => matcher.source);
 
-    let offset = 0;
+    const sourceTouchpoints = unfilteredSourceTouchpoints.map((entry) => {
+      return entry.isPathComplete ? null : entry;
+    }).reduce((cleansed, entry) => {
+      return entry ? cleansed.concat(entry) : cleansed;
+    }, []);
+
+    if(model.sustainTimer && sourceTouchpoints.length > 0) {
+      // If a sustain timer is set, it's because we expect to have NO gesture-source _initially_.
+      // If we actually have one, that's cause for rejection.
+      //
+      this.finalize(false, 'path');
+      return;
+    } else if(!model.sustainTimer && sourceTouchpoints.length == 0) {
+      // If no sustain timer is set, we don't start against the specified set; that'll happen
+      // once there's an actual source to support the modeled gesture.
+      this.finalize(false, 'path');
+    }
+
     for(let touchpointIndex = 0; touchpointIndex < sourceTouchpoints.length; touchpointIndex++) {
       const srcContact = sourceTouchpoints[touchpointIndex];
-
-      // If a touchpoint's path is already complete, ignore it when modeling a new gesture.
-      if(srcContact.path.isComplete) {
-        offset++;
-        continue;
-      }
 
       if(srcContact instanceof GestureSourceSubview) {
         srcContact.disconnect();  // prevent further updates from mangling tracked path info.
       }
-      let i = touchpointIndex - offset;
 
-      const contactSpec = model.contacts[i];
+      const contactSpec = model.contacts[touchpointIndex];
       /* c8 ignore next 3 */
       if(!contactSpec) {
-        throw new Error(`No contact model for inherited path: gesture "${model.id}', entry ${i}`);
+        throw new Error(`No contact model for inherited path: gesture "${model.id}', entry ${touchpointIndex}`);
       }
       const inheritancePattern = contactSpec?.model.pathInheritance ?? 'chop';
 
       let preserveBaseItem: boolean = false;
 
-      let contact: GestureSource<Type>;
+      let contact: GestureSourceSubview<Type>;
       switch(inheritancePattern) {
         case 'reject':
           this.finalize(false, 'path');
@@ -220,6 +226,30 @@ export class GestureMatcher<Type> {
     return bestMatcher.source;
   }
 
+  public get baseItem(): Type {
+    return this.comparisonStandard.baseItem;
+  }
+
+  public get currentItem(): Type {
+    return this.comparisonStandard.currentSample.item;
+  }
+
+  /*
+   * Gets the GestureSource identifier corresponding to the gesture being matched
+   * and all predecessor stages.  All are relevant for resolving gesture-selection;
+   * predecessor IDs become relevant for gesture stages that start without an
+   * active GestureSource.  (One that's not already finished its path)
+   *
+   * In theory, just one predecessor previous should be fine, rather than
+   * 'all'... but that'd take a little extra work.
+   */
+  public get allSourceIds(): string[] {
+    const currentIds = this.pathMatchers.map((entry) => entry.source.identifier);
+    const predecessorIds = this.predecessor ? this.predecessor.allSourceIds : [];
+
+    return currentIds.concat(predecessorIds);
+  }
+
   mayAddContact(): boolean {
     return this.pathMatchers.length < this.model.contacts.length;
   }
@@ -263,11 +293,10 @@ export class GestureMatcher<Type> {
       }
     }
 
-    this.baseSources.push(simpleSource);
     this.addContactInternal(simpleSource.constructSubview(false, true));
   }
 
-  private addContactInternal(simpleSource: GestureSource<Type>) {
+  private addContactInternal(simpleSource: GestureSourceSubview<Type>) {
     const existingContacts = this.pathMatchers.length;
 
     // The number of already-active contacts tracked for this gesture
