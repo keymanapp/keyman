@@ -7,31 +7,34 @@ export interface InputSample<Type, StateToken = any> {
    * Represents the x-coordinate of the input sample
    * in 'client' / viewport coordinates.
    */
-  clientX?: number;
+  readonly clientX?: number;
 
   /**
    * Represents the x-coordinate of the input sample in
    * coordinates relative to the recognizer's `targetRoot`.
    */
-  targetX: number;
+  readonly targetX: number;
 
   /**
    * Represents the y-coordinate of the input sample
    * in 'client' / viewport coordinates.
    */
-  clientY?: number;
+  readonly clientY?: number;
 
   /**
    * Represents the y-coordinate of the input sample in
    * coordinates relative to the recognizer's `targetRoot`.
    */
-  targetY: number;
+  readonly targetY: number;
 
   /**
    * Represents the timestamp at which the input was observed
    * (in ms)
    */
-  t: number;
+  readonly t: number;
+
+  // The following two are intentionally _not_ readonly; `stateToken`, in particular,
+  // may need modification by specific gesture-model implementations.
 
   /**
    * The UI/UX 'item' underneath the touchpoint for this sample.

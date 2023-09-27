@@ -1,12 +1,13 @@
 import EventEmitter from "eventemitter3";
 import { InputSample } from "./inputSample.js";
 import { CumulativePathStats } from "./cumulativePathStats.js";
+import { Mutable } from "../mutable.js";
 
 /**
  * Documents the expected typing of serialized versions of the `GesturePath` class.
  */
 export type SerializedGesturePath<Type, StateToken> = {
-  coords: InputSample<Type, StateToken>[]; // ensures type match with public class property.
+  coords: Mutable<InputSample<Type, StateToken>>[]; // ensures type match with public class property.
   wasCancelled?: boolean;
 }
 
