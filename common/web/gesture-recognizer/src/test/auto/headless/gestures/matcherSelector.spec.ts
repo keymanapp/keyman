@@ -7,6 +7,7 @@ import { assertingPromiseStatus as promiseStatus } from '../../../resources/asse
 
 import { simulateMultiSourceMatcherInput, simulateSelectorInput } from "../../../resources/simulateMultiSourceInput.js";
 
+import { timedPromise } from '@keymanapp/web-utils';
 import { GestureSource, gestures } from '@keymanapp/gesture-recognizer';
 
 import { TouchpathTurtle } from '#tools';
@@ -97,6 +98,12 @@ describe("MatcherSelector", function () {
 
         let completion = executor();
         const selector = await selectorPromise;
+
+        await timedPromise(200);
+        // Multitap should already be eliminated from consideration.
+        assert.sameOrderedMembers(selector.potentialMatchersForSource(sources[0]).map((matcher) => matcher.model.id), ['simple-tap', 'longpress']);
+        assert.sameOrderedMembers(sources[0].potentialModelMatchIds, ['simple-tap', 'longpress']);
+
         await Promise.race([completion, selectionPromises[0]]);
 
         assert.equal(await promiseStatus(selectionPromises[0]), PromiseStatuses.PROMISE_RESOLVED);
@@ -249,6 +256,11 @@ describe("MatcherSelector", function () {
           }
         });
 
+        await timedPromise(200); // after the longpress-reset
+        // Multitap should already be eliminated from consideration.
+        assert.sameOrderedMembers(selector.potentialMatchersForSource(sources[0]).map((matcher) => matcher.model.id), ['simple-tap', 'longpress']);
+        assert.sameOrderedMembers(sources[0].potentialModelMatchIds, ['simple-tap', 'longpress']);
+
         await Promise.race([completion, selectionPromises[0]]);
 
         assert.equal(await promiseStatus(selectionPromises[0]), PromiseStatuses.PROMISE_RESOLVED);
@@ -292,6 +304,10 @@ describe("MatcherSelector", function () {
 
         let completion = executor();
         const selector = await selectorPromise;
+
+        // Multitap should already be eliminated from consideration... even at timestamp 0.
+        assert.sameOrderedMembers(selector.potentialMatchersForSource(sources[0]).map((matcher) => matcher.model.id), ['simple-tap', 'longpress']);
+        assert.sameOrderedMembers(sources[0].potentialModelMatchIds, ['simple-tap', 'longpress']);
         await Promise.race([completion, selectionPromises[0]]);
 
         // So, the terminate signal didn't complete the selection?
@@ -542,6 +558,15 @@ describe("MatcherSelector", function () {
 
         let completion = executor();
         const selector = await selectorPromise;
+
+        await timedPromise(350); // in the middle of the second tap.
+        // The first tap is done and over... but it should be associated with a potential multitap.
+        assert.sameOrderedMembers(selector.potentialMatchersForSource(sources[0]).map((matcher) => matcher.model.id), ['multitap']);
+        assert.sameOrderedMembers(sources[0].potentialModelMatchIds, ['multitap']);
+        // The second tap - that one isn't locked-in as a multitap yet.
+        assert.sameOrderedMembers(selector.potentialMatchersForSource(sources[1]).map((matcher) => matcher.model.id), ['multitap', 'simple-tap', 'longpress']);
+        assert.sameOrderedMembers(sources[1].potentialModelMatchIds, ['multitap', 'simple-tap', 'longpress']);
+
         await Promise.race([completion, selectionPromises[0]]);
 
         assert.equal(await promiseStatus(selectionPromises[0]), PromiseStatuses.PROMISE_RESOLVED);

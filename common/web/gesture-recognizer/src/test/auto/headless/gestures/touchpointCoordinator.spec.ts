@@ -27,6 +27,9 @@ import {
   SimpleTapModel,
   SubkeySelectModel
 } from './isolatedGestureSpecs.js';
+
+const LongpressDurationThreshold = LongpressModel.contacts[0].model.timer.duration;
+
 import { PROMISE_PENDING } from 'promise-status-async';
 
 const TestGestureModelDefinitions: GestureModelDefs<string> = {
@@ -130,6 +133,111 @@ describe("TouchpointCoordinator", () => {
     await runnerPromise;
 
     await sequenceAssertionPromise.corePromise;
+    assert.isEmpty(touchpointCoordinator.activeGestures);
+  });
+
+  it('integration with properties: longpress -> subkey select', async () => {
+    const turtle = new TouchpathTurtle({
+      targetX: 1,
+      targetY: 1,
+      t: 100,
+      item: 'a'
+    });
+    turtle.wait(1000, 50);
+    turtle.move(0, 10, 100, 5);
+    turtle.hoveredItem = 'à';
+    turtle.move(90, 10, 100, 5);
+    turtle.hoveredItem = 'â';
+    turtle.commitPending();
+
+    const emulationEngine = new HeadlessInputEngine();
+    const touchpointCoordinator = new TouchpointCoordinator(TestGestureModelDefinitions, [emulationEngine]);
+    const completionPromise = emulationEngine.playbackRecording({
+      inputs: [ {
+        path: {
+          coords: turtle.path,
+        },
+        isFromTouch: true
+      }],
+      config: null
+    });
+
+    const sequenceAssertion: SequenceAssertion<string> = [
+      {
+        matchedId: 'longpress',
+        item: null,
+        linkType: 'chain',
+        sources: (sources) => {
+          // Assert single-source
+          assert.equal(sources.length, 1);
+
+          // Assert wait appropriate to the longpress threshold.  Likely won't be the full 1000 ms.
+          const pathStats = sources[0].path.stats;
+          assert.isAtLeast(pathStats.duration, LongpressModel.contacts[0].model.timer.duration - 1);
+          assert.isAtMost(pathStats.rawDistance, 0.1);
+          return;
+        }
+      },
+      {
+        matchedId: 'subkey-select',
+        item: 'â',
+        linkType: 'complete',
+        sources: (sources) => {
+          const pathStats = sources[0].path.stats;
+          assert.isAtLeast(pathStats.rawDistance, 19.9);
+          assert.isAtLeast(pathStats.duration, 1200 - LongpressModel.contacts[0].model.timer.duration - 2);
+        }
+      }
+    ];
+
+    const sequencePromise = new ManagedPromise<GestureSequence<string>>();
+    const sequenceAssertionPromise = new ManagedPromise<void>();
+    const sourceSpy = sinon.fake();
+    touchpointCoordinator.on('inputstart', sourceSpy);
+    touchpointCoordinator.on('recognizedgesture', async (sequence) => {
+      try {
+        sequencePromise.resolve(sequence);
+        await assertGestureSequence(sequence, completionPromise, sequenceAssertion);
+        sequenceAssertionPromise.resolve();
+      } catch(err) {
+        sequenceAssertionPromise.reject(err);
+      }
+    });
+
+    const runnerPromise = fakeClock.runToLastAsync();
+
+    // Longpress not yet complete.
+    await timedPromise(200);
+    const sources: GestureSource<string>[] = [];
+    sources.push(sourceSpy.args[0][0] as GestureSource<string>);
+
+    // Verify touchpointCoordinator properties
+    assert.sameOrderedMembers(touchpointCoordinator.activeSources, sources);
+    assert.sameOrderedMembers(touchpointCoordinator.activeGestures, []);
+
+    // Tests the live integration for `potentialModelMatchIds`, as it's established by TouchpointCoordinator.
+    assert.sameOrderedMembers(sources[0].potentialModelMatchIds, ['simple-tap', 'longpress']);
+
+    const sequence = await sequencePromise.corePromise;
+    assert.isNotEmpty(touchpointCoordinator.activeGestures);
+
+    // We should be in subkey-select mode by this point
+    await timedPromise(100 + LongpressDurationThreshold + 20);
+    assert.sameOrderedMembers(sources[0].potentialModelMatchIds, ['subkey-select']);
+    assert.sameOrderedMembers(sequence.potentialModelMatchIds, ['subkey-select']);
+
+    // Verify touchpointCoordinator properties (again)
+    assert.sameOrderedMembers(touchpointCoordinator.activeSources, sources);
+    assert.sameOrderedMembers(touchpointCoordinator.activeGestures, [sequence]);
+
+    await runnerPromise;
+
+    await sequenceAssertionPromise.corePromise;
+
+    // Verify touchpointCoordinator cleanup now that the gestures are over
+    assert.sameOrderedMembers(touchpointCoordinator.activeSources, []);
+    assert.sameOrderedMembers(touchpointCoordinator.activeGestures, []);
+
     assert.isEmpty(touchpointCoordinator.activeGestures);
   });
 
@@ -795,6 +903,140 @@ describe("TouchpointCoordinator", () => {
     await runnerPromise;
     await sequenceAssertionPromise.corePromise;
     assert.isEmpty(touchpointCoordinator.activeGestures);
+  });
+
+  it('integration with properties: basic multitap', async () => {
+    const turtle0 = new TouchpathTurtle({
+      targetX: 1,
+      targetY: 1,
+      t: 100,
+      item: 'a'
+    });
+    turtle0.wait(40, 2);
+    turtle0.commitPending();
+
+    const turtle1 = new TouchpathTurtle({
+      targetX: 1,
+      targetY: 1,
+      t: 200,
+      item: 'a'
+    });
+    turtle1.wait(40, 2);
+    turtle1.commitPending();
+
+    const emulationEngine = new HeadlessInputEngine();
+    const touchpointCoordinator = new TouchpointCoordinator(TestGestureModelDefinitions, [emulationEngine]);
+    const completionPromise = emulationEngine.playbackRecording({
+      inputs: [ {
+        path: {
+          coords: turtle0.path,
+        },
+        isFromTouch: true
+      }, {
+        path: {
+          coords: turtle1.path,
+        },
+        isFromTouch: true
+      }],
+      config: null
+    }).then(async () => {
+      // Ride out the multitap timer so we can achieve full completion.
+      let promise = timedPromise(MultitapModel.sustainTimer.duration+1).then(() => {});
+      await fakeClock.runToLastAsync();
+      await promise;
+    });
+
+    const sequenceAssertion: SequenceAssertion<string> = [
+      {
+        matchedId: 'simple-tap',
+        item: 'a',
+        linkType: 'chain',
+        sources: (sources) => {
+          assert.equal(sources.length, 1);
+          assert.isTrue(sources[0].isPathComplete);
+          return;
+        }
+      },
+      {
+        matchedId: 'multitap',
+        item: 'a',
+        linkType: 'chain',
+        sources: (sources) => {
+          // Assert single-source; the first tap is not under consideration for this stage.
+          assert.equal(sources.length, 1);
+        }
+      }
+    ];
+
+    const sequencePromise = new ManagedPromise<GestureSequence<string>>();
+    const sequenceAssertionPromise = new ManagedPromise<void>();
+    const sourceSpy = sinon.fake();
+    touchpointCoordinator.on('inputstart', sourceSpy);
+    touchpointCoordinator.on('recognizedgesture', async (sequence) => {
+      try {
+        sequencePromise.resolve(sequence);
+        await assertGestureSequence(sequence, completionPromise, sequenceAssertion);
+        sequenceAssertionPromise.resolve();
+      } catch(err) {
+        sequenceAssertionPromise.reject(err);
+      }
+    });
+
+    const runnerPromise = fakeClock.runToLastAsync();
+
+    // Middle of the first tap.
+    await timedPromise(120);
+    const sources: GestureSource<string>[] = [];
+    sources.push(sourceSpy.args[0][0]);
+
+    assert.sameOrderedMembers(touchpointCoordinator.activeSources, sources);
+    assert.sameOrderedMembers(touchpointCoordinator.activeGestures, []);
+    assert.sameOrderedMembers(sources[0].potentialModelMatchIds, ['simple-tap', 'longpress']);
+
+    const sequence = await sequencePromise.corePromise; // t = 140
+    assert.isNotEmpty(touchpointCoordinator.activeGestures);
+
+    // After the first, before the second.
+    await timedPromise(40); // t = 180
+
+    assert.sameOrderedMembers(touchpointCoordinator.activeSources, []);
+    assert.sameOrderedMembers(touchpointCoordinator.activeGestures, [sequence]);
+    assert.sameOrderedMembers(sequence.potentialModelMatchIds, ['multitap']);
+    assert.sameOrderedMembers(sources[0].potentialModelMatchIds, ['multitap']);
+
+    // During the second.
+    await timedPromise(40); // t = 220
+
+    assert.isOk(sourceSpy.args[1]);
+    assert.isArray(sourceSpy.args[1]);
+    sources.push(sourceSpy.args[1][0]);
+
+    assert.sameOrderedMembers(touchpointCoordinator.activeSources, [sources[1]]);
+    assert.sameOrderedMembers(touchpointCoordinator.activeGestures, [sequence]);
+    assert.sameOrderedMembers(sequence.potentialModelMatchIds, ['multitap']);
+    assert.sameOrderedMembers(sources[0].potentialModelMatchIds, ['multitap']);
+    assert.sameOrderedMembers(sources[1].potentialModelMatchIds, ['multitap', 'simple-tap', 'longpress']);
+
+    // After the second, before the multitap timer fully elapses.
+    await timedPromise(40); // t = 260
+
+    assert.sameOrderedMembers(touchpointCoordinator.activeSources, []);
+    assert.sameOrderedMembers(touchpointCoordinator.activeGestures, [sequence]);
+    assert.sameOrderedMembers(sequence.potentialModelMatchIds, ['multitap']);
+    assert.sameOrderedMembers(sources[0].potentialModelMatchIds, ['multitap']);
+    assert.sameOrderedMembers(sources[1].potentialModelMatchIds, ['multitap']);
+    assert.equal(sequence.stageReports.length, 2);
+
+    await runnerPromise;
+    await sequenceAssertionPromise.corePromise;
+    assert.isEmpty(touchpointCoordinator.activeGestures);
+
+    // And, ensure property cleanup happened as expected
+    assert.sameOrderedMembers(touchpointCoordinator.activeSources, []);
+    assert.sameOrderedMembers(touchpointCoordinator.activeGestures, []);
+    assert.sameOrderedMembers(sequence.potentialModelMatchIds, []);
+    assert.sameOrderedMembers(sources[0].potentialModelMatchIds, []);
+    assert.sameOrderedMembers(sources[1].potentialModelMatchIds, []);
   });
 
   it('modipress: one simple tap before its end', async () => {

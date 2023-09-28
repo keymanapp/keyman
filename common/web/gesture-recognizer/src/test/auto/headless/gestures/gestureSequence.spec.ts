@@ -4,7 +4,7 @@ import sinon from 'sinon';
 import * as PromiseStatusModule from 'promise-status-async';
 import { assertingPromiseStatus as promiseStatus } from '../../../resources/assertingPromiseStatus.js';
 
-import { GestureModelDefs, GestureSource, gestures } from '@keymanapp/gesture-recognizer';
+import { GestureModelDefs, buildGestureMatchInspector, gestures } from '@keymanapp/gesture-recognizer';
 const { matchers } = gestures;
 
 // Huh... gotta do BOTH here?  One for constructor use, the other for generic-parameter use?
@@ -92,6 +92,8 @@ async function sequenceEmulationAndAssertion(emulationEngine: HeadlessInputEngin
   // The workaround: we build Promises for would-be async handlers that can sync; we pass caught errors
   // to them so that they're reported by the automated test.
   emulationEngine.on('pointstart', (source) => {
+    source.setGestureMatchInspector(buildGestureMatchInspector(selector));
+
     try {
       // These parts should be handled by TouchpointCoordinator.  This is a simplified mocked version
       // of what lies there.
