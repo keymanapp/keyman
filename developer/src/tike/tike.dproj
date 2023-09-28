@@ -235,7 +235,6 @@
             <Form>frmNewFileDetails</Form>
         </DCCReference>
         <DCCReference Include="..\..\..\common\windows\delphi\general\StockFileNames.pas"/>
-        <DCCReference Include="compile\KeymanWebKeyCodes.pas"/>
         <DCCReference Include="..\..\..\common\windows\delphi\general\utildir.pas"/>
         <DCCReference Include="..\..\..\common\windows\delphi\tlb\ADOX_TLB.pas"/>
         <DCCReference Include="..\..\..\common\windows\delphi\tlb\ADODB_TLB.pas"/>
@@ -541,7 +540,6 @@
             <FormType>dfm</FormType>
         </DCCReference>
         <DCCReference Include="main\Keyman.Developer.System.KeymanDeveloperPaths.pas"/>
-        <DCCReference Include="..\common\delphi\compiler\Keyman.Developer.System.ValidateKpsFile.pas"/>
         <DCCReference Include="dialogs\Keyman.Developer.UI.UfrmServerOptions.pas">
             <Form>frmServerOptions</Form>
             <FormType>dfm</FormType>
