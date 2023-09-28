@@ -404,17 +404,6 @@ export class Bksp extends Tran {
   }
 };
 
-// 'vkey'
-
-export class VkeyItem {
-  vkey: number;
-  target: number;
-}
-
-export class Vkey extends Section {
-  vkeys: VkeyItem[] = [];
-};
-
 // 'disp'
 export class DispItem {
   to: StrsItem;
@@ -569,7 +558,6 @@ export interface KMXPlusData {
     tran?: Tran;
     uset?: Uset; // uset is ignored in-memory
     vars?: Vars;
-    vkey?: Vkey;
 };
 
 export class KMXPlusFile extends KMXFile {

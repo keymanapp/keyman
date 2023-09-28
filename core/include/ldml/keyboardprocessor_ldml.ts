@@ -37,8 +37,7 @@ export type SectionIdent =
   'strs' |
   'tran' |
   'uset' |
-  'vars' |
-  'vkey';
+  'vars';
 
 
 type SectionMap = {
@@ -509,19 +508,6 @@ class Constants {
   readonly tran_group_type_reorder = 1;
 
   /* ------------------------------------------------------------------
-    * vkey section
-      ------------------------------------------------------------------ */
-
-  /**
-   * Minimum length of the 'vkey' section not including variable parts
-   */
-  readonly length_vkey = 12;
-  /**
-   *  Length of each item in the 'vkey' section variable part
-   */
-  readonly length_vkey_item = 8;
-
-  /* ------------------------------------------------------------------
    * vars section
    * ------------------------------------------------------------------ */
 
@@ -585,7 +571,6 @@ class Constants {
       tran: 'tran',
       uset: 'uset',
       vars: 'vars',
-      vkey: 'vkey',
   };
 
   /**

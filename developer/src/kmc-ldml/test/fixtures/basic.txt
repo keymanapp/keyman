@@ -137,9 +137,6 @@ block(sectitems)
   76 61 72 73
   diff(sect,vars)
 
-  76 6b 65 79
-  diff(sect,vkey)
-
 block(endsect)
 
 # ----------------------------------------------------------------------------------------------------
@@ -578,14 +575,5 @@ block(vars)                         # struct COMP_KMXPLUS_VARS {
   index(strNull,strUSet,2)          #   KMXPLUS_STR value '[abc]'
   00 00 00 00                       #   KMXPLUS_ELEM elem
 block(varsEnd)
-
-block(vkey)                         # struct COMP_KMXPLUS_VKEY {
-  76 6b 65 79                       #   KMX_DWORD header.ident;   // 0000 Section name - vkey
-  sizeof(vkey)                      #   KMX_DWORD header.size;    // 0004 Section length
-  02 00 00 00                       #   KMX_DWORD count;          // 0008 Number of vkey maps
-
-  41 00 00 00    51 00 00 00        #   KMX_DWORD vkey;  KMX_DWORD target; // K_A => K_Q
-  51 00 00 00    41 00 00 00        #   KMX_DWORD vkey;  KMX_DWORD target; // K_Q => K_A
-                                    # };
 
 block(eof)   # end of file

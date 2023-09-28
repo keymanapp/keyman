@@ -27,7 +27,6 @@ export interface LKKeyboard {
   forms?: LKForms;
   displays?: LKDisplays;
   layers?: LKLayers[];
-  vkeys?: LKVkeys;
   variables?: LKVariables;
   transforms?: LKTransforms[];
 };
@@ -127,15 +126,6 @@ export interface LKLayer {
 
 export interface LKRow {
   keys?: string;
-};
-
-export interface LKVkeys {
-  vkey?: LKVkey[];
-};
-
-export interface LKVkey {
-  from?: string;
-  to?: string;
 };
 
 export interface LKVariables {

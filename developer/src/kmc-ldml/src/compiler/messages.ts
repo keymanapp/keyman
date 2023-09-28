@@ -1,6 +1,6 @@
 import { CompilerErrorNamespace, CompilerErrorSeverity, CompilerMessageSpec as m } from "@keymanapp/common-types";
 
-const SevInfo = CompilerErrorSeverity.Info | CompilerErrorNamespace.LdmlKeyboardCompiler;
+// const SevInfo = CompilerErrorSeverity.Info | CompilerErrorNamespace.LdmlKeyboardCompiler;
 const SevHint = CompilerErrorSeverity.Hint | CompilerErrorNamespace.LdmlKeyboardCompiler;
 const SevWarn = CompilerErrorSeverity.Warn | CompilerErrorNamespace.LdmlKeyboardCompiler;
 const SevError = CompilerErrorSeverity.Error | CompilerErrorNamespace.LdmlKeyboardCompiler;
@@ -35,21 +35,7 @@ export class CompilerMessages {
     m(this.HINT_LocaleIsNotMinimalAndClean, `Locale '${o.sourceLocale}' is not minimal or correctly formatted and should be '${o.locale}'`);
   static HINT_LocaleIsNotMinimalAndClean = SevHint | 0x0008;
 
-  static Hint_VkeyIsNotValid = (o:{vkey: string}) =>
-    m(this.HINT_VkeyIsNotValid, `Virtual key '${o.vkey}' is not found in the CLDR VKey Enum table.`);
-  static HINT_VkeyIsNotValid = SevHint | 0x0009;
-
-  static Hint_VkeyIsRedundant = (o:{vkey: string}) =>
-    m(this.HINT_VkeyIsRedundant, `Virtual key '${o.vkey}' is mapped to itself, which is redundant.`);
-  static HINT_VkeyIsRedundant = SevHint | 0x000A;
-
-  static Error_VkeyIsRepeated = (o:{vkey: string}) =>
-    m(this.ERROR_VkeyIsRepeated, `Virtual key '${o.vkey}' has more than one vkey entry.`);
-  static ERROR_VkeyIsRepeated = SevError | 0x000B;
-
-  static Info_MultipleVkeysHaveSameTarget = (o:{vkey: string}) =>
-    m(this.INFO_MultipleVkeysHaveSameTarget, `Target virtual key '${o.vkey}' has multiple source mappings, which may be an error.`);
-  static INFO_MultipleVkeysHaveSameTarget = SevInfo | 0x000C;
+  // gap: 0x0009 … 0x000C were for vkeys
 
   static Error_InvalidVersion = (o:{version: string}) =>
     m(this.ERROR_InvalidVersion, `Version number '${o.version}' must be a semantic version format string.`);
