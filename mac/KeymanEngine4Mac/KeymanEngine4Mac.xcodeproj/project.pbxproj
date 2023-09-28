@@ -20,8 +20,8 @@
 		299F9E2A29C46AFC0053E903 /* CoreHelperTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 299F9E2729C46AFB0053E903 /* CoreHelperTests.m */; };
 		299F9E2B29C46AFC0053E903 /* CoreWrapperTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 299F9E2829C46AFB0053E903 /* CoreWrapperTests.m */; };
 		299F9E2C29C46AFC0053E903 /* CoreTestStaticHelperMethods.m in Sources */ = {isa = PBXBuildFile; fileRef = 299F9E2929C46AFC0053E903 /* CoreTestStaticHelperMethods.m */; };
-		29B4AE042AC3F9440076A786 /* libsicuucd.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 29B4ADFE2AC3F4EF0076A786 /* libsicuucd.a */; };
-		29B4AE052AC3F96B0076A786 /* libsicui18nd.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 29B4AE002AC3F5100076A786 /* libsicui18nd.a */; };
+		29A12C292AC51D3F00327D46 /* libsicuuc.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 29A205D82AC2E446000750C0 /* libsicuuc.a */; };
+		29A12C2A2AC51D6100327D46 /* libsicui18n.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 29A205DA2AC2E46A000750C0 /* libsicui18n.a */; };
 		378568D122FCCF0A00B481B5 /* sil_ipa.kmx in Resources */ = {isa = PBXBuildFile; fileRef = 378568D022FCCF0A00B481B5 /* sil_ipa.kmx */; };
 		378568D322FCD93300B481B5 /* indexoffset1892.kmx in Resources */ = {isa = PBXBuildFile; fileRef = 378568D222FCD93300B481B5 /* indexoffset1892.kmx */; };
 		980053351B37C9B50088DDDD /* NFont.h in Headers */ = {isa = PBXBuildFile; fileRef = 980053311B37C9B50088DDDD /* NFont.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -154,8 +154,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				29B4AE042AC3F9440076A786 /* libsicuucd.a in Frameworks */,
-				29B4AE052AC3F96B0076A786 /* libsicui18nd.a in Frameworks */,
+				29A12C292AC51D3F00327D46 /* libsicuuc.a in Frameworks */,
+				29A12C2A2AC51D6100327D46 /* libsicui18n.a in Frameworks */,
 				2993C33829B1DD6900FB5E95 /* libkmnkbp0.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
