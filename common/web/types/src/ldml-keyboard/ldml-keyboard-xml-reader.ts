@@ -61,7 +61,6 @@ export class LDMLKeyboardXMLSourceFileReader {
     boxXmlArray(source?.keyboard3, 'layers');
     boxXmlArray(source?.keyboard3?.displays, 'display');
     boxXmlArray(source?.keyboard3?.names, 'name');
-    boxXmlArray(source?.keyboard3?.vkeys, 'vkey');
     boxXmlArray(source?.keyboard3?.keys, 'key');
     boxXmlArray(source?.keyboard3?.keys, 'flicks');
     boxXmlArray(source?.keyboard3?.locales, 'locale');
