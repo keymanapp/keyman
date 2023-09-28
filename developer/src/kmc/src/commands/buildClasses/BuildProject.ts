@@ -87,7 +87,7 @@ class ProjectBuilder {
 
     const buildFilename = path.relative(process.cwd(), infile).replace(/\\/g, '/');
     const callbacks = new CompilerFileCallbacks(buildFilename, options, this.callbacks);
-    callbacks.reportMessage(InfrastructureMessages.Info_BuildingFile({filename: buildFilename}));
+    callbacks.reportMessage(InfrastructureMessages.Info_BuildingFile({filename: infile, relativeFilename:buildFilename}));
 
     fs.mkdirSync(path.dirname(options.outFile), {recursive:true});
 
@@ -98,9 +98,9 @@ class ProjectBuilder {
     result = result && !callbacks.hasFailureMessage(this.options.compilerWarningsAsErrors ?? this.project.options.compilerWarningsAsErrors);
 
     if(result) {
-      callbacks.reportMessage(InfrastructureMessages.Info_FileBuiltSuccessfully({filename: buildFilename}));
+      callbacks.reportMessage(InfrastructureMessages.Info_FileBuiltSuccessfully({filename: infile, relativeFilename:buildFilename}));
     } else {
-      callbacks.reportMessage(InfrastructureMessages.Info_FileNotBuiltSuccessfully({filename: buildFilename}));
+      callbacks.reportMessage(InfrastructureMessages.Info_FileNotBuiltSuccessfully({filename: infile, relativeFilename: buildFilename}));
     }
 
     return result;
