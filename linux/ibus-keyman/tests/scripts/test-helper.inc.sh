@@ -152,7 +152,7 @@ function _setup_test_dbus_server() {
 }
 
 function _setup_display_server() {
-  local DISPLAY_SERVER ENV_FILE CLEANUP_FILE PID_FILE PID
+  local DISPLAY_SERVER ENV_FILE CLEANUP_FILE PID_FILE PID DISP_XVFB DISP_XEPHYR
   ENV_FILE=$1
   CLEANUP_FILE=$2
   PID_FILE=$3
@@ -171,7 +171,7 @@ function _setup_display_server() {
     mutter --wayland --headless --no-x11 --virtual-monitor 1024x768 &> "$TMPFILE" &
     PID=$!
     echo "kill -9 ${PID} || true" >> "$CLEANUP_FILE"
-    echo "${PID}" >> "${PID_FILE}"
+    echo "${PID} mutter" >> "${PID_FILE}"
     sleep 1s
     export WAYLAND_DISPLAY
     WAYLAND_DISPLAY=$(grep "Using Wayland display" "$TMPFILE" | cut -d"'" -f2)
@@ -179,25 +179,37 @@ function _setup_display_server() {
     echo "export WAYLAND_DISPLAY=\"$WAYLAND_DISPLAY\"" >> "$ENV_FILE"
   else
     echo "Running on X11:"
-    echo "Starting Xvfb..."
-    Xvfb -screen 0 1024x768x24 :33 &> /dev/null &
-    PID=$!
+    while true; do
+      echo "Starting Xvfb..."
+      DISP_XVFB=$RANDOM
+      Xvfb -screen 0 1024x768x24 :${DISP_XVFB} &> /dev/null &
+      PID=$!
+      sleep 1
+      if ps --no-headers --pid="$PID" > /dev/null; then
+        break
+      fi
+    done
     echo "kill -9 ${PID} || true" >> "$CLEANUP_FILE"
-    echo "${PID}" >> "${PID_FILE}"
-    sleep 1
-    echo "Starting Xephyr..."
-    DISPLAY=:33 Xephyr :32 -screen 1024x768 &> /dev/null &
-    PID=$!
+    echo "${PID} Xvfb" >> "${PID_FILE}"
+    while true; do
+      echo "Starting Xephyr..."
+      DISP_XEPHYR=$RANDOM
+      DISPLAY=:${DISP_XVFB} Xephyr :${DISP_XEPHYR} -screen 1024x768 &> /dev/null &
+      PID=$!
+      sleep 1
+      if ps --no-headers --pid="$PID" > /dev/null; then
+        break
+      fi
+    done
     echo "kill -9 ${PID} || true" >> "$CLEANUP_FILE"
-    echo "${PID}" >> "${PID_FILE}"
-    sleep 1
+    echo "${PID} Xephyr" >> "${PID_FILE}"
     echo "Starting metacity"
-    metacity --display=:32 &> /dev/null &
+    metacity --display=:${DISP_XEPHYR} &> /dev/null &
     PID=$!
     echo "kill -9 ${PID} || true" >> "$CLEANUP_FILE"
-    echo "${PID}" >> "${PID_FILE}"
+    echo "${PID} metacity" >> "${PID_FILE}"
 
-    export DISPLAY=:32
+    export DISPLAY=:${DISP_XEPHYR}
     echo "export DISPLAY=\"$DISPLAY\"" >> "$ENV_FILE"
   fi
 }
@@ -239,7 +251,7 @@ function _setup_ibus() {
   ibus-daemon ${ARG_VERBOSE-} --daemonize --panel=disable --address=unix:abstract="${TEMP_DATA_DIR}/test-ibus" ${IBUS_CONFIG-} &> /tmp/ibus-daemon.log
   PID=$(pgrep -f "${TEMP_DATA_DIR}/test-ibus")
   echo "kill -9 ${PID} || true" >> "$CLEANUP_FILE"
-  echo "${PID}" >> "${PID_FILE}"
+  echo "${PID} ibus-daemon" >> "${PID_FILE}"
   sleep 1s
 
   IBUS_ADDRESS=$(ibus address)
@@ -252,7 +264,7 @@ function _setup_ibus() {
   "${TOP_BINDIR}/src/ibus-engine-keyman" --testing ${ARG_VERBOSE-} &> /tmp/ibus-engine-keyman.log &
   PID=$!
   echo "kill -9 ${PID} || true" >> "$CLEANUP_FILE"
-  echo "${PID}" >> "${PID_FILE}"
+  echo "${PID} ibus-engine-keyman" >> "${PID_FILE}"
   sleep 1s
 }
 
@@ -312,25 +324,31 @@ function exit_on_package_build() {
 }
 
 function check_processes_running() {
-  local DISPLAY_SERVER ENV_FILE CLEANUP_FILE PID_FILE PID MISSING
+  local DISPLAY_SERVER ENV_FILE CLEANUP_FILE PID_FILE LINE PID MISSING MISSING_PROCS
   DISPLAY_SERVER=$1
   ENV_FILE=$2
   CLEANUP_FILE=$3
   PID_FILE=$4
   MISSING=false
+  MISSING_PROCS=""
 
-  while read -r PID; do
-    if [ -z "$PID" ]; then
+  while read -r LINE; do
+    if [ -z "$LINE" ]; then
       continue
-    elif ! ps --no-headers --pid="$PID" > /dev/null; then
+    fi
+    PID=$(echo "$LINE" | cut -d' ' -f1)
+    if ! ps --no-headers --pid="$PID" > /dev/null; then
       MISSING=true
+      MISSING_PROCS="${MISSING_PROCS}    $(echo "$LINE" | cut -d' ' -f2)\n"
       break
     fi
   done < "${PID_FILE}"
 
   if $MISSING; then
     echo "# Some background processes no longer running. Restarting..."
-    echo "Some background processes no longer running. Restarting..." > /tmp/debug.output
+    echo "Some background processes no longer running:" > /tmp/debug.output
+    echo "$MISSING_PROCS" >> /tmp/debug.output
+    echo "Restarting..." >> /tmp/debug.output
     cleanup "${CLEANUP_FILE}" > /dev/null 2>&1
     setup "${DISPLAY_SERVER}" "${ENV_FILE}" "${CLEANUP_FILE}" "${PID_FILE}" > /dev/null 2>&1
   fi
