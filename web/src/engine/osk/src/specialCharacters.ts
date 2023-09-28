@@ -40,11 +40,12 @@ let specialCharacters = {
   '*RTLBkSp*':        0x72,
   '*ShiftLock*':      0x73,
   '*ShiftedLock*':    0x74,
-  '*ZWNJ*':           0x79, // If this one is specified, auto-detection will kick in.
+  '*ZWNJ*':           0x75, // If this one is specified, auto-detection will kick in.
   '*ZWNJiOS*':        0x75, // The iOS version will be used by default, but the
   '*ZWNJAndroid*':    0x76, // Android platform has its own default glyph.
   // Added in Keyman 17.0.
   // Reference: https://github.com/silnrsi/font-symchar/blob/v4.000/documentation/encoding.md
+  '*ZWNJGeneric*':    0x79, // Generic version of ZWNJ (no override)
   '*Sp*':             0x80, // Space
   '*NBSp*':           0x82, // No-break Space
   '*NarNBSp*':        0x83, // Narrow No-break Space
