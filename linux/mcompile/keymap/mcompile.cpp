@@ -343,10 +343,10 @@ KMX_BOOL KMX_DoConvert(LPKMX_KEYBOARD kbd, PKMX_WCHAR kbid, KMX_BOOL bDeadkeyCon
 /*
   //_S2 this is to use a file and a vector instead of GDK-functions so debugging is easier...not needed later...
   v_dw_3D complete_Vector;
-  bool writeVec_OK =  writeVectorToFile(All_Vector);
-  bool WriteFileOK =  writeFileToVector( complete_Vector,"/Projects/keyman/keyman/linux/mcompile/keymap/VectorFile2.txt" );
+  //bool writeVec_OK =  writeVectorToFile(All_Vector);
+  bool WriteFileOK =  writeFileToVector( complete_Vector,"/Projects/keyman/keyman/linux/mcompile/keymap/VectorFile.txt" );
   bool isEqual= CompareVector_To_VectorOfFile( All_Vector, complete_Vector);
-  wprintf(L" vectors are equal: %i\n",isEqual);*/
+  wprintf(L" vectors are equal: %i\n",isEqual);    // this mmeans both file are equal and All_Vector contains correct data*/
 //test(All_Vector);
 
 //test_In_Out(All_Vector);

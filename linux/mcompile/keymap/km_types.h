@@ -119,18 +119,33 @@ typedef KMX_UCHAR* KMX_PUCHAR;
 #define VK_xDF		0xDF
 #define VK_OEM_102  0xE2  //  "<>" or "\|" on RT 102-key kbd.
 
-#define VK_NUMPAD0  0xFFB0
-#define VK_NUMPAD1  0xFFB1
-#define VK_NUMPAD2  0xFFB2
-#define VK_NUMPAD3  0xFFB3
-#define VK_NUMPAD4  0xFFB4
-#define VK_NUMPAD5  0xFFB5
-#define VK_NUMPAD6  0xFFB6
-#define VK_NUMPAD7  0xFFB7
-#define VK_NUMPAD8  0xFFB8
-#define VK_NUMPAD9  0xFFB9
-#define VK_DIVIDE   0xFFAF
-#define VK_CANCEL   0xFF1B
-#define VK_DECIMAL  0xFFAC
+/*#define VK_NUMPAD0  0x5A
+#define VK_NUMPAD1  0x57
+#define VK_NUMPAD2  0x58
+#define VK_NUMPAD3  0x59
+#define VK_NUMPAD4  0x53
+#define VK_NUMPAD5  0x54
+#define VK_NUMPAD6  0x55
+#define VK_NUMPAD7  0x4F
+#define VK_NUMPAD8  0x50
+#define VK_NUMPAD9  0x51
+#define VK_DIVIDE   0x6A
+#define VK_CANCEL   0x09
+#define VK_DECIMAL  0x5B*/
+
+
+#define VK_NUMPAD0  96
+#define VK_NUMPAD1  97
+#define VK_NUMPAD2  98
+#define VK_NUMPAD3  99
+#define VK_NUMPAD4  100
+#define VK_NUMPAD5  101
+#define VK_NUMPAD6  102
+#define VK_NUMPAD7  103
+#define VK_NUMPAD8  104
+#define VK_NUMPAD9  105
+#define VK_DIVIDE   111
+#define VK_CANCEL   3
+#define VK_DECIMAL  110
 
 #endif /*KM_TYPES*/

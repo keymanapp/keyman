@@ -25,6 +25,9 @@ TODO typeddef of KMX_HKL - van I delete all m_hkl from classes?
 TODO define what to return when SC/VK is not found in    get_VirtualKey_Other_From_SC,...
 TODO check if passed All_Vectpor as ptr/ref not as value e.g. in KMX_CharFromVK, KMX_VKUSToVKUnderlyingLayout, KMX_ImportRules
 ToDo in get_VirtualKey_Other_From_SC:  what if we use  column 3(altgr) and 4 (shift+altgr) ??
+TODO where to store VK_CANCEL.... in km_types.h or elsewhere?
+ToDo check up to 8 shiftstates ( find symbols-file with 8)
+TODO get_position_From_VirtualKey_US: take care of the other shiftstates
 TODO ...
 
 //---------------------------
