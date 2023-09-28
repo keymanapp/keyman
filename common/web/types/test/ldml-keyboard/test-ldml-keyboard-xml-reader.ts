@@ -4,6 +4,7 @@ import {assert} from 'chai';
 import { CommonTypesMessages } from '../../src/util/common-events.js';
 import { testReaderCases } from '../helpers/reader-callback-test.js';
 import { HardwareToKeymap, USVirtualKeyCodes } from '../../src/consts/virtual-key-constants.js';
+import fs from 'node:fs';
 
 function pluckKeysFromKeybag(keys: LKKey[], ids: string[]) {
   return keys.filter(({id}) => ids.indexOf(id) !== -1);
@@ -146,6 +147,16 @@ describe('ldml keyboard xml reader tests', function () {
 describe('verify scancodes', function () {
   this.slow(500); // 0.5 sec -- json schema validation takes a while
 
+  // for err, convert a vkey name to a number
+  function findVkeyName(n : Number) : string {
+    for (const [k, v] of Object.entries(USVirtualKeyCodes)) {
+      if (v === n) {
+        return k;
+      }
+    }
+    return n.toString(); // punt
+  }
+
   testReaderCases([
     {
       // We've read this above, but we're going to test for scancodes here
@@ -158,7 +169,7 @@ describe('verify scancodes', function () {
 
         assert.sameDeepMembers(ldmlFormIds, kmcFormIds, "LDML and kmc form ids");
 
-        const scanToVkey = new Map<String,Number>();
+        const scanToVkey = new Map<string,number>();
 
         source?.keyboard3?.forms?.form.forEach((form) => {
           const {id, scanCodes} = form;
@@ -167,16 +178,6 @@ describe('verify scancodes', function () {
           const ldmlRowCounts = scanCodes.map(o => o.codes.split(" ").length);
           const kmcRowCounts = km.map(o => o.length);
           assert.deepEqual(ldmlRowCounts, kmcRowCounts, `ldml/kmc counts for form ${id}`);
-
-          // for err, convert a vkey name to a number
-          function findVkeyName(n : Number) : string {
-            for (const [k, v] of Object.entries(USVirtualKeyCodes)) {
-              if (v === n) {
-                return k;
-              }
-            }
-            return n.toString(); // punt
-          }
 
           // Now, at least check to see if we're being consistent.
           const ldmlRows = scanCodes.map(o => o.codes.split(" "));
@@ -195,14 +196,26 @@ describe('verify scancodes', function () {
               }
             }
           }
-          // congratulations to us..
-          // TODO-LDML: now write out the mapping
-          
         });
 
-        // 1 time code?
+        class ScanToVkey {
+          scan: string;
+          vname: string;
+          vcode: number;
+        };
 
+        const outMap : ScanToVkey[] = [];
+        for (const [k,v] of scanToVkey.entries()) {
+          outMap.push({
+            scan: k,
+            vname: findVkeyName(v),
+            vcode: v,
+          });
+        }
 
+        const comp = new Intl.Collator(['und'], {numeric: true});
+        outMap.sort((a,b) => comp.compare(a.scan, b.scan));
+        fs.writeFileSync('build/test/ldml-keyboard/scancodes.json', JSON.stringify(outMap, null, ' '), 'utf-8');
       },
     },
   ]);
