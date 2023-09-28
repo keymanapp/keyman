@@ -338,12 +338,19 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
       // document.body is the event root for mouse interactions b/c we need to track
       // when the mouse leaves the VisualKeyboard's hierarchy.
       mouseEventRoot: document.body,
-      // touchEventRoot:  this.element, // is the default,
-      // TODO:  properly define as a class field/method?
+      // touchEventRoot:  this.element, // is the default
       itemIdentifier: (sample, target) => {
-        return null;
+        if(sample.stateToken == this.layerId) {
+          let resolvedTarget =  this.keyTarget(target);
+          if(resolvedTarget) {
+            return resolvedTarget;
+          }
+        }
+
+        return this.layerGroup.findNearestKey(sample);
       }
     };
+
     return new GestureRecognizer(modelSetForKeyboard(this.layoutKeyboard), config);
   }
 
@@ -1039,78 +1046,6 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
         }
       }
     } catch (ex) { }
-    return null;
-  }
-
-  /**
-   * Identify the key nearest to the touch point if at the end of a key row,
-   * but return null more than about 0.6 key width from the nearest key.
-   *
-   *  @param  {Event}   e   touch event
-   *  @param  {Object}  t   HTML object at touch point
-   *  @return {Object}      nearest key to touch point
-   *
-   **/
-  findNearestKey(input: InputEventCoordinate, t: HTMLElement): KeyElement {
-    if (!input) {
-      return null;
-    }
-
-    // Get touch point on screen
-    var x = input.x;
-
-    // Get key-row beneath touch point
-    while (t && t.className !== undefined && t.className.indexOf('key-row') < 0) {
-      t = <HTMLElement>t.parentNode;
-    }
-    if (!t) {
-      return null;
-    }
-
-    // Find minimum distance from any key
-    var k, k0 = 0, dx, dxMax = 24, dxMin = 100000, x1, x2;
-    for (k = 0; k < t.childNodes.length; k++) {
-      let keySquare = t.childNodes[k] as HTMLElement; // gets the .kmw-key-square containing a key
-      // Find the actual key element.
-      let childNode = keySquare.firstChild ? keySquare.firstChild as HTMLElement : keySquare;
-
-      if (childNode.className !== undefined
-        && (childNode.className.indexOf('key-hidden') >= 0
-          || childNode.className.indexOf('key-blank') >= 0)) {
-        continue;
-      }
-      x1 = keySquare.offsetLeft;
-      x2 = x1 + keySquare.offsetWidth;
-      if (x >= x1 && x <= x2) {
-        // Within the key square
-        return <KeyElement>childNode;
-      }
-      dx = x1 - x;
-      if (dx >= 0 && dx < dxMin) {
-        // To right of key
-        k0 = k; dxMin = dx;
-      }
-      dx = x - x2;
-      if (dx >= 0 && dx < dxMin) {
-        // To left of key
-        k0 = k; dxMin = dx;
-      }
-    }
-
-    if (dxMin < 100000) {
-      t = <HTMLElement>t.childNodes[k0];
-      x1 = t.offsetLeft;
-      x2 = x1 + t.offsetWidth;
-
-      // Limit extended touch area to the larger of 0.6 of key width and 24 px
-      if (t.offsetWidth > 40) {
-        dxMax = 0.6 * t.offsetWidth;
-      }
-
-      if (((x1 - x) >= 0 && (x1 - x) < dxMax) || ((x - x2) >= 0 && (x - x2) < dxMax)) {
-        return <KeyElement>t.firstChild;
-      }
-    }
     return null;
   }
 
