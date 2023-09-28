@@ -101,7 +101,7 @@
       "type": "shell",
       "label": "ibus-keyman: configure",
       "command": "./build.sh",
-      "args": ["configure", "--debug"],
+      "args": ["configure", "--debug", "--coverage"],
       "options": {
         "cwd": "${workspaceFolder}/linux/ibus-keyman",
         "env": {
@@ -121,7 +121,7 @@
       "type": "shell",
       "label": "ibus-keyman: build",
       "command": "./build.sh",
-      "args": [ "build", "--debug" ],
+      "args": [ "build", "--debug", "--coverage" ],
       "options": {
         "cwd": "${workspaceFolder}/linux/ibus-keyman/",
       },
@@ -144,7 +144,8 @@
       "args": [
         "test",
         "--debug",
-        "--no-integration"
+        "--no-integration",
+        "--coverage"
       ],
       "options": {
         "cwd": "${workspaceFolder}/linux/ibus-keyman/",
@@ -158,7 +159,8 @@
       "command": "./build.sh",
       "args": [
         "test",
-        "--debug"
+        "--debug",
+        "--coverage"
       ],
       "options": {
         "cwd": "${workspaceFolder}/linux/ibus-keyman/",
