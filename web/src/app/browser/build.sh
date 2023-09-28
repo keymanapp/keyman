@@ -41,6 +41,11 @@ builder_describe_outputs \
 
 #### Build action definitions ####
 
+do_clean() {
+  rm -rf "$KEYMAN_ROOT/web/build/$SUBPROJECT_NAME"
+  rm -rf "$KEYMAN_ROOT/web/build/publish"
+}
+
 compile_and_copy() {
   local COMPILE_FLAGS=
   if builder_has_option --ci; then
@@ -61,7 +66,7 @@ compile_and_copy() {
 }
 
 builder_run_action configure verify_npm_setup
-builder_run_action clean rm -rf "$KEYMAN_ROOT/web/build/$SUBPROJECT_NAME"
+builder_run_action clean do_clean
 builder_run_action build compile_and_copy
 
 # No headless tests for this child project.  Currently, DOM-based unit &
