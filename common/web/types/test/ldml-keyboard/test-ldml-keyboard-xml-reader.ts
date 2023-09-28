@@ -3,7 +3,7 @@ import 'mocha';
 import {assert} from 'chai';
 import { CommonTypesMessages } from '../../src/util/common-events.js';
 import { testReaderCases } from '../helpers/reader-callback-test.js';
-import { HardwareToKeymap } from '../../src/consts/virtual-key-constants.js';
+import { HardwareToKeymap, USVirtualKeyCodes } from '../../src/consts/virtual-key-constants.js';
 
 function pluckKeysFromKeybag(keys: LKKey[], ids: string[]) {
   return keys.filter(({id}) => ids.indexOf(id) !== -1);
@@ -143,7 +143,7 @@ describe('ldml keyboard xml reader tests', function () {
   ]);
 });
 
-describe.skip('verify scancodes', function () {
+describe('verify scancodes', function () {
   this.slow(500); // 0.5 sec -- json schema validation takes a while
 
   testReaderCases([
@@ -158,6 +158,8 @@ describe.skip('verify scancodes', function () {
 
         assert.sameDeepMembers(ldmlFormIds, kmcFormIds, "LDML and kmc form ids");
 
+        const scanToVkey = new Map<String,Number>();
+
         source?.keyboard3?.forms?.form.forEach((form) => {
           const {id, scanCodes} = form;
           const km = HardwareToKeymap.get(id);
@@ -165,7 +167,42 @@ describe.skip('verify scancodes', function () {
           const ldmlRowCounts = scanCodes.map(o => o.codes.split(" ").length);
           const kmcRowCounts = km.map(o => o.length);
           assert.deepEqual(ldmlRowCounts, kmcRowCounts, `ldml/kmc counts for form ${id}`);
+
+          // for err, convert a vkey name to a number
+          function findVkeyName(n : Number) : string {
+            for (const [k, v] of Object.entries(USVirtualKeyCodes)) {
+              if (v === n) {
+                return k;
+              }
+            }
+            return n.toString(); // punt
+          }
+
+          // Now, at least check to see if we're being consistent.
+          const ldmlRows = scanCodes.map(o => o.codes.split(" "));
+          for (let r=0;r<ldmlRows.length;r++) {
+            const ldmlRow = ldmlRows[r];
+            const kmcRow = km[r];
+            for (let c=0;c<ldmlRow.length;c++) {
+              const scan = ldmlRow[c];
+              const vkey = kmcRow[c];
+              if(!scanToVkey.has(scan)) {
+                scanToVkey.set(scan, vkey);
+              } else {
+                const have = findVkeyName(vkey);
+                const want = findVkeyName(scanToVkey.get(scan));
+                assert.equal(have, want, `while on ${id} ${r}:${c} - differing vkey for ${scan}`);
+              }
+            }
+          }
+          // congratulations to us..
+          // TODO-LDML: now write out the mapping
+          
         });
+
+        // 1 time code?
+
+
       },
     },
   ]);
