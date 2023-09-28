@@ -19,7 +19,7 @@ describe('keyboard-info-compiler', function () {
     const buildKeyboardInfoFilename = makePathToFixture('khmer_angkor', 'build', 'khmer_angkor.keyboard_info');
 
     const compiler = new KeyboardInfoCompiler(callbacks);
-    const data = compiler.writeMergedKeyboardInfoFile({
+    const data = compiler.writeKeyboardInfoFile({
       kmpFilename,
       sourcePath: 'release/k/khmer_angkor',
       kpsFilename,

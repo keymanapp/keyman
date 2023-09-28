@@ -1,5 +1,5 @@
 //
-// Version 1.0 of Keyman Developer Project .kpj file
+// Version 1.0 and 2.0 of Keyman Developer Project .kpj file
 //
 
 import { KeymanFileTypes } from '../main.js';
@@ -9,11 +9,17 @@ export class KeymanDeveloperProject {
   options: KeymanDeveloperProjectOptions;
   files: KeymanDeveloperProjectFile[];
   projectPath: string = '';
+  readonly projectFile: KeymanDeveloperProjectFile;
 
-  constructor(private projectFilename: string, version: KeymanDeveloperProjectVersion, private callbacks: CompilerCallbacks) {
-    this.projectPath = this.callbacks.path.dirname(this.projectFilename);
+  get projectFilename() {
+    return this._projectFilename;
+  }
+
+  constructor(private _projectFilename: string, version: KeymanDeveloperProjectVersion, private callbacks: CompilerCallbacks) {
+    this.projectPath = this.callbacks.path.dirname(this._projectFilename);
     this.options = new KeymanDeveloperProjectOptions(version);
     this.files = [];
+    this.projectFile = new KeymanDeveloperProjectFile20(_projectFilename, callbacks);
   }
   /**
    * Adds .kmn, .xml, .kps to project based on options.sourcePath
@@ -38,8 +44,6 @@ export class KeymanDeveloperProject {
         this.files.push(file);
       }
     }
-
-    this.addMetadataFile();
   }
 
   public isKeyboardProject() {
@@ -50,26 +54,32 @@ export class KeymanDeveloperProject {
     return !!this.files.find(file => file.fileType == KeymanFileTypes.Source.Model);
   }
 
-  public addMetadataFile() {
-    const ext = this.isLexicalModelProject() ? KeymanFileTypes.Source.ModelInfo : KeymanFileTypes.Source.KeyboardInfo;
-
-    if(this.files.find(file => KeymanFileTypes.filenameIs(file.filename, ext))) {
-      return;
-    }
-
-    const infoFile =
-      this.callbacks.path.join(this.projectPath,
-      this.callbacks.path.basename(this.projectFilename, KeymanFileTypes.Source.Project) + ext);
-    this.files.push(new KeymanDeveloperProjectFile20(infoFile, this.callbacks));
-  }
-
   private resolveProjectPath(p: string): string {
     // Replace placeholders in the target path
     return p.replace('$PROJECTPATH', this.projectPath);
   }
 
+  getOutputFilePath(type: KeymanFileTypes.Binary) {
+    // Roughly corresponds to Delphi TProject.GetTargetFileName
+    let p = this.options.version == '1.0' ?
+      this.options.buildPath || '$SOURCEPATH' :
+      this.options.buildPath;
+
+    // Replace placeholders in the target path
+    if(this.options.version == '1.0') {
+      // TODO: do we need to support $VERSION?
+      // $SOURCEPATH only supported in 1.0 projects
+      p = p.replace('$SOURCEPATH', this.callbacks.path.dirname(this._projectFilename));
+    }
+
+    p = this.resolveProjectPath(p);
+
+    const f = this.callbacks.path.basename(this._projectFilename, KeymanFileTypes.Source.Project) + type;
+    return this.callbacks.path.normalize(this.callbacks.path.join(p, f));
+  }
+
   resolveInputFilePath(file: KeymanDeveloperProjectFile): string {
-    return this.callbacks.resolveFilename(this.projectFilename, file.filePath);
+    return this.callbacks.resolveFilename(this._projectFilename, file.filePath);
   }
 
   resolveOutputFilePath(file: KeymanDeveloperProjectFile, sourceExt: string, targetExt: string): string {

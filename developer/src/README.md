@@ -70,31 +70,40 @@ details.
 
 ## src/kmc
 
-node-based next generation compiler, hosts kmc, kmlmi, kmlmc, kmlmp
+node-based next generation compiler, hosts kmc, (and legacy kmlmc, kmlmp)
+
+### src/kmc-analyze - Analysis tools
+
+File analysis tools for Keyman files.
+
+### src/kmc-keyboard-info - Keyboard Info Compiler
+
+Builds .keyboard_info files for use on the Keyman Cloud keyboard repository
+at https://github.com/keymanapp/keyboards. Command line access through kmc.
+
+### src/kmc-kmn - Keyboard Compiler
+
+Builds .kmx files from .kmn. Command line access through kmc.
 
 ### src/kmc-ldml - LDML Keyboard Compiler
 
-Next Generation keyboard compiler package - LDML keyboards only at present.
-Command line access through kmc.
+Next Generation keyboard compiler - LDML keyboards. Command line access through
+kmc.
 
 ### src/kmc-model - Lexical Model Compiler
 
-The Lexical Model Compiler, kmlmc, runs on nodeJS on all supported desktop
-platforms. Command line access through kmc/kmlmc.
-
-### src/kmc-package - Package Compiler
-
-The package compiler is broadly compatible with the kmcomp .kps package
-compiler. However at this stage it is only tested with lexical models, and use
-with keyboards (either .js or .kmx) is not tested or supported. It is likely in
-the future that the kmcomp .kps compiler will be deprecated in favour of this
-one. Command line access through kmc/kmlmp.
+The Lexical Model Compiler, runs on nodeJS on all supported desktop platforms.
+Command line access through kmc.
 
 ### src/kmc-model-info - Model Info Compiler
 
-Merges .model_info files for use on the Keyman Cloud lexical model repository at
-https://github.com/keymanapp/lexical-models. Command line access through
-kmc/kmlmi.
+Builds .model_info files for use on the Keyman Cloud lexical model repository at
+https://github.com/keymanapp/lexical-models. Command line access through kmc.
+
+### src/kmc-package - Package Compiler
+
+Compiles .kps packages into .kmp files. Works with both lexical model packages
+and keyboard packages. Command line access through kmc.
 
 ## src/samples
 
