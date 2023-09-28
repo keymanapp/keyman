@@ -444,6 +444,7 @@ begin
   if (FMode = fmInstallBackground) then
   begin
     /// Moving this to OnlineUpdateCheck
+    KL.Log('initprog fmInstallBackground');
     with TOnlineUpdateCheck.Create(nil, True, True) do
     try
       ProcessBackgroundInstall

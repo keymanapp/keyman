@@ -25,6 +25,40 @@ begin
   Result := code;
 end;
 
+
+function UpdateState: Boolean;
+var
+  UpdateStr : AnsiString;
+  UpdatePBytes : PByte;
+  hk: Winapi.Windows.HKEY;
+  updateData: Cardinal;
+begin
+
+  Result := False;
+  UpdateStr := 'usPostinstall';
+    //KL.Log('SetBackgroundState State Entry');
+  if RegOpenKeyEx(HKEY_LOCAL_MACHINE, PChar(SRegKey_KeymanEngine_LM), 0, KEY_ALL_ACCESS, hk) = ERROR_SUCCESS then
+  begin
+    try
+      if RegSetValueEx(hk, PChar(SRegValue_Update_State), 0, REG_SZ, PByte(UpdateStr), Length(UpdateStr) + 1) = ERROR_SUCCESS then
+      begin
+        Result := True;
+      end
+      else
+      begin
+      // error log
+      end;
+    finally
+      RegCloseKey(hk);
+    end;
+  end
+  else
+  begin
+   // couldn't open registry key
+  end;
+end;
+
+
 {
   Add permission for ALL APPLICATION PACKAGES to read %ProgramData%\Keyman folder
 }
@@ -61,6 +95,8 @@ begin
       end;
 
       Result := ERROR_SUCCESS;
+      // TODO better error checking on the registry key update
+      UpdateState;
 
     finally
       if not CloseHandle(hFile) then

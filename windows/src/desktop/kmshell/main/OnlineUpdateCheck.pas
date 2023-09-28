@@ -40,6 +40,7 @@ uses
   System.Classes,
   System.SysUtils,
   System.UITypes,
+  System.IOUtils,
   System.Types,
   Vcl.Forms,
   TypInfo,
@@ -226,6 +227,10 @@ type
     function checkUpdateSchedule : Boolean;
 
     function handleEventCheckForUpdates: Boolean;
+
+    // This is just for testing only.
+    procedure DoDownloadUpdatesBackgroundTest(SavePath: string; var Result: Boolean);
+    procedure processKickofInstall;
 
 
 
@@ -559,6 +564,41 @@ begin
   end;
 end;
 
+// Test installing only
+procedure TOnlineUpdateCheck.DoDownloadUpdatesBackgroundTest(SavePath: string; var Result: Boolean);
+var
+  i, downloadCount: Integer;
+  UpdateDir : string;
+
+begin
+   try
+    Result := False;
+
+
+    UpdateDir := 'C:\Projects\rcswag\testCache';
+    KL.Log('DoDownloadUpdatesBackgroundTest SavePath:'+ SavePath);
+    // Check if the update source directory exists
+    if DirectoryExists(UpdateDir) then
+    begin
+      // Create the update cached directory if it doesn't exist
+      if not DirectoryExists(SavePath) then
+        ForceDirectories(SavePath);
+
+      // Copy all files from the updatedir to savepath
+      TDirectory.Copy(UpdateDir, SavePath);
+      Result:= True;
+      KL.Log('All files copied successfully.');
+    end
+    else
+      KL.Log('Source directory does not exist.');
+  except
+    on E: Exception do
+      KL.Log('Error: ' + E.Message);
+  end;
+
+end;
+
+
 function TOnlineUpdateCheck.DownloadUpdatesBackground: Boolean;
 var
   i: Integer;
@@ -577,7 +617,11 @@ begin
     FParams.Packages[i].Install := True;
 
   // Download files
-  DoDownloadUpdatesBackground(DownloadBackGroundSavePath, DownloadResult);
+  // DoDownloadUpdatesBackground(DownloadBackGroundSavePath, DownloadResult);
+  // For development by passing the DoDownloadUpdatesBackground and just add
+  // the cached file on my local disk as a simulation
+   DoDownloadUpdatesBackgroundTest(DownloadBackGroundSavePath, DownloadResult);
+
   KL.Log('TOnlineUpdateCheck.DownloadUpdatesBackground: DownloadResult = '+IntToStr(Ord(DownloadResult)));
   ShowMessage('TOnlineUpdateCheck.DownloadUpdatesBackground: DownloadResult = '+IntToStr(Ord(DownloadResult)));
   Result := DownloadResult;
@@ -987,10 +1031,12 @@ begin
   with TRegistryErrorControlled.Create do  // I2890
   try
     RootKey := HKEY_LOCAL_MACHINE;
+    KL.Log('SetBackgroundState State Entry');
     if OpenKey(SRegKey_KeymanEngine_LM, True) then
     begin
         UpdateStr := GetEnumName(TypeInfo(TUpdateState), Ord(Update));
-        Write(SRegValue_Update_State, UpdateStr);
+        WriteString(SRegValue_Update_State, UpdateStr);
+        KL.Log('SetBackgroundState State is:[' + UpdateStr + ']');
     end;
     Result := True;
   //except
@@ -1017,12 +1063,15 @@ begin
   try
     RootKey := HKEY_LOCAL_MACHINE;
     if OpenKeyReadOnly(SRegKey_KeymanEngine_LM) and ValueExists(SRegValue_Update_State) then
-        try
-          UpdateState := TUpdateState(GetEnumValue(TypeInfo(TUpdateState), ReadString(SRegValue_Update_State)));
-          KL.Log('CheckBackgroundState State is:[' + ReadString(SRegValue_Update_State) + ']');
-        except
+      begin
+        UpdateState := TUpdateState(GetEnumValue(TypeInfo(TUpdateState), ReadString(SRegValue_Update_State)));
+        KL.Log('CheckBackgroundState State is:[' + ReadString(SRegValue_Update_State) + ']');
+      end
+    else
+      begin
           UpdateState := usIdle; // do we need a unknown state ?
-        end;
+          KL.Log('CheckBackgroundState State reg value not found default:[' + ReadString(SRegValue_Update_State) + ']');
+      end
     finally
       Free;
   end;
@@ -1071,6 +1120,7 @@ end;
 function TOnlineUpdateCheck.CheckUpdateSchedule: Boolean;
 begin
   try
+    Result := False;
     with TRegistryErrorControlled.Create do
     try
       if OpenKeyReadOnly(SRegKey_KeymanDesktop_CU) then
@@ -1244,6 +1294,33 @@ begin
   end;
 end;
 
+procedure TOnlineUpdateCheck.processKickofInstall;
+begin
+
+    SetBackgroundState(usPending);
+    // request install
+    if IsKeymanRunning then
+    begin
+      KL.Log('ProcessBackground Keyman Running wait till restart');
+    end
+      // can't install just set icon
+      // then handleInstall will kick it off
+    else
+     // start installing "handleInstall"
+    begin
+      SetBackgroundState(usInstalling);
+      KL.Log('ProcessBackground calling BackgroundInstall');
+      if not BackgroundInstall then
+      // TODO // if BackgroundInstall fails then exit and handle event
+      // back to pending ( 3 times ) then after that set reovery.
+      begin
+        SetBackgroundState(usPending);
+      end;
+    end;
+  // !DownloadResult
+
+end;
+
 
 procedure TOnlineUpdateCheck.ProcessBackgroundInstall;  // I2329
 var
@@ -1257,12 +1334,16 @@ var
 begin
 // check the registry value
   UpdateState := CheckBackgroundState;
-  KL.Log('ProcessBackground Install case :[ idle  ]');
+  KL.Log('ProcessBackground Install Entry');
   case UpdateState of
     usIdle:
       begin
-      // Do Nothing
       KL.Log('ProcessBackground Install case :[ idle  ]');
+      if (CheckUpdateSchedule) then
+        begin
+           SetBackgroundState(usCheck);
+           ProcessBackgroundInstall;
+        end;
       end;
     usCheck:
       begin
@@ -1274,24 +1355,32 @@ begin
           // We can transition straight to download
           DownloadResult := DownloadUpdatesBackground;
           if DownloadResult then
-            begin
-              SetBackgroundState(usPending);
-              // request install
-              if IsKeymanRunning then
-                // can't install just set icon
-                // then handleInstall will kick it off
-              else
-               // start installing "handleInstall"
-               begin
-                SetBackgroundState(usInstalling);
-                if not BackgroundInstall then
-                // TODO // if BackgroundInstall fails then exit and handle event
-                // back to pending ( 3 times ) then after that set reovery.
-                begin
-                  SetBackgroundState(usPending);
-                end;
-               end;
-            end;
+          begin
+            processKickofInstall;
+          end;
+//            begin
+//              SetBackgroundState(usPending);
+//              // request install
+//              if IsKeymanRunning then
+//                begin
+//                  KL.Log('ProcessBackground Keyman Running wait till restart');
+//                end
+//                // can't install just set icon
+//                // then handleInstall will kick it off
+//              else
+//               // start installing "handleInstall"
+//               begin
+//                SetBackgroundState(usInstalling);
+//                KL.Log('ProcessBackground calling BackgroundInstall');
+//                if not BackgroundInstall then
+//                // TODO // if BackgroundInstall fails then exit and handle event
+//                // back to pending ( 3 times ) then after that set reovery.
+//                begin
+//                  SetBackgroundState(usPending);
+//                end;
+//               end;
+
+            // !DownloadResult
         end
         else
           SetBackgroundState(usIdle);
@@ -1305,9 +1394,21 @@ begin
       CheckResult := CheckForUpdates;
         if CheckResult = oucUpdatesAvailable then
         begin
-          SetBackgroundState(usDownload);
-          // We can transition straight to download
-          DownloadUpdatesBackground;
+
+          // TODO: We should keep track of how many times we tried to download updates
+          // in the background if the count reaches 3(or defined number) log error
+          // to sentry and go back to the idle state. This will allow it to try
+          // again on the next scheduled time.
+          // TODO: to much code duplication this is why we need to use a proper
+          // state machine layout
+          DownloadResult := DownloadUpdatesBackground;
+          if DownloadResult then
+          begin
+            processKickofInstall;
+          end
+          else
+              KL.Log('ProcessBackground Install case :[download] downloadresult='+IntToStr(Ord(DownloadResult)));
+
         end
         else
           SetBackgroundState(usIdle);
@@ -1322,7 +1423,7 @@ begin
 
       SetBackgroundState(usInstalling);
       if not BackgroundInstall then
-      // TODO // if BackgroundInstall fails then exit and handle event
+      // TODO // if BackgroundInstall fails then exit and handle event, trasition back to
       // back to pending ( 3 times ) then after that set reovery.
       begin
         SetBackgroundState(usPending);
@@ -1330,7 +1431,7 @@ begin
 
       // if BackgroundInstall fails then exit and handle event
       // back to pending ( 3 times ) then after that exit
-      // IF BackgroundInstall fails then log and set to idle
+      // IF BackgroundInstall fails then log(sentry) and set to idle
       // Else is Successful we need to exit right out of kmshell as we have started
       // an the install process to execute. We leave the registry value as installing
       // one installing has finished then the registry value to be set to complete
