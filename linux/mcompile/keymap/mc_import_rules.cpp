@@ -140,17 +140,14 @@ public:
                                                         //translated into a scan code. If it is a virtual-key
                                                         //code that does not distinguish between left- and
                                                         //right-hand keys, the left-hand scan code is returned.
-                                                        //If there is no translation, the function returns 0.
-    this->m_hkl = hkl;
-    this->m_vk = KMX_virtualKey;
-    memset(this->m_rgfDeadKey,0,sizeof(this->m_rgfDeadKey));*/
+                                                        //If there is no translation, the function returns 0.*/
 
 
-/*
-    this->m_sc = MapVirtualKeyEx(virtualKey, 0, hkl);
+
+    this->m_sc = get_SC_From_VirtualKey_Other(KMX_virtualKey, All_Vector);
     this->m_hkl = hkl;
     this->m_vk = KMX_virtualKey;
-    memset(this->m_rgfDeadKey,0,sizeof(this->m_rgfDeadKey));*/
+    memset(this->m_rgfDeadKey,0,sizeof(this->m_rgfDeadKey));
   }
 
   KMX_VirtualKey(UINT scanCode, KMX_HKL hkl, v_dw_3D All_Vector) {
@@ -172,8 +169,8 @@ public:
   UINT SC() {
     return this->m_sc;
   }
-/*
-  std::wstring GetShiftState(ShiftState shiftState, bool capsLock) {
+
+  std::wstring KMX_GetShiftState(ShiftState shiftState, bool capsLock) {
     return this->m_rgss[(UINT)shiftState][(capsLock ? 1 : 0)];
   }
   
@@ -182,6 +179,7 @@ public:
     this->m_rgss[(UINT)shiftState][(capsLock ? 1 : 0)] = value;
   }
 
+/*
   bool IsSGCAPS() {
     std::wstring stBase = this->GetShiftState(Base, false);
     std::wstring stShift = this->GetShiftState(Shft, false);
@@ -477,7 +475,7 @@ public:
     return deadKey;
   }
 
-  void ClearKeyboardBuffer(UINT vk, UINT sc, HKL hkl) {
+  void KMX_ClearKeyboardBuffer(UINT vk, UINT sc, HKL hkl) {
     WCHAR sb[16];
     int rc = 0;
     do {
@@ -502,10 +500,11 @@ int GetMaxDeadkeyIndex(WCHAR *p) {
 bool  write_rgKey_ToFile(std::vector<KMX_VirtualKey*> rgKey ){
   std::string RGKey_FileName="/Projects/keyman/keyman/linux/mcompile/keymap/rgKey_lin.txt";
 
-  std::ofstream TxTFile(RGKey_FileName);
+  std::wofstream TxTFile(RGKey_FileName);
   for ( int i=0; i< rgKey.size();i++) {
     if(rgKey[i] != NULL) {
-        TxTFile << rgKey[i]->VK() << "-" << rgKey[i]->SC()<< "-";
+        TxTFile << rgKey[i]->VK() << "-" << rgKey[i]->SC()<< " -> ( " << rgKey[i]->KMX_GetShiftState(Base, 0) << "-" << rgKey[i]->KMX_GetShiftState(Base, 1) << " )"
+        << " *-* ( " << rgKey[i]->KMX_GetShiftState(Shft, 0) << "-" << rgKey[i]->KMX_GetShiftState(Shft, 1) << " )";
         TxTFile << "\n";
     }
   }
@@ -513,6 +512,28 @@ bool  write_rgKey_ToFile(std::vector<KMX_VirtualKey*> rgKey ){
   return true;
 }
 
+
+// _S2 where to put this??
+std::wstring  get_VirtualKey_US_from_iKey(KMX_DWORD iKey, ShiftState &ss, int &caps, v_dw_3D &All_Vector) {
+
+  int icaps;
+  KMX_DWORD SC_ = get_position_From_VirtualKey_US(iKey, All_Vector);
+
+  if (ss >9)
+    return L"";
+
+  if( ss < All_Vector[0][SC_].size()-1) {
+
+    if ( ss % 2 == 0)
+      icaps = ss+2-caps;
+
+    if ( ss % 2 == 1)
+      icaps = ss+caps;
+
+    return std::wstring(1, (int) All_Vector[0][SC_][icaps]);
+  }
+  return L"";
+}
 
 bool KMX_ImportRules(KMX_WCHAR *kbid, LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector,std::vector<KMX_DeadkeyMapping> *FDeadkeys, KMX_BOOL bDeadkeyConversion) {   // I4353   // I4552
  wprintf(L"\n ##### KMX_ImportRules of mc_import_rules started #####\n");
@@ -560,18 +581,19 @@ bool KMX_ImportRules(KMX_WCHAR *kbid, LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector,std
     }
   }
 
-/*
-  // _S2 do we need NUMPAD now or later?
+ /* // where in rgkey do I store Numpad???
+  // _S2 do we need NUMPAD now or later? If so we need to add Numpad values to All_Vector ( which has only values a-z)
 // _S2 use KMX_VirtualKey !!
   // _S2 do I need NUMPAD + SPECIAL_SHIFT for first draft ??
   // add the special keys that do not get added from the code above
   for(UINT ke = VK_NUMPAD0; ke <= VK_NUMPAD9; ke++) {
       rgKey[ke] = new KMX_VirtualKey(hkl, ke, All_Vector);
   }
+
   rgKey[VK_DIVIDE] = new KMX_VirtualKey(hkl, VK_DIVIDE, All_Vector);
   rgKey[VK_CANCEL] = new KMX_VirtualKey(hkl, VK_CANCEL, All_Vector);
   rgKey[VK_DECIMAL] = new KMX_VirtualKey(hkl, VK_DECIMAL, All_Vector);
-  */
+ */
 
 /*  // _S2 do we need special shift state now or later?
   // See if there is a special shift state added
@@ -598,99 +620,63 @@ bool KMX_ImportRules(KMX_WCHAR *kbid, LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector,std
   }
 */
 
-
+  // _S2 skip shiftstates 4, 5, 8, 9
   for(UINT iKey = 0; iKey < rgKey.size(); iKey++) {
-      if(rgKey[iKey] != NULL) {
-          WCHAR sbBuffer[256];     // Scratchpad we use many places
+    if(rgKey[iKey] != NULL) {
+      WCHAR sbBuffer[256];     // Scratchpad we use many places
 
-          for(ShiftState ss = Base; ss <= loader.MaxShiftState(); ss = (ShiftState)((int)ss + 1)) {
-              if(ss == Menu || ss == ShftMenu) {
-                  // Alt and Shift+Alt don't work, so skip them
-                  continue;
-              }
+      for(ShiftState ss = Base; ss <= loader.MaxShiftState(); ss = (ShiftState)((int)ss + 1)) {
+        if(ss == Menu || ss == ShftMenu) {
+          // Alt and Shift+Alt don't work, so skip them
+          continue;
+        }
 
-// _S2 can go later: check if all correct
-write_rgKey_ToFile(rgKey)  ;
-v_dw_2D  V_lin,V_win,V_map;
-write_RGKEY_FileToVector(V_win, "rgKey_win_first.txt");
-write_RGKEY_FileToVector(V_lin, "rgKey_lin.txt");
-//write_RGKEY_FileToVector(V_map, "map.txt");
-CompareVector_To_VectorOfFile_RGKEY( V_win, V_lin,V_map);
+        for(int caps = 0; caps <= 1; caps++) {
 
-int STOP = 0;
-/*
-              for(int caps = 0; caps <= 1; caps++) {
-                  loader.ClearKeyboardBuffer(VK_DECIMAL, rgKey[VK_DECIMAL]->SC(), hkl);
-                  ////FillKeyState(lpKeyState, ss, (caps != 0)); //http://blogs.msdn.com/michkap/archive/2006/04/18/578557.aspx
-                  loader.FillKeyState(lpKeyState, ss, (caps == 0));
-                  //sbBuffer = new StringBuilder(10);
+          //_S2 get char  - do I need rc ?? ( was rc = ToUnicodeEx...)
+          std::wstring char_for_input = get_VirtualKey_US_from_iKey(iKey, ss, caps, All_Vector);
+
+          //do I need that ??
+          //if rc >0: it got 1 or more char AND buffer is empty ( nothing inside ) {
+            if(char_for_input == L"") {
+                  rgKey[iKey]->SetShiftState(ss, L"", false, (caps == 0));
+            }
+
+            //else   // if rc ==1 : it got 1  char && something    {
+            if( (ss == Ctrl || ss == ShftCtrl) /*&& something? */) {
+                continue;
+            }
+
+            // fill m_rgss and m_rgfDeadkey ( m_rgfDeadkey will be done later)
+            rgKey[iKey]->SetShiftState(ss, char_for_input, false, (caps == 0));
+          //}  // from rc==1
+        // } // from rc > 0
 
 
-                  // _S2 do I need ToUnicodeEx() or can I use my Vector??
-                  int rc = ToUnicodeEx(rgKey[iKey]->VK(), rgKey[iKey]->SC(), lpKeyState, sbBuffer, _countof(sbBuffer), 0, hkl);
-                  if(rc > 0) {
-                      if(*sbBuffer == 0) {
-                          // Someone defined NULL on the keyboard; let's coddle them
-                          ////rgKey[iKey].SetShiftState(ss, "\u0000", false, (caps != 0));
-                          rgKey[iKey]->SetShiftState(ss, L"", false, (caps == 0));
-                      }
-                      else {
-                          if((rc == 1) &&
-                              (ss == Ctrl || ss == ShftCtrl) &&
-                              (rgKey[iKey]->VK() == ((UINT)sbBuffer[0] + 0x40))) {
-                              // ToUnicodeEx has an internal knowledge about those 
-                              // VK_A ~ VK_Z keys to produce the control characters, 
-                              // when the conversion rule is not provided in keyboard 
-                              // layout files
-                              continue;
-                          }
-                          sbBuffer[rc] = 0;
-                          //rgKey[iKey].SetShiftState(ss, sbBuffer.ToString().Substring(0, rc), false, (caps != 0));
-                          rgKey[iKey]->SetShiftState(ss, sbBuffer, false, (caps == 0));
-
-                      }
-                  }
-                  else if(rc < 0) {
-                      //rgKey[iKey].SetShiftState(ss, sbBuffer.ToString().Substring(0, 1), true, (caps != 0));
-                      sbBuffer[2] = 0;
-                      rgKey[iKey]->SetShiftState(ss, sbBuffer, true, (caps == 0));
-
-                      // It's a dead key; let's flush out whats stored in the keyboard state.
-                      loader.ClearKeyboardBuffer(VK_DECIMAL, rgKey[VK_DECIMAL]->SC(), hkl);
-                      DeadKey *dk = NULL;
-                      for(UINT iDead = 0; iDead < alDead.size(); iDead++) {
-                          dk = alDead[iDead];
-                          if(dk->DeadCharacter() == rgKey[iKey]->GetShiftState(ss, caps == 0)[0]) {
-                              break;
-                          }
-                          dk = NULL;
-                      }
-                      if(dk == NULL) {
-                        alDead.push_back(loader.ProcessDeadKey(iKey, ss, lpKeyState, rgKey, caps == 0, hkl));
-                      }
-                  }
-              }
-*/
-          }
+        // _S2 handle deadkeys later
+        // if rc <0:  it got a deadkey   {
+            // fill m_rgss and m_rgfDeadkey
+            //SET_SHIFTSTATES( deadkey)   //sbuffer is value out of ToUnicodeEx / AllVector
+            // do more stuff for deadkeys...
+        // } from rc<0
+        }
       }
-  }
-/*
-  // _S2 do I need this for Linux??
-  for(int i = 0; i < cKeyboards; i++) {
-    if(hkl == rghkl[i]) {
-      hkl = NULL;
-      break;
     }
   }
 
-  // _S2 do I need this for Linux??
-  if(hkl != NULL) {
-    UnloadKeyboardLayout(hkl);
-  }
 
-  // _S2 do I need that for Linux??
-  delete[] rghkl;
-*/
+
+  // _S2 can go later: check if all correct
+  /*write_rgKey_ToFile(rgKey)  ;
+  v_dw_2D  V_lin,V_win,V_map;
+  write_RGKEY_FileToVector(V_lin, "rgKey_lin.txt");
+  write_RGKEY_FileToVector(V_win, "rgKey_Win.txt");
+  write_RGKEY_FileToVector(V_map, "map.txt");
+  CompareVector_To_VectorOfFile_RGKEY( V_win, V_lin,V_map);*/
+
+  int STOP = 0;
+
+
   //-------------------------------------------------------------
   // Now that we've collected the key data, we need to
   // translate it to kmx and append to the existing keyboard

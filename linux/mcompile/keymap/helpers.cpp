@@ -217,6 +217,8 @@ bool CompareVector_To_VectorOfFile_RGKEY(v_dw_2D Win_Vector,v_dw_2D Lin_Vector, 
     }
     */
   }
+   wprintf(L" No Difference found in A-Z  :-)   SC have an offset of 8 ");
+
   return true;
   }
 
@@ -264,7 +266,7 @@ for ( int i=0; i< Lin_Vector.size();i++) {
 bool write_RGKEY_FileToVector(v_dw_2D& shift_states, const char* infile) {
   FILE *fp;
   char str[600];
-  std::vector<char> delim{' ', '[', ']', '}',  ';', '\t', '\n'};
+  std::vector<char> delim{' ', '[', ']', '}','*',  ')','(','>', '\t', '\n'};
   v_str_1D complete_List;
   v_dw_1D tokens_dw;
   int k = -1;
@@ -329,7 +331,7 @@ bool test_In_Out(v_dw_3D All_Vector){
     wprintf(L"\n");
   }
 
-  wprintf(L"*****************************************\n");
+  wprintf(L"-------------**\n");
   for ( int i=0; i<61;i++)
   {
     KMX_DWORD VK_Other= get_VirtualKey_Other_From_SC(i,All_Vector);
@@ -346,7 +348,7 @@ bool test_In_Out(v_dw_3D All_Vector){
     }
   }
 
-  wprintf(L" 3 *****************************************\n");
+  wprintf(L" 3 -------------**\n");
   for ( int i=0; i<61;i++)
   {
     KMX_DWORD VK_Other= get_VirtualKey_US_From_SC(i,All_Vector);
