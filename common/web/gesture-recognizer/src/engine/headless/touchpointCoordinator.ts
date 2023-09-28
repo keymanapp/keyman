@@ -5,13 +5,13 @@ import { MatcherSelector } from "./gestures/matchers/matcherSelector.js";
 import { GestureSequence } from "./gestures/matchers/gestureSequence.js";
 import { GestureModelDefs, getGestureModelSet } from "./gestures/specs/gestureModelDefs.js";
 
-interface EventMap<HoveredItemType> {
+interface EventMap<HoveredItemType, StateToken> {
   /**
    * Indicates that a new potential gesture has begun.
    * @param input
    * @returns
    */
-  'inputstart': (input: GestureSource<HoveredItemType>) => void;
+  'inputstart': (input: GestureSource<HoveredItemType, StateToken>) => void;
 
   'recognizedgesture': (sequence: GestureSequence<HoveredItemType>) => void;
 }
@@ -24,7 +24,7 @@ interface EventMap<HoveredItemType> {
  * Of particular note: when a gesture involves multiple touchpoints - like a multitap - this class
  * is responsible for linking related touchpoints together for the detection of that gesture.
  */
-export class TouchpointCoordinator<HoveredItemType, StateToken=any> extends EventEmitter<EventMap<HoveredItemType>> {
+export class TouchpointCoordinator<HoveredItemType, StateToken=any> extends EventEmitter<EventMap<HoveredItemType, StateToken>> {
   private inputEngines: InputEngineBase<HoveredItemType, StateToken>[];
   private selectorStack: MatcherSelector<HoveredItemType>[] = [new MatcherSelector()];
 
