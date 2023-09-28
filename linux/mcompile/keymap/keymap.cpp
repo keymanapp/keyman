@@ -203,6 +203,65 @@ int split_US_To_3D_Vector(v_dw_3D &all_US,v_str_1D completeList) {
   }
   return 0;
 }
+/*
+int replace_PosKey_with_Keycode(std::string  in) {
+  int out = returnIfCharInvalid;
+  if      ( in == "key<TLDE>")    out = 49;   // TOASK correct ???
+  else if ( in == "key<AE01>")    out = 10;
+  else if ( in == "key<AE02>")    out = 11;
+  else if ( in == "key<AE03>")    out = 12;
+  else if ( in == "key<AE04>")    out = 13;
+  else if ( in == "key<AE05>")    out = 14;
+  else if ( in == "key<AE06>")    out = 15;
+  else if ( in == "key<AE07>")    out = 16;
+  else if ( in == "key<AE08>")    out = 17;
+  else if ( in == "key<AE09>")    out = 18;
+  else if ( in == "key<AE10>")    out = 19;
+  else if ( in == "key<AE11>")    out = 20;
+  else if ( in == "key<AE12>")    out = 21;
+
+  else if ( in == "key<AD01>")    out = 16;
+  else if ( in == "key<AD02>")    out = 17;
+  else if ( in == "key<AD03>")    out = 18;
+  else if ( in == "key<AD04>")    out = 19;
+  else if ( in == "key<AD05>")    out = 20;
+  else if ( in == "key<AD06>")    out = 21;
+  else if ( in == "key<AD07>")    out = 22;
+  else if ( in == "key<AD08>")    out = 23;
+  else if ( in == "key<AD09>")    out = 24;
+  else if ( in == "key<AD10>")    out = 25;
+  else if ( in == "key<AD11>")    out = 26;
+  else if ( in == "key<AD12>")    out = 27;
+
+  else if ( in == "key<AC01>")    out = 30;
+  else if ( in == "key<AC02>")    out = 31;
+  else if ( in == "key<AC03>")    out = 32;
+  else if ( in == "key<AC04>")    out = 33;
+  else if ( in == "key<AC05>")    out = 34;
+  else if ( in == "key<AC06>")    out = 35;
+  else if ( in == "key<AC07>")    out = 36;
+  else if ( in == "key<AC08>")    out = 37;
+  else if ( in == "key<AC09>")    out = 38;
+  else if ( in == "key<AC10>")    out = 39;
+  else if ( in == "key<AC11>")    out = 40;
+  else if ( in == "key<AC12>")    out = 41;
+
+  else if ( in == "key<AB01>")    out = 44;
+  else if ( in == "key<AB02>")    out = 45;
+  else if ( in == "key<AB03>")    out = 46;
+  else if ( in == "key<AB04>")    out = 47;
+  else if ( in == "key<AB05>")    out = 48;
+  else if ( in == "key<AB06>")    out = 49;
+  else if ( in == "key<AB07>")    out = 50;
+  else if ( in == "key<AB08>")    out = 51;
+  else if ( in == "key<AB09>")    out = 52;
+  else if ( in == "key<AB10>")    out = 53;
+  else if ( in == "key<BKSL>")    out = 54;
+  else if ( in == "key<LSGT>")    out = 55;
+
+  return out;
+}
+*/
 
 int replace_PosKey_with_Keycode(std::string  in) {
   int out = returnIfCharInvalid;
@@ -479,9 +538,22 @@ KMX_DWORD get_SC_From_VirtualKey_Other(KMX_DWORD VK_Other , v_dw_3D &All_Vector)
 KMX_DWORD get_SC_From_VirtualKey_US(KMX_DWORD VK_US , v_dw_3D &All_Vector){
   // find correct row of char in US
   for( int i=0; i< (int)All_Vector[0].size()-1;i++) {
-    if  ( All_Vector[0][i][1] == VK_US ) {
+    if  ( All_Vector[0][i][2] == VK_US ) {
       wprintf(L" SC= %i   .. i= %i  .. %i:\t\t %i (%c) : %i (%c)  --- \n",VK_US , i,  All_Vector[0][i][0] , All_Vector[0][i][1] ,All_Vector[0][i][1] , All_Vector[0][i][2] , All_Vector[0][i][2]   ); 
       return All_Vector[0][i][0] ;
+    }
+  }
+  return 0;    //_S2 what do I return if not found??
+}
+
+
+// return the Scancode of for given VirtualKey of Other US
+KMX_DWORD get_position_From_VirtualKey_US(KMX_DWORD VK_US , v_dw_3D &All_Vector){
+  // find correct row of char in US
+  for( int i=0; i< (int)All_Vector[0].size()-1;i++) {
+    if  ( All_Vector[0][i][2] == VK_US ) {
+      wprintf(L" SC= %i   .. i= %i  .. %i:\t\t %i (%c) : %i (%c)  --- \n",VK_US , i,  All_Vector[0][i][0] , All_Vector[0][i][1] ,All_Vector[0][i][1] , All_Vector[0][i][2] , All_Vector[0][i][2]   ); 
+      return i;
     }
   }
   return 0;    //_S2 what do I return if not found??
