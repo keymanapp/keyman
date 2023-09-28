@@ -1,0 +1,81 @@
+/* Title for the bookmarks menu within the embedded browser */
+"browser-bookmarks-add-title" = "စွံ သမ္တီမုက်လိက်";
+
+/* Title for the bookmarks menu within the embedded browser */
+"browser-bookmarks-none" = "မုက်လိက်သမ္တီလဝ်ဟွံမွဲ";
+
+/* Title for the bookmarks menu within the embedded browser */
+"browser-bookmarks-title" = "သမ္တီမုက်လိက်";
+
+/* Used to confirm a user's desire to install a package */
+"confirm-install" = "စုတ်";
+
+/* The label for the toggle to stop automatically showing the "Get Started" tutorial popup. */
+"disable-get-started" = "လ္ပထ္ၜးမွဲလန်ပၠန်ညိ";
+
+/* Indicates an error opening a web page requested by a user */
+"error-opening-page" = "ပံက်မုက်လိက်ဟွံဂွံ";
+
+/* Long-form used when installing a font in order to display a language properly. */
+"font-install-description" = "%@ ဂွံထ္ၜးပ္ဍဲကဵု ကပေါတ်စက်စုၚ်ၚ်မာန်ဂှ် ရုဲစှ်ကဵု စုတ် ညိ";
+
+/* The name of the iOS Settings menu option for keyboards */
+"ios-settings-keyboards" = "ကဳဗုဒ်ဂမၠိုၚ်";
+
+/* The name of the iOS Settings menu option for giving the keyboard full access.  (The menu entry
+underneath the app's name within the app-specific keyboard menu.) */
+"ios-settings-allow-full-access" = "ကဵုအခေါၚ်ပေၚ်ၚ်";
+
+/* Short-form used when installing a font in order to display a language properly. */
+"language-for-font" = "မလိက် %@";
+
+/* Used for 'add' options within menus */
+"menu-add" = "စုတ်";
+
+/* Used to indicate a sequence of menu options that a user needs to copy.  May be chained.  Example:  "Keyboards (1) > Enable Keyman (2)" */
+"menu-breadcrumbing" = "%1$@ > %2$@";
+
+/* Used to exit a menu without choosing an option */
+"menu-cancel" = "တးပါဲ";
+
+/* Menu option that erases all previously-typed text. */
+"menu-clear-text" = "ပလီုလိက်";
+
+/* Menu option that displays a list designed to help users start using the app */
+"menu-get-started" = "စတရဴစိုအ်";
+
+/* Menu option that displays help for the app */
+"menu-help" = "တၚ်နၚ်";
+
+/* Menu option that displays the main screen's drop-down menu */
+"menu-more" = "ဂၠိုၚ်နူဏံ";
+
+/* Menu option used to edit keyboard and dictionary settings */
+"menu-settings" = "ဒၞါဲပလေဝ်နာနာ";
+
+/* Menu option that displays the iOS Share menu */
+"menu-share" = "ပါ်ပရအ်";
+
+/* Menu option that displays an embedded web browser. */
+"menu-show-browser" = "ဗရဴသာ";
+
+/* Menu option used to control in-app font size. */
+"menu-text-size" = "အဝဲမလိက်";
+
+/* Used to describe the current font size */
+"text-size-label" = "အဝဲမလိက်: %i";
+
+/* Text to indicate that a user should set a toggle within iOS Settings to 'active'. */
+"toggle-to-enable" = "ပံက် %@";
+
+/* First option on the Get Started tutorial - Add a keyboard for your language */
+"tutorial-add-keyboard" = "စုတ်ကဳဗုဒ်သွက်ဘာသာမၞး";
+
+/* Third option on the Get Started tutorial - Displays app help. */
+"tutorial-show-help" = "တၚ်နၚ်ဂၠိုၚ်နူဏံ";
+
+/* Second option on the Get Started tutorial - Set up Keyman as system-wide keyboard */
+"tutorial-system-keyboard" = "သ္ပဒတန်ကဳမာန် နကဵု ကဳဗုဒ်သၞောတ်စက်";
+
+/* Used to display app version (as in \"Version: 1.0.2\" */
+"version-label" = "ပါယှေန်: %@";

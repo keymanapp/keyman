@@ -1,0 +1,911 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  strings.xml: Contains all localizable strings for Keyman for Windows
+  * Create a user interface translation for Keyman for Windows at https://translate.keyman.com/
+-->
+<resources>
+  <!-- Context: System -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 7.1.266.0 -->
+  <string name="S_LocaleAuthors" comment="Name(s) of people who created this translation - i.e. your name">ကဳမာန်</string>
+  <!-- Context: _Font -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="SK_UIFontName" comment="The standard font">Segoe UI</string>
+  <!-- Context: _Font -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="SK_UIFontSize" comment="The standard font size">၉</string>
+  <!-- Context: Formatted Messages -->
+  <!-- String Type: FormatString -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="SKButtonYes" comment="Yes button in message boxes">&amp;ယွံ</string>
+  <!-- Context: Formatted Messages -->
+  <!-- String Type: FormatString -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="SKButtonNo" comment="No button in message boxes">&amp;ဟအှ်ေ</string>
+  <!-- Context: General Strings -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="S_Button_OK" comment="Ok button term">အဵုခေ</string>
+  <!-- Context: General Strings -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="S_Button_Cancel" comment="Cancel button term">တးပါဲ</string>
+  <!-- Context: General Strings -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="S_Button_Close" comment="Close button term">ကၟာတ်</string>
+  <!-- Context: Formatted Messages -->
+  <!-- String Type: FormatString -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="SKButtonOK" comment="OK button in message boxes">အဵုခေ</string>
+  <!-- Context: Formatted Messages -->
+  <!-- String Type: FormatString -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="SKButtonCancel" comment="Cancel button in message boxes">တးပါဲ</string>
+  <!-- Context: Formatted Messages -->
+  <!-- String Type: FormatString -->
+  <!-- Introduced: 16.0.47 -->
+  <string name="SKAddremove" comment="Add or Remove languages button opens a dialog window">စုတ်/ပ္တိတ် ဘာသာတၟိ...</string>
+  <!-- Context: Formatted Messages -->
+  <!-- String Type: FormatString -->
+  <!-- Introduced: 8.0.330.0 -->
+  <string name="SKBalloonClickToSelectKeyboard" comment="Balloon that shows when Keyman icon is first shown during the tutorial">သ္ဂောံရုဲကောန်ဍေၚ်ဂှ် ခ္ဍံက်လ္တူ ဗီုဏံညိ</string>
+  <!-- Context: Formatted Messages -->
+  <!-- String Type: FormatString -->
+  <!-- Introduced: 8.0.330.0 -->
+  <string name="SKBalloonOSKClosed" comment="Balloon that shows when OSK is closed">Keyman ဂှ် ကၠောန်မံၚ်ကမၠောန်ဖိုဟ်ဏောၚ်။ ခ္ဍံက်လ္တူ ရုပ် ဏံတုဲ အခိၚ်လဵုဟွံရုဲ ပြံၚ်သၠာဲကေတ် ကောန်ဍေၚ်ဘာသာ မၞးမာန်ရ။</string>
+  <!-- Context: Formatted Messages -->
+  <!-- String Type: FormatString -->
+  <!-- Introduced: 14.0.234 -->
+  <string name="SKBalloonKeymanIsRunning" comment="Balloon that shows when user tries to start Keyman but it is already running">Keyman ကၠောန်မံၚ်ကမၠောန်တုဲတုဲရ။ သ္ဂောံသုၚ်စောဲ ကောန်ဍေၚ်ဘာသာမၞးဂှ် ဍဵုလ္တူ ရုပ် Keyman ညိ</string>
+  <!-- Context: Configuration Dialog -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="S_ConfigurationTitle" comment="Configuration dialog title, which includes the product name">ဗီုပြၚ်သၞောတ်စက် Keyman</string>
+  <!-- Context: Configuration Dialog -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 7.0.239.0 -->
+  <string name="S_Caption_Help" comment="Configuration dialog link to Help">အရီုဗၚ်</string>
+  <!-- Context: Configuration Dialog -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 16.0.47.0 -->
+  <string name="S_Caption_Uninstall" comment="Configuration dialog link to Uninstall Keyboard">ပလှ်</string>
+  <!-- Context: Configuration Dialog -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 16.0.47.0 -->
+  <string name="S_Caption_Enable" comment="Configuration dialog link to Enable Keyboard">ပံက်</string>
+  <!-- Context: Configuration Dialog -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 16.0.47.0 -->
+  <string name="S_Caption_Disable" comment="Configuration dialog link to Disable Keyboard">ကၟာတ်</string>
+  <!-- Context: Configuration Dialog - Tab names -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="S_Keyboards" comment="Keyboard Layouts tab name">သ္ၚိအၚ်ကဳဗုဒ်ဂမၠိုၚ်</string>
+  <!-- Context: Configuration Dialog - Tab names -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="S_Keyboards_AccessChar" comment="Direct access to the Keyboard Layouts tab using alt+">K</string>
+  <!-- Context: Configuration Dialog - Tab names -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="S_Options" comment="Options tab name">တၚ်ရုဲစှ်ဂမၠိုၚ်</string>
+  <!-- Context: Configuration Dialog - Tab names -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="S_Options_AccessChar" comment="Direct access to the Options tab using alt+">O</string>
+  <!-- Context: Configuration Dialog - Tab names -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="S_Hotkeys" comment="Hotkeys tab name">မဍဵုတၟေၚ်</string>
+  <!-- Context: Configuration Dialog - Tab names -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="S_Hotkeys_AccessChar" comment="Direct access to the Hotkeys tab using alt+">H</string>
+  <!-- Context: Configuration Dialog - Tab names -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="S_Support" comment="Support tab name">အထံက်အပၚ်</string>
+  <!-- Context: Configuration Dialog - Tab names -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="S_Support_AccessChar" comment="Direct access to the Support tab using alt+">S</string>
+  <!-- Context: Configuration Dialog - Tab names -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 9.0.493.0 -->
+  <string name="S_KeepInTouch" comment="Keep in touch tab name">ကေတ်အဆက်ညိ</string>
+  <!-- Context: Configuration Dialog - Tab names -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 9.0.492.0 -->
+  <string name="S_KeepInTouch_AccessChar" comment="Direct access to the Keep in Touch tab using alt+">T</string>
+  <!-- Context: Configuration Dialog - Captions -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="S_Caption_Filename" comment="Keyboard download window, etc. - term for filename">ယၟုဝှါၚ်:</string>
+  <!-- Context: Configuration Dialog - Captions -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="S_Caption_Version" comment="Keyboard download window, etc. - term for package version">ပါယှေန်ပက်ကေ:</string>
+  <!-- Context: Configuration Dialog - Captions -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 9.0.442.0 -->
+  <string name="S_Caption_KeyboardVersion" comment="Keyboard download window, etc. - term for keyboard version">ပါယှေန်ကဳဗုဒ်:</string>
+  <!-- Context: Configuration Dialog - Captions -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="S_Caption_Author" comment="Keyboard download window, etc. - term for author">မၞိဟ်ချူဗဒှ်:</string>
+  <!-- Context: Configuration Dialog - Captions -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="S_Caption_Website" comment="Keyboard download window, etc. - term for website">ဝက်သာ်:</string>
+  <!-- Context: Configuration Dialog - Captions -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="S_Caption_Package" comment="Keyboard download window, etc. - term for package">ပက်ကေ:</string>
+  <!-- Context: Configuration Dialog - Captions -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="S_Caption_Fonts" comment="Keyboard download window, etc. - term for fonts">မလိက်ဖွန်ဂမၠိုၚ်:</string>
+  <!-- Context: Configuration Dialog - Captions -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="S_Caption_Keyboards" comment="Keyboard download window, etc. - term for keyboard layouts">သ္ၚိအၚ်ကဳဗုဒ်ဂမၠိုၚ်:</string>
+  <!-- Context: Keyboard Install Dialog - Captions -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 14.0 -->
+  <string name="S_Caption_Keyboard" comment="Keyboard install dialog - term for a single keyboard layout">သ္ၚိအၚ်ကဳဗုဒ်:</string>
+  <!-- Context: Keyboard Install Dialog - Captions -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 14.0 -->
+  <string name="S_Caption_KeyboardLanguage" comment="Keyboard install dialog - term for caption for language selector a single keyboard layout">ဘာသာ ကဳဗုဒ်:</string>
+  <!-- Context: Configuration Dialog - Captions -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="S_Caption_Encodings" comment="Keyboard download window, etc. - term for encodings (encodings include Unicode, ANSI, Non-Unicode, etc).">အေန်ကုဒ်ဂမၠိုၚ်:</string>
+  <!-- Context: Configuration Dialog - Captions -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="S_Caption_LayoutType" comment="Keyboard download window, etc. - term for keyboard layout type (keyboard layout types include Fixed and Mnemonic)">ဂကူ သ္ၚိအၚ်:</string>
+  <!-- Context: Configuration Dialog - Captions -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="S_LayoutType_Positional" comment="Keyboard download window, etc. - term for the fixed keyboard layout type">ဗီုပြၚ်ဂမစိုတ် (Positional)</string>
+  <!-- Context: Configuration Dialog - Captions -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="S_LayoutType_Mnemonic" comment="Keyboard download window, etc. - term for the mnemonic keyboard layout type">ခံက်အၚ် သွက် သ္ၚိအၚ် ဝေန်ဒဵု (Mnemonic)</string>
+  <!-- Context: Configuration Dialog - Captions -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 9.0.420.0 -->
+  <string name="S_Caption_Languages" comment="Text preceding linked language profiles">ဘာသာဂမၠိုၚ်:</string>
+  <!-- Context: Configuration Dialog - Captions -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 9.0.420.0 -->
+  <string name="S_Languages_Uninstall" comment="Remove language profile">✕</string>
+  <!-- Context: Configuration Dialog - Captions -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 9.0.420.0 -->
+  <string name="S_Languages_Install" comment="Add language profile">ထပ်စုတ် ဘာသာ</string>
+  <!-- Context: Configuration Dialog - Captions -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 16.0.47 -->
+  <string name="S_Languages_Addremove" comment="Title for dialog to add or remove languages for keyboard layout">စုတ်/ပ္တိတ် ဘာသာ</string>
+  <!-- Context: Configuration Dialog - Captions -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="S_Caption_OnScreenKeyboard" comment="Term for the On Screen Keyboard">ကဳဗုဒ်လ္တူဗၠးမုက်:</string>
+  <!-- Context: Configuration Dialog - Captions -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 8.0.306.0 -->
+  <string name="S_OnScreenKeyboard_Custom" comment="(OSK) Custom term">ပၟိက်စိုတ်</string>
+  <!-- Context: Configuration Dialog - Captions -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="S_OnScreenKeyboard_Installed" comment="(OSK) Installed term">စုတ်လဝ်တုဲ</string>
+  <!-- Context: Configuration Dialog - Captions -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="S_OnScreenKeyboard_NotInstalled" comment="(OSK) Not installed term">ဟွံဂွံစုတ်လဝ်ဏီ</string>
+  <!-- Context: Configuration Dialog - Captions -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 8.0.306.0 -->
+  <string name="S_Caption_Documentation" comment="Term for the Documentation">ပရောပရာ</string>
+  <!-- Context: Configuration Dialog - Captions -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 8.0.306.0 -->
+  <string name="S_Documentation_Installed" comment="(Documentation) Installed term">စုတ်တုဲ</string>
+  <!-- Context: Configuration Dialog - Captions -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 8.0.306.0 -->
+  <string name="S_Documentation_NotInstalled" comment="(Documentation) Not installed term">ဟွံဂွံစုတ်လဝ်</string>
+  <!-- Context: Configuration Dialog - Captions -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="S_Caption_Message" comment="Keyboard download window, etc. - term for additional messages">လိက်ဂကန်ဖျန်:</string>
+  <!-- Context: Configuration Dialog - Captions -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="S_Caption_Copyright" comment="Keyboard download window, etc. - term for copyright">တၠမူ:</string>
+  <!-- Context: Configuration Dialog - Footer -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 14.0 -->
+  <string name="S_Footer_ChangesImmediate" comment="Short-term (14.0) message explaining why Ok and Cancel buttons are no longer present">ပရေၚ်ပြံၚ်သၠာဲ ဒှ်ဒတန် ဓဝါဲဂှ်</string>
+  <!-- Context: Configuration Dialog - Footer -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="S_Button_InstallKeyboard" comment="Keyboard Layouts - install keyboard button">စုတ်ကဳဗုဒ်...</string>
+  <!-- Context: Configuration Dialog - Footer -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="S_Button_DownloadKeyboard" comment="Keyboard Layouts - download keyboard button">ဂြဲကေတ် ကဳဗုဒ်...</string>
+  <!-- Context: Configuration Dialog - Keyboard Layouts tab -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 8.0.287.0 -->
+  <string name="S_Menu_Options" comment="KL option button submenu - keyboard options">ဒၞါဲရုဲစှ် ကဳဗုဒ် ဂမၠိုၚ်...</string>
+  <!-- Context: Configuration Dialog - Keyboard Layouts tab -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="S_Keyboards_NoKeyboardsInstalled" comment="Keyboard Layouts - notice of no keyboard layouts installed">ကဳဗုဒ်လဵုမွဲ မၞးဟွံဂွံစုတ်လဝ်ဏီ။ သ္ဂောံစုတ် သ္ၚိအၚ်ကဳဗုဒ် နူ ဝက်သာ် ကဳမာန်ဂှ် ဍဵုလ္တူ မဍဵု ဂြဲကေတ် ကဳဗုဒ်ညိ။</string>
+  <!-- Parameters: %1$s = keyboard layout name -->
+  <!-- Context: Configuration Dialog - Keyboard Layouts tab -->
+  <!-- Introduced: 7.1.251.0 -->
+  <!-- String Type: PlainText -->
+  <string name="SKUninstallRequireAdmin" comment="Keyboard Layouts - notice of ineligibility to uninstall a keyboard">မၞိဟ်က္ဆံၚ် ထိၚ်ဒဝ်ဟေၚ် ပလှ်ပ္တိတ် ကဳဗုဒ် \'%1$s\' ဏံမာန်ရ။</string>
+  <!-- Context: Configuration Dialog - Keyboard Layouts tab -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 13.0.40.0 -->
+  <string name="S_Keyboard_Share" comment="Keyboard Layouts - share selected keyboard button">ပါ်ပြအ် ကဳဗုဒ်</string>
+  <!-- Context: Configuration Dialog - Keyboard Layouts tab -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 13.0.40.0 -->
+  <string name="S_Keyboard_Share_QRCode" comment="Keyboard Layouts - caption explaining QRCode, plus prefix to link to share">ဂွံစုတ်ကဳဗုဒ်ဏံ ပ္ဍဲစက်တၞဟ်ဟ်ဂှ် သဂေန် ကုက်ဏံညိ </string>
+  <!-- Context: Configuration Dialog - Keyboard Layouts tab -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 13.0.40.0 -->
+  <string name="S_Keyboard_Share_Link" comment="Keyboard Layouts - text for link to share">ပါ်ပြအ်လ္တူ လပှ်ကျာ</string>
+  <!-- Context: Configuration Dialog - Keyboard Layouts tab -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 13.0.40.0 -->
+  <string name="S_Keyboard_Share_LinkSuffix" comment="Keyboard Layouts - suffix for link to share"></string>
+  <!-- Context: Configuration Dialog - Options tab -->
+  <!-- String Type: FormatString -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="kogGeneral" comment="Options section - General">နာနာ</string>
+  <!-- Context: Configuration Dialog - Options tab -->
+  <!-- String Type: FormatString -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="kogStartup" comment="Options section - Startup">စညိ</string>
+  <!-- Context: Configuration Dialog - Options tab -->
+  <!-- String Type: FormatString -->
+  <!-- Introduced: 7.0.244.0 -->
+  <string name="kogOSK" comment="Options section - OSK">ကဳဗုဒ်လ္တူဗၠးမုက်</string>
+  <!-- Context: Configuration Dialog - Options tab -->
+  <!-- String Type: FormatString -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="kogAdvanced" comment="Options section - Advanced">ဒၞါဲပလေဝ် က္ဆံၚ်သၠုၚ်</string>
+  <!-- Context: Configuration Dialog - Options tab -->
+  <!-- String Type: FormatString -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="koKeyboardHotkeysAreToggle" comment="General options - hotkeys toggle on AND off a keyboard layout">မဍဵုတၟေၚ် ကဳဗုဒ် ပံက် ကဳဗုဒ်</string>
+  <!-- Context: Configuration Dialog - Options tab -->
+  <!-- String Type: FormatString -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="koAltGrCtrlAlt" comment="General options - Ctrl+Alt simulates AltGr on computers without AltGr">ပချဳ AltGr နကဵု Ctrl+Alt</string>
+  <!-- Context: Configuration Dialog - Options tab -->
+  <!-- String Type: FormatString -->
+  <!-- Introduced: 9.0.480.0 -->
+  <string name="koDeadkeyConversion" comment="Advanced options - Base keyboard deadkeys are treated as normal keys">စွံ မဍဵုချိုတ်တ် နကဵု မဍဵု အလောတ်</string>
+  <!-- Context: Configuration Dialog - Options tab -->
+  <!-- String Type: FormatString -->
+  <!-- Introduced: 7.0.244.0 -->
+  <string name="koShowHints" comment="General options - show/hide hint messages (resets hint messages individually disabled)">ထ္ၜးလိက်စၞောန်</string>
+  <!-- Context: Configuration Dialog - Options tab -->
+  <!-- String Type: FormatString -->
+  <!-- Introduced: 14.0 -->
+  <string name="koAutomaticallyReportErrors" comment="General options - report errors to Keyman team automatically">ပ္တိုန်ထ္ၜး တၚ်ယောၚ်ယာကဵု keyman.com ကေတ်တ်</string>
+  <!-- Context: Configuration Dialog - Options tab -->
+  <!-- String Type: FormatString -->
+  <!-- Introduced: 14.0 -->
+  <string name="koAutomaticallyReportUsage" comment="General options - report anonymous usage to Keyman team automatically">ပါ်ပရအ် စရၚ်သုၚ်စောဲ သ္ၚိတ်တ်ကု keyman.com</string>
+  <!-- Context: Configuration Dialog - Options tab -->
+  <!-- String Type: FormatString -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="koStartWithWindows" comment="Startup options - Start Keyman with Windows start">စကမၠောန် အဃော ဝေန်ဒဵုစ</string>
+  <!-- Context: Configuration Dialog - Options tab -->
+  <!-- String Type: FormatString -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="koShowStartup" comment="Startup options - show/hide splash screen">ပံက် ဗၠးသပလက်</string>
+  <!-- Context: Configuration Dialog - Options tab -->
+  <!-- String Type: FormatString -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="koShowWelcome" comment="Startup options - show/hide welcome screen">ထ္ၜးမုက်လိက် ဒုၚ်တၠုၚ်</string>
+  <!-- Context: Configuration Dialog - Options tab -->
+  <!-- String Type: FormatString -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="koCheckForUpdates" comment="Startup options - check online weekly for updates">စၟဳစၟတ် keyman.com သွက် သမၠုၚ်က္ဆံၚ် ဇၟာပ်သတ္တဟ</string>
+  <!-- Context: Configuration Dialog - Options tab -->
+  <!-- String Type: FormatString -->
+  <!-- Introduced: 7.0.236.0 -->
+  <string name="koTestKeymanFunctioning" comment="Startup options - test for conflicting apps when Product starts">စၟဳစၟတ် အပလဳကေယှေန် ပဠပထုဲမာန် အဃောစ ကဳမာန်</string>
+  <!-- Context: Configuration Dialog - Options tab -->
+  <!-- String Type: FormatString -->
+  <!-- Introduced: 7.0.236.0 -->
+  <string name="koReleaseShiftKeysAfterKeyPress" comment="OSK options - Releases shift/ctrl/alt on OSK after key press">ဍဵုကဳတုဲ ဗလး Shift/Ctrl/Alt လ္တူ ကဳဗုဒ်ဗၠးမုက်</string>
+  <!-- Context: Configuration Dialog - Options tab -->
+  <!-- String Type: FormatString -->
+  <!-- Introduced: 7.0.244.0 -->
+  <string name="koAutoOpenOSK" comment="OSK options - auto-open OSK">ယဝ်ရ ကဳဗုဒ်ကဳမာန် ရုဲလဝ်မ္ဂး ပံက် ကဳဗုဒ်ဗၠးမုက် လၟိန်</string>
+  <!-- Context: Configuration Dialog - Options tab -->
+  <!-- String Type: FormatString -->
+  <!-- Introduced: 7.0.244.0 -->
+  <string name="koAutoSwitchOSKPages" comment="OSK options - when a keyboard is activated, switch to most appropriate page in OSK">ယဝ်ရ ရုဲစှ်လဝ်ကဳဗုဒ်မွဲမွဲမ္ဂး ပံက်ကဵု အရီုဗၚ် မဆက်စပ် ကု ကဳဗုဒ်ဗၠးမုက်</string>
+  <!-- Context: Configuration Dialog - Options tab -->
+  <!-- String Type: FormatString -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="koDebugging" comment="Advanced options - turn on debugging (which creates a very large file)">ဂၠိုက်ဂၠာဲပသောၚ်စၟ</string>
+  <!-- Context: Configuration Dialog - Options tab -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 9.0.445.0 -->
+  <string name="S_Button_BaseKeyboard" comment="Options tab - base keyboard button">ကဳဗုဒ် သဇိုၚ်...</string>
+  <!-- Context: Configuration Dialog - Hotkeys tab -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 7.0.241.0 -->
+  <string name="S_Hotkey_Language_Prefix" comment="Hotkey - activation term preceding Windows language name. Note: include a space following."></string>
+  <!-- e.g. "Activate [Korean KORDA] Keyboard" -->
+  <!-- Context: Configuration Dialog - Hotkeys tab -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 7.0.241.0 -->
+  <string name="S_Hotkey_Language_Suffix" comment="Hotkey - language term following Windows language name. Note: include an initial space."></string>
+  <!-- Context: Configuration Dialog - Hotkeys tab -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="S_Hotkey_None" comment="Hotkey - text used when no hotkey set">(ကဳတၟေၚ်ဟွံမွဲ)</string>
+  <!-- Context: Configuration Dialog - Hotkeys tab -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="S_Hotkey_TurnKeymanOff" comment="Hotkey - Turn Product Off">ကၟာတ် ပြံၚ်သၠာဲ ကဳမာန်</string>
+  <!-- Context: Configuration Dialog - Hotkeys tab -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="S_Hotkey_OpenKeyboardMenu" comment="Hotkey - Open Keyman system tray menu">ပံက် မဳနူ ကဳဗုဒ်</string>
+  <!-- Context: Configuration Dialog - Hotkeys tab -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="S_Hotkey_ShowOnScreenKeyboard" comment="Hotkey - show keyboard in OSK">ထ္ၜးက္ဆံၚ် ကဳဗုဒ်ဗၠးမုက်</string>
+  <!-- Context: Configuration Dialog - Hotkeys tab -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="S_Hotkey_OpenConfiguration" comment="Hotkey - open Keyman Configuration">ဗီုပြၚ်သၞောတ်စက် ကဳမာန်</string>
+  <!-- Context: Configuration Dialog - Hotkeys tab -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 7.1.275.0 -->
+  <string name="S_Hotkey_ShowFontHelper" comment="Hotkey - show font helper in OSK">ထ္ၜးအရီုဗၚ်သွက်မလိက်</string>
+  <!-- Context: Configuration Dialog - Hotkeys tab -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 7.1.275.0 -->
+  <string name="S_Hotkey_ShowCharacterMap" comment="Hotkey - show character map in OSK">ထ္ၜးခံက်အၚ် အက္ခရ်</string>
+  <!-- Context: Configuration Dialog - Hotkeys tab -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 7.1.275.0 -->
+  <string name="S_Hotkey_OpenTextEditor" comment="Hotkey - open text editor">ပံက် ဒၞါဲပလေဝ်ဒါန်လိက်</string>
+  <!-- Context: Configuration Dialog - Hotkeys tab -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 8.0.294.0 -->
+  <string name="S_Hotkey_SwitchLanguage" comment="Hotkey - switch language window">ပံက်စက်ပြံၚ် ဘာသာ</string>
+  <!-- Context: Configuration Dialog - Hotkeys tab -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 7.1.274.0 -->
+  <string name="S_Hotkey_Control_Title" comment="Hotkey - Control Title">မဍဵုတၟေၚ်နာနာ</string>
+  <!-- Context: Configuration Dialog - Hotkeys tab -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 7.1.274.0 -->
+  <string name="S_Hotkey_Keyboard_Title" comment="Hotkey - Keyboard Title">သ္ၚိအၚ်ကဳဗုဒ်ဂမၠိုၚ်</string>
+  <!-- Context: Configuration Dialog - Support tab -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 9.0.465.0 -->
+  <string name="S_Support_ContactInstructions_Free" comment="">တၚ်ယောၚ်ယာ တၚ်ဟွံကၠးမးမွဲမွဲဒှ်တိုန်အဃောသုၚ်စောဲ ကဳမာန်မ္ဂး သၟာန်သၟုက်ပ္ဍဲကဵု ဂကောံ ဖဝ်ရာမ် ကဳမာန်ဂွံရ။</string>
+  <!-- Context: Configuration Dialog - Support tab -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 9.0.465.0 -->
+  <string name="S_Button_CommunitySupport" comment="">ပံက်ဖဝ်ရာမ် ကဳမာန်</string>
+  <!-- Context: Configuration Dialog - Support tab -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 11.0.1500.0 -->
+  <string name="S_Support_CreatedBySIL" comment="Support - SIL statement">SIL International ဖန်ဗဒှ်လဝ်</string>
+  <!-- Context: Configuration Dialog - Support tab -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="S_Support_Copyright" comment="Support - Product Copyright">တၠမူ © SIL International. အခေါၚ်အဝဵုနွံပေၚ်ၚ်။</string>
+  <!-- Context: Configuration Dialog - Support tab -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="S_Support_Version" comment="Support - version">ပါယှေန်</string>
+  <!-- Context: Configuration Dialog - Support tab -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 8.0.294.0 -->
+  <string name="S_Support_UsefulLinks" comment="Support - Useful Links heading">လေက် ဒှ်အထံက်အရီုဂမၠိုၚ်</string>
+  <!-- Context: Configuration Dialog - Support tab -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="S_Button_OnlineSupport" comment="Support button - links to online support">အရီုဗၚ်လ္တူလပှ်ကျာ</string>
+  <!-- Context: Configuration Dialog - Support tab -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="S_Button_CheckForUpdates" comment="Support button - manually checks for product updates">စၟဳစၟတ်တၚ်နၚ်ပ္တိုန်က္ဆံၚ်</string>
+  <!-- Context: Configuration Dialog - Support tab -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="S_Button_ProxyConfig" comment="Options button - allows manual adjustment of proxy settings">တၚ်ပလေဝ် ပရံက်ဇြဳ...</string>
+  <!-- Context: Configuration Dialog - Support tab -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="S_Button_SettingsManager" comment="Options button - access to the Settings Manager">တၚ်ပလေဝ် ကဳမာန်နာနာ...</string>
+  <!-- Context: Configuration Dialog - Support tab -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="S_Menu_Diagnostics_Diagnostics" comment="Support button submenu - performs a diagnostic report">ဂၠိုၚ်ဂၠါဲပြဿနာ</string>
+  <!-- Context: Download Keyboard Dialog -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="S_DownloadKeyboard_Title" comment="Download keyboard layout from keyman.com dialog title">ဂြဲကေတ် ကဳဗုဒ်နူ keyman.com</string>
+  <!-- Context: Download Keyboard Dialog -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="S_DownloadKeyboard_DownloadOnlyCheckbox" comment="Download only option checkbox">ဂြဲဖျေံသၟး လ္ပစုတ်</string>
+  <!-- Parameters: %1$s = Error Message, %2$d Error Code -->
+  <!-- Context: Download Keyboard Dialog -->
+  <!-- String Type: FormatString -->
+  <!-- Introduced: 14.0 -->
+  <string name="S_DownloadKeyboard_DownloadError" comment="Message shown when there is an error downloading the keyboard package">ဂြဲဖျေံကဳဗုဒ်ဟွံဂွံ၊ တၚ်ဗၠေတ် %2$d: %1$s</string>
+  <!-- Context: Download Keyboard Dialog -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 14.0 -->
+  <string name="S_Button_Back" comment="Back button">&lt; ကလေၚ်</string>
+  <!-- Context: Install Keyboard Dialog -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="S_InstallKeyboard_Title" comment="Install keyboard/package dialog title">စုတ် ကဳဗုဒ်/ပက်ကေ</string>
+  <!-- Context: Install Keyboard Dialog -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="S_InstallKeyboard_Tab_Details" comment="Install keyboard/package - details">တၚ်နၚ်သောဲသောဲဗြောဲဗြောဲ</string>
+  <!-- Context: Install Keyboard Dialog -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="S_InstallKeyboard_Tab_Readme" comment="Install keyboard/package - readme">ဗှ်အဲညိ</string>
+  <!-- Context: Install Keyboard Dialog -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="S_InstallKeyboard_Button_Install" comment="Install keyboard/package - install button">စုတ်</string>
+  <!-- Context: Proxy Configuration Dialog -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="S_ProxyConfiguration_Title" comment="Proxy configuration dialog title">တၚ်ချိၚ်သာပါပရံက်ဇြဳ</string>
+  <!-- Context: Proxy Configuration Dialog -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="S_ProxyConfiguration_Server" comment="Proxy dialog - fillable-field server">သာပါ: </string>
+  <!-- Context: Proxy Configuration Dialog -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="S_ProxyConfiguration_Port" comment="Proxy dialog - fillable-field port">ဖတ်: </string>
+  <!-- Context: Proxy Configuration Dialog -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="S_ProxyConfiguration_Username" comment="Proxy dialog - fillable-field username">ယၟုမၞိဟ်သုၚ်စောဲ: </string>
+  <!-- Context: Proxy Configuration Dialog -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="S_ProxyConfiguration_Password" comment="Proxy dialog - fillable-field password">မဓလုက်: </string>
+  <!-- Context: Base Keyboard Dialog -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 9.0.445.0 -->
+  <string name="S_BaseKeyboard_Title" comment="Base keyboard dialog title">စွံဒတန် ကဳဗုဒ်သဇိုၚ်</string>
+  <!-- Context: Base Keyboard Dialog -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 9.0.445.0 -->
+  <string name="S_BaseKeyboard_Text" comment="Base keyboard dialog description">ရုဲစှ် သ္ၚိအၚ်ကဳဗုဒ် လက်တေန် မၞးသုၚ်စောဲ ပ္ဍဲဝေန်ဒဵုညိ။ ကဳဗုဒ် ကဳမာန် ချိၚ်ဆဏာကဵု ကဳဗုဒ် အတိုၚ်မၞးဒးစိုတ်ဂှ်ဏောၚ်။</string>
+  <!-- Context: Hotkey Dialog -->
+  <!-- String Type: FormatString -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="SKChangeHotkeyTitle" comment="Change Hotkey dialog title">ပြံၚ်မဍဵုတၟေၚ်</string>
+  <!-- Parameters: %1$s = Name of keyboard -->
+  <!-- Context: Hotkey Dialog -->
+  <!-- Introduced: 7.0.241.0 -->
+  <!-- String Type: FormatString -->
+  <string name="SKSetHotkey_Language" comment="Hotkey dialog - message when setting hotkey for a language">ရုဲစှ်မဍဵုတၟေၚ် ဟွံသေၚ်မ္ဂး ရုဲကေတ် \'ပၟိက်စိုတ်\' တုဲ ဍဵုလဝ် Ctrl,Shift and/ Alt တုဲ တက်စုတ် မဍဵုတၟေၚ်မၞးဒးစိုတ်သွက်ဘာသာ %1$s:</string>
+  <!-- Context: Hotkey Dialog -->
+  <!-- String Type: FormatString -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="SKSetHotkey_Interface" comment="Hotkey dialog - message displayed when changing a hotkey for a product feature (e.g. show menu or show on screen keyboard)">ရုဲစှ်မဍဵုတၟေၚ် ဟွံသေၚ်မ္ဂး ရုဲကေတ် \'ပၟိက်စိုတ်\' တုဲ ဍဵုလဝ် Ctrl,Shift and/ Alt တုဲ တက်စုတ် မဍဵုတၟေၚ်မၞးဒးစိုတ်:</string>
+  <!-- Parameters: %1$s = Hotkey -->
+  <!-- Context: Hotkey Dialog -->
+  <!-- Introduced: 7.0.230.0 -->
+  <!-- String Type: FormatString -->
+  <string name="SKUnsafeHotkey" comment="Hotkey dialog - warning of hotkey conflict with standard keyboard use">မဍဵုတၟေၚ် %1$s ဂှ်ဒှ် ပဠပထုဲကု ကဳဗုဒ်ဓမ္မတာမာန်ရ။ မၞးအောန်အိုတ်သုၚ်စောဲ ကဵု Ctrl ကဵု Alt ညိ။ မိက်ဂွံပြံၚ်လၟုဟ်ဟာ\?</string>
+  <!-- Parameters: %1$s = Hotkey, %2$s = Conflicting keyboard -->
+  <!-- Context: Hotkey Dialog -->
+  <!-- Introduced: 7.0.230.0 -->
+  <!-- String Type: FormatString -->
+  <string name="SKHotkeyConflicts_Keyboard" comment="Hotkey dialog - warning of hotkey conflict with hotkey for another keyboard">မဍဵုတၟေၚ် %1$s ဒှ်ပြသာနာကု မဍဵုတၟေၚ် ရုဲစှ်လဝ်သွက် ကဳဗုဒ် %2$s ရ။ ယဝ်ဆက်အာမ္ဂး မဍဵုတၟေၚ်သွက် ကဳဗုဒ် %2$s ဂှ်သ္အးထောံဏောၚ်။ ဆက်အာဟာ\?</string>
+  <!-- Parameters: %1$s = Hotkey -->
+  <!-- Context: Hotkey Dialog -->
+  <!-- Introduced: 14.0.117 -->
+  <!-- String Type: FormatString -->
+  <string name="SKHotkeyConflicts_Interface" comment="Hotkey dialog - warning of hotkey conflict with hotkey for another interface hotkey">မဍဵုတၟေၚ် %1$s ဒှ်ပြဿနာကု မဍဵုတၟေၚ်တၞဟ်ဟ်ရ။ ယဝ်ဆက်အာမ္ဂး မဍဵုတၟေၚ်တၞဟ်ဟ်ဂှ် သ္အးထောံရောၚ်။ ဆက်အာဟာ\?</string>
+  <!-- Context: Online Update Dialog -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="S_Update_Title" comment="Update dialog title, where Keyman = product name">ကပေါတ်တၟိသွက်ကဳမာန်တံကလိဂွံမာန်ယျ</string>
+  <!-- Context: Online Update Dialog -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="S_Update_NewVersionAvailable" comment="Update dialog - updates available text">ပ္တိုန်က္ဆံၚ်သွက်ကဳမာန်ဂွံရ</string>
+  <!-- Context: Online Update Dialog -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 7.1.255.0 -->
+  <string name="S_Update_NewVersionPrompt" comment="Update dialog - prompt to select updates">ရုဲစှ်တၚ်သမၠုၚ်က္ဆံၚ်မၞးမိက်ဂွံစုတ်ညိ:</string>
+  <!-- Context: Online Update Dialog -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="S_Update_DownloadFrom" comment="Update dialog - download information">မၞးဂြဲကေတ်ပါယှေန်တၟိမာန် နူ :</string>
+  <!-- Context: Online Update Dialog -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="S_Update_Button_InstallNow" comment="Update dialog - install now button">စုတ်လၟုဟ်</string>
+  <!-- Context: Online Update Dialog -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="S_Update_Button_InstallLater" comment="Update dialog - cancel button">တးပါဲ</string>
+  <!-- Context: Online Update Dialog -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 7.1.255.0 -->
+  <string name="S_Update_OldVersionHead" comment="Update dialog - old version">ပါယှေန်တြေံ</string>
+  <!-- Context: Online Update Dialog -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 7.1.255.0 -->
+  <string name="S_Update_ComponentHead" comment="Update dialog - update component">ကပေါတ်သမၠုၚ်က္ဆံၚ်တုဲ</string>
+  <!-- Context: Online Update Dialog -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 7.1.255.0 -->
+  <string name="S_Update_SizeHead" comment="Update dialog - update size">အဝဲ</string>
+  <!-- Parameters: %1$s = Current version number -->
+  <!-- Context: Online Update Dialog -->
+  <!-- Introduced: 7.0.230.0 -->
+  <!-- String Type: FormatString -->
+  <string name="SKUpdate_KeymanText" comment="Update dialog - name and version of updatable product">ကဳမာန် %1$s</string>
+  <!-- Parameters: %1$s = Package description, %2$s = Current package version number -->
+  <!-- Context: Online Update Dialog -->
+  <!-- Introduced: 7.0.230.0 -->
+  <!-- String Type: FormatString -->
+  <string name="SKUpdate_PackageText" comment="Update dialog - name and version of updatable keyboard layout package">ကဳဗုဒ် %1$s %2$s</string>
+  <!-- Context: Online Update Dialog -->
+  <!-- String Type: FormatString -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="SKUpdate_UnableToContact" comment="Update dialog - unable to access keyman.com warning">ဆက်စၠောံကု keyman.com ဟွံဂွံ - ကလေၚ်စၟဳစၟတ် အေန်တာနက်တုဲ ဂ္စါန်မွဲဝါပၠန်ညိ။</string>
+  <!-- Parameters: %1$s = Error message -->
+  <!-- Context: Online Update Dialog -->
+  <!-- Introduced: 7.0.230.0 -->
+  <!-- String Type: FormatString -->
+  <string name="SKUpdate_UnableToContact_Error" comment="Update dialog - unable to access keyman.com error message">ဆက်စၠောံကု keyman.com ဟွံဂွံ - ကလေၚ်စၟဳစၟတ် အေန်တာနက်တုဲ ဂ္စါန်မွဲဝါပၠန်ညိ။ တၚ်ယောၚ်ယာဂှ် :%1$s</string>
+  <!-- Context: Online Update Dialog -->
+  <!-- String Type: FormatString -->
+  <!-- Introduced: 8.0.288.0 -->
+  <string name="SKUpdate_IconTitle" comment="Update icon - title">တၚ်သမၠုၚ်က္ဆံၚ်သွက်ကီမာန်ကလိဂွံမာန်ရ</string>
+  <!-- Context: Online Update Dialog -->
+  <!-- String Type: FormatString -->
+  <!-- Introduced: 8.0.288.0 -->
+  <string name="SKUpdate_IconText" comment="Update icon - text">သ္ဂောံဂြဲကေတ်တုဲ ပ္တိုန်က္ဆံၚ်ဂှ် ဍဵုရုပ်ဏံညိ</string>
+  <!-- Context: Online Update Dialog -->
+  <!-- String Type: FormatString -->
+  <!-- Introduced: 8.0.288.0 -->
+  <string name="SKUpdate_IconMenuText" comment="Update icon - install menu item">ဗဵုကေုာံ &amp;ပ္တိုန် သမၠုၚ်က္ဆံၚ်ကဳမာန်</string>
+  <!-- Context: Online Update Dialog -->
+  <!-- String Type: FormatString -->
+  <!-- Introduced: 8.0.288.0 -->
+  <string name="SKUpdate_IconMenuExit" comment="Update icon - exit menu item">ဗ&amp;ဒေါံ စၟဳစၟတ်သမၠုၚ်က္ဆံၚ်အောန်လာၚ်</string>
+  <!-- Context: Splash Dialog -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 8.0.288.0 -->
+  <string name="S_Splash_Name" comment="Splash major title">ကဳမာန်</string>
+  <!-- Context: Splash Dialog -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 8.0.294.0 -->
+  <string name="S_Splash_Start" comment="Start Keyman button">စ ကဳမာန်</string>
+  <!-- Context: Splash Dialog -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 8.0.294.0 -->
+  <string name="S_Splash_Exit" comment="Exit button">တိတ်</string>
+  <!-- Context: Splash Dialog -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 8.0.294.0 -->
+  <string name="S_Splash_Configuration" comment="Keyman Configuration link">ပလေဝ်ပလေတ်နာနာ</string>
+  <!-- Context: Splash Dialog -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 9.0.341.0 -->
+  <string name="S_Splash_ShowAtStartup" comment="Show at Startup toggle">ထ္ၜးမုက်ဒ္ၚောဝ်တဏအ်ကာလစကၠောန်</string>
+  <!-- Context: _LanguageInfo -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 8.0.278.0 -->
+  <string name="S_DisplayIn" comment="'Display In' text label for UI language menu">ဓမံက်ထ္ၜးပ္ဍဲ</string>
+  <!-- Context: _LanguageInfo -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 8.0.278.0 -->
+  <string name="S_MoreUILanguagesMenu" comment="More UI languages online menu item">ကလေၚ်ဂၠာဲဓမံက်ထ္ၜးအရေဝ်ဘာသာတၞဟ်လ္ပာ်အောန်လာဲ...</string>
+  <!-- Context: _LanguageInfo -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 9.0.525.0 -->
+  <string name="S_ContributeUILanguagesMenu" comment="Link to contribute to language UI">ကဵုအရီုကၠာဲဘာသာမဆေၚ်စပ်ကဵုကိစ္စညးလွပ်တၞဟ်...</string>
+  <!-- Context: _LanguageInfo -->
+  <!-- String Type: FormatString -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="SKUILanguageName" comment="User interface language name in the UI language">မန်</string>
+  <!-- Context: _LanguageInfo -->
+  <!-- String Type: FormatString -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="SKUILanguageNameWithEnglish" comment="UI language name in the UI language with the English name in parentheses  (this message is used when the user gets stuck in a strange UI language)">မန် (Mon)</string>
+  <!-- Context: _LanguageInfo -->
+  <!-- String Type: FormatString -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="SKLanguageCode" comment="The language code for the current translation">mnw</string>
+  <!-- Context: _LanguageInfo -->
+  <!-- String Type: FormatString -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="SKDefaultLanguageCode" comment="The default language code for this product.  This should be the language that the product is created in. For Keyman this must stay 'en', for all translations.">mnw</string>
+  <!-- Context: Formatted Messages -->
+  <!-- String Type: FormatString -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="SKShortApplicationTitle" comment="Product name">ကဳမာအ်</string>
+  <!-- Context: Hints -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 7.0.244.0 -->
+  <string name="S_Button_ResetHints" comment="Hint - options tab button to reset hints">သအးထောံဂရိပ်အရေဝ်ဂမၠိုၚ်</string>
+  <!-- Context: Hints -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 7.0.244.0 -->
+  <string name="SKHintsReset" comment="Hint - options tab dialog confirming reset of hints">ထိုၚ်လိက်ဂရိပ်အရေဝ်သီုဖအိုတ်ဒးဒုၚ်သအးထောံတုဲ ကဵု ကလေၚ်ဓမံက်ထ္ၜးကဵုမွဲအလန်ပၠန်။</string>
+  <!-- Context: Hints -->
+  <!-- Introduced: 7.0.244.0 -->
+  <!-- String Type: HintTitle -->
+  <!-- DevNote: this is a constructed identifier so won't appear in a search with i18n-check-unused-strings.sh -->
+  <string name="HintTitle_KH_EXITPRODUCT" comment="Hint - dialog title upon attempting to exit product">တိတ်နူကဳမာအ်ချိုတ်ပၠိုတ်ယျဟာ?</string>
+  <!-- Context: Hints -->
+  <!-- Introduced: 7.0.244.0 -->
+  <!-- String Type: Hint -->
+  <!-- DevNote: this is a constructed identifier so won't appear in a search with i18n-check-unused-strings.sh -->
+  <string name="Hint_KH_EXITPRODUCT" comment="Hint - asks for confirmation, explains the difference between de-activating a keyboard layout and closing Product">မိက်ဂွံကၟာတ် ကဳမာန်ဂှ် ချိုတ်ပၠိုန်ဟာ\? ကဳဗုဒ်ကဳမာန်မၞးဂှ် လုပ်အာပ္ဍဲစရၚ် အရေဝ်ဘသာ ဝေန်ဒဵု ရောၚ် ဆ္ဂး ဟွံကေၚ်ပံက်ကၟာတ် ကဳမာန်ဏီမ္ဂး ဟွံကၠောန်ကမၠောန်ရ။</string>
+  <!-- Context: Hints -->
+  <!-- Introduced: 7.0.244.0 -->
+  <!-- String Type: HintTitle -->
+  <!-- DevNote: this is a constructed identifier so won't appear in a search with i18n-check-unused-strings.sh -->
+  <string name="HintTitle_KH_CLOSEOSK" comment="Hint - dialog title upon closing the OSK">ကၟာတ်ကဳဗုဒ်ဗၠးမုက်</string>
+  <!-- Context: Hints -->
+  <!-- Introduced: 7.0.244.0 -->
+  <!-- String Type: Hint -->
+  <!-- DevNote: this is a constructed identifier so won't appear in a search with i18n-check-unused-strings.sh -->
+  <string name="Hint_KH_CLOSEOSK" comment="Hint - explains that Product is still running and informs how to reopen OSK">ကၟာတ် ကဳဗုဒ်ဗၠးမုက်တုဲ။ ကဳမာန်ကၠောန်မံၚ်ကမၠောန်ဖိုဟ်။ မၞးဍဵုလ္တူရုပ်ကဳမာန်တုဲ ရုဲကေတ် ကဳဗုဒ်ဗၠးမုက်မာန်ရ။</string>
+  <!-- Context: Hints -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 10.0.836.0 -->
+  <string name="S_HintDialog_DontShowHintAgain" comment="Hint dialog - caption of checkbox at bottom of dialog">လ္ပထ္ၜးလိက်စၞောန်ပၠန်ညိ</string>
+  <!-- Context: Help Dialog -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="S_HelpTitle" comment="Help - product name help">အရီုဗၚ် ကဳမာန်</string>
+  <!-- Context: Help Dialog -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="S_Help_Product" comment="Help - help contents link title">တၚ်အရီုဗၚ်ဂမၠိုၚ်</string>
+  <!-- Context: Help Dialog -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="S_Help_Keyboard_Prefix" comment="Help - text preceding keyboard name">အရီုဗၚ်လ္တူ \"</string>
+  <!-- Context: Help Dialog -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="S_Help_Keyboard_Suffix" comment="Help - text following keyboard name">\" ကဳဗုဒ်</string>
+  <!-- Context: Toolbar Context Help -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="S_Toolbar_ViewOnScreenKeyboard" comment="Toolbar help - View OSK pop-up text">ဗဵုကဳဗုဒ်လ္တူဗလးမုက်</string>
+  <!-- Context: Toolbar Context Help -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="S_Toolbar_ViewFontHelper" comment="Toolbar help - View Font Helper pop-up text">ဗဵုအရီုဗၚ်မလိက်ဖွန်</string>
+  <!-- Context: Toolbar Context Help -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="S_Toolbar_ViewCharacterMap" comment="Toolbar help - View Character Map pop-up text">ဗဵုခံက်သ္ၚိအၚ်အက္ခရ်</string>
+  <!-- Context: Toolbar Context Help -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="S_Toolbar_OpenConfiguration" comment="Toolbar help - Open Keyman Configuration pop-up text">ပံက်ဒၞါဲပလေဝ်သၞောတ်စက် ကဳမာန် နာနာ</string>
+  <!-- Context: Toolbar Context Help -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="S_Toolbar_OpenHelp" comment="Toolbar help - Open help pop-up text">ပံက်ဒၞါဲအရီုဗၚ်</string>
+  <!-- Context: Toolbar Context Help -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="S_Toolbar_CloseOnScreenKeyboard" comment="Toolbar help - Close OSK pop-up text">ကၟာတ် ကဳဗုဒ်ဗၠးမုက်</string>
+  <!-- Context: System Tray Menu Items -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="S_Menu_SwitchKeymanOff" comment="Systray item - Switch Keyman Off [&amp; precedes alt + access-character]">ပြံၚ် ကဳမာန် &amp;ကၟာတ်</string>
+  <!-- Context: System Tray Menu Items -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="S_Menu_OnScreenKeyboard" comment="Systray item - OSK [&amp; precedes alt + access-character]">ကဳဗုဒ် &amp;လ္တူဗၠးမုက်</string>
+  <!-- Context: System Tray Menu Items -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="S_Menu_FontHelper" comment="Systray item - Font Helper [&amp; precedes alt + access-character]">အရီုဗၚ်မလိက်ဖွန်&amp;</string>
+  <!-- Context: System Tray Menu Items -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="S_Menu_CharacterMap" comment="Systray item - Character Map [&amp; precedes alt + access-character]">သ္ၚိအၚ် အက္ခရ် &amp;</string>
+  <!-- Context: System Tray Menu Items -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="S_Menu_TextEditor" comment="Systray item - Text Editor [&amp; precedes alt + access-character]">&amp;ပလေဝ်ဒါန်လိက်...</string>
+  <!-- Context: System Tray Menu Items -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="S_Menu_Configuration" comment="Systray item - Configuration [&amp; precedes alt + access-character]">တၚ်ပလေဝ်နာနာ &amp;...</string>
+  <!-- Context: System Tray Menu Items -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="S_Menu_Help" comment="Systray item - Help [&amp; precedes alt + access-character]">&amp;အရီုဗၚ်...</string>
+  <!-- Context: System Tray Menu Items -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="S_Menu_Exit" comment="Systray item - Exit [&amp; precedes alt + access-character]">တိတ်&amp;</string>
+  <!-- Context: On Screen Keyboard Menu Items -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="S_OSKContext_FadeWhenInactive" comment="OSK right-click menu - fade OSK when mouse is elsewhere">ဟွံချဳဓရာၚ်မ္ဂး အေဲဖျေံလျး</string>
+  <!-- Context: On Screen Keyboard Menu Items -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="S_OSKContext_ShowToolbar" comment="OSK right-click menu - show/hide OSK toolbar">ထ္ၜးဒၞါဲကပေါတ်</string>
+  <!-- Context: On Screen Keyboard Menu Items -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="S_OSKContext_SaveAsWebPage" comment="OSK right-click menu - save diagram of active keyboard layout as a web page">ဂွံစွံနကဵု မုက်လိက် ဝေက်...</string>
+  <!-- Context: On Screen Keyboard Menu Items -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="S_OSKContext_Print" comment="OSK right-click menu - print diagram of active keyboard layout">ဆာဲပ္တိတ်...</string>
+  <!-- Context: Formatted Messages -->
+  <!-- String Type: FormatString -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="SKApplicationTitle" comment="Product name used for the title of message boxes and message dialogs">ကဳမာန်</string>
+  <!-- Parameters: %1$s = Version number string -->
+  <!-- Context: Formatted Messages -->
+  <!-- Introduced: 7.0.230.0 -->
+  <!-- String Type: FormatString -->
+  <string name="SKSplashVersion" comment="Version number">ပါယှေန် %1$s</string>
+  <!-- Context: Formatted Messages -->
+  <!-- String Type: FormatString -->
+  <!-- Introduced: 7.0.239.0 -->
+  <string name="SKButtonPrint" comment="Print button in Welcome dialog for keyboards">&amp;ဆာဲပ္တိတ်...</string>
+  <!-- Parameters: %1$s = Package to be uninstalled -->
+  <!-- Context: Formatted Messages -->
+  <!-- Introduced: 7.0.230.0 -->
+  <!-- String Type: FormatString -->
+  <string name="SKPackageAlreadyInstalled" comment="Notice during package installation that a package with the same name is already installed.">ပက်ကေ နကဵုယၟု %1$s ဂှ်စုတ်လဝ်တုဲတုဲ။ မိက်ဂွံပ္တိတ်ထောံဍေံတုဲ ကလေၚ်စုတ်တၟိဟာ\?</string>
+  <!-- Parameters: %1$s = Keyboard name -->
+  <!-- Context: Formatted Messages -->
+  <!-- Introduced: 7.0.230.0 -->
+  <!-- String Type: FormatString -->
+  <string name="SKKeyboardAlreadyInstalled" comment="Notice during keyboard layout installation that a keyboard layout with the same name is already installed.">ကဳဗုဒ် နကဵု ယၟု %1$s ဂှ်စုတ်လဝ်တုဲတုဲ။ ယဝ်ဆက်အာမ္ဂး ပ္တိတ်ဍေံကၠာတုဲ စုတ်တၟိရောၚ်။ ဆက်အာဟာ\?</string>
+  <!-- Parameters: %1$s = Keyboard name, %2$s = Package name -->
+  <!-- Context: Formatted Messages -->
+  <!-- Introduced: 7.0.230.0 -->
+  <!-- String Type: FormatString -->
+  <string name="SKKeyboardPartOfPackage" comment="Notice of need to uninstall an entire package">ကဳဗုဒ် %1$s ဂှ် အပိုၚ်ခြာ နူကဵု ပက်ကေ %2$s ရ။ မၞးဒးပ္တိတ် အတိုၚ်ပက်ကေမွဲရောၚ်။ ဆက်အာဟာ\?</string>
+  <!-- PArameters: %1$s = BCP 47 code -->
+  <!-- Context: Formatted Messages -->
+  <!-- Introduced: 14.0.211 -->
+  <!-- String Type: FormatString -->
+  <string name="SKInstallLanguageTransientLimit" comment="Message shown when Keyman is unable to install a Windows language for a keyboard">စုတ် အရေဝ်ဘာသာကဳဗုဒ် ဟွံဂွံ။ ဝေန်ဒဵုစဵုဒၞါလဝ် စုတ်ပၟိက်စိုတ်ဂွံ ၄ ဘာသာဟေၚ် တုဲ မၞးစုတ်လဝ် ပဵုအာနူကဵု ဗ္ၜတ်ဒှ်ဂွံရ။</string>
+  <!-- Parameters: %1$s = Package Name -->
+  <!-- Context: Formatted Messages -->
+  <!-- Introduced: 7.0.230.0 -->
+  <!-- String Type: FormatString -->
+  <string name="SKPackageDoesNotIncludeWelcome" comment="Notice of lack of introductory help">ပက်ကေ (ဟွံ) ကဳဗုဒ် %1$s ဟွံမွဲပ္ဍဲကဵု အရီုဗၚ်ဆက်မိတ်ရ။</string>
+  <!-- Context: Formatted Messages -->
+  <!-- String Type: FormatString -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="SKOSNotSupported" comment="Notice of unsupported operating system">စက်မၞးသုၚ်စောဲမံၚ်လၟုဟ်ဏံဟွံထံက်ပၚ်ရ။</string>
+  <!-- Context: Formatted Messages -->
+  <!-- String Type: FormatString -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="SKOnlineHelpFile" comment="File name of the help file - must be .chm format.  The locale folder will be checked first for the file">KeymanDesktop.chm</string>
+  <!-- Context: Formatted Messages -->
+  <!-- String Type: FormatString -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="SKCouldNotFindHelp" comment="Notice of help file not found">ဝှါၚ်အရီုဗၚ်ဂၠါဲဟွံဆဵု။</string>
+  <!-- Context: Formatted Messages -->
+  <!-- String Type: FormatString -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="SKANSIEncoding" comment="Keyboard with an ANSI or Codepage encoding">မုက်လိက်ကုက်</string>
+  <!-- Context: Formatted Messages -->
+  <!-- String Type: FormatString -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="SKUnicodeEncoding" comment="Keyboard with a Unicode encoding">ယူနဳကုဒ်</string>
+  <!-- Context: Formatted Messages -->
+  <!-- String Type: FormatString -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="SKDownloadProgress_Title" comment="Notice of file downloading">ဂြဲဖျေံဒၟံၚ်ဝှါၚ်</string>
+  <!-- Parameters: %1$s = Keyboard name -->
+  <!-- Context: Formatted Messages -->
+  <!-- Introduced: 7.0.230.0 -->
+  <!-- String Type: FormatString -->
+  <string name="SKUninstallOnScreenKeyboard" comment="Request for confirmation to uninstall OSK for a keyboard layout">မိက်ဂွံပ္တိတ် ကဳဗုဒ်ဗၠးမုက် စုတ်လဝ်သွက်%1$s ဂှ်ချိုတ်ပၠိုတ်ဟာ?</string>
+  <!-- Parameters: %1$s = Keyboard name -->
+  <!-- Context: Formatted Messages -->
+  <!-- Introduced: 7.0.239.0 -->
+  <!-- String Type: FormatString -->
+  <string name="SKUninstallKeyboard" comment="Request for confirmation to uninstall keyboard layout">မၞးမိက်ဂွံပ္တိတ် ကဳဗုဒ် %1$s ဂှ်ချိုတ်ပၠိုတ်ဟာ\?</string>
+  <!-- Parameters: %1$s = Package name, %2$s: Fonts list -->
+  <!-- Context: Formatted Messages -->
+  <!-- Introduced: 7.0.239.0 -->
+  <!-- String Type: FormatString -->
+  <string name="SKUninstallPackage" comment="Request for confirmation to uninstall a package">မၞးမိက်ဂွံပ္တိတ် ပက်ကေ %1$s ဂှ်ချိုတ်ပၠိုတ်ဟာ\?\n\n%2$s</string>
+  <!-- Parameters: %1$s = Fonts list -->
+  <!-- Context: Formatted Messages -->
+  <!-- Introduced: 7.1.270.0 -->
+  <!-- String Type: FormatString -->
+  <string name="SKUninstallPackageFonts" comment="Text embedded in SKUninstallPackage when fonts are ready for uninstall.">မလိက်ဝှတ်သၟဝ်တေံဂှ်လေဝ်တိတ်အာဏောၚ်: %1$s ။</string>
+  <!-- Context: Formatted Messages -->
+  <!-- String Type: FormatString -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="SKUnicodeData_Build" comment="Request to build Unicode Character Map database">အက္ခရ်ဂမၠိုၚ်ဂှ် ကၠာဟွံဂိုၚ် သြိုၚ်ခၞံ သုၚ်စောဲဂွံဂှ် နွံပ္ဍဲသ္ၚိအၚ်အက္ခရ်ရ။ မိက်ဂွံသြိုၚ်လၟုဟ်ဟာ?</string>
+  <!-- Parameters: %1$s = Error detail string -->
+  <!-- Context: Formatted Messages -->
+  <!-- Introduced: 7.0.230.0 -->
+  <!-- String Type: FormatString -->
+  <string name="SKUnicodeData_DatabaseCouldNotBeDeleted" comment="Error deleting Unicode Character Map database">သ္ဂောံကလေၚ် သြိုၚ်ခၞံ အက္ခရ်ဂှ် ပလီု ဒေတာသွက်အက္ခရ်ယူနဳကုဒ် ဟွံဂွံရ။ တၚ်ယောၚ်ယာသောဲသောဲဗြောဲဗြောဲဂမၠိုၚ်ဂှ်: %1$s</string>
+  <!-- Parameters: %1$s = Error details -->
+  <!-- Context: Formatted Messages -->
+  <!-- Introduced: 7.0.230.0 -->
+  <!-- String Type: FormatString -->
+  <string name="SKUnicodeData_CouldNotCreateDatabase" comment="Error creating Unicode Character Map database">ဒေတာသွက် အက္ခရ်ယူနဳကုဒ် ဂှ် ဖန်ဗဒှ်ဟွံဂွံတုဲ ကၟာတ်ထောံရ။ တၚ်ယောၚ်ယာသောဲသောဲဗြောဲဗြောဲဂမၠိုၚ်ဂှ်: %1$s</string>
+  <!-- Parameters: %1$s = Error message -->
+  <!-- Context: Formatted Messages -->
+  <!-- Introduced: 7.0.230.0 -->
+  <!-- String Type: FormatString -->
+  <string name="SKUnicodeData_DatabaseLoadFailedRebuild" comment="Error loading Unicode Character Map database. Request to rebuild.">ဒေတာသွက်အက္ခရ်ယူနဳကုဒ် ဂြဲပ္တိုန် ဟွံအံၚ်ဇၞး (%1$s)။ ကလေၚ်သြိုၚ်ဍေံလၟုဟ်ဟာ\?</string>
+  <!-- Parameters: %1$s: error message -->
+  <!-- Context: Formatted Messages -->
+  <!-- Introduced: 7.0.241.0 -->
+  <!-- String Type: FormatString -->
+  <string name="SKCannotStartProduct" comment="Error from Keyman failing to start keyman.exe due to an access denied or file not found">ကဳမာန် စကမၠောန်ဟွံဂွံ။ အာစၟဳစၟတ် တၚ်ပလေဝ်နာနာပ္ဍဲ ပရေၚ်ဂီုဂၠီုတေံတုဲ keyman.exe ဂှ်ကဵုအခေါၚ်ကၠာညိ။ ယဝ်တၚ်ယောၚ်ယာ ကလေၚ်ကၠုၚ်ဂှ်: \n\n%1$s\n\n မိက်ဂွံကလေၚ်ဂ္စါန် တုဲ ပံက် ကဳမာန် မွဲဝါလၟုဟ်ဟာ\?</string>
+  <!-- Context: Formatted Messages -->
+  <!-- String Type: FormatString -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="SKDebuggingWarning" comment="Warning upon starting debugging in the Options tab">တၚ်နၚ် သောၚ်သၠးစၟသွက်ကဳမာန်ဂှ် ဂိုၚ်စွံလဝ်ပ္ဍဲ ဝှါၚ်ကော်စ %LOCALAPPDATA% \Keyman\Diag\system#.etl (#ဂှ် မဂၞန်ရ)။ ကၠာဟွံပလီု ဝှါၚ်ဂှ် ကၟာတ်ထောံကဳမာန်ကၠာညိ။\n\n\သတိ: ဝှါၚ်ဏံဇၞော်တိုန်ပြဟ်ဟ်မာန်ရ။ ပံက်ဂၠိုက်ဂၠာဲပသောၚ်စၟဂှ် ဖအိၚ်ဖျေံစက်မၞးမာန်တုဲ အ္စာပလေဝ်စက်တံကဵုကသပ်မှ ပံက်မ္ဂးခိုဟ်ရ။\n\nတၚ်ကဵုသတိပရေၚ်ပူဂဵု: ဝှါၚ်ပသောၚ်စၟဂှ် သမ္တီစုတ် အရာမၞးတက်ဏာတံဖအိုတ်ရောၚ်။ အခိၚ်ပိုဲဂၠိုက်ဂၠာဲပသောၚ်စၟမှ ပံက်ကဵု ဝှါၚ်ပသောၚ်စၟမ္ဂးခိုဟ်ရ။</string>
+  <!-- Context: OSK Font Helper -->
+  <!-- String Type: FormatString -->
+  <!-- Introduced: 8.0.294.0 -->
+  <string name="S_OSK_FontHelper_PleaseWait" comment="OSK Font helper message">အဃောဂၠာဲဒၟံၚ် ဝှတ်မလိက်သွက် ကဳဗုဒ် %1$s ဂှ်မၚ်ညိ</string>
+  <!-- Context: OSK Font Helper -->
+  <!-- String Type: FormatString -->
+  <!-- Introduced: 8.0.294.0 -->
+  <string name="S_OSK_FontHelper_NonUnicode" comment="OSK Font helper non-Unicode keyboard">ကဳဗုဒ် %1$s ဂှ် ကဳဗုဒ်ယူနဳကုဒ် ဟွံသေၚ်။ မလိက်ဝှတ်ဂှ် ဂၠာဲကေတ်တ်ဟွံဂွံ။ စၟဳစၟတ် လိက်ကၞပ် ကဳဗုဒ် သွက်တၚ်နၚ် ဝှတ်။</string>
+  <!-- Context: OSK Font Helper -->
+  <!-- String Type: FormatString -->
+  <!-- Introduced: 8.0.294.0 -->
+  <string name="S_OSK_FontHelper_NoKeyboards" comment="OSK Font helper no keyboards">သ္ၚိအၚ်ကဳဗုဒ် လဵုမွဲဟွံဂွံပ္တိုန်စုတ်လဝ်။</string>
+  <!-- Context: OSK Font Helper -->
+  <!-- String Type: FormatString -->
+  <!-- Introduced: 8.0.294.0 -->
+  <string name="S_OSK_FontHelper_ChooseKeyboard" comment="OSK Font helper choose keyboard">သ္ဂောံဆဵု မလိက်ကောန်ဍောၚ် မဆေၚ်စပ်တံဂှ် ရုဲကဵု ကဳဗုဒ် ကဳမာန်တံညိ။</string>
+  <!-- Context: Text Editor -->
+  <!-- String Type: FormatString -->
+  <!-- Introduced: 10.0.836.0 -->
+  <string name="SKTextEditorCaption" comment="Caption of Text Editor">ဒၞါဲပလေဝ်ဒါန်လိက် - ကဳမာန်</string>
+</resources>
