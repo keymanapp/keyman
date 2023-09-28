@@ -1,6 +1,6 @@
 import EventEmitter from "eventemitter3";
 import { InputEngineBase } from "./inputEngineBase.js";
-import { GestureSource, GestureSourceSubview } from "./gestureSource.js";
+import { buildGestureMatchInspector, GestureSource } from "./gestureSource.js";
 import { MatcherSelector } from "./gestures/matchers/matcherSelector.js";
 import { GestureSequence } from "./gestures/matchers/gestureSequence.js";
 import { GestureModelDefs, getGestureModelSet } from "./gestures/specs/gestureModelDefs.js";
@@ -52,6 +52,7 @@ export class TouchpointCoordinator<HoveredItemType, StateToken=any> extends Even
   }
 
   public popSelector(selector: MatcherSelector<HoveredItemType>) {
+    /* c8 ignore start */
     if(this.selectorStack.length <= 1) {
       throw new Error("May not pop the original, base gesture selector.");
     }
@@ -60,6 +61,7 @@ export class TouchpointCoordinator<HoveredItemType, StateToken=any> extends Even
     if(index == -1) {
       throw new Error("This selector has not been pushed onto the 'setChange' stack.");
     }
+    /* c8 ignore end */
 
     selector.cascadeTermination();
 
@@ -79,6 +81,8 @@ export class TouchpointCoordinator<HoveredItemType, StateToken=any> extends Even
     this.addSimpleSourceHooks(touchpoint);
     const modelDefs = this.gestureModelDefinitions;
     const selector = this.currentSelector;
+
+    touchpoint.setGestureMatchInspector(buildGestureMatchInspector(selector));
 
     const firstSelectionPromise = selector.matchGesture(touchpoint, getGestureModelSet(modelDefs, selector.baseGestureSetId));
     firstSelectionPromise.then((selection) => {
@@ -119,6 +123,10 @@ export class TouchpointCoordinator<HoveredItemType, StateToken=any> extends Even
 
   public get activeGestures(): GestureSequence<HoveredItemType>[] {
     return [].concat(this._activeGestures);
+  }
+
+  public get activeSources(): GestureSource<HoveredItemType, StateToken>[] {
+    return [].concat(this.inputEngines.map((engine) => engine.activeSources).reduce((merged, arr) => merged.concat(arr), []));
   }
 
   /**
