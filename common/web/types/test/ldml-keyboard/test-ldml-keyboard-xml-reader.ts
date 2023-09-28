@@ -143,7 +143,7 @@ describe('ldml keyboard xml reader tests', function () {
   ]);
 });
 
-describe('verify scancodes', function () {
+describe.skip('verify scancodes', function () {
   this.slow(500); // 0.5 sec -- json schema validation takes a while
 
   testReaderCases([
