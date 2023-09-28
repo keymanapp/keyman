@@ -5,6 +5,7 @@ import { KeyboardInfoCompiler } from '@keymanapp/kmc-keyboard-info';
 import { loadProject } from '../../util/projectLoader.js';
 import { InfrastructureMessages } from '../../messages/infrastructureMessages.js';
 import { calculateSourcePath } from '../../util/calculateSourcePath.js';
+import { getLastGitCommitDate } from '../../util/getLastGitCommitDate.js';
 
 export class BuildKeyboardInfo extends BuildActivity {
   public get name(): string { return 'Keyboard metadata'; }
@@ -43,13 +44,15 @@ export class BuildKeyboardInfo extends BuildActivity {
 
 
     const jsFilename = project.resolveOutputFilePath(keyboard, KeymanFileTypes.Source.KeymanKeyboard, KeymanFileTypes.Binary.WebKeyboard);
+    const lastCommitDate = getLastGitCommitDate(callbacks.path.dirname(project.resolveInputFilePath(metadata)));
 
     const compiler = new KeyboardInfoCompiler(callbacks);
     const data = compiler.writeMergedKeyboardInfoFile({
       kmpFilename:  project.resolveOutputFilePath(kps, KeymanFileTypes.Source.Package, KeymanFileTypes.Binary.Package),
       kpsFilename: project.resolveInputFilePath(kps),
       jsFilename: fs.existsSync(jsFilename) ? jsFilename : undefined,
-      sourcePath: calculateSourcePath(infile)
+      sourcePath: calculateSourcePath(infile),
+      lastCommitDate
     });
 
     if(data == null) {
