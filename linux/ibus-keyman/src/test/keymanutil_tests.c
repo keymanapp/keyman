@@ -9,21 +9,21 @@
 #define TEST_FIXTURE "keymanutil-test"
 
 void
-delete_options_key(gchar* testname) {
+_delete_tst_options_key(gchar* testname) {
   g_autofree gchar *path = g_strdup_printf("%s%s/%s/", KEYMAN_DCONF_OPTIONS_PATH, TEST_FIXTURE, testname);
   g_autoptr(GSettings) settings = g_settings_new_with_path(KEYMAN_DCONF_OPTIONS_CHILD_NAME, path);
   g_settings_reset(settings, KEYMAN_DCONF_OPTIONS_KEY);
 }
 
 void
-set_options_key(gchar* testname, gchar** options) {
+_set_tst_options_key(gchar* testname, gchar** options) {
   g_autofree gchar* path = g_strdup_printf("%s%s/%s/", KEYMAN_DCONF_OPTIONS_PATH, TEST_FIXTURE, testname);
   g_autoptr(GSettings) settings = g_settings_new_with_path(KEYMAN_DCONF_OPTIONS_CHILD_NAME, path);
   g_settings_set_strv(settings, KEYMAN_DCONF_OPTIONS_KEY, (const gchar* const*)options);
 }
 
 gchar**
-get_options_key(gchar* testname) {
+_get_tst_options_key(gchar* testname) {
   g_autofree gchar* path = g_strdup_printf("%s%s/%s/", KEYMAN_DCONF_OPTIONS_PATH, TEST_FIXTURE, testname);
   g_autoptr(GSettings) settings = g_settings_new_with_path(KEYMAN_DCONF_OPTIONS_CHILD_NAME, path);
   gchar** result = g_settings_get_strv(settings, KEYMAN_DCONF_OPTIONS_KEY);
@@ -31,7 +31,7 @@ get_options_key(gchar* testname) {
 }
 
 kmp_keyboard*
-_get_kmp_keyboard(gchar* version, gchar** languages) {
+_get_tst_kmp_keyboard(gchar* version, gchar** languages) {
   kmp_keyboard* keyboard = g_new0(kmp_keyboard, 1);
   keyboard->name         = g_strdup("Testing");
   keyboard->id           = g_strdup("tst");
@@ -51,7 +51,7 @@ _get_kmp_keyboard(gchar* version, gchar** languages) {
 }
 
 kmp_info*
-_get_kmp_info(gchar * copyright, gchar * author_desc, gchar * author_url) {
+_get_tst_kmp_info(gchar * copyright, gchar * author_desc, gchar * author_url) {
   kmp_info* info    = g_new0(kmp_info, 1);
   info->copyright   = g_strdup(copyright);
   info->author_desc = g_strdup(author_desc);
@@ -60,7 +60,7 @@ _get_kmp_info(gchar * copyright, gchar * author_desc, gchar * author_url) {
 }
 
 keyboard_details*
-_get_keyboard_details(gchar * description, gchar * license) {
+_get_tst_keyboard_details(gchar * description, gchar * license) {
   keyboard_details* details = g_new0(keyboard_details, 1);
   details->id               = g_strdup("tst");
   details->description      = g_strdup(description);
@@ -69,16 +69,16 @@ _get_keyboard_details(gchar * description, gchar * license) {
 }
 
 add_keyboard_data*
-_get_keyboard_data() {
+_get_tst_keyboard_data() {
   add_keyboard_data* kb_data = g_new0(add_keyboard_data, 1);
   kb_data->engines_list      = NULL;
-  kb_data->info              = _get_kmp_info(NULL, NULL, NULL);
+  kb_data->info              = _get_tst_kmp_info(NULL, NULL, NULL);
   kb_data->kmp_dir           = "/tmp";
   return kb_data;
 }
 
 void
-free_kb_data(add_keyboard_data* kb_data) {
+_free_tst_kb_data(add_keyboard_data* kb_data) {
   if (kb_data->engines_list)
     g_list_free(kb_data->engines_list);
   if (kb_data->info)
@@ -91,7 +91,7 @@ void free_keyboard(gpointer data);
 void free_info(gpointer data);
 kmp_json_status free_keyboard_details(keyboard_details* kbd_details);
 
-G_DEFINE_AUTOPTR_CLEANUP_FUNC(add_keyboard_data, free_kb_data)
+G_DEFINE_AUTOPTR_CLEANUP_FUNC(add_keyboard_data, _free_tst_kb_data)
 G_DEFINE_AUTOPTR_CLEANUP_FUNC(kmp_keyboard, free_keyboard)
 G_DEFINE_AUTOPTR_CLEANUP_FUNC(kmp_info, free_info)
 G_DEFINE_AUTOPTR_CLEANUP_FUNC(keyboard_details, free_keyboard_details)
@@ -102,55 +102,55 @@ void
 test_keyman_put_options_todconf__invalid() {
   // Initialize
   gchar* testname = "test_keyman_put_options_todconf__test_keyman_put_options_todconf__invalid";
-  delete_options_key(testname);
+  _delete_tst_options_key(testname);
 
   // Execute
   keyman_put_options_todconf(TEST_FIXTURE, testname, "new_key", NULL);
 
   // Verify
-  g_auto(GStrv) options = get_options_key(testname);
+  g_auto(GStrv) options = _get_tst_options_key(testname);
   g_assert_nonnull(options);
   g_assert_null(options[0]);
 
   // Cleanup
-  delete_options_key(testname);
+  _delete_tst_options_key(testname);
 }
 
 void
 test_keyman_put_options_todconf__new_key() {
   // Initialize
   gchar* testname = "test_keyman_put_options_todconf__new_key";
-  delete_options_key(testname);
+  _delete_tst_options_key(testname);
   g_autofree gchar* value = g_strdup_printf("%d", g_test_rand_int());
 
   // Execute
   keyman_put_options_todconf(TEST_FIXTURE, testname, "new_key", value);
 
   // Verify
-  g_auto(GStrv) options = get_options_key(testname);
+  g_auto(GStrv) options = _get_tst_options_key(testname);
   g_autofree gchar* expected = g_strdup_printf("new_key=%s", value);
   g_assert_nonnull(options);
   g_assert_cmpstr(options[0], ==, expected);
   g_assert_null(options[1]);
 
   // Cleanup
-  delete_options_key(testname);
+  _delete_tst_options_key(testname);
 }
 
 void
 test_keyman_put_options_todconf__other_keys() {
   // Initialize
   gchar* testname = "test_keyman_put_options_todconf__other_keys";
-  delete_options_key(testname);
+  _delete_tst_options_key(testname);
   gchar* existingKeys[] = {"key1=val1", "key2=val2", NULL};
-  set_options_key(testname, existingKeys);
+  _set_tst_options_key(testname, existingKeys);
   g_autofree gchar* value = g_strdup_printf("%d", g_test_rand_int());
 
   // Execute
   keyman_put_options_todconf(TEST_FIXTURE, testname, "new_key", value);
 
   // Verify
-  g_auto(GStrv) options = get_options_key(testname);
+  g_auto(GStrv) options = _get_tst_options_key(testname);
   g_autofree gchar* expected = g_strdup_printf("new_key=%s", value);
   g_assert_nonnull(options);
   g_assert_cmpstr(options[0], ==, "key1=val1");
@@ -159,23 +159,23 @@ test_keyman_put_options_todconf__other_keys() {
   g_assert_null(options[3]);
 
   // Cleanup
-  delete_options_key(testname);
+  _delete_tst_options_key(testname);
 }
 
 void
 test_keyman_put_options_todconf__existing_key() {
   // Initialize
   gchar* testname = "test_keyman_put_options_todconf__existing_key";
-  delete_options_key(testname);
+  _delete_tst_options_key(testname);
   gchar* existingKeys[] = {"key1=val1", "new_key=val2", NULL};
-  set_options_key(testname, existingKeys);
+  _set_tst_options_key(testname, existingKeys);
   g_autofree gchar* value = g_strdup_printf("%d", g_test_rand_int());
 
   // Execute
   keyman_put_options_todconf(TEST_FIXTURE, testname, "new_key", value);
 
   // Verify
-  g_auto(GStrv) options = get_options_key(testname);
+  g_auto(GStrv) options = _get_tst_options_key(testname);
   g_autofree gchar* expected = g_strdup_printf("new_key=%s", value);
   g_assert_nonnull(options);
   g_assert_cmpstr(options[0], ==, "key1=val1");
@@ -183,7 +183,7 @@ test_keyman_put_options_todconf__existing_key() {
   g_assert_null(options[2]);
 
   // Cleanup
-  delete_options_key(testname);
+  _delete_tst_options_key(testname);
 }
 
 //----------------------------------------------------------------------------------------------
@@ -263,9 +263,9 @@ void
 test_get_engine_for_language__null_language() {
   // Initialize
   gchar* languages[]        = {"en:English", NULL};
-  g_autoptr(kmp_keyboard) keyboard    = _get_kmp_keyboard("1.0", languages);
-  g_autoptr(kmp_info) info            = _get_kmp_info("Copyright by me", "My Author", "myauthor@example.com");
-  g_autoptr(keyboard_details) details = _get_keyboard_details("my description", "MIT");
+  g_autoptr(kmp_keyboard) keyboard    = _get_tst_kmp_keyboard("1.0", languages);
+  g_autoptr(kmp_info) info            = _get_tst_kmp_info("Copyright by me", "My Author", "myauthor@example.com");
+  g_autoptr(keyboard_details) details = _get_tst_keyboard_details("my description", "MIT");
 
   // Execute
   g_autoptr(IBusEngineDesc) desc = get_engine_for_language(keyboard, info, details, "/tmp", NULL, NULL);
@@ -278,9 +278,9 @@ void
 test_get_engine_for_language__empty_language() {
   // Initialize
   gchar* languages[]        = {"en:English", NULL};
-  g_autoptr(kmp_keyboard) keyboard    = _get_kmp_keyboard("1.0", languages);
-  g_autoptr(kmp_info) info            = _get_kmp_info("Copyright by me", "My Author", "myauthor@example.com");
-  g_autoptr(keyboard_details) details = _get_keyboard_details("my description", "MIT");
+  g_autoptr(kmp_keyboard) keyboard    = _get_tst_kmp_keyboard("1.0", languages);
+  g_autoptr(kmp_info) info            = _get_tst_kmp_info("Copyright by me", "My Author", "myauthor@example.com");
+  g_autoptr(keyboard_details) details = _get_tst_keyboard_details("my description", "MIT");
 
   // Execute
   g_autoptr(IBusEngineDesc) desc = get_engine_for_language(keyboard, info, details, "/tmp", "", "");
@@ -293,9 +293,9 @@ void
 test_get_engine_for_language__one_language() {
   // Initialize
   gchar* languages[]        = {"en:English", NULL};
-  g_autoptr(kmp_keyboard) keyboard    = _get_kmp_keyboard("1.0", languages);
-  g_autoptr(kmp_info) info            = _get_kmp_info("Copyright by me", "My Author", "myauthor@example.com");
-  g_autoptr(keyboard_details) details = _get_keyboard_details("my description", "MIT");
+  g_autoptr(kmp_keyboard) keyboard    = _get_tst_kmp_keyboard("1.0", languages);
+  g_autoptr(kmp_info) info            = _get_tst_kmp_info("Copyright by me", "My Author", "myauthor@example.com");
+  g_autoptr(keyboard_details) details = _get_tst_keyboard_details("my description", "MIT");
 
   // Execute
   g_autoptr(IBusEngineDesc) desc = get_engine_for_language(keyboard, info, details, "/tmp", "en", "English");
@@ -310,9 +310,9 @@ void
 test_get_engine_for_language__one_unknown_language() {
   // Initialize
   gchar* languages[]        = {"foo:Foo", NULL};
-  g_autoptr(kmp_keyboard) keyboard    = _get_kmp_keyboard("1.0", languages);
-  g_autoptr(kmp_info) info            = _get_kmp_info("Copyright by me", "My Author", "myauthor@example.com");
-  g_autoptr(keyboard_details) details = _get_keyboard_details("my description", "MIT");
+  g_autoptr(kmp_keyboard) keyboard    = _get_tst_kmp_keyboard("1.0", languages);
+  g_autoptr(kmp_info) info            = _get_tst_kmp_info("Copyright by me", "My Author", "myauthor@example.com");
+  g_autoptr(keyboard_details) details = _get_tst_keyboard_details("my description", "MIT");
 
   // Execute
   g_autoptr(IBusEngineDesc) desc = get_engine_for_language(keyboard, info, details, "/tmp", "foo", "Foo");
@@ -327,9 +327,9 @@ void
 test_get_engine_for_language__different_languages() {
   // Initialize
   gchar* languages[]        = {"en:English", NULL};
-  g_autoptr(kmp_keyboard) keyboard    = _get_kmp_keyboard("1.0", languages);
-  g_autoptr(kmp_info) info            = _get_kmp_info("Copyright by me", "My Author", "myauthor@example.com");
-  g_autoptr(keyboard_details) details = _get_keyboard_details("my description", "MIT");
+  g_autoptr(kmp_keyboard) keyboard    = _get_tst_kmp_keyboard("1.0", languages);
+  g_autoptr(kmp_info) info            = _get_tst_kmp_info("Copyright by me", "My Author", "myauthor@example.com");
+  g_autoptr(keyboard_details) details = _get_tst_keyboard_details("my description", "MIT");
 
   // Execute
   g_autoptr(IBusEngineDesc) desc = get_engine_for_language(keyboard, info, details, "/tmp", "foo", "Foo");
@@ -344,9 +344,9 @@ void
 test_get_engine_for_language__no_kbd_language() {
   // Initialize
   gchar* languages[]        = {NULL};
-  g_autoptr(kmp_keyboard) keyboard    = _get_kmp_keyboard("1.0", languages);
-  g_autoptr(kmp_info) info            = _get_kmp_info("Copyright by me", "My Author", "myauthor@example.com");
-  g_autoptr(keyboard_details) details = _get_keyboard_details("my description", "MIT");
+  g_autoptr(kmp_keyboard) keyboard    = _get_tst_kmp_keyboard("1.0", languages);
+  g_autoptr(kmp_info) info            = _get_tst_kmp_info("Copyright by me", "My Author", "myauthor@example.com");
+  g_autoptr(keyboard_details) details = _get_tst_keyboard_details("my description", "MIT");
 
   // Execute
   g_autoptr(IBusEngineDesc) desc = get_engine_for_language(keyboard, info, details, "/tmp", "en", "English");
@@ -362,8 +362,8 @@ void
 test_keyman_add_keyboard__no_language() {
   // Initialize
   gchar* languages[]         = {NULL};
-  g_autoptr(kmp_keyboard) keyboard     = _get_kmp_keyboard("1.0", languages);
-  g_autoptr(add_keyboard_data) kb_data = _get_keyboard_data();
+  g_autoptr(kmp_keyboard) keyboard     = _get_tst_kmp_keyboard("1.0", languages);
+  g_autoptr(add_keyboard_data) kb_data = _get_tst_keyboard_data();
 
   // Execute
   keyman_add_keyboard(keyboard, kb_data);
@@ -379,8 +379,8 @@ void
 test_keyman_add_keyboard__one_language() {
   // Initialize
   gchar* languages[]         = {"en:English", NULL};
-  g_autoptr(kmp_keyboard) keyboard     = _get_kmp_keyboard("1.0", languages);
-  g_autoptr(add_keyboard_data) kb_data = _get_keyboard_data();
+  g_autoptr(kmp_keyboard) keyboard     = _get_tst_kmp_keyboard("1.0", languages);
+  g_autoptr(add_keyboard_data) kb_data = _get_tst_keyboard_data();
 
   // Execute
   keyman_add_keyboard(keyboard, kb_data);
@@ -396,8 +396,8 @@ void
 test_keyman_add_keyboard__two_languages() {
   // Initialize
   gchar* languages[]         = {"en:English", "fr:French", NULL};
-  g_autoptr(kmp_keyboard) keyboard     = _get_kmp_keyboard("1.0", languages);
-  g_autoptr(add_keyboard_data) kb_data = _get_keyboard_data();
+  g_autoptr(kmp_keyboard) keyboard     = _get_tst_kmp_keyboard("1.0", languages);
+  g_autoptr(add_keyboard_data) kb_data = _get_tst_keyboard_data();
 
   // Execute
   keyman_add_keyboard(keyboard, kb_data);
@@ -417,8 +417,8 @@ void
 test_keyman_add_keyboard__prev_engine_adding_same_version() {
   // Initialize
   gchar* languages[]         = {"en:English", NULL};
-  g_autoptr(kmp_keyboard) keyboard     = _get_kmp_keyboard("1.0", languages);
-  g_autoptr(add_keyboard_data) kb_data = _get_keyboard_data();
+  g_autoptr(kmp_keyboard) keyboard     = _get_tst_kmp_keyboard("1.0", languages);
+  g_autoptr(add_keyboard_data) kb_data = _get_tst_keyboard_data();
   IBusEngineDesc* desc = ibus_keyman_engine_desc_new("en:/usr/share/keyman/tst.kmx", "Testing", NULL, NULL, "en", NULL, NULL, "", "us", "1.0");
   kb_data->engines_list = g_list_append(kb_data->engines_list, desc);
 
@@ -436,8 +436,8 @@ void
 test_keyman_add_keyboard__prev_engine_adding_newer_version() {
   // Initialize
   gchar* languages[]         = {"en:English", "fr:French", NULL};  // New version adds French
-  g_autoptr(kmp_keyboard) keyboard     = _get_kmp_keyboard("1.1", languages);
-  g_autoptr(add_keyboard_data) kb_data = _get_keyboard_data();
+  g_autoptr(kmp_keyboard) keyboard     = _get_tst_kmp_keyboard("1.1", languages);
+  g_autoptr(add_keyboard_data) kb_data = _get_tst_keyboard_data();
   IBusEngineDesc* desc =
       ibus_keyman_engine_desc_new("en:/usr/share/keyman/tst.kmx", "Testing", NULL, NULL, "en", NULL, NULL, "", "us", "1.0");
   kb_data->engines_list = g_list_append(kb_data->engines_list, desc);
@@ -467,8 +467,8 @@ test_keyman_add_keyboard__prev_engine_adding_newer_version_9593() {
 
   // Initialize
   gchar* languages[]         = {"en:English", "fr:French", NULL};  // New version adds French
-  g_autoptr(kmp_keyboard) keyboard     = _get_kmp_keyboard("1.10", languages);
-  g_autoptr(add_keyboard_data) kb_data = _get_keyboard_data();
+  g_autoptr(kmp_keyboard) keyboard     = _get_tst_kmp_keyboard("1.10", languages);
+  g_autoptr(add_keyboard_data) kb_data = _get_tst_keyboard_data();
   IBusEngineDesc* desc =
       ibus_keyman_engine_desc_new("en:/usr/share/keyman/tst.kmx", "Testing", NULL, NULL, "en", NULL, NULL, "", "us", "1.9");
   kb_data->engines_list = g_list_append(kb_data->engines_list, desc);
@@ -495,8 +495,8 @@ void
 test_keyman_add_keyboard__prev_engine_adding_older_version() {
   // Initialize
   gchar* languages[]         = {"en:English", "fr:French", NULL};  // Old version has additional French
-  g_autoptr(kmp_keyboard) keyboard     = _get_kmp_keyboard("0.9", languages);
-  g_autoptr(add_keyboard_data) kb_data = _get_keyboard_data();
+  g_autoptr(kmp_keyboard) keyboard     = _get_tst_kmp_keyboard("0.9", languages);
+  g_autoptr(add_keyboard_data) kb_data = _get_tst_keyboard_data();
   IBusEngineDesc* desc =
       ibus_keyman_engine_desc_new("en:/usr/share/keyman/tst.kmx", "Testing", NULL, NULL, "en", NULL, NULL, "", "us", "1.0");
   kb_data->engines_list = g_list_append(kb_data->engines_list, desc);

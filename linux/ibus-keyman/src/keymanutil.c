@@ -444,7 +444,7 @@ keyman_put_options_todconf(gchar *package_id,
     }
 
     // Obtain keyboard options from DConf
-    gchar **options = keyman_get_options_fromdconf(package_id, keyboard_id);
+    g_auto(GStrv) options    = keyman_get_options_fromdconf(package_id, keyboard_id);
     g_autofree gchar *needle = g_strdup_printf("%s=", option_key);
     gchar *kvp = g_strdup_printf("%s=%s", option_key, option_value);
 
@@ -476,16 +476,14 @@ keyman_put_options_todconf(gchar *package_id,
 
     // Write to DConf
     g_autofree gchar *path = g_strdup_printf("%s%s/%s/", KEYMAN_DCONF_OPTIONS_PATH, package_id, keyboard_id);
-    GSettings *child_settings = g_settings_new_with_path(KEYMAN_DCONF_OPTIONS_CHILD_NAME, path);
+    g_autoptr(GSettings) child_settings = g_settings_new_with_path(KEYMAN_DCONF_OPTIONS_CHILD_NAME, path);
     if (child_settings != NULL)
     {
         g_message("writing keyboard options to DConf");
         g_settings_set_strv(child_settings, KEYMAN_DCONF_OPTIONS_KEY, (const gchar *const *)options);
     }
 
-    g_object_unref(G_OBJECT(child_settings));
-    g_strfreev(options);
-    // kvp got assigned to options[x] and so got freed by g_strfreev()
+    // kvp got assigned to options[x] and so gets freed when options are freed
 }
 
 
