@@ -4,13 +4,14 @@ set -eu
 TOP_SRCDIR=${top_srcdir:-$(realpath "$(dirname "$0")/../..")}
 TESTBASEDIR=${XDG_DATA_HOME:-$HOME/.local/share}/keyman
 TESTDIR=${TESTBASEDIR}/test_kmx
-PID_FILE=/tmp/ibus-keyman-test-pids
+CLEANUP_FILE=/tmp/ibus-keyman-test-cleanup
+PID_FILE=/tmp/ibus-keyman-test.pids
 ENV_FILE=/tmp/keyman-env.txt
 
 . "$(dirname "$0")"/test-helper.inc.sh
 
 local_cleanup() {
-  cleanup "$PID_FILE"
+  cleanup "$CLEANUP_FILE"
 }
 
 if [ -v KEYMAN_PKG_BUILD ]; then
@@ -62,7 +63,7 @@ function run_tests() {
 
   G_TEST_BUILDDIR="$(dirname "$0")/../../../build/$(arch)/${CONFIG}/tests"
 
-  setup "$DISPLAY_SERVER" "$ENV_FILE" "$PID_FILE"
+  setup "$DISPLAY_SERVER" "$ENV_FILE" "$CLEANUP_FILE" "$PID_FILE"
 
   echo "# NOTE: When the tests fail check /tmp/ibus-engine-keyman.log and /tmp/ibus-daemon.log!"
   echo ""
@@ -89,7 +90,7 @@ function run_tests() {
     --directory "$TESTDIR" "${DISPLAY_SERVER}" ${TESTFILES[@]}
   echo "# Finished tests."
 
-  cleanup "$PID_FILE"
+  cleanup "$CLEANUP_FILE"
 }
 
 USE_WAYLAND=1
@@ -132,6 +133,7 @@ if [ ! -f "${G_TEST_BUILDDIR}/ibus-keyman-tests" ]; then
   G_TEST_BUILDDIR="${G_TEST_BUILDDIR:-../../build/$(arch)/release/tests}"
 fi
 
+echo > "$CLEANUP_FILE"
 echo > "$PID_FILE"
 trap local_cleanup EXIT SIGINT
 
