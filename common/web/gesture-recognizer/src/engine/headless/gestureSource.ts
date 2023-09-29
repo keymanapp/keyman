@@ -2,6 +2,13 @@ import { InputSample } from "./inputSample.js";
 import { SerializedGesturePath, GesturePath } from "./gesturePath.js";
 import { GestureRecognizerConfiguration, preprocessRecognizerConfig } from "../configuration/gestureRecognizerConfiguration.js";
 import { Nonoptional } from "../nonoptional.js";
+import { MatcherSelector } from "./gestures/matchers/matcherSelector.js";
+
+export function buildGestureMatchInspector<Type>(selector: MatcherSelector<Type>) {
+  return (source: GestureSource<Type, any>) => {
+    return selector.potentialMatchersForSource(source).map((matcher) => matcher.model.id);
+  };
+}
 
 /**
  * Documents the expected typing of serialized versions of the `GestureSource` class.
@@ -66,6 +73,27 @@ export class GestureSource<HoveredItemType, StateToken=any> {
   }
 
   /**
+   * Allows the GestureSource to report on its remaining potential GestureModel matches for the
+   * current gesture stage.
+   *
+   * Would be nice to have it required in the constructor, but that would greatly complicate certain
+   * automated testing patterns.
+   */
+  private _matchInspectionClosure: (source: GestureSource<HoveredItemType, StateToken>) => string[];
+
+  /**
+   * For internal gesture-engine use only.  Will throw an error if called more than once during the
+   * GestureSource's lifetime.
+   */
+  public setGestureMatchInspector(closure: typeof GestureSource.prototype._matchInspectionClosure) {
+    if(this._matchInspectionClosure) {
+      throw new Error("Invalid state:  the match-inspection closure has already been set");
+    }
+
+    this._matchInspectionClosure = closure;
+  }
+
+  /**
    * Constructs a new GestureSource instance for tracking updates to an active input point over time.
    * @param identifier     The system identifier for the input point's events.
    * @param initialHoveredItem  The initiating event's original target element
@@ -116,6 +144,14 @@ export class GestureSource<HoveredItemType, StateToken=any> {
    */
   public get currentSample(): InputSample<HoveredItemType, StateToken> {
     return this.path.coords[this.path.coords.length-1];
+  }
+
+  /**
+   * Returns an array of IDs for gesture models that are still valid for the `GestureSource`'s
+   * current state.  They will be specified in descending `resolutionPriority` order.
+   */
+  public get potentialModelMatchIds(): string[] {
+    return this._matchInspectionClosure(this);
   }
 
   /**

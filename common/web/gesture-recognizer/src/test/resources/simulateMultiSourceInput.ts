@@ -1,4 +1,4 @@
-import { InputSample, GestureSource, gestures } from '@keymanapp/gesture-recognizer';
+import { InputSample, buildGestureMatchInspector, GestureSource, gestures } from '@keymanapp/gesture-recognizer';
 import { ManagedPromise, timedPromise } from '@keymanapp/web-utils';
 import { GestureSourceSubview } from '../../../build/obj/headless/gestureSource.js';
 
@@ -393,6 +393,10 @@ export function simulateSelectorInput<Type>(
     executor
     // Minor TS inference problem below (b/c arrays aren't necessarily guaranteed a first entry?)
   } = simulateMultiSourceInput(config, input.pathSpecs as any, fakeClock);
+
+  testObjPromise.then((selector) => {
+    sources.forEach((source) => source.setGestureMatchInspector(buildGestureMatchInspector(selector)));
+  });
 
   return {
     sources,

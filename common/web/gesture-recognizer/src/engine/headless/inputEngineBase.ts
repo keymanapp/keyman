@@ -56,4 +56,8 @@ export abstract class InputEngineBase<HoveredItemType, StateToken = any> extends
   protected addTouchpoint(touchpoint: GestureSource<HoveredItemType, StateToken>) {
     this._activeTouchpoints.push(touchpoint);
   }
+
+  public get activeSources(): GestureSource<HoveredItemType, StateToken>[] {
+    return [].concat(this._activeTouchpoints);
+  }
 }

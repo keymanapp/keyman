@@ -43,6 +43,16 @@ export class MatcherSelector<Type> extends EventEmitter<EventMap<Type>> {
     this.baseGestureSetId = baseSetId || 'default';
   }
 
+  /**
+   * Returns all active `GestureMatcher`s that are currently active for the specified `GestureSource`.
+   * They will be specified in descending `resolutionPriority` order.
+   * @param source
+   * @returns
+   */
+  public potentialMatchersForSource(source: GestureSource<Type>) {
+    return this.potentialMatchers.filter((matcher) => matcher.allSourceIds.find((id) => id == source.identifier));
+  }
+
   public cascadeTermination() {
     const potentialMatchers = this.potentialMatchers;
     const matchersToCancel = potentialMatchers.filter((matcher) => !matcher.model.sustainWhenNested);

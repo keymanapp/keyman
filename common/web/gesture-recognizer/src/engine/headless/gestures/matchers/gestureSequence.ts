@@ -105,6 +105,32 @@ export class GestureSequence<Type> extends EventEmitter<EventMap<Type>> {
     return this.selector?.baseGestureSetId ?? null;
   }
 
+    /**
+   * Returns an array of IDs for gesture models that are still valid for the `GestureSource`'s
+   * current state.  They will be specified in descending `resolutionPriority` order.
+   */
+    public get potentialModelMatchIds(): string[] {
+      // The new round of model-matching is based on the sources used by the previous round.
+      // This is important; 'sustainTimer' gesture models may rely on a now-terminated source
+      // from that previous round (like with multitaps).
+      const lastStageReport = this.stageReports[this.stageReports.length-1];
+      const trackedSources = lastStageReport.sources;
+
+      const potentialMatches = trackedSources.map((source) => {
+        return this.selector.potentialMatchersForSource(source)
+          .map((matcher) => matcher.model.id)
+      }).reduce((deduplicated, arr) => {
+        for(let entry of arr) {
+          if(deduplicated.indexOf(entry) == -1) {
+            deduplicated.push(entry);
+          }
+        }
+        return deduplicated;
+      }, [] as string[]);
+
+      return potentialMatches;
+    }
+
   private readonly selectionHandler = (selection: MatcherSelection<Type>) => {
     const matchReport = new GestureStageReport<Type>(selection);
     if(selection.matcher) {

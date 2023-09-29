@@ -32,6 +32,7 @@ export class HeadlessInputEngine<Type = any> extends InputEngineBase<Type> {
     replaySource.update(headSample); // is included before the point is made available.
 
     const startPromise = timedPromise(headSample.t).then(() => {
+      this.addTouchpoint(replaySource);
       this.emit('pointstart', replaySource);
     });
 
@@ -64,6 +65,7 @@ export class HeadlessInputEngine<Type = any> extends InputEngineBase<Type> {
       if(replaySource.isPathComplete) {
         return;
       }
+      this.dropTouchpointWithId(replaySource.rawIdentifier);
       replaySource.terminate(recording.path.wasCancelled);
     });
   }
