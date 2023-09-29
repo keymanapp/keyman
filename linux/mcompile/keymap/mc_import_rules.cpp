@@ -174,7 +174,7 @@ public:
     return this->m_rgss[(UINT)shiftState][(capsLock ? 1 : 0)];
   }
   
-  void SetShiftState(ShiftState shiftState, std::wstring value, bool isDeadKey, bool capsLock) {
+  void KMX_SetShiftState(ShiftState shiftState, std::wstring value, bool isDeadKey, bool capsLock) {
     this->m_rgfDeadKey[(UINT)shiftState][(capsLock ? 1 : 0)] = isDeadKey;
     this->m_rgss[(UINT)shiftState][(capsLock ? 1 : 0)] = value;
   }
@@ -517,12 +517,12 @@ bool  write_rgKey_ToFile(std::vector<KMX_VirtualKey*> rgKey ){
 std::wstring  get_VirtualKey_US_from_iKey(KMX_DWORD iKey, ShiftState &ss, int &caps, v_dw_3D &All_Vector) {
 
   int icaps;
-  KMX_DWORD SC_ = get_position_From_VirtualKey_US(iKey, All_Vector);
+  KMX_DWORD pos = get_position_From_VirtualKey_US(iKey, All_Vector);
 
   if (ss >9)
     return L"";
 
-  if( ss < All_Vector[0][SC_].size()-1) {
+  if( ss < All_Vector[0][pos].size()-1) {
 
     if ( ss % 2 == 0)
       icaps = ss+2-caps;
@@ -530,7 +530,7 @@ std::wstring  get_VirtualKey_US_from_iKey(KMX_DWORD iKey, ShiftState &ss, int &c
     if ( ss % 2 == 1)
       icaps = ss+caps;
 
-    return std::wstring(1, (int) All_Vector[0][SC_][icaps]);
+    return std::wstring(1, (int) All_Vector[0][pos][icaps]);
   }
   return L"";
 }
@@ -620,7 +620,7 @@ bool KMX_ImportRules(KMX_WCHAR *kbid, LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector,std
   }
 */
 
-  // _S2 skip shiftstates 4, 5, 8, 9
+  // _S2 in this part we skip shiftstates 4, 5, 8, 9
   for(UINT iKey = 0; iKey < rgKey.size(); iKey++) {
     if(rgKey[iKey] != NULL) {
       WCHAR sbBuffer[256];     // Scratchpad we use many places
@@ -633,26 +633,33 @@ bool KMX_ImportRules(KMX_WCHAR *kbid, LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector,std
 
         for(int caps = 0; caps <= 1; caps++) {
 
+          //_S2 TODO
           //_S2 get char  - do I need rc ?? ( was rc = ToUnicodeEx...)
-          std::wstring char_for_input = get_VirtualKey_US_from_iKey(iKey, ss, caps, All_Vector);
+          std::wstring VK_US = get_VirtualKey_US_from_iKey(iKey, ss, caps, All_Vector);
 
+          //_S2 TODO
           //do I need that ??
           //if rc >0: it got 1 or more char AND buffer is empty ( nothing inside ) {
-            if(char_for_input == L"") {
-                  rgKey[iKey]->SetShiftState(ss, L"", false, (caps == 0));
+            if(VK_US == L"") {
+                  rgKey[iKey]->KMX_SetShiftState(ss, L"", false, (caps == 0));
             }
 
-            //else   // if rc ==1 : it got 1  char && something    {
-            if( (ss == Ctrl || ss == ShftCtrl) /*&& something? */) {
+            //_S2 TODO
+            //else   // if rc ==1 : it got 1  char && +40 in Buffer CTRl pressed    {
+                //It's dealing with control characters. If ToUnicodeEx gets VK_A with the Ctrl key pressed,
+                //it will write 0x01 to sBuffer[0] , without Ctrl it's 0x41. The if detects this case.
+            if( (ss == Ctrl || ss == ShftCtrl) /*&& CTRl +0x40 in the buffer ( which indicates a ctrl press)   */) {
                 continue;
             }
 
+            //_S2 TODO
             // fill m_rgss and m_rgfDeadkey ( m_rgfDeadkey will be done later)
-            rgKey[iKey]->SetShiftState(ss, char_for_input, false, (caps == 0));
+            rgKey[iKey]->KMX_SetShiftState(ss, VK_US, false, (caps == 0));
           //}  // from rc==1
         // } // from rc > 0
 
 
+        //_S2 TODO
         // _S2 handle deadkeys later
         // if rc <0:  it got a deadkey   {
             // fill m_rgss and m_rgfDeadkey
@@ -674,18 +681,17 @@ bool KMX_ImportRules(KMX_WCHAR *kbid, LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector,std
   write_RGKEY_FileToVector(V_map, "map.txt");
   CompareVector_To_VectorOfFile_RGKEY( V_win, V_lin,V_map);*/
 
-  int STOP = 0;
 
 
   //-------------------------------------------------------------
   // Now that we've collected the key data, we need to
   // translate it to kmx and append to the existing keyboard
   //-------------------------------------------------------------
-/*
+
   int nDeadkey = 0;
 
-  LPGROUP gp = new GROUP[kp->cxGroupArray+2];  // leave space for old
-  memcpy(gp, kp->dpGroupArray, sizeof(GROUP) * kp->cxGroupArray);
+  LPKMX_GROUP gp = new KMX_GROUP[kp->cxGroupArray+4];  // leave space for old
+  memcpy(gp, kp->dpGroupArray, sizeof(KMX_GROUP) * kp->cxGroupArray);
 
   //
   // Find the current highest deadkey index
@@ -699,13 +705,22 @@ bool KMX_ImportRules(KMX_WCHAR *kbid, LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector,std
      // *p++ = CODE_USE;
      // *p++ = (WCHAR)(kp->cxGroupArray + 1);
      // *p = 0;
+    //}
+    LPKMX_KEY kkp = gp->dpKeyArray;
+
+int STOP=0;
+    /*for(UINT j = 0; j < gp->cxKeyArray; j++, kkp++) {
+      nDeadkey = max(nDeadkey, KMX_GetMaxDeadkeyIndex(kkp->dpContext));
+      nDeadkey = max(nDeadkey, KMX_GetMaxDeadkeyIndex(kkp->dpOutput));
     }
-    LPKEY kkp = gp->dpKeyArray;
-    for(UINT j = 0; j < gp->cxKeyArray; j++, kkp++) {
-      nDeadkey = max(nDeadkey, GetMaxDeadkeyIndex(kkp->dpContext));
-      nDeadkey = max(nDeadkey, GetMaxDeadkeyIndex(kkp->dpOutput));
-    }
+    */
   }
+
+
+
+int STOP2=0;
+
+  /*
   kp->cxGroupArray++;
   gp = &kp->dpGroupArray[kp->cxGroupArray-1];
 
@@ -855,8 +870,7 @@ bool KMX_ImportRules(KMX_WCHAR *kbid, LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector,std
       kkp++;
     }
   }
-  */
+*/
 wprintf(L"\n ##### KMX_ImportRules of mc_import_rules ended #####\n");
-  return true;
+return true;
 }
-
