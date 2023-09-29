@@ -2,6 +2,8 @@ import EventEmitter from "eventemitter3";
 import { InputEngineBase } from "./inputEngineBase.js";
 import { GestureSource, GestureSourceSubview } from "./gestureSource.js";
 import { MatcherSelector } from "./gestures/matchers/matcherSelector.js";
+import { GestureSequence } from "./gestures/matchers/gestureSequence.js";
+import { GestureModelDefs, getGestureModelSet } from "./gestures/specs/gestureModelDefs.js";
 
 interface EventMap<HoveredItemType> {
   /**
@@ -10,6 +12,8 @@ interface EventMap<HoveredItemType> {
    * @returns
    */
   'inputstart': (input: GestureSource<HoveredItemType>) => void;
+
+  'recognizedgesture': (sequence: GestureSequence<HoveredItemType>) => void;
 }
 
 /**
@@ -24,11 +28,21 @@ export class TouchpointCoordinator<HoveredItemType> extends EventEmitter<EventMa
   private inputEngines: InputEngineBase<HoveredItemType>[];
   private selectorStack: MatcherSelector<HoveredItemType>[] = [new MatcherSelector()];
 
-  private _activeSources: GestureSource<HoveredItemType>[] = [];
+  private gestureModelDefinitions: GestureModelDefs<HoveredItemType>;
 
-  public constructor() {
+  private _activeSources: GestureSource<HoveredItemType>[] = [];
+  private _activeGestures: GestureSequence<HoveredItemType>[] = [];
+
+  public constructor(gestureModelDefinitions: GestureModelDefs<HoveredItemType>, inputEngines?: InputEngineBase<HoveredItemType>[]) {
     super();
+
+    this.gestureModelDefinitions = gestureModelDefinitions;
     this.inputEngines = [];
+    if(inputEngines) {
+      for(let engine of inputEngines) {
+        this.addEngine(engine);
+      }
+    }
   }
 
   public pushSelector(selector: MatcherSelector<HoveredItemType>) {
@@ -58,29 +72,59 @@ export class TouchpointCoordinator<HoveredItemType> extends EventEmitter<EventMa
 
   private readonly onNewTrackedPath = (touchpoint: GestureSource<HoveredItemType>) => {
     this.addSimpleSourceHooks(touchpoint);
+    const modelDefs = this.gestureModelDefinitions;
+    const selector = this.currentSelector;
 
-    // ... stuff
+    const firstSelectionPromise = selector.matchGesture(touchpoint, getGestureModelSet(modelDefs, selector.baseGestureSetId));
+    firstSelectionPromise.then((selection) => {
+      if(selection.result.matched == false) {
+        return;
+      }
+
+      // For multitouch gestures, only report the gesture **once**.
+      const sourceIDs = selection.matcher.allSourceIds;
+      for(let sequence of this._activeGestures) {
+        if(!!sequence.allSourceIds.find((id1) => !!sourceIDs.find((id2) => id1 == id2))) {
+          // We've already established (and thus, already reported) a GestureSequence for this selection.
+          return;
+        }
+      }
+
+      const gestureSequence = new GestureSequence(selection, modelDefs, this.currentSelector, this);
+      this._activeGestures.push(gestureSequence);
+      gestureSequence.on('complete', () => {
+        // When the GestureSequence is fully complete and all related `firstSelectionPromise`s have
+        // had the chance to resolve, drop the reference; prevent memory leakage.
+        const index = this._activeGestures.indexOf(gestureSequence);
+        if(index != -1) {
+          this._activeGestures.splice(index, 1);
+        }
+      });
+
+      // Could track sequences easily enough; the question is how to tell when to 'let go'.
+
+      this.emit('recognizedgesture', gestureSequence);
+
+      // Any related 'push' mechanics that may still be lingering are currently handled by GestureSequence
+      // during its 'completion' processing.  (See `GestureSequence.selectionHandler`.)
+    });
 
     this.emit('inputstart', touchpoint);
   }
 
-  private doGestureUpdate(source: GestureSource<HoveredItemType>) {
-    // Should probably ensure data-updates for multi-contact gestures are synchronized
-    // before proceeding.  Single-contact cases are inherently synchronized, of course.
-    //
-    // Should a gesture type have geometric requirements on the current location of active
-    // touchpaths, having a desync during a quick movement could cause the calculated
-    // distance between the locations to be markedly different than expected.
-
-    // TODO: stuff, including synchronization.  Probably do that on the caller,
-    // rather than here?
+  public get activeGestures(): GestureSequence<HoveredItemType>[] {
+    return [].concat(this._activeGestures);
   }
 
   private addSimpleSourceHooks(touchpoint: GestureSource<HoveredItemType>) {
-    touchpoint.path.on('step', () => this.doGestureUpdate(touchpoint));
 
     touchpoint.path.on('invalidated', () => {
-      // TODO: on cancellation, is there any other cleanup to be done?
+      // GestureSequence _should_ handle any other cleanup internally as fallout
+      // from the path being cancelled.
+
+      // To consider: should it specially mark if it 'completed' due to cancellation,
+      // or is that safe to infer from the tracked GestureSource(s)?
+      // Currently, we're going with the latter.
 
       // Also mark the touchpoint as no longer active.
       let i = this._activeSources.indexOf(touchpoint);

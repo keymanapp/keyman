@@ -53,6 +53,8 @@ export class GestureMatcher<Type> implements PredecessorMatch<Type> {
     }).filter((entry) => !!entry);
   }
 
+  private _isCancelled: boolean = false;
+
   private readonly predecessor?: PredecessorMatch<Type>;
 
   private readonly publishedPromise: ManagedPromise<MatchResult<Type>>; // unsure on the actual typing at the moment.
@@ -147,6 +149,14 @@ export class GestureMatcher<Type> implements PredecessorMatch<Type> {
     }
   }
 
+  public cancel() {
+    this._isCancelled = true;
+  }
+
+  public get isCancelled(): boolean {
+    return this._isCancelled;
+  }
+
   private finalize(matched: boolean, cause: FulfillmentCause) {
     if(this.publishedPromise.isFulfilled) {
       return this._result;
@@ -172,24 +182,6 @@ export class GestureMatcher<Type> implements PredecessorMatch<Type> {
           type: 'none',
           item: 'none'
         };
-      }
-
-      for(let i = 0; i < this.pathMatchers.length; i++) {
-        const matcher = this.pathMatchers[i];
-        const contactSpec = this.model.contacts[i];
-
-        // If the path already terminated, no need to evaluate further for this contact point.
-        if(matcher.source.isPathComplete) {
-          continue;
-        }
-
-        if(matched && contactSpec.endOnResolve) {
-          matcher.source.terminate(false);
-        } else if(!matched && contactSpec.endOnReject) {
-          // Ending due to gesture-rejection effectively means to cancel the path,
-          // so signal exactly that.
-          matcher.source.terminate(true);
-        }
       }
 
       // Determine the item source for the item to be reported for this gesture, if any.
@@ -223,6 +215,38 @@ export class GestureMatcher<Type> implements PredecessorMatch<Type> {
       /* c8 ignore next 3 */
     } catch(err) {
       this.publishedPromise.reject(err);
+    }
+  }
+
+  /**
+   * Applies any source-finalization specified by the model based on whether or not it was matched.
+   * It is invalid to call this method before model evaluation is complete.
+   *
+   * Additionally, this should only be applied for "selected" gesture models - those that "win"
+   * and are accepted as part of a GestureSequence.
+   */
+  public finalizeSources() {
+    if(!this._result) {
+      throw Error("Invalid state for source-finalization - the matcher's evaluation of the gesture model is not yet complete");
+    }
+
+    const matched = this._result.matched;
+    for(let i = 0; i < this.pathMatchers.length; i++) {
+      const matcher = this.pathMatchers[i];
+      const contactSpec = this.model.contacts[i];
+
+      // If the path already terminated, no need to evaluate further for this contact point.
+      if(matcher.source.isPathComplete) {
+        continue;
+      }
+
+      if(matched && contactSpec.endOnResolve) {
+        matcher.source.terminate(false);
+      } else if(!matched && contactSpec.endOnReject) {
+        // Ending due to gesture-rejection effectively means to cancel the path,
+        // so signal exactly that.
+        matcher.source.terminate(true);
+      }
     }
   }
 
@@ -312,11 +336,13 @@ export class GestureMatcher<Type> implements PredecessorMatch<Type> {
 
     const contactSpec = this.model.contacts[existingContacts];
     const contactModel = new PathMatcher(contactSpec.model, simpleSource);
+    // Add it early, as we need it to be accessible for reference via .primaryPath stuff below.
+    this.pathMatchers.push(contactModel);
+
     let baseItem: Type = null;
-    if(existingContacts) {
-      // just use the highest-priority item source's base item and call it a day.
-      baseItem = this.primaryPath.baseItem;
-    } else if(this.predecessor && this.model.sustainTimer) {
+    // If there were no existing contacts but a predecessor exists and a sustain timer
+    // has been specified, it needs special base-item handling.
+    if(!existingContacts && this.predecessor && this.model.sustainTimer) {
       const baseItemMode = this.model.sustainTimer.baseItem ?? 'result';
 
       switch(baseItemMode) {
@@ -330,6 +356,10 @@ export class GestureMatcher<Type> implements PredecessorMatch<Type> {
           baseItem = this.predecessor.result.action.item;
           break;
       }
+    } else {
+      // just use the highest-priority item source's base item and call it a day.
+      // There's no need to refer to some previously-existing source for comparison.
+      baseItem = this.primaryPath.baseItem;
     }
 
     if(contactSpec.model.allowsInitialState) {
@@ -340,11 +370,12 @@ export class GestureMatcher<Type> implements PredecessorMatch<Type> {
       }
     }
 
+    // Now that we've done the initial-state check, we can check for instantly-matching path models.
+    contactModel.update();
+
     contactModel.promise.then((resolution) => {
       this.finalize(resolution.type == 'resolve', resolution.cause);
     });
-
-    this.pathMatchers.push(contactModel);
   }
 
   update() {

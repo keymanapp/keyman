@@ -233,6 +233,23 @@ export class MatcherSelector<Type> extends EventEmitter<EventMap<Type>> {
         }
       }
 
+      /* If cancellation was requested but not pre-filtered by the synchronizer setup, replace
+       * the result object.  The matcher's Promise may have resolved simultaneously with the
+       * winner but 'lost', a scenario that may require careful handling to clean up.
+       */
+      if(matcher.isCancelled) {
+        result = {
+          matched: false,
+          action: {
+            type: 'none',
+            item: null
+          }
+        };
+      } else {
+        // Since we've selected this matcher, it should apply any model-specified finalization necessary.
+        matcher.finalizeSources();
+      }
+
       // Find ALL associated match-promises for sources matched by the matcher.
       const matchedContactIds = matcher.allSourceIds;
 
@@ -249,6 +266,12 @@ export class MatcherSelector<Type> extends EventEmitter<EventMap<Type>> {
         // It's already been handled; do not re-attempt.
         return;
       }
+
+      if(matcher.isCancelled) {
+        // Fortunately, the rest of the code will help us recover from the state.
+        console.warn("Unexpected state:  a cancelled GestureMatcher was still listed as a possibility");
+      }
+
       this.potentialMatchers.splice(matcherIndex, 1);
 
       /*
@@ -331,29 +354,36 @@ export class MatcherSelector<Type> extends EventEmitter<EventMap<Type>> {
             return !losingMatchers.find((matcher2) => matcher == matcher2);
           });
 
-          // Drop all trackers for the matched sources.
+          /*
+          * While the 'synchronizer' setup will perfectly handle most cases, we need this block to catch
+          * a somewhat niche case:  if a second source was added to the matcher at a later point in time,
+          * there are two separate Promise handlers - with separate synchronization sets.  We use the
+          * `cancel` method to ensure that cancellation from one set propagates to the other handler.
+          * (It seems the simplest & most straightforward approach to do ensure localized, per-matcher
+          * consistency without mangling any matchers that shouldn't be affected.)
+          *
+          * This can arise if a modipress is triggered at the same time a new touchpoint begins, which
+          * could trigger a simple-tap.
+          */
+          losingMatchers.forEach((matcher) => {
+            matcher.cancel();
+          });
+
+          // Drop the newly-cancelled trackers.
           this._sourceSelector = this._sourceSelector.filter((a) => !sourceMetadata.find((b) => a == b));
 
           // And now for one line with some "heavy lifting":
 
           /*
-           * Does two things:
-           * 1. Fulfills the contract set by `matchGesture`.
+           * Fulfills the contract set by `matchGesture`.
            *
-           * 2. Fulfilling the ManagedPromise acts as a synchronizer, facilitating the guarantee at
-           * the start of this closure.  It's set synchronously, so other gesture-matchers that
-           * call into this method will know that a match has already fulfilled for the matched
+           * Also, fulfilling the ManagedPromise acts as a synchronizer, partially facilitating the
+           * guarantee at the start of this closure.  It's set synchronously, so other gesture-matchers
+           * that call into this method will know that a match has already fulfilled for the matched
            * source(s).  Any further matchers will be silently ignored, effectively cancelling them.
-           *
-           * If we're within this closure, the closure's synchronizer-promise matches the instance
-           * currently set on its `tracker` - as are any others affected by the resolving matcher.
-           *
-           * It _is_ possible that we may need to resolve a Promise not included in the synchronizer
-           * set - if a second contact / source was added at a later point in time to something that
-           * started single-contact.  Two separate 'raise' attempts would occur, since the links to
-           * this method were set for each source independently.  The most consistent way to ensure
-           * synchronization is thus to rely on the instance annotated on the tracker itself for
-           * each matched source.
+           * However, this fails to handle the case where two separate calls to matcherSelectionFilter
+           * occur for the same matcher due to one source being added at a later point in time;
+           * this is what the `cancel`
            */
           tracker.matchPromise.resolve({matcher, result});
         }
