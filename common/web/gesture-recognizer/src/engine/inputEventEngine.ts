@@ -34,6 +34,7 @@ export abstract class InputEventEngine<HoveredItemType, StateToken> extends Inpu
 
   protected onInputStart(identifier: number, sample: InputSample<HoveredItemType, StateToken>, target: EventTarget, isFromTouch: boolean) {
     const touchpoint = new GestureSource<HoveredItemType>(identifier, this.config, isFromTouch);
+    touchpoint.stateToken = this.stateToken;
     touchpoint.update(sample);
 
     this.addTouchpoint(touchpoint);
