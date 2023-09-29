@@ -16,50 +16,71 @@ export class HeadlessInputEngine<Type = any> extends InputEngineBase<Type> {
   }
 
   public preparePathPlayback(recordedPoint: SerializedGestureSource) {
-    const originalSamples = recordedPoint.path.coords;
-    const sampleCount = originalSamples.length;
+    return this.playbackRecording({
+      inputs: [
+        recordedPoint
+      ],
+      config: null
+    });
+  }
 
-    const headSample = originalSamples[0];
-    const tailSamples = originalSamples.slice(1);
+  private prepareSourceStart(recordedSource: SerializedGestureSource) {
+    const headSample = recordedSource.path.coords[0];
 
     const pathID = this.PATH_ID_SEED++;
-    let replayPoint = new GestureSource<Type>(pathID, null, recordedPoint.isFromTouch);
-    replayPoint.update(headSample); // is included before the point is made available.
+    let replaySource = new GestureSource<Type>(pathID, null, recordedSource.isFromTouch);
+    replaySource.update(headSample); // is included before the point is made available.
 
-    // Build promises designed to reproduce the events at the correct times.
-    let samplePromises: Promise<void>[] = [
-      timedPromise(headSample.t).then(() => {
-        this.emit('pointstart', replayPoint);
-      })
-    ];
+    const startPromise = timedPromise(headSample.t).then(() => {
+      this.emit('pointstart', replaySource);
+    });
 
-    samplePromises = samplePromises.concat(tailSamples.map((sample) => {
+    return {
+      promise: startPromise,
+      source: replaySource
+    }
+  }
+
+  private replaySourceSamples(replaySource: GestureSource<Type>, recording: SerializedGestureSource) {
+    const originalSamples = recording.path.coords;
+    const tailSamples = originalSamples.slice(1);
+
+    const samplePromises = tailSamples.map((sample) => {
       return timedPromise(sample.t).then(() => {
-        replayPoint.update(sample);
+        if(replaySource.isPathComplete) {
+          return;
+        }
+        replaySource.update(sample);
       });
-    }));
-
-    const endTime = originalSamples[sampleCount-1].t;
-
-    const endPromise = timedPromise(endTime).then(() => {
-      replayPoint.terminate(recordedPoint.path.wasCancelled);
     });
 
-    // Wrap it all together with a nice little bow.
-    const compositePromise = Promise.all([endPromise].concat(samplePromises)).catch((reason) => {
-      // Because we use a `setInterval` internally, we need cleanup if things go wrong.
-      replayPoint.terminate(true);
-      throw reason;
-    });
+    return samplePromises;
+  }
 
-    return compositePromise;
+  private playbackTerminations(replaySource: GestureSource<Type>, recording: SerializedGestureSource) {
+    const sampleCount = recording.path.coords.length;
+    const endTime = recording.path.coords[sampleCount-1].t;
+    return timedPromise(endTime).then(() => {
+      if(replaySource.isPathComplete) {
+        return;
+      }
+      replaySource.terminate(recording.path.wasCancelled);
+    });
   }
 
   async playbackRecording(recordedObj: RecordedCoordSequenceSet) {
-    const inputPromises = recordedObj.inputs.map((recordedInput) => {
-      return this.preparePathPlayback(recordedInput);
-    });
+    const playbackStartTuples = recordedObj.inputs.map((recording) => this.prepareSourceStart(recording));
+    const playbackStarts = playbackStartTuples.map((tuple) => tuple.promise);
+    const sources = playbackStartTuples.map((tuple) => tuple.source);
 
-    await Promise.all(inputPromises);
+    const playbackMiddles = recordedObj.inputs.map((recording, index) => this.replaySourceSamples(sources[index], recording));
+
+    const playbackTerminations = recordedObj.inputs.map((recording, index) => this.playbackTerminations(sources[index], recording));
+
+    await Promise.all(([] as Promise<any>[])
+      .concat(playbackStarts)
+      .concat(playbackMiddles.reduce((fullSet, set) => { return fullSet.concat(set)}, []))
+      .concat(playbackTerminations)
+    );
   }
 }

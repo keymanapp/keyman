@@ -11,8 +11,10 @@ export class GestureRecognizer<HoveredItemType> extends TouchpointCoordinator<Ho
   private readonly touchEngine: TouchEventEngine<HoveredItemType>;
 
   public constructor(config: GestureRecognizerConfiguration<HoveredItemType>) {
+    const preprocessedConfig = preprocessRecognizerConfig(config);
+
     super();
-    this.config = preprocessRecognizerConfig(config);
+    this.config = preprocessedConfig;
 
     this.mouseEngine = new MouseEventEngine<HoveredItemType>(this.config);
     this.touchEngine = new TouchEventEngine<HoveredItemType>(this.config);

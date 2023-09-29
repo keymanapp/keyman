@@ -335,7 +335,7 @@ describe("GestureMatcher", function() {
       assert.equal(await promiseStatus(modelMatcher.promise), PromiseStatuses.PROMISE_RESOLVED);
       assert.equal(await promiseStatus(completion), PromiseStatusModule.PROMISE_PENDING);
 
-      assert.deepEqual(await modelMatcher.promise, {matched: true, action: { type: 'chain', item: null, next: 'subkeyselect'}});
+      assert.deepEqual(await modelMatcher.promise, {matched: true, action: { type: 'chain', item: null, next: 'subkey-select'}});
       assert.isFalse(sources[0].path.isComplete);
 
       // Did we resolve at the expected point in the path - once the timer duration had passed?
@@ -487,7 +487,7 @@ describe("GestureMatcher", function() {
       const modelMatcher = await modelMatcherPromise;
 
       assert.equal(await promiseStatus(modelMatcher.promise), PromiseStatuses.PROMISE_RESOLVED);
-      assert.deepEqual(await modelMatcher.promise, {matched: true, action: { type: 'chain', item: 'a', next: 'multitap' }});
+      assert.deepEqual(await modelMatcher.promise, {matched: true, action: { type: 'optional-chain', item: 'a', allowNext: 'multitap' }});
       // touchpoints[0] - a pre-completed path.
       assert.isTrue(sources[1].path.isComplete);
     });
@@ -642,7 +642,7 @@ describe("GestureMatcher", function() {
       }
       assert.equal(await promiseStatus(modelMatcher.promise), PromiseStatuses.PROMISE_RESOLVED);
 
-      assert.deepEqual(await modelMatcher.promise, {matched: true, action: { type: 'chain', item: 'a', next: 'multitap'}});
+      assert.deepEqual(await modelMatcher.promise, {matched: true, action: { type: 'optional-chain', item: 'a', allowNext: 'multitap'}});
       assert.isTrue(sources[1].path.isComplete);
 
       // Design note:  as this one is _not_ complete, when gesture chaining tries to do a followup multitap match,

@@ -250,7 +250,7 @@ export class GestureMatcher<Type> implements PredecessorMatch<Type> {
       return this.predecessor.primaryPath;
     }
 
-    return bestMatcher.source;
+    return bestMatcher?.source;
   }
 
   public get baseItem(): Type {
@@ -271,8 +271,11 @@ export class GestureMatcher<Type> implements PredecessorMatch<Type> {
    * 'all'... but that'd take a little extra work.
    */
   public get allSourceIds(): string[] {
-    const currentIds = this.pathMatchers.map((entry) => entry.source.identifier);
+    let currentIds = this.pathMatchers.map((entry) => entry.source.identifier);
     const predecessorIds = this.predecessor ? this.predecessor.allSourceIds : [];
+
+    // Each ID should only be listed once, regardless of source.
+    currentIds = currentIds.filter((entry) => predecessorIds.indexOf(entry) == -1);
 
     return currentIds.concat(predecessorIds);
   }
@@ -289,9 +292,19 @@ export class GestureMatcher<Type> implements PredecessorMatch<Type> {
       throw new Error(`The specified gesture model does not support more than ${existingContacts} contact points.`);
     }
 
-    // The number of already-active contacts tracked for this gesture
-    const contactSpec = this.model.contacts[existingContacts];
+    this.addContactInternal(simpleSource.constructSubview(false, true));
+  }
 
+  public get result() {
+    return this._result;
+  }
+
+  private addContactInternal(simpleSource: GestureSourceSubview<Type>) {
+    // The number of already-active contacts tracked for this gesture
+    const existingContacts = this.pathMatchers.length;
+
+    const contactSpec = this.model.contacts[existingContacts];
+    const contactModel = new PathMatcher(contactSpec.model, simpleSource);
     let baseItem: Type = null;
     if(existingContacts) {
       // just use the highest-priority item source's base item and call it a day.
@@ -313,26 +326,13 @@ export class GestureMatcher<Type> implements PredecessorMatch<Type> {
     }
 
     if(contactSpec.model.allowsInitialState) {
-      const initialStateCheck = contactSpec.model.allowsInitialState(simpleSource.currentSample, this.primaryPath.currentSample, baseItem);
+      const initialStateCheck = contactSpec.model.allowsInitialState(simpleSource.currentSample, this.primaryPath?.currentSample, baseItem);
 
       if(!initialStateCheck) {
         this.finalize(false, 'path');
       }
     }
 
-    this.addContactInternal(simpleSource.constructSubview(false, true));
-  }
-
-  public get result() {
-    return this._result;
-  }
-
-  private addContactInternal(simpleSource: GestureSourceSubview<Type>) {
-    const existingContacts = this.pathMatchers.length;
-
-    // The number of already-active contacts tracked for this gesture
-    const contactSpec = this.model.contacts[existingContacts];
-    const contactModel = new PathMatcher(contactSpec.model, simpleSource);
     contactModel.promise.then((resolution) => {
       this.finalize(resolution.type == 'resolve', resolution.cause);
     });

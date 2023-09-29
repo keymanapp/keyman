@@ -24,7 +24,7 @@ export const LongpressModel: GestureModel = {
   ],
   resolutionAction: {
     type: 'chain',
-    next: 'subkeyselect',
+    next: 'subkey-select',
     item: 'none'
   },
   /*
@@ -68,8 +68,9 @@ export const MultitapModel: GestureModel = {
     baseItem: 'base'
   },
   resolutionAction: {
-    type: 'chain',
-    next: 'multitap'
+    type: 'optional-chain',
+    allowNext: 'multitap',
+    item: 'current'
   }
 }
 
