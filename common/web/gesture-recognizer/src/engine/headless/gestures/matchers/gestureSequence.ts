@@ -126,7 +126,7 @@ export class GestureSequence<Type> extends EventEmitter<EventMap<Type>> {
           }
         }
         return deduplicated;
-      }, [] as string[]);;
+      }, [] as string[]);
 
       return potentialMatches;
     }
