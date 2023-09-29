@@ -70,19 +70,19 @@ public:
     this->m_rgbasechar.push_back(baseCharacter);
     this->m_rgcombchar.push_back(combinedCharacter);
   }
-
-  int Count() {
+*/
+  int KMX_Count() {
     return this->m_rgbasechar.size();
   }
 
-  WCHAR GetBaseCharacter(int index) {
+  KMX_WCHAR KMX_GetBaseCharacter(int index) {
     return this->m_rgbasechar[index];
   }
 
-  WCHAR GetCombinedCharacter(int index) {
+  KMX_WCHAR KMX_GetCombinedCharacter(int index) {
     return this->m_rgcombchar[index];
   }
-
+/*
   bool ContainsBaseCharacter(WCHAR baseCharacter) {
     std::vector<WCHAR>::iterator it;
     for(it=this->m_rgbasechar.begin(); it<m_rgbasechar.end(); it++) {
@@ -788,6 +788,8 @@ int STOP=0;
   kp->cxGroupArray++;
   gp = &kp->dpGroupArray[kp->cxGroupArray-1];
 
+int STOP2=0;
+
 // _S2 need to change mapping win-lin before i can get correct values here!
   UINT nKeys = 0;
   for (UINT iKey = 0; iKey < rgKey.size(); iKey++) {
@@ -819,22 +821,18 @@ int STOP=0;
     }
   }
 
-
-int STOP2=0;
-
-  /*
   gp->cxKeyArray = nKeys;
 
   //
   // Add nomatch control to each terminating 'using keys' group   // I4550
   //
-  LPGROUP gp2 = kp->dpGroupArray;
+  LPKMX_GROUP gp2 = kp->dpGroupArray;
   for(UINT i = 0; i < kp->cxGroupArray - 1; i++, gp2++) {
     if(gp2->fUsingKeys && gp2->dpNoMatch == NULL) {
-      WCHAR *p = gp2->dpNoMatch = new WCHAR[4];
+      KMX_WCHAR *p = gp2->dpNoMatch = new KMX_WCHAR[4];
       *p++ = UC_SENTINEL;
       *p++ = CODE_USE;
-      *p++ = (WCHAR)(kp->cxGroupArray);
+      *p++ = (KMX_WCHAR)(kp->cxGroupArray);
       *p = 0;
 
       //
@@ -843,22 +841,22 @@ int STOP2=0;
       // loop is not very efficient but it's not worthy of optimisation.
       //
       UINT j;
-      LPKEY kkp;
+      LPKMX_KEY kkp;
       for(j = 0, kkp = gp->dpKeyArray; j < gp->cxKeyArray; j++, kkp++) {
         if((kkp->ShiftFlags & (K_CTRLFLAG|K_ALTFLAG|LCTRLFLAG|LALTFLAG|RCTRLFLAG|RALTFLAG)) != 0) {
           gp2->cxKeyArray++;
-          LPKEY kkp2 = new KEY[gp2->cxKeyArray];
-          memcpy(kkp2, gp2->dpKeyArray, sizeof(KEY)*(gp2->cxKeyArray-1));
+          LPKMX_KEY kkp2 = new KMX_KEY[gp2->cxKeyArray];
+          memcpy(kkp2, gp2->dpKeyArray, sizeof(KMX_KEY)*(gp2->cxKeyArray-1));
           gp2->dpKeyArray = kkp2;
           kkp2 = &kkp2[gp2->cxKeyArray-1];
-          kkp2->dpContext = new WCHAR; *kkp2->dpContext = 0;
+          kkp2->dpContext = new KMX_WCHAR; *kkp2->dpContext = 0;
           kkp2->Key = kkp->Key;
           kkp2->ShiftFlags = kkp->ShiftFlags;
           kkp2->Line = 0;
-          WCHAR *p = kkp2->dpOutput = new WCHAR[4];
+          KMX_WCHAR *p = kkp2->dpOutput = new KMX_WCHAR[4];
           *p++ = UC_SENTINEL;
           *p++ = CODE_USE;
-          *p++ = (WCHAR)(kp->cxGroupArray);
+          *p++ = (KMX_WCHAR)(kp->cxGroupArray);
           *p = 0;
         }
       }
@@ -873,10 +871,10 @@ int STOP2=0;
   if (alDead.size() > 0 && !bDeadkeyConversion) {   // I4552
     kp->cxGroupArray++;
 
-    WCHAR *p = gp->dpMatch = new WCHAR[4];
+    KMX_WCHAR *p = gp->dpMatch = new KMX_WCHAR[4];
     *p++ = UC_SENTINEL;
     *p++ = CODE_USE;
-    *p++ = (WCHAR) kp->cxGroupArray;
+    *p++ = (KMX_WCHAR) kp->cxGroupArray;
     *p = 0;
 
     gp++;
@@ -886,10 +884,10 @@ int STOP2=0;
     gp->dpName = NULL;
     gp->dpNoMatch = NULL;
     gp->cxKeyArray = alDead.size();
-    LPKEY kkp = gp->dpKeyArray = new KEY[alDead.size()];
+    LPKMX_KEY kkp = gp->dpKeyArray = new KMX_KEY[alDead.size()];
 
-    LPSTORE sp = new STORE[kp->cxStoreArray + alDead.size() * 2];
-    memcpy(sp, kp->dpStoreArray, sizeof(STORE) * kp->cxStoreArray);
+    LPKMX_STORE sp = new KMX_STORE[kp->cxStoreArray + alDead.size() * 2];
+    memcpy(sp, kp->dpStoreArray, sizeof(KMX_STORE) * kp->cxStoreArray);
 
     kp->dpStoreArray = sp;
 
@@ -902,34 +900,34 @@ int STOP2=0;
 
       sp->dpName = NULL;
       sp->dwSystemID = 0;
-      sp->dpString = new WCHAR[dk->Count() + 1];
-      for(int j = 0; j < dk->Count(); j++) 
-        sp->dpString[j] = dk->GetBaseCharacter(j);
-      sp->dpString[dk->Count()] = 0;
+      sp->dpString = new KMX_WCHAR[dk->KMX_Count() + 1];
+      for(int j = 0; j < dk->KMX_Count(); j++)
+        sp->dpString[j] = dk->KMX_GetBaseCharacter(j);
+      sp->dpString[dk->KMX_Count()] = 0;
       sp++;
 
       sp->dpName = NULL;
       sp->dwSystemID = 0;
-      sp->dpString = new WCHAR[dk->Count() + 1];
-      for(int j = 0; j < dk->Count(); j++) 
-        sp->dpString[j] = dk->GetCombinedCharacter(j);
-      sp->dpString[dk->Count()] = 0;
+      sp->dpString = new KMX_WCHAR[dk->KMX_Count() + 1];
+      for(int j = 0; j < dk->KMX_Count(); j++)
+        sp->dpString[j] = dk->KMX_GetCombinedCharacter(j);
+      sp->dpString[dk->KMX_Count()] = 0;
       sp++;
 
       kkp->Line = 0;
       kkp->ShiftFlags = 0;
       kkp->Key = 0;
-      WCHAR *p = kkp->dpContext = new WCHAR[8];
+      KMX_WCHAR *p = kkp->dpContext = new KMX_WCHAR[8];
       *p++ = UC_SENTINEL;
       *p++ = CODE_DEADKEY;
-      *p++ = DeadKeyMap(dk->DeadCharacter(), &alDead, nDeadkey, FDeadkeys);   // I4353
+      *p++ = KMX_DeadKeyMap(dk->KMX_DeadCharacter(), &alDead, nDeadkey, FDeadkeys);   // I4353
       // *p++ = nDeadkey+i;
       *p++ = UC_SENTINEL;
       *p++ = CODE_ANY;
       *p++ = nStoreBase + i*2 + 1;
       *p = 0;
 
-      p = kkp->dpOutput = new WCHAR[5];
+      p = kkp->dpOutput = new KMX_WCHAR[5];
       *p++ = UC_SENTINEL;
       *p++ = CODE_INDEX;
       *p++ = nStoreBase + i*2 + 2;
@@ -939,7 +937,8 @@ int STOP2=0;
       kkp++;
     }
   }
-*/
+
+
 wprintf(L"\n ##### KMX_ImportRules of mc_import_rules ended #####\n");
 return true;
 }
