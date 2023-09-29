@@ -142,6 +142,7 @@ export class TouchpointCoordinator<HoveredItemType, StateToken=any> extends Even
 
   public set stateToken(token: StateToken) {
     this._stateToken = token;
+    this.inputEngines.forEach((engine) => engine.stateToken = token);
   }
 
   private addSimpleSourceHooks(touchpoint: GestureSource<HoveredItemType>) {
