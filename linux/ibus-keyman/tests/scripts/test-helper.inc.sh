@@ -346,9 +346,10 @@ function check_processes_running() {
 
   if $MISSING; then
     echo "# Some background processes no longer running. Restarting..."
-    echo "Some background processes no longer running:" > /tmp/debug.output
+    echo "Some background processes no longer running:" >> /tmp/debug.output
     echo "$MISSING_PROCS" >> /tmp/debug.output
     echo "Restarting..." >> /tmp/debug.output
+    mv /tmp/ibus-engine-keyman.log{,"-$(date -Iseconds)"}
     cleanup "${CLEANUP_FILE}" > /dev/null 2>&1
     setup "${DISPLAY_SERVER}" "${ENV_FILE}" "${CLEANUP_FILE}" "${PID_FILE}" > /dev/null 2>&1
   fi
