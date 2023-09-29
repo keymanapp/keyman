@@ -58,6 +58,9 @@ export class TouchpointCoordinator<HoveredItemType> extends EventEmitter<EventMa
     if(index == -1) {
       throw new Error("This selector has not been pushed onto the 'setChange' stack.");
     }
+
+    selector.cascadeTermination();
+
     this.selectorStack.splice(index, 1);
   }
 

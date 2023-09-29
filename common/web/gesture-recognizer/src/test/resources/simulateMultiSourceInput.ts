@@ -122,12 +122,13 @@ function prepareSourceForTimer<Type> (
 
 function prepareSourceForRawSequence<Type>(
   contactSpec: SimSpecSequence<Type>,
-  startTime: number
+  startTime: number,
+  isFirstSample: boolean
 ): ReturnType<typeof prepareSimContact<Type>> {
   const simpleSource = new GestureSource<Type>(simSourceIdSeed++, null, true);
 
   const promise = timedPromise(startTime).then(() => {
-    if(startTime != 0) {
+    if(!isFirstSample) {
       // Acceptance of new contact points requires an existing sample.
       simpleSource.update(contactSpec.samples[0]);
     }
@@ -143,7 +144,7 @@ function prepareSourceForRawSequence<Type>(
   //
   // We do this early to ensure new paths appear before updates to already-existing sources
   // occur for the same timestamp.
-  if(startTime != 0) {
+  if(!isFirstSample) {
     adjustedSpec.samples.splice(0, 1);
   }
 
@@ -160,7 +161,8 @@ function prepareSourceForRawSequence<Type>(
 
 function prepareSimContact<Type>(
   contactSpec: SimSpec<Type> | SimInitialSpec<Type>,
-  startTime: number
+  startTime: number,
+  isFirstSample: boolean
 ): {
   sourceSpecs: {
     source: GestureSource<Type>,
@@ -174,7 +176,7 @@ function prepareSimContact<Type>(
     case 'timer':
       return prepareSourceForTimer(contactSpec, startTime);
     case 'sequence':
-      return prepareSourceForRawSequence(contactSpec, startTime);
+      return prepareSourceForRawSequence(contactSpec, startTime, isFirstSample);
     default:
       // TS infers `contactSpec.type` to 'never' if we try to include that in the error below without the cast.
       throw new Error(`Unexpected type specified in simulation spec for tests: ${(contactSpec as any).type}`)
@@ -214,7 +216,10 @@ function simulateMultiSourceInput<OutputType, Type>(
   // Expectation (that should probably be an assertion) - the first entry in the input should hold the
   // earliest timestamp.
   const startTimestamp = getSimComponentInitialTime(specs[0]);
-  const processedSetup = specs.map((entry) => prepareSimContact(entry, getSimComponentInitialTime(entry) - startTimestamp));
+  const processedSetup = specs.map((entry) => {
+    const initialTime = getSimComponentInitialTime(entry);
+    return prepareSimContact(entry, initialTime, initialTime == startTimestamp);
+  });
   processedSetup[0].testObjParam.then((param) => {
     try {
       const testObj = config.construction(param);
@@ -254,7 +259,7 @@ function simulateMultiSourceInput<OutputType, Type>(
 
     const sequence = sequenceSpec.samples;
     const sequencePromises = sequence.map((sample) => {
-      return timedPromise(sample.t - startTimestamp).then(async () => {
+      return timedPromise(sample.t).then(async () => {
         const testObj = await testObjPromise;
         // We already committed the sample early, to facilitate new contact-point acceptance,
         // so we skip re-adding it here.  We DO allow all other update functionality to

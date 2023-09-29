@@ -43,6 +43,57 @@ export class MatcherSelector<Type> extends EventEmitter<EventMap<Type>> {
     this.baseGestureSetId = baseSetId || 'default';
   }
 
+  public cascadeTermination() {
+    const potentialMatchers = this.potentialMatchers;
+    const matchersToCancel = potentialMatchers.filter((matcher) => !matcher.model.sustainWhenNested);
+
+    // Leave any matchers for models that specify `sustainWhenNested`.
+    const matchersToPreserve = potentialMatchers.filter((matcher) => matcher.model.sustainWhenNested);
+    this.potentialMatchers = matchersToPreserve;
+
+    // Now, we need to clean up any `matchGesture` calls that no longer have valid models to match
+    // (because none specified `sustainWhenNested`).
+    //
+    // Easiest way:  first, identify any GestureSources tied to match attempts that DO involve
+    // a `sustainWhenNested` model.
+    // 1. Find the source IDs referenced for each case... (map)
+    // 2. Then flatten + deduplicate the entries of the resulting array. (reduce)
+    const sourceIdsToPreserve = matchersToPreserve.map((matcher) => matcher.allSourceIds).reduce((compactArray, current) => {
+      for(const entry of current) {
+        if(compactArray.indexOf(entry) == -1) {
+          compactArray.push(entry);
+        }
+      }
+
+      return compactArray;
+    }, [] as string[]);
+
+    // Any source not in the previous array no longer has an active reference; no matches
+    // can occur for it any longer.
+    const sourcesToCancel = this._sourceSelector.filter((sourceTracker) => {
+      return !sourceIdsToPreserve.find((id) => id == sourceTracker.source.identifier);
+    });
+
+    // Now we can actually trigger proper cancellation - both for the model-match attempts
+    // and for the `matchGesture` call that referenced the cancelled model-match attempts.
+    sourcesToCancel.forEach((sourceTracker) => {
+      sourceTracker.matchPromise.resolve({
+        matcher: null,
+        result: {
+          matched: false,
+          action: {
+            type: 'complete',
+            item: null
+          }
+        }
+      });
+
+      this._sourceSelector.splice(this._sourceSelector.indexOf(sourceTracker), 1);
+    });
+
+    matchersToCancel.forEach((matcher) => matcher.cancel());
+  }
+
   /**
    * Aims to match the gesture-source's path against the specified set of gesture models.  The
    * returned Promise will resolve either when a match is found or all models have rejected the path.
