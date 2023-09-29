@@ -1,4 +1,7 @@
 import EventEmitter from "eventemitter3";
+
+import { GestureRecognizerConfiguration } from "../configuration/gestureRecognizerConfiguration.js";
+import { Nonoptional } from "../nonoptional.js";
 import { GestureSource } from "./gestureSource.js";
 
 interface EventMap<HoveredItemType, StateToken> {
@@ -20,17 +23,45 @@ interface EventMap<HoveredItemType, StateToken> {
 export abstract class InputEngineBase<HoveredItemType, StateToken = any> extends EventEmitter<EventMap<HoveredItemType, StateToken>> {
   private _activeTouchpoints: GestureSource<HoveredItemType>[] = [];
 
+  // Touch interactions in the browser actually _re-use_ touch IDs once they lapse; the IDs are not lifetime-unique.
+  // This gesture-engine desires lifetime-unique IDs, though, so we map them within this engine to remedy that problem.
+  private readonly identifierMap: Record<number, number> = {};
+  private static IDENTIFIER_SEED = 0;
+
   public stateToken: StateToken;
+
+  protected readonly config: Nonoptional<GestureRecognizerConfiguration<HoveredItemType, StateToken>>;
+
+  public constructor(config: Nonoptional<GestureRecognizerConfiguration<HoveredItemType, StateToken>>) {
+    super();
+    this.config = config;
+  }
+
+  createTouchpoint(identifier: number, isFromTouch: boolean) {
+    // IDs provided to `GestureSource` should be engine-unique.  Unfortunately, the base identifier patterns provided by
+    // browsers don't do this, so we map the browser ID to an engine-internal one.
+    const unique_id = InputEngineBase.IDENTIFIER_SEED++;
+    this.identifierMap[identifier] = unique_id;
+
+    const source = new GestureSource<HoveredItemType, StateToken>(unique_id, this.config, isFromTouch);
+    source.stateToken = this.stateToken;
+
+    // Do not add here; it needs special managing for unit tests.
+
+    return source;
+  }
 
   /**
    * @param identifier The identifier number corresponding to the input sequence.
    */
   hasActiveTouchpoint(identifier: number) {
-    return this.getTouchpointWithId(identifier) !== undefined;
+    const id = this.identifierMap[identifier];
+    return id !== undefined; //this.getTouchpointWithId(id) !== undefined;
   }
 
   protected getTouchpointWithId(identifier: number) {
-    return this._activeTouchpoints.find((point) => point.rawIdentifier == identifier);
+    const id = this.identifierMap[identifier];
+    return this._activeTouchpoints.find((point) => point.rawIdentifier == id);
   }
 
   /**
@@ -42,15 +73,23 @@ export abstract class InputEngineBase<HoveredItemType, StateToken = any> extends
    * @returns
    */
   protected getConfigForId(identifier: number) {
-    return this.getTouchpointWithId(identifier).currentRecognizerConfig;
+    const id = this.identifierMap[identifier];
+    return this.getTouchpointWithId(id).currentRecognizerConfig;
   }
 
   protected getStateTokenForId(identifier: number) {
-    return this.getTouchpointWithId(identifier).stateToken ?? null;
+    const id = this.identifierMap[identifier];
+    return this.getTouchpointWithId(id).stateToken ?? null;
   }
 
-  public dropTouchpointWithId(identifier: number) {
-    this._activeTouchpoints = this._activeTouchpoints.filter((point) => point.rawIdentifier != identifier);
+  public dropTouchpoint(point: GestureSource<HoveredItemType>) {
+    const id = point.rawIdentifier;
+    this._activeTouchpoints = this._activeTouchpoints.filter((pt) => point != pt);
+    for(let key in this.identifierMap) {
+      if(this.identifierMap[key] == id) {
+        delete this.identifierMap[key];
+      }
+    }
   }
 
   protected addTouchpoint(touchpoint: GestureSource<HoveredItemType, StateToken>) {

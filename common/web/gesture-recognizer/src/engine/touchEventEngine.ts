@@ -3,6 +3,7 @@ import { InputEventEngine } from "./inputEventEngine.js";
 import { InputSample } from "./headless/inputSample.js";
 import { Nonoptional } from "./nonoptional.js";
 import { ZoneBoundaryChecker } from "./configuration/zoneBoundaryChecker.js";
+import { GestureSource } from "./headless/gestureSource.js";
 
 export class TouchEventEngine<HoveredItemType, StateToken = any> extends InputEventEngine<HoveredItemType, StateToken> {
   private readonly _touchStart: typeof TouchEventEngine.prototype.onTouchStart;
@@ -63,10 +64,14 @@ export class TouchEventEngine<HoveredItemType, StateToken = any> extends InputEv
     }
   }
 
-  public dropTouchpointWithId(identifier: number) {
-    super.dropTouchpointWithId(identifier);
+  public dropTouchpoint(source: GestureSource<HoveredItemType>) {
+    super.dropTouchpoint(source);
 
-    delete this.safeBoundMaskMap[identifier];
+    for(let key in this.safeBoundMaskMap) {
+      if(this.getTouchpointWithId(Number.parseInt(key, 10)) == source) {
+        delete this.safeBoundMaskMap[key];
+      }
+    }
   }
 
   private buildSampleFromTouch(touch: Touch, timestamp: number) {

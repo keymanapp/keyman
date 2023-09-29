@@ -10,9 +10,11 @@ import { timedPromise } from '@keymanapp/web-utils';
 export class HeadlessInputEngine<Type = any> extends InputEngineBase<Type> {
   private PATH_ID_SEED = 1;
 
-  // Should generally keep a simple, parameterless default constructor.
+  // Should generally keep a simple default constructor.
   constructor() {
-    super();
+    // When headless, we can bypass the need for a recognizer-config - we've bypassed the
+    // need for layout specifications.
+    super(null);
   }
 
   public preparePathPlayback(recordedPoint: SerializedGestureSource) {
@@ -28,7 +30,7 @@ export class HeadlessInputEngine<Type = any> extends InputEngineBase<Type> {
     const headSample = recordedSource.path.coords[0];
 
     const pathID = this.PATH_ID_SEED++;
-    let replaySource = new GestureSource<Type>(pathID, null, recordedSource.isFromTouch);
+    let replaySource = this.createTouchpoint(pathID, recordedSource.isFromTouch);
     replaySource.update(headSample); // is included before the point is made available.
 
     const startPromise = timedPromise(headSample.t).then(() => {
@@ -65,7 +67,7 @@ export class HeadlessInputEngine<Type = any> extends InputEngineBase<Type> {
       if(replaySource.isPathComplete) {
         return;
       }
-      this.dropTouchpointWithId(replaySource.rawIdentifier);
+      this.dropTouchpoint(replaySource);
       replaySource.terminate(recording.path.wasCancelled);
     });
   }

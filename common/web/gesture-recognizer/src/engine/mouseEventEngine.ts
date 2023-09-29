@@ -12,8 +12,6 @@ export class MouseEventEngine<HoveredItemType, StateToken = any> extends InputEv
   private hasActiveClick: boolean = false;
   private disabledSafeBounds: number = 0;
 
-  private static IDENTIFIER_SEED: number;
-
   public constructor(config: Nonoptional<GestureRecognizerConfiguration<HoveredItemType, StateToken>>) {
     super(config);
 
@@ -22,22 +20,13 @@ export class MouseEventEngine<HoveredItemType, StateToken = any> extends InputEv
     this._mouseStart = (event: MouseEvent) => this.onMouseStart(event);
     this._mouseMove  = (event: MouseEvent) => this.onMouseMove(event);
     this._mouseEnd   = (event: MouseEvent) => this.onMouseEnd(event);
-
-    // IDs should be unique.  Fortunately, they're disambiguated by their corresponding GestureSource,
-    // which has gives a globally-unique string-based identifier based partly on the numeric ID set here.
-    MouseEventEngine.IDENTIFIER_SEED = 0;
   }
 
   private get eventRoot(): HTMLElement {
     return this.config.mouseEventRoot;
   }
-
-  private generateIdentifier(): number {
-    return MouseEventEngine.IDENTIFIER_SEED++;
-  }
-
   private get activeIdentifier(): number {
-    return MouseEventEngine.IDENTIFIER_SEED-1;
+    return 0;
   }
 
   // public static forPredictiveBanner(banner: SuggestionBanner, handlerRoot: SuggestionManager) {
@@ -92,7 +81,7 @@ export class MouseEventEngine<HoveredItemType, StateToken = any> extends InputEv
 
     this.preventPropagation(event);
 
-    const identifier = this.generateIdentifier();
+    const identifier = this.activeIdentifier;
     const sample = this.buildSampleFromEvent(event, identifier);
 
     if(!ZoneBoundaryChecker.inputStartOutOfBoundsCheck(sample, this.config)) {
