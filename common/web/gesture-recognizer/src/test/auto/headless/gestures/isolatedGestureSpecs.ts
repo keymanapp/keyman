@@ -33,12 +33,12 @@ export const LongpressModel: GestureModel = {
    */
   rejectionActions: {
     item: {
-      type: 'optional-chain',
-      allowNext: 'longpress'
+      type: 'replace',
+      replace: 'longpress'
     },
     path: {
-      type: 'optional-chain',
-      allowNext: 'longpress'
+      type: 'replace',
+      replace: 'longpress'
     }
   }
 }
@@ -68,8 +68,8 @@ export const MultitapModel: GestureModel = {
     baseItem: 'base'
   },
   resolutionAction: {
-    type: 'optional-chain',
-    allowNext: 'multitap',
+    type: 'chain',
+    next: 'multitap',
     item: 'current'
   }
 }
@@ -87,18 +87,19 @@ export const SimpleTapModel: GestureModel = {
       },
       endOnResolve: true
     }, {
-      model: specs.InstantResolutionModel
+      model: specs.InstantResolutionModel,
+      resetOnResolve: true
     }
   ],
   resolutionAction: {
-    type: 'optional-chain',
-    allowNext: 'multitap',
+    type: 'chain',
+    next: 'multitap',
     item: 'current'
   },
   rejectionActions: {
     item: {
-      type: 'optional-chain',
-      allowNext: 'simple-tap'
+      type: 'replace',
+      replace: 'simple-tap'
     }
   }
 }

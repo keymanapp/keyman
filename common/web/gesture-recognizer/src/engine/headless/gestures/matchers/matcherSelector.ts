@@ -245,6 +245,10 @@ export class MatcherSelector<Type> extends EventEmitter<EventMap<Type>> {
 
       // We have a result for this matcher; go ahead and remove it from the 'potential' list.
       const matcherIndex = this.potentialMatchers.indexOf(matcher);
+      if(matcherIndex == -1) {
+        // It's already been handled; do not re-attempt.
+        return;
+      }
       this.potentialMatchers.splice(matcherIndex, 1);
 
       /*

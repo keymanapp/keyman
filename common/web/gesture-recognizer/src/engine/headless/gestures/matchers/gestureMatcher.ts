@@ -1,6 +1,6 @@
 import { GestureSource, GestureSourceSubview } from "../../gestureSource.js";
 
-import { GestureModel, GestureResolution, GestureResolutionSpec, RejectionDefault, ResolutionItemSpec } from "../specs/gestureModel.js";
+import { GestureModel, GestureResolution, GestureResolutionSpec, RejectionDefault, RejectionReplace, ResolutionItemSpec } from "../specs/gestureModel.js";
 
 import { ManagedPromise, TimeoutPromise } from "@keymanapp/web-utils";
 import { FulfillmentCause, PathMatcher } from "./pathMatcher.js";
@@ -44,7 +44,13 @@ export class GestureMatcher<Type> implements PredecessorMatch<Type> {
   private readonly pathMatchers: PathMatcher<Type>[];
 
   public get sources(): GestureSource<Type>[] {
-    return this.pathMatchers.map((pathMatch) => pathMatch.source);
+    return this.pathMatchers.map((pathMatch, index) => {
+      if(this.model.contacts[index].resetOnResolve) {
+        return undefined;
+      } else {
+        return pathMatch.source;
+      }
+    }).filter((entry) => !!entry);
   }
 
   private readonly predecessor?: PredecessorMatch<Type>;
@@ -148,7 +154,7 @@ export class GestureMatcher<Type> implements PredecessorMatch<Type> {
 
     try {
       // Determine the correct action-spec that should result from the finalization.
-      let action: GestureResolutionSpec | (RejectionDefault & ResolutionItemSpec);
+      let action: GestureResolutionSpec | ((RejectionDefault | RejectionReplace) & ResolutionItemSpec);
       if(matched) {
         // Easy peasy - resolutions only need & have the one defined action type.
         action = this.model.resolutionAction;
@@ -271,7 +277,8 @@ export class GestureMatcher<Type> implements PredecessorMatch<Type> {
    * 'all'... but that'd take a little extra work.
    */
   public get allSourceIds(): string[] {
-    let currentIds = this.pathMatchers.map((entry) => entry.source.identifier);
+    // Do not include any to-be-reset (thus, excluded) sources here.
+    let currentIds = this.sources.map((entry) => entry.identifier);
     const predecessorIds = this.predecessor ? this.predecessor.allSourceIds : [];
 
     // Each ID should only be listed once, regardless of source.

@@ -374,7 +374,7 @@ describe("GestureMatcher", function() {
 
       assert.equal(await promiseStatus(modelMatcher.promise), PromiseStatuses.PROMISE_RESOLVED);
       assert.equal(await promiseStatus(completion), PromiseStatusModule.PROMISE_PENDING);
-      assert.deepEqual(await modelMatcher.promise, {matched: false, action: { type: 'optional-chain', item: null, allowNext: 'longpress'}});
+      assert.deepEqual(await modelMatcher.promise, {matched: false, action: { type: 'replace', item: null, replace: 'longpress'}});
       assert.isFalse(sources[0].path.isComplete);
 
       const dist = (sample1: InputSample<any>, sample2: InputSample<any>) => {
@@ -420,7 +420,7 @@ describe("GestureMatcher", function() {
 
       assert.equal(await promiseStatus(modelMatcher.promise), PromiseStatuses.PROMISE_RESOLVED);
       assert.equal(await promiseStatus(completion), PromiseStatusModule.PROMISE_PENDING);
-      assert.deepEqual(await modelMatcher.promise, {matched: false, action: { type: 'optional-chain', item: null, allowNext: 'longpress'}});
+      assert.deepEqual(await modelMatcher.promise, {matched: false, action: { type: 'replace', item: null, replace: 'longpress'}});
       assert.isFalse(sources[0].path.isComplete);
 
       // The sample at which the item changed from 'a' to 'b'.
@@ -487,7 +487,7 @@ describe("GestureMatcher", function() {
       const modelMatcher = await modelMatcherPromise;
 
       assert.equal(await promiseStatus(modelMatcher.promise), PromiseStatuses.PROMISE_RESOLVED);
-      assert.deepEqual(await modelMatcher.promise, {matched: true, action: { type: 'optional-chain', item: 'a', allowNext: 'multitap' }});
+      assert.deepEqual(await modelMatcher.promise, {matched: true, action: { type: 'chain', item: 'a', next: 'multitap' }});
       // touchpoints[0] - a pre-completed path.
       assert.isTrue(sources[1].path.isComplete);
     });
@@ -642,7 +642,7 @@ describe("GestureMatcher", function() {
       }
       assert.equal(await promiseStatus(modelMatcher.promise), PromiseStatuses.PROMISE_RESOLVED);
 
-      assert.deepEqual(await modelMatcher.promise, {matched: true, action: { type: 'optional-chain', item: 'a', allowNext: 'multitap'}});
+      assert.deepEqual(await modelMatcher.promise, {matched: true, action: { type: 'chain', item: 'a', next: 'multitap'}});
       assert.isTrue(sources[1].path.isComplete);
 
       // Design note:  as this one is _not_ complete, when gesture chaining tries to do a followup multitap match,
@@ -676,7 +676,7 @@ describe("GestureMatcher", function() {
         await modelMatcher.promise;
       }
       assert.equal(await promiseStatus(modelMatcher.promise), PromiseStatuses.PROMISE_RESOLVED);
-      assert.deepEqual(await modelMatcher.promise, {matched: true, action: { type: 'optional-chain', item: 'a', allowNext: 'multitap'}});
+      assert.deepEqual(await modelMatcher.promise, {matched: true, action: { type: 'chain', item: 'a', next: 'multitap'}});
       assert.isTrue(sources[0].path.isComplete);
 
       const finalStats = modelMatcher.sources[0].path.stats;
@@ -718,7 +718,7 @@ describe("GestureMatcher", function() {
 
       assert.equal(await promiseStatus(modelMatcher.promise), PromiseStatuses.PROMISE_RESOLVED);
 
-      assert.deepEqual(await modelMatcher.promise, {matched: true, action: { type: 'optional-chain', item: 'a', allowNext: 'multitap'}});
+      assert.deepEqual(await modelMatcher.promise, {matched: true, action: { type: 'chain', item: 'a', next: 'multitap'}});
       assert.isTrue(sources[0].path.isComplete);
       assert.isFalse(sources[1].path.isComplete);
     });
