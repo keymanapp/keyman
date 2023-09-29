@@ -26,5 +26,24 @@ export class KeyboardInfoCompilerMessages {
     `Invalid author email: ${o.email}`);
   static ERROR_InvalidAuthorEmail = SevError | 0x0005;
 
+  static Error_LicenseFileDoesNotExist = (o:{filename:string}) => m(this.ERROR_LicenseFileIsMissing,
+    `License file ${o.filename} does not exist.`);
+  static ERROR_LicenseFileIsMissing = SevError | 0x0006;
+
+  static Error_LicenseFileIsDamaged = (o:{filename:string}) => m(this.ERROR_LicenseFileIsDamaged,
+    `License file ${o.filename} could not be loaded or decoded.`);
+  static ERROR_LicenseFileIsDamaged = SevError | 0x0007;
+
+  static Error_LicenseIsNotValid = (o:{filename:string,message:string}) => m(this.ERROR_LicenseIsNotValid,
+    `An error was encountered parsing license file ${o.filename}: ${o.message}.`);
+  static ERROR_LicenseIsNotValid = SevError | 0x0008;
+
+  static Error_CannotBuildWithoutKmpFile = () => m(this.ERROR_CannotBuildWithoutKmpFile,
+    `Compiling the .keyboard_info file requires a .kmp file for metadata.`);
+  static ERROR_CannotBuildWithoutKmpFile = SevError | 0x0009;
+
+  static Error_NoLicenseFound = () => m(this.ERROR_NoLicenseFound,
+    `No license for the keyboard was found. MIT license is required for publication to Keyman keyboards repository.`);
+  static ERROR_NoLicenseFound = SevError | 0x000A;
 }
 

@@ -62,8 +62,10 @@ export class KPJFileReader {
     if(result.options.version == '2.0') {
       result.options.buildPath = (project.Options?.BuildPath || result.options.buildPath).replace(/\\/g, '/');
       result.options.sourcePath = (project.Options?.SourcePath || result.options.sourcePath).replace(/\\/g, '/');
+      result.options.skipMetadataFiles = this.boolFromString(project.Options?.SkipMetadataFiles, false);
     } else {
       result.options.buildPath = (project.Options?.BuildPath || '').replace(/\\/g, '/');
+      result.options.skipMetadataFiles = this.boolFromString(project.Options?.SkipMetadataFiles, true);
     }
     result.options.checkFilenameConventions = this.boolFromString(project.Options?.CheckFilenameConventions, false);
     result.options.compilerWarningsAsErrors = this.boolFromString(project.Options?.CompilerWarningsAsErrors, false);
@@ -75,7 +77,6 @@ export class KPJFileReader {
 
     if(result.options.version == '1.0') {
       this.transformFilesVersion10(project, result);
-      result.addMetadataFile();
     } else {
       result.populateFiles();
     }

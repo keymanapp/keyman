@@ -9,13 +9,11 @@ This package provides the following Keyman **command line tools**:
    file.
  - `kmlmp` — uses a `.model.kmp` file to generate a redistributable **lexical
    model package**.
- - `kmlmi` — merges Keyman lexical model `.model_info` files.
 
 `kmlmc` is intended to be used standalone, or as part of a build system. `kmlmp`
-is used only by command line tools. `kmlmi` is used exclusively in the
-[lexical-models repository][lexical models].
+is used only by command line tools.
 
-Note: `kmc` will in the future replace `kmlmc`, `kmlmp`, and `kmlmi`.
+Note: `kmc` will in the future replace `kmlmc` and `kmlmp`.
 
 In order to build [lexical models][], these tools must be built and compiled.
 
@@ -51,7 +49,6 @@ To see more command line options by using the `--help` option:
 
     kmlmc --help
     kmlmp --help
-    kmlmi --help
 
 How to build from source
 ------------------------

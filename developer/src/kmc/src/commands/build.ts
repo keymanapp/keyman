@@ -19,6 +19,7 @@ function commandOptionsToCompilerOptions(options: any): CompilerOptions {
     // CompilerBaseOptions
     outFile: options.outFile,
     logLevel: options.logLevel,
+    logFormat: options.logFormat,
     color: options.color,
     // CompilerOptions
     shouldAddCompilerVersion: options.compilerVersion,
@@ -40,10 +41,6 @@ Supported file types:
   * .xml: LDML keyboard
   * .model.ts: Keyman lexical model
   * .kps: Keyman keyboard or lexical model package
-
-The following two metadata file types are also supported:
-  * .model_info: lexical model metadata file
-  * .keyboard_info: keyboard metadata file
 
 File lists can be referenced with @filelist.txt.
 
@@ -116,22 +113,22 @@ async function build(filename: string, parentCallbacks: NodeCompilerCallbacks, o
     if(fs.statSync(filename).isDirectory()) {
       buildFilename = path.join(buildFilename, path.basename(buildFilename) + KeymanFileTypes.Source.Project);
     }
-    buildFilename = path.relative(process.cwd(), buildFilename).replace(/\\/g, '/');
+    const relativeFilename = path.relative(process.cwd(), buildFilename).replace(/\\/g, '/');
 
     const callbacks = new CompilerFileCallbacks(buildFilename, options, parentCallbacks);
-    callbacks.reportMessage(InfrastructureMessages.Info_BuildingFile({filename:buildFilename}));
+    callbacks.reportMessage(InfrastructureMessages.Info_BuildingFile({filename:buildFilename, relativeFilename}));
 
     let result = await builder.build(filename, callbacks, options);
     result = result && !callbacks.hasFailureMessage();
     if(result) {
       callbacks.reportMessage(builder instanceof BuildProject
-        ? InfrastructureMessages.Info_ProjectBuiltSuccessfully({filename:buildFilename})
-        : InfrastructureMessages.Info_FileBuiltSuccessfully({filename:buildFilename})
+        ? InfrastructureMessages.Info_ProjectBuiltSuccessfully({filename:buildFilename, relativeFilename})
+        : InfrastructureMessages.Info_FileBuiltSuccessfully({filename:buildFilename, relativeFilename})
       );
     } else {
       callbacks.reportMessage(builder instanceof BuildProject
-        ? InfrastructureMessages.Info_ProjectNotBuiltSuccessfully({filename:buildFilename})
-        : InfrastructureMessages.Info_FileNotBuiltSuccessfully({filename:buildFilename})
+        ? InfrastructureMessages.Info_ProjectNotBuiltSuccessfully({filename:buildFilename, relativeFilename})
+        : InfrastructureMessages.Info_FileNotBuiltSuccessfully({filename:buildFilename, relativeFilename})
       );
     }
 

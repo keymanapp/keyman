@@ -3,6 +3,9 @@ rem We use test.bat so we can test errorlevels
 setlocal
 set ESC=
 
+rem This is temporary until source keyboard_info files go away
+copy "%KEYMAN_ROOT%\common\schemas\keyboard_info\keyboard_info.schema.json" "%KEYMAN_ROOT%\common\schemas\keyboard_info\keyboard_info.source.json"
+
 if "%1"=="-h" goto usage
 if "%1"=="--help" goto usage
 if "%1"=="-?" goto usage
@@ -34,7 +37,7 @@ goto :eof
 
 :should-pass
 echo %BLUE%TEST: %1 %WHITE%
-"%compiler%" -s -vs -schema-path "%KEYMAN_ROOT%\common\schemas\keyboard_info" "%2"
+"%compiler%" -vs -schema-path "%KEYMAN_ROOT%\common\schemas\keyboard_info" "%2"
 if %ERRORLEVEL% EQU 0 (
   echo %GREEN%TEST PASSED%WHITE%
   exit /b 0

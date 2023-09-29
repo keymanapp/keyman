@@ -184,11 +184,7 @@
       </Component>
 
       <Component>
-        <File Name="keyboard_info.distribution.json" Source="..\..\..\common\schemas\keyboard_info\" KeyPath="yes" />
-      </Component>
-
-      <Component>
-        <File Name="keyboard_info.source.json" Source="..\..\..\common\schemas\keyboard_info\" KeyPath="yes" />
+        <File Name="keyboard_info.schema.json" Source="..\..\..\common\schemas\keyboard_info\" KeyPath="yes" />
       </Component>
 
       <!-- Data Files -->
@@ -255,10 +251,6 @@
 
       <Component Directory="INSTALLDIR">
         <File Name='kmlmc.cmd' KeyPath="yes" Source="node\kmlmc.cmd" />
-      </Component>
-
-      <Component Directory="INSTALLDIR">
-        <File Name='kmlmi.cmd' KeyPath="yes" Source="node\kmlmi.cmd" />
       </Component>
 
       <Component Directory="INSTALLDIR">

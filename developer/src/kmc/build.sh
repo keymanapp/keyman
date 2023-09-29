@@ -20,6 +20,7 @@ builder_describe "Build Keyman Keyboard Compiler kmc" \
   "@/common/include" \
   "@/common/web/keyman-version" \
   "@/common/web/types" \
+  "@/developer/src/common/web/utils" \
   "@/developer/src/kmc-analyze" \
   "@/developer/src/kmc-keyboard-info" \
   "@/developer/src/kmc-kmn" \
@@ -74,9 +75,8 @@ fi
 if builder_start_action test; then
   eslint .
   tsc --build test/
-  mocha
-  # TODO: enable c8 (disabled because no coverage at present)
-  #     && c8 --reporter=lcov --reporter=text mocha
+  # TODO: increase coverage to 90%
+  c8 --reporter=lcov --reporter=text --exclude-after-remap --lines=30 mocha
   builder_finish_action success test
 fi
 

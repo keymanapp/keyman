@@ -24,10 +24,15 @@
     "url": "https://github.com/keymanapp/keyman/issues"
   },
   "dependencies": {
-    "@keymanapp/common-types": "*"
+    "@keymanapp/common-types": "*",
+    "@keymanapp/kmc-package": "*",
+    "@keymanapp/developer-utils": "*"
   },
+  "bundleDependencies": [
+    "@keymanapp/developer-utils"
+  ],
   "devDependencies": {
-    "@types/chai": "^4.1.7",
+    "@types/chai": "^4.3.5",
     "@types/mocha": "^5.2.7",
     "@types/node": "^20.4.1",
     "c8": "^7.12.0",

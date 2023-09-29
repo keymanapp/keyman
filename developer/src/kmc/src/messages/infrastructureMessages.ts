@@ -12,8 +12,8 @@ export class InfrastructureMessages {
   static FATAL_UnexpectedException = SevFatal | 0x0001;
 
   // For this message, we override the filename with the passed-in file. A bit of a hack but does the job
-  static Info_BuildingFile = (o:{filename:string}) => ({filename:o.filename, ...m(this.INFO_BuildingFile,
-    `Building ${o.filename}`)});
+  static Info_BuildingFile = (o:{filename:string,relativeFilename:string}) => ({filename:o.filename, ...m(this.INFO_BuildingFile,
+    `Building ${o.relativeFilename}`)});
   static INFO_BuildingFile = SevInfo | 0x0002;
 
   static Error_FileDoesNotExist = (o:{filename:string}) => m(this.ERROR_FileDoesNotExist,
@@ -29,13 +29,13 @@ export class InfrastructureMessages {
   static ERROR_OutFileNotValidForProjects = SevError | 0x0005;
 
   // For this message, we override the filename with the passed-in file. A bit of a hack but does the job
-  static Info_FileBuiltSuccessfully = (o:{filename:string}) => ({filename:o.filename, ...m(this.INFO_FileBuiltSuccessfully,
-    `${o.filename} built successfully.`)});
+  static Info_FileBuiltSuccessfully = (o:{filename:string,relativeFilename:string}) => ({filename:o.filename, ...m(this.INFO_FileBuiltSuccessfully,
+    `${o.relativeFilename} built successfully.`)});
   static INFO_FileBuiltSuccessfully = SevInfo | 0x0006;
 
   // For this message, we override the filename with the passed-in file. A bit of a hack but does the job
-  static Info_FileNotBuiltSuccessfully = (o:{filename:string}) => ({filename:o.filename, ...m(this.INFO_FileNotBuiltSuccessfully,
-    `${o.filename} failed to build.`)});
+  static Info_FileNotBuiltSuccessfully = (o:{filename:string,relativeFilename:string}) => ({filename:o.filename, ...m(this.INFO_FileNotBuiltSuccessfully,
+    `${o.relativeFilename} failed to build.`)});
   static INFO_FileNotBuiltSuccessfully = SevInfo | 0x0007;
 
   static Error_InvalidProjectFile = (o:{message:string}) => m(this.ERROR_InvalidProjectFile,
@@ -51,13 +51,13 @@ export class InfrastructureMessages {
   static ERROR_UnknownFileFormat = SevError | 0x000A;
 
   // For this message, we override the filename with the passed-in file. A bit of a hack but does the job
-  static Info_ProjectBuiltSuccessfully = (o:{filename:string}) => ({filename:o.filename, ...m(this.INFO_ProjectBuiltSuccessfully,
-    `Project ${o.filename} built successfully.`)});
+  static Info_ProjectBuiltSuccessfully = (o:{filename:string,relativeFilename:string}) => ({filename:o.filename, ...m(this.INFO_ProjectBuiltSuccessfully,
+    `Project ${o.relativeFilename} built successfully.`)});
   static INFO_ProjectBuiltSuccessfully = SevInfo | 0x000B;
 
   // For this message, we override the filename with the passed-in file. A bit of a hack but does the job
-  static Info_ProjectNotBuiltSuccessfully = (o:{filename:string}) => ({filename:o.filename, ...m(this.INFO_ProjectNotBuiltSuccessfully,
-    `Project ${o.filename} failed to build.`)});
+  static Info_ProjectNotBuiltSuccessfully = (o:{filename:string,relativeFilename:string}) => ({filename:o.filename, ...m(this.INFO_ProjectNotBuiltSuccessfully,
+    `Project ${o.relativeFilename} failed to build.`)});
   static INFO_ProjectNotBuiltSuccessfully = SevInfo | 0x000C;
 
   static Info_TooManyMessages = (o:{count:number}) => m(this.INFO_TooManyMessages,

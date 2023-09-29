@@ -3,22 +3,22 @@
   "languages": {
     "km": {
       "oskFont": {
-        "family": "Khmer Busra Kbd",
+        "family": "khmer_angkor Keyman OSK Font",
         "source": [
           "khmer_busra_kbd.ttf"
         ]
       },
       "font": {
-        "family": "Khmer Mondulkiri",
+        "family": "khmer_angkor Keyman Display Font",
         "source": [
           "Mondulkiri-R.ttf"
         ]
       },
-      "example": {
-        "keys": "xjmEr",
+      "examples": [{
+        "keys": "x j m E r",
         "text": "\u1781\u17D2\u1798\u17C2\u179A",
         "note": "Name of language"
-      },
+      }],
       "displayName": "Khmer",
       "languageName": "Khmer"
     }
