@@ -686,8 +686,7 @@ export class PathSegmenter {
       cumulativeStats = new CumulativePathStats();
     }
 
-    sample = {... sample};
-    sample.t += timeDelta;
+    sample = {... sample, t: sample.t + timeDelta};
     const extendedStats = cumulativeStats.extend(sample);
     this.steppedCumulativeStats.push(extendedStats);
 

@@ -6,9 +6,9 @@ import { Nonoptional } from "../nonoptional.js";
 /**
  * Documents the expected typing of serialized versions of the `GestureSource` class.
  */
-export type SerializedGestureSource<HoveredItemType = any> = {
+export type SerializedGestureSource<HoveredItemType = any, StateToken = any> = {
   isFromTouch: boolean;
-  path: SerializedGesturePath<HoveredItemType>;
+  path: SerializedGesturePath<HoveredItemType, StateToken>;
   // identifier is not included b/c it's only needed during live processing.
 }
 
@@ -31,7 +31,7 @@ export type SerializedGestureSource<HoveredItemType = any> = {
  * gestures expect multiple, hence "simple".
  *
  */
-export class GestureSource<HoveredItemType> {
+export class GestureSource<HoveredItemType, StateToken=any> {
   /**
    * Indicates whether or not this tracked point's original source is a DOM `Touch`.
    */
@@ -43,19 +43,25 @@ export class GestureSource<HoveredItemType> {
   public readonly rawIdentifier: number;
 
   // A full, uninterrupted recording of all samples observed during the lifetime of the touchpoint.
-  protected _path: GesturePath<HoveredItemType>;
+  protected _path: GesturePath<HoveredItemType, StateToken>;
 
   protected _baseItem: HoveredItemType;
 
   private static _jsonIdSeed: -1;
 
   // Assertion:  must always contain an index 0 - the base recognizer config.
-  protected recognizerConfigStack: Nonoptional<GestureRecognizerConfiguration<HoveredItemType>>[];
+  protected recognizerConfigStack: Nonoptional<GestureRecognizerConfiguration<HoveredItemType, StateToken>>[];
+
+  /**
+   * Usable by the gesture-recognizer library's consumer to track a token identifying specific states
+   * of the consuming system if desired.
+   */
+  public stateToken: StateToken = null;
 
   /**
    * Tracks the coordinates and timestamps of each update for the lifetime of this `GestureSource`.
    */
-  public get path(): GesturePath<HoveredItemType> {
+  public get path(): GesturePath<HoveredItemType, StateToken> {
     return this._path;
   }
 
@@ -67,7 +73,8 @@ export class GestureSource<HoveredItemType> {
    */
   constructor(
     identifier: number,
-    recognizerConfig: Nonoptional<GestureRecognizerConfiguration<HoveredItemType>> | Nonoptional<GestureRecognizerConfiguration<HoveredItemType>>[],
+    recognizerConfig: Nonoptional<GestureRecognizerConfiguration<HoveredItemType, StateToken>>
+      | Nonoptional<GestureRecognizerConfiguration<HoveredItemType, StateToken>>[],
     isFromTouch: boolean
   ) {
     this.rawIdentifier = identifier;
@@ -92,7 +99,7 @@ export class GestureSource<HoveredItemType> {
     return instance;
   }
 
-  public update(sample: InputSample<HoveredItemType>) {
+  public update(sample: InputSample<HoveredItemType, StateToken>) {
     this.path.extend(sample);
     this._baseItem ||= sample.item;
   }
@@ -107,7 +114,7 @@ export class GestureSource<HoveredItemType> {
   /**
    * The most recent path sample (coordinate) under consideration for this `GestureSource`.
    */
-  public get currentSample(): InputSample<HoveredItemType> {
+  public get currentSample(): InputSample<HoveredItemType, StateToken> {
     return this.path.coords[this.path.coords.length-1];
   }
 
@@ -122,7 +129,7 @@ export class GestureSource<HoveredItemType> {
    * from the most recently-observed path coordinate.
    * @returns
    */
-  public constructSubview(startAtEnd: boolean, preserveBaseItem: boolean): GestureSourceSubview<HoveredItemType> {
+  public constructSubview(startAtEnd: boolean, preserveBaseItem: boolean): GestureSourceSubview<HoveredItemType, StateToken> {
     return new GestureSourceSubview(this, this.recognizerConfigStack, startAtEnd, preserveBaseItem);
   }
 
@@ -153,7 +160,7 @@ export class GestureSource<HoveredItemType> {
     return `${prefix}:${this.rawIdentifier}`;
   }
 
-  public pushRecognizerConfig(config: Omit<GestureRecognizerConfiguration<HoveredItemType>, 'touchEventRoot'| 'mouseEventRoot'>) {
+  public pushRecognizerConfig(config: Omit<GestureRecognizerConfiguration<HoveredItemType, StateToken>, 'touchEventRoot'| 'mouseEventRoot'>) {
     const configToProcess = {...config,
       mouseEventRoot: this.recognizerConfigStack[0].mouseEventRoot,
       touchEventRoot: this.recognizerConfigStack[0].touchEventRoot
@@ -191,8 +198,8 @@ export class GestureSource<HoveredItemType> {
   }
 }
 
-export class GestureSourceSubview<HoveredItemType> extends GestureSource<HoveredItemType> {
-  private _baseSource: GestureSource<HoveredItemType>
+export class GestureSourceSubview<HoveredItemType, StateToken = any> extends GestureSource<HoveredItemType, StateToken> {
+  private _baseSource: GestureSource<HoveredItemType, StateToken>
   private _baseStartIndex: number;
   private subviewDisconnector: () => void;
 
@@ -231,7 +238,7 @@ export class GestureSourceSubview<HoveredItemType> extends GestureSource<Hovered
      * Provides a coordinate-system translation for source subviews.
      * The base version still needs to use the original coord system, though.
      */
-    const translateSample = (sample: InputSample<HoveredItemType>) => {
+    const translateSample = (sample: InputSample<HoveredItemType, StateToken>) => {
       const translation = this.recognizerTranslation;
       // Provide a coordinate-system translation for source subviews.
       // The base version still needs to use the original coord system, though.
@@ -240,7 +247,7 @@ export class GestureSourceSubview<HoveredItemType> extends GestureSource<Hovered
 
     // Note: we don't particularly need subviews to track the actual coords aside from
     // tracking related stats data.  But... we don't have an "off-switch" for that yet.
-    let subpath: GesturePath<HoveredItemType>;
+    let subpath: GesturePath<HoveredItemType, StateToken>;
 
     // Will hold the last sample _even if_ we don't save every coord that comes through.
     const lastSample = source.path.stats.lastSample;
@@ -254,7 +261,7 @@ export class GestureSourceSubview<HoveredItemType> extends GestureSource<Hovered
       this._baseStartIndex = start;
     }
 
-    subpath = new GesturePath<HoveredItemType>();
+    subpath = new GesturePath<HoveredItemType, StateToken>();
     for(let i=0; i < length; i++) {
       subpath.extend(translateSample(baseSource.path.coords[start + i]));
     }
@@ -271,7 +278,7 @@ export class GestureSourceSubview<HoveredItemType> extends GestureSource<Hovered
       // Ensure that this 'subview' is updated whenever the "source of truth" is.
       const completeHook    = ()       => this.path.terminate(false);
       const invalidatedHook = ()       => this.path.terminate(true);
-      const stepHook        = (sample: InputSample<HoveredItemType>) => {
+      const stepHook        = (sample: InputSample<HoveredItemType, StateToken>) => {
         super.update(translateSample(sample));
       };
       baseSource.path.on('complete',    completeHook);
@@ -328,15 +335,15 @@ export class GestureSourceSubview<HoveredItemType> extends GestureSource<Hovered
     }
   }
 
-  public pushRecognizerConfig(config: Omit<GestureRecognizerConfiguration<HoveredItemType>, "touchEventRoot" | "mouseEventRoot">): void {
+  public pushRecognizerConfig(config: Omit<GestureRecognizerConfiguration<HoveredItemType, StateToken>, "touchEventRoot" | "mouseEventRoot">): void {
     throw new Error("Pushing and popping of recognizer configurations should only be called on the base GestureSource");
   }
 
-  public popRecognizerConfig(): Nonoptional<GestureRecognizerConfiguration<HoveredItemType>> {
+  public popRecognizerConfig(): Nonoptional<GestureRecognizerConfiguration<HoveredItemType, StateToken>> {
     throw new Error("Pushing and popping of recognizer configurations should only be called on the base GestureSource");
   }
 
-  public update(sample: InputSample<HoveredItemType>): void {
+  public update(sample: InputSample<HoveredItemType, StateToken>): void {
     throw new Error("Updates should be provided through the base GestureSource.")
   }
 
