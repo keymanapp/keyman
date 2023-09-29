@@ -200,7 +200,7 @@ export class GestureSequence<Type> extends EventEmitter<EventMap<Type>> {
           const targetSet = selection.result.action.selectionMode;
           // push the new one.
           const changedSetSelector = new MatcherSelector<Type>(targetSet);
-          this.pushedSelector = changedSetSelector
+          this.pushedSelector = changedSetSelector;
           this.touchpointCoordinator?.pushSelector(changedSetSelector);
         }
       }
