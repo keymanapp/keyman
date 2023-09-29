@@ -1,5 +1,52 @@
 # Keyman Version History
 
+## 17.0.182 alpha 2023-09-28
+
+* chore(web): builds that output to web/build/publish should also clean it (#9613)
+* chore(linux): Dynamically choose display number (#9629)
+* docs(linux): Update sample tasks.json for Linux (#9634)
+* chore(common): Add Crowdin strings for Mon (#9550)
+* fix(developer): only include mobile touch platform in basic project (#9549)
+* fix(windows): fix the ellipsis for longer text on buttons (#9638)
+
+## 17.0.181 alpha 2023-09-26
+
+* chore: workaround npm/cli#3466 when bundling internal deps (#9536)
+* chore(linux): Check and restart background processes (#9608)
+
+## 17.0.180 alpha 2023-09-25
+
+* fix(linux): Fix detection of unit tests (#9606)
+
+## 17.0.179 alpha 2023-09-22
+
+* chore(resources): ldml: update to keyboard3 (#9588)
+* change(android,web) Use web-based popup key longpresses (#9591)
+
+## 17.0.178 alpha 2023-09-21
+
+* fix(linux): Correctly open files linked from help page (#9601)
+* chore(linux): Fix bugs, add dependency and update documentation (#9602)
+
+## 17.0.177 alpha 2023-09-20
+
+* chore(linux): Add coverage action to `ibus-keyman/build.sh` (#9583)
+* docs(common): Fix documentation for `builder_describe_internal_dependency` (#9582)
+
+## 17.0.176 alpha 2023-09-19
+
+* chore(oem/fv/android): Update Gradle to 7.4 (#9590)
+* refactor(linux): Rename defines to clarify purpose  ️ (#9584)
+*  (#9560)
+
+## 17.0.175 alpha 2023-09-18
+
+* chore(linux): Split startup process (#9570)
+
+## 17.0.174 alpha 2023-09-16
+
+* refactor(linux): Reformat file (#9569)
+
 ## 17.0.173 alpha 2023-09-13
 
 * chore(common): Update to Unicode 15.1 (#9555)

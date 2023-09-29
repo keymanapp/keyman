@@ -59,7 +59,7 @@ void KeymanSystemServiceClient::SetCapsLockIndicator(guint32 capsLock) {
     KEYMAN_INTERFACE_NAME, "SetCapsLockIndicator", error, &msg, "b", capsLock);
   if (result < 0) {
     g_error("%s: Failed to call method SetCapsLockIndicator: %s. %s. %s.",
-      __FUNCTION__, strerror(-result), error->name, error->message);
+      __FUNCTION__, strerror(-result), error ? error->name : "-", error ? error->message : "-");
     return;
   }
 }
@@ -78,7 +78,7 @@ gint32 KeymanSystemServiceClient::GetCapsLockIndicator() {
     KEYMAN_INTERFACE_NAME, "GetCapsLockIndicator", error, &msg, "");
   if (result < 0) {
     g_error("%s: Failed to call method GetCapsLockIndicator: %s. %s. %s.",
-      __FUNCTION__, strerror(-result), error->name, error->message);
+      __FUNCTION__, strerror(-result), error ? error->name : "-", error ? error->message : "-");
     return -1;
   }
 

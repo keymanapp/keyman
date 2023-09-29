@@ -11,8 +11,8 @@ Exact copy of mt.xml from CLDR, but with:
   - an updated DTD path
   - test case
 -->
-<!DOCTYPE keyboard SYSTEM "../../../../../resources/standards-data/ldml-keyboards/techpreview/dtd/ldmlKeyboard.dtd">
-<keyboard locale="mt" conformsTo="techpreview">
+<!DOCTYPE keyboard3 SYSTEM "../../../../../resources/standards-data/ldml-keyboards/techpreview/dtd/ldmlKeyboard3.dtd">
+<keyboard3 locale="mt" conformsTo="techpreview">
     <locales>
         <!-- English is also an official language in Malta.-->
         <locale id="en" />
@@ -90,4 +90,4 @@ Exact copy of mt.xml from CLDR, but with:
         </layer>
     </layers>
 
-</keyboard>
+</keyboard3>

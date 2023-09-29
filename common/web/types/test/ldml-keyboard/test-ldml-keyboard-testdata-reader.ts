@@ -11,16 +11,16 @@ describe('ldml keyboard xml reader tests', function () {
       subpath: 'test-fr.xml',
       callback: (data, source) => {
         assert.ok(source);
-        assert.ok(source.keyboardTest);
-        assert.equal(source.keyboardTest.conformsTo, constants.cldr_version_latest);
+        assert.ok(source.keyboardTest3);
+        assert.equal(source.keyboardTest3.conformsTo, constants.cldr_version_latest);
 
-        assert.deepEqual(source.keyboardTest.info, {
+        assert.deepEqual(source.keyboardTest3.info, {
           keyboard: 'fr-t-k0-azerty.xml',
           author: 'Team Keyboard',
           name: 'fr-test'
         });
 
-        assert.sameDeepMembers(source.keyboardTest.repertoire, [
+        assert.sameDeepMembers(source.keyboardTest3.repertoire, [
           {
             name: 'simple-repertoire',
             chars: '[a b c d e \\u{22}]',
@@ -29,10 +29,10 @@ describe('ldml keyboard xml reader tests', function () {
           { name: 'chars-repertoire', chars: '[á é ó]', type: 'gesture' }
         ]);
 
-        assert.equal(1, source.keyboardTest.tests?.length);
-        assert.equal('key-tests', source.keyboardTest.tests[0].name);
-        assert.equal(1, source.keyboardTest.tests[0].test?.length);
-        const test0 = source.keyboardTest.tests[0].test[0];
+        assert.equal(1, source.keyboardTest3.tests?.length);
+        assert.equal('key-tests', source.keyboardTest3.tests[0].name);
+        assert.equal(1, source.keyboardTest3.tests[0].test?.length);
+        const test0 = source.keyboardTest3.tests[0].test[0];
         assert.equal('key-test', test0.name);
         assert.equal('abc\\u0022...', test0.startContext?.to);
         assert.sameDeepOrderedMembers([

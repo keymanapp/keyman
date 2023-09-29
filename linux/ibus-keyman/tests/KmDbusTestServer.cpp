@@ -139,6 +139,11 @@ void KmDbusTestServer::Loop()
 
 int
 main(int argc, char *argv[]) {
+  if (!g_file_test(KEYMAN_TEST_SERVICE_PATH, G_FILE_TEST_IS_DIR)) {
+    std::cerr << "ERROR: Directory " << KEYMAN_TEST_SERVICE_PATH << " doesn't exist! Exiting." << std::endl;
+    return 1;
+  }
+
   KmDbusTestServer testServer;
   testServer.Loop();
 
