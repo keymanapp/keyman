@@ -8,7 +8,6 @@ type GestureModel = specTypeDefs.GestureModel<string>;
 export const LongpressModel: GestureModel = {
   id: 'longpress',
   resolutionPriority: 0,
-  itemPriority: 0,
   contacts: [
     {
       model: {
@@ -47,7 +46,6 @@ export const LongpressModel: GestureModel = {
 export const MultitapModel: GestureModel = {
   id: 'multitap',
   resolutionPriority: 2,
-  itemPriority: 1,
   contacts: [
     {
       model: {
@@ -78,7 +76,6 @@ export const MultitapModel: GestureModel = {
 export const SimpleTapModel: GestureModel = {
   id: 'simple-tap',
   resolutionPriority: 1,
-  itemPriority: 0,
   contacts: [
     {
       model: {
@@ -108,7 +105,6 @@ export const SimpleTapModel: GestureModel = {
 export const SubkeySelectModel: GestureModel = {
   id: 'subkey-select',
   resolutionPriority: 0,
-  itemPriority: 0,
   contacts: [
     {
       model: {
@@ -137,7 +133,6 @@ export const SubkeySelectModel: GestureModel = {
 export const ModipressStartModel: GestureModel = {
   id: 'modipress-start',
   resolutionPriority: 5,
-  itemPriority: 0,
   contacts: [
     {
       model: {
@@ -162,7 +157,6 @@ export const ModipressStartModel: GestureModel = {
 export const ModipressEndModel: GestureModel = {
   id: 'modipress-end',
   resolutionPriority: 5,
-  itemPriority: 0,
   contacts: [
     {
       model: {

@@ -28,7 +28,6 @@ type PathInheritanceType = gestures.specs.ContactModel<string>['pathInheritance'
 function dummyInheritanceMatcher(inheritanceType: PathInheritanceType): gestures.specs.GestureModel<string> {
   return {
     id: "dummy",
-    itemPriority: 0,
     resolutionPriority: 0,
     resolutionAction: { type: 'complete', item: 'current' },
     contacts: [

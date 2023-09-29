@@ -92,13 +92,6 @@ export interface GestureModel<Type> {
   // ComplexGestureSource for the same update.
   readonly resolutionPriority: number;
 
-  // This field is primarly used at the `GestureMatcher` level, rather than the
-  // `PathMatcher` level.
-  //
-  // If there are multiple unresolved gestures, with no lock-in, the "potential gesture" with the
-  // highest item priority is the authority re: the "current item".
-  readonly itemPriority: number;
-
   // One or more "touchpath models" - how a touchpath matching this gesture would look, based on its
   // ordinal position.  (Same order as in the TrackedInput)
   readonly contacts: {
