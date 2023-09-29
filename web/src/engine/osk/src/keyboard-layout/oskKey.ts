@@ -25,6 +25,7 @@ export class OSKKeySpec implements LayoutKey {
   nextlayer?: string;
   pad?: number;
   sk?: OSKKeySpec[];
+  default?: boolean;
 
   constructor(id: string, text?: string, width?: number, sp?: ButtonClass, nextlayer?: string, pad?: number) {
     this.id = id;
