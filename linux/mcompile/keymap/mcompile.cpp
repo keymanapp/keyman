@@ -239,6 +239,13 @@ KMX_DWORD  KMX_VKUSToVKUnderlyingLayout(v_dw_3D &All_Vector,KMX_DWORD inUS) {
   return inUS;
 }
 
+// _S2 this will definitely give wrong results!!!!
+KMX_WORD KMX_VKUnderlyingLayoutToVKUS(KMX_WORD VKey) {
+  // _S2 TODO adapt for mcompile linux
+  return VKey;
+}
+
+
 // takes cpital character of Other keyboard and returns character of Other keyboard with shiftstate VKShiftState[j]
 KMX_DWORD KMX_CharFromVK(v_dw_3D &All_Vector,KMX_DWORD vkUnderlying, KMX_UINT VKShiftState, KMX_WCHAR* DeadKey){
 

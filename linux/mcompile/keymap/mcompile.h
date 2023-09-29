@@ -39,6 +39,8 @@ struct KMX_DeadkeyMapping {   // I4353
 
 extern std::vector<KMX_DeadkeyMapping> KMX_FDeadkeys;   // I4353
 
+// _S2 is this correct here???
+KMX_WORD KMX_VKUnderlyingLayoutToVKUS(KMX_WORD VKey) ;
 
 //--------------------old 
 /*
