@@ -75,12 +75,10 @@ export default class OSKLayerGroup {
 
     // Kind of WET with VisualKeyboard.updateState, but oh well.
     let priorLayer: OSKLayer = null;
-    if(layer.element.style.display != 'block') {
+    if(layer.element.style.display == 'block') {
+      priorLayer = layer;
+    } else {
       for(let id in this.layers) {
-        if(id == layerId) {
-          continue;
-        }
-
         if(this.layers[id].element.style.display == 'block') {
           priorLayer = this.layers[id];
         }
