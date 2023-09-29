@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 17.0.183 alpha 2023-09-29
+
+* feat(web): browser-KMW support for default subkeys (#9496)
+* refactor(linux): Add more tests for `keymanutil.c`  ️ (#9595)
+
 ## 17.0.182 alpha 2023-09-28
 
 * chore(web): builds that output to web/build/publish should also clean it (#9613)
