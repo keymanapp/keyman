@@ -196,6 +196,25 @@ export class KeysCompiler extends SectionCompiler {
     }
   }
 
+  private getKeymapFromForm(hardware : string) : Constants.KeyMap {
+    return KeysCompiler.getKeymapFromForms(this.keyboard3?.forms.form, hardware);
+  }
+
+  public static getKeymapFromForms(forms: LDMLKeyboard.LKForm[], hardware: string): Constants.KeyMap {
+    const ldmlForm = forms.find((f) => f.id === hardware);
+    if (!ldmlForm) {
+      return undefined;
+    }
+    return KeysCompiler.getKeymapFromScancodes(ldmlForm);
+  }
+
+  public static getKeymapFromScancodes(ldmlForm: LDMLKeyboard.LKForm) {
+    const { scanCodes } = ldmlForm;
+    const ldmlScan = scanCodes.map(o => o.codes.split(" ").map(n => Number.parseInt(n, 16)));
+    const ldmlVkey = Constants.CLDRScanToKeyMap(ldmlScan);
+    return ldmlVkey;
+  }
+
   /**
    * TODO-LDML: from old 'keys'
    * Validate for purpose of kmap
@@ -217,10 +236,8 @@ export class KeysCompiler extends SectionCompiler {
       valid = false;
     }
 
-    const keymap = Constants.HardwareToKeymap.get(hardware);
-    /* c8 ignore next 5 */
+    const keymap = this.getKeymapFromForm(hardware);
     if (!keymap) {
-      // not reached due to XML validation
       this.callbacks.reportMessage(
         CompilerMessages.Error_InvalidHardware({ form: hardware })
       );
@@ -287,7 +304,7 @@ export class KeysCompiler extends SectionCompiler {
     hardware: string
   ): Keys {
     const mod = translateLayerAttrToModifier(layer);
-    const keymap = Constants.HardwareToKeymap.get(hardware);
+    const keymap = this.getKeymapFromForm(hardware);
 
     let y = -1;
     for (let row of layer.row) {
