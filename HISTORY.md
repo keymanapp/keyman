@@ -1,5 +1,19 @@
 # Keyman Version History
 
+## 17.0.182 alpha 2023-09-28
+
+* chore(web): builds that output to web/build/publish should also clean it (#9613)
+* chore(linux): Dynamically choose display number (#9629)
+* docs(linux): Update sample tasks.json for Linux (#9634)
+* chore(common): Add Crowdin strings for Mon (#9550)
+* fix(developer): only include mobile touch platform in basic project (#9549)
+* fix(windows): fix the ellipsis for longer text on buttons (#9638)
+
+## 17.0.181 alpha 2023-09-26
+
+* chore: workaround npm/cli#3466 when bundling internal deps (#9536)
+* chore(linux): Check and restart background processes (#9608)
+
 ## 17.0.180 alpha 2023-09-25
 
 * fix(linux): Fix detection of unit tests (#9606)
