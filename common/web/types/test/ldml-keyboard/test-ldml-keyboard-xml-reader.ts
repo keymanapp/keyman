@@ -216,6 +216,11 @@ describe('verify scancodes', function () {
         const comp = new Intl.Collator(['und'], {numeric: true});
         outMap.sort((a,b) => comp.compare(a.scan, b.scan));
         fs.writeFileSync('build/test/ldml-keyboard/scancodes.json', JSON.stringify(outMap, null, ' '), 'utf-8');
+        fs.writeFileSync('build/test/ldml-keyboard/scancodes.ts',
+          `export const scanToVkey = {\n` +
+          outMap.map(o => `  0x${o.scan}: k.${o.vname},`).join('\n') +
+          `\n};\n`,
+          'utf-8');
       },
     },
   ]);

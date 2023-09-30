@@ -144,7 +144,76 @@ export const USVirtualKeyCodes = {
 
 const k = USVirtualKeyCodes;
 
+/** Map a CLDR scancode to a US VKey ala USVirtualKeyCodes */
+export const CLDRScanToUSVirtualKeyCodes = {
+  0x02: k.K_1,
+  0x03: k.K_2,
+  0x04: k.K_3,
+  0x05: k.K_4,
+  0x06: k.K_5,
+  0x07: k.K_6,
+  0x08: k.K_7,
+  0x09: k.K_8,
+  0x0A: k.K_9,
+  0x0B: k.K_0,
+  0x0C: k.K_HYPHEN,
+  0x0D: k.K_EQUAL,
+
+  0x10: k.K_Q,
+  0x11: k.K_W,
+  0x12: k.K_E,
+  0x13: k.K_R,
+  0x14: k.K_T,
+  0x15: k.K_Y,
+  0x16: k.K_U,
+  0x17: k.K_I,
+  0x18: k.K_O,
+  0x19: k.K_P,
+  0x1A: k.K_LBRKT,
+  0x1B: k.K_RBRKT,
+
+  0x1E: k.K_A,
+  0x1F: k.K_S,
+  0x20: k.K_D,
+  0x21: k.K_F,
+  0x22: k.K_G,
+  0x23: k.K_H,
+  0x24: k.K_J,
+  0x25: k.K_K,
+  0x26: k.K_L,
+  0x27: k.K_COLON,
+  0x28: k.K_QUOTE,
+  0x29: k.K_BKQUOTE,
+
+  0x2B: k.K_BKSLASH,
+  0x2C: k.K_Z,
+  0x2D: k.K_X,
+  0x2E: k.K_C,
+  0x2F: k.K_V,
+  0x30: k.K_B,
+  0x31: k.K_N,
+  0x32: k.K_M,
+  0x33: k.K_COMMA,
+  0x34: k.K_PERIOD,
+  0x35: k.K_SLASH,
+
+  0x39: k.K_SPACE,
+
+  0x56: k.K_oE2,
+  0x73: k.k_oC1,
+  0x7D: k.K_oE2,
+};
+
 export type KeyMap = number[][];
+
+/**
+ * Convert a scan code numerical KeyMap to VKeys
+ * @param scans
+ * @returns
+ */
+export function CLDRScanToKeyMap(scans: KeyMap): KeyMap {
+  return scans.map(row => row.map(scan => CLDRScanToUSVirtualKeyCodes ? [scan]));
+}
 
 export const USVirtualKeyMap: KeyMap = [
   // ` 1 2 3 4 5 6 7 8 9 0 - = [bksp]
