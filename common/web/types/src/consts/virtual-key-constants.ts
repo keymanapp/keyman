@@ -212,87 +212,19 @@ export type KeyMap = number[][];
  * @returns
  */
 export function CLDRScanToKeyMap(scans: KeyMap): KeyMap {
-  return scans.map(row => row.map(scan => CLDRScanToUSVirtualKeyCodes ? [scan]));
+  // typescript fun to index the scan table
+  function hasKey(key: PropertyKey): key is keyof typeof CLDRScanToUSVirtualKeyCodes {
+    return key in CLDRScanToUSVirtualKeyCodes;
+  }
+
+  return scans.map((row) => row.map((scan) => {
+    if (hasKey(scan)) {
+      return CLDRScanToUSVirtualKeyCodes[scan];
+    } else {
+      return undefined;
+    }
+  }));
 }
-
-export const USVirtualKeyMap: KeyMap = [
-  // ` 1 2 3 4 5 6 7 8 9 0 - = [bksp]
-  [ k.K_BKQUOTE, k.K_1, k.K_2, k.K_3, k.K_4, k.K_5, k.K_6, k.K_7, k.K_8, k.K_9, k.K_0, k.K_HYPHEN, k.K_EQUAL ],
-  // [tab] Q W E R T Y U I O P [ ] \
-  [ k.K_Q, k.K_W, k.K_E, k.K_R, k.K_T, k.K_Y, k.K_U, k.K_I, k.K_O, k.K_P, k.K_LBRKT, k.K_RBRKT, k.K_BKSLASH ],
-  // [caps] A S D F G H J K L ; ' [enter]
-  [ k.K_A, k.K_S, k.K_D, k.K_F, k.K_G, k.K_H, k.K_J, k.K_K, k.K_L, k.K_COLON, k.K_QUOTE ],
-  // [shift] Z X C V B N M , . / [shift] *=oE2
-  [ k.K_Z, k.K_X, k.K_C, k.K_V, k.K_B, k.K_N, k.K_M, k.K_COMMA, k.K_PERIOD, k.K_SLASH ],
-  // space
-  [ k.K_SPACE ],
-];
-
-export const KSVirtualKeyMap: KeyMap = [
-  // ` 1 2 3 4 5 6 7 8 9 0 - = YEN [bksp]
-  [ k.K_BKQUOTE, k.K_1, k.K_2, k.K_3, k.K_4, k.K_5, k.K_6, k.K_7, k.K_8, k.K_9, k.K_0, k.K_HYPHEN, k.K_EQUAL, k.K_BKSLASH /* YEN */  ],
-  // [tab] Q W E R T Y U I O P [ ] \
-  [ k.K_Q, k.K_W, k.K_E, k.K_R, k.K_T, k.K_Y, k.K_U, k.K_I, k.K_O, k.K_P, k.K_LBRKT, k.K_RBRKT ],
-  // [caps] A S D F G H J K L ; ' [enter]
-  [ k.K_A, k.K_S, k.K_D, k.K_F, k.K_G, k.K_H, k.K_J, k.K_K, k.K_L, k.K_COLON, k.K_QUOTE ],
-  // [shift] Z X C V B N M , . / [shift]
-  [ k.K_Z, k.K_X, k.K_C, k.K_V, k.K_B, k.K_N, k.K_M, k.K_COMMA, k.K_PERIOD, k.K_SLASH ],
-  // space
-  [ k.K_SPACE ],
-];
-
-export const ISOVirtualKeyMap: KeyMap = [
-  // ` 1 2 3 4 5 6 7 8 9 0 - = [bksp]
-  [ k.K_BKQUOTE, k.K_1, k.K_2, k.K_3, k.K_4, k.K_5, k.K_6, k.K_7, k.K_8, k.K_9, k.K_0, k.K_HYPHEN, k.K_EQUAL ],
-  // [tab] Q W E R T Y U I O P [ ]
-  [ k.K_Q, k.K_W, k.K_E, k.K_R, k.K_T, k.K_Y, k.K_U, k.K_I, k.K_O, k.K_P, k.K_LBRKT, k.K_RBRKT  ],
-  // [caps] A S D F G H J K L ; ' \ [enter]
-  [ k.K_A, k.K_S, k.K_D, k.K_F, k.K_G, k.K_H, k.K_J, k.K_K, k.K_L, k.K_COLON, k.K_QUOTE, k.K_BKSLASH ],
-  // [shift] * Z X C V B N M , . / [shift] *=oE2
-  [ k.K_oE2, k.K_Z, k.K_X, k.K_C, k.K_V, k.K_B, k.K_N, k.K_M, k.K_COMMA, k.K_PERIOD, k.K_SLASH ],
-  // space
-  [ k.K_SPACE ],
-];
-
-export const JISVirtualKeyMap: KeyMap = [
-  // [Hankaku/Zenkaku] 1 2 3 4 5 6 7 8 9 0 - ^ ¥ [bksp]
-  [ k.K_BKQUOTE, k.K_1, k.K_2, k.K_3, k.K_4, k.K_5, k.K_6, k.K_7, k.K_8, k.K_9, k.K_0, k.K_HYPHEN, k.K_EQUAL, k.K_oE2 /* YEN */ ],
-  // [tab] Q W E R T Y U I O P @ [ [enter]
-  [ k.K_Q, k.K_W, k.K_E, k.K_R, k.K_T, k.K_Y, k.K_U, k.K_I, k.K_O, k.K_P, k.K_LBRKT, k.K_RBRKT  ],
-  // [caps] A S D F G H J K L ; : ] [enter]
-  [ k.K_A, k.K_S, k.K_D, k.K_F, k.K_G, k.K_H, k.K_J, k.K_K, k.K_L, k.K_COLON, k.K_QUOTE, k.K_BKSLASH ],
-  // [shift] Z X C V B N M , . / _ [shift]
-  [ k.K_Z, k.K_X, k.K_C, k.K_V, k.K_B, k.K_N, k.K_M, k.K_COMMA, k.K_PERIOD, k.K_SLASH, k.k_oC1 /* ろ */ ],
-  // space
-  [ k.K_SPACE ],
-];
-
-export const ABNT2VirtualKeyMap: KeyMap = [
-  // ' 1 2 3 4 5 6 7 8 9 0 - = [bksp]
-  [ k.K_BKQUOTE, k.K_1, k.K_2, k.K_3, k.K_4, k.K_5, k.K_6, k.K_7, k.K_8, k.K_9, k.K_0, k.K_HYPHEN, k.K_EQUAL ],
-  // [tab] Q W E R T Y U I O P ´ [
-  [ k.K_Q, k.K_W, k.K_E, k.K_R, k.K_T, k.K_Y, k.K_U, k.K_I, k.K_O, k.K_P, k.K_LBRKT, k.K_RBRKT  ],
-  // [caps] A S D F G H J K L ç ~ ] [enter]
-  [ k.K_A, k.K_S, k.K_D, k.K_F, k.K_G, k.K_H, k.K_J, k.K_K, k.K_L, k.K_COLON, k.K_QUOTE, k.K_BKSLASH ],
-  // [shift] \ Z X C V B N M , . ; / [shift]
-  [ k.K_oE2, k.K_Z, k.K_X, k.K_C, k.K_V, k.K_B, k.K_N, k.K_M, k.K_COMMA, k.K_PERIOD, k.K_SLASH, k.k_oC1 /* ABNT2 */ ],
-  // space
-  [ k.K_SPACE ],
-];
-
-/**
- * Map from a hardware constant to a keymap
- * For the 'key' see constants.layr_list_hardware_map
- */
-export const HardwareToKeymap: Map<string, KeyMap> = new Map(
-  [
-    ["us",    USVirtualKeyMap],
-    ["iso",   ISOVirtualKeyMap],
-    ["jis",   JISVirtualKeyMap],
-    ["abnt2", ABNT2VirtualKeyMap],
-    ["ks",    KSVirtualKeyMap],
-  ]
-);
 
 /**
  * Maps LDML VKey Names from CLDR VKey Enum in TR35 to Keyman virtual key codes

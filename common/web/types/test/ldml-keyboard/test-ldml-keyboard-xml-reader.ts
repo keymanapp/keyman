@@ -3,7 +3,7 @@ import 'mocha';
 import {assert} from 'chai';
 import { CommonTypesMessages } from '../../src/util/common-events.js';
 import { testReaderCases } from '../helpers/reader-callback-test.js';
-import { HardwareToKeymap, USVirtualKeyCodes } from '../../src/consts/virtual-key-constants.js';
+import { KeyMap, USVirtualKeyCodes } from '../../src/consts/virtual-key-constants.js';
 import fs from 'node:fs';
 
 function pluckKeysFromKeybag(keys: LKKey[], ids: string[]) {
@@ -145,6 +145,88 @@ describe('ldml keyboard xml reader tests', function () {
 });
 
 describe('verify scancodes', function () {
+  // TODO-LDML: Temporarily, the old maps are here to double check round trips.
+  const k = USVirtualKeyCodes;
+
+  const USVirtualKeyMap: KeyMap = [
+    // ` 1 2 3 4 5 6 7 8 9 0 - = [bksp]
+    [ k.K_BKQUOTE, k.K_1, k.K_2, k.K_3, k.K_4, k.K_5, k.K_6, k.K_7, k.K_8, k.K_9, k.K_0, k.K_HYPHEN, k.K_EQUAL ],
+    // [tab] Q W E R T Y U I O P [ ] \
+    [ k.K_Q, k.K_W, k.K_E, k.K_R, k.K_T, k.K_Y, k.K_U, k.K_I, k.K_O, k.K_P, k.K_LBRKT, k.K_RBRKT, k.K_BKSLASH ],
+    // [caps] A S D F G H J K L ; ' [enter]
+    [ k.K_A, k.K_S, k.K_D, k.K_F, k.K_G, k.K_H, k.K_J, k.K_K, k.K_L, k.K_COLON, k.K_QUOTE ],
+    // [shift] Z X C V B N M , . / [shift] *=oE2
+    [ k.K_Z, k.K_X, k.K_C, k.K_V, k.K_B, k.K_N, k.K_M, k.K_COMMA, k.K_PERIOD, k.K_SLASH ],
+    // space
+    [ k.K_SPACE ],
+  ];
+
+  const KSVirtualKeyMap: KeyMap = [
+    // ` 1 2 3 4 5 6 7 8 9 0 - = YEN [bksp]
+    [ k.K_BKQUOTE, k.K_1, k.K_2, k.K_3, k.K_4, k.K_5, k.K_6, k.K_7, k.K_8, k.K_9, k.K_0, k.K_HYPHEN, k.K_EQUAL, k.K_BKSLASH /* YEN */  ],
+    // [tab] Q W E R T Y U I O P [ ] \
+    [ k.K_Q, k.K_W, k.K_E, k.K_R, k.K_T, k.K_Y, k.K_U, k.K_I, k.K_O, k.K_P, k.K_LBRKT, k.K_RBRKT ],
+    // [caps] A S D F G H J K L ; ' [enter]
+    [ k.K_A, k.K_S, k.K_D, k.K_F, k.K_G, k.K_H, k.K_J, k.K_K, k.K_L, k.K_COLON, k.K_QUOTE ],
+    // [shift] Z X C V B N M , . / [shift]
+    [ k.K_Z, k.K_X, k.K_C, k.K_V, k.K_B, k.K_N, k.K_M, k.K_COMMA, k.K_PERIOD, k.K_SLASH ],
+    // space
+    [ k.K_SPACE ],
+  ];
+
+   const ISOVirtualKeyMap: KeyMap = [
+    // ` 1 2 3 4 5 6 7 8 9 0 - = [bksp]
+    [ k.K_BKQUOTE, k.K_1, k.K_2, k.K_3, k.K_4, k.K_5, k.K_6, k.K_7, k.K_8, k.K_9, k.K_0, k.K_HYPHEN, k.K_EQUAL ],
+    // [tab] Q W E R T Y U I O P [ ]
+    [ k.K_Q, k.K_W, k.K_E, k.K_R, k.K_T, k.K_Y, k.K_U, k.K_I, k.K_O, k.K_P, k.K_LBRKT, k.K_RBRKT  ],
+    // [caps] A S D F G H J K L ; ' \ [enter]
+    [ k.K_A, k.K_S, k.K_D, k.K_F, k.K_G, k.K_H, k.K_J, k.K_K, k.K_L, k.K_COLON, k.K_QUOTE, k.K_BKSLASH ],
+    // [shift] * Z X C V B N M , . / [shift] *=oE2
+    [ k.K_oE2, k.K_Z, k.K_X, k.K_C, k.K_V, k.K_B, k.K_N, k.K_M, k.K_COMMA, k.K_PERIOD, k.K_SLASH ],
+    // space
+    [ k.K_SPACE ],
+  ];
+
+   const JISVirtualKeyMap: KeyMap = [
+    // [Hankaku/Zenkaku] 1 2 3 4 5 6 7 8 9 0 - ^ ¥ [bksp]
+    [ k.K_BKQUOTE, k.K_1, k.K_2, k.K_3, k.K_4, k.K_5, k.K_6, k.K_7, k.K_8, k.K_9, k.K_0, k.K_HYPHEN, k.K_EQUAL, k.K_oE2 /* YEN */ ],
+    // [tab] Q W E R T Y U I O P @ [ [enter]
+    [ k.K_Q, k.K_W, k.K_E, k.K_R, k.K_T, k.K_Y, k.K_U, k.K_I, k.K_O, k.K_P, k.K_LBRKT, k.K_RBRKT  ],
+    // [caps] A S D F G H J K L ; : ] [enter]
+    [ k.K_A, k.K_S, k.K_D, k.K_F, k.K_G, k.K_H, k.K_J, k.K_K, k.K_L, k.K_COLON, k.K_QUOTE, k.K_BKSLASH ],
+    // [shift] Z X C V B N M , . / _ [shift]
+    [ k.K_Z, k.K_X, k.K_C, k.K_V, k.K_B, k.K_N, k.K_M, k.K_COMMA, k.K_PERIOD, k.K_SLASH, k.k_oC1 /* ろ */ ],
+    // space
+    [ k.K_SPACE ],
+  ];
+
+   const ABNT2VirtualKeyMap: KeyMap = [
+    // ' 1 2 3 4 5 6 7 8 9 0 - = [bksp]
+    [ k.K_BKQUOTE, k.K_1, k.K_2, k.K_3, k.K_4, k.K_5, k.K_6, k.K_7, k.K_8, k.K_9, k.K_0, k.K_HYPHEN, k.K_EQUAL ],
+    // [tab] Q W E R T Y U I O P ´ [
+    [ k.K_Q, k.K_W, k.K_E, k.K_R, k.K_T, k.K_Y, k.K_U, k.K_I, k.K_O, k.K_P, k.K_LBRKT, k.K_RBRKT  ],
+    // [caps] A S D F G H J K L ç ~ ] [enter]
+    [ k.K_A, k.K_S, k.K_D, k.K_F, k.K_G, k.K_H, k.K_J, k.K_K, k.K_L, k.K_COLON, k.K_QUOTE, k.K_BKSLASH ],
+    // [shift] \ Z X C V B N M , . ; / [shift]
+    [ k.K_oE2, k.K_Z, k.K_X, k.K_C, k.K_V, k.K_B, k.K_N, k.K_M, k.K_COMMA, k.K_PERIOD, k.K_SLASH, k.k_oC1 /* ABNT2 */ ],
+    // space
+    [ k.K_SPACE ],
+  ];
+
+  /**
+   * Map from a hardware constant to a keymap
+   * For the 'key' see constants.layr_list_hardware_map
+   */
+  const HardwareToKeymap: Map<string, KeyMap> = new Map(
+    [
+      ["us",    USVirtualKeyMap],
+      ["iso",   ISOVirtualKeyMap],
+      ["jis",   JISVirtualKeyMap],
+      ["abnt2", ABNT2VirtualKeyMap],
+      ["ks",    KSVirtualKeyMap],
+    ]
+  );
+
   this.slow(500); // 0.5 sec -- json schema validation takes a while
 
   // for err, convert a vkey name to a number
@@ -165,7 +247,7 @@ describe('verify scancodes', function () {
         assert.ok(source?.keyboard3?.forms?.form);
 
         const ldmlFormIds = source?.keyboard3?.forms?.form.map(f => f.id);
-        const kmcFormIds =  Array.from(HardwareToKeymap.keys());
+        const kmcFormIds =  Array.from(HardwareToKeymap.keys()); // comes from static data above.
 
         assert.sameDeepMembers(ldmlFormIds, kmcFormIds, "LDML and kmc form ids");
 
@@ -204,8 +286,8 @@ describe('verify scancodes', function () {
           vcode: number;
         };
 
-        const outMap : ScanToVkey[] = [];
-        for (const [k,v] of scanToVkey.entries()) {
+        const outMap: ScanToVkey[] = [];
+        for (const [k, v] of scanToVkey.entries()) {
           outMap.push({
             scan: k,
             vname: findVkeyName(v),
@@ -213,14 +295,16 @@ describe('verify scancodes', function () {
           });
         }
 
-        const comp = new Intl.Collator(['und'], {numeric: true});
-        outMap.sort((a,b) => comp.compare(a.scan, b.scan));
+        const comp = new Intl.Collator(['und'], { numeric: true });
+        outMap.sort((a, b) => comp.compare(a.scan, b.scan));
         fs.writeFileSync('build/test/ldml-keyboard/scancodes.json', JSON.stringify(outMap, null, ' '), 'utf-8');
         fs.writeFileSync('build/test/ldml-keyboard/scancodes.ts',
           `export const scanToVkey = {\n` +
           outMap.map(o => `  0x${o.scan}: k.${o.vname},`).join('\n') +
           `\n};\n`,
           'utf-8');
+
+
       },
     },
   ]);
