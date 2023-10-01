@@ -199,32 +199,37 @@ export const CLDRScanToUSVirtualKeyCodes = {
 
   0x39: k.K_SPACE,
 
-  0x56: k.K_oE2,
+  0x56: k.K_oE2, // << Dup
   0x73: k.k_oC1,
-  0x7D: k.K_oE2,
+  0x7D: k.K_oE2, // << Dup
 };
 
 export type KeyMap = number[][];
 
 /**
  * Convert a scan code numerical KeyMap to VKeys
- * @param scans
+ * @param scans keymap to convert
+ * @param badScans output: set of not-found scancodes
  * @returns
  */
-export function CLDRScanToKeyMap(scans: KeyMap): KeyMap {
-  // typescript fun to index the scan table
-  function hasKey(key: PropertyKey): key is keyof typeof CLDRScanToUSVirtualKeyCodes {
+export function CLDRScanToKeyMap(scans: KeyMap, badScans?: Set<number>): KeyMap {
+  return scans.map((row) => row.map((scan) => CLDRScanToVkey(scan, badScans)));
+}
+
+/** Convert one scan code to vkey, or undefined */
+export function CLDRScanToVkey(scan: number, badScans?: Set<number>): number {
+  /** typescript fun to index the scan table */
+  function hasScanCode(key: PropertyKey): key is keyof typeof CLDRScanToUSVirtualKeyCodes {
     return key in CLDRScanToUSVirtualKeyCodes;
   }
-
-  return scans.map((row) => row.map((scan) => {
-    if (hasKey(scan)) {
-      return CLDRScanToUSVirtualKeyCodes[scan];
-    } else {
-      return undefined;
-    }
-  }));
+  if (hasScanCode(scan)) {
+    return CLDRScanToUSVirtualKeyCodes[scan];
+  } else {
+    badScans?.add(scan);
+    return undefined;
+  }
 }
+
 
 /**
  * Maps LDML VKey Names from CLDR VKey Enum in TR35 to Keyman virtual key codes

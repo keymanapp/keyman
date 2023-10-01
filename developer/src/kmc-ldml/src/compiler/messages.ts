@@ -35,7 +35,16 @@ export class CompilerMessages {
     m(this.HINT_LocaleIsNotMinimalAndClean, `Locale '${o.sourceLocale}' is not minimal or correctly formatted and should be '${o.locale}'`);
   static HINT_LocaleIsNotMinimalAndClean = SevHint | 0x0008;
 
-  // gap: 0x0009 … 0x000C were for vkeys
+  static Error_InvalidScanCode = (o:{form?: string, codes?: string[]}) =>
+  m(this.ERROR_InvalidScanCode, `Form '${o.form}' has invalid/unknown scancodes '${o.codes?.join(' ')}'`);
+  static ERROR_InvalidScanCode = SevError | 0x0009;
+
+  static Warn_CustomForm = (o:{id: string}) =>
+  m(this.WARN_CustomForm, `Custom <form id="${o.id}"> element. Key layout may not be as expected.`);
+  static WARN_CustomForm = SevWarn | 0x000A;
+
+  // 0x000B - available
+  // 0x000C - available
 
   static Error_InvalidVersion = (o:{version: string}) =>
     m(this.ERROR_InvalidVersion, `Version number '${o.version}' must be a semantic version format string.`);
@@ -134,10 +143,6 @@ export class CompilerMessages {
   static Error_DisplayNeedsToOrId = (o:{to?: string, id?: string}) =>
   m(this.ERROR_DisplayNeedsToOrId, `display ${CompilerMessages.toOrId(o)} needs to= or id=, but not both`);
   static ERROR_DisplayNeedsToOrId = SevError | 0x0022;
-
-  static Warn_UnsupportedCustomForm = (o:{id: string}) =>
-  m(this.WARN_UnsupportedCustomForm, `Custom <form id="${o.id}"> element is ignored. Key layout may not be as expected.`);
-  static WARN_UnsupportedCustomForm = SevWarn | 0x0023;
 }
 
 

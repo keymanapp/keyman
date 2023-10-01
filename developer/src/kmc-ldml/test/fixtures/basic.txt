@@ -302,7 +302,7 @@ block(layr)                         # struct COMP_KMXPLUS_LAYR {
   01 00 00 00                       #   KMX_DWORD rowCount
   02 00 00 00                       #   KMX_DWORD keyCount
   # list 0
-  04 00 00 00                       #   KMX_DWORD hardware = 'us'
+  index(strNull,strUs,2)            #   KMXPLUS_STR hardware = 'us'
   00 00 00 00                       #   KMX_DWORD layer;
   01 00 00 00 # count
   7B 00 00 00                       #   KMX_DWORD minDeviceWidth; // 123
@@ -423,6 +423,7 @@ block(strs)                         #  struct COMP_KMXPLUS_STRS {
   diff(strs,strAuthor)     sizeof(strAuthor,2)
   diff(strs,strConformsTo) sizeof(strConformsTo,2)
   diff(strs,strThat)   sizeof(strThat,2)
+  diff(strs,strUs)    sizeof(strUs,2)
   diff(strs,strVse)   sizeof(strVse,2)
   diff(strs,strVst)   sizeof(strVst,2)
   diff(strs,strVus)   sizeof(strVus,2)
@@ -460,6 +461,7 @@ block(strs)                         #  struct COMP_KMXPLUS_STRS {
   block(strConformsTo)       74 00 65 00 63 00 68 00 70 00 72 00 65 00 76 00
                              69 00 65 00 77 00 block(x) 00 00                         # 'techpreview'
   block(strThat)             74 00 68 00 61 00 74 00 block(x) 00 00                     # 'that'
+  block(strUs)               75 00 73 00 block(x) 00 00                           # 'us' (layout)
   block(strVse)              76 00 73 00 65 00 block(x) 00 00                     # 'vse'
   block(strVst)              76 00 73 00 74 00 block(x) 00 00                     # 'vst'
   block(strVus)              76 00 75 00 73 00 block(x) 00 00                     # 'vus'

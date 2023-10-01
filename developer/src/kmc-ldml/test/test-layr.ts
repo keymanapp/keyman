@@ -32,7 +32,7 @@ describe('layr', function () {
         const list0 = layr.lists[0];
         assert.ok(list0);
         assert.equal(list0.layers.length, 1);
-        assert.equal(list0.hardware, constants.layr_list_hardware_us);
+        assert.equal(list0.hardware.value, 'us');
         const layer0 = list0.layers[0];
         assert.ok(layer0);
         assert.equal(layer0.rows.length, 1);
@@ -51,7 +51,7 @@ describe('layr', function () {
         const layr = <Layr> sect;
         assert.equal(layr.lists?.length, 2);
 
-        const listHardware = layr.lists.find(v => v.hardware === constants.layr_list_hardware_iso);
+        const listHardware = layr.lists.find(v => v.hardware.value === 'iso');
         assert.ok(listHardware);
         assert.equal(listHardware.minDeviceWidth, 0);
         assert.equal(listHardware.layers.length, 2);
@@ -73,7 +73,7 @@ describe('layr', function () {
         assert.equal(hardware1row0.keys.length, 2);
         allKeysOk(hardware1row0,'q w', 'hardware1row0');
 
-        const listTouch = layr.lists.find(v => v.hardware === constants.layr_list_hardware_touch);
+        const listTouch = layr.lists.find(v => v.hardware.value === constants.layr_list_hardware_touch);
         assert.ok(listTouch);
         assert.equal(listTouch.minDeviceWidth, 300);
         assert.equal(listTouch.layers.length, 1);
@@ -106,32 +106,9 @@ describe('layr', function () {
       errors: [CompilerMessages.Error_ExcessHardware({ form: 'iso' })],
     },
     {
-      subpath: 'sections/layr/invalid-invalid-form.xml',
-      errors: [CompilerMessages.Error_InvalidHardware({
-        form: 'holographic',
-      }),],
-    },
-    {
       // missing layer element
       subpath: 'sections/layr/invalid-missing-layer.xml',
       errors: [CompilerMessages.Error_MustBeAtLeastOneLayerElement()],
-    },
-    {
-      // warning on custom form
-      subpath: 'sections/layr/hint-custom-form.xml',
-      warnings: [
-        CompilerMessages.Warn_UnsupportedCustomForm({id: "us"}),
-      ],
-    },
-    {
-      // error on unknown form
-      subpath: 'sections/layr/error-custom-form.xml',
-      warnings: [
-        CompilerMessages.Warn_UnsupportedCustomForm({id: "zzz"}),
-      ],
-      errors: [CompilerMessages.Error_InvalidHardware({
-        form: 'zzz',
-      }),],
     },
   ]);
 });

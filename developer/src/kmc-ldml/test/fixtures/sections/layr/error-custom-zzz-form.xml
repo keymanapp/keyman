@@ -7,18 +7,20 @@
   </names>
 
   <keys>
-    <key id="grave" to="`" />
     <key id="one" to="1" />
+    <key id="two" to="2" />
+    <key id="three" to="3" />
   </keys>
   <forms>
     <!-- warning, custom scancodes -->
     <form id="zzz">
-      <scanCodes codes="01 02 03 04" />
+      <!-- This will break because of scancode FF -->
+      <scanCodes codes="25 12 FF" />
     </form>
   </forms>
-  <layers form="zzz"> <!-- INVALID: 'zzz' is not a valid form. -->
+  <layers form="zzz">
     <layer id="base">
-      <row keys="grave one" />
+      <row keys="one two three" />
     </layer>
   </layers>
 </keyboard3>

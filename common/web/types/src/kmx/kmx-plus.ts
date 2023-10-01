@@ -422,7 +422,7 @@ export class Disp extends Section {
  * In-memory `<layers>`
  */
 export class LayrList {
-  hardware: number;
+  hardware: StrsItem;
   layers: LayrEntry[] = [];
   minDeviceWidth: number; // millimeters
 };
@@ -708,7 +708,7 @@ export class KMXPlusFile extends KMXFile {
     });
 
     this.COMP_PLUS_LAYR_LIST = new r.Struct({
-      hardware: r.uint32le, //enum
+      hardware: STR_REF, // str: hardware name
       layer: r.uint32le, // index into layers
       count: r.uint32le,
       minDeviceWidth: r.uint32le, // integer: millimeters

@@ -3,6 +3,7 @@ import 'mocha';
 import {assert} from 'chai';
 import { CommonTypesMessages } from '../../src/util/common-events.js';
 import { testReaderCases } from '../helpers/reader-callback-test.js';
+import { CLDRScanToVkey, CLDRScanToKeyMap } from '../../src/consts/virtual-key-constants.js';
 
 function pluckKeysFromKeybag(keys: LKKey[], ids: string[]) {
   return keys.filter(({id}) => ids.indexOf(id) !== -1);
@@ -140,4 +141,33 @@ describe('ldml keyboard xml reader tests', function () {
       ],
     },
   ]);
+});
+
+describe('check scan code routines', () => {
+  it('should be able to detect bad single scancodes', () => {
+    const badScans = new Set<number>();
+    const ckey = CLDRScanToVkey(0xFF, badScans);
+    assert.isUndefined(ckey, `expected undefined 0xFF`);
+    assert.equal(badScans.size, 1);
+    assert.sameDeepMembers(Array.from(badScans.values()), [0xFF]);
+  });
+  it('should be able to detect bad list scancodes', () => {
+    const badScans = new Set<number>();
+    const ckeys = CLDRScanToKeyMap([[0x02, 0xFF]], badScans);
+    assert.sameDeepMembers(ckeys, [[49, undefined]]);
+    assert.equal(badScans.size, 1);
+    assert.sameDeepMembers(Array.from(badScans.values()), [0xFF]);
+  });
+  it.skip('CLDRScanToUSVirtualKeyCodes should be 1:1', () => {
+    const vkeyToScan = new Map<number, number>();
+    // check all scancodes
+    for (let scan = 0; scan <= 0xFF; scan++) {
+      const vkey = CLDRScanToVkey(scan);
+      if (vkey !== undefined) {
+        assert.isFalse(vkeyToScan.has(vkey),
+          `vkey ${vkey} mapped from more than one scancode: ${Number(vkeyToScan.get(vkey)).toString(16)} and ${Number(scan).toString(16)}`);
+        vkeyToScan.set(vkey, scan);
+      }
+    }
+  });
 });

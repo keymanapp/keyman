@@ -353,35 +353,7 @@ class Constants {
   /**
    * for the 'hardware' field indicating a touch keyboard, non-hardware
    */
-  readonly layr_list_hardware_touch = 0;
-  /**
-   * for the 'hardware' field indicating an abnt2 layout
-   */
-  readonly layr_list_hardware_abnt2 = 1;
-  /**
-   * for the 'hardware' field indicating an iso layout
-   */
-  readonly layr_list_hardware_iso = 2;
-  /**
-   * for the 'hardware' field indicating a jis layout
-   */
-  readonly layr_list_hardware_jis = 3;
-  /**
-   * for the 'hardware' field indicating a us layout
-   */
-  readonly layr_list_hardware_us = 4;
-  /**
-   * Convenience map of layr_list_hardware field values
-   */
-  readonly layr_list_hardware_map: Map<String, number> = new Map(
-    [
-      ["touch", this.layr_list_hardware_touch],
-      ["abnt2", this.layr_list_hardware_abnt2],
-      ["iso", this.layr_list_hardware_iso],
-      ["jis", this.layr_list_hardware_jis],
-      ["us", this.layr_list_hardware_us],
-    ]
-  );
+  readonly layr_list_hardware_touch = 'touch';
   /**
    * Length of each layer entry in the 'layr' section variable part
    */
