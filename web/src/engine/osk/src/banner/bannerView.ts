@@ -248,11 +248,12 @@ export class BannerController {
           // Invalid option specified!
       }
       this._options[key] = optionSpec[key];
+    }
 
-      // If no banner instance exists yet, go with a safe, blank initialization.
-      if(!this.container.banner) {
-        this.selectBanner('inactive');
-      }
+    // Move out of for loop to handle standup
+    // If no banner instance exists yet, go with a safe, blank initialization.
+    if(!this.container.banner) {
+      this.selectBanner('inactive');
     }
   }
 
