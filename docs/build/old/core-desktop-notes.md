@@ -127,7 +127,7 @@ npm i -g @keymanapp/kmc
 If you want to rebuild keyboards for tests, you'll also need node:
 
 ```bash
-# TODO: node install
+brew install node
 ```
 
 And you will also need to install `kmc`:
