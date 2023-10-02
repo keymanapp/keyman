@@ -20,14 +20,25 @@ TODO shiftstate-count
 TODO keymap SplitToV.cpp exchange 4 with genaerated shiftcount
 TODO check if part with surplus is neccessary
 TODO shift-statevector
-TODO Do I need HKL for Linux / can I just use a void* ??
-TODO typeddef of KMX_HKL - van I delete all m_hkl from classes?
+TODO Do I need HKL for Linux / can I just use a void* or remove HKL ??
+TODO typeddef of KMX_HKL - can I delete all m_hkl from classes?
 TODO define what to return when SC/VK is not found in    get_VirtualKey_Other_From_SC,...
 TODO check if passed All_Vectpor as ptr/ref not as value e.g. in KMX_CharFromVK, KMX_VKUSToVKUnderlyingLayout, KMX_ImportRules
 ToDo in get_VirtualKey_Other_From_SC:  what if we use  column 3(altgr) and 4 (shift+altgr) ??
 TODO where to store VK_CANCEL.... in km_types.h or elsewhere?
 ToDo check up to 8 shiftstates ( find symbols-file with 8)
 TODO get_position_From_VirtualKey_US: take care of the other shiftstates
+ToDo make this better!!! get_VirtualKey_Other_From_SC
+
+TODO next:
+    change mapping (win-lin) for writing All_Vector
+    compare entries in rgKey ( are the same rgKey[]filled? it is OK from rgKey[65]-rgkey[90] but for other values??? )
+    mc_import-rules (from ~ l. 790) see if everything gives the same result on win-Lin
+    check if I use char16_t everywhere instead of wchar_t or char
+    replace GDK
+    see in which files I can put some functions (e.g. incxstr) that were duplicated or even #include their original location
+    remove testing functions
+    remove USE_GDK
 TODO ...
 
 //---------------------------
