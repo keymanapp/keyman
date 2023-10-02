@@ -182,7 +182,7 @@ describe('CompilerMessages', function () {
 
   // ERROR_PackageMustContainAPackageOrAKeyboard
 
-  it('should generate ERROR_PackageMustContainAModelOrAKeyboard if package contains a .doc file', async function() {
+  it('should generate ERROR_PackageMustContainAModelOrAKeyboard if package contains no keyboard or model', async function() {
     testForMessage(this, ['invalid', 'error_package_must_contain_a_model_or_a_keyboard.kps'],
       CompilerMessages.ERROR_PackageMustContainAModelOrAKeyboard);
   });
@@ -199,6 +199,13 @@ describe('CompilerMessages', function () {
   it('should generate WARN_KeyboardShouldHaveAtLeastOneLanguage if keyboard has zero language tags', async function() {
     testForMessage(this, ['invalid', 'warn_keyboard_should_have_at_least_one_language.kps'],
       CompilerMessages.WARN_KeyboardShouldHaveAtLeastOneLanguage);
+  });
+
+  // HINT_PackageContainsSourceFile
+
+  it('should generate HINT_PackageContainsSourceFile if package contains a source file', async function() {
+    testForMessage(this, ['invalid', 'hint_source_file_should_not_be_in_package.kps'],
+      CompilerMessages.HINT_PackageContainsSourceFile);
   });
 
 });
