@@ -1,7 +1,7 @@
 #
 # Test that kmc passes various compile tests
 #
-# Uses kmc.exe rather than attempting to run a separate test
+# Uses kmc.js (via kmc.cmd) rather than attempting to run a separate test
 #
 
 !include ..\..\..\Defines.mak
