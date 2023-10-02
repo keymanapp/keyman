@@ -166,8 +166,6 @@ export class TouchEventEngine<HoveredItemType, StateToken = any> extends InputEv
   onTouchEnd(event: TouchEvent) {
     let propagationActive = true;
 
-    // this.maintainTouchpointsWithIds(touchListToArray(event.touches).map((touch) => touch.identifier));
-
     // Only lists touch contact points that have been lifted; touchmove is raised separately if any movement occurred.
     for(let i=0; i < event.changedTouches.length; i++) {
       const touch = event.changedTouches.item(i);

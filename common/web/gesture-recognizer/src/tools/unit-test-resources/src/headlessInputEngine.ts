@@ -42,7 +42,8 @@ export class HeadlessInputEngine<Type = any> extends InputEngineBase<Type> {
 
     return {
       promise: startPromise,
-      source: replaySource
+      source: replaySource,
+      internal_id: pathID
     }
   }
 
@@ -75,6 +76,7 @@ export class HeadlessInputEngine<Type = any> extends InputEngineBase<Type> {
 
   async playbackRecording(recordedObj: RecordedCoordSequenceSet) {
     const playbackStartTuples = recordedObj.inputs.map((recording) => this.prepareSourceStart(recording));
+
     const playbackStarts = playbackStartTuples.map((tuple) => tuple.promise);
     const sources = playbackStartTuples.map((tuple) => tuple.source);
 
@@ -83,7 +85,7 @@ export class HeadlessInputEngine<Type = any> extends InputEngineBase<Type> {
     const playbackTerminations = recordedObj.inputs.map((recording, index) => this.playbackTerminations(sources[index], recording));
 
     playbackStarts.forEach((promise) => promise.then(() => {
-        this.maintainTouchpointsWithIds(playbackStartTuples.map((tuple) => tuple.source.rawIdentifier));
+        this.maintainTouchpointsWithIds(playbackStartTuples.map((tuple) => tuple.internal_id));
       })
     );
 
