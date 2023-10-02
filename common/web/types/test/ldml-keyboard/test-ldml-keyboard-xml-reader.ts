@@ -3,7 +3,7 @@ import 'mocha';
 import {assert} from 'chai';
 import { CommonTypesMessages } from '../../src/util/common-events.js';
 import { testReaderCases } from '../helpers/reader-callback-test.js';
-import { CLDRScanToVkey, CLDRScanToKeyMap } from '../../src/consts/virtual-key-constants.js';
+import { CLDRScanToVkey, CLDRScanToKeyMap, USVirtualKeyCodes } from '../../src/consts/virtual-key-constants.js';
 
 function pluckKeysFromKeybag(keys: LKKey[], ids: string[]) {
   return keys.filter(({id}) => ids.indexOf(id) !== -1);
@@ -163,11 +163,20 @@ describe('check scan code routines', () => {
     // check all scancodes
     for (let scan = 0; scan <= 0xFF; scan++) {
       const vkey = CLDRScanToVkey(scan);
-      if (vkey !== undefined && vkey !== 226) {
-        assert.isFalse(vkeyToScan.has(vkey),
-          `vkey ${vkey} (other than 226) mapped from more than one scancode: ${Number(vkeyToScan.get(vkey)).toString(16)} and ${Number(scan).toString(16)}`);
-        vkeyToScan.set(vkey, scan);
+      if (vkey === undefined) {
+        // not mapped, which is OK
+        continue;
       }
+      if (scan === 0x56 || scan === 0x7D) {
+        // These both can map to this scancode
+        assert.equal(vkey, USVirtualKeyCodes.K_oE2);
+      } else {
+        // don't check those exceptions
+        assert.isFalse(vkeyToScan.has(vkey),
+          `vkey ${vkey} mapped from more than one scancode: ${Number(vkeyToScan.get(vkey)).toString(16)} and ${Number(scan).toString(16)}`);
+      }
+      // do make sure nothing else maps to that vkey
+      vkeyToScan.set(vkey, scan);
     }
   });
 });
