@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 17.0.184 alpha 2023-10-02
+
+* fix(web): fixes toolbar refocus timing after a keyboard change (#9618)
+
 ## 17.0.183 alpha 2023-09-29
 
 * feat(web): browser-KMW support for default subkeys (#9496)
