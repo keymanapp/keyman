@@ -199,9 +199,9 @@ export const CLDRScanToUSVirtualKeyCodes = {
 
   0x39: k.K_SPACE,
 
-  0x56: k.K_oE2, // << Dup
+  0x56: k.K_oE2, // << Same as 0x7D; found on iso, abnt2
   0x73: k.k_oC1,
-  0x7D: k.K_oE2, // << Dup
+  0x7D: k.K_oE2, // << Same as 0x56; found on jis
 };
 
 export type KeyMap = number[][];
