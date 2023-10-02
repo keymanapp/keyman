@@ -41,6 +41,7 @@ export abstract class InputEngineBase<HoveredItemType, StateToken = any> extends
     // IDs provided to `GestureSource` should be engine-unique.  Unfortunately, the base identifier patterns provided by
     // browsers don't do this, so we map the browser ID to an engine-internal one.
     const unique_id = InputEngineBase.IDENTIFIER_SEED++;
+
     this.identifierMap[identifier] = unique_id;
 
     const source = new GestureSource<HoveredItemType, StateToken>(unique_id, this.config, isFromTouch);
@@ -52,6 +53,27 @@ export abstract class InputEngineBase<HoveredItemType, StateToken = any> extends
   }
 
   /**
+   * Calls to this method will cancel any touchpoints whose internal IDs are _not_ included in the parameter.
+   * Designed to facilitate recovery from error cases and peculiar states that sometimes arise when debugging.
+   * @param identifiers
+   */
+  maintainTouchpointsWithIds(identifiers: number[]) {
+    const identifiersToMaintain = identifiers.map((internal_id) => this.identifierMap[internal_id]);
+    const sourcesToDrop: GestureSource<HoveredItemType>[] = [];
+
+    this._activeTouchpoints.forEach((source) => {
+      if(identifiersToMaintain.indexOf(source.rawIdentifier) == -1) {
+        sourcesToDrop.push(source);
+      }
+    });
+
+    sourcesToDrop.forEach((source) => {
+      // Will trigger `.dropTouchpoint` later in the event chain.
+      source.terminate(true);
+    });
+  }
+
+  /**
    * @param identifier The identifier number corresponding to the input sequence.
    */
   hasActiveTouchpoint(identifier: number) {
@@ -59,6 +81,13 @@ export abstract class InputEngineBase<HoveredItemType, StateToken = any> extends
     return id !== undefined; //this.getTouchpointWithId(id) !== undefined;
   }
 
+  /**
+   * Retrieves the GestureSource (corresponding to a single touchpoint) corresponding
+   * to the specified internal identifier.  Internal ID -> unique ID mapping is
+   * performed here.
+   * @param identifier
+   * @returns
+   */
   protected getTouchpointWithId(identifier: number) {
     const id = this.identifierMap[identifier];
     return this._activeTouchpoints.find((point) => point.rawIdentifier == id);
@@ -73,17 +102,20 @@ export abstract class InputEngineBase<HoveredItemType, StateToken = any> extends
    * @returns
    */
   protected getConfigForId(identifier: number) {
-    const id = this.identifierMap[identifier];
-    return this.getTouchpointWithId(id).currentRecognizerConfig;
+    // protected - so, used internally only within the input engines.
+    // `getTouchpointWithId` will perform the internal -> external ID mapping.
+    return this.getTouchpointWithId(identifier).currentRecognizerConfig;
   }
 
   protected getStateTokenForId(identifier: number) {
-    const id = this.identifierMap[identifier];
-    return this.getTouchpointWithId(id).stateToken ?? null;
+    // protected - so, used internally only within the input engines.
+    // `getTouchpointWithId` will perform the internal -> external ID mapping.
+    return this.getTouchpointWithId(identifier).stateToken ?? null;
   }
 
-  public dropTouchpoint(point: GestureSource<HoveredItemType>) {
+  protected dropTouchpoint(point: GestureSource<HoveredItemType>) {
     const id = point.rawIdentifier;
+
     this._activeTouchpoints = this._activeTouchpoints.filter((pt) => point != pt);
     for(let key in this.identifierMap) {
       if(this.identifierMap[key] == id) {

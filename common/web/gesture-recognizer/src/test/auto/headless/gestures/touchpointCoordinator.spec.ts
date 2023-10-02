@@ -241,6 +241,81 @@ describe("TouchpointCoordinator", () => {
     assert.isEmpty(touchpointCoordinator.activeGestures);
   });
 
+  /**
+   * This test-case aims to replicate a fun scenario that arises at times during interactive debugging:
+   *
+   * Triggering an instant breakpoint (with F8) in Chrome during a longpress can prevent a 'touchend'
+   * from ever occurring for a GestureSource.  Accordingly, we need to test fallback behavior for
+   * recovering from such a state:  if a source is no longer in the event's `.touches` array, we know
+   * the touchpoint no longer exists.  Also, if it's in a `touchstart`'s `.changedTouches` array, we
+   * know it's being started.
+   */
+  it('interrupted longpress recovery', async () => {
+    const turtle1 = new TouchpathTurtle({
+      targetX: 1,
+      targetY: 1,
+      t: 100,
+      item: 'a'
+    });
+    turtle1.wait(1000, 50);
+    turtle1.move(0, 10, 100, 5);
+    turtle1.hoveredItem = 'à';
+    turtle1.move(90, 10, 100, 5);
+    turtle1.hoveredItem = 'â';
+    turtle1.commitPending();
+
+    const turtle2 = new TouchpathTurtle({
+      targetX: 11,
+      targetY: 11,
+      t: 700,
+      item: 'b'
+    });
+    turtle2.commitPending();
+
+    const emulationEngine = new HeadlessInputEngine();
+    const touchpointCoordinator = new TouchpointCoordinator(TestGestureModelDefinitions, [emulationEngine]);
+    const completionPromise1 = emulationEngine.playbackRecording({
+      inputs: [ {
+        path: {
+          coords: turtle1.path,
+        },
+        isFromTouch: true
+      }],
+      config: null
+    });
+
+    // Will interrupt the previous emulation and cancel the pending gesture halfway.
+    const completionPromise2 = emulationEngine.playbackRecording({
+      inputs: [ {
+        path: {
+          coords: turtle2.path
+        },
+        isFromTouch: true
+      }],
+      config: null
+    });
+
+    const sequencePromise = new ManagedPromise<GestureSequence<string>>();
+    const sourceSpy = sinon.fake();
+    touchpointCoordinator.on('inputstart', sourceSpy);
+    touchpointCoordinator.on('recognizedgesture', async (sequence) => {
+      try {
+        sequencePromise.resolve(sequence);
+      } catch(err) {
+      }
+    });
+
+    const runnerPromise = fakeClock.runToLastAsync();
+
+    await Promise.all([runnerPromise, completionPromise1, completionPromise2]);
+
+    // Verify that all sources and sequences are cleared.
+    assert.sameOrderedMembers(touchpointCoordinator.activeSources, []);
+    assert.sameOrderedMembers(touchpointCoordinator.activeGestures, []);
+
+    assert.isEmpty(touchpointCoordinator.activeGestures);
+  });
+
   it('longpress -> attempted simple-tap during subkey select', async () => {
     const turtle1 = new TouchpathTurtle({
       targetX: 1,

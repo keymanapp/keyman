@@ -7,7 +7,12 @@ import { GestureMatcher, MatchResult, PredecessorMatch } from "./gestureMatcher.
 import { GestureModel } from "../specs/gestureModel.js";
 
 interface GestureSourceTracker<Type> {
-  source: GestureSourceSubview<Type>;
+  /**
+   * Should be the actual GestureSource instance, not a subview thereof.
+   * Each `GestureMatcher` will construct its own 'subview' into the GestureSource
+   * based on its model's needs.
+   */
+  source: GestureSource<Type>;
   matchPromise: ManagedPromise<MatcherSelection<Type>>;
 }
 
@@ -98,7 +103,10 @@ export class MatcherSelector<Type> extends EventEmitter<EventMap<Type>> {
         }
       });
 
-      this._sourceSelector.splice(this._sourceSelector.indexOf(sourceTracker), 1);
+      const index = this._sourceSelector.indexOf(sourceTracker);
+      if(index > -1) {
+        this._sourceSelector.splice(index, 1);
+      }
     });
 
     matchersToCancel.forEach((matcher) => matcher.cancel());
@@ -132,12 +140,14 @@ export class MatcherSelector<Type> extends EventEmitter<EventMap<Type>> {
   ): Promise<MatcherSelection<Type>> {
     /*
      * To be clear, this _starts_ the source-tracking process.  It's an async process, though.
+     *
+     * Operate based upon the actual GestureSource, not a subview.  Subviews can get
+     * 'detached', a state not compatible with the needs of this method.
      */
-
     const sourceNotYetStaged = source instanceof GestureSource;
     const sources = sourceNotYetStaged
-      ? [source.constructSubview(false, true)]
-      : source.sources as GestureSourceSubview<Type>[];
+      ? [source instanceof GestureSourceSubview ? source.baseSource : source]
+      : (source.sources as GestureSourceSubview<Type>[]).map((source) => source.baseSource);
 
     const matchPromise = new ManagedPromise<MatcherSelection<Type>>();
 
@@ -249,10 +259,10 @@ export class MatcherSelector<Type> extends EventEmitter<EventMap<Type>> {
   };
 
   private resetSourceHooks() {
-    const resetHooks = (gestureSource: GestureSourceSubview<Type>) => {
+    const resetHooks = (gestureSource: GestureSource<Type>) => {
       // GestureSourceSubviews stay synchronized with their 'base' via event handlers.
       // We want GestureMatchers to receive all updates before we attempt a sync'd update.
-      const baseSource = gestureSource.baseSource;
+      const baseSource = gestureSource;
 
       // So, a resetHooks call says to remove the old handler...
       baseSource.path.off('step', this.attemptSynchronousUpdate);

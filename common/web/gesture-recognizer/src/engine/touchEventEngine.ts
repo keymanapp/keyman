@@ -5,6 +5,15 @@ import { Nonoptional } from "./nonoptional.js";
 import { ZoneBoundaryChecker } from "./configuration/zoneBoundaryChecker.js";
 import { GestureSource } from "./headless/gestureSource.js";
 
+function touchListToArray(list: TouchList) {
+  const arr: Touch[] = [];
+
+  for(let i=0; i < list.length; i++) {
+    arr.push(list.item(i));
+  }
+
+  return arr;
+}
 export class TouchEventEngine<HoveredItemType, StateToken = any> extends InputEventEngine<HoveredItemType, StateToken> {
   private readonly _touchStart: typeof TouchEventEngine.prototype.onTouchStart;
   private readonly _touchMove:  typeof TouchEventEngine.prototype.onTouchMove;
@@ -89,6 +98,13 @@ export class TouchEventEngine<HoveredItemType, StateToken = any> extends InputEv
 
     this.preventPropagation(event);
 
+    // In case a touch ID is reused, we can pre-emptively filter it for special cases to cancel the old version,
+    // noting that it's included by a changedTouch.  (Only _new_ contact points are included in .changedTouches
+    // during a touchstart.)
+    const allTouches = touchListToArray(event.touches);
+    const newTouches = touchListToArray(event.changedTouches);
+    this.maintainTouchpointsWithIds(allTouches.filter((touch) => (newTouches.indexOf(touch) != -1)).map((touch) => touch.identifier));
+
     // Ensure the same timestamp is used for all touches being updated.
     const timestamp = performance.now();
 
@@ -116,6 +132,8 @@ export class TouchEventEngine<HoveredItemType, StateToken = any> extends InputEv
     let propagationActive = true;
     // Ensure the same timestamp is used for all touches being updated.
     const timestamp = performance.now();
+
+    this.maintainTouchpointsWithIds(touchListToArray(event.touches).map((touch) => touch.identifier));
 
     // Do not change to `changedTouches` - we need a sample for all active touches in order
     // to facilitate path-update synchronization for multi-touch gestures.
@@ -147,6 +165,8 @@ export class TouchEventEngine<HoveredItemType, StateToken = any> extends InputEv
 
   onTouchEnd(event: TouchEvent) {
     let propagationActive = true;
+
+    // this.maintainTouchpointsWithIds(touchListToArray(event.touches).map((touch) => touch.identifier));
 
     // Only lists touch contact points that have been lifted; touchmove is raised separately if any movement occurred.
     for(let i=0; i < event.changedTouches.length; i++) {

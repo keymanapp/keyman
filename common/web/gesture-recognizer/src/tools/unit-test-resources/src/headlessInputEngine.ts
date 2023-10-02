@@ -32,6 +32,8 @@ export class HeadlessInputEngine<Type = any> extends InputEngineBase<Type> {
     const pathID = this.PATH_ID_SEED++;
     let replaySource = this.createTouchpoint(pathID, recordedSource.isFromTouch);
     replaySource.update(headSample); // is included before the point is made available.
+    replaySource.path.on('invalidated', () => this.dropTouchpoint(replaySource));
+    replaySource.path.on('complete', () => this.dropTouchpoint(replaySource));
 
     const startPromise = timedPromise(headSample.t).then(() => {
       this.addTouchpoint(replaySource);
@@ -67,7 +69,6 @@ export class HeadlessInputEngine<Type = any> extends InputEngineBase<Type> {
       if(replaySource.isPathComplete) {
         return;
       }
-      this.dropTouchpoint(replaySource);
       replaySource.terminate(recording.path.wasCancelled);
     });
   }
@@ -80,6 +81,11 @@ export class HeadlessInputEngine<Type = any> extends InputEngineBase<Type> {
     const playbackMiddles = recordedObj.inputs.map((recording, index) => this.replaySourceSamples(sources[index], recording));
 
     const playbackTerminations = recordedObj.inputs.map((recording, index) => this.playbackTerminations(sources[index], recording));
+
+    playbackStarts.forEach((promise) => promise.then(() => {
+        this.maintainTouchpointsWithIds(playbackStartTuples.map((tuple) => tuple.source.rawIdentifier));
+      })
+    );
 
     await Promise.all(([] as Promise<any>[])
       .concat(playbackStarts)
