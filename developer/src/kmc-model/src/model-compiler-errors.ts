@@ -2,8 +2,8 @@ import { CompilerErrorNamespace, CompilerErrorSeverity, CompilerEvent, CompilerM
 
 const Namespace = CompilerErrorNamespace.ModelCompiler;
 // const SevInfo = CompilerErrorSeverity.Info | Namespace;
-// const SevHint = CompilerErrorSeverity.Hint | Namespace;
-const SevWarn = CompilerErrorSeverity.Warn | Namespace;
+const SevHint = CompilerErrorSeverity.Hint | Namespace;
+// const SevWarn = CompilerErrorSeverity.Warn | Namespace;
 const SevError = CompilerErrorSeverity.Error | Namespace;
 const SevFatal = CompilerErrorSeverity.Fatal | Namespace;
 
@@ -24,13 +24,13 @@ export class ModelCompilerMessages {
   static Fatal_UnexpectedException = (o:{e: any}) => m(this.FATAL_UnexpectedException, null, o.e ?? 'unknown error');
   static FATAL_UnexpectedException = SevFatal | 0x0001;
 
-  static Warn_MixedNormalizationForms = (o:{wordform: string}) => m(this.WARN_MixedNormalizationForms,
+  static Hint_MixedNormalizationForms = (o:{wordform: string}) => m(this.HINT_MixedNormalizationForms,
     `“${o.wordform}” is not in Unicode NFC. Automatically converting to NFC.`);
-  static WARN_MixedNormalizationForms = SevWarn | 0x0002;
+  static HINT_MixedNormalizationForms = SevHint | 0x0002;
 
-  static Warn_DuplicateWordInSameFile = (o:{wordform: string}) => m(this.WARN_DuplicateWordInSameFile,
+  static Hint_DuplicateWordInSameFile = (o:{wordform: string}) => m(this.HINT_DuplicateWordInSameFile,
     `duplicate word “${o.wordform}” found in same file; summing counts`);
-  static WARN_DuplicateWordInSameFile = SevWarn | 0x0003;
+  static HINT_DuplicateWordInSameFile = SevHint | 0x0003;
 
   static Error_UnimplementedModelFormat = (o:{format: string}) => m(this.ERROR_UnimplementedModelFormat,
     `Unimplemented model format: ${o.format}`);
