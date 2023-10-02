@@ -96,7 +96,7 @@ You may also need `kmc` - see below.
 
 * Add emcc to PATH (probably upstream/enscripten)
 
-You may also need the `kmc` - see below.
+You may also need `kmc` - see below.
 
 #### kmc - All Linux platforms
 
