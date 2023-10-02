@@ -158,14 +158,14 @@ describe('check scan code routines', () => {
     assert.equal(badScans.size, 1);
     assert.sameDeepMembers(Array.from(badScans.values()), [0xFF]);
   });
-  it.skip('CLDRScanToUSVirtualKeyCodes should be 1:1', () => {
+  it('CLDRScanToUSVirtualKeyCodes should be 1:1', () => {
     const vkeyToScan = new Map<number, number>();
     // check all scancodes
     for (let scan = 0; scan <= 0xFF; scan++) {
       const vkey = CLDRScanToVkey(scan);
-      if (vkey !== undefined) {
+      if (vkey !== undefined && vkey !== 226) {
         assert.isFalse(vkeyToScan.has(vkey),
-          `vkey ${vkey} mapped from more than one scancode: ${Number(vkeyToScan.get(vkey)).toString(16)} and ${Number(scan).toString(16)}`);
+          `vkey ${vkey} (other than 226) mapped from more than one scancode: ${Number(vkeyToScan.get(vkey)).toString(16)} and ${Number(scan).toString(16)}`);
         vkeyToScan.set(vkey, scan);
       }
     }

@@ -122,8 +122,8 @@ export const USVirtualKeyCodes = {
    */
   K_oE2:226,
   K_OE2:226,
-  k_oC1:193,  // ISO B11, ABNT-2 key to left of right shift, not on US keyboard
-  k_OC1:193,
+  K_oC1:193,  // ISO B11, ABNT-2 key to left of right shift, not on US keyboard
+  K_OC1:193,
   'K_?C1':193,
   'k_?C1':193,
   K_oDF:0xDF,
@@ -200,7 +200,7 @@ export const CLDRScanToUSVirtualKeyCodes = {
   0x39: k.K_SPACE,
 
   0x56: k.K_oE2, // << Same as 0x7D; found on iso, abnt2
-  0x73: k.k_oC1,
+  0x73: k.K_oC1,
   0x7D: k.K_oE2, // << Same as 0x56; found on jis
 };
 
@@ -230,59 +230,3 @@ export function CLDRScanToVkey(scan: number, badScans?: Set<number>): number {
   }
 }
 
-
-/**
- * Maps LDML VKey Names from CLDR VKey Enum in TR35 to Keyman virtual key codes
- */
-export const LdmlVkeyNames: Record<string, number> = {
-  'SPACE':     k.K_SPACE,      // 0x20,  // A03
-  '0':         k.K_0,          // 0x30,  // E10
-  '1':         k.K_1,          // 0x31,  // E01
-  '2':         k.K_2,          // 0x32,  // E02
-  '3':         k.K_3,          // 0x33,  // E03
-  '4':         k.K_4,          // 0x34,  // E04
-  '5':         k.K_5,          // 0x35,  // E05
-  '6':         k.K_6,          // 0x36,  // E06
-  '7':         k.K_7,          // 0x37,  // E07
-  '8':         k.K_8,          // 0x38,  // E08
-  '9':         k.K_9,          // 0x39,  // E09
-  'A':         k.K_A,          // 0x41,  // C01
-  'B':         k.K_B,          // 0x42,  // B05
-  'C':         k.K_C,          // 0x43,  // B03
-  'D':         k.K_D,          // 0x44,  // C03
-  'E':         k.K_E,          // 0x45,  // D03
-  'F':         k.K_F,          // 0x46,  // C04
-  'G':         k.K_G,          // 0x47,  // C05
-  'H':         k.K_H,          // 0x48,  // C06
-  'I':         k.K_I,          // 0x49,  // D08
-  'J':         k.K_J,          // 0x4A,  // C07
-  'K':         k.K_K,          // 0x4B,  // C08
-  'L':         k.K_L,          // 0x4C,  // C09
-  'M':         k.K_M,          // 0x4D,  // B07
-  'N':         k.K_N,          // 0x4E,  // B06
-  'O':         k.K_O,          // 0x4F,  // D09
-  'P':         k.K_P,          // 0x50,  // D10
-  'Q':         k.K_Q,          // 0x51,  // D01
-  'R':         k.K_R,          // 0x52,  // D04
-  'S':         k.K_S,          // 0x53,  // C02
-  'T':         k.K_T,          // 0x54,  // D05
-  'U':         k.K_U,          // 0x55,  // D07
-  'V':         k.K_V,          // 0x56,  // B05
-  'W':         k.K_W,          // 0x57,  // D02
-  'X':         k.K_X,          // 0x58,  // B02
-  'Y':         k.K_Y,          // 0x59,  // D06
-  'Z':         k.K_Z,          // 0x5A,  // B01
-  'SEMICOLON': k.K_COLON,      // 0xBA,  // C10
-  'EQUAL':     k.K_EQUAL,      // 0xBB,  // E12
-  'COMMA':     k.K_COMMA,      // 0xBC,  // B08
-  'HYPHEN':    k.K_HYPHEN,     // 0xBD,  // E11
-  'PERIOD':    k.K_PERIOD,     // 0xBE,  // B09
-  'SLASH':     k.K_SLASH,      // 0xBF,  // B10
-  'GRAVE':     k.K_BKQUOTE,    // 0xC0,  // E00
-  'LBRACKET':  k.K_LBRKT,      // 0xDB,  // D11
-  'BACKSLASH': k.K_BKSLASH,    // 0xDC,  // D13
-  'RBRACKET':  k.K_RBRKT,      // 0xDD,  // D12
-  'QUOTE':     k.K_QUOTE,      // 0xDE,  // C11
-  'LESS-THAN': k.K_oE2,        // 0xE2,  // B00  102nd key on European layouts, right of left shift.
-  'ABNT2':     k.k_oC1,        // 0xC1,  // B11  Extra key, left of right-shift, ABNT2
-};
