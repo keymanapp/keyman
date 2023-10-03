@@ -52,13 +52,6 @@
       <FileType>.md</FileType>
     </File>
     <File>
-      <ID>id_621d2fc48f94f0e3862c706c37ff7a8b</ID>
-      <Filename>capslock.keyboard_info</Filename>
-      <Filepath>capslock.keyboard_info</Filepath>
-      <FileVersion></FileVersion>
-      <FileType>.keyboard_info</FileType>
-    </File>
-    <File>
       <ID>id_894c97d2a53dc029f8ca18fd3e0c2ff0</ID>
       <Filename>capslock.kmx</Filename>
       <Filepath>source\..\build\capslock.kmx</Filepath>
