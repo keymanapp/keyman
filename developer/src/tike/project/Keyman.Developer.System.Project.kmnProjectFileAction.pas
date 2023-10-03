@@ -46,8 +46,6 @@ begin
   begin
     FJS := TKeyboardUtils.GetKeymanWebCompiledFileName(FileName);
     CleanFile(FJS); // keyboard-x.y.js
-//    CleanFile(ChangeFileExt(FJS, '') + '_load.js'); // keyboard-x.y_load.js
-//    CleanFile(ChangeFileExt(FJS, '.json'), True); // keyboard-x.y_load.js
   end;
 
   Result := True;
