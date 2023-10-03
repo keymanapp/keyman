@@ -11,7 +11,19 @@ do_clean() {
   # clean: note build/<target> will be left, but build/<target>/<configuration> should be gone
   local target=$1
   builder_start_action clean:$target || return 0
+
   rm -rf "$MESON_PATH"
+
+  # Removes ICU cached components so it will be re-downloaded and built. Note:
+  # we could use `git clean`, but this clarifies exactly what is deleted, and
+  # but we try not to use git commands in build scripts, to maintain clear
+  # responsibility
+  rm -rf \
+    "$THIS_SCRIPT_PATH/subprojects/packagecache" \
+    "$THIS_SCRIPT_PATH/subprojects/icu" \
+    "$THIS_SCRIPT_PATH/subprojects/*.tgz" \
+    "$THIS_SCRIPT_PATH/subprojects/*.zip"
+
   builder_finish_action success clean:$target
 }
 
