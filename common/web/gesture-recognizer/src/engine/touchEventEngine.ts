@@ -103,7 +103,8 @@ export class TouchEventEngine<HoveredItemType, StateToken = any> extends InputEv
     // during a touchstart.)
     const allTouches = touchListToArray(event.touches);
     const newTouches = touchListToArray(event.changedTouches);
-    this.maintainTouchpointsWithIds(allTouches.filter((touch) => (newTouches.indexOf(touch) != -1)).map((touch) => touch.identifier));
+    // Maintain all touches in the `.touches` array that are NOT marked as `.changedTouches` (and therefore, new)
+    this.maintainTouchpointsWithIds(allTouches.filter((touch) => (newTouches.indexOf(touch) == -1)).map((touch) => touch.identifier));
 
     // Ensure the same timestamp is used for all touches being updated.
     const timestamp = performance.now();
