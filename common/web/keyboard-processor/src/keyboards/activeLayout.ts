@@ -55,7 +55,10 @@ class ActiveKeyBase {
   proportionalX: number;
   proportionalWidth: number;
 
+  // While they're only valid on ActiveKey, spec'ing them here makes references more concise within the OSK.
   sk?: ActiveKey[];
+  multitap?: ActiveSubkey[];
+  flick?: TouchLayout.TouchLayoutFlick;
 
   // Keeping things simple here, as this was added LATE in 14.0 beta.
   // Could definitely extend in the future to instead return an object
@@ -296,6 +299,10 @@ class ActiveKeyBase {
 
 
 export class ActiveKey extends ActiveKeyBase implements LayoutKey {
+  public polyfill() {
+
+  }
+
   public getSubkey(coreID: string): ActiveKey {
     if(this.sk) {
       for(let key of this.sk) {
