@@ -21,7 +21,7 @@
 @interface KMInputMethodEventHandler ()
 @property KMContext *cachedContext; // TODO: rename after eliminating other context references
 @property (nonatomic, retain) KeySender* keySender;
-@property (nonatomic, retain) TextCompatibilityCheck* textCompatibility;
+@property (nonatomic, retain) TextCompatibilityCheck* compatibilityCheck;
 @property int generatedBackspaceCount;
 @property (nonatomic, retain) NSString* clientApplicationId;
 @property NSString *queuedText;
@@ -61,8 +61,6 @@ NSRange _previousSelRange;
 
 // This is the public initializer.
 - (instancetype)initWithClient:(NSString *)clientAppId client:(id) sender {
-    _textCompatibility = [[TextCompatibilityCheck alloc]initWithClient:sender applicationId:clientAppId];
-    NSLog(@"KMInputMethodHandler initWithClient checkClientTextCompatibility: %@", _textCompatibility);
     self.senderForDeleteBack = sender;
     _keySender = [[KeySender alloc] init];
     _cachedContext = [[KMContext alloc] init];
@@ -87,7 +85,7 @@ NSRange _previousSelRange;
     // the context, so we pretend/hope it won't.
     BOOL selectionCanChangeUnexpectedly = (![clientAppId isEqual: @"com.github.atom"]);
     // TODO: this equates 'legacyMode' with being forced to send events
-    return [self initWithLegacyMode:self.textCompatibility.mustBackspaceUsingEvents clientSelectionCanChangeUnexpectedly:selectionCanChangeUnexpectedly];
+    return [self initWithLegacyMode:self.compatibilityCheck.mustBackspaceUsingEvents clientSelectionCanChangeUnexpectedly:selectionCanChangeUnexpectedly];
 }
 
 - (void)switchToLegacyMode {
@@ -900,11 +898,26 @@ NSRange _previousSelRange;
     }];
 }
 
+- (void)doTextCompatibilityCheckIfNeeded:(id)client {
+  // if TextCompatibilityCheck is null or stale,
+  // then create a new one for the current application
+  
+  if ((self.compatibilityCheck == nil) || (![self.compatibilityCheck.clientApplicationId isEqualTo:self.clientApplicationId])) {
+    self.compatibilityCheck = [[TextCompatibilityCheck alloc]initWithClient:client applicationId:self.clientApplicationId];
+    NSLog(@"KMInputMethodHandler initWithClient checkClientTextCompatibility: %@", _compatibilityCheck);
+  } else if (self.compatibilityCheck.isApiComplianceUncertain) {
+    // if it is valid but compliance is undetermined, then test it
+    [self.compatibilityCheck testApiCompliance:client];
+  }
+}
+
 //MARK: Core-related key processing
 // replacement handleEvent implementation for core event processing
 - (BOOL)handleEvent:(NSEvent *)event client:(id)sender {
   NSLog(@"handleEvent event = %@", event);
 
+  [self doTextCompatibilityCheckIfNeeded:sender];
+  
   // mouse movement requires that the context be invalidated
   
   if (self.AppDelegate.contextChangingEventDetected)
@@ -934,7 +947,7 @@ NSRange _previousSelRange;
     }
   }
     if (event.type == NSEventTypeFlagsChanged) {
-        // We mark the context as out of date only for the Command keys
+        // Mark the context as out of date for the command keys
         switch([event keyCode]) {
             case kVK_RightCommand:
             case kVK_Command:
@@ -971,7 +984,7 @@ NSRange _previousSelRange;
   NSLog(@"loadContext called.");
 
   if ([self.cachedContext isInvalid]) {
-    if (self.textCompatibility.canReadText) {
+    if (self.compatibilityCheck.canReadText) {
       NSRange selectionRange = [client selectedRange];
       NSRange contextRange = NSMakeRange(0, selectionRange.location);
       attributedString = [client attributedSubstringFromRange:contextRange];
@@ -988,27 +1001,6 @@ NSRange _previousSelRange;
     [self.kme setCoreContext:contextString];
     }
 }
-
-/*
--(void)checkClientTextCompatibility:(id) client {
-  if(!self.textCompatibility) {
-    _textCompatibility = [[TextCompatibilityCheck alloc]initWithClient:client applicationId:self.clientApplicationId];
-    NSLog(@"KMInputMethodHandler checkClientTextCompatibility: %@", self.textCompatibility);
-  }
-}
-*/
-/*
--(BOOL)containsKeymanCoreActions:(NSArray*)actions {
-  BOOL containsCoreActions = NO;
-  
-  if (actions.count > 0) {
-    id object = [actions objectAtIndex:0];
-    containsCoreActions = [object isKindOfClass:[CoreAction class]];
-    NSLog(@"containsKeymanCoreActions returning %@", containsCoreActions?@"Yes":@"No");
-  }
-  return containsCoreActions;
-}
-*/
 
 /*
  * Returns YES if we have applied an event to the client.
@@ -1107,7 +1099,7 @@ NSRange _previousSelRange;
   }
 
   if ((operation.isTextAndBackspaceScenario)) {
-    if (self.textCompatibility.mustBackspaceUsingEvents) {
+    if (self.compatibilityCheck.mustBackspaceUsingEvents) {
       NSLog(@"KXMInputMethodHandler executeCompositeOperation, text and backspace scenario with events");
      [self sendEventsForOperation: event actionOperation:operation];
     } else {
@@ -1147,9 +1139,6 @@ NSRange _previousSelRange;
     }
     
     if (actualReplacementCount > 0) {
-      // TODO: remove this extraneous reading of context or do something useful with it
-      NSRange contextRange = NSMakeRange(0, selectionRange.location);
-      NSAttributedString *context = [client attributedSubstringFromRange:contextRange];
       NSLog(@"KXMInputMethodHandler insertAndReplaceText, actualReplacementCount=%d, selectionRange.location=%lu", actualReplacementCount, selectionRange.location);
       
       replacementRange = NSMakeRange(selectionRange.location-actualReplacementCount, replacementCount);
@@ -1162,6 +1151,9 @@ NSRange _previousSelRange;
   }
   [client insertText:text replacementRange:replacementRange];
   [self.cachedContext replaceSubstring:text count:actualReplacementCount];
+  if (self.compatibilityCheck.isApiComplianceUncertain) {
+    [self.compatibilityCheck testApiComplianceAfterInsert:client];
+  }
 }
 
 

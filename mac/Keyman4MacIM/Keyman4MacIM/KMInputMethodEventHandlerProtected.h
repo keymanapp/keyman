@@ -38,7 +38,6 @@ typedef NS_ENUM(NSInteger, ClientCapability) {
 @property BOOL ignoreNextDeleteBackHighLevel;
 
 - (instancetype)initWithLegacyMode:(BOOL)legacy clientSelectionCanChangeUnexpectedly:(BOOL) flagClientSelectionCanChangeUnexpectedly;
-- (BOOL)isClientAppLegacy:(NSString *)clientAppId fromArray:(NSArray *)legacyApps;
 - (void)handleCommand:(NSEvent *)event;
 // This just sets the legacyMode property to true and spits out a debug message to that effect.
 - (void)switchToLegacyMode;

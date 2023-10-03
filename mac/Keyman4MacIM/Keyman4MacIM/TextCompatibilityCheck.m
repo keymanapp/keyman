@@ -6,7 +6,19 @@
  * 
  * Created by Shawn Schantz on 2023-05-05.
  * 
- * Check what APIs are available for getting location/selection and getting context
+ * Check whether the current text input client is compatibility with APIs.
+ * Compliance is determined by attempting the current selection (location and length),
+ * but this is not a surefire indicator. For some apps,  a valid but incorrect selection of
+ * {0, 0} is returned regardless of the real selection.
+ *
+ * When {0, 0} is returned, then we can check to see if a subsequent insert results in a
+ * change in the location. It always should, because it cannot replace at location 0.
+ * If the location does change, then the selection API is compliant.
+ *
+ * Even worse for some apps, the selection API works, but attempts
+ * to replace during an insert do not work. There is no way to detect this behavior,
+ * so these apps must be hard-coded as non-compliant. A couple of known apps
+ * that behave this way are Brackets (Adobe OS project) and MacVIM
  */
 
 #import "TextCompatibilityCheck.h"
@@ -17,8 +29,8 @@ NSString *const kKMLegacyApps = @"KMLegacyApps";
 @interface TextCompatibilityCheck()
 
 @property (readonly) id client;
-@property (readonly) NSString *clientApplicationId;
-@property (readonly) BOOL hasWorkingSelectionApi;
+@property BOOL apiComplianceUncertain;
+@property BOOL hasCompliantSelectionApi;
 @property (readonly) BOOL hasReadApi;
 @property (readonly) BOOL hasInsertApi;
 
@@ -26,57 +38,101 @@ NSString *const kKMLegacyApps = @"KMLegacyApps";
 
 @implementation TextCompatibilityCheck
 
--(instancetype)initWithClient:(id) client applicationId:(NSString *)appId  {
+-(instancetype)initWithClient:(id) client applicationId:(NSString *)appId {
   self = [super init];
   if (self) {
     _client = client;
     _clientApplicationId = appId;
-    _hasWorkingSelectionApi = [self checkSelectionApi: client applicationId:appId];
+    _apiComplianceUncertain = YES;
+    
+    // first check in the noncompliant app lists
+    // TODO: uncomment after testing
+    //BOOL isUncompliantApp = ![self containedInNoncompliantAppLists:clientAppId];
+    BOOL isUncompliantApp = NO;
+    
+    if (isUncompliantApp) {
+      _apiComplianceUncertain = NO;
+      self.hasCompliantSelectionApi = NO;
+    } else {
+      [self testApiCompliance:client];
+    }
+    
     _hasReadApi = [client respondsToSelector:@selector(attributedSubstringFromRange:)];
     _hasInsertApi = [client respondsToSelector:@selector(insertText:replacementRange:)];
-
   }
   return self;
 }
 
 -(NSString *)description
 {
-return [NSString stringWithFormat:@"hasSelectionAPI: %d, hasReadAPI: %d, hasInsertAPI: %d, canGetSelection: %d, canReadText: %d, canInsertText: %d, canReplaceText: %d, mustBackspaceUsingEvents: %d, clientAppId: %@, client: %@", self.hasWorkingSelectionApi, self.hasReadApi, self.hasInsertApi, [self canGetSelection], [self canReadText], [self canInsertText], [self canReplaceText], [self mustBackspaceUsingEvents], _clientApplicationId, _client];
+return [NSString stringWithFormat:@"apiComplianceUncertain: %d, hasWorkingSelectionApi: %d, hasReadAPI: %d, hasInsertAPI: %d, canGetSelection: %d, canReadText: %d, canInsertText: %d, canReplaceText: %d, mustBackspaceUsingEvents: %d, clientAppId: %@, client: %@", self.apiComplianceUncertain, self.hasCompliantSelectionApi, self.hasReadApi, self.hasInsertApi, [self canGetSelection], [self canReadText], [self canInsertText], [self canReplaceText], [self mustBackspaceUsingEvents], _clientApplicationId, _client];
 }
 
-/** returns true if the API selectedRange is determined to be broken because it either fails the test or is included in our hard-coded list of legacy apps */
--(BOOL) checkSelectionApi:(id) client applicationId:(NSString *)clientAppId  {
-  BOOL workingSelectionApi = NO;
+/** test to see if the API selectedRange functions properly for the text input client  */
+-(void) testApiCompliance:(id) client {
+  BOOL selectionApiVerified = NO;
 
-  workingSelectionApi = [client respondsToSelector:@selector(selectedRange)];
+  // confirm that the API actually exists (this always seems to return true)
+    selectionApiVerified = [client respondsToSelector:@selector(selectedRange)];
   
-  /*
-  // if the selector exists, then call the API and see if it returns a valid value
-  if (workingSelectionApi) {
-    NSRange selectionRange = [self.client selectedRange];
-    NSLog(@"TextCompatibilityCheck checkSelectionApi, location = %lu, length = %lu", selectionRange.location, selectionRange.length);
+  // so it exists, now call the API and see if it works as expected
+  if (selectionApiVerified) {
+    NSRange selectionRange = [client selectedRange];
+    NSLog(@"TextCompatibilityCheck testSelectionApi, location = %lu, length = %lu", selectionRange.location, selectionRange.length);
 
-    NSRange notFoundRange = NSMakeRange(NSNotFound, NSNotFound);
-
-    if (NSEqualRanges(selectionRange, notFoundRange)) {
-      workingSelectionApi = YES;
-      // no current selection, but API is working
-      NSLog(@"TextCompatibilityCheck checkSelectionApi, range is NSNotFound");
-    } else {
-      workingSelectionApi = YES;
+    if (selectionRange.location == NSNotFound) {
+      // NSNotFound may just mean that we don't have the focus yet
+      // say NO for now, but this may toggle back to YES after the first insertText
+      selectionApiVerified = NO;
+      self.apiComplianceUncertain = YES;
+      NSLog(@"TextCompatibilityCheck checkSelectionApi not compliant but uncertain, range is NSNotFound");
+    } else if (selectionRange.location == 0) {
+      // location zero may just mean that we are at the beginning of the doc
+      // say YES for now, but this may toggle back to NO after the first insertText
+      selectionApiVerified = YES;
+      self.apiComplianceUncertain = YES;
+      NSLog(@"TextCompatibilityCheck checkSelectionApi compliant but uncertain, location = 0");
+    } else if (selectionRange.location > 0) {
+      // we are confident, based on testing, that selectedRange API does  work
+      selectionApiVerified = YES;
+      self.apiComplianceUncertain = NO;
+      NSLog(@"TextCompatibilityCheck checkSelectionApi compliant and certain, location > 0");
     }
   }
-*/
   
+  NSLog(@"***testSelectionApi workingSelectionApi for app %@: set to %@", self.clientApplicationId, selectionApiVerified?@"yes":@"no");
   
-  // if the selection API appears to work, it may still be broken
-  // getting the selection does not work for anything in the noncompliant app lists
-  if (workingSelectionApi) {
-    workingSelectionApi = ![self containedInNoncompliantAppLists:clientAppId];
+  self.hasCompliantSelectionApi = selectionApiVerified;
+}
+
+/** if apiComplianceUncertain is true, checking the selection after an insert can make it clear  */
+-(void) testApiComplianceAfterInsert:(id) client {
+  if(self.apiComplianceUncertain) {
+    NSRange selectionRange = [client selectedRange];
+    NSLog(@"TextCompatibilityCheck testSelectionApiAfterInsert, location = %lu, length = %lu", selectionRange.location, selectionRange.length);
+
+    if (selectionRange.location == NSNotFound) {
+      // NO for certain, insertText means we have focus, NSNotFound means that the selection API does not work
+      self.hasCompliantSelectionApi = NO;
+      self.apiComplianceUncertain = NO;
+      NSLog(@"TextCompatibilityCheck testApiComplianceAfterInsert certain, non-compliant, range is NSNotFound");
+    } else if (selectionRange.location == 0) {
+      // NO for certain, after an insertText we cannot be at location 0
+      self.hasCompliantSelectionApi = NO;
+      self.apiComplianceUncertain = NO;
+      NSLog(@"TextCompatibilityCheck testApiComplianceAfterInsert certain, non-compliant, location = 0");
+    } else if (selectionRange.location > 0) {
+      // we are confident, based on testing, the selectedRange API does work
+      self.hasCompliantSelectionApi = YES;
+      self.apiComplianceUncertain = NO;
+      NSLog(@"TextCompatibilityCheck checkSelectionApi compliant and certain, location > 0");
+    }
+    
+    NSLog(@"testSelectionApiAfterInsert, self.hasWorkingSelectionApi = %@ for app %@", self.hasCompliantSelectionApi?@"yes":@"no", self.clientApplicationId);
+    NSLog(@"testSelectionApiAfterInsert checkClientTextCompatibility: %@", self);
+ } else {
+    NSLog(@"TextCompatibilityCheck testSelectionApiAfterInsert, compliance is already known");
   }
-  
-  NSLog(@"hasWorkingSelectionApi for app %@: set to %@", clientAppId, workingSelectionApi?@"yes":@"no");
-  return workingSelectionApi;
 }
 
 /**
@@ -134,7 +190,7 @@ return [NSString stringWithFormat:@"hasSelectionAPI: %d, hasReadAPI: %d, hasInse
 *  This was formerly called the legacy app list, renamed to improve clarity.
 */
 - (BOOL)containedInUserManagedNoncompliantAppList:(NSString *)clientAppId {
-  BOOL isAppNonCompliant = false;
+  BOOL isAppNonCompliant = NO;
   NSArray *legacyAppsUserDefaults = self.legacyAppsUserDefaults;
 
   if(legacyAppsUserDefaults != nil) {
@@ -151,7 +207,7 @@ return [NSString stringWithFormat:@"hasSelectionAPI: %d, hasReadAPI: %d, hasInse
  */
 /*
 - (BOOL)isClientAppLegacy:(NSString *)clientAppId {
-  BOOL isAppNonCompliant = false;
+  BOOL isAppNonCompliant = NO;
   
     NSArray *legacyAppsUserDefaults = self.legacyAppsUserDefaults;
 
@@ -215,14 +271,18 @@ return [NSString stringWithFormat:@"hasSelectionAPI: %d, hasReadAPI: %d, hasInse
     return NO;
 }
 
+-(BOOL) isApiComplianceUncertain {
+  return self.apiComplianceUncertain;
+}
+
 
 -(BOOL) canGetSelection {
-  return self.hasWorkingSelectionApi;
+  return self.hasCompliantSelectionApi;
 }
 
 -(BOOL) canReadText {
   // seems simple, but every application tested that returned the selection also successfully read the text using attributedSubstringFromRange
-  BOOL canReadText = self.hasReadApi && [self canGetSelection];
+  BOOL canReadText =  self.hasReadApi && self.canGetSelection;
   return canReadText;
 }
 
@@ -233,12 +293,12 @@ return [NSString stringWithFormat:@"hasSelectionAPI: %d, hasReadAPI: %d, hasInse
 
 -(BOOL) canReplaceText {
   // testing shows that every application that returns the selection, can also replace text
-  return self.hasInsertApi && [self canGetSelection];
+  return self.hasInsertApi && self.canGetSelection;
 }
 
 -(BOOL) mustBackspaceUsingEvents {
   // if we cannot replace text, then we always need to use events to backspace
-  return ![self canReplaceText];
+  return !self.canReplaceText;
 }
 
 /*

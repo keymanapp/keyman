@@ -14,12 +14,13 @@
 NS_ASSUME_NONNULL_BEGIN
 
 @interface TextCompatibilityCheck : NSObject
+@property (readonly) NSString *clientApplicationId;
 
 -(instancetype)initWithClient:(id) client applicationId:(NSString *)appId;
--(BOOL)canGetSelection;
+-(void)testApiCompliance:(id) client;
+-(void)testApiComplianceAfterInsert:(id) client;
+-(BOOL)isApiComplianceUncertain;
 -(BOOL)canReadText;
--(BOOL)canInsertText;
--(BOOL)canReplaceText;
 -(BOOL)mustBackspaceUsingEvents;
 @end
 
