@@ -69,7 +69,6 @@ type
   TfrmPackageEditor = class(TfrmTikeEditor)   // I4689
     dlgFiles: TOpenDialog;
     dlgNewCustomisation: TSaveDialog;
-    dlgOpenProductInstaller: TOpenDialog;
     pages: TLeftTabbedPageControl;
     pageFiles: TTabSheet;
     pageDetails: TTabSheet;
@@ -169,13 +168,6 @@ type
     lblCompileTargetHeader: TLabel;
     cmdInstall: TButton;
     cmdUninstall: TButton;
-    panBuildWindowsInstaller: TPanel;
-    Label9: TLabel;
-    lblBootstrapMSI: TLabel;
-    lblInstallerOutputFilename: TLabel;
-    editBootstrapMSI: TEdit;
-    editInstallerOutputFilename: TEdit;
-    cmdInstallWith: TButton;
     pageLexicalModels: TTabSheet;
     panLexicalModels: TPanel;
     lblLexlicalModels: TLabel;
@@ -200,7 +192,6 @@ type
     panFileActions: TPanel;
     lblFileActions: TLabel;
     editOutPath: TEdit;
-    cmdCompileInstaller: TButton;
     cmdAddToProject: TButton;
     cmdBuildPackage: TButton;
     Label5: TLabel;
@@ -256,8 +247,6 @@ type
     procedure cmdUninstallClick(Sender: TObject);
     procedure cmdOpenContainingFolderClick(Sender: TObject);
     procedure cmdOpenFileClick(Sender: TObject);
-    procedure cmdCompileInstallerClick(Sender: TObject);
-    procedure cmdInstallWithClick(Sender: TObject);
     procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure pagesChanging(Sender: TObject;
       var AllowChange: Boolean);
@@ -395,7 +384,6 @@ uses
 
   CharMapDropTool,
   CharMapInsertMode,
-  CompilePackageInstaller,
   Keyman.Developer.System.Project.kpsProjectFile,
   Keyman.Developer.System.Project.kpsProjectFileAction,
   Keyman.Developer.System.ServerAPI,
@@ -490,17 +478,6 @@ procedure TfrmPackageEditor.SourceChanged(Sender: TObject);
 begin
   if FSetup = 0 then
     Modified := True;
-end;
-
-procedure TfrmPackageEditor.cmdCompileInstallerClick(Sender: TObject);
-begin
-  if Untitled or Modified then   // I2178
-    ShowMessage('You must save the package before you can build it.')
-  else
-  begin
-    frmMessages.Clear;
-    DoAction(pfaCompileInstaller);
-  end;
 end;
 
 procedure TfrmPackageEditor.cmdCopyDebuggerLinkClick(Sender: TObject);
@@ -1267,17 +1244,6 @@ begin
   DoAction(pfaInstall);
 end;
 
-procedure TfrmPackageEditor.cmdInstallWithClick(Sender: TObject);
-begin
-  dlgOpenProductInstaller.FileName := pack.KPSOptions.MSIFileName;
-  if dlgOpenProductInstaller.Execute then
-  begin
-    pack.KPSOptions.MSIFileName := dlgOpenProductInstaller.FileName;
-    Modified := True;
-    UpdateData;
-  end;
-end;
-
 {-------------------------------------------------------------------------------
  - Display refresh routines                                                    -
  -------------------------------------------------------------------------------}
@@ -1350,10 +1316,6 @@ begin
     editStartMenuPath.Text := pack.StartMenu.Path;
 
     editOutPath.Text := (ProjectFile as TkpsProjectFile).TargetFilename;   // I4688
-    editBootstrapMSI.Text := pack.KPSOptions.MSIFileName;
-    if pack.KPSOptions.MSIFileName = ''
-      then editInstallerOutputFilename.Text := ''
-      else editInstallerOutputFilename.Text := (ProjectFile as TkpsProjectFile).TargetInstallerFileName;   // I4688
 
     if lbFiles.Items.Count > 0 then lbFiles.ItemIndex := 0;
     lbFilesClick(lbFiles);
@@ -1983,7 +1945,6 @@ begin
   end;
 
   panBuildDesktop.Visible := FHasDesktopTarget;
-  panBuildWindowsInstaller.Visible := FHasDesktopTarget;
   panBuildMobile.Visible := FHasMobileTarget;
 end;
 
