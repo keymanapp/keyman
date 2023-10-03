@@ -17,7 +17,26 @@ import specs = gestures.specs;
  * @param keyboard
  * @returns
  */
-export function modelSetForKeyboard(keyboard: Keyboard): GestureModelDefs<KeyElement> {
+export function gestureSetForKeyboard(keyboard: Keyboard): GestureModelDefs<KeyElement> {
+  // To be used among the `allowsInitialState` contact-model specifications as needed.
+  const gestureKeyFilter = (key: KeyElement, gestureId: string) => {
+    const keySpec = key.key.spec;
+    switch(gestureId) {
+      case 'special-key-start':
+        return ['K_LOPT', 'K_ROPT', 'K_BKSP'].indexOf(keySpec.baseKeyID) != -1;
+      case 'longpress':
+        return !!keySpec.sk;
+      case 'multitap':
+        //return !!keySpec. // no field specified for this within KMW yet!
+        return keySpec.baseKeyID == 'K_SHIFT';
+      case 'flick':
+        //return !!keySpec. // no field specified for this within KMW yet!
+        return false;
+      default:
+        return true;
+    }
+  };
+
   // TODO:  keyboard-specific config stuff
   // if `null`, assume a no-flick keyboard (assuming our default layout has no flicks)
 
@@ -31,13 +50,15 @@ export function modelSetForKeyboard(keyboard: Keyboard): GestureModelDefs<KeyEle
       LongpressModel,
       MultitapModel,
       SimpleTapModel,
+      SpecialKeyStartModel,
+      SpecialKeyEndModel,
       SubkeySelectModel,
       ModipressStartModel,
       ModipressEndModel
     ],
     sets: {
-      default: [LongpressModel.id, SimpleTapModel.id, ModipressStartModel.id],
-      modipress: [LongpressModel.id, SimpleTapModel.id], // no nested modipressing
+      default: [LongpressModel.id, SimpleTapModel.id, ModipressStartModel.id, SpecialKeyStartModel.id],
+      modipress: [LongpressModel.id, SimpleTapModel.id, SpecialKeyStartModel.id], // no nested modipressing
       none: []
     }
   }
@@ -159,6 +180,56 @@ type GestureModel = specs.GestureModel<KeyElement>;
 // - has flicks?  no longpress shortcut, also no longpress reset(?)
 // - modipress:  keyboard-specific modifier keys - which may require inspection of a
 //   key's properties.
+
+export const SpecialKeyStartModel: GestureModel = {
+  id: 'special-key-start',
+  resolutionPriority: 0,
+  contacts : [
+    {
+      model: {
+        ...InstantContactResolutionModel,
+        allowsInitialState: (incoming, dummy, baseItem) => {
+          // TODO:  needs better abstraction, probably.
+
+          // But, to get started... we can just use a simple hardcoded approach.
+          const modifierKeyIds = ['K_LOPT', 'K_ROPT', 'K_BKSP'];
+          for(const modKeyId of modifierKeyIds) {
+            if(baseItem.key.spec.id == modKeyId) {
+              return true;
+            }
+          }
+
+          return false;
+        }
+      },
+      endOnResolve: false  // keyboard-selection longpress - would be nice to not need to lift the finger
+                           // in app/browser form.
+    }
+  ],
+  resolutionAction: {
+    type: 'chain',
+    next: 'special-key-end',
+    item: 'current'
+  }
+}
+
+export const SpecialKeyEndModel: GestureModel = {
+  id: 'special-key-end',
+  resolutionPriority: 0,
+  contacts : [
+    {
+      model: {
+        ...SimpleTapContactModel,
+        itemChangeAction: 'resolve'
+      },
+      endOnResolve: true,
+    }
+  ],
+  resolutionAction: {
+    type: 'complete',
+    item: 'none'
+  }
+}
 
 // Is kind of a mix of the two longpress styles.
 export const LongpressModel: GestureModel = {

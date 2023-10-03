@@ -42,7 +42,7 @@ import InternalPendingLongpress from './input/gestures/browser/pendingLongpress.
 import InternalKeyTip from './input/gestures/browser/keytip.js';
 import CommonConfiguration from './config/commonConfiguration.js';
 
-import { modelSetForKeyboard } from './input/gestures/specsForKeyboard.js';
+import { gestureSetForKeyboard } from './input/gestures/specsForKeyboard.js';
 
 import { getViewportScale } from './screenUtils.js';
 
@@ -353,7 +353,7 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
       }
     };
 
-    const recognizer = new GestureRecognizer(modelSetForKeyboard(this.layoutKeyboard), config);
+    const recognizer = new GestureRecognizer(gestureSetForKeyboard(this.layoutKeyboard), config);
     recognizer.stateToken = this.layerId;
 
     const sourceTrackingMap: Record<string, {
