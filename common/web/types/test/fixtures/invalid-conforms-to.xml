@@ -4,7 +4,7 @@
   DOCTYPE keyboard SYSTEM "../../../../../resources/standards-data/ldml-keyboards/techpreview/dtd/ldmlKeyboard.dtd"
   Disabling doctype for this invalid file, not used by compiler, and avoids complaints in IDEs etc.
 -->
-<keyboard locale="mt" conformsTo="nothing-anyone-ever-heard-of"> <!-- invalid -->
+<keyboard3 locale="mt" conformsTo="nothing-anyone-ever-heard-of"> <!-- invalid -->
   <info author="srl295" indicator="🙀" layout="qwerty" normalization="NFC" />
 
   <names>
@@ -16,4 +16,4 @@
     <key id="that" to="ថា" />
   </keys>
 
-</keyboard>
+</keyboard3>

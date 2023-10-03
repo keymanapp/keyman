@@ -1,0 +1,38 @@
+/* Checkbox text to always show on-screen keyboard */
+"4UX-80-0Vo.title" = "ထ္ၜး ကဳဗုဒ် ဗၠးမုက်လၟိုန်";
+
+/* Checkbox text to enable verbose Console logging */
+"7J6-zy-R20.title" = "သုၚ်စောဲ verbose Console logging";
+
+/* Support button text  */
+"93O-x6-RLF.label" = "အထံက်အပၚ်";
+
+/* Download Keyboard button text */
+"CTw-kf-WNS.title" = "ဂြဲကေတ် ကဳဗုဒ်...";
+
+/* Keyman Configuration window title */
+"F0z-JX-Cv5.title" = "ဗီုပြၚ်သၞောတ်စက် ကဳမာန်";
+
+/* button text to go back to previous page */
+"JOK-JV-n8w.title" = "ကလေၚ်";
+
+/* Keyboards button text */
+"MPN-9N-wWc.label" = "ကဳဗုဒ်ဂမၠိုၚ်";
+
+/* text to explain verbose Console logging option */
+"MrI-GM-7d6.title" = "အခါရ တၚ်ရုဲစှ် verbose logging ဂှ်ပံက်လဝ်မ္ဂး ကဳမာန် တော်ဆ ကမၠောန်သွက်ဂွံကဵု အထံက်အရီုကု ဂၠိုက်ဂၠါဲပြဿနာရ။ ဂွံဆဵု တၚ်တော်ဆလဝ်သွက်ကဳမာန်တံဂှ် သုၚ်စောဲ Console programဏံမာန်ရ။ ပ္ဍဲ Console ဂှ် ဒၞါဲထ္ဍိုဟ်ဒှ် ရုဲစှ်ကဵု ထ္ၜးလိက်တၚ်နၚ် နူကဵု ကမၠောန် ကဳမာန်တံဖအိုတ်ညိ။ တၚ်နၚ်တော်ဆလဝ်တံဂှ် နွံပၟိက်မ္ဂး ဆာဲပ္တိတ်တုဲ ပၠံၚ်ဗ္စိုပ်ကု ဂကောံအထံက်ပၚ် ကဳမာန် မာန်ရ။";
+
+/* button text to move forward to the next page */
+"eXr-8V-h1g.title" = "ဆက်အာဂတ";
+
+/* button text to return to the home help page */
+"fXS-aC-CMH.title" = "မုက်တမ်";
+
+/* Options button text */
+"frd-No-seV.label" = "တၚ်ရုဲစှ်ဂမၠိုၚ်";
+
+/* Installed Keyboard column heading */
+"jex-Nd-Qzg.headerCell.title" = "ကဳဗုဒ်စုတ်လဝ်တုဲတုဲ";
+
+/* Verbose logging tooltip text */
+"uWx-3J-U0D.ibShadowedToolTip" = "ယဝ်ရမၞးဒှ်မံၚ်ခက်ခုဲမွဲမွဲသာကု ကဳဗုဒ်မွဲမွဲ ဒှ်ဒှ် ကဵု ကဳမာန်ဒှ်ဒှ် မ္ဂး ပံက်လဝ်ၝဏံညိ။";
