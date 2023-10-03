@@ -1,9 +1,10 @@
-import OSKKey, { OSKKeySpec } from '../../../keyboard-layout/oskKey.js';
+import { ActiveSubkey } from '@keymanapp/keyboard-processor';
+import OSKKey from '../../../keyboard-layout/oskKey.js';
 import { KeyData, KeyElement, link } from '../../../keyElement.js';
 import VisualKeyboard from '../../../visualKeyboard.js';
 
 export default class OSKSubKey extends OSKKey {
-  constructor(spec: OSKKeySpec, layer: string) {
+  constructor(spec: ActiveSubkey, layer: string) {
     if(typeof(layer) != 'string' || layer == '') {
       throw "The 'layer' parameter for subkey construction must be properly defined.";
     }

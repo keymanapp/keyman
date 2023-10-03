@@ -1,4 +1,7 @@
-import { ActiveKey, ButtonClass, DeviceSpec, LayoutKey } from '@keymanapp/keyboard-processor';
+import { ActiveKey, ActiveSubkey, ButtonClass, DeviceSpec, LayoutKey } from '@keymanapp/keyboard-processor';
+import { TouchLayout } from '@keymanapp/common-types';
+import TouchLayoutFlick = TouchLayout.TouchLayoutFlick;
+
 // At present, we don't use @keymanapp/keyman.  Just `keyman`.  (Refer to <root>/web/package.json.)
 import { getAbsoluteX, getAbsoluteY } from 'keyman/engine/dom-utils';
 
@@ -10,32 +13,6 @@ import buttonClassNames from '../buttonClassNames.js';
 import { KeyElement } from '../keyElement.js';
 import VisualKeyboard from '../visualKeyboard.js';
 
-export class OSKKeySpec implements LayoutKey {
-  id: typeof ActiveKey.prototype.id;
-
-  // Only set (within @keymanapp/keyboard-processor) for keys actually specified in a loaded layout
-  baseKeyID?: string;
-  coreID?: string;
-  elementID?: string;
-
-  text?: string;
-  sp?: ButtonClass;
-  width: number;
-  layer?: string; // The key will derive its base modifiers from this property - may not equal the layer on which it is displayed.
-  nextlayer?: string;
-  pad?: number;
-  sk?: OSKKeySpec[];
-
-  constructor(id: typeof OSKKeySpec.prototype.id, text?: string, width?: number, sp?: ButtonClass, nextlayer?: string, pad?: number) {
-    this.id = id;
-    this.text = text;
-    this.width = width ? width : 50;
-    this.sp = sp;
-    this.nextlayer = nextlayer;
-    this.pad = pad;
-  }
-}
-
 export default abstract class OSKKey {
   // Only set here to act as an alias for code built against legacy versions.
   static readonly specialCharacters = specialChars;
@@ -43,7 +20,7 @@ export default abstract class OSKKey {
   static readonly BUTTON_CLASSES = buttonClassNames;
 
   static readonly HIGHLIGHT_CLASS = 'kmw-key-touched';
-  readonly spec: OSKKeySpec;
+  readonly spec: ActiveKey | ActiveSubkey;
 
   btn: KeyElement;
   label: HTMLSpanElement;
@@ -54,7 +31,7 @@ export default abstract class OSKKey {
    */
   readonly layer: string;
 
-  constructor(spec: OSKKeySpec, layer: string) {
+  constructor(spec: ActiveKey | ActiveSubkey, layer: string) {
     this.spec = spec;
     this.layer = layer;
   }
