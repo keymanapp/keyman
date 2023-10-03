@@ -4,6 +4,7 @@ import { KmnCompiler } from '@keymanapp/kmc-kmn';
 import { CompilerOptions, CompilerCallbacks, KeymanFileTypes } from '@keymanapp/common-types';
 import { BuildActivity } from './BuildActivity.js';
 import * as fs from 'fs';
+import { InfrastructureMessages } from '../../messages/infrastructureMessages.js';
 
 export class BuildKmnKeyboard extends BuildActivity {
   public get name(): string { return 'Keyman keyboard'; }
@@ -19,15 +20,15 @@ export class BuildKmnKeyboard extends BuildActivity {
     // We need to resolve paths to absolute paths before calling kmc-kmn
     if(options.outFile) {
       options.outFile = getPosixAbsolutePath(options.outFile);
+      const folderName = path.dirname(options.outFile);
+      try {
+        fs.mkdirSync(folderName, {recursive: true});
+      } catch(e) {
+        callbacks.reportMessage(InfrastructureMessages.Error_CannotCreateFolder({folderName, e}));
+        return false;
+      }
     }
-
     infile = getPosixAbsolutePath(infile);
-    try {
-      fs.mkdirSync(path.dirname(options.outFile), {recursive: true});
-    } catch(e) {
-      // TODO: error
-      return false;
-    }
     return compiler.run(infile, options);
   }
 }

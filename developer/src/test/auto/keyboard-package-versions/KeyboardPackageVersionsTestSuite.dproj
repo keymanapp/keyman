@@ -146,7 +146,6 @@
         <DCCReference Include="..\..\..\tike\project\Keyman.Developer.System.Project.ProjectLog.pas"/>
         <DCCReference Include="..\..\..\tike\project\Keyman.Developer.System.Project.ProjectSaver.pas"/>
         <DCCReference Include="..\..\..\common\delphi\general\UKeymanTargets.pas"/>
-        <DCCReference Include="..\..\..\tike\compile\CompileKeymanWeb.pas"/>
         <DCCReference Include="..\..\..\common\delphi\compiler\CompileErrorCodes.pas"/>
         <DCCReference Include="..\..\..\tike\main\KeyboardParser.pas"/>
         <DCCReference Include="..\..\..\common\delphi\general\WindowsLanguages.pas"/>

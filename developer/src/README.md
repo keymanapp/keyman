@@ -39,22 +39,6 @@ a full node.js install.
 A keyboard source analysis and automated regression test tool. Testing for
 logical errors of a keyboard.
 
-## src/kmcmpdll - kmcmpdll.dll & kmcmpdll.x64.dll
-
-This is the main source code for the keyboard compiler, packaged as a dynamic
-linked library for Windows. The consumers will call 'CompileKeyboardFile'.
-
-### src/kmcmpdll/kcframe - kcframe.exe & kcframe.x64.exe
-
-Located under kmcmpdll folder this is used for debugging in Visual Studio.  A
-command line program compiler for a keyboard file 'kmn' into a binary format
-'kmx'. Has hardcoded default arguments.
-
-## src/kmcomp - kmcomp.exe & kmcomp.x64.exe
-
-The main command line compiler for a keyboard. It compiles keyboards (.kmn),
-packages (.kps), and projects (.kpj).
-
 ## src/kmconvert - kmconvert.exe & kmconvert.x64.exe
 
 KMConvert converts keyboard layouts between different formats. KMConvert will

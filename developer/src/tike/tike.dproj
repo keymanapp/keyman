@@ -236,7 +236,6 @@
             <Form>frmNewFileDetails</Form>
         </DCCReference>
         <DCCReference Include="..\..\..\common\windows\delphi\general\StockFileNames.pas"/>
-        <DCCReference Include="compile\CompileKeymanWeb.pas"/>
         <DCCReference Include="compile\KeymanWebKeyCodes.pas"/>
         <DCCReference Include="..\..\..\common\windows\delphi\general\utildir.pas"/>
         <DCCReference Include="..\..\..\common\windows\delphi\tlb\ADOX_TLB.pas"/>

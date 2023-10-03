@@ -65,7 +65,6 @@ uses
   Keyman.Developer.System.Project.ProjectLog in '..\..\..\tike\project\Keyman.Developer.System.Project.ProjectLog.pas',
   Keyman.Developer.System.Project.ProjectSaver in '..\..\..\tike\project\Keyman.Developer.System.Project.ProjectSaver.pas',
   UKeymanTargets in '..\..\..\common\delphi\general\UKeymanTargets.pas',
-  CompileKeymanWeb in '..\..\..\tike\compile\CompileKeymanWeb.pas',
   CompileErrorCodes in '..\..\..\common\delphi\compiler\CompileErrorCodes.pas',
   KeyboardParser in '..\..\..\tike\main\KeyboardParser.pas',
   WindowsLanguages in '..\..\..\common\delphi\general\WindowsLanguages.pas',

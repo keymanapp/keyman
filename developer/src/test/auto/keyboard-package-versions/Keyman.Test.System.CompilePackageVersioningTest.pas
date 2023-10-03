@@ -66,14 +66,6 @@ begin
 
   FRoot := ExtractFileDir(ExtractFileDir(ExtractFileDir(ExtractFileDir(ParamStr(0)))));
 
-  //
-  // Force load development version of kmcmpdll
-  // Assumes it has already been built, of course...
-  //
-  FUnitTestKMCmpDllPath := FRoot + '\..\..\..\..\bin\';
-  Assert.IsTrue(FileExists(FUnitTestKMCmpDllPath + 'kmcmpdll.dll'),
-    'kmcmpdll.dll does not exist at ' + FUnitTestKMCmpDllPath + 'kmcmpdll.dll');
-
   p := TProjectConsole.Create(ptUnknown, FRoot+'\test-1.0\test-1.0.kpj', False);
   try
     for i := 0 to p.Files.Count - 1 do
