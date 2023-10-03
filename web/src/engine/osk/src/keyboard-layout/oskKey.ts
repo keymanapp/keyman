@@ -11,7 +11,7 @@ import { KeyElement } from '../keyElement.js';
 import VisualKeyboard from '../visualKeyboard.js';
 
 export class OSKKeySpec implements LayoutKey {
-  id: string;
+  id: typeof ActiveKey.prototype.id;
 
   // Only set (within @keymanapp/keyboard-processor) for keys actually specified in a loaded layout
   baseKeyID?: string;
@@ -26,7 +26,7 @@ export class OSKKeySpec implements LayoutKey {
   pad?: number;
   sk?: OSKKeySpec[];
 
-  constructor(id: string, text?: string, width?: number, sp?: ButtonClass, nextlayer?: string, pad?: number) {
+  constructor(id: typeof OSKKeySpec.prototype.id, text?: string, width?: number, sp?: ButtonClass, nextlayer?: string, pad?: number) {
     this.id = id;
     this.text = text;
     this.width = width ? width : 50;

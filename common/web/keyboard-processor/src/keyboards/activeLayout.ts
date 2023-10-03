@@ -2,9 +2,11 @@ import Codes from "../text/codes.js";
 import KeyEvent, { KeyEventSpec } from "../text/keyEvent.js";
 import KeyMapping from "../text/keyMapping.js";
 import type { KeyDistribution } from "../text/keyEvent.js";
-import type { LayoutKey, LayoutRow, LayoutLayer, LayoutFormFactor, ButtonClass } from "./defaultLayouts.js";
+import type { LayoutKey, LayoutSubKey, LayoutRow, LayoutLayer, LayoutFormFactor, ButtonClass } from "./defaultLayouts.js";
 import type Keyboard from "./keyboard.js";
 
+import { TouchLayout } from "@keymanapp/common-types";
+import TouchLayoutDefaultHint = TouchLayout.TouchLayoutDefaultHint;
 import { type DeviceSpec } from "@keymanapp/web-utils";
 
 // TS 3.9 changed behavior of getters to make them
@@ -20,7 +22,8 @@ function Enumerable(
     descriptor.enumerable = true;
 };
 
-export class ActiveKey implements LayoutKey {
+
+class ActiveKeyBase {
   static readonly DEFAULT_PAD=15;          // Padding to left of key, in virtual units
   static readonly DEFAULT_RIGHT_MARGIN=15; // Padding to right of right-most key, in virtual units
   static readonly DEFAULT_KEY_WIDTH=100;   // Width of a key, if not specified, in virtual units
@@ -28,13 +31,13 @@ export class ActiveKey implements LayoutKey {
   // Defines key defaults
   static readonly DEFAULT_KEY = {
     text: '',
-    width: ActiveKey.DEFAULT_KEY_WIDTH,
+    width: ActiveKeyBase.DEFAULT_KEY_WIDTH,
     sp: 0,
-    pad: ActiveKey.DEFAULT_PAD
+    pad: ActiveKeyBase.DEFAULT_PAD
   };
 
   /** WARNING - DO NOT USE DIRECTLY outside of @keymanapp/keyboard-processor! */
-  id?: string;
+  id: `T_${string}` | `K_${string}` | `U_${string}` | `t_${string}` | `k_${string}` | `u_${string}`;
 
   // These are fine.
   width?: number;
@@ -84,7 +87,7 @@ export class ActiveKey implements LayoutKey {
   public get isPadding(): boolean {
     // Does not include 9 (class:  blank) as that may be an intentional 'catch' for misplaced
     // keystrokes.
-    return this['sp'] == 10; // Button class: hidden.
+    return this.sp == 10; // Button class: hidden.
   }
 
   /**
@@ -203,7 +206,7 @@ export class ActiveKey implements LayoutKey {
 
   static polyfill(key: LayoutKey, keyboard: Keyboard, layout: ActiveLayout, displayLayer: string) {
     // Add class functions to the existing layout object, allowing it to act as an ActiveLayout.
-    let dummy = new ActiveKey();
+    let dummy = new ActiveKeyBase();
     let proto = Object.getPrototypeOf(dummy);
 
     for(let prop in dummy) {
@@ -221,7 +224,7 @@ export class ActiveKey implements LayoutKey {
     // Ensure subkeys are also properly extended.
     if(key.sk) {
       for(let subkey of key.sk) {
-        ActiveKey.polyfill(subkey, keyboard, layout, displayLayer);
+        ActiveSubkey.polyfill(subkey, keyboard, layout, displayLayer);
       }
     }
 
@@ -289,7 +292,10 @@ export class ActiveKey implements LayoutKey {
 
     this._baseKeyEvent = Lkc;
   }
+}
 
+
+export class ActiveKey extends ActiveKeyBase implements LayoutKey {
   public getSubkey(coreID: string): ActiveKey {
     if(this.sk) {
       for(let key of this.sk) {
@@ -301,6 +307,11 @@ export class ActiveKey implements LayoutKey {
 
     return null;
   }
+}
+
+
+export class ActiveSubkey extends ActiveKeyBase implements LayoutSubKey {
+
 }
 
 export class ActiveRow implements LayoutRow {
@@ -350,14 +361,14 @@ export class ActiveRow implements LayoutRow {
       // to allow the keyboard font to ovveride the SpecialOSK font.
       // Blank keys are no longer reclassed - can use before/after CSS to add text
       switch(key['sp']) {
-        case '1':
+        case 1:
           if(!ActiveRow.SPECIAL_LABEL.test(key['text']) && key['text'] != '') {
-            key['sp']='3';
+            key.sp=3;
           }
           break;
-        case '2':
+        case 2:
           if(!ActiveRow.SPECIAL_LABEL.test(key['text']) && key['text'] != '') {
-            key['sp']='4';
+            key.sp=4;
           }
           break;
       }
@@ -670,6 +681,7 @@ export class ActiveLayout implements LayoutFormFactor{
   isDefault?: boolean;
   keyboard: Keyboard;
   formFactor: DeviceSpec.FormFactor;
+  defaultHint: TouchLayoutDefaultHint;
 
   /**
    * Facilitates mapping layer id strings to their specification objects.

@@ -3,9 +3,18 @@
    Copyright 2017 SIL International
 ***/
 
+import { Version, deepCopy } from "@keymanapp/web-utils";
+import { TouchLayout } from "@keymanapp/common-types";
+
+import LayoutFormFactorBase = TouchLayout.TouchLayoutPlatform;
+import LayoutLayerBase = TouchLayout.TouchLayoutLayer;
+export type LayoutRow = TouchLayout.TouchLayoutRow;
+export type LayoutKey = TouchLayout.TouchLayoutKey;
+export type LayoutSubKey = TouchLayout.TouchLayoutSubKey;
+
+
 import Codes from "../text/codes.js";
 import type Keyboard from "./keyboard.js";
-import { Version, deepCopy } from "@keymanapp/web-utils";
 
 export type KLS = {[layerName: string]: string[]};
 
@@ -13,40 +22,19 @@ export type KLS = {[layerName: string]: string[]};
 export type ButtonClass       =  0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10;
 export type ButtonClassString = "0"|"1"|"2"|"3"|"4"|"5"|"6"|"7"|"8"|"9"|"10";
 
-export type LayoutKey = {
-  "id"?: string,
-  "text"?: string,
-  "sp"?: ButtonClass | ButtonClassString,
-  "width"?: string | number,
-  "layer"?: string, // Key derives any modifiers from the value set here if specified, not the actual display layer.
-  "nextlayer"?: string,
-  "pad"?: string | number,
-  "sk"?: LayoutKey[]
-}
-
-export type LayoutRow = {
-  "id": string | number,
-  "key": LayoutKey[]
-};
-
-export type LayoutLayer = {
-  "id": string,
-  "row": LayoutRow[],
-
-  // Post-processing elements.
+export interface LayoutLayer extends LayoutLayerBase {
+  // Post-processing elements tracked by Web.
   shiftKey?: LayoutKey,
   capsKey?: LayoutKey,
   numKey?: LayoutKey,
   scrollKey?: LayoutKey,
   aligned?: boolean
-}
+};
 
-export type LayoutFormFactor = {
-  "displayUnderlying"?: boolean,
-  "font": string,
-  "layer": LayoutLayer[],
-  isDefault?: boolean
-}
+export interface LayoutFormFactor extends LayoutFormFactorBase {
+  // To facilitate those post-processing elements.
+  layer: LayoutLayer[]
+};
 
 export type LayoutSpec = {
   "desktop"?: LayoutFormFactor,
@@ -83,7 +71,7 @@ export class Layouts {
     'HIDDEN':10
   };
 
-  static modifierSpecials = {
+  static modifierSpecials: Record<string, string> = {
     'leftalt': '*LAlt*',
     'rightalt': '*RAlt*',
     'alt': '*Alt*',
@@ -228,10 +216,10 @@ export class Layouts {
 
           // Create a new subkey for the specified layer so that it will be accessible via OSK.
           var specialChar = Layouts.modifierSpecials[layerID];
-          let subkey: LayoutKey = {
-            id: "K_" + specialChar,
+          let subkey: LayoutSubKey = {
+            id: `K_${specialChar}`,
             text: specialChar,
-            sp: "1",
+            sp: 1,
             nextlayer: layerID
           }
           shiftKey['sk'].push(subkey);
@@ -488,7 +476,7 @@ export class Layouts {
             if(typeof key102 == 'undefined' || !key102) {
               if(formFactor == 'desktop') {
                 keys.splice(j--, 1);
-                keys[0]['width']='200';
+                keys[0]['width']=200;
               } else {
                 keys[j]['sp']=buttonClasses['HIDDEN'];
               }
@@ -552,13 +540,14 @@ export class Layouts {
   static dfltLayout: LayoutSpec = {
       "desktop":
       {
+          "defaultHint": 'dot',
           "font": "Tahoma,Helvetica",
           "layer": [
               {
                   "id": "default",
                   "row": [
                       {
-                          "id": "1",
+                          "id": 1,
                           "key": [
                               { "id": "K_BKQUOTE" },
                               { "id": "K_1" },
@@ -573,13 +562,13 @@ export class Layouts {
                               { "id": "K_0" },
                               { "id": "K_HYPHEN" },
                               { "id": "K_EQUAL" },
-                              { "id": "K_BKSP", "text": "*BkSp*", "sp": "1", "width": "130" }
+                              { "id": "K_BKSP", "text": "*BkSp*", "sp": 1, "width": 130 }
                           ]
                       },
                       {
-                          "id": "2",
+                          "id": 2,
                           "key": [
-                              { "id": "K_TAB", "text": "*Tab*", "sp": "1", "width": "130" },
+                              { "id": "K_TAB", "text": "*Tab*", "sp": 1, "width": 130 },
                               { "id": "K_Q" },
                               { "id": "K_W" },
                               { "id": "K_E" },
@@ -596,9 +585,9 @@ export class Layouts {
                           ]
                       },
                       {
-                          "id": "3",
+                          "id": 3,
                           "key": [
-                              { "id": "K_CAPS", "text": "*Caps*", "sp": "1", "width": "165" },
+                              { "id": "K_CAPS", "text": "*Caps*", "sp": 1, "width": 165 },
                               { "id": "K_A" },
                               { "id": "K_S" },
                               { "id": "K_D" },
@@ -610,13 +599,13 @@ export class Layouts {
                               { "id": "K_L" },
                               { "id": "K_COLON" },
                               { "id": "K_QUOTE" },
-                              { "id": "K_ENTER", "text": "*Enter*", "sp": "1", "width": "165" }
+                              { "id": "K_ENTER", "text": "*Enter*", "sp": 1, "width": 165 }
                           ]
                       },
                       {
-                          "id": "4",
+                          "id": 4,
                           "key": [
-                              { "id": "K_SHIFT", "text": "*Shift*", "sp": "1", "width": "130" },
+                              { "id": "K_SHIFT", "text": "*Shift*", "sp": 1, "width": 130 },
                               { "id": "K_oE2" },
                               { "id": "K_Z" },
                               { "id": "K_X" },
@@ -628,17 +617,17 @@ export class Layouts {
                               { "id": "K_COMMA" },
                               { "id": "K_PERIOD" },
                               { "id": "K_SLASH" },
-                              { "id": "K_RSHIFT", "text": "*Shift*", "sp": "1", "width": "130" }
+                              { "id": "K_RSHIFT", "text": "*Shift*", "sp": 1, "width": 130 }
                           ]
                       },
                       {
-                          "id": "5",
+                          "id": 5,
                           "key": [
-                              { "id": "K_LCONTROL", "text": "*Ctrl*", "sp": "1", "width": "170" },
-                              { "id": "K_LALT", "text": "*Alt*", "sp": "1", "width": "160" },
-                              { "id": "K_SPACE", "text": "", "width": "770" },
-                              { "id": "K_RALT", "text": "*Alt*", "sp": "1", "width": "160" },
-                              { "id": "K_RCONTROL", "text": "*Ctrl*", "sp": "1", "width": "170" }
+                              { "id": "K_LCONTROL", "text": "*Ctrl*", "sp": 1, "width": 170 },
+                              { "id": "K_LALT", "text": "*Alt*", "sp": 1, "width": 160 },
+                              { "id": "K_SPACE", "text": "", "width": 770 },
+                              { "id": "K_RALT", "text": "*Alt*", "sp": 1, "width": 160 },
+                              { "id": "K_RCONTROL", "text": "*Ctrl*", "sp": 1, "width": 170 }
                           ]
                       }
                   ]
@@ -647,13 +636,14 @@ export class Layouts {
       },
       "tablet":
       {
+          "defaultHint": 'dot',
           "font": "Tahoma,Helvetica",
           "layer": [
               {
                   "id": "default",
                   "row": [
                       {
-                          "id": "0",
+                          "id": 0,
                           "key": [
                               { "id": "K_1" },
                               { "id": "K_2" },
@@ -667,13 +657,13 @@ export class Layouts {
                               { "id": "K_0" },
                               { "id": "K_HYPHEN" },
                               { "id": "K_EQUAL" },
-                              { "sp": "10", "width": "1" }
+                              { "sp": 10, "width": 1 }
                           ]
                       },
                       {
-                          "id": "1",
+                          "id": 1,
                           "key": [
-                              { "id": "K_Q", "pad": "25" },
+                              { "id": "K_Q", "pad": 25 },
                               { "id": "K_W" },
                               { "id": "K_E" },
                               { "id": "K_R" },
@@ -685,13 +675,13 @@ export class Layouts {
                               { "id": "K_P" },
                               { "id": "K_LBRKT" },
                               { "id": "K_RBRKT" },
-                              { "sp": "10", "width": "1" }
+                              { "sp": 10, "width": 1 }
                           ]
                       },
                       {
-                          "id": "2",
+                          "id": 2,
                           "key": [
-                              { "id": "K_A", "pad": "50" },
+                              { "id": "K_A", "pad": 50 },
                               { "id": "K_S" },
                               { "id": "K_D" },
                               { "id": "K_F" },
@@ -702,13 +692,13 @@ export class Layouts {
                               { "id": "K_L" },
                               { "id": "K_COLON" },
                               { "id": "K_QUOTE" },
-                              { "id": "K_BKSLASH", "width": "90" }
+                              { "id": "K_BKSLASH", "width": 90 }
                           ]
                       },
                       {
-                          "id": "3",
+                          "id": 3,
                           "key": [
-                              { "id": "K_oE2", "width": "90" },
+                              { "id": "K_oE2", "width": 90 },
                               { "id": "K_Z" },
                               { "id": "K_X" },
                               { "id": "K_C" },
@@ -720,26 +710,26 @@ export class Layouts {
                               { "id": "K_PERIOD" },
                               { "id": "K_SLASH" },
                               { "id": "K_BKQUOTE" },
-                              { "sp": "10", "width": "1" }
+                              { "sp": 10, "width": 1 }
                           ]
                       },
                       {
-                          "id": "4",
+                          "id": 4,
                           "key": [
                               {
-                                  "id": "K_SHIFT", "text": "*Shift*", "sp": "1", "width": "200", "sk": [
-                                      { "id": "K_LCONTROL", "text": "*Ctrl*", "sp": "1", "width": "50", "nextlayer": "ctrl" },
-                                      { "id": "K_LCONTROL", "text": "*LCtrl*", "sp": "1", "width": "50", "nextlayer": "leftctrl" },
-                                      { "id": "K_RCONTROL", "text": "*RCtrl*", "sp": "1", "width": "50", "nextlayer": "rightctrl" },
-                                      { "id": "K_LALT", "text": "*Alt*", "sp": "1", "width": "50", "nextlayer": "alt" },
-                                      { "id": "K_LALT", "text": "*LAlt*", "sp": "1", "width": "50", "nextlayer": "leftalt" },
-                                      { "id": "K_RALT", "text": "*RAlt*", "sp": "1", "width": "50", "nextlayer": "rightalt" },
-                                      { "id": "K_ALTGR", "text": "*AltGr*", "sp": "1", "width": "50", "nextlayer": "ctrl-alt" }]
+                                  "id": "K_SHIFT", "text": "*Shift*", "sp": 1, "width": 200, "sk": [
+                                      { "id": "K_LCONTROL", "text": "*Ctrl*", "sp": 1, "width": 50, "nextlayer": "ctrl" },
+                                      { "id": "K_LCONTROL", "text": "*LCtrl*", "sp": 1, "width": 50, "nextlayer": "leftctrl" },
+                                      { "id": "K_RCONTROL", "text": "*RCtrl*", "sp": 1, "width": 50, "nextlayer": "rightctrl" },
+                                      { "id": "K_LALT", "text": "*Alt*", "sp": 1, "width": 50, "nextlayer": "alt" },
+                                      { "id": "K_LALT", "text": "*LAlt*", "sp": 1, "width": 50, "nextlayer": "leftalt" },
+                                      { "id": "K_RALT", "text": "*RAlt*", "sp": 1, "width": 50, "nextlayer": "rightalt" },
+                                      { "id": "K_ALTGR", "text": "*AltGr*", "sp": 1, "width": 50, "nextlayer": "ctrl-alt" }]
                               },
-                              { "id": "K_LOPT", "text": "*Menu*", "sp": "1", "width": "150" },
-                              { "id": "K_SPACE", "text": "", "width": "570" },
-                              { "id": "K_BKSP", "text": "*BkSp*", "sp": "1", "width": "150" },
-                              { "id": "K_ENTER", "text": "*Enter*", "sp": "1", "width": "200" }
+                              { "id": "K_LOPT", "text": "*Menu*", "sp": 1, "width": 150 },
+                              { "id": "K_SPACE", "text": "", "width": 570 },
+                              { "id": "K_BKSP", "text": "*BkSp*", "sp": 1, "width": 150 },
+                              { "id": "K_ENTER", "text": "*Enter*", "sp": 1, "width": 200 }
                           ]
                       }
                   ]
@@ -748,13 +738,14 @@ export class Layouts {
       },
       "phone":
       {
+          "defaultHint": 'dot',
           "font": "Tahoma,Helvetica",
           "layer": [
               {
                   "id": "default",
                   "row": [
                       {
-                          "id": "0",
+                          "id": 0,
                           "key": [
                               { "id": "K_1" },
                               { "id": "K_2" },
@@ -768,13 +759,13 @@ export class Layouts {
                               { "id": "K_0" },
                               { "id": "K_HYPHEN" },
                               { "id": "K_EQUAL" },
-                              { "sp": "10", "width": "1" }
+                              { "sp": 10, "width": 1 }
                           ]
                       },
                       {
-                          "id": "1",
+                          "id": 1,
                           "key": [
-                              { "id": "K_Q", "pad": "25" },
+                              { "id": "K_Q", "pad": 25 },
                               { "id": "K_W" },
                               { "id": "K_E" },
                               { "id": "K_R" },
@@ -786,13 +777,13 @@ export class Layouts {
                               { "id": "K_P" },
                               { "id": "K_LBRKT" },
                               { "id": "K_RBRKT" },
-                              { "sp": "10", "width": "1" }
+                              { "sp": 10, "width": 1 }
                           ]
                       },
                       {
-                          "id": "2",
+                          "id": 2,
                           "key": [
-                              { "id": "K_A", "pad": "50" },
+                              { "id": "K_A", "pad": 50 },
                               { "id": "K_S" },
                               { "id": "K_D" },
                               { "id": "K_F" },
@@ -803,13 +794,13 @@ export class Layouts {
                               { "id": "K_L" },
                               { "id": "K_COLON" },
                               { "id": "K_QUOTE" },
-                              { "id": "K_BKSLASH", "width": "90" }
+                              { "id": "K_BKSLASH", "width": 90 }
                           ]
                       },
                       {
-                          "id": "3",
+                          "id": 3,
                           "key": [
-                              { "id": "K_oE2", "width": "90" },
+                              { "id": "K_oE2", "width": 90 },
                               { "id": "K_Z" },
                               { "id": "K_X" },
                               { "id": "K_C" },
@@ -821,26 +812,26 @@ export class Layouts {
                               { "id": "K_PERIOD" },
                               { "id": "K_SLASH" },
                               { "id": "K_BKQUOTE" },
-                              { "sp": "10", "width": "1" }
+                              { "sp": 10, "width": 1 }
                           ]
                       },
                       {
-                          "id": "4",
+                          "id": 4,
                           "key": [
                               {
-                                  "id": "K_SHIFT", "text": "*Shift*", "sp": "1", "width": "200", "sk": [
-                                      { "id": "K_LCONTROL", "text": "*Ctrl*", "sp": "1", "width": "50", "nextlayer": "ctrl" },
-                                      { "id": "K_LCONTROL", "text": "*LCtrl*", "sp": "1", "width": "50", "nextlayer": "leftctrl" },
-                                      { "id": "K_RCONTROL", "text": "*RCtrl*", "sp": "1", "width": "50", "nextlayer": "rightctrl" },
-                                      { "id": "K_LALT", "text": "*Alt*", "sp": "1", "width": "50", "nextlayer": "alt" },
-                                      { "id": "K_LALT", "text": "*LAlt*", "sp": "1", "width": "50", "nextlayer": "leftalt" },
-                                      { "id": "K_RALT", "text": "*RAlt*", "sp": "1", "width": "50", "nextlayer": "rightalt" },
-                                      { "id": "K_ALTGR", "text": "*AltGr*", "sp": "1", "width": "50", "nextlayer": "ctrl-alt" }]
+                                  "id": "K_SHIFT", "text": "*Shift*", "sp": 1, "width": 200, "sk": [
+                                      { "id": "K_LCONTROL", "text": "*Ctrl*", "sp": 1, "width": 50, "nextlayer": "ctrl" },
+                                      { "id": "K_LCONTROL", "text": "*LCtrl*", "sp": 1, "width": 50, "nextlayer": "leftctrl" },
+                                      { "id": "K_RCONTROL", "text": "*RCtrl*", "sp": 1, "width": 50, "nextlayer": "rightctrl" },
+                                      { "id": "K_LALT", "text": "*Alt*", "sp": 1, "width": 50, "nextlayer": "alt" },
+                                      { "id": "K_LALT", "text": "*LAlt*", "sp": 1, "width": 50, "nextlayer": "leftalt" },
+                                      { "id": "K_RALT", "text": "*RAlt*", "sp": 1, "width": 50, "nextlayer": "rightalt" },
+                                      { "id": "K_ALTGR", "text": "*AltGr*", "sp": 1, "width": 50, "nextlayer": "ctrl-alt" }]
                               },
-                              { "id": "K_LOPT", "text": "*Menu*", "width": "150", "sp": "1" },
-                              { "id": "K_SPACE", "width": "570", "text": "" },
-                              { "id": "K_BKSP", "text": "*BkSp*", "width": "150", "sp": "1" },
-                              { "id": "K_ENTER", "text": "*Enter*", "width": "200", "sp": "1" }
+                              { "id": "K_LOPT", "text": "*Menu*", "width": 150, "sp": 1 },
+                              { "id": "K_SPACE", "width": 570, "text": "" },
+                              { "id": "K_BKSP", "text": "*BkSp*", "width": 150, "sp": 1 },
+                              { "id": "K_ENTER", "text": "*Enter*", "width": 200, "sp": 1 }
                           ]
                       }
                   ]
