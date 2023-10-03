@@ -3,6 +3,7 @@ import { platform } from 'os';
 import { KmnCompiler } from '@keymanapp/kmc-kmn';
 import { CompilerOptions, CompilerCallbacks, KeymanFileTypes } from '@keymanapp/common-types';
 import { BuildActivity } from './BuildActivity.js';
+import * as fs from 'fs';
 
 export class BuildKmnKeyboard extends BuildActivity {
   public get name(): string { return 'Keyman keyboard'; }
@@ -16,14 +17,18 @@ export class BuildKmnKeyboard extends BuildActivity {
     }
 
     // We need to resolve paths to absolute paths before calling kmc-kmn
-    let outfile = this.getOutputFilename(infile, options);
+    if(options.outFile) {
+      options.outFile = getPosixAbsolutePath(options.outFile);
+    }
 
     infile = getPosixAbsolutePath(infile);
-    outfile = getPosixAbsolutePath(outfile);
-
-    // TODO: Currently this only builds .kmn->.kmx, and targeting .js is as-yet unsupported
-    // TODO: outfile should be set in options only?
-    return compiler.run(infile, outfile, options);
+    try {
+      fs.mkdirSync(path.dirname(options.outFile), {recursive: true});
+    } catch(e) {
+      // TODO: error
+      return false;
+    }
+    return compiler.run(infile, options);
   }
 }
 

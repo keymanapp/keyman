@@ -23,7 +23,7 @@ if "%1"=="-t" (
 )
 
 if "%1"=="" (
-  set compiler=..\..\..\..\bin\developer\kmcomp.exe
+  set compiler=..\..\..\..\bin\kmcomp.exe
 ) else (
   set compiler=%1
   shift
@@ -186,4 +186,4 @@ exit /b 0
 :usage
 echo Usage: test.bat [-c] [path-to-kmcomp.exe]
 echo -c will add colour via ANSI escapes (don't use in redirected scripts)
-echo path-to-kmcomp.exe, if not included will default to ..\..\..\..\bin\developer\kmcomp.exe
+echo path-to-kmcomp.exe, if not included will default to ..\..\..\..\bin\kmcomp.exe

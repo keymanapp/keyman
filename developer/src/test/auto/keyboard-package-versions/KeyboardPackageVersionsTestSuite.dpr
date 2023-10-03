@@ -92,7 +92,8 @@ uses
   Keyman.Developer.System.Project.UrlRenderer in '..\..\..\tike\project\Keyman.Developer.System.Project.UrlRenderer.pas',
   KeymanPaths in '..\..\..\..\..\common\windows\delphi\general\KeymanPaths.pas',
   Keyman.Developer.System.ValidateKpsFile in '..\..\..\common\delphi\compiler\Keyman.Developer.System.ValidateKpsFile.pas',
-  Keyman.Developer.System.KeymanDeveloperPaths in '..\..\..\tike\main\Keyman.Developer.System.KeymanDeveloperPaths.pas';
+  Keyman.Developer.System.KeymanDeveloperPaths in '..\..\..\tike\main\Keyman.Developer.System.KeymanDeveloperPaths.pas',
+  Keyman.Developer.System.KmcWrapper in '..\..\..\tike\compile\Keyman.Developer.System.KmcWrapper.pas';
 
 var
   runner : ITestRunner;

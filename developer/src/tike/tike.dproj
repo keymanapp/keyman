@@ -565,6 +565,7 @@
             <Form>frmEditPackageWebFonts</Form>
             <FormType>dfm</FormType>
         </DCCReference>
+        <DCCReference Include="compile\Keyman.Developer.System.KmcWrapper.pas"/>
         <None Include="Profiling\AQtimeModule1.aqt"/>
         <BuildConfiguration Include="Debug">
             <Key>Cfg_2</Key>
@@ -626,12 +627,6 @@
                 <Platform value="Win64">False</Platform>
             </Platforms>
             <Deployment Version="3">
-                <DeployFile LocalName="bin\Win32\Debug\tike.exe" Configuration="Debug" Class="ProjectOutput">
-                    <Platform Name="Win32">
-                        <RemoteName>tike.exe</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
                 <DeployFile LocalName="bin\Win32\Debug\tike.exe" Configuration="Debug" Class="ProjectOutput">
                     <Platform Name="Win32">
                         <RemoteName>tike.exe</RemoteName>
