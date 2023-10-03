@@ -160,8 +160,14 @@ export interface KpsFileStartMenuItems {
 }
 
 export interface KpsFileStrings {
-  //TODO: validate this structure
-  string: string[] | string;
+  string: KpsFileString[] | KpsFileString;
+}
+
+export interface KpsFileString {
+  $: {
+    name: string;
+    value: string;
+  }
 }
 
 export interface KpsFileLanguageExamples {

@@ -38,17 +38,29 @@ To see more command line options by using the `--help` option:
 
     kmc --help
 
-kmlmc Usage
------------
+---
 
-To compile a lexical model from its `.model.ts` source, use `kmlmc`:
+To compile a lexical model from its `.model.ts` source, use `kmc`:
 
-    kmlmc my-lexical-model.model.ts --outFile my-lexical-model.js
+    kmc build my-lexical-model.model.ts --outFile my-lexical-model.model.js
 
 To see more command line options by using the `--help` option:
 
-    kmlmc --help
-    kmlmp --help
+    kmc --help
+
+---
+
+kmc can now build package installers for Windows. Example usage (Bash on
+Windows, using 'node .' instead of 'kmc' to run the local build):
+
+```
+node . build windows-package-installer \
+  $KEYMAN_ROOT/developer/src/kmc-package/test/fixtures/khmer_angkor/source/khmer_angkor.kps \
+  --msi /c/Program\ Files\ \(x86\)/Common\ Files/Keyman/Cached\ Installer\ Files/keymandesktop.msi \
+  --exe $KEYMAN_ROOT/windows/bin/desktop/setup-redist.exe \
+  --license $KEYMAN_ROOT/LICENSE.md \
+  --out-file ./khmer.exe
+```
 
 How to build from source
 ------------------------
