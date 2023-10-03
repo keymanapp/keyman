@@ -128,6 +128,13 @@ describe('CompilerMessages', function () {
       CompilerMessages.WARN_FileInPackageDoesNotFollowFilenameConventions, {checkFilenameConventions: true});
   });
 
+  // Test the inverse -- no warning generated if checkFilenameConventions is false
+
+  it('should not generate WARN_FileInPackageDoesNotFollowFilenameConventions if content filename has wrong conventions but checkFilenameConventions is false', async function() {
+    testForMessage(this, ['invalid', 'warn_file_in_package_does_not_follow_filename_conventions.kps'], null, {checkFilenameConventions: false});
+    testForMessage(this, ['invalid', 'warn_file_in_package_does_not_follow_filename_conventions_2.kps'], null, {checkFilenameConventions: false});
+  });
+
   // ERROR_PackageNameCannotBeBlank
 
   it('should generate ERROR_PackageNameCannotBeBlank if package info has empty name', async function() {
