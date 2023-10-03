@@ -9,7 +9,7 @@ export class BaseOptions {
   }
 
   public static addLogFormat(program: Command) {
-    return program.addOption(new Option('-l, --log-format <logFormat>', 'Log format').choices(ALL_COMPILER_LOG_FORMATS).default('formatted'));
+    return program.addOption(new Option('--log-format <logFormat>', 'Log format').choices(ALL_COMPILER_LOG_FORMATS).default('formatted'));
   }
 
   public static addOutFile(program: Command) {

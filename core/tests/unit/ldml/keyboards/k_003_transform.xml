@@ -45,7 +45,7 @@ from https://github.com/unicode-org/cldr/blob/keyboard-preview/docs/ldml/tr35-ke
 
   <transforms type="simple">
     <transformGroup>
-      <transform from="^${e}" to="ê"/>
+      <transform from="\^${e}" to="ê"/> <!-- TODO-LDML: ^ should not need escape here ideally -->
     </transformGroup>
     <transformGroup>
       <!-- testing -->

@@ -96,7 +96,7 @@ You may also need `kmc` - see below.
 
 * Add emcc to PATH (probably upstream/enscripten)
 
-You may also need the `kmc` - see below.
+You may also need `kmc` - see below.
 
 #### kmc - All Linux platforms
 
@@ -127,7 +127,7 @@ npm i -g @keymanapp/kmc
 If you want to rebuild keyboards for tests, you'll also need node:
 
 ```bash
-# TODO: node install
+brew install node
 ```
 
 And you will also need to install `kmc`:

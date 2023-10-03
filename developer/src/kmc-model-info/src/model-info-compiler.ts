@@ -19,7 +19,7 @@ export class ModelInfoSources {
   /** The data from the .kps file, transformed to kmp.json */
   kmpJsonData: KmpJsonFile.KmpJsonFile;
 
-  /** The path in the keymanapp/lexical-models repo where this model may be found (optional) */
+  /** The path in the keymanapp/lexical-models repo where this model may be found */
   sourcePath: string;
 
   /** The compiled model filename and relative path (.js) */
