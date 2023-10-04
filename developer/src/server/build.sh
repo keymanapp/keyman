@@ -24,6 +24,10 @@ builder_describe "Build Keyman Developer Server" \
   ":server     Keyman Developer Server main program" \
   ":addins     Windows addins for GUI integration"
 
+builder_describe_internal_dependency \
+  publish:server       build:server \
+  publish:server       build:addins
+
 builder_describe_outputs \
   configure:server     /node_modules \
   configure:addins     /node_modules \
