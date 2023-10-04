@@ -4,8 +4,8 @@ import {
 } from '@keymanapp/gesture-recognizer';
 
 import {
-  Codes,
-  Keyboard
+  type ActiveLayout,
+  deepCopy
 } from '@keymanapp/keyboard-processor';
 
 import { type KeyElement } from '../../keyElement.js';
@@ -17,7 +17,7 @@ import specs = gestures.specs;
  * @param keyboard
  * @returns
  */
-export function gestureSetForKeyboard(keyboard: Keyboard): GestureModelDefs<KeyElement> {
+export function gestureSetForLayout(layout: ActiveLayout): GestureModelDefs<KeyElement> {
   // To be used among the `allowsInitialState` contact-model specifications as needed.
   const gestureKeyFilter = (key: KeyElement, gestureId: string) => {
     const keySpec = key.key.spec;
@@ -27,38 +27,82 @@ export function gestureSetForKeyboard(keyboard: Keyboard): GestureModelDefs<KeyE
       case 'longpress':
         return !!keySpec.sk;
       case 'multitap':
-        //return !!keySpec. // no field specified for this within KMW yet!
-        return keySpec.baseKeyID == 'K_SHIFT';
+        if(layout.hasMultitaps) {
+          return !!keySpec.multitap;
+        } else if(layout.formFactor != 'desktop') {
+          // maintain our special caps-shifting?
+          // if(keySpec.baseKeyID == 'K_SHIFT') {
+
+          // } else {
+          return false;
+          // }
+        }
       case 'flick':
-        //return !!keySpec. // no field specified for this within KMW yet!
-        return false;
+        // This is a gesture-start check; there won't yet be any directional info available.
+        return !!keySpec.flick;
       default:
         return true;
     }
   };
 
-  // TODO:  keyboard-specific config stuff
-  // if `null`, assume a no-flick keyboard (assuming our default layout has no flicks)
+  let longpressModel: GestureModel = deepCopy(layout.hasFlicks ? BasicLongpressModel : LongpressModelWithShortcut);
 
-  // Idea:  if we want to get fancy, we could detect if the keyboard even _supports_ some of
-  // the less common gestures and just... not include the model if it doesn't.  Should only
-  // do that if it's computationally "cheap", though.
+  function withKeySpecFiltering(model: GestureModel, contactIndices: number | number[]) {
+    // Creates deep copies of the model specifications that are safe to customize to the
+    // keyboard layout.
+    model = deepCopy(model);
+    const modelId = model.id;
+
+    if(typeof contactIndices == 'number') {
+      contactIndices = [contactIndices];
+    }
+
+    model.contacts.forEach((contact, index) => {
+      if((contactIndices as number[]).indexOf(index) != -1) {
+        const baseInitialStateCheck = contact.model.allowsInitialState ?? (() => true);
+
+        contact.model = {
+          ...contact.model,
+          allowsInitialState: (sample, ancestorSample, key) => {
+            return baseInitialStateCheck(sample, ancestorSample, key) && gestureKeyFilter(key, modelId);
+          }
+        };
+      }
+    });
+
+    return model;
+  }
+
+  const gestureModels = [
+    withKeySpecFiltering(longpressModel, 0),
+    // FIXME: needs a special version - we need access to the corresponding GestureSequence's
+    // stage 0 to properly resolve this!
+    withKeySpecFiltering(MultitapModel, 0),
+    SimpleTapModel,
+    withKeySpecFiltering(SpecialKeyStartModel, 0),
+    SpecialKeyEndModel,
+    SubkeySelectModel,
+    withKeySpecFiltering(ModipressStartModel, 0),
+    ModipressEndModel
+  ];
+
+  const defaultSet = [
+    BasicLongpressModel.id, SimpleTapModel.id, ModipressStartModel.id, SpecialKeyStartModel.id
+  ];
+
+  if(layout.hasFlicks) {
+    // TODO:
+    // gestureModels.push // flick-start
+    // gestureModels.push // flick-end
+
+    // defaultSet.push('flick-start');
+  }
+
   return {
-    gestures: [
-      // TODO:  some, if not all, will probably utilize methods, rather than constant definitions.
-      // But, this should be fine for a first-pass integration attempt.
-      LongpressModel,
-      MultitapModel,
-      SimpleTapModel,
-      SpecialKeyStartModel,
-      SpecialKeyEndModel,
-      SubkeySelectModel,
-      ModipressStartModel,
-      ModipressEndModel
-    ],
+    gestures: gestureModels,
     sets: {
-      default: [LongpressModel.id, SimpleTapModel.id, ModipressStartModel.id, SpecialKeyStartModel.id],
-      modipress: [LongpressModel.id, SimpleTapModel.id, SpecialKeyStartModel.id], // no nested modipressing
+      default: defaultSet,
+      modipress: defaultSet.filter((entry) => entry != ModipressStartModel.id), // no nested modipressing
       none: []
     }
   }
@@ -85,7 +129,7 @@ export const InstantContactResolutionModel: ContactModel = {
 }
 
 export const LongpressDistanceThreshold = 10;
-export const MainContactLongpressSourceModel: ContactModel = {
+export const BasicLongpressContactModel: ContactModel = {
   itemChangeAction: 'reject',
   itemPriority: 0,
   pathResolutionAction: 'resolve',
@@ -108,8 +152,8 @@ export const MainContactLongpressSourceModel: ContactModel = {
 };
 
 export const LongpressFlickDistanceThreshold = 6;
-export const MainContactLongpressSourceModelWithShortcut: ContactModel = {
-  ...MainContactLongpressSourceModel,
+export const LongpressContactModelWithShortcut: ContactModel = {
+  ...BasicLongpressContactModel,
   pathModel: {
     evaluate: (path) => {
       const stats = path.stats;
@@ -119,7 +163,7 @@ export const MainContactLongpressSourceModelWithShortcut: ContactModel = {
         return 'resolve';
       }
 
-      return MainContactLongpressSourceModel.pathModel.evaluate(path);
+      return BasicLongpressContactModel.pathModel.evaluate(path);
     }
   }
 }
@@ -231,15 +275,47 @@ export const SpecialKeyEndModel: GestureModel = {
   }
 }
 
-// Is kind of a mix of the two longpress styles.
-export const LongpressModel: GestureModel = {
+/**
+ * The flickless, roaming-touch-less version.
+ */
+export const BasicLongpressModel: GestureModel = {
   id: 'longpress',
   resolutionPriority: 0,
   contacts: [
     {
       model: {
         // Is the version without the up-flick shortcut.
-        ...MainContactLongpressSourceModel,
+        ...BasicLongpressContactModel,
+        itemPriority: 1,
+        pathInheritance: 'chop'
+      },
+      endOnResolve: false
+    }, {
+      model: InstantContactRejectionModel
+    }
+  ],
+  resolutionAction: {
+    type: 'chain',
+    next: 'subkey-select',
+    selectionMode: 'none',
+    item: 'none'
+  }
+}
+
+/**
+ * For use when a layout doesn't have flicks; has the up-flick shortcut
+ * and facilitates roaming-touch.
+ */
+export const LongpressModelWithShortcut: GestureModel = {
+  ...BasicLongpressModel,
+
+  id: 'longpress',
+  resolutionPriority: 0,
+  contacts: [
+    {
+      model: {
+        // Is the version without the up-flick shortcut.
+        ...LongpressContactModelWithShortcut,
         itemPriority: 1,
         pathInheritance: 'chop'
       },
@@ -254,6 +330,7 @@ export const LongpressModel: GestureModel = {
     selectionMode: 'none',
     item: 'none'
   },
+
   /*
    * Note:  these actions make sense in a 'roaming-touch' context, but not when
    * flicks are also enabled.

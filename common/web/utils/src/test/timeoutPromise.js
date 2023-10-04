@@ -1,6 +1,6 @@
 import { assert } from 'chai';
 
-import { TimeoutPromise } from '@keymanapp/web-utils';
+import { TimeoutPromise, timedPromise } from '@keymanapp/web-utils';
 
 // Set this long enough to allow a bit of delay from OS context-switching (often on the
 // order of ~16ms for some OSes) to occur multiple times without breaking these tests.
@@ -12,6 +12,17 @@ describe("TimeoutPromise", () => {
     const promise = new TimeoutPromise(INTERVAL);
 
     assert.isTrue(await promise.corePromise);
+
+    const end = Date.now();
+    // https://github.com/nodejs/node/issues/26578 - setTimeout() may resolve 1ms earlier than requested.
+    assert.isAtLeast(end-start, INTERVAL-1);
+  });
+
+  it('standard use (simpler format)', async () => {
+    const start = Date.now();
+    const promise = timedPromise(INTERVAL);
+
+    assert.isTrue(await promise);
 
     const end = Date.now();
     // https://github.com/nodejs/node/issues/26578 - setTimeout() may resolve 1ms earlier than requested.
