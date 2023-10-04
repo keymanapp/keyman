@@ -8,7 +8,8 @@ export function getCompiledKmxKeyboardMetadata(kmx: KMX.KEYBOARD): WebKeyboardMe
     keyboardName: getStoreFromKmx(kmx, KMX.KMXFile.TSS_NAME),
     keyboardVersion: getStoreFromKmx(kmx, KMX.KMXFile.TSS_KEYBOARDVERSION),
     minKeymanVersion: ((kmx.fileVersion & 0xFF00) >> 8).toString() + '.' + (kmx.fileVersion & 0xFF).toString(),
-    targets: getStoreFromKmx(kmx, KMX.KMXFile.TSS_TARGETS) ?? 'windows'
+    targets: getStoreFromKmx(kmx, KMX.KMXFile.TSS_TARGETS) ?? 'windows',
+    hasTouchLayout: !!getStoreFromKmx(kmx, KMX.KMXFile.TSS_LAYOUTFILE)
   };
 }
 

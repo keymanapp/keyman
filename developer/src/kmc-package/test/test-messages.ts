@@ -208,6 +208,17 @@ describe('CompilerMessages', function () {
       CompilerMessages.WARN_KeyboardShouldHaveAtLeastOneLanguage);
   });
 
+  // HINT_JsKeyboardFileHasNoTouchTargets
+
+  it('should generate HINT_JsKeyboardFileHasNoTouchTargets if keyboard has no touch targets', async function() {
+    testForMessage(this, ['invalid', 'hint_js_keyboard_file_has_no_touch_targets.kps'],
+      CompilerMessages.HINT_JsKeyboardFileHasNoTouchTargets);
+  });
+
+  it('should not generate HINT_JsKeyboardFileHasNoTouchTargets if keyboard has a touch target', async function() {
+    testForMessage(this, ['khmer_angkor', 'source', 'khmer_angkor.kps'], null);
+  });
+  
   // HINT_PackageContainsSourceFile
 
   it('should generate HINT_PackageContainsSourceFile if package contains a source file', async function() {
