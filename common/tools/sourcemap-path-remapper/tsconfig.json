@@ -5,7 +5,6 @@
     "allowJs": false,
     "allowSyntheticDefaultImports": true,
     "declaration": true,
-    "module": "es6",
     "inlineSourceMap": true,
     "inlineSources": true,
     "sourceRoot": "/common/tools/sourcemap-path-remapper/src",
