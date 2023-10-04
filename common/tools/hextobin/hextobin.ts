@@ -1,7 +1,6 @@
 #!/usr/bin/env node
-import * as fs from 'fs';
-import * as rd from 'readline';
 import * as program from 'commander';
+import hextobin from './index.js';
 
 let inputFilename: string = "";
 let outputFilename: string = "";
@@ -42,7 +41,5 @@ function exitDueToUsageError(message: string): never  {
   program.outputHelp();
   return process.exit(64); // SysExits.EX_USAGE
 }
-
-import hextobin from './index';
 
 hextobin(inputFilename, outputFilename, {silent: false});

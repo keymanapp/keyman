@@ -1,11 +1,4 @@
 #!/usr/bin/env bash
-#
-# Builds hextobin.js
-#
-
-# Exit on command failure and when using unset variables:
-set -eu
-
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
@@ -23,20 +16,9 @@ builder_describe "Build hextobin" clean configure build
 builder_describe_outputs \
   configure /node_modules \
   build     build/index.js
+
 builder_parse "$@"
 
-if builder_start_action clean; then
-  npm run clean
-  builder_finish_action success clean
-fi
-
-if builder_start_action configure; then
-  verify_npm_setup
-  builder_finish_action success configure
-fi
-
-if builder_start_action build; then
-  npm run build
-  builder_finish_action success build
-fi
-
+builder_run_action clean      rm -rf build/ node_modules/
+builder_run_action configure  verify_npm_setup
+builder_run_action build      tsc --build
