@@ -15,10 +15,9 @@
     <key id="w" to="w" />
     <flicks id="flick0">
         <flick directions="nw se" to="ç" />
-        <flick directions="ne sw" to="ê" />
+        <flick directions="ne sw" to="${ecaret}" />
     </flicks>
   </keys>
-
   <layers form="touch" minDeviceWidth="300">
     <layer id="base">
       <row keys="Q q W w" />
@@ -34,4 +33,8 @@
       <row keys="q w" />
     </layer>
   </layers>
+
+  <variables>
+    <string id="ecaret" value="ê" />
+  </variables>
 </keyboard3>
