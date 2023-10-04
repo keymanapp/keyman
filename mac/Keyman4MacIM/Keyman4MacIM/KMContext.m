@@ -6,10 +6,9 @@
  * 
  * Created by Shawn Schantz on 2023-05-11.
  * 
- * Tracks the state of the context in the client application to the best of our ability.
+ * Tracks the state of the context in the client application.
  * Needed for storing and managing marker actions returned from Keyman Core.
- * Also useful for applications that do not tell us about their context with the APIs
- * selectedRange and attributedSubstringFromRange
+ * Also useful for applications that do not allow us to read the context.
  */
 
 #import "KMContext.h"

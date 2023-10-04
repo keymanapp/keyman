@@ -62,7 +62,6 @@ typedef enum {BackspacesOnly,
   BOOL containsBackspaces = NO;
   BOOL backspaceFirst = NO;
   BOOL characterFirst = NO;
-  // TODO: track character count?
   // TODO: adjust backspace count for code points with more than one code unit?
   // TODO: backspace event and replacement range must be tested for surrogate pairs
   
@@ -204,22 +203,6 @@ typedef enum {BackspacesOnly,
 
 @end
 
-/**
- * KMActionHandlerResult describes the steps that Keyman must take to apply the
- * necessary changes to the text of the client application.
- *
- * Changes are made to the client application by generating events and posting
- * them to the client application or by calling the following APIs: insertText,
- * attributedSubstringFromRange and selectedRange. It is preferable to use the
- * APIs, but they are not supported by all applications, and the APIs themselves
- * have limitations.
- *
- * If we need to do a single backspace, then we have no API available to do that
- * and must send an event to make the client think that the backspace key was
- * typed. The changes described in KMActionHandlerResult must be applied in the
- * correct order to produce the correct output at the client.
- */
-
 @implementation KMActionHandlerResult
 -(instancetype)initForActions:(NSArray*)actions handledEvent:(BOOL)handledEvent backspaceCount:(int)backspaces textToInsert:(NSString*)text {
   self = [super init];
@@ -251,7 +234,6 @@ typedef enum {BackspacesOnly,
             addedCompositeOperation = YES;
           }
         } else {
-          // TODO: this could be more clear, logically equating unhandled event with backspace is confusing even if always true
           /**
            * if we are not handling the event (letting backspace passthrough), then just make an operation for the action
            * so that it can be used to update the context

@@ -24,11 +24,6 @@
 - (void)clearCoreContext;
 - (void)setCoreContext:(NSString *)context;
 
-//TODO: remove additional context methods
-/*
-- (void)setContextBuffer:(NSString *)ctxBuf;
-- (NSString *)contextBuffer;
- */
 - (void)setCoreOptions:(NSString *)key withValue:(NSString *)value;
 - (NSArray *)processEvent:(NSEvent *)event;
 - (void)setUseVerboseLogging:(BOOL)useVerboseLogging;

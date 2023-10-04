@@ -12,7 +12,7 @@
 #import "KMContext.h"
 #import "KeySender.h"
 #import "KMCoreActionHandler.h"
-#import "TextCompatibilityCheck.h"
+#import "TextApiCompliance.h"
 //TODO: remove debug call to PrivacyConsent
 #import "PrivacyConsent.h"
 
@@ -21,7 +21,7 @@
 @interface KMInputMethodEventHandler ()
 @property KMContext *cachedContext; // TODO: rename after eliminating other context references
 @property (nonatomic, retain) KeySender* keySender;
-@property (nonatomic, retain) TextCompatibilityCheck* compatibilityCheck;
+@property (nonatomic, retain) TextApiCompliance* apiCompliance;
 @property int generatedBackspaceCount;
 @property (nonatomic, retain) NSString* clientApplicationId;
 @property NSString *queuedText;
@@ -80,12 +80,10 @@ NSRange _previousSelRange;
     else
         _easterEggForSentry = nil;
 
-  //TODO: move to TextCompatibilityCheck
     // For the Atom editor, this isn't really true (the context CAN change unexpectedly), but we can't get
     // the context, so we pretend/hope it won't.
     BOOL selectionCanChangeUnexpectedly = (![clientAppId isEqual: @"com.github.atom"]);
-    // TODO: this equates 'legacyMode' with being forced to send events
-    return [self initWithLegacyMode:self.compatibilityCheck.mustBackspaceUsingEvents clientSelectionCanChangeUnexpectedly:selectionCanChangeUnexpectedly];
+    return [self initWithLegacyMode:self.apiCompliance.mustBackspaceUsingEvents clientSelectionCanChangeUnexpectedly:selectionCanChangeUnexpectedly];
 }
 
 - (void)switchToLegacyMode {
@@ -898,28 +896,22 @@ NSRange _previousSelRange;
     }];
 }
 
-- (void)doTextCompatibilityCheckIfNeeded:(id)client {
-  // if TextCompatibilityCheck is null or stale,
+//MARK: Core-related key processing
+
+- (void)checkTextApiCompliance:(id)client {
+  // if TextApiCompliance object is null or stale,
   // then create a new one for the current application
   
-  if ((self.compatibilityCheck == nil) || (![self.compatibilityCheck.clientApplicationId isEqualTo:self.clientApplicationId])) {
-    self.compatibilityCheck = [[TextCompatibilityCheck alloc]initWithClient:client applicationId:self.clientApplicationId];
-    NSLog(@"KMInputMethodHandler initWithClient checkClientTextCompatibility: %@", _compatibilityCheck);
-  } else if (self.compatibilityCheck.isApiComplianceUncertain) {
-    // if it is valid but compliance is undetermined, then test it
-    [self.compatibilityCheck testApiCompliance:client];
+  if ((self.apiCompliance == nil) || (![self.apiCompliance.clientApplicationId isEqualTo:self.clientApplicationId])) {
+    self.apiCompliance = [[TextApiCompliance alloc]initWithClient:client applicationId:self.clientApplicationId];
+    NSLog(@"KMInputMethodHandler initWithClient checkTextApiCompliance: %@", _apiCompliance);
+  } else if (self.apiCompliance.isComplianceUncertain) {
+    // if it is valid but compliance is uncertain, then test it
+    [self.apiCompliance testCompliance:client];
   }
 }
 
-//MARK: Core-related key processing
-// replacement handleEvent implementation for core event processing
-- (BOOL)handleEvent:(NSEvent *)event client:(id)sender {
-  NSLog(@"handleEvent event = %@", event);
-
-  [self doTextCompatibilityCheckIfNeeded:sender];
-  
-  // mouse movement requires that the context be invalidated
-  
+- (void) checkIfContextChangingEventDetected {
   if (self.AppDelegate.contextChangingEventDetected)
   {
     if (!self.cachedContext.isInvalid) {
@@ -928,12 +920,22 @@ NSRange _previousSelRange;
     }
     self.AppDelegate.contextChangingEventDetected = NO;
   }
+}
+
+// handleEvent implementation for core event processing
+- (BOOL)handleEvent:(NSEvent *)event client:(id)sender {
+  NSLog(@"handleEvent event = %@", event);
+
+  [self checkTextApiCompliance:sender];
+  
+  // mouse movement requires that the context be invalidated
+  [self checkIfContextChangingEventDetected];
 
   if (event.type == NSKeyDown) {
-    if ([self.cachedContext isInvalid]) {
-      [self loadContext:event forClient:sender];
-    }
+    [self loadContextIfInvalid:event forClient:sender];
     
+    // indicates that our generated backspace event(s) are consumed
+    // and we can insert text that followed the backspace(s)
     if (event.keyCode == kKeymanEventKeyCode) {
       [self insertQueuedText: event client:sender];
       return YES;
@@ -967,7 +969,7 @@ NSRange _previousSelRange;
 
     if ((event.modifierFlags & NSEventModifierFlagCommand) == NSEventModifierFlagCommand) {
         [self handleCommand:event];
-        return NO; // We let the client app handle all Command-key events.
+        return NO; // let the client app handle all Command-key events.
     }
 
     BOOL handled = [self handleEventWithKeymanEngine:event in: sender];
@@ -978,13 +980,12 @@ NSRange _previousSelRange;
     return handled;
 }
 
--(void)loadContext:(NSEvent *)event forClient:(id) client {
+-(void)loadContextIfInvalid:(NSEvent *)event forClient:(id) client {
   NSString *contextString = nil;
   NSAttributedString *attributedString = nil;
-  NSLog(@"loadContext called.");
 
   if ([self.cachedContext isInvalid]) {
-    if (self.compatibilityCheck.canReadText) {
+    if (self.apiCompliance.canReadText) {
       NSRange selectionRange = [client selectedRange];
       NSRange contextRange = NSMakeRange(0, selectionRange.location);
       attributedString = [client attributedSubstringFromRange:contextRange];
@@ -1013,14 +1014,7 @@ NSRange _previousSelRange;
  * -return YES after generating a backspace event
  */
 -(BOOL)applyKeymanCoreActions:(NSArray*)actions event: (NSEvent*)event client:(id) client {
-  //TODO: remove lots of debug code
   NSLog(@"applyKeymanCoreActions invoked, actions.count = %lu ", (unsigned long)actions.count);
-  NSLog(@"event = %@, client = %@, context.currentContext = %@", event, client, self.cachedContext.currentContext);
-  NSString *contextBefore = [[NSString alloc] initWithString:self.cachedContext.currentContext];
-  NSUInteger lengthBefore = _cachedContext.currentContext.length;
-  NSUInteger realLengthBefore =
-      [_cachedContext.currentContext lengthOfBytesUsingEncoding:NSUTF32StringEncoding] / 4;
-
   
   KMCoreActionHandler *actionHandler = [[KMCoreActionHandler alloc] initWithActions:(NSArray*)actions context: self.cachedContext keyCode: event.keyCode];
   KMActionHandlerResult *result = actionHandler.handleActions;
@@ -1032,14 +1026,6 @@ NSRange _previousSelRange;
       [self executeSimpleOperation:operation keyDownEvent:event];
     }
   }
-
-  // TODO: remove more debug code
-  NSString *contextAfter = _cachedContext.currentContext;
-  NSUInteger lengthAfter = _cachedContext.currentContext.length;
-  NSUInteger realLengthAfter =
-      [_cachedContext.currentContext lengthOfBytesUsingEncoding:NSUTF32StringEncoding] / 4;
-
-  NSLog(@"applyKeymanCoreActions, contextBefore = '%@', length = %lu, real length = %lu; contextAfter = '%@', length = %lu, real length = %lu", contextBefore, lengthBefore, realLengthBefore, contextAfter, lengthAfter, realLengthAfter);
 
   return result.handledEvent;
 }
@@ -1059,16 +1045,12 @@ NSRange _previousSelRange;
       NSBeep();
       break;
     case PersistOptionAction:
-      // TODO: remove number key code
-        //int keyInteger = action.key.intValue;
-        //NSNumber *keyNumber = [NSNumber numberWithInt:keyInteger];
-        //NSString *valueString = action.value;
       if(action.key && action.value) {
-        NSLog(@"*** PersistOptionAction calling writePersistedOptions, key: %@, value: %@", action.key, action.value);
+        NSLog(@"PersistOptionAction calling writePersistedOptions, key: %@, value: %@", action.key, action.value);
         [self.AppDelegate writePersistedOptions:action.key withValue:action.value];
       }
       else {
-        NSLog(@"*** Invalid values for PersistOptionAction, not writing to UserDefaults, key: %@, value: %@", action.key, action.value);
+        NSLog(@"Invalid values for PersistOptionAction, not writing to UserDefaults, key: %@, value: %@", action.key, action.value);
       }
       break;
     case InvalidateContextAction:
@@ -1099,7 +1081,7 @@ NSRange _previousSelRange;
   }
 
   if ((operation.isTextAndBackspaceScenario)) {
-    if (self.compatibilityCheck.mustBackspaceUsingEvents) {
+    if (self.apiCompliance.mustBackspaceUsingEvents) {
       NSLog(@"KXMInputMethodHandler executeCompositeOperation, text and backspace scenario with events");
      [self sendEventsForOperation: event actionOperation:operation];
     } else {
@@ -1117,7 +1099,7 @@ NSRange _previousSelRange;
 /**
  * This directly inserts text and applies backspaces for the operation by replacing existing text with the new text.
  * Because this method depends on the selectedRange API which is not implemented correctly for some client applications,
- * this method can only be used if approved by TextCompatibilityCheck
+ * this method can only be used if approved by TextApiCompliance
  */
 -(void)insertAndReplaceText:(NSString *)text backspaceCount:(int) replacementCount client:(id) client {
 
@@ -1131,7 +1113,6 @@ NSRange _previousSelRange;
     
     // make sure we have room to apply backspaces from current location
     actualReplacementCount = MIN(replacementCount, (int)selectionRange.location);
-    // TODO: need to use unicode length to determine whether we have room for backspace
     
     // log this: it is a sign that we are out of sync
     if (actualReplacementCount < replacementCount) {
@@ -1151,8 +1132,8 @@ NSRange _previousSelRange;
   }
   [client insertText:text replacementRange:replacementRange];
   [self.cachedContext replaceSubstring:text count:actualReplacementCount];
-  if (self.compatibilityCheck.isApiComplianceUncertain) {
-    [self.compatibilityCheck testApiComplianceAfterInsert:client];
+  if (self.apiCompliance.isComplianceUncertain) {
+    [self.apiCompliance testComplianceAfterInsert:client];
   }
 }
 

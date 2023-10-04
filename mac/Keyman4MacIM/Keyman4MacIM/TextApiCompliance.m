@@ -1,7 +1,7 @@
 /**
  * Keyman is copyright (C) SIL International. MIT License.
  * 
- * TextCompatibilityCheck.m
+ * TextApiCompliance.m
  * Keyman
  * 
  * Created by Shawn Schantz on 2023-05-05.
@@ -30,31 +30,31 @@
  * we can only delete by sending backspace events.
  */
 
-#import "TextCompatibilityCheck.h"
+#import "TextApiCompliance.h"
 #import <InputMethodKit/InputMethodKit.h>
 
 NSString *const kKMLegacyApps = @"KMLegacyApps";
 
-@interface TextCompatibilityCheck()
+@interface TextApiCompliance()
 
 @property (readonly) id client;
-@property BOOL apiComplianceUncertain;
+@property BOOL complianceUncertain;
 @property BOOL hasCompliantSelectionApi;
 
 @end
 
-@implementation TextCompatibilityCheck
+@implementation TextApiCompliance
 
 -(instancetype)initWithClient:(id) client applicationId:(NSString *)appId {
   self = [super init];
   if (self) {
     _client = client;
     _clientApplicationId = appId;
-    _apiComplianceUncertain = YES;
+    _complianceUncertain = YES;
     
     // if we do not have hard-coded noncompliance, then test the app
     if (![self applyNoncompliantAppLists:appId]) {
-      [self testApiCompliance:client];
+      [self testCompliance:client];
     }
   }
   return self;
@@ -62,38 +62,42 @@ NSString *const kKMLegacyApps = @"KMLegacyApps";
 
 -(NSString *)description
 {
-return [NSString stringWithFormat:@"apiComplianceUncertain: %d, hasCompliantSelectionApi: %d, canReadText: %d, canReplaceText: %d, mustBackspaceUsingEvents: %d, clientAppId: %@, client: %@", self.apiComplianceUncertain, self.hasCompliantSelectionApi, [self canReadText], [self canReplaceText], [self mustBackspaceUsingEvents], _clientApplicationId, _client];
+return [NSString stringWithFormat:@"complianceUncertain: %d, hasCompliantSelectionApi: %d, canReadText: %d, canReplaceText: %d, mustBackspaceUsingEvents: %d, clientAppId: %@, client: %@", self.complianceUncertain, self.hasCompliantSelectionApi, [self canReadText], [self canReplaceText], [self mustBackspaceUsingEvents], _clientApplicationId, _client];
 }
 
 /** test to see if the API selectedRange functions properly for the text input client  */
--(void) testApiCompliance:(id) client {
+-(void) testCompliance:(id) client {
   BOOL selectionApiVerified = NO;
 
   // confirm that the API actually exists (this always seems to return true)
-    selectionApiVerified = [client respondsToSelector:@selector(selectedRange)];
+  selectionApiVerified = [client respondsToSelector:@selector(selectedRange)];
   
-  // so it exists, now call the API and see if it works as expected
-  if (selectionApiVerified) {
+  if (!selectionApiVerified) {
+    self.complianceUncertain = NO;
+    self.hasCompliantSelectionApi = NO;
+  }
+  else {
+    // if API exists, call it and see if it works as expected
     NSRange selectionRange = [client selectedRange];
-    NSLog(@"TextCompatibilityCheck testSelectionApi, location = %lu, length = %lu", selectionRange.location, selectionRange.length);
-
+    NSLog(@"TextApiCompliance testSelectionApi, location = %lu, length = %lu", selectionRange.location, selectionRange.length);
+    
     if (selectionRange.location == NSNotFound) {
       // NSNotFound may just mean that we don't have the focus yet
       // say NO for now, but this may toggle back to YES after the first insertText
       selectionApiVerified = NO;
-      self.apiComplianceUncertain = YES;
-      NSLog(@"TextCompatibilityCheck checkSelectionApi not compliant but uncertain, range is NSNotFound");
+      self.complianceUncertain = YES;
+      NSLog(@"TextApiCompliance checkSelectionApi not compliant but uncertain, range is NSNotFound");
     } else if (selectionRange.location == 0) {
       // location zero may just mean that we are at the beginning of the doc
       // say YES for now, but this may toggle back to NO after the first insertText
       selectionApiVerified = YES;
-      self.apiComplianceUncertain = YES;
-      NSLog(@"TextCompatibilityCheck checkSelectionApi compliant but uncertain, location = 0");
+      self.complianceUncertain = YES;
+      NSLog(@"TextApiCompliance checkSelectionApi compliant but uncertain, location = 0");
     } else if (selectionRange.location > 0) {
       // we are confident, based on testing, that selectedRange API does  work
       selectionApiVerified = YES;
-      self.apiComplianceUncertain = NO;
-      NSLog(@"TextCompatibilityCheck checkSelectionApi compliant and certain, location > 0");
+      self.complianceUncertain = NO;
+      NSLog(@"TextApiCompliance checkSelectionApi compliant and certain, location > 0");
     }
   }
   
@@ -102,39 +106,39 @@ return [NSString stringWithFormat:@"apiComplianceUncertain: %d, hasCompliantSele
   self.hasCompliantSelectionApi = selectionApiVerified;
 }
 
-/** if apiComplianceUncertain is true, checking the selection after an insert can make it clear  */
--(void) testApiComplianceAfterInsert:(id) client {
-  if(self.apiComplianceUncertain) {
+/** if complianceUncertain is true, checking the selection after an insert can make it clear  */
+-(void) testComplianceAfterInsert:(id) client {
+  if(self.complianceUncertain) {
     NSRange selectionRange = [client selectedRange];
-    NSLog(@"TextCompatibilityCheck testSelectionApiAfterInsert, location = %lu, length = %lu", selectionRange.location, selectionRange.length);
+    NSLog(@"TextApiCompliance testSelectionApiAfterInsert, location = %lu, length = %lu", selectionRange.location, selectionRange.length);
 
     if (selectionRange.location == NSNotFound) {
       // NO for certain, insertText means we have focus, NSNotFound means that the selection API does not work
       self.hasCompliantSelectionApi = NO;
-      self.apiComplianceUncertain = NO;
-      NSLog(@"TextCompatibilityCheck testApiComplianceAfterInsert certain, non-compliant, range is NSNotFound");
+      self.complianceUncertain = NO;
+      NSLog(@"TextApiCompliance testComplianceAfterInsert certain, non-compliant, range is NSNotFound");
     } else if (selectionRange.location == 0) {
       // NO for certain, after an insertText we cannot be at location 0
       self.hasCompliantSelectionApi = NO;
-      self.apiComplianceUncertain = NO;
-      NSLog(@"TextCompatibilityCheck testApiComplianceAfterInsert certain, non-compliant, location = 0");
+      self.complianceUncertain = NO;
+      NSLog(@"TextApiCompliance testComplianceAfterInsert certain, non-compliant, location = 0");
     } else if (selectionRange.location > 0) {
       // we are confident, based on testing, the selectedRange API does work
       self.hasCompliantSelectionApi = YES;
-      self.apiComplianceUncertain = NO;
-      NSLog(@"TextCompatibilityCheck checkSelectionApi compliant and certain, location > 0");
+      self.complianceUncertain = NO;
+      NSLog(@"TextApiCompliance checkSelectionApi compliant and certain, location > 0");
     }
     
     NSLog(@"testSelectionApiAfterInsert, self.hasWorkingSelectionApi = %@ for app %@", self.hasCompliantSelectionApi?@"yes":@"no", self.clientApplicationId);
-    NSLog(@"testSelectionApiAfterInsert checkClientTextCompatibility: %@", self);
+    NSLog(@"testSelectionApiAfterInsert TextApiCompliance: %@", self);
  } else {
-    NSLog(@"TextCompatibilityCheck testSelectionApiAfterInsert, compliance is already known");
+    NSLog(@"TextApiCompliance testSelectionApiAfterInsert, compliance is already known");
   }
 }
 
 /**
  * Apply the hard-coded non-compliant app list and the user-managed (via user defaults) non-compliant app list.
- * If true, mark the app as non-compliant and certain (not apiComplianceUncertain).
+ * If true, mark the app as non-compliant and certain (not complianceUncertain).
  */
 - (BOOL)applyNoncompliantAppLists:(NSString *)clientAppId {
   BOOL isAppNonCompliant = [self containedInHardCodedNoncompliantAppList:clientAppId];
@@ -145,7 +149,7 @@ return [NSString stringWithFormat:@"apiComplianceUncertain: %d, hasCompliantSele
   NSLog(@"containedInNoncompliantAppLists: for app %@: %@", clientAppId, isAppNonCompliant?@"yes":@"no");
   
   if (isAppNonCompliant) {
-    self.apiComplianceUncertain = NO;
+    self.complianceUncertain = NO;
     self.hasCompliantSelectionApi = NO;
   }
   
@@ -229,8 +233,8 @@ return [NSString stringWithFormat:@"apiComplianceUncertain: %d, hasCompliantSele
     return NO;
 }
 
--(BOOL) isApiComplianceUncertain {
-  return self.apiComplianceUncertain;
+-(BOOL) isComplianceUncertain {
+  return self.complianceUncertain;
 }
 
 -(BOOL) canReadText {

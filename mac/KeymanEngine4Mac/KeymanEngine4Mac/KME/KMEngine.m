@@ -116,7 +116,6 @@ const NSString* kEasterEggKmxName = @"EnglishSpanish.kmx";
 
   // CoreWrapper returns an array of CoreAction objects
   NSArray *coreActions = [self.keymanCore processEvent:event];
-  // TODO: make this nil assignment part of the conversion method
   if ([coreActions count] == 0) {
     return nil;
   } else {

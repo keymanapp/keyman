@@ -1,25 +1,24 @@
 /**
  * Keyman is copyright (C) SIL International. MIT License.
  * 
- * TextCompatibilityCheck.h
+ * TextApiCompliance.h
  * Keyman
  * 
  * Created by Shawn Schantz on 2023-05-05.
  * 
- * Description...
  */
 
 #import <Foundation/Foundation.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface TextCompatibilityCheck : NSObject
+@interface TextApiCompliance : NSObject
 @property (readonly) NSString *clientApplicationId;
 
 -(instancetype)initWithClient:(id) client applicationId:(NSString *)appId;
--(void)testApiCompliance:(id) client;
--(void)testApiComplianceAfterInsert:(id) client;
--(BOOL)isApiComplianceUncertain;
+-(void)testCompliance:(id) client;
+-(void)testComplianceAfterInsert:(id) client;
+-(BOOL)isComplianceUncertain;
 -(BOOL)canReadText;
 -(BOOL)mustBackspaceUsingEvents;
 @end
