@@ -2,8 +2,8 @@ import { warning as logWarning, info as logInfo } from '@actions/core';
 
 import { GitHub } from '@actions/github';
 
-import { findLastHistoryPR, getAssociatedPR} from './graphql/queries';
-import { spawnChild } from './util/spawnAwait';
+import { findLastHistoryPR, getAssociatedPR} from './graphql/queries.js';
+import { spawnChild } from './util/spawnAwait.js';
 
 const getPullRequestInformation = async (
   octokit: GitHub, base: string
@@ -67,7 +67,7 @@ const getAssociatedPRInformation = async (
     }
   }: any = response;
 
-  const node = nodes.find(node => node.state == 'MERGED');
+  const node = nodes.find((node:any) => node.state == 'MERGED');
   return node ? { title: node.title, number: node.number } : undefined;
 };
 
