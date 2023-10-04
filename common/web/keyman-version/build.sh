@@ -18,7 +18,8 @@ builder_describe "Build the include script for current Keyman version" \
   clean \
   build \
   "pack                      build a local .tgz pack for testing" \
-  "publish                   publish to npm"
+  "publish                   publish to npm" \
+  test
 
 builder_describe_outputs \
   configure "/node_modules" \
