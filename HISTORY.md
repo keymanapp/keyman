@@ -1,5 +1,14 @@
 # Keyman Version History
 
+## 17.0.186 alpha 2023-10-04
+
+* feat(developer): show an INFO message when warnings have failed a build (#9652)
+* chore(developer): reduce duplicate words warning to hint (#9653)
+* feat(developer): issue hint if package includes keyboard source files (#9658)
+* chore(developer): switch on code coverage reporting for kmc (#9662)
+* fix(core): clean cached ICU in core (#9668)
+* feat(developer): warn if .kps includes a .js which is not touch-capable (#9667)
+
 ## 17.0.185 alpha 2023-10-03
 
 * chore(web): Add non-printing characters to the OSK (#9547)
