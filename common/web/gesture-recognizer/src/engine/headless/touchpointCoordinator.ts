@@ -1,9 +1,10 @@
 import EventEmitter from "eventemitter3";
 import { InputEngineBase } from "./inputEngineBase.js";
 import { buildGestureMatchInspector, GestureSource } from "./gestureSource.js";
-import { MatcherSelector } from "./gestures/matchers/matcherSelector.js";
+import { MatcherSelection, MatcherSelector } from "./gestures/matchers/matcherSelector.js";
 import { GestureSequence } from "./gestures/matchers/gestureSequence.js";
-import { GestureModelDefs, getGestureModelSet } from "./gestures/specs/gestureModelDefs.js";
+import { GestureModelDefs, getGestureModel, getGestureModelSet } from "./gestures/specs/gestureModelDefs.js";
+import { GestureModel } from "./gestures/specs/gestureModel.js";
 
 interface EventMap<HoveredItemType, StateToken> {
   /**
@@ -45,10 +46,21 @@ export class TouchpointCoordinator<HoveredItemType, StateToken=any> extends Even
         this.addEngine(engine);
       }
     }
+
+    this.selectorStack[0].on('rejectionwithaction', this.modelResetHandler)
   }
+
+  private readonly modelResetHandler = (selection: MatcherSelection<HoveredItemType>, replaceModelWith: (model: GestureModel<HoveredItemType>) => void) => {
+    if(selection.result.action.type == 'replace') {
+      replaceModelWith(getGestureModel(this.gestureModelDefinitions, selection.result.action.replace));
+    } else {
+      throw new Error("Missed a case in implementation!");
+    }
+  };
 
   public pushSelector(selector: MatcherSelector<HoveredItemType>) {
     this.selectorStack.push(selector);
+    selector.on('rejectionwithaction', this.modelResetHandler);
   }
 
   public popSelector(selector: MatcherSelector<HoveredItemType>) {
@@ -63,6 +75,7 @@ export class TouchpointCoordinator<HoveredItemType, StateToken=any> extends Even
     }
     /* c8 ignore end */
 
+    selector.off('rejectionwithaction', this.modelResetHandler);
     selector.cascadeTermination();
 
     this.selectorStack.splice(index, 1);

@@ -99,7 +99,7 @@ export class GestureMatcher<Type> implements PredecessorMatch<Type> {
       return entry.isPathComplete ? null : entry;
     }).reduce((cleansed, entry) => {
       return entry ? cleansed.concat(entry) : cleansed;
-    }, []);
+    }, [] as GestureSource<Type>[]);
 
     if(model.sustainTimer && sourceTouchpoints.length > 0) {
       // If a sustain timer is set, it's because we expect to have NO gesture-source _initially_.

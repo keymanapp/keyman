@@ -269,7 +269,7 @@ export class GestureSourceSubview<HoveredItemType, StateToken = any> extends Ges
       // Check against the full remaining length of the original source; does
       // the subview provided to us include its source's most recent point?
       const sampleCountSinceStart = source.baseSource.path.coords.length;
-      if(expectedLength != start + sampleCountSinceStart) {
+      if(expectedLength != sampleCountSinceStart) {
         mayUpdate = false;
       }
     }
@@ -380,6 +380,8 @@ export class GestureSourceSubview<HoveredItemType, StateToken = any> extends Ges
    */
   public disconnect() {
     if(this.subviewDisconnector) {
+      console.log("disconnecting - most recent sample follows");
+      console.log(this.currentSample);
       this.subviewDisconnector();
       this.subviewDisconnector = null;
     }
