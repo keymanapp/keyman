@@ -31,14 +31,14 @@ TODO get_position_From_VirtualKey_US: take care of the other shiftstates
 ToDo make this better!!! get_VirtualKey_Other_From_SC
 
 TODO next:
-    change mapping (win-lin) for writing All_Vector
-    compare entries in rgKey ( are the same rgKey[]filled? it is OK from rgKey[65]-rgkey[90] but for other values??? )
-    mc_import-rules (from ~ l. 790) see if everything gives the same result on win-Lin
-    check if I use char16_t everywhere instead of wchar_t or char
-    replace GDK
-    see in which files I can put some functions (e.g. incxstr) that were duplicated or even #include their original location
-    remove testing functions
-    remove USE_GDK
+    - change mapping (win-lin) for writing All_Vector
+    - compare entries in rgKey ( are the same rgKey[]filled? it is OK from rgKey[65]-rgkey[90] but for other values??? )
+    - mc_import-rules (from ~ l. 790) see if everything gives the same result on win-Lin
+    - check if I use char16_t everywhere instead of wchar_t or char
+    - replace GDK
+    - see in which files I can put some functions (e.g. incxstr) that were duplicated or even #include their original location
+    - remove testing functions
+    - remove USE_GDK
 TODO ...
 
 //---------------------------

@@ -112,7 +112,7 @@ KMX_DWORD convertNamesToValue(std::wstring tok_wstr){
   first[L"backslash"]      =   VK_BKSLASH;    /* DC = 220 */
   first[L"bracketleft"]    =   VK_LBRKT;      /* DB = 219 */
   first[L"bracketright"]   =   VK_RBRKT;      /* DD = 221 */
-  first[L"parenright"]     =   VK_COLON;      /* BA = 186 */
+  first[L"colon"]          =   VK_COLON;      /* BA = 186 */
   first[L"comma"]          =   VK_COMMA;      /* BC = 188 */
   first[L"period"]         =   VK_PERIOD;     /* BE = 190 */
   first[L"slash"]          =   VK_SLASH;      /* BF = 191 */
@@ -167,7 +167,7 @@ int split_US_To_3D_Vector(v_dw_3D &all_US,v_str_1D completeList) {
       std::istringstream split1(completeList[k]);
       for (std::string each; std::getline(split1, each, split_bracel); tokens.push_back(each));
 
-      // replace keys names with Keycode (<AD06> with 29,...)
+      // replace keys names with Keycode (<AD06> with 21,...)
       Keycde = replace_PosKey_with_Keycode(tokens[0]);
       tokens[0] = std::to_string(Keycde);
 
@@ -464,26 +464,20 @@ KMX_DWORD get_VirtualKey_Other_From_SC(KMX_DWORD SC , v_dw_3D &All_Vector){
 
       // _S2 what if we use  column 3(altgr) and 4 (shift+altgr) ??
 
-      /*// unshifted values e.g. "q" (=113) are stored in column All_Vector[1][i][ 1 ]
-      if  ( All_Vector[k][i][0] == (SC- All_Vector[0].size() )) {
-        wprintf(L" SC= %i   .. i= %i  .. %i:\t\t %i(%c)   (%i (%c) : %i (%c) ) --- \n",SC , i,  All_Vector[k][i][0] , All_Vector[k][i][1] ,All_Vector[1][i][1],All_Vector[1][i][1],All_Vector[k][i][1] , All_Vector[k][i][2] , All_Vector[k][i][2]   ); 
-        return All_Vector[1][i][1] ;
-      }*/
-
-      if(( SC < 10) && (SC >= 0)){
+      if( SC < 12) {
         //  values for numbers  are stored in column All_Vector[1][i][ 1 ]
-          if  ( All_Vector[k][i][0] == SC ) {
-            wprintf(L" SC= %i   .. i= %i  .. %i:\t\t %i(%c)   (%i (%c) : %i (%c) ) --- \n",SC , i,  All_Vector[k][i][0] , All_Vector[k][i][1] ,All_Vector[1][i][2],All_Vector[1][i][2] ,All_Vector[k][i][1] , All_Vector[k][i][2] , All_Vector[k][i][2]   ); 
-            KMX_DWORD returnval= All_Vector[1][i][1];
-            return All_Vector[1][i][1];
-          }
+        if ( All_Vector[k][i][0] == SC ) {
+          wprintf(L" SC= %i   .. i= %i  .. %i:\t\t %i(%c)   (%i (%c) : %i (%c) ) --- \n",SC , i,  All_Vector[k][i][0] , All_Vector[k][i][1] ,All_Vector[1][i][2],All_Vector[1][i][2] ,All_Vector[k][i][1] , All_Vector[k][i][2] , All_Vector[k][i][2]   ); 
+          //KMX_DWORD returnval= All_Vector[1][i][1];
+          // we could return All_Vector[0][i][1]; since win version uses us numbers here
+          return All_Vector[1][i][1];
+        }
       }
 
       // shifted values e.g. "Q" (=81) are stored in column All_Vector[1][i][ 2 ]
-      if  ( All_Vector[k][i][0] == SC ) {
+      else if  ( All_Vector[k][i][0] == SC ) {
         wprintf(L" SC= %i   .. i= %i  .. %i:\t\t %i(%c)   (%i (%c) : %i (%c) ) --- \n",SC , i,  All_Vector[k][i][0] , All_Vector[k][i][1] ,All_Vector[1][i][2],All_Vector[1][i][2] ,All_Vector[k][i][1] , All_Vector[k][i][2] , All_Vector[k][i][2]   ); 
-        KMX_DWORD returnval= All_Vector[1][i][2];
-
+        //KMX_DWORD returnval= All_Vector[1][i][2];
         return All_Vector[1][i][2];
       }
     }
@@ -563,8 +557,10 @@ KMX_DWORD get_SC_From_VirtualKey_US(KMX_DWORD VK_US , v_dw_3D &All_Vector){
 KMX_DWORD get_position_From_VirtualKey_US(KMX_DWORD VK_US , v_dw_3D &All_Vector){
   // find correct row of char in US
   for( int i=0; i< (int)All_Vector[0].size()-1;i++) {
-    if  ( All_Vector[0][i][2] == VK_US ) {
-      wprintf(L" SC= %i   .. i= %i  .. %i:\t\t %i (%c) : %i (%c)  --- \n",VK_US , i,  All_Vector[0][i][0] , All_Vector[0][i][1] ,All_Vector[0][i][1] , All_Vector[0][i][2] , All_Vector[0][i][2]   ); 
+    if ( ( All_Vector[0][i][1] == VK_US ) || ( All_Vector[0][i][2] == VK_US )) {
+      wprintf(L" VK_US= %i   .. i= %i  .. %i\t\t %i (%c) : %i (%c)  +++ %i\t\t %i (%c) : %i (%c)  \n",VK_US , i,
+      All_Vector[0][i][0] , All_Vector[0][i][1] ,All_Vector[0][i][1] , All_Vector[0][i][2] , All_Vector[0][i][2],
+      All_Vector[1][i][0] , All_Vector[1][i][1] ,All_Vector[1][i][1] , All_Vector[1][i][2] , All_Vector[1][i][2] );
       return i;
     }
   }

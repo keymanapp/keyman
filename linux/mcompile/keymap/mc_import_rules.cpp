@@ -592,6 +592,7 @@ std::wstring  get_VirtualKey_US_from_iKey(KMX_DWORD iKey, ShiftState &ss, int &c
     return L"";
 
   if( ss < All_Vector[0][pos].size()-1) {
+  //if( ss < All_Vector[1][pos].size()-1) {   // _S2 numbers need this
 
     if ( ss % 2 == 0)
       icaps = ss+2-caps;
@@ -600,6 +601,7 @@ std::wstring  get_VirtualKey_US_from_iKey(KMX_DWORD iKey, ShiftState &ss, int &c
       icaps = ss+caps;
 
     return std::wstring(1, (int) All_Vector[0][pos][icaps]);
+     //return std::wstring(1, (int) All_Vector[1][pos][icaps]);
   }
   return L"";
 }
