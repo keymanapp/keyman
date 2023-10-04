@@ -1,10 +1,11 @@
 #!/usr/bin/env node
-import * as program from 'commander';
+import { Command } from 'commander';
 import hextobin from './index.js';
 
 let inputFilename: string = "";
 let outputFilename: string = "";
 
+const program = new Command();
 program
   .description(
 `Will convert the input file which is a hex dump to the output file. Hex dump can contain
