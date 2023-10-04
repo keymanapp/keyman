@@ -342,28 +342,26 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
       mouseEventRoot: document.body,
       // touchEventRoot:  this.element, // is the default
       itemIdentifier: (sample, target) => {
-        if(sample.stateToken == this.layerId) {
-          let resolvedTarget =  this.keyTarget(target);
-          if(resolvedTarget) {
-            return resolvedTarget;
-          }
-        }
+        /* ALWAYS use the findNearestKey function.
+         * MDN spec for `target`, which comes from Touch.target for touch-based interactions:
+         *
+         * > The read-only target property of the Touch interface returns the (EventTarget) on which the touch contact
+         *   started when it was first placed on the surface, even if the touch point has since moved outside the
+         *   interactive area of that element[...]
+         */
 
         return this.layerGroup.findNearestKey(sample);
       }
     };
 
-    const recognizer = new GestureRecognizer(gestureSetForLayout(this.kbdLayout), config);
+    const recognizer = new GestureRecognizer(gestureSetForLayout(this.layerGroup), config);
     recognizer.stateToken = this.layerId;
 
     const sourceTrackingMap: Record<string, {
       source: GestureSource<KeyElement, string>,
-      roamingHandler: typeof roamingTouchHighlighting,
+      roamingHighlightHandler: (sample: InputSample<KeyElement, string>) => void,
       key: KeyElement
     }> = {};
-
-    // TODO:  Obviously, this is extremely rough at present.
-    const roamingTouchHighlighting: (sample: InputSample<KeyElement, string>) => void = null;
 
     // Now to set up event-handling links.
     // This handler should probably vary based on the keyboard: do we allow roaming touches or not?
@@ -373,7 +371,7 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
       // highlighting it)
       const trackingEntry = sourceTrackingMap[source.identifier] = {
         source: source,
-        roamingHandler: (sample) => {
+        roamingHighlightHandler: (sample) => {
           // Maintain highlighting
           const key = sample.item;
           const oldKey = sourceTrackingMap[source.identifier].key;
@@ -404,7 +402,7 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
       // If so, separate handler - it likely needs to be disabled once the first gesture-component
       // match happens, unlike the highlighting part.
 
-      source.path.on('step', trackingEntry.roamingHandler);
+      source.path.on('step', trackingEntry.roamingHighlightHandler);
 
       source.path.on('step', (sample) => {
         console.log(`New sample for source ${source.identifier}:`);
@@ -436,7 +434,7 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
         // if( /* not in subkey-select mode */) {
         for(let id of gestureStage.allSourceIds) {
           const trackingEntry = sourceTrackingMap[id];
-          trackingEntry.source.path.off('step', trackingEntry.roamingHandler);
+          trackingEntry.source.path.off('step', trackingEntry.roamingHighlightHandler);
         }
         // }
 
@@ -452,6 +450,10 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
             // (certain types should probably use the base coord... or even from
             // a prior stage of the sequence as appropriate.)
             coord = coordSource.currentSample;
+          }
+
+          if(gestureStage.matchedId == 'multitap') {
+            // TODO:  examine sequence, determine rota-style index to apply; select THAT item instead.
           }
 
           // Once the best coord to use for fat-finger calculations has been determined:

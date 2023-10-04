@@ -1,12 +1,13 @@
 import {
   gestures,
-  GestureModelDefs
+  GestureModelDefs,
+  InputSample
 } from '@keymanapp/gesture-recognizer';
 
 import {
-  type ActiveLayout,
   deepCopy
 } from '@keymanapp/keyboard-processor';
+import OSKLayerGroup from '../../keyboard-layout/oskLayerGroup.js';
 
 import { type KeyElement } from '../../keyElement.js';
 
@@ -17,7 +18,9 @@ import specs = gestures.specs;
  * @param keyboard
  * @returns
  */
-export function gestureSetForLayout(layout: ActiveLayout): GestureModelDefs<KeyElement> {
+export function gestureSetForLayout(layerGroup: OSKLayerGroup): GestureModelDefs<KeyElement> {
+  const layout = layerGroup.spec;
+
   // To be used among the `allowsInitialState` contact-model specifications as needed.
   const gestureKeyFilter = (key: KeyElement, gestureId: string) => {
     const keySpec = key.key.spec;
@@ -45,8 +48,10 @@ export function gestureSetForLayout(layout: ActiveLayout): GestureModelDefs<KeyE
     }
   };
 
-  let longpressModel: GestureModel = deepCopy(layout.hasFlicks ? BasicLongpressModel : LongpressModelWithShortcut);
+  const simpleTapModel: GestureModel = deepCopy(layout.hasFlicks ? SimpleTapModel : SimpleTapModelWithReset);
+  const longpressModel: GestureModel = deepCopy(layout.hasFlicks ? BasicLongpressModel : LongpressModelWithShortcut);
 
+  // #region Functions for implementing and/or extending path initial-state checks
   function withKeySpecFiltering(model: GestureModel, contactIndices: number | number[]) {
     // Creates deep copies of the model specifications that are safe to customize to the
     // keyboard layout.
@@ -73,12 +78,53 @@ export function gestureSetForLayout(layout: ActiveLayout): GestureModelDefs<KeyE
     return model;
   }
 
+  function withLayerChangeItemFix(model: GestureModel, contactIndices: number | number[]) {
+    // Creates deep copies of the model specifications that are safe to customize to the
+    // keyboard layout.
+    model = deepCopy(model);
+
+    if(typeof contactIndices == 'number') {
+      contactIndices = [contactIndices];
+    }
+
+    model.contacts.forEach((contact, index) => {
+      if((contactIndices as number[]).indexOf(index) != -1) {
+        const baseInitialStateCheck = contact.model.allowsInitialState ?? (() => true);
+
+        contact.model = {
+          ...contact.model,
+          // And now for the true purpose of the method.
+          allowsInitialState: (sample, ancestorSample, baseKey) => {
+            // By default, the state token is set to whatever the current layer is for a source.
+            //
+            // So, if the first tap of a key swaps layers, the second tap will be on the wrong layer and
+            // thus have a different state token.  This is the perfect place to detect and correct that.
+            if(ancestorSample.stateToken != sample.stateToken) {
+              sample.stateToken = ancestorSample.stateToken;
+
+              // Specialized item lookup is required here for proper 'correction' - we want the key
+              // corresponding to our original layer, not the new layer here.  Now that we've identified
+              // the original OSK layer (state) for the gesture, we can find the best matching key
+              // from said layer instead of the current layer.
+              //
+              // Matters significantly for multitaps if and when they include layer-switching specs.
+              sample.item = layerGroup.findNearestKey(sample);
+            }
+
+            return baseInitialStateCheck(sample, ancestorSample, baseKey);
+          }
+        };
+      }
+    });
+
+    return model;
+  }
+  // #endregion
+
   const gestureModels = [
     withKeySpecFiltering(longpressModel, 0),
-    // FIXME: needs a special version - we need access to the corresponding GestureSequence's
-    // stage 0 to properly resolve this!
-    withKeySpecFiltering(MultitapModel, 0),
-    SimpleTapModel,
+    withLayerChangeItemFix(withKeySpecFiltering(MultitapModel, 0), 0),
+    simpleTapModel,
     withKeySpecFiltering(SpecialKeyStartModel, 0),
     SpecialKeyEndModel,
     SubkeySelectModel,
@@ -357,17 +403,6 @@ export const MultitapModel: GestureModel = {
         itemPriority: 1,
         pathInheritance: 'reject',
         allowsInitialState(incomingSample, comparisonSample, baseItem) {
-          // By default, the state token is set to whatever the current layer is for a source.
-          //
-          // So, if the first tap of a key swaps layers, the second tap will be on the wrong layer and
-          // thus have a different state token.  This is the perfect place to detect and correct that.
-          if(comparisonSample.stateToken != incomingSample.stateToken) {
-            incomingSample.stateToken = comparisonSample.stateToken;
-
-            // TODO: specialized item lookup required here for proper 'correction', corresponding to
-            // the owning VisualKeyboard.  That rigging doesn't exist quite yet, at the time of writing this.
-            incomingSample.item = undefined;
-          }
           return incomingSample.item == baseItem;
         },
       },
@@ -408,7 +443,11 @@ export const SimpleTapModel: GestureModel = {
     type: 'chain',
     next: 'multitap',
     item: 'current'
-  },
+  }
+}
+
+export const SimpleTapModelWithReset: GestureModel = {
+  ...SimpleTapModel,
   rejectionActions: {
     item: {
       type: 'replace',

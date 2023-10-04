@@ -1,4 +1,4 @@
-import { ActiveLayer, type DeviceSpec, Keyboard, LayoutLayer } from '@keymanapp/keyboard-processor';
+import { ActiveLayer, type DeviceSpec, Keyboard, LayoutLayer, ActiveLayout } from '@keymanapp/keyboard-processor';
 
 import { InputSample } from '@keymanapp/gesture-recognizer';
 
@@ -10,9 +10,11 @@ import OSKRow from './oskRow.js';
 export default class OSKLayerGroup {
   public readonly element: HTMLDivElement;
   public readonly layers: {[layerID: string]: OSKLayer} = {};
+  public readonly spec: ActiveLayout;
 
   public constructor(vkbd: VisualKeyboard, keyboard: Keyboard, formFactor: DeviceSpec.FormFactor) {
     let layout = keyboard.layout(formFactor);
+    this.spec = layout;
 
     const lDiv = this.element = document.createElement('div');
     const ls=lDiv.style;

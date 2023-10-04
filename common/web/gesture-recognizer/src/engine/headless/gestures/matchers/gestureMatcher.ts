@@ -266,7 +266,7 @@ export class GestureMatcher<Type> implements PredecessorMatch<Type> {
    */
   public get primaryPath(): GestureSource<Type> {
     let bestMatcher: PathMatcher<Type>;
-    let highestPriority = Number.MIN_VALUE;
+    let highestPriority = Number.NEGATIVE_INFINITY;
     for(let matcher of this.pathMatchers) {
       if(matcher.model.itemPriority > highestPriority) {
         highestPriority = matcher.model.itemPriority;
@@ -359,6 +359,11 @@ export class GestureMatcher<Type> implements PredecessorMatch<Type> {
           baseItem = this.predecessor.result.action.item;
           break;
       }
+
+      // Under 'sustain timer' mode, the concept is that the first new source is the
+      // continuation and successor to `predecessor.primaryPath`. Its base `item`
+      // should reflect this.
+      simpleSource.baseItem = baseItem ?? simpleSource.baseItem;
     } else {
       // just use the highest-priority item source's base item and call it a day.
       // There's no need to refer to some previously-existing source for comparison.

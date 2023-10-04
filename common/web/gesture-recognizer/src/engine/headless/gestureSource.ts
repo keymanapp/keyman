@@ -133,10 +133,18 @@ export class GestureSource<HoveredItemType, StateToken=any> {
   }
 
   /**
-   * The first path sample (coordinate) under consideration for this `GestureSource`.
+   * The 'base item' for the path of this `GestureSource`.
+   *
+   * May be set independently after construction for cases where one GestureSource conceptually
+   * "succeeds" another one, as with multitap gestures.  (Though, those generally constrain
+   * new paths to have the same base item.)
    */
   public get baseItem(): HoveredItemType {
     return this._baseItem;
+  }
+
+  public set baseItem(value: HoveredItemType) {
+    this._baseItem = value;
   }
 
   /**
@@ -299,12 +307,18 @@ export class GestureSourceSubview<HoveredItemType, StateToken = any> extends Ges
 
     subpath = new GesturePath<HoveredItemType, StateToken>();
     for(let i=0; i < length; i++) {
+      // IMPORTANT:  also acts as a deep-copy of the sample; edits to it do not propagate to other
+      // subviews or the original `baseSource`.  Needed for multitaps that trigger system
+      // `stateToken` changes.
       subpath.extend(translateSample(baseSource.path.coords[start + i]));
     }
 
     this._path = subpath;
 
     if(preserveBaseItem) {
+      // IMPORTANT:  inherits the _subview's_ base item, not the baseSource's version thereof.
+      // This allows gesture models based upon 'sustain timers' to have a different base item
+      // than concurrent models that aren't sustain-followups.
       this._baseItem = source.baseItem;
     } else {
       this._baseItem = lastSample?.item;
