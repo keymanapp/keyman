@@ -126,7 +126,7 @@ make-kmc-install-zip: copy-schemas
 
 # TODO: are these required?
 # kpj.schema.json kvks.schema.json \
-# ldml-keyboard.schema.json ldml-keyboardtest.schema.json \
+# ldml-keyboard3.schema.json ldml-keyboardtest3.schema.json \
 
 copy-schemas:
     copy $(KEYMAN_ROOT)\common\schemas\keyboard_info\keyboard_info.schema.json $(DEVELOPER_ROOT)\bin

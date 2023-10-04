@@ -43,7 +43,7 @@ export class VarsCompiler extends SectionCompiler {
 
   private validateVars(): boolean {
     let valid = true;
-    const variables = this.keyboard?.variables;
+    const variables = this.keyboard3?.variables;
 
     if (!variables) {
       return true; // nothing to check
@@ -152,10 +152,10 @@ export class VarsCompiler extends SectionCompiler {
     let valid = true;
 
     // call our friends to validate
-    valid = this.validateVarsMarkers(this.keyboard, mt) && valid; // accumulate validity
-    valid = KeysCompiler.validateMarkers(this.keyboard, mt) && valid; // accumulate validity
-    valid = TransformCompiler.validateMarkers(this.keyboard, mt) && valid; // accumulate validity
-    valid = DispCompiler.validateMarkers(this.keyboard, mt) && valid; // accumulate validity
+    valid = this.validateVarsMarkers(this.keyboard3, mt) && valid; // accumulate validity
+    valid = KeysCompiler.validateMarkers(this.keyboard3, mt) && valid; // accumulate validity
+    valid = TransformCompiler.validateMarkers(this.keyboard3, mt) && valid; // accumulate validity
+    valid = DispCompiler.validateMarkers(this.keyboard3, mt) && valid; // accumulate validity
 
     return valid;
   }
@@ -195,7 +195,7 @@ export class VarsCompiler extends SectionCompiler {
   public compile(sections: DependencySections): Vars {
     const result =  new Vars();
 
-    const variables = this.keyboard?.variables;
+    const variables = this.keyboard3?.variables;
     // we always have vars, it's depended on by other sections
     // we already know the variables do not conflict with each other
     // need to add these one by one, because they depend on each other.

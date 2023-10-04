@@ -3,7 +3,7 @@ import { assert } from 'chai';
 import { LayrCompiler } from '../src/compiler/layr.js';
 import { CompilerMessages } from '../src/compiler/messages.js';
 import { compilerTestCallbacks, loadSectionFixture, testCompilationCases } from './helpers/index.js';
-import { KMXPlus, CommonTypesMessages } from '@keymanapp/common-types';
+import { KMXPlus } from '@keymanapp/common-types';
 import { constants } from '@keymanapp/ldml-keyboard-constants';
 
 import Layr = KMXPlus.Layr;
@@ -106,11 +106,9 @@ describe('layr', function () {
     },
     {
       subpath: 'sections/layr/invalid-invalid-form.xml',
-      errors: [CommonTypesMessages.Error_SchemaValidationError({
-        instancePath: '/keyboard/layers/0/form',
-        keyword: 'enum',
-        message: 'must be equal to one of the allowed values',
-        params: `allowedValues="touch,us,iso,jis,abnt2"`}),],
+      errors: [CompilerMessages.Error_InvalidHardware({
+        form: 'holographic',
+      }),],
     },
     {
       // missing layer element

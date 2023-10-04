@@ -5,8 +5,8 @@
 @@expected: \u0061
 -->
 
-<!DOCTYPE keyboard SYSTEM "../../../../../resources/standards-data/ldml-keyboards/techpreview/dtd/ldmlKeyboard.dtd">
-<keyboard locale="en" conformsTo="techpreview">
+<!DOCTYPE keyboard3 SYSTEM "../../../../../resources/standards-data/ldml-keyboards/techpreview/dtd/ldmlKeyboard3.dtd">
+<keyboard3 locale="en" conformsTo="techpreview">
   <info author="srl295" indicator="🙀" layout="qwerty" normalization="NFC" />
 
   <names>
@@ -23,4 +23,4 @@
       <row keys="a gap"/>
     </layer>
   </layers>
-</keyboard>
+</keyboard3>

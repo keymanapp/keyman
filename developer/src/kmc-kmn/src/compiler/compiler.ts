@@ -422,6 +422,17 @@ export class KmnCompiler implements UnicodeSetParser {
     return Module.kmcmp_testSentry();
   }
 
+  /** convert `\u{1234}` to `\u1234` etc */
+  public static fixNewPattern(pattern: string) : string {
+    pattern = pattern.replaceAll(/\\u\{([0-9a-fA-F]{6})\}/g, `\\U00$1`);
+    pattern = pattern.replaceAll(/\\u\{([0-9a-fA-F]{5})\}/g, `\\U000$1`);
+    pattern = pattern.replaceAll(/\\u\{([0-9a-fA-F]{4})\}/g, `\\u$1`);
+    pattern = pattern.replaceAll(/\\u\{([0-9a-fA-F]{3})\}/g, `\\u0$1`);
+    pattern = pattern.replaceAll(/\\u\{([0-9a-fA-F]{2})\}/g, `\\u00$1`);
+    pattern = pattern.replaceAll(/\\u\{([0-9a-fA-F]{1})\}/g, `\\u000$1`);
+    return pattern;
+  }
+
   /**
    *
    * @param pattern UnicodeSet pattern such as `[a-z]`
@@ -436,6 +447,8 @@ export class KmnCompiler implements UnicodeSetParser {
 
     // TODO-LDML: Catch OOM
     const buf = this.wasmExports.malloc(rangeCount * 2 * Module.HEAPU32.BYTES_PER_ELEMENT);
+    // fix \u1234 pattern format
+    pattern = KmnCompiler.fixNewPattern(pattern);
     /** If <= 0: return code. If positive: range count */
     const rc = Module.kmcmp_parseUnicodeSet(pattern, buf, rangeCount * 2);
     if (rc >= 0) {
@@ -460,6 +473,8 @@ export class KmnCompiler implements UnicodeSetParser {
       /* c8 ignore next 2 */
       return null;
     }
+    // fix \u1234 pattern format
+    pattern = KmnCompiler.fixNewPattern(pattern);
     // call with rangeCount = 0 to invoke in 'preflight' mode.
     const rc = Module.kmcmp_parseUnicodeSet(pattern, 0, 0);
     if (rc >= 0) {

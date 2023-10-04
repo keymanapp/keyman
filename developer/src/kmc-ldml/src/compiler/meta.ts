@@ -20,8 +20,8 @@ export class MetaCompiler extends SectionCompiler {
   public validate(): boolean {
     let valid = true;
 
-    valid &&= this.validateNormalization(this.keyboard.info?.normalization);
-    valid &&= this.validateVersion(this.keyboard.version?.number);
+    valid &&= this.validateNormalization(this.keyboard3.info?.normalization);
+    valid &&= this.validateVersion(this.keyboard3.version?.number);
 
     return valid;
   }
@@ -53,16 +53,16 @@ export class MetaCompiler extends SectionCompiler {
 
   public compile(sections: DependencySections): Meta {
     let result = new Meta();
-    result.author        = sections.strs.allocString(this.keyboard.info?.author);
-    result.conform       = sections.strs.allocString(this.keyboard.conformsTo);
-    result.layout        = sections.strs.allocString(this.keyboard.info?.layout);
-    result.normalization = sections.strs.allocString(this.keyboard.info?.normalization);
-    result.indicator     = sections.strs.allocString(this.keyboard.info?.indicator);
-    result.version       = sections.strs.allocString(this.keyboard.version?.number ?? "0.0.0");
+    result.author        = sections.strs.allocString(this.keyboard3.info?.author);
+    result.conform       = sections.strs.allocString(this.keyboard3.conformsTo);
+    result.layout        = sections.strs.allocString(this.keyboard3.info?.layout);
+    result.normalization = sections.strs.allocString(this.keyboard3.info?.normalization);
+    result.indicator     = sections.strs.allocString(this.keyboard3.info?.indicator);
+    result.version       = sections.strs.allocString(this.keyboard3.version?.number ?? "0.0.0");
     result.settings =
-      (this.keyboard.settings?.fallback == "omit" ? KeyboardSettings.fallback : 0) |
-      (this.keyboard.settings?.transformFailure == "omit" ? KeyboardSettings.transformFailure : 0) |
-      (this.keyboard.settings?.transformPartial == "hide" ? KeyboardSettings.transformPartial : 0);
+      (this.keyboard3.settings?.fallback == "omit" ? KeyboardSettings.fallback : 0) |
+      (this.keyboard3.settings?.transformFailure == "omit" ? KeyboardSettings.transformFailure : 0) |
+      (this.keyboard3.settings?.transformPartial == "hide" ? KeyboardSettings.transformPartial : 0);
     return result;
   }
 }

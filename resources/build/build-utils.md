@@ -510,8 +510,8 @@ builder_describe_internal_dependency action:target depaction:deptarget ...
 
 ```bash
 builder_describe_internal_dependency \
-  mac:build mac-x86_64:build \
-  mac:build mac-arm64:build
+  build:mac build:mac-x86_64 \
+  build:mac build:mac-arm64
 ```
 
 **Note:** actions and targets must be fully specified, and this _must_ be called
