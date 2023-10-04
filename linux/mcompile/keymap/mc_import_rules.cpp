@@ -27,16 +27,16 @@
 #include "mc_kmxfile.h"
 
 enum ShiftState {
-    Base = 0,                    // 0
-    Shft = 1,                    // 1
-    Ctrl = 2,                    // 2
-    ShftCtrl = Shft | Ctrl,          // 3
-    Menu = 4,                    // 4 -- NOT USED
-    ShftMenu = Shft | Menu,          // 5 -- NOT USED
-    MenuCtrl = Menu | Ctrl,          // 6
-    ShftMenuCtrl = Shft | Menu | Ctrl,   // 7
-    Xxxx = 8,                    // 8
-    ShftXxxx = Shft | Xxxx,          // 9
+    Base = 0,                           // 0
+    Shft = 1,                           // 1
+    Ctrl = 2,                           // 2
+    ShftCtrl = Shft | Ctrl,             // 3
+    Menu = 4,                           // 4 -- NOT USED
+    ShftMenu = Shft | Menu,             // 5 -- NOT USED
+    MenuCtrl = Menu | Ctrl,             // 6
+    ShftMenuCtrl = Shft | Menu | Ctrl,  // 7
+    Xxxx = 8,                           // 8
+    ShftXxxx = Shft | Xxxx,             // 9
 };
 
 const int KMX_ShiftStateMap[] = {
@@ -49,7 +49,8 @@ const int KMX_ShiftStateMap[] = {
   ISVIRTUALKEY | RALTFLAG,
   ISVIRTUALKEY | RALTFLAG | K_SHIFTFLAG,
   0,
-  0};
+  0
+};
 
 class DeadKey {
 private:
@@ -178,7 +179,6 @@ public:
     this->m_rgfDeadKey[(UINT)shiftState][(capsLock ? 1 : 0)] = isDeadKey;
     this->m_rgss[(UINT)shiftState][(capsLock ? 1 : 0)] = value;
   }
-
 
   bool KMX_IsSGCAPS() {
     std::wstring stBase = this->KMX_GetShiftState(Base, false);
@@ -547,8 +547,6 @@ PKMX_WCHAR KMX_incxstr(PKMX_WCHAR p) {
   return p;
 }
 
-
-
 int KMX_GetMaxDeadkeyIndex(KMX_WCHAR *p) {
   int n = 0;
   while(p && *p) {
@@ -562,8 +560,6 @@ int KMX_GetMaxDeadkeyIndex(KMX_WCHAR *p) {
   }
   return n;
 }
-
-
 
 // _S2 has to go !!
 bool  write_rgKey_ToFile(std::vector<KMX_VirtualKey*> rgKey ){
@@ -630,7 +626,6 @@ bool KMX_ImportRules(KMX_WCHAR *kbid, LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector,std
                                                                                           */
 
   KMX_HKL hkl = NULL;               //_S2 added: but can I do this?? hkl is not needed in Linux??
-
 
   BYTE lpKeyState[256];// = new KeysEx[256];
   std::vector<KMX_VirtualKey*> rgKey; //= new VirtualKey[256];
@@ -779,20 +774,15 @@ bool KMX_ImportRules(KMX_WCHAR *kbid, LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector,std
     //}
     LPKMX_KEY kkp = gp->dpKeyArray;
 
-int STOP=0;
     for(UINT j = 0; j < gp->cxKeyArray; j++, kkp++) {
       nDeadkey = std::max(nDeadkey, KMX_GetMaxDeadkeyIndex(kkp->dpContext));
       nDeadkey = std::max(nDeadkey, KMX_GetMaxDeadkeyIndex(kkp->dpOutput));
     }
   }
 
-
   kp->cxGroupArray++;
   gp = &kp->dpGroupArray[kp->cxGroupArray-1];
 
-int STOP2=0;
-
-// _S2 need to change mapping win-lin before i can get correct values here!
   UINT nKeys = 0;
   for (UINT iKey = 0; iKey < rgKey.size(); iKey++) {
     if ((rgKey[iKey] != NULL) && rgKey[iKey]->KMX_IsKeymanUsedKey() && (!rgKey[iKey]->KMX_IsEmpty())) {
@@ -837,7 +827,7 @@ int STOP2=0;
       *p++ = (KMX_WCHAR)(kp->cxGroupArray);
       *p = 0;
 
-      //
+      // _S2 TODO not sure if this works OK -> we need to use more shiftstates than base+Shift
       // I4550 - Each place we have a nomatch > use(baselayout) (this last group), we need to add all 
       // the AltGr and ShiftAltGr combinations as rules to allow them to be matched as well.  Yes, this
       // loop is not very efficient but it's not worthy of optimisation.
@@ -865,7 +855,7 @@ int STOP2=0;
     }
   }
 
-  //
+  // _S2 TODO not sure if this works OK -> we need to use deadkeys...
   // If we have deadkeys, then add a new group to translate the deadkeys per the deadkey tables
   // We only do this if not in deadkey conversion mode
   //

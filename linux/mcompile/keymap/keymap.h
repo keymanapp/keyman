@@ -44,88 +44,16 @@ const KMX_DWORD KMX_VKMap[] = {
 };
 
 // mapping between Linux keycodes and keyman SC
-const int keycode_map_old[67]={
+const int keycode_map[60]={
   0,   /* */
-  0,   /* */
-  0,   /* */
-  0,   /* */
-  0,   /* */
-  0,   /* */
-  0,   /* */
-  0,   /* */
-  0,   /* */
-  0,   /* */
-  2,   /*10. 1 */
-  3,   /*11. 2 */
-  4,   /*12. 3 */
-  5,   /*13. 4 */
-  6,   /*14. 5 */
-  7,   /*15. 6 */
-  8,   /*16. 7 */
-  9,   /*17. 8 */
-  10,  /*18. 9 */
-  11,  /*19. 0 */
-  12,  /*20. MINUS */
-  13,  /*21. EQUALS*/
-      14,  /*22. BACKSPACE*/
-      15,  /*23. TAB*/
-  16,   /* 24. Q */
-  17,  /* 25. W */
-  18,  /* 26. E */
-  19,  /* 27. R */
-  20,  /* 28. T */
-  21,  /* 29. Z */
-  22,  /* 30. U */
-  23,  /* 31. I*/
-  24,  /* 32. O*/
-  25,  /* 33. P*/
-  26,  /*34. LEFTBRACE*/
-  27,  /*35. RIGHTBRACE*/
-      28,  /*36. ENTER*/
-      29,  /*37. LEFTCTRL*/
-  30,  /* 38. A */
-  31,  /* 39. S */
-  32,  /* 40. D */
-  33,  /* 41. F */
-  34,  /* 42. G */
-  35,  /* 43. H */
-  36,  /* 44. J */
-  37,  /* 45. K */
-  38,  /* 46. L */
-  39,   /*47. SEMICOLON*/
-  40,   /*48. APOSTROPHE*/
-      41,   /*49. GRAVE*/
-      42,   /*50. LEFTSHIFT*/
-      43,   /*51. BACKSLASH*/
-  44,  /*52. Z */
-  45,  /*53. X */
-  46,  /*54. C */
-  47,  /*55. V */
-  48,  /*56. B */
-  49,  /*57. N */
-  50,  /*58. M */
-  51,  /*59. COMMA */
-  52,  /*60. DOT */
-      53,  /*61. SLASH */
-      54,  /*62. R_SHIFT */
-      55,  /*63. * */
-      56,  /*64. LEFTALT*/
-      57,  /*65. SPACE*/
-      58  /*66. CAPSLOCK*/
-};
-
-
-// mapping between Linux keycodes and keyman SC
-const int keycode_map[67]={
-  0,   /* */
-  10,   /*10. 1 */
-  11,   /*11. 2 */
-  12,   /*12. 3 */
-  13,   /*13. 4 */
-  14,   /*14. 5 */
-  15,   /*15. 6 */
-  16,   /*16. 7 */
-  17,   /*17. 8 */
+  10,  /*10. 1 */
+  11,  /*11. 2 */
+  12,  /*12. 3 */
+  13,  /*13. 4 */
+  14,  /*14. 5 */
+  15,  /*15. 6 */
+  16,  /*16. 7 */
+  17,  /*17. 8 */
   18,  /*18. 9 */
   19,  /*19. 0 */
   20,  /*20. MINUS */
@@ -133,7 +61,7 @@ const int keycode_map[67]={
       22,  /*22. BACKSPACE*/
       23,  /*23. TAB*/
   0,   /* */
-  24,   /* 16.. Q */
+  24,  /* 16.. Q */
   25,  /* 7. W */
   26,  /* 18. E */
   27,  /* 19. R */
@@ -156,8 +84,8 @@ const int keycode_map[67]={
   44,  /* 36. J */
   45,  /* 37. K */
   46,  /* 38. L */
-  47,   /*39. SEMICOLON*/
-  48,   /*40. APOSTROPHE*/
+  47,  /*39. SEMICOLON*/
+  48,  /*40. APOSTROPHE*/
       49,   /*41. GRAVE*/
       50,   /*42. LEFTSHIFT*/
       51,   /*43. BACKSLASH*/
@@ -177,13 +105,6 @@ const int keycode_map[67]={
       65,  /*57. SPACE*/
       66 , /*58. CAPSLOCK*/
   0,   /* */
-  0,   /* */
-  0,   /* */
-  0,   /* */
-  0,   /* */
-  0,   /* */
-  0,   /* */
-  0    /* */
 };
 
 // this is what we return when we find an invalid character
@@ -208,12 +129,11 @@ int split_US_To_3D_Vector(v_dw_3D &all_US, v_str_1D completeList);
 // replace Name of Key (e.g. <AD06>)  wih Keycode ( e.g. 15 )
 int replace_PosKey_with_Keycode(std::string in);
 
-
 // create an empty 2D vector containing "--" in all fields
 v_dw_2D create_empty_2D(int dim_rows, int dim_shifts);
 
 // get Keyvals from VectorFile.txt and insert into All_Vector
-bool InsertKeyvalsFromVectorFile(v_dw_3D &All_Vector);
+//bool InsertKeyvalsFromVectorFile(v_dw_3D &All_Vector);
 
 // query All_Vector
 // return the VirtualKey of the Other Keyboard for given Scancode

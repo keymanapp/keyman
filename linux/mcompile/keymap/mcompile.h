@@ -28,7 +28,9 @@
 #include "mc_kmxfile.h"
 
 int run(int argc, std::vector<std::u16string>  str_argv, char* argv[]);
+
 void KMX_LogError(const KMX_WCHART* m1, int m2 = 0);
+
 //void KMX_LogError(const KMX_WCHART* m1, int m2 = 0, LPKMX_KEY key =NULL);
 
 struct KMX_DeadkeyMapping {   // I4353

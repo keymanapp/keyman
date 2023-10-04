@@ -8,12 +8,13 @@
 #include "keymap.h"
 
 
+//_S2 do not review - all this will be deleted later
+
 // why again here?
 typedef std::vector<std::string> v_str_1D;
 typedef std::vector<KMX_DWORD> v_dw_1D;
 typedef std::vector<std::vector<KMX_DWORD> > v_dw_2D;
 typedef std::vector<std::vector<std::vector<KMX_DWORD> > > v_dw_3D;
-
 
 int test_helpers();
 
@@ -25,7 +26,6 @@ bool InsertKeyvalsFromVectorFile(v_dw_3D &complete_Vector) ;
 
 // create a Vector with all entries of file
 int createOneVectorFromBothKeyboards(v_dw_3D &All_Vector);
-
 
 bool writeVectorToFile(v_dw_3D V) ;
 bool writeFileToVector(v_dw_3D& complete_Vector, const char* infile);

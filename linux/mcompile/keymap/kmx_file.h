@@ -308,8 +308,8 @@ struct KMX_COMP_STORE {
   };
 
 struct KMX_COMP_KEY {
-  KMX_WORD  Key;
-  KMX_WORD  _reserved;
+  KMX_WORD Key;
+  KMX_WORD _reserved;
   KMX_DWORD Line;
   KMX_DWORD ShiftFlags;
   KMX_DWORD dpOutput;
@@ -360,8 +360,6 @@ struct KMX_COMP_KEYBOARD_KMXPLUSINFO {
 /**
  * Only valid if comp_keyboard.dwFlags&KF_KMXPLUS
  */
-
-
 struct KMX_COMP_KEYBOARD_EX {
   KMX_COMP_KEYBOARD             header;    // 0000 see COMP_KEYBOARD
   KMX_COMP_KEYBOARD_KMXPLUSINFO kmxplus;   // 0040 see COMP_KEYBOARD_EXTRA

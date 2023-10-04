@@ -1,12 +1,13 @@
 
 #include "helpers.h"
 
+//_S2 do not review - all this will be deleted later
+
 int test_helpers(){
  wprintf(L"##### test_helpers is here and USE_GDK is %i\n", USE_GDK);
 }
 
 int append_other_ToVector(v_dw_3D &All_Vector) {
-
   InsertKeyvalsFromVectorFile(All_Vector);
   return 0;
 }
@@ -78,7 +79,6 @@ int createOneVectorFromBothKeyboards(v_dw_3D &All_Vector){
   //wprintf(L"   +++++++ dimensions of Vector in createOneVectorFromBothKeyboards 3 \t\t\t\t\t\t %li..%li..%li\n", All_Vector.size(), All_Vector[0].size(),All_Vector[0][0].size());
   return 0;
 }
-
 
 bool writeVectorToFile(v_dw_3D V) {
   std::string TxtFileName  = "/Projects/keyman/keyman/linux/mcompile/keymap/VectorFile2.txt" ;
@@ -222,7 +222,6 @@ bool CompareVector_To_VectorOfFile_RGKEY(v_dw_2D Win_Vector,v_dw_2D Lin_Vector, 
   return true;
   }
 
-
 /*bool CompareVector_To_VectorOfFile_RGKEY(v_dw_2D Win_Vector,v_dw_2D Lin_Vector, v_dw_2D Map_Vector){
   wprintf(L" #### CompareVector_To_VectorOfFile started: ");
   wprintf(L" #### dimensions:  %i  %i  -- %i  %i  \n", Win_Vector.size() ,Win_Vector[0].size(), Lin_Vector.size() ,Lin_Vector[0].size());
@@ -309,9 +308,6 @@ bool write_RGKEY_FileToVector(v_dw_2D& shift_states, const char* infile) {
   fclose(fp);
   return(0);
 }
-
-
-
 
 bool test_In_Out(v_dw_3D All_Vector){
 

@@ -107,7 +107,7 @@ int run(int argc, std::vector<std::u16string> str_argv, char* argv_ch[] = NULL){
      return 1;
    }
 
-//-_S2 -------u option will be done later----------------------
+//-_S2 -------u option will be done later DFo we need it?? ----------------------
 
  /* if(wcscmp(argv[1], L"-u") == 0) { // I4273
     wchar_t *infile = argv[2], *outfile = argv[3];
@@ -245,15 +245,19 @@ KMX_WORD KMX_VKUnderlyingLayoutToVKUS(KMX_WORD VKey) {
   return VKey;
 }
 
-
 // takes cpital character of Other keyboard and returns character of Other keyboard with shiftstate VKShiftState[j]
 KMX_DWORD KMX_CharFromVK(v_dw_3D &All_Vector,KMX_DWORD vkUnderlying, KMX_UINT VKShiftState, KMX_WCHAR* DeadKey){
 
   KMX_UINT VKShiftState_lin;
-  if (VKShiftState == 0 )      VKShiftState_lin =0;
-  if (VKShiftState == 16)      VKShiftState_lin =1;
-  if (VKShiftState == 9 )      VKShiftState_lin =2;
-  if (VKShiftState == 25)      VKShiftState_lin =3;
+
+  /* 0000 0000 */
+  if (VKShiftState == 0 )      VKShiftState_lin = 0;
+  /* 0001 0000 */
+  if (VKShiftState == 16)      VKShiftState_lin = 1;
+  /* 0000 1001 */
+  if (VKShiftState == 9 )      VKShiftState_lin = 2;
+   /* 0001 1001 */
+  if (VKShiftState == 25)      VKShiftState_lin = 3;
 
   // loop and find vkUnderlying in Other; then return char with correct shiftstate
   for( int i=0; i< (int)All_Vector[1].size();i++) {
@@ -368,7 +372,6 @@ KMX_BOOL KMX_DoConvert(LPKMX_KEYBOARD kbd, PKMX_WCHAR kbid, KMX_BOOL bDeadkeyCon
     // Loop through each possible key on the keyboard
     for (int i = 0;KMX_VKMap[i]; i++) { // I4651
 
-      // _S2 why were those 2 functions originally not done in 1 step ??
       KMX_DWORD vkUnderlying = KMX_VKUSToVKUnderlyingLayout(All_Vector,(int) KMX_VKMap[i] );
 
       KMX_WCHAR ch = KMX_CharFromVK(All_Vector,vkUnderlying, VKShiftState[j], &DeadKey);
@@ -410,7 +413,6 @@ wprintf(L"\n##### KMX_ReportUnconvertedKeyboardRules of mcompile will start ####
   if(!KMX_ImportRules(kbid, kbd, All_Vector, &KMX_FDeadkeys, bDeadkeyConversion)) {   // I4353   // I4552
     return FALSE;
   }
-/**/
 
   wprintf(L"\n##### KMX_DoConvert of mcompile ended #####\n");
   return TRUE;

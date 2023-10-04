@@ -9,8 +9,6 @@
 
 #include <iostream>		// _S2 can be removed later
 
-//+++++++++++++++++++++++++++++++++++
-
 #ifndef _KMXFILE_H
 #define _KMXFILE_H
 
@@ -31,7 +29,6 @@ typedef struct KMX_tagKEY {
 } KMX_KEY, *LPKMX_KEY;
 
 
-
 typedef struct KMX_tagGROUP {
 	KMX_WCHAR* dpName;
 	LPKMX_KEY dpKeyArray;		// [LPKEY] address of first item in key array
@@ -40,7 +37,6 @@ typedef struct KMX_tagGROUP {
 	KMX_DWORD cxKeyArray;		// in array entries  // _S2 was DWORD
 	int32_t  fUsingKeys;		// group(xx) [using keys] <-- specified or not
 } KMX_GROUP, *LPKMX_GROUP;
-
 
 
 typedef struct KMX_tagKEYBOARD {
@@ -76,9 +72,11 @@ typedef struct KMX_tagKEYBOARD {
 	//HBITMAP	hBitmap;		// handle to the bitmap in the file;
 } KMX_KEYBOARD, *LPKMX_KEYBOARD;
 
-KMX_BOOL KMX_LoadKeyboard(char16_t* fileName, LPKMX_KEYBOARD *lpKeyboard);		// _S2 LPKEYBOARD ok to leave as is??
+
+KMX_BOOL KMX_LoadKeyboard(char16_t* fileName, LPKMX_KEYBOARD *lpKeyboard);
 
 KMX_BOOL KMX_SaveKeyboard(LPKMX_KEYBOARD kbd, PKMX_WCHAR filename);
+
 KMX_DWORD KMX_WriteCompiledKeyboard(LPKMX_KEYBOARD fk, FILE* hOutfile, KMX_BOOL FSaveDebug);
 #endif
 

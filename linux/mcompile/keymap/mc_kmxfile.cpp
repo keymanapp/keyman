@@ -76,7 +76,6 @@ KMX_DWORD KMX_WriteCompiledKeyboard(LPKMX_KEYBOARD fk, FILE* hOutfile, KMX_BOOL 
 		if( fgp->dpNoMatch ) size += u16len(fgp->dpNoMatch)*2 + 2;
 	}
 
-
 	for(i = 0; i < fk->cxStoreArray; i++)
 	{
 		size += u16len(fk->dpStoreArray[i].dpString)*2 + 2;
@@ -226,6 +225,7 @@ PKMX_WCHAR KMX_StringOffset(PKMX_BYTE base, KMX_DWORD offset) {
 }
 
 #ifdef KMX_64BIT
+
 /**
   CopyKeyboard will copy the data read into bufp from x86-sized structures into
   x64-sized structures starting at `base`
