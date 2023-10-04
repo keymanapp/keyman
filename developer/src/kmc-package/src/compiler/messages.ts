@@ -119,5 +119,9 @@ export class CompilerMessages {
   static Hint_JsKeyboardFileHasNoTouchTargets = (o:{id:string}) => m(this.HINT_JsKeyboardFileHasNoTouchTargets,
     `The keyboard ${o.id} has been included for touch platforms, but does not include a touch layout.`);
   static HINT_JsKeyboardFileHasNoTouchTargets = SevHint | 0x001C;
+
+  static Hint_PackageContainsSourceFile = (o:{filename:string}) => m(this.HINT_PackageContainsSourceFile,
+    `The source file ${o.filename} should not be included in the package; instead include the compiled result.`);
+  static HINT_PackageContainsSourceFile = SevHint | 0x001D;
 }
 

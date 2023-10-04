@@ -1,5 +1,12 @@
 # Keyman Version History
 
+## 17.0.185 alpha 2023-10-03
+
+* chore(web): Add non-printing characters to the OSK (#9547)
+* feat(developer): support `store(&version) '17.0'` (#9656)
+* chore(developer): add test for `checkFilenameConventions == false` or unset (#9661)
+* feat(developer): ldml scan codes support (#9615)
+
 ## 17.0.184 alpha 2023-10-02
 
 * fix(web): fixes toolbar refocus timing after a keyboard change (#9618)

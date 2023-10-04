@@ -71,5 +71,9 @@ export class InfrastructureMessages {
   static Error_NotAProjectFile = (o:{filename:string}) => m(this.ERROR_NotAProjectFile,
     `File ${o.filename} must have a .kpj extension to be treated as a project.`);
   static ERROR_NotAProjectFile = SevError | 0x000F;
+
+  static Info_WarningsHaveFailedBuild = () => m(this.INFO_WarningsHaveFailedBuild,
+    `The build failed because option "treat warnings as errors" is enabled and there are one or more warnings.`);
+  static INFO_WarningsHaveFailedBuild = SevInfo | 0x0010;
 }
 
