@@ -3,7 +3,7 @@
 <keyboardTest3 conformsTo="techpreview">
   <info keyboard="k_210_marker.xml" author="Team Keyboard" name="marker" />
   <tests name="marker-tests">
-    <!-- <test name="marker-test-basic-grave">
+    <test name="marker-test-basic-grave">
       <startContext to="" />
       <keystroke key="e" />
       <keystroke key="grave" />
@@ -35,18 +35,26 @@
       <startContext to="e" />
       <keystroke key="acute" />
       <check result="é" />
-    </test> -->
+    </test>
     <test name="marker-test-any-marker">
       <startContext to="" />
       <keystroke key="acute" />
       <keystroke key="z" />
       <check result="Z" />
     </test>
-    <!-- <test name="marker-test-trailing-acute">
+    <test name="marker-test-trailing-acute">
       <startContext to="" />
       <keystroke key="acute" />
-      TODO-LDML: broken, becasue without a rule to 'cleanup' trailing acute, we don't currently have code to fix it
       <check result="" />
-    </test> -->
+      <keystroke key="x" />
+      <check result="x" />
+    </test>
+    <test name="marker-test-trailing-acute2">
+      <startContext to="" />
+      <keystroke key="x" />
+      <check result="x" />
+      <keystroke key="acute" />
+      <check result="x" />
+    </test>
   </tests>
 </keyboardTest3>
