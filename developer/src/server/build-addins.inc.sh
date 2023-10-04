@@ -11,7 +11,7 @@ isNodeX64() {
   # [[ $(file -b "$(which node)" | grep x86-64) ]] && echo 1 || echo 0
 }
 
-build_addins() {
+do_build_addins() {
   local NODEX64=$(isNodeX64)
   local ARCH=x64
   local TRAYICON_TARGET=addon.x64.node

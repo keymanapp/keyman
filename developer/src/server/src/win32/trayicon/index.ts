@@ -1,8 +1,17 @@
-const os = require('os');
+import * as os from 'os';
+import { createRequire } from 'node:module';
+const require = createRequire(import.meta.url);
 const { CTrayIconContainer } = require(os.arch() == 'ia32' ? "./addon" : "./addon.x64");
 
 class WindowsTrayicon {
-	constructor(options) {
+	__itemCallbacks: any[];
+	__icon: any;
+	__trayTitle: any;
+	__menuItems: any;
+	__nativeTray: any;
+
+
+	constructor(options: any) {
 		this.__itemCallbacks = [];
 		this.__icon = options.icon;
 		this.__trayTitle = options.title || "";
@@ -12,7 +21,7 @@ class WindowsTrayicon {
 		for (const item of this.__menuItems) {
 			this.__nativeTray.AddMenuItem(item.id, item.caption);
 		}
-		this.__nativeTray.OnMenuItem((id) => {
+		this.__nativeTray.OnMenuItem((id: any) => {
 			for (const cb of this.__itemCallbacks) {
 				cb(id);
 			}
@@ -23,15 +32,15 @@ class WindowsTrayicon {
 		}
 		this.__nativeTray.Start();
 	}
-	item(cb) {
+	item(cb: any) {
 		if ("function" === typeof cb) {
 			this.__itemCallbacks.push(cb);
 		}
 	}
-	balloon(title, text, timeout = 5000) {
+	balloon(title: any, text: any, timeout = 5000) {
 		return new Promise((resolve) => {
 			this.__nativeTray.ShowBalloon(title, text, timeout, () => {
-				resolve();
+				resolve(null);
 			})
 		});
 	}
@@ -40,4 +49,4 @@ class WindowsTrayicon {
 	}
 }
 
-module.exports = WindowsTrayicon;
+export default WindowsTrayicon;
