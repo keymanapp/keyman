@@ -101,8 +101,8 @@ These dependencies are also listed below if you'd prefer to install manually.
   sdkmanager --licenses
   ```
 
-* kmcomp (optional): WINE
-  - Required to build keyboards using kmcomp
+* kmc (optional): node
+  - Required to build keyboards using kmc
 
   ```bash
   brew tap homebrew/cask-versions

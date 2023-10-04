@@ -11,10 +11,9 @@
   ],
   "scripts": {
     "build": "tsc -b",
-    "bundle": "npm run bundle-kmc && npm run bundle-kmlmc && npm run bundle-kmlmi && npm run bundle-kmlmp",
+    "bundle": "npm run bundle-kmc && npm run bundle-kmlmc && npm run bundle-kmlmp",
     "bundle-kmc": "esbuild build/src/kmc.js --bundle --platform=node --target=es2022 > build/cjs-src/kmc.cjs",
     "bundle-kmlmc": "esbuild build/src/kmlmc.js --bundle --platform=node --target=es2022 > build/cjs-src/kmlmc.cjs",
-    "bundle-kmlmi": "esbuild build/src/kmlmi.js --bundle --platform=node --target=es2022 > build/cjs-src/kmlmi.cjs",
     "bundle-kmlmp": "esbuild build/src/kmlmp.js --bundle --platform=node --target=es2022 > build/cjs-src/kmlmp.cjs",
     "test": "eslint . && cd test && tsc -b && cd .. && mocha",
     "prepublishOnly": "npm run build"
@@ -33,8 +32,7 @@
   "bin": {
     "kmc": "build/src/kmc.js",
     "kmlmc": "build/src/kmlmc.js",
-    "kmlmp": "build/src/kmlmp.js",
-    "kmlmi": "build/src/kmlmi.js"
+    "kmlmp": "build/src/kmlmp.js"
   },
   "dependencies": {
     "@keymanapp/common-types": "*",

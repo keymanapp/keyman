@@ -34,11 +34,13 @@ describe('compilerWarningsAsErrors', function () {
       const builder = new BuildProject();
       const path = makePathToFixture('compiler-warnings-as-errors',
         `compiler_warnings_as_errors_${truth.kpj === true ? 'true' : (truth.kpj === false ? 'false' : 'undefined')}.kpj`);
-      const result = await builder.build(path, callbacks, {compilerWarningsAsErrors: truth.cli});
+      const result = await builder.build(path, callbacks, {
+        compilerWarningsAsErrors: truth.cli,
+      });
+      if(truth.result != result) {
+        callbacks.printMessages();
+      }
       if(truth.result) {
-        if(callbacks.messages.length != 0) {
-          callbacks.printMessages();
-        }
         assert.isTrue(result);
       } else {
         assert.isFalse(result);

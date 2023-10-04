@@ -1,8 +1,0 @@
-﻿store(&NAME) 'Test Empty Store Name'
-begin Unicode > use(main)
-
-group(main) using keys
-
-store(a) 'abc'
-
-any(a) + 'a' > index(a,1)

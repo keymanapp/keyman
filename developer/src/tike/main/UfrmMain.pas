@@ -272,7 +272,6 @@ type
     CompileModel1: TMenuItem;
     N2: TMenuItem;
     estLexicalModel1: TMenuItem;
-    mnuToolsDebugTestsCompilerExceptionTest: TMenuItem;
     mnuToolsDebugTestsShowDebuggerEventsPanel: TMenuItem;
     N3: TMenuItem;
     N4: TMenuItem;
@@ -302,7 +301,6 @@ type
     procedure pagesChange(Sender: TObject);
     procedure pagesCloseTab(Sender: TObject; Index: Integer);
     procedure mnuToolsClick(Sender: TObject);
-    procedure mnuToolsDebugTestsCompilerExceptionTestClick(Sender: TObject);
     procedure mnuToolsDebugTestsShowDebuggerEventsPanelClick(Sender: TObject);
     procedure ApplicationEvents1Message(var Msg: tagMSG; var Handled: Boolean);
 
@@ -1435,12 +1433,6 @@ end;
 procedure TfrmKeymanDeveloper.cbTextFileFormatItemClick(Sender: TObject);
 begin
   modActionsMain.actToolsFileFormat.Execute;
-end;
-
-procedure TfrmKeymanDeveloper.mnuToolsDebugTestsCompilerExceptionTestClick(
-  Sender: TObject);
-begin
-  Compiler_Diagnostic(0);
 end;
 
 procedure TfrmKeymanDeveloper.mnuToolsDebugTestsExceptionTestClick(Sender: TObject);
