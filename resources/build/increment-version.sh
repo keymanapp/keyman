@@ -88,9 +88,7 @@ echo "increment-version.sh: building resources/build/version"
 pushd "$KEYMAN_ROOT"
 npm ci
 
-pushd "$KEYMAN_ROOT/resources/build/version"
-npm run build:ts
-popd
+"$KEYMAN_ROOT/resources/build/version/build.sh"
 
 echo "increment-version.sh: running resources/build/version"
 pushd "$KEYMAN_ROOT"

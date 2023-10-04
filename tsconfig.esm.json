@@ -47,6 +47,8 @@
     // { "path": "./web/tools/sourcemap-root/tsconfig.json" },
     { "path": "./common/web/lm-message-types/" },
     { "path": "./common/web/lm-worker/" },
-    { "path": "./common/tools/hextobin/" }
+    { "path": "./common/tools/hextobin/" },
+
+    { "path": "./resources/build/version/" },
   ]
 }
