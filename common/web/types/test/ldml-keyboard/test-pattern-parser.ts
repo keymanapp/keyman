@@ -75,6 +75,7 @@ describe('Test of Pattern Parsers', () => {
             'a': 0,
             'b': 1,
             'c': 2,
+            'zz': MarkerParser.MAX_MARKER_INDEX - 1, // this is an ordering, so needs to be -1
             'zzz': 0x2FFFFF,
           };
           const o = m[item];
@@ -103,6 +104,17 @@ describe('Test of Pattern Parsers', () => {
           markers
         )
       );
+      // verify the matching behavior of these
+      assert.isTrue(new RegExp(MarkerParser.toSentinelString(`Q\\m{a}`, markers, true), 'u')
+        .test(MarkerParser.toSentinelString(`Q\\m{a}`, markers, false)), `Q\\m{a} did not match`);
+      assert.isFalse(new RegExp(MarkerParser.toSentinelString(`Q\\m{a}`, markers, true), 'u')
+        .test(MarkerParser.toSentinelString(`Q\\m{b}`, markers, false)), `Q\\m{a} should not match Q\\m{b}`);
+      assert.isTrue(new RegExp(MarkerParser.toSentinelString(`Q\\m{.}`, markers, true), 'u')
+        .test(MarkerParser.toSentinelString(`Q\\m{a}`, markers, false)), `Q\\m{.} did not match Q\\m{a}`);
+      assert.isTrue(new RegExp(MarkerParser.toSentinelString(`Q\\m{.}`, markers, true), 'u')
+        .test(MarkerParser.toSentinelString(`Q\\m{zz}`, markers, false)), `Q\\m{.} did not match Q\\m{zz} (max marker)`);
+      assert.isFalse(new RegExp(MarkerParser.toSentinelString(`Q\\m{.}`, markers, true), 'u')
+        .test(MarkerParser.toSentinelString(`\\m{a}`, markers, false)), `Q\\m{.} did not match \\m{a}`);
     });
     it('should match some marker constants', () => {
       assert.equal(constants.uc_sentinel, KMXFile.UC_SENTINEL);

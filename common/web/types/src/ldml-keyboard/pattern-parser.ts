@@ -64,6 +64,9 @@ export class MarkerParser {
   public static readonly MAX_MARKER_INDEX = constants.marker_max_index;
   /** Max count of markers */
   public static readonly MAX_MARKER_COUNT = constants.marker_max_count;
+  /** Expression that matches any marker */
+  public static readonly ANY_MARKER_MATCH =
+    this.SENTINEL + this.MARKER_CODE + `[\\u0001-\\u${this.MAX_MARKER_INDEX.toString(16)}]`;
 
   /**
    * Pattern for matching a marker reference, OR the special marker \m{.}
@@ -91,10 +94,13 @@ export class MarkerParser {
   }
 
   /** @returns all marker strings as sentinel values */
-  public static toSentinelString(s: string, markers?: OrderedStringList) : string {
+  public static toSentinelString(s: string, markers?: OrderedStringList, forMatch?: boolean) : string {
     if (!s) return s;
     return s.replaceAll(this.REFERENCE, (sub, arg) => {
       if (arg === MarkerParser.ANY_MARKER_ID) {
+        if (forMatch) {
+          return this.ANY_MARKER_MATCH;
+        }
         return MarkerParser.markerOutput(MarkerParser.ANY_MARKER_INDEX);
       }
       if (!markers) {
@@ -103,10 +109,10 @@ export class MarkerParser {
       const order = markers.getItemOrder(arg);
       if (order === -1) {
         throw RangeError(`Internal Error: Could not find marker \\m{${arg}}`);
-      } else if(order >= MarkerParser.MAX_MARKER_INDEX) {
+      } else if(order > MarkerParser.MAX_MARKER_INDEX) {
         throw RangeError(`Internal Error: marker \\m{${arg}} has out of range index ${order}`);
       } else {
-        return MarkerParser.markerOutput(order+1);
+        return MarkerParser.markerOutput(order + 1);
       }
     });
   }
