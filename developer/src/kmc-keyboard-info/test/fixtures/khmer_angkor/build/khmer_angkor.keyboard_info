@@ -15,7 +15,13 @@
         ]
       },
       "examples": [{
-        "keys": "x j m E r",
+        "keys": [
+          { "key": "x" },
+          { "key": "j" },
+          { "key": "m" },
+          { "key": "E" },
+          { "key": "r" }
+        ],
         "text": "\u1781\u17D2\u1798\u17C2\u179A",
         "note": "Name of language"
       }],

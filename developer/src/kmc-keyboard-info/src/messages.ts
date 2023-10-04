@@ -2,7 +2,7 @@ import { CompilerErrorNamespace, CompilerErrorSeverity, CompilerMessageSpec as m
 
 const Namespace = CompilerErrorNamespace.KeyboardInfoCompiler;
 // const SevInfo = CompilerErrorSeverity.Info | Namespace;
-// const SevHint = CompilerErrorSeverity.Hint | Namespace;
+const SevHint = CompilerErrorSeverity.Hint | Namespace;
 const SevWarn = CompilerErrorSeverity.Warn | Namespace;
 const SevError = CompilerErrorSeverity.Error | Namespace;
 const SevFatal = CompilerErrorSeverity.Fatal | Namespace;
@@ -45,5 +45,17 @@ export class KeyboardInfoCompilerMessages {
   static Error_NoLicenseFound = () => m(this.ERROR_NoLicenseFound,
     `No license for the keyboard was found. MIT license is required for publication to Keyman keyboards repository.`);
   static ERROR_NoLicenseFound = SevError | 0x000A;
+
+  static Hint_OutputValidation = (o:{message: any}) => m(this.HINT_OutputValidation,
+    `Validating output: ${o.message}.`);
+  static HINT_OutputValidation = SevHint | 0x000B;
+
+  static Warn_OutputValidation = (o:{message: any}) => m(this.WARN_OutputValidation,
+    `Validating output: ${o.message}.`);
+  static WARN_OutputValidation = SevWarn | 0x000C;
+
+  static Error_OutputValidation = (o:{message: any}) => m(this.ERROR_OutputValidation,
+    `Validating output: ${o.message}.`);
+  static ERROR_OutputValidation = SevError | 0x000D;
 }
 

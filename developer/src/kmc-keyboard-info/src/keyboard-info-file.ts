@@ -49,7 +49,12 @@ export interface KeyboardInfoFileLanguageFont {
 }
 
 export interface KeyboardInfoFileExample {
-  keys?: string;
+  keys?: KeyboardInfoFileExampleKey[];
   text?: string;
   note?: string;
+}
+
+export interface KeyboardInfoFileExampleKey {
+  key: string;
+  modifiers?: string[];
 }

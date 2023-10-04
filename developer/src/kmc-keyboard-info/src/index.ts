@@ -11,6 +11,14 @@ import langtags from "./imports/langtags.js";
 import { validateMITLicense } from "@keymanapp/developer-utils";
 import { KmpCompiler } from "@keymanapp/kmc-package";
 
+import AjvModule from 'ajv';
+import AjvFormatsModule from 'ajv-formats';
+const Ajv = AjvModule.default; // The actual expected Ajv type.
+const ajvFormats = AjvFormatsModule.default;
+
+import { Schemas } from "@keymanapp/common-types";
+import { packageKeysExamplesToKeyboardInfo } from "./example-keys.js";
+
 const regionNames = new Intl.DisplayNames(['en'], { type: "region" });
 const scriptNames = new Intl.DisplayNames(['en'], { type: "script" });
 const langtagsByTag = {};
@@ -281,6 +289,20 @@ export class KeyboardInfoCompiler {
     }
 
     const jsonOutput = JSON.stringify(keyboard_info, null, 2);
+
+    // TODO: look at performance improvements by precompiling Ajv schemas on first use
+    const ajv = new Ajv({ logger: {
+      log: (message) => this.callbacks.reportMessage(KeyboardInfoCompilerMessages.Hint_OutputValidation({message})),
+      warn: (message) => this.callbacks.reportMessage(KeyboardInfoCompilerMessages.Warn_OutputValidation({message})),
+      error: (message) => this.callbacks.reportMessage(KeyboardInfoCompilerMessages.Error_OutputValidation({message})),
+    }});
+    ajvFormats.default(ajv);
+    if(!ajv.validate(Schemas.default.keyboard_info, keyboard_info)) {
+      // This is an internal fatal error; we should not be capable of producing
+      // invalid output, so it is best to throw and die
+      throw new Error(ajv.errorsText());
+    }
+
     return new TextEncoder().encode(jsonOutput);
   }
 
@@ -380,9 +402,9 @@ export class KeyboardInfoCompiler {
         if(example.id == bcp47) {
           language.examples.push({
             // we don't copy over example.id
-            keys:example.keys,
-            note:example.note,
-            text:example.text
+            keys: packageKeysExamplesToKeyboardInfo(example.keys),
+            note: example.note,
+            text: example.text
           });
         }
       }
