@@ -19,7 +19,6 @@ do_clean() {
   # but we try not to use git commands in build scripts, to maintain clear
   # responsibility
   rm -rf \
-    "$THIS_SCRIPT_PATH/subprojects/packagecache" \
     "$THIS_SCRIPT_PATH/subprojects/icu" \
     "$THIS_SCRIPT_PATH/subprojects/*.tgz" \
     "$THIS_SCRIPT_PATH/subprojects/*.zip"
