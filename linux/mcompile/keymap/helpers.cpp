@@ -182,8 +182,6 @@ bool CompareVector_To_VectorOfFile(v_dw_3D All_Vector,v_dw_3D File_Vector){
   }
 
   return true;
-  wprintf(L" #### CompareVector_To_VectorOfFile ended \n");   //_S2 kommt hier nie hin
-  return false;                                               //_S2 kommt hier nie hin
 }
 
 bool CompareVector_To_VectorOfFile_RGKEY(v_dw_2D Win_Vector,v_dw_2D Lin_Vector, v_dw_2D Map_Vector){
