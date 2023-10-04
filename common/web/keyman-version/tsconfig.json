@@ -1,17 +1,11 @@
 {
-  "extends": "../../../tsconfig-base.json",
+  "extends": "../../../tsconfig.esm-base.json",
 
   "compilerOptions": {
-    "allowJs": false,
-    "declaration": true,
-    "module": "es6",
-    "sourceMap": true,
     "outDir": "./build",
-    "lib": ["es6"],
-    "target": "es5",
-    "downlevelIteration": true,
     "rootDir": "."
   },
+
   "include": [
     "version.inc.ts"
   ]
