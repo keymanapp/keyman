@@ -116,6 +116,10 @@ async function build(filename: string, parentCallbacks: NodeCompilerCallbacks, o
       return false;
     }
 
+    // Normalize case for the filename and expand the path; this avoids false
+    // positive case mismatches on input filenames and glommed paths
+    filename = fs.realpathSync.native(filename);
+
     let builder = null;
 
     // If infile is a directory, then we treat that as a project and build it
