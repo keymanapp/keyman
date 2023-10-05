@@ -115,9 +115,15 @@ export class GestureMatcher<Type> implements PredecessorMatch<Type> {
 
     for(let touchpointIndex = 0; touchpointIndex < sourceTouchpoints.length; touchpointIndex++) {
       const srcContact = sourceTouchpoints[touchpointIndex];
+      let baseContact = srcContact;
 
       if(srcContact instanceof GestureSourceSubview) {
         srcContact.disconnect();  // prevent further updates from mangling tracked path info.
+        baseContact = srcContact.baseSource;
+      }
+
+      if(baseContact.isPathComplete) {
+        throw new Error("GestureMatcher may not be built against already-completed contact points");
       }
 
       const contactSpec = model.contacts[touchpointIndex];

@@ -380,8 +380,6 @@ export class GestureSourceSubview<HoveredItemType, StateToken = any> extends Ges
    */
   public disconnect() {
     if(this.subviewDisconnector) {
-      console.log("disconnecting - most recent sample follows");
-      console.log(this.currentSample);
       this.subviewDisconnector();
       this.subviewDisconnector = null;
     }

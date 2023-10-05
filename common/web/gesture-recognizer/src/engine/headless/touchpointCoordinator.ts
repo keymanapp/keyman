@@ -51,6 +51,16 @@ export class TouchpointCoordinator<HoveredItemType, StateToken=any> extends Even
   }
 
   private readonly modelResetHandler = (selection: MatcherSelection<HoveredItemType>, replaceModelWith: (model: GestureModel<HoveredItemType>) => void) => {
+    const sourceIds = selection.matcher.allSourceIds;
+
+    // If there's an active gesture that uses a source noted in the selection, it's the responsibility
+    // of an existing GestureSequence to handle this one.  The handler should bypass it for this round.
+    if(this.activeGestures.find((sequence) => {
+      return sequence.allSourceIds.find((a) => sourceIds.indexOf(a) != -1);
+    })) {
+      return;
+    }
+
     if(selection.result.action.type == 'replace') {
       replaceModelWith(getGestureModel(this.gestureModelDefinitions, selection.result.action.replace));
     } else {
