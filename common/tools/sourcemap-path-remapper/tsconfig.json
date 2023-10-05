@@ -5,6 +5,7 @@
     "allowJs": false,
     "allowSyntheticDefaultImports": true,
     "declaration": true,
+    "sourceMap": false,
     "inlineSourceMap": true,
     "inlineSources": true,
     "sourceRoot": "/common/tools/sourcemap-path-remapper/src",
