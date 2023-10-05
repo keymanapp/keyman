@@ -40,16 +40,35 @@ function compile_schemas() {
     "$KEYMAN_ROOT/common/schemas/keyboard_info/keyboard_info.schema.json"
   )
 
+  rm -rf "$THIS_SCRIPT_PATH/obj/schemas"
+  mkdir -p "$THIS_SCRIPT_PATH/obj/schemas"
   rm -rf "$THIS_SCRIPT_PATH/src/schemas"
   mkdir -p "$THIS_SCRIPT_PATH/src/schemas"
   cp "${schemas[@]}" "$THIS_SCRIPT_PATH/src/schemas/"
 
   # TODO: use https://github.com/tc39/proposal-json-modules instead of this once it stablises
   for schema in "${schemas[@]}"; do
-    local fn="$THIS_SCRIPT_PATH/src/schemas/$(basename "$schema" .json)"
+    local schema_base="$(basename "$schema" .json)"
+    local fn="$THIS_SCRIPT_PATH/src/schemas/$schema_base"
+    local out="$THIS_SCRIPT_PATH/obj/schemas/$schema_base.validator.cjs"
+
+    # emit a .ts wrapper for the schema file
+
+    builder_echo "Compiling schema $schema_base.json"
     echo 'export default ' > "$fn.ts"
     cat "$fn.json" >> "$fn.ts"
+
+    # emit a compiled validator for the schema file
+
+    # While would seem obvious to just run 'ajv' directly here, somewhere node
+    # is picking up the wrong path for the build and breaking the formats
+    # imports. So it is essential to use `npm run` at this point, even though it
+    # is painfully slower, at least until we figure out the path discrepancy.
+    npm run build:schema -- -c ./tools/formats.cjs -s "$fn.json" --strict-types false -o "$out"
   done
+
+  # the validators now need to be compiled to esm
+  node tools/schema-bundler.js
 }
 
 function copy_cldr_imports() {

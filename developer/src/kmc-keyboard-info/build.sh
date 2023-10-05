@@ -11,6 +11,7 @@ cd "$THIS_SCRIPT_PATH"
 
 builder_describe "Build Keyman kmc keyboard-info Compiler module" \
   "@/common/web/types" \
+  "@/developer/src/common/web/utils" \
   "clean" \
   "configure" \
   "build" \
