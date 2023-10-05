@@ -45,6 +45,7 @@ import CommonConfiguration from './config/commonConfiguration.js';
 import { gestureSetForLayout } from './input/gestures/specsForLayout.js';
 
 import { getViewportScale } from './screenUtils.js';
+import { HeldRepeater } from './input/gestures/heldRepeater.js';
 
 export interface VisualKeyboardConfiguration extends CommonConfiguration {
   /**
@@ -436,13 +437,15 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
         // First, if we've configured the gesture to generate a keystroke, let's handle that.
         const gestureKey = gestureStage.item;
 
-        if(gestureKey /* && gestureKey is appropriate for the gesture */) {
+        if(gestureKey) {
           let coordSource = gestureStage.sources[0];
           let coord: InputSample<KeyElement, string> = null;
           if(coordSource) {
             // TODO:  should probably vary depending upon `gestureStage.matchedId`
             // (certain types should probably use the base coord... or even from
             // a prior stage of the sequence as appropriate.)
+            //
+            // This is the coordinate used as the basis for fat-finger calculations.
             coord = coordSource.currentSample;
           }
 
@@ -452,6 +455,17 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
 
           // Once the best coord to use for fat-finger calculations has been determined:
           this.modelKeyClick(gestureStage.item, coord);
+
+          // -- Scratch-space as gestures start becoming integrated --
+          // Reordering may follow at some point.
+          if(gestureStage.matchedId == 'special-key-start' && gestureKey.key.spec.baseKeyID == 'K_BKSP') {
+            // Possible enhancement:  maybe update the held location for the backspace if there's movement?
+            // But... that seems pretty low-priority.
+            //
+            // Merely constructing the instance is enough; it'll link into the sequence's events and
+            // handle everything that remains for the backspace from here.
+            new HeldRepeater(gestureSequence, () => this.modelKeyClick(gestureKey, coord));
+          }
 
           // TODO:  depending upon the gesture type, what sort of UI shifts should happen to
           // facilitate follow-up stages?
