@@ -38,6 +38,10 @@ describe('keys', function () {
         assert.equal(compilerTestCallbacks.messages.length, 0);
         assert.equal(keys.keys.length, 4);
 
+        const [w] = keys.keys.filter(({ id }) => id.value === 'w');
+        assert.ok(w);
+        assert.equal(w.to.value, 'w', 'substituted key value');
+
         const [q] = keys.keys.filter(({ id }) => id.value === 'q');
         assert.ok(q);
         assert.isFalse(!!(q.flags & constants.keys_key_flags_gap));

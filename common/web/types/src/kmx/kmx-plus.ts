@@ -234,6 +234,7 @@ export class Vars extends Section {
     });
   }
   substituteStrings(str: string, sections: DependencySections): string {
+    if (!str) return str;
     return str.replaceAll(VariableParser.STRING_REFERENCE, (_entire, id) => {
       const val = this.findStringVariableValue(id);
       if (val === null) {
@@ -512,6 +513,18 @@ export class List extends Section {
       s = '';
     }
     return this.allocList(strs, s.split(' ').map(unescapeString));
+  }
+  /** perform string variable, marker, and unescaping */
+  allocListFromSubstitutedSpaces(s: string, sections: DependencySections): ListItem {
+    if(s === undefined || s === null) {
+      s = '';
+    }
+    return this.allocList(sections.strs, s.split(' ').map(s => {
+      s = sections.vars.substituteStrings(s, sections);
+      s = sections.vars.substituteMarkerString(s);
+      s = unescapeString(s);
+      return s;
+    }));
   }
   /**
    * Return a List object referring to the string list.

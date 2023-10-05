@@ -130,7 +130,11 @@ export class KeysCompiler extends SectionCompiler {
 
       for (let lkflick of lkflicks.flick) {
         let flags = 0;
-        const to = sections.strs.allocAndUnescapeString(lkflick.to, true);
+        let cookedTo = lkflick.to;
+        // pull in string variables and markers
+        cookedTo = sections.vars.substituteStrings(cookedTo, sections);
+        cookedTo = sections.vars.substituteMarkerString(cookedTo);
+        const to = sections.strs.allocAndUnescapeString(cookedTo, true);
         if (!to.isOneChar) {
           flags |= constants.keys_flick_flags_extend;
         }
@@ -141,7 +145,6 @@ export class KeysCompiler extends SectionCompiler {
         flicks.flicks.push({
           directions,
           flags,
-          // TODO-LDML: markers,variables
           to,
         });
       }
@@ -168,24 +171,23 @@ export class KeysCompiler extends SectionCompiler {
         flags |= constants.keys_key_flags_notransform;
       }
       const id = sections.strs.allocString(key.id);
-      const longPress: ListItem = sections.list.allocListFromEscapedSpaces(
-        sections.strs,
-        // TODO-LDML: markers,variables
-        key.longPress
+      const longPress: ListItem = sections.list.allocListFromSubstitutedSpaces(
+        key.longPress,
+        sections,
       );
-      const longPressDefault = sections.strs.allocAndUnescapeString(
-        // TODO-LDML: variables
-        sections.vars.substituteMarkerString(key.longPressDefault),
-      );
-      const multiTap: ListItem = sections.list.allocListFromEscapedSpaces(
-        sections.strs,
-        // TODO-LDML: markers,variables
-        key.multiTap
+      let cookedLongPressDefault = key.longPressDefault;
+      cookedLongPressDefault = sections.vars.substituteStrings(cookedLongPressDefault, sections);
+      cookedLongPressDefault = sections.vars.substituteMarkerString(cookedLongPressDefault)
+      const longPressDefault = sections.strs.allocAndUnescapeString(cookedLongPressDefault);
+
+      const multiTap: ListItem = sections.list.allocListFromSubstitutedSpaces(
+        key.multiTap,
+        sections,
       );
       const keySwitch = sections.strs.allocString(key.switch); // 'switch' is a reserved word
       const toRaw = key.to;
-      // TODO-LDML: variables
-      let toCooked = sections.vars.substituteMarkerString(toRaw);
+      let toCooked = sections.vars.substituteStrings(toRaw, sections);
+      toCooked = sections.vars.substituteMarkerString(toCooked);
       const to = sections.strs.allocAndUnescapeString(toCooked, true);
       if (!to.isOneChar) {
         flags |= constants.keys_key_flags_extend;

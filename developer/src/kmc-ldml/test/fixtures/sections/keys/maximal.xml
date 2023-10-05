@@ -12,7 +12,7 @@
     <!-- This key gets a bunch of other status -->
     <key id="q" flicks="flick0" to="q" longPress="á é í" longPressDefault="é"
         multiTap="ä ë ï" transform="no" width="3.14159" />
-    <key id="w" to="w" />
+    <key id="w" to="${www}" />
     <flicks id="flick0">
         <flick directions="nw se" to="ç" />
         <flick directions="ne sw" to="${ecaret}" />
@@ -36,5 +36,6 @@
 
   <variables>
     <string id="ecaret" value="ê" />
+    <string id="www" value="w" />
   </variables>
 </keyboard3>

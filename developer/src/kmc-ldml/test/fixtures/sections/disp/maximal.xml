@@ -9,7 +9,7 @@
   <displays>
     <display id="g" display="(g)"/>
     <display to="f" display="(f)"/> <!-- Note: in opposite lexical order, as the compiler will sort -->
-    <display to="e" display="(${eee})"/>
+    <display to="${eee}" display="(${eee})"/>
     <displayOptions baseCharacter="x" />
   </displays>
 
