@@ -241,6 +241,90 @@ describe('keys.kmap', function () {
         CompilerMessages.Error_MissingFlicks({flicks:'an-undefined-flick-id',id:'Q'}),
       ]
     },
+    {
+      subpath: 'sections/layr/invalid-invalid-form.xml',
+      errors: [CompilerMessages.Error_InvalidHardware({
+        form: 'holographic',
+      }),],
+    },
+    {
+      // warning on custom form
+      subpath: 'sections/layr/warn-custom-us-form.xml',
+      warnings: [
+        CompilerMessages.Warn_CustomForm({id: "us"}),
+      ],
+      callback: (sect, subpath, callbacks) => {
+        const keys = sect as Keys;
+        assert.isNotNull(keys);
+        assert.equal(compilerTestCallbacks.messages.length, 0);
+        assert.equal(keys.keys.length, 3);
+        assert.sameDeepMembers(keys.kmap, [
+          {
+            vkey: K.K_K,
+            key: 'one',
+            mod: constants.keys_mod_none,
+          },
+          {
+            vkey: K.K_E,
+            key: 'two',
+            mod: constants.keys_mod_none,
+          },
+          {
+            vkey: K.K_Y,
+            key: 'three',
+            mod: constants.keys_mod_none,
+          },
+        ]);
+      },
+    },
+    {
+      // warning on a custom unknown form - but no error!
+      subpath: 'sections/layr/warn-custom-zzz-form.xml',
+      warnings: [
+        CompilerMessages.Warn_CustomForm({id: "zzz"}),
+      ],
+      callback: (sect, subpath, callbacks) => {
+        const keys = sect as Keys;
+        assert.isNotNull(keys);
+        assert.equal(compilerTestCallbacks.messages.length, 0);
+        assert.equal(keys.keys.length, 3);
+        assert.sameDeepMembers(keys.kmap, [
+          {
+            vkey: K.K_K,
+            key: 'one',
+            mod: constants.keys_mod_none,
+          },
+          {
+            vkey: K.K_E,
+            key: 'two',
+            mod: constants.keys_mod_none,
+          },
+          {
+            vkey: K.K_Y,
+            key: 'three',
+            mod: constants.keys_mod_none,
+          },
+        ]);
+      },
+    },
+    {
+      subpath: 'sections/layr/error-custom-us-form.xml',
+      warnings: [
+        CompilerMessages.Warn_CustomForm({id: "us"}),
+      ],
+      errors: [
+        CompilerMessages.Error_InvalidScanCode({ form: "us", codes: ['ff'] }),
+      ],
+    },
+    {
+      subpath: 'sections/layr/error-custom-zzz-form.xml',
+      warnings: [
+        CompilerMessages.Warn_CustomForm({id: "zzz"}),
+      ],
+      errors: [
+        CompilerMessages.Error_InvalidScanCode({ form: "zzz", codes: ['ff'] }),
+      ],
+    },
   ]);
 
   it('should reject layouts with too many hardware rows', async function() {

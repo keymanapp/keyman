@@ -1,5 +1,35 @@
 # Keyman Version History
 
+## 17.0.185 alpha 2023-10-03
+
+* chore(web): Add non-printing characters to the OSK (#9547)
+* feat(developer): support `store(&version) '17.0'` (#9656)
+* chore(developer): add test for `checkFilenameConventions == false` or unset (#9661)
+* feat(developer): ldml scan codes support (#9615)
+
+## 17.0.184 alpha 2023-10-02
+
+* fix(web): fixes toolbar refocus timing after a keyboard change (#9618)
+
+## 17.0.183 alpha 2023-09-29
+
+* feat(web): browser-KMW support for default subkeys (#9496)
+* refactor(linux): Add more tests for `keymanutil.c`  ️ (#9595)
+
+## 17.0.182 alpha 2023-09-28
+
+* chore(web): builds that output to web/build/publish should also clean it (#9613)
+* chore(linux): Dynamically choose display number (#9629)
+* docs(linux): Update sample tasks.json for Linux (#9634)
+* chore(common): Add Crowdin strings for Mon (#9550)
+* fix(developer): only include mobile touch platform in basic project (#9549)
+* fix(windows): fix the ellipsis for longer text on buttons (#9638)
+
+## 17.0.181 alpha 2023-09-26
+
+* chore: workaround npm/cli#3466 when bundling internal deps (#9536)
+* chore(linux): Check and restart background processes (#9608)
+
 ## 17.0.180 alpha 2023-09-25
 
 * fix(linux): Fix detection of unit tests (#9606)

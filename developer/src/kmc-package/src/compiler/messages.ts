@@ -2,7 +2,7 @@ import { CompilerErrorNamespace, CompilerErrorSeverity, CompilerMessageSpec as m
 
 const Namespace = CompilerErrorNamespace.PackageCompiler;
 const SevInfo = CompilerErrorSeverity.Info | Namespace;
-// const SevHint = CompilerErrorSeverity.Hint | Namespace;
+const SevHint = CompilerErrorSeverity.Hint | Namespace;
 const SevWarn = CompilerErrorSeverity.Warn | Namespace;
 const SevError = CompilerErrorSeverity.Error | Namespace;
 const SevFatal = CompilerErrorSeverity.Fatal | Namespace;
@@ -116,5 +116,12 @@ export class CompilerMessages {
     `The keyboard ${o.id} should have at least one language specified.`);
   static WARN_KeyboardShouldHaveAtLeastOneLanguage = SevWarn | 0x001B;
 
+  static Hint_JsKeyboardFileHasNoTouchTargets = (o:{id:string}) => m(this.HINT_JsKeyboardFileHasNoTouchTargets,
+    `The keyboard ${o.id} has been included for touch platforms, but does not include a touch layout.`);
+  static HINT_JsKeyboardFileHasNoTouchTargets = SevHint | 0x001C;
+
+  static Hint_PackageContainsSourceFile = (o:{filename:string}) => m(this.HINT_PackageContainsSourceFile,
+    `The source file ${o.filename} should not be included in the package; instead include the compiled result.`);
+  static HINT_PackageContainsSourceFile = SevHint | 0x001D;
 }
 
