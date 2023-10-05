@@ -34,12 +34,12 @@ const KMX_DWORD KMX_VKMap[] = {
   '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
 
   //_S2 those might not work correctly yet*/
-  /*VK_SPACE,
+  VK_SPACE,
   VK_ACCENT, VK_HYPHEN, VK_EQUAL,
   VK_LBRKT, VK_RBRKT, VK_BKSLASH,
   VK_COLON, VK_QUOTE,
   VK_COMMA, VK_PERIOD, VK_SLASH,
-  VK_xDF, VK_OEM_102,*/
+  VK_xDF, VK_OEM_102,/**/
   0
 };
 
@@ -61,8 +61,8 @@ const int keycode_map[60]={
       22,  /*22. BACKSPACE*/
       23,  /*23. TAB*/
   0,   /* */
-  24,  /* 16.. Q */
-  25,  /* 7. W */
+  24,  /* 16. Q */
+  25,  /* 17. W */
   26,  /* 18. E */
   27,  /* 19. R */
   28,  /* 20. T */
@@ -126,8 +126,9 @@ bool createCompleteRow_US(v_str_1D &complete_List, FILE *fpp, const char *text, 
 // 2nd step: write contents to 3D vector
 int split_US_To_3D_Vector(v_dw_3D &all_US, v_str_1D completeList);
 
-// replace Name of Key (e.g. <AD06>)  wih Keycode ( e.g. 15 )
+// replace Name of Key (e.g. <AD06>)  wih Keycode ( e.g. 0x15 )
 int replace_PosKey_with_Keycode(std::string in);
+int replace_PosKey_with_Keycode_use_Lin(std::string  in);
 
 // create an empty 2D vector containing "--" in all fields
 v_dw_2D create_empty_2D(int dim_rows, int dim_shifts);

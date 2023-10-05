@@ -168,7 +168,7 @@ int split_US_To_3D_Vector(v_dw_3D &all_US,v_str_1D completeList) {
       for (std::string each; std::getline(split1, each, split_bracel); tokens.push_back(each));
 
       // replace keys names with Keycode (<AD06> with 21,...)
-      Keycde = replace_PosKey_with_Keycode(tokens[0]);
+      Keycde = replace_PosKey_with_Keycode_use_Lin(tokens[0]);
       tokens[0] = std::to_string(Keycde);
 
       // seperate rest of the vector to its elements and push to 'tokens'
@@ -265,6 +265,67 @@ int replace_PosKey_with_Keycode(std::string  in) {
   return out;
 }
 
+int replace_PosKey_with_Keycode_use_Lin(std::string  in) {
+  int out = returnIfCharInvalid;
+
+// _S2 these are the Scancode-Values we use in Keyman ( = like the windows scancodes)
+
+  if      ( in == "key<TLDE>")     out = 49;            /* 0X             VK_  */  // TOASK correct ???
+  else if ( in == "key<AE01>")     out = 10;            /* 0X02           VK_1 */
+  else if ( in == "key<AE02>")     out = 11;            /* 0X03           VK_2  */
+  else if ( in == "key<AE03>")     out = 12;            /* 0X04           VK_3  */
+  else if ( in == "key<AE04>")     out = 13;            /* 0X05           VK_4  */
+  else if ( in == "key<AE05>")     out = 14;            /* 0X06           VK_5  */
+  else if ( in == "key<AE06>")     out = 15;            /* 0X07           VK_6  */
+  else if ( in == "key<AE07>")     out = 16;            /* 0X08           VK_7  */
+  else if ( in == "key<AE08>")     out = 17;            /* 0X09           VK_8  */
+  else if ( in == "key<AE09>")     out = 18;            /* 0X0A           VK_9  */
+  else if ( in == "key<AE10>")     out = 19;            /* 0X0B           VK_0  */
+  else if ( in == "key<AE11>")     out = 20;            /* 0X0C           VK_MINUS   */
+  else if ( in == "key<AE12>")     out = 21;            /* 0X0D           VK_EQUALS   */
+
+  else if ( in == "key<AD01>")    out = 24;            /* 0X10            VK_Q  */
+  else if ( in == "key<AD02>")    out = 25;            /* 0X11            VK_W  */
+  else if ( in == "key<AD03>")    out = 26;            /* 0X12            VK_E  */
+  else if ( in == "key<AD04>")    out = 27;            /* 0X13            VK_R  */
+  else if ( in == "key<AD05>")    out = 28;            /* 0X14            VK_T  */
+  else if ( in == "key<AD06>")    out = 29;            /* 0X15            VK_Y  */
+  else if ( in == "key<AD07>")    out = 30;            /* 0X16            VK_U  */
+  else if ( in == "key<AD08>")    out = 31;            /* 0X17            VK_I  */
+  else if ( in == "key<AD09>")    out = 32;            /* 0X18            VK_O  */
+  else if ( in == "key<AD10>")    out = 33;            /* 0X19            VK_P  */
+  else if ( in == "key<AD11>")    out = 34;            /* 0X1A            VK_LEFTBRACE  */
+  else if ( in == "key<AD12>")    out = 35;            /* 0X1B            VK_RIGHTBRACE  */
+
+  else if ( in == "key<AC01>")    out = 38;            /* 0X1E            VK_A  */
+  else if ( in == "key<AC02>")    out = 39;            /* 0X1F            VK_S  */
+  else if ( in == "key<AC03>")    out = 40;            /* 0X20            VK_D  */
+  else if ( in == "key<AC04>")    out = 41;            /* 0X21            VK_F  */
+  else if ( in == "key<AC05>")    out = 42;            /* 0X22            VK_G  */
+  else if ( in == "key<AC06>")    out = 43;            /* 0X23            VK_H  */
+  else if ( in == "key<AC07>")    out = 44;            /* 0X24            VK_J  */
+  else if ( in == "key<AC08>")    out = 45;            /* 0X25            VK_K  */
+  else if ( in == "key<AC09>")    out = 46;            /* 0X26            VK_L  */
+  else if ( in == "key<AC10>")    out = 47;            /* 0X27            VK_SEMICOLON  */
+  else if ( in == "key<AC11>")    out = 48;            /* 0X28            VK_APOSTROPHE  */
+  else if ( in == "key<AC12>")    out = 49;            /* 0X29            VK_GRAVE  */
+
+  else if ( in == "key<AB01>")    out = 52;            /* 0X2C            VK_Z  */
+  else if ( in == "key<AB02>")    out = 53;            /* 0X2D            VK_X  */
+  else if ( in == "key<AB03>")    out = 54;            /* 0X2E            VK_C  */
+  else if ( in == "key<AB04>")    out = 55;            /* 0X2F            VK_V  */
+  else if ( in == "key<AB05>")    out = 56;            /* 0X30            VK_B  */
+  else if ( in == "key<AB06>")    out = 57;            /* 0X31            VK_N  */
+  else if ( in == "key<AB07>")    out = 58;            /* 0X32            VK_M  */
+  else if ( in == "key<AB08>")    out = 59;            /* 0X33            VK_ COMMA */
+  else if ( in == "key<AB09>")    out = 60;            /* 0X34            VK_DOT  */
+  else if ( in == "key<AB10>")    out = 61;            /* 0X35            VK_SLASH  */
+  else if ( in == "key<BKSL>")    out = 62;            /* 0X36            VK_RIGHTSHIFT  */
+  else if ( in == "key<LSGT>")    out = 63;            /* 0X37            VK_RIGHTSHIFT  */
+
+  return out;
+}
+
 
 v_dw_2D create_empty_2D( int dim_rows,int dim_shifts) {
 
@@ -282,7 +343,12 @@ v_dw_2D create_empty_2D( int dim_rows,int dim_shifts) {
 }
 
 #if USE_GDK
+KMX_DWORD writeKeyvalsFromKeymap(GdkKeymap *keymap, guint keycode, int shift_state_pos);
 int append_other_ToVector(v_dw_3D &All_Vector,GdkKeymap * keymap) {
+
+
+
+ writeKeyvalsFromKeymap(keymap,1, 0);
 
   // create a 2D vector all filled with " " and push to 3D-Vector
   v_dw_2D Other_Vector2D = create_empty_2D(All_Vector[0].size(),All_Vector[0][0].size());
@@ -305,13 +371,35 @@ int append_other_ToVector(v_dw_3D &All_Vector,GdkKeymap * keymap) {
 
     // get key name US stored in [0][i][0] and copy to name in "other"-block[1][i][0]
     All_Vector[1][i][0] = All_Vector[0][i][0];
-
+/*
     // get Keyvals of this key and copy to unshifted/shifted in "other"-block[1][i][1] / block[1][i][2]
     All_Vector[1][i][0+1] = getKeyvalsFromKeymap(keymap,keycode_map[All_Vector[0][i][0]],0);   //shift state: unshifted:0
     All_Vector[1][i][1+1] = getKeyvalsFromKeymap(keymap,keycode_map[All_Vector[0][i][0]],1);   //shift state: shifted:1
 
-    wprintf(L" Keycodes US dw        :   %d (US): -- %i (%c)  -- %i (%c) ---- (other): %i (%c)  --  %i(%c)    \n",(All_Vector[1][i][0]),All_Vector[0][i][1],All_Vector[0][i][1],All_Vector[0][i][2],All_Vector[0][i][2],All_Vector[1][i][1] ,All_Vector[1][i][1],All_Vector[1][i][2],All_Vector[1][i][2]);
-    wprintf(L"   Keycodes ->Other dw:-:   %d (US): -- %i (%c)  -- %i (%c)   \n\n",(All_Vector[1][i][0]),All_Vector[1][i][1],All_Vector[1][i][1],All_Vector[1][i][2],All_Vector[1][i][2]);
+KMX_DWORD inValue = All_Vector[0][i][0];
+KMX_DWORD KeycodeMapped_inValue = keycode_map[All_Vector[0][i][0]];
+KMX_DWORD resultOf_GETKEYVALS = getKeyvalsFromKeymap(keymap,keycode_map[All_Vector[0][i][0]],0);
+KMX_DWORD resultOf_GETKEYVALS_shift = getKeyvalsFromKeymap(keymap,keycode_map[All_Vector[0][i][0]],1);
+
+wprintf(L" inValue: %i -KeycodeMapped_inValue: %i,  resultOf_GETKEYVALS: %i ,  resultOf_GETKEYVALS_shift: %i     :   %d (US): -- %i (%c)  -- %i (%c) ---- (other): %i (%c)  --  %i(%c)    \n",inValue,KeycodeMapped_inValue,resultOf_GETKEYVALS,resultOf_GETKEYVALS_shift,(All_Vector[1][i][0]),All_Vector[0][i][1],All_Vector[0][i][1],All_Vector[0][i][2],All_Vector[0][i][2],All_Vector[1][i][1] ,All_Vector[1][i][1],All_Vector[1][i][2],All_Vector[1][i][2]);
+*/
+  // get Keyvals of this key and copy to unshifted/shifted in "other"-block[1][i][1] / block[1][i][2]
+    All_Vector[1][i][0+1] = getKeyvalsFromKeymap(keymap,All_Vector[0][i][0],0);   //shift state: unshifted:0
+    All_Vector[1][i][1+1] = getKeyvalsFromKeymap(keymap,All_Vector[0][i][0],1);   //shift state: shifted:1
+
+KMX_DWORD inValue = All_Vector[0][i][0];
+KMX_DWORD KeycodeMapped_inValue = All_Vector[0][i][0];
+KMX_DWORD resultOf_GETKEYVALS = getKeyvalsFromKeymap(keymap,All_Vector[0][i][0],0);
+KMX_DWORD resultOf_GETKEYVALS_shift = getKeyvalsFromKeymap(keymap,All_Vector[0][i][0],1);
+
+wprintf(L" inValue: %i -KeycodeMapped_inValue: %i,  resultOf_GETKEYVALS: %i ,  resultOf_GETKEYVALS_shift: %i     :   %d (US): -- %i (%c)  -- %i (%c) ---- (other): %i (%c)  --  %i(%c)    \n",inValue,KeycodeMapped_inValue,resultOf_GETKEYVALS,resultOf_GETKEYVALS_shift,(All_Vector[1][i][0]),All_Vector[0][i][1],All_Vector[0][i][1],All_Vector[0][i][2],All_Vector[0][i][2],All_Vector[1][i][1] ,All_Vector[1][i][1],All_Vector[1][i][2],All_Vector[1][i][2]);
+
+
+
+
+    //wprintf(L" Keycodes US dw        :   %d (US): -- %i (%c)  -- %i (%c) ---- (other): %i (%c)  --  %i(%c)    \n",(All_Vector[1][i][0]),All_Vector[0][i][1],All_Vector[0][i][1],All_Vector[0][i][2],All_Vector[0][i][2],All_Vector[1][i][1] ,All_Vector[1][i][1],All_Vector[1][i][2],All_Vector[1][i][2]);
+    //wprintf(L"   Keycodes ->Other dw:-:   %d (US): -- %i (%c)  -- %i (%c)   \n\n",(All_Vector[1][i][0]),All_Vector[1][i][1],All_Vector[1][i][1],All_Vector[1][i][2],All_Vector[1][i][2]);
+    int enxdfghj=9;
   }
   return 0;
 }
@@ -330,6 +418,21 @@ bool InsertKeyvalsFromKeymap(v_dw_3D &All_Vector,GdkKeymap * keymap){
     //wprintf(L" Keycodes US dw        :   %d (US): -- %i (%c)  -- %i (%c) ---- (other): %i (%c)  --  %i(%c)    \n",(All_Vector[1][i][0]),All_Vector[0][i][1],All_Vector[0][i][1],All_Vector[0][i][2],All_Vector[0][i][2],All_Vector[1][i][1] ,All_Vector[1][i][1],All_Vector[1][i][2],All_Vector[1][i][2]);
     //wprintf(L"   Keycodes ->Other dw:-:   %d (US): -- %i (%c)  -- %i (%c)   \n\n",(All_Vector[1][i][0]),All_Vector[1][i][1],All_Vector[1][i][1],All_Vector[1][i][2],All_Vector[1][i][2]);
   }
+}
+
+// _S2 can go later
+KMX_DWORD writeKeyvalsFromKeymap(GdkKeymap *keymap, guint keycode, int shift_state_pos) {
+  GdkKeymapKey *maps;
+  guint *keyvals;
+  gint count;
+  KMX_DWORD out;
+  for ( int ii =1; ii< 255;ii++) {
+
+  KMX_DWORD out = getKeyvalsFromKeymap(keymap,ii,0);
+  KMX_DWORD out2= getKeyvalsFromKeymap(keymap,ii,1);
+  wprintf(L" ii = %i  --> keymap = %i (%c)..%i(%c) \n",ii, out,out, out2,out2);
+  }
+
 }
 
 KMX_DWORD getKeyvalsFromKeymap(GdkKeymap *keymap, guint keycode, int shift_state_pos) {
@@ -409,22 +512,24 @@ KMX_DWORD get_VirtualKey_Other_From_SC(KMX_DWORD SC , v_dw_3D &All_Vector){
 
       // _S2 what if we use  column 3(altgr) and 4 (shift+altgr) ??
 
-      if( SC < 12) {
+      if( SC < 20) {
         //  values for numbers  are stored in column All_Vector[1][i][ 1 ]
         if ( All_Vector[k][i][0] == SC ) {
-          wprintf(L" SC= %i   .. i= %i  .. %i:\t\t %i(%c)   (%i (%c) : %i (%c) ) --- \n",SC , i,  All_Vector[k][i][0] , All_Vector[k][i][1] ,All_Vector[1][i][2],All_Vector[1][i][2] ,All_Vector[k][i][1] , All_Vector[k][i][2] , All_Vector[k][i][2]   ); 
-          //KMX_DWORD returnval= All_Vector[1][i][1];
+          wprintf(L" SC= %i   .. i= %i  .. %i:\t\t %i(%c)   (%i (%c) : %i (%c) ) --- \n",SC , i,  All_Vector[k][i][0] , All_Vector[k][i][1] ,All_Vector[k][i][2],All_Vector[k][i][2] ,All_Vector[k][i][1] , All_Vector[k][i][2] , All_Vector[k][i][2]   ); 
+          KMX_DWORD returnval= All_Vector[k][i][1];
           // we could return All_Vector[0][i][1]; since win version uses US numbers here
-          return All_Vector[1][i][1];
+          return All_Vector[k][i][1];
         }
       }
-
+      else {
       // shifted values e.g. "Q" (=81) are stored in column All_Vector[1][i][ 2 ]
-      else if  ( All_Vector[k][i][0] == SC ) {
+      if  ( All_Vector[k][i][0] == SC ) {
         wprintf(L" SC= %i   .. i= %i  .. %i:\t\t %i(%c)   (%i (%c) : %i (%c) ) --- \n",SC , i,  All_Vector[k][i][0] , All_Vector[k][i][1] ,All_Vector[1][i][2],All_Vector[1][i][2] ,All_Vector[k][i][1] , All_Vector[k][i][2] , All_Vector[k][i][2]   ); 
-        //KMX_DWORD returnval= All_Vector[1][i][2];
+        KMX_DWORD returnval= All_Vector[1][i][2];
         return All_Vector[1][i][2];
       }
+      }
+//hier All_Vector[1][i][1]; ergibt , und . aber kleinbuchstaben ode ; und : aber grossbuchstaben
     }
   }
   return 0;    //_S2 what do I return if not found??
@@ -467,11 +572,13 @@ KMX_DWORD get_SC_From_VirtualKey_US(KMX_DWORD VK_US , v_dw_3D &All_Vector){
   return 0;    //_S2 what do I return if not found??
 }
 
+// ToDo write 2 func for return pos of Key_US and Pos of Key_Other
 // return the Scancode of for given VirtualKey of Other US
 KMX_DWORD get_position_From_VirtualKey_US(KMX_DWORD VK_US , v_dw_3D &All_Vector){
   // find correct row of char in US
   for( int i=0; i< (int)All_Vector[0].size()-1;i++) {
     if ( ( All_Vector[0][i][1] == VK_US ) || ( All_Vector[0][i][2] == VK_US )) {
+    //if ( ( All_Vector[0][i][1] == VK_US ) ) {
       wprintf(L" VK_US= %i   .. i= %i  .. %i\t\t %i (%c) : %i (%c)  +++ %i\t\t %i (%c) : %i (%c)  \n",VK_US , i,
       All_Vector[0][i][0] , All_Vector[0][i][1] ,All_Vector[0][i][1] , All_Vector[0][i][2] , All_Vector[0][i][2],
       All_Vector[1][i][0] , All_Vector[1][i][1] ,All_Vector[1][i][1] , All_Vector[1][i][2] , All_Vector[1][i][2] );

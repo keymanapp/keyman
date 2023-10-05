@@ -602,6 +602,30 @@ std::wstring  get_VirtualKey_US_from_iKey(KMX_DWORD iKey, ShiftState &ss, int &c
   return L"";
 }
 
+// _S2 where to put this??
+std::wstring  get_VirtualKey_Other_from_iKey(KMX_DWORD iKey, ShiftState &ss, int &caps, v_dw_3D &All_Vector) {
+
+  int icaps;
+  KMX_DWORD pos = get_position_From_VirtualKey_US(iKey, All_Vector);
+
+  if (ss >9)
+    return L"";
+
+  if( ss < All_Vector[1][pos].size()-1) {
+  //if( ss < All_Vector[1][pos].size()-1) {   // _S2 numbers need this
+
+    if ( ss % 2 == 0)
+      icaps = ss+2-caps;
+
+    if ( ss % 2 == 1)
+      icaps = ss+caps;
+
+    return std::wstring(1, (int) All_Vector[1][pos][icaps]);
+     //return std::wstring(1, (int) All_Vector[1][pos][icaps]);
+  }
+  return L"";
+}
+
 bool KMX_ImportRules(KMX_WCHAR *kbid, LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector,std::vector<KMX_DeadkeyMapping> *FDeadkeys, KMX_BOOL bDeadkeyConversion) {   // I4353   // I4552
  wprintf(L"\n ##### KMX_ImportRules of mc_import_rules started #####\n");
   KMX_Loader loader;
@@ -702,11 +726,12 @@ bool KMX_ImportRules(KMX_WCHAR *kbid, LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector,std
           //_S2 TODO
           //_S2 get char  - do I need rc ?? ( was rc = ToUnicodeEx...)
           std::wstring VK_US = get_VirtualKey_US_from_iKey(iKey, ss, caps, All_Vector);
+          std::wstring VK_Other = get_VirtualKey_Other_from_iKey(iKey, ss, caps, All_Vector);
 
           //_S2 TODO
           //do I need that ??
           //if rc >0: it got 1 or more char AND buffer is empty ( nothing inside ) {
-            if(VK_US == L"") {
+            if(VK_Other == L"") {
                   rgKey[iKey]->KMX_SetShiftState(ss, L"", false, (caps == 0));
             }
 
@@ -720,7 +745,7 @@ bool KMX_ImportRules(KMX_WCHAR *kbid, LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector,std
 
             //_S2 TODO
             // fill m_rgss and m_rgfDeadkey ( m_rgfDeadkey will be done later)
-            rgKey[iKey]->KMX_SetShiftState(ss, VK_US, false, (caps == 0));
+            rgKey[iKey]->KMX_SetShiftState(ss, VK_Other, false, (caps == 0));
           //}  // from rc==1
         // } // from rc > 0
 
