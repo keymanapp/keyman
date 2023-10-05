@@ -21,7 +21,7 @@
 
 @interface KMEngine ()
 @property (readonly) CoreHelper *coreHelper;
-@property (nonatomic, retain) CoreWrapper * keymanCore;
+@property (nonatomic, retain) CoreWrapper * coreWrapper;
 @end
 
 @implementation KMEngine
@@ -43,7 +43,7 @@ const NSString* kEasterEggKmxName = @"EnglishSpanish.kmx";
       
       if (kmx) {
         [self loadCoreWrapperFromKmxFile:self.kmx.filePath];
-        [self.keymanCore setContext:contextString];
+        [self.coreWrapper setContext:contextString];
       }
     }
 
@@ -52,8 +52,8 @@ const NSString* kEasterEggKmxName = @"EnglishSpanish.kmx";
 
 -(void)loadCoreWrapperFromKmxFile:(NSString *)kmxFilePath {
   @try {
-    _keymanCore = [[CoreWrapper alloc] initWithHelper:_coreHelper kmxFilePath:kmxFilePath];
-    NSLog(@"loadCoreWrapperFromKmxFile, keyboardId = %@", [self.keymanCore keyboardId]);
+    _coreWrapper = [[CoreWrapper alloc] initWithHelper:_coreHelper kmxFilePath:kmxFilePath];
+    NSLog(@"loadCoreWrapperFromKmxFile, keyboardId = %@", [self.coreWrapper keyboardId]);
   }
   @catch (NSException *exception) {
     NSLog(@"loadCoreWrapperFromKmxFile, failed to create keyboard for path '%@' with exception: %@", kmxFilePath, exception.description);
@@ -63,7 +63,6 @@ const NSString* kEasterEggKmxName = @"EnglishSpanish.kmx";
 -(void)setKmx:(KMXFile*) kmxFile {
   if (_kmx!=kmxFile) {
     _kmx = kmxFile;
-    // TODO: is it valid to set kmx to nil? do we then dispose of the wrapper?
     if (kmxFile != nil) {
       [self loadCoreWrapperFromKmxFile:kmxFile.filePath];
     }
@@ -91,19 +90,19 @@ const NSString* kEasterEggKmxName = @"EnglishSpanish.kmx";
 }
 
 - (NSString *)getCoreContext {
-  return self.keymanCore.context;
+  return self.coreWrapper.context;
 }
 
 - (void)clearCoreContext {
-  [self.keymanCore clearCoreContext];
+  [self.coreWrapper clearCoreContext];
 }
 
 - (void)setCoreContext:(NSString *)context {
-  [self.keymanCore setContext:context];
+  [self.coreWrapper setContext:context];
 }
 
 - (void)setCoreOptions:(NSString *)key withValue:(NSString *)value {
-  BOOL success = [self.keymanCore setOptionsForCore:key value:value];
+  BOOL success = [self.coreWrapper setOptionsForCore:key value:value];
   NSLog(@"setCoreOptions for key: %@, value: %@ succeeded = %@", key, value, success ? @"YES" : @"NO");
 }
 
@@ -115,7 +114,7 @@ const NSString* kEasterEggKmxName = @"EnglishSpanish.kmx";
       return nil;
 
   // CoreWrapper returns an array of CoreAction objects
-  NSArray *coreActions = [self.keymanCore processEvent:event];
+  NSArray *coreActions = [self.coreWrapper processEvent:event];
   if ([coreActions count] == 0) {
     return nil;
   } else {
