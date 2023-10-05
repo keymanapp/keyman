@@ -25,4 +25,5 @@ a much more intuitive manner when using TSF.
 
 ## What applications support TSF?
 
-TSF is supported by a wide range of software and Windows components.
+TSF is supported by a range of software and Windows components.
+This includes: MS Office Applications, Firefox, Adobe Create Cloud Apps, Notepad in Windows 11
