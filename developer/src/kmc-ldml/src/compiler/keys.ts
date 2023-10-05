@@ -36,6 +36,15 @@ export class KeysCompiler extends SectionCompiler {
   public validate() {
     let valid = true;
 
+    // There's no 'form' compiler.
+    // We validate this here so that someone checks it.
+    this.keyboard3.forms?.form?.forEach((form) => {
+      if (!LDMLKeyboard.ImportStatus.isImpliedImport(form)) {
+        // If it's not an implied import, give a warning.
+        this.callbacks.reportMessage(CompilerMessages.Warn_CustomForm({ id: form.id }));
+      }
+    });
+
     // general key-level validation here, only of used keys
     const usedKeys = allUsedKeyIdsInLayers(this.keyboard3?.layers);
     const uniqueKeys = calculateUniqueKeys([...this.keyboard3.keys?.key]);
@@ -196,6 +205,26 @@ export class KeysCompiler extends SectionCompiler {
     }
   }
 
+  private getKeymapFromForm(hardware : string, badScans?: Set<number>) : Constants.KeyMap {
+    return KeysCompiler.getKeymapFromForms(this.keyboard3?.forms.form, hardware, badScans);
+  }
+
+  public static getKeymapFromForms(forms: LDMLKeyboard.LKForm[], hardware: string, badScans?: Set<number>): Constants.KeyMap {
+    // seach in reverse form because of overrides
+    const ldmlForm = [...forms].reverse().find((f) => f.id === hardware);
+    if (!ldmlForm) {
+      return undefined;
+    }
+    return KeysCompiler.getKeymapFromScancodes(ldmlForm, badScans);
+  }
+
+  public static getKeymapFromScancodes(ldmlForm: LDMLKeyboard.LKForm, badScans?: Set<number>) {
+    const { scanCodes } = ldmlForm;
+    const ldmlScan = scanCodes.map(o => o.codes.split(" ").map(n => Number.parseInt(n, 16)));
+    const ldmlVkey = Constants.CLDRScanToKeyMap(ldmlScan, badScans);
+    return ldmlVkey;
+  }
+
   /**
    * TODO-LDML: from old 'keys'
    * Validate for purpose of kmap
@@ -217,14 +246,21 @@ export class KeysCompiler extends SectionCompiler {
       valid = false;
     }
 
-    const keymap = Constants.HardwareToKeymap.get(hardware);
-    /* c8 ignore next 5 */
+    const badScans = new Set<number>();
+    const keymap = this.getKeymapFromForm(hardware, badScans);
     if (!keymap) {
-      // not reached due to XML validation
       this.callbacks.reportMessage(
         CompilerMessages.Error_InvalidHardware({ form: hardware })
       );
       valid = false;
+      return valid;
+    } else if (badScans.size !== 0) {
+      const codes = Array.from(badScans.values()).map(n => Number(n).toString(16)).sort();
+      this.callbacks.reportMessage(
+        CompilerMessages.Error_InvalidScanCode({ form: hardware, codes })
+      );
+      valid = false;
+      return valid;
     }
 
     const uniqueKeys = calculateUniqueKeys([...this.keyboard3.keys?.key]);
@@ -287,7 +323,7 @@ export class KeysCompiler extends SectionCompiler {
     hardware: string
   ): Keys {
     const mod = translateLayerAttrToModifier(layer);
-    const keymap = Constants.HardwareToKeymap.get(hardware);
+    const keymap = this.getKeymapFromForm(hardware);
 
     let y = -1;
     for (let row of layer.row) {
