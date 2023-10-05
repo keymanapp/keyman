@@ -1,5 +1,5 @@
 import { OrderedStringList } from 'src/ldml-keyboard/pattern-parser.js';
-import { Strs, StrsItem } from './kmx-plus.js';
+import { DependencySections, StrsItem, StrsOptions } from './kmx-plus.js';
 
 /**
  * A single entry in a ListItem.
@@ -31,14 +31,13 @@ export class ListItem extends Array<ListIndex> implements OrderedStringList {
    * @param source array of strings
    * @returns
    */
-  constructor(strs: Strs, source: Array<string>) {
+  constructor(source: Array<string>, opts: StrsOptions, sections: DependencySections) {
     super();
     if(!source) {
       return;
     }
-
     for (const str of source) {
-        let index = new ListIndex(strs.allocString(str));
+        let index = new ListIndex(sections.strs.allocString(str, opts, sections));
         this.push(index);
     }
   }

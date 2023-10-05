@@ -57,16 +57,20 @@ export class DispCompiler extends SectionCompiler {
     let result = new Disp();
 
     // displayOptions
-    result.baseCharacter = sections.strs.allocAndUnescapeString(this.keyboard3.displays?.displayOptions?.baseCharacter);
+    result.baseCharacter = sections.strs.allocString(this.keyboard3.displays?.displayOptions?.baseCharacter, {unescape: true});
 
     // displays
     result.disps = this.keyboard3.displays?.display.map(display => ({
-      to: sections.strs.allocAndUnescapeString(
-        sections.vars.substituteMarkerString(
-          sections.vars.substituteStrings(display.to, sections))),
+      to: sections.strs.allocString(display.to, {
+        stringVariables: true,
+        markers: true,
+        unescape: true,
+      }, sections),
       id: sections.strs.allocString(display.id), // not escaped, not substituted
-      display: sections.strs.allocAndUnescapeString(
-        sections.vars.substituteStrings(display.display, sections)),
+      display: sections.strs.allocString(display.display, {
+        stringVariables: true,
+        unescape: true,
+      }, sections),
     })) || []; // TODO-LDML: need coverage for the []
 
     result.disps.sort((a: DispItem, b: DispItem) => {

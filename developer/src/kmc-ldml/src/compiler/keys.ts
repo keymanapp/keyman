@@ -130,18 +130,18 @@ export class KeysCompiler extends SectionCompiler {
 
       for (let lkflick of lkflicks.flick) {
         let flags = 0;
-        let cookedTo = lkflick.to;
-        // pull in string variables and markers
-        cookedTo = sections.vars.substituteStrings(cookedTo, sections);
-        cookedTo = sections.vars.substituteMarkerString(cookedTo);
-        const to = sections.strs.allocAndUnescapeString(cookedTo, true);
+        const to = sections.strs.allocString(lkflick.to, {
+          stringVariables: true, markers: true, unescape: true, singleOk: true
+        }, sections);
         if (!to.isOneChar) {
           flags |= constants.keys_flick_flags_extend;
         }
         let directions: ListItem = sections.list.allocListFromSpaces(
-          sections.strs,
-          lkflick.directions
-        );
+          lkflick.directions,
+          {
+            stringVariables: true, markers: true, unescape: true
+          },
+          sections);
         flicks.flicks.push({
           directions,
           flags,
@@ -171,24 +171,44 @@ export class KeysCompiler extends SectionCompiler {
         flags |= constants.keys_key_flags_notransform;
       }
       const id = sections.strs.allocString(key.id);
-      const longPress: ListItem = sections.list.allocListFromSubstitutedSpaces(
-        key.longPress,
-        sections,
-      );
-      let cookedLongPressDefault = key.longPressDefault;
-      cookedLongPressDefault = sections.vars.substituteStrings(cookedLongPressDefault, sections);
-      cookedLongPressDefault = sections.vars.substituteMarkerString(cookedLongPressDefault)
-      const longPressDefault = sections.strs.allocAndUnescapeString(cookedLongPressDefault);
+      const longPress: ListItem = sections.list.allocListFromSpaces(
+        key.longPress, {
+          stringVariables: true,
+          markers: true,
+          unescape: true,
+        },
+        sections);
 
-      const multiTap: ListItem = sections.list.allocListFromSubstitutedSpaces(
+      const longPressDefault = sections.strs.allocString(key.longPressDefault,
+        {
+          stringVariables: true,
+          markers: true,
+          unescape: true,
+        },
+        sections);
+
+      const multiTap: ListItem = sections.list.allocListFromSpaces(
         key.multiTap,
-        sections,
-      );
+        {
+          stringVariables: true,
+          markers: true,
+          unescape: true,
+        },
+        sections);
       const keySwitch = sections.strs.allocString(key.switch); // 'switch' is a reserved word
+
       const toRaw = key.to;
+
       let toCooked = sections.vars.substituteStrings(toRaw, sections);
       toCooked = sections.vars.substituteMarkerString(toCooked);
-      const to = sections.strs.allocAndUnescapeString(toCooked, true);
+      const to = sections.strs.allocString(key.to,
+        {
+          stringVariables: true,
+          markers: true,
+          unescape: true,
+          singleOk: true
+        },
+        sections);
       if (!to.isOneChar) {
         flags |= constants.keys_key_flags_extend;
       }
