@@ -4,12 +4,16 @@ import { ViewportZoneSource } from "./viewportZoneSource.js";
 export class PaddedZoneSource implements RecognitionZoneSource {
   private readonly root: RecognitionZoneSource;
 
-  private edgePadding: {
+  private _edgePadding: {
     x: number,
     y: number,
     w: number,
     h: number
   };
+
+  public get edgePadding() {
+    return this._edgePadding;
+  }
 
   /**
    * Provides a dynamic 'padded' recognition zone based upon offsetting from the borders
@@ -54,12 +58,32 @@ export class PaddedZoneSource implements RecognitionZoneSource {
     // In case it isn't yet defined.
     edgePadding = edgePadding || [0, 0, 0, 0];
 
+    this.updatePadding(edgePadding);
+  }
+
+  /**
+   * Provides a dynamic 'padded' recognition zone based upon offsetting from the borders
+   * of another defined zone.
+   *
+   * Padding is defined using the standard CSS border & padding spec style:
+   * - [a]:  equal and even padding on all sides
+   * - [a, b]: top & bottom use `a`, left & right use `b`
+   * - [a, b, c]: top uses `a`, left & right use `b`, bottom uses `c`
+   * - [a, b, c, d]: top, right, bottom, then left.
+   *
+   * Positive padding reduces the size of the resulting zone; negative padding expands it.
+   *
+   * @param rootZoneSource The root zone source object/element to be 'padded'
+   * @param edgePadding A set of 1 to 4 numbers defining padding per the standard CSS border & padding spec style.
+   */
+  updatePadding(edgePadding: number[]) {
+
     // Modeled after CSS styling definitions... just with preprocessed numbers, not strings.
     switch(edgePadding.length) {
       case 1:
         // all sides equal
         const val = edgePadding[0];
-        this.edgePadding = {
+        this._edgePadding = {
           x: val,
           y: val,
           w: 2 * val,
@@ -68,7 +92,7 @@ export class PaddedZoneSource implements RecognitionZoneSource {
         break;
       case 2:
         // top & bottom, left & right
-        this.edgePadding = {
+        this._edgePadding = {
           x: edgePadding[1],
           y: edgePadding[0],
           w: 2 * edgePadding[1],
@@ -77,7 +101,7 @@ export class PaddedZoneSource implements RecognitionZoneSource {
         break;
       case 3:
         // top, left & right, bottom
-        this.edgePadding = {
+        this._edgePadding = {
           x: edgePadding[1],
           y: edgePadding[0],
           w: 2 * edgePadding[1],
@@ -85,7 +109,7 @@ export class PaddedZoneSource implements RecognitionZoneSource {
         };
       case 4:
         // top, right, bottom, left
-        this.edgePadding = {
+        this._edgePadding = {
           x: edgePadding[3],
           y: edgePadding[0],
           w: edgePadding[1] + edgePadding[3],

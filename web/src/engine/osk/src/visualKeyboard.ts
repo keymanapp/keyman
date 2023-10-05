@@ -19,7 +19,8 @@ import {
   GestureRecognizer,
   GestureRecognizerConfiguration,
   GestureSource,
-  InputSample
+  InputSample,
+  PaddedZoneSource
 } from '@keymanapp/gesture-recognizer';
 
 import { createStyleSheet, getAbsoluteX, getAbsoluteY, StylesheetManager } from 'keyman/engine/dom-utils';
@@ -336,11 +337,16 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
   }
 
   private constructGestureEngine(): GestureRecognizer<KeyElement, string> {
+    const rowCount = this.kbdLayout.layerMap['default'].row.length;
+
     const config: GestureRecognizerConfiguration<KeyElement, string> = {
       targetRoot: this.element,
       // document.body is the event root for mouse interactions b/c we need to track
       // when the mouse leaves the VisualKeyboard's hierarchy.
       mouseEventRoot: document.body,
+      // Note: at this point in execution, the value will evaluate to NaN!  Height hasn't been set yet.
+      // BUT:  we need to establish the instance now; we can update it later when height _is_ set.
+      maxRoamingBounds: new PaddedZoneSource(this.element, [-0.333 * this.height / rowCount]),
       // touchEventRoot:  this.element, // is the default
       itemIdentifier: (sample, target) => {
         /* ALWAYS use the findNearestKey function.
@@ -458,6 +464,10 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
 
           // -- Scratch-space as gestures start becoming integrated --
           // Reordering may follow at some point.
+          //
+          // Potential long-term idea:  only handle the first stage; delegate future stages to
+          // specialized handlers for the remainder of the sequence.
+          // Should work for modipresses, too... I think.
           if(gestureStage.matchedId == 'special-key-start' && gestureKey.key.spec.baseKeyID == 'K_BKSP') {
             // Possible enhancement:  maybe update the held location for the backspace if there's movement?
             // But... that seems pretty low-priority.
@@ -1465,8 +1475,6 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
     gs.fontSize = this.fontSize.styleString;
     bs.fontSize = ParsedLengthStyle.forScalar(fs).styleString;
 
-    // NEW CODE ------
-
     // Step 1:  have the necessary conditions been met?
     const fixedSize = this.width && this.height;
     const computedStyle = getComputedStyle(this.kbdDiv);
@@ -1492,9 +1500,10 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
       return;
     }
 
-    // Step 3:  perform layout operations.  (Handled by 'old code' section below.)
-
-    // END NEW CODE -----------
+    // Step 3:  perform layout operations.
+    const paddingZone = this.gestureEngine.config.maxRoamingBounds as PaddedZoneSource;
+    const rowCount = this.currentLayer.rows.length;
+    paddingZone.updatePadding([-0.333 * this._computedHeight / rowCount]);
 
     // Needs the refreshed layout info to work correctly.
     if(this.currentLayer) {
