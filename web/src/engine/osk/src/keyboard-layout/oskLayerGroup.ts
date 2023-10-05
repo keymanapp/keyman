@@ -124,6 +124,11 @@ export default class OSKLayerGroup {
       }
     }
 
+    // If the coordinate isn't even on the keyboard... abort.
+    if(row == null) {
+      return null;
+    }
+
     // Assertion:  row no longer `null`.
 
     // Warning: am not 100% sure that what follows is actually fully correct.
