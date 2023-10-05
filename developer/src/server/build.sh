@@ -32,7 +32,7 @@ builder_describe_outputs \
   configure:server     /node_modules \
   configure:addins     /node_modules \
   build:server         /developer/src/server/build/src/index.js \
-  build:addins         /developer/src/server/build/src/win32/console/index.js
+  build:addins         /developer/src/server/build/src/win32/trayicon/addon.node
 
 builder_parse "$@"
 
