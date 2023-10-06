@@ -12,7 +12,7 @@ test: prereq
 
 # prereq may not be needed?
 prereq:
-  cd $(VERIFY_SIGNATURES)
+  cd $(VERIFY_SIGNATURES_PATH)
   $(MAKE)
 
 clean: def-clean
