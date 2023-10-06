@@ -11,12 +11,7 @@ import langtags from "./imports/langtags.js";
 import { validateMITLicense } from "@keymanapp/developer-utils";
 import { KmpCompiler } from "@keymanapp/kmc-package";
 
-import AjvModule from 'ajv';
-import AjvFormatsModule from 'ajv-formats';
-const Ajv = AjvModule.default; // The actual expected Ajv type.
-const ajvFormats = AjvFormatsModule.default;
-
-import { Schemas } from "@keymanapp/common-types";
+import { SchemaValidators } from "@keymanapp/common-types";
 import { packageKeysExamplesToKeyboardInfo } from "./example-keys.js";
 
 const regionNames = new Intl.DisplayNames(['en'], { type: "region" });
@@ -290,17 +285,10 @@ export class KeyboardInfoCompiler {
 
     const jsonOutput = JSON.stringify(keyboard_info, null, 2);
 
-    // TODO: look at performance improvements by precompiling Ajv schemas on first use
-    const ajv = new Ajv({ logger: {
-      log: (message) => this.callbacks.reportMessage(KeyboardInfoCompilerMessages.Hint_OutputValidation({message})),
-      warn: (message) => this.callbacks.reportMessage(KeyboardInfoCompilerMessages.Warn_OutputValidation({message})),
-      error: (message) => this.callbacks.reportMessage(KeyboardInfoCompilerMessages.Error_OutputValidation({message})),
-    }});
-    ajvFormats.default(ajv);
-    if(!ajv.validate(Schemas.default.keyboard_info, keyboard_info)) {
+    if(!SchemaValidators.default.keyboard_info(keyboard_info)) {
       // This is an internal fatal error; we should not be capable of producing
       // invalid output, so it is best to throw and die
-      throw new Error(ajv.errorsText());
+      throw new Error((<any>SchemaValidators.default.keyboard_info).errorsText());
     }
 
     return new TextEncoder().encode(jsonOutput);

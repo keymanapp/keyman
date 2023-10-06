@@ -5,7 +5,6 @@
     "outDir": "build/src/",
     "rootDir": "src/",
     "baseUrl": ".",
-    "allowSyntheticDefaultImports": true, // for ajv
 
     "paths": {
       // "@keymanapp/keyman-version": ["../../../common/web/keyman-version/keyman-version.mts"],
