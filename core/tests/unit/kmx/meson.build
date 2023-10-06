@@ -85,7 +85,7 @@ tests = [
 node = find_program('node', required: true)
 
 kmc_root = meson.current_source_dir() / '../../../../developer/src/kmc/build/src/kmc.js'
-kmc_cmd = [node, kmc_root]
+kmc_cmd = [node, '--enable-source-maps', kmc_root]
 
 if build_machine.system() == 'windows'
   copy_cmd = [find_program('cmd.exe', required: true), '/c', 'copy']

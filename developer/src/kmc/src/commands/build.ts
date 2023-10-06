@@ -157,6 +157,9 @@ async function build(filename: string, parentCallbacks: NodeCompilerCallbacks, o
         : InfrastructureMessages.Info_FileBuiltSuccessfully({filename:buildFilename, relativeFilename})
       );
     } else {
+      if(!callbacks.hasFailureMessage(false)) { // false == check only for error+fatal messages
+        callbacks.reportMessage(InfrastructureMessages.Info_WarningsHaveFailedBuild());
+      }
       callbacks.reportMessage(builder instanceof BuildProject
         ? InfrastructureMessages.Info_ProjectNotBuiltSuccessfully({filename:buildFilename, relativeFilename})
         : InfrastructureMessages.Info_FileNotBuiltSuccessfully({filename:buildFilename, relativeFilename})

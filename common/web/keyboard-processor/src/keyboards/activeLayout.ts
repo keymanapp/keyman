@@ -48,6 +48,12 @@ export class ActiveKey implements LayoutKey {
   _baseKeyEvent: KeyEvent;
   isMnemonic: boolean = false;
 
+  /**
+   * Only available on subkeys, but we don't distinguish between base keys and subkeys
+   * at this level yet in KMW.
+   */
+  default?: boolean;
+
   proportionalPad: number;
   proportionalX: number;
   proportionalWidth: number;

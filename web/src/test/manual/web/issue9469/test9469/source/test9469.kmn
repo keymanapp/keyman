@@ -3,7 +3,7 @@ c with name "test9469"
 store(&VERSION) '10.0'
 store(&NAME) 'test9469'
 store(&COPYRIGHT) '© 2023 SIL International'
-store(&KEYBOARDVERSION) '1.0'
+store(&KEYBOARDVERSION) '1.1'
 store(&TARGETS) 'any'
 store(&BITMAP) 'test9469.ico'
 store(&VISUALKEYBOARD) 'test9469.kvks'
@@ -14,4 +14,7 @@ begin Unicode > use(main)
 
 group(main) using keys
 
-c This keyboard is just to visually inspect the touch layout key caps / longpress so none of the T_new_ keys are defined
+c This keyboard is just to visually inspect the touch layout key caps / longpress so nearly all of the T_new_ keys are not defined
++ [T_ZWNJ] > U+200C
++ [T_ZWNJIOS] > U+200C
++ [T_ZWNJANDROID] > U+200C

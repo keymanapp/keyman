@@ -404,17 +404,6 @@ export class Bksp extends Tran {
   }
 };
 
-// 'vkey'
-
-export class VkeyItem {
-  vkey: number;
-  target: number;
-}
-
-export class Vkey extends Section {
-  vkeys: VkeyItem[] = [];
-};
-
 // 'disp'
 export class DispItem {
   to: StrsItem;
@@ -433,7 +422,7 @@ export class Disp extends Section {
  * In-memory `<layers>`
  */
 export class LayrList {
-  hardware: number;
+  hardware: StrsItem;
   layers: LayrEntry[] = [];
   minDeviceWidth: number; // millimeters
 };
@@ -569,7 +558,6 @@ export interface KMXPlusData {
     tran?: Tran;
     uset?: Uset; // uset is ignored in-memory
     vars?: Vars;
-    vkey?: Vkey;
 };
 
 export class KMXPlusFile extends KMXFile {
@@ -720,7 +708,7 @@ export class KMXPlusFile extends KMXFile {
     });
 
     this.COMP_PLUS_LAYR_LIST = new r.Struct({
-      hardware: r.uint32le, //enum
+      hardware: STR_REF, // str: hardware name
       layer: r.uint32le, // index into layers
       count: r.uint32le,
       minDeviceWidth: r.uint32le, // integer: millimeters

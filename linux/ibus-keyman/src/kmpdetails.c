@@ -455,6 +455,24 @@ kmp_json_status free_keyboard_details(keyboard_details *kbd_details)
     return JSON_OK;
 }
 
+void free_info(gpointer data) {
+  kmp_info *info = (kmp_info *)data;
+  if (info->name)
+    g_free(info->name);
+  if (info->version)
+    g_free(info->version);
+  if (info->copyright)
+    g_free(info->copyright);
+  if (info->author_desc)
+    g_free(info->author_desc);
+  if (info->author_url)
+    g_free(info->author_url);
+  if (info->website_desc)
+    g_free(info->website_desc);
+  if (info->website_url)
+    g_free(info->website_url);
+}
+
 kmp_json_status free_kmp_details(kmp_details * details)
 {
     g_assert(details != NULL);
@@ -462,15 +480,9 @@ kmp_json_status free_kmp_details(kmp_details * details)
     g_free(details->system.keymanDeveloperVersion);
     g_free(details->options.readmeFile);
     g_free(details->options.graphicFile);
-    g_free(details->info.name);
-    g_free(details->info.version);
-    g_free(details->info.copyright);
-    g_free(details->info.author_desc);
-    g_free(details->info.author_url);
-    g_free(details->info.website_desc);
-    g_free(details->info.website_url);
+    free_info(&details->info);
     if (details->keyboards != NULL) {
-        g_list_free_full(details->keyboards, (GDestroyNotify)free_keyboard);
+      g_list_free_full(details->keyboards, (GDestroyNotify)free_keyboard);
     }
     if (details->files != NULL) {
         g_list_free_full(details->files, (GDestroyNotify)free_fileinfo);

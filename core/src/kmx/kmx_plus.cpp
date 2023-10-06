@@ -216,25 +216,6 @@ COMP_KMXPLUS_META::valid(KMX_DWORD _kmn_unused(length)) const {
 }
 
 bool
-COMP_KMXPLUS_VKEY::valid(KMX_DWORD _kmn_unused(length)) const {
-  DebugLog("vkey: count 0x%X\n", count);
-  if (header.size < sizeof(*this)+(sizeof(entries[0])*count)) {
-    DebugLog("header.size < expected size");
-    assert(false);
-    return false;
-  }
-  for (KMX_DWORD i = 0; i < count; i++) {
-    DebugLog("vkey #0x%X: 0x%X->0x%X", i, entries[i].vkey, entries[i].target);
-    if (entries[i].vkey > 0xFF || entries[i].target > 0xFF) {
-      DebugLog("vkey source or target out of range [0x00…0xFF]");
-      assert(false);
-      return false;
-    }
-  }
-  return true;
-}
-
-bool
 COMP_KMXPLUS_DISP::valid(KMX_DWORD _kmn_unused(length)) const {
   DebugLog("disp: count 0x%X\n", count);
   if (header.size < sizeof(*this)+(sizeof(entries[0])*count)) {
@@ -1183,7 +1164,7 @@ COMP_KMXPLUS_USET_Helper::getRange(KMX_DWORD i) const {
 
 kmx_plus::kmx_plus(const COMP_KEYBOARD *keyboard, size_t length)
     : bksp(nullptr), disp(nullptr), elem(nullptr), key2(nullptr), layr(nullptr), list(nullptr), loca(nullptr), meta(nullptr),
-      sect(nullptr), strs(nullptr), tran(nullptr), vars(nullptr), vkey(nullptr), valid(false) {
+      sect(nullptr), strs(nullptr), tran(nullptr), vars(nullptr), valid(false) {
   DebugLog("kmx_plus: Got a COMP_KEYBOARD at %p\n", keyboard);
 #if !KMXPLUS_DEBUG_LOAD
   DebugLog("Note: define KMXPLUS_DEBUG_LOAD=1 at compile time for more verbosity in loading");
@@ -1232,7 +1213,6 @@ kmx_plus::kmx_plus(const COMP_KEYBOARD *keyboard, size_t length)
     tran = section_from_sect<COMP_KMXPLUS_TRAN>(sect);
     uset = section_from_sect<COMP_KMXPLUS_USET>(sect);
     vars = section_from_sect<COMP_KMXPLUS_VARS>(sect);
-    vkey = section_from_sect<COMP_KMXPLUS_VKEY>(sect);
 
     // Initialize the helper objects for sections with dynamic parts.
     // Note: all of these setters will be passed 'nullptr'
