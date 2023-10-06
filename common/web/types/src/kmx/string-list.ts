@@ -73,10 +73,18 @@ export class ListItem extends Array<ListIndex> implements OrderedStringList {
   }
   /** for debugging, print as single string */
   toString(): string {
-    return this.toStringArray().join(' ');
+    let ss = '';
+    for (let i = 0 ;i < this.length; i++) {
+      if (ss)  {
+         ss = ss + ' ';
+      }
+      ss = ss + (this[i].toString());
+    }
+    return ss;
+    // return this.toStringArray().join(' ');
   }
   /** for debugging, map to string array */
   toStringArray(): string[] {
-    return this.map(v => v.value.value);
+    return this.map(v => v.toString());
   }
 };
