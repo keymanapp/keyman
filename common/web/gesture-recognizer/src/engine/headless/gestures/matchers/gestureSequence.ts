@@ -130,7 +130,9 @@ export class GestureSequence<Type> extends EventEmitter<EventMap<Type>> {
   }
 
   public get allSourceIds(): string[] {
-    return this.stageReports[this.stageReports.length - 1]?.allSourceIds;
+    // Note:  there is a brief window of time - between construction & the deferred first
+    // 'stage' event - during which this array may be of length 0.
+    return this.stageReports[this.stageReports.length - 1]?.allSourceIds ?? [];
   }
 
   private get baseGestureSetId(): string {

@@ -221,7 +221,10 @@ export class MatcherSelector<Type> extends EventEmitter<EventMap<Type>> {
         matcher: null,
         result: {
           matched: false,
-          action: null
+          action: {
+            type: 'complete',
+            item: null
+          }
         }
       });
     }

@@ -52,6 +52,11 @@ export class BrowserDriver {
   simulateOSKEvent(eventSpec: OSKInputEventSpec) {
     let target = this.target;
     let oskKeyElement = document.getElementById(eventSpec.keyID);
+    const boundingBox = oskKeyElement.getBoundingClientRect();
+    const center = {
+      clientX: boundingBox.left + boundingBox.width/2,
+      clientY: boundingBox.top + boundingBox.height/2
+    }
 
     if(!oskKeyElement) {
       console.error('Could not find OSK key "' + eventSpec.keyID + '"!');
@@ -65,14 +70,18 @@ export class BrowserDriver {
     if(keyman.config.hostDevice.touchable) {
       downEvent = new Event(BrowserDriver.oskDownTouchType);
       upEvent = new Event(BrowserDriver.oskUpTouchType);
-      downEvent['touches'] = [{"target": oskKeyElement}];
-      upEvent['touches'] = [{"target": oskKeyElement}];
-      downEvent['changedTouches'] = [{"target": oskKeyElement}];
-      upEvent['changedTouches'] = [{"target": oskKeyElement}];
+      downEvent['touches'] = [{"target": oskKeyElement, ...center}];
+      upEvent['touches'] = [{"target": oskKeyElement, ...center}];
+      downEvent['changedTouches'] = [{"target": oskKeyElement, ...center}];
+      upEvent['changedTouches'] = [{"target": oskKeyElement, ...center}];
     } else {
       downEvent = new Event(BrowserDriver.oskDownMouseType);
       upEvent = new Event(BrowserDriver.oskUpMouseType);
+      downEvent.clientX = center.clientX;
+      downEvent.clientY = center.clientY;
       downEvent['relatedTarget'] = target;
+      upEvent.clientX = center.clientX;
+      upEvent.clientY = center.clientY;
       upEvent['relatedTarget'] = target;
       // Mouse-click driven OSK use involves use of at least one mouse button.
       downEvent['button'] = upEvent['button'] = 0;
