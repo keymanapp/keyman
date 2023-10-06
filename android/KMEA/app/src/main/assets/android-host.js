@@ -69,6 +69,7 @@ function showBanner(flag) {
 function setBanner(bannerType) {
   if (keyman.osk && keyman.osk.bannerController) {
     window.console.log('setBanner: current KMW banner is: ' + keyman.osk.bannerController.activeType);
+    window.console.log('setBanner: options are: ' + JSON.stringify(keyman.osk.bannerController.getOptions()));
     if (keyman.osk.bannerController.activeType == 'blank') {
       keyman.osk.bannerController.setBanner(bannerType);
     }

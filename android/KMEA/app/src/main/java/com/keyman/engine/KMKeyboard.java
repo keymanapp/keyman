@@ -98,7 +98,7 @@ final class KMKeyboard extends WebView {
 
   // Stores the current image for use by the Banner
   // when predictive text is not active
-  protected String bannerImgPath;
+  protected String bannerImagePath;
 
   // Facilitates a 'lazy init' - we'll only check the preference when it matters,
   // rather than at construction time.
@@ -395,8 +395,8 @@ final class KMKeyboard extends WebView {
 
     int bannerHeight = KMManager.getBannerHeight(context);
     int oskHeight = KMManager.getKeyboardHeight(context);
-    if (this.bannerImgPath != null) {
-      loadJavascript(KMString.format("setBannerImage('%s')", this.bannerImgPath));
+    if (this.bannerImagePath != null) {
+      loadJavascript(KMString.format("setBannerImage('%s')", this.bannerImagePath));
     }
     loadJavascript(KMString.format("setBannerHeight(%d)", bannerHeight));
     loadJavascript(KMString.format("setOskWidth(%d)", newConfig.screenWidthDp));
@@ -659,8 +659,12 @@ final class KMKeyboard extends WebView {
     loadJavascript(jsString);
   }
 
+  public String getBannerImage() {
+    return this.bannerImagePath;
+  }
+
   public void setBannerImage(String path) {
-    this.bannerImgPath = path; // Save the path in case delayed initialization is needed
+    this.bannerImagePath = path; // Save the path in case delayed initialization is needed
     String logString = "";
     if (path != null && path.contains("base64") || path.length() > 256) {
       logString = "<base64 image>";
