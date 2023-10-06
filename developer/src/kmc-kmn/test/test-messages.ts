@@ -1,11 +1,10 @@
 import 'mocha';
-import path from 'path';
 import { assert } from 'chai';
 import { CompilerMessages } from '../src/compiler/messages.js';
 import { TestCompilerCallbacks, verifyCompilerMessagesObject } from '@keymanapp/developer-test-helpers';
 import { makePathToFixture } from './helpers/index.js';
 import { KmnCompiler } from '../src/main.js';
-import { CompilerErrorNamespace, KeymanFileTypes } from '@keymanapp/common-types';
+import { CompilerErrorNamespace } from '@keymanapp/common-types';
 
 describe('CompilerMessages', function () {
   const callbacks = new TestCompilerCallbacks();
@@ -28,10 +27,9 @@ describe('CompilerMessages', function () {
     assert(compiler.verifyInitialized());
 
     const kmnPath = makePathToFixture(...fixture);
-    const outfile = path.basename(kmnPath, KeymanFileTypes.Source.KeymanKeyboard) + KeymanFileTypes.Binary.Keyboard;
 
     // Note: throwing away compile results (just to memory)
-    compiler.runCompiler(kmnPath, outfile, {saveDebug: true, shouldAddCompilerVersion: false});
+    compiler.runCompiler(kmnPath, {saveDebug: true, shouldAddCompilerVersion: false});
 
     if(messageId) {
       assert.isTrue(callbacks.hasMessage(messageId), `messageId ${messageId.toString(16)} not generated, instead got: `+JSON.stringify(callbacks.messages,null,2));

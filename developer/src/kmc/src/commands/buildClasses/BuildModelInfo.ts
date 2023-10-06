@@ -1,15 +1,16 @@
 import * as fs from 'fs';
 import { BuildActivity } from './BuildActivity.js';
 import { CompilerCallbacks, CompilerOptions, KeymanFileTypes } from '@keymanapp/common-types';
-import { writeMergedModelMetadataFile } from '@keymanapp/kmc-model-info';
+import { ModelInfoCompiler } from '@keymanapp/kmc-model-info';
 import { KmpCompiler } from '@keymanapp/kmc-package';
 import { loadProject } from '../../util/projectLoader.js';
 import { InfrastructureMessages } from '../../messages/infrastructureMessages.js';
 import { calculateSourcePath } from '../../util/calculateSourcePath.js';
+import { getLastGitCommitDate } from '../../util/getLastGitCommitDate.js';
 
 export class BuildModelInfo extends BuildActivity {
   public get name(): string { return 'Lexical model metadata'; }
-  public get sourceExtension(): KeymanFileTypes.Source { return KeymanFileTypes.Source.ModelInfo; }
+  public get sourceExtension(): KeymanFileTypes.Source { return KeymanFileTypes.Source.Project; }
   public get compiledExtension(): KeymanFileTypes.Binary { return KeymanFileTypes.Binary.ModelInfo; }
   public get description(): string { return 'Build a lexical model metadata file'; }
 
@@ -24,20 +25,15 @@ export class BuildModelInfo extends BuildActivity {
    * @returns
    */
   public async build(infile: string, callbacks: CompilerCallbacks, options: CompilerOptions): Promise<boolean> {
-    if(KeymanFileTypes.filenameIs(infile, KeymanFileTypes.Source.ModelInfo)) {
-      // We are given a .model_info but need to use the project file in the
-      // same folder, so that we can find the related files.
-      infile = KeymanFileTypes.replaceExtension(infile, KeymanFileTypes.Source.ModelInfo, KeymanFileTypes.Source.Project);
+    if(!KeymanFileTypes.filenameIs(infile, KeymanFileTypes.Source.Project)) {
+      // Even if the project file does not exist, we use its name as our reference
+      // in order to avoid ambiguity
+      throw new Error(`BuildModelInfo called with unexpected file type ${infile}`);
     }
+
     const project = loadProject(infile, callbacks);
     if(!project) {
       // Error messages will be reported by loadProject
-      return false;
-    }
-
-    const metadata = project.files.find(file => file.fileType == KeymanFileTypes.Source.ModelInfo);
-    if(!metadata) {
-      callbacks.reportMessage(InfrastructureMessages.Error_FileTypeNotFound({ext: KeymanFileTypes.Source.ModelInfo}));
       return false;
     }
 
@@ -60,25 +56,25 @@ export class BuildModelInfo extends BuildActivity {
       return false;
     }
 
-    const data = writeMergedModelMetadataFile(
-      project.resolveInputFilePath(metadata),
-      callbacks,
-      {
-        model_id: callbacks.path.basename(metadata.filename, KeymanFileTypes.Source.ModelInfo),
-        kmpJsonData,
-        sourcePath: calculateSourcePath(infile),
-        modelFileName: project.resolveOutputFilePath(model, KeymanFileTypes.Source.Model, KeymanFileTypes.Binary.Model),
-        kmpFileName: project.resolveOutputFilePath(kps, KeymanFileTypes.Source.Package, KeymanFileTypes.Binary.Package),
-      }
-    );
+    const lastCommitDate = getLastGitCommitDate(project.projectPath);
+    const compiler = new ModelInfoCompiler(callbacks);
+    const data = compiler.writeModelMetadataFile({
+      model_id: callbacks.path.basename(project.projectPath, KeymanFileTypes.Source.Project),
+      kmpJsonData,
+      sourcePath: calculateSourcePath(infile),
+      modelFileName: project.resolveOutputFilePath(model, KeymanFileTypes.Source.Model, KeymanFileTypes.Binary.Model),
+      kmpFileName: project.resolveOutputFilePath(kps, KeymanFileTypes.Source.Package, KeymanFileTypes.Binary.Package),
+      kpsFilename: project.resolveInputFilePath(kps),
+      lastCommitDate
+    });
 
     if(data == null) {
-      // Error messages have already been emitted by writeMergedModelMetadataFile
+      // Error messages have already been emitted by writeModelMetadataFile
       return false;
     }
 
     fs.writeFileSync(
-      project.resolveOutputFilePath(metadata, KeymanFileTypes.Source.ModelInfo, KeymanFileTypes.Binary.ModelInfo),
+      project.getOutputFilePath(KeymanFileTypes.Binary.ModelInfo),
       data
     );
 

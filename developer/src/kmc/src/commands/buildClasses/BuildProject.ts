@@ -2,7 +2,7 @@ import * as path from 'path';
 import * as fs from 'fs';
 import { CompilerCallbacks, CompilerFileCallbacks, CompilerOptions, KeymanDeveloperProject, KeymanDeveloperProjectFile, KeymanFileTypes } from '@keymanapp/common-types';
 import { BuildActivity } from './BuildActivity.js';
-import { buildActivities } from './buildActivities.js';
+import { buildActivities, buildKeyboardInfoActivity, buildModelInfoActivity } from './buildActivities.js';
 import { InfrastructureMessages } from '../../messages/infrastructureMessages.js';
 import { loadProject } from '../../util/projectLoader.js';
 
@@ -52,13 +52,24 @@ class ProjectBuilder {
       }
     }
 
-    // TODO: generate .keyboard_info from .kps + etc (and support merge of
-    // $PROJECTPATH/.keyboard_info for version 1.0 projects)
+    // Build project metadata
+    if(!this.project.options.skipMetadataFiles) {
+      if(!await (this.buildProjectTargets(
+          this.project.isKeyboardProject()
+          ? buildKeyboardInfoActivity
+          : buildModelInfoActivity))) {
+        return false;
+      }
+    }
 
     return true;
   }
 
   async buildProjectTargets(activity: BuildActivity): Promise<boolean> {
+    if(activity.sourceExtension == KeymanFileTypes.Source.Project) {
+      return await this.buildTarget(this.project.projectFile, activity);
+    }
+
     let result = true;
     for(let file of this.project.files) {
       if(file.fileType.toLowerCase() == activity.sourceExtension) {
@@ -76,7 +87,7 @@ class ProjectBuilder {
 
     const buildFilename = path.relative(process.cwd(), infile).replace(/\\/g, '/');
     const callbacks = new CompilerFileCallbacks(buildFilename, options, this.callbacks);
-    callbacks.reportMessage(InfrastructureMessages.Info_BuildingFile({filename: buildFilename}));
+    callbacks.reportMessage(InfrastructureMessages.Info_BuildingFile({filename: infile, relativeFilename:buildFilename}));
 
     fs.mkdirSync(path.dirname(options.outFile), {recursive:true});
 
@@ -87,9 +98,9 @@ class ProjectBuilder {
     result = result && !callbacks.hasFailureMessage(this.options.compilerWarningsAsErrors ?? this.project.options.compilerWarningsAsErrors);
 
     if(result) {
-      callbacks.reportMessage(InfrastructureMessages.Info_FileBuiltSuccessfully({filename: buildFilename}));
+      callbacks.reportMessage(InfrastructureMessages.Info_FileBuiltSuccessfully({filename: infile, relativeFilename:buildFilename}));
     } else {
-      callbacks.reportMessage(InfrastructureMessages.Info_FileNotBuiltSuccessfully({filename: buildFilename}));
+      callbacks.reportMessage(InfrastructureMessages.Info_FileNotBuiltSuccessfully({filename: infile, relativeFilename: buildFilename}));
     }
 
     return result;

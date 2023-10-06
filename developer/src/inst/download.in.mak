@@ -22,7 +22,7 @@ KEYMAN_WIX_TEMP_SERVER=$(TEMP)\keyman_wix_build\Server
 KEYMAN_WIX_KMDEV_SERVER=$(DEVELOPER_ROOT)\bin\server
 KEYMAN_DEVELOPER_TEMPLATES_ROOT=$(DEVELOPER_ROOT)\src\kmconvert\data
 
-copykmdev: makeinstaller make-kmcomp-install-zip
+copykmdev: makeinstaller make-kmc-install-zip
     -mkdir $(DEVELOPER_ROOT)\release\$Version
     copy /Y $(DEVELOPER_ROOT)\src\inst\keymandeveloper.msi $(DEVELOPER_ROOT)\release\$Version\keymandeveloper.msi
     copy /Y $(DEVELOPER_ROOT)\src\inst\keymandeveloper-$Version.exe $(DEVELOPER_ROOT)\release\$Version\keymandeveloper-$Version.exe
@@ -105,21 +105,20 @@ makeinstaller:
     $(SIGNCODE) /d "Keyman Developer" keymandeveloper-$Version.exe
 
 #
-# Zip the files we distribute as part of the standalone kmcomp distro into release\$Version\kmcomp-$Version.zip
+# Zip the files we distribute as part of the standalone kmc distro into release\$Version\kmcomp-$Version.zip
 #
 
-KMCOMP_ZIP=$(DEVELOPER_ROOT)\release\$Version\kmcomp-$Version.zip
+# TODO: rename this to keyman-developer-cli-$Version.zip
+KMC_ZIP=$(DEVELOPER_ROOT)\release\$Version\kmcomp-$Version.zip
 
-make-kmcomp-install-zip: copy-schemas
+make-kmc-install-zip: copy-schemas
     cd $(DEVELOPER_ROOT)\bin
 
-    $(WZZIP) -bd -bb0 $(KMCOMP_ZIP) \
-        kmcomp.exe kmcmpdll.dll \
-        kmcomp.x64.exe kmcmpdll.x64.dll \
+    $(WZZIP) -bd -bb0 $(KMC_ZIP) \
         kmconvert.exe \
         sentry.dll sentry.x64.dll \
         kmdecomp.exe \
-        keyboard_info.source.json keyboard_info.distribution.json \
+        keyboard_info.schema.json \
         keyman-touch-layout.spec.json keyman-touch-layout.clean.spec.json \
         xml\layoutbuilder\*.keyman-touch-layout \
         projects\* \
@@ -130,8 +129,7 @@ make-kmcomp-install-zip: copy-schemas
 # ldml-keyboard3.schema.json ldml-keyboardtest3.schema.json \
 
 copy-schemas:
-    copy $(KEYMAN_ROOT)\common\schemas\keyboard_info\keyboard_info.source.json $(DEVELOPER_ROOT)\bin
-    copy $(KEYMAN_ROOT)\common\schemas\keyboard_info\keyboard_info.distribution.json $(DEVELOPER_ROOT)\bin
+    copy $(KEYMAN_ROOT)\common\schemas\keyboard_info\keyboard_info.schema.json $(DEVELOPER_ROOT)\bin
     copy $(KEYMAN_ROOT)\common\schemas\keyman-touch-layout\keyman-touch-layout.spec.json $(DEVELOPER_ROOT)\bin
     copy $(KEYMAN_ROOT)\common\schemas\keyman-touch-layout\keyman-touch-layout.clean.spec.json $(DEVELOPER_ROOT)\bin
     copy $(KEYMAN_ROOT)\common\schemas\displaymap\displaymap.schema.json $(DEVELOPER_ROOT)\bin

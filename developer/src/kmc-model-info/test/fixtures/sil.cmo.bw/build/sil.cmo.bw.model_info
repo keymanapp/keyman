@@ -3,7 +3,8 @@
   "languages": [
     "cmo-Khmr"
   ],
-  "description": "Bunong Wordlist is based on the Bible wordlist of 1,157 unique entries with their frequencies.",
+  "description": "<p>Bunong Wordlist is based on the Bible wordlist of 1,157 unique entries with their frequencies.</p>",
+  "helpLink": "https://help.keyman.com/model/sil.cmo.bw",
   "id": "sil.cmo.bw",
   "name": "Bunong Wordlist",
   "authorName": "",

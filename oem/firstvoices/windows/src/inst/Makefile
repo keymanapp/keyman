@@ -8,9 +8,9 @@
 
 DESKTOP_FILES=firstvoices.wixobj desktopui.wixobj
 MSI=firstvoices.msi
+EXE_ZIP=firstvoices.zip
 EXE=firstvoices.exe
 KMP=fv_all.kmp
-INTEXE=firstvoices-fv_all.exe
 APPTITLE="Keyman for FirstVoices"
 TITLEIMAGE=setuptitle.png
 
@@ -48,12 +48,19 @@ prereq:
     cd $(FVROOT)\src\inst
 
 desktop: prereq
+    rem compile .msi
     $(MAKE) -fdownload.mak candle-desktop
     $(WIXLIGHT) -dWixUILicenseRtf=License.rtf -out $(MSI) -ext WixUIExtension $(DESKTOP_FILES)
     $(SIGNCODE) /d $(APPTITLE) $(MSI)
-    $(ROOT)\bin\buildtools\buildpkg -m $(MSI) -s $(ROOT)\bin\desktop -l license.html -a $(APPTITLE) -i $(TITLEIMAGE) -n "FirstVoices Keyboards" -startDisabled -startWithConfiguration $(KMP)
-    if exist $(EXE) del $(EXE)
-    ren $(INTEXE) $(EXE)
+
+    rem build self-extracting archive
+    $(MAKE) -fdownload.mak setup-inf
+    $(WZZIP) $(EXE_ZIP) $(MSI) license.html setup.inf $(TITLEIMAGE) $(KMP)
+    -del setup.inf
+    $(COPY) /b $(ROOT)\bin\desktop\setup-redist.exe + $(EXE_ZIP) $(EXE)
+    -del $(EXE_ZIP)
+
+    rem sign and copy files
     $(SIGNCODE) /d $(APPTITLE) $(EXE)
     $(MAKE) -fdownload.mak copyredist-desktop
 
