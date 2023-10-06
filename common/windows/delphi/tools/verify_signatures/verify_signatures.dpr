@@ -36,6 +36,7 @@ begin
     Delete(s,1,1);
   end;
 
+  // TODO: sign these files and move the check down to the EndsWith node test
   if str[0].ToLower.Contains('sentry.') or str[0].ToLower.Contains('crashpad_handler') or str[0].ToLower.Contains('keymanmc') then
     // We don't verify sentry.dll or sentry.x64.dll or crashpad_handler.exe because they're not our files
     // We don't verify keymanmc.dll because it has no version resources, as it is mc-generated
@@ -60,6 +61,14 @@ begin
     begin
       Exit('File was signed more than 1 day ago.');
     end;
+  end;
+
+  if str[0].ToLower.EndsWith('node') then
+  begin
+    // It's one of the node addons -- in developer server at time of writing
+    // we don't have a version resource but we have signed it, so treat it
+    // as valid
+    Exit('');
   end;
 
   if str[3] <> 'SIL International' then
