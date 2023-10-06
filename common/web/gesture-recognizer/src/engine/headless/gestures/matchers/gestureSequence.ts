@@ -142,6 +142,12 @@ export class GestureSequence<Type> extends EventEmitter<EventMap<Type>> {
    * current state.  They will be specified in descending `resolutionPriority` order.
    */
     public get potentialModelMatchIds(): string[] {
+      // If `this.selector` is null, it's because no further matches are possible.
+      // We've already emitted the 'complete' event as well.
+      if(!this.selector) {
+        return [];
+      }
+
       // The new round of model-matching is based on the sources used by the previous round.
       // This is important; 'sustainTimer' gesture models may rely on a now-terminated source
       // from that previous round (like with multitaps).
