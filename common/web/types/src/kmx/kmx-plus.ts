@@ -293,8 +293,8 @@ export class Vars extends Section {
       return v[0];
     }
   }
-  substituteMarkerString(s : string) : string {
-    return MarkerParser.toSentinelString(s, this.markers);
+  substituteMarkerString(s : string, forMatch? : boolean) : string {
+    return MarkerParser.toSentinelString(s, this.markers, forMatch);
   }
 };
 
