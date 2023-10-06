@@ -178,10 +178,16 @@ export class BannerController {
     imagePath: ""
   }
 
-  // Default to black image banner for Android
-  public static readonly DEFAULT_ANDROID_OPTIONS: BannerOptions = {
+  // Default to black image banner for Android phone
+  public static readonly DEFAULT_ANDROID_PHONE_OPTIONS: BannerOptions = {
     alwaysShow: true,
     imagePath: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABoAAAARCAIAAABM7ytaAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAAEnQAABJ0Ad5mH3gAAAAVSURBVDhPYxgFo2AUjIJRQDpgYAAABT8AAcEGbxwAAAAASUVORK5CYII="
+  }
+
+  // Default to gray image banner for Android tablet
+  public static readonly DEFAULT_ANDROID_TABLET_OPTIONS: BannerOptions = {
+    alwaysShow: true,
+    imagePath: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB8AAAAXCAYAAADz/ZRUAAAABHNCSVQICAgIfAhkiAAAABl0RVh0U29mdHdhcmUAZ25vbWUtc2NyZWVuc2hvdO8Dvz4AAAAtdEVYdENyZWF0aW9uIFRpbWUARnJpIDA2IE9jdCAyMDIzIDAyOjUxOjQ0IFBNICswN4WPPMwAAABRSURBVEiJ7c1BCoAwDAXRaeP9b6PQs9kkbt02CEX4sx9eu86RCWQmK7k7c95ExNL37qAAA5gZZlaGAXoU4K/qbRsNfaMtXLhw4cKFCxf+Y/wBEz4WP2Yx4QAAAAAASUVORK5CYII=="
   }
 
   constructor(bannerView: BannerView, hostDevice: DeviceSpec, predictionContext?: PredictionContext) {
@@ -192,9 +198,17 @@ export class BannerController {
 
     // Initialize with the default options - any 'manually set' options come post-construction.
     // This will also automatically set the default banner in place.
-    this.setOptions(
-      this.hostDevice.OS != DeviceSpec.OperatingSystem.Android ? 
-      BannerController.DEFAULT_OPTIONS : BannerController.DEFAULT_ANDROID_OPTIONS);
+    console.log(this.hostDevice);
+    this.setOptions(BannerController.DEFAULT_OPTIONS);
+    if (this.hostDevice.OS == DeviceSpec.OperatingSystem.Android) {
+      // Embedded Android devices will default to image banner
+      if (this.hostDevice.formFactor == DeviceSpec.FormFactor.Phone) {
+        this.setOptions(BannerController.DEFAULT_ANDROID_PHONE_OPTIONS);
+      } else if (this.hostDevice.formFactor == DeviceSpec.FormFactor.Tablet) {
+        this.setOptions(BannerController.DEFAULT_ANDROID_TABLET_OPTIONS);
+      }
+      // Desktop sticks with default options
+    }
   }
 
   /**
