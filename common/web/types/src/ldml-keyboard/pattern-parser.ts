@@ -64,9 +64,15 @@ export class MarkerParser {
   public static readonly MAX_MARKER_INDEX = constants.marker_max_index;
   /** Max count of markers */
   public static readonly MAX_MARKER_COUNT = constants.marker_max_count;
+
+  private static anyMarkerMatch() : string {
+    const start = (`0000` + (this.MIN_MARKER_INDEX).toString(16)).slice(-4);
+    const end   = (`0000` + (this.MAX_MARKER_INDEX).toString(16)).slice(-4);
+    return `${this.SENTINEL}${this.MARKER_CODE}[\\u${start}-\\u${end}]`;
+  }
+
   /** Expression that matches any marker */
-  public static readonly ANY_MARKER_MATCH =
-    this.SENTINEL + this.MARKER_CODE + `[\\u0001-\\u${this.MAX_MARKER_INDEX.toString(16)}]`;
+  public static readonly ANY_MARKER_MATCH = MarkerParser.anyMarkerMatch();
 
   /**
    * Pattern for matching a marker reference, OR the special marker \m{.}
