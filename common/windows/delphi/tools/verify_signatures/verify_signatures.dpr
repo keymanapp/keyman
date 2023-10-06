@@ -1,4 +1,4 @@
-program verify;
+program verify_signatures;
 
 {$APPTYPE CONSOLE}
 
@@ -90,7 +90,7 @@ begin
 
     if (ParamStr(1) = '-?') or (ParamCount < 1) then
     begin
-      writeln('verify [-d] VERSION.md: Verify the output of sigcheck to ensure all executables are signed and have proper version.');
+      writeln('verify_signatures [-d] VERSION.md: Verify the output of sigcheck to ensure all executables are signed and have proper version.');
       writeln('  -d: Check the timestamp on the signature is less than 2 days old.');
       writeln('  VERSION.md: path to the version to verify against');
       Halt(2);
