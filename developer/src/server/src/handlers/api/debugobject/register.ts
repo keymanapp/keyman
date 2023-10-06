@@ -1,9 +1,9 @@
-import express = require('express');
-import { DebugObject, isValidId, simplifyId } from "../../../data";
-import fs = require('fs');
-import crypto = require('crypto');
-import { configuration } from '../../../config';
-import chalk = require('chalk');
+import * as express from 'express';
+import { DebugObject, isValidId, simplifyId } from "../../../data.js";
+import * as fs from 'fs';
+import * as crypto from 'crypto';
+import { configuration } from '../../../config.js';
+import chalk from 'chalk';
 
 // We allow only 12 objects of each type in the cache
 const MAX_OBJECTS = 12;

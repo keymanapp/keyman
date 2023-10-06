@@ -1,13 +1,13 @@
 {
-  "extends": "../../../tsconfig-base.json",
+  "extends": "../../../tsconfig.esm-base.json",
 
   "compilerOptions": {
-    "module": "commonjs",
     "target": "es2022",
-    "moduleResolution": "node",
     "sourceMap": true,
-    "outDir": "dist/",
+    "outDir": "build/src/",
     "rootDir": "src/",
+    "baseUrl": ".",
+
     "declaration": true,
     "alwaysStrict": true,
     "noImplicitThis": true,
@@ -16,6 +16,7 @@
     "strictBindCallApply": true,
     "strictFunctionTypes": true,
     "noUnusedLocals": true,
+    "allowJs": true,
     "lib": ["es2022"]
   },
   "include": [
