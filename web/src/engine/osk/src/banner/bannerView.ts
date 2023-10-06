@@ -243,6 +243,9 @@ export class BannerController {
         case 'imagePath':
           // Determines the image file to use for ImageBanners.
           this.imagePath = optionSpec[key];
+          if(this.container.banner instanceof ImageBanner) {
+            this.container.banner.setImagePath(optionSpec[key]);
+          }
           break;
         default:
           // Invalid option specified!
