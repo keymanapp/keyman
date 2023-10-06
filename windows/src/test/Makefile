@@ -27,7 +27,7 @@ test-manifest-exec:
 # validate certificates and binary metadata on executables
 # TODO: move to buildtools?
 verify_signatures: .virtual
-    cd $(ROOT)\src\buildtools\verify_signatures
+    cd $(ROOT)\src\test\verify_signatures
     $(MAKE) $(TARGET)
 
 # ----------------------------------------------------------------------
