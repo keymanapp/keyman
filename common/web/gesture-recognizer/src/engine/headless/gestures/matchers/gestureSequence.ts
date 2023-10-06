@@ -72,10 +72,12 @@ interface PopConfig {
   count: number
 }
 
+export type ConfigChangeClosure<Type> = (configStackCommand: PushConfig<Type> | PopConfig) => void;
+
 interface EventMap<Type> {
   stage: (
     stageReport: GestureStageReport<Type>,
-    changeConfiguration: (configStackCommand: PushConfig<Type> | PopConfig) => void
+    changeConfiguration: ConfigChangeClosure<Type>
   ) => void;
   complete: () => void;
 }

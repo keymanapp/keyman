@@ -1,12 +1,10 @@
 import OSKSubKey from './oskSubKey.js';
-import RealizedGesture from '../realizedGesture.interface.js';
 import { type KeyElement } from '../../../keyElement.js';
 import OSKBaseKey from '../../../keyboard-layout/oskBaseKey.js';
 import VisualKeyboard from '../../../visualKeyboard.js';
-import InputEventCoordinate from '../../../input/inputEventCoordinate.js';
 
 import { DeviceSpec, KeyEvent, ActiveSubkey } from '@keymanapp/keyboard-processor';
-import { InputSample } from '@keymanapp/gesture-recognizer';
+import { ConfigChangeClosure, GestureRecognizerConfiguration, GestureSequence, PaddedZoneSource } from '@keymanapp/gesture-recognizer';
 
 /**
  * Represents a 'realized' longpress gesture's default implementation
@@ -24,11 +22,10 @@ import { InputSample } from '@keymanapp/gesture-recognizer';
  * The `Promise` may also resolve to `null` if the user indicates
  * the desire to cancel subkey selection.
  */
-export default class SubkeyPopup implements RealizedGesture {
+export default class SubkeyPopup {
   public readonly element: HTMLDivElement;
   public readonly shim: HTMLDivElement;
 
-  private vkbd: VisualKeyboard;
   private currentSelection: KeyElement;
 
   private callout: HTMLDivElement;
@@ -36,18 +33,33 @@ export default class SubkeyPopup implements RealizedGesture {
   public readonly baseKey: KeyElement;
   public readonly promise: Promise<KeyEvent>;
 
-  // Resolves the promise that generated this SubkeyPopup.
-  private resolver: (keyEvent: KeyEvent) => void;
+  public readonly subkeys: KeyElement[];
 
-  constructor(vkbd: VisualKeyboard, e: KeyElement) {
-    let _this = this;
-
-    this.promise = new Promise<KeyEvent>(function(resolve) {
-      _this.resolver = resolve;
-    })
-
-    this.vkbd = vkbd;
+  constructor(
+    source: GestureSequence<KeyElement>,
+    configChanger: ConfigChangeClosure<KeyElement>,
+    vkbd: VisualKeyboard,
+    e: KeyElement
+  ) {
     this.baseKey = e;
+
+    source.on('complete', () => {
+      this.currentSelection.key.highlight(false);
+      this.clear();
+    });
+
+    // From here, we want to make decisions based on only the subkey-menu portion of the gesture path.
+    const subkeyComponent = source.stageReports[0].sources[0].constructSubview(true, false);
+
+    // Watch for touchpoint selection of new keys.
+    subkeyComponent.path.on('step', (sample) => {
+      // Require a fudge-factor before dropping the default key.
+      if(subkeyComponent.path.stats.netDistance >= 4) {
+        this.currentSelection.key.highlight(false);
+        sample.item.key.highlight(true);
+        this.currentSelection = sample.item;
+      }
+    });
 
     // If the user doesn't move their finger and releases, we'll output the base key
     // by default.
@@ -60,15 +72,15 @@ export default class SubkeyPopup implements RealizedGesture {
     // The holder is position:fixed, but the keys do not need to be, as no scrolling
     // is possible while the array is visible.  So it is simplest to let the keys have
     // position:static and display:inline-block
-    var subKeys = this.element = document.createElement('div');
+    const elements = this.element = document.createElement('div');
 
     var i;
-    subKeys.id='kmw-popup-keys';
+    elements.id='kmw-popup-keys';
 
     // #3718: No longer prepend base key to popup array
 
     // Must set position dynamically, not in CSS
-    var ss=subKeys.style;
+    var ss=elements.style;
 
     // Set key font according to layout, or defaulting to OSK font
     // (copied, not inherited, since OSK is not a parent of popup keys)
@@ -85,6 +97,7 @@ export default class SubkeyPopup implements RealizedGesture {
     ss.width=(nCols*e.offsetWidth+nCols*5)+'px';
 
     // Add nested button elements for each sub-key
+    this.subkeys = [];
     for(i=0; i<nKeys; i++) {
       var needsTopMargin = false;
       let nRow=Math.floor(i/nCols);
@@ -99,8 +112,9 @@ export default class SubkeyPopup implements RealizedGesture {
       }
       let keyGenerator = new OSKSubKey(subKeySpec[i], layer);
       let kDiv = keyGenerator.construct(vkbd, <KeyElement> e, needsTopMargin);
+      this.subkeys.push(kDiv.firstChild as KeyElement);
 
-      subKeys.appendChild(kDiv);
+      elements.appendChild(kDiv);
     }
 
     // And add a filter to fade main keyboard
@@ -109,20 +123,82 @@ export default class SubkeyPopup implements RealizedGesture {
 
     // Highlight the duplicated base key or ideal subkey (if a phone)
     if(vkbd.device.formFactor == DeviceSpec.FormFactor.Phone) {
-      this.selectDefaultSubkey(vkbd, e, subKeys /* == this.element */);
+      this.selectDefaultSubkey(vkbd, e, elements /* == this.element */);
     }
+
+    vkbd.topContainer.appendChild(this.element);
+    vkbd.topContainer.appendChild(this.shim);
+
+    // Must be placed after its `.element` has been inserted into the DOM.
+    this.reposition(vkbd);
+
+    const config = this.buildPopupRecognitionConfig(vkbd);
+    configChanger({
+      type: 'push',
+      config: config
+    });
   }
 
-  finalize(input: InputSample<KeyElement>) {
-    if(this.resolver) {
-      let keyEvent: KeyEvent = null;
-      if(this.currentSelection) {
-        keyEvent = this.vkbd.initKeyEvent(this.currentSelection, input);
-        this.currentSelection.key.highlight(false);
+  private buildPopupRecognitionConfig(vkbd: VisualKeyboard): GestureRecognizerConfiguration<KeyElement, string> {
+    const baseBounding = this.element.getBoundingClientRect();
+    const underlyingKeyBounding = this.baseKey.getBoundingClientRect();
+
+    const subkeyStyle = this.subkeys[0].style;
+    const subkeyHeight = Number.parseInt(subkeyStyle.height, 10);
+    const basePadding = -0.333 * subkeyHeight;  // extends bounds by the absolute value.
+
+    const bottomDistance = underlyingKeyBounding.bottom - baseBounding.bottom;
+
+    const roamBounding = new PaddedZoneSource(this.element, [
+      // top
+      basePadding,
+      // left, right
+      basePadding,
+      // bottom: ensure the recognition zone includes the row of the base key.
+      // basePadding is already negative, but bottomDistance isn't.
+      bottomDistance > basePadding ? -bottomDistance : basePadding
+    ]);
+
+    return {
+      targetRoot: this.element,
+      inputStartBounds: vkbd.element,
+      maxRoamingBounds: roamBounding,
+      itemIdentifier: (coord, target) => {
+        let bestMatchKey: KeyElement = null;
+        let bestYdist = Number.MAX_VALUE;
+        let bestXdist = Number.MAX_VALUE;
+
+        for(let key of this.subkeys) {
+          const keyBounds = key.getBoundingClientRect();
+
+          let xDist = Number.MAX_VALUE;
+          let yDist = Number.MAX_VALUE;
+
+          if(keyBounds.left <= coord.clientX && coord.clientX < keyBounds.right) {
+            xDist = 0;
+          } else {
+            xDist = (keyBounds.left >= coord.clientX) ? keyBounds.left - coord.clientX : coord.clientX - keyBounds.right;
+          }
+
+          if(keyBounds.top <= coord.clientY && coord.clientY < keyBounds.bottom) {
+            yDist = 0;
+          } else {
+            yDist = (keyBounds.top >= coord.clientY) ? keyBounds.top - coord.clientY : coord.clientY - keyBounds.bottom;
+          }
+
+          if(xDist == 0 && yDist == 0) {
+            // Perfect match!
+            return key;
+          } else if(xDist < bestXdist || (xDist == bestXdist && yDist < bestYdist)) {
+            bestXdist = xDist;
+            bestMatchKey = key;
+            bestYdist = yDist;
+          }
+        }
+
+        return bestMatchKey;
       }
-      this.resolver(keyEvent);
     }
-    this.resolver = null;
   }
 
   reposition(vkbd: VisualKeyboard) {
@@ -168,7 +244,7 @@ export default class SubkeyPopup implements RealizedGesture {
 
     // Add the callout
     if(vkbd.device.formFactor == DeviceSpec.FormFactor.Phone && vkbd.device.OS == DeviceSpec.OperatingSystem.iOS) {
-      this.callout = this.addCallout(e, delta);
+      this.callout = this.addCallout(e, delta, vkbd.topContainer);
     }
   }
 
@@ -178,9 +254,7 @@ export default class SubkeyPopup implements RealizedGesture {
    * @param   {Object}  key   HTML key element
    * @return  {Object}        callout object
    */
-  addCallout(key: KeyElement, delta?: number): HTMLDivElement {
-    const _Box = this.vkbd.topContainer;
-
+  addCallout(key: KeyElement, delta: number, _Box: HTMLElement): HTMLDivElement {
     delta = delta || 0;
 
     let calloutHeight = key.offsetHeight - delta + 6;
@@ -248,11 +322,6 @@ export default class SubkeyPopup implements RealizedGesture {
   }
 
   clear() {
-    // Discard the reference to the Promise's resolve method, allowing
-    // GC to clean it up.  The corresponding Promise's contract allows
-    // passive cancellation.
-    this.resolver = null;
-
     // Remove the displayed subkey array, if any
     if(this.element.parentNode) {
       this.element.parentNode.removeChild(this.element);
@@ -264,35 +333,6 @@ export default class SubkeyPopup implements RealizedGesture {
 
     if(this.callout && this.callout.parentNode) {
       this.callout.parentNode.removeChild(this.callout);
-    }
-  }
-
-  updateTouch(input: InputEventCoordinate) {
-    this.currentSelection = null;
-    this.baseKey.key.highlight(false);
-
-    for(let i=0; i < this.baseKey['subKeys'].length; i++) {
-      try {
-        let sk = this.element.childNodes[i].firstChild as KeyElement;
-
-        let onKey = sk.key.isUnderTouch(input);
-        if(onKey) {
-          this.currentSelection = sk;
-        }
-        sk.key.highlight(onKey);
-      } catch(ex) {
-        if(ex.message) {
-          console.error("Unexpected error when attempting to update selected subkey:" + ex.message);
-        } else {
-          console.error("Unexpected error (and error type) when attempting to update selected subkey.");
-        }
-      }
-    }
-
-    // Use the popup duplicate of the base key if a phone with a visible popup array
-    if(!this.currentSelection && this.baseKey.key.isUnderTouch(input)) {
-      this.baseKey.key.highlight(true);
-      this.currentSelection = this.baseKey;
     }
   }
 }

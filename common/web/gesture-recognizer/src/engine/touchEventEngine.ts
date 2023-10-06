@@ -86,7 +86,7 @@ export class TouchEventEngine<HoveredItemType, StateToken = any> extends InputEv
   private buildSampleFromTouch(touch: Touch, timestamp: number) {
     // WILL be null for newly-starting `GestureSource`s / contact points.
     const source = this.getTouchpointWithId(touch.identifier);
-    return this.buildSampleFor(touch.clientX, touch.clientY, touch.target, timestamp, source?.stateToken ?? this.stateToken);
+    return this.buildSampleFor(touch.clientX, touch.clientY, touch.target, timestamp, source);
   }
 
   onTouchStart(event: TouchEvent) {

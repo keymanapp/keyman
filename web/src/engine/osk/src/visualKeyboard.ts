@@ -39,7 +39,6 @@ import RealizedGesture from './input/gestures/realizedGesture.interface.js';
 import { defaultFontSize, getFontSizeStyle } from './fontSizeUtils.js';
 import PendingMultiTap, { PendingMultiTapState } from './input/gestures/browser/pendingMultiTap.js';
 import InternalSubkeyPopup from './input/gestures/browser/subkeyPopup.js';
-import InternalPendingLongpress from './input/gestures/browser/pendingLongpress.js';
 import InternalKeyTip from './input/gestures/browser/keytip.js';
 import CommonConfiguration from './config/commonConfiguration.js';
 
@@ -47,6 +46,7 @@ import { gestureSetForLayout } from './input/gestures/specsForLayout.js';
 
 import { getViewportScale } from './screenUtils.js';
 import { HeldRepeater } from './input/gestures/heldRepeater.js';
+import SubkeyPopup from './input/gestures/browser/subkeyPopup.js';
 
 export interface VisualKeyboardConfiguration extends CommonConfiguration {
   /**
@@ -355,6 +355,9 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
          * > The read-only target property of the Touch interface returns the (EventTarget) on which the touch contact
          *   started when it was first placed on the surface, even if the touch point has since moved outside the
          *   interactive area of that element[...]
+         *
+         * Therefore, `target` is for the initial element, not necessarily the one currently under
+         * the touchpoint - which matters during a 'touchmove'.
          */
 
         return this.layerGroup.findNearestKey(sample);
@@ -442,44 +445,59 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
 
         // First, if we've configured the gesture to generate a keystroke, let's handle that.
         const gestureKey = gestureStage.item;
+        let coordSource = gestureStage.sources[0];
+        let coord: InputSample<KeyElement, string> = null;
+        if(coordSource) {
+          // TODO:  should probably vary depending upon `gestureStage.matchedId`
+          // (certain types should probably use the base coord... or even from
+          // a prior stage of the sequence as appropriate.)
+          //
+          // This is the coordinate used as the basis for fat-finger calculations.
+          coord = coordSource.currentSample;
+        }
 
         if(gestureKey) {
-          let coordSource = gestureStage.sources[0];
-          let coord: InputSample<KeyElement, string> = null;
-          if(coordSource) {
-            // TODO:  should probably vary depending upon `gestureStage.matchedId`
-            // (certain types should probably use the base coord... or even from
-            // a prior stage of the sequence as appropriate.)
-            //
-            // This is the coordinate used as the basis for fat-finger calculations.
-            coord = coordSource.currentSample;
-          }
 
           if(gestureStage.matchedId == 'multitap') {
             // TODO:  examine sequence, determine rota-style index to apply; select THAT item instead.
           }
 
-          // Once the best coord to use for fat-finger calculations has been determined:
-          this.modelKeyClick(gestureStage.item, coord);
-
-          // -- Scratch-space as gestures start becoming integrated --
-          // Reordering may follow at some point.
-          //
-          // Potential long-term idea:  only handle the first stage; delegate future stages to
-          // specialized handlers for the remainder of the sequence.
-          // Should work for modipresses, too... I think.
-          if(gestureStage.matchedId == 'special-key-start' && gestureKey.key.spec.baseKeyID == 'K_BKSP') {
-            // Possible enhancement:  maybe update the held location for the backspace if there's movement?
-            // But... that seems pretty low-priority.
-            //
-            // Merely constructing the instance is enough; it'll link into the sequence's events and
-            // handle everything that remains for the backspace from here.
-            new HeldRepeater(gestureSequence, () => this.modelKeyClick(gestureKey, coord));
+          if(gestureStage.matchedId == 'subkey-select') {
+            // TODO:  examine subkey menu, determine proper set of fat-finger alternates.
           }
 
-          // TODO:  depending upon the gesture type, what sort of UI shifts should happen to
-          // facilitate follow-up stages?
+          // Once the best coord to use for fat-finger calculations has been determined:
+          this.modelKeyClick(gestureStage.item, coord);
         }
+
+        // Outside of passing keys along... the handling of later stages is delegated
+        // to gesture-specific handling classes.
+        if(gestureSequence.stageReports.length > 1) {
+          return;
+        }
+
+        // So, if this is the first stage, this is where we need to perform that delegation.
+
+        // -- Scratch-space as gestures start becoming integrated --
+        // Reordering may follow at some point.
+        //
+        // Potential long-term idea:  only handle the first stage; delegate future stages to
+        // specialized handlers for the remainder of the sequence.
+        // Should work for modipresses, too... I think.
+        if(gestureStage.matchedId == 'special-key-start' && gestureKey.key.spec.baseKeyID == 'K_BKSP') {
+          // Possible enhancement:  maybe update the held location for the backspace if there's movement?
+          // But... that seems pretty low-priority.
+          //
+          // Merely constructing the instance is enough; it'll link into the sequence's events and
+          // handle everything that remains for the backspace from here.
+          new HeldRepeater(gestureSequence, () => this.modelKeyClick(gestureKey, coord));
+        } else if(gestureStage.matchedId == 'longpress') {
+          // Likewise.
+          new SubkeyPopup(gestureSequence, configChanger, this, gestureSequence.stageReports[0].sources[0].baseItem);
+        }
+
+        // TODO:  depending upon the gesture type, what sort of UI shifts should happen to
+        // facilitate follow-up stages?
       })
     });
 
@@ -1764,30 +1782,30 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
     }
   }
 
-  /**
-   * Starts an implementation-specific longpress gesture.  Separately implemented for
-   * in-browser and embedded modes.
-   * @param key The base key of the longpress.
-   * @returns
-   */
-  startLongpress(key: KeyElement): PendingGesture {
-    // First-level object/Promise:  will produce a subkey popup when the longpress gesture completes.
-    // 'Returns' a second-level object/Promise:  resolves when a subkey is selected or is cancelled.
-    let pendingLongpress = new InternalPendingLongpress(this, key);
-    pendingLongpress.promise.then((subkeyPopup) => {
-      // In-browser-specific handling.
-      if (subkeyPopup) {
-        // Append the touch-hold (subkey) array to the OSK
-        this.topContainer.appendChild(subkeyPopup.element);
-        this.topContainer.appendChild(subkeyPopup.shim);
+  // /**
+  //  * Starts an implementation-specific longpress gesture.  Separately implemented for
+  //  * in-browser and embedded modes.
+  //  * @param key The base key of the longpress.
+  //  * @returns
+  //  */
+  // startLongpress(key: KeyElement): PendingGesture {
+  //   // First-level object/Promise:  will produce a subkey popup when the longpress gesture completes.
+  //   // 'Returns' a second-level object/Promise:  resolves when a subkey is selected or is cancelled.
+  //   let pendingLongpress = new InternalPendingLongpress(this, key);
+  //   pendingLongpress.promise.then((subkeyPopup) => {
+  //     // In-browser-specific handling.
+  //     if (subkeyPopup) {
+  //       // Append the touch-hold (subkey) array to the OSK
+  //       this.topContainer.appendChild(subkeyPopup.element);
+  //       this.topContainer.appendChild(subkeyPopup.shim);
 
-        // Must be placed after its `.element` has been inserted into the DOM.
-        subkeyPopup.reposition(this);
-      }
-    });
+  //       // Must be placed after its `.element` has been inserted into the DOM.
+  //       subkeyPopup.reposition(this);
+  //     }
+  //   });
 
-    return pendingLongpress;
-  }
+  //   return pendingLongpress;
+  // }
 
   /**
    * Initializes all supported gestures given a base key and the triggering touch coordinates.
@@ -1821,36 +1839,36 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
     }
 
 
-    if (key['subKeys']) {
-      let _this = this;
+    // if (key['subKeys']) {
+    //   let _this = this;
 
-      let pendingLongpress = this.startLongpress(key);
-      if (pendingLongpress == null) {
-        return;
-      }
-      this.pendingSubkey = pendingLongpress;
+    //   let pendingLongpress = this.startLongpress(key);
+    //   if (pendingLongpress == null) {
+    //     return;
+    //   }
+    //   this.pendingSubkey = pendingLongpress;
 
-      pendingLongpress.promise.then(function (subkeyPopup) {
-        if (_this.pendingSubkey == pendingLongpress) {
-          _this.pendingSubkey = null;
-        }
+    //   pendingLongpress.promise.then(function (subkeyPopup) {
+    //     if (_this.pendingSubkey == pendingLongpress) {
+    //       _this.pendingSubkey = null;
+    //     }
 
-        if (subkeyPopup) {
-          // Clear key preview if any
-          _this.showKeyTip(null, false);
+    //     if (subkeyPopup) {
+    //       // Clear key preview if any
+    //       _this.showKeyTip(null, false);
 
-          _this.subkeyGesture = subkeyPopup;
-          subkeyPopup.promise.then(function (keyEvent: KeyEvent) {
-            // Allow active cancellation, even if the source should allow passive.
-            // It's an easy and cheap null guard.
-            if (keyEvent) {
-              _this.raiseKeyEvent(keyEvent, null);
-            }
-            _this.clearPopup();
-          });
-        }
-      });
-    }
+    //       _this.subkeyGesture = subkeyPopup;
+    //       subkeyPopup.promise.then(function (keyEvent: KeyEvent) {
+    //         // Allow active cancellation, even if the source should allow passive.
+    //         // It's an easy and cheap null guard.
+    //         if (keyEvent) {
+    //           _this.raiseKeyEvent(keyEvent, null);
+    //         }
+    //         _this.clearPopup();
+    //       });
+    //     }
+    //   });
+    // }
   }
 
   /**
@@ -1885,16 +1903,16 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
 
     this.currentTarget = null;
 
-    // If popup is visible, need to move over popup, not over main keyboard
-    // Could be turned into a browser-longpress specific implementation within browser.PendingLongpress?
-    if (key1 && key1['subKeys'] != null && this.initTouchCoord) {
-      if(this.pendingSubkey && this.pendingSubkey instanceof InternalPendingLongpress) {
-        // Show popup keys immediately if touch moved up towards key array (KMEW-100, Build 353)
-        if (this.initTouchCoord.y - input.y > this.getLongpressFlickThreshold()) {
-          this.pendingSubkey.resolve();
-        }
-      }
-    }
+    // // If popup is visible, need to move over popup, not over main keyboard
+    // // Could be turned into a browser-longpress specific implementation within browser.PendingLongpress?
+    // if (key1 && key1['subKeys'] != null && this.initTouchCoord) {
+    //   if(this.pendingSubkey && this.pendingSubkey instanceof InternalPendingLongpress) {
+    //     // Show popup keys immediately if touch moved up towards key array (KMEW-100, Build 353)
+    //     if (this.initTouchCoord.y - input.y > this.getLongpressFlickThreshold()) {
+    //       this.pendingSubkey.resolve();
+    //     }
+    //   }
+    // }
 
     // If there is an active popup menu (which can occur from the previous block),
     // a subkey popup exists; do not allow base key output.
