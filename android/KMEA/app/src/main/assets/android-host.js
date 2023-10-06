@@ -86,9 +86,6 @@ function setBannerImage(path) {
       "imagePath": path,
       "alwaysShow": true});
   }
-
-  // Refresh KMW's OSK
-  keyman.refreshOskLayout();
 }
 
 function notifyHost(event, params) {
