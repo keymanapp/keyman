@@ -5,6 +5,7 @@ import { ManagedPromise } from "@keymanapp/web-utils";
 import { GestureSource, GestureSourceSubview } from "../../gestureSource.js";
 import { GestureMatcher, MatchResult, PredecessorMatch } from "./gestureMatcher.js";
 import { GestureModel } from "../specs/gestureModel.js";
+import { GestureSequence } from "./index.js";
 
 interface GestureSourceTracker<Type> {
   /**
@@ -149,6 +150,12 @@ export class MatcherSelector<Type> extends EventEmitter<EventMap<Type>> {
       ? [source instanceof GestureSourceSubview ? source.baseSource : source]
       : (source.sources as GestureSourceSubview<Type>[]).map((source) => source.baseSource);
 
+    if(sourceNotYetStaged) {
+      source.path.on('invalidated', () => {
+        this.cleanSourceIdsForSequence([source.identifier]);
+      })
+    }
+
     const matchPromise = new ManagedPromise<MatcherSelection<Type>>();
 
     /*
@@ -281,6 +288,15 @@ export class MatcherSelector<Type> extends EventEmitter<EventMap<Type>> {
     // Make sure our source-watching hooks are the last handler for the event;
     // matcher-handlers should go first.  (Due to how subview synchronization works)
     this._sourceSelector.forEach((entry) => resetHooks(entry.source));
+  }
+
+  public cleanSourceIdsForSequence(idsToClean: string[]) {
+    for(const id of idsToClean) {
+      const index = this._sourceSelector.findIndex((entry) => entry.source.identifier);
+      if(index > -1) {
+        this._sourceSelector.splice(index, 1);
+      }
+    }
   }
 
   private matchersForSource(source: GestureSource<Type>) {
