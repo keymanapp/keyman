@@ -15,7 +15,6 @@ import { BUILDER_STRS, build_strs } from './build-strs.js';
 import { BUILDER_TRAN, build_tran } from './build-tran.js';
 import { BUILDER_USET, build_uset } from './build-uset.js';
 import { BUILDER_VARS, build_vars } from './build-vars.js';
-import { BUILDER_VKEY, build_vkey } from './build-vkey.js';
 
 type BUILDER_BKSP = BUILDER_TRAN;
 // type BUILDER_FINL = BUILDER_TRAN;
@@ -36,7 +35,6 @@ type SectionBuilders = {
   tran?: BUILDER_TRAN;
   uset?: BUILDER_USET;
   vars?: BUILDER_VARS;
-  vkey?: BUILDER_VKEY;
 };
 
 export default class KMXPlusBuilder {
@@ -73,7 +71,6 @@ export default class KMXPlusBuilder {
     this.emitSection(file, this.file.COMP_PLUS_TRAN, this.sect.tran);
     this.emitSection(file, this.file.COMP_PLUS_USET, this.sect.uset);
     this.emitSection(file, this.file.COMP_PLUS_VARS, this.sect.vars);
-    this.emitSection(file, this.file.COMP_PLUS_VKEY, this.sect.vkey);
 
     return file;
   }
@@ -100,7 +97,6 @@ export default class KMXPlusBuilder {
     this.sect.tran = build_tran(this.file.kmxplus.tran, this.sect.strs, this.sect.elem);
     this.sect.uset = build_uset(this.file.kmxplus, this.sect.strs);
     this.sect.vars = build_vars(this.file.kmxplus, this.sect.strs, this.sect.elem, this.sect.list);
-    this.sect.vkey = build_vkey(this.file.kmxplus);
 
     // Finalize the sect (index) section
 
@@ -138,7 +134,6 @@ export default class KMXPlusBuilder {
     offset = this.finalize_sect_item(this.sect.tran, offset);
     offset = this.finalize_sect_item(this.sect.uset, offset);
     offset = this.finalize_sect_item(this.sect.vars, offset);
-    offset = this.finalize_sect_item(this.sect.vkey, offset);
 
     this.sect.sect.total = offset;
   }

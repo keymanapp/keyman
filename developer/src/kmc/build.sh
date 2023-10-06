@@ -75,8 +75,10 @@ fi
 if builder_start_action test; then
   eslint .
   tsc --build test/
-  # TODO: increase coverage to 90%
-  c8 --reporter=lcov --reporter=text --exclude-after-remap --lines=30 mocha
+  readonly C8_THRESHOLD=35
+  c8 --reporter=lcov --reporter=text --lines $C8_THRESHOLD --statements $C8_THRESHOLD --branches $C8_THRESHOLD --functions $C8_THRESHOLD mocha
+  builder_echo warning "Coverage thresholds are currently $C8_THRESHOLD%, which is lower than ideal."
+  builder_echo warning "Please increase threshold in build.sh as test coverage improves."
   builder_finish_action success test
 fi
 

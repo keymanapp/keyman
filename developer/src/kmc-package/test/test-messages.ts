@@ -128,6 +128,13 @@ describe('CompilerMessages', function () {
       CompilerMessages.WARN_FileInPackageDoesNotFollowFilenameConventions, {checkFilenameConventions: true});
   });
 
+  // Test the inverse -- no warning generated if checkFilenameConventions is false
+
+  it('should not generate WARN_FileInPackageDoesNotFollowFilenameConventions if content filename has wrong conventions but checkFilenameConventions is false', async function() {
+    testForMessage(this, ['invalid', 'warn_file_in_package_does_not_follow_filename_conventions.kps'], null, {checkFilenameConventions: false});
+    testForMessage(this, ['invalid', 'warn_file_in_package_does_not_follow_filename_conventions_2.kps'], null, {checkFilenameConventions: false});
+  });
+
   // ERROR_PackageNameCannotBeBlank
 
   it('should generate ERROR_PackageNameCannotBeBlank if package info has empty name', async function() {
@@ -182,7 +189,7 @@ describe('CompilerMessages', function () {
 
   // ERROR_PackageMustContainAPackageOrAKeyboard
 
-  it('should generate ERROR_PackageMustContainAModelOrAKeyboard if package contains a .doc file', async function() {
+  it('should generate ERROR_PackageMustContainAModelOrAKeyboard if package contains no keyboard or model', async function() {
     testForMessage(this, ['invalid', 'error_package_must_contain_a_model_or_a_keyboard.kps'],
       CompilerMessages.ERROR_PackageMustContainAModelOrAKeyboard);
   });
@@ -199,6 +206,24 @@ describe('CompilerMessages', function () {
   it('should generate WARN_KeyboardShouldHaveAtLeastOneLanguage if keyboard has zero language tags', async function() {
     testForMessage(this, ['invalid', 'warn_keyboard_should_have_at_least_one_language.kps'],
       CompilerMessages.WARN_KeyboardShouldHaveAtLeastOneLanguage);
+  });
+
+  // HINT_JsKeyboardFileHasNoTouchTargets
+
+  it('should generate HINT_JsKeyboardFileHasNoTouchTargets if keyboard has no touch targets', async function() {
+    testForMessage(this, ['invalid', 'hint_js_keyboard_file_has_no_touch_targets.kps'],
+      CompilerMessages.HINT_JsKeyboardFileHasNoTouchTargets);
+  });
+
+  it('should not generate HINT_JsKeyboardFileHasNoTouchTargets if keyboard has a touch target', async function() {
+    testForMessage(this, ['khmer_angkor', 'source', 'khmer_angkor.kps'], null);
+  });
+  
+  // HINT_PackageContainsSourceFile
+
+  it('should generate HINT_PackageContainsSourceFile if package contains a source file', async function() {
+    testForMessage(this, ['invalid', 'hint_source_file_should_not_be_in_package.kps'],
+      CompilerMessages.HINT_PackageContainsSourceFile);
   });
 
 });
