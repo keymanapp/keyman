@@ -12,13 +12,13 @@ cd "$THIS_SCRIPT_PATH"
 
 ################################ Main script ################################
 
-builder_describe "Build hextobin" clean configure build
+builder_describe "Build version tooling" clean configure build
 builder_describe_outputs \
-  configure /node_modules \
-  build     /common/tools/hextobin/build/index.js
+  configure /resources/build/version/node_modules \
+  build     /resources/build/version/build/src/index.js
 
 builder_parse "$@"
 
-builder_run_action clean      rm -rf build/ node_modules/
+builder_run_action clean      rm -rf build/ node_modules/ dist/ lib/
 builder_run_action configure  verify_npm_setup
 builder_run_action build      tsc --build

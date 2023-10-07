@@ -105,16 +105,20 @@ describe('Test of Pattern Parsers', () => {
         )
       );
       // verify the matching behavior of these
-      assert.isTrue(new RegExp(MarkerParser.toSentinelString(`Q\\m{a}`, markers, true), 'u')
+      assert.isTrue(new RegExp(MarkerParser.toSentinelString(`^Q\\m{a}$`, markers, true), 'u')
         .test(MarkerParser.toSentinelString(`Q\\m{a}`, markers, false)), `Q\\m{a} did not match`);
-      assert.isFalse(new RegExp(MarkerParser.toSentinelString(`Q\\m{a}`, markers, true), 'u')
+      assert.isFalse(new RegExp(MarkerParser.toSentinelString(`^Q\\m{a}$`, markers, true), 'u')
         .test(MarkerParser.toSentinelString(`Q\\m{b}`, markers, false)), `Q\\m{a} should not match Q\\m{b}`);
-      assert.isTrue(new RegExp(MarkerParser.toSentinelString(`Q\\m{.}`, markers, true), 'u')
+      assert.isTrue(new RegExp(MarkerParser.toSentinelString(`^Q\\m{.}$`, markers, true), 'u')
         .test(MarkerParser.toSentinelString(`Q\\m{a}`, markers, false)), `Q\\m{.} did not match Q\\m{a}`);
-      assert.isTrue(new RegExp(MarkerParser.toSentinelString(`Q\\m{.}`, markers, true), 'u')
+      assert.isTrue(new RegExp(MarkerParser.toSentinelString(`^Q\\m{.}$`, markers, true), 'u')
         .test(MarkerParser.toSentinelString(`Q\\m{zz}`, markers, false)), `Q\\m{.} did not match Q\\m{zz} (max marker)`);
-      assert.isFalse(new RegExp(MarkerParser.toSentinelString(`Q\\m{.}`, markers, true), 'u')
+      assert.isFalse(new RegExp(MarkerParser.toSentinelString(`^Q\\m{.}$`, markers, true), 'u')
         .test(MarkerParser.toSentinelString(`\\m{a}`, markers, false)), `Q\\m{.} did not match \\m{a}`);
+      assert.isTrue(new RegExp(MarkerParser.toSentinelString(`^\\m{.}$`, markers, true), 'u')
+        .test(MarkerParser.toSentinelString(`\\m{a}`, markers, false)), `\\m{.} did not match \\m{a}`);
+      assert.isFalse(new RegExp(MarkerParser.toSentinelString(`^\\m{.}$`, markers, true), 'u')
+        .test(MarkerParser.toSentinelString(`\\m{a}\\m{b}`, markers, false)), `\\m{.} did not match \\m{a}\\m{b}`);
     });
     it('should match some marker constants', () => {
       assert.equal(constants.uc_sentinel, KMXFile.UC_SENTINEL);

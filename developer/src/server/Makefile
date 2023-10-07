@@ -5,7 +5,7 @@
 !include ..\Defines.mak
 
 build: .virtual
-    $(GIT_BASH_FOR_KEYMAN) build.sh --production --test
+    $(GIT_BASH_FOR_KEYMAN) build.sh configure build test installer
 
 clean: .virtual
 #TODO: move to build.sh `clean` target

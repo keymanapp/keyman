@@ -1,6 +1,6 @@
-import chalk = require('chalk');
-import express = require('express');
-import { DebugObject, isValidId, simplifyId } from "../../../data";
+import * as express from 'express';
+import chalk from 'chalk';
+import { DebugObject, isValidId, simplifyId } from "../../../data.js";
 
 export default function apiGet (data: { [id: string]: DebugObject }, req: express.Request, res: express.Response, next: express.NextFunction) {
   let id = req.query['id'] as string;
