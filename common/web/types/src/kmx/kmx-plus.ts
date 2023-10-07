@@ -35,14 +35,14 @@ export class Elem extends Section {
   strings: ElementString[] = [];
   constructor(sections: DependencySections) {
     super();
-    this.strings.push(new ElementString(sections, '')); // C7043: null element string
+    this.strings.push(ElementString.fromStrings(sections, '')); // C7043: null element string
   }
   /**
    * @param source if a string array, does not get reinterpreted as UnicodeSet. This is used with vars, etc. Or pass `["str"]` for an explicit 1-element elem.
    * If it is a string, will be interpreted per reorder element ruls.
    */
   allocElementString(sections: DependencySections, source: string | string[], order?: string, tertiary?: string, tertiary_base?: string, prebase?: string): ElementString {
-    let s = new ElementString(sections, source, order, tertiary, tertiary_base, prebase);
+    let s = ElementString.fromStrings(sections, source, order, tertiary, tertiary_base, prebase);
     let result = this.strings.find(item => item.isEqual(s));
     if(result === undefined) {
       result = s;
@@ -547,14 +547,14 @@ export class List extends Section {
     let result = this.lists.find(item => item.isEqual(s));
     if(result === undefined) {
       // allocate a new ListItem
-      result = new ListItem(s, opts, sections);
+      result = ListItem.fromStrings(s, opts, sections);
       this.lists.push(result);
     }
     return result;
   }
   constructor(strs: Strs) {
     super();
-    this.lists.push(new ListItem([], {}, { strs })); // C7043: null element string
+    this.lists.push(ListItem.fromStrings([], {}, { strs })); // C7043: null element string
   }
   lists: ListItem[] = [];
 };

@@ -33,15 +33,16 @@ export class ListItem extends Array<ListIndex> implements OrderedStringList {
    * be needed depending on the options
    * @returns
    */
-  constructor(source: Array<string>, opts: StrsOptions, sections: DependencySections) {
-    super();
-    if(!source) {
-      return;
+  static fromStrings(source: Array<string>, opts: StrsOptions, sections: DependencySections) : ListItem {
+    const a = new ListItem();
+    if (!source) {
+      return a;
     }
     for (const str of source) {
         let index = new ListIndex(sections.strs.allocString(str, opts, sections));
-        this.push(index);
+        a.push(index);
     }
+    return a;
   }
   getItemOrder(item: string): number {
     return this.findIndex(({value}) => value.value === item);
