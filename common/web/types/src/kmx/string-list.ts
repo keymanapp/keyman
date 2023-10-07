@@ -27,8 +27,10 @@ export class ListItem extends Array<ListIndex> implements OrderedStringList {
   /**
    * Construct a new list from an array of strings.
    * Use List. This is meant to be called by the List.allocString*() functions.
-   * @param strs the Strs section is needed to construct this object.
    * @param source array of strings
+   * @param opts string handling options
+   * @param sections the Strs section is needed to construct this object, and other sections may
+   * be needed depending on the options
    * @returns
    */
   constructor(source: Array<string>, opts: StrsOptions, sections: DependencySections) {
@@ -71,20 +73,13 @@ export class ListItem extends Array<ListIndex> implements OrderedStringList {
       return 0;
     }
   }
-  /** for debugging, print as single string */
+  /** for debugging and tests, print as single string */
   toString(): string {
-    let ss = '';
-    for (let i = 0 ;i < this.length; i++) {
-      if (ss)  {
-         ss = ss + ' ';
-      }
-      ss = ss + (this[i].toString());
-    }
-    return ss;
-    // return this.toStringArray().join(' ');
+    return this.toStringArray().join(' ');
   }
-  /** for debugging, map to string array */
+  /** for debugging and tests, map to string array */
   toStringArray(): string[] {
-    return this.map(v => v.toString());
+    // TODO-LDML: this crashes: return this.map(v => v.toString());
+    return Array.from(this.values()).map(v => v.toString());
   }
 };
