@@ -150,6 +150,7 @@ type
     FReadmeFile: TPackageContentFile;
     FGraphicFile: TPackageContentFile;
     FLicenseFile: TPackageContentFile;
+    FWelcomeFile: TPackageContentFile;
     FLoadLegacy: Boolean;
     procedure SetReadmeFile(const Value: TPackageContentFile);
     procedure SetExecuteProgram(Value: WideString);
@@ -161,6 +162,9 @@ type
       EventType: TPackageNotifyEventType; var FAllow: Boolean);
     procedure SetLicenseFile(const Value: TPackageContentFile);
     procedure LicenseRemoved(Sender: TObject;
+      EventType: TPackageNotifyEventType; var FAllow: Boolean);
+    procedure SetWelcomeFile(const Value: TPackageContentFile);
+    procedure WelcomeRemoved(Sender: TObject;
       EventType: TPackageNotifyEventType; var FAllow: Boolean);
   public
     constructor Create(APackage: TPackage); override;
@@ -178,6 +182,7 @@ type
     property ReadmeFile: TPackageContentFile read FReadmeFile write SetReadmeFile;
     property GraphicFile: TPackageContentFile read FGraphicFile write SetGraphicFile;
     property LicenseFile: TPackageContentFile read FLicenseFile write SetLicenseFile;
+    property WelcomeFile: TPackageContentFile read FWelcomeFile write SetWelcomeFile;
   end;
 
   { Package Information }
@@ -515,6 +520,7 @@ const
   SReadmeNotOwnedCorrectly = 'The readme file ''%s'' referred to is not part of the package.';
   SGraphicNotOwnedCorrectly = 'The graphic file ''%s'' referred to is not part of the package.';
   SLicenseNotOwnedCorrectly = 'The license file ''%s'' referred to is not part of the package.';
+  SWelcomeNotOwnedCorrectly = 'The welcome file ''%s'' referred to is not part of the package.';
   SFileNotOwnedCorrectly = 'The file ''%s'' referred to is not part of the package.';
   SDisplayFontNotOwnedCorrectly = 'The display font file ''%s'' referred to is not part of the package.';
   SOSKFontNotOwnedCorrectly = 'The OSK font file ''%s'' referred to is not part of the package.';
@@ -568,6 +574,7 @@ const
   SJSON_Options_ReadMeFile = 'readmeFile';
   SJSON_Options_GraphicFile = 'graphicFile';
   SJSON_Options_LicenseFile = 'licenseFile';
+  SJSON_Options_WelcomeFile = 'welcomeFile';
 
   SJSON_Registry = 'registry';
   SJSON_Registry_Root = 'root';
@@ -665,6 +672,9 @@ begin
   if Assigned(Source.LicenseFile)
     then LicenseFile := Package.Files.FromFileName(Source.LicenseFile.FileName)
     else LicenseFile := nil;
+  if Assigned(Source.WelcomeFile)
+    then WelcomeFile := Package.Files.FromFileName(Source.WelcomeFile.FileName)
+    else WelcomeFile := nil;
 end;
 
 constructor TPackageOptions.Create(APackage: TPackage);
@@ -679,6 +689,7 @@ begin
   ReadmeFile := nil;
   GraphicFile := nil;
   LicenseFile := nil;
+  WelcomeFile := nil;
   inherited Destroy;
 end;
 
@@ -697,6 +708,11 @@ begin
   FLicenseFile := nil;
 end;
 
+procedure TPackageOptions.WelcomeRemoved(Sender: TObject; EventType: TPackageNotifyEventType; var FAllow: Boolean);
+begin
+  FWelcomeFile := nil;
+end;
+
 procedure TPackageOptions.LoadXML(ARoot: IXMLNode);
 begin
   FileVersion :=                XmlVarToStr(ARoot.ChildNodes['System'].ChildNodes['FileVersion'].NodeValue);
@@ -704,9 +720,11 @@ begin
   ReadmeFile :=                 Package.Files.FromFileName(XmlVarToStr(ARoot.ChildNodes['Options'].ChildNodes['ReadMeFile'].NodeValue));
   GraphicFile :=                Package.Files.FromFileName(XmlVarToStr(ARoot.ChildNodes['Options'].ChildNodes['GraphicFile'].NodeValue));
   LicenseFile :=                Package.Files.FromFileName(XmlVarToStr(ARoot.ChildNodes['Options'].ChildNodes['LicenseFile'].NodeValue));
+  WelcomeFile :=                Package.Files.FromFileName(XmlVarToStr(ARoot.ChildNodes['Options'].ChildNodes['WelcomeFile'].NodeValue));
   if Assigned(ReadmeFile) then ReadmeFile.AddNotifyObject(ReadmeRemoved);
   if Assigned(GraphicFile) then GraphicFile.AddNotifyObject(GraphicRemoved);
   if Assigned(LicenseFile) then LicenseFile.AddNotifyObject(LicenseRemoved);
+  if Assigned(WelcomeFile) then WelcomeFile.AddNotifyObject(WelcomeRemoved);
 end;
 
 procedure TPackageOptions.SaveXML(ARoot: IXMLNode);
@@ -719,6 +737,8 @@ begin
     ARoot.ChildNodes['Options'].ChildNodes['GraphicFile'].NodeValue := GraphicFile.RelativeFileName;
   if Assigned(LicenseFile) then
     ARoot.ChildNodes['Options'].ChildNodes['LicenseFile'].NodeValue := LicenseFile.RelativeFileName;
+  if Assigned(WelcomeFile) then
+    ARoot.ChildNodes['Options'].ChildNodes['WelcomeFile'].NodeValue := WelcomeFile.RelativeFileName;
 end;
 
 procedure TPackageOptions.LoadIni(AIni: TIniFile);
@@ -730,6 +750,7 @@ begin
   if Assigned(ReadmeFile) then ReadmeFile.AddNotifyObject(ReadmeRemoved);
   if Assigned(GraphicFile) then GraphicFile.AddNotifyObject(GraphicRemoved);
   // LicenseFile not supported in ini
+  // WelcomeFile not supported in ini
 end;
 
 procedure TPackageOptions.LoadJSON(ARoot: TJSONObject);
@@ -744,9 +765,11 @@ begin
   ReadmeFile :=                 Package.Files.FromFileName(GetJsonValueString(FOptions, SJSON_Options_ReadMeFile));
   GraphicFile :=                Package.Files.FromFileName(GetJsonValueString(FOptions, SJSON_Options_GraphicFile));
   LicenseFile :=                Package.Files.FromFileName(GetJsonValueString(FOptions, SJSON_Options_LicenseFile));
+  WelcomeFile :=                Package.Files.FromFileName(GetJsonValueString(FOptions, SJSON_Options_WelcomeFile));
   if Assigned(ReadmeFile) then ReadmeFile.AddNotifyObject(ReadmeRemoved);
   if Assigned(GraphicFile) then GraphicFile.AddNotifyObject(GraphicRemoved);
   if Assigned(LicenseFile) then LicenseFile.AddNotifyObject(LicenseRemoved);
+  if Assigned(WelcomeFile) then WelcomeFile.AddNotifyObject(WelcomeRemoved);
 end;
 
 procedure TPackageOptions.SaveIni(AIni: TIniFile);
@@ -758,6 +781,7 @@ begin
   if Assigned(GraphicFile) then
     AIni.WriteString('Package', 'GraphicFile', GraphicFile.RelativeFileName);
   // licenseFile not supported in ini
+  // welcomeFile not supported in ini
 end;
 
 procedure TPackageOptions.SaveJSON(ARoot: TJSONObject);
@@ -779,6 +803,8 @@ begin
     FOptions.AddPair(SJSON_Options_GraphicFile, GraphicFile.RelativeFileName);
   if Assigned(LicenseFile) then
     FOptions.AddPair(SJSON_Options_LicenseFile, LicenseFile.RelativeFileName);
+  if Assigned(WelcomeFile) then
+    FOptions.AddPair(SJSON_Options_WelcomeFile, WelcomeFile.RelativeFileName);
 end;
 
 procedure TPackageOptions.SetExecuteProgram(Value: WideString);
@@ -816,6 +842,19 @@ begin
     if Value.Package <> Package then raise EPackageInfo.CreateFmt(SLicenseNotOwnedCorrectly, [Value]);
     FLicenseFile := Value;
     FLicenseFile.AddNotifyObject(LicenseRemoved);
+  end;
+end;
+
+procedure TPackageOptions.SetWelcomeFile(const Value: TPackageContentFile);
+begin
+  if Assigned(FWelcomeFile) then FWelcomeFile.RemoveNotifyObject(WelcomeRemoved);
+  if not Assigned(Value) then
+    FWelcomeFile := nil
+  else
+  begin
+    if Value.Package <> Package then raise EPackageInfo.CreateFmt(SWelcomeNotOwnedCorrectly, [Value]);
+    FWelcomeFile := Value;
+    FWelcomeFile.AddNotifyObject(WelcomeRemoved);
   end;
 end;
 

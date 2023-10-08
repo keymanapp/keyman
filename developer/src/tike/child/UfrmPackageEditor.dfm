@@ -184,7 +184,7 @@ inherited frmPackageEditor: TfrmPackageEditor
     Top = 0
     Width = 965
     Height = 622
-    ActivePage = pageKeyboards
+    ActivePage = pageDetails
     Align = alClient
     Images = modActionsMain.ilEditorPages
     MultiLine = True
@@ -236,7 +236,7 @@ inherited frmPackageEditor: TfrmPackageEditor
           Width = 546
           Height = 32
           AutoSize = False
-          Caption =
+          Caption = 
             'A typical package will need keyboards, fonts, and documentation.' +
             ' You shouldn'#39't typically add source files. Also, don'#39't add any s' +
             'tandard Keyman files (such as keyman.exe) here.'
@@ -839,7 +839,7 @@ inherited frmPackageEditor: TfrmPackageEditor
         end
         object lblReadme: TLabel
           Left = 15
-          Top = 120
+          Top = 148
           Width = 63
           Height = 13
           Caption = '&Readme file:'
@@ -853,35 +853,35 @@ inherited frmPackageEditor: TfrmPackageEditor
         end
         object lblStep2c: TLabel
           Left = 15
-          Top = 173
+          Top = 202
           Width = 41
           Height = 13
           Caption = 'Version:'
         end
         object lblStep2d: TLabel
           Left = 15
-          Top = 221
+          Top = 254
           Width = 54
           Height = 13
           Caption = 'Copyright:'
         end
         object lblStep2e: TLabel
           Left = 15
-          Top = 253
+          Top = 282
           Width = 39
           Height = 13
           Caption = 'Author:'
         end
         object lblStep2f: TLabel
-          Left = 15
-          Top = 277
+          Left = 295
+          Top = 282
           Width = 77
           Height = 13
           Caption = 'E-mail address:'
         end
         object lblStep2g: TLabel
           Left = 15
-          Top = 301
+          Top = 309
           Width = 49
           Height = 13
           Caption = 'Web Site:'
@@ -927,7 +927,7 @@ inherited frmPackageEditor: TfrmPackageEditor
         end
         object lblVersionHint: TLabel
           Left = 622
-          Top = 175
+          Top = 204
           Width = 46
           Height = 13
           Anchors = [akTop, akRight]
@@ -959,20 +959,28 @@ inherited frmPackageEditor: TfrmPackageEditor
         end
         object lblLicenseFile: TLabel
           Left = 15
-          Top = 147
+          Top = 175
           Width = 59
           Height = 13
           Caption = '&License file:'
           FocusControl = cbLicense
         end
+        object lblWelcomeFile: TLabel
+          Left = 14
+          Top = 118
+          Width = 69
+          Height = 13
+          Caption = '&Welcome file:'
+          FocusControl = cbWelcomeFile
+        end
         object cbReadMe: TComboBox
           Left = 114
-          Top = 115
+          Top = 143
           Width = 499
           Height = 21
           Style = csDropDownList
           Anchors = [akLeft, akTop, akRight]
-          TabOrder = 1
+          TabOrder = 2
           OnClick = cbReadMeClick
         end
         object editInfoName: TEdit
@@ -986,58 +994,57 @@ inherited frmPackageEditor: TfrmPackageEditor
         end
         object editInfoVersion: TEdit
           Left = 114
-          Top = 170
+          Top = 199
           Width = 499
           Height = 21
           Anchors = [akLeft, akTop, akRight]
-          TabOrder = 3
+          TabOrder = 4
           OnChange = editInfoVersionChange
         end
         object editInfoCopyright: TEdit
           Left = 114
-          Top = 218
+          Top = 251
           Width = 499
           Height = 21
           Anchors = [akLeft, akTop, akRight]
-          TabOrder = 5
+          TabOrder = 6
           Text = #169
           OnChange = editInfoCopyrightChange
         end
         object editInfoAuthor: TEdit
           Left = 114
-          Top = 250
-          Width = 499
+          Top = 279
+          Width = 175
           Height = 21
-          Anchors = [akLeft, akTop, akRight]
-          TabOrder = 7
+          TabOrder = 8
           OnChange = editInfoAuthorChange
         end
         object editInfoEmail: TEdit
-          Left = 114
-          Top = 274
-          Width = 499
+          Left = 377
+          Top = 279
+          Width = 236
           Height = 21
           Anchors = [akLeft, akTop, akRight]
-          TabOrder = 8
+          TabOrder = 9
           OnChange = editInfoEmailChange
         end
         object editInfoWebSite: TEdit
           Left = 114
-          Top = 298
+          Top = 306
           Width = 499
           Height = 21
           Anchors = [akLeft, akTop, akRight]
-          TabOrder = 9
+          TabOrder = 10
           OnChange = editInfoWebSiteChange
         end
         object cmdInsertCopyright: TButton
           Left = 620
-          Top = 218
+          Top = 251
           Width = 49
           Height = 21
           Anchors = [akTop, akRight]
           Caption = '&Insert '#169
-          TabOrder = 6
+          TabOrder = 7
           OnClick = cmdInsertCopyrightClick
         end
         object cbKMPImageFile: TComboBox
@@ -1047,7 +1054,7 @@ inherited frmPackageEditor: TfrmPackageEditor
           Height = 21
           Style = csDropDownList
           Anchors = [akLeft, akTop, akRight]
-          TabOrder = 10
+          TabOrder = 11
           OnClick = cbKMPImageFileClick
         end
         object panKMPImageSample: TPanel
@@ -1057,7 +1064,7 @@ inherited frmPackageEditor: TfrmPackageEditor
           Height = 251
           Anchors = [akTop, akRight]
           BevelOuter = bvLowered
-          TabOrder = 11
+          TabOrder = 12
           object imgKMPSample: TImage
             Left = 1
             Top = 0
@@ -1067,11 +1074,11 @@ inherited frmPackageEditor: TfrmPackageEditor
         end
         object chkFollowKeyboardVersion: TCheckBox
           Left = 114
-          Top = 196
+          Top = 225
           Width = 237
           Height = 17
           Caption = 'Package version follows keyboard version'
-          TabOrder = 4
+          TabOrder = 5
           OnClick = chkFollowKeyboardVersionClick
         end
         object memoInfoDescription: TMemo
@@ -1079,7 +1086,7 @@ inherited frmPackageEditor: TfrmPackageEditor
           Top = 394
           Width = 499
           Height = 97
-          TabOrder = 12
+          TabOrder = 13
           OnChange = memoInfoDescriptionChange
         end
         object gridRelatedPackages: TStringGrid
@@ -1092,7 +1099,7 @@ inherited frmPackageEditor: TfrmPackageEditor
           FixedCols = 0
           RowCount = 9
           Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goColSizing, goRowSelect]
-          TabOrder = 13
+          TabOrder = 14
           OnDblClick = gridRelatedPackagesDblClick
           ColWidths = (
             78
@@ -1104,7 +1111,7 @@ inherited frmPackageEditor: TfrmPackageEditor
           Width = 73
           Height = 25
           Caption = '&Add...'
-          TabOrder = 14
+          TabOrder = 15
           OnClick = cmdAddRelatedPackageClick
         end
         object cmdEditRelatedPackage: TButton
@@ -1113,7 +1120,7 @@ inherited frmPackageEditor: TfrmPackageEditor
           Width = 73
           Height = 25
           Caption = 'Ed&it...'
-          TabOrder = 15
+          TabOrder = 16
           OnClick = cmdEditRelatedPackageClick
         end
         object cmdRemoveRelatedPackage: TButton
@@ -1122,18 +1129,28 @@ inherited frmPackageEditor: TfrmPackageEditor
           Width = 72
           Height = 25
           Caption = '&Remove'
-          TabOrder = 16
+          TabOrder = 17
           OnClick = cmdRemoveRelatedPackageClick
         end
         object cbLicense: TComboBox
           Left = 114
-          Top = 143
+          Top = 171
           Width = 499
           Height = 21
           Style = csDropDownList
           Anchors = [akLeft, akTop, akRight]
-          TabOrder = 2
+          TabOrder = 3
           OnClick = cbLicenseClick
+        end
+        object cbWelcomeFile: TComboBox
+          Left = 114
+          Top = 115
+          Width = 499
+          Height = 21
+          Style = csDropDownList
+          Anchors = [akLeft, akTop, akRight]
+          TabOrder = 1
+          OnClick = cbWelcomeFileClick
         end
       end
     end
@@ -1325,7 +1342,7 @@ inherited frmPackageEditor: TfrmPackageEditor
           Top = 48
           Width = 551
           Height = 13
-          Caption =
+          Caption = 
             'Compiling the package takes all the files you have selected and ' +
             'compresses them into a single package file.'
         end

@@ -32,6 +32,7 @@
             <xs:element minOccurs="0" maxOccurs="1" name="ReadMeFile" type="xs:string" />
             <xs:element minOccurs="0" maxOccurs="1" name="GraphicFile" type="xs:string" />
             <xs:element minOccurs="0" maxOccurs="1" name="LicenseFile" type="xs:string" />
+            <xs:element minOccurs="0" maxOccurs="1" name="WelcomeFile" type="xs:string" />
             <xs:element minOccurs="0" maxOccurs="1" name="MSIFileName" type="xs:string" />
             <xs:element minOccurs="0" maxOccurs="1" name="MSIOptions" type="xs:string" />
             <xs:element minOccurs="0" maxOccurs="1" name="FollowKeyboardVersion" type="km-empty" />

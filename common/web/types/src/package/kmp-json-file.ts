@@ -18,6 +18,7 @@ export interface KmpJsonFileOptions {
   readmeFile?: string;
   graphicFile?: string;
   licenseFile?: string;
+  welcomeFile?: string;
   executeProgram?: string;
   msiFilename?: string;
   msiOptions?: string;
