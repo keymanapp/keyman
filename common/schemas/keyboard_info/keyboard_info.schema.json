@@ -75,27 +75,11 @@
     "KeyboardExampleInfo": {
       "type": "object",
       "properties": {
-        "keys": {
-          "type": "array",
-          "items": { "$ref": "#/definitions/KeyboardExampleKeyInfo" }
-        },
+        "keys": { "type": "string" },
         "text": { "type": "string" },
         "note": { "type": "string" }
       },
       "required": ["keys", "text"],
-      "additionalProperties": false
-    },
-
-    "KeyboardExampleKeyInfo": {
-      "type": "object",
-      "properties": {
-        "key": { "type": "string" },
-        "modifiers": {
-          "type": "array",
-          "items": { "type": "string" }
-        }
-      },
-      "required": ["key"],
       "additionalProperties": false
     },
 

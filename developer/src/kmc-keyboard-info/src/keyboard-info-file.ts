@@ -49,12 +49,20 @@ export interface KeyboardInfoFileLanguageFont {
 }
 
 export interface KeyboardInfoFileExample {
-  keys?: KeyboardInfoFileExampleKey[];
+  /**
+   * A space-separated list of keys.
+   * - modifiers indicated with "+"
+   * - spacebar is "space"
+   * - plus key is "shift+=" or "plus" on US English (all other punctuation as per key cap).
+   * - Hardware modifiers are: "shift", "ctrl", "alt", "left-ctrl",
+   *   "right-ctrl", "left-alt", "right-alt"
+   * - Key caps should generally be their character for desktop (Latin script
+   *   case insensitive), or the actual key cap for touch
+   * - Caps Lock should be indicated with "caps-on", "caps-off"
+   *
+   * e.g. "shift+a b right-alt+c space plus z z z" represents something like: "Ab{AltGr+C} +zzz"
+   */
+  keys?: string;
   text?: string;
   note?: string;
-}
-
-export interface KeyboardInfoFileExampleKey {
-  key: string;
-  modifiers?: string[];
 }

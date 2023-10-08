@@ -12,7 +12,7 @@ Documentation at https://help.keyman.com/developer/cloud/keyboard_info
 # .keyboard_info version history
 
 ## 2023-08-11 2.0 stable
-* Removed legacyId, documentationFilename, documentationFileSize. Source vs distribution keyboard_info distinction is removed.
+* Removed legacyId, documentationFilename, documentationFileSize. Source vs distribution keyboard_info distinction is removed. Example key sequences are simplified.
 
 ## 2019-09-06 1.0.6 stable
 * No changes (see api.keyman.com#36 and api.keyman.com#59. Reverted in 2020-06-10.).
