@@ -88,9 +88,9 @@ export class CompilerMessages {
     `Language tag '${o.lang}' in ${o.resourceType} ${o.id} is invalid.`);
   static ERROR_LanguageTagIsNotValid = SevError | 0x0014;
 
-  static Warn_LanguageTagIsNotMinimal = (o: {resourceType: string, id:string, actual:string, expected:string}) => m(this.WARN_LanguageTagIsNotMinimal,
+  static Hint_LanguageTagIsNotMinimal = (o: {resourceType: string, id:string, actual:string, expected:string}) => m(this.HINT_LanguageTagIsNotMinimal,
     `Language tag '${o.actual}' in ${o.resourceType} ${o.id} is not minimal, and should be '${o.expected}'.`);
-  static WARN_LanguageTagIsNotMinimal = SevWarn | 0x0015;
+  static HINT_LanguageTagIsNotMinimal = SevHint | 0x0015;
 
   static Error_ModelMustHaveAtLeastOneLanguage = (o:{id:string}) => m(this.ERROR_ModelMustHaveAtLeastOneLanguage,
     `The lexical model ${o.id} must have at least one language specified.`);

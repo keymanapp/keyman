@@ -163,7 +163,7 @@ describe('CompilerMessages', function () {
   // WARN_LanguageTagIsNotMinimal
 
   it('should generate WARN_LanguageTagIsNotMinimal if keyboard has a non-minimal language tag', async function() {
-    testForMessage(this, ['invalid', 'warn_language_tag_is_not_minimal.kps'], CompilerMessages.WARN_LanguageTagIsNotMinimal);
+    testForMessage(this, ['invalid', 'warn_language_tag_is_not_minimal.kps'], CompilerMessages.HINT_LanguageTagIsNotMinimal);
   });
 
   // ERROR_ModelMustHaveAtLeastOneLanguage
@@ -218,7 +218,7 @@ describe('CompilerMessages', function () {
   it('should not generate HINT_JsKeyboardFileHasNoTouchTargets if keyboard has a touch target', async function() {
     testForMessage(this, ['khmer_angkor', 'source', 'khmer_angkor.kps'], null);
   });
-  
+
   // HINT_PackageContainsSourceFile
 
   it('should generate HINT_PackageContainsSourceFile if package contains a source file', async function() {

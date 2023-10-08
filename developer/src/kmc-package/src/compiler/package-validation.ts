@@ -64,7 +64,7 @@ export class PackageValidation {
       const minimalTag = locale.minimize().toString();
 
       if(minimalTag.toLowerCase() !== lang.id.toLowerCase()) {
-        this.callbacks.reportMessage(CompilerMessages.Warn_LanguageTagIsNotMinimal({resourceType, id, actual: lang.id, expected: minimalTag}));
+        this.callbacks.reportMessage(CompilerMessages.Hint_LanguageTagIsNotMinimal({resourceType, id, actual: lang.id, expected: minimalTag}));
       }
 
       if(minimalTags[minimalTag]) {
