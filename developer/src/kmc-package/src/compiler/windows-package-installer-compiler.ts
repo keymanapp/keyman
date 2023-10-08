@@ -123,11 +123,11 @@ License=${this.callbacks.path.basename(sources.licenseFilename)}
     setupInf += `\n[Packages]\n`;
     setupInf += kmpFilename + '\n';
     // TODO: multiple packages?
-    const strings = !kps.strings?.string ? [] : (Array.isArray(kps.strings.string) ? kps.strings.string : [kps.strings.string]);
+    const strings = !kps.Strings?.String ? [] : (Array.isArray(kps.Strings.String) ? kps.Strings.String : [kps.Strings.String]);
     if (strings.length) {
       setupInf += `\n[Strings]\n`;
       for (const str of strings) {
-        setupInf += `${str.$?.name}=${str.$?.value}\n`;
+        setupInf += `${str.$?.Name}=${str.$?.Value}\n`;
       }
     }
 
