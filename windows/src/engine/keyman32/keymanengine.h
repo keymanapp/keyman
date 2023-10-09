@@ -40,7 +40,7 @@
 #include <msctf.h>
 #include "../../../../common/windows/cpp/include/legacy_kmx_file.h"
 #include <keyman/keyman_core_api.h>
-#include <keyman/keyman_core_api_consts.h.h>
+#include <keyman/keyman_core_api_consts.h>
 
 /***************************************************************************/
 

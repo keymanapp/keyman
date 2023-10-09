@@ -620,7 +620,7 @@ const
   KM_KBP_VKEY__FE   = $FE;
   KM_KBP_VKEY__FF   = $FF;
 
-// keyman_core_api_consts.h.h
+// keyman_core_api_consts.h
 const
   // Defined environment options for KMX processor
   KM_KBP_KMX_ENV_PLATFORM                       = 'platform';

@@ -4,7 +4,7 @@
 */
 #include "kmx_processevent.h"
 #include "state.hpp"
-#include <keyman/keyman_core_api_consts.h.h>
+#include <keyman/keyman_core_api_consts.h>
 
 using namespace km::kbp;
 using namespace kmx;

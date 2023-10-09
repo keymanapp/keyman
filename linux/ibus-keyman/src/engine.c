@@ -29,7 +29,7 @@
 #include <gio/gio.h>
 
 #include <keyman/keyman_core_api.h>
-#include <keyman/keyman_core_api_consts.h.h>
+#include <keyman/keyman_core_api_consts.h>
 
 #include "config.h"
 #include "keymanutil.h"
