@@ -71,13 +71,13 @@ char VKeyToChar(KMX_UINT modifiers, KMX_UINT vk) {
  * @param state      A pointer to the state object.
  * @param vkey       A virtual key to be processed.
  * @param modifiers  The combinations of modifier keys set at the time vkey was pressed,
- *                   bitmask from the km_kbp_modifier_state enum.
+ *                   bitmask from the km_core_modifier_state enum.
  * @param isKeyDown  TRUE if this is called on KeyDown event, FALSE if called on KeyUp event
 *
  * @return           TRUE if keystroke should be eaten
 */
 KMX_BOOL KMX_ProcessEvent::ProcessEvent(
-  km_kbp_state *state,
+  km_core_state *state,
   KMX_UINT vkey,
   KMX_DWORD modifiers,
   KMX_BOOL isKeyDown
@@ -133,7 +133,7 @@ KMX_BOOL KMX_ProcessEvent::ProcessEvent(
   KMX_BOOL fOutputKeystroke = FALSE;
 
   if(m_debug_items) {
-    km_kbp_state_debug_key_info key_info;
+    km_core_state_debug_key_info key_info;
     key_info.character = m_state.charCode;
     key_info.modifier_state = modifiers;
     key_info.vk = m_state.vkey;
@@ -548,8 +548,8 @@ int KMX_ProcessEvent::PostString(PKMX_WCHAR str, LPKEYBOARD lpkb, PKMX_WCHAR end
 
 KMX_BOOL KMX_ProcessEvent::IsMatchingBaseLayout(PKMX_WCHAR layoutName)  // I3432
 {
-  KMX_BOOL bEqual = u16icmp(layoutName, static_cast<const km_kbp_cp *>(m_environment.baseLayout().c_str())) == 0 ||   // I4583
-                u16icmp(layoutName, static_cast<const km_kbp_cp*>(m_environment.baseLayoutAlt().c_str())) == 0;   // I4583
+  KMX_BOOL bEqual = u16icmp(layoutName, static_cast<const km_core_cp *>(m_environment.baseLayout().c_str())) == 0 ||   // I4583
+                u16icmp(layoutName, static_cast<const km_core_cp*>(m_environment.baseLayoutAlt().c_str())) == 0;   // I4583
 
   return bEqual;
 }

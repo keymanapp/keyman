@@ -17,7 +17,7 @@
 #include <assert.h>
 
 namespace {
-  constexpr km_kbp_attr const engine_attrs = {
+  constexpr km_core_attr const engine_attrs = {
     256,
     KM_KBP_LIB_CURRENT,
     KM_KBP_LIB_AGE,
@@ -82,7 +82,7 @@ ldml_processor::ldml_processor(path const & kb_path, const std::vector<uint8_t> 
       } else {
         str = keyEntry->get_to_string();
       }
-      keys.add((km_kbp_virtual_key)kmapEntry->vkey, (uint16_t)kmapEntry->mod, str);
+      keys.add((km_core_virtual_key)kmapEntry->vkey, (uint16_t)kmapEntry->mod, str);
     }
   } // else: no keys! but still valid. Just, no keys.
 
@@ -146,9 +146,9 @@ bool ldml_processor::is_kmxplus_file(path const & kb_path, std::vector<uint8_t>&
   return true;
 }
 
-km_kbp_status
+km_core_status
 ldml_processor::process_queued_actions(
-  km_kbp_state *state
+  km_core_state *state
 ) {
   assert(state);
   if (!state)
@@ -158,8 +158,8 @@ ldml_processor::process_queued_actions(
 }
 
 bool ldml_processor::queue_action(
-  km_kbp_state * state,
-  km_kbp_action_item const* action_item
+  km_core_state * state,
+  km_core_action_item const* action_item
 )
 {
   assert(state);
@@ -169,10 +169,10 @@ bool ldml_processor::queue_action(
   return false;
 }
 
-km_kbp_status
+km_core_status
 ldml_processor::process_event(
-  km_kbp_state *state,
-  km_kbp_virtual_key vk,
+  km_core_state *state,
+  km_core_virtual_key vk,
   uint16_t modifier_state,
   uint8_t is_key_down,
   uint16_t /*event_flags*/ // TODO-LDML: unused... for now...
@@ -284,7 +284,7 @@ ldml_processor::process_event(
             size_t contextRemoved = 0;
             for (auto c = state->context().rbegin(); charsToDelete > 0 && c != state->context().rend(); c++, contextRemoved++) {
               /** last char of context */
-              km_kbp_usv lastCtx = ctxtstr.back();
+              km_core_usv lastCtx = ctxtstr.back();
               uint8_t type = c->type;
               assert(type == KM_KBP_BT_CHAR || type == KM_KBP_BT_MARKER);
               if (type == KM_KBP_BT_CHAR) {
@@ -330,37 +330,37 @@ ldml_processor::process_event(
   return KM_KBP_STATUS_OK;
 }
 
-km_kbp_attr const & ldml_processor::attributes() const {
+km_core_attr const & ldml_processor::attributes() const {
   return engine_attrs;
 }
 
-km_kbp_keyboard_key  * ldml_processor::get_key_list() const {
-  km_kbp_keyboard_key* key_list = new km_kbp_keyboard_key(KM_KBP_KEYBOARD_KEY_LIST_END);
+km_core_keyboard_key  * ldml_processor::get_key_list() const {
+  km_core_keyboard_key* key_list = new km_core_keyboard_key(KM_KBP_KEYBOARD_KEY_LIST_END);
   return key_list;
 }
 
-km_kbp_keyboard_imx  * ldml_processor::get_imx_list() const {
-  km_kbp_keyboard_imx* imx_list = new km_kbp_keyboard_imx(KM_KBP_KEYBOARD_IMX_END);
+km_core_keyboard_imx  * ldml_processor::get_imx_list() const {
+  km_core_keyboard_imx* imx_list = new km_core_keyboard_imx(KM_KBP_KEYBOARD_IMX_END);
   return imx_list;
 }
 
-km_kbp_context_item * ldml_processor::get_intermediate_context() {
-  km_kbp_context_item *citems = new km_kbp_context_item(KM_KBP_CONTEXT_ITEM_END);
+km_core_context_item * ldml_processor::get_intermediate_context() {
+  km_core_context_item *citems = new km_core_context_item(KM_KBP_CONTEXT_ITEM_END);
   return citems;
 }
 
-km_kbp_status ldml_processor::validate() const {
+km_core_status ldml_processor::validate() const {
   return _valid ? KM_KBP_STATUS_OK : KM_KBP_STATUS_INVALID_KEYBOARD;
 }
 
 void
-ldml_processor::emit_text(km_kbp_state *state, const std::u16string &str) {
+ldml_processor::emit_text(km_core_state *state, const std::u16string &str) {
   const std::u32string str32 = kmx::u16string_to_u32string(str);
   emit_text(state, str32);
 }
 
 void
-ldml_processor::emit_text(km_kbp_state *state, const std::u32string &str) {
+ldml_processor::emit_text(km_core_state *state, const std::u32string &str) {
   for (auto it = str.begin(); it < str.end(); it++) {
     const auto ch = *it;
     // If we are at the start of a sequence:
@@ -381,21 +381,21 @@ ldml_processor::emit_text(km_kbp_state *state, const std::u32string &str) {
 }
 
 void
-ldml_processor::emit_text(km_kbp_state *state, km_kbp_usv ch) {
+ldml_processor::emit_text(km_core_state *state, km_core_usv ch) {
   assert(ch != LDML_UC_SENTINEL);
   state->context().push_character(ch);
   state->actions().push_character(ch);
 }
 
 void
-ldml_processor::emit_marker(km_kbp_state *state, KMX_DWORD marker_no) {
+ldml_processor::emit_marker(km_core_state *state, KMX_DWORD marker_no) {
   assert(km::kbp::kmx::is_valid_marker(marker_no));
   state->actions().push_marker(marker_no);
   state->context().push_marker(marker_no);
 }
 
 size_t
-ldml_processor::context_to_string(km_kbp_state *state, std::u32string &str) {
+ldml_processor::context_to_string(km_core_state *state, std::u32string &str) {
     str.clear();
     auto &cp      = state->context();
     size_t ctxlen = 0; // TODO-LDML: is this needed?

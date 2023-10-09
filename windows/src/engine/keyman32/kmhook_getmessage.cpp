@@ -287,7 +287,7 @@ LRESULT _kmnGetMessageProc(int nCode, WPARAM wParam, LPARAM lParam)
           if (!_td->lpActiveKeyboard) {
             return CallNextHookEx(Globals::get_hhookGetMessage(), nCode, wParam, lParam);
           }
-          if (KM_KBP_STATUS_OK != km_kbp_process_queued_actions(_td->lpActiveKeyboard->lpCoreKeyboardState)) {
+          if (KM_KBP_STATUS_OK != km_core_process_queued_actions(_td->lpActiveKeyboard->lpCoreKeyboardState)) {
             SendDebugMessageFormat(0, sdmGlobal, 0, "_kmnGetMessageProc wm_keymanim_close process event fail");
             return CallNextHookEx(Globals::get_hhookGetMessage(), nCode, wParam, lParam);
           }

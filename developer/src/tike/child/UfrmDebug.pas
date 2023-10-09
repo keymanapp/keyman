@@ -372,12 +372,12 @@ end;
 function TfrmDebug.SetKeyEventContext: Boolean;
 var
   context: pkm_core_context;
-  context_items: TArray<km_kbp_context_item>;
+  context_items: TArray<km_core_context_item>;
   n, i: Integer;
   ch: Char;
   dk: TDeadKeyInfo;
 begin
-  context := km_kbp_state_context(FDebugCore.State);
+  context := km_core_state_context(FDebugCore.State);
 
   if memo.SelLength > 0 then
   begin
@@ -392,7 +392,7 @@ begin
     // backspace in the case of backspace key, rather
     // than deleting the last character of the selection
     // (Keyman Core is not aware of selection).
-    km_kbp_context_clear(context);
+    km_core_context_clear(context);
     Exit(True);
   end;
 
@@ -426,7 +426,7 @@ begin
   end;
 
   context_items[n]._type := KM_KBP_CT_END;
-  Result := km_kbp_context_set(context, @context_items[0]) = KM_KBP_STATUS_OK;
+  Result := km_core_context_set(context, @context_items[0]) = KM_KBP_STATUS_OK;
 end;
 
 function TfrmDebug.ProcessKeyEvent(var Message: TMessage): Boolean;
@@ -476,7 +476,7 @@ begin
   if not SetKeyEventContext then
     Exit(False);
 
-  if km_kbp_process_event(FDebugCore.State, Message.WParam, modifier, 1, KM_KBP_EVENT_FLAG_DEFAULT) = KM_KBP_STATUS_OK then
+  if km_core_process_event(FDebugCore.State, Message.WParam, modifier, 1, KM_KBP_EVENT_FLAG_DEFAULT) = KM_KBP_STATUS_OK then
   begin
     // Process keystroke -- true = swallow keystroke
     Result := True;
@@ -723,7 +723,7 @@ procedure TfrmDebug.ExecuteEventAction(n: Integer);
     UpdateDeadkeys;
   end;
 
-  procedure DoBackspace(BackspaceType: km_kbp_backspace_type);
+  procedure DoBackspace(BackspaceType: km_core_backspace_type);
   var
     m, n: Integer;
     dk: TDeadKeyInfo;
@@ -915,7 +915,7 @@ begin
       KM_KBP_IT_CHAR:           DoChar(Text);
       KM_KBP_IT_MARKER:         DoDeadkey(dwData);
       KM_KBP_IT_ALERT:          DoBell;
-      KM_KBP_IT_BACK:           DoBackspace(km_kbp_backspace_type(dwData));
+      KM_KBP_IT_BACK:           DoBackspace(km_core_backspace_type(dwData));
       KM_KBP_IT_PERSIST_OPT: ; //TODO
       KM_KBP_IT_CAPSLOCK:    ; //TODO
       KM_KBP_IT_INVALIDATE_CONTEXT: ; // no-op

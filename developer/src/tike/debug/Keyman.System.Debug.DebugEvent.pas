@@ -31,7 +31,7 @@ type
   { DebugEvent structure -- an event has occurred }
 
   TDebugEventActionData = class
-    ActionType: km_kbp_action_type;
+    ActionType: km_core_action_type;
     dwData: Integer;
     Text: WideString;
   end;
@@ -68,7 +68,7 @@ type
 
   TDebugEventList = class(TObjectList<TDebugEvent>)
   private
-    procedure Action_Char(const character: km_kbp_usv);
+    procedure Action_Char(const character: km_core_usv);
     procedure Action_DeleteBack(expected_type: uint8_t;
       expected_value: uintptr_t);
     procedure Action_EmitKeystroke(const key: Word);
@@ -172,7 +172,7 @@ end;
 /// Insert a UTF-32 character at the insertion point.
 /// TODO: define behaviour around selection
 ///
-procedure TDebugEventList.Action_Char(const character: km_kbp_usv);
+procedure TDebugEventList.Action_Char(const character: km_core_usv);
 var
   event: TDebugEvent;
 begin
@@ -320,7 +320,7 @@ var
   action: pkm_core_action_item;
 begin
   Result := True;
-  action := km_kbp_state_action_items(state, nil);
+  action := km_core_state_action_items(state, nil);
   while (action._type <> KM_KBP_IT_END) do
   begin
     Result := Result and AddActionItem(vk, action);
@@ -340,8 +340,8 @@ var
   action_index: Integer;
 begin
   Result := True;
-  debug := km_kbp_state_debug_items(state, nil);
-  action := km_kbp_state_action_items(state, nil);
+  debug := km_core_state_debug_items(state, nil);
+  action := km_core_state_action_items(state, nil);
   action_index := 0;
   while debug._type <> KM_KBP_DEBUG_END do
   begin

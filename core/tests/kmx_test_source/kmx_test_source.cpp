@@ -50,7 +50,7 @@ KmxTestSource::parse_source_string(std::string const &s) {
   for (auto p = s.begin(); p != s.end(); p++) {
     if (*p == '\\') {
       p++;
-      km_kbp_usv v;
+      km_core_usv v;
       assert(p != s.end());
       if (*p == 'u' || *p == 'U') {
         // Unicode value
@@ -62,10 +62,10 @@ KmxTestSource::parse_source_string(std::string const &s) {
         assert(v >= 0x0001 && v <= 0x10FFFF);
         p += n - 1;
         if (v < 0x10000) {
-          t += km_kbp_cp(v);
+          t += km_core_cp(v);
         } else {
-          t += km_kbp_cp(Uni_UTF32ToSurrogate1(v));
-          t += km_kbp_cp(Uni_UTF32ToSurrogate2(v));
+          t += km_core_cp(Uni_UTF32ToSurrogate1(v));
+          t += km_core_cp(Uni_UTF32ToSurrogate2(v));
         }
       } else if (*p == 'd') {
         // Deadkey
@@ -167,9 +167,9 @@ KmxTestSource::load_source(
   return 0;
 }
 
-km_kbp_option_item *
+km_core_option_item *
 KmxTestSource::get_keyboard_options(kmx_options options) {
-  km_kbp_option_item *keyboard_opts = new km_kbp_option_item[options.size() + 1];
+  km_core_option_item *keyboard_opts = new km_core_option_item[options.size() + 1];
 
   int i = 0;
   for (auto it = options.begin(); it != options.end(); it++) {
@@ -187,13 +187,13 @@ KmxTestSource::get_keyboard_options(kmx_options options) {
       keyboard_opts[i].scope = KM_KBP_OPT_KEYBOARD;
     }
 
-    km_kbp_cp *cp = new km_kbp_cp[key.length() + 1];
+    km_core_cp *cp = new km_core_cp[key.length() + 1];
     key.copy(cp, key.length());
     cp[key.length()] = 0;
 
     keyboard_opts[i].key = cp;
 
-    cp = new km_kbp_cp[it->value.length() + 1];
+    cp = new km_core_cp[it->value.length() + 1];
     it->value.copy(cp, it->value.length());
     cp[it->value.length()] = 0;
 
@@ -224,7 +224,7 @@ KmxTestSource::get_modifier(std::string const m) {
   return 0;
 }
 
-km_kbp_virtual_key
+km_core_virtual_key
 KmxTestSource::get_vk(std::string const &vk) {
   for (int i = 1; i < 256; i++) {
     if (vk == km::kbp::kmx::s_key_names[i]) {
@@ -242,7 +242,7 @@ KmxTestSource::vkey_to_event(std::string const &vk_event) {
   std::stringstream f(vk_event);
   std::string s;
   uint16_t modifier_state = 0;
-  km_kbp_virtual_key vk   = 0;
+  km_core_virtual_key vk   = 0;
   while (std::getline(f, s, ' ')) {
     uint16_t modifier = get_modifier(s);
     if (modifier != 0) {

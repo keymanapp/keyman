@@ -24,7 +24,7 @@ extern "C"
 #endif
 
 /**
- * The maximum size of context in km_kbp_cp units for a single debug
+ * The maximum size of context in km_core_cp units for a single debug
  * event. This is taken from MAXCONTEXT in keyman32 (Windows) and is purely
  * a convenience value. We can increase it if there is a demonstrated need.
  */
@@ -56,7 +56,7 @@ typedef struct {
   uint16_t vk;
   uint16_t modifier_state;
   char16_t character;
-} km_kbp_state_debug_key_info;
+} km_core_state_debug_key_info;
 
 /**
  * Option event data.
@@ -65,8 +65,8 @@ typedef struct {
  */
 typedef struct {
   void *store;      // LPSTORE
-  km_kbp_cp value[DEBUG_MAX_CONTEXT];  // value to be saved into the store
-} km_kbp_state_debug_kmx_option_info;
+  km_core_cp value[DEBUG_MAX_CONTEXT];  // value to be saved into the store
+} km_core_state_debug_kmx_option_info;
 
 /**
  * KMX processor data for each event. kmx_base.h defines the types that are
@@ -80,7 +80,7 @@ typedef struct {
  */
 
 typedef struct {
-  km_kbp_cp context[DEBUG_MAX_CONTEXT];     // The context matched by the rule (? may not need this?) // TODO: rename to context_matched
+  km_core_cp context[DEBUG_MAX_CONTEXT];     // The context matched by the rule (? may not need this?) // TODO: rename to context_matched
   void *group;  // LPGROUP
   void *rule;   // LPKEY
   uint16_t store_offsets[DEBUG_STORE_OFFSETS_SIZE];	// pairs--store, char position, terminated by 0xFFFF // TODO use a better structure here
@@ -89,8 +89,8 @@ typedef struct {
   /// the debugger; the debugger uses this to determine when to
   /// execute the actions when single-stepping.
   uint16_t first_action;
-  km_kbp_state_debug_kmx_option_info option;
-} km_kbp_state_debug_kmx_info;
+  km_core_state_debug_kmx_option_info option;
+} km_core_state_debug_kmx_info;
 
 /**
  * A single debug event.
@@ -98,14 +98,14 @@ typedef struct {
 typedef struct {
   uint32_t  type; // 32 bits is better optimized than 8 bits
   uint32_t flags;
-  km_kbp_state_debug_key_info key_info;
-  km_kbp_state_debug_kmx_info kmx_info;
-} km_kbp_state_debug_item;
+  km_core_state_debug_key_info key_info;
+  km_core_state_debug_kmx_info kmx_info;
+} km_core_state_debug_item;
 
 /**
  * A single debug event.
  */
-enum km_kbp_debug_type {
+enum km_core_debug_type {
   KM_KBP_DEBUG_BEGIN = 0,
   //KM_KBP_DEBUG_BEGIN_ANSI = 1, // not supported; instead rewrite ansi keyboards to Unicode with mcompile
   KM_KBP_DEBUG_GROUP_ENTER = 2,
@@ -140,8 +140,8 @@ enum km_kbp_debug_type {
  * @returns   KM_KBP_STATUS_OK on success
  */
 KMN_API
-km_kbp_status
-km_kbp_state_debug_set(km_kbp_state *state, int value);
+km_core_status
+km_core_state_debug_set(km_core_state *state, int value);
 
 /**
  * Get current debug tracing status
@@ -152,7 +152,7 @@ km_kbp_state_debug_set(km_kbp_state *state, int value);
  */
 KMN_API
 uint8_t
-km_kbp_state_debug_get(km_kbp_state const *state);
+km_core_state_debug_get(km_core_state const *state);
 
 /**
  * Read current debug trace log
@@ -165,8 +165,8 @@ km_kbp_state_debug_get(km_kbp_state const *state);
  *            with last entry guaranteed to be KM_KBP_DEBUG_END.
  */
 KMN_API
-km_kbp_state_debug_item const *
-km_kbp_state_debug_items(km_kbp_state const *state, size_t *num_items);
+km_core_state_debug_item const *
+km_core_state_debug_items(km_core_state const *state, size_t *num_items);
 
 #if defined(__cplusplus)
 } // extern "C"

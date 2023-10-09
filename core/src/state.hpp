@@ -3,7 +3,7 @@
   Description:  Internal context class and adaptor class for the API.
   Create Date:  17 Oct 2018
   Authors:      Tim Eves (TSE)
-  History:      17 Oct 2018 - TSE - Refactored out of km_kbp_state_api.cpp
+  History:      17 Oct 2018 - TSE - Refactored out of km_core_state_api.cpp
 */
 
 #pragma once
@@ -23,26 +23,26 @@ namespace kbp
 //Forward declarations
 class abstract_processor;
 
-using action = km_kbp_action_item;
+using action = km_core_action_item;
 
 class actions : public std::vector<action>
 {
   std::vector<option> _option_items_stack;
 
-  template<km_kbp_action_type V>
-  void _push_vkey(km_kbp_virtual_key);
+  template<km_core_action_type V>
+  void _push_vkey(km_core_virtual_key);
 
 public:
   template<typename... Args>
   actions(Args&&... args);
 
-  void push_character(km_kbp_usv usv);
+  void push_character(km_core_usv usv);
   void push_marker(uintptr_t marker);
   void push_alert();
-  void push_backspace(km_kbp_backspace_type expected_type, uintptr_t expected_value = 0);
+  void push_backspace(km_core_backspace_type expected_type, uintptr_t expected_value = 0);
   void push_persist(option const &);
   void push_persist(option const &&);
-  void push_emit_keystroke(km_kbp_virtual_key vk=0);
+  void push_emit_keystroke(km_core_virtual_key vk=0);
   void push_capslock(bool);
   void push_invalidate_context();
 
@@ -56,35 +56,35 @@ actions::actions(Args&&... args)
 : std::vector<action>(std::forward<Args>(args)...)
 {
   // Ensure the action items list is terminated in case the client calls
-  // km_kbp_state_action_items before they call process_event.
+  // km_core_state_action_items before they call process_event.
   commit();
 }
 
 inline
-void actions::push_character(km_kbp_usv usv) {
+void actions::push_character(km_core_usv usv) {
   assert(empty() || (!empty() && back().type != KM_KBP_IT_END));
-  emplace_back(km_kbp_action_item{ KM_KBP_IT_CHAR, {0,}, {usv} });
+  emplace_back(km_core_action_item{ KM_KBP_IT_CHAR, {0,}, {usv} });
 }
 
 
 inline
 void actions::push_marker(uintptr_t marker) {
   assert(empty() || (!empty() && back().type != KM_KBP_IT_END));
-  emplace_back(km_kbp_action_item {KM_KBP_IT_MARKER, {0,}, {marker}});
+  emplace_back(km_core_action_item {KM_KBP_IT_MARKER, {0,}, {marker}});
 }
 
 
 inline
 void actions::push_alert() {
   assert(empty() || (!empty() && back().type != KM_KBP_IT_END));
-  emplace_back(km_kbp_action_item {KM_KBP_IT_ALERT, {0,}, {0}});
+  emplace_back(km_core_action_item {KM_KBP_IT_ALERT, {0,}, {0}});
 }
 
 
 inline
-void actions::push_backspace(km_kbp_backspace_type expected_type, uintptr_t expected_value) {
+void actions::push_backspace(km_core_backspace_type expected_type, uintptr_t expected_value) {
   assert(empty() || (!empty() && back().type != KM_KBP_IT_END));
-  km_kbp_action_item item = {KM_KBP_IT_BACK, {}, {}};
+  km_core_action_item item = {KM_KBP_IT_BACK, {}, {}};
   item.backspace.expected_type = expected_type;
   item.backspace.expected_value = expected_value;
   emplace_back(item);
@@ -92,22 +92,22 @@ void actions::push_backspace(km_kbp_backspace_type expected_type, uintptr_t expe
 
 
 inline
-void actions::push_emit_keystroke(km_kbp_virtual_key vk) {
+void actions::push_emit_keystroke(km_core_virtual_key vk) {
   assert(empty() || (!empty() && back().type != KM_KBP_IT_END));
-  emplace_back(km_kbp_action_item {KM_KBP_IT_EMIT_KEYSTROKE, {0,}, {vk}});
+  emplace_back(km_core_action_item {KM_KBP_IT_EMIT_KEYSTROKE, {0,}, {vk}});
 }
 
 inline
 void actions::push_invalidate_context() {
   assert(empty() || (!empty() && back().type != KM_KBP_IT_END));
-  emplace_back(km_kbp_action_item {KM_KBP_IT_INVALIDATE_CONTEXT, {0,}, {0}});
+  emplace_back(km_core_action_item {KM_KBP_IT_INVALIDATE_CONTEXT, {0,}, {0}});
 }
 
 
 inline
 void actions::commit() {
   assert(empty() || (!empty() && back().type != KM_KBP_IT_END));
-  emplace_back(km_kbp_action_item {KM_KBP_IT_END, {0,}, {0}});
+  emplace_back(km_core_action_item {KM_KBP_IT_END, {0,}, {0}});
 }
 
 
@@ -126,11 +126,11 @@ protected:
     kbp::abstract_processor & _processor;
     kbp::actions              _actions;
     kbp::debug_items          _debug_items;
-    km_kbp_keyboard_imx_platform _imx_callback;
+    km_core_keyboard_imx_platform _imx_callback;
     void *_imx_object;
 
 public:
-    state(kbp::abstract_processor & kb, km_kbp_option_item const *env);
+    state(kbp::abstract_processor & kb, km_core_option_item const *env);
 
     state(state const &) = default;
     state(state const &&) = delete;
@@ -147,7 +147,7 @@ public:
     kbp::debug_items        & debug_items() noexcept        { return _debug_items; }
     kbp::debug_items const  & debug_items() const noexcept  { return _debug_items; }
 
-    void imx_register_callback(km_kbp_keyboard_imx_platform imx_callback, void *callback_object);
+    void imx_register_callback(km_core_keyboard_imx_platform imx_callback, void *callback_object);
 
     void imx_deregister_callback();
 
@@ -157,9 +157,9 @@ public:
 } // namespace kbp
 } // namespace km
 
-struct km_kbp_state : public km::kbp::state
+struct km_core_state : public km::kbp::state
 {
   template<typename... Args>
-  km_kbp_state(Args&&... args) : km::kbp::state(std::forward<Args>(args)...)
+  km_core_state(Args&&... args) : km::kbp::state(std::forward<Args>(args)...)
   {}
 };

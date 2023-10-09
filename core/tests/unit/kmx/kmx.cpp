@@ -34,7 +34,7 @@ namespace {
 
 bool g_beep_found = false;
 
-km_kbp_option_item test_env_opts[] =
+km_core_option_item test_env_opts[] =
 {
   KM_KBP_OPTIONS_END
 };
@@ -58,10 +58,10 @@ string_to_hex(const std::u16string &input) {
 
 void
 apply_action(
-    km_kbp_state const *,
-    km_kbp_action_item const &act,
+    km_core_state const *,
+    km_core_action_item const &act,
     std::u16string &text_store,
-    std::vector<km_kbp_context_item> &context,
+    std::vector<km_core_context_item> &context,
     km::tests::kmx_options &options,
     km::tests::KmxTestSource &test_source) {
   switch (act.type) {
@@ -73,7 +73,7 @@ apply_action(
     // std::cout << "beep" << std::endl;
     break;
   case KM_KBP_IT_CHAR:
-    context.push_back(km_kbp_context_item{
+    context.push_back(km_core_context_item{
         KM_KBP_CT_CHAR,
         {
             0,
@@ -90,7 +90,7 @@ apply_action(
     break;
   case KM_KBP_IT_MARKER:
     // std::cout << "deadkey(" << act.marker << ")" << std::endl;
-    context.push_back(km_kbp_context_item{
+    context.push_back(km_core_context_item{
         KM_KBP_CT_MARKER,
         {
             0,
@@ -110,7 +110,7 @@ apply_action(
       context.pop_back();
     } else if (text_store.length() > 0) {
       assert(!context.empty() && !text_store.empty());
-      km_kbp_usv ch = text_store.back();
+      km_core_usv ch = text_store.back();
       text_store.pop_back();
       if (text_store.length() > 0 && Uni_IsSurrogate2(ch)) {
         auto ch1 = text_store.back();
@@ -176,35 +176,35 @@ run_test(const km::kbp::path &source, const km::kbp::path &compiled) {
   std::cout << "source file   = " << source << std::endl
             << "compiled file = " << compiled << std::endl;
 
-  km_kbp_keyboard * test_kb = nullptr;
-  km_kbp_state * test_state = nullptr;
+  km_core_keyboard * test_kb = nullptr;
+  km_core_state * test_state = nullptr;
 
-  try_status(km_kbp_keyboard_load(compiled.c_str(), &test_kb));
+  try_status(km_core_keyboard_load(compiled.c_str(), &test_kb));
 
   // Setup state, environment
-  try_status(km_kbp_state_create(test_kb, test_env_opts, &test_state));
+  try_status(km_core_state_create(test_kb, test_env_opts, &test_state));
 
   // Setup keyboard options
   if (options.size() > 0) {
-    km_kbp_option_item *keyboard_opts = test_source.get_keyboard_options(options);
+    km_core_option_item *keyboard_opts = test_source.get_keyboard_options(options);
 
-    try_status(km_kbp_state_options_update(test_state, keyboard_opts));
+    try_status(km_core_state_options_update(test_state, keyboard_opts));
 
     delete [] keyboard_opts;
   }
 
   // Setup context
-  km_kbp_context_item *citems = nullptr;
-  try_status(km_kbp_context_items_from_utf16(context.c_str(), &citems));
-  try_status(km_kbp_context_set(km_kbp_state_context(test_state), citems));
+  km_core_context_item *citems = nullptr;
+  try_status(km_core_context_items_from_utf16(context.c_str(), &citems));
+  try_status(km_core_context_set(km_core_state_context(test_state), citems));
 
   // Make a copy of the setup context for the test
-  std::vector<km_kbp_context_item> test_context;
-  for(km_kbp_context_item *ci = citems; ci->type != KM_KBP_CT_END; ci++) {
+  std::vector<km_core_context_item> test_context;
+  for(km_core_context_item *ci = citems; ci->type != KM_KBP_CT_END; ci++) {
     test_context.emplace_back(*ci);
   }
 
-  km_kbp_context_items_dispose(citems);
+  km_core_context_items_dispose(citems);
 
   // Setup baseline text store
   std::u16string text_store = context;
@@ -220,19 +220,19 @@ run_test(const km::kbp::path &source, const km::kbp::path &compiled) {
     }
 
     for (auto key_down = 1; key_down >= 0; key_down--) {
-      try_status(km_kbp_process_event(test_state, p.vk, p.modifier_state | test_source.caps_lock_state(), key_down, KM_KBP_EVENT_FLAG_DEFAULT));
+      try_status(km_core_process_event(test_state, p.vk, p.modifier_state | test_source.caps_lock_state(), key_down, KM_KBP_EVENT_FLAG_DEFAULT));
 
-      for (auto act = km_kbp_state_action_items(test_state, nullptr); act->type != KM_KBP_IT_END; act++) {
+      for (auto act = km_core_state_action_items(test_state, nullptr); act->type != KM_KBP_IT_END; act++) {
         apply_action(test_state, *act, text_store, test_context, options, test_source);
       }
     }
 
     // Compare context and text store at each step - should be identical
     size_t n = 0;
-    try_status(km_kbp_context_get(km_kbp_state_context(test_state), &citems));
-    try_status(km_kbp_context_items_to_utf16(citems, nullptr, &n));
-    km_kbp_cp *buf = new km_kbp_cp[n];
-    try_status(km_kbp_context_items_to_utf16(citems, buf, &n));
+    try_status(km_core_context_get(km_core_state_context(test_state), &citems));
+    try_status(km_core_context_items_to_utf16(citems, nullptr, &n));
+    km_core_cp *buf = new km_core_cp[n];
+    try_status(km_core_context_items_to_utf16(citems, buf, &n));
 
     // Verify that both our local test_context and the core's test_state.context have
     // not diverged
@@ -242,7 +242,7 @@ run_test(const km::kbp::path &source, const km::kbp::path &compiled) {
       assert(test_ci->type == ci->type && test_ci->marker == ci->marker);
     }
 
-    km_kbp_context_items_dispose(citems);
+    km_core_context_items_dispose(citems);
     if (text_store != buf) {
       std::cerr << "text store has diverged from buf" << std::endl;
       std::cerr << "text store: " << string_to_hex(text_store) << " [" << text_store << "]" << std::endl;
@@ -257,10 +257,10 @@ run_test(const km::kbp::path &source, const km::kbp::path &compiled) {
 
   // Compare final output - retrieve internal context
   size_t n = 0;
-  try_status(km_kbp_context_get(km_kbp_state_context(test_state), &citems));
-  try_status(km_kbp_context_items_to_utf16(citems, nullptr, &n));
-  km_kbp_cp *buf = new km_kbp_cp[n];
-  try_status(km_kbp_context_items_to_utf16(citems, buf, &n));
+  try_status(km_core_context_get(km_core_state_context(test_state), &citems));
+  try_status(km_core_context_items_to_utf16(citems, nullptr, &n));
+  km_core_cp *buf = new km_core_cp[n];
+  try_status(km_core_context_items_to_utf16(citems, buf, &n));
 
   // Verify that both our local test_context and the core's test_state.context have
   // not diverged
@@ -270,7 +270,7 @@ run_test(const km::kbp::path &source, const km::kbp::path &compiled) {
     assert(test_ci->type == ci->type && test_ci->marker == ci->marker);
   }
 
-  km_kbp_context_items_dispose(citems);
+  km_core_context_items_dispose(citems);
 
   std::cout << "expected  : " << string_to_hex(expected) << " [" << expected << "]" << std::endl;
   std::cout << "text store: " << string_to_hex(text_store) << " [" << text_store << "]" << std::endl;
@@ -286,8 +286,8 @@ run_test(const km::kbp::path &source, const km::kbp::path &compiled) {
   for (auto it = options.begin(); it != options.end(); it++) {
     if (it->type == km::tests::KOT_OUTPUT) {
       std::cout << "output option-key: " << it->key << " expected: " << it->value;
-      km_kbp_cp const *value;
-      try_status(km_kbp_state_option_lookup(test_state, KM_KBP_OPT_KEYBOARD, it->key.c_str(), &value));
+      km_core_cp const *value;
+      try_status(km_core_state_option_lookup(test_state, KM_KBP_OPT_KEYBOARD, it->key.c_str(), &value));
       std::cout << " actual: " << value << std::endl;
       if (it->value.compare(value) != 0) return __LINE__;
     } else if (it->type == km::tests::KOT_SAVED) {
@@ -297,8 +297,8 @@ run_test(const km::kbp::path &source, const km::kbp::path &compiled) {
   }
 
   // Destroy them
-  km_kbp_state_dispose(test_state);
-  km_kbp_keyboard_dispose(test_kb);
+  km_core_state_dispose(test_state);
+  km_core_keyboard_dispose(test_kb);
 
   return 0;
 }

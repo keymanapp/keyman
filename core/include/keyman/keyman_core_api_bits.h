@@ -27,7 +27,7 @@
 #endif
 
 #if defined _WIN32 || defined __CYGWIN__
-  typedef wchar_t  const * km_kbp_path_name;
+  typedef wchar_t  const * km_core_path_name;
   #define _KM_KBP_PATH_SEPARATOR (L'\\')
   #define _KM_KBP_EXT_SEPARATOR (L'.')
   #if defined __GNUC__  // These three will be redefined for Windows
@@ -43,7 +43,7 @@
   #define _kmn_import_flag     dllimport
   #define _kmn_static_flag
 #else
-  typedef char const * km_kbp_path_name;
+  typedef char const * km_core_path_name;
   #define _KM_KBP_PATH_SEPARATOR ('/')
   #define _KM_KBP_EXT_SEPARATOR ('.')
 #endif

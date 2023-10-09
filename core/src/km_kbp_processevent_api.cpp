@@ -12,9 +12,9 @@
 #include "processor.hpp"
 #include "state.hpp"
 
-km_kbp_status
-km_kbp_event(
-  km_kbp_state *state,
+km_core_status
+km_core_event(
+  km_core_state *state,
   uint32_t event,
   void* data
 ) {
@@ -39,9 +39,9 @@ km_kbp_event(
   return state->processor().external_event(state, event, data);
 }
 
-km_kbp_status
-km_kbp_process_event(km_kbp_state *state,
-                     km_kbp_virtual_key vk,
+km_core_status
+km_core_process_event(km_core_state *state,
+                     km_core_virtual_key vk,
                      uint16_t modifier_state,
                      uint8_t is_key_down,
                      uint16_t event_flags) {
@@ -52,9 +52,9 @@ km_kbp_process_event(km_kbp_state *state,
   return state->processor().process_event(state, vk, modifier_state, is_key_down, event_flags);
 }
 
-km_kbp_status
-km_kbp_process_queued_actions(
-      km_kbp_state *state
+km_core_status
+km_core_process_queued_actions(
+      km_core_state *state
       ) {
   assert(state != nullptr);
   if(state == nullptr) {
@@ -63,8 +63,8 @@ km_kbp_process_queued_actions(
   return state->processor().process_queued_actions(state);
 }
 
-km_kbp_attr const *
-km_kbp_get_engine_attrs(km_kbp_state const *state)
+km_core_attr const *
+km_core_get_engine_attrs(km_core_state const *state)
 {
   assert(state != nullptr);
   if(state == nullptr) {

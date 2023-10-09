@@ -53,7 +53,7 @@ const char *debug_item_types[] = {
   "KM_KBP_DEBUG_SET_OPTION", // = 11
 };
 
-void print_debug_item(const char *title, km_kbp_state_debug_item const & item) {
+void print_debug_item(const char *title, km_core_state_debug_item const & item) {
   LPGROUP gp = static_cast<LPGROUP>(item.kmx_info.group);
   LPKEY rule = static_cast<LPKEY>(item.kmx_info.rule);
   LPSTORE store = static_cast<LPSTORE>(item.kmx_info.option.store);
@@ -100,8 +100,8 @@ bool are_store_offsets_equal(const uint16_t (&lhs)[DEBUG_STORE_OFFSETS_SIZE], co
 }
 
 bool operator==(
-  km_kbp_state_debug_item const & lhs,
-  km_kbp_state_debug_item const & rhs
+  km_core_state_debug_item const & lhs,
+  km_core_state_debug_item const & rhs
 ) {
   auto result = (lhs.type == rhs.type && lhs.flags == rhs.flags && lhs.kmx_info.first_action == rhs.kmx_info.first_action);
   if(result) {
@@ -164,11 +164,11 @@ bool operator==(
 
 
 bool debug_items(
-  km_kbp_state const * state,
-  std::initializer_list<km_kbp_state_debug_item> const & expected
+  km_core_state const * state,
+  std::initializer_list<km_core_state_debug_item> const & expected
 ) {
   size_t n = 0;
-  auto act = km_kbp_state_debug_items(state, &n);
+  auto act = km_core_state_debug_items(state, &n);
 
   for (auto &rhs: expected) {
     if ((int)--n < 0) {

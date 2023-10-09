@@ -23,9 +23,9 @@ using namespace km::kbp;
 // Forward declarations
 class context;
 
-km_kbp_status km_kbp_state_create(km_kbp_keyboard * keyboard,
-                                  km_kbp_option_item const *env,
-                                  km_kbp_state ** out)
+km_core_status km_core_state_create(km_core_keyboard * keyboard,
+                                  km_core_option_item const *env,
+                                  km_core_state ** out)
 {
   assert(keyboard); assert(env); assert(out);
   if (!keyboard || !env || !out)
@@ -33,7 +33,7 @@ km_kbp_status km_kbp_state_create(km_kbp_keyboard * keyboard,
 
   try
   {
-    *out = new km_kbp_state(static_cast<abstract_processor&>(*keyboard), env);
+    *out = new km_core_state(static_cast<abstract_processor&>(*keyboard), env);
   }
   catch (std::bad_alloc &)
   {
@@ -43,35 +43,35 @@ km_kbp_status km_kbp_state_create(km_kbp_keyboard * keyboard,
 }
 
 
-km_kbp_status km_kbp_state_clone(km_kbp_state const *state,
-                                 km_kbp_state ** out)
+km_core_status km_core_state_clone(km_core_state const *state,
+                                 km_core_state ** out)
 {
   assert(state); assert(out);
   if (!state || !out)
     return KM_KBP_STATUS_INVALID_ARGUMENT;
 
-  *out = new km_kbp_state(*state);
+  *out = new km_core_state(*state);
   return KM_KBP_STATUS_OK;
 }
 
 
-void km_kbp_state_dispose(km_kbp_state *state)
+void km_core_state_dispose(km_core_state *state)
 {
   delete state;
 }
 
 
-km_kbp_context *km_kbp_state_context(km_kbp_state *state)
+km_core_context *km_core_state_context(km_core_state *state)
 {
   assert(state);
   if (!state) return nullptr;
 
-  return static_cast<km_kbp_context *>(&state->context());
+  return static_cast<km_core_context *>(&state->context());
 }
 
-km_kbp_status kbp_state_get_intermediate_context(
-  km_kbp_state *state,
-  km_kbp_context_item ** context_items
+km_core_status kbp_state_get_intermediate_context(
+  km_core_state *state,
+  km_core_context_item ** context_items
 ) {
   assert(state);
   assert(context_items);
@@ -84,7 +84,7 @@ km_kbp_status kbp_state_get_intermediate_context(
   return KM_KBP_STATUS_OK;
 }
 
-km_kbp_action_item const * km_kbp_state_action_items(km_kbp_state const *state,
+km_core_action_item const * km_core_state_action_items(km_core_state const *state,
                                                      size_t *num_items)
 {
   assert(state && state->actions().size() > 0);
@@ -99,9 +99,9 @@ km_kbp_action_item const * km_kbp_state_action_items(km_kbp_state const *state,
   return state->actions().data();
 }
 
-km_kbp_status km_kbp_state_queue_action_items(
-  km_kbp_state *state,
-  km_kbp_action_item const *action_items
+km_core_status km_core_state_queue_action_items(
+  km_core_state *state,
+  km_core_action_item const *action_items
 ) {
   assert(state);
   assert(action_items);
@@ -146,7 +146,7 @@ namespace {
 }
 
 
-json & operator << (json & j, km_kbp_action_item const &act)
+json & operator << (json & j, km_core_action_item const &act)
 {
   j << json::flat << json::object;
   if (act.type >= KM_KBP_IT_MAX_TYPE_ID)
@@ -165,7 +165,7 @@ json & operator << (json & j, km_kbp_action_item const &act)
       break;
     case KM_KBP_IT_CHAR:
     case KM_KBP_IT_MARKER:
-      j << km_kbp_context_item {act.type, {0,}, {act.character}}; // TODO: is act.type correct here? it may map okay but this is bad practice to mix constants across types. Similarly using act.character instead of act.type
+      j << km_core_context_item {act.type, {0,}, {act.character}}; // TODO: is act.type correct here? it may map okay but this is bad practice to mix constants across types. Similarly using act.character instead of act.type
       break;
     case KM_KBP_IT_PERSIST_OPT:
       j << json::object
@@ -197,7 +197,7 @@ json & operator << (json & j, actions const & acts)
 }
 
 
-km_kbp_status km_kbp_state_to_json(km_kbp_state const *state,
+km_core_status km_core_state_to_json(km_core_state const *state,
                                         char *buf,
                                         size_t *space)
 {
@@ -239,9 +239,9 @@ km_kbp_status km_kbp_state_to_json(km_kbp_state const *state,
 
 }
 
-void km_kbp_state_imx_register_callback(
-  km_kbp_state *state,
-  km_kbp_keyboard_imx_platform imx_callback,
+void km_core_state_imx_register_callback(
+  km_core_state *state,
+  km_core_keyboard_imx_platform imx_callback,
   void *callback_object
 ) {
   assert(state);
@@ -251,7 +251,7 @@ void km_kbp_state_imx_register_callback(
   state->imx_register_callback(imx_callback, callback_object);
 }
 
-void km_kbp_state_imx_deregister_callback(km_kbp_state *state)
+void km_core_state_imx_deregister_callback(km_core_state *state)
 {
   assert(state);
   if (!state) {

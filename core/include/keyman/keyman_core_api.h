@@ -67,12 +67,12 @@ Caps Lock.
 
 ## API
 ### Namespace
-All calls, types and enums are prefixed with the namespace identifier `km_kbp_`
+All calls, types and enums are prefixed with the namespace identifier `km_core_`
 
 ### API idioms
 Almost all calls marshalling variable length aggregate data in or out of an API
 object take the form:
-> km_kbp_status *fn_name*(object_ref, buffer_ptr, size_ptr)
+> km_core_status *fn_name*(object_ref, buffer_ptr, size_ptr)
 
 where the buffer is nullable and all other arguments are required (will result
 in an `KM_KBP_STATUS_INVALID_ARGUMENT` status being returned if nulled). When
@@ -81,7 +81,7 @@ buffer in the variable pointed to by `size_ptr`.
 
 Calls which result in the allocation of resources, regardless of resulting
 ownership, are of the form:
-> km_kbp_status *fn_name*(object_ref, out_ptr)
+> km_core_status *fn_name*(object_ref, out_ptr)
 
 where `out_ptr` is a valid pointer to a caller allocated variable to hold the
 resulting ouput. This is often a reference to a created object. All arguments
@@ -110,24 +110,24 @@ extern "C"
 #endif
 // Basic types
 //
-typedef uint16_t    km_kbp_virtual_key; // A virtual key code.
-typedef uint32_t    km_kbp_status;      // Status return code.
+typedef uint16_t    km_core_virtual_key; // A virtual key code.
+typedef uint32_t    km_core_status;      // Status return code.
 
 // Opaque object types.
 //
-typedef struct km_kbp_context     km_kbp_context;
-typedef struct km_kbp_keyboard    km_kbp_keyboard;
-typedef struct km_kbp_state       km_kbp_state;
-typedef struct km_kbp_options     km_kbp_options;
+typedef struct km_core_context     km_core_context;
+typedef struct km_core_keyboard    km_core_keyboard;
+typedef struct km_core_state       km_core_state;
+typedef struct km_core_options     km_core_options;
 
 // Forward declarations
 //
-typedef struct km_kbp_option_item  km_kbp_option_item;
+typedef struct km_core_option_item  km_core_option_item;
 
 // Callback function used to to access Input Method eXtension library functions
 // from Keyman Core
 //
-typedef uint8_t (*km_kbp_keyboard_imx_platform)(km_kbp_state*, uint32_t, void*);
+typedef uint8_t (*km_core_keyboard_imx_platform)(km_core_state*, uint32_t, void*);
 
 /*```
 ### Error Handling
@@ -137,7 +137,7 @@ value is an error). Any functions that can fail will always return a status
 value and all results are returned via outparams passed to the function.
 ```c
 */
-enum km_kbp_status_codes {
+enum km_core_status_codes {
   KM_KBP_STATUS_OK = 0,
   KM_KBP_STATUS_NO_MEM = 1,
   KM_KBP_STATUS_IO_ERROR = 2,
@@ -176,7 +176,7 @@ Contexts are always owned by their state.  They may be set to a list of
 context_items or interrogated for their current list of context items.
 ```c
 */
-enum km_kbp_context_type {
+enum km_core_context_type {
   KM_KBP_CT_END,
   KM_KBP_CT_CHAR,
   KM_KBP_CT_MARKER
@@ -186,17 +186,17 @@ typedef struct {
   uint8_t   type;
   uint8_t   _reserved[3];
   union {
-    km_kbp_usv  character;
+    km_core_usv  character;
     uint32_t    marker;
   };
-} km_kbp_context_item;
+} km_core_context_item;
 
 #define KM_KBP_CONTEXT_ITEM_END {KM_KBP_CT_END, {0,}, {0,}}
 /*
 ```
-### `km_kbp_context_items_from_utf16`
+### `km_core_context_items_from_utf16`
 ##### Description:
-Convert a UTF16 encoded Unicode string into an array of `km_kbp_context_item`
+Convert a UTF16 encoded Unicode string into an array of `km_core_context_item`
 structures. Allocates memory as needed.
 ##### Return status:
 - `KM_KBP_STATUS_OK`: On success.
@@ -208,23 +208,23 @@ structures. Allocates memory as needed.
 ##### Parameters:
 - __text__: a pointer to a null terminated array of utf16 encoded data.
 - __out_ptr__: a pointer to the result variable:
-    A pointer to the start of the `km_kbp_context_item` array containing the
+    A pointer to the start of the `km_core_context_item` array containing the
     representation of the input string.
     Terminated with a type of `KM_KBP_CT_END`. Must be disposed of with
-    `km_kbp_context_items_dispose`.
+    `km_core_context_items_dispose`.
 
 ```c
 */
 KMN_API
-km_kbp_status
-km_kbp_context_items_from_utf16(km_kbp_cp const *text,
-                                km_kbp_context_item **out_ptr);
+km_core_status
+km_core_context_items_from_utf16(km_core_cp const *text,
+                                km_core_context_item **out_ptr);
 
 /*
 ```
-### `km_kbp_context_items_from_utf8`
+### `km_core_context_items_from_utf8`
 ##### Description:
-Convert an UTF8 encoded Unicode string into an array of `km_kbp_context_item`
+Convert an UTF8 encoded Unicode string into an array of `km_core_context_item`
 structures. Allocates memory as needed.
 ##### Status:
 - `KM_KBP_STATUS_INVALID_ARGUMENT`: If non-optional parameters are null.
@@ -235,20 +235,20 @@ decoded.
 ##### Parameters:
 - __text__: a pointer to a null terminated array of utf8 encoded data.
 - __out_ptr__: a pointer to the result variable:
-    A pointer to the  start of the `km_kbp_context_item` array containing the
+    A pointer to the  start of the `km_core_context_item` array containing the
     representation of the input string.
     Terminated with a type of `KM_KBP_CT_END`.
 
 ```c
 */
 KMN_API
-km_kbp_status
-km_kbp_context_items_from_utf8(char const *text,
-                                km_kbp_context_item **out_ptr);
+km_core_status
+km_core_context_items_from_utf8(char const *text,
+                                km_core_context_item **out_ptr);
 
 /*
 ```
-### `km_kbp_context_items_to_utf16`
+### `km_core_context_items_to_utf16`
 ##### Description:
 Convert a context item array into a UTF-16 encoded string placing it into
 the supplied buffer of specified size, and return the number of code units
@@ -262,7 +262,7 @@ context during the conversion.
   `buf_size` will contain the space required. The contents of the buffer are
   undefined.
 ##### Parameters:
-- __context_items__: A pointer to the start of an array `km_kbp_context_item`.
+- __context_items__: A pointer to the start of an array `km_core_context_item`.
     Must be terminated with a type of `KM_KBP_CT_END`.
 - __buf__: A pointer to the buffer to place the UTF-16 string into.
     May be null to request size calculation.
@@ -273,14 +273,14 @@ context during the conversion.
 ```c
 */
 KMN_API
-km_kbp_status
-km_kbp_context_items_to_utf16(km_kbp_context_item const *item,
-                              km_kbp_cp *buf,
+km_core_status
+km_core_context_items_to_utf16(km_core_context_item const *item,
+                              km_core_cp *buf,
                               size_t *buf_size);
 
 /*
 ```
-### `km_kbp_context_items_to_utf8`
+### `km_core_context_items_to_utf8`
 ##### Description:
 Convert a context item array into a UTF-8 encoded string placing it into
 the supplied buffer of specified size, and return the number of code units
@@ -294,7 +294,7 @@ context during the conversion.
   `buf_size` will contain the space required. The contents of the buffer are
   undefined.
 ##### Parameters:
-- __context_items__: A pointer to the start of an array `km_kbp_context_item`.
+- __context_items__: A pointer to the start of an array `km_core_context_item`.
     Must be terminated with a type of `KM_KBP_CT_END`.
 - __buf__: A pointer to the buffer to place the UTF-8 string into.
     May be null to request size calculation.
@@ -305,33 +305,33 @@ context during the conversion.
 ```c
 */
 KMN_API
-km_kbp_status
-km_kbp_context_items_to_utf8(km_kbp_context_item const *item,
+km_core_status
+km_core_context_items_to_utf8(km_core_context_item const *item,
                               char *buf,
                               size_t *buf_size);
 
 /*
 ```
-### `km_kbp_context_items_dispose`
+### `km_core_context_items_dispose`
 ##### Description:
-Free the allocated memory belonging to a `km_kbp_context_item` array previously
-returned by `km_kbp_context_items_from_utf16` or `km_kbp_context_get`
+Free the allocated memory belonging to a `km_core_context_item` array previously
+returned by `km_core_context_items_from_utf16` or `km_core_context_get`
 ##### Parameters:
-- __context_items__: A pointer to the start of the `km_kbp_context_item` array
+- __context_items__: A pointer to the start of the `km_core_context_item` array
     to be disposed of.
 
 ```c
 */
 KMN_API
 void
-km_kbp_context_items_dispose(km_kbp_context_item *context_items);
+km_core_context_items_dispose(km_core_context_item *context_items);
 
 /*
 ```
-### `km_kbp_context_set`
+### `km_core_context_set`
 ##### Description:
 Replace the contents of the current context with a new sequence of
-`km_kbp_context_item` entries.
+`km_core_context_item` entries.
 ##### Return status:
 - `KM_KBP_STATUS_OK`: On success.
 - `KM_KBP_STATUS_INVALID_ARGUMENT`: If non-optional parameters are null.
@@ -339,45 +339,45 @@ Replace the contents of the current context with a new sequence of
   grow the context buffer internally.
 ##### Parameters:
 - __context__: A pointer to an opaque context object
-- __context_items__: A pointer to the start of the `km_kbp_context_item`
+- __context_items__: A pointer to the start of the `km_core_context_item`
     array containing the new context. It must be terminated with an item
     of type `KM_KBP_CT_END`.
 
 ```c
 */
 KMN_API
-km_kbp_status
-km_kbp_context_set(km_kbp_context *context,
-                   km_kbp_context_item const *context_items);
+km_core_status
+km_core_context_set(km_core_context *context,
+                   km_core_context_item const *context_items);
 
 /*
 ```
-### `km_kbp_context_get`
+### `km_core_context_get`
 ##### Description:
 Copies all items in the context into a new array and returns the new array.
-This must be disposed of by caller using `km_kbp_context_items_dispose`.
+This must be disposed of by caller using `km_core_context_items_dispose`.
 ##### Return status:
 - `KM_KBP_STATUS_OK`: On success.
 - `KM_KBP_STATUS_INVALID_ARGUMENT`: If non-optional parameters are null.
 - `KM_KBP_STATUS_NO_MEM`: In the event not enough memory can be allocated for the
   output buffer.
 ##### Parameters:
-- __context_items__: A pointer to the start of an array `km_kbp_context_item`.
+- __context_items__: A pointer to the start of an array `km_core_context_item`.
 - __out__: a pointer to the result variable:
-    A pointer to the start of the `km_kbp_context_item` array containing a
+    A pointer to the start of the `km_core_context_item` array containing a
     copy of the context. Terminated with a type of `KM_KBP_CT_END`. Must be
-    disposed of with `km_kbp_context_items_dispose`.
+    disposed of with `km_core_context_items_dispose`.
 
 ```c
 */
 KMN_API
-km_kbp_status
-km_kbp_context_get(km_kbp_context const *context_items,
-                   km_kbp_context_item **out);
+km_core_status
+km_core_context_get(km_core_context const *context_items,
+                   km_core_context_item **out);
 
 /*
 ```
-### `km_kbp_context_clear`
+### `km_core_context_clear`
 ##### Description:
 Removes all context_items from the internal array. If `context` is
 null, has no effect.
@@ -388,11 +388,11 @@ null, has no effect.
 */
 KMN_API
 void
-km_kbp_context_clear(km_kbp_context *);
+km_core_context_clear(km_core_context *);
 
 /*
 ```
-### `km_kbp_context_length`
+### `km_core_context_length`
 ##### Description:
 Return the number of items in the context.
 ##### Return:
@@ -405,11 +405,11 @@ pointer.
 */
 KMN_API
 size_t
-km_kbp_context_length(km_kbp_context *);
+km_core_context_length(km_core_context *);
 
 /*
 ```
-### `km_kbp_context_append`
+### `km_core_context_append`
 ##### Description:
 Add more items to the end (insertion point) of the context. If these exceed the
 maximum context length the same number of items will be dropped from the
@@ -422,18 +422,18 @@ beginning of the context.
 ##### Parameters:
 - __context__: A pointer to an opaque context object.
 - __context_items__: A pointer to the start of the `KM_KBP_CT_END` terminated
-    array of `km_kbp_context_item` to append.
+    array of `km_core_context_item` to append.
 
 ```c
 */
 KMN_API
-km_kbp_status
-km_kbp_context_append(km_kbp_context *context,
-                      km_kbp_context_item const *context_items);
+km_core_status
+km_core_context_append(km_core_context *context,
+                      km_core_context_item const *context_items);
 
 /*
 ```
-### `km_kbp_context_shrink`
+### `km_core_context_shrink`
 ##### Description:
 Remove a specified number of items from the end of the context, optionally
 add up to the same number of the supplied items to the front of the context.
@@ -446,34 +446,34 @@ add up to the same number of the supplied items to the front of the context.
 - __context__: A pointer to an opaque context object.
 - __num__: The number of items to remove from the end of context.
 - __context_items__: Pointer to the start of the `KM_KBP_CT_END` terminated
-    array of `km_kbp_context_item` to add to the front. Up to `num` items will
+    array of `km_core_context_item` to add to the front. Up to `num` items will
     be prepended. This may be null if not required.
 
 ```c
 */
 KMN_API
-km_kbp_status
-km_kbp_context_shrink(km_kbp_context *context,
+km_core_status
+km_core_context_shrink(km_core_context *context,
                       size_t num,
-                      km_kbp_context_item const *prefix);
+                      km_core_context_item const *prefix);
 
 /*
 ```
-### `km_kbp_context_item_list_size`
+### `km_core_context_item_list_size`
 ##### Description:
-Return the length of a terminated `km_kbp_context_item` array.
+Return the length of a terminated `km_core_context_item` array.
 ##### Return:
 The number of items in the list, not including terminating item,
 or 0 if `context_items` is null.
 ##### Parameters:
 - __context_items__: A pointer to a `KM_KBP_CT_END` terminated array of
-    `km_kbp_context_item` values.
+    `km_core_context_item` values.
 
 ```c
 */
 KMN_API
 size_t
-km_kbp_context_item_list_size(km_kbp_context_item const *context_items);
+km_core_context_item_list_size(km_core_context_item const *context_items);
 
 /*
 ```
@@ -486,11 +486,11 @@ other actions.
 */
 
 typedef struct {
-  uint8_t expected_type;     // km_kbp_backspace_type
+  uint8_t expected_type;     // km_core_backspace_type
   uintptr_t expected_value;  // used mainly in unit tests
-} km_kbp_backspace_item;
+} km_core_backspace_item;
 
-enum km_kbp_backspace_type {
+enum km_core_backspace_type {
   KM_KBP_BT_UNKNOWN    = 0,  // Used at beginning of context; user-initiated backspace
   KM_KBP_BT_CHAR       = 1,  // Deleting a character prior to insertion point
   KM_KBP_BT_MARKER     = 2,  // Deleting a marker prior to insertion point
@@ -502,14 +502,14 @@ typedef struct {
   uint8_t   _reserved[sizeof(void*)-sizeof(uint8_t)];
   union {
     uintptr_t             marker;          // MARKER type
-    km_kbp_option_item    const * option;  // OPT types
-    km_kbp_usv            character;       // CHAR type
+    km_core_option_item    const * option;  // OPT types
+    km_core_usv            character;       // CHAR type
     uint8_t               capsLock;        // CAPSLOCK type, 1 to turn on, 0 to turn off
-    km_kbp_backspace_item backspace;       // BACKSPACE type
+    km_core_backspace_item backspace;       // BACKSPACE type
   };
-} km_kbp_action_item;
+} km_core_action_item;
 
-enum km_kbp_action_type {
+enum km_core_action_type {
   KM_KBP_IT_END         = 0,  // Marks end of action items list.
   KM_KBP_IT_CHAR        = 1,  // A Unicode character has been generated.
   KM_KBP_IT_MARKER      = 2,  // Correlates to kmn's "deadkey" markers.
@@ -533,9 +533,9 @@ enum km_kbp_action_type {
 A state’s default options are set from the keyboard at creation time and the
 environment. The Platform layer is then is expected to apply any persisted
 options it is maintaining.  Options are passed into and out of API functions as
-simple C arrays of `km_kbp_option_item` terminated with a `KM_KBP_OPTIONS_END`
+simple C arrays of `km_core_option_item` terminated with a `KM_KBP_OPTIONS_END`
 sentinel value. A state's options are exposed and manipulatable via the
-`km_kbp_options` API. All option values are of type C string.
+`km_core_options` API. All option values are of type C string.
 
 During processing when the Platform layer finds a PERSIST action type it should
 store the updated option in the appropriate place, based on its scope.
@@ -545,16 +545,16 @@ value.
 ```c
 */
 
-enum km_kbp_option_scope {
+enum km_core_option_scope {
   KM_KBP_OPT_UNKNOWN      = 0,
   KM_KBP_OPT_KEYBOARD     = 1,
   KM_KBP_OPT_ENVIRONMENT  = 2,
   KM_KBP_OPT_MAX_SCOPES
 };
 
-struct km_kbp_option_item {
-  km_kbp_cp const *   key;
-  km_kbp_cp const *   value;
+struct km_core_option_item {
+  km_core_cp const *   key;
+  km_core_cp const *   value;
   uint8_t             scope;  // Scope which an option belongs to.
 };
 
@@ -563,26 +563,26 @@ struct km_kbp_option_item {
 
 /*
 ```
-### `km_kbp_options_list_size`
+### `km_core_options_list_size`
 ##### Description:
-Return the length of a terminated `km_kbp_option_item` array (options
+Return the length of a terminated `km_core_option_item` array (options
 list).
 ##### Return:
 The number of items in the list, not including terminating item,
 or 0 if `opts` is null.
 ##### Parameters:
 - __opts__: A pointer to a `KM_KBP_OPTIONS_END` terminated array of
-    `km_kbp_option_item` values.
+    `km_core_option_item` values.
 
 ```c
 */
 KMN_API
 size_t
-km_kbp_options_list_size(km_kbp_option_item const *opts);
+km_core_options_list_size(km_core_option_item const *opts);
 
 /*
 ```
-### `km_kbp_state_option_lookup`
+### `km_core_state_option_lookup`
 ##### Description:
 Lookup an option based on its key, in an options list.
 ##### Return status:
@@ -593,7 +593,7 @@ Lookup an option based on its key, in an options list.
 ##### Parameters:
 - __state__: An opaque pointer to a state object.
 - __scope__: Which key-value store to interrogate.
-- __key__: A UTF-16 string that matches the key in the target `km_kbp_option_item`.
+- __key__: A UTF-16 string that matches the key in the target `km_core_option_item`.
 - __value__: A pointer to the result variable:
   A pointer to a UTF-16 string value owned by the state or keyboard object at
   the time of the call. This pointer is only valid *until* the next call to any
@@ -601,17 +601,17 @@ Lookup an option based on its key, in an options list.
 ```c
 */
 KMN_API
-km_kbp_status
-km_kbp_state_option_lookup(km_kbp_state const *state,
+km_core_status
+km_core_state_option_lookup(km_core_state const *state,
                       uint8_t scope,
-                      km_kbp_cp const *key,
-                      km_kbp_cp const **value);
+                      km_core_cp const *key,
+                      km_core_cp const **value);
 
 /*
 ```
-### `km_kbp_state_options_update`
+### `km_core_state_options_update`
 ##### Description:
-Adds or updates one or more options from a list of `km_kbp_option_item`s.
+Adds or updates one or more options from a list of `km_core_option_item`s.
 ##### Return status:
 - `KM_KBP_STATUS_OK`: On success.
 - `KM_KBP_STATUS_INVALID_ARGUMENT`: If non-optional parameters are null.
@@ -619,21 +619,21 @@ Adds or updates one or more options from a list of `km_kbp_option_item`s.
 - `KM_KBP_STATUS_KEY_ERROR`: The key cannot be found.
 ##### Parameters:
 - __state__: An opaque pointer to a state object.
-- __new_opts__: An array of `km_kbp_option_item` objects to update or add. Must be
+- __new_opts__: An array of `km_core_option_item` objects to update or add. Must be
     terminated with `KM_KBP_OPTIONS_END`.
 
 ```c
 */
 KMN_API
-km_kbp_status
-km_kbp_state_options_update(km_kbp_state *state,
-                      km_kbp_option_item const *new_opts);
+km_core_status
+km_core_state_options_update(km_core_state *state,
+                      km_core_option_item const *new_opts);
 
 /*
 ```
-### `km_kbp_state_options_to_json`
+### `km_core_state_options_to_json`
 ##### Description:
-Export the contents of a `km_kbp_options` array to a JSON formatted document and
+Export the contents of a `km_core_options` array to a JSON formatted document and
 place it in the supplied buffer, reporting how much space was used. If null is
 passed as the buffer the number of bytes required is returned in `space`. If
 there is insufficent space to hold the document the contents of the buffer is
@@ -653,8 +653,8 @@ null. On return it will hold how many bytes were used.
 ```c
 */
 KMN_API
-km_kbp_status
-km_kbp_state_options_to_json(km_kbp_state const *state,
+km_core_status
+km_core_state_options_to_json(km_core_state const *state,
                        char *buf,
                        size_t *space);
 
@@ -669,31 +669,31 @@ of state objects.
 ```c
 */
 typedef struct {
-  km_kbp_cp const * version_string;   // Processor specific version string.
-  km_kbp_cp const * id;               // Keyman keyboard ID string.
-  km_kbp_path_name  folder_path;      // Path to the unpacked folder containing
+  km_core_cp const * version_string;   // Processor specific version string.
+  km_core_cp const * id;               // Keyman keyboard ID string.
+  km_core_path_name  folder_path;      // Path to the unpacked folder containing
                                       // the keyboard and associated resources.
-  km_kbp_option_item const * default_options;
-} km_kbp_keyboard_attrs;
+  km_core_option_item const * default_options;
+} km_core_keyboard_attrs;
 
 typedef struct {
-  km_kbp_virtual_key key;
+  km_core_virtual_key key;
   uint32_t modifier_flag;
-} km_kbp_keyboard_key;
+} km_core_keyboard_key;
 
 #define KM_KBP_KEYBOARD_KEY_LIST_END { 0, 0 }
 
 typedef struct {
-  km_kbp_cp const * library_name;
-  km_kbp_cp const * function_name;
+  km_core_cp const * library_name;
+  km_core_cp const * function_name;
   uint32_t imx_id; // unique identifier used to call this function
-} km_kbp_keyboard_imx;
+} km_core_keyboard_imx;
 
 #define KM_KBP_KEYBOARD_IMX_END { 0, 0, 0 }
 
 /*
 ```
-### `km_kbp_keyboard_load`
+### `km_core_keyboard_load`
 ##### Description:
 Parse and load keyboard from the supplied path and a pointer to the loaded keyboard
 into the out paramter.
@@ -711,21 +711,21 @@ into the out paramter.
     contains a valid path to the keyboard file.
 - __keyboard__: A pointer to result variable:
     A pointer to the opaque keyboard object returned by the Processor. This
-    memory must be freed with a call to `km_kbp_keyboard_dispose`.
+    memory must be freed with a call to `km_core_keyboard_dispose`.
 
 ```c
 */
 KMN_API
-km_kbp_status
-km_kbp_keyboard_load(km_kbp_path_name kb_path,
-                     km_kbp_keyboard **keyboard);
+km_core_status
+km_core_keyboard_load(km_core_path_name kb_path,
+                     km_core_keyboard **keyboard);
 
 /*
 ```
-### `km_kbp_keyboard_dispose`
+### `km_core_keyboard_dispose`
 ##### Description:
 Free the allocated memory belonging to an opaque keyboard object previously
-returned by `km_kbp_keyboard_load`.
+returned by `km_core_keyboard_load`.
 ##### Parameters:
 - __keyboard__: A pointer to the opaque keyboard object to be
     disposed of.
@@ -734,11 +734,11 @@ returned by `km_kbp_keyboard_load`.
 */
 KMN_API
 void
-km_kbp_keyboard_dispose(km_kbp_keyboard *keyboard);
+km_core_keyboard_dispose(km_core_keyboard *keyboard);
 
 /*
 ```
-### `km_kbp_keyboard_get_attrs`
+### `km_core_keyboard_get_attrs`
 ##### Description:
 Returns the const internal attributes of the keyboard. This structure is valid
 for the lifetime of the opaque keyboard object. Do not modify the returned data.
@@ -748,18 +748,18 @@ for the lifetime of the opaque keyboard object. Do not modify the returned data.
 ##### Parameters:
 - __keyboard__: A pointer to the opaque keyboard object to be queried.
 - __out__: A pointer to the result:
-    A pointer to a `km_kbp_keyboard_attrs` structure.
+    A pointer to a `km_core_keyboard_attrs` structure.
 
 ```c
 */
 KMN_API
-km_kbp_status
-km_kbp_keyboard_get_attrs(km_kbp_keyboard const *keyboard,
-                          km_kbp_keyboard_attrs const **out);
+km_core_status
+km_core_keyboard_get_attrs(km_core_keyboard const *keyboard,
+                          km_core_keyboard_attrs const **out);
 
 /*
 ```
-### `km_kbp_keyboard_get_key_list`
+### `km_core_keyboard_get_key_list`
 ##### Description:
 Returns the unordered full set of modifier+virtual keys that are handled by the
 keyboard. The matching dispose call needs to be called to free the memory.
@@ -768,23 +768,23 @@ keyboard. The matching dispose call needs to be called to free the memory.
 - `KM_KBP_STATUS_INVALID_ARGUMENT`: If non-optional parameters are null.
 ##### Parameters:
 - __keyboard__: A pointer to the opaque keyboard object to be queried.
-- __out__: A pointer to an array of `km_kbp_keyboard_key` structures,
+- __out__: A pointer to an array of `km_core_keyboard_key` structures,
            terminated by `KM_KBP_KEYBOARD_KEY_LIST_END`.
 
 ```c
 */
 KMN_API
-km_kbp_status
-km_kbp_keyboard_get_key_list(km_kbp_keyboard const *keyboard,
-                            km_kbp_keyboard_key **out);
+km_core_status
+km_core_keyboard_get_key_list(km_core_keyboard const *keyboard,
+                            km_core_keyboard_key **out);
 
 
 /**
 ```
-### `km_kbp_keyboard_key_list_dispose`
+### `km_core_keyboard_key_list_dispose`
 ##### Description:
 Free the allocated memory belonging to a keyboard key list previously
-returned by `km_kbp_keyboard_get_key_list`.
+returned by `km_core_keyboard_get_key_list`.
 ##### Parameters:
 - __key_list__: A pointer to the keyboard key list to be
     disposed of.
@@ -792,46 +792,46 @@ returned by `km_kbp_keyboard_get_key_list`.
 ```c
 */
 KMN_API
-void km_kbp_keyboard_key_list_dispose(km_kbp_keyboard_key *key_list);
+void km_core_keyboard_key_list_dispose(km_core_keyboard_key *key_list);
 
 /**
- * km_kbp_keyboard_get_imx_list:
+ * km_core_keyboard_get_imx_list:
  *
  * Returns: the list of IMX libraries and function names that are referenced by
  * the keyboard.The matching dispose call needs to be called to free the memory.
  */
 KMN_API
-km_kbp_status km_kbp_keyboard_get_imx_list(km_kbp_keyboard const *keyboard, km_kbp_keyboard_imx **imx_list);
+km_core_status km_core_keyboard_get_imx_list(km_core_keyboard const *keyboard, km_core_keyboard_imx **imx_list);
 
 /**
- * km_kbp_keyboard_imx_list_dispose:
+ * km_core_keyboard_imx_list_dispose:
  *
  * Disposes of the IMX list
  *
  * Returns: --
  */
 KMN_API
-void km_kbp_keyboard_imx_list_dispose(km_kbp_keyboard_imx *imx_list);
+void km_core_keyboard_imx_list_dispose(km_core_keyboard_imx *imx_list);
 
 /**
- * km_kbp_state_imx_register_callback:
+ * km_core_state_imx_register_callback:
  *
  * Register the IMX callback endpoint for the client.
  *
  * Returns: --
  */
 KMN_API
-void km_kbp_state_imx_register_callback(km_kbp_state *state, km_kbp_keyboard_imx_platform imx_callback, void *callback_object);
+void km_core_state_imx_register_callback(km_core_state *state, km_core_keyboard_imx_platform imx_callback, void *callback_object);
 
 /**
- *  km_kbp_state_imx_deregister_callback:
+ *  km_core_state_imx_deregister_callback:
  *
  * De-register IMX callback endpoint for the client.
  *
  * Returns: --
  */
 KMN_API
-void km_kbp_state_imx_deregister_callback(km_kbp_state *state);
+void km_core_state_imx_deregister_callback(km_core_state *state);
 
 /*
 ```
@@ -844,7 +844,7 @@ and dynamic options ("option stores" in kmn format).
 
 /*
 ```
-### `km_kbp_state_create`
+### `km_core_state_create`
 ##### Description:
 Create a keyboard processor state object, maintaining state for the keyboard in
 the environment passed.
@@ -858,24 +858,24 @@ the environment passed.
 - __keyboard__:
 A pointer to the opaque keyboard object this object will hold state for.
 - __env__:
-The array of `km_kbp_option_item` key/value pairs used to initialise the
+The array of `km_core_option_item` key/value pairs used to initialise the
 environment, terminated by `KM_KBP_OPTIONS_END`.
 - __out__:
 A pointer to result variable: A pointer to the opaque state object
 returned by the Processor, initalised to maintain state for `keyboard`.
-This must be disposed of by a call to `km_kbp_state_dispose`.
+This must be disposed of by a call to `km_core_state_dispose`.
 
 ```c
 */
 KMN_API
-km_kbp_status
-km_kbp_state_create(km_kbp_keyboard *keyboard,
-                    km_kbp_option_item const *env,
-                    km_kbp_state **out);
+km_core_status
+km_core_state_create(km_core_keyboard *keyboard,
+                    km_core_option_item const *env,
+                    km_core_state **out);
 
 /*
 ```
-### `km_kbp_state_clone`
+### `km_core_state_clone`
 ##### Description:
 Clone an existing opaque state object.
 ##### Return status:
@@ -890,22 +890,22 @@ A pointer to the opaque statea object to be cloned.
 - __out__:
 A pointer to result variable: A pointer to the opaque state object
 returned by the Processor, cloned from the existing object `state`. This
-must be disposed of by a call to `km_kbp_state_dispose`.
+must be disposed of by a call to `km_core_state_dispose`.
 
 ```c
 */
 KMN_API
-km_kbp_status
-km_kbp_state_clone(km_kbp_state const *state,
-                   km_kbp_state **out);
+km_core_status
+km_core_state_clone(km_core_state const *state,
+                   km_core_state **out);
 
 /*
 ```
-### `km_kbp_state_dispose`
+### `km_core_state_dispose`
 ##### Description:
-Free the allocated resources belonging to a `km_kbp_state` object previously
-returned by `km_kbp_state_create` or `km_kbp_state_clone`. After this all
-pointers previously returned by any km_kbp_state family of calls will become
+Free the allocated resources belonging to a `km_core_state` object previously
+returned by `km_core_state_create` or `km_core_state_clone`. After this all
+pointers previously returned by any km_core_state family of calls will become
 invalid.
 ##### Parameters:
 - __state__: A pointer to the opaque state object to be disposed.
@@ -914,11 +914,11 @@ invalid.
 */
 KMN_API
 void
-km_kbp_state_dispose(km_kbp_state *state);
+km_core_state_dispose(km_core_state *state);
 
 /*
 ```
-### `km_kbp_state_context`
+### `km_core_state_context`
 ##### Description:
 Get access to the state object's context.
 ##### Return:
@@ -930,8 +930,8 @@ of the state object. If null is passed in, then null is returned.
 ```c
 */
 KMN_API
-km_kbp_context *
-km_kbp_state_context(km_kbp_state *state);
+km_core_context *
+km_core_state_context(km_core_state *state);
 
 
 /*
@@ -942,29 +942,29 @@ Get access to the state object's keyboard processor's intermediate context. This
 is used during an IMX callback, part way through processing a keystroke.
 ##### Return:
 A pointer to an context item array. Must be disposed of by a call
-to `km_kbp_context_items_dispose`.
+to `km_core_context_items_dispose`.
 ##### Parameters:
 - __state__: A pointer to the opaque state object to be queried.
 
 ```c
 */
 KMN_API
-km_kbp_status
-kbp_state_get_intermediate_context(km_kbp_state *state, km_kbp_context_item ** context_items);
+km_core_status
+kbp_state_get_intermediate_context(km_core_state *state, km_core_context_item ** context_items);
 
 /*
 ```
-### `km_kbp_state_action_items`
+### `km_core_state_action_items`
 ##### Description:
 Get the list of action items generated by the last call to
-`km_kbp_process_event`.
+`km_core_process_event`.
 ##### Return:
-A pointer to a `km_kbp_action_item` list, of `*num_items` in length. This data
+A pointer to a `km_core_action_item` list, of `*num_items` in length. This data
 becomes invalid when the state object is destroyed, or after a call to
-`km_kbp_process_event`. Do not modify the contents of this data. The returned
+`km_core_process_event`. Do not modify the contents of this data. The returned
 array is terminated with a `KM_KBP_IT_END` entry.
 ##### Parameters:
-- __state__: A pointer to the opaque `km_kbp_state` object to be queried.
+- __state__: A pointer to the opaque `km_core_state` object to be queried.
 - __num_items__:
 A pointer to a result variable: The number of items in the action item list
 including the `KM_KBP_IT_END` terminator. May be null if not that
@@ -973,37 +973,37 @@ information is required.
 ```c
 */
 KMN_API
-km_kbp_action_item const *
-km_kbp_state_action_items(km_kbp_state const *state,
+km_core_action_item const *
+km_core_state_action_items(km_core_state const *state,
                           size_t *num_items);
 
 /*
 ```
-### `km_kbp_state_queue_action_items`
+### `km_core_state_queue_action_items`
 ##### Description:
 Queue actions for the current keyboard processor state; normally
-used in IMX callbacks called during `km_kbp_process_event`.
+used in IMX callbacks called during `km_core_process_event`.
 ##### Return:
 - `KM_KBP_STATUS_OK`: On success.
 - `KM_KBP_STATUS_INVALID_ARGUMENT`:
 In the event the `state` or `action_items` pointer are null.
 ##### Parameters:
-- __state__:        A pointer to the opaque `km_kbp_state` object to be queried.
+- __state__:        A pointer to the opaque `km_core_state` object to be queried.
 - __action_items__: The action items to be added to the core
                     queue. Must be terminated with a `KM_KBP_IT_END` entry.
 
 ```c
 */
 KMN_API
-km_kbp_status
-km_kbp_state_queue_action_items(km_kbp_state *state,
-                         km_kbp_action_item const *action_items);
+km_core_status
+km_core_state_queue_action_items(km_core_state *state,
+                         km_core_action_item const *action_items);
 
 /*
 ```
 ### `km_kpb_state_to_json`
 ##### Description:
-Export the internal state of a `km_kbp_state` object to a JSON format document
+Export the internal state of a `km_core_state` object to a JSON format document
 and place it in the supplied buffer, reporting how much space was used. If null
 is passed as the buffer the number of bytes required is returned. If there is
 insufficent space to hold the document, the contents of the buffer is undefined.
@@ -1027,8 +1027,8 @@ null. On return it will hold how many bytes were used.
 ```c
 */
 KMN_API
-km_kbp_status
-km_kbp_state_to_json(km_kbp_state const *state,
+km_core_status
+km_core_state_to_json(km_core_state const *state,
                      char *buf,
                      size_t *space);
 
@@ -1045,9 +1045,9 @@ typedef struct {
   uint16_t    technology;   // A bit field specifiying which Keyboard
                             //  technologies the engine supports.
   char const *vendor;       // Implementor of the processor.
-} km_kbp_attr;
+} km_core_attr;
 
-enum km_kbp_tech_value {
+enum km_core_tech_value {
   KM_KBP_TECH_UNSPECIFIED = 0,
   KM_KBP_TECH_MOCK        = 1 << 0,
   KM_KBP_TECH_KMX         = 1 << 1,
@@ -1055,34 +1055,34 @@ enum km_kbp_tech_value {
 };
 
 /**
- * km_kbp_event_flags:
+ * km_core_event_flags:
  *
- * Bit flags to be used with the event_flags parameter of km_kbp_process_event
+ * Bit flags to be used with the event_flags parameter of km_core_process_event
  */
-enum km_kbp_event_flags {
+enum km_core_event_flags {
   KM_KBP_EVENT_FLAG_DEFAULT = 0, // default value: hardware
   KM_KBP_EVENT_FLAG_TOUCH = 1, // set if the event is touch, otherwise hardware
 };
 
 /*
 ```
-### `km_kbp_get_engine_attrs`
+### `km_core_get_engine_attrs`
 ##### Description:
 Get access processors attributes describing version and technology implemented.
 ##### Return:
-A pointer to a `km_kbp_attr` structure. Do not modify the contents of this
+A pointer to a `km_core_attr` structure. Do not modify the contents of this
 structure.
 ##### Parameters:
-- __state__: An opaque pointer to an `km_kbp_state`.
+- __state__: An opaque pointer to an `km_core_state`.
 ```c
 */
 KMN_API
-km_kbp_attr const *
-km_kbp_get_engine_attrs(km_kbp_state const *state);
+km_core_attr const *
+km_core_get_engine_attrs(km_core_state const *state);
 
 /*
 ```
-### `km_kbp_process_event`
+### `km_core_process_event`
 ##### Description:
 Run the keyboard on an opaque state object with the provided virtual key and modifer
 key state. Updates the state object as appropriate and fills out its action list.
@@ -1102,26 +1102,26 @@ state is passed.
 - __vk__: A virtual key to be processed.
 - __modifier_state__:
 The combinations of modifier keys set at the time key `vk` was pressed, bitmask
-from the `km_kbp_modifier_state` enum.
-- __event_flags__: Event level flags, see km_kbp_event_flags
+from the `km_core_modifier_state` enum.
+- __event_flags__: Event level flags, see km_core_event_flags
 
 ```c
 */
 KMN_API
-km_kbp_status
-km_kbp_process_event(km_kbp_state *state,
-                     km_kbp_virtual_key vk,
+km_core_status
+km_core_process_event(km_core_state *state,
+                     km_core_virtual_key vk,
                      uint16_t modifier_state,
                      uint8_t is_key_down,
                      uint16_t event_flags);
 
 /*
 ```
-### `km_kbp_process_queued_actions`
+### `km_core_process_queued_actions`
 ##### Description:
 Process the keyboard processors queued actions for the opaque state object.
 Updates the state object as appropriate and fills out its action list.
-The client can add actions externally via the `km_kbp_state_queue_action_items` and
+The client can add actions externally via the `km_core_state_queue_action_items` and
 then request the processing of the actions with this method.
 
 The state action list will be cleared at the start of this call; options and context in
@@ -1139,12 +1139,12 @@ In the event the `state` pointer is null
 ```c
 */
 KMN_API
-km_kbp_status
-km_kbp_process_queued_actions(km_kbp_state *state);
+km_core_status
+km_core_process_queued_actions(km_core_state *state);
 
 /*
 ```
-### `km_kbp_event`
+### `km_core_event`
 ##### Description:
 Tell the keyboard processor that an external event has occurred, such as a keyboard
 being activated through the language switching UI.
@@ -1163,20 +1163,20 @@ the state may also be modified.
 
 ##### Parameters:
 - __state__: A pointer to the opaque state object.
-- __event__: The event to be processed, from km_kbp_event_code enumeration
+- __event__: The event to be processed, from km_core_event_code enumeration
 - __data__: Additional event-specific data. Currently unused, must be nullptr.
 
 ```c
 */
 KMN_API
-km_kbp_status
-km_kbp_event(
-  km_kbp_state *state,
+km_core_status
+km_core_event(
+  km_core_state *state,
   uint32_t event,
   void* data
 );
 
-enum km_kbp_event_code {
+enum km_core_event_code {
   // A keyboard has been activated by the user. The processor may use this
   // event, for example, to switch caps lock state or provide other UX.
   KM_KBP_EVENT_KEYBOARD_ACTIVATED = 1,

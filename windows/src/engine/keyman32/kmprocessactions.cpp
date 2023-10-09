@@ -6,7 +6,7 @@
  */
 #include "pch.h"
 
-static BOOL processUnicodeChar(AITIP* app, const km_kbp_action_item* actionItem) {
+static BOOL processUnicodeChar(AITIP* app, const km_core_action_item* actionItem) {
   if (Uni_IsSMP(actionItem->character)) {
     app->QueueAction(QIT_CHAR, (Uni_UTF32ToSurrogate1(actionItem->character)));
     app->QueueAction(QIT_CHAR, (Uni_UTF32ToSurrogate2(actionItem->character)));
@@ -17,7 +17,7 @@ static BOOL processUnicodeChar(AITIP* app, const km_kbp_action_item* actionItem)
   return TRUE;
 }
 
-static BOOL processMarker(AITIP* app, const km_kbp_action_item* actionItem) {
+static BOOL processMarker(AITIP* app, const km_core_action_item* actionItem) {
   app->QueueAction(QIT_DEADKEY, (DWORD)actionItem->marker);
   return TRUE;
 }
@@ -27,7 +27,7 @@ static BOOL processAlert(AITIP* app) {
   return TRUE;
 }
 
-static BOOL processBack(AITIP* app, const km_kbp_action_item* actionItem) {
+static BOOL processBack(AITIP* app, const km_core_action_item* actionItem) {
   if (actionItem->backspace.expected_type == KM_KBP_BT_MARKER) {
     app->QueueAction(QIT_BACK, BK_DEADKEY);
   } else if(actionItem->backspace.expected_type == KM_KBP_BT_CHAR) {
@@ -46,20 +46,20 @@ static BOOL processBack(AITIP* app, const km_kbp_action_item* actionItem) {
 }
 
 static BOOL processPersistOpt(
-  const km_kbp_action_item* actionItem,
-  km_kbp_state* keyboardState,
+  const km_core_action_item* actionItem,
+  km_core_state* keyboardState,
   LPINTKEYBOARDINFO activeKeyboard
 ) {
   if (actionItem->option != NULL)
   {
     // Allocate for 1 option plus 1 pad struct of 0's for KM_KBP_IT_END
-    km_kbp_option_item keyboardOpts[2] = { 0 };
+    km_core_option_item keyboardOpts[2] = { 0 };
     keyboardOpts[0].key = actionItem->option->key;
     keyboardOpts[0].value     = actionItem->option->value;
-    km_kbp_status eventStatus = (km_kbp_status_codes)km_kbp_state_options_update(keyboardState, keyboardOpts);
+    km_core_status eventStatus = (km_core_status_codes)km_core_state_options_update(keyboardState, keyboardOpts);
     if (eventStatus != KM_KBP_STATUS_OK)
     {
-      // log warning "problem saving option for km_kbp_keyboard");
+      // log warning "problem saving option for km_core_keyboard");
       SendDebugMessageFormat(0, sdmGlobal, 0, "ProcessHook: Error %d saving option for keyboard [%s].", eventStatus, activeKeyboard->Name);
     }
 
@@ -79,15 +79,15 @@ static BOOL processPersistOpt(
 
 static BOOL processInvalidateContext(
   AITIP* app,
-  km_kbp_state* keyboardState
+  km_core_state* keyboardState
 ) {
-  km_kbp_context_clear(km_kbp_state_context(keyboardState));
+  km_core_context_clear(km_core_state_context(keyboardState));
   app->ResetContext();
   return TRUE;
 }
 
 static BOOL
-processCapsLock(const km_kbp_action_item* actionItem, BOOL isUp, BOOL Updateable, BOOL externalEvent) {
+processCapsLock(const km_core_action_item* actionItem, BOOL isUp, BOOL Updateable, BOOL externalEvent) {
 
   // We only want to process the Caps Lock key event once --
   // in the first pass (!Updateable).
@@ -134,7 +134,7 @@ BOOL ProcessActions(BOOL* emitKeyStroke)
   // Process the action items from the core. This actions will modify the windows context (AppContext).
   // Therefore it is not required to copy the context from the core to the windows context.
 
-  for (auto act = km_kbp_state_action_items(_td->lpActiveKeyboard->lpCoreKeyboardState, nullptr); act->type != KM_KBP_IT_END; act++) {
+  for (auto act = km_core_state_action_items(_td->lpActiveKeyboard->lpCoreKeyboardState, nullptr); act->type != KM_KBP_IT_END; act++) {
     BOOL continueProcessingActions = TRUE;
     SendDebugMessageFormat(0, sdmGlobal, 0, "ProcessActions : act->type=%d", act->type);
     switch (act->type) {
@@ -190,7 +190,7 @@ ProcessActionsNonUpdatableParse(BOOL* emitKeyStroke) {
   _td->CoreProcessEventRun = TRUE;
 
   BOOL continueProcessingActions = TRUE;
-  for (auto act = km_kbp_state_action_items(_td->lpActiveKeyboard->lpCoreKeyboardState, nullptr); act->type != KM_KBP_IT_END; act++) {
+  for (auto act = km_core_state_action_items(_td->lpActiveKeyboard->lpCoreKeyboardState, nullptr); act->type != KM_KBP_IT_END; act++) {
     switch (act->type) {
     case KM_KBP_IT_EMIT_KEYSTROKE:
       *emitKeyStroke = TRUE;
@@ -221,7 +221,7 @@ ProcessActionsExternalEvent() {
   // Currently only a subset of actions are handled.
   // Other actions will be added when needed.
   BOOL continueProcessingActions = TRUE;
-  for (auto act = km_kbp_state_action_items(_td->lpActiveKeyboard->lpCoreKeyboardState, nullptr); act->type != KM_KBP_IT_END;
+  for (auto act = km_core_state_action_items(_td->lpActiveKeyboard->lpCoreKeyboardState, nullptr); act->type != KM_KBP_IT_END;
        act++) {
     switch (act->type) {
     case KM_KBP_IT_CAPSLOCK:

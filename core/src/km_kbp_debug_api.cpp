@@ -15,9 +15,9 @@
 
 using namespace km::kbp;
 
-km_kbp_status
-km_kbp_state_debug_set(
-  km_kbp_state *state,
+km_core_status
+km_core_state_debug_set(
+  km_core_state *state,
   int value
 ) {
   assert(state);
@@ -29,8 +29,8 @@ km_kbp_state_debug_set(
 }
 
 uint8_t
-km_kbp_state_debug_get(
-  km_kbp_state const *state
+km_core_state_debug_get(
+  km_core_state const *state
 ) {
   assert(state);
   if(!state) {
@@ -39,9 +39,9 @@ km_kbp_state_debug_get(
   return state->debug_items().is_enabled() ? 1 : 0;
 }
 
-km_kbp_state_debug_item const *
-km_kbp_state_debug_items(
-  km_kbp_state const *state,
+km_core_state_debug_item const *
+km_core_state_debug_items(
+  km_core_state const *state,
   size_t *num_items
 ) {
   assert(state && state->debug_items().size() > 0);

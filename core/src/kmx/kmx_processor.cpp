@@ -7,11 +7,11 @@ using namespace km::kbp;
 using namespace kmx;
 
 // TODO consolodate with appint.cpp and put in public library.
-static KMX_BOOL ContextItemsFromAppContext(KMX_WCHAR *buf, km_kbp_context_item** outPtr)
+static KMX_BOOL ContextItemsFromAppContext(KMX_WCHAR *buf, km_core_context_item** outPtr)
 {
   assert(buf);
   assert(outPtr);
-  km_kbp_context_item* context_items  = new km_kbp_context_item[xstrlen(buf) + 1];
+  km_core_context_item* context_items  = new km_core_context_item[xstrlen(buf) + 1];
   PKMX_WCHAR p = buf;
   *outPtr = context_items;
   while (*p) {
@@ -19,22 +19,22 @@ static KMX_BOOL ContextItemsFromAppContext(KMX_WCHAR *buf, km_kbp_context_item**
       assert(*(p + 1) == CODE_DEADKEY);
       // we know the only uc_sentinel code in the context is code_deadkey, which has only 1 parameter: uc_sentinel code_deadkey <deadkey_id>
       // setup dead key context item
-      *context_items = km_kbp_context_item{ KM_KBP_CT_MARKER, {0,}, {*(p+2)} };
+      *context_items = km_core_context_item{ KM_KBP_CT_MARKER, {0,}, {*(p+2)} };
     } else if (Uni_IsSurrogate1(*p) && Uni_IsSurrogate2(*(p + 1))) {
       // handle surrogate
-      *context_items = km_kbp_context_item{ KM_KBP_CT_CHAR, {0,}, {(char32_t)Uni_SurrogateToUTF32(*p, *(p + 1))} };
+      *context_items = km_core_context_item{ KM_KBP_CT_CHAR, {0,}, {(char32_t)Uni_SurrogateToUTF32(*p, *(p + 1))} };
     } else {
-      *context_items = km_kbp_context_item{ KM_KBP_CT_CHAR, {0,}, {*p} };
+      *context_items = km_core_context_item{ KM_KBP_CT_CHAR, {0,}, {*p} };
     }
     p = incxstr(p);
     context_items++;
   }
   // terminate the context_items array.
-  *context_items = km_kbp_context_item KM_KBP_CONTEXT_ITEM_END;
+  *context_items = km_core_context_item KM_KBP_CONTEXT_ITEM_END;
   return true;
 }
 
-km_kbp_status kmx_processor::validate() const {
+km_core_status kmx_processor::validate() const {
   return _valid ? KM_KBP_STATUS_OK : KM_KBP_STATUS_INVALID_KEYBOARD;
 }
 
@@ -63,7 +63,7 @@ kmx_processor::kmx_processor(kbp::path p) {
 
 char16_t const *
 kmx_processor::lookup_option(
-  km_kbp_option_scope scope,
+  km_core_option_scope scope,
   std::u16string const &key
 ) const {
   char16_t const *pValue = nullptr;
@@ -83,7 +83,7 @@ kmx_processor::lookup_option(
 
 option
 kmx_processor::update_option(
-  km_kbp_option_scope scope,
+  km_core_option_scope scope,
   std::u16string const &key,
   std::u16string const &value
 ) {
@@ -103,9 +103,9 @@ kmx_processor::update_option(
   return option(scope, key, value);
 }
 
-km_kbp_status
+km_core_status
 kmx_processor::external_event(
-  km_kbp_state* state,
+  km_core_state* state,
   uint32_t event,
   void* _kmn_unused(data)
 ) {
@@ -129,8 +129,8 @@ kmx_processor::external_event(
 
 bool
 kmx_processor::queue_action(
-  km_kbp_state * state,
-  km_kbp_action_item const * action_item
+  km_core_state * state,
+  km_core_action_item const * action_item
 ) {
   switch (action_item->type) {
   case KM_KBP_IT_END:
@@ -180,8 +180,8 @@ kmx_processor::queue_action(
   return true;
 }
 
-km_kbp_status
-kmx_processor::internal_process_queued_actions(km_kbp_state *state) {
+km_core_status
+kmx_processor::internal_process_queued_actions(km_core_state *state) {
 
   for (auto i = 0; i < _kmx.GetActions()->Length(); i++) {
     auto a = _kmx.GetActions()->Get(i);
@@ -268,10 +268,10 @@ kmx_processor::internal_process_queued_actions(km_kbp_state *state) {
   return KM_KBP_STATUS_OK;
 }
 
-km_kbp_status
+km_core_status
 kmx_processor::process_event(
-  km_kbp_state *state,
-  km_kbp_virtual_key vk,
+  km_core_state *state,
+  km_core_virtual_key vk,
   uint16_t modifier_state,
   uint8_t is_key_down,
   uint16_t /* event_flags */
@@ -309,13 +309,13 @@ kmx_processor::process_event(
   return internal_process_queued_actions(state);
 }
 
-km_kbp_status
-kmx_processor::process_queued_actions (km_kbp_state *state) {
+km_core_status
+kmx_processor::process_queued_actions (km_core_state *state) {
   state->actions().clear();
   return internal_process_queued_actions(state);
 }
 
-constexpr km_kbp_attr const engine_attrs = {
+constexpr km_core_attr const engine_attrs = {
   256,
   KM_KBP_LIB_CURRENT,
   KM_KBP_LIB_AGE,
@@ -324,28 +324,28 @@ constexpr km_kbp_attr const engine_attrs = {
   "SIL International"
 };
 
-km_kbp_attr const & kmx_processor::attributes() const {
+km_core_attr const & kmx_processor::attributes() const {
   return engine_attrs;
 }
 
-km_kbp_context_item * kmx_processor::get_intermediate_context() {
+km_core_context_item * kmx_processor::get_intermediate_context() {
   KMX_WCHAR *buf = _kmx.GetContext()->BufMax(MAXCONTEXT);
-  km_kbp_context_item *citems = nullptr;
+  km_core_context_item *citems = nullptr;
   if (!ContextItemsFromAppContext(buf, &citems)) {
-    citems = new km_kbp_context_item(KM_KBP_CONTEXT_ITEM_END);
+    citems = new km_core_context_item(KM_KBP_CONTEXT_ITEM_END);
   }
   return citems;
 }
 
-km_kbp_keyboard_key * kmx_processor::get_key_list() const  {
+km_core_keyboard_key * kmx_processor::get_key_list() const  {
   // Iterate through the groups and get the rules with virtual keys
   // and store the key along with the modifer.
   const uint32_t group_cnt = _kmx.GetKeyboard()->Keyboard->cxGroupArray;
   const LPGROUP group_array = _kmx.GetKeyboard()->Keyboard->dpGroupArray;
   GROUP *p_group;
 
-  std::map<std::pair<km_kbp_virtual_key,uint32_t>, uint32_t> map_rules;
-  km_kbp_virtual_key v_key;
+  std::map<std::pair<km_core_virtual_key,uint32_t>, uint32_t> map_rules;
+  km_core_virtual_key v_key;
   uint32_t modifier_flag;
 // Use hash map to get the unique list
   for(auto i = decltype(group_cnt){0}; i < group_cnt; i++) {
@@ -363,8 +363,8 @@ km_kbp_keyboard_key * kmx_processor::get_key_list() const  {
     }
   }
   // Now convert to the keyboard key array
-  km_kbp_keyboard_key *rules = new km_kbp_keyboard_key[map_rules.size() + 1];
-  std::map<std::pair<km_kbp_virtual_key,uint32_t>, uint32_t>::iterator it = map_rules.begin();
+  km_core_keyboard_key *rules = new km_core_keyboard_key[map_rules.size() + 1];
+  std::map<std::pair<km_core_virtual_key,uint32_t>, uint32_t>::iterator it = map_rules.begin();
   int n = 0;
   while (it != map_rules.end()){
     auto pair = it->first;
@@ -378,7 +378,7 @@ km_kbp_keyboard_key * kmx_processor::get_key_list() const  {
   return rules;
 }
 
-km_kbp_keyboard_imx * kmx_processor::get_imx_list() const  {
+km_core_keyboard_imx * kmx_processor::get_imx_list() const  {
 
   const uint32_t store_cnt = _kmx.GetKeyboard()->Keyboard->cxStoreArray;
   const LPSTORE store_array = _kmx.GetKeyboard()->Keyboard->dpStoreArray;
@@ -392,7 +392,7 @@ km_kbp_keyboard_imx * kmx_processor::get_imx_list() const  {
     }
   }
 
-  km_kbp_keyboard_imx *imx_list = new km_kbp_keyboard_imx[fn_count + 1];
+  km_core_keyboard_imx *imx_list = new km_core_keyboard_imx[fn_count + 1];
 
   for(uint32_t i = 0; i < store_cnt; i++) {
     LPSTORE p_store = &store_array[i];

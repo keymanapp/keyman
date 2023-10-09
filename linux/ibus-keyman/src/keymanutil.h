@@ -87,7 +87,7 @@ gchar**  keyman_get_options_fromdconf
                                             (gchar *package_id,
                                              gchar *keyboard_id);
 
-// Obtain Keyboard Options from DConf and parse into a GQueue of struct km_kbp_option_item
+// Obtain Keyboard Options from DConf and parse into a GQueue of struct km_core_option_item
 //
 // Parameters:
 // package_id  (gchar *): Package ID

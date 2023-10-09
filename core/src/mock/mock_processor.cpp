@@ -58,7 +58,7 @@ namespace
   };
 
 
-  constexpr km_kbp_attr const engine_attrs = {
+  constexpr km_core_attr const engine_attrs = {
     256,
     KM_KBP_LIB_CURRENT,
     KM_KBP_LIB_AGE,
@@ -84,14 +84,14 @@ namespace km {
     {
     }
 
-    char16_t const * mock_processor::lookup_option(km_kbp_option_scope scope,
+    char16_t const * mock_processor::lookup_option(km_core_option_scope scope,
                                     std::u16string const & key) const
     {
       auto i = _options.find(char16_t(scope) + key);
       return i != _options.end() ? i->second.c_str() : nullptr;
     }
 
-    option mock_processor::update_option(km_kbp_option_scope scope,
+    option mock_processor::update_option(km_core_option_scope scope,
                        std::u16string const & key,
                        std::u16string const & value)
     {
@@ -107,9 +107,9 @@ namespace km {
       return option(scope, key, result.first->second);
     }
 
-    km_kbp_status
+    km_core_status
     mock_processor::process_queued_actions(
-      km_kbp_state *state
+      km_core_state *state
     ) {
       assert(state);
       if (!state)
@@ -119,8 +119,8 @@ namespace km {
     }
 
     bool mock_processor::queue_action(
-      km_kbp_state * state,
-      km_kbp_action_item const* action_item
+      km_core_state * state,
+      km_core_action_item const* action_item
     )
     {
       assert(state);
@@ -130,10 +130,10 @@ namespace km {
       return false;
     }
 
-    km_kbp_status
+    km_core_status
     mock_processor::process_event(
-      km_kbp_state *state,
-      km_kbp_virtual_key vk,
+      km_core_state *state,
+      km_core_virtual_key vk,
       uint16_t modifier_state,
       uint8_t is_key_down,
       uint16_t /* event_flags */
@@ -182,7 +182,7 @@ namespace km {
 
             for (auto c = char_seq; *c; ++c)
             {
-              km_kbp_usv usv = *c;
+              km_core_usv usv = *c;
               state->context().push_character(usv);
               state->actions().push_character(usv);
             }
@@ -206,27 +206,27 @@ namespace km {
       return KM_KBP_STATUS_OK;
     }
 
-    km_kbp_attr const & mock_processor::attributes() const {
+    km_core_attr const & mock_processor::attributes() const {
       return engine_attrs;
     }
 
-    km_kbp_keyboard_key  * mock_processor::get_key_list() const {
-      km_kbp_keyboard_key* key_list = new km_kbp_keyboard_key(KM_KBP_KEYBOARD_KEY_LIST_END);
+    km_core_keyboard_key  * mock_processor::get_key_list() const {
+      km_core_keyboard_key* key_list = new km_core_keyboard_key(KM_KBP_KEYBOARD_KEY_LIST_END);
       return key_list;
     }
 
-    km_kbp_keyboard_imx  * mock_processor::get_imx_list() const {
-      km_kbp_keyboard_imx* imx_list = new km_kbp_keyboard_imx(KM_KBP_KEYBOARD_IMX_END);
+    km_core_keyboard_imx  * mock_processor::get_imx_list() const {
+      km_core_keyboard_imx* imx_list = new km_core_keyboard_imx(KM_KBP_KEYBOARD_IMX_END);
       return imx_list;
     }
 
-    km_kbp_context_item * mock_processor::get_intermediate_context() {
-      km_kbp_context_item *citems = new km_kbp_context_item(KM_KBP_CONTEXT_ITEM_END);
+    km_core_context_item * mock_processor::get_intermediate_context() {
+      km_core_context_item *citems = new km_core_context_item(KM_KBP_CONTEXT_ITEM_END);
       return citems;
     }
 
-    km_kbp_status mock_processor::validate() const { return KM_KBP_STATUS_OK; }
+    km_core_status mock_processor::validate() const { return KM_KBP_STATUS_OK; }
 
-    km_kbp_status null_processor::validate() const { return KM_KBP_STATUS_INVALID_ARGUMENT; }
+    km_core_status null_processor::validate() const { return KM_KBP_STATUS_INVALID_ARGUMENT; }
   } // namespace kbp
 } // namespace km

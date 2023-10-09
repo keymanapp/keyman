@@ -39,7 +39,7 @@ element::element(const SimpleUSet &new_u, KMX_DWORD new_flags)
     : chr(), uset(new_u), flags((new_flags & ~LDML_ELEM_FLAGS_TYPE) | LDML_ELEM_FLAGS_TYPE_USET) {
 }
 
-element::element(km_kbp_usv ch, KMX_DWORD new_flags)
+element::element(km_core_usv ch, KMX_DWORD new_flags)
     : chr(ch), uset(), flags((new_flags & ~LDML_ELEM_FLAGS_TYPE) | LDML_ELEM_FLAGS_TYPE_CHAR) {
 }
 
@@ -76,7 +76,7 @@ element::get_flags() const {
 }
 
 bool
-element::matches(km_kbp_usv ch) const {
+element::matches(km_core_usv ch) const {
   if (is_uset()) {
     return uset.contains(ch);
   } else {
@@ -187,7 +187,7 @@ element_list::load(const kmx::kmx_plus &kplus, kmx::KMXPLUS_ELEM id) {
     KMX_DWORD flags = e.flags;
     auto type = flags & LDML_ELEM_FLAGS_TYPE;
     if (type == LDML_ELEM_FLAGS_TYPE_CHAR) {
-      km_kbp_usv ch = e.element;
+      km_core_usv ch = e.element;
       emplace_back(ch, flags); // char
     } else if (type == LDML_ELEM_FLAGS_TYPE_USET) {
       // need to load a SimpleUSet

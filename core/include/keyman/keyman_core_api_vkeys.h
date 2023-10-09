@@ -6,7 +6,7 @@
                 maintain readability of the primary API header.
   Create Date:  17 Oct 2018
   Authors:      Tim Eves (TSE)
-  History:      17 Oct 2018 - TSE - Moved & refactored km_kbp_modifier_state
+  History:      17 Oct 2018 - TSE - Moved & refactored km_core_modifier_state
                                     from keyman_core_api.h.
                                   - Added VKey and mask definitions.
                  6 Oct 2018 - TSE - Move into keyman folder.
@@ -15,7 +15,7 @@
 
 #pragma once
 
-enum km_kbp_modifier_state {
+enum km_core_modifier_state {
   KM_KBP_MODIFIER_LCTRL       = 1 << 0,
   KM_KBP_MODIFIER_RCTRL       = 1 << 1,
   KM_KBP_MODIFIER_LALT        = 1 << 2,
@@ -40,7 +40,7 @@ enum km_kbp_modifier_state {
   */
 };
 
-enum km_kbp_modifier_mask {
+enum km_core_modifier_mask {
   KM_KBP_MODIFIER_MASK_ALL         = 0x7f,
   KM_KBP_MODIFIER_MASK_ALT_GR_SIM  = KM_KBP_MODIFIER_LCTRL|KM_KBP_MODIFIER_LALT,
   KM_KBP_MODIFIER_MASK_CHIRAL      = 0x1f,

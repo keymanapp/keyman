@@ -43,8 +43,8 @@ namespace
 
 
 }
-km_kbp_status
-km_kbp_keyboard_load(km_kbp_path_name kb_path, km_kbp_keyboard **keyboard)
+km_core_status
+km_core_keyboard_load(km_core_path_name kb_path, km_core_keyboard **keyboard)
 {
   assert(keyboard);
   if (!keyboard)
@@ -53,12 +53,12 @@ km_kbp_keyboard_load(km_kbp_path_name kb_path, km_kbp_keyboard **keyboard)
   try
   {
     abstract_processor *kp = processor_factory(kb_path);
-    km_kbp_status status = kp->validate();
+    km_core_status status = kp->validate();
     if (status != KM_KBP_STATUS_OK) {
       delete kp;
       return status;
     }
-    *keyboard = static_cast<km_kbp_keyboard *>(kp);
+    *keyboard = static_cast<km_core_keyboard *>(kp);
   }
   catch (std::bad_alloc &)
   {
@@ -68,14 +68,14 @@ km_kbp_keyboard_load(km_kbp_path_name kb_path, km_kbp_keyboard **keyboard)
 }
 
 void
-km_kbp_keyboard_dispose(km_kbp_keyboard *keyboard)
+km_core_keyboard_dispose(km_core_keyboard *keyboard)
 {
   delete keyboard;
 }
 
-km_kbp_status
-km_kbp_keyboard_get_attrs(km_kbp_keyboard const *keyboard,
-                          km_kbp_keyboard_attrs const **out)
+km_core_status
+km_core_keyboard_get_attrs(km_core_keyboard const *keyboard,
+                          km_core_keyboard_attrs const **out)
 {
   assert(keyboard); assert(out);
   if (!keyboard || !out)
@@ -85,9 +85,9 @@ km_kbp_keyboard_get_attrs(km_kbp_keyboard const *keyboard,
   return KM_KBP_STATUS_OK;
 }
 
-km_kbp_status
-km_kbp_keyboard_get_key_list(km_kbp_keyboard const *keyboard,
-                             km_kbp_keyboard_key **out)
+km_core_status
+km_core_keyboard_get_key_list(km_core_keyboard const *keyboard,
+                             km_core_keyboard_key **out)
 {
   assert(keyboard); assert(out);
   if (!keyboard || !out)
@@ -97,14 +97,14 @@ km_kbp_keyboard_get_key_list(km_kbp_keyboard const *keyboard,
   return KM_KBP_STATUS_OK;
 }
 
-void km_kbp_keyboard_key_list_dispose(km_kbp_keyboard_key *key_list)
+void km_core_keyboard_key_list_dispose(km_core_keyboard_key *key_list)
 {
   delete[] key_list;
 }
 
-km_kbp_status km_kbp_keyboard_get_imx_list(
-  km_kbp_keyboard const *keyboard,
-  km_kbp_keyboard_imx** imx_list
+km_core_status km_core_keyboard_get_imx_list(
+  km_core_keyboard const *keyboard,
+  km_core_keyboard_imx** imx_list
 ) {
   assert(keyboard); assert(imx_list);
   if (!keyboard || !imx_list) {
@@ -115,13 +115,13 @@ km_kbp_status km_kbp_keyboard_get_imx_list(
   return KM_KBP_STATUS_OK;
 }
 
-void km_kbp_keyboard_imx_list_dispose(km_kbp_keyboard_imx *imx_list)
+void km_core_keyboard_imx_list_dispose(km_core_keyboard_imx *imx_list)
 {
   if(!imx_list) {
     return;
   }
 
-  km_kbp_keyboard_imx *imx_rule_it = imx_list;
+  km_core_keyboard_imx *imx_rule_it = imx_list;
   for (; imx_rule_it->library_name; ++imx_rule_it) {
     delete [] imx_rule_it->library_name; // from u16dup
     delete [] imx_rule_it->function_name; // from u16dup

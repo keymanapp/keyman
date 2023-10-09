@@ -8,7 +8,7 @@ namespace
 {
 
 inline
-bool operator==(km_kbp_option_item const & lhs, km_kbp_option_item const & rhs) {
+bool operator==(km_core_option_item const & lhs, km_core_option_item const & rhs) {
   return lhs.scope == rhs.scope
       && std::u16string(lhs.key) == rhs.key
       && std::u16string(lhs.value) == rhs.value;
@@ -26,7 +26,7 @@ const char *action_item_types[] = {
   "KM_KBP_IT_CAPSLOCK",//     = 8, Enable or disable capsLock
 };
 
-void print_action_item(const char *title, km_kbp_action_item const & item) {
+void print_action_item(const char *title, km_core_action_item const & item) {
   std::cout
     << "action_item " << title << std::endl
     << "  type:    " << action_item_types[item.type] << std::endl;
@@ -62,8 +62,8 @@ void print_action_item(const char *title, km_kbp_action_item const & item) {
 }
 
 bool operator==(
-  km_kbp_action_item const & lhs,
-  km_kbp_action_item const & rhs
+  km_core_action_item const & lhs,
+  km_core_action_item const & rhs
 ) {
   auto result = (lhs.type == rhs.type);
   if(result) {
@@ -91,11 +91,11 @@ bool operator==(
 }
 
 bool action_items(
-  km_kbp_state const * state,
-  std::initializer_list<km_kbp_action_item> const & expected
+  km_core_state const * state,
+  std::initializer_list<km_core_action_item> const & expected
 ) {
   size_t n = 0;
-  auto act = km_kbp_state_action_items(state, &n);
+  auto act = km_core_state_action_items(state, &n);
 
   for (auto &rhs: expected) {
     if ((int)--n < 0) {

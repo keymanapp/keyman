@@ -2,16 +2,16 @@
 
 #define WINDOWS_PLATFORM_ENV u"windows hardware desktop native"
 
-BOOL SetupCoreEnvironment(km_kbp_option_item **core_environment) {
-  km_kbp_option_item *items = new km_kbp_option_item[6];
+BOOL SetupCoreEnvironment(km_core_option_item **core_environment) {
+  km_core_option_item *items = new km_core_option_item[6];
 
   items[0].scope = KM_KBP_OPT_ENVIRONMENT;
   items[0].key = KM_KBP_KMX_ENV_BASELAYOUT;
-  items[0].value = reinterpret_cast<km_kbp_cp*>(Globals::get_BaseKeyboardName());
+  items[0].value = reinterpret_cast<km_core_cp*>(Globals::get_BaseKeyboardName());
 
   items[1].scope = KM_KBP_OPT_ENVIRONMENT;
   items[1].key = KM_KBP_KMX_ENV_BASELAYOUTALT;
-  items[1].value = reinterpret_cast<km_kbp_cp*>(Globals::get_BaseKeyboardNameAlt());
+  items[1].value = reinterpret_cast<km_core_cp*>(Globals::get_BaseKeyboardNameAlt());
 
   items[2].scope = KM_KBP_OPT_ENVIRONMENT;
   items[2].key = KM_KBP_KMX_ENV_SIMULATEALTGR;
@@ -31,7 +31,7 @@ BOOL SetupCoreEnvironment(km_kbp_option_item **core_environment) {
   return TRUE;
 }
 
-void DeleteCoreEnvironment(km_kbp_option_item *core_environment) {
+void DeleteCoreEnvironment(km_core_option_item *core_environment) {
   // All keys and values are pointers to owned memory, so only need to delete
   // the array of options
   delete [] core_environment;

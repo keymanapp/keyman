@@ -6,7 +6,7 @@
 // from android/KMEA/app/src/main/java/com/tavultesoft/kmea/KMScanCodeMap.java
 // uses kernel keycodes which are (X11 keycode - 8)
 // see /usr/include/linux/input-event-codes.h
-static km_kbp_virtual_key const keycode_to_vk[256] = {
+static km_core_virtual_key const keycode_to_vk[256] = {
     0,                    // KEY_RESERVED = 0x00;
     KM_KBP_VKEY_ESC,      // KEY_ESC = 0x01;
     KM_KBP_VKEY_1,        // KEY_1 = 0x02;

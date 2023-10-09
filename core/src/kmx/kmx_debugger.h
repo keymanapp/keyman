@@ -31,12 +31,12 @@ private:
     PKMX_WORD index_stack = nullptr
   );
   void fill_store_offsets(
-    km_kbp_state_debug_kmx_info *info,
+    km_core_state_debug_kmx_info *info,
     PKMX_WORD index_stack
   );
 public:
   KMX_DebugItems(debug_items *items);
-  void push_begin(km_kbp_state_debug_key_info *key_info, uint32_t flags);
+  void push_begin(km_core_state_debug_key_info *key_info, uint32_t flags);
   void push_end(uint16_t first_action, uint32_t flags);
   void push_group_enter(uint16_t first_action, LPGROUP group);
   void push_group_exit(uint16_t first_action, uint32_t flags, LPGROUP group);
@@ -73,7 +73,7 @@ KMX_DebugItems::KMX_DebugItems(debug_items *items) {
 
 inline void
 KMX_DebugItems::push_begin(
-  km_kbp_state_debug_key_info *key_info,
+  km_core_state_debug_key_info *key_info,
   uint32_t flags
 ) {
   // As the vector always starts with a single KM_KBP_DEBUG_END entry,

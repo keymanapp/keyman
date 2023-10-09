@@ -42,21 +42,21 @@ namespace kbp {
       std::vector<uint8_t>& data
     );
 
-    km_kbp_status
+    km_core_status
     process_event(
-      km_kbp_state *state,
-      km_kbp_virtual_key vk,
+      km_core_state *state,
+      km_core_virtual_key vk,
       uint16_t modifier_state,
       uint8_t is_key_down,
       uint16_t event_flags
     ) override;
 
-    virtual km_kbp_attr const & attributes() const override;
-    km_kbp_status               validate() const override;
+    virtual km_core_attr const & attributes() const override;
+    km_core_status               validate() const override;
 
     char16_t const *
     lookup_option(
-      km_kbp_option_scope _kmn_unused(scope),
+      km_core_option_scope _kmn_unused(scope),
       std::u16string const & _kmn_unused(key)
     ) const override {
       return nullptr;
@@ -64,35 +64,35 @@ namespace kbp {
 
     option
     update_option(
-      km_kbp_option_scope _kmn_unused(scope),
+      km_core_option_scope _kmn_unused(scope),
       std::u16string const & _kmn_unused(key),
       std::u16string const & _kmn_unused(value)
     ) override {
       return option();
     }
 
-    km_kbp_status process_queued_actions(km_kbp_state *state) override;
+    km_core_status process_queued_actions(km_core_state *state) override;
 
     bool queue_action(
-      km_kbp_state * state,
-      km_kbp_action_item const* action_item
+      km_core_state * state,
+      km_core_action_item const* action_item
     ) override;
 
-    km_kbp_context_item * get_intermediate_context() override;
+    km_core_context_item * get_intermediate_context() override;
 
-    km_kbp_keyboard_key  * get_key_list() const override;
+    km_core_keyboard_key  * get_key_list() const override;
 
-    km_kbp_keyboard_imx  * get_imx_list() const override;
+    km_core_keyboard_imx  * get_imx_list() const override;
 
   private:
      /** emit text to context and actions */
-     static void emit_text(km_kbp_state *state, const std::u16string &str);
+     static void emit_text(km_core_state *state, const std::u16string &str);
      /** emit text to context and actions */
-     static void emit_text(km_kbp_state *state, const std::u32string &str);
+     static void emit_text(km_core_state *state, const std::u32string &str);
      /** emit char to context and actions */
-     static void emit_text(km_kbp_state *state, km_kbp_usv ch);
+     static void emit_text(km_core_state *state, km_core_usv ch);
      /** emit a marker */
-     static void emit_marker(km_kbp_state *state, KMX_DWORD marker);
+     static void emit_marker(km_core_state *state, KMX_DWORD marker);
 
      /**
       * add the string+marker portion of the context to the beginning of str.
@@ -100,7 +100,7 @@ namespace kbp {
       * Convert markers into the UC_SENTINEL format.
       * @return the number of context items consumed
       */
-     static size_t context_to_string(km_kbp_state *state, std::u32string &str);
+     static size_t context_to_string(km_core_state *state, std::u32string &str);
 
      /** prepend the marker string in UC_SENTINEL format to the str */
      inline static void prepend_marker(std::u32string &str, KMX_DWORD marker);
@@ -108,7 +108,7 @@ namespace kbp {
 
   void
   ldml_processor::prepend_marker(std::u32string &str, KMX_DWORD marker) {
-     km_kbp_usv triple[] = {LDML_UC_SENTINEL, LDML_MARKER_CODE, marker};
+     km_core_usv triple[] = {LDML_UC_SENTINEL, LDML_MARKER_CODE, marker};
      str.insert(0, triple, 3);
   }
 

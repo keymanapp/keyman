@@ -71,8 +71,8 @@ struct _IBusKeymanEngine {
   IBusEngine parent;
 
   /* members */
-  km_kbp_keyboard *keyboard;
-  km_kbp_state    *state;
+  km_core_keyboard *keyboard;
+  km_core_state    *state;
   gchar           *ldmlfile;
   gchar           *kb_name;
   gboolean         lctrl_pressed;
@@ -204,18 +204,18 @@ ibus_keyman_engine_class_init (IBusKeymanEngineClass *klass)
     // engine_class->property_activate = ibus_keyman_engine_property_activate;
 }
 
-static gchar *get_current_context_text(km_kbp_context *context)
+static gchar *get_current_context_text(km_core_context *context)
 {
     size_t buf_size = 512;
-    km_kbp_context_item *context_items;
+    km_core_context_item *context_items;
     gchar *current_context_utf8 = g_new0(gchar, buf_size);
-    if (km_kbp_context_get(context, &context_items) == KM_KBP_STATUS_OK) {
-        km_kbp_context_items_to_utf8(context_items,
+    if (km_core_context_get(context, &context_items) == KM_KBP_STATUS_OK) {
+        km_core_context_items_to_utf8(context_items,
                             current_context_utf8,
                             &buf_size);
     }
-    km_kbp_context_items_dispose(context_items);
-    g_message("%s: current context is:%zu:%zu:%s:", __FUNCTION__, km_kbp_context_length(context), buf_size, current_context_utf8);
+    km_core_context_items_dispose(context_items);
+    g_message("%s: current context is:%zu:%zu:%s:", __FUNCTION__, km_core_context_length(context), buf_size, current_context_utf8);
     return current_context_utf8;
 }
 
@@ -239,16 +239,16 @@ client_supports_surrounding_text(IBusEngine *engine) {
 static void
 reset_context(IBusEngine *engine) {
   IBusKeymanEngine *keyman = (IBusKeymanEngine *)engine;
-  km_kbp_context *context;
+  km_core_context *context;
 
   g_message("%s", __FUNCTION__);
-  context = km_kbp_state_context(keyman->state);
+  context = km_core_state_context(keyman->state);
 
   if (client_supports_surrounding_text(engine)) {
     IBusText *text;
     gchar *surrounding_text, *current_context_utf8;
     guint cursor_pos, anchor_pos, context_start, context_end;
-    km_kbp_context_item *context_items;
+    km_core_context_item *context_items;
 
     ibus_engine_get_surrounding_text(engine, &text, &cursor_pos, &anchor_pos);
 
@@ -261,19 +261,19 @@ reset_context(IBusEngine *engine) {
     current_context_utf8 = get_current_context_text(context);
     if (!(*current_context_utf8) || !g_str_has_suffix(surrounding_text, current_context_utf8)) {
       g_message("%s: setting context because it has changed from expected", __FUNCTION__);
-      enum km_kbp_status_codes status = km_kbp_context_items_from_utf8(surrounding_text, &context_items);
+      enum km_core_status_codes status = km_core_context_items_from_utf8(surrounding_text, &context_items);
       if (status == KM_KBP_STATUS_OK) {
-        km_kbp_context_set(context, context_items);
-        km_kbp_context_items_dispose(context_items);
+        km_core_context_set(context, context_items);
+        km_core_context_items_dispose(context_items);
       } else {
-        km_kbp_context_clear(context);
+        km_core_context_clear(context);
         g_message("%s: setting context failed with status code %d", __FUNCTION__, status);
       }
     }
     g_free(surrounding_text);
     g_free(current_context_utf8);
   } else {
-    km_kbp_context_clear(context);
+    km_core_context_clear(context);
     g_message("%s: client does not support surrounding text", __FUNCTION__);
   }
 }
@@ -299,7 +299,7 @@ ibus_keyman_engine_init(IBusKeymanEngine *keyman) {
   keyman->state = NULL;
 }
 
-static km_kbp_cp* get_base_layout()
+static km_core_cp* get_base_layout()
 {
   return u"en-US";
 
@@ -327,20 +327,20 @@ static km_kbp_cp* get_base_layout()
     lang = strdup("en-US");
   }
   g_message("lang is %s", lang);
-  km_kbp_cp *cp = g_utf8_to_utf16(lang, -1, NULL, NULL, NULL);
+  km_core_cp *cp = g_utf8_to_utf16(lang, -1, NULL, NULL, NULL);
   return cp;
   // g_free(lang);
 #endif
 }
 
-static km_kbp_status
+static km_core_status
 setup_environment(IBusKeymanEngine *keyman)
 {
   g_assert(keyman);
   g_message("%s: setting up environment", __FUNCTION__);
 
   // Allocate enough options for: 3 environments plus 1 pad struct of 0's
-  km_kbp_option_item environment_opts[4] = {0};
+  km_core_option_item environment_opts[4] = {0};
 
   environment_opts[0].scope = KM_KBP_OPT_ENVIRONMENT;
   environment_opts[0].key   = KM_KBP_KMX_ENV_PLATFORM;
@@ -355,14 +355,14 @@ setup_environment(IBusKeymanEngine *keyman)
   environment_opts[2].value = get_base_layout();  // TODO: free when mnemonic layouts are to be supported
 
 
-  km_kbp_status status = km_kbp_state_create(keyman->keyboard, environment_opts, &(keyman->state));
+  km_core_status status = km_core_state_create(keyman->keyboard, environment_opts, &(keyman->state));
   if (status != KM_KBP_STATUS_OK) {
-    g_warning("%s: problem creating km_kbp_state. Status is %u.", __FUNCTION__, status);
+    g_warning("%s: problem creating km_core_state. Status is %u.", __FUNCTION__, status);
   }
   return status;
 }
 
-static km_kbp_status
+static km_core_status
 load_keyboard_options(IBusKeymanEngine *keyman)
 {
   g_assert(keyman);
@@ -378,10 +378,10 @@ load_keyboard_options(IBusKeymanEngine *keyman)
   }
 
   // Allocate enough options for: num_options plus 1 pad struct of 0's
-  km_kbp_option_item *keyboard_opts = g_new0(km_kbp_option_item, num_options + 1);
+  km_core_option_item *keyboard_opts = g_new0(km_core_option_item, num_options + 1);
 
   for (int i = 0; i < num_options; i++) {
-    km_kbp_option_item *item = g_queue_pop_head(queue_options);
+    km_core_option_item *item = g_queue_pop_head(queue_options);
     keyboard_opts[i].scope = item->scope;
     keyboard_opts[i].key   = item->key;
     keyboard_opts[i].value = item->value;
@@ -389,14 +389,14 @@ load_keyboard_options(IBusKeymanEngine *keyman)
 
 
   // once we have the option list we can then update the options using the public api call
-  km_kbp_status status = km_kbp_state_options_update(keyman->state, keyboard_opts);
+  km_core_status status = km_core_state_options_update(keyman->state, keyboard_opts);
 
   if (status != KM_KBP_STATUS_OK) {
-    g_warning("%s: problem creating km_kbp_state. Status is %u.", __FUNCTION__, status);
+    g_warning("%s: problem creating km_core_state. Status is %u.", __FUNCTION__, status);
   }
   for (int i = 0; i < num_options; i++) {
-    g_free((km_kbp_cp *)keyboard_opts[i].key);
-    g_free((km_kbp_cp *)keyboard_opts[i].value);
+    g_free((km_core_cp *)keyboard_opts[i].key);
+    g_free((km_core_cp *)keyboard_opts[i].value);
   }
   g_queue_free_full(queue_options, NULL);
   g_free(keyboard_opts);
@@ -470,13 +470,13 @@ ibus_keyman_engine_constructor(
     }
     g_free(kmx_file);
 
-    km_kbp_status status;
+    km_core_status status;
 
-    status = km_kbp_keyboard_load(abs_kmx_path, &(keyman->keyboard));
+    status = km_core_keyboard_load(abs_kmx_path, &(keyman->keyboard));
     g_free(abs_kmx_path);
 
     if (status != KM_KBP_STATUS_OK) {
-      g_warning("%s: problem creating km_kbp_keyboard. Status is %u.", __FUNCTION__, status);
+      g_warning("%s: problem creating km_core_keyboard. Status is %u.", __FUNCTION__, status);
       ibus_keyman_engine_destroy(keyman);
       return NULL;
     }
@@ -522,12 +522,12 @@ ibus_keyman_engine_destroy (IBusKeymanEngine *keyman)
     }
 
     if (keyman->state) {
-        km_kbp_state_dispose(keyman->state);
+        km_core_state_dispose(keyman->state);
         keyman->state = NULL;
     }
 
     if (keyman->keyboard) {
-        km_kbp_keyboard_dispose(keyman->keyboard);
+        km_core_keyboard_dispose(keyman->keyboard);
         keyman->keyboard = NULL;
     }
 
@@ -566,7 +566,7 @@ static void forward_backspace(IBusKeymanEngine *keyman, unsigned int state)
 static gboolean
 process_unicode_char_action(
   IBusKeymanEngine *keyman,
-  const km_kbp_action_item *action_item
+  const km_core_action_item *action_item
 ) {
   g_assert(g_unichar_type(action_item->character) != G_UNICODE_SURROGATE);
   gchar *utf8   = (gchar *)g_new0(gchar, 12);
@@ -603,7 +603,7 @@ static gboolean process_alert_action() {
 static gboolean
 process_backspace_action(
   IBusEngine *engine,
-  const km_kbp_action_item *action_items,
+  const km_core_action_item *action_items,
   int i,
   size_t num_action_items
 ) {
@@ -635,12 +635,12 @@ process_backspace_action(
       g_message("%s: increment consecutive backspaces to %d", __FUNCTION__, keyman->consecutive_backspaces);
     } else {
       g_message("%s: forwarding backspace with reset context", __FUNCTION__);
-      km_kbp_context_item *context_items;
-      km_kbp_context_get(km_kbp_state_context(keyman->state), &context_items);
+      km_core_context_item *context_items;
+      km_core_context_get(km_core_state_context(keyman->state), &context_items);
       reset_context(engine);
       forward_backspace(keyman, 0);
-      km_kbp_context_set(km_kbp_state_context(keyman->state), context_items);
-      km_kbp_context_items_dispose(context_items);
+      km_core_context_set(km_core_state_context(keyman->state), context_items);
+      km_core_context_items_dispose(context_items);
     }
   }
   return TRUE;
@@ -664,18 +664,18 @@ finish_backspace_action(
 static gboolean
 process_persist_action(
   IBusKeymanEngine *keyman,
-  const km_kbp_action_item *action_item
+  const km_core_action_item *action_item
 ) {
   // Save keyboard option
   if (!action_item->option)
     return TRUE;
 
   // Allocate for 1 option plus 1 pad struct of 0's
-  km_kbp_option_item *keyboard_opts = g_new0(km_kbp_option_item, 2);
-  memmove(&(keyboard_opts[0]), action_item->option, sizeof(km_kbp_option_item));
-  km_kbp_status event_status = km_kbp_state_options_update(keyman->state, keyboard_opts);
+  km_core_option_item *keyboard_opts = g_new0(km_core_option_item, 2);
+  memmove(&(keyboard_opts[0]), action_item->option, sizeof(km_core_option_item));
+  km_core_status event_status = km_core_state_options_update(keyman->state, keyboard_opts);
   if (event_status != KM_KBP_STATUS_OK) {
-    g_warning("%s: problem saving option for km_kbp_keyboard", __FUNCTION__);
+    g_warning("%s: problem saving option for km_core_keyboard", __FUNCTION__);
   }
   g_free(keyboard_opts);
 
@@ -711,7 +711,7 @@ process_invalidate_context_action(IBusEngine *engine) {
 static gboolean
 process_capslock_action(
   IBusKeymanEngine *keyman,
-  const km_kbp_action_item *action_item
+  const km_core_action_item *action_item
 ) {
   g_message("%s: %s caps-lock", __FUNCTION__, action_item->capsLock ? "Enable" : "Disable");
 
@@ -788,7 +788,7 @@ process_end_action(IBusKeymanEngine *keyman) {
 static gboolean
 process_actions(
   IBusEngine *engine,
-  const km_kbp_action_item *action_items,
+  const km_core_action_item *action_items,
   size_t num_action_items
 ) {
   IBusKeymanEngine *keyman = (IBusKeymanEngine *)engine;
@@ -934,19 +934,19 @@ ibus_keyman_engine_process_key_event(
     km_mod_state |= KM_KBP_MODIFIER_CAPS;
   }
   g_message("%s: before process key event", __FUNCTION__);
-  km_kbp_context *context = km_kbp_state_context(keyman->state);
+  km_core_context *context = km_core_state_context(keyman->state);
   g_free(get_current_context_text(context));
   g_message("DAR: %s - km_mod_state=0x%x", __FUNCTION__, km_mod_state);
-  km_kbp_process_event(keyman->state, keycode_to_vk[keycode], km_mod_state, isKeyDown, KM_KBP_EVENT_FLAG_DEFAULT);
-  context                    = km_kbp_state_context(keyman->state);
+  km_core_process_event(keyman->state, keycode_to_vk[keycode], km_mod_state, isKeyDown, KM_KBP_EVENT_FLAG_DEFAULT);
+  context                    = km_core_state_context(keyman->state);
   g_message("%s: after process key event", __FUNCTION__);
   g_free(get_current_context_text(context));
 
-  // km_kbp_state_action_items to get action items
+  // km_core_state_action_items to get action items
   size_t num_action_items;
   g_free(keyman->commit_item->char_buffer);
   keyman->commit_item->char_buffer = NULL;
-  const km_kbp_action_item *action_items = km_kbp_state_action_items(keyman->state, &num_action_items);
+  const km_core_action_item *action_items = km_core_state_action_items(keyman->state, &num_action_items);
 
   if (!process_actions(engine, action_items, num_action_items) &&
       (!client_supports_prefilter(engine) || client_supports_surrounding_text(engine))) {
@@ -956,7 +956,7 @@ ibus_keyman_engine_process_key_event(
     return FALSE;
   }
 
-  context = km_kbp_state_context(keyman->state);
+  context = km_core_state_context(keyman->state);
   g_message("%s: after processing all actions", __FUNCTION__);
   g_free(get_current_context_text(context));
   return TRUE;
@@ -1009,7 +1009,7 @@ ibus_keyman_engine_focus_out (IBusEngine *engine)
     IBusKeymanEngine *keyman = (IBusKeymanEngine *) engine;
 
     g_message("%s", __FUNCTION__);
-    km_kbp_context_clear(km_kbp_state_context(keyman->state));
+    km_core_context_clear(km_core_state_context(keyman->state));
     parent_class->focus_out (engine);
 }
 
