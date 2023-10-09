@@ -10,6 +10,17 @@ import { type KeymanEngine } from 'keyman/app/browser';
 
 declare var keyman: KeymanEngine;
 
+function asTouchList(arr: any[]) {
+  return {
+    get length() {
+      return arr.length;
+    },
+
+    item(index: number) {
+      return arr[index];
+    }
+  }
+}
 export class BrowserDriver {
   static readonly physicalEventClass: string = "KeyboardEvent";
   static readonly physicalEventType: string = "keydown";
@@ -88,10 +99,10 @@ export class BrowserDriver {
       if(keyman.config.hostDevice.touchable) {
         downEvent = new Event(BrowserDriver.oskDownTouchType);
         upEvent = new Event(BrowserDriver.oskUpTouchType);
-        downEvent['touches'] = [{"target": oskKeyElement, ...center}];
-        upEvent['touches'] = [{"target": oskKeyElement, ...center}];
-        downEvent['changedTouches'] = [{"target": oskKeyElement, ...center}];
-        upEvent['changedTouches'] = [{"target": oskKeyElement, ...center}];
+        downEvent['touches'] = asTouchList([{"target": oskKeyElement, ...center}]);
+        upEvent['touches'] = asTouchList([{"target": oskKeyElement, ...center}]);
+        downEvent['changedTouches'] = asTouchList([{"target": oskKeyElement, ...center}]);
+        upEvent['changedTouches'] = asTouchList([{"target": oskKeyElement, ...center}]);
       } else {
         downEvent = new Event(BrowserDriver.oskDownMouseType);
         upEvent = new Event(BrowserDriver.oskUpMouseType);
