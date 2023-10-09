@@ -50,14 +50,14 @@ km_kbp_state_debug_key_info = record
   character: char16_t;
 end;
 
-pkm_kbp_state_debug_key_info = ^km_kbp_state_debug_key_info;
+pkm_core_state_debug_key_info = ^km_kbp_state_debug_key_info;
 
 km_kbp_state_debug_kmx_option_info = record
   store: Pointer;       // LPSTORE
   value: array[0..DEBUG_MAX_CONTEXT-1] of km_kbp_cp;  // value to be saved into the store
 end;
 
-pkm_kbp_state_debug_kmx_option_info = ^km_kbp_state_debug_kmx_option_info;
+pkm_core_state_debug_kmx_option_info = ^km_kbp_state_debug_kmx_option_info;
 
 ///
 /// KMX processor data for each event. kmx_base.h defines the types that are
@@ -83,7 +83,7 @@ km_kbp_state_debug_kmx_info = record
   option: km_kbp_state_debug_kmx_option_info;
 end;
 
-pkm_kbp_state_debug_kmx_info = ^km_kbp_state_debug_kmx_info;
+pkm_core_state_debug_kmx_info = ^km_kbp_state_debug_kmx_info;
 
 ///
 /// A single debug event.
@@ -98,7 +98,7 @@ km_kbp_state_debug_item = record
   kmx_info: km_kbp_state_debug_kmx_info;
 end;
 
-pkm_kbp_state_debug_item = ^km_kbp_state_debug_item;
+pkm_core_state_debug_item = ^km_kbp_state_debug_item;
 
 ///
 /// A single debug event.
@@ -109,7 +109,7 @@ km_kbp_debug_type = type uint32_t;
 // These types are used only for debugging convenience
 type
   km_kbp_state_debug_item_array = array[0..100] of km_kbp_state_debug_item;
-  pkm_kbp_state_debug_item_array = ^km_kbp_state_debug_item_array;
+  pkm_core_state_debug_item_array = ^km_kbp_state_debug_item_array;
 
 const
   KM_KBP_DEBUG_BEGIN = 0;
@@ -145,7 +145,7 @@ const KM_KBP_DEBUG_FLAG_OUTPUTKEYSTROKE    = $0001;
 /// @returns   KM_KBP_STATUS_OK on success
 ///
 function km_kbp_state_debug_set(
-  state: pkm_kbp_state;
+  state: pkm_core_state;
   value: integer
 ): km_kbp_status; cdecl; external kmnkbp0 delayed;
 
@@ -157,7 +157,7 @@ function km_kbp_state_debug_set(
 /// @returns   1 if debugging is enabled, 0 otherwise
 ///
 function km_kbp_state_debug_get(
-  state: pkm_kbp_state
+  state: pkm_core_state
 ): uint8_t; cdecl; external kmnkbp0 delayed;
 
 ///
@@ -171,9 +171,9 @@ function km_kbp_state_debug_get(
 ///            with last entry guaranteed to be KM_KBP_DEBUG_END.
 ///
 function km_kbp_state_debug_items(
-  state: pkm_kbp_state;
+  state: pkm_core_state;
   num_items: PCardinal
-): pkm_kbp_state_debug_item; cdecl; external kmnkbp0 delayed;
+): pkm_core_state_debug_item; cdecl; external kmnkbp0 delayed;
 
 implementation
 

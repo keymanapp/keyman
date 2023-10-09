@@ -18,8 +18,8 @@ type
 
   TDebugCore = class
   private
-    FKeyboard: pkm_kbp_keyboard;
-    FState: pkm_kbp_state;
+    FKeyboard: pkm_core_keyboard;
+    FState: pkm_core_state;
     class var KeymanCoreLoaded: Boolean;
     class procedure InitKeymanCore; static;
     function GetKMXPlatform: string;
@@ -30,8 +30,8 @@ type
     function GetOption(const name: string): string;
     procedure SetOption(const name, value: string);
     property KMXPlatform: string read GetKMXPlatform write SetKMXPlatform;
-    property Keyboard: pkm_kbp_keyboard read FKeyboard;
-    property State: pkm_kbp_state read FState;
+    property Keyboard: pkm_core_keyboard read FKeyboard;
+    property State: pkm_core_state read FState;
   end;
 
 implementation
@@ -98,13 +98,13 @@ end;
 
 function TDebugCore.GetKMXPlatform: string;
 var
-  p: pkm_kbp_cp;
+  p: pkm_core_cp;
   status: km_kbp_status;
 begin
   status := km_kbp_state_option_lookup(
     FState,
     KM_KBP_OPT_ENVIRONMENT,
-    pkm_kbp_cp(PWideChar(KM_KBP_KMX_ENV_PLATFORM)),
+    pkm_core_cp(PWideChar(KM_KBP_KMX_ENV_PLATFORM)),
     p
   );
   if status <> KM_KBP_STATUS_OK then
@@ -117,8 +117,8 @@ var
   options: array[0..1] of km_kbp_option_item;
   status: km_kbp_status;
 begin
-  options[0].key := pkm_kbp_cp(PWideChar(KM_KBP_KMX_ENV_PLATFORM));
-  options[0].value := pkm_kbp_cp(PWideChar(Value));
+  options[0].key := pkm_core_cp(PWideChar(KM_KBP_KMX_ENV_PLATFORM));
+  options[0].value := pkm_core_cp(PWideChar(Value));
   options[0].scope := KM_KBP_OPT_ENVIRONMENT;
   options[1] := KM_KBP_OPTIONS_END;
   status := km_kbp_state_options_update(FState, @options[0]);
@@ -128,13 +128,13 @@ end;
 
 function TDebugCore.GetOption(const name: string): string;
 var
-  p: pkm_kbp_cp;
+  p: pkm_core_cp;
   status: km_kbp_status;
 begin
   status := km_kbp_state_option_lookup(
     FState,
     KM_KBP_OPT_KEYBOARD,
-    pkm_kbp_cp(PWideChar(name)),
+    pkm_core_cp(PWideChar(name)),
     p
   );
   if status <> KM_KBP_STATUS_OK then
@@ -147,8 +147,8 @@ var
   options: array[0..1] of km_kbp_option_item;
   status: km_kbp_status;
 begin
-  options[0].key := pkm_kbp_cp(PWideChar(Name));
-  options[0].value := pkm_kbp_cp(PWideChar(Value));
+  options[0].key := pkm_core_cp(PWideChar(Name));
+  options[0].value := pkm_core_cp(PWideChar(Value));
   options[0].scope := KM_KBP_OPT_KEYBOARD;
   options[1] := KM_KBP_OPTIONS_END;
   status := km_kbp_state_options_update(FState, @options[0]);

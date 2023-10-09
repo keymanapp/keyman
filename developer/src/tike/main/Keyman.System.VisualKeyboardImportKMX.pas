@@ -106,7 +106,7 @@ procedure TVisualKeyboardImportKMX.ImportKey(vk: TVKKey);
 var
   data: string;
   i: Integer;
-  context: pkm_kbp_context;
+  context: pkm_core_context;
 begin
   context := km_kbp_state_context(FCore.State);
   km_kbp_context_clear(context);

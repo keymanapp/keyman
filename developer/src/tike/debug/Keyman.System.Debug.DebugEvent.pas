@@ -47,7 +47,7 @@ type
     Context: WideString;
     StoreOffsets: array[0..20] of Word; //TKeymanStoreEx;
     nStores: Integer;
-    procedure FillStoreList(event: pkm_kbp_state_debug_item; KeyboardMemory: PChar);
+    procedure FillStoreList(event: pkm_core_state_debug_item; KeyboardMemory: PChar);
   end;
 
   TDebugEventType = (etAction, etRuleMatch);
@@ -73,23 +73,23 @@ type
       expected_value: uintptr_t);
     procedure Action_EmitKeystroke(const key: Word);
     procedure Action_Marker(marker: uintptr_t);
-    function AddActionItem(key: Word; action: pkm_kbp_action_item): Boolean;
+    function AddActionItem(key: Word; action: pkm_core_action_item): Boolean;
     procedure AddDebugItem(
-      debug: pkm_kbp_state_debug_item;
+      debug: pkm_core_state_debug_item;
       debugkeyboard: TDebugKeyboard;
       vk: uint16_t;
       modifier_state: uint16_t
     );
   public
     function AddStateItems(
-      state: pkm_kbp_state;
+      state: pkm_core_state;
       vk: uint16_t;
       modifier_state: uint16_t;
       debugkeyboard: TDebugKeyboard
     ): Boolean; overload;
 
     function AddStateItems(
-      state: pkm_kbp_state;
+      state: pkm_core_state;
       vk: uint16_t;
       modifier_state: uint16_t
     ): Boolean; overload;
@@ -133,7 +133,7 @@ begin
   end;
 end;
 
-function TDebugEventList.AddActionItem(key: Word; action: pkm_kbp_action_item): Boolean;
+function TDebugEventList.AddActionItem(key: Word; action: pkm_core_action_item): Boolean;
 begin
   Result := True;
   case action._type of
@@ -220,7 +220,7 @@ begin
 end;
 
 procedure TDebugEventList.AddDebugItem(
-  debug: pkm_kbp_state_debug_item;
+  debug: pkm_core_state_debug_item;
   debugkeyboard: TDebugKeyboard;
   vk: uint16_t;
   modifier_state: uint16_t);
@@ -312,12 +312,12 @@ begin
 end;
 
 function TDebugEventList.AddStateItems(
-  state: pkm_kbp_state;
+  state: pkm_core_state;
   vk: uint16_t;
   modifier_state: uint16_t
 ): Boolean;
 var
-  action: pkm_kbp_action_item;
+  action: pkm_core_action_item;
 begin
   Result := True;
   action := km_kbp_state_action_items(state, nil);
@@ -329,14 +329,14 @@ begin
 end;
 
 function TDebugEventList.AddStateItems(
-  state: pkm_kbp_state;
+  state: pkm_core_state;
   vk: uint16_t;
   modifier_state: uint16_t;
   debugkeyboard: TDebugKeyboard
 ): Boolean;
 var
-  action: pkm_kbp_action_item;
-  debug: pkm_kbp_state_debug_item;
+  action: pkm_core_action_item;
+  debug: pkm_core_state_debug_item;
   action_index: Integer;
 begin
   Result := True;
@@ -374,7 +374,7 @@ end;
 
 { TDebugEventRuleData }
 
-procedure TDebugEventRuleData.FillStoreList(event: pkm_kbp_state_debug_item; KeyboardMemory: PChar);
+procedure TDebugEventRuleData.FillStoreList(event: pkm_core_state_debug_item; KeyboardMemory: PChar);
   function StoreOffset(kfh: PKeyboardFileHeader; i: Word): PChar;
   begin
     Result := KeyboardMemory;

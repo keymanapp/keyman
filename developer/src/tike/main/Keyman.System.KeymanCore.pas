@@ -21,22 +21,22 @@ type
 
   km_kbp_usv = uint32_t;  // UTF-32
   km_kbp_cp = WideChar;
-  pkm_kbp_cp = ^km_kbp_cp;
+  pkm_core_cp = ^km_kbp_cp;
 
   km_kbp_context = record end;
-  pkm_kbp_context = ^km_kbp_context;
+  pkm_core_context = ^km_kbp_context;
 
   km_kbp_keyboard = record end;
-  pkm_kbp_keyboard = ^km_kbp_keyboard;
+  pkm_core_keyboard = ^km_kbp_keyboard;
 
   km_kbp_state = record end;
-  pkm_kbp_state = ^km_kbp_state;
+  pkm_core_state = ^km_kbp_state;
 
   km_kbp_options = record end;
-  pkm_kbp_options = ^km_kbp_options;
+  pkm_core_options = ^km_kbp_options;
 
   km_kbp_path_name = PWideChar; // on Windows
-  pkm_kbp_path_name = ^km_kbp_path_name;
+  pkm_core_path_name = ^km_kbp_path_name;
 
 type
   km_kbp_status = (
@@ -69,7 +69,7 @@ type
     2: (marker: uint32_t);
   end;
 
-  pkm_kbp_context_item = ^km_kbp_context_item;
+  pkm_core_context_item = ^km_kbp_context_item;
 
 const
   KM_KBP_CONTEXT_ITEM_END: km_kbp_context_item = (
@@ -82,23 +82,23 @@ const
   kmnkbp0 = 'kmnkbp0-0.dll';
 
 function km_kbp_context_items_from_utf16(
-  const text: pkm_kbp_cp;
-  var out_ptr: pkm_kbp_context_item
+  const text: pkm_core_cp;
+  var out_ptr: pkm_core_context_item
 ): km_kbp_status; cdecl; external kmnkbp0 delayed;
 
 function km_kbp_context_items_from_utf8(
   const text: PAnsiChar;
-  var out_ptr: pkm_kbp_context_item
+  var out_ptr: pkm_core_context_item
 ): km_kbp_status; cdecl; external kmnkbp0 delayed;
 
 function km_kbp_context_items_to_utf16(
-  const item: pkm_kbp_context_item;
-  buf: pkm_kbp_cp;
+  const item: pkm_core_context_item;
+  buf: pkm_core_cp;
   var buf_size: integer
 ): km_kbp_status; cdecl; external kmnkbp0 delayed;
 
 function km_kbp_context_items_to_utf8(
-  const item: pkm_kbp_context_item;
+  const item: pkm_core_context_item;
   buf: pansichar;
   var buf_size: integer
 ): km_kbp_status; cdecl; external kmnkbp0 delayed;
@@ -108,28 +108,28 @@ procedure km_kbp_context_items_dispose(
 ); cdecl; external kmnkbp0 delayed;
 
 function km_kbp_context_set(
-  context: pkm_kbp_context;
-  context_items: pkm_kbp_context_item
+  context: pkm_core_context;
+  context_items: pkm_core_context_item
 ): km_kbp_status; cdecl; external kmnkbp0 delayed;
 
 function km_kbp_context_get(
-  context: pkm_kbp_context;
-  var context_items: pkm_kbp_context_item
+  context: pkm_core_context;
+  var context_items: pkm_core_context_item
 ): km_kbp_status; cdecl; external kmnkbp0 delayed;
 
 procedure km_kbp_context_clear(
-  context: pkm_kbp_context
+  context: pkm_core_context
 ); cdecl; external kmnkbp0 delayed;
 
 function km_kbp_context_append(
-  context: pkm_kbp_context;
-  context_items: pkm_kbp_context_item
+  context: pkm_core_context;
+  context_items: pkm_core_context_item
 ): km_kbp_status; cdecl; external kmnkbp0 delayed;
 
 function km_kbp_context_shrink(
-  context: pkm_kbp_context;
+  context: pkm_core_context;
   num: Integer;
-  prefix: pkm_kbp_context_item
+  prefix: pkm_core_context_item
 ): km_kbp_status; cdecl; external kmnkbp0 delayed;
 
 
@@ -143,12 +143,12 @@ type
   );
 
   km_kbp_option_item = record
-    key: pkm_kbp_cp;
-    value: pkm_kbp_cp;
+    key: pkm_core_cp;
+    value: pkm_core_cp;
     scope: km_kbp_option_scope;
   end;
 
-  pkm_kbp_option_item = ^km_kbp_option_item;
+  pkm_core_option_item = ^km_kbp_option_item;
 
 const
   KM_KBP_OPTIONS_END: km_kbp_option_item = (key: nil; value: nil; scope: KM_KBP_OPT_UNKNOWN);
@@ -193,91 +193,91 @@ type
 {$ENDIF}
   case Integer of
     0: (marker: uintptr_t);
-    1: (option: pkm_kbp_option_item);
+    1: (option: pkm_core_option_item);
     2: (character: km_kbp_usv);
     3: (backspace: km_kbp_backspace_item);
     4: (capsLock: uint8_t);  // CAPSLOCK type, 1 to turn on, 0 to turn off
   end;
 
-  pkm_kbp_action_item = ^km_kbp_action_item;
+  pkm_core_action_item = ^km_kbp_action_item;
 
 // These types are used only for debugging convenience
 type
   km_kbp_action_item_array = array[0..100] of km_kbp_action_item;
-  pkm_kbp_action_item_array = ^km_kbp_action_item_array;
+  pkm_core_action_item_array = ^km_kbp_action_item_array;
 
 function km_kbp_options_list_size(
-  opts: pkm_kbp_option_item
+  opts: pkm_core_option_item
 ): Integer; cdecl; external kmnkbp0 delayed;
 
 function km_kbp_state_option_lookup(
-  state: pkm_kbp_state;
+  state: pkm_core_state;
   scope: km_kbp_option_scope;
-  key: pkm_kbp_cp;
-  var value: pkm_kbp_cp
+  key: pkm_core_cp;
+  var value: pkm_core_cp
 ): km_kbp_status; cdecl; external kmnkbp0 delayed;
 
 function km_kbp_state_options_update(
-  state: pkm_kbp_state;
-  new_opts: pkm_kbp_option_item
+  state: pkm_core_state;
+  new_opts: pkm_core_option_item
 ): km_kbp_status; cdecl; external kmnkbp0 delayed;
 
 function km_kbp_state_options_to_json(
-  state: pkm_kbp_state;
+  state: pkm_core_state;
   buf: PAnsiChar;
   var space: Integer
 ): km_kbp_status; cdecl; external kmnkbp0 delayed;
 
 type
   km_kbp_keyboard_attrs = record
-    version_string: pkm_kbp_cp;
-    id: pkm_kbp_cp;
+    version_string: pkm_core_cp;
+    id: pkm_core_cp;
     folder_path: km_kbp_path_name;
-    default_optons: pkm_kbp_option_item
+    default_optons: pkm_core_option_item
   end;
 
-  pkm_kbp_keyboard_attrs = ^km_kbp_keyboard_attrs;
+  pkm_core_keyboard_attrs = ^km_kbp_keyboard_attrs;
 
 function km_kbp_keyboard_load(
   kb_path: km_kbp_path_name;
-  var keyboard: pkm_kbp_keyboard
+  var keyboard: pkm_core_keyboard
 ): km_kbp_status; cdecl; external kmnkbp0 delayed;
 
 procedure km_kbp_keyboard_dispose(
-  keyboard: pkm_kbp_keyboard
+  keyboard: pkm_core_keyboard
 ); cdecl; external kmnkbp0 delayed;
 
 function km_kbp_keyboard_get_attrs(
-  keyboard: pkm_kbp_keyboard;
-  var out: pkm_kbp_keyboard_attrs
+  keyboard: pkm_core_keyboard;
+  var out: pkm_core_keyboard_attrs
 ): km_kbp_status; cdecl; external kmnkbp0 delayed;
 
 function km_kbp_state_create(
-  keyboard: pkm_kbp_keyboard;
-  env: pkm_kbp_option_item;
-  var out: pkm_kbp_state
+  keyboard: pkm_core_keyboard;
+  env: pkm_core_option_item;
+  var out: pkm_core_state
 ): km_kbp_status; cdecl; external kmnkbp0 delayed;
 
 function km_kbp_state_clone(
-  state: pkm_kbp_state;
-  var out: pkm_kbp_state
+  state: pkm_core_state;
+  var out: pkm_core_state
 ): km_kbp_status; cdecl; external kmnkbp0 delayed;
 
 procedure km_kbp_state_dispose(
-  state: pkm_kbp_state
+  state: pkm_core_state
 ); cdecl; external kmnkbp0 delayed;
 
 function km_kbp_state_context(
-  state: pkm_kbp_state
-): pkm_kbp_context; cdecl; external kmnkbp0 delayed;
+  state: pkm_core_state
+): pkm_core_context; cdecl; external kmnkbp0 delayed;
 
 function km_kbp_state_action_items(
-  state: pkm_kbp_state;
+  state: pkm_core_state;
   num_items: pinteger
-): pkm_kbp_action_item; cdecl; external kmnkbp0 delayed;
+): pkm_core_action_item; cdecl; external kmnkbp0 delayed;
 
 function km_kbp_state_to_json(
-  state: pkm_kbp_state;
+  state: pkm_core_state;
   buf: PAnsiChar;
   space: pinteger
 ): km_kbp_status; cdecl; external kmnkbp0 delayed;
@@ -293,7 +293,7 @@ type
     vendor: pansichar       // Implementor of the processor.
   end;
 
-  pkm_kbp_attr = ^km_kbp_attr;
+  pkm_core_attr = ^km_kbp_attr;
 
   km_kbp_tech_value = (
     KM_KBP_TECH_UNSPECIFIED = 0,
@@ -304,12 +304,12 @@ type
   );
 
 function km_kbp_get_engine_attrs(
-  state: pkm_kbp_state
-): pkm_kbp_attr; cdecl; external kmnkbp0 delayed;
+  state: pkm_core_state
+): pkm_core_attr; cdecl; external kmnkbp0 delayed;
 
 function
 km_kbp_process_event(
-  state: pkm_kbp_state;
+  state: pkm_core_state;
   vk: km_kbp_virtual_key;
   modifier_state: uint16_t;
   is_key_down: uint8_t;

@@ -371,7 +371,7 @@ end;
 
 function TfrmDebug.SetKeyEventContext: Boolean;
 var
-  context: pkm_kbp_context;
+  context: pkm_core_context;
   context_items: TArray<km_kbp_context_item>;
   n, i: Integer;
   ch: Char;
