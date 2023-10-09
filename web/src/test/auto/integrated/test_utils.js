@@ -201,31 +201,24 @@ export async function loadKeyboardFromJSON(jsonPath, timeout, params) {
   return loadKeyboardStub(stub, timeout, params);
 }
 
-function runLoadedKeyboardTest(testDef, device, usingOSK, assertCallback) {
+async function runLoadedKeyboardTest(testDef, device, usingOSK, assertCallback) {
   var inputElem = document.getElementById('singleton');
 
   let proctor = new KMWRecorder.BrowserProctor(inputElem, device, usingOSK, assertCallback);
-  testDef.test(proctor);
+  await testDef.test(proctor);
 }
 
-export function runKeyboardTestFromJSON(jsonPath, params, assertCallback, timeout) {
+export async function runKeyboardTestFromJSON(jsonPath, params, assertCallback, timeout) {
   var testSpec = new KMWRecorder.KeyboardTest(fixture.load(jsonPath, true));
   let device = new Device();
   device.detect();
 
   return loadKeyboardStub(testSpec.keyboard, timeout).then(() => {
-    runLoadedKeyboardTest(testSpec, device.coreSpec, params.usingOSK, assertCallback);
+    return runLoadedKeyboardTest(testSpec, device.coreSpec, params.usingOSK, assertCallback);
   }).finally(() => {
     keyman.removeKeyboards(testSpec.keyboard.id);
   });
 }
-
-// function retrieveAndReset(Pelem) {
-//   let val = Pelem.value;
-//   Pelem.value = "";
-
-//   return val;
-// }
 
 // Useful for tests related to strings with supplementary pairs.
 export function toSupplementaryPairString(code) {

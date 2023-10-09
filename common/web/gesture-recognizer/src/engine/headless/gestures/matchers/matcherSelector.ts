@@ -151,6 +151,8 @@ export class MatcherSelector<Type> extends EventEmitter<EventMap<Type>> {
       : (source.sources as GestureSourceSubview<Type>[]).map((source) => source.baseSource);
 
     if(sourceNotYetStaged) {
+      // Cancellation before a first stage is possible; in this case, there's no sequence
+      // to trigger cleanup.  We can do that here.
       source.path.on('invalidated', () => {
         this.cleanSourceIdsForSequence([source.identifier]);
       })

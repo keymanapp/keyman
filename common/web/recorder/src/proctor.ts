@@ -29,7 +29,7 @@ export default abstract class Proctor {
   }
 
   // Performs global test prep.
-  abstract beforeAll();
+  abstract beforeAll(): Promise<void>;
 
   // Performs per-test setup
   abstract before();
@@ -49,5 +49,5 @@ export default abstract class Proctor {
    * Simulates the specified test sequence for use in testing.
    * @param sequence The recorded sequence, generally provided by a test set.
    */
-  abstract simulateSequence(sequence: TestSequence<any>, target?: OutputTarget);
+  abstract simulateSequence(sequence: TestSequence<any>, target?: OutputTarget): Promise<string>;
 }
