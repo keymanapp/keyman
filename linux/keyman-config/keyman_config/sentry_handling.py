@@ -1,5 +1,6 @@
 #!/usr/bin/python3
 import getpass
+import hashlib
 import importlib
 import logging
 import os
@@ -124,7 +125,9 @@ class SentryErrorHandling:
           integrations=[sentry_logging],
           before_send=self._before_send
         )
-        set_user({'id': hash(getpass.getuser())})
+        hash = hashlib.md5()
+        hash.update(getpass.getuser().encode())
+        set_user({'id': hash.hexdigest()})
         with configure_scope() as scope:
             scope.set_tag("app", os.path.basename(sys.argv[0]))
             scope.set_tag("pkgversion", __pkgversion__)
