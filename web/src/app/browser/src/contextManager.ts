@@ -184,7 +184,17 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
 
   public deactivateCurrentTarget() {
     const priorTarget = this.activeTarget || this.lastActiveTarget;
-    if(priorTarget) {
+
+    /* During integrated tests, it was possible in the past for a `beforeAll`
+     * -initialized KMW to reach this state between tests.  The target fixture
+     * got cleared, but the `mostRecentTarget` / `lastActiveTarget` was not
+     * - just the `currentTarget` / `activeTarget`.
+     *
+     * Newly-added code in `forgetActiveTarget` seeks to prevent this scenario,
+     * but as there's no consistent repro to prove it sufficient, an appropriate
+     * guard-condition has been added here too.
+     */
+    if(priorTarget && this.page.isAttached(priorTarget.getElement())) {
       this._BlurKeyboardSettings(priorTarget.getElement());
     }
 
@@ -198,12 +208,19 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
     this.focusAssistant.maintainingFocus = false;
     this.focusAssistant.restoringFocus = false;
 
-    const priorTarget = this.activeTarget || this.lastActiveTarget;
+    const priorTarget = this.activeTarget || this.mostRecentTarget;
     if(priorTarget) {
       this._BlurKeyboardSettings(priorTarget.getElement());
     }
 
+    // Will ensure that the element is no longer active.  Does not erase
+    // it from being the `lastActiveTarget`, though.
     this.setActiveTarget(null, true);
+
+    // So we erase it here.
+    if(priorTarget == this.lastActiveTarget) {
+      this.mostRecentTarget = null;
+    }
   }
 
   public setActiveTarget(target: OutputTarget<any>, sendEvents: boolean) {
