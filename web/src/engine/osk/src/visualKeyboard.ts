@@ -507,7 +507,8 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
           // Merely constructing the instance is enough; it'll link into the sequence's events and
           // handle everything that remains for the backspace from here.
           new HeldRepeater(gestureSequence, () => this.modelKeyClick(gestureKey, coord));
-        } else if(gestureStage.matchedId == 'longpress') {
+        } else if(gestureStage.matchedId.indexOf('longpress') > -1) {
+          // Matches:  'longpress', 'longpress-reset'.
           // Likewise.
           new SubkeyPopup(gestureSequence, configChanger, this, gestureSequence.stageReports[0].sources[0].baseItem);
         }

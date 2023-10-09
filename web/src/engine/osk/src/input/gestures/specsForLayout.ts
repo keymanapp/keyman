@@ -189,6 +189,9 @@ export function gestureSetForLayout(layerGroup: OSKLayerGroup, params: GesturePa
     // gestureModels.push // flick-end
 
     // defaultSet.push('flick-start');
+  } else {
+    // A post-roam version of longpress with the up-flick shortcut disabled but roaming still on.
+    gestureModels.push(withKeySpecFiltering(longpressModelWithRoaming(params), 0));
   }
 
   return {
@@ -244,7 +247,7 @@ export function BasicLongpressContactModel(params: GestureParams): ContactModel 
   };
 }
 
-export function LongpressContactModelWithShortcut(params: GestureParams): ContactModel {
+export function LongpressContactModelWithShortcut(params: GestureParams, enabledFlicks?: false | undefined): ContactModel {
   const spec = params.longpress;
   const base = BasicLongpressContactModel(params);
 
@@ -263,7 +266,7 @@ export function LongpressContactModelWithShortcut(params: GestureParams): Contac
          * The 'indexOf' allows 'n', 'nw', and 'ne' - approx 67.5 degrees on
          * each side of due N in total.
          */
-        if(spec.permitFlick && (stats.cardinalDirection?.indexOf('n') != -1 ?? false)) {
+        if((enabledFlicks ?? spec.permitFlick) && (stats.cardinalDirection?.indexOf('n') != -1 ?? false)) {
           if(stats.netDistance > spec.flickDist) {
             return 'resolve';
           }
@@ -433,7 +436,6 @@ export function longpressModelWithShortcut(params: GestureParams): GestureModel 
     contacts: [
       {
         model: {
-          // Is the version without the up-flick shortcut.
           ...LongpressContactModelWithShortcut(params),
           itemPriority: 1,
           pathInheritance: 'chop'
@@ -457,15 +459,63 @@ export function longpressModelWithShortcut(params: GestureParams): GestureModel 
     rejectionActions: {
       item: {
         type: 'replace',
-        replace: 'longpress'
+        replace: 'longpress-roam'
       },
       path: {
         type: 'replace',
-        replace: 'longpress'
+        replace: 'longpress-roam'
       }
     }
   }
 }
+
+/**
+ * For use when a layout doesn't have flicks; has the up-flick shortcut
+ * and facilitates roaming-touch.
+ */
+export function longpressModelWithRoaming(params: GestureParams): GestureModel {
+  return {
+    ...basicLongpressModel(params),
+
+    id: 'longpress-roam',
+    resolutionPriority: 0,
+    contacts: [
+      {
+        model: {
+          // false - disabled shortcut regardless of params
+          ...LongpressContactModelWithShortcut(params, false),
+          itemPriority: 1,
+          pathInheritance: 'chop'
+        },
+        endOnResolve: false
+      }, {
+        model: InstantContactRejectionModel
+      }
+    ],
+    resolutionAction: {
+      type: 'chain',
+      next: 'subkey-select',
+      selectionMode: 'none',
+      item: 'none'
+    },
+
+    /*
+     * Note:  these actions make sense in a 'roaming-touch' context, but not when
+     * flicks are also enabled.
+     */
+    rejectionActions: {
+      item: {
+        type: 'replace',
+        replace: 'longpress-roam'
+      },
+      path: {
+        type: 'replace',
+        replace: 'longpress-roam'
+      }
+    }
+  }
+}
+
 
 export const MultitapModel: GestureModel = {
   id: 'multitap',
