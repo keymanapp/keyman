@@ -159,9 +159,6 @@ export class MatcherSelector<Type> extends EventEmitter<EventMap<Type>> {
     }
 
     const matchPromise = new ManagedPromise<MatcherSelection<Type>>();
-    matchPromise.finally(() => {
-      this._sourceSelector = this._sourceSelector.filter((source) => sources.indexOf(source.source) == -1);
-    });
 
     /*
      * First...
