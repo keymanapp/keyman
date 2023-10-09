@@ -22,7 +22,7 @@
 namespace km {
 namespace kbp {
 
-#define KM_KBP_LMDL_PROCESSOR_VERSION u"1.0"
+#define KM_CORE_LMDL_PROCESSOR_VERSION u"1.0"
 
   class ldml_processor : public abstract_processor {
   private:

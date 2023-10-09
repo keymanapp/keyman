@@ -68,7 +68,7 @@ BOOL IntLoadKeyboardOptionsRegistrytoCore(LPCSTR key, LPINTKEYBOARDINFO kp, km_c
   // Get the list of default options to determine size of list
   const km_core_keyboard_attrs* keyboardAttrs;
   km_core_status err_status = km_core_keyboard_get_attrs(kp->lpCoreKeyboard, &keyboardAttrs);
-  if (err_status != KM_KBP_STATUS_OK) {
+  if (err_status != KM_CORE_STATUS_OK) {
     SendDebugMessageFormat(
         0, sdmKeyboard, 0, "LoadKeyboardOptionsRegistrytoCore: km_core_keyboard_get_attrs failed with error status [%d]", err_status);
     return FALSE;
@@ -85,7 +85,7 @@ BOOL IntLoadKeyboardOptionsRegistrytoCore(LPCSTR key, LPINTKEYBOARDINFO kp, km_c
 
   int n = 0;
   for (auto kpc = keyboardAttrs->default_options; kpc->key; kpc++) {
-    keyboardOpts[n].scope = KM_KBP_OPT_KEYBOARD;
+    keyboardOpts[n].scope = KM_CORE_OPT_KEYBOARD;
     keyboardOpts[n].key   = kpc->key;
     LPCWSTR coreKey = reinterpret_cast<LPCWSTR>(kpc->key);
     WCHAR val[256];
@@ -96,11 +96,11 @@ BOOL IntLoadKeyboardOptionsRegistrytoCore(LPCSTR key, LPINTKEYBOARDINFO kp, km_c
     }
     n++;
   }
-  keyboardOpts[n] = KM_KBP_OPTIONS_END;
+  keyboardOpts[n] = KM_CORE_OPTIONS_END;
 
   // once we have the option list we can then update the options using the public api call
   err_status = km_core_state_options_update(state, keyboardOpts);
-  if (err_status != KM_KBP_STATUS_OK) {
+  if (err_status != KM_CORE_STATUS_OK) {
     SendDebugMessageFormat(
         0, sdmKeyboard, 0, "LoadKeyboardOptionsRegistrytoCore: km_core_state_options_update failed with error status [%d]", err_status);
   }

@@ -29,7 +29,7 @@ using namespace km::kbp::kmx;
 
 km_core_option_item test_env_opts[] =
 {
-  KM_KBP_OPTIONS_END
+  KM_CORE_OPTIONS_END
 };
 
 std::map<uint16_t,std::string> expected_imx_map { {3, "imsample.dll:DF"},
@@ -52,12 +52,12 @@ extern "C"
   /**
    * This callback will be used in place of a callback to the third party
    * library. It will then test adding to the action queue all the implemented action types.
-   * KM_KBP_IT_END
-   * KM_KBP_IT_CHAR
-   * KM_KBP_IT_MARKER
-   * KM_KBP_IT_ALERT
-   * KM_KBP_IT_BACK
-   * KM_KBP_IT_INVALIDATE_CONTEXT
+   * KM_CORE_IT_END
+   * KM_CORE_IT_CHAR
+   * KM_CORE_IT_MARKER
+   * KM_CORE_IT_ALERT
+   * KM_CORE_IT_BACK
+   * KM_CORE_IT_INVALIDATE_CONTEXT
    *
    *
    * @param state
@@ -102,35 +102,35 @@ uint8_t test_imx_callback(km_core_state *state, uint32_t imx_id, void *callback_
     // here will need updating
   case 3:
 
-    a_items[0].type      = KM_KBP_IT_CHAR;
+    a_items[0].type      = KM_CORE_IT_CHAR;
     a_items[0].character = km_core_usv('X');
-    a_items[1].type      = KM_KBP_IT_ALERT;
-    a_items[2].type   = KM_KBP_IT_END;
+    a_items[1].type      = KM_CORE_IT_ALERT;
+    a_items[2].type   = KM_CORE_IT_END;
     km_core_state_queue_action_items(state, a_items);
     break;
   case 4:
 
-    a_items[0].type      = KM_KBP_IT_CHAR;
+    a_items[0].type      = KM_CORE_IT_CHAR;
     a_items[0].character = km_core_usv('Y');
-    a_items[1].type      = KM_KBP_IT_MARKER;
+    a_items[1].type      = KM_CORE_IT_MARKER;
     a_items[1].marker = 1;
-    a_items[2].type      = KM_KBP_IT_CHAR;
+    a_items[2].type      = KM_CORE_IT_CHAR;
     a_items[2].character = km_core_usv('A');
-    a_items[3].type   = KM_KBP_IT_END;
+    a_items[3].type   = KM_CORE_IT_END;
     km_core_state_queue_action_items(state, a_items);
     break;
   case 5:
-    a_items[0].type      = KM_KBP_IT_BACK;
-    a_items[0].backspace.expected_type = KM_KBP_BT_CHAR;
+    a_items[0].type      = KM_CORE_IT_BACK;
+    a_items[0].backspace.expected_type = KM_CORE_BT_CHAR;
     a_items[0].backspace.expected_value = km_core_usv('A');
-    a_items[1].type      = KM_KBP_IT_CHAR;
+    a_items[1].type      = KM_CORE_IT_CHAR;
     a_items[1].character = km_core_usv('Z');
-    a_items[2].type   = KM_KBP_IT_END;
+    a_items[2].type   = KM_CORE_IT_END;
     km_core_state_queue_action_items(state, a_items);
     break;
   case 6: {
-      a_items[0].type   = KM_KBP_IT_INVALIDATE_CONTEXT;
-      a_items[1].type   = KM_KBP_IT_END;
+      a_items[0].type   = KM_CORE_IT_INVALIDATE_CONTEXT;
+      a_items[1].type   = KM_CORE_IT_END;
       km_core_state_queue_action_items(state, a_items);
     }
     break;
@@ -217,27 +217,27 @@ void test_queue_actions (const km::kbp::path &source_keyboard) {
   km_core_state_imx_register_callback(test_state, test_imx_callback, (void*)&g_extract_imx_map);
 
   // Key Press that doesn't trigger a call back
-  try_status(km_core_process_event(test_state, KM_KBP_VKEY_S,KM_KBP_MODIFIER_SHIFT, 1, KM_KBP_EVENT_FLAG_DEFAULT));
-  assert(action_items(test_state, {{KM_KBP_IT_CHAR, {0,}, {km_core_usv('S')}}, {KM_KBP_IT_END}}));
+  try_status(km_core_process_event(test_state, KM_CORE_VKEY_S,KM_CORE_MODIFIER_SHIFT, 1, KM_CORE_EVENT_FLAG_DEFAULT));
+  assert(action_items(test_state, {{KM_CORE_IT_CHAR, {0,}, {km_core_usv('S')}}, {KM_CORE_IT_END}}));
 
-  try_status(km_core_process_event(test_state, KM_KBP_VKEY_BKSP, 0, 1, KM_KBP_EVENT_FLAG_DEFAULT));
-  assert(action_items(test_state, {{KM_KBP_IT_CHAR, {0,}, {km_core_usv('X')}}, {KM_KBP_IT_ALERT, {0,}, {0}}, {KM_KBP_IT_END}}));
+  try_status(km_core_process_event(test_state, KM_CORE_VKEY_BKSP, 0, 1, KM_CORE_EVENT_FLAG_DEFAULT));
+  assert(action_items(test_state, {{KM_CORE_IT_CHAR, {0,}, {km_core_usv('X')}}, {KM_CORE_IT_ALERT, {0,}, {0}}, {KM_CORE_IT_END}}));
 
-  try_status(km_core_process_event(test_state, KM_KBP_VKEY_ESC, 0, 1, KM_KBP_EVENT_FLAG_DEFAULT));
-  assert(action_items(test_state, { {KM_KBP_IT_CHAR, {0,}, {km_core_usv('Y')}},
-                                    {KM_KBP_IT_MARKER, {0,}, {1}},
-                                    {KM_KBP_IT_CHAR, {0,}, {km_core_usv('A')}},
-                                    {KM_KBP_IT_END}}));
+  try_status(km_core_process_event(test_state, KM_CORE_VKEY_ESC, 0, 1, KM_CORE_EVENT_FLAG_DEFAULT));
+  assert(action_items(test_state, { {KM_CORE_IT_CHAR, {0,}, {km_core_usv('Y')}},
+                                    {KM_CORE_IT_MARKER, {0,}, {1}},
+                                    {KM_CORE_IT_CHAR, {0,}, {km_core_usv('A')}},
+                                    {KM_CORE_IT_END}}));
 
-  try_status(km_core_process_event(test_state, KM_KBP_VKEY_1, 0, 1, KM_KBP_EVENT_FLAG_DEFAULT));
+  try_status(km_core_process_event(test_state, KM_CORE_VKEY_1, 0, 1, KM_CORE_EVENT_FLAG_DEFAULT));
 
-  km_core_action_item bksp_a = {KM_KBP_IT_BACK};
-  bksp_a.backspace.expected_type = KM_KBP_BT_CHAR;
+  km_core_action_item bksp_a = {KM_CORE_IT_BACK};
+  bksp_a.backspace.expected_type = KM_CORE_BT_CHAR;
   bksp_a.backspace.expected_value = 'A';
-  assert(action_items(test_state, {bksp_a,{KM_KBP_IT_CHAR, {0,}, {km_core_usv('Z')}}, {KM_KBP_IT_END}}));
+  assert(action_items(test_state, {bksp_a,{KM_CORE_IT_CHAR, {0,}, {km_core_usv('Z')}}, {KM_CORE_IT_END}}));
 
-  try_status(km_core_process_event(test_state, KM_KBP_VKEY_2, 0, 1, KM_KBP_EVENT_FLAG_DEFAULT));
-  assert(action_items(test_state, {{KM_KBP_IT_INVALIDATE_CONTEXT, {0,}, {0}}, {KM_KBP_IT_END}}));
+  try_status(km_core_process_event(test_state, KM_CORE_VKEY_2, 0, 1, KM_CORE_EVENT_FLAG_DEFAULT));
+  assert(action_items(test_state, {{KM_CORE_IT_INVALIDATE_CONTEXT, {0,}, {0}}, {KM_CORE_IT_END}}));
 
   km_core_state_imx_deregister_callback(test_state);
   km_core_keyboard_imx_list_dispose(kb_imx_list);

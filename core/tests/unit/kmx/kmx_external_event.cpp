@@ -22,14 +22,14 @@
 /**
  * This test will test the infrastructure around the external event processing
  * The functions tested are:
- * - km_core_event with the event KM_KBP_EVENT_KEYBOARD_ACTIVATED
+ * - km_core_event with the event KM_CORE_EVENT_KEYBOARD_ACTIVATED
  */
 
 using namespace km::kbp::kmx;
 
 km_core_option_item test_env_opts[] =
 {
-  KM_KBP_OPTIONS_END
+  KM_CORE_OPTIONS_END
 };
 
 int error_args() {
@@ -50,14 +50,14 @@ void test_external_event(const km::kbp::path &source_file){
   try_status(km_core_state_create(test_kb, test_env_opts, &test_state));
 
   // Set up external events to test the processing.
-  uint32_t event = KM_KBP_EVENT_KEYBOARD_ACTIVATED;
+  uint32_t event = KM_CORE_EVENT_KEYBOARD_ACTIVATED;
   // For this particular test we want to have the capslock state as on.
   // then after the km_core_event the caps lock should be off as the load
   // keyboard is a caps always off keyboard
 
   try_status(km_core_event(test_state, event, nullptr));
   // The action to turn capslock off must be in the actions list.
-  assert(action_items(test_state, {{KM_KBP_IT_CAPSLOCK, {0,}, {0}}, {KM_KBP_IT_END}}));
+  assert(action_items(test_state, {{KM_CORE_IT_CAPSLOCK, {0,}, {0}}, {KM_CORE_IT_END}}));
 
   km_core_state_dispose(test_state);
   km_core_keyboard_dispose(test_kb);

@@ -59,7 +59,7 @@ json & km::kbp::operator << (json &j, abstract_processor const &)
   // }
 
   j << "saved" << json::object;
-  for (auto scope: {KM_KBP_OPT_KEYBOARD, KM_KBP_OPT_ENVIRONMENT})
+  for (auto scope: {KM_CORE_OPT_KEYBOARD, KM_CORE_OPT_ENVIRONMENT})
   {
     j << scope_names_lut[scope-1] << json::object;
     // for (auto & opt: opts._saved)

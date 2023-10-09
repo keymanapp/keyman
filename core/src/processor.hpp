@@ -51,7 +51,7 @@ namespace kbp
       uint32_t _kmn_unused(event),
       void* _kmn_unused(data)
     ) {
-      return KM_KBP_STATUS_OK;
+      return KM_CORE_STATUS_OK;
     }
 
     virtual km_core_attr const & attributes() const = 0;
@@ -75,7 +75,7 @@ namespace kbp
      * updateing the state as required.
      *
      * @param   state  An opaque pointer to a state object
-     * @return  km_core_status  `KM_KBP_STATUS_OK`: On success. Else KB_KBP_ error code
+     * @return  km_core_status  `KM_CORE_STATUS_OK`: On success. Else KB_KBP_ error code
      */
     virtual km_core_status
     process_queued_actions(

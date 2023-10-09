@@ -262,7 +262,7 @@ PreservedKeyMap::MapKeyboard(km_core_keyboard *pKeyboard, PreservedKey **pPreser
   km_core_keyboard_key *kb_key_list;
 
   km_core_status err_status = km_core_keyboard_get_key_list(pKeyboard, &kb_key_list);
-  if ((err_status != KM_KBP_STATUS_OK) || (kb_key_list ==nullptr)) {
+  if ((err_status != KM_CORE_STATUS_OK) || (kb_key_list ==nullptr)) {
     return FALSE;
   }
 

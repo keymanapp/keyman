@@ -43,7 +43,7 @@ void KMX_DebugItems::push_set_option(
   KMX_WCHAR const * value
 ) {
   _items->assert_push_entry();
-  km_core_state_debug_item item = {KM_KBP_DEBUG_SET_OPTION, 0, {}, {}};
+  km_core_state_debug_item item = {KM_CORE_DEBUG_SET_OPTION, 0, {}, {}};
   item.kmx_info.first_action = first_action;
   item.kmx_info.rule = nullptr;
   item.kmx_info.group = nullptr;

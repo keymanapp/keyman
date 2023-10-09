@@ -38,7 +38,7 @@ public:
 
   int
   caps_lock_state() {
-    return _caps_lock_on ? KM_KBP_MODIFIER_CAPS : 0;
+    return _caps_lock_on ? KM_CORE_MODIFIER_CAPS : 0;
   }
 
   void

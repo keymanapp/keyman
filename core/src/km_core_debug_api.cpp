@@ -22,10 +22,10 @@ km_core_state_debug_set(
 ) {
   assert(state);
   if(!state) {
-    return KM_KBP_STATUS_INVALID_ARGUMENT;
+    return KM_CORE_STATUS_INVALID_ARGUMENT;
   }
   state->debug_items().set_enabled(value ? true : false);
-  return KM_KBP_STATUS_OK;
+  return KM_CORE_STATUS_OK;
 }
 
 uint8_t
@@ -58,6 +58,6 @@ km_core_state_debug_items(
 
   // Process events will ensure that the debug vector is always well
   // terminated
-  assert(state->debug_items().back().type == KM_KBP_DEBUG_END);
+  assert(state->debug_items().back().type == KM_CORE_DEBUG_END);
   return state->debug_items().data();
 }

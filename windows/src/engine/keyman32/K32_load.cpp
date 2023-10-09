@@ -88,7 +88,7 @@ BOOL LoadlpKeyboard(int i)
   if (!GetKeyboardFileName(_td->lpKeyboards[i].Name, buf, 255)) return FALSE;
   PWCHAR keyboardPath = strtowstr(buf);
   km_core_status err_status = km_core_keyboard_load(keyboardPath, &_td->lpKeyboards[i].lpCoreKeyboard);
-  if (err_status != KM_KBP_STATUS_OK) {
+  if (err_status != KM_CORE_STATUS_OK) {
     SendDebugMessageFormat(0, sdmLoad, 0, "LoadlpKeyboard: km_core_keyboard_load failed for %ls with error status [%d]", keyboardPath, err_status);
     delete keyboardPath;
     return FALSE;
@@ -106,7 +106,7 @@ BOOL LoadlpKeyboard(int i)
 
   DeleteCoreEnvironment(core_environment);
 
-  if (err_status != KM_KBP_STATUS_OK) {
+  if (err_status != KM_CORE_STATUS_OK) {
     SendDebugMessageFormat(
         0, sdmLoad, 0, "LoadlpKeyboard: km_core_state_create failed with error status [%d]", err_status);
     // Dispose of the keyboard to leave us in a consistent state
@@ -115,7 +115,7 @@ BOOL LoadlpKeyboard(int i)
   }
   // Register callback?
   err_status = km_core_keyboard_get_imx_list(_td->lpKeyboards[i].lpCoreKeyboard, &_td->lpKeyboards[i].lpIMXList);
-  if (err_status != KM_KBP_STATUS_OK) {
+  if (err_status != KM_CORE_STATUS_OK) {
     SendDebugMessageFormat(0, sdmLoad, 0, "LoadlpKeyboard: km_core_keyboard_get_imx_list failed with error status [%d]", err_status);
     // Dispose of the keyboard to leave us in a consistent state
     ReleaseKeyboardMemoryCore(&_td->lpKeyboards[i].lpCoreKeyboard);

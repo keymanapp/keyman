@@ -20,7 +20,7 @@ using namespace km::kbp::kmx;
 
 km_core_option_item test_env_opts[] =
 {
-  KM_KBP_OPTIONS_END
+  KM_CORE_OPTIONS_END
 };
 
 int error_args() {
@@ -33,13 +33,13 @@ int error_args() {
 #define CHAR_CODE_LOWER_B 98
 
 
-std::map<std::pair<km_core_virtual_key,uint32_t>, uint32_t> kb_key_expected_key_list {{{KM_KBP_VKEY_1, 0},0},
-                                              {{KM_KBP_VKEY_2, 0},0},
-                                              {{KM_KBP_VKEY_A, 0},0},
-                                              {{KM_KBP_VKEY_B, 0},0},
-                                              {{KM_KBP_VKEY_B, KM_KBP_MODIFIER_CTRL},KM_KBP_MODIFIER_CTRL},
-                                              {{KM_KBP_VKEY_C, 0},0},
-                                              {{KM_KBP_VKEY_C, KM_KBP_MODIFIER_ALT},KM_KBP_MODIFIER_ALT},
+std::map<std::pair<km_core_virtual_key,uint32_t>, uint32_t> kb_key_expected_key_list {{{KM_CORE_VKEY_1, 0},0},
+                                              {{KM_CORE_VKEY_2, 0},0},
+                                              {{KM_CORE_VKEY_A, 0},0},
+                                              {{KM_CORE_VKEY_B, 0},0},
+                                              {{KM_CORE_VKEY_B, KM_CORE_MODIFIER_CTRL},KM_CORE_MODIFIER_CTRL},
+                                              {{KM_CORE_VKEY_C, 0},0},
+                                              {{KM_CORE_VKEY_C, KM_CORE_MODIFIER_ALT},KM_CORE_MODIFIER_ALT},
                                               };
 
 /**

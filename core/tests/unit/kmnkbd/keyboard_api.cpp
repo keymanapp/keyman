@@ -17,7 +17,7 @@ namespace
 }
 
 #define   try_status(expr) \
-{auto __s = (expr); if (__s != KM_KBP_STATUS_OK) return 100*__LINE__+__s;}
+{auto __s = (expr); if (__s != KM_CORE_STATUS_OK) return 100*__LINE__+__s;}
 
 int main(int, char *[])
 {

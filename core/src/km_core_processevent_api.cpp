@@ -20,20 +20,20 @@ km_core_event(
 ) {
   assert(state != nullptr);
   if(state == nullptr) {
-    return KM_KBP_STATUS_INVALID_ARGUMENT;
+    return KM_CORE_STATUS_INVALID_ARGUMENT;
   }
 
-  // event: KM_KBP_EVENT_KEYBOARD_ACTIVATED; data should be nullptr
-  // future event: KM_KBP_EVENT_KEYBOARD_DEACTIVATED
+  // event: KM_CORE_EVENT_KEYBOARD_ACTIVATED; data should be nullptr
+  // future event: KM_CORE_EVENT_KEYBOARD_DEACTIVATED
   switch(event) {
-    case KM_KBP_EVENT_KEYBOARD_ACTIVATED:
+    case KM_CORE_EVENT_KEYBOARD_ACTIVATED:
       assert(data == nullptr);
       if(data != nullptr) {
-        return KM_KBP_STATUS_INVALID_ARGUMENT;
+        return KM_CORE_STATUS_INVALID_ARGUMENT;
       }
       break;
     default:
-      return KM_KBP_STATUS_INVALID_ARGUMENT;
+      return KM_CORE_STATUS_INVALID_ARGUMENT;
   }
 
   return state->processor().external_event(state, event, data);
@@ -47,7 +47,7 @@ km_core_process_event(km_core_state *state,
                      uint16_t event_flags) {
   assert(state != nullptr);
   if(state == nullptr) {
-    return KM_KBP_STATUS_INVALID_ARGUMENT;
+    return KM_CORE_STATUS_INVALID_ARGUMENT;
   }
   return state->processor().process_event(state, vk, modifier_state, is_key_down, event_flags);
 }
@@ -58,7 +58,7 @@ km_core_process_queued_actions(
       ) {
   assert(state != nullptr);
   if(state == nullptr) {
-    return KM_KBP_STATUS_INVALID_ARGUMENT;
+    return KM_CORE_STATUS_INVALID_ARGUMENT;
   }
   return state->processor().process_queued_actions(state);
 }

@@ -42,15 +42,15 @@ extern "C"
  * These modifier flags are used internally in the kmx engine, so will be
  * exposed only in debugging modifier states.
  */
-#define KM_KBP_MODIFIER_VIRTUALKEY      0x4000
-#define KM_KBP_MODIFIER_VIRTUALCHARKEY  0x8000
+#define KM_CORE_MODIFIER_VIRTUALKEY      0x4000
+#define KM_CORE_MODIFIER_VIRTUALCHARKEY  0x8000
 
 /**
  * Input key event data. The `character` member is derived from
  * a US English key event for vk + modifier_state, and is 0 if
  * the vk + modifier_state do not generate a character.
  *
- * Used only in event type KM_KBP_DEBUG_BEGIN.
+ * Used only in event type KM_CORE_DEBUG_BEGIN.
  */
 typedef struct {
   uint16_t vk;
@@ -61,7 +61,7 @@ typedef struct {
 /**
  * Option event data.
  *
- * Used only in event type KM_KBP_DEBUG_SET_OPTION.
+ * Used only in event type KM_CORE_DEBUG_SET_OPTION.
  */
 typedef struct {
   void *store;      // LPSTORE
@@ -76,7 +76,7 @@ typedef struct {
  * The context value here will be an intermediate value, and may differ
  * from event to event as the context can be rewritten for each rule match.
  *
- * Used in all event types except KM_KBP_DEBUG_BEGIN, KM_KBP_DEBUG_END.
+ * Used in all event types except KM_CORE_DEBUG_BEGIN, KM_CORE_DEBUG_END.
  */
 
 typedef struct {
@@ -106,30 +106,30 @@ typedef struct {
  * A single debug event.
  */
 enum km_core_debug_type {
-  KM_KBP_DEBUG_BEGIN = 0,
-  //KM_KBP_DEBUG_BEGIN_ANSI = 1, // not supported; instead rewrite ansi keyboards to Unicode with mcompile
-  KM_KBP_DEBUG_GROUP_ENTER = 2,
-  KM_KBP_DEBUG_GROUP_EXIT = 3,
-  KM_KBP_DEBUG_RULE_ENTER = 4,
-  KM_KBP_DEBUG_RULE_EXIT = 5,
-  KM_KBP_DEBUG_MATCH_ENTER = 6,
-  KM_KBP_DEBUG_MATCH_EXIT = 7,
-  KM_KBP_DEBUG_NOMATCH_ENTER = 8,
-  KM_KBP_DEBUG_NOMATCH_EXIT = 9,
-  KM_KBP_DEBUG_END = 10,
-  KM_KBP_DEBUG_SET_OPTION = 11,
+  KM_CORE_DEBUG_BEGIN = 0,
+  //KM_CORE_DEBUG_BEGIN_ANSI = 1, // not supported; instead rewrite ansi keyboards to Unicode with mcompile
+  KM_CORE_DEBUG_GROUP_ENTER = 2,
+  KM_CORE_DEBUG_GROUP_EXIT = 3,
+  KM_CORE_DEBUG_RULE_ENTER = 4,
+  KM_CORE_DEBUG_RULE_EXIT = 5,
+  KM_CORE_DEBUG_MATCH_ENTER = 6,
+  KM_CORE_DEBUG_MATCH_EXIT = 7,
+  KM_CORE_DEBUG_NOMATCH_ENTER = 8,
+  KM_CORE_DEBUG_NOMATCH_EXIT = 9,
+  KM_CORE_DEBUG_END = 10,
+  KM_CORE_DEBUG_SET_OPTION = 11,
 };
 
-// Flags for KM_KBP_DEBUG_GROUP_EXIT
-#define KM_KBP_DEBUG_FLAG_RECURSIVE_OVERFLOW  0x0001
-#define KM_KBP_DEBUG_FLAG_NOMATCH             0x0002
+// Flags for KM_CORE_DEBUG_GROUP_EXIT
+#define KM_CORE_DEBUG_FLAG_RECURSIVE_OVERFLOW  0x0001
+#define KM_CORE_DEBUG_FLAG_NOMATCH             0x0002
 
-// Flags for KM_KBP_DEBUG_BEGIN
+// Flags for KM_CORE_DEBUG_BEGIN
 // TODO: do we need this at all?
-#define KM_KBP_DEBUG_FLAG_UNICODE             0x0001  // Always set
+#define KM_CORE_DEBUG_FLAG_UNICODE             0x0001  // Always set
 
-// Flags for KM_KBP_DEBUG_END
-#define KM_KBP_DEBUG_FLAG_OUTPUTKEYSTROKE     0x0001
+// Flags for KM_CORE_DEBUG_END
+#define KM_CORE_DEBUG_FLAG_OUTPUTKEYSTROKE     0x0001
 
 /**
  * Enable or disable debug tracing
@@ -137,7 +137,7 @@ enum km_core_debug_type {
  * @param state     Pointer to initialized state
  * @param value     Set to 1 to enable debugging, 0 to disable
  *
- * @returns   KM_KBP_STATUS_OK on success
+ * @returns   KM_CORE_STATUS_OK on success
  */
 KMN_API
 km_core_status
@@ -162,7 +162,7 @@ km_core_state_debug_get(km_core_state const *state);
  *                  nullptr if not required.
  *
  * @returns   pointer to read only array of debug item events,
- *            with last entry guaranteed to be KM_KBP_DEBUG_END.
+ *            with last entry guaranteed to be KM_CORE_DEBUG_END.
  */
 KMN_API
 km_core_state_debug_item const *

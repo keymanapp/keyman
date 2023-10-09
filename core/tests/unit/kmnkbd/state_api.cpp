@@ -44,7 +44,7 @@ namespace
   km_core_option_item test_env_opts[] =
   {
     {u"hello",     u"world", 0},
-    KM_KBP_OPTIONS_END
+    KM_CORE_OPTIONS_END
   };
 
 constexpr char const *doc1_expected = u8"\
@@ -90,7 +90,7 @@ constexpr char const *doc2_expected = u8"\
 constexpr km_core_option_item const expected_persist_opt = {
   u"__test_point",
   u"F2 pressed test save.",
-  KM_KBP_OPT_KEYBOARD
+  KM_CORE_OPT_KEYBOARD
 };
 
 extern "C"
@@ -140,8 +140,8 @@ int main(int argc, char * argv[])
 
   // Overwrite some data.
   km_core_option_item new_opt[] = {
-    {u"hello", u"globe", KM_KBP_OPT_ENVIRONMENT},
-    KM_KBP_OPTIONS_END};
+    {u"hello", u"globe", KM_CORE_OPT_ENVIRONMENT},
+    KM_CORE_OPTIONS_END};
   try_status(km_core_state_options_update(test_clone, new_opt));
 
   // Test the engine
@@ -150,28 +150,28 @@ int main(int argc, char * argv[])
   DISABLE_WARNING_PUSH
   DISABLE_WARNING_TYPE_LIMITS
   // Check the lib supplies our required interface.
-  if (attrs->current - attrs->age > KM_KBP_LIB_CURRENT
-      || attrs->current < KM_KBP_LIB_CURRENT) return __LINE__;
+  if (attrs->current - attrs->age > KM_CORE_LIB_CURRENT
+      || attrs->current < KM_CORE_LIB_CURRENT) return __LINE__;
   if (attrs->max_context < 16) return __LINE__;
   DISABLE_WARNING_POP
 
-  try_status(km_core_process_event(test_state, KM_KBP_VKEY_S,
-                                  KM_KBP_MODIFIER_SHIFT, 1, KM_KBP_EVENT_FLAG_DEFAULT));
-  assert(action_items(test_state, {{KM_KBP_IT_CHAR, {0,}, {km_core_usv('S')}}, {KM_KBP_IT_END}}));
-  try_status(km_core_process_event(test_state, KM_KBP_VKEY_I,
-                                  KM_KBP_MODIFIER_SHIFT, 1, KM_KBP_EVENT_FLAG_DEFAULT));
-  assert(action_items(test_state, {{KM_KBP_IT_CHAR, {0,}, {km_core_usv('I')}}, {KM_KBP_IT_END}}));
-  try_status(km_core_process_event(test_state, KM_KBP_VKEY_L, 0, 1, KM_KBP_EVENT_FLAG_DEFAULT));
-  assert(action_items(test_state, {{KM_KBP_IT_CHAR, {0,}, {km_core_usv('l')}}, {KM_KBP_IT_END}}));
+  try_status(km_core_process_event(test_state, KM_CORE_VKEY_S,
+                                  KM_CORE_MODIFIER_SHIFT, 1, KM_CORE_EVENT_FLAG_DEFAULT));
+  assert(action_items(test_state, {{KM_CORE_IT_CHAR, {0,}, {km_core_usv('S')}}, {KM_CORE_IT_END}}));
+  try_status(km_core_process_event(test_state, KM_CORE_VKEY_I,
+                                  KM_CORE_MODIFIER_SHIFT, 1, KM_CORE_EVENT_FLAG_DEFAULT));
+  assert(action_items(test_state, {{KM_CORE_IT_CHAR, {0,}, {km_core_usv('I')}}, {KM_CORE_IT_END}}));
+  try_status(km_core_process_event(test_state, KM_CORE_VKEY_L, 0, 1, KM_CORE_EVENT_FLAG_DEFAULT));
+  assert(action_items(test_state, {{KM_CORE_IT_CHAR, {0,}, {km_core_usv('l')}}, {KM_CORE_IT_END}}));
 
-  try_status(km_core_process_event(test_state, KM_KBP_VKEY_BKSP, 0, 1, KM_KBP_EVENT_FLAG_DEFAULT));
-  assert(action_items(test_state, {{KM_KBP_IT_BACK, {0,}, {0}}, {KM_KBP_IT_END}}));
-  try_status(km_core_process_event(test_state, KM_KBP_VKEY_L,
-                                  KM_KBP_MODIFIER_SHIFT, 1, KM_KBP_EVENT_FLAG_DEFAULT));
-  assert(action_items(test_state, {{KM_KBP_IT_CHAR, {0,}, {km_core_usv('L')}}, {KM_KBP_IT_END}}));
-  try_status(km_core_process_event(test_state, KM_KBP_VKEY_F2, 0, 1, KM_KBP_EVENT_FLAG_DEFAULT));
-  assert(action_items(test_state, {{KM_KBP_IT_PERSIST_OPT, {0,},
-                      {uintptr_t(&expected_persist_opt)}}, {KM_KBP_IT_END}}));
+  try_status(km_core_process_event(test_state, KM_CORE_VKEY_BKSP, 0, 1, KM_CORE_EVENT_FLAG_DEFAULT));
+  assert(action_items(test_state, {{KM_CORE_IT_BACK, {0,}, {0}}, {KM_CORE_IT_END}}));
+  try_status(km_core_process_event(test_state, KM_CORE_VKEY_L,
+                                  KM_CORE_MODIFIER_SHIFT, 1, KM_CORE_EVENT_FLAG_DEFAULT));
+  assert(action_items(test_state, {{KM_CORE_IT_CHAR, {0,}, {km_core_usv('L')}}, {KM_CORE_IT_END}}));
+  try_status(km_core_process_event(test_state, KM_CORE_VKEY_F2, 0, 1, KM_CORE_EVENT_FLAG_DEFAULT));
+  assert(action_items(test_state, {{KM_CORE_IT_PERSIST_OPT, {0,},
+                      {uintptr_t(&expected_persist_opt)}}, {KM_CORE_IT_END}}));
 
   // Test debug dump
   auto doc1 = get_json_doc(*test_state),

@@ -60,10 +60,10 @@ namespace
 
   constexpr km_core_attr const engine_attrs = {
     256,
-    KM_KBP_LIB_CURRENT,
-    KM_KBP_LIB_AGE,
-    KM_KBP_LIB_REVISION,
-    KM_KBP_TECH_MOCK,
+    KM_CORE_LIB_CURRENT,
+    KM_CORE_LIB_AGE,
+    KM_CORE_LIB_REVISION,
+    KM_CORE_TECH_MOCK,
     "SIL International"
   };
 
@@ -75,7 +75,7 @@ namespace km {
     mock_processor::mock_processor(kbp::path const & path)
     : abstract_processor(
         keyboard_attributes(path.stem(), u"3.145", path.parent(), {
-          option{KM_KBP_OPT_KEYBOARD, u"__test_point", u"not tiggered"},
+          option{KM_CORE_OPT_KEYBOARD, u"__test_point", u"not tiggered"},
         })),
       _options({
           {u"\x01__test_point", u"not tiggered"},
@@ -113,9 +113,9 @@ namespace km {
     ) {
       assert(state);
       if (!state)
-        return KM_KBP_STATUS_INVALID_ARGUMENT;
+        return KM_CORE_STATUS_INVALID_ARGUMENT;
       // TODO Implement
-      return KM_KBP_STATUS_OK;
+      return KM_CORE_STATUS_OK;
     }
 
     bool mock_processor::queue_action(
@@ -140,11 +140,11 @@ namespace km {
     ) {
       assert(state);
       if (!state)
-        return KM_KBP_STATUS_INVALID_ARGUMENT;
+        return KM_CORE_STATUS_INVALID_ARGUMENT;
 
       if (!is_key_down) {
         // TODO: Implement caps lock handling
-        return KM_KBP_STATUS_OK;
+        return KM_CORE_STATUS_OK;
       }
 
       try {
@@ -153,28 +153,28 @@ namespace km {
 
         switch (vk)
         {
-        case KM_KBP_VKEY_BKSP:
+        case KM_CORE_VKEY_BKSP:
           state->context().pop_back();
-          state->actions().push_backspace(KM_KBP_BT_UNKNOWN); // Assuming we don't know the character
+          state->actions().push_backspace(KM_CORE_BT_UNKNOWN); // Assuming we don't know the character
           break;
 
-        case KM_KBP_VKEY_F2:
+        case KM_CORE_VKEY_F2:
         {
           state->actions().push_persist(
-            update_option(KM_KBP_OPT_KEYBOARD,
+            update_option(KM_CORE_OPT_KEYBOARD,
                         u"__test_point",
                         u"F2 pressed test save."));
           break;
         }
 
-        case KM_KBP_VKEY_F4:
-          state->context().push_marker(KM_KBP_VKEY_QUOTE);
-          state->actions().push_marker(KM_KBP_VKEY_QUOTE);
+        case KM_CORE_VKEY_F4:
+          state->context().push_marker(KM_CORE_VKEY_QUOTE);
+          state->actions().push_marker(KM_CORE_VKEY_QUOTE);
           break;
 
         default:
         {
-          auto shift_state = bool(modifier_state & KM_KBP_MODIFIER_SHIFT);
+          auto shift_state = bool(modifier_state & KM_CORE_MODIFIER_SHIFT);
           // Only process further one of the shift states has something to output.
           if (table[0][vk][0] || table[1][vk][0])
           {
@@ -188,7 +188,7 @@ namespace km {
             }
             state->actions().commit();
 
-            return KM_KBP_STATUS_OK;
+            return KM_CORE_STATUS_OK;
           }
 
           // Both shift states output nothing, generate an alert.
@@ -200,10 +200,10 @@ namespace km {
         state->actions().commit();
       } catch (std::bad_alloc &) {
         state->actions().clear();
-        return KM_KBP_STATUS_NO_MEM;
+        return KM_CORE_STATUS_NO_MEM;
       }
 
-      return KM_KBP_STATUS_OK;
+      return KM_CORE_STATUS_OK;
     }
 
     km_core_attr const & mock_processor::attributes() const {
@@ -211,22 +211,22 @@ namespace km {
     }
 
     km_core_keyboard_key  * mock_processor::get_key_list() const {
-      km_core_keyboard_key* key_list = new km_core_keyboard_key(KM_KBP_KEYBOARD_KEY_LIST_END);
+      km_core_keyboard_key* key_list = new km_core_keyboard_key(KM_CORE_KEYBOARD_KEY_LIST_END);
       return key_list;
     }
 
     km_core_keyboard_imx  * mock_processor::get_imx_list() const {
-      km_core_keyboard_imx* imx_list = new km_core_keyboard_imx(KM_KBP_KEYBOARD_IMX_END);
+      km_core_keyboard_imx* imx_list = new km_core_keyboard_imx(KM_CORE_KEYBOARD_IMX_END);
       return imx_list;
     }
 
     km_core_context_item * mock_processor::get_intermediate_context() {
-      km_core_context_item *citems = new km_core_context_item(KM_KBP_CONTEXT_ITEM_END);
+      km_core_context_item *citems = new km_core_context_item(KM_CORE_CONTEXT_ITEM_END);
       return citems;
     }
 
-    km_core_status mock_processor::validate() const { return KM_KBP_STATUS_OK; }
+    km_core_status mock_processor::validate() const { return KM_CORE_STATUS_OK; }
 
-    km_core_status null_processor::validate() const { return KM_KBP_STATUS_INVALID_ARGUMENT; }
+    km_core_status null_processor::validate() const { return KM_CORE_STATUS_INVALID_ARGUMENT; }
   } // namespace kbp
 } // namespace km

@@ -62,29 +62,29 @@ actions::actions(Args&&... args)
 
 inline
 void actions::push_character(km_core_usv usv) {
-  assert(empty() || (!empty() && back().type != KM_KBP_IT_END));
-  emplace_back(km_core_action_item{ KM_KBP_IT_CHAR, {0,}, {usv} });
+  assert(empty() || (!empty() && back().type != KM_CORE_IT_END));
+  emplace_back(km_core_action_item{ KM_CORE_IT_CHAR, {0,}, {usv} });
 }
 
 
 inline
 void actions::push_marker(uintptr_t marker) {
-  assert(empty() || (!empty() && back().type != KM_KBP_IT_END));
-  emplace_back(km_core_action_item {KM_KBP_IT_MARKER, {0,}, {marker}});
+  assert(empty() || (!empty() && back().type != KM_CORE_IT_END));
+  emplace_back(km_core_action_item {KM_CORE_IT_MARKER, {0,}, {marker}});
 }
 
 
 inline
 void actions::push_alert() {
-  assert(empty() || (!empty() && back().type != KM_KBP_IT_END));
-  emplace_back(km_core_action_item {KM_KBP_IT_ALERT, {0,}, {0}});
+  assert(empty() || (!empty() && back().type != KM_CORE_IT_END));
+  emplace_back(km_core_action_item {KM_CORE_IT_ALERT, {0,}, {0}});
 }
 
 
 inline
 void actions::push_backspace(km_core_backspace_type expected_type, uintptr_t expected_value) {
-  assert(empty() || (!empty() && back().type != KM_KBP_IT_END));
-  km_core_action_item item = {KM_KBP_IT_BACK, {}, {}};
+  assert(empty() || (!empty() && back().type != KM_CORE_IT_END));
+  km_core_action_item item = {KM_CORE_IT_BACK, {}, {}};
   item.backspace.expected_type = expected_type;
   item.backspace.expected_value = expected_value;
   emplace_back(item);
@@ -93,21 +93,21 @@ void actions::push_backspace(km_core_backspace_type expected_type, uintptr_t exp
 
 inline
 void actions::push_emit_keystroke(km_core_virtual_key vk) {
-  assert(empty() || (!empty() && back().type != KM_KBP_IT_END));
-  emplace_back(km_core_action_item {KM_KBP_IT_EMIT_KEYSTROKE, {0,}, {vk}});
+  assert(empty() || (!empty() && back().type != KM_CORE_IT_END));
+  emplace_back(km_core_action_item {KM_CORE_IT_EMIT_KEYSTROKE, {0,}, {vk}});
 }
 
 inline
 void actions::push_invalidate_context() {
-  assert(empty() || (!empty() && back().type != KM_KBP_IT_END));
-  emplace_back(km_core_action_item {KM_KBP_IT_INVALIDATE_CONTEXT, {0,}, {0}});
+  assert(empty() || (!empty() && back().type != KM_CORE_IT_END));
+  emplace_back(km_core_action_item {KM_CORE_IT_INVALIDATE_CONTEXT, {0,}, {0}});
 }
 
 
 inline
 void actions::commit() {
-  assert(empty() || (!empty() && back().type != KM_KBP_IT_END));
-  emplace_back(km_core_action_item {KM_KBP_IT_END, {0,}, {0}});
+  assert(empty() || (!empty() && back().type != KM_CORE_IT_END));
+  emplace_back(km_core_action_item {KM_CORE_IT_END, {0,}, {0}});
 }
 
 

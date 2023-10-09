@@ -101,18 +101,18 @@ Process_Event_Core(PKEYMAN64THREADDATA _td) {
   PWSTR contextBuf = _td->app->ContextBufMax(MAXCONTEXT);
   km_core_context_item *citems = nullptr;
   ContextItemsFromAppContext(contextBuf, &citems);
-  if (KM_KBP_STATUS_OK != km_core_context_set(km_core_state_context(_td->lpActiveKeyboard->lpCoreKeyboardState), citems)) {
+  if (KM_CORE_STATUS_OK != km_core_context_set(km_core_state_context(_td->lpActiveKeyboard->lpCoreKeyboardState), citems)) {
     km_core_context_items_dispose(citems);
     return FALSE;
   }
   km_core_context_items_dispose(citems);
   SendDebugMessageFormat(
       0, sdmGlobal, 0, "ProcessEvent: vkey[%d] ShiftState[%d] isDown[%d]", _td->state.vkey,
-      static_cast<uint16_t>(Globals::get_ShiftState() & (KM_KBP_MODIFIER_MASK_ALL | KM_KBP_MODIFIER_MASK_CAPS)), (uint8_t)_td->state.isDown);
+      static_cast<uint16_t>(Globals::get_ShiftState() & (KM_CORE_MODIFIER_MASK_ALL | KM_CORE_MODIFIER_MASK_CAPS)), (uint8_t)_td->state.isDown);
   //  Mask the bits supported according to `km_core_modifier_state` enum, update the mask if this enum is expanded.
-  if (KM_KBP_STATUS_OK != km_core_process_event(
+  if (KM_CORE_STATUS_OK != km_core_process_event(
     _td->lpActiveKeyboard->lpCoreKeyboardState, _td->state.vkey,
-    static_cast<uint16_t>(Globals::get_ShiftState() & (KM_KBP_MODIFIER_MASK_ALL | KM_KBP_MODIFIER_MASK_CAPS)), (uint8_t)_td->state.isDown, KM_KBP_EVENT_FLAG_DEFAULT)) {
+    static_cast<uint16_t>(Globals::get_ShiftState() & (KM_CORE_MODIFIER_MASK_ALL | KM_CORE_MODIFIER_MASK_CAPS)), (uint8_t)_td->state.isDown, KM_CORE_EVENT_FLAG_DEFAULT)) {
     SendDebugMessageFormat(0, sdmGlobal, 0, "ProcessEvent CoreProcessEvent Result:False %d ", FALSE);
     return FALSE;
   }

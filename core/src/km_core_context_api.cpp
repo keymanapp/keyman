@@ -25,7 +25,7 @@ namespace {
                       km_core_context_item **out_ptr)
   {
     assert(text); assert(out_ptr);
-    if (!text || !out_ptr)  return KM_KBP_STATUS_INVALID_ARGUMENT;
+    if (!text || !out_ptr)  return KM_CORE_STATUS_INVALID_ARGUMENT;
 
     *out_ptr = nullptr;
     try
@@ -34,21 +34,21 @@ namespace {
 
       for (auto i = typename U::const_iterator(text); *i; ++i)
       {
-        if(i.error())   return KM_KBP_STATUS_INVALID_UTF;
-        res.emplace_back(km_core_context_item {KM_KBP_CT_CHAR, {0,}, {*i}});
+        if(i.error())   return KM_CORE_STATUS_INVALID_UTF;
+        res.emplace_back(km_core_context_item {KM_CORE_CT_CHAR, {0,}, {*i}});
       }
       // Terminate the context_items array.
-      res.emplace_back(km_core_context_item KM_KBP_CONTEXT_ITEM_END);
+      res.emplace_back(km_core_context_item KM_CORE_CONTEXT_ITEM_END);
 
       *out_ptr = new km_core_context_item[res.size()];
       std::move(res.begin(), res.end(), *out_ptr);
     }
     catch (std::bad_alloc &)
     {
-      return KM_KBP_STATUS_NO_MEM;
+      return KM_CORE_STATUS_NO_MEM;
     }
 
-    return KM_KBP_STATUS_OK;
+    return KM_CORE_STATUS_OK;
   }
 
   template<class U>
@@ -57,7 +57,7 @@ namespace {
                                   size_t * sz_ptr)
   {
     assert(ci); assert(sz_ptr);
-    if (!ci || !sz_ptr)   return KM_KBP_STATUS_INVALID_ARGUMENT;
+    if (!ci || !sz_ptr)   return KM_CORE_STATUS_INVALID_ARGUMENT;
     auto const buf_size = *sz_ptr;
 
     if (buf && buf_size > 0)
@@ -65,9 +65,9 @@ namespace {
       auto i = typename U::iterator(buf);
       auto const e = decltype(i)(buf + buf_size - 1);
 
-      for (;i != e && ci->type != KM_KBP_CT_END && !i.error(); ++ci)
+      for (;i != e && ci->type != KM_CORE_CT_END && !i.error(); ++ci)
       {
-        if (ci->type == KM_KBP_CT_CHAR)
+        if (ci->type == KM_CORE_CT_CHAR)
         {
           *i = ci->character; ++i;
         }
@@ -77,13 +77,13 @@ namespace {
       *sz_ptr = buf_size - (e - i);
 
       // Skip over any final markers - they are execluded from context
-      while(ci->type == KM_KBP_CT_MARKER) {
+      while(ci->type == KM_CORE_CT_MARKER) {
         ci++;
       }
 
-      return ci->type == KM_KBP_CT_END
-              ? KM_KBP_STATUS_OK
-              : KM_KBP_STATUS_INSUFFICENT_BUFFER;
+      return ci->type == KM_CORE_CT_END
+              ? KM_CORE_STATUS_OK
+              : KM_CORE_STATUS_INSUFFICENT_BUFFER;
     }
     else
     {
@@ -92,17 +92,17 @@ namespace {
 
       do
       {
-        if (ci->type == KM_KBP_CT_CHAR)
+        if (ci->type == KM_CORE_CT_CHAR)
         {
           int8_t l = 4;
           U::codec::put(cps, ci->character, l);
           n += l;
         }
       }
-      while(ci++->type != KM_KBP_CT_END);
+      while(ci++->type != KM_CORE_CT_END);
 
       *sz_ptr = n+1;
-      return KM_KBP_STATUS_OK;
+      return KM_CORE_STATUS_OK;
     }
   }
 }
@@ -158,7 +158,7 @@ km_core_status km_core_context_get(km_core_context const *ctxt,
                                  km_core_context_item **out_ptr)
 {
   assert(ctxt); assert(out_ptr);
-  if (!ctxt || !out_ptr)   return KM_KBP_STATUS_INVALID_ARGUMENT;
+  if (!ctxt || !out_ptr)   return KM_CORE_STATUS_INVALID_ARGUMENT;
 
   try
   {
@@ -166,12 +166,12 @@ km_core_status km_core_context_get(km_core_context const *ctxt,
   }
   catch (std::bad_alloc &)
   {
-    return KM_KBP_STATUS_NO_MEM;
+    return KM_CORE_STATUS_NO_MEM;
   }
   std::copy(ctxt->begin(), ctxt->end(), *out_ptr);
-  (*out_ptr)[ctxt->size()].type = KM_KBP_CT_END;
+  (*out_ptr)[ctxt->size()].type = KM_CORE_CT_END;
 
-  return KM_KBP_STATUS_OK;
+  return KM_CORE_STATUS_OK;
 }
 
 
@@ -196,19 +196,19 @@ km_core_status km_core_context_append(km_core_context *ctxt,
                                     km_core_context_item const *ci)
 {
   assert(ctxt); assert(ci);
-  if (!ctxt || !ci)   return KM_KBP_STATUS_INVALID_ARGUMENT;
+  if (!ctxt || !ci)   return KM_CORE_STATUS_INVALID_ARGUMENT;
 
   try
   {
-    for (;ci->type != KM_KBP_CT_END; ++ci)
+    for (;ci->type != KM_CORE_CT_END; ++ci)
     {
       ctxt->emplace_back(*ci);
     }
   } catch (std::bad_alloc &) {
-    return KM_KBP_STATUS_NO_MEM;
+    return KM_CORE_STATUS_NO_MEM;
   }
 
-  return KM_KBP_STATUS_OK;
+  return KM_CORE_STATUS_OK;
 }
 
 
@@ -216,7 +216,7 @@ km_core_status km_core_context_shrink(km_core_context *ctxt, size_t num,
                            km_core_context_item const * ci)
 {
   assert(ctxt);
-  if (!ctxt)   return KM_KBP_STATUS_INVALID_ARGUMENT;
+  if (!ctxt)   return KM_CORE_STATUS_INVALID_ARGUMENT;
 
   try
   {
@@ -225,17 +225,17 @@ km_core_status km_core_context_shrink(km_core_context *ctxt, size_t num,
     if (ci)
     {
       auto const ip = ctxt->begin();
-      while(num-- && ci->type != KM_KBP_CT_END)
+      while(num-- && ci->type != KM_CORE_CT_END)
       {
         ctxt->emplace(ip, *ci);
         ci++;
       }
     }
   } catch (std::bad_alloc &) {
-    return KM_KBP_STATUS_NO_MEM;
+    return KM_CORE_STATUS_NO_MEM;
   }
 
-  return KM_KBP_STATUS_OK;
+  return KM_CORE_STATUS_OK;
 }
 
 size_t
@@ -265,11 +265,11 @@ json & operator << (json & j, km_core_context_item const & i)
 
   switch (i.type)
   {
-    case KM_KBP_CT_CHAR:
+    case KM_CORE_CT_CHAR:
       utf8::codec::put(cps, i.character, l);
       j << json::string(&cps[0]);
       break;
-    case KM_KBP_CT_MARKER:
+    case KM_CORE_CT_MARKER:
       j << json::integer_u(i.marker);
       break;
     default:

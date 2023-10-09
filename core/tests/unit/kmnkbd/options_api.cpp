@@ -13,7 +13,7 @@
 #include "state.hpp"
 
 #define   try_status(expr) \
-{auto __s = (expr); if (__s != KM_KBP_STATUS_OK) std::exit(100*__LINE__+__s);}
+{auto __s = (expr); if (__s != KM_CORE_STATUS_OK) std::exit(100*__LINE__+__s);}
 
 namespace
 {
@@ -22,42 +22,42 @@ namespace
   {
     {u"isdummy",   u"yes", 0},
     {u"testing",   u"maybe", 0},
-    KM_KBP_OPTIONS_END
+    KM_CORE_OPTIONS_END
   };
 
   km_core_option_item const test_kb[] =
   {
     {u"hello",     u"world", 0},
-    KM_KBP_OPTIONS_END
+    KM_CORE_OPTIONS_END
   };
 
   km_core_option_item test_opts[] =
   {
-    {u"isdummy",   u"no", KM_KBP_OPT_ENVIRONMENT},
-    {u"hello",     u"globe", KM_KBP_OPT_KEYBOARD},
-    KM_KBP_OPTIONS_END
+    {u"isdummy",   u"no", KM_CORE_OPT_ENVIRONMENT},
+    {u"hello",     u"globe", KM_CORE_OPT_KEYBOARD},
+    KM_CORE_OPTIONS_END
   };
 
   km_core_option_item bad_key_opts[] =
   {
-    {u"isdumber",   u"yes!", KM_KBP_OPT_ENVIRONMENT},
-    KM_KBP_OPTIONS_END
+    {u"isdumber",   u"yes!", KM_CORE_OPT_ENVIRONMENT},
+    KM_CORE_OPTIONS_END
   };
 
   km_core_option_item bad_scope_opts[] =
   {
-    {u"hello",   u"!", KM_KBP_OPT_UNKNOWN},
-    KM_KBP_OPTIONS_END
+    {u"hello",   u"!", KM_CORE_OPT_UNKNOWN},
+    KM_CORE_OPTIONS_END
   };
 #endif
-  km_core_option_item const empty_options_list[] = {KM_KBP_OPTIONS_END};
+  km_core_option_item const empty_options_list[] = {KM_CORE_OPTIONS_END};
 
   km_core_option_item const api_mock_options[] =
   {
-    {u"hello",   u"world", KM_KBP_OPT_KEYBOARD},
-    {u"isdummy",     u"yes", KM_KBP_OPT_ENVIRONMENT},
-    {u"testing",     u"maybe", KM_KBP_OPT_ENVIRONMENT},
-    KM_KBP_OPTIONS_END
+    {u"hello",   u"world", KM_CORE_OPT_KEYBOARD},
+    {u"isdummy",     u"yes", KM_CORE_OPT_ENVIRONMENT},
+    {u"testing",     u"maybe", KM_CORE_OPT_ENVIRONMENT},
+    KM_CORE_OPTIONS_END
   };
 
 #if 0
@@ -83,7 +83,7 @@ namespace
     auto s = km_core_state_option_lookup(api_mock_options, scope,
                                          key.c_str(),
                                          &ret);
-    bool v = s == KM_KBP_STATUS_OK && ret == value;
+    bool v = s == KM_CORE_STATUS_OK && ret == value;
     return v;
   }
 
@@ -131,25 +131,25 @@ int main(int, char * [])
 #if 0
   km_core_cp const *value;
   auto s = km_core_options_lookup(api_empty_options,
-                                     KM_KBP_OPT_ENVIRONMENT,
+                                     KM_CORE_OPT_ENVIRONMENT,
                                      u"isdummy", &value);
-  if (s != KM_KBP_STATUS_KEY_ERROR) return __LINE__;
+  if (s != KM_CORE_STATUS_KEY_ERROR) return __LINE__;
   if (get_json_doc(api_empty_options) != empty_json) return __LINE__;
 
   // Lets update data.
-  assert_lookup_equals(u"isdummy", u"yes", KM_KBP_OPT_ENVIRONMENT);
-  assert_lookup_equals(u"hello", u"world", KM_KBP_OPT_KEYBOARD);
+  assert_lookup_equals(u"isdummy", u"yes", KM_CORE_OPT_ENVIRONMENT);
+  assert_lookup_equals(u"hello", u"world", KM_CORE_OPT_KEYBOARD);
   try_status(km_core_options_update(api_mock_options, test_opts));
-  assert_lookup_equals(u"isdummy", u"no", KM_KBP_OPT_ENVIRONMENT);
-  assert_lookup_equals(u"hello", u"globe", KM_KBP_OPT_KEYBOARD);
+  assert_lookup_equals(u"isdummy", u"no", KM_CORE_OPT_ENVIRONMENT);
+  assert_lookup_equals(u"hello", u"globe", KM_CORE_OPT_KEYBOARD);
 
   // Test writing of non-exitent keys
   if (km_core_options_update(api_mock_options, bad_key_opts)
-      != KM_KBP_STATUS_KEY_ERROR)
+      != KM_CORE_STATUS_KEY_ERROR)
     return __LINE__;
 
   if (km_core_options_update(api_mock_options, bad_scope_opts)
-      != KM_KBP_STATUS_INVALID_ARGUMENT)
+      != KM_CORE_STATUS_INVALID_ARGUMENT)
     return __LINE__;
 
   // Create a single entry options set for testing fuller json output.

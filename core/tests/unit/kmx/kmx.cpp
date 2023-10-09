@@ -36,7 +36,7 @@ bool g_beep_found = false;
 
 km_core_option_item test_env_opts[] =
 {
-  KM_KBP_OPTIONS_END
+  KM_CORE_OPTIONS_END
 };
 
 std::string
@@ -65,16 +65,16 @@ apply_action(
     km::tests::kmx_options &options,
     km::tests::KmxTestSource &test_source) {
   switch (act.type) {
-  case KM_KBP_IT_END:
+  case KM_CORE_IT_END:
     assert(false);
     break;
-  case KM_KBP_IT_ALERT:
+  case KM_CORE_IT_ALERT:
     g_beep_found = true;
     // std::cout << "beep" << std::endl;
     break;
-  case KM_KBP_IT_CHAR:
+  case KM_CORE_IT_CHAR:
     context.push_back(km_core_context_item{
-        KM_KBP_CT_CHAR,
+        KM_CORE_CT_CHAR,
         {
             0,
         },
@@ -88,25 +88,25 @@ apply_action(
     }
     // std::cout << "char(" << act.character << ") size=" << cp->size() << std::endl;
     break;
-  case KM_KBP_IT_MARKER:
+  case KM_CORE_IT_MARKER:
     // std::cout << "deadkey(" << act.marker << ")" << std::endl;
     context.push_back(km_core_context_item{
-        KM_KBP_CT_MARKER,
+        KM_CORE_CT_MARKER,
         {
             0,
         },
         {(uint32_t)act.marker}});
     break;
-  case KM_KBP_IT_BACK:
+  case KM_CORE_IT_BACK:
     // It is valid for a backspace to be received with an empty text store
     // as the user can press backspace with no text in the store and Keyman
     // will pass that back to the client, as the client may do additional
     // processing at start of a text store, e.g. delete from a previous cell
     // in a table. Or, if Keyman has a cached context, then there may be
     // additional text in the text store that Keyman can't see.
-    if (act.backspace.expected_type == KM_KBP_BT_MARKER) {
+    if (act.backspace.expected_type == KM_CORE_BT_MARKER) {
       assert(!context.empty());
-      assert(context.back().type == KM_KBP_CT_MARKER);
+      assert(context.back().type == KM_CORE_CT_MARKER);
       context.pop_back();
     } else if (text_store.length() > 0) {
       assert(!context.empty() && !text_store.empty());
@@ -123,12 +123,12 @@ apply_action(
       }
       assert(ch == act.backspace.expected_value);
 
-      assert(context.back().type == KM_KBP_CT_CHAR);
+      assert(context.back().type == KM_CORE_CT_CHAR);
       assert(context.back().character == ch);
       context.pop_back();
     }
     break;
-  case KM_KBP_IT_PERSIST_OPT: {
+  case KM_CORE_IT_PERSIST_OPT: {
     bool found = false;
     for (auto it = options.begin(); it != options.end(); it++) {
       if (it->type == km::tests::KOT_SAVED) {
@@ -139,20 +139,20 @@ apply_action(
         }
       }
     }
-    std::cout << "action: option " << (act.option->scope == KM_KBP_OPT_ENVIRONMENT ? "environment " : "keyboard ")
+    std::cout << "action: option " << (act.option->scope == KM_CORE_OPT_ENVIRONMENT ? "environment " : "keyboard ")
               << act.option->key << "=" << act.option->value << " persistence requested" << std::endl;
     if (!found) {
       std::cout << "option " << act.option->key
                 << " saved but no expected output found. Suggestion: update test to include saved option value." << std::endl;
     }
   } break;
-  case KM_KBP_IT_INVALIDATE_CONTEXT:
+  case KM_CORE_IT_INVALIDATE_CONTEXT:
     std::cout << "action: context invalidated (markers cleared)" << std::endl;
     break;
-  case KM_KBP_IT_EMIT_KEYSTROKE:
+  case KM_CORE_IT_EMIT_KEYSTROKE:
     std::cout << "action: emit keystroke" << std::endl;
     break;
-  case KM_KBP_IT_CAPSLOCK:
+  case KM_CORE_IT_CAPSLOCK:
     std::cout << "action: capsLock " << act.capsLock << std::endl;
     test_source.set_caps_lock_on(act.capsLock);
     break;
@@ -200,7 +200,7 @@ run_test(const km::kbp::path &source, const km::kbp::path &compiled) {
 
   // Make a copy of the setup context for the test
   std::vector<km_core_context_item> test_context;
-  for(km_core_context_item *ci = citems; ci->type != KM_KBP_CT_END; ci++) {
+  for(km_core_context_item *ci = citems; ci->type != KM_CORE_CT_END; ci++) {
     test_context.emplace_back(*ci);
   }
 
@@ -215,14 +215,14 @@ run_test(const km::kbp::path &source, const km::kbp::path &compiled) {
     // we mimic that in the tests. We assume caps lock state is
     // updated on key_down before the processor receives the
     // event.
-    if (p.vk == KM_KBP_VKEY_CAPS) {
+    if (p.vk == KM_CORE_VKEY_CAPS) {
       test_source.toggle_caps_lock_state();
     }
 
     for (auto key_down = 1; key_down >= 0; key_down--) {
-      try_status(km_core_process_event(test_state, p.vk, p.modifier_state | test_source.caps_lock_state(), key_down, KM_KBP_EVENT_FLAG_DEFAULT));
+      try_status(km_core_process_event(test_state, p.vk, p.modifier_state | test_source.caps_lock_state(), key_down, KM_CORE_EVENT_FLAG_DEFAULT));
 
-      for (auto act = km_core_state_action_items(test_state, nullptr); act->type != KM_KBP_IT_END; act++) {
+      for (auto act = km_core_state_action_items(test_state, nullptr); act->type != KM_CORE_IT_END; act++) {
         apply_action(test_state, *act, text_store, test_context, options, test_source);
       }
     }
@@ -237,8 +237,8 @@ run_test(const km::kbp::path &source, const km::kbp::path &compiled) {
     // Verify that both our local test_context and the core's test_state.context have
     // not diverged
     auto ci = citems;
-    for(auto test_ci = test_context.begin(); ci->type != KM_KBP_CT_END || test_ci != test_context.end(); ci++, test_ci++) {
-      assert(ci->type != KM_KBP_CT_END && test_ci != test_context.end()); // Verify that both lists are same length
+    for(auto test_ci = test_context.begin(); ci->type != KM_CORE_CT_END || test_ci != test_context.end(); ci++, test_ci++) {
+      assert(ci->type != KM_CORE_CT_END && test_ci != test_context.end()); // Verify that both lists are same length
       assert(test_ci->type == ci->type && test_ci->marker == ci->marker);
     }
 
@@ -265,8 +265,8 @@ run_test(const km::kbp::path &source, const km::kbp::path &compiled) {
   // Verify that both our local test_context and the core's test_state.context have
   // not diverged
   auto ci = citems;
-  for(auto test_ci = test_context.begin(); ci->type != KM_KBP_CT_END || test_ci != test_context.end(); ci++, test_ci++) {
-    assert(ci->type != KM_KBP_CT_END && test_ci != test_context.end()); // Verify that both lists are same length
+  for(auto test_ci = test_context.begin(); ci->type != KM_CORE_CT_END || test_ci != test_context.end(); ci++, test_ci++) {
+    assert(ci->type != KM_CORE_CT_END && test_ci != test_context.end()); // Verify that both lists are same length
     assert(test_ci->type == ci->type && test_ci->marker == ci->marker);
   }
 
@@ -287,7 +287,7 @@ run_test(const km::kbp::path &source, const km::kbp::path &compiled) {
     if (it->type == km::tests::KOT_OUTPUT) {
       std::cout << "output option-key: " << it->key << " expected: " << it->value;
       km_core_cp const *value;
-      try_status(km_core_state_option_lookup(test_state, KM_KBP_OPT_KEYBOARD, it->key.c_str(), &value));
+      try_status(km_core_state_option_lookup(test_state, KM_CORE_OPT_KEYBOARD, it->key.c_str(), &value));
       std::cout << " actual: " << value << std::endl;
       if (it->value.compare(value) != 0) return __LINE__;
     } else if (it->type == km::tests::KOT_SAVED) {

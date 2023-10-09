@@ -22,7 +22,7 @@ namespace kbp
 {
   struct option : public km_core_option_item
   {
-    option(): km_core_option_item KM_KBP_OPTIONS_END {}
+    option(): km_core_option_item KM_CORE_OPTIONS_END {}
     option(option const &);
     option(option &&);
     option(km_core_option_scope, char16_t const *, char16_t const *);

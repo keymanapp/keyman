@@ -97,29 +97,29 @@ static km_core_action_item*
 kmnToCoreActionItem(int ItemType, DWORD dwData, WORD wVkey) {
 
   km_core_action_item *actionItems = new km_core_action_item[2];
-  actionItems[0].type             = KM_KBP_IT_END;
-  actionItems[1].type             = KM_KBP_IT_END;
+  actionItems[0].type             = KM_CORE_IT_END;
+  actionItems[1].type             = KM_CORE_IT_END;
   switch (ItemType) {
   case QIT_CHAR:
-    actionItems[0].type = KM_KBP_IT_CHAR;
+    actionItems[0].type = KM_CORE_IT_CHAR;
     actionItems[0].character = dwData;
     break;
   case QIT_DEADKEY:
-    actionItems[0].type = KM_KBP_IT_MARKER;
+    actionItems[0].type = KM_CORE_IT_MARKER;
     actionItems[0].marker = dwData;
     break;
   case QIT_BELL:
-    actionItems[0].type   = KM_KBP_IT_ALERT;
+    actionItems[0].type   = KM_CORE_IT_ALERT;
     break;
   case QIT_BACK:
     switch (dwData) {
     case BK_DEFAULT:
-      actionItems[0].type      = KM_KBP_IT_BACK;
-      actionItems[0].backspace.expected_type = KM_KBP_BT_CHAR;
+      actionItems[0].type      = KM_CORE_IT_BACK;
+      actionItems[0].backspace.expected_type = KM_CORE_BT_CHAR;
       break;
     case BK_DEADKEY:
-      actionItems[0].type                    = KM_KBP_IT_BACK;
-      actionItems[0].backspace.expected_type = KM_KBP_BT_MARKER;
+      actionItems[0].type                    = KM_CORE_IT_BACK;
+      actionItems[0].backspace.expected_type = KM_CORE_BT_MARKER;
       break;
     }
     break;
@@ -127,7 +127,7 @@ kmnToCoreActionItem(int ItemType, DWORD dwData, WORD wVkey) {
   case QIT_VKEYUP:
     if (dwData == wVkey) {
       SendDebugMessageFormat(0, sdmKeyboard, 0, "kmnToCoreActionItem: Emit Action:[%s] Key:[%x] ", ItemTypes[ItemType], dwData);
-      actionItems[0].type      = KM_KBP_IT_EMIT_KEYSTROKE;
+      actionItems[0].type      = KM_CORE_IT_EMIT_KEYSTROKE;
       actionItems[0].character = dwData;
     } else{
       SendDebugMessageFormat(
@@ -138,7 +138,7 @@ kmnToCoreActionItem(int ItemType, DWORD dwData, WORD wVkey) {
     SendDebugMessageFormat(0, sdmKeyboard, 0, "kmnToCoreActionItem: Unhandled Action: [%s] [%x] ", ItemTypes[ItemType], dwData);
     break;      ;
    case QIT_INVALIDATECONTEXT:
-     actionItems[0].type = KM_KBP_IT_INVALIDATE_CONTEXT;
+     actionItems[0].type = KM_CORE_IT_INVALIDATE_CONTEXT;
     break;
   }
 
@@ -169,9 +169,9 @@ LogContext(km_core_state *lpCoreKeyboardState, uint8_t context_type) {
     log_str_title = core_context;
     break;
   default:
-    error_status = KM_KBP_STATUS_INVALID_ARGUMENT;
+    error_status = KM_CORE_STATUS_INVALID_ARGUMENT;
   }
-  if (error_status != KM_KBP_STATUS_OK){
+  if (error_status != KM_CORE_STATUS_OK){
     km_core_context_items_dispose(citems);
     return FALSE;
   }
@@ -318,7 +318,7 @@ extern "C" BOOL _declspec(dllexport) WINAPI KMSetOutput(PWSTR buf, DWORD backlen
   // correctly. To do this need to check the context as we process the
   // backspaces.
   km_core_context_item *citems = nullptr;
-  if (KM_KBP_STATUS_OK != kbp_state_get_intermediate_context(_td->lpActiveKeyboard->lpCoreKeyboardState, &citems)) {
+  if (KM_CORE_STATUS_OK != kbp_state_get_intermediate_context(_td->lpActiveKeyboard->lpCoreKeyboardState, &citems)) {
     delete[] actionItems;
     return FALSE;
   }
@@ -337,7 +337,7 @@ extern "C" BOOL _declspec(dllexport) WINAPI KMSetOutput(PWSTR buf, DWORD backlen
   delete[] contextString;
 
   while (backlen-- > 0) {
-    actionItems[idx].type = KM_KBP_IT_BACK;
+    actionItems[idx].type = KM_CORE_IT_BACK;
     WCHAR *CodeUnitPtr;
     const int DeadKeyLength = 3;
     const int SurrogateLength = 2;
@@ -345,18 +345,18 @@ extern "C" BOOL _declspec(dllexport) WINAPI KMSetOutput(PWSTR buf, DWORD backlen
     if (context.CharIsDeadkey()) {
       CodeUnitPtr = context.BufMax(DeadKeyLength);
       CodeUnitPtr += 2;
-      actionItems[idx].backspace.expected_type  = KM_KBP_BT_MARKER;
+      actionItems[idx].backspace.expected_type  = KM_CORE_BT_MARKER;
       actionItems[idx].backspace.expected_value = (uintptr_t)*CodeUnitPtr;
     } else if (context.CharIsSurrogatePair()) {
       CodeUnitPtr = context.BufMax(SurrogateLength);
-      actionItems[idx].backspace.expected_type  = KM_KBP_BT_CHAR;
+      actionItems[idx].backspace.expected_type  = KM_CORE_BT_CHAR;
       actionItems[idx].backspace.expected_value = (DWORD)Uni_SurrogateToUTF32(*CodeUnitPtr, *(CodeUnitPtr + 1));
     } else if (!context.IsEmpty()) {
       CodeUnitPtr = context.BufMax(SingleCharLength);
-      actionItems[idx].backspace.expected_type  = KM_KBP_BT_CHAR;
+      actionItems[idx].backspace.expected_type  = KM_CORE_BT_CHAR;
       actionItems[idx].backspace.expected_value = (DWORD)*CodeUnitPtr;
     } else {
-      actionItems[idx].backspace.expected_type  = KM_KBP_BT_UNKNOWN;
+      actionItems[idx].backspace.expected_type  = KM_CORE_BT_UNKNOWN;
       actionItems[idx].backspace.expected_value = 0;
     }
     context.Delete();
@@ -364,7 +364,7 @@ extern "C" BOOL _declspec(dllexport) WINAPI KMSetOutput(PWSTR buf, DWORD backlen
   }
 
   while (*buf) {
-    actionItems[idx].type      = KM_KBP_IT_CHAR;
+    actionItems[idx].type      = KM_CORE_IT_CHAR;
     if (Uni_IsSurrogate1(*buf) && Uni_IsSurrogate2(*(buf + 1))) {
       actionItems[idx].character = Uni_SurrogateToUTF32(*buf, *(buf + 1));
       buf++;
@@ -374,8 +374,8 @@ extern "C" BOOL _declspec(dllexport) WINAPI KMSetOutput(PWSTR buf, DWORD backlen
     buf++;
     idx++;
   }
-  actionItems[idx].type   = KM_KBP_IT_END;
-  if (KM_KBP_STATUS_OK != km_core_state_queue_action_items(_td->lpActiveKeyboard->lpCoreKeyboardState, actionItems)) {
+  actionItems[idx].type   = KM_CORE_IT_END;
+  if (KM_CORE_STATUS_OK != km_core_state_queue_action_items(_td->lpActiveKeyboard->lpCoreKeyboardState, actionItems)) {
     delete[] actionItems;
     return FALSE;
   }
@@ -400,7 +400,7 @@ extern "C" BOOL _declspec(dllexport) WINAPI KMQueueAction(int ItemType, DWORD dw
   km_core_action_item *actionItem = kmnToCoreActionItem(ItemType, dwData, _td->state.vkey);
   km_core_status_codes error_status =
       (km_core_status_codes)km_core_state_queue_action_items(_td->lpActiveKeyboard->lpCoreKeyboardState, actionItem);
-  if (error_status != KM_KBP_STATUS_OK) {
+  if (error_status != KM_CORE_STATUS_OK) {
     delete[] actionItem;
     SendDebugMessageFormat(0, sdmKeyboard, 0, "KMQueueAction: Error core queue_action_items error status:[%lu]",error_status);
     return FALSE;
@@ -428,7 +428,7 @@ extern "C" BOOL _declspec(dllexport) WINAPI KMGetContext(PWSTR buf, DWORD len)
   }
 
   km_core_context_item *citems = nullptr;
-  if (KM_KBP_STATUS_OK != kbp_state_get_intermediate_context(_td->lpActiveKeyboard->lpCoreKeyboardState, &citems)) {
+  if (KM_CORE_STATUS_OK != kbp_state_get_intermediate_context(_td->lpActiveKeyboard->lpCoreKeyboardState, &citems)) {
       return FALSE;
   }
 

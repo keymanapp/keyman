@@ -53,17 +53,17 @@ begin
   FState := nil;
 
   status := km_core_keyboard_load(PChar(FileName), FKeyboard);
-  if status <> KM_KBP_STATUS_OK then
+  if status <> KM_CORE_STATUS_OK then
     raise EDebugCore.CreateFmt('Unable to start debugger -- keyboard load failed with error %x', [Ord(status)]);
 
-  status := km_core_state_create(FKeyboard, @KM_KBP_OPTIONS_END, FState);
-  if status <> KM_KBP_STATUS_OK then
+  status := km_core_state_create(FKeyboard, @KM_CORE_OPTIONS_END, FState);
+  if status <> KM_CORE_STATUS_OK then
     raise EDebugCore.CreateFmt('Unable to start debugger -- state creation failed with error %x', [Ord(status)]);
 
   if EnableDebug then
   begin
     status := km_core_state_debug_set(FState, 1);
-    if status <> KM_KBP_STATUS_OK then
+    if status <> KM_CORE_STATUS_OK then
       raise EDebugCore.CreateFmt('Unable to start debugger -- enabling debug failed with error %x', [Ord(status)]);
   end;
 end;
@@ -103,11 +103,11 @@ var
 begin
   status := km_core_state_option_lookup(
     FState,
-    KM_KBP_OPT_ENVIRONMENT,
-    pkm_core_cp(PWideChar(KM_KBP_KMX_ENV_PLATFORM)),
+    KM_CORE_OPT_ENVIRONMENT,
+    pkm_core_cp(PWideChar(KM_CORE_KMX_ENV_PLATFORM)),
     p
   );
-  if status <> KM_KBP_STATUS_OK then
+  if status <> KM_CORE_STATUS_OK then
     raise EDebugCore.CreateFmt('Unable to locate platform, error %x', [Ord(status)]);
   Result := PWideChar(p);
 end;
@@ -117,12 +117,12 @@ var
   options: array[0..1] of km_core_option_item;
   status: km_core_status;
 begin
-  options[0].key := pkm_core_cp(PWideChar(KM_KBP_KMX_ENV_PLATFORM));
+  options[0].key := pkm_core_cp(PWideChar(KM_CORE_KMX_ENV_PLATFORM));
   options[0].value := pkm_core_cp(PWideChar(Value));
-  options[0].scope := KM_KBP_OPT_ENVIRONMENT;
-  options[1] := KM_KBP_OPTIONS_END;
+  options[0].scope := KM_CORE_OPT_ENVIRONMENT;
+  options[1] := KM_CORE_OPTIONS_END;
   status := km_core_state_options_update(FState, @options[0]);
-  if status <> KM_KBP_STATUS_OK then
+  if status <> KM_CORE_STATUS_OK then
     raise EDebugCore.CreateFmt('Unable to set platform, error %x', [Ord(status)]);
 end;
 
@@ -133,11 +133,11 @@ var
 begin
   status := km_core_state_option_lookup(
     FState,
-    KM_KBP_OPT_KEYBOARD,
+    KM_CORE_OPT_KEYBOARD,
     pkm_core_cp(PWideChar(name)),
     p
   );
-  if status <> KM_KBP_STATUS_OK then
+  if status <> KM_CORE_STATUS_OK then
     raise EDebugCore.CreateFmt('Unable to locate option %s, error %x', [name, Ord(status)]);
   Result := PWideChar(p);
 end;
@@ -149,10 +149,10 @@ var
 begin
   options[0].key := pkm_core_cp(PWideChar(Name));
   options[0].value := pkm_core_cp(PWideChar(Value));
-  options[0].scope := KM_KBP_OPT_KEYBOARD;
-  options[1] := KM_KBP_OPTIONS_END;
+  options[0].scope := KM_CORE_OPT_KEYBOARD;
+  options[1] := KM_CORE_OPTIONS_END;
   status := km_core_state_options_update(FState, @options[0]);
-  if status <> KM_KBP_STATUS_OK then
+  if status <> KM_CORE_STATUS_OK then
     raise EDebugCore.CreateFmt('Unable to set option %s, error %x', [name, Ord(status)]);
 end;
 

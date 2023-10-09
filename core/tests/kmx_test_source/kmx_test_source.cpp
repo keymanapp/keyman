@@ -182,9 +182,9 @@ KmxTestSource::get_keyboard_options(kmx_options options) {
     if (key[0] == u'&') {
       // environment value (aka system store)
       key.erase(0, 1);
-      keyboard_opts[i].scope = KM_KBP_OPT_ENVIRONMENT;
+      keyboard_opts[i].scope = KM_CORE_OPT_ENVIRONMENT;
     } else {
-      keyboard_opts[i].scope = KM_KBP_OPT_KEYBOARD;
+      keyboard_opts[i].scope = KM_CORE_OPT_KEYBOARD;
     }
 
     km_core_cp *cp = new km_core_cp[key.length() + 1];
@@ -202,7 +202,7 @@ KmxTestSource::get_keyboard_options(kmx_options options) {
     i++;
   }
 
-  keyboard_opts[i] = KM_KBP_OPTIONS_END;
+  keyboard_opts[i] = KM_CORE_OPTIONS_END;
   return keyboard_opts;
 }
 
@@ -211,7 +211,7 @@ KmxTestSource::char_to_event(char ch) {
   assert(ch >= 32);
   return {
       km::kbp::kmx::s_char_to_vkey[(int)ch - 32].vk,
-      (uint16_t)(km::kbp::kmx::s_char_to_vkey[(int)ch - 32].shifted ? KM_KBP_MODIFIER_SHIFT : 0)};
+      (uint16_t)(km::kbp::kmx::s_char_to_vkey[(int)ch - 32].shifted ? KM_CORE_MODIFIER_SHIFT : 0)};
 }
 
 uint16_t

@@ -31,15 +31,15 @@ namespace
   auto const bmp_ctxt_size = count_codepoints(initial_bmp_context),
              smp_ctxt_size = count_codepoints(initial_smp_context);
   km_core_context_item test_marker_ctxt[2] = {
-    {KM_KBP_CT_MARKER, {0,}, {0xDEADBEEF}},
-    {KM_KBP_CT_END, {0,}, {0}}
+    {KM_CORE_CT_MARKER, {0,}, {0xDEADBEEF}},
+    {KM_CORE_CT_END, {0,}, {0}}
   };
 
 
 }
 
 #define   try_status(expr) \
-{auto __s = (expr); if (__s != KM_KBP_STATUS_OK) return 100*__LINE__+__s;}
+{auto __s = (expr); if (__s != KM_CORE_STATUS_OK) return 100*__LINE__+__s;}
 
 int main(int, char * [])
 {
@@ -72,12 +72,12 @@ int main(int, char * [])
   // Test buffer overrun protection.
   ctxt_size=4; // This includes space for the null terminator
   if (km_core_context_items_to_utf16(ctxt2, ctxt_buffer, &ctxt_size)
-        != KM_KBP_STATUS_INSUFFICENT_BUFFER
+        != KM_CORE_STATUS_INSUFFICENT_BUFFER
       || ctxt_size != 4)
     return __LINE__;
   ctxt_size=8; // This includes space for the null terminator
   if (km_core_context_items_to_utf8(ctxt4, ctxt_u8_buffer, &ctxt_size)
-        != KM_KBP_STATUS_INSUFFICENT_BUFFER
+        != KM_CORE_STATUS_INSUFFICENT_BUFFER
       || ctxt_size != 6)
     return __LINE__;
 

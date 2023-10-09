@@ -48,13 +48,13 @@ km_core_keyboard_load(km_core_path_name kb_path, km_core_keyboard **keyboard)
 {
   assert(keyboard);
   if (!keyboard)
-    return KM_KBP_STATUS_INVALID_ARGUMENT;
+    return KM_CORE_STATUS_INVALID_ARGUMENT;
 
   try
   {
     abstract_processor *kp = processor_factory(kb_path);
     km_core_status status = kp->validate();
-    if (status != KM_KBP_STATUS_OK) {
+    if (status != KM_CORE_STATUS_OK) {
       delete kp;
       return status;
     }
@@ -62,9 +62,9 @@ km_core_keyboard_load(km_core_path_name kb_path, km_core_keyboard **keyboard)
   }
   catch (std::bad_alloc &)
   {
-    return KM_KBP_STATUS_NO_MEM;
+    return KM_CORE_STATUS_NO_MEM;
   }
-  return KM_KBP_STATUS_OK;
+  return KM_CORE_STATUS_OK;
 }
 
 void
@@ -79,10 +79,10 @@ km_core_keyboard_get_attrs(km_core_keyboard const *keyboard,
 {
   assert(keyboard); assert(out);
   if (!keyboard || !out)
-    return KM_KBP_STATUS_INVALID_ARGUMENT;
+    return KM_CORE_STATUS_INVALID_ARGUMENT;
 
   *out = &keyboard->keyboard();
-  return KM_KBP_STATUS_OK;
+  return KM_CORE_STATUS_OK;
 }
 
 km_core_status
@@ -91,10 +91,10 @@ km_core_keyboard_get_key_list(km_core_keyboard const *keyboard,
 {
   assert(keyboard); assert(out);
   if (!keyboard || !out)
-    return KM_KBP_STATUS_INVALID_ARGUMENT;
+    return KM_CORE_STATUS_INVALID_ARGUMENT;
 
   *out = keyboard->get_key_list();
-  return KM_KBP_STATUS_OK;
+  return KM_CORE_STATUS_OK;
 }
 
 void km_core_keyboard_key_list_dispose(km_core_keyboard_key *key_list)
@@ -108,11 +108,11 @@ km_core_status km_core_keyboard_get_imx_list(
 ) {
   assert(keyboard); assert(imx_list);
   if (!keyboard || !imx_list) {
-    return KM_KBP_STATUS_INVALID_ARGUMENT;
+    return KM_CORE_STATUS_INVALID_ARGUMENT;
   }
 
   *imx_list = keyboard->get_imx_list();
-  return KM_KBP_STATUS_OK;
+  return KM_CORE_STATUS_OK;
 }
 
 void km_core_keyboard_imx_list_dispose(km_core_keyboard_imx *imx_list)

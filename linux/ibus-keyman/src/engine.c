@@ -209,7 +209,7 @@ static gchar *get_current_context_text(km_core_context *context)
     size_t buf_size = 512;
     km_core_context_item *context_items;
     gchar *current_context_utf8 = g_new0(gchar, buf_size);
-    if (km_core_context_get(context, &context_items) == KM_KBP_STATUS_OK) {
+    if (km_core_context_get(context, &context_items) == KM_CORE_STATUS_OK) {
         km_core_context_items_to_utf8(context_items,
                             current_context_utf8,
                             &buf_size);
@@ -262,7 +262,7 @@ reset_context(IBusEngine *engine) {
     if (!(*current_context_utf8) || !g_str_has_suffix(surrounding_text, current_context_utf8)) {
       g_message("%s: setting context because it has changed from expected", __FUNCTION__);
       enum km_core_status_codes status = km_core_context_items_from_utf8(surrounding_text, &context_items);
-      if (status == KM_KBP_STATUS_OK) {
+      if (status == KM_CORE_STATUS_OK) {
         km_core_context_set(context, context_items);
         km_core_context_items_dispose(context_items);
       } else {
@@ -342,21 +342,21 @@ setup_environment(IBusKeymanEngine *keyman)
   // Allocate enough options for: 3 environments plus 1 pad struct of 0's
   km_core_option_item environment_opts[4] = {0};
 
-  environment_opts[0].scope = KM_KBP_OPT_ENVIRONMENT;
-  environment_opts[0].key   = KM_KBP_KMX_ENV_PLATFORM;
+  environment_opts[0].scope = KM_CORE_OPT_ENVIRONMENT;
+  environment_opts[0].key   = KM_CORE_KMX_ENV_PLATFORM;
   environment_opts[0].value = u"linux desktop hardware native";
 
-  environment_opts[1].scope = KM_KBP_OPT_ENVIRONMENT;
-  environment_opts[1].key   = KM_KBP_KMX_ENV_BASELAYOUT;
+  environment_opts[1].scope = KM_CORE_OPT_ENVIRONMENT;
+  environment_opts[1].key   = KM_CORE_KMX_ENV_BASELAYOUT;
   environment_opts[1].value = u"kbdus.dll";
 
-  environment_opts[2].scope = KM_KBP_OPT_ENVIRONMENT;
-  environment_opts[2].key   = KM_KBP_KMX_ENV_BASELAYOUTALT;
+  environment_opts[2].scope = KM_CORE_OPT_ENVIRONMENT;
+  environment_opts[2].key   = KM_CORE_KMX_ENV_BASELAYOUTALT;
   environment_opts[2].value = get_base_layout();  // TODO: free when mnemonic layouts are to be supported
 
 
   km_core_status status = km_core_state_create(keyman->keyboard, environment_opts, &(keyman->state));
-  if (status != KM_KBP_STATUS_OK) {
+  if (status != KM_CORE_STATUS_OK) {
     g_warning("%s: problem creating km_core_state. Status is %u.", __FUNCTION__, status);
   }
   return status;
@@ -374,7 +374,7 @@ load_keyboard_options(IBusKeymanEngine *keyman)
   int num_options       = g_queue_get_length(queue_options);
   if (num_options < 1) {
     g_queue_free_full(queue_options, NULL);
-    return KM_KBP_STATUS_OK;
+    return KM_CORE_STATUS_OK;
   }
 
   // Allocate enough options for: num_options plus 1 pad struct of 0's
@@ -391,7 +391,7 @@ load_keyboard_options(IBusKeymanEngine *keyman)
   // once we have the option list we can then update the options using the public api call
   km_core_status status = km_core_state_options_update(keyman->state, keyboard_opts);
 
-  if (status != KM_KBP_STATUS_OK) {
+  if (status != KM_CORE_STATUS_OK) {
     g_warning("%s: problem creating km_core_state. Status is %u.", __FUNCTION__, status);
   }
   for (int i = 0; i < num_options; i++) {
@@ -475,20 +475,20 @@ ibus_keyman_engine_constructor(
     status = km_core_keyboard_load(abs_kmx_path, &(keyman->keyboard));
     g_free(abs_kmx_path);
 
-    if (status != KM_KBP_STATUS_OK) {
+    if (status != KM_CORE_STATUS_OK) {
       g_warning("%s: problem creating km_core_keyboard. Status is %u.", __FUNCTION__, status);
       ibus_keyman_engine_destroy(keyman);
       return NULL;
     }
 
     status = setup_environment(keyman);
-    if (status != KM_KBP_STATUS_OK) {
+    if (status != KM_CORE_STATUS_OK) {
       ibus_keyman_engine_destroy(keyman);
       return NULL;
     }
 
     status = load_keyboard_options(keyman);
-    if (status != KM_KBP_STATUS_OK) {
+    if (status != KM_CORE_STATUS_OK) {
       ibus_keyman_engine_destroy(keyman);
       return NULL;
     }
@@ -608,7 +608,7 @@ process_backspace_action(
   size_t num_action_items
 ) {
   IBusKeymanEngine *keyman = (IBusKeymanEngine *)engine;
-  if (action_items[i].backspace.expected_type == KM_KBP_IT_MARKER) {
+  if (action_items[i].backspace.expected_type == KM_CORE_IT_MARKER) {
     g_message("%s: skipping marker type", __FUNCTION__);
   } else if (keyman->commit_item->char_buffer != NULL) {
     g_message("%s: removing one utf8 char from CHAR buffer", __FUNCTION__);
@@ -674,7 +674,7 @@ process_persist_action(
   km_core_option_item *keyboard_opts = g_new0(km_core_option_item, 2);
   memmove(&(keyboard_opts[0]), action_item->option, sizeof(km_core_option_item));
   km_core_status event_status = km_core_state_options_update(keyman->state, keyboard_opts);
-  if (event_status != KM_KBP_STATUS_OK) {
+  if (event_status != KM_CORE_STATUS_OK) {
     g_warning("%s: problem saving option for km_core_keyboard", __FUNCTION__);
   }
   g_free(keyboard_opts);
@@ -794,49 +794,49 @@ process_actions(
   IBusKeymanEngine *keyman = (IBusKeymanEngine *)engine;
   for (int i = 0; i < num_action_items; i++) {
     gboolean continue_with_next_action = TRUE;
-    if (action_items[i].type != KM_KBP_IT_BACK && keyman->consecutive_backspaces > 0) {
+    if (action_items[i].type != KM_CORE_IT_BACK && keyman->consecutive_backspaces > 0) {
       finish_backspace_action(engine);
     }
     switch (action_items[i].type) {
-    case KM_KBP_IT_CHAR:
+    case KM_CORE_IT_CHAR:
       g_message("CHAR action %d/%d", i + 1, (int)num_action_items);
       continue_with_next_action = process_unicode_char_action(keyman, &action_items[i]);
       g_assert(continue_with_next_action == TRUE);
       break;
-    case KM_KBP_IT_MARKER:
+    case KM_CORE_IT_MARKER:
       g_message("MARKER action %d/%d", i + 1, (int)num_action_items);
       break;
-    case KM_KBP_IT_ALERT:
+    case KM_CORE_IT_ALERT:
       g_message("ALERT action %d/%d", i + 1, (int)num_action_items);
       continue_with_next_action = process_alert_action();
       g_assert(continue_with_next_action == TRUE);
       break;
-    case KM_KBP_IT_BACK:
+    case KM_CORE_IT_BACK:
       g_message("BACK action %d/%d", i + 1, (int)num_action_items);
       continue_with_next_action = process_backspace_action(engine, action_items, i, num_action_items);
       g_assert(continue_with_next_action == TRUE);
       break;
-    case KM_KBP_IT_PERSIST_OPT:
+    case KM_CORE_IT_PERSIST_OPT:
       g_message("PERSIST_OPT action %d/%d", i + 1, (int)num_action_items);
       continue_with_next_action = process_persist_action(keyman, &action_items[i]);
       g_assert(continue_with_next_action == TRUE);
       break;
-    case KM_KBP_IT_EMIT_KEYSTROKE:
+    case KM_CORE_IT_EMIT_KEYSTROKE:
       g_message("EMIT_KEYSTROKE action %d/%d", i + 1, (int)num_action_items);
       continue_with_next_action = process_emit_keystroke_action(keyman);
       g_assert(continue_with_next_action == TRUE);
       break;
-    case KM_KBP_IT_INVALIDATE_CONTEXT:
+    case KM_CORE_IT_INVALIDATE_CONTEXT:
       g_message("INVALIDATE_CONTEXT action %d/%d", i + 1, (int)num_action_items);
       continue_with_next_action = process_invalidate_context_action(engine);
       g_assert(continue_with_next_action == TRUE);
       break;
-    case KM_KBP_IT_CAPSLOCK:
+    case KM_CORE_IT_CAPSLOCK:
       g_message("CAPSLOCK action %d/%d", i + 1, (int)num_action_items);
       continue_with_next_action = process_capslock_action(keyman, &action_items[i]);
       g_assert(continue_with_next_action == TRUE);
       break;
-    case KM_KBP_IT_END:
+    case KM_CORE_IT_END:
       g_message("END action %d/%d", i + 1, (int)num_action_items);
       continue_with_next_action = process_end_action(keyman);
       break;
@@ -904,40 +904,40 @@ ibus_keyman_engine_process_key_event(
   // keyman modifiers are different from X11/ibus
   uint16_t km_mod_state = 0;
   if (state & IBUS_SHIFT_MASK) {
-    km_mod_state |= KM_KBP_MODIFIER_SHIFT;
+    km_mod_state |= KM_CORE_MODIFIER_SHIFT;
   }
   if (state & IBUS_MOD5_MASK) {
-    km_mod_state |= KM_KBP_MODIFIER_RALT;
-    g_message("%s: modstate KM_KBP_MODIFIER_RALT from IBUS_MOD5_MASK", __FUNCTION__);
+    km_mod_state |= KM_CORE_MODIFIER_RALT;
+    g_message("%s: modstate KM_CORE_MODIFIER_RALT from IBUS_MOD5_MASK", __FUNCTION__);
   }
   if (state & IBUS_MOD1_MASK) {
     if (keyman->ralt_pressed) {
-      km_mod_state |= KM_KBP_MODIFIER_RALT;
-      g_message("%s: modstate KM_KBP_MODIFIER_RALT from ralt_pressed", __FUNCTION__);
+      km_mod_state |= KM_CORE_MODIFIER_RALT;
+      g_message("%s: modstate KM_CORE_MODIFIER_RALT from ralt_pressed", __FUNCTION__);
     }
     if (keyman->lalt_pressed) {
-      km_mod_state |= KM_KBP_MODIFIER_LALT;
-      g_message("%s: modstate KM_KBP_MODIFIER_LALT from lalt_pressed", __FUNCTION__);
+      km_mod_state |= KM_CORE_MODIFIER_LALT;
+      g_message("%s: modstate KM_CORE_MODIFIER_LALT from lalt_pressed", __FUNCTION__);
     }
   }
   if (state & IBUS_CONTROL_MASK) {
     if (keyman->rctrl_pressed) {
-      km_mod_state |= KM_KBP_MODIFIER_RCTRL;
-      g_message("%s: modstate KM_KBP_MODIFIER_RCTRL from rctrl_pressed", __FUNCTION__);
+      km_mod_state |= KM_CORE_MODIFIER_RCTRL;
+      g_message("%s: modstate KM_CORE_MODIFIER_RCTRL from rctrl_pressed", __FUNCTION__);
     }
     if (keyman->lctrl_pressed) {
-      km_mod_state |= KM_KBP_MODIFIER_LCTRL;
-      g_message("%s: modstate KM_KBP_MODIFIER_LCTRL from lctrl_pressed", __FUNCTION__);
+      km_mod_state |= KM_CORE_MODIFIER_LCTRL;
+      g_message("%s: modstate KM_CORE_MODIFIER_LCTRL from lctrl_pressed", __FUNCTION__);
     }
   }
   if (state & IBUS_LOCK_MASK) {
-    km_mod_state |= KM_KBP_MODIFIER_CAPS;
+    km_mod_state |= KM_CORE_MODIFIER_CAPS;
   }
   g_message("%s: before process key event", __FUNCTION__);
   km_core_context *context = km_core_state_context(keyman->state);
   g_free(get_current_context_text(context));
   g_message("DAR: %s - km_mod_state=0x%x", __FUNCTION__, km_mod_state);
-  km_core_process_event(keyman->state, keycode_to_vk[keycode], km_mod_state, isKeyDown, KM_KBP_EVENT_FLAG_DEFAULT);
+  km_core_process_event(keyman->state, keycode_to_vk[keycode], km_mod_state, isKeyDown, KM_CORE_EVENT_FLAG_DEFAULT);
   context                    = km_core_state_context(keyman->state);
   g_message("%s: after process key event", __FUNCTION__);
   g_free(get_current_context_text(context));

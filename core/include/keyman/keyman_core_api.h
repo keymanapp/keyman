@@ -75,7 +75,7 @@ object take the form:
 > km_core_status *fn_name*(object_ref, buffer_ptr, size_ptr)
 
 where the buffer is nullable and all other arguments are required (will result
-in an `KM_KBP_STATUS_INVALID_ARGUMENT` status being returned if nulled). When
+in an `KM_CORE_STATUS_INVALID_ARGUMENT` status being returned if nulled). When
 `buffer` is `nullptr` or `0` the function will place the size of the required
 buffer in the variable pointed to by `size_ptr`.
 
@@ -85,7 +85,7 @@ ownership, are of the form:
 
 where `out_ptr` is a valid pointer to a caller allocated variable to hold the
 resulting ouput. This is often a reference to a created object. All arguments
-are required (will result in an `KM_KBP_STATUS_INVALID_ARGUMENT` status being
+are required (will result in an `KM_CORE_STATUS_INVALID_ARGUMENT` status being
 returned if nulled).
 
 For accessors to fixed size attributes of an object these will take the form:
@@ -138,20 +138,20 @@ value and all results are returned via outparams passed to the function.
 ```c
 */
 enum km_core_status_codes {
-  KM_KBP_STATUS_OK = 0,
-  KM_KBP_STATUS_NO_MEM = 1,
-  KM_KBP_STATUS_IO_ERROR = 2,
-  KM_KBP_STATUS_INVALID_ARGUMENT = 3,
-  KM_KBP_STATUS_KEY_ERROR = 4,
-  KM_KBP_STATUS_INSUFFICENT_BUFFER = 5,
-  KM_KBP_STATUS_INVALID_UTF = 6,
-  KM_KBP_STATUS_INVALID_KEYBOARD = 7,
-  KM_KBP_STATUS_OS_ERROR = 0x80000000
+  KM_CORE_STATUS_OK = 0,
+  KM_CORE_STATUS_NO_MEM = 1,
+  KM_CORE_STATUS_IO_ERROR = 2,
+  KM_CORE_STATUS_INVALID_ARGUMENT = 3,
+  KM_CORE_STATUS_KEY_ERROR = 4,
+  KM_CORE_STATUS_INSUFFICENT_BUFFER = 5,
+  KM_CORE_STATUS_INVALID_UTF = 6,
+  KM_CORE_STATUS_INVALID_KEYBOARD = 7,
+  KM_CORE_STATUS_OS_ERROR = 0x80000000
 };
 
 /*
 ```
-The final status code KM_KBP_STATUS_OS_ERROR is intended to allow encapsulating
+The final status code KM_CORE_STATUS_OS_ERROR is intended to allow encapsulating
 a platform error code; the remaining 31 low bits are the error code returned by
 the OS for cases where the failure mode is platform specific. For HRESULT codes
 this only permits failure codes to be passed.
@@ -177,9 +177,9 @@ context_items or interrogated for their current list of context items.
 ```c
 */
 enum km_core_context_type {
-  KM_KBP_CT_END,
-  KM_KBP_CT_CHAR,
-  KM_KBP_CT_MARKER
+  KM_CORE_CT_END,
+  KM_CORE_CT_CHAR,
+  KM_CORE_CT_MARKER
 };
 
 typedef struct {
@@ -191,7 +191,7 @@ typedef struct {
   };
 } km_core_context_item;
 
-#define KM_KBP_CONTEXT_ITEM_END {KM_KBP_CT_END, {0,}, {0,}}
+#define KM_CORE_CONTEXT_ITEM_END {KM_CORE_CT_END, {0,}, {0,}}
 /*
 ```
 ### `km_core_context_items_from_utf16`
@@ -199,18 +199,18 @@ typedef struct {
 Convert a UTF16 encoded Unicode string into an array of `km_core_context_item`
 structures. Allocates memory as needed.
 ##### Return status:
-- `KM_KBP_STATUS_OK`: On success.
-- `KM_KBP_STATUS_INVALID_ARGUMENT`: If non-optional parameters are null.
-- `KM_KBP_STATUS_NO_MEM`: In the event not enough memory can be allocated for the
+- `KM_CORE_STATUS_OK`: On success.
+- `KM_CORE_STATUS_INVALID_ARGUMENT`: If non-optional parameters are null.
+- `KM_CORE_STATUS_NO_MEM`: In the event not enough memory can be allocated for the
   output buffer.
-- `KM_KBP_STATUS_INVALID_UTF`: In the event the UTF16 string cannot be decoded
+- `KM_CORE_STATUS_INVALID_UTF`: In the event the UTF16 string cannot be decoded
   because it contains unpaired surrogate codeunits.
 ##### Parameters:
 - __text__: a pointer to a null terminated array of utf16 encoded data.
 - __out_ptr__: a pointer to the result variable:
     A pointer to the start of the `km_core_context_item` array containing the
     representation of the input string.
-    Terminated with a type of `KM_KBP_CT_END`. Must be disposed of with
+    Terminated with a type of `KM_CORE_CT_END`. Must be disposed of with
     `km_core_context_items_dispose`.
 
 ```c
@@ -227,17 +227,17 @@ km_core_context_items_from_utf16(km_core_cp const *text,
 Convert an UTF8 encoded Unicode string into an array of `km_core_context_item`
 structures. Allocates memory as needed.
 ##### Status:
-- `KM_KBP_STATUS_INVALID_ARGUMENT`: If non-optional parameters are null.
-- `KM_KBP_STATUS_NO_MEM`: In the event it cannot allocate enough memory for the
+- `KM_CORE_STATUS_INVALID_ARGUMENT`: If non-optional parameters are null.
+- `KM_CORE_STATUS_NO_MEM`: In the event it cannot allocate enough memory for the
   output buffer.
-- `KM_KBP_STATUS_INVALID_UTF`: In the event the UTF8 string cannot be
+- `KM_CORE_STATUS_INVALID_UTF`: In the event the UTF8 string cannot be
 decoded.
 ##### Parameters:
 - __text__: a pointer to a null terminated array of utf8 encoded data.
 - __out_ptr__: a pointer to the result variable:
     A pointer to the  start of the `km_core_context_item` array containing the
     representation of the input string.
-    Terminated with a type of `KM_KBP_CT_END`.
+    Terminated with a type of `KM_CORE_CT_END`.
 
 ```c
 */
@@ -256,14 +256,14 @@ actually used in the conversion. If null is passed as the buffer the
 number codeunits required is returned. This will strip markers from the
 context during the conversion.
 ##### Return status:
-- `KM_KBP_STATUS_OK`: On success.
-- `KM_KBP_STATUS_INVALID_ARGUMENT`: If non-optional parameters are null.
-- `KM_KBP_STATUS_INSUFFICENT_BUFFER`: If the buffer is not large enough.
+- `KM_CORE_STATUS_OK`: On success.
+- `KM_CORE_STATUS_INVALID_ARGUMENT`: If non-optional parameters are null.
+- `KM_CORE_STATUS_INSUFFICENT_BUFFER`: If the buffer is not large enough.
   `buf_size` will contain the space required. The contents of the buffer are
   undefined.
 ##### Parameters:
 - __context_items__: A pointer to the start of an array `km_core_context_item`.
-    Must be terminated with a type of `KM_KBP_CT_END`.
+    Must be terminated with a type of `KM_CORE_CT_END`.
 - __buf__: A pointer to the buffer to place the UTF-16 string into.
     May be null to request size calculation.
 - __buf_size__: a pointer to the result variable:
@@ -288,14 +288,14 @@ actually used in the conversion. If null is passed as the buffer the
 number codeunits required is returned. This will strip markers from the
 context during the conversion.
 ##### Return status:
-- `KM_KBP_STATUS_OK`: On success.
-- `KM_KBP_STATUS_INVALID_ARGUMENT`: If non-optional parameters are null.
-- `KM_KBP_STATUS_INSUFFICENT_BUFFER`: If the buffer is not large enough.
+- `KM_CORE_STATUS_OK`: On success.
+- `KM_CORE_STATUS_INVALID_ARGUMENT`: If non-optional parameters are null.
+- `KM_CORE_STATUS_INSUFFICENT_BUFFER`: If the buffer is not large enough.
   `buf_size` will contain the space required. The contents of the buffer are
   undefined.
 ##### Parameters:
 - __context_items__: A pointer to the start of an array `km_core_context_item`.
-    Must be terminated with a type of `KM_KBP_CT_END`.
+    Must be terminated with a type of `KM_CORE_CT_END`.
 - __buf__: A pointer to the buffer to place the UTF-8 string into.
     May be null to request size calculation.
 - __buf_size__: a pointer to the result variable:
@@ -333,15 +333,15 @@ km_core_context_items_dispose(km_core_context_item *context_items);
 Replace the contents of the current context with a new sequence of
 `km_core_context_item` entries.
 ##### Return status:
-- `KM_KBP_STATUS_OK`: On success.
-- `KM_KBP_STATUS_INVALID_ARGUMENT`: If non-optional parameters are null.
-- `KM_KBP_STATUS_NO_MEM`: In the event not enough memory can be allocated to
+- `KM_CORE_STATUS_OK`: On success.
+- `KM_CORE_STATUS_INVALID_ARGUMENT`: If non-optional parameters are null.
+- `KM_CORE_STATUS_NO_MEM`: In the event not enough memory can be allocated to
   grow the context buffer internally.
 ##### Parameters:
 - __context__: A pointer to an opaque context object
 - __context_items__: A pointer to the start of the `km_core_context_item`
     array containing the new context. It must be terminated with an item
-    of type `KM_KBP_CT_END`.
+    of type `KM_CORE_CT_END`.
 
 ```c
 */
@@ -357,15 +357,15 @@ km_core_context_set(km_core_context *context,
 Copies all items in the context into a new array and returns the new array.
 This must be disposed of by caller using `km_core_context_items_dispose`.
 ##### Return status:
-- `KM_KBP_STATUS_OK`: On success.
-- `KM_KBP_STATUS_INVALID_ARGUMENT`: If non-optional parameters are null.
-- `KM_KBP_STATUS_NO_MEM`: In the event not enough memory can be allocated for the
+- `KM_CORE_STATUS_OK`: On success.
+- `KM_CORE_STATUS_INVALID_ARGUMENT`: If non-optional parameters are null.
+- `KM_CORE_STATUS_NO_MEM`: In the event not enough memory can be allocated for the
   output buffer.
 ##### Parameters:
 - __context_items__: A pointer to the start of an array `km_core_context_item`.
 - __out__: a pointer to the result variable:
     A pointer to the start of the `km_core_context_item` array containing a
-    copy of the context. Terminated with a type of `KM_KBP_CT_END`. Must be
+    copy of the context. Terminated with a type of `KM_CORE_CT_END`. Must be
     disposed of with `km_core_context_items_dispose`.
 
 ```c
@@ -415,13 +415,13 @@ Add more items to the end (insertion point) of the context. If these exceed the
 maximum context length the same number of items will be dropped from the
 beginning of the context.
 ##### Return status:
-- `KM_KBP_STATUS_OK`: On success.
-- `KM_KBP_STATUS_INVALID_ARGUMENT`: If non-optional parameters are null.
-- `KM_KBP_STATUS_NO_MEM`: In the event not enough memory can be allocated to
+- `KM_CORE_STATUS_OK`: On success.
+- `KM_CORE_STATUS_INVALID_ARGUMENT`: If non-optional parameters are null.
+- `KM_CORE_STATUS_NO_MEM`: In the event not enough memory can be allocated to
   grow the context buffer internally.
 ##### Parameters:
 - __context__: A pointer to an opaque context object.
-- __context_items__: A pointer to the start of the `KM_KBP_CT_END` terminated
+- __context_items__: A pointer to the start of the `KM_CORE_CT_END` terminated
     array of `km_core_context_item` to append.
 
 ```c
@@ -438,14 +438,14 @@ km_core_context_append(km_core_context *context,
 Remove a specified number of items from the end of the context, optionally
 add up to the same number of the supplied items to the front of the context.
 ##### Return status:
-- `KM_KBP_STATUS_OK`: On success.
-- `KM_KBP_STATUS_INVALID_ARGUMENT`: If non-optional parameters are null.
-- `KM_KBP_STATUS_NO_MEM`: in the event it cannot allocated enough memory to grow
+- `KM_CORE_STATUS_OK`: On success.
+- `KM_CORE_STATUS_INVALID_ARGUMENT`: If non-optional parameters are null.
+- `KM_CORE_STATUS_NO_MEM`: in the event it cannot allocated enough memory to grow
   the context internally.
 ##### Parameters:
 - __context__: A pointer to an opaque context object.
 - __num__: The number of items to remove from the end of context.
-- __context_items__: Pointer to the start of the `KM_KBP_CT_END` terminated
+- __context_items__: Pointer to the start of the `KM_CORE_CT_END` terminated
     array of `km_core_context_item` to add to the front. Up to `num` items will
     be prepended. This may be null if not required.
 
@@ -466,7 +466,7 @@ Return the length of a terminated `km_core_context_item` array.
 The number of items in the list, not including terminating item,
 or 0 if `context_items` is null.
 ##### Parameters:
-- __context_items__: A pointer to a `KM_KBP_CT_END` terminated array of
+- __context_items__: A pointer to a `KM_CORE_CT_END` terminated array of
     `km_core_context_item` values.
 
 ```c
@@ -491,10 +491,10 @@ typedef struct {
 } km_core_backspace_item;
 
 enum km_core_backspace_type {
-  KM_KBP_BT_UNKNOWN    = 0,  // Used at beginning of context; user-initiated backspace
-  KM_KBP_BT_CHAR       = 1,  // Deleting a character prior to insertion point
-  KM_KBP_BT_MARKER     = 2,  // Deleting a marker prior to insertion point
-  KM_KBP_BT_MAX_TYPE_ID
+  KM_CORE_BT_UNKNOWN    = 0,  // Used at beginning of context; user-initiated backspace
+  KM_CORE_BT_CHAR       = 1,  // Deleting a character prior to insertion point
+  KM_CORE_BT_MARKER     = 2,  // Deleting a marker prior to insertion point
+  KM_CORE_BT_MAX_TYPE_ID
 };
 
 typedef struct {
@@ -510,20 +510,20 @@ typedef struct {
 } km_core_action_item;
 
 enum km_core_action_type {
-  KM_KBP_IT_END         = 0,  // Marks end of action items list.
-  KM_KBP_IT_CHAR        = 1,  // A Unicode character has been generated.
-  KM_KBP_IT_MARKER      = 2,  // Correlates to kmn's "deadkey" markers.
-  KM_KBP_IT_ALERT       = 3,  // The keyboard has triggered a alert/beep/bell.
-  KM_KBP_IT_BACK        = 4,  // Delete the codepoint preceding the insertion point.
-  KM_KBP_IT_PERSIST_OPT = 5,  // The indicated option needs to be stored.
-  KM_KBP_IT_EMIT_KEYSTROKE = 6,  // Emit the current keystroke to the application
-  KM_KBP_IT_INVALIDATE_CONTEXT = 7,
+  KM_CORE_IT_END         = 0,  // Marks end of action items list.
+  KM_CORE_IT_CHAR        = 1,  // A Unicode character has been generated.
+  KM_CORE_IT_MARKER      = 2,  // Correlates to kmn's "deadkey" markers.
+  KM_CORE_IT_ALERT       = 3,  // The keyboard has triggered a alert/beep/bell.
+  KM_CORE_IT_BACK        = 4,  // Delete the codepoint preceding the insertion point.
+  KM_CORE_IT_PERSIST_OPT = 5,  // The indicated option needs to be stored.
+  KM_CORE_IT_EMIT_KEYSTROKE = 6,  // Emit the current keystroke to the application
+  KM_CORE_IT_INVALIDATE_CONTEXT = 7,
           // The processor requests that the context buffer be cleared;
           // for applications where context is cached, this clears the context;
           // for applications where context is read from the focused text store,
           // the context is just re-read and markers flushed.
-  KM_KBP_IT_CAPSLOCK    = 8,  // Enable or disable capsLock
-  KM_KBP_IT_MAX_TYPE_ID
+  KM_CORE_IT_CAPSLOCK    = 8,  // Enable or disable capsLock
+  KM_CORE_IT_MAX_TYPE_ID
 };
 
 
@@ -533,7 +533,7 @@ enum km_core_action_type {
 A state’s default options are set from the keyboard at creation time and the
 environment. The Platform layer is then is expected to apply any persisted
 options it is maintaining.  Options are passed into and out of API functions as
-simple C arrays of `km_core_option_item` terminated with a `KM_KBP_OPTIONS_END`
+simple C arrays of `km_core_option_item` terminated with a `KM_CORE_OPTIONS_END`
 sentinel value. A state's options are exposed and manipulatable via the
 `km_core_options` API. All option values are of type C string.
 
@@ -546,10 +546,10 @@ value.
 */
 
 enum km_core_option_scope {
-  KM_KBP_OPT_UNKNOWN      = 0,
-  KM_KBP_OPT_KEYBOARD     = 1,
-  KM_KBP_OPT_ENVIRONMENT  = 2,
-  KM_KBP_OPT_MAX_SCOPES
+  KM_CORE_OPT_UNKNOWN      = 0,
+  KM_CORE_OPT_KEYBOARD     = 1,
+  KM_CORE_OPT_ENVIRONMENT  = 2,
+  KM_CORE_OPT_MAX_SCOPES
 };
 
 struct km_core_option_item {
@@ -558,7 +558,7 @@ struct km_core_option_item {
   uint8_t             scope;  // Scope which an option belongs to.
 };
 
-#define KM_KBP_OPTIONS_END { 0, 0, 0 }
+#define KM_CORE_OPTIONS_END { 0, 0, 0 }
 
 
 /*
@@ -571,7 +571,7 @@ list).
 The number of items in the list, not including terminating item,
 or 0 if `opts` is null.
 ##### Parameters:
-- __opts__: A pointer to a `KM_KBP_OPTIONS_END` terminated array of
+- __opts__: A pointer to a `KM_CORE_OPTIONS_END` terminated array of
     `km_core_option_item` values.
 
 ```c
@@ -586,10 +586,10 @@ km_core_options_list_size(km_core_option_item const *opts);
 ##### Description:
 Lookup an option based on its key, in an options list.
 ##### Return status:
-- `KM_KBP_STATUS_OK`: On success.
-- `KM_KBP_STATUS_INVALID_ARGUMENT`: If non-optional parameters are null, or
+- `KM_CORE_STATUS_OK`: On success.
+- `KM_CORE_STATUS_INVALID_ARGUMENT`: If non-optional parameters are null, or
   if the scope is invalid.
-- `KM_KBP_STATUS_KEY_ERROR`: The key cannot be found.
+- `KM_CORE_STATUS_KEY_ERROR`: The key cannot be found.
 ##### Parameters:
 - __state__: An opaque pointer to a state object.
 - __scope__: Which key-value store to interrogate.
@@ -613,14 +613,14 @@ km_core_state_option_lookup(km_core_state const *state,
 ##### Description:
 Adds or updates one or more options from a list of `km_core_option_item`s.
 ##### Return status:
-- `KM_KBP_STATUS_OK`: On success.
-- `KM_KBP_STATUS_INVALID_ARGUMENT`: If non-optional parameters are null.
-- `KM_KBP_STATUS_NO_MEM`: In the event an internal memory allocation fails.
-- `KM_KBP_STATUS_KEY_ERROR`: The key cannot be found.
+- `KM_CORE_STATUS_OK`: On success.
+- `KM_CORE_STATUS_INVALID_ARGUMENT`: If non-optional parameters are null.
+- `KM_CORE_STATUS_NO_MEM`: In the event an internal memory allocation fails.
+- `KM_CORE_STATUS_KEY_ERROR`: The key cannot be found.
 ##### Parameters:
 - __state__: An opaque pointer to a state object.
 - __new_opts__: An array of `km_core_option_item` objects to update or add. Must be
-    terminated with `KM_KBP_OPTIONS_END`.
+    terminated with `KM_CORE_OPTIONS_END`.
 
 ```c
 */
@@ -639,9 +639,9 @@ passed as the buffer the number of bytes required is returned in `space`. If
 there is insufficent space to hold the document the contents of the buffer is
 undefined. The returned buffer uses UTF-8 encoding.
 ##### Return status:
-- `KM_KBP_STATUS_OK`: On success.
-- `KM_KBP_STATUS_INVALID_ARGUMENT`: If non-optional parameters are null.
-- `KM_KBP_STATUS_NO_MEM`: In the event an internal memory allocation fails.
+- `KM_CORE_STATUS_OK`: On success.
+- `KM_CORE_STATUS_INVALID_ARGUMENT`: If non-optional parameters are null.
+- `KM_CORE_STATUS_NO_MEM`: In the event an internal memory allocation fails.
 ##### Parameters:
 - __state__: An opaque pointer to a state object.
 - __buf__: A pointer to the buffer to place the C string containing the JSON
@@ -681,7 +681,7 @@ typedef struct {
   uint32_t modifier_flag;
 } km_core_keyboard_key;
 
-#define KM_KBP_KEYBOARD_KEY_LIST_END { 0, 0 }
+#define KM_CORE_KEYBOARD_KEY_LIST_END { 0, 0 }
 
 typedef struct {
   km_core_cp const * library_name;
@@ -689,7 +689,7 @@ typedef struct {
   uint32_t imx_id; // unique identifier used to call this function
 } km_core_keyboard_imx;
 
-#define KM_KBP_KEYBOARD_IMX_END { 0, 0, 0 }
+#define KM_CORE_KEYBOARD_IMX_END { 0, 0, 0 }
 
 /*
 ```
@@ -698,13 +698,13 @@ typedef struct {
 Parse and load keyboard from the supplied path and a pointer to the loaded keyboard
 into the out paramter.
 ##### Return status:
-- `KM_KBP_STATUS_OK`: On success.
-- `KM_KBP_STATUS_NO_MEM`: In the event an internal memory allocation fails.
-- `KM_KBP_STATUS_IO_ERROR`:
+- `KM_CORE_STATUS_OK`: On success.
+- `KM_CORE_STATUS_NO_MEM`: In the event an internal memory allocation fails.
+- `KM_CORE_STATUS_IO_ERROR`:
     In the event the keyboard file is unparseable for any reason
-- `KM_KBP_STATUS_INVALID_ARGUMENT`:
+- `KM_CORE_STATUS_INVALID_ARGUMENT`:
     In the event the file doesn't exist or is inaccesible or `keyboard` is null.
-- `KM_KBP_STATUS_OS_ERROR`: Bit 31 (high bit) set, bits 0-30 are an OS-specific
+- `KM_CORE_STATUS_OS_ERROR`: Bit 31 (high bit) set, bits 0-30 are an OS-specific
     error code.
 ##### Parameters:
 - __kb_path__: On Windows, a UTF-16 string; on other platforms, a C string:
@@ -743,8 +743,8 @@ km_core_keyboard_dispose(km_core_keyboard *keyboard);
 Returns the const internal attributes of the keyboard. This structure is valid
 for the lifetime of the opaque keyboard object. Do not modify the returned data.
 ##### Return status:
-- `KM_KBP_STATUS_OK`: On success.
-- `KM_KBP_STATUS_INVALID_ARGUMENT`: If non-optional parameters are null.
+- `KM_CORE_STATUS_OK`: On success.
+- `KM_CORE_STATUS_INVALID_ARGUMENT`: If non-optional parameters are null.
 ##### Parameters:
 - __keyboard__: A pointer to the opaque keyboard object to be queried.
 - __out__: A pointer to the result:
@@ -764,12 +764,12 @@ km_core_keyboard_get_attrs(km_core_keyboard const *keyboard,
 Returns the unordered full set of modifier+virtual keys that are handled by the
 keyboard. The matching dispose call needs to be called to free the memory.
 ##### Return status:
-- `KM_KBP_STATUS_OK`: On success.
-- `KM_KBP_STATUS_INVALID_ARGUMENT`: If non-optional parameters are null.
+- `KM_CORE_STATUS_OK`: On success.
+- `KM_CORE_STATUS_INVALID_ARGUMENT`: If non-optional parameters are null.
 ##### Parameters:
 - __keyboard__: A pointer to the opaque keyboard object to be queried.
 - __out__: A pointer to an array of `km_core_keyboard_key` structures,
-           terminated by `KM_KBP_KEYBOARD_KEY_LIST_END`.
+           terminated by `KM_CORE_KEYBOARD_KEY_LIST_END`.
 
 ```c
 */
@@ -849,17 +849,17 @@ and dynamic options ("option stores" in kmn format).
 Create a keyboard processor state object, maintaining state for the keyboard in
 the environment passed.
 ##### Return status:
-- `KM_KBP_STATUS_OK`: On success.
-- `KM_KBP_STATUS_NO_MEM`:
+- `KM_CORE_STATUS_OK`: On success.
+- `KM_CORE_STATUS_NO_MEM`:
   In the event memory is unavailable to allocate a state object.
-- `KM_KBP_STATUS_INVALID_ARGUMENT`:
+- `KM_CORE_STATUS_INVALID_ARGUMENT`:
   In the event the `keyboard` or `out` pointer are null.
 ##### Parameters:
 - __keyboard__:
 A pointer to the opaque keyboard object this object will hold state for.
 - __env__:
 The array of `km_core_option_item` key/value pairs used to initialise the
-environment, terminated by `KM_KBP_OPTIONS_END`.
+environment, terminated by `KM_CORE_OPTIONS_END`.
 - __out__:
 A pointer to result variable: A pointer to the opaque state object
 returned by the Processor, initalised to maintain state for `keyboard`.
@@ -879,10 +879,10 @@ km_core_state_create(km_core_keyboard *keyboard,
 ##### Description:
 Clone an existing opaque state object.
 ##### Return status:
-- `KM_KBP_STATUS_OK`: On success.
-- `KM_KBP_STATUS_NO_MEM`:
+- `KM_CORE_STATUS_OK`: On success.
+- `KM_CORE_STATUS_NO_MEM`:
 In the event memory is unavailable to allocate a state object.
-- `KM_KBP_STATUS_INVALID_ARGUMENT`:
+- `KM_CORE_STATUS_INVALID_ARGUMENT`:
 In the event the `state` or `out` pointer are null.
 ##### Parameters:
 - __state__:
@@ -962,12 +962,12 @@ Get the list of action items generated by the last call to
 A pointer to a `km_core_action_item` list, of `*num_items` in length. This data
 becomes invalid when the state object is destroyed, or after a call to
 `km_core_process_event`. Do not modify the contents of this data. The returned
-array is terminated with a `KM_KBP_IT_END` entry.
+array is terminated with a `KM_CORE_IT_END` entry.
 ##### Parameters:
 - __state__: A pointer to the opaque `km_core_state` object to be queried.
 - __num_items__:
 A pointer to a result variable: The number of items in the action item list
-including the `KM_KBP_IT_END` terminator. May be null if not that
+including the `KM_CORE_IT_END` terminator. May be null if not that
 information is required.
 
 ```c
@@ -984,13 +984,13 @@ km_core_state_action_items(km_core_state const *state,
 Queue actions for the current keyboard processor state; normally
 used in IMX callbacks called during `km_core_process_event`.
 ##### Return:
-- `KM_KBP_STATUS_OK`: On success.
-- `KM_KBP_STATUS_INVALID_ARGUMENT`:
+- `KM_CORE_STATUS_OK`: On success.
+- `KM_CORE_STATUS_INVALID_ARGUMENT`:
 In the event the `state` or `action_items` pointer are null.
 ##### Parameters:
 - __state__:        A pointer to the opaque `km_core_state` object to be queried.
 - __action_items__: The action items to be added to the core
-                    queue. Must be terminated with a `KM_KBP_IT_END` entry.
+                    queue. Must be terminated with a `KM_CORE_IT_END` entry.
 
 ```c
 */
@@ -1014,8 +1014,8 @@ versioned is not part of this API and is intended solely for use in diagnostics
 or by development and debugging tools which are aware of processor
 implementation details.
 ##### Return status:
-- `KM_KBP_STATUS_OK`: On success.
-- `KM_KBP_STATUS_NO_MEM`: In the event an internal memory allocation fails.
+- `KM_CORE_STATUS_OK`: On success.
+- `KM_CORE_STATUS_NO_MEM`: In the event an internal memory allocation fails.
 ##### Parameters:
 - __state__: An pointer to an opaque state object.
 - __buf__: A pointer to the buffer to place the C string containing the JSON
@@ -1048,10 +1048,10 @@ typedef struct {
 } km_core_attr;
 
 enum km_core_tech_value {
-  KM_KBP_TECH_UNSPECIFIED = 0,
-  KM_KBP_TECH_MOCK        = 1 << 0,
-  KM_KBP_TECH_KMX         = 1 << 1,
-  KM_KBP_TECH_LDML        = 1 << 2
+  KM_CORE_TECH_UNSPECIFIED = 0,
+  KM_CORE_TECH_MOCK        = 1 << 0,
+  KM_CORE_TECH_KMX         = 1 << 1,
+  KM_CORE_TECH_LDML        = 1 << 2
 };
 
 /**
@@ -1060,8 +1060,8 @@ enum km_core_tech_value {
  * Bit flags to be used with the event_flags parameter of km_core_process_event
  */
 enum km_core_event_flags {
-  KM_KBP_EVENT_FLAG_DEFAULT = 0, // default value: hardware
-  KM_KBP_EVENT_FLAG_TOUCH = 1, // set if the event is touch, otherwise hardware
+  KM_CORE_EVENT_FLAG_DEFAULT = 0, // default value: hardware
+  KM_CORE_EVENT_FLAG_TOUCH = 1, // set if the event is touch, otherwise hardware
 };
 
 /*
@@ -1090,10 +1090,10 @@ key state. Updates the state object as appropriate and fills out its action list
 The action list will be cleared at the start of this call; options and context in
 the state may also be modified.
 ##### Return status:
-- `KM_KBP_STATUS_OK`: On success.
-- `KM_KBP_STATUS_NO_MEM`:
+- `KM_CORE_STATUS_OK`: On success.
+- `KM_CORE_STATUS_NO_MEM`:
 In the event memory is unavailable to allocate internal buffers.
-- `KM_KBP_STATUS_INVALID_ARGUMENT`:
+- `KM_CORE_STATUS_INVALID_ARGUMENT`:
 In the event the `state` pointer is null or an invalid virtual key or modifier
 state is passed.
 
@@ -1127,10 +1127,10 @@ then request the processing of the actions with this method.
 The state action list will be cleared at the start of this call; options and context in
 the state may also be modified.
 ##### Return status:
-- `KM_KBP_STATUS_OK`: On success.
-- `KM_KBP_STATUS_NO_MEM`:
+- `KM_CORE_STATUS_OK`: On success.
+- `KM_CORE_STATUS_NO_MEM`:
 In the event memory is unavailable to allocate internal buffers.
-- `KM_KBP_STATUS_INVALID_ARGUMENT`:
+- `KM_CORE_STATUS_INVALID_ARGUMENT`:
 In the event the `state` pointer is null
 
 ##### Parameters:
@@ -1149,10 +1149,10 @@ km_core_process_queued_actions(km_core_state *state);
 Tell the keyboard processor that an external event has occurred, such as a keyboard
 being activated through the language switching UI.
 ##### Return status:
-- `KM_KBP_STATUS_OK`: On success.
-- `KM_KBP_STATUS_NO_MEM`:
+- `KM_CORE_STATUS_OK`: On success.
+- `KM_CORE_STATUS_NO_MEM`:
 In the event memory is unavailable to allocate internal buffers.
-- `KM_KBP_STATUS_INVALID_ARGUMENT`:
+- `KM_CORE_STATUS_INVALID_ARGUMENT`:
 In the event the `state` pointer is null or an invalid event or data is passed.
 
 The keyboard processor may generate actions which should be processed by the
@@ -1179,8 +1179,8 @@ km_core_event(
 enum km_core_event_code {
   // A keyboard has been activated by the user. The processor may use this
   // event, for example, to switch caps lock state or provide other UX.
-  KM_KBP_EVENT_KEYBOARD_ACTIVATED = 1,
-  //future: KM_KBP_EVENT_KEYBOARD_DEACTIVATED = 2,
+  KM_CORE_EVENT_KEYBOARD_ACTIVATED = 1,
+  //future: KM_CORE_EVENT_KEYBOARD_DEACTIVATED = 2,
 };
 
 #if defined(__cplusplus)

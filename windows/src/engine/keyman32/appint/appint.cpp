@@ -240,18 +240,18 @@ BOOL ContextItemsFromAppContext(WCHAR const* buf, km_core_context_item** outPtr)
       // we know the only uc_sentinel code in the context is code_deadkey, which has only 1 parameter: uc_sentinel code_deadkey <deadkey_id>
       // setup dead key context item
       p += 2;
-      context_items[contextIndex++] = km_core_context_item{ KM_KBP_CT_MARKER, {0,}, {*p} };
+      context_items[contextIndex++] = km_core_context_item{ KM_CORE_CT_MARKER, {0,}, {*p} };
     } else if (Uni_IsSurrogate1(*p) && Uni_IsSurrogate2(*(p + 1))) {
       // handle surrogate
-      context_items[contextIndex++] = km_core_context_item{ KM_KBP_CT_CHAR, {0,}, {(char32_t)Uni_SurrogateToUTF32(*p, *(p + 1))} };
+      context_items[contextIndex++] = km_core_context_item{ KM_CORE_CT_CHAR, {0,}, {(char32_t)Uni_SurrogateToUTF32(*p, *(p + 1))} };
       p++;
     } else {
-      context_items[contextIndex++] = km_core_context_item{ KM_KBP_CT_CHAR, {0,}, {*p} };
+      context_items[contextIndex++] = km_core_context_item{ KM_CORE_CT_CHAR, {0,}, {*p} };
     }
     p++;
   }
   // terminate the context_items array.
-  context_items[contextIndex] = km_core_context_item KM_KBP_CONTEXT_ITEM_END;
+  context_items[contextIndex] = km_core_context_item KM_CORE_CONTEXT_ITEM_END;
 
   *outPtr = context_items;
   return true;
@@ -265,16 +265,16 @@ ContextItemToAppContext(km_core_context_item *contextItems, PWSTR outBuf, DWORD 
 
   km_core_context_item *km_core_context_it = contextItems;
   uint8_t contextLen               = 0;
-  for (; km_core_context_it->type != KM_KBP_CT_END; ++km_core_context_it) {
+  for (; km_core_context_it->type != KM_CORE_CT_END; ++km_core_context_it) {
     ++contextLen;
   }
 
   WCHAR *buf = new WCHAR[(contextLen*3)+ 1 ]; // *3 if every context item was a deadkey
   uint8_t idx               = 0;
   km_core_context_it = contextItems;
-  for (; km_core_context_it->type != KM_KBP_CT_END; ++km_core_context_it) {
+  for (; km_core_context_it->type != KM_CORE_CT_END; ++km_core_context_it) {
     switch (km_core_context_it->type) {
-    case KM_KBP_CT_CHAR:
+    case KM_CORE_CT_CHAR:
       if (Uni_IsSMP(km_core_context_it->character)) {
         buf[idx++] = static_cast<WCHAR> Uni_UTF32ToSurrogate1(km_core_context_it->character);
         buf[idx++] = static_cast<WCHAR> Uni_UTF32ToSurrogate2(km_core_context_it->character);
@@ -282,7 +282,7 @@ ContextItemToAppContext(km_core_context_item *contextItems, PWSTR outBuf, DWORD 
         buf[idx++] = (km_core_cp)km_core_context_it->character;
       }
       break;
-    case KM_KBP_CT_MARKER:
+    case KM_CORE_CT_MARKER:
       assert(km_core_context_it->marker > 0);
       buf[idx++] = UC_SENTINEL;
       buf[idx++] = CODE_DEADKEY;

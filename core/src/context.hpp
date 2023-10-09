@@ -30,13 +30,13 @@ public:
 
 inline
 void context::push_character(km_core_usv usv) {
-  emplace_back(km_core_context_item { KM_KBP_CT_CHAR, {0,}, {usv} });
+  emplace_back(km_core_context_item { KM_CORE_CT_CHAR, {0,}, {usv} });
 }
 
 
 inline
 void context::push_marker(uint32_t marker) {
-  emplace_back(km_core_context_item { KM_KBP_CT_MARKER, {0,}, {marker} });
+  emplace_back(km_core_context_item { KM_CORE_CT_MARKER, {0,}, {marker} });
 }
 
 } // namespace kbp

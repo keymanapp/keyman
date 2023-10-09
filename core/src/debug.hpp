@@ -41,19 +41,19 @@ debug_items::debug_items(Args&&... args)
 
 inline
 void debug_items::assert_push_entry() {
-  assert(empty() || (!empty() && back().type != KM_KBP_DEBUG_END));
+  assert(empty() || (!empty() && back().type != KM_CORE_DEBUG_END));
 }
 
 inline
 void debug_items::push_begin(km_core_state_debug_key_info *key_info, uint32_t flags) {
   assert_push_entry();
-  emplace_back(km_core_state_debug_item{ KM_KBP_DEBUG_BEGIN, flags, {*key_info, }, { }});
+  emplace_back(km_core_state_debug_item{ KM_CORE_DEBUG_BEGIN, flags, {*key_info, }, { }});
 }
 
 inline
 void debug_items::push_end(uint16_t first_action, uint32_t flags) {
   assert_push_entry();
-  emplace_back(km_core_state_debug_item{ KM_KBP_DEBUG_END, flags, { }, { u"", nullptr, nullptr, { }, first_action, {} } });
+  emplace_back(km_core_state_debug_item{ KM_CORE_DEBUG_END, flags, { }, { u"", nullptr, nullptr, { }, first_action, {} } });
 }
 
 inline

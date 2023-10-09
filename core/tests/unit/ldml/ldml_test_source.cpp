@@ -67,7 +67,7 @@ LdmlTestSource::~LdmlTestSource() {
 }
 
 km_core_status LdmlTestSource::get_expected_load_status() {
-  return KM_KBP_STATUS_OK;
+  return KM_CORE_STATUS_OK;
 }
 
 bool LdmlTestSource::get_expected_beep() const {
@@ -259,7 +259,7 @@ LdmlEmbeddedTestSource::load_source( const km::kbp::path &path ) {
 
 km_core_status
 LdmlEmbeddedTestSource::get_expected_load_status() {
-  return expected_error ? KM_KBP_STATUS_INVALID_KEYBOARD : KM_KBP_STATUS_OK;
+  return expected_error ? KM_CORE_STATUS_INVALID_KEYBOARD : KM_CORE_STATUS_OK;
 }
 
 const std::u16string&
@@ -273,7 +273,7 @@ bool LdmlEmbeddedTestSource::get_expected_beep() const {
 
 int
 LdmlTestSource::caps_lock_state() {
-  return _caps_lock_on ? KM_KBP_MODIFIER_CAPS : 0;
+  return _caps_lock_on ? KM_CORE_MODIFIER_CAPS : 0;
 }
 
 void
@@ -291,7 +291,7 @@ LdmlTestSource::char_to_event(char ch) {
   assert(ch >= 32);
   return {
       km::kbp::kmx::s_char_to_vkey[(int)ch - 32].vk,
-      (uint16_t)(km::kbp::kmx::s_char_to_vkey[(int)ch - 32].shifted ? KM_KBP_MODIFIER_SHIFT : 0)};
+      (uint16_t)(km::kbp::kmx::s_char_to_vkey[(int)ch - 32].shifted ? KM_CORE_MODIFIER_SHIFT : 0)};
 }
 
 uint16_t
