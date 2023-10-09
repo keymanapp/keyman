@@ -26,6 +26,7 @@ describe('keyboard-info-compiler', function () {
         sourcePath: 'release/k/khmer_angkor',
         kpsFilename,
         jsFilename: jsFilename,
+        forPublishing: true,
       });
     } catch(e) {
       callbacks.printMessages();

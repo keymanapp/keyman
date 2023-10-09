@@ -1,12 +1,13 @@
 import * as fs from 'fs';
 import { BuildActivity } from './BuildActivity.js';
-import { CompilerCallbacks, CompilerOptions, KeymanFileTypes } from '@keymanapp/common-types';
+import { CompilerCallbacks, KeymanFileTypes } from '@keymanapp/common-types';
 import { ModelInfoCompiler } from '@keymanapp/kmc-model-info';
 import { KmpCompiler } from '@keymanapp/kmc-package';
 import { loadProject } from '../../util/projectLoader.js';
 import { InfrastructureMessages } from '../../messages/infrastructureMessages.js';
 import { calculateSourcePath } from '../../util/calculateSourcePath.js';
 import { getLastGitCommitDate } from '../../util/getLastGitCommitDate.js';
+import { ExtendedCompilerOptions } from 'src/util/extendedCompilerOptions.js';
 
 export class BuildModelInfo extends BuildActivity {
   public get name(): string { return 'Lexical model metadata'; }
@@ -24,7 +25,7 @@ export class BuildModelInfo extends BuildActivity {
    * @param options
    * @returns
    */
-  public async build(infile: string, callbacks: CompilerCallbacks, options: CompilerOptions): Promise<boolean> {
+  public async build(infile: string, callbacks: CompilerCallbacks, options: ExtendedCompilerOptions): Promise<boolean> {
     if(!KeymanFileTypes.filenameIs(infile, KeymanFileTypes.Source.Project)) {
       // Even if the project file does not exist, we use its name as our reference
       // in order to avoid ambiguity
@@ -65,7 +66,8 @@ export class BuildModelInfo extends BuildActivity {
       modelFileName: project.resolveOutputFilePath(model, KeymanFileTypes.Source.Model, KeymanFileTypes.Binary.Model),
       kmpFileName: project.resolveOutputFilePath(kps, KeymanFileTypes.Source.Package, KeymanFileTypes.Binary.Package),
       kpsFilename: project.resolveInputFilePath(kps),
-      lastCommitDate
+      lastCommitDate,
+      forPublishing: !!options.forPublishing,
     });
 
     if(data == null) {

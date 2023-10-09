@@ -11,10 +11,9 @@ import { expandFileLists } from '../util/fileLists.js';
 import { isProject } from '../util/projectLoader.js';
 import { buildTestData } from './buildTestData/index.js';
 import { buildWindowsPackageInstaller } from './buildWindowsPackageInstaller/index.js';
-//import { buildWindowsPackageInstaller } from './buildWindowsPackageInstaller/index.js';
+import { ExtendedCompilerOptions } from 'src/util/extendedCompilerOptions.js';
 
-
-function commandOptionsToCompilerOptions(options: any): CompilerOptions {
+function commandOptionsToCompilerOptions(options: any): ExtendedCompilerOptions {
   // We don't want to rename command line options to match the precise
   // properties that we have in CompilerOptions, but nor do we want to rename
   // CompilerOptions properties...
@@ -29,6 +28,8 @@ function commandOptionsToCompilerOptions(options: any): CompilerOptions {
     saveDebug: options.debug,
     compilerWarningsAsErrors: options.compilerWarningsAsErrors,
     warnDeprecatedCode: options.warnDeprecatedCode,
+    // ExtendedOptions
+    forPublishing: options.forPublishing,
   }
 }
 
@@ -50,6 +51,7 @@ export function declareBuild(program: Command) {
 
   buildCommand.command('file [infile...]', {isDefault: true})
     .description(`Compile one or more source files or projects ('file' subcommand is default).`)
+    .option('--for-publishing', 'Verify that project meets @keymanapp repository requirements')
     .addHelpText('after', `
 Supported file types:
 * folder: Keyman project in folder

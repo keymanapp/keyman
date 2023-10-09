@@ -1,17 +1,18 @@
 import * as path from 'path';
 import * as fs from 'fs';
-import { CompilerCallbacks, CompilerFileCallbacks, CompilerOptions, KeymanDeveloperProject, KeymanDeveloperProjectFile, KeymanFileTypes } from '@keymanapp/common-types';
+import { CompilerCallbacks, CompilerFileCallbacks, KeymanDeveloperProject, KeymanDeveloperProjectFile, KeymanFileTypes } from '@keymanapp/common-types';
 import { BuildActivity } from './BuildActivity.js';
 import { buildActivities, buildKeyboardInfoActivity, buildModelInfoActivity } from './buildActivities.js';
 import { InfrastructureMessages } from '../../messages/infrastructureMessages.js';
 import { loadProject } from '../../util/projectLoader.js';
+import { ExtendedCompilerOptions } from 'src/util/extendedCompilerOptions.js';
 
 export class BuildProject extends BuildActivity {
   public get name(): string { return 'Project'; }
   public get sourceExtension(): KeymanFileTypes.Source { return KeymanFileTypes.Source.Project; }
   public get compiledExtension(): KeymanFileTypes.Binary { return null; }
   public get description(): string  { return 'Build a keyboard or lexical model project'; }
-  public async build(infile: string, callbacks: CompilerCallbacks, options: CompilerOptions): Promise<boolean> {
+  public async build(infile: string, callbacks: CompilerCallbacks, options: ExtendedCompilerOptions): Promise<boolean> {
     let builder = new ProjectBuilder(infile, callbacks, options);
     return builder.run();
   }
@@ -20,10 +21,10 @@ export class BuildProject extends BuildActivity {
 class ProjectBuilder {
   callbacks: CompilerCallbacks;
   infile: string;
-  options: CompilerOptions;
+  options: ExtendedCompilerOptions;
   project: KeymanDeveloperProject;
 
-  constructor(infile: string, callbacks: CompilerCallbacks, options: CompilerOptions) {
+  constructor(infile: string, callbacks: CompilerCallbacks, options: ExtendedCompilerOptions) {
     this.infile = path.resolve(infile);
     this.callbacks = new CompilerFileCallbacks(infile, options, callbacks);
     this.options = options;
@@ -53,7 +54,7 @@ class ProjectBuilder {
     }
 
     // Build project metadata
-    if(!this.project.options.skipMetadataFiles) {
+    if(this.options.forPublishing || !this.project.options.skipMetadataFiles) {
       if(!await (this.buildProjectTargets(
           this.project.isKeyboardProject()
           ? buildKeyboardInfoActivity
