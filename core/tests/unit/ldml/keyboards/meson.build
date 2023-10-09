@@ -51,7 +51,7 @@ kmc_root = join_paths(meson.source_root(),'..','developer','src','kmc')
 ldml_root = join_paths(meson.source_root(),'..','resources','standards-data','ldml-keyboards','techpreview')
 ldml_data = join_paths(ldml_root, '3.0')
 ldml_testdata = join_paths(ldml_root, 'test')
-kmc_cmd = [node, kmc_root]
+kmc_cmd = [node, '--enable-source-maps', kmc_root]
 
 # Build all keyboards in output folder
 

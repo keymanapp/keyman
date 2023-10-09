@@ -112,8 +112,10 @@ function _parseWordList(wordlist: WordList, source:  WordListSource): void {
 
     wordform = wordform.normalize('NFC');
     if (original !== wordform) {
-      // Mixed normalization forms are yucky! Warn about it.
-      callbacks.reportMessage(ModelCompilerMessages.Warn_MixedNormalizationForms({wordform: wordform}));
+      // Mixed normalization forms are yucky! Hint about it, because it may
+      // result in unexpected counts where multiple normalization forms for one
+      // word
+      callbacks.reportMessage(ModelCompilerMessages.Hint_MixedNormalizationForms({wordform: wordform}));
     }
 
     wordform = wordform.trim()
@@ -129,9 +131,9 @@ function _parseWordList(wordlist: WordList, source:  WordListSource): void {
     }
 
     if (wordsSeenInThisFile.has(wordform)) {
-      // The same word seen across multiple files is fine,
-      // but a word seen multiple times in one file is a problem!
-      callbacks.reportMessage(ModelCompilerMessages.Warn_DuplicateWordInSameFile({wordform: wordform}));
+      // The same word seen across multiple files is fine, but a word seen
+      // multiple times in one file may be a problem
+      callbacks.reportMessage(ModelCompilerMessages.Hint_DuplicateWordInSameFile({wordform: wordform}));
     }
     wordsSeenInThisFile.add(wordform);
 

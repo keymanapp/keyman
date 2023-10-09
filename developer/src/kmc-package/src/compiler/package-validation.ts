@@ -1,4 +1,4 @@
-import { KmpJsonFile, CompilerCallbacks, CompilerOptions } from '@keymanapp/common-types';
+import { KmpJsonFile, CompilerCallbacks, CompilerOptions, KeymanFileTypes } from '@keymanapp/common-types';
 import { CompilerMessages } from './messages.js';
 import { keymanEngineForWindowsFiles, keymanForWindowsInstallerFiles, keymanForWindowsRedistFiles } from './redist-files.js';
 
@@ -167,15 +167,35 @@ export class PackageValidation {
   }
 
   private checkIfContentFileIsDangerous(file: KmpJsonFile.KmpJsonFileContentFile): boolean {
-    let filename = this.callbacks.path.basename(file.name).toLowerCase();
+    const filename = this.callbacks.path.basename(file.name).toLowerCase();
+
+    // # Test for inclusion of redistributable files
+
     if(keymanForWindowsInstallerFiles.includes(filename) ||
         keymanForWindowsRedistFiles.includes(filename) ||
         keymanEngineForWindowsFiles.includes(filename)) {
       this.callbacks.reportMessage(CompilerMessages.Warn_RedistFileShouldNotBeInPackage({filename}));
     }
+
+    // # Test for inclusion of .doc or .docx files
+
     if(filename.match(/\.doc(x?)$/)) {
       this.callbacks.reportMessage(CompilerMessages.Warn_DocFileDangerous({filename}));
     }
+
+    // # Test for inclusion of keyboard source files
+    //
+    // We treat this as a hint, because it's not a dangerous problem, just
+    // something that suggests that perhaps they are trying to distribute the
+    // wrong files.
+    //
+    // Note: we allow .xml in the package because there are other files
+    // which may be valid, not just LDML keyboards
+    const fileType = KeymanFileTypes.sourceTypeFromFilename(file.name);
+    if(fileType !== null && fileType !== KeymanFileTypes.Source.LdmlKeyboard) {
+      this.callbacks.reportMessage(CompilerMessages.Hint_PackageContainsSourceFile({filename: file.name}));
+    }
+
     return true;
   }
 
