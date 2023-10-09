@@ -36,6 +36,7 @@ function help() {
   echo "  --env <envfile>         Name of the file containing environment variables to use"
   echo "  --check <pidfile>       Name of the file containing pids to check are running"
   echo "  --cleanup <file>        Name of the file containing cleanup of processes"
+  echo "  --testname <name>       Name of the test"
   exit 0
 }
 
@@ -69,6 +70,7 @@ while (( $# )); do
     --env) shift ; ARG_ENV=$1 ;;
     --check) shift; ARG_PIDS=$1 ;;
     --cleanup) shift; ARG_CLEANUP=$1 ;;
+    --testname) shift; ARG_TESTNAME=$1 ;;
     --) shift ; TESTFILE=$1; break ;;
     *) echo "Error: Unexpected argument \"$1\". Exiting." ; exit 4 ;;
   esac
@@ -81,7 +83,7 @@ if [ -n "${ARG_PIDS:-}" ] && [ ! -n "${ARG_CLEANUP:-}" ]; then
   exit 6
 fi
 
-check_processes_running "$ARG_DISPLAY_SERVER" "$ARG_ENV" "$ARG_CLEANUP" "$ARG_PIDS" >&2
+check_processes_running "$ARG_DISPLAY_SERVER" "$ARG_ENV" "$ARG_CLEANUP" "$ARG_PIDS" "$ARG_TESTNAME" >&2
 
 # shellcheck source=/dev/null
 . "$ARG_ENV"

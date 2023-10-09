@@ -118,7 +118,7 @@ foreach kmx: kmxtest_files
   test(
     'X11-' + testname + '__surrounding-text',
     run_test,
-    args: [ '--x11', '--surrounding-text', test_args],
+    args: [ '--testname', testname, '--x11', '--surrounding-text', test_args],
     env: test_env,
     depends: [test_exe],
     priority: -11,
@@ -129,7 +129,7 @@ foreach kmx: kmxtest_files
   test(
     'X11-' + testname + '__no-surrounding-text',
     run_test,
-    args: [ '--x11', '--no-surrounding-text', test_args],
+    args: [ '--testname', testname, '--x11', '--no-surrounding-text', test_args],
     env: test_env,
     depends: [test_exe],
     priority: -12,
@@ -141,7 +141,7 @@ foreach kmx: kmxtest_files
     test(
       'Wayland-' + testname + '__surrounding-text',
       run_test,
-      args: [ '--wayland', '--surrounding-text', test_args],
+      args: [ '--testname', testname, '--wayland', '--surrounding-text', test_args],
       env: test_env,
       depends: [test_exe],
       priority: -21,
@@ -152,7 +152,7 @@ foreach kmx: kmxtest_files
     test(
       'Wayland-' + testname + '__no-surrounding-text',
       run_test,
-      args: [ '--wayland', '--no-surrounding-text', test_args],
+      args: [ '--testname', testname, '--wayland', '--no-surrounding-text', test_args],
       env: test_env,
       depends: [test_exe],
       priority: -22,

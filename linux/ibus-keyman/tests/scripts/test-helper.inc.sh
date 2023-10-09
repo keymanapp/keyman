@@ -324,11 +324,12 @@ function exit_on_package_build() {
 }
 
 function check_processes_running() {
-  local DISPLAY_SERVER ENV_FILE CLEANUP_FILE PID_FILE LINE PID MISSING MISSING_PROCS
+  local DISPLAY_SERVER ENV_FILE CLEANUP_FILE PID_FILE LINE PID MISSING MISSING_PROCS TEST_NAME
   DISPLAY_SERVER=$1
   ENV_FILE=$2
   CLEANUP_FILE=$3
   PID_FILE=$4
+  TEST_NAME=$5
   MISSING=false
   MISSING_PROCS=""
 
@@ -339,17 +340,17 @@ function check_processes_running() {
     PID=$(echo "$LINE" | cut -d' ' -f1)
     if ! ps --no-headers --pid="$PID" > /dev/null; then
       MISSING=true
-      MISSING_PROCS="${MISSING_PROCS}    $(echo "$LINE" | cut -d' ' -f2)\n"
+      MISSING_PROCS="${MISSING_PROCS}    $(echo "$LINE" | cut -d' ' -f2)"
       break
     fi
   done < "${PID_FILE}"
 
   if $MISSING; then
     echo "# Some background processes no longer running. Restarting..."
-    echo "Some background processes no longer running:" >> /tmp/debug.output
-    echo "$MISSING_PROCS" >> /tmp/debug.output
-    echo "Restarting..." >> /tmp/debug.output
-    mv /tmp/ibus-engine-keyman.log{,"-$(date -Iseconds)"}
+    { echo "Some background processes no longer running (running ${TEST_NAME}):" ; \
+      echo "$MISSING_PROCS" ; \
+      echo "Restarting..." ; } >> /tmp/debug.output
+    mv /tmp/ibus-engine-keyman.log{,"-${TEST_NAME}-$(date -Iseconds)"}
     cleanup "${CLEANUP_FILE}" > /dev/null 2>&1
     setup "${DISPLAY_SERVER}" "${ENV_FILE}" "${CLEANUP_FILE}" "${PID_FILE}" > /dev/null 2>&1
   fi
