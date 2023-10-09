@@ -188,7 +188,7 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
     /* During integrated tests, it was possible in the past for a `beforeAll`
      * -initialized KMW to reach this state between tests.  The target fixture
      * got cleared, but the `mostRecentTarget` / `lastActiveTarget` was not
-     * - just the `currentTarget` / `activeTarget`.
+     * - just the `currentTarget` / `activeTarget`.  See #9718.
      *
      * Newly-added code in `forgetActiveTarget` seeks to prevent this scenario,
      * but as there's no consistent repro to prove it sufficient, an appropriate
