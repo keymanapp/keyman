@@ -1,7 +1,7 @@
 {
  * Keyman is copyright (C) SIL International. MIT License.
  *
- * Debug interface for Keyman Core, matches keyman_core_api_debug.h.h
+ * Debug interface for Keyman Core, matches keyman_core_api_debug.h
 }
 unit Keyman.System.KeymanCoreDebug;
 
@@ -189,7 +189,7 @@ initialization
   Assert(sizeof(km_kbp_keyboard_attrs) = 16);
   Assert(sizeof(km_kbp_attr) = 16);
 
-  //keyman_core_api_debug.h.h:
+  //keyman_core_api_debug.h:
   Assert(sizeof(km_kbp_state_debug_item) = 432);
   Assert(sizeof(km_kbp_state_debug_key_info) = 6);
   Assert(sizeof(km_kbp_state_debug_kmx_info) = 416);

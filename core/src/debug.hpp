@@ -10,7 +10,7 @@
 #include <vector>
 
 #include <keyman/keyman_core_api.h>
-#include <keyman/keyman_core_api_debug.h.h>
+#include <keyman/keyman_core_api_debug.h>
 
 namespace km {
 namespace kbp

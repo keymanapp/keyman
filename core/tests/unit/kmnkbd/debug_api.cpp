@@ -469,7 +469,7 @@ int print_sizeof() {
   std::cout << "sizeof(km_kbp_keyboard_attrs): " << sizeof(km_kbp_keyboard_attrs) << std::endl;
   std::cout << "sizeof(km_kbp_attr): " << sizeof(km_kbp_attr) << std::endl;
   std::cout << std::endl;
-  std::cout << "keyman_core_api_debug.h.h:" << std::endl;
+  std::cout << "keyman_core_api_debug.h:" << std::endl;
   std::cout << "sizeof(km_kbp_state_debug_item): " << sizeof(km_kbp_state_debug_item) << std::endl;
   std::cout << "sizeof(km_kbp_state_debug_key_info): " << sizeof(km_kbp_state_debug_key_info) << std::endl;
   std::cout << "sizeof(km_kbp_state_debug_kmx_info): " << sizeof(km_kbp_state_debug_kmx_info) << std::endl;

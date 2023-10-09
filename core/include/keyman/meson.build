@@ -26,7 +26,7 @@ configure_file(
 install_headers('keyman_core_api.h',
                 'keyman_core_api_bits.h',
                 'keyman_core_api_consts.h',
-                'keyman_core_api_debug.h.h',
+                'keyman_core_api_debug.h',
                 'keyman_core_api_vkeys.h',
                 join_paths(meson.current_build_dir(), 'keyman_core_api_version.h'),
                 '../../../common/include/km_types.h',
