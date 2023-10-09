@@ -24,7 +24,7 @@
       <ID>basic</ID>
       <Version>1.0</Version>
       <Languages>
-        <!-- WARN_PackageShouldNotRepeatLanguages -->
+        <!-- HINT_PackageShouldNotRepeatLanguages -->
         <Language ID="km">Central Khmer (Khmer, Cambodia)</Language>
         <Language ID="KM">Khmer</Language>
       </Languages>

@@ -68,7 +68,7 @@ export class PackageValidation {
       }
 
       if(minimalTags[minimalTag]) {
-        this.callbacks.reportMessage(CompilerMessages.Warn_PackageShouldNotRepeatLanguages({resourceType, id, minimalTag, firstTag: lang.id, secondTag: minimalTags[minimalTag]}));
+        this.callbacks.reportMessage(CompilerMessages.Hint_PackageShouldNotRepeatLanguages({resourceType, id, minimalTag, firstTag: lang.id, secondTag: minimalTags[minimalTag]}));
       }
       else {
         minimalTags[minimalTag] = lang.id;

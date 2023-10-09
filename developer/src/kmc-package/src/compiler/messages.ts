@@ -50,9 +50,9 @@ export class CompilerMessages {
     `The package contains both lexical models and keyboards, which is not permitted.`);
   static ERROR_PackageCannotContainBothModelsAndKeyboards = SevError | 0x000B;
 
-  static Warn_PackageShouldNotRepeatLanguages = (o:{resourceType: string, id: string, minimalTag: string, firstTag: string, secondTag: string}) => m(this.WARN_PackageShouldNotRepeatLanguages,
+  static Hint_PackageShouldNotRepeatLanguages = (o:{resourceType: string, id: string, minimalTag: string, firstTag: string, secondTag: string}) => m(this.HINT_PackageShouldNotRepeatLanguages,
     `Two language tags in ${o.resourceType} ${o.id}, '${o.firstTag}' and '${o.secondTag}', reduce to the same minimal tag '${o.minimalTag}'.`);
-  static WARN_PackageShouldNotRepeatLanguages = SevWarn | 0x000C;
+  static HINT_PackageShouldNotRepeatLanguages = SevHint | 0x000C;
 
   static Warn_PackageNameDoesNotFollowLexicalModelConventions = (o:{filename: string}) => m(this.WARN_PackageNameDoesNotFollowLexicalModelConventions,
     `The package file ${o.filename} does not follow the recommended model filename conventions. The name should be all lower case, `+
