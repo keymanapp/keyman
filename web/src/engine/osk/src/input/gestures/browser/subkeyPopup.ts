@@ -44,7 +44,7 @@ export default class SubkeyPopup {
     this.baseKey = e;
 
     source.on('complete', () => {
-      this.currentSelection.key.highlight(false);
+      this.currentSelection?.key.highlight(false);
       this.clear();
     });
 
@@ -55,8 +55,8 @@ export default class SubkeyPopup {
     subkeyComponent.path.on('step', (sample) => {
       // Require a fudge-factor before dropping the default key.
       if(subkeyComponent.path.stats.netDistance >= 4) {
-        this.currentSelection.key.highlight(false);
-        sample.item.key.highlight(true);
+        this.currentSelection?.key.highlight(false);
+        sample.item?.key.highlight(true);
         this.currentSelection = sample.item;
       }
     });
@@ -123,7 +123,7 @@ export default class SubkeyPopup {
 
     // Highlight the duplicated base key or ideal subkey (if a phone)
     if(vkbd.device.formFactor == DeviceSpec.FormFactor.Phone) {
-      this.selectDefaultSubkey(vkbd, e, elements /* == this.element */);
+      this.selectDefaultSubkey(e, elements /* == this.element */);
     }
 
     vkbd.topContainer.appendChild(this.element);
@@ -145,7 +145,7 @@ export default class SubkeyPopup {
 
     const subkeyStyle = this.subkeys[0].style;
     const subkeyHeight = Number.parseInt(subkeyStyle.height, 10);
-    const basePadding = -0.333 * subkeyHeight;  // extends bounds by the absolute value.
+    const basePadding = -0.666 * subkeyHeight;  // extends bounds by the absolute value.
 
     const bottomDistance = underlyingKeyBounding.bottom - baseBounding.bottom;
 
@@ -159,15 +159,33 @@ export default class SubkeyPopup {
       bottomDistance > basePadding ? -bottomDistance : basePadding
     ]);
 
+    const topContainer = vkbd.topContainer;
+    const topContainerBounding = topContainer.getBoundingClientRect();
+    // Uses the top boundary from `roamBounding` unless the OSK's main element has a more
+    // permissive top boundary.
+    const topPadding = Math.min(baseBounding.top + basePadding - topContainerBounding.top, 0);
+    const sustainBounding = new PaddedZoneSource(topContainer, [topPadding, 0, 0])
+
     return {
       targetRoot: this.element,
       inputStartBounds: vkbd.element,
-      maxRoamingBounds: roamBounding,
+      maxRoamingBounds: sustainBounding,
       itemIdentifier: (coord, target) => {
+        const roamingRect = roamBounding.getBoundingClientRect();
+
         let bestMatchKey: KeyElement = null;
         let bestYdist = Number.MAX_VALUE;
         let bestXdist = Number.MAX_VALUE;
 
+        // Step 1:  is the coordinate within the range we permit for selecting _anything_?
+        if(coord.clientX < roamingRect.left || coord.clientX > roamingRect.right) {
+          return null;
+        }
+        if(coord.clientY < roamingRect.top || coord.clientY > roamingRect.bottom) {
+          return null;
+        }
+
+        // Step 2:  okay, selection is permitted.  So... what to select?
         for(let key of this.subkeys) {
           const keyBounds = key.getBoundingClientRect();
 
@@ -285,7 +303,7 @@ export default class SubkeyPopup {
     }
   }
 
-  selectDefaultSubkey(vkbd: VisualKeyboard, baseKey: KeyElement, popupBase: HTMLElement) {
+  selectDefaultSubkey(baseKey: KeyElement, popupBase: HTMLElement) {
     var bk: KeyElement;
     let subkeys = baseKey['subKeys'];
     for(let i=0; i < subkeys.length; i++) {
@@ -311,7 +329,8 @@ export default class SubkeyPopup {
     }
 
     if(bk) {
-      vkbd.keyPending = bk;
+      this.currentSelection = bk;
+
       // Subkeys never get key previews, so we can directly highlight the subkey.
       bk.key.highlight(true);
     }
