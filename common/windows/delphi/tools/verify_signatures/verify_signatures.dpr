@@ -1,4 +1,4 @@
-program verify;
+program verify_signatures;
 
 {$APPTYPE CONSOLE}
 
@@ -36,6 +36,7 @@ begin
     Delete(s,1,1);
   end;
 
+  // TODO: sign these files and move the check down to the EndsWith node test
   if str[0].ToLower.Contains('sentry.') or str[0].ToLower.Contains('crashpad_handler') or str[0].ToLower.Contains('keymanmc') then
     // We don't verify sentry.dll or sentry.x64.dll or crashpad_handler.exe because they're not our files
     // We don't verify keymanmc.dll because it has no version resources, as it is mc-generated
@@ -60,6 +61,14 @@ begin
     begin
       Exit('File was signed more than 1 day ago.');
     end;
+  end;
+
+  if str[0].ToLower.EndsWith('node') then
+  begin
+    // It's one of the node addons -- in developer server at time of writing
+    // we don't have a version resource but we have signed it, so treat it
+    // as valid
+    Exit('');
   end;
 
   if str[3] <> 'SIL International' then
@@ -90,7 +99,7 @@ begin
 
     if (ParamStr(1) = '-?') or (ParamCount < 1) then
     begin
-      writeln('verify [-d] VERSION.md: Verify the output of sigcheck to ensure all executables are signed and have proper version.');
+      writeln('verify_signatures [-d] VERSION.md: Verify the output of sigcheck to ensure all executables are signed and have proper version.');
       writeln('  -d: Check the timestamp on the signature is less than 2 days old.');
       writeln('  VERSION.md: path to the version to verify against');
       Halt(2);
