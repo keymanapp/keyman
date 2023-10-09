@@ -154,7 +154,7 @@ export class MatcherSelector<Type> extends EventEmitter<EventMap<Type>> {
       // Cancellation before a first stage is possible; in this case, there's no sequence
       // to trigger cleanup.  We can do that here.
       source.path.on('invalidated', () => {
-        this.cleanSourceIdsForSequence([source.identifier]);
+        this.dropSourcesWithIds([source.identifier]);
       })
     }
 
@@ -292,11 +292,23 @@ export class MatcherSelector<Type> extends EventEmitter<EventMap<Type>> {
     this._sourceSelector.forEach((entry) => resetHooks(entry.source));
   }
 
-  public cleanSourceIdsForSequence(idsToClean: string[]) {
+  public dropSourcesWithIds(idsToClean: string[]) {
     for(const id of idsToClean) {
       const index = this._sourceSelector.findIndex((entry) => entry.source.identifier);
       if(index > -1) {
-        this._sourceSelector.splice(index, 1);
+        // Ensure that any pending MatcherSelector and/or GestureSequence promises dependent
+        // on the source fully resolve (with cancellation).
+        const droppedSelector = this._sourceSelector.splice(index, 1)[0];
+        droppedSelector.matchPromise.resolve({
+          matcher: null,
+          result: {
+            matched: false,
+            action: {
+              type: 'none',
+              item: null
+            }
+          }
+        });
       }
     }
   }

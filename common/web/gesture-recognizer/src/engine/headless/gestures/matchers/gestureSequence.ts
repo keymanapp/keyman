@@ -109,7 +109,7 @@ export class GestureSequence<Type> extends EventEmitter<EventMap<Type>> {
     this.selector.on('rejectionwithaction', this.modelResetHandler);
     this.once('complete', () => {
       this.selector.off('rejectionwithaction', this.modelResetHandler);
-      this.selector.cleanSourceIdsForSequence(this.allSourceIds);
+      this.selector.dropSourcesWithIds(this.allSourceIds);
 
       // Dropping the reference here gives us two benefits:
       // 1.  Allows garbage collection to do its thing; this might be the last reference left to the selector instance.
