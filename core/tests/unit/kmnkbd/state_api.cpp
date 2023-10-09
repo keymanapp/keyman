@@ -9,7 +9,7 @@
 #include <iostream>
 #include <string>
 
-#include <keyman/keyboardprocessor.h>
+#include <keyman/keyman_core_api.h>
 
 #include "path.hpp"
 #include "state.hpp"
@@ -49,7 +49,7 @@ namespace
 
 constexpr char const *doc1_expected = u8"\
 {\n\
-    \"$schema\" : \"keyman/keyboardprocessor/doc/introspection.schema\",\n\
+    \"$schema\" : \"keyman/core/doc/introspection.schema\",\n\
     \"keyboard\" : {\n\
         \"id\" : \"dummy\",\n\
         \"folder\" : \"\",\n\
@@ -75,7 +75,7 @@ constexpr char const *doc1_expected = u8"\
 
 constexpr char const *doc2_expected = u8"\
 {\n\
-    \"$schema\" : \"keyman/keyboardprocessor/doc/introspection.schema\",\n\
+    \"$schema\" : \"keyman/core/doc/introspection.schema\",\n\
     \"keyboard\" : {\n\
         \"id\" : \"dummy\",\n\
         \"folder\" : \"\",\n\

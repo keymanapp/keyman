@@ -1,7 +1,7 @@
 {
  * Keyman is copyright (C) SIL International. MIT License.
  *
- * Interface for Keyman Core, matches keyboardprocessor.h
+ * Interface for Keyman Core, matches keyman_core_api.h
 }
 unit Keyman.System.KeymanCore;
 
@@ -321,7 +321,7 @@ const
   KM_KBP_EVENT_FLAG_TOUCH = 1; // set if the event is touch, otherwise hardware
 
 
-// keyboardprocessor_vkeys.h
+// keyman_core_api_vkeys.h
 
 const
 // enum km_kbp_modifier_state - matches Keyman32 shift states
@@ -620,7 +620,7 @@ const
   KM_KBP_VKEY__FE   = $FE;
   KM_KBP_VKEY__FF   = $FF;
 
-// keyboardprocessor_consts.h
+// keyman_core_api_consts.h.h
 const
   // Defined environment options for KMX processor
   KM_KBP_KMX_ENV_PLATFORM                       = 'platform';

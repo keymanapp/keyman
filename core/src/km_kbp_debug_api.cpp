@@ -8,7 +8,7 @@
 #include <algorithm>
 #include <sstream>
 
-#include <keyman/keyboardprocessor.h>
+#include <keyman/keyman_core_api.h>
 
 #include "processor.hpp"
 #include "state.hpp"

@@ -11,7 +11,7 @@ cd "$WORKDIR"
 
 # Test all include files are available
 cat <<EOF > keymantest.c
-#include <keyman/keyboardprocessor.h>
+#include <keyman/keyman_core_api.h>
 km_kbp_context* c;
 EOF
 
@@ -21,7 +21,7 @@ echo "build 1: OK"
 
 # Test pkg-config file - include without path
 cat <<EOF > keymantest.c
-#include <keyboardprocessor.h>
+#include <keyman_core_api.h>
 km_kbp_context* c;
 EOF
 

@@ -2,7 +2,7 @@
 #include <glib.h>
 #include <ibus.h>
 #include <iostream>
-#include <keyman/keyboardprocessor.h>
+#include <keyman/keyman_core_api.h>
 #include <kmx/kmx_processevent.h>
 #include <linux/input-event-codes.h>
 #include <list>

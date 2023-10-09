@@ -55,7 +55,7 @@
 #include <ibus.h>
 #include <gmodule.h>
 
-#include <keyman/keyboardprocessor.h>
+#include <keyman/keyman_core_api.h>
 
 // Number of default Keyboard processor environment options for: "platform", "baseLayout", and "baseLayoutAlt"
 #define KEYMAN_ENVIRONMENT_OPTIONS 3

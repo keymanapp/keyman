@@ -12,7 +12,7 @@
 #include <string>
 #include <type_traits>
 
-#include <keyman/keyboardprocessor.h>
+#include <keyman/keyman_core_api.h>
 #include "jsonpp.hpp"
 #include "utfcodec.hpp"
 

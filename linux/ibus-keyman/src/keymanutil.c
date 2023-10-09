@@ -55,7 +55,7 @@
 #include <glib.h>
 #include <glib/gprintf.h>
 #include <string.h>
-#include <keyman/keyboardprocessor.h>
+#include <keyman/keyman_core_api.h>
 
 #include "bcp47util.h"
 #include "kmpdetails.h"

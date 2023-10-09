@@ -1,5 +1,5 @@
 #include <windows.h>
-#include "include/keyman/keyboardprocessor_version.h"
+#include "include/keyman/keyman_core_api_version.h"
 
 // Encoding: UTF8 (compile with rc /c65001)
 // Use rc /n to append null to all strings

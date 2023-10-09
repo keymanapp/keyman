@@ -10,7 +10,7 @@
 
 #include <string>
 #include <unordered_map>
-#include <keyman/keyboardprocessor.h>
+#include <keyman/keyman_core_api.h>
 
 #include "processor.hpp"
 #include "option.hpp"

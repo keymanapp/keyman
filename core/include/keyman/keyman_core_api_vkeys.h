@@ -7,7 +7,7 @@
   Create Date:  17 Oct 2018
   Authors:      Tim Eves (TSE)
   History:      17 Oct 2018 - TSE - Moved & refactored km_kbp_modifier_state
-                                    from keyboardprocessor.h.
+                                    from keyman_core_api.h.
                                   - Added VKey and mask definitions.
                  6 Oct 2018 - TSE - Move into keyman folder.
 

@@ -11,7 +11,7 @@
 #include <cassert>
 #include <vector>
 
-#include <keyman/keyboardprocessor.h>
+#include <keyman/keyman_core_api.h>
 #include "keyboard.hpp"
 #include "processor.hpp"
 #include "kmx/kmx_processor.hpp"

@@ -11,7 +11,7 @@
 #include <string>
 #include <unordered_map>
 
-#include <keyman/keyboardprocessor.h>
+#include <keyman/keyman_core_api.h>
 
 #include "keyboard.hpp"
 
@@ -96,7 +96,7 @@ namespace kbp
     ) = 0;
 
   /**
-   * Returns the keyboardprocessor context as an array of
+   * Returns the core context as an array of
    * km_kbp_context_items. Caller is responsible for freeing
    * the memory
    * @return km_kbp_context_item*

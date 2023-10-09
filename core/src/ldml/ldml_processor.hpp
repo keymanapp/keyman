@@ -13,7 +13,7 @@
 #include <utility>
 #include <vector>
 #include <memory>
-#include <keyman/keyboardprocessor.h>
+#include <keyman/keyman_core_api.h>
 #include "processor.hpp"
 #include "option.hpp"
 #include "ldml_vkeys.hpp"
