@@ -630,7 +630,7 @@ const
   KM_CORE_KMX_ENV_CAPSLOCK                       = 'capsLock';
   KM_CORE_KMX_ENV_BASELAYOUTGIVESCTRLRALTFORRALT = 'baseLayoutGivesCtrlRAltForRAlt';
 
-procedure _km_kbp_set_library_path(const path: string);
+procedure _km_core_set_library_path(const path: string);
 
 implementation
 
@@ -638,7 +638,7 @@ uses
   System.SysUtils,
   Winapi.Windows;
 
-procedure _km_kbp_set_library_path(const path: string);
+procedure _km_core_set_library_path(const path: string);
 begin
   if LoadLibrary(PChar(path)) = 0 then
     RaiseLastOSError;

@@ -87,7 +87,7 @@ begin
   begin
     path := TKeymanPaths.KeymanCoreLibraryPath(kmnkbp0);
     try
-      _km_kbp_set_library_path(path);
+      _km_core_set_library_path(path);
     except
       on E:Exception do
         raise EDebugCore.CreateFmt('Unable to load Keyman Core library at %s: %s %s', [path, E.ClassName, E.Message]);
