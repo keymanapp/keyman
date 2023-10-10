@@ -1,118 +1,89 @@
 #include "insthelper.h"
-#include "pch.h"  // use stdafx.h in Visual Studio 2017 and earlier
-#include <limits.h>
-#include <utility>
-#include <iostream>
-#include <msiquery.h>
-#include <knownfolders.h>
-#include <ShlObj_core.h>
-#include <security.h>
+#include "pch.h"
 #include <AccCtrl.h>
+#include <ShlObj_core.h>
+#include <iostream>
+#include <knownfolders.h>
+#include <limits.h>
+#include <msiquery.h>
+#include <security.h>
+#include <utility>
+#include <tchar.h>
+#include <string>
+#include <AclAPI.h>
+#include <Windows.h>
+#include <Msi.h>
 
-std::wstring const SFolderKeymanRoot = L"Keyman";
+const LPCTSTR SFolderKeymanRoot = TEXT("\\Keyman");
 
-void convertWStringToCharPtr(_In_ std::wstring input, _Out_ char *outputString) {
-  size_t outputSize     = input.length() + 1;  // +1 for null terminator
-  outputString          = new char[outputSize];
-  size_t charsConverted = 0;
-  const wchar_t *inputW = input.c_str();
-  wcstombs_s(&charsConverted, outputString, outputSize, inputW, input.length());
-}
-
-std::string SysErrorMessage(DWORD errorCode) {
-  // Declare a buffer to store the error message.
-  char messageBuffer[1024];
-
-  // Get the error message from the system.
-  DWORD messageLength =
-      FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM, nullptr, errorCode, 0, messageBuffer, sizeof(messageBuffer), nullptr);
-
-  // If the error message is not empty, return it.
-  if (messageLength > 0) {
-    return std::string(messageBuffer);
-  } else {
-    return std::string("Unknown error");
-  }
-}
-
-unsigned int ReportFailure(MSIHANDLE hInstall, std::string func, unsigned int code) {
-  MsiSetProperty(
-      hInstall, "EnginePostInstall_Error",
-      (LPCWSTR)("Keyman Engine failed to set permissions on shared data in " + func + ": " + SysErrorMessage(code)));
-}
-
-void
-GrantPermissionToAllApplicationPackages(LPCTSTR lpFolderPath) {
-  SECURITY_ATTRIBUTES sa;
-  sa.nLength              = sizeof(sa);
-  sa.lpSecurityDescriptor = NULL;
-  sa.bInheritHandle       = FALSE;
-
-  TRUSTEE_W trustee;
-  trustee.TrusteeForm = TRUSTEE_IS_NAME;
-  trustee.TrusteeType = TRUSTEE_IS_WELL_KNOWN_GROUP;
-  trustee.ptstrName   = L"ALL APPLICATION PACKAGES";
-
-  InitializeSecurityDescriptor(&sa.lpSecurityDescriptor, SECURITY_DESCRIPTOR_REVISION);
-  SetSecurityDescriptorGroup(&sa.lpSecurityDescriptor, &trustee, 0);
-
-  SetFileSecurity(lpFolderPath, DACL_SECURITY_INFORMATION, sa.lpSecurityDescriptor);
-}
-
-unsigned int EnginePostInstall(MSIHANDLE hInstall) {
+unsigned int
+EnginePostInstall(MSIHANDLE hInstall) {
   HANDLE hFile;
-  std::wstring Path;
 
-  try {
-    // Find %appdata% path
-    wchar_t appDataPath[MAX_PATH];
-    if (SHGetFolderPathW(NULL, CSIDL_APPDATA, NULL, 0, appDataPath) != S_OK) {
-      // Handle error
-      return 1;
-    }
-    std::wstring AppDataPath(appDataPath);
-
-    // Directory path
-    Path = AppDataPath + SFolderKeymanRoot;
+  // Find %appdata% path
+  TCHAR path[MAX_PATH];
+  if (SUCCEEDED(SHGetFolderPathW(NULL, CSIDL_COMMON_APPDATA, NULL, 0, path))) {
+    _tcscat_s(path, SFolderKeymanRoot);
 
     // Create directory if it does not exist
-    struct stat dirMeta;
-    char *path;
-    convertWStringToCharPtr(Path, path);
-    if (stat(path, &dirMeta) != 0) {
-      if (!CreateDirectory(&Path[0], NULL)) {
-        return ReportFailure(hInstall, "CreateDir", GetLastError());
+    if (GetFileAttributes(path) == INVALID_FILE_ATTRIBUTES) {
+      if (!CreateDirectory(path, NULL)) {
+        DWORD errorCode = GetLastError();
+        std::wstring error =
+            L"Keyman Engine failed to set permissions on shared data in CreateDir: " + std::to_wstring(errorCode);
+        MsiSetProperty(hInstall, TEXT("EnginePostInstall_Error"), error.c_str());
+        return errorCode;
       }
     }
 
     // Create file
-    hFile = CreateFile((LPCWSTR)Path.c_str(), READ_CONTROL | WRITE_DAC, 0, nullptr, OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS, 0);
+    hFile = CreateFile(path, READ_CONTROL | WRITE_DAC, 0, NULL, OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS, NULL);
     if (hFile == INVALID_HANDLE_VALUE) {
-      return ReportFailure(hInstall, "CreateFile", GetLastError());
+      DWORD errorCode    = GetLastError();
+      std::wstring error = L"Keyman Engine failed to set permissions on shared data in CreateFile: " + std::to_wstring(errorCode);
+      MsiSetProperty(hInstall, TEXT("EnginePostInstall_Error"), error.c_str());
+      return errorCode;
     }
 
-    try {
-      try {
-        GrantPermissionToAllApplicationPackages(hFile, GENERIC_READ | GENERIC_EXECUTE, SE_FILE_OBJECT);
-      } catch (EOSError &E) {
-        return ReportFailure(hInstall, "GrantPermission", E.ErrorCode);
-      }
+    // Set permission on shared data
+    EXPLICIT_ACCESS ea      = {0};
+    ea.grfAccessPermissions = GENERIC_READ | GENERIC_EXECUTE;
+    ea.grfAccessMode        = SET_ACCESS;
+    ea.grfInheritance       = SUB_CONTAINERS_AND_OBJECTS_INHERIT;
+    ea.Trustee.TrusteeForm  = TRUSTEE_IS_NAME;
+    ea.Trustee.ptstrName    = (LPWCH)L"ALL APPLICATION PACKAGES";
 
-      return ERROR_SUCCESS;
+    PACL pOldDACL = NULL;
 
-    } finally {
-      if (!CloseHandle(hFile)) {
-        return ReportFailure(hInstall, "CloseHandle", GetLastError());
+    DWORD result = SetEntriesInAcl(1, &ea, NULL, &pOldDACL);
+    if (result != ERROR_SUCCESS) {
+      CloseHandle(hFile);
+      std::wstring error =
+          L"Keyman Engine failed to set permissions on shared data in GrantPermission: " + std::to_wstring(result);
+      MsiSetProperty(hInstall, TEXT("EnginePostInstall_Error"), error.c_str());
+      if (pOldDACL) {
+        LocalFree(pOldDACL);
       }
+      return result;
     }
-  } catch (Exception &E) {
-    MsiSetProperty(
-        hInstall, "EnginePostInstall_Error", (LPCWSTR)("Keyman Engine failed to set permissions on shared data, " + E.what()));
-    // We don't have an error value so we'll just return !success
-    return ERROR_INVALID_FUNCTION;
+
+    result = SetNamedSecurityInfo(path, SE_FILE_OBJECT, DACL_SECURITY_INFORMATION, NULL, NULL, pOldDACL, NULL);
+    if (result != ERROR_SUCCESS) {
+      std::wstring error = L"Keyman Engine failed to apply DACL to shared data folder: " + std::to_wstring(result);
+      MsiSetProperty(hInstall, TEXT("EnginePostInstall_Error"), error.c_str());
+    }
+
+    if (pOldDACL) {
+      LocalFree(pOldDACL);
+    }
+
+    CloseHandle(hFile);
   }
+
+  return ERROR_SUCCESS;
 }
 
-unsigned int PreUninstall() {
+unsigned int
+PreUninstall() {
   return 1;
 }
