@@ -86,10 +86,10 @@ typedef struct tagINTKEYBOARDINFO
   int        __filler2; // makes same as KEYBOARDINFO
   int        nProfiles;
   LPINTKEYBOARDPROFILE Profiles;
-  km_kbp_keyboard* lpCoreKeyboard;
-  km_kbp_option_item* lpCoreKeyboardOptions;
-  km_kbp_state* lpCoreKeyboardState;
-  km_kbp_keyboard_imx* lpIMXList;
+  km_core_keyboard* lpCoreKeyboard;
+  km_core_option_item* lpCoreKeyboardOptions;
+  km_core_state* lpCoreKeyboardState;
+  km_core_keyboard_imx* lpIMXList;
 } INTKEYBOARDINFO, * LPINTKEYBOARDINFO;
 
 typedef struct tagINI
@@ -107,7 +107,7 @@ typedef struct tagKMSTATE
   WCHAR charCode;      // I4582
   BOOL windowunicode;  // I4287
   BOOL isDown;
-  km_kbp_keyboard* lpCoreKb;  //  future use with IMDLL
+  km_core_keyboard* lpCoreKb;  //  future use with IMDLL
 } KMSTATE;
 
 // I3616
@@ -121,8 +121,8 @@ LRESULT CALLBACK kmnLowLevelKeyboardProc(   // I4124
   _In_  LPARAM lParam
 );
 
-BOOL ReleaseStateMemoryCore(km_kbp_state** state);
-BOOL ReleaseKeyboardMemoryCore(km_kbp_keyboard** kbd);
+BOOL ReleaseStateMemoryCore(km_core_state** state);
+BOOL ReleaseKeyboardMemoryCore(km_core_keyboard** kbd);
 
 void PostGETNEXT(HWND hwnd);
 BOOL CompareMsg(LPMSG MsgA, LPMSG MsgB);
@@ -264,7 +264,7 @@ BOOL SelectKeyboardTSF(DWORD KeymanID, BOOL foreground);   // I3933   // I3949  
 BOOL ReportKeyboardChanged(WORD wCommand, DWORD dwProfileType, UINT langid, HKL hkl, GUID clsid, GUID guidProfile);
 void ProcessModifierChange(UINT key, BOOL isUp, BOOL isExtended);   // I4793
 
-BOOL SetupCoreEnvironment(km_kbp_option_item **test_env_opts);
-void DeleteCoreEnvironment(km_kbp_option_item *test_env_opts);
+BOOL SetupCoreEnvironment(km_core_option_item **test_env_opts);
+void DeleteCoreEnvironment(km_core_option_item *test_env_opts);
 
 #endif  // _KEYMANENGINE_H

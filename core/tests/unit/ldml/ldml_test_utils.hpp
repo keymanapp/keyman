@@ -18,7 +18,7 @@
 namespace km {
 namespace tests {
 
-km_kbp_virtual_key get_vk(std::string const &vk);
+km_core_virtual_key get_vk(std::string const &vk);
 
 }  // namespace tests
 }  // namespace km

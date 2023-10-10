@@ -79,44 +79,44 @@ BOOL LoadlpKeyboard(int i)
   if (_td->lpActiveKeyboard == &_td->lpKeyboards[i]) _td->lpActiveKeyboard = NULL;  // I822 TSF not working
 
   if (_td->lpKeyboards[i].lpCoreKeyboardState) {
-    SendDebugMessageFormat(0, sdmLoad, 0, "LoadlpKeyboard: a keyboard km_kbp_state exits without matching keyboard - disposing of state");
-    km_kbp_state_dispose(_td->lpKeyboards[i].lpCoreKeyboardState);
+    SendDebugMessageFormat(0, sdmLoad, 0, "LoadlpKeyboard: a keyboard km_core_state exits without matching keyboard - disposing of state");
+    km_core_state_dispose(_td->lpKeyboards[i].lpCoreKeyboardState);
     _td->lpKeyboards[i].lpCoreKeyboardState = NULL;
   }
 
   char buf[256];
   if (!GetKeyboardFileName(_td->lpKeyboards[i].Name, buf, 255)) return FALSE;
   PWCHAR keyboardPath = strtowstr(buf);
-  km_kbp_status err_status = km_kbp_keyboard_load(keyboardPath, &_td->lpKeyboards[i].lpCoreKeyboard);
-  if (err_status != KM_KBP_STATUS_OK) {
-    SendDebugMessageFormat(0, sdmLoad, 0, "LoadlpKeyboard: km_kbp_keyboard_load failed for %ls with error status [%d]", keyboardPath, err_status);
+  km_core_status err_status = km_core_keyboard_load(keyboardPath, &_td->lpKeyboards[i].lpCoreKeyboard);
+  if (err_status != KM_CORE_STATUS_OK) {
+    SendDebugMessageFormat(0, sdmLoad, 0, "LoadlpKeyboard: km_core_keyboard_load failed for %ls with error status [%d]", keyboardPath, err_status);
     delete keyboardPath;
     return FALSE;
   }
   delete keyboardPath;
 
-  km_kbp_option_item *core_environment = nullptr;
+  km_core_option_item *core_environment = nullptr;
 
   if(!SetupCoreEnvironment(&core_environment)) {
     SendDebugMessageFormat(0, sdmLoad, 0, "LoadlpKeyboard: Unable to set environment options for keyboard %ls", keyboardPath);
     return FALSE;
   }
 
-  err_status = km_kbp_state_create(_td->lpKeyboards[i].lpCoreKeyboard, core_environment, &_td->lpKeyboards[i].lpCoreKeyboardState);
+  err_status = km_core_state_create(_td->lpKeyboards[i].lpCoreKeyboard, core_environment, &_td->lpKeyboards[i].lpCoreKeyboardState);
 
   DeleteCoreEnvironment(core_environment);
 
-  if (err_status != KM_KBP_STATUS_OK) {
+  if (err_status != KM_CORE_STATUS_OK) {
     SendDebugMessageFormat(
-        0, sdmLoad, 0, "LoadlpKeyboard: km_kbp_state_create failed with error status [%d]", err_status);
+        0, sdmLoad, 0, "LoadlpKeyboard: km_core_state_create failed with error status [%d]", err_status);
     // Dispose of the keyboard to leave us in a consistent state
     ReleaseKeyboardMemoryCore(&_td->lpKeyboards[i].lpCoreKeyboard);
     return FALSE;
   }
   // Register callback?
-  err_status = km_kbp_keyboard_get_imx_list(_td->lpKeyboards[i].lpCoreKeyboard, &_td->lpKeyboards[i].lpIMXList);
-  if (err_status != KM_KBP_STATUS_OK) {
-    SendDebugMessageFormat(0, sdmLoad, 0, "LoadlpKeyboard: km_kbp_keyboard_get_imx_list failed with error status [%d]", err_status);
+  err_status = km_core_keyboard_get_imx_list(_td->lpKeyboards[i].lpCoreKeyboard, &_td->lpKeyboards[i].lpIMXList);
+  if (err_status != KM_CORE_STATUS_OK) {
+    SendDebugMessageFormat(0, sdmLoad, 0, "LoadlpKeyboard: km_core_keyboard_get_imx_list failed with error status [%d]", err_status);
     // Dispose of the keyboard to leave us in a consistent state
     ReleaseKeyboardMemoryCore(&_td->lpKeyboards[i].lpCoreKeyboard);
     return FALSE;

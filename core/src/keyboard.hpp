@@ -3,7 +3,7 @@
   Description:  Internal keyboard class and adaptor class for the API.
   Create Date:  2 Oct 2018
   Authors:      Tim Eves (TSE)
-  History:      2 Oct 2018 - TSE - Refactored out of km_kbp_keyboard_api.cpp
+  History:      2 Oct 2018 - TSE - Refactored out of km_core_keyboard_api.cpp
 */
 
 #pragma once
@@ -22,7 +22,7 @@ class json;
 namespace km {
 namespace kbp
 {
-  class keyboard_attributes : public km_kbp_keyboard_attrs
+  class keyboard_attributes : public km_core_keyboard_attrs
   {
     std::u16string      _keyboard_id;
     std::u16string      _version_string;
@@ -36,7 +36,7 @@ namespace kbp
     using path_type = decltype(_folder_path);
 
     keyboard_attributes()
-    : km_kbp_keyboard_attrs {nullptr, nullptr, nullptr, nullptr} {}
+    : km_core_keyboard_attrs {nullptr, nullptr, nullptr, nullptr} {}
     keyboard_attributes(keyboard_attributes const &) = delete;
     keyboard_attributes(keyboard_attributes &&);
 

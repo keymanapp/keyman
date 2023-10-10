@@ -66,8 +66,8 @@ LdmlTestSource::~LdmlTestSource() {
 
 }
 
-km_kbp_status LdmlTestSource::get_expected_load_status() {
-  return KM_KBP_STATUS_OK;
+km_core_status LdmlTestSource::get_expected_load_status() {
+  return KM_CORE_STATUS_OK;
 }
 
 bool LdmlTestSource::get_expected_beep() const {
@@ -108,7 +108,7 @@ LdmlTestSource::parse_source_string(std::string const &s) {
   for (auto p = s.begin(); p != s.end(); p++) {
     if (*p == '\\') {
       p++;
-      km_kbp_usv v;
+      km_core_usv v;
       bool had_open_curly = false;
       assert(p != s.end());
       if (*p == 'u' || *p == 'U') {
@@ -126,10 +126,10 @@ LdmlTestSource::parse_source_string(std::string const &s) {
         assert(v >= 0x0001 && v <= 0x10FFFF);
         p += n - 1;
         if (v < 0x10000) {
-          t += km_kbp_cp(v);
+          t += km_core_cp(v);
         } else {
-          t += km_kbp_cp(Uni_UTF32ToSurrogate1(v));
-          t += km_kbp_cp(Uni_UTF32ToSurrogate2(v));
+          t += km_core_cp(Uni_UTF32ToSurrogate1(v));
+          t += km_core_cp(Uni_UTF32ToSurrogate2(v));
         }
         if (had_open_curly) {
           p++;
@@ -157,7 +157,7 @@ LdmlTestSource::parse_u8_source_string(std::string const &u8s) {
   for (auto p = s.begin(); p != s.end(); p++) {
     if (*p == '\\') {
       p++;
-      km_kbp_usv v;
+      km_core_usv v;
       bool had_open_curly = false;
       assert(p != s.end());
       if (*p == 'u' || *p == 'U') {
@@ -177,10 +177,10 @@ LdmlTestSource::parse_u8_source_string(std::string const &u8s) {
         assert(v >= 0x0001 && v <= 0x10FFFF);
         p += n - 1;
         if (v < 0x10000) {
-          t += km_kbp_cp(v);
+          t += km_core_cp(v);
         } else {
-          t += km_kbp_cp(Uni_UTF32ToSurrogate1(v));
-          t += km_kbp_cp(Uni_UTF32ToSurrogate2(v));
+          t += km_core_cp(Uni_UTF32ToSurrogate1(v));
+          t += km_core_cp(Uni_UTF32ToSurrogate2(v));
         }
         if (had_open_curly) {
           p++;
@@ -257,9 +257,9 @@ LdmlEmbeddedTestSource::load_source( const km::kbp::path &path ) {
   return 0;
 }
 
-km_kbp_status
+km_core_status
 LdmlEmbeddedTestSource::get_expected_load_status() {
-  return expected_error ? KM_KBP_STATUS_INVALID_KEYBOARD : KM_KBP_STATUS_OK;
+  return expected_error ? KM_CORE_STATUS_INVALID_KEYBOARD : KM_CORE_STATUS_OK;
 }
 
 const std::u16string&
@@ -273,7 +273,7 @@ bool LdmlEmbeddedTestSource::get_expected_beep() const {
 
 int
 LdmlTestSource::caps_lock_state() {
-  return _caps_lock_on ? KM_KBP_MODIFIER_CAPS : 0;
+  return _caps_lock_on ? KM_CORE_MODIFIER_CAPS : 0;
 }
 
 void
@@ -291,7 +291,7 @@ LdmlTestSource::char_to_event(char ch) {
   assert(ch >= 32);
   return {
       km::kbp::kmx::s_char_to_vkey[(int)ch - 32].vk,
-      (uint16_t)(km::kbp::kmx::s_char_to_vkey[(int)ch - 32].shifted ? KM_KBP_MODIFIER_SHIFT : 0)};
+      (uint16_t)(km::kbp::kmx::s_char_to_vkey[(int)ch - 32].shifted ? KM_CORE_MODIFIER_SHIFT : 0)};
 }
 
 uint16_t
@@ -312,7 +312,7 @@ LdmlEmbeddedTestSource::vkey_to_event(std::string const &vk_event) {
   std::stringstream f(vk_event);
   std::string s;
   uint16_t modifier_state = 0;
-  km_kbp_virtual_key vk   = 0;
+  km_core_virtual_key vk   = 0;
   while (std::getline(f, s, ' ')) {
     uint16_t modifier = get_modifier(s);
     if (modifier != 0) {
@@ -442,7 +442,7 @@ void LdmlJsonTestSource::set_key_from_id(key_event& k, const std::u16string& id)
     auto *kmap = kmxplus->key2Helper.getKmap(kmapIndex);
     assert(kmap != nullptr);
     if (kmap->key == keyIndex) {
-      k = {(km_kbp_virtual_key)kmap->vkey, (uint16_t)kmap->mod};
+      k = {(km_core_virtual_key)kmap->vkey, (uint16_t)kmap->mod};
       return;
     }
   }
@@ -561,7 +561,7 @@ LdmlJsonRepertoireTestSource::next_action(ldml_action &fillin) {
   }
 
   // we have already excluded strings, so just get the codepoint
-  const km_kbp_usv ch = iterator->getCodepoint();
+  const km_core_usv ch = iterator->getCodepoint();
 
   // as string for debugging.
   // const icu::UnicodeString& str = iterator->getString();
@@ -606,7 +606,7 @@ LdmlJsonRepertoireTestSource::next_action(ldml_action &fillin) {
     auto *kmap = kmxplus->key2Helper.getKmap(kmapIndex);
     assert(kmap != nullptr);
     if (kmap->key == keyIndex) {
-      fillin.k = {(km_kbp_virtual_key)kmap->vkey, (uint16_t)kmap->mod};
+      fillin.k = {(km_core_virtual_key)kmap->vkey, (uint16_t)kmap->mod};
       std::cout << "found vkey " << fillin.k.vk << ":" << fillin.k.modifier_state << std::endl;
       fillin.type = LDML_ACTION_KEY_EVENT;
       return;

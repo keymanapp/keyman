@@ -58,4 +58,4 @@ Caps Lock.
 
 ### Namespace
 
-All calls, types and enums are prefixed with the namespace identifier `km_kbp_`
+All calls, types and enums are prefixed with the namespace identifier `km_core_`

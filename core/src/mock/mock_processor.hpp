@@ -3,7 +3,7 @@
   Description:  Internal keyboard class and adaptor class for the API.
   Create Date:  2 Oct 2018
   Authors:      Tim Eves (TSE)
-  History:      2 Oct 2018 - TSE - Refactored out of km_kbp_keyboard_api.cpp
+  History:      2 Oct 2018 - TSE - Refactored out of km_core_keyboard_api.cpp
 */
 
 #pragma once
@@ -26,44 +26,44 @@ namespace kbp
     mock_processor(km::kbp::path const &);
 //    ~mock_processor() override;
 
-    km_kbp_status
+    km_core_status
     process_event(
-      km_kbp_state *state,
-      km_kbp_virtual_key vk,
+      km_core_state *state,
+      km_core_virtual_key vk,
       uint16_t modifier_state,
       uint8_t is_key_down,
       uint16_t event_flags
     ) override;
 
-    virtual km_kbp_attr const & attributes() const override;
-    km_kbp_status               validate() const override;
+    virtual km_core_attr const & attributes() const override;
+    km_core_status               validate() const override;
 
 
     char16_t const *
     lookup_option(
-      km_kbp_option_scope,
+      km_core_option_scope,
       std::u16string const & key
     ) const override;
 
     option
     update_option(
-      km_kbp_option_scope,
+      km_core_option_scope,
       std::u16string const & key,
       std::u16string const & value
     ) override;
 
-    km_kbp_status process_queued_actions( km_kbp_state *state) override;
+    km_core_status process_queued_actions( km_core_state *state) override;
 
     bool queue_action(
-      km_kbp_state * state,
-      km_kbp_action_item const* action_item
+      km_core_state * state,
+      km_core_action_item const* action_item
     ) override;
 
-    km_kbp_context_item * get_intermediate_context() override;
+    km_core_context_item * get_intermediate_context() override;
 
-    km_kbp_keyboard_key  * get_key_list() const override;
+    km_core_keyboard_key  * get_key_list() const override;
 
-    km_kbp_keyboard_imx  * get_imx_list() const override;
+    km_core_keyboard_imx  * get_imx_list() const override;
 
   };
 
@@ -74,7 +74,7 @@ namespace kbp
       _attributes = keyboard_attributes(u"null", u"0.0", path(), {});
     }
 
-    km_kbp_status validate() const override;
+    km_core_status validate() const override;
   };
 } // namespace kbp
 } // namespace km

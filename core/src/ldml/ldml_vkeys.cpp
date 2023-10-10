@@ -16,7 +16,7 @@ vkeys::vkeys() : vkey_to_string() {
 }
 
 void
-vkeys::add(km_kbp_virtual_key vk, uint16_t modifier_state, std::u16string output) {
+vkeys::add(km_core_virtual_key vk, uint16_t modifier_state, std::u16string output) {
   // construct key
   const vkey_id id(vk, modifier_state);
   // assign the string
@@ -27,7 +27,7 @@ static const uint16_t BOTH_ALT  = LALTFLAG  | RALTFLAG;
 static const uint16_t BOTH_CTRL = LCTRLFLAG | RCTRLFLAG;
 
 std::u16string
-vkeys::lookup(km_kbp_virtual_key vk, uint16_t modifier_state) const {
+vkeys::lookup(km_core_virtual_key vk, uint16_t modifier_state) const {
   const vkey_id id(vk, modifier_state);
 
   // try exact match first
