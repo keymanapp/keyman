@@ -244,6 +244,7 @@ type
     { Run throughs the different states of an updating keyman from in the background }
     procedure ProcessBackgroundInstall;
     property ShowErrors: Boolean read FShowErrors write FShowErrors;
+    function CheckBackgroundState : TUpdateState;
   end;
 
   IOnlineUpdateSharedData = interface
@@ -1050,7 +1051,8 @@ begin
 
 end;
 
-function CheckBackgroundState : TUpdateState;  // I2329
+
+function TOnlineUpdateCheck.CheckBackgroundState : TUpdateState;  // I2329
 var
   UpdateState : TUpdateState;
 
@@ -1089,6 +1091,9 @@ begin
     // If Keyman has failed to be shutdown then it will exit
     // the state will remain in background for the next time processbackgoundinstall is called.
     SavePath := IncludeTrailingPathDelimiter(GetFolderPath(CSIDL_COMMON_APPDATA) + SFolder_CachedUpdateFiles);
+    // For testing
+    SavePath := 'C:\Projects\rcswag\testCache\';
+
     GetFileNamesInDirectory(SavePath, fileNames);
     // for now we only want the exe all though excute install can
     // handle msi and msp
@@ -1354,6 +1359,7 @@ begin
           SetBackgroundState(usDownload);
           // We can transition straight to download
           DownloadResult := DownloadUpdatesBackground;
+          KL.Log('ProcessBackground Install: DownloadResult = '+IntToStr(Ord(DownloadResult)));
           if DownloadResult then
           begin
             processKickofInstall;
@@ -1451,6 +1457,10 @@ begin
       KL.Log('ProcessBackground Install case :[ postinstall ]');
       // TODO Remove cached files. Do any loging updating of files etc and then set back to idle
       SavePath := IncludeTrailingPathDelimiter(GetFolderPath(CSIDL_COMMON_APPDATA) + SFolder_CachedUpdateFiles);
+      /// For testing using local user area cache
+      SavePath := 'C:\Projects\rcswag\testCache';
+      KL.Log('ProcessBackground Install posInstall SavePath:'+ SavePath);
+
       GetFileNamesInDirectory(SavePath, fileNames);
       // for now we only want the exe all though excute install can
       // handle msi and msp

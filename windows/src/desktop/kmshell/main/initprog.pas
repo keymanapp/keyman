@@ -75,7 +75,7 @@ procedure Main(Owner: TComponent = nil);
 
 type
     TKMShellMode = (fmUndefined, fmInstall, fmView, fmUninstall, fmAbout,
-                    fmInstallBackground, fmUninstallKeyboard,
+                    fmUninstallKeyboard,
                     fmInstallTipsForPackages, fmInstallKeyboardLanguage, fmRegisterTip, fmInstallTip, fmUninstallKeyboardLanguage,   // I3624
                     fmUninstallPackage, fmRegistryAdd, fmRegistryRemove,
                     fmMain, fmHelp, fmHelpKMShell,
@@ -241,7 +241,6 @@ begin
       else if s = '-m' then   FMode := fmMigrate
       else if s = '-i' then   FMode := fmInstall
       else if s = '-ikl' then FMode := fmInstallKeyboardLanguage   // I3624
-      else if s = '-background-update' then FMode := fmInstallBackground
       else if s = '-register-tip' then FMode := fmRegisterTip
       else if s = '-install-tip' then FMode := fmInstallTip
       else if s = '-install-tips-for-packages' then FMode := fmInstallTipsForPackages
@@ -261,7 +260,7 @@ begin
       else if s = '-h'   then FMode := fmHelp
       else if s = '-t'   then FMode := fmTextEditor
       else if s = '-ouc' then FMode := fmOnlineUpdateCheck
-      else if s = '-buc' then FMode := fmBackgroundUpdateCheck   // may end up not using
+      else if s = '-buc' then FMode := fmBackgroundUpdateCheck
       else if s = '-basekeyboard' then FMode := fmBaseKeyboard   // I4169
       else if s = '-nowelcome'   then FNoWelcome := True
       else if s = '-kw' then FMode := fmKeyboardWelcome  // I2569
@@ -394,6 +393,7 @@ var
   kdl: IKeymanDefaultLanguage;
   FIcon: string;
   FMutex: TKeymanMutex;  // I2720
+  UpdateState : TUpdateState;
     function FirstKeyboardFileName: WideString;
     begin
       if KeyboardFileNames.Count = 0
@@ -441,10 +441,16 @@ begin
     Exit;
   end;
 
-  if (FMode = fmInstallBackground) then
+  with TOnlineUpdateCheck.Create(nil, True, True) do
+    try
+      UpdateState := CheckBackgroundState;
+    finally
+      Free;
+    end;
+  if ((FMode = fmBackgroundUpdateCheck) or (UpdateState <> usIdle)) then
   begin
     /// Moving this to OnlineUpdateCheck
-    KL.Log('initprog fmInstallBackground');
+    KL.Log('initprog fmBackgroundUpdateCheck');
     with TOnlineUpdateCheck.Create(nil, True, True) do
     try
       ProcessBackgroundInstall

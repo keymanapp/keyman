@@ -28,7 +28,7 @@ end;
 
 function UpdateState: Boolean;
 var
-  UpdateStr : AnsiString;
+  UpdateStr : UnicodeString;
   UpdatePBytes : PByte;
   hk: Winapi.Windows.HKEY;
   updateData: Cardinal;
@@ -40,7 +40,7 @@ begin
   if RegOpenKeyEx(HKEY_LOCAL_MACHINE, PChar(SRegKey_KeymanEngine_LM), 0, KEY_ALL_ACCESS, hk) = ERROR_SUCCESS then
   begin
     try
-      if RegSetValueEx(hk, PChar(SRegValue_Update_State), 0, REG_SZ, PByte(UpdateStr), Length(UpdateStr) + 1) = ERROR_SUCCESS then
+      if RegSetValueEx(hk, PChar(SRegValue_Update_State), 0, REG_SZ, PWideChar(UpdateStr), Length(UpdateStr) * SizeOf(Char)) = ERROR_SUCCESS then
       begin
         Result := True;
       end
