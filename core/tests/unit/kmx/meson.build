@@ -168,7 +168,7 @@ endforeach
 
 subdir('fixtures')
 
-# test for km_kbp_keyboard_get_key_list
+# test for km_core_keyboard_get_key_list
 
 # For following tests, we need to be copying from source_path,
 # not build_path, so we'll just update test_path accordingly. This

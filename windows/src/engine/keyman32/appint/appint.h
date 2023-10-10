@@ -201,21 +201,21 @@ public:
  * @param   outPtr  The ouput array of context items. caller to free memory
  * @return  BOOL    True if array created successfully
  */
-BOOL ContextItemsFromAppContext(WCHAR const* buf, km_kbp_context_item** outPtr);
+BOOL ContextItemsFromAppContext(WCHAR const* buf, km_core_context_item** outPtr);
 
 /**
- * Convert km_kbp_context_item array into an kmx char buffer.
+ * Convert km_core_context_item array into an kmx char buffer.
  * Caller is responsible for freeing the memory.
  * The length is restricted to a maximum of MAXCONTEXT length. If the number
- * of input km_kbp_context_items exceeds this length the characters furthest
+ * of input km_core_context_items exceeds this length the characters furthest
  * from the caret will be truncated.
  *
- * @param  contextItems  the input core context array. (km_kbp_context_item)
+ * @param  contextItems  the input core context array. (km_core_context_item)
  * @param  [out] outBuf  the kmx character array output. caller to free memory.
  *
  * @return  BOOL    True if array created successfully
  */
-BOOL ContextItemToAppContext(km_kbp_context_item *contextItems, PWSTR outBuf, DWORD len);
+BOOL ContextItemToAppContext(km_core_context_item *contextItems, PWSTR outBuf, DWORD len);
 
 extern const LPSTR ItemTypes[];
 

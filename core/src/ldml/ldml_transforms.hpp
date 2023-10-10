@@ -48,7 +48,7 @@ public:
   /** construct from a SimpleUSet */
   element(const SimpleUSet &u, KMX_DWORD flags);
   /** construct from a single char */
-  element(km_kbp_usv ch, KMX_DWORD flags);
+  element(km_core_usv ch, KMX_DWORD flags);
   /** @returns true if a SimpleUSet type */
   bool is_uset() const;
   /** @returns true if prebase bit set*/
@@ -62,13 +62,13 @@ public:
   /** @returns raw elem flags */
   KMX_DWORD get_flags() const;
   /** @returns true if matches this character*/
-  bool matches(km_kbp_usv ch) const;
+  bool matches(km_core_usv ch) const;
   /** debugging: dump this element via DebugLog() */
   void dump() const;
 
 private:
   // TODO-LDML: support multi-char strings? (Not needed currently)
-  const km_kbp_usv chr;
+  const km_core_usv chr;
   const SimpleUSet uset;
   const KMX_DWORD flags;
 };
@@ -140,7 +140,7 @@ public:
 
 /** a single char, categorized according to reorder rules*/
 struct reorder_sort_key {
-  km_kbp_usv ch;         // the single char value
+  km_core_usv ch;         // the single char value
   signed char primary;   // primary order value
   size_t secondary;      // index position
   signed char tertiary;  // tertiary value, defaults to 0

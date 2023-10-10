@@ -13,7 +13,7 @@
 #include <utility>
 #include <vector>
 
-#include <keyman/keyboardprocessor.h>
+#include <keyman/keyman_core_api.h>
 
 namespace km {
 namespace kbp {
@@ -22,7 +22,7 @@ namespace ldml {
 /**
  * identifier for keybag lookup
  */
-typedef std::pair<km_kbp_virtual_key, uint16_t> vkey_id;
+typedef std::pair<km_core_virtual_key, uint16_t> vkey_id;
 
 /**
  * LDML Class to manage all things key related: vkey remapping and vkey to string
@@ -38,13 +38,13 @@ public:
   /**
    * add a vkey to the bag
    */
-  void add(km_kbp_virtual_key vk, uint16_t modifier_state, std::u16string output);
+  void add(km_core_virtual_key vk, uint16_t modifier_state, std::u16string output);
 
   /**
    * Lookup a vkey, returns an empty string if not found
    */
   std::u16string
-  lookup(km_kbp_virtual_key vk, uint16_t modifier_state) const;
+  lookup(km_core_virtual_key vk, uint16_t modifier_state) const;
 
 private:
   /**
