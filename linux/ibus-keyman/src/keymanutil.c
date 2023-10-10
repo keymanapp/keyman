@@ -65,6 +65,22 @@
 
 #define N_(text) text
 
+GHashTable *custom_keyboards = NULL;
+
+void free_cust_kbd(gpointer data) {
+  if (data == NULL)
+    return;
+
+  cust_kbd *kbd_data = (cust_kbd *)data;
+
+  g_free(kbd_data->kb_id_with_lang);
+  g_free(kbd_data->lang->id);
+  if (kbd_data->lang->name)
+    g_free(kbd_data->lang->name);
+  g_free(kbd_data->lang);
+  g_free(kbd_data);
+}
+
 // change to keyman_get_kmpdirs_fromdir
 // returns list of directories with kmp.json
 GList * keyman_get_kmpdirs_fromdir(GList *kmpdir_list, const gchar * path)
@@ -151,18 +167,17 @@ get_engine_for_language(
     kmp_info *info,
     keyboard_details *kbd_details,
     gchar *kmp_dir,
-    gchar *lang_id,
-    gchar *lang_name) {
+    kmp_language *lang) {
   IBusEngineDesc* engine_desc = NULL;
-  if (!lang_id || !strlen(lang_id))
+  if (!lang || !lang->id || !strlen(lang->id))
     return engine_desc;
 
   int capacity          = 255;
   g_autofree gchar *name_with_lang = NULL;
   g_autofree gchar *minimized_tag = g_new0(gchar, capacity);
-  int result = bcp47_minimize(lang_id, minimized_tag, capacity);
+  int result = bcp47_minimize(lang->id, minimized_tag, capacity);
   if (result < 0) {
-    g_strlcpy(minimized_tag, lang_id, capacity);
+    g_strlcpy(minimized_tag, lang->id, capacity);
   }
 
   g_autofree gchar *lang_code = g_new0(gchar, capacity);
@@ -172,11 +187,11 @@ get_engine_for_language(
 
   // If ibus doesn't know about the language then append the
   // language name to the keyboard name
-  if (lang_name != NULL) {
+  if (lang->name != NULL) {
     g_autofree gchar *ibus_lang = ibus_get_untranslated_language_name(lang_code);
     g_debug("%s: untranslated ibus language for %s: %s", __FUNCTION__, minimized_tag, ibus_lang);
     if (g_strcmp0(ibus_lang, "Other") == 0) {
-      name_with_lang = g_strjoin(" - ", keyboard->name, lang_name, NULL);
+      name_with_lang = g_strjoin(" - ", keyboard->name, lang->name, NULL);
     }
   }
 
@@ -198,13 +213,12 @@ get_engine_for_language(
   return engine_desc;
 }
 
-// Add a keyboard (ibus engine) to the list of engines
-void
-keyman_add_keyboard(gpointer data, gpointer user_data) {
-  kmp_keyboard *keyboard = (kmp_keyboard *)data;
-  add_keyboard_data *kb_data = (add_keyboard_data *)user_data;
-
-  for (GList *e = kb_data->engines_list; e != NULL; e = e->next) {
+gboolean
+keyman_list_contains_keyboard(
+  GList *engines_list,
+  kmp_keyboard *keyboard
+) {
+  for (GList *e = engines_list; e != NULL; e = e->next) {
     IBusEngineDesc *engine_desc = (IBusEngineDesc *)e->data;
     const gchar *version        = ibus_engine_desc_get_version(engine_desc);
     const gchar *engine_name    = ibus_engine_desc_get_name(engine_desc);
@@ -215,8 +229,81 @@ keyman_add_keyboard(gpointer data, gpointer user_data) {
     // TODO: fix version comparison (#9593)
     if (g_strcmp0(kmx_file, keyboard->kmx_file) == 0 && g_strcmp0(version, keyboard->version) >= 0) {
       g_debug("keyboard %s already exists at version %s which is newer or same as %s", kmx_file, version, keyboard->version);
-      return;
+      return TRUE;
     }
+  }
+  return FALSE;
+}
+
+GList *
+keyman_add_custom_keyboards(
+  kmp_keyboard *keyboard,
+  add_keyboard_data *kb_data,
+  keyboard_details * kbd_details,
+  gchar * kmx_path
+) {
+  GList * engines_list = kb_data->engines_list;
+  GPtrArray *language_keyboards = g_hash_table_lookup(custom_keyboards, kmx_path);
+  if (language_keyboards == NULL)
+    return engines_list;
+
+  for (int i = 0; i < language_keyboards->len; i++) {
+    cust_kbd *data = (cust_kbd *)g_ptr_array_index(language_keyboards, i);
+    IBusEngineDesc *engine_desc = get_engine_for_language(keyboard, kb_data->info, kbd_details, kb_data->kmp_dir, data->lang);
+    if (engine_desc) {
+      engines_list = g_list_append(engines_list, engine_desc);
+    }
+  }
+  return engines_list;
+}
+
+GList *
+keyman_add_keyboards_for_language_if_given(
+  kmp_keyboard *keyboard,
+  add_keyboard_data *kb_data,
+  keyboard_details * kbd_details,
+  gchar * kmx_path
+) {
+  GList * engines_list = kb_data->engines_list;
+  if (keyboard->languages != NULL) {
+    for (GList *l = keyboard->languages; l != NULL; l = l->next) {
+      kmp_language *language = (kmp_language *)l->data;
+      IBusEngineDesc *engine_desc =
+          get_engine_for_language(keyboard, kb_data->info, kbd_details, kb_data->kmp_dir, language);
+      if (engine_desc) {
+        engines_list = g_list_append(engines_list, engine_desc);
+      }
+    }
+  } else {
+    g_message("adding engine %s", kmx_path);
+    engines_list = g_list_append(
+        engines_list,
+        ibus_keyman_engine_desc_new(
+            kmx_path,                       // kmx full path
+            keyboard->name,                 // longname
+            kbd_details->description,       // description
+            kb_data->info->copyright,       // copyright if available
+            NULL,                           // language, most are ignored by ibus except major languages
+            kbd_details->license,           // license
+            kb_data->info->author_desc,     // author name only, not email
+            keyman_get_icon_file(kmx_path), // icon full path
+            "us",                           // layout defaulting to us (en-US)
+            keyboard->version));
+  }
+  return engines_list;
+}
+
+// Add a keyboard (ibus engine) to the list of engines
+void
+keyman_add_keyboard(
+  gpointer data,
+  gpointer user_data
+) {
+  kmp_keyboard *keyboard = (kmp_keyboard *)data;
+  add_keyboard_data *kb_data = (add_keyboard_data *)user_data;
+
+  if (keyman_list_contains_keyboard(kb_data->engines_list, keyboard)) {
+    return;
   }
 
   g_autofree gchar *json_file             = g_strjoin(".", keyboard->id, "json", NULL);
@@ -224,31 +311,8 @@ keyman_add_keyboard(gpointer data, gpointer user_data) {
   get_keyboard_details(kb_data->kmp_dir, json_file, kbd_details);
   g_autofree gchar *abs_kmx = g_strjoin("/", kb_data->kmp_dir, keyboard->kmx_file, NULL);
 
-  if (keyboard->languages != NULL) {
-    for (GList *l = keyboard->languages; l != NULL; l = l->next) {
-      kmp_language *language = (kmp_language *)l->data;
-      IBusEngineDesc *engine_desc =
-          get_engine_for_language(keyboard, kb_data->info, kbd_details, kb_data->kmp_dir, language->id, language->name);
-      if (engine_desc) {
-        kb_data->engines_list = g_list_append(kb_data->engines_list, engine_desc);
-      }
-    }
-  } else {
-    g_message("adding engine %s", abs_kmx);
-    kb_data->engines_list = g_list_append(
-        kb_data->engines_list,
-        ibus_keyman_engine_desc_new(
-            abs_kmx,                        // kmx full path
-            keyboard->name,                 // longname
-            kbd_details->description,       // description
-            kb_data->info->copyright,       // copyright if available
-            NULL,                           // language, most are ignored by ibus except major languages
-            kbd_details->license,           // license
-            kb_data->info->author_desc,     // author name only, not email
-            keyman_get_icon_file(abs_kmx),  // icon full path
-            "us",                           // layout defaulting to us (en-US)
-            keyboard->version));
-  }
+  kb_data->engines_list = keyman_add_keyboards_for_language_if_given(keyboard, kb_data, kbd_details, abs_kmx);
+  kb_data->engines_list = keyman_add_custom_keyboards(keyboard, kb_data, kbd_details, abs_kmx);
 }
 
 // Add keyboards found in {kmp_dir}/kmp.json to engines_list
@@ -258,6 +322,7 @@ keyman_add_keyboards_from_dir(gpointer data, gpointer user_data) {
   GList ** engines_list = (GList **)user_data;
 
   g_autoptr(kmp_details) details = g_new0(kmp_details, 1);
+
   if (get_kmp_details(kmp_dir, details) == JSON_OK) {
     add_keyboard_data kb_data;
     kb_data.engines_list = *engines_list;
@@ -270,12 +335,14 @@ keyman_add_keyboards_from_dir(gpointer data, gpointer user_data) {
 }
 
 GList *
-ibus_keyman_list_engines (void)
+ibus_keyman_list_engines()
 {
     GList *engines = NULL;
     GList *kmpdir_list;
     gchar *xdgenv;
     g_autofree gchar *local_keyboard_path;
+
+    custom_keyboards = keyman_get_custom_keyboard_dictionary();
 
     g_debug("adding from /usr/share/keyman");
     kmpdir_list = keyman_get_kmpdirs_fromdir(NULL, "/usr/share/keyman");
@@ -298,7 +365,10 @@ ibus_keyman_list_engines (void)
 }
 
 void
-add_engine(gpointer data, gpointer user_data) {
+add_engine(
+  gpointer data,
+  gpointer user_data
+) {
   IBusEngineDesc *desc     = IBUS_ENGINE_DESC(data);
   IBusComponent *component = IBUS_COMPONENT(user_data);
   ibus_component_add_engine(component, g_object_ref(desc));
@@ -323,7 +393,6 @@ ibus_keyman_get_component (void)
 
     return component;
 }
-
 
 // Obtain Keyboard Options list from DConf
 // DConf options are in a list of strings like ['option_key1=value1', 'option_key2=value2']
@@ -475,6 +544,37 @@ void
 keyman_set_custom_keyboards(gchar ** keyboards) {
   g_autoptr(GSettings) settings = g_settings_new(KEYMAN_DCONF_ENGINE_NAME);
   g_settings_set_strv(settings, KEYMAN_DCONF_KEYBOARDS_KEY, (const gchar *const *)keyboards);
+}
+
+GHashTable *
+keyman_get_custom_keyboard_dictionary() {
+  g_auto(GStrv) custom_keyboards = keyman_get_custom_keyboards();
+  if (!custom_keyboards)
+    return NULL;
+
+  GHashTable *hash_table = g_hash_table_new_full(g_str_hash, g_str_equal, g_free, (GDestroyNotify)g_ptr_array_unref);
+
+  for (int i = 0; custom_keyboards[i]; i++) {
+    g_auto(GStrv) keyboard_tokens = g_strsplit(custom_keyboards[i], ":", 2);
+
+    if (keyboard_tokens != NULL && keyboard_tokens[0] != NULL && keyboard_tokens[1] != NULL) {
+      GPtrArray *language_keyboards = g_hash_table_lookup(hash_table, keyboard_tokens[1]);
+      if (!language_keyboards) {
+        language_keyboards = g_ptr_array_new_full(1, free_cust_kbd);
+        g_hash_table_insert(hash_table, g_strdup(keyboard_tokens[1]), language_keyboards);
+      }
+
+      cust_kbd *data        = g_new0(cust_kbd, 1);
+      data->kb_id_with_lang = g_strdup(custom_keyboards[i]);
+      data->lang            = g_new0(kmp_language, 1);
+      data->lang->id        = g_strdup(keyboard_tokens[0]);
+      g_ptr_array_add(language_keyboards, data);
+    } else {
+      g_debug("%s: Invalid keyboard: '%s'", __FUNCTION__, custom_keyboards[i]);
+    }
+  }
+
+  return hash_table;
 }
 
 #ifdef DEBUG
