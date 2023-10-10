@@ -2,6 +2,7 @@ var assert = chai.assert;
 
 import {
   loadKeyboardFromJSON,
+  oskResourceLoadPromise,
   setupKMW,
   teardownKMW
 } from "../test_utils.js";
@@ -61,6 +62,11 @@ describe('Event Management', function() {
 
     keyman.setActiveElement(ele);
 
+    // Browsers will only start loading OSK resources (the CSS) once both a keyboard and target
+    // are set... and that's an async operation.
+    await oskResourceLoadPromise();
+
+    // OSK CSS is needed for successful simulation for integration tests involving the gesture engine.
     let eventDriver = new KMWRecorder.BrowserDriver(ele);
     await eventDriver.simulateEvent(event);
 
