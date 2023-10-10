@@ -295,8 +295,8 @@ run_test(const km::kbp::path &source, const km::kbp::path &compiled, km::tests::
  * Run all tests for this keyboard
  */
 int run_all_tests(const km::kbp::path &source, const km::kbp::path &compiled) {
-  std::cout << "source file   = " << source << std::endl
-            << "compiled file = " << compiled << std::endl;
+  std::wcout << console_color::fg(console_color::BLUE) << "source file   = " << source << std::endl
+            << "compiled file = " << compiled << console_color::reset() << std::endl;
 
   km::tests::LdmlEmbeddedTestSource embedded_test_source;
 
@@ -306,7 +306,8 @@ int run_all_tests(const km::kbp::path &source, const km::kbp::path &compiled) {
 
   if (embedded_result == 0) {
     // embedded loaded OK, try it
-    std::cout << "TEST: " << source.name() << " (embedded)" << std::endl;
+    std::wcout << console_color::fg(console_color::BLUE) << console_color::bold() << "TEST: " << source.name() << " (embedded)"
+               << console_color::reset() << std::endl;
     embedded_result = run_test(source, compiled, embedded_test_source);
     if (embedded_result != 0) {
         failures.push_back("in-XML (@@ comment) embedded test failed");
@@ -327,26 +328,40 @@ int run_all_tests(const km::kbp::path &source, const km::kbp::path &compiled) {
     assert(json_tests.size() > 0);
     // Loop over all tests
     for (const auto& n : json_tests) {
-      std::cout << "TEST: " << json_path.stem() << "/" << n.first << std::endl;
+      std::wcout << console_color::fg(console_color::BLUE) << console_color::bold() << "TEST: " << json_path.stem().c_str() << "/" << n.first.c_str() << console_color::reset() << std::endl;
       int sub_test = run_test(source, compiled, *n.second);
       if (sub_test != 0) {
-        std::cout << " FAIL: " << json_path.stem() << "/" << n.first << std::endl;
+        std::wcout << console_color::fg(console_color::BRIGHT_RED) << "FAIL: " << json_path.stem() << "/" << n.first.c_str()
+                   << console_color::reset() << std::endl;
         failures.push_back(json_path.stem() + "/" + n.first);
         json_result = sub_test; // set to last failure
       } else {
-        std::cout << " PASS: " << json_path.stem() << "/" << n.first << std::endl;
+        std::wcout << console_color::fg(console_color::GREEN) << " PASS: " << console_color::reset() << json_path.stem()
+                  << "/" << n.first.c_str() << std::endl;
       }
     }
-    std::cout << " " << json_tests.size() << " JSON test(s)  in "  << json_path.stem() << std::endl;
+    int all_count = json_tests.size();
+    int fail_count = failures.size();
+    int pass_count = all_count - fail_count;
+    if (pass_count > 0) {
+      std::wcout << console_color::fg(console_color::GREEN) << " +" << pass_count;
+    }
+    if (fail_count > 0) {
+     std::wcout << console_color::fg(console_color::BRIGHT_RED) <<
+                " -" << fail_count;
+    }
+    std::wcout << console_color::reset() << " of " << all_count << " JSON tests in "
+              << json_path.stem() << std::endl;
   }
 
 
   // OK.
+  std::wcout << console_color::fg(console_color::YELLOW) << "---- Summary of " << source.name() << " ----" << console_color::reset() << std::endl;
   if (embedded_result == -1) {
-    std::cout << "Note: No embedded test." << std::endl;
+    std::wcout << console_color::fg(console_color::YELLOW) << "Note: No embedded test." << console_color::reset() << std::endl;
   }
   if (json_result == -1) {
-    std::cout << "Note: No json test." << std::endl;
+    std::wcout << console_color::fg(console_color::YELLOW) << "Note: No json test." << console_color::reset() << std::endl;
   }
 
   // if both are missing, that's an error in itself.
@@ -358,7 +373,7 @@ int run_all_tests(const km::kbp::path &source, const km::kbp::path &compiled) {
   // recap the failures
   if (failures.size() > 0) {
     for (const auto& f : failures) {
-      std::cerr << "failure summary: " << f << std::endl;
+      std::wcerr << console_color::fg(console_color::RED) << "failed: " << f.c_str() << console_color::reset() << std::endl;
     }
     return -1;
   } else {
@@ -402,7 +417,7 @@ int main(int argc, char *argv[]) {
 
   int rc = run_all_tests(argv[first_arg], argv[first_arg + 1]);
   if (rc != EXIT_SUCCESS) {
-    std::cerr << "FAILED" << std::endl;
+    std::wcerr << console_color::fg(console_color::BRIGHT_RED) << "FAILED" << console_color::reset() << std::endl;
     rc = EXIT_FAILURE;
   }
   return rc;
