@@ -1,4 +1,4 @@
-#include <keyman/keyboardprocessor.h>
+#include <keyman/keyman_core_api.h>
 #include <string>
 #include <iostream>
 

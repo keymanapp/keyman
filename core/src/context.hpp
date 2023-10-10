@@ -9,7 +9,7 @@
 #pragma once
 #include <list>
 #include <vector>
-#include <keyman/keyboardprocessor.h>
+#include <keyman/keyman_core_api.h>
 
 // Forward declarations
 class json;

@@ -1,7 +1,7 @@
 #ifndef __KEYCODES_H__
 #define __KEYCODES_H__
 
-#include <keyman/keyboardprocessor.h>
+#include <keyman/keyman_core_api.h>
 
 // from android/KMEA/app/src/main/java/com/tavultesoft/kmea/KMScanCodeMap.java
 // uses kernel keycodes which are (X11 keycode - 8)

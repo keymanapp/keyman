@@ -15,8 +15,8 @@
 
 #include <stdint.h>
 #include <stdlib.h>
-#include <keyman/keyboardprocessor_bits.h>
-#include <keyman/keyboardprocessor_vkeys.h>
+#include <keyman/keyman_core_api_bits.h>
+#include <keyman/keyman_core_api_vkeys.h>
 
 #if defined(__cplusplus)
 extern "C"

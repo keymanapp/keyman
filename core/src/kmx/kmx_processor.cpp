@@ -1,4 +1,4 @@
-#include <keyman/keyboardprocessor.h>
+#include <keyman/keyman_core_api.h>
 #include "state.hpp"
 #include "kmx/kmx_processor.hpp"
 #include <map>

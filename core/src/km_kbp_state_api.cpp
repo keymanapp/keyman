@@ -12,7 +12,7 @@
 #include <algorithm>
 #include <sstream>
 
-#include <keyman/keyboardprocessor.h>
+#include <keyman/keyman_core_api.h>
 #include "jsonpp.hpp"
 
 #include "processor.hpp"
@@ -212,7 +212,7 @@ km_kbp_status km_kbp_state_to_json(km_kbp_state const *state,
   {
     // Pretty print the document.
     jo << json::object
-        << "$schema" << "keyman/keyboardprocessor/doc/introspection.schema"
+        << "$schema" << "keyman/core/doc/introspection.schema"
         << "keyboard" << state->processor().keyboard()
 //        << "options" << state->options()  TODO: Fix
         << "context" << state->context()

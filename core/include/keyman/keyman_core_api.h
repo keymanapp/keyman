@@ -57,7 +57,7 @@ A virtual key event and modifier map received from the Platform layer to be
 processed with the state object for this Client application.
 - __Virtual Key:__
 A code based on the US English layout, with values matching the Windows
-virtual key codes. See `keyboardprocessor_vkeys.h` for definitions.
+virtual key codes. See `keyman_core_api_vkeys.h` for definitions.
 - __Modifier Key:__
 The set of Control, Shift, Alt, Caps Lock keys. On some platforms these may
 have other names (e.g. Alt is called Option on macOS); other platform-specific
@@ -100,9 +100,9 @@ nothing in that event.
 */
 #include <stdint.h>
 #include <stdlib.h>
-#include <keyman/keyboardprocessor_bits.h>
-#include <keyman/keyboardprocessor_vkeys.h>
-#include <keyman/keyboardprocessor_version.h>
+#include <keyman/keyman_core_api_bits.h>
+#include <keyman/keyman_core_api_vkeys.h>
+#include <keyman/keyman_core_api_version.h>
 
 #if defined(__cplusplus)
 extern "C"
@@ -989,7 +989,7 @@ used in IMX callbacks called during `km_kbp_process_event`.
 In the event the `state` or `action_items` pointer are null.
 ##### Parameters:
 - __state__:        A pointer to the opaque `km_kbp_state` object to be queried.
-- __action_items__: The action items to be added to the keyboardprocessor
+- __action_items__: The action items to be added to the core
                     queue. Must be terminated with a `KM_KBP_IT_END` entry.
 
 ```c

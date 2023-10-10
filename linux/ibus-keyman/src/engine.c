@@ -28,8 +28,8 @@
 #include <gdk/gdk.h>
 #include <gio/gio.h>
 
-#include <keyman/keyboardprocessor.h>
-#include <keyman/keyboardprocessor_consts.h>
+#include <keyman/keyman_core_api.h>
+#include <keyman/keyman_core_api_consts.h>
 
 #include "config.h"
 #include "keymanutil.h"

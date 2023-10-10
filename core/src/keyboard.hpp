@@ -11,7 +11,7 @@
 #include <string>
 #include <vector>
 
-#include <keyman/keyboardprocessor.h>
+#include <keyman/keyman_core_api.h>
 
 #include "option.hpp"
 #include "path.hpp"

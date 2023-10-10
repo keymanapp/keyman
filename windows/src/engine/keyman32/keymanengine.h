@@ -18,11 +18,11 @@
 #define _CRT_SECURE_CPP_OVERLOAD_STANDARD_NAMES_COUNT 1
 #endif
 
-// For keyboardprocessor_bits.h
+// For keyman_core_api_bits.h
 #ifndef KMN_KBP_STATIC
 #define KMN_KBP_STATIC
 #endif
-// For keyboardprocessor_bits.h
+// For keyman_core_api_bits.h
 #ifndef _WIN32
 #define _WIN32 1
 #endif
@@ -39,8 +39,8 @@
 #include <assert.h>
 #include <msctf.h>
 #include "../../../../common/windows/cpp/include/legacy_kmx_file.h"
-#include <keyman/keyboardprocessor.h>
-#include <keyman/keyboardprocessor_consts.h>
+#include <keyman/keyman_core_api.h>
+#include <keyman/keyman_core_api_consts.h>
 
 /***************************************************************************/
 

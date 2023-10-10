@@ -9,8 +9,8 @@
 #include <cassert>
 #include <vector>
 
-#include <keyman/keyboardprocessor.h>
-#include <keyman/keyboardprocessor_debug.h>
+#include <keyman/keyman_core_api.h>
+#include <keyman/keyman_core_api_debug.h>
 
 namespace km {
 namespace kbp

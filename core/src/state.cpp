@@ -7,7 +7,7 @@
 
 #include "state.hpp"
 #include "processor.hpp"
-#include <keyman/keyboardprocessor_consts.h>
+#include <keyman/keyman_core_api_consts.h>
 
 using namespace km::kbp;
 

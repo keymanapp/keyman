@@ -6,7 +6,7 @@
 */
 #include <string>
 
-#include <keyman/keyboardprocessor.h>
+#include <keyman/keyman_core_api.h>
 #include "path.hpp"
 
 //#include "keyboard.hpp"

@@ -3,7 +3,7 @@
   Authors:          mcdurdin
 */
 #include <kmx/kmx_processevent.h>
-#include <keyman/keyboardprocessor_consts.h>
+#include <keyman/keyman_core_api_consts.h>
 #include <state.hpp>
 #include <option.hpp>
 

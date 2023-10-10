@@ -8,7 +8,7 @@
   History:      17 Oct 2018 - TSE - Initial implementation.
 */
 
-#include <keyman/keyboardprocessor.h>
+#include <keyman/keyman_core_api.h>
 #include "processor.hpp"
 #include "state.hpp"
 
