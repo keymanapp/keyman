@@ -11,8 +11,8 @@ cd "$WORKDIR"
 
 # Test all include files are available
 cat <<EOF > keymantest.c
-#include <keyman/keyboardprocessor.h>
-km_kbp_context* c;
+#include <keyman/keyman_core_api.h>
+km_core_context* c;
 EOF
 
 # shellcheck disable=SC2046
@@ -21,8 +21,8 @@ echo "build 1: OK"
 
 # Test pkg-config file - include without path
 cat <<EOF > keymantest.c
-#include <keyboardprocessor.h>
-km_kbp_context* c;
+#include <keyman_core_api.h>
+km_core_context* c;
 EOF
 
 # shellcheck disable=SC2046

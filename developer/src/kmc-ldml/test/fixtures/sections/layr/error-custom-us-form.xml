@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE keyboard3 SYSTEM "../../../../../../../resources/standards-data/ldml-keyboards/techpreview/dtd/ldmlKeyboard3.dtd">
+<keyboard3 locale="und" conformsTo="techpreview">
+  <names>
+    <name value="layr-hint-custom-form" />
+  </names>
+
+  <keys>
+    <key id="one" to="1" />
+    <key id="two" to="2" />
+    <key id="three" to="3" />
+  </keys>
+  <forms>
+    <!-- this will emit a warning about custom scancodes -->
+    <form id="us">
+      <!-- This will break because of scancode FF -->
+      <scanCodes codes="25 12 FF" />
+    </form>
+  </forms>
+  <layers form="us">
+    <layer id="base">
+      <row keys="one two three" />
+    </layer>
+  </layers>
+</keyboard3>

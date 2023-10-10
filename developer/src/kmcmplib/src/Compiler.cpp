@@ -1029,6 +1029,8 @@ KMX_DWORD ProcessSystemStore(PFILE_KEYBOARD fk, KMX_DWORD SystemID, PFILE_STORE 
     else if (u16ncmp(p, u"10.0", 4) == 0)  fk->version = VERSION_100;
     else if (u16ncmp(p, u"14.0", 4) == 0)  fk->version = VERSION_140; // Adds support for #917 -- context() with notany() for KeymanWeb
     else if (u16ncmp(p, u"15.0", 4) == 0)  fk->version = VERSION_150; // Adds support for U_xxxx_yyyy #2858
+    else if (u16ncmp(p, u"16.0", 4) == 0)  fk->version = VERSION_160; // KMXPlus
+    else if (u16ncmp(p, u"17.0", 4) == 0)  fk->version = VERSION_170; // Flicks and gestures
 
     else return CERR_InvalidVersion;
 
@@ -1058,7 +1060,7 @@ KMX_DWORD ProcessSystemStore(PFILE_KEYBOARD fk, KMX_DWORD SystemID, PFILE_STORE 
       u16ncpy(q, pp2, u16len(pp2) + 1);
 
       // Change compiled reference file extension to .kvk
-      pp2 = ( km_kbp_cp *) u16chr(q, 0) - 5;
+      pp2 = ( km_core_cp *) u16chr(q, 0) - 5;
       if (pp2 > q && u16icmp(pp2, u".kvks") == 0) {
         pp2[4] = 0;
       }

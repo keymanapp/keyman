@@ -824,10 +824,12 @@ if(!keyman?.ui?.name) {
         this.selectedLanguage = kbd.LanguageCode;
 
         // Return focus to input area and activate the selected keyboard
-        this.setLastFocus(); //*****this seems out of sequence???
         this.addKeyboardToList(lang, kbd);
         if(updateKeyman) {
-          keymanweb.setActiveKeyboard(kbd.InternalName, kbd.LanguageCode);
+          keymanweb.setActiveKeyboard(kbd.InternalName, kbd.LanguageCode).then(() => {
+            // Restore focus _after_ the keyboard finishes loading.
+            this.setLastFocus();
+          });
         }
         this.listedKeyboards[this.findListedKeyboard(lang)].buttonNode.className = 'kmw_button_selected';
 

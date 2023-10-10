@@ -1,13 +1,11 @@
 {
   "name": "@keymanapp/developer-server",
   "description": "Keyman Developer backend server",
-  "main": "dist/index.js",
+  "main": "build/src/index.js",
+  "type": "module",
   "scripts": {
-    "build": "tsc -b",
-    "postbuild": "npx gosh ./postbuild.sh",
-    "prod": "node .",
-    "test": "mocha",
-    "watch": "npm run postbuild && tsc-watch --onSuccess \"node --inspect .\" --onFailure \"node --inspect .\""
+    "build": "npx gosh ./build.sh build",
+    "test": "npx gosh ./build.sh test"
   },
   "license": "MIT",
   "dependencies": {
@@ -24,13 +22,13 @@
     "node-windows-trayicon": "keymanapp/node-windows-trayicon#keyman-16.0"
   },
   "devDependencies": {
-    "@keymanapp/resources-gosh": "*",
     "@keymanapp/keyman-version": "*",
+    "@keymanapp/resources-gosh": "*",
     "@types/chai": "^4.3.0",
     "@types/express": "^4.17.13",
     "@types/mocha": "^9.1.0",
     "@types/multer": "^1.4.7",
-    "@types/node": "^17.0.0",
+    "@types/node": "^20.4.1",
     "@types/ws": "^8.2.2",
     "chai": "^4.3.4",
     "copyfiles": "^2.4.1",
@@ -41,6 +39,6 @@
   },
   "mocha": {
     "require": "ts-node/register",
-    "spec": "**/*.test.ts"
+    "spec": "build/**/*.test.js"
   }
 }

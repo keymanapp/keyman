@@ -322,3 +322,12 @@ SYMSTORE="C:\Program Files (x86)\Windows Kits\10\Debuggers\x64\symstore.exe" add
     /compress /f
 
 CLEAN=-del /S /Q
+
+#
+# Signature checks
+#
+
+VERIFY_SIGNATURES_PATH=$(KEYMAN_ROOT)\common\windows\delphi\tools\verify_signatures
+# Note: hyphen prefix is important to ignore return value from sigcheck
+SIGCHECK=-$(VERIFY_SIGNATURES_PATH)\$(WIN32_TARGET_PATH)\sigcheck -q -s -e -v -accepteula
+VERIFY_SIGNATURES=$(VERIFY_SIGNATURES_PATH)\$(WIN32_TARGET_PATH)\verify_signatures -d $(KEYMAN_ROOT)\VERSION.md
