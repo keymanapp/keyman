@@ -14,13 +14,9 @@ import { ConfigChangeClosure, GestureRecognizerConfiguration, GestureSequence, P
  * * The UI needed to present a subkey menu
  * * The state management needed to present feedback about the
  * currently-selected subkey to the user
- * * A `Promise` that will resolve to the user's selected subkey
- * once the longpress operation is complete.
  *
  * As selection of the subkey occurs after the subkey popup is
  * displayed, selection of the subkey is inherently asynchronous.
- * The `Promise` may also resolve to `null` if the user indicates
- * the desire to cancel subkey selection.
  */
 export default class SubkeyPopup {
   public readonly element: HTMLDivElement;
@@ -31,8 +27,6 @@ export default class SubkeyPopup {
   private callout: HTMLDivElement;
 
   public readonly baseKey: KeyElement;
-  public readonly promise: Promise<KeyEvent>;
-
   public readonly subkeys: KeyElement[];
 
   constructor(
