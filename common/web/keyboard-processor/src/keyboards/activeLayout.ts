@@ -310,6 +310,27 @@ export class ActiveKeyBase {
       hasMultitaps: false
     }
 
+    // The default-layer shift key on mobile platforms should have a default multitap under
+    // select conditions.
+    //
+    // Note:  whether or not any other key has multitaps doesn't matter here.  Just THIS one.
+    if(key.id == 'K_SHIFT' && displayLayer == 'default' && layout.formFactor != 'desktop') {
+      /* Extra requirements:
+       *
+       * 1. The SHIFT key must not specify subkeys or have already-specified multitaps.
+       *
+       *    Note:  touch layouts specified on desktop layouts often do specify subkeys;
+       *    utilized modifiers aside from 'shift' become subkeys of K_SHIFT)
+       *
+       * 2. There exists a specified 'caps' layer.  Otherwise, there's no destination for
+       *    the default multitap.
+       *
+       */
+      if(!key.sk && !key.multitap && !!layout.layer.find((entry) => entry.id == 'caps')) {
+        key.multitap = [Layouts.dfltShiftMultitap];
+      }
+    }
+
     // Add class functions to the existing layout object, allowing it to act as an ActiveLayout.
     let dummy = new ActiveKeyBase();
     let proto = Object.getPrototypeOf(dummy);
@@ -803,9 +824,11 @@ export class ActiveLayout implements LayoutFormFactor{
    * @param formFactor
    */
   static polyfill(layout: LayoutFormFactor, keyboard: Keyboard, formFactor: DeviceSpec.FormFactor): ActiveLayout {
+    /* c8 ignore start */
     if(layout == null) {
       throw new Error("Cannot build an ActiveLayout for a null specification.");
     }
+    /* c8 ignore end */
 
     const analysisMetadata: AnalysisMetadata = {
       hasFlicks: false,

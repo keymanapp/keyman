@@ -8,13 +8,13 @@ export class HeldRepeater implements GestureHandler {
   static readonly INITIAL_DELAY = 500;
   static readonly REPEAT_DELAY = 100;
 
-  readonly source: GestureSequence<KeyElement>;
+  readonly source: GestureSequence<KeyElement, string>;
   readonly hasModalVisualization = false;
   readonly repeatClosure: () => void;
 
   timerHandle: number;
 
-  constructor(source: GestureSequence<KeyElement>, closureToRepeat: () => void) {
+  constructor(source: GestureSequence<KeyElement, string>, closureToRepeat: () => void) {
     this.source = source;
     this.repeatClosure = closureToRepeat;
 

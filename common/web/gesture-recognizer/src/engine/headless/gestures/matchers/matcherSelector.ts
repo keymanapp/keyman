@@ -5,6 +5,8 @@ import { ManagedPromise, timedPromise } from "@keymanapp/web-utils";
 import { GestureSource, GestureSourceSubview } from "../../gestureSource.js";
 import { GestureMatcher, MatchResult, PredecessorMatch } from "./gestureMatcher.js";
 import { GestureModel } from "../specs/gestureModel.js";
+import { GestureSequence } from "./index.js";
+import { ItemIdentifier } from "../../../configuration/gestureRecognizerConfiguration.js";
 
 interface GestureSourceTracker<Type, StateToken> {
   /**

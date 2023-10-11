@@ -537,6 +537,15 @@ export class Layouts {
     return KLS;
   }
 
+  static dfltShiftMultitap: LayoutSubKey = {
+    // Needs to be something special and unique.  Typing restricts us from
+    // using a reserved key-id prefix, though.
+    id: "T_MT_SHIFT_TO_CAPS",
+    text: '*ShiftLock*',
+    sp: 1,
+    nextlayer: 'caps'
+  }
+
   // Defines the default visual layout for a keyboard.
   /* c8 ignore start */
   static dfltLayout: LayoutSpec = {

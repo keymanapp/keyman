@@ -36,7 +36,7 @@ export default class SubkeyPopup implements GestureHandler {
   private readonly gestureParams: GestureParams;
 
   constructor(
-    source: GestureSequence<KeyElement>,
+    source: GestureSequence<KeyElement, string>,
     configChanger: ConfigChangeClosure<KeyElement>,
     vkbd: VisualKeyboard,
     e: KeyElement,

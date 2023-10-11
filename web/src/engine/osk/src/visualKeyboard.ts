@@ -12,7 +12,8 @@ import {
   KeyEvent,
   Layouts,
   StateKeyMap,
-  LayoutKey
+  LayoutKey,
+  ActiveSubKey
 } from '@keymanapp/keyboard-processor';
 
 import { buildCorrectiveLayout, distributionFromDistanceMaps, keyTouchDistances } from '@keymanapp/input-processor';
@@ -46,6 +47,7 @@ import { DEFAULT_GESTURE_PARAMS, GestureParams, gestureSetForLayout } from './in
 import { getViewportScale } from './screenUtils.js';
 import { HeldRepeater } from './input/gestures/heldRepeater.js';
 import SubkeyPopup from './input/gestures/browser/subkeyPopup.js';
+import Multitap from './input/gestures/browser/multitap.js';
 import { GestureHandler } from './input/gestures/gestureHandler.js';
 
 export interface VisualKeyboardConfiguration extends CommonConfiguration {
@@ -494,17 +496,22 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
             correctionKeyDistribution = this.getSimpleTapCorrectionProbabilities(coord, gestureKey.key.spec as ActiveKey);
           }
 
-          // Once the best coord to use for fat-finger calculations has been determined:
-          this.modelKeyClick(gestureStage.item, coord, correctionKeyDistribution);
+          // Multitaps do special key-mapping stuff internally and produce + raise their
+          // key events directly.
+          if(gestureStage.matchedId != 'multitap') {
+            // Once the best coord to use for fat-finger calculations has been determined:
+            this.modelKeyClick(gestureStage.item, coord, correctionKeyDistribution);
+          }
         }
 
         // Outside of passing keys along... the handling of later stages is delegated
         // to gesture-specific handling classes.
-        if(gestureSequence.stageReports.length > 1) {
+        if(gestureSequence.stageReports.length > 1 && gestureStage.matchedId != 'modipress-end') {
           return;
         }
 
         // So, if this is the first stage, this is where we need to perform that delegation.
+        const baseItem = gestureSequence.stageReports[0].item;
 
         // -- Scratch-space as gestures start becoming integrated --
         // Reordering may follow at some point.
@@ -529,6 +536,9 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
             gestureSequence.stageReports[0].sources[0].baseItem,
             DEFAULT_GESTURE_PARAMS
           );
+        } else if(baseItem.key.spec.multitap && (gestureStage.matchedId == 'simple-tap' || gestureStage.matchedId == 'multitap' || gestureStage.matchedId == 'modipress-end')) {
+          // Likewise - mere construction is enough.
+          handler = new Multitap(gestureSequence, this, baseItem);
         }
 
         if(handler) {
@@ -944,6 +954,11 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
       return null;
     }
 
+    // Return the event object.
+    return this.keyEventFromSpec(keySpec);
+  }
+
+  keyEventFromSpec(keySpec: ActiveKey | ActiveSubKey) {
     //let core = com.keyman.singleton.core; // only singleton-based ref currently needed here.
 
     // Start:  mirrors _GetKeyEventProperties
@@ -988,6 +1003,8 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
     if (!layer) {
       return;
     }
+
+    this.gestureEngine.stateToken = layerId;
 
     // So... through KMW 14, we actually never tracked the capsKey, numKey, and scrollKey
     // properly for keyboard-defined layouts - only _default_, desktop-style layouts.
