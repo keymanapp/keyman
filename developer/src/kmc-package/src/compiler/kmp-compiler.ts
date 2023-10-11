@@ -82,7 +82,7 @@ export class KmpCompiler {
     //
 
     if(kps.Options) {
-      kmp.options.executeProgram = kps.Options?.ExecuteProgram || undefined;
+      kmp.options.executeProgram = kps.Options.ExecuteProgram || undefined;
       kmp.options.graphicFile = kps.Options.GraphicFile || undefined;
       kmp.options.msiFilename = kps.Options.MsiFileName || undefined;
       kmp.options.msiOptions = kps.Options.MsiOptions || undefined;
