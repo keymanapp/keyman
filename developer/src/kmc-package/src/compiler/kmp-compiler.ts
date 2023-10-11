@@ -28,6 +28,9 @@ export class KmpCompiler {
 
   public transformKpsToKmpObject(kpsFilename: string): KmpJsonFile.KmpJsonFile {
     const kps = this.loadKpsFile(kpsFilename);
+    if(!kps) {
+      return null;
+    }
     return this.transformKpsFileToKmpObject(kpsFilename, kps);
   }
 

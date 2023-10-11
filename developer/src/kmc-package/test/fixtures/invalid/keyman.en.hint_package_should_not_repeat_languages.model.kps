@@ -24,7 +24,7 @@
       <ID>example.qaa.sencoten</ID>
       <Languages>
         <Language ID="qaa">North Straits Salish</Language>
-        <!-- WARN_PackageShouldNotRepeatLanguages -->
+        <!-- HINT_PackageShouldNotRepeatLanguages -->
         <Language ID="QAA">Salish Again</Language>
         <Language ID="qaa-Latn">SENĆOŦEN</Language>
       </Languages>

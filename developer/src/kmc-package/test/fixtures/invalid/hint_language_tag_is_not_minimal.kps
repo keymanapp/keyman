@@ -24,7 +24,7 @@
       <ID>basic</ID>
       <Version>1.0</Version>
       <Languages>
-        <!-- WARN_LanguageTagIsNotMinimal -->
+        <!-- HINT_LanguageTagIsNotMinimal -->
         <Language ID="km-Khmr-KH">Central Khmer (Khmer, Cambodia)</Language>
       </Languages>
     </Keyboard>
