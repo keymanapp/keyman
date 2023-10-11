@@ -217,6 +217,8 @@ type
     lblWebDisplayFonts: TLabel;
     lblLicenseFile: TLabel;
     cbLicense: TComboBox;
+    lblWelcomeFile: TLabel;
+    cbWelcomeFile: TComboBox;
     procedure cmdCloseClick(Sender: TObject);
     procedure cmdAddFileClick(Sender: TObject);
     procedure cmdRemoveFileClick(Sender: TObject);
@@ -293,6 +295,7 @@ type
     procedure cmdKeyboardWebOSKFontsClick(Sender: TObject);
     procedure cmdKeyboardWebDisplayFontsClick(Sender: TObject);
     procedure cbLicenseClick(Sender: TObject);
+    procedure cbWelcomeFileClick(Sender: TObject);
   private
     pack: TKPSFile;
     FSetup: Integer;
@@ -308,6 +311,7 @@ type
     procedure EnableDetailsTabControls;
     procedure EnableCompileTabControls;
     function DoAction(action: TProjectFileAction): Boolean;
+    procedure UpdateWelcomeFile;
     procedure UpdateReadme;
     procedure UpdateImageFiles;
     procedure GetStartMenuEntries(var AName, AProg, AParams: WideString);
@@ -448,6 +452,7 @@ begin
     gridRelatedPackages.Cells[1, 0] := 'Relationship';
 
     UpdateStartMenuPrograms;
+    UpdateWelcomeFile;
     UpdateReadme;
     UpdateLicense;
     UpdateImageFiles;
@@ -768,6 +773,7 @@ begin
   pack.Files.Add(f);
   lbFiles.ItemIndex := lbFiles.Items.AddObject(ExtractFileName(FileName), f);
   lbFilesClick(lbFiles);
+  UpdateWelcomeFile;
   UpdateReadme;
   UpdateLicense;
   UpdateImageFiles;
@@ -814,6 +820,7 @@ begin
     lbFiles.Items.Delete(lbFiles.ItemIndex);
     if lbFiles.Items.Count > 0 then lbFiles.ItemIndex := 0;
     lbFilesClick(lbFiles);
+    UpdateWelcomeFile;
     UpdateReadme;
     UpdateLicense;
     UpdateImageFiles;
@@ -941,6 +948,15 @@ end;
 {-------------------------------------------------------------------------------
  - Options page                                                                -
  -------------------------------------------------------------------------------}
+
+procedure TfrmPackageEditor.cbWelcomeFileClick(Sender: TObject);
+begin
+  if FSetup > 0 then Exit;
+  if cbWelcomeFile.ItemIndex <= 0
+    then pack.Options.WelcomeFile := nil
+    else pack.Options.WelcomeFile := cbWelcomeFile.Items.Objects[cbWelcomeFile.ItemIndex] as TPackageContentFile;
+  Modified := True;
+end;
 
 procedure TfrmPackageEditor.cbReadMeClick(Sender: TObject);
 begin
@@ -1258,6 +1274,11 @@ begin
   cbStartMenuProgram.Items.Insert(3, '(About Product)');
 end;
 
+procedure TfrmPackageEditor.UpdateWelcomeFile;
+begin
+  FillFileList(cbWelcomeFile, pack.Options.WelcomeFile);
+end;
+
 procedure TfrmPackageEditor.UpdateReadme;
 begin
   FillFileList(cbReadme, pack.Options.ReadmeFile);
@@ -1297,6 +1318,7 @@ begin
       lbFiles.Items.AddObject(ExtractFileName(pack.Files[i].FileName), pack.Files[i]);
 
     UpdateOutPath;
+    UpdateWelcomeFile;
     UpdateReadme;
     UpdateLicense;
     UpdateImageFiles;

@@ -16,6 +16,11 @@ import { markdownToHTML } from './markdown.js';
 const KMP_JSON_FILENAME = 'kmp.json';
 const KMP_INF_FILENAME = 'kmp.inf';
 
+// welcome.htm: this is a legacy filename, as of 17.0 the welcome
+// (documentation) filename can be any file, but we will fallback to detecting
+// this filename for existing keyboard packages.
+const WELCOME_HTM_FILENAME = 'welcome.htm';
+
 export class KmpCompiler {
 
   constructor(private callbacks: CompilerCallbacks) {
@@ -84,6 +89,7 @@ export class KmpCompiler {
       kmp.options.msiOptions = kps.options.msiOptions || undefined;
       kmp.options.readmeFile = kps.options.readMeFile || undefined;
       kmp.options.licenseFile = kps.options.licenseFile || undefined;
+      kmp.options.welcomeFile = kps.options.welcomeFile || undefined;
     }
 
     //
@@ -373,6 +379,8 @@ export class KmpCompiler {
       return null;
     }
 
+    // TODO #9477: transform .md to .htm
+
     // Remove path data from file references in options
 
     if(data.options.graphicFile) {
@@ -384,6 +392,16 @@ export class KmpCompiler {
     if(data.options.licenseFile) {
       data.options.licenseFile = this.callbacks.path.basename(data.options.licenseFile);
     }
+    if(data.options.welcomeFile) {
+      data.options.welcomeFile = this.callbacks.path.basename(data.options.welcomeFile);
+    } else if(data.files.find(file => file.name == WELCOME_HTM_FILENAME)) {
+      // We will, for improved backward-compatibility with existing packages, add a
+      // reference to the file welcome.htm is it is present in the package. This allows
+      // newer tools to avoid knowing about welcome.htm, if we assume that they work with
+      // packages compiled with kmc-package (17.0+) and not kmcomp (5.x-16.x).
+      data.options.welcomeFile = WELCOME_HTM_FILENAME;
+    }
+
     if(data.options.msiFilename) {
       data.options.msiFilename = this.callbacks.path.basename(data.options.msiFilename);
     }

@@ -42,6 +42,7 @@ export interface KpsFileOptions {
   readMeFile?: string;
   graphicFile?: string;
   licenseFile?: string;
+  welcomeFile?: string;
   executeProgram?: string;
   msiFileName?: string;
   msiOptions?: string;
