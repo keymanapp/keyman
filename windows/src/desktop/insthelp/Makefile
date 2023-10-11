@@ -11,9 +11,9 @@ build: version.res dirs
     $(COPY) $(WIN32_TARGET_PATH)\insthelp.exe $(ROOT)\bin\desktop\insthelp.exe
 
 test-manifest:
-    # test that (a) linked manifest exists and correct, and (b) has uiAccess=true
+# test that (a) linked manifest exists and correct, and (b) has uiAccess=true
     @rem $(MT) -nologo -inputresource:$(PROGRAM)\desktop\insthelp.exe -validate_manifest
-    # TODO: Investigate why no manifest included?
+# TODO: Investigate why no manifest included?
 
 clean: def-clean
 

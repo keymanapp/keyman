@@ -26,6 +26,9 @@ copykmdev: makeinstaller make-kmc-install-zip
     -mkdir $(DEVELOPER_ROOT)\release\$Version
     copy /Y $(DEVELOPER_ROOT)\src\inst\keymandeveloper.msi $(DEVELOPER_ROOT)\release\$Version\keymandeveloper.msi
     copy /Y $(DEVELOPER_ROOT)\src\inst\keymandeveloper-$Version.exe $(DEVELOPER_ROOT)\release\$Version\keymandeveloper-$Version.exe
+    $(SIGCHECK) $(DEVELOPER_ROOT)\release\$Version\* > sig1
+    $(VERIFY_SIGNATURES) < sig1
+    -del sig1
 
 test-releaseexists:
     if exist $(DEVELOPER_ROOT)\release\$Version\keymandeveloper*.msi echo. & echo Release $Version already exists. Delete it or update VERSION.md and try again & exit 1

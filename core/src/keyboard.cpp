@@ -3,7 +3,7 @@
   Description:  Internal keyboard class and adaptor class for the API.
   Create Date:  2 Oct 2018
   Authors:      Tim Eves (TSE)
-  History:      7 Oct 2018 - TSE - Refactored out of km_kbp_keyboard_api.cpp
+  History:      7 Oct 2018 - TSE - Refactored out of km_core_keyboard_api.cpp
 */
 #include "keyboard.hpp"
 #include "jsonpp.hpp"

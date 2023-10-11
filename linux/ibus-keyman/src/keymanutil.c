@@ -55,7 +55,7 @@
 #include <glib.h>
 #include <glib/gprintf.h>
 #include <string.h>
-#include <keyman/keyboardprocessor.h>
+#include <keyman/keyman_core_api.h>
 
 #include "bcp47util.h"
 #include "kmpdetails.h"
@@ -379,7 +379,7 @@ keyman_get_options_fromdconf(gchar *package_id,
     return options;
 }
 
-// Obtain Keyboard Options from DConf and parse into a GQueue of struct km_kbp_option_item
+// Obtain Keyboard Options from DConf and parse into a GQueue of struct km_core_option_item
 //
 // Parameters:
 // package_id  (gchar *): Package ID
@@ -406,9 +406,9 @@ keyman_get_options_queue_fromdconf(gchar *package_id,
             if (option_tokens != NULL && option_tokens[0] != NULL && option_tokens[1] != NULL)
             {
                 g_message("Keyboard Option [%d], %s=%s", index, option_tokens[0], option_tokens[1]);
-                km_kbp_option_item *opt = g_new0(km_kbp_option_item, 1);
-                opt[0].scope = KM_KBP_OPT_KEYBOARD;
-                km_kbp_cp *ocp = g_utf8_to_utf16(option_tokens[0], -1, NULL, NULL, NULL);
+                km_core_option_item *opt = g_new0(km_core_option_item, 1);
+                opt[0].scope = KM_CORE_OPT_KEYBOARD;
+                km_core_cp *ocp = g_utf8_to_utf16(option_tokens[0], -1, NULL, NULL, NULL);
                 opt[0].key = ocp;
                 ocp = g_utf8_to_utf16 (option_tokens[1], -1, NULL, NULL, NULL);
                 opt[0].value = ocp;

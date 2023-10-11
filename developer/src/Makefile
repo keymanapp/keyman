@@ -148,6 +148,8 @@ do-build-release:
     $(MAKE) build-release-dependencies
     $(MAKE) "SIGNCODE_BUILD=SIGNCODE_BUILD" build test
     $(MAKE) signcode
+    cd $(DEVELOPER_ROOT)\src\tools\verify_signatures
+    $(MAKE) test
 
     cd $(DEVELOPER_ROOT)\src\inst
     $(MAKE)

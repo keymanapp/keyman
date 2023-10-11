@@ -1,5 +1,6 @@
 #!/usr/bin/python3
 import getpass
+import hashlib
 import importlib
 import logging
 import os
@@ -124,13 +125,24 @@ class SentryErrorHandling:
           integrations=[sentry_logging],
           before_send=self._before_send
         )
-        set_user({'id': hash(getpass.getuser())})
+        hash = hashlib.md5()
+        hash.update(getpass.getuser().encode())
+        set_user({'id': hash.hexdigest()})
         with configure_scope() as scope:
             scope.set_tag("app", os.path.basename(sys.argv[0]))
             scope.set_tag("pkgversion", __pkgversion__)
             scope.set_tag("platform", platform.platform())
             scope.set_tag("system", platform.system())
             scope.set_tag("tier", __tier__)
+            scope.set_tag("device", platform.node())
+            try:
+                os_release = platform.freedesktop_os_release()
+                scope.set_tag('os', os_release['PRETTY_NAME'])
+                scope.set_tag('os.name', os_release['NAME'])
+                if 'VERSION' in os_release:
+                    scope.set_tag('os.version', os_release['VERSION'])
+            except OSError as e:
+                logging.debug(f'System does not have os_release file: {e.strerror}')
         logging.info("Initialized Sentry error reporting")
 
     def _raven_initialize(self):
