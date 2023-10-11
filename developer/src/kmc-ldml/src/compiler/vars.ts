@@ -216,7 +216,7 @@ export class VarsCompiler extends SectionCompiler {
 
     // collect all markers, excluding the match-all
     const allMarkers : string[] = Array.from(mt.all).filter(m => m !== MarkerParser.ANY_MARKER_ID).sort();
-    result.markers = sections.list.allocList(sections.strs, allMarkers);
+    result.markers = sections.list.allocList(allMarkers, {}, sections);
 
     return result.valid() ? result : null;
   }

@@ -13,12 +13,12 @@
 #include <kmx/kmx_processevent.h> // for char to vk mapping tables
 #include <kmx/kmx_xstring.h> // for surrogate pair macros
 #include <kmx/kmx_plus.h>
-#include <keyman/keyboardprocessor.h>
+#include <keyman/keyman_core_api.h>
 
 namespace km {
 namespace tests {
 
-km_kbp_virtual_key get_vk(std::string const &vk);
+km_core_virtual_key get_vk(std::string const &vk);
 
 }  // namespace tests
 }  // namespace km

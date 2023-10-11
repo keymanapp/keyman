@@ -1,5 +1,5 @@
-import express = require('express');
-import { SiteData, data } from "../../data";
+import * as express from 'express';
+import { SiteData, data } from "../../data.js";
 
 export default function handleIncKeyboardsJs (req: express.Request, res: express.Response) {
   let headers = {"Content-Type": "application/javascript"};

@@ -1,0 +1,127 @@
+{
+  "system": {
+    "keymanDeveloperVersion": "10.0.1202.0",
+    "fileVersion": "7.0"
+  },
+  "options": {
+    "readmeFile": "readme.htm"
+  },
+  "info": {
+    "version": {
+      "description": "1.6.1"
+    },
+    "name": {
+      "description": "LIBTRALO"
+    },
+    "copyright": {
+      "description": "\u00A9 2008-2018 SIL International"
+    },
+    "author": {
+      "description": "support@keyman.com",
+      "url": "mailto:support@keyman.com"
+    }
+  },
+  "files": [
+    {
+      "name": "libtralo.kmx",
+      "description": "Keyboard LIBTRALO"
+    },
+    {
+      "name": "readme.htm",
+      "description": "File readme.htm"
+    },
+    {
+      "name": "libtralo.png",
+      "description": "File libtralo.png"
+    },
+    {
+      "name": "welcome.htm",
+      "description": "File welcome.htm"
+    },
+    {
+      "name": "Charis_SIL_README.txt",
+      "description": "File Charis_SIL_README.txt"
+    },
+    {
+      "name": "CharisSIL-B.ttf",
+      "description": "Font Charis SIL Bold"
+    },
+    {
+      "name": "CharisSIL-BI.ttf",
+      "description": "Font Charis SIL Bold Italic"
+    },
+    {
+      "name": "CharisSIL-I.ttf",
+      "description": "Font Charis SIL Italic"
+    },
+    {
+      "name": "CharisSIL-R.ttf",
+      "description": "Font Charis SIL"
+    },
+    {
+      "name": "FONTLOG.txt",
+      "description": "File FONTLOG.txt"
+    },
+    {
+      "name": "OFL.txt",
+      "description": "File OFL.txt"
+    },
+    {
+      "name": "OFL-FAQ.txt",
+      "description": "File OFL-FAQ.txt"
+    },
+    {
+      "name": "CharisSILDan-Bold.ttf",
+      "description": "Font Charis SIL Dan Bold"
+    },
+    {
+      "name": "CharisSILDan-BoldItalic.ttf",
+      "description": "Font Charis SIL Dan Bold Italic"
+    },
+    {
+      "name": "CharisSILDan-Italic.ttf",
+      "description": "Font Charis SIL Dan Italic"
+    },
+    {
+      "name": "CharisSILDan-Regular.ttf",
+      "description": "Font Charis SIL Dan"
+    },
+    {
+      "name": "libtralo.js",
+      "description": "File libtralo.js"
+    },
+    {
+      "name": "libtralo.kvk",
+      "description": "File libtralo.kvk"
+    },
+    {
+      "name": "CharisSILDan_FONTLOG.txt",
+      "description": "File CharisSILDan_FONTLOG.txt"
+    },
+    {
+      "name": "kmp.inf",
+      "description": "Package information"
+    },
+    {
+      "name": "kmp.json",
+      "description": "Package information (JSON)"
+    }
+  ],
+  "keyboards": [
+    {
+      "name": "TEST2",
+      "id": "test2",
+      "version": "1.6.1",
+      "languages": [
+        {
+          "name": "Bom-Kim (Latin)",
+          "id": "bmf-Latn"
+        },
+        {
+          "name": "Sherbro (Latin)",
+          "id": "bun-Latn"
+        }
+      ]
+    }
+  ]
+}

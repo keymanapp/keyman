@@ -81,7 +81,7 @@ support: global
     $(MAKE) $(TARGET)
     cd $(ROOT)\src
 
-test:
+test: .virtual
     cd $(ROOT)\src\test
     $(MAKE) $(TARGET)
     cd $(ROOT)\src

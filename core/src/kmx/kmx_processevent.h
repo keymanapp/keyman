@@ -11,7 +11,7 @@
 #include <assert.h>
 #include <string>
 #include <string.h>
-#include <keyman/keyboardprocessor_bits.h>
+#include <keyman/keyman_core_api_bits.h>
 #include "debuglog.h"
 #include "kmx_base.h"
 #include "kmx_file.h"
@@ -40,7 +40,7 @@ private:
   PKMX_WCHAR m_miniContext;
   int m_miniContextIfLen; // number of if() statements excluded from start of m_miniContext
   KMSTATE m_state;
-  km_kbp_state *m_kbp_state;
+  km_core_state *m_kbp_state;
 
 
   kmx::KMX_Actions m_actions;
@@ -54,7 +54,7 @@ private:
   KMX_DWORD m_modifiers = 0;
 
   /* File loading */
-  KMX_BOOL LoadKeyboard(km_kbp_path_name fileName, LPKEYBOARD *lpKeyboard);
+  KMX_BOOL LoadKeyboard(km_core_path_name fileName, LPKEYBOARD *lpKeyboard);
   KMX_BOOL VerifyKeyboard(PKMX_BYTE filebase, size_t sz);
   KMX_BOOL VerifyChecksum(PKMX_BYTE buf,  size_t sz);
 #ifdef KMX_64BIT
@@ -96,8 +96,8 @@ public:
   KMX_ProcessEvent();
   ~KMX_ProcessEvent();
 
-  KMX_BOOL Load(km_kbp_path_name keyboardName);
-  KMX_BOOL ProcessEvent(km_kbp_state *state, KMX_UINT vkey, KMX_DWORD modifiers, KMX_BOOL isKeyDown);  // returns FALSE on error or key not matched
+  KMX_BOOL Load(km_core_path_name keyboardName);
+  KMX_BOOL ProcessEvent(km_core_state *state, KMX_UINT vkey, KMX_DWORD modifiers, KMX_BOOL isKeyDown);  // returns FALSE on error or key not matched
 
   KMX_Actions *GetActions();
   KMX_Context *GetContext();
@@ -120,7 +120,7 @@ inline KMX_BOOL KMX_ProcessEvent::IsCapsLockOn(KMX_DWORD modifiers) {
 /* Global Constants */
 
 struct char_to_vkey {
-  km_kbp_virtual_key vk;
+  km_core_virtual_key vk;
   bool shifted, caps;
 };
 

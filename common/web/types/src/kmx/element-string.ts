@@ -31,11 +31,11 @@ export class ElementString extends Array<ElemElement> {
    * @param source if a string array, does not get reinterpreted as UnicodeSet. This is used with vars, etc. Or pass `["str"]` for an explicit 1-element elem.
    * If it is a string, will be interpreted per reorder element rules.
    */
-  constructor(sections: DependencySections, source: string | string[], order?: string, tertiary?: string, tertiary_base?: string, prebase?: string) {
-    super();
-    //TODO-LDML: full UnicodeSet and parsing
+  static fromStrings(sections: DependencySections, source: string | string[], order?: string, tertiary?: string, tertiary_base?: string, prebase?: string) : ElementString {
+    // the returned array
+    const array = new ElementString();
     if(!source) {
-      return;
+      return array;
     }
 
     let items : ElementSegment[];
@@ -80,16 +80,16 @@ export class ElementString extends Array<ElemElement> {
           throw Error(`Could not parse uset ${item.segment}`);
         }
         elem.uset = sections.uset.allocUset(uset, sections);
-        elem.value = sections.strs.allocString('', true); // no string
+        elem.value = sections.strs.allocString('', {singleOk: true}); // no string
       } else if (item.type === ElementType.codepoint || item.type === ElementType.escaped || item.type === ElementType.string) {
         // some kind of a string
         let str = item.segment;
         if (item.type === ElementType.escaped && !MATCH_HEX_ESCAPE.test(str)) {
           str = unescapeOneQuadString(str);
           // TODO-LDML: any other escape forms here?
-          elem.value = sections.strs.allocString(str, true);
+          elem.value = sections.strs.allocString(str, { singleOk: true });
         } else {
-          elem.value = sections.strs.allocAndUnescapeString(str, true);
+          elem.value = sections.strs.allocString(str, { unescape: true, singleOk: true });
         }
         // Now did we end up with one char or no?
         if (elem.value.isOneChar) {
@@ -104,8 +104,9 @@ export class ElementString extends Array<ElemElement> {
         (ElemElementFlags.type & typeFlag) |
         (tertiary_bases?.[i] == '1' /* TODO-LDML: or 'true'? */ ? ElemElementFlags.tertiary_base : 0) |
         (prebases?.[i] == '1' /* TODO-LDML: or 'true'? */ ? ElemElementFlags.prebase : 0);
-      this.push(elem);
+      array.push(elem);
     };
+    return array;
   }
   isEqual(a: ElementString): boolean {
     if (a.length != this.length) {

@@ -1,6 +1,6 @@
-import chalk = require('chalk');
-import express = require('express');
-import { data, DebugPackage } from "../../../data";
+import chalk from 'chalk';
+import * as express from 'express';
+import { data, DebugPackage } from "../../../data.js";
 
 export default function apiPackageRegister (req: express.Request, res: express.Response, next: express.NextFunction) {
   const kmp: DebugPackage = data.packages[req.body['id']];

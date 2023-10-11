@@ -12,7 +12,7 @@
 using namespace km::kbp;
 using namespace kmx;
 
-const km_kbp_cp *km::kbp::kmx::u16chr(const km_kbp_cp *p, km_kbp_cp ch) {
+const km_core_cp *km::kbp::kmx::u16chr(const km_core_cp *p, km_core_cp ch) {
   while (*p) {
     if (*p == ch) return p;
     p++;
@@ -20,8 +20,8 @@ const km_kbp_cp *km::kbp::kmx::u16chr(const km_kbp_cp *p, km_kbp_cp ch) {
   return ch == 0 ? p : NULL;
 }
 
-const km_kbp_cp *km::kbp::kmx::u16cpy(km_kbp_cp *dst, const km_kbp_cp *src) {
-  km_kbp_cp *o = dst;
+const km_core_cp *km::kbp::kmx::u16cpy(km_core_cp *dst, const km_core_cp *src) {
+  km_core_cp *o = dst;
   while (*src) {
     *dst++ = *src++;
   }
@@ -29,8 +29,8 @@ const km_kbp_cp *km::kbp::kmx::u16cpy(km_kbp_cp *dst, const km_kbp_cp *src) {
   return o;
 }
 
-const km_kbp_cp *km::kbp::kmx::u16ncpy(km_kbp_cp *dst, const km_kbp_cp *src, size_t max) {
-  km_kbp_cp *o = dst;
+const km_core_cp *km::kbp::kmx::u16ncpy(km_core_cp *dst, const km_core_cp *src, size_t max) {
+  km_core_cp *o = dst;
   while (*src && max > 0) {
     *dst++ = *src++;
     max--;
@@ -42,7 +42,7 @@ const km_kbp_cp *km::kbp::kmx::u16ncpy(km_kbp_cp *dst, const km_kbp_cp *src, siz
   return o;
 }
 
-size_t km::kbp::kmx::u16len(const km_kbp_cp *p) {
+size_t km::kbp::kmx::u16len(const km_core_cp *p) {
   int i = 0;
   while (*p) {
     p++;
@@ -51,7 +51,7 @@ size_t km::kbp::kmx::u16len(const km_kbp_cp *p) {
   return i;
 }
 
-int km::kbp::kmx::u16cmp(const km_kbp_cp *p, const km_kbp_cp *q) {
+int km::kbp::kmx::u16cmp(const km_core_cp *p, const km_core_cp *q) {
   while (*p && *q) {
     if (*p != *q) return *p - *q;
     p++;
@@ -60,7 +60,7 @@ int km::kbp::kmx::u16cmp(const km_kbp_cp *p, const km_kbp_cp *q) {
   return *p - *q;
 }
 
-int km::kbp::kmx::u16icmp(const km_kbp_cp *p, const km_kbp_cp *q) {
+int km::kbp::kmx::u16icmp(const km_core_cp *p, const km_core_cp *q) {
   while (*p && *q) {
     if (toupper(*p) != toupper(*q)) return *p - *q;
     p++;
@@ -69,7 +69,7 @@ int km::kbp::kmx::u16icmp(const km_kbp_cp *p, const km_kbp_cp *q) {
   return *p - *q;
 }
 
-int km::kbp::kmx::u16ncmp(const km_kbp_cp *p, const km_kbp_cp *q, size_t count) {
+int km::kbp::kmx::u16ncmp(const km_core_cp *p, const km_core_cp *q, size_t count) {
   while (*p && *q && count) {
     if (*p != *q) return *p - *q;
     p++;
@@ -81,13 +81,13 @@ int km::kbp::kmx::u16ncmp(const km_kbp_cp *p, const km_kbp_cp *q, size_t count) 
   return 0;
 }
 
-km_kbp_cp *km::kbp::kmx::u16tok(km_kbp_cp *p, km_kbp_cp ch, km_kbp_cp **ctx) {
+km_core_cp *km::kbp::kmx::u16tok(km_core_cp *p, km_core_cp ch, km_core_cp **ctx) {
   if (!p) {
     p = *ctx;
     if (!p) return NULL;
   }
 
-  km_kbp_cp *q = p;
+  km_core_cp *q = p;
   while (*q && *q != ch) {
     q++;
   }
@@ -103,9 +103,9 @@ km_kbp_cp *km::kbp::kmx::u16tok(km_kbp_cp *p, km_kbp_cp ch, km_kbp_cp **ctx) {
   return p;
 }
 
-km_kbp_cp *km::kbp::kmx::u16dup(km_kbp_cp *src) {
-  km_kbp_cp *dup = new km_kbp_cp[u16len(src) + 1];
-  memcpy(dup, src, (u16len(src) + 1) * sizeof(km_kbp_cp));
+km_core_cp *km::kbp::kmx::u16dup(km_core_cp *src) {
+  km_core_cp *dup = new km_core_cp[u16len(src) + 1];
+  memcpy(dup, src, (u16len(src) + 1) * sizeof(km_core_cp));
   return dup;
 }
 
