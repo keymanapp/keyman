@@ -34,6 +34,9 @@
 
   <transforms type="simple">
     <transformGroup>
+      <transform from="\m{.}z" to="Z" />
+    </transformGroup>
+    <transformGroup>
       <transform from="C" to="\m{caret}" />
       <transform from="H" to="\m{hacek}" />
     </transformGroup>

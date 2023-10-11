@@ -47,7 +47,7 @@
     }
   },
   "properties": {
-    "$schema": { "const": "keyman/keyboardprocessor/doc/introspection.schema" },
+    "$schema": { "const": "keyman/core/doc/introspection.schema" },
     "keyboard": { "$ref": "#/definitions/keyboard" },
     "options": {
       "type": "object",

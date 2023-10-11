@@ -333,21 +333,16 @@ There are `listCount` total lists.
 
 | ∆ | Bits | Name             | Description                                |
 |---|------|------------------|--------------------------------------------|
-| 0+|  32  | hardware         | int: enumeration for hardware layout       |
+| 0+|  32  | hardware         | str: name of hardware layout.              |
 | 4+|  32  | layer            | int: index to first layer element          |
 | 8+|  32  | count            | int: number of layer elements in this list |
 |12+|  32  | minDeviceWidth   | int: min device width in millimeters, or 0 |
 
-- `hardware`: an enumeration with the following values:
-  - 0: `touch` (non-hardware)
-  - 1: `abnt2`
-  - 2: `iso`
-  - 3: `jis`
-  - 4: `us`
+- `hardware` is the name of a form, or the string `touch`
 
 See UTS #35 section 7 for details about these values.
 
-Layer lists are sorted by `hardware` enum, then minDeviceWidth ascending.
+Layer lists are sorted by `hardware` string, then minDeviceWidth ascending.
 
 ### `layr.layers` subtable
 

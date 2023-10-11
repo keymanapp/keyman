@@ -1,11 +1,9 @@
 import 'mocha';
 import {assert} from 'chai';
-import x_hextobin from '@keymanapp/hextobin';
+import hextobin from '@keymanapp/hextobin';
 import { KMXBuilder } from '@keymanapp/common-types';
 import {checkMessages, compileKeyboard, compilerTestCallbacks, compilerTestOptions, makePathToFixture} from './helpers/index.js';
 import { LdmlKeyboardCompiler } from '../src/compiler/compiler.js';
-
-const hextobin = (x_hextobin as any).default;
 
 describe('compiler-tests', function() {
   this.slow(500); // 0.5 sec -- json schema validation takes a while

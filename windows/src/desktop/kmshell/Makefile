@@ -39,7 +39,7 @@ wrap-symbols:
     $(SYMSTORE) $(DEBUGPATH)\desktop\kmshell.dbg /t keyman-windows
 
 test-manifest:
-    # test that (a) linked manifest exists and correct, and (b) has uiAccess=true
+# test that (a) linked manifest exists and correct, and (b) has uiAccess=true
     $(MT) -nologo -inputresource:$(PROGRAM)\desktop\kmshell.exe -validate_manifest
 
 install: .virtual

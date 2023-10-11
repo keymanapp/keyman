@@ -1,13 +1,14 @@
 import { info as logInfo } from '@actions/core';
 import { GitHub } from '@actions/github';
 
-import { sendCommentToPullRequestAndRelatedIssues, fixupHistory } from './fixupHistory';
-import { incrementVersion } from './incrementVersion';
-const yargs = require('yargs');
+import { sendCommentToPullRequestAndRelatedIssues, fixupHistory } from './fixupHistory.js';
+import { incrementVersion } from './incrementVersion.js';
+import yargs from 'yargs';
+import { hideBin } from 'yargs/helpers';
 import { readFileSync } from 'fs';
-import { reportHistory } from './reportHistory';
+import { reportHistory } from './reportHistory.js';
 
-const argv = yargs
+const argv = await yargs(hideBin(process.argv))
   .command(['history'], 'Fixes up HISTORY.md with pull request data')
   .command(['version'], 'Increments the current patch version in VERSION.md')
   .command(['report-history'], 'Print list of outstanding PRs waiting for the next build')
@@ -81,10 +82,10 @@ const main = async (): Promise<void> => {
 
   if(argv._.includes('report-history')) {
     let pulls = await reportHistory(octokit, argv.base, argv.force, argv['github-pr'], argv.from, argv.to);
-    let versions = {};
+    let versions: {[index:string]:any} = {};
     pulls.forEach((item) => {
       if(typeof item.version == 'string') {
-        if(typeof versions[item.version] == 'undefined')  {
+        if(typeof (versions)[item.version] == 'undefined')  {
           versions[item.version] = {data: item.tag_data, pulls: []};
        }
        // We want to invert the order of the pulls as we go to
