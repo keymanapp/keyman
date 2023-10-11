@@ -321,6 +321,7 @@ export default class SubkeyPopup {
     }
 
     if(bk) {
+      this.currentSelection?.key.highlight(false);
       this.currentSelection = bk;
 
       // Subkeys never get key previews, so we can directly highlight the subkey.
