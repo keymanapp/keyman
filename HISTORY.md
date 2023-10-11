@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 17.0.189 alpha 2023-10-11
+
+* refactor(linux): Use auto cleanup (and fix some memory leaks) (#9648)
+* refactor(linux): Simplify adding keyboard (#9734)
+
 ## 17.0.188 alpha 2023-10-11
 
 * chore(android,windows): Update crowdin strings for Kannada (#9737)
