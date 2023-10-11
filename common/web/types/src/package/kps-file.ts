@@ -17,44 +17,44 @@ export interface KpsPackage {
   /**
    * <Package> -- the root element.
    */
-  package: KpsFile;
+  Package: KpsFile;
 }
 
 export interface KpsFile {
-  system: KpsFileSystem;
-  options: KpsFileOptions;
-  info?: KpsFileInfo;
-  files?: KpsFileContentFiles;
-  keyboards?: KpsFileKeyboards;
-  lexicalModels?: KpsFileLexicalModels;
-  startMenu?: KpsFileStartMenu;
-  strings?: KpsFileStrings;
-  relatedPackages?: KpsFileRelatedPackages;
+  System: KpsFileSystem;
+  Options: KpsFileOptions;
+  Info?: KpsFileInfo;
+  Files?: KpsFileContentFiles;
+  Keyboards?: KpsFileKeyboards;
+  LexicalModels?: KpsFileLexicalModels;
+  StartMenu?: KpsFileStartMenu;
+  Strings?: KpsFileStrings;
+  RelatedPackages?: KpsFileRelatedPackages;
 }
 
 export interface KpsFileSystem {
-  keymanDeveloperVersion: string;
-  fileVersion: string;
+  KeymanDeveloperVersion: string;
+  FileVersion: string;
 }
 
 export interface KpsFileOptions {
-  followKeyboardVersion?: string;
-  readMeFile?: string;
-  graphicFile?: string;
-  licenseFile?: string;
-  welcomeFile?: string;
-  executeProgram?: string;
-  msiFileName?: string;
-  msiOptions?: string;
+  FollowKeyboardVersion?: string;
+  ReadMeFile?: string;
+  GraphicFile?: string;
+  LicenseFile?: string;
+  WelcomeFile?: string;
+  ExecuteProgram?: string;
+  MsiFileName?: string;
+  MsiOptions?: string;
 }
 
 export interface KpsFileInfo {
-  name?: KpsFileInfoItem;
-  copyright?: KpsFileInfoItem;
-  author?: KpsFileInfoItem;
-  webSite?: KpsFileInfoItem;
-  version?: KpsFileInfoItem;
-  description?: KpsFileInfoItem;
+  Name?: KpsFileInfoItem;
+  Copyright?: KpsFileInfoItem;
+  Author?: KpsFileInfoItem;
+  WebSite?: KpsFileInfoItem;
+  Version?: KpsFileInfoItem;
+  Description?: KpsFileInfoItem;
 }
 
 export interface KpsFileInfoItem {
@@ -63,31 +63,31 @@ export interface KpsFileInfoItem {
 }
 
 export interface KpsFileContentFiles {
-  file: KpsFileContentFile[] | KpsFileContentFile;
+  File: KpsFileContentFile[] | KpsFileContentFile;
 }
 
 export interface KpsFileContentFile {
-  name: string;
+  Name: string;
   /** @deprecated */
-  description: string;
+  Description: string;
   /** @deprecated */
-  copyLocation: string;
+  CopyLocation: string;
   /** @deprecated */
-  fileType: string;
+  FileType: string;
 }
 
 export interface KpsFileLexicalModel {
-  name: string;
-  iD: string;
-  languages: KpsFileLanguages;
+  Name: string;
+  ID: string;
+  Languages: KpsFileLanguages;
 }
 
 export interface KpsFileLexicalModels {
-  lexicalModel: KpsFileLexicalModel[] | KpsFileLexicalModel;
+  LexicalModel: KpsFileLexicalModel[] | KpsFileLexicalModel;
 }
 
 export interface KpsFileLanguages {
-  language: KpsFileLanguage[] | KpsFileLanguage;
+  Language: KpsFileLanguage[] | KpsFileLanguage;
 }
 
 export interface KpsFileLanguage {
@@ -96,7 +96,7 @@ export interface KpsFileLanguage {
 }
 
 export interface KpsFileRelatedPackages {
-  relatedPackage: KpsFileRelatedPackage | KpsFileRelatedPackage[];
+  RelatedPackage: KpsFileRelatedPackage | KpsFileRelatedPackage[];
 }
 
 export interface KpsFileRelatedPackage {
@@ -110,26 +110,26 @@ export interface KpsFileRelatedPackage {
 }
 
 export interface KpsFileKeyboard {
-  name: string;     /// the descriptive name of the keyboard
-  iD: string;       /// the keyboard identifier, equal to the basename of the keyboard file sans extension
-  version: string;
-  oSKFont?: string;
-  displayFont?: string;
-  rTL?: string;
-  languages?: KpsFileLanguages;
-  examples?: KpsFileLanguageExamples;
+  Name: string;     /// the descriptive name of the keyboard
+  ID: string;       /// the keyboard identifier, equal to the basename of the keyboard file sans extension
+  Version: string;
+  OSKFont?: string;
+  DisplayFont?: string;
+  RTL?: string;
+  Languages?: KpsFileLanguages;
+  Examples?: KpsFileLanguageExamples;
   /**
    * array of web font alternatives for OSK. should be same font data as oskFont
    */
-  webOSKFonts?: KpsFileFonts;
+  WebOSKFonts?: KpsFileFonts;
   /**
    * array of web font alternatives for display. should be same font data as displayFont
    */
-  webDisplayFonts?: KpsFileFonts;
+  WebDisplayFonts?: KpsFileFonts;
 }
 
 export interface KpsFileFonts {
-  font: KpsFileFont[] | KpsFileFont;
+  Font: KpsFileFont[] | KpsFileFont;
 }
 
 export interface KpsFileFont {
@@ -139,40 +139,40 @@ export interface KpsFileFont {
 }
 
 export interface KpsFileKeyboards {
-  keyboard: KpsFileKeyboard[] | KpsFileKeyboard;
+  Keyboard: KpsFileKeyboard[] | KpsFileKeyboard;
 }
 
 export interface KpsFileStartMenu {
-  folder?: string;
-  addUninstallEntry?: string;
-  items?: KpsFileStartMenuItems;
+  Folder?: string;
+  AddUninstallEntry?: string;
+  Items?: KpsFileStartMenuItems;
 }
 
 export interface KpsFileStartMenuItem {
-  name: string;
-  fileName: string;
-  arguments?: string;
-  icon?: string;
-  location?: string;
+  Name: string;
+  FileName: string;
+  Arguments?: string;
+  Icon?: string;
+  Location?: string;
 }
 
 export interface KpsFileStartMenuItems {
-  item: KpsFileStartMenuItem[] | KpsFileStartMenuItem;
+  Item: KpsFileStartMenuItem[] | KpsFileStartMenuItem;
 }
 
 export interface KpsFileStrings {
-  string: KpsFileString[] | KpsFileString;
+  String: KpsFileString[] | KpsFileString;
 }
 
 export interface KpsFileString {
   $: {
-    name: string;
-    value: string;
+    Name: string;
+    Value: string;
   }
 }
 
 export interface KpsFileLanguageExamples {
-  example: KpsFileLanguageExample | KpsFileLanguageExample[];
+  Example: KpsFileLanguageExample | KpsFileLanguageExample[];
 }
 
 /**

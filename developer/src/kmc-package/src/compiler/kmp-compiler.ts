@@ -46,7 +46,6 @@ export class KmpCompiler {
     const kpsPackage = (() => {
         let a: KpsFile.KpsPackage;
         let parser = new xml2js.Parser({
-          tagNameProcessors: [xml2js.processors.firstCharLowerCase],
           explicitArray: false
         });
         // TODO: add unit test for xml errors parsing .kps file
@@ -54,7 +53,7 @@ export class KmpCompiler {
         return a;
     })();
 
-    const kps: KpsFile.KpsFile = kpsPackage.package;
+    const kps: KpsFile.KpsFile = kpsPackage.Package;
     return kps;
   }
 
@@ -85,32 +84,32 @@ export class KmpCompiler {
     // Fill in additional fields
     //
 
-    if(kps.options) {
-      kmp.options.executeProgram = kps.options?.executeProgram || undefined;
-      kmp.options.graphicFile = kps.options.graphicFile || undefined;
-      kmp.options.msiFilename = kps.options.msiFileName || undefined;
-      kmp.options.msiOptions = kps.options.msiOptions || undefined;
-      kmp.options.readmeFile = kps.options.readMeFile || undefined;
-      kmp.options.licenseFile = kps.options.licenseFile || undefined;
-      kmp.options.welcomeFile = kps.options.welcomeFile || undefined;
+    if(kps.Options) {
+      kmp.options.executeProgram = kps.Options.ExecuteProgram || undefined;
+      kmp.options.graphicFile = kps.Options.GraphicFile || undefined;
+      kmp.options.msiFilename = kps.Options.MsiFileName || undefined;
+      kmp.options.msiOptions = kps.Options.MsiOptions || undefined;
+      kmp.options.readmeFile = kps.Options.ReadMeFile || undefined;
+      kmp.options.licenseFile = kps.Options.LicenseFile || undefined;
+      kmp.options.welcomeFile = kps.Options.WelcomeFile || undefined;
     }
 
     //
     // Add basic metadata
     //
 
-    if(kps.info) {
-      kmp.info = this.kpsInfoToKmpInfo(kps.info);
+    if(kps.Info) {
+      kmp.info = this.kpsInfoToKmpInfo(kps.Info);
     }
 
     //
     // Add related package metadata
     //
 
-    if(kps.relatedPackages) {
+    if(kps.RelatedPackages) {
       // Note: 'relationship' field is required for kmp.json but optional for .kps, only
       // two values are supported -- deprecates or related.
-      kmp.relatedPackages = (this.arrayWrap(kps.relatedPackages.relatedPackage) as KpsFile.KpsFileRelatedPackage[]).map(p =>
+      kmp.relatedPackages = (this.arrayWrap(kps.RelatedPackages.RelatedPackage) as KpsFile.KpsFileRelatedPackage[]).map(p =>
         ({id: p.$.ID, relationship: p.$.Relationship == 'deprecates' ? 'deprecates' : 'related'})
       );
     }
@@ -119,12 +118,12 @@ export class KmpCompiler {
     // Add file metadata
     //
 
-    if(kps.files && kps.files.file) {
-      kmp.files = this.arrayWrap(kps.files.file).map((file: KpsFile.KpsFileContentFile) => {
+    if(kps.Files && kps.Files.File) {
+      kmp.files = this.arrayWrap(kps.Files.File).map((file: KpsFile.KpsFileContentFile) => {
         return {
-          name: file.name.trim(),
-          description: file.description.trim(),
-          copyLocation: parseInt(file.copyLocation, 10) || undefined
+          name: file.Name.trim(),
+          description: file.Description.trim(),
+          copyLocation: parseInt(file.CopyLocation, 10) || undefined
           // note: we don't emit fileType as that is not permitted in kmp.json
         };
       });
@@ -133,7 +132,7 @@ export class KmpCompiler {
 
     // Keyboard packages also include a legacy kmp.inf file (this will be removed,
     // one day)
-    if(kps.keyboards && kps.keyboards.keyboard) {
+    if(kps.Keyboards && kps.Keyboards.Keyboard) {
       kmp.files.push({
         name: KMP_INF_FILENAME,
         description: "Package information"
@@ -150,29 +149,29 @@ export class KmpCompiler {
     // Add keyboard metadata
     //
 
-    if(kps.keyboards && kps.keyboards.keyboard) {
-      kmp.keyboards = this.arrayWrap(kps.keyboards.keyboard).map((keyboard: KpsFile.KpsFileKeyboard) => ({
-        displayFont: keyboard.displayFont ? this.callbacks.path.basename(keyboard.displayFont) : undefined,
-        oskFont: keyboard.oSKFont ? this.callbacks.path.basename(keyboard.oSKFont) : undefined,
-        name:keyboard.name.trim(),
-        id:keyboard.iD.trim(),
-        version:keyboard.version.trim(),
-        rtl:keyboard.rTL == 'True' ? true : undefined,
-        languages: keyboard.languages ?
-          this.kpsLanguagesToKmpLanguages(this.arrayWrap(keyboard.languages.language) as KpsFile.KpsFileLanguage[]) :
+    if(kps.Keyboards && kps.Keyboards.Keyboard) {
+      kmp.keyboards = this.arrayWrap(kps.Keyboards.Keyboard).map((keyboard: KpsFile.KpsFileKeyboard) => ({
+        displayFont: keyboard.DisplayFont ? this.callbacks.path.basename(keyboard.DisplayFont) : undefined,
+        oskFont: keyboard.OSKFont ? this.callbacks.path.basename(keyboard.OSKFont) : undefined,
+        name:keyboard.Name.trim(),
+        id:keyboard.ID.trim(),
+        version:keyboard.Version.trim(),
+        rtl:keyboard.RTL == 'True' ? true : undefined,
+        languages: keyboard.Languages ?
+          this.kpsLanguagesToKmpLanguages(this.arrayWrap(keyboard.Languages.Language) as KpsFile.KpsFileLanguage[]) :
           [],
-        examples: keyboard.examples ?
-          (this.arrayWrap(keyboard.examples.example) as KpsFile.KpsFileLanguageExample[]).map(
+        examples: keyboard.Examples ?
+          (this.arrayWrap(keyboard.Examples.Example) as KpsFile.KpsFileLanguageExample[]).map(
             e => ({id: e.$.ID, keys: e.$.Keys, text: e.$.Text, note: e.$.Note})
           ) as KmpJsonFile.KmpJsonFileExample[] :
           undefined,
-        webDisplayFonts: keyboard.webDisplayFonts ?
-          (this.arrayWrap(keyboard.webDisplayFonts.font) as KpsFile.KpsFileFont[]).map(
+        webDisplayFonts: keyboard.WebDisplayFonts ?
+          (this.arrayWrap(keyboard.WebDisplayFonts.Font) as KpsFile.KpsFileFont[]).map(
             e => (this.callbacks.path.basename(e.$.Filename))
           ) :
           undefined,
-        webOskFonts: keyboard.webOSKFonts ?
-          (this.arrayWrap(keyboard.webOSKFonts.font) as KpsFile.KpsFileFont[]).map(
+        webOskFonts: keyboard.WebOSKFonts ?
+          (this.arrayWrap(keyboard.WebOSKFonts.Font) as KpsFile.KpsFileFont[]).map(
             e => (this.callbacks.path.basename(e.$.Filename))
           ) :
           undefined,
@@ -183,12 +182,12 @@ export class KmpCompiler {
     // Add lexical-model metadata
     //
 
-    if(kps.lexicalModels && kps.lexicalModels.lexicalModel) {
-      kmp.lexicalModels = this.arrayWrap(kps.lexicalModels.lexicalModel).map((model: KpsFile.KpsFileLexicalModel) => ({
-        name:model.name.trim(),
-        id:model.iD.trim(),
-        languages: model.languages ?
-          this.kpsLanguagesToKmpLanguages(this.arrayWrap(model.languages.language) as KpsFile.KpsFileLanguage[]) : []
+    if(kps.LexicalModels && kps.LexicalModels.LexicalModel) {
+      kmp.lexicalModels = this.arrayWrap(kps.LexicalModels.LexicalModel).map((model: KpsFile.KpsFileLexicalModel) => ({
+        name:model.Name.trim(),
+        id:model.ID.trim(),
+        languages: model.Languages ?
+          this.kpsLanguagesToKmpLanguages(this.arrayWrap(model.Languages.Language) as KpsFile.KpsFileLanguage[]) : []
       }));
     }
 
@@ -213,7 +212,7 @@ export class KmpCompiler {
       return null;
     }
 
-    if(kps.keyboards && kps.keyboards.keyboard) {
+    if(kps.Keyboards && kps.Keyboards.Keyboard) {
       kmp.system.fileVersion = versionValidator.getMinKeymanVersion(metadata);
     } else {
       kmp.system.fileVersion = MIN_LM_FILEVERSION_KMP_JSON;
@@ -237,21 +236,24 @@ export class KmpCompiler {
     // Add Windows Start Menu metadata
     //
 
-    if(kps.startMenu && (kps.startMenu.folder || kps.startMenu.items)) {
+    if(kps.StartMenu && (kps.StartMenu.Folder || kps.StartMenu.Items)) {
       kmp.startMenu = {};
-      if(kps.startMenu.addUninstallEntry === '') kmp.startMenu.addUninstallEntry = true;
-      if(kps.startMenu.folder) kmp.startMenu.folder = kps.startMenu.folder;
-      if(kps.startMenu.items && kps.startMenu.items.item) {
-        kmp.startMenu.items = this.arrayWrap(kps.startMenu.items.item);
+      if(kps.StartMenu.AddUninstallEntry === '') kmp.startMenu.addUninstallEntry = true;
+      if(kps.StartMenu.Folder) kmp.startMenu.folder = kps.StartMenu.Folder;
+      if(kps.StartMenu.Items && kps.StartMenu.Items.Item) {
+        kmp.startMenu.items = this.arrayWrap(kps.StartMenu.Items.Item).map((item: KpsFile.KpsFileStartMenuItem) => ({
+          filename: item.FileName,
+          name: item.Name,
+          arguments: item.Arguments,
+          icon: item.Icon,
+          location: item.Location
+        }));
 
         // Remove default values
         for(let item of kmp.startMenu.items) {
           if(item.icon == '') delete item.icon;
           if(item.location == 'psmelStartMenu') delete item.location;
           if(item.arguments == '') delete item.arguments;
-          // Horrific case change between .kps and kmp.json:
-          item.filename = (<any>item).fileName;
-          delete (<any>item).fileName;
         }
       } else {
         kmp.startMenu.items = [];
@@ -269,12 +271,12 @@ export class KmpCompiler {
     let kmpInfo: KmpJsonFile.KmpJsonFileInfo = {};
 
     const keys: [(keyof KpsFile.KpsFileInfo), (keyof KmpJsonFile.KmpJsonFileInfo), boolean][] = [
-      ['author','author',false],
-      ['copyright','copyright',false],
-      ['name','name',false],
-      ['version','version',false],
-      ['webSite','website',false],
-      ['description','description',true],
+      ['Author','author',false],
+      ['Copyright','copyright',false],
+      ['Name','name',false],
+      ['Version','version',false],
+      ['WebSite','website',false],
+      ['Description','description',true],
     ];
 
     for (let [src,dst,isMarkdown] of keys) {
