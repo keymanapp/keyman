@@ -36,6 +36,15 @@ export class KeysCompiler extends SectionCompiler {
   public validate() {
     let valid = true;
 
+    // There's no 'form' compiler.
+    // We validate this here so that someone checks it.
+    this.keyboard3.forms?.form?.forEach((form) => {
+      if (!LDMLKeyboard.ImportStatus.isImpliedImport(form)) {
+        // If it's not an implied import, give a warning.
+        this.callbacks.reportMessage(CompilerMessages.Warn_CustomForm({ id: form.id }));
+      }
+    });
+
     // general key-level validation here, only of used keys
     const usedKeys = allUsedKeyIdsInLayers(this.keyboard3?.layers);
     const uniqueKeys = calculateUniqueKeys([...this.keyboard3.keys?.key]);
@@ -121,18 +130,21 @@ export class KeysCompiler extends SectionCompiler {
 
       for (let lkflick of lkflicks.flick) {
         let flags = 0;
-        const to = sections.strs.allocAndUnescapeString(lkflick.to, true);
+        const to = sections.strs.allocString(lkflick.to, {
+          stringVariables: true, markers: true, unescape: true, singleOk: true
+        }, sections);
         if (!to.isOneChar) {
           flags |= constants.keys_flick_flags_extend;
         }
         let directions: ListItem = sections.list.allocListFromSpaces(
-          sections.strs,
-          lkflick.directions
-        );
+          lkflick.directions,
+          {
+            stringVariables: true, markers: true, unescape: true
+          },
+          sections);
         flicks.flicks.push({
           directions,
           flags,
-          // TODO-LDML: markers,variables
           to,
         });
       }
@@ -159,25 +171,44 @@ export class KeysCompiler extends SectionCompiler {
         flags |= constants.keys_key_flags_notransform;
       }
       const id = sections.strs.allocString(key.id);
-      const longPress: ListItem = sections.list.allocListFromEscapedSpaces(
-        sections.strs,
-        // TODO-LDML: markers,variables
-        key.longPress
-      );
-      const longPressDefault = sections.strs.allocAndUnescapeString(
-        // TODO-LDML: variables
-        sections.vars.substituteMarkerString(key.longPressDefault),
-      );
-      const multiTap: ListItem = sections.list.allocListFromEscapedSpaces(
-        sections.strs,
-        // TODO-LDML: markers,variables
-        key.multiTap
-      );
+      const longPress: ListItem = sections.list.allocListFromSpaces(
+        key.longPress, {
+          stringVariables: true,
+          markers: true,
+          unescape: true,
+        },
+        sections);
+
+      const longPressDefault = sections.strs.allocString(key.longPressDefault,
+        {
+          stringVariables: true,
+          markers: true,
+          unescape: true,
+        },
+        sections);
+
+      const multiTap: ListItem = sections.list.allocListFromSpaces(
+        key.multiTap,
+        {
+          stringVariables: true,
+          markers: true,
+          unescape: true,
+        },
+        sections);
       const keySwitch = sections.strs.allocString(key.switch); // 'switch' is a reserved word
+
       const toRaw = key.to;
-      // TODO-LDML: variables
-      let toCooked = sections.vars.substituteMarkerString(toRaw);
-      const to = sections.strs.allocAndUnescapeString(toCooked, true);
+
+      let toCooked = sections.vars.substituteStrings(toRaw, sections);
+      toCooked = sections.vars.substituteMarkerString(toCooked);
+      const to = sections.strs.allocString(key.to,
+        {
+          stringVariables: true,
+          markers: true,
+          unescape: true,
+          singleOk: true
+        },
+        sections);
       if (!to.isOneChar) {
         flags |= constants.keys_key_flags_extend;
       }
@@ -194,6 +225,26 @@ export class KeysCompiler extends SectionCompiler {
         width,
       });
     }
+  }
+
+  private getKeymapFromForm(hardware : string, badScans?: Set<number>) : Constants.KeyMap {
+    return KeysCompiler.getKeymapFromForms(this.keyboard3?.forms.form, hardware, badScans);
+  }
+
+  public static getKeymapFromForms(forms: LDMLKeyboard.LKForm[], hardware: string, badScans?: Set<number>): Constants.KeyMap {
+    // seach in reverse form because of overrides
+    const ldmlForm = [...forms].reverse().find((f) => f.id === hardware);
+    if (!ldmlForm) {
+      return undefined;
+    }
+    return KeysCompiler.getKeymapFromScancodes(ldmlForm, badScans);
+  }
+
+  public static getKeymapFromScancodes(ldmlForm: LDMLKeyboard.LKForm, badScans?: Set<number>) {
+    const { scanCodes } = ldmlForm;
+    const ldmlScan = scanCodes.map(o => o.codes.split(" ").map(n => Number.parseInt(n, 16)));
+    const ldmlVkey = Constants.CLDRScanToKeyMap(ldmlScan, badScans);
+    return ldmlVkey;
   }
 
   /**
@@ -217,14 +268,21 @@ export class KeysCompiler extends SectionCompiler {
       valid = false;
     }
 
-    const keymap = Constants.HardwareToKeymap.get(hardware);
-    /* c8 ignore next 5 */
+    const badScans = new Set<number>();
+    const keymap = this.getKeymapFromForm(hardware, badScans);
     if (!keymap) {
-      // not reached due to XML validation
       this.callbacks.reportMessage(
         CompilerMessages.Error_InvalidHardware({ form: hardware })
       );
       valid = false;
+      return valid;
+    } else if (badScans.size !== 0) {
+      const codes = Array.from(badScans.values()).map(n => Number(n).toString(16)).sort();
+      this.callbacks.reportMessage(
+        CompilerMessages.Error_InvalidScanCode({ form: hardware, codes })
+      );
+      valid = false;
+      return valid;
     }
 
     const uniqueKeys = calculateUniqueKeys([...this.keyboard3.keys?.key]);
@@ -287,7 +345,7 @@ export class KeysCompiler extends SectionCompiler {
     hardware: string
   ): Keys {
     const mod = translateLayerAttrToModifier(layer);
-    const keymap = Constants.HardwareToKeymap.get(hardware);
+    const keymap = this.getKeymapFromForm(hardware);
 
     let y = -1;
     for (let row of layer.row) {

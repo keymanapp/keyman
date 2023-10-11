@@ -2,6 +2,12 @@
 
 import argparse
 import logging
+import sys
+import gi
+
+gi.require_version('Gtk', '3.0')
+
+from gi.repository import Gtk
 
 from keyman_config import __versionwithtag__, __pkgversion__, add_standard_arguments, initialize_logging, initialize_sentry
 from keyman_config.handle_install import download_and_install_package
@@ -29,6 +35,8 @@ if __name__ == '__main__':
     add_standard_arguments(parser)
 
     args = parser.parse_args()
+
+    Gtk.init(sys.argv[1:])
 
     initialize_logging(args)
     initialize_sentry()

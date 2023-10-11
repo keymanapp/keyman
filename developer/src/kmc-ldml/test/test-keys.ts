@@ -38,6 +38,10 @@ describe('keys', function () {
         assert.equal(compilerTestCallbacks.messages.length, 0);
         assert.equal(keys.keys.length, 4);
 
+        const [w] = keys.keys.filter(({ id }) => id.value === 'w');
+        assert.ok(w);
+        assert.equal(w.to.value, 'w', 'substituted key value');
+
         const [q] = keys.keys.filter(({ id }) => id.value === 'q');
         assert.ok(q);
         assert.isFalse(!!(q.flags & constants.keys_key_flags_gap));
@@ -57,7 +61,7 @@ describe('keys', function () {
 
         const [flick0_ne_sw] = flick0.flicks.filter(({ directions }) => directions && directions.isEqual('ne sw'.split(' ')));
         assert.ok(flick0_ne_sw);
-        assert.equal(flick0_ne_sw.to?.value, 'ê');
+        assert.equal(flick0_ne_sw.to?.value, 'ê'); // via variable
       },
     },
     {
@@ -129,11 +133,11 @@ describe('keys', function () {
         const MARKER_1 = MarkerParser.markerOutput(1);
         assert.equal(ww.to.value, MARKER_1);
         assert.equal(ww.longPressDefault.value, MARKER_1);
-        // TODO-LDML: assert.equal(ww.longPress[0].value.value, MARKER_1);
-        // TODO-LDML: assert.equal(ww.multiTap[0].value.value, MARKER_1);
+        assert.equal(ww.longPress[0].value.value, MARKER_1);
+        assert.equal(ww.multiTap[0].value.value, MARKER_1);
         const [flickw] = keys.flicks?.filter(({id}) => id.value === 'flickw');
         assert.ok(flickw);
-        // TODO-LDML: assert.equal(flickw.flicks[0].to.value, MARKER_1);
+        assert.equal(flickw.flicks[0].to.value, MARKER_1);
       },
     },
   ]);
@@ -240,6 +244,90 @@ describe('keys.kmap', function () {
       errors: [
         CompilerMessages.Error_MissingFlicks({flicks:'an-undefined-flick-id',id:'Q'}),
       ]
+    },
+    {
+      subpath: 'sections/layr/invalid-invalid-form.xml',
+      errors: [CompilerMessages.Error_InvalidHardware({
+        form: 'holographic',
+      }),],
+    },
+    {
+      // warning on custom form
+      subpath: 'sections/layr/warn-custom-us-form.xml',
+      warnings: [
+        CompilerMessages.Warn_CustomForm({id: "us"}),
+      ],
+      callback: (sect, subpath, callbacks) => {
+        const keys = sect as Keys;
+        assert.isNotNull(keys);
+        assert.equal(compilerTestCallbacks.messages.length, 0);
+        assert.equal(keys.keys.length, 3);
+        assert.sameDeepMembers(keys.kmap, [
+          {
+            vkey: K.K_K,
+            key: 'one',
+            mod: constants.keys_mod_none,
+          },
+          {
+            vkey: K.K_E,
+            key: 'two',
+            mod: constants.keys_mod_none,
+          },
+          {
+            vkey: K.K_Y,
+            key: 'three',
+            mod: constants.keys_mod_none,
+          },
+        ]);
+      },
+    },
+    {
+      // warning on a custom unknown form - but no error!
+      subpath: 'sections/layr/warn-custom-zzz-form.xml',
+      warnings: [
+        CompilerMessages.Warn_CustomForm({id: "zzz"}),
+      ],
+      callback: (sect, subpath, callbacks) => {
+        const keys = sect as Keys;
+        assert.isNotNull(keys);
+        assert.equal(compilerTestCallbacks.messages.length, 0);
+        assert.equal(keys.keys.length, 3);
+        assert.sameDeepMembers(keys.kmap, [
+          {
+            vkey: K.K_K,
+            key: 'one',
+            mod: constants.keys_mod_none,
+          },
+          {
+            vkey: K.K_E,
+            key: 'two',
+            mod: constants.keys_mod_none,
+          },
+          {
+            vkey: K.K_Y,
+            key: 'three',
+            mod: constants.keys_mod_none,
+          },
+        ]);
+      },
+    },
+    {
+      subpath: 'sections/layr/error-custom-us-form.xml',
+      warnings: [
+        CompilerMessages.Warn_CustomForm({id: "us"}),
+      ],
+      errors: [
+        CompilerMessages.Error_InvalidScanCode({ form: "us", codes: ['ff'] }),
+      ],
+    },
+    {
+      subpath: 'sections/layr/error-custom-zzz-form.xml',
+      warnings: [
+        CompilerMessages.Warn_CustomForm({id: "zzz"}),
+      ],
+      errors: [
+        CompilerMessages.Error_InvalidScanCode({ form: "zzz", codes: ['ff'] }),
+      ],
     },
   ]);
 

@@ -1,7 +1,7 @@
-import express = require('express');
-import { DebugObject, isValidId, simplifyId } from "../../../data";
-import fs = require('fs');
-import chalk = require('chalk');
+import * as express from 'express';
+import { DebugObject, isValidId, simplifyId } from "../../../data.js";
+import * as fs from 'fs';
+import chalk from 'chalk';
 
 export default function apiUnregister<O extends DebugObject> (root:{ [id: string]: O }, req: express.Request, res: express.Response, next: express.NextFunction) {
   let id = req.body['id'];

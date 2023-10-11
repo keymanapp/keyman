@@ -160,7 +160,7 @@ extern "C" __declspec(dllexport) BOOL WINAPI TIPProcessKey(WPARAM wParam, LPARAM
   DWORD LocalShiftState = Globals::get_ShiftState();
   // Only the modifer flag 'f_ShiftState' is changed before sending the key stroke to the
   // core processor. The core processor has the keyboard Caps Lock stores and will
-  // queue an action 'KM_KBP_IT_CAPSLOCK'. In processing the action the Windows engine will synthesise keystrokes
+  // queue an action 'KM_CORE_IT_CAPSLOCK'. In processing the action the Windows engine will synthesise keystrokes
   // to ensure caps lock is in the correct state.
   if (!Preserved) {
     switch (wParam) {

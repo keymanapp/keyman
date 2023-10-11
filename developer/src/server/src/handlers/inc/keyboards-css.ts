@@ -1,6 +1,6 @@
-import express = require('express');
-import path = require('path');
-import { data, SiteData } from "../../data";
+import * as express from 'express';
+import * as path from 'path';
+import { data, SiteData } from "../../data.js";
 
 export default function handleIncKeyboardsCss (req: express.Request, res: express.Response) {
   let headers = {"Content-Type": "text/css"};

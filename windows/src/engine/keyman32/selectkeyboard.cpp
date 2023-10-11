@@ -102,9 +102,9 @@ BOOL SelectKeyboard(DWORD KeymanID)
 
         ActivateDLLs(_td->lpActiveKeyboard);
 
-        if (KM_KBP_STATUS_OK !=
-            km_kbp_event(_td->lpActiveKeyboard->lpCoreKeyboardState, KM_KBP_EVENT_KEYBOARD_ACTIVATED, nullptr)) {
-          SendDebugMessageFormat(0, sdmGlobal, 0, "km_kbp_event Failed Result: %d ", FALSE);
+        if (KM_CORE_STATUS_OK !=
+            km_core_event(_td->lpActiveKeyboard->lpCoreKeyboardState, KM_CORE_EVENT_KEYBOARD_ACTIVATED, nullptr)) {
+          SendDebugMessageFormat(0, sdmGlobal, 0, "km_core_event Failed Result: %d ", FALSE);
         } else {
           ProcessActionsExternalEvent();
         }
