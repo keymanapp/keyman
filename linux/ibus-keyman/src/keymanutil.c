@@ -529,21 +529,87 @@ keyman_put_options_todconf(gchar *package_id,
     // kvp got assigned to options[x] and so gets freed when options are freed
 }
 
-gchar**
+static GPtrArray *
+_ptr_array_new_from_array(
+    gpointer *data,
+    gsize len,
+    gboolean null_terminated) {
+  GPtrArray *array;
+
+  g_assert(data != NULL || len == 0);
+  g_assert(len <= G_MAXUINT);
+
+  array = g_ptr_array_new_full(len, NULL);
+
+  for (gsize i = 0; i < len; i++)
+    array->pdata[i] = g_strdup(data[i]);
+
+  if (null_terminated && array->pdata != NULL)
+    array->pdata[len++] = NULL;
+
+  array->len = len;
+
+  return array;
+}
+
+// `g_ptr_array_new_from_null_terminated_array` is only available in GLib 2.76, but we're still
+// stuck to 2.64 (Ubuntu 20.04 Focal) and 2.72 (Ubuntu 22.04 Jammy). Therefore we
+// copy the implementation here (slightly simplified). Once we're past 2.76 we can use the GLib method
+// directly.
+GPtrArray *
+_g_ptr_array_new_from_null_terminated_array(
+    gpointer *data,
+    GCopyFunc copy_func,
+    gpointer copy_func_user_data,
+    GDestroyNotify element_free_func) {
+  gsize len = 0;
+
+  if (data != NULL) {
+    for (gsize i = 0; data[i] != NULL; ++i)
+      len += 1;
+  }
+
+  g_assert(data != NULL || len == 0);
+  g_return_val_if_fail(len <= G_MAXUINT, NULL);
+
+  return _ptr_array_new_from_array(data, len, TRUE);
+}
+
+GPtrArray *
+_keyman_cleanup_custom_keyboards(gchar **keyboards) {
+  GPtrArray *ptr_array = _g_ptr_array_new_from_null_terminated_array((gpointer*)keyboards, NULL, NULL, NULL);
+
+  for (int i = 0; i < ptr_array->len; i++) {
+    if (ptr_array->pdata[i] == NULL) {
+      continue;
+    }
+    g_auto(GStrv) keyboard_tokens = g_strsplit(ptr_array->pdata[i], ":", 2);
+    if (keyboard_tokens == NULL
+      || keyboard_tokens[0] == NULL || strlen(keyboard_tokens[0]) == 0
+      || keyboard_tokens[1] == NULL || strlen(keyboard_tokens[1]) == 0
+    ) {
+      g_ptr_array_remove_index(ptr_array, i--);
+    }
+  }
+  return ptr_array;
+}
+
+gchar **
 keyman_get_custom_keyboards() {
   g_autoptr(GSettings) settings = g_settings_new(KEYMAN_DCONF_ENGINE_NAME);
-  gchar **result      = g_settings_get_strv(settings, KEYMAN_DCONF_KEYBOARDS_KEY);
+  g_auto(GStrv) result          = g_settings_get_strv(settings, KEYMAN_DCONF_KEYBOARDS_KEY);
   if (result && result[0] == NULL) {
-    g_strfreev(result);
     return NULL;
   }
-  return result;
+  g_autoptr(GPtrArray) cleaned_result = _keyman_cleanup_custom_keyboards(result);
+  return (gchar**)g_ptr_array_steal(cleaned_result, NULL);
 }
 
 void
 keyman_set_custom_keyboards(gchar ** keyboards) {
   g_autoptr(GSettings) settings = g_settings_new(KEYMAN_DCONF_ENGINE_NAME);
-  g_settings_set_strv(settings, KEYMAN_DCONF_KEYBOARDS_KEY, (const gchar *const *)keyboards);
+  g_autoptr(GPtrArray) cleaned_keyboards = _keyman_cleanup_custom_keyboards(keyboards);
+  g_settings_set_strv(settings, KEYMAN_DCONF_KEYBOARDS_KEY, (const gchar *const *)cleaned_keyboards->pdata);
 }
 
 GHashTable *

@@ -367,6 +367,25 @@ test_keyman_set_custom_keyboards__delete_key_empty_array() {
   _delete_tst_kbds_key();
 }
 
+void
+test_keyman_set_custom_keyboards__invalid_values() {
+  // Initialize
+  _delete_tst_kbds_key();
+  gchar* keyboards[] = {"invalid", "fr:/tmp/test/test.kmx", "", ":/tmp/bla.kmx", "fr:", NULL};
+
+  // Execute
+  keyman_set_custom_keyboards(keyboards);
+
+  // Verify
+  g_auto(GStrv) result = _get_tst_kbds_key();
+  g_assert_nonnull(result);
+  gchar* expected[] = {"fr:/tmp/test/test.kmx", NULL};
+  _kmn_assert_cmpstrv(result, expected);
+
+  // Cleanup
+  _delete_tst_kbds_key();
+}
+
 //----------------------------------------------------------------------------------------------
 void
 test_keyman_get_custom_keyboards__value() {
@@ -380,6 +399,24 @@ test_keyman_get_custom_keyboards__value() {
   // Verify
   g_assert_nonnull(result);
   _kmn_assert_cmpstrv(result, keyboards);
+
+  // Cleanup
+  _delete_tst_kbds_key();
+}
+
+void
+test_keyman_get_custom_keyboards__invalid_values() {
+  // Initialize
+  gchar* keyboards[] = {"invalid", "fr:/tmp/test/test.kmx", "", NULL};
+  _set_tst_kbds_key(keyboards);
+
+  // Execute
+  g_auto(GStrv) result = keyman_get_custom_keyboards();
+
+  // Verify
+  gchar* expected[] = {"fr:/tmp/test/test.kmx", NULL};
+  g_assert_nonnull(result);
+  _kmn_assert_cmpstrv(result, expected);
 
   // Cleanup
   _delete_tst_kbds_key();
@@ -1031,8 +1068,10 @@ int main(int argc, char* argv[]) {
   g_test_add_func(
       "/keymanutil/keyman_set_custom_keyboards/delete_key_empty_array",
       test_keyman_set_custom_keyboards__delete_key_empty_array);
+  g_test_add_func("/keymanutil/keyman_set_custom_keyboards/invalid_values", test_keyman_set_custom_keyboards__invalid_values);
 
   g_test_add_func("/keymanutil/keyman_get_custom_keyboards/value", test_keyman_get_custom_keyboards__value);
+  g_test_add_func("/keymanutil/keyman_get_custom_keyboards/invalid_values", test_keyman_get_custom_keyboards__invalid_values);
   g_test_add_func("/keymanutil/keyman_get_custom_keyboards/no_key", test_keyman_get_custom_keyboards__no_key);
   g_test_add_func("/keymanutil/keyman_get_custom_keyboards/empty", test_keyman_get_custom_keyboards__empty);
 
