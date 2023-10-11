@@ -56,6 +56,9 @@ export interface KeyboardInfoSources {
 
   /** Last modification date for files in the project folder 'YYYY-MM-DDThh:mm:ssZ' */
   lastCommitDate?: string;
+
+  /** Return an error if project does not meet requirements of keyboards repository */
+  forPublishing: boolean;
 };
 
 export class KeyboardInfoCompiler {
@@ -121,15 +124,23 @@ export class KeyboardInfoCompiler {
 
     // License
 
-    if(!kmpJsonData.options?.licenseFile) {
-      this.callbacks.reportMessage(KeyboardInfoCompilerMessages.Error_NoLicenseFound());
-      return null;
+    if(sources.forPublishing) {
+      // We will only verify the license if asked to do so, so that all keyboard
+      // projects can be built even if license is not present. Keyboards
+      // repository will always verify license
+      if(!kmpJsonData.options?.licenseFile) {
+        this.callbacks.reportMessage(KeyboardInfoCompilerMessages.Error_NoLicenseFound());
+        return null;
+      }
+
+      if(!this.isLicenseMIT(this.callbacks.resolveFilename(sources.kpsFilename, kmpJsonData.options.licenseFile))) {
+        return null;
+      }
     }
 
-    if(!this.isLicenseMIT(this.callbacks.resolveFilename(sources.kpsFilename, kmpJsonData.options.licenseFile))) {
-      return null;
-    }
-
+    // Even if license is not verified, we set the .keyboard_info license to
+    // 'mit' to meet the schema requirements. The .keyboard_info file is only
+    // used by the keyboards repository, so this is a fair assumption to make.
     keyboard_info.license = 'mit';
 
     // isRTL

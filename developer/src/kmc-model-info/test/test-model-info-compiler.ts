@@ -29,6 +29,7 @@ describe('model-info-compiler', function () {
       modelFileName,
       sourcePath: 'release/sil/sil.cmo.bw',
       kpsFilename,
+      forPublishing: true,
     });
     if(data == null) {
       callbacks.printMessages();

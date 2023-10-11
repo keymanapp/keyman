@@ -1,18 +1,19 @@
 import * as fs from 'fs';
 import { BuildActivity } from './BuildActivity.js';
-import { CompilerCallbacks, CompilerOptions, KeymanDeveloperProject, KeymanFileTypes } from '@keymanapp/common-types';
+import { CompilerCallbacks, KeymanDeveloperProject, KeymanFileTypes } from '@keymanapp/common-types';
 import { KeyboardInfoCompiler } from '@keymanapp/kmc-keyboard-info';
 import { loadProject } from '../../util/projectLoader.js';
 import { InfrastructureMessages } from '../../messages/infrastructureMessages.js';
 import { calculateSourcePath } from '../../util/calculateSourcePath.js';
 import { getLastGitCommitDate } from '../../util/getLastGitCommitDate.js';
+import { ExtendedCompilerOptions } from 'src/util/extendedCompilerOptions.js';
 
 export class BuildKeyboardInfo extends BuildActivity {
   public get name(): string { return 'Keyboard metadata'; }
   public get sourceExtension(): KeymanFileTypes.Source { return KeymanFileTypes.Source.Project; }
   public get compiledExtension(): KeymanFileTypes.Binary { return KeymanFileTypes.Binary.KeyboardInfo; }
   public get description(): string { return 'Build a keyboard metadata file'; }
-  public async build(infile: string, callbacks: CompilerCallbacks, options: CompilerOptions): Promise<boolean> {
+  public async build(infile: string, callbacks: CompilerCallbacks, options: ExtendedCompilerOptions): Promise<boolean> {
     if(!KeymanFileTypes.filenameIs(infile, KeymanFileTypes.Source.Project)) {
       // Even if the project file does not exist, we use its name as our reference
       // in order to avoid ambiguity
@@ -41,7 +42,8 @@ export class BuildKeyboardInfo extends BuildActivity {
       kpsFilename: project.resolveInputFilePath(kps),
       jsFilename: fs.existsSync(jsFilename) ? jsFilename : undefined,
       sourcePath: calculateSourcePath(infile),
-      lastCommitDate
+      lastCommitDate,
+      forPublishing: !!options.forPublishing,
     });
 
     if(data == null) {

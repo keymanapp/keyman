@@ -33,6 +33,9 @@ export class ModelInfoSources {
 
   /** Last modification date for files in the project folder 'YYYY-MM-DDThh:mm:ssZ' */
   lastCommitDate?: string;
+
+  /** Return an error if project does not meet requirements of lexical-models repository */
+  forPublishing: boolean;
 };
 /* c8 ignore stop */
 
