@@ -1,5 +1,26 @@
 # Keyman Version History
 
+## 17.0.187 alpha 2023-10-11
+
+* chore(developer): convert Server to ES Modules (#9673)
+* chore(common): convert hextobin to ES Modules (#9676)
+* chore(common): convert resources/build/version to ES Modules (#9678)
+* chore(common): keyman-version now generates only es module (#9680)
+* chore(common): cleanup final Typescript non-ESM metadata (#9681)
+* chore(ios): renew certificate (#9697)
+*  (#9687)
+* feat(developer): ldml fix all remaining TODOs around markers and variables (#9688)
+* fix(windows): re-enable signature check (#9695)
+* fix(common): fix schema fixer (#9727)
+* chore(core): rename keyboardprocessor.h to keyman_core_api.h (#9723)
+* chore: rename km_kbp_ to km_core_ (#9724)
+* chore(developer): fixup signcode paths for server (#9730)
+* fix(linux): Explicitly initialize GTK (#9706)
+* chore(linux): Improve Sentry reports (#9725)
+* epic(developer): refactor package-metadata for 17.0 (#9485)
+* chore: clean up a few minor discrepancies in builder.inc.sh (#9731)
+* fix: path for ESM increment-version, and exit code (#9738)
+
 ## 17.0.186 alpha 2023-10-04
 
 * feat(developer): show an INFO message when warnings have failed a build (#9652)
