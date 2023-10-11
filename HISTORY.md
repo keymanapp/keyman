@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 17.0.188 alpha 2023-10-11
+
+* chore(android,windows): Update crowdin strings for Kannada (#9737)
+
 ## 17.0.187 alpha 2023-10-11
 
 * chore(developer): convert Server to ES Modules (#9673)
