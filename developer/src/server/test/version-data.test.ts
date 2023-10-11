@@ -1,8 +1,6 @@
 import {assert} from 'chai';
 import 'mocha';
-
-import { extractVersionData } from './version-data';
-
+import { extractVersionData } from '../src/version-data.js';
 
 describe('extractVersionData', function() {
   it('should parse version strings', function() {
