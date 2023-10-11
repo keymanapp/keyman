@@ -13,7 +13,7 @@ using namespace kmx;
 #include <share.h>
 #endif
 
-KMX_BOOL KMX_ProcessEvent::Load(km_kbp_path_name KeyboardName)
+KMX_BOOL KMX_ProcessEvent::Load(km_core_path_name KeyboardName)
 {
   if(!LoadKeyboard(KeyboardName, &m_keyboard.Keyboard)) return FALSE;   // I5136
 
@@ -53,7 +53,7 @@ static_assert(sizeof(CODE__SIZE) / sizeof(CODE__SIZE[0]) == (CODE_LASTCODE + 1),
 
 
 
-KMX_BOOL KMX_ProcessEvent::LoadKeyboard(km_kbp_path_name fileName, LPKEYBOARD *lpKeyboard)
+KMX_BOOL KMX_ProcessEvent::LoadKeyboard(km_core_path_name fileName, LPKEYBOARD *lpKeyboard)
 {
   PKMX_BYTE buf;
   FILE *fp;

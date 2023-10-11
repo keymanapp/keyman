@@ -3,7 +3,7 @@
   Description:  Internal keyboard class and adaptor class for the API.
   Create Date:  2 Oct 2018
   Authors:      Tim Eves (TSE)
-  History:      2 Oct 2018 - TSE - Refactored out of km_kbp_keyboard_api.cpp
+  History:      2 Oct 2018 - TSE - Refactored out of km_core_keyboard_api.cpp
 */
 
 #pragma once
@@ -12,7 +12,7 @@
 #include <string>
 #include <type_traits>
 
-#include <keyman/keyboardprocessor.h>
+#include <keyman/keyman_core_api.h>
 #include "jsonpp.hpp"
 #include "utfcodec.hpp"
 
@@ -25,7 +25,7 @@ namespace kbp
   {
   public:
     using char_type = std::remove_const_t<
-                        std::remove_pointer_t<km_kbp_path_name>>;
+                        std::remove_pointer_t<km_core_path_name>>;
     using string_type = std::basic_string<char_type>;
     static constexpr char_type const parent_separator = _KM_KBP_PATH_SEPARATOR,
                                      suffix_separator = _KM_KBP_EXT_SEPARATOR;

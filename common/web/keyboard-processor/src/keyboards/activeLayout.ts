@@ -51,6 +51,12 @@ class ActiveKeyBase {
   _baseKeyEvent: KeyEvent;
   isMnemonic: boolean = false;
 
+  /**
+   * Only available on subkeys, but we don't distinguish between base keys and subkeys
+   * at this level yet in KMW.
+   */
+  default?: boolean;
+
   proportionalPad: number;
   proportionalX: number;
   proportionalWidth: number;
@@ -207,7 +213,7 @@ class ActiveKeyBase {
     rawKey.sp ||= 0; // The default button class.
   }
 
-  static polyfill(key: LayoutKey, keyboard: Keyboard, layout: ActiveLayout, displayLayer: string) {
+  static polyfill(key: LayoutKey | LayoutSubKey, keyboard: Keyboard, layout: ActiveLayout, displayLayer: string) {
     // Add class functions to the existing layout object, allowing it to act as an ActiveLayout.
     let dummy = new ActiveKeyBase();
     let proto = Object.getPrototypeOf(dummy);
@@ -225,8 +231,8 @@ class ActiveKeyBase {
     }
 
     // Ensure subkeys are also properly extended.
-    if(key.sk) {
-      for(let subkey of key.sk) {
+    if((key as LayoutKey).sk) {
+      for(let subkey of (key as LayoutKey).sk) {
         ActiveSubkey.polyfill(subkey, keyboard, layout, displayLayer);
       }
     }
@@ -234,6 +240,8 @@ class ActiveKeyBase {
     let aKey = key as ActiveKey;
     aKey.displayLayer = displayLayer;
     aKey.layer = aKey.layer || displayLayer;
+
+    aKey.default = (key as LayoutSubKey).default;
 
     // Compute the key's base KeyEvent properties for use in future event generation
     aKey.constructBaseKeyEvent(keyboard, layout, displayLayer);
@@ -299,10 +307,6 @@ class ActiveKeyBase {
 
 
 export class ActiveKey extends ActiveKeyBase implements LayoutKey {
-  public polyfill() {
-
-  }
-
   public getSubkey(coreID: string): ActiveKey {
     if(this.sk) {
       for(let key of this.sk) {

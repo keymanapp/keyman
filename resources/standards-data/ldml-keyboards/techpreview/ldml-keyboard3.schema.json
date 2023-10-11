@@ -635,46 +635,6 @@
         }
       },
       "type": "object"
-    },
-    "vkey": {
-      "additionalProperties": false,
-      "properties": {
-        "from": {
-          "type": "string"
-        },
-        "to": {
-          "type": "string"
-        }
-      },
-      "required": [
-        "from",
-        "to"
-      ],
-      "type": "object"
-    },
-    "vkeys": {
-      "additionalProperties": false,
-      "properties": {
-        "import": {
-          "items": {
-            "$ref": "#/definitions/import"
-          },
-          "type": "array"
-        },
-        "special": {
-          "items": {
-            "$ref": "#/definitions/special"
-          },
-          "type": "array"
-        },
-        "vkey": {
-          "items": {
-            "$ref": "#/definitions/vkey"
-          },
-          "type": "array"
-        }
-      },
-      "type": "object"
     }
   },
   "properties": {
@@ -740,9 +700,6 @@
         },
         "version": {
           "$ref": "#/definitions/version"
-        },
-        "vkeys": {
-          "$ref": "#/definitions/vkeys"
         }
       },
       "required": [

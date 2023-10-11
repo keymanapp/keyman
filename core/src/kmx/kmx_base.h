@@ -1,7 +1,7 @@
 #pragma once
 
-#include <keyman/keyboardprocessor_bits.h>
-#include <keyman/keyboardprocessor.h>
+#include <keyman/keyman_core_api_bits.h>
+#include <keyman/keyman_core_api.h>
 
 #if defined(_WIN32) || defined(_WIN64)
 #define snprintf _snprintf

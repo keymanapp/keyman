@@ -17,9 +17,9 @@ const char16_t Uni_FD_NONCHARACTER_END   = 0xFDEF;
 const char16_t Uni_FFFE_NONCHARACTER     = 0xFFFE;
 const char16_t Uni_FFFF_NONCHARACTER     = 0xFFFF;
 const char16_t Uni_BMP_END               = 0xFFFF;
-const km_kbp_usv Uni_SMP_START           = 0x010000;
-const km_kbp_usv Uni_PLANE_MASK          = 0x1F0000;
-const km_kbp_usv Uni_MAX_CODEPOINT       = 0x10FFFF;
+const km_core_usv Uni_SMP_START           = 0x010000;
+const km_core_usv Uni_PLANE_MASK          = 0x1F0000;
+const km_core_usv Uni_MAX_CODEPOINT       = 0x10FFFF;
 
 /**
  * @brief True if a lead surrogate
@@ -65,20 +65,20 @@ const km_kbp_usv Uni_MAX_CODEPOINT       = 0x10FFFF;
 /**
  * @returns true if the character is a noncharacter
 */
-bool Uni_IsNonCharacter(km_kbp_usv ch);
+bool Uni_IsNonCharacter(km_core_usv ch);
 
 /**
  * @returns true if the character is a valid Unicode code point.
  * Surrogates belong to UTF-16 and are invalid.
 */
-bool Uni_IsValid(km_kbp_usv ch);
+bool Uni_IsValid(km_core_usv ch);
 
 /**
  * @returns true if the character is a valid Unicode code point range, that is, [start-end] are all
  * valid.
  * Surrogates belong to UTF-16 and are invalid.
 */
-bool Uni_IsValid(km_kbp_usv start, km_kbp_usv range);
+bool Uni_IsValid(km_core_usv start, km_core_usv range);
 
 /**
  * char16_t array big enough to hold a single Unicode codepoint,
@@ -107,15 +107,15 @@ int xchrcmp(PKMX_WCHAR ch1, PKMX_WCHAR ch2);
 PKMX_CHAR wstrtostr(PKMX_WCHAR in);
 PKMX_WCHAR strtowstr(PKMX_CHAR in);
 
-const km_kbp_cp *u16chr(const km_kbp_cp *p, km_kbp_cp ch);
-const km_kbp_cp *u16cpy(km_kbp_cp *dst, const km_kbp_cp *src);  // TODO: deprecate all usages
-const km_kbp_cp *u16ncpy(km_kbp_cp *dst, const km_kbp_cp *src, size_t max);
-size_t u16len(const km_kbp_cp *p);
-int u16cmp(const km_kbp_cp *p, const km_kbp_cp *q);
-int u16icmp(const km_kbp_cp *p, const km_kbp_cp *q);
-int u16ncmp(const km_kbp_cp *p, const km_kbp_cp *q, size_t count);
-km_kbp_cp *u16tok(km_kbp_cp *p, km_kbp_cp ch, km_kbp_cp **ctx);
-km_kbp_cp *u16dup(km_kbp_cp *src);
+const km_core_cp *u16chr(const km_core_cp *p, km_core_cp ch);
+const km_core_cp *u16cpy(km_core_cp *dst, const km_core_cp *src);  // TODO: deprecate all usages
+const km_core_cp *u16ncpy(km_core_cp *dst, const km_core_cp *src, size_t max);
+size_t u16len(const km_core_cp *p);
+int u16cmp(const km_core_cp *p, const km_core_cp *q);
+int u16icmp(const km_core_cp *p, const km_core_cp *q);
+int u16ncmp(const km_core_cp *p, const km_core_cp *q, size_t count);
+km_core_cp *u16tok(km_core_cp *p, km_core_cp ch, km_core_cp **ctx);
+km_core_cp *u16dup(km_core_cp *src);
 
 //KMX_BOOL MapUSCharToVK(KMX_WORD ch, PKMX_WORD puKey, PKMX_DWORD puShiftFlags);
 
@@ -185,23 +185,23 @@ u32string_to_u16string(const std::u32string &source) {
   return out;
 }
 
-inline bool Uni_IsEndOfPlaneNonCharacter(km_kbp_usv ch) {
+inline bool Uni_IsEndOfPlaneNonCharacter(km_core_usv ch) {
   return (((ch) & Uni_FFFE_NONCHARACTER) == Uni_FFFE_NONCHARACTER); // matches FFFF or FFFE
 }
 
-inline bool Uni_IsNoncharacter(km_kbp_usv ch) {
+inline bool Uni_IsNoncharacter(km_core_usv ch) {
   return (((ch) >= Uni_FD_NONCHARACTER_START && (ch) <= Uni_FD_NONCHARACTER_END) || Uni_IsEndOfPlaneNonCharacter(ch));
 }
 
-inline bool Uni_InCodespace(km_kbp_usv ch) {
+inline bool Uni_InCodespace(km_core_usv ch) {
   return ((ch) <= Uni_MAX_CODEPOINT);
 };
 
-inline bool Uni_IsValid(km_kbp_usv ch) {
+inline bool Uni_IsValid(km_core_usv ch) {
   return (Uni_InCodespace(ch) && !Uni_IsSurrogate(ch) && !Uni_IsNoncharacter(ch));
 }
 
-inline bool Uni_IsValid(km_kbp_usv start, km_kbp_usv end) {
+inline bool Uni_IsValid(km_core_usv start, km_core_usv end) {
   if (!Uni_IsValid(end) || !Uni_IsValid(start) || (end < start)) {
     // start or end out of range, or inverted range
     return false;
