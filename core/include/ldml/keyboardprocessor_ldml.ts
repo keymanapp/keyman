@@ -37,8 +37,7 @@ export type SectionIdent =
   'strs' |
   'tran' |
   'uset' |
-  'vars' |
-  'vkey';
+  'vars';
 
 
 type SectionMap = {
@@ -74,6 +73,10 @@ class Constants {
    * implied keys file
    */
   readonly cldr_implied_keys_import = `${this.cldr_version_techpreview}/keys-Latn-implied.xml`;
+  /**
+   * implied scancodes file
+   */
+  readonly cldr_implied_forms_import = `${this.cldr_version_techpreview}/scanCodes-implied.xml`;
   /**
    * Length of a raw section header, in bytes
    */
@@ -350,35 +353,7 @@ class Constants {
   /**
    * for the 'hardware' field indicating a touch keyboard, non-hardware
    */
-  readonly layr_list_hardware_touch = 0;
-  /**
-   * for the 'hardware' field indicating an abnt2 layout
-   */
-  readonly layr_list_hardware_abnt2 = 1;
-  /**
-   * for the 'hardware' field indicating an iso layout
-   */
-  readonly layr_list_hardware_iso = 2;
-  /**
-   * for the 'hardware' field indicating a jis layout
-   */
-  readonly layr_list_hardware_jis = 3;
-  /**
-   * for the 'hardware' field indicating a us layout
-   */
-  readonly layr_list_hardware_us = 4;
-  /**
-   * Convenience map of layr_list_hardware field values
-   */
-  readonly layr_list_hardware_map: Map<String, number> = new Map(
-    [
-      ["touch", this.layr_list_hardware_touch],
-      ["abnt2", this.layr_list_hardware_abnt2],
-      ["iso", this.layr_list_hardware_iso],
-      ["jis", this.layr_list_hardware_jis],
-      ["us", this.layr_list_hardware_us],
-    ]
-  );
+  readonly layr_list_hardware_touch = 'touch';
   /**
    * Length of each layer entry in the 'layr' section variable part
    */
@@ -505,19 +480,6 @@ class Constants {
   readonly tran_group_type_reorder = 1;
 
   /* ------------------------------------------------------------------
-    * vkey section
-      ------------------------------------------------------------------ */
-
-  /**
-   * Minimum length of the 'vkey' section not including variable parts
-   */
-  readonly length_vkey = 12;
-  /**
-   *  Length of each item in the 'vkey' section variable part
-   */
-  readonly length_vkey_item = 8;
-
-  /* ------------------------------------------------------------------
    * vars section
    * ------------------------------------------------------------------ */
 
@@ -581,7 +543,6 @@ class Constants {
       tran: 'tran',
       uset: 'uset',
       vars: 'vars',
-      vkey: 'vkey',
   };
 
   /**

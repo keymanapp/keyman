@@ -144,9 +144,10 @@ export class KMXFile {
   public static readonly VERSION_150 = 0x00000F00;
 
   public static readonly VERSION_160 = 0x00001000;
+  public static readonly VERSION_170 = 0x00001100;
 
   public static readonly VERSION_MIN = this.VERSION_50;
-  public static readonly VERSION_MAX = this.VERSION_160;
+  public static readonly VERSION_MAX = this.VERSION_170;
 
   //
   // Backspace types

@@ -1,18 +1,18 @@
 (*
   Name:             UfrmDebugStatus_CallStack
   Copyright:        Copyright (C) SIL International.
-  Documentation:    
-  Description:      
+  Documentation:
+  Description:
   Create Date:      14 Sep 2006
 
   Modified Date:    14 Sep 2006
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
+  Bugs:
+  Todo:
+  Notes:
   History:          14 Sep 2006 - mcdurdin - Initial version
 *)
 unit UfrmDebugStatus_CallStack;
@@ -73,9 +73,9 @@ var
   s: string;
 begin
   case rule.ItemType of
-    KM_KBP_DEBUG_BEGIN:
+    KM_CORE_DEBUG_BEGIN:
       lbCallStack.Items.AddObject('begin Unicode', rule);
-    KM_KBP_DEBUG_GROUP_ENTER:
+    KM_CORE_DEBUG_GROUP_ENTER:
       if rule.Group.dpName <> '' then
       begin
         s := 'group('+rule.Group.dpName+')';
@@ -84,11 +84,11 @@ begin
       end
       else
         lbCallStack.Items.AddObject('Unknown group', rule);
-    KM_KBP_DEBUG_RULE_ENTER:
+    KM_CORE_DEBUG_RULE_ENTER:
       lbCallStack.Items.AddObject('rule at line '+IntToStr(rule.line), rule);
-    KM_KBP_DEBUG_MATCH_ENTER:
+    KM_CORE_DEBUG_MATCH_ENTER:
       lbCallStack.Items.AddObject('match rule', rule);
-    KM_KBP_DEBUG_NOMATCH_ENTER:
+    KM_CORE_DEBUG_NOMATCH_ENTER:
       lbCallStack.Items.AddObject('nomatch rule', rule);
   end;
 end;

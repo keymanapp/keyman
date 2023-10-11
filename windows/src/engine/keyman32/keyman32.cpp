@@ -565,17 +565,17 @@ BOOL ReleaseKeyboardMemory(LPKEYBOARD kbd)
 	return TRUE;
 }
 
-BOOL ReleaseStateMemoryCore(km_kbp_state **state) {
+BOOL ReleaseStateMemoryCore(km_core_state **state) {
   if (!*state) return TRUE;
-  km_kbp_state_dispose(*state);
+  km_core_state_dispose(*state);
   *state = NULL;
   return TRUE;
 }
 
-BOOL ReleaseKeyboardMemoryCore(km_kbp_keyboard **kbd) {
+BOOL ReleaseKeyboardMemoryCore(km_core_keyboard **kbd) {
   if (!*kbd)
     return TRUE;
-  km_kbp_keyboard_dispose(*kbd);
+  km_core_keyboard_dispose(*kbd);
   *kbd = NULL;
   return TRUE;
 }

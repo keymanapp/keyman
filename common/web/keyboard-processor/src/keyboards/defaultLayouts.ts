@@ -22,8 +22,11 @@ export type KLS = {[layerName: string]: string[]};
 export type ButtonClass       =  0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10;
 export type ButtonClassString = "0"|"1"|"2"|"3"|"4"|"5"|"6"|"7"|"8"|"9"|"10";
 
-export interface LayoutLayer extends LayoutLayerBase {
-  // Post-processing elements tracked by Web.
+export type LayoutLayer = {
+  "id": string,
+  "row": LayoutRow[],
+
+  // Post-processing elements.
   shiftKey?: LayoutKey,
   capsKey?: LayoutKey,
   numKey?: LayoutKey,
