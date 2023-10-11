@@ -235,9 +235,12 @@ ldml_processor::process_event(
     default:
     // all other VKs
       {
+        UErrorCode status = U_ZERO_ERROR;
         // Look up the key
-        const std::u16string str = keys.lookup(vk, modifier_state);
+        std::u16string str = keys.lookup(vk, modifier_state);
 
+        ldml::normalize_nfd(str, status);
+        assert(U_SUCCESS(status));
         if (str.empty()) {
           // no key was found, so pass the keystroke on to the Engine
           state->actions().push_invalidate_context();
@@ -248,7 +251,7 @@ ldml_processor::process_event(
         // found a string - push it into the context and actions
         // we convert it here instead of using the emit_text() overload
         // so that we don't have to reconvert it inside the transform code.
-        const std::u32string str32 = kmx::u16string_to_u32string(str);
+        std::u32string str32 = kmx::u16string_to_u32string(str);
 
         if (!transforms) {
           // No transforms: just emit the string.
@@ -263,12 +266,18 @@ ldml_processor::process_event(
           (void)context_to_string(state, ctxtstr);
           // add the newly added key output to ctxtstr
           ctxtstr.append(str32);
+          // and normalize
+          ldml::normalize_nfd(ctxtstr, status);
+          assert(U_SUCCESS(status));
 
           /** the output buffer for transforms */
           std::u32string outputString;
 
           // apply the transform, get how much matched (at the end)
           const size_t matchedContext = transforms->apply(ctxtstr, outputString);
+
+          ldml::normalize_nfd(outputString, status);
+          assert(U_SUCCESS(status));
 
           if (matchedContext == 0) {
             // No match, just emit the original string

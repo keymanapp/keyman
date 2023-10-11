@@ -9,20 +9,20 @@
       <keystroke key="e" />
       <keystroke key="u-0300" />
       <keystroke key="u-0320" />
-      <check result="e\u{0300}\u{0320}" />
+      <check result="e\u{0320}\u{0300}" />
     </test>
     <test name="regex-test-0-b">
       <startContext to="" />
       <keystroke key="e" />
       <keystroke key="u-0320" />
       <keystroke key="u-0300" />
-      <check result="e\u{0300}\u{0320}" />
+      <check result="e\u{0320}\u{0300}" />
     </test>
     <test name="regex-test-0-c">
       <startContext to="" />
       <keystroke key="u-00e0" />
       <keystroke key="u-0320" />
-      <check result="e\u{0300}\u{0320}" />
+      <check result="e\u{0320}\u{0300}" />
     </test>
   </tests>
   <tests name="regex-tests-1">

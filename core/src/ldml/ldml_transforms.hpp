@@ -25,6 +25,7 @@
 #include "unicode/unistr.h"
 #include "unicode/regex.h"
 #include "unicode/utext.h"
+#include "unicode/normalizer2.h"
 
 namespace km {
 namespace kbp {
@@ -269,6 +270,13 @@ public:
        const kbp::kmx::COMP_KMXPLUS_TRAN *tran,
        const kbp::kmx::COMP_KMXPLUS_TRAN_Helper &tranHelper);
 };
+
+// string routines
+
+/** Normalize a u32string inplace. Returns a reference to the same string. */
+std::u32string &normalize_nfd(std::u32string &str, UErrorCode &status);
+/** Normalize a u16string inplace. Returns a reference to the same string. */
+std::u16string &normalize_nfd(std::u16string &str, UErrorCode &status);
 
 }  // namespace ldml
 }  // namespace kbp

@@ -40,17 +40,6 @@ from https://github.com/unicode-org/cldr/blob/keyboard-preview/docs/ldml/tr35-ke
   </variables>
 
   <transforms type="simple">
-    <!-- BEGIN pre normalization-->
-    <transformGroup>
-      <!-- TODO: NFC to NFD -->
-      <transform from="\u{00E0}" to="e\u{0300}" />
-    </transformGroup>
-    <transformGroup>
-      <!-- TODO: reorder -->
-      <transform from="e\u{0300}\u{0320}" to="e\u{0320}\u{0300}"/>
-    </transformGroup>
-    <!-- END pre normalization-->
-
     <transformGroup>
       <!-- these should NOT match-->
       <transform from="e[\u{0300}][\u{0320}]" to="NO0" /> <!-- out of order -->
@@ -59,16 +48,5 @@ from https://github.com/unicode-org/cldr/blob/keyboard-preview/docs/ldml/tr35-ke
       <transform from="2e\u{0320}\u{0300}" to="YES2" /> <!-- in order  NFD -->
       <transform from="3\u{00E0}\u{0320}" to="YES3" /> <!-- in order   NFC -->
     </transformGroup>
-
-    <!-- BEGIN post normalization -->
-    <transformGroup>
-      <!-- TODO: NFC to NFD -->
-      <transform from="\u{00E0}" to="e\u{0300}" />
-    </transformGroup>
-    <transformGroup>
-      <!-- TODO: reorder -->
-      <transform from="e\u{0300}\u{0320}" to="e\u{0320}\u{0300}"/>
-    </transformGroup>
-    <!-- END post normalization -->
   </transforms>
 </keyboard3>
