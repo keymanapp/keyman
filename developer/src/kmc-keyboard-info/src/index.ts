@@ -12,7 +12,6 @@ import { validateMITLicense } from "@keymanapp/developer-utils";
 import { KmpCompiler } from "@keymanapp/kmc-package";
 
 import { SchemaValidators } from "@keymanapp/common-types";
-import { packageKeysExamplesToKeyboardInfo } from "./example-keys.js";
 
 const regionNames = new Intl.DisplayNames(['en'], { type: "region" });
 const scriptNames = new Intl.DisplayNames(['en'], { type: "script" });
@@ -288,7 +287,10 @@ export class KeyboardInfoCompiler {
     if(!SchemaValidators.default.keyboard_info(keyboard_info)) {
       // This is an internal fatal error; we should not be capable of producing
       // invalid output, so it is best to throw and die
-      throw new Error((<any>SchemaValidators.default.keyboard_info).errorsText());
+      throw new Error(JSON.stringify({
+        keyboard_info: keyboard_info,
+        error: SchemaValidators.default.keyboard_info.errors
+      }, null, 2));
     }
 
     return new TextEncoder().encode(jsonOutput);
@@ -390,7 +392,7 @@ export class KeyboardInfoCompiler {
         if(example.id == bcp47) {
           language.examples.push({
             // we don't copy over example.id
-            keys: packageKeysExamplesToKeyboardInfo(example.keys),
+            keys: example.keys,
             note: example.note,
             text: example.text
           });
