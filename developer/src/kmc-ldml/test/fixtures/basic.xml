@@ -14,11 +14,6 @@
     <name value="TestKbd" />
   </names>
 
-  <vkeys>
-    <vkey from="Q" to="A" />
-    <vkey from="A" to="Q" />
-  </vkeys>
-
   <displays>
     <!-- values chosen to reuse strings -->
     <display to="a" display="^" />

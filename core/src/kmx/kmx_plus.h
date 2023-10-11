@@ -348,7 +348,7 @@ struct COMP_KMXPLUS_BKSP : public COMP_KMXPLUS_TRAN {
 
 
 /* ------------------------------------------------------------------
- * vkey section
+ * vars section
    ------------------------------------------------------------------ */
 
 struct COMP_KMXPLUS_VARS_ITEM {
@@ -375,30 +375,6 @@ struct COMP_KMXPLUS_VARS {
 static_assert(sizeof(struct COMP_KMXPLUS_VARS) % 0x4 == 0, "Structs prior to variable part should align to 32-bit boundary");
 static_assert(sizeof(struct COMP_KMXPLUS_VARS) == LDML_LENGTH_VARS, "mismatched size of section vars");
 static_assert(sizeof(struct COMP_KMXPLUS_VARS_ITEM) == LDML_LENGTH_VARS_ITEM, "mismatched size of vars item");
-
-/* ------------------------------------------------------------------
- * vkey section
-   ------------------------------------------------------------------ */
-
-struct COMP_KMXPLUS_VKEY_ENTRY {
-    KMX_DWORD_unaligned vkey;
-    KMX_DWORD_unaligned target;
-};
-
-struct COMP_KMXPLUS_VKEY {
-  static const KMXPLUS_IDENT IDENT = LDML_SECTIONID_VKEY;
-  COMP_KMXPLUS_HEADER header;
-  KMX_DWORD_unaligned count;
-  COMP_KMXPLUS_VKEY_ENTRY entries[];
-  /**
-   * @brief True if section is valid.
-   */
-  bool valid(KMX_DWORD length) const;
-};
-
-static_assert(sizeof(struct COMP_KMXPLUS_VKEY) % 0x4 == 0, "Structs prior to variable part should align to 32-bit boundary");
-static_assert(sizeof(struct COMP_KMXPLUS_VKEY) == LDML_LENGTH_VKEY, "mismatched size of section vkey");
-
 
 /* ------------------------------------------------------------------
  * disp section
@@ -706,8 +682,8 @@ struct COMP_KMXPLUS_USET_USET {
 };
 
 struct COMP_KMXPLUS_USET_RANGE {
-  km_kbp_usv start;
-  km_kbp_usv end;
+  km_core_usv start;
+  km_core_usv end;
   public:
     COMP_KMXPLUS_USET_RANGE(const COMP_KMXPLUS_USET_RANGE& other);
     COMP_KMXPLUS_USET_RANGE(KMX_DWORD start, KMX_DWORD end);
@@ -725,7 +701,7 @@ class SimpleUSet {
     /** empty set */
     SimpleUSet();
     /** true if the uset contains this char */
-    bool contains(km_kbp_usv ch) const;
+    bool contains(km_core_usv ch) const;
     /** debugging */
     void dump() const;
     bool valid() const;
@@ -787,7 +763,6 @@ class kmx_plus {
     const COMP_KMXPLUS_TRAN *tran;
     const COMP_KMXPLUS_USET *uset;
     const COMP_KMXPLUS_VARS *vars;
-    const COMP_KMXPLUS_VKEY *vkey;
     inline bool is_valid() { return valid; }
     COMP_KMXPLUS_BKSP_Helper bkspHelper;
     COMP_KMXPLUS_KEYS_Helper key2Helper;

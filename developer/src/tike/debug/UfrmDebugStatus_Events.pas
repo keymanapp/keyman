@@ -77,11 +77,11 @@ var
   s: string;
 begin
   case rule.ItemType of
-    KM_KBP_DEBUG_BEGIN,
-    KM_KBP_DEBUG_END:
-        AddItem(rule.ItemType = KM_KBP_DEBUG_BEGIN, 'begin Unicode', rule);
-    KM_KBP_DEBUG_GROUP_ENTER,
-    KM_KBP_DEBUG_GROUP_EXIT:
+    KM_CORE_DEBUG_BEGIN,
+    KM_CORE_DEBUG_END:
+        AddItem(rule.ItemType = KM_CORE_DEBUG_BEGIN, 'begin Unicode', rule);
+    KM_CORE_DEBUG_GROUP_ENTER,
+    KM_CORE_DEBUG_GROUP_EXIT:
       begin
         if rule.Group.dpName <> '' then
         begin
@@ -90,18 +90,18 @@ begin
         end
         else
           s := 'Unknown group';
-        AddItem(rule.ItemType = KM_KBP_DEBUG_GROUP_ENTER, s, rule);
+        AddItem(rule.ItemType = KM_CORE_DEBUG_GROUP_ENTER, s, rule);
       end;
-    KM_KBP_DEBUG_RULE_ENTER,
-    KM_KBP_DEBUG_RULE_EXIT:
-      AddItem(rule.ItemType = KM_KBP_DEBUG_RULE_ENTER, 'rule at line '+IntToStr(rule.line), rule);
-    KM_KBP_DEBUG_MATCH_ENTER,
-    KM_KBP_DEBUG_MATCH_EXIT:
-      AddItem(rule.ItemType = KM_KBP_DEBUG_MATCH_ENTER, 'match rule', rule);
-    KM_KBP_DEBUG_NOMATCH_ENTER,
-    KM_KBP_DEBUG_NOMATCH_EXIT:
-      AddItem(rule.ItemType = KM_KBP_DEBUG_NOMATCH_ENTER, 'nomatch rule', rule);
-    KM_KBP_DEBUG_SET_OPTION:
+    KM_CORE_DEBUG_RULE_ENTER,
+    KM_CORE_DEBUG_RULE_EXIT:
+      AddItem(rule.ItemType = KM_CORE_DEBUG_RULE_ENTER, 'rule at line '+IntToStr(rule.line), rule);
+    KM_CORE_DEBUG_MATCH_ENTER,
+    KM_CORE_DEBUG_MATCH_EXIT:
+      AddItem(rule.ItemType = KM_CORE_DEBUG_MATCH_ENTER, 'match rule', rule);
+    KM_CORE_DEBUG_NOMATCH_ENTER,
+    KM_CORE_DEBUG_NOMATCH_EXIT:
+      AddItem(rule.ItemType = KM_CORE_DEBUG_NOMATCH_ENTER, 'nomatch rule', rule);
+    KM_CORE_DEBUG_SET_OPTION:
       AddItem(True, 'set option', rule);
     else
       lbCallStack.Items.AddObject('???', rule);
@@ -115,16 +115,16 @@ procedure TfrmDebugStatus_Events.AddActionEvent(action: TDebugEventActionData);
   end;
 begin
   case action.ActionType of
-    KM_KBP_IT_EMIT_KEYSTROKE: AddItem('emit_keystroke', action);
+    KM_CORE_IT_EMIT_KEYSTROKE: AddItem('emit_keystroke', action);
 //    QIT_VSHIFTDOWN:  AddItem('vshiftdown', action);
 //    QIT_VSHIFTUP:    AddItem('vshiftup', action);
-    KM_KBP_IT_CHAR:        AddItem('char', action);
-    KM_KBP_IT_MARKER:     AddItem('marker', action);
-    KM_KBP_IT_ALERT:        AddItem('alert', action);
-    KM_KBP_IT_BACK:        AddItem('back', action);
-    KM_KBP_IT_PERSIST_OPT: AddItem('persist_opt', action);
-    KM_KBP_IT_INVALIDATE_CONTEXT:  AddItem('invalidate_context', action);
-    KM_KBP_IT_CAPSLOCK:    AddItem('capslock', action);
+    KM_CORE_IT_CHAR:        AddItem('char', action);
+    KM_CORE_IT_MARKER:     AddItem('marker', action);
+    KM_CORE_IT_ALERT:        AddItem('alert', action);
+    KM_CORE_IT_BACK:        AddItem('back', action);
+    KM_CORE_IT_PERSIST_OPT: AddItem('persist_opt', action);
+    KM_CORE_IT_INVALIDATE_CONTEXT:  AddItem('invalidate_context', action);
+    KM_CORE_IT_CAPSLOCK:    AddItem('capslock', action);
     else             AddItem('Unknown action ???', action);
   end;
 end;

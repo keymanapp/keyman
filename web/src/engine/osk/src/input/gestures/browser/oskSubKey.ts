@@ -25,9 +25,10 @@ export default class OSKSubKey extends OSKKey {
     let ks=kDiv.style;
 
     for(var tp in tKey) {
-      // The subkey has already had its _baseKeyEvent field constructed; don't overwrite it!
-      // Layout properties, however, are safe to overwrite.
-      if(typeof spec[tp] != 'string' && tp != '_baseKeyEvent') {
+      // We've already preprocessed the keyboard's version of the subkey.  While certain
+      // layout properties are fine to overwrite, certain functional properties must
+      // be preserved.
+      if(typeof spec[tp] != 'string' && tp != 'default' && tp != '_baseKeyEvent') {
         spec[tp]=tKey[tp];
       }
     }

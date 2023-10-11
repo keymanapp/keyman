@@ -220,6 +220,14 @@ export async function runKeyboardTestFromJSON(jsonPath, params, assertCallback, 
   });
 }
 
+export async function oskResourceLoadPromise() {
+  // If the CSS isn't fully loaded, the element positions will not match their expected
+  // locations in the keyboard layout and OSK keys won't be triggered properly by the
+  // gesture engine.
+  const styleManager = keyman.osk['uiStyleSheetManager']; // is private
+  await styleManager.allLoadedPromise();
+}
+
 // Useful for tests related to strings with supplementary pairs.
 export function toSupplementaryPairString(code) {
   var H = Math.floor((code - 0x10000) / 0x400) + 0xD800;

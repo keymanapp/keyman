@@ -305,20 +305,18 @@ export default class SubkeyPopup {
       let skElement = <KeyElement> popupBase.childNodes[i].firstChild;
 
       // Preference order:
-      // #1:  if a default subkey has been specified, select it.  (pending, for 15.0+)
+      // #1:  if a default subkey has been specified, select it.
       // #2:  if no default subkey is specified, default to a subkey with the same
       //      key ID and layer / modifier spec.
-      //if(skSpec.isDefault) { TODO for 15.0
-      //  bk = skElement;
-      //  break;
-      //} else
-      if(!baseKey.key || !baseKey.key.spec) {
+      if(skSpec.default) {
+       bk = skElement;
+       break;
+      } else if(!baseKey.key || !baseKey.key.spec) {
         continue;
       }
 
       if(skSpec.elementID == baseKey.key.spec.elementID) {
         bk = skElement;
-        break; // Best possible match has been found.  (Disable 'break' once above block is implemented.)
       }
     }
 
