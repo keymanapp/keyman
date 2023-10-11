@@ -12,6 +12,7 @@
     "strictBindCallApply": true,
     "strictFunctionTypes": true,
     "noUnusedLocals": true,
+    "allowJs": true,
 
     "rootDir": ".",
 

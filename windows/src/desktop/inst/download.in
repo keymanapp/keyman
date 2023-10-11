@@ -67,3 +67,15 @@ candle-locale:
 # locale files are in desktop/locale/*
   $(WIXHEAT) dir ..\kmshell\locale -o locale.wxs -ag -cg Locale -dr INSTALLDIR -var var.LOCALESOURCE -wx -nologo
   $(WIXCANDLE) -dVERSION=$VersionWin -dRELEASE=$VersionRelease -dPRODUCTID=$GUID1 -dLOCALESOURCE=..\kmshell\locale locale.wxs
+
+#
+# Build setup.inf
+#
+
+setup-inf:
+  echo [Setup] > setup.inf
+  echo Version=$VersionWin >> setup.inf
+  echo MSIFileName=keymandesktop.msi >> setup.inf
+  echo MSIOptions= >> setup.inf
+  echo License=license.html >> setup.inf
+  echo [Packages] >> setup.inf

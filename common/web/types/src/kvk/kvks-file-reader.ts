@@ -1,12 +1,10 @@
 import * as xml2js from 'xml2js';
 import KVKSourceFile from './kvks-file.js';
-import { default as AjvModule } from 'ajv';
-const Ajv = AjvModule.default; // The actual expected Ajv type.
 import { boxXmlArray } from '../util/util.js';
 import { DEFAULT_KVK_FONT, VisualKeyboard, VisualKeyboardHeaderFlags, VisualKeyboardKey, VisualKeyboardKeyFlags, VisualKeyboardLegalShiftStates, VisualKeyboardShiftState } from './visual-keyboard.js';
 import { USVirtualKeyCodes } from '../consts/virtual-key-constants.js';
 import { BUILDER_KVK_HEADER_VERSION, KVK_HEADER_IDENTIFIER_BYTES } from './kvk-file.js';
-import Schemas from '../schemas.js';
+import SchemaValidators from '../schema-validators.js';
 
 
 export default class KVKSFileReader {
@@ -85,9 +83,8 @@ export default class KVKSFileReader {
   }
 
   public validate(source: KVKSourceFile): void {
-    const ajv = new Ajv();
-    if(!ajv.validate(Schemas.kvks, source)) {
-      throw new Error(ajv.errorsText());
+    if(!SchemaValidators.kvks(source)) {
+      throw new Error((<any>SchemaValidators.kvks).errorsText());
     }
   }
 

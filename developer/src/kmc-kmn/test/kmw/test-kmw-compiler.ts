@@ -19,7 +19,6 @@ const debug=false;
 const generateTestFilenames = (id: string) => ({
   fixture: fixturesDir + id + KeymanFileTypes.Binary.WebKeyboard,
   source: fixturesDir + id + KeymanFileTypes.Source.KeymanKeyboard,
-  intermediate: fixturesDir + id + KeymanFileTypes.Binary.Keyboard,
   binary: fixturesDir + id + '.test' + KeymanFileTypes.Binary.WebKeyboard
 });
 
@@ -67,7 +66,7 @@ describe('KeymanWeb Compiler', function() {
 function run_test_keyboard(kmnCompiler: KmnCompiler, id: string): { result: CompilerResult, actualCode: string, actual: ETLResult, expectedCode: string, expected: ETLResult } {
   const filenames = generateTestFilenames(id);
 
-  let result = kmnCompiler.runCompiler(filenames.source, filenames.intermediate, {
+  let result = kmnCompiler.runCompiler(filenames.source, {
     shouldAddCompilerVersion: false,
     saveDebug: true,
   });

@@ -3,13 +3,16 @@
 #
 
 !ifdef NODELPHI
-TARGETS=build-tools kmcmplib kmcmpdll kmanalyze kmdecomp server kmc
+DELPHI_TARGETS=
 !else
-TARGETS=build-tools kmcmplib kmcmpdll kmcomp kmanalyze kmconvert tike samples setup inst kmdecomp server kmc
+# note: inst is not really a delphi target but depends on delphi
+DELPHI_TARGETS=kmconvert tike setup inst
 !endif
 
+TARGETS=build-tools kmcmplib kmanalyze $(DELPHI_TARGETS) kmdecomp samples server kmc
+
 EXCLUDEPATHDEFINES=1
-MANIFESTS=kmcomp tike setup
+MANIFESTS=tike setup
 CLEANS=clean-developer
 
 EXCLUDEPATHDEFINES=1
@@ -33,16 +36,8 @@ kmcmplib: global-versions .virtual
     cd $(DEVELOPER_ROOT)\src\kmcmplib
     $(MAKE) $(TARGET)
 
-kmcmpdll: kmcmplib .virtual
-    cd $(DEVELOPER_ROOT)\src\kmcmpdll
-    $(MAKE) $(TARGET)
-
 kmdecomp: .virtual
     cd $(DEVELOPER_ROOT)\src\kmdecomp
-    $(MAKE) $(TARGET)
-
-kmcomp: kmcmpdll
-    cd $(DEVELOPER_ROOT)\src\kmcomp
     $(MAKE) $(TARGET)
 
 kmanalyze: .virtual
@@ -53,7 +48,7 @@ kmconvert: .virtual
     cd $(DEVELOPER_ROOT)\src\kmconvert
     $(MAKE) $(TARGET)
 
-tike: kmcmpdll redist
+tike: redist
     cd $(DEVELOPER_ROOT)\src\tike
     $(MAKE) $(TARGET)
 

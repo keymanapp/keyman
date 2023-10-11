@@ -279,7 +279,7 @@ begin
   if not TCanonicalLanguageCodeUtils.IsCanonical(tag, msg, False, False) then
   begin
     // Just a warning, because it's not illegal, just generates a warning
-    // kmcomp-side
+    // kmc-side
     OutputText('Warning: '+component+': '+msg);
   end;
 

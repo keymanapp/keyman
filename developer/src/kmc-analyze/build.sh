@@ -29,7 +29,7 @@ function do_test() {
   # TODO: enable tests
   #     cd test && tsc --build && cd .. && mocha
   # TODO: enable c8 (disabled because no coverage at present)
-  #     c8 --reporter=lcov --reporter=text mocha
+  #     c8 --reporter=lcov --reporter=text --exclude-after-remap mocha
 }
 
 builder_run_action clean      rm -rf ./build/
