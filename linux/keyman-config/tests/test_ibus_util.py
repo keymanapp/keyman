@@ -6,9 +6,10 @@ from keyman_config.ibus_util import get_ibus_bus, install_to_ibus, uninstall_fro
 
 
 @patch('keyman_config.ibus_util.IBus.Bus')
+@patch('time.sleep', return_value=None)
 class IbusUtilTests(unittest.TestCase):
 
-    def test_getIbusBus_NotConnected_ReturnsNone(self, MockIbusBusClass):
+    def test_getIbusBus_NotConnected_ReturnsNone(self, PatchedTimeSleep, MockIbusBusClass):
         # Setup
         mock_ibusBusInstance = MockIbusBusClass.return_value
         mock_ibusBusInstance.is_connected.return_value = False
@@ -18,7 +19,7 @@ class IbusUtilTests(unittest.TestCase):
         self.assertTrue(MockIbusBusClass.called, "IBus.Bus called")
         self.assertTrue(mock_ibusBusInstance.destroy.called)
 
-    def test_getIbusBus_GlobalEngineNotEnabled_ReturnsNone(self, MockIbusBusClass):
+    def test_getIbusBus_GlobalEngineNotEnabled_ReturnsNone(self, PatchedTimeSleep, MockIbusBusClass):
         # Setup
         mock_ibusBusInstance = MockIbusBusClass.return_value
         mock_ibusBusInstance.is_connected.return_value = True
@@ -30,7 +31,7 @@ class IbusUtilTests(unittest.TestCase):
         self.assertTrue(MockIbusBusClass.called, "IBus.Bus called")
         self.assertTrue(mock_ibusBusInstance.destroy.called)
 
-    def test_getIbusBus_ReturnsBus(self, MockIbusBusClass):
+    def test_getIbusBus_ReturnsBus(self, PatchedTimeSleep, MockIbusBusClass):
         # Setup
         mock_ibusBusInstance = MockIbusBusClass.return_value
         # Execute/Verify
@@ -40,7 +41,7 @@ class IbusUtilTests(unittest.TestCase):
 
     @patch('keyman_config.gsettings.GSettings.get')
     @patch('keyman_config.gsettings.GSettings.set')
-    def test_installToIbus_AlreadyInstalled(self, MockSettingsSet, MockSettingsGet, MockIbusBusClass):
+    def test_installToIbus_AlreadyInstalled(self, MockSettingsSet, MockSettingsGet, PatchedTimeSleep, MockIbusBusClass):
         # Setup
         mock_settingsGet = MockSettingsGet
         mock_settingsSet = MockSettingsSet
@@ -56,7 +57,7 @@ class IbusUtilTests(unittest.TestCase):
 
     @patch('keyman_config.gsettings.GSettings.get')
     @patch('keyman_config.gsettings.GSettings.set')
-    def test_installToIbus_InstallsNewKb(self, MockSettingsSet, MockSettingsGet, MockIbusBusClass):
+    def test_installToIbus_InstallsNewKb(self, MockSettingsSet, MockSettingsGet, PatchedTimeSleep, MockIbusBusClass):
         # Setup
         mock_settingsGet = MockSettingsGet
         mock_settingsSet = MockSettingsSet
@@ -72,7 +73,7 @@ class IbusUtilTests(unittest.TestCase):
 
     @patch('keyman_config.gsettings.GSettings.get')
     @patch('keyman_config.gsettings.GSettings.set')
-    def test_uninstallFromIbus_KbInstalled(self, MockSettingsSet, MockSettingsGet, MockIbusBusClass):
+    def test_uninstallFromIbus_KbInstalled(self, MockSettingsSet, MockSettingsGet, PatchedTimeSleep, MockIbusBusClass):
         # Setup
         mock_settingsGet = MockSettingsGet
         mock_settingsSet = MockSettingsSet
@@ -88,7 +89,7 @@ class IbusUtilTests(unittest.TestCase):
 
     @patch('keyman_config.gsettings.GSettings.get')
     @patch('keyman_config.gsettings.GSettings.set')
-    def test_uninstallFromIbus_KbNotInstalled(self, MockSettingsSet, MockSettingsGet, MockIbusBusClass):
+    def test_uninstallFromIbus_KbNotInstalled(self, MockSettingsSet, MockSettingsGet, PatchedTimeSleep, MockIbusBusClass):
         # Setup
         mock_settingsGet = MockSettingsGet
         mock_settingsSet = MockSettingsSet
