@@ -42,7 +42,7 @@ const KMX_DWORD KMX_VKMap[] = {
   VK_xDF, VK_OEM_102,/**/
   0
 };
-
+// _S2 how many fielsds do I need??
 // mapping between Linux keycodes and keyman SC
 const int keycode_map[60]={
   0,   /* */
@@ -107,6 +107,85 @@ const int keycode_map[60]={
   0,   /* */
 };
 
+// _S2 how many fielsds do I need??
+const int Lin_KM__map_arr[70]={
+  0,  /* */
+  1,  /* */
+  2,  /* */
+  3,  /* */
+  4,  /* */
+  5,  /* */
+  6,  /* */
+  7,  /* */
+  8,  /* */
+  9,  /* */
+
+  10,  /*10. 1 */
+  11,  /*11. 2 */
+  12,  /*12. 3 */
+  13,  /*13. 4 */
+  14,  /*14. 5 */
+  15,  /*15. 6 */
+  16,  /*16. 7 */
+  17,  /*17. 8 */
+  18,  /*18. 9 */
+  19,  /*19. 0 */
+
+  20,  /*20. MINUS */
+  21,  /*21. EQUALS*/
+  22,  /*22. BACKSPACE*/
+  23,  /*23. TAB*/
+  24,  /* 16. Q */
+  25,  /* 17. W */
+  26,  /* 18. E */
+  27,  /* 19. R */
+  28,  /* 20. T */
+  29,  /* 21. Z */
+
+  30,  /* 22. U */
+  31,  /* 23. I*/
+  32,  /* 24. O*/
+  33,  /* 25. P*/
+  34,  /*26. LEFTBRACE*/
+  35,  /*27. RIGHTBRACE*/
+  36,  /*28. ENTER*/
+  37,  /*29. LEFTCTRL*/
+  38,  /* 30. A */
+  39,  /* 31. S */
+
+  40,  /* 32. D */
+  41,  /* 33. F */
+  42,  /* 34. G */
+  43,  /* 35. H */
+  44,  /* 36. J */
+  45,  /* 37. K */
+  46,  /* 38. L */
+  47,  /*39. SEMICOLON*/
+  48,  /*40. APOSTROPHE*/
+  49,   /*41. GRAVE*/
+
+  50,   /*42. LEFTSHIFT*/
+  51,   /*43. BACKSLASH*/
+  52,  /*44. Z */
+  53,  /*45. X */
+  54,  /*46. C */
+  55,  /*47. V */
+  56,  /*48. B */
+  57,  /*49. N */
+  58,  /*50. M */
+  188,  /*51. COMMA */
+
+  190,  /*52. DOT */
+  61,  /*53. SLASH */
+  62,  /*54. R_SHIFT */
+  63,  /*55. * */
+  64,  /*56. LEFTALT*/
+  65,  /*57. SPACE*/
+  66 , /*58. CAPSLOCK*/
+};
+
+const int Lin_KM__map(int i);
+
 // this is what we return when we find an invalid character
 //_S2 Which character do we use in that case?  0 or FFFF or 32 or ??
 static KMX_DWORD returnIfCharInvalid = 32;
@@ -127,7 +206,6 @@ bool createCompleteRow_US(v_str_1D &complete_List, FILE *fpp, const char *text, 
 int split_US_To_3D_Vector(v_dw_3D &all_US, v_str_1D completeList);
 
 // replace Name of Key (e.g. <AD06>)  wih Keycode ( e.g. 0x15 )
-int replace_PosKey_with_Keycode(std::string in);
 int replace_PosKey_with_Keycode_use_Lin(std::string  in);
 
 // create an empty 2D vector containing "--" in all fields
@@ -146,7 +224,9 @@ KMX_DWORD get_SC_From_VirtualKey_Other(KMX_DWORD VK_Other , v_dw_3D &All_Vector)
 // return the Scancode of for given VirtualKey of Other US
 KMX_DWORD get_SC_From_VirtualKey_US(KMX_DWORD VK_US , v_dw_3D &All_Vector);
 // return the Scancode of for given VirtualKey of Other US
-KMX_DWORD get_position_From_VirtualKey_US(KMX_DWORD VK_US , v_dw_3D &All_Vector);
+KMX_DWORD get_position_From_VirtualKey_Other(KMX_DWORD VK_US , v_dw_3D &All_Vector);
+
+bool IsKeyIn_VKMap(UINT SC);
 
 #if USE_GDK
 

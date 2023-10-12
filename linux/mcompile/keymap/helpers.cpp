@@ -359,3 +359,108 @@ bool test_In_Out(v_dw_3D All_Vector){
     }
   }
 }
+
+// ToDo write 2 func for return pos of Key_US and Pos of Key_Other
+// return the Scancode of for given VirtualKey of Other US
+KMX_DWORD get_position_From_VirtualKey_US(KMX_DWORD VK_US , v_dw_3D &All_Vector){
+  // find correct row of char in US
+  for( int i=0; i< (int)All_Vector[0].size()-1;i++) {
+    if ( ( All_Vector[0][i][1] == VK_US ) || ( All_Vector[0][i][2] == VK_US )) {
+    //if ( ( All_Vector[0][i][1] == VK_US ) ) {
+      //wprintf(L" VK_US= %i   .. i= %i  .. %i\t\t %i (%c) : %i (%c)  +++ %i\t\t %i (%c) : %i (%c)  \n",VK_US , i,
+     // All_Vector[0][i][0] , All_Vector[0][i][1] ,All_Vector[0][i][1] , All_Vector[0][i][2] , All_Vector[0][i][2],
+     //All_Vector[1][i][0] , All_Vector[1][i][1] ,All_Vector[1][i][1] , All_Vector[1][i][2] , All_Vector[1][i][2] );
+      return i;
+    }
+  }
+  return 0;    //_S2 what do I return if not found??
+}
+
+/*
+// _S2 where to put this??
+std::wstring  get_VirtualKey_US_from_iKey(KMX_DWORD iKey, ShiftState &ss, int &caps, v_dw_3D &All_Vector) {
+
+  int icaps;
+  KMX_DWORD pos = get_position_From_VirtualKey_US(iKey, All_Vector);
+
+  if (ss >9)
+    return L"";
+
+  if( ss < All_Vector[0][pos].size()-1) {
+  //if( ss < All_Vector[1][pos].size()-1) {   // _S2 numbers need this
+
+    if ( ss % 2 == 0)
+      icaps = ss+2-caps;
+
+    if ( ss % 2 == 1)
+      icaps = ss+caps;
+
+    return std::wstring(1, (int) All_Vector[0][pos][icaps]);
+     //return std::wstring(1, (int) All_Vector[1][pos][icaps]);
+  }
+  return L"";
+}
+*/
+
+
+int replace_PosKey_with_Keycode(std::string  in) {
+  int out = returnIfCharInvalid;
+
+// _S2 these are the Scancode-Values we use in Keyman ( = like the windows scancodes)
+
+  if      ( in == "key<TLDE>")    out = 49;            /* 0X              VK_  */  // TOASK correct ???
+  else if ( in == "key<AE01>")    out = 1;             /* 0X02            VK_1 */
+  else if ( in == "key<AE02>")    out = 2;             /* 0X03            VK_2  */
+  else if ( in == "key<AE03>")    out = 3;             /* 0X04            VK_3  */
+  else if ( in == "key<AE04>")    out = 4;             /* 0X05            VK_4  */
+  else if ( in == "key<AE05>")    out = 5;             /* 0X06            VK_5  */
+  else if ( in == "key<AE06>")    out = 6;             /* 0X07            VK_6  */
+  else if ( in == "key<AE07>")    out = 7;             /* 0X08            VK_7  */
+  else if ( in == "key<AE08>")    out = 8;             /* 0X09            VK_8  */
+  else if ( in == "key<AE09>")    out = 9;             /* 0X0A            VK_9  */
+  else if ( in == "key<AE10>")    out = 10;            /* 0X0B            VK_0  */
+  else if ( in == "key<AE11>")    out = 12;            /* 0X0C            VK_MINUS   */
+  else if ( in == "key<AE12>")    out = 13;            /* 0X0D            VK_EQUALS   */
+
+  else if ( in == "key<AD01>")    out = 16;            /* 0X10            VK_Q  */
+  else if ( in == "key<AD02>")    out = 17;            /* 0X11            VK_W  */
+  else if ( in == "key<AD03>")    out = 18;            /* 0X12            VK_E  */
+  else if ( in == "key<AD04>")    out = 19;            /* 0X13            VK_R  */
+  else if ( in == "key<AD05>")    out = 20;            /* 0X14            VK_T  */
+  else if ( in == "key<AD06>")    out = 21;            /* 0X15            VK_Y  */
+  else if ( in == "key<AD07>")    out = 22;            /* 0X16            VK_U  */
+  else if ( in == "key<AD08>")    out = 23;            /* 0X17            VK_I  */
+  else if ( in == "key<AD09>")    out = 24;            /* 0X18            VK_O  */
+  else if ( in == "key<AD10>")    out = 25;            /* 0X19            VK_P  */
+  else if ( in == "key<AD11>")    out = 26;            /* 0X1A            VK_LEFTBRACE  */
+  else if ( in == "key<AD12>")    out = 27;            /* 0X1B            VK_RIGHTBRACE  */
+
+  else if ( in == "key<AC01>")    out = 30;            /* 0X1E            VK_A  */
+  else if ( in == "key<AC02>")    out = 31;            /* 0X1F            VK_S  */
+  else if ( in == "key<AC03>")    out = 32;            /* 0X20            VK_D  */
+  else if ( in == "key<AC04>")    out = 33;            /* 0X21            VK_F  */
+  else if ( in == "key<AC05>")    out = 34;            /* 0X22            VK_G  */
+  else if ( in == "key<AC06>")    out = 35;            /* 0X23            VK_H  */
+  else if ( in == "key<AC07>")    out = 36;            /* 0X24            VK_J  */
+  else if ( in == "key<AC08>")    out = 37;            /* 0X25            VK_K  */
+  else if ( in == "key<AC09>")    out = 38;            /* 0X26            VK_L  */
+  else if ( in == "key<AC10>")    out = 39;            /* 0X27            VK_SEMICOLON  */
+  else if ( in == "key<AC11>")    out = 40;            /* 0X28            VK_APOSTROPHE  */
+  else if ( in == "key<AC12>")    out = 41;            /* 0X29            VK_GRAVE  */
+
+  else if ( in == "key<AB01>")    out = 44;            /* 0X2C            VK_Z  */
+  else if ( in == "key<AB02>")    out = 45;            /* 0X2D            VK_X  */
+  else if ( in == "key<AB03>")    out = 46;            /* 0X2E            VK_C  */
+  else if ( in == "key<AB04>")    out = 47;            /* 0X2F            VK_V  */
+  else if ( in == "key<AB05>")    out = 48;            /* 0X30            VK_B  */
+  else if ( in == "key<AB06>")    out = 49;            /* 0X31            VK_N  */
+  else if ( in == "key<AB07>")    out = 50;            /* 0X32            VK_M  */
+  else if ( in == "key<AB08>")    out = 51;            /* 0X33            VK_ COMMA */
+  else if ( in == "key<AB09>")    out = 52;            /* 0X34            VK_DOT  */
+  else if ( in == "key<AB10>")    out = 53;            /* 0X35            VK_SLASH  */
+  else if ( in == "key<BKSL>")    out = 54;            /* 0X36            VK_RIGHTSHIFT  */
+  else if ( in == "key<LSGT>")    out = 55;            /* 0X37            VK_RIGHTSHIFT  */
+  else if ( in == "key<SPCE>")    out = 65;            /* 0X20            VK_SPACE  */
+
+  return out;
+}
