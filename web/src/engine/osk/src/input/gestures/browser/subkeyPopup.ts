@@ -150,7 +150,7 @@ export default class SubkeyPopup {
       basePadding,
       // bottom: ensure the recognition zone includes the row of the base key.
       // basePadding is already negative, but bottomDistance isn't.
-      bottomDistance > basePadding ? -bottomDistance : basePadding
+      -bottomDistance < basePadding ? -bottomDistance : basePadding
     ]);
 
     const topContainer = vkbd.topContainer;
