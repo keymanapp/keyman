@@ -15,11 +15,6 @@ import {
 
 import { BANNER_GESTURE_SET } from './bannerGestureSet.js';
 
-import InputEventEngine, { InputEventEngineConfig } from '../input/event-interpreter/inputEventEngine.js';
-import MouseEventEngine from '../input/event-interpreter/mouseEventEngine.js';
-import TouchEventEngine from '../input/event-interpreter/touchEventEngine.js';
-import UITouchHandlerBase from '../input/event-interpreter/uiTouchHandlerBase.js';
-
 import { createUnselectableElement } from 'keyman/engine/dom-utils';
 
 // Base class for a banner above the keyboard in the OSK

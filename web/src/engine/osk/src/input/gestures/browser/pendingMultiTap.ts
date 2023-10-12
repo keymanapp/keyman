@@ -1,7 +1,7 @@
 import { Codes, KeyEvent } from '@keymanapp/keyboard-processor';
 import { type KeyElement } from '../../../keyElement.js';
 import VisualKeyboard from '../../../visualKeyboard.js';
-import PendingGesture from '../pendingGesture.interface.js';
+// import PendingGesture from '../pendingGesture.interface.js';
 
 export enum PendingMultiTapState { Waiting, Realized, Cancelled };
 /**
@@ -9,7 +9,7 @@ export enum PendingMultiTapState { Waiting, Realized, Cancelled };
  * (based on key id substring in the case of the shift key), within a
  * specified timeout period.
  */
-export default class PendingMultiTap implements PendingGesture {
+export default class PendingMultiTap /*implements PendingGesture*/ {
   public readonly vkbd: VisualKeyboard;
   public readonly baseKey: KeyElement;
   public readonly count: number;
