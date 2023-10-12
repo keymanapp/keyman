@@ -22,6 +22,7 @@ export type LayoutKey = {
   "nextlayer"?: string,
   "pad"?: string | number,
   "sk"?: LayoutKey[]
+  "default"?: boolean
 }
 
 export type LayoutRow = {

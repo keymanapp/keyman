@@ -6,6 +6,7 @@ export interface WebKeyboardMetadata {
   isRtl: boolean;
   isMnemonic: boolean;
   targets?: string;
+  hasTouchLayout: boolean;
 };
 
 /**
@@ -24,12 +25,14 @@ export function getCompiledWebKeyboardMetadata(js: string): WebKeyboardMetadata 
     const minverRegex = /this.KMINVER\s*=\s*([''"])(.*?)\1/;
     const rtlRegex =    /this.KRTL\s*=\s*(.*?)\s*;/;
     const mnemonicRegex = /this.KM\s*=\s*(.*?)\s*;/;
+    const touchLayoutRegex = /this.KVKL\s*=\s*{/;
 
     const name = nameRegex.exec(js);
     const kbver = kbverRegex.exec(js);
     const minver = minverRegex.exec(js);
     const rtl = rtlRegex.exec(js);
     const mnemonic = mnemonicRegex.exec(js);
+    const touchLayout = touchLayoutRegex.exec(js);
 
     const SKeymanVersion70 = '7.0';
 
@@ -38,6 +41,7 @@ export function getCompiledWebKeyboardMetadata(js: string): WebKeyboardMetadata 
       keyboardVersion: kbver ? kbver[2] : null,
       minKeymanVersion: minver ? minver[2] : SKeymanVersion70,
       isRtl: !!(rtl && rtl[1].match(/^(1|true)$/)),
-      isMnemonic: !!(mnemonic && mnemonic[1].match(/^(1|true)$/))
+      isMnemonic: !!(mnemonic && mnemonic[1].match(/^(1|true)$/)),
+      hasTouchLayout: !!touchLayout
     };
   }

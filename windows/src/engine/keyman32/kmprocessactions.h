@@ -30,7 +30,7 @@ BOOL ProcessActionsNonUpdatableParse(BOOL* emitKeyStroke);
  * This function processes the actions queued in the core processor in
  * the external event case. That is actions not caused by a keystroke but from selecting a
  * different keyboard for example.
- * Currently only KM_KBP_IT_CAPSLOCK and KM_KBP_IT_INVALIDATE_CONTEXT are processed.
+ * Currently only KM_CORE_IT_CAPSLOCK and KM_CORE_IT_INVALIDATE_CONTEXT are processed.
  *
  * @return BOOL  TRUE if actions were successfully processed
  */

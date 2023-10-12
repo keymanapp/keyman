@@ -24,7 +24,7 @@
  * @param  kp     keyboard info object with options to be updated
  * @param  state  core keyboard state used to update keyboard options
  */
-void LoadKeyboardOptionsRegistrytoCore(LPINTKEYBOARDINFO kp, km_kbp_state* state);
+void LoadKeyboardOptionsRegistrytoCore(LPINTKEYBOARDINFO kp, km_core_state* state);
 
 /**
  *  Saves the keyboard option to the windows registry

@@ -1,10 +1,8 @@
 {
-    "extends": "../../../tsconfig-base.json",
+    "extends": "../../../tsconfig.base.json",
     "compilerOptions": {
         "composite": true,
         "declaration": true,
-        "module": "es2020",
-        "moduleResolution": "node",
         "rootDir": ".",
         "outDir": "build/",
     },

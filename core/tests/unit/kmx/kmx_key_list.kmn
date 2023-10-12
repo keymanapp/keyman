@@ -1,4 +1,4 @@
-c Description: Tests multiple groups. This keyboard is used to test km_kbp_keyboard_get_key_list API call
+c Description: Tests multiple groups. This keyboard is used to test km_core_keyboard_get_key_list API call
 c keys: [K_1][K_2]
 c expected: abc
 c context:
