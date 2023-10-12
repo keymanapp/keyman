@@ -5,7 +5,7 @@
     { "path": "./common/models/templates/tsconfig.json" },
     { "path": "./common/models/types/tsconfig.json" },
     { "path": "./common/models/wordbreakers/tsconfig.json" },
-    { "path": "./common/predictive-text/tsconfig.json" },
+    { "path": "./common/predictive-text/tsconfig.all.json" },
     { "path": "./common/tools/hextobin/" },
 
     { "path": "./common/web/gesture-recognizer/tsconfig.json" },
