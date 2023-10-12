@@ -93,3 +93,4 @@ class GSettings():
         else:
             variant = self._convert_array_to_variant(value, type)
             self.schema.set_value(key, variant)
+            self.schema.sync()
