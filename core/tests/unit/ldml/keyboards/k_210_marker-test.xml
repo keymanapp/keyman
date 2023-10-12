@@ -7,13 +7,13 @@
       <startContext to="" />
       <keystroke key="e" />
       <keystroke key="grave" />
-      <check result="è" />
+      <check result="è" />
     </test>
     <test name="marker-test-basic-acute">
       <startContext to="" />
       <keystroke key="e" />
       <keystroke key="acute" />
-      <check result="é" />
+      <check result="é" />
     </test>
     <test name="marker-test-double-acute">
       <startContext to="" />
