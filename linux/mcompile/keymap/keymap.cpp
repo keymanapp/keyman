@@ -354,7 +354,7 @@ KMX_DWORD KeycodeMapped_inValue = All_Vector[0][i][0];
 KMX_DWORD resultOf_GETKEYVALS = getKeyvalsFromKeymap(keymap,All_Vector[0][i][0],0);
 KMX_DWORD resultOf_GETKEYVALS_shift = getKeyvalsFromKeymap(keymap,All_Vector[0][i][0],1);
 
-wprintf(L" inValue: %i -KeycodeMapped_inValue: %i,  resultOf_GETKEYVALS: %i ,  resultOf_GETKEYVALS_shift: %i     :   %d (US): -- %i (%c)  -- %i (%c) ---- (other): %i (%c)  --  %i(%c)    \n",inValue,KeycodeMapped_inValue,resultOf_GETKEYVALS,resultOf_GETKEYVALS_shift,(All_Vector[1][i][0]),All_Vector[0][i][1],All_Vector[0][i][1],All_Vector[0][i][2],All_Vector[0][i][2],All_Vector[1][i][1] ,All_Vector[1][i][1],All_Vector[1][i][2],All_Vector[1][i][2]);
+//wprintf(L" inValue: %i -KeycodeMapped_inValue: %i,  resultOf_GETKEYVALS: %i ,  resultOf_GETKEYVALS_shift: %i     :   %d (US): -- %i (%c)  -- %i (%c) ---- (other): %i (%c)  --  %i(%c)    \n",inValue,KeycodeMapped_inValue,resultOf_GETKEYVALS,resultOf_GETKEYVALS_shift,(All_Vector[1][i][0]),All_Vector[0][i][1],All_Vector[0][i][1],All_Vector[0][i][2],All_Vector[0][i][2],All_Vector[1][i][1] ,All_Vector[1][i][1],All_Vector[1][i][2],All_Vector[1][i][2]);
 
 
 
@@ -477,7 +477,7 @@ KMX_DWORD get_VirtualKey_Other_From_SC(KMX_DWORD SC , v_dw_3D &All_Vector){
       if( SC < 65) {
         //  values for numbers  are stored in column All_Vector[1][i][ 1 ]
         if ( All_Vector[k][i][0] == SC ) {
-          wprintf(L" SC= %i   .. i= %i  .. %i:\t\t %i(%c)   (%i (%c) : %i (%c) ) --- \n",SC , i,  All_Vector[k][i][0] , All_Vector[k][i][1] ,All_Vector[k][i][2],All_Vector[k][i][2] ,All_Vector[k][i][1] , All_Vector[k][i][2] , All_Vector[k][i][2]   ); 
+          //wprintf(L" SC= %i   .. i= %i  .. %i:\t\t %i(%c)   (%i (%c) : %i (%c) ) --- \n",SC , i,  All_Vector[k][i][0] , All_Vector[k][i][1] ,All_Vector[k][i][2],All_Vector[k][i][2] ,All_Vector[k][i][1] , All_Vector[k][i][2] , All_Vector[k][i][2]   ); 
           KMX_DWORD returnval= All_Vector[k][i][1];
           // we could return All_Vector[0][i][1]; since win version uses US numbers here
           return All_Vector[k][i][1];
@@ -486,7 +486,7 @@ KMX_DWORD get_VirtualKey_Other_From_SC(KMX_DWORD SC , v_dw_3D &All_Vector){
       else {
       // shifted values e.g. "Q" (=81) are stored in column All_Vector[1][i][ 2 ]
       if  ( All_Vector[k][i][0] == SC ) {
-        wprintf(L" SC= %i   .. i= %i  .. %i:\t\t %i(%c)   (%i (%c) : %i (%c) ) --- \n",SC , i,  All_Vector[k][i][0] , All_Vector[k][i][1] ,All_Vector[1][i][2],All_Vector[1][i][2] ,All_Vector[k][i][1] , All_Vector[k][i][2] , All_Vector[k][i][2]   ); 
+        //wprintf(L" SC= %i   .. i= %i  .. %i:\t\t %i(%c)   (%i (%c) : %i (%c) ) --- \n",SC , i,  All_Vector[k][i][0] , All_Vector[k][i][1] ,All_Vector[1][i][2],All_Vector[1][i][2] ,All_Vector[k][i][1] , All_Vector[k][i][2] , All_Vector[k][i][2]   ); 
         KMX_DWORD returnval= All_Vector[1][i][2];
         return All_Vector[1][i][2];
         }

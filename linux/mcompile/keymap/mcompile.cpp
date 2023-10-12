@@ -313,7 +313,6 @@ int createOneVectorFromBothKeyboards(v_dw_3D &All_Vector,GdkKeymap *keymap){
 
 KMX_BOOL KMX_DoConvert(LPKMX_KEYBOARD kbd, PKMX_WCHAR kbid, KMX_BOOL bDeadkeyConversion, gint argc, gchar *argv[]) {
 
-  wprintf(L"\n##### KMX_DoConvert of mcompile started #####\n");
   KMX_WCHAR DeadKey;
 
   if(!KMX_SetKeyboardToPositional(kbd)) return FALSE;
@@ -403,7 +402,6 @@ KMX_BOOL KMX_DoConvert(LPKMX_KEYBOARD kbd, PKMX_WCHAR kbid, KMX_BOOL bDeadkeyCon
       }
     }
   }
-wprintf(L"\n##### KMX_ReportUnconvertedKeyboardRules of mcompile will start #####\n");
 
   KMX_ReportUnconvertedKeyboardRules(kbd);
 
@@ -413,8 +411,6 @@ wprintf(L"\n##### KMX_ReportUnconvertedKeyboardRules of mcompile will start ####
   if(!KMX_ImportRules(kbid, kbd, All_Vector, &KMX_FDeadkeys, bDeadkeyConversion)) {   // I4353   // I4552
     return FALSE;
   }
-
-  wprintf(L"\n##### KMX_DoConvert of mcompile ended #####\n");
   return TRUE;
 }
 
@@ -435,7 +431,6 @@ void KMX_LogError(const KMX_WCHART* m1,int m2, LPKMX_KEY key) {
 //
 void KMX_TranslateKey(LPKMX_KEY key, KMX_WORD vk, KMX_UINT shift, KMX_WCHAR ch) {
 
-  //wprintf(L"\n     ##### KMX_TranslateKey of mcompile started #### with vk: %i (%c) shift: %i ch: %i (%c)......" , vk,vk, shift, ch,ch);
   // The weird LCTRL+RALT is Windows' way of mapping the AltGr key.
   // We store that as just RALT, and use the option "Simulate RAlt with Ctrl+Alt"
   // to provide an alternate..
@@ -464,31 +459,22 @@ void KMX_TranslateKey(LPKMX_KEY key, KMX_WORD vk, KMX_UINT shift, KMX_WCHAR ch) 
 //wprintf(L"key->ShiftFlags for VIRTUALCHARKEY=  %i", key->ShiftFlags);
     //wprintf(L"     2 and changed, vk: %i (%c) --->  %i (%c) ", vk,vk, ch,ch);
   }
-
-  //wprintf(L"\n     ##### KMX_TranslateKey of mcompile ended ##### \n");
-  //wprintf(L"key->ShiftFlags: %i, key->Key: %i\n", key->ShiftFlags,key->Key);
 }
 
 void KMX_TranslateGroup(LPKMX_GROUP group, KMX_WORD vk, KMX_UINT shift, KMX_WCHAR ch) {
 
-  //wprintf(L"\n   ##### KMX_TranslateGroup of mcompile started #####\n");
   for(unsigned int i = 0; i < group->cxKeyArray; i++) {
     KMX_TranslateKey(&group->dpKeyArray[i], vk, shift, ch);
   }
-
-  //wprintf(L"   ##### KMX_TranslateGroup of mcompile ended #####\n");
 }
 
 void KMX_TranslateKeyboard(LPKMX_KEYBOARD kbd, KMX_WORD vk, KMX_UINT shift, KMX_WCHAR ch) {
-  //wprintf(L"\n ##### KMX_TranslateKeyboard of mcompile started #####\n");
 //if((shift & (LCTRLFLAG|RALTFLAG)) == (LCTRLFLAG|RALTFLAG)){
-  //wprintf(L"     ##### KMX_TranslateKeyboard of mcompile started #### with vk: %i (%c) shift: %i ch: %i (%c)......(shift & (LCTRLFLAG|RALTFLAG)) %i == (LCTRLFLAG|RALTFLAG)%i): %i \n" , vk,vk, shift, ch,ch,  (shift & (LCTRLFLAG|RALTFLAG)) , (LCTRLFLAG|RALTFLAG),  (shift & (LCTRLFLAG|RALTFLAG))  == (LCTRLFLAG|RALTFLAG));
   for(unsigned int i = 0; i < kbd->cxGroupArray; i++) {
     if(kbd->dpGroupArray[i].fUsingKeys) {
       KMX_TranslateGroup(&kbd->dpGroupArray[i], vk, shift, ch);
     }
   }
-  //wprintf(L" ##### KMX_TranslateKeyboard of mcompile ended #####\n");
 }
 
 void KMX_ReportUnconvertedKeyRule(LPKMX_KEY key) {
@@ -504,21 +490,17 @@ void KMX_ReportUnconvertedKeyRule(LPKMX_KEY key) {
 }
 
 void KMX_ReportUnconvertedGroupRules(LPKMX_GROUP group) {
-  wprintf(L"\n ##### KMX_ReportUnconvertedGroupRules of mcompile started #####\n");
   for(unsigned int i = 0; i < group->cxKeyArray; i++) {
     KMX_ReportUnconvertedKeyRule(&group->dpKeyArray[i]);
   }
-  wprintf(L"\n ##### KMX_ReportUnconvertedGroupRules of mcompile ended #####\n");
 }
 
 void KMX_ReportUnconvertedKeyboardRules(LPKMX_KEYBOARD kbd) {
-  wprintf(L"\n ##### KMX_ReportUnconvertedKeyboardRules of mcompile started #####\n");
   for(unsigned int i = 0; i < kbd->cxGroupArray; i++) {
     if(kbd->dpGroupArray[i].fUsingKeys) {
       KMX_ReportUnconvertedGroupRules(&kbd->dpGroupArray[i]);
     }
   }
-  wprintf(L"\n ##### KMX_ReportUnconvertedKeyboardRules of mcompile ended #####\n");
 }
 
 

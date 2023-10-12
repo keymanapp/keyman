@@ -623,7 +623,6 @@ std::wstring  get_VirtualKey_Other_from_iKey(KMX_DWORD iKey, ShiftState &ss, int
 }
 
 bool KMX_ImportRules(KMX_WCHAR *kbid, LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector,std::vector<KMX_DeadkeyMapping> *FDeadkeys, KMX_BOOL bDeadkeyConversion) {   // I4353   // I4552
- wprintf(L"\n ##### KMX_ImportRules of mc_import_rules started #####\n");
   KMX_Loader loader;
   const size_t BUF_sz= 256;
 
@@ -728,8 +727,7 @@ bool KMX_ImportRules(KMX_WCHAR *kbid, LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector,std
           std::wstring VK_Other = get_VirtualKey_Other_from_iKey(mapped_ikey, ss, caps, All_Vector);
 
           //std::wstring VK_Other = get_VirtualKey_Other_from_iKey(iKey, ss, caps, All_Vector);
-          wprintf(L"ikey : %i (mapped to %i ) SS (%i)  caps(%i) ----> returns  %s (%i)\n",
-          iKey, mapped_ikey , ss, caps, VK_Other.c_str(), (int) *( VK_Other.c_str()));
+          //wprintf(L"ikey : %i (mapped to %i ) SS (%i)  caps(%i) ----> returns  %s (%i)\n",          iKey, mapped_ikey , ss, caps, VK_Other.c_str(), (int) *( VK_Other.c_str()));
 
           //_S2 TODO
           //do I need that ??
@@ -976,8 +974,5 @@ wprintf(L"Results for %i: %s, %s, %s, %s   \n", zz, rgKey[zz]->KMX_GetShiftState
       kkp++;
     }
   }
-
-
-wprintf(L"\n ##### KMX_ImportRules of mc_import_rules ended #####\n");
 return true;
 }
