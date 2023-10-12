@@ -235,98 +235,17 @@ ldml_processor::process_event(
     default:
     // all other VKs
       {
-        UErrorCode status = U_ZERO_ERROR;
         // Look up the key
-        std::u16string str = keys.lookup(vk, modifier_state);
+        const std::u16string key_str = keys.lookup(vk, modifier_state);
 
-        ldml::normalize_nfd(str, status);
-        assert(U_SUCCESS(status));
-        if (str.empty()) {
+        if (key_str.empty()) {
           // no key was found, so pass the keystroke on to the Engine
           state->actions().push_invalidate_context();
           state->actions().push_emit_keystroke();
           break; // ----- commit and exit
         }
 
-        // found a string - push it into the context and actions
-        // we convert it here instead of using the emit_text() overload
-        // so that we don't have to reconvert it inside the transform code.
-        std::u32string str32 = kmx::u16string_to_u32string(str);
-
-        if (!transforms) {
-          // No transforms: just emit the string.
-          emit_text(state, str32);
-        } else {
-          // Process transforms here
-          /**
-           * a copy of the current/changed context, for transform use.
-           *
-           */
-          std::u32string ctxtstr;
-          (void)context_to_string(state, ctxtstr);
-          // add the newly added key output to ctxtstr
-          ctxtstr.append(str32);
-          // and normalize
-          ldml::normalize_nfd(ctxtstr, status);
-          assert(U_SUCCESS(status));
-
-          /** the output buffer for transforms */
-          std::u32string outputString;
-
-          // apply the transform, get how much matched (at the end)
-          const size_t matchedContext = transforms->apply(ctxtstr, outputString);
-
-          ldml::normalize_nfd(outputString, status);
-          assert(U_SUCCESS(status));
-
-          if (matchedContext == 0) {
-            // No match, just emit the original string
-            emit_text(state, str32);
-          } else {
-            // We have a match.
-
-            ctxtstr.resize(ctxtstr.length() - str32.length());
-            /** how many chars of the context we need to clear */
-            auto charsToDelete = matchedContext - str32.length(); /* we don't need to clear the output of the current key */
-
-            /** how many context items need to be removed */
-            size_t contextRemoved = 0;
-            for (auto c = state->context().rbegin(); charsToDelete > 0 && c != state->context().rend(); c++, contextRemoved++) {
-              /** last char of context */
-              km_core_usv lastCtx = ctxtstr.back();
-              uint8_t type = c->type;
-              assert(type == KM_CORE_BT_CHAR || type == KM_CORE_BT_MARKER);
-              if (type == KM_CORE_BT_CHAR) {
-                // single char, drop it
-                charsToDelete--;
-                assert(c->character == lastCtx);
-                ctxtstr.pop_back();
-                state->actions().push_backspace(KM_CORE_BT_CHAR, lastCtx);  // Cause prior char to be removed
-              } else if (type == KM_CORE_BT_MARKER) {
-                // it's a marker, 'worth' 3 uchars
-                assert(charsToDelete >= 3);
-                assert(lastCtx == c->marker); // end of list
-                charsToDelete -= 3;
-                // pop off the three-part sentinel string
-                ctxtstr.pop_back();
-                ctxtstr.pop_back();
-                ctxtstr.pop_back();
-                // push a special backspace to delete the marker
-                state->actions().push_backspace(KM_CORE_BT_MARKER, c->marker);
-              }
-            }
-            // now, pop the right number of context items
-            for (size_t i = 0; i < contextRemoved; i++) {
-              // we don't pop during the above loop because the iterator gets confused
-              state->context().pop_back();
-            }
-            // Now, add in the updated text. This will convert UC_SENTINEL, etc back to marker actions.
-            emit_text(state, outputString);
-            // If we needed it further. we could update ctxtstr here:
-            //    ctxtstr.append(outputString);
-            // ... but it is no longer needed at this point.
-          } // end of transform match
-        } // end of processing transforms
+        process_key_string(state, key_str);
       } // end of processing a 'normal' vk
     } // end of switch
     // end of normal processing: commit and exit
@@ -337,6 +256,85 @@ ldml_processor::process_event(
   }
 
   return KM_CORE_STATUS_OK;
+}
+
+void
+ldml_processor::process_key_string(km_core_state *state, const std::u16string &key_str) const {
+  // found a string - push it into the context and actions
+  // we convert it here instead of using the emit_text() overload
+  // so that we don't have to reconvert it inside the transform code.
+  std::u32string str32 = kmx::u16string_to_u32string(key_str);
+
+  if (!transforms) {
+    // No transforms: just emit the string.
+    emit_text(state, str32);
+  } else {
+    // Process transforms here
+    /**
+     * a copy of the current/changed context, for transform use.
+     *
+     */
+    std::u32string ctxtstr;
+    (void)context_to_string(state, ctxtstr);
+    // add the newly added key output to ctxtstr
+    ctxtstr.append(str32);
+    // and normalize
+
+    /** the output buffer for transforms */
+    std::u32string outputString;
+
+    // apply the transform, get how much matched (at the end)
+    const size_t matchedContext = transforms->apply(ctxtstr, outputString);
+
+
+    if (matchedContext == 0) {
+      // No match, just emit the original string
+      emit_text(state, str32);
+    } else {
+      // We have a match.
+
+      ctxtstr.resize(ctxtstr.length() - str32.length());
+      /** how many chars of the context we need to clear */
+      auto charsToDelete = matchedContext - str32.length(); /* we don't need to clear the output of the current key */
+
+      /** how many context items need to be removed */
+      size_t contextRemoved = 0;
+      for (auto c = state->context().rbegin(); charsToDelete > 0 && c != state->context().rend(); c++, contextRemoved++) {
+        /** last char of context */
+        km_core_usv lastCtx = ctxtstr.back();
+        uint8_t type        = c->type;
+        assert(type == KM_CORE_BT_CHAR || type == KM_CORE_BT_MARKER);
+        if (type == KM_CORE_BT_CHAR) {
+          // single char, drop it
+          charsToDelete--;
+          assert(c->character == lastCtx);
+          ctxtstr.pop_back();
+          state->actions().push_backspace(KM_CORE_BT_CHAR, c->character);  // Cause prior char to be removed
+        } else if (type == KM_CORE_BT_MARKER) {
+          // it's a marker, 'worth' 3 uchars
+          assert(charsToDelete >= 3);
+          assert(lastCtx == c->marker);  // end of list
+          charsToDelete -= 3;
+          // pop off the three-part sentinel string
+          ctxtstr.pop_back();
+          ctxtstr.pop_back();
+          ctxtstr.pop_back();
+          // push a special backspace to delete the marker
+          state->actions().push_backspace(KM_CORE_BT_MARKER, c->marker);
+        }
+      }
+      // now, pop the right number of context items
+      for (size_t i = 0; i < contextRemoved; i++) {
+        // we don't pop during the above loop because the iterator gets confused
+        state->context().pop_back();
+      }
+      // Now, add in the updated text. This will convert UC_SENTINEL, etc back to marker actions.
+      emit_text(state, outputString);
+      // If we needed it further. we could update ctxtstr here:
+      //    ctxtstr.append(outputString);
+      // ... but it is no longer needed at this point.
+    }  // end of transform match
+  }    // end of processing transforms
 }
 
 km_core_attr const & ldml_processor::attributes() const {
