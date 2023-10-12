@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 17.0.190 alpha 2023-10-12
+
+* chore(web): web build streamlining (#9743)
+* chore(linux): Add code coverage reports for keyman-config and keyman-system-service (#9753)
+
 ## 17.0.189 alpha 2023-10-11
 
 * refactor(linux): Use auto cleanup (and fix some memory leaks) (#9648)
