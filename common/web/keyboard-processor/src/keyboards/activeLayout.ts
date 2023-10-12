@@ -241,8 +241,6 @@ class ActiveKeyBase {
     aKey.displayLayer = displayLayer;
     aKey.layer = aKey.layer || displayLayer;
 
-    aKey.default = (key as LayoutSubKey).default;
-
     // Compute the key's base KeyEvent properties for use in future event generation
     aKey.constructBaseKeyEvent(keyboard, layout, displayLayer);
   }
