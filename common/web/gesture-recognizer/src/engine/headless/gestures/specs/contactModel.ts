@@ -57,12 +57,6 @@ export interface ContactModel<Type> {
    * Is needed to define whether or not the contact-point should be ignored by this gesture type.
    * If undefined, defaults to () => true.
    *
-   * Param 2 allows use of the ongoing sequence's properties to provide further filtering;
-   * this is needed by KMW's OSK to determine the base key for a multitouch.
-   *
-   * Param 4 should prove useful in the future for multitouch gestures dependent upon relative
-   * location of the touches involved, such as caret-panning.
-   *
    * @param incomingSample   The first input sample of the path to be modeled.
    * @param comparisonSample The most recent sample related to the same gesture component, if one exists.
    *                         May be `null`.
