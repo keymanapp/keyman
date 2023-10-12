@@ -3,6 +3,18 @@ import EventEmitter from 'eventemitter3';
 import { DeviceSpec } from '@keymanapp/web-utils';
 import { Keyboard, KeyboardProperties } from '@keymanapp/keyboard-processor';
 import { type PredictionContext } from '@keymanapp/input-processor';
+
+
+import {
+  GestureRecognizer,
+  GestureRecognizerConfiguration,
+  GestureSource,
+  InputSample,
+  PaddedZoneSource
+} from '@keymanapp/gesture-recognizer';
+
+import { BANNER_GESTURE_SET } from './bannerGestureSet.js';
+
 import InputEventEngine, { InputEventEngineConfig } from '../input/event-interpreter/inputEventEngine.js';
 import MouseEventEngine from '../input/event-interpreter/mouseEventEngine.js';
 import TouchEventEngine from '../input/event-interpreter/touchEventEngine.js';
@@ -49,7 +61,7 @@ export abstract class Banner {
    * @return       {boolean}   true if the banner styling changed
    * Description   Update the height and display styling of the banner
    */
-  private update() : boolean {
+  protected update() : boolean {
     let ds = this.div.style;
     let currentHeightStyle = ds.height;
     let currentDisplayStyle = ds.display;
@@ -233,6 +245,18 @@ export class BannerSuggestion {
     this.display = display;
   }
 
+  public highlight(on: boolean) {
+    const elem = this.div;
+    let classes = elem.className;
+    let cs = ' ' + SuggestionBanner.TOUCHED_CLASS;
+
+    if(on && classes.indexOf(cs) < 0) {
+      elem.className=classes+cs;
+    } else {
+      elem.className=classes.replace(cs,'');
+    }
+  }
+
   public isEmpty(): boolean {
     return !this._suggestion;
   }
@@ -287,7 +311,9 @@ export class SuggestionBanner extends Banner {
   private options : BannerSuggestion[] = [];
   private hostDevice: DeviceSpec;
 
-  private manager: SuggestionInputManager;
+  private gestureEngine: GestureRecognizer<BannerSuggestion>;
+
+  // private manager: SuggestionInputManager;
 
   private _predictionContext: PredictionContext;
 
@@ -302,10 +328,10 @@ export class SuggestionBanner extends Banner {
 
     this.buildInternals(false);
 
-    this.manager = new SuggestionInputManager(this.getDiv());
-    this.events = this.manager.events;
+    // this.manager = new SuggestionInputManager(this.getDiv());
+    this.events = new EventEmitter<SuggestionInputEventMap>(); //this.manager.events;
 
-    this.setupInputHandling();
+    this.gestureEngine = this.setupInputHandling();
   }
 
   buildInternals(rtl: boolean) {
@@ -342,34 +368,119 @@ export class SuggestionBanner extends Banner {
     }
   }
 
-  private setupInputHandling() {
-    let inputEngine: InputEventEngine;
-    if(this.hostDevice.touchable) { //  /*&& ('ontouchstart' in window)*/ // Except Chrome emulation doesn't set this.
-      // Not to mention, it's rather redundant.
-      inputEngine = this.touchEventConfig;
-    } else {
-      inputEngine = this.mouseEventConfig;
+  private setupInputHandling(): GestureRecognizer<BannerSuggestion> {
+
+    const findTargetFrom = (e: HTMLElement): HTMLDivElement => {
+    try {
+      if(e) {
+        if(e.classList.contains('kmw-suggest-option')) {
+          return e as HTMLDivElement;
+        }
+        if(e.parentElement && e.parentElement.classList.contains('kmw-suggest-option')) {
+          return e.parentElement as HTMLDivElement;
+        }
+      }
+    } catch(ex) {}
+      return null;
     }
 
-    inputEngine.registerEventHandlers();
+    const config: GestureRecognizerConfiguration<BannerSuggestion> = {
+      targetRoot: this.getDiv(),
+      maxRoamingBounds: new PaddedZoneSource(this.getDiv(), [-0.333 * this.height]),
+      // touchEventRoot:  this.element, // is the default
+      itemIdentifier: (sample, target: HTMLElement) => {
+        let bestMatch: BannerSuggestion = null;
+        let bestDist = Number.MAX_VALUE;
 
-    this.manager.events.on('highlight', (suggestion, on) => {
-      const elem = suggestion.div;
-      let classes = elem.className;
-      let cs = ' ' + SuggestionBanner.TOUCHED_CLASS;
+        for(let i = 0; i < this.options.length; i++) {
+          const option = this.options[i];
+          const optionBounding = option.div.getBoundingClientRect();
 
-      if(on && classes.indexOf(cs) < 0) {
-        elem.className=classes+cs;
-      } else {
-        elem.className=classes.replace(cs,'');
+          if(optionBounding.left <= sample.clientX && sample.clientX < optionBounding.right) {
+            return option;
+          } else {
+            const dist = (sample.clientX < optionBounding.left ? -1 : 1) * (sample.clientX - optionBounding.left);
+
+            if(dist < bestDist) {
+              bestDist = dist;
+              bestMatch = option;
+            }
+          }
+        }
+
+        return bestMatch;
       }
+    };
+
+    const engine = new GestureRecognizer<BannerSuggestion>(BANNER_GESTURE_SET, config);
+
+    const sourceTracker: {
+      source: GestureSource<BannerSuggestion>,
+      roamingHighlightHandler: (sample: InputSample<BannerSuggestion>) => void,
+      suggestion: BannerSuggestion
+    } = {
+      source: null,
+      roamingHighlightHandler: null,
+      suggestion: null
+    };
+
+    engine.on('inputstart', (source) => {
+      // The banner does not support multi-touch - if one is still current, block all others.
+      if(sourceTracker.source) {
+        source.terminate(true);
+        return;
+      }
+
+      sourceTracker.source = source;
+      sourceTracker.roamingHighlightHandler = (sample) => {
+          // Maintain highlighting
+          const suggestion = sample.item;
+
+          if(suggestion != sourceTracker.suggestion) {
+            sourceTracker.suggestion.highlight(false);
+            suggestion.highlight(true);
+            sourceTracker.suggestion = suggestion;
+          }
+        };
+      sourceTracker.suggestion = source.currentSample.item
+
+
+      source.currentSample.item.highlight(true);
+
+      const terminationHandler = () => {
+        sourceTracker.suggestion.highlight(false);
+        sourceTracker.source = null;
+        sourceTracker.roamingHighlightHandler = null;
+        sourceTracker.suggestion = null;
+      }
+
+      source.path.on('complete', terminationHandler);
+      source.path.on('invalidated', terminationHandler);
+      source.path.on('step', sourceTracker.roamingHighlightHandler);
     });
 
-    this.manager.events.on('apply', (option) => {
-      if(this.predictionContext) {
-        this.predictionContext.accept(option.suggestion);
-      }
+    engine.on('recognizedgesture', (sequence) => {
+      // The actual result comes in via the sequence's `stage` event.
+      sequence.once('stage', (result) => {
+        const suggestion = result.item; // Should also == sourceTracker.suggestion.
+        if(suggestion) {
+          this.predictionContext.accept(suggestion.suggestion);
+        }
+      });
     });
+
+    return engine;
+  }
+
+  protected update() {
+    const result = super.update();
+
+    // Ensure the banner's extended recognition zone is based on proper, up-to-date layout info.
+    // Note:  during banner init, `this.gestureEngine` may only be defined after
+    // the first call to this setter!
+    (this.gestureEngine?.config.maxRoamingBounds as PaddedZoneSource)?.updatePadding([-0.333 * this.height]);
+
+    return result;
   }
 
   public configureForKeyboard(keyboard: Keyboard, keyboardProperties: KeyboardProperties) {
@@ -387,36 +498,6 @@ export class SuggestionBanner extends Banner {
 
     this.options.forEach((option) => option.matchKeyboardProperties(keyboardProperties));
     this.onSuggestionUpdate(this.currentSuggestions); // restore suggestions
-  }
-
-  private get mouseEventConfig() {
-    const config: InputEventEngineConfig = {
-      targetRoot: this.getDiv(),
-      // document.body is the event root b/c we need to track the mouse if it leaves
-      // the VisualKeyboard's hierarchy.
-      eventRoot: document.body,
-      inputStartHandler: this.manager.touchStart.bind(this.manager),
-      inputMoveHandler:  this.manager.touchMove.bind(this.manager),
-      inputEndHandler:   this.manager.touchEnd.bind(this.manager),
-      coordConstrainedWithinInteractiveBounds: function() { return true; }
-    };
-
-    return new MouseEventEngine(config);
-  }
-
-  private get touchEventConfig() {
-    const config: InputEventEngineConfig = {
-      targetRoot: this.getDiv(),
-      // document.body is the event root b/c we need to track the mouse if it leaves
-      // the VisualKeyboard's hierarchy.
-      eventRoot: this.getDiv(),
-      inputStartHandler: this.manager.touchStart.bind(this.manager),
-      inputMoveHandler:  this.manager.touchMove.bind(this.manager),
-      inputEndHandler:   this.manager.touchEnd.bind(this.manager),
-      coordConstrainedWithinInteractiveBounds: function() { return true; }
-    };
-
-    return new TouchEventEngine(config);
   }
 
   public get predictionContext(): PredictionContext {
@@ -454,117 +535,4 @@ interface SuggestionInputEventMap {
   highlight: (bannerSuggestion: BannerSuggestion, state: boolean) => void,
   apply: (bannerSuggestion: BannerSuggestion) => void;
   hold: (bannerSuggestion: BannerSuggestion) => void;
-}
-
-class SuggestionInputManager extends UITouchHandlerBase<HTMLDivElement> {
-  public readonly events = new EventEmitter<SuggestionInputEventMap>();
-
-  private eventDisablePromise: Promise<any>;
-
-  platformHold: (suggestion: BannerSuggestion, isCustom: boolean) => void;
-
-  //#region Touch handling implementation
-  findTargetFrom(e: HTMLElement): HTMLDivElement {
-    try {
-      if(e) {
-        if(e.classList.contains('kmw-suggest-option')) {
-          return e as HTMLDivElement;
-        }
-        if(e.parentElement && e.parentElement.classList.contains('kmw-suggest-option')) {
-          return e.parentElement as HTMLDivElement;
-        }
-        // if(e.firstChild && util.hasClass(<HTMLElement> e.firstChild,'kmw-suggest-option')) {
-        //   return e.firstChild as HTMLDivElement;
-        // }
-      }
-    } catch(ex) {}
-    return null;
-  }
-
-  protected highlight(t: HTMLDivElement, on: boolean): void {
-    let suggestion = t['suggestion'] as BannerSuggestion;
-
-    // Never highlight an empty suggestion button.
-    if(suggestion.isEmpty()) {
-      on = false;
-    }
-
-    this.events.emit('highlight', suggestion, on);
-  }
-
-  protected select(t: HTMLDivElement): void {
-    this.events.emit('apply', t['suggestion'] as BannerSuggestion);
-  }
-
-  //#region Long-press support
-  protected hold(t: HTMLDivElement): void {
-    // let suggestionObj = t['suggestion'] as BannerSuggestion;
-    //
-    // // Is this the <keep> suggestion?  It's never in this.currentSuggestions, so check against that.
-    // let isCustom = this.currentSuggestions.indexOf(suggestionObj.suggestion) == -1;
-
-    this.events.emit('hold', t['suggestion'] as BannerSuggestion);
-  }
-  protected clearHolds(): void {
-    // Temp, pending implementation of suggestion longpress submenus
-    // - nothing to clear without them -
-
-    // only really used in native-KMW
-  }
-
-  protected hasModalPopup(): boolean {
-    return this.eventsBlocked;
-  }
-
-  protected dealiasSubTarget(target: HTMLDivElement): HTMLDivElement {
-    return target;
-  }
-
-  protected hasSubmenu(t: HTMLDivElement): boolean {
-    // Temp, pending implementation of suggestion longpress submenus
-
-    // Only really used by native-KMW - see kmwnative's highlightSubKeys func.
-    return false;
-  }
-
-  protected isSubmenuActive(): boolean {
-    // Temp, pending implementation of suggestion longpress submenus
-
-    // Utilized only by native-KMW - it parallels hasModalPopup() in purpose.
-    return false;
-  }
-
-  protected displaySubmenuFor(target: HTMLDivElement) {
-    // Utilized only by native-KMW to show submenus.
-    throw new Error("Method not implemented.");
-  }
-  //#endregion
-  //#endregion
-
-  public get eventsBlocked(): boolean {
-    return !!this.eventDisablePromise;
-  }
-
-  /**
-   * Intended for use by the mobile apps, which sometimes 'takes over' touch handling.
-   * For such cases, input should be blocked within KMW when the apps are managing an
-   * ongoing touch-hold for any other interaction.
-   *
-   * Formerly:
-  ```
-  let keyman = com.keyman.singleton;
-  return keyman['osk'].vkbd.subkeyGesture && keyman.isEmbedded;
-  ```
-   */
-  public temporarilyBlockEvents(promise: Promise<void>) { // TODO:  ensure connection for embedded mode!
-    this.eventDisablePromise = promise;                   // Will require routing; this class is not exported!
-    promise.finally(() => {
-      this.eventDisablePromise = null;
-    })
-  }
-
-  constructor(div: HTMLElement) {
-    // TODO:  Determine appropriate CSS styling names, etc.
-    super(div, Banner.BANNER_CLASS, SuggestionBanner.TOUCHED_CLASS);
-  }
 }
