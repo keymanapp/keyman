@@ -282,6 +282,7 @@
       "command": "${workspaceFolder}/linux/keyman-system-service/build.sh",
       "args": [
         "--debug",
+        "--coverage",
         "configure"
       ],
       "options": {
@@ -299,13 +300,30 @@
       "command": "${workspaceFolder}/linux/keyman-system-service/build.sh",
       "args": [
         "--debug",
-        "test:arch"
+        "test"
       ],
       "problemMatcher": [
         "$gcc"
       ],
       "group": "test",
       "detail": "run tests for keyman-system-service"
+    },
+    {
+      "type": "shell",
+      "label": "keyman-system-service: report",
+      "command": "${workspaceFolder}/linux/keyman-system-service/build.sh",
+      "args": [
+        "test",
+        "--report",
+        "--debug",
+        "--coverage",
+        "--no-integration",
+      ],
+      "problemMatcher": [
+        "$gcc"
+      ],
+      "group": "test",
+      "detail": "run tests and create unit test coverage report"
     },
   ]
 }
