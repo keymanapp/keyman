@@ -17,6 +17,10 @@ copyredist-desktop:
   copy /Y keymandesktop.exe $(ROOT)\release\$Version\keyman-$Version.exe
   copy /Y $(ROOT)\bin\desktop\setup.exe $(ROOT)\release\$Version\setup.exe
 
+  $(SIGCHECK) $(ROOT)\release\$Version\* > sig1
+  $(VERIFY_SIGNATURES) < sig1
+  -del sig1
+
 # Copy the unsigned setup.exe for use in bundling scenarios; zip it up for clarity
   $(WZZIP) $(ROOT)\release\$Version\setup-redist.zip $(ROOT)\bin\desktop\setup-redist.exe
 
@@ -63,3 +67,15 @@ candle-locale:
 # locale files are in desktop/locale/*
   $(WIXHEAT) dir ..\kmshell\locale -o locale.wxs -ag -cg Locale -dr INSTALLDIR -var var.LOCALESOURCE -wx -nologo
   $(WIXCANDLE) -dVERSION=$VersionWin -dRELEASE=$VersionRelease -dPRODUCTID=$GUID1 -dLOCALESOURCE=..\kmshell\locale locale.wxs
+
+#
+# Build setup.inf
+#
+
+setup-inf:
+  echo [Setup] > setup.inf
+  echo Version=$VersionWin >> setup.inf
+  echo MSIFileName=keymandesktop.msi >> setup.inf
+  echo MSIOptions= >> setup.inf
+  echo License=license.html >> setup.inf
+  echo [Packages] >> setup.inf

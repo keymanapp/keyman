@@ -682,8 +682,8 @@ struct COMP_KMXPLUS_USET_USET {
 };
 
 struct COMP_KMXPLUS_USET_RANGE {
-  km_kbp_usv start;
-  km_kbp_usv end;
+  km_core_usv start;
+  km_core_usv end;
   public:
     COMP_KMXPLUS_USET_RANGE(const COMP_KMXPLUS_USET_RANGE& other);
     COMP_KMXPLUS_USET_RANGE(KMX_DWORD start, KMX_DWORD end);
@@ -701,7 +701,7 @@ class SimpleUSet {
     /** empty set */
     SimpleUSet();
     /** true if the uset contains this char */
-    bool contains(km_kbp_usv ch) const;
+    bool contains(km_core_usv ch) const;
     /** debugging */
     void dump() const;
     bool valid() const;

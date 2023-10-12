@@ -74,9 +74,18 @@ export class CompilerError {
    * @param filename
    * @returns
    */
-  static formatFilename(filename: string): string {
+  static formatFilename(filename: string, options?: {
+    fullPath?: boolean,
+    forwardSlashes?: boolean
+  }): string {
     if(!filename) {
       return '';
+    }
+
+    if(options?.fullPath) {
+      return options?.forwardSlashes ?
+        filename.replaceAll(/\\/g, '/') :
+        filename.replaceAll(/\//g, '\\');
     }
 
     let x = filename.lastIndexOf('/');
@@ -239,6 +248,7 @@ export interface CompilerFileSystemCallbacks {
 
 export interface CompilerCallbackOptions {
   logLevel?: CompilerLogLevel;
+  logFormat?: CompilerLogFormat;
   color?: boolean; // null or undefined == use console default
   compilerWarningsAsErrors?: boolean;
 };
@@ -356,6 +366,10 @@ export interface CompilerBaseOptions {
    */
   logLevel?: CompilerLogLevel;
   /**
+   * Format of output for log to console
+   */
+  logFormat?: CompilerLogFormat;
+  /**
    * Optional output file for activities that generate output
    */
   outFile?: string;
@@ -390,6 +404,7 @@ export interface CompilerOptions extends CompilerBaseOptions {
 
 export const defaultCompilerOptions: CompilerOptions = {
   logLevel: 'info',
+  logFormat: 'formatted',
   // outFile: (undefined)
   saveDebug: false,
   shouldAddCompilerVersion: true,
@@ -443,3 +458,11 @@ export const compilerLogLevelToSeverity: {[index in CompilerLogLevel]: number} =
   'info': CompilerErrorSeverity.Info,
   'debug': CompilerErrorSeverity.Info
 };
+
+export const ALL_COMPILER_LOG_FORMATS = [
+  'tsv',
+  'formatted'
+] as const;
+
+type CompilerLogFormatTuple = typeof ALL_COMPILER_LOG_FORMATS;
+export type CompilerLogFormat = CompilerLogFormatTuple[number];

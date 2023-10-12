@@ -4,7 +4,8 @@
 
 !include ..\..\..\Defines.mak
 
-build: dirs # version.res manifest.res
+build: dirs
+# version.res manifest.res
     $(DELPHI_MSBUILD) SentryClientTest.dproj "/p:Platform=Win32"
     $(DELPHI_MSBUILD) SentryClientVclTest.dproj "/p:Platform=Win32"
 

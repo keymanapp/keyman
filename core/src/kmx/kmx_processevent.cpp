@@ -4,7 +4,7 @@
 */
 #include "kmx_processevent.h"
 #include "state.hpp"
-#include <keyman/keyboardprocessor_consts.h>
+#include <keyman/keyman_core_api_consts.h>
 
 using namespace km::kbp;
 using namespace kmx;
@@ -44,7 +44,7 @@ char VKeyToChar(KMX_UINT modifiers, KMX_UINT vk) {
     shifted = (modifiers & K_SHIFTFLAG) == K_SHIFTFLAG,
     caps = (modifiers & CAPITALFLAG) == CAPITALFLAG;
 
-  if (vk == KM_KBP_VKEY_SPACE) {
+  if (vk == KM_CORE_VKEY_SPACE) {
     // Override for space because it is the same for
     // shifted and unshifted.
     return 32;
@@ -71,13 +71,13 @@ char VKeyToChar(KMX_UINT modifiers, KMX_UINT vk) {
  * @param state      A pointer to the state object.
  * @param vkey       A virtual key to be processed.
  * @param modifiers  The combinations of modifier keys set at the time vkey was pressed,
- *                   bitmask from the km_kbp_modifier_state enum.
+ *                   bitmask from the km_core_modifier_state enum.
  * @param isKeyDown  TRUE if this is called on KeyDown event, FALSE if called on KeyUp event
 *
  * @return           TRUE if keystroke should be eaten
 */
 KMX_BOOL KMX_ProcessEvent::ProcessEvent(
-  km_kbp_state *state,
+  km_core_state *state,
   KMX_UINT vkey,
   KMX_DWORD modifiers,
   KMX_BOOL isKeyDown
@@ -111,15 +111,15 @@ KMX_BOOL KMX_ProcessEvent::ProcessEvent(
   }
 
   switch (vkey) {
-  case KM_KBP_VKEY_CAPS:
+  case KM_CORE_VKEY_CAPS:
     if (KeyCapsLockPress(modifiers, isKeyDown))
       return TRUE;
     break;
-  case KM_KBP_VKEY_SHIFT:
+  case KM_CORE_VKEY_SHIFT:
     KeyShiftPress(modifiers, isKeyDown);
     return TRUE;
-  case KM_KBP_VKEY_CONTROL:
-  case KM_KBP_VKEY_ALT:
+  case KM_CORE_VKEY_CONTROL:
+  case KM_CORE_VKEY_ALT:
     return TRUE;
   }
 
@@ -133,17 +133,17 @@ KMX_BOOL KMX_ProcessEvent::ProcessEvent(
   KMX_BOOL fOutputKeystroke = FALSE;
 
   if(m_debug_items) {
-    km_kbp_state_debug_key_info key_info;
+    km_core_state_debug_key_info key_info;
     key_info.character = m_state.charCode;
     key_info.modifier_state = modifiers;
     key_info.vk = m_state.vkey;
-    m_debug_items->push_begin(&key_info, KM_KBP_DEBUG_FLAG_UNICODE);
+    m_debug_items->push_begin(&key_info, KM_CORE_DEBUG_FLAG_UNICODE);
   }
 
   ProcessGroup(gp, &fOutputKeystroke);
 
   if(m_debug_items) {
-    m_debug_items->push_end(m_actions.Length(), fOutputKeystroke ? KM_KBP_DEBUG_FLAG_OUTPUTKEYSTROKE : 0);
+    m_debug_items->push_end(m_actions.Length(), fOutputKeystroke ? KM_CORE_DEBUG_FLAG_OUTPUTKEYSTROKE : 0);
     // m_debug_items is just a helper class that pushes to state->debug_items(),
     // so we can throw it away after we are done with it
     DeleteInternalDebugItems();
@@ -199,7 +199,7 @@ KMX_BOOL KMX_ProcessEvent::ProcessGroup(LPGROUP gp, KMX_BOOL *pOutputKeystroke)
     DebugLog("Aborting output: m_state.LoopTimes exceeded.");
     m_state.StopOutput = TRUE;
     if(m_debug_items) {
-      m_debug_items->push_group_exit(m_actions.Length(), KM_KBP_DEBUG_FLAG_RECURSIVE_OVERFLOW, gp);
+      m_debug_items->push_group_exit(m_actions.Length(), KM_CORE_DEBUG_FLAG_RECURSIVE_OVERFLOW, gp);
     }
     return FALSE;
   }
@@ -262,7 +262,7 @@ KMX_BOOL KMX_ProcessEvent::ProcessGroup(LPGROUP gp, KMX_BOOL *pOutputKeystroke)
     if(!gp || (m_state.charCode == 0 && gp->fUsingKeys))   // I4585
         // 7.0.241.0: I1133 - Fix mismatched parentheses on m_state.charCode - ie. we don't want to output this letter if !gp->fUsingKeys
     {
-      KMX_BOOL fIsBackspace = m_state.vkey == KM_KBP_VKEY_BKSP && (m_modifiers & (LCTRLFLAG|RCTRLFLAG|LALTFLAG|RALTFLAG)) == 0;   // I4128
+      KMX_BOOL fIsBackspace = m_state.vkey == KM_CORE_VKEY_BKSP && (m_modifiers & (LCTRLFLAG|RCTRLFLAG|LALTFLAG|RALTFLAG)) == 0;   // I4128
 
       if(fIsBackspace) {   // I4838   // I4933
 
@@ -278,7 +278,7 @@ KMX_BOOL KMX_ProcessEvent::ProcessGroup(LPGROUP gp, KMX_BOOL *pOutputKeystroke)
         if(!pdeletecontext || *pdeletecontext == 0) {   // I4933
           m_actions.QueueAction(QIT_INVALIDATECONTEXT, 0);
           if(m_debug_items) {
-            m_debug_items->push_group_exit(m_actions.Length(), KM_KBP_DEBUG_FLAG_NOMATCH, gp);
+            m_debug_items->push_group_exit(m_actions.Length(), KM_CORE_DEBUG_FLAG_NOMATCH, gp);
           }
           *pOutputKeystroke = TRUE;   // I4933
           return FALSE;   // I4933
@@ -293,9 +293,9 @@ KMX_BOOL KMX_ProcessEvent::ProcessGroup(LPGROUP gp, KMX_BOOL *pOutputKeystroke)
           m_actions.QueueAction(QIT_BACK, BK_DEADKEY);  // side effect: also removes last char from context
           pdeletecontext = m_context.Buf(1);
         }
-      } else if (m_state.vkey == KM_KBP_VKEY_CAPS) {
+      } else if (m_state.vkey == KM_CORE_VKEY_CAPS) {
         if (m_debug_items) {
-          m_debug_items->push_group_exit(m_actions.Length(), KM_KBP_DEBUG_FLAG_NOMATCH, gp);
+          m_debug_items->push_group_exit(m_actions.Length(), KM_CORE_DEBUG_FLAG_NOMATCH, gp);
         }
         *pOutputKeystroke = TRUE;
         return FALSE;
@@ -303,7 +303,7 @@ KMX_BOOL KMX_ProcessEvent::ProcessGroup(LPGROUP gp, KMX_BOOL *pOutputKeystroke)
         DebugLog(" ... IsLegacy = FALSE; IsTIP = TRUE");   // I4128
         m_actions.QueueAction(QIT_INVALIDATECONTEXT, 0);
         if(m_debug_items) {
-          m_debug_items->push_group_exit(m_actions.Length(), KM_KBP_DEBUG_FLAG_NOMATCH, gp);
+          m_debug_items->push_group_exit(m_actions.Length(), KM_CORE_DEBUG_FLAG_NOMATCH, gp);
         }
         *pOutputKeystroke = TRUE;
         return FALSE;
@@ -327,7 +327,7 @@ KMX_BOOL KMX_ProcessEvent::ProcessGroup(LPGROUP gp, KMX_BOOL *pOutputKeystroke)
     }
 
     if(m_debug_items) {
-      m_debug_items->push_group_exit(m_actions.Length(), KM_KBP_DEBUG_FLAG_NOMATCH, gp);
+      m_debug_items->push_group_exit(m_actions.Length(), KM_CORE_DEBUG_FLAG_NOMATCH, gp);
     }
     return TRUE;
   }
@@ -548,8 +548,8 @@ int KMX_ProcessEvent::PostString(PKMX_WCHAR str, LPKEYBOARD lpkb, PKMX_WCHAR end
 
 KMX_BOOL KMX_ProcessEvent::IsMatchingBaseLayout(PKMX_WCHAR layoutName)  // I3432
 {
-  KMX_BOOL bEqual = u16icmp(layoutName, static_cast<const km_kbp_cp *>(m_environment.baseLayout().c_str())) == 0 ||   // I4583
-                u16icmp(layoutName, static_cast<const km_kbp_cp*>(m_environment.baseLayoutAlt().c_str())) == 0;   // I4583
+  KMX_BOOL bEqual = u16icmp(layoutName, static_cast<const km_core_cp *>(m_environment.baseLayout().c_str())) == 0 ||   // I4583
+                u16icmp(layoutName, static_cast<const km_core_cp*>(m_environment.baseLayoutAlt().c_str())) == 0;   // I4583
 
   return bEqual;
 }

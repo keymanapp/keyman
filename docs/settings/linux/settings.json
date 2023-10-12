@@ -16,7 +16,7 @@
   "python.pythonPath": "/usr/bin/python3",
   "files.associations": {
     "*.tcc": "cpp",
-    "keyboardprocessor.h": "c",
+    "keyman_core_api.h": "c",
     "engine.h": "c",
     "keyman-service.h": "c",
     "keymanutil.h": "c",

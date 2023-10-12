@@ -38,6 +38,10 @@ describe('keys', function () {
         assert.equal(compilerTestCallbacks.messages.length, 0);
         assert.equal(keys.keys.length, 4);
 
+        const [w] = keys.keys.filter(({ id }) => id.value === 'w');
+        assert.ok(w);
+        assert.equal(w.to.value, 'w', 'substituted key value');
+
         const [q] = keys.keys.filter(({ id }) => id.value === 'q');
         assert.ok(q);
         assert.isFalse(!!(q.flags & constants.keys_key_flags_gap));
@@ -57,7 +61,7 @@ describe('keys', function () {
 
         const [flick0_ne_sw] = flick0.flicks.filter(({ directions }) => directions && directions.isEqual('ne sw'.split(' ')));
         assert.ok(flick0_ne_sw);
-        assert.equal(flick0_ne_sw.to?.value, 'ê');
+        assert.equal(flick0_ne_sw.to?.value, 'ê'); // via variable
       },
     },
     {
@@ -129,11 +133,11 @@ describe('keys', function () {
         const MARKER_1 = MarkerParser.markerOutput(1);
         assert.equal(ww.to.value, MARKER_1);
         assert.equal(ww.longPressDefault.value, MARKER_1);
-        // TODO-LDML: assert.equal(ww.longPress[0].value.value, MARKER_1);
-        // TODO-LDML: assert.equal(ww.multiTap[0].value.value, MARKER_1);
+        assert.equal(ww.longPress[0].value.value, MARKER_1);
+        assert.equal(ww.multiTap[0].value.value, MARKER_1);
         const [flickw] = keys.flicks?.filter(({id}) => id.value === 'flickw');
         assert.ok(flickw);
-        // TODO-LDML: assert.equal(flickw.flicks[0].to.value, MARKER_1);
+        assert.equal(flickw.flicks[0].to.value, MARKER_1);
       },
     },
   ]);

@@ -50,9 +50,9 @@ export class CompilerMessages {
     `The package contains both lexical models and keyboards, which is not permitted.`);
   static ERROR_PackageCannotContainBothModelsAndKeyboards = SevError | 0x000B;
 
-  static Warn_PackageShouldNotRepeatLanguages = (o:{resourceType: string, id: string, minimalTag: string, firstTag: string, secondTag: string}) => m(this.WARN_PackageShouldNotRepeatLanguages,
+  static Hint_PackageShouldNotRepeatLanguages = (o:{resourceType: string, id: string, minimalTag: string, firstTag: string, secondTag: string}) => m(this.HINT_PackageShouldNotRepeatLanguages,
     `Two language tags in ${o.resourceType} ${o.id}, '${o.firstTag}' and '${o.secondTag}', reduce to the same minimal tag '${o.minimalTag}'.`);
-  static WARN_PackageShouldNotRepeatLanguages = SevWarn | 0x000C;
+  static HINT_PackageShouldNotRepeatLanguages = SevHint | 0x000C;
 
   static Warn_PackageNameDoesNotFollowLexicalModelConventions = (o:{filename: string}) => m(this.WARN_PackageNameDoesNotFollowLexicalModelConventions,
     `The package file ${o.filename} does not follow the recommended model filename conventions. The name should be all lower case, `+
@@ -88,9 +88,9 @@ export class CompilerMessages {
     `Language tag '${o.lang}' in ${o.resourceType} ${o.id} is invalid.`);
   static ERROR_LanguageTagIsNotValid = SevError | 0x0014;
 
-  static Warn_LanguageTagIsNotMinimal = (o: {resourceType: string, id:string, actual:string, expected:string}) => m(this.WARN_LanguageTagIsNotMinimal,
+  static Hint_LanguageTagIsNotMinimal = (o: {resourceType: string, id:string, actual:string, expected:string}) => m(this.HINT_LanguageTagIsNotMinimal,
     `Language tag '${o.actual}' in ${o.resourceType} ${o.id} is not minimal, and should be '${o.expected}'.`);
-  static WARN_LanguageTagIsNotMinimal = SevWarn | 0x0015;
+  static HINT_LanguageTagIsNotMinimal = SevHint | 0x0015;
 
   static Error_ModelMustHaveAtLeastOneLanguage = (o:{id:string}) => m(this.ERROR_ModelMustHaveAtLeastOneLanguage,
     `The lexical model ${o.id} must have at least one language specified.`);

@@ -168,7 +168,7 @@ function _builder_prepublish() {
       local link_source=node_modules/$package
 
       # lookup the link_target from top-level package.json/dependencies
-      local link_target="$(cat "$KEYMAN_ROOT/builder_package_publish.json" | jq -r .dependencies.\"$package\")"
+      local link_target="$(cat "$KEYMAN_ROOT/builder_package_publish.json" | "$JQ" -r .dependencies.\"$package\")"
 
       if [[ $link_target =~ ^file: ]]; then
         link_target="$KEYMAN_ROOT"/${link_target#file:}
