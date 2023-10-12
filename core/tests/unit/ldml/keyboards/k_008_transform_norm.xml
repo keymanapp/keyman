@@ -13,11 +13,11 @@ from https://github.com/unicode-org/cldr/blob/keyboard-preview/docs/ldml/tr35-ke
   </names>
 
   <keys>
-    <key id="u-0320" to="\u{0320}" />
-    <key id="u-0300" to="\u{0300}" />
-    <key id="u-00e0" to="\u{00e0}" />
+    <key id="u-0320" to="\u{0320}" /> <!-- ◌̠ -->
+    <key id="u-0300" to="\u{0300}" /> <!-- ◌̀ -->
+    <key id="u-00e8" to="\u{00e8}" /> <!-- è -->
     <key id="nfd" to="e\u{0320}\u{0300}" />
-    <key id="nfc" to="\u{00E0}\u{0320}" />
+    <key id="nfc" to="\u{00E8}\u{0320}" />
     <key id="not-nfd" to="e\u{0300}\u{0320}" />
   </keys>
 
@@ -30,7 +30,7 @@ from https://github.com/unicode-org/cldr/blob/keyboard-preview/docs/ldml/tr35-ke
       <row keys="space" />
     </layer>
     <layer modifier="shift" id="shift">
-      <row keys="u-0300 u-00e0 nfd nfc not-nfd" />
+      <row keys="u-0300 u-00e8 nfd nfc not-nfd" />
     </layer>
   </layers>
 
@@ -46,7 +46,7 @@ from https://github.com/unicode-org/cldr/blob/keyboard-preview/docs/ldml/tr35-ke
       <!-- these SHOULD match -->
       <transform from="1e\u{0300}\u{0320}" to="YES1" /> <!-- out of order but should get normalized -->
       <transform from="2e\u{0320}\u{0300}" to="YES2" /> <!-- in order  NFD -->
-      <transform from="3\u{00E0}\u{0320}" to="YES3" /> <!-- in order   NFC -->
+      <transform from="3\u{00E8}\u{0320}" to="YES3" /> <!-- in order   NFC -->
     </transformGroup>
   </transforms>
 </keyboard3>

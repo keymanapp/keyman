@@ -93,6 +93,12 @@ namespace kbp {
      static void emit_text(km_core_state *state, km_core_usv ch);
      /** emit a marker */
      static void emit_marker(km_core_state *state, KMX_DWORD marker);
+     /**
+      * Delete text from the state.
+      * @param str string with text to remove, from the end
+      * @param length number of chars from the end of str to drop
+      */
+     static void remove_text(km_core_state *state, std::u32string &str, size_t length);
 
      /** process a typed key */
      void process_key_string(km_core_state *state, const std::u16string &key_str) const;
@@ -103,7 +109,7 @@ namespace kbp {
       * Convert markers into the UC_SENTINEL format.
       * @return the number of context items consumed
       */
-     static size_t context_to_string(km_core_state *state, std::u32string &str);
+     static size_t context_to_string(km_core_state *state, std::u32string &str, bool include_markers = true);
 
      /** prepend the marker string in UC_SENTINEL format to the str */
      inline static void prepend_marker(std::u32string &str, KMX_DWORD marker);

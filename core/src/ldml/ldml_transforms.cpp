@@ -846,6 +846,7 @@ transforms::load(
 
 // string
 
+// TODO-LDML: copypasta -> refactor
 std::u32string &normalize_nfd(std::u32string &str, UErrorCode &status) {
   const icu::Normalizer2 *nfd = icu::Normalizer2::getNFDInstance(status);
   if (U_FAILURE(status)) {
@@ -873,6 +874,7 @@ std::u32string &normalize_nfd(std::u32string &str, UErrorCode &status) {
   return str;
 }
 
+// TODO-LDML: copypasta -> refactor
 std::u16string &normalize_nfd(std::u16string &str, UErrorCode &status) {
   const icu::Normalizer2 *nfd = icu::Normalizer2::getNFDInstance(status);
   if (U_FAILURE(status)) {
@@ -887,6 +889,51 @@ std::u16string &normalize_nfd(std::u16string &str, UErrorCode &status) {
   str.assign(dest.getBuffer(), dest.length());
   return str;
 }
+
+// TODO-LDML: copypasta -> refactor
+std::u32string &normalize_nfc(std::u32string &str, UErrorCode &status) {
+  const icu::Normalizer2 *nfc = icu::Normalizer2::getNFCInstance(status);
+  if (U_FAILURE(status)) {
+    return str;
+  }
+  icu::UnicodeString dest;
+  const std::u16string rstr = km::kbp::kmx::u32string_to_u16string(str);
+  icu::UnicodeString src = icu::UnicodeString(rstr.data(), (int32_t)rstr.length());
+  nfc->normalize(src, dest, status);
+  if (U_FAILURE(status)) {
+    return str;
+  }
+
+  UErrorCode preflightStatus = U_ZERO_ERROR;
+  // calculate how big the buffer is
+  auto out32len              = dest.toUTF32(nullptr, 0, preflightStatus); // preflightStatus will be an err, because we know the buffer overruns zero bytes
+  // allocate
+  char32_t *s                = new char32_t[out32len + 1];
+  assert(s != nullptr);
+  // convert
+  dest.toUTF32((UChar32 *)s, out32len + 1, status);
+  assert(U_SUCCESS(status));
+  str.assign(s, out32len);
+  delete [] s;
+  return str;
+}
+
+// TODO-LDML: copypasta -> refactor
+std::u16string &normalize_nfc(std::u16string &str, UErrorCode &status) {
+  const icu::Normalizer2 *nfc = icu::Normalizer2::getNFCInstance(status);
+  if (U_FAILURE(status)) {
+    return str;
+  }
+  icu::UnicodeString dest;
+  icu::UnicodeString src = icu::UnicodeString(str.data(), (int32_t)str.length());
+  nfc->normalize(src, dest, status);
+  if (U_FAILURE(status)) {
+    return str;
+  }
+  str.assign(dest.getBuffer(), dest.length());
+  return str;
+}
+
 
 
 

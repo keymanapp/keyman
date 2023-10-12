@@ -277,6 +277,10 @@ public:
 std::u32string &normalize_nfd(std::u32string &str, UErrorCode &status);
 /** Normalize a u16string inplace. Returns a reference to the same string. */
 std::u16string &normalize_nfd(std::u16string &str, UErrorCode &status);
+/** Normalize a u32string inplace. Returns a reference to the same string. */
+std::u32string &normalize_nfc(std::u32string &str, UErrorCode &status);
+/** Normalize a u16string inplace. Returns a reference to the same string. */
+std::u16string &normalize_nfc(std::u16string &str, UErrorCode &status);
 
 }  // namespace ldml
 }  // namespace kbp

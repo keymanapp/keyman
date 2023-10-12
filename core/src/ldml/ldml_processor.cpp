@@ -6,6 +6,7 @@
 */
 
 #include <fstream>
+#include <algorithm>
 #include "ldml/ldml_processor.hpp"
 #include "state.hpp"
 #include "kmx_file.h"
@@ -260,81 +261,100 @@ ldml_processor::process_event(
 
 void
 ldml_processor::process_key_string(km_core_state *state, const std::u16string &key_str) const {
-  // found a string - push it into the context and actions
-  // we convert it here instead of using the emit_text() overload
+  UErrorCode status = U_ZERO_ERROR;
+  // We know that key_str is not empty per the caller.
+
+  // we convert the keys str to UTF-32 here instead of using the emit_text() overload
   // so that we don't have to reconvert it inside the transform code.
-  std::u32string str32 = kmx::u16string_to_u32string(key_str);
+  std::u32string key_str32 = kmx::u16string_to_u32string(key_str);
+  // normalize the keystroke to NFD
+  ldml::normalize_nfd(key_str32, status);
 
-  if (!transforms) {
-    // No transforms: just emit the string.
-    emit_text(state, str32);
+  // extract context string, in NFC
+  std::u32string old_ctxtstr_nfc;
+  (void)context_to_string(state, old_ctxtstr_nfc, false);
+  ldml::normalize_nfc(old_ctxtstr_nfc, status);
+  assert(U_SUCCESS(status));
+
+  // context string in NFD
+  std::u32string ctxtstr;
+  (void)context_to_string(state, ctxtstr, true); // with markers
+  // add the newly added key output to ctxtstr
+  ctxtstr.append(key_str32);
+  ldml::normalize_nfd(ctxtstr, status);
+  assert(U_SUCCESS(status));
+
+  /** transform output string */
+  std::u32string outputString;
+  /** how many chars of the ctxtstr to replace */
+  size_t matchedContext = 0; // zero if no transforms
+
+  // begin modifications to the string
+
+  if(transforms) {
+    matchedContext = transforms->apply(ctxtstr, outputString);
   } else {
-    // Process transforms here
-    /**
-     * a copy of the current/changed context, for transform use.
-     *
-     */
-    std::u32string ctxtstr;
-    (void)context_to_string(state, ctxtstr);
-    // add the newly added key output to ctxtstr
-    ctxtstr.append(str32);
-    // and normalize
+    // no transforms, no output
+  }
 
-    /** the output buffer for transforms */
-    std::u32string outputString;
+  // drop last 'matchedContext':
+  ctxtstr.resize(ctxtstr.length() - matchedContext);
+  ctxtstr.append(outputString); // TODO-LDML: should be able to do a normalization-safe append here.
+  ldml::normalize_nfd(ctxtstr, status);
+  assert(U_SUCCESS(status));
 
-    // apply the transform, get how much matched (at the end)
-    const size_t matchedContext = transforms->apply(ctxtstr, outputString);
+  // Ok. We've done all the happy manipulations.
 
+  /** NFC and no markers */
+  std::u32string ctxtstr_cleanedup = ctxtstr;
+  // TODO-LDML: remove markers!
+  ldml::normalize_nfc(ctxtstr_cleanedup, status);
 
-    if (matchedContext == 0) {
-      // No match, just emit the original string
-      emit_text(state, str32);
-    } else {
-      // We have a match.
+  // find common prefix
+  auto ctxt_prefix = mismatch(old_ctxtstr_nfc.begin(), old_ctxtstr_nfc.end(), ctxtstr_cleanedup.begin(), ctxtstr_cleanedup.end());
+  /** the part of the old str that changed */
+  std::u32string old_ctxtstr_changed(ctxt_prefix.first,old_ctxtstr_nfc.end());
+  std::u32string new_ctxtstr_changed(ctxt_prefix.second,ctxtstr_cleanedup.end());
 
-      ctxtstr.resize(ctxtstr.length() - str32.length());
-      /** how many chars of the context we need to clear */
-      auto charsToDelete = matchedContext - str32.length(); /* we don't need to clear the output of the current key */
+  // drop the old suffix. Note: this mutates old_ctxtstr_changed.
+  remove_text(state, old_ctxtstr_changed, old_ctxtstr_changed.length());
+  assert(old_ctxtstr_changed.length() == 0);
+  emit_text(state, new_ctxtstr_changed);
+}
 
-      /** how many context items need to be removed */
-      size_t contextRemoved = 0;
-      for (auto c = state->context().rbegin(); charsToDelete > 0 && c != state->context().rend(); c++, contextRemoved++) {
-        /** last char of context */
-        km_core_usv lastCtx = ctxtstr.back();
-        uint8_t type        = c->type;
-        assert(type == KM_CORE_BT_CHAR || type == KM_CORE_BT_MARKER);
-        if (type == KM_CORE_BT_CHAR) {
-          // single char, drop it
-          charsToDelete--;
-          assert(c->character == lastCtx);
-          ctxtstr.pop_back();
-          state->actions().push_backspace(KM_CORE_BT_CHAR, c->character);  // Cause prior char to be removed
-        } else if (type == KM_CORE_BT_MARKER) {
-          // it's a marker, 'worth' 3 uchars
-          assert(charsToDelete >= 3);
-          assert(lastCtx == c->marker);  // end of list
-          charsToDelete -= 3;
-          // pop off the three-part sentinel string
-          ctxtstr.pop_back();
-          ctxtstr.pop_back();
-          ctxtstr.pop_back();
-          // push a special backspace to delete the marker
-          state->actions().push_backspace(KM_CORE_BT_MARKER, c->marker);
-        }
-      }
-      // now, pop the right number of context items
-      for (size_t i = 0; i < contextRemoved; i++) {
-        // we don't pop during the above loop because the iterator gets confused
-        state->context().pop_back();
-      }
-      // Now, add in the updated text. This will convert UC_SENTINEL, etc back to marker actions.
-      emit_text(state, outputString);
-      // If we needed it further. we could update ctxtstr here:
-      //    ctxtstr.append(outputString);
-      // ... but it is no longer needed at this point.
-    }  // end of transform match
-  }    // end of processing transforms
+void
+ldml_processor::remove_text(km_core_state *state, std::u32string &str, size_t length) {
+  /** how many context items need to be removed */
+  size_t contextRemoved = 0;
+  for (auto c = state->context().rbegin(); length > 0 && c != state->context().rend(); c++, contextRemoved++) {
+    /** last char of context */
+    km_core_usv lastCtx = str.back();
+    uint8_t type        = c->type;
+    assert(type == KM_CORE_BT_CHAR || type == KM_CORE_BT_MARKER);
+    if (type == KM_CORE_BT_CHAR) {
+      // single char, drop it
+      length--;
+      assert(c->character == lastCtx);
+      str.pop_back();
+      state->actions().push_backspace(KM_CORE_BT_CHAR, c->character);  // Cause prior char to be removed
+    } else if (type == KM_CORE_BT_MARKER) {
+      // it's a marker, 'worth' 3 uchars
+      assert(length >= 3);
+      assert(lastCtx == c->marker);  // end of list
+      length -= 3;
+      // pop off the three-part sentinel string
+      str.pop_back();
+      str.pop_back();
+      str.pop_back();
+      // push a special backspace to delete the marker
+      state->actions().push_backspace(KM_CORE_BT_MARKER, c->marker);
+    }
+  }
+  // now, pop the right number of context items
+  for (size_t i = 0; i < contextRemoved; i++) {
+    // we don't pop during the above loop because the iterator gets confused
+    state->context().pop_back();
+  }
 }
 
 km_core_attr const & ldml_processor::attributes() const {
@@ -402,10 +422,10 @@ ldml_processor::emit_marker(km_core_state *state, KMX_DWORD marker_no) {
 }
 
 size_t
-ldml_processor::context_to_string(km_core_state *state, std::u32string &str) {
+ldml_processor::context_to_string(km_core_state *state, std::u32string &str, bool include_markers) {
     str.clear();
     auto &cp      = state->context();
-    size_t ctxlen = 0; // TODO-LDML: is this needed?
+    size_t ctxlen = 0; // TODO-LDML: not used by callers?
     uint8_t last_type = KM_CORE_BT_UNKNOWN;
     for (auto c = cp.rbegin(); c != cp.rend(); c++, ctxlen++) {
       last_type = c->type;
@@ -413,14 +433,15 @@ ldml_processor::context_to_string(km_core_state *state, std::u32string &str) {
         str.insert(0, 1, c->character);
       } else if (last_type == KM_CORE_BT_MARKER) {
         assert(km::kbp::kmx::is_valid_marker(c->marker));
-        prepend_marker(str, c->marker);
+        if (include_markers) {
+          prepend_marker(str, c->marker);
+        }
       } else {
         break;
       }
     }
     return ctxlen; // consumed the entire context buffer.
 }
-
 
 } // namespace kbp
 } // namespace km

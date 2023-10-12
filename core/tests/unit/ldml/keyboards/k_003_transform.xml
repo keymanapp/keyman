@@ -4,7 +4,7 @@
 from https://github.com/unicode-org/cldr/blob/keyboard-preview/docs/ldml/tr35-keyboards.md#element-transform
 
 @@keys: [K_Q][K_U][K_BKQUOTE][K_E]
-@@expected: que\u0302
+@@expected: qu\u00EA
 
 -->
 <!DOCTYPE keyboard3 SYSTEM "../../../../../resources/standards-data/ldml-keyboards/techpreview/dtd/ldmlKeyboard3.dtd">

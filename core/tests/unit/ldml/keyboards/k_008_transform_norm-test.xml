@@ -20,7 +20,7 @@
     </test>
     <test name="regex-test-0-c">
       <startContext to="" />
-      <keystroke key="u-00e0" />
+      <keystroke key="u-00e8" />
       <keystroke key="u-0320" />
       <check result="e\u{0320}\u{0300}" />
     </test>
