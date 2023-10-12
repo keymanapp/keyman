@@ -228,8 +228,6 @@ const
   CWARN_KeyShouldIncludeNCaps                       = $20AD;
 
   CHINT_UnreachableRule                             = $10AE;
-  CHINT_FilenameHasDifferingCase                    = $10AF;
-  CWARN_MissingFile                                 = $20B0;
 
 implementation
 

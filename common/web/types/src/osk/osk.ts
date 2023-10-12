@@ -1,8 +1,6 @@
 import { TouchLayoutFile, TouchLayoutFlick, TouchLayoutKey, TouchLayoutPlatform, TouchLayoutSubKey } from "src/keyman-touch-layout/keyman-touch-layout-file.js";
 import { VisualKeyboard } from "../kvk/visual-keyboard.js";
-import { default as AjvModule } from 'ajv';
-import Schemas from "../schemas.js";
-const Ajv = AjvModule.default; // The actual expected Ajv type.
+import SchemaValidators from "../schema-validators.js";
 
 export interface StringRefUsage {
   filename: string;
@@ -24,11 +22,10 @@ export interface StringResult {
 export type PuaMap = {[index:string]: string};
 
 export function parseMapping(mapping: any) {
-  const ajv = new Ajv();
-  if(!ajv.validate(Schemas.displayMap, <any>mapping))
+  if(!SchemaValidators.displayMap(<any>mapping))
   /* c8 ignore next 3 */
   {
-    throw new Error(ajv.errorsText());
+    throw new Error((<any>SchemaValidators.displayMap).errorsText());
   }
 
   let map: PuaMap = {};

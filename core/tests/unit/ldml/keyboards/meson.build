@@ -72,7 +72,7 @@ endforeach
 
 foreach kbd : tests_with_testdata
   configure_file(
-    command: kmc_cmd + ['build-test-data', '@INPUT@', '--out-file', '@OUTPUT@'],
+    command: kmc_cmd + ['build', 'ldml-test-data', '@INPUT@', '--out-file', '@OUTPUT@'],
     input: kbd + '-test.xml',
     output: kbd + '-test.json',
   )
@@ -91,7 +91,7 @@ foreach kbd : tests_from_cldr
     output: kbd + '.kmx',
   )
   configure_file(
-    command: kmc_cmd + ['build-test-data', '@INPUT@', '--out-file', '@OUTPUT@'],
+    command: kmc_cmd + ['build', 'ldml-test-data', '@INPUT@', '--out-file', '@OUTPUT@'],
     input: join_paths(ldml_testdata, kbd + '-test.xml'),
     output: kbd + '-test.json',
   )

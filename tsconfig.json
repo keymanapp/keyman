@@ -18,6 +18,8 @@
     { "path": "./common/web/utils/tsconfig.json" },
 
     { "path": "./developer/src/common/web/test-helpers/tsconfig.json" },
+    { "path": "./developer/src/common/web/utils/tsconfig.json" },
+    { "path": "./developer/src/common/web/utils/test/tsconfig.json" },
 
     { "path": "./developer/src/kmc/tsconfig.json" },
     { "path": "./developer/src/kmc/test/tsconfig.json" },

@@ -75,7 +75,7 @@ GList * keyman_get_kmpdirs_fromdir(GList *kmpdir_list, const gchar * path)
         struct dirent *file = readdir(dir);
         while (file != NULL) {
             struct stat filestat;
-            gchar * absfn = g_strdup_printf("%s/%s", path, file->d_name);
+            g_autofree gchar *absfn = g_strdup_printf("%s/%s", path, file->d_name);
             stat(absfn, &filestat);
 
             if (S_ISDIR(filestat.st_mode))
@@ -89,7 +89,6 @@ GList * keyman_get_kmpdirs_fromdir(GList *kmpdir_list, const gchar * path)
                 g_message("adding kmp path %s", path);
                 kmpdir_list=g_list_append(kmpdir_list, g_strdup(path));
             }
-            g_free(absfn);
 
             file = readdir(dir);
         }
@@ -102,12 +101,12 @@ gchar * keyman_get_icon_file(const gchar *kmx_file)
 {
     // Now there will only be the .png
     // which at some point will get extracted from the .kmx during installation
-    gchar *filename, *full_path_to_icon_file, *p;
+    gchar *full_path_to_icon_file, *p;
+    g_autofree gchar *filename;
 
-    p=rindex(kmx_file,'.');
+    p = rindex(kmx_file, '.');
     filename = g_strndup(kmx_file, p-kmx_file);
     full_path_to_icon_file=g_strdup_printf("%s.bmp.png", filename);
-    g_free(filename);
 
     if (!g_file_test(full_path_to_icon_file, G_FILE_TEST_EXISTS)) {
         g_free(full_path_to_icon_file);
@@ -117,40 +116,33 @@ gchar * keyman_get_icon_file(const gchar *kmx_file)
 }
 
 IBusEngineDesc *
-ibus_keyman_engine_desc_new (gchar * file_name,
-                      gchar *name,
-                      gchar *description,
-                      gchar *copyright,
-                      gchar *lang,
-                      gchar *license,
-                      gchar *author,
-                      gchar *icon,
-                      gchar *layout,
-                      gchar *version)
-{
-   IBusEngineDesc *engine_desc;
-    gchar * desc;
+ibus_keyman_engine_desc_new(
+    gchar *file_name,
+    gchar *name,
+    gchar *description,
+    gchar *copyright,
+    gchar *lang,
+    gchar *license,
+    gchar *author,
+    gchar *icon,
+    gchar *layout,
+    gchar *version
+) {
+  IBusEngineDesc *engine_desc;
+  g_autofree gchar *desc;
 
-    if (description == NULL) {
-        desc = g_strdup_printf("%s", copyright);
-    }
-    else {
-        desc = g_strdup_printf("%s\n%s", description, copyright);
-    }
+  if (description == NULL) {
+    desc = g_strdup_printf("%s", copyright);
+  } else {
+    desc = g_strdup_printf("%s\n%s", description, copyright);
+  }
 
-    engine_desc = ibus_engine_desc_new_varargs ("name", file_name,
-                                    "longname", name,
-                                    "description", desc,
-                                    "language", lang ? lang : "other",
-                                    "license", license ? license : "",
-                                    "author", author ? author : "",
-                                    "icon", icon,
-                                    "layout", layout,
-                                    "version", version ? version : "",
-                                    NULL);
-    g_free(desc);
-
-    return engine_desc;
+  engine_desc = ibus_engine_desc_new_varargs(
+      "name", file_name, "longname", name, "description", desc, "language", lang ? lang : "other", "license",
+      license ? license : "", "author", author ? author : "", "icon", icon, "layout", layout, "version", version ? version : "",
+      NULL);
+  g_object_ref(engine_desc);
+  return engine_desc;
 }
 
 IBusEngineDesc *
@@ -166,14 +158,14 @@ get_engine_for_language(
     return engine_desc;
 
   int capacity          = 255;
-  gchar *name_with_lang = NULL;
-  gchar *minimized_tag  = g_new0(gchar, capacity);
+  g_autofree gchar *name_with_lang = NULL;
+  g_autofree gchar *minimized_tag = g_new0(gchar, capacity);
   int result = bcp47_minimize(lang_id, minimized_tag, capacity);
   if (result < 0) {
     g_strlcpy(minimized_tag, lang_id, capacity);
   }
 
-  gchar *lang_code = g_new0(gchar, capacity);
+  g_autofree gchar *lang_code = g_new0(gchar, capacity);
   if (!bcp47_get_language_code(minimized_tag, lang_code, capacity)) {
     g_strlcpy(lang_code, minimized_tag, capacity);
   }
@@ -181,16 +173,15 @@ get_engine_for_language(
   // If ibus doesn't know about the language then append the
   // language name to the keyboard name
   if (lang_name != NULL) {
-    gchar *ibus_lang = ibus_get_untranslated_language_name(lang_code);
+    g_autofree gchar *ibus_lang = ibus_get_untranslated_language_name(lang_code);
     g_debug("%s: untranslated ibus language for %s: %s", __FUNCTION__, minimized_tag, ibus_lang);
     if (g_strcmp0(ibus_lang, "Other") == 0) {
       name_with_lang = g_strjoin(" - ", keyboard->name, lang_name, NULL);
     }
-    g_free(ibus_lang);
   }
 
-  gchar *abs_kmx = g_strjoin("/", kmp_dir, keyboard->kmx_file, NULL);
-  gchar *id_with_lang = g_strjoin(":", minimized_tag, abs_kmx, NULL);
+  g_autofree gchar *abs_kmx = g_strjoin("/", kmp_dir, keyboard->kmx_file, NULL);
+  g_autofree gchar *id_with_lang = g_strjoin(":", minimized_tag, abs_kmx, NULL);
 
   g_message("adding engine %s", id_with_lang);
   engine_desc = ibus_keyman_engine_desc_new(
@@ -204,11 +195,6 @@ get_engine_for_language(
     keyman_get_icon_file(abs_kmx),  // icon full path
     "us",                           // layout defaulting to us (en-US)
     keyboard->version);
-  g_free(abs_kmx);
-  g_free(lang_code);
-  g_free(minimized_tag);
-  g_free(id_with_lang);
-  g_free(name_with_lang);
   return engine_desc;
 }
 
@@ -217,59 +203,51 @@ void
 keyman_add_keyboard(gpointer data, gpointer user_data) {
   kmp_keyboard *keyboard = (kmp_keyboard *)data;
   add_keyboard_data *kb_data = (add_keyboard_data *)user_data;
-  gboolean alreadyexists     = FALSE;
 
-  for (GList *e = kb_data->engines_list; e != NULL && alreadyexists == FALSE; e = e->next) {
+  for (GList *e = kb_data->engines_list; e != NULL; e = e->next) {
     IBusEngineDesc *engine_desc = (IBusEngineDesc *)e->data;
     const gchar *version        = ibus_engine_desc_get_version(engine_desc);
     const gchar *engine_name    = ibus_engine_desc_get_name(engine_desc);
-    gchar *kmx_file             = g_path_get_basename(engine_name);
+    g_autofree gchar *kmx_file  = g_path_get_basename(engine_name);
     // If we already have an engine for this keyboard (in a different area), we
     // don't want to add it again since we wouldn't add anything new
     // if it's the same version
     // TODO: fix version comparison (#9593)
     if (g_strcmp0(kmx_file, keyboard->kmx_file) == 0 && g_strcmp0(version, keyboard->version) >= 0) {
-      alreadyexists = TRUE;
       g_debug("keyboard %s already exists at version %s which is newer or same as %s", kmx_file, version, keyboard->version);
+      return;
     }
-    g_free(kmx_file);
   }
 
-  if (!alreadyexists) {
-    gchar *json_file              = g_strjoin(".", keyboard->id, "json", NULL);
-    keyboard_details *kbd_details = g_new0(keyboard_details, 1);
-    get_keyboard_details(kb_data->kmp_dir, json_file, kbd_details);
-    g_free(json_file);
+  g_autofree gchar *json_file             = g_strjoin(".", keyboard->id, "json", NULL);
+  g_autoptr(keyboard_details) kbd_details = g_new0(keyboard_details, 1);
+  get_keyboard_details(kb_data->kmp_dir, json_file, kbd_details);
+  g_autofree gchar *abs_kmx = g_strjoin("/", kb_data->kmp_dir, keyboard->kmx_file, NULL);
 
-    if (keyboard->languages != NULL) {
-      for (GList *l = keyboard->languages; l != NULL; l = l->next) {
-        kmp_language *language = (kmp_language *)l->data;
-        IBusEngineDesc *engine_desc =
-            get_engine_for_language(keyboard, kb_data->info, kbd_details, kb_data->kmp_dir, language->id, language->name);
-        if (engine_desc) {
-          kb_data->engines_list = g_list_append(kb_data->engines_list, engine_desc);
-        }
+  if (keyboard->languages != NULL) {
+    for (GList *l = keyboard->languages; l != NULL; l = l->next) {
+      kmp_language *language = (kmp_language *)l->data;
+      IBusEngineDesc *engine_desc =
+          get_engine_for_language(keyboard, kb_data->info, kbd_details, kb_data->kmp_dir, language->id, language->name);
+      if (engine_desc) {
+        kb_data->engines_list = g_list_append(kb_data->engines_list, engine_desc);
       }
-    } else {
-      gchar *abs_kmx = g_strjoin("/", kb_data->kmp_dir, keyboard->kmx_file, NULL);
-      g_message("adding engine %s", abs_kmx);
-      kb_data->engines_list = g_list_append(
-          kb_data->engines_list,
-          ibus_keyman_engine_desc_new(
-              abs_kmx,                        // kmx full path
-              keyboard->name,                 // longname
-              kbd_details->description,       // description
-              kb_data->info->copyright,       // copyright if available
-              NULL,                           // language, most are ignored by ibus except major languages
-              kbd_details->license,           // license
-              kb_data->info->author_desc,     // author name only, not email
-              keyman_get_icon_file(abs_kmx),  // icon full path
-              "us",                           // layout defaulting to us (en-US)
-              keyboard->version));
-      g_free(abs_kmx);
     }
-    free_keyboard_details(kbd_details);
-    g_free(kbd_details);
+  } else {
+    g_message("adding engine %s", abs_kmx);
+    kb_data->engines_list = g_list_append(
+        kb_data->engines_list,
+        ibus_keyman_engine_desc_new(
+            abs_kmx,                        // kmx full path
+            keyboard->name,                 // longname
+            kbd_details->description,       // description
+            kb_data->info->copyright,       // copyright if available
+            NULL,                           // language, most are ignored by ibus except major languages
+            kbd_details->license,           // license
+            kb_data->info->author_desc,     // author name only, not email
+            keyman_get_icon_file(abs_kmx),  // icon full path
+            "us",                           // layout defaulting to us (en-US)
+            keyboard->version));
   }
 }
 
@@ -279,7 +257,7 @@ keyman_add_keyboards_from_dir(gpointer data, gpointer user_data) {
   gchar * kmp_dir = (gchar *) data;
   GList ** engines_list = (GList **)user_data;
 
-  kmp_details *details = g_new0(kmp_details, 1);
+  g_autoptr(kmp_details) details = g_new0(kmp_details, 1);
   if (get_kmp_details(kmp_dir, details) == JSON_OK) {
     add_keyboard_data kb_data;
     kb_data.engines_list = *engines_list;
@@ -289,8 +267,6 @@ keyman_add_keyboards_from_dir(gpointer data, gpointer user_data) {
     g_list_foreach(details->keyboards, keyman_add_keyboard, &kb_data);
     *engines_list = kb_data.engines_list;
   }
-  free_kmp_details(details);
-  g_free(details);
 }
 
 GList *
@@ -298,7 +274,8 @@ ibus_keyman_list_engines (void)
 {
     GList *engines = NULL;
     GList *kmpdir_list;
-    gchar *local_keyboard_path, *xdgenv;
+    gchar *xdgenv;
+    g_autofree gchar *local_keyboard_path;
 
     g_debug("adding from /usr/share/keyman");
     kmpdir_list = keyman_get_kmpdirs_fromdir(NULL, "/usr/share/keyman");
@@ -314,9 +291,8 @@ ibus_keyman_list_engines (void)
     }
     g_debug("adding from %s", local_keyboard_path);
     kmpdir_list = keyman_get_kmpdirs_fromdir(kmpdir_list, local_keyboard_path);
-    g_free(local_keyboard_path);
     g_list_foreach(kmpdir_list, keyman_add_keyboards_from_dir, &engines);
-    g_list_free(kmpdir_list);
+    g_list_free_full(kmpdir_list, g_free);
 
     return engines;
 }
@@ -325,13 +301,12 @@ void
 add_engine(gpointer data, gpointer user_data) {
   IBusEngineDesc *desc     = IBUS_ENGINE_DESC(data);
   IBusComponent *component = IBUS_COMPONENT(user_data);
-  ibus_component_add_engine(component, desc);
+  ibus_component_add_engine(component, g_object_ref(desc));
 }
 
 IBusComponent *
 ibus_keyman_get_component (void)
 {
-    GList *engines;
     IBusComponent *component;
 
     component = ibus_component_new ("org.freedesktop.IBus.Keyman",
@@ -343,9 +318,8 @@ ibus_keyman_get_component (void)
                                     "",
                                     "ibus-keyman");
 
-    engines = ibus_keyman_list_engines ();
+    g_autolist(IBusEngineDesc) engines = ibus_keyman_list_engines();
     g_list_foreach(engines, add_engine, component);
-    g_list_free (engines);
 
     return component;
 }
