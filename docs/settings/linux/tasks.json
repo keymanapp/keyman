@@ -197,6 +197,23 @@
     },
     {
       "type": "shell",
+      "label": "keyman-config: report",
+      "command": "${workspaceFolder}/linux/keyman-config/build.sh",
+      "args": [
+        "test",
+        "--report",
+        "--debug",
+        "--coverage",
+        "--no-integration"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}/linux/keyman-config",
+      },
+      "group": "test",
+      "detail": "run tests and create unit test coverage report"
+    },
+    {
+      "type": "shell",
       "label": "keyman-system-service: clean",
       "command": "${workspaceFolder}/linux/keyman-system-service/build.sh",
       "args": [
