@@ -7,6 +7,9 @@
     { "path": "./common/models/wordbreakers/tsconfig.json" },
     { "path": "./common/predictive-text/tsconfig.json" },
     { "path": "./common/tools/hextobin/" },
+
+    { "path": "./common/web/gesture-recognizer/tsconfig.json" },
+    { "path": "./common/web/gesture-recognizer/src/tools/unit-test-resources/tsconfig.json" },
     { "path": "./common/web/input-processor/tsconfig.json" },
     { "path": "./common/web/keyboard-processor/tsconfig.json" },
     { "path": "./common/web/keyman-version" },

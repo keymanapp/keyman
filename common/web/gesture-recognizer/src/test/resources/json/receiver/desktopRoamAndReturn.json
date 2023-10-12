@@ -1,0 +1,288 @@
+{
+  "inputs": [
+    {
+      "isFromTouch": false,
+      "path": {
+        "coords": [
+          {
+            "targetX": 119,
+            "targetY": 27,
+            "t": 670652.6999999881
+          },
+          {
+            "targetX": 119,
+            "targetY": 26,
+            "t": 670770.8999999762
+          },
+          {
+            "targetX": 119,
+            "targetY": 25,
+            "t": 670783.5
+          },
+          {
+            "targetX": 119,
+            "targetY": 24,
+            "t": 670792.5
+          },
+          {
+            "targetX": 119,
+            "targetY": 24,
+            "t": 670815.2999999523
+          },
+          {
+            "targetX": 119,
+            "targetY": 23,
+            "t": 670825.8999999762
+          },
+          {
+            "targetX": 119,
+            "targetY": 22,
+            "t": 670848.1999999881
+          },
+          {
+            "targetX": 119,
+            "targetY": 21,
+            "t": 670859.0999999642
+          },
+          {
+            "targetX": 119,
+            "targetY": 20,
+            "t": 670875.8999999762
+          },
+          {
+            "targetX": 119,
+            "targetY": 20,
+            "t": 670892.6999999881
+          },
+          {
+            "targetX": 119,
+            "targetY": 19,
+            "t": 670909.1999999881
+          },
+          {
+            "targetX": 119,
+            "targetY": 18,
+            "t": 670926.5
+          },
+          {
+            "targetX": 119,
+            "targetY": 16,
+            "t": 670942.5
+          },
+          {
+            "targetX": 118,
+            "targetY": 15,
+            "t": 670959.1999999881
+          },
+          {
+            "targetX": 118,
+            "targetY": 12,
+            "t": 670975.7999999523
+          },
+          {
+            "targetX": 118,
+            "targetY": 12,
+            "t": 670993.1999999881
+          },
+          {
+            "targetX": 118,
+            "targetY": 10,
+            "t": 671009.1999999881
+          },
+          {
+            "targetX": 118,
+            "targetY": 8,
+            "t": 671025.8999999762
+          },
+          {
+            "targetX": 118,
+            "targetY": 6,
+            "t": 671042.5999999642
+          },
+          {
+            "targetX": 118,
+            "targetY": 5,
+            "t": 671059.2999999523
+          },
+          {
+            "targetX": 118,
+            "targetY": 4,
+            "t": 671075.8999999762
+          },
+          {
+            "targetX": 118,
+            "targetY": 2,
+            "t": 671092.5999999642
+          },
+          {
+            "targetX": 118,
+            "targetY": 0,
+            "t": 671109.1999999881
+          },
+          {
+            "targetX": 118,
+            "targetY": 0,
+            "t": 671125.8999999762
+          },
+          {
+            "targetX": 118,
+            "targetY": -2,
+            "t": 671142.5999999642
+          },
+          {
+            "targetX": 118,
+            "targetY": -3,
+            "t": 671159.0999999642
+          },
+          {
+            "targetX": 118,
+            "targetY": -4,
+            "t": 671175.7999999523
+          },
+          {
+            "targetX": 118,
+            "targetY": -4,
+            "t": 671192.5
+          },
+          {
+            "targetX": 118,
+            "targetY": -5,
+            "t": 671244.3999999762
+          },
+          {
+            "targetX": 118,
+            "targetY": -6,
+            "t": 671260
+          },
+          {
+            "targetX": 119,
+            "targetY": -7,
+            "t": 671275.8999999762
+          },
+          {
+            "targetX": 120,
+            "targetY": -7,
+            "t": 671326.1999999881
+          },
+          {
+            "targetX": 120,
+            "targetY": -8,
+            "t": 671342.5
+          },
+          {
+            "targetX": 120,
+            "targetY": -8,
+            "t": 671359.8999999762
+          },
+          {
+            "targetX": 120,
+            "targetY": -8,
+            "t": 671376
+          },
+          {
+            "targetX": 121,
+            "targetY": -8,
+            "t": 671395.1999999881
+          },
+          {
+            "targetX": 121,
+            "targetY": -9,
+            "t": 671420.5999999642
+          },
+          {
+            "targetX": 122,
+            "targetY": -9,
+            "t": 671460
+          },
+          {
+            "targetX": 123,
+            "targetY": -9,
+            "t": 671475.8999999762
+          },
+          {
+            "targetX": 124,
+            "targetY": -9,
+            "t": 671525.8999999762
+          },
+          {
+            "targetX": 125,
+            "targetY": -8,
+            "t": 671542.5999999642
+          },
+          {
+            "targetX": 126,
+            "targetY": -8,
+            "t": 671559.2999999523
+          },
+          {
+            "targetX": 127,
+            "targetY": -6,
+            "t": 671575.7999999523
+          },
+          {
+            "targetX": 128,
+            "targetY": -4,
+            "t": 671592.5999999642
+          },
+          {
+            "targetX": 128,
+            "targetY": -3,
+            "t": 671609.2999999523
+          },
+          {
+            "targetX": 129,
+            "targetY": -1,
+            "t": 671625.8999999762
+          },
+          {
+            "targetX": 129,
+            "targetY": 0,
+            "t": 671642.5999999642
+          },
+          {
+            "targetX": 129,
+            "targetY": 0,
+            "t": 671659.1999999881
+          },
+          {
+            "targetX": 129,
+            "targetY": 1,
+            "t": 671675.8999999762
+          },
+          {
+            "targetX": 130,
+            "targetY": 1,
+            "t": 671692.8999999762
+          },
+          {
+            "targetX": 130,
+            "targetY": 3,
+            "t": 671709.2999999523
+          },
+          {
+            "targetX": 130,
+            "targetY": 4,
+            "t": 671734.8999999762
+          },
+          {
+            "targetX": 130,
+            "targetY": 4,
+            "t": 671749.5
+          },
+          {
+            "targetX": 130,
+            "targetY": 5,
+            "t": 671793
+          }
+        ],
+        "wasCancelled": false
+      }
+    }
+  ],
+  "config": {
+    "deviceStyle": "screen3",
+    "roamingStyle": "bounds1",
+    "receiverStyle": "full",
+    "safeZoneStyle": "safe-loose"
+  }
+}

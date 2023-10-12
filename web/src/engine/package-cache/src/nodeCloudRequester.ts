@@ -56,7 +56,7 @@ export default class NodeCloudRequester implements CloudRequesterInterface {
         }
       });
 
-      if(!promise.hasFinalized) {
+      if(!promise.isResolved) {
         promise.reject(new Error(CLOUD_STUB_REGISTRATION_ERR));
       }
     }
