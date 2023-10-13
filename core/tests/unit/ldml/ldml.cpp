@@ -213,6 +213,7 @@ run_test(const km::kbp::path &source, const km::kbp::path &compiled, km::tests::
 
   // Run through actions, applying output for each event
   for (test_source.next_action(action); action.type != km::tests::LDML_ACTION_DONE; test_source.next_action(action)) {
+    // handle backspace here
     if (action.type == km::tests::LDML_ACTION_KEY_EVENT) {
       auto &p = action.k;
       std::cout << "- key action: 0x" << std::hex << p.vk << "/modifier 0x" << p.modifier_state << std::dec << std::endl;
@@ -294,9 +295,12 @@ run_test(const km::kbp::path &source, const km::kbp::path &compiled, km::tests::
 /**
  * Run all tests for this keyboard
  */
-int run_all_tests(const km::kbp::path &source, const km::kbp::path &compiled) {
+int run_all_tests(const km::kbp::path &source, const km::kbp::path &compiled, const std::string &filter) {
   std::wcout << console_color::fg(console_color::BLUE) << "source file   = " << source << std::endl
             << "compiled file = " << compiled << console_color::reset() << std::endl;
+  if(!filter.empty()) {
+    std::wcout << "Running only tests matching (substring search): " << filter.c_str() << std::endl;
+  }
 
   km::tests::LdmlEmbeddedTestSource embedded_test_source;
 
@@ -304,7 +308,12 @@ int run_all_tests(const km::kbp::path &source, const km::kbp::path &compiled) {
 
   int embedded_result = embedded_test_source.load_source(source);
 
-  if (embedded_result == 0) {
+  if (!filter.empty()) {
+    // Always skip the embedded test if there's a filter.
+    std::wcout << console_color::fg(console_color::YELLOW) << "SKIP: " << source.name() << " (embedded)" << console_color::reset()
+               << std::endl;
+    embedded_result = 0;  // no error
+  } else if (embedded_result == 0) {
     // embedded loaded OK, try it
     std::wcout << console_color::fg(console_color::BLUE) << console_color::bold() << "TEST: " << source.name() << " (embedded)"
                << console_color::reset() << std::endl;
@@ -325,30 +334,42 @@ int run_all_tests(const km::kbp::path &source, const km::kbp::path &compiled) {
   if (json_result != -1) {
     const km::tests::JsonTestMap& json_tests = json_factory.get_tests();
 
+    size_t skip_count = 0;
     assert(json_tests.size() > 0);
     // Loop over all tests
     for (const auto& n : json_tests) {
-      std::wcout << console_color::fg(console_color::BLUE) << console_color::bold() << "TEST: " << json_path.stem().c_str() << "/" << n.first.c_str() << console_color::reset() << std::endl;
+      const auto test_name = n.first;
+      auto qq = test_name.find(filter);
+      if (filter == "--list" || (qq == std::string::npos)) {
+        skip_count ++;
+        std::wcout << console_color::fg(console_color::YELLOW) << "SKIP: " << json_path.stem().c_str() << "/" << console_color::bold() << n.first.c_str() << console_color::reset() << std::endl;
+        continue;
+      }
+      std::wcout << console_color::fg(console_color::BLUE) << "TEST: " << json_path.stem().c_str() << "/" << console_color::bold() << n.first.c_str() << console_color::reset() << std::endl;
       int sub_test = run_test(source, compiled, *n.second);
       if (sub_test != 0) {
-        std::wcout << console_color::fg(console_color::BRIGHT_RED) << "FAIL: " << json_path.stem() << "/" << n.first.c_str()
+        std::wcout << console_color::fg(console_color::BRIGHT_RED) << "FAIL: " << json_path.stem() << "/" << console_color::bold() << n.first.c_str()
                    << console_color::reset() << std::endl;
         failures.push_back(json_path.stem() + "/" + n.first);
         json_result = sub_test; // set to last failure
       } else {
-        std::wcout << console_color::fg(console_color::GREEN) << " PASS: " << console_color::reset() << json_path.stem()
-                  << "/" << n.first.c_str() << std::endl;
+        std::wcout << console_color::fg(console_color::GREEN) << "PASS: " << console_color::reset() << json_path.stem()
+                  << "/" << console_color::bold() << n.first.c_str() << std::endl;
       }
     }
-    auto all_count = json_tests.size();
+    auto all_count  = json_tests.size();
     auto fail_count = failures.size();
-    auto pass_count = all_count - fail_count;
+    auto pass_count = all_count - fail_count - skip_count;
     if (pass_count > 0) {
       std::wcout << console_color::fg(console_color::GREEN) << " +" << pass_count;
     }
     if (fail_count > 0) {
      std::wcout << console_color::fg(console_color::BRIGHT_RED) <<
                 " -" << fail_count;
+    }
+    if (skip_count > 0) {
+     std::wcout << console_color::fg(console_color::YELLOW) <<
+                " (skipped " << skip_count << ")";
     }
     std::wcout << console_color::reset() << " of " << all_count << " JSON tests in "
               << json_path.stem() << std::endl;
@@ -386,10 +407,11 @@ int run_all_tests(const km::kbp::path &source, const km::kbp::path &compiled) {
 
 constexpr const auto help_str =
     "\
-ldml [--color] <LDML_TEST_FILE> <KMX_FILE>\n\
+ldml [--color] <LDML_FILE> <KMX_FILE> [ <TEST_FILTER> | --list ]\n\
 help:\n\
-\tKMN_FILE:\tThe ldml test file for the keyboard under test.\n\
-\tKMX_FILE:\tThe corresponding compiled kmx file.\n";
+\tLDML_FILE:\tThe .xml file for the keyboard under test.\n\
+\tKMX_FILE:\tThe corresponding compiled kmx file.\n\
+\tTEST_FILTER:\tIf present, only run json tests containing the filter substring.  --list will list all tests\n";
 
 }  // namespace
 
@@ -402,20 +424,28 @@ int error_args() {
 int main(int argc, char *argv[]) {
   int first_arg = 1;
 
-  if (argc < 3) {
+  if ((argc - first_arg) < 2) { // if < 2 remaining args
     return error_args();
   }
 
-  auto arg_color = std::string(argv[1]) == "--color";
+  auto arg_color = std::string(argv[first_arg]) == "--color";
   if(arg_color) {
     first_arg++;
-    if(argc < 4) {
-      return error_args();
-    }
   }
   console_color::enabled = console_color::isaterminal() || arg_color;
 
-  int rc = run_all_tests(argv[first_arg], argv[first_arg + 1]);
+  if ((argc - first_arg) < 2) {
+    return error_args();
+  }
+  const km::kbp::path ldml_file = argv[first_arg++];
+  const km::kbp::path kmx_file  = argv[first_arg++];
+
+  std::string filter; // default to 'all tests'
+  if ((argc - first_arg) >= 1) {
+    filter = argv[first_arg++];
+  }
+
+  int rc = run_all_tests(ldml_file, kmx_file, filter);
   if (rc != EXIT_SUCCESS) {
     std::wcerr << console_color::fg(console_color::BRIGHT_RED) << "FAILED" << console_color::reset() << std::endl;
     rc = EXIT_FAILURE;
