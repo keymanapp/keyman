@@ -133,4 +133,66 @@
       <check result="YES3" />
     </test>
   </tests>
+  <tests name="regex-tests-4">
+    <test name="regex-test-4a-0">
+      <startContext to="" />
+      <keystroke key="stampy" />
+      <keystroke key="4" />
+      <keystroke key="e" />
+      <keystroke key="u-0320" />
+      <keystroke key="u-0300" />
+      <backspace /> <!-- skip the number, match any -->
+      <check result="YES4" />
+    </test>
+    <test name="regex-test-4a-1">
+      <startContext to="" />
+      <keystroke key="4" />
+      <keystroke key="stampy" />
+      <keystroke key="e" />
+      <keystroke key="u-0320" />
+      <keystroke key="u-0300" />
+      <backspace /> <!-- skip the number, match any -->
+      <check result="YES4" />
+    </test>
+    <test name="regex-test-4a-2">
+      <startContext to="" />
+      <keystroke key="4" />
+      <keystroke key="e" />
+      <keystroke key="stampy" />
+      <keystroke key="u-0320" />
+      <keystroke key="u-0300" />
+      <backspace /> <!-- skip the number, match any -->
+      <check result="YES4" />
+    </test>
+    <test name="regex-test-4a-3">
+      <startContext to="" />
+      <keystroke key="4" />
+      <keystroke key="e" />
+      <keystroke key="u-0320" />
+      <keystroke key="stampy" />
+      <keystroke key="u-0300" />
+      <backspace /> <!-- skip the number, match any -->
+      <check result="YES4" />
+    </test>
+    <test name="regex-test-4a-4">
+      <startContext to="" />
+      <keystroke key="4" />
+      <keystroke key="e" />
+      <keystroke key="u-0320" />
+      <keystroke key="u-0300" />
+      <keystroke key="stampy" />
+      <backspace /> <!-- skip the number, match any -->
+      <check result="YES4" />
+    </test>
+  </tests>
+  <tests name="regex-tests-5">
+    <test name="regex-test-5a-0">
+      <startContext to="" />
+      <keystroke key="5" />
+      <keystroke key="e" />
+      <keystroke key="u-0320" />
+      <keystroke key="u-0300" />
+      <check result="YES4" />
+    </test>
+  </tests>
 </keyboardTest3>
