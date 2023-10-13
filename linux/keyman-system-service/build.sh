@@ -50,14 +50,14 @@ builder_run_action clean rm -rf "$THIS_SCRIPT_PATH/build/"
 # shellcheck disable=SC2086
 builder_run_action configure meson setup "$MESON_PATH" --werror --buildtype $MESON_TARGET ${MESON_COVERAGE} "${builder_extra_params[@]}"
 
+cd "$MESON_PATH" || true
+
 if builder_start_action build; then
-  cd "$MESON_PATH"
   ninja
   builder_finish_action success build
 fi
 
 if builder_start_action test; then
-  cd "$MESON_PATH"
   meson test --print-errorlogs $builder_verbose
   if builder_has_option --coverage; then
     # Note: requires lcov > 1.16 to properly work (see https://github.com/mesonbuild/meson/issues/6747)
@@ -67,13 +67,11 @@ if builder_start_action test; then
 fi
 
 if builder_start_action install; then
-  cd "$MESON_PATH"
   ninja install
   builder_finish_action success install
 fi
 
 if builder_start_action uninstall; then
-  cd "$MESON_PATH"
   ninja uninstall
   builder_finish_action success uninstall
 fi

@@ -30,3 +30,12 @@ builder_describe \
 builder_parse "$@"
 
 builder_run_child_actions clean configure build test install uninstall
+
+test_action() {
+  if builder_has_option --report; then
+    builder_echo "Opening coverage reports in browser..."
+    xdg-open "file://${THIS_SCRIPT_PATH}/CodeCoverageReports.html"
+  fi
+}
+
+builder_run_action test test_action
