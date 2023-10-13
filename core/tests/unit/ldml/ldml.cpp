@@ -340,9 +340,9 @@ int run_all_tests(const km::kbp::path &source, const km::kbp::path &compiled) {
                   << "/" << n.first.c_str() << std::endl;
       }
     }
-    int all_count = json_tests.size();
-    int fail_count = failures.size();
-    int pass_count = all_count - fail_count;
+    auto all_count = json_tests.size();
+    auto fail_count = failures.size();
+    auto pass_count = all_count - fail_count;
     if (pass_count > 0) {
       std::wcout << console_color::fg(console_color::GREEN) << " +" << pass_count;
     }
