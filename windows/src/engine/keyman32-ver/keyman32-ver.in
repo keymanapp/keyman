@@ -1,4 +1,4 @@
-LIBRARY   KEYMAN32
+LIBRARY   keyman32-ver$VersionWithTag
 
 EXPORTS
       Keyman_GetInitialised

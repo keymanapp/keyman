@@ -30,6 +30,12 @@
 
 typedef BOOL (WINAPI *InitDllFunction)(PSTR name);
 
+#ifdef _WIN64
+  const wchar_t keyman_engine_arch[] = L"keyman64.dll";
+#else
+  const wchar_t keyman_engine_arch[] = L"keyman32.dll";
+#endif
+
 /* Add a dll to the list of dlls associated with the keyboard */
 // core processor implementation also uses this function
 static LPIMDLL AddIMDLL(LPINTKEYBOARDINFO lpkbi, LPSTR kbdpath, LPSTR dllfilename)
@@ -227,6 +233,15 @@ BOOL UnloadDLLs(LPINTKEYBOARDINFO lpkbi)
 
   if (lpkbi->lpCoreKeyboardState) {
           km_core_state_imx_deregister_callback(lpkbi->lpCoreKeyboardState);
+          PKEYMAN64THREADDATA _td = ThreadGlobals();
+          if (!_td) {
+            return FALSE;
+          }
+          if (_td->hModuleProxy) {
+            FreeLibrary(_td->hModuleProxy);
+            _td->hModuleProxy = NULL;
+          }
+
   }
 	return TRUE;
 }
@@ -575,11 +590,46 @@ LoadDLLs(LPINTKEYBOARDINFO lpkbi) {
 
   if (!GetKeyboardFileName(lpkbi->Name, fullname, _MAX_PATH))
     return FALSE;
-  if ((!lpkbi->lpCoreKeyboard) || (!lpkbi->lpCoreKeyboard)){
+  if (!lpkbi->lpCoreKeyboard){
+    return FALSE;
+  }
+
+  PKEYMAN64THREADDATA _td = ThreadGlobals();
+  if (!_td){
     return FALSE;
   }
 
   km_core_keyboard_imx *imx_list = lpkbi->lpIMXList;
+  // return early if the list empty avoiding loading the proxy dll into memory
+  if (!imx_list->library_name) {
+    return FALSE;
+  }
+
+   if (!_td->hModuleProxy) {
+    wchar_t module_filename[_MAX_PATH];
+    if(!GetModuleFileNameW(g_hInstance, module_filename, _MAX_PATH)){
+      SendDebugMessageFormat(0, sdmKeyboard, 0, "LoadDLLsCore: unable to get handle for loaded keyman versioned dll; error:[%d]", GetLastError());
+        return FALSE;
+    }
+
+    wchar_t *p = wcsrchr(module_filename, '\\'); // find last occurrence of '\'
+    if (p != NULL) {
+      size_t len = wcslen(keyman_engine_arch);
+      // We know that the arch filename is shorter than the versioned filename so this
+      // should always be safe, just insure we insert the null character
+      wcsncpy_s(p, _MAX_PATH - (p - module_filename), keyman_engine_arch, len);
+      _td->hModuleProxy = LoadLibraryW(module_filename);
+      if (!_td->hModuleProxy) {
+        SendDebugMessageFormat(0, sdmKeyboard, 0, "LoadDLLsCore: [%s] not loaded with error:[%d]", module_filename, GetLastError());
+        return FALSE;
+      }
+    }
+    else {
+      SendDebugMessageFormat(0, sdmKeyboard, 0, "LoadDLLsCore: unable to find path for keyman versioned dll");
+        return FALSE;
+    }
+  }
+
   BOOL result = false;
   for (; imx_list->library_name; ++imx_list) {
     LPIMDLL imd = AddIMDLL(lpkbi, fullname, wstrtostr(reinterpret_cast<LPCWSTR>(imx_list->library_name)));

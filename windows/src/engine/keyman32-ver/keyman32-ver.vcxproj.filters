@@ -132,26 +132,26 @@
     <ClCompile Include="kmprocessactions.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\global\cpp\kmtip_guids.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="CoreEnvironment.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="KEYMAN32-VER.DEF">
-      <Filter>Source Files</Filter>
-    </None>
     <None Include="..\..\..\..\common\resources\bitmaps\arrow.bmp">
       <Filter>Resource Files</Filter>
     </None>
     <None Include="..\..\..\..\common\resources\bitmaps\mask.bmp">
       <Filter>Resource Files</Filter>
     </None>
+    <None Include="KEYMAN32-VER.DEF">
+      <Filter>Source Files</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="KEYMAN32-VER.RC">
-      <Filter>Source Files</Filter>
-    </ResourceCompile>
-    <ResourceCompile Include="keyman-debug-etw.rc">
       <Filter>Source Files</Filter>
     </ResourceCompile>
   </ItemGroup>
@@ -210,9 +210,6 @@
     <ClInclude Include="k32_tsf.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="keyman-debug-etw.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="keyeventsenderthread.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -240,8 +237,11 @@
     <ClInclude Include="kmprocessactions.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <CustomBuild Include="keyman-debug-etw.man" />
+    <ClInclude Include="..\..\..\include\kmtip_guids.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\keyman32\keyman-debug-etw.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

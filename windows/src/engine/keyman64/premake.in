@@ -1,0 +1,26 @@
+# Copy files to correct names in \release; this file is munged by mkver to download.mak
+#
+
+!include ..\..\defines.mak
+
+default:
+  echo Please don't call this file directly -- used by Makefile
+
+clean:
+    $(MSBUILD) keyman64-ver.sln $(MSBUILD_CLEAN) "/p:Platform=x64;VersionWithTag=$VersionWithTag"
+
+signcode:
+    $(SIGNCODE) /d "Keyman Engine x64" $(PROGRAM)\engine\keyman64-ver$VersionWithTag.dll
+
+wrap-symbols:
+    $(SYMSTORE) $(PROGRAM)\engine\keyman64-ver$VersionWithTag.dll /t keyman-engine-windows
+    $(SYMSTORE) $(DEBUGPATH)\engine\keyman64-ver$VersionWithTag.pdb /t keyman-engine-windows
+
+install:
+    $(COPY) $(PROGRAM)\engine\keyman64-ver$VersionWithTag.dll "$(INSTALLPATH_KEYMANENGINE)\keyman64-ver$VersionWithTag.dll"
+
+
+build:
+    $(MSBUILD) keyman64-ver.sln $(MSBUILD_BUILD) "/p:Platform=x64;VersionWithTag=$VersionWithTag"
+    $(COPY) $(X64_TARGET_PATH)\keyman64-ver$VersionWithTag.dll $(PROGRAM)\engine
+    $(COPY) $(X64_TARGET_PATH)\keyman64-ver$VersionWithTag.pdb $(DEBUGPATH)\engine

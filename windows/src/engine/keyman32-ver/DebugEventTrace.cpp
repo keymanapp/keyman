@@ -1,6 +1,6 @@
 
 #include "pch.h"
-#include "keyman-debug-etw.h"
+#include "../keyman32/keyman-debug-etw.h"
 
 #ifdef _WIN64
 #define DEBUG_PLATFORM_STRING "x64"

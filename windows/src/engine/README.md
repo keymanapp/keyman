@@ -13,7 +13,7 @@ Host application for the Keyman Engine. Shows the Keyman icon, Keyman menu, OSK,
 
 ## keymanx64 - keymanx64.exe
 
-64-bit version of keyman.exe. All UI is in keyman.exe, so this is a thin wrapper around the keyman32 build.
+64-bit version of keyman.exe. All UI is in keyman.exe, so this is a thin wrapper around the keyman32-ver build.
 
 ## kmcomapi - kmcomapi.dll | kmcomapi.x64.dll
 

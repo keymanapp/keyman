@@ -11,18 +11,19 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{A7069186-5AE7-4504-8926-861B7A34BA9E}</ProjectGuid>
-    <RootNamespace>Keyman32</RootNamespace>
+    <ProjectGuid>{BD5564FB-35A5-4A3C-B96A-4A6578E2B593}</ProjectGuid>
+    <RootNamespace>Keyman32-ver</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+    <ProjectName>keyman32-ver</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
-    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseOfMfc>false</UseOfMfc>
     <PlatformToolset>v142</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
-    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseOfMfc>false</UseOfMfc>
     <PlatformToolset>v142</PlatformToolset>
   </PropertyGroup>
@@ -54,12 +55,14 @@
     <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" />
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <LibraryPath>$(ProjectDir)..\..\..\..\core\build\x86\$(Configuration)\src;$(ProjectDir)..\..\..\..\core\build\rust\x86\$(Configuration);$(LibraryPath)</LibraryPath>
-    <IncludePath>$(ProjectDir)..\..\..\..\common\include;$(ProjectDir)..\..\..\..\core\build\x86\$(Configuration)\include;$(ProjectDir)..\..\..\..\core\include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(ProjectDir)..\..\..\..\core\build\x86\$(Configuration)\src;$(ProjectDir)..\..\..\..\core\build\x86\$(Configuration)\subprojects\icu\source\common;$(ProjectDir)..\..\..\..\core\build\x86\$(Configuration)\subprojects\icu\source\i18n;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(ProjectDir)..\..\..\..\common\include;$(ProjectDir)..\..\..\..\core\include;$(ProjectDir)..\..\..\..\core\build\x86\$(Configuration)\include;$(IncludePath)</IncludePath>
+    <TargetName>$(ProjectName)$(VersionWithTag)</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <LibraryPath>$(ProjectDir)..\..\..\..\core\build\x86\$(Configuration)\src;$(ProjectDir)..\..\..\..\core\build\rust\x86\$(Configuration);$(LibraryPath)</LibraryPath>
+    <LibraryPath>$(ProjectDir)..\..\..\..\core\build\x86\$(Configuration)\src;$(ProjectDir)..\..\..\..\core\build\x86\$(Configuration)\subprojects\icu\source\common;$(ProjectDir)..\..\..\..\core\build\x86\$(Configuration)\subprojects\icu\source\i18n;$(LibraryPath)</LibraryPath>
     <IncludePath>$(ProjectDir)..\..\..\..\common\include;$(ProjectDir)..\..\..\..\core\include;$(ProjectDir)..\..\..\..\core\build\x86\$(Configuration)\include;$(IncludePath)</IncludePath>
+    <TargetName>$(ProjectName)$(VersionWithTag)</TargetName>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <Midl>
@@ -67,7 +70,7 @@
       <MkTypLibCompatible>true</MkTypLibCompatible>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <TargetEnvironment>Win32</TargetEnvironment>
-      <TypeLibraryName>./Keyman32.tlb</TypeLibraryName>
+      <TypeLibraryName>./Keyman32-ver.tlb</TypeLibraryName>
       <HeaderFileName>
       </HeaderFileName>
     </Midl>
@@ -84,9 +87,6 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <AssemblerOutput>All</AssemblerOutput>
-      <AssemblerListingLocation>./</AssemblerListingLocation>
-      <ObjectFileName>./</ObjectFileName>
-      <ProgramDataBaseFileName>./</ProgramDataBaseFileName>
       <WarningLevel>Level4</WarningLevel>
       <TreatWarningAsError>true</TreatWarningAsError>
       <SuppressStartupBanner>true</SuppressStartupBanner>
@@ -98,27 +98,24 @@
     </ResourceCompile>
     <Link>
       <AdditionalOptions>/verbose:lib /section:.SHARDATA,rws %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalDependencies>kmnkbp0.lib;psapi.lib;rpcrt4.lib;version.lib;setupapi.lib;iphlpapi.lib;imm32.lib;crypt32.lib;wintrust.lib;imagehlp.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <OutputFile>./Keyman32$(Version_with_tag).dll</OutputFile>
+      <AdditionalDependencies>libicuuc.a;libicuin.a;libkmnkbp0.a;psapi.lib;rpcrt4.lib;version.lib;setupapi.lib;iphlpapi.lib;imm32.lib;crypt32.lib;wintrust.lib;imagehlp.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <ModuleDefinitionFile>keyman32-ver.def</ModuleDefinitionFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <ProgramDatabaseFile>./Keyman32.pdb</ProgramDatabaseFile>
       <GenerateMapFile>true</GenerateMapFile>
-      <MapFileName>./Keyman32.map</MapFileName>
       <MapExports>false</MapExports>
       <SubSystem>Windows</SubSystem>
       <OptimizeReferences>true</OptimizeReferences>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <BaseAddress>0x1c100000</BaseAddress>
-      <ImportLibrary>./Keyman32.lib</ImportLibrary>
       <TargetMachine>MachineX86</TargetMachine>
       <UACUIAccess>true</UACUIAccess>
       <TreatWarningAsError>true</TreatWarningAsError>
+      <ImportLibrary>..\..\..\lib\keyman32-ver.lib</ImportLibrary>
     </Link>
     <Bscmake>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <OutputFile>./Keyman32.bsc</OutputFile>
+      <OutputFile>./Keyman32-ver.bsc</OutputFile>
     </Bscmake>
     <Manifest>
       <AdditionalManifestFiles>
@@ -131,7 +128,7 @@
       <MkTypLibCompatible>true</MkTypLibCompatible>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <TargetEnvironment>Win32</TargetEnvironment>
-      <TypeLibraryName>./Keyman32.tlb</TypeLibraryName>
+      <TypeLibraryName>./Keyman32-ver.tlb</TypeLibraryName>
       <HeaderFileName>
       </HeaderFileName>
     </Midl>
@@ -145,9 +142,6 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <AssemblerOutput>All</AssemblerOutput>
-      <AssemblerListingLocation>./</AssemblerListingLocation>
-      <ObjectFileName>./</ObjectFileName>
-      <ProgramDataBaseFileName>./</ProgramDataBaseFileName>
       <BrowseInformation>true</BrowseInformation>
       <WarningLevel>Level4</WarningLevel>
       <TreatWarningAsError>true</TreatWarningAsError>
@@ -160,24 +154,21 @@
     </ResourceCompile>
     <Link>
       <AdditionalOptions>/verbose:lib /section:.SHARDATA,rws %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalDependencies>kmnkbp0.lib;psapi.lib;rpcrt4.lib;version.lib;setupapi.lib;iphlpapi.lib;imm32.lib;crypt32.lib;wintrust.lib;imagehlp.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <OutputFile>./Keyman32$(Version_with_tag).dll</OutputFile>
+      <AdditionalDependencies>libicuuc.a;libicuin.a;libkmnkbp0.a;psapi.lib;rpcrt4.lib;version.lib;setupapi.lib;iphlpapi.lib;imm32.lib;crypt32.lib;wintrust.lib;imagehlp.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <ModuleDefinitionFile>keyman32-ver.def</ModuleDefinitionFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <ProgramDatabaseFile>./Keyman32.pdb</ProgramDatabaseFile>
       <GenerateMapFile>true</GenerateMapFile>
-      <MapFileName>./Keyman32.map</MapFileName>
       <SubSystem>Windows</SubSystem>
       <BaseAddress>0x1C100000</BaseAddress>
-      <ImportLibrary>./Keyman32.lib</ImportLibrary>
       <TargetMachine>MachineX86</TargetMachine>
       <UACUIAccess>true</UACUIAccess>
       <TreatWarningAsError>true</TreatWarningAsError>
+      <ImportLibrary>..\..\..\lib\keyman32-ver.lib</ImportLibrary>
     </Link>
     <Bscmake>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <OutputFile>./Keyman32.bsc</OutputFile>
+      <OutputFile>./Keyman32-ver.bsc</OutputFile>
     </Bscmake>
     <Manifest>
       <AdditionalManifestFiles>
@@ -185,6 +176,7 @@
     </Manifest>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\global\cpp\kmtip_guids.cpp" />
     <ClCompile Include="$(KEYMAN_ROOT)\common\windows\cpp\src\xstring.cpp" />
     <ClCompile Include="appint\aiTIP.cpp">
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
@@ -340,31 +332,20 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <CustomBuild Include="keyman-debug-etw.man">
-      <FileType>Document</FileType>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">mc %(FullPath)</Command>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Compiling keyman-debug-etw</Message>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(Filename).rc;%(Filename.h);MSG00001.bin</Outputs>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">mc %(FullPath)</Command>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Compiling keyman-debug-etw</Message>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(Filename).rc;%(Filename.h);MSG00001.bin</Outputs>
-      <SubType>Designer</SubType>
-    </CustomBuild>
     <None Include="KEYMAN32-VER.DEF" />
     <None Include="..\..\..\..\common\resources\bitmaps\arrow.bmp" />
     <None Include="..\..\..\..\common\resources\bitmaps\mask.bmp" />
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="keyman-debug-etw.rc" />
     <ResourceCompile Include="KEYMAN32-VER.RC">
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\keyman32\keyman-debug-etw.h" />
     <ClInclude Include="keymanengine.h" />
+    <ClInclude Include="..\..\..\include\kmtip_guids.h" />
     <ClInclude Include="appint\aiTIP.h" />
     <ClInclude Include="appint\aiWin2000Unicode.h" />
     <ClInclude Include="appint\appint.h" />
@@ -380,7 +361,6 @@
     <ClInclude Include="keyboardoptions.h" />
     <ClInclude Include="keyman64.h" />
     <ClInclude Include="keymancontrol.h" />
-    <ClInclude Include="keyman-debug-etw.h" />
     <ClInclude Include="keyeventsenderthread.h" />
     <ClInclude Include="keystate.h" />
     <ClInclude Include="$(KEYMAN_ROOT)\common\windows\cpp\include\registry.h" />

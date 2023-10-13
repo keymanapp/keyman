@@ -1,0 +1,83 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="$(KEYMAN_ROOT)\common\windows\cpp\src\xstring.cpp" />
+    <ClCompile Include="..\keyman32-ver\appint\aiTIP.cpp" />
+    <ClCompile Include="..\keyman32-ver\appint\aiWin2000Unicode.cpp" />
+    <ClCompile Include="..\keyman32-ver\appint\appint.cpp" />
+    <ClCompile Include="..\keyman32-ver\calldll.cpp" />
+    <ClCompile Include="..\keyman32-ver\capsstate.cpp" />
+    <ClCompile Include="..\keyman32-ver\glossary.cpp" />
+    <ClCompile Include="..\keyman32-ver\hookutils.cpp" />
+    <ClCompile Include="..\keyman32-ver\K32_DBG.CPP" />
+    <ClCompile Include="..\keyman32-ver\k32_globals.cpp" />
+    <ClCompile Include="..\keyman32-ver\K32_load.cpp" />
+    <ClCompile Include="..\keyman32-ver\k32_tsf.cpp" />
+    <ClCompile Include="..\keyman32-ver\keybd_shift.cpp" />
+    <ClCompile Include="..\keyman32-ver\keyboardoptions.cpp" />
+    <ClCompile Include="..\keyman32-ver\Keyman32.cpp" />
+    <ClCompile Include="$(KEYMAN_ROOT)\common\windows\cpp\src\keynames.cpp" />
+    <ClCompile Include="..\keyman32-ver\keystate.cpp" />
+    <ClCompile Include="..\keyman32-ver\kmhook_callwndproc.cpp" />
+    <ClCompile Include="..\keyman32-ver\kmhook_getmessage.cpp" />
+    <ClCompile Include="..\keyman32-ver\kmprocess.cpp" />
+    <ClCompile Include="$(KEYMAN_ROOT)\common\windows\cpp\src\registry.cpp" />
+    <ClCompile Include="..\keyman32-ver\pch.cpp" />
+    <ClCompile Include="..\keyman32-ver\preservedkeymap.cpp" />
+    <ClCompile Include="..\keyman32-ver\security.cpp" />
+    <ClCompile Include="..\keyman32-ver\selectkeyboard.cpp" />
+    <ClCompile Include="..\keyman32-ver\serialkeyeventclient.cpp" />
+    <ClCompile Include="..\keyman32-ver\serialkeyeventserver.cpp" />
+    <ClCompile Include="..\keyman32-ver\SharedBuffers.cpp" />
+    <ClCompile Include="..\keyman32-ver\syskbd.cpp" />
+    <ClCompile Include="..\keyman32-ver\syskbdnt.cpp" />
+    <ClCompile Include="$(KEYMAN_ROOT)\common\windows\cpp\src\unicode.cpp" />
+    <ClCompile Include="..\keyman32-ver\versioninfo.cpp" />
+    <ClCompile Include="..\keyman32-ver\VKScanCodes.cpp" />
+    <ClCompile Include="..\keyman32-ver\DebugEventTrace.cpp" />
+    <ClCompile Include="..\keyman32-ver\kmprocessactions.cpp" />
+    <ClCompile Include="..\..\global\cpp\kmtip_guids.cpp" />
+    <ClCompile Include="..\keyman32-ver\CoreEnvironment.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\keyman32-ver\appint\aiTIP.h" />
+    <ClInclude Include="..\keyman32-ver\appint\aiWin2000Unicode.h" />
+    <ClInclude Include="..\keyman32-ver\appint\appint.h" />
+    <ClInclude Include="..\keyman32-ver\calldll.h" />
+    <ClInclude Include="..\keyman32-ver\capsstate.h" />
+    <ClInclude Include="$(KEYMAN_ROOT)\common\windows\cpp\include\legacy_kmx_file.h" />
+    <ClInclude Include="$(KEYMAN_ROOT)\common\windows\cpp\include\crc32.h" />
+    <ClInclude Include="..\keyman32-ver\globals.h" />
+    <ClInclude Include="..\keyman32-ver\hotkeys.h" />
+    <ClInclude Include="..\keyman32-ver\k32_res.h" />
+    <ClInclude Include="..\keyman32-ver\KBD.H" />
+    <ClInclude Include="..\keyman32-ver\keyman64.h" />
+    <ClInclude Include="..\keyman32-ver\keymancontrol.h" />
+    <ClInclude Include="$(KEYMAN_ROOT)\common\windows\cpp\include\keynames.h" />
+    <ClInclude Include="..\keyman32-ver\keyeventsenderthread.h" />
+    <ClInclude Include="..\keyman32-ver\keystate.h" />
+    <ClInclude Include="..\keyman32-ver\kmprot.h" />
+    <ClInclude Include="$(KEYMAN_ROOT)\common\windows\cpp\include\registry.h" />
+    <ClInclude Include="..\keyman32-ver\pch.h" />
+    <ClInclude Include="..\keyman32-ver\security.h" />
+    <ClInclude Include="..\keyman32-ver\serialkeyeventclient.h" />
+    <ClInclude Include="..\keyman32-ver\serialkeyeventcommon.h" />
+    <ClInclude Include="..\keyman32-ver\serialkeyeventserver.h" />
+    <ClInclude Include="..\keyman32-ver\SharedBuffers.h" />
+    <ClInclude Include="..\keyman32-ver\syskbd.h" />
+    <ClInclude Include="..\keyman32-ver\testkeymanfunctioning.h" />
+    <ClInclude Include="$(KEYMAN_ROOT)\common\windows\cpp\include\unicode.h" />
+    <ClInclude Include="..\keyman32-ver\vkscancodes.h" />
+    <ClInclude Include="..\keyman32-ver\keymanengine.h" />
+    <ClInclude Include="..\keyman32-ver\kmprocessactions.h" />
+    <ClInclude Include="..\..\..\include\kmtip_guids.h" />
+    <ClInclude Include="..\keyman64\keyman-debug-etw.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Keyman64-ver.RC" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="$(KEYMAN_ROOT)\common\resources\bitmaps\arrow.bmp" />
+    <None Include="$(KEYMAN_ROOT)\common\resources\bitmaps\mask.bmp" />
+  </ItemGroup>
+</Project>
