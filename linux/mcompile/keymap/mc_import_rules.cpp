@@ -578,45 +578,56 @@ bool  write_rgKey_ToFile(std::vector<KMX_VirtualKey*> rgKey ){
   return true;
 }
 
-bool VK_Neither_DigitNorChar(int pos, v_dw_3D & All_Vector){
- if((!( All_Vector[1][pos][1] == All_Vector[1][pos][2] + 32) && (!((All_Vector[1][pos][1] >= 48  && All_Vector[1][pos][1]  <= 57) || (All_Vector[1][pos][1] >= 65  && All_Vector[1][pos][1]  <= 90)))))
-  return true;
-
-    else
-      return false;
+bool is_Letter(int pos, v_dw_3D & All_Vector){
+  if( ( All_Vector[1][pos][1] == All_Vector[1][pos][2] + 32)  )
+    return true;
+  return false;
 }
 
-bool is_lowercase_alphabetic(int pos, v_dw_3D & All_Vector){
-
-    if(( All_Vector[1][pos][1] == All_Vector[1][pos][2] + 32)  && ( (All_Vector[1][pos][1] >= 97  && All_Vector[1][pos][1]  <= 122) ))
+bool is_Number(int pos, v_dw_3D & All_Vector){
+  if( (pos > 0  && pos  < 11 ) )
       return true;
-    else
-      return false;
-  }
+  return false;
+}
 
+bool is_Special(int pos, v_dw_3D & All_Vector){
+  if( !is_Number && !is_Letter)
+    return true;
+  return false;
+}
 
 // _S2 where to put this??
 std::wstring  get_VirtualKey_Other_from_iKey(KMX_DWORD iKey, ShiftState &ss, int &caps, v_dw_3D &All_Vector) {
 
-  int icaps;
   // _S2 this will find the correct row in All_Vector
   //( e.g. get_position_From_VirtualKey_Other(65 ,All_Vector ) returns 25
   // All_Vector[25] contains SC(38), unshifted A (97) shifted A (65) )
   KMX_DWORD pos = get_position_From_VirtualKey_Other(iKey, All_Vector);
 
+  int icaps;
   if (ss >9)
     return L"";
 
   if( ss < All_Vector[1][pos].size()-1) {
 
     // ss 0,2,4...
-    if ( ss % 2 == 0)
-      icaps = ss+2-caps;
+    if ( ss % 2 == 0) {
+
+      if ( is_Letter(pos, All_Vector) || is_Number(pos, All_Vector))
+        icaps = ss+2-caps;
+
+      else
+        icaps = ss+1;
+    }
 
     // ss 1,3,5...
-    if ( ss % 2 == 1)
-      icaps = ss+caps;
+    if ( ss % 2 == 1) {
+      if ( is_Letter(pos, All_Vector) || is_Number(pos, All_Vector))
+        icaps = ss+caps;
 
+      else
+        icaps = ss+1;
+    }
     return std::wstring(1, (int) All_Vector[1][pos][icaps]);
   }
   return L"";
@@ -656,7 +667,7 @@ bool KMX_ImportRules(KMX_WCHAR *kbid, LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector,std
   // values in it. Then, store the SC in each valid VK so it can act as both a 
   // flag that the VK is valid, and it can store the SC value.
   //for(UINT sc = 0x01; sc <= 0x7f; sc++) {
-  for(UINT sc = 0x0; sc <= 0xff; sc++) {
+  for(UINT sc = 0x0; sc <= 0x7f; sc++) {
     KMX_VirtualKey *key = new KMX_VirtualKey(sc, hkl, All_Vector);      // _S2 get this from my Vector
     uint key_vk = key->VK() ;
    if(key->VK() != 0) {
@@ -666,7 +677,7 @@ bool KMX_ImportRules(KMX_WCHAR *kbid, LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector,std
     }
   }
 
- /* // where in rgkey do I store Numpad???
+ // where in rgkey do I store Numpad???
   // _S2 do we need NUMPAD now or later? If so we need to add Numpad values to All_Vector ( which has only values a-z)
 // _S2 use KMX_VirtualKey !!
   // _S2 do I need NUMPAD + SPECIAL_SHIFT for first draft ??
@@ -678,9 +689,9 @@ bool KMX_ImportRules(KMX_WCHAR *kbid, LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector,std
   rgKey[VK_DIVIDE] = new KMX_VirtualKey(hkl, VK_DIVIDE, All_Vector);
   rgKey[VK_CANCEL] = new KMX_VirtualKey(hkl, VK_CANCEL, All_Vector);
   rgKey[VK_DECIMAL] = new KMX_VirtualKey(hkl, VK_DECIMAL, All_Vector);
- */
 
-/*  // _S2 do we need special shift state now or later?
+/*
+ // _S2 do we need special shift state now or later?
   // See if there is a special shift state added
   for(UINT vk = 0; vk <= VK_OEM_CLEAR; vk++) {
       UINT sc = MapVirtualKeyEx(vk, 0, hkl);
@@ -723,7 +734,6 @@ bool KMX_ImportRules(KMX_WCHAR *kbid, LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector,std
 
           //_S2 TODO
           //_S2 get char  - do I need rc ?? ( was rc = ToUnicodeEx...)
-          //std::wstring VK_US = get_VirtualKey_US_from_iKey(iKey, ss, caps, All_Vector);
           std::wstring VK_Other = get_VirtualKey_Other_from_iKey(mapped_ikey, ss, caps, All_Vector);
 
           //std::wstring VK_Other = get_VirtualKey_Other_from_iKey(iKey, ss, caps, All_Vector);
@@ -734,7 +744,6 @@ bool KMX_ImportRules(KMX_WCHAR *kbid, LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector,std
           //if rc >0: it got 1 or more char AND buffer is empty ( nothing inside ) {
             if(VK_Other == L"") {
                   rgKey[iKey]->KMX_SetShiftState(ss, L"", false, (caps == 0));
-                  //rgKey[iKey]->KMX_SetShiftState(ss, L"", false, (caps == 0));
             }
 
             //_S2 TODO
@@ -777,22 +786,12 @@ bool KMX_ImportRules(KMX_WCHAR *kbid, LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector,std
   CompareVector_To_VectorOfFile_RGKEY( V_win, V_lin,V_map);*/
 
 
-int zz;
-zz = 54;
-wprintf(L"Results for %i: %s, %s, %s, %s   \n", zz, rgKey[zz]->KMX_GetShiftState(Base,0).c_str(), rgKey[zz]->KMX_GetShiftState(Base,1).c_str() ,rgKey[zz]->KMX_GetShiftState(Shft,0).c_str(), rgKey[zz]->KMX_GetShiftState(Shft,1).c_str());
-zz = 65;
-wprintf(L"Results for %i: %s, %s, %s, %s   \n", zz, rgKey[zz]->KMX_GetShiftState(Base,0).c_str(), rgKey[zz]->KMX_GetShiftState(Base,1).c_str() ,rgKey[zz]->KMX_GetShiftState(Shft,0).c_str(), rgKey[zz]->KMX_GetShiftState(Shft,1).c_str());
-zz = 189;
-wprintf(L"Results for %i: %s, %s, %s, %s   \n", zz, rgKey[zz]->KMX_GetShiftState(Base,0).c_str(), rgKey[zz]->KMX_GetShiftState(Base,1).c_str() ,rgKey[zz]->KMX_GetShiftState(Shft,0).c_str(), rgKey[zz]->KMX_GetShiftState(Shft,1).c_str());
-zz = 188;
-wprintf(L"Results for %i: %lS, %lS, %lS, %lS   \n", zz, rgKey[zz]->KMX_GetShiftState(Base,0).c_str(), rgKey[zz]->KMX_GetShiftState(Base,1).c_str() ,rgKey[zz]->KMX_GetShiftState(Shft,0).c_str(), rgKey[zz]->KMX_GetShiftState(Shft,1).c_str());
-/*
-zz = 191;
-wprintf(L"Results for %i: %S, %S, %S, %S   \n", zz, rgKey[zz]->KMX_GetShiftState(Base,0).c_str(), rgKey[zz]->KMX_GetShiftState(Base,1).c_str() ,rgKey[zz]->KMX_GetShiftState(Shft,0).c_str(), rgKey[zz]->KMX_GetShiftState(Shft,1).c_str());
+std::vector< int > TestValues = {49,54,65,89,189,188};
 
-zz = 186;
-wprintf(L"Results for %i: %s, %s, %s, %s   \n", zz, rgKey[zz]->KMX_GetShiftState(Base,0).c_str(), rgKey[zz]->KMX_GetShiftState(Base,1).c_str() ,rgKey[zz]->KMX_GetShiftState(Shft,0).c_str(), rgKey[zz]->KMX_GetShiftState(Shft,1).c_str());
-*/
+for ( int i=0; i < TestValues.size();i++) {
+  wprintf(L"Results for %i\t: %s  %s  %s  %s   \n", TestValues[i], rgKey[TestValues[i]]->KMX_GetShiftState(Base,0).c_str(),   rgKey[TestValues[i]]->KMX_GetShiftState(Base,1).c_str() ,  rgKey[TestValues[i]]->KMX_GetShiftState(Shft,0).c_str(), rgKey[TestValues[i]]->KMX_GetShiftState(Shft,1).c_str());
+}
+
 
   //-------------------------------------------------------------
   // Now that we've collected the key data, we need to

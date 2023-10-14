@@ -146,4 +146,12 @@ typedef KMX_UCHAR* KMX_PUCHAR;
 #define VK_CANCEL   3
 #define VK_DECIMAL  110
 
+#define VK_OEM_CLEAR      0xFE
+#define VK_LSHIFT         0xA0
+#define VK_RSHIFT         0xA1
+#define VK_LCONTROL       0xA2
+#define VK_RCONTROL       0xA3
+#define VK_LMENU          0xA4
+#define VK_RMENU          0xA5
+
 #endif /*KM_TYPES*/

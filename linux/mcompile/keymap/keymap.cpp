@@ -478,8 +478,6 @@ KMX_DWORD get_VirtualKey_Other_From_SC(KMX_DWORD SC , v_dw_3D &All_Vector){
         //  values for numbers  are stored in column All_Vector[1][i][ 1 ]
         if ( All_Vector[k][i][0] == SC ) {
           //wprintf(L" SC= %i   .. i= %i  .. %i:\t\t %i(%c)   (%i (%c) : %i (%c) ) --- \n",SC , i,  All_Vector[k][i][0] , All_Vector[k][i][1] ,All_Vector[k][i][2],All_Vector[k][i][2] ,All_Vector[k][i][1] , All_Vector[k][i][2] , All_Vector[k][i][2]   ); 
-          KMX_DWORD returnval= All_Vector[k][i][1];
-          // we could return All_Vector[0][i][1]; since win version uses US numbers here
           return All_Vector[k][i][1];
         }
       }
@@ -487,12 +485,9 @@ KMX_DWORD get_VirtualKey_Other_From_SC(KMX_DWORD SC , v_dw_3D &All_Vector){
       // shifted values e.g. "Q" (=81) are stored in column All_Vector[1][i][ 2 ]
       if  ( All_Vector[k][i][0] == SC ) {
         //wprintf(L" SC= %i   .. i= %i  .. %i:\t\t %i(%c)   (%i (%c) : %i (%c) ) --- \n",SC , i,  All_Vector[k][i][0] , All_Vector[k][i][1] ,All_Vector[1][i][2],All_Vector[1][i][2] ,All_Vector[k][i][1] , All_Vector[k][i][2] , All_Vector[k][i][2]   ); 
-        KMX_DWORD returnval= All_Vector[1][i][2];
         return All_Vector[1][i][2];
         }
       }
-
-    //hier All_Vector[1][i][1]; ergibt , und . aber kleinbuchstaben ode ; und : aber grossbuchstaben
 
     if( IsKeyIn_VKMap(SC))
       return SC;    //_S2 what do I return if not found??
