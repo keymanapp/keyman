@@ -113,8 +113,8 @@ function do_build() {
             -exportArchive \
             -archivePath "$ARCHIVE_PATH" \
             -exportOptionsPlist exportAppStore.plist \
-            -exportPath "$BUILD_PATH/${CONFIG}-iphoneos"
-             -allowProvisioningUpdates \
+            -exportPath "$BUILD_PATH/${CONFIG}-iphoneos" \
+            -allowProvisioningUpdates \
             VERSION=$VERSION \
             VERSION_WITH_TAG=$VERSION_WITH_TAG
   else
