@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 17.0.191 alpha 2023-10-15
+
+* chore: update readme for keyboard_info schema (#9746)
+
 ## 17.0.190 alpha 2023-10-12
 
 * chore(web): web build streamlining (#9743)
