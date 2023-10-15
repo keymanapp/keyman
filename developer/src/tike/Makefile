@@ -11,7 +11,6 @@ build: version.res manifest.res icons dirs xml xsd pull-core
     $(TDS2DBG) $(WIN32_TARGET_PATH)\tike.exe
     $(COPY) $(WIN32_TARGET_PATH)\tike.exe $(DEVELOPER_PROGRAM)
     $(COPY) kmlmc.cmd $(DEVELOPER_PROGRAM)
-    $(COPY) kmlmi.cmd $(DEVELOPER_PROGRAM)
     $(COPY) kmlmp.cmd $(DEVELOPER_PROGRAM)
     $(COPY) kmc.cmd $(DEVELOPER_PROGRAM)
     $(COPY) $(KEYMAN_ROOT)\core\build\x86\$(TARGET_PATH)\src\kmnkbp0-0.dll $(DEVELOPER_PROGRAM)

@@ -4,8 +4,7 @@ c keys: [K_A][K_B][K_SPACE][K_C][K_SPACE][K_D][K_SPACE][K_D][K_E]
 c expected: XYZ
 
 store(&VERSION) '9.0'
-NAME "Alt key tests"
-HOTKEY "[CTRL SHIFT K_A]"
+store(&HOTKEY) "[CTRL SHIFT K_A]"
 store(&mnemoniclayout) "1"
 
 begin Unicode > use(main)

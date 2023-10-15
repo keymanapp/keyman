@@ -95,7 +95,7 @@ const
       ValueType: kstInteger
   );
 
-  BaseKeymanSettings: array[0..34] of TKeymanSettingBase = (
+  BaseKeymanSettings: array[0..33] of TKeymanSettingBase = (
 
     // TIKE:UTikeDebugMode.TikeDebugMode
     (
@@ -229,15 +229,6 @@ const
       RootKey: HKCU;
       Key: SRegKey_KeymanDebug_CU;
       Description: 'Source files for Unicode data'
-    ),
-
-    // TIKE:RedistFiles.GetDebugKMCmpDllPath
-    (
-      ID: 'development.paths.developer.kmcmpdll';
-      Name: 'Debug_KMCMPDLLPath';
-      RootKey: HKCU;
-      Key: SRegKey_KeymanDebug_CU;
-      Description: 'Path to debug version of kmcmpdll.dll'
     ),
 
     // TIKE:RedistFiles.GetRedistAddinsPath

@@ -5,7 +5,9 @@ import { CompilerBaseOptions, CompilerCallbacks, defaultCompilerOptions, LDMLKey
 import { NodeCompilerCallbacks } from '../../util/NodeCompilerCallbacks.js';
 import { fileURLToPath } from 'url';
 
-export function buildTestData(infile: string, options: CompilerBaseOptions) {
+export function buildTestData(infile: string, _options: any, commander: any) {
+  const options: CompilerBaseOptions = commander.optsWithGlobals();
+
   let compilerOptions: kmcLdml.LdmlCompilerOptions = {
     ...defaultCompilerOptions,
     ...options,

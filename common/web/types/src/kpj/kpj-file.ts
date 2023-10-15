@@ -20,6 +20,7 @@ export interface KPJFileOptions {
   SourcePath?: string;                        // default '' in 1.0, '$PROJECTPATH/source' in 2.0
   CompilerWarningsAsErrors?: string;          // default False
   WarnDeprecatedCode?: string;                // default True
+  SkipMetadataFiles?: string;                 // default True for 1.0, False for 2.0
   CheckFilenameConventions?: string;          // default False
   ProjectType?: 'keyboard' | 'lexicalmodel';  // default 'keyboard'
   Version?: '1.0' | '2.0';                    // default 1.0

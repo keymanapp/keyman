@@ -4,6 +4,9 @@
   "devDependencies": {
     "@types/chai": "^4.3.5",
     "@typescript-eslint/eslint-plugin": "^5.59.1",
+    "ajv": "^8.12.0",
+    "ajv-cli": "^5.0.0",
+    "ajv-formats": "^2.1.1",
     "chai": "^4.3.4",
     "esbuild": "^0.15.16",
     "eslint": "^8.39.0",
@@ -23,6 +26,7 @@
     "resources/build/version",
     "core/include/ldml",
     "developer/src/common/web/test-helpers",
+    "developer/src/common/web/utils",
     "developer/src/kmc-analyze",
     "developer/src/kmc-keyboard-info",
     "developer/src/kmc-kmn",
@@ -32,6 +36,7 @@
     "developer/src/kmc-package",
     "developer/src/kmc",
     "developer/src/server",
+    "developer/utils",
     "common/models/*",
     "common/test/resources",
     "common/tools/*",
@@ -43,6 +48,7 @@
   "dependencies": {
     "@keymanapp/common-types": "file:common/web/types",
     "@keymanapp/developer-test-helpers": "file:developer/src/common/web/test-helpers",
+    "@keymanapp/developer-utils": "file:developer/src/common/web/utils",
     "@keymanapp/hextobin": "file:common/tools/hextobin",
     "@keymanapp/keyman-version": "file:common/web/keyman-version",
     "@keymanapp/ldml-keyboard-constants": "file:core/include/ldml"
