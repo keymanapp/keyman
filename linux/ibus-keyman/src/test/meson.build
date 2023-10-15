@@ -84,7 +84,7 @@ test(
 test(
   'keymanutil-tests',
   run_src_test,
-  args: [ '--tap', '-k', '--env', env_file, '--', keymanutil_tests],
+  args: [ '--tap', '-k', '--env', env_file, '--', keymanutil_tests, '--testdata', meson.current_source_dir() / 'testdata'],
   env: test_env,
   priority: -2,
   is_parallel: false,
@@ -103,7 +103,7 @@ test(
 test(
   'print-kmp-test',
   run_src_test,
-  args: [ '--', print_kmp_test, meson.current_source_dir() / 'kmp.json' ],
+  args: [ '--', print_kmp_test, meson.current_source_dir() / 'testdata/kmp.json' ],
   env: test_env,
   priority: -2,
   protocol: 'exitcode',

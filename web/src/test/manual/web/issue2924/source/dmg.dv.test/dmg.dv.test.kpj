@@ -49,13 +49,6 @@
       <FileType>.md</FileType>
     </File>
     <File>
-      <ID>id_4b12eec2a4d0bfc7b5441a4a59691eab</ID>
-      <Filename>dmg.dv.test.model_info</Filename>
-      <Filepath>dmg.dv.test.model_info</Filepath>
-      <FileVersion></FileVersion>
-      <FileType>.model_info</FileType>
-    </File>
-    <File>
       <ID>id_6ee5fa96871fb96ecebf2cbe9ec7425b</ID>
       <Filename>dmg.dv.test.model.js</Filename>
       <Filepath>source\..\build\dmg.dv.test.model.js</Filepath>

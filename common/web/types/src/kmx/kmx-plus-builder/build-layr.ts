@@ -13,7 +13,7 @@ import { BUILDER_SECTION } from "./builder-section.js";
  * List of layers, the <layers> element
  */
 interface BUILDER_LAYR_LIST {
-  hardware: number; // hardware indicator
+  hardware: BUILDER_STR_REF; // hardware or 'touch'
   layer: number; // index of first layer in the list, in the
   count: number; // number of layer entries in the list
   minDeviceWidth: number; // width in millimeters
@@ -82,7 +82,7 @@ export function build_layr(kmxplus: KMXPlusData, sect_strs: BUILDER_STRS, sect_l
 
   layr.lists = kmxplus.layr.lists.map((list) => {
     const blist: BUILDER_LAYR_LIST = {
-      hardware: list.hardware,
+      hardware: build_strs_index(sect_strs, list.hardware),
       layer: null, // to be set below
       _layers: list.layers,
       count: list.layers.length,
@@ -92,6 +92,7 @@ export function build_layr(kmxplus: KMXPlusData, sect_strs: BUILDER_STRS, sect_l
   });
   // now sort the lists
   layr.lists.sort((a, b) => {
+    // sort by string #
     if (a.hardware < b.hardware) {
       return -1;
     } else if (a.hardware > b.hardware) {

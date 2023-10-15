@@ -47,6 +47,8 @@ Note that this is different from other 0-based indices in KMX+. If there are thr
 ## Compiler (kmc)
 
 - `U+FFFF` needs to be illegal as a literal or escaped sequence. So `\u{FFFF}` is not allowed, for example, nor as a literal in the UTF-8 .xml stream.
+- Matching `\m{abc}` (some marker) will turn into a match for `U+FFFF U+0008 U+XXXX` for that match.
+- Matching `\m{.}` (_any_ marker) will turn into the special sequence `U+FFFF U+0008 [U+0001-U+D7FE]` where the latter is a range
 
 ### `vars`
 

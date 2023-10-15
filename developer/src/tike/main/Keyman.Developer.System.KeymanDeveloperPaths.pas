@@ -16,6 +16,9 @@ type
     const S_LexicalModelCompiler = 'kmlmc.cmd';
     class function LexicalModelCompilerPath: string; static;
 
+    const S_Kmc = 'kmc.cmd';
+    class function KmcPath: string; static;
+
     const S_ServerConfigJson = 'config.json';
     class function ServerDataPath: string; static;
     class function ServerPath: string; static;
@@ -52,6 +55,17 @@ begin
   if TKeymanPaths.RunningFromSource(KeymanRoot)
     then Result := KeymanRoot + 'developer\src\server\'
     else Result := ExtractFilePath(ParamStr(0)) + 'server\';
+end;
+
+class function TKeymanDeveloperPaths.KmcPath: string;
+var
+  KeymanRoot: string;
+begin
+  if TKeymanPaths.RunningFromSource(KeymanRoot)
+    then Result := KeymanRoot + 'developer\src\tike\'
+    else Result := ExtractFilePath(ParamStr(0));
+
+  Result := Result + S_Kmc;
 end;
 
 class function TKeymanDeveloperPaths.LexicalModelCompilerPath: string;

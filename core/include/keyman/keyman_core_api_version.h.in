@@ -1,0 +1,15 @@
+#define km_core_version_stringify(x) km_core_version_to_string(x)
+#define km_core_version_to_string(x) #x
+
+// Product versioning
+
+#define KM_CORE_VERSION_MAJOR @majorver@
+#define KM_CORE_VERSION_MINOR @minorver@
+#define KM_CORE_VERSION_PATCH @patchver@
+#define KM_CORE_VERSION_STRING km_core_version_stringify(@majorver@ ## . ## @minorver@ ## . ## @patchver@ ## .0)
+
+// API versioning
+
+#define KM_CORE_LIB_CURRENT  @lib_curr@
+#define KM_CORE_LIB_AGE      @lib_age@
+#define KM_CORE_LIB_REVISION @lib_rev@

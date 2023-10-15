@@ -8,9 +8,14 @@ export class PackageKeyboardTargetValidator {
 
   public verifyAllTargets(kmp: KmpJsonFile.KmpJsonFile, metadata: KeyboardMetadataCollection): void {
     for(let keyboard of Object.keys(metadata)) {
+      let hasJS = true;
+
       if(metadata[keyboard].data.targets) {
-        // get the targets from the .kmx
-        this.verifyTargets(metadata[keyboard].keyboard, metadata[keyboard].data.targets, kmp);
+        // get the targets from the .kmx (only the .kmx has the targets data)
+        hasJS = this.verifyTargets(metadata[keyboard].keyboard, metadata[keyboard].data.targets, kmp);
+      }
+      if(hasJS && !metadata[keyboard].data.hasTouchLayout) {
+        this.callbacks.reportMessage(CompilerMessages.Hint_JsKeyboardFileHasNoTouchTargets({id: metadata[keyboard].keyboard.id}));
       }
     }
   }
@@ -23,7 +28,7 @@ export class PackageKeyboardTargetValidator {
     keyboard: KmpJsonFile.KmpJsonFileKeyboard,
     targetsText: string,
     kmp: KmpJsonFile.KmpJsonFile
-  ): void {
+  ): boolean {
     // Note, if we have gotten this far, we've already located and loaded a
     // .kmx, so no need to verify that the package includes a .kmx
 
@@ -34,7 +39,12 @@ export class PackageKeyboardTargetValidator {
       if(!kmp.files.find(file => this.callbacks.path.basename(file.name, '.js') == keyboard.id)) {
         // .js version of the keyboard is not found, warn
         this.callbacks.reportMessage(CompilerMessages.Warn_JsKeyboardFileIsMissing({id: keyboard.id}));
+        return false;
       }
+      // A js file is included and targeted
+      return true;
     }
+    // js is not targeted
+    return false;
   }
 }

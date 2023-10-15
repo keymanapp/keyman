@@ -1,3 +1,6 @@
+#ifndef __KMPDETAILS_H__
+#define __KMPDETAILS_H__
+
 // kmp details from json
 
 #include <glib.h>
@@ -76,3 +79,12 @@ kmp_json_status free_kmp_details(kmp_details * details);
 kmp_json_status get_keyboard_details(const gchar *kmp_dir, const gchar *id, keyboard_details *details);
 kmp_json_status free_keyboard_details(keyboard_details * details);
 kmp_json_status print_kmp_details(kmp_details * details);
+void free_keyboard(gpointer data);
+void free_info(gpointer data);
+
+G_DEFINE_AUTOPTR_CLEANUP_FUNC(kmp_keyboard, free_keyboard)
+G_DEFINE_AUTOPTR_CLEANUP_FUNC(kmp_info, free_info)
+G_DEFINE_AUTOPTR_CLEANUP_FUNC(kmp_details, free_kmp_details)
+G_DEFINE_AUTOPTR_CLEANUP_FUNC(keyboard_details, free_keyboard_details)
+
+#endif // __KMPDETAILS_H__
