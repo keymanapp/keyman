@@ -59,7 +59,19 @@ export interface TouchLayoutKey {
   hint?: string;
 };
 
-export enum TouchLayoutKeySp { normal=0, special=1, specialActive=2, deadkey=8, blank=9, spacer=10 };
+export const enum TouchLayoutKeySp {
+  normal=0,
+  special=1,
+  specialActive=2,
+  // Special use in the Web OSK - resolved at runtime, is a variant of `special` with the keyboard font.
+  customSpecial=3,
+  // Special use in the Web OSK - resolved at runtime, is a runtime variant of `specialActive` with the keyboard font.
+  customSpecialActive=4,
+  deadkey=8,
+  blank=9,
+  spacer=10
+};
+
 export type TouchLayoutKeyPad = number; // 0-100000
 export type TouchLayoutKeyWidth = number; // 0-100000
 

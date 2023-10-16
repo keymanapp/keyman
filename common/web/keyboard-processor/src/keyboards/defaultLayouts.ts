@@ -12,6 +12,9 @@ export type LayoutRow = TouchLayout.TouchLayoutRow;
 export type LayoutKey = TouchLayout.TouchLayoutKey;
 export type LayoutSubKey = TouchLayout.TouchLayoutSubKey;
 
+import ButtonClasses = TouchLayout.TouchLayoutKeySp;
+
+export { ButtonClasses };
 
 import Codes from "../text/codes.js";
 import type Keyboard from "./keyboard.js";
@@ -20,7 +23,6 @@ export type KLS = {[layerName: string]: string[]};
 
 // The following types provide type definitions for the full JSON format we use for visual keyboard definitions.
 export type ButtonClass       =  0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10;
-export type ButtonClassString = "0"|"1"|"2"|"3"|"4"|"5"|"6"|"7"|"8"|"9"|"10";
 
 export interface LayoutLayer extends LayoutLayerBase {
   // Post-processing elements.
@@ -60,18 +62,6 @@ export class Layouts {
     +'~!@#$%^&*()_+\xA7~~QWERTYUIOP{}\\~~~ASDFGHJKL:"~~~~~?ZXCVBNM<>?~~~~~ ';
 
   static readonly DEFAULT_RAW_SPEC = {'F':'Tahoma', 'BK': Layouts.dfltText};
-
-  // Cross-reference with the ids in osk.setButtonClass.
-  static buttonClasses: {[name: string]: ButtonClass} = {
-    'DEFAULT':0,
-    'SHIFT':1,     // special-key / frame key styling:  uses our custom, PUA OSK font
-    'SHIFT-ON':2,
-    'SPECIAL':3,   // special-key / frame key styling:  uses the keyboard's font
-    'SPECIAL-ON':4,
-    'DEADKEY':8,
-    'BLANK':9,
-    'HIDDEN':10
-  };
 
   static modifierSpecials: Record<string, string> = {
     'leftalt': '*LAlt*',
@@ -323,7 +313,7 @@ export class Layouts {
       // Set modifier key appearance and behaviour for non-desktop devices using the default layout
       if(formFactor != 'desktop') {
         if(n > 0 && shiftKey != null) {
-          shiftKey['sp']=Layouts.buttonClasses['SHIFT-ON'];
+          shiftKey['sp']=ButtonClasses.specialActive;
           shiftKey['sk']=null;
           shiftKey['text'] = Layouts.modifierSpecials[layers[n].id] ? Layouts.modifierSpecials[layers[n].id] : "*Shift*";
         }
@@ -407,7 +397,6 @@ export class Layouts {
    */
   static formatDefaultLayer(layer: LayoutLayer, chiral: boolean, formFactor: string, key102: boolean) {
     var layerId = layer['id'];
-    let buttonClasses = Layouts.buttonClasses;
 
     // Correct appearance of state-dependent modifier keys according to group
     for(var i=0; i<layer['row'].length; i++) {
@@ -420,7 +409,7 @@ export class Layouts {
           case 'K_LSHIFT':
           case 'K_RSHIFT':
             if(layerId.indexOf('shift') != -1) {
-              key['sp'] = buttonClasses['SHIFT-ON'];
+              key['sp'] = ButtonClasses.specialActive;
             }
             if(formFactor != 'desktop') {
               if(layerId != 'default') {
@@ -434,7 +423,7 @@ export class Layouts {
           case 'K_LCONTROL':
             if(chiral) {
               if(layerId.indexOf('leftctrl') != -1) {
-                key['sp'] = buttonClasses['SHIFT-ON'];
+                key['sp'] = ButtonClasses.specialActive;
               }
               break;
             }
@@ -442,35 +431,35 @@ export class Layouts {
           case 'K_RCONTROL':
             if(chiral) {
               if(layerId.indexOf('rightctrl') != -1) {
-                key['sp'] = buttonClasses['SHIFT-ON'];
+                key['sp'] = ButtonClasses.specialActive;
               }
               break;
             }
           case 'K_CONTROL':
             if(layerId.indexOf('ctrl') != -1) {
               if(!chiral || (layerId.indexOf('leftctrl') != -1 && layerId.indexOf('rightctrl') != -1)) {
-                key['sp'] = buttonClasses['SHIFT-ON'];
+                key['sp'] = ButtonClasses.specialActive;
               }
             }
             break;
           case 'K_LALT':
             if(chiral) {
               if(layerId.indexOf('leftalt') != -1) {
-                key['sp'] = buttonClasses['SHIFT-ON'];
+                key['sp'] = ButtonClasses.specialActive;
               }
               break;
             }
           case 'K_RALT':
             if(chiral) {
               if(layerId.indexOf('rightalt') != -1) {
-                key['sp'] = buttonClasses['SHIFT-ON'];
+                key['sp'] = ButtonClasses.specialActive;
               }
               break;
             }
           case 'K_ALT':
             if(layerId.indexOf('alt') != -1) {
               if(!chiral || (layerId.indexOf('leftalt') != -1 && layerId.indexOf('rightalt') != -1)) {
-                key['sp'] = buttonClasses['SHIFT-ON'];
+                key['sp'] = ButtonClasses.specialActive;
               }
             }
             break;
@@ -480,7 +469,7 @@ export class Layouts {
                 keys.splice(j--, 1);
                 keys[0]['width']=KEY_102_WIDTH;
               } else {
-                keys[j]['sp']=buttonClasses['HIDDEN'];
+                keys[j]['sp']=ButtonClasses.spacer;
               }
             }
             break;
