@@ -1,11 +1,9 @@
 import * as xml2js from 'xml2js';
 import { KPJFile, KPJFileProject } from './kpj-file.js';
-import { default as AjvModule } from 'ajv';
-const Ajv = AjvModule.default; // The actual expected Ajv type.
 import { boxXmlArray } from '../util/util.js';
 import { KeymanDeveloperProject, KeymanDeveloperProjectFile10, KeymanDeveloperProjectType } from './keyman-developer-project.js';
 import { CompilerCallbacks } from '../util/compiler-interfaces.js';
-import Schemas from '../schemas.js';
+import SchemaValidators from '../schema-validators.js';
 
 export class KPJFileReader {
   constructor(private callbacks: CompilerCallbacks) {
@@ -35,13 +33,11 @@ export class KPJFileReader {
   }
 
   public validate(source: KPJFile): void {
-    const ajv = new Ajv();
-    if(!ajv.validate(Schemas.kpj, source)) {
-      const ajvLegacy = new Ajv();
-      if(!ajvLegacy.validate(Schemas.kpj90, source)) {
+    if(!SchemaValidators.kpj(source)) {
+      if(!SchemaValidators.kpj90(source)) {
         // If the legacy schema also does not validate, then we will only report
         // the errors against the modern schema
-        throw new Error(ajv.errorsText());
+        throw new Error((<any>SchemaValidators.kpj).errors);
       }
     }
   }
@@ -62,8 +58,10 @@ export class KPJFileReader {
     if(result.options.version == '2.0') {
       result.options.buildPath = (project.Options?.BuildPath || result.options.buildPath).replace(/\\/g, '/');
       result.options.sourcePath = (project.Options?.SourcePath || result.options.sourcePath).replace(/\\/g, '/');
+      result.options.skipMetadataFiles = this.boolFromString(project.Options?.SkipMetadataFiles, false);
     } else {
       result.options.buildPath = (project.Options?.BuildPath || '').replace(/\\/g, '/');
+      result.options.skipMetadataFiles = this.boolFromString(project.Options?.SkipMetadataFiles, true);
     }
     result.options.checkFilenameConventions = this.boolFromString(project.Options?.CheckFilenameConventions, false);
     result.options.compilerWarningsAsErrors = this.boolFromString(project.Options?.CompilerWarningsAsErrors, false);
@@ -75,7 +73,6 @@ export class KPJFileReader {
 
     if(result.options.version == '1.0') {
       this.transformFilesVersion10(project, result);
-      result.addMetadataFile();
     } else {
       result.populateFiles();
     }

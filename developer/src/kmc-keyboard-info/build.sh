@@ -11,6 +11,7 @@ cd "$THIS_SCRIPT_PATH"
 
 builder_describe "Build Keyman kmc keyboard-info Compiler module" \
   "@/common/web/types" \
+  "@/developer/src/common/web/utils" \
   "clean" \
   "configure" \
   "build" \
@@ -43,7 +44,7 @@ builder_run_action build       tsc --build
 if builder_start_action test; then
   eslint .
   tsc --build test
-  c8 --reporter=lcov --reporter=text mocha
+  c8 --reporter=lcov --reporter=text --exclude-after-remap mocha
   builder_finish_action success test
 fi
 

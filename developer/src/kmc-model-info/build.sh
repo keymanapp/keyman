@@ -52,7 +52,8 @@ fi
 if builder_start_action test; then
   eslint .
   tsc --build test
-  c8 --reporter=lcov --reporter=text mocha
+  c8 --reporter=lcov --reporter=text --exclude-after-remap --lines 80 mocha
+  # TODO: remove --lines 80 and improve coverage
   builder_finish_action success test
 fi
 

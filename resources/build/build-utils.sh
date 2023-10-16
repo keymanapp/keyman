@@ -29,6 +29,11 @@
 # Note: keep changes to version, tier and tag determination in sync with mkver (windows/src/buildutils/mkver)
 #
 
+# Note: set -eu and SHLVL are deliberately set both here and in builder.inc.sh,
+#       because we want them set as early as possible, and because
+#       builder.inc.sh is shared to other repos, this keeps the usage consistent
+#       there as well.
+
 # Exit on command failure and when using unset variables:
 set -eu
 

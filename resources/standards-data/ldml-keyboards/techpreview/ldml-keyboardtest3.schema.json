@@ -210,7 +210,8 @@
       "required": [
         "info",
         "conformsTo"
-      ]
+      ],
+      "type": "object"
     }
   },
   "required": [

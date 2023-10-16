@@ -384,7 +384,7 @@ COMP_KMXPLUS_ELEM_ELEMENT::loadAsStringList(KMX_DWORD length, const COMP_KMXPLUS
       str = km::kbp::kmx::u16string_to_u32string(str16);
     } else {
       // single char
-      str = std::u32string(1, (km_kbp_usv)o.element);
+      str = std::u32string(1, (km_core_usv)o.element);
     }
     list.emplace_back(str);
   }
@@ -1108,7 +1108,7 @@ SimpleUSet::SimpleUSet(const COMP_KMXPLUS_USET_RANGE *newRange, size_t newCount)
 SimpleUSet::SimpleUSet() {
 }
 
-bool SimpleUSet::contains(km_kbp_usv ch) const {
+bool SimpleUSet::contains(km_core_usv ch) const {
   for (const auto &range : ranges) {
     if (range.start <= ch && range.end >= ch) {
       return true;

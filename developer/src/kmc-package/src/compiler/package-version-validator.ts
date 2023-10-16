@@ -35,7 +35,7 @@ export class PackageVersionValidator {
    * @returns
    */
   public validateAndUpdateVersions(kps: KpsFile.KpsFile, kmp: KmpJsonFile.KmpJsonFile, keyboardMetadata: KeyboardMetadataCollection) {
-    const followKeyboardVersion = kps.options?.followKeyboardVersion !== undefined;
+    const followKeyboardVersion = kps.Options?.FollowKeyboardVersion !== undefined;
 
     if(followKeyboardVersion) {
       if(!this.checkFollowKeyboardVersion(kmp)) {

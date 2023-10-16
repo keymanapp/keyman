@@ -21,9 +21,7 @@
   "exports": {
     ".": "./build/obj/index.js",
     "./lib": {
-      "types": "./build/lib/index.d.ts",
-      "import": "./build/lib/index.mjs",
-      "require": "./build/lib/index.cjs"
+      "types": "./build/lib/index.d.ts"
     },
     "./obj/*.js": "./build/obj/*.js"
   },

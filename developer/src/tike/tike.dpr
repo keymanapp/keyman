@@ -16,7 +16,6 @@ uses
   compile in '..\common\delphi\compiler\compile.pas',
   KeymanDeveloperOptions in 'main\KeymanDeveloperOptions.pas',
   UfrmKeyTest in 'debug\UfrmKeyTest.pas' {frmKeyTest},
-  CompilePackage in '..\common\delphi\compiler\CompilePackage.pas',
   KeymanDeveloperUtils in 'main\KeymanDeveloperUtils.pas',
   UfrmEditor in 'child\UfrmEditor.pas' {frmEditor},
   MenuImgList in '..\common\delphi\components\MenuImgList.pas',
@@ -89,8 +88,6 @@ uses
   utilfiletypes in '..\..\..\common\windows\delphi\general\utilfiletypes.pas',
   UfrmNewFileDetails in 'dialogs\UfrmNewFileDetails.pas' {frmNewFileDetails},
   StockFileNames in '..\..\..\common\windows\delphi\general\StockFileNames.pas',
-  CompileKeymanWeb in 'compile\CompileKeymanWeb.pas',
-  KeymanWebKeyCodes in 'compile\KeymanWebKeyCodes.pas',
   utildir in '..\..\..\common\windows\delphi\general\utildir.pas',
   ADOX_TLB in '..\..\..\common\windows\delphi\tlb\ADOX_TLB.pas',
   ADODB_TLB in '..\..\..\common\windows\delphi\tlb\ADODB_TLB.pas',
@@ -139,7 +136,6 @@ uses
   VisualKeyboardExportPNG in '..\..\..\common\windows\delphi\visualkeyboard\VisualKeyboardExportPNG.pas',
   MSXML2_TLB in '..\..\..\common\windows\delphi\tlb\MSXML2_TLB.pas',
   CharacterInfo in 'main\CharacterInfo.pas',
-  CompilePackageInstaller in '..\common\delphi\compiler\CompilePackageInstaller.pas',
   UTikeDebugMode in 'main\UTikeDebugMode.pas',
   kmxfileconsts in '..\..\..\common\windows\delphi\keyboards\kmxfileconsts.pas',
   kmxfileutils in '..\..\..\common\windows\delphi\keyboards\kmxfileutils.pas',
@@ -279,12 +275,15 @@ uses
   UfrmDebugStatus_Platform in 'debug\UfrmDebugStatus_Platform.pas' {frmDebugStatus_Platform},
   UfrmDebugStatus_Options in 'debug\UfrmDebugStatus_Options.pas' {frmDebugStatus_Options},
   Keyman.Developer.System.KeymanDeveloperPaths in 'main\Keyman.Developer.System.KeymanDeveloperPaths.pas',
-  Keyman.Developer.System.ValidateKpsFile in '..\common\delphi\compiler\Keyman.Developer.System.ValidateKpsFile.pas',
   Keyman.Developer.UI.UfrmServerOptions in 'dialogs\Keyman.Developer.UI.UfrmServerOptions.pas' {frmServerOptions},
   Keyman.Developer.System.ServerAPI in 'http\Keyman.Developer.System.ServerAPI.pas',
   Keyman.System.FontLoadUtil in 'main\Keyman.System.FontLoadUtil.pas',
   Keyman.Developer.UI.ServerUI in 'http\Keyman.Developer.UI.ServerUI.pas',
-  Keyman.Developer.System.GenerateKeyboardIcon in '..\kmconvert\Keyman.Developer.System.GenerateKeyboardIcon.pas';
+  Keyman.Developer.System.GenerateKeyboardIcon in '..\kmconvert\Keyman.Developer.System.GenerateKeyboardIcon.pas',
+  Keyman.Developer.UI.UfrmEditLanguageExample in 'dialogs\examples\Keyman.Developer.UI.UfrmEditLanguageExample.pas' {frmEditLanguageExample},
+  Keyman.Developer.UI.UfrmEditRelatedPackage in 'dialogs\relatedPackages\Keyman.Developer.UI.UfrmEditRelatedPackage.pas' {frmEditRelatedPackage},
+  Keyman.Developer.UI.UfrmEditPackageWebFonts in 'dialogs\packageWebFonts\Keyman.Developer.UI.UfrmEditPackageWebFonts.pas' {frmEditPackageWebFonts},
+  Keyman.Developer.System.KmcWrapper in 'compile\Keyman.Developer.System.KmcWrapper.pas';
 
 {$R *.RES}
 {$R ICONS.RES}
@@ -314,7 +313,7 @@ begin
           Application.Title := 'Keyman Developer';
           if TikeActive then Exit;
           Application.CreateForm(TmodWebHttpServer, modWebHttpServer);
-          try
+  try
             Application.CreateForm(TfrmKeymanDeveloper, frmKeymanDeveloper);
             Application.Run;
           finally

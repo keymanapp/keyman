@@ -6,9 +6,6 @@
         <Projects Include="keyboard-js-info\KeyboardJSInfoTestSuite.dproj">
             <Dependencies/>
         </Projects>
-        <Projects Include="keyboard-package-versions\KeyboardPackageVersionsTestSuite.dproj">
-            <Dependencies/>
-        </Projects>
         <Projects Include="kmcomp-x64-structures\passtructsize\passtructsize.dproj">
             <Dependencies/>
         </Projects>
@@ -40,15 +37,6 @@
     </Target>
     <Target Name="KeyboardJSInfoTestSuite:Make">
         <MSBuild Projects="keyboard-js-info\KeyboardJSInfoTestSuite.dproj" Targets="Make"/>
-    </Target>
-    <Target Name="KeyboardPackageVersionsTestSuite">
-        <MSBuild Projects="keyboard-package-versions\KeyboardPackageVersionsTestSuite.dproj"/>
-    </Target>
-    <Target Name="KeyboardPackageVersionsTestSuite:Clean">
-        <MSBuild Projects="keyboard-package-versions\KeyboardPackageVersionsTestSuite.dproj" Targets="Clean"/>
-    </Target>
-    <Target Name="KeyboardPackageVersionsTestSuite:Make">
-        <MSBuild Projects="keyboard-package-versions\KeyboardPackageVersionsTestSuite.dproj" Targets="Make"/>
     </Target>
     <Target Name="passtructsize">
         <MSBuild Projects="kmcomp-x64-structures\passtructsize\passtructsize.dproj"/>
@@ -96,13 +84,13 @@
         <MSBuild Projects="package-info\PackageInfoTestSuite.dproj" Targets="Make"/>
     </Target>
     <Target Name="Build">
-        <CallTarget Targets="KeyboardJSInfoTestSuite;KeyboardPackageVersionsTestSuite;passtructsize;kmconverttest;KMXFileLanguagesTestSuite;ModelTsParserTest;PackageInfoTestSuite"/>
+        <CallTarget Targets="KeyboardJSInfoTestSuite;passtructsize;kmconverttest;KMXFileLanguagesTestSuite;ModelTsParserTest;PackageInfoTestSuite"/>
     </Target>
     <Target Name="Clean">
-        <CallTarget Targets="KeyboardJSInfoTestSuite:Clean;KeyboardPackageVersionsTestSuite:Clean;passtructsize:Clean;kmconverttest:Clean;KMXFileLanguagesTestSuite:Clean;ModelTsParserTest:Clean;PackageInfoTestSuite:Clean"/>
+        <CallTarget Targets="KeyboardJSInfoTestSuite:Clean;Clean;passtructsize:Clean;kmconverttest:Clean;KMXFileLanguagesTestSuite:Clean;ModelTsParserTest:Clean;PackageInfoTestSuite:Clean"/>
     </Target>
     <Target Name="Make">
-        <CallTarget Targets="KeyboardJSInfoTestSuite:Make;KeyboardPackageVersionsTestSuite:Make;passtructsize:Make;kmconverttest:Make;KMXFileLanguagesTestSuite:Make;ModelTsParserTest:Make;PackageInfoTestSuite:Make"/>
+        <CallTarget Targets="KeyboardJSInfoTestSuite:Make;Make;passtructsize:Make;kmconverttest:Make;KMXFileLanguagesTestSuite:Make;ModelTsParserTest:Make;PackageInfoTestSuite:Make"/>
     </Target>
     <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
 </Project>

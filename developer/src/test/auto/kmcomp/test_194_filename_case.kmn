@@ -3,8 +3,8 @@ c
 c Test all the different types of files that may be referenced by a .kmn
 c for case mismatches
 
-store(&VERSION) '10.0'
-store(&TARGETS) 'windows'
+store(&VERSION) '14.0'
+store(&TARGETS) 'any'
 store(&BITMAP) 'test_194_Filename_case'
 store(&KMW_HELPFILE) 'test_194_Filename_case.html'
 store(&KMW_EMBEDJS) 'test_194_Filename_case.embed_js' c .embed_js just to avoid .js being deleted by nmake clean...

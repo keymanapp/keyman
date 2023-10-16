@@ -16,20 +16,18 @@ describe('BuildProject', function () {
       compilerWarningsAsErrors: true,
       saveDebug: false,
       warnDeprecatedCode: true,
-      logLevel: 'info'
+      logLevel: 'info',
     });
-    if(callbacks.messages.length != 6) {
-      callbacks.printMessages();
-    }
-    assert.equal(callbacks.messages.length, 6);
     const messages = [
       InfrastructureMessages.INFO_BuildingFile, // kmn
       InfrastructureMessages.INFO_FileBuiltSuccessfully,
       InfrastructureMessages.INFO_BuildingFile, // kps
       InfrastructureMessages.INFO_FileBuiltSuccessfully,
-      InfrastructureMessages.INFO_BuildingFile, // keyboard_info
-      InfrastructureMessages.INFO_FileBuiltSuccessfully,
     ];
+    if(callbacks.messages.length != messages.length) {
+      callbacks.printMessages();
+    }
+    assert.equal(callbacks.messages.length, messages.length);
     for(let i = 0; i < messages.length; i++) {
       assert.equal(callbacks.messages[i].code, messages[i]);
     }

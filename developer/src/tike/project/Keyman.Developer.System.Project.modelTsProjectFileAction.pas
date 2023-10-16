@@ -29,7 +29,6 @@ uses
   System.Variants,
   Winapi.Windows,
 
-  CompileKeymanWeb,
   compile,
   Keyman.System.LexicalModelUtils,
   Keyman.Developer.System.LexicalModelCompile,

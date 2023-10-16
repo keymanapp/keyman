@@ -7,6 +7,7 @@ import ldmlKeyboardTest3 from './schemas/ldml-keyboardtest3.schema.js';
 import displayMap from './schemas/displaymap.schema.js';
 import touchLayoutClean from './schemas/keyman-touch-layout.clean.spec.js';
 import touchLayout from './schemas/keyman-touch-layout.spec.js';
+import keyboard_info from './schemas/keyboard_info.schema.js';
 
 const Schemas = {
   kpj,
@@ -17,6 +18,7 @@ const Schemas = {
   displayMap,
   touchLayoutClean,
   touchLayout,
+  keyboard_info,
 };
 
 export default Schemas;
