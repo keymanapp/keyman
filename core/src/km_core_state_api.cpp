@@ -69,7 +69,7 @@ km_core_context *km_core_state_context(km_core_state *state)
   return static_cast<km_core_context *>(&state->context());
 }
 
-km_core_status kbp_state_get_intermediate_context(
+km_core_status km_core_state_get_intermediate_context(
   km_core_state *state,
   km_core_context_item ** context_items
 ) {

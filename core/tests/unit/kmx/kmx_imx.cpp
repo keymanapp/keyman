@@ -74,7 +74,7 @@ uint8_t test_imx_callback(km_core_state *state, uint32_t imx_id, void *callback_
 
   // Test get intermediate context
   km_core_context_item *entry_context = nullptr;
-  kbp_state_get_intermediate_context(state, &entry_context);
+  km_core_state_get_intermediate_context(state, &entry_context);
 
   size_t n = 0;
   try_status(km_core_context_items_to_utf16(entry_context, nullptr, &n))
@@ -142,7 +142,7 @@ uint8_t test_imx_callback(km_core_state *state, uint32_t imx_id, void *callback_
   }
   // Test Exit Context
   km_core_context_item *exit_context = nullptr;
-  kbp_state_get_intermediate_context(state, &exit_context);
+  km_core_state_get_intermediate_context(state, &exit_context);
 
   n = 0;
   try_status(km_core_context_items_to_utf16(exit_context, nullptr, &n))
