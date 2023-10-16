@@ -75,8 +75,7 @@ void free_cust_kbd(gpointer data) {
 
   g_free(kbd_data->kb_id_with_lang);
   g_free(kbd_data->lang->id);
-  if (kbd_data->lang->name)
-    g_free(kbd_data->lang->name);
+  g_free(kbd_data->lang->name);
   g_free(kbd_data->lang);
   g_free(kbd_data);
 }
