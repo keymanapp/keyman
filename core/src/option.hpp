@@ -4,7 +4,7 @@
                 the API.
   Create Date:  2 Oct 2018
   Authors:      Tim Eves (TSE)
-  History:       2 Oct 2018 - TSE - Refactored out of km_kbp_options_api.cpp.
+  History:       2 Oct 2018 - TSE - Refactored out of km_core_options_api.cpp.
                  7 Nov 2018 - TSE - Refactored into option.hpp & option.cpp.
 */
 
@@ -12,7 +12,7 @@
 
 #include <string>
 
-#include <keyman/keyboardprocessor.h>
+#include <keyman/keyman_core_api.h>
 
 // Forward declarations
 class json;
@@ -20,13 +20,13 @@ class json;
 namespace km {
 namespace kbp
 {
-  struct option : public km_kbp_option_item
+  struct option : public km_core_option_item
   {
-    option(): km_kbp_option_item KM_KBP_OPTIONS_END {}
+    option(): km_core_option_item KM_CORE_OPTIONS_END {}
     option(option const &);
     option(option &&);
-    option(km_kbp_option_scope, char16_t const *, char16_t const *);
-    option(km_kbp_option_scope, std::u16string const &,
+    option(km_core_option_scope, char16_t const *, char16_t const *);
+    option(km_core_option_scope, std::u16string const &,
            std::u16string const &);
 
     ~option() noexcept;
@@ -39,7 +39,7 @@ namespace kbp
 
 
   inline
-  option::option(km_kbp_option_scope s,
+  option::option(km_core_option_scope s,
                  std::u16string const & k, std::u16string const & v)
   : option(s, k.c_str(), v.c_str())
   {}
@@ -47,7 +47,7 @@ namespace kbp
 
   inline
   option::option(option const & rhs)
-  : option(km_kbp_option_scope(rhs.scope), rhs.key, rhs.value) {}
+  : option(km_core_option_scope(rhs.scope), rhs.key, rhs.value) {}
 
 
   inline

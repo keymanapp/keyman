@@ -80,6 +80,12 @@ if (data.title.endsWith('ldmlKeyboard3.xsd')) {
     }
 }
 
+if (data.title.endsWith('ldmlKeyboardTest3.xsd')) {
+  if (data?.properties?.keyboardTest3) {
+      data.properties.keyboardTest3.type = 'object';
+  }
+}
+
 // Write stuff
 const outstr = JSON.stringify(data, null, "  ");
 writeFileSync(argv[2] || 1, outstr, "utf-8");

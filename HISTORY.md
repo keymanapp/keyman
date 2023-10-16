@@ -1,5 +1,69 @@
 # Keyman Version History
 
+## 17.0.191 alpha 2023-10-15
+
+* chore: update readme for keyboard_info schema (#9746)
+
+## 17.0.190 alpha 2023-10-12
+
+* chore(web): web build streamlining (#9743)
+* chore(linux): Add code coverage reports for keyman-config and keyman-system-service (#9753)
+
+## 17.0.189 alpha 2023-10-11
+
+* refactor(linux): Use auto cleanup (and fix some memory leaks) (#9648)
+* refactor(linux): Simplify adding keyboard (#9734)
+
+## 17.0.188 alpha 2023-10-11
+
+* chore(android,windows): Update crowdin strings for Kannada (#9737)
+
+## 17.0.187 alpha 2023-10-11
+
+* chore(developer): convert Server to ES Modules (#9673)
+* chore(common): convert hextobin to ES Modules (#9676)
+* chore(common): convert resources/build/version to ES Modules (#9678)
+* chore(common): keyman-version now generates only es module (#9680)
+* chore(common): cleanup final Typescript non-ESM metadata (#9681)
+* chore(ios): renew certificate (#9697)
+*  (#9687)
+* feat(developer): ldml fix all remaining TODOs around markers and variables (#9688)
+* fix(windows): re-enable signature check (#9695)
+* fix(common): fix schema fixer (#9727)
+* chore(core): rename keyboardprocessor.h to keyman_core_api.h (#9723)
+* chore: rename km_kbp_ to km_core_ (#9724)
+* chore(developer): fixup signcode paths for server (#9730)
+* fix(linux): Explicitly initialize GTK (#9706)
+* chore(linux): Improve Sentry reports (#9725)
+* epic(developer): refactor package-metadata for 17.0 (#9485)
+* chore: clean up a few minor discrepancies in builder.inc.sh (#9731)
+* fix: path for ESM increment-version, and exit code (#9738)
+
+## 17.0.186 alpha 2023-10-04
+
+* feat(developer): show an INFO message when warnings have failed a build (#9652)
+* chore(developer): reduce duplicate words warning to hint (#9653)
+* feat(developer): issue hint if package includes keyboard source files (#9658)
+* chore(developer): switch on code coverage reporting for kmc (#9662)
+* fix(core): clean cached ICU in core (#9668)
+* feat(developer): warn if .kps includes a .js which is not touch-capable (#9667)
+
+## 17.0.185 alpha 2023-10-03
+
+* chore(web): Add non-printing characters to the OSK (#9547)
+* feat(developer): support `store(&version) '17.0'` (#9656)
+* chore(developer): add test for `checkFilenameConventions == false` or unset (#9661)
+* feat(developer): ldml scan codes support (#9615)
+
+## 17.0.184 alpha 2023-10-02
+
+* fix(web): fixes toolbar refocus timing after a keyboard change (#9618)
+
+## 17.0.183 alpha 2023-09-29
+
+* feat(web): browser-KMW support for default subkeys (#9496)
+* refactor(linux): Add more tests for `keymanutil.c`  ️ (#9595)
+
 ## 17.0.182 alpha 2023-09-28
 
 * chore(web): builds that output to web/build/publish should also clean it (#9613)

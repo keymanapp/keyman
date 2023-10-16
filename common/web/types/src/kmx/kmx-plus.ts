@@ -35,14 +35,14 @@ export class Elem extends Section {
   strings: ElementString[] = [];
   constructor(sections: DependencySections) {
     super();
-    this.strings.push(new ElementString(sections, '')); // C7043: null element string
+    this.strings.push(ElementString.fromStrings(sections, '')); // C7043: null element string
   }
   /**
    * @param source if a string array, does not get reinterpreted as UnicodeSet. This is used with vars, etc. Or pass `["str"]` for an explicit 1-element elem.
    * If it is a string, will be interpreted per reorder element ruls.
    */
   allocElementString(sections: DependencySections, source: string | string[], order?: string, tertiary?: string, tertiary_base?: string, prebase?: string): ElementString {
-    let s = new ElementString(sections, source, order, tertiary, tertiary_base, prebase);
+    let s = ElementString.fromStrings(sections, source, order, tertiary, tertiary_base, prebase);
     let result = this.strings.find(item => item.isEqual(s));
     if(result === undefined) {
       result = s;
@@ -143,44 +143,66 @@ export class CharStrsItem extends StrsItem {
   }
 };
 
+/** class for string manipulation options. These are in order of the pipeline. */
+export interface StrsOptions {
+  /** apply string variables (requires sections) */
+  stringVariables?: boolean;
+  /** apply markers (requires sections) */
+  markers?: boolean;
+  /** unescape with unescapeString */
+  unescape?: boolean;
+  /** string can be stored as a single CharStrsItem, not in strs table. */
+  singleOk?: boolean;
+};
+
 export class Strs extends Section {
   strings: StrsItem[] = [ new StrsItem('') ]; // C7043: The null string is always requierd
   /**
    * Allocate a StrsItem given the string, unescaping if necessary.
    * @param s escaped string
-   * @param singleOk if true, allocate a CharStrsItem (not in strs table) if single-char capable.
-   * @returns
+   * @param opts options for allocation
+   * @param sections other sections, if needed
+   * @returns StrsItem
    */
-  allocAndUnescapeString(s?: string, singleOk?: boolean): StrsItem {
-    return this.allocString(unescapeString(s), singleOk);
-  }
-  /**
-   * Allocate a StrsItem given the string.
-   * @param s string
-   * @param singleOk if true, allocate a CharStrsItem (not in strs table) if single-char capable.
-   * @returns
-   */
-  allocString(s?: string, singleOk?: boolean): StrsItem {
-    if(s === undefined || s === null) {
-      // undefined or null are always equivalent to empty string, see C7043
-      s = '';
-    }
+  allocString(s?: string, opts?: StrsOptions, sections?: DependencySections): StrsItem {
+    // Run the string processing pipeline
+    s = Strs.processString(s, opts, sections);
 
-    if(typeof s !== 'string') {
-      throw new Error('alloc_string: s must be a string, undefined, or null.');
-    }
-
-    // if it's a single char, don't push it into the list
-    if (singleOk && isOneChar(s)) {
+    // if it's a single char, don't push it into the strs table
+    if (opts?.singleOk && isOneChar(s)) {
       return new CharStrsItem(s);
     }
 
+    // default: look to see if the string is already present
     let result = this.strings.find(item => item.value === s);
     if(result === undefined) {
+      // only add if not already present
       result = new StrsItem(s);
       this.strings.push(result);
     }
     return result;
+  }
+
+  /** process everything according to opts */
+  static processString(s: string, opts: StrsOptions, sections: DependencySections) {
+    s = s ?? '';
+    // type check everything else
+    if (typeof s !== 'string') {
+      throw new Error('alloc_string: s must be a string, undefined, or null.');
+    }
+    // substitute variables
+    if (opts?.stringVariables) {
+      s = sections.vars.substituteStrings(s, sections);
+    }
+    // substitute markers
+    if (opts?.markers) {
+      s = sections.vars.substituteMarkerString(s);
+    }
+    // unescape \u{…}
+    if (opts?.unescape) {
+      s = unescapeString(s);
+    }
+    return s;
   }
 };
 
@@ -234,6 +256,7 @@ export class Vars extends Section {
     });
   }
   substituteStrings(str: string, sections: DependencySections): string {
+    if (!str) return str;
     return str.replaceAll(VariableParser.STRING_REFERENCE, (_entire, id) => {
       const val = this.findStringVariableValue(id);
       if (val === null) {
@@ -293,8 +316,8 @@ export class Vars extends Section {
       return v[0];
     }
   }
-  substituteMarkerString(s : string) : string {
-    return MarkerParser.toSentinelString(s, this.markers);
+  substituteMarkerString(s : string, forMatch? : boolean) : string {
+    return MarkerParser.toSentinelString(s, this.markers, forMatch);
   }
 };
 
@@ -309,7 +332,7 @@ export class VarsItem extends Section {
   constructor(id: string, value: string, sections: DependencySections) {
     super();
     this.id = sections.strs.allocString(id);
-    this.value = sections.strs.allocAndUnescapeString(value);
+    this.value = sections.strs.allocString(value, {unescape: true});
   }
 
   valid() : boolean {
@@ -404,17 +427,6 @@ export class Bksp extends Tran {
   }
 };
 
-// 'vkey'
-
-export class VkeyItem {
-  vkey: number;
-  target: number;
-}
-
-export class Vkey extends Section {
-  vkeys: VkeyItem[] = [];
-};
-
 // 'disp'
 export class DispItem {
   to: StrsItem;
@@ -433,7 +445,7 @@ export class Disp extends Section {
  * In-memory `<layers>`
  */
 export class LayrList {
-  hardware: number;
+  hardware: StrsItem;
   layers: LayrEntry[] = [];
   minDeviceWidth: number; // millimeters
 };
@@ -510,19 +522,14 @@ export class List extends Section {
    * Allocate a list from a space-separated list of items.
    * Note that passing undefined or null or `''` will
    * end up being the same as the empty list `[]`
-   * @param strs Strs section for allocation
    * @param s space-separated list of items
+   * @param opts string options
+   * @param sections sections
    * @returns a List object
    */
-  allocListFromSpaces(strs: Strs, s?: string): ListItem {
+  allocListFromSpaces(s: string, opts: StrsOptions, sections: DependencySections): ListItem {
     s = s ?? '';
-    return this.allocList(strs, s.split(' '));
-  }
-  allocListFromEscapedSpaces(strs: Strs, s?: string): ListItem {
-    if(s === undefined || s === null) {
-      s = '';
-    }
-    return this.allocList(strs, s.split(' ').map(unescapeString));
+    return this.allocList(s.split(' '), opts, sections);
   }
   /**
    * Return a List object referring to the string list.
@@ -532,7 +539,7 @@ export class List extends Section {
    * @param s string list to allocate
    * @returns
    */
-  allocList(strs: Strs, s?: string[]): ListItem {
+  allocList(s: string[], opts: StrsOptions, sections: DependencySections): ListItem {
     // Special case the 'null' list for [] or ['']
     if (!s || (s.length === 1 && s[0] === '')) {
       return this.lists[0];
@@ -540,14 +547,14 @@ export class List extends Section {
     let result = this.lists.find(item => item.isEqual(s));
     if(result === undefined) {
       // allocate a new ListItem
-      result = new ListItem(strs, s);
+      result = ListItem.fromStrings(s, opts, sections);
       this.lists.push(result);
     }
     return result;
   }
   constructor(strs: Strs) {
     super();
-    this.lists.push(new ListItem(strs, [])); // C7043: null element string
+    this.lists.push(ListItem.fromStrings([], {}, { strs })); // C7043: null element string
   }
   lists: ListItem[] = [];
 };
@@ -569,7 +576,6 @@ export interface KMXPlusData {
     tran?: Tran;
     uset?: Uset; // uset is ignored in-memory
     vars?: Vars;
-    vkey?: Vkey;
 };
 
 export class KMXPlusFile extends KMXFile {
@@ -720,7 +726,7 @@ export class KMXPlusFile extends KMXFile {
     });
 
     this.COMP_PLUS_LAYR_LIST = new r.Struct({
-      hardware: r.uint32le, //enum
+      hardware: STR_REF, // str: hardware name
       layer: r.uint32le, // index into layers
       count: r.uint32le,
       minDeviceWidth: r.uint32le, // integer: millimeters

@@ -1,5 +1,5 @@
 import { OrderedStringList } from 'src/ldml-keyboard/pattern-parser.js';
-import { Strs, StrsItem } from './kmx-plus.js';
+import { DependencySections, StrsItem, StrsOptions } from './kmx-plus.js';
 
 /**
  * A single entry in a ListItem.
@@ -27,20 +27,22 @@ export class ListItem extends Array<ListIndex> implements OrderedStringList {
   /**
    * Construct a new list from an array of strings.
    * Use List. This is meant to be called by the List.allocString*() functions.
-   * @param strs the Strs section is needed to construct this object.
    * @param source array of strings
+   * @param opts string handling options
+   * @param sections the Strs section is needed to construct this object, and other sections may
+   * be needed depending on the options
    * @returns
    */
-  constructor(strs: Strs, source: Array<string>) {
-    super();
-    if(!source) {
-      return;
+  static fromStrings(source: Array<string>, opts: StrsOptions, sections: DependencySections) : ListItem {
+    const a = new ListItem();
+    if (!source) {
+      return a;
     }
-
     for (const str of source) {
-        let index = new ListIndex(strs.allocString(str));
-        this.push(index);
+        let index = new ListIndex(sections.strs.allocString(str, opts, sections));
+        a.push(index);
     }
+    return a;
   }
   getItemOrder(item: string): number {
     return this.findIndex(({value}) => value.value === item);
@@ -72,12 +74,13 @@ export class ListItem extends Array<ListIndex> implements OrderedStringList {
       return 0;
     }
   }
-  /** for debugging, print as single string */
+  /** for debugging and tests, print as single string */
   toString(): string {
     return this.toStringArray().join(' ');
   }
-  /** for debugging, map to string array */
+  /** for debugging and tests, map to string array */
   toStringArray(): string[] {
-    return this.map(v => v.value.value);
+    // TODO-LDML: this crashes: return this.map(v => v.toString());
+    return Array.from(this.values()).map(v => v.toString());
   }
 };

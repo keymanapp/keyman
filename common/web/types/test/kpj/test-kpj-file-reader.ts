@@ -23,6 +23,7 @@ describe('kpj-file-reader', function () {
     assert.equal(kpj.KeymanDeveloperProject.Options.CompilerWarningsAsErrors, 'True');
     assert.equal(kpj.KeymanDeveloperProject.Options.ProjectType, 'keyboard');
     assert.equal(kpj.KeymanDeveloperProject.Options.WarnDeprecatedCode, 'True');
+    assert.isUndefined(kpj.KeymanDeveloperProject.Options.SkipMetadataFiles); // because this is a 1.0 version file
     assert.isUndefined(kpj.KeymanDeveloperProject.Options.Version);
 
     assert.lengthOf(kpj.KeymanDeveloperProject.Files.File, 21);
@@ -73,9 +74,10 @@ describe('kpj-file-reader', function () {
     assert.isTrue(project.options.compilerWarningsAsErrors);
     assert.equal(project.options.projectType, KeymanDeveloperProjectType.Keyboard);
     assert.isTrue(project.options.warnDeprecatedCode);
+    assert.isTrue(project.options.skipMetadataFiles);
     assert.equal(project.options.version, '1.0');
 
-    assert.lengthOf(project.files, 3);
+    assert.lengthOf(project.files, 2);
 
     let f: KeymanDeveloperProjectFile10 = <KeymanDeveloperProjectFile10>project.files[0];
     assert.equal(f.id, 'id_f347675c33d2e6b1c705c787fad4941a');

@@ -140,9 +140,8 @@ export class KmnCompiler implements UnicodeSetParser {
     return true;
   }
 
-  // TODO: use outFile from options
-  public run(infile: string, outfile: string, options?: KmnCompilerOptions): boolean {
-    let result = this.runCompiler(infile, outfile, options);
+  public run(infile: string, options?: KmnCompilerOptions): boolean {
+    let result = this.runCompiler(infile, options);
     if(result) {
       if(result.kmx) {
         this.callbacks.fs.writeFileSync(result.kmx.filename, result.kmx.data);
@@ -235,13 +234,15 @@ export class KmnCompiler implements UnicodeSetParser {
     return new Uint8Array(new Uint8Array(Module.HEAP8.buffer, offset, size));
   }
 
-  public runCompiler(infile: string, outfile: string, options: KmnCompilerOptions): CompilerResult {
+  public runCompiler(infile: string, options: KmnCompilerOptions): CompilerResult {
     if(!this.verifyInitialized()) {
       /* c8 ignore next 2 */
       return null;
     }
 
     options = {...baseOptions, ...options};
+
+    options.outFile = options.outFile ?? infile.replace(/\.kmn$/i, '.kmx');
 
     (globalThis as any)[this.callbackID] = {
       message: this.compilerMessageCallback,
@@ -267,7 +268,7 @@ export class KmnCompiler implements UnicodeSetParser {
 
       if(result.extra.targets & COMPILETARGETS_KMX) {
         result.kmx = {
-          filename: outfile,
+          filename: options.outFile,
           data: this.copyWasmBuffer(wasm_result.kmx, wasm_result.kmxSize)
         };
       }
@@ -282,7 +283,7 @@ export class KmnCompiler implements UnicodeSetParser {
       }
 
       if(result.extra.kvksFilename) {
-        result.kvk = this.runKvkCompiler(result.extra.kvksFilename, infile, outfile, result.displayMap);
+        result.kvk = this.runKvkCompiler(result.extra.kvksFilename, infile, options.outFile, result.displayMap);
         if(!result.kvk) {
           return null;
         }
@@ -302,7 +303,7 @@ export class KmnCompiler implements UnicodeSetParser {
         kmw_result.displayMap = result.displayMap; // we can safely re-use the kmx compile displayMap
 
         const web_kmx = this.copyWasmBuffer(wasm_result.kmx, wasm_result.kmxSize);
-        result.js = this.runWebCompiler(infile, outfile, web_kmx, result.kvk?.data, kmw_result, options);
+        result.js = this.runWebCompiler(infile, options.outFile, web_kmx, result.kvk?.data, kmw_result, options);
         if(!result.js) {
           return null;
         }

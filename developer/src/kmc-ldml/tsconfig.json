@@ -1,11 +1,10 @@
 {
-  "extends": "../../../tsconfig.esm-base.json",
+  "extends": "../../../tsconfig.base.json",
 
   "compilerOptions": {
     "outDir": "build/src/",
     "rootDir": "src/",
     "baseUrl": ".",
-    "allowSyntheticDefaultImports": true, // for ajv
 
     "paths": {
       // "@keymanapp/keyman-version": ["../../../common/web/keyman-version/keyman-version.mts"],

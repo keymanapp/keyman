@@ -49,13 +49,6 @@
       <FileType>.md</FileType>
     </File>
     <File>
-      <ID>id_8146e45ce008c5c83d5a824f2121c46c</ID>
-      <Filename>sil.cmo.bw.model_info</Filename>
-      <Filepath>sil.cmo.bw.model_info</Filepath>
-      <FileVersion></FileVersion>
-      <FileType>.model_info</FileType>
-    </File>
-    <File>
       <ID>id_46ebc8fccf1bc10c92484653167449df</ID>
       <Filename>sil.cmo.bw.model.js</Filename>
       <Filepath>source\..\build\sil.cmo.bw.model.js</Filepath>

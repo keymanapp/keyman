@@ -1,5 +1,5 @@
-import fs = require('fs');
-import { configuration } from './config';
+import * as fs from 'fs';
+import { configuration } from './config.js';
 
 export interface DebugObject {
   id: string;

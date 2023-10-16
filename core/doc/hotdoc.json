@@ -4,7 +4,7 @@
     "sitemap": "@doc_dir@/sitemap.txt",
     "index": "@doc_dir@/markdown_files/index.md",
     "c_sources": [
-      "@include_dir@/keyman/keyboardprocessor.h"
+      "@include_dir@/keyman/keyman_core_api.h"
     ],
     "c_include_directories": [
       "@include_dir@",

@@ -7,7 +7,7 @@ NOTARGET_SIGNCODE=yes
 !ifdef NODELPHI
 TARGETS=.virtual
 !else
-TARGETS=build_standards_data buildunidata devtools sentrytool test-klog
+TARGETS=build_standards_data buildunidata devtools sentrytool test-klog verify_signatures
 !endif
 
 CLEANS=clean-tools
@@ -26,6 +26,10 @@ sentrytool: .virtual
 
 buildunidata: .virtual
     cd $(COMMON_ROOT)\tools\buildunidata
+    $(MAKE) $(TARGET)
+
+verify_signatures: .virtual
+    cd $(COMMON_ROOT)\tools\verify_signatures
     $(MAKE) $(TARGET)
 
 devtools: .virtual
