@@ -42,6 +42,8 @@ export type LayoutSpec = {
   "tablet"?: LayoutFormFactor
 }
 
+const KEY_102_WIDTH = 200;
+
 // This class manages default layout construction for consumption by OSKs without a specified layout.
 export class Layouts {
   static dfltCodes=[
@@ -476,7 +478,7 @@ export class Layouts {
             if(typeof key102 == 'undefined' || !key102) {
               if(formFactor == 'desktop') {
                 keys.splice(j--, 1);
-                keys[0]['width']=200;
+                keys[0]['width']=KEY_102_WIDTH;
               } else {
                 keys[j]['sp']=buttonClasses['HIDDEN'];
               }
