@@ -22,10 +22,7 @@ export type KLS = {[layerName: string]: string[]};
 export type ButtonClass       =  0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10;
 export type ButtonClassString = "0"|"1"|"2"|"3"|"4"|"5"|"6"|"7"|"8"|"9"|"10";
 
-export type LayoutLayer = {
-  "id": string,
-  "row": LayoutRow[],
-
+export interface LayoutLayer extends LayoutLayerBase {
   // Post-processing elements.
   shiftKey?: LayoutKey,
   capsKey?: LayoutKey,
@@ -44,6 +41,8 @@ export type LayoutSpec = {
   "phone"?: LayoutFormFactor,
   "tablet"?: LayoutFormFactor
 }
+
+const KEY_102_WIDTH = 200;
 
 // This class manages default layout construction for consumption by OSKs without a specified layout.
 export class Layouts {
@@ -65,9 +64,9 @@ export class Layouts {
   // Cross-reference with the ids in osk.setButtonClass.
   static buttonClasses: {[name: string]: ButtonClass} = {
     'DEFAULT':0,
-    'SHIFT':1,
+    'SHIFT':1,     // special-key / frame key styling:  uses our custom, PUA OSK font
     'SHIFT-ON':2,
-    'SPECIAL':3,
+    'SPECIAL':3,   // special-key / frame key styling:  uses the keyboard's font
     'SPECIAL-ON':4,
     'DEADKEY':8,
     'BLANK':9,
@@ -479,7 +478,7 @@ export class Layouts {
             if(typeof key102 == 'undefined' || !key102) {
               if(formFactor == 'desktop') {
                 keys.splice(j--, 1);
-                keys[0]['width']=200;
+                keys[0]['width']=KEY_102_WIDTH;
               } else {
                 keys[j]['sp']=buttonClasses['HIDDEN'];
               }
