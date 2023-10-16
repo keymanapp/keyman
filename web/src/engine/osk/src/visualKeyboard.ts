@@ -47,6 +47,7 @@ import { DEFAULT_GESTURE_PARAMS, GestureParams, gestureSetForLayout } from './in
 import { getViewportScale } from './screenUtils.js';
 import { HeldRepeater } from './input/gestures/heldRepeater.js';
 import SubkeyPopup from './input/gestures/browser/subkeyPopup.js';
+import { GestureHandler } from './input/gestures/gestureHandler.js';
 
 export interface VisualKeyboardConfiguration extends CommonConfiguration {
   /**
@@ -199,6 +200,9 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
   // Popup key management
   keytip: KeyTip;
   globeHint: GlobeHint;
+
+  activeGestures: GestureHandler[] = [];
+
   pendingSubkey: PendingGesture;
   subkeyGesture: RealizedGesture;
 
@@ -492,6 +496,8 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
           return;
         }
 
+        let handler: GestureHandler = null;
+
         // So, if this is the first stage, this is where we need to perform that delegation.
 
         // -- Scratch-space as gestures start becoming integrated --
@@ -506,11 +512,18 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
           //
           // Merely constructing the instance is enough; it'll link into the sequence's events and
           // handle everything that remains for the backspace from here.
-          new HeldRepeater(gestureSequence, () => this.modelKeyClick(gestureKey, coord));
+          handler = new HeldRepeater(gestureSequence, () => this.modelKeyClick(gestureKey, coord));
         } else if(gestureStage.matchedId.indexOf('longpress') > -1) {
           // Matches:  'longpress', 'longpress-reset'.
           // Likewise.
-          new SubkeyPopup(gestureSequence, configChanger, this, gestureSequence.stageReports[0].sources[0].baseItem);
+          handler = new SubkeyPopup(gestureSequence, configChanger, this, gestureSequence.stageReports[0].sources[0].baseItem);
+        }
+
+        if(handler) {
+          this.activeGestures.push(handler);
+          gestureSequence.on('complete', () => {
+            this.activeGestures = this.activeGestures.filter((gesture) => gesture != handler);
+          });
         }
 
         // TODO:  depending upon the gesture type, what sort of UI shifts should happen to
@@ -1163,19 +1176,6 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
     this._UpdateVKShiftStyle();
   }
 
-  clearPopup() {
-    // Remove the displayed subkey array, if any, and cancel popup request
-    if (this.subkeyGesture) {
-      this.subkeyGesture.clear();
-      this.subkeyGesture = null;
-    }
-
-    if (this.pendingSubkey) {
-      this.pendingSubkey.cancel();
-      this.pendingSubkey = null;
-    }
-  }
-
   //#endregion
 
   /**
@@ -1722,11 +1722,11 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
       return;
     }
 
-    let sk = this.subkeyGesture;
-    let popup = (sk && sk.isVisible());
+    const modalVizActive = this.activeGestures.find((handler) => handler.hasModalVisualization);
 
-    // If popup keys are active, do not show the key tip.
-    on = popup ? false : on;
+    // If the subkey menu (or a different modal visualization) is active, do not show the key tip -
+    // even if for a different contact point.
+    on = modalVizActive ? false : on;
 
     tip.show(key, on, this);
   };
@@ -1763,6 +1763,8 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
       this.styleSheet.parentNode.removeChild(this.styleSheet);
     }
 
+    this.activeGestures.forEach((handler) => handler.cancel());
+
     if(this.gestureEngine) {
       this.gestureEngine.destroy();
     }
@@ -1775,9 +1777,6 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
     this.touchPending = null;
 
     this.keytip?.show(null, false, this);
-    this.subkeyGesture?.clear();
-    this.pendingMultiTap?.cancel();
-    this.pendingSubkey?.cancel();
   }
 
   raiseKeyEvent(keyEvent: KeyEvent, e: KeyElement) {

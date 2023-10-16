@@ -5,6 +5,7 @@ import VisualKeyboard from '../../../visualKeyboard.js';
 
 import { DeviceSpec, KeyEvent, ActiveSubKey } from '@keymanapp/keyboard-processor';
 import { ConfigChangeClosure, GestureRecognizerConfiguration, GestureSequence, PaddedZoneSource } from '@keymanapp/gesture-recognizer';
+import { GestureHandler } from '../gestureHandler.js';
 
 /**
  * Represents a 'realized' longpress gesture's default implementation
@@ -18,7 +19,7 @@ import { ConfigChangeClosure, GestureRecognizerConfiguration, GestureSequence, P
  * As selection of the subkey occurs after the subkey popup is
  * displayed, selection of the subkey is inherently asynchronous.
  */
-export default class SubkeyPopup {
+export default class SubkeyPopup implements GestureHandler {
   public readonly element: HTMLDivElement;
   public readonly shim: HTMLDivElement;
 
@@ -29,6 +30,8 @@ export default class SubkeyPopup {
   public readonly baseKey: KeyElement;
   public readonly subkeys: KeyElement[];
 
+  private source: GestureSequence<KeyElement>;
+
   constructor(
     source: GestureSequence<KeyElement>,
     configChanger: ConfigChangeClosure<KeyElement>,
@@ -36,6 +39,7 @@ export default class SubkeyPopup {
     e: KeyElement
   ) {
     this.baseKey = e;
+    this.source = source;
 
     source.on('complete', () => {
       this.currentSelection?.key.highlight(false);
@@ -329,8 +333,13 @@ export default class SubkeyPopup {
     }
   }
 
-  isVisible(): boolean {
+  get hasModalVisualization() {
     return this.element.style.visibility == 'visible';
+  }
+
+  cancel() {
+    this.clear();
+    this.source.cancel();
   }
 
   clear() {

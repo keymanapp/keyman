@@ -302,6 +302,11 @@ export class GestureSequence<Type> extends EventEmitter<EventMap<Type>> {
       throw new Error("Missed a case in implementation!");
     }
   };
+
+  public cancel() {
+    const sources = this.stageReports[this.stageReports.length - 1].sources;
+    sources.forEach((src) => src.terminate(true));
+  }
 }
 
 export function modelSetForAction<Type>(
