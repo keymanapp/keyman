@@ -3,7 +3,7 @@ import { type KeyElement } from '../../../keyElement.js';
 import OSKBaseKey from '../../../keyboard-layout/oskBaseKey.js';
 import VisualKeyboard from '../../../visualKeyboard.js';
 
-import { DeviceSpec, KeyEvent, ActiveSubkey } from '@keymanapp/keyboard-processor';
+import { DeviceSpec, KeyEvent, ActiveSubKey } from '@keymanapp/keyboard-processor';
 import { ConfigChangeClosure, GestureRecognizerConfiguration, GestureSequence, PaddedZoneSource } from '@keymanapp/gesture-recognizer';
 
 /**
@@ -61,7 +61,7 @@ export default class SubkeyPopup {
     e.key.highlight(true);
 
     // A tag we directly set on a key element during its construction.
-    let subKeySpec: ActiveSubkey[] = e['subKeys'];
+    let subKeySpec: ActiveSubKey[] = e['subKeys'];
 
     // The holder is position:fixed, but the keys do not need to be, as no scrolling
     // is possible while the array is visible.  So it is simplest to let the keys have

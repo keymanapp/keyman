@@ -1072,7 +1072,6 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
     // for key spec tracking.
     let keySpec = (e['key'] ? e['key'].spec : null) as unknown as ActiveKey;
     if (!keySpec) {
-      console.error("OSK key with ID '" + e.id + "', keyID '" + e.keyId + "' missing needed specification");
       return null;
     }
 

@@ -87,9 +87,12 @@ export class InputSequenceSimulator<HoveredItemType> {
       const mappedSample = this.getSampleClientPos(data.sample);
 
       let touch: Touch;
-      let touchDict = {identifier: data.identifier,
-                        target: targetElement || config.targetRoot,
-                        ...mappedSample};
+      let touchDict = {
+        identifier: data.identifier,
+        target: targetElement || config.targetRoot,
+        ...mappedSample
+      };
+
       if(window['Touch'] !== undefined) {
         touch = new Touch(touchDict);
       } else {

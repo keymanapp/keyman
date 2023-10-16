@@ -76,7 +76,7 @@ export class TouchEventEngine<HoveredItemType, StateToken = any> extends InputEv
   public dropTouchpoint(source: GestureSource<HoveredItemType>) {
     super.dropTouchpoint(source);
 
-    for(let key in this.safeBoundMaskMap) {
+    for(const key of Object.keys(this.safeBoundMaskMap)) {
       if(this.getTouchpointWithId(Number.parseInt(key, 10)) == source) {
         delete this.safeBoundMaskMap[key];
       }
@@ -104,7 +104,10 @@ export class TouchEventEngine<HoveredItemType, StateToken = any> extends InputEv
     const allTouches = touchListToArray(event.touches);
     const newTouches = touchListToArray(event.changedTouches);
     // Maintain all touches in the `.touches` array that are NOT marked as `.changedTouches` (and therefore, new)
-    this.maintainTouchpointsWithIds(allTouches.filter((touch) => (newTouches.indexOf(touch) == -1)).map((touch) => touch.identifier));
+    this.maintainTouchpointsWithIds(allTouches
+      .filter((touch) => (newTouches.indexOf(touch) == -1))
+      .map((touch) => touch.identifier)
+    );
 
     // Ensure the same timestamp is used for all touches being updated.
     const timestamp = performance.now();
@@ -134,7 +137,9 @@ export class TouchEventEngine<HoveredItemType, StateToken = any> extends InputEv
     // Ensure the same timestamp is used for all touches being updated.
     const timestamp = performance.now();
 
-    this.maintainTouchpointsWithIds(touchListToArray(event.touches).map((touch) => touch.identifier));
+    this.maintainTouchpointsWithIds(touchListToArray(event.touches)
+      .map((touch) => touch.identifier)
+    );
 
     // Do not change to `changedTouches` - we need a sample for all active touches in order
     // to facilitate path-update synchronization for multi-touch gestures.
