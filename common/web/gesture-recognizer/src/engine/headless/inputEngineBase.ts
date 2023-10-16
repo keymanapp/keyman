@@ -59,26 +59,17 @@ export abstract class InputEngineBase<HoveredItemType, StateToken = any> extends
    */
   maintainTouchpointsWithIds(identifiers: number[]) {
     const identifiersToMaintain = identifiers.map((internal_id) => this.identifierMap[internal_id]);
-    const sourcesToDrop: GestureSource<HoveredItemType>[] = [];
-
-    this._activeTouchpoints.forEach((source) => {
-      if(identifiersToMaintain.indexOf(source.rawIdentifier) == -1) {
-        sourcesToDrop.push(source);
-      }
-    });
-
-    sourcesToDrop.forEach((source) => {
+    this._activeTouchpoints
+      .filter((source) => !identifiersToMaintain.includes(source.rawIdentifier))
       // Will trigger `.dropTouchpoint` later in the event chain.
-      source.terminate(true);
-    });
+      .forEach((source) => source.terminate(true));
   }
 
   /**
    * @param identifier The identifier number corresponding to the input sequence.
    */
   hasActiveTouchpoint(identifier: number) {
-    const id = this.identifierMap[identifier];
-    return id !== undefined; //this.getTouchpointWithId(id) !== undefined;
+    return this.identifierMap[identifier] !== undefined;
   }
 
   /**
@@ -117,7 +108,7 @@ export abstract class InputEngineBase<HoveredItemType, StateToken = any> extends
     const id = point.rawIdentifier;
 
     this._activeTouchpoints = this._activeTouchpoints.filter((pt) => point != pt);
-    for(let key in this.identifierMap) {
+    for(const key of Object.keys(this.identifierMap)) {
       if(this.identifierMap[key] == id) {
         delete this.identifierMap[key];
       }
