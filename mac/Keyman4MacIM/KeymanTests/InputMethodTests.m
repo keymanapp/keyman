@@ -23,7 +23,7 @@
 // included following interface that we can see and test private methods of TextApiCompliance
 @interface TextApiCompliance (Testing)
 
-- (BOOL)isClientAppLegacy:(NSString *)clientAppId fromArray:(NSArray *)legacyApps;
+- (BOOL)arrayContainsApplicationId:(NSString *)clientAppId fromArray:(NSArray *)legacyApps;
 
 @end
 
@@ -44,7 +44,7 @@
 
   NSArray *legacyAppsArray = [NSArray arrayWithObjects:@"com.microsoft.VSCode",@"com.adobe.Photoshop",nil];
 
-  BOOL isLegacy = [apiCompliance isClientAppLegacy:clientAppId fromArray:legacyAppsArray];
+  BOOL isLegacy = [apiCompliance arrayContainsApplicationId:clientAppId fromArray:legacyAppsArray];
   NSLog(@"isLegacy = %@", isLegacy?@"yes":@"no");
     XCTAssert(isLegacy == NO, @"App not expected to be in legacy list");
 }
@@ -56,7 +56,7 @@
 
   NSArray *legacyAppsArray = [NSArray arrayWithObjects:@"com.adobe.Photoshop",@"com.microsoft.VSCode",nil];
 
-  BOOL isLegacy = [apiCompliance isClientAppLegacy:clientAppId fromArray:legacyAppsArray];
+  BOOL isLegacy = [apiCompliance arrayContainsApplicationId:clientAppId fromArray:legacyAppsArray];
   NSLog(@"isLegacy = %@", isLegacy?@"yes":@"no");
     XCTAssert(isLegacy == YES, @"App expected to be in legacy list");
 }

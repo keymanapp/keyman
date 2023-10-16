@@ -30,16 +30,12 @@ NSMutableString* _easterEggForSentry = nil;
 const NSString* kEasterEggText = @"Sentrycrash#KME";
 const NSString* kEasterEggKmxName = @"EnglishSpanish.kmx";
 
-- (id)initWithKMX:(KMXFile *)kmx context:(NSString *)contextString {
+- (id)initWithKMX:(KMXFile *)kmx context:(NSString *)contextString verboseLogging:(BOOL)enableDebugLogging {
     self = [super init];
     if (self) {
-#ifdef DEBUG
-        self.debugMode = YES;
-#else
-        self.debugMode = NO;
-#endif
+        self.debugMode = enableDebugLogging;
         _kmx = kmx;
-        _coreHelper = [[CoreHelper alloc] init];
+        _coreHelper = [[CoreHelper alloc] initWithDebugMode:enableDebugLogging];
       
       if (kmx) {
         [self loadCoreWrapperFromKmxFile:self.kmx.filePath];
@@ -53,7 +49,7 @@ const NSString* kEasterEggKmxName = @"EnglishSpanish.kmx";
 -(void)loadCoreWrapperFromKmxFile:(NSString *)kmxFilePath {
   @try {
     _coreWrapper = [[CoreWrapper alloc] initWithHelper:_coreHelper kmxFilePath:kmxFilePath];
-    NSLog(@"loadCoreWrapperFromKmxFile, keyboardId = %@", [self.coreWrapper keyboardId]);
+    [self.coreHelper logDebugMessage:@"loadCoreWrapperFromKmxFile, keyboardId = %@", [self.coreWrapper keyboardId]];
   }
   @catch (NSException *exception) {
     NSLog(@"loadCoreWrapperFromKmxFile, failed to create keyboard for path '%@' with exception: %@", kmxFilePath, exception.description);
@@ -72,8 +68,12 @@ const NSString* kEasterEggKmxName = @"EnglishSpanish.kmx";
 - (void)setUseVerboseLogging:(BOOL)useVerboseLogging {
     self.debugMode = useVerboseLogging;
 
+    if (self.coreHelper) {
+        self.coreHelper.debugMode = useVerboseLogging;
+    }
+  
     if (useVerboseLogging) {
-        NSLog(@"KME - Turning verbose logging on");
+        NSLog(@"KMEngine - Turning verbose logging on");
         // In Keyman Engine if "debugMode" is turned on (explicitly) with "English plus Spanish" as the current keyboard and you type "Sentrycrash#KME",
         // it will force a simulated crash to test reporting to sentry.keyman.com.
         NSString * kmxName = [[_kmx filePath] lastPathComponent];
@@ -86,7 +86,7 @@ const NSString* kEasterEggKmxName = @"EnglishSpanish.kmx";
             _easterEggForSentry = nil;
     }
     else
-        NSLog(@"KME - Turning verbose logging off");
+        NSLog(@"KMEngine - Turning verbose logging off");
 }
 
 - (NSString *)getCoreContext {
@@ -103,7 +103,7 @@ const NSString* kEasterEggKmxName = @"EnglishSpanish.kmx";
 
 - (void)setCoreOptions:(NSString *)key withValue:(NSString *)value {
   BOOL success = [self.coreWrapper setOptionsForCore:key value:value];
-  NSLog(@"setCoreOptions for key: %@, value: %@ succeeded = %@", key, value, success ? @"YES" : @"NO");
+  [self.coreHelper logDebugMessage:@"setCoreOptions for key: %@, value: %@ succeeded = %@", key, value, success ? @"YES" : @"NO"];
 }
 
 /*

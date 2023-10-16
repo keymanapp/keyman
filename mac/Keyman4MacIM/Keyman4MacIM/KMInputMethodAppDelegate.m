@@ -141,6 +141,15 @@ NSString* _keymanDataPath = nil;
   }
 }
 
+-(void)logDebugMessage:(NSString *)format, ... {
+  if (self.debugMode) {
+    va_list args;
+    va_start(args, format);
+    NSLogv(format, args);
+    va_end(args);
+  }
+}
+
 - (KeymanVersionInfo)versionInfo {
     KeymanVersionInfo result;
     // Get version information from Info.plist, which is filled in
@@ -391,8 +400,7 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
 
 - (KMEngine *)kme {
     if (_kme == nil) {
-       _kme = [[KMEngine alloc] initWithKMX:nil context:self.contextBuffer];
-        [_kme setDebugMode:self.debugMode];
+       _kme = [[KMEngine alloc] initWithKMX:nil context:self.contextBuffer verboseLogging:self.debugMode];
     }
 
     return _kme;

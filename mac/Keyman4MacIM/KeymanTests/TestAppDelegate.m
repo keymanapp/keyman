@@ -16,8 +16,7 @@
 
 - (KMEngine *)kme {
     if (_kme == nil) {
-        _kme = [[KMEngine alloc] initWithKMX:nil context:self.contextBuffer];
-        [_kme setDebugMode:self.debugMode];
+      _kme = [[KMEngine alloc] initWithKMX:nil context:self.contextBuffer verboseLogging:self.debugMode];
     }
     
     return _kme;

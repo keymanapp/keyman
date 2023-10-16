@@ -101,7 +101,7 @@ ActionArrayOptimizer *optimizer;
   
   NSUInteger stringLength = [optionNameString lengthOfBytesUsingEncoding:NSUTF16StringEncoding];
   
-  unichar const *  convertedString = [CoreHelper createUnicharStringFromNSString: optionNameString];
+  unichar const *  convertedString = [[CoreTestStaticHelperMethods helper] createUnicharStringFromNSString: optionNameString];
   NSData *dataFromConversion = [NSData dataWithBytes:convertedString length:stringLength];
   NSData *dataFromLiteral = [NSData dataWithBytes:keyUnicharString length:stringLength];
   XCTAssertTrue([dataFromLiteral isEqualToData:dataFromConversion], @"Converted unichar string is not equal to literal unichar string.");
@@ -113,7 +113,7 @@ ActionArrayOptimizer *optimizer;
   
   NSUInteger stringLength = [numberString lengthOfBytesUsingEncoding:NSUTF16StringEncoding];
   
-  unichar const *  convertedString = [CoreHelper createUnicharStringFromNSString: numberString];
+  unichar const *  convertedString = [[CoreTestStaticHelperMethods helper] createUnicharStringFromNSString: numberString];
   NSData *dataFromConversion = [NSData dataWithBytes:convertedString length:stringLength];
   NSData *dataFromLiteral = [NSData dataWithBytes:unicharString length:stringLength];
   XCTAssertTrue([dataFromLiteral isEqualToData:dataFromConversion], @"Converted unichar string is not equal to literal unichar string.");
@@ -123,7 +123,7 @@ ActionArrayOptimizer *optimizer;
   unichar const * unicharString = u"option_ligature_ew";
   NSString *optionNameString = @"option_ligature_ew";
 
-  NSString *convertedString = [CoreHelper createNSStringFromUnicharString:unicharString];
+  NSString *convertedString = [[CoreTestStaticHelperMethods helper] createNSStringFromUnicharString:unicharString];
 
   XCTAssertTrue([convertedString isEqual:optionNameString], @"Converted unichar string is not equal to literal string.");
 }

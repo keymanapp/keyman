@@ -9,7 +9,6 @@
  */
 
 #import <Foundation/Foundation.h>
-#import "KMContext.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -38,10 +37,7 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 @interface KMCoreActionHandler : NSObject
--(instancetype)initWithActions:(NSArray*)actions context: (KMContext *)context keyCode: (unsigned short)keyCode;
-/*
--(instancetype)initWithActions:(NSArray*)actions context: (KMContext *)context event: (NSEvent *)event client:(id) client;
- */
+-(instancetype)initWithActions:(NSArray*)actions keyCode: (unsigned short)keyCode;
 -(KMActionHandlerResult*)handleActions;
 @end
 

@@ -114,14 +114,14 @@ NSUInteger const MAXIMUM_CONTEXT_LENGTH = 80;         // KM_KBP_IT_CHAR
     }
   }
   if (newText.length > 0) {
-    [self addSubtring:newText];
+    [self addSubstring:newText];
   }
   NSLog(@"   ***CachedContext replaceSubstring, resulting context = %@", _context);
 }
 
--(void)addSubtring:(NSString*)string {
+-(void)addSubstring:(NSString*)string {
   [self.context appendString:string];
-  NSLog(@"   ***CachedContext addSubtring, resulting context = %@", _context);
+  NSLog(@"   ***CachedContext addSubstring, resulting context = %@", _context);
 }
 
 -(void)applyAction:(CoreAction*)action keyDownEvent:(nonnull NSEvent *)event {
@@ -132,7 +132,7 @@ NSUInteger const MAXIMUM_CONTEXT_LENGTH = 80;         // KM_KBP_IT_CHAR
       [self appendMarker];
       break;
     case CharacterAction:
-      [self addSubtring:action.content];
+      [self addSubstring:action.content];
       break;
     case CharacterBackspaceAction:
       [self deleteLastCodePoint];
@@ -178,7 +178,7 @@ NSUInteger const MAXIMUM_CONTEXT_LENGTH = 80;         // KM_KBP_IT_CHAR
     case kVK_Return:
     case kVK_ANSI_KeypadEnter:
       NSLog(@"applyUnhandledEvent kVK_Return");
-      [self addSubtring:@"\n"];
+      [self addSubstring:@"\n"];
       break;
     default:
       {
@@ -187,7 +187,7 @@ NSUInteger const MAXIMUM_CONTEXT_LENGTH = 80;         // KM_KBP_IT_CHAR
         // can generate more than one character in event.characters.
         unichar ch = [event.characters characterAtIndex:0];
         if (keyCode < 0x33 || (ch >= 0x2A && ch <= 0x39)) { // Main keys, Numpad char range, normal punctuation
-          [self addSubtring:event.characters];
+          [self addSubstring:event.characters];
         }
         else {
             // Other keys

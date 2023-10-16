@@ -11,6 +11,7 @@
 
 #import <InputMethodKit/InputMethodKit.h>
 #import "KeySender.h"
+#import "KMInputMethodAppDelegate.h"
 
 const CGKeyCode kKeymanEventKeyCode = 0xFF;
 
@@ -21,6 +22,10 @@ const CGKeyCode kKeymanEventKeyCode = 0xFF;
 @end
 
 @implementation KeySender
+
+-(KMInputMethodAppDelegate *)appDelegate {
+  return (KMInputMethodAppDelegate *)[NSApp delegate];
+}
 
 -(instancetype)init  {
   self = [super init];
@@ -36,7 +41,7 @@ const CGKeyCode kKeymanEventKeyCode = 0xFF;
   pid_t processId = app.processIdentifier;
   NSString *appName = app.localizedName;
 
-  NSLog(@"sendKeyDown keyCode %lu to app %@ with pid %d", (unsigned long)keyCode, appName, processId);
+  [self.appDelegate logDebugMessage:@"sendKeyDown keyCode %lu to app %@ with pid %d", (unsigned long)keyCode, appName, processId];
 
   CGEventFlags KMEventModifierKeyman = 1 << 24;
 
@@ -69,12 +74,12 @@ const CGKeyCode kKeymanEventKeyCode = 0xFF;
 }
 
 - (void)sendBackspaceforSourceEvent:(NSEvent *)event {
-  NSLog(@"KeySender sendBackspaceforSourceEvent");
+  [self.appDelegate logDebugMessage:@"KeySender sendBackspaceforSourceEvent"];
   [self sendKeyDown:kVK_Delete forSourceEvent:event includeKeyUp:YES];
 }
 
 - (void)sendKeymanKeyCodeForEvent:(NSEvent *)event {
-  NSLog(@"KeySender sendKeymanKeyCodeForEvent");
+  [self.appDelegate logDebugMessage:@"KeySender sendKeymanKeyCodeForEvent"];
   // this is not a real keycode, so we do not need a key up event
   // kKeymanEventKeyCode is used to indicate that all the backspaces have been processed
   // and we can insert the queuedText to the client

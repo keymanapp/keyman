@@ -81,6 +81,7 @@ typedef struct {
 @property (nonatomic, assign) BOOL useNullChar;
 @property (nonatomic, assign) BOOL debugMode;
 
+- (void)logDebugMessage:(NSString *)format, ...;
 - (NSMenu *)menu;
 - (void)saveActiveKeyboards;
 - (void)readPersistedOptions;

@@ -1,7 +1,7 @@
 /**
  * Keyman is copyright (C) SIL International. MIT License.
  * 
- * CachedContext.h
+ * KMContext.h
  * Keyman
  * 
  * Created by Shawn Schantz on 2023-05-11.
@@ -21,7 +21,7 @@ NS_ASSUME_NONNULL_BEGIN
 -(instancetype)init NS_DESIGNATED_INITIALIZER;
 -(instancetype)initWithString:(NSString*)initialContext;
 -(void)resetContext:(NSString*)newContext;
--(void)addSubtring:(NSString*)string;
+-(void)addSubstring:(NSString*)string;
 -(void)replaceSubstring:(NSString*)newText count:(int)count;
 -(void)deleteLastCodePoint;
 -(void)applyAction:(CoreAction*)action keyDownEvent:(nonnull NSEvent *)event;

@@ -73,7 +73,7 @@ NSRange _previousSelRange;
     // In Xcode, if Keyman is the active IM and is in "debugMode" and "English plus Spanish" is 
     // the current keyboard and you type "Sentry force now", it will force a simulated crash to 
     // test reporting to sentry.keyman.com
-    if ([self.AppDelegate debugMode] && [clientAppId isEqual: @"com.apple.dt.Xcode"]) {
+    if ([self.appDelegate debugMode] && [clientAppId isEqual: @"com.apple.dt.Xcode"]) {
         NSLog(@"Sentry - Preparing to detect Easter egg.");
         _easterEggForSentry = [[NSMutableString alloc] init];
     }
@@ -88,7 +88,7 @@ NSRange _previousSelRange;
 
 - (void)switchToLegacyMode {
     _legacyMode = YES;
-    if ([self.AppDelegate debugMode])
+    if ([self.appDelegate debugMode])
         NSLog(@"Using legacy mode for this app.");
 }
 
@@ -96,7 +96,7 @@ NSRange _previousSelRange;
     if (_numberOfPostedDeletesToExpect > 0 || (_pendingBuffer != nil && _pendingBuffer.length > 0) ||
         _keyCodeOfOriginalEvent != 0 || _sourceFromOriginalEvent != nil)
     {
-        if ([self.AppDelegate debugMode]) {
+        if ([self.appDelegate debugMode]) {
             NSLog(@"ERROR: new app activated before previous app finished processing pending events!");
             NSLog(@"  _numberOfPostedDeletesToExpect = %lu", _numberOfPostedDeletesToExpect);
             NSLog(@"  pendingBuffer = \"%@\"", _pendingBuffer == nil ? @"(NIL)" : (NSString*)[self pendingBuffer]);
@@ -125,7 +125,7 @@ NSRange _previousSelRange;
     // the only downside to treating all commands as having the potential to change the selection
     // is that some "legacy" apps can't get their context at all. This can be overridden so that
     // legacy apps can mitigate this problem as appropriate.
-    if ([self.AppDelegate debugMode])
+    if ([self.appDelegate debugMode])
         NSLog(@"Command key - context needs to be re-gotten.");
     _contextOutOfDate = YES;
 }
@@ -143,14 +143,12 @@ NSRange _previousSelRange;
 - (void)insertPendingBufferTextIn:(id)client {
     NSUInteger length = [self pendingBuffer].length;
     if (!length) {
-        if ([self.AppDelegate debugMode])
-            NSLog(@"Error - expected text in pending buffer!");
+        [self.appDelegate logDebugMessage:@"Error - expected text in pending buffer!"];
         return;
     }
     NSString* text = [self pendingBuffer];
 
-    if ([self.AppDelegate debugMode])
-        NSLog(@"Inserting text from pending buffer: \"%@\"", text);
+    [self.appDelegate logDebugMessage:@"Inserting text from pending buffer: \"%@\"", text];
 
     [client insertText:text replacementRange:NSMakeRange(NSNotFound, NSNotFound)];
     _previousSelRange.location += text.length;
@@ -159,12 +157,12 @@ NSRange _previousSelRange;
     [self setPendingBuffer:@""];
 }
 
-- (KMInputMethodAppDelegate *)AppDelegate {
+- (KMInputMethodAppDelegate *)appDelegate {
     return (KMInputMethodAppDelegate *)[NSApp delegate];
 }
 
 - (KMEngine *)kme {
-    return self.AppDelegate.kme;
+    return self.appDelegate.kme;
 }
 
 - (NSMutableString *)contextBuffer {
@@ -175,7 +173,7 @@ NSRange _previousSelRange;
                                   userInfo:nil];
         @throw exception;
     }
-    return self.AppDelegate.contextBuffer;
+    return self.appDelegate.contextBuffer;
 }
 
 - (NSRange)getSelectionRangefromClient:(id)client {
@@ -185,11 +183,9 @@ NSRange _previousSelRange;
                 NSRange selRange = [client selectedRange];
                 if (selRange.location != NSNotFound || selRange.length != NSNotFound) {
                     _clientCanProvideSelectionInfo = Yes;
-                    if ([self.AppDelegate debugMode]) {
-                        NSLog(@"Client can provide selection info.");
-                        NSLog(@"selRange.location: %lu", (unsigned long)selRange.location);
-                        NSLog(@"selRange.length: %lu", (unsigned long)selRange.length);
-                    }
+                    [self.appDelegate logDebugMessage:@"Client can provide selection info."];
+                    [self.appDelegate logDebugMessage:@"selRange.location: %lu", (unsigned long)selRange.location];
+                    [self.appDelegate logDebugMessage:@"selRange.length: %lu", (unsigned long)selRange.length];
                     return selRange;
                 }
             }
@@ -198,8 +194,7 @@ NSRange _previousSelRange;
             // still in the same location in the context. This may be totally untrue, but if the client can't report
             // its location, we have nothing else to go on.
             _clientSelectionCanChangeUnexpectedly = NO;
-            if ([self.AppDelegate debugMode])
-                NSLog(@"Client can NOT provide selection info!");
+            [self.appDelegate logDebugMessage:@"Client can NOT provide selection info!"];
             // fall through
         case No:
             return NSMakeRange(NSNotFound, NSNotFound);
@@ -207,19 +202,15 @@ NSRange _previousSelRange;
         case Unreliable:
         {
             NSRange selRange = [client selectedRange];
-            if ([self.AppDelegate debugMode]) {
-                NSLog(@"selRange.location: %lu", (unsigned long)selRange.location);
-            }
+            [self.appDelegate logDebugMessage:@"selRange.location: %lu", (unsigned long)selRange.location];
             return selRange;
         }
     }
 }
 
 - (void)updateContextBuffer:(id)sender {
-    if ([self.AppDelegate debugMode]) {
-        NSLog(@"*** updateContextBuffer ***");
-        NSLog(@"sender: %@", sender);
-    }
+      [self.appDelegate logDebugMessage:@"*** updateContextBuffer ***"];
+      [self.appDelegate logDebugMessage:@"sender: %@", sender];
 
     NSRange selRange = [self getSelectionRangefromClient: sender];
 
@@ -231,12 +222,10 @@ NSRange _previousSelRange;
     // REVIEW: If there is ever a situation where preBuffer gets some text but the client reports its
     // selectedRange as not found, we probably can't reliably assume that the current location is really
     // at the end of the "preBuffer", so maybe we just need to assume no context.
-    [self.AppDelegate setContextBuffer:preBuffer.length?[NSMutableString stringWithString:preBuffer]:nil];
+    [self.appDelegate setContextBuffer:preBuffer.length?[NSMutableString stringWithString:preBuffer]:nil];
     _contextOutOfDate = NO;
-    if ([self.AppDelegate debugMode]) {
-        NSLog(@"contextBuffer = \"%@\"", self.contextBuffer.length?[self.contextBuffer codeString]:@"{empty}");
-        NSLog(@"***");
-    }
+      [self.appDelegate logDebugMessage:@"contextBuffer = \"%@\"", self.contextBuffer.length?[self.contextBuffer codeString]:@"{empty}"];
+      [self.appDelegate logDebugMessage:@"***"];
     _previousSelRange = selRange;
 }
 
@@ -246,20 +235,17 @@ NSRange _previousSelRange;
 
     NSUInteger start = 0;
     if (len > kMaxContext) {
-        if ([self.AppDelegate debugMode])
-            NSLog(@"Limiting context to %lu characters", kMaxContext);
+        [self.appDelegate logDebugMessage:@"Limiting context to %lu characters", kMaxContext];
         start = len - kMaxContext;
         len = kMaxContext;
     }
 
     NSString *preBuffer = [[sender attributedSubstringFromRange:NSMakeRange(start, len)] string];
-    if ([self.AppDelegate debugMode]) {
-        NSLog(@"preBuffer = \"%@\"", preBuffer ? preBuffer : @"nil");
-        if (preBuffer.length)
-            NSLog(@"First character: '%x'", [preBuffer characterAtIndex:0]);
-        else
-            NSLog(@"preBuffer has a length of 0");
-    }
+    [self.appDelegate logDebugMessage:@"preBuffer = \"%@\"", preBuffer ? preBuffer : @"nil"];
+    if (preBuffer.length)
+      [self.appDelegate logDebugMessage:@"First character: '%x'", [preBuffer characterAtIndex:0]];
+    else
+      [self.appDelegate logDebugMessage:@"preBuffer has a length of 0"];
 
     return preBuffer;
 }
@@ -288,18 +274,18 @@ NSRange _previousSelRange;
 }
 
 - (void)updateContextBufferIfNeeded:(id)client {
-    // REVIEW: if self.AppDelegate.lowLevelEventTap == nil under what circumstances might we be able to safely
+    // REVIEW: if self.appDelegate.lowLevelEventTap == nil under what circumstances might we be able to safely
     // re-get the context? (Probably clientCanProvideSelectionInfo would need to be true, and it would only
     // actually be useful if client respondsToSelector:@selector(attributedSubstringFromRange:), but even then
     // we'd only want to do it if we have actually moved from our previous location. Otherwise, we wouldn't be
     // able to handle dead keys correctly.)
-    if (self.AppDelegate.contextChangingEventDetected)
+    if (self.appDelegate.contextChangingEventDetected)
     {
-        if (!_contextOutOfDate && [self.AppDelegate debugMode]) {
-            NSLog(@"Low-level event requires context to be re-retrieved.");
+        if (!_contextOutOfDate) {
+          [self.appDelegate logDebugMessage:@"Low-level event requires context to be re-retrieved."];
         }
         _contextOutOfDate = YES;
-        self.AppDelegate.contextChangingEventDetected = NO;
+        self.appDelegate.contextChangingEventDetected = NO;
     }
 
     if (_contextOutOfDate)
@@ -311,17 +297,15 @@ NSRange _previousSelRange;
 
   // TODO: remove willDeleteNullChar with core code in place
   if ([self willDeleteNullChar]) {
-    if ([self.AppDelegate debugMode]) {
-        NSLog(@"willDeleteNullChar = true");
-    }
-    return NO;
+      [self.appDelegate logDebugMessage:@"willDeleteNullChar = true"];
+      return NO;
   }
   else {
-    actions = [self processEventWithKeymanEngine:event in:sender];
-    if (actions.count == 0) {
-      [self checkEventForSentryEasterEgg:event];
-      return NO;
-    }
+      actions = [self processEventWithKeymanEngine:event in:sender];
+      if (actions.count == 0) {
+        [self checkEventForSentryEasterEgg:event];
+        return NO;
+      }
   }
   
   return [self applyKeymanCoreActions:actions event:event client:sender];
@@ -333,19 +317,19 @@ NSRange _previousSelRange;
   
   for (NSDictionary *action in actions) {
       NSString *actionType = [[action allKeys] objectAtIndex:0];
-      if ([self.AppDelegate debugMode]) {
+      if ([self.appDelegate debugMode]) {
           NSLog(@"Handling %@ action...", actionType);
           NSLog(@"contextBuffer = \"%@\"", self.contextBuffer.length?[self.contextBuffer codeString]:@"{empty}");
       }
 
       if ([actionType isEqualToString:Q_STR]) {
           NSString *output = [action objectForKey:actionType];
-          if ([self.AppDelegate debugMode])
+          if ([self.appDelegate debugMode])
               NSLog(@"output = %@", output);
           if (deleteBackPosted)
           {
               [self appendPendingBuffer:output];
-              if ([self.AppDelegate debugMode])
+              if ([self.appDelegate debugMode])
                   NSLog(@"pendingBuffer = %@", [self pendingBuffer]);
           }
           else {
@@ -354,12 +338,12 @@ NSRange _previousSelRange;
               // processing the Q_BACK, which we now need to replace with the text we're inserting.
               if (nc > 0) {
                   NSUInteger pos = [self getSelectionRangefromClient:sender].location;
-                  if ([self.AppDelegate debugMode]) {
+                  if ([self.appDelegate debugMode]) {
                       NSLog(@"nc = %lu", nc);
                       NSLog(@"pos = %lu", pos);
                   }
                   if (pos >= nc && pos != NSNotFound) {
-                      if ([self.AppDelegate debugMode]) {
+                      if ([self.appDelegate debugMode]) {
                           NSLog(@"Replacement index = %lu", pos - nc);
                           NSLog(@"Replacement length = %lu", nc);
                       }
@@ -414,7 +398,7 @@ NSRange _previousSelRange;
           NSDictionary *save = [action objectForKey:actionType];
           NSNumber *storeKey = [save allKeys][0];
           NSString *value = [save objectForKey:storeKey];
-          [self.AppDelegate saveStore:storeKey withValue:value];
+          [self.appDelegate saveStore:storeKey withValue:value];
       }
   }
 }
@@ -422,10 +406,10 @@ NSRange _previousSelRange;
 
 - (NSArray*) processEventWithKeymanEngine:(NSEvent *)event in:(id) sender {
   NSArray* actions = nil;
-  if (self.AppDelegate.lowLevelEventTap != nil) {
-      NSEvent *eventWithOriginalModifierFlags = [NSEvent keyEventWithType:event.type location:event.locationInWindow modifierFlags:self.AppDelegate.currentModifierFlags timestamp:event.timestamp windowNumber:event.windowNumber context:event.context characters:event.characters charactersIgnoringModifiers:event.charactersIgnoringModifiers isARepeat:event.isARepeat keyCode:event.keyCode];
+  if (self.appDelegate.lowLevelEventTap != nil) {
+      NSEvent *eventWithOriginalModifierFlags = [NSEvent keyEventWithType:event.type location:event.locationInWindow modifierFlags:self.appDelegate.currentModifierFlags timestamp:event.timestamp windowNumber:event.windowNumber context:event.context characters:event.characters charactersIgnoringModifiers:event.charactersIgnoringModifiers isARepeat:event.isARepeat keyCode:event.keyCode];
     actions = [self.kme processEvent:eventWithOriginalModifierFlags];
-    NSLog(@"processEventWithKeymanEngine, using AppDelegate.currentModifierFlags %lu, instead of event.modifiers = %lu", (unsigned long)self.AppDelegate.currentModifierFlags, (unsigned long)event.modifierFlags);
+    [self.appDelegate logDebugMessage:@"processEventWithKeymanEngine, using AppDelegate.currentModifierFlags %lu, instead of event.modifiers = %lu", (unsigned long)self.appDelegate.currentModifierFlags, (unsigned long)event.modifierFlags];
   }
   else {
       // Depending on the client app and the keyboard, using the passed-in event as it is should work okay.
@@ -433,9 +417,7 @@ NSRange _previousSelRange;
       // context might go undetected in some apps, resulting in errant behavior for subsequent typing.
     actions = [self.kme processEvent:event];
   }
-  if ([self.AppDelegate debugMode]) {
-      NSLog(@"processEventWithKeymanEngine, actions = %@", actions);
-  }
+  [self.appDelegate logDebugMessage:@"processEventWithKeymanEngine, actions = %@", actions];
   return actions;
 }
 
@@ -465,7 +447,7 @@ NSRange _previousSelRange;
 
 
 - (void)processUnhandledDeleteBack:(id)client updateEngineContext:(BOOL *)updateEngineContext {
-    if ([self.AppDelegate debugMode]) {
+    if ([self.appDelegate debugMode]) {
         NSLog(@"Processing an unhandled delete-back...");
         NSLog(@"_numberOfPostedDeletesToExpect = %lu", _numberOfPostedDeletesToExpect);
     }
@@ -486,13 +468,13 @@ NSRange _previousSelRange;
     }
     if (_numberOfPostedDeletesToExpect > 0) {
         if (--_numberOfPostedDeletesToExpect == 0) {
-            if ([self.AppDelegate debugMode])
+            if ([self.appDelegate debugMode])
                 NSLog(@"Processing final posted delete-back...");
 
             self.willDeleteNullChar = NO;
             if (_legacyMode) {
                 if (_pendingBuffer != nil && _pendingBuffer.length > 0) {
-                    if ([self.AppDelegate debugMode])
+                    if ([self.appDelegate debugMode])
                         NSLog(@"Posting special code to tell IM to insert characters from pending buffer.");
                     [self performSelector:@selector(initiatePendingBufferProcessing:) withObject:client afterDelay:0.1];
                 }
@@ -502,7 +484,7 @@ NSRange _previousSelRange;
                     NSLog(@"----- If not legacy mode, _sourceFromOriginalEvent should be retained until original code is posted -----");
                 }
                 else {
-                    if ([self.AppDelegate debugMode]) {
+                    if ([self.appDelegate debugMode]) {
                         NSLog(@"Re-posting original (unhandled) code: %d", (int)_keyCodeOfOriginalEvent);
                     }
                     [self postKeyPressToFrontProcess:_keyCodeOfOriginalEvent from:_sourceFromOriginalEvent];
@@ -532,7 +514,7 @@ NSRange _previousSelRange;
     self.ignoreNextDeleteBackHighLevel = NO;
     if(event.keyCode == kVK_Delete && _legacyMode && [self pendingBuffer].length > 0) {
         BOOL updateEngineContext = YES;
-        if ([self.AppDelegate debugMode]) {
+        if ([self.appDelegate debugMode]) {
             NSLog(@"legacy: delete-back received, processing");
         }
         [self processUnhandledDeleteBack:self.senderForDeleteBack updateEngineContext: &updateEngineContext];
@@ -542,191 +524,8 @@ NSRange _previousSelRange;
     return self.ignoreNextDeleteBackHighLevel;
 }
 
-/*
-- (BOOL)legacyHandleEvent:(NSEvent *)event client:(id)sender {
-   // OSK key feedback from hardware keyboard is disabled
-  //if (event.type == NSKeyDown)
-   //  [self.AppDelegate handleKeyEvent:event];
-
-    if (event.type == NSEventTypeFlagsChanged) {
-        // We mark the context as out of date only for the Command keys
-        switch([event keyCode]) {
-            case kVK_RightCommand:
-            case kVK_Command:
-                _contextOutOfDate = YES;
-                break;
-            case kVK_Shift:
-            case kVK_RightShift:
-            case kVK_CapsLock:
-            case kVK_Option:
-            case kVK_RightOption:
-            case kVK_Control:
-            case kVK_RightControl:
-                break;
-        }
-        return NO;
-    }
-
-    if ((event.modifierFlags & NSEventModifierFlagCommand) == NSEventModifierFlagCommand) {
-        [self handleCommand:event];
-        return NO; // We let the client app handle all Command-key events.
-    }
-
-    if (_legacyMode && event.keyCode == kProcessPendingBuffer)
-    {
-        if ([self.AppDelegate debugMode]) {
-            NSLog(@"Processing the special %hu code", kProcessPendingBuffer);
-
-            NSUInteger length = [self pendingBuffer].length;
-            if (length > 0) {
-                for (NSUInteger ich = 0; ich < length; ich++)
-                    NSLog(@"Char %li: '%x'", ich, [[self pendingBuffer] characterAtIndex:ich]);
-            }
-        }
-
-        [self insertPendingBufferTextIn:sender];
-        return YES;
-    }
-
-    if(event.keyCode == kVK_Delete && _legacyMode && self.ignoreNextDeleteBackHighLevel) {
-       // This event was sent by Keyman and we should just
-        // pass it through to the app. handleDeleteBackLowLevel
-        // already did anything we need with it.
-        return NO; // We'll let the client app accept the Delete Back
-    }
-
-    [self checkContextIn:sender];
-
-    [self updateContextBufferIfNeeded:sender];
-
-    if ([self.AppDelegate debugMode]) {
-        NSLog(@"handleEvent sender type = %@", NSStringFromClass([sender class]));
-        if (_clientCanProvideSelectionInfo == Yes)
-            NSLog(@"handleEvent sender selection range location = %lu", [self getSelectionRangefromClient:sender].location);
-    }
-
-    BOOL handled = [self handleEventWithKeymanEngine:event in: sender];
-
-    if(handled) {
-        // TODO: Send the final transform that we've built up
-        // [self sendFinalTransformToClient: sender deleteLeft: nDeleteLeft textToInsert: strTextToInsert];
-    }
-    else {
-        handled = [self handleDefaultKeymanEngineActions:event in: sender];
-    }
-
-    if ([self.AppDelegate debugMode]) {
-        if (_contextOutOfDate)
-            NSLog(@"Context now out of date.");
-        else
-            NSLog(@"contextBuffer = \"%@\"", self.contextBuffer.length?[self.contextBuffer codeString]:@"{empty}");
-        NSLog(@"kme.contextBuffer = \"%@\"", self.kme.contextBuffer.length?[self.kme.contextBuffer codeString]:@"{empty}");
-        if (_clientCanProvideSelectionInfo == Yes) {
-            NSRange range = [self getSelectionRangefromClient:sender]; // This call (in debug) reports location to Console
-            NSLog(@"sender.selectedRange.length = %lu", range.length);
-        }
-        NSLog(@"***");
-    }
-
-    // Note: Although this would seem to be the obvious place to set _previousSelRange (in legacy mode), we can't
-    // because the selection range doesn't get updated until after we return from this method.
-    return handled;
-}
-*/
-
-/*
-- (void)sendFinalTransformToClient:(id) sender for:(NSEvent *)event deleteLeft:(NSUInteger)deleteLeft textToInsert:(NSString*) strTextToInsert {
-    // deleteLeft is now the number of characters to delete from the client.
-    if (deleteLeft > 0) {
-        deleteBackPosted = [self deleteLeft:n in:sender for: event];
-    }
-   if(str != null && str.length > 0) {
-       insert
-   }
-}
-*/
-
-/*
-- (BOOL)handleDefaultKeymanEngineActions:(NSEvent*) event in:(id) sender {
-    NSUInteger nc = [self.contextBuffer deleteLastNullChars];
-    if (nc > 0) {
-        if ([self.AppDelegate debugMode])
-            NSLog(@"Deleted %li null characters from context buffer", nc);
-        // This can presumably only happen if a previous event resulted in a chain of
-        // actions that had a Q_BACK not followed by a Q_STR.
-        self.willDeleteNullChar = YES;
-        [self postDeleteBacks:nc for:event];
-        _keyCodeOfOriginalEvent = event.keyCode;
-
-        return YES;
-    }
-
-    // For other events that the Keyman engine does not have rules, just apply context changes
-    // and let client handle the event
-    NSString* charactersToAppend = nil;
-    BOOL updateEngineContext = YES;
-    unsigned short keyCode = event.keyCode;
-    switch (keyCode) {
-        case kVK_Delete:
-            NSLog(@"handleDefaultKeymanEngineActions kVK_Delete");
-            [self processUnhandledDeleteBack: sender updateEngineContext: &updateEngineContext];
-            break;
-
-        case kVK_LeftArrow:
-            // I had started some code to try to guess where in the context we ended up after a left arrow,
-            // but too many potential pitfalls. Marc says it's better to just let it be dumb.
-        case kVK_RightArrow:
-        case kVK_UpArrow:
-        case kVK_DownArrow:
-        case kVK_Home:
-        case kVK_End:
-        case kVK_PageUp:
-        case kVK_PageDown:
-            _contextOutOfDate = YES;
-            updateEngineContext = NO;
-            break;
-
-        case kVK_Return:
-        case kVK_ANSI_KeypadEnter:
-            NSLog(@"handleDefaultKeymanEngineActions kVK_Return");
-            charactersToAppend = @"\n";
-            break;
-
-        default:
-            {
-                // NOTE: Although ch is usually the same as keyCode, when the option key is depressed (and
-                // perhaps in some other cases) it may not be (keyCode can be 0). Likewise, the option key
-                // can generate more than one character in event.characters.
-                unichar ch = [event.characters characterAtIndex:0];
-                if (keyCode < 0x33 || (ch >= 0x2A && ch <= 0x39)) { // Main keys, Numpad char range, normal punctuation
-                    charactersToAppend = event.characters;
-                }
-                else {
-                    // Other keys
-                }
-            }
-            break;
-    }
-    if (charactersToAppend != nil) {
-        if ([self.AppDelegate debugMode]) {
-            NSLog(@"Adding \"%@\" to context buffer", charactersToAppend);
-        }
-        [self.contextBuffer appendString:charactersToAppend];
-        if (_legacyMode) {
-            _previousSelRange.location += charactersToAppend.length;
-            _previousSelRange.length = 0;
-        }
-    }
-
-    if (updateEngineContext) {
-        [self.kme setContextBuffer:self.contextBuffer];
-    }
-    return NO;
-}
-*/
-
 - (BOOL)deleteBack:(NSUInteger)n in:(id) client for:(NSEvent *) event {
-    if ([self.AppDelegate debugMode])
+    if ([self.appDelegate debugMode])
         NSLog(@"Attempting to back-delete %li characters.", n);
     NSRange selectedRange = [self getSelectionRangefromClient:client];
     NSInteger pos = selectedRange.location;
@@ -742,7 +541,7 @@ NSRange _previousSelRange;
 }
 
 - (void)deleteBack:(NSUInteger)n at:(NSUInteger) pos in:(id)client {
-    if ([self.AppDelegate debugMode]) {
+    if ([self.appDelegate debugMode]) {
         NSLog(@"Using Apple IM-compliant mode.");
         NSLog(@"pos = %lu", pos);
     }
@@ -773,7 +572,7 @@ NSRange _previousSelRange;
                 if ([client respondsToSelector:@selector(attributedSubstringFromRange:)])
                     preChar = [[client attributedSubstringFromRange:NSMakeRange(preCharPos, nbrOfPreCharacters)] string];
                 if (!preChar) {
-                    if ([self.AppDelegate debugMode]) {
+                    if ([self.appDelegate debugMode]) {
                         NSLog(@"Client apparently doesn't implement attributedSubstringFromRange. Attempting to get preChar from context...");
                     }
                     if (self.contextBuffer != nil && preCharPos < self.contextBuffer.length) {
@@ -782,36 +581,36 @@ NSRange _previousSelRange;
                     if (!preChar)
                         break;
                 }
-                if ([self.AppDelegate debugMode])
+                if ([self.appDelegate debugMode])
                     NSLog(@"Testing preChar: %@", preChar);
 
                 if ([regexNonCombiningMark numberOfMatchesInString:preChar options:NSMatchingAnchored range:NSMakeRange(0, 1)] > 0)
                     break;
                 if (preCharPos == 0) {
-                    if ([self.AppDelegate debugMode]) {
+                    if ([self.appDelegate debugMode]) {
                         NSLog(@"Failed to find a base character!");
                     }
                     break;
                 }
-                if ([self.AppDelegate debugMode]) {
+                if ([self.appDelegate debugMode]) {
                     NSLog(@"Have not yet found a base character. nbrOfPreCharacters = %lu", nbrOfPreCharacters);
                 }
             }
             if (preChar) {
-                if ([self.AppDelegate debugMode]) {
+                if ([self.appDelegate debugMode]) {
                     NSLog(@"preChar (to insert at %lu) = \"%@\"", preCharPos, preChar);
                 }
                 [client insertText:preChar replacementRange:NSMakeRange(preCharPos, n+nbrOfPreCharacters)];
             }
             else {
-                if ([self.AppDelegate debugMode]) {
+                if ([self.appDelegate debugMode]) {
                     NSLog(@"Switching to legacy mode - client apparently doesn't implement attributedSubstringFromRange and no previous character in context buffer.");
                 }
                 _legacyMode = YES; // client apparently doesn't implement attributedSubstringFromRange.
             }
         }
         else {
-            if ([self.AppDelegate debugMode])
+            if ([self.appDelegate debugMode])
                 NSLog(@"No previous character to use for replacement - replacing range with space");
             [client insertText:@" " replacementRange:NSMakeRange(pos - n, n)];
             [self.contextBuffer appendNullChar];
@@ -825,14 +624,14 @@ NSRange _previousSelRange;
         pos = self.contextBuffer.length + n;
     }
 
-    if ([self.AppDelegate debugMode]) {
+    if ([self.appDelegate debugMode]) {
         NSLog(@"Using Legacy mode.");
         NSLog(@"pos = %lu", pos);
     }
 
     if (pos >= n) {
         // n is now the number of delete-backs we need to post (plus one more if there is selected text)
-        if ([self.AppDelegate debugMode]) {
+        if ([self.appDelegate debugMode]) {
             NSLog(@"Legacy mode: calling postDeleteBacks");
             if (_clientCanProvideSelectionInfo == No || _clientCanProvideSelectionInfo == Unreliable)
                 NSLog(@"Cannot trust client to report accurate selection length - assuming no selection.");
@@ -865,10 +664,10 @@ NSRange _previousSelRange;
 
     for (int db = 0; db < count; db++)
     {
-        if ([self.AppDelegate debugMode]) {
+        if ([self.appDelegate debugMode]) {
             NSLog(@"Posting a delete (down/up) at kCGHIDEventTap.");
         }
-        [self.AppDelegate postKeyboardEventWithSource:_sourceFromOriginalEvent code:kVK_Delete postCallback:^(CGEventRef eventToPost) {
+        [self.appDelegate postKeyboardEventWithSource:_sourceFromOriginalEvent code:kVK_Delete postCallback:^(CGEventRef eventToPost) {
             CGEventPost(kCGHIDEventTap, eventToPost);
         }];
     }
@@ -882,7 +681,7 @@ NSRange _previousSelRange;
     ProcessSerialNumber psn;
     GetFrontProcess(&psn);
 
-    if ([self.AppDelegate debugMode]) {
+    if ([self.appDelegate debugMode]) {
         if (code == kProcessPendingBuffer) {
             NSLog(@"Posting code to tell Keyman to process characters in pending buffer.");
         }
@@ -891,7 +690,7 @@ NSRange _previousSelRange;
         }
     }
 
-    [self.AppDelegate postKeyboardEventWithSource:source code:code postCallback:^(CGEventRef eventToPost) {
+    [self.appDelegate postKeyboardEventWithSource:source code:code postCallback:^(CGEventRef eventToPost) {
         CGEventPostToPSN((ProcessSerialNumberPtr)&psn, eventToPost);
     }];
 }
@@ -904,7 +703,7 @@ NSRange _previousSelRange;
   
   if ((self.apiCompliance == nil) || (![self.apiCompliance.clientApplicationId isEqualTo:self.clientApplicationId])) {
     self.apiCompliance = [[TextApiCompliance alloc]initWithClient:client applicationId:self.clientApplicationId];
-    NSLog(@"KMInputMethodHandler initWithClient checkTextApiCompliance: %@", _apiCompliance);
+    [self.appDelegate logDebugMessage:@"KMInputMethodHandler initWithClient checkTextApiCompliance: %@", _apiCompliance];
   } else if (self.apiCompliance.isComplianceUncertain) {
     // if it is valid but compliance is uncertain, then test it
     [self.apiCompliance testCompliance:client];
@@ -912,19 +711,19 @@ NSRange _previousSelRange;
 }
 
 - (void) checkIfContextChangingEventDetected {
-  if (self.AppDelegate.contextChangingEventDetected)
+  if (self.appDelegate.contextChangingEventDetected)
   {
     if (!self.cachedContext.isInvalid) {
-      NSLog(@"Low-level event has invalidated the context.");
+      [self.appDelegate logDebugMessage:@"Low-level event has invalidated the context."];
       [self.cachedContext invalidateContext];
     }
-    self.AppDelegate.contextChangingEventDetected = NO;
+    self.appDelegate.contextChangingEventDetected = NO;
   }
 }
 
 // handleEvent implementation for core event processing
 - (BOOL)handleEvent:(NSEvent *)event client:(id)sender {
-  NSLog(@"handleEvent event = %@", event);
+  [self.appDelegate logDebugMessage:@"handleEvent event = %@", event];
 
   [self checkTextApiCompliance:sender];
   
@@ -944,7 +743,7 @@ NSRange _previousSelRange;
     if(event.keyCode == kVK_Delete && self.generatedBackspaceCount > 0) {
       self.generatedBackspaceCount--;
       [self.cachedContext deleteLastCodePoint];
-      NSLog(@"handleEvent KVK_Delete, reducing generatedBackspaceCount to %d ", self.generatedBackspaceCount);
+      [self.appDelegate logDebugMessage:@"handleEvent KVK_Delete, reducing generatedBackspaceCount to %d ", self.generatedBackspaceCount];
       return NO;
     }
   }
@@ -974,7 +773,7 @@ NSRange _previousSelRange;
 
     BOOL handled = [self handleEventWithKeymanEngine:event in: sender];
     if (event.type == NSKeyDown) {
-      NSLog(@"event, keycode: %u, characters='%@' handled by KeymanEngine: %@", event.keyCode, event.characters, handled?@"yes":@"no");
+      [self.appDelegate logDebugMessage:@"event, keycode: %u, characters='%@' handled by KeymanEngine: %@", event.keyCode, event.characters, handled?@"yes":@"no"];
     }
 
     return handled;
@@ -997,7 +796,7 @@ NSRange _previousSelRange;
       contextString = attributedString.string;
     }
     
-    NSLog(@"loadContext, new context='%@'", contextString);
+    [self.appDelegate logDebugMessage:@"loadContext, new context='%@'", contextString];
     [self.cachedContext resetContext:contextString];
     [self.kme setCoreContext:contextString];
     }
@@ -1014,9 +813,9 @@ NSRange _previousSelRange;
  * -return YES after generating a backspace event
  */
 -(BOOL)applyKeymanCoreActions:(NSArray*)actions event: (NSEvent*)event client:(id) client {
-  NSLog(@"applyKeymanCoreActions invoked, actions.count = %lu ", (unsigned long)actions.count);
+  [self.appDelegate logDebugMessage:@"applyKeymanCoreActions invoked, actions.count = %lu ", (unsigned long)actions.count];
   
-  KMCoreActionHandler *actionHandler = [[KMCoreActionHandler alloc] initWithActions:(NSArray*)actions context: self.cachedContext keyCode: event.keyCode];
+  KMCoreActionHandler *actionHandler = [[KMCoreActionHandler alloc] initWithActions:(NSArray*)actions keyCode: event.keyCode];
   KMActionHandlerResult *result = actionHandler.handleActions;
 
   for (KMActionOperation *operation in [result.operations objectEnumerator]) {
@@ -1038,7 +837,7 @@ NSRange _previousSelRange;
 -(void)executeSimpleOperation:(KMActionOperation*)operation keyDownEvent:(nonnull NSEvent *)event {
   CoreAction *action = operation.action;
   if (action != nil) {
-    NSLog(@"KXMInputMethodHandler executeSimpleOperation: %@", operation);
+    [self.appDelegate logDebugMessage:@"KXMInputMethodHandler executeSimpleOperation: %@", operation];
   }
   switch(action.actionType) {
     case AlertAction:
@@ -1046,11 +845,11 @@ NSRange _previousSelRange;
       break;
     case PersistOptionAction:
       if(action.key && action.value) {
-        NSLog(@"PersistOptionAction calling writePersistedOptions, key: %@, value: %@", action.key, action.value);
-        [self.AppDelegate writePersistedOptions:action.key withValue:action.value];
+        [self.appDelegate logDebugMessage:@"PersistOptionAction calling writePersistedOptions, key: %@, value: %@", action.key, action.value];
+        [self.appDelegate writePersistedOptions:action.key withValue:action.value];
       }
       else {
-        NSLog(@"Invalid values for PersistOptionAction, not writing to UserDefaults, key: %@, value: %@", action.key, action.value);
+        [self.appDelegate logDebugMessage:@"Invalid values for PersistOptionAction, not writing to UserDefaults, key: %@, value: %@", action.key, action.value];
       }
       break;
     case InvalidateContextAction:
@@ -1068,24 +867,24 @@ NSRange _previousSelRange;
 }
 
 -(void)executeCompositeOperation:(KMActionOperation*)operation keyDownEvent:(nonnull NSEvent *)event client:(id) client {
-  NSLog(@"KXMInputMethodHandler executeCompositeOperation, composite operation: %@", operation);
+  [self.appDelegate logDebugMessage:@"KXMInputMethodHandler executeCompositeOperation, composite operation: %@", operation];
   
   if ((operation.isTextOnlyScenario)) {
-    NSLog(@"KXMInputMethodHandler executeCompositeOperation, text only scenario");
+    [self.appDelegate logDebugMessage:@"KXMInputMethodHandler executeCompositeOperation, text only scenario"];
     [self insertAndReplaceTextForOperation:operation client:client];
   }
       
   if (operation.isBackspaceOnlyScenario) {
-    NSLog(@"KXMInputMethodHandler executeCompositeOperation, backspace only scenario");
+    [self.appDelegate logDebugMessage:@"KXMInputMethodHandler executeCompositeOperation, backspace only scenario"];
     [self sendEventsForOperation: event actionOperation:operation];
   }
 
   if ((operation.isTextAndBackspaceScenario)) {
     if (self.apiCompliance.mustBackspaceUsingEvents) {
-      NSLog(@"KXMInputMethodHandler executeCompositeOperation, text and backspace scenario with events");
+      [self.appDelegate logDebugMessage:@"KXMInputMethodHandler executeCompositeOperation, text and backspace scenario with events"];
      [self sendEventsForOperation: event actionOperation:operation];
     } else {
-      NSLog(@"KXMInputMethodHandler executeCompositeOperation, text and backspace scenario with insert API");
+      [self.appDelegate logDebugMessage:@"KXMInputMethodHandler executeCompositeOperation, text and backspace scenario with insert API"];
       // directly insert text and handle backspaces by using replace
       [self insertAndReplaceTextForOperation:operation client:client];
     }
@@ -1103,7 +902,7 @@ NSRange _previousSelRange;
  */
 -(void)insertAndReplaceText:(NSString *)text backspaceCount:(int) replacementCount client:(id) client {
 
-  NSLog(@"KXMInputMethodHandler insertAndReplaceText: %@ replacementCount: %d", text, replacementCount);
+  [self.appDelegate logDebugMessage:@"KXMInputMethodHandler insertAndReplaceText: %@ replacementCount: %d", text, replacementCount];
   int actualReplacementCount = 0;
   NSRange replacementRange;
   NSRange notFoundRange = NSMakeRange(NSNotFound, NSNotFound);
@@ -1116,14 +915,14 @@ NSRange _previousSelRange;
     
     // log this: it is a sign that we are out of sync
     if (actualReplacementCount < replacementCount) {
-      NSLog(@"KXMInputMethodHandler insertAndReplaceText, replacement of %d characters limited by start of context to actual count: %d", replacementCount, actualReplacementCount);
+      [self.appDelegate logDebugMessage:@"KXMInputMethodHandler insertAndReplaceText, replacement of %d characters limited by start of context to actual count: %d", replacementCount, actualReplacementCount];
     }
     
     if (actualReplacementCount > 0) {
-      NSLog(@"KXMInputMethodHandler insertAndReplaceText, actualReplacementCount=%d, selectionRange.location=%lu", actualReplacementCount, selectionRange.location);
+      [self.appDelegate logDebugMessage:@"KXMInputMethodHandler insertAndReplaceText, actualReplacementCount=%d, selectionRange.location=%lu", actualReplacementCount, selectionRange.location];
       
       replacementRange = NSMakeRange(selectionRange.location-actualReplacementCount, replacementCount);
-      NSLog(@"KXMInputMethodHandler insertAndReplaceText, insertText %@ in replacementRange.start=%lu, replacementRange.length=%lu", text, replacementRange.location, replacementRange.length);
+      [self.appDelegate logDebugMessage:@"KXMInputMethodHandler insertAndReplaceText, insertText %@ in replacementRange.start=%lu, replacementRange.length=%lu", text, replacementRange.location, replacementRange.length];
     } else {
       replacementRange = notFoundRange;
     }
@@ -1139,7 +938,7 @@ NSRange _previousSelRange;
 
 
 -(void)sendEventsForOperation: (NSEvent *)event actionOperation:(KMActionOperation*)operation {
-  NSLog(@"sendEventsForOperation backspaceCount: %d, textToInsert: %@, hasAccessibility = %@", operation.backspaceCount, operation.textToInsert, [PrivacyConsent.shared checkAccessibility]?@"YES":@"***NO!***");
+  [self.appDelegate logDebugMessage:@"sendEventsForOperation backspaceCount: %d, textToInsert: %@, hasAccessibility = %@", operation.backspaceCount, operation.textToInsert, [PrivacyConsent.shared checkAccessibility]?@"YES":@"***NO!***"];
   
   if (operation.hasBackspaces) {
     for (int i = 0; i < operation.backspaceCount; i++)
@@ -1157,10 +956,10 @@ NSRange _previousSelRange;
 
 -(void)insertQueuedText: (NSEvent *)event client:(id) client  {
   if (self.queuedText.length> 0) {
-    NSLog(@"insertQueuedText, inserting %@", self.queuedText);
+    [self.appDelegate logDebugMessage:@"insertQueuedText, inserting %@", self.queuedText];
     [self insertAndReplaceText:self.queuedText backspaceCount:0 client:client];
   } else {
-    NSLog(@"handleQueuedText called but no text to insert");
+    [self.appDelegate logDebugMessage:@"handleQueuedText called but no text to insert"];
   }
 }
 

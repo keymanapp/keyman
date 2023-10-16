@@ -31,10 +31,10 @@ UInt32 VirtualKeyMap[VIRTUAL_KEY_ARRAY_SIZE];
 
 @implementation CoreHelper
 
-+(unichar const *) createUnicharStringFromNSString:(NSString *)string {
+-(unichar const *) createUnicharStringFromNSString:(NSString *)string {
   NSString *nullTerminatedString = [string stringByAppendingString:@"\0"];
   if (![nullTerminatedString canBeConvertedToEncoding:NSUTF16LittleEndianStringEncoding]) {
-    NSLog(@"createUnicharStringFromNSString, canBeConvertedToEncoding false for NSUTF16LittleEndianStringEncoding");
+    [self logDebugMessage:@"createUnicharStringFromNSString, canBeConvertedToEncoding false for NSUTF16LittleEndianStringEncoding"];
     return nil;
   }
   
@@ -42,11 +42,11 @@ UInt32 VirtualKeyMap[VIRTUAL_KEY_ARRAY_SIZE];
   return (unichar const *) data.bytes;
 }
 
-+(NSString *) createNSStringFromUnicharString:(unichar const *)string {
-  return [[NSString alloc] initWithCharacters:string length:[CoreHelper unicharStringLength:string]];
+-(NSString *) createNSStringFromUnicharString:(unichar const *)string {
+  return [[NSString alloc] initWithCharacters:string length:[self unicharStringLength:string]];
 }
 
-+(unsigned long long) unicharStringLength:(unichar const *)string {
+-(unsigned long long) unicharStringLength:(unichar const *)string {
     unsigned long long length = 0llu;
     if(NULL == string) return length;
 
@@ -57,13 +57,23 @@ UInt32 VirtualKeyMap[VIRTUAL_KEY_ARRAY_SIZE];
 }
 
 
--(instancetype)init {
+-(instancetype)initWithDebugMode:(BOOL)debugMode {
   self = [super init];
   if (self) {
+    _debugMode = debugMode;
     _optimizer = [[ActionArrayOptimizer alloc] init];
     [self initVirtualKeyMapping];
-    }
-    return self;
+  }
+  return self;
+}
+
+-(void)logDebugMessage:(NSString *)format, ... {
+  if (self.debugMode) {
+    va_list args;
+    va_start(args, format);
+    NSLogv(format, args);
+    va_end(args);
+  }
 }
 
 -(unsigned short) macVirtualKeyToWindowsVirtualKey:(unsigned short) keyCode {
@@ -75,9 +85,9 @@ UInt32 VirtualKeyMap[VIRTUAL_KEY_ARRAY_SIZE];
 }
 
 -(NSArray*)optimizeActionArray:(NSArray*)actionArray {
-  NSLog(@"unoptimized actions array: %@", actionArray);
+  [self logDebugMessage:@"unoptimized actions array: %@", actionArray];
   NSArray* optimizedActionArray = [self.optimizer optimize:actionArray];
-  NSLog(@"optimized actions array: %@", optimizedActionArray);
+  [self logDebugMessage:@"optimized actions array: %@", optimizedActionArray];
   return optimizedActionArray;
 }
 
@@ -112,7 +122,7 @@ UInt32 VirtualKeyMap[VIRTUAL_KEY_ARRAY_SIZE];
     keymanModifiers |= KM_KBP_MODIFIER_NOCAPS;
   }*/
   
-  NSLog(@"macToKeymanModifier result  = %u", (unsigned int)keymanModifiers);
+  [self logDebugMessage:@"macToKeymanModifier result  = %u", (unsigned int)keymanModifiers];
   return keymanModifiers;
 }
 
@@ -154,12 +164,13 @@ UInt32 VirtualKeyMap[VIRTUAL_KEY_ARRAY_SIZE];
  */
 -(NSString*)utf32ValueToString:(UInt32)scalarValue {
   NSData * characterData = [[NSData alloc] initWithBytes:&scalarValue length:sizeof(scalarValue)];
-  NSLog(@"characterData: '%@'", characterData);
+  [self logDebugMessage:@"characterData: '%@'", characterData];
 
   NSString *characterString=[[NSString alloc] initWithBytes:[characterData bytes] length:[characterData length] encoding:NSUTF32LittleEndianStringEncoding];
   return characterString;
 }
 
+// TODO: alphabetize instead of using whatever this order is
 
 // Creates a VK map to convert Mac VK codes to Windows VK codes
 - (void)initVirtualKeyMapping {

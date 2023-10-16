@@ -31,7 +31,6 @@ typedef enum {BackspacesOnly,
 
 @property (readonly) NSArray *actions;
 @property (readonly) unsigned short keyCode;        /* device-independent key number */
-@property (readonly) KMContext *context;
 @property (readonly) ClientTextOutputPattern pattern;
 @property int backspaceCount;
 @property BOOL useEvents;
@@ -40,12 +39,15 @@ typedef enum {BackspacesOnly,
 
 @implementation KMCoreActionHandler
 
--(instancetype)initWithActions:(NSArray*)actions context: (KMContext *)context keyCode: (unsigned short)keyCode  {
+-(KMInputMethodAppDelegate *)appDelegate {
+  return (KMInputMethodAppDelegate *)[NSApp delegate];
+}
+
+-(instancetype)initWithActions:(NSArray*)actions keyCode: (unsigned short)keyCode  {
   self = [super init];
   if (self) {
     _actions = actions;
     _keyCode = keyCode;
-    _context = context;
     _backspaceCount = 0;
     _emitKeystroke = NO;
   }
@@ -83,7 +85,7 @@ typedef enum {BackspacesOnly,
     }
   }
 
-  NSLog(@"analyzeActions, containsCharacters = %d, containsBackspaces = %d ", containsCharacters,  containsBackspaces);
+  [self.appDelegate logDebugMessage:@"analyzeActions, containsCharacters = %d, containsBackspaces = %d ", containsCharacters,  containsBackspaces];
 
   ClientTextOutputPattern actionPattern = None;
   // second, asssign an actionPattern type based on what we found
@@ -119,7 +121,7 @@ typedef enum {BackspacesOnly,
 -(KMActionHandlerResult*)handleActions {
   KMActionHandlerResult *result = nil;
   
-  NSLog(@"handleActions invoked, actions.count = %lu ", (unsigned long)self.actions.count);
+  [self.appDelegate logDebugMessage:@"handleActions invoked, actions.count = %lu ", (unsigned long)self.actions.count];
   
   // examine the pattern of actions for required text inserted and deleted
   _pattern = [self analyzeActions:self.actions];
@@ -153,7 +155,7 @@ typedef enum {BackspacesOnly,
  * The event is marked as handled and the result includes the new text string to insert in the client
  */
 -(KMActionHandlerResult*)buildResultForCharactersOnly {
-  NSLog(@"buildResultForCharactersOnly");
+  [self.appDelegate logDebugMessage:@"buildResultForCharactersOnly"];
   return [[KMActionHandlerResult alloc] initForActions:self.actions handledEvent:YES backspaceCount:0 textToInsert:[self collectOutputText]];
 }
 
@@ -161,7 +163,7 @@ typedef enum {BackspacesOnly,
  * Mark the event as NOT handled, we simply let the original backspace event pass through to the client without manipulating the client text
  */
 -(KMActionHandlerResult*)buildResultForSinglePassThroughBackspaceNoText {
-  NSLog(@"buildResultForSinglePassThroughBackspaceNoText");
+  [self.appDelegate logDebugMessage:@"buildResultForSinglePassThroughBackspaceNoText"];
   return [[KMActionHandlerResult alloc] initForActions:self.actions handledEvent:NO backspaceCount:0 textToInsert:@""];
 }
 
@@ -169,7 +171,7 @@ typedef enum {BackspacesOnly,
  * Multiple backspaces with no text will be handled by generating events
  */
 -(KMActionHandlerResult*)buildResultForMultipleBackspacesNoText {
-  NSLog(@"buildResultForMultipleBackspacesNoText");
+  [self.appDelegate logDebugMessage:@"buildResultForMultipleBackspacesNoText"];
   return [[KMActionHandlerResult alloc] initForActions:self.actions handledEvent:YES backspaceCount:self.backspaceCount textToInsert:@""];
 }
 
@@ -177,7 +179,7 @@ typedef enum {BackspacesOnly,
  * For backspaces needed before text, insert with replace is possible, but some clients do not support replace
  */
 -(KMActionHandlerResult*)buildResultForBackspacesBeforeText {
-  NSLog(@"buildResultForBackspacesBeforeText");
+  [self.appDelegate logDebugMessage:@"buildResultForBackspacesBeforeText"];
   return [[KMActionHandlerResult alloc] initForActions:self.actions handledEvent:YES backspaceCount:self.backspaceCount textToInsert:[self collectOutputText]];
 }
 
@@ -185,8 +187,7 @@ typedef enum {BackspacesOnly,
  * For case with no actions of type CharacterAction or CharacterBackspaceAction
  */
 -(KMActionHandlerResult*)buildResultForNoCharactersOrBackspaces {
-  NSLog(@"buildResultForNoCharactersOrBackspaces");
-  
+  [self.appDelegate logDebugMessage:@"buildResultForNoCharactersOrBackspaces"];
   return [[KMActionHandlerResult alloc] initForActions:self.actions handledEvent:NO backspaceCount:0 textToInsert:@""];
 }
 
@@ -258,8 +259,6 @@ typedef enum {BackspacesOnly,
         break;
     }
   }
-
-  NSLog(@"populateOperationListForActions: %@", operationsList);
 
   return [operationsList copy];
 }

@@ -32,7 +32,9 @@
 
 #import "TextApiCompliance.h"
 #import <InputMethodKit/InputMethodKit.h>
+#import "KMInputMethodAppDelegate.h"
 
+// this is the user managed list of non-compliant apps persisted in User Defaults
 NSString *const kKMLegacyApps = @"KMLegacyApps";
 
 @interface TextApiCompliance()
@@ -44,6 +46,10 @@ NSString *const kKMLegacyApps = @"KMLegacyApps";
 @end
 
 @implementation TextApiCompliance
+
+-(KMInputMethodAppDelegate *)appDelegate {
+  return (KMInputMethodAppDelegate *)[NSApp delegate];
+}
 
 -(instancetype)initWithClient:(id) client applicationId:(NSString *)appId {
   self = [super init];
@@ -79,30 +85,29 @@ return [NSString stringWithFormat:@"complianceUncertain: %d, hasCompliantSelecti
   else {
     // if API exists, call it and see if it works as expected
     NSRange selectionRange = [client selectedRange];
-    NSLog(@"TextApiCompliance testSelectionApi, location = %lu, length = %lu", selectionRange.location, selectionRange.length);
+    [self.appDelegate logDebugMessage:@"TextApiCompliance testCompliance, location = %lu, length = %lu", selectionRange.location, selectionRange.length];
     
     if (selectionRange.location == NSNotFound) {
       // NSNotFound may just mean that we don't have the focus yet
       // say NO for now, but this may toggle back to YES after the first insertText
       selectionApiVerified = NO;
       self.complianceUncertain = YES;
-      NSLog(@"TextApiCompliance checkSelectionApi not compliant but uncertain, range is NSNotFound");
+      [self.appDelegate logDebugMessage:@"TextApiCompliance testCompliance not compliant but uncertain, range is NSNotFound"];
     } else if (selectionRange.location == 0) {
       // location zero may just mean that we are at the beginning of the doc
       // say YES for now, but this may toggle back to NO after the first insertText
       selectionApiVerified = YES;
       self.complianceUncertain = YES;
-      NSLog(@"TextApiCompliance checkSelectionApi compliant but uncertain, location = 0");
+      [self.appDelegate logDebugMessage:@"TextApiCompliance testCompliance compliant but uncertain, location = 0"];
     } else if (selectionRange.location > 0) {
       // we are confident, based on testing, that selectedRange API does  work
       selectionApiVerified = YES;
       self.complianceUncertain = NO;
-      NSLog(@"TextApiCompliance checkSelectionApi compliant and certain, location > 0");
+      [self.appDelegate logDebugMessage:@"TextApiCompliance testCompliance compliant and certain, location > 0"];
     }
   }
-  
-  NSLog(@"***testSelectionApi workingSelectionApi for app %@: set to %@", self.clientApplicationId, selectionApiVerified?@"yes":@"no");
-  
+  [self.appDelegate logDebugMessage:@"TextApiCompliance testCompliance workingSelectionApi for app %@: set to %@", self.clientApplicationId, selectionApiVerified?@"yes":@"no"];
+
   self.hasCompliantSelectionApi = selectionApiVerified;
 }
 
@@ -110,29 +115,29 @@ return [NSString stringWithFormat:@"complianceUncertain: %d, hasCompliantSelecti
 -(void) testComplianceAfterInsert:(id) client {
   if(self.complianceUncertain) {
     NSRange selectionRange = [client selectedRange];
-    NSLog(@"TextApiCompliance testSelectionApiAfterInsert, location = %lu, length = %lu", selectionRange.location, selectionRange.length);
-
+    [self.appDelegate logDebugMessage:@"TextApiCompliance testSelectionApiAfterInsert, location = %lu, length = %lu", selectionRange.location, selectionRange.length];
+    
     if (selectionRange.location == NSNotFound) {
       // NO for certain, insertText means we have focus, NSNotFound means that the selection API does not work
       self.hasCompliantSelectionApi = NO;
       self.complianceUncertain = NO;
-      NSLog(@"TextApiCompliance testComplianceAfterInsert certain, non-compliant, range is NSNotFound");
+      [self.appDelegate logDebugMessage:@"TextApiCompliance testComplianceAfterInsert certain, non-compliant, range is NSNotFound"];
     } else if (selectionRange.location == 0) {
       // NO for certain, after an insertText we cannot be at location 0
       self.hasCompliantSelectionApi = NO;
       self.complianceUncertain = NO;
-      NSLog(@"TextApiCompliance testComplianceAfterInsert certain, non-compliant, location = 0");
+      [self.appDelegate logDebugMessage:@"TextApiCompliance testComplianceAfterInsert certain, non-compliant, location = 0"];
     } else if (selectionRange.location > 0) {
       // we are confident, based on testing, the selectedRange API does work
       self.hasCompliantSelectionApi = YES;
       self.complianceUncertain = NO;
-      NSLog(@"TextApiCompliance checkSelectionApi compliant and certain, location > 0");
+      [self.appDelegate logDebugMessage:@"TextApiCompliance testComplianceAfterInsert compliant and certain, location > 0"];
     }
     
-    NSLog(@"testSelectionApiAfterInsert, self.hasWorkingSelectionApi = %@ for app %@", self.hasCompliantSelectionApi?@"yes":@"no", self.clientApplicationId);
-    NSLog(@"testSelectionApiAfterInsert TextApiCompliance: %@", self);
+    [self.appDelegate logDebugMessage:@"TextApiCompliance testComplianceAfterInsert, self.hasWorkingSelectionApi = %@ for app %@", self.hasCompliantSelectionApi?@"yes":@"no", self.clientApplicationId];
+    [self.appDelegate logDebugMessage:@"TextApiCompliance testComplianceAfterInsert TextApiCompliance: %@", self];
  } else {
-    NSLog(@"TextApiCompliance testSelectionApiAfterInsert, compliance is already known");
+   [self.appDelegate logDebugMessage:@"TextApiCompliance testSelectionApiAfterInsert, compliance is already known"];
   }
 }
 
@@ -146,7 +151,7 @@ return [NSString stringWithFormat:@"complianceUncertain: %d, hasCompliantSelecti
     isAppNonCompliant = [self containedInUserManagedNoncompliantAppList:clientAppId];
   }
   
-  NSLog(@"containedInNoncompliantAppLists: for app %@: %@", clientAppId, isAppNonCompliant?@"yes":@"no");
+  [self.appDelegate logDebugMessage:@"containedInNoncompliantAppLists: for app %@: %@", clientAppId, isAppNonCompliant?@"yes":@"no"];
   
   if (isAppNonCompliant) {
     self.complianceUncertain = NO;
@@ -182,50 +187,50 @@ return [NSString stringWithFormat:@"complianceUncertain: %d, hasCompliantSelecti
                      [clientAppId isEqual: @"com.Keyman.test.legacyInput"]
                      /*||[clientAppId isEqual: @"ro.sync.exml.Oxygen"] - Oxygen has worse problems */
                      );
-    NSLog(@"containedInHardCodedNoncompliantAppList: for app %@: %@", clientAppId, isAppNonCompliant?@"yes":@"no");
-    return isAppNonCompliant;
-  }
+
+  [self.appDelegate logDebugMessage:@"containedInHardCodedNoncompliantAppList: for app %@: %@", clientAppId, isAppNonCompliant?@"yes":@"no"];
+  return isAppNonCompliant;
+}
 
 /**
- * Returns the list of user-default legacy apps
+ * Returns the list of application IDs for non-compliant apps
  */
-- (NSArray *)legacyAppsUserDefaults {
+- (NSArray *)noncompliantAppsUserDefaults {
     NSUserDefaults *userData = [NSUserDefaults standardUserDefaults];
     return [userData arrayForKey:kKMLegacyApps];
 }
 
-/** Check this user-managed list to see if the application ID is among those
-* that are known to not implement selectionRange correctly.
-*  This was formerly called the legacy app list, renamed to improve clarity.
+/**
+* Check this user-managed list to see if the application ID is among those known to be non-compliant.
 */
 - (BOOL)containedInUserManagedNoncompliantAppList:(NSString *)clientAppId {
   BOOL isAppNonCompliant = NO;
-  NSArray *legacyAppsUserDefaults = self.legacyAppsUserDefaults;
+  NSArray *legacyAppsUserDefaults = [self noncompliantAppsUserDefaults];
 
   if(legacyAppsUserDefaults != nil) {
-    isAppNonCompliant = [self isClientAppLegacy:clientAppId fromArray:legacyAppsUserDefaults];
+    isAppNonCompliant = [self arrayContainsApplicationId:clientAppId fromArray:legacyAppsUserDefaults];
   }
-  NSLog(@"containedInUserManagedNoncompliantAppList: for app %@: %@", clientAppId, isAppNonCompliant?@"yes":@"no");
-
-    return isAppNonCompliant;
-  }
+  [self.appDelegate logDebugMessage:@"containedInUserManagedNoncompliantAppList: for app %@: %@", clientAppId, isAppNonCompliant?@"yes":@"no"];
+  return isAppNonCompliant;
+}
 
 /**
  * Checks array for a list of possible regexes to match a client app id
  */
-- (BOOL)isClientAppLegacy:(NSString *)clientAppId fromArray:(NSArray *)legacyApps {
-    for(id legacyApp in legacyApps) {
-        if(![legacyApp isKindOfClass:[NSString class]]) {
-            NSLog(@"isClientAppLegacy:fromArray: LegacyApps user defaults array should contain only strings");
+- (BOOL)arrayContainsApplicationId:(NSString *)applicationId fromArray:(NSArray *)applicationArray {
+    for(id appId in applicationArray) {
+        if(![appId isKindOfClass:[NSString class]]) {
+          // always log this: bad data in UserDefaults
+          NSLog(@"arrayContainsApplicationId:fromArray: LegacyApps user defaults array should contain only strings");
         } else {
             NSError *error = nil;
-            NSRange range =  NSMakeRange(0, clientAppId.length);
+            NSRange range =  NSMakeRange(0, applicationId.length);
             
-            NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern: (NSString *) legacyApp options: 0 error: &error];
-            NSArray *matchesArray = [regex matchesInString:clientAppId options:0 range:range];
+            NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern: (NSString *) appId options: 0 error: &error];
+            NSArray *matchesArray = [regex matchesInString:applicationId options:0 range:range];
             if(matchesArray.count>0) {
-              NSLog(@"isClientAppLegacy: found match for legacy app %@: ", clientAppId);
-               return YES;
+              [self.appDelegate logDebugMessage:@"arrayContainsApplicationId: found match for application ID %@: ", applicationId];
+              return YES;
             }
         }
     }

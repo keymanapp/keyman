@@ -15,10 +15,15 @@ NS_ASSUME_NONNULL_BEGIN
 extern UInt32 VirtualKeyMap[0x80];
 
 @interface CoreHelper : NSObject
-+(unichar const *) createUnicharStringFromNSString:(NSString *)string;
-+(NSString *) createNSStringFromUnicharString:(unichar const *)string;
-+(unsigned long long) unicharStringLength:(unichar const *)string;
--(instancetype)init;
+
+@property (assign, nonatomic) BOOL debugMode;
+
+-(unichar const *) createUnicharStringFromNSString:(NSString *)string;
+-(NSString *) createNSStringFromUnicharString:(unichar const *)string;
+-(unsigned long long) unicharStringLength:(unichar const *)string;
+
+-(instancetype)initWithDebugMode:(BOOL)debugMode;
+-(void)logDebugMessage:(NSString *)format, ...;
 -(unsigned short) macVirtualKeyToWindowsVirtualKey:(unsigned short) keyCode;
 -(UInt32)macToKeymanModifier:(NSEventModifierFlags)modifiers;
 -(NSArray*)optimizeActionArray:(NSArray*)actionArray;
