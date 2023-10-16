@@ -1,5 +1,15 @@
 # Keyman Version History
 
+## 17.0.192 alpha 2023-10-16
+
+* fix(ios): missing backslash in build script (#9765)
+* chore(linux): Speed up ibus-util tests (#9754)
+* feat(linux): Allow loading of keyboards with arbitrary language  ️ (#9735)
+
+## 17.0.191 alpha 2023-10-15
+
+* chore: update readme for keyboard_info schema (#9746)
+
 ## 17.0.190 alpha 2023-10-12
 
 * chore(web): web build streamlining (#9743)
