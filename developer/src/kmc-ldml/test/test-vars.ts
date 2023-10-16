@@ -203,8 +203,9 @@ describe('vars', function () {
         callback(sect) {
           const vars = <Vars> sect;
           assert.ok(vars.markers);
-          assert.sameDeepOrderedMembers(vars.markers.toStringArray(),
-            ['m','x']);
+          // assert.sameDeepOrderedMembers(vars.markers.toStringArray(),
+            // ['m','x']);
+          assert.equal(vars.markers.toString(), 'm x');
         },
       },
       {

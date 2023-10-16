@@ -88,16 +88,14 @@ echo "increment-version.sh: building resources/build/version"
 pushd "$KEYMAN_ROOT"
 npm ci
 
-pushd "$KEYMAN_ROOT/resources/build/version"
-npm run build:ts
-popd
+"$KEYMAN_ROOT/resources/build/version/build.sh"
 
 echo "increment-version.sh: running resources/build/version"
 pushd "$KEYMAN_ROOT"
 ABORT=0
-node resources/build/version/lib/index.js history version -t "$GITHUB_TOKEN" -b "$base" $HISTORY_FORCE || ABORT=$?
+node resources/build/version/build/src/index.js history version -t "$GITHUB_TOKEN" -b "$base" $HISTORY_FORCE || ABORT=$?
 
-if [[ $ABORT = 1 ]]; then
+if [[ $ABORT = 50 ]]; then
   if [[ $FORCE = 0 ]]; then
     echo "Skipping version increment from $VERSION: no recently merged pull requests were found"
     if [ ! -z "${TEAMCITY_VERSION-}" ]; then
@@ -109,7 +107,7 @@ if [[ $ABORT = 1 ]]; then
     echo "Force specified; building even though no changes were detected"
   fi
 elif [[ $ABORT != 0 ]]; then
-  echo "Failed to complete version history check"
+  echo "Failed to complete version history check (node version/lib/index.js failed with error $ABORT)"
   exit $ABORT
 fi
 popd > /dev/null

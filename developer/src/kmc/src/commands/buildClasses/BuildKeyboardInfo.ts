@@ -1,69 +1,49 @@
 import * as fs from 'fs';
 import { BuildActivity } from './BuildActivity.js';
-import { CompilerCallbacks, CompilerOptions, KeymanDeveloperProject, KeymanFileTypes } from '@keymanapp/common-types';
+import { CompilerCallbacks, KeymanDeveloperProject, KeymanFileTypes } from '@keymanapp/common-types';
 import { KeyboardInfoCompiler } from '@keymanapp/kmc-keyboard-info';
 import { loadProject } from '../../util/projectLoader.js';
 import { InfrastructureMessages } from '../../messages/infrastructureMessages.js';
-import { KmpCompiler } from '@keymanapp/kmc-package';
 import { calculateSourcePath } from '../../util/calculateSourcePath.js';
-
-const HelpRoot = 'https://help.keyman.com/keyboard/';
+import { getLastGitCommitDate } from '../../util/getLastGitCommitDate.js';
+import { ExtendedCompilerOptions } from 'src/util/extendedCompilerOptions.js';
 
 export class BuildKeyboardInfo extends BuildActivity {
   public get name(): string { return 'Keyboard metadata'; }
-  public get sourceExtension(): KeymanFileTypes.Source { return KeymanFileTypes.Source.KeyboardInfo; }
+  public get sourceExtension(): KeymanFileTypes.Source { return KeymanFileTypes.Source.Project; }
   public get compiledExtension(): KeymanFileTypes.Binary { return KeymanFileTypes.Binary.KeyboardInfo; }
   public get description(): string { return 'Build a keyboard metadata file'; }
-  public async build(infile: string, callbacks: CompilerCallbacks, options: CompilerOptions): Promise<boolean> {
-    if(KeymanFileTypes.filenameIs(infile, KeymanFileTypes.Source.KeyboardInfo)) {
-      // We are given a .keyboard_info but need to use the project file in the
-      // same folder, so that we can find the related files. This also supports
-      // version 2.0 projects (where the .kpj file is optional).
-      infile = KeymanFileTypes.replaceExtension(infile, KeymanFileTypes.Source.KeyboardInfo, KeymanFileTypes.Source.Project);
+  public async build(infile: string, callbacks: CompilerCallbacks, options: ExtendedCompilerOptions): Promise<boolean> {
+    if(!KeymanFileTypes.filenameIs(infile, KeymanFileTypes.Source.Project)) {
+      // Even if the project file does not exist, we use its name as our reference
+      // in order to avoid ambiguity
+      throw new Error(`BuildKeyboardInfo called with unexpected file type ${infile}`);
     }
+
     const project = loadProject(infile, callbacks);
     if(!project) {
+      // Error messages written by loadProject
       return false;
     }
-
-    const metadata = findProjectFile(callbacks, project, KeymanFileTypes.Source.KeyboardInfo);
-    if(!metadata) {
-      // Project loader should always have added a metadata file
-      return false;
-    }
-
-    if(!fs.existsSync(project.resolveInputFilePath(metadata))) {
-      // For now, if the metadata file does not exist, we won't attempt to build
-      // it. One day in the future, when source metadata files become optional,
-      // we'll need to skip this
-      return true;
-    }
-
 
     const keyboard = findProjectFile(callbacks, project, KeymanFileTypes.Source.KeymanKeyboard);
     const kps = findProjectFile(callbacks, project, KeymanFileTypes.Source.Package);
     if(!keyboard || !kps)  {
+      // Error messages written by findProjectFile
       return false;
     }
 
-    let kmpCompiler = new KmpCompiler(callbacks);
-    let kmpJsonData = kmpCompiler.transformKpsToKmpObject(project.resolveInputFilePath(kps));
-    if(!kmpJsonData) {
-      // Errors will have been emitted by KmpCompiler
-      return false;
-    }
+    const jsFilename = project.resolveOutputFilePath(keyboard, KeymanFileTypes.Source.KeymanKeyboard, KeymanFileTypes.Binary.WebKeyboard);
+    const lastCommitDate = getLastGitCommitDate(project.projectPath);
 
-    const keyboardFileNameJs = project.resolveOutputFilePath(keyboard, KeymanFileTypes.Source.KeymanKeyboard, KeymanFileTypes.Binary.WebKeyboard);
-    const keyboard_id = callbacks.path.basename(metadata.filename, KeymanFileTypes.Source.KeyboardInfo);
     const compiler = new KeyboardInfoCompiler(callbacks);
-    const data = compiler.writeMergedKeyboardInfoFile(project.resolveInputFilePath(metadata), {
-      keyboard_id,
-      kmpFileName:  project.resolveOutputFilePath(kps, KeymanFileTypes.Source.Package, KeymanFileTypes.Binary.Package),
-      kmpJsonData,
-      kpsFileName: project.resolveInputFilePath(kps),
-      helpLink: HelpRoot + keyboard_id,
-      keyboardFileNameJs: fs.existsSync(keyboardFileNameJs) ? keyboardFileNameJs : undefined,
-      sourcePath: calculateSourcePath(infile)
+    const data = compiler.writeKeyboardInfoFile({
+      kmpFilename:  project.resolveOutputFilePath(kps, KeymanFileTypes.Source.Package, KeymanFileTypes.Binary.Package),
+      kpsFilename: project.resolveInputFilePath(kps),
+      jsFilename: fs.existsSync(jsFilename) ? jsFilename : undefined,
+      sourcePath: calculateSourcePath(infile),
+      lastCommitDate,
+      forPublishing: !!options.forPublishing,
     });
 
     if(data == null) {
@@ -71,8 +51,10 @@ export class BuildKeyboardInfo extends BuildActivity {
       return false;
     }
 
+    const outputFilename = project.getOutputFilePath(KeymanFileTypes.Binary.KeyboardInfo);
+
     fs.writeFileSync(
-      project.resolveOutputFilePath(metadata, KeymanFileTypes.Source.KeyboardInfo, KeymanFileTypes.Binary.KeyboardInfo),
+      outputFilename,
       data
     );
 

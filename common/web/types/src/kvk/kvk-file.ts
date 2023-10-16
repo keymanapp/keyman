@@ -49,6 +49,7 @@ export interface BUILDER_KVK_KEY {
 export const BUILDER_KVK_KEY_Size = 9; // size of fixed elements of BUILDER_KVK_KEY
 
 export const enum BUILDER_KVK_HEADER_FLAGS {
+  kvkhNone = 0x00, // no flags
   kvkh102 = 0x01,
   kvkhDisplayUnderlying = 0x02,
   kvkhUseUnderlying = 0x04,

@@ -10,6 +10,7 @@
     <GraphicFile>splash.gif</GraphicFile>
     <MSIFileName></MSIFileName>
     <MSIOptions></MSIOptions>
+    <LicenseFile>..\LICENSE.md</LicenseFile>
     <FollowKeyboardVersion/>
   </Options>
   <StartMenu>
@@ -22,8 +23,18 @@
     <Author URL="mailto:makara_sok@sil.org">Makara Sok</Author>
     <Version URL=""></Version>
     <WebSite URL="https://keyman.com/keyboards/khmer_angkor">https://keyman.com/keyboards/khmer_angkor</WebSite>
+    <Description URL="">Khmer Unicode keyboard layout based on the NiDA keyboard layout. Automatically corrects many common keying errors.</Description>
   </Info>
+  <RelatedPackages>
+    <RelatedPackage ID="khmer10" Relationship="deprecates" />
+  </RelatedPackages>
   <Files>
+    <File>
+      <Name>..\LICENSE.md</Name>
+      <Description>File LICENSE.md</Description>
+      <CopyLocation>0</CopyLocation>
+      <FileType>.md</FileType>
+    </File>
     <File>
       <Name>..\build\khmer_angkor.js</Name>
       <Description>File khmer_angkor.js</Description>
@@ -143,6 +154,9 @@
       <Languages>
         <Language ID="km">Central Khmer (Khmer, Cambodia)</Language>
       </Languages>
+      <Examples>
+        <Example ID="km" Keys="x j m E r" Text="ខ្មែរ" Note="Name of language" />
+      </Examples>
     </Keyboard>
   </Keyboards>
   <Strings/>

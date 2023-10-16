@@ -16,7 +16,9 @@ builder_describe \
   "test" \
   "install                   install artifacts" \
   "uninstall                 uninstall artifacts" \
-  "--no-integration          don't run integration tests"
+  "--no-integration          don't run integration tests" \
+  "--report                  create coverage report" \
+  "--coverage                capture test coverage"
 
 builder_parse "$@"
 
@@ -87,7 +89,19 @@ build_action() {
 }
 
 test_action() {
-  execute_with_temp_schema ./run-tests.sh
+  local options
+
+  if builder_has_option --coverage; then
+    options="--coverage"
+  else
+    options=""
+  fi
+  execute_with_temp_schema ./run-tests.sh "${options}"
+
+  if builder_has_option --report; then
+    builder_echo "Creating coverage report"
+    python3 -m coverage html --directory="$THIS_SCRIPT_PATH/build/coveragereport/" --data-file=build/.coverage
+  fi
 }
 
 install_action() {

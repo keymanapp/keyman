@@ -6,7 +6,6 @@
       "rootDirs": ["./", "../src/"],
       "outDir": "../build/test",
       "esModuleInterop": true,
-      "moduleResolution": "node16",
       "allowSyntheticDefaultImports": true,
       "baseUrl": ".",
       "paths": {

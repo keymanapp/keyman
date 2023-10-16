@@ -6,6 +6,7 @@ import { makePathToFixture } from './helpers/index.js';
 import { NodeCompilerCallbacks } from '../src/util/NodeCompilerCallbacks.js';
 import { CompilerErrorNamespace } from '@keymanapp/common-types';
 import { unitTestEndpoints } from '../src/commands/build.js';
+import { KmnCompilerMessages } from '@keymanapp/kmc-kmn';
 
 describe('InfrastructureMessages', function () {
   it('should have a valid InfrastructureMessages object', function() {
@@ -64,5 +65,23 @@ describe('InfrastructureMessages', function () {
     ncb.loadFile(makePathToFixture('invalid-keyboards', 'Hint_Filename_Has_Differing_Case.kmn'));
     assert.isTrue(ncb.hasMessage(InfrastructureMessages.HINT_FilenameHasDifferingCase),
       `HINT_FilenameHasDifferingCase not generated, instead got: `+JSON.stringify(ncb.messages,null,2));
+  });
+
+  // INFO_WarningsHaveFailedBuild
+
+  it('should generate INFO_WarningsHaveFailedBuild if only warnings failed the build', async function() {
+    // NOTE: we can probably re-use this format for most other message tests in the future
+    const ncb = new NodeCompilerCallbacks({logLevel: 'silent'});
+    const filename = makePathToFixture('compiler-warnings-as-errors', 'keyboard.kmn');
+    const expectedMessages = [
+      InfrastructureMessages.INFO_BuildingFile,
+      KmnCompilerMessages.WARN_HeaderStatementIsDeprecated,
+      InfrastructureMessages.INFO_WarningsHaveFailedBuild,
+      InfrastructureMessages.INFO_FileNotBuiltSuccessfully
+    ];
+    await unitTestEndpoints.build(filename, ncb, {compilerWarningsAsErrors: true});
+    assert.deepEqual(ncb.messages.map(m => m.code), expectedMessages,
+      `actual callbacks.messages:\n${JSON.stringify(ncb.messages,null,2)}\n\n`+
+      `did not match expected:\n${JSON.stringify(expectedMessages,null,2)}\n\n`);
   });
 });

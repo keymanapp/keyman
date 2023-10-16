@@ -1,21 +1,21 @@
-import { environment } from './environment';
+import { environment } from './environment.js';
 
-const Sentry = require("@sentry/node");
+import * as Sentry from '@sentry/node';
 Sentry.init({
   dsn: 'https://39b25a09410349a58fe12aaf721565af@o1005580.ingest.sentry.io/5983519',  // Keyman Developer
   environment: environment.versionEnvironment,
   release: environment.versionGitTag
 });
 
-import express = require('express');
-import ws = require('ws');
-import os = require('os');
-import multer = require('multer');
-import fs = require('fs');
-import setupRoutes from './routes';
-import { configuration } from './config';
-import tray from './tray';
-import chalk = require('chalk');
+import express from 'express';
+import * as ws from 'ws';
+import * as os from 'os';
+import multer from 'multer';
+import * as fs from 'fs';
+import setupRoutes from './routes.js';
+import { configuration } from './config.js';
+import tray from './tray.js';
+import chalk from 'chalk';
 
 const options = {
   ngrokLog: false,   // Set this to true if you need to see ngrok logs in the console
@@ -58,7 +58,7 @@ const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 102
 
 /* Websockets */
 
-const wsServer = new ws.Server({ noServer: true });
+const wsServer = new ws.WebSocketServer({ noServer: true });
 wsServer.on('connection', socket => {
   socket.on('message', (message) => {
     console.debug('wsServer.socket.onmessage: '+message.toString());
@@ -87,7 +87,7 @@ server.on('upgrade', (request, socket, head) => {
 configuration.ngrokEndpoint = '';
 
 if(configuration.useNgrok && os.platform() == 'win32' && fs.existsSync(configuration.ngrokBinPath)) {
-  const ngrok = require('ngrok');
+  const ngrok: any = await import('ngrok');
   (async function() {
     configuration.ngrokEndpoint = await ngrok.connect({
       proto: 'http',

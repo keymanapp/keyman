@@ -46,12 +46,12 @@ kmx_files = files(
   'keyboard.cpp',
   'state.cpp',
   'debuglog.cpp',
-  'km_kbp_context_api.cpp',
-  'km_kbp_keyboard_api.cpp',
-  'km_kbp_options_api.cpp',
-  'km_kbp_state_api.cpp',
-  'km_kbp_debug_api.cpp',
-  'km_kbp_processevent_api.cpp',
+  'km_core_context_api.cpp',
+  'km_core_keyboard_api.cpp',
+  'km_core_options_api.cpp',
+  'km_core_state_api.cpp',
+  'km_core_debug_api.cpp',
+  'km_core_processevent_api.cpp',
   'jsonpp.cpp',
   'ldml/ldml_processor.cpp',
   'ldml/ldml_transforms.cpp',
@@ -74,12 +74,12 @@ kmx_files = files(
 )
 
 api_files = files(
-  'km_kbp_context_api.cpp',
-  'km_kbp_keyboard_api.cpp',
-  'km_kbp_options_api.cpp',
-  'km_kbp_state_api.cpp',
-  'km_kbp_debug_api.cpp',
-  'km_kbp_processevent_api.cpp',
+  'km_core_context_api.cpp',
+  'km_core_keyboard_api.cpp',
+  'km_core_options_api.cpp',
+  'km_core_state_api.cpp',
+  'km_core_debug_api.cpp',
+  'km_core_processevent_api.cpp',
 )
 
 core_files = files(

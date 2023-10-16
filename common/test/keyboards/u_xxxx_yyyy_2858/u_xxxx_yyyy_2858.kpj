@@ -52,13 +52,6 @@
       <FileType>.md</FileType>
     </File>
     <File>
-      <ID>id_10a5cd9d0c42cd03b9838916f6f0bd3d</ID>
-      <Filename>u_xxxx_yyyy_2858.keyboard_info</Filename>
-      <Filepath>u_xxxx_yyyy_2858.keyboard_info</Filepath>
-      <FileVersion></FileVersion>
-      <FileType>.keyboard_info</FileType>
-    </File>
-    <File>
       <ID>id_a1200478ad69b7f058fdce369fb1d960</ID>
       <Filename>u_xxxx_yyyy_2858.kmx</Filename>
       <Filepath>source\..\build\u_xxxx_yyyy_2858.kmx</Filepath>

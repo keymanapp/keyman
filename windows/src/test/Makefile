@@ -4,12 +4,14 @@
 
 # ----------------------------------------------------------------------
 
+# TODO: both test-manifest-exec and verify_signatures are really part of buildtools
+
 !ifdef NODELPHI
 TARGETS=.virtual
 !else
-TARGETS=test_i3633
+TARGETS=verify_signatures
 !endif
-CLEAN=test_i3633
+CLEAN=verify_signatures
 
 test: test-manifest-exec
     $(MAKE) "TARGET=test" $(TARGETS)
@@ -22,10 +24,10 @@ test-manifest-exec:
     $(MAKE) test-manifest
     cd test
 
-# test_i3633: validate certificates and binary metadata on executables
-# TODO: Move this to buildtools
-test_i3633:
-    cd $(ROOT)\src\test\test_i3633
+# validate certificates and binary metadata on executables
+# TODO: move to buildtools?
+verify_signatures: .virtual
+    cd $(ROOT)\src\test\verify_signatures
     $(MAKE) $(TARGET)
 
 # ----------------------------------------------------------------------
