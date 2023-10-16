@@ -1,0 +1,13 @@
+﻿c gesture_prototyping generated from template at 2023-10-11 12:19:43
+c with name "gesture_prototyping"
+store(&VERSION) '10.0'
+store(&NAME) 'gesture_prototyping'
+store(&COPYRIGHT) '© SIL International'
+store(&KEYBOARDVERSION) '1.0'
+store(&TARGETS) 'web iphone ipad androidphone androidtablet'
+store(&VISUALKEYBOARD) 'gesture_prototyping.kvks'
+store(&LAYOUTFILE) 'gesture_prototyping.keyman-touch-layout'
+
+begin Unicode > use(main)
+
+group(main) using keys
