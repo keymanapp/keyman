@@ -118,7 +118,6 @@ uses
   CharacterDragObject,
   CharMapDropTool,
   ClipBrd,
-  CompileKeymanWeb,
   dmActionsMain,
   dmActionsTextEditor,
   keymanstrings,

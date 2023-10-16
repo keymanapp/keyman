@@ -12,7 +12,7 @@ namespace km {
 namespace tests {
 
 struct key_event {
-  km_kbp_virtual_key vk;
+  km_core_virtual_key vk;
   uint16_t modifier_state;
 };
 
@@ -58,7 +58,7 @@ public:
   virtual int caps_lock_state();
   virtual void toggle_caps_lock_state();
   virtual void set_caps_lock_on(bool caps_lock_on);
-  virtual km_kbp_status get_expected_load_status();
+  virtual km_core_status get_expected_load_status();
   virtual const std::u16string &get_context() const  = 0;
   virtual bool get_expected_beep() const;
 
@@ -104,7 +104,7 @@ public:
    */
   int load_source(const km::kbp::path &path);
 
-  virtual km_kbp_status get_expected_load_status();
+  virtual km_core_status get_expected_load_status();
   virtual const std::u16string &get_context() const;
   virtual bool get_expected_beep() const;
 

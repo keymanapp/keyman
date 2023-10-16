@@ -3,7 +3,7 @@ import { assert } from 'chai';
 import 'mocha';
 import { TestCompilerCallbacks } from '@keymanapp/developer-test-helpers';
 import { makePathToFixture } from './helpers/index.js';
-import { writeMergedModelMetadataFile } from '../src/model-info-compiler.js';
+import { ModelInfoCompiler } from '../src/model-info-compiler.js';
 import { KmpCompiler } from '@keymanapp/kmc-package';
 
 const callbacks = new TestCompilerCallbacks();
@@ -14,22 +14,26 @@ beforeEach(function() {
 
 describe('model-info-compiler', function () {
   it('compile a .model_info file correctly', function() {
-    const path = makePathToFixture('sil.cmo.bw', 'sil.cmo.bw.model_info');
-    const kpsFileName = makePathToFixture('sil.cmo.bw', 'source', 'sil.cmo.bw.model.kps');
+    const kpsFilename = makePathToFixture('sil.cmo.bw', 'source', 'sil.cmo.bw.model.kps');
     const kmpFileName = makePathToFixture('sil.cmo.bw', 'build', 'sil.cmo.bw.model.kmp');
     const buildModelInfoFilename = makePathToFixture('sil.cmo.bw', 'build', 'sil.cmo.bw.model_info');
 
     const kmpCompiler = new KmpCompiler(callbacks);
-    const kmpJsonData = kmpCompiler.transformKpsToKmpObject(kpsFileName);
+    const kmpJsonData = kmpCompiler.transformKpsToKmpObject(kpsFilename);
     const modelFileName = makePathToFixture('sil.cmo.bw', 'build', 'sil.cmo.bw.model.js');
 
-    const data = writeMergedModelMetadataFile(path, callbacks, {
+    const data = (new ModelInfoCompiler(callbacks)).writeModelMetadataFile({
       kmpFileName,
       kmpJsonData,
       model_id: 'sil.cmo.bw',
       modelFileName,
-      sourcePath: 'release/sil/sil.cmo.bw'
+      sourcePath: 'release/sil/sil.cmo.bw',
+      kpsFilename,
+      forPublishing: true,
     });
+    if(data == null) {
+      callbacks.printMessages();
+    }
     assert.isNotNull(data);
 
     const actual = JSON.parse(new TextDecoder().decode(data));
@@ -40,9 +44,5 @@ describe('model-info-compiler', function () {
     delete expected['lastModifiedDate'];
 
     assert.deepEqual(actual, expected);
-  });
-
-  it('compile a .model_info file correctly when no source .model_info exists', function() {
-    this.skip(); // TODO: support model_info when no source file exists (determine license from LICENSE.md)
   });
 });

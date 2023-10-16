@@ -1,6 +1,6 @@
 /* Debugging */
 
-#include <keyman/keyboardprocessor_bits.h>
+#include <keyman/keyman_core_api_bits.h>
 
 namespace km {
 namespace kbp {

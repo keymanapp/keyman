@@ -23,7 +23,9 @@ builder_describe \
   "test" \
   "install                   install artifacts" \
   "uninstall                 uninstall artifacts" \
-  "--no-integration+         don't run integration tests"
+  "--no-integration+         don't run integration tests" \
+  "--report+                 create coverage report" \
+  "--coverage+               capture test coverage"
 
 builder_parse "$@"
 

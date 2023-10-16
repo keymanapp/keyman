@@ -17,12 +17,12 @@
 #include <assert.h>
 
 namespace {
-  constexpr km_kbp_attr const engine_attrs = {
+  constexpr km_core_attr const engine_attrs = {
     256,
-    KM_KBP_LIB_CURRENT,
-    KM_KBP_LIB_AGE,
-    KM_KBP_LIB_REVISION,
-    KM_KBP_TECH_LDML,
+    KM_CORE_LIB_CURRENT,
+    KM_CORE_LIB_AGE,
+    KM_CORE_LIB_REVISION,
+    KM_CORE_TECH_LDML,
     "SIL International"
   };
 }
@@ -35,7 +35,7 @@ namespace kbp {
 
 ldml_processor::ldml_processor(path const & kb_path, const std::vector<uint8_t> &data)
 : abstract_processor(
-    keyboard_attributes(kb_path.stem(), KM_KBP_LMDL_PROCESSOR_VERSION, kb_path.parent(), {})
+    keyboard_attributes(kb_path.stem(), KM_CORE_LMDL_PROCESSOR_VERSION, kb_path.parent(), {})
   ), _valid(false), transforms(), bksp_transforms(), keys()
 {
 
@@ -82,7 +82,7 @@ ldml_processor::ldml_processor(path const & kb_path, const std::vector<uint8_t> 
       } else {
         str = keyEntry->get_to_string();
       }
-      keys.add((km_kbp_virtual_key)kmapEntry->vkey, (uint16_t)kmapEntry->mod, str);
+      keys.add((km_core_virtual_key)kmapEntry->vkey, (uint16_t)kmapEntry->mod, str);
     }
   } // else: no keys! but still valid. Just, no keys.
 
@@ -146,20 +146,20 @@ bool ldml_processor::is_kmxplus_file(path const & kb_path, std::vector<uint8_t>&
   return true;
 }
 
-km_kbp_status
+km_core_status
 ldml_processor::process_queued_actions(
-  km_kbp_state *state
+  km_core_state *state
 ) {
   assert(state);
   if (!state)
-    return KM_KBP_STATUS_INVALID_ARGUMENT;
+    return KM_CORE_STATUS_INVALID_ARGUMENT;
   // TODO Implement
-  return KM_KBP_STATUS_OK;
+  return KM_CORE_STATUS_OK;
 }
 
 bool ldml_processor::queue_action(
-  km_kbp_state * state,
-  km_kbp_action_item const* action_item
+  km_core_state * state,
+  km_core_action_item const* action_item
 )
 {
   assert(state);
@@ -169,23 +169,23 @@ bool ldml_processor::queue_action(
   return false;
 }
 
-km_kbp_status
+km_core_status
 ldml_processor::process_event(
-  km_kbp_state *state,
-  km_kbp_virtual_key vk,
+  km_core_state *state,
+  km_core_virtual_key vk,
   uint16_t modifier_state,
   uint8_t is_key_down,
   uint16_t /*event_flags*/ // TODO-LDML: unused... for now...
 ) {
   assert(state);
   if (!state)
-    return KM_KBP_STATUS_INVALID_ARGUMENT;
+    return KM_CORE_STATUS_INVALID_ARGUMENT;
 
   if (!is_key_down) {
     // TODO: Implement caps lock handling
     state->actions().clear();
     state->actions().commit();
-    return KM_KBP_STATUS_OK;
+    return KM_CORE_STATUS_OK;
   }
 
   try {
@@ -194,7 +194,7 @@ ldml_processor::process_event(
 
     switch (vk) {
     // Special handling for backspace VK
-    case KM_KBP_VKEY_BKSP:
+    case KM_CORE_VKEY_BKSP:
       {
         if (!!bksp_transforms) {
           // TODO-LDML: process bksp
@@ -211,7 +211,7 @@ ldml_processor::process_event(
         // attempt to get the last char
         auto end = state->context().rbegin();
         if(end != state->context().rend()) {
-          if((*end).type == KM_KBP_CT_CHAR) {
+          if((*end).type == KM_CORE_CT_CHAR) {
             last_char = (*end).character;
             // TODO-LDML: markers!
           }
@@ -225,9 +225,9 @@ ldml_processor::process_event(
             dumped in somewhere unknown, so we will have to depend on the app to
             be sensible about backspacing because we know nothing.
           */
-          state->actions().push_backspace(KM_KBP_BT_UNKNOWN);
+          state->actions().push_backspace(KM_CORE_BT_UNKNOWN);
         } else {
-          state->actions().push_backspace(KM_KBP_BT_CHAR, last_char);
+          state->actions().push_backspace(KM_CORE_BT_CHAR, last_char);
           state->context().pop_back();
         }
       }
@@ -284,16 +284,16 @@ ldml_processor::process_event(
             size_t contextRemoved = 0;
             for (auto c = state->context().rbegin(); charsToDelete > 0 && c != state->context().rend(); c++, contextRemoved++) {
               /** last char of context */
-              km_kbp_usv lastCtx = ctxtstr.back();
+              km_core_usv lastCtx = ctxtstr.back();
               uint8_t type = c->type;
-              assert(type == KM_KBP_BT_CHAR || type == KM_KBP_BT_MARKER);
-              if (type == KM_KBP_BT_CHAR) {
+              assert(type == KM_CORE_BT_CHAR || type == KM_CORE_BT_MARKER);
+              if (type == KM_CORE_BT_CHAR) {
                 // single char, drop it
                 charsToDelete--;
                 assert(c->character == lastCtx);
                 ctxtstr.pop_back();
-                state->actions().push_backspace(KM_KBP_BT_CHAR, lastCtx);  // Cause prior char to be removed
-              } else if (type == KM_KBP_BT_MARKER) {
+                state->actions().push_backspace(KM_CORE_BT_CHAR, lastCtx);  // Cause prior char to be removed
+              } else if (type == KM_CORE_BT_MARKER) {
                 // it's a marker, 'worth' 3 uchars
                 assert(charsToDelete >= 3);
                 assert(lastCtx == c->marker); // end of list
@@ -303,7 +303,7 @@ ldml_processor::process_event(
                 ctxtstr.pop_back();
                 ctxtstr.pop_back();
                 // push a special backspace to delete the marker
-                state->actions().push_backspace(KM_KBP_BT_MARKER, c->marker);
+                state->actions().push_backspace(KM_CORE_BT_MARKER, c->marker);
               }
             }
             // now, pop the right number of context items
@@ -324,43 +324,43 @@ ldml_processor::process_event(
     state->actions().commit();
   } catch (std::bad_alloc &) {
     state->actions().clear();
-    return KM_KBP_STATUS_NO_MEM;
+    return KM_CORE_STATUS_NO_MEM;
   }
 
-  return KM_KBP_STATUS_OK;
+  return KM_CORE_STATUS_OK;
 }
 
-km_kbp_attr const & ldml_processor::attributes() const {
+km_core_attr const & ldml_processor::attributes() const {
   return engine_attrs;
 }
 
-km_kbp_keyboard_key  * ldml_processor::get_key_list() const {
-  km_kbp_keyboard_key* key_list = new km_kbp_keyboard_key(KM_KBP_KEYBOARD_KEY_LIST_END);
+km_core_keyboard_key  * ldml_processor::get_key_list() const {
+  km_core_keyboard_key* key_list = new km_core_keyboard_key(KM_CORE_KEYBOARD_KEY_LIST_END);
   return key_list;
 }
 
-km_kbp_keyboard_imx  * ldml_processor::get_imx_list() const {
-  km_kbp_keyboard_imx* imx_list = new km_kbp_keyboard_imx(KM_KBP_KEYBOARD_IMX_END);
+km_core_keyboard_imx  * ldml_processor::get_imx_list() const {
+  km_core_keyboard_imx* imx_list = new km_core_keyboard_imx(KM_CORE_KEYBOARD_IMX_END);
   return imx_list;
 }
 
-km_kbp_context_item * ldml_processor::get_intermediate_context() {
-  km_kbp_context_item *citems = new km_kbp_context_item(KM_KBP_CONTEXT_ITEM_END);
+km_core_context_item * ldml_processor::get_intermediate_context() {
+  km_core_context_item *citems = new km_core_context_item(KM_CORE_CONTEXT_ITEM_END);
   return citems;
 }
 
-km_kbp_status ldml_processor::validate() const {
-  return _valid ? KM_KBP_STATUS_OK : KM_KBP_STATUS_INVALID_KEYBOARD;
+km_core_status ldml_processor::validate() const {
+  return _valid ? KM_CORE_STATUS_OK : KM_CORE_STATUS_INVALID_KEYBOARD;
 }
 
 void
-ldml_processor::emit_text(km_kbp_state *state, const std::u16string &str) {
+ldml_processor::emit_text(km_core_state *state, const std::u16string &str) {
   const std::u32string str32 = kmx::u16string_to_u32string(str);
   emit_text(state, str32);
 }
 
 void
-ldml_processor::emit_text(km_kbp_state *state, const std::u32string &str) {
+ldml_processor::emit_text(km_core_state *state, const std::u32string &str) {
   for (auto it = str.begin(); it < str.end(); it++) {
     const auto ch = *it;
     // If we are at the start of a sequence:
@@ -381,30 +381,30 @@ ldml_processor::emit_text(km_kbp_state *state, const std::u32string &str) {
 }
 
 void
-ldml_processor::emit_text(km_kbp_state *state, km_kbp_usv ch) {
+ldml_processor::emit_text(km_core_state *state, km_core_usv ch) {
   assert(ch != LDML_UC_SENTINEL);
   state->context().push_character(ch);
   state->actions().push_character(ch);
 }
 
 void
-ldml_processor::emit_marker(km_kbp_state *state, KMX_DWORD marker_no) {
+ldml_processor::emit_marker(km_core_state *state, KMX_DWORD marker_no) {
   assert(km::kbp::kmx::is_valid_marker(marker_no));
   state->actions().push_marker(marker_no);
   state->context().push_marker(marker_no);
 }
 
 size_t
-ldml_processor::context_to_string(km_kbp_state *state, std::u32string &str) {
+ldml_processor::context_to_string(km_core_state *state, std::u32string &str) {
     str.clear();
     auto &cp      = state->context();
     size_t ctxlen = 0; // TODO-LDML: is this needed?
-    uint8_t last_type = KM_KBP_BT_UNKNOWN;
+    uint8_t last_type = KM_CORE_BT_UNKNOWN;
     for (auto c = cp.rbegin(); c != cp.rend(); c++, ctxlen++) {
       last_type = c->type;
-      if (last_type == KM_KBP_BT_CHAR) {
+      if (last_type == KM_CORE_BT_CHAR) {
         str.insert(0, 1, c->character);
-      } else if (last_type == KM_KBP_BT_MARKER) {
+      } else if (last_type == KM_CORE_BT_MARKER) {
         assert(km::kbp::kmx::is_valid_marker(c->marker));
         prepend_marker(str, c->marker);
       } else {
