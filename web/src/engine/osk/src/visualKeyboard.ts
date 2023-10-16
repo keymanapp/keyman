@@ -368,7 +368,6 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
     // Now to set up event-handling links.
     // This handler should probably vary based on the keyboard: do we allow roaming touches or not?
     recognizer.on('inputstart', (source) => {
-      console.log(source);
       // Make sure we're tracking the source and its currently-selected item (the latter, as we're
       // highlighting it)
       const trackingEntry = sourceTrackingMap[source.identifier] = {
@@ -407,8 +406,6 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
       source.path.on('step', trackingEntry.roamingHandler);
 
       source.path.on('step', (sample) => {
-        console.log(`New sample for source ${source.identifier}:`);
-        console.log(sample);
         // // Do... something based on the potential gesture types that could arise, as appropriate.
         // // Should be useful for selecting a hint type, etc.
         // source.potentialModelMatchIds
@@ -424,8 +421,6 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
 
       // This should probably be universal in some manner.
       gestureSequence.on('complete', () => {
-        console.log("Complete:");
-        console.log(gestureSequence);
       });
 
       // This should probably vary based on the type of gesture.
@@ -440,7 +435,6 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
         }
         // }
 
-        console.log(gestureStage);
         // First, if we've configured the gesture to generate a keystroke, let's handle that.
         const gestureKey = gestureStage.item;
 
@@ -1201,7 +1195,6 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
     // for key spec tracking.
     let keySpec = (e['key'] ? e['key'].spec : null) as unknown as ActiveKey;
     if (!keySpec) {
-      console.error("OSK key with ID '" + e.id + "', keyID '" + e.keyId + "' missing needed specification");
       return null;
     }
 
