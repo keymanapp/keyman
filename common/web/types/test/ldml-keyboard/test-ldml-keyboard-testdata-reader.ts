@@ -9,6 +9,7 @@ describe('ldml keyboard xml reader tests', function () {
 
   testTestdataReaderCases([
     {
+      // Note! There's another test case against similar data, in developer/src/kmc-ldml/test/test-testdata-e2e.ts using test-fr.json
       subpath: 'test-fr.xml',
       callback: (data, source) => {
         assert.ok(source);
@@ -45,8 +46,10 @@ describe('ldml keyboard xml reader tests', function () {
           { type: "check", result: 'abc\\u0022...stu' },
           { type: "emit", to: 'v' },
           { type: "check", result: 'abc\\u0022...stuv' },
+          { type: "backspace" },
+          { type: "check", result: 'abc\\u0022...stu' },
         ];
-        assert.sameDeepOrderedMembers(expectedActions, test0.actions);
+        assert.sameDeepOrderedMembers(expectedActions, test0.actions, 'Static data in .ts file should match parsed test-fr.xml');
       },
     }
   ]);

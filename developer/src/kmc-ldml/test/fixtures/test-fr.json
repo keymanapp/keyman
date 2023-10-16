@@ -59,6 +59,13 @@
               {
                 "type": "check",
                 "result": "abc\\u0022...stuv"
+              },
+              {
+                "type": "backspace"
+              },
+              {
+                "type": "check",
+                "result": "abc\\u0022...stu"
               }
             ]
           }
