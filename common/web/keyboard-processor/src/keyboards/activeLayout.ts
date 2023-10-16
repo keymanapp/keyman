@@ -2,6 +2,7 @@ import Codes from "../text/codes.js";
 import KeyEvent, { KeyEventSpec } from "../text/keyEvent.js";
 import KeyMapping from "../text/keyMapping.js";
 import type { KeyDistribution } from "../text/keyEvent.js";
+import { Layouts } from "./defaultLayouts.js";
 import type { LayoutKey, LayoutSubKey, LayoutRow, LayoutLayer, LayoutFormFactor, ButtonClass } from "./defaultLayouts.js";
 import type Keyboard from "./keyboard.js";
 
@@ -74,7 +75,7 @@ class ActiveKeyBase {
 
   // While they're only valid on ActiveKey, spec'ing them here makes references more concise within the OSK.
   sk?: ActiveKey[];
-  multitap?: ActiveSubkey[];
+  multitap?: ActiveSubKey[];
   flick?: TouchLayout.TouchLayoutFlick;
 
   // Keeping things simple here, as this was added LATE in 14.0 beta.
@@ -107,7 +108,7 @@ class ActiveKeyBase {
   public get isPadding(): boolean {
     // Does not include 9 (class:  blank) as that may be an intentional 'catch' for misplaced
     // keystrokes.
-    return this.sp == 10; // Button class: hidden.
+    return this.sp == Layouts.buttonClasses.HIDDEN; // Button class: hidden.
   }
 
   /**
@@ -251,7 +252,7 @@ class ActiveKeyBase {
     if(key.sk) {
       analysisFlagObj.hasLongpresses = true;
       for(let subkey of key.sk) {
-        ActiveSubkey.polyfill(subkey, keyboard, layout, displayLayer, analysisFlagObj);
+        ActiveSubKey.polyfill(subkey, keyboard, layout, displayLayer, analysisFlagObj);
       }
     }
 
@@ -259,7 +260,7 @@ class ActiveKeyBase {
     if(key.multitap) {
       analysisFlagObj.hasMultitaps = true;
       for(let mtKey of key.multitap) {
-        ActiveSubkey.polyfill(mtKey, keyboard, layout, displayLayer, analysisFlagObj);
+        ActiveSubKey.polyfill(mtKey, keyboard, layout, displayLayer, analysisFlagObj);
       }
     }
 
@@ -267,15 +268,13 @@ class ActiveKeyBase {
     if(key.flick) {
       analysisFlagObj.hasFlicks = true;
       for(let flickKey in key.flick) {
-        ActiveSubkey.polyfill(key.flick[flickKey as keyof TouchLayoutFlick], keyboard, layout, displayLayer, analysisFlagObj);
+        ActiveSubKey.polyfill(key.flick[flickKey as keyof TouchLayoutFlick], keyboard, layout, displayLayer, analysisFlagObj);
       }
     }
 
     let aKey = key as ActiveKey;
     aKey.displayLayer = displayLayer;
     aKey.layer = aKey.layer || displayLayer;
-
-    aKey.default = (key as LayoutSubKey).default;
 
     // Compute the key's base KeyEvent properties for use in future event generation
     aKey.constructBaseKeyEvent(keyboard, layout, displayLayer);
@@ -355,7 +354,7 @@ export class ActiveKey extends ActiveKeyBase implements LayoutKey {
 }
 
 
-export class ActiveSubkey extends ActiveKeyBase implements LayoutSubKey {
+export class ActiveSubKey extends ActiveKeyBase implements LayoutSubKey {
 
 }
 
@@ -414,14 +413,14 @@ export class ActiveRow implements LayoutRow {
       // to allow the keyboard font to ovveride the SpecialOSK font.
       // Blank keys are no longer reclassed - can use before/after CSS to add text
       switch(key['sp']) {
-        case 1:
+        case Layouts.buttonClasses['SHIFT']:
           if(!ActiveRow.SPECIAL_LABEL.test(key['text']) && key['text'] != '') {
-            key.sp=3;
+            key.sp=Layouts.buttonClasses['SPECIAL'];
           }
           break;
-        case 2:
+        case Layouts.buttonClasses['SHIFT-ON']:
           if(!ActiveRow.SPECIAL_LABEL.test(key['text']) && key['text'] != '') {
-            key.sp=4;
+            key.sp=Layouts.buttonClasses['SPECIAL-ON'];
           }
           break;
       }
