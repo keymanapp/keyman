@@ -17,6 +17,7 @@ import { GestureHandler } from '../gestureHandler.js';
  */
 export default class Multitap implements GestureHandler {
   public readonly baseKey: KeyElement;
+  public readonly baseContextToken: number;
   public readonly hasModalVisualization = false;
 
   private readonly multitaps: ActiveSubKey[];
@@ -27,9 +28,11 @@ export default class Multitap implements GestureHandler {
   constructor(
     source: GestureSequence<KeyElement, string>,
     vkbd: VisualKeyboard,
-    e: KeyElement
+    e: KeyElement,
+    contextToken: number
   ) {
     this.baseKey = e;
+    this.baseContextToken = contextToken;
     this.multitaps = e.key.spec.multitap;
 
     // // For multitaps, keeping the key highlighted makes sense.  I think.
@@ -61,9 +64,11 @@ export default class Multitap implements GestureHandler {
         : this.multitaps[this.tapIndex-1];
 
       const keyEvent = vkbd.keyEventFromSpec(selection);
-      const keyDistances = this.currentStageKeyDistances();
-      // TODO: special fat-finger alternates stuff?
-      vkbd.raiseKeyEvent(keyEvent, null, keyDistances);
+      keyEvent.baseTranscriptionToken = this.baseContextToken;
+      keyEvent.keyDistribution = this.currentStageKeyDistances();
+      const keyResult = vkbd.raiseKeyEvent(keyEvent, null);
+
+      // TODO:  store the context token, possibly other stuff?
     });
 
     /* In theory, setting up a specialized recognizer config limited to the base key's surface area

@@ -29,6 +29,8 @@ import {
 
 import { createStyleSheet, getAbsoluteX, getAbsoluteY, StylesheetManager } from 'keyman/engine/dom-utils';
 
+import { KeyEventHandler, KeyEventResultCallback } from 'keyman/engine/events';
+
 import GlobeHint from './globehint.interface.js';
 import KeyboardView from './components/keyboardView.interface.js';
 import { type KeyElement, getKeyFrom } from './keyElement.js';
@@ -99,7 +101,7 @@ interface EventMap {
    * Note:  the following code block was originally used to integrate with the keyboard & input
    * processors, but it requires entanglement with components external to this OSK module.
    */
-  'keyevent': (event: KeyEvent) => void,
+  'keyevent': KeyEventHandler,
 
   'hiderequested': (keyElement: KeyElement) => void,
 
@@ -477,6 +479,10 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
           coord = coordSource.currentSample;
         }
 
+        let keyResult: {
+          contextToken?: number
+        } = null;
+
         if(gestureKey) {
           let correctionKeyDistribution: KeyDistribution;
 
@@ -500,7 +506,7 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
           // key events directly.
           if(gestureStage.matchedId != 'multitap') {
             // Once the best coord to use for fat-finger calculations has been determined:
-            this.modelKeyClick(gestureStage.item, coord, correctionKeyDistribution);
+            keyResult = this.modelKeyClick(gestureStage.item, coord);
           }
         }
 
@@ -538,7 +544,7 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
           );
         } else if(baseItem.key.spec.multitap && (gestureStage.matchedId == 'simple-tap' || gestureStage.matchedId == 'multitap' || gestureStage.matchedId == 'modipress-end')) {
           // Likewise - mere construction is enough.
-          handler = new Multitap(gestureSequence, this, baseItem);
+          handler = new Multitap(gestureSequence, this, baseItem, keyResult.contextToken);
         }
 
         if(handler) {
@@ -936,7 +942,7 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
       keyEvent.keyDistribution = keyDistribution;
     }
 
-    this.raiseKeyEvent(keyEvent, e);
+    return this.raiseKeyEvent(keyEvent, e);
   }
 
   initKeyEvent(e: KeyElement) {
@@ -1627,9 +1633,19 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
     // Exclude menu and OSK hide keys from normal click processing
     if(keyEvent.kName == 'K_LOPT' || keyEvent.kName == 'K_ROPT') {
       this.optionKey(e, keyEvent.kName, true);
-      return true;
+      return {};
     }
 
-    this.emit('keyevent', keyEvent);
+    let callbackData: {
+      contextToken?: number
+    } = { };
+
+    const keyEventCallback: KeyEventResultCallback = (result, error) => {
+      callbackData.contextToken = result?.transcription?.token;
+    }
+
+    this.emit('keyevent', keyEvent, keyEventCallback);
+
+    return callbackData;
   }
 }

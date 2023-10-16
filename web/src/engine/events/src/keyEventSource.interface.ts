@@ -11,4 +11,4 @@ interface EventMap {
   'keyevent': KeyEventHandler;
 }
 
-export default interface KeyEventSourceInterface extends EventEmitter<EventMap> { }
+export interface KeyEventSourceInterface<Map extends EventMap> extends EventEmitter<Map> { }
