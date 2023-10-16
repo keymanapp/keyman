@@ -62,9 +62,9 @@ export class Layouts {
   // Cross-reference with the ids in osk.setButtonClass.
   static buttonClasses: {[name: string]: ButtonClass} = {
     'DEFAULT':0,
-    'SHIFT':1,
+    'SHIFT':1,     // special-key / frame key styling:  uses our custom, PUA OSK font
     'SHIFT-ON':2,
-    'SPECIAL':3,
+    'SPECIAL':3,   // special-key / frame key styling:  uses the keyboard's font
     'SPECIAL-ON':4,
     'DEADKEY':8,
     'BLANK':9,
