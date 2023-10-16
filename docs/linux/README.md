@@ -98,7 +98,7 @@ Run `./build.sh --debug --coverage --report test` to create the report.
 
 There's also an index page (`linux/CodecoverageReports.html`) that links to all
 three reports. You can run
-`linux/build.sh --debug --coverage --report --no-integration test`
+`linux/build.sh --debug --coverage --report --open --no-integration test`
 to create the coverage reports for all three Linux projects and open the
 index page in the browser.
 
