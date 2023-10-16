@@ -1,4 +1,4 @@
-import { ActiveKey, ActiveSubkey, ButtonClass, DeviceSpec, LayoutKey } from '@keymanapp/keyboard-processor';
+import { ActiveKey, ActiveSubKey, ButtonClass, DeviceSpec, LayoutKey } from '@keymanapp/keyboard-processor';
 import { TouchLayout } from '@keymanapp/common-types';
 import TouchLayoutFlick = TouchLayout.TouchLayoutFlick;
 
@@ -20,7 +20,7 @@ export default abstract class OSKKey {
   static readonly BUTTON_CLASSES = buttonClassNames;
 
   static readonly HIGHLIGHT_CLASS = 'kmw-key-touched';
-  readonly spec: ActiveKey | ActiveSubkey;
+  readonly spec: ActiveKey | ActiveSubKey;
 
   btn: KeyElement;
   label: HTMLSpanElement;
@@ -31,7 +31,7 @@ export default abstract class OSKKey {
    */
   readonly layer: string;
 
-  constructor(spec: ActiveKey | ActiveSubkey, layer: string) {
+  constructor(spec: ActiveKey | ActiveSubKey, layer: string) {
     this.spec = spec;
     this.layer = layer;
   }
