@@ -45,33 +45,26 @@ else
   MESON_COVERAGE=
 fi
 
-builder_run_action clean rm -rf "$THIS_SCRIPT_PATH/build/"
+configure_action() {
+  # shellcheck disable=SC2086,SC2154
+  meson setup ${MESON_COVERAGE} --werror --buildtype $MESON_TARGET "${builder_extra_params[@]}" "$MESON_PATH"
+}
 
-# shellcheck disable=SC2086
-builder_run_action configure meson setup "$MESON_PATH" --werror --buildtype $MESON_TARGET ${MESON_COVERAGE} "${builder_extra_params[@]}"
-
-cd "$MESON_PATH" || true
-
-if builder_start_action build; then
-  ninja
-  builder_finish_action success build
-fi
-
-if builder_start_action test; then
+test_action() {
+  # shellcheck disable=SC2086,SC2154
   meson test --print-errorlogs $builder_verbose
   if builder_has_option --coverage; then
     # Note: requires lcov > 1.16 to properly work (see https://github.com/mesonbuild/meson/issues/6747)
     ninja coverage-html
   fi
-  builder_finish_action success test
-fi
+}
 
-if builder_start_action install; then
-  ninja install
-  builder_finish_action success install
-fi
+builder_run_action clean       rm -rf "$THIS_SCRIPT_PATH/build/"
+builder_run_action configure   configure_action
 
-if builder_start_action uninstall; then
-  ninja uninstall
-  builder_finish_action success uninstall
-fi
+[ -d "$MESON_PATH" ] && cd "$MESON_PATH"
+
+builder_run_action build       ninja
+builder_run_action test        test_action
+builder_run_action install     ninja install
+builder_run_action uninstall   ninja uninstall
