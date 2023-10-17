@@ -295,7 +295,6 @@ export default class InputProcessor {
         // Sort the distribution into probability-descending order.
         keyDistribution.sort((a, b) => b.p - a.p);
 
-        let activeLayout = this.activeKeyboard.layout(keyEvent.device.formFactor);
         alternates = [];
 
         let totalMass = 0; // Tracks sum of non-error probabilities.
@@ -314,9 +313,9 @@ export default class InputProcessor {
 
           let mock = Mock.from(windowedMock, false);
 
-          let altKey = activeLayout.getLayer(keyEvent.kbdLayer).getKey(pair.keyId);
+          const altKey = pair.keySpec;
           if(!altKey) {
-            console.warn("Potential fat-finger key could not be found in layer!");
+            console.warn("Internal error:  failed to properly filter set of keys for corrections");
             continue;
           }
 

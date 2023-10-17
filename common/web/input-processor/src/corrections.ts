@@ -1,3 +1,4 @@
+import { ActiveKeyBase, KeyDistribution } from "@keymanapp/keyboard-processor";
 import { CorrectionLayout } from "./correctionLayout.js";
 
 /**
@@ -9,8 +10,8 @@ import { CorrectionLayout } from "./correctionLayout.js";
  *                          by a correction algorithm, also within <0, 0> to <1, 1>.
  * @returns A mapping of key IDs to the 'squared pseudo-distance' of the touchpoint to each key.
  */
-export function keyTouchDistances(touchCoords: {x: number, y: number}, correctiveLayout: CorrectionLayout): Map<string, number> {
-  let keyDists: Map<string, number> = new Map<string, number>();
+export function keyTouchDistances(touchCoords: {x: number, y: number}, correctiveLayout: CorrectionLayout): Map<ActiveKeyBase, number> {
+  let keyDists: Map<ActiveKeyBase, number> = new Map<ActiveKeyBase, number>();
 
   // This double-nested loop computes a pseudo-distance for the touch from each key.  Quite useful for
   // generating a probability distribution.
@@ -54,7 +55,7 @@ export function keyTouchDistances(touchCoords: {x: number, y: number}, correctiv
     distY += dy * entry.height;
 
     const distance = distX * distX + distY * distY;
-    keyDists.set(entry.keySpec.coreID, distance);
+    keyDists.set(entry.keySpec, distance);
   });
 
   return keyDists;
@@ -65,8 +66,8 @@ export function keyTouchDistances(touchCoords: {x: number, y: number}, correctiv
  * consideration.
  * @returns
  */
-export function distributionFromDistanceMap(squaredDistMap: Map<string, number>): {keyId: string, p: number}[] {
-  const keyProbs = new Map<string, number>();
+export function distributionFromDistanceMap(squaredDistMap: Map<ActiveKeyBase, number>): KeyDistribution {
+  const keyProbs = new Map<ActiveKeyBase, number>();
   let totalMass = 0;
 
   // Should we wish to allow multiple different transforms for distance -> probability, use a function parameter in place
@@ -81,10 +82,10 @@ export function distributionFromDistanceMap(squaredDistMap: Map<string, number>)
     keyProbs.set(key, keyProbs.get(key) ?? 0 + entry);
   }
 
-  const list: {keyId: string, p: number}[] = [];
+  const list: {keySpec: ActiveKeyBase, p: number}[] = [];
 
   for(let key of keyProbs.keys()) {
-    list.push({keyId: key, p: keyProbs.get(key) / totalMass});
+    list.push({keySpec: key, p: keyProbs.get(key) / totalMass});
   }
 
   return list.sort(function(a, b) {

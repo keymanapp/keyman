@@ -3,9 +3,11 @@ import { type KeyElement } from '../../../keyElement.js';
 import OSKBaseKey from '../../../keyboard-layout/oskBaseKey.js';
 import VisualKeyboard from '../../../visualKeyboard.js';
 
-import { DeviceSpec, KeyEvent, ActiveSubKey } from '@keymanapp/keyboard-processor';
+import { DeviceSpec, KeyEvent, ActiveSubKey, KeyDistribution } from '@keymanapp/keyboard-processor';
 import { ConfigChangeClosure, GestureRecognizerConfiguration, GestureSequence, PaddedZoneSource } from '@keymanapp/gesture-recognizer';
 import { GestureHandler } from '../gestureHandler.js';
+import { CorrectionLayout, CorrectionLayoutEntry, distributionFromDistanceMap, keyTouchDistances } from '@keymanapp/input-processor';
+import { GestureParams } from '../specsForLayout.js';
 
 /**
  * Represents a 'realized' longpress gesture's default implementation
@@ -31,15 +33,18 @@ export default class SubkeyPopup implements GestureHandler {
   public readonly subkeys: KeyElement[];
 
   private source: GestureSequence<KeyElement>;
+  private readonly gestureParams: GestureParams;
 
   constructor(
     source: GestureSequence<KeyElement>,
     configChanger: ConfigChangeClosure<KeyElement>,
     vkbd: VisualKeyboard,
-    e: KeyElement
+    e: KeyElement,
+    gestureParams: GestureParams
   ) {
     this.baseKey = e;
     this.source = source;
+    this.gestureParams = gestureParams;
 
     source.on('complete', () => {
       this.currentSelection?.key.highlight(false);
@@ -335,6 +340,86 @@ export default class SubkeyPopup implements GestureHandler {
 
   get hasModalVisualization() {
     return this.element.style.visibility == 'visible';
+  }
+
+  buildCorrectiveLayout(): CorrectionLayout {
+    const baseBounding = this.element.getBoundingClientRect();
+    const aspectRatio = baseBounding.width / baseBounding.height;
+
+    const keys = this.subkeys.map((keyElement) => {
+      const subkeyBounds = keyElement.getBoundingClientRect();
+
+      // Ensures we have the right typing.
+      const correctiveData: CorrectionLayoutEntry = {
+        keySpec: keyElement.key.spec,
+        centerX: ((subkeyBounds.right - subkeyBounds.width / 2) - baseBounding.left) / baseBounding.width,
+        centerY: ((subkeyBounds.bottom - subkeyBounds.height / 2) - baseBounding.top) / baseBounding.height,
+        width: subkeyBounds.width / baseBounding.width,
+        height: subkeyBounds.height / baseBounding.height
+      }
+
+      return correctiveData;
+    });
+
+    return {
+      keys: keys,
+      kbdScaleRatio: aspectRatio
+    }
+  }
+
+  currentStageKeyDistances(): KeyDistribution {
+    const latestStage = this.source.stageReports[this.source.stageReports.length-1];
+    const baseStage = this.source.stageReports[0];
+    const gestureSource = latestStage.sources[0];
+    const lastCoord = gestureSource.currentSample;
+
+    const baseBounding = this.element.getBoundingClientRect();
+    const mappedCoord = {
+      x: lastCoord.targetX / baseBounding.width,
+      y: lastCoord.targetY / baseBounding.height
+    }
+
+    // Lock the coordinate within base-element bounds; corrects for the allowed 'popup roaming' zone.
+    //
+    // To consider:  add a 'clipping' feature to `keyTouchDistances`?  It'd make sense for base keys,
+    // too.
+    mappedCoord.x = mappedCoord.x < 0 ? 0 : (mappedCoord.x > 1 ? 1: mappedCoord.x);
+    mappedCoord.y = mappedCoord.y < 0 ? 0 : (mappedCoord.y > 1 ? 1: mappedCoord.y);
+
+    const rawSqDistances = keyTouchDistances(mappedCoord, this.buildCorrectiveLayout());
+    const currentKeyDist = rawSqDistances.get(lastCoord.item.key.spec);
+
+    // Include the base key as a corrective option.
+    if(!this.subkeys.find((entry) => entry.keyId == this.baseKey.keyId)) {
+      /*
+       * - how long has the subkey menu been visible?
+       *   - Base key should be less likely if it's been visible a while,
+       *     but reasonably likely if it only just appeared.
+       *     - Especially if up-flicks are allowed.  Though, in that case, consider
+       *       base-layer neighbors, and particularly the one directly under the touchpoint?
+       * - raw distance traveled (since the menu appeared)
+       *   - similarly, short distance = a more likely base key?
+       */
+
+      // The concept:  how likely is it that the user MEANT to output a subkey?
+      let timeDistance = Math.min(
+        // The full path is included by the model - meaning the base wait is included here in
+        // in the stats;  we subtract it to get just the duration of the subkey menu.
+        gestureSource.path.stats.duration - baseStage.sources[0].path.stats.duration,
+        this.gestureParams.longpress.waitLength
+        ) / (2 * this.gestureParams.longpress.waitLength);  // normalize:  max time distance of 0.5
+
+      let pathDistance = Math.min(
+        gestureSource.path.stats.rawDistance,
+        this.gestureParams.longpress.noiseTolerance*4
+      ) / (this.gestureParams.longpress.noiseTolerance * 8); // normalize similarly.
+
+      // We only want to add a single distance 'dimension' - we'll choose the one that affects
+      // the interpreted distance the least.  (This matters for upflick-shortcutting in particular)
+      const layerDistance = Math.min(timeDistance * timeDistance, pathDistance * pathDistance);
+      rawSqDistances.set(this.baseKey.key.spec, currentKeyDist + layerDistance);
+    }
+    return distributionFromDistanceMap(rawSqDistances);
   }
 
   cancel() {

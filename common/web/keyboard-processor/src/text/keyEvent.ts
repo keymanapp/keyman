@@ -11,10 +11,11 @@ import { type DeviceSpec } from "@keymanapp/web-utils";
 
 import Codes from './codes.js';
 import DefaultRules from './defaultRules.js';
+import { ActiveKeyBase } from "../index.js";
 
 // Represents a probability distribution over a keyboard's keys.
 // Defined here to avoid compilation issues.
-export type KeyDistribution = {keyId: string, p: number}[];
+export type KeyDistribution = {keySpec: ActiveKeyBase, p: number}[];
 
 /**
  * A simple instance of the standard 'default rules' for keystroke processing from the
@@ -45,8 +46,8 @@ export interface KeyEventSpec {
    */
   srcKeyboard?: Keyboard;
 
-  // Holds relevant event properties leading to construction of this KeyEvent.
-  source?: any; // Technically, KeyEvent|MouseEvent|Touch - but those are DOM types that must be kept out of headless mode.
+  // // Holds relevant event properties leading to construction of this KeyEvent.
+  // source?: any; // Technically, KeyEvent|MouseEvent|Touch - but those are DOM types that must be kept out of headless mode.
   // Holds a generated fat-finger distribution (when appropriate)
   keyDistribution?: KeyDistribution;
 

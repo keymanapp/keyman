@@ -1,4 +1,5 @@
 import { GestureSequence } from "@keymanapp/gesture-recognizer";
+import { KeyDistribution } from "@keymanapp/keyboard-processor";
 
 import { KeyElement } from "../../keyElement.js";
 import { GestureHandler } from './gestureHandler.js';
@@ -34,5 +35,9 @@ export class HeldRepeater implements GestureHandler {
     this.repeatClosure();
 
     this.timerHandle = window.setTimeout(this.deleteRepeater, HeldRepeater.REPEAT_DELAY);
+  }
+
+  currentStageKeyDistances(): KeyDistribution {
+    return null;
   }
 }

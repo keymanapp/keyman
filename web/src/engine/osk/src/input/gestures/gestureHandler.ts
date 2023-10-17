@@ -1,3 +1,5 @@
+import { KeyDistribution } from "@keymanapp/keyboard-processor";
+
 export interface GestureHandler {
   /**
    * Triggers cancellation of any further processing for the gesture being handled.
@@ -9,4 +11,6 @@ export interface GestureHandler {
    * scenario in which key previews (on phones) should be disabled.
    */
   readonly hasModalVisualization: boolean;
+
+  currentStageKeyDistances(): KeyDistribution;
 }
