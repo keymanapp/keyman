@@ -9,7 +9,7 @@ export function validateMITLicense(license: string) {
   // lexical-models repositories, suggest we don't worry about this
 
   // split input text into paragraphs, trimming whitespace
-  const text = license.split('\n').map(line => line.trim()).join('\n').split(/\n\s*\n/);
+  const text = license.trim().split('\n').map(line => line.trim()).join('\n').split(/\n\s*\n/);
 
   // MIT license, cleanup whitespace
   const clauses = [
