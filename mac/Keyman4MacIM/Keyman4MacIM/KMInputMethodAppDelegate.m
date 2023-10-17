@@ -780,6 +780,8 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
         KVKFile *kvk = nil;
         BOOL didSetKeyboard = NO;
         NSInteger itag = 1000;
+        NSString *keyboardMenuName = @"";
+      
         [keyboards.submenu removeAllItems];
         for (NSString *path in self.activeKeyboards) {
             NSDictionary *infoDict = [KMXFile keyboardInfoFromKmxFile:path];
@@ -787,6 +789,8 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
                 continue;
             //NSString *str = [NSString stringWithFormat:@"%@ (%@)", [infoDict objectForKey:kKMKeyboardNameKey], [infoDict objectForKey:kKMKeyboardVersionKey]];
             NSString *str = [infoDict objectForKey:kKMKeyboardNameKey];
+            // for debugging
+            keyboardMenuName = str;
             NSMenuItem *item = [[NSMenuItem alloc] initWithTitle:str action:@selector(menuAction:) keyEquivalent:@""];
             [item setTag:itag++];
             if ([path isEqualToString:self.selectedKeyboard]) {
@@ -809,6 +813,8 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
             }
             else
                 [item setState:NSOffState];
+
+          NSLog(@"*** adding item to keyboards menu, itag=%lu, keyboard=%@", itag, keyboardMenuName);
 
             [keyboards.submenu addItem:item];
         }
