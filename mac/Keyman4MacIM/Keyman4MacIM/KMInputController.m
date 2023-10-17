@@ -213,7 +213,10 @@ NSMutableArray *servers;
     }
     else if (itag >= 1000) {
         NSMenuItem *keyboards = [self.AppDelegate.menu itemWithTag:1];
+        NSString *title = keyboards.title;
+        NSLog(@"Input Menu, selected Keyboards menu, itag: %lu, title: %@", itag, title);
         for (NSMenuItem *item in keyboards.submenu.itemArray) {
+        NSLog(@"menu item, itag: %lu, title: %@", item.tag, item.title);
             if (item.tag == itag)
                 [item setState:NSOnState];
             else
