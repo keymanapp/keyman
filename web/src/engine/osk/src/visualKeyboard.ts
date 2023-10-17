@@ -709,12 +709,8 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
 
   //#region OSK touch handlers
   getTouchCoordinatesOnKeyboard(input: InputSample<KeyElement, string>) {
-    // We need to compute the 'local', keyboard-based coordinates for the touch.
-    let kbdCoords = {
-      x: getAbsoluteX(this.kbdDiv),
-      y: getAbsoluteY(this.kbdDiv)
-    }
-    let offsetCoords = { x: input.targetX - kbdCoords.x, y: input.targetY - kbdCoords.y };
+    // `input` is already in keyboard-local coordinates.  It's not scaled, though.
+    let offsetCoords = { x: input.targetX, y: input.targetY };
 
     // The layer group's element always has the proper width setting, unlike kbdDiv itself.
     offsetCoords.x /= this.layerGroup.element.offsetWidth;
