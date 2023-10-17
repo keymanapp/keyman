@@ -87,6 +87,21 @@ scripts/run-tests
 The `run-tests` script accepts different arguments which can be seen with
 `scripts/run-tests --help`.
 
+### Code Coverage Report
+
+All three projects (ibus-keyman, keyman-config, and keyman-system-service)
+can produce code coverage reports.
+
+Run `./build.sh --debug --coverage --report test` to create the report.
+
+**Note:** You might have to run `./build.sh clean` first.
+
+There's also an index page (`linux/CodecoverageReports.html`) that links to all
+three reports. You can run
+`linux/build.sh --debug --coverage --report --open --no-integration test`
+to create the coverage reports for all three Linux projects and open the
+index page in the browser.
+
 ## Running Keyman for Linux
 
 ### Setting up Ibus
