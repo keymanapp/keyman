@@ -263,11 +263,13 @@ void
 ldml_processor::process_key_string(km_core_state *state, const std::u16string &key_str) const {
   UErrorCode status = U_ZERO_ERROR;
   // We know that key_str is not empty per the caller.
+  assert(!key_str.empty());
 
   // we convert the keys str to UTF-32 here instead of using the emit_text() overload
   // so that we don't have to reconvert it inside the transform code.
   std::u32string key_str32 = kmx::u16string_to_u32string(key_str);
-  // normalize the keystroke to NFD
+  ldml::normalize_nfd(key_str32, status);
+  assert(U_SUCCESS(status));
   ldml::normalize_nfd(key_str32, status);
 
   // extract context string, in NFC
