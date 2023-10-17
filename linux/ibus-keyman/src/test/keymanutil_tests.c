@@ -723,8 +723,8 @@ test_keyman_add_keyboard__one_language_plus_custom() {
 void
 test_keyman_add_keyboard__one_language_plus_two_custom() {
   // Initialize
-  gchar* languages[]                   = {"en:English", NULL};
-  custom_keyboards                     = g_hash_table_new_full(g_str_hash, g_str_equal, g_free, (GDestroyNotify)g_ptr_array_unref);
+  gchar* languages[]            = {"en:English", NULL};
+  custom_keyboards              = g_hash_table_new_full(g_str_hash, g_str_equal, g_free, (GDestroyNotify)g_ptr_array_unref);
   g_hash_table_insert(custom_keyboards, g_strdup("/tmp/tst.kmx"), g_ptr_array_new_full(1, g_free));
   GPtrArray* language_keyboards = g_hash_table_lookup(custom_keyboards, "/tmp/tst.kmx");
   cust_kbd* data                = g_new0(cust_kbd, 1);
@@ -744,18 +744,21 @@ test_keyman_add_keyboard__one_language_plus_two_custom() {
   keyman_add_keyboard(keyboard, kb_data);
 
   // Verify
-  g_assert_nonnull(kb_data->engines_list->data);
-  IBusEngineDesc* desc = (IBusEngineDesc*)kb_data->engines_list->data;
+  GList* list = kb_data->engines_list;
+  g_assert_nonnull(list);
+  IBusEngineDesc* desc = (IBusEngineDesc*)list->data;
   g_assert_cmpstr(ibus_engine_desc_get_name(desc), ==, "en:/tmp/tst.kmx");
-  g_assert_nonnull(kb_data->engines_list->next);
-  g_assert_nonnull(kb_data->engines_list->next->data);
-  desc = (IBusEngineDesc*)kb_data->engines_list->next->data;
+  g_assert_nonnull(list->next);
+  list = list->next;
+  g_assert_nonnull(list->data);
+  desc = (IBusEngineDesc*)list->data;
   g_assert_cmpstr(ibus_engine_desc_get_name(desc), ==, "ldb:/tmp/tst.kmx");
-  g_assert_nonnull(kb_data->engines_list->next);
-  g_assert_nonnull(kb_data->engines_list->next->data);
-  desc = (IBusEngineDesc*)kb_data->engines_list->next->data;
+  g_assert_nonnull(list->next);
+  list = list->next;
+  g_assert_nonnull(list->data);
+  desc = (IBusEngineDesc*)list->data;
   g_assert_cmpstr(ibus_engine_desc_get_name(desc), ==, "lda:/tmp/tst.kmx");
-  g_assert_null(kb_data->engines_list->next->next);
+  g_assert_null(list->next);
 }
 
 void
@@ -990,11 +993,7 @@ test_keyman_add_keyboards_from_dir__one_language_plus_two_different_custom() {
   gchar* kmx_path  = g_strdup_printf("%s/test1.kmx", kmp_dir);
   g_hash_table_insert(custom_keyboards, g_strdup(kmx_path), g_ptr_array_new_full(1, g_free));
   GPtrArray* language_keyboards = g_hash_table_lookup(custom_keyboards, kmx_path);
-  cust_kbd* /* The above code is written in the C programming language.
-  However, it does not contain any specific instructions or
-  logic. It only includes the word "data" and three hash
-  symbols " */
-  data                = g_new0(cust_kbd, 1);
+  cust_kbd* data                = g_new0(cust_kbd, 1);
   data->kb_id_with_lang         = g_strdup_printf("ldb:%s", kmx_path);
   data->lang                    = g_new0(kmp_language, 1);
   data->lang->id                = g_strdup("ldb");
@@ -1018,7 +1017,7 @@ test_keyman_add_keyboards_from_dir__one_language_plus_two_different_custom() {
   IBusEngineDesc* desc             = IBUS_ENGINE_DESC(keyboards->data);
   g_autofree gchar* expected_name = g_strdup_printf("bza:%s/test1.kmx", kmp_dir);
   g_assert_cmpstr(ibus_engine_desc_get_name(desc), ==, expected_name);
-  desc                            = IBUS_ENGINE_DESC(keyboards->next->next->data);
+  desc                            = IBUS_ENGINE_DESC(keyboards->next->data);
   expected_name                   = g_strdup_printf("ldb:%s/test1.kmx", kmp_dir);
   g_assert_cmpstr(ibus_engine_desc_get_name(desc), ==, expected_name);
 }
@@ -1093,6 +1092,7 @@ int main(int argc, char* argv[]) {
   g_test_add_func("/keymanutil/keyman_add_keyboard/one_language", test_keyman_add_keyboard__one_language);
   g_test_add_func("/keymanutil/keyman_add_keyboard/two_languages", test_keyman_add_keyboard__two_languages);
   g_test_add_func("/keymanutil/keyman_add_keyboard/one_language_plus_custom", test_keyman_add_keyboard__one_language_plus_custom);
+  g_test_add_func("/keymanutil/keyman_add_keyboard/one_language_plus_two_custom", test_keyman_add_keyboard__one_language_plus_two_custom);
   g_test_add_func(
       "/keymanutil/keyman_add_keyboard/prev_engine_adding_same_version",
       test_keyman_add_keyboard__prev_engine_adding_same_version);
@@ -1111,6 +1111,9 @@ int main(int argc, char* argv[]) {
   g_test_add_func("/keymanutil/keyman_add_keyboards_from_dir/one_dir", test_keyman_add_keyboards_from_dir__one_dir);
   g_test_add_func("/keymanutil/keyman_add_keyboards_from_dir/two_langs", test_keyman_add_keyboards_from_dir__two_langs);
   g_test_add_func("/keymanutil/keyman_add_keyboards_from_dir/prev_keyboards", test_keyman_add_keyboards_from_dir__prev_keyboards);
+  g_test_add_func(
+      "/keymanutil/keyman_add_keyboards_from_dir/one_language_plus_two_different_custom",
+      test_keyman_add_keyboards_from_dir__one_language_plus_two_different_custom);
 
   // Run tests
   int retVal = g_test_run();
