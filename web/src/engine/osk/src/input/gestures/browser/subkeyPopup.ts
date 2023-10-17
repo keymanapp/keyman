@@ -389,36 +389,45 @@ export default class SubkeyPopup implements GestureHandler {
     const rawSqDistances = keyTouchDistances(mappedCoord, this.buildCorrectiveLayout());
     const currentKeyDist = rawSqDistances.get(lastCoord.item.key.spec);
 
+    /*
+     * - how long has the subkey menu been visible?
+     *   - Base key should be less likely if it's been visible a while,
+     *     but reasonably likely if it only just appeared.
+     *     - Especially if up-flicks are allowed.  Though, in that case, consider
+     *       base-layer neighbors, and particularly the one directly under the touchpoint?
+     * - raw distance traveled (since the menu appeared)
+     *   - similarly, short distance = a more likely base key?
+     */
+
+    // The concept:  how likely is it that the user MEANT to output a subkey?
+    let timeDistance = Math.min(
+      // The full path is included by the model - meaning the base wait is included here in
+      // in the stats;  we subtract it to get just the duration of the subkey menu.
+      gestureSource.path.stats.duration - baseStage.sources[0].path.stats.duration,
+      this.gestureParams.longpress.waitLength
+      ) / (2 * this.gestureParams.longpress.waitLength);  // normalize:  max time distance of 0.5
+
+    let pathDistance = Math.min(
+      gestureSource.path.stats.rawDistance,
+      this.gestureParams.longpress.noiseTolerance*4
+    ) / (this.gestureParams.longpress.noiseTolerance * 8); // normalize similarly.
+
+    // We only want to add a single distance 'dimension' - we'll choose the one that affects
+    // the interpreted distance the least.  (This matters for upflick-shortcutting in particular)
+    const layerDistance = Math.min(timeDistance * timeDistance, pathDistance * pathDistance);
+    const baseKeyDistance = currentKeyDist + layerDistance;
+
     // Include the base key as a corrective option.
-    if(!this.subkeys.find((entry) => entry.keyId == this.baseKey.keyId)) {
-      /*
-       * - how long has the subkey menu been visible?
-       *   - Base key should be less likely if it's been visible a while,
-       *     but reasonably likely if it only just appeared.
-       *     - Especially if up-flicks are allowed.  Though, in that case, consider
-       *       base-layer neighbors, and particularly the one directly under the touchpoint?
-       * - raw distance traveled (since the menu appeared)
-       *   - similarly, short distance = a more likely base key?
-       */
-
-      // The concept:  how likely is it that the user MEANT to output a subkey?
-      let timeDistance = Math.min(
-        // The full path is included by the model - meaning the base wait is included here in
-        // in the stats;  we subtract it to get just the duration of the subkey menu.
-        gestureSource.path.stats.duration - baseStage.sources[0].path.stats.duration,
-        this.gestureParams.longpress.waitLength
-        ) / (2 * this.gestureParams.longpress.waitLength);  // normalize:  max time distance of 0.5
-
-      let pathDistance = Math.min(
-        gestureSource.path.stats.rawDistance,
-        this.gestureParams.longpress.noiseTolerance*4
-      ) / (this.gestureParams.longpress.noiseTolerance * 8); // normalize similarly.
-
-      // We only want to add a single distance 'dimension' - we'll choose the one that affects
-      // the interpreted distance the least.  (This matters for upflick-shortcutting in particular)
-      const layerDistance = Math.min(timeDistance * timeDistance, pathDistance * pathDistance);
+    const subkeyMatch = this.subkeys.find((entry) => entry.keyId == this.baseKey.keyId);
+    if(subkeyMatch) {
+      const distAsSubkey = rawSqDistances.get(subkeyMatch.key.spec);
+      if(distAsSubkey > baseKeyDistance) {
+        rawSqDistances.set(subkeyMatch.key.spec, distAsSubkey);
+      } // else make no changes
+    } else {
       rawSqDistances.set(this.baseKey.key.spec, currentKeyDist + layerDistance);
     }
+    // TODO:  allow use of multiple maps for distance combining instead!
     return distributionFromDistanceMap(rawSqDistances);
   }
 
