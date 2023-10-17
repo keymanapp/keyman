@@ -1,7 +1,6 @@
 import Codes from "../text/codes.js";
 import KeyEvent, { KeyEventSpec } from "../text/keyEvent.js";
 import KeyMapping from "../text/keyMapping.js";
-import type { KeyDistribution } from "../text/keyEvent.js";
 import { Layouts } from "./defaultLayouts.js";
 import type { LayoutKey, LayoutSubKey, LayoutRow, LayoutLayer, LayoutFormFactor, ButtonClass } from "./defaultLayouts.js";
 import type Keyboard from "./keyboard.js";
@@ -10,9 +9,6 @@ import { TouchLayout } from "@keymanapp/common-types";
 import TouchLayoutDefaultHint = TouchLayout.TouchLayoutDefaultHint;
 import TouchLayoutFlick = TouchLayout.TouchLayoutFlick;
 import { type DeviceSpec } from "@keymanapp/web-utils";
-
-import { CorrectionLayout, CorrectionLayoutEntry } from "./correctionLayout.js";
-import { distributionFromDistanceMap, keyTouchDistances } from "./corrections.js";
 
 // TS 3.9 changed behavior of getters to make them
 // non-enumerable by default. This broke our 'polyfill'
@@ -36,23 +32,6 @@ interface AnalysisMetadata {
   hasFlicks: boolean;
   hasMultitaps: boolean;
   hasLongpresses: boolean;
-}
-
-// Not compatible with subkeys - their layout data is only determined (presently) at runtime.
-class CorrectiveBaseKeyLayout implements CorrectionLayoutEntry {
-  readonly keySpec: ActiveKeyBase;
-  readonly centerX: number;
-  readonly centerY: number;
-  readonly width: number;
-  readonly height: number;
-
-  constructor(layer: ActiveLayer, row: ActiveRow, key: ActiveKey) {
-    this.keySpec = key;
-    this.centerX = key.proportionalX;
-    this.centerY = row.proportionalY;
-    this.width = key.proportionalWidth;
-    this.height = layer.rowProportionalHeight;
-  }
 }
 
 export class ActiveKeyBase {
@@ -606,53 +585,6 @@ export class ActiveLayer implements LayoutLayer {
     });
 
     return map;
-  }
-
-  /**
-   * Builds a sorted-order array of most likely keys to be intended for a given touch.
-   * @param touchCoords A proportional (x, y) coordinate of the touch within the keyboard's geometry.
-   *                           Should be within [0, 0] to [1, 1].
-   * @param kbdScaleRatio The ratio of the keyboard's horizontal scale to its vertical scale.
-   *                           For a 400 x 200 keyboard, should be 2.
-   */
-  getTouchProbabilities(touchCoords: {x: number, y: number}, kbdScaleRatio: number): KeyDistribution {
-    const correctiveLayout = this.buildCorrectiveLayout(kbdScaleRatio);
-    const rawSqDistances = keyTouchDistances(touchCoords, correctiveLayout);
-
-    return distributionFromDistanceMap(rawSqDistances);
-  }
-
-  /**
-   * Builds the corrective layout object corresponding to this layer, as needed for use
-   * of our key-correction algorithms.
-   *
-   * @param kbdScaleRatio The ratio of the keyboard's horizontal scale to its vertical scale.
-   *                           For a 400 x 200 keyboard, should be 2.
-   */
-  public buildCorrectiveLayout(kbdScaleRatio: number) {
-    return {
-      keys: this.row.map((row) => {
-        return row.key.map((key) => new CorrectiveBaseKeyLayout(this, row, key));
-        // ... and flatten/merge the resulting arrays.
-      }).reduce((flattened, rowEntries) => flattened.concat(rowEntries), [])
-      .filter((entry) => {
-        const key = entry.keySpec;
-
-        // If the key lacks an ID, just skip it.  Sometimes used for padding.
-        if(!key.baseKeyID) {
-          return false;
-          // Attempt to filter out known non-output keys.
-          // Results in a more optimized distribution.
-        } else if(Codes.isKnownOSKModifierKey(key.baseKeyID)) {
-          return false;
-        } else if(key.isPadding) { // to the user, blank / padding keys do not exist.
-          return false;
-        } else {
-          return true;
-        }
-      }),
-      kbdScaleRatio: kbdScaleRatio
-    };
   }
 
   getKey(keyId: string) {

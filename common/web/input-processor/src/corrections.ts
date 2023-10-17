@@ -54,7 +54,7 @@ export function keyTouchDistances(touchCoords: {x: number, y: number}, correctiv
     distY += dy * entry.height;
 
     const distance = distX * distX + distY * distY;
-    keyDists[entry.keySpec.coreID] = distance;
+    keyDists.set(entry.keySpec.coreID, distance);
   });
 
   return keyDists;
@@ -81,14 +81,10 @@ export function distributionFromDistanceMap(squaredDistMap: Map<string, number>)
     keyProbs.set(key, keyProbs.get(key) ?? 0 + entry);
   }
 
-  for(let key of Object.keys(keyProbs)) {
-    keyProbs.set(key, keyProbs.get(key) / totalMass);
-  }
-
   const list: {keyId: string, p: number}[] = [];
 
   for(let key of keyProbs.keys()) {
-    list.push({keyId: key, p: keyProbs.get(key)});
+    list.push({keyId: key, p: keyProbs.get(key) / totalMass});
   }
 
   return list.sort(function(a, b) {

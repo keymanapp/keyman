@@ -15,6 +15,8 @@ import {
   LayoutKey
 } from '@keymanapp/keyboard-processor';
 
+import { buildCorrectiveLayout, distributionFromDistanceMap, keyTouchDistances } from '@keymanapp/input-processor';
+
 import {
   GestureRecognizer,
   GestureRecognizerConfiguration,
@@ -38,7 +40,6 @@ import PendingGesture from './input/gestures/pendingGesture.interface.js';
 import RealizedGesture from './input/gestures/realizedGesture.interface.js';
 import { defaultFontSize, getFontSizeStyle } from './fontSizeUtils.js';
 import PendingMultiTap, { PendingMultiTapState } from './input/gestures/browser/pendingMultiTap.js';
-import InternalSubkeyPopup from './input/gestures/browser/subkeyPopup.js';
 import InternalKeyTip from './input/gestures/browser/keytip.js';
 import CommonConfiguration from './config/commonConfiguration.js';
 
@@ -746,7 +747,10 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
     }
 
     let kbdAspectRatio = layerGroup.offsetWidth / this.kbdDiv.offsetHeight;
-    let baseKeyProbabilities = this.kbdLayout.getLayer(this.layerId).getTouchProbabilities(touchKbdPos, kbdAspectRatio);
+    const correctiveLayout = buildCorrectiveLayout(this.kbdLayout.getLayer(this.layerId), kbdAspectRatio);
+    const rawSqDistances = keyTouchDistances(touchKbdPos, correctiveLayout);
+
+    let baseKeyProbabilities = distributionFromDistanceMap(rawSqDistances);
 
     if (!keySpec || !this.subkeyGesture || !this.subkeyGesture.baseKey.key) {
       return baseKeyProbabilities;

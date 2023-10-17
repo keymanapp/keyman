@@ -3,8 +3,6 @@
   "extends": "../tsconfig.kmw-main-base.json",
   "compilerOptions": {
     "baseUrl": "./",
-    // Necessary for ES5 iteration of Map.keys().
-    "downlevelIteration": true,
     "outDir": "build/obj/",
     "tsBuildInfoFile": "build/obj/tsconfig.tsbuildinfo",
     "rootDir": "./src"
