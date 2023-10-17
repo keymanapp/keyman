@@ -1,5 +1,14 @@
 import { ActiveKeyBase } from "./activeLayout.js";
 
+// This interface lives within the keyboard-processor package because
+// fat-finger correction layout info was spec'd there in and before
+// Keyman 16.0.
+
+/**
+ * Defines correction-layout mappings for keys to be considered by
+ * the fat-finger algorithm and its related calculations, which are
+ * used to determine the "closest keys" for corrections.
+ */
 export interface CorrectionLayoutEntry {
   /**
    * The ID of the key corresponding to this entry.
