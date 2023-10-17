@@ -11,6 +11,8 @@ import TouchLayoutDefaultHint = TouchLayout.TouchLayoutDefaultHint;
 import TouchLayoutFlick = TouchLayout.TouchLayoutFlick;
 import { type DeviceSpec } from "@keymanapp/web-utils";
 
+import { CorrectionLayout, CorrectionLayoutEntry } from "./correctionLayout.js";
+
 // TS 3.9 changed behavior of getters to make them
 // non-enumerable by default. This broke our 'polyfill'
 // functions which depended on enumeration to copy the
@@ -35,7 +37,24 @@ interface AnalysisMetadata {
   hasLongpresses: boolean;
 }
 
-class ActiveKeyBase {
+// Not compatible with subkeys - their layout data is only determined (presently) at runtime.
+class CorrectiveBaseKeyLayout implements CorrectionLayoutEntry {
+  readonly key: ActiveKeyBase;
+  readonly centerX: number;
+  readonly centerY: number;
+  readonly width: number;
+  readonly height: number;
+
+  constructor(layer: ActiveLayer, row: ActiveRow, key: ActiveKey) {
+    this.key = key;
+    this.centerX = key.proportionalX;
+    this.centerY = row.proportionalY;
+    this.width = key.proportionalWidth;
+    this.height = layer.rowProportionalHeight;
+  }
+}
+
+export class ActiveKeyBase {
   static readonly DEFAULT_PAD=15;          // Padding to left of key, in virtual units
   static readonly DEFAULT_RIGHT_MARGIN=15; // Padding to right of right-most key, in virtual units
   static readonly DEFAULT_KEY_WIDTH=100;   // Width of a key, if not specified, in virtual units
@@ -49,7 +68,7 @@ class ActiveKeyBase {
   };
 
   /** WARNING - DO NOT USE DIRECTLY outside of @keymanapp/keyboard-processor! */
-  id: `T_${string}` | `K_${string}` | `U_${string}` | `t_${string}` | `k_${string}` | `u_${string}`;
+  id: TouchLayout.TouchLayoutKeyId;
 
   // These are fine.
   width?: number;
@@ -624,11 +643,11 @@ export class ActiveLayer implements LayoutLayer {
 
     // Should we wish to allow multiple different transforms for distance -> probability, use a function parameter in place
     // of the formula in the loop below.
-    for(let key in keyDists) {
+    for(let key of keyDists.keys()) {
       totalMass += keyProbs[key] = 1 / (Math.pow(keyDists[key], 2) + 1e-6); // Prevent div-by-0 errors.
     }
 
-    for(let key in keyProbs) {
+    for(let key of Object.keys(keyProbs)) {
       keyProbs[key] /= totalMass;
     }
 
@@ -643,68 +662,73 @@ export class ActiveLayer implements LayoutLayer {
    * @param kbdScaleRatio The ratio of the keyboard's horizontal scale to its vertical scale.
    *                           For a 400 x 200 keyboard, should be 2.
    */
-  private keyTouchDistances(touchCoords: {x: number, y: number}, kbdScaleRatio: number): {[keyId: string]: number} {
-    let layer = this;
+  private keyTouchDistances(touchCoords: {x: number, y: number}, kbdScaleRatio: number): Map<string, number> {
+    let keyDists: Map<string, number> = new Map<string, number>();
 
-    let keyDists: {[keyId: string]: number} = {};
+    // Generate the correction layout mappings for each key.  Due to the data structures,
+    // we start with each row...
+    const correctiveLayoutData: CorrectionLayout = this.row.map((row) => {
+      return row.key.map((key) => new CorrectiveBaseKeyLayout(this, row, key));
+      // ... and flatten/merge the resulting arrays.
+    }).reduce((flattened, rowEntries) => flattened.concat(rowEntries), []);
 
     // This double-nested loop computes a pseudo-distance for the touch from each key.  Quite useful for
     // generating a probability distribution.
-    this.row.forEach(function(row: ActiveRow): void {
-      row.key.forEach(function(key: ActiveKey): void {
-        // If the key lacks an ID, just skip it.  Sometimes used for padding.
-        if(!key.baseKeyID) {
+    correctiveLayoutData.forEach((entry) => {
+      const key = entry.key;
+
+      // If the key lacks an ID, just skip it.  Sometimes used for padding.
+      if(!key.baseKeyID) {
+        return;
+      } else {
+        // Attempt to filter out known non-output keys.
+        // Results in a more optimized distribution.
+        if(Codes.isKnownOSKModifierKey(key.baseKeyID)) {
           return;
-        } else {
-          // Attempt to filter out known non-output keys.
-          // Results in a more optimized distribution.
-          if(Codes.isKnownOSKModifierKey(key.baseKeyID)) {
-            return;
-          } else if(key.isPadding) { // to the user, blank / padding keys do not exist.
-            return;
-          }
+        } else if(key.isPadding) { // to the user, blank / padding keys do not exist.
+          return;
         }
-        // These represent the within-key distance of the touch from the key's center.
-        // Both should be on the interval [0, 0.5].
-        let dx = Math.abs(touchCoords.x - key.proportionalX);
-        let dy = Math.abs(touchCoords.y - row.proportionalY);
+      }
+      // These represent the within-key distance of the touch from the key's center.
+      // Both should be on the interval [0, 0.5].
+      let dx = Math.abs(touchCoords.x - entry.centerX);
+      let dy = Math.abs(touchCoords.y - entry.centerY);
 
-        // If the touch isn't within the key, these store the out-of-key distance
-        // from the closest point on the key being checked.
-        let distX: number, distY: number;
+      // If the touch isn't within the key, these store the out-of-key distance
+      // from the closest point on the key being checked.
+      let distX: number, distY: number;
 
-        if(dx > 0.5 * key.proportionalWidth) {
-          distX = (dx - 0.5 * key.proportionalWidth);
-          dx = 0.5;
-        } else {
-          distX = 0;
-          dx /= key.proportionalWidth;
-        }
+      if(dx > 0.5 * entry.width) {
+        distX = (dx - 0.5 * entry.width);
+        dx = 0.5;
+      } else {
+        distX = 0;
+        dx /= entry.width;
+      }
 
-        if(dy > 0.5 * layer.rowProportionalHeight) {
-          distY = (dy - 0.5 * layer.rowProportionalHeight);
-          dy = 0.5;
-        } else {
-          distY = 0;
-          dy /= layer.rowProportionalHeight;
-        }
+      if(dy > 0.5 * entry.height) {
+        distY = (dy - 0.5 * entry.height);
+        dy = 0.5;
+      } else {
+        distY = 0;
+        dy /= entry.height;
+      }
 
-        // Now that the differentials are computed, it's time to do distance scaling.
-        //
-        // For out-of-key distance, we scale the X component by the keyboard's aspect ratio
-        // to get the actual out-of-key distance rather than proportional.
-        distX *= kbdScaleRatio;
+      // Now that the differentials are computed, it's time to do distance scaling.
+      //
+      // For out-of-key distance, we scale the X component by the keyboard's aspect ratio
+      // to get the actual out-of-key distance rather than proportional.
+      distX *= kbdScaleRatio;
 
-        // While the keys are rarely perfect squares, we map all within-key distance
-        // to a square shape.  (ALT/CMD should seem as close to SPACE as a 'B'.)
-        //
-        // For that square, we take the rowHeight as its edge lengths.
-        distX += dx * layer.rowProportionalHeight;
-        distY += dy * layer.rowProportionalHeight;
+      // While the keys are rarely perfect squares, we map all within-key distance
+      // to a square shape.  (ALT/CMD should seem as close to SPACE as a 'B'.)
+      //
+      // For that square, we take the rowHeight as its edge lengths.
+      distX += dx * entry.height;
+      distY += dy * entry.height;
 
-        let distance = distX * distX + distY * distY;
-        keyDists[key.coreID] = distance;
-      });
+      const distance = distX * distX + distY * distY;
+      keyDists[key.coreID] = distance;
     });
 
     return keyDists;
