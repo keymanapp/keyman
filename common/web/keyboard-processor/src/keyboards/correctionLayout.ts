@@ -13,7 +13,7 @@ export interface CorrectionLayoutEntry {
   /**
    * The ID of the key corresponding to this entry.
    */
-  readonly key: ActiveKeyBase;
+  readonly keySpec: ActiveKeyBase;
 
   /**
    * Represents the center x coordinate of the key based on the coordinate system
@@ -40,4 +40,18 @@ export interface CorrectionLayoutEntry {
   readonly height: number;
 }
 
-export type CorrectionLayout = CorrectionLayoutEntry[];
+export interface CorrectionLayout {
+  /**
+   * Defines the mappings of each key to be considered by a key-correction
+   * algorithm.  The key's bounding box should be defined relative to its
+   * containers bounding box, with both mapped to a coordinate system from
+   * <0, 0> to <1, 1> - a unit square.
+   */
+  keys: CorrectionLayoutEntry[];
+
+  /**
+   * The ratio of the keyboard's horizontal scale to its vertical scale.
+   * For a 400 x 200 keyboard, should be 2.
+   */
+  kbdScaleRatio: number;
+}
