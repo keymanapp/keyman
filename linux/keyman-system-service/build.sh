@@ -35,15 +35,22 @@ else
 fi
 MESON_PATH="build/$(uname -m)/$MESON_TARGET"
 
-builder_describe_outputs \
-  configure "${MESON_PATH}/build.ninja" \
-  build "${MESON_PATH}/src/keyman-system-service"
+clean_action() {
+  rm -rf "$THIS_SCRIPT_PATH/build/"
+}
 
-if builder_has_option --coverage; then
-  MESON_COVERAGE=-Db_coverage=true
-else
-  MESON_COVERAGE=
-fi
+check_missing_coverage_configuration() {
+  if builder_has_option --coverage && [ -d "$MESON_PATH" ]; then
+    # It's possible that we got configured because we're a dependency of ibus-keyman
+    # in which case the `--coverage` option wasn't passed along.
+    cd "$MESON_PATH"
+    if ! ninja -t targets | grep -q coverage-html ; then
+      cd "$THIS_SCRIPT_PATH"
+      clean_action
+    fi
+    cd "$THIS_SCRIPT_PATH"
+  fi
+}
 
 configure_action() {
   # shellcheck disable=SC2086,SC2154
@@ -59,7 +66,19 @@ test_action() {
   fi
 }
 
-builder_run_action clean       rm -rf "$THIS_SCRIPT_PATH/build/"
+check_missing_coverage_configuration
+
+builder_describe_outputs \
+  configure "${MESON_PATH}/build.ninja" \
+  build "${MESON_PATH}/src/keyman-system-service"
+
+if builder_has_option --coverage; then
+  MESON_COVERAGE=-Db_coverage=true
+else
+  MESON_COVERAGE=
+fi
+
+builder_run_action clean       clean_action
 builder_run_action configure   configure_action
 
 [ -d "$MESON_PATH" ] && cd "$MESON_PATH"
