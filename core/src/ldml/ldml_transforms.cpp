@@ -865,7 +865,9 @@ static bool normalize(const icu::Normalizer2 *n, std::u16string &str, UErrorCode
   icu::UnicodeString src = icu::UnicodeString(str.data(), (int32_t)str.length());
   n->normalize(src, dest, status);
   UASSERT_SUCCESS(status);
-  str.assign(dest.getBuffer(), dest.length());
+  if (U_SUCCESS(status)) {
+    str.assign(dest.getBuffer(), dest.length());
+  }
   return U_SUCCESS(status);
 }
 
