@@ -37,7 +37,7 @@ export class HeldRepeater implements GestureHandler {
     this.timerHandle = window.setTimeout(this.deleteRepeater, HeldRepeater.REPEAT_DELAY);
   }
 
-  currentStageKeyDistances(): KeyDistribution {
+  currentStageKeyDistribution(): KeyDistribution {
     return null;
   }
 }
