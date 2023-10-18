@@ -25,8 +25,8 @@ py = import('python')
 python = py.find_installation()
 
 # TODO: Shared includes may use namespaces, etc which need future tidyup.
-# For now, we use KMN_KBP to inject the km::kbp::kmx namespace
-defns += ['-DKMN_KBP']
+# For now, we use KMN_CORE to inject the km::kbp::kmx namespace
+defns += ['-DKMN_CORE']
 
 # #define DEBUG when we are on a debug build
 if get_option('buildtype') == 'debug'

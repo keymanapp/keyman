@@ -7,7 +7,7 @@
 version_res = []
 
 # TODO: shouldn't this be defined only for dylib and not static lib?
-defns += ['-DKMN_KBP_EXPORTING']
+defns += ['-DKMN_CORE_EXPORTING']
 
 if cpp_compiler.get_id() == 'msvc'
   defns += ['-DUNICODE']
@@ -18,7 +18,7 @@ endif
 
 if cpp_compiler.get_id() == 'emscripten'
   # TODO: why do we need this defn here?
-  defns += ['-DKMN_KBP']
+  defns += ['-DKMN_CORE']
 endif
 
 # ICU4C is used for repertoire tests and core implementation

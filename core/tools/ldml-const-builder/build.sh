@@ -17,7 +17,7 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 # This script runs from its own folder
 cd "$(dirname "$THIS_SCRIPT")"
 
-KBP_LDML_H_FILE="../../include/ldml/keyboardprocessor_ldml.h"
+CORE_LDML_H_FILE="../../include/ldml/keyboardprocessor_ldml.h"
 
 ################################ Main script ################################
 
@@ -30,7 +30,7 @@ builder_parse "$@"
 
 if builder_start_action clean; then
   rm -rf ../../include/ldml/build/
-  # Not removing ${KBP_LDML_H_FILE} as it is checked in
+  # Not removing ${CORE_LDML_H_FILE} as it is checked in
   builder_finish_action success clean
 fi
 
@@ -42,8 +42,8 @@ if builder_start_action build; then
 fi
 
 if builder_start_action run; then
-  node --enable-source-maps ../../include/ldml/ldml-const-builder/ldml-const-builder.js > ${KBP_LDML_H_FILE}
-  echo "Updated ${KBP_LDML_H_FILE}"
+  node --enable-source-maps ../../include/ldml/ldml-const-builder/ldml-const-builder.js > ${CORE_LDML_H_FILE}
+  echo "Updated ${CORE_LDML_H_FILE}"
 
   builder_finish_action success run
 fi

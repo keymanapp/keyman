@@ -1,8 +1,8 @@
 
 #pragma once
 
-#ifndef KMN_KBP
-#define KMN_KBP
+#ifndef KMN_CORE
+#define KMN_CORE
 #endif
 #ifndef USE_CHAR16_T
 #define USE_CHAR16_T

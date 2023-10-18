@@ -75,7 +75,7 @@ namespace kbp
      * updateing the state as required.
      *
      * @param   state  An opaque pointer to a state object
-     * @return  km_core_status  `KM_CORE_STATUS_OK`: On success. Else KB_KBP_ error code
+     * @return  km_core_status  `KM_CORE_STATUS_OK`: On success. Else KB_CORE_ error code
      */
     virtual km_core_status
     process_queued_actions(

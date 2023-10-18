@@ -25,7 +25,7 @@ typedef KMX_WORD  __attribute__((aligned(1))) KMX_WORD_unaligned;
 #define KMX_WORD_unaligned  KMX_WORD
 #endif
 
-#ifdef KMN_KBP
+#ifdef KMN_CORE
 // TODO: move this to a common namespace keyman::common::kmx_file or similar in the future
 namespace km {
 namespace kbp {
@@ -402,7 +402,7 @@ static_assert(sizeof(COMP_KEY) == KEYBOARDFILEKEY_SIZE, "COMP_KEY must be KEYBOA
 static_assert(sizeof(COMP_GROUP) == KEYBOARDFILEGROUP_SIZE, "COMP_GROUP must be KEYBOARDFILEGROUP_SIZE bytes");
 static_assert(sizeof(COMP_KEYBOARD) == KEYBOARDFILEHEADER_SIZE, "COMP_KEYBOARD must be KEYBOARDFILEHEADER_SIZE bytes");
 
-#ifdef KMN_KBP
+#ifdef KMN_CORE
 } // namespace kmx
 } // namespace kbp
 } // namespace km

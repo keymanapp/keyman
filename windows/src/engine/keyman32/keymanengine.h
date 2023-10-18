@@ -19,8 +19,8 @@
 #endif
 
 // For keyman_core_api_bits.h
-#ifndef KMN_KBP_STATIC
-#define KMN_KBP_STATIC
+#ifndef KMN_CORE_STATIC
+#define KMN_CORE_STATIC
 #endif
 // For keyman_core_api_bits.h
 #ifndef _WIN32

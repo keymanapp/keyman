@@ -27,14 +27,14 @@ namespace kbp
     using char_type = std::remove_const_t<
                         std::remove_pointer_t<km_core_path_name>>;
     using string_type = std::basic_string<char_type>;
-    static constexpr char_type const parent_separator = _KM_KBP_PATH_SEPARATOR,
-                                     suffix_separator = _KM_KBP_EXT_SEPARATOR;
+    static constexpr char_type const parent_separator = _KM_CORE_PATH_SEPARATOR,
+                                     suffix_separator = _KM_CORE_EXT_SEPARATOR;
   private:
     string_type _path;
 
     void normalise() {
-      #if '/' != _KM_KBP_PATH_SEPARATOR
-      std::replace(_path.begin(), _path.end(), char_type('/'), _KM_KBP_PATH_SEPARATOR);
+      #if '/' != _KM_CORE_PATH_SEPARATOR
+      std::replace(_path.begin(), _path.end(), char_type('/'), _KM_CORE_PATH_SEPARATOR);
       #endif
     }
 
