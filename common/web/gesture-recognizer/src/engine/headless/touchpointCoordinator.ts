@@ -14,7 +14,7 @@ interface EventMap<HoveredItemType, StateToken> {
    */
   'inputstart': (input: GestureSource<HoveredItemType, StateToken>) => void;
 
-  'recognizedgesture': (sequence: GestureSequence<HoveredItemType>) => void;
+  'recognizedgesture': (sequence: GestureSequence<HoveredItemType, StateToken>) => void;
 }
 
 /**
@@ -27,16 +27,16 @@ interface EventMap<HoveredItemType, StateToken> {
  */
 export class TouchpointCoordinator<HoveredItemType, StateToken=any> extends EventEmitter<EventMap<HoveredItemType, StateToken>> {
   private inputEngines: InputEngineBase<HoveredItemType, StateToken>[];
-  private selectorStack: MatcherSelector<HoveredItemType>[] = [new MatcherSelector()];
+  private selectorStack: MatcherSelector<HoveredItemType, StateToken>[] = [new MatcherSelector()];
 
-  private gestureModelDefinitions: GestureModelDefs<HoveredItemType>;
+  private gestureModelDefinitions: GestureModelDefs<HoveredItemType, StateToken>;
 
   private _activeSources: GestureSource<HoveredItemType>[] = [];
-  private _activeGestures: GestureSequence<HoveredItemType>[] = [];
+  private _activeGestures: GestureSequence<HoveredItemType, StateToken>[] = [];
 
   private _stateToken: StateToken;
 
-  public constructor(gestureModelDefinitions: GestureModelDefs<HoveredItemType>, inputEngines?: InputEngineBase<HoveredItemType, StateToken>[]) {
+  public constructor(gestureModelDefinitions: GestureModelDefs<HoveredItemType, StateToken>, inputEngines?: InputEngineBase<HoveredItemType, StateToken>[]) {
     super();
 
     this.gestureModelDefinitions = gestureModelDefinitions;
@@ -50,7 +50,10 @@ export class TouchpointCoordinator<HoveredItemType, StateToken=any> extends Even
     this.selectorStack[0].on('rejectionwithaction', this.modelResetHandler)
   }
 
-  private readonly modelResetHandler = (selection: MatcherSelection<HoveredItemType>, replaceModelWith: (model: GestureModel<HoveredItemType>) => void) => {
+  private readonly modelResetHandler = (
+    selection: MatcherSelection<HoveredItemType, StateToken>,
+    replaceModelWith: (model: GestureModel<HoveredItemType, StateToken>) => void
+  ) => {
     const sourceIds = selection.matcher.allSourceIds;
 
     // If there's an active gesture that uses a source noted in the selection, it's the responsibility
@@ -68,12 +71,12 @@ export class TouchpointCoordinator<HoveredItemType, StateToken=any> extends Even
     }
   };
 
-  public pushSelector(selector: MatcherSelector<HoveredItemType>) {
+  public pushSelector(selector: MatcherSelector<HoveredItemType, StateToken>) {
     this.selectorStack.push(selector);
     selector.on('rejectionwithaction', this.modelResetHandler);
   }
 
-  public popSelector(selector: MatcherSelector<HoveredItemType>) {
+  public popSelector(selector: MatcherSelector<HoveredItemType, StateToken>) {
     /* c8 ignore start */
     if(this.selectorStack.length <= 1) {
       throw new Error("May not pop the original, base gesture selector.");
@@ -144,7 +147,7 @@ export class TouchpointCoordinator<HoveredItemType, StateToken=any> extends Even
     this.emit('inputstart', touchpoint);
   }
 
-  public get activeGestures(): GestureSequence<HoveredItemType>[] {
+  public get activeGestures(): GestureSequence<HoveredItemType, StateToken>[] {
     return [].concat(this._activeGestures);
   }
 

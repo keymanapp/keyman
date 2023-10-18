@@ -4,8 +4,8 @@ import { GestureRecognizerConfiguration, preprocessRecognizerConfig } from "../c
 import { Nonoptional } from "../nonoptional.js";
 import { MatcherSelector } from "./gestures/matchers/matcherSelector.js";
 
-export function buildGestureMatchInspector<Type>(selector: MatcherSelector<Type>) {
-  return (source: GestureSource<Type, any>) => {
+export function buildGestureMatchInspector<Type, StateToken>(selector: MatcherSelector<Type, StateToken>) {
+  return (source: GestureSource<Type, StateToken>) => {
     return selector.potentialMatchersForSource(source).map((matcher) => matcher.model.id);
   };
 }
@@ -277,6 +277,7 @@ export class GestureSourceSubview<HoveredItemType, StateToken = any> extends Ges
     super(source.rawIdentifier, configStack, source.isFromTouch);
 
     const baseSource = this._baseSource = source instanceof GestureSourceSubview ? source._baseSource : source;
+    this.stateToken = source.stateToken;
 
     /**
      * Provides a coordinate-system translation for source subviews.
@@ -286,7 +287,23 @@ export class GestureSourceSubview<HoveredItemType, StateToken = any> extends Ges
       const translation = this.recognizerTranslation;
       // Provide a coordinate-system translation for source subviews.
       // The base version still needs to use the original coord system, though.
-      return {...sample, targetX: sample.targetX - translation.x, targetY: sample.targetY - translation.y};
+      const transformedSample = {...sample, targetX: sample.targetX - translation.x, targetY: sample.targetY - translation.y};
+
+      // If the subview is operating from the perspective of a different state token than its base source,
+      // its samples' item fields will need correction.
+      //
+      // This can arise during multitap-like scenarios.
+      if(this.stateToken != baseSource.stateToken) {
+        transformedSample.item = this.currentRecognizerConfig.itemIdentifier(
+          {
+            ...sample,
+            stateToken: this.stateToken
+          },
+          null
+        );
+      }
+
+      return transformedSample;
     }
 
     // Note: we don't particularly need subviews to track the actual coords aside from

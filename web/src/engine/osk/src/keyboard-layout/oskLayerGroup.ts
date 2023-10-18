@@ -1,4 +1,5 @@
 import { ActiveLayer, type DeviceSpec, Keyboard, LayoutLayer, ActiveLayout } from '@keymanapp/keyboard-processor';
+import { ManagedPromise } from '@keymanapp/web-utils';
 
 import { InputSample } from '@keymanapp/gesture-recognizer';
 
@@ -11,6 +12,8 @@ export default class OSKLayerGroup {
   public readonly element: HTMLDivElement;
   public readonly layers: {[layerID: string]: OSKLayer} = {};
   public readonly spec: ActiveLayout;
+
+  private _activeLayerId: string = 'default';
 
   public constructor(vkbd: VisualKeyboard, keyboard: Keyboard, formFactor: DeviceSpec.FormFactor) {
     let layout = keyboard.layout(formFactor);
@@ -61,6 +64,35 @@ export default class OSKLayerGroup {
     }
   }
 
+  public get activeLayerId(): string {
+    return this._activeLayerId;
+  }
+
+  public set activeLayerId(id: string) {
+    this._activeLayerId = id;
+
+    for (let key of Object.keys(this.layers)) {
+      const layer = this.layers[key];
+      const layerElement = layer.element;
+      if (layer.id == id) {
+        layerElement.style.display = 'block';
+      } else {
+        layerElement.style.display = 'none';
+      }
+    }
+  }
+
+  /**
+   * The core function referenced by the gesture engine for determining the key that
+   * best matches the state of contact points and ongoing gestures.
+   *
+   * Calls to this function may temporarily change which layer is set for display,
+   * as layout reflows are necessary for lookups in layers not currently set active.
+   * Such changes layer will be reverted once the JS microtask queue regains control;
+   * this delay is to prevent costly layout thrashing effects.
+   * @param coord
+   * @returns
+   */
   findNearestKey(coord: Omit<InputSample<KeyElement>, 'item'>): KeyElement {
     if(!coord) {
       return null;
@@ -75,30 +107,41 @@ export default class OSKLayerGroup {
       throw new Error(`Layer id ${layerId} could not be found`);
     }
 
-    // Kind of WET with VisualKeyboard.updateState, but oh well.
-    let priorLayer: OSKLayer = null;
-    if(layer.element.style.display == 'block') {
-      priorLayer = layer;
-    } else {
+    // Note:  we do NOT manipulate `._activeLayerId` here!  This is designed
+    // explicitly to be temporary.
+    if(layer.element.style.display != 'block') {
       for(let id in this.layers) {
         if(this.layers[id].element.style.display == 'block') {
-          priorLayer = this.layers[id];
+          const priorLayer = this.layers[id];
+          priorLayer.element.style.display = 'none';
         }
         this.layers[id].element.style.display = 'none';
       }
     }
     layer.element.style.display = 'block';
 
-    try {
-      return this.nearestKey(coord, layer);
-    } finally {
-      if(layer != priorLayer) {
+    /* As soon as control returns to the JS microtask queue, restore the original layer.
+     * We want to avoid doing it sooner in case another lookup occurs before the standard
+     * async reflow, as that could trigger expensive "layout thrashing" effects.
+     *
+     * In the case that a gesture-source's path needs to be remapped do a different layer,
+     * multiple synchronous calls to this method may occur.  This is a pattern that may
+     * result during input layer-remapping used to solve issues like #7173 and possibly
+     * also during multitap operations.
+     *
+     * On "layout thrashing": https://webperf.tips/tip/layout-thrashing/
+     */
+    Promise.resolve().then(() => {
+      const trueLayer = this.layers[this._activeLayerId];
+      // If either condition holds, we have to trigger a layout reflow; it's the same cost
+      // whether one changes or both do.
+      if(layer.element.style.display == 'block' || trueLayer.element.style.display != 'block') {
         layer.element.style.display = 'none';
-        if(priorLayer) {
-          priorLayer.element.style.display = 'block';
-        }
+        trueLayer.element.style.display = 'block';
       }
-    }
+    })
+
+    return this.nearestKey(coord, layer);
   }
 
   private nearestKey(coord: Omit<InputSample<KeyElement>, 'item'>, layer: OSKLayer): KeyElement {

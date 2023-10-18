@@ -6,24 +6,27 @@ import { GestureSource, GestureSourceSubview } from "../../gestureSource.js";
 import { GestureMatcher, MatchResult, PredecessorMatch } from "./gestureMatcher.js";
 import { GestureModel } from "../specs/gestureModel.js";
 import { GestureSequence } from "./index.js";
+import { ItemIdentifier } from "../../../configuration/gestureRecognizerConfiguration.js";
 
-interface GestureSourceTracker<Type> {
+interface GestureSourceTracker<Type, StateToken> {
   /**
    * Should be the actual GestureSource instance, not a subview thereof.
    * Each `GestureMatcher` will construct its own 'subview' into the GestureSource
    * based on its model's needs.
    */
   source: GestureSource<Type>;
-  matchPromise: ManagedPromise<MatcherSelection<Type>>;
+  matchPromise: ManagedPromise<MatcherSelection<Type, StateToken>>;
 }
 
-export interface MatcherSelection<Type> {
-  matcher: PredecessorMatch<Type>,
+export interface MatcherSelection<Type, StateToken = any> {
+  matcher: PredecessorMatch<Type, StateToken>,
   result: MatchResult<Type>
 }
 
-interface EventMap<Type> {
-  'rejectionwithaction': (selection: MatcherSelection<Type>, replaceModelWith: (replacementModel: GestureModel<Type>) => void) => void;
+interface EventMap<Type, StateToken> {
+  'rejectionwithaction': (
+    selection: MatcherSelection<Type, StateToken>,
+    replaceModelWith: (replacementModel: GestureModel<Type, StateToken>) => void) => void;
 }
 
 /**
@@ -38,9 +41,9 @@ interface EventMap<Type> {
  * GestureSource, the Promise will resolve when the last potential model is rejected,
  * providing values indicating match failure and the action to be taken.
  */
-export class MatcherSelector<Type> extends EventEmitter<EventMap<Type>> {
-  private _sourceSelector: GestureSourceTracker<Type>[] = [];
-  private potentialMatchers: GestureMatcher<Type>[] = [];
+export class MatcherSelector<Type, StateToken = any> extends EventEmitter<EventMap<Type, StateToken>> {
+  private _sourceSelector: GestureSourceTracker<Type, StateToken>[] = [];
+  private potentialMatchers: GestureMatcher<Type, StateToken>[] = [];
 
   public readonly baseGestureSetId: string;
 
@@ -120,9 +123,9 @@ export class MatcherSelector<Type> extends EventEmitter<EventMap<Type>> {
    * @param gestureModelSet
    */
   public matchGesture(
-    source: GestureSource<Type>,
-    gestureModelSet: GestureModel<Type>[]
-  ): Promise<MatcherSelection<Type>>;
+    source: GestureSource<Type, StateToken>,
+    gestureModelSet: GestureModel<Type, StateToken>[]
+  ): Promise<MatcherSelection<Type, StateToken>>;
 
   /**
    * Facilitates matching a new stage in an ongoing gesture-stage sequence based on a previously-
@@ -131,14 +134,14 @@ export class MatcherSelector<Type> extends EventEmitter<EventMap<Type>> {
    * @param gestureModelSet
    */
   public matchGesture(
-    priorStageMatcher: PredecessorMatch<Type>,
-    gestureModelSet: GestureModel<Type>[]
-  ): Promise<MatcherSelection<Type>>;
+    priorStageMatcher: PredecessorMatch<Type, StateToken>,
+    gestureModelSet: GestureModel<Type, StateToken>[]
+  ): Promise<MatcherSelection<Type, StateToken>>;
 
   public matchGesture(
-    source: GestureSource<Type> | PredecessorMatch<Type>,
-    gestureModelSet: GestureModel<Type>[]
-  ): Promise<MatcherSelection<Type>> {
+    source: GestureSource<Type> | PredecessorMatch<Type, StateToken>,
+    gestureModelSet: GestureModel<Type, StateToken>[]
+  ): Promise<MatcherSelection<Type, StateToken>> {
     /*
      * To be clear, this _starts_ the source-tracking process.  It's an async process, though.
      *
@@ -158,7 +161,7 @@ export class MatcherSelector<Type> extends EventEmitter<EventMap<Type>> {
       })
     }
 
-    const matchPromise = new ManagedPromise<MatcherSelection<Type>>();
+    const matchPromise = new ManagedPromise<MatcherSelection<Type, StateToken>>();
 
     /*
      * First...
@@ -174,7 +177,7 @@ export class MatcherSelector<Type> extends EventEmitter<EventMap<Type>> {
 
       // Sets up source selectors - the object that matches a source against its Promise.
       // Promises only resolve once, after all - once called, a "selection" has been made.
-      const sourceSelectors: GestureSourceTracker<Type> = {
+      const sourceSelectors: GestureSourceTracker<Type, StateToken> = {
         source: src,
         matchPromise: matchPromise
       };
@@ -319,7 +322,7 @@ export class MatcherSelector<Type> extends EventEmitter<EventMap<Type>> {
     });
   }
 
-  private matcherSelectionFilter(matcher: GestureMatcher<Type>, matchSynchronizers: ManagedPromise<any>[]) {
+  private matcherSelectionFilter(matcher: GestureMatcher<Type, StateToken>, matchSynchronizers: ManagedPromise<any>[]) {
     // Returns a closure-captured Promise-resolution handler used by individual GestureMatchers managed
     // by this class instance.
     return async (result: MatchResult<Type>) => {
@@ -422,7 +425,7 @@ export class MatcherSelector<Type> extends EventEmitter<EventMap<Type>> {
       if(!result.matched) {
         // There is an action to be resolved...
         // But we didn't actually MATCH a gesture.
-        const replacer = (replacementModel: GestureModel<Type>) => {
+        const replacer = (replacementModel: GestureModel<Type, StateToken>) => {
           const replacementMatcher = new GestureMatcher(replacementModel, matcher);
 
           /* IMPORTANT: verify that the replacement model is initially valid.

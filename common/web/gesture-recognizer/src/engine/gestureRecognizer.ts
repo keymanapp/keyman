@@ -11,7 +11,7 @@ export class GestureRecognizer<HoveredItemType, StateToken = any> extends Touchp
   private readonly mouseEngine: MouseEventEngine<HoveredItemType>;
   private readonly touchEngine: TouchEventEngine<HoveredItemType>;
 
-  public constructor(gestureModelDefinitions: GestureModelDefs<HoveredItemType>, config: GestureRecognizerConfiguration<HoveredItemType, StateToken>) {
+  public constructor(gestureModelDefinitions: GestureModelDefs<HoveredItemType, StateToken>, config: GestureRecognizerConfiguration<HoveredItemType, StateToken>) {
     const preprocessedConfig = preprocessRecognizerConfig(config);
 
     // Possibly just a stop-gap measure... but this provides an empty gesture-spec set definition
