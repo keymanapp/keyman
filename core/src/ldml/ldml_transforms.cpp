@@ -857,17 +857,23 @@ bool normalize_nfd(std::u32string &str) {
   }
 }
 
+/** internal function to normalize with a specified mode */
+static bool normalize(const icu::Normalizer2 *n, std::u16string &str, UErrorCode &status) {
+  UASSERT_SUCCESS(status);
+  assert(n != nullptr);
+  icu::UnicodeString dest;
+  icu::UnicodeString src = icu::UnicodeString(str.data(), (int32_t)str.length());
+  n->normalize(src, dest, status);
+  UASSERT_SUCCESS(status);
+  str.assign(dest.getBuffer(), dest.length());
+  return U_SUCCESS(status);
+}
+
 bool normalize_nfd(std::u16string &str) {
   UErrorCode status = U_ZERO_ERROR;
   const icu::Normalizer2 *nfd = icu::Normalizer2::getNFDInstance(status);
   UASSERT_SUCCESS(status);
-  if (U_FAILURE(status)) return false; // exit early since normalizer pointer could be nullptr
-  icu::UnicodeString dest;
-  icu::UnicodeString src = icu::UnicodeString(str.data(), (int32_t)str.length());
-  nfd->normalize(src, dest, status);
-  UASSERT_SUCCESS(status);
-  str.assign(dest.getBuffer(), dest.length());
-  return U_SUCCESS(status);
+  return normalize(nfd, str, status);
 }
 
 bool normalize_nfc(std::u32string &str) {
@@ -884,14 +890,7 @@ bool normalize_nfc(std::u16string &str) {
   UErrorCode status = U_ZERO_ERROR;
   const icu::Normalizer2 *nfc = icu::Normalizer2::getNFCInstance(status);
   UASSERT_SUCCESS(status);
-  if (U_FAILURE(status)) return false; // exit early since normalizer pointer could be nullptr
-
-  icu::UnicodeString dest;
-  icu::UnicodeString src = icu::UnicodeString(str.data(), (int32_t)str.length());
-  nfc->normalize(src, dest, status);
-  UASSERT_SUCCESS(status);
-  str.assign(dest.getBuffer(), dest.length());
-  return U_SUCCESS(status);
+  return normalize(nfc, str, status);
 }
 
 }  // namespace ldml
