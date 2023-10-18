@@ -65,7 +65,7 @@ export default class Multitap implements GestureHandler {
 
       const keyEvent = vkbd.keyEventFromSpec(selection);
       keyEvent.baseTranscriptionToken = this.baseContextToken;
-      keyEvent.keyDistribution = this.currentStageKeyDistances();
+      keyEvent.keyDistribution = this.currentStageKeyDistribution();
       const keyResult = vkbd.raiseKeyEvent(keyEvent, null);
 
       // TODO:  store the context token, possibly other stuff?
@@ -81,7 +81,7 @@ export default class Multitap implements GestureHandler {
      */
   }
 
-  currentStageKeyDistances(): KeyDistribution {
+  currentStageKeyDistribution(): KeyDistribution {
     // TODO:  multitap corrections
     return [];
   }
