@@ -936,7 +936,7 @@ km_core_state_context(km_core_state *state);
 
 /*
 ```
-### `kbp_state_get_intermediate_context`
+### `km_core_state_get_intermediate_context`
 ##### Description:
 Get access to the state object's keyboard processor's intermediate context. This context
 is used during an IMX callback, part way through processing a keystroke.
@@ -950,7 +950,7 @@ to `km_core_context_items_dispose`.
 */
 KMN_API
 km_core_status
-kbp_state_get_intermediate_context(km_core_state *state, km_core_context_item ** context_items);
+km_core_state_get_intermediate_context(km_core_state *state, km_core_context_item ** context_items);
 
 /*
 ```
