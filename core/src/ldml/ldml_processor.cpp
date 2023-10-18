@@ -12,7 +12,7 @@
 #include "kmx_file.h"
 #include "kmx/kmx_plus.h"
 #include "kmx/kmx_xstring.h"
-#include "ldml/keyboardprocessor_ldml.h"
+#include "ldml/keyman_core_ldml.h"
 #include "kmx/kmx_file_validator.hpp"
 #include "debuglog.h"
 #include <assert.h>

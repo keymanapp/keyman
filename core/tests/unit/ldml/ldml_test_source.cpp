@@ -22,7 +22,7 @@
 #include <kmx/kmx_processevent.h> // for char to vk mapping tables
 #include <kmx/kmx_xstring.h> // for surrogate pair macros
 #include <kmx/kmx_plus.h>
-#include "ldml/keyboardprocessor_ldml.h"
+#include "ldml/keyman_core_ldml.h"
 #include "ldml/ldml_processor.hpp"
 #include "ldml/ldml_transforms.hpp"
 
