@@ -73,7 +73,7 @@ export class Layouts {
     'HIDDEN':10
   };
 
-  static modifierSpecials: Record<string, string> = {
+  static modifierSpecials = {
     'leftalt': '*LAlt*',
     'rightalt': '*RAlt*',
     'alt': '*Alt*',
