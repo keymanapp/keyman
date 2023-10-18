@@ -89,6 +89,21 @@ The `run-tests` script accepts different arguments which can be seen with
 
 ### Code Coverage Report
 
+#### Prerequisites
+
+Code coverage reports require some additional tools: lcov, gcovr,
+libdatetime-perl, and coverage.
+
+You can install these with:
+
+```bash
+sudo apt update
+sudo apt install -y lcov libdatetime-perl gcovr
+pip3 install coverage
+```
+
+#### Creating and displaying code coverage reports
+
 All three projects (ibus-keyman, keyman-config, and keyman-system-service)
 can produce code coverage reports.
 
