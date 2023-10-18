@@ -486,7 +486,7 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
               throw new Error("Invalid state - reference to subkey menu is missing");
             }
             // TODO:  examine subkey menu, determine proper set of fat-finger alternates.
-            correctionKeyDistribution = handler.currentStageKeyDistances();
+            correctionKeyDistribution = handler.currentStageKeyDistribution();
           }
 
           if(!correctionKeyDistribution) {

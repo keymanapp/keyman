@@ -12,5 +12,5 @@ export interface GestureHandler {
    */
   readonly hasModalVisualization: boolean;
 
-  currentStageKeyDistances(): KeyDistribution;
+  currentStageKeyDistribution(): KeyDistribution;
 }

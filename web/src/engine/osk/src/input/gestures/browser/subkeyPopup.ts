@@ -367,7 +367,7 @@ export default class SubkeyPopup implements GestureHandler {
     }
   }
 
-  currentStageKeyDistances(): KeyDistribution {
+  currentStageKeyDistribution(): KeyDistribution {
     const latestStage = this.source.stageReports[this.source.stageReports.length-1];
     const baseStage = this.source.stageReports[0];
     const gestureSource = latestStage.sources[0];
