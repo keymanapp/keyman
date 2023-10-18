@@ -61,14 +61,25 @@ export interface TouchLayoutKey {
 
 export const enum TouchLayoutKeySp {
   normal=0,
+  /** A 'frame' key, such as Shift or Enter, which is styled accordingly; uses
+   *  the 'KeymanwebOsk' font on KeymanWeb */
   special=1,
+  /** A 'frame' key, such as Shift or Enter, which is styled accordingly and is
+   *  highlighted to indicate it is active, such as the shift key on a shift
+   *  layer; uses the 'KeymanwebOsk' font on KeymanWeb */
   specialActive=2,
-  // Special use in the Web OSK - resolved at runtime, is a variant of `special` with the keyboard font.
+  /** **KeymanWeb runtime private use:** a variant of `special` with the
+   *  keyboard font rather than 'KeymanwebOsk' font */
   customSpecial=3,
-  // Special use in the Web OSK - resolved at runtime, is a runtime variant of `specialActive` with the keyboard font.
+  /** **KeymanWeb runtime private use:** a  variant of `specialActive` with the
+   *  keyboard font rather than 'KeymanwebOsk' font. */
   customSpecialActive=4,
+  /** A styling signal to indicate that the key may have 'deadkey' type
+   *  behaviour. */
   deadkey=8,
+  /** A key which is rendered as a blank keycap, blocks any interaction */
   blank=9,
+  /** Renders the key only as a gap or spacer, blocks any interaction */
   spacer=10
 };
 
