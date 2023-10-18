@@ -102,7 +102,7 @@ export function correctionKeyFilter(key: ActiveKeyBase): boolean {
 export function buildCorrectiveLayout(layer: ActiveLayer, kbdScaleRatio: number) {
   return {
     keys: layer.row.map((row) => {
-      return row.key.map((key) => new CorrectiveBaseKeyLayout(this, row, key));
+      return row.key.map((key) => new CorrectiveBaseKeyLayout(layer, row, key));
       // ... and flatten/merge the resulting arrays.
     }).reduce((flattened, rowEntries) => flattened.concat(rowEntries), [])
     .filter((entry) => correctionKeyFilter(entry.keySpec)),
