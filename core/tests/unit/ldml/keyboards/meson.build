@@ -1,5 +1,5 @@
 # Copyright:    © SIL International.
-# Description:  Cross platform build script to compile kmkbpldml API unit tests.
+# Description:  Cross platform build script to compile kmcoreldml API unit tests.
 # Create Date:  5 Aug 2022
 # Authors:      Marc Durdin
 #

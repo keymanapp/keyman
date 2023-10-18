@@ -16,7 +16,7 @@
 #include "kmx_plus.h"
 
 namespace km {
-namespace kbp {
+namespace core {
 namespace kmx {
 
 /**
@@ -381,7 +381,7 @@ COMP_KMXPLUS_ELEM_ELEMENT::loadAsStringList(KMX_DWORD length, const COMP_KMXPLUS
     if (o.type() == LDML_ELEM_FLAGS_TYPE_STR) {
       // fetch the string
       const auto str16 = strs.get(o.element);
-      str = km::kbp::kmx::u16string_to_u32string(str16);
+      str = km::core::kmx::u16string_to_u32string(str16);
     } else {
       // single char
       str = std::u32string(1, (km_core_usv)o.element);
@@ -1289,5 +1289,5 @@ const COMP_KMXPLUS_VARS_ITEM *COMP_KMXPLUS_VARS::findByStringId(KMX_DWORD strId)
 
 
 }  // namespace kmx
-}  // namespace kbp
+}  // namespace core
 }  // namespace km

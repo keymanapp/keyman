@@ -27,10 +27,10 @@
 #include "unicode/utext.h"
 
 namespace km {
-namespace kbp {
+namespace core {
 namespace ldml {
 
-using km::kbp::kmx::SimpleUSet;
+using km::core::kmx::SimpleUSet;
 
 /**
  * Type of a group
@@ -266,10 +266,10 @@ public:
   /** load from a kmx_plus data section, either tran or bksp */
   static transforms *
   load(const kmx::kmx_plus &kplus,
-       const kbp::kmx::COMP_KMXPLUS_TRAN *tran,
-       const kbp::kmx::COMP_KMXPLUS_TRAN_Helper &tranHelper);
+       const core::kmx::COMP_KMXPLUS_TRAN *tran,
+       const core::kmx::COMP_KMXPLUS_TRAN_Helper &tranHelper);
 };
 
 }  // namespace ldml
-}  // namespace kbp
+}  // namespace core
 }  // namespace km

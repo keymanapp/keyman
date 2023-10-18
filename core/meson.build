@@ -25,7 +25,7 @@ py = import('python')
 python = py.find_installation()
 
 # TODO: Shared includes may use namespaces, etc which need future tidyup.
-# For now, we use KM_CORE_LIBRARY to inject the km::kbp::kmx namespace
+# For now, we use KM_CORE_LIBRARY to inject the km::core::kmx namespace
 defns += ['-DKM_CORE_LIBRARY']
 
 # #define DEBUG when we are on a debug build

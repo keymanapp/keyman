@@ -15,7 +15,7 @@
 class json;
 
 namespace km {
-namespace kbp
+namespace core
 {
 
 // This will likely be replaced with a class implementing a more space
@@ -39,13 +39,13 @@ void context::push_marker(uint32_t marker) {
   emplace_back(km_core_context_item { KM_CORE_CT_MARKER, {0,}, {marker} });
 }
 
-} // namespace kbp
+} // namespace core
 } // namespace km
 
-json & operator << (json &, km::kbp::context const &);
+json & operator << (json &, km::core::context const &);
 json & operator << (json &, km_core_context_item const &);
 
 
-struct km_core_context : public km::kbp::context
+struct km_core_context : public km::core::context
 {
 };

@@ -9,7 +9,7 @@
 #include "debuglog.h"
 
 namespace km {
-namespace kbp {
+namespace core {
 namespace kmx {
 
 #define TAB "\t"

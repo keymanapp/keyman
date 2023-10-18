@@ -3,7 +3,7 @@
 #include "kmx_base.h"
 
 namespace km {
-namespace kbp {
+namespace core {
 namespace kmx {
 
 const char16_t Uni_LEAD_SURROGATE_START  = 0xD800;
@@ -25,12 +25,12 @@ const km_core_usv Uni_MAX_CODEPOINT       = 0x10FFFF;
  * @brief True if a lead surrogate
  * \def Uni_IsSurrogate1
  */
-#define Uni_IsSurrogate1(ch) ((ch) >= km::kbp::kmx::Uni_LEAD_SURROGATE_START && (ch) <= km::kbp::kmx::Uni_LEAD_SURROGATE_END)
+#define Uni_IsSurrogate1(ch) ((ch) >= km::core::kmx::Uni_LEAD_SURROGATE_START && (ch) <= km::core::kmx::Uni_LEAD_SURROGATE_END)
 /**
  * @brief True if a trail surrogate
  * \def Uni_IsSurrogate2
  */
-#define Uni_IsSurrogate2(ch) ((ch) >= km::kbp::kmx::Uni_TRAIL_SURROGATE_START && (ch) <= km::kbp::kmx::Uni_TRAIL_SURROGATE_END)
+#define Uni_IsSurrogate2(ch) ((ch) >= km::core::kmx::Uni_TRAIL_SURROGATE_START && (ch) <= km::core::kmx::Uni_TRAIL_SURROGATE_END)
 
 /**
  * @brief True if any surrogate
@@ -42,7 +42,7 @@ const km_core_usv Uni_MAX_CODEPOINT       = 0x10FFFF;
  * @brief Returns true if BMP (Plane 0)
  * \def Uni_IsBMP
  */
-#define Uni_IsBMP(ch) ((ch) <=  km::kbp::kmx::Uni_BMP_END)
+#define Uni_IsBMP(ch) ((ch) <=  km::core::kmx::Uni_BMP_END)
 
 /**
  * @brief Convert two UTF-16 surrogates into one UTF-32 codepoint
@@ -50,7 +50,7 @@ const km_core_usv Uni_MAX_CODEPOINT       = 0x10FFFF;
  * @param cl trail surrogate - Uni_IsSurrogate2(cl) must == true
  * \def Uni_SurrogateToUTF
  */
-#define Uni_SurrogateToUTF32(ch, cl) (((ch) - km::kbp::kmx::Uni_LEAD_SURROGATE_START) * 0x400 + ((cl) - km::kbp::kmx::Uni_TRAIL_SURROGATE_START) + km::kbp::kmx::Uni_SMP_START)
+#define Uni_SurrogateToUTF32(ch, cl) (((ch) - km::core::kmx::Uni_LEAD_SURROGATE_START) * 0x400 + ((cl) - km::core::kmx::Uni_TRAIL_SURROGATE_START) + km::core::kmx::Uni_SMP_START)
 
 /**
  * @brief Convert UTF-32 BMP to UTF-16 BMP
@@ -59,8 +59,8 @@ const km_core_usv Uni_MAX_CODEPOINT       = 0x10FFFF;
  */
 #define Uni_UTF32BMPToUTF16(ch) ((ch) & Uni_FFFF_NONCHARACTER)
 
-#define Uni_UTF32ToSurrogate1(ch) (char16_t)(((ch) - km::kbp::kmx::Uni_SMP_START) / 0x400 + km::kbp::kmx::Uni_LEAD_SURROGATE_START)
-#define Uni_UTF32ToSurrogate2(ch) (char16_t)(((ch) - km::kbp::kmx::Uni_SMP_START) % 0x400 + km::kbp::kmx::Uni_TRAIL_SURROGATE_START)
+#define Uni_UTF32ToSurrogate1(ch) (char16_t)(((ch) - km::core::kmx::Uni_SMP_START) / 0x400 + km::core::kmx::Uni_LEAD_SURROGATE_START)
+#define Uni_UTF32ToSurrogate2(ch) (char16_t)(((ch) - km::core::kmx::Uni_SMP_START) % 0x400 + km::core::kmx::Uni_TRAIL_SURROGATE_START)
 
 /**
  * @returns true if the character is a noncharacter
@@ -224,5 +224,5 @@ inline bool Uni_IsValid(km_core_usv start, km_core_usv end) {
 
 
 } // namespace kmx
-} // namespace kbp
+} // namespace core
 } // namespace km

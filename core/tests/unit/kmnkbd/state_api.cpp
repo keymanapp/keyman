@@ -112,7 +112,7 @@ int main(int argc, char * argv[])
   km_core_keyboard * test_kb = nullptr;
   km_core_state * test_state = nullptr,
                * test_clone = nullptr;
-  try_status(km_core_keyboard_load(km::kbp::path("dummy.mock").c_str(), &test_kb));
+  try_status(km_core_keyboard_load(km::core::path("dummy.mock").c_str(), &test_kb));
 
   // Simple sanity tests.
   try_status(km_core_state_create(test_kb, test_env_opts, &test_state));

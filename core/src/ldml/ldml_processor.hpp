@@ -20,7 +20,7 @@
 #include "ldml_transforms.hpp"
 
 namespace km {
-namespace kbp {
+namespace core {
 
 #define KM_CORE_LMDL_PROCESSOR_VERSION u"1.0"
 
@@ -112,5 +112,5 @@ namespace kbp {
      str.insert(0, triple, 3);
   }
 
-} // namespace kbp
+} // namespace core
 } // namespace km

@@ -211,7 +211,7 @@ LdmlEmbeddedTestSource::is_token(const std::string token, std::string &line) {
 }
 
 int
-LdmlEmbeddedTestSource::load_source( const km::kbp::path &path ) {
+LdmlEmbeddedTestSource::load_source( const km::core::path &path ) {
   const std::string s_keys = "@@keys: ";
   const std::string s_expected = "@@expected: ";
   const std::string s_context = "@@context: ";
@@ -290,15 +290,15 @@ key_event
 LdmlTestSource::char_to_event(char ch) {
   assert(ch >= 32);
   return {
-      km::kbp::kmx::s_char_to_vkey[(int)ch - 32].vk,
-      (uint16_t)(km::kbp::kmx::s_char_to_vkey[(int)ch - 32].shifted ? KM_CORE_MODIFIER_SHIFT : 0)};
+      km::core::kmx::s_char_to_vkey[(int)ch - 32].vk,
+      (uint16_t)(km::core::kmx::s_char_to_vkey[(int)ch - 32].shifted ? KM_CORE_MODIFIER_SHIFT : 0)};
 }
 
 uint16_t
 LdmlTestSource::get_modifier(std::string const m) {
-  for (int i = 0; km::kbp::kmx::s_modifier_names[i].name; i++) {
-    if (m == km::kbp::kmx::s_modifier_names[i].name) {
-      return km::kbp::kmx::s_modifier_names[i].modifier;
+  for (int i = 0; km::core::kmx::s_modifier_names[i].name; i++) {
+    if (m == km::core::kmx::s_modifier_names[i].name) {
+      return km::core::kmx::s_modifier_names[i].modifier;
     }
   }
   return 0;
@@ -380,7 +380,7 @@ LdmlEmbeddedTestSource::next_key(std::string &keys) {
 
 class LdmlJsonTestSource : public LdmlTestSource {
 public:
-  LdmlJsonTestSource(const std::string &path, km::kbp::kmx::kmx_plus *kmxplus);
+  LdmlJsonTestSource(const std::string &path, km::core::kmx::kmx_plus *kmxplus);
   virtual ~LdmlJsonTestSource();
   virtual const std::u16string &get_context() const;
   int load(const nlohmann::json &test);
@@ -394,14 +394,14 @@ private:
    * Which action are we on?
   */
   std::size_t action_index = -1;
-  const km::kbp::kmx::kmx_plus *kmxplus;
+  const km::core::kmx::kmx_plus *kmxplus;
   /**
    * Helpers
   */
   void set_key_from_id(key_event& k, const std::u16string& id);
 };
 
-LdmlJsonTestSource::LdmlJsonTestSource(const std::string &path, km::kbp::kmx::kmx_plus *k)
+LdmlJsonTestSource::LdmlJsonTestSource(const std::string &path, km::core::kmx::kmx_plus *k)
 :path(path), kmxplus(k) {
 
 }
@@ -509,7 +509,7 @@ int LdmlJsonTestSource::load(const nlohmann::json &data) {
 #if defined(HAVE_ICU4C)
 class LdmlJsonRepertoireTestSource : public LdmlTestSource {
 public:
-  LdmlJsonRepertoireTestSource(const std::string &path, km::kbp::kmx::kmx_plus *kmxplus);
+  LdmlJsonRepertoireTestSource(const std::string &path, km::core::kmx::kmx_plus *kmxplus);
   virtual ~LdmlJsonRepertoireTestSource();
   virtual const std::u16string &get_context() const;
   int load(const nlohmann::json &test);
@@ -524,14 +524,14 @@ private:
   std::unique_ptr<icu::UnicodeSet> uset;
   std::unique_ptr<icu::UnicodeSetIterator> iterator;
   bool need_check = false; // set this after each char
-  const km::kbp::kmx::kmx_plus *kmxplus;
+  const km::core::kmx::kmx_plus *kmxplus;
   /**
    * Helpers
   */
   void set_key_from_id(key_event& k, const std::u16string& id);
 };
 
-LdmlJsonRepertoireTestSource::LdmlJsonRepertoireTestSource(const std::string &path, km::kbp::kmx::kmx_plus *k)
+LdmlJsonRepertoireTestSource::LdmlJsonRepertoireTestSource(const std::string &path, km::core::kmx::kmx_plus *k)
 :path(path), kmxplus(k){
 
 }
@@ -566,8 +566,8 @@ LdmlJsonRepertoireTestSource::next_action(ldml_action &fillin) {
   // as string for debugging.
   // const icu::UnicodeString& str = iterator->getString();
 
-  km::kbp::kmx::char16_single ch16;
-  std::size_t len = km::kbp::kmx::Utf32CharToUtf16(ch, ch16);
+  km::core::kmx::char16_single ch16;
+  std::size_t len = km::core::kmx::Utf32CharToUtf16(ch, ch16);
   std::u16string chstr = std::u16string(ch16.ch, len);
   // append to expected
   expected.append(chstr);
@@ -661,14 +661,14 @@ int LdmlJsonRepertoireTestSource::load(const nlohmann::json &data) {
 LdmlJsonTestSourceFactory::LdmlJsonTestSourceFactory() : test_map() {
 }
 
-km::kbp::path
-LdmlJsonTestSourceFactory::kmx_to_test_json(const km::kbp::path &kmx) {
-  km::kbp::path p = kmx;
+km::core::path
+LdmlJsonTestSourceFactory::kmx_to_test_json(const km::core::path &kmx) {
+  km::core::path p = kmx;
   p.replace_extension(TEST_JSON_SUFFIX);
   return p;
 }
 
-int LdmlJsonTestSourceFactory::load(const km::kbp::path &compiled, const km::kbp::path &path) {
+int LdmlJsonTestSourceFactory::load(const km::core::path &compiled, const km::core::path &path) {
   std::ifstream json_file(path.native());
   if (!json_file) {
     return -1; // no file
@@ -679,14 +679,14 @@ int LdmlJsonTestSourceFactory::load(const km::kbp::path &compiled, const km::kbp
   }
 
   // check and load the KMX (yes, once again)
-  if(!km::kbp::ldml_processor::is_kmxplus_file(compiled, rawdata)) {
+  if(!km::core::ldml_processor::is_kmxplus_file(compiled, rawdata)) {
     std::cerr << "Reading KMX for test purposes failed: " << compiled << std::endl;
     return __LINE__;
   }
 
-  auto comp_keyboard = (const km::kbp::kmx::COMP_KEYBOARD*)rawdata.data();
+  auto comp_keyboard = (const km::core::kmx::COMP_KEYBOARD*)rawdata.data();
   // initialize the kmxplus object with our copy
-  kmxplus.reset(new km::kbp::kmx::kmx_plus(comp_keyboard, rawdata.size()));
+  kmxplus.reset(new km::core::kmx::kmx_plus(comp_keyboard, rawdata.size()));
 
   if (!kmxplus->is_valid()) {
     std::cerr << "kmx_plus invalid" << std::endl;
