@@ -3,10 +3,10 @@ import { type KeyElement } from '../../../keyElement.js';
 import OSKBaseKey from '../../../keyboard-layout/oskBaseKey.js';
 import VisualKeyboard from '../../../visualKeyboard.js';
 
-import { DeviceSpec, KeyEvent, ActiveSubKey, KeyDistribution } from '@keymanapp/keyboard-processor';
+import { DeviceSpec, KeyEvent, ActiveSubKey, KeyDistribution, ActiveKeyBase } from '@keymanapp/keyboard-processor';
 import { ConfigChangeClosure, GestureRecognizerConfiguration, GestureSequence, PaddedZoneSource } from '@keymanapp/gesture-recognizer';
 import { GestureHandler } from '../gestureHandler.js';
-import { CorrectionLayout, CorrectionLayoutEntry, distributionFromDistanceMap, keyTouchDistances } from '@keymanapp/input-processor';
+import { CorrectionLayout, CorrectionLayoutEntry, distributionFromDistanceMaps, keyTouchDistances } from '@keymanapp/input-processor';
 import { GestureParams } from '../specsForLayout.js';
 
 /**
@@ -381,8 +381,9 @@ export default class SubkeyPopup implements GestureHandler {
 
     // Lock the coordinate within base-element bounds; corrects for the allowed 'popup roaming' zone.
     //
-    // To consider:  add a 'clipping' feature to `keyTouchDistances`?  It'd make sense for base keys,
-    // too.
+    // To consider:  add a 'clipping' feature to `keyTouchDistances`?  It could make sense for base
+    // keys, too - especially when emulating a touch OSK via the inline-OSK mode used in the
+    // Developer host page.
     mappedCoord.x = mappedCoord.x < 0 ? 0 : (mappedCoord.x > 1 ? 1: mappedCoord.x);
     mappedCoord.y = mappedCoord.y < 0 ? 0 : (mappedCoord.y > 1 ? 1: mappedCoord.y);
 
@@ -418,17 +419,17 @@ export default class SubkeyPopup implements GestureHandler {
     const baseKeyDistance = currentKeyDist + layerDistance;
 
     // Include the base key as a corrective option.
+    const baseKeyMap = new Map<ActiveKeyBase, number>();
     const subkeyMatch = this.subkeys.find((entry) => entry.keyId == this.baseKey.keyId);
     if(subkeyMatch) {
-      const distAsSubkey = rawSqDistances.get(subkeyMatch.key.spec);
-      if(distAsSubkey > baseKeyDistance) {
-        rawSqDistances.set(subkeyMatch.key.spec, distAsSubkey);
-      } // else make no changes
+      // Ensure that the base key's entry can be merged with that of its subkey.
+      // (Assuming that always makes sense.)
+      baseKeyMap.set(subkeyMatch.key.spec, baseKeyDistance);
     } else {
-      rawSqDistances.set(this.baseKey.key.spec, currentKeyDist + layerDistance);
+      baseKeyMap.set(this.baseKey.key.spec, baseKeyDistance);
     }
-    // TODO:  allow use of multiple maps for distance combining instead!
-    return distributionFromDistanceMap(rawSqDistances);
+
+    return distributionFromDistanceMaps([rawSqDistances, baseKeyMap]);
   }
 
   cancel() {

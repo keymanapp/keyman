@@ -66,20 +66,26 @@ export function keyTouchDistances(touchCoords: {x: number, y: number}, correctiv
  * consideration.
  * @returns
  */
-export function distributionFromDistanceMap(squaredDistMap: Map<ActiveKeyBase, number>): KeyDistribution {
+export function distributionFromDistanceMaps(squaredDistMaps: Map<ActiveKeyBase, number> | Map<ActiveKeyBase, number>[]): KeyDistribution {
   const keyProbs = new Map<ActiveKeyBase, number>();
   let totalMass = 0;
 
-  // Should we wish to allow multiple different transforms for distance -> probability, use a function parameter in place
-  // of the formula in the loop below.
-  for(let key of squaredDistMap.keys()) {
-    // We've found that in practice, dist^-4 seems to work pretty well.  (Our input has dist^2.)
-    // (Note:  our rule of thumb here has only been tested for layout-based distances.)
-    const entry = 1 / (Math.pow(squaredDistMap.get(key), 2) + 1e-6); // Prevent div-by-0 errors.
-    totalMass += entry;
+  if(!Array.isArray(squaredDistMaps)) {
+    squaredDistMaps = [squaredDistMaps];
+  }
 
-    // In case of duplicate key IDs.
-    keyProbs.set(key, keyProbs.get(key) ?? 0 + entry);
+  for(let squaredDistMap of squaredDistMaps) {
+    // Should we wish to allow multiple different transforms for distance -> probability, use a function parameter in place
+    // of the formula in the loop below.
+    for(let key of squaredDistMap.keys()) {
+      // We've found that in practice, dist^-4 seems to work pretty well.  (Our input has dist^2.)
+      // (Note:  our rule of thumb here has only been tested for layout-based distances.)
+      const entry = 1 / (Math.pow(squaredDistMap.get(key), 2) + 1e-6); // Prevent div-by-0 errors.
+      totalMass += entry;
+
+      // In case of duplicate key IDs; this can occur if multiple sets are specified.
+      keyProbs.set(key, keyProbs.get(key) ?? 0 + entry);
+    }
   }
 
   const list: {keySpec: ActiveKeyBase, p: number}[] = [];

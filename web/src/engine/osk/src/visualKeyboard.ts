@@ -15,7 +15,7 @@ import {
   LayoutKey
 } from '@keymanapp/keyboard-processor';
 
-import { buildCorrectiveLayout, distributionFromDistanceMap, keyTouchDistances } from '@keymanapp/input-processor';
+import { buildCorrectiveLayout, distributionFromDistanceMaps, keyTouchDistances } from '@keymanapp/input-processor';
 
 import {
   GestureRecognizer,
@@ -768,7 +768,7 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
 
     const correctiveLayout = buildCorrectiveLayout(this.kbdLayout.getLayer(this.layerId), kbdAspectRatio);
     const rawSqDistances = keyTouchDistances(touchKbdPos, correctiveLayout);
-    return distributionFromDistanceMap(rawSqDistances);
+    return distributionFromDistanceMaps(rawSqDistances);
   }
 
   //#region Input handling start
