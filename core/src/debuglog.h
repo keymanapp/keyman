@@ -1,5 +1,7 @@
 /* Debugging */
 
+#pragma once
+
 #include <keyman/keyman_core_api_bits.h>
 
 namespace km {

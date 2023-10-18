@@ -468,9 +468,7 @@ LdmlJsonTestSource::next_action(ldml_action &fillin) {
   if (as_check.is_string()) {
     fillin.type   = LDML_ACTION_CHECK_EXPECTED;
     fillin.string = LdmlTestSource::parse_u8_source_string(as_check.get<std::string>());
-    UErrorCode status = U_ZERO_ERROR;
-    km::kbp::ldml::normalize_nfc(fillin.string, status);
-    assert(U_SUCCESS(status));
+    assert(km::kbp::ldml::normalize_nfc(fillin.string));
     return;
   }
 
@@ -489,8 +487,7 @@ LdmlJsonTestSource::next_action(ldml_action &fillin) {
   if (as_emit.is_string()) {
     fillin.type   = LDML_ACTION_EMIT_STRING;
     fillin.string = LdmlTestSource::parse_u8_source_string(as_emit.get<std::string>());
-    UErrorCode status = U_ZERO_ERROR;
-    km::kbp::ldml::normalize_nfc(fillin.string, status);
+    assert(km::kbp::ldml::normalize_nfc(fillin.string));
     return;
   }
 
@@ -508,8 +505,7 @@ int LdmlJsonTestSource::load(const nlohmann::json &data) {
   this->data        = data;  // TODO-LDML
   auto startContext = data["/startContext/to"_json_pointer];
   context = LdmlTestSource::parse_u8_source_string(startContext);
-  UErrorCode status = U_ZERO_ERROR;
-  km::kbp::ldml::normalize_nfc(context, status);
+  assert(km::kbp::ldml::normalize_nfc(context));
   return 0;
 }
 

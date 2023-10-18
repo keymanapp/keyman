@@ -13,6 +13,7 @@
 #include <string>
 #include <unordered_map>
 #include <utility>
+#include "debuglog.h"
 
 #if !defined(HAVE_ICU4C)
 #error icu4c is required for this code
@@ -30,6 +31,13 @@
 namespace km {
 namespace kbp {
 namespace ldml {
+
+// macro for working with ICU calls
+#define UASSERT_SUCCESS(status) \
+  if (U_FAILURE(status)) { \
+    DebugLog("U_FAILURE(%s)", u_errorName(status)); \
+    assert(U_SUCCESS(status)); \
+  }
 
 using km::kbp::kmx::SimpleUSet;
 
@@ -273,14 +281,14 @@ public:
 
 // string routines
 
-/** Normalize a u32string inplace to NFD. Returns a reference to the same string. */
-std::u32string &normalize_nfd(std::u32string &str, UErrorCode &status);
-/** Normalize a u16string inplace to NFD. Returns a reference to the same string. */
-std::u16string &normalize_nfd(std::u16string &str, UErrorCode &status);
-/** Normalize a u32string inplace to NFC. Returns a reference to the same string. */
-std::u32string &normalize_nfc(std::u32string &str, UErrorCode &status);
-/** Normalize a u16string inplace to NFC. Returns a reference to the same string. */
-std::u16string &normalize_nfc(std::u16string &str, UErrorCode &status);
+/** Normalize a u32string inplace to NFD. @return false on failure */
+bool normalize_nfd(std::u32string &str);
+/** Normalize a u16string inplace to NFD. @return false on failure */
+bool normalize_nfd(std::u16string &str);
+/** Normalize a u32string inplace to NFC. @return false on failure */
+bool normalize_nfc(std::u32string &str);
+/** Normalize a u16string inplace to NFC. @return false on failure */
+bool normalize_nfc(std::u16string &str);
 
 }  // namespace ldml
 }  // namespace kbp

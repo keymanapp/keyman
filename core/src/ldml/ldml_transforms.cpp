@@ -470,7 +470,7 @@ transform_entry::init() {
     // NFD normalize on pattern creation
     nfd->normalize(patustr_raw, patustr, status);
     fFromPattern.reset(icu::RegexPattern::compile(patustr, 0, status));
-    assert(U_SUCCESS(status)); // TODO-LDML: may be best to propagate status up ^^
+    UASSERT_SUCCESS(status);
   }
 }
 
@@ -484,7 +484,7 @@ transform_entry::apply(const std::u32string &input, std::u32string &output) cons
   icu::UnicodeString matchustr  = icu::UnicodeString(matchstr.data(), (int32_t)matchstr.length());
   // TODO-LDML: create a new Matcher every time. These could be cached and reset.
   std::unique_ptr<icu::RegexMatcher> matcher(fFromPattern->matcher(matchustr, status));
-  assert(U_SUCCESS(status));
+  UASSERT_SUCCESS(status);
 
   if (!matcher->find(status)) { // i.e. matches somewhere, in this case at end of str
     return 0; // no match
@@ -494,7 +494,7 @@ transform_entry::apply(const std::u32string &input, std::u32string &output) cons
   // TODO-LDML: if we had an underlying UText this would be simpler.
   int32_t matchStart = matcher->start(status);
   int32_t matchEnd   = matcher->end(status);
-  assert(U_SUCCESS(status));
+  UASSERT_SUCCESS(status);
   // extract..
   const icu::UnicodeString substr = matchustr.tempSubStringBetween(matchStart, matchEnd);
   // preflight to UTF-32 to get length
@@ -521,7 +521,7 @@ transform_entry::apply(const std::u32string &input, std::u32string &output) cons
     // we actually need the group(1) string here.
     // this is only the content in parenthesis ()
     icu::UnicodeString group1 = matcher->group(1, status);
-    assert(U_SUCCESS(status)); // TODO-LDML: could be a malformed from pattern
+    UASSERT_SUCCESS(status); // TODO-LDML: could be a malformed from pattern
     // now, how long is group1 in UTF-32, hmm?
     UErrorCode preflightStatus = U_ZERO_ERROR; // throwaway status
     auto group1Len             = group1.toUTF32(nullptr, 0, preflightStatus);
@@ -529,7 +529,7 @@ transform_entry::apply(const std::u32string &input, std::u32string &output) cons
     assert(s != nullptr); // TODO-LDML: OOM
     // convert
     substr.toUTF32((UChar32 *)s, group1Len + 1, status);
-    assert(U_SUCCESS(status));
+    UASSERT_SUCCESS(status);
     std::u32string match32(s, group1Len); // taken from just group1
     // clean up buffer
     delete [] s;
@@ -552,10 +552,10 @@ transform_entry::apply(const std::u32string &input, std::u32string &output) cons
   const icu::Normalizer2 *nfd = icu::Normalizer2::getNFDInstance(status);
   icu::UnicodeString rustr2;
   nfd->normalize(rustr, rustr2, status);
-  assert(U_SUCCESS(status));
+  UASSERT_SUCCESS(status);
   // here we replace the match output.
   icu::UnicodeString entireOutput = matcher->replaceFirst(rustr2, status);
-  assert(U_SUCCESS(status)); // TODO-LDML: could fail here due to bad input (syntax err)
+  UASSERT_SUCCESS(status); // TODO-LDML: could fail here due to bad input (syntax err)
 
   // entireOutput includes all of 'input', but modified. Need to substring it.
   icu::UnicodeString outu_raw = entireOutput.tempSubString(matchStart);
@@ -563,7 +563,7 @@ transform_entry::apply(const std::u32string &input, std::u32string &output) cons
   // normalize the replaced string
   icu::UnicodeString outu;
   nfd->normalize(outu_raw, outu, status);
-  assert(U_SUCCESS(status));
+  UASSERT_SUCCESS(status);
 
   // Special case if there's no output, save some allocs
   if (outu.length() == 0) {
@@ -578,7 +578,7 @@ transform_entry::apply(const std::u32string &input, std::u32string &output) cons
     assert(s != nullptr);
     // convert
     outu.toUTF32((UChar32 *)s, out32len + 1, status);
-    assert(U_SUCCESS(status));
+    UASSERT_SUCCESS(status);
     output.assign(s, out32len);
     // now, build a u32string
     std::u32string out32(s, out32len);
@@ -844,66 +844,55 @@ transforms::load(
   return transforms;
 }
 
-// string
+// string manipulation
 
-// TODO-LDML: copypasta -> refactor
-std::u32string &normalize_nfd(std::u32string &str, UErrorCode &status) {
+bool normalize_nfd(std::u32string &str) {
   std::u16string rstr = km::kbp::kmx::u32string_to_u16string(str);
 
-  normalize_nfd(rstr, status);
-  if (U_SUCCESS(status)) {
-    // if failure, leave it alone
+  if(!normalize_nfd(rstr)) {
+    return false;
+  } else {
     str = km::kbp::kmx::u16string_to_u32string(rstr);
+    return true;
   }
-  return str;
 }
 
-// TODO-LDML: copypasta -> refactor
-std::u16string &normalize_nfd(std::u16string &str, UErrorCode &status) {
+bool normalize_nfd(std::u16string &str) {
+  UErrorCode status = U_ZERO_ERROR;
   const icu::Normalizer2 *nfd = icu::Normalizer2::getNFDInstance(status);
-  if (U_FAILURE(status)) {
-    return str;
-  }
+  UASSERT_SUCCESS(status);
+  if (U_FAILURE(status)) return false; // exit early since normalizer pointer could be nullptr
   icu::UnicodeString dest;
   icu::UnicodeString src = icu::UnicodeString(str.data(), (int32_t)str.length());
   nfd->normalize(src, dest, status);
-  if (U_FAILURE(status)) {
-    return str;
-  }
+  UASSERT_SUCCESS(status);
   str.assign(dest.getBuffer(), dest.length());
-  return str;
+  return U_SUCCESS(status);
 }
 
-// TODO-LDML: copypasta -> refactor
-std::u32string &normalize_nfc(std::u32string &str, UErrorCode &status) {
+bool normalize_nfc(std::u32string &str) {
   std::u16string rstr = km::kbp::kmx::u32string_to_u16string(str);
-
-  normalize_nfc(rstr, status);
-  if (U_SUCCESS(status)) {
-    // if failure, leave it alone
+  if(!normalize_nfc(rstr)) {
+    return false;
+  } else {
     str = km::kbp::kmx::u16string_to_u32string(rstr);
+    return true;
   }
-  return str;
 }
 
-// TODO-LDML: copypasta -> refactor
-std::u16string &normalize_nfc(std::u16string &str, UErrorCode &status) {
+bool normalize_nfc(std::u16string &str) {
+  UErrorCode status = U_ZERO_ERROR;
   const icu::Normalizer2 *nfc = icu::Normalizer2::getNFCInstance(status);
-  if (U_FAILURE(status)) {
-    return str;
-  }
+  UASSERT_SUCCESS(status);
+  if (U_FAILURE(status)) return false; // exit early since normalizer pointer could be nullptr
+
   icu::UnicodeString dest;
   icu::UnicodeString src = icu::UnicodeString(str.data(), (int32_t)str.length());
   nfc->normalize(src, dest, status);
-  if (U_FAILURE(status)) {
-    return str;
-  }
+  UASSERT_SUCCESS(status);
   str.assign(dest.getBuffer(), dest.length());
-  return str;
+  return U_SUCCESS(status);
 }
-
-
-
 
 }  // namespace ldml
 }  // namespace kbp
