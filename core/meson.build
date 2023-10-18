@@ -1,5 +1,5 @@
 # Copyright:    © 2018-2022 SIL International.
-# Description:  Cross platform build script to compile libkmnkbp, documentation
+# Description:  Cross platform build script to compile libkeymancore, documentation
 #               and tests.
 # Create Date:  2 Oct 2018
 # Authors:      Tim Eves (TSE)
@@ -19,7 +19,7 @@ project('keyboardprocessor', 'cpp', 'c',
 # meson doesn't allow us to reference a file outside its root
 subdir('resources')
 
-lib_version = '0.0.0'
+lib_version = '1.0.0'
 
 py = import('python')
 python = py.find_installation()

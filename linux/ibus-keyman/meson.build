@@ -18,8 +18,8 @@ icu =            dependency('icu-i18n')
 core_dir = meson.current_source_dir() / '../../core'
 common_dir = meson.current_source_dir() / '../../common'
 
-kmnkbp_lib = cc.find_library(
-  'kmnkbp0', # meson will prefix 'lib'
+keymancore_lib = cc.find_library(
+  'keymancore', # meson will prefix 'lib'
   dirs: [ core_dir / 'build/arch' / get_option('buildtype') / 'src' ]
 )
 

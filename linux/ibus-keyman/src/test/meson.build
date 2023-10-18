@@ -3,7 +3,7 @@ keymanutil_sources = [
   util_files,
 ]
 
-keymanutil_deps = [gtk, ibus, icu, json_glib, kmnkbp_lib]
+keymanutil_deps = [gtk, ibus, icu, json_glib, keymancore_lib]
 
 test_env = [
   'G_TEST_SRCDIR=' + meson.current_source_dir(),

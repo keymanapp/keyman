@@ -63,7 +63,7 @@ if builder_start_action verify; then
     tmpDir=$(mktemp -d)
     dpkg -x "${BIN_PKG}" "$tmpDir"
     cd debian
-    dpkg-gensymbols -v"${PKG_VERSION}" -plibkmnkbp0-0 -e"${tmpDir}"/usr/lib/x86_64-linux-gnu/libkmnkbp0.so* -Olibkmnkbp0-0.symbols -c4
+    dpkg-gensymbols -v"${PKG_VERSION}" -plibkmnkbp0-0 -e"${tmpDir}"/usr/lib/x86_64-linux-gnu/libkeymancore.so* -Olibkmnkbp0-0.symbols -c4
     echo ":heavy_check_mark: libkmnkbp0-0 API didn't change" >&2
   fi
   builder_finish_action success verify
