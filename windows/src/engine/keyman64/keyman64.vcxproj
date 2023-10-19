@@ -18,6 +18,9 @@
     <ClCompile Include="keyman64_proxy.cpp" />
     <ClCompile Include="pch.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Keyman64.RC" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{CE480BDD-E112-488D-8684-ECBA8F46FF87}</ProjectGuid>
     <RootNamespace>Keyman32-ver</RootNamespace>
