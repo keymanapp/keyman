@@ -14,7 +14,7 @@ else
   warns = []
 endif
 
-local_defns = ['-DKMN_CORE_STATIC']
+local_defns = ['-DKM_CORE_LIBRARY_STATIC']
 tests = [
   ['context-api', 'context_api.cpp'],
   ['keyboard-api', 'keyboard_api.cpp'],

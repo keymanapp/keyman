@@ -48,10 +48,10 @@
   #define _KM_CORE_EXT_SEPARATOR ('.')
 #endif
 
-#if defined KMN_CORE_STATIC
+#if defined KM_CORE_LIBRARY_STATIC
   #define KMN_API             _kmn_tag_fn(_kmn_static_flag)
   #define KMN_DEPRECATED_API  _kmn_tag_fn(_kmn_deprecated_flag _kmn_and _kmn_static_flag)
-#elif defined KMN_CORE_EXPORTING
+#elif defined KM_CORE_LIBRARY_EXPORTING
   #define KMN_API             _kmn_tag_fn(_kmn_export_flag)
   #define KMN_DEPRECATED_API  _kmn_tag_fn(_kmn_deprecated_flag _kmn_and _kmn_export_flag)
 #else
@@ -59,8 +59,8 @@
   #define KMN_DEPRECATED_API  _kmn_tag_fn(_kmn_deprecated_flag _kmn_and _kmn_import_flag)
 #endif
 
-#ifndef KMN_CORE
-#define KMN_CORE
+#ifndef KM_CORE_LIBRARY
+#define KM_CORE_LIBRARY
 #endif
 #ifndef USE_CHAR16_T
 #define USE_CHAR16_T
