@@ -261,28 +261,25 @@ ldml_processor::process_event(
 
 void
 ldml_processor::process_key_string(km_core_state *state, const std::u16string &key_str) const {
-  UErrorCode status = U_ZERO_ERROR;
   // We know that key_str is not empty per the caller.
+  assert(!key_str.empty());
 
   // we convert the keys str to UTF-32 here instead of using the emit_text() overload
   // so that we don't have to reconvert it inside the transform code.
   std::u32string key_str32 = kmx::u16string_to_u32string(key_str);
-  // normalize the keystroke to NFD
-  ldml::normalize_nfd(key_str32, status);
+  assert(ldml::normalize_nfd(key_str32)); // TODO-LDML: else fail?
 
   // extract context string, in NFC
   std::u32string old_ctxtstr_nfc;
   (void)context_to_string(state, old_ctxtstr_nfc, false);
-  ldml::normalize_nfc(old_ctxtstr_nfc, status);
-  assert(U_SUCCESS(status));
+  assert(ldml::normalize_nfc(old_ctxtstr_nfc)); // TODO-LDML: else fail?
 
   // context string in NFD
   std::u32string ctxtstr;
   (void)context_to_string(state, ctxtstr, true); // with markers
   // add the newly added key output to ctxtstr
   ctxtstr.append(key_str32);
-  ldml::normalize_nfd(ctxtstr, status);
-  assert(U_SUCCESS(status));
+  assert(ldml::normalize_nfd(ctxtstr)); // TODO-LDML: else fail?
 
   /** transform output string */
   std::u32string outputString;
@@ -300,15 +297,14 @@ ldml_processor::process_key_string(km_core_state *state, const std::u16string &k
   // drop last 'matchedContext':
   ctxtstr.resize(ctxtstr.length() - matchedContext);
   ctxtstr.append(outputString); // TODO-LDML: should be able to do a normalization-safe append here.
-  ldml::normalize_nfd(ctxtstr, status);
-  assert(U_SUCCESS(status));
+  assert(ldml::normalize_nfd(ctxtstr)); // TODO-LDML: else fail?
 
   // Ok. We've done all the happy manipulations.
 
   /** NFC and no markers */
   std::u32string ctxtstr_cleanedup = ctxtstr;
   // TODO-LDML: remove markers!
-  ldml::normalize_nfc(ctxtstr_cleanedup, status);
+  assert(ldml::normalize_nfc(ctxtstr_cleanedup)); // TODO-LDML: else fail?
 
   // find common prefix
   auto ctxt_prefix = mismatch(old_ctxtstr_nfc.begin(), old_ctxtstr_nfc.end(), ctxtstr_cleanedup.begin(), ctxtstr_cleanedup.end());
@@ -342,9 +338,12 @@ ldml_processor::remove_text(km_core_state *state, std::u32string &str, size_t le
       assert(length >= 3);
       assert(lastCtx == c->marker);  // end of list
       length -= 3;
-      // pop off the three-part sentinel string
+      // pop off the three-part sentinel string (in reverse order of course)
+      assert(str.back() == c->marker); // marker #
       str.pop_back();
+      assert(str.back() == LDML_MARKER_CODE);
       str.pop_back();
+      assert(str.back() == LDML_UC_SENTINEL);
       str.pop_back();
       // push a special backspace to delete the marker
       state->actions().push_backspace(KM_CORE_BT_MARKER, c->marker);

@@ -1,5 +1,23 @@
 # Keyman Version History
 
+## 17.0.194 alpha 2023-10-18
+
+* chore(linux): Re-enable building for Ubuntu 23.10 Mantic (#9780)
+* chore(linux): Add missing tests (#9783)
+* fix(web): fixes touch form-factor default kbd on cookieless keymanweb.com page load (#9786)
+* fix(developer): three kmc .keyboard_info generation bugs (#9784)
+* fix(developer): handle invalid project folders cleanly (#9785)
+* chore(linux): Fix build scripts (#9781)
+
+## 17.0.193 alpha 2023-10-17
+
+* fix(developer): kmc crash on start (#9771)
+* fix(core): don't use double newlines in debuglog (#9258)
+* chore(linux): Add code coverage index page (#9758)
+* feat(linux): Allow installing keyboards with arbitrary language  ️ (#9756)
+* fix(linux): Fix crash initializing Sentry with Python < 3.10 (#9774)
+* chore(linux): Rename `kbp_state_get_intermediate_context` to `km_core…`  ️ (#9775)
+
 ## 17.0.192 alpha 2023-10-16
 
 * fix(ios): missing backslash in build script (#9765)

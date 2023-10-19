@@ -12,7 +12,7 @@
 #include "kmx/kmx_xstring.h"
 
 #ifndef assert
-#define assert(x)  // TODO-LDML
+#define assert(x) ((void)0)
 #endif
 
 namespace km {
@@ -403,7 +403,7 @@ transform_entry::transform_entry(const transform_entry &other)
 
 transform_entry::transform_entry(const std::u32string &from, const std::u32string &to)
     : fFrom(from), fTo(to), fFromPattern(nullptr), fMapFromStrId(), fMapToStrId(), fMapFromList(), fMapToList() {
-  assert(!fFrom.empty()); // TODO-LDML: should not happen?
+  assert(!fFrom.empty());
 
   init();
 }
@@ -414,14 +414,16 @@ transform_entry::transform_entry(
     const std::u32string &to,
     KMX_DWORD mapFrom,
     KMX_DWORD mapTo,
-    const kmx::kmx_plus &kplus)
+    const kmx::kmx_plus &kplus,
+    bool &valid)
     : fFrom(from), fTo(to), fFromPattern(nullptr), fMapFromStrId(mapFrom), fMapToStrId(mapTo) {
+  valid = false;
   assert(!fFrom.empty()); // TODO-LDML: should not happen?
   assert((fMapFromStrId == 0) == (fMapToStrId == 0));  // we have both or we have neither.
   assert(kplus.strs != nullptr);
   assert(kplus.vars != nullptr);
   assert(kplus.elem != nullptr);
-  init();
+  valid = init();
 
   // setup mapFrom
   if (fMapFromStrId != 0) {
@@ -456,7 +458,7 @@ transform_entry::transform_entry(
   }
 }
 
-void
+bool
 transform_entry::init() {
   if (!fFrom.empty()) {
     // TODO-LDML: if we have mapFrom, may need to do other processing.
@@ -470,8 +472,9 @@ transform_entry::init() {
     // NFD normalize on pattern creation
     nfd->normalize(patustr_raw, patustr, status);
     fFromPattern.reset(icu::RegexPattern::compile(patustr, 0, status));
-    assert(U_SUCCESS(status)); // TODO-LDML: may be best to propagate status up ^^
+    return (UASSERT_SUCCESS(status));
   }
+  return false; // fFrom should not be empty.
 }
 
 size_t
@@ -484,7 +487,7 @@ transform_entry::apply(const std::u32string &input, std::u32string &output) cons
   icu::UnicodeString matchustr  = icu::UnicodeString(matchstr.data(), (int32_t)matchstr.length());
   // TODO-LDML: create a new Matcher every time. These could be cached and reset.
   std::unique_ptr<icu::RegexMatcher> matcher(fFromPattern->matcher(matchustr, status));
-  assert(U_SUCCESS(status));
+  UASSERT_SUCCESS(status);
 
   if (!matcher->find(status)) { // i.e. matches somewhere, in this case at end of str
     return 0; // no match
@@ -494,7 +497,7 @@ transform_entry::apply(const std::u32string &input, std::u32string &output) cons
   // TODO-LDML: if we had an underlying UText this would be simpler.
   int32_t matchStart = matcher->start(status);
   int32_t matchEnd   = matcher->end(status);
-  assert(U_SUCCESS(status));
+  UASSERT_SUCCESS(status);
   // extract..
   const icu::UnicodeString substr = matchustr.tempSubStringBetween(matchStart, matchEnd);
   // preflight to UTF-32 to get length
@@ -521,7 +524,7 @@ transform_entry::apply(const std::u32string &input, std::u32string &output) cons
     // we actually need the group(1) string here.
     // this is only the content in parenthesis ()
     icu::UnicodeString group1 = matcher->group(1, status);
-    assert(U_SUCCESS(status)); // TODO-LDML: could be a malformed from pattern
+    UASSERT_SUCCESS(status); // TODO-LDML: could be a malformed from pattern
     // now, how long is group1 in UTF-32, hmm?
     UErrorCode preflightStatus = U_ZERO_ERROR; // throwaway status
     auto group1Len             = group1.toUTF32(nullptr, 0, preflightStatus);
@@ -529,7 +532,7 @@ transform_entry::apply(const std::u32string &input, std::u32string &output) cons
     assert(s != nullptr); // TODO-LDML: OOM
     // convert
     substr.toUTF32((UChar32 *)s, group1Len + 1, status);
-    assert(U_SUCCESS(status));
+    UASSERT_SUCCESS(status);
     std::u32string match32(s, group1Len); // taken from just group1
     // clean up buffer
     delete [] s;
@@ -552,10 +555,10 @@ transform_entry::apply(const std::u32string &input, std::u32string &output) cons
   const icu::Normalizer2 *nfd = icu::Normalizer2::getNFDInstance(status);
   icu::UnicodeString rustr2;
   nfd->normalize(rustr, rustr2, status);
-  assert(U_SUCCESS(status));
+  UASSERT_SUCCESS(status);
   // here we replace the match output.
   icu::UnicodeString entireOutput = matcher->replaceFirst(rustr2, status);
-  assert(U_SUCCESS(status)); // TODO-LDML: could fail here due to bad input (syntax err)
+  UASSERT_SUCCESS(status); // TODO-LDML: could fail here due to bad input (syntax err)
 
   // entireOutput includes all of 'input', but modified. Need to substring it.
   icu::UnicodeString outu_raw = entireOutput.tempSubString(matchStart);
@@ -563,7 +566,7 @@ transform_entry::apply(const std::u32string &input, std::u32string &output) cons
   // normalize the replaced string
   icu::UnicodeString outu;
   nfd->normalize(outu_raw, outu, status);
-  assert(U_SUCCESS(status));
+  UASSERT_SUCCESS(status);
 
   // Special case if there's no output, save some allocs
   if (outu.length() == 0) {
@@ -578,7 +581,7 @@ transform_entry::apply(const std::u32string &input, std::u32string &output) cons
     assert(s != nullptr);
     // convert
     outu.toUTF32((UChar32 *)s, out32len + 1, status);
-    assert(U_SUCCESS(status));
+    UASSERT_SUCCESS(status);
     output.assign(s, out32len);
     // now, build a u32string
     std::u32string out32(s, out32len);
@@ -767,35 +770,34 @@ transforms::load(
     const kmx::kmx_plus &kplus,
     const kbp::kmx::COMP_KMXPLUS_TRAN *tran,
     const kbp::kmx::COMP_KMXPLUS_TRAN_Helper &tranHelper) {
+  bool valid = true;
   if (tran == nullptr) {
     DebugLog("for tran: tran is null");
-    assert(false);
-    return nullptr;
-  }
-  if (!tranHelper.valid()) {
+    valid = false;
+  } else if (!tranHelper.valid()) {
     DebugLog("for tran: tranHelper is invalid");
-    assert(false);
-    return nullptr;
-  }
-  if (nullptr == kplus.elem) {
+    valid = false;
+  } else if (nullptr == kplus.elem) {
     DebugLog("for tran: kplus.elem == nullptr");
-    assert(false);
-    return nullptr;
-  }
-  if (nullptr == kplus.strs) {
+    valid = false;
+  } else if (nullptr == kplus.strs) {
     DebugLog("for tran: kplus.strs == nullptr");  // need a string table to get strings
-    assert(false);
-    return nullptr;
-  }
-  if (nullptr == kplus.vars) {
+    valid = false;
+  } else if (nullptr == kplus.vars) {
     DebugLog("for tran: kplus.vars == nullptr");  // need a vars table to get maps
-    assert(false);
+    valid = false;
+  }
+
+  assert(valid);
+  if (!valid) {
     return nullptr;
   }
 
   // with that out of the way, let's set it up
 
-  transforms *transforms = new ldml::transforms();
+  std::unique_ptr<transforms> transforms;
+
+  transforms.reset(new ldml::transforms());
 
   for (KMX_DWORD groupNumber = 0; groupNumber < tran->groupCount; groupNumber++) {
     const kmx::COMP_KMXPLUS_TRAN_GROUP *group = tranHelper.getGroup(groupNumber);
@@ -811,7 +813,11 @@ transforms::load(
         const std::u32string toStr                      = kmx::u16string_to_u32string(kplus.strs->get(element->to));
         KMX_DWORD mapFrom                               = element->mapFrom; // copy, because of alignment
         KMX_DWORD mapTo                                 = element->mapTo;   // copy, because of alignment
-        newGroup.emplace_back(fromStr, toStr, mapFrom, mapTo, kplus);  // creating a transform_entry
+        newGroup.emplace_back(fromStr, toStr, mapFrom, mapTo, kplus, valid);  // creating a transform_entry
+        assert(valid);
+        if(!valid) {
+          return nullptr;
+        }
       }
       transforms->addGroup(newGroup);
     } else if (group->type == LDML_TRAN_GROUP_TYPE_REORDER) {
@@ -841,101 +847,62 @@ transforms::load(
       return nullptr;
     }
   }
-  return transforms;
+  assert(valid);
+  if (!valid) {
+    return nullptr;
+  } else {
+    return transforms.release();
+  }
 }
 
-// string
+// string manipulation
 
-// TODO-LDML: copypasta -> refactor
-std::u32string &normalize_nfd(std::u32string &str, UErrorCode &status) {
-  const icu::Normalizer2 *nfd = icu::Normalizer2::getNFDInstance(status);
-  if (U_FAILURE(status)) {
-    return str;
+bool normalize_nfd(std::u32string &str) {
+  std::u16string rstr = km::kbp::kmx::u32string_to_u16string(str);
+  if(!normalize_nfd(rstr)) {
+    return false;
+  } else {
+    str = km::kbp::kmx::u16string_to_u32string(rstr);
+    return true;
   }
-  icu::UnicodeString dest;
-  const std::u16string rstr = km::kbp::kmx::u32string_to_u16string(str);
-  icu::UnicodeString src = icu::UnicodeString(rstr.data(), (int32_t)rstr.length());
-  nfd->normalize(src, dest, status);
-  if (U_FAILURE(status)) {
-    return str;
-  }
-
-  UErrorCode preflightStatus = U_ZERO_ERROR;
-  // calculate how big the buffer is
-  auto out32len              = dest.toUTF32(nullptr, 0, preflightStatus); // preflightStatus will be an err, because we know the buffer overruns zero bytes
-  // allocate
-  char32_t *s                = new char32_t[out32len + 1];
-  assert(s != nullptr);
-  // convert
-  dest.toUTF32((UChar32 *)s, out32len + 1, status);
-  assert(U_SUCCESS(status));
-  str.assign(s, out32len);
-  delete [] s;
-  return str;
 }
 
-// TODO-LDML: copypasta -> refactor
-std::u16string &normalize_nfd(std::u16string &str, UErrorCode &status) {
-  const icu::Normalizer2 *nfd = icu::Normalizer2::getNFDInstance(status);
-  if (U_FAILURE(status)) {
-    return str;
-  }
+/** internal function to normalize with a specified mode */
+static bool normalize(const icu::Normalizer2 *n, std::u16string &str, UErrorCode &status) {
+  UASSERT_SUCCESS(status);
+  assert(n != nullptr);
   icu::UnicodeString dest;
   icu::UnicodeString src = icu::UnicodeString(str.data(), (int32_t)str.length());
-  nfd->normalize(src, dest, status);
-  if (U_FAILURE(status)) {
-    return str;
+  n->normalize(src, dest, status);
+  if (UASSERT_SUCCESS(status)) {
+    str.assign(dest.getBuffer(), dest.length());
   }
-  str.assign(dest.getBuffer(), dest.length());
-  return str;
+  return U_SUCCESS(status);
 }
 
-// TODO-LDML: copypasta -> refactor
-std::u32string &normalize_nfc(std::u32string &str, UErrorCode &status) {
+bool normalize_nfd(std::u16string &str) {
+  UErrorCode status = U_ZERO_ERROR;
+  const icu::Normalizer2 *nfd = icu::Normalizer2::getNFDInstance(status);
+  UASSERT_SUCCESS(status);
+  return normalize(nfd, str, status);
+}
+
+bool normalize_nfc(std::u32string &str) {
+  std::u16string rstr = km::kbp::kmx::u32string_to_u16string(str);
+  if(!normalize_nfc(rstr)) {
+    return false;
+  } else {
+    str = km::kbp::kmx::u16string_to_u32string(rstr);
+    return true;
+  }
+}
+
+bool normalize_nfc(std::u16string &str) {
+  UErrorCode status = U_ZERO_ERROR;
   const icu::Normalizer2 *nfc = icu::Normalizer2::getNFCInstance(status);
-  if (U_FAILURE(status)) {
-    return str;
-  }
-  icu::UnicodeString dest;
-  const std::u16string rstr = km::kbp::kmx::u32string_to_u16string(str);
-  icu::UnicodeString src = icu::UnicodeString(rstr.data(), (int32_t)rstr.length());
-  nfc->normalize(src, dest, status);
-  if (U_FAILURE(status)) {
-    return str;
-  }
-
-  UErrorCode preflightStatus = U_ZERO_ERROR;
-  // calculate how big the buffer is
-  auto out32len              = dest.toUTF32(nullptr, 0, preflightStatus); // preflightStatus will be an err, because we know the buffer overruns zero bytes
-  // allocate
-  char32_t *s                = new char32_t[out32len + 1];
-  assert(s != nullptr);
-  // convert
-  dest.toUTF32((UChar32 *)s, out32len + 1, status);
-  assert(U_SUCCESS(status));
-  str.assign(s, out32len);
-  delete [] s;
-  return str;
+  UASSERT_SUCCESS(status);
+  return normalize(nfc, str, status);
 }
-
-// TODO-LDML: copypasta -> refactor
-std::u16string &normalize_nfc(std::u16string &str, UErrorCode &status) {
-  const icu::Normalizer2 *nfc = icu::Normalizer2::getNFCInstance(status);
-  if (U_FAILURE(status)) {
-    return str;
-  }
-  icu::UnicodeString dest;
-  icu::UnicodeString src = icu::UnicodeString(str.data(), (int32_t)str.length());
-  nfc->normalize(src, dest, status);
-  if (U_FAILURE(status)) {
-    return str;
-  }
-  str.assign(dest.getBuffer(), dest.length());
-  return str;
-}
-
-
-
 
 }  // namespace ldml
 }  // namespace kbp

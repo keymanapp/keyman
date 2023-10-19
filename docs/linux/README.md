@@ -87,6 +87,36 @@ scripts/run-tests
 The `run-tests` script accepts different arguments which can be seen with
 `scripts/run-tests --help`.
 
+### Code Coverage Report
+
+#### Prerequisites
+
+Code coverage reports require some additional tools: lcov, gcovr,
+libdatetime-perl, and coverage.
+
+You can install these with:
+
+```bash
+sudo apt update
+sudo apt install -y lcov libdatetime-perl gcovr
+pip3 install coverage
+```
+
+#### Creating and displaying code coverage reports
+
+All three projects (ibus-keyman, keyman-config, and keyman-system-service)
+can produce code coverage reports.
+
+Run `./build.sh --debug --coverage --report test` to create the report.
+
+**Note:** You might have to run `./build.sh clean` first.
+
+There's also an index page (`linux/CodecoverageReports.html`) that links to all
+three reports. You can run
+`linux/build.sh --debug --coverage --report --open --no-integration test`
+to create the coverage reports for all three Linux projects and open the
+index page in the browser.
+
 ## Running Keyman for Linux
 
 ### Setting up Ibus

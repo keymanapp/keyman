@@ -472,9 +472,7 @@ LdmlJsonTestSource::next_action(ldml_action &fillin) {
   if (type == "check") {
     fillin.type   = LDML_ACTION_CHECK_EXPECTED;
     fillin.string = LdmlTestSource::parse_u8_source_string(result.get<std::string>());
-    UErrorCode status = U_ZERO_ERROR;
-    km::kbp::ldml::normalize_nfc(fillin.string, status);
-    assert(U_SUCCESS(status));
+    assert(km::kbp::ldml::normalize_nfc(fillin.string));
     return;
   } else if (type == "keystroke") {
     fillin.type   = LDML_ACTION_KEY_EVENT;
@@ -485,8 +483,7 @@ LdmlJsonTestSource::next_action(ldml_action &fillin) {
   } else if (type == "emit") {
     fillin.type   = LDML_ACTION_EMIT_STRING;
     fillin.string = LdmlTestSource::parse_u8_source_string(to.get<std::string>());
-    UErrorCode status = U_ZERO_ERROR;
-    km::kbp::ldml::normalize_nfc(fillin.string, status);
+    assert(km::kbp::ldml::normalize_nfc(fillin.string));
     return;
   } else if (type == "backspace") {
     // backspace is handled as a key event
@@ -510,8 +507,7 @@ int LdmlJsonTestSource::load(const nlohmann::json &data) {
   this->data        = data;  // TODO-LDML
   auto startContext = data["/startContext/to"_json_pointer];
   context = LdmlTestSource::parse_u8_source_string(startContext);
-  UErrorCode status = U_ZERO_ERROR;
-  km::kbp::ldml::normalize_nfc(context, status);
+  assert(km::kbp::ldml::normalize_nfc(context));
   return 0;
 }
 

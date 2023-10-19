@@ -1,6 +1,6 @@
 import * as fs from 'fs';
 import { BuildActivity } from './BuildActivity.js';
-import { CompilerCallbacks, KeymanDeveloperProject, KeymanFileTypes } from '@keymanapp/common-types';
+import { CompilerCallbacks, KeymanFileTypes } from '@keymanapp/common-types';
 import { KeyboardInfoCompiler } from '@keymanapp/kmc-keyboard-info';
 import { loadProject } from '../../util/projectLoader.js';
 import { InfrastructureMessages } from '../../messages/infrastructureMessages.js';
@@ -26,21 +26,21 @@ export class BuildKeyboardInfo extends BuildActivity {
       return false;
     }
 
-    const keyboard = findProjectFile(callbacks, project, KeymanFileTypes.Source.KeymanKeyboard);
-    const kps = findProjectFile(callbacks, project, KeymanFileTypes.Source.Package);
-    if(!keyboard || !kps)  {
-      // Error messages written by findProjectFile
+    const kps = project.files.find(file => file.fileType == KeymanFileTypes.Source.Package);
+    if(!kps)  {
+      callbacks.reportMessage(InfrastructureMessages.Error_FileTypeNotFound({ext: KeymanFileTypes.Source.Package}));
       return false;
     }
 
-    const jsFilename = project.resolveOutputFilePath(keyboard, KeymanFileTypes.Source.KeymanKeyboard, KeymanFileTypes.Binary.WebKeyboard);
+    const keyboard = project.files.find(file => file.fileType == KeymanFileTypes.Source.KeymanKeyboard);
+    const jsFilename = keyboard ? project.resolveOutputFilePath(keyboard, KeymanFileTypes.Source.KeymanKeyboard, KeymanFileTypes.Binary.WebKeyboard) : null;
     const lastCommitDate = getLastGitCommitDate(project.projectPath);
 
     const compiler = new KeyboardInfoCompiler(callbacks);
     const data = compiler.writeKeyboardInfoFile({
       kmpFilename:  project.resolveOutputFilePath(kps, KeymanFileTypes.Source.Package, KeymanFileTypes.Binary.Package),
       kpsFilename: project.resolveInputFilePath(kps),
-      jsFilename: fs.existsSync(jsFilename) ? jsFilename : undefined,
+      jsFilename: jsFilename && fs.existsSync(jsFilename) ? jsFilename : undefined,
       sourcePath: calculateSourcePath(infile),
       lastCommitDate,
       forPublishing: !!options.forPublishing,
@@ -60,12 +60,4 @@ export class BuildKeyboardInfo extends BuildActivity {
 
     return true;
   }
-}
-
-function findProjectFile(callbacks: CompilerCallbacks, project: KeymanDeveloperProject, ext: KeymanFileTypes.Source) {
-  const file = project.files.find(file => file.fileType == ext);
-  if(!file) {
-    callbacks.reportMessage(InfrastructureMessages.Error_FileTypeNotFound({ext}));
-  }
-  return file;
 }

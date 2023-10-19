@@ -6,6 +6,7 @@ import os
 from shutil import rmtree
 
 from keyman_config import _
+from keyman_config.custom_keyboards import CustomKeyboards
 from keyman_config.dbus_util import get_keyman_config_service
 from keyman_config.fcitx_util import is_fcitx_running
 from keyman_config.get_kmp import (InstallLocation, get_keyboard_dir,
@@ -13,6 +14,7 @@ from keyman_config.get_kmp import (InstallLocation, get_keyboard_dir,
 from keyman_config.gnome_keyboards_util import (GnomeKeyboardsUtil,
                                                 get_ibus_keyboard_id,
                                                 is_gnome_shell)
+from keyman_config.gsettings import GSettings
 from keyman_config.ibus_util import IbusUtil, get_ibus_bus, restart_ibus
 from keyman_config.kmpmetadata import get_metadata
 
@@ -42,7 +44,6 @@ def _uninstall_dir(what, dir):
     else:
         logging.info('No %s directory %s', what, dir)
 
-
 def _uninstall_kmp_common(location, packageID, removeLanguages):
     kbdir = get_keyboard_dir(location, packageID)
     kbdocdir = get_keyman_doc_dir(location, packageID)
@@ -59,8 +60,16 @@ def _uninstall_kmp_common(location, packageID, removeLanguages):
                 _uninstall_keyboards_from_gnome(keyboards, kbdir)
             else:
                 _uninstall_keyboards_from_ibus(keyboards, kbdir)
+
+            logging.debug('Removing custom keyboards:')
+            custom_keyboards = CustomKeyboards()
+            for kb in keyboards:
+                kb_path = os.path.join(kbdir, kb["id"] + ".kmx")
+                logging.debug(f'    removing {kb["id"]} ({kb_path})')
+                custom_keyboards.remove(kb_path)
         else:
             logging.info(f'Could not uninstall {where} keyboard "{packageID}" from list of keyboards')
+
     else:
         logging.info(f'Replacing {where} keyboard: "{packageID}"')
 
