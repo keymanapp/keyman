@@ -42,8 +42,7 @@ inline bool uassert_success(const char *file, int line, const char *function, UE
   }
 }
 
-#define UASSERT_SUCCESS(status) assert(U_SUCCESS(status)); \
-  uassert_success(__FILE__, __LINE__, __FUNCTION__, status)
+#define UASSERT_SUCCESS(status) assert(U_SUCCESS(status)), uassert_success(__FILE__, __LINE__, __FUNCTION__, status)
 
 using km::kbp::kmx::SimpleUSet;
 
@@ -109,7 +108,8 @@ public:
       const std::u32string &to,
       KMX_DWORD mapFrom,
       KMX_DWORD mapTo,
-      const kmx::kmx_plus &kplus);
+      const kmx::kmx_plus &kplus,
+      bool &valid);
 
   /**
    * If matching, apply the match to the output string
@@ -128,8 +128,8 @@ private:
   const KMX_DWORD fMapToStrId;
   std::deque<std::u32string> fMapFromList;
   std::deque<std::u32string> fMapToList;
-  /** Internal function to setup pattern string */
-  void init();
+  /** Internal function to setup pattern string @returns true on success */
+  bool init();
   /** @returns the index of the item in the fMapFromList list, or -1 */
   int32_t findIndexFrom(const std::u32string &match) const;
 public:

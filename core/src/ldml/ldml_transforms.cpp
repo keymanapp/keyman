@@ -12,7 +12,7 @@
 #include "kmx/kmx_xstring.h"
 
 #ifndef assert
-#define assert(x)  // TODO-LDML
+#define assert(x) ((void)0)
 #endif
 
 namespace km {
@@ -403,7 +403,7 @@ transform_entry::transform_entry(const transform_entry &other)
 
 transform_entry::transform_entry(const std::u32string &from, const std::u32string &to)
     : fFrom(from), fTo(to), fFromPattern(nullptr), fMapFromStrId(), fMapToStrId(), fMapFromList(), fMapToList() {
-  assert(!fFrom.empty()); // TODO-LDML: should not happen?
+  assert(!fFrom.empty());
 
   init();
 }
@@ -414,14 +414,16 @@ transform_entry::transform_entry(
     const std::u32string &to,
     KMX_DWORD mapFrom,
     KMX_DWORD mapTo,
-    const kmx::kmx_plus &kplus)
+    const kmx::kmx_plus &kplus,
+    bool &valid)
     : fFrom(from), fTo(to), fFromPattern(nullptr), fMapFromStrId(mapFrom), fMapToStrId(mapTo) {
+  valid = false;
   assert(!fFrom.empty()); // TODO-LDML: should not happen?
   assert((fMapFromStrId == 0) == (fMapToStrId == 0));  // we have both or we have neither.
   assert(kplus.strs != nullptr);
   assert(kplus.vars != nullptr);
   assert(kplus.elem != nullptr);
-  init();
+  valid = init();
 
   // setup mapFrom
   if (fMapFromStrId != 0) {
@@ -456,7 +458,7 @@ transform_entry::transform_entry(
   }
 }
 
-void
+bool
 transform_entry::init() {
   if (!fFrom.empty()) {
     // TODO-LDML: if we have mapFrom, may need to do other processing.
@@ -470,8 +472,9 @@ transform_entry::init() {
     // NFD normalize on pattern creation
     nfd->normalize(patustr_raw, patustr, status);
     fFromPattern.reset(icu::RegexPattern::compile(patustr, 0, status));
-    UASSERT_SUCCESS(status);
+    return (UASSERT_SUCCESS(status));
   }
+  return false; // fFrom should not be empty.
 }
 
 size_t
@@ -767,35 +770,34 @@ transforms::load(
     const kmx::kmx_plus &kplus,
     const kbp::kmx::COMP_KMXPLUS_TRAN *tran,
     const kbp::kmx::COMP_KMXPLUS_TRAN_Helper &tranHelper) {
+  bool valid = true;
   if (tran == nullptr) {
     DebugLog("for tran: tran is null");
-    assert(false);
-    return nullptr;
-  }
-  if (!tranHelper.valid()) {
+    valid = false;
+  } else if (!tranHelper.valid()) {
     DebugLog("for tran: tranHelper is invalid");
-    assert(false);
-    return nullptr;
-  }
-  if (nullptr == kplus.elem) {
+    valid = false;
+  } else if (nullptr == kplus.elem) {
     DebugLog("for tran: kplus.elem == nullptr");
-    assert(false);
-    return nullptr;
-  }
-  if (nullptr == kplus.strs) {
+    valid = false;
+  } else if (nullptr == kplus.strs) {
     DebugLog("for tran: kplus.strs == nullptr");  // need a string table to get strings
-    assert(false);
-    return nullptr;
-  }
-  if (nullptr == kplus.vars) {
+    valid = false;
+  } else if (nullptr == kplus.vars) {
     DebugLog("for tran: kplus.vars == nullptr");  // need a vars table to get maps
-    assert(false);
+    valid = false;
+  }
+
+  assert(valid);
+  if (!valid) {
     return nullptr;
   }
 
   // with that out of the way, let's set it up
 
-  transforms *transforms = new ldml::transforms();
+  std::unique_ptr<transforms> transforms;
+
+  transforms.reset(new ldml::transforms());
 
   for (KMX_DWORD groupNumber = 0; groupNumber < tran->groupCount; groupNumber++) {
     const kmx::COMP_KMXPLUS_TRAN_GROUP *group = tranHelper.getGroup(groupNumber);
@@ -811,7 +813,11 @@ transforms::load(
         const std::u32string toStr                      = kmx::u16string_to_u32string(kplus.strs->get(element->to));
         KMX_DWORD mapFrom                               = element->mapFrom; // copy, because of alignment
         KMX_DWORD mapTo                                 = element->mapTo;   // copy, because of alignment
-        newGroup.emplace_back(fromStr, toStr, mapFrom, mapTo, kplus);  // creating a transform_entry
+        newGroup.emplace_back(fromStr, toStr, mapFrom, mapTo, kplus, valid);  // creating a transform_entry
+        assert(valid);
+        if(!valid) {
+          return nullptr;
+        }
       }
       transforms->addGroup(newGroup);
     } else if (group->type == LDML_TRAN_GROUP_TYPE_REORDER) {
@@ -841,14 +847,18 @@ transforms::load(
       return nullptr;
     }
   }
-  return transforms;
+  assert(valid);
+  if (!valid) {
+    return nullptr;
+  } else {
+    return transforms.release();
+  }
 }
 
 // string manipulation
 
 bool normalize_nfd(std::u32string &str) {
   std::u16string rstr = km::kbp::kmx::u32string_to_u16string(str);
-
   if(!normalize_nfd(rstr)) {
     return false;
   } else {
@@ -864,8 +874,7 @@ static bool normalize(const icu::Normalizer2 *n, std::u16string &str, UErrorCode
   icu::UnicodeString dest;
   icu::UnicodeString src = icu::UnicodeString(str.data(), (int32_t)str.length());
   n->normalize(src, dest, status);
-  UASSERT_SUCCESS(status);
-  if (U_SUCCESS(status)) {
+  if (UASSERT_SUCCESS(status)) {
     str.assign(dest.getBuffer(), dest.length());
   }
   return U_SUCCESS(status);
