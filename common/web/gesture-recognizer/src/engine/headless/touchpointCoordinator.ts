@@ -112,8 +112,15 @@ export class TouchpointCoordinator<HoveredItemType, StateToken=any> extends Even
 
     touchpoint.setGestureMatchInspector(buildGestureMatchInspector(selector));
 
-    const firstSelectionPromise = selector.matchGesture(touchpoint, getGestureModelSet(modelDefs, selector.baseGestureSetId));
-    firstSelectionPromise.then((selection) => {
+    // We wait for the source to fully pass through the gesture-model spin-up phase; there's a chanc
+    const modelingSpinupPromise = selector.matchGesture(touchpoint, getGestureModelSet(modelDefs, selector.baseGestureSetId));
+    modelingSpinupPromise.then(async (selectionPromiseHost) => {
+      this.emit('inputstart', touchpoint);
+
+      const selection = await selectionPromiseHost.selectionPromise;
+
+      // Any related 'push' mechanics that may still be lingering are currently handled by GestureSequence
+      // during its 'completion' processing.  (See `GestureSequence.selectionHandler`.)
       if(selection.result.matched == false) {
         return;
       }
@@ -141,12 +148,7 @@ export class TouchpointCoordinator<HoveredItemType, StateToken=any> extends Even
       // Could track sequences easily enough; the question is how to tell when to 'let go'.
 
       this.emit('recognizedgesture', gestureSequence);
-
-      // Any related 'push' mechanics that may still be lingering are currently handled by GestureSequence
-      // during its 'completion' processing.  (See `GestureSequence.selectionHandler`.)
     });
-
-    this.emit('inputstart', touchpoint);
   }
 
   public get activeGestures(): GestureSequence<HoveredItemType, StateToken>[] {

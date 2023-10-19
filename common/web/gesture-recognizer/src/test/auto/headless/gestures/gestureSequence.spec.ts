@@ -91,13 +91,13 @@ async function sequenceEmulationAndAssertion(emulationEngine: HeadlessInputEngin
   // Note:  errors from async handlers do not get caught by Mocha if unhandled.
   // The workaround: we build Promises for would-be async handlers that can sync; we pass caught errors
   // to them so that they're reported by the automated test.
-  emulationEngine.on('pointstart', (source) => {
+  emulationEngine.on('pointstart', async (source) => {
     source.setGestureMatchInspector(buildGestureMatchInspector(selector));
 
     try {
       // These parts should be handled by TouchpointCoordinator.  This is a simplified mocked version
       // of what lies there.
-      const matchPromise = selector.matchGesture(source, getGestureModelSet(TestGestureModelDefinitions, 'default'));
+      const matchPromise = (await selector.matchGesture(source, getGestureModelSet(TestGestureModelDefinitions, 'default'))).selectionPromise;
 
       matchPromise.then(async (selection) => {
         if(!selectionPromise.isResolved) {

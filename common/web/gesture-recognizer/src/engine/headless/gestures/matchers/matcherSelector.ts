@@ -28,6 +28,15 @@ interface EventMap<Type, StateToken> {
 }
 
 /**
+ * Because returning an unresolved Promise from an await func will await that Promise.
+ *
+ * This allows us to bypass that, resolving yet providing a pending Promise.
+ */
+interface AsyncPromiseReturner<Type> {
+  selectionPromise: Promise<Type>;
+}
+
+/**
  * This class is used to "select" successfully-matched gesture models from among an
  * active set of potential GestureMatchers.  There may be multiple GestureSources /
  * contact-points active; it is able to resolve when they are correlated and how
@@ -126,29 +135,55 @@ export class MatcherSelector<Type, StateToken = any> extends EventEmitter<EventM
   /**
    * Aims to match the gesture-source's path against the specified set of gesture models.  The
    * returned Promise will resolve either when a match is found or all models have rejected the path.
+   *
+   * In order to facilitate state management when an incoming source triggers a match for a
+   * previously-existing gesture but is not considered part of it, this method involves two levels
+   * of asynchronicity.
+   *
+   * 1. A source must wait for such "triggered matches" to fully resolve before new gesture models
+   *    based solely upon it may be built, as stateToken updates may occur as a result.
+   *
+   *    `await` statements against this method will resolve when all valid model types for the source
+   *    have been initialized.
+   *
+   * 2. The object returned via the `await` Promise provides a `.selectionPromise`; this will resolve
+   *    once the best gesture-model match has been determined.
    * @param source
    * @param gestureModelSet
    */
   public async matchGesture(
     source: GestureSource<Type, StateToken>,
     gestureModelSet: GestureModel<Type, StateToken>[]
-  ): Promise<MatcherSelection<Type, StateToken>>;
+  ): Promise<AsyncPromiseReturner<MatcherSelection<Type, StateToken>>>;
 
   /**
    * Facilitates matching a new stage in an ongoing gesture-stage sequence based on a previously-
    * matched stage and the specified models for stages that may follow it.
+   *
+   * In order to facilitate state management when an incoming source triggers a match for a
+   * previously-existing gesture but is not considered part of it, this method involves two levels
+   * of asynchronicity.
+   *
+   * 1. A source must wait for such "triggered matches" to fully resolve before new gesture models
+   *    based solely upon it may be built, as stateToken updates may occur as a result.
+   *
+   *    `await` statements against this method will resolve when all valid model types for the source
+   *    have been initialized.
+   *
+   * 2. The object returned via the `await` Promise provides a `.selectionPromise`; this will resolve
+   *    once the best gesture-model match has been determined.
    * @param source
    * @param gestureModelSet
    */
   public async matchGesture(
     priorStageMatcher: PredecessorMatch<Type, StateToken>,
     gestureModelSet: GestureModel<Type, StateToken>[]
-  ): Promise<MatcherSelection<Type, StateToken>>;
+  ): Promise<AsyncPromiseReturner<MatcherSelection<Type, StateToken>>>;
 
   public async matchGesture(
     source: GestureSource<Type> | PredecessorMatch<Type, StateToken>,
     gestureModelSet: GestureModel<Type, StateToken>[]
-  ): Promise<MatcherSelection<Type, StateToken>> {
+  ): Promise<AsyncPromiseReturner<MatcherSelection<Type, StateToken>>> {
     /*
      * To be clear, this _starts_ the source-tracking process.  It's an async process, though.
      *
@@ -163,7 +198,7 @@ export class MatcherSelector<Type, StateToken = any> extends EventEmitter<EventM
     // Defining these as locals helps the TS type-checker better infer types within
     // this method; a later assignment to `source` will remove its ability to infer
     // `source`'s type at this point.
-    let unmatchedSource = sourceNotYetStaged ? source : null;
+    const unmatchedSource = sourceNotYetStaged ? source : null;
     const priorMatcher = sourceNotYetStaged ? null: source;
 
     if(this.pendingMatchSetup) {
@@ -253,8 +288,28 @@ export class MatcherSelector<Type, StateToken = any> extends EventEmitter<EventM
         // stateToken may have shifted by the time we regain control here.
         const incomingStateToken = this.stateToken;
 
+        const newlyResolvedMatchers = extendableMatcherSet.filter((matcher) => matcher.result && matcher.result.matched);
+        const srcIsMatched = newlyResolvedMatchers.find((matcher) => matcher.allSourceIds.indexOf(unmatchedSource.identifier) > -1);
+
+        // The source triggered a match for an existing gesture and is considered part of it;
+        // no need to test it against models for newly-starting ones.
+        if(srcIsMatched) {
+          return { selectionPromise: matchPromise.corePromise };
+        }
+
+        // If we've reached this point, we should assume that the incoming source should act
+        // independently as the start of a new gesture.
+        //
+        // Accordingly, if there's a new state token in place, we should ensure the source
+        // reflects THAT token, rather than the default one it was given.
+
         if(originalStateToken != incomingStateToken) {
-          unmatchedSource = unmatchedSource.constructSubview(false, true, incomingStateToken);
+          const currentSample = unmatchedSource.currentSample;
+          unmatchedSource.stateToken = incomingStateToken;
+          currentSample.stateToken = incomingStateToken;
+
+          currentSample.item = source.currentRecognizerConfig.itemIdentifier(currentSample, null);
+          unmatchedSource.baseItem = currentSample.item;
         }
       }
     }
@@ -299,7 +354,7 @@ export class MatcherSelector<Type, StateToken = any> extends EventEmitter<EventM
     // Now that all GestureMatchers are built, reset ALL of our sync-update-check hooks.
     this.resetSourceHooks();
 
-    return matchPromise.corePromise;
+    return { selectionPromise: matchPromise.corePromise };
   }
 
   private readonly attemptSynchronousUpdate = () => {
