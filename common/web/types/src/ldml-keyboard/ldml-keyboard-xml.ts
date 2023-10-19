@@ -11,8 +11,8 @@ export interface LDMLKeyboardXMLSourceFile {
   /**
    * <keyboard> -- the root element.
    */
-  keyboard: LKKeyboard;
-}
+  keyboard3: LKKeyboard;
+};
 
 export interface LKKeyboard {
   locale?: string;
@@ -24,9 +24,9 @@ export interface LKKeyboard {
   names?: LKNames;
   settings?: LKSettings;
   keys?: LKKeys;
+  forms?: LKForms;
   displays?: LKDisplays;
   layers?: LKLayers[];
-  vkeys?: LKVkeys;
   variables?: LKVariables;
   transforms?: LKTransforms[];
 };
@@ -128,15 +128,6 @@ export interface LKRow {
   keys?: string;
 };
 
-export interface LKVkeys {
-  vkey?: LKVkey[];
-};
-
-export interface LKVkey {
-  from?: string;
-  to?: string;
-};
-
 export interface LKVariables {
   string?: LKString[];
   set?: LKSet[];
@@ -193,3 +184,36 @@ export interface LKDisplays {
   display?: LKDisplay[];
   displayOptions?: LKDisplayOptions;
 };
+
+export interface LKForms {
+  form?: LKForm[];
+};
+
+export interface LKForm {
+  id?: string;
+  scanCodes?: LKScanCodes[];
+};
+
+export interface LKScanCodes {
+  codes?: string;
+};
+
+/**
+ * Utilities for determining the import status of items
+ */
+export class ImportStatus {
+  /** item came in via implied (spec based) import, such as keys-Latn-implied.xml */
+  static impliedImport = Symbol('LDML implied import');
+  /** item came in via import */
+  static import = Symbol('LDML import');
+
+  /** @returns true if the object was loaded through an implied import */
+  static isImpliedImport(o : any) : boolean {
+    return o && !!o[ImportStatus.impliedImport];
+  }
+  /** @returns true if the object was loaded through an explicit import */
+  static isImport(o : any) : boolean {
+    return o && !!o[ImportStatus.import];
+  }
+};
+

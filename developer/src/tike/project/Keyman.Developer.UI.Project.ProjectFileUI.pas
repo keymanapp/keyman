@@ -34,7 +34,7 @@ uses
 
 type
   TProjectFileAction = (pfaCompile, pfaInstall, pfaUninstall, pfaDebug,
-    pfaTestKeymanWeb, pfaCompileInstaller, pfaFontHelper, pfaFontDialog, pfaClean);   // I4057
+    pfaTestKeymanWeb, pfaFontHelper, pfaFontDialog, pfaClean);   // I4057
 
   TProjectUI = class(TProject)
   private

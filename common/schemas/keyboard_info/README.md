@@ -1,17 +1,30 @@
 # keyboard_info
 
-* **keyboard_info.source.json**
-* **keyboard_info.distribution.json**
+* **keyboard_info.schema.json**
 
 Documentation at https://help.keyman.com/developer/cloud/keyboard_info
 
 * Primary version:
-  * https://github.com/keymanapp/api.keyman.com/tree/master/schemas/keyboard_info.source
-  * https://github.com/keymanapp/api.keyman.com/tree/master/schemas/keyboard_info.distribution
+  * https://github.com/keymanapp/api.keyman.com/tree/master/schemas/keyboard_info
 * Synchronized copies at:
   * https://github.com/keymanapp/keyman/tree/master/common/schemas/keyboard_info
 
 # .keyboard_info version history
+
+## 2023-08-11 2.0 stable
+* Removed:
+  - `.documentationFilename`
+  - `.documentationFileSize`
+  - `.legacyId`
+    `.links`
+    `.related[].note`
+    `.languages[].example`
+  Added:
+  - `.languages[].examples[]`
+  Modified:
+  - `.languages[].font`, `.languages[].oskFont`: `.source` is `[string]`
+  - Source .keyboard_info files are no longer needed, so source vs distribution
+    keyboard_info distinction is removed
 
 ## 2019-09-06 1.0.6 stable
 * No changes (see api.keyman.com#36 and api.keyman.com#59. Reverted in 2020-06-10.).

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE keyboardTest SYSTEM "../../../../../resources/standards-data/ldml-keyboards/techpreview/dtd/ldmlKeyboardTest.dtd">
-<keyboardTest conformsTo="techpreview">
+<!DOCTYPE keyboardTest3 SYSTEM "../../../../../resources/standards-data/ldml-keyboards/techpreview/dtd/ldmlKeyboardTest3.dtd">
+<keyboardTest3 conformsTo="techpreview">
   <info keyboard="k_210_marker.xml" author="Team Keyboard" name="marker" />
   <tests name="marker-tests">
     <test name="marker-test-basic-grave">
@@ -21,12 +21,6 @@
       <keystroke key="acute" />
       <check result="+" />
     </test>
-    <test name="marker-test-trailing-acute">
-      <startContext to="" />
-      <keystroke key="acute" />
-      <!-- TODO-LDML: broken, becasue without a rule to 'cleanup' trailing acute, we don't currently have code to fix it -->
-      <check result="" />
-    </test>
     <test name="marker-test-trailing-grave">
       <startContext to="" />
       <keystroke key="grave" />
@@ -42,5 +36,25 @@
       <keystroke key="acute" />
       <check result="é" />
     </test>
+    <test name="marker-test-any-marker">
+      <startContext to="" />
+      <keystroke key="acute" />
+      <keystroke key="z" />
+      <check result="Z" />
+    </test>
+    <test name="marker-test-trailing-acute">
+      <startContext to="" />
+      <keystroke key="acute" />
+      <check result="" />
+      <keystroke key="x" />
+      <check result="x" />
+    </test>
+    <test name="marker-test-trailing-acute2">
+      <startContext to="" />
+      <keystroke key="x" />
+      <check result="x" />
+      <keystroke key="acute" />
+      <check result="x" />
+    </test>
   </tests>
-</keyboardTest>
+</keyboardTest3>

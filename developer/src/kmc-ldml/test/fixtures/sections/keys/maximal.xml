@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<!DOCTYPE keyboard SYSTEM "../../../../../../../resources/standards-data/ldml-keyboards/techpreview/dtd/ldmlKeyboard.dtd">
-<keyboard locale="mt" conformsTo="techpreview">
+<!DOCTYPE keyboard3 SYSTEM "../../../../../../../resources/standards-data/ldml-keyboards/techpreview/dtd/ldmlKeyboard3.dtd">
+<keyboard3 locale="mt" conformsTo="techpreview">
   <names>
     <name value="hardware-gap-switch" />
   </names>
@@ -12,13 +12,12 @@
     <!-- This key gets a bunch of other status -->
     <key id="q" flicks="flick0" to="q" longPress="á é í" longPressDefault="é"
         multiTap="ä ë ï" transform="no" width="3.14159" />
-    <key id="w" to="w" />
+    <key id="w" to="${www}" />
     <flicks id="flick0">
         <flick directions="nw se" to="ç" />
-        <flick directions="ne sw" to="ê" />
+        <flick directions="ne sw" to="${ecaret}" />
     </flicks>
   </keys>
-
   <layers form="touch" minDeviceWidth="300">
     <layer id="base">
       <row keys="Q q W w" />
@@ -34,4 +33,9 @@
       <row keys="q w" />
     </layer>
   </layers>
-</keyboard>
+
+  <variables>
+    <string id="ecaret" value="ê" />
+    <string id="www" value="w" />
+  </variables>
+</keyboard3>

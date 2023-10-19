@@ -10,12 +10,11 @@
   </Info>
   <Files>
     <File>
-      <!-- error_package_must_contain_a_model_or_a_keyboard. This is a common error:
-           to include a .kmn instead of a .kmx -->
-      <Name>khmer_angkor.kmn</Name>
-      <Description>Keyboard Khmer Angkor</Description>
+      <!-- error_package_must_contain_a_model_or_a_keyboard.  -->
+      <Name>example.txt</Name>
+      <Description>Example text file</Description>
       <CopyLocation>0</CopyLocation>
-      <FileType>.kmn</FileType>
+      <FileType>.txt</FileType>
     </File>
   </Files>
 </Package>

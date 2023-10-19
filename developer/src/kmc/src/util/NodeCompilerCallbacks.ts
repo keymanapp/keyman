@@ -1,5 +1,6 @@
 import * as fs from 'fs';
 import * as path from 'path';
+import { platform } from 'os';
 import { CompilerCallbacks, CompilerEvent,
          CompilerPathCallbacks, CompilerFileSystemCallbacks,
          compilerLogLevelToSeverity, CompilerErrorSeverity,
@@ -71,8 +72,17 @@ export class NodeCompilerCallbacks implements CompilerCallbacks {
       // Note, we only check this if the file exists, because
       // if it is not found, that will be returned as an error
       // from loadFile anyway.
-      const filename = fs.realpathSync(originalFilename);
-      const nativeFilename = fs.realpathSync.native(filename);
+      let filename = fs.realpathSync(originalFilename);
+      let nativeFilename = fs.realpathSync.native(filename);
+      if(platform() == 'win32' && originalFilename.match(/^.:/)) {
+        // When an absolute path is passed in, it includes a drive letter.
+        // Drive letter case can differ but we don't care about that on win32.
+        // Typically absolute paths only appear for input parameters, as absolute
+        // paths are flagged as warnings when they appear in source files anyway.
+        // Upper casing the drive letter just avoids the issue.
+        filename = filename[0].toUpperCase() + filename.substring(1);
+        nativeFilename = nativeFilename[0].toUpperCase() + nativeFilename.substring(1);
+      }
       if(filename != nativeFilename) {
         this.reportMessage(InfrastructureMessages.Hint_FilenameHasDifferingCase({
           reference: path.basename(originalFilename),
@@ -154,6 +164,28 @@ export class NodeCompilerCallbacks implements CompilerCallbacks {
       event.filename = this.messageFilename;
     }
 
+    this.printMessage(event);
+  }
+
+  private printMessage(event: CompilerEvent) {
+    if(this.options.logFormat == 'tsv') {
+      this.printTsvMessage(event);
+    } else {
+      this.printFormattedMessage(event);
+    }
+  }
+
+  private printTsvMessage(event: CompilerEvent) {
+    process.stdout.write([
+      CompilerError.formatFilename(event.filename, {fullPath:true, forwardSlashes:false}),
+      CompilerError.formatLine(event.line),
+      CompilerError.formatSeverity(event.code),
+      CompilerError.formatCode(event.code),
+      CompilerError.formatMessage(event.message)
+    ].join('\t') + '\n');
+  }
+
+  private printFormattedMessage(event: CompilerEvent) {
     const severityColor = severityColors[CompilerError.severity(event.code)] ?? color.reset;
     const messageColor = this.messageSpecialColor(event) ?? color.reset;
     process.stdout.write(
@@ -172,7 +204,6 @@ export class NodeCompilerCallbacks implements CompilerCallbacks {
       // Special case: we'll add a blank line after project builds
       process.stdout.write('\n');
     }
-
   }
 
   /**

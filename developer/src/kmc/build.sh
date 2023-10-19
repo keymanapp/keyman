@@ -20,6 +20,7 @@ builder_describe "Build Keyman Keyboard Compiler kmc" \
   "@/common/include" \
   "@/common/web/keyman-version" \
   "@/common/web/types" \
+  "@/developer/src/common/web/utils" \
   "@/developer/src/kmc-analyze" \
   "@/developer/src/kmc-keyboard-info" \
   "@/developer/src/kmc-kmn" \
@@ -74,9 +75,10 @@ fi
 if builder_start_action test; then
   eslint .
   tsc --build test/
-  mocha
-  # TODO: enable c8 (disabled because no coverage at present)
-  #     && c8 --reporter=lcov --reporter=text mocha
+  readonly C8_THRESHOLD=35
+  c8 --reporter=lcov --reporter=text --lines $C8_THRESHOLD --statements $C8_THRESHOLD --branches $C8_THRESHOLD --functions $C8_THRESHOLD mocha
+  builder_echo warning "Coverage thresholds are currently $C8_THRESHOLD%, which is lower than ideal."
+  builder_echo warning "Please increase threshold in build.sh as test coverage improves."
   builder_finish_action success test
 fi
 
@@ -133,6 +135,10 @@ fi
 if builder_start_action publish; then
   . "$KEYMAN_ROOT/resources/build/build-utils-ci.inc.sh"
 
+  # To ensure that we cache the top-level package.json, we must call this before
+  # the global publish
+  builder_publish_cleanup
+
   # For now, kmc will have responsibility for publishing keyman-version and
   # common-types, as well as all the other dependent modules. In the future, we
   # should probably have a top-level npm publish script that publishes all
@@ -143,14 +149,20 @@ if builder_start_action publish; then
 
   # Finally, publish kmc
   builder_publish_to_npm
+  builder_publish_cleanup
   builder_finish_action success publish
 elif builder_start_action pack; then
   . "$KEYMAN_ROOT/resources/build/build-utils-ci.inc.sh"
+
+  # To ensure that we cache the top-level package.json, we must call this before
+  # the global pack
+  builder_publish_cleanup
 
   for package in "${PACKAGES[@]}"; do
     "$KEYMAN_ROOT/$package/build.sh" pack $DRY_RUN
   done
 
   builder_publish_to_pack
+  builder_publish_cleanup
   builder_finish_action success pack
 fi

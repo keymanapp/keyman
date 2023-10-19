@@ -21,7 +21,7 @@ wrap-symbols:
     $(SYMSTORE) $(DEBUGPATH)\desktop\kmconfig.dbg /t keyman-windows
 
 test-manifest:
-    # test that linked manifest exists and correct
+# test that linked manifest exists and correct
     $(MT) -nologo -inputresource:$(PROGRAM)\desktop\kmconfig.exe -validate_manifest
 
 install:

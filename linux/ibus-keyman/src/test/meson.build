@@ -19,7 +19,8 @@ test_include_dirs = [
 ]
 
 env_file = '/tmp/env-src-test.txt'
-pid_file = '/tmp/ibus-keyman-src-test-pids'
+cleanup_file = '/tmp/ibus-keyman-src-test-pids'
+pid_file = '/tmp/ibus-keyman-src-test-pids.pids'
 
 setup_src_test_tests = find_program('setup-tests.sh', dirs: [meson.current_source_dir()])
 teardown_tests = find_program('teardown-tests.sh', dirs: [meson.current_source_dir() / '../../tests/scripts'])
@@ -64,7 +65,7 @@ bcp47_util_tests = executable(
 test(
   'setup-src-test',
   setup_src_test_tests,
-  args: ['--x11', env_file, pid_file],
+  args: ['--x11', env_file, cleanup_file, pid_file],
   env: test_env,
   priority: -1,
   is_parallel: false,
@@ -74,7 +75,7 @@ test(
 test(
   'teardown-src-test',
   teardown_tests,
-  args: [pid_file],
+  args: [cleanup_file],
   priority: -9,
   is_parallel: false,
   protocol: 'exitcode'
@@ -83,7 +84,7 @@ test(
 test(
   'keymanutil-tests',
   run_src_test,
-  args: [ '--tap', '-k', '--env', env_file, '--', keymanutil_tests],
+  args: [ '--tap', '-k', '--env', env_file, '--', keymanutil_tests, '--testdata', meson.current_source_dir() / 'testdata'],
   env: test_env,
   priority: -2,
   is_parallel: false,
@@ -102,7 +103,7 @@ test(
 test(
   'print-kmp-test',
   run_src_test,
-  args: [ '--', print_kmp_test, meson.current_source_dir() / 'kmp.json' ],
+  args: [ '--', print_kmp_test, meson.current_source_dir() / 'testdata/kmp.json' ],
   env: test_env,
   priority: -2,
   protocol: 'exitcode',

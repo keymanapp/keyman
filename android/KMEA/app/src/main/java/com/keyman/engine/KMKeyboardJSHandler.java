@@ -92,10 +92,6 @@ public class KMKeyboardJSHandler {
           return;
         }
 
-        if (k.subKeysWindow != null) {
-          return;
-        }
-
         if (!isInappKMTextViewValid(k.keyboardType)) {
           return;
         }
@@ -201,10 +197,6 @@ public class KMKeyboardJSHandler {
       public void run() {
         if (k == null) {
           KMLog.LogError(TAG, "dispatchKey failed: Keyboard is null");
-          return;
-        }
-
-        if (k.subKeysWindow != null) {
           return;
         }
 

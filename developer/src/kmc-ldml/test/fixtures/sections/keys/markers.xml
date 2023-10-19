@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<!DOCTYPE keyboard SYSTEM "../../../../../../../resources/standards-data/ldml-keyboards/techpreview/dtd/ldmlKeyboard.dtd">
-<keyboard locale="mt" conformsTo="techpreview">
+<!DOCTYPE keyboard3 SYSTEM "../../../../../../../resources/standards-data/ldml-keyboards/techpreview/dtd/ldmlKeyboard3.dtd">
+<keyboard3 locale="mt" conformsTo="techpreview">
   <names>
     <name value="keys-markers" />
   </names>
@@ -24,6 +24,6 @@
       <transform from="\m{w}" to="W" /> <!-- to quell marker err -->
     </transformGroup>
   </transforms>
-</keyboard>
+</keyboard3>
 
 <!-- you can have any output you want, as long as it's an W ! -->

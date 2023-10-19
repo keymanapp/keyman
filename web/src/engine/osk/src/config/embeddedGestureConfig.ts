@@ -6,6 +6,4 @@ import VisualKeyboard from "../visualKeyboard.js";
 
 export default interface EmbeddedGestureConfig {
   createGlobeHint?: (vkbd: VisualKeyboard) => GlobeHint;
-  createKeyTip?: (vkbd: VisualKeyboard) => KeyTip;
-  startLongpress?: (vkbd: VisualKeyboard, key: KeyElement) => PendingGesture;
 }

@@ -50,7 +50,8 @@ stop_test_server = executable(
 )
 
 env_file = '/tmp/env.txt'
-pid_file = '/tmp/ibus-keyman-test-pids'
+cleanup_file = '/tmp/ibus-keyman-test-pids'
+pid_file = '/tmp/ibus-keyman-test-pids.pids'
 
 setup_tests = find_program('setup-tests.sh', dirs: [meson.current_source_dir() / 'scripts'])
 teardown_tests = find_program('teardown-tests.sh', dirs: [meson.current_source_dir() / 'scripts'])
@@ -64,7 +65,7 @@ can_build_wayland = mutter.found()
 test(
   'setup-x11',
   setup_tests,
-  args: ['--x11', env_file, pid_file],
+  args: ['--x11', env_file, cleanup_file, pid_file],
   env: test_env,
   priority: -10,
   is_parallel: false,
@@ -74,7 +75,7 @@ test(
 test(
   'teardown-x11',
   teardown_tests,
-  args: [pid_file],
+  args: [cleanup_file],
   priority: -19,
   is_parallel: false,
   protocol: 'exitcode'
@@ -84,7 +85,7 @@ if can_build_wayland
   test(
     'setup-wayland',
     setup_tests,
-    args: ['--wayland', env_file, pid_file],
+    args: ['--wayland', env_file, cleanup_file, pid_file],
     env: test_env,
     priority: -20,
     is_parallel: false,
@@ -94,7 +95,7 @@ if can_build_wayland
   test(
     'teardown-wayland',
     teardown_tests,
-    args: [pid_file],
+    args: [cleanup_file],
     priority: -29,
     is_parallel: false,
     protocol: 'exitcode'
@@ -113,11 +114,11 @@ foreach kmx: kmxtest_files
     continue
   endif
   testname = filename[1].split('.kmx')[0]
-  test_args = [ '--tap', '-k', '--env', env_file, '--', filename]
+  test_args = [ '--tap', '-k', '--env', env_file, '--cleanup', cleanup_file, '--check', pid_file, '--', filename]
   test(
     'X11-' + testname + '__surrounding-text',
     run_test,
-    args: [ '--x11', '--surrounding-text', test_args],
+    args: [ '--testname', testname, '--x11', '--surrounding-text', test_args],
     env: test_env,
     depends: [test_exe],
     priority: -11,
@@ -128,7 +129,7 @@ foreach kmx: kmxtest_files
   test(
     'X11-' + testname + '__no-surrounding-text',
     run_test,
-    args: [ '--x11', '--no-surrounding-text', test_args],
+    args: [ '--testname', testname, '--x11', '--no-surrounding-text', test_args],
     env: test_env,
     depends: [test_exe],
     priority: -12,
@@ -140,7 +141,7 @@ foreach kmx: kmxtest_files
     test(
       'Wayland-' + testname + '__surrounding-text',
       run_test,
-      args: [ '--wayland', '--surrounding-text', test_args],
+      args: [ '--testname', testname, '--wayland', '--surrounding-text', test_args],
       env: test_env,
       depends: [test_exe],
       priority: -21,
@@ -151,7 +152,7 @@ foreach kmx: kmxtest_files
     test(
       'Wayland-' + testname + '__no-surrounding-text',
       run_test,
-      args: [ '--wayland', '--no-surrounding-text', test_args],
+      args: [ '--testname', testname, '--wayland', '--no-surrounding-text', test_args],
       env: test_env,
       depends: [test_exe],
       priority: -22,

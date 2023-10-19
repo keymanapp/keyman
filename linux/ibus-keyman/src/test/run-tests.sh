@@ -58,4 +58,4 @@ glib-compile-schemas "$SCHEMA_DIR"
 
 export GSETTINGS_BACKEND=memory
 
-"${G_TEST_BUILDDIR:-.}/keymanutil-tests" "$@"
+"${G_TEST_BUILDDIR:-.}/keymanutil-tests" "$@" --testdata "${SRCDIR}/src/test/testdata"

@@ -41,7 +41,7 @@ export class TransformCompiler<T extends TransformCompilerType, TranBase extends
     const reportMessage = this.callbacks.reportMessage.bind(this.callbacks);
 
     let valid = true;
-    const transforms = this?.keyboard?.transforms;
+    const transforms = this?.keyboard3?.transforms;
     if (transforms) {
       const types : string[] = transforms.map(({type}) => type);
       if (!verifyValidAndUnique(types,
@@ -121,12 +121,11 @@ export class TransformCompiler<T extends TransformCompilerType, TranBase extends
   private compileTransform(sections: DependencySections, transform: LKTransform) : TranTransform {
     let result = new TranTransform();
     let cookedFrom = transform.from;
-    let cookedTo = transform.to;
 
     cookedFrom = sections.vars.substituteStrings(cookedFrom, sections);
     // TODO: handle 'map' case
     const mapFrom = VariableParser.CAPTURE_SET_REFERENCE.exec(cookedFrom);
-    const mapTo = VariableParser.MAPPED_SET_REFERENCE.exec(cookedTo || '');
+    const mapTo = VariableParser.MAPPED_SET_REFERENCE.exec(transform.to || '');
     if (mapFrom && mapTo) { // TODO-LDML: error cases
       result.mapFrom = sections.strs.allocString(mapFrom[1]); // var name
       result.mapTo = sections.strs.allocString(mapTo[1]); // var name
@@ -134,19 +133,21 @@ export class TransformCompiler<T extends TransformCompilerType, TranBase extends
       result.mapFrom = sections.strs.allocString(''); // TODO-LDML
       result.mapTo = sections.strs.allocString(''); // TODO-LDML
     }
-
     cookedFrom = sections.vars.substituteSetRegex(cookedFrom, sections);
 
-    if (cookedTo) {
-      cookedTo = sections.vars.substituteStrings(cookedTo, sections);
-    }
-
     // add in markers. idempotent if no markers.
-    cookedFrom = sections.vars.substituteMarkerString(cookedFrom); // TODO-LDML: need to support \m{.} here, maybe other edge cases
-    cookedTo = sections.vars.substituteMarkerString(cookedTo);
+    cookedFrom = sections.vars.substituteMarkerString(cookedFrom, true);
 
-    result.from = sections.strs.allocAndUnescapeString(cookedFrom); // TODO-LDML: not unescaped here, done previously
-    result.to = sections.strs.allocAndUnescapeString(cookedTo); // TODO-LDML: not unescaped here, done previously
+    // cookedFrom is cooked above, since there's some special treatment
+    result.from = sections.strs.allocString(cookedFrom, {
+      unescape: true
+    }, sections);
+    // 'to' is handled via allocString
+    result.to = sections.strs.allocString(transform.to, {
+      stringVariables: true,
+      markers: true,
+      unescape: true,
+    }, sections);
     return result;
   }
 
@@ -167,7 +168,7 @@ export class TransformCompiler<T extends TransformCompilerType, TranBase extends
   }
 
   public compile(sections: DependencySections): TranBase {
-    for(let t of this.keyboard.transforms) {
+    for(let t of this.keyboard3.transforms) {
       if(t.type == this.type) {
         // compile only the transforms of the correct type
         return this.compileTransforms(sections, t);

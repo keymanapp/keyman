@@ -101,7 +101,7 @@ Building:
 * Ant
 * Gradle
 * Maven
-* OpenJDK 11
+* Optional: OpenJDK 11 (https://learn.microsoft.com/en-us/java/openjdk/download)
 
 ```ps1
 # Elevated PowerShell
@@ -254,8 +254,8 @@ choco install openjdk
   choco install visualstudio2019community visualstudio2019-workload-nativedesktop visualstudio2019buildtools
   ```
   * Verify required build tools are installed
-    * Run `Visual Studio Installer` 
-    * Check the `Individual components` tab 
+    * Run `Visual Studio Installer`
+    * Check the `Individual components` tab
     * Verify `MSVC v142 - VS 2019 c++ x64/x86 build tools (Latest)` is installed. If not, install it.
 
   Recommended: configure Visual Studio to use two-space tab stops:

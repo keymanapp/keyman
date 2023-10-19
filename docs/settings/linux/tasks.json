@@ -101,7 +101,7 @@
       "type": "shell",
       "label": "ibus-keyman: configure",
       "command": "./build.sh",
-      "args": ["configure", "--debug"],
+      "args": ["configure", "--debug", "--coverage"],
       "options": {
         "cwd": "${workspaceFolder}/linux/ibus-keyman",
         "env": {
@@ -121,7 +121,7 @@
       "type": "shell",
       "label": "ibus-keyman: build",
       "command": "./build.sh",
-      "args": [ "build", "--debug" ],
+      "args": [ "build", "--debug", "--coverage" ],
       "options": {
         "cwd": "${workspaceFolder}/linux/ibus-keyman/",
       },
@@ -144,7 +144,8 @@
       "args": [
         "test",
         "--debug",
-        "--no-integration"
+        "--no-integration",
+        "--coverage"
       ],
       "options": {
         "cwd": "${workspaceFolder}/linux/ibus-keyman/",
@@ -158,13 +159,31 @@
       "command": "./build.sh",
       "args": [
         "test",
-        "--debug"
+        "--debug",
+        "--coverage"
       ],
       "options": {
         "cwd": "${workspaceFolder}/linux/ibus-keyman/",
       },
       "group": "build",
       "detail": "run unit and integration tests of ibus-keyman"
+    },
+    {
+      "type": "shell",
+      "label": "ibus-keyman: report",
+      "command": "./build.sh",
+      "args": [
+        "test",
+        "--report",
+        "--debug",
+        "--coverage",
+        "--no-integration"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}/linux/ibus-keyman/",
+      },
+      "group": "build",
+      "detail": "run tests and create unit test coverage report"
     },
     {
       "type": "shell",
@@ -175,6 +194,23 @@
       },
       "group": "test",
       "detail": "unit test keyman-config"
+    },
+    {
+      "type": "shell",
+      "label": "keyman-config: report",
+      "command": "${workspaceFolder}/linux/keyman-config/build.sh",
+      "args": [
+        "test",
+        "--report",
+        "--debug",
+        "--coverage",
+        "--no-integration"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}/linux/keyman-config",
+      },
+      "group": "test",
+      "detail": "run tests and create unit test coverage report"
     },
     {
       "type": "shell",
@@ -246,6 +282,7 @@
       "command": "${workspaceFolder}/linux/keyman-system-service/build.sh",
       "args": [
         "--debug",
+        "--coverage",
         "configure"
       ],
       "options": {
@@ -263,13 +300,30 @@
       "command": "${workspaceFolder}/linux/keyman-system-service/build.sh",
       "args": [
         "--debug",
-        "test:arch"
+        "test"
       ],
       "problemMatcher": [
         "$gcc"
       ],
       "group": "test",
       "detail": "run tests for keyman-system-service"
+    },
+    {
+      "type": "shell",
+      "label": "keyman-system-service: report",
+      "command": "${workspaceFolder}/linux/keyman-system-service/build.sh",
+      "args": [
+        "test",
+        "--report",
+        "--debug",
+        "--coverage",
+        "--no-integration",
+      ],
+      "problemMatcher": [
+        "$gcc"
+      ],
+      "group": "test",
+      "detail": "run tests and create unit test coverage report"
     },
   ]
 }

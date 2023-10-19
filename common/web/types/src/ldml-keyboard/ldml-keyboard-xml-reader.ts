@@ -1,13 +1,11 @@
 import * as xml2js from 'xml2js';
-import { LDMLKeyboardXMLSourceFile, LKImport } from './ldml-keyboard-xml.js';
-import { default as AjvModule } from 'ajv';
-const Ajv = AjvModule.default; // The actual expected Ajv type.
+import { LDMLKeyboardXMLSourceFile, LKImport, ImportStatus } from './ldml-keyboard-xml.js';
 import { boxXmlArray } from '../util/util.js';
 import { CompilerCallbacks } from '../util/compiler-interfaces.js';
 import { constants } from '@keymanapp/ldml-keyboard-constants';
 import { CommonTypesMessages } from '../util/common-events.js';
 import { LDMLKeyboardTestDataXMLSourceFile, LKTTest, LKTTests } from './ldml-keyboard-testdata-xml.js';
-import Schemas from '../schemas.js';
+import SchemaValidators from '../schema-validators.js';
 
 interface NameAndProps  {
   '$'?: any; // content
@@ -39,27 +37,34 @@ export class LDMLKeyboardXMLSourceFileReader {
    * @returns true on success, false on failure
    */
   private boxArrays(source: any) : boolean {
-    if (source?.keyboard) {
-      if (!source.keyboard.keys) {
-        source.keyboard.keys = {
+    if (source?.keyboard3) {
+      if (!source.keyboard3.keys) {
+        source.keyboard3.keys = {
           key: [],
           flicks: [],
         };
       }
-      if (!source.keyboard.keys.import) {
-        source.keyboard.keys.import = [];
+      if (!source.keyboard3.keys.import) {
+        source.keyboard3.keys.import = [];
+      }
+      if (!source.keyboard3.forms) {
+        source.keyboard3.forms = {
+          form: [],
+        };
+      }
+      if (!source.keyboard3.forms.import) {
+        source.keyboard3.forms.import = [];
       }
     }
-    boxXmlArray(source?.keyboard, 'layers');
-    boxXmlArray(source?.keyboard?.displays, 'display');
-    boxXmlArray(source?.keyboard?.names, 'name');
-    boxXmlArray(source?.keyboard?.vkeys, 'vkey');
-    boxXmlArray(source?.keyboard?.keys, 'key');
-    boxXmlArray(source?.keyboard?.keys, 'flicks');
-    boxXmlArray(source?.keyboard?.locales, 'locale');
-    boxXmlArray(source?.keyboard, 'transforms');
-    if(source?.keyboard?.layers) {
-      for(let layers of source?.keyboard?.layers) {
+    boxXmlArray(source?.keyboard3, 'layers');
+    boxXmlArray(source?.keyboard3?.displays, 'display');
+    boxXmlArray(source?.keyboard3?.names, 'name');
+    boxXmlArray(source?.keyboard3?.keys, 'key');
+    boxXmlArray(source?.keyboard3?.keys, 'flicks');
+    boxXmlArray(source?.keyboard3?.locales, 'locale');
+    boxXmlArray(source?.keyboard3, 'transforms');
+    if(source?.keyboard3?.layers) {
+      for(let layers of source?.keyboard3?.layers) {
         boxXmlArray(layers, 'layer');
         if(layers?.layer) {
           for(let layer of layers?.layer) {
@@ -68,18 +73,24 @@ export class LDMLKeyboardXMLSourceFileReader {
         }
       }
     }
-    if(source?.keyboard?.keys?.flicks) {
-      for(let flicks of source?.keyboard?.keys?.flicks) {
+    if(source?.keyboard3?.forms?.form) {
+      boxXmlArray(source?.keyboard3?.forms, 'form');
+      for(let form of source?.keyboard3?.forms?.form) {
+        boxXmlArray(form, 'scanCodes');
+      }
+    }
+    if(source?.keyboard3?.keys?.flicks) {
+      for(let flicks of source?.keyboard3?.keys?.flicks) {
         boxXmlArray(flicks, 'flick');
       }
     }
-    if(source?.keyboard?.variables) {
-      boxXmlArray(source?.keyboard?.variables, 'set');
-      boxXmlArray(source?.keyboard?.variables, 'string');
-      boxXmlArray(source?.keyboard?.variables, 'unicodeSet');
+    if(source?.keyboard3?.variables) {
+      boxXmlArray(source?.keyboard3?.variables, 'set');
+      boxXmlArray(source?.keyboard3?.variables, 'string');
+      boxXmlArray(source?.keyboard3?.variables, 'unicodeSet');
     }
-    if(source?.keyboard?.transforms) {
-      for(let transforms of source.keyboard.transforms)  {
+    if(source?.keyboard3?.transforms) {
+      for(let transforms of source.keyboard3.transforms)  {
         boxXmlArray(transforms, 'transformGroup');
         for (let transformGroup of transforms.transformGroup) {
           boxXmlArray(transformGroup, 'transform');
@@ -149,7 +160,15 @@ export class LDMLKeyboardXMLSourceFileReader {
       if (!this.resolveOneImport(obj, subtag, {
         base: constants.cldr_import_base,
         path: constants.cldr_implied_keys_import
-      })) {
+      }, true)) {
+        return false;
+      }
+    } else if (subtag === 'forms') {
+      // <import base="cldr" path="techpreview/scanCodes-implied.xml"/>
+      if (!this.resolveOneImport(obj, subtag, {
+        base: constants.cldr_import_base,
+        path: constants.cldr_implied_forms_import
+      }, true)) {
         return false;
       }
     }
@@ -160,9 +179,10 @@ export class LDMLKeyboardXMLSourceFileReader {
    * @param obj the object being imported into
    * @param subtag obj's element tag, e.g. `keys`
    * @param asImport the import structure
+   * @param implied true if it is an implied import
    * @returns true on success, false on failure
    */
-  private resolveOneImport(obj: any, subtag: string, asImport: LKImport) : boolean {
+  private resolveOneImport(obj: any, subtag: string, asImport: LKImport, implied? : boolean) : boolean {
     const { base, path } = asImport;
     if (base !== constants.cldr_import_base) {
       this.callbacks.reportMessage(CommonTypesMessages.Error_ImportInvalidBase({base, path, subtag}));
@@ -189,12 +209,20 @@ export class LDMLKeyboardXMLSourceFileReader {
     // pull all children of importXml[subtag] into obj
     for (const subsubtag of Object.keys(importRootNode).reverse()) { // e.g. <key/>
       const subsubval = importRootNode[subsubtag];
+      const basePath = `${base}/${path}`;
       if (!Array.isArray(subsubval)) {
         // This is somewhat of an internal error, indicating that a non-mergeable XML file was imported
         // Not exercisable with the standard LDML imports.
         this.callbacks.reportMessage(CommonTypesMessages.Error_ImportMergeFail({base, path, subtag, subsubtag}));
         return false;
       }
+      // Mark all children as an import
+      subsubval.forEach(o => o[ImportStatus.import] = basePath);
+      if (implied) {
+        // mark all children as an implied import
+        subsubval.forEach(o => o[ImportStatus.impliedImport] = basePath);
+      }
+
       if (!obj[subsubtag]) {
         obj[subsubtag] = []; // start with empty array
       }
@@ -207,9 +235,8 @@ export class LDMLKeyboardXMLSourceFileReader {
    * @returns true if valid, false if invalid
    */
   public validate(source: LDMLKeyboardXMLSourceFile | LDMLKeyboardTestDataXMLSourceFile): boolean {
-    const ajv = new Ajv();
-    if(!ajv.validate(Schemas.ldmlKeyboard, source)) {
-      for (let err of ajv.errors) {
+    if(!SchemaValidators.ldmlKeyboard3(source)) {
+      for (let err of (<any>SchemaValidators.ldmlKeyboard3).errors) {
         this.callbacks.reportMessage(CommonTypesMessages.Error_SchemaValidationError({
           instancePath: err.instancePath,
           keyword: err.keyword,
@@ -345,16 +372,16 @@ export class LDMLKeyboardXMLSourceFileReader {
   boxTestDataArrays(raw: any) : LDMLKeyboardTestDataXMLSourceFile | null {
     if (!raw) return null;
     const a : LDMLKeyboardTestDataXMLSourceFile = {
-      keyboardTest: {
-        conformsTo: raw?.keyboardTest?.$?.conformsTo,
+      keyboardTest3: {
+        conformsTo: raw?.keyboardTest3?.$?.conformsTo,
       }
     };
 
-    const $$ : NameAndProps[] = raw?.keyboardTest?.$$;
+    const $$ : NameAndProps[] = raw?.keyboardTest3?.$$;
 
-    this.stuffBoxes(a.keyboardTest, $$, 'info');
-    this.stuffBoxes(a.keyboardTest, $$, 'repertoire', true);
-    this.stuffBoxes(a.keyboardTest, $$, 'tests', true, (o, r) => {
+    this.stuffBoxes(a.keyboardTest3, $$, 'info');
+    this.stuffBoxes(a.keyboardTest3, $$, 'repertoire', true);
+    this.stuffBoxes(a.keyboardTest3, $$, 'tests', true, (o, r) => {
       // start with basic unpack
       const tests : LKTTests = LDMLKeyboardXMLSourceFileReader.defaultMapper(o, r);
       // add ingredients

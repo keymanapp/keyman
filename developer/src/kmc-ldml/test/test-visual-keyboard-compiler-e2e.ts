@@ -1,10 +1,8 @@
 import 'mocha';
 import {assert} from 'chai';
-import x_hextobin from '@keymanapp/hextobin';
+import hextobin from '@keymanapp/hextobin';
 import { KvkFileWriter } from '@keymanapp/common-types';
 import {checkMessages,  compilerTestOptions,  compileVisualKeyboard, makePathToFixture} from './helpers/index.js';
-
-const hextobin = (x_hextobin as any).default;
 
 describe('visual-keyboard-compiler', function() {
   this.slow(500); // 0.5 sec -- json schema validation takes a while

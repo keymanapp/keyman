@@ -1,6 +1,6 @@
-import chalk = require('chalk');
-import express = require('express');
-import { data, DebugFont, simplifyId } from "../../../data";
+import chalk from 'chalk';
+import * as express from 'express';
+import { data, DebugFont, simplifyId } from "../../../data.js";
 
 export default function apiKeyboardRegister (req: express.Request, res: express.Response, next: express.NextFunction) {
   const id = simplifyId(req.body['id']);

@@ -1,4 +1,5 @@
-import { Constants, VisualKeyboard, LDMLKeyboard } from "@keymanapp/common-types";
+import { VisualKeyboard, LDMLKeyboard } from "@keymanapp/common-types";
+import { KeysCompiler } from "./keys.js";
 
 export class LdmlKeyboardVisualKeyboardCompiler {
   public compile(source: LDMLKeyboard.LDMLKeyboardXMLSourceFile): VisualKeyboard.VisualKeyboard {
@@ -13,9 +14,10 @@ export class LdmlKeyboardVisualKeyboardCompiler {
     result.header.ansiFont = {...VisualKeyboard.DEFAULT_KVK_FONT};
     result.header.unicodeFont = {...VisualKeyboard.DEFAULT_KVK_FONT};
 
-    for(let layers of source.keyboard.layers) {
+    for(let layers of source.keyboard3.layers) {
+      const hardware = layers.form;
       for(let layer of layers.layer) {
-        this.compileHardwareLayer(source, result, layer);
+        this.compileHardwareLayer(source, result, layer, hardware);
       }
     }
     return result;
@@ -24,9 +26,16 @@ export class LdmlKeyboardVisualKeyboardCompiler {
   private compileHardwareLayer(
     source: LDMLKeyboard.LDMLKeyboardXMLSourceFile,
     vk: VisualKeyboard.VisualKeyboard,
-    layer: LDMLKeyboard.LKLayer
+    layer: LDMLKeyboard.LKLayer,
+    hardware: string,
   ) {
-    // TODO-LDML: consider consolidation with keys.ts?
+    if (hardware === 'touch') {
+      hardware = 'us'; // TODO-LDML: US Only. Do something different here?
+    }
+    const keymap = KeysCompiler.getKeymapFromForms(source.keyboard3?.forms?.form, hardware);
+    if (!keymap) {
+      throw Error(`Internal error: could not find keymap for form ${hardware}`);
+    }
     const shift = this.translateLayerIdToVisualKeyboardShift(layer.id);
 
     let y = -1;
@@ -38,7 +47,7 @@ export class LdmlKeyboardVisualKeyboardCompiler {
       for(let key of keys) {
         x++;
 
-        let keydef = source.keyboard.keys?.key?.find(x => x.id == key);
+        let keydef = source.keyboard3.keys?.key?.find(x => x.id == key);
 
         if (!keydef) {
           throw Error(`Internal Error: could not find key id="${key}" in layer "${layer.id || '<none>'}", row "${y}"`);
@@ -48,7 +57,7 @@ export class LdmlKeyboardVisualKeyboardCompiler {
           flags: VisualKeyboard.VisualKeyboardKeyFlags.kvkkUnicode,
           shift: shift,
           text: keydef.to, // TODO-LDML: displays
-          vkey: Constants.USVirtualKeyMap[y][x] // TODO-LDML: #7965  US-only
+          vkey: keymap[y][x],
         });
       }
     }
