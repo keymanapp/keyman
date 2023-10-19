@@ -32,12 +32,18 @@ namespace km {
 namespace kbp {
 namespace ldml {
 
-// macro for working with ICU calls
-#define UASSERT_SUCCESS(status) \
-  if (U_FAILURE(status)) { \
-    DebugLog("U_FAILURE(%s)", u_errorName(status)); \
-    assert(U_SUCCESS(status)); \
+/** @returns true on success */
+inline bool uassert_success(const char *file, int line, const char *function, UErrorCode status) {
+  if (U_FAILURE(status)) {
+    DebugLog2(file, line, function, "U_FAILURE(%s)", u_errorName(status));
+    return false;
+  } else {
+    return true;
   }
+}
+
+#define UASSERT_SUCCESS(status) assert(U_SUCCESS(status)); \
+  uassert_success(__FILE__, __LINE__, __FUNCTION__, status)
 
 using km::kbp::kmx::SimpleUSet;
 
