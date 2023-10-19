@@ -49,6 +49,13 @@ export class MatcherSelector<Type, StateToken = any> extends EventEmitter<EventM
 
   public readonly baseGestureSetId: string;
 
+  /**
+   * Used to force synchronization during `matchGesture` setup in case
+   * of two simultaneous inputs that both require deferral to previously-
+   * existing matchers that could resolve first.
+   */
+  private pendingMatchSetup?: Promise<void>;
+
   constructor(baseSetId?: string) {
     super();
     this.baseGestureSetId = baseSetId || 'default';
@@ -205,6 +212,12 @@ export class MatcherSelector<Type, StateToken = any> extends EventEmitter<EventM
      * change their committed links; bypass this section.
      */
     if(sourceNotYetStaged) {
+      if(this.pendingMatchSetup) {
+        // If a prior call is still waiting on the `await` below, wait for it to clear
+        // entirely before proceeding; there could be effects for how the next part below is processed.
+        await this.pendingMatchSetup;
+      }
+
       const extendableMatcherSet = this.potentialMatchers.filter((matcher) => matcher.mayAddContact());
       extendableMatcherSet.forEach((matcher) => {
         // TODO:  do we alter the resolution priority in any way, now that there's an extra touchpoint?
@@ -215,29 +228,36 @@ export class MatcherSelector<Type, StateToken = any> extends EventEmitter<EventM
         matcher.promise.then(this.matcherSelectionFilter(matcher, synchronizationSet));
       });
 
-      const originalStateToken = this.stateToken;
+      if(extendableMatcherSet.length > 0) {
+        const originalStateToken = this.stateToken;
 
-      /* We need to wait for any and all pending promises to resolve after the previous loop -
-       * if any gesture models have resolved, it is possible that our consumer may alter the
-       * active state token as a consequence... and expect that to be used for the source if it
-       * corresponds to a newly-starting gesture.  See #7173 and compare with the simple-tap
-       * shortcut in which a new second tap instantly resolves the first.  (If the resolved
-       * tap changes the active layer - the 'state token' here - that's what this addresses.)
-       *
-       * The easiest and cleanest way to ensure all Promises that can resolve, do so before
-       * proceeding:  `setTimeout` uses the macrotask queue, while `Promise`s resolve on the
-       * microtask queue.  Thus, awaiting completion of a 0-sec timeout lets everything
-       * that can fulfill do so before this proceeds.
-       *
-       * Reference: https://javascript.info/event-loop
-       */
-      await timedPromise(0);
+        /* We need to wait for any and all pending promises to resolve after the previous loop -
+         * if any gesture models have resolved, it is possible that our consumer may alter the
+         * active state token as a consequence... and expect that to be used for the source if it
+         * corresponds to a newly-starting gesture.  See #7173 and compare with the simple-tap
+         * shortcut in which a new second tap instantly resolves the first.  (If the resolved
+         * tap changes the active layer - the 'state token' here - that's what this addresses.)
+         *
+         * The easiest and cleanest way to ensure all Promises that can resolve, do so before
+         * proceeding:  `setTimeout` uses the macrotask queue, while `Promise`s resolve on the
+         * microtask queue.  Thus, awaiting completion of a 0-sec timeout lets everything
+         * that can fulfill do so before this proceeds.
+         *
+         * Reference: https://javascript.info/event-loop
+         */
 
-      // stateToken may have shifted by the time we regain control here.
-      const incomingStateToken = this.stateToken;
+        const pendingMatchGesture = new ManagedPromise<void>();
+        this.pendingMatchSetup = pendingMatchGesture.corePromise;
+        await timedPromise(0);
+        this.pendingMatchSetup = null;
+        pendingMatchGesture.resolve();
 
-      if(originalStateToken != incomingStateToken) {
-        unmatchedSource = unmatchedSource.constructSubview(false, true, incomingStateToken);
+        // stateToken may have shifted by the time we regain control here.
+        const incomingStateToken = this.stateToken;
+
+        if(originalStateToken != incomingStateToken) {
+          unmatchedSource = unmatchedSource.constructSubview(false, true, incomingStateToken);
+        }
       }
     }
 
