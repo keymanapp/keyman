@@ -166,6 +166,12 @@ export class MatcherSelector<Type, StateToken = any> extends EventEmitter<EventM
     let unmatchedSource = sourceNotYetStaged ? source : null;
     const priorMatcher = sourceNotYetStaged ? null: source;
 
+    if(this.pendingMatchSetup) {
+      // If a prior call is still waiting on the `await` below, wait for it to clear
+      // entirely before proceeding; there could be effects for how the next part below is processed.
+      await this.pendingMatchSetup;
+    }
+
     if(sourceNotYetStaged) {
       // Cancellation before a first stage is possible; in this case, there's no sequence
       // to trigger cleanup.  We can do that here.
@@ -210,12 +216,6 @@ export class MatcherSelector<Type, StateToken = any> extends EventEmitter<EventM
      * change their committed links; bypass this section.
      */
     if(sourceNotYetStaged) {
-      if(this.pendingMatchSetup) {
-        // If a prior call is still waiting on the `await` below, wait for it to clear
-        // entirely before proceeding; there could be effects for how the next part below is processed.
-        await this.pendingMatchSetup;
-      }
-
       const extendableMatcherSet = this.potentialMatchers.filter((matcher) => matcher.mayAddContact());
       extendableMatcherSet.forEach((matcher) => {
         // TODO:  do we alter the resolution priority in any way, now that there's an extra touchpoint?
