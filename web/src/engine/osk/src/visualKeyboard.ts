@@ -217,6 +217,7 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
       throw new Error(`Keyboard ${this.layoutKeyboard.id} does not have a layer with id ${value}`);
     } else {
       this._layerId = value;
+      this.layerGroup.activeLayerId = value;
       this.gestureEngine.stateToken = value;
     }
 
@@ -1376,7 +1377,7 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
     // Select the layer to display, and adjust sizes
     if (layout != null) {
       kbdObj.layerId = layerId;
-      kbdObj.gestureEngine.stateToken = layerId;
+      kbdObj.layerGroup.activeLayerId = layerId;
 
       // This still feels fairly hacky... but something IS needed to constrain the height.
       // There are plans to address related concerns through some of the later aspects of

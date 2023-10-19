@@ -92,6 +92,8 @@ export class TouchpointCoordinator<HoveredItemType, StateToken=any> extends Even
     selector.cascadeTermination();
 
     this.selectorStack.splice(index, 1);
+    // Make sure the current state token is set at this stage.
+    this.currentSelector.stateToken = this.stateToken;
   }
 
   public get currentSelector() {
@@ -169,6 +171,7 @@ export class TouchpointCoordinator<HoveredItemType, StateToken=any> extends Even
   public set stateToken(token: StateToken) {
     this._stateToken = token;
     this.inputEngines.forEach((engine) => engine.stateToken = token);
+    this.currentSelector.stateToken = token;
   }
 
   private addSimpleSourceHooks(touchpoint: GestureSource<HoveredItemType>) {

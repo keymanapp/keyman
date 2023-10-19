@@ -415,6 +415,10 @@ export class GestureMatcher<Type, StateToken = any> implements PredecessorMatch<
       );
 
       if(!initialStateCheck) {
+        // The initial state check failed, and we should not permanently establish a
+        // pathMatcher for a source that failed to meet initial conditions.
+        this.pathMatchers.pop();
+
         this.finalize(false, 'path');
       }
     }

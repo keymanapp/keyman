@@ -538,7 +538,8 @@ export const MultitapModel: GestureModel<any> = {
       },
       endOnResolve: true
     }, {
-      model: InstantContactResolutionModel
+      model: InstantContactResolutionModel,
+      resetOnResolve: true
     }
   ],
   sustainTimer: {
