@@ -16,10 +16,13 @@ if [ -n "$TEAMCITY_VERSION" ]; then
   if ! pip3 list --format=columns | grep -q teamcity-messages; then
       pip3 install teamcity-messages
   fi
-  python3 -m teamcity.unittestpy discover -s tests -p test_*.py
+  test_module=teamcity.unittestpy
 else
-  # shellcheck disable=SC2086
-  python3 ${coverage:-} -m unittest discover -v -s tests -p test_*.py
+  test_module=unittest
+  extra_opts=-v
 fi
+
+# shellcheck disable=SC2086
+python3 ${coverage:-} -m ${test_module:-} discover ${extra_opts:-} -s tests -p test_*.py
 
 rm -rf "$XDG_CONFIG_HOME"

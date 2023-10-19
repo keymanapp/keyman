@@ -46,7 +46,7 @@ execute_with_temp_schema() {
   TEMP_DATA_DIR=$(mktemp -d)
   SCHEMA_DIR="${TEMP_DATA_DIR}/glib-2.0/schemas"
   export XDG_DATA_DIRS="${TEMP_DATA_DIR}":${XDG_DATA_DIRS-}
-  export GSETTINGS_SCHEMA_DIR="${SCHEMA_DIR}"
+  export GSETTINGS_SCHEMA_DIR="${SCHEMA_DIR}:/usr/share/glib-2.0/schemas/:${GSETTINGS_SCHEMA_DIR-}"
   mkdir -p "${SCHEMA_DIR}"
   cp resources/com.keyman.gschema.xml "${SCHEMA_DIR}"/
   glib-compile-schemas "${SCHEMA_DIR}"

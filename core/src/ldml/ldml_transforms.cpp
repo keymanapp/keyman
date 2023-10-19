@@ -408,7 +408,6 @@ transform_entry::transform_entry(const std::u32string &from, const std::u32strin
   init();
 }
 
-// TODO-LDML: How do we return errors from here?
 transform_entry::transform_entry(
     const std::u32string &from,
     const std::u32string &to,
@@ -417,13 +416,16 @@ transform_entry::transform_entry(
     const kmx::kmx_plus &kplus,
     bool &valid)
     : fFrom(from), fTo(to), fFromPattern(nullptr), fMapFromStrId(mapFrom), fMapToStrId(mapTo) {
-  valid = false;
+  if (!valid)
+    return; // exit early
   assert(!fFrom.empty()); // TODO-LDML: should not happen?
   assert((fMapFromStrId == 0) == (fMapToStrId == 0));  // we have both or we have neither.
   assert(kplus.strs != nullptr);
   assert(kplus.vars != nullptr);
   assert(kplus.elem != nullptr);
-  valid = init();
+  if(!init()) {
+    valid = false;
+  }
 
   // setup mapFrom
   if (fMapFromStrId != 0) {
@@ -460,21 +462,21 @@ transform_entry::transform_entry(
 
 bool
 transform_entry::init() {
-  if (!fFrom.empty()) {
-    // TODO-LDML: if we have mapFrom, may need to do other processing.
-    const std::u16string patstr = km::kbp::kmx::u32string_to_u16string(fFrom);
-    UErrorCode status           = U_ZERO_ERROR;
-    /* const */ icu::UnicodeString patustr_raw = icu::UnicodeString(patstr.data(), (int32_t)patstr.length());
-    // add '$' to match to end
-    patustr_raw.append(u'$');
-    icu::UnicodeString patustr;
-    const icu::Normalizer2 *nfd = icu::Normalizer2::getNFDInstance(status);
-    // NFD normalize on pattern creation
-    nfd->normalize(patustr_raw, patustr, status);
-    fFromPattern.reset(icu::RegexPattern::compile(patustr, 0, status));
-    return (UASSERT_SUCCESS(status));
+  if (fFrom.empty()) {
+    return false;
   }
-  return false; // fFrom should not be empty.
+  // TODO-LDML: if we have mapFrom, may need to do other processing.
+  const std::u16string patstr = km::kbp::kmx::u32string_to_u16string(fFrom);
+  UErrorCode status           = U_ZERO_ERROR;
+  /* const */ icu::UnicodeString patustr_raw = icu::UnicodeString(patstr.data(), (int32_t)patstr.length());
+  // add '$' to match to end
+  patustr_raw.append(u'$');
+  icu::UnicodeString patustr;
+  const icu::Normalizer2 *nfd = icu::Normalizer2::getNFDInstance(status);
+  // NFD normalize on pattern creation
+  nfd->normalize(patustr_raw, patustr, status);
+  fFromPattern.reset(icu::RegexPattern::compile(patustr, 0, status));
+  return (UASSERT_SUCCESS(status));
 }
 
 size_t
@@ -813,6 +815,10 @@ transforms::load(
         const std::u32string toStr                      = kmx::u16string_to_u32string(kplus.strs->get(element->to));
         KMX_DWORD mapFrom                               = element->mapFrom; // copy, because of alignment
         KMX_DWORD mapTo                                 = element->mapTo;   // copy, because of alignment
+        assert(!fromStr.empty());
+        if (fromStr.empty()) {
+          valid = false;
+        }
         newGroup.emplace_back(fromStr, toStr, mapFrom, mapTo, kplus, valid);  // creating a transform_entry
         assert(valid);
         if(!valid) {
