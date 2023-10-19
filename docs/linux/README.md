@@ -102,6 +102,9 @@ sudo apt install -y lcov libdatetime-perl gcovr
 pip3 install coverage
 ```
 
+**Note:** You want lcov > 1.16, so you might have to download and install
+a newer version e.g. from <https://packages.ubuntu.com/mantic/lcov>.
+
 #### Creating and displaying code coverage reports
 
 All three projects (ibus-keyman, keyman-config, and keyman-system-service)
