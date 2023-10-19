@@ -37,6 +37,21 @@ typedef struct {
     NSString *apiKeymanCom;
 } KeymanVersionInfo;
 
+// tags for default menu items, displayed whether keyboards are active or not
+static const int DIVIDER_MENUITEM_TAG = -4;
+static const int CONFIG_MENUITEM_TAG = -3;
+static const int OSK_MENUITEM_TAG = -2;
+static const int ABOUT_MENUITEM_TAG = -1;
+
+// the number of menu items that do not represent active keyboards
+static const int DEFAULT_KEYMAN_MENU_ITEM_COUNT = 4;
+
+// the tag for the first keyboard dynamically added to the menu
+static const int KEYMAN_FIRST_KEYBOARD_MENUITEM_TAG = 0;
+
+// the menu index for the first keyboard dynamically added to the menu
+static const int KEYMAN_FIRST_KEYBOARD_MENUITEM_INDEX = 0;
+
 @interface KMInputMethodAppDelegate : NSObject
 #define USE_ALERT_SHOW_HELP_TO_FORCE_EASTER_EGG_CRASH_FROM_ENGINE 1
 #ifdef USE_ALERT_SHOW_HELP_TO_FORCE_EASTER_EGG_CRASH_FROM_ENGINE
@@ -54,6 +69,7 @@ typedef struct {
 @property (nonatomic, strong) NSMutableArray *kmxFileList;
 @property (nonatomic, strong) NSString *selectedKeyboard;
 @property (nonatomic, strong) NSMutableArray *activeKeyboards;
+@property (assign) int numberOfKeyboardMenuItems;
 @property (nonatomic, strong) NSMutableString *contextBuffer;
 @property (nonatomic, assign) NSEventModifierFlags currentModifierFlags;
 @property (nonatomic, assign) CFMachPortRef lowLevelEventTap;
@@ -87,6 +103,7 @@ typedef struct {
 - (void)showAboutWindow;
 - (void)showOSK;
 - (void)showConfigurationWindow;
+- (void)selectKeyboardFromMenu:(NSInteger)tag;
 - (void)sleepFollowingDeactivationOfServer:(id)lastServer;
 - (void)wakeUpWith:(id)newServer;
 - (void)handleKeyEvent:(NSEvent *)event;
