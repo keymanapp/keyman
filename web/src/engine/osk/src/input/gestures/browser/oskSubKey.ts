@@ -3,6 +3,24 @@ import OSKKey from '../../../keyboard-layout/oskKey.js';
 import { KeyData, KeyElement, link } from '../../../keyElement.js';
 import VisualKeyboard from '../../../visualKeyboard.js';
 
+// Typing is to ensure that the keys specified below actually are on the type...
+// and to gain Intellisense if more need to be added.
+
+/**
+ * Names of class fields corresponding to layout properties of subkeys.
+ * Subkeys are always given consistent styling and may not customize
+ * padding or width.
+ */
+const LAYOUT_KEY_PROPS: readonly (keyof ActiveSubKey)[] = [
+  'width',
+  'pad'
+];
+
+const TEXT_PROPS: readonly (keyof ActiveSubKey)[] = [
+  'id',
+  'text'
+]
+
 export default class OSKSubKey extends OSKKey {
   constructor(spec: ActiveSubKey, layer: string) {
     if(typeof(layer) != 'string' || layer == '') {
@@ -24,12 +42,15 @@ export default class OSKSubKey extends OSKKey {
     let tKey = osk.getDefaultKeyObject();
     let ks=kDiv.style;
 
-    for(const tp of Object.keys(tKey)) {
-      // We've already preprocessed the keyboard's version of the subkey.  While certain
-      // layout properties are fine to overwrite, certain functional properties must
-      // be preserved.
-      if(typeof spec[tp] != 'string' && tp != 'default' && tp != '_baseKeyEvent') {
-        spec[tp]=tKey[tp];
+    // Ensure consistency in styling for all subkeys.
+    // `as string[]` - because TS doesn't inspect the array to ensure no readonly props are referenced.
+    for(const tp of LAYOUT_KEY_PROPS as string[]) {
+      spec[tp]=tKey[tp];
+    }
+
+    for(const tp of TEXT_PROPS as string[]) {
+      if(typeof spec[tp] != 'string') {
+        spec[tp] = tKey[tp];
       }
     }
 

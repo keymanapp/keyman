@@ -39,6 +39,7 @@ class ActiveKeyBase {
 
   /** WARNING - DO NOT USE DIRECTLY outside of @keymanapp/keyboard-processor! */
   id: `T_${string}` | `K_${string}` | `U_${string}` | `t_${string}` | `k_${string}` | `u_${string}`;
+  text: string;
 
   // These are fine.
   width?: number;
