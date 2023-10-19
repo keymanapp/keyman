@@ -804,7 +804,7 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
   }
   
   if (numberToRemove > 0) {
-    for (int i = 1; i <= numberToRemove; i++) {
+    for (int i = 0; i < numberToRemove; i++) {
       [self.menu removeItemAtIndex:KEYMAN_FIRST_KEYBOARD_MENUITEM_INDEX];
     }
   }
