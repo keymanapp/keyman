@@ -22,12 +22,12 @@ If "**Change my app recommendation settings**" is shown, select that and go to s
 
 ## Allow Windows 11 to Install Apps From Anywhere
 
-1. You may be warned to use a "Microsoft-verfied" App from the Microsoft Store. This is because Keyman is not available in the Microsoft Store.
+1. You may be warned to use a "Microsoft-verified" App from the Microsoft Store. This is because Keyman is not available in the Microsoft Store.
 If "**Change my app recommendation settings**" is shown, select that and go to step 4.
 ![](../desktop_images/km_non_app_store_1.png)
 
 
-2. If that is not available Open the Windows 11 start menu (Windows logo) and select **Settings**
+2. If that is not available, open the Windows 11 start menu (Windows logo) and select **Settings**.
 
 3. Click on the **Apps** in the **Windows Settings** menu
 
