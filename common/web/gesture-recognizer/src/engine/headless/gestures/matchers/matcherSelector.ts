@@ -288,20 +288,17 @@ export class MatcherSelector<Type, StateToken = any> extends EventEmitter<EventM
         // stateToken may have shifted by the time we regain control here.
         const incomingStateToken = this.stateToken;
 
-        const newlyResolvedMatchers = extendableMatcherSet.filter((matcher) => matcher.result && matcher.result.matched);
-        const srcIsMatched = newlyResolvedMatchers.find((matcher) => matcher.allSourceIds.indexOf(unmatchedSource.identifier) > -1);
-
-        // The source triggered a match for an existing gesture and is considered part of it;
-        // no need to test it against models for newly-starting ones.
-        if(srcIsMatched) {
-          return { selectionPromise: matchPromise.corePromise };
-        }
-
-        // If we've reached this point, we should assume that the incoming source should act
-        // independently as the start of a new gesture.
-        //
-        // Accordingly, if there's a new state token in place, we should ensure the source
-        // reflects THAT token, rather than the default one it was given.
+        /* If we've reached this point, we should assume that the incoming source may act
+         * independently as the start of a new gesture.
+         *
+         * Accordingly, if there's a new state token in place, we should ensure the source
+         * reflects THAT token, rather than the default one it was given.
+         *
+         * If it ends up as part of an already-existing gesture, the 'subview' mechanic will
+         * ensure that it is viewed correctly therein - as the 'subview' will have been
+         * built before the code below takes effect and since the change below will not
+         * propagate.
+         */
 
         if(originalStateToken != incomingStateToken) {
           const currentSample = unmatchedSource.currentSample;
