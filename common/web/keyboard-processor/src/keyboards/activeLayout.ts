@@ -2,7 +2,7 @@ import Codes from "../text/codes.js";
 import KeyEvent, { KeyEventSpec } from "../text/keyEvent.js";
 import KeyMapping from "../text/keyMapping.js";
 import type { KeyDistribution } from "../text/keyEvent.js";
-import { Layouts } from "./defaultLayouts.js";
+import { ButtonClasses, Layouts } from "./defaultLayouts.js";
 import type { LayoutKey, LayoutSubKey, LayoutRow, LayoutLayer, LayoutFormFactor, ButtonClass } from "./defaultLayouts.js";
 import type Keyboard from "./keyboard.js";
 
@@ -68,7 +68,7 @@ class ActiveKeyBase {
   static readonly DEFAULT_KEY = {
     text: '',
     width: ActiveKeyBase.DEFAULT_KEY_WIDTH,
-    sp: Layouts.buttonClasses.DEFAULT,
+    sp: ButtonClasses.normal,
     pad: ActiveKeyBase.DEFAULT_PAD
   };
 
@@ -133,7 +133,7 @@ class ActiveKeyBase {
   public get isPadding(): boolean {
     // Does not include 9 (class:  blank) as that may be an intentional 'catch' for misplaced
     // keystrokes.
-    return this.sp == Layouts.buttonClasses.HIDDEN; // Button class: hidden.
+    return this.sp == ButtonClasses.spacer; // Button class: hidden.
   }
 
   /**
@@ -482,17 +482,17 @@ export class ActiveRow implements LayoutRow {
       }
 
       // Modify the key type for special keys with non-standard labels
-      // to allow the keyboard font to ovveride the SpecialOSK font.
+      // to allow the keyboard font to overide the SpecialOSK font.
       // Blank keys are no longer reclassed - can use before/after CSS to add text
       switch(key['sp']) {
-        case Layouts.buttonClasses.SHIFT:
+        case ButtonClasses.special:
           if(!ActiveRow.SPECIAL_LABEL.test(key['text']) && key['text'] != '') {
-            key.sp=Layouts.buttonClasses.SPECIAL;
+            key.sp=ButtonClasses.customSpecial;
           }
           break;
-        case Layouts.buttonClasses['SHIFT-ON']:
+        case ButtonClasses.specialActive:
           if(!ActiveRow.SPECIAL_LABEL.test(key['text']) && key['text'] != '') {
-            key.sp=Layouts.buttonClasses['SPECIAL-ON'];
+            key.sp=ButtonClasses.customSpecialActive;
           }
           break;
       }
