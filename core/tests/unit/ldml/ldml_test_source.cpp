@@ -462,37 +462,39 @@ LdmlJsonTestSource::next_action(ldml_action &fillin) {
 
   action_index++;
   auto action   = data["/actions"_json_pointer].at(action_index);
+  // load up several common attributes
+  auto type     = action["/type"_json_pointer];
+  auto result   = action["/result"_json_pointer];
+  auto key      = action["/key"_json_pointer];
+  auto to       = action["/to"_json_pointer];
 
   // is it a check event?
-  auto as_check = action["/check/result"_json_pointer];
-  if (as_check.is_string()) {
+  if (type == "check") {
     fillin.type   = LDML_ACTION_CHECK_EXPECTED;
-    fillin.string = LdmlTestSource::parse_u8_source_string(as_check.get<std::string>());
+    fillin.string = LdmlTestSource::parse_u8_source_string(result.get<std::string>());
     assert(km::kbp::ldml::normalize_nfc(fillin.string));
     return;
-  }
-
-  // is it a keystroke by id?
-  auto as_key  = action["/keystroke/key"_json_pointer];
-  if (as_key.is_string()) {
+  } else if (type == "keystroke") {
     fillin.type   = LDML_ACTION_KEY_EVENT;
-    auto keyId = LdmlTestSource::parse_u8_source_string(as_key.get<std::string>());
+    auto keyId = LdmlTestSource::parse_u8_source_string(key.get<std::string>());
     // now, look up the key
     set_key_from_id(fillin.k, keyId);
     return;
-  }
-  // TODO-LDML: handle gesture, etc
-
-  auto as_emit = action["/emit/to"_json_pointer];
-  if (as_emit.is_string()) {
+  } else if (type == "emit") {
     fillin.type   = LDML_ACTION_EMIT_STRING;
-    fillin.string = LdmlTestSource::parse_u8_source_string(as_emit.get<std::string>());
+    fillin.string = LdmlTestSource::parse_u8_source_string(to.get<std::string>());
     assert(km::kbp::ldml::normalize_nfc(fillin.string));
+    return;
+  } else if (type == "backspace") {
+    // backspace is handled as a key event
+    fillin.type             = LDML_ACTION_KEY_EVENT;
+    fillin.k.modifier_state = 0;
+    fillin.k.vk             = KM_CORE_VKEY_BKSP;
     return;
   }
 
   // TODO-LDML: error passthrough
-  std::cerr << "TODO-LDML: Error, unknown/unhandled action: " << action << std::endl;
+  std::cerr << "TODO-LDML: Error, unknown/unhandled action: " << type << std::endl;
   fillin.type = LDML_ACTION_DONE;
 }
 
@@ -707,7 +709,9 @@ int LdmlJsonTestSourceFactory::load(const km::kbp::path &compiled, const km::kbp
   auto info_author = data["/keyboardTest3/info/author"_json_pointer].get<std::string>();
   auto info_name = data["/keyboardTest3/info/name"_json_pointer].get<std::string>();
   // TODO-LDML: store these elsewhere?
-  std::cout << "JSON: reading " << info_name << " test of " << info_keyboard << " by " << info_author << std::endl;
+  std::wcout << console_color::fg(console_color::BLUE) << "test file     = " << path.name().c_str() << console_color::reset() << std::endl;
+  std::wcout << console_color::fg(console_color::YELLOW) << info_name.c_str() << "/ " << console_color::reset()
+             << " test: " << info_keyboard.c_str() << " author: " << info_author.c_str() << std::endl;
 
   auto all_tests = data["/keyboardTest3/tests"_json_pointer];
   assert_or_return((!all_tests.empty()) && (all_tests.size() > 0));  // TODO-LDML: can be empty if repertoire only?
@@ -718,7 +722,7 @@ int LdmlJsonTestSourceFactory::load(const km::kbp::path &compiled, const km::kbp
       auto test_name = test["/name"_json_pointer].get<std::string>();
       std::string test_path;
       test_path.append(info_name).append("/tests/").append(tests_name).append("/").append(test_name);
-      std::cout << "JSON: reading " << info_name << "/" << test_path << std::endl;
+      // std::cout << "JSON: reading " << info_name << "/" << test_path << std::endl;
 
       std::unique_ptr<LdmlJsonTestSource> subtest(new LdmlJsonTestSource(test_path, kmxplus.get()));
       assert_or_return(subtest->load(test) == 0);
