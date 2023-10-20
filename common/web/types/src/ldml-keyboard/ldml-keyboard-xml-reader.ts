@@ -1,6 +1,3 @@
-// Enables DOM types, but just for this one module.
-///<reference lib="dom" />
-
 import * as xml2js from 'xml2js';
 import { LDMLKeyboardXMLSourceFile, LKImport, ImportStatus } from './ldml-keyboard-xml.js';
 import { default as AjvModule } from 'ajv';
