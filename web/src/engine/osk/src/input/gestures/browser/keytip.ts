@@ -2,6 +2,7 @@ import OSKBaseKey from '../../../keyboard-layout/oskBaseKey.js';
 import { KeyElement } from '../../../keyElement.js';
 import KeyTipInterface from '../../../keytip.interface.js';
 import VisualKeyboard from '../../../visualKeyboard.js';
+import { GesturePreviewHost } from '../../../keyboard-layout/gesturePreviewHost.js';
 
 export default class KeyTip implements KeyTipInterface {
   public readonly element: HTMLDivElement;
@@ -18,7 +19,7 @@ export default class KeyTip implements KeyTipInterface {
 
   private readonly cap: HTMLDivElement;
   private readonly tip: HTMLDivElement;
-  private readonly label: HTMLSpanElement;
+  private previewHost: HTMLDivElement;
 
   private readonly constrain: boolean;
 
@@ -38,11 +39,10 @@ export default class KeyTip implements KeyTipInterface {
 
     tipElement.appendChild(this.tip = document.createElement('div'));
     tipElement.appendChild(this.cap = document.createElement('div'));
-    this.tip.appendChild(this.label = document.createElement('span'));
+    this.tip.appendChild(this.previewHost = document.createElement('div'));
 
     this.tip.className = 'kmw-keytip-tip';
     this.cap.className = 'kmw-keytip-cap';
-    this.label.className = 'kmw-keytip-label';
 
     this.constrain = constrain;
   }
@@ -105,7 +105,9 @@ export default class KeyTip implements KeyTipInterface {
         kts.fontSize = key.key.getIdealFontSize(vkbd, key.key.keyText, scaleStyle, true);
       }
 
-      this.label.textContent = kc.textContent;
+      const oldHost = this.previewHost;
+      this.previewHost = (new GesturePreviewHost(key)).element;
+      this.tip.replaceChild(this.previewHost, oldHost);
 
       // Adjust shape if at edges
       var xOverflow = (canvasWidth - xWidth) / 2;

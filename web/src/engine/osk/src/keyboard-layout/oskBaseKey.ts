@@ -6,10 +6,12 @@ import { KeyData, KeyElement, link } from '../keyElement.js';
 import OSKRow from './oskRow.js';
 import VisualKeyboard from '../visualKeyboard.js';
 import { ParsedLengthStyle } from '../lengthStyle.js';
+import { GesturePreviewHost } from './gesturePreviewHost.js';
 
 
 export default class OSKBaseKey extends OSKKey {
   private capLabel: HTMLDivElement;
+  private previewHost: HTMLDivElement;
   public readonly row: OSKRow;
 
   constructor(spec: ActiveKey, layer: string, row: OSKRow) {
@@ -122,6 +124,10 @@ export default class OSKBaseKey extends OSKKey {
     // Add text to button and button to placeholder div
     kDiv.appendChild(btn);
 
+    this.previewHost = document.createElement('div');
+    this.previewHost.style.display = 'none';
+    btn.appendChild(this.previewHost);
+
     // The 'return value' of this process.
     return this.square = kDiv;
   }
@@ -161,6 +167,21 @@ export default class OSKBaseKey extends OSKKey {
     skIcon.textContent = text;
 
     return skIcon;
+  }
+
+  public highlight(on: boolean): void {
+    super.highlight(on);
+
+    if(on) {
+      const oldPreviewHost = this.previewHost;
+      this.previewHost = (new GesturePreviewHost(this.btn)).element;
+      this.btn.replaceChild(this.previewHost, oldPreviewHost);
+    } else {
+      const oldPreviewHost = this.previewHost;
+      this.previewHost = document.createElement('div');
+      this.previewHost.style.display = 'none';
+      this.btn.replaceChild(this.previewHost, oldPreviewHost);
+    }
   }
 
   public refreshLayout(vkbd: VisualKeyboard) {

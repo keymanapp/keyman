@@ -342,6 +342,25 @@ body div.kmw-key-shift-on span.kmw-key-text {font-family:SpecialOSK !important;f
   z-index: 10002;
 }
 
+#kmw-gesture-preview {
+  position: absolute;
+  height: 100%;
+  width: 100%;
+  display: block;
+  z-index: 1;
+  top: 0;
+  left: 0;
+  background-color: inherit;
+}
+
+#kmw-gesture-base-label {
+  top: 50%;
+  transform: translateY(-50%);
+  position: absolute;
+  display: block;
+  width: 100%;
+}
+
 /* Key preview styles */
 
 div.ios div.kmw-keytip, div.android div.kmw-keytip {
@@ -399,6 +418,8 @@ div.android div.kmw-keytip {
 div.android div.kmw-keytip-tip {
   border-radius: 6px;
   background: #999;
+  /* Needed in order to properly 'anchor' the gesture-preview */
+  position: relative;
 }
 
 div.android div.kmw-keytip-cap {
