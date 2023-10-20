@@ -85,7 +85,7 @@ class ActiveKeyBase {
   nextlayer: string;
   sp?: ButtonClass;
 
-  _baseKeyEvent: KeyEvent;
+  private _baseKeyEvent: KeyEvent;
   isMnemonic: boolean = false;
 
   /**

@@ -69,7 +69,7 @@ export class MouseEventEngine<HoveredItemType, StateToken = any> extends InputEv
   private buildSampleFromEvent(event: MouseEvent, identifier: number) {
     // WILL be null for newly-starting `GestureSource`s / contact points.
     const source = this.getTouchpointWithId(identifier);
-    return this.buildSampleFor(event.clientX, event.clientY, event.target, performance.now(), source?.stateToken ?? this.stateToken);
+    return this.buildSampleFor(event.clientX, event.clientY, event.target, performance.now(), source);
   }
 
   onMouseStart(event: MouseEvent) {

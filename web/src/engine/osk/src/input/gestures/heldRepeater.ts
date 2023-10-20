@@ -1,12 +1,14 @@
 import { GestureSequence } from "@keymanapp/gesture-recognizer";
 
 import { KeyElement } from "../../keyElement.js";
+import { GestureHandler } from './gestureHandler.js';
 
-export class HeldRepeater {
+export class HeldRepeater implements GestureHandler {
   static readonly INITIAL_DELAY = 500;
   static readonly REPEAT_DELAY = 100;
 
   readonly source: GestureSequence<KeyElement>;
+  readonly hasModalVisualization = false;
   readonly repeatClosure: () => void;
 
   timerHandle: number;
@@ -21,6 +23,11 @@ export class HeldRepeater {
       window.clearTimeout(this.timerHandle);
       this.timerHandle = undefined;
     });
+  }
+
+  cancel() {
+    this.deleteRepeater();
+    this.source.cancel();
   }
 
   readonly deleteRepeater = () => {

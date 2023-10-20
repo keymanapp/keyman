@@ -107,6 +107,7 @@ export class PaddedZoneSource implements RecognitionZoneSource {
           w: 2 * edgePadding[1],
           h: edgePadding[0] + edgePadding[2]
         };
+        break;
       case 4:
         // top, right, bottom, left
         this._edgePadding = {

@@ -39,14 +39,15 @@ import RealizedGesture from './input/gestures/realizedGesture.interface.js';
 import { defaultFontSize, getFontSizeStyle } from './fontSizeUtils.js';
 import PendingMultiTap, { PendingMultiTapState } from './input/gestures/browser/pendingMultiTap.js';
 import InternalSubkeyPopup from './input/gestures/browser/subkeyPopup.js';
-import InternalPendingLongpress from './input/gestures/browser/pendingLongpress.js';
 import InternalKeyTip from './input/gestures/browser/keytip.js';
 import CommonConfiguration from './config/commonConfiguration.js';
 
-import { gestureSetForLayout } from './input/gestures/specsForLayout.js';
+import { DEFAULT_GESTURE_PARAMS, GestureParams, gestureSetForLayout } from './input/gestures/specsForLayout.js';
 
 import { getViewportScale } from './screenUtils.js';
 import { HeldRepeater } from './input/gestures/heldRepeater.js';
+import SubkeyPopup from './input/gestures/browser/subkeyPopup.js';
+import { GestureHandler } from './input/gestures/gestureHandler.js';
 
 export interface VisualKeyboardConfiguration extends CommonConfiguration {
   /**
@@ -112,6 +113,13 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
    * prevent issue #7173.
    */
   readonly gestureEngine: GestureRecognizer<KeyElement, string>;
+
+  /**
+   * Tweakable gesture parameters referenced by supported gestures and the gesture engine.
+   */
+  readonly gestureParams: GestureParams = {
+    ...DEFAULT_GESTURE_PARAMS
+  };
 
   // Legacy alias, maintaining a reference for code built against older
   // versions of KMW.
@@ -192,6 +200,9 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
   // Popup key management
   keytip: KeyTip;
   globeHint: GlobeHint;
+
+  activeGestures: GestureHandler[] = [];
+
   pendingSubkey: PendingGesture;
   subkeyGesture: RealizedGesture;
 
@@ -355,13 +366,16 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
          * > The read-only target property of the Touch interface returns the (EventTarget) on which the touch contact
          *   started when it was first placed on the surface, even if the touch point has since moved outside the
          *   interactive area of that element[...]
+         *
+         * Therefore, `target` is for the initial element, not necessarily the one currently under
+         * the touchpoint - which matters during a 'touchmove'.
          */
 
         return this.layerGroup.findNearestKey(sample);
       }
     };
 
-    const recognizer = new GestureRecognizer(gestureSetForLayout(this.layerGroup), config);
+    const recognizer = new GestureRecognizer(gestureSetForLayout(this.layerGroup, this.gestureParams), config);
     recognizer.stateToken = this.layerId;
 
     const sourceTrackingMap: Record<string, {
@@ -424,62 +438,96 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
 
       // Drop any roaming-touch specific behaviors here.
 
-      // This should probably be universal in some manner.
       gestureSequence.on('complete', () => {
+        // Do cleanup - we'll no longer be tracking these, but that's only confirmed now.
+        // Multitouch does reference tracking data for a source after its completion,
+        // but only while still permitting new touches.  If we're here, that time is over.
+        for(let id of gestureSequence.allSourceIds) {
+          delete sourceTrackingMap[id];
+        }
       });
 
       // This should probably vary based on the type of gesture.
       gestureSequence.on('stage', (gestureStage, configChanger) => {
-        // Disable roaming-touch highlighting for all touchpoints included in a gesture, even
-        // newly-included ones as they occur.
-
-        // if( /* not in subkey-select mode */) {
+        // Disable roaming-touch highlighting (and current highlighting) for all
+        // touchpoints included in a gesture, even newly-included ones as they occur.
         for(let id of gestureStage.allSourceIds) {
           const trackingEntry = sourceTrackingMap[id];
+          if(trackingEntry.key) {
+            this.highlightKey(trackingEntry.key, false);
+            trackingEntry.key = null;
+          }
+
           trackingEntry.source.path.off('step', trackingEntry.roamingHighlightHandler);
         }
-        // }
+
 
         // First, if we've configured the gesture to generate a keystroke, let's handle that.
         const gestureKey = gestureStage.item;
 
+        let coordSource = gestureStage.sources[0];
+        let coord: InputSample<KeyElement, string> = null;
+        if(coordSource) {
+          // TODO:  should probably vary depending upon `gestureStage.matchedId`
+          // (certain types should probably use the base coord... or even from
+          // a prior stage of the sequence as appropriate.)
+          //
+          // This is the coordinate used as the basis for fat-finger calculations.
+          coord = coordSource.currentSample;
+        }
+
         if(gestureKey) {
-          let coordSource = gestureStage.sources[0];
-          let coord: InputSample<KeyElement, string> = null;
-          if(coordSource) {
-            // TODO:  should probably vary depending upon `gestureStage.matchedId`
-            // (certain types should probably use the base coord... or even from
-            // a prior stage of the sequence as appropriate.)
-            //
-            // This is the coordinate used as the basis for fat-finger calculations.
-            coord = coordSource.currentSample;
-          }
 
           if(gestureStage.matchedId == 'multitap') {
             // TODO:  examine sequence, determine rota-style index to apply; select THAT item instead.
           }
 
-          // Once the best coord to use for fat-finger calculations has been determined:
-          this.modelKeyClick(gestureStage.item, coord);
-
-          // -- Scratch-space as gestures start becoming integrated --
-          // Reordering may follow at some point.
-          //
-          // Potential long-term idea:  only handle the first stage; delegate future stages to
-          // specialized handlers for the remainder of the sequence.
-          // Should work for modipresses, too... I think.
-          if(gestureStage.matchedId == 'special-key-start' && gestureKey.key.spec.baseKeyID == 'K_BKSP') {
-            // Possible enhancement:  maybe update the held location for the backspace if there's movement?
-            // But... that seems pretty low-priority.
-            //
-            // Merely constructing the instance is enough; it'll link into the sequence's events and
-            // handle everything that remains for the backspace from here.
-            new HeldRepeater(gestureSequence, () => this.modelKeyClick(gestureKey, coord));
+          if(gestureStage.matchedId == 'subkey-select') {
+            // TODO:  examine subkey menu, determine proper set of fat-finger alternates.
           }
 
-          // TODO:  depending upon the gesture type, what sort of UI shifts should happen to
-          // facilitate follow-up stages?
+          // Once the best coord to use for fat-finger calculations has been determined:
+          this.modelKeyClick(gestureStage.item, coord);
         }
+
+        // Outside of passing keys along... the handling of later stages is delegated
+        // to gesture-specific handling classes.
+        if(gestureSequence.stageReports.length > 1) {
+          return;
+        }
+
+        let handler: GestureHandler = null;
+
+        // So, if this is the first stage, this is where we need to perform that delegation.
+
+        // -- Scratch-space as gestures start becoming integrated --
+        // Reordering may follow at some point.
+        //
+        // Potential long-term idea:  only handle the first stage; delegate future stages to
+        // specialized handlers for the remainder of the sequence.
+        // Should work for modipresses, too... I think.
+        if(gestureStage.matchedId == 'special-key-start' && gestureKey.key.spec.baseKeyID == 'K_BKSP') {
+          // Possible enhancement:  maybe update the held location for the backspace if there's movement?
+          // But... that seems pretty low-priority.
+          //
+          // Merely constructing the instance is enough; it'll link into the sequence's events and
+          // handle everything that remains for the backspace from here.
+          handler = new HeldRepeater(gestureSequence, () => this.modelKeyClick(gestureKey, coord));
+        } else if(gestureStage.matchedId.indexOf('longpress') > -1) {
+          // Matches:  'longpress', 'longpress-reset'.
+          // Likewise.
+          handler = new SubkeyPopup(gestureSequence, configChanger, this, gestureSequence.stageReports[0].sources[0].baseItem);
+        }
+
+        if(handler) {
+          this.activeGestures.push(handler);
+          gestureSequence.on('complete', () => {
+            this.activeGestures = this.activeGestures.filter((gesture) => gesture != handler);
+          });
+        }
+
+        // TODO:  depending upon the gesture type, what sort of UI shifts should happen to
+        // facilitate follow-up stages?
       })
     });
 
@@ -876,83 +924,11 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
   //   // Identify the key touched
   //   var t = <HTMLElement>input.target, key = this.keyTarget(t);
 
-  //   // Save the touch point, which is used for quick-display of popup keys (defined in highlightSubKeys)
-  //   this.initTouchCoord = input;
-
-  //   // Set the key for the new touch point to be current target, if defined
-  //   this.currentTarget = key;
-
-  //   // Clear repeated backspace if active, preventing 'sticky' behavior.
-  //   this.cancelDelete();
-
-  //   // Prevent multi-touch if popup displayed
-  //   if (this.subkeyGesture && this.subkeyGesture.isVisible()) {
-  //     return;
-  //   }
-
-  //   // Keep track of number of active (unreleased) touch points
-  //   this.touchCount = input.activeInputCount;
-
-  //   // Get nearest key if touching a hidden key or the end of a key row
-  //   if ((key && ((key.className.indexOf('key-hidden') >= 0) || (key.className.indexOf('key-blank') >= 0)))
-  //     || t.className.indexOf('kmw-key-row') >= 0) {
-
-  //     // Perform "fudged" selection ops if and only if we're not sure about the precision of the
-  //     // input source.  Mouse-based selection IS precise, so no need for "fudging" there.
-  //     if (!input.isFromMouse) {
-  //       key = this.findNearestKey(input, t);
-  //     }
-  //   }
-  //   // Do not do anything if no key identified!
-  //   if (key == null) {
-  //     return;
-  //   }
-
-  //   // Get key name (K_...) from element ID
-  //   let keyName = key['keyId'];
-
-  //   // Highlight the touched key
-  //   this.highlightKey(key, true);
-
   //   // Special function keys need immediate action
-  //   if (keyName == 'K_LOPT' || keyName == 'K_ROPT') {
-  //     window.setTimeout(function (this: VisualKeyboard) {
-  //       this.modelKeyClick(key);
-  //       // Because we immediately process the key, we need to re-highlight it after the click.
-  //       this.highlightKey(key, true);
-  //       // Highlighting'll be cleared automatically later.
-  //     }.bind(this), 0);
-  //     this.keyPending = null;
-  //     this.touchPending = null;
-
-  //     // Also backspace, to allow delete to repeat while key held
-  //   } else if (keyName == 'K_BKSP') {
-  //     // While we could inline the execution of the delete key here, we lose the ability to
-  //     // record the backspace key if we do so.
-  //     this.modelKeyClick(key, input);
-  //     this.deleteKey = key;
-  //     this.deleting = window.setTimeout(this.repeatDelete, 500);
-  //     this.keyPending = null;
-  //     this.touchPending = null;
-  //   } else {
-  //     if (this.keyPending) {
-  //       this.highlightKey(this.keyPending, false);
-
-  //       if (this.subkeyGesture && this.subkeyGesture instanceof InternalSubkeyPopup) {
-  //         let subkeyPopup = this.subkeyGesture as InternalSubkeyPopup;
-  //         subkeyPopup.updateTouch(input);
-  //         subkeyPopup.finalize(input);
-  //       } else {
-  //         this.modelKeyClick(this.keyPending, this.touchPending);
-  //       }
-  //       // Decrement the number of unreleased touch points to prevent
-  //       // sending the keystroke again when the key is actually released
-  //       this.touchCount--;
-  //     } else {
+  //   if (is not special key) {
+  //     if (!this.keyPending) {
   //       this.initGestures(key, input);
   //     }
-  //     this.keyPending = key;
-  //     this.touchPending = input;
   //   }
   // }
 
@@ -984,75 +960,9 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
   //   if (this.pendingMultiTap && this.pendingMultiTap.cancelled) {
   //     this.pendingMultiTap = null;
   //   }
-
-  //   // Longpress
-  //   if ((this.subkeyGesture && this.subkeyGesture.isVisible())) {
-  //     // Ignore release if a multiple touch
-  //     if (input.activeInputCount > 0) {
-  //       return;
-  //     }
-
-  //     if (this.subkeyGesture instanceof InternalSubkeyPopup) {
-  //       let subkeyPopup = this.subkeyGesture as InternalSubkeyPopup;
-  //       subkeyPopup.finalize(input);
-  //     }
-  //     this.highlightKey(this.keyPending, false);
-  //     this.keyPending = null;
-  //     this.touchPending = null;
-
-  //     return;
-  //   }
-
-  //   // Handle menu key release event
-  //   if (t && t.id) {
-  //     this.optionKey(t, t.id, false);
-  //   }
-
-  //   // Test if moved off screen (effective release point must be corrected for touch point horizontal speed)
-  //   // This is not completely effective and needs some tweaking, especially on Android
-  //   if (!this.detectWithinInteractiveBounds(input)) {
-  //     this.moveCancel(input);
-  //     this.touchCount--;
-  //     return;
-  //   }
-
-  //   // Save then decrement current touch count
-  //   var tc = this.touchCount;
-  //   if (this.touchCount > 0) {
-  //     this.touchCount--;
-  //   }
-
-  //   // Process and clear highlighting of pending target
-  //   if (this.keyPending) {
-  //     this.highlightKey(this.keyPending, false);
-  //     // Output character unless moved off key
-  //     if (this.keyPending.className.indexOf('hidden') < 0 && tc > 0) {
-  //       this.modelKeyClick(this.keyPending, input);
-  //     }
-  //     this.clearPopup();
-  //     this.keyPending = null;
-  //     this.touchPending = null;
-  //     // Always clear highlighting of current target on release (multi-touch)
-  //   } else {
-  //     var tt = input;
-  //     t = this.keyTarget(tt.target);
-  //     if (!t) {
-  //       // Operates relative to the viewport, not based on the actual coordinate on the page.
-  //       var t1 = document.elementFromPoint(input.x - window.pageXOffset, input.y - window.pageYOffset);
-  //       t = this.findNearestKey(input, <HTMLElement>t1);
-  //     }
-
-  //     this.highlightKey(t, false);
-  //   }
   // }
 
   // moveCancel(input: InputEventCoordinate): void {
-  //   // Do not attempt to support reselection of target key for overlapped keystrokes.
-  //   // Perform _after_ ensuring possible sticky keys have been cancelled.
-  //   if (input.activeInputCount > 1) {
-  //     return;
-  //   }
-
   //   // Update all gesture tracking.  The function returns true if further input processing
   //   // should be blocked.  (Keeps the subkey array operating when the input coordinate has
   //   // moved outside the OSK's boundaries.)
@@ -1061,12 +971,6 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
   //   }
 
   //   this.cancelDelete();
-
-  //   this.highlightKey(this.keyPending, false);
-  //   this.showKeyTip(null, false);
-  //   this.clearPopup();
-  //   this.keyPending = null;
-  //   this.touchPending = null;
   // }
 
   // /**
@@ -1093,20 +997,6 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
   //   const key0 = this.keyPending;
   //   let key1 = this.keyTarget(t1); // Not only gets base keys, but also gets popup keys!
 
-  //   // Find the nearest key to the touch point if not on a visible key
-  //   if ((key1 && key1.className.indexOf('key-hidden') >= 0) ||
-  //     (t1 && (!key1) && t1.className.indexOf('key-row') >= 0)) {
-  //     key1 = this.findNearestKey(input, t1);
-  //   }
-
-  //   // Cancels BKSP if it's not the key.  (Note... could also cancel BKSP if the ongoing
-  //   // input is cancelled, regardless of key, just to be safe.)
-
-  //   // Stop repeat if no longer on BKSP key
-  //   if (key1 && (typeof key1.id == 'string') && (key1.id.indexOf('-K_BKSP') < 0)) {
-  //     this.cancelDelete();
-  //   }
-
   //   // Cancels if it's a multitouch attempt.
 
   //   // Do not attempt to support reselection of target key for overlapped keystrokes.
@@ -1121,32 +1011,6 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
   //   // should be blocked.
   //   if (this.updateGestures(key1, key0, input)) {
   //     return;
-  //   }
-
-  //   // Identify current touch position (to manage off-key release)
-  //   this.currentTarget = key1;
-
-  //   // Only NOW do we denote the newly-selected key as the currently-focused key.
-
-  //   // Replace the target key, if any, by the new target key
-  //   // Do not replace a null target, as that indicates the key has already been released
-  //   if (key1 && this.keyPending) {
-  //     this.highlightKey(key0, false);
-  //     this.keyPending = key1;
-  //     this.touchPending = input;
-  //   }
-
-  //   if (key0 && key1 && (key1 != key0) && (key1.id != '')) {
-  //     // While there may not be an active subkey menu, we should probably update which base key
-  //     // is being highlighted by the current touch & start a pending longpress for it.
-  //     this.clearPopup();
-  //     this.initGestures(key1, input);
-  //   }
-
-  //   if (this.keyPending) {
-  //     if (key0 != key1 || key1.className.indexOf(OSKKey.HIGHLIGHT_CLASS) < 0) {
-  //       this.highlightKey(key1, true);
-  //     }
   //   }
   // }
 
@@ -1306,19 +1170,6 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
     }
 
     this._UpdateVKShiftStyle();
-  }
-
-  clearPopup() {
-    // Remove the displayed subkey array, if any, and cancel popup request
-    if (this.subkeyGesture) {
-      this.subkeyGesture.clear();
-      this.subkeyGesture = null;
-    }
-
-    if (this.pendingSubkey) {
-      this.pendingSubkey.cancel();
-      this.pendingSubkey = null;
-    }
   }
 
   //#endregion
@@ -1497,8 +1348,10 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
 
     // Step 3:  perform layout operations.
     const paddingZone = this.gestureEngine.config.maxRoamingBounds as PaddedZoneSource;
-    const rowCount = this.currentLayer.rows.length;
-    paddingZone.updatePadding([-0.333 * this._computedHeight / rowCount]);
+    paddingZone.updatePadding([-0.333 * this.currentLayer.rowHeight]);
+
+    const longpressShortcutThreshold = 0.25 * this.currentLayer.rowHeight;
+    this.gestureParams.longpress.flickDist = longpressShortcutThreshold;
 
     // Needs the refreshed layout info to work correctly.
     if(this.currentLayer) {
@@ -1760,31 +1613,6 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
   }
 
   /**
-   * Starts an implementation-specific longpress gesture.  Separately implemented for
-   * in-browser and embedded modes.
-   * @param key The base key of the longpress.
-   * @returns
-   */
-  startLongpress(key: KeyElement): PendingGesture {
-    // First-level object/Promise:  will produce a subkey popup when the longpress gesture completes.
-    // 'Returns' a second-level object/Promise:  resolves when a subkey is selected or is cancelled.
-    let pendingLongpress = new InternalPendingLongpress(this, key);
-    pendingLongpress.promise.then((subkeyPopup) => {
-      // In-browser-specific handling.
-      if (subkeyPopup) {
-        // Append the touch-hold (subkey) array to the OSK
-        this.topContainer.appendChild(subkeyPopup.element);
-        this.topContainer.appendChild(subkeyPopup.shim);
-
-        // Must be placed after its `.element` has been inserted into the DOM.
-        subkeyPopup.reposition(this);
-      }
-    });
-
-    return pendingLongpress;
-  }
-
-  /**
    * Initializes all supported gestures given a base key and the triggering touch coordinates.
    * @param key     The gesture's base key
    * @param touch   The starting touch coordinates for the gesture
@@ -1812,38 +1640,6 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
       this.pendingMultiTap = new PendingMultiTap(this, key, 2);
       this.pendingMultiTap.timeout.then(() => {
         this.pendingMultiTap = null;
-      });
-    }
-
-
-    if (key['subKeys']) {
-      let _this = this;
-
-      let pendingLongpress = this.startLongpress(key);
-      if (pendingLongpress == null) {
-        return;
-      }
-      this.pendingSubkey = pendingLongpress;
-
-      pendingLongpress.promise.then(function (subkeyPopup) {
-        if (_this.pendingSubkey == pendingLongpress) {
-          _this.pendingSubkey = null;
-        }
-
-        if (subkeyPopup) {
-          // Clear key preview if any
-          _this.showKeyTip(null, false);
-
-          _this.subkeyGesture = subkeyPopup;
-          subkeyPopup.promise.then(function (keyEvent: KeyEvent) {
-            // Allow active cancellation, even if the source should allow passive.
-            // It's an easy and cheap null guard.
-            if (keyEvent) {
-              _this.raiseKeyEvent(keyEvent, null);
-            }
-            _this.clearPopup();
-          });
-        }
       });
     }
   }
@@ -1879,17 +1675,6 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
     }
 
     this.currentTarget = null;
-
-    // If popup is visible, need to move over popup, not over main keyboard
-    // Could be turned into a browser-longpress specific implementation within browser.PendingLongpress?
-    if (key1 && key1['subKeys'] != null && this.initTouchCoord) {
-      if(this.pendingSubkey && this.pendingSubkey instanceof InternalPendingLongpress) {
-        // Show popup keys immediately if touch moved up towards key array (KMEW-100, Build 353)
-        if (this.initTouchCoord.y - input.y > this.getLongpressFlickThreshold()) {
-          this.pendingSubkey.resolve();
-        }
-      }
-    }
 
     // If there is an active popup menu (which can occur from the previous block),
     // a subkey popup exists; do not allow base key output.
@@ -1933,11 +1718,11 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
       return;
     }
 
-    let sk = this.subkeyGesture;
-    let popup = (sk && sk.isVisible());
+    const modalVizActive = this.activeGestures.find((handler) => handler.hasModalVisualization);
 
-    // If popup keys are active, do not show the key tip.
-    on = popup ? false : on;
+    // If the subkey menu (or a different modal visualization) is active, do not show the key tip -
+    // even if for a different contact point.
+    on = modalVizActive ? false : on;
 
     tip.show(key, on, this);
   };
@@ -1974,6 +1759,8 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
       this.styleSheet.parentNode.removeChild(this.styleSheet);
     }
 
+    this.activeGestures.forEach((handler) => handler.cancel());
+
     if(this.gestureEngine) {
       this.gestureEngine.destroy();
     }
@@ -1986,9 +1773,6 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
     this.touchPending = null;
 
     this.keytip?.show(null, false, this);
-    this.subkeyGesture?.clear();
-    this.pendingMultiTap?.cancel();
-    this.pendingSubkey?.cancel();
   }
 
   raiseKeyEvent(keyEvent: KeyEvent, e: KeyElement) {
