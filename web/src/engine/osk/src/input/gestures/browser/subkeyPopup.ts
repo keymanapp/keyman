@@ -1,12 +1,11 @@
 import OSKSubKey from './oskSubKey.js';
 import RealizedGesture from '../realizedGesture.interface.js';
-import { OSKKeySpec } from '../../../keyboard-layout/oskKey.js';
 import { type KeyElement } from '../../../keyElement.js';
 import OSKBaseKey from '../../../keyboard-layout/oskBaseKey.js';
 import VisualKeyboard from '../../../visualKeyboard.js';
 import InputEventCoordinate from '../../../input/inputEventCoordinate.js';
 
-import { DeviceSpec, KeyEvent } from '@keymanapp/keyboard-processor';
+import { DeviceSpec, KeyEvent, ActiveSubKey } from '@keymanapp/keyboard-processor';
 
 /**
  * Represents a 'realized' longpress gesture's default implementation
@@ -58,7 +57,7 @@ export default class SubkeyPopup implements RealizedGesture {
     e.key.highlight(true);
 
     // A tag we directly set on a key element during its construction.
-    let subKeySpec: OSKKeySpec[] = e['subKeys'];
+    let subKeySpec: ActiveSubKey[] = e['subKeys'];
 
     // The holder is position:fixed, but the keys do not need to be, as no scrolling
     // is possible while the array is visible.  So it is simplest to let the keys have

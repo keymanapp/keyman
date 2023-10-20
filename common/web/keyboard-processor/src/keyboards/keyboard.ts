@@ -401,7 +401,7 @@ export default class Keyboard {
     // Final check - do we construct a layout, or is this a case where helpText / insertHelpHTML should take over?
     if(rawSpecifications) {
       // Now to generate a layout from our raw specifications.
-      let layout = this._layouts[formFactor] = Layouts.buildDefaultLayout(rawSpecifications, this, formFactor);
+      let layout = this._layouts[formFactor] = Layouts.buildDefaultLayout(rawSpecifications, this, formFactor) as ActiveLayout;
       layout.isDefault = true;
       return layout;
     } else {

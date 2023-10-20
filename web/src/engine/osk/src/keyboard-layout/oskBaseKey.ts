@@ -1,7 +1,7 @@
 import { ActiveKey, Codes, DeviceSpec } from '@keymanapp/keyboard-processor';
 import { landscapeView } from 'keyman/engine/dom-utils';
 
-import OSKKey, { OSKKeySpec } from './oskKey.js';
+import OSKKey from './oskKey.js';
 import { KeyData, KeyElement, link } from '../keyElement.js';
 import OSKRow from './oskRow.js';
 import VisualKeyboard from '../visualKeyboard.js';
@@ -11,7 +11,7 @@ export default class OSKBaseKey extends OSKKey {
   private capLabel: HTMLDivElement;
   public readonly row: OSKRow;
 
-  constructor(spec: OSKKeySpec, layer: string, row: OSKRow) {
+  constructor(spec: ActiveKey, layer: string, row: OSKRow) {
     super(spec, layer);
     this.row = row;
   }

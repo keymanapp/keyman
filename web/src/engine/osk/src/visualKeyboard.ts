@@ -11,7 +11,8 @@ import {
   KeyDistribution,
   KeyEvent,
   Layouts,
-  StateKeyMap
+  StateKeyMap,
+  LayoutKey
 } from '@keymanapp/keyboard-processor';
 
 import { createStyleSheet, getAbsoluteX, getAbsoluteY, StylesheetManager } from 'keyman/engine/dom-utils';
@@ -24,7 +25,7 @@ import TouchEventEngine from './input/event-interpreter/touchEventEngine.js';
 import KeyboardView from './components/keyboardView.interface.js';
 import { type KeyElement, getKeyFrom } from './keyElement.js';
 import KeyTip from './keytip.interface.js';
-import OSKKey, { OSKKeySpec } from './keyboard-layout/oskKey.js';
+import OSKKey from './keyboard-layout/oskKey.js';
 import OSKLayer from './keyboard-layout/oskLayer.js';
 import OSKLayerGroup from './keyboard-layout/oskLayerGroup.js';
 import { LengthStyle, ParsedLengthStyle } from './lengthStyle.js';
@@ -521,9 +522,10 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
    *
    * @return    {Object}    An object that contains default key properties
    */
-  getDefaultKeyObject(): OSKKeySpec {
-    return new OSKKeySpec(undefined, '', ActiveKey.DEFAULT_KEY.width, ActiveKey.DEFAULT_KEY.sp as ButtonClass,
-      null, ActiveKey.DEFAULT_KEY.pad);
+  getDefaultKeyObject(): ActiveKey {
+    const baseKeyObject: LayoutKey = {...ActiveKey.DEFAULT_KEY};
+    ActiveKey.polyfill(baseKeyObject, this.layoutKeyboard, this.kbdLayout, this.layerId);
+    return baseKeyObject as ActiveKey;
   };
   //#endregion
 
