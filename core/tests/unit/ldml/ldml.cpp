@@ -437,8 +437,8 @@ int main(int argc, char *argv[]) {
   if ((argc - first_arg) < 2) {
     return error_args();
   }
-  const km::kbp::path ldml_file = argv[first_arg++];
-  const km::kbp::path kmx_file  = argv[first_arg++];
+  const km::core::path ldml_file = argv[first_arg++];
+  const km::core::path kmx_file  = argv[first_arg++];
 
   std::string filter; // default to 'all tests'
   if ((argc - first_arg) >= 1) {
