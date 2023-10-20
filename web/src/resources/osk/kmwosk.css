@@ -361,6 +361,12 @@ body div.kmw-key-shift-on span.kmw-key-text {font-family:SpecialOSK !important;f
   width: 100%;
 }
 
+.kmw-flick-preview {
+  position: absolute;
+  font: 0.333em Arial;
+  color: #aaa;
+}
+
 /* Key preview styles */
 
 div.ios div.kmw-keytip, div.android div.kmw-keytip {
