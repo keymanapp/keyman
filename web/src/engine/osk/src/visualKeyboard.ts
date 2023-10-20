@@ -15,13 +15,17 @@ import {
   LayoutKey
 } from '@keymanapp/keyboard-processor';
 
+import {
+  GestureRecognizer,
+  GestureRecognizerConfiguration,
+  GestureSource,
+  InputSample
+} from '@keymanapp/gesture-recognizer';
+
 import { createStyleSheet, getAbsoluteX, getAbsoluteY, StylesheetManager } from 'keyman/engine/dom-utils';
 
 import GlobeHint from './globehint.interface.js';
 import InputEventCoordinate from './input/inputEventCoordinate.js';
-import InputEventEngine, { InputEventEngineConfig } from './input/event-interpreter/inputEventEngine.js';
-import MouseEventEngine from './input/event-interpreter/mouseEventEngine.js';
-import TouchEventEngine from './input/event-interpreter/touchEventEngine.js';
 import KeyboardView from './components/keyboardView.interface.js';
 import { type KeyElement, getKeyFrom } from './keyElement.js';
 import KeyTip from './keytip.interface.js';
@@ -37,6 +41,8 @@ import InternalSubkeyPopup from './input/gestures/browser/subkeyPopup.js';
 import InternalPendingLongpress from './input/gestures/browser/pendingLongpress.js';
 import InternalKeyTip from './input/gestures/browser/keytip.js';
 import CommonConfiguration from './config/commonConfiguration.js';
+
+import { modelSetForKeyboard } from './input/gestures/specsForKeyboard.js';
 
 import { getViewportScale } from './screenUtils.js';
 
@@ -97,6 +103,14 @@ interface EventMap {
 }
 
 export default class VisualKeyboard extends EventEmitter<EventMap> implements KeyboardView {
+  /**
+   * The gesture-engine used to support user interaction with this keyboard.
+   *
+   * Note: `stateToken` should match a layer id from this.layoutKeyboard; this helps to
+   * prevent issue #7173.
+   */
+  readonly gestureEngine: GestureRecognizer<KeyElement, string>;
+
   // Legacy alias, maintaining a reference for code built against older
   // versions of KMW.
   static readonly specialCharacters = OSKKey.specialCharacters;
@@ -114,8 +128,6 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
   private _layerId: string = "default";
   layerIndex: number = 0; // the index of the default layer
   readonly isRTL: boolean;
-
-  inputEngine: InputEventEngine;
 
   readonly isStatic: boolean = false;
   _fixedWidthScaling:  boolean = false;
@@ -198,6 +210,7 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
       throw new Error(`Keyboard ${this.layoutKeyboard.id} does not have a layer with id ${value}`);
     } else {
       this._layerId = value;
+      this.gestureEngine.stateToken = value;
     }
 
     if(changedLayer) {
@@ -302,12 +315,7 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
     // For 'live' touch keyboards, attach touch-based event handling.
     // Needs to occur AFTER this.kbdDiv is initialized.
     if (!this.isStatic) {
-      if (this.hostDevice.touchable) {
-        this.inputEngine = this.touchInputConfiguration;
-      } else {
-        this.inputEngine = this.mouseInputConfiguration;
-      }
-      this.inputEngine.registerEventHandlers();
+      this.gestureEngine = this.constructGestureEngine();
     }
 
     Lkbd.classList.add(config.device.formFactor, 'kmw-osk-inner-frame');
@@ -326,34 +334,130 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
     this.element.classList.add(kbdClassSuffix);
   }
 
-  private get mouseInputConfiguration() {
-    const config: InputEventEngineConfig = {
+  private constructGestureEngine(): GestureRecognizer<KeyElement, string> {
+    const config: GestureRecognizerConfiguration<KeyElement, string> = {
       targetRoot: this.element,
-      // document.body is the event root b/c we need to track the mouse if it leaves
-      // the VisualKeyboard's hierarchy.
-      eventRoot: document.body,
-      inputStartHandler: this.touch.bind(this),
-      inputMoveHandler: this.moveOver.bind(this),
-      inputMoveCancelHandler: this.moveCancel.bind(this),
-      inputEndHandler: this.release.bind(this),
-      coordConstrainedWithinInteractiveBounds: this.detectWithinInteractiveBounds.bind(this)
+      // document.body is the event root for mouse interactions b/c we need to track
+      // when the mouse leaves the VisualKeyboard's hierarchy.
+      mouseEventRoot: document.body,
+      // touchEventRoot:  this.element, // is the default
+      itemIdentifier: (sample, target) => {
+        if(sample.stateToken == this.layerId) {
+          let resolvedTarget =  this.keyTarget(target);
+          if(resolvedTarget) {
+            return resolvedTarget;
+          }
+        }
+
+        return this.layerGroup.findNearestKey(sample);
+      }
     };
 
-    return new MouseEventEngine(config);
-  }
+    const recognizer = new GestureRecognizer(modelSetForKeyboard(this.layoutKeyboard), config);
+    recognizer.stateToken = this.layerId;
 
-  private get touchInputConfiguration() {
-    let config: InputEventEngineConfig = {
-      targetRoot: this.element,
-      eventRoot: this.element,
-      inputStartHandler: this.touch.bind(this),
-      inputMoveHandler: this.moveOver.bind(this),
-      inputMoveCancelHandler: this.moveCancel.bind(this),
-      inputEndHandler: this.release.bind(this),
-      coordConstrainedWithinInteractiveBounds: this.detectWithinInteractiveBounds.bind(this)
-    };
+    const sourceTrackingMap: Record<string, {
+      source: GestureSource<KeyElement, string>,
+      roamingHandler: typeof roamingTouchHighlighting,
+      key: KeyElement
+    }> = {};
 
-    return new TouchEventEngine(config);
+    // TODO:  Obviously, this is extremely rough at present.
+    const roamingTouchHighlighting: (sample: InputSample<KeyElement, string>) => void = null;
+
+    // Now to set up event-handling links.
+    // This handler should probably vary based on the keyboard: do we allow roaming touches or not?
+    recognizer.on('inputstart', (source) => {
+      // Make sure we're tracking the source and its currently-selected item (the latter, as we're
+      // highlighting it)
+      const trackingEntry = sourceTrackingMap[source.identifier] = {
+        source: source,
+        roamingHandler: (sample) => {
+          // Maintain highlighting
+          const key = sample.item;
+          const oldKey = sourceTrackingMap[source.identifier].key;
+
+          if(key != oldKey) {
+            this.highlightKey(oldKey, false);
+            this.highlightKey(key, true);
+            sourceTrackingMap[source.identifier].key = key;
+          }
+        },
+        key: source.currentSample.item
+      }
+
+      // Yay for closure-capture mechanics:  we can "keep a lock" on this newly-starting
+      // gesture's highlighted key here.
+      this.highlightKey(trackingEntry.key, true);
+
+      const endHighlighting = () => {
+        if(trackingEntry.key) {
+          this.highlightKey(trackingEntry.key, false);
+        }
+      }
+
+      source.path.on('invalidated', endHighlighting);
+      source.path.on('complete', endHighlighting);
+
+      // TODO:  any other 'invalidated' / 'complete' handling needed?
+      // If so, separate handler - it likely needs to be disabled once the first gesture-component
+      // match happens, unlike the highlighting part.
+
+      source.path.on('step', trackingEntry.roamingHandler);
+
+      source.path.on('step', (sample) => {
+        // // Do... something based on the potential gesture types that could arise, as appropriate.
+        // // Should be useful for selecting a hint type, etc.
+        // source.potentialModelMatchIds
+      })
+    });
+
+    //
+    recognizer.on('recognizedgesture', (gestureSequence) => {
+      // The highlighting-disablement part of `onRoamingSourceEnd` is 100% safe, so we can leave
+      // that running.
+
+      // Drop any roaming-touch specific behaviors here.
+
+      // This should probably be universal in some manner.
+      gestureSequence.on('complete', () => {
+      });
+
+      // This should probably vary based on the type of gesture.
+      gestureSequence.on('stage', (gestureStage, configChanger) => {
+        // Disable roaming-touch highlighting for all touchpoints included in a gesture, even
+        // newly-included ones as they occur.
+
+        // if( /* not in subkey-select mode */) {
+        for(let id of gestureStage.allSourceIds) {
+          const trackingEntry = sourceTrackingMap[id];
+          trackingEntry.source.path.off('step', trackingEntry.roamingHandler);
+        }
+        // }
+
+        // First, if we've configured the gesture to generate a keystroke, let's handle that.
+        const gestureKey = gestureStage.item;
+
+        if(gestureKey /* && gestureKey is appropriate for the gesture */) {
+          let coordSource = gestureStage.sources[0];
+          let coord: InputSample<KeyElement, string> = null;
+          if(coordSource) {
+            // TODO:  should probably vary depending upon `gestureStage.matchedId`
+            // (certain types should probably use the base coord... or even from
+            // a prior stage of the sequence as appropriate.)
+            coord = coordSource.currentSample;
+          }
+
+          // Once the best coord to use for fat-finger calculations has been determined:
+          this.modelKeyClick(gestureStage.item, coord);
+
+          // TODO:  depending upon the gesture type, what sort of UI shifts should happen to
+          // facilitate follow-up stages?
+        }
+      })
+    });
+
+    return recognizer;
   }
 
   public get element(): HTMLDivElement {
@@ -530,13 +634,13 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
   //#endregion
 
   //#region OSK touch handlers
-  getTouchCoordinatesOnKeyboard(input: InputEventCoordinate) {
+  getTouchCoordinatesOnKeyboard(input: InputSample<KeyElement, string>) {
     // We need to compute the 'local', keyboard-based coordinates for the touch.
     let kbdCoords = {
       x: getAbsoluteX(this.kbdDiv),
       y: getAbsoluteY(this.kbdDiv)
     }
-    let offsetCoords = { x: input.x - kbdCoords.x, y: input.y - kbdCoords.y };
+    let offsetCoords = { x: input.targetX - kbdCoords.x, y: input.targetY - kbdCoords.y };
 
     // The layer group's element always has the proper width setting, unlike kbdDiv itself.
     offsetCoords.x /= this.layerGroup.element.offsetWidth;
@@ -552,7 +656,7 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
    * @param keySpec The spec of the key directly triggered by the input event.  May be for a subkey.
    * @returns
    */
-  getTouchProbabilities(input: InputEventCoordinate, keySpec?: ActiveKey): KeyDistribution {
+  getTouchProbabilities(input: InputSample<KeyElement, string>, keySpec?: ActiveKey): KeyDistribution {
     // TODO: It'd be nice to optimize by keeping these off when unused, but the wiring
     //       necessary would get in the way of modularization at the moment.
     // let keyman = com.keyman.singleton;
@@ -740,289 +844,289 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
     }
   }
 
-  /**
-   * The main OSK touch start event handler
-   *
-   *  @param  {Event} e   touch start event object
-   *
-   */
-  touch(input: InputEventCoordinate) {
-    // Identify the key touched
-    var t = <HTMLElement>input.target, key = this.keyTarget(t);
+  // /**
+  //  * The main OSK touch start event handler
+  //  *
+  //  *  @param  {Event} e   touch start event object
+  //  *
+  //  */
+  // touch(input: InputEventCoordinate) {
+  //   // Identify the key touched
+  //   var t = <HTMLElement>input.target, key = this.keyTarget(t);
 
-    // Save the touch point, which is used for quick-display of popup keys (defined in highlightSubKeys)
-    this.initTouchCoord = input;
+  //   // Save the touch point, which is used for quick-display of popup keys (defined in highlightSubKeys)
+  //   this.initTouchCoord = input;
 
-    // Set the key for the new touch point to be current target, if defined
-    this.currentTarget = key;
+  //   // Set the key for the new touch point to be current target, if defined
+  //   this.currentTarget = key;
 
-    // Clear repeated backspace if active, preventing 'sticky' behavior.
-    this.cancelDelete();
+  //   // Clear repeated backspace if active, preventing 'sticky' behavior.
+  //   this.cancelDelete();
 
-    // Prevent multi-touch if popup displayed
-    if (this.subkeyGesture && this.subkeyGesture.isVisible()) {
-      return;
-    }
+  //   // Prevent multi-touch if popup displayed
+  //   if (this.subkeyGesture && this.subkeyGesture.isVisible()) {
+  //     return;
+  //   }
 
-    // Keep track of number of active (unreleased) touch points
-    this.touchCount = input.activeInputCount;
+  //   // Keep track of number of active (unreleased) touch points
+  //   this.touchCount = input.activeInputCount;
 
-    // Get nearest key if touching a hidden key or the end of a key row
-    if ((key && ((key.className.indexOf('key-hidden') >= 0) || (key.className.indexOf('key-blank') >= 0)))
-      || t.className.indexOf('kmw-key-row') >= 0) {
+  //   // Get nearest key if touching a hidden key or the end of a key row
+  //   if ((key && ((key.className.indexOf('key-hidden') >= 0) || (key.className.indexOf('key-blank') >= 0)))
+  //     || t.className.indexOf('kmw-key-row') >= 0) {
 
-      // Perform "fudged" selection ops if and only if we're not sure about the precision of the
-      // input source.  Mouse-based selection IS precise, so no need for "fudging" there.
-      if (!input.isFromMouse) {
-        key = this.findNearestKey(input, t);
-      }
-    }
-    // Do not do anything if no key identified!
-    if (key == null) {
-      return;
-    }
+  //     // Perform "fudged" selection ops if and only if we're not sure about the precision of the
+  //     // input source.  Mouse-based selection IS precise, so no need for "fudging" there.
+  //     if (!input.isFromMouse) {
+  //       key = this.findNearestKey(input, t);
+  //     }
+  //   }
+  //   // Do not do anything if no key identified!
+  //   if (key == null) {
+  //     return;
+  //   }
 
-    // Get key name (K_...) from element ID
-    let keyName = key['keyId'];
+  //   // Get key name (K_...) from element ID
+  //   let keyName = key['keyId'];
 
-    // Highlight the touched key
-    this.highlightKey(key, true);
+  //   // Highlight the touched key
+  //   this.highlightKey(key, true);
 
-    // Special function keys need immediate action
-    if (keyName == 'K_LOPT' || keyName == 'K_ROPT') {
-      window.setTimeout(function (this: VisualKeyboard) {
-        this.modelKeyClick(key);
-        // Because we immediately process the key, we need to re-highlight it after the click.
-        this.highlightKey(key, true);
-        // Highlighting'll be cleared automatically later.
-      }.bind(this), 0);
-      this.keyPending = null;
-      this.touchPending = null;
+  //   // Special function keys need immediate action
+  //   if (keyName == 'K_LOPT' || keyName == 'K_ROPT') {
+  //     window.setTimeout(function (this: VisualKeyboard) {
+  //       this.modelKeyClick(key);
+  //       // Because we immediately process the key, we need to re-highlight it after the click.
+  //       this.highlightKey(key, true);
+  //       // Highlighting'll be cleared automatically later.
+  //     }.bind(this), 0);
+  //     this.keyPending = null;
+  //     this.touchPending = null;
 
-      // Also backspace, to allow delete to repeat while key held
-    } else if (keyName == 'K_BKSP') {
-      // While we could inline the execution of the delete key here, we lose the ability to
-      // record the backspace key if we do so.
-      this.modelKeyClick(key, input);
-      this.deleteKey = key;
-      this.deleting = window.setTimeout(this.repeatDelete, 500);
-      this.keyPending = null;
-      this.touchPending = null;
-    } else {
-      if (this.keyPending) {
-        this.highlightKey(this.keyPending, false);
+  //     // Also backspace, to allow delete to repeat while key held
+  //   } else if (keyName == 'K_BKSP') {
+  //     // While we could inline the execution of the delete key here, we lose the ability to
+  //     // record the backspace key if we do so.
+  //     this.modelKeyClick(key, input);
+  //     this.deleteKey = key;
+  //     this.deleting = window.setTimeout(this.repeatDelete, 500);
+  //     this.keyPending = null;
+  //     this.touchPending = null;
+  //   } else {
+  //     if (this.keyPending) {
+  //       this.highlightKey(this.keyPending, false);
 
-        if (this.subkeyGesture && this.subkeyGesture instanceof InternalSubkeyPopup) {
-          let subkeyPopup = this.subkeyGesture as InternalSubkeyPopup;
-          subkeyPopup.updateTouch(input);
-          subkeyPopup.finalize(input);
-        } else {
-          this.modelKeyClick(this.keyPending, this.touchPending);
-        }
-        // Decrement the number of unreleased touch points to prevent
-        // sending the keystroke again when the key is actually released
-        this.touchCount--;
-      } else {
-        this.initGestures(key, input);
-      }
-      this.keyPending = key;
-      this.touchPending = input;
-    }
-  }
+  //       if (this.subkeyGesture && this.subkeyGesture instanceof InternalSubkeyPopup) {
+  //         let subkeyPopup = this.subkeyGesture as InternalSubkeyPopup;
+  //         subkeyPopup.updateTouch(input);
+  //         subkeyPopup.finalize(input);
+  //       } else {
+  //         this.modelKeyClick(this.keyPending, this.touchPending);
+  //       }
+  //       // Decrement the number of unreleased touch points to prevent
+  //       // sending the keystroke again when the key is actually released
+  //       this.touchCount--;
+  //     } else {
+  //       this.initGestures(key, input);
+  //     }
+  //     this.keyPending = key;
+  //     this.touchPending = input;
+  //   }
+  // }
 
-  /**
-   * OSK touch release event handler
-   *
-   *  @param  {Event} e   touch release event object
-   *
-   **/
-  release(input: InputEventCoordinate): void {
-    // Prevent incorrect multi-touch behaviour if native or device popup visible
-    var t = this.currentTarget;
+  // /**
+  //  * OSK touch release event handler
+  //  *
+  //  *  @param  {Event} e   touch release event object
+  //  *
+  //  **/
+  // release(input: InputEventCoordinate): void {
+  //   // Prevent incorrect multi-touch behaviour if native or device popup visible
+  //   var t = this.currentTarget;
 
-    // Clear repeated backspace if active, preventing 'sticky' behavior.
-    this.cancelDelete();
+  //   // Clear repeated backspace if active, preventing 'sticky' behavior.
+  //   this.cancelDelete();
 
-    // Multi-Tap
-    if (this.pendingMultiTap && this.pendingMultiTap.realized) {
-      // Ignore pending key if we've just handled a multitap
-      this.pendingMultiTap = null;
+  //   // Multi-Tap
+  //   if (this.pendingMultiTap && this.pendingMultiTap.realized) {
+  //     // Ignore pending key if we've just handled a multitap
+  //     this.pendingMultiTap = null;
 
-      this.highlightKey(this.keyPending, false);
-      this.keyPending = null;
-      this.touchPending = null;
+  //     this.highlightKey(this.keyPending, false);
+  //     this.keyPending = null;
+  //     this.touchPending = null;
 
-      return;
-    }
+  //     return;
+  //   }
 
-    if (this.pendingMultiTap && this.pendingMultiTap.cancelled) {
-      this.pendingMultiTap = null;
-    }
+  //   if (this.pendingMultiTap && this.pendingMultiTap.cancelled) {
+  //     this.pendingMultiTap = null;
+  //   }
 
-    // Longpress
-    if ((this.subkeyGesture && this.subkeyGesture.isVisible())) {
-      // Ignore release if a multiple touch
-      if (input.activeInputCount > 0) {
-        return;
-      }
+  //   // Longpress
+  //   if ((this.subkeyGesture && this.subkeyGesture.isVisible())) {
+  //     // Ignore release if a multiple touch
+  //     if (input.activeInputCount > 0) {
+  //       return;
+  //     }
 
-      if (this.subkeyGesture instanceof InternalSubkeyPopup) {
-        let subkeyPopup = this.subkeyGesture as InternalSubkeyPopup;
-        subkeyPopup.finalize(input);
-      }
-      this.highlightKey(this.keyPending, false);
-      this.keyPending = null;
-      this.touchPending = null;
+  //     if (this.subkeyGesture instanceof InternalSubkeyPopup) {
+  //       let subkeyPopup = this.subkeyGesture as InternalSubkeyPopup;
+  //       subkeyPopup.finalize(input);
+  //     }
+  //     this.highlightKey(this.keyPending, false);
+  //     this.keyPending = null;
+  //     this.touchPending = null;
 
-      return;
-    }
+  //     return;
+  //   }
 
-    // Handle menu key release event
-    if (t && t.id) {
-      this.optionKey(t, t.id, false);
-    }
+  //   // Handle menu key release event
+  //   if (t && t.id) {
+  //     this.optionKey(t, t.id, false);
+  //   }
 
-    // Test if moved off screen (effective release point must be corrected for touch point horizontal speed)
-    // This is not completely effective and needs some tweaking, especially on Android
-    if (!this.detectWithinInteractiveBounds(input)) {
-      this.moveCancel(input);
-      this.touchCount--;
-      return;
-    }
+  //   // Test if moved off screen (effective release point must be corrected for touch point horizontal speed)
+  //   // This is not completely effective and needs some tweaking, especially on Android
+  //   if (!this.detectWithinInteractiveBounds(input)) {
+  //     this.moveCancel(input);
+  //     this.touchCount--;
+  //     return;
+  //   }
 
-    // Save then decrement current touch count
-    var tc = this.touchCount;
-    if (this.touchCount > 0) {
-      this.touchCount--;
-    }
+  //   // Save then decrement current touch count
+  //   var tc = this.touchCount;
+  //   if (this.touchCount > 0) {
+  //     this.touchCount--;
+  //   }
 
-    // Process and clear highlighting of pending target
-    if (this.keyPending) {
-      this.highlightKey(this.keyPending, false);
-      // Output character unless moved off key
-      if (this.keyPending.className.indexOf('hidden') < 0 && tc > 0) {
-        this.modelKeyClick(this.keyPending, input);
-      }
-      this.clearPopup();
-      this.keyPending = null;
-      this.touchPending = null;
-      // Always clear highlighting of current target on release (multi-touch)
-    } else {
-      var tt = input;
-      t = this.keyTarget(tt.target);
-      if (!t) {
-        // Operates relative to the viewport, not based on the actual coordinate on the page.
-        var t1 = document.elementFromPoint(input.x - window.pageXOffset, input.y - window.pageYOffset);
-        t = this.findNearestKey(input, <HTMLElement>t1);
-      }
+  //   // Process and clear highlighting of pending target
+  //   if (this.keyPending) {
+  //     this.highlightKey(this.keyPending, false);
+  //     // Output character unless moved off key
+  //     if (this.keyPending.className.indexOf('hidden') < 0 && tc > 0) {
+  //       this.modelKeyClick(this.keyPending, input);
+  //     }
+  //     this.clearPopup();
+  //     this.keyPending = null;
+  //     this.touchPending = null;
+  //     // Always clear highlighting of current target on release (multi-touch)
+  //   } else {
+  //     var tt = input;
+  //     t = this.keyTarget(tt.target);
+  //     if (!t) {
+  //       // Operates relative to the viewport, not based on the actual coordinate on the page.
+  //       var t1 = document.elementFromPoint(input.x - window.pageXOffset, input.y - window.pageYOffset);
+  //       t = this.findNearestKey(input, <HTMLElement>t1);
+  //     }
 
-      this.highlightKey(t, false);
-    }
-  }
+  //     this.highlightKey(t, false);
+  //   }
+  // }
 
-  moveCancel(input: InputEventCoordinate): void {
-    // Do not attempt to support reselection of target key for overlapped keystrokes.
-    // Perform _after_ ensuring possible sticky keys have been cancelled.
-    if (input.activeInputCount > 1) {
-      return;
-    }
+  // moveCancel(input: InputEventCoordinate): void {
+  //   // Do not attempt to support reselection of target key for overlapped keystrokes.
+  //   // Perform _after_ ensuring possible sticky keys have been cancelled.
+  //   if (input.activeInputCount > 1) {
+  //     return;
+  //   }
 
-    // Update all gesture tracking.  The function returns true if further input processing
-    // should be blocked.  (Keeps the subkey array operating when the input coordinate has
-    // moved outside the OSK's boundaries.)
-    if (this.updateGestures(null, this.keyPending, input)) {
-      return;
-    }
+  //   // Update all gesture tracking.  The function returns true if further input processing
+  //   // should be blocked.  (Keeps the subkey array operating when the input coordinate has
+  //   // moved outside the OSK's boundaries.)
+  //   if (this.updateGestures(null, this.keyPending, input)) {
+  //     return;
+  //   }
 
-    this.cancelDelete();
+  //   this.cancelDelete();
 
-    this.highlightKey(this.keyPending, false);
-    this.showKeyTip(null, false);
-    this.clearPopup();
-    this.keyPending = null;
-    this.touchPending = null;
-  }
+  //   this.highlightKey(this.keyPending, false);
+  //   this.showKeyTip(null, false);
+  //   this.clearPopup();
+  //   this.keyPending = null;
+  //   this.touchPending = null;
+  // }
 
-  /**
-   * OSK touch move event handler
-   *
-   *  @param  {Event} e   touch move event object
-   *
-   **/
-  moveOver(input: InputEventCoordinate): void {
-    // Shouldn't be possible, but just in case.
-    if (this.touchCount == 0) {
-      this.cancelDelete();
-      return;
-    }
+  // /**
+  //  * OSK touch move event handler
+  //  *
+  //  *  @param  {Event} e   touch move event object
+  //  *
+  //  **/
+  // moveOver(input: InputEventCoordinate): void {
+  //   // Shouldn't be possible, but just in case.
+  //   if (this.touchCount == 0) {
+  //     this.cancelDelete();
+  //     return;
+  //   }
 
-    // Get touch position
-    const x = input.x - window.pageXOffset;
-    const y = input.y - window.pageYOffset;
+  //   // Get touch position
+  //   const x = input.x - window.pageXOffset;
+  //   const y = input.y - window.pageYOffset;
 
-    // Move target key and highlighting
-    this.touchPending = input;
-    // Operates on viewport-based coordinates, not page-based.
-    var t1 = <HTMLElement>document.elementFromPoint(x, y);
-    const key0 = this.keyPending;
-    let key1 = this.keyTarget(t1); // Not only gets base keys, but also gets popup keys!
+  //   // Move target key and highlighting
+  //   this.touchPending = input;
+  //   // Operates on viewport-based coordinates, not page-based.
+  //   var t1 = <HTMLElement>document.elementFromPoint(x, y);
+  //   const key0 = this.keyPending;
+  //   let key1 = this.keyTarget(t1); // Not only gets base keys, but also gets popup keys!
 
-    // Find the nearest key to the touch point if not on a visible key
-    if ((key1 && key1.className.indexOf('key-hidden') >= 0) ||
-      (t1 && (!key1) && t1.className.indexOf('key-row') >= 0)) {
-      key1 = this.findNearestKey(input, t1);
-    }
+  //   // Find the nearest key to the touch point if not on a visible key
+  //   if ((key1 && key1.className.indexOf('key-hidden') >= 0) ||
+  //     (t1 && (!key1) && t1.className.indexOf('key-row') >= 0)) {
+  //     key1 = this.findNearestKey(input, t1);
+  //   }
 
-    // Cancels BKSP if it's not the key.  (Note... could also cancel BKSP if the ongoing
-    // input is cancelled, regardless of key, just to be safe.)
+  //   // Cancels BKSP if it's not the key.  (Note... could also cancel BKSP if the ongoing
+  //   // input is cancelled, regardless of key, just to be safe.)
 
-    // Stop repeat if no longer on BKSP key
-    if (key1 && (typeof key1.id == 'string') && (key1.id.indexOf('-K_BKSP') < 0)) {
-      this.cancelDelete();
-    }
+  //   // Stop repeat if no longer on BKSP key
+  //   if (key1 && (typeof key1.id == 'string') && (key1.id.indexOf('-K_BKSP') < 0)) {
+  //     this.cancelDelete();
+  //   }
 
-    // Cancels if it's a multitouch attempt.
+  //   // Cancels if it's a multitouch attempt.
 
-    // Do not attempt to support reselection of target key for overlapped keystrokes.
-    // Perform _after_ ensuring possible sticky keys have been cancelled.
-    if (input.activeInputCount > 1) {
-      return;
-    }
+  //   // Do not attempt to support reselection of target key for overlapped keystrokes.
+  //   // Perform _after_ ensuring possible sticky keys have been cancelled.
+  //   if (input.activeInputCount > 1) {
+  //     return;
+  //   }
 
-    // Gesture-updates should probably be a separate call from other touch-move aspects.
+  //   // Gesture-updates should probably be a separate call from other touch-move aspects.
 
-    // Update all gesture tracking.  The function returns true if further input processing
-    // should be blocked.
-    if (this.updateGestures(key1, key0, input)) {
-      return;
-    }
+  //   // Update all gesture tracking.  The function returns true if further input processing
+  //   // should be blocked.
+  //   if (this.updateGestures(key1, key0, input)) {
+  //     return;
+  //   }
 
-    // Identify current touch position (to manage off-key release)
-    this.currentTarget = key1;
+  //   // Identify current touch position (to manage off-key release)
+  //   this.currentTarget = key1;
 
-    // Only NOW do we denote the newly-selected key as the currently-focused key.
+  //   // Only NOW do we denote the newly-selected key as the currently-focused key.
 
-    // Replace the target key, if any, by the new target key
-    // Do not replace a null target, as that indicates the key has already been released
-    if (key1 && this.keyPending) {
-      this.highlightKey(key0, false);
-      this.keyPending = key1;
-      this.touchPending = input;
-    }
+  //   // Replace the target key, if any, by the new target key
+  //   // Do not replace a null target, as that indicates the key has already been released
+  //   if (key1 && this.keyPending) {
+  //     this.highlightKey(key0, false);
+  //     this.keyPending = key1;
+  //     this.touchPending = input;
+  //   }
 
-    if (key0 && key1 && (key1 != key0) && (key1.id != '')) {
-      // While there may not be an active subkey menu, we should probably update which base key
-      // is being highlighted by the current touch & start a pending longpress for it.
-      this.clearPopup();
-      this.initGestures(key1, input);
-    }
+  //   if (key0 && key1 && (key1 != key0) && (key1.id != '')) {
+  //     // While there may not be an active subkey menu, we should probably update which base key
+  //     // is being highlighted by the current touch & start a pending longpress for it.
+  //     this.clearPopup();
+  //     this.initGestures(key1, input);
+  //   }
 
-    if (this.keyPending) {
-      if (key0 != key1 || key1.className.indexOf(OSKKey.HIGHLIGHT_CLASS) < 0) {
-        this.highlightKey(key1, true);
-      }
-    }
-  }
+  //   if (this.keyPending) {
+  //     if (key0 != key1 || key1.className.indexOf(OSKKey.HIGHLIGHT_CLASS) < 0) {
+  //       this.highlightKey(key1, true);
+  //     }
+  //   }
+  // }
 
   //#endregion
 
@@ -1052,78 +1156,6 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
   }
 
   /**
-   * Identify the key nearest to the touch point if at the end of a key row,
-   * but return null more than about 0.6 key width from the nearest key.
-   *
-   *  @param  {Event}   e   touch event
-   *  @param  {Object}  t   HTML object at touch point
-   *  @return {Object}      nearest key to touch point
-   *
-   **/
-  findNearestKey(input: InputEventCoordinate, t: HTMLElement): KeyElement {
-    if (!input) {
-      return null;
-    }
-
-    // Get touch point on screen
-    var x = input.x;
-
-    // Get key-row beneath touch point
-    while (t && t.className !== undefined && t.className.indexOf('key-row') < 0) {
-      t = <HTMLElement>t.parentNode;
-    }
-    if (!t) {
-      return null;
-    }
-
-    // Find minimum distance from any key
-    var k, k0 = 0, dx, dxMax = 24, dxMin = 100000, x1, x2;
-    for (k = 0; k < t.childNodes.length; k++) {
-      let keySquare = t.childNodes[k] as HTMLElement; // gets the .kmw-key-square containing a key
-      // Find the actual key element.
-      let childNode = keySquare.firstChild ? keySquare.firstChild as HTMLElement : keySquare;
-
-      if (childNode.className !== undefined
-        && (childNode.className.indexOf('key-hidden') >= 0
-          || childNode.className.indexOf('key-blank') >= 0)) {
-        continue;
-      }
-      x1 = keySquare.offsetLeft;
-      x2 = x1 + keySquare.offsetWidth;
-      if (x >= x1 && x <= x2) {
-        // Within the key square
-        return <KeyElement>childNode;
-      }
-      dx = x1 - x;
-      if (dx >= 0 && dx < dxMin) {
-        // To right of key
-        k0 = k; dxMin = dx;
-      }
-      dx = x - x2;
-      if (dx >= 0 && dx < dxMin) {
-        // To left of key
-        k0 = k; dxMin = dx;
-      }
-    }
-
-    if (dxMin < 100000) {
-      t = <HTMLElement>t.childNodes[k0];
-      x1 = t.offsetLeft;
-      x2 = x1 + t.offsetWidth;
-
-      // Limit extended touch area to the larger of 0.6 of key width and 24 px
-      if (t.offsetWidth > 40) {
-        dxMax = 0.6 * t.offsetWidth;
-      }
-
-      if (((x1 - x) >= 0 && (x1 - x) < dxMax) || ((x - x2) >= 0 && (x - x2) < dxMax)) {
-        return <KeyElement>t.firstChild;
-      }
-    }
-    return null;
-  }
-
-  /**
    *  Repeat backspace as long as the backspace key is held down
    **/
   repeatDelete: () => void = function (this: VisualKeyboard) {
@@ -1146,12 +1178,12 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
   }
   //#endregion
 
-  modelKeyClick(e: KeyElement, input?: InputEventCoordinate) {
+  modelKeyClick(e: KeyElement, input?: InputSample<KeyElement, string>) {
     let keyEvent = this.initKeyEvent(e, input);
     this.raiseKeyEvent(keyEvent, e);
   }
 
-  initKeyEvent(e: KeyElement, input?: InputEventCoordinate) {
+  initKeyEvent(e: KeyElement, input?: InputSample<KeyElement, string>) {
     // Turn off key highlighting (or preview)
     this.highlightKey(e, false);
 
@@ -1163,7 +1195,6 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
     // for key spec tracking.
     let keySpec = (e['key'] ? e['key'].spec : null) as unknown as ActiveKey;
     if (!keySpec) {
-      console.error("OSK key with ID '" + e.id + "', keyID '" + e.keyId + "' missing needed specification");
       return null;
     }
 
@@ -1171,7 +1202,7 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
     return this.keyEventFromSpec(keySpec, input);
   }
 
-  keyEventFromSpec(keySpec: ActiveKey, input?: InputEventCoordinate) {
+  keyEventFromSpec(keySpec: ActiveKey, input?: InputSample<KeyElement, string>) {
     //let core = com.keyman.singleton.core; // only singleton-based ref currently needed here.
 
     // Start:  mirrors _GetKeyEventProperties
@@ -1630,6 +1661,7 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
     // Select the layer to display, and adjust sizes
     if (layout != null) {
       kbdObj.layerId = layerId;
+      kbdObj.gestureEngine.stateToken = layerId;
 
       // This still feels fairly hacky... but something IS needed to constrain the height.
       // There are plans to address related concerns through some of the later aspects of
@@ -1921,8 +1953,8 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
       this.styleSheet.parentNode.removeChild(this.styleSheet);
     }
 
-    if(this.inputEngine) {
-      this.inputEngine.unregisterEventHandlers();
+    if(this.gestureEngine) {
+      this.gestureEngine.destroy();
     }
 
     if(this.deleting) {

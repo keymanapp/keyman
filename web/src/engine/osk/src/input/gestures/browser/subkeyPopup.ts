@@ -6,6 +6,7 @@ import VisualKeyboard from '../../../visualKeyboard.js';
 import InputEventCoordinate from '../../../input/inputEventCoordinate.js';
 
 import { DeviceSpec, KeyEvent, ActiveSubKey } from '@keymanapp/keyboard-processor';
+import { InputSample } from '@keymanapp/gesture-recognizer';
 
 /**
  * Represents a 'realized' longpress gesture's default implementation
@@ -115,7 +116,7 @@ export default class SubkeyPopup implements RealizedGesture {
     }
   }
 
-  finalize(input: InputEventCoordinate) {
+  finalize(input: InputSample<KeyElement>) {
     if(this.resolver) {
       let keyEvent: KeyEvent = null;
       if(this.currentSelection) {
