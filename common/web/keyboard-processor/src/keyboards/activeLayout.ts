@@ -23,6 +23,24 @@ function Enumerable(
     descriptor.enumerable = true;
 };
 
+const KeyTypesOfKeyMap = {
+  id: 'string',
+  text: 'string',
+  layer: 'string',
+  nextlayer: 'string',
+  font: 'string',
+  fontsize: 'string',
+  sp: 'number',
+  pad: 'number',
+  width: 'number',
+  sk: 'subkeys',
+  flick: 'flicks',
+  multitap: 'subkeys',
+  hint: 'string',
+  default: 'boolean'
+} as const;
+
+const KeyTypesOfFlickList = ['n', 's', 'e', 'w', 'ne', 'nw', 'se', 'sw'] as const;
 
 class ActiveKeyBase {
   static readonly DEFAULT_PAD=15;          // Padding to left of key, in virtual units
@@ -198,6 +216,8 @@ class ActiveKeyBase {
   }
 
   static sanitize(rawKey: LayoutKey) {
+    // In older versions of KeymanWeb, we specified these three properties as strings...
+    // despite them holding a numerical value.
     if(typeof rawKey.width == 'string') {
       rawKey.width = parseInt(rawKey.width, 10);
     }
@@ -213,6 +233,51 @@ class ActiveKeyBase {
       rawKey.sp = Number.parseInt(rawKey.sp, 10) as ButtonClass;
     }
     rawKey.sp ||= 0; // The default button class.
+
+    // And now for generalized type validation. -----------------------------------------
+
+    // Object.entries does require Android 54... but we do polyfill within the Android app.  Should be 'fine'.
+    for(const [key, value] of Object.entries(KeyTypesOfKeyMap)) {
+      switch(value) {
+        case 'subkeys':
+          const arr = rawKey[key] as LayoutSubKey[];
+          if(!Array.isArray(arr)) {
+            delete rawKey[key];
+          } else {
+            for(let i=0; i < arr.length; i++) {
+              const sk = arr[i];
+              if(typeof sk != 'object') {
+                arr.splice(i--, 1);
+              } else {
+                ActiveKey.sanitize(sk);
+              }
+            }
+          }
+          break;
+        case 'flicks':
+          const flickObj = rawKey[key];
+          if(typeof flickObj != 'object') {
+            delete rawKey[key];
+          } else {
+            for(const flickKey of KeyTypesOfFlickList) {
+              const sk = flickObj[flickKey];
+              if(typeof sk != 'object') {
+                delete flickObj[flickKey];
+              } else {
+                ActiveKey.sanitize(sk);
+              }
+            }
+          }
+          break;
+        default:
+          const prop = rawKey[key];
+          if(typeof prop != value) {
+            delete rawKey[key];
+          }
+      }
+    }
+
+    rawKey.text ||= ActiveKey.DEFAULT_KEY.text;
   }
 
   static polyfill(key: LayoutKey | LayoutSubKey, keyboard: Keyboard, layout: ActiveLayout, displayLayer: string) {
@@ -322,7 +387,7 @@ export class ActiveKey extends ActiveKeyBase implements LayoutKey {
 
 
 export class ActiveSubKey extends ActiveKeyBase implements LayoutSubKey {
-
+  //
 }
 
 export class ActiveRow implements LayoutRow {
