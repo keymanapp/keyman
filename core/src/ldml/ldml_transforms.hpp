@@ -13,6 +13,7 @@
 #include <string>
 #include <unordered_map>
 #include <utility>
+#include "debuglog.h"
 
 #if !defined(HAVE_ICU4C)
 #error icu4c is required for this code
@@ -25,10 +26,23 @@
 #include "unicode/unistr.h"
 #include "unicode/regex.h"
 #include "unicode/utext.h"
+#include "unicode/normalizer2.h"
 
 namespace km {
 namespace kbp {
 namespace ldml {
+
+/** @returns true on success */
+inline bool uassert_success(const char *file, int line, const char *function, UErrorCode status) {
+  if (U_FAILURE(status)) {
+    DebugLog2(file, line, function, "U_FAILURE(%s)", u_errorName(status));
+    return false;
+  } else {
+    return true;
+  }
+}
+
+#define UASSERT_SUCCESS(status) assert(U_SUCCESS(status)), uassert_success(__FILE__, __LINE__, __FUNCTION__, status)
 
 using km::kbp::kmx::SimpleUSet;
 
@@ -94,7 +108,8 @@ public:
       const std::u32string &to,
       KMX_DWORD mapFrom,
       KMX_DWORD mapTo,
-      const kmx::kmx_plus &kplus);
+      const kmx::kmx_plus &kplus,
+      bool &valid);
 
   /**
    * If matching, apply the match to the output string
@@ -113,8 +128,8 @@ private:
   const KMX_DWORD fMapToStrId;
   std::deque<std::u32string> fMapFromList;
   std::deque<std::u32string> fMapToList;
-  /** Internal function to setup pattern string */
-  void init();
+  /** Internal function to setup pattern string @returns true on success */
+  bool init();
   /** @returns the index of the item in the fMapFromList list, or -1 */
   int32_t findIndexFrom(const std::u32string &match) const;
 public:
@@ -269,6 +284,17 @@ public:
        const kbp::kmx::COMP_KMXPLUS_TRAN *tran,
        const kbp::kmx::COMP_KMXPLUS_TRAN_Helper &tranHelper);
 };
+
+// string routines
+
+/** Normalize a u32string inplace to NFD. @return false on failure */
+bool normalize_nfd(std::u32string &str);
+/** Normalize a u16string inplace to NFD. @return false on failure */
+bool normalize_nfd(std::u16string &str);
+/** Normalize a u32string inplace to NFC. @return false on failure */
+bool normalize_nfc(std::u32string &str);
+/** Normalize a u16string inplace to NFC. @return false on failure */
+bool normalize_nfc(std::u16string &str);
 
 }  // namespace ldml
 }  // namespace kbp

@@ -24,6 +24,7 @@
 #include <kmx/kmx_plus.h>
 #include "ldml/keyboardprocessor_ldml.h"
 #include "ldml/ldml_processor.hpp"
+#include "ldml/ldml_transforms.hpp"
 
 #include "path.hpp"
 #include "state.hpp"
@@ -467,6 +468,7 @@ LdmlJsonTestSource::next_action(ldml_action &fillin) {
   if (as_check.is_string()) {
     fillin.type   = LDML_ACTION_CHECK_EXPECTED;
     fillin.string = LdmlTestSource::parse_u8_source_string(as_check.get<std::string>());
+    assert(km::kbp::ldml::normalize_nfc(fillin.string));
     return;
   }
 
@@ -485,6 +487,7 @@ LdmlJsonTestSource::next_action(ldml_action &fillin) {
   if (as_emit.is_string()) {
     fillin.type   = LDML_ACTION_EMIT_STRING;
     fillin.string = LdmlTestSource::parse_u8_source_string(as_emit.get<std::string>());
+    assert(km::kbp::ldml::normalize_nfc(fillin.string));
     return;
   }
 
@@ -502,7 +505,7 @@ int LdmlJsonTestSource::load(const nlohmann::json &data) {
   this->data        = data;  // TODO-LDML
   auto startContext = data["/startContext/to"_json_pointer];
   context = LdmlTestSource::parse_u8_source_string(startContext);
-
+  assert(km::kbp::ldml::normalize_nfc(context));
   return 0;
 }
 
