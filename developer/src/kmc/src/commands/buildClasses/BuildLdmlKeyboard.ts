@@ -48,7 +48,7 @@ async function buildLdmlKeyboardToMemory(inputFilename: string, callbacks: Compi
     ...defaultCompilerOptions,
     ...options,
     readerOptions: {
-      importsPath: fileURLToPath(LDMLKeyboardXMLSourceFileReader.defaultImportsURL)
+      importsPath: fileURLToPath(new URL(...LDMLKeyboardXMLSourceFileReader.defaultImportsURL))
     }
   };
 

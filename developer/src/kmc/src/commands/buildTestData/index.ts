@@ -14,7 +14,7 @@ export function buildTestData(infile: string, _options: any, commander: any) {
     saveDebug: false,
     shouldAddCompilerVersion: false,
     readerOptions: {
-      importsPath: fileURLToPath(LDMLKeyboardXMLSourceFileReader.defaultImportsURL)
+      importsPath: fileURLToPath(new URL(...LDMLKeyboardXMLSourceFileReader.defaultImportsURL))
     }
   };
 

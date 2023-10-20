@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE keyboardTest3 SYSTEM "../../../../../resources/standards-data/ldml-keyboards/techpreview/dtd/ldmlKeyboardTest3.dtd">
+<keyboardTest3 conformsTo="techpreview">
+  <info keyboard="k_008_transform_norm.xml" author="Team Keyboard" name="transform-norm" />
+  <tests name="regex-tests-0">
+    <!-- none of these should match the transform -->
+    <test name="regex-test-0-a">
+      <startContext to="" />
+      <keystroke key="e" />
+      <keystroke key="u-0300" />
+      <keystroke key="u-0320" />
+      <check result="e\u{0320}\u{0300}" />
+    </test>
+    <test name="regex-test-0-b">
+      <startContext to="" />
+      <keystroke key="e" />
+      <keystroke key="u-0320" />
+      <keystroke key="u-0300" />
+      <check result="e\u{0320}\u{0300}" />
+    </test>
+    <test name="regex-test-0-c">
+      <startContext to="" />
+      <keystroke key="u-00e8" />
+      <keystroke key="u-0320" />
+      <check result="e\u{0320}\u{0300}" />
+    </test>
+  </tests>
+  <tests name="regex-tests-1">
+    <test name="regex-test-1-nfd">
+      <startContext to="" />
+      <keystroke key="1" />
+      <keystroke key="e" />
+      <keystroke key="u-0300" />
+      <keystroke key="u-0320" />
+      <check result="YES1" />
+    </test>
+    <test name="regex-test-1-nfd2">
+      <startContext to="" />
+      <keystroke key="1" />
+      <keystroke key="nfd" />
+      <check result="YES1" />
+    </test>
+    <test name="regex-test-1-nfc">
+      <startContext to="" />
+      <keystroke key="1" />
+      <keystroke key="nfc" />
+      <check result="YES1" />
+    </test>
+    <test name="regex-test-1-nfd-ooo">
+      <startContext to="" />
+      <keystroke key="1" />
+      <keystroke key="e" />
+      <keystroke key="u-0320" />
+      <keystroke key="u-0300" />
+      <check result="YES1" />
+    </test>
+    <test name="regex-test-1-nfd-ooo2">
+      <startContext to="" />
+      <keystroke key="1" />
+      <keystroke key="not-nfd" />
+      <check result="YES1" />
+    </test>
+  </tests>
+  <tests name="regex-tests-2">
+    <test name="regex-test-2-nfd">
+      <startContext to="" />
+      <keystroke key="2" />
+      <keystroke key="e" />
+      <keystroke key="u-0300" />
+      <keystroke key="u-0320" />
+      <check result="YES2" />
+    </test>
+    <test name="regex-test-2-nfd2">
+      <startContext to="" />
+      <keystroke key="2" />
+      <keystroke key="nfd" />
+      <check result="YES2" />
+    </test>
+    <test name="regex-test-2-nfc">
+      <startContext to="" />
+      <keystroke key="2" />
+      <keystroke key="nfc" />
+      <check result="YES2" />
+    </test>
+    <test name="regex-test-2-nfd-ooo">
+      <startContext to="" />
+      <keystroke key="2" />
+      <keystroke key="e" />
+      <keystroke key="u-0320" />
+      <keystroke key="u-0300" />
+      <check result="YES2" />
+    </test>
+    <test name="regex-test-2-nfd-ooo2">
+      <startContext to="" />
+      <keystroke key="2" />
+      <keystroke key="not-nfd" />
+      <check result="YES2" />
+    </test>
+  </tests>
+  <tests name="regex-tests-3">
+    <test name="regex-test-3-nfd">
+      <startContext to="" />
+      <keystroke key="3" />
+      <keystroke key="e" />
+      <keystroke key="u-0300" />
+      <keystroke key="u-0320" />
+      <check result="YES3" />
+    </test>
+    <test name="regex-test-3-nfd2">
+      <startContext to="" />
+      <keystroke key="3" />
+      <keystroke key="nfd" />
+      <check result="YES3" />
+    </test>
+    <test name="regex-test-3-nfc">
+      <startContext to="" />
+      <keystroke key="3" />
+      <keystroke key="nfc" />
+      <check result="YES3" />
+    </test>
+    <test name="regex-test-3-nfd-ooo">
+      <startContext to="" />
+      <keystroke key="3" />
+      <keystroke key="e" />
+      <keystroke key="u-0320" />
+      <keystroke key="u-0300" />
+      <check result="YES3" />
+    </test>
+    <test name="regex-test-3-nfd-ooo2">
+      <startContext to="" />
+      <keystroke key="3" />
+      <keystroke key="not-nfd" />
+      <check result="YES3" />
+    </test>
+  </tests>
+</keyboardTest3>

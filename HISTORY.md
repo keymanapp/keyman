@@ -1,5 +1,21 @@
 # Keyman Version History
 
+## 17.0.195 alpha 2023-10-19
+
+* chore(linux): Allow to collect coverage on TC (#9790)
+* fix(common): don't use URL in common/web/types (#9798)
+* chore: update kmp.schema.json and docs for kps schema (#9800)
+* docs(windows): update text and images for windows 11 (#9689)
+
+## 17.0.194 alpha 2023-10-18
+
+* chore(linux): Re-enable building for Ubuntu 23.10 Mantic (#9780)
+* chore(linux): Add missing tests (#9783)
+* fix(web): fixes touch form-factor default kbd on cookieless keymanweb.com page load (#9786)
+* fix(developer): three kmc .keyboard_info generation bugs (#9784)
+* fix(developer): handle invalid project folders cleanly (#9785)
+* chore(linux): Fix build scripts (#9781)
+
 ## 17.0.193 alpha 2023-10-17
 
 * fix(developer): kmc crash on start (#9771)
