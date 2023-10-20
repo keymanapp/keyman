@@ -10,9 +10,11 @@ import { timedPromise } from '@keymanapp/web-utils';
 export class HeadlessInputEngine<Type = any> extends InputEngineBase<Type> {
   private PATH_ID_SEED = 1;
 
-  // Should generally keep a simple, parameterless default constructor.
+  // Should generally keep a simple default constructor.
   constructor() {
-    super();
+    // When headless, we can bypass the need for a recognizer-config - we've bypassed the
+    // need for layout specifications.
+    super(null);
   }
 
   public preparePathPlayback(recordedPoint: SerializedGestureSource) {
@@ -28,8 +30,10 @@ export class HeadlessInputEngine<Type = any> extends InputEngineBase<Type> {
     const headSample = recordedSource.path.coords[0];
 
     const pathID = this.PATH_ID_SEED++;
-    let replaySource = new GestureSource<Type>(pathID, null, recordedSource.isFromTouch);
+    let replaySource = this.createTouchpoint(pathID, recordedSource.isFromTouch);
     replaySource.update(headSample); // is included before the point is made available.
+    replaySource.path.on('invalidated', () => this.dropTouchpoint(replaySource));
+    replaySource.path.on('complete', () => this.dropTouchpoint(replaySource));
 
     const startPromise = timedPromise(headSample.t).then(() => {
       this.addTouchpoint(replaySource);
@@ -38,7 +42,8 @@ export class HeadlessInputEngine<Type = any> extends InputEngineBase<Type> {
 
     return {
       promise: startPromise,
-      source: replaySource
+      source: replaySource,
+      internal_id: pathID
     }
   }
 
@@ -65,19 +70,24 @@ export class HeadlessInputEngine<Type = any> extends InputEngineBase<Type> {
       if(replaySource.isPathComplete) {
         return;
       }
-      this.dropTouchpointWithId(replaySource.rawIdentifier);
       replaySource.terminate(recording.path.wasCancelled);
     });
   }
 
   async playbackRecording(recordedObj: RecordedCoordSequenceSet) {
     const playbackStartTuples = recordedObj.inputs.map((recording) => this.prepareSourceStart(recording));
+
     const playbackStarts = playbackStartTuples.map((tuple) => tuple.promise);
     const sources = playbackStartTuples.map((tuple) => tuple.source);
 
     const playbackMiddles = recordedObj.inputs.map((recording, index) => this.replaySourceSamples(sources[index], recording));
 
     const playbackTerminations = recordedObj.inputs.map((recording, index) => this.playbackTerminations(sources[index], recording));
+
+    playbackStarts.forEach((promise) => promise.then(() => {
+        this.maintainTouchpointsWithIds(playbackStartTuples.map((tuple) => tuple.internal_id));
+      })
+    );
 
     await Promise.all(([] as Promise<any>[])
       .concat(playbackStarts)

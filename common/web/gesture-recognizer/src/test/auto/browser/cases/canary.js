@@ -70,10 +70,9 @@ describe("'Canary' checks", function() {
       this.controller.layoutConfiguration = layout;
 
       let fireEvent = () => {
-        playbackEngine.replayTouchSample(/*relative coord:*/ {targetX: 10, targetY: 10},
+        playbackEngine.replayTouchSamples(/*relative coord:*/ [ { sample: {targetX: 10, targetY: 10}, identifier: 1}],
                                           /*state:*/         "start",
-                                          /*identifier:*/    1,
-                                          /*otherTouches:*/  [],
+                                          /*recentTouches:*/  [],
                                         );
       }
 

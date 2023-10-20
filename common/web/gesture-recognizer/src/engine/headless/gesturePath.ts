@@ -136,10 +136,8 @@ export class GesturePath<Type, StateToken = any> extends EventEmitter<EventMap<T
     // If cancelling, do so before finishing segments
     if(cancel) {
       this.emit('invalidated');
-    }
-
-    // If not cancelling, signal completion after finishing segments.
-    if(!cancel) {
+    } else {
+      // If not cancelling, signal completion after finishing segments.
       this.emit('complete');
     }
 

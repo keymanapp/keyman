@@ -9,6 +9,13 @@ import { FixtureLayoutConfiguration } from "./fixtureLayoutConfiguration.js";
 import { RecordedCoordSequenceSet } from "./inputRecording.js";
 import { SequenceRecorder } from "./sequenceRecorder.js";
 
+interface ChangedTouchData<Type> {
+  sample: InputSample<Type>,
+  identifier: number
+};
+
+type InputState = 'start' | 'move' | 'end';
+
 /**
  * This class is designed to 'replay' a recorded InputSequence's DOM events to ensure
  * that the recognizer's DOM layer is working correctly.
@@ -68,33 +75,42 @@ export class InputSequenceSimulator<HoveredItemType> {
     return event;
   }
 
-  replayTouchSample(sample: JSONObject<InputSample<HoveredItemType>>,
-                    state: string,
-                    identifier: number,
-                    otherTouches: Touch[],
-                    targetElement?: HTMLElement): Touch {
+  replayTouchSamples(changedTouchData: ChangedTouchData<HoveredItemType>[],
+                    state: InputState,
+                    recentTouches: Touch[],
+                    targetElement?: HTMLElement): Touch[] {
     let config = this.controller.recognizer.config;
 
     let event: TouchEvent;
-    const mappedSample = this.getSampleClientPos(sample);
 
-    let touch: Touch;
-    let touchDict = {identifier: identifier,
-                      target: targetElement || config.targetRoot,
-                      ...mappedSample};
-    if(window['Touch'] !== undefined) {
-      touch = new Touch(touchDict);
-    } else {
-      // When not performing touch-emulation, some desktop browsers will leave `Touch` undefined.
-      touch = touchDict as any;
-    }
+    const changedTouches = changedTouchData.map((data) => {
+      const mappedSample = this.getSampleClientPos(data.sample);
 
-    otherTouches = otherTouches || [];
+      let touch: Touch;
+      let touchDict = {
+        identifier: data.identifier,
+        target: targetElement || config.targetRoot,
+        ...mappedSample
+      };
+
+      if(window['Touch'] !== undefined) {
+        touch = new Touch(touchDict);
+      } else {
+        // When not performing touch-emulation, some desktop browsers will leave `Touch` undefined.
+        touch = touchDict as any;
+      }
+
+      return touch;
+    });
+
+    // Now that we've removed the entries that match any changed touchpoints, filter out any null entries.
+    let otherTouches = recentTouches.concat([]).filter((entry) => !!entry);
+    otherTouches = otherTouches.filter((a) => !changedTouches.find((b) => a.identifier == b.identifier));
 
     let touchEventDict: TouchEventInit = {
       bubbles: true,
-      touches: [touch].concat(otherTouches),
-      changedTouches: [touch],
+      touches: changedTouches.concat(otherTouches),
+      changedTouches: changedTouches,
     }
 
     let buildEvent = (type: string, dict: TouchEventInit) => {
@@ -121,7 +137,7 @@ export class InputSequenceSimulator<HoveredItemType> {
 
     config.targetRoot.dispatchEvent(event);
 
-    return touch;
+    return changedTouches;
   }
 
   replayMouseSample(sample: JSONObject<InputSample<HoveredItemType>>, state: string, targetElement?: HTMLElement) {
@@ -165,11 +181,13 @@ export class InputSequenceSimulator<HoveredItemType> {
    * @returns The final sample to be simulated.
    */
   private replayCore(sequenceTestSpec: RecordedCoordSequenceSet,
-    replayExecutor: (func: () => void, sample?: InputSample<HoveredItemType>) => void): InputSample<HoveredItemType> {
+    replayExecutor: (func: () => void, timestamp: number) => void): number {
     let inputs = sequenceTestSpec.inputs;
     const config = sequenceTestSpec.config;
 
     this.controller.layoutConfiguration = new FixtureLayoutConfiguration(config);
+
+    const touchpoints = inputs.map((input, index) => GestureSource.deserialize(input, index));
 
     /**
      * For each corresponding recorded sequence, notes the index of the sequence's
@@ -179,7 +197,7 @@ export class InputSequenceSimulator<HoveredItemType> {
     let sequenceProgress: number[] = new Array(inputs.length).fill(0);
     let sequenceTouches: Touch[] = new Array(inputs.length).fill(null);
 
-    let lastSample = null;
+    let lastTimestamp = null;
 
     while(sequenceProgress.find((number) => number != Number.MAX_VALUE) !== undefined) {
       // Determine the sequence that has the chronologically next-in-line sample
@@ -190,10 +208,9 @@ export class InputSequenceSimulator<HoveredItemType> {
        * Pulls double-duty as the index of the sequence owning said sample & as
        * the sequence's common 'identifier' value for emulated Touches.
        */
-      let selectedSequence = -1;
+      let selectedSequences = [-1];
 
       for(let index=0; index < inputs.length; index++) {
-        // TODO:  does not iterate over all touchpoints.  Not that we can have more than one at present...
         const touchpoint = GestureSource.deserialize(inputs[index], index);
         const indexInSequence = sequenceProgress[index];
 
@@ -203,58 +220,77 @@ export class InputSequenceSimulator<HoveredItemType> {
 
         if(touchpoint.path.coords[indexInSequence].t < minTimestamp) {
           minTimestamp = touchpoint.path.coords[indexInSequence].t;
-          selectedSequence = index;
+          selectedSequences = [index];
+        } else if (touchpoint.path.coords[indexInSequence].t == minTimestamp) {
+          selectedSequences.push(index);
         }
       }
 
-      const touchpoint = GestureSource.deserialize(inputs[selectedSequence], selectedSequence);
-      const indexInSequence = sequenceProgress[selectedSequence];
-      let state: string = "move";
+      const preprocessing = selectedSequences.map((inputIndex) => {
+        const touchpoint = touchpoints[inputIndex];
+        const indexInSequence = sequenceProgress[inputIndex];
 
-      let appendEndEvent = false;
-      if(indexInSequence + 1 >= touchpoint.path.coords.length) {
-        sequenceProgress[selectedSequence] = Number.MAX_VALUE;
-        appendEndEvent = true;
-      } else {
-        sequenceProgress[selectedSequence]++;
-      }
+        let appendEndEvent = false;
+        if(indexInSequence + 1 >= touchpoint.path.coords.length) {
+          sequenceProgress[inputIndex] = Number.MAX_VALUE;
+          appendEndEvent = true;
+        } else {
+          sequenceProgress[inputIndex]++;
+        }
 
-      if(indexInSequence == 0) {
-        state = "start";
-      }
+        let state: string = "move";
 
-      const sample = touchpoint.path.coords[indexInSequence] as InputSample<HoveredItemType>;
-      if(touchpoint.isFromTouch) {
-        let otherTouches = [].concat(sequenceTouches);
-        otherTouches.splice(selectedSequence, 1);
-        // Now that we've removed the entry for the current touchpoint, filter out any null entries.
-        otherTouches = otherTouches.filter((val) => !!val);
+        if(indexInSequence == 0) {
+          state = "start";
+        }
 
-        replayExecutor(() => {
-          sequenceTouches[selectedSequence] = this.replayTouchSample(sample, state, selectedSequence, otherTouches);
-        }, sample);
-        if(appendEndEvent) {
-          // Synchronous in sync mode, but set with a timeout in async mode.
+        const sample = touchpoint.path.coords[indexInSequence] as InputSample<HoveredItemType>;
+
+        return {
+          sample: sample,
+          state: state,
+          appendEndEvent: appendEndEvent,
+          identifier: inputIndex
+        };
+      });
+
+      // Assumption:  all are touch or all are mouse - no heterogenous mixtures.
+      const sampleReplayer = touchpoints[0].isFromTouch
+        ? (samples: ChangedTouchData<HoveredItemType>[], state: InputState) => {
           replayExecutor(() => {
-            this.replayTouchSample(sample, "end", selectedSequence, otherTouches);
-          }, sample);
-          sequenceTouches[selectedSequence] = null;
+            const replayedSamples = this.replayTouchSamples(samples, state, sequenceTouches);
+
+            replayedSamples.forEach((touch, index) => {
+              sequenceTouches[samples[index].identifier] = state == 'end' ? null : touch;
+            });
+          }, minTimestamp);
         }
-      } else {
-        replayExecutor(() => {
-          this.replayMouseSample(sample, state);
-        }, sample);
-        if(appendEndEvent) {
+        : (samples: ChangedTouchData<HoveredItemType>[], state: InputState) => {
           replayExecutor(() => {
-            this.replayMouseSample(sample, "end");
-          }, sample);
-        }
+            // There's only ever a single mouse contact point, so its emulation is far simpler.
+            this.replayMouseSample(samples[0].sample, state);
+          }, minTimestamp);
+        };
+
+      const startTouches = preprocessing.filter((value) => value.state == 'start');
+      if(startTouches.length > 0) {
+        sampleReplayer(startTouches, 'start');
       }
 
-      lastSample = sample;
+      const moveTouches = preprocessing.filter((value) => value.state == 'move');
+      if(moveTouches.length > 0) {
+        sampleReplayer(moveTouches, 'move');
+      }
+
+      const endTouches = preprocessing.filter((value) => value.appendEndEvent);
+      if(endTouches.length > 0) {
+        sampleReplayer(endTouches, 'end');
+      }
+
+      lastTimestamp = minTimestamp;
     }
 
-    return lastSample;
+    return lastTimestamp;
   }
 
   /**
@@ -304,10 +340,10 @@ export class InputSequenceSimulator<HoveredItemType> {
     // We're operating asynchronously, so we wrap each simulated event in a timeout.
     // NOTE:  this will be much less precise without stubbed timeout systems like the one
     // included within SinonJS.
-    const finalSample = this.replayCore(sequenceTestSpec, (func, sample) => {
+    const finalTimestamp = this.replayCore(sequenceTestSpec, (func, timestamp) => {
       window.setTimeout(() => {
         func();
-      }, sample.t);
+      }, timestamp);
     });
 
     return new Promise((resolve) => {
@@ -318,7 +354,7 @@ export class InputSequenceSimulator<HoveredItemType> {
         let recording = JSON.parse(recorder.recordingsToJSON()) as RecordedCoordSequenceSet;
         recorder.clear();
         resolve(recording);
-      }, finalSample.t + 30);
+      }, finalTimestamp + 30);
     });
   }
 }

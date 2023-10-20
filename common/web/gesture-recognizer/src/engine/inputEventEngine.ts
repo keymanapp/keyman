@@ -1,17 +1,8 @@
-import { GestureRecognizerConfiguration } from "./configuration/gestureRecognizerConfiguration.js";
 import { InputEngineBase } from "./headless/inputEngineBase.js";
 import { InputSample } from "./headless/inputSample.js";
-import { Nonoptional } from "./nonoptional.js";
 import { GestureSource } from "./headless/gestureSource.js";
 
 export abstract class InputEventEngine<HoveredItemType, StateToken> extends InputEngineBase<HoveredItemType, StateToken> {
-  protected readonly config: Nonoptional<GestureRecognizerConfiguration<HoveredItemType, StateToken>>;
-
-  public constructor(config: Nonoptional<GestureRecognizerConfiguration<HoveredItemType, StateToken>>) {
-    super();
-    this.config = config;
-  }
-
   abstract registerEventHandlers(): void;
   abstract unregisterEventHandlers(): void;
 
@@ -33,8 +24,7 @@ export abstract class InputEventEngine<HoveredItemType, StateToken> extends Inpu
   }
 
   protected onInputStart(identifier: number, sample: InputSample<HoveredItemType, StateToken>, target: EventTarget, isFromTouch: boolean) {
-    const touchpoint = new GestureSource<HoveredItemType>(identifier, this.config, isFromTouch);
-    touchpoint.stateToken = this.stateToken;
+    const touchpoint = this.createTouchpoint(identifier, isFromTouch);
     touchpoint.update(sample);
 
     this.addTouchpoint(touchpoint);
@@ -42,11 +32,11 @@ export abstract class InputEventEngine<HoveredItemType, StateToken> extends Inpu
     // External objects may desire to directly terminate handling of
     // input sequences under specific conditions.
     touchpoint.path.on('invalidated', () => {
-      this.dropTouchpointWithId(identifier);
+      this.dropTouchpoint(touchpoint);
     });
 
     touchpoint.path.on('complete', () => {
-      this.dropTouchpointWithId(identifier);
+      this.dropTouchpoint(touchpoint);
     });
 
     this.emit('pointstart', touchpoint);

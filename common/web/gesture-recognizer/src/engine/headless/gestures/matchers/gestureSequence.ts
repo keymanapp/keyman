@@ -8,10 +8,24 @@ import { MatcherSelection, MatcherSelector } from "./matcherSelector.js";
 import { GestureRecognizerConfiguration, TouchpointCoordinator } from "../../../index.js";
 
 export class GestureStageReport<Type> {
+  /**
+   * The id of the GestureModel spec that was matched at this stage of the
+   * GestureSequence.
+   */
   public readonly matchedId: string;
+
   public readonly linkType: MatchResult<Type>['action']['type'];
+  /**
+   * The `item`, if any, specified for selection by the matched gesture model.
+   */
   public readonly item: Type;
+  /**
+   * The set of GestureSource contact points matched to this stage of the GestureSequence.
+   * The first one listed (index 0) will be the entry responsible for selection of the
+   * `item` field.
+   */
   public readonly sources: GestureSourceSubview<Type>[];
+
   public readonly allSourceIds: string[];
 
   constructor(selection: MatcherSelection<Type>) {
@@ -31,6 +45,16 @@ export class GestureStageReport<Type> {
     // Just to be extra-sure they don't continue to update.
     // Alternatively, we could just make an extra copy and then instantly "disconnect" the new instance.
     this.sources?.forEach((source) => source.disconnect());
+    // Make sure that the `primaryPath` source ends up as the first entry.
+    this.sources?.sort((a, b) => {
+      if(matcher?.primaryPath == a) {
+        return -1;
+      } else if(matcher?.primaryPath == b) {
+        return 1;
+      } else {
+        return 0;
+      }
+    })
 
     this.allSourceIds = matcher?.allSourceIds || [];
   }
