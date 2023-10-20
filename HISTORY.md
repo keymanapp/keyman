@@ -1,5 +1,21 @@
 # Keyman Version History
 
+## 16.0.142 stable 2023-10-20
+
+* chore(linux): Update debian changelog (#9326)
+* chore(linux): Remove obsolete dist from uploading to launchpad (#9340)
+* chore(linux): Stop building Kinetic on Jenkins (#9354)
+* chore(linux): Work around build failure on Debian mips64el (#9342)
+* chore(linux): Update debian changelog (#9359)
+* chore(android): Update targetSDKVersion to 33 (#9494)
+* chore(linux): Remove workaround for mips64el (#9519)
+* chore(linux): Workaround: Don't run Wayland tests (#9530)
+* chore(linux): Add `clean` target to `rules` (#9532)
+* fix(linux): Prevent exception if neither USER, LOGNAME nor SUDO_USER set (#9544)
+* chore(linux): Ignore tests that fail on ba-jammy-64-ta (#9556)
+* chore(ios): renew certificate (#9811)
+* fix(mac): move keyboard menu items to main Input Menu from submenu (#9810)
+
 ## 16.0.141 stable 2023-07-25
 
 * chore(mac): fix corrupt installer (#9332)
