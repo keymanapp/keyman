@@ -6,6 +6,7 @@ const FLICK_DIRS = ['n', 'ne', 'e', 'se', 's', 'sw', 'w', 'nw'] as const;
 export class GesturePreviewHost {
   private readonly div: HTMLDivElement;
   private readonly label: HTMLSpanElement;
+  private readonly previewImgContainer: HTMLDivElement;
 
   private flickPreviews: HTMLDivElement[] = [];
 
@@ -28,6 +29,11 @@ export class GesturePreviewHost {
 
     // Re-use the text value from the base key's label.
     label.textContent = key.key.label.textContent;
+
+    const multitapPreview = this.previewImgContainer = document.createElement('div');
+    this.previewImgContainer.id = 'kmw-preview-img-container';
+    this.previewImgContainer.className = 'kmw-multitap-preview'; // to indicate multitap presence.
+    this.div.appendChild(this.previewImgContainer);
 
     for(const dir of FLICK_DIRS) {
       const index = FLICK_DIRS.indexOf(dir);
@@ -52,10 +58,10 @@ export class GesturePreviewHost {
       }
 
       if(dir.includes('n')) {
-        arrowEle.style.top = isDiag ? '5%' : '-5%';
+        arrowEle.style.top = isDiag ? '10%' : '0%';
         arrowEle.textContent ||= '\ufe3f';
       } else if(dir.includes('s')) {
-        arrowEle.style.bottom = isDiag ? '5%' : '-5%';
+        arrowEle.style.bottom = isDiag ? '10%' : '0%';
         arrowEle.textContent ||= '\ufe40';
       } else {
         arrowEle.style.top = '50%';
@@ -66,7 +72,7 @@ export class GesturePreviewHost {
       arrowEle.style.transform = arrowEle.style.transform + `rotate(${angle}deg)`;
 
       this.flickPreviews.push(arrowEle);
-      this.div.appendChild(arrowEle);
+      multitapPreview.appendChild(arrowEle);
     }
   }
 }

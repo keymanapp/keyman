@@ -350,7 +350,7 @@ body div.kmw-key-shift-on span.kmw-key-text {font-family:SpecialOSK !important;f
   z-index: 1;
   top: 0;
   left: 0;
-  background-color: inherit;
+  /* background-color: inherit; */
 }
 
 #kmw-gesture-base-label {
@@ -365,6 +365,28 @@ body div.kmw-key-shift-on span.kmw-key-text {font-family:SpecialOSK !important;f
   position: absolute;
   font: 0.333em Arial;
   color: #aaa;
+}
+
+#kmw-preview-img-container {
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  right: 0px;
+  bottom: 0px;
+
+  transition: 0.5s linear all;
+}
+
+#kmw-preview-img-container.kmw-multitap-preview {
+  position: absolute;
+  margin-top: 1px;
+  margin-left: 1px;
+  margin-bottom: 1px;
+  margin-right: 1px;
+  border-right: 2px darkgray dotted;
+  border-bottom: 2px darkgray dotted;
+  /* border-top: 1px lightgray dotted; */
+  /* border-left: 1px lightgray dotted; */
 }
 
 /* Key preview styles */
