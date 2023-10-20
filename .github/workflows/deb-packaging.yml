@@ -105,10 +105,7 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        # Currently not building mantic until ibus version on mantic stabilizied
-        # and we can provide a patched version
-        # dist: [focal, jammy, lunar, mantic]
-        dist: [focal, jammy, lunar]
+        dist: [focal, jammy, lunar, mantic]
         arch: [amd64]
 
     runs-on: ubuntu-latest

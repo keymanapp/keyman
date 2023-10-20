@@ -229,6 +229,7 @@ void kmp_files_foreach (JsonArray *array,
     }
 }
 
+// Get kmp_details from `<kbd>.json`
 kmp_json_status get_keyboard_details(const char *kmp_dir, const char *id, keyboard_details *keyboard)
 {
     g_autoptr(JsonParser) parser;
@@ -267,6 +268,7 @@ kmp_json_status get_keyboard_details(const char *kmp_dir, const char *id, keyboa
     return JSON_OK;
 }
 
+// Get kmp_details from `kmp.json` file
 kmp_json_status get_kmp_details(const char *kmp_dir, kmp_details *details)
 {
     g_autoptr(JsonParser) parser;

@@ -1,7 +1,7 @@
 libkmnkbp0.so.0 libkmnkbp0-0 #MINVER#
 * Build-Depends-Package: libkmnkbp-dev
 
- kbp_state_get_intermediate_context@Base 15.0
+ km_core_state_get_intermediate_context@Base 17.0.193
  km_core_context_append@Base 15.0
  km_core_context_clear@Base 15.0
  km_core_context_get@Base 15.0

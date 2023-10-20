@@ -358,7 +358,7 @@ int DebugLog_1(const char *file, int line, const char *function, const char *fmt
           "%ld" TAB   //"TickCount" TAB
           "%s:%d" TAB //"SourceFile" TAB
           "%s" TAB    //"Function"
-          "%s" NL,    //"Message"
+          "%s",    //"Message"
 
           GetTickCount(), //"TickCount" TAB
           file, line,     //"SourceFile" TAB

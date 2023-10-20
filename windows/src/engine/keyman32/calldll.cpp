@@ -165,7 +165,7 @@ LogContext(km_core_state *lpCoreKeyboardState, uint8_t context_type) {
     log_str_title = int_context;
     break;
   case CONTEXT_INT:
-    error_status = (km_core_status_codes)kbp_state_get_intermediate_context(lpCoreKeyboardState, &citems);
+    error_status = (km_core_status_codes)km_core_state_get_intermediate_context(lpCoreKeyboardState, &citems);
     log_str_title = core_context;
     break;
   default:
@@ -318,7 +318,7 @@ extern "C" BOOL _declspec(dllexport) WINAPI KMSetOutput(PWSTR buf, DWORD backlen
   // correctly. To do this need to check the context as we process the
   // backspaces.
   km_core_context_item *citems = nullptr;
-  if (KM_CORE_STATUS_OK != kbp_state_get_intermediate_context(_td->lpActiveKeyboard->lpCoreKeyboardState, &citems)) {
+  if (KM_CORE_STATUS_OK != km_core_state_get_intermediate_context(_td->lpActiveKeyboard->lpCoreKeyboardState, &citems)) {
     delete[] actionItems;
     return FALSE;
   }
@@ -428,7 +428,7 @@ extern "C" BOOL _declspec(dllexport) WINAPI KMGetContext(PWSTR buf, DWORD len)
   }
 
   km_core_context_item *citems = nullptr;
-  if (KM_CORE_STATUS_OK != kbp_state_get_intermediate_context(_td->lpActiveKeyboard->lpCoreKeyboardState, &citems)) {
+  if (KM_CORE_STATUS_OK != km_core_state_get_intermediate_context(_td->lpActiveKeyboard->lpCoreKeyboardState, &citems)) {
       return FALSE;
   }
 
