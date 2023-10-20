@@ -107,6 +107,14 @@ export class GestureSequence<Type> extends EventEmitter<EventMap<Type>> {
     this.stageReports = [];
     this.selector = selector;
     this.selector.on('rejectionwithaction', this.modelResetHandler);
+    this.once('complete', () => {
+      this.selector.off('rejectionwithaction', this.modelResetHandler)
+
+      // Dropping the reference here gives us two benefits:
+      // 1.  Allows garbage collection to do its thing; this might be the last reference left to the selector instance.
+      // 2.  Acts as an obvious flag / indicator of sequence completion.
+      this.selector = null;
+    });
     this.gestureConfig = gestureModelDefinitions;
 
     // So that we can...
@@ -134,6 +142,12 @@ export class GestureSequence<Type> extends EventEmitter<EventMap<Type>> {
    * current state.  They will be specified in descending `resolutionPriority` order.
    */
     public get potentialModelMatchIds(): string[] {
+      // If `this.selector` is null, it's because no further matches are possible.
+      // We've already emitted the 'complete' event as well.
+      if(!this.selector) {
+        return [];
+      }
+
       // The new round of model-matching is based on the sources used by the previous round.
       // This is important; 'sustainTimer' gesture models may rely on a now-terminated source
       // from that previous round (like with multitaps).
@@ -260,17 +274,23 @@ export class GestureSequence<Type> extends EventEmitter<EventMap<Type>> {
         this.pushedSelector = null;
       }
 
-      // Dropping the reference here gives us two benefits:
-      // 1.  Allows garbage collection to do its thing; this might be the last reference left to the selector instance.
-      // 2.  Acts as an obvious flag / indicator of sequence completion.
-      this.selector = null;
-
       // Any extra finalization stuff should go here, before the event, if needed.
       this.emit('complete');
     }
   }
 
   private readonly modelResetHandler = (selection: MatcherSelection<Type>, replaceModelWith: (model: GestureModel<Type>) => void) => {
+    const sourceIds = selection.matcher.allSourceIds;
+
+    // If none of the sources involved match a source already included in the sequence, bypass
+    // this handler; it belongs to a different sequence or one that's beginning.
+    //
+    // This works even for multitaps because we include the most recent ancestor sources in
+    // `allSourceIds` - that one will match here.
+    if(this.allSourceIds.find((a) => sourceIds.indexOf(a) == -1)) {
+      return;
+    }
+
     if(selection.result.action.type == 'replace') {
       replaceModelWith(getGestureModel(this.gestureConfig, selection.result.action.replace));
     } else {

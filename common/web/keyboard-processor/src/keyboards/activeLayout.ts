@@ -8,6 +8,7 @@ import type Keyboard from "./keyboard.js";
 
 import { TouchLayout } from "@keymanapp/common-types";
 import TouchLayoutDefaultHint = TouchLayout.TouchLayoutDefaultHint;
+import TouchLayoutFlick = TouchLayout.TouchLayoutFlick;
 import { type DeviceSpec } from "@keymanapp/web-utils";
 
 // TS 3.9 changed behavior of getters to make them
@@ -22,6 +23,17 @@ function Enumerable(
 ) {
     descriptor.enumerable = true;
 };
+
+/**
+ * Designed for use by call-by-reference objects during keyboard-load preprocessing
+ * to note properties of a keyboard that are only specified at lower levels of the
+ * layout object.
+ */
+interface AnalysisMetadata {
+  hasFlicks: boolean;
+  hasMultitaps: boolean;
+  hasLongpresses: boolean;
+}
 
 /** A map of key field names with values matching the `typeof` the corresponding property
  * seen in keyman-touch-layout-file.ts from common/web/types.
@@ -285,7 +297,13 @@ class ActiveKeyBase {
     rawKey.text ||= ActiveKey.DEFAULT_KEY.text;
   }
 
-  static polyfill(key: LayoutKey | LayoutSubKey, keyboard: Keyboard, layout: ActiveLayout, displayLayer: string) {
+  static polyfill(key: LayoutKey, keyboard: Keyboard, layout: ActiveLayout, displayLayer: string, analysisFlagObj?: AnalysisMetadata) {
+    analysisFlagObj ||= {
+      hasFlicks: false,
+      hasLongpresses: false,
+      hasMultitaps: false
+    }
+
     // Add class functions to the existing layout object, allowing it to act as an ActiveLayout.
     let dummy = new ActiveKeyBase();
     let proto = Object.getPrototypeOf(dummy);
@@ -303,9 +321,26 @@ class ActiveKeyBase {
     }
 
     // Ensure subkeys are also properly extended.
-    if((key as LayoutKey).sk) {
-      for(let subkey of (key as LayoutKey).sk) {
-        ActiveSubKey.polyfill(subkey, keyboard, layout, displayLayer);
+    if(key.sk) {
+      analysisFlagObj.hasLongpresses = true;
+      for(let subkey of key.sk) {
+        ActiveSubKey.polyfill(subkey, keyboard, layout, displayLayer, analysisFlagObj);
+      }
+    }
+
+    // Also multitap keys.
+    if(key.multitap) {
+      analysisFlagObj.hasMultitaps = true;
+      for(let mtKey of key.multitap) {
+        ActiveSubKey.polyfill(mtKey, keyboard, layout, displayLayer, analysisFlagObj);
+      }
+    }
+
+
+    if(key.flick) {
+      analysisFlagObj.hasFlicks = true;
+      for(let flickKey in key.flick) {
+        ActiveSubKey.polyfill(key.flick[flickKey as keyof TouchLayoutFlick], keyboard, layout, displayLayer, analysisFlagObj);
       }
     }
 
@@ -427,7 +462,15 @@ export class ActiveRow implements LayoutRow {
     }
   }
 
-  static polyfill(row: LayoutRow, keyboard: Keyboard, layout: ActiveLayout, displayLayer: string, totalWidth: number, proportionalY: number) {
+  static polyfill(
+    row: LayoutRow,
+    keyboard: Keyboard,
+    layout: ActiveLayout,
+    displayLayer: string,
+    totalWidth: number,
+    proportionalY: number,
+    analysisFlagObj: AnalysisMetadata
+  ) {
     // Apply defaults, setting the width and other undefined properties for each key
     let keys=row['key'];
     for(let j=0; j<keys.length; j++) {
@@ -454,7 +497,7 @@ export class ActiveRow implements LayoutRow {
           break;
       }
 
-      ActiveKey.polyfill(key, keyboard, layout, displayLayer);
+      ActiveKey.polyfill(key, keyboard, layout, displayLayer, analysisFlagObj);
     }
 
     /* The calculations here are effectively 'virtualized'.  When used with the OSK, the VisualKeyboard
@@ -557,7 +600,7 @@ export class ActiveLayer implements LayoutLayer {
     }
   }
 
-  static polyfill(layer: LayoutLayer, keyboard: Keyboard, layout: ActiveLayout) {
+  static polyfill(layer: LayoutLayer, keyboard: Keyboard, layout: ActiveLayout, analysisFlagObj: AnalysisMetadata) {
     layer.aligned=false;
 
     // Create a DIV for each row of the group
@@ -590,7 +633,7 @@ export class ActiveLayer implements LayoutLayer {
     for(let i=0; i<rowCount; i++) {
       // Calculate proportional y-coord of row.  0 is at top with highest y-coord.
       let rowProportionalY = (i + 0.5) / rowCount;
-      ActiveRow.polyfill(layer.row[i], keyboard, layout, layer.id, totalWidth, rowProportionalY);
+      ActiveRow.polyfill(layer.row[i], keyboard, layout, layer.id, totalWidth, rowProportionalY, analysisFlagObj);
     }
 
     // Add class functions and properties to the existing layout object, allowing it to act as an ActiveLayout.
@@ -764,6 +807,10 @@ export class ActiveLayout implements LayoutFormFactor{
   formFactor: DeviceSpec.FormFactor;
   defaultHint: TouchLayoutDefaultHint;
 
+  hasFlicks: boolean = false;
+  hasLongpresses: boolean = false;
+  hasMultitaps: boolean = false;
+
   /**
    * Facilitates mapping layer id strings to their specification objects.
    */
@@ -820,6 +867,12 @@ export class ActiveLayout implements LayoutFormFactor{
       throw new Error("Cannot build an ActiveLayout for a null specification.");
     }
 
+    const analysisMetadata: AnalysisMetadata = {
+      hasFlicks: false,
+      hasLongpresses: false,
+      hasMultitaps: false
+    };
+
     /* Standardize the layout object's data types.
       *
       * In older versions of KMW, some numeric properties were long represented as strings instead,
@@ -847,9 +900,13 @@ export class ActiveLayout implements LayoutFormFactor{
     aLayout.formFactor = formFactor;
 
     for(n=0; n<layers.length; n++) {
-      ActiveLayer.polyfill(layers[n], keyboard, aLayout);
+      ActiveLayer.polyfill(layers[n], keyboard, aLayout, analysisMetadata);
       layerMap[layers[n].id] = layers[n] as ActiveLayer;
     }
+
+    aLayout.hasFlicks = analysisMetadata.hasFlicks;
+    aLayout.hasLongpresses = analysisMetadata.hasLongpresses;
+    aLayout.hasMultitaps = analysisMetadata.hasMultitaps;
 
     aLayout.layerMap = layerMap;
 

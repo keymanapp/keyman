@@ -56,9 +56,16 @@ export interface ContactModel<Type> {
   /**
    * Is needed to define whether or not the contact-point should be ignored by this gesture type.
    * If undefined, defaults to () => true.
-   * Param 2 only matters for slots of multitouch gesture spec added after initialization of
-   * the gesture's corresponding matcher; it will receive the latest sample from the highest-priority
-   * active path (or predecessor gesture, if no path is active due to a 'sustain' state)
+   *
+   * @param incomingSample   The first input sample of the path to be modeled.
+   * @param comparisonSample The most recent sample related to the same gesture component, if one exists.
+   *                         May be `null`.
+   * @param baseItem         The 'base item' for the path corresponding to `comparisonSample`
+   * @returns
    */
-  readonly allowsInitialState?: (incomingSample: InputSample<Type>, comparisonSample?: InputSample<Type>, baseItem?: Type) => boolean;
+  readonly allowsInitialState?: (
+    incomingSample: InputSample<Type>,
+    comparisonSample?: InputSample<Type>,
+    baseItem?: Type
+  ) => boolean;
 }

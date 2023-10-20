@@ -19,7 +19,8 @@ import {
   GestureRecognizer,
   GestureRecognizerConfiguration,
   GestureSource,
-  InputSample
+  InputSample,
+  PaddedZoneSource
 } from '@keymanapp/gesture-recognizer';
 
 import { createStyleSheet, getAbsoluteX, getAbsoluteY, StylesheetManager } from 'keyman/engine/dom-utils';
@@ -42,9 +43,10 @@ import InternalPendingLongpress from './input/gestures/browser/pendingLongpress.
 import InternalKeyTip from './input/gestures/browser/keytip.js';
 import CommonConfiguration from './config/commonConfiguration.js';
 
-import { modelSetForKeyboard } from './input/gestures/specsForKeyboard.js';
+import { gestureSetForLayout } from './input/gestures/specsForLayout.js';
 
 import { getViewportScale } from './screenUtils.js';
+import { HeldRepeater } from './input/gestures/heldRepeater.js';
 
 export interface VisualKeyboardConfiguration extends CommonConfiguration {
   /**
@@ -335,35 +337,38 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
   }
 
   private constructGestureEngine(): GestureRecognizer<KeyElement, string> {
+    const rowCount = this.kbdLayout.layerMap['default'].row.length;
+
     const config: GestureRecognizerConfiguration<KeyElement, string> = {
       targetRoot: this.element,
       // document.body is the event root for mouse interactions b/c we need to track
       // when the mouse leaves the VisualKeyboard's hierarchy.
       mouseEventRoot: document.body,
+      // Note: at this point in execution, the value will evaluate to NaN!  Height hasn't been set yet.
+      // BUT:  we need to establish the instance now; we can update it later when height _is_ set.
+      maxRoamingBounds: new PaddedZoneSource(this.element, [NaN]),
       // touchEventRoot:  this.element, // is the default
       itemIdentifier: (sample, target) => {
-        if(sample.stateToken == this.layerId) {
-          let resolvedTarget =  this.keyTarget(target);
-          if(resolvedTarget) {
-            return resolvedTarget;
-          }
-        }
+        /* ALWAYS use the findNearestKey function.
+         * MDN spec for `target`, which comes from Touch.target for touch-based interactions:
+         *
+         * > The read-only target property of the Touch interface returns the (EventTarget) on which the touch contact
+         *   started when it was first placed on the surface, even if the touch point has since moved outside the
+         *   interactive area of that element[...]
+         */
 
         return this.layerGroup.findNearestKey(sample);
       }
     };
 
-    const recognizer = new GestureRecognizer(modelSetForKeyboard(this.layoutKeyboard), config);
+    const recognizer = new GestureRecognizer(gestureSetForLayout(this.layerGroup), config);
     recognizer.stateToken = this.layerId;
 
     const sourceTrackingMap: Record<string, {
       source: GestureSource<KeyElement, string>,
-      roamingHandler: typeof roamingTouchHighlighting,
+      roamingHighlightHandler: (sample: InputSample<KeyElement, string>) => void,
       key: KeyElement
     }> = {};
-
-    // TODO:  Obviously, this is extremely rough at present.
-    const roamingTouchHighlighting: (sample: InputSample<KeyElement, string>) => void = null;
 
     // Now to set up event-handling links.
     // This handler should probably vary based on the keyboard: do we allow roaming touches or not?
@@ -372,7 +377,7 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
       // highlighting it)
       const trackingEntry = sourceTrackingMap[source.identifier] = {
         source: source,
-        roamingHandler: (sample) => {
+        roamingHighlightHandler: (sample) => {
           // Maintain highlighting
           const key = sample.item;
           const oldKey = sourceTrackingMap[source.identifier].key;
@@ -403,7 +408,7 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
       // If so, separate handler - it likely needs to be disabled once the first gesture-component
       // match happens, unlike the highlighting part.
 
-      source.path.on('step', trackingEntry.roamingHandler);
+      source.path.on('step', trackingEntry.roamingHighlightHandler);
 
       source.path.on('step', (sample) => {
         // // Do... something based on the potential gesture types that could arise, as appropriate.
@@ -431,25 +436,46 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
         // if( /* not in subkey-select mode */) {
         for(let id of gestureStage.allSourceIds) {
           const trackingEntry = sourceTrackingMap[id];
-          trackingEntry.source.path.off('step', trackingEntry.roamingHandler);
+          trackingEntry.source.path.off('step', trackingEntry.roamingHighlightHandler);
         }
         // }
 
         // First, if we've configured the gesture to generate a keystroke, let's handle that.
         const gestureKey = gestureStage.item;
 
-        if(gestureKey /* && gestureKey is appropriate for the gesture */) {
+        if(gestureKey) {
           let coordSource = gestureStage.sources[0];
           let coord: InputSample<KeyElement, string> = null;
           if(coordSource) {
             // TODO:  should probably vary depending upon `gestureStage.matchedId`
             // (certain types should probably use the base coord... or even from
             // a prior stage of the sequence as appropriate.)
+            //
+            // This is the coordinate used as the basis for fat-finger calculations.
             coord = coordSource.currentSample;
+          }
+
+          if(gestureStage.matchedId == 'multitap') {
+            // TODO:  examine sequence, determine rota-style index to apply; select THAT item instead.
           }
 
           // Once the best coord to use for fat-finger calculations has been determined:
           this.modelKeyClick(gestureStage.item, coord);
+
+          // -- Scratch-space as gestures start becoming integrated --
+          // Reordering may follow at some point.
+          //
+          // Potential long-term idea:  only handle the first stage; delegate future stages to
+          // specialized handlers for the remainder of the sequence.
+          // Should work for modipresses, too... I think.
+          if(gestureStage.matchedId == 'special-key-start' && gestureKey.key.spec.baseKeyID == 'K_BKSP') {
+            // Possible enhancement:  maybe update the held location for the backspace if there's movement?
+            // But... that seems pretty low-priority.
+            //
+            // Merely constructing the instance is enough; it'll link into the sequence's events and
+            // handle everything that remains for the backspace from here.
+            new HeldRepeater(gestureSequence, () => this.modelKeyClick(gestureKey, coord));
+          }
 
           // TODO:  depending upon the gesture type, what sort of UI shifts should happen to
           // facilitate follow-up stages?
@@ -635,12 +661,8 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
 
   //#region OSK touch handlers
   getTouchCoordinatesOnKeyboard(input: InputSample<KeyElement, string>) {
-    // We need to compute the 'local', keyboard-based coordinates for the touch.
-    let kbdCoords = {
-      x: getAbsoluteX(this.kbdDiv),
-      y: getAbsoluteY(this.kbdDiv)
-    }
-    let offsetCoords = { x: input.targetX - kbdCoords.x, y: input.targetY - kbdCoords.y };
+    // `input` is already in keyboard-local coordinates.  It's not scaled, though.
+    let offsetCoords = { x: input.targetX, y: input.targetY };
 
     // The layer group's element always has the proper width setting, unlike kbdDiv itself.
     offsetCoords.x /= this.layerGroup.element.offsetWidth;
@@ -1448,8 +1470,6 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
     gs.fontSize = this.fontSize.styleString;
     bs.fontSize = ParsedLengthStyle.forScalar(fs).styleString;
 
-    // NEW CODE ------
-
     // Step 1:  have the necessary conditions been met?
     const fixedSize = this.width && this.height;
     const computedStyle = getComputedStyle(this.kbdDiv);
@@ -1475,9 +1495,10 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
       return;
     }
 
-    // Step 3:  perform layout operations.  (Handled by 'old code' section below.)
-
-    // END NEW CODE -----------
+    // Step 3:  perform layout operations.
+    const paddingZone = this.gestureEngine.config.maxRoamingBounds as PaddedZoneSource;
+    const rowCount = this.currentLayer.rows.length;
+    paddingZone.updatePadding([-0.333 * this._computedHeight / rowCount]);
 
     // Needs the refreshed layout info to work correctly.
     if(this.currentLayer) {

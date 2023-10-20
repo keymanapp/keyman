@@ -1,4 +1,4 @@
-import { ActiveLayer, type DeviceSpec, Keyboard, LayoutLayer } from '@keymanapp/keyboard-processor';
+import { ActiveLayer, type DeviceSpec, Keyboard, LayoutLayer, ActiveLayout } from '@keymanapp/keyboard-processor';
 
 import { InputSample } from '@keymanapp/gesture-recognizer';
 
@@ -10,9 +10,11 @@ import OSKRow from './oskRow.js';
 export default class OSKLayerGroup {
   public readonly element: HTMLDivElement;
   public readonly layers: {[layerID: string]: OSKLayer} = {};
+  public readonly spec: ActiveLayout;
 
   public constructor(vkbd: VisualKeyboard, keyboard: Keyboard, formFactor: DeviceSpec.FormFactor) {
     let layout = keyboard.layout(formFactor);
+    this.spec = layout;
 
     const lDiv = this.element = document.createElement('div');
     const ls=lDiv.style;
@@ -114,11 +116,21 @@ export default class OSKLayerGroup {
     }
 
     let row: OSKRow = null;
+    let bestMatchDistance = Number.MAX_VALUE;
+
+    // Find the row that the touch-coordinate lies within.
     for(const r of layer.rows) {
       const rowRect = translation(r.element.getBoundingClientRect());
       if(rowRect.top <= coord.targetY && coord.targetY < rowRect.bottom) {
         row = r;
         break;
+      } else {
+        const distance = rowRect.top > coord.targetY ? rowRect.top - coord.targetY : coord.targetY - rowRect.bottom;
+
+        if(distance < bestMatchDistance) {
+          bestMatchDistance = distance;
+          row = r;
+        }
       }
     }
 
