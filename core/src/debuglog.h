@@ -1,5 +1,7 @@
 /* Debugging */
 
+#pragma once
+
 #include <keyman/keyman_core_api_bits.h>
 
 namespace km {
@@ -18,10 +20,12 @@ extern const char *s_key_names[];
 
 #ifdef _MSC_VER
 #define DebugLog(msg,...) (km::core::kmx::ShouldDebug() ? km::core::kmx::DebugLog_1(__FILE__, __LINE__, __FUNCTION__, (msg),__VA_ARGS__) : 0)
+#define DebugLog2(file,line,function,msg,...) (km::core::kmx::ShouldDebug() ? km::core::kmx::DebugLog_1(file, line, function, (msg),__VA_ARGS__) : 0)
 #define console_error(msg,...) write_console(TRUE, (msg), __VA_ARGS__)
 #define console_log(msg,...) write_console(FALSE, (msg), __VA_ARGS__)
 #else
 #define DebugLog(msg,...) (km::core::kmx::ShouldDebug() ? km::core::kmx::DebugLog_1(__FILE__, __LINE__, __FUNCTION__, (msg), ##__VA_ARGS__) : 0)
+#define DebugLog2(file,line,function,msg,...) (km::core::kmx::ShouldDebug() ? km::core::kmx::DebugLog_1(file, line, function, (msg), ##__VA_ARGS__) : 0)
 #define console_error(msg,...) write_console(TRUE, (msg), ##__VA_ARGS__)
 #define console_log(msg,...) write_console(FALSE, (msg), ##__VA_ARGS__)
 #endif

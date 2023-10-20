@@ -21,7 +21,6 @@ tests_without_testdata = [
   'k_003_transform',
   'k_004_tinyshift',
   'k_005_modbittest',
-  # 'k_006_backspace', ## not quite there yet. TODO-LDML
   'k_010_mt',
   'k_011_mt_iso',
   'k_100_keytest',
@@ -33,7 +32,9 @@ tests_without_testdata = [
 # These tests have a k_001_tiny-test.xml file as well.
 tests_with_testdata = [
   'k_001_tiny',
+  'k_006_backspace',
   'k_007_transform_rgx',
+  'k_008_transform_norm',
   'k_020_fr', # TODO-LDML: move to cldr above (fix vkey)
   'k_200_reorder_nod_Lana',
   'k_210_marker',
