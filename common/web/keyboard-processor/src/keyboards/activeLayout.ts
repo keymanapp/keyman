@@ -371,9 +371,9 @@ export class ActiveRow implements LayoutRow {
       // to allow the keyboard font to ovveride the SpecialOSK font.
       // Blank keys are no longer reclassed - can use before/after CSS to add text
       switch(key['sp']) {
-        case Layouts.buttonClasses['SHIFT']:
+        case Layouts.buttonClasses.SHIFT:
           if(!ActiveRow.SPECIAL_LABEL.test(key['text']) && key['text'] != '') {
-            key.sp=Layouts.buttonClasses['SPECIAL'];
+            key.sp=Layouts.buttonClasses.SPECIAL;
           }
           break;
         case Layouts.buttonClasses['SHIFT-ON']:
