@@ -1,5 +1,16 @@
 # Keyman Version History
 
+## 17.0.196 alpha 2023-10-20
+
+* fix(mac): move keyboard menu items to main Input Menu from submenu (#9777)
+*  (#9728)
+*  (#9759)
+* docs(common): macos build update (#9809)
+* fix(web): enhances integrated test stability (#9718)
+* chore(linux): Update packaging GHA  ️ (#9812)
+* chore(linux): Rename KBP to CORE  ️ (#9794)
+* chore(linux): Fix build by adding one character (#9817)
+
 ## 17.0.195 alpha 2023-10-19
 
 * chore(linux): Allow to collect coverage on TC (#9790)
