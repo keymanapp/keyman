@@ -4,8 +4,8 @@
  * Keyman Core - KMX Extended String unit tests
  */
 
-#ifndef KMN_KBP
-#define KMN_KBP
+#ifndef KM_CORE_LIBRARY
+#define KM_CORE_LIBRARY
 #endif
 #ifndef USE_CHAR16_T
 #define USE_CHAR16_T

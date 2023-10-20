@@ -6,7 +6,7 @@
 
 #include <kmx_file.h>
 
-#ifdef KMN_KBP
+#ifdef KM_CORE_LIBRARY
 // TODO: move this to a common namespace keyman::common::kmx_file or similar in the future
 namespace km {
 namespace kbp {
@@ -27,7 +27,7 @@ public:
 };
 
 
-#ifdef KMN_KBP
+#ifdef KM_CORE_LIBRARY
 } // namespace kmx
 } // namespace kbp
 } // namespace km
