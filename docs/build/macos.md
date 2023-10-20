@@ -39,7 +39,7 @@ Rosetta 2 installed.
 
 Many dependencies are only required for specific projects.
 
-* XCode (iOS, macOS) 12.4 or later is needed only for Keyman for Mac and Keyman
+* XCode (iOS, macOS) 12.4 or later is needed only for Keyman for macOS and Keyman
   for iOS.
   * Install from App Store
   * Accept the Xcode license: `sudo xcodebuild -license accept`
@@ -106,10 +106,10 @@ brew install carthage cocoapods
 
 ## Keyman for Android Dependencies
 
-* openjdk 8, Android SDK, Android Studio, Ant, Gradle, Maven
+* openjdk 11, Android SDK, Android Studio, Ant, Gradle, Maven
 
 ```shell
-brew install openjdk@8 android-sdk android-studio ant gradle maven
+brew install openjdk@11 android-sdk android-studio ant gradle maven
 # update path
 source ../resources/devbox/macos/keyman.macos.env.sh
 # optionally install sdk images
