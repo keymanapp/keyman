@@ -572,7 +572,6 @@ uses
   CharMapDropTool,
   Clipbrd,
   compile,
-  CompileKeymanWeb,
   dmActionsMain,
   KeymanDeveloperOptions,
   KeymanVersion,
@@ -582,6 +581,7 @@ uses
   Keyman.Developer.System.Project.ProjectLog,
   Keyman.Developer.System.Project.kmnProjectFileAction,
   Keyman.Developer.System.ServerAPI,
+  Keyman.Developer.System.KmcWrapper,
   Keyman.Developer.UI.Project.ProjectFileUI,
   Keyman.Developer.UI.UfrmMessageDlgWithSave,
   ErrorControlledRegistry,
@@ -2950,6 +2950,7 @@ var
   kbdparser: TKeyboardParser;
   FEncoding: TEncoding;
   FIncludeCodes: string;
+  w: TKmcWrapper;
 begin
   KMXFileName := TTempFileManager.Get('.kmx');   // I4181
   KMNFileName := TTempFileManager.Get('.kmn');   // I4181
@@ -2997,11 +2998,16 @@ begin
 
   TProject.CompilerMessageFile := ProjectFile;
   frmMessages.Clear;
-  if CompileKeyboardFile(PChar(KMNFileName.Name), PChar(KMXFileName2), False, False, False, ProjectCompilerMessage) <= 0 then   // I4181   // I4865   // I4866
-  begin
-    frmMessages.DoShowForm;
-    ShowMessage('There were errors compiling the keyboard to convert to the On Screen Keyboard.');
-    FreeAndNil(KMXFileName);   // I4181
+  w := TKmcWrapper.Create;
+  try
+    if not w.Compile(ProjectFile, KMNFileName.Name, KMXFileName2, False) then
+    begin
+      frmMessages.DoShowForm;
+      ShowMessage('There were errors compiling the keyboard to convert to the On Screen Keyboard.');
+      FreeAndNil(KMXFileName);   // I4181
+    end;
+  finally
+    w.Free;
   end;
   FreeAndNil(KMNFileName);   // I4181
   TProject.CompilerMessageFile := nil;

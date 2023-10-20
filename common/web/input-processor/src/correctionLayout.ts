@@ -40,7 +40,7 @@ export interface CorrectionLayout {
   /**
    * Defines the mappings of each key to be considered by a key-correction
    * algorithm.  The key's bounding box should be defined relative to its
-   * containers bounding box, with both mapped to a coordinate system from
+   * container's bounding box, with both mapped to a coordinate system from
    * <0, 0> to <1, 1> - a unit square.
    */
   keys: CorrectionLayoutEntry[];

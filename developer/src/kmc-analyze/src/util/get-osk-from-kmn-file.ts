@@ -14,9 +14,7 @@ export async function getOskFromKmnFile(callbacks: CompilerCallbacks, filename: 
     return null;
   }
 
-  // Note, output filename here is just to provide path data,
-  // as nothing is written to disk
-  let result = kmnCompiler.runCompiler(filename, filename + '.tmp', {
+  let result = kmnCompiler.runCompiler(filename, {
     shouldAddCompilerVersion: false,
     saveDebug: false,
   });

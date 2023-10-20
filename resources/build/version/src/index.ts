@@ -123,7 +123,7 @@ const main = async (): Promise<void> => {
     process.exit(0); // Tell shell that we have updated files
   }
 
-  process.exit(1); // Tell shell that we haven't updated files
+  process.exit(50); // Tell shell that we haven't updated files
 };
 
 
@@ -132,5 +132,5 @@ main().then(
 )
 .catch((error: Error): void => {
   console.error(`An unexpected error occurred: ${error.message}, ${error.stack ?? 'no stack trace'}.`);
-  process.exit(2);
+  process.exit(1);
 });

@@ -9,7 +9,7 @@ import { TestCompilerCallbacks } from './TestCompilerCallbacks.js';
 import { fileURLToPath } from 'url';
 
 const readerOptions: LDMLKeyboardXMLSourceFileReaderOptions = {
-  importsPath: fileURLToPath(LDMLKeyboardXMLSourceFileReader.defaultImportsURL)
+  importsPath: fileURLToPath(new URL(...LDMLKeyboardXMLSourceFileReader.defaultImportsURL))
 };
 
 export interface CompilationCase {

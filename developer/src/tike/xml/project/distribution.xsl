@@ -98,10 +98,6 @@
         <xsl:with-param name="command">keyman:compilefile?id=<xsl:value-of select="ID" /></xsl:with-param>
       </xsl:call-template>
       <xsl:call-template name="menuitem">
-        <xsl:with-param name="caption">Build installer</xsl:with-param>
-        <xsl:with-param name="command">keyman:package_compileinstaller?id=<xsl:value-of select="ID" /></xsl:with-param>
-      </xsl:call-template>
-      <xsl:call-template name="menuitem">
         <xsl:with-param name="caption">Clean</xsl:with-param>
         <xsl:with-param name="command">keyman:cleanfile?id=<xsl:value-of select="ID" /></xsl:with-param>
       </xsl:call-template>

@@ -3,6 +3,9 @@ import OSKKey from '../../../keyboard-layout/oskKey.js';
 import { KeyData, KeyElement, link } from '../../../keyElement.js';
 import VisualKeyboard from '../../../visualKeyboard.js';
 
+// Typing is to ensure that the keys specified below actually are on the type...
+// and to gain Intellisense if more need to be added.
+
 export default class OSKSubKey extends OSKKey {
   constructor(spec: ActiveSubKey, layer: string) {
     if(typeof(layer) != 'string' || layer == '') {
@@ -23,15 +26,6 @@ export default class OSKSubKey extends OSKKey {
     let kDiv=document.createElement('div');
     let tKey = osk.getDefaultKeyObject();
     let ks=kDiv.style;
-
-    for(const tp of Object.keys(tKey)) {
-      // We've already preprocessed the keyboard's version of the subkey.  While certain
-      // layout properties are fine to overwrite, certain functional properties must
-      // be preserved.
-      if(typeof spec[tp] != 'string' && tp != 'default' && tp != '_baseKeyEvent') {
-        spec[tp]=tKey[tp];
-      }
-    }
 
     kDiv.className='kmw-key-square-ex';
     if(topMargin) {

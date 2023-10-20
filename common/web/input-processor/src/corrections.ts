@@ -13,7 +13,7 @@ import { CorrectionLayout } from "./correctionLayout.js";
 export function keyTouchDistances(touchCoords: {x: number, y: number}, correctiveLayout: CorrectionLayout): Map<ActiveKeyBase, number> {
   let keyDists: Map<ActiveKeyBase, number> = new Map<ActiveKeyBase, number>();
 
-  // This double-nested loop computes a pseudo-distance for the touch from each key.  Quite useful for
+  // This loop computes a pseudo-distance for the touch from each key. Quite useful for
   // generating a probability distribution.
   correctiveLayout.keys.forEach((entry) => {
     // These represent the within-key distance of the touch from the key's center.
