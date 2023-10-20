@@ -19,7 +19,7 @@ export class GesturePreviewHost {
     base.style.pointerEvents='none';
     const label = this.label = document.createElement('span');
     label.className='kmw-gesture-base-label kmw-key-text';
-    label.id = label.className;
+    label.id = 'kmw-gesture-base-label';
     base.appendChild(label);
 
     // Re-use the text value from the base key's label.
