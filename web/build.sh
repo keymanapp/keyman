@@ -99,9 +99,10 @@ builder_run_child_actions build:app/ui
 # Needs both app/browser and app/ui.
 builder_run_child_actions build:samples
 
-builder_run_child_actions build:test-pages
-
 builder_run_child_actions build:tools
+
+# Some test pages refer to KMW tools.
+builder_run_child_actions build:test-pages
 
 builder_run_child_actions test
 

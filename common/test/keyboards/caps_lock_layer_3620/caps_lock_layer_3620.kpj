@@ -52,13 +52,6 @@
       <FileType>.md</FileType>
     </File>
     <File>
-      <ID>id_fff8738ee01fad8282ccd871d1b1d7ec</ID>
-      <Filename>caps_lock_layer_3620.keyboard_info</Filename>
-      <Filepath>caps_lock_layer_3620.keyboard_info</Filepath>
-      <FileVersion></FileVersion>
-      <FileType>.keyboard_info</FileType>
-    </File>
-    <File>
       <ID>id_6beb4ed096b4f0d03913a0cf0dc1c10b</ID>
       <Filename>caps_lock_layer_3620.kmx</Filename>
       <Filepath>source\..\build\caps_lock_layer_3620.kmx</Filepath>

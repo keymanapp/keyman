@@ -5,7 +5,7 @@ import * as fs from 'fs';
 /**
  * Locates the Keyman Developer bin folder, checking first if this is running
  * from the source repository (using the presence of the KEYMAN_ROOT environment
- * variable), and if not, checking for the presence of kmcomp.exe in each
+ * variable), and if not, checking for the presence of kmconvert.exe in each
  * parent folder recursively until we reach the root of the filesystem.
  * @returns string | null
  */
@@ -21,18 +21,18 @@ export function getDeveloperBinPath(): string {
     }
   }
 
-  // Otherwise, we will look in parent folders until we find kmcomp.exe
-  // TODO: once we eliminate kmcomp.exe, we'll need to do this some other way?
+  // Otherwise, we will look in parent folders until we find kmconvert.exe
+  // TODO: if we eliminate kmconvert.exe, we'll need to do this some other way?
   let p = fileURLToPath(import.meta.url);
   const root = path.parse(p).root.toLowerCase(); // lower-case for drive letter on Windows
   p = path.dirname(p);
   do {
-    if (fs.existsSync(path.join(p, 'kmcomp.exe'))) {
+    if (fs.existsSync(path.join(p, 'kmconvert.exe'))) {
       return p;
     }
     p = path.dirname(p);
   } while (p.toLowerCase() != root);
 
-  // kmcomp.exe was not found on the path
+  // kmconvert.exe was not found on the path
   return null;
 }

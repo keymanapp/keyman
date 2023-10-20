@@ -45,6 +45,10 @@
           "type": "string",
           "pattern": "^(True|False)$"
         },
+        "SkipMetadataFiles": {
+          "type": "string",
+          "pattern": "^(True|False)$"
+        },
         "ProjectType": {
           "type": "string",
           "pattern": "^(keyboard|lexicalmodel)$"

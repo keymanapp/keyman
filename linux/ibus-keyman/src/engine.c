@@ -246,7 +246,8 @@ reset_context(IBusEngine *engine) {
 
   if (client_supports_surrounding_text(engine)) {
     IBusText *text;
-    gchar *surrounding_text, *current_context_utf8;
+    g_autofree gchar *surrounding_text = NULL;
+    g_autofree gchar *current_context_utf8 = NULL;
     guint cursor_pos, anchor_pos, context_start, context_end;
     km_core_context_item *context_items;
 
@@ -270,8 +271,6 @@ reset_context(IBusEngine *engine) {
         g_message("%s: setting context failed with status code %d", __FUNCTION__, status);
       }
     }
-    g_free(surrounding_text);
-    g_free(current_context_utf8);
   } else {
     km_core_context_clear(context);
     g_message("%s: client does not support surrounding text", __FUNCTION__);
@@ -362,9 +361,19 @@ setup_environment(IBusKeymanEngine *keyman)
   return status;
 }
 
+void
+free_km_core_option_item(gpointer data) {
+  if (!data)
+    return;
+
+  km_core_option_item *opt = (km_core_option_item *)data;
+  g_free((km_core_cp *)opt->key);
+  g_free((km_core_cp *)opt->value);
+  g_free(opt);
+}
+
 static km_core_status
-load_keyboard_options(IBusKeymanEngine *keyman)
-{
+load_keyboard_options(IBusKeymanEngine *keyman) {
   g_assert(keyman);
 
   // Retrieve keyboard options from DConf
@@ -373,7 +382,7 @@ load_keyboard_options(IBusKeymanEngine *keyman)
   GQueue *queue_options = keyman_get_options_queue_fromdconf(keyman->kb_name, keyman->kb_name);
   int num_options       = g_queue_get_length(queue_options);
   if (num_options < 1) {
-    g_queue_free_full(queue_options, NULL);
+    g_queue_free_full(queue_options, free_km_core_option_item);
     return KM_CORE_STATUS_OK;
   }
 
@@ -387,18 +396,13 @@ load_keyboard_options(IBusKeymanEngine *keyman)
     keyboard_opts[i].value = item->value;
   }
 
-
   // once we have the option list we can then update the options using the public api call
   km_core_status status = km_core_state_options_update(keyman->state, keyboard_opts);
 
   if (status != KM_CORE_STATUS_OK) {
     g_warning("%s: problem creating km_core_state. Status is %u.", __FUNCTION__, status);
   }
-  for (int i = 0; i < num_options; i++) {
-    g_free((km_core_cp *)keyboard_opts[i].key);
-    g_free((km_core_cp *)keyboard_opts[i].value);
-  }
-  g_queue_free_full(queue_options, NULL);
+  g_queue_free_full(queue_options, free_km_core_option_item);
   g_free(keyboard_opts);
   return status;
 }
@@ -412,7 +416,8 @@ ibus_keyman_engine_constructor(
     IBusKeymanEngine *keyman;
     IBusEngine *engine;
     const gchar *engine_name;
-    gchar *p, *abs_kmx_path;
+    gchar *p;
+    g_autofree gchar *abs_kmx_path = NULL;
 
     g_debug("DAR: %s", __FUNCTION__);
 
@@ -451,29 +456,25 @@ ibus_keyman_engine_constructor(
 
     g_strfreev(split_name);
 
-    gchar *kmx_file = g_path_get_basename(abs_kmx_path);
+    g_autofree gchar *kmx_file = g_path_get_basename(abs_kmx_path);
     p = rindex(kmx_file, '.'); // get id to use as dbus service name
     if (p) {
         keyman->kb_name = g_strndup(kmx_file, p-kmx_file);
         p = rindex(abs_kmx_path, '.');
         if (p)
         {
-            gchar *dir = g_path_get_dirname(abs_kmx_path);
-            gchar *ldmlfile = g_strdup_printf("%s/%s.ldml", dir, keyman->kb_name);
+            g_autofree gchar *dir = g_path_get_dirname(abs_kmx_path);
+            g_autofree gchar *ldmlfile = g_strdup_printf("%s/%s.ldml", dir, keyman->kb_name);
             if (g_file_test(ldmlfile, G_FILE_TEST_EXISTS))
             {
                 keyman->ldmlfile = g_strdup(ldmlfile);
             }
-            g_free(dir);
-            g_free(ldmlfile);
         }
     }
-    g_free(kmx_file);
 
     km_core_status status;
 
     status = km_core_keyboard_load(abs_kmx_path, &(keyman->keyboard));
-    g_free(abs_kmx_path);
 
     if (status != KM_CORE_STATUS_OK) {
       g_warning("%s: problem creating km_core_keyboard. Status is %u.", __FUNCTION__, status);

@@ -46,7 +46,7 @@ const KEY_102_WIDTH = 200;
 
 // This class manages default layout construction for consumption by OSKs without a specified layout.
 export class Layouts {
-  static dfltCodes=[
+  static readonly dfltCodes: ReadonlyArray<string> = [
     "K_BKQUOTE","K_1","K_2","K_3","K_4","K_5","K_6","K_7","K_8","K_9","K_0",
     "K_HYPHEN","K_EQUAL","K_*","K_*","K_*","K_Q","K_W","K_E","K_R","K_T",
     "K_Y","K_U","K_I","K_O","K_P","K_LBRKT","K_RBRKT","K_BKSLASH","K_*",
@@ -56,13 +56,13 @@ export class Layouts {
     "K_SLASH","K_*","K_*","K_*","K_*","K_*","K_SPACE"
   ];
 
-  static dfltText='`1234567890-=\xA7~~qwertyuiop[]\\~~~asdfghjkl;\'~~~~~?zxcvbnm,./~~~~~ '
+  static readonly dfltText='`1234567890-=\xA7~~qwertyuiop[]\\~~~asdfghjkl;\'~~~~~?zxcvbnm,./~~~~~ '
     +'~!@#$%^&*()_+\xA7~~QWERTYUIOP{}\\~~~ASDFGHJKL:"~~~~~?ZXCVBNM<>?~~~~~ ';
 
-  static readonly DEFAULT_RAW_SPEC = {'F':'Tahoma', 'BK': Layouts.dfltText};
+  static readonly DEFAULT_RAW_SPEC = {'F':'Tahoma', 'BK': Layouts.dfltText} as const;
 
   // Cross-reference with the ids in osk.setButtonClass.
-  static buttonClasses: {[name: string]: ButtonClass} = {
+  static readonly buttonClasses: {[name: string]: ButtonClass} = {
     'DEFAULT':0,
     'SHIFT':1,     // special-key / frame key styling:  uses our custom, PUA OSK font
     'SHIFT-ON':2,
@@ -73,7 +73,7 @@ export class Layouts {
     'HIDDEN':10
   };
 
-  static modifierSpecials: Record<string, string> = {
+  static readonly modifierSpecials = {
     'leftalt': '*LAlt*',
     'rightalt': '*RAlt*',
     'alt': '*Alt*',
@@ -93,7 +93,7 @@ export class Layouts {
     'rightalt-shift': '*RAltShift*',
     'leftctrl-shift': '*LCtrlShift*',
     'rightctrl-shift': '*RCtrlShift*'
-  };
+  } as const;
 
   /**
   * Build a default layout for keyboards with no explicit layout

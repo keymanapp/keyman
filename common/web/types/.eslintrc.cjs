@@ -8,6 +8,8 @@ module.exports = {
     "coverage/*",
     "node_modules/*",
     "test/fixtures/*",
+    "tools/*",
+    "src/schemas/*"
   ],
   overrides: [
     {
