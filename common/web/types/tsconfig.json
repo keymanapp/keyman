@@ -5,11 +5,11 @@
     "outDir": "build/src/",
     "rootDir": "src/",
     "baseUrl": ".",
-    "allowSyntheticDefaultImports": true, // for ajv
-    "resolveJsonModule": true,
+    "allowSyntheticDefaultImports": true,
   },
   "include": [
-    "src/**/*.ts"
+    "src/**/*.ts",
+    "src/schemas/*.mjs", // Import the validators
   ],
   "references": [
     { "path": "../keyman-version" },

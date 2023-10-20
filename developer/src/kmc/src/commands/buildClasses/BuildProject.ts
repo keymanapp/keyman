@@ -1,17 +1,18 @@
 import * as path from 'path';
 import * as fs from 'fs';
-import { CompilerCallbacks, CompilerFileCallbacks, CompilerOptions, KeymanDeveloperProject, KeymanDeveloperProjectFile, KeymanFileTypes } from '@keymanapp/common-types';
+import { CompilerCallbacks, CompilerFileCallbacks, KeymanDeveloperProject, KeymanDeveloperProjectFile, KeymanFileTypes } from '@keymanapp/common-types';
 import { BuildActivity } from './BuildActivity.js';
-import { buildActivities } from './buildActivities.js';
+import { buildActivities, buildKeyboardInfoActivity, buildModelInfoActivity } from './buildActivities.js';
 import { InfrastructureMessages } from '../../messages/infrastructureMessages.js';
 import { loadProject } from '../../util/projectLoader.js';
+import { ExtendedCompilerOptions } from 'src/util/extendedCompilerOptions.js';
 
 export class BuildProject extends BuildActivity {
   public get name(): string { return 'Project'; }
   public get sourceExtension(): KeymanFileTypes.Source { return KeymanFileTypes.Source.Project; }
   public get compiledExtension(): KeymanFileTypes.Binary { return null; }
   public get description(): string  { return 'Build a keyboard or lexical model project'; }
-  public async build(infile: string, callbacks: CompilerCallbacks, options: CompilerOptions): Promise<boolean> {
+  public async build(infile: string, callbacks: CompilerCallbacks, options: ExtendedCompilerOptions): Promise<boolean> {
     let builder = new ProjectBuilder(infile, callbacks, options);
     return builder.run();
   }
@@ -20,10 +21,10 @@ export class BuildProject extends BuildActivity {
 class ProjectBuilder {
   callbacks: CompilerCallbacks;
   infile: string;
-  options: CompilerOptions;
+  options: ExtendedCompilerOptions;
   project: KeymanDeveloperProject;
 
-  constructor(infile: string, callbacks: CompilerCallbacks, options: CompilerOptions) {
+  constructor(infile: string, callbacks: CompilerCallbacks, options: ExtendedCompilerOptions) {
     this.infile = path.resolve(infile);
     this.callbacks = new CompilerFileCallbacks(infile, options, callbacks);
     this.options = options;
@@ -52,13 +53,24 @@ class ProjectBuilder {
       }
     }
 
-    // TODO: generate .keyboard_info from .kps + etc (and support merge of
-    // $PROJECTPATH/.keyboard_info for version 1.0 projects)
+    // Build project metadata
+    if(this.options.forPublishing || !this.project.options.skipMetadataFiles) {
+      if(!await (this.buildProjectTargets(
+          this.project.isKeyboardProject()
+          ? buildKeyboardInfoActivity
+          : buildModelInfoActivity))) {
+        return false;
+      }
+    }
 
     return true;
   }
 
   async buildProjectTargets(activity: BuildActivity): Promise<boolean> {
+    if(activity.sourceExtension == KeymanFileTypes.Source.Project) {
+      return await this.buildTarget(this.project.projectFile, activity);
+    }
+
     let result = true;
     for(let file of this.project.files) {
       if(file.fileType.toLowerCase() == activity.sourceExtension) {
@@ -76,7 +88,7 @@ class ProjectBuilder {
 
     const buildFilename = path.relative(process.cwd(), infile).replace(/\\/g, '/');
     const callbacks = new CompilerFileCallbacks(buildFilename, options, this.callbacks);
-    callbacks.reportMessage(InfrastructureMessages.Info_BuildingFile({filename: buildFilename}));
+    callbacks.reportMessage(InfrastructureMessages.Info_BuildingFile({filename: infile, relativeFilename:buildFilename}));
 
     fs.mkdirSync(path.dirname(options.outFile), {recursive:true});
 
@@ -87,9 +99,9 @@ class ProjectBuilder {
     result = result && !callbacks.hasFailureMessage(this.options.compilerWarningsAsErrors ?? this.project.options.compilerWarningsAsErrors);
 
     if(result) {
-      callbacks.reportMessage(InfrastructureMessages.Info_FileBuiltSuccessfully({filename: buildFilename}));
+      callbacks.reportMessage(InfrastructureMessages.Info_FileBuiltSuccessfully({filename: infile, relativeFilename:buildFilename}));
     } else {
-      callbacks.reportMessage(InfrastructureMessages.Info_FileNotBuiltSuccessfully({filename: buildFilename}));
+      callbacks.reportMessage(InfrastructureMessages.Info_FileNotBuiltSuccessfully({filename: infile, relativeFilename: buildFilename}));
     }
 
     return result;

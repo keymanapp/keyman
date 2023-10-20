@@ -131,9 +131,6 @@ begin
     frmMessages.DoShowForm;
 
   Result :=
-    // Note: we do not surface the ability to exclude version information from
-    // the TIKE compiler; this must be done from kmcomp.exe.
-    ProjectFile.DoSetCompilerOptions(True, FKeymanDeveloperOptions.UseLegacyCompiler) and
     ProjectFile.CompileKeyboard;
 
   if Result and

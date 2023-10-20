@@ -351,7 +351,7 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
       mouseEventRoot: document.body,
       // Note: at this point in execution, the value will evaluate to NaN!  Height hasn't been set yet.
       // BUT:  we need to establish the instance now; we can update it later when height _is_ set.
-      maxRoamingBounds: new PaddedZoneSource(this.element, [-0.333 * this.height / rowCount]),
+      maxRoamingBounds: new PaddedZoneSource(this.element, [NaN]),
       // touchEventRoot:  this.element, // is the default
       itemIdentifier: (sample, target) => {
         /* ALWAYS use the findNearestKey function.

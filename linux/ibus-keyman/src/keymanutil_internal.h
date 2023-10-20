@@ -36,4 +36,7 @@ IBusEngineDesc *get_engine_for_language(
 void keyman_add_keyboard(gpointer data, gpointer user_data);
 void keyman_add_keyboards_from_dir(gpointer data, gpointer user_data);
 
-#endif  // __KEYMANUTIL_INTERNAL_H__
+G_DEFINE_AUTOPTR_CLEANUP_FUNC(IBusEngineDesc, g_object_unref)
+G_DEFINE_AUTOPTR_CLEANUP_FUNC(IBusComponent, g_object_unref)
+
+#endif // __KEYMANUTIL_INTERNAL_H__

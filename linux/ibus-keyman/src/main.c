@@ -28,6 +28,7 @@
 #include "engine.h"
 #include "keyman-service.h"
 #include "keymanutil.h"
+#include "keymanutil_internal.h"
 
 static IBusBus *bus         = NULL;
 static IBusFactory *factory = NULL;
@@ -52,8 +53,8 @@ ibus_disconnected_cb(IBusBus *unused_bus, gpointer unused_data) {
   KeymanService *service = km_service_get_default(NULL);
   g_clear_object(&service);
 
-  g_object_unref(factory);
-  g_object_unref(bus);
+  if (factory) g_object_unref(factory);
+  if (bus) g_object_unref(bus);
 
   ibus_quit();
 }
@@ -66,26 +67,29 @@ add_single_keyboard(gpointer data, gpointer user_data) {
 #else
   const gchar *engine_name = engine->name;
 #endif /* !IBUS_CHECK_VERSION(1,3,99) */
-  ibus_factory_add_engine(factory, engine_name, IBUS_TYPE_KEYMAN_ENGINE);
+  if (engine_name) {
+    ibus_factory_add_engine(factory, engine_name, IBUS_TYPE_KEYMAN_ENGINE);
+  } else {
+    g_error("%s: Trying to add NULL engine", __FUNCTION__);
+  }
 }
 
 static void
 add_keyboards(IBusBus *bus, gpointer user_data) {
-  GList *engines;
-  IBusComponent *component;
+  g_autolist(IBusEngineDesc) engines;
+  g_autoptr(IBusComponent) component;
 
   g_message("Adding keyboards to ibus");
 
   component = ibus_keyman_get_component();
 
   GDBusConnection *connection = ibus_bus_get_connection(bus);
-  factory = ibus_factory_new(connection);
+  factory = ibus_factory_new(g_object_ref(connection));
 
   g_signal_connect(bus, "disconnected", G_CALLBACK(ibus_disconnected_cb), NULL);
 
   engines = ibus_component_get_engines(component);
   g_list_foreach(engines, add_single_keyboard, NULL);
-  g_list_free(engines);
 
   if (ibus) {
     ibus_bus_request_name(bus, "org.freedesktop.IBus.Keyman", 0);
@@ -93,7 +97,6 @@ add_keyboards(IBusBus *bus, gpointer user_data) {
     ibus_bus_register_component(bus, component);
   }
 
-  g_object_unref(component);
   km_service_get_default(NULL);  // initialise dbus service
 }
 
@@ -117,8 +120,8 @@ start_component(void) {
 
 static void
 print_engines_xml(void) {
-  IBusComponent *component;
-  GString *output;
+  g_autoptr(IBusComponent) component;
+  g_autoptr(GString) output;
 
   ibus_init();
 
@@ -128,9 +131,6 @@ print_engines_xml(void) {
   ibus_component_output_engines(component, output, 0);
 
   fprintf(stdout, "%s", output->str);
-
-  g_string_free(output, TRUE);
-  g_object_unref(component);
 }
 
 int
@@ -145,7 +145,9 @@ main(gint argc, gchar **argv) {
   g_option_context_add_main_entries(context, entries, "ibus-keyman");
 
   if (!g_option_context_parse(context, &argc, &argv, &error)) {
+    g_assert(error != NULL);
     g_print("Option parsing failed: %s\n", error->message);
+    g_error_free(error);
     g_option_context_free(context);
     exit(-1);
   }

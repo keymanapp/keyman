@@ -3127,10 +3127,6 @@ inherited frmKeymanDeveloper: TfrmKeymanDeveloper
           Caption = '&Exception Test'
           OnClick = mnuToolsDebugTestsExceptionTestClick
         end
-        object mnuToolsDebugTestsCompilerExceptionTest: TMenuItem
-          Caption = '&Compiler Exception Test'
-          OnClick = mnuToolsDebugTestsCompilerExceptionTestClick
-        end
       end
     end
     object Help1: TMenuItem

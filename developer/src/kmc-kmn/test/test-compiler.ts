@@ -38,12 +38,12 @@ describe('Compiler class', function() {
 
     const fixtureName = baselineDir + 'k_000___null_keyboard.kmx';
     const infile = baselineDir + 'k_000___null_keyboard.kmn';
-    const outfile = __dirname + '/k_000___null_keyboard.kmx';
+    const outFile = __dirname + '/k_000___null_keyboard.kmx';
 
-    assert(compiler.run(infile, outfile, {saveDebug: true, shouldAddCompilerVersion: false}));
+    assert(compiler.run(infile, {saveDebug: true, outFile, shouldAddCompilerVersion: false}));
 
-    assert(fs.existsSync(outfile));
-    const outfileData = fs.readFileSync(outfile);
+    assert(fs.existsSync(outFile));
+    const outfileData = fs.readFileSync(outFile);
     const fixtureData = fs.readFileSync(fixtureName);
     assert.equal(outfileData.byteLength, fixtureData.byteLength);
     assert.deepEqual(outfileData, fixtureData);
@@ -62,12 +62,12 @@ describe('Compiler class', function() {
       if(file.match(/\.kmx$/)) {
         const fixtureName = baselineDir + file;
         const infile = baselineDir + file.replace(/x$/, 'n');
-        const outfile = __dirname + '/' + file;
+        const outFile = __dirname + '/' + file;
 
-        assert(compiler.run(infile, outfile, {saveDebug: true, shouldAddCompilerVersion: false}));
+        assert(compiler.run(infile, {saveDebug: true, outFile, shouldAddCompilerVersion: false}));
 
-        assert(fs.existsSync(outfile));
-        const outfileData = fs.readFileSync(outfile);
+        assert(fs.existsSync(outFile));
+        const outfileData = fs.readFileSync(outFile);
         const fixtureData = fs.readFileSync(fixtureName);
         assert.equal(outfileData.byteLength, fixtureData.byteLength);
         assert.deepEqual(outfileData, fixtureData);
@@ -89,7 +89,7 @@ describe('Compiler class', function() {
     const resultingKmxfile = __dirname + '/caps_lock_layer_3620.kmx';
     const resultingKvkfile = __dirname + '/caps_lock_layer_3620.kvk';
 
-    assert.isTrue(compiler.run(infile, resultingKmxfile, {saveDebug: true, shouldAddCompilerVersion: false}));
+    assert.isTrue(compiler.run(infile, {saveDebug: true, shouldAddCompilerVersion: false}));
 
     assert.isTrue(fs.existsSync(resultingKmxfile));
     assert.isTrue(fs.existsSync(resultingKvkfile));
