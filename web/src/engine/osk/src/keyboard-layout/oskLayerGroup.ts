@@ -104,28 +104,17 @@ export default class OSKLayerGroup {
   private nearestKey(coord: Omit<InputSample<KeyElement>, 'item'>, layer: OSKLayer): KeyElement {
     const baseRect = this.element.getBoundingClientRect();
 
-    /**
-     * Transforms the client rect of child elements to use a coordinate system where the top-left
-     * of the layer group's bounding rectangle serves as the origin - the same coordinate
-     * system output by the gesture engine.
-     * @param childRect
-     * @returns
-     */
-    const translation = (childRect: DOMRect) => {
-      return new DOMRect(childRect.x - baseRect.x, childRect.y - baseRect.y, childRect.width, childRect.height);
-    }
-
     let row: OSKRow = null;
     let bestMatchDistance = Number.MAX_VALUE;
 
     // Find the row that the touch-coordinate lies within.
     for(const r of layer.rows) {
-      const rowRect = translation(r.element.getBoundingClientRect());
-      if(rowRect.top <= coord.targetY && coord.targetY < rowRect.bottom) {
+      const rowRect = r.element.getBoundingClientRect();
+      if(rowRect.top <= coord.clientY && coord.clientY < rowRect.bottom) {
         row = r;
         break;
       } else {
-        const distance = rowRect.top > coord.targetY ? rowRect.top - coord.targetY : coord.targetY - rowRect.bottom;
+        const distance = rowRect.top > coord.clientY ? rowRect.top - coord.clientY : coord.clientY - rowRect.bottom;
 
         if(distance < bestMatchDistance) {
           bestMatchDistance = distance;
@@ -144,12 +133,12 @@ export default class OSKLayerGroup {
     let dxMax = 24;
     let dxMin = 100000;
 
-    const x = coord.targetX;
+    const x = coord.clientX;
 
     for (let k = 0; k < row.keys.length; k++) {
       // Second-biggest, though documentation suggests this is probably right.
       const keySquare = row.keys[k].square as HTMLElement; // gets the .kmw-key-square containing a key
-      const squareRect = translation(keySquare.getBoundingClientRect());
+      const squareRect = keySquare.getBoundingClientRect();
 
       // Find the actual key element.
       let childNode = keySquare.firstChild ? keySquare.firstChild as HTMLElement : keySquare;
@@ -179,7 +168,7 @@ export default class OSKLayerGroup {
 
     if (dxMin < 100000) {
       const t = <HTMLElement>row.keys[closestKeyIndex].square;
-      const squareRect = translation(t.getBoundingClientRect());
+      const squareRect = t.getBoundingClientRect();
 
       const x1 = squareRect.left;
       const x2 = squareRect.right;

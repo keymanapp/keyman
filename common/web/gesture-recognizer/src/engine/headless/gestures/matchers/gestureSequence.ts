@@ -108,7 +108,8 @@ export class GestureSequence<Type> extends EventEmitter<EventMap<Type>> {
     this.selector = selector;
     this.selector.on('rejectionwithaction', this.modelResetHandler);
     this.once('complete', () => {
-      this.selector.off('rejectionwithaction', this.modelResetHandler)
+      this.selector.off('rejectionwithaction', this.modelResetHandler);
+      this.selector.dropSourcesWithIds(this.allSourceIds);
 
       // Dropping the reference here gives us two benefits:
       // 1.  Allows garbage collection to do its thing; this might be the last reference left to the selector instance.
@@ -130,7 +131,9 @@ export class GestureSequence<Type> extends EventEmitter<EventMap<Type>> {
   }
 
   public get allSourceIds(): string[] {
-    return this.stageReports[this.stageReports.length - 1]?.allSourceIds;
+    // Note:  there is a brief window of time - between construction & the deferred first
+    // 'stage' event - during which this array may be of length 0.
+    return this.stageReports[this.stageReports.length - 1]?.allSourceIds ?? [];
   }
 
   private get baseGestureSetId(): string {
