@@ -17,6 +17,7 @@ cd "$THIS_SCRIPT_PATH"
 
 builder_describe "Builds the Keyman Engine for Web's On-Screen Keyboard package (OSK)." \
   "@/common/web/input-processor build" \
+  "@/common/web/gesture-recognizer build" \
   "@/web/src/engine/dom-utils build" \
   "@/web/src/engine/events build" \
   "clean" \

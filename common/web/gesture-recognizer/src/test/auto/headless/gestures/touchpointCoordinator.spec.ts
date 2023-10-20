@@ -306,8 +306,13 @@ describe("TouchpointCoordinator", () => {
     });
 
     const runnerPromise = fakeClock.runToLastAsync();
+    const sequence = await sequencePromise;
+    const completeStub = sinon.fake();
+    sequence.on('complete', completeStub); // was not called!  Confirms a suspicion.
 
     await Promise.all([runnerPromise, completionPromise1, completionPromise2]);
+
+    assert.isTrue(completeStub.calledOnce);
 
     // Verify that all sources and sequences are cleared.
     assert.sameOrderedMembers(touchpointCoordinator.activeSources, []);

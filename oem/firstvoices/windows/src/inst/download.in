@@ -22,3 +22,15 @@ candle-desktop:
   $(WIXHEAT) dir ..\xml -o desktopui.wxs -ag -cg DesktopUI -dr INSTALLDIR -suid -var var.DESKTOPUISOURCE -wx -nologo
   $(WIXCANDLE) -dOEMNAME="$(OEMNAME)" -dPRODUCTNAME="$(PRODUCTNAME)" -dROOT="$(ROOT)" -dVERSION=$VersionWin -dRELEASE=$VersionRelease -dPRODUCTID=$GUID1 -dDESKTOPUISOURCE=..\xml firstvoices.wxs desktopui.wxs
 
+setup-inf:
+  echo [Setup] > setup.inf
+  echo Version=$VersionWin >> setup.inf
+  echo MSIFileName=firstvoices.msi >> setup.inf
+  echo MSIOptions= >> setup.inf
+  echo AppName=Keyman for FirstVoices >> setup.inf
+  echo License=license.html >> setup.inf
+  echo TitleImage=setuptitle.png >> setup.inf
+  echo StartDisabled=True >> setup.inf
+  echo StartWithConfiguration=True >> setup.inf
+  echo [Packages] >> setup.inf
+  echo fv_all.kmp=FirstVoices Keyboards >> setup.inf

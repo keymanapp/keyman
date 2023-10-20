@@ -4,11 +4,23 @@ import {
   OSKInputEventSpec,
   PhysicalInputEventSpec
 } from "@keymanapp/recorder-core";
+import { ManagedPromise, timedPromise } from "@keymanapp/web-utils";
 
 import { type KeymanEngine } from 'keyman/app/browser';
 
 declare var keyman: KeymanEngine;
 
+function asTouchList(arr: any[]) {
+  return {
+    get length() {
+      return arr.length;
+    },
+
+    item(index: number) {
+      return arr[index];
+    }
+  }
+}
 export class BrowserDriver {
   static readonly physicalEventClass: string = "KeyboardEvent";
   static readonly physicalEventType: string = "keydown";
@@ -26,13 +38,13 @@ export class BrowserDriver {
     this.target = target;
   }
 
-  simulateEvent(eventSpec: InputEventSpec) {
+  async simulateEvent(eventSpec: InputEventSpec) {
     switch(eventSpec.type) {
       case "key":
         this.simulateHardwareEvent(eventSpec as PhysicalInputEventSpec);
         break;
       case "osk":
-        this.simulateOSKEvent(eventSpec as OSKInputEventSpec);
+        await this.simulateOSKEvent(eventSpec as OSKInputEventSpec);
         break;
     }
   }
@@ -49,48 +61,96 @@ export class BrowserDriver {
     this.target.dispatchEvent(event);
   }
 
-  simulateOSKEvent(eventSpec: OSKInputEventSpec) {
-    let target = this.target;
-    let oskKeyElement = document.getElementById(eventSpec.keyID);
+  async simulateOSKEvent(eventSpec: OSKInputEventSpec) {
+    const originalLayer = keyman.osk.vkbd.layerId;
 
-    if(!oskKeyElement) {
-      console.error('Could not find OSK key "' + eventSpec.keyID + '"!');
-      // The following lines will throw an appropriate-enough error.
-      return;
+    // Calculations go wrong if the key's layer is not visible.
+    const keyID = eventSpec.keyID;
+    const targetLayer = keyID.indexOf('-') == -1 ? keyID : keyID.substring(0, keyID.lastIndexOf('-'));
+
+    if(targetLayer != originalLayer) {
+      keyman.osk.vkbd.layerGroup.layers[originalLayer].element.style.display = 'none';
+      keyman.osk.vkbd.layerGroup.layers[targetLayer].element.style.display = 'block';
+      keyman.osk.vkbd.layerId = targetLayer;
+
+      // Only the "current" layer of the OSK is laid out on refresh; a non-default
+      // layer won't have proper layout before this!
+      keyman.osk.vkbd.refreshLayout();
     }
 
-    // To be safe, we replicate the MouseEvent similarly to the keystroke event.
-    var downEvent;
-    var upEvent;
-    if(keyman.config.hostDevice.touchable) {
-      downEvent = new Event(BrowserDriver.oskDownTouchType);
-      upEvent = new Event(BrowserDriver.oskUpTouchType);
-      downEvent['touches'] = [{"target": oskKeyElement}];
-      upEvent['touches'] = [{"target": oskKeyElement}];
-      downEvent['changedTouches'] = [{"target": oskKeyElement}];
-      upEvent['changedTouches'] = [{"target": oskKeyElement}];
-    } else {
-      downEvent = new Event(BrowserDriver.oskDownMouseType);
-      upEvent = new Event(BrowserDriver.oskUpMouseType);
-      downEvent['relatedTarget'] = target;
-      upEvent['relatedTarget'] = target;
-      // Mouse-click driven OSK use involves use of at least one mouse button.
-      downEvent['button'] = upEvent['button'] = 0;
-      downEvent['buttons'] = 1;
-      upEvent['buttons'] = 0;
-    }
+    try {
+      let target = this.target;
+      let oskKeyElement = document.getElementById(eventSpec.keyID);
+      const boundingBox = oskKeyElement.getBoundingClientRect();
+      const center = {
+        clientX: boundingBox.left + boundingBox.width/2,
+        clientY: boundingBox.top + boundingBox.height/2
+      }
 
-    oskKeyElement.dispatchEvent(downEvent);
-    oskKeyElement.dispatchEvent(upEvent);
+      if(!oskKeyElement) {
+        console.error('Could not find OSK key "' + eventSpec.keyID + '"!');
+        // The following lines will throw an appropriate-enough error.
+        return;
+      }
+
+      // To be safe, we replicate the MouseEvent similarly to the keystroke event.
+      var downEvent;
+      var upEvent;
+      if(keyman.config.hostDevice.touchable) {
+        downEvent = new Event(BrowserDriver.oskDownTouchType);
+        upEvent = new Event(BrowserDriver.oskUpTouchType);
+        downEvent['touches'] = asTouchList([{"target": oskKeyElement, ...center}]);
+        upEvent['touches'] = asTouchList([{"target": oskKeyElement, ...center}]);
+        downEvent['changedTouches'] = asTouchList([{"target": oskKeyElement, ...center}]);
+        upEvent['changedTouches'] = asTouchList([{"target": oskKeyElement, ...center}]);
+      } else {
+        downEvent = new Event(BrowserDriver.oskDownMouseType);
+        upEvent = new Event(BrowserDriver.oskUpMouseType);
+        downEvent.clientX = center.clientX;
+        downEvent.clientY = center.clientY;
+        downEvent['relatedTarget'] = target;
+        upEvent.clientX = center.clientX;
+        upEvent.clientY = center.clientY;
+        upEvent['relatedTarget'] = target;
+        // Mouse-click driven OSK use involves use of at least one mouse button.
+        downEvent['button'] = upEvent['button'] = 0;
+        downEvent['buttons'] = 1;
+        upEvent['buttons'] = 0;
+      }
+
+      oskKeyElement.dispatchEvent(downEvent);
+      oskKeyElement.dispatchEvent(upEvent);
+
+      // Note:  our gesture engine's internal structure means that even simple keystrokes like this
+      // involve async processing.  We'll need to sync up.
+      const defermentPromise = new ManagedPromise<void>();
+
+      // Easiest way to resolve?  Just wait for the key event.  Currently, our integration tests
+      // at this level only use simple-taps, so there shouldn't be any cases that emit multiple
+      // key events at this time.
+      keyman.osk.on('keyevent', () => { defermentPromise.resolve() });
+
+      // Just in case something goes wrong and no event occurs, we apply a timeout to keep
+      // the tests moving along.
+      await Promise.race([defermentPromise.corePromise, timedPromise(50)]);
+    } finally {
+      // The alt-layer needs to be maintained until the key is generated.
+      if(targetLayer != originalLayer) {
+        keyman.osk.vkbd.layerGroup.layers[targetLayer].element.style.display = 'none';
+        keyman.osk.vkbd.layerGroup.layers[originalLayer].element.style.display = 'block';
+        keyman.osk.vkbd.layerId = originalLayer;
+        keyman.osk.vkbd.refreshLayout();
+      }
+    }
   }
 
   // Execution of a test sequence depends on the testing environment; integrated
   // testing requires browser-specific code.
-  simulateSequence(sequence: InputEventSpecSequence): string {
+  async simulateSequence(sequence: InputEventSpecSequence): Promise<string> {
     let ele = this.target;
 
     for(var i=0; i < sequence.inputs.length; i++) {
-      this.simulateEvent(sequence.inputs[i]);
+      await this.simulateEvent(sequence.inputs[i]);
     }
 
     if(ele instanceof HTMLInputElement || ele instanceof HTMLTextAreaElement) {

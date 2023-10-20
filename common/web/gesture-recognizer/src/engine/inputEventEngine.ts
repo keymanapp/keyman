@@ -6,7 +6,7 @@ export abstract class InputEventEngine<HoveredItemType, StateToken> extends Inpu
   abstract registerEventHandlers(): void;
   abstract unregisterEventHandlers(): void;
 
-  protected buildSampleFor(clientX: number, clientY: number, target: EventTarget, timestamp: number, stateToken: StateToken): InputSample<HoveredItemType, StateToken> {
+  protected buildSampleFor(clientX: number, clientY: number, target: EventTarget, timestamp: number, source: GestureSource<HoveredItemType, StateToken>): InputSample<HoveredItemType, StateToken> {
     const targetRect = this.config.targetRoot.getBoundingClientRect();
     const sample: InputSample<HoveredItemType, StateToken> = {
       clientX: clientX,
@@ -14,10 +14,11 @@ export abstract class InputEventEngine<HoveredItemType, StateToken> extends Inpu
       targetX: clientX - targetRect.left,
       targetY: clientY - targetRect.top,
       t: timestamp,
-      stateToken: stateToken
+      stateToken: source?.stateToken ?? this.stateToken
     };
 
-    const hoveredItem = this.config.itemIdentifier(sample, target);
+    const itemIdentifier = source?.currentRecognizerConfig.itemIdentifier ?? this.config.itemIdentifier;
+    const hoveredItem = itemIdentifier(sample, target);
     sample.item = hoveredItem;
 
     return sample;
@@ -68,7 +69,7 @@ export abstract class InputEventEngine<HoveredItemType, StateToken> extends Inpu
     }
 
     const lastEntry = touchpoint.path.coords[touchpoint.path.coords.length-1];
-    const sample = this.buildSampleFor(lastEntry.clientX, lastEntry.clientY, target, lastEntry.t, lastEntry.stateToken);
+    const sample = this.buildSampleFor(lastEntry.clientX, lastEntry.clientY, target, lastEntry.t, touchpoint);
 
     /* While an 'end' event immediately follows a 'move' if it occurred simultaneously,
      * this is decidedly _not_ the case if the touchpoint was held for a while without

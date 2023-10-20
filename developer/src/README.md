@@ -8,7 +8,6 @@ We do not have 100% clean separation between Keyman Developer and Keyman for
 Windows. Shared units are intended to live in common, however the following
 projects will need to be updated in the future.
 
-* buildpkg in Windows depends on various compiler units in multiple folders.
 * kmbrowserhost in Windows is included as part of Keyman Developer.
 
 # Folders
@@ -37,22 +36,6 @@ a full node.js install.
 A keyboard source analysis and automated regression test tool. Testing for
 logical errors of a keyboard.
 
-## src/kmcmpdll - kmcmpdll.dll & kmcmpdll.x64.dll
-
-This is the main source code for the keyboard compiler, packaged as a dynamic
-linked library for Windows. The consumers will call 'CompileKeyboardFile'.
-
-### src/kmcmpdll/kcframe - kcframe.exe & kcframe.x64.exe
-
-Located under kmcmpdll folder this is used for debugging in Visual Studio.  A
-command line program compiler for a keyboard file 'kmn' into a binary format
-'kmx'. Has hardcoded default arguments.
-
-## src/kmcomp - kmcomp.exe & kmcomp.x64.exe
-
-The main command line compiler for a keyboard. It compiles keyboards (.kmn),
-packages (.kps), and projects (.kpj).
-
 ## src/kmconvert - kmconvert.exe & kmconvert.x64.exe
 
 KMConvert converts keyboard layouts between different formats. KMConvert will
@@ -68,31 +51,40 @@ details.
 
 ## src/kmc
 
-node-based next generation compiler, hosts kmc, kmlmi, kmlmc, kmlmp
+node-based next generation compiler, hosts kmc, (and legacy kmlmc, kmlmp)
+
+### src/kmc-analyze - Analysis tools
+
+File analysis tools for Keyman files.
+
+### src/kmc-keyboard-info - Keyboard Info Compiler
+
+Builds .keyboard_info files for use on the Keyman Cloud keyboard repository
+at https://github.com/keymanapp/keyboards. Command line access through kmc.
+
+### src/kmc-kmn - Keyboard Compiler
+
+Builds .kmx files from .kmn. Command line access through kmc.
 
 ### src/kmc-ldml - LDML Keyboard Compiler
 
-Next Generation keyboard compiler package - LDML keyboards only at present.
-Command line access through kmc.
+Next Generation keyboard compiler - LDML keyboards. Command line access through
+kmc.
 
 ### src/kmc-model - Lexical Model Compiler
 
-The Lexical Model Compiler, kmlmc, runs on nodeJS on all supported desktop
-platforms. Command line access through kmc/kmlmc.
-
-### src/kmc-package - Package Compiler
-
-The package compiler is broadly compatible with the kmcomp .kps package
-compiler. However at this stage it is only tested with lexical models, and use
-with keyboards (either .js or .kmx) is not tested or supported. It is likely in
-the future that the kmcomp .kps compiler will be deprecated in favour of this
-one. Command line access through kmc/kmlmp.
+The Lexical Model Compiler, runs on nodeJS on all supported desktop platforms.
+Command line access through kmc.
 
 ### src/kmc-model-info - Model Info Compiler
 
-Merges .model_info files for use on the Keyman Cloud lexical model repository at
-https://github.com/keymanapp/lexical-models. Command line access through
-kmc/kmlmi.
+Builds .model_info files for use on the Keyman Cloud lexical model repository at
+https://github.com/keymanapp/lexical-models. Command line access through kmc.
+
+### src/kmc-package - Package Compiler
+
+Compiles .kps packages into .kmp files. Works with both lexical model packages
+and keyboard packages. Command line access through kmc.
 
 ## src/samples
 

@@ -99,7 +99,7 @@ export class GestureMatcher<Type> implements PredecessorMatch<Type> {
       return entry.isPathComplete ? null : entry;
     }).reduce((cleansed, entry) => {
       return entry ? cleansed.concat(entry) : cleansed;
-    }, []);
+    }, [] as GestureSource<Type>[]);
 
     if(model.sustainTimer && sourceTouchpoints.length > 0) {
       // If a sustain timer is set, it's because we expect to have NO gesture-source _initially_.
@@ -115,9 +115,15 @@ export class GestureMatcher<Type> implements PredecessorMatch<Type> {
 
     for(let touchpointIndex = 0; touchpointIndex < sourceTouchpoints.length; touchpointIndex++) {
       const srcContact = sourceTouchpoints[touchpointIndex];
+      let baseContact = srcContact;
 
       if(srcContact instanceof GestureSourceSubview) {
         srcContact.disconnect();  // prevent further updates from mangling tracked path info.
+        baseContact = srcContact.baseSource;
+      }
+
+      if(baseContact.isPathComplete) {
+        throw new Error("GestureMatcher may not be built against already-completed contact points");
       }
 
       const contactSpec = model.contacts[touchpointIndex];
@@ -266,7 +272,7 @@ export class GestureMatcher<Type> implements PredecessorMatch<Type> {
    */
   public get primaryPath(): GestureSource<Type> {
     let bestMatcher: PathMatcher<Type>;
-    let highestPriority = Number.MIN_VALUE;
+    let highestPriority = Number.NEGATIVE_INFINITY;
     for(let matcher of this.pathMatchers) {
       if(matcher.model.itemPriority > highestPriority) {
         highestPriority = matcher.model.itemPriority;
@@ -359,6 +365,11 @@ export class GestureMatcher<Type> implements PredecessorMatch<Type> {
           baseItem = this.predecessor.result.action.item;
           break;
       }
+
+      // Under 'sustain timer' mode, the concept is that the first new source is the
+      // continuation and successor to `predecessor.primaryPath`. Its base `item`
+      // should reflect this.
+      simpleSource.baseItem = baseItem ?? simpleSource.baseItem;
     } else {
       // just use the highest-priority item source's base item and call it a day.
       // There's no need to refer to some previously-existing source for comparison.

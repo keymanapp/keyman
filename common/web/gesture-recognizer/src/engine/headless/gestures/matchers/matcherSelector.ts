@@ -5,6 +5,7 @@ import { ManagedPromise } from "@keymanapp/web-utils";
 import { GestureSource, GestureSourceSubview } from "../../gestureSource.js";
 import { GestureMatcher, MatchResult, PredecessorMatch } from "./gestureMatcher.js";
 import { GestureModel } from "../specs/gestureModel.js";
+import { GestureSequence } from "./index.js";
 
 interface GestureSourceTracker<Type> {
   /**
@@ -149,6 +150,14 @@ export class MatcherSelector<Type> extends EventEmitter<EventMap<Type>> {
       ? [source instanceof GestureSourceSubview ? source.baseSource : source]
       : (source.sources as GestureSourceSubview<Type>[]).map((source) => source.baseSource);
 
+    if(sourceNotYetStaged) {
+      // Cancellation before a first stage is possible; in this case, there's no sequence
+      // to trigger cleanup.  We can do that here.
+      source.path.on('invalidated', () => {
+        this.dropSourcesWithIds([source.identifier]);
+      })
+    }
+
     const matchPromise = new ManagedPromise<MatcherSelection<Type>>();
 
     /*
@@ -221,7 +230,10 @@ export class MatcherSelector<Type> extends EventEmitter<EventMap<Type>> {
         matcher: null,
         result: {
           matched: false,
-          action: null
+          action: {
+            type: 'complete',
+            item: null
+          }
         }
       });
     }
@@ -278,6 +290,27 @@ export class MatcherSelector<Type> extends EventEmitter<EventMap<Type>> {
     // Make sure our source-watching hooks are the last handler for the event;
     // matcher-handlers should go first.  (Due to how subview synchronization works)
     this._sourceSelector.forEach((entry) => resetHooks(entry.source));
+  }
+
+  public dropSourcesWithIds(idsToClean: string[]) {
+    for(const id of idsToClean) {
+      const index = this._sourceSelector.findIndex((entry) => entry.source.identifier);
+      if(index > -1) {
+        // Ensure that any pending MatcherSelector and/or GestureSequence promises dependent
+        // on the source fully resolve (with cancellation).
+        const droppedSelector = this._sourceSelector.splice(index, 1)[0];
+        droppedSelector.matchPromise.resolve({
+          matcher: null,
+          result: {
+            matched: false,
+            action: {
+              type: 'none',
+              item: null
+            }
+          }
+        });
+      }
+    }
   }
 
   private matchersForSource(source: GestureSource<Type>) {
