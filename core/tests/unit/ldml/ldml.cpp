@@ -27,7 +27,7 @@
 #include <kmx/kmx_xstring.h>  // for surrogate pair macros
 
 #include "ldml_test_source.hpp"
-
+#include "debuglog.h"
 namespace {
 
 bool g_beep_found = false;
@@ -216,7 +216,8 @@ run_test(const km::core::path &source, const km::core::path &compiled, km::tests
     // handle backspace here
     if (action.type == km::tests::LDML_ACTION_KEY_EVENT) {
       auto &p = action.k;
-      std::cout << "- key action: 0x" << std::hex << p.vk << "/modifier 0x" << p.modifier_state << std::dec << std::endl;
+      std::cout << "- key action: " << km::kbp::kmx::Debug_VirtualKey(p.vk) << "/modifier " << km::kbp::kmx::Debug_ModifierName(p.modifier_state) << " 0x" << p.modifier_state
+                << std::dec << std::endl;
       // Because a normal system tracks caps lock state itself,
       // we mimic that in the tests. We assume caps lock state is
       // updated on key_down before the processor receives the
