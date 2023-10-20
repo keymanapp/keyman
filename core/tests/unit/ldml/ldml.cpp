@@ -105,6 +105,7 @@ apply_action(
       assert(!context.empty());
       assert(context.back().type == KM_CORE_CT_MARKER);
       context.pop_back();
+      // no change to text store.
     } else if (text_store.length() > 0) {
       assert(!context.empty() && !text_store.empty());
       km_core_usv ch = text_store.back();
@@ -118,11 +119,23 @@ apply_action(
           text_store.pop_back();
         }
       }
-      assert(ch == act.backspace.expected_value);
-
-      assert(context.back().type == KM_CORE_CT_CHAR);
-      assert(context.back().character == ch);
-      context.pop_back();
+      if (act.backspace.expected_type == KM_CORE_BT_CHAR) {
+        assert(ch == act.backspace.expected_value);
+        assert(context.back().type == KM_CORE_CT_CHAR);
+        assert(context.back().character == ch);
+        context.pop_back();
+      } else {
+        assert(act.backspace.expected_type == KM_CORE_BT_UNKNOWN); // else it must be unknown
+        // pop to first character or empty
+        while (!context.empty() && context.back().type != KM_CORE_CT_CHAR) {
+          // pop off all non-character entries
+          context.pop_back();
+        }
+        if (!context.empty()) {
+          // pop off the next character
+          context.pop_back();
+        }
+      }
     }
     break;
   case KM_CORE_IT_PERSIST_OPT:

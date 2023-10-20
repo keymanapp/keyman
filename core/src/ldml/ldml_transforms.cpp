@@ -863,16 +863,6 @@ transforms::load(
 
 // string manipulation
 
-bool normalize_nfd(std::u32string &str) {
-  std::u16string rstr = km::core::kmx::u32string_to_u16string(str);
-  if(!normalize_nfd(rstr)) {
-    return false;
-  } else {
-    str = km::core::kmx::u16string_to_u32string(rstr);
-    return true;
-  }
-}
-
 /** internal function to normalize with a specified mode */
 static bool normalize(const icu::Normalizer2 *n, std::u16string &str, UErrorCode &status) {
   UASSERT_SUCCESS(status);
@@ -886,11 +876,29 @@ static bool normalize(const icu::Normalizer2 *n, std::u16string &str, UErrorCode
   return U_SUCCESS(status);
 }
 
+bool normalize_nfd(std::u32string &str) {
+  std::u16string rstr = km::core::kmx::u32string_to_u16string(str);
+  if(!normalize_nfd(rstr)) {
+    return false;
+  } else {
+    str = km::core::kmx::u16string_to_u32string(rstr);
+    return true;
+  }
+}
+
 bool normalize_nfd(std::u16string &str) {
   UErrorCode status = U_ZERO_ERROR;
   const icu::Normalizer2 *nfd = icu::Normalizer2::getNFDInstance(status);
   UASSERT_SUCCESS(status);
   return normalize(nfd, str, status);
+}
+
+bool normalize_nfd_markers(std::u16string &str, marker_map &_kmn_unused(map)) {
+  return normalize_nfd(str);
+}
+
+bool normalize_nfd_markers(std::u32string &str, marker_map &_kmn_unused(map)) {
+  return normalize_nfd(str);
 }
 
 bool normalize_nfc(std::u32string &str) {
@@ -908,6 +916,53 @@ bool normalize_nfc(std::u16string &str) {
   const icu::Normalizer2 *nfc = icu::Normalizer2::getNFCInstance(status);
   UASSERT_SUCCESS(status);
   return normalize(nfc, str, status);
+}
+
+std::u32string remove_markers(const std::u32string &str, marker_map *markers) {
+  std::u32string out;
+  auto i = str.begin();
+  auto last = i;
+  for (i = find(i, str.end(), LDML_UC_SENTINEL); i != str.end(); i = find(i, str.end(), LDML_UC_SENTINEL)) {
+    // append any prefix (from prior pos'n to here)
+    out.append(last, i);
+
+    // #1: LDML_UC_SENTINEL (what we searched for)
+    assert(*i == LDML_UC_SENTINEL); // assert that find() worked
+    i++;
+    last = i;
+    if (i == str.end()) {
+      break; // hit end
+    }
+
+    // #2 LDML_MARKER_CODE
+    assert(*i == LDML_MARKER_CODE);
+    if (*i != LDML_MARKER_CODE) {
+      continue; // can't process this, get out
+    }
+    i++;
+    last = i;
+    if (i == str.end()) {
+      break; // hit end
+    }
+
+    // #3 marker number
+    const KMX_DWORD marker_no = *i;
+    assert(marker_no >= LDML_MARKER_MIN_INDEX && marker_no <= LDML_MARKER_MAX_INDEX);
+    i++; // if end, we'll break out of the loop
+    last = i;
+
+    // record the marker
+    if (markers != nullptr) {
+      if (i == str.end()) {
+        markers->emplace(MARKER_BEFORE_EOT, marker_no);
+      } else {
+        markers->emplace(*i, marker_no);
+      }
+    }
+  }
+  // get the suffix between the last marker and the end
+  out.append(last, str.end());
+  return out;
 }
 
 }  // namespace ldml

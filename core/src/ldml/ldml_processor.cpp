@@ -209,15 +209,20 @@ ldml_processor::process_event(
           // const size_t matchedContext = transforms->apply(ctxtstr, outputString);
         }
         KMX_DWORD last_char = 0UL;
+        KMX_DWORD last_marker = 0UL;
         // attempt to get the last char
         auto end = state->context().rbegin();
         if(end != state->context().rend()) {
           if((*end).type == KM_CORE_CT_CHAR) {
             last_char = (*end).character;
-            // TODO-LDML: markers!
+          } else if((*end).type == KM_CORE_BT_MARKER) {
+            last_marker = (*end).marker;
           }
         }
-        if (last_char == 0UL) {
+        if (last_marker != 0UL) {
+          // delete of a marker
+          state->actions().push_backspace(KM_CORE_BT_MARKER, last_marker);
+        } else if (last_char == 0UL) {
           /*
             We couldn't find a character at end of context (context is empty),
             so we'll pass the backspace keystroke on to the app to process; the
@@ -297,25 +302,44 @@ ldml_processor::process_key_string(km_core_state *state, const std::u16string &k
   // drop last 'matchedContext':
   ctxtstr.resize(ctxtstr.length() - matchedContext);
   ctxtstr.append(outputString); // TODO-LDML: should be able to do a normalization-safe append here.
-  assert(ldml::normalize_nfd(ctxtstr)); // TODO-LDML: else fail?
+  assert(ldml::normalize_nfd(ctxtstr)); // TODO-LDML: Need marker-safe normalize here.
 
   // Ok. We've done all the happy manipulations.
 
   /** NFC and no markers */
-  std::u32string ctxtstr_cleanedup = ctxtstr;
-  // TODO-LDML: remove markers!
-  assert(ldml::normalize_nfc(ctxtstr_cleanedup)); // TODO-LDML: else fail?
+  std::u32string ctxtstr_cleanedup = ldml::remove_markers(ctxtstr);
+  assert(ldml::normalize_nfc(ctxtstr_cleanedup));
 
-  // find common prefix
+  // find common prefix.
+  // For example, if the context previously had "aaBBBBB" and it is changing to "aaCCC" then we will have:
+  // - old_ctxtstr_changed = "BBBBB"
+  // - new_ctxtstr_changed = "CCC"
+  // So the BBBBB needs to be removed and then CCC added.
   auto ctxt_prefix = mismatch(old_ctxtstr_nfc.begin(), old_ctxtstr_nfc.end(), ctxtstr_cleanedup.begin(), ctxtstr_cleanedup.end());
-  /** the part of the old str that changed */
+  /** The part of the old string to be removed */
   std::u32string old_ctxtstr_changed(ctxt_prefix.first,old_ctxtstr_nfc.end());
+  /** The new context to be added */
   std::u32string new_ctxtstr_changed(ctxt_prefix.second,ctxtstr_cleanedup.end());
 
   // drop the old suffix. Note: this mutates old_ctxtstr_changed.
   remove_text(state, old_ctxtstr_changed, old_ctxtstr_changed.length());
   assert(old_ctxtstr_changed.length() == 0);
+  // old_ctxtstr_changed is now empty because it's been removed.
+  // context is "aa" in the above example.
   emit_text(state, new_ctxtstr_changed);
+
+  // TODO-LDML: need to emit marker here - need to emit text w/ markers, and handle appropriately.
+  // // TODO-LDML: 1-marker hack!
+  if (key_str32.length() == 3 && key_str32[0] == LDML_UC_SENTINEL && key_str32[1] == LDML_MARKER_CODE) {
+    state->context().push_marker(key_str32[2]);
+  }
+
+  // for debugging!
+  {
+    std::u32string ctxtstr2;
+    (void)context_to_string(state, ctxtstr2, true); // with markers
+    (void)0;
+  }
 }
 
 void

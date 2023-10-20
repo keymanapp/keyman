@@ -55,6 +55,14 @@ from https://github.com/unicode-org/cldr/blob/keyboard-preview/docs/ldml/tr35-ke
       <transform from="5e\m{stampy}\u{0320}\u{0300}" to="YES5b" />
       <transform from="5e\u{0320}\m{stampy}\u{0300}" to="YES5c" />
       <transform from="5e\u{0320}\u{0300}\m{stampy}" to="YES5d" />
+
+      <transform from="6\m{stampy}e\u{0320}" to="YES6a" />
+      <transform from="6e\m{stampy}\u{0320}" to="YES6b" />
+      <transform from="6e\u{0320}\m{stampy}" to="YES6c" />
+
+      <transform from="7\m{stampy}e\u{0300}" to="YES7a" />
+      <transform from="7e\m{stampy}\u{0300}" to="YES7b" />
+      <transform from="7e\u{0300}\m{stampy}" to="YES7c" />
     </transformGroup>
   </transforms>
 </keyboard3>

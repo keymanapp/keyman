@@ -195,4 +195,43 @@
       <check result="YES4" />
     </test>
   </tests>
+  <tests name="regex-tests-6">
+    <test name="regex-test-6a-0">
+      <startContext to="" />
+      <keystroke key="6" />
+      <keystroke key="stampy" />
+      <keystroke key="e" />
+      <keystroke key="u-0320" />
+      <backspace /> <!-- skip the number, match any -->
+      <check result="YES6" />
+    </test>
+    <test name="regex-test-6a-1">
+      <startContext to="" />
+      <keystroke key="6" />
+      <keystroke key="e" />
+      <keystroke key="stampy" />
+      <keystroke key="u-0320" />
+      <backspace /> <!-- skip the number, match any -->
+      <check result="YES6" />
+    </test>
+    <test name="regex-test-6a-2">
+      <startContext to="" />
+      <keystroke key="6" />
+      <keystroke key="e" />
+      <keystroke key="u-0320" />
+      <keystroke key="stampy" />
+      <backspace /> <!-- skip the number, match any -->
+      <check result="YES6" />
+    </test>
+  </tests>
+  <tests name="regex-tests-7">
+    <test name="regex-test-7a-0">
+      <startContext to="" />
+      <keystroke key="7" />
+      <keystroke key="e" />
+      <keystroke key="u-0300" />
+      <backspace /> <!-- skip the number, match any -->
+      <check result="YES7" />
+    </test>
+  </tests>
 </keyboardTest3>
