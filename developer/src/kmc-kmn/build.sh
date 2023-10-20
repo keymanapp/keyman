@@ -70,7 +70,7 @@ if builder_start_action test; then
   copy_deps
   tsc --build test/
   npm run lint
-  c8 --reporter=lcov --reporter=text mocha "${builder_extra_params[@]}"
+  c8 --reporter=lcov --reporter=text --exclude-after-remap mocha "${builder_extra_params[@]}"
   builder_finish_action success test
 fi
 

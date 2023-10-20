@@ -1,0 +1,1 @@
+export { validateMITLicense } from './src/validate-mit-license.js';

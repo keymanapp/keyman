@@ -239,8 +239,6 @@
 #define CWARN_KeyShouldIncludeNCaps                        0x000020AD
 
 #define CHINT_UnreachableRule                              0x000010AE
-#define CHINT_FilenameHasDifferingCase                     0x000010AF // only used in kmcmpdll
-#define CWARN_MissingFile                                  0x000020B0 // only used in kmcmpdll
 
 #define CERR_BufferOverflow                                0x000080C0
 #define CERR_Break                                         0x000080C1

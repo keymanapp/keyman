@@ -1,13 +1,15 @@
 ﻿c This should generate KS=1 in the .js
 store(&VERSION) '9.0'
 store(&NAME) 'I3317 - with supp chars'
+store(&TARGETS) 'web'
+
 begin Unicode > use(main)
 
 store(something) 'abc'
 
 group(main) using keys
-                      
-U+13000 'abc' + 'd' > 'efg' 
+
+U+13000 'abc' + 'd' > 'efg'
 
 match > 'abc'
 nomatch > 'abc'
