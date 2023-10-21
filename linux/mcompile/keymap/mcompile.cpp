@@ -229,7 +229,6 @@ KMX_BOOL KMX_SetKeyboardToPositional(LPKMX_KEYBOARD kbd) {
 KMX_DWORD  KMX_VKUSToVKUnderlyingLayout(v_dw_3D &All_Vector,KMX_DWORD inUS) {
   // loop and find char in US; then return char of Other
   for( int i=0; i< (int)All_Vector[0].size();i++) {
-    // lists entries of all_vector
     for( int j=1; j< (int)All_Vector[0][0].size();j++) {
       if((inUS == All_Vector[0][i][j] )) {
         return  All_Vector[1][i][2];
@@ -239,11 +238,19 @@ KMX_DWORD  KMX_VKUSToVKUnderlyingLayout(v_dw_3D &All_Vector,KMX_DWORD inUS) {
   return inUS;
 }
 
-// _S2 this will definitely give wrong results!!!!
-KMX_WORD KMX_VKUnderlyingLayoutToVKUS(KMX_WORD VKey) {
-  // _S2 TODO adapt for mcompile linux
-  return VKey;
+// takes capital letter of Other returns cpital character of US keyboard
+KMX_WORD KMX_VKUnderlyingLayoutToVKUS(v_dw_3D &All_Vector,KMX_DWORD inOther) {
+ // loop and find char in Other; then return char of US
+  for( int i=0; i< (int)All_Vector[1].size();i++) {
+    for( int j=1; j< (int)All_Vector[1][0].size();j++) {
+      if((inOther == All_Vector[1][i][j] )) {
+        return  All_Vector[0][i][2];
+      }
+    }
+  }
+  return inOther;
 }
+
 
 // takes cpital character of Other keyboard and returns character of Other keyboard with shiftstate VKShiftState[j]
 KMX_DWORD KMX_CharFromVK(v_dw_3D &All_Vector,KMX_DWORD vkUnderlying, KMX_UINT VKShiftState, KMX_WCHAR* DeadKey){

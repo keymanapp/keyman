@@ -287,7 +287,7 @@ public:
     return nkeys;
   }
 
-  bool KMX_LayoutRow(int MaxShiftState, LPKMX_KEY key, std::vector<DeadKey*> *deadkeys, int deadkeyBase, BOOL bDeadkeyConversion) {   // I4552
+  bool KMX_LayoutRow(int MaxShiftState, LPKMX_KEY key, std::vector<DeadKey*> *deadkeys, int deadkeyBase, BOOL bDeadkeyConversion,v_dw_3D &All_Vector) {   // I4552
     // Get the CAPSLOCK value
     int capslock =
         (this->KMX_IsCapsEqualToShift() ? 1 : 0) |
@@ -306,12 +306,14 @@ public:
 
         if (st.size() == 0) {
           // No character assigned here
-        } else if (this->m_rgfDeadKey[(int)ss][caps]) {
+        }
+        // _S2 deadkeys don work yet
+        else if (this->m_rgfDeadKey[(int)ss][caps]) {
           // It's a dead key, append an @ sign.
           key->dpContext = new KMX_WCHAR[1];
           *key->dpContext = 0;
           key->ShiftFlags = this->KMX_GetShiftStateValue(capslock, caps, (ShiftState) ss);
-          key->Key = KMX_VKUnderlyingLayoutToVKUS(this->VK());
+          key->Key = KMX_VKUnderlyingLayoutToVKUS(All_Vector,this->VK());
           key->Line = 0;
 
           if(bDeadkeyConversion) {   // I4552
@@ -333,7 +335,7 @@ public:
           }
             
           if(isvalid) {
-            key->Key = KMX_VKUnderlyingLayoutToVKUS(this->VK());
+            key->Key = KMX_VKUnderlyingLayoutToVKUS(All_Vector,this->VK());
             key->Line = 0;
             key->ShiftFlags = this->KMX_GetShiftStateValue(capslock, caps, (ShiftState) ss);
             key->dpContext = new KMX_WCHAR; *key->dpContext = 0;
@@ -585,7 +587,7 @@ bool is_Letter(int pos, v_dw_3D & All_Vector){
 }
 
 bool is_Number(int pos, v_dw_3D & All_Vector){
-  if( (pos > 0  && pos  < 11 ) )
+  if(  (All_Vector[1][pos][1] >= 48) && (All_Vector[1][pos][1]  <= 57)    )
       return true;
   return false;
 }
@@ -595,6 +597,13 @@ bool is_Special(int pos, v_dw_3D & All_Vector){
     return true;
   return false;
 }
+
+bool is_Edges(int pos, v_dw_3D & All_Vector){
+  if( (All_Vector[1][pos][1] == 48))
+    return true;
+  return false;
+}
+
 
 // _S2 where to put this??
 std::wstring  get_VirtualKey_Other_from_iKey(KMX_DWORD iKey, ShiftState &ss, int &caps, v_dw_3D &All_Vector) {
@@ -613,18 +622,22 @@ std::wstring  get_VirtualKey_Other_from_iKey(KMX_DWORD iKey, ShiftState &ss, int
     // ss 0,2,4...
     if ( ss % 2 == 0) {
 
+      // aAAa  4$$4
       if ( is_Letter(pos, All_Vector) || is_Number(pos, All_Vector))
         icaps = ss+2-caps;
 
+      // ..::  ##''
       else
         icaps = ss+1;
     }
 
     // ss 1,3,5...
     if ( ss % 2 == 1) {
+      // aAAa  4$$4
       if ( is_Letter(pos, All_Vector) || is_Number(pos, All_Vector))
         icaps = ss+caps;
 
+      // ..::  ##''
       else
         icaps = ss+1;
     }
@@ -786,7 +799,7 @@ bool KMX_ImportRules(KMX_WCHAR *kbid, LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector,std
   CompareVector_To_VectorOfFile_RGKEY( V_win, V_lin,V_map);*/
 
 
-std::vector< int > TestValues = {49,54,65,89,189,188};
+std::vector< int > TestValues = {48,49,50,52,53,54,55,56,57,54,65,89,189,188};
 
 for ( int i=0; i < TestValues.size();i++) {
   wprintf(L"Results for %i\t: %s  %s  %s  %s   \n", TestValues[i], rgKey[TestValues[i]]->KMX_GetShiftState(Base,0).c_str(),   rgKey[TestValues[i]]->KMX_GetShiftState(Base,1).c_str() ,  rgKey[TestValues[i]]->KMX_GetShiftState(Shft,0).c_str(), rgKey[TestValues[i]]->KMX_GetShiftState(Shft,1).c_str());
@@ -847,11 +860,13 @@ for ( int i=0; i < TestValues.size();i++) {
   //
   // Fill in the new rules
   //
+int STOP;
 
   for (UINT iKey = 0; iKey < rgKey.size(); iKey++) {
     if ((rgKey[iKey] != NULL) && rgKey[iKey]->KMX_IsKeymanUsedKey() && (!rgKey[iKey]->KMX_IsEmpty())) {
+      wprintf(L"********************************* I use Key Nr %i\n",iKey);
       // for each item, 
-      if(rgKey[iKey]->KMX_LayoutRow(loader.MaxShiftState(), &gp->dpKeyArray[nKeys], &alDead, nDeadkey, bDeadkeyConversion)) {   // I4552
+      if(rgKey[iKey]->KMX_LayoutRow(loader.MaxShiftState(), &gp->dpKeyArray[nKeys], &alDead, nDeadkey, bDeadkeyConversion, All_Vector)) {   // I4552
         nKeys+=rgKey[iKey]->KMX_GetKeyCount(loader.MaxShiftState());
       }
     }
