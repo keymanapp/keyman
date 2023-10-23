@@ -1,0 +1,230 @@
+{
+  "phone": {
+    "font": "Tahoma",
+    "layer": [
+      {
+        "id": "default",
+        "row": [
+          {
+            "id": 1,
+            "key": [
+              {
+                "id": "K_7",
+                "text": "7",
+                "hint": ""
+              },
+              {
+                "id": "K_8",
+                "text": "8",
+                "hint": "abc",
+                "multitap": [
+                  {
+                    "text": "a",
+                    "id": "K_A"
+                  },
+                  {
+                    "text": "b",
+                    "id": "K_B"
+                  },
+                  {
+                    "text": "c",
+                    "id": "K_C"
+                  }
+                ]
+              },
+              {
+                "id": "K_9",
+                "text": "9",
+                "hint": "def",
+                "multitap": [
+                  {
+                    "text": "d",
+                    "id": "K_D"
+                  },
+                  {
+                    "text": "e",
+                    "id": "K_E"
+                  },
+                  {
+                    "text": "f",
+                    "id": "K_F"
+                  }
+                ]
+              },
+              {
+                "id": "K_BKSP",
+                "text": "*BkSp*",
+                "width": 100,
+                "sp": 1
+              }
+            ]
+          },
+          {
+            "id": 2,
+            "key": [
+              {
+                "id": "K_4",
+                "text": "4",
+                "hint": "ghi",
+                "multitap": [
+                  {
+                    "text": "g",
+                    "id": "K_G"
+                  },
+                  {
+                    "text": "h",
+                    "id": "K_H"
+                  },
+                  {
+                    "text": "i",
+                    "id": "K_I"
+                  }
+                ]
+              },
+              {
+                "id": "K_5",
+                "text": "5",
+                "hint": "jkl",
+                "multitap": [
+                  {
+                    "text": "j",
+                    "id": "K_J"
+                  },
+                  {
+                    "text": "k",
+                    "id": "K_K"
+                  },
+                  {
+                    "text": "l",
+                    "id": "K_L"
+                  }
+                ]
+              },
+              {
+                "id": "K_6",
+                "text": "6",
+                "hint": "mno",
+                "multitap": [
+                  {
+                    "text": "m",
+                    "id": "K_M"
+                  },
+                  {
+                    "text": "n",
+                    "id": "K_N"
+                  },
+                  {
+                    "text": "o",
+                    "id": "K_O"
+                  }
+                ]
+              },
+              {
+                "id": "K_LOPT",
+                "text": "*Menu*",
+                "width": 120,
+                "sp": 1
+              }
+            ]
+          },
+          {
+            "id": 3,
+            "key": [
+              {
+                "id": "K_1",
+                "text": "1",
+                "hint": "pqrs",
+                "multitap": [
+                  {
+                    "text": "p",
+                    "id": "K_P"
+                  },
+                  {
+                    "text": "q",
+                    "id": "K_Q"
+                  },
+                  {
+                    "text": "r",
+                    "id": "K_R"
+                  },
+                  {
+                    "text": "s",
+                    "id": "K_S"
+                  }
+                ]
+              },
+              {
+                "id": "K_2",
+                "text": "2",
+                "hint": "tuv",
+                "multitap": [
+                  {
+                    "text": "t",
+                    "id": "K_T"
+                  },
+                  {
+                    "text": "u",
+                    "id": "K_U"
+                  },
+                  {
+                    "text": "v",
+                    "id": "K_V"
+                  }
+                ]
+              },
+              {
+                "id": "K_3",
+                "text": "3",
+                "hint": "wxyz",
+                "multitap": [
+                  {
+                    "text": "w",
+                    "id": "K_W"
+                  },
+                  {
+                    "text": "x",
+                    "id": "K_X"
+                  },
+                  {
+                    "text": "y",
+                    "id": "K_Y"
+                  },
+                  {
+                    "text": "z",
+                    "id": "K_Z"
+                  }
+                ]
+              },
+              {
+                "id": "K_ENTER",
+                "text": "*Enter*",
+                "width": 150,
+                "sp": 1
+              }
+            ]
+          },
+          {
+            "id": 4,
+            "key": [
+              {
+                "id": "T_100",
+                "width": 100,
+                "sp": 10
+              },
+              {
+                "id": "K_0",
+                "text": "0"
+              },
+              {
+                "id": "K_SPACE",
+                "text": "",
+                "width": 250,
+                "sp": 0
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}
