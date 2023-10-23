@@ -28,7 +28,7 @@ wrap-symbols:
     @rem Not required
 
 test-manifest:
-    @rem This target needed as dependency for TIKE and KMCMPDLL
+    @rem This target needed as dependency for TIKE
 
 test:
     $(CALLER) ./build.sh test $(BUILD_DEBUG)

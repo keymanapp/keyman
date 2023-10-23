@@ -188,7 +188,7 @@ begin
   begin
     pf := FGlobalProject.FindFile(FFileName);
     if Assigned(pf) then (pf.UI as TProjectFileUI).DefaultEvent(Self)   // I4687
-    else frmKeymanDeveloper.OpenFile(FFileName, False);
+    else if FileExists(FFileName) then frmKeymanDeveloper.OpenFile(FFileName, False);
     frm := frmKeymanDeveloper.FindEditorByFileName(FFileName);
     if not Assigned(frm) then
     begin

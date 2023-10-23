@@ -22,14 +22,12 @@ interface AnalysisActivityOptions /* not inheriting from CompilerBaseOptions */ 
 
 export function declareAnalyze(program: Command) {
   let command = program.command('analyze [infile...]');
-  BaseOptions.addVersion(command);
   declareOskCharUse(command);
   declareOskRewrite(command);
 }
 
 function declareOskCharUse(command: Command) {
   let subCommand = command.command('osk-char-use');
-  BaseOptions.addVersion(subCommand);
   BaseOptions.addLogLevel(subCommand);
   subCommand
     .description('Analyze On Screen Keyboards for character usage')
@@ -37,7 +35,8 @@ function declareOskCharUse(command: Command) {
     .option('--include-counts', 'Include number of times each character is referenced', false)
     .option('--strip-dotted-circle', 'Strip U+25CC (dotted circle base) from results', false)
     .addOption(new Option('-m, --mapping-file <filename>', 'Result file to write to (.json, .md, or .txt)').makeOptionMandatory())
-    .action(async (filenames: string[], options: any) => {
+    .action(async (filenames: string[], _options: any, commander: any) => {
+      const options = commander.optsWithGlobals();
       if(!filenames.length) {
         // If there are no filenames provided, then we are building the current
         // folder ('.') as a project-style build

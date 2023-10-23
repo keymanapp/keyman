@@ -46,8 +46,6 @@ export interface KeyEventSpec {
    */
   srcKeyboard?: Keyboard;
 
-  // // Holds relevant event properties leading to construction of this KeyEvent.
-  // source?: any; // Technically, KeyEvent|MouseEvent|Touch - but those are DOM types that must be kept out of headless mode.
   // Holds a generated fat-finger distribution (when appropriate)
   keyDistribution?: KeyDistribution;
 

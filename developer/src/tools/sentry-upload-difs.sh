@@ -30,10 +30,6 @@ cd "$KEYMAN_ROOT/developer/src"
 #
 
 [ -f ./samples/imsample/IMSample.pdb ] && rm -f ./samples/imsample/IMSample.pdb
-[ -f ./kmcmpdll/Win32/Release/kcframe.pdb ] && rm -f ./kmcmpdll/Win32/Release/kcframe.pdb
-[ -f ./kmcmpdll/Win32/Debug/kcframe.pdb ] && rm -f ./kmcmpdll/Win32/Debug/kcframe.pdb
-[ -f ./kmcmpdll/x64/Release/kcframe.x64.pdb ] && rm -f ./kmcmpdll/x64/Release/kcframe.x64.pdb
-[ -f ./kmcmpdll/x64/Debug/kcframe.x64.pdb ] && rm -f ./kmcmpdll/x64/Debug/kcframe.x64.pdb
 
 #
 # Upload the files

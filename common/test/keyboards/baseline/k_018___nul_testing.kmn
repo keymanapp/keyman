@@ -3,11 +3,10 @@ c Description: Tests the processing of nul in LHS of rules
 c keys: [K_A][K_A]
 c expected: OKa
 
-VERSION 9.0   
-NAME "Nul test"
-HOTKEY "[CTRL SHIFT K_N]"
+store(&VERSION) "9.0"
+store(&HOTKEY) "[CTRL SHIFT K_N]"
 
-begin unicode > use(main)                   
+begin unicode > use(main)
 
 group(Main) using keys
     nul + 'a' > 'OK'

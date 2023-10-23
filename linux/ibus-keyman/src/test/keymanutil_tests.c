@@ -86,16 +86,7 @@ _free_tst_kb_data(add_keyboard_data* kb_data) {
   g_free(kb_data);
 }
 
-// defined in kmpdetails
-void free_keyboard(gpointer data);
-void free_info(gpointer data);
-kmp_json_status free_keyboard_details(keyboard_details* kbd_details);
-
 G_DEFINE_AUTOPTR_CLEANUP_FUNC(add_keyboard_data, _free_tst_kb_data)
-G_DEFINE_AUTOPTR_CLEANUP_FUNC(kmp_keyboard, free_keyboard)
-G_DEFINE_AUTOPTR_CLEANUP_FUNC(kmp_info, free_info)
-G_DEFINE_AUTOPTR_CLEANUP_FUNC(keyboard_details, free_keyboard_details)
-G_DEFINE_AUTOPTR_CLEANUP_FUNC(IBusEngineDesc, g_object_unref)
 
 //----------------------------------------------------------------------------------------------
 void

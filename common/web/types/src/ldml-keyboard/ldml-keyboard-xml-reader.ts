@@ -1,16 +1,11 @@
-// Enables DOM types, but just for this one module.
-///<reference lib="dom" />
-
 import * as xml2js from 'xml2js';
 import { LDMLKeyboardXMLSourceFile, LKImport, ImportStatus } from './ldml-keyboard-xml.js';
-import { default as AjvModule } from 'ajv';
-const Ajv = AjvModule.default; // The actual expected Ajv type.
 import { boxXmlArray } from '../util/util.js';
 import { CompilerCallbacks } from '../util/compiler-interfaces.js';
 import { constants } from '@keymanapp/ldml-keyboard-constants';
 import { CommonTypesMessages } from '../util/common-events.js';
 import { LDMLKeyboardTestDataXMLSourceFile, LKTTest, LKTTests } from './ldml-keyboard-testdata-xml.js';
-import Schemas from '../schemas.js';
+import SchemaValidators from '../schema-validators.js';
 
 interface NameAndProps  {
   '$'?: any; // content
@@ -26,8 +21,8 @@ export class LDMLKeyboardXMLSourceFileReader {
   constructor(private options: LDMLKeyboardXMLSourceFileReaderOptions, private callbacks : CompilerCallbacks) {
   }
 
-  static get defaultImportsURL() {
-    return new URL(`../import/`, import.meta.url);
+  static get defaultImportsURL(): [string,string] {
+    return ['../import/', import.meta.url];
   }
 
   readImportFile(version: string, subpath: string): Uint8Array {
@@ -240,9 +235,8 @@ export class LDMLKeyboardXMLSourceFileReader {
    * @returns true if valid, false if invalid
    */
   public validate(source: LDMLKeyboardXMLSourceFile | LDMLKeyboardTestDataXMLSourceFile): boolean {
-    const ajv = new Ajv();
-    if(!ajv.validate(Schemas.ldmlKeyboard3, source)) {
-      for (let err of ajv.errors) {
+    if(!SchemaValidators.ldmlKeyboard3(source)) {
+      for (let err of (<any>SchemaValidators.ldmlKeyboard3).errors) {
         this.callbacks.reportMessage(CommonTypesMessages.Error_SchemaValidationError({
           instancePath: err.instancePath,
           keyword: err.keyword,

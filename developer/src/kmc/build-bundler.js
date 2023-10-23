@@ -8,7 +8,6 @@ await esbuild.build({
   entryPoints: [
     'build/src/kmc.js',
     'build/src/kmlmc.js',
-    'build/src/kmlmi.js',
     'build/src/kmlmp.js',
   ],
   bundle: true,

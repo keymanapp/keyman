@@ -7,7 +7,7 @@ NOTARGET_SIGNCODE=yes
 !ifdef NODELPHI
 TARGETS=.virtual
 !else
-TARGETS=common buildpkg
+TARGETS=common
 !endif
 
 CLEANS=clean-buildtools
@@ -20,15 +20,10 @@ common: .virtual
     cd $(KEYMAN_ROOT)\common\windows\delphi\tools
     $(MAKE) $(TARGET)
 
-buildpkg: .virtual
-    cd $(ROOT)\src\buildtools\buildpkg
-    $(MAKE) $(TARGET)
-
 # ----------------------------------------------------------------------
 
 clean-buildtools:
-    cd $(ROOT)\src\buildtools
-    -del version.txt
+    rem no action
 
 !include ..\Target.mak
 

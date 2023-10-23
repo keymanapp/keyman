@@ -10,9 +10,7 @@ export const enum Source {
   LdmlKeyboard = '.xml',  // Warning, also other possible uses
   Package = '.kps',
   VisualKeyboard = '.kvks',
-  TouchLayout = '.keyman-touch-layout',
-  KeyboardInfo = '.keyboard_info',
-  ModelInfo = '.model_info',
+  TouchLayout = '.keyman-touch-layout'
 };
 
 /**
@@ -26,9 +24,7 @@ export const ALL_SOURCE: ReadonlyArray<Source> = [
   Source.LdmlKeyboard,
   Source.Package,
   Source.VisualKeyboard,
-  Source.TouchLayout,
-  Source.KeyboardInfo,
-  Source.ModelInfo,
+  Source.TouchLayout
 ] as const;
 
 /**
