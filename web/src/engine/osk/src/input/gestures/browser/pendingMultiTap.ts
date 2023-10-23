@@ -9,7 +9,7 @@ export enum PendingMultiTapState { Waiting, Realized, Cancelled };
  * (based on key id substring in the case of the shift key), within a
  * specified timeout period.
  */
-export default class PendingMultiTap /*implements PendingGesture*/ {
+export default class PendingMultiTap {
   public readonly vkbd: VisualKeyboard;
   public readonly baseKey: KeyElement;
   public readonly count: number;
