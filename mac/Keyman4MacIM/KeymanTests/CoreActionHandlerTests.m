@@ -35,7 +35,7 @@
   KMContext *context = [[KMContext alloc] init];
   unsigned int keycode = 0;
   
-  KMCoreActionHandler *actionHandler = [[KMCoreActionHandler alloc] initWithActions:actions context: context keyCode: keycode];
+  KMCoreActionHandler *actionHandler = [[KMCoreActionHandler alloc] initWithActions:actions keyCode: keycode];
 
     // This is an example of a functional test case.
     // Use XCTAssert and related functions to verify your tests produce the correct results.

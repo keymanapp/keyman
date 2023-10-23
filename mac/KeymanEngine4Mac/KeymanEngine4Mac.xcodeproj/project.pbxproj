@@ -93,12 +93,8 @@
 		299F9E2729C46AFB0053E903 /* CoreHelperTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CoreHelperTests.m; sourceTree = "<group>"; };
 		299F9E2829C46AFB0053E903 /* CoreWrapperTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CoreWrapperTests.m; sourceTree = "<group>"; };
 		299F9E2929C46AFC0053E903 /* CoreTestStaticHelperMethods.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CoreTestStaticHelperMethods.m; sourceTree = "<group>"; };
-		29A205D42AC2CC55000750C0 /* libsicuucd.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libsicuucd.a; path = "../../core/build/mac-x86_64/debug/subprojects/icu/source/common/libsicuucd.a"; sourceTree = "<group>"; };
-		29A205D62AC2CC7B000750C0 /* libsicui18nd.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libsicui18nd.a; path = "../../core/build/mac-x86_64/debug/subprojects/icu/source/i18n/libsicui18nd.a"; sourceTree = "<group>"; };
 		29A205D82AC2E446000750C0 /* libsicuuc.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libsicuuc.a; path = "../../core/build/mac-arm64/release/subprojects/icu/source/common/libsicuuc.a"; sourceTree = "<group>"; };
 		29A205DA2AC2E46A000750C0 /* libsicui18n.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libsicui18n.a; path = "../../core/build/mac-arm64/release/subprojects/icu/source/i18n/libsicui18n.a"; sourceTree = "<group>"; };
-		29B4ADFE2AC3F4EF0076A786 /* libsicuucd.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libsicuucd.a; path = "../../core/build/mac-arm64/debug/subprojects/icu/source/common/libsicuucd.a"; sourceTree = "<group>"; };
-		29B4AE002AC3F5100076A786 /* libsicui18nd.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libsicui18nd.a; path = "../../core/build/mac-arm64/debug/subprojects/icu/source/i18n/libsicui18nd.a"; sourceTree = "<group>"; };
 		378568D022FCCF0A00B481B5 /* sil_ipa.kmx */ = {isa = PBXFileReference; lastKnownFileType = file; path = sil_ipa.kmx; sourceTree = "<group>"; };
 		378568D222FCD93300B481B5 /* indexoffset1892.kmx */ = {isa = PBXFileReference; lastKnownFileType = file; path = indexoffset1892.kmx; sourceTree = "<group>"; };
 		980053311B37C9B50088DDDD /* NFont.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NFont.h; sourceTree = "<group>"; };
@@ -189,12 +185,8 @@
 		2993C33629B1DD6800FB5E95 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				29B4AE002AC3F5100076A786 /* libsicui18nd.a */,
-				29B4ADFE2AC3F4EF0076A786 /* libsicuucd.a */,
 				29A205DA2AC2E46A000750C0 /* libsicui18n.a */,
 				29A205D82AC2E446000750C0 /* libsicuuc.a */,
-				29A205D62AC2CC7B000750C0 /* libsicui18nd.a */,
-				29A205D42AC2CC55000750C0 /* libsicuucd.a */,
 				2993C33729B1DD6900FB5E95 /* libkmnkbp0.a */,
 			);
 			name = Frameworks;
