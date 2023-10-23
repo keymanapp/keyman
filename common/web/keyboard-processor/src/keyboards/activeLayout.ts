@@ -56,7 +56,9 @@ const KeyTypesOfKeyMap = {
   default: 'boolean'
 } as const;
 
-const KeyTypesOfFlickList = ['n', 's', 'e', 'w', 'ne', 'nw', 'se', 'sw'] as const;
+// Keep in this specific order: it's the ordering of priority for default hint selection when
+// based on available hints.  (i.e., `layout.defaultHint == 'flick'`)
+const KeyTypesOfFlickList = ['n', 'ne', 'e', 'se', 's', 'sw', 'w', 'nw'] as const;
 
 export class ActiveKeyBase {
   static readonly DEFAULT_PAD=15;          // Padding to left of key, in virtual units
@@ -348,16 +350,53 @@ export class ActiveKeyBase {
     aKey.displayLayer = displayLayer;
     aKey.layer = aKey.layer || displayLayer;
 
-    aKey.hint = aKey.hint || ActiveKeyBase.determineHint(aKey, layout.defaultHint);
+    aKey.hint = ActiveKeyBase.determineHint(aKey, layout.defaultHint);
 
     // Compute the key's base KeyEvent properties for use in future event generation
     aKey.constructBaseKeyEvent(keyboard, layout, displayLayer);
   }
 
   private static determineHint(spec: ActiveKey, defaultHint: TouchLayout.TouchLayoutDefaultHint): string {
+    // If a hint was directly specified, don't override it.
+    if(spec.hint) {
+      return spec.hint;
+    }
+
+    // Is more compact than writing 8 separate cases.
+    if(defaultHint.includes('flick-')) {
+      // 6 = length of 'flick-'
+      if(!spec.flick) {
+        return '';
+      }
+
+      const dir = defaultHint.substring(6);
+
+      return spec.flick[dir]?.text ?? '';
+    }
+
     switch(defaultHint) {
       case 'none':
         return '';
+      case 'multitap':
+        if(!spec.multitap) {
+          return '';
+        }
+        return spec.multitap[0].text;
+      case 'flick':
+        if(!spec.flick) {
+          return '';
+        }
+        for(const key of KeyTypesOfFlickList) {
+          if(spec.flick[key]) {
+            return spec.flick[key].text;
+          }
+        }
+        return '';
+      case 'longpress':
+        if(!spec.sk) {
+          return '';
+        }
+        return spec.sk[0].text;
       case 'dot':
       default:
         if(spec.sk) {
