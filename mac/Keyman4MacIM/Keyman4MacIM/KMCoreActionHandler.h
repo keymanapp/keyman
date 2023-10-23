@@ -9,6 +9,7 @@
  */
 
 #import <Foundation/Foundation.h>
+#import <KeymanEngine4Mac/KeymanEngine4Mac.h>
 
 NS_ASSUME_NONNULL_BEGIN
 

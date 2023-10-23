@@ -11,7 +11,6 @@
 
 #import <XCTest/XCTest.h>
 #import "KMCoreActionHandler.h"
-#import "KMContext.h"
 
 //#import <KeymanEngine4Mac/KeymanEngine4Mac.h>
 
@@ -32,7 +31,6 @@
 - (void)testExample {
   
   NSArray *actions = nil;
-  KMContext *context = [[KMContext alloc] init];
   unsigned int keycode = 0;
   
   KMCoreActionHandler *actionHandler = [[KMCoreActionHandler alloc] initWithActions:actions keyCode: keycode];
