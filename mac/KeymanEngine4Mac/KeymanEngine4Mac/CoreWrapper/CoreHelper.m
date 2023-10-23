@@ -16,7 +16,7 @@
 
 #import "CoreHelper.h"
 #import "CoreAction.h"
-#import "keyboardprocessor.h"
+#import "keyman_core_api.h"
 #import "ActionArrayOptimizer.h"
 #import "MacVKCodes.h"
 #import "WindowsVKCodes.h"
@@ -94,32 +94,32 @@ UInt32 VirtualKeyMap[VIRTUAL_KEY_ARRAY_SIZE];
 -(UInt32)macToKeymanModifier:(NSEventModifierFlags)modifiers {
   UInt32 keymanModifiers = 0;
   if ([self isShiftKey:modifiers]) {
-    keymanModifiers |= KM_KBP_MODIFIER_SHIFT;
+    keymanModifiers |= KM_CORE_MODIFIER_SHIFT;
   }
   
   if([self isLeftOptionKey:modifiers]) {
-    keymanModifiers |= KM_KBP_MODIFIER_LALT;
+    keymanModifiers |= KM_CORE_MODIFIER_LALT;
   } else if([self isRightOptionKey:modifiers]) {
-    keymanModifiers |= KM_KBP_MODIFIER_RALT;
+    keymanModifiers |= KM_CORE_MODIFIER_RALT;
   } else if ([self isOptionKey:modifiers]) {
-    keymanModifiers |= KM_KBP_MODIFIER_ALT;
+    keymanModifiers |= KM_CORE_MODIFIER_ALT;
   }
 
   if ([self isLeftControlKey:modifiers]) {
-    keymanModifiers |= KM_KBP_MODIFIER_LCTRL;
+    keymanModifiers |= KM_CORE_MODIFIER_LCTRL;
   } else if ([self isRightControlKey:modifiers]) {
-    keymanModifiers |= KM_KBP_MODIFIER_RCTRL;
+    keymanModifiers |= KM_CORE_MODIFIER_RCTRL;
   } else if ([self isControlKey:modifiers]) {
-    keymanModifiers |= KM_KBP_MODIFIER_CTRL;
+    keymanModifiers |= KM_CORE_MODIFIER_CTRL;
   }
   
   if ([self isCapsLockKey:modifiers]) {
-    keymanModifiers |= KM_KBP_MODIFIER_CAPS;
+    keymanModifiers |= KM_CORE_MODIFIER_CAPS;
   }
   // setting NOCAPS in Core breaks keyboards like EuroLatin and Amharic
   // apparently better to simply leave the CAPS bit clear
   /*else {
-    keymanModifiers |= KM_KBP_MODIFIER_NOCAPS;
+    keymanModifiers |= KM_CORE_MODIFIER_NOCAPS;
   }*/
   
   [self logDebugMessage:@"macToKeymanModifier result  = %u", (unsigned int)keymanModifiers];
@@ -160,7 +160,7 @@ UInt32 VirtualKeyMap[VIRTUAL_KEY_ARRAY_SIZE];
 
 /*
  Converts a UTF-32 unicode scalar value to an NSString.
- Use this method to convert values from Keyman Core of type km_kbp_usv, equivalent to uint32_t
+ Use this method to convert values from Keyman Core of type km_core_usv, equivalent to uint32_t
  */
 -(NSString*)utf32ValueToString:(UInt32)scalarValue {
   NSData * characterData = [[NSData alloc] initWithBytes:&scalarValue length:sizeof(scalarValue)];

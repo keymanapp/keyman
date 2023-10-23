@@ -13,7 +13,7 @@
 #import "CoreHelper.h"
 #import <Cocoa/Cocoa.h>
 #import "CoreTestStaticHelperMethods.h"
-#import "keyboardprocessor.h"
+#import "keyman_core_api.h"
 #import "CoreAction.h"
 #import "ActionArrayOptimizer.h"
 
@@ -37,14 +37,14 @@ ActionArrayOptimizer *optimizer;
   const unsigned int MAC_A_KEYCODE = 0;
   // Mac 'A' key = 0, Windows 'S' key = 83;
   uint16_t windowsKeyCode = [[CoreTestStaticHelperMethods helper] macVirtualKeyToWindowsVirtualKey:MAC_A_KEYCODE];
-  XCTAssertEqual(windowsKeyCode, KM_KBP_VKEY_A, @"Unexpected conversion from Mac to Windows key code.");
+  XCTAssertEqual(windowsKeyCode, KM_CORE_VKEY_A, @"Unexpected conversion from Mac to Windows key code.");
 }
 
 - (void)testKeycodeConversion_MacS_ReturnsWindowsS {
   const unsigned int MAC_S_KEYCODE = 1;
   // Mac 'S' key = 1, Windows 'S' key = 65;
   uint16_t windowsKeyCode = [[CoreTestStaticHelperMethods helper] macVirtualKeyToWindowsVirtualKey:MAC_S_KEYCODE];
-  XCTAssertEqual(windowsKeyCode, KM_KBP_VKEY_S, @"Unexpected conversion from Mac to Windows key code.");
+  XCTAssertEqual(windowsKeyCode, KM_CORE_VKEY_S, @"Unexpected conversion from Mac to Windows key code.");
 }
 
 - (void)testKeycodeConversion_NegativeKeycode_ReturnsZero {
@@ -61,12 +61,12 @@ ActionArrayOptimizer *optimizer;
 
 - (void)testModifierConversion_MacShift_ReturnsKeymanShift {
   uint32_t keymanModifierState = [[CoreTestStaticHelperMethods helper] macToKeymanModifier:NSEventModifierFlagShift];
-  XCTAssertEqual(keymanModifierState, KM_KBP_MODIFIER_SHIFT, @"Failed conversion of shift modifier from Mac to Keyman.");
+  XCTAssertEqual(keymanModifierState, KM_CORE_MODIFIER_SHIFT, @"Failed conversion of shift modifier from Mac to Keyman.");
 }
 
 - (void)testModifierConversion_MacCapsLock_ReturnsKeymanCapsLock {
   uint32_t keymanModifierState = [[CoreTestStaticHelperMethods helper] macToKeymanModifier:NSEventModifierFlagCapsLock];
-  XCTAssertEqual(keymanModifierState, KM_KBP_MODIFIER_CAPS, @"Failed conversion of caps lock modifier from Mac to Keyman.");
+  XCTAssertEqual(keymanModifierState, KM_CORE_MODIFIER_CAPS, @"Failed conversion of caps lock modifier from Mac to Keyman.");
 }
 
 /**
@@ -76,18 +76,18 @@ ActionArrayOptimizer *optimizer;
 - (void)testModifierConversion_MacModifierWithCapsLock_ReturnsKeymanClearedNoCapsLock {
   // use command key flag just to pick something that is not caps lock
   uint32_t keymanModifierState = [[CoreTestStaticHelperMethods helper] macToKeymanModifier:NSEventModifierFlagCommand];
-  BOOL noCapsFlag = !(keymanModifierState & KM_KBP_MODIFIER_NOCAPS);
+  BOOL noCapsFlag = !(keymanModifierState & KM_CORE_MODIFIER_NOCAPS);
   XCTAssertTrue(noCapsFlag, @"Failed modifier flag conversion for no caps lock case.");
 }
 
 - (void)testModifierConversion_MacOption_ReturnsKeymanAlt {
   uint32_t keymanModifierState = [[CoreTestStaticHelperMethods helper] macToKeymanModifier:NSEventModifierFlagOption];
-  XCTAssertEqual(keymanModifierState, KM_KBP_MODIFIER_ALT, @"Failed conversion of option modifier from Mac to Keyman alt.");
+  XCTAssertEqual(keymanModifierState, KM_CORE_MODIFIER_ALT, @"Failed conversion of option modifier from Mac to Keyman alt.");
 }
 
 - (void)testModifierConversion_MacControl_ReturnsKeymanControl {
   uint32_t keymanModifierState = [[CoreTestStaticHelperMethods helper] macToKeymanModifier:NSEventModifierFlagControl];
-  XCTAssertEqual(keymanModifierState, KM_KBP_MODIFIER_CTRL, @"Failed conversion of control modifier from Mac to Keyman  control.");
+  XCTAssertEqual(keymanModifierState, KM_CORE_MODIFIER_CTRL, @"Failed conversion of control modifier from Mac to Keyman  control.");
 }
 
 - (void)testUnsupportedModifierConversion_MacHelpKeyModifier_ReturnsZero {
