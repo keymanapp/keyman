@@ -11,7 +11,7 @@ export default class KeyTip implements KeyTipInterface {
 
   //  -----
   // |     | <-- tip
-  // |  x  | <-- label
+  // |  x  | <-- preview
   // |_   _|
   //  |   |
   //  |   |  <-- cap
@@ -19,7 +19,8 @@ export default class KeyTip implements KeyTipInterface {
 
   private readonly cap: HTMLDivElement;
   private readonly tip: HTMLDivElement;
-  private previewHost: HTMLDivElement;
+  private previewHost: GesturePreviewHost;
+  private preview: HTMLDivElement;
 
   private readonly constrain: boolean;
 
@@ -39,7 +40,7 @@ export default class KeyTip implements KeyTipInterface {
 
     tipElement.appendChild(this.tip = document.createElement('div'));
     tipElement.appendChild(this.cap = document.createElement('div'));
-    this.tip.appendChild(this.previewHost = document.createElement('div'));
+    this.tip.appendChild(this.preview = document.createElement('div'));
 
     this.tip.className = 'kmw-keytip-tip';
     this.cap.className = 'kmw-keytip-cap';
@@ -105,9 +106,10 @@ export default class KeyTip implements KeyTipInterface {
         kts.fontSize = key.key.getIdealFontSize(vkbd, key.key.keyText, scaleStyle, true);
       }
 
-      const oldHost = this.previewHost;
-      this.previewHost = (new GesturePreviewHost(key)).element;
-      this.tip.replaceChild(this.previewHost, oldHost);
+      const oldHost = this.preview;
+      this.previewHost = new GesturePreviewHost(key, true);
+      this.preview = this.previewHost.element;
+      this.tip.replaceChild(this.preview, oldHost);
 
       // Adjust shape if at edges
       var xOverflow = (canvasWidth - xWidth) / 2;
@@ -145,6 +147,10 @@ export default class KeyTip implements KeyTipInterface {
       kts.display = 'block';
     } else { // Hide the key preview
       this.element.style.display = 'none';
+      this.previewHost = null;
+      const oldPreview = this.preview;
+      this.preview = document.createElement('div');
+      this.tip.replaceChild(this.preview, oldPreview);
     }
 
     // Save the key preview state

@@ -128,6 +128,10 @@ export function gestureSetForLayout(layerGroup: OSKLayerGroup, params: GesturePa
 
   // To be used among the `allowsInitialState` contact-model specifications as needed.
   const gestureKeyFilter = (key: KeyElement, gestureId: string) => {
+    if(!key) {
+      return false;
+    }
+
     const keySpec = key.key.spec;
     switch(gestureId) {
       case 'modipress-start':

@@ -11,7 +11,9 @@ import { GesturePreviewHost } from './gesturePreviewHost.js';
 
 export default class OSKBaseKey extends OSKKey {
   private capLabel: HTMLDivElement;
-  private previewHost: HTMLDivElement;
+  private previewHost: GesturePreviewHost;
+  private preview: HTMLDivElement;
+
   public readonly row: OSKRow;
 
   constructor(spec: ActiveKey, layer: string, row: OSKRow) {
@@ -124,9 +126,9 @@ export default class OSKBaseKey extends OSKKey {
     // Add text to button and button to placeholder div
     kDiv.appendChild(btn);
 
-    this.previewHost = document.createElement('div');
-    this.previewHost.style.display = 'none';
-    btn.appendChild(this.previewHost);
+    this.preview = document.createElement('div');
+    this.preview.style.display = 'none';
+    btn.appendChild(this.preview);
 
     // The 'return value' of this process.
     return this.square = kDiv;
@@ -171,17 +173,17 @@ export default class OSKBaseKey extends OSKKey {
 
   public highlight(on: boolean): void {
     super.highlight(on);
+    const oldPreview = this.preview;
 
-    if(on) {
-      const oldPreviewHost = this.previewHost;
-      this.previewHost = (new GesturePreviewHost(this.btn)).element;
-      this.btn.replaceChild(this.previewHost, oldPreviewHost);
+    if(on && this.allowsKeyTip()) {
+      this.previewHost = new GesturePreviewHost(this.btn, false);
+      this.preview = this.previewHost.element;
     } else {
-      const oldPreviewHost = this.previewHost;
-      this.previewHost = document.createElement('div');
-      this.previewHost.style.display = 'none';
-      this.btn.replaceChild(this.previewHost, oldPreviewHost);
+      this.previewHost = null;
+      this.preview = document.createElement('div');
+      this.preview.style.display = 'none';
     }
+    this.btn.replaceChild(this.preview, oldPreview);
   }
 
   public refreshLayout(vkbd: VisualKeyboard) {
