@@ -78,6 +78,9 @@ export class ActiveKeyBase {
   text: string;
   hint?: string;
 
+  font?: string;
+  fontsize?: string;
+
   // These are fine.
   width?: number;
   pad?: number;

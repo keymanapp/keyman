@@ -118,7 +118,7 @@ export default class OSKBaseKey extends OSKKey {
     var skIcon = document.createElement('div');
 
     // Ensure that we use the keyboard's text font for hints.
-    skIcon.className='kmw-key-popup-icon keymanweb-font';
+    skIcon.className='kmw-key-popup-icon kmw-key-text';
     if(this.spec.hint == '\u2022') {
       // The original, pre-17.0 longpress dot-hint used bold-face styling.
       skIcon.style.fontWeight='bold';

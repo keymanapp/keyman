@@ -272,7 +272,7 @@
 
 /* Popup icon style (and content)*/
 .kmw-key-popup-icon{position:absolute;display:block;visibility:visible;right:4%;top:1%;/*width:8px;height:8px;*/
-      font:0.5em Arial;color:#aaa}
+      font-size:0.5em;color:#aaa; line-height:initial}
 /*.phone .kmw-key-popup-icon{right:6%;top:-2px;width:8px;height:8px;text-align:right;}
 .desktop .kmw-key-popup-icon{right:4%;top:0;width:8px;height:8px;} */
 
