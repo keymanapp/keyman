@@ -171,9 +171,9 @@
                 "text": "l"
               },
               {
-                "id": "T_new_88",
-                "text": "",
-                "width": 10
+                "id": "T_new_414",
+                "width": 10,
+                "sp": 10
               }
             ]
           },
@@ -260,6 +260,22 @@
                   {
                     "text": ";",
                     "id": "K_COLON"
+                  }
+                ],
+                "multitap": [
+                  {
+                    "text": ",",
+                    "id": "K_COMMA"
+                  },
+                  {
+                    "text": "!",
+                    "id": "K_1",
+                    "layer": "shift"
+                  },
+                  {
+                    "text": "?",
+                    "id": "K_SLASH",
+                    "layer": "shift"
                   }
                 ]
               },
@@ -1227,9 +1243,9 @@
                 "text": "ĺ"
               },
               {
-                "id": "T_new_88",
-                "text": "",
-                "width": 10
+                "id": "T_new_828",
+                "width": 10,
+                "sp": 10
               }
             ]
           },
@@ -1468,9 +1484,9 @@
                 "text": "l"
               },
               {
-                "id": "T_new_88",
-                "text": "",
-                "width": 10
+                "id": "T_new_1003",
+                "width": 10,
+                "sp": 10
               }
             ]
           },
@@ -1708,9 +1724,9 @@
                 "text": "l"
               },
               {
-                "id": "T_new_88",
-                "text": "",
-                "width": 10
+                "id": "T_new_1178",
+                "width": 10,
+                "sp": 10
               }
             ]
           },
