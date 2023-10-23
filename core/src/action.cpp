@@ -89,7 +89,12 @@ km_core_actions * km::kbp::action_items_to_actions(
         // no-op
         break;
       case KM_CORE_IT_MARKER:
-        output.push_back({KM_CORE_CT_MARKER,{0},action_items->marker});
+        {
+         km_core_context_item ci = {0};
+          ci.type = KM_CORE_CT_MARKER;
+          ci.marker = action_items->marker;
+          output.push_back(ci);
+        }
         break;
       case KM_CORE_IT_PERSIST_OPT:
         // TODO: lowpri: replace existing item if already present in options vector?
