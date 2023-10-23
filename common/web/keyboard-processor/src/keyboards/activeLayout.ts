@@ -363,7 +363,7 @@ export class ActiveKeyBase {
     }
 
     // Is more compact than writing 8 separate cases.
-    if(defaultHint.includes('flick-')) {
+    if(defaultHint?.includes('flick-')) {
       // 6 = length of 'flick-'
       if(!spec.flick) {
         return '';
