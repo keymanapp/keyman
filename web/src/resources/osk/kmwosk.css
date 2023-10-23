@@ -346,6 +346,7 @@ body div.kmw-key-shift-on span.kmw-key-text {font-family:SpecialOSK !important;f
   position: absolute;
   display: block;
   z-index: 1;
+  border-radius: inherit;
   top: 0px;
   left: 0px;
   right: 0px;
