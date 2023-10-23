@@ -27,6 +27,7 @@ builder_describe \
   configure \
   build \
   test \
+  ":utils=src/common/web/utils              Developer utils" \
   ":kmcmplib=src/kmcmplib                   Compiler - .kmn compiler" \
   ":kmc-analyze=src/kmc-analyze             Compiler - Analysis Tools" \
   ":kmc-keyboard-info=src/kmc-keyboard-info Compiler - .keyboard_info Module" \

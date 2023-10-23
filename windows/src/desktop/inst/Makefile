@@ -28,11 +28,19 @@ prereq-resources:
     $(SIGNCODE) /d "Keyman Resources" desktop_resources.dll
 
 desktop: prereq
+    rem compile .msi
     $(MAKE) -fdownload.mak candle
     $(WIXLIGHT) -dWixUILicenseRtf=License.rtf -out keymandesktop.msi -ext WixUIExtension $(DESKTOP_FILES)
     $(SIGNCODE) /d "Keyman" keymandesktop.msi
-# TODO: replace buildpkg with kmcomp and remove buildpkg from repository
-    $(ROOT)\bin\buildtools\buildpkg -m keymandesktop.msi -s $(ROOT)\bin\desktop -l license.html
+
+    rem build self-extracting archive
+    $(MAKE) -fdownload.mak setup-inf
+    $(WZZIP) keymandesktop.zip keymandesktop.msi license.html setup.inf
+    -del setup.inf
+    $(COPY) /b $(ROOT)\bin\desktop\setup-redist.exe + keymandesktop.zip keymandesktop.exe
+    -del keymandesktop.zip
+
+    rem sign and copy files
     $(SIGNCODE) /d "Keyman" keymandesktop.exe
     $(MAKE) -fdownload.mak copyredist-desktop
 
@@ -51,6 +59,8 @@ clean:
     -del /Q desktopui.wxs
     -del /Q cef.wxs
     -del /Q locale.wxs
+    -del keymandesktop.zip
+    -del setup.inf
 
 check:
     if not exist $(ROOT)\src\engine\inst\keymanengine.msm $(MAKE) check-engine

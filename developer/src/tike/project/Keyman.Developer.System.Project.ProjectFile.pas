@@ -1096,7 +1096,7 @@ var
   i: Integer;
 begin
   for i := 0 to Files.Count - 1 do
-    if Files[i].FileName = AFileName then
+    if SameText(Files[i].FileName, AFileName) then
     begin
       Result := Files[i];
       Exit;

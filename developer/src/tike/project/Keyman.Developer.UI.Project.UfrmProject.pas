@@ -549,21 +549,6 @@ begin
         (FGlobalProject.Files[i].UI as TProjectFileUI).DoAction(pfaCompile, False);
     end;
   end
-  else if Command = 'package_compileallinstallers' then   // I4734
-  begin
-    ClearMessages;
-    for i := 0 to FGlobalProject.Files.Count - 1 do
-    begin
-      if FGlobalProject.Files[i] is TkpsProjectFile then
-        (FGlobalProject.Files[i].UI as TProjectFileUI).DoAction(pfaCompileInstaller, False);
-    end;
-  end
-  else if Command = 'package_compileinstaller' then
-  begin
-    ClearMessages;
-    pf := SelectedProjectFile;
-    if Assigned(pf) then (pf.UI as TProjectFileUI).DoAction(pfaCompileInstaller, False);
-  end
   else if Command = 'package_cleanall' then   // I4692
   begin
     ClearMessages;

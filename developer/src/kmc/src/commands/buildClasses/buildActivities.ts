@@ -13,9 +13,12 @@ export const buildActivities: BuildActivity[] = [
   new BuildLdmlKeyboard(),
   new BuildModel(),
   new BuildPackage(),
-  new BuildKeyboardInfo(),
-  new BuildModelInfo(),
 ];
+
+// These are built from the .kpj reference after all others
+export const buildKeyboardInfoActivity = new BuildKeyboardInfo();
+export const buildModelInfoActivity = new BuildModelInfo();
+
 
 // Note: BuildProject is not listed here to avoid circular references,
 // because it depends on the other activities here. This means that

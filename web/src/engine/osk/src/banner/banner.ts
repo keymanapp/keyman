@@ -308,8 +308,6 @@ export class SuggestionBanner extends Banner {
 
   private gestureEngine: GestureRecognizer<BannerSuggestion>;
 
-  // private manager: SuggestionInputManager;
-
   private _predictionContext: PredictionContext;
 
   static readonly TOUCHED_CLASS: string = 'kmw-suggest-touched';
@@ -320,10 +318,8 @@ export class SuggestionBanner extends Banner {
     this.hostDevice = hostDevice;
 
     this.getDiv().className = this.getDiv().className + ' ' + SuggestionBanner.BANNER_CLASS;
-
     this.buildInternals(false);
 
-    // this.manager = new SuggestionInputManager(this.getDiv());
     this.events = new EventEmitter<SuggestionInputEventMap>(); //this.manager.events;
 
     this.gestureEngine = this.setupInputHandling();
@@ -387,8 +383,7 @@ export class SuggestionBanner extends Banner {
         let bestMatch: BannerSuggestion = null;
         let bestDist = Number.MAX_VALUE;
 
-        for(let i = 0; i < this.options.length; i++) {
-          const option = this.options[i];
+        for(const option of this.options) {
           const optionBounding = option.div.getBoundingClientRect();
 
           if(optionBounding.left <= sample.clientX && sample.clientX < optionBounding.right) {
@@ -437,7 +432,7 @@ export class SuggestionBanner extends Banner {
             sourceTracker.suggestion = suggestion;
           }
         };
-      sourceTracker.suggestion = source.currentSample.item
+      sourceTracker.suggestion = source.currentSample.item;
 
 
       source.currentSample.item.highlight(true);

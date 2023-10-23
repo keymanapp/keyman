@@ -113,7 +113,7 @@
       <ID>obolo_chwerty_6347</ID>
       <Version>1.2.1</Version>
       <Languages>
-        <Language ID="ann-Latn">Obolo (Andoni)</Language>
+        <Language ID="ann">Obolo (Andoni)</Language>
       </Languages>
     </Keyboard>
   </Keyboards>

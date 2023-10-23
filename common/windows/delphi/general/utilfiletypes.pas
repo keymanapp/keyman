@@ -62,14 +62,15 @@ const
   Ext_LexicalModelPackageSource = '.model.kps';
   Ext_LexicalModelProject = '.model.kpj';
 
-const ExtFileTypes: array[0..13] of TKMFileTypeInfo = (
+const ExtFileTypes: array[0..14] of TKMFileTypeInfo = (
   (Ext: Ext_KeymanSource; FileType: ftKeymanSource),
   (Ext: Ext_PackageSource; FileType: ftPackageSource),
   (Ext: Ext_KeymanFile; FileType: ftKeymanFile),
   (Ext: Ext_PackageFile; FileType: ftPackageFile),
   (Ext: '.ttf'; FileType: ftFont),
   (Ext: '.otf'; FileType: ftFont),
-  (Ext: '.fon'; FileType: ftFont),
+  (Ext: '.woff'; FileType: ftFont),
+  (Ext: '.woff2'; FileType: ftFont),
   (Ext: '.ttc'; FileType: ftFont),
   (Ext: Ext_VisualKeyboard; FileType: ftVisualKeyboard),
   (Ext: Ext_VisualKeyboardSource; FileType: ftVisualKeyboardSource),

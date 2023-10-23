@@ -2,10 +2,10 @@
 !include ..\..\..\Defines.mak
 
 all:
-  for %d in (*.kmn) do $(PROGRAM)\dev\kmcomp "%d"
+  for %d in (*.kmn) do $(PROGRAM)\bin\kmc.cmd build "%d"
 
 .kmn.kmx:
-  &$(PROGRAM)\dev\kmcomp $**
+  &$(PROGRAM)\bin\kmc.cmd build $**
 
 clean:
   -del *.kmx

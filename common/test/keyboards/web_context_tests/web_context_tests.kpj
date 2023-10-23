@@ -52,13 +52,6 @@
       <FileType>.md</FileType>
     </File>
     <File>
-      <ID>id_41e1ad22438964b0b5b84605df1c667d</ID>
-      <Filename>web_context_tests.keyboard_info</Filename>
-      <Filepath>web_context_tests.keyboard_info</Filepath>
-      <FileVersion></FileVersion>
-      <FileType>.keyboard_info</FileType>
-    </File>
-    <File>
       <ID>id_fa6acb8dd8884fe0c6c6262bb4477d27</ID>
       <Filename>web_context_tests.kmx</Filename>
       <Filepath>source\..\build\web_context_tests.kmx</Filepath>

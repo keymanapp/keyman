@@ -5,7 +5,8 @@
   },
   "options": {
     "readmeFile": "readme.htm",
-    "graphicFile": "splash.gif"
+    "graphicFile": "splash.gif",
+    "welcomeFile": "welcome.htm"
   },
   "info": {
     "name": {

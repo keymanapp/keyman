@@ -87,19 +87,3 @@ labels:
   - label: 'windows/'
     matcher:
       title: '\(.*windows.*\):'
-
-  #
-  # epics -- we will add/remove these as we work on new epics each release
-  #
-
-  - label: 'epic-ldml'
-    matcher:
-      branch: '.*epic-ldml.*' # anywhere in the branch name, e.g. feat/epic-ldml/developer/... or feat/developer/foo-epic-ldml
-
-  - label: 'epic-gestures'
-    matcher:
-      branch: '.*epic-gestures.*' # anywhere in the branch name, e.g. feat/epic-gestures/web/... or feat/web/foo-epic-gestures
-
-  - label: 'epic-kmcompx'
-    matcher:
-      branch: '.*epic-kmcompx.*'
