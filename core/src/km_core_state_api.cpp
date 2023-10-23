@@ -259,3 +259,102 @@ void km_core_state_imx_deregister_callback(km_core_state *state)
   }
   state->imx_deregister_callback();
 }
+
+
+bool is_context_valid(km_core_cp const * context, km_core_cp const * cached_context) {
+  km_core_cp const* context_p = context;
+  while(*context_p) {
+    context_p++;
+  }
+
+  km_core_cp const* cached_context_p = cached_context;
+  while(*cached_context_p) {
+    cached_context_p++;
+  }
+
+  // we need to compare from the end of the cached context
+  for(; context_p >= context && cached_context_p >= cached_context; context_p--, cached_context_p--) {
+    if(*context_p != *cached_context_p) {
+      // The cached context doesn't match the application context, so it is
+      // invalid
+      return false;
+    }
+  }
+
+  if(cached_context_p > cached_context) {
+    // if the cached context is longer than the application context, then we also
+    // assume that it is invalid
+    return false;
+  }
+
+  // It's acceptable for the application context to be longer than the cached
+  // context, so if we match the whole cached context, we can safely return true
+  return true;
+}
+km_core_status km_core_state_context_validate(
+  km_core_state *state,
+  km_core_cp const *application_context
+) {
+  assert(state != nullptr);
+  assert(application_context != nullptr);
+  if(state == nullptr || application_context == nullptr) {
+    return KM_CORE_STATUS_INVALID_ARGUMENT;
+  }
+
+  size_t buf_size;
+  km_core_status status;
+  km_core_context_item* context_items = nullptr;
+
+  auto context = km_core_state_context(state);
+  if((status = km_core_context_get(context, &context_items)) != KM_CORE_STATUS_OK) {
+    return status;
+  }
+
+  if((status = km_core_context_items_to_utf16(context_items, nullptr, &buf_size)) != KM_CORE_STATUS_OK) {
+    km_core_context_items_dispose(context_items);
+    return status;
+  }
+
+  km_core_cp* cached_context = new km_core_cp[buf_size];
+
+  status = km_core_context_items_to_utf16(context_items, cached_context, &buf_size);
+  km_core_context_items_dispose(context_items);
+
+  if(status != KM_CORE_STATUS_OK) {
+    delete[] cached_context;
+    return status;
+  }
+
+  bool is_valid = is_context_valid(application_context, cached_context);
+
+  delete[] cached_context;
+
+  if(is_valid) {
+    // We keep the context as is
+    return KM_CORE_STATUS_OK;
+  }
+
+  // We replace the cached context with the current application context
+  status = km_core_context_items_from_utf16(application_context, &context_items);
+  if (status == KM_CORE_STATUS_OK) {
+    km_core_context_set(context, context_items);
+    km_core_context_items_dispose(context_items);
+  } else {
+    // TODO: DebugLog as this is a fail case
+    km_core_context_clear(context);
+  }
+
+  return KM_CORE_STATUS_OK;
+}
+
+
+km_core_status km_core_state_context_invalidate(
+  km_core_state *state
+) {
+  assert(state != nullptr);
+  if(state == nullptr) {
+    return KM_CORE_STATUS_INVALID_ARGUMENT;
+  }
+  km_core_context_clear(km_core_state_context(state));
+  return KM_CORE_STATUS_OK;
+}

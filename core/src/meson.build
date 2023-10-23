@@ -42,10 +42,12 @@ endif
 
 
 kmx_files = files(
+  'action.cpp',
   'option.cpp',
   'keyboard.cpp',
   'state.cpp',
   'debuglog.cpp',
+  'km_core_action_api.cpp',
   'km_core_context_api.cpp',
   'km_core_keyboard_api.cpp',
   'km_core_options_api.cpp',
@@ -74,6 +76,7 @@ kmx_files = files(
 )
 
 api_files = files(
+  'km_core_action_api.cpp',
   'km_core_context_api.cpp',
   'km_core_keyboard_api.cpp',
   'km_core_options_api.cpp',
@@ -83,6 +86,7 @@ api_files = files(
 )
 
 core_files = files(
+  'action.cpp',
   'option.cpp',
   'keyboard.cpp',
   'state.cpp',

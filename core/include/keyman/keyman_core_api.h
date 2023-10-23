@@ -312,6 +312,38 @@ km_core_context_items_to_utf8(km_core_context_item const *item,
 
 /*
 ```
+### `km_core_context_items_to_utf32`
+##### Description:
+Convert a context item array into a UTF-32 encoded string placing it into
+the supplied buffer of specified size, and return the number of codepoints
+actually used in the conversion. If null is passed as the buffer the
+number codepoints required is returned. This will strip markers from the
+context during the conversion.
+##### Return status:
+- `KM_CORE_STATUS_OK`: On success.
+- `KM_CORE_STATUS_INVALID_ARGUMENT`: If non-optional parameters are null.
+- `KM_CORE_STATUS_INSUFFICENT_BUFFER`: If the buffer is not large enough.
+  `buf_size` will contain the space required. The contents of the buffer are
+  undefined.
+##### Parameters:
+- __context_items__: A pointer to the start of an array `km_core_context_item`.
+    Must be terminated with a type of `KM_CORE_CT_END`.
+- __buf__: A pointer to the buffer to place the UTF-32 string into.
+    May be null to request size calculation.
+- __buf_size__: a pointer to the result variable:
+    The size of the supplied buffer in codepoints if `buf` is given.
+    On return will be the size required if `buf` is null.
+
+```c
+*/
+KMN_API
+km_core_status
+km_core_context_items_to_utf32(km_core_context_item const *item,
+                              km_core_usv *buf,
+                              size_t *buf_size);
+
+/*
+```
 ### `km_core_context_items_dispose`
 ##### Description:
 Free the allocated memory belonging to a `km_core_context_item` array previously
@@ -526,6 +558,128 @@ enum km_core_action_type {
   KM_CORE_IT_MAX_TYPE_ID
 };
 
+/*
+```
+### Actions
+This structure provides the results of processing a key event to the Platform layer and
+should be processed by the Platform layer to issue commands to the os text
+services framework to transform the text store in the Client Application, among
+other actions.
+
+This API replaces the Action items APIs, which is now deprecated and will be
+removed in the future.
+```c
+*/
+
+typedef struct {
+  // number of codepoints (not codeunits!) to delete from app context, 0+
+  int delete_back;
+
+  // null-term string of characters to insert into document
+  km_core_usv* output;
+
+  // list of options to persist, terminated with KM_CORE_OPTIONS_END
+  km_core_option_item* persist_options;
+
+  // issue a beep
+  bool do_alert;
+
+  // emit the input keystroke to the application, unmodified?
+  bool emit_keystroke;
+
+  // -1=unchanged, 0=off, 1=on
+  int new_caps_lock_state;
+} km_core_actions;
+
+/*
+```
+### `km_core_state_get_actions`
+##### Description:
+Returns a pointer to an actions object which details all the actions
+that the Platform layer must take after a keystroke. The `delete_back`
+action must be performed before the `output` action, but the other
+actions may be performed in any order.
+##### Return:
+A pointer to a `km_core_actions` object, which must be freed with
+`km_core_actions_dispose`.
+##### Parameters:
+- __state__: An opaque pointer to a state object.
+
+```c
+*/
+KMN_API
+km_core_actions*
+km_core_state_get_actions(
+  km_core_state const *state
+);
+
+/*
+```
+### `km_core_actions_dispose`
+##### Description:
+Free the allocated memory belonging to an actions object previously
+returned by `km_core_state_get_actions`.
+##### Parameters:
+- __actions__: A pointer to the actions object to be disposed of.
+
+```c
+*/
+KMN_API
+km_core_status
+km_core_actions_dispose(
+  km_core_actions* actions
+);
+
+/*
+```
+### `km_core_state_context_validate`
+##### Description:
+Determines if the input context has changed, and if so, resets
+the internal cached context (including markers), to the new
+context string.
+
+This and `km_core_state_context_invalidate` will replace existing Core context
+APIs.
+
+##### Parameters:
+- __state__: An opaque pointer to a state object.
+- __application_context__: A pointer to an null-terminated `km_core_cp` string
+    representing the current context from the application.
+##### Return status:
+- `KM_CORE_STATUS_OK`: On success.
+- `KM_CORE_STATUS_INVALID_ARGUMENT`: If non-optional parameters are null.
+
+```c
+*/
+KMN_API
+km_core_status
+km_core_state_context_validate(
+  km_core_state *state,
+  km_core_cp const *application_context
+);
+
+/*
+```
+### `km_core_state_context_invalidate`
+##### Description:
+Flushes the internal cached context for the state.
+
+This and `km_core_state_context_validate` will replace existing Core context
+APIs.
+
+##### Parameters:
+- __state__: An opaque pointer to a state object.
+##### Return status:
+- `KM_CORE_STATUS_OK`: On success.
+- `KM_CORE_STATUS_INVALID_ARGUMENT`: If non-optional parameters are null.
+
+```c
+*/
+KMN_API
+km_core_status
+km_core_state_context_invalidate(
+  km_core_state *state
+);
 
 /*
 ```
