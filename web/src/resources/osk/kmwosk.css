@@ -344,12 +344,14 @@ body div.kmw-key-shift-on span.kmw-key-text {font-family:SpecialOSK !important;f
 
 #kmw-gesture-preview {
   position: absolute;
-  height: 100%;
-  width: 100%;
   display: block;
   z-index: 1;
-  top: 0;
-  left: 0;
+  top: 0px;
+  left: 0px;
+  right: 0px;
+  bottom: 0px;
+  /* Clip anything that 'scrolls' past the preview's boundaries.*/
+  overflow: hidden;
   /* Hides the base key entirely; this prevents artifacting should positioning vary a bit. */
   background-color: inherit;
 }
@@ -375,15 +377,15 @@ body div.kmw-key-shift-on span.kmw-key-text {font-family:SpecialOSK !important;f
 
 #kmw-preview-img-container {
   position: absolute;
-  top: 0px;
-  left: 0px;
-  right: 0px;
-  bottom: 0px;
 
-  transition: 0.5s linear all;
+  /* Facilitates scrolling animation to match a flick */
+  height: 100%;
+  width: 100%;
+
+  transition: 0.5s linear border;
 }
 
-#kmw-preview-img-container.kmw-multitap-preview {
+#kmw-gesture-preview.kmw-multitap-preview {
   position: absolute;
   margin-top: 1px;
   margin-left: 1px;
@@ -393,7 +395,7 @@ body div.kmw-key-shift-on span.kmw-key-text {font-family:SpecialOSK !important;f
   border-bottom: 2px darkgray dotted;
 }
 
-#kmw-preview-img-container.kmw-multitap-preview.multitap-clear {
+#kmw-gesture-preview.kmw-multitap-preview.multitap-clear {
   /* Because on some devices, 1px border may not equal 1px positioning!
    * Use of full transparency removes the (visual) border but keeps
    * altered positioning intact, avoiding any animation thereof.

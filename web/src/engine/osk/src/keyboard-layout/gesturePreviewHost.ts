@@ -40,8 +40,11 @@ export class GesturePreviewHost {
 
     base.style.pointerEvents='none';
 
-    // Should probably just be the base element at this point...
-    // Ah well, only figured this out after experimentation.
+    // We want this to be distinct from the base element so that we can scroll it;
+    // this matters greatly for doing flick things.
+    //
+    // Note:  should probably put multitap style & longpress subkey bit one layer up;
+    // it looks REALLY odd when the multitap style scrolls.
     const previewImgContainer = this.previewImgContainer = document.createElement('div');
     this.previewImgContainer.id = 'kmw-preview-img-container';
 
@@ -56,7 +59,7 @@ export class GesturePreviewHost {
     this.mtStyling = DEMO_ALL || keySpec.multitap;
     if(this.mtStyling) {
       // Shifts the layout to provide a rough multitap visualization
-      this.previewImgContainer.className = 'kmw-multitap-preview'; // to indicate multitap presence.
+      base.classList.add('kmw-multitap-preview'); // to indicate multitap presence.
     }
 
     this.div.appendChild(this.previewImgContainer);
@@ -131,14 +134,14 @@ export class GesturePreviewHost {
       let xAdjustment = DEMO_ALL || keySpec.multitap ? 3 : 0;
       skIcon.style.marginRight = `-${xAdjustment}px`;
 
-      previewImgContainer.appendChild(skIcon);
+      base.appendChild(skIcon);
     }
   }
 
   // These may not exist like this longterm.
   private clearMultitap() {
     if(this.mtStyling) {
-      this.previewImgContainer.classList.add('multitap-clear');
+      this.div.classList.add('multitap-clear');
     }
   }
 
