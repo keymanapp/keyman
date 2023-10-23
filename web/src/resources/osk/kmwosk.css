@@ -271,10 +271,8 @@
 .desktop .kmw-key-label{position:absolute;left:2px;top:2px;font:0.5em Arial;color:#888;background-color:transparent;}
 
 /* Popup icon style (and content)*/
-.kmw-key-popup-icon:before{content:'\2022';}
-
 .kmw-key-popup-icon{position:absolute;display:block;visibility:visible;right:4%;top:1%;/*width:8px;height:8px;*/
-      font:bold 0.5em Arial;color:#aaa;}
+      font:0.5em Arial;color:#aaa}
 /*.phone .kmw-key-popup-icon{right:6%;top:-2px;width:8px;height:8px;text-align:right;}
 .desktop .kmw-key-popup-icon{right:4%;top:0;width:8px;height:8px;} */
 

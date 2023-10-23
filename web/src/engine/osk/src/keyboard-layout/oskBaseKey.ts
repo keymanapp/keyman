@@ -81,12 +81,6 @@ export default class OSKBaseKey extends OSKKey {
         bsk[bsn].layer = btn.key.layer
       }
     }
-
-    // If a subkey array is defined, add an icon
-    var skIcon = document.createElement('div');
-    skIcon.className='kmw-key-popup-icon';
-    //kDiv.appendChild(skIcon);
-    btn.appendChild(skIcon);
   }
 
   construct(vkbd: VisualKeyboard): HTMLDivElement {
@@ -119,6 +113,20 @@ export default class OSKBaseKey extends OSKKey {
     } else {
       btn['subKeys']=null;
     }
+
+    // If a subkey array is defined, add an icon
+    var skIcon = document.createElement('div');
+
+    // Ensure that we use the keyboard's text font for hints.
+    skIcon.className='kmw-key-popup-icon keymanweb-font';
+    if(this.spec.hint == '\u2022') {
+      // The original, pre-17.0 longpress dot-hint used bold-face styling.
+      skIcon.style.fontWeight='bold';
+    }
+    skIcon.textContent = this.spec.hint;
+
+    //kDiv.appendChild(skIcon);
+    btn.appendChild(skIcon);
 
     // Add text to button and button to placeholder div
     kDiv.appendChild(btn);

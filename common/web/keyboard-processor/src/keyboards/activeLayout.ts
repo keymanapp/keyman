@@ -74,6 +74,7 @@ export class ActiveKeyBase {
   /** WARNING - DO NOT USE DIRECTLY outside of @keymanapp/keyboard-processor! */
   id: TouchLayout.TouchLayoutKeyId;
   text: string;
+  hint?: string;
 
   // These are fine.
   width?: number;
@@ -347,8 +348,24 @@ export class ActiveKeyBase {
     aKey.displayLayer = displayLayer;
     aKey.layer = aKey.layer || displayLayer;
 
+    aKey.hint = aKey.hint || ActiveKeyBase.determineHint(aKey, layout.defaultHint);
+
     // Compute the key's base KeyEvent properties for use in future event generation
     aKey.constructBaseKeyEvent(keyboard, layout, displayLayer);
+  }
+
+  private static determineHint(spec: ActiveKey, defaultHint: TouchLayout.TouchLayoutDefaultHint): string {
+    switch(defaultHint) {
+      case 'none':
+        return '';
+      case 'dot':
+      default:
+        if(spec.sk) {
+          return '\u2022';
+        } else {
+          return '';
+        }
+    }
   }
 
   private constructBaseKeyEvent(keyboard: Keyboard, layout: ActiveLayout, displayLayer: string) {
