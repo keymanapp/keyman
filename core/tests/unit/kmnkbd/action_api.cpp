@@ -38,7 +38,11 @@ void test_two_backspaces() {
 
   assert(actions->code_points_to_delete == 1);
   assert(std::u32string(actions->output) == U"");
-  assert(actions->persist_options == nullptr);
+  assert(actions->persist_options != nullptr);
+  assert(actions->persist_options[0].key == nullptr);
+  assert(actions->persist_options[0].value == nullptr);
+  assert(actions->persist_options[0].scope == KM_CORE_OPT_UNKNOWN);
+
   assert(actions->do_alert == false);
   assert(actions->emit_keystroke == false);
   assert(actions->new_caps_lock_state == -1);
@@ -65,7 +69,10 @@ void test_marker_text_interleaved() {
 
   assert(actions->code_points_to_delete == 0);
   assert(std::u32string(actions->output) == U"ABD");
-  assert(actions->persist_options == nullptr);
+  assert(actions->persist_options != nullptr);
+  assert(actions->persist_options[0].key == nullptr);
+  assert(actions->persist_options[0].value == nullptr);
+  assert(actions->persist_options[0].scope == KM_CORE_OPT_UNKNOWN);
   assert(actions->do_alert == false);
   assert(actions->emit_keystroke == false);
   assert(actions->new_caps_lock_state == -1);
@@ -85,7 +92,10 @@ void test_alert() {
 
   assert(actions->code_points_to_delete == 0);
   assert(std::u32string(actions->output) == U"");
-  assert(actions->persist_options == nullptr);
+  assert(actions->persist_options != nullptr);
+  assert(actions->persist_options[0].key == nullptr);
+  assert(actions->persist_options[0].value == nullptr);
+  assert(actions->persist_options[0].scope == KM_CORE_OPT_UNKNOWN);
   assert(actions->do_alert == KM_CORE_TRUE);
   assert(actions->emit_keystroke == KM_CORE_FALSE);
   assert(actions->new_caps_lock_state == KM_CORE_CAPS_UNCHANGED);
@@ -105,7 +115,10 @@ void test_emit_keystroke() {
 
   assert(actions->code_points_to_delete == 0);
   assert(std::u32string(actions->output) == U"");
-  assert(actions->persist_options == nullptr);
+  assert(actions->persist_options != nullptr);
+  assert(actions->persist_options[0].key == nullptr);
+  assert(actions->persist_options[0].value == nullptr);
+  assert(actions->persist_options[0].scope == KM_CORE_OPT_UNKNOWN);
   assert(actions->do_alert == KM_CORE_FALSE);
   assert(actions->emit_keystroke == KM_CORE_TRUE);
   assert(actions->new_caps_lock_state == KM_CORE_CAPS_UNCHANGED);
@@ -126,7 +139,10 @@ void test_invalidate_context() {
 
   assert(actions->code_points_to_delete == 0);
   assert(std::u32string(actions->output) == U"");
-  assert(actions->persist_options == nullptr);
+  assert(actions->persist_options != nullptr);
+  assert(actions->persist_options[0].key == nullptr);
+  assert(actions->persist_options[0].value == nullptr);
+  assert(actions->persist_options[0].scope == KM_CORE_OPT_UNKNOWN);
   assert(actions->do_alert == KM_CORE_FALSE);
   assert(actions->emit_keystroke == KM_CORE_FALSE);
   assert(actions->new_caps_lock_state == KM_CORE_CAPS_UNCHANGED);

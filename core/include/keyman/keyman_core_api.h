@@ -587,7 +587,7 @@ typedef struct {
   // issue a beep, 0 = no, 1 = yes
   km_core_bool do_alert;
 
-  // emit the input keystroke to the application, unmodified? 0 = no, 1 = yes
+  // emit the (unmodified) input keystroke to the application, 0 = no, 1 = yes
   km_core_bool emit_keystroke;
 
   // -1=unchanged, 0=off, 1=on

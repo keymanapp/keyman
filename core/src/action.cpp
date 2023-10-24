@@ -29,15 +29,17 @@ km_core_actions * km::core::action_item_list_to_actions_object(
 
   std::unique_ptr<km_core_actions> actions(new km_core_actions);
 
-  // Set actions defaults
+  // Set actions default values
   std::vector<km_core_context_item> output;
   std::vector<km_core_option_item> options;
   actions->code_points_to_delete = 0;
-  actions->output = nullptr;
-  actions->persist_options = nullptr;
   actions->do_alert = KM_CORE_FALSE;
   actions->emit_keystroke = KM_CORE_FALSE;
   actions->new_caps_lock_state = KM_CORE_CAPS_UNCHANGED;
+
+  // Clear output pointers, will be set later once we have sizes
+  actions->output = nullptr;
+  actions->persist_options = nullptr;
 
   for (; action_items->type != KM_CORE_IT_END; ++action_items) {
     assert(action_items->type < KM_CORE_IT_MAX_TYPE_ID);
@@ -105,9 +107,10 @@ km_core_actions * km::core::action_item_list_to_actions_object(
     }
   }
 
-  output.push_back(KM_CORE_CONTEXT_ITEM_END);
 
-  // Strip the markers from the output to be passed to the app
+  // Strip the markers from the output, and convert to an string of UTF-32
+
+  output.push_back(KM_CORE_CONTEXT_ITEM_END);
 
   size_t buf_size;
 
@@ -121,14 +124,15 @@ km_core_actions * km::core::action_item_list_to_actions_object(
     return nullptr;
   }
 
+  actions->output = output_usv.release();
+
   // Create an array of the persisted options
 
-  if(!options.empty()) {
-    options.push_back(KM_CORE_OPTIONS_END);
-    actions->persist_options = new km_core_option_item[options.size()];
-    std::copy(options.begin(), options.end(), actions->persist_options);
-  }
+  options.push_back(KM_CORE_OPTIONS_END);
+  actions->persist_options = new km_core_option_item[options.size()];
+  std::copy(options.begin(), options.end(), actions->persist_options);
 
-  actions->output = output_usv.release();
+  // We now have a complete set of actions
+
   return actions.release();
 }
