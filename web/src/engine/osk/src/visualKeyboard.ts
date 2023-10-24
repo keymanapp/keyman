@@ -40,7 +40,6 @@ import OSKLayer from './keyboard-layout/oskLayer.js';
 import OSKLayerGroup from './keyboard-layout/oskLayerGroup.js';
 import { LengthStyle, ParsedLengthStyle } from './lengthStyle.js';
 import { defaultFontSize, getFontSizeStyle } from './fontSizeUtils.js';
-import PendingMultiTap, { PendingMultiTapState } from './input/gestures/browser/pendingMultiTap.js';
 import InternalKeyTip from './input/gestures/browser/keytip.js';
 import CommonConfiguration from './config/commonConfiguration.js';
 
@@ -203,9 +202,6 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
   globeHint: GlobeHint;
 
   activeGestures: GestureHandler[] = [];
-
-  // Multi-tap gesture management
-  pendingMultiTap: PendingMultiTap;
 
   // The keyboard object corresponding to this VisualKeyboard.
   public readonly layoutKeyboard: Keyboard;
@@ -487,7 +483,7 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
           let correctionKeyDistribution: KeyDistribution;
 
           if(gestureStage.matchedId == 'multitap') {
-            // TODO:  examine sequence, determine rota-style index to apply; select THAT item instead.
+            // TODO:  determine fat-finger effects to apply.
           }
 
           if(gestureStage.matchedId == 'subkey-select') {
@@ -779,110 +775,6 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
     const rawSqDistances = keyTouchDistances(touchKbdPos, correctiveLayout);
     return distributionFromDistanceMaps(rawSqDistances);
   }
-
-  //#region Input handling start
-
-  // /**
-  //  * The main OSK touch start event handler
-  //  *
-  //  *  @param  {Event} e   touch start event object
-  //  *
-  //  */
-  // touch(input: InputEventCoordinate) {
-  //   // Identify the key touched
-  //   var t = <HTMLElement>input.target, key = this.keyTarget(t);
-
-  //   // Special function keys need immediate action
-  //   if (is not special key) {
-  //     if (!this.keyPending) {
-  //       this.initGestures(key, input);
-  //     }
-  //   }
-  // }
-
-  // /**
-  //  * OSK touch release event handler
-  //  *
-  //  *  @param  {Event} e   touch release event object
-  //  *
-  //  **/
-  // release(input: InputEventCoordinate): void {
-  //   // Prevent incorrect multi-touch behaviour if native or device popup visible
-  //   var t = this.currentTarget;
-
-  //   // Clear repeated backspace if active, preventing 'sticky' behavior.
-  //   this.cancelDelete();
-
-  //   // Multi-Tap
-  //   if (this.pendingMultiTap && this.pendingMultiTap.realized) {
-  //     // Ignore pending key if we've just handled a multitap
-  //     this.pendingMultiTap = null;
-
-  //     this.highlightKey(this.keyPending, false);
-  //     this.keyPending = null;
-  //     this.touchPending = null;
-
-  //     return;
-  //   }
-
-  //   if (this.pendingMultiTap && this.pendingMultiTap.cancelled) {
-  //     this.pendingMultiTap = null;
-  //   }
-  // }
-
-  // moveCancel(input: InputEventCoordinate): void {
-  //   // Update all gesture tracking.  The function returns true if further input processing
-  //   // should be blocked.  (Keeps the subkey array operating when the input coordinate has
-  //   // moved outside the OSK's boundaries.)
-  //   if (this.updateGestures(null, this.keyPending, input)) {
-  //     return;
-  //   }
-
-  //   this.cancelDelete();
-  // }
-
-  // /**
-  //  * OSK touch move event handler
-  //  *
-  //  *  @param  {Event} e   touch move event object
-  //  *
-  //  **/
-  // moveOver(input: InputEventCoordinate): void {
-  //   // Shouldn't be possible, but just in case.
-  //   if (this.touchCount == 0) {
-  //     this.cancelDelete();
-  //     return;
-  //   }
-
-  //   // Get touch position
-  //   const x = input.x - window.pageXOffset;
-  //   const y = input.y - window.pageYOffset;
-
-  //   // Move target key and highlighting
-  //   this.touchPending = input;
-  //   // Operates on viewport-based coordinates, not page-based.
-  //   var t1 = <HTMLElement>document.elementFromPoint(x, y);
-  //   const key0 = this.keyPending;
-  //   let key1 = this.keyTarget(t1); // Not only gets base keys, but also gets popup keys!
-
-  //   // Cancels if it's a multitouch attempt.
-
-  //   // Do not attempt to support reselection of target key for overlapped keystrokes.
-  //   // Perform _after_ ensuring possible sticky keys have been cancelled.
-  //   if (input.activeInputCount > 1) {
-  //     return;
-  //   }
-
-  //   // Gesture-updates should probably be a separate call from other touch-move aspects.
-
-  //   // Update all gesture tracking.  The function returns true if further input processing
-  //   // should be blocked.
-  //   if (this.updateGestures(key1, key0, input)) {
-  //     return;
-  //   }
-  // }
-
-  //#endregion
 
   /**
    * Get the current key target from the touch point element within the key
@@ -1476,79 +1368,6 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
       this.highlightKey(this.hkKey, false);
     }
   }
-
-  // /**
-  //  * Initializes all supported gestures given a base key and the triggering touch coordinates.
-  //  * @param key     The gesture's base key
-  //  * @param touch   The starting touch coordinates for the gesture
-  //  * @returns
-  //  */
-  // initGestures(key: KeyElement, input: InputEventCoordinate) {
-
-  //   if (this.pendingMultiTap) {
-  //     switch (this.pendingMultiTap.incrementTouch(key)) {
-  //       case PendingMultiTapState.Cancelled:
-  //         this.pendingMultiTap = null;
-  //         break;
-  //       case PendingMultiTapState.Realized:
-  //         // Don't initialize any other gestures if the
-  //         // multi tap is realized; we cleanup on touch
-  //         // release because we need to cancel the base
-  //         // key action
-  //         return;
-  //     }
-  //   }
-
-  //   if (!this.pendingMultiTap && PendingMultiTap.isValidTarget(this, key)) {
-  //     // We are only going to support double-tap on Shift
-  //     // in Keyman 15, so we pass in the constant count = 2
-  //     this.pendingMultiTap = new PendingMultiTap(this, key, 2);
-  //     this.pendingMultiTap.timeout.then(() => {
-  //       this.pendingMultiTap = null;
-  //     });
-  //   }
-  // }
-
-  // /**
-  //  * Updates all currently-pending and activated gestures.
-  //  *
-  //  * @param currentKey    The key currently underneath the most recent touch coordinate
-  //  * @param previousKey   The previously-selected key
-  //  * @param input         The current mouse or touch coordinate for the gesture
-  //  * @returns true if should fully capture input, false if input should 'fall through'.
-  //  */
-  // updateGestures(currentKey: KeyElement, previousKey: KeyElement, input: InputEventCoordinate): boolean {
-  //   let key0 = previousKey;
-  //   let key1 = currentKey;
-
-  //   if(!currentKey && this.pendingMultiTap) {
-  //     this.pendingMultiTap.cancel();
-  //     this.pendingMultiTap = null;
-  //   }
-
-  //   // Clear previous key highlighting, allow subkey controller to highlight as appropriate.
-  //   if (this.subkeyGesture) {
-  //     if (key0) {
-  //       key0.key.highlight(false);
-  //     }
-  //     this.subkeyGesture.updateTouch(input);
-
-  //     this.keyPending = null;
-  //     this.touchPending = null;
-
-  //     return true;
-  //   }
-
-  //   this.currentTarget = null;
-
-  //   // If there is an active popup menu (which can occur from the previous block),
-  //   // a subkey popup exists; do not allow base key output.
-  //   if (this.subkeyGesture || this.pendingSubkey) {
-  //     return true;
-  //   }
-
-  //   return false;
-  // }
 
   optionKey(e: KeyElement, keyName: string, keyDown: boolean) {
     if (keyName.indexOf('K_LOPT') >= 0) {
