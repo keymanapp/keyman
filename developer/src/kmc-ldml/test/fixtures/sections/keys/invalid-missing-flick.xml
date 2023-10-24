@@ -7,14 +7,14 @@
   </names>
 
   <keys>
-    <key id="Q" to="Q" flicks="an-undefined-flick-id"/>
-    <key id="W" to="W" flicks="flick0" />
+    <key id="Q" output="Q" flicks="an-undefined-flick-id"/>
+    <key id="W" output="W" flicks="flick0" />
     <flicks id="flick0">
-        <flick directions="nw se" to="ç" />
+        <flickSegment directions="nw se" keyId@@="ç" />
     </flicks>
   </keys>
 
-  <layers form="iso">
+  <layers formId="iso">
     <layer id="base">
       <!-- beware: this is mapping ` and 1! -->
       <row keys="Q W" />

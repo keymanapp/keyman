@@ -7,11 +7,11 @@
   </names>
 
   <keys>
-    <key id="grave" to="`" />
-    <key id="one" to="1" />
+    <key id="grave" output="`" />
+    <key id="one" output="1" />
   </keys>
 
-  <layers form="touch">
+  <layers formId="touch">
     <!-- INVALID: need at least one layer. -->
   </layers>
 </keyboard3>

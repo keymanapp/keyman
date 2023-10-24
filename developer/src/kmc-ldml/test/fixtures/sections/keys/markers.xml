@@ -7,13 +7,13 @@
   </names>
 
   <keys>
-    <key id="ww" to="\m{w}" flicks="flickw" longPress="\m{w}" longPressDefault="\m{w}" multiTap="\m{w}" />
+    <key id="ww" output="\m{w}" flicks="flickw" longPressKeyIds@@="\m{w}" longPressDefault="\m{w}" multiTap="\m{w}" />
     <flicks id="flickw">
-        <flick directions="nw" to="\m{w}" />
+        <flickSegment directions="nw" keyId@@="\m{w}" />
     </flicks>
   </keys>
 
-  <layers form="iso">
+  <layers formId="iso">
     <layer id="base">
       <row keys="ww" />
     </layer>

@@ -4,11 +4,7 @@
 <keyboard3 locale="mt" conformsTo="techpreview">
   <version number="1.2.3" />
 
-  <info author="The Keyman Team" indicator="QW" layout="QWIRKY" normalization="NFC" />
-
-  <names>
-    <name value="meta-maximal" />
-  </names>
+  <info author="The Keyman Team" indicator="QW" layout="QWIRKY"  name="meta-maximal"/>
 
   <settings fallback="omit" />
 

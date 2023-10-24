@@ -21,9 +21,9 @@ export interface LKKeyboard {
   locales?: LKLocales;
   version?: LKVersion;
   info?: LKInfo;
-  names?: LKNames;
   settings?: LKSettings;
   keys?: LKKeys;
+  flicks?: LKFlicks;
   forms?: LKForms;
   displays?: LKDisplays;
   layers?: LKLayers[];
@@ -58,24 +58,14 @@ export interface LKVersion {
 }
 
 export interface LKInfo {
+  name?: string;
   author?: string;
-  indicator?: string;
   layout?: string;
-  normalization?: string;
-};
-
-export interface LKNames {
-  name: LKName[];
-};
-
-export interface LKName {
-  value?: string;
+  indicator?: string;
 };
 
 export interface LKSettings {
-  fallback: "omit";
-  transformFailure: "omit";
-  transformPartial: "hide";
+  normalization: "disabled";
 };
 
 export interface LKKeys {
@@ -85,26 +75,29 @@ export interface LKKeys {
 
 export interface LKKey {
   id?: string;
-  flicks?: string;
-  to?: string;
+  flickId?: string;
+  output?: string;
   gap?: boolean;
-  switch?: string;
-  longPress?: string;
-  longPressDefault?: string;
-  multiTap?: string;
-  transform?: "no";
+  layerId?: string;
+  longPressKeyIds?: string;
+  longPressDefaultKeyId?: string;
+  multiTapKeyIds?: string;
   width?: number;
 };
 
 export interface LKFlicks {
-  id?: string;
   flick?: LKFlick[];
 };
 
 export interface LKFlick {
-  directions?: string;
-  to?: string;
+  id?: string;
+  flickSegment?: LKFlickSegment;
 };
+
+export interface LKFlickSegment {
+  directions?: string;
+  keyId?: string;
+}
 
 export interface LKLayers {
   /**
@@ -120,7 +113,7 @@ export interface LKLayers {
 
 export interface LKLayer {
   id?: string;
-  modifier?: string;
+  modifiers?: string;
   row?: LKRow[];
 };
 

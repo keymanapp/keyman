@@ -52,7 +52,7 @@
 		<key id="extra" gap="true" />
 		<!--
 			TODO: need discussion
-		<key id="enter" to="\u{000A}" />
+		<key id="enter" output="\u{000A}" />
 		-->
 		<key id="enter" gap="true" />
 

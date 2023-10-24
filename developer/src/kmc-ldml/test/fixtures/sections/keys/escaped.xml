@@ -8,23 +8,23 @@
 
   <keys>
     <key id="Q" gap="true" />
-    <key id="W" switch="shift" />
+    <key id="W" layerId="shift" />
     <!-- This key gets a bunch of other status -->
-    <key id="q" flicks="flick0" to="\u{71}" longPress="á \u{00e9} í" longPressDefault="\u{e9}"
+    <key id="q" flicks="flick0" output="\u{71}" longPressKeyIds@@="á \u{00e9} í" longPressDefault="\u{e9}"
         multiTap="ä \u{eb} ï" transform="no" width="3.14159" />
-    <key id="w" to="\u{77}" />
+    <key id="w" output="\u{77}" />
     <flicks id="flick0">
-        <flick directions="nw se" to="ç" />
-        <flick directions="ne sw" to="\u{ea 0301}" /> <!-- ế -->
+        <flickSegment directions="nw se" keyId@@="ç" />
+        <flickSegment directions="ne sw" keyId@@="\u{ea 0301}" /> <!-- ế -->
     </flicks>
   </keys>
 
-  <layers form="touch" minDeviceWidth="300">
+  <layers formId="touch" minDeviceWidth="300">
     <layer id="base">
       <row keys="Q q W w" />
     </layer>
   </layers>
-  <layers form="iso">
+  <layers formId="iso">
     <layer id="base">
       <!-- beware: this is mapping ` and 1! -->
       <row keys="Q W" />

@@ -8,8 +8,8 @@
 
   <keys />
 
-  <layers form="us">
-    <layer id="base" modifier="altR-shift"> <!-- invalid, should be "altR shift" -->
+  <layers formId="us">
+    <layer id="base" modifiers="altR-shift"> <!-- invalid, should be "altR shift" -->
       <row keys="a b c" />
     </layer>
   </layers>

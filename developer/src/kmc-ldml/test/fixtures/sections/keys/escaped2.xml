@@ -7,10 +7,10 @@
   </names>
 
   <keys>
-    <key id="grave" to="\u{1faa6}" />
+    <key id="grave" output="\u{1faa6}" />
   </keys>
 
-  <layers form="us">
+  <layers formId="us">
     <layer id="base">
       <row keys="grave" />
     </layer>

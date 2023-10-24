@@ -7,9 +7,9 @@
   </names>
 
   <keys>
-    <key id="one" to="1" />
-    <key id="two" to="2" />
-    <key id="three" to="3" />
+    <key id="one" output="1" />
+    <key id="two" output="2" />
+    <key id="three" output="3" />
   </keys>
   <forms>
     <!-- this will emit a warning about custom scancodes -->
@@ -18,7 +18,7 @@
       <scanCodes codes="25 12 15" />
     </form>
   </forms>
-  <layers form="us">
+  <layers formId="us">
     <layer id="base">
       <row keys="one two three" />
     </layer>

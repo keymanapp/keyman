@@ -7,11 +7,11 @@
   </names>
 
   <keys>
-    <key id="grave" to="🪦" />
-    <key id="mistake" to="oops" />
+    <key id="grave" output="🪦" />
+    <key id="mistake" output="oops" />
   </keys>
 
-  <layers form="us">
+  <layers formId="us">
     <layer id="base">
       <row keys="grave mistake" />
     </layer>

@@ -10,7 +10,7 @@
     <key id="Q" /> <!-- missing to, gap, and switch -->
   </keys>
 
-  <layers form="us">
+  <layers formId="us">
     <layer id="base">
       <!-- beware: this is mapping `! -->
       <row keys="Q" />

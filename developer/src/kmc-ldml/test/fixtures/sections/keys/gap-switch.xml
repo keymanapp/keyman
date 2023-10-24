@@ -9,11 +9,11 @@
   <keys>
     <key id="Q" gap="true" />
     <key id="W" switch="shift" />
-    <key id="q" to="q" />
-    <key id="w" to="w" />
+    <key id="q" output="q" />
+    <key id="w" output="w" />
   </keys>
 
-  <layers form="us">
+  <layers formId="us">
     <layer id="base">
       <!-- beware: this is mapping ` and 1! -->
       <row keys="Q W" />

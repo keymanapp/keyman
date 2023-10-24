@@ -19,7 +19,7 @@
   </displays>
 
   <keys>
-    <key id="m" to="\m{m}" />
+    <key id="m" output="\m{m}" />
   </keys>
 
   <!-- from spec -->
