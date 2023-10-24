@@ -137,11 +137,6 @@ export default class OSKBaseKey extends OSKKey {
       return skIcon;
     }
 
-    if(hintSpec.text == '\u2022') {
-      // The original, pre-17.0 longpress dot-hint used bold-face styling.
-      skIcon.style.fontWeight='bold';
-    }
-
     if(hintSpec.font) {
       skIcon.style.fontFamily = hintSpec.font;
     } else {
@@ -158,7 +153,12 @@ export default class OSKBaseKey extends OSKKey {
 
     // If the base key itself is the source of the hint text, we use `hint` directly.
     // Otherwise, we present the source subkey's key cap as the hint.
-    skIcon.textContent = hintSpec == this.spec ? this.spec.hint : hintSpec.text;
+    const text = hintSpec == this.spec ? this.spec.hint : hintSpec.text;
+    if(text == '\u2022') {
+      // The original, pre-17.0 longpress dot-hint used bold-face styling.
+      skIcon.style.fontWeight='bold';
+    }
+    skIcon.textContent = text;
 
     return skIcon;
   }
