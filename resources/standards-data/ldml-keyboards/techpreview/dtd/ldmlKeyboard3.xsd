@@ -22,11 +22,11 @@ Note: DTD @-annotations are not currently converted to .xsd. For full CLDR file 
         <xs:element maxOccurs="unbounded" minOccurs="0" ref="import"/>
         <xs:element minOccurs="0" ref="locales"/>
         <xs:element minOccurs="0" ref="version"/>
-        <xs:element minOccurs="0" ref="info"/>
-        <xs:element ref="names"/>
+        <xs:element ref="info"/>
         <xs:element minOccurs="0" ref="settings"/>
         <xs:element minOccurs="0" ref="displays"/>
         <xs:element minOccurs="0" ref="keys"/>
+        <xs:element minOccurs="0" ref="flicks"/>
         <xs:element minOccurs="0" ref="forms"/>
         <xs:element maxOccurs="unbounded" minOccurs="0" ref="layers"/>
         <xs:element minOccurs="0" ref="variables"/>
@@ -97,8 +97,8 @@ Note: DTD @-annotations are not currently converted to .xsd. For full CLDR file 
   
   <xs:element name="info">
     <xs:complexType>
+      <xs:attribute name="name" use="required"/>
       <xs:attribute name="author"/>
-      <xs:attribute name="normalization"/>
       <xs:attribute name="layout"/>
       <xs:attribute name="indicator"/>
     </xs:complexType>
@@ -112,33 +112,12 @@ Note: DTD @-annotations are not currently converted to .xsd. For full CLDR file 
   
   
   
-  <xs:element name="names">
-    <xs:complexType>
-      <xs:sequence>
-        <xs:element maxOccurs="unbounded" minOccurs="0" ref="import"/>
-        <xs:element maxOccurs="unbounded" ref="name"/>
-        <xs:element maxOccurs="unbounded" minOccurs="0" ref="special"/>
-      </xs:sequence>
-    </xs:complexType>
-  </xs:element>
-  
-  <xs:element name="name">
-    <xs:complexType>
-      <xs:attribute name="value" use="required"/>
-    </xs:complexType>
-  </xs:element>
-  
-  
-  
-  
-  <xs:element name="special" type="any"/>
-  
   <xs:element name="settings">
     <xs:complexType>
-      <xs:attribute name="fallback">
+      <xs:attribute name="normalization">
         <xs:simpleType>
           <xs:restriction base="xs:token">
-            <xs:enumeration value="omit"/>
+            <xs:enumeration value="disabled"/>
           </xs:restriction>
         </xs:simpleType>
       </xs:attribute>
@@ -160,8 +139,8 @@ Note: DTD @-annotations are not currently converted to .xsd. For full CLDR file 
   
   <xs:element name="display">
     <xs:complexType>
-      <xs:attribute name="id" type="xs:NMTOKEN"/>
-      <xs:attribute name="to"/>
+      <xs:attribute name="keyId" type="xs:NMTOKEN"/>
+      <xs:attribute name="output"/>
       <xs:attribute name="display" use="required"/>
     </xs:complexType>
   </xs:element>
@@ -181,14 +160,13 @@ Note: DTD @-annotations are not currently converted to .xsd. For full CLDR file 
   
   
   
+  <xs:element name="special" type="any"/>
+  
   <xs:element name="keys">
     <xs:complexType>
       <xs:sequence>
         <xs:element maxOccurs="unbounded" minOccurs="0" ref="import"/>
-        <xs:choice maxOccurs="unbounded" minOccurs="0">
-          <xs:element ref="key"/>
-          <xs:element ref="flicks"/>
-        </xs:choice>
+        <xs:element maxOccurs="unbounded" minOccurs="0" ref="key"/>
         <xs:element maxOccurs="unbounded" minOccurs="0" ref="special"/>
       </xs:sequence>
     </xs:complexType>
@@ -197,7 +175,7 @@ Note: DTD @-annotations are not currently converted to .xsd. For full CLDR file 
   <xs:element name="key">
     <xs:complexType>
       <xs:attribute name="id" type="xs:NMTOKEN" use="required"/>
-      <xs:attribute name="flicks" type="xs:NMTOKEN"/>
+      <xs:attribute name="flickId" type="xs:NMTOKEN"/>
       <xs:attribute name="gap">
         <xs:simpleType>
           <xs:restriction base="xs:token">
@@ -205,10 +183,10 @@ Note: DTD @-annotations are not currently converted to .xsd. For full CLDR file 
           </xs:restriction>
         </xs:simpleType>
       </xs:attribute>
-      <xs:attribute name="to"/>
-      <xs:attribute name="longPress"/>
-      <xs:attribute name="longPressDefault"/>
-      <xs:attribute name="multiTap"/>
+      <xs:attribute name="output"/>
+      <xs:attribute name="longPressKeyIds" type="xs:NMTOKENS"/>
+      <xs:attribute name="longPressDefaultKeyId" type="xs:NMTOKEN"/>
+      <xs:attribute name="multiTapKeyIds" type="xs:NMTOKENS"/>
       <xs:attribute name="stretch">
         <xs:simpleType>
           <xs:restriction base="xs:token">
@@ -216,14 +194,7 @@ Note: DTD @-annotations are not currently converted to .xsd. For full CLDR file 
           </xs:restriction>
         </xs:simpleType>
       </xs:attribute>
-      <xs:attribute name="switch" type="xs:NMTOKEN"/>
-      <xs:attribute name="transform">
-        <xs:simpleType>
-          <xs:restriction base="xs:token">
-            <xs:enumeration value="no"/>
-          </xs:restriction>
-        </xs:simpleType>
-      </xs:attribute>
+      <xs:attribute name="layerId" type="xs:NMTOKEN"/>
       <xs:attribute name="width"/>
     </xs:complexType>
   </xs:element>
@@ -245,13 +216,19 @@ Note: DTD @-annotations are not currently converted to .xsd. For full CLDR file 
   
   
   
-  
-  
-  
   <xs:element name="flicks">
     <xs:complexType>
       <xs:sequence>
-        <xs:element maxOccurs="unbounded" ref="flick"/>
+        <xs:element maxOccurs="unbounded" minOccurs="0" ref="import"/>
+        <xs:element maxOccurs="unbounded" minOccurs="0" ref="flick"/>
+        <xs:element maxOccurs="unbounded" minOccurs="0" ref="special"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="flick">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element maxOccurs="unbounded" ref="flickSegment"/>
         <xs:element maxOccurs="unbounded" minOccurs="0" ref="special"/>
       </xs:sequence>
       <xs:attribute name="id" type="xs:NMTOKEN" use="required"/>
@@ -259,13 +236,12 @@ Note: DTD @-annotations are not currently converted to .xsd. For full CLDR file 
   </xs:element>
   
   
-  <xs:element name="flick">
+  <xs:element name="flickSegment">
     <xs:complexType>
       <xs:attribute name="directions" type="xs:NMTOKENS" use="required"/>
-      <xs:attribute name="to" use="required"/>
+      <xs:attribute name="keyId" type="xs:NMTOKEN" use="required"/>
     </xs:complexType>
   </xs:element>
-  
   
   
   
@@ -306,7 +282,7 @@ Note: DTD @-annotations are not currently converted to .xsd. For full CLDR file 
         <xs:element maxOccurs="unbounded" minOccurs="0" ref="layer"/>
         <xs:element maxOccurs="unbounded" minOccurs="0" ref="special"/>
       </xs:sequence>
-      <xs:attribute name="form" type="xs:NMTOKEN" use="required"/>
+      <xs:attribute name="formId" type="xs:NMTOKEN" use="required"/>
       <xs:attribute name="minDeviceWidth"/>
     </xs:complexType>
   </xs:element>
@@ -320,7 +296,7 @@ Note: DTD @-annotations are not currently converted to .xsd. For full CLDR file 
         <xs:element maxOccurs="unbounded" minOccurs="0" ref="special"/>
       </xs:sequence>
       <xs:attribute name="id" type="xs:NMTOKEN"/>
-      <xs:attribute name="modifier" type="xs:NMTOKENS"/>
+      <xs:attribute name="modifiers" type="xs:NMTOKENS"/>
     </xs:complexType>
   </xs:element>
   
