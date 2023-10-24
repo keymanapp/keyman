@@ -1,13 +1,10 @@
 name: "Ubuntu packaging"
-run-name: "Ubuntu packaging - ${{ github.event.inputs.branch }} (branch ${{ github.head_ref }}), by @${{ github.actor }}"
+run-name: "Ubuntu packaging - ${{ github.event.inputs.branch }} (branch ${{ github.event.inputs.baseBranch }}), by @${{ github.event.inputs.user }}"
 on:
   workflow_dispatch:
     inputs:
       ref:
         description: 'For a PR `refs/pull/<PR-NUMBER>/merge`'
-        required: true
-      headRef:
-        description: 'The ref of HEAD. For a PR `refs/pull/<PR-NUMBER>/head`.'
         required: true
       branch:
         description: 'The branch. For a PR `PR-<PR-NUMBER>`.'
@@ -248,6 +245,7 @@ jobs:
       uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c #v3.3.0
       with:
         ref: '${{ github.event.inputs.ref }}'
+        fetch-depth: 0
 
     - name: Download Artifacts
       uses: actions/download-artifact@9bc31d5ccc31df68ecc42ccf4149144866c47d8a # v3.0.2
@@ -263,10 +261,13 @@ jobs:
       run: |
         cd linux
         PKG_NAME=libkeymancore
-        SRC_PKG="${GITHUB_WORKSPACE}/artifacts/keyman-srcpkg/keyman_${{ needs.sourcepackage.outputs.VERSION }}-1.debian.tar.xz" \
-        BIN_PKG="${GITHUB_WORKSPACE}/artifacts/keyman-binarypkgs/${PKG_NAME}_${{ needs.sourcepackage.outputs.VERSION }}-1${{ needs.sourcepackage.outputs.PRERELEASE_TAG }}+jammy1_amd64.deb" \
-        PKG_VERSION="${{ needs.sourcepackage.outputs.VERSION }}" \
-        ./scripts/deb-packaging.sh --gha verify 2>> $GITHUB_STEP_SUMMARY
+        ./scripts/deb-packaging.sh \
+          --gha \
+          --bin-pkg "${GITHUB_WORKSPACE}/artifacts/keyman-binarypkgs/${PKG_NAME}_${{ needs.sourcepackage.outputs.VERSION }}-1${{ needs.sourcepackage.outputs.PRERELEASE_TAG }}+jammy1_amd64.deb" \
+          --pkg-version "${{ needs.sourcepackage.outputs.VERSION }}" \
+          --git-ref "${{ github.sha }}" \
+          --git-base "${{ github.event.inputs.baseRef }}" \
+          verify 2>> $GITHUB_STEP_SUMMARY
 
     - name: Archive .symbols file
       uses: actions/upload-artifact@0b7f8abb1508181956e8e162db84b466c27e18ce # v3.1.2
