@@ -180,6 +180,26 @@ printBuildNumberForTeamCity
 
 findShouldSentryRelease
 
+# Sets the BUILDER_OS environment variable to linux|mac|win
+#
+_builder_get_operating_system() {
+  declare -g BUILDER_OS
+  # Default value, since it's the most general case/configuration to detect.
+  BUILDER_OS=linux
+
+  # Subject to change with future improvements.
+  if [[ $OSTYPE == darwin* ]]; then
+    BUILDER_OS=mac
+  elif [[ $OSTYPE == msys ]]; then
+    BUILDER_OS=win
+  elif [[ $OSTYPE == cygwin ]]; then
+    BUILDER_OS=win
+  fi
+  readonly BUILDER_OS
+}
+
+_builder_get_operating_system
+
 # Intended for use with macOS-based builds, as Xcode build phase "run script"s do not have access to important
 # environment variables.  Doesn't hurt to run it at other times as well.  The output file is .gitignore'd.
 function exportEnvironmentDefinitionScript() {
@@ -214,7 +234,7 @@ function exportEnvironmentDefinitionScript() {
 # someone else to intentionally use, so this check seems reasonable.
 #
 # https://gist.github.com/gdavis/6670468 has a representative copy of a standard Xcode environment variable setup.
-if [[ -z "${XCODE_VERSION_ACTUAL:-}" ]] && [[ -z "${XCODE_PRODUCT_BUILD_VERSION:-}" ]]; then
+if [ "$BUILDER_OS" == "mac" ] && [[ -z "${XCODE_VERSION_ACTUAL:-}" ]] && [[ -z "${XCODE_PRODUCT_BUILD_VERSION:-}" ]]; then
     exportEnvironmentDefinitionScript
 fi
 
@@ -316,3 +336,10 @@ run_xcodebuild() {
     fail "Build failed! Error: [$ret_code] when executing command: 'xcodebuild $cmnd'"
   fi
 }
+
+
+#
+# We always want to use tools out of node_modules/.bin to guarantee that we get the
+# correct version
+#
+set_keyman_standard_build_path
