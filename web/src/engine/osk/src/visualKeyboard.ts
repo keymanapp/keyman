@@ -29,7 +29,6 @@ import {
 import { createStyleSheet, getAbsoluteX, getAbsoluteY, StylesheetManager } from 'keyman/engine/dom-utils';
 
 import GlobeHint from './globehint.interface.js';
-import InputEventCoordinate from './input/inputEventCoordinate.js';
 import KeyboardView from './components/keyboardView.interface.js';
 import { type KeyElement, getKeyFrom } from './keyElement.js';
 import KeyTip from './keytip.interface.js';
@@ -37,8 +36,6 @@ import OSKKey from './keyboard-layout/oskKey.js';
 import OSKLayer from './keyboard-layout/oskLayer.js';
 import OSKLayerGroup from './keyboard-layout/oskLayerGroup.js';
 import { LengthStyle, ParsedLengthStyle } from './lengthStyle.js';
-import PendingGesture from './input/gestures/pendingGesture.interface.js';
-import RealizedGesture from './input/gestures/realizedGesture.interface.js';
 import { defaultFontSize, getFontSizeStyle } from './fontSizeUtils.js';
 import PendingMultiTap, { PendingMultiTapState } from './input/gestures/browser/pendingMultiTap.js';
 import InternalKeyTip from './input/gestures/browser/keytip.js';
@@ -180,7 +177,6 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
 
   // State-related properties
   keyPending: KeyElement;
-  touchPending: InputEventCoordinate;
   deleteKey: KeyElement;
   deleting: number; // Tracks a timer id for repeated deletions.
   nextLayer: string;
@@ -192,7 +188,6 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
   };
 
   // Touch-tracking properties
-  initTouchCoord: InputEventCoordinate;
   touchCount: number;
   currentTarget: KeyElement;
 
@@ -204,9 +199,6 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
   globeHint: GlobeHint;
 
   activeGestures: GestureHandler[] = [];
-
-  pendingSubkey: PendingGesture;
-  subkeyGesture: RealizedGesture;
 
   // Multi-tap gesture management
   pendingMultiTap: PendingMultiTap;
@@ -772,108 +764,6 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
   }
 
   //#region Input handling start
-
-  /**
-   * Determines a "fuzzy boundary" area around the OSK within which active mouse and
-   * touch events will be maintained, even if their coordinates lie outside of the OSK's
-   * true visual bounds.
-   * @returns A `BoundingRect`, in `.pageX` / `.pageY` coordinates.
-   */
-  private getInteractiveBoundingRect(): BoundingRect {
-    // Determine the important geometric values involved
-    let oskX = getAbsoluteX(this.element);
-    let oskY = getAbsoluteY(this.element);
-
-    // Determine the out-of-bounds threshold at which touch-cancellation should automatically occur.
-    // Assuming square key-squares, we'll use 1/3 the height of a row for bounds detection
-    // for both dimensions.
-    const rowCount = this.currentLayer.rows.length;
-    const buffer = (0.333 * this.height / rowCount);
-
-    // Determine the OSK's boundaries and the boundaries of the page / view.
-    // These values are needed in .pageX / .pageY coordinates for the final calcs.
-    let boundingRect: BoundingRect = {
-      left: oskX - buffer,
-      right: oskX + this.width + buffer,
-      top: oskY - buffer,
-      bottom: oskY + this.height + buffer
-    };
-
-    return boundingRect;
-  }
-
-  /**
-   * Adjusts a potential "interactive boundary" definition by enforcing an
-   * "event cancellation zone" near screen boundaries that are not directly adjacent
-   * to the ongoing input event's initial coordinate.
-   *
-   * This facilitates modeling of conventional cancellation gestures where a user would
-   * drag the mouse or touch point off the OSK, as mouse and touch event handlers receive
-   * no input beyond screen boundaries.
-   *
-   * @param baseBounds The baseline interactive bounding area to be adjusted
-   * @param startCoord The initial coordinate of a currently-ongoing input event
-   * @returns
-   */
-  private applyScreenMarginBoundsThresholding(baseBounds: BoundingRect,
-    startCoord: InputEventCoordinate): BoundingRect {
-    // Determine the needed linear translation to screen coordinates.
-    const xDelta = window.screenLeft - window.pageXOffset;
-    const yDelta = window.screenTop - window.pageYOffset;
-
-    let adjustedBounds: BoundingRect = { ...baseBounds };
-
-    // Also translate the initial touch's screen coord, as it affects our bounding box logic.
-    const initScreenCoord = new InputEventCoordinate(startCoord.x + xDelta, startCoord.y + yDelta);
-
-    // Detection:  is the OSK aligned with any screen boundaries?
-    // If so, create a 'fuzzy' zone around the edges not near the initial touch point that allow
-    // move-based cancellation.
-
-    // If the initial input screen-coord is at least 5 pixels from the screen's left AND
-    // the OSK's left boundary is within 2 pixels from the screen's left...
-    if (initScreenCoord.x >= 5 && baseBounds.left + xDelta <= 2) {
-      adjustedBounds.left = 2 - xDelta; // new `leftBound` is set to 2 pixels from the screen's left.
-    }
-
-    if (initScreenCoord.x <= screen.width - 5 && baseBounds.right + xDelta >= screen.width - 2) {
-      adjustedBounds.right = (screen.width - 2) - xDelta; // new `rightBound` 2px from screen's right.
-    }
-
-    if (initScreenCoord.y >= 5 && baseBounds.top + yDelta <= 2) {
-      adjustedBounds.top = 2 - yDelta;
-    }
-
-    if (initScreenCoord.y <= screen.height - 5 && baseBounds.bottom + yDelta >= screen.height - 2) {
-      adjustedBounds.bottom = (screen.height - 2) - yDelta;
-    }
-
-    return adjustedBounds;
-  }
-
-  detectWithinInteractiveBounds(coord: InputEventCoordinate): boolean {
-    // Shortcuts the method during unit testing, as we don't currently
-    // provide coordinate values in its synthetic events.
-    if (coord.x === null && coord.y === null) {
-      return true;
-    }
-
-    const baseBoundingRect = this.getInteractiveBoundingRect();
-    let adjustedBoundingRect = baseBoundingRect;
-    if(this.initTouchCoord) {
-      this.applyScreenMarginBoundsThresholding(baseBoundingRect, this.initTouchCoord);
-    }
-
-    // Now to check where the input coordinate lies in relation to the final bounding box!
-
-    if (coord.x < adjustedBoundingRect.left || coord.x > adjustedBoundingRect.right) {
-      return false;
-    } else if (coord.y < adjustedBoundingRect.top || coord.y > adjustedBoundingRect.bottom) {
-      return false;
-    } else {
-      return true;
-    }
-  }
 
   // /**
   //  * The main OSK touch start event handler
@@ -1571,88 +1461,78 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
     }
   }
 
-  /**
-   * Initializes all supported gestures given a base key and the triggering touch coordinates.
-   * @param key     The gesture's base key
-   * @param touch   The starting touch coordinates for the gesture
-   * @returns
-   */
-  initGestures(key: KeyElement, input: InputEventCoordinate) {
+  // /**
+  //  * Initializes all supported gestures given a base key and the triggering touch coordinates.
+  //  * @param key     The gesture's base key
+  //  * @param touch   The starting touch coordinates for the gesture
+  //  * @returns
+  //  */
+  // initGestures(key: KeyElement, input: InputEventCoordinate) {
 
-    if (this.pendingMultiTap) {
-      switch (this.pendingMultiTap.incrementTouch(key)) {
-        case PendingMultiTapState.Cancelled:
-          this.pendingMultiTap = null;
-          break;
-        case PendingMultiTapState.Realized:
-          // Don't initialize any other gestures if the
-          // multi tap is realized; we cleanup on touch
-          // release because we need to cancel the base
-          // key action
-          return;
-      }
-    }
+  //   if (this.pendingMultiTap) {
+  //     switch (this.pendingMultiTap.incrementTouch(key)) {
+  //       case PendingMultiTapState.Cancelled:
+  //         this.pendingMultiTap = null;
+  //         break;
+  //       case PendingMultiTapState.Realized:
+  //         // Don't initialize any other gestures if the
+  //         // multi tap is realized; we cleanup on touch
+  //         // release because we need to cancel the base
+  //         // key action
+  //         return;
+  //     }
+  //   }
 
-    if (!this.pendingMultiTap && PendingMultiTap.isValidTarget(this, key)) {
-      // We are only going to support double-tap on Shift
-      // in Keyman 15, so we pass in the constant count = 2
-      this.pendingMultiTap = new PendingMultiTap(this, key, 2);
-      this.pendingMultiTap.timeout.then(() => {
-        this.pendingMultiTap = null;
-      });
-    }
-  }
+  //   if (!this.pendingMultiTap && PendingMultiTap.isValidTarget(this, key)) {
+  //     // We are only going to support double-tap on Shift
+  //     // in Keyman 15, so we pass in the constant count = 2
+  //     this.pendingMultiTap = new PendingMultiTap(this, key, 2);
+  //     this.pendingMultiTap.timeout.then(() => {
+  //       this.pendingMultiTap = null;
+  //     });
+  //   }
+  // }
 
-  /**
-   * Updates all currently-pending and activated gestures.
-   *
-   * @param currentKey    The key currently underneath the most recent touch coordinate
-   * @param previousKey   The previously-selected key
-   * @param input         The current mouse or touch coordinate for the gesture
-   * @returns true if should fully capture input, false if input should 'fall through'.
-   */
-  updateGestures(currentKey: KeyElement, previousKey: KeyElement, input: InputEventCoordinate): boolean {
-    let key0 = previousKey;
-    let key1 = currentKey;
+  // /**
+  //  * Updates all currently-pending and activated gestures.
+  //  *
+  //  * @param currentKey    The key currently underneath the most recent touch coordinate
+  //  * @param previousKey   The previously-selected key
+  //  * @param input         The current mouse or touch coordinate for the gesture
+  //  * @returns true if should fully capture input, false if input should 'fall through'.
+  //  */
+  // updateGestures(currentKey: KeyElement, previousKey: KeyElement, input: InputEventCoordinate): boolean {
+  //   let key0 = previousKey;
+  //   let key1 = currentKey;
 
-    if(!currentKey && this.pendingMultiTap) {
-      this.pendingMultiTap.cancel();
-      this.pendingMultiTap = null;
-    }
+  //   if(!currentKey && this.pendingMultiTap) {
+  //     this.pendingMultiTap.cancel();
+  //     this.pendingMultiTap = null;
+  //   }
 
-    // Clear previous key highlighting, allow subkey controller to highlight as appropriate.
-    if (this.subkeyGesture) {
-      if (key0) {
-        key0.key.highlight(false);
-      }
-      this.subkeyGesture.updateTouch(input);
+  //   // Clear previous key highlighting, allow subkey controller to highlight as appropriate.
+  //   if (this.subkeyGesture) {
+  //     if (key0) {
+  //       key0.key.highlight(false);
+  //     }
+  //     this.subkeyGesture.updateTouch(input);
 
-      this.keyPending = null;
-      this.touchPending = null;
+  //     this.keyPending = null;
+  //     this.touchPending = null;
 
-      return true;
-    }
+  //     return true;
+  //   }
 
-    this.currentTarget = null;
+  //   this.currentTarget = null;
 
-    // If there is an active popup menu (which can occur from the previous block),
-    // a subkey popup exists; do not allow base key output.
-    if (this.subkeyGesture || this.pendingSubkey) {
-      return true;
-    }
+  //   // If there is an active popup menu (which can occur from the previous block),
+  //   // a subkey popup exists; do not allow base key output.
+  //   if (this.subkeyGesture || this.pendingSubkey) {
+  //     return true;
+  //   }
 
-    return false;
-  }
-
-  private getLongpressFlickThreshold(): number {
-    const rowHeight = this.currentLayer.rowHeight;
-
-    // If larger than 5 (and it likely is), new threshold = 1/4 the std. key height.
-    const proportionalThreshold = rowHeight / 4;
-
-    // 5 - the longpress-flick triggering threshold before 15.0.
-    return Math.max(proportionalThreshold, 5);
-  }
+  //   return false;
+  // }
 
   optionKey(e: KeyElement, keyName: string, keyDown: boolean) {
     if (keyName.indexOf('K_LOPT') >= 0) {
@@ -1729,7 +1609,6 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
     }
 
     this.keyPending = null;
-    this.touchPending = null;
 
     this.keytip?.show(null, false, this);
   }

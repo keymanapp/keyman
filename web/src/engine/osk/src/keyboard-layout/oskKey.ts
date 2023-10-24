@@ -6,7 +6,6 @@ import TouchLayoutFlick = TouchLayout.TouchLayoutFlick;
 import { getAbsoluteX, getAbsoluteY } from 'keyman/engine/dom-utils';
 
 import { getFontSizeStyle } from '../fontSizeUtils.js';
-import InputEventCoordinate from '../input/inputEventCoordinate.js';
 import specialChars from '../specialCharacters.js';
 import buttonClassNames from '../buttonClassNames.js';
 
@@ -377,19 +376,6 @@ export default abstract class OSKKey {
     t.innerText = keyText;
 
     return t;
-  }
-
-  public isUnderTouch(input: InputEventCoordinate): boolean {
-    let x = input.x;
-    let y = input.y;
-
-    let btn = this.btn;
-    let x0 = getAbsoluteX(btn);
-    let y0 = getAbsoluteY(btn);
-    let x1 = x0 + btn.offsetWidth;
-    let y1 = y0 + btn.offsetHeight;
-
-    return (x > x0 && x < x1 && y > y0 && y < y1);
   }
 
   public refreshLayout(vkbd: VisualKeyboard) {

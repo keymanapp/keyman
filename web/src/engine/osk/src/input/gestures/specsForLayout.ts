@@ -95,11 +95,11 @@ export function gestureSetForLayout(layerGroup: OSKLayerGroup, params: GesturePa
     }
   };
 
-  const simpleTapModel: GestureModel = deepCopy(layout.hasFlicks ? SimpleTapModel : SimpleTapModelWithReset);
-  const longpressModel: GestureModel = deepCopy(layout.hasFlicks ? basicLongpressModel(params) : longpressModelWithShortcut(params));
+  const simpleTapModel: GestureModel<KeyElement> = deepCopy(layout.hasFlicks ? SimpleTapModel : SimpleTapModelWithReset);
+  const longpressModel: GestureModel<KeyElement> = deepCopy(layout.hasFlicks ? basicLongpressModel(params) : longpressModelWithShortcut(params));
 
   // #region Functions for implementing and/or extending path initial-state checks
-  function withKeySpecFiltering(model: GestureModel, contactIndices: number | number[]) {
+  function withKeySpecFiltering(model: GestureModel<KeyElement>, contactIndices: number | number[]) {
     // Creates deep copies of the model specifications that are safe to customize to the
     // keyboard layout.
     model = deepCopy(model);
@@ -125,7 +125,7 @@ export function gestureSetForLayout(layerGroup: OSKLayerGroup, params: GesturePa
     return model;
   }
 
-  function withLayerChangeItemFix(model: GestureModel, contactIndices: number | number[]) {
+  function withLayerChangeItemFix(model: GestureModel<KeyElement>, contactIndices: number | number[]) {
     // Creates deep copies of the model specifications that are safe to customize to the
     // keyboard layout.
     model = deepCopy(model);
@@ -206,7 +206,9 @@ export function gestureSetForLayout(layerGroup: OSKLayerGroup, params: GesturePa
 
 // #region Definition of models for paths comprising gesture-stage models
 
-type ContactModel = specs.ContactModel<KeyElement>;
+// Note:  as specified below, none of the raw specs actually need access to KeyElement typing.
+
+type ContactModel = specs.ContactModel<any>;
 
 export const InstantContactRejectionModel: ContactModel = {
   itemPriority: 0,
@@ -337,14 +339,18 @@ export const SubkeySelectContactModel: ContactModel = {
 // #endregion
 
 // #region Gesture-stage model definitions
-type GestureModel = specs.GestureModel<KeyElement>;
+
+// Note:  as specified below, most of the raw specs actually need access to KeyElement typing.
+// That only becomes relevant with some of the modifier functions in the `gestureSetForLayout`
+// func at the top.
+type GestureModel<Type> = specs.GestureModel<Type>;
 
 // TODO:  customization of the gesture models depending upon properties of the keyboard.
 // - has flicks?  no longpress shortcut, also no longpress reset(?)
 // - modipress:  keyboard-specific modifier keys - which may require inspection of a
 //   key's properties.
 
-export const SpecialKeyStartModel: GestureModel = {
+export const SpecialKeyStartModel: GestureModel<KeyElement> = {
   id: 'special-key-start',
   resolutionPriority: 0,
   contacts : [
@@ -376,7 +382,7 @@ export const SpecialKeyStartModel: GestureModel = {
   }
 }
 
-export const SpecialKeyEndModel: GestureModel = {
+export const SpecialKeyEndModel: GestureModel<any> = {
   id: 'special-key-end',
   resolutionPriority: 0,
   contacts : [
@@ -397,7 +403,7 @@ export const SpecialKeyEndModel: GestureModel = {
 /**
  * The flickless, roaming-touch-less version.
  */
-export function basicLongpressModel(params: GestureParams): GestureModel {
+export function basicLongpressModel(params: GestureParams): GestureModel<any> {
   return {
     id: 'longpress',
     resolutionPriority: 0,
@@ -427,7 +433,7 @@ export function basicLongpressModel(params: GestureParams): GestureModel {
  * For use when a layout doesn't have flicks; has the up-flick shortcut
  * and facilitates roaming-touch.
  */
-export function longpressModelWithShortcut(params: GestureParams): GestureModel {
+export function longpressModelWithShortcut(params: GestureParams): GestureModel<any> {
   return {
     ...basicLongpressModel(params),
 
@@ -473,7 +479,7 @@ export function longpressModelWithShortcut(params: GestureParams): GestureModel 
  * For use when a layout doesn't have flicks; has the up-flick shortcut
  * and facilitates roaming-touch.
  */
-export function longpressModelWithRoaming(params: GestureParams): GestureModel {
+export function longpressModelWithRoaming(params: GestureParams): GestureModel<any> {
   return {
     ...basicLongpressModel(params),
 
@@ -517,7 +523,7 @@ export function longpressModelWithRoaming(params: GestureParams): GestureModel {
 }
 
 
-export const MultitapModel: GestureModel = {
+export const MultitapModel: GestureModel<any> = {
   id: 'multitap',
   resolutionPriority: 2,
   contacts: [
@@ -547,7 +553,7 @@ export const MultitapModel: GestureModel = {
   }
 }
 
-export const SimpleTapModel: GestureModel = {
+export const SimpleTapModel: GestureModel<any> = {
   id: 'simple-tap',
   resolutionPriority: 1,
   contacts: [
@@ -570,7 +576,7 @@ export const SimpleTapModel: GestureModel = {
   }
 }
 
-export const SimpleTapModelWithReset: GestureModel = {
+export const SimpleTapModelWithReset: GestureModel<any> = {
   ...SimpleTapModel,
   rejectionActions: {
     item: {
@@ -580,7 +586,7 @@ export const SimpleTapModelWithReset: GestureModel = {
   }
 }
 
-export const SubkeySelectModel: GestureModel = {
+export const SubkeySelectModel: GestureModel<any> = {
   id: 'subkey-select',
   resolutionPriority: 0,
   contacts: [
@@ -608,7 +614,7 @@ export const SubkeySelectModel: GestureModel = {
   sustainWhenNested: true
 }
 
-export const ModipressStartModel: GestureModel = {
+export const ModipressStartModel: GestureModel<KeyElement> = {
   id: 'modipress-start',
   resolutionPriority: 5,
   contacts: [
@@ -641,7 +647,7 @@ export const ModipressStartModel: GestureModel = {
   }
 }
 
-export const ModipressEndModel: GestureModel = {
+export const ModipressEndModel: GestureModel<any> = {
   id: 'modipress-end',
   resolutionPriority: 5,
   contacts: [
