@@ -9,7 +9,7 @@ working on ‘layr’, using ‘disp’ as a model from https://github.com/keyma
 
 ## Constants and Scaffolding
 
-- *Edit/Commit*: `core/include/ldml/keyboardprocessor_ldml.ts`
+- *Edit/Commit*: `core/include/ldml/keyman_core_ldml.ts`
     - update `SectionIdent` and keep in order: `'layr' |`
     - update `Constants.section` (near the end of the file) and keep in order: `'layr': 'layr',`
     - add a comment block in order `layr section`
@@ -18,7 +18,7 @@ working on ‘layr’, using ‘disp’ as a model from https://github.com/keyma
         - add parameters for each flag/bitfield
     - Check indentation, check for copypasta errs!
 - Run: `./core/tools/ldml-const-builder/build.sh clean build run`
-- Verify/Commit: `core/include/ldml/keyboardprocessor_ldml.h`
+- Verify/Commit: `core/include/ldml/keyman_core_ldml.h`
 
 ## XML changes
 

@@ -10,7 +10,7 @@
 #include <kmx/kmx_xstring.h>
 
 #include "kmx_processevent.h" // for debug functions
-#include "ldml/keyboardprocessor_ldml.h"
+#include "ldml/keyman_core_ldml.h"
 
 #include <assert.h>
 #include "kmx_plus.h"

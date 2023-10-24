@@ -10,7 +10,7 @@
 #include <km_types.h>
 #include <kmx/kmx_base.h>
 #include <kmx_file.h>
-#include <ldml/keyboardprocessor_ldml.h>
+#include <ldml/keyman_core_ldml.h>
 #include <list>
 #include <deque>
 
