@@ -310,20 +310,20 @@
                 "sp": 0
               },
               {
-                "id": "U_0301",
+                "id": "T_ACUTE",
                 "text": "́",
                 "sp": 1,
                 "nextlayer": "accent-acute",
                 "multitap": [
                   {
                     "text": "̀",
-                    "id": "U_0300",
+                    "id": "T_GRAVE",
                     "sp": "1",
                     "nextlayer": "accent-grave"
                   },
                   {
                     "text": "̂",
-                    "id": "U_0302",
+                    "id": "T_CIRCUMFLEX",
                     "sp": "1",
                     "nextlayer": "circumflex"
                   }
@@ -1373,13 +1373,13 @@
                 "multitap": [
                   {
                     "text": "̀",
-                    "id": "U_0300",
+                    "id": "T_GRAVE",
                     "sp": "1",
                     "nextlayer": "accent-grave"
                   },
                   {
                     "text": "̂",
-                    "id": "U_0302",
+                    "id": "T_CIRCUMFLEX",
                     "sp": "1",
                     "nextlayer": "circumflex"
                   }
@@ -1610,16 +1610,17 @@
                 "id": "T_DEFAULT",
                 "text": "*abc*",
                 "sp": 1,
+                "nextlayer": "default",
                 "multitap": [
                   {
                     "text": "́",
-                    "id": "U_0301",
+                    "id": "T_ACUTE",
                     "sp": "1",
                     "nextlayer": "accent-acute"
                   },
                   {
                     "text": "̂",
-                    "id": "U_0302",
+                    "id": "T_CIRCUMFLEX",
                     "sp": "1",
                     "nextlayer": "circumflex"
                   }
@@ -1847,20 +1848,20 @@
                 "sp": 0
               },
               {
-                "id": "U_0301",
+                "id": "T_DEFAULT",
                 "text": "*abc*",
                 "sp": 1,
                 "nextlayer": "default",
                 "multitap": [
                   {
                     "text": "́",
-                    "id": "U_0301",
+                    "id": "T_ACUTE",
                     "sp": "1",
                     "nextlayer": "accent-acute"
                   },
                   {
                     "text": "̀",
-                    "id": "U_0300",
+                    "id": "T_GRAVE",
                     "sp": "1",
                     "nextlayer": "accent-grave"
                   }
