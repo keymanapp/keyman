@@ -112,7 +112,12 @@ export class TouchpointCoordinator<HoveredItemType, StateToken=any> extends Even
 
     touchpoint.setGestureMatchInspector(buildGestureMatchInspector(selector));
 
-    // We wait for the source to fully pass through the gesture-model spin-up phase; there's a chanc
+    /* We wait for the source to fully pass through the gesture-model spin-up phase; there's
+     * a chance that the new source will complete an existing gesture instantly without being
+     * locked to it, resulting in activation of a different `stateToken`.
+     *
+     * This, in turn, can affect what the initial 'item' for the new gesture will be.
+     */
     const modelingSpinupPromise = selector.matchGesture(touchpoint, getGestureModelSet(modelDefs, selector.baseGestureSetId));
     modelingSpinupPromise.then(async (selectionPromiseHost) => {
       this.emit('inputstart', touchpoint);
