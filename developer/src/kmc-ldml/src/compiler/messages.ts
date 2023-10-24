@@ -59,20 +59,20 @@ export class CompilerMessages {
   static FATAL_SectionCompilerFailed = SevFatal | 0x000F;
 
   /** annotate the to= or id= entry */
-  private static toOrId(o:{to?: string, id?: string}) {
-    if (o.to && o.id) {
-      return `to='${o.to}' id='${o.id}'`;
-    } else if(o.id) {
-      return `id='${o.id}'`;
-    } else if (o.to) {
-      return `to='${o.to}'`;
+  private static outputOrKeyId(o:{output?: string, keyId?: string}) {
+    if (o.output && o.keyId) {
+      return `to='${o.output}' id='${o.keyId}'`;
+    } else if(o.keyId) {
+      return `id='${o.keyId}'`;
+    } else if (o.output) {
+      return `to='${o.output}'`;
     } else {
       return '';
     }
   }
 
-  static Error_DisplayIsRepeated = (o:{to?: string, id?: string}) =>
-    m(this.ERROR_DisplayIsRepeated, `display ${CompilerMessages.toOrId(o)} has more than one display entry.`);
+  static Error_DisplayIsRepeated = (o:{output?: string, keyId?: string}) =>
+    m(this.ERROR_DisplayIsRepeated, `display ${CompilerMessages.outputOrKeyId(o)} has more than one display entry.`);
   static ERROR_DisplayIsRepeated = SevError | 0x0010;
 
   static Error_KeyMissingToGapOrSwitch = (o:{keyId: string}) =>
@@ -140,8 +140,8 @@ export class CompilerMessages {
   m(this.ERROR_MissingMarkers, `Markers used for matching but not defined: ${o.ids?.join(',')}`);
   static ERROR_MissingMarkers = SevError | 0x0021;
 
-  static Error_DisplayNeedsToOrId = (o:{to?: string, id?: string}) =>
-  m(this.ERROR_DisplayNeedsToOrId, `display ${CompilerMessages.toOrId(o)} needs to= or id=, but not both`);
+  static Error_DisplayNeedsToOrId = (o:{output?: string, keyId?: string}) =>
+  m(this.ERROR_DisplayNeedsToOrId, `display ${CompilerMessages.outputOrKeyId(o)} needs output= or keyId=, but not both`);
   static ERROR_DisplayNeedsToOrId = SevError | 0x0022;
 }
 

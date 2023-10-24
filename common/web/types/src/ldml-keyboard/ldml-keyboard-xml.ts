@@ -168,9 +168,9 @@ export interface LKDisplayOptions {
 };
 
 export interface LKDisplay {
-  to?: string;
+  output?: string;
   display?: string;
-  id?: string;
+  keyId?: string;
 };
 
 export interface LKDisplays {
