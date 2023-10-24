@@ -6,7 +6,7 @@
 
   <info author="The Keyman Team" indicator="QW" layout="QWIRKY"  name="meta-maximal"/>
 
-  <settings fallback="omit" />
+  >
 
   <keys />
 </keyboard3>

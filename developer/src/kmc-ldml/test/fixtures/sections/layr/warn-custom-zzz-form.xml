@@ -2,10 +2,7 @@
 
 <!DOCTYPE keyboard3 SYSTEM "../../../../../../../resources/standards-data/ldml-keyboards/techpreview/dtd/ldmlKeyboard3.dtd">
 <keyboard3 locale="und" conformsTo="techpreview">
-  <names>
-    <name value="layr-error-custom-form" />
-  </names>
-
+  <info name="layr-error-custom-form"/>
   <keys>
     <key id="one" output="1" />
     <key id="two" output="2" />

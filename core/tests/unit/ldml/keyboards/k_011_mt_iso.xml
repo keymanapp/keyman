@@ -17,12 +17,7 @@ Exact copy of mt.xml from CLDR, but with:
         <!-- English is also an official language in Malta.-->
         <locale id="en" />
     </locales>
-    <info author="Steven R. Loomis" layout="QWERTY" indicator="MT" />
-
-    <names>
-        <name value="Maltese" />
-        <name value="MSA 100:2002" />
-    </names>
+    <info author="Steven R. Loomis" layout="QWERTY" indicator="MT"  name="Maltese"/>
 
     <keys>
         <!-- imports -->

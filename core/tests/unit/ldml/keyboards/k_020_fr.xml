@@ -9,19 +9,15 @@
 		keyboard formats -->
 	<!-- 'version' element is now optional -->
 	<version number="1.0.1" />
-	<info author="Team Keyboard" layout="AZERTY" indicator="FR" />
-	<names>
-		<name value="French Test Updated" />
-		<name value="French Test AZERTY Updated" />
-	</names>
+	<info author="Team Keyboard" layout="AZERTY" indicator="FR"  name="French Test Updated"/>
 
-	<settings fallback="omit" /> <!-- "hide" makes this act like a dead keyTBD -->
+	> <!-- "hide" makes this act like a dead keyTBD -->
 
 	<displays>
 		<!-- Note: displays is only used for keycap presentation -->
 		<!-- this example is not required for this keyboard as we use the spacing
 			modifiers -->
-		<display to="\u0300" display="\u02CB" /> <!-- display combining grave as modifier letter grave ˋ -->
+		<display output="\u0300" display="\u02CB" /> <!-- display combining grave as modifier letter grave ˋ -->
 		<!-- Note: We discussed why the existing displayMap was used for display.
 			rather than adding something closer to the key layout. 1. This way we can
 			tell the renderer what to do. Could be double diacritics, spacing issues,
@@ -36,10 +32,10 @@
 		<import base="cldr" path="techpreview/keys-Zyyy-currency.xml" />
 
 		<!-- switch keys -->
-		<key id="shift" switch="shift" />
-		<key id="numeric" switch="numeric" />
-		<key id="symbol" switch="symbol" />
-		<key id="base" switch="base" />
+		<key id="shift" layerId="shift" />
+		<key id="numeric" layerId="numeric" />
+		<key id="symbol" layerId="symbol" />
+		<key id="base" layerId="base" />
 
     <!-- TODO-LDML -->
 		<key id="bksp" gap="true" />

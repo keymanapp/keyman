@@ -2,7 +2,7 @@
 
 <!DOCTYPE keyboard3 SYSTEM "../../../../../../../resources/standards-data/ldml-keyboards/techpreview/dtd/ldmlKeyboard3.dtd">
 <keyboard3 locale="mt" conformsTo="techpreview">
-  <info normalization="NFQ"  name="meta-minimal"/>
+  <info name="meta-minimal"/>
 
   <keys />
 </keyboard3>

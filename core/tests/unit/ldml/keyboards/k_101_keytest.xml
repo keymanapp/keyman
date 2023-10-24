@@ -9,7 +9,7 @@
   <info author="srl295" indicator="🙀" layout="qwerty"  name="TestKbd"/>
 
   <displays>
-    <display to="a" display="(a)"/>
+    <display output="a" display="(a)"/>
     <displayOptions baseCharacter="x"/>
   </displays>
 

@@ -9,8 +9,8 @@
   <info author="srl295" indicator="🙀" layout="qwerty"  name="Marker Test"/>
 
   <displays>
-    <display to="\m{grave}" display="`" />
-    <display to="\m{acute}" display="´" />
+    <display output="\m{grave}" display="`" />
+    <display output="\m{acute}" display="´" />
   </displays>
 
   <keys>

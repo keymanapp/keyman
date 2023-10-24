@@ -2,12 +2,10 @@
 
 <!DOCTYPE keyboard3 SYSTEM "../../../../../../../resources/standards-data/ldml-keyboards/techpreview/dtd/ldmlKeyboard3.dtd">
 <keyboard3 locale="mt" conformsTo="techpreview">
-  <names>
-    <name value="disp-invalid" />
-  </names>
+  <info name="disp-invalid"/>
 
   <displays>
-    <display to="e" id="e" display="(e)"/> <!-- both to and id -->
+    <display output="e" id="e" display="(e)"/> <!-- both to and id -->
     <displayOptions baseCharacter="x" />
   </displays>
 </keyboard3>

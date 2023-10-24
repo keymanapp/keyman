@@ -2,13 +2,11 @@
 
 <!DOCTYPE keyboard3 SYSTEM "../../../../../../../resources/standards-data/ldml-keyboards/techpreview/dtd/ldmlKeyboard3.dtd">
 <keyboard3 locale="mt" conformsTo="techpreview">
-  <names>
-    <name value="hardware-gap-switch" />
-  </names>
+  <info name="hardware-gap-switch"/>
 
   <keys>
     <key id="Q" gap="true" />
-    <key id="W" switch="shift" />
+    <key id="W" layerId="shift" />
     <key id="q" output="q" />
     <key id="w" output="w" />
   </keys>
