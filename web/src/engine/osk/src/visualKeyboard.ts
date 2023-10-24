@@ -15,11 +15,12 @@ import {
   LayoutKey
 } from '@keymanapp/keyboard-processor';
 
-import { buildCorrectiveLayout, distributionFromDistanceMap, keyTouchDistances } from '@keymanapp/input-processor';
+import { buildCorrectiveLayout, distributionFromDistanceMaps, keyTouchDistances } from '@keymanapp/input-processor';
 
 import {
   GestureRecognizer,
   GestureRecognizerConfiguration,
+  GestureSequence,
   GestureSource,
   InputSample,
   PaddedZoneSource
@@ -385,6 +386,8 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
       key: KeyElement
     }> = {};
 
+    const gestureHandlerMap = new Map<GestureSequence<KeyElement>, GestureHandler>();
+
     // Now to set up event-handling links.
     // This handler should probably vary based on the keyboard: do we allow roaming touches or not?
     recognizer.on('inputstart', (source) => {
@@ -450,6 +453,8 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
 
       // This should probably vary based on the type of gesture.
       gestureSequence.on('stage', (gestureStage, configChanger) => {
+        let handler: GestureHandler = gestureHandlerMap.get(gestureSequence);
+
         // Disable roaming-touch highlighting (and current highlighting) for all
         // touchpoints included in a gesture, even newly-included ones as they occur.
         for(let id of gestureStage.allSourceIds) {
@@ -478,17 +483,26 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
         }
 
         if(gestureKey) {
+          let correctionKeyDistribution: KeyDistribution;
 
           if(gestureStage.matchedId == 'multitap') {
             // TODO:  examine sequence, determine rota-style index to apply; select THAT item instead.
           }
 
           if(gestureStage.matchedId == 'subkey-select') {
+            if(!handler) {
+              throw new Error("Invalid state - reference to subkey menu is missing");
+            }
             // TODO:  examine subkey menu, determine proper set of fat-finger alternates.
+            correctionKeyDistribution = handler.currentStageKeyDistribution();
+          }
+
+          if(!correctionKeyDistribution) {
+            correctionKeyDistribution = this.getSimpleTapCorrectionProbabilities(coord, gestureKey.key.spec as ActiveKey);
           }
 
           // Once the best coord to use for fat-finger calculations has been determined:
-          this.modelKeyClick(gestureStage.item, coord);
+          this.modelKeyClick(gestureStage.item, coord, correctionKeyDistribution);
         }
 
         // Outside of passing keys along... the handling of later stages is delegated
@@ -496,8 +510,6 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
         if(gestureSequence.stageReports.length > 1) {
           return;
         }
-
-        let handler: GestureHandler = null;
 
         // So, if this is the first stage, this is where we need to perform that delegation.
 
@@ -517,11 +529,18 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
         } else if(gestureStage.matchedId.indexOf('longpress') > -1) {
           // Matches:  'longpress', 'longpress-reset'.
           // Likewise.
-          handler = new SubkeyPopup(gestureSequence, configChanger, this, gestureSequence.stageReports[0].sources[0].baseItem);
+          handler = new SubkeyPopup(
+            gestureSequence,
+            configChanger,
+            this,
+            gestureSequence.stageReports[0].sources[0].baseItem,
+            DEFAULT_GESTURE_PARAMS
+          );
         }
 
         if(handler) {
           this.activeGestures.push(handler);
+          gestureHandlerMap.set(gestureSequence, handler);
           gestureSequence.on('complete', () => {
             this.activeGestures = this.activeGestures.filter((gesture) => gesture != handler);
           });
@@ -727,7 +746,7 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
    * @param keySpec The spec of the key directly triggered by the input event.  May be for a subkey.
    * @returns
    */
-  getTouchProbabilities(input: InputSample<KeyElement, string>, keySpec?: ActiveKey): KeyDistribution {
+  getSimpleTapCorrectionProbabilities(input: InputSample<KeyElement, string>, keySpec?: ActiveKey): KeyDistribution {
     // TODO: It'd be nice to optimize by keeping these off when unused, but the wiring
     //       necessary would get in the way of modularization at the moment.
     // let keyman = com.keyman.singleton;
@@ -736,82 +755,20 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
     // }
 
     // Note:  if subkeys are active, they will still be displayed at this time.
-    // TODO:  In such cases, we should build an ActiveLayout (of sorts) for subkey displays,
-    //        update their geometries to the actual display values, and use the results here.
     let touchKbdPos = this.getTouchCoordinatesOnKeyboard(input);
     let layerGroup = this.layerGroup.element;  // Always has proper dimensions, unlike kbdDiv itself.
-    let width = layerGroup.offsetWidth, height = this.kbdDiv.offsetHeight;
+    const width = layerGroup.offsetWidth, height = this.kbdDiv.offsetHeight;
+
     // Prevent NaN breakages.
     if (!width || !height) {
       return null;
     }
 
-    let kbdAspectRatio = layerGroup.offsetWidth / this.kbdDiv.offsetHeight;
+    let kbdAspectRatio = width / height;
+
     const correctiveLayout = buildCorrectiveLayout(this.kbdLayout.getLayer(this.layerId), kbdAspectRatio);
     const rawSqDistances = keyTouchDistances(touchKbdPos, correctiveLayout);
-
-    let baseKeyProbabilities = distributionFromDistanceMap(rawSqDistances);
-
-    if (!keySpec || !this.subkeyGesture || !this.subkeyGesture.baseKey.key) {
-      return baseKeyProbabilities;
-    } else {
-      // A temp-hack, as this was noted just before 14.0's release.
-      // Since a more... comprehensive solution would be way too complex this late in the game,
-      // this provides a half-decent stopgap measure.
-      //
-      // Will not correct to nearby subkeys; only includes the selected subkey and its base keys.
-      // Still, better than ignoring them both for whatever base key is beneath the final cursor location.
-      let baseMass = 1.0;
-
-      let baseKeyMass = 1.0;
-      let baseKeyID = this.subkeyGesture.baseKey.key.spec.coreID;
-
-      let popupKeyMass = 0.0;
-      let popupKeyID: string = null;
-
-      popupKeyMass = 3.0;
-      popupKeyID = keySpec.coreID;
-
-      // If the base key appears in the subkey array and was selected, merge the probability masses.
-      if (popupKeyID == baseKeyID) {
-        baseKeyMass += popupKeyMass;
-        popupKeyMass = 0;
-      } else {
-        // We namespace it so that lookup operations know to find it via its base key.
-        popupKeyID = `${baseKeyID}::${popupKeyID}`;
-      }
-
-      // Compute the normalization factor
-      let totalMass = baseMass + baseKeyMass + popupKeyMass;
-      let scalar = 1.0 / totalMass;
-
-      // Prevent duplicate entries in the final map & normalize the remaining entries!
-      for (let i = 0; i < baseKeyProbabilities.length; i++) {
-        let entry = baseKeyProbabilities[i];
-        if (entry.keyId == baseKeyID) {
-          baseKeyMass += entry.p * scalar;
-          baseKeyProbabilities.splice(i, 1);
-          i--;
-        } else if (entry.keyId == popupKeyID) {
-          popupKeyMass = + entry.p * scalar;
-          baseKeyProbabilities.splice(i, 1);
-          i--;
-        } else {
-          entry.p *= scalar;
-        }
-      }
-
-      let finalArray: { keyId: string, p: number }[] = [];
-
-      if (popupKeyMass > 0) {
-        finalArray.push({ keyId: popupKeyID, p: popupKeyMass * scalar });
-      }
-
-      finalArray.push({ keyId: baseKeyID, p: baseKeyMass * scalar });
-
-      finalArray = finalArray.concat(baseKeyProbabilities);
-      return finalArray;
-    }
+    return distributionFromDistanceMaps(rawSqDistances);
   }
 
   //#region Input handling start
@@ -1068,12 +1025,20 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
   }
   //#endregion
 
-  modelKeyClick(e: KeyElement, input?: InputSample<KeyElement, string>) {
-    let keyEvent = this.initKeyEvent(e, input);
+  modelKeyClick(e: KeyElement, input?: InputSample<KeyElement, string>, keyDistribution?: KeyDistribution) {
+    let keyEvent = this.initKeyEvent(e);
+
+    if (input) {
+      keyEvent.source = input;
+    }
+    if(keyDistribution) {
+      keyEvent.keyDistribution = keyDistribution;
+    }
+
     this.raiseKeyEvent(keyEvent, e);
   }
 
-  initKeyEvent(e: KeyElement, input?: InputSample<KeyElement, string>) {
+  initKeyEvent(e: KeyElement) {
     // Turn off key highlighting (or preview)
     this.highlightKey(e, false);
 
@@ -1088,11 +1053,6 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
       return null;
     }
 
-    // Return the event object.
-    return this.keyEventFromSpec(keySpec, input);
-  }
-
-  keyEventFromSpec(keySpec: ActiveKey, input?: InputSample<KeyElement, string>) {
     //let core = com.keyman.singleton.core; // only singleton-based ref currently needed here.
 
     // Start:  mirrors _GetKeyEventProperties
@@ -1112,11 +1072,6 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
     Lkc.srcKeyboard = this.layoutKeyboard;
 
     // End - mirrors _GetKeyEventProperties
-
-    if (input) {
-      Lkc.source = input;
-      Lkc.keyDistribution = this.getTouchProbabilities(input, keySpec);
-    }
 
     // Return the event object.
     return Lkc;

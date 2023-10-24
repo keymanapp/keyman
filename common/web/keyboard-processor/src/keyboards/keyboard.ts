@@ -1,6 +1,6 @@
 import Codes from "../text/codes.js";
 import { Layouts, type LayoutFormFactor } from "./defaultLayouts.js";
-import { ActiveKey, ActiveLayout } from "./activeLayout.js";
+import { ActiveKey, ActiveKeyBase, ActiveLayout } from "./activeLayout.js";
 import KeyEvent from "../text/keyEvent.js";
 import type OutputTarget from "../text/outputTarget.js";
 
@@ -468,7 +468,7 @@ export default class Keyboard {
     return keyEvent;
   }
 
-  constructKeyEvent(key: ActiveKey, device: DeviceSpec, stateKeys: StateKeyMap): KeyEvent {
+  constructKeyEvent(key: ActiveKeyBase, device: DeviceSpec, stateKeys: StateKeyMap): KeyEvent {
     // Make a deep copy of our preconstructed key event, filling it out from there.
     const Lkc = key.baseKeyEvent;
     Lkc.device = device;
