@@ -115,7 +115,7 @@ keymancore = declare_dependency(link_with: lib, include_directories: inc, depend
 
 pkg = import('pkgconfig')
 pkg.generate(
-    name: 'keyman_kmn_processor',
+    name: 'keyman_core',
     version: meson.project_version(),
     description: 'Keyman processor for KMN keyboards.',
     subdirs: headerdirs,
