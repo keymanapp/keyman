@@ -1,8 +1,33 @@
 name: "Ubuntu packaging"
-run-name: "Ubuntu packaging - ${{ github.event.client_payload.branch }} (branch ${{ github.head_ref }}), by @${{ github.actor }}"
+run-name: "Ubuntu packaging - ${{ github.event.inputs.branch }} (branch ${{ github.head_ref }}), by @${{ github.actor }}"
 on:
-  repository_dispatch:
-    types: ['deb-release-packaging:*', 'deb-pr-packaging:*']
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: 'For a PR `refs/pull/<PR-NUMBER>/merge`'
+        required: true
+      headRef:
+        description: 'The ref of HEAD. For a PR `refs/pull/<PR-NUMBER>/head`.'
+        required: true
+      branch:
+        description: 'The branch. For a PR `PR-<PR-NUMBER>`.'
+        required: true
+        default: 'master'
+      baseBranch:
+        description: 'For a PR the base branch, otherwise the same as `branch`.'
+        required: true
+        default: 'master'
+      baseRef:
+        description: 'The ref of the previous commit. For a PR the same as `baseBranch`.'
+        required: true
+      user:
+        description: 'The user that triggered the build or created the PR'
+        required: true
+      isTestBuild:
+        description: 'True if this is a test build. False if this is a release build.'
+        required: false
+        default: 'true'
+
 env:
   COLOR_GREEN: "\e[32m"
   GH_TOKEN: ${{ github.token }}
@@ -17,26 +42,21 @@ jobs:
     outputs:
       VERSION: ${{ steps.version_step.outputs.VERSION }}
       PRERELEASE_TAG: ${{ steps.prerelease_tag.outputs.PRERELEASE_TAG }}
-      GIT_SHA: ${{ steps.set_status.outputs.GIT_SHA }}
-      GHA_TEST_BUILD: ${{ github.event.client_payload.isTestBuild }}
-      GHA_BRANCH: ${{ github.event.client_payload.branch }}
     steps:
     - name: Checkout
       uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c #v3.3.0
       with:
-        ref: '${{ github.event.client_payload.ref }}'
+        ref: '${{ github.event.inputs.ref }}'
 
     - name: Set pending status on PR builds
       id: set_status
-      if: github.event.client_payload.isTestBuild == 'true'
+      if: github.event.inputs.isTestBuild == 'true'
       shell: bash
       run: |
-        GIT_SHA="${{ github.event.client_payload.sha }}"
-        echo "GIT_SHA=$GIT_SHA" >> $GITHUB_OUTPUT
         gh api \
           --method POST \
           -H "Accept: application/vnd.github+json" \
-          /repos/$GITHUB_REPOSITORY/statuses/$GIT_SHA \
+          /repos/$GITHUB_REPOSITORY/statuses/${{ github.sha }} \
           -f state='pending' \
           -f target_url="$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID" \
           -f description='Debian packaging started' \
@@ -72,8 +92,8 @@ jobs:
       id: prerelease_tag
       shell: bash
       run: |
-        if [ "${{ github.event.client_payload.isTestBuild }}" == "true" ]; then
-          PRERELEASE_TAG="~${{ github.event.client_payload.branch }}-$GITHUB_RUN_NUMBER.$GITHUB_RUN_ATTEMPT"
+        if [ "${{ github.event.inputs.isTestBuild }}" == "true" ]; then
+          PRERELEASE_TAG="~${{ github.event.inputs.branch }}-$GITHUB_RUN_NUMBER.$GITHUB_RUN_ATTEMPT"
         else
           PRERELEASE_TAG=""
         fi
@@ -81,10 +101,10 @@ jobs:
 
     - name: Output which branch or PR we're building plus name of .dsc file
       run: |
-        if [ "${{ github.event.client_payload.isTestBuild }}" == "true" ]; then
-          echo ":checkered_flag: **Test build of version ${{ steps.version_step.outputs.VERSION }} for ${{ github.event.client_payload.branch }}**" >> $GITHUB_STEP_SUMMARY
+        if [ "${{ github.event.inputs.isTestBuild }}" == "true" ]; then
+          echo ":checkered_flag: **Test build of version ${{ steps.version_step.outputs.VERSION }} for ${{ github.event.inputs.branch }}**" >> $GITHUB_STEP_SUMMARY
         else
-          echo ":ship: **Release build of ${{ github.event.client_payload.branch }} branch (${{ github.event.client_payload.ref}}), version ${{ steps.version_step.outputs.VERSION }}**" >> $GITHUB_STEP_SUMMARY
+          echo ":ship: **Release build of ${{ github.event.inputs.branch }} branch (${{ github.event.inputs.ref}}), version ${{ steps.version_step.outputs.VERSION }}**" >> $GITHUB_STEP_SUMMARY
         fi
         echo "" >> $GITHUB_STEP_SUMMARY
         echo ":gift: Generated source package:" >> $GITHUB_STEP_SUMMARY
@@ -146,7 +166,7 @@ jobs:
     needs: [sourcepackage, binary_packages]
     runs-on: ubuntu-latest
     environment: "deploy (linux)"
-    if: github.event.client_payload.isTestBuild == 'false'
+    if: github.event.inputs.isTestBuild == 'false'
 
     steps:
       - name: Sign packages
@@ -165,7 +185,7 @@ jobs:
     needs: [sourcepackage, deb_signing]
     runs-on: self-hosted
     environment: "deploy (linux)"
-    if: github.event.client_payload.isTestBuild == 'false'
+    if: github.event.inputs.isTestBuild == 'false'
 
     steps:
     - name: Install dput
@@ -195,7 +215,7 @@ jobs:
 
     - name: Upload
       run: |
-        case ${{ github.event.client_payload.branch }} in
+        case ${{ github.event.inputs.branch }} in
           stable-*)  destination='' ;;
           beta)      destination='-proposed' ;;
           *)         destination='-experimental' ;;
@@ -227,7 +247,7 @@ jobs:
     - name: Checkout
       uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c #v3.3.0
       with:
-        ref: '${{ github.event.client_payload.ref }}'
+        ref: '${{ github.event.inputs.ref }}'
 
     - name: Download Artifacts
       uses: actions/download-artifact@9bc31d5ccc31df68ecc42ccf4149144866c47d8a # v3.0.2
@@ -259,7 +279,7 @@ jobs:
     name: Set result status on PR builds
     needs: [sourcepackage, binary_packages, api_verification]
     runs-on: ubuntu-latest
-    if: ${{ always() && github.event.client_payload.isTestBuild == 'true' }}
+    if: ${{ always() && github.event.inputs.isTestBuild == 'true' }}
     steps:
     - name: Set success
       if: needs.sourcepackage.result == 'success' && needs.binary_packages.result == 'success' && needs.api_verification.result == 'success'
@@ -284,7 +304,7 @@ jobs:
         gh api \
           --method POST \
           -H "Accept: application/vnd.github+json" \
-          /repos/$GITHUB_REPOSITORY/statuses/${{ needs.sourcepackage.outputs.GIT_SHA }} \
+          /repos/$GITHUB_REPOSITORY/statuses/${{ github.sha }} \
           -f state="$RESULT" \
           -f target_url="$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID" \
           -f description="$MSG" \
