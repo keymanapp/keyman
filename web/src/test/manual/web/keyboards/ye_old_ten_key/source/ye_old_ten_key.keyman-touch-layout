@@ -366,7 +366,8 @@
                 "id": "K_SHIFT",
                 "text": "*Shift*",
                 "width": 100,
-                "sp": 1
+                "sp": 1,
+                "nextlayer": "shift"
               },
               {
                 "id": "K_0",
@@ -398,7 +399,6 @@
                 "text": "8",
                 "hint": "ABC",
                 "multitap": [
-                    
                   {
                     "text": "A",
                     "id": "K_A"
@@ -495,7 +495,8 @@
                   {
                     "text": "I",
                     "id": "K_I"
-                  }, {
+                  },
+                  {
                     "text": "g",
                     "id": "K_G",
                     "nextlayer": "default",
@@ -746,7 +747,8 @@
                 "id": "K_SHIFT",
                 "text": "*Shifted*",
                 "width": 100,
-                "sp": 1
+                "sp": 1,
+                "nextlayer": "default"
               },
               {
                 "id": "K_0",
