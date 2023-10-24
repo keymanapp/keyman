@@ -11,7 +11,7 @@ menuDropdown.onclick = (value) => {
   menuDropdown.set(''); // we never show an 'active' package
   if(value == '#install-keyman') {
     let href = '';
-    switch(keyman.config.hostDevice.OS) {
+    switch(keyman.config.hostDevice.OS) {   // note: KeymanWeb internal API
       case 'ios':     href = 'https://keyman.com/go/developer/'+versionMajor+'/ios-app'; break;
       case 'android': href = 'https://keyman.com/go/developer/'+versionMajor+'/android-app'; break;
       case 'linux':   href = 'https://keyman.com/linux/download'; break;
