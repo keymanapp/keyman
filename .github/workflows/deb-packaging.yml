@@ -219,7 +219,7 @@ jobs:
         echo "::endgroup::"
 
   api_verification:
-    name: Verify API for libkmnkbp0.so
+    name: Verify API for libkeymancore.so
     needs: [sourcepackage, binary_packages]
     runs-on: ubuntu-latest
 
