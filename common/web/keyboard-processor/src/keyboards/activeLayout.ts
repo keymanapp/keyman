@@ -59,7 +59,7 @@ const KeyTypesOfKeyMap = {
 
 const KeyTypesOfFlickList = ['n', 's', 'e', 'w', 'ne', 'nw', 'se', 'sw'] as const;
 
-class ActiveKeyBase {
+export class ActiveKeyBase {
   static readonly DEFAULT_PAD=15;          // Padding to left of key, in virtual units
   static readonly DEFAULT_RIGHT_MARGIN=15; // Padding to right of right-most key, in virtual units
   static readonly DEFAULT_KEY_WIDTH=100;   // Width of a key, if not specified, in virtual units
@@ -73,7 +73,7 @@ class ActiveKeyBase {
   };
 
   /** WARNING - DO NOT USE DIRECTLY outside of @keymanapp/keyboard-processor! */
-  id: `T_${string}` | `K_${string}` | `U_${string}` | `t_${string}` | `k_${string}` | `u_${string}`;
+  id: TouchLayout.TouchLayoutKeyId;
   text: string;
 
   // These are fine.
@@ -658,128 +658,6 @@ export class ActiveLayer implements LayoutLayer {
     });
 
     return map;
-  }
-
-  /**
-   * Builds a sorted-order array of most likely keys to be intended for a given touch.
-   * @param touchCoords A proportional (x, y) coordinate of the touch within the keyboard's geometry.
-   *                           Should be within [0, 0] to [1, 1].
-   * @param kbdScaleRatio The ratio of the keyboard's horizontal scale to its vertical scale.
-   *                           For a 400 x 200 keyboard, should be 2.
-   */
-  getTouchProbabilities(touchCoords: {x: number, y: number}, kbdScaleRatio: number): KeyDistribution {
-    let distribution = this.simpleTouchDistribution(touchCoords, kbdScaleRatio);
-    let list: {keyId: string, p: number}[] = [];
-
-    for(let key in distribution) {
-      list.push({keyId: key, p: distribution[key]});
-    }
-
-    return list.sort(function(a, b) {
-      return b.p - a.p; // Largest probability keys should be listed first.
-    })
-  }
-
-  /**
-   * Computes a probability distribution regarding the likelihood of a touch command being intended
-   * for each of the layout's keys.
-   * @param touchCoords A proportional (x, y) coordinate of the touch within the keyboard's geometry.
-   *                           Should be within [0, 0] to [1, 1].
-   * @param kbdScaleRatio The ratio of the keyboard's horizontal scale to its vertical scale.
-   *                           For a 400 x 200 keyboard, should be 2.
-   */
-  simpleTouchDistribution(touchCoords: {x: number, y: number}, kbdScaleRatio: number): {[keyId: string]: number} {
-    let keyDists = this.keyTouchDistances(touchCoords, kbdScaleRatio);
-    let keyProbs: {[keyId: string]: number} = {};
-
-    let totalMass = 0;
-
-    // Should we wish to allow multiple different transforms for distance -> probability, use a function parameter in place
-    // of the formula in the loop below.
-    for(let key in keyDists) {
-      totalMass += keyProbs[key] = 1 / (Math.pow(keyDists[key], 2) + 1e-6); // Prevent div-by-0 errors.
-    }
-
-    for(let key in keyProbs) {
-      keyProbs[key] /= totalMass;
-    }
-
-    return keyProbs;
-  }
-
-  /**
-   * Computes a squared 'pseudo-distance' for the touch from each key.  (Not a proper metric.)
-   * Intended for use in generating a probability distribution over the keys based on the touch input.
-   * @param touchCoords A proportional (x, y) coordinate of the touch within the keyboard's geometry.
-   *                           Should be within [0, 0] to [1, 1].
-   * @param kbdScaleRatio The ratio of the keyboard's horizontal scale to its vertical scale.
-   *                           For a 400 x 200 keyboard, should be 2.
-   */
-  private keyTouchDistances(touchCoords: {x: number, y: number}, kbdScaleRatio: number): {[keyId: string]: number} {
-    let layer = this;
-
-    let keyDists: {[keyId: string]: number} = {};
-
-    // This double-nested loop computes a pseudo-distance for the touch from each key.  Quite useful for
-    // generating a probability distribution.
-    this.row.forEach(function(row: ActiveRow): void {
-      row.key.forEach(function(key: ActiveKey): void {
-        // If the key lacks an ID, just skip it.  Sometimes used for padding.
-        if(!key.baseKeyID) {
-          return;
-        } else {
-          // Attempt to filter out known non-output keys.
-          // Results in a more optimized distribution.
-          if(Codes.isKnownOSKModifierKey(key.baseKeyID)) {
-            return;
-          } else if(key.isPadding) { // to the user, blank / padding keys do not exist.
-            return;
-          }
-        }
-        // These represent the within-key distance of the touch from the key's center.
-        // Both should be on the interval [0, 0.5].
-        let dx = Math.abs(touchCoords.x - key.proportionalX);
-        let dy = Math.abs(touchCoords.y - row.proportionalY);
-
-        // If the touch isn't within the key, these store the out-of-key distance
-        // from the closest point on the key being checked.
-        let distX: number, distY: number;
-
-        if(dx > 0.5 * key.proportionalWidth) {
-          distX = (dx - 0.5 * key.proportionalWidth);
-          dx = 0.5;
-        } else {
-          distX = 0;
-          dx /= key.proportionalWidth;
-        }
-
-        if(dy > 0.5 * layer.rowProportionalHeight) {
-          distY = (dy - 0.5 * layer.rowProportionalHeight);
-          dy = 0.5;
-        } else {
-          distY = 0;
-          dy /= layer.rowProportionalHeight;
-        }
-
-        // Now that the differentials are computed, it's time to do distance scaling.
-        //
-        // For out-of-key distance, we scale the X component by the keyboard's aspect ratio
-        // to get the actual out-of-key distance rather than proportional.
-        distX *= kbdScaleRatio;
-
-        // While the keys are rarely perfect squares, we map all within-key distance
-        // to a square shape.  (ALT/CMD should seem as close to SPACE as a 'B'.)
-        //
-        // For that square, we take the rowHeight as its edge lengths.
-        distX += dx * layer.rowProportionalHeight;
-        distY += dy * layer.rowProportionalHeight;
-
-        let distance = distX * distX + distY * distY;
-        keyDists[key.coreID] = distance;
-      });
-    });
-
-    return keyDists;
   }
 
   getKey(keyId: string) {
