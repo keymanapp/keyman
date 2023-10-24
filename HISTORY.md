@@ -1,5 +1,13 @@
 # Keyman Version History
 
+## 17.0.197 alpha 2023-10-24
+
+* chore(linux): Rename (lib)kmnkbp to (lib)keymancore  ️ (#9793)
+* chore(linux): Rename `namespace kbp` to `core`  ️ (#9792)
+* chore(linux): rename keyboardprocessor_ldml.* to keyman_core_ldml  ️ (#9791)
+* chore(linux): Rename libkmnkbp0-0 package  ️ (#9795)
+* fix(web): proper disabling of prediction timeout for prediction unit tests (#9835)
+
 ## 17.0.196 alpha 2023-10-20
 
 * fix(mac): move keyboard menu items to main Input Menu from submenu (#9777)
