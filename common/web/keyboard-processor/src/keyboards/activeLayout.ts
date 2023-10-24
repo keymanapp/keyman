@@ -369,16 +369,15 @@ export class ActiveKeyBase {
 
     // Is more compact than writing 8 separate cases.
     if(defaultHint?.includes('flick-')) {
-      // 6 = length of 'flick-'
-      if(!spec.flick) {
-        return;
+      if(spec.flick) {
+        // 6 = length of 'flick-'
+        const dir = defaultHint.substring(6);
+
+        if(spec.flick[dir]?.text) {
+          spec.hintSrc = spec.flick[dir];
+        }
       }
 
-      const dir = defaultHint.substring(6);
-
-      if(spec.flick[dir]?.text) {
-        spec.hintSrc = spec.flick[dir];
-      }
       return;
     }
 
@@ -386,26 +385,24 @@ export class ActiveKeyBase {
       case 'none':
         return;
       case 'multitap':
-        if(!spec.multitap) {
-          return;
+        if(spec.multitap) {
+          spec.hintSrc = spec.multitap[0];
         }
-        spec.hintSrc = spec.multitap[0];
+        return;
       case 'flick':
-        if(!spec.flick) {
-          return;
-        }
-        for(const key of KeyTypesOfFlickList) {
-          if(spec.flick[key]) {
-            spec.hintSrc = spec.flick[key];
-            return;
+        if(spec.flick) {
+          for(const key of KeyTypesOfFlickList) {
+            if(spec.flick[key]) {
+              spec.hintSrc = spec.flick[key];
+              return;
+            }
           }
         }
         return;
       case 'longpress':
-        if(!spec.sk) {
-          return;
+        if(spec.sk) {
+          spec.hintSrc = spec.sk[0];
         }
-        spec.hintSrc = spec.sk[0];
         return;
       case 'dot':
       default:
