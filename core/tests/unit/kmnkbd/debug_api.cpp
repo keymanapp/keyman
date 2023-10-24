@@ -402,8 +402,11 @@ void test_save_option() {
     km_core_state_debug_item{KM_CORE_DEBUG_END, 0, {}, {u"", nullptr, nullptr, {}, 1}},
   }));
 
+  km_core_action_item action = {KM_CORE_IT_PERSIST_OPT, {0,}, };
+  action.option = &opt;
+
   assert(action_items(test_state, {
-    {KM_CORE_IT_PERSIST_OPT, {0,}, {uintptr_t(&opt)}},
+    action,
     {KM_CORE_IT_END}
   }));
 }

@@ -533,10 +533,10 @@ typedef struct {
   uint8_t   type;
   uint8_t   _reserved[sizeof(void*)-sizeof(uint8_t)];
   union {
-    uintptr_t             marker;          // MARKER type
+    uint32_t               marker;          // MARKER type
     km_core_option_item    const * option;  // OPT types
     km_core_usv            character;       // CHAR type
-    uint8_t               capsLock;        // CAPSLOCK type, 1 to turn on, 0 to turn off
+    uint8_t                capsLock;        // CAPSLOCK type, 1 to turn on, 0 to turn off; re name see #9833
     km_core_backspace_item backspace;       // BACKSPACE type
   };
 } km_core_action_item;

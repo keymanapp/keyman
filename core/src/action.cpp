@@ -80,7 +80,7 @@ km_core_actions * km::kbp::action_items_to_actions(
         actions->new_caps_lock_state = action_items->capsLock;
         break;
       case KM_CORE_IT_CHAR:
-        output.push_back({KM_CORE_CT_CHAR,{0},action_items->character});
+        output.push_back({KM_CORE_CT_CHAR,{0},{action_items->character}});
         break;
       case KM_CORE_IT_EMIT_KEYSTROKE:
         actions->emit_keystroke = true;
@@ -89,12 +89,7 @@ km_core_actions * km::kbp::action_items_to_actions(
         // no-op
         break;
       case KM_CORE_IT_MARKER:
-        {
-         km_core_context_item ci = {0};
-          ci.type = KM_CORE_CT_MARKER;
-          ci.marker = action_items->marker;
-          output.push_back(ci);
-        }
+        output.push_back({KM_CORE_CT_MARKER,{0},{action_items->marker}});
         break;
       case KM_CORE_IT_PERSIST_OPT:
         // TODO: lowpri: replace existing item if already present in options vector?
@@ -109,7 +104,7 @@ km_core_actions * km::kbp::action_items_to_actions(
     }
   }
 
-  output.push_back({KM_CORE_CT_END});
+  output.push_back(KM_CORE_CONTEXT_ITEM_END);
 
   // Strip the markers from the output to be passed to the app
 

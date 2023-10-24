@@ -192,7 +192,7 @@ type
     _reserved: array[0..2] of uint8_t;
 {$ENDIF}
   case Integer of
-    0: (marker: uintptr_t);
+    0: (marker: uint32_t);
     1: (option: pkm_core_option_item);
     2: (character: km_core_usv);
     3: (backspace: km_core_backspace_item);

@@ -14,8 +14,9 @@
 
 #include "path.hpp"
 #include "action.hpp"
-#include "utfcodec.hpp"
+
 #include <test_assert.h>
+#include "../emscripten_filesystem.h"
 
 const km_core_action_item alert_action_item();
 const km_core_action_item bksp_action_item(uint8_t type, uintptr_t value);
@@ -25,7 +26,7 @@ const km_core_action_item emit_keystroke_action_item();
 const km_core_action_item persist_opt_action_item(km_core_option_item const *option);
 const km_core_action_item end_action_item();
 const km_core_action_item invalidate_context_action_item();
-const km_core_action_item marker_action_item(uintptr_t marker);
+const km_core_action_item marker_action_item(uint32_t marker);
 
 //-------------------------------------------------------------------------------------
 
@@ -424,7 +425,7 @@ const km_core_action_item invalidate_context_action_item() {
   return res;
 }
 
-const km_core_action_item marker_action_item(uintptr_t marker) {
+const km_core_action_item marker_action_item(uint32_t marker) {
   km_core_action_item res = {0};
   res.type = KM_CORE_IT_MARKER;
   res.character = marker;

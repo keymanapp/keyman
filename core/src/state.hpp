@@ -37,7 +37,7 @@ public:
   actions(Args&&... args);
 
   void push_character(km_core_usv usv);
-  void push_marker(uintptr_t marker);
+  void push_marker(uint32_t marker);
   void push_alert();
   void push_backspace(km_core_backspace_type expected_type, uintptr_t expected_value = 0);
   void push_persist(option const &);
@@ -68,7 +68,7 @@ void actions::push_character(km_core_usv usv) {
 
 
 inline
-void actions::push_marker(uintptr_t marker) {
+void actions::push_marker(uint32_t marker) {
   assert(empty() || (!empty() && back().type != KM_CORE_IT_END));
   emplace_back(km_core_action_item {KM_CORE_IT_MARKER, {0,}, {marker}});
 }
