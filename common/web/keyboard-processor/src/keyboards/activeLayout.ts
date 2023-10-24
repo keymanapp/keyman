@@ -378,8 +378,8 @@ export class ActiveKeyBase {
 
       if(spec.flick[dir]?.text) {
         spec.hintSrc = spec.flick[dir];
-        return;
       }
+      return;
     }
 
     switch(defaultHint) {
