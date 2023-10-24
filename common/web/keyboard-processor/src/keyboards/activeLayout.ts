@@ -77,6 +77,7 @@ export class ActiveKeyBase {
   id: TouchLayout.TouchLayoutKeyId;
   text: string;
   hint?: string;
+  hintSrc?: TouchLayout.TouchLayoutSubKey | TouchLayout.TouchLayoutKey;
 
   font?: string;
   fontsize?: string;
@@ -353,60 +354,66 @@ export class ActiveKeyBase {
     aKey.displayLayer = displayLayer;
     aKey.layer = aKey.layer || displayLayer;
 
-    aKey.hint = ActiveKeyBase.determineHint(aKey, layout.defaultHint);
+    ActiveKeyBase.determineHint(aKey, layout.defaultHint);
 
     // Compute the key's base KeyEvent properties for use in future event generation
     aKey.constructBaseKeyEvent(keyboard, layout, displayLayer);
   }
 
-  private static determineHint(spec: ActiveKey, defaultHint: TouchLayout.TouchLayoutDefaultHint): string {
+  private static determineHint(spec: ActiveKey, defaultHint: TouchLayout.TouchLayoutDefaultHint): void {
     // If a hint was directly specified, don't override it.
     if(spec.hint) {
-      return spec.hint;
+      spec.hintSrc = spec;
+      return;
     }
 
     // Is more compact than writing 8 separate cases.
     if(defaultHint?.includes('flick-')) {
       // 6 = length of 'flick-'
       if(!spec.flick) {
-        return '';
+        return;
       }
 
       const dir = defaultHint.substring(6);
 
-      return spec.flick[dir]?.text ?? '';
+      if(spec.flick[dir]?.text) {
+        spec.hintSrc = spec.flick[dir];
+        return;
+      }
     }
 
     switch(defaultHint) {
       case 'none':
-        return '';
+        return;
       case 'multitap':
         if(!spec.multitap) {
-          return '';
+          return;
         }
-        return spec.multitap[0].text;
+        spec.hintSrc = spec.multitap[0];
       case 'flick':
         if(!spec.flick) {
-          return '';
+          return;
         }
         for(const key of KeyTypesOfFlickList) {
           if(spec.flick[key]) {
-            return spec.flick[key].text;
+            spec.hintSrc = spec.flick[key];
+            return;
           }
         }
-        return '';
+        return;
       case 'longpress':
         if(!spec.sk) {
-          return '';
+          return;
         }
-        return spec.sk[0].text;
+        spec.hintSrc = spec.sk[0];
+        return;
       case 'dot':
       default:
         if(spec.sk) {
-          return '\u2022';
-        } else {
-          return '';
+          spec.hint = '\u2022';
+          spec.hintSrc = spec;
         }
+        return;
     }
   }
 

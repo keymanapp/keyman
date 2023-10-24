@@ -115,17 +115,7 @@ export default class OSKBaseKey extends OSKKey {
     }
 
     // If a subkey array is defined, add an icon
-    var skIcon = document.createElement('div');
-
-    // Ensure that we use the keyboard's text font for hints.
-    skIcon.className='kmw-key-popup-icon kmw-key-text';
-    if(this.spec.hint == '\u2022') {
-      // The original, pre-17.0 longpress dot-hint used bold-face styling.
-      skIcon.style.fontWeight='bold';
-    }
-    skIcon.textContent = this.spec.hint;
-
-    //kDiv.appendChild(skIcon);
+    const skIcon = this.generateHint();
     btn.appendChild(skIcon);
 
     // Add text to button and button to placeholder div
@@ -133,6 +123,34 @@ export default class OSKBaseKey extends OSKKey {
 
     // The 'return value' of this process.
     return this.square = kDiv;
+  }
+
+  public generateHint(): HTMLDivElement {
+    // If a hint is defined, add an icon
+    const skIcon = document.createElement('div');
+    // Ensure that we use the keyboard's text font for hints.
+    skIcon.className='kmw-key-popup-icon';
+
+    const hintSpec = this.spec.hintSrc;
+    if(!hintSpec) {
+      return skIcon;
+    }
+
+    if(hintSpec.text == '\u2022') {
+      // The original, pre-17.0 longpress dot-hint used bold-face styling.
+      skIcon.style.fontWeight='bold';
+    }
+
+    if(hintSpec.font) {
+      skIcon.style.fontFamily = hintSpec.font;
+    } else {
+      skIcon.classList.add('kmw-key-text');
+    }
+    // If the base key itself is the source of the hint text, we use `hint` directly.
+    // Otherwise, we present the source subkey's key cap as the hint.
+    skIcon.textContent = hintSpec == this.spec ? this.spec.hint : hintSpec.text;
+
+    return skIcon;
   }
 
   public refreshLayout(vkbd: VisualKeyboard) {
