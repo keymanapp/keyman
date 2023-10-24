@@ -581,11 +581,11 @@ typedef struct {
   // list of options to persist, terminated with KM_CORE_OPTIONS_END
   km_core_option_item* persist_options;
 
-  // issue a beep
-  bool do_alert;
+  // issue a beep, 0 = no, 1 = yes
+  int do_alert;
 
-  // emit the input keystroke to the application, unmodified?
-  bool emit_keystroke;
+  // emit the input keystroke to the application, unmodified? 0 = no, 1 = yes
+  int emit_keystroke;
 
   // -1=unchanged, 0=off, 1=on
   int new_caps_lock_state;
