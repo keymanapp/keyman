@@ -40,7 +40,7 @@ void test_two_backspaces() {
 
   km_core_actions *actions = km::kbp::action_item_list_to_actions_object(action_items);
 
-  assert(actions->delete_back_codepoints == 1);
+  assert(actions->code_points_to_delete == 1);
   assert(std::u32string(actions->output) == U"");
   assert(actions->persist_options == nullptr);
   assert(actions->do_alert == false);
@@ -67,7 +67,7 @@ void test_marker_text_interleaved() {
 
   km_core_actions *actions = km::kbp::action_item_list_to_actions_object(action_items);
 
-  assert(actions->delete_back_codepoints == 0);
+  assert(actions->code_points_to_delete == 0);
   assert(std::u32string(actions->output) == U"ABD");
   assert(actions->persist_options == nullptr);
   assert(actions->do_alert == false);
@@ -87,7 +87,7 @@ void test_alert() {
 
   km_core_actions *actions = km::kbp::action_item_list_to_actions_object(action_items);
 
-  assert(actions->delete_back_codepoints == 0);
+  assert(actions->code_points_to_delete == 0);
   assert(std::u32string(actions->output) == U"");
   assert(actions->persist_options == nullptr);
   assert(actions->do_alert == KM_CORE_TRUE);
@@ -107,7 +107,7 @@ void test_emit_keystroke() {
 
   km_core_actions *actions = km::kbp::action_item_list_to_actions_object(action_items);
 
-  assert(actions->delete_back_codepoints == 0);
+  assert(actions->code_points_to_delete == 0);
   assert(std::u32string(actions->output) == U"");
   assert(actions->persist_options == nullptr);
   assert(actions->do_alert == KM_CORE_FALSE);
@@ -128,7 +128,7 @@ void test_invalidate_context() {
 
   km_core_actions *actions = km::kbp::action_item_list_to_actions_object(action_items);
 
-  assert(actions->delete_back_codepoints == 0);
+  assert(actions->code_points_to_delete == 0);
   assert(std::u32string(actions->output) == U"");
   assert(actions->persist_options == nullptr);
   assert(actions->do_alert == KM_CORE_FALSE);
@@ -154,7 +154,7 @@ void test_persist_opt() {
 
   km_core_actions *actions = km::kbp::action_item_list_to_actions_object(action_items);
 
-  assert(actions->delete_back_codepoints == 0);
+  assert(actions->code_points_to_delete == 0);
   assert(std::u32string(actions->output) == U"");
   assert(actions->persist_options != nullptr);
   assert(std::u16string(actions->persist_options[0].key) == u"key");

@@ -576,7 +576,7 @@ typedef enum { KM_CORE_CAPS_UNCHANGED = -1, KM_CORE_CAPS_OFF = 0, KM_CORE_CAPS_O
 
 typedef struct {
   // number of codepoints (not codeunits!) to delete from app context.
-  unsigned int delete_back_codepoints;
+  unsigned int code_points_to_delete;
 
   // null-term string of characters to insert into document
   km_core_usv* output;
@@ -599,7 +599,7 @@ typedef struct {
 ### `km_core_state_get_actions`
 ##### Description:
 Returns a pointer to an actions object which details all the actions
-that the Platform layer must take after a keystroke. The `delete_back_codepoints`
+that the Platform layer must take after a keystroke. The `code_points_to_delete`
 action must be performed before the `output` action, but the other
 actions may be performed in any order.
 ##### Return:

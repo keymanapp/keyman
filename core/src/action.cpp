@@ -31,7 +31,7 @@ km_core_actions * km::kbp::action_item_list_to_actions_object(
   // Set actions defaults
   std::vector<km_core_context_item> output;
   std::vector<km_core_option_item> options;
-  actions->delete_back_codepoints = 0;
+  actions->code_points_to_delete = 0;
   actions->output = nullptr;
   actions->persist_options = nullptr;
   actions->do_alert = KM_CORE_FALSE;
@@ -54,7 +54,7 @@ km_core_actions * km::kbp::action_item_list_to_actions_object(
             break;
           case KM_CORE_BT_CHAR:
             if(output.empty()) {
-              actions->delete_back_codepoints++;
+              actions->code_points_to_delete++;
             } else {
               auto last_context_item = output.back();
               output.pop_back();
