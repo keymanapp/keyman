@@ -22,6 +22,7 @@ import {
   SystemStoreIDs,
   type TextTransform
 } from "@keymanapp/keyboard-processor";
+import { TranscriptionCache } from "../transcriptionCache.js";
 
 export default class InputProcessor {
   public static readonly DEFAULT_OPTIONS: ProcessorInitOptions = {
@@ -37,6 +38,8 @@ export default class InputProcessor {
   private kbdProcessor: KeyboardProcessor;
   private lngProcessor: LanguageProcessor;
 
+  private readonly contextCache = new TranscriptionCache();
+
   constructor(device: DeviceSpec, predictiveTextWorker: Worker, options?: ProcessorInitOptions) {
     if(!device) {
       throw new Error('device must be defined');
@@ -48,7 +51,7 @@ export default class InputProcessor {
 
     this.contextDevice = device;
     this.kbdProcessor = new KeyboardProcessor(device, options);
-    this.lngProcessor = new LanguageProcessor(predictiveTextWorker);
+    this.lngProcessor = new LanguageProcessor(predictiveTextWorker, this.contextCache);
   }
 
   public get languageProcessor(): LanguageProcessor {
@@ -214,6 +217,10 @@ export default class InputProcessor {
       ruleBehavior.transcription = outputTarget.buildTranscriptionFrom(outputTarget, null, false);
       ruleBehavior.triggersDefaultCommand = true;
     }
+
+    // Multitaps operate in part by referencing 'committed' Transcriptions to rewind
+    // the context as necessary.
+    this.contextCache.save(ruleBehavior.transcription);
 
     // The keyboard may want to take an action after all other keystroke processing is
     // finished, for example to switch layers. This action may not have any output
