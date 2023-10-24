@@ -19,7 +19,7 @@
 // Forward declarations
 
 namespace km {
-namespace kbp
+namespace core
 {
   class path
   {
@@ -157,5 +157,5 @@ namespace kbp
     return os;
   }
 
-} // namespace kbp
+} // namespace core
 } // namespace km

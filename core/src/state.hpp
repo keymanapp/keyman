@@ -18,7 +18,7 @@
 #include "debug.hpp"
 
 namespace km {
-namespace kbp
+namespace core
 {
 //Forward declarations
 class abstract_processor;
@@ -122,30 +122,30 @@ void actions::clear() {
 class state
 {
 protected:
-    kbp::context              _ctxt;
-    kbp::abstract_processor & _processor;
-    kbp::actions              _actions;
-    kbp::debug_items          _debug_items;
+    core::context              _ctxt;
+    core::abstract_processor & _processor;
+    core::actions              _actions;
+    core::debug_items          _debug_items;
     km_core_keyboard_imx_platform _imx_callback;
     void *_imx_object;
 
 public:
-    state(kbp::abstract_processor & kb, km_core_option_item const *env);
+    state(core::abstract_processor & kb, km_core_option_item const *env);
 
     state(state const &) = default;
     state(state const &&) = delete;
 
-    kbp::context       &  context() noexcept            { return _ctxt; }
-    kbp::context const &  context() const noexcept      { return _ctxt; }
+    core::context       &  context() noexcept            { return _ctxt; }
+    core::context const &  context() const noexcept      { return _ctxt; }
 
-    kbp::abstract_processor const & processor() const noexcept { return _processor; }
-    kbp::abstract_processor &       processor() noexcept { return _processor; }
+    core::abstract_processor const & processor() const noexcept { return _processor; }
+    core::abstract_processor &       processor() noexcept { return _processor; }
 
-    kbp::actions        & actions() noexcept        { return _actions; }
-    kbp::actions const  & actions() const noexcept  { return _actions; }
+    core::actions        & actions() noexcept        { return _actions; }
+    core::actions const  & actions() const noexcept  { return _actions; }
 
-    kbp::debug_items        & debug_items() noexcept        { return _debug_items; }
-    kbp::debug_items const  & debug_items() const noexcept  { return _debug_items; }
+    core::debug_items        & debug_items() noexcept        { return _debug_items; }
+    core::debug_items const  & debug_items() const noexcept  { return _debug_items; }
 
     void imx_register_callback(km_core_keyboard_imx_platform imx_callback, void *callback_object);
 
@@ -154,12 +154,12 @@ public:
     void imx_callback(uint32_t imx_id);
 };
 
-} // namespace kbp
+} // namespace core
 } // namespace km
 
-struct km_core_state : public km::kbp::state
+struct km_core_state : public km::core::state
 {
   template<typename... Args>
-  km_core_state(Args&&... args) : km::kbp::state(std::forward<Args>(args)...)
+  km_core_state(Args&&... args) : km::core::state(std::forward<Args>(args)...)
   {}
 };

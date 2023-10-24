@@ -28,7 +28,7 @@ typedef KMX_WORD  __attribute__((aligned(1))) KMX_WORD_unaligned;
 #ifdef KM_CORE_LIBRARY
 // TODO: move this to a common namespace keyman::common::kmx_file or similar in the future
 namespace km {
-namespace kbp {
+namespace core {
 namespace kmx {
 #endif
 
@@ -404,6 +404,6 @@ static_assert(sizeof(COMP_KEYBOARD) == KEYBOARDFILEHEADER_SIZE, "COMP_KEYBOARD m
 
 #ifdef KM_CORE_LIBRARY
 } // namespace kmx
-} // namespace kbp
+} // namespace core
 } // namespace km
 #endif

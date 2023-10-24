@@ -16,7 +16,7 @@
 #include "keyboard.hpp"
 
 namespace km {
-namespace kbp
+namespace core
 {
   class abstract_processor
   {
@@ -127,7 +127,7 @@ namespace kbp
 
   json & operator << (json &j, abstract_processor const &opts);
 
-} // namespace kbp
+} // namespace core
 } // namespace km
 
-struct km_core_keyboard : public km::kbp::abstract_processor {};
+struct km_core_keyboard : public km::core::abstract_processor {};

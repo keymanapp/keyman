@@ -27,7 +27,7 @@
 /***************************************************************************/
 
 namespace km {
-namespace kbp {
+namespace core {
 namespace kmx {
 
 /* Utility */
@@ -40,7 +40,7 @@ private:
   PKMX_WCHAR m_miniContext;
   int m_miniContextIfLen; // number of if() statements excluded from start of m_miniContext
   KMSTATE m_state;
-  km_core_state *m_kbp_state;
+  km_core_state *m_core_state;
 
 
   kmx::KMX_Actions m_actions;
@@ -127,5 +127,5 @@ struct char_to_vkey {
 extern const struct char_to_vkey s_char_to_vkey[];
 
 } // namespace kmx
-} // namespace kbp
+} // namespace core
 } // namespace km

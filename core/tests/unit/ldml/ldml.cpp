@@ -77,8 +77,8 @@ apply_action(
         },
         {act.character}});
     {
-      km::kbp::kmx::char16_single buf;
-      const int len = km::kbp::kmx::Utf32CharToUtf16(act.character, buf);
+      km::core::kmx::char16_single buf;
+      const int len = km::core::kmx::Utf32CharToUtf16(act.character, buf);
       for(int i=0; i<len; i++) {
         text_store.push_back(buf.ch[i]);
       }
@@ -176,7 +176,7 @@ verify_context(std::u16string& text_store, km_core_state* &test_state, std::vect
 }
 
 int
-run_test(const km::kbp::path &source, const km::kbp::path &compiled, km::tests::LdmlTestSource& test_source) {
+run_test(const km::core::path &source, const km::core::path &compiled, km::tests::LdmlTestSource& test_source) {
   km_core_keyboard * test_kb = nullptr;
   km_core_state * test_state = nullptr;
 
@@ -295,7 +295,7 @@ run_test(const km::kbp::path &source, const km::kbp::path &compiled, km::tests::
 /**
  * Run all tests for this keyboard
  */
-int run_all_tests(const km::kbp::path &source, const km::kbp::path &compiled, const std::string &filter) {
+int run_all_tests(const km::core::path &source, const km::core::path &compiled, const std::string &filter) {
   std::wcout << console_color::fg(console_color::BLUE) << "source file   = " << source << std::endl
             << "compiled file = " << compiled << console_color::reset() << std::endl;
   if(!filter.empty()) {
@@ -437,8 +437,8 @@ int main(int argc, char *argv[]) {
   if ((argc - first_arg) < 2) {
     return error_args();
   }
-  const km::kbp::path ldml_file = argv[first_arg++];
-  const km::kbp::path kmx_file  = argv[first_arg++];
+  const km::core::path ldml_file = argv[first_arg++];
+  const km::core::path kmx_file  = argv[first_arg++];
 
   std::string filter; // default to 'all tests'
   if ((argc - first_arg) >= 1) {

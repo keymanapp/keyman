@@ -21,7 +21,7 @@
 #include <kmx_file.h>
 #include <test_assert.h>
 
-using namespace km::kbp::kmx;
+using namespace km::core::kmx;
 using namespace std;
 
 #define U_1F609_WINKING_FACE u"\U0001F609"

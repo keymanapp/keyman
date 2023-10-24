@@ -18,7 +18,7 @@
 #include "processor.hpp"
 #include "state.hpp"
 
-using namespace km::kbp;
+using namespace km::core;
 
 // Forward declarations
 class context;

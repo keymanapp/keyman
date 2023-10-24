@@ -15,7 +15,7 @@
 #include <deque>
 
 namespace km {
-namespace kbp {
+namespace core {
 namespace kmx {
 
 /**
@@ -111,7 +111,7 @@ struct COMP_KMXPLUS_ELEM_ELEMENT {
    * @param length number of elements, including this one
    * @return the string elements as a string array
   */
-  std::deque<std::u32string> loadAsStringList(KMX_DWORD length, const km::kbp::kmx::COMP_KMXPLUS_STRS &strs) const;
+  std::deque<std::u32string> loadAsStringList(KMX_DWORD length, const km::core::kmx::COMP_KMXPLUS_STRS &strs) const;
 
   /** @return element type */
   KMX_DWORD type() const;
@@ -782,5 +782,5 @@ class kmx_plus {
 #endif
 
 }  // namespace kmx
-}  // namespace kbp
+}  // namespace core
 }  // namespace km

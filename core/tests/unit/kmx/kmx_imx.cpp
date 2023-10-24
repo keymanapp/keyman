@@ -25,7 +25,7 @@
  *  get_intermediate_context
  */
 
-using namespace km::kbp::kmx;
+using namespace km::core::kmx;
 
 km_core_option_item test_env_opts[] =
 {
@@ -156,13 +156,13 @@ uint8_t test_imx_callback(km_core_state *state, uint32_t imx_id, void *callback_
 }
 }; // extern "C"
 
-void test_imx_list(const km::kbp::path &source_file){
+void test_imx_list(const km::core::path &source_file){
 
   km_core_keyboard * test_kb = nullptr;
   km_core_state * test_state = nullptr;
   km_core_keyboard_imx * kb_imx_list;
 
-  km::kbp::path full_path = source_file;
+  km::core::path full_path = source_file;
 
   try_status(km_core_keyboard_load(full_path.native().c_str(), &test_kb));
 
@@ -201,13 +201,13 @@ void test_imx_list(const km::kbp::path &source_file){
 // the kmx processor will add this items to its action queue.
 // Finally when the `process_event` call returns we verify the action
 // queue is as expected.
-void test_queue_actions (const km::kbp::path &source_keyboard) {
+void test_queue_actions (const km::core::path &source_keyboard) {
 
   km_core_keyboard * test_kb = nullptr;
   km_core_state * test_state = nullptr;
   km_core_keyboard_imx * kb_imx_list;
 
-  km::kbp::path full_path = source_keyboard;
+  km::core::path full_path = source_keyboard;
 
   try_status(km_core_keyboard_load(full_path.native().c_str(), &test_kb));
 
@@ -262,7 +262,7 @@ int main(int argc, char *argv []) {
     }
   }
   console_color::enabled = console_color::isaterminal() || arg_color;
-  km::kbp::kmx::g_debug_ToConsole = TRUE;
+  km::core::kmx::g_debug_ToConsole = TRUE;
 
 #ifdef __EMSCRIPTEN__
   test_imx_list(get_wasm_file_path(argv[first_arg]));
