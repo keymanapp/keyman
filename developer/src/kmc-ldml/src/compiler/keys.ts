@@ -15,8 +15,8 @@ export class KeysCompiler extends SectionCompiler {
     keyboard: LDMLKeyboard.LKKeyboard,
     mt: MarkerTracker
   ): boolean {
-    keyboard.keys?.key?.forEach(({ to }) =>
-      mt.add(MarkerUse.emit, MarkerParser.allReferences(to))
+    keyboard.keys?.key?.forEach(({ output }) =>
+      mt.add(MarkerUse.emit, MarkerParser.allReferences(output))
     );
     return true;
   }
@@ -49,21 +49,21 @@ export class KeysCompiler extends SectionCompiler {
     const usedKeys = allUsedKeyIdsInLayers(this.keyboard3?.layers);
     const uniqueKeys = calculateUniqueKeys([...this.keyboard3.keys?.key]);
     for (let key of uniqueKeys) {
-      const { id, flicks } = key;
+      const { id, flickId } = key;
       if (!usedKeys.has(id)) {
         continue; // unused key, ignore
       }
       // TODO-LDML: further key-level validation here
-      if (!flicks) {
+      if (!flickId) {
         continue; // no flicks
       }
-      const flickEntry = this.keyboard3.keys?.flicks?.find(
-        (x) => x.id === flicks
+      const flickEntry = this.keyboard3?.flicks?.flick.find(
+        ({id}) => id === flickId
       );
       if (!flickEntry) {
         valid = false;
         this.callbacks.reportMessage(
-          CompilerMessages.Error_MissingFlicks({ flicks, id })
+          CompilerMessages.Error_MissingFlicks({ flickId, id })
         );
       }
     }
@@ -123,29 +123,22 @@ export class KeysCompiler extends SectionCompiler {
   }
 
   public loadFlicks(sections: DependencySections, sect: Keys) {
-    for (let lkflicks of this.keyboard3.keys.flicks) {
+    for (let flick of this.keyboard3.flicks?.flick) {
       let flicks: KeysFlicks = new KeysFlicks(
-        sections.strs.allocString(lkflicks.id)
+        sections.strs.allocString(flick.id)
       );
 
-      for (let lkflick of lkflicks.flick) {
-        let flags = 0;
-        const to = sections.strs.allocString(lkflick.to, {
-          stringVariables: true, markers: true, unescape: true, singleOk: true
-        }, sections);
-        if (!to.isOneChar) {
-          flags |= constants.keys_flick_flags_extend;
-        }
-        let directions: ListItem = sections.list.allocListFromSpaces(
-          lkflick.directions,
+      for (let {keyId, directions} of flick.flickSegment) {
+        const keyIdStr = sections.strs.allocString(keyId);
+        let directionsList: ListItem = sections.list.allocListFromSpaces(
+          directions,
           {
             stringVariables: true, markers: true, unescape: true
           },
           sections);
         flicks.flicks.push({
-          directions,
-          flags,
-          to,
+          directions: directionsList,
+          keyId: keyIdStr,
         });
       }
 
@@ -163,45 +156,30 @@ export class KeysCompiler extends SectionCompiler {
         continue; // unused key, skip
       }
       let flags = 0;
-      const flicks = key.flicks;
-      if (!!key.gap) {
+      const { flickId, gap, longPressDefaultKeyId, longPressKeyIds, multiTapKeyIds, layerId, output } = key;
+      if (!!gap) {
         flags |= constants.keys_key_flags_gap;
-      }
-      if (key.transform === "no") {
-        flags |= constants.keys_key_flags_notransform;
       }
       const id = sections.strs.allocString(key.id);
       const longPress: ListItem = sections.list.allocListFromSpaces(
-        key.longPress, {
-          stringVariables: true,
-          markers: true,
-          unescape: true,
-        },
+        longPressKeyIds, {},
         sections);
 
-      const longPressDefault = sections.strs.allocString(key.longPressDefault,
-        {
-          stringVariables: true,
-          markers: true,
-          unescape: true,
-        },
+      const longPressDefault = sections.strs.allocString(longPressDefaultKeyId,
+        {},
         sections);
 
       const multiTap: ListItem = sections.list.allocListFromSpaces(
-        key.multiTap,
-        {
-          stringVariables: true,
-          markers: true,
-          unescape: true,
-        },
+        multiTapKeyIds,
+        {},
         sections);
-      const keySwitch = sections.strs.allocString(key.switch); // 'switch' is a reserved word
+      const keySwitch = sections.strs.allocString(layerId); // 'switch' is a reserved word
 
-      const toRaw = key.to;
+      const toRaw = output;
 
       let toCooked = sections.vars.substituteStrings(toRaw, sections);
       toCooked = sections.vars.substituteMarkerString(toCooked);
-      const to = sections.strs.allocString(key.to,
+      const to = sections.strs.allocString(toCooked,
         {
           stringVariables: true,
           markers: true,
@@ -215,7 +193,7 @@ export class KeysCompiler extends SectionCompiler {
       const width = Math.ceil((key.width || 1) * 10.0); // default, width=1
       sect.keys.push({
         flags,
-        flicks,
+        flicks: flickId,
         id,
         longPress,
         longPressDefault,
@@ -260,10 +238,10 @@ export class KeysCompiler extends SectionCompiler {
   ) {
     let valid = true;
 
-    const { modifier } = layer;
-    if (!validModifier(modifier)) {
+    const { modifiers } = layer;
+    if (!validModifier(modifiers)) {
       this.callbacks.reportMessage(
-        CompilerMessages.Error_InvalidModifier({ modifier, layer: layer.id })
+        CompilerMessages.Error_InvalidModifier({ modifiers, layer: layer.id })
       );
       valid = false;
     }
@@ -301,7 +279,7 @@ export class KeysCompiler extends SectionCompiler {
           CompilerMessages.Error_RowOnHardwareLayerHasTooManyKeys({
             row: y + 1,
             hardware,
-            modifier,
+            modifiers,
           })
         );
         valid = false;
@@ -325,7 +303,7 @@ export class KeysCompiler extends SectionCompiler {
           valid = false;
           continue;
         }
-        if (!keydef.to && !keydef.gap && !keydef.switch) {
+        if (!keydef.output && !keydef.gap && !keydef.flickId) {
           this.callbacks.reportMessage(
             CompilerMessages.Error_KeyMissingToGapOrSwitch({ keyId: key })
           );

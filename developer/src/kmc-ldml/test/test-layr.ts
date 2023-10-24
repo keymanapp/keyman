@@ -97,7 +97,7 @@ describe('layr', function () {
       errors: [
         CompilerMessages.Error_InvalidModifier({
           layer: 'base',
-          modifier: 'altR-shift'
+          modifiers: 'altR-shift'
         }),
       ],
     },

@@ -18,9 +18,9 @@ describe('meta', function () {
     assert.isEmpty(meta.author.value);        // TODO-LDML: default author string "unknown"?
     assert.equal(meta.conform.value, 'techpreview');
     assert.isEmpty(meta.layout.value);        // TODO-LDML: assumed layout?
-    assert.isEmpty(meta.normalization.value); // TODO-LDML: assumed normalization?
     assert.isEmpty(meta.indicator.value);     // TODO-LDML: synthesize an indicator?
     assert.equal(meta.settings, KeyboardSettings.none);
+    assert.equal(meta.name?.value, "meta-minimal");
   });
 
   it('should compile maximal metadata', async function() {
@@ -30,17 +30,16 @@ describe('meta', function () {
     assert.equal(meta.author.value, 'The Keyman Team');
     assert.equal(meta.conform.value, 'techpreview');
     assert.equal(meta.layout.value, 'QWIRKY');
-    assert.equal(meta.normalization.value, 'NFC');
     assert.equal(meta.indicator.value, 'QW');
     assert.equal(meta.version.value, "1.2.3");
-    assert.equal(meta.settings, KeyboardSettings.fallback);
+    assert.equal(meta.settings, KeyboardSettings.none);
   });
 
   it('should reject invalid normalization', async function() {
     let meta = await loadSectionFixture(MetaCompiler, 'sections/meta/invalid-normalization.xml', compilerTestCallbacks) as Meta;
     assert.isNull(meta);
     assert.equal(compilerTestCallbacks.messages.length, 1);
-    assert.deepEqual(compilerTestCallbacks.messages[0], CompilerMessages.Error_InvalidNormalization({form:'NFQ'}));
+    assert.deepEqual(compilerTestCallbacks.messages[0], CompilerMessages.Error_InvalidNormalization());
   });
 
   it('should reject invalid version', async function() {

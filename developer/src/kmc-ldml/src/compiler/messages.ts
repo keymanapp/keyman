@@ -7,7 +7,7 @@ const SevError = CompilerErrorSeverity.Error | CompilerErrorNamespace.LdmlKeyboa
 const SevFatal = CompilerErrorSeverity.Fatal | CompilerErrorNamespace.LdmlKeyboardCompiler;
 
 export class CompilerMessages {
-  static Error_InvalidNormalization = (o:{form: string}) => m(this.ERROR_InvalidNormalization, `Invalid normalization form '${o.form}`);
+  static Error_InvalidNormalization = () => m(this.ERROR_InvalidNormalization, `normalization=disabled is not allowed.`);
   static ERROR_InvalidNormalization = SevError | 0x0001;
 
   static Error_InvalidLocale = (o:{tag: string}) => m(this.ERROR_InvalidLocale, `Invalid BCP 47 locale form '${o.tag}'`);
@@ -16,7 +16,7 @@ export class CompilerMessages {
   static Error_HardwareLayerHasTooManyRows = () => m(this.ERROR_HardwareLayerHasTooManyRows, `'hardware' layer has too many rows`);
   static ERROR_HardwareLayerHasTooManyRows = SevError | 0x0003;
 
-  static Error_RowOnHardwareLayerHasTooManyKeys = (o:{row: number, hardware: string, modifier: string}) =>  m(this.ERROR_RowOnHardwareLayerHasTooManyKeys, `Row #${o.row} on 'hardware' ${o.hardware} layer for modifier ${o.modifier || 'none'} has too many keys`);
+  static Error_RowOnHardwareLayerHasTooManyKeys = (o:{row: number, hardware: string, modifiers: string}) =>  m(this.ERROR_RowOnHardwareLayerHasTooManyKeys, `Row #${o.row} on 'hardware' ${o.hardware} layer for modifier ${o.modifiers || 'none'} has too many keys`);
   static ERROR_RowOnHardwareLayerHasTooManyKeys = SevError | 0x0004;
 
   static Error_KeyNotFoundInKeyBag = (o:{keyId: string, col: number, row: number, layer: string, form: string}) =>
@@ -76,7 +76,7 @@ export class CompilerMessages {
   static ERROR_DisplayIsRepeated = SevError | 0x0010;
 
   static Error_KeyMissingToGapOrSwitch = (o:{keyId: string}) =>
-  m(this.ERROR_KeyMissingToGapOrSwitch, `key id='${o.keyId}' must have either to=, gap=, or switch=.`);
+  m(this.ERROR_KeyMissingToGapOrSwitch, `key id='${o.keyId}' must have either output=, gap=, or layerId=.`);
   static ERROR_KeyMissingToGapOrSwitch = SevError | 0x0011;
 
   static Error_ExcessHardware = (o:{form: string}) => m(this.ERROR_ExcessHardware,
@@ -87,12 +87,12 @@ export class CompilerMessages {
     `layers has invalid value form=${o.form}`);
   static ERROR_InvalidHardware = SevError | 0x0013;
 
-  static Error_InvalidModifier = (o:{layer: string, modifier: string}) => m(this.ERROR_InvalidModifier,
-    `layer has invalid modifier='${o.modifier}' on layer id=${o.layer}`);
+  static Error_InvalidModifier = (o:{layer: string, modifiers: string}) => m(this.ERROR_InvalidModifier,
+    `layer has invalid modifiers='${o.modifiers}' on layer id=${o.layer}`);
   static ERROR_InvalidModifier = SevError | 0x0014;
 
-  static Error_MissingFlicks = (o:{flicks: string, id: string}) => m(this.ERROR_MissingFlicks,
-    `key id=${o.id} refers to missing flicks=${o.flicks}`);
+  static Error_MissingFlicks = (o:{flickId: string, id: string}) => m(this.ERROR_MissingFlicks,
+    `key id=${o.id} refers to missing flickId=${o.flickId}`);
   static ERROR_MissingFlicks = SevError | 0x0015;
 
   static Error_DuplicateVariable = (o:{ids: string}) => m(this.ERROR_DuplicateVariable,

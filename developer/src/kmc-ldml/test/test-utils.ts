@@ -50,13 +50,13 @@ describe('test of util/util.ts', () => {
     });
     it('should handle some real cases', () => {
       assert.sameDeepMembers(calculateUniqueKeys([
-        { id: 'a', to: 'a' },
-        { id: 'a', to: 'a' }, // dup
-        { id: 'b', to: 'b' },
-        { id: 'a', to: 'å' }, // override
+        { id: 'a', output: 'a' },
+        { id: 'a', output: 'a' }, // dup
+        { id: 'b', output: 'b' },
+        { id: 'a', output: 'å' }, // override
       ]),[
-        { id: 'b', to: 'b' },
-        { id: 'a', to: 'å' },
+        { id: 'b', output: 'b' },
+        { id: 'a', output: 'å' },
       ]);
     });
   });
@@ -105,30 +105,30 @@ describe('test of util/util.ts', () => {
       }), constants.keys_mod_none);
       assert.equal(translateLayerAttrToModifier({
         id: 'base',
-        modifier: '',
+        modifiers: '',
       }), constants.keys_mod_none);
       assert.equal(translateLayerAttrToModifier({
         id: 'base',
-        modifier: 'none',
+        modifiers: 'none',
       }), constants.keys_mod_none);
       assert.equal(translateLayerAttrToModifier({
         id: 'shift',
-        modifier: 'shift',
+        modifiers: 'shift',
       }), constants.keys_mod_shift);
       assert.equal(translateLayerAttrToModifier({
         id: 'shift',
-        modifier: 'shift',
+        modifiers: 'shift',
       }), constants.keys_mod_shift);
       assert.equal(translateLayerAttrToModifier({
         id: 'altshift',
-        modifier: 'alt shift',
+        modifiers: 'alt shift',
       }), constants.keys_mod_alt | constants.keys_mod_shift);
     });
     it('should round trip each possible modifier', () => {
       for(let str of constants.keys_mod_map.keys()) {
         const layer : LDMLKeyboard.LKLayer = {
           id: str,
-          modifier: `${str}`,
+          modifiers: `${str}`,
         };
         assert.equal(translateLayerAttrToModifier(layer),
           constants.keys_mod_map.get(str), str);
@@ -138,7 +138,7 @@ describe('test of util/util.ts', () => {
       for(let str of constants.keys_mod_map.keys()) {
         const layer : LDMLKeyboard.LKLayer = {
           id: str,
-          modifier: `${str} altL`,
+          modifiers: `${str} altL`,
         };
         assert.equal(translateLayerAttrToModifier(layer),
           constants.keys_mod_map.get(str) | constants.keys_mod_altL, str);

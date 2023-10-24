@@ -3,6 +3,6 @@
 <!DOCTYPE keyboard3 SYSTEM "../../../../../../../resources/standards-data/ldml-keyboards/techpreview/dtd/ldmlKeyboard3.dtd">
 <keyboard3 locale="mt" conformsTo="techpreview">
   <info name="meta-minimal"/>
-
+  <settings normalization="disabled" />
   <keys />
 </keyboard3>

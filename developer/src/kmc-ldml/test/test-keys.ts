@@ -57,11 +57,11 @@ describe('keys', function () {
 
         const [flick0_nw_se] = flick0.flicks.filter(({ directions }) => directions && directions.isEqual('nw se'.split(' ')));
         assert.ok(flick0_nw_se);
-        assert.equal(flick0_nw_se.to?.value, 'ç');
+        assert.equal(flick0_nw_se.keyId?.value, 'ç');
 
         const [flick0_ne_sw] = flick0.flicks.filter(({ directions }) => directions && directions.isEqual('ne sw'.split(' ')));
         assert.ok(flick0_ne_sw);
-        assert.equal(flick0_ne_sw.to?.value, 'ê'); // via variable
+        assert.equal(flick0_ne_sw.keyId?.value, 'ê'); // via variable
       },
     },
     {
@@ -87,11 +87,11 @@ describe('keys', function () {
 
         const [flick0_nw_se] = flick0.flicks.filter(({ directions }) => directions && directions.isEqual('nw se'.split(' ')));
         assert.ok(flick0_nw_se);
-        assert.equal(flick0_nw_se.to?.value, 'ç');
+        assert.equal(flick0_nw_se.keyId?.value, 'ç');
 
         const [flick0_ne_sw] = flick0.flicks.filter(({ directions }) => directions && directions.isEqual('ne sw'.split(' ')));
         assert.ok(flick0_ne_sw);
-        assert.equal(flick0_ne_sw.to?.value, 'ế');
+        assert.equal(flick0_ne_sw.keyId?.value, 'ế');
       },
     },
     {
@@ -137,7 +137,7 @@ describe('keys', function () {
         assert.equal(ww.multiTap[0].value.value, MARKER_1);
         const [flickw] = keys.flicks?.filter(({id}) => id.value === 'flickw');
         assert.ok(flickw);
-        assert.equal(flickw.flicks[0].to.value, MARKER_1);
+        assert.equal(flickw.flicks[0].keyId.value, MARKER_1);
       },
     },
   ]);
@@ -236,13 +236,13 @@ describe('keys.kmap', function () {
     {
       subpath: 'sections/keys/invalid-bad-modifier.xml',
       errors: [
-        CompilerMessages.Error_InvalidModifier({layer:'base',modifier:'altR-shift'}),
+        CompilerMessages.Error_InvalidModifier({layer:'base',modifiers:'altR-shift'}),
       ]
     },
     {
       subpath: 'sections/keys/invalid-missing-flick.xml',
       errors: [
-        CompilerMessages.Error_MissingFlicks({flicks:'an-undefined-flick-id',id:'Q'}),
+        CompilerMessages.Error_MissingFlicks({flickId:'an-undefined-flick-id',id:'Q'}),
       ]
     },
     {
@@ -344,7 +344,7 @@ describe('keys.kmap', function () {
     assert.isNull(keys);
     assert.equal(compilerTestCallbacks.messages.length, 1);
 
-    assert.deepEqual(compilerTestCallbacks.messages[0], CompilerMessages.Error_RowOnHardwareLayerHasTooManyKeys({row: 1, hardware: 'us', modifier: 'none'}));
+    assert.deepEqual(compilerTestCallbacks.messages[0], CompilerMessages.Error_RowOnHardwareLayerHasTooManyKeys({row: 1, hardware: 'us', modifiers: 'none'}));
   });
 
   it('should reject layouts with undefined keys', async function() {

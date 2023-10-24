@@ -56,7 +56,7 @@ export class LdmlKeyboardVisualKeyboardCompiler {
         vk.keys.push({
           flags: VisualKeyboard.VisualKeyboardKeyFlags.kvkkUnicode,
           shift: shift,
-          text: keydef.to, // TODO-LDML: displays
+          text: keydef.output, // TODO-LDML: displays
           vkey: keymap[y][x],
         });
       }

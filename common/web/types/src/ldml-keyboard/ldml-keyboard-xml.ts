@@ -91,7 +91,7 @@ export interface LKFlicks {
 
 export interface LKFlick {
   id?: string;
-  flickSegment?: LKFlickSegment;
+  flickSegment?: LKFlickSegment[];
 };
 
 export interface LKFlickSegment {

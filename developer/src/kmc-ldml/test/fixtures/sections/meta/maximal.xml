@@ -1,12 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!DOCTYPE keyboard3 SYSTEM "../../../../../../../resources/standards-data/ldml-keyboards/techpreview/dtd/ldmlKeyboard3.dtd">
 <keyboard3 locale="mt" conformsTo="techpreview">
   <version number="1.2.3" />
 
-  <info author="The Keyman Team" indicator="QW" layout="QWIRKY"  name="meta-maximal"/>
-
-  >
+  <info author="The Keyman Team" indicator="QW" layout="QWIRKY" name="meta-maximal" />
 
   <keys />
 </keyboard3>

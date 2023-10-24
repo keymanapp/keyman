@@ -27,7 +27,7 @@ export class TouchLayoutCompiler {
     // TODO-LDML: consider consolidation with keys.ts?
 
     let fileLayer: TouchLayout.TouchLayoutLayer = {
-      id: this.translateLayerIdToTouchLayoutLayerId(layer.id, layer.modifier),
+      id: this.translateLayerIdToTouchLayoutLayerId(layer.id, layer.modifiers),
       row: []
     };
 
@@ -45,7 +45,7 @@ export class TouchLayoutCompiler {
         if(keydef) {
           const fileKey: TouchLayout.TouchLayoutKey = {
             id: this.translateKeyIdentifierToTouch(keydef.id) as TouchLayout.TouchLayoutKeyId,
-            text: keydef.to || '',
+            text: keydef.output || '',
             // TODO-LDML: additional properties
           };
           fileRow.key.push(fileKey);
@@ -83,6 +83,10 @@ export class TouchLayoutCompiler {
     };
 
     // canonicalize modifier string, alphabetical
+    // TODO-LDML: need to support multiple here
+    if (modifier.indexOf(',') !== -1) {
+      throw Error(`Internal error: TODO-LDML: multiple modifiers ${modifier} not yet supported.`);
+    }
     modifier = (modifier||'').split(/\b/).sort().join(' ').trim();
 
     if(Object.hasOwn(map, modifier)) {

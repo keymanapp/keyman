@@ -103,10 +103,14 @@ export function verifyValidAndUnique(
  * @returns modifier
  */
 export function translateLayerAttrToModifier(layer: LDMLKeyboard.LKLayer) : number {
-  const { modifier } = layer;
-  if (modifier) {
+  const { modifiers } = layer;
+  if (modifiers) {
+    // TODO-LDML
+    if (modifiers.indexOf(',') !== -1) {
+      throw Error(`TODO-LDML #9838: ”,” in modifiers not supported yet.`);
+    }
     let mod = constants.keys_mod_none;
-    for (let str of modifier.split(' ')) {
+    for (let str of modifiers.split(' ')) {
       const submod = constants.keys_mod_map.get(str);
       mod |= submod;
     }
@@ -122,9 +126,12 @@ export function translateLayerAttrToModifier(layer: LDMLKeyboard.LKLayer) : numb
  */
 export function validModifier(modifier?: string) : boolean {
   if (!modifier) return true;  // valid to have no modifier, == none
-  for (let str of modifier.split(' ')) {
-    if (!constants.keys_mod_map.has(str)) {
-      return false;
+  // TODO-LDML: enforce illegal combinations per spec.
+  for (let sub of modifier.split(',')) {
+    for (let str of sub.split(' ')) {
+      if (!constants.keys_mod_map.has(str)) {
+        return false;
+      }
     }
   }
   return true;
