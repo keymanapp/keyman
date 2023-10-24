@@ -124,6 +124,8 @@ export class GesturePreviewHost {
     if(DEMO_ALL || keySpec.sk) {
       const skIcon = this.lpPreview = document.createElement('div');
       skIcon.className='kmw-key-popup-icon';
+      skIcon.textContent = '\u2022';
+      skIcon.style.fontWeight='bold';
 
       // Default positioning puts it far too close to the flick-preview bit.
       let yAdjustment = DEMO_ALL || keySpec.multitap ? 1 : 0;

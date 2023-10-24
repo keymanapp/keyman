@@ -405,7 +405,7 @@ body div.kmw-key-shift-on span.kmw-key-text {font-family:SpecialOSK !important;f
   border-bottom: 2px transparent dotted;
 }
 
-.kmw-key-popup-icon.longpress-clear:before {
+.kmw-key-popup-icon.longpress-clear {
   color: transparent;
   transition: 0.5s linear all;
 }
