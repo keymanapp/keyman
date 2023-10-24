@@ -5,6 +5,7 @@ import OSKKey from './oskKey.js';
 import { KeyData, KeyElement, link } from '../keyElement.js';
 import OSKRow from './oskRow.js';
 import VisualKeyboard from '../visualKeyboard.js';
+import { ParsedLengthStyle } from '../lengthStyle.js';
 
 
 export default class OSKBaseKey extends OSKKey {
@@ -146,6 +147,15 @@ export default class OSKBaseKey extends OSKKey {
     } else {
       skIcon.classList.add('kmw-key-text');
     }
+
+    if(hintSpec.fontsize) {
+      const parsed = new ParsedLengthStyle(hintSpec.fontsize);
+      // From kmwosk.css: .kmw-key-popup-icon { font-size: 0.5em }
+      // The spec says to overwrite that, but we still want half-size compared to the text
+      // as a key-cap.
+      skIcon.style.fontSize = parsed.scaledBy(0.5).styleString;
+    }
+
     // If the base key itself is the source of the hint text, we use `hint` directly.
     // Otherwise, we present the source subkey's key cap as the hint.
     skIcon.textContent = hintSpec == this.spec ? this.spec.hint : hintSpec.text;
