@@ -1,13 +1,9 @@
 /*
   Copyright:    © 2018 SIL International.
   Description:  Tests for the context API family of functions.
-  Create Date:  19 Oct 2018
-  Authors:      Tim Eves (TSE)
-  History:      19 Oct 2018 - TSE - Initial implementation.
-                22 Oct 2018 - TSE - Refactor to add and use try_status macro
-                                    for improved readability.
-                                  - Add more tests to cover corner cases and
-                                    mutation functions.
+  Create Date:  23 Oct 2023
+  Authors:      Marc Durdin
+  History:      23 Oct 2023 - MCD - Initial implementation.
 */
 #include <string>
 #include <keyman/keyman_core_api.h>

@@ -635,6 +635,23 @@ km_core_actions_dispose(
 
 /*
 ```
+### `km_core_context_status`
+##### Description:
+Return values for `km_core_state_context_set_if_needed`.
+
+```c
+*/
+
+typedef enum {
+  KM_CORE_CONTEXT_STATUS_UNCHANGED = 0,  // Cached context change was not needed
+  KM_CORE_CONTEXT_STATUS_UPDATED = 1,    // Cached context was set to application context
+  KM_CORE_CONTEXT_STATUS_CLEARED = 2,    // Application context was invalid, context was cleared
+  KM_CORE_CONTEXT_STATUS_ERROR = 3,      // Internal error
+  KM_CORE_CONTEXT_STATUS_INVALID_ARGUMENT = 4, // Invalid arguments
+} km_core_context_status;
+
+/*
+```
 ### `km_core_state_context_set_if_needed`
 ##### Description:
 Sets the internal cached context for the state object, to the passed-in
@@ -665,14 +682,6 @@ will replace most uses of the existing Core context APIs.
 
 ```c
 */
-
-typedef enum {
-  KM_CORE_CONTEXT_STATUS_UNCHANGED = 0,  // Cached context change was not needed
-  KM_CORE_CONTEXT_STATUS_UPDATED = 1,    // Cached context was set to application context
-  KM_CORE_CONTEXT_STATUS_CLEARED = 2,    // Application context was invalid, context was cleared
-  KM_CORE_CONTEXT_STATUS_ERROR = 3,      // Internal error
-  KM_CORE_CONTEXT_STATUS_INVALID_ARGUMENT = 4, // Invalid arguments
-} km_core_context_status;
 
 KMN_API
 km_core_context_status

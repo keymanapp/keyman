@@ -310,7 +310,7 @@ km_core_context_status km_core_state_context_set_if_needed(
     return KM_CORE_CONTEXT_STATUS_ERROR;
   }
 
-  if(km_core_context_items_to_utf16(context_items, nullptr, &buf_size)) {
+  if(km_core_context_items_to_utf16(context_items, nullptr, &buf_size) != KM_CORE_STATUS_OK) {
     km_core_context_items_dispose(context_items);
     return KM_CORE_CONTEXT_STATUS_ERROR;
   }

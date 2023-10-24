@@ -9,6 +9,7 @@
 #include <cassert>
 #include <algorithm>
 #include <sstream>
+#include <memory>
 
 #include <keyman/keyman_core_api.h>
 
@@ -26,7 +27,7 @@ km_core_actions * km::kbp::action_item_list_to_actions_object(
 
   km_core_status status = KM_CORE_STATUS_OK;
 
-  km_core_actions* actions = new km_core_actions;
+  std::unique_ptr<km_core_actions> actions(new km_core_actions);
 
   // Set actions defaults
   std::vector<km_core_context_item> output;
@@ -111,15 +112,12 @@ km_core_actions * km::kbp::action_item_list_to_actions_object(
   size_t buf_size;
 
   if((status = km_core_context_items_to_utf32(output.data(), nullptr, &buf_size)) != KM_CORE_STATUS_OK) {
-    delete actions;
     return nullptr;
   }
 
-  actions->output = new km_core_usv[buf_size];
+  std::unique_ptr<km_core_usv[]> output_usv(new km_core_usv[buf_size]);
 
-  if((status = km_core_context_items_to_utf32(output.data(), actions->output, &buf_size)) != KM_CORE_STATUS_OK) {
-    delete[] actions->output;
-    delete actions;
+  if((status = km_core_context_items_to_utf32(output.data(), output_usv.get(), &buf_size)) != KM_CORE_STATUS_OK) {
     return nullptr;
   }
 
@@ -131,5 +129,6 @@ km_core_actions * km::kbp::action_item_list_to_actions_object(
     std::copy(options.begin(), options.end(), actions->persist_options);
   }
 
-  return actions;
+  actions->output = output_usv.release();
+  return actions.release();
 }
