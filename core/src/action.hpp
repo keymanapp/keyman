@@ -11,10 +11,10 @@
 #include <keyman/keyman_core_api.h>
 
 namespace km {
-namespace kbp
+namespace core
 {
   km_core_actions* action_item_list_to_actions_object(
     km_core_action_item const *action_items
   );
-} // namespace kbp
+} // namespace core
 } // namespace km

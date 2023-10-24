@@ -17,7 +17,7 @@
 #include "state.hpp"
 #include "option.hpp"
 
-km_core_actions * km::kbp::action_item_list_to_actions_object(
+km_core_actions * km::core::action_item_list_to_actions_object(
   km_core_action_item const *action_items
 ) {
   assert(action_items != nullptr);
@@ -94,7 +94,7 @@ km_core_actions * km::kbp::action_item_list_to_actions_object(
         break;
       case KM_CORE_IT_PERSIST_OPT:
         // TODO: lowpri: replace existing item if already present in options vector?
-        options.push_back(km::kbp::option(
+        options.push_back(km::core::option(
           static_cast<km_core_option_scope>(action_items->option->scope),
           action_items->option->key,
           action_items->option->value

@@ -34,7 +34,7 @@ void test_two_backspaces() {
     end_action_item()
   };
 
-  km_core_actions *actions = km::kbp::action_item_list_to_actions_object(action_items);
+  km_core_actions *actions = km::core::action_item_list_to_actions_object(action_items);
 
   assert(actions->code_points_to_delete == 1);
   assert(std::u32string(actions->output) == U"");
@@ -61,7 +61,7 @@ void test_marker_text_interleaved() {
     end_action_item()
   };
 
-  km_core_actions *actions = km::kbp::action_item_list_to_actions_object(action_items);
+  km_core_actions *actions = km::core::action_item_list_to_actions_object(action_items);
 
   assert(actions->code_points_to_delete == 0);
   assert(std::u32string(actions->output) == U"ABD");
@@ -81,7 +81,7 @@ void test_alert() {
     end_action_item()
   };
 
-  km_core_actions *actions = km::kbp::action_item_list_to_actions_object(action_items);
+  km_core_actions *actions = km::core::action_item_list_to_actions_object(action_items);
 
   assert(actions->code_points_to_delete == 0);
   assert(std::u32string(actions->output) == U"");
@@ -101,7 +101,7 @@ void test_emit_keystroke() {
     end_action_item()
   };
 
-  km_core_actions *actions = km::kbp::action_item_list_to_actions_object(action_items);
+  km_core_actions *actions = km::core::action_item_list_to_actions_object(action_items);
 
   assert(actions->code_points_to_delete == 0);
   assert(std::u32string(actions->output) == U"");
@@ -122,7 +122,7 @@ void test_invalidate_context() {
     end_action_item()
   };
 
-  km_core_actions *actions = km::kbp::action_item_list_to_actions_object(action_items);
+  km_core_actions *actions = km::core::action_item_list_to_actions_object(action_items);
 
   assert(actions->code_points_to_delete == 0);
   assert(std::u32string(actions->output) == U"");
@@ -148,7 +148,7 @@ void test_persist_opt() {
     end_action_item()
   };
 
-  km_core_actions *actions = km::kbp::action_item_list_to_actions_object(action_items);
+  km_core_actions *actions = km::core::action_item_list_to_actions_object(action_items);
 
   assert(actions->code_points_to_delete == 0);
   assert(std::u32string(actions->output) == U"");
@@ -205,7 +205,7 @@ void teardown() {
 void setup(const char *keyboard, const km_core_cp* context) {
   teardown();
 
-  km::kbp::path path = km::kbp::path::join(arg_path, keyboard);
+  km::core::path path = km::core::path::join(arg_path, keyboard);
   try_status(km_core_keyboard_load(path.native().c_str(), &test_kb));
   try_status(km_core_state_create(test_kb, test_env_opts, &test_state));
   try_status(km_core_context_items_from_utf16(context, &citems));

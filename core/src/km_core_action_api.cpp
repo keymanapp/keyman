@@ -17,7 +17,7 @@
 #include "state.hpp"
 #include "action.hpp"
 
-using namespace km::kbp;
+using namespace km::core;
 
 km_core_actions* km_core_state_get_actions(
   km_core_state const *state
