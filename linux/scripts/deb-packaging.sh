@@ -57,16 +57,12 @@ fi
 
 if builder_start_action verify; then
   tar xf "${SRC_PKG}"
-  if [ ! -f debian/libkmnkbp0-0.symbols ] && [ ! -f debian/libkeymancore.symbols ]; then
-    echo ":warning: Missing libkmnkbp0-0.symbols/libkeymancore.symbols file" >&2
+  if [ ! -f debian/libkeymancore.symbols ]; then
+    echo ":warning: Missing libkeymancore.symbols file" >&2
   else
-    if [ -f debian/libkeymancore.symbols ]; then
-        PKG_NAME=libkeymancore
-        LIB_NAME=libkeymancore
-    else
-        PKG_NAME=libkmnkbp0-0
-        LIB_NAME=libkmnkbp0
-    fi
+    PKG_NAME=libkeymancore
+    LIB_NAME=libkeymancore
+
     tmpDir=$(mktemp -d)
     dpkg -x "${BIN_PKG}" "$tmpDir"
     cd debian

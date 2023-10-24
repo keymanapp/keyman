@@ -16,7 +16,7 @@
 #endif
 
 namespace km {
-namespace kbp {
+namespace core {
 namespace ldml {
 
 /**
@@ -466,7 +466,7 @@ transform_entry::init() {
     return false;
   }
   // TODO-LDML: if we have mapFrom, may need to do other processing.
-  const std::u16string patstr = km::kbp::kmx::u32string_to_u16string(fFrom);
+  const std::u16string patstr = km::core::kmx::u32string_to_u16string(fFrom);
   UErrorCode status           = U_ZERO_ERROR;
   /* const */ icu::UnicodeString patustr_raw = icu::UnicodeString(patstr.data(), (int32_t)patstr.length());
   // add '$' to match to end
@@ -485,7 +485,7 @@ transform_entry::apply(const std::u32string &input, std::u32string &output) cons
   // TODO-LDML: Really? can't go from u32 to UnicodeString?
   // TODO-LDML: Also, we could cache the u16 string at the transformGroup level or higher.
   UErrorCode status = U_ZERO_ERROR;
-  const std::u16string matchstr = km::kbp::kmx::u32string_to_u16string(input);
+  const std::u16string matchstr = km::core::kmx::u32string_to_u16string(input);
   icu::UnicodeString matchustr  = icu::UnicodeString(matchstr.data(), (int32_t)matchstr.length());
   // TODO-LDML: create a new Matcher every time. These could be cached and reset.
   std::unique_ptr<icu::RegexMatcher> matcher(fFromPattern->matcher(matchustr, status));
@@ -518,7 +518,7 @@ transform_entry::apply(const std::u32string &input, std::u32string &output) cons
     // Normal case: not a map.
     // This replace will apply $1, $2 etc.
     // Convert the fTo into u16 TODO-LDML (we could cache this?)
-    const std::u16string rstr = km::kbp::kmx::u32string_to_u16string(fTo);
+    const std::u16string rstr = km::core::kmx::u32string_to_u16string(fTo);
     rustr  = icu::UnicodeString(rstr.data(), (int32_t)rstr.length());
   } else {
     // Set map case: mapping from/to
@@ -548,7 +548,7 @@ transform_entry::apply(const std::u32string &input, std::u32string &output) cons
 
     // 2. get the target string, convert to utf-16
     // we use the same matchIndex that was just found
-    const std::u16string rstr = km::kbp::kmx::u32string_to_u16string(fMapToList.at(matchIndex));
+    const std::u16string rstr = km::core::kmx::u32string_to_u16string(fMapToList.at(matchIndex));
 
     // 3. update the UnicodeString for replacement
     rustr  = icu::UnicodeString(rstr.data(), (int32_t)rstr.length());
@@ -770,8 +770,8 @@ transforms::apply(std::u32string &str) {
 transforms *
 transforms::load(
     const kmx::kmx_plus &kplus,
-    const kbp::kmx::COMP_KMXPLUS_TRAN *tran,
-    const kbp::kmx::COMP_KMXPLUS_TRAN_Helper &tranHelper) {
+    const core::kmx::COMP_KMXPLUS_TRAN *tran,
+    const core::kmx::COMP_KMXPLUS_TRAN_Helper &tranHelper) {
   bool valid = true;
   if (tran == nullptr) {
     DebugLog("for tran: tran is null");
@@ -864,11 +864,11 @@ transforms::load(
 // string manipulation
 
 bool normalize_nfd(std::u32string &str) {
-  std::u16string rstr = km::kbp::kmx::u32string_to_u16string(str);
+  std::u16string rstr = km::core::kmx::u32string_to_u16string(str);
   if(!normalize_nfd(rstr)) {
     return false;
   } else {
-    str = km::kbp::kmx::u16string_to_u32string(rstr);
+    str = km::core::kmx::u16string_to_u32string(rstr);
     return true;
   }
 }
@@ -894,11 +894,11 @@ bool normalize_nfd(std::u16string &str) {
 }
 
 bool normalize_nfc(std::u32string &str) {
-  std::u16string rstr = km::kbp::kmx::u32string_to_u16string(str);
+  std::u16string rstr = km::core::kmx::u32string_to_u16string(str);
   if(!normalize_nfc(rstr)) {
     return false;
   } else {
-    str = km::kbp::kmx::u16string_to_u32string(rstr);
+    str = km::core::kmx::u16string_to_u32string(rstr);
     return true;
   }
 }
@@ -911,5 +911,5 @@ bool normalize_nfc(std::u16string &str) {
 }
 
 }  // namespace ldml
-}  // namespace kbp
+}  // namespace core
 }  // namespace km

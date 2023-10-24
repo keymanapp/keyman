@@ -79,58 +79,58 @@ const
   );
 
 const
-  kmnkbp0 = 'kmnkbp0-0.dll';
+  keymancore = 'keymancore-1.dll';
 
 function km_core_context_items_from_utf16(
   const text: pkm_core_cp;
   var out_ptr: pkm_core_context_item
-): km_core_status; cdecl; external kmnkbp0 delayed;
+): km_core_status; cdecl; external keymancore delayed;
 
 function km_core_context_items_from_utf8(
   const text: PAnsiChar;
   var out_ptr: pkm_core_context_item
-): km_core_status; cdecl; external kmnkbp0 delayed;
+): km_core_status; cdecl; external keymancore delayed;
 
 function km_core_context_items_to_utf16(
   const item: pkm_core_context_item;
   buf: pkm_core_cp;
   var buf_size: integer
-): km_core_status; cdecl; external kmnkbp0 delayed;
+): km_core_status; cdecl; external keymancore delayed;
 
 function km_core_context_items_to_utf8(
   const item: pkm_core_context_item;
   buf: pansichar;
   var buf_size: integer
-): km_core_status; cdecl; external kmnkbp0 delayed;
+): km_core_status; cdecl; external keymancore delayed;
 
 procedure km_core_context_items_dispose(
   const context_items: km_core_context_item
-); cdecl; external kmnkbp0 delayed;
+); cdecl; external keymancore delayed;
 
 function km_core_context_set(
   context: pkm_core_context;
   context_items: pkm_core_context_item
-): km_core_status; cdecl; external kmnkbp0 delayed;
+): km_core_status; cdecl; external keymancore delayed;
 
 function km_core_context_get(
   context: pkm_core_context;
   var context_items: pkm_core_context_item
-): km_core_status; cdecl; external kmnkbp0 delayed;
+): km_core_status; cdecl; external keymancore delayed;
 
 procedure km_core_context_clear(
   context: pkm_core_context
-); cdecl; external kmnkbp0 delayed;
+); cdecl; external keymancore delayed;
 
 function km_core_context_append(
   context: pkm_core_context;
   context_items: pkm_core_context_item
-): km_core_status; cdecl; external kmnkbp0 delayed;
+): km_core_status; cdecl; external keymancore delayed;
 
 function km_core_context_shrink(
   context: pkm_core_context;
   num: Integer;
   prefix: pkm_core_context_item
-): km_core_status; cdecl; external kmnkbp0 delayed;
+): km_core_status; cdecl; external keymancore delayed;
 
 
 
@@ -208,25 +208,25 @@ type
 
 function km_core_options_list_size(
   opts: pkm_core_option_item
-): Integer; cdecl; external kmnkbp0 delayed;
+): Integer; cdecl; external keymancore delayed;
 
 function km_core_state_option_lookup(
   state: pkm_core_state;
   scope: km_core_option_scope;
   key: pkm_core_cp;
   var value: pkm_core_cp
-): km_core_status; cdecl; external kmnkbp0 delayed;
+): km_core_status; cdecl; external keymancore delayed;
 
 function km_core_state_options_update(
   state: pkm_core_state;
   new_opts: pkm_core_option_item
-): km_core_status; cdecl; external kmnkbp0 delayed;
+): km_core_status; cdecl; external keymancore delayed;
 
 function km_core_state_options_to_json(
   state: pkm_core_state;
   buf: PAnsiChar;
   var space: Integer
-): km_core_status; cdecl; external kmnkbp0 delayed;
+): km_core_status; cdecl; external keymancore delayed;
 
 type
   km_core_keyboard_attrs = record
@@ -241,46 +241,46 @@ type
 function km_core_keyboard_load(
   kb_path: km_core_path_name;
   var keyboard: pkm_core_keyboard
-): km_core_status; cdecl; external kmnkbp0 delayed;
+): km_core_status; cdecl; external keymancore delayed;
 
 procedure km_core_keyboard_dispose(
   keyboard: pkm_core_keyboard
-); cdecl; external kmnkbp0 delayed;
+); cdecl; external keymancore delayed;
 
 function km_core_keyboard_get_attrs(
   keyboard: pkm_core_keyboard;
   var out: pkm_core_keyboard_attrs
-): km_core_status; cdecl; external kmnkbp0 delayed;
+): km_core_status; cdecl; external keymancore delayed;
 
 function km_core_state_create(
   keyboard: pkm_core_keyboard;
   env: pkm_core_option_item;
   var out: pkm_core_state
-): km_core_status; cdecl; external kmnkbp0 delayed;
+): km_core_status; cdecl; external keymancore delayed;
 
 function km_core_state_clone(
   state: pkm_core_state;
   var out: pkm_core_state
-): km_core_status; cdecl; external kmnkbp0 delayed;
+): km_core_status; cdecl; external keymancore delayed;
 
 procedure km_core_state_dispose(
   state: pkm_core_state
-); cdecl; external kmnkbp0 delayed;
+); cdecl; external keymancore delayed;
 
 function km_core_state_context(
   state: pkm_core_state
-): pkm_core_context; cdecl; external kmnkbp0 delayed;
+): pkm_core_context; cdecl; external keymancore delayed;
 
 function km_core_state_action_items(
   state: pkm_core_state;
   num_items: pinteger
-): pkm_core_action_item; cdecl; external kmnkbp0 delayed;
+): pkm_core_action_item; cdecl; external keymancore delayed;
 
 function km_core_state_to_json(
   state: pkm_core_state;
   buf: PAnsiChar;
   space: pinteger
-): km_core_status; cdecl; external kmnkbp0 delayed;
+): km_core_status; cdecl; external keymancore delayed;
 
 type
   km_core_attr = record
@@ -305,7 +305,7 @@ type
 
 function km_core_get_engine_attrs(
   state: pkm_core_state
-): pkm_core_attr; cdecl; external kmnkbp0 delayed;
+): pkm_core_attr; cdecl; external keymancore delayed;
 
 function
 km_core_process_event(
@@ -314,7 +314,7 @@ km_core_process_event(
   modifier_state: uint16_t;
   is_key_down: uint8_t;
   event_flags: uint16_t
-): km_core_status; cdecl; external kmnkbp0 delayed;
+): km_core_status; cdecl; external keymancore delayed;
 
 const
   KM_CORE_EVENT_FLAG_DEFAULT = 0; // default value: hardware

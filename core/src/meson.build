@@ -1,5 +1,5 @@
 # Copyright:    © 2018-2022 SIL International.
-# Description:  Cross platform build script to compile libkmnkbp.
+# Description:  Cross platform build script to compile libkeymancore.
 # Create Date:  2 Oct 2018
 # Authors:      Tim Eves (TSE)
 #
@@ -98,7 +98,7 @@ mock_files = files(
   'mock/mock_processor.cpp',
 )
 
-lib = library('kmnkbp0',
+lib = library('keymancore',
   api_files,
   core_files,
   kmx_files,
@@ -115,11 +115,11 @@ lib = library('kmnkbp0',
 
 headerdirs = [ '.', 'keyman' ] # subdirectories of ${prefix}/include to add to header path
 
-kmnkbp = declare_dependency(link_with: lib, include_directories: inc, dependencies: [icu_uc, icu_i18n])
+keymancore = declare_dependency(link_with: lib, include_directories: inc, dependencies: [icu_uc, icu_i18n])
 
 pkg = import('pkgconfig')
 pkg.generate(
-    name: 'keyman_kmn_processor',
+    name: 'keyman_core',
     version: meson.project_version(),
     description: 'Keyman processor for KMN keyboards.',
     subdirs: headerdirs,

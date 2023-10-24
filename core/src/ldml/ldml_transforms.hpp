@@ -29,7 +29,7 @@
 #include "unicode/normalizer2.h"
 
 namespace km {
-namespace kbp {
+namespace core {
 namespace ldml {
 
 /** @returns true on success */
@@ -44,7 +44,7 @@ inline bool uassert_success(const char *file, int line, const char *function, UE
 
 #define UASSERT_SUCCESS(status) assert(U_SUCCESS(status)), uassert_success(__FILE__, __LINE__, __FUNCTION__, status)
 
-using km::kbp::kmx::SimpleUSet;
+using km::core::kmx::SimpleUSet;
 
 /**
  * Type of a group
@@ -281,8 +281,8 @@ public:
   /** load from a kmx_plus data section, either tran or bksp */
   static transforms *
   load(const kmx::kmx_plus &kplus,
-       const kbp::kmx::COMP_KMXPLUS_TRAN *tran,
-       const kbp::kmx::COMP_KMXPLUS_TRAN_Helper &tranHelper);
+       const core::kmx::COMP_KMXPLUS_TRAN *tran,
+       const core::kmx::COMP_KMXPLUS_TRAN_Helper &tranHelper);
 };
 
 // string routines
@@ -297,5 +297,5 @@ bool normalize_nfc(std::u32string &str);
 bool normalize_nfc(std::u16string &str);
 
 }  // namespace ldml
-}  // namespace kbp
+}  // namespace core
 }  // namespace km

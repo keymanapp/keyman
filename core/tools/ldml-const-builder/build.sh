@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# Builds /core/include/ldml/keyboardprocessor_ldml.h from /core/include/ldml/keyboardprocessor_ldml.ts
+# Builds /core/include/ldml/keyman_core_ldml.h from /core/include/ldml/keyman_core_ldml.ts
 #
 
 # Exit on command failure and when using unset variables:
@@ -17,7 +17,7 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 # This script runs from its own folder
 cd "$(dirname "$THIS_SCRIPT")"
 
-CORE_LDML_H_FILE="../../include/ldml/keyboardprocessor_ldml.h"
+CORE_LDML_H_FILE="../../include/ldml/keyman_core_ldml.h"
 
 ################################ Main script ################################
 

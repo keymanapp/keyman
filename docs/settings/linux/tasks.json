@@ -108,7 +108,7 @@
           "CPPFLAGS": "-DG_MESSAGES_DEBUG -I${workspaceFolder}/core/build/arch/debug/include/ -I${workspaceFolder}/core/include/ -I/home/eberhard/Develop/keyman/ibus/ibus/src -I${workspaceFolder}/common/include",
           "CFLAGS": "-g -O0",
           "CXXFLAGS": "-g -O0",
-          "KEYMAN_PROC_LIBS": "-L${workspaceFolder}/core/build/arch/debug/src -lkmnkbp0",
+          "KEYMAN_PROC_LIBS": "-L${workspaceFolder}/core/build/arch/debug/src -lkeymancore",
           "KEYMAN_PROC_CFLAGS": "-I${workspaceFolder}/core/build/arch/debug/include -I${workspaceFolder}/core/include -I${workspaceFolder}/common/include",
           "PKG_CONFIG_PATH": "${workspaceFolder}/core/build/arch/debug/meson-private"
         },

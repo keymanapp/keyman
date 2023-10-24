@@ -1,6 +1,6 @@
 /*
   Copyright:    © 2018 SIL International.
-  Description:  Cross platform API C/C++ declarations for libkmnkbp keyboard
+  Description:  Cross platform API C/C++ declarations for libkeymancore keyboard
                 processor.
   Create Date:  2 Oct 2018
   Authors:      Tim Eves (TSE)

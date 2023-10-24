@@ -21,7 +21,7 @@
 #include <test_assert.h>
 #include "../emscripten_filesystem.h"
 
-using namespace km::kbp::kmx;
+using namespace km::core::kmx;
 
 km_core_option_item test_env_opts[] =
 {
@@ -51,7 +51,7 @@ void teardown() {
 void setup(const char *keyboard) {
   teardown();
 
-  km::kbp::path path = km::kbp::path::join(arg_path, keyboard);
+  km::core::path path = km::core::path::join(arg_path, keyboard);
 
   try_status(km_core_keyboard_load(path.native().c_str(), &test_kb));
   try_status(km_core_state_create(test_kb, test_env_opts, &test_state));

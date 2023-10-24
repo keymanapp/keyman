@@ -12,7 +12,7 @@
 #include "kmx_file.h"
 #include "kmx/kmx_plus.h"
 #include "kmx/kmx_xstring.h"
-#include "ldml/keyboardprocessor_ldml.h"
+#include "ldml/keyman_core_ldml.h"
 #include "kmx/kmx_file_validator.hpp"
 #include "debuglog.h"
 #include <assert.h>
@@ -28,10 +28,10 @@ namespace {
   };
 }
 
-// using km::kbp::kmx::ShouldDebug; // for DebugLog
+// using km::core::kmx::ShouldDebug; // for DebugLog
 
 namespace km {
-namespace kbp {
+namespace core {
 
 
 ldml_processor::ldml_processor(path const & kb_path, const std::vector<uint8_t> &data)
@@ -89,7 +89,7 @@ ldml_processor::ldml_processor(path const & kb_path, const std::vector<uint8_t> 
 
   // load transforms
   if (kplus.tran != nullptr && kplus.tran->groupCount > 0) {
-    transforms.reset(km::kbp::ldml::transforms::load(kplus, kplus.tran, kplus.tranHelper));
+    transforms.reset(km::core::ldml::transforms::load(kplus, kplus.tran, kplus.tranHelper));
     if (!transforms) {
       DebugLog("Failed to load tran transforms");
       return; // failed to load
@@ -98,7 +98,7 @@ ldml_processor::ldml_processor(path const & kb_path, const std::vector<uint8_t> 
 
   // load bksp transforms
   if (kplus.bksp != nullptr && kplus.bksp->groupCount > 0) {
-    bksp_transforms.reset(km::kbp::ldml::transforms::load(kplus, kplus.bksp, kplus.bkspHelper));
+    bksp_transforms.reset(km::core::ldml::transforms::load(kplus, kplus.bksp, kplus.bkspHelper));
     if (!bksp_transforms) {
       DebugLog("Failed to load bksp transforms");
       return; // failed to load
@@ -415,7 +415,7 @@ ldml_processor::emit_text(km_core_state *state, km_core_usv ch) {
 
 void
 ldml_processor::emit_marker(km_core_state *state, KMX_DWORD marker_no) {
-  assert(km::kbp::kmx::is_valid_marker(marker_no));
+  assert(km::core::kmx::is_valid_marker(marker_no));
   state->actions().push_marker(marker_no);
   state->context().push_marker(marker_no);
 }
@@ -431,7 +431,7 @@ ldml_processor::context_to_string(km_core_state *state, std::u32string &str, boo
       if (last_type == KM_CORE_BT_CHAR) {
         str.insert(0, 1, c->character);
       } else if (last_type == KM_CORE_BT_MARKER) {
-        assert(km::kbp::kmx::is_valid_marker(c->marker));
+        assert(km::core::kmx::is_valid_marker(c->marker));
         if (include_markers) {
           prepend_marker(str, c->marker);
         }
@@ -442,5 +442,5 @@ ldml_processor::context_to_string(km_core_state *state, std::u32string &str, boo
     return ctxlen; // consumed the entire context buffer.
 }
 
-} // namespace kbp
+} // namespace core
 } // namespace km
