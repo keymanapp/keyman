@@ -253,8 +253,8 @@ km_core_context_items_from_utf8(char const *text,
 Convert a context item array into a UTF-16 encoded string placing it into
 the supplied buffer of specified size, and return the number of code units
 actually used in the conversion. If null is passed as the buffer the
-number codeunits required is returned. This will strip markers from the
-context during the conversion.
+number of codeunits required is returned. Any markers in the context will
+not be included in the output buffer.
 ##### Return status:
 - `KM_CORE_STATUS_OK`: On success.
 - `KM_CORE_STATUS_INVALID_ARGUMENT`: If non-optional parameters are null.
@@ -285,8 +285,8 @@ km_core_context_items_to_utf16(km_core_context_item const *item,
 Convert a context item array into a UTF-8 encoded string placing it into
 the supplied buffer of specified size, and return the number of code units
 actually used in the conversion. If null is passed as the buffer the
-number codeunits required is returned. This will strip markers from the
-context during the conversion.
+number of codeunits required is returned. Any markers in the context will
+not be included in the output buffer.
 ##### Return status:
 - `KM_CORE_STATUS_OK`: On success.
 - `KM_CORE_STATUS_INVALID_ARGUMENT`: If non-optional parameters are null.
@@ -317,8 +317,8 @@ km_core_context_items_to_utf8(km_core_context_item const *item,
 Convert a context item array into a UTF-32 encoded string placing it into
 the supplied buffer of specified size, and return the number of codepoints
 actually used in the conversion. If null is passed as the buffer the
-number codepoints required is returned. This will strip markers from the
-context during the conversion.
+number of codepoints required is returned. Any markers in the context will
+not be included in the output buffer.
 ##### Return status:
 - `KM_CORE_STATUS_OK`: On success.
 - `KM_CORE_STATUS_INVALID_ARGUMENT`: If non-optional parameters are null.
@@ -571,9 +571,12 @@ removed in the future.
 ```c
 */
 
+typedef enum { KM_CORE_FALSE = 0, KM_CORE_TRUE = 1 } km_core_bool;
+typedef enum { KM_CORE_CAPS_UNCHANGED = -1, KM_CORE_CAPS_OFF = 0, KM_CORE_CAPS_ON = 1 } km_core_caps_state;
+
 typedef struct {
-  // number of codepoints (not codeunits!) to delete from app context, 0+
-  int delete_back;
+  // number of codepoints (not codeunits!) to delete from app context.
+  unsigned int delete_back_codepoints;
 
   // null-term string of characters to insert into document
   km_core_usv* output;
@@ -582,13 +585,13 @@ typedef struct {
   km_core_option_item* persist_options;
 
   // issue a beep, 0 = no, 1 = yes
-  int do_alert;
+  km_core_bool do_alert;
 
   // emit the input keystroke to the application, unmodified? 0 = no, 1 = yes
-  int emit_keystroke;
+  km_core_bool emit_keystroke;
 
   // -1=unchanged, 0=off, 1=on
-  int new_caps_lock_state;
+  km_core_caps_state new_caps_lock_state;
 } km_core_actions;
 
 /*
@@ -596,7 +599,7 @@ typedef struct {
 ### `km_core_state_get_actions`
 ##### Description:
 Returns a pointer to an actions object which details all the actions
-that the Platform layer must take after a keystroke. The `delete_back`
+that the Platform layer must take after a keystroke. The `delete_back_codepoints`
 action must be performed before the `output` action, but the other
 actions may be performed in any order.
 ##### Return:
@@ -632,52 +635,73 @@ km_core_actions_dispose(
 
 /*
 ```
-### `km_core_state_context_validate`
+### `km_core_state_context_set_if_needed`
 ##### Description:
-Determines if the input context has changed, and if so, resets
-the internal cached context (including markers), to the new
-context string.
+Sets the internal cached context for the state object, to the passed-in
+application context string, if it differs from the codepoints in the
+cached context. For the purposes of comparison, (1) cached markers are
+ignored, (2) if the cached context is shorter than the application
+context, it is considered identical, but (3) if the cached context is
+longer, then it is considered different.
 
-This and `km_core_state_context_invalidate` will replace existing Core context
-APIs.
+If a difference is found, then the cached context will be set to the
+application context, and thus any cached markers will be cleared.
+
+`km_core_state_context_set_if_needed` and `km_core_state_context_clear`
+will replace most uses of the existing Core context APIs.
 
 ##### Parameters:
 - __state__: An opaque pointer to a state object.
-- __application_context__: A pointer to an null-terminated `km_core_cp` string
-    representing the current context from the application.
+- __application_context__: A pointer to an null-terminated `km_core_cp`
+    string representing the current context from the application.
 ##### Return status:
-- `KM_CORE_STATUS_OK`: On success.
-- `KM_CORE_STATUS_INVALID_ARGUMENT`: If non-optional parameters are null.
+- `KM_CORE_CONTEXT_STATUS_UNCHANGED`: Cached context change was not needed
+- `KM_CORE_CONTEXT_STATUS_UPDATED`: Cached context was set to application
+  context
+- `KM_CORE_CONTEXT_STATUS_CLEARED`: Application context was invalid, perhaps
+  had unpaired surrogates, and so cached context was cleared instead
+- `KM_CORE_CONTEXT_STATUS_ERROR`: Internal error
+- `KM_CORE_CONTEXT_STATUS_INVALID_ARGUMENT`: One or more parameters was null
 
 ```c
 */
+
+typedef enum {
+  KM_CORE_CONTEXT_STATUS_UNCHANGED = 0,  // Cached context change was not needed
+  KM_CORE_CONTEXT_STATUS_UPDATED = 1,    // Cached context was set to application context
+  KM_CORE_CONTEXT_STATUS_CLEARED = 2,    // Application context was invalid, context was cleared
+  KM_CORE_CONTEXT_STATUS_ERROR = 3,      // Internal error
+  KM_CORE_CONTEXT_STATUS_INVALID_ARGUMENT = 4, // Invalid arguments
+} km_core_context_status;
+
 KMN_API
-km_core_status
-km_core_state_context_validate(
+km_core_context_status
+km_core_state_context_set_if_needed(
   km_core_state *state,
   km_core_cp const *application_context
 );
 
 /*
 ```
-### `km_core_state_context_invalidate`
+### `km_core_state_context_clear`
 ##### Description:
-Flushes the internal cached context for the state.
+Clears the internal cached context for the state. This is the same as
+`km_core_context_clear(km_core_state_context(&state))`.
 
-This and `km_core_state_context_validate` will replace existing Core context
-APIs.
+`km_core_state_context_set_if_needed` and `km_core_state_context_clear`
+will replace most uses of the existing Core context APIs.
 
 ##### Parameters:
 - __state__: An opaque pointer to a state object.
 ##### Return status:
 - `KM_CORE_STATUS_OK`: On success.
-- `KM_CORE_STATUS_INVALID_ARGUMENT`: If non-optional parameters are null.
+- `KM_CORE_STATUS_INVALID_ARGUMENT`: If any parameters are null.
 
 ```c
 */
 KMN_API
 km_core_status
-km_core_state_context_invalidate(
+km_core_state_context_clear(
   km_core_state *state
 );
 

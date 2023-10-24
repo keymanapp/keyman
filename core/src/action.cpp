@@ -16,7 +16,7 @@
 #include "state.hpp"
 #include "option.hpp"
 
-km_core_actions * km::kbp::action_items_to_actions(
+km_core_actions * km::kbp::action_item_list_to_actions_object(
   km_core_action_item const *action_items
 ) {
   assert(action_items != nullptr);
@@ -31,30 +31,30 @@ km_core_actions * km::kbp::action_items_to_actions(
   // Set actions defaults
   std::vector<km_core_context_item> output;
   std::vector<km_core_option_item> options;
-  actions->delete_back = 0;
+  actions->delete_back_codepoints = 0;
   actions->output = nullptr;
   actions->persist_options = nullptr;
-  actions->do_alert = false;
-  actions->emit_keystroke = false;
-  actions->new_caps_lock_state = -1;
+  actions->do_alert = KM_CORE_FALSE;
+  actions->emit_keystroke = KM_CORE_FALSE;
+  actions->new_caps_lock_state = KM_CORE_CAPS_UNCHANGED;
 
   for (; action_items->type != KM_CORE_IT_END; ++action_items) {
     assert(action_items->type < KM_CORE_IT_MAX_TYPE_ID);
 
     switch(action_items->type) {
       case KM_CORE_IT_ALERT:
-        actions->do_alert = true;
+        actions->do_alert = KM_CORE_TRUE;
         break;
       case KM_CORE_IT_BACK:
         switch(action_items->backspace.expected_type) {
           case KM_CORE_BT_UNKNOWN:
             // this is equivalent to emit_keystroke, because the only time we
             // are allowed to do an unknown bksp is when a bksp is passed in
-            actions->emit_keystroke = true;
+            actions->emit_keystroke = KM_CORE_TRUE;
             break;
           case KM_CORE_BT_CHAR:
             if(output.empty()) {
-              actions->delete_back++;
+              actions->delete_back_codepoints++;
             } else {
               auto last_context_item = output.back();
               output.pop_back();
@@ -77,13 +77,13 @@ km_core_actions * km::kbp::action_items_to_actions(
         }
         break;
       case KM_CORE_IT_CAPSLOCK:
-        actions->new_caps_lock_state = action_items->capsLock;
+        actions->new_caps_lock_state = action_items->capsLock ? KM_CORE_CAPS_ON : KM_CORE_CAPS_OFF;
         break;
       case KM_CORE_IT_CHAR:
         output.push_back({KM_CORE_CT_CHAR,{0},{action_items->character}});
         break;
       case KM_CORE_IT_EMIT_KEYSTROKE:
-        actions->emit_keystroke = true;
+        actions->emit_keystroke = KM_CORE_TRUE;
         break;
       case KM_CORE_IT_INVALIDATE_CONTEXT:
         // no-op

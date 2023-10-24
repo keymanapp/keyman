@@ -38,9 +38,9 @@ void test_two_backspaces() {
     end_action_item()
   };
 
-  km_core_actions *actions = km::kbp::action_items_to_actions(action_items);
+  km_core_actions *actions = km::kbp::action_item_list_to_actions_object(action_items);
 
-  assert(actions->delete_back == 1);
+  assert(actions->delete_back_codepoints == 1);
   assert(std::u32string(actions->output) == U"");
   assert(actions->persist_options == nullptr);
   assert(actions->do_alert == false);
@@ -65,9 +65,9 @@ void test_marker_text_interleaved() {
     end_action_item()
   };
 
-  km_core_actions *actions = km::kbp::action_items_to_actions(action_items);
+  km_core_actions *actions = km::kbp::action_item_list_to_actions_object(action_items);
 
-  assert(actions->delete_back == 0);
+  assert(actions->delete_back_codepoints == 0);
   assert(std::u32string(actions->output) == U"ABD");
   assert(actions->persist_options == nullptr);
   assert(actions->do_alert == false);
@@ -85,14 +85,14 @@ void test_alert() {
     end_action_item()
   };
 
-  km_core_actions *actions = km::kbp::action_items_to_actions(action_items);
+  km_core_actions *actions = km::kbp::action_item_list_to_actions_object(action_items);
 
-  assert(actions->delete_back == 0);
+  assert(actions->delete_back_codepoints == 0);
   assert(std::u32string(actions->output) == U"");
   assert(actions->persist_options == nullptr);
-  assert(actions->do_alert == true);
-  assert(actions->emit_keystroke == false);
-  assert(actions->new_caps_lock_state == -1);
+  assert(actions->do_alert == KM_CORE_TRUE);
+  assert(actions->emit_keystroke == KM_CORE_FALSE);
+  assert(actions->new_caps_lock_state == KM_CORE_CAPS_UNCHANGED);
 
   try_status(km_core_actions_dispose(actions));
 }
@@ -105,14 +105,14 @@ void test_emit_keystroke() {
     end_action_item()
   };
 
-  km_core_actions *actions = km::kbp::action_items_to_actions(action_items);
+  km_core_actions *actions = km::kbp::action_item_list_to_actions_object(action_items);
 
-  assert(actions->delete_back == 0);
+  assert(actions->delete_back_codepoints == 0);
   assert(std::u32string(actions->output) == U"");
   assert(actions->persist_options == nullptr);
-  assert(actions->do_alert == false);
-  assert(actions->emit_keystroke == true);
-  assert(actions->new_caps_lock_state == -1);
+  assert(actions->do_alert == KM_CORE_FALSE);
+  assert(actions->emit_keystroke == KM_CORE_TRUE);
+  assert(actions->new_caps_lock_state == KM_CORE_CAPS_UNCHANGED);
 
   try_status(km_core_actions_dispose(actions));
 }
@@ -126,14 +126,14 @@ void test_invalidate_context() {
     end_action_item()
   };
 
-  km_core_actions *actions = km::kbp::action_items_to_actions(action_items);
+  km_core_actions *actions = km::kbp::action_item_list_to_actions_object(action_items);
 
-  assert(actions->delete_back == 0);
+  assert(actions->delete_back_codepoints == 0);
   assert(std::u32string(actions->output) == U"");
   assert(actions->persist_options == nullptr);
-  assert(actions->do_alert == false);
-  assert(actions->emit_keystroke == false);
-  assert(actions->new_caps_lock_state == -1);
+  assert(actions->do_alert == KM_CORE_FALSE);
+  assert(actions->emit_keystroke == KM_CORE_FALSE);
+  assert(actions->new_caps_lock_state == KM_CORE_CAPS_UNCHANGED);
 
   try_status(km_core_actions_dispose(actions));
 }
@@ -152,9 +152,9 @@ void test_persist_opt() {
     end_action_item()
   };
 
-  km_core_actions *actions = km::kbp::action_items_to_actions(action_items);
+  km_core_actions *actions = km::kbp::action_item_list_to_actions_object(action_items);
 
-  assert(actions->delete_back == 0);
+  assert(actions->delete_back_codepoints == 0);
   assert(std::u32string(actions->output) == U"");
   assert(actions->persist_options != nullptr);
   assert(std::u16string(actions->persist_options[0].key) == u"key");
@@ -170,9 +170,9 @@ void test_persist_opt() {
   assert(actions->persist_options[1].value == nullptr);
   assert(actions->persist_options[1].scope == KM_CORE_OPT_UNKNOWN);
 
-  assert(actions->do_alert == false);
-  assert(actions->emit_keystroke == false);
-  assert(actions->new_caps_lock_state == -1);
+  assert(actions->do_alert == KM_CORE_FALSE);
+  assert(actions->emit_keystroke == KM_CORE_FALSE);
+  assert(actions->new_caps_lock_state == KM_CORE_CAPS_UNCHANGED);
 
   try_status(km_core_actions_dispose(actions));
 }
@@ -227,40 +227,40 @@ bool is_identical_context(km_core_cp const *cached_context) {
   return result;
 }
 
-void test_context_validate_identical_context() {
+void test_context_set_if_needed_identical_context() {
   km_core_cp const *application_context = u"This is a test";
   km_core_cp const *cached_context =      u"This is a test";
   setup("k_000___null_keyboard.kmx", cached_context);
-  try_status(km_core_state_context_validate(test_state, application_context));
+  assert(km_core_state_context_set_if_needed(test_state, application_context) == KM_CORE_CONTEXT_STATUS_UNCHANGED);
   assert(is_identical_context(cached_context));
   teardown();
 }
 
-void test_context_validate_different_context() {
+void test_context_set_if_needed_different_context() {
   km_core_cp const *application_context = u"This is a    test";
   km_core_cp const *cached_context =      u"This isn't a test";
   setup("k_000___null_keyboard.kmx", cached_context);
-  try_status(km_core_state_context_validate(test_state, application_context));
+  assert(km_core_state_context_set_if_needed(test_state, application_context) == KM_CORE_CONTEXT_STATUS_UPDATED);
   assert(!is_identical_context(cached_context));
   assert(is_identical_context(application_context));
   teardown();
 }
 
-void test_context_validate_app_context_is_longer() {
+void test_context_set_if_needed_app_context_is_longer() {
   km_core_cp const *application_context = u"Longer This is a test";
   km_core_cp const *cached_context =             u"This is a test";
   setup("k_000___null_keyboard.kmx", cached_context);
-  try_status(km_core_state_context_validate(test_state, application_context));
+  assert(km_core_state_context_set_if_needed(test_state, application_context) == KM_CORE_CONTEXT_STATUS_UNCHANGED);
   // Should be true -- longer, but what exists is identical to cached
   assert(is_identical_context(cached_context));
   teardown();
 }
 
-void test_context_validate_app_context_is_shorter() {
+void test_context_set_if_needed_app_context_is_shorter() {
   km_core_cp const *application_context =      u"is a test";
   km_core_cp const *cached_context =      u"This is a test";
   setup("k_000___null_keyboard.kmx", cached_context);
-  try_status(km_core_state_context_validate(test_state, application_context));
+  assert(km_core_state_context_set_if_needed(test_state, application_context) == KM_CORE_CONTEXT_STATUS_UPDATED);
   // Should be false -- app ctxt is shorter, so doesn't matter that what we have
   // matches
   assert(!is_identical_context(cached_context));
@@ -268,7 +268,7 @@ void test_context_validate_app_context_is_shorter() {
   teardown();
 }
 
-void test_context_validate_cached_context_has_markers() {
+void test_context_set_if_needed_cached_context_has_markers() {
   km_core_cp const *application_context = u"123";
   km_core_cp const *cached_context =      u"123";
   setup("k_000___null_keyboard.kmx", cached_context);
@@ -286,7 +286,7 @@ void test_context_validate_cached_context_has_markers() {
   };
 
   try_status(km_core_context_set(km_core_state_context(test_state), citems));
-  try_status(km_core_state_context_validate(test_state, application_context));
+  assert(km_core_state_context_set_if_needed(test_state, application_context) == KM_CORE_CONTEXT_STATUS_UNCHANGED);
 
   km_core_context_item* citems_new;
 
@@ -304,18 +304,18 @@ void test_context_validate_cached_context_has_markers() {
   teardown();
 }
 
-void test_context_validate() {
-  test_context_validate_identical_context();
-  test_context_validate_different_context();
-  test_context_validate_app_context_is_longer();
-  test_context_validate_app_context_is_shorter();
-  test_context_validate_cached_context_has_markers();
+void test_context_set_if_needed() {
+  test_context_set_if_needed_identical_context();
+  test_context_set_if_needed_different_context();
+  test_context_set_if_needed_app_context_is_longer();
+  test_context_set_if_needed_app_context_is_shorter();
+  test_context_set_if_needed_cached_context_has_markers();
 }
 
-void test_context_invalidate() {
+void test_context_clear() {
   km_core_cp const *cached_context =      u"This is a test";
   setup("k_000___null_keyboard.kmx", cached_context);
-  try_status(km_core_state_context_invalidate(test_state));
+  try_status(km_core_state_context_clear(test_state));
   assert(!is_identical_context(cached_context));
   assert(is_identical_context(u""));
   teardown();
@@ -364,8 +364,8 @@ int main(int argc, char *argv []) {
   test_invalidate_context();
 
   // context -- todo move to another file
-  test_context_validate();
-  test_context_invalidate();
+  test_context_set_if_needed();
+  test_context_clear();
 }
 
 //-------------------------------------------------------------------------------------

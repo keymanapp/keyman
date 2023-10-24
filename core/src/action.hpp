@@ -13,7 +13,7 @@
 namespace km {
 namespace kbp
 {
-  km_core_actions* action_items_to_actions(
+  km_core_actions* action_item_list_to_actions_object(
     km_core_action_item const *action_items
   );
 } // namespace kbp

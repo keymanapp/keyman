@@ -33,7 +33,7 @@ km_core_actions* km_core_state_get_actions(
     return nullptr;
   }
 
-  actions = action_items_to_actions(action_items);
+  actions = action_item_list_to_actions_object(action_items);
   return actions;
 }
 
