@@ -1,7 +1,7 @@
 import { KMX, Osk, TouchLayout, TouchLayoutFileReader, TouchLayoutFileWriter } from "@keymanapp/common-types";
-import { callbacks, IsKeyboardVersion14OrLater, IsKeyboardVersion15OrLater } from "./compiler-globals.js";
+import { callbacks, IsKeyboardVersion14OrLater, IsKeyboardVersion15OrLater, IsKeyboardVersion17OrLater } from "./compiler-globals.js";
 import { JavaScript_Key } from "./javascript-strings.js";
-import { TRequiredKey, CRequiredKeys, CSpecialText10, CSpecialText14, CSpecialText14ZWNJ, CSpecialText14Map } from "./constants.js";
+import { TRequiredKey, CRequiredKeys, CSpecialText10, CSpecialText14, CSpecialText14ZWNJ, CSpecialText14Map, CSpecialText17, CSpecialText17ZWNJ, CSpecialText17Map } from "./constants.js";
 import { KeymanWebTouchStandardKeyNames, KMWAdditionalKeyNames, VKeyNames } from "./keymanweb-key-codes.js";
 import { KmwCompilerMessages } from "./messages.js";
 
@@ -147,6 +147,8 @@ function CheckKey(
     if((CSpecialText10.includes(FText) || CSpecialText14.includes(FText)) &&
         !CSpecialText14ZWNJ.includes(FText) &&
         !IsKeyboardVersion14OrLater() &&
+        !CSpecialText17ZWNJ.includes(FText) &&
+        !IsKeyboardVersion17OrLater() &&
         !([TouchLayout.TouchLayoutKeySp.special, TouchLayout.TouchLayoutKeySp.specialActive].includes(FKeyType))) {
       callbacks.reportMessage(KmwCompilerMessages.Warn_TouchLayoutSpecialLabelOnNormalKey({
         keyId: FId,
@@ -193,6 +195,22 @@ function TransformSpecialKeys14(FDebug: boolean, sLayoutFile: string): string {
         sLayoutFile = sLayoutFile.replaceAll('"text": "'+CSpecialText14Map[i][0]+'"', '"text": this._v>13 ? "'+CSpecialText14Map[i][0]+'" : "'+CSpecialText14Map[i][1]+'"');
       } else {
         sLayoutFile = sLayoutFile.replaceAll('"text":"'+CSpecialText14Map[i][0]+'"', '"text":this._v>13?"'+CSpecialText14Map[i][0]+'":"'+CSpecialText14Map[i][1]+'"');
+      }
+    }
+  }
+  return sLayoutFile;
+}
+
+function TransformSpecialKeys17(FDebug: boolean, sLayoutFile: string): string {
+  // Rewrite Special key labels that are only supported in Keyman 17+
+  // This code is a little ugly but effective.
+  if(!IsKeyboardVersion17OrLater()) {
+    for(let i = 0; i < CSpecialText17Map.length; i++) {
+      // Assumes the JSON output format will not change
+      if(FDebug) {
+        sLayoutFile = sLayoutFile.replaceAll('"text": "'+CSpecialText17Map[i][0]+'"', '"text": this._v>16 ? "'+CSpecialText17Map[i][0]+'" : "'+CSpecialText17Map[i][1]+'"');
+      } else {
+        sLayoutFile = sLayoutFile.replaceAll('"text":"'+CSpecialText17Map[i][0]+'"', '"text":this._v>16?"'+CSpecialText17Map[i][0]+'":"'+CSpecialText17Map[i][1]+'"');
       }
     }
   }
@@ -281,6 +299,8 @@ export function ValidateLayoutFile(fk: KMX.KEYBOARD, FDebug: boolean, sLayoutFil
   sLayoutFile = writer.compile(data);
 
   sLayoutFile = TransformSpecialKeys14(FDebug, sLayoutFile);
+
+  sLayoutFile = TransformSpecialKeys17(FDebug, sLayoutFile);
 
   return {
     output: sLayoutFile,

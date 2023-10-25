@@ -21,7 +21,14 @@ export const
     ['*ShiftedLock*', '*Shifted*'],
     ['*ZWNJ*', '<|>'],
     ['*ZWNJiOS*', '<|>'],
-    ['*ZWNJAndroid*', '<|>']
+    ['*ZWNJAndroid*', '<|>'],
+  ],
+  // these names were added in Keyman 17
+  CSpecialText17: string = '*Sp*\0*NBSp*\0*NarNBSp*\0*EnQ*\0*EmQ*\0*EnSp*\0*EmSp*\0*PunctSp*\0' +
+    '*ThSp*\0*HSp*\0*ZWSp*\0*ZWJ*\0*WJ*\0*CGJ*\0*LTRM*\0*RTLM*\0*SH*\0*HTab*\0',
+  CSpecialText17ZWNJ: string = '*ZWNJGeneric*',
+  CSpecialText17Map: string[][] = [
+    ['*ZWNJGeneric*', '<|>']
   ];
 
 

@@ -46,3 +46,7 @@ export function IsKeyboardVersion14OrLater(): boolean {
 export function IsKeyboardVersion15OrLater(): boolean {
   return fk.fileVersion >= KMX.KMXFile.VERSION_150;
 }
+
+export function IsKeyboardVersion17OrLater(): boolean {
+  return fk.fileVersion >= KMX.KMXFile.VERSION_170;
+}
