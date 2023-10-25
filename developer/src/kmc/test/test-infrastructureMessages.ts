@@ -36,12 +36,16 @@ describe('InfrastructureMessages', function () {
     assert.instanceOf<Error>(ncb.messages[0].exceptionVar, Error);
     });
 
-/*
   // ERROR_FileDoesNotExist
 
   it('should generate ERROR_FileDoesNotExist if a file does not exist', async function() {
-    await testForMessage(this, ['invalid-keyboards', 'error_file_does_not_exist.kmn'], CompilerMessages.ERROR_FileDoesNotExist);
+    const ncb = new NodeCompilerCallbacks({logLevel: 'silent'});
+    await unitTestEndpoints.build(makePathToFixture('invalid-keyboards', 'Error_File_Does_Not_Exist.kmn'), ncb, {});
+    assert.isTrue(ncb.hasMessage(InfrastructureMessages.ERROR_FileDoesNotExist),
+      `ERROR_FileDoesNotExist not generated, instead got: `+JSON.stringify(ncb.messages,null,2));
   });
+
+/*
 
   // ERROR_FileTypeNotRecognized
 
