@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 17.0.198 alpha 2023-10-25
+
+* chore(common): Add entries from 16.0 HISTORY.md (#9826)
+* feat(core): new actions APIs (#9828)
+
 ## 17.0.197 alpha 2023-10-24
 
 * chore(linux): Rename (lib)kmnkbp to (lib)keymancore  ️ (#9793)
