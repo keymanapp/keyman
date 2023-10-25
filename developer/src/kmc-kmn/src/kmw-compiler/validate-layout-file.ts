@@ -144,7 +144,7 @@ function CheckKey(
     // Keyman versions before 14 do not support '*special*' labels on non-special keys.
     // ZWNJ use, however, is safe because it will be transformed in function
     // TransformSpecialKeys14 to '<|>',  which does not require the custom OSK font.
-    if((CSpecialText10.includes(FText) || CSpecialText14.includes(FText)) &&
+    if((CSpecialText10.includes(FText) || CSpecialText14.includes(FText) || CSpecialText17.includes(FText)) &&
         !CSpecialText14ZWNJ.includes(FText) &&
         !IsKeyboardVersion14OrLater() &&
         !CSpecialText17ZWNJ.includes(FText) &&
