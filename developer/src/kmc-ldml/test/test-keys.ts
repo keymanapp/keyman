@@ -248,7 +248,7 @@ describe('keys.kmap', function () {
     {
       subpath: 'sections/layr/invalid-invalid-form.xml',
       errors: [CompilerMessages.Error_InvalidHardware({
-        form: 'holographic',
+        formId: 'holographic',
       }),],
     },
     {

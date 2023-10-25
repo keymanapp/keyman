@@ -30,7 +30,7 @@ export class KeysCompiler extends SectionCompiler {
    * @returns just the non-touch layers.
    */
   public hardwareLayers() {
-    return this.keyboard3.layers?.filter(({ form }) => form !== "touch");
+    return this.keyboard3.layers?.filter(({ formId }) => formId !== "touch");
   }
 
   public validate() {
@@ -78,7 +78,7 @@ export class KeysCompiler extends SectionCompiler {
       for (let layers of hardwareLayers) {
         for (let layer of layers.layer) {
           valid =
-            this.validateHardwareLayerForKmap(layers.form, layer) && valid; // note: always validate even if previously invalid results found
+            this.validateHardwareLayerForKmap(layers.formId, layer) && valid; // note: always validate even if previously invalid results found
         }
       }
       // TODO-LDML: } else { touch?
@@ -113,9 +113,9 @@ export class KeysCompiler extends SectionCompiler {
       );
     } else if (hardwareLayers.length === 1) {
       const theLayers = hardwareLayers[0];
-      const { form } = theLayers;
+      const { formId } = theLayers;
       for (let layer of theLayers.layer) {
-        this.compileHardwareLayerToKmap(sections, layer, sect, form);
+        this.compileHardwareLayerToKmap(sections, layer, sect, formId);
       }
     } // else: TODO-LDML do nothing if only touch layers
 
@@ -250,7 +250,7 @@ export class KeysCompiler extends SectionCompiler {
     const keymap = this.getKeymapFromForm(hardware, badScans);
     if (!keymap) {
       this.callbacks.reportMessage(
-        CompilerMessages.Error_InvalidHardware({ form: hardware })
+        CompilerMessages.Error_InvalidHardware({ formId: hardware })
       );
       valid = false;
       return valid;

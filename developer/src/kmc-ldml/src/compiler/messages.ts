@@ -61,11 +61,11 @@ export class CompilerMessages {
   /** annotate the to= or id= entry */
   private static outputOrKeyId(o:{output?: string, keyId?: string}) {
     if (o.output && o.keyId) {
-      return `to='${o.output}' id='${o.keyId}'`;
+      return `output='${o.output}' keyId='${o.keyId}'`;
     } else if(o.keyId) {
-      return `id='${o.keyId}'`;
+      return `keyId='${o.keyId}'`;
     } else if (o.output) {
-      return `to='${o.output}'`;
+      return `output='${o.output}'`;
     } else {
       return '';
     }
@@ -79,12 +79,12 @@ export class CompilerMessages {
   m(this.ERROR_KeyMissingToGapOrSwitch, `key id='${o.keyId}' must have either output=, gap=, or layerId=.`);
   static ERROR_KeyMissingToGapOrSwitch = SevError | 0x0011;
 
-  static Error_ExcessHardware = (o:{form: string}) => m(this.ERROR_ExcessHardware,
-    `layers form=${o.form}: Can only have one non-'touch' element`);
+  static Error_ExcessHardware = (o:{formId: string}) => m(this.ERROR_ExcessHardware,
+    `layers formId=${o.formId}: Can only have one non-'touch' element`);
   static ERROR_ExcessHardware = SevError | 0x0012;
 
-  static Error_InvalidHardware = (o:{form: string}) => m(this.ERROR_InvalidHardware,
-    `layers has invalid value form=${o.form}`);
+  static Error_InvalidHardware = (o:{formId: string}) => m(this.ERROR_InvalidHardware,
+    `layers has invalid value formId=${o.formId}`);
   static ERROR_InvalidHardware = SevError | 0x0013;
 
   static Error_InvalidModifier = (o:{layer: string, modifiers: string}) => m(this.ERROR_InvalidModifier,

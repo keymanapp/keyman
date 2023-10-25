@@ -103,7 +103,7 @@ export interface LKLayers {
   /**
    * `touch`, or hardware `us`, `iso`, `jis`, `abnt2`
    */
-  form?: string;
+  formId?: string;
   /**
    * Minimum width in millimeters
    */

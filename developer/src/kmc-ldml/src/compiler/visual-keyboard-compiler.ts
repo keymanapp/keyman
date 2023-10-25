@@ -15,9 +15,9 @@ export class LdmlKeyboardVisualKeyboardCompiler {
     result.header.unicodeFont = {...VisualKeyboard.DEFAULT_KVK_FONT};
 
     for(let layers of source.keyboard3.layers) {
-      const hardware = layers.form;
+      const { formId } = layers;
       for(let layer of layers.layer) {
-        this.compileHardwareLayer(source, result, layer, hardware);
+        this.compileHardwareLayer(source, result, layer, formId);
       }
     }
     return result;
