@@ -140,6 +140,13 @@ km_core_status km_core_context_items_to_utf16(km_core_context_item const *ci,
             sz_ptr);
 }
 
+km_core_status km_core_context_items_to_utf32(km_core_context_item const *ci,
+                                            km_core_usv *buf, size_t * sz_ptr)
+{
+  return _context_items_to<utf32>(ci,
+            reinterpret_cast<utf32::codeunit_t *>(buf),
+            sz_ptr);
+}
 
 void km_core_context_items_dispose(km_core_context_item *ci)
 {
