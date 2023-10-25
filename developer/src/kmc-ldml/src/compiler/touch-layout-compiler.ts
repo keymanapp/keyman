@@ -59,6 +59,9 @@ export class TouchLayoutCompiler {
   }
 
   private translateLayerIdToTouchLayoutLayerId(id: string, modifier: string): string {
+    if (!modifier) {
+      modifier = 'none';
+    }
     // Touch layout layers have a set of reserved names that correspond to
     // hardware modifiers. We want to map these identifiers first before falling
     // back to the layer ids

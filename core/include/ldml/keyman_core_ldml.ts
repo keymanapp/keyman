@@ -393,7 +393,7 @@ class Constants {
   /**
    * length of the 'meta' section
    */
-  readonly length_meta = 32;
+  readonly length_meta = 36;
   /**
    * bitwise or value for normalization=disabled in meta.settings
    */

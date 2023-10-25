@@ -5,7 +5,7 @@
   <info name="disp-invalid"/>
 
   <displays>
-    <display output="e" id="e" display="(e)"/> <!-- both to and id -->
+    <display output="e" keyId="e" display="(e)"/> <!-- both to and id -->
     <displayOptions baseCharacter="x" />
   </displays>
 </keyboard3>

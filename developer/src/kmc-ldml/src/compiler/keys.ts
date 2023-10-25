@@ -123,26 +123,29 @@ export class KeysCompiler extends SectionCompiler {
   }
 
   public loadFlicks(sections: DependencySections, sect: Keys) {
-    for (let flick of this.keyboard3.flicks?.flick) {
-      let flicks: KeysFlicks = new KeysFlicks(
-        sections.strs.allocString(flick.id)
-      );
+    if (this.keyboard3?.flicks?.flick) {
+      for (let flick of this.keyboard3?.flicks?.flick) {
+        const { id } = flick;
+        let flicks: KeysFlicks = new KeysFlicks(
+          sections.strs.allocString(id)
+        );
 
-      for (let {keyId, directions} of flick.flickSegment) {
-        const keyIdStr = sections.strs.allocString(keyId);
-        let directionsList: ListItem = sections.list.allocListFromSpaces(
-          directions,
-          {
-            stringVariables: true, markers: true, unescape: true
-          },
-          sections);
-        flicks.flicks.push({
-          directions: directionsList,
-          keyId: keyIdStr,
-        });
+        for (let {keyId, directions} of flick.flickSegment) {
+          const keyIdStr = sections.strs.allocString(keyId);
+          let directionsList: ListItem = sections.list.allocListFromSpaces(
+            directions,
+            {
+              stringVariables: true, markers: true, unescape: true
+            },
+            sections);
+          flicks.flicks.push({
+            directions: directionsList,
+            keyId: keyIdStr,
+          });
+        }
+
+        sect.flicks.push(flicks);
       }
-
-      sect.flicks.push(flicks);
     }
   }
 
@@ -303,7 +306,7 @@ export class KeysCompiler extends SectionCompiler {
           valid = false;
           continue;
         }
-        if (!keydef.output && !keydef.gap && !keydef.flickId) {
+        if (!keydef.output && !keydef.gap && !keydef.layerId) {
           this.callbacks.reportMessage(
             CompilerMessages.Error_KeyMissingToGapOrSwitch({ keyId: key })
           );

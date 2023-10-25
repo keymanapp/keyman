@@ -5,11 +5,17 @@
   <info name="keys-markers"/>
 
   <keys>
-    <key id="ww" output="\m{w}" flicks="flickw" longPressKeyIds@@="\m{w}" longPressDefault="\m{w}" multiTap="\m{w}" />
-    <flicks id="flickw">
-        <flickSegment directions="nw" keyId@@="\m{w}" />
-    </flicks>
+    <key id="aa" output="\m{aa}" />
+    <key id="bb" output="\m{bb}" />
+    <key id="cc" output="\m{cc}" />
+    <key id="dd" output="\m{dd}" />
+    <key id="ww" output="\m{w}" flickId="flickw" longPressKeyIds="aa bb" longPressDefaultKeyId="bb" multiTapKeyIds="cc" />
   </keys>
+  <flicks>
+    <flick id="flickw">
+      <flickSegment directions="nw" keyId="dd" />
+    </flick>
+  </flicks>
 
   <layers formId="iso">
     <layer id="base">

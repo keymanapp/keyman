@@ -19,7 +19,7 @@ describe('disp', function () {
   });
   it('should compile typical disp', async function() {
     let disp = await loadSectionFixture(DispCompiler, 'sections/disp/typical.xml', compilerTestCallbacks) as Disp;
-    assert.equal(compilerTestCallbacks.messages, []);
+    assert.sameDeepMembers(compilerTestCallbacks.messages, []);
 
     assert.ok(disp?.disps);
     assert.equal(disp.disps.length, 1);
@@ -61,13 +61,13 @@ describe('disp', function () {
     let disp = await loadSectionFixture(DispCompiler, 'sections/disp/invalid-dupto.xml', compilerTestCallbacks) as Disp;
     assert.isNull(disp);
     assert.equal(compilerTestCallbacks.messages.length, 1);
-    assert.deepEqual(compilerTestCallbacks.messages[0], CompilerMessages.Error_DisplayIsRepeated({output:'e'}));
+    assert.deepEqual(compilerTestCallbacks.messages[0], CompilerMessages.Error_DisplayIsRepeated({ output: 'e' }));
   });
   it('should reject duplicate ids', async function() {
-    let disp = await loadSectionFixture(DispCompiler, 'sections/disp/invalid-dupid.xml', compilerTestCallbacks) as Disp;
+    let disp = await loadSectionFixture(DispCompiler, 'sections/disp/invalid-dupid.xml', compilerTestCallbacks) as Disp;1
     assert.isNull(disp);
     assert.equal(compilerTestCallbacks.messages.length, 1);
-    assert.deepEqual(compilerTestCallbacks.messages[0], CompilerMessages.Error_DisplayIsRepeated({output:'e'}));
+    assert.deepEqual(compilerTestCallbacks.messages[0], CompilerMessages.Error_DisplayIsRepeated({ keyId: 'e' }));
   });
   it('should reject if neither to nor id', async function() {
     let disp = await loadSectionFixture(DispCompiler, 'sections/disp/invalid-none.xml', compilerTestCallbacks) as Disp;
