@@ -311,9 +311,10 @@
               },
               {
                 "id": "T_ACUTE",
-                "text": "́",
+                "text": "◌́",
                 "sp": 1,
                 "nextlayer": "accent-acute",
+                "hint": "◌̀◌̂",
                 "multitap": [
                   {
                     "text": "̀",
