@@ -392,11 +392,13 @@
               {
                 "id": "K_7",
                 "text": "7",
+                "layer": "default",
                 "hint": ""
               },
               {
                 "id": "K_8",
                 "text": "8",
+                "layer": "default",
                 "hint": "ABC",
                 "multitap": [
                   {
@@ -434,6 +436,7 @@
               {
                 "id": "K_9",
                 "text": "9",
+                "layer": "default",
                 "hint": "DEF",
                 "multitap": [
                   {
@@ -482,6 +485,7 @@
               {
                 "id": "K_4",
                 "text": "4",
+                "layer": "default",
                 "hint": "GHI",
                 "multitap": [
                   {
@@ -519,6 +523,7 @@
               {
                 "id": "K_5",
                 "text": "5",
+                "layer": "default",
                 "hint": "JKL",
                 "multitap": [
                   {
@@ -556,6 +561,7 @@
               {
                 "id": "K_6",
                 "text": "6",
+                "layer": "default",
                 "hint": "MNO",
                 "multitap": [
                   {
@@ -604,6 +610,7 @@
               {
                 "id": "K_1",
                 "text": "1",
+                "layer": "default",
                 "hint": "PQRS",
                 "multitap": [
                   {
@@ -651,6 +658,7 @@
               {
                 "id": "K_2",
                 "text": "2",
+                "layer": "default",
                 "hint": "TUV",
                 "multitap": [
                   {
@@ -688,6 +696,7 @@
               {
                 "id": "K_3",
                 "text": "3",
+                "layer": "default",
                 "hint": "WXYZ",
                 "multitap": [
                   {
