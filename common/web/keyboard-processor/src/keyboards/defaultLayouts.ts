@@ -540,7 +540,7 @@ export class Layouts {
   static dfltShiftMultitap: LayoutSubKey = {
     // Needs to be something special and unique.  Typing restricts us from
     // using a reserved key-id prefix, though.
-    id: "T_MT_SHIFT_TO_CAPS",
+    id: "T_*_MT_SHIFT_TO_CAPS",
     text: '*ShiftLock*',
     sp: 1,
     nextlayer: 'caps'
