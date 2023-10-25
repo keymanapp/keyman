@@ -109,7 +109,10 @@ export default class InputProcessor {
         if(transcription) {
           const rewindingTransform = transcription.preInput.buildTransformFrom(outputTarget);
           outputTarget.apply(rewindingTransform);
-          // TODO: Is anything extra needed for deadkey rewinding?  Probably.
+
+          // For multitaps, we must also restore the original deadkeys.
+          outputTarget.deadkeys().clear();
+          transcription.preInput.deadkeys().dks.forEach((dk) => outputTarget.deadkeys().add(dk));
         } else {
           console.warn('The base context for the multitap could not be found');
         }
