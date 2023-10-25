@@ -41,10 +41,23 @@ export interface GestureParams {
     noiseTolerance: number,
 
     /**
-     * The duration that the base key must be held before the subkey menu will be displayed
-     * should the up-flick shortcut not be utilized.
+     * The duration (in ms) that the base key must be held before the subkey menu will be
+     * displayed should the up-flick shortcut not be utilized.
      */
     waitLength: number
+  },
+  multitap: {
+    /**
+     * The duration (in ms) permitted between taps.  Taps with a greater time interval
+     * between them will be considered separate.
+     */
+    waitLength: number;
+
+    /**
+     * The duration (in ms) permitted for a tap to be held before it will no longer
+     * be considered part of a multitap.
+     */
+    holdLength: number;
   }
 }
 
@@ -54,6 +67,10 @@ export const DEFAULT_GESTURE_PARAMS: GestureParams = {
     flickDist: 5,
     waitLength: 500,
     noiseTolerance: 10
+  },
+  multitap: {
+    waitLength: 500,
+    holdLength: 500
   }
 }
 
@@ -76,7 +93,7 @@ export function gestureSetForLayout(layerGroup: OSKLayerGroup, params: GesturePa
         return ['K_LOPT', 'K_ROPT', 'K_BKSP'].indexOf(keySpec.baseKeyID) != -1;
       case 'longpress':
         return !!keySpec.sk;
-      case 'multitap':
+      case 'multitap-start':
       case 'modipress-multitap-start':
         if(layout.hasMultitaps) {
           return !!keySpec.multitap;
@@ -91,6 +108,7 @@ export function gestureSetForLayout(layerGroup: OSKLayerGroup, params: GesturePa
     }
   };
 
+  const _initialTapModel: GestureModel<KeyElement> = deepCopy(layout.hasFlicks ? initialTapModel(params) : initialTapModelWithReset(params));
   const simpleTapModel: GestureModel<KeyElement> = deepCopy(layout.hasFlicks ? SimpleTapModel : SimpleTapModelWithReset);
   const longpressModel: GestureModel<KeyElement> = deepCopy(layout.hasFlicks ? basicLongpressModel(params) : longpressModelWithShortcut(params));
 
@@ -124,19 +142,21 @@ export function gestureSetForLayout(layerGroup: OSKLayerGroup, params: GesturePa
 
   const gestureModels = [
     withKeySpecFiltering(longpressModel, 0),
-    withKeySpecFiltering(MultitapModel, 0),
+    withKeySpecFiltering(multitapStartModel(params), 0),
+    multitapEndModel(params),
+    _initialTapModel,
     simpleTapModel,
     withKeySpecFiltering(SpecialKeyStartModel, 0),
     SpecialKeyEndModel,
     SubkeySelectModel,
     withKeySpecFiltering(ModipressStartModel, 0),
     ModipressEndModel,
-    withKeySpecFiltering(ModipressMultitapStartModel, 0),
-    ModipressMultitapEndModel
+    withKeySpecFiltering(modipressMultitapStartModel(params), 0),
+    modipressMultitapEndModel(params)
   ];
 
   const defaultSet = [
-    longpressModel.id, SimpleTapModel.id, ModipressStartModel.id, SpecialKeyStartModel.id
+    longpressModel.id, _initialTapModel.id, ModipressStartModel.id, SpecialKeyStartModel.id
   ];
 
   if(layout.hasFlicks) {
@@ -478,35 +498,101 @@ export function longpressModelWithRoaming(params: GestureParams): GestureModel<a
   }
 }
 
-
-export const MultitapModel: GestureModel<any> = {
-  id: 'multitap',
-  resolutionPriority: 2,
-  contacts: [
-    {
-      model: {
-        ...SimpleTapContactModel,
-        itemPriority: 1,
-        pathInheritance: 'reject',
-        allowsInitialState(incomingSample, comparisonSample, baseItem) {
-          return incomingSample.item == baseItem;
+export function multitapStartModel(params: GestureParams): GestureModel<any> {
+  return {
+    id: 'multitap-start',
+    resolutionPriority: 2,
+    contacts: [
+      {
+        model: {
+          ...InstantContactResolutionModel,
+          itemPriority: 1,
+          pathInheritance: 'reject',
+          allowsInitialState(incomingSample, comparisonSample, baseItem) {
+            return incomingSample.item == baseItem;
+          },
         },
-      },
-      endOnResolve: true
-    }, {
-      model: InstantContactResolutionModel,
-      resetOnResolve: true
+      }
+    ],
+    sustainTimer: {
+      duration: params.multitap.waitLength,
+      expectedResult: false,
+      baseItem: 'base'
+    },
+    resolutionAction: {
+      type: 'chain',
+      next: 'multitap-end',
+      item: 'current'
     }
-  ],
-  sustainTimer: {
-    duration: 500,
-    expectedResult: false,
-    baseItem: 'base'
-  },
-  resolutionAction: {
-    type: 'chain',
-    next: 'multitap',
-    item: 'current'
+  }
+}
+
+export function multitapEndModel(params: GestureParams): GestureModel<any> {
+  return {
+    id: 'multitap-end',
+    resolutionPriority: 2,
+    contacts: [
+      {
+        model: {
+          ...SimpleTapContactModel,
+          itemPriority: 1,
+          timer: {
+            duration: params.multitap.holdLength,
+            expectedResult: false
+          }
+        },
+        endOnResolve: true
+      }, {
+        model: InstantContactResolutionModel,
+        resetOnResolve: true
+      }
+    ],
+    rejectionActions: {
+      timer: {
+        type: 'replace',
+        replace: 'simple-tap'
+      }
+    },
+    resolutionAction: {
+      type: 'chain',
+      next: 'multitap-start',
+      item: 'none'
+    }
+  }
+}
+
+export function initialTapModel(params: GestureParams): GestureModel<any> {
+  return {
+    id: 'initial-tap',
+    resolutionPriority: 1,
+    contacts: [
+      {
+        model: {
+          ...SimpleTapContactModel,
+          pathInheritance: 'chop',
+          itemPriority: 1,
+          timer: {
+            duration: params.multitap.holdLength,
+            expectedResult: false
+          }
+        },
+        endOnResolve: true
+      }, {
+        model: InstantContactResolutionModel,
+        resetOnResolve: true
+      }
+    ],
+    rejectionActions: {
+      timer: {
+        type: 'replace',
+        replace: 'simple-tap'
+      }
+    },
+    resolutionAction: {
+      type: 'chain',
+      next: 'multitap-start',
+      item: 'current'
+    }
   }
 }
 
@@ -527,15 +613,29 @@ export const SimpleTapModel: GestureModel<any> = {
     }
   ],
   resolutionAction: {
-    type: 'chain',
-    next: 'multitap',
+    type: 'complete',
     item: 'current'
+  }
+}
+
+export function initialTapModelWithReset(params: GestureParams): GestureModel<any> {
+  const base = initialTapModel(params);
+  return {
+    ...base,
+    rejectionActions: {
+      ...base.rejectionActions,
+      item: {
+        type: 'replace',
+        replace: 'initial-tap'
+      }
+    }
   }
 }
 
 export const SimpleTapModelWithReset: GestureModel<any> = {
   ...SimpleTapModel,
   rejectionActions: {
+    ...SimpleTapModel.rejectionActions,
     item: {
       type: 'replace',
       replace: 'simple-tap'
@@ -626,77 +726,81 @@ export const ModipressEndModel: GestureModel<any> = {
   }
 }
 
-export const ModipressMultitapStartModel: GestureModel<KeyElement> = {
-  id: 'modipress-multitap-start',
-  resolutionPriority: 6,
-  contacts: [
-    {
-      model: {
-        ...ModipressContactStartModel,
-        pathInheritance: 'reject',
-        allowsInitialState(incomingSample, comparisonSample, baseItem) {
-          if(incomingSample.item != baseItem) {
-            return false;
-          }
-          // TODO:  needs better abstraction, probably.
-
-          // But, to get started... we can just use a simple hardcoded approach.
-          const modifierKeyIds = ['K_SHIFT', 'K_ALT', 'K_CTRL'];
-          for(const modKeyId of modifierKeyIds) {
-            if(baseItem.key.spec.id == modKeyId) {
-              return true;
+export function modipressMultitapStartModel(params: GestureParams): GestureModel<KeyElement> {
+  return {
+    id: 'modipress-multitap-start',
+    resolutionPriority: 6,
+    contacts: [
+      {
+        model: {
+          ...ModipressContactStartModel,
+          pathInheritance: 'reject',
+          allowsInitialState(incomingSample, comparisonSample, baseItem) {
+            if(incomingSample.item != baseItem) {
+              return false;
             }
-          }
+            // TODO:  needs better abstraction, probably.
 
-          return false;
-        },
-        itemChangeAction: 'reject',
-        itemPriority: 1
+            // But, to get started... we can just use a simple hardcoded approach.
+            const modifierKeyIds = ['K_SHIFT', 'K_ALT', 'K_CTRL'];
+            for(const modKeyId of modifierKeyIds) {
+              if(baseItem.key.spec.id == modKeyId) {
+                return true;
+              }
+            }
+
+            return false;
+          },
+          itemChangeAction: 'reject',
+          itemPriority: 1
+        }
       }
+    ],
+    sustainTimer: {
+      duration: params.multitap.waitLength,
+      expectedResult: false,
+      baseItem: 'base'
+    },
+    resolutionAction: {
+      type: 'chain',
+      next: 'modipress-multitap-end',
+      selectionMode: 'modipress',
+      item: 'current' // return the modifier key ID so that we know to shift to it!
     }
-  ],
-  sustainTimer: {
-    duration: 500,
-    expectedResult: false,
-    baseItem: 'base'
-  },
-  resolutionAction: {
-    type: 'chain',
-    next: 'modipress-multitap-end',
-    selectionMode: 'modipress',
-    item: 'current' // return the modifier key ID so that we know to shift to it!
   }
 }
 
-export const ModipressMultitapEndModel: GestureModel<any> = {
-  id: 'modipress-multitap-end',
-  resolutionPriority: 5,
-  contacts: [
-    {
-      model: {
-        ...ModipressContactEndModel,
-        itemChangeAction: 'reject',
-        pathInheritance: 'full',
-        timer: {
-          // will need something similar for base modipress.
-          duration: 500,
-          expectedResult: false
+export function modipressMultitapEndModel(params: GestureParams): GestureModel<any> {
+  return {
+    id: 'modipress-multitap-end',
+    resolutionPriority: 5,
+    contacts: [
+      {
+        model: {
+          ...ModipressContactEndModel,
+          itemChangeAction: 'reject',
+          pathInheritance: 'full',
+          timer: {
+            // will need something similar for base modipress.
+            duration: params.multitap.holdLength,
+            expectedResult: false
+          }
         }
       }
-    }
-  ],
-  resolutionAction: {
-    type: 'chain',
-    // Because SHIFT -> CAPS multitap is a thing.  Shift gets handled as a modipress first.
-    // TODO:  maybe be selective about it:  if the tap occurs within a set amount of time?
-    next: 'modipress-multitap-start',
-    // Key was already emitted from the 'modipress-start' stage.
-    item: 'none'
-  },
-  rejectionActions: {
-    timer: {
-      type: 'replace',
-      replace: 'modipress-end'
+    ],
+    resolutionAction: {
+      type: 'chain',
+      // Because SHIFT -> CAPS multitap is a thing.  Shift gets handled as a modipress first.
+      // TODO:  maybe be selective about it:  if the tap occurs within a set amount of time?
+      next: 'modipress-multitap-start',
+      // Key was already emitted from the 'modipress-start' stage.
+      item: 'none'
+    },
+    rejectionActions: {
+      timer: {
+        type: 'replace',
+        replace: 'modipress-end'
+      }
     }
   }
 }

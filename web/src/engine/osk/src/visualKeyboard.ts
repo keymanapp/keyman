@@ -13,7 +13,8 @@ import {
   Layouts,
   StateKeyMap,
   LayoutKey,
-  ActiveSubKey
+  ActiveSubKey,
+  timedPromise
 } from '@keymanapp/keyboard-processor';
 
 import { buildCorrectiveLayout, distributionFromDistanceMaps, keyTouchDistances } from '@keymanapp/input-processor';
@@ -409,6 +410,7 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
       const endHighlighting = () => {
         if(trackingEntry.key) {
           this.highlightKey(trackingEntry.key, false);
+          trackingEntry.key = null;
         }
       }
 
@@ -451,13 +453,30 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
         // Disable roaming-touch highlighting (and current highlighting) for all
         // touchpoints included in a gesture, even newly-included ones as they occur.
         for(let id of gestureStage.allSourceIds) {
-          const trackingEntry = sourceTrackingMap[id];
-          if(trackingEntry.key) {
-            this.highlightKey(trackingEntry.key, false);
-            trackingEntry.key = null;
+          const clearRoaming = (trackingEntry: typeof sourceTrackingMap['']) => {
+            if(trackingEntry.key) {
+              this.highlightKey(trackingEntry.key, false);
+              trackingEntry.key = null;
+            }
+
+            trackingEntry.source.path.off('step', trackingEntry.roamingHighlightHandler);
           }
 
-          trackingEntry.source.path.off('step', trackingEntry.roamingHighlightHandler);
+          const trackingEntry = sourceTrackingMap[id];
+
+          if(trackingEntry) {
+            clearRoaming(trackingEntry);
+          } else {
+            // May arise during multitaps, as the 'wait' stage instantly accepts new incoming
+            // sources before they are reported fully to the `inputstart` event.
+            const _id = id;
+            timedPromise(0).then(() => {
+              const tracker = sourceTrackingMap[_id];
+              if(tracker) {
+                clearRoaming(tracker);
+              }
+            });
+          }
         }
 
 
@@ -482,7 +501,7 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
         if(gestureKey) {
           let correctionKeyDistribution: KeyDistribution;
 
-          if(gestureStage.matchedId == 'multitap') {
+          if(gestureStage.matchedId.indexOf('multitap') > -1) {
             // TODO:  determine fat-finger effects to apply.
           }
 
@@ -500,7 +519,7 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
 
           // Multitaps do special key-mapping stuff internally and produce + raise their
           // key events directly.
-          if(gestureStage.matchedId != 'multitap') {
+          if(!(handler instanceof Multitap)) {
             // Once the best coord to use for fat-finger calculations has been determined:
             keyResult = this.modelKeyClick(gestureStage.item, coord);
           }
@@ -538,7 +557,7 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
             gestureSequence.stageReports[0].sources[0].baseItem,
             DEFAULT_GESTURE_PARAMS
           );
-        } else if(baseItem.key.spec.multitap && (gestureStage.matchedId == 'simple-tap' || gestureStage.matchedId == 'multitap' || gestureStage.matchedId == 'modipress-end')) {
+        } else if(baseItem.key.spec.multitap && (gestureStage.matchedId == 'initial-tap' || gestureStage.matchedId == 'multitap' || gestureStage.matchedId == 'modipress-start')) {
           // Likewise - mere construction is enough.
           handler = new Multitap(gestureSequence, this, baseItem, keyResult.contextToken);
         }

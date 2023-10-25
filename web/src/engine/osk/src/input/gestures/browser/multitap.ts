@@ -47,13 +47,19 @@ export default class Multitap implements GestureHandler {
 
     source.on('stage', (tap) => {
       switch(tap.matchedId) {
-        case 'modipress-multitap-start':
-          return;
-        case 'multitap':
         case 'modipress-multitap-end':
+        case 'modipress-end':
+        case 'multitap-end':
+        case 'simple-tap':
+          return;
+        // Once a multitap starts, it's better to emit keys on keydown; that way,
+        // if a user holds long, they get what they see if they decide to stop,
+        // but also have time to decide if they want to continue to what's next.
+        case 'multitap-start':
+        case 'modipress-multitap-start':
           break;
         default:
-          throw new Error("Unsupported gesture state encountered during multitap sequence");
+          throw new Error(`Unsupported gesture state encountered during multitap: ${tap.matchedId}`);
       }
 
       // For rota-style behavior
