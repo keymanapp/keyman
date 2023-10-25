@@ -39,13 +39,16 @@ describe('InfrastructureMessages', function () {
       `ERROR_FileDoesNotExist not generated, instead got: `+JSON.stringify(ncb.messages,null,2));
   });
 
-/*
-
   // ERROR_FileTypeNotRecognized
 
   it('should generate ERROR_FileTypeNotRecognized if a file is not a recognized type', async function() {
-    await testForMessage(this, ['invalid-keyboards', 'error_file_type_not_recognized.xxx'], CompilerMessages.ERROR_FileTypeNotRecognized);
+    const ncb = new NodeCompilerCallbacks({logLevel: 'silent'});
+    await unitTestEndpoints.build(makePathToFixture('invalid-keyboards', 'error_file_type_not_recognized.xxx'), ncb, {});
+    assert.isTrue(ncb.hasMessage(InfrastructureMessages.ERROR_FileTypeNotRecognized),
+      `ERROR_FileTypeNotRecognized not generated, instead got: `+JSON.stringify(ncb.messages,null,2));
   });
+
+/*
 
   // ERROR_OutFileNotValidForProjects
 
