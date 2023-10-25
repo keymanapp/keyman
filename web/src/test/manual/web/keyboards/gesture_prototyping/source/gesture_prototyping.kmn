@@ -10,4 +10,12 @@ store(&LAYOUTFILE) 'gesture_prototyping.keyman-touch-layout'
 
 begin Unicode > use(main)
 
+c This tells Keyman which keys should have casing behavior applied
+$keymanweb: store(&CasedKeys) [K_A] .. [K_Z]
+
+c Match our alphabet keys so we get casing behavior applied
+store(default-alpha) 'a' .. 'z'     'A' .. 'Z'
+
 group(main) using keys
+
+$keymanweb: + any(default-alpha) > index(default-alpha, 1)
