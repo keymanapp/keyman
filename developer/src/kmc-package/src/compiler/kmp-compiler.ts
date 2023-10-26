@@ -31,11 +31,14 @@ export class KmpCompiler {
       return null;
     }
     const kmp = this.transformKpsFileToKmpObject(kpsFilename, kps);
+    if(!kmp) {
+      return null;
+    }
 
     // Verify that the generated kmp.json validates with the kmp.json schema
     if(!SchemaValidators.default.kmp(kmp)) {
       // This is an internal error, so throwing an exception is appropriate
-      throw new Error((<any>SchemaValidators.default.kmp).errors);
+      throw new Error(JSON.stringify((<any>SchemaValidators.default.kmp).errors));
     }
 
     return kmp;
