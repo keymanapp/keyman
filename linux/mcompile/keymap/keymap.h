@@ -34,12 +34,27 @@ const KMX_DWORD KMX_VKMap[] = {
   '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
 
   //_S2 those might not work correctly yet*/
-  VK_SPACE,
-  VK_ACCENT, VK_HYPHEN, VK_EQUAL,
-  VK_LBRKT, VK_RBRKT, VK_BKSLASH,
-  VK_COLON, VK_QUOTE,
-  VK_COMMA, VK_PERIOD, VK_SLASH,
-  VK_xDF, VK_OEM_102,/**/
+
+  VK_ACCENT,    /*   192 VK_OEM_3 */
+  VK_HYPHEN,    /* - 189 VK_OEM_MINUS */
+  VK_EQUAL,     /* = 187 VK_OEM_PLUS */
+
+  VK_LBRKT,     /* [ 219 VK_OEM_4 */
+  VK_RBRKT,     /* ] 221 VK_OEM_6 */
+  VK_BKSLASH,   /* \ 220 VK_OEM_5 */
+
+  VK_COLON,     /* ; 186 VK_OEM_1  or ö */
+  VK_QUOTE,     /* ' 222 VK_OEM_7  or Ä */
+
+  VK_COMMA,     /* , 188 VK_OEM_COMMA */
+  VK_PERIOD,    /* . 190 VK_OEM_PERIOD */
+  VK_SLASH,     /* / 191 VK_OEM_2 */
+
+  VK_SPACE,     /*   32 */
+
+  VK_xDF,       /* ß (?) 223*/
+  VK_OEM_102,   /* < > | 226 */
+
   0
 };
 // _S2 how many fielsds do I need??

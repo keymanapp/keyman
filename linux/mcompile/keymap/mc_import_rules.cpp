@@ -679,10 +679,13 @@ bool KMX_ImportRules(KMX_WCHAR *kbid, LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector,std
   // Scroll through the Scan Code (SC) values and get the valid Virtual Key (VK)
   // values in it. Then, store the SC in each valid VK so it can act as both a 
   // flag that the VK is valid, and it can store the SC value.
+    // _S2 this does not find exactly the same keys as the windows version does(windows finds more)
+    // but the ones we need for mcompile are there
   //for(UINT sc = 0x01; sc <= 0x7f; sc++) {
   for(UINT sc = 0x0; sc <= 0x7f; sc++) {
     KMX_VirtualKey *key = new KMX_VirtualKey(sc, hkl, All_Vector);      // _S2 get this from my Vector
     uint key_vk = key->VK() ;
+    wprintf(L" sc= %i ---  VK = %i (%c)\n",sc,key_vk,key_vk);
    if(key->VK() != 0) {
       rgKey[key->VK()] = key;
     } else {
@@ -690,11 +693,6 @@ bool KMX_ImportRules(KMX_WCHAR *kbid, LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector,std
     }
   }
 
- // where in rgkey do I store Numpad???
-  // _S2 do we need NUMPAD now or later? If so we need to add Numpad values to All_Vector ( which has only values a-z)
-// _S2 use KMX_VirtualKey !!
-  // _S2 do I need NUMPAD + SPECIAL_SHIFT for first draft ??
-  // add the special keys that do not get added from the code above
   for(UINT ke = VK_NUMPAD0; ke <= VK_NUMPAD9; ke++) {
       rgKey[ke] = new KMX_VirtualKey(hkl, ke, All_Vector);
   }
@@ -728,6 +726,13 @@ bool KMX_ImportRules(KMX_WCHAR *kbid, LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector,std
       }
   }
 */
+// _S2 test rgkey can go later
+ for(UINT iKey = 160; iKey < rgKey.size(); iKey++) {
+    if(rgKey[iKey] != NULL) {
+        wprintf(L" Key Nr %i is available\n",iKey);
+    }
+ }
+
 
   // _S2 in this part we skip shiftstates 4, 5, 8, 9
   for(UINT iKey = 0; iKey < rgKey.size(); iKey++) {
@@ -745,6 +750,7 @@ bool KMX_ImportRules(KMX_WCHAR *kbid, LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector,std
 
         for(int caps = 0; caps <= 1; caps++) {
 
+    wprintf(L"this was ss %i - ikey %i\n",ss ,iKey);
           //_S2 TODO
           //_S2 get char  - do I need rc ?? ( was rc = ToUnicodeEx...)
           std::wstring VK_Other = get_VirtualKey_Other_from_iKey(mapped_ikey, ss, caps, All_Vector);
@@ -771,7 +777,6 @@ bool KMX_ImportRules(KMX_WCHAR *kbid, LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector,std
             // fill m_rgss and m_rgfDeadkey ( m_rgfDeadkey will be done later)
             //rgKey[iKey]->KMX_SetShiftState(ss, VK_Other, false, (caps == 0));
            rgKey[iKey]->KMX_SetShiftState(ss, VK_Other, false, (caps == 0));
-           //rgKey[196]->KMX_SetShiftState(ss, VK_Other, false, (caps == 0));
           //}  // from rc==1
         // } // from rc > 0
 
@@ -798,13 +803,14 @@ bool KMX_ImportRules(KMX_WCHAR *kbid, LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector,std
   write_RGKEY_FileToVector(V_map, "map.txt");
   CompareVector_To_VectorOfFile_RGKEY( V_win, V_lin,V_map);*/
 
-
-std::vector< int > TestValues = {48,49,50,52,53,54,55,56,57,54,65,89,189,188};
-
-for ( int i=0; i < TestValues.size();i++) {
-  wprintf(L"Results for %i\t: %s  %s  %s  %s   \n", TestValues[i], rgKey[TestValues[i]]->KMX_GetShiftState(Base,0).c_str(),   rgKey[TestValues[i]]->KMX_GetShiftState(Base,1).c_str() ,  rgKey[TestValues[i]]->KMX_GetShiftState(Shft,0).c_str(), rgKey[TestValues[i]]->KMX_GetShiftState(Shft,1).c_str());
-}
-
+  //std::vector< int > TestValues = {48,49,50,52,53,54,55,56,57,54,65,89,189,188};
+  //std::vector< int > TestValues = {48,49,50,52,53,54,55,56};
+  wprintf(L"-----------------\nNow the tests:\n");
+  std::vector< int > TestValues = {65};
+  for ( int i=0; i < TestValues.size();i++) {
+    wprintf(L"Results for %i\t: %s  %s  %s  %s   \n", TestValues[i], rgKey[TestValues[i]]->KMX_GetShiftState(Base,0).c_str(),   rgKey[TestValues[i]]->KMX_GetShiftState(Base,1).c_str() ,  rgKey[TestValues[i]]->KMX_GetShiftState(Shft,0).c_str(), rgKey[TestValues[i]]->KMX_GetShiftState(Shft,1).c_str());
+  }
+  wprintf(L"-----------------\n");
 
   //-------------------------------------------------------------
   // Now that we've collected the key data, we need to
