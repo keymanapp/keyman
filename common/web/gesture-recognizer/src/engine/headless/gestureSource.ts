@@ -272,19 +272,13 @@ export class GestureSourceSubview<HoveredItemType, StateToken = any> extends Ges
     preserveBaseItem: boolean,
     stateTokenOverride?: StateToken
   ) {
-    let mayUpdate = true;
+    //let mayUpdate = true;
     let start = 0;
     let length = source.path.coords.length;
-    if(source instanceof GestureSourceSubview) {
-      start = source._baseStartIndex;
-      const expectedLength = start + length;
-      // Check against the full remaining length of the original source; does
-      // the subview provided to us include its source's most recent point?
-      const sampleCountSinceStart = source.baseSource.path.coords.length;
-      if(expectedLength != sampleCountSinceStart) {
-        mayUpdate = false;
-      }
-    }
+
+    // While it'd be nice to validate that a previous subview, if used, has all 'current'
+    // entries, this gets tricky; race conditions are possible in which an extra input event
+    // occurs before subviews can be spun up when starting a model-matcher in some scenarios.
 
     super(source.rawIdentifier, configStack, source.isFromTouch);
 
@@ -358,24 +352,22 @@ export class GestureSourceSubview<HoveredItemType, StateToken = any> extends Ges
       this._baseItem = lastSample?.item;
     }
 
-    if(mayUpdate) {
-      // Ensure that this 'subview' is updated whenever the "source of truth" is.
-      const completeHook    = ()       => this.path.terminate(false);
-      const invalidatedHook = ()       => this.path.terminate(true);
-      const stepHook        = (sample: InputSample<HoveredItemType, StateToken>) => {
-        super.update(translateSample(sample));
-      };
-      baseSource.path.on('complete',    completeHook);
-      baseSource.path.on('invalidated', invalidatedHook);
-      baseSource.path.on('step',        stepHook);
+    // Ensure that this 'subview' is updated whenever the "source of truth" is.
+    const completeHook    = ()       => this.path.terminate(false);
+    const invalidatedHook = ()       => this.path.terminate(true);
+    const stepHook        = (sample: InputSample<HoveredItemType, StateToken>) => {
+      super.update(translateSample(sample));
+    };
+    baseSource.path.on('complete',    completeHook);
+    baseSource.path.on('invalidated', invalidatedHook);
+    baseSource.path.on('step',        stepHook);
 
-      // But make sure we can "disconnect" it later once the gesture being matched
-      // with the subview has fully matched; it's good to have a snapshot left over.
-      this.subviewDisconnector = () => {
-        baseSource.path.off('complete',    completeHook);
-        baseSource.path.off('invalidated', invalidatedHook);
-        baseSource.path.off('step',        stepHook);
-      }
+    // But make sure we can "disconnect" it later once the gesture being matched
+    // with the subview has fully matched; it's good to have a snapshot left over.
+    this.subviewDisconnector = () => {
+      baseSource.path.off('complete',    completeHook);
+      baseSource.path.off('invalidated', invalidatedHook);
+      baseSource.path.off('step',        stepHook);
     }
   }
 
