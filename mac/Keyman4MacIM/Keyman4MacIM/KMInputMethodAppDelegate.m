@@ -318,7 +318,7 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
                     NSLog(@"eventTapFunction: system event kCGEventFlagsChanged to: %x", (int) sysEvent.modifierFlags);
                 appDelegate.currentModifierFlags = sysEvent.modifierFlags;
                 if (appDelegate.currentModifierFlags & NSEventModifierFlagCommand) {
-                    appDelegate.contextChangingEventDetected = YES;
+                    appDelegate.contextChangedByLowLevelEvent = YES;
                 }
                 break;
 
@@ -327,7 +327,7 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
             case kCGEventOtherMouseUp:
             case kCGEventOtherMouseDown:
             NSLog(@"Event tap context invalidation flagged due to event: %@", event);
-                appDelegate.contextChangingEventDetected = YES;
+                appDelegate.contextChangedByLowLevelEvent = YES;
                 break;
 
             case kCGEventKeyDown:
@@ -382,7 +382,7 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
                     case kVK_ForwardDelete:
                         // Text modification by the forward delete key should reset context, but
                         // note that normal Delete (aka Bksp) is already managed by Keyman correctly.
-                        appDelegate.contextChangingEventDetected = YES;
+                        appDelegate.contextChangedByLowLevelEvent = YES;
                         break;
                 }
                 break;
@@ -771,7 +771,7 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
     _contextBuffer = [contextBuffer mutableCopy];
     if (_contextBuffer.length)
         [_contextBuffer replaceOccurrencesOfString:@"\0" withString:[NSString nullChar] options:0 range:NSMakeRange(0, 1)];
-    [self.kme setCoreContext:self.contextBuffer];
+    [self.kme setCoreContextIfNeeded:self.contextBuffer];
 }
 
 - (void)awakeFromNib {

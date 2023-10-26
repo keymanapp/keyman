@@ -18,8 +18,8 @@
 
 @interface CoreWrapper()
 
-@property (readonly) km_core_keyboard * keyboard;
-@property (readonly) km_core_state *keyboardState;
+@property (readonly) km_core_keyboard * coreKeyboard;
+@property (readonly) km_core_state *coreState;
 @property (weak, nonatomic, readonly) CoreHelper *coreHelper;
 
 @end
@@ -52,13 +52,13 @@ const int CORE_ENVIRONMENT_ARRAY_LENGTH = 6;
       [self createKeyboardStateUsingCore];
     }
     @catch (NSException *exception) {
-      if (self.keyboardState) {
-        km_core_state_dispose(self.keyboardState);
-        _keyboardState = nil;
+      if (self.coreState) {
+        km_core_state_dispose(self.coreState);
+        _coreState = nil;
       }
-      if (self.keyboard) {
-        km_core_keyboard_dispose(self.keyboard);
-        _keyboard = nil;
+      if (self.coreKeyboard) {
+        km_core_keyboard_dispose(self.coreKeyboard);
+        _coreKeyboard = nil;
       }
       //TODO: use NSError instead of NSException?
       @throw;
@@ -67,18 +67,18 @@ const int CORE_ENVIRONMENT_ARRAY_LENGTH = 6;
 }
 
 -(void) dealloc{
-  if (self.keyboardState) {
-    km_core_state_dispose(self.keyboardState);
+  if (self.coreState) {
+    km_core_state_dispose(self.coreState);
   }
-  if (self.keyboard) {
-    km_core_keyboard_dispose(self.keyboard);
+  if (self.coreKeyboard) {
+    km_core_keyboard_dispose(self.coreKeyboard);
   }
   [self.coreHelper logDebugMessage:@"CoreWrapper dealloc called."];
 }
 
 -(void)loadKeyboardUsingCore:(NSString*) path {
   km_core_path_name keyboardPath = [path UTF8String];
-  km_core_status result = km_core_keyboard_load(keyboardPath, &_keyboard);
+  km_core_status result = km_core_keyboard_load(keyboardPath, &_coreKeyboard);
   
   if (result != KM_CORE_STATUS_OK) {
     NSString *message = [NSString stringWithFormat:@"Unexpected Keyman Core result: %u", result];
@@ -87,9 +87,9 @@ const int CORE_ENVIRONMENT_ARRAY_LENGTH = 6;
 }
 
 -(void)readKeyboardAttributesUsingCore {
-  if (self.keyboard != nil) {
+  if (self.coreKeyboard != nil) {
     const km_core_keyboard_attrs * keyboardAttributes;
-    km_core_status result = km_core_keyboard_get_attrs(self.keyboard, &keyboardAttributes);
+    km_core_status result = km_core_keyboard_get_attrs(self.coreKeyboard, &keyboardAttributes);
 
     if (result==KM_CORE_STATUS_OK) {
       _keyboardVersion = [self.coreHelper createNSStringFromUnicharString:keyboardAttributes->version_string];
@@ -110,7 +110,7 @@ const int CORE_ENVIRONMENT_ARRAY_LENGTH = 6;
 
   if([CoreWrapper setupCoreEnvironment:coreEnvironment]) {
     // create state using keyboard and option list
-    result = km_core_state_create(self.keyboard, coreEnvironment, &_keyboardState);
+    result = km_core_state_create(self.coreKeyboard, coreEnvironment, &_coreState);
 
     if (result != KM_CORE_STATUS_OK) {
       NSString *message = [NSString stringWithFormat:@"Unexpected Keyman Core result: %u", result];
@@ -160,7 +160,7 @@ const int CORE_ENVIRONMENT_ARRAY_LENGTH = 6;
             withModifier:(uint16_t)modifierState
              withKeyDown:(uint8_t) isKeyDown {
 
-  km_core_status result = km_core_process_event(self.keyboardState, keyCode, modifierState, isKeyDown, KM_CORE_EVENT_FLAG_DEFAULT);
+  km_core_status result = km_core_process_event(self.coreState, keyCode, modifierState, isKeyDown, KM_CORE_EVENT_FLAG_DEFAULT);
 
   if (result!=KM_CORE_STATUS_OK) {
     [self.coreHelper logDebugMessage:@"km_core_process_event() result = %u\n", result];
@@ -176,7 +176,7 @@ const int CORE_ENVIRONMENT_ARRAY_LENGTH = 6;
 -(NSArray*)loadActionsUsingCore {
   size_t actionCount = 0;
   km_core_action_item const * actionList =
-      km_core_state_action_items(self.keyboardState, &actionCount);
+      km_core_state_action_items(self.coreState, &actionCount);
   
   NSMutableArray *eventArray = [NSMutableArray arrayWithCapacity:actionCount];
 
@@ -259,7 +259,7 @@ const int CORE_ENVIRONMENT_ARRAY_LENGTH = 6;
 }
 
 -(NSString *)getContextAsStringUsingCore {
-  km_core_context * context =  km_core_state_context(self.keyboardState);
+  km_core_context * context =  km_core_state_context(self.coreState);
   
   km_core_context_item * contextItemsArray = nil;
   size_t contextLength = km_core_context_length(context);
@@ -292,8 +292,15 @@ const int CORE_ENVIRONMENT_ARRAY_LENGTH = 6;
 }
 
 -(void)clearContextUsingCore {
-  km_core_context * coreContext =  km_core_state_context(self.keyboardState);
+  km_core_context * coreContext =  km_core_state_context(self.coreState);
   km_core_context_clear(coreContext);
+  [self.coreHelper logDebugMessage:@"km_core_context_clear called"];
+}
+
+-(void)setContextIfNeeded:(NSString*)context {
+  unichar const * unicharContext = [self.coreHelper createUnicharStringFromNSString:context];
+  km_core_status result = km_core_state_context_set_if_needed(self.coreState, unicharContext);
+  [self.coreHelper logDebugMessage:@"CoreWrapper setContextIfNeeded, context=%@, km_core_state_context_set_if_needed result=%i", context, result];
 }
 
 -(void)setContext:(NSString*)context {
@@ -308,7 +315,7 @@ const int CORE_ENVIRONMENT_ARRAY_LENGTH = 6;
     [self.coreHelper logDebugMessage:@"km_core_context_items_from_utf8, result=%i", result];
     
     // set the context in core using the array
-    km_core_context * coreContext =  km_core_state_context(self.keyboardState);
+    km_core_context * coreContext =  km_core_state_context(self.coreState);
     km_core_context_set(coreContext, contextItemArray);
     // dispose
     km_core_context_items_dispose(contextItemArray);
@@ -356,7 +363,7 @@ const int CORE_ENVIRONMENT_ARRAY_LENGTH = 6;
   option[0].value = [self.coreHelper createUnicharStringFromNSString: value];
   option[0].scope = KM_CORE_OPT_KEYBOARD;
   
-  km_core_status result = km_core_state_options_update(self.keyboardState, &option[0]);
+  km_core_status result = km_core_state_options_update(self.coreState, &option[0]);
   [self.coreHelper logDebugMessage:@"setOptionsForCore, km_core_state_options_update result = %d", result];
   
   return (result==KM_CORE_STATUS_OK);
@@ -365,7 +372,7 @@ const int CORE_ENVIRONMENT_ARRAY_LENGTH = 6;
 -(void)readCoreOptions: (km_core_cp const *) key {
   km_core_cp const * valueFromCore = nil;
   km_core_status result =
-  km_core_state_option_lookup(self.keyboardState,
+  km_core_state_option_lookup(self.coreState,
                              KM_CORE_OPT_KEYBOARD,
                              key,
                              &valueFromCore);

@@ -27,6 +27,7 @@ NS_ASSUME_NONNULL_BEGIN
 -(NSArray*)processMacVirtualKey:(unsigned short)macKeyCode
               withModifiers:(NSEventModifierFlags)modifierState
                 withKeyDown:(BOOL)isKeyDown;
+-(void)setContextIfNeeded:(NSString*)context;
 -(void)setContext:(NSString*)context;
 -(NSString*)context;
 -(void)clearCoreContext;

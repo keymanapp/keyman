@@ -76,7 +76,7 @@ static const int KEYMAN_FIRST_KEYBOARD_MENUITEM_INDEX = 0;
 @property (nonatomic, assign) CFMachPortRef lowLevelEventTap;
 @property (nonatomic, assign) CFRunLoopSourceRef runLoopEventSrc;
 @property (nonatomic, assign) BOOL sleeping;
-@property (nonatomic, assign) BOOL contextChangingEventDetected;
+@property (nonatomic, assign) BOOL contextChangedByLowLevelEvent;
 @property (nonatomic, strong) OSKWindowController *oskWindow;
 @property (nonatomic, strong) NSString *keyboardName;
 @property (nonatomic, strong) NSImage *keyboardIcon;

@@ -9,22 +9,19 @@
 #import "KMInputMethodEventHandlerProtected.h"
 #import <KeymanEngine4Mac/KeymanEngine4Mac.h>
 #import <Carbon/Carbon.h> /* For kVK_ constants. */
-#import "KMContext.h"
 #import "KeySender.h"
 #import "KMCoreActionHandler.h"
 #import "TextApiCompliance.h"
-//TODO: remove debug call to PrivacyConsent
-#import "PrivacyConsent.h"
 
 @import Sentry;
 
 @interface KMInputMethodEventHandler ()
-@property KMContext *cachedContext; // TODO: rename after eliminating other context references
 @property (nonatomic, retain) KeySender* keySender;
 @property (nonatomic, retain) TextApiCompliance* apiCompliance;
 @property int generatedBackspaceCount;
 @property (nonatomic, retain) NSString* clientApplicationId;
 @property NSString *queuedText;
+@property BOOL contextChanged;
 @end
 
 @implementation KMInputMethodEventHandler
@@ -63,7 +60,6 @@ NSRange _previousSelRange;
 - (instancetype)initWithClient:(NSString *)clientAppId client:(id) sender {
     self.senderForDeleteBack = sender;
     _keySender = [[KeySender alloc] init];
-    _cachedContext = [[KMContext alloc] init];
     _clientApplicationId = clientAppId;
     _generatedBackspaceCount = 0;
   
@@ -125,9 +121,8 @@ NSRange _previousSelRange;
     // the only downside to treating all commands as having the potential to change the selection
     // is that some "legacy" apps can't get their context at all. This can be overridden so that
     // legacy apps can mitigate this problem as appropriate.
-    if ([self.appDelegate debugMode])
-        NSLog(@"Command key - context needs to be re-gotten.");
-    _contextOutOfDate = YES;
+    [self.appDelegate logDebugMessage:@"KMInputMethodEventHandler handleCommand, event type=%@, must refresh context", event.type];
+    self.contextChanged = YES;
 }
 
 - (void)checkContextIn:(id)client {
@@ -279,13 +274,13 @@ NSRange _previousSelRange;
     // actually be useful if client respondsToSelector:@selector(attributedSubstringFromRange:), but even then
     // we'd only want to do it if we have actually moved from our previous location. Otherwise, we wouldn't be
     // able to handle dead keys correctly.)
-    if (self.appDelegate.contextChangingEventDetected)
+    if (self.appDelegate.contextChangedByLowLevelEvent)
     {
         if (!_contextOutOfDate) {
           [self.appDelegate logDebugMessage:@"Low-level event requires context to be re-retrieved."];
         }
         _contextOutOfDate = YES;
-        self.appDelegate.contextChangingEventDetected = NO;
+        self.appDelegate.contextChangedByLowLevelEvent = NO;
     }
 
     if (_contextOutOfDate)
@@ -710,14 +705,14 @@ NSRange _previousSelRange;
   }
 }
 
-- (void) checkIfContextChangingEventDetected {
-  if (self.appDelegate.contextChangingEventDetected)
+- (void) handleContextChangedByLowLevelEvent {
+  if (self.appDelegate.contextChangedByLowLevelEvent)
   {
-    if (!self.cachedContext.isInvalid) {
-      [self.appDelegate logDebugMessage:@"Low-level event has invalidated the context."];
-      [self.cachedContext invalidateContext];
+    if (!self.contextChanged) {
+      [self.appDelegate logDebugMessage:@"Low-level event has changed the context."];
+      self.contextChanged = YES;
     }
-    self.appDelegate.contextChangingEventDetected = NO;
+    self.appDelegate.contextChangedByLowLevelEvent = NO;
   }
 }
 
@@ -728,31 +723,30 @@ NSRange _previousSelRange;
   [self checkTextApiCompliance:sender];
   
   // mouse movement requires that the context be invalidated
-  [self checkIfContextChangingEventDetected];
+  [self handleContextChangedByLowLevelEvent];
 
-  if (event.type == NSKeyDown) {
-    [self loadContextIfInvalid:event forClient:sender];
-    
-    // indicates that our generated backspace event(s) are consumed
-    // and we can insert text that followed the backspace(s)
-    if (event.keyCode == kKeymanEventKeyCode) {
-      [self insertQueuedText: event client:sender];
-      return YES;
-    }
+    if (event.type == NSKeyDown) {
+      [self reportContext:event forClient:sender];
+      
+      // indicates that our generated backspace event(s) are consumed
+      // and we can insert text that followed the backspace(s)
+      if (event.keyCode == kKeymanEventKeyCode) {
+        [self insertQueuedText: event client:sender];
+        return YES;
+      }
 
-    if(event.keyCode == kVK_Delete && self.generatedBackspaceCount > 0) {
-      self.generatedBackspaceCount--;
-      [self.cachedContext deleteLastCodePoint];
-      [self.appDelegate logDebugMessage:@"handleEvent KVK_Delete, reducing generatedBackspaceCount to %d ", self.generatedBackspaceCount];
-      return NO;
+      if(event.keyCode == kVK_Delete && self.generatedBackspaceCount > 0) {
+        self.generatedBackspaceCount--;
+        [self.appDelegate logDebugMessage:@"handleEvent KVK_Delete, reducing generatedBackspaceCount to %d ", self.generatedBackspaceCount];
+        return NO;
+      }
     }
-  }
     if (event.type == NSEventTypeFlagsChanged) {
         // Mark the context as out of date for the command keys
         switch([event keyCode]) {
             case kVK_RightCommand:
             case kVK_Command:
-            [self.cachedContext invalidateContext];
+                self.contextChanged = YES;
                 break;
             case kVK_Shift:
             case kVK_RightShift:
@@ -779,30 +773,51 @@ NSRange _previousSelRange;
     return handled;
 }
 
--(void)loadContextIfInvalid:(NSEvent *)event forClient:(id) client {
+/**
+ * Called for every keystroke.
+ * If we can read the context, send it to Keyman Core.
+ * For non-compliant apps, we cannot read the context.
+ * In the non-compliant app case, if the context has changed then clear it in Core.
+ */
+-(void)reportContext:(NSEvent *)event forClient:(id) client {
   NSString *contextString = nil;
-  NSAttributedString *attributedString = nil;
 
-  if ([self.cachedContext isInvalid]) {
-    if (self.apiCompliance.canReadText) {
-      NSRange selectionRange = [client selectedRange];
-      NSRange contextRange = NSMakeRange(0, selectionRange.location);
-      attributedString = [client attributedSubstringFromRange:contextRange];
-    }
-    
-    if(attributedString == nil) {
-      contextString = @"";
-    } else {
-      contextString = attributedString.string;
-    }
-    
-    [self.appDelegate logDebugMessage:@"loadContext, new context='%@'", contextString];
-    [self.cachedContext resetContext:contextString];
-    [self.kme setCoreContext:contextString];
-    }
+  // if we can read the text, then get the context and send it to Core
+  // we do this whether the context has changed or not
+  if (self.apiCompliance.canReadText) {
+    contextString = [self readContext:event forClient:client];
+    [self.appDelegate logDebugMessage:@"reportContext, setting new context='%@' for compliant app (if needed)", contextString];
+    [self.kme setCoreContextIfNeeded:contextString];
+  } else if (self.contextChanged) {
+  // we cannot read the text but know the context has changed, so we must clear it
+    [self.appDelegate logDebugMessage:@"reportContext, clearing context for non-compliant app"];
+    [self.kme clearCoreContext];
+  }
+  
+  // the context is now current, reset the flag
+  self.contextChanged = NO;
 }
 
-/*
+-(NSString*)readContext:(NSEvent *)event forClient:(id) client {
+  NSString *contextString = nil;
+  NSAttributedString *attributedString = nil;
+  
+  // if we can read the text, then get the context
+  if (self.apiCompliance.canReadText) {
+    NSRange selectionRange = [client selectedRange];
+    NSRange contextRange = NSMakeRange(0, selectionRange.location);
+    attributedString = [client attributedSubstringFromRange:contextRange];
+  }
+  
+  if(attributedString == nil) {
+    contextString = @"";
+  } else {
+    contextString = attributedString.string;
+  }
+  return contextString;
+}
+
+/**
  * Returns YES if we have applied an event to the client.
  * If NO, then (passthrough case) we are instructing the OS to apply the original event.
  * If any of the returned actions result in a change to the client, then return YES.
@@ -853,7 +868,7 @@ NSRange _previousSelRange;
       }
       break;
     case InvalidateContextAction:
-      [self.cachedContext invalidateContext];
+      self.contextChanged = YES;
       break;
     case CapsLockAction: {
       //TODO: handle this somewhere
@@ -862,8 +877,6 @@ NSRange _previousSelRange;
     default:
       break;
   }
-
-  [self.cachedContext applyAction:operation.action keyDownEvent:event];
 }
 
 -(void)executeCompositeOperation:(KMActionOperation*)operation keyDownEvent:(nonnull NSEvent *)event client:(id) client {
@@ -930,7 +943,6 @@ NSRange _previousSelRange;
     replacementRange = notFoundRange;
   }
   [client insertText:text replacementRange:replacementRange];
-  [self.cachedContext replaceSubstring:text count:actualReplacementCount];
   if (self.apiCompliance.isComplianceUncertain) {
     [self.apiCompliance testComplianceAfterInsert:client];
   }
@@ -938,8 +950,6 @@ NSRange _previousSelRange;
 
 
 -(void)sendEventsForOperation: (NSEvent *)event actionOperation:(KMActionOperation*)operation {
-  [self.appDelegate logDebugMessage:@"sendEventsForOperation backspaceCount: %d, textToInsert: %@, hasAccessibility = %@", operation.backspaceCount, operation.textToInsert, [PrivacyConsent.shared checkAccessibility]?@"YES":@"***NO!***"];
-  
   if (operation.hasBackspaces) {
     for (int i = 0; i < operation.backspaceCount; i++)
     {

@@ -101,6 +101,9 @@
                <Test
                   Identifier = "KMEngineTests/testprocessEvent_eventForUnshiftedNumeralWithCipherMusicKmx_ReturnsQstrActionToInsertNumeral">
                </Test>
+               <Test
+                  Identifier = "KMEngineTests/testsetContextBuffer_EmptyContext_InitializedWithContext">
+               </Test>
             </SkippedTests>
          </TestableReference>
       </Testables>

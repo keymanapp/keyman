@@ -22,6 +22,7 @@
 - (id)initWithKMX:(KMXFile *)kmx context:(NSString *)ctxBuf verboseLogging:(BOOL)enableDebugLogging;
 - (NSString *)getCoreContext;
 - (void)clearCoreContext;
+- (void)setCoreContextIfNeeded:(NSString *)context;
 - (void)setCoreContext:(NSString *)context;
 
 - (void)setCoreOptions:(NSString *)key withValue:(NSString *)value;

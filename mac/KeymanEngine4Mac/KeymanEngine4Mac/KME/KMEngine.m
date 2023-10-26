@@ -97,6 +97,10 @@ const NSString* kEasterEggKmxName = @"EnglishSpanish.kmx";
   [self.coreWrapper clearCoreContext];
 }
 
+- (void)setCoreContextIfNeeded:(NSString *)context {
+  [self.coreWrapper setContextIfNeeded:context];
+}
+
 - (void)setCoreContext:(NSString *)context {
   [self.coreWrapper setContext:context];
 }
