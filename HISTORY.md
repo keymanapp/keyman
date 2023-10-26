@@ -1,5 +1,25 @@
 # Keyman Version History
 
+## 17.0.199 alpha 2023-10-26
+
+* fix(developer): handle xml errors in package compiler (#9821)
+* fix(developer): server download Keyman link (#9822)
+* chore(common): handle invalid XML in kpj-file-reader (#9824)
+* fix(developer): reduce confusion in Unicode fields in touch layout editor (#9839)
+
+## 17.0.198 alpha 2023-10-25
+
+* chore(common): Add entries from 16.0 HISTORY.md (#9826)
+* feat(core): new actions APIs (#9828)
+
+## 17.0.197 alpha 2023-10-24
+
+* chore(linux): Rename (lib)kmnkbp to (lib)keymancore  ️ (#9793)
+* chore(linux): Rename `namespace kbp` to `core`  ️ (#9792)
+* chore(linux): rename keyboardprocessor_ldml.* to keyman_core_ldml  ️ (#9791)
+* chore(linux): Rename libkmnkbp0-0 package  ️ (#9795)
+* fix(web): proper disabling of prediction timeout for prediction unit tests (#9835)
+
 ## 17.0.196 alpha 2023-10-20
 
 * fix(mac): move keyboard menu items to main Input Menu from submenu (#9777)
@@ -1150,6 +1170,22 @@
 * chore: move to 17.0-alpha (#7577)
 * chore: Move to 17.0 alpha
 
+## 16.0.142 stable 2023-10-20
+
+* chore(linux): Update debian changelog (#9326)
+* chore(linux): Remove obsolete dist from uploading to launchpad (#9340)
+* chore(linux): Stop building Kinetic on Jenkins (#9354)
+* chore(linux): Work around build failure on Debian mips64el (#9342)
+* chore(linux): Update debian changelog (#9359)
+* chore(android): Update targetSDKVersion to 33 (#9494)
+* chore(linux): Remove workaround for mips64el (#9519)
+* chore(linux): Workaround: Don't run Wayland tests (#9530)
+* chore(linux): Add `clean` target to `rules` (#9532)
+* fix(linux): Prevent exception if neither USER, LOGNAME nor SUDO_USER set (#9544)
+* chore(linux): Ignore tests that fail on ba-jammy-64-ta (#9556)
+* chore(ios): renew certificate (#9811)
+* fix(mac): move keyboard menu items to main Input Menu from submenu (#9810)
+
 ## 16.0.141 stable 2023-07-25
 
 * chore(mac): fix corrupt installer (#9332)
@@ -1537,6 +1573,7 @@
 * fix(linux): Fix upload script (#7494)
 * docs(linux): Update sample vscode settings (#7491)
 * fix(android/engine): Dismiss key preview and subkeys on globe action (#7472)
+* refactor(linux): Cleanup whitespace (#7500)
 * chore(linux): Improve debug output (#7499)
 
 ## 16.0.84 alpha 2022-10-19
@@ -1824,7 +1861,7 @@
 ## 16.0.34 alpha 2022-07-15
 
 * fix(developer): set contextDevice in web debugger  ️ (#6906)
-* fix(web): postkeystroke processing should ignore key-event source ️ (#6901)
+* fix(web): postkeystroke processing should ignore key-event source (#6901)
 * fix(web): layer-setting ops should not trigger for hardware keystroke processing  ️ (#6902)
 * fix(developer): kmdecomp virtual character key output (#6940)
 * fix(developer): crash on exit when checking for updates (#6941)

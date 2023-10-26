@@ -44,8 +44,9 @@ function loadDefaultProjectFromFolder(infile: string, callbacks: CompilerCallbac
 function loadProjectFromFile(infile: string, callbacks: CompilerCallbacks): KeymanDeveloperProject {
   const kpjData = callbacks.loadFile(infile);
   const reader = new KPJFileReader(callbacks);
-  const kpj = reader.read(kpjData);
+  let kpj = null;
   try {
+    kpj = reader.read(kpjData);
     reader.validate(kpj);
   } catch(e) {
     callbacks.reportMessage(InfrastructureMessages.Error_InvalidProjectFile({message: (e??'').toString()}));

@@ -39,6 +39,10 @@ export class WindowsPackageInstallerCompiler {
 
   public async compile(kpsFilename: string, sources: WindowsPackageInstallerSources): Promise<Uint8Array> {
     const kps = this.kmpCompiler.loadKpsFile(kpsFilename);
+    if(!kps) {
+      // errors will already have been reported by loadKpsFile
+      return null;
+    }
 
     // Check existence of required files
     for(const filename of [sources.licenseFilename, sources.msiFilename, sources.setupExeFilename]) {
