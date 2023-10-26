@@ -185,30 +185,6 @@ describe("GestureSource", function() {
       assert.deepEqual(subview.currentSample, worldSample);
     });
 
-    it('is not updated if constructed from old, not-up-to-date subview', () => {
-      let source = new GestureSource<string>(0, null, true);
-      let updatingSubview = source.constructSubview(false, true);
-      let oldSubview = source.constructSubview(false, true);
-      oldSubview.disconnect();
-
-      source.update(helloSample);
-
-      let subview = oldSubview.constructSubview(false, true);
-
-      assert.equal(subview.path.coords.length, 0);
-
-      source.update(worldSample);
-
-      // Only the 'updating' one should update in this scenario.
-      //
-      // It's an error if the subview based on the non-updated subview updates,
-      // as there would be a gap in the path!
-      assert.equal(updatingSubview.path.coords.length, 2);
-      assert.equal(subview.path.coords.length, 0);
-      assert.deepEqual(updatingSubview.currentSample, worldSample);
-      assert.isNotOk(subview.currentSample);
-    });
-
     it("propagate path termination (complete)",  () => {
       let source = new GestureSource<string>(0, null, true);
       let subview = source.constructSubview(true, true);

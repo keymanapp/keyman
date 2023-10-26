@@ -274,6 +274,9 @@ export class GestureSourceSubview<HoveredItemType, StateToken = any> extends Ges
   ) {
     let start = 0;
     let length = source.path.coords.length;
+    if(source instanceof GestureSourceSubview) {
+      start = source._baseStartIndex;
+    }
 
     // While it'd be nice to validate that a previous subview, if used, has all 'current'
     // entries, this gets tricky; race conditions are possible in which an extra input event
