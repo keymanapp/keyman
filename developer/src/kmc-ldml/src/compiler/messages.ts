@@ -43,7 +43,10 @@ export class CompilerMessages {
   m(this.WARN_CustomForm, `Custom <form id="${o.id}"> element. Key layout may not be as expected.`);
   static WARN_CustomForm = SevWarn | 0x000A;
 
-  // 0x000B - available
+  static Error_GestureKeyNotFoundInKeyBag = (o:{keyId: string, parentKeyId: string, attribute: string}) =>
+  m(this.ERROR_GestureKeyNotFoundInKeyBag, `Key '${o.keyId}' not found in key bag, referenced from other '${o.parentKeyId}' in ${o.attribute}`);
+  static ERROR_GestureKeyNotFoundInKeyBag = SevError | 0x000B;
+
   // 0x000C - available
 
   static Error_InvalidVersion = (o:{version: string}) =>

@@ -20,14 +20,15 @@ describe('keys', function () {
         assert.equal(compilerTestCallbacks.messages.length, 0);
         assert.equal(keys.keys.length, 2);
         assert.equal(keys.flicks.length, 1); // there's always a 'null' flick
-        assert.equal(keys.keys[0].to.value, 'oops');
-        assert.isFalse(keys.keys[0].to.isOneChar);
-        assert.equal(keys.keys[0].flags, constants.keys_key_flags_extend);
-        assert.equal(keys.keys[0].id.value, 'mistake');
-        assert.isTrue(keys.keys[1].to.isOneChar);
-        assert.equal(keys.keys[1].to.value, String.fromCodePoint(0x1FAA6));
-        assert.equal(keys.keys[1].flags, 0);
-        assert.equal(keys.keys[1].id.value, 'grave');
+        // ids are in sorted order in memory`
+        assert.isTrue(keys.keys[0].to.isOneChar);
+        assert.equal(keys.keys[0].to.value, String.fromCodePoint(0x1FAA6));
+        assert.equal(keys.keys[0].flags, 0);
+        assert.equal(keys.keys[0].id.value, 'grave');
+        assert.equal(keys.keys[1].to.value, 'oops');
+        assert.isFalse(keys.keys[1].to.isOneChar);
+        assert.equal(keys.keys[1].flags, constants.keys_key_flags_extend);
+        assert.equal(keys.keys[1].id.value, 'mistake');
       },
     },
     {
@@ -36,7 +37,7 @@ describe('keys', function () {
         const keys = <Keys> sect;
         assert.ok(keys);
         assert.equal(compilerTestCallbacks.messages.length, 0);
-        assert.equal(keys.keys.length, 4);
+        assert.equal(keys.keys.length, 12); // includes flick and gesture keys
 
         const [w] = keys.keys.filter(({ id }) => id.value === 'w');
         assert.ok(w);
@@ -47,9 +48,9 @@ describe('keys', function () {
         assert.isFalse(!!(q.flags & constants.keys_key_flags_gap));
         assert.equal(q.width, 32, 'q\'s width'); // ceil(3.14159 * 10.0)
         assert.equal(q.flicks, 'flick0'); // note this is a string, not a StrsItem
-        assert.equal(q.longPress.toString(), 'á é í');
-        assert.equal(q.longPressDefault.value, 'é');
-        assert.equal(q.multiTap.toString(), 'ä ë ï');
+        assert.equal(q.longPress.toString(), 'a-acute e-acute i-acute');
+        assert.equal(q.longPressDefault.value, 'e-acute');
+        assert.equal(q.multiTap.toString(), 'a-umlaut e-umlaut i-umlaut');
 
         const [flick0] = keys.flicks.filter(({ id }) => id.value === 'flick0');
         assert.ok(flick0);
@@ -57,11 +58,11 @@ describe('keys', function () {
 
         const [flick0_nw_se] = flick0.flicks.filter(({ directions }) => directions && directions.isEqual('nw se'.split(' ')));
         assert.ok(flick0_nw_se);
-        assert.equal(flick0_nw_se.keyId?.value, 'ç');
+        assert.equal(flick0_nw_se.keyId?.value, 'c-cedilla');
 
         const [flick0_ne_sw] = flick0.flicks.filter(({ directions }) => directions && directions.isEqual('ne sw'.split(' ')));
         assert.ok(flick0_ne_sw);
-        assert.equal(flick0_ne_sw.keyId?.value, 'ê'); // via variable
+        assert.equal(flick0_ne_sw.keyId?.value, 'e-caret'); // via variable
       },
     },
     {
@@ -70,16 +71,16 @@ describe('keys', function () {
         const keys = <Keys> sect;
         assert.ok(keys);
         assert.equal(compilerTestCallbacks.messages.length, 0);
-        assert.equal(keys.keys.length, 4);
+        assert.equal(keys.keys.length, 12); // flick and gesture keys
 
         const [q] = keys.keys.filter(({ id }) => id.value === 'q');
         assert.ok(q);
         assert.isFalse(!!(q.flags & constants.keys_key_flags_gap));
         assert.equal(q.width, 32); // ceil(3.1 * 10)
         assert.equal(q.flicks, 'flick0'); // note this is a string, not a StrsItem
-        assert.equal(q.longPress.toString(), 'á é í');
-        assert.equal(q.longPressDefault.value, 'é');
-        assert.equal(q.multiTap.toString(), 'ä ë ï');
+        assert.equal(q.longPress.toString(), 'a-acute e-acute i-acute');
+        assert.equal(q.longPressDefault.value, 'e-acute');
+        assert.equal(q.multiTap.toString(), 'a-umlaut e-umlaut i-umlaut');
 
         const [flick0] = keys.flicks.filter(({ id }) => id.value === 'flick0');
         assert.ok(flick0);
@@ -87,11 +88,11 @@ describe('keys', function () {
 
         const [flick0_nw_se] = flick0.flicks.filter(({ directions }) => directions && directions.isEqual('nw se'.split(' ')));
         assert.ok(flick0_nw_se);
-        assert.equal(flick0_nw_se.keyId?.value, 'ç');
+        assert.equal(flick0_nw_se.keyId?.value, 'c');
 
         const [flick0_ne_sw] = flick0.flicks.filter(({ directions }) => directions && directions.isEqual('ne sw'.split(' ')));
         assert.ok(flick0_ne_sw);
-        assert.equal(flick0_ne_sw.keyId?.value, 'ế');
+        assert.equal(flick0_ne_sw.keyId?.value, 'eee');
       },
     },
     {
@@ -126,18 +127,18 @@ describe('keys', function () {
         const keys = <Keys> sect;
         assert.ok(keys);
         assert.equal(compilerTestCallbacks.messages.length, 0);
-        assert.equal(keys.keys.length, 1);
+        assert.equal(keys.keys.length, 5);
 
-        const [ww] = keys.keys.filter(({ id }) => id.value === 'ww');
+        const ww = keys.keys.find(({ id }) => id.value === 'ww');
         assert.ok(ww);
-        const MARKER_1 = MarkerParser.markerOutput(1);
-        assert.equal(ww.to.value, MARKER_1);
-        assert.equal(ww.longPressDefault.value, MARKER_1);
-        assert.equal(ww.longPress[0].value.value, MARKER_1);
-        assert.equal(ww.multiTap[0].value.value, MARKER_1);
+        const MARKER_5 = MarkerParser.markerOutput(5);
+        assert.equal(ww.to.value, MARKER_5);
+        assert.equal(ww.longPressDefault.value, 'bb');
+        assert.equal(ww.longPress[0].value.value, 'aa');
+        assert.equal(ww.multiTap[0].value.value, 'cc');
         const [flickw] = keys.flicks?.filter(({id}) => id.value === 'flickw');
         assert.ok(flickw);
-        assert.equal(flickw.flicks[0].keyId.value, MARKER_1);
+        assert.equal(flickw.flicks[0].keyId.value, 'dd');
       },
     },
   ]);

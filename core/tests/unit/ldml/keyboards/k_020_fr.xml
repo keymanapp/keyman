@@ -54,10 +54,11 @@
 		<!-- extra symbols -->
 		<key id="bullet" output="•" />
 		<key id="umlaut" output="¨" />
-		<key id="super-2" output="²" longPressKeyIds@@="₂" />
+		<key id="sub-2" output="₂" />
+		<key id="super-2" output="²" longPressKeyIds="sub-2" />
 
 		<!-- test key -->
- 		<key id="a" flicks="a" output="a" longPressKeyIds@@="à â á ä ã å ā" />
+ 		<key id="a" flicks="a" output="a" longPressKeyIds="à â á ä ã å ā" />
 		<flicks id="a">
 			<flickSegment directions="nw" keyId@@="\u1234" />
 			<flickSegment directions="nw se" keyId@@="\uFFFF" />
@@ -65,7 +66,7 @@
 		</flicks>
 
 		<!-- test key -->
-		<key id="A" flicks="b" output="A" longPressKeyIds@@="À Á Ä Ã Å Ā" />
+		<key id="A" flicks="b" output="A" longPressKeyIds="À Á Ä Ã Å Ā" />
 
 		<!-- test flick -->
 		<flicks id="b">

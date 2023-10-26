@@ -7,7 +7,7 @@ import DependencySections = KMXPlus.DependencySections;
 import Keys = KMXPlus.Keys;
 import ListItem = KMXPlus.ListItem;
 import KeysFlicks = KMXPlus.KeysFlicks;
-import { allUsedKeyIdsInLayers, calculateUniqueKeys, translateLayerAttrToModifier, validModifier } from '../util/util.js';
+import { allUsedKeyIdsInFlick, allUsedKeyIdsInKey, allUsedKeyIdsInLayers, calculateUniqueKeys, hashFlicks, hashKeys, translateLayerAttrToModifier, validModifier } from '../util/util.js';
 import { MarkerTracker, MarkerUse } from './marker-tracker.js';
 
 export class KeysCompiler extends SectionCompiler {
@@ -15,9 +15,25 @@ export class KeysCompiler extends SectionCompiler {
     keyboard: LDMLKeyboard.LKKeyboard,
     mt: MarkerTracker
   ): boolean {
-    keyboard.keys?.key?.forEach(({ output }) =>
-      mt.add(MarkerUse.emit, MarkerParser.allReferences(output))
-    );
+    // TODO-LDML: repetition
+
+    const uniqueKeys = calculateUniqueKeys([...keyboard.keys?.key]);
+    const keyBag = hashKeys(uniqueKeys); // for easier lookup
+    // will be the set of ALL keys used in this keyboard
+    const usedKeys = allUsedKeyIdsInLayers(keyboard?.layers);
+    // save off the layer key IDs before we mutate the set
+    const layerKeyIds = Array.from(usedKeys.values());
+    const flickHash = hashFlicks(keyboard?.flicks?.flick); // for easier lookup
+    const usedFlicks = KeysCompiler.getUsedFlicks(layerKeyIds, keyBag);
+    KeysCompiler.addKeysFromFlicks(usedFlicks, flickHash, usedKeys);
+    KeysCompiler.addUsedGestureKeys(layerKeyIds, keyBag, usedKeys);
+
+    // process each key
+    for (let keyId of usedKeys.values()) {
+      const key = keyBag.get(keyId);
+      if (!key) continue;
+      mt.add(MarkerUse.emit, MarkerParser.allReferences(key.output));
+    }
     return true;
   }
 
@@ -45,30 +61,54 @@ export class KeysCompiler extends SectionCompiler {
       }
     });
 
-    // general key-level validation here, only of used keys
-    const usedKeys = allUsedKeyIdsInLayers(this.keyboard3?.layers);
-    const uniqueKeys = calculateUniqueKeys([...this.keyboard3.keys?.key]);
-    for (let key of uniqueKeys) {
-      const { id, flickId } = key;
-      if (!usedKeys.has(id)) {
-        continue; // unused key, ignore
+    const keyBag = this.getKeyBag();
+    // will be the set of ALL keys used in this keyboard
+    const usedKeys = this.getLayerKeyIds();
+    // save off the layer key IDs before we mutate the set
+    const layerKeyIds = Array.from(usedKeys.values());
+    const flickHash = this.getFlicks(); // for easier lookup
+    const usedFlicks = KeysCompiler.getUsedFlicks(layerKeyIds, keyBag);
+
+    // go through each layer key and collect flicks and gestures
+    for(const keyId of layerKeyIds) {
+      const key = keyBag.get(keyId);
+
+      if (!key) {
+        // Note: validateHardwareLayerForKmap(), below, will raise an error for hardware keys that are missing, with additional
+        // context. For this section, we just skip missing keys.
+        continue;
       }
-      // TODO-LDML: further key-level validation here
-      if (!flickId) {
-        continue; // no flicks
+
+      const { flickId } = key;
+      if (flickId) {
+        if (!flickHash.has(flickId)) {
+          valid = false;
+          this.callbacks.reportMessage(
+            CompilerMessages.Error_MissingFlicks({ flickId, id: keyId })
+          );
+        }
       }
-      const flickEntry = this.keyboard3?.flicks?.flick.find(
-        ({id}) => id === flickId
-      );
-      if (!flickEntry) {
-        valid = false;
-        this.callbacks.reportMessage(
-          CompilerMessages.Error_MissingFlicks({ flickId, id })
-        );
+      const gestureKeys = allUsedKeyIdsInKey(key);
+
+      for(const [gestureKeyId, attrs] of gestureKeys.entries()) {
+        const gestureKey = keyBag.get(gestureKeyId);
+        if (gestureKey == null) {
+          // TODO-LDML: could keep track of already missing keys so we don't warn multiple times on gesture keys
+          valid = false;
+          this.callbacks.reportMessage(
+            CompilerMessages.Error_GestureKeyNotFoundInKeyBag({keyId: gestureKeyId, parentKeyId: keyId, attribute: attrs.join(',')})
+          );
+        } else {
+          usedKeys.add(gestureKeyId);
+        }
       }
     }
 
-    // the layr compiler does more extensive validation of the layer attributes.
+    // now, check the flicks
+    KeysCompiler.addKeysFromFlicks(usedFlicks, flickHash, usedKeys);
+    // TODO-LDML: hint on unused flicks (that aren't imported)
+
+    // Note: the layr compiler does more extensive validation of the layer attributes.
 
     // Kmap validation
     const hardwareLayers = this.hardwareLayers();
@@ -78,13 +118,37 @@ export class KeysCompiler extends SectionCompiler {
       for (let layers of hardwareLayers) {
         for (let layer of layers.layer) {
           valid =
-            this.validateHardwareLayerForKmap(layers.formId, layer) && valid; // note: always validate even if previously invalid results found
+            this.validateHardwareLayerForKmap(layers.formId, layer, keyBag) && valid; // note: always validate even if previously invalid results found
         }
       }
       // TODO-LDML: } else { touch?
     }
 
     return valid;
+  }
+
+  static addKeysFromFlicks(usedFlicks: Set<string>, flickHash: Map<string, LDMLKeyboard.LKFlick>, usedKeys: Set<string>) {
+    for (let flickId of usedFlicks.values()) {
+      const flick = flickHash.get(flickId);
+      if (!flick) continue;
+      const flickKeys = allUsedKeyIdsInFlick(flick);
+      flickKeys.forEach(keyId => usedKeys.add(keyId));
+    }
+  }
+
+  private getFlicks() {
+    return hashFlicks(this.keyboard3?.flicks?.flick);
+  }
+
+  /** a set with all key ids used in all layers */
+  private getLayerKeyIds() {
+    return allUsedKeyIdsInLayers(this.keyboard3?.layers);
+  }
+
+  /** the entire keybag (used or unused) as a hash */
+  private getKeyBag() : Map<string, LDMLKeyboard.LKKey> {
+    const uniqueKeys = calculateUniqueKeys([...this.keyboard3.keys?.key]);
+    return hashKeys(uniqueKeys); // for easier lookup
   }
 
   public compile(sections: DependencySections): Keys {
@@ -96,11 +160,21 @@ export class KeysCompiler extends SectionCompiler {
 
     let sect = new Keys(sections.strs);
 
-    // Load the flicks first
-    this.loadFlicks(sections, sect);
+    // TODO-LDML: some duplication with validate()
+    const keyBag = this.getKeyBag();
+    // We only want to include used keys in .kmx
+    const usedKeys = this.getLayerKeyIds();
+    // save off the layer key IDs before we mutate the set
+    const layerKeyIds = Array.from(usedKeys.values());
 
-    // Now, load the keys
-    this.loadKeys(sections, sect);
+    // Load the flicks first
+    this.loadFlicks(sections, sect, keyBag, layerKeyIds, usedKeys);
+
+    // add in the gesture keys
+    KeysCompiler.addUsedGestureKeys(layerKeyIds, keyBag, usedKeys);
+
+    // Now, load the keys into memory
+    this.loadKeys(sections, sect, keyBag, layerKeyIds, usedKeys);
 
     // Finally, kmap
     // Use LayerMap + keys to generate compiled keys for hardware
@@ -122,42 +196,79 @@ export class KeysCompiler extends SectionCompiler {
     return sect;
   }
 
-  public loadFlicks(sections: DependencySections, sect: Keys) {
-    if (this.keyboard3?.flicks?.flick) {
-      for (let flick of this.keyboard3?.flicks?.flick) {
-        const { id } = flick;
-        let flicks: KeysFlicks = new KeysFlicks(
-          sections.strs.allocString(id)
-        );
-
-        for (let {keyId, directions} of flick.flickSegment) {
-          const keyIdStr = sections.strs.allocString(keyId);
-          let directionsList: ListItem = sections.list.allocListFromSpaces(
-            directions,
-            {
-              stringVariables: true, markers: true, unescape: true
-            },
-            sections);
-          flicks.flicks.push({
-            directions: directionsList,
-            keyId: keyIdStr,
-          });
-        }
-
-        sect.flicks.push(flicks);
+  static addUsedGestureKeys(layerKeyIds: string[], keyBag: Map<string, LDMLKeyboard.LKKey>, usedKeys: Set<string>) {
+    for (let keyId of layerKeyIds) {
+      const key = keyBag.get(keyId);
+      if (!key) continue;
+      for (let gestureKeyId of allUsedKeyIdsInKey(key).keys()) {
+        usedKeys.add(gestureKeyId);
       }
     }
   }
 
-  public loadKeys(sections: DependencySections, sect: Keys) {
-    const usedKeys = allUsedKeyIdsInLayers(this.keyboard3?.layers);
-    const uniqueKeys = calculateUniqueKeys([...this.keyboard3.keys?.key]);
+  /**
+   *
+   * @param keyBag the keybag as a hash
+   * @param layerKeyIds list of keys from the layer, to extract used flicks
+   * @param usedKeys will be populated with keys used in the flick
+   */
+  public loadFlicks(sections: DependencySections, sect: Keys,
+    keyBag: Map<string, LDMLKeyboard.LKKey>, layerKeyIds: string[], usedKeys: Set<string>) {
+    const flickHash = this.getFlicks(); // for easier lookup
+    const usedFlicks = KeysCompiler.getUsedFlicks(layerKeyIds, keyBag);
 
-    for (let key of uniqueKeys) {
-      if (!usedKeys.has(key.id)) {
-        // TODO-LDML: linting for unused, non-implied and non-imported keys,
-        continue; // unused key, skip
+    // only include used flicks in the table
+    // this way, extra unused imported flicks are ignored
+    // in id order, for now
+    for (let flickId of Array.from(usedFlicks.values()).sort()) {
+      const flick = flickHash.get(flickId);
+      if (!flick) continue; // already reported by validate()
+
+      // allocate the in-memory <flick id=…>
+      let flicks: KeysFlicks = new KeysFlicks(
+        sections.strs.allocString(flickId)
+      );
+
+      // add data from each segment
+      for (let { keyId, directions } of flick.flickSegment) {
+        const keyIdStr = sections.strs.allocString(keyId);
+        let directionsList: ListItem = sections.list.allocListFromSpaces(
+          directions,
+          {
+            stringVariables: true, markers: true, unescape: true
+          },
+          sections);
+        flicks.flicks.push({
+          directions: directionsList,
+          keyId: keyIdStr,
+        });
+        usedKeys.add(keyId);
       }
+
+      sect.flicks.push(flicks);
+    }
+  }
+
+  static getUsedFlicks(layerKeyIds: string[], keyBag: Map<string, LDMLKeyboard.LKKey>) {
+    const usedFlicks = new Set<string>();
+    for (let keyId of layerKeyIds) {
+      const key = keyBag.get(keyId);
+      if (!key) continue;
+      if (!key.flickId) continue;
+      usedFlicks.add(key.flickId);
+    }
+    return usedFlicks;
+  }
+
+  public loadKeys(sections: DependencySections, sect: Keys, keyBag: Map<string, LDMLKeyboard.LKKey>,
+    layerKeyIds: string[], usedKeys: Set<string>) {
+
+    // for each used key (whether from layer, gesture, etc.)
+    // push these in id order, for tidiness
+    for (let keyId of Array.from(usedKeys.values()).sort()) {
+      const key = keyBag.get(keyId);
+      if (!key) continue; // missing key
+
       let flags = 0;
       const { flickId, gap, longPressDefaultKeyId, longPressKeyIds, multiTapKeyIds, layerId, output } = key;
       if (!!gap) {
@@ -229,16 +340,17 @@ export class KeysCompiler extends SectionCompiler {
   }
 
   /**
-   * TODO-LDML: from old 'keys'
    * Validate for purpose of kmap
    * @param hardware the 'form' parameter
    * @param layer
-   * @returns
+   * @param keyHash the keybag's hash
+   * @returns true if valid
    */
   private validateHardwareLayerForKmap(
     hardware: string,
-    layer: LDMLKeyboard.LKLayer
-  ) {
+    layer: LDMLKeyboard.LKLayer,
+    keyHash: Map<string, LDMLKeyboard.LKKey>
+  ): boolean {
     let valid = true;
 
     const { modifiers } = layer;
@@ -266,7 +378,6 @@ export class KeysCompiler extends SectionCompiler {
       return valid;
     }
 
-    const uniqueKeys = calculateUniqueKeys([...this.keyboard3.keys?.key]);
     if (layer.row.length > keymap.length) {
       this.callbacks.reportMessage(
         CompilerMessages.Error_HardwareLayerHasTooManyRows()
@@ -292,7 +403,7 @@ export class KeysCompiler extends SectionCompiler {
       for (let key of keys) {
         x++;
 
-        let keydef = uniqueKeys.find((x) => x.id == key);
+        let keydef = keyHash.get(key);
         if (!keydef) {
           this.callbacks.reportMessage(
             CompilerMessages.Error_KeyNotFoundInKeyBag({

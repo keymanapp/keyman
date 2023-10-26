@@ -8,7 +8,7 @@
     <key id="equal" output="=" />
     <key id="hyphen" output="-" />
     <key id="untransformed-hat" output="^"/>
-    <key id="hat" output="\{hat}"/>
+    <key id="hat" output="\m{hat}"/>
   </keys>
 
   <layers formId="us">

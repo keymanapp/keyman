@@ -59,9 +59,6 @@ export class TouchLayoutCompiler {
   }
 
   private translateLayerIdToTouchLayoutLayerId(id: string, modifier: string): string {
-    if (!modifier) {
-      modifier = 'none';
-    }
     // Touch layout layers have a set of reserved names that correspond to
     // hardware modifiers. We want to map these identifiers first before falling
     // back to the layer ids
@@ -76,7 +73,6 @@ export class TouchLayoutCompiler {
     // rightalt       | altR
     // rightalt-shift | altR shift
     //
-
     const map = {
       none:         'default',
       shift:        'shift',
@@ -87,7 +83,7 @@ export class TouchLayoutCompiler {
 
     // canonicalize modifier string, alphabetical
     // TODO-LDML: need to support multiple here
-    if (modifier.indexOf(',') !== -1) {
+    if (modifier && modifier.indexOf(',') !== -1) {
       throw Error(`Internal error: TODO-LDML: multiple modifiers ${modifier} not yet supported.`);
     }
     modifier = (modifier||'').split(/\b/).sort().join(' ').trim();

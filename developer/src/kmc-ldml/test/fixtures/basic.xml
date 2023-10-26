@@ -18,6 +18,7 @@
   </displays>
 
   <keys>
+    <!-- Note: implied keys here: 'a' and 'e' -->
     <key id="hmaqtugha" output="ħ" longPressKeyIds="a e" />
     <key id="that" output="ថា" />
   </keys>
@@ -57,4 +58,3 @@
     </transformGroup>
   </transforms>
 </keyboard3>
-ti

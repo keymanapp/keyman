@@ -32,12 +32,29 @@ export function calculateUniqueKeys(keys?: LDMLKeyboard.LKKey[]): LDMLKeyboard.L
   return uniqueKeys;
 }
 
+/** Convert an array of keys to a hash */
+export function hashKeys(keys?: LDMLKeyboard.LKKey[]) : Map<string, LDMLKeyboard.LKKey> {
+  const m = new Map<string, LDMLKeyboard.LKKey>();
+  for (const k of keys ?? []) {
+    m.set(k.id, k);
+  }
+  return m;
+}
+
+export function hashFlicks(flicks?: LDMLKeyboard.LKFlick[]) : Map<string, LDMLKeyboard.LKFlick> {
+  const m = new Map<string, LDMLKeyboard.LKFlick>();
+  for (const k of flicks ?? []) {
+    m.set(k.id, k);
+  }
+  return m;
+}
+
+
 /**
- *
  * @param layersList list of layers elements, from `keyboard?.layers`
  * @returns set of key IDs
  */
-export function allUsedKeyIdsInLayers(layersList : LDMLKeyboard.LKLayers[] | null): Set<string> {
+export function allUsedKeyIdsInLayers(layersList?: LDMLKeyboard.LKLayers[]): Set<string> {
   const s = new Set<string>();
   if (layersList) {
     for (const layers of layersList || []) {
@@ -50,6 +67,45 @@ export function allUsedKeyIdsInLayers(layersList : LDMLKeyboard.LKLayers[] | nul
           }
         }
       }
+    }
+  }
+  return s;
+}
+
+/**
+ * Extract all of the key ids that this key refers to, not counting flicks
+ * @returns map from the key id to a set of attribute names (such as `multiTapDefaultKeyId` etc.) used by that key.
+ */
+export function allUsedKeyIdsInKey(key : LDMLKeyboard.LKKey) : Map<string, string[]> {
+  const m = new Map<string, string[]>();
+  /** add one key */
+  function addKey(keyId : string | undefined, attr: string) {
+    if (!keyId) return;
+    if (!m.has(keyId)) m.set(keyId,[]);
+    m.get(keyId).push(attr);
+  }
+  /** add a set of keys */
+  function addKeys(keyIds : string | undefined, attr: string) {
+    if (!keyIds) return;
+    for (const keyId of keyIds?.split(' ')) {
+      addKey(keyId, attr);
+    }
+  }
+
+  const {longPressKeyIds, longPressDefaultKeyId, multiTapKeyIds} = key;
+
+  addKey(longPressDefaultKeyId, 'longPressDefaultKeyId');
+  addKeys(longPressKeyIds, 'longPressKeyIds');
+  addKeys(multiTapKeyIds, 'multiTapKeyIds');
+
+  return m;
+}
+
+export function allUsedKeyIdsInFlick(flick? : LDMLKeyboard.LKFlick) : Set<string> {
+  const s = new Set<string>();
+  if(flick) {
+    for (const {keyId} of flick.flickSegment) {
+      s.add(keyId);
     }
   }
   return s;
