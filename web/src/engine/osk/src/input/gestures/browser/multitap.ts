@@ -1,11 +1,10 @@
-import OSKSubKey from './oskSubKey.js';
 import { type KeyElement } from '../../../keyElement.js';
-import OSKBaseKey from '../../../keyboard-layout/oskBaseKey.js';
 import VisualKeyboard from '../../../visualKeyboard.js';
 
-import { DeviceSpec, KeyEvent, ActiveSubKey, ActiveKey, KeyDistribution } from '@keymanapp/keyboard-processor';
-import { ConfigChangeClosure, GestureRecognizerConfiguration, GestureSequence, PaddedZoneSource } from '@keymanapp/gesture-recognizer';
+import { DeviceSpec, KeyEvent, ActiveSubKey, ActiveKey, KeyDistribution, ActiveKeyBase } from '@keymanapp/keyboard-processor';
+import { GestureSequence } from '@keymanapp/gesture-recognizer';
 import { GestureHandler } from '../gestureHandler.js';
+import { distributionFromDistanceMaps } from '@keymanapp/input-processor';
 
 /**
  * Represents a potential multitap gesture's implementation within KeymanWeb.
@@ -33,7 +32,7 @@ export default class Multitap implements GestureHandler {
   ) {
     this.baseKey = e;
     this.baseContextToken = contextToken;
-    this.multitaps = e.key.spec.multitap;
+    this.multitaps = [e.key.spec].concat(e.key.spec.multitap);
 
     // // For multitaps, keeping the key highlighted makes sense.  I think.
     // this.baseKey.key.highlight(true);
@@ -63,18 +62,16 @@ export default class Multitap implements GestureHandler {
       }
 
       // For rota-style behavior
-      this.tapIndex = (this.tapIndex + 1) % (this.baseKey.key.spec.multitap.length+1);
-
-      const selection = this.tapIndex == 0
-        ? this.baseKey.key.spec
-        : this.multitaps[this.tapIndex-1];
+      this.tapIndex = (this.tapIndex + 1) % this.multitaps.length;
+      const selection = this.multitaps[this.tapIndex];
 
       const keyEvent = vkbd.keyEventFromSpec(selection);
       keyEvent.baseTranscriptionToken = this.baseContextToken;
-      keyEvent.keyDistribution = this.currentStageKeyDistribution();
-      const keyResult = vkbd.raiseKeyEvent(keyEvent, null);
 
-      // TODO:  store the context token, possibly other stuff?
+      const baseDistances = vkbd.getSimpleTapCorrectionDistances(tap.sources[0].currentSample, this.baseKey.key.spec as ActiveKey);
+      keyEvent.keyDistribution = this.currentStageKeyDistribution(baseDistances);
+
+      vkbd.raiseKeyEvent(keyEvent, null);
     });
 
     /* In theory, setting up a specialized recognizer config limited to the base key's surface area
@@ -87,9 +84,57 @@ export default class Multitap implements GestureHandler {
      */
   }
 
-  currentStageKeyDistribution(): KeyDistribution {
-    // TODO:  multitap corrections
-    return [];
+  currentStageKeyDistribution(baseDistances: Map<ActiveKeyBase, number>): KeyDistribution {
+    /* Concept:  use the base distance map - what if the tap was meant for elsewhere?
+     * That said, given the base key's probability... modify that by a 'tap distance' metric,
+     * where the probability of all taps in the multitap rota sum up to the base key's original
+     * probability.
+     */
+
+    const baseDistribution = distributionFromDistanceMaps(baseDistances);
+    const keyIndex = baseDistribution.findIndex((entry) => entry.keySpec == this.baseKey.key.spec);
+
+    if(keyIndex == -1) { // also covers undefined, but does not include 0.
+      console.warn("Could not find base key's probability for multitap correction");
+
+      // Decently recoverable; just use the simple-tap distances instead.
+      return baseDistribution;
+    }
+
+    const baseProb = baseDistribution.splice(keyIndex, 1)[0].p;
+
+    let totalWeight = 0;
+    let multitapEntries: {keySpec: ActiveKeyBase, p: number}[] = [];
+    for(let i = 0; i < this.multitaps.length; i++) {
+      const key = this.multitaps[i];
+      // 'standard distance', no real modular effects needed.
+      const distStd = Math.abs(i - this.tapIndex) % this.multitaps.length;
+      // 'wrapped distance', when the modular effects are definitely needed.
+      const distWrap = (i + this.multitaps.length - this.tapIndex) % this.multitaps.length;
+      const modularLinDist = distStd < distWrap ? distStd : distWrap;
+
+      // Simple approach for now - we'll ignore timing considerations and
+      // just use raw modular distance.
+      // Actual tap:  1 (base weight)
+      // "one off": 1/4 as likely
+      // "two off": 1/9 as likely
+      // etc.
+      const keyWeight = 1.0 / ((1 + modularLinDist) * (1 + modularLinDist));
+      totalWeight += keyWeight;
+      multitapEntries.push({
+        keySpec: key,
+        p: keyWeight
+      });
+    }
+
+    // Converts from the weights to the final probability values specified by the
+    // top comment within this method.
+    const scalar = baseProb  / totalWeight;
+    multitapEntries.forEach((entry) => {
+      entry.p = scalar * entry.p;
+    });
+
+    return baseDistribution.concat(multitapEntries).sort((a, b) => b.p - a.p);
   }
 
   cancel() {

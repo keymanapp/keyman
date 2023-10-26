@@ -14,7 +14,8 @@ import {
   StateKeyMap,
   LayoutKey,
   ActiveSubKey,
-  timedPromise
+  timedPromise,
+  ActiveKeyBase
 } from '@keymanapp/keyboard-processor';
 
 import { buildCorrectiveLayout, distributionFromDistanceMaps, keyTouchDistances } from '@keymanapp/input-processor';
@@ -500,21 +501,19 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
 
         if(gestureKey) {
           let correctionKeyDistribution: KeyDistribution;
+          const baseDistanceMap = this.getSimpleTapCorrectionDistances(coord, gestureKey.key.spec as ActiveKey);
 
-          if(gestureStage.matchedId.indexOf('multitap') > -1) {
-            // TODO:  determine fat-finger effects to apply.
-          }
-
-          if(gestureStage.matchedId == 'subkey-select') {
-            if(!handler) {
-              throw new Error("Invalid state - reference to subkey menu is missing");
-            }
-            // TODO:  examine subkey menu, determine proper set of fat-finger alternates.
-            correctionKeyDistribution = handler.currentStageKeyDistribution();
+          if(handler) {
+            // Certain gestures (especially flicks) like to consider the base layout as part
+            // of their corrective-distribution calculations.
+            //
+            // May be `null` for gestures that don't need custom correction handling,
+            // such as modipresses or initial/simple-tap keystrokes.
+            correctionKeyDistribution = handler.currentStageKeyDistribution(baseDistanceMap);
           }
 
           if(!correctionKeyDistribution) {
-            correctionKeyDistribution = this.getSimpleTapCorrectionProbabilities(coord, gestureKey.key.spec as ActiveKey);
+            correctionKeyDistribution = distributionFromDistanceMaps(baseDistanceMap);
           }
 
           // Multitaps do special key-mapping stuff internally and produce + raise their
@@ -770,7 +769,7 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
    * @param keySpec The spec of the key directly triggered by the input event.  May be for a subkey.
    * @returns
    */
-  getSimpleTapCorrectionProbabilities(input: InputSample<KeyElement, string>, keySpec?: ActiveKey): KeyDistribution {
+  getSimpleTapCorrectionDistances(input: InputSample<KeyElement, string>, keySpec?: ActiveKey): Map<ActiveKeyBase, number> {
     // TODO: It'd be nice to optimize by keeping these off when unused, but the wiring
     //       necessary would get in the way of modularization at the moment.
     // let keyman = com.keyman.singleton;
@@ -791,8 +790,7 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
     let kbdAspectRatio = width / height;
 
     const correctiveLayout = buildCorrectiveLayout(this.kbdLayout.getLayer(this.layerId), kbdAspectRatio);
-    const rawSqDistances = keyTouchDistances(touchKbdPos, correctiveLayout);
-    return distributionFromDistanceMaps(rawSqDistances);
+    return keyTouchDistances(touchKbdPos, correctiveLayout);
   }
 
   /**
