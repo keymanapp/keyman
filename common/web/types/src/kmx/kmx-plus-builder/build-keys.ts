@@ -41,7 +41,7 @@ interface BUILDER_KEYS_FLICKS {
  */
 interface BUILDER_KEYS_FLICK {
   directions: BUILDER_LIST_REF; // list of cardinal/intercardinal directions
-  to: BUILDER_STR_REF | number; // str or single codepoint
+  to: BUILDER_STR_REF; // str
 };
 
 

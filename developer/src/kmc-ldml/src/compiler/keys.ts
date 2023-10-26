@@ -234,9 +234,7 @@ export class KeysCompiler extends SectionCompiler {
         const keyIdStr = sections.strs.allocString(keyId);
         let directionsList: ListItem = sections.list.allocListFromSpaces(
           directions,
-          {
-            stringVariables: true, markers: true, unescape: true
-          },
+          { },
           sections);
         flicks.flicks.push({
           directions: directionsList,

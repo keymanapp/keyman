@@ -737,7 +737,6 @@ export class KMXPlusFile extends KMXFile {
 
     this.COMP_PLUS_KEYS_FLICK = new r.Struct({
       directions: LIST_REF, // list
-      flags: r.uint32le,
       to: STR_OR_CHAR32, // str | codepoint
     });
 
