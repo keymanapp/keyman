@@ -15,7 +15,7 @@
 		2993C33329B1D92E00FB5E95 /* ActionArrayOptimizer.h in Headers */ = {isa = PBXBuildFile; fileRef = 2993C32929B1D92E00FB5E95 /* ActionArrayOptimizer.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		2993C33429B1D92E00FB5E95 /* CoreAction.h in Headers */ = {isa = PBXBuildFile; fileRef = 2993C32A29B1D92E00FB5E95 /* CoreAction.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		2993C33529B1D92E00FB5E95 /* CoreHelper.h in Headers */ = {isa = PBXBuildFile; fileRef = 2993C32B29B1D92E00FB5E95 /* CoreHelper.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		2993C33829B1DD6900FB5E95 /* libkmnkbp0.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 2993C33729B1DD6900FB5E95 /* libkmnkbp0.a */; };
+		2993C33829B1DD6900FB5E95 /* libkeymancore.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 2993C33729B1DD6900FB5E95 /* libkeymancore.a */; };
 		299D0B1B29CAB2F500767276 /* el_nuer.kmx in Resources */ = {isa = PBXBuildFile; fileRef = 299D0B1A29CAB2F500767276 /* el_nuer.kmx */; };
 		299F9E2A29C46AFC0053E903 /* CoreHelperTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 299F9E2729C46AFB0053E903 /* CoreHelperTests.m */; };
 		299F9E2B29C46AFC0053E903 /* CoreWrapperTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 299F9E2829C46AFB0053E903 /* CoreWrapperTests.m */; };
@@ -87,7 +87,7 @@
 		2993C32929B1D92E00FB5E95 /* ActionArrayOptimizer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ActionArrayOptimizer.h; sourceTree = "<group>"; };
 		2993C32A29B1D92E00FB5E95 /* CoreAction.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CoreAction.h; sourceTree = "<group>"; };
 		2993C32B29B1D92E00FB5E95 /* CoreHelper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CoreHelper.h; sourceTree = "<group>"; };
-		2993C33729B1DD6900FB5E95 /* libkmnkbp0.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libkmnkbp0.a; path = ../../core/build/mac/debug/libkmnkbp0.a; sourceTree = "<group>"; };
+		2993C33729B1DD6900FB5E95 /* libkeymancore.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libkeymancore.a; path = ../../core/build/mac/debug/libkeymancore.a; sourceTree = "<group>"; };
 		299D0B1A29CAB2F500767276 /* el_nuer.kmx */ = {isa = PBXFileReference; lastKnownFileType = file; path = el_nuer.kmx; sourceTree = "<group>"; };
 		299F9E2629C46AFB0053E903 /* CoreTestStaticHelperMethods.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CoreTestStaticHelperMethods.h; sourceTree = "<group>"; };
 		299F9E2729C46AFB0053E903 /* CoreHelperTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CoreHelperTests.m; sourceTree = "<group>"; };
@@ -152,7 +152,7 @@
 			files = (
 				29A12C292AC51D3F00327D46 /* libsicuuc.a in Frameworks */,
 				29A12C2A2AC51D6100327D46 /* libsicui18n.a in Frameworks */,
-				2993C33829B1DD6900FB5E95 /* libkmnkbp0.a in Frameworks */,
+				2993C33829B1DD6900FB5E95 /* libkeymancore.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -187,7 +187,7 @@
 			children = (
 				29A205DA2AC2E46A000750C0 /* libsicui18n.a */,
 				29A205D82AC2E446000750C0 /* libsicuuc.a */,
-				2993C33729B1DD6900FB5E95 /* libkmnkbp0.a */,
+				2993C33729B1DD6900FB5E95 /* libkeymancore.a */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";

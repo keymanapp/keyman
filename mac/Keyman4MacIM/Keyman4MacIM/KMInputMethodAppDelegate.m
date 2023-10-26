@@ -881,7 +881,7 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
     [self setKvk:kvk];
     [self setKeyboardName:[kmxInfo objectForKey:kKMKeyboardNameKey]];
     [self setKeyboardIcon:[kmxInfo objectForKey:kKMKeyboardIconKey]];
-    [self loadSavedStores];
+    [self readPersistedOptions];
 }
 
 // defaults to the whatever keyboard happens to be first in the list
@@ -940,7 +940,7 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
     [self setKeyboardIcon:[kmxInfo objectForKey:kKMKeyboardIconKey]];
     [self setContextBuffer:nil];
     [self setSelectedKeyboard:path];
-    [self loadSavedStores];
+    [self readPersistedOptions];
     if (kvk != nil && self.alwaysShowOSK)
         [self showOSK];
 }
