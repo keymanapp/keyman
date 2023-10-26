@@ -100,13 +100,10 @@ export class TrackedContextState {
 
       if(lexicalModel && lexicalModel.traverseFromRoot) {
         // We need to construct a separate search space from other ContextStates.
-        // "Rewinding" a SearchSpace (like, for multitaps) is not trivial.
-        // Fully cloning an existing one would be WAY better, though; reuse of
-        // old calculations and all that.
-        this.searchSpace = [new SearchSpace(lexicalModel)];
-
-        const lastToken = this.tokens[this.tokens.length-1];
-        lastToken.transformDistributions.forEach(distrib => this.searchSpace[0].addInput(distrib));
+        //
+        // In case we are unable to perfectly track context (say, due to multitaps)
+        // we need to ensure that only fully-utilized keystrokes are considered.
+        this.searchSpace = obj.searchSpace.map((space) => new SearchSpace(space));
       }
     } else {
       let lexicalModel = obj;
