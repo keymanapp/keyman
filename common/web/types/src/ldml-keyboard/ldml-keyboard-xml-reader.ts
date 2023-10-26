@@ -21,8 +21,8 @@ export class LDMLKeyboardXMLSourceFileReader {
   constructor(private options: LDMLKeyboardXMLSourceFileReaderOptions, private callbacks : CompilerCallbacks) {
   }
 
-  static get defaultImportsURL() {
-    return new URL(`../import/`, import.meta.url);
+  static get defaultImportsURL(): [string,string] {
+    return ['../import/', import.meta.url];
   }
 
   readImportFile(version: string, subpath: string): Uint8Array {
@@ -393,15 +393,12 @@ export class LDMLKeyboardXMLSourceFileReader {
         r.stuffBoxes(test, $$, 'startContext'); // singleton
         // now the actions
         test.actions = $$.map(v => {
-          const subtag = v['#name'];
-          const subv = LDMLKeyboardXMLSourceFileReader.defaultMapper(v, r);
-          switch(subtag) {
-            case 'keystroke': return { keystroke: subv };
-            case 'check':     return { check:     subv };
-            case 'emit':      return { emit:      subv };
-            case 'startContext': return null; // handled above
-            default: this.callbacks.reportMessage(CommonTypesMessages.Error_TestDataUnexpectedAction({ subtag })); return null;
+          const type = v['#name']; // element name
+          if (type === 'startContext') {
+            return null; // handled above
           }
+          const subv = LDMLKeyboardXMLSourceFileReader.defaultMapper(v, r);
+          return Object.assign({ type }, subv);
         }).filter(v => v !== null);
         return test;
       });

@@ -30,6 +30,9 @@ export class KeymanDeveloperProject {
       throw new Error('populateFiles can only be called on a v2.0 project');
     }
     let sourcePath = this.resolveProjectPath(this.options.sourcePath);
+    if(!this.callbacks.fs.existsSync(sourcePath)) {
+      return false;
+    }
     let files = this.callbacks.fs.readdirSync(sourcePath);
     for(let filename of files) {
       let fullPath = this.callbacks.path.join(sourcePath, filename);
@@ -44,6 +47,7 @@ export class KeymanDeveloperProject {
         this.files.push(file);
       }
     }
+    return true;
   }
 
   public isKeyboardProject() {

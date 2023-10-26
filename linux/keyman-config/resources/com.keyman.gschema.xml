@@ -16,4 +16,13 @@
       <description>List of strings</description>
     </key>
   </schema>
+
+  <schema id="com.keyman.engine" path="/com/keyman/engine/">
+    <key name="additional-keyboards" type="as">
+        <default>[]</default>
+        <summary>User-added additional language/keyboards</summary>
+        <description>This setting contains installed keyboards for bcp47 codes
+        that are not listed in the keyboard metadata.</description>
+    </key>
+  </schema>
 </schemalist>

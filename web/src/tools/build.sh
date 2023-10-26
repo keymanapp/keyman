@@ -31,42 +31,12 @@ builder_describe "Builds the Keyman Engine for Web's development & unit-testing 
 
 builder_parse "$@"
 
-### CLEAN ACTIONS
+builder_run_child_actions clean
 
-if builder_start_action clean:bulk_rendering; then
-  testing/bulk_rendering/build.sh clean
-
-  builder_finish_action success clean:bulk_rendering
+# Some of the web/src/test section uses this script as a dependency.  We can skip
+# the configure sections in such a case.
+if ! builder_is_dep_build && ! builder_is_child_build; then
+  builder_run_child_actions configure
 fi
 
-if builder_start_action clean:recorder; then
-  testing/recorder/build.sh clean
-
-  builder_finish_action success clean:recorder
-fi
-
-if builder_start_action clean:sourcemap-root; then
-  building/sourcemap-root/build.sh clean
-
-  builder_finish_action success clean:sourcemap-root
-fi
-
-### BUILD ACTIONS
-
-if builder_start_action build:bulk_rendering; then
-  testing/bulk_rendering/build.sh
-
-  builder_finish_action success build:bulk_rendering
-fi
-
-if builder_start_action build:recorder; then
-  testing/recorder/build.sh
-
-  builder_finish_action success build:recorder
-fi
-
-if builder_start_action build:sourcemap-root; then
-  building/sourcemap-root/build.sh
-
-  builder_finish_action success build:sourcemap-root
-fi
+builder_run_child_actions build

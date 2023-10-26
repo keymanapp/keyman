@@ -28,8 +28,8 @@
 
 #if defined _WIN32 || defined __CYGWIN__
   typedef wchar_t  const * km_core_path_name;
-  #define _KM_KBP_PATH_SEPARATOR (L'\\')
-  #define _KM_KBP_EXT_SEPARATOR (L'.')
+  #define _KM_CORE_PATH_SEPARATOR (L'\\')
+  #define _KM_CORE_EXT_SEPARATOR (L'.')
   #if defined __GNUC__  // These three will be redefined for Windows
     #undef _kmn_export_flag
     #undef _kmn_import_flag
@@ -44,14 +44,14 @@
   #define _kmn_static_flag
 #else
   typedef char const * km_core_path_name;
-  #define _KM_KBP_PATH_SEPARATOR ('/')
-  #define _KM_KBP_EXT_SEPARATOR ('.')
+  #define _KM_CORE_PATH_SEPARATOR ('/')
+  #define _KM_CORE_EXT_SEPARATOR ('.')
 #endif
 
-#if defined KMN_KBP_STATIC
+#if defined KM_CORE_LIBRARY_STATIC
   #define KMN_API             _kmn_tag_fn(_kmn_static_flag)
   #define KMN_DEPRECATED_API  _kmn_tag_fn(_kmn_deprecated_flag _kmn_and _kmn_static_flag)
-#elif defined KMN_KBP_EXPORTING
+#elif defined KM_CORE_LIBRARY_EXPORTING
   #define KMN_API             _kmn_tag_fn(_kmn_export_flag)
   #define KMN_DEPRECATED_API  _kmn_tag_fn(_kmn_deprecated_flag _kmn_and _kmn_export_flag)
 #else
@@ -59,8 +59,8 @@
   #define KMN_DEPRECATED_API  _kmn_tag_fn(_kmn_deprecated_flag _kmn_and _kmn_import_flag)
 #endif
 
-#ifndef KMN_KBP
-#define KMN_KBP
+#ifndef KM_CORE_LIBRARY
+#define KM_CORE_LIBRARY
 #endif
 #ifndef USE_CHAR16_T
 #define USE_CHAR16_T

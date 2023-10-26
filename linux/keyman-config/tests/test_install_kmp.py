@@ -8,7 +8,7 @@ from keyman_config.get_kmp import InstallLocation
 from keyman_config.install_kmp import InstallError, InstallKmp
 
 
-class InstallKmpTests(unittest.TestCase):
+class InstallKmpBase(unittest.TestCase):
 
     def setUp(self):
         patcher1 = patch('keyman_config.install_kmp.install_to_ibus')
@@ -40,7 +40,12 @@ class InstallKmpTests(unittest.TestCase):
         self.mockIsFcitxRunning = patcher9.start()
         self.addCleanup(patcher9.stop)
         self.mockIsFcitxRunning.return_value = False
+        patcher10 = patch('keyman_config.install_kmp.CustomKeyboards')
+        self.mockCustomKeyboardsClass = patcher10.start()
+        self.addCleanup(patcher10.stop)
 
+
+class InstallKeyboardsToIbusTests(InstallKmpBase):
     def test_InstallKeyboardsToIbus_NoIbus(self):
         # Setup
         self.mockGetIbusBus.return_value = None
@@ -122,6 +127,8 @@ class InstallKmpTests(unittest.TestCase):
         self.mockRestartIbus.assert_called_once()
         bus.destroy.assert_called_once()
 
+
+class InstallKeyboardsToGnomeTests(InstallKmpBase):
     def test_InstallKeyboardsToGnome_SingleKbNoLanguages(self):
         # Setup
         mockGnomeKeyboardsUtilInstance = self.mockGnomeKeyboardsUtilClass.return_value
@@ -194,6 +201,8 @@ class InstallKmpTests(unittest.TestCase):
             [('xkb', 'en'), ('ibus', 'de:fooDir/foo1.kmx')])
         self.mockRestartIbus.assert_not_called()
 
+
+class NormalizeLanguageTests(InstallKmpBase):
     def test_normalizeLanguage(self):
         # Setup
         languages = [
@@ -233,6 +242,8 @@ class InstallKmpTests(unittest.TestCase):
         # Verify
         self.assertEqual(result, '')
 
+
+class InstallKmpTests(InstallKmpBase):
     def _createEmptyKmp(self, workdir):
         kmpfile = os.path.join(workdir, 'foo.kmp')
         with open(kmpfile, 'w') as file:
@@ -298,8 +309,12 @@ class InstallKmpTests(unittest.TestCase):
                 kmpfile = self._createEmptyKmp(workdir.name)
                 self._createKmpJson(packagedir.name, testcase['fileVersion'])
 
-                # Execute
-                InstallKmp()._install_kmp(kmpfile, 'km', InstallLocation.User)
+                with patch('keyman_config.install_kmp.process_keyboard_data') as mock:
+                    method = mock.return_value
+                    method.return_value = None
+
+                    # Execute
+                    InstallKmp()._install_kmp(kmpfile, 'km', InstallLocation.User)
 
                 # Verify
                 self.mockInstallToIbus.assert_called_once()
@@ -309,5 +324,58 @@ class InstallKmpTests(unittest.TestCase):
                 packagedir.cleanup()
 
 
-if __name__ == '__main__':
-    unittest.main()
+class InstallKeyboardsTests(InstallKmpBase):
+    def test_InstallKeyboards_NoLang(self):
+        # Setup
+        mockCustomKeyboardsInstance = self.mockCustomKeyboardsClass.return_value
+        mockCustomKeyboardsInstance.get.return_value = None
+        keyboards = [{'id': 'foo1', 'languages': [{'id': 'en'}, {'id': 'fr'}]}]
+        # Execute
+        InstallKmp()._install_keyboards(keyboards, 'fooDir', None)
+        # Verify
+        self.mockInstallToIbus.assert_called_once_with(ANY, 'en:fooDir/foo1.kmx')
+        mockCustomKeyboardsInstance.add.assert_not_called()
+
+    def test_InstallKeyboards_LangInKeyboard(self):
+        # Setup
+        keyboards = [{'id': 'foo1', 'languages': [{'id': 'en'}, {'id': 'fr'}]}]
+        mockCustomKeyboardsInstance = self.mockCustomKeyboardsClass.return_value
+        mockCustomKeyboardsInstance.get.return_value = None
+        # Execute
+        InstallKmp()._install_keyboards(keyboards, 'fooDir', 'fr')
+        # Verify
+        self.mockInstallToIbus.assert_called_once_with(ANY, 'fr:fooDir/foo1.kmx')
+        mockCustomKeyboardsInstance.add.assert_not_called()
+
+    def test_InstallKeyboards_CustomLang(self):
+        # Setup
+        mockCustomKeyboardsInstance = self.mockCustomKeyboardsClass.return_value
+        mockCustomKeyboardsInstance.get.return_value = None
+        keyboards = [{'id': 'foo1', 'languages': [{'id': 'en'}, {'id': 'fr'}]}]
+        # Execute
+        InstallKmp()._install_keyboards(keyboards, 'fooDir', 'mul')
+        # Verify
+        self.mockInstallToIbus.assert_called_once_with(ANY, 'mul:fooDir/foo1.kmx')
+        mockCustomKeyboardsInstance.add.assert_called_once_with('mul:fooDir/foo1.kmx')
+
+
+class AddCustomKeyboardTests(InstallKmpBase):
+    def test_AddCustomKeyboard_NoLang(self):
+        # Setup
+        mockCustomKeyboardsInstance = self.mockCustomKeyboardsClass.return_value
+        keyboard = {'id': 'foo1'}
+        # Execute
+        language = InstallKmp()._add_custom_keyboard(keyboard, 'fooDir', None)
+        # Verify
+        self.assertEqual(language, None)
+        mockCustomKeyboardsInstance.add.assert_not_called()
+
+    def test_AddCustomKeyboard_Add(self):
+        # Setup
+        mockCustomKeyboardsInstance = self.mockCustomKeyboardsClass.return_value
+        keyboard = {'id': 'foo1'}
+        # Execute
+        language = InstallKmp()._add_custom_keyboard(keyboard, 'fooDir', 'mul')
+        # Verify
+        self.assertEqual(language, 'mul')
+        mockCustomKeyboardsInstance.add.assert_called_once_with('mul:fooDir/foo1.kmx')

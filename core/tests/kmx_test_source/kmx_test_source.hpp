@@ -25,7 +25,7 @@ public:
   KmxTestSource();
 
   int load_source(
-      const km::kbp::path &path,
+      const km::core::path &path,
       std::string &keys,
       std::u16string &expected,
       std::u16string &context,
