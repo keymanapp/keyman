@@ -21,7 +21,12 @@ export class KPJFileReader {
       emptyTag: ''
     });
 
-    parser.parseString(file, (e: unknown, r: unknown) => { data = r as KPJFile });
+    parser.parseString(file, (e: unknown, r: unknown) => {
+      if(e) {
+        throw e;
+      }
+      data = r as KPJFile;
+    });
     data = this.boxArrays(data);
     for(let file of data.KeymanDeveloperProject?.Files?.File) {
       // xml2js imports <Details/> as '' so we will just delete the empty string
