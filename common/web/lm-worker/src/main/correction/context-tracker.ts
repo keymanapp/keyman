@@ -1,4 +1,4 @@
-import { tokenize } from '@keymanapp/models-templates';
+import { applyTransform, tokenize } from '@keymanapp/models-templates';
 import { defaultWordbreaker } from '@keymanapp/models-wordbreakers';
 
 import { ClassicalDistanceCalculation } from './classical-calculation.js';
@@ -57,7 +57,8 @@ export class TrackedContextToken {
 }
 
 export class TrackedContextState {
-  // Stores the source Context (as a debugging reference).  Not currently utilized.
+  // Stores the post-transform Context.  Useful as a debugging reference, but also used to
+  // pre-validate context state matches in case of discarded changes from multitaps.
   taggedContext: Context;
   model: LexicalModel;
 
@@ -82,9 +83,9 @@ export class TrackedContextState {
       this.tokens = source.tokens.map(function(token) {
         let copy = new TrackedContextToken();
         copy.raw = token.raw;
-        copy.replacements = token.replacements
+        copy.replacements = [].concat(token.replacements)
         copy.activeReplacementId = token.activeReplacementId;
-        copy.transformDistributions = token.transformDistributions;
+        copy.transformDistributions = [].concat(token.transformDistributions);
 
         if(token.replacementText) {
           copy.replacementText = token.replacementText;
@@ -92,9 +93,21 @@ export class TrackedContextState {
 
         return copy;
       });
-      this.searchSpace = obj.searchSpace;
+
       this.indexOffset = 0;
-      this.model = obj.model;
+      const lexicalModel = this.model = obj.model;
+      this.taggedContext = obj.taggedContext;
+
+      if(lexicalModel && lexicalModel.traverseFromRoot) {
+        // We need to construct a separate search space from other ContextStates.
+        // "Rewinding" a SearchSpace (like, for multitaps) is not trivial.
+        // Fully cloning an existing one would be WAY better, though; reuse of
+        // old calculations and all that.
+        this.searchSpace = [new SearchSpace(lexicalModel)];
+
+        const lastToken = this.tokens[this.tokens.length-1];
+        lastToken.transformDistributions.forEach(distrib => this.searchSpace[0].addInput(distrib));
+      }
     } else {
       let lexicalModel = obj;
       this.tokens = [];
@@ -296,7 +309,7 @@ class CircularArray<Item> {
 export class ContextTracker extends CircularArray<TrackedContextState> {
   static attemptMatchContext(tokenizedContext: USVString[],
                               matchState: TrackedContextState,
-                              transformDistribution?: Distribution<Transform>,): TrackedContextState {
+                              transformDistribution?: Distribution<Transform>): TrackedContextState {
     // Map the previous tokenized state to an edit-distance friendly version.
     let matchContext: USVString[] = matchState.toRawTokenization();
 
@@ -366,9 +379,13 @@ export class ContextTracker extends CircularArray<TrackedContextState> {
 
       state = new TrackedContextState(matchState);
     } else {
-      // Since we're continuing a previously-cached context, we can reuse the same SearchSpace
-      // to continue making predictions.
-      state = matchState;
+      // We're continuing a previously-cached context; create a deep-copy of it.
+      // We can't just re-use the old instance, unfortunately; predictions break
+      // with multitaps otherwise - we should avoid tracking keystrokes that were
+      // rewound.
+      //
+      // If there are no incoming transforms, though... yeah, re-use is safe then.
+      state = !!transformDistribution ? new TrackedContextState(matchState) : matchState;
     }
 
     const hasDistribution = transformDistribution && Array.isArray(transformDistribution);
@@ -517,9 +534,31 @@ export class ContextTracker extends CircularArray<TrackedContextState> {
 
     if(tokenizedContext.left.length > 0) {
       for(let i = this.count - 1; i >= 0; i--) {
+        const priorMatchState = this.item(i);
+        if(transformDistribution && transformDistribution.length > 0) {
+          // Using the potential `matchState` + the incoming transform, do the results line up for
+          // our observed context?  If not, skip it.
+          //
+          // Necessary to properly handle multitaps, as there are context rewinds that the
+          // predictive-text engine is not otherwise warned about.
+          const doublecheckContext = applyTransform(transformDistribution[0].sample, priorMatchState.taggedContext);
+          if(doublecheckContext.left != context.left) {
+            continue;
+          }
+        } else if(priorMatchState.taggedContext.left != context.left) {
+          continue;
+        }
+
         let resultState = ContextTracker.attemptMatchContext(tokenizedContext.left, this.item(i), transformDistribution);
 
         if(resultState) {
+          // Keep it reasonably current!  And it's probably fine to have it more than once
+          // in the history.  However, if it's the most current already, there's no need
+          // to refresh it.
+          if(this.newest != resultState && this.newest != priorMatchState) {
+            this.enqueue(priorMatchState);
+          }
+
           resultState.taggedContext = context;
           if(resultState != this.item(i)) {
             this.enqueue(resultState);

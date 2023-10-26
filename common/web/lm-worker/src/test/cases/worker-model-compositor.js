@@ -947,11 +947,14 @@ describe('ModelCompositor', function() {
       let compositor = new ModelCompositor(model);
 
       let initialSuggestions = compositor.predict(postTransform, baseContext);
+      const suggestionContextState = compositor.contextTracker.newest;
+
       let keepSuggestion = initialSuggestions[0];
       assert.equal(keepSuggestion.tag, 'keep'); // corresponds to `postTransform`, but the transform isn't equal.
 
-      let baseContextState = compositor.contextTracker.analyzeState(model, baseContext);
-      assert.equal(compositor.contextTracker.count, 1);
+      // One for base state, before the transform...
+      // one for after, since it makes an edit.
+      assert.equal(compositor.contextTracker.count, 2);
 
       let baseSuggestion = initialSuggestions[1];
       let reversion = compositor.acceptSuggestion(baseSuggestion, baseContext, postTransform);
@@ -959,20 +962,20 @@ describe('ModelCompositor', function() {
       assert.equal(reversion.id, -baseSuggestion.id);
 
       // Accepting the suggestion adds an extra context state.
-      assert.equal(compositor.contextTracker.count, 2);
+      assert.equal(compositor.contextTracker.count, 3);
 
       // The replacement should be marked on the context-tracking token.
-      assert.isOk(baseContextState.tail.replacement);
+      assert.isOk(suggestionContextState.tail.replacement);
 
       let appliedContext = models.applyTransform(baseSuggestion.transform, baseContext);
       compositor.applyReversion(reversion, appliedContext);
 
       // Reverting the suggestion should remove that extra state.
-      assert.equal(compositor.contextTracker.count, 1);
-      assert.equal(compositor.contextTracker.item(0), baseContextState);
+      assert.equal(compositor.contextTracker.count, 2);
+      assert.equal(compositor.contextTracker.item(1), suggestionContextState);
 
       // The replacement should no longer be marked for the context-tracking token.
-      assert.isNotOk(baseContextState.tail.replacement);
+      assert.isNotOk(suggestionContextState.tail.replacement);
     });
   });
 });
