@@ -499,7 +499,9 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
           contextToken?: number
         } = null;
 
-        if(gestureKey) {
+        // Multitaps do special key-mapping stuff internally and produce + raise their
+        // key events directly.
+        if(gestureKey && !(handler instanceof Multitap)) {
           let correctionKeyDistribution: KeyDistribution;
           const baseDistanceMap = this.getSimpleTapCorrectionDistances(coord, gestureKey.key.spec as ActiveKey);
 
@@ -516,12 +518,8 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
             correctionKeyDistribution = distributionFromDistanceMaps(baseDistanceMap);
           }
 
-          // Multitaps do special key-mapping stuff internally and produce + raise their
-          // key events directly.
-          if(!(handler instanceof Multitap)) {
-            // Once the best coord to use for fat-finger calculations has been determined:
-            keyResult = this.modelKeyClick(gestureStage.item, coord);
-          }
+          // Once the best coord to use for fat-finger calculations has been determined:
+          keyResult = this.modelKeyClick(gestureStage.item, coord);
         }
 
         // Outside of passing keys along... the handling of later stages is delegated

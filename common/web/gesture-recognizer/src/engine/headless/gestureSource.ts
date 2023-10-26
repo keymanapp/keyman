@@ -299,18 +299,23 @@ export class GestureSourceSubview<HoveredItemType, StateToken = any> extends Ges
       const translation = this.recognizerTranslation;
       // Provide a coordinate-system translation for source subviews.
       // The base version still needs to use the original coord system, though.
-      const transformedSample = {...sample, targetX: sample.targetX - translation.x, targetY: sample.targetY - translation.y};
+      const transformedSample = {
+        ...sample,
+        targetX: sample.targetX - translation.x,
+        targetY: sample.targetY - translation.y
+      };
+
+      if(this.stateToken) {
+        transformedSample.stateToken = this.stateToken;
+      }
 
       // If the subview is operating from the perspective of a different state token than its base source,
       // its samples' item fields will need correction.
       //
       // This can arise during multitap-like scenarios.
-      if(this.stateToken != baseSource.stateToken) {
+      if(this.stateToken != baseSource.stateToken || this.stateToken != source.stateToken) {
         transformedSample.item = this.currentRecognizerConfig.itemIdentifier(
-          {
-            ...sample,
-            stateToken: this.stateToken
-          },
+          transformedSample,
           null
         );
       }

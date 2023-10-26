@@ -68,7 +68,20 @@ export default class Multitap implements GestureHandler {
       const keyEvent = vkbd.keyEventFromSpec(selection);
       keyEvent.baseTranscriptionToken = this.baseContextToken;
 
-      const baseDistances = vkbd.getSimpleTapCorrectionDistances(tap.sources[0].currentSample, this.baseKey.key.spec as ActiveKey);
+      const coord = tap.sources[0].currentSample;
+      const baseDistances = vkbd.getSimpleTapCorrectionDistances(coord, this.baseKey.key.spec as ActiveKey);
+      if(coord.stateToken != vkbd.layerId) {
+        const matchKey = vkbd.layerGroup.findNearestKey({...coord, stateToken: vkbd.layerId});
+
+        // Replace the key at the current location for the current layer key
+        // with the multitap base key.
+        const p = baseDistances.get(matchKey.key.spec);
+        if(p == null) {
+          console.warn("Could not find current layer's key")
+        }
+        baseDistances.delete(matchKey.key.spec);
+        baseDistances.set(coord.item.key.spec, p);
+      }
       keyEvent.keyDistribution = this.currentStageKeyDistribution(baseDistances);
 
       vkbd.raiseKeyEvent(keyEvent, null);

@@ -389,13 +389,12 @@ export class GestureMatcher<Type, StateToken = any> implements PredecessorMatch<
       // should reflect this.
       simpleSource.baseItem = baseItem ?? simpleSource.baseItem;
       simpleSource.stateToken = baseStateToken;
+      simpleSource.currentSample.stateToken = baseStateToken;
 
       // May be missing during unit tests.
       if(simpleSource.currentRecognizerConfig) {
-        simpleSource.currentSample.item = simpleSource.currentRecognizerConfig.itemIdentifier({
-            ...simpleSource.currentSample,
-            stateToken: baseStateToken
-          },
+        simpleSource.currentSample.item = simpleSource.currentRecognizerConfig.itemIdentifier(
+          simpleSource.currentSample,
           null
         );
       }
