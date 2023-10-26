@@ -364,6 +364,8 @@
         [self saveActiveKeyboards];
     }
     else if (checkBox.state == NSOffState) {
+        if ([self.AppDelegate debugMode])
+            NSLog(@"Disabling active keyboard: %@", kmxFilePath);
         [self.activeKeyboards removeObject:kmxFilePath];
         [self saveActiveKeyboards];
     }

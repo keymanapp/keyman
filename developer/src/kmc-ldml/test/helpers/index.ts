@@ -37,7 +37,7 @@ export const compilerTestCallbacks = new TestCompilerCallbacks();
 
 export const compilerTestOptions: LdmlCompilerOptions = {
   readerOptions: {
-    importsPath: fileURLToPath(LDMLKeyboardXMLSourceFileReader.defaultImportsURL)
+    importsPath: fileURLToPath(new URL(...LDMLKeyboardXMLSourceFileReader.defaultImportsURL))
   }
 };
 

@@ -68,6 +68,9 @@
 #define KEYMAN_DCONF_OPTIONS_PATH "/desktop/ibus/keyman/options/"
 #define KEYMAN_DCONF_OPTIONS_KEY "options"
 
+#define KEYMAN_DCONF_ENGINE_NAME "com.keyman.engine"
+#define KEYMAN_DCONF_ENGINE_PATH "/com/keyman/engine/"
+#define KEYMAN_DCONF_KEYBOARDS_KEY "additional-keyboards"
 
 G_BEGIN_DECLS
 
