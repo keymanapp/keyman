@@ -33,7 +33,7 @@ unit utilkmshell;  // I3306   // I4181
 interface
 
 uses
-  System.UITypes,
+  System.UITypes, System.IOUtils, System.Types,
   Dialogs, Windows, ComObj, shlobj, controls, sysutils, classes;
 
 const
@@ -100,6 +100,7 @@ function GetLongFile(APath:String):String;
 function TSFInstalled: Boolean;
 
 function GetLongFileName(const fname: string): string;
+procedure GetFileNamesInDirectory(const directoryPath: string; var fileNames: TStringDynArray);
 
 function WaitForElevatedConfiguration(WindowHandle: THandle; const Parameters: WideString; FWait: Boolean = True): Cardinal;
 function RunConfiguration(WindowHandle: THandle; const Parameters: WideString): Boolean;
@@ -575,6 +576,20 @@ begin
   if GetFullPathName(PChar(fname), 260, buf, p) = 0
     then Result := fname
     else Result := buf;
+end;
+
+procedure GetFileNamesInDirectory(const directoryPath: string; var fileNames: TStringDynArray);
+var
+  fileName: string;
+begin
+  // Check if the directory exists
+  if TDirectory.Exists(directoryPath) then
+  begin
+    // Retrieve file names within the directory
+    fileNames := TDirectory.GetFiles(directoryPath);
+  end
+  else
+    KL.Log('Directory does not exist.');
 end;
 
 function RunConfiguration(WindowHandle: THandle; const Parameters: WideString): Boolean;

@@ -82,6 +82,7 @@ type
                     fmMigrate, fmSplash, fmStart,
                     fmUpgradeKeyboards, fmOnlineUpdateCheck,// I2548
                     fmOnlineUpdateAdmin, fmTextEditor,
+                    fmBackgroundUpdateCheck,
                     fmFirstRun, // I2562
                     fmKeyboardWelcome,  // I2569
                     fmKeyboardPrint,  // I2329
@@ -103,9 +104,11 @@ var
 implementation
 
 uses
+  Winapi.Shlobj,
   custinterfaces,
   DebugPaths,
   Dialogs,
+  utilexecute,
   GetOsVersion,
   help,
   HTMLHelpViewer,
@@ -141,6 +144,7 @@ uses
   UpgradeMnemonicLayout,
   utilfocusappwnd,
   utilkmshell,
+  utildir,
 
   KeyboardTIPCheck,
 
@@ -155,6 +159,14 @@ uses
 function FirstRun(FQuery, FDisablePackages, FDefaultUILanguage: string): Boolean; forward;  // I2562
 procedure ShowKeyboardWelcome(PackageName: WideString); forward;  // I2569
 procedure PrintKeyboard(KeyboardName: WideString); forward;  // I2329
+{
+  Calls the Windows shell to execute the file passed in `SavePath`
+  @param  SavePath  The full path file name to be open by the shell
+}
+procedure ExecuteInstall(SavePath: String); forward;
+{
+  Starts the install of the cached files
+}
 
 procedure Main(Owner: TComponent = nil);
 var
@@ -229,7 +241,6 @@ begin
       else if s = '-m' then   FMode := fmMigrate
       else if s = '-i' then   FMode := fmInstall
       else if s = '-ikl' then FMode := fmInstallKeyboardLanguage   // I3624
-
       else if s = '-register-tip' then FMode := fmRegisterTip
       else if s = '-install-tip' then FMode := fmInstallTip
       else if s = '-install-tips-for-packages' then FMode := fmInstallTipsForPackages
@@ -249,6 +260,7 @@ begin
       else if s = '-h'   then FMode := fmHelp
       else if s = '-t'   then FMode := fmTextEditor
       else if s = '-ouc' then FMode := fmOnlineUpdateCheck
+      else if s = '-buc' then FMode := fmBackgroundUpdateCheck
       else if s = '-basekeyboard' then FMode := fmBaseKeyboard   // I4169
       else if s = '-nowelcome'   then FNoWelcome := True
       else if s = '-kw' then FMode := fmKeyboardWelcome  // I2569
@@ -381,6 +393,7 @@ var
   kdl: IKeymanDefaultLanguage;
   FIcon: string;
   FMutex: TKeymanMutex;  // I2720
+  UpdateState : TUpdateState;
     function FirstKeyboardFileName: WideString;
     begin
       if KeyboardFileNames.Count = 0
@@ -426,6 +439,24 @@ begin
   begin
     ShowMessage(MsgFromId(SKOSNotSupported));
     Exit;
+  end;
+
+  with TOnlineUpdateCheck.Create(nil, True, True) do
+    try
+      UpdateState := CheckBackgroundState;
+    finally
+      Free;
+    end;
+  if ((FMode = fmBackgroundUpdateCheck) or (UpdateState <> usIdle)) then
+  begin
+    /// Moving this to OnlineUpdateCheck
+    KL.Log('initprog fmBackgroundUpdateCheck');
+    with TOnlineUpdateCheck.Create(nil, True, True) do
+    try
+      ProcessBackgroundInstall
+    finally
+      Free;
+    end;
   end;
 
   if not FSilent or (FMode = fmUpgradeMnemonicLayout) then   // I4553
@@ -648,5 +679,23 @@ begin
     end;
 end;
 
-end.
+procedure ExecuteInstall(SavePath: String);
+var
+  s: string;
+  FResult: Boolean;
+begin
+  s := LowerCase(ExtractFileExt(SavePath));
+  if s = '.msp' then
+    FResult := TUtilExecute.Shell(0, 'msiexec.exe', '', '/qb /p "'+SavePath+'" AUTOLAUNCHPRODUCT=1')  // I3349
+  else if s = '.msi' then
+    FResult := TUtilExecute.Shell(0, 'msiexec.exe', '', '/qb /i "'+SavePath+'" AUTOLAUNCHPRODUCT=1')  // I3349
+  else if s = '.exe' then
+    FResult := TUtilExecute.Shell(0, SavePath, '', '-au')  // I3349
+  else
+    Exit;
+  if not FResult then
+    KL.Log(SysErrorMessage(GetLastError));
+end;
 
+
+end.
