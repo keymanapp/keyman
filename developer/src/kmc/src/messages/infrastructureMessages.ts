@@ -79,5 +79,9 @@ export class InfrastructureMessages {
   static Error_CannotCreateFolder = (o:{folderName:string, e: any}) => m(this.ERROR_CannotCreateFolder, null,
     `Unable to create folder ${o.folderName}: ${o.e ?? 'unknown error'}`);
   static ERROR_CannotCreateFolder = SevError | 0x0011;
+
+  static Error_InvalidProjectFolder = (o:{folderName:string}) => m(this.ERROR_InvalidProjectFolder,
+    `The folder ${o.folderName} does not appear to be a Keyman Developer project`);
+  static ERROR_InvalidProjectFolder = SevError | 0x0012;
 }
 

@@ -71,4 +71,6 @@
 /* message displayed to alert user to need grant accessibility permission */
 "privacy-alert-text" = "To function properly, Keyman requires accessibility features:\n\nGrant access in System Preferences, Security & Privacy.\nRestart your system.";
 
+/* Text of menu item in Input Menu when no Keyboards are configured -- include parentheses  */
+"no-keyboard-configured-menu-placeholder" = "(No Keyboard Configured)";
 

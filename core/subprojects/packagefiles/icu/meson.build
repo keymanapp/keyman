@@ -35,7 +35,7 @@ uconfig.set('U_ENABLE_DYLOAD', 0) # no DLL
 uconfig.set('U_CHECK_DYLOAD', 0) # no DLL
 uconfig.set('UCONFIG_NO_FILE_IO', 1)
 uconfig.set('UCONFIG_NO_LEGACY_CONVERSION', 1) # turn off file based codepage conversion
-uconfig.set('UCONFIG_NO_NORMALIZATION', 1) # TODO-LDML: may want this
+uconfig.set('UCONFIG_NO_NORMALIZATION', 0)
 uconfig.set('UCONFIG_NO_BREAK_ITERATION', 1) # TODO-LDML: may want this
 uconfig.set('UCONFIG_NO_IDNA', 1)
 uconfig.set('UCONFIG_NO_COLLATION', 1)

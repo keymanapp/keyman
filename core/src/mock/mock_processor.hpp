@@ -16,14 +16,14 @@
 #include "option.hpp"
 
 namespace km {
-namespace kbp
+namespace core
 {
   class mock_processor : public abstract_processor
   {
     std::unordered_map<std::u16string, std::u16string> _options;
 
   public:
-    mock_processor(km::kbp::path const &);
+    mock_processor(km::core::path const &);
 //    ~mock_processor() override;
 
     km_core_status
@@ -76,5 +76,5 @@ namespace kbp
 
     km_core_status validate() const override;
   };
-} // namespace kbp
+} // namespace core
 } // namespace km

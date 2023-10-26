@@ -37,3 +37,16 @@ Here's how to make the change with Windows Settings:
     5.  The Keyman icon will now always appear in the Windows
         Taskbar near the clock, if Keyman is on.
     6.  Continue on to [Step 5](../start/tutorial#step-5-) of this guide.
+
+-   On Windows 11
+
+    1.  Right-click on the Windows Taskbar.
+    
+        ![](../desktop_images/win11-taskbar1.png)
+    2.  Select 'Taskbar settings'.
+    3.  Under 'Other system tray icons', expand the list, 
+        click the toggle button beside 'Keyman Engine x86'to turn it on.
+        ![](../desktop_images/win11-taskbar2.png)
+    4.  The Keyman icon will now always appear in the Windows
+        Taskbar near the clock, if Keyman is on.
+    5.  Continue on to [Step 5](../start/tutorial#step-5-) of this guide.
