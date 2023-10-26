@@ -272,7 +272,6 @@ export class GestureSourceSubview<HoveredItemType, StateToken = any> extends Ges
     preserveBaseItem: boolean,
     stateTokenOverride?: StateToken
   ) {
-    //let mayUpdate = true;
     let start = 0;
     let length = source.path.coords.length;
 
