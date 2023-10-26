@@ -280,6 +280,9 @@ export class KmnCompiler implements UnicodeSetParser {
 
       if(result.extra.displayMapFilename) {
         result.displayMap = this.loadDisplayMapping(infile, result.extra.displayMapFilename)
+        if(!result.displayMap) {
+          return null;
+        }
       }
 
       if(result.extra.kvksFilename) {
@@ -406,6 +409,10 @@ export class KmnCompiler implements UnicodeSetParser {
     try {
       // Expected file format: displaymap.schema.json
       const data = this.callbacks.loadFile(displayMapFilename);
+      if(!data) {
+        this.callbacks.reportMessage(CompilerMessages.Error_FileNotFound({filename: displayMapFilename}));
+        return null;
+      }
       const mapping = JSON.parse(new TextDecoder().decode(data));
       return Osk.parseMapping(mapping);
     } catch(e) {

@@ -87,6 +87,10 @@ export class CompilerMessages {
   static Error_InvalidKvkFile = (o:{filename: string, e: any}) => m(this.ERROR_InvalidKvkFile,
     `Error encountered loading ${o.filename}: ${o.e ?? 'unknown error'}`); // Note, not fatal, not reporting to Sentry
   static ERROR_InvalidKvkFile = SevError | 0x90B;
+
+  static Error_FileNotFound = (o:{filename: string}) => m(this.ERROR_FileNotFound,
+    `File ${o.filename} was not found`);
+  static ERROR_FileNotFound = SevError | 0x90C;
 };
 
 /**
