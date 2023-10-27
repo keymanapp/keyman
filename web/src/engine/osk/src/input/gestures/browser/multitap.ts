@@ -69,11 +69,6 @@ export default class Multitap implements GestureHandler {
         // if a user holds long, they get what they see if they decide to stop,
         // but also have time to decide if they want to continue to what's next.
         case 'modipress-multitap-start':
-          const modipressHandler = new Modipress(source, vkbd, () => {
-            this.modipress = vkbd.activeModipress = null;
-          });
-          this.modipress = vkbd.activeModipress = modipressHandler;
-          // fallthrough;
         case 'multitap-start':
           break;
         default:
@@ -104,6 +99,14 @@ export default class Multitap implements GestureHandler {
       keyEvent.keyDistribution = this.currentStageKeyDistribution(baseDistances);
 
       vkbd.raiseKeyEvent(keyEvent, null);
+
+      // Now that the key has been processed, with a layer possibly changed as a result...
+      if(tap.matchedId == 'modipress-multitap-start') {
+        const modipressHandler = new Modipress(source, vkbd, () => {
+          this.modipress = vkbd.activeModipress = null;
+        });
+        this.modipress = vkbd.activeModipress = modipressHandler;
+      }
     };
 
     source.on('stage', stageHandler);
