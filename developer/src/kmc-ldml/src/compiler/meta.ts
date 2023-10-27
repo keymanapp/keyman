@@ -41,8 +41,7 @@ export class MetaCompiler extends SectionCompiler {
 
   private validateNormalization(normalization?: string) {
     if (normalization === 'disabled') {
-      this.callbacks.reportMessage(CompilerMessages.Error_InvalidNormalization());
-      return false;
+      this.callbacks.reportMessage(CompilerMessages.Hint_NormalizationDisabled());
     }
     return true;
   }

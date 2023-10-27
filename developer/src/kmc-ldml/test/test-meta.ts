@@ -35,11 +35,11 @@ describe('meta', function () {
     assert.equal(meta.settings, KeyboardSettings.none);
   });
 
-  it('should reject invalid normalization', async function() {
-    let meta = await loadSectionFixture(MetaCompiler, 'sections/meta/invalid-normalization.xml', compilerTestCallbacks) as Meta;
-    assert.isNull(meta);
+  it('should hint when normalization=disabled', async function() {
+    let meta = await loadSectionFixture(MetaCompiler, 'sections/meta/hint-normalization.xml', compilerTestCallbacks) as Meta;
+    assert.isNotNull(meta);
     assert.equal(compilerTestCallbacks.messages.length, 1);
-    assert.deepEqual(compilerTestCallbacks.messages[0], CompilerMessages.Error_InvalidNormalization());
+    assert.deepEqual(compilerTestCallbacks.messages[0], CompilerMessages.Hint_NormalizationDisabled());
   });
 
   it('should reject invalid version', async function() {

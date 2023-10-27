@@ -7,8 +7,8 @@ const SevError = CompilerErrorSeverity.Error | CompilerErrorNamespace.LdmlKeyboa
 const SevFatal = CompilerErrorSeverity.Fatal | CompilerErrorNamespace.LdmlKeyboardCompiler;
 
 export class CompilerMessages {
-  static Error_InvalidNormalization = () => m(this.ERROR_InvalidNormalization, `normalization=disabled is not allowed.`);
-  static ERROR_InvalidNormalization = SevError | 0x0001;
+  static Hint_NormalizationDisabled = () => m(this.HINT_NormalizationDisabled, `normalization=disabled is not recommended.`);
+  static HINT_NormalizationDisabled = SevHint | 0x0001;
 
   static Error_InvalidLocale = (o:{tag: string}) => m(this.ERROR_InvalidLocale, `Invalid BCP 47 locale form '${o.tag}'`);
   static ERROR_InvalidLocale = SevError | 0x0002;
