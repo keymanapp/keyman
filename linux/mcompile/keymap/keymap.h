@@ -57,7 +57,7 @@ const KMX_DWORD KMX_VKMap[] = {
 
   0
 };
-// _S2 how many fielsds do I need??
+// _S2 how many fields do I need??
 // mapping between Linux keycodes and keyman SC
 const int keycode_map[60]={
   0,   /* */
@@ -122,6 +122,7 @@ const int keycode_map[60]={
   0,   /* */
 };
 
+// _S2 not used-can go later
 // _S2 how many fielsds do I need??
 const int Lin_KM__map_arr[70]={
   0,  /* */
@@ -200,6 +201,7 @@ const int Lin_KM__map_arr[70]={
 };
 
 const int Lin_KM__map(int i);
+const int Lin_KM__map(int i, v_dw_3D &All_Vector);
 
 // this is what we return when we find an invalid character
 //_S2 Which character do we use in that case?  0 or FFFF or 32 or ??
@@ -226,12 +228,13 @@ int replace_PosKey_with_Keycode_use_Lin(std::string  in);
 // create an empty 2D vector containing "--" in all fields
 v_dw_2D create_empty_2D(int dim_rows, int dim_shifts);
 
-// get Keyvals from VectorFile.txt and insert into All_Vector
-//bool InsertKeyvalsFromVectorFile(v_dw_3D &All_Vector);
 
 // query All_Vector
 // return the VirtualKey of the Other Keyboard for given Scancode
 KMX_DWORD get_VirtualKey_Other_From_SC(KMX_DWORD SC , v_dw_3D &All_Vector);
+KMX_DWORD get_VirtualKey_Other_Layer1_From_SC(KMX_DWORD SC , v_dw_3D &All_Vector);
+KMX_DWORD get_VirtualKey_Other_Layer2_From_SC(KMX_DWORD SC , v_dw_3D &All_Vector);
+
 // return the VirtualKey of the US Keyboard for given Scancode
 KMX_DWORD get_VirtualKey_US_From_SC(KMX_DWORD SC , v_dw_3D &All_Vector);
 // return the Scancode of for given VirtualKey of Other Keyboard
