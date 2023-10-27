@@ -54,12 +54,7 @@ export default class KeymanEngine<
       }
     }
 
-    //... probably only applies for physical keystrokes.
-    if(!event.isSynthetic) {
-      if(this.osk?.vkbd?.keyPending) {
-        this.osk.vkbd.keyPending = null;
-      }
-    } else if(this.keyEventRefocus) { // && event.isSynthetic // as in, is from the OSK.
+    if(this.keyEventRefocus) { // && event.isSynthetic // as in, is from the OSK.
       // Do anything needed to guarantee that the outputTarget stays active (`app/browser`: maintains focus).
       // (Interaction with the OSK may have de-focused the element providing active context;
       // we want to restore it in case the user swaps back to the hardware keyboard afterward.)
@@ -72,6 +67,14 @@ export default class KeymanEngine<
     // Deleting matched deadkeys here seems to correct some of the issues.   (JD 6/6/14)
     outputTarget.deadkeys().deleteMatched();      // Delete any matched deadkeys before continuing
 
+    if(event.isSynthetic) {
+      const oskLayer = this.osk.vkbd.layerId;
+
+      // In case of modipresses.
+      if(oskLayer && oskLayer != this.core.keyboardProcessor.layerId) {
+        this.core.keyboardProcessor.layerId = oskLayer;
+      }
+    }
     const result = this.core.processKeyEvent(event, outputTarget);
 
     if(result && result.transcription?.transform) {

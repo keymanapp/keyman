@@ -856,7 +856,7 @@ export default abstract class OSKView
       //
       // Also, only change the layer ID itself if there is an actual corresponding layer
       // in the OSK.
-      if(this.vkbd?.layerGroup.layers[newValue]) {
+      if(this.vkbd?.layerGroup.layers[newValue] && !this.vkbd?.layerLocked) {
         this.vkbd.layerId = newValue;
         // Ensure that the layer's spacebar is properly captioned.
         this.vkbd.showLanguage();

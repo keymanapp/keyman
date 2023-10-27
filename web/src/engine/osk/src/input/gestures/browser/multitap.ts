@@ -2,9 +2,10 @@ import { type KeyElement } from '../../../keyElement.js';
 import VisualKeyboard from '../../../visualKeyboard.js';
 
 import { DeviceSpec, KeyEvent, ActiveSubKey, ActiveKey, KeyDistribution, ActiveKeyBase } from '@keymanapp/keyboard-processor';
-import { GestureSequence } from '@keymanapp/gesture-recognizer';
+import { GestureSequence, GestureStageReport } from '@keymanapp/gesture-recognizer';
 import { GestureHandler } from '../gestureHandler.js';
 import { distributionFromDistanceMaps } from '@keymanapp/input-processor';
+import Modipress from './modipress.js';
 
 /**
  * Represents a potential multitap gesture's implementation within KeymanWeb.
@@ -21,6 +22,7 @@ export default class Multitap implements GestureHandler {
 
   private readonly multitaps: ActiveSubKey[];
   private tapIndex = 0;
+  private modipress: Modipress;
 
   private sequence: GestureSequence<KeyElement, string>;
 
@@ -40,12 +42,23 @@ export default class Multitap implements GestureHandler {
     source.on('complete', () => {
       if(source.stageReports.length > 1) {
       }
+      if(this.modipress) {
+        this.modipress.cancel();
+      }
       // this.currentSelection?.key.highlight(false);
       this.clear();
     });
 
-    source.on('stage', (tap) => {
+    const stageHandler = (tap: GestureStageReport<KeyElement, string>) => {
       switch(tap.matchedId) {
+        // In the case that a modifier key supports multitap, reaching this stage
+        // indicates that the multitapping is over.  Not the modipressing, though.
+        case 'modipress-hold':
+          this.clear();
+          // We'll let the co-existing modipress handler continue.
+          source.off('stage', stageHandler);
+          return;
+        case 'modipress-end-multitap-transition':
         case 'modipress-multitap-end':
         case 'modipress-end':
         case 'multitap-end':
@@ -54,8 +67,13 @@ export default class Multitap implements GestureHandler {
         // Once a multitap starts, it's better to emit keys on keydown; that way,
         // if a user holds long, they get what they see if they decide to stop,
         // but also have time to decide if they want to continue to what's next.
-        case 'multitap-start':
         case 'modipress-multitap-start':
+          const modipressHandler = new Modipress(source, vkbd, () => {
+            this.modipress = vkbd.activeModipress = null;
+          });
+          this.modipress = vkbd.activeModipress = modipressHandler;
+          // fallthrough;
+        case 'multitap-start':
           break;
         default:
           throw new Error(`Unsupported gesture state encountered during multitap: ${tap.matchedId}`);
@@ -70,7 +88,7 @@ export default class Multitap implements GestureHandler {
 
       const coord = tap.sources[0].currentSample;
       const baseDistances = vkbd.getSimpleTapCorrectionDistances(coord, this.baseKey.key.spec as ActiveKey);
-      if(coord.stateToken != vkbd.layerId) {
+      if(coord.stateToken != vkbd.layerId && !tap.matchedId.includes('modipress')) {
         const matchKey = vkbd.layerGroup.findNearestKey({...coord, stateToken: vkbd.layerId});
 
         // Replace the key at the current location for the current layer key
@@ -85,7 +103,9 @@ export default class Multitap implements GestureHandler {
       keyEvent.keyDistribution = this.currentStageKeyDistribution(baseDistances);
 
       vkbd.raiseKeyEvent(keyEvent, null);
-    });
+    };
+
+    source.on('stage', stageHandler);
 
     /* In theory, setting up a specialized recognizer config limited to the base key's surface area
      * would be pretty ideal - it'd provide automatic cancellation if anywhere else were touched.
