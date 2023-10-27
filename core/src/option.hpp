@@ -18,7 +18,7 @@
 class json;
 
 namespace km {
-namespace kbp
+namespace core
 {
   struct option : public km_core_option_item
   {
@@ -89,5 +89,5 @@ namespace kbp
 
 
 
-} // namespace kbp
+} // namespace core
 } // namespace km

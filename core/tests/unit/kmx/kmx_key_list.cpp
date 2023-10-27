@@ -16,7 +16,7 @@
 #include <test_color.h>
 #include "../emscripten_filesystem.h"
 
-using namespace km::kbp::kmx;
+using namespace km::core::kmx;
 
 km_core_option_item test_env_opts[] =
 {
@@ -48,13 +48,13 @@ std::map<std::pair<km_core_virtual_key,uint32_t>, uint32_t> kb_key_expected_key_
  *
  * @param source_file  Path to kmx keyboard file
  */
-void test_key_list(const km::kbp::path &source_file){
+void test_key_list(const km::core::path &source_file){
 
   km_core_keyboard * test_kb = nullptr;
   km_core_state * test_state = nullptr;
   km_core_keyboard_key * kb_key_list;
 
-  km::kbp::path full_path = source_file;
+  km::core::path full_path = source_file;
 
   try_status(km_core_keyboard_load(full_path.native().c_str(), &test_kb));
 

@@ -13,7 +13,7 @@
 
 namespace
 {
-  km::kbp::path const test_kb_path = "/a/dummy/keyboard.mock";
+  km::core::path const test_kb_path = "/a/dummy/keyboard.mock";
 }
 
 #define   try_status(expr) \

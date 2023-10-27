@@ -16,7 +16,7 @@
 #include <keyman/keyman_core_api.h>
 
 namespace km {
-namespace kbp {
+namespace core {
 namespace ldml {
 
 /**
@@ -55,5 +55,5 @@ private:
 };
 
 }  // namespace ldml
-}  // namespace kbp
+}  // namespace core
 }  // namespace km

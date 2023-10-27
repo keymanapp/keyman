@@ -61,8 +61,8 @@ namespace
   };
 
 #if 0
-  km::kbp::state mock_state(test_kb, test_env);
-  km::kbp::state empty_state(empty_options_list, empty_options_list);
+  km::core::state mock_state(test_kb, test_env);
+  km::core::state empty_state(empty_options_list, empty_options_list);
 
 
   std::string get_json_doc(km_core_state * const state)
