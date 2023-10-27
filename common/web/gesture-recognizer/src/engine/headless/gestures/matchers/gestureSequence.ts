@@ -310,7 +310,7 @@ export class GestureSequence<Type, StateToken = any> extends EventEmitter<EventM
 
   public cancel() {
     const sources = this.stageReports[this.stageReports.length - 1].sources;
-    sources.forEach((src) => src.terminate(true));
+    sources.forEach((src) => !src.isPathComplete && src.terminate(true));
   }
 }
 

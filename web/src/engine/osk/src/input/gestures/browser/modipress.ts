@@ -60,6 +60,7 @@ export default class Modipress implements GestureHandler {
     const callback = this.completionCallback;
     this.completionCallback = null;
     callback && callback();
+    this.source.cancel();
   }
 
   readonly hasModalVisualization = false;

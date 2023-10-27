@@ -35,6 +35,7 @@ export default class Multitap implements GestureHandler {
     this.baseKey = e;
     this.baseContextToken = contextToken;
     this.multitaps = [e.key.spec].concat(e.key.spec.multitap);
+    this.sequence = source;
 
     // // For multitaps, keeping the key highlighted makes sense.  I think.
     // this.baseKey.key.highlight(true);
