@@ -134,7 +134,7 @@
       <Culture>0x0c09</Culture>
     </ResourceCompile>
     <Link>
-      <AdditionalDependencies>..\..\..\lib\keyman32.lib;version.lib;wintrust.lib;crypt32.lib;imagehlp.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>..\..\..\lib\keyman32-ver.lib;version.lib;wintrust.lib;crypt32.lib;imagehlp.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <ModuleDefinitionFile>.\kmtip.def</ModuleDefinitionFile>
       <GenerateMapFile>true</GenerateMapFile>
@@ -177,7 +177,7 @@
       <Culture>0x0c09</Culture>
     </ResourceCompile>
     <Link>
-      <AdditionalDependencies>..\..\..\lib\keyman64.lib;version.lib;wintrust.lib;crypt32.lib;imagehlp.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>..\..\..\lib\keyman64-ver.lib;version.lib;wintrust.lib;crypt32.lib;imagehlp.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <ModuleDefinitionFile>.\kmtip64.def</ModuleDefinitionFile>
       <GenerateMapFile>true</GenerateMapFile>
@@ -219,7 +219,7 @@
       <Culture>0x0c09</Culture>
     </ResourceCompile>
     <Link>
-      <AdditionalDependencies>..\..\..\lib\keyman32.lib;version.lib;wintrust.lib;crypt32.lib;imagehlp.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>..\..\..\lib\keyman32-ver.lib;version.lib;wintrust.lib;crypt32.lib;imagehlp.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <ModuleDefinitionFile>.\kmtip.def</ModuleDefinitionFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -261,7 +261,7 @@
       <Culture>0x0c09</Culture>
     </ResourceCompile>
     <Link>
-      <AdditionalDependencies>..\..\..\lib\keyman64.lib;version.lib;wintrust.lib;crypt32.lib;imagehlp.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>..\..\..\lib\keyman64-ver.lib;version.lib;wintrust.lib;crypt32.lib;imagehlp.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <ModuleDefinitionFile>.\kmtip64.def</ModuleDefinitionFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>

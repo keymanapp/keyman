@@ -104,6 +104,10 @@
         <File Id="keyman32.dll" Name="keyman32.dll" KeyPath="yes" />
       </Component>
 
+       <Component Guid="*" SharedDllRefCount="yes">
+        <File Id="keyman32_ver.dll" Name="keyman32-ver$(var.VERSION_WITH_TAG).dll" KeyPath="yes"  Source="..\..\..\bin\engine\keyman32-ver$(var.VERSION_WITH_TAG).dll" />
+      </Component>
+
       <Component Guid="{1853C94A-0F4C-4D43-AF07-E3F27794FDC9}">
         <File Id="keyman.exe" Name="keyman.exe" KeyPath="yes" />
       </Component>
@@ -137,8 +141,17 @@
         <File Id="keyman64.dll" Name="keyman64.dll" KeyPath="yes" Source="..\..\..\bin\engine\keyman64.dll" />
       </Component>
 
+      <Component Guid="*" SharedDllRefCount="yes">
+        <File Id="keyman64_ver.dll" Name="keyman64-ver$(var.VERSION_WITH_TAG).dll" KeyPath="yes" Source="..\..\..\bin\engine\keyman64-ver$(var.VERSION_WITH_TAG).dll" />
+      </Component>
+
       <Component Guid="{1D136A8F-BC8C-432F-B82F-822EBBE986F2}">
         <File Id="keymanx64.exe" Name='keymanx64.exe' KeyPath="yes" Source="..\..\..\bin\engine\keymanx64.exe" />
+      </Component>
+
+      <Component Id="Reg_KeymanVersion" Guid="*">
+                <RegistryValue KeyPath="yes" Root="HKLM" Key="Software\Keyman\Keyman Engine" Name="keyman32 name" Type="string" Value="keyman32-ver$(var.VERSION_WITH_TAG).dll" />
+                <RegistryValue Root="HKLM" Key="Software\Keyman\Keyman Engine" Name="keyman64 name" Type="string" Value="keyman64-ver$(var.VERSION_WITH_TAG).dll" />
       </Component>
 
       <Component Guid="{FB88ED52-C8F9-44F8-91F2-D0E377504C0D}">

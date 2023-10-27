@@ -194,11 +194,6 @@ uses
 var
   wm_keyman: Integer = 0;
 
-{$IFNDEF WIN64}
-const
-  SKeyman32Filename = 'keyman32.dll';
-{$ENDIF}
-
 const
   SWnd_MasterController = 'TfrmKeyman7Main';
   SWnd_VisualKeyboard = 'TfrmVisualKeyboard';
@@ -724,13 +719,14 @@ procedure TKeymanControl.LoadKeyman32;
     end;
 var
   s: string;
+  Keyman32Name: string;
 begin
   if hlibKeyman32 = 0 then
   begin
-
-    s := GetKeymanInstallPath+SKeyman32Filename;   // I3598
+    Keyman32Name := GetKeyman32Name;
+    s := GetKeymanInstallPath+Keyman32Name;   // I3598
     if not FileExists(s) then
-      ErrorFmt(KMN_E_KeymanControl_CannotLoadKeyman32, VarArrayOf([Integer(GetLastError), 'Failed to find '+SKeyman32Filename+' at "'+s+'", '+SysErrorMessage(GetLastError)]));
+      ErrorFmt(KMN_E_KeymanControl_CannotLoadKeyman32, VarArrayOf([Integer(GetLastError), 'Failed to find '+Keyman32Name+' at "'+s+'", '+SysErrorMessage(GetLastError)]));
 
     hlibKeyman32 := LoadLibrary(PChar(s));
     if hlibKeyman32 = 0 then

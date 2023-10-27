@@ -4,7 +4,8 @@
 
 !include ..\..\Defines.mak
 
-build: version.res dirs pull-core
+build: version.res dirs
+    $(MKVER_U) exports.in exports.h
     $(MSBUILD) keyman32.vcxproj $(MSBUILD_BUILD)
     $(COPY) $(WIN32_TARGET_PATH)\keyman32.dll $(PROGRAM)\engine
     $(COPY) $(WIN32_TARGET_PATH)\keyman32.pdb $(DEBUGPATH)\engine

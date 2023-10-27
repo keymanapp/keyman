@@ -15,7 +15,7 @@ BOOL Keyman_ForceKeyboard(PSTR s);
 BOOL Keyman_StopForcingKeyboard();
 
 /************************************************************************************************************
- * DLL entry functions          
+ * DLL entry functions
  ************************************************************************************************************/
 
 int PASCAL WinMain(HINSTANCE hinstance, HINSTANCE hprevinst, LPSTR cmdline, int nCmdShow)
@@ -37,7 +37,7 @@ int PASCAL WinMain(HINSTANCE hinstance, HINSTANCE hprevinst, LPSTR cmdline, int 
 	wc.lpszClassName = L"KeymanDebug";
 	if(!RegisterClassW(&wc)) return FALSE;
 
-	hwnd = CreateWindowW(L"KeymanDebug", L"Keyman Debugger", 
+	hwnd = CreateWindowW(L"KeymanDebug", L"Keyman Debugger",
 		WS_OVERLAPPEDWINDOW | WS_VISIBLE,
 		CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, 0, NULL, hinst, NULL);
 	if(!hwnd) return FALSE;
@@ -68,7 +68,7 @@ void CreateFont()
 
 	font.lfHeight         = -MulDiv(36, lfpixelsy, 72);
 	font.lfWidth          = 0;
-	font.lfEscapement     = 0; 
+	font.lfEscapement     = 0;
 	font.lfOrientation    = 0;
 	font.lfWeight         = FW_NORMAL;
 	font.lfItalic         = FALSE;
@@ -168,7 +168,7 @@ BOOL Keyman_Initialise(HWND hwnd, BOOL FSingleApp)
 	Keyman_InitialiseProc ki;
 
 	FLoad = FALSE;
-	
+
 	hkeyman = GetModuleHandle("keyman32.dll");
 	if(!hkeyman)
 	{
@@ -214,7 +214,7 @@ BOOL Keyman_ForceKeyboard(PSTR s)
 
 	hkeyman = GetModuleHandle("keyman32.dll");
 	if(!hkeyman) return FALSE;
-	
+
 	fk = (Keyman_ForceKeyboardProc) GetProcAddress(hkeyman, "Keyman_ForceKeyboard");
 	if(!fk) return FALSE;
 
