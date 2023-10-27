@@ -35,6 +35,8 @@ export default class SubkeyPopup implements GestureHandler {
   private source: GestureSequence<KeyElement>;
   private readonly gestureParams: GestureParams;
 
+  readonly shouldLockLayer: boolean = false;
+
   constructor(
     source: GestureSequence<KeyElement, string>,
     configChanger: ConfigChangeClosure<KeyElement>,
@@ -45,6 +47,10 @@ export default class SubkeyPopup implements GestureHandler {
     this.baseKey = e;
     this.source = source;
     this.gestureParams = gestureParams;
+
+    if(vkbd.layerLocked) {
+      this.shouldLockLayer = true;
+    }
 
     source.on('complete', () => {
       this.currentSelection?.key.highlight(false);

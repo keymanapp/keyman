@@ -523,7 +523,16 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
           }
 
           // Once the best coord to use for fat-finger calculations has been determined:
-          keyResult = this.modelKeyClick(gestureStage.item, coord);
+          const shouldLockLayer = handlers && (handlers[0] instanceof SubkeyPopup) && handlers[0].shouldLockLayer;
+          try {
+            if(shouldLockLayer) {
+              this.lockLayer(true);
+            }
+            keyResult = this.modelKeyClick(gestureStage.item, coord);
+          } finally {
+            this.lockLayer(false);
+          }
+
         }
 
         // Outside of passing keys along... the handling of later stages is delegated
