@@ -222,8 +222,9 @@ export class GestureSequence<Type, StateToken = any> extends EventEmitter<EventM
     // In some automated tests, `this.touchpointCoordinator` may be `null`.
     let selectorNotCurrent = false;
     if(this.touchpointCoordinator) {
-      selectorNotCurrent = ![this.selector, this.pushedSelector].find((sel) => sel == this.touchpointCoordinator.currentSelector);
+      selectorNotCurrent = !this.touchpointCoordinator.selectorStackIncludes(this.selector);
     }
+
     let nextModels = modelSetForAction(selection.result.action, this.gestureConfig, this.baseGestureSetId);
     if(selectorNotCurrent) {
       // If this sequence's selector isn't current, we're in an unrooted state; the parent, base gesture
