@@ -9,7 +9,7 @@
 #include "utfcodec.hpp"
 
 
-using namespace km::kbp::kmx;
+using namespace km::core::kmx;
 
 int test_COMP_KMXPLUS_KEYS_KEY() {
   std::cout << "== " << __FUNCTION__ << std::endl;
@@ -61,11 +61,11 @@ int test_COMP_KMXPLUS_KEYS_KEY() {
 int test_ldml_vkeys() {
   std::cout << "== " << __FUNCTION__ << std::endl;
 
-  km::kbp::ldml::vkeys vk;
+  km::core::ldml::vkeys vk;
 
 #define ADD_VKEY(k, m) { \
   const char* str = k "-" #m ; \
-  PKMX_WCHAR wstr = km::kbp::kmx::strtowstr(const_cast<PKMX_CHAR>(str)); \
+  PKMX_WCHAR wstr = km::core::kmx::strtowstr(const_cast<PKMX_CHAR>(str)); \
   vk.add(km::tests::get_vk(k), m, wstr); \
   delete [] wstr; \
 }

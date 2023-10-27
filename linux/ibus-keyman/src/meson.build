@@ -17,7 +17,7 @@ include_dirs = [
   include_directories(meson.current_build_dir() / '..'),
 ]
 
-deps = [gtk, ibus, icu, json_glib, kmnkbp_lib, systemd]
+deps = [gtk, ibus, icu, json_glib, keymancore_lib, systemd]
 
 prefix = get_option('prefix')
 cfg = configuration_data()

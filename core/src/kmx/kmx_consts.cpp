@@ -2,7 +2,7 @@
 #include "kmx_processevent.h"
 
 namespace km {
-namespace kbp {
+namespace core {
 namespace kmx {
 
 const struct char_to_vkey s_char_to_vkey[] = {
@@ -105,5 +105,5 @@ const struct char_to_vkey s_char_to_vkey[] = {
 };
 
 } // namespace kmx
-} // namespace kbp
+} // namespace core
 } // namespace km
