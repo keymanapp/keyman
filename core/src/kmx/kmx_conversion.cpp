@@ -3,7 +3,7 @@
 
 #include "kmx_processevent.h"
 
-using namespace km::kbp;
+using namespace km::core;
 using namespace kmx;
 
 /* This array is lifted from preservedkeymap.cpp */
@@ -116,7 +116,7 @@ const struct
 };
 
 
-KMX_BOOL km::kbp::kmx::MapUSCharToVK(KMX_WORD ch, PKMX_WORD puKey, PKMX_DWORD puShiftFlags) {
+KMX_BOOL km::core::kmx::MapUSCharToVK(KMX_WORD ch, PKMX_WORD puKey, PKMX_DWORD puShiftFlags) {
   assert(puKey != NULL);
   assert(puShiftFlags != NULL);
   if (ch >= 0x20 && ch < 0x7F) {

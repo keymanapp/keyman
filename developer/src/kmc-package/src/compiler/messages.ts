@@ -123,5 +123,9 @@ export class CompilerMessages {
   static Hint_PackageContainsSourceFile = (o:{filename:string}) => m(this.HINT_PackageContainsSourceFile,
     `The source file ${o.filename} should not be included in the package; instead include the compiled result.`);
   static HINT_PackageContainsSourceFile = SevHint | 0x001D;
+
+  static Error_InvalidPackageFile = (o:{e:any}) => m(this.ERROR_InvalidPackageFile,
+    `Package source file is invalid: ${(o.e ?? 'unknown error').toString()}`);
+  static ERROR_InvalidPackageFile = SevError | 0x001E;
 }
 

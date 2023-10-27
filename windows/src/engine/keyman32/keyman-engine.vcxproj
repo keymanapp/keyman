@@ -98,7 +98,7 @@
     </ResourceCompile>
     <Link>
       <AdditionalOptions>/verbose:lib /section:.SHARDATA,rws %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalDependencies>kmnkbp0.lib;psapi.lib;rpcrt4.lib;version.lib;setupapi.lib;iphlpapi.lib;imm32.lib;crypt32.lib;wintrust.lib;imagehlp.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>keymancore.lib;psapi.lib;rpcrt4.lib;version.lib;setupapi.lib;iphlpapi.lib;imm32.lib;crypt32.lib;wintrust.lib;imagehlp.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>./Keyman32$(Version_with_tag).dll</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <ModuleDefinitionFile>keyman32-ver.def</ModuleDefinitionFile>
@@ -160,7 +160,7 @@
     </ResourceCompile>
     <Link>
       <AdditionalOptions>/verbose:lib /section:.SHARDATA,rws %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalDependencies>kmnkbp0.lib;psapi.lib;rpcrt4.lib;version.lib;setupapi.lib;iphlpapi.lib;imm32.lib;crypt32.lib;wintrust.lib;imagehlp.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>keymancore.lib;psapi.lib;rpcrt4.lib;version.lib;setupapi.lib;iphlpapi.lib;imm32.lib;crypt32.lib;wintrust.lib;imagehlp.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>./Keyman32$(Version_with_tag).dll</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <ModuleDefinitionFile>keyman32-ver.def</ModuleDefinitionFile>

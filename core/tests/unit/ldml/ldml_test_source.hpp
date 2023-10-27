@@ -81,16 +81,16 @@ class LdmlJsonTestSourceFactory {
      * @param compiled the KMX - for lookup
      * @param path the json
     */
-    int load(const km::kbp::path &compiled, const km::kbp::path &path);
+    int load(const km::core::path &compiled, const km::core::path &path);
 
-    static km::kbp::path kmx_to_test_json(const km::kbp::path& kmx);
+    static km::core::path kmx_to_test_json(const km::core::path& kmx);
 
     const JsonTestMap& get_tests() const;
   private:
     JsonTestMap test_map;
     // copy of the kbd data, for lookups
     std::vector<uint8_t> rawdata;
-    std::unique_ptr<km::kbp::kmx::kmx_plus> kmxplus;
+    std::unique_ptr<km::core::kmx::kmx_plus> kmxplus;
 };
 
 
@@ -102,7 +102,7 @@ public:
   /**
    * Load the test_source from comments in the .xml source
    */
-  int load_source(const km::kbp::path &path);
+  int load_source(const km::core::path &path);
 
   virtual km_core_status get_expected_load_status();
   virtual const std::u16string &get_context() const;

@@ -109,7 +109,7 @@
     </ResourceCompile>
     <Link>
       <AdditionalOptions>/verbose:lib /section:.SHARDATA,rws %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalDependencies>libicuuc.a;libicuin.a;libkmnkbp0.a;psapi.lib;version.lib;setupapi.lib;iphlpapi.lib;imm32.lib;crypt32.lib;wintrust.lib;imagehlp.lib;ws2_32.lib;libcmt.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>libicuuc.a;libicuin.a;libkeymancore.a;psapi.lib;version.lib;setupapi.lib;iphlpapi.lib;imm32.lib;crypt32.lib;wintrust.lib;imagehlp.lib;ws2_32.lib;libcmt.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <AdditionalLibraryDirectories>C:\Program Files\Microsoft SDKs\Windows\v7.0\Lib\x64;$(VCInstallDir)lib\amd64;$(VCInstallDir)lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
@@ -165,7 +165,7 @@
     </ResourceCompile>
     <Link>
       <AdditionalOptions>/verbose:lib /section:.SHARDATA,rws %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalDependencies>libicuuc.a;libicuin.a;libkmnkbp0.a;psapi.lib;version.lib;setupapi.lib;iphlpapi.lib;imm32.lib;crypt32.lib;wintrust.lib;imagehlp.lib;ws2_32.lib;libcmt.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>libicuuc.a;libicuin.a;libkeymancore.a;psapi.lib;version.lib;setupapi.lib;iphlpapi.lib;imm32.lib;crypt32.lib;wintrust.lib;imagehlp.lib;ws2_32.lib;libcmt.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <AdditionalLibraryDirectories>C:\Program Files\Microsoft SDKs\Windows\v7.0\Lib\x64;$(VCInstallDir)lib\amd64;$(VCInstallDir)lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>

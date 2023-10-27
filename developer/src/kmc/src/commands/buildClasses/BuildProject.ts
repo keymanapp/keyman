@@ -1,6 +1,6 @@
 import * as path from 'path';
 import * as fs from 'fs';
-import { CompilerCallbacks, CompilerFileCallbacks, KeymanDeveloperProject, KeymanDeveloperProjectFile, KeymanFileTypes } from '@keymanapp/common-types';
+import { CompilerCallbacks, CompilerFileCallbacks, KeymanDeveloperProject, KeymanDeveloperProjectFile, KeymanDeveloperProjectType, KeymanFileTypes } from '@keymanapp/common-types';
 import { BuildActivity } from './BuildActivity.js';
 import { buildActivities, buildKeyboardInfoActivity, buildModelInfoActivity } from './buildActivities.js';
 import { InfrastructureMessages } from '../../messages/infrastructureMessages.js';
@@ -55,10 +55,25 @@ class ProjectBuilder {
 
     // Build project metadata
     if(this.options.forPublishing || !this.project.options.skipMetadataFiles) {
-      if(!await (this.buildProjectTargets(
-          this.project.isKeyboardProject()
-          ? buildKeyboardInfoActivity
-          : buildModelInfoActivity))) {
+      let activity: BuildActivity = null;
+
+      // Determine activity type first of all by examining files in the project
+      // Then if that is inconclusive, examine the declared project type
+      if(this.project.isKeyboardProject()) {
+        activity = buildKeyboardInfoActivity;
+      } else if(this.project.isLexicalModelProject()) {
+        activity = buildModelInfoActivity;
+      } else if(this.project.options.projectType == KeymanDeveloperProjectType.Keyboard) {
+        activity = buildKeyboardInfoActivity;
+      } else if(this.project.options.projectType == KeymanDeveloperProjectType.LexicalModel) {
+        activity = buildModelInfoActivity;
+      } else {
+        // If we get here, then we are not sure what type of project this is, so
+        // we'll assume keyboard
+        activity = buildKeyboardInfoActivity;
+      }
+
+      if(!await (this.buildProjectTargets(activity))) {
         return false;
       }
     }

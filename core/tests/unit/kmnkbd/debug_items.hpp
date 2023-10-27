@@ -6,7 +6,7 @@
 
 #include <test_assert.h>
 
-using namespace km::kbp::kmx;
+using namespace km::core::kmx;
 
 namespace {
 
