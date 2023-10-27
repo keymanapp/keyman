@@ -2,9 +2,7 @@
 
 <!DOCTYPE keyboard3 SYSTEM "../../../../../../../resources/standards-data/ldml-keyboards/techpreview/dtd/ldmlKeyboard3.dtd">
 <keyboard3 locale="mt" conformsTo="techpreview">
-  <names>
-    <name value="layr-invalid-missing-layer2" />
-  </names>
+  <info name="layr-invalid-missing-layer2"/>
 
   <keys />
   <!-- invalid: need a layer! -->

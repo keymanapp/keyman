@@ -40,8 +40,8 @@ describe('LdmlKeyboardKeymanWebCompiler', function() {
     const outputNoDebug = jsCompilerNoDebug.compile('basic.xml', source);
     assert.isNotNull(outputNoDebug);
 
-    // Does the emitted js match?
-    const outputFixtureNoDebug = fs.readFileSync(outputFilenameNoDebug, 'utf-8').replaceAll(/\r\n/g, '\n');
+    // Does the emitted js match? The nodebug has no newline at end, but allow one in the fixture
+    const outputFixtureNoDebug = fs.readFileSync(outputFilenameNoDebug, 'utf-8').replaceAll(/\r\n/g, '\n').trim();
     assert.strictEqual(outputNoDebug, outputFixtureNoDebug);
 
     // TODO(lowpri): consider using Typescript parser to generate AST for further validation

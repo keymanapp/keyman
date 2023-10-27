@@ -10,9 +10,7 @@
     <locale id="en-fonipa" />
   </locales>
 
-  <names>
-    <name value="loca-multiple" />
-  </names>
+  <info name="loca-multiple"/>
 
   <keys />
 </keyboard3>
