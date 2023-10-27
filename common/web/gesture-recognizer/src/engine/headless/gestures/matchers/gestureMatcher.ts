@@ -127,10 +127,6 @@ export class GestureMatcher<Type, StateToken = any> implements PredecessorMatch<
         baseContact = srcContact.baseSource;
       }
 
-      if(baseContact.isPathComplete) {
-        throw new Error("GestureMatcher may not be built against already-completed contact points");
-      }
-
       const contactSpec = model.contacts[touchpointIndex];
       /* c8 ignore next 3 */
       if(!contactSpec) {
