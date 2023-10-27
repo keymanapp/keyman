@@ -251,8 +251,7 @@ export class KeysCompiler extends SectionCompiler {
     const usedFlicks = new Set<string>();
     for (let keyId of layerKeyIds) {
       const key = keyBag.get(keyId);
-      if (!key) continue;
-      if (!key.flickId) continue;
+      if (!key?.flickId) continue;
       usedFlicks.add(key.flickId);
     }
     return usedFlicks;
