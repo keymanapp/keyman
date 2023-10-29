@@ -1,13 +1,4 @@
 #!/usr/bin/env bash
-
-#
-# Prevents 'clear' on exit of mingw64 bash shell
-#
-SHLVL=0
-
-set -e
-set -u
-
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BASH_SOURCE[0]}")"
@@ -136,49 +127,6 @@ function upload_keyman_help {
 }
 
 #
-# Commit and push to the help.keyman.com repo
-# Creates a pull request with the 'auto' label
-# Which a GitHub action will watch for in order
-# to automatically process and merge it
-#
-
-function commit_and_push {
-  echo "Committing and pushing updated Keyman for $platform documentation"
-
-  pushd $HELP_KEYMAN_COM
-
-  if [ ! -z "${TEAMCITY_VERSION-}" ]; then
-    git config user.name "Keyman Build Server"
-    git config user.email "keyman-server@users.noreply.github.com"
-  fi
-
-  local branchname="auto/$platform-help-$VERSION_WITH_TAG"
-  local modifiedfiles=$(help_product_path)
-
-  local basebranch="master"
-
-  git checkout -b $branchname $basebranch
-  git add $modifiedfiles || return 1
-  git diff --cached --no-ext-diff --quiet --exit-code && {
-    # if no changes then don't do anything.
-    echo "No changes to commit"
-    popd
-    return 0
-  }
-
-  echo "changes added to cache...>>>"
-  local commitmessage="auto: Keyman for $platform help deployment"
-  git commit -m "$commitmessage" || return 1
-  git push origin $branchname || return 1
-  hub pull-request -b $basebranch -l auto -m "$commitmessage" || return 1
-  popd
-
-  echo "Push to help.keyman.com complete"
-
-  return 0
-}
-
-#
 # Main
 #
 
@@ -213,4 +161,13 @@ generate_markdown_help || exit 1
 echo "Uploading Keyman for $platform documentation to help.keyman.com"
 
 upload_keyman_help || exit 1
-commit_and_push || exit 1
+
+ci_add_files "$HELP_KEYMAN_COM" "$(help_product_path)"
+if ! ci_repo_has_cached_changes "$HELP_KEYMAN_COM"; then
+  echo "No changes to commit"
+  exit 0
+fi
+
+ci_open_pull_request "$HELP_KEYMAN_COM" "auto/$platform-help-$VERSION_WITH_TAG" "auto: Keyman for $platform help deployment"
+
+exit 0

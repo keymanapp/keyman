@@ -1,12 +1,7 @@
 #!/usr/bin/env bash
-
 #
-# Prevents 'clear' on exit of mingw64 bash shell
+# TODO: is this script still necessary or is /web/ci.sh a complete replacement?
 #
-SHLVL=0
-
-set -eu
-
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BASH_SOURCE[0]}")"
@@ -15,6 +10,7 @@ THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BA
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 . "$KEYMAN_ROOT/resources/build/jq.inc.sh"
+. "$KEYMAN_ROOT/resources/build/ci/pull-requests.inc.sh"
 
 #
 # In this script we update the s.keyman.com git repo and copy the Keyman Web release
@@ -100,54 +96,18 @@ function remap_sourcemap_paths {
   done
 }
 
-
-#
-# Commit and push to the s.keyman.com repo
-# Creates a pull request with the 'auto' label
-# Which a GitHub action will watch for in order
-# to automatically process and merge it
-#
-
-function commit_and_push {
-  echo "Committing and pushing KeymanWeb"
-  cd "$KEYMAN_ROOT/web/tools"
-  pushd "$S_KEYMAN_COM"
-
-  if [ ! -z "${TEAMCITY_VERSION-}" ]; then
-    git config user.name "Keyman Build Server"
-    git config user.email "keyman-server@users.noreply.github.com"
-  fi
-
-  local branchname="auto/kmw-release-$VERSION"
-  local modifiedfiles="kmw/engine/$VERSION"
-
-  local basebranch="master"
-
-  git checkout -b $branchname $basebranch
-  git add $modifiedfiles || return 1
-  git diff --cached --no-ext-diff --quiet --exit-code && {
-    # if no changes then don't do anything.
-    echo "No changes to commit"
-    popd
-    return 0
-  }
-
-  echo "changes added to cache...>>>"
-  local commitmessage="auto: KeymanWeb release $VERSION"
-  git commit -m "$commitmessage" || return 1
-  git push origin $branchname || return 1
-  hub pull-request -b $basebranch -l auto -m "$commitmessage" || return 1
-  popd
-
-  echo "Push to s.keyman.com complete"
-
-  return 0
-}
-
 #
 # Main
 #
 
 upload_keyman_web
 remap_sourcemap_paths
-commit_and_push
+
+echo "Committing and pushing KeymanWeb release $VERSION to s.keyman.com"
+
+ci_add_files "$S_KEYMAN_COM" "kmw/engine/$VERSION"
+if ! ci_repo_has_cached_changes "$S_KEYMAN_COM"; then
+  builder_die "No release was added to s.keyman.com, something went wrong"
+fi
+
+ci_open_pull_request "$S_KEYMAN_COM" auto/keymanweb/release "auto: KeymanWeb release $VERSION"
