@@ -20,7 +20,8 @@ const OrderedFlickDirections = ['n', 'ne', 'e', 'se', 's', 'sw', 'w', 'nw'] as c
 const MAX_TOLERANCE_ANGLE_SKEW = Math.PI / 2;
 
 /**
- *
+ * Represents a flick gesture's implementation within KeymanWeb, including
+ * its predictive-text correction aspects.
  */
 export default class Flick implements GestureHandler {
   readonly directlyEmitsKeys = true;

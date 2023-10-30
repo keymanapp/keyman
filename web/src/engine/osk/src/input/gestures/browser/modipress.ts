@@ -6,7 +6,10 @@ import { GestureSequence } from '@keymanapp/gesture-recognizer';
 import { GestureHandler } from '../gestureHandler.js';
 
 /**
+ * Represents a potential modipress gesture's implementation within KeymanWeb, including
+ * modipresses generated at the end of multitap sequences.
  *
+ * This involves "locking" the current layer in place until the modipress is complete.
  */
 export default class Modipress implements GestureHandler {
   readonly directlyEmitsKeys = true;
