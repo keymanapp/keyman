@@ -83,10 +83,10 @@ echo_heading "Zipping Install Keyman.app for notarization to $TARGET_ZIP_PATH"
 
 /usr/bin/ditto -c -k --keepParent "$TARGET_APP_PATH" "$TARGET_ZIP_PATH"
 
-builder_heading "Uploading Install Keyman.zip to Apple for notarization"
+echo_heading "Uploading Install Keyman.zip to Apple for notarization"
 mac_notarize "$TARGETPATH" "$TARGET_ZIP_PATH"
 
-builder_heading "Attempting to staple notarization to Install Keyman.app"
+echo_heading "Attempting to staple notarization to Install Keyman.app"
 xcrun stapler staple "$TARGET_APP_PATH" || builder_die "stapler failed"
 
 # Done.

@@ -26,7 +26,7 @@ function mac_notarize() {
       builder_die "Notarization failed with $NOTARYTOOL_STATUS"
   fi
 
-  builder_heading "Notarization completed successfully. Review logs below for any warnings."
+  echo_heading "Notarization completed successfully. Review logs below for any warnings."
 
   xcrun notarytool log \
         --apple-id "$APPSTORECONNECT_USERNAME" \

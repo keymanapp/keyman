@@ -448,7 +448,7 @@ if $PREPRELEASE || $NOTARIZE; then
 
     /usr/bin/ditto -c -k --keepParent "$TARGET_APP_PATH" "$TARGET_ZIP_PATH"
 
-    builder_heading "Uploading Keyman.zip to Apple for notarization"
+    echo_heading "Uploading Keyman.zip to Apple for notarization"
     mac_notarize "$TARGET_PATH" "$TARGET_ZIP_PATH"
 
     echo
