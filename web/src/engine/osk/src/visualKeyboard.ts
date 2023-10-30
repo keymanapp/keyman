@@ -574,6 +574,7 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
         } else if(gestureStage.matchedId.indexOf('flick') > -1) {
           handlers = [new Flick(
             gestureSequence,
+            configChanger,
             this,
             gestureSequence.stageReports[0].sources[0].baseItem,
             DEFAULT_GESTURE_PARAMS

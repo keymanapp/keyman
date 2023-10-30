@@ -2,7 +2,7 @@ import { type KeyElement } from '../../../keyElement.js';
 import VisualKeyboard from '../../../visualKeyboard.js';
 
 import { ActiveKey, ActiveKeyBase, ActiveSubKey, KeyDistribution } from '@keymanapp/keyboard-processor';
-import { CumulativePathStats, GestureSequence } from '@keymanapp/gesture-recognizer';
+import { ConfigChangeClosure, CumulativePathStats, GestureRecognizerConfiguration, GestureSequence, PaddedZoneSource } from '@keymanapp/gesture-recognizer';
 import { GestureHandler } from '../gestureHandler.js';
 import { distributionFromDistanceMaps } from '@keymanapp/input-processor';
 import { GestureParams } from '../specsForLayout.js';
@@ -37,6 +37,7 @@ export default class Flick implements GestureHandler {
 
   constructor(
     sequence: GestureSequence<KeyElement, string>,
+    configChanger: ConfigChangeClosure<KeyElement>,
     vkbd: VisualKeyboard,
     e: KeyElement,
     gestureParams: GestureParams
@@ -66,6 +67,34 @@ export default class Flick implements GestureHandler {
       // emit the keystroke
       vkbd.raiseKeyEvent(keyEvent, null);
     });
+
+    // Be sure to extend roaming bounds a bit more than usual for flicks, as they can be quick motions.
+    const altConfig = this.buildPopupRecognitionConfig(vkbd);
+    configChanger({
+      type: 'push',
+      config: altConfig
+    });
+  }
+
+  private buildPopupRecognitionConfig(vkbd: VisualKeyboard): GestureRecognizerConfiguration<KeyElement, string> {
+    const rowHeight = vkbd.layerGroup.layers['default'].rowHeight
+
+    const basePadding = -2 * rowHeight;  // extends bounds by the absolute value.
+
+    const roamBounding = new PaddedZoneSource(vkbd.element, [
+      // top
+      basePadding * 2, // be extra-loose for the top!
+      // left, right
+      basePadding,
+      // bottom: ensure the recognition zone includes the row of the base key.
+      // basePadding is already negative, but bottomDistance isn't.
+      basePadding
+    ]);
+
+    return {
+      ...vkbd.gestureEngine.config,
+      maxRoamingBounds: roamBounding
+    }
   }
 
   cancel() {
