@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 17.0.203 alpha 2023-10-30
+
+* fix(linux): Fix uninstallation of shared keyboard (#9880)
+* chore: include ci/pull-requests.inc.sh for help uploads (#9897)
+
 ## 17.0.202 alpha 2023-10-30
 
 * chore(common): unify pull-request creation scripts (#9888)
