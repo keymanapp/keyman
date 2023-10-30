@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 17.0.202 alpha 2023-10-30
+
+* chore(common): unify pull-request creation scripts (#9888)
+* epic: Keyman Core for Mac (#7857)
+
 ## 17.0.201 alpha 2023-10-28
 
 * fix(core): build: support -t parameter correctly (#9820)
