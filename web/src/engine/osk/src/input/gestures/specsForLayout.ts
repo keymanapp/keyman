@@ -108,10 +108,8 @@ export function gestureSetForLayout(layerGroup: OSKLayerGroup, params: GesturePa
   const gestureKeyFilter = (key: KeyElement, gestureId: string) => {
     const keySpec = key.key.spec;
     switch(gestureId) {
-      // case 'modipress-start':
-      //   return keySupportsModipress(key);
-      // case 'initial-tap':
-      //   return !keySupportsModipress(key);
+      case 'modipress-start':
+        return keySupportsModipress(key);
       case 'special-key-start':
         return ['K_LOPT', 'K_ROPT', 'K_BKSP'].indexOf(keySpec.baseKeyID) != -1;
       case 'longpress':
@@ -776,7 +774,8 @@ export const ModipressMultitapTransitionModel: GestureModel<any> = {
   id: 'modipress-end-multitap-transition',
   resolutionPriority: 5,
   contacts: [
-    // None.  But this may need some help to resolve & forward the original base source.
+    // None.  This exists as an intermediate state to transition from
+    // a basic modipress into a combined multitap + modipress.
   ],
   sustainTimer: {
     duration: 0,
@@ -854,7 +853,6 @@ export function modipressMultitapEndModel(params: GestureParams): GestureModel<a
           itemChangeAction: 'reject',
           pathInheritance: 'full',
           timer: {
-            // will need something similar for base modipress.
             duration: params.multitap.holdLength,
             expectedResult: false
           }
@@ -864,7 +862,6 @@ export function modipressMultitapEndModel(params: GestureParams): GestureModel<a
     resolutionAction: {
       type: 'chain',
       // Because SHIFT -> CAPS multitap is a thing.  Shift gets handled as a modipress first.
-      // TODO:  maybe be selective about it:  if the tap occurs within a set amount of time?
       next: 'modipress-multitap-start',
       // Key was already emitted from the 'modipress-start' stage.
       item: 'none'
