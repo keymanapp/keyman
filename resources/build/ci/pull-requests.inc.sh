@@ -100,21 +100,21 @@ function ci_open_pull_request {
   local branch="$branch_base/$uuid"
   local current_branch="$(git branch --show-current)"
 
-  builder_echo "Creating new branch '$branch' on '$repo'"
+  echo "Creating new branch '$branch' on '$repo'"
   git switch -c "$branch"
-  builder_echo "$commit_message"
+  echo "$commit_message"
   git commit -m "$commit_message"
   git push origin "$branch"
-  builder_echo "Push complete"
+  echo "Push complete"
 
   hub pull-request -f --no-edit -l auto
-  builder_echo "Pull request created"
+  echo "Pull request created"
 
   git switch "$current_branch"
-  builder_echo "Switched back to $current_branch"
+  echo "Switched back to $current_branch"
 
   popd >/dev/null
 
-  builder_echo "Pull request successfully created"
+  echo "Pull request successfully created"
   return 0
 }

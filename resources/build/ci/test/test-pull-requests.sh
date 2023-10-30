@@ -19,30 +19,30 @@ test_repo_base=`mktemp -d`
 test_repo="$test_repo_base/ci-test-repo"
 test_filename="$(uuidgen).md"
 
-builder_echo "Preparing local repository clone in $test_repo"
+echo "Preparing local repository clone in $test_repo"
 
 pushd "$test_repo_base" >/dev/null
 git clone https://github.com/keymanapp/ci-test-repo
 popd >/dev/null
 
-builder_echo "Creating test file $test_filename"
+echo "Creating test file $test_filename"
 
 echo "This is a test $test_filename" > "$test_repo/$test_filename"
 
-builder_echo blue "Testing ci_add_files"
+echo "Testing ci_add_files"
 
 ci_add_files "$test_repo" .
 
-builder_echo blue "Testing ci_repo_has_cached_changes"
+echo "Testing ci_repo_has_cached_changes"
 
 if ! ci_repo_has_cached_changes "$test_repo"; then
   builder_die "Expected to have a file to commit!"
 fi
 
-builder_echo blue "Testing ci_open_pull_request"
+echo "Testing ci_open_pull_request"
 
 ci_open_pull_request "$test_repo" "test/ci" "chore: testing CI"
 
 rm -rf "$test_repo_base"
 
-builder_echo green "Tests passed"
+echo "Tests passed"
