@@ -79,7 +79,7 @@ export const DEFAULT_GESTURE_PARAMS: GestureParams = {
   }
 }
 
-function keySupportsModipress(key: KeyElement) {
+export function keySupportsModipress(key: KeyElement) {
   // Future enhancement idea:  allow some extra way for a key to say "hi, I'm modipressable".
   const keySpec = key.key.spec;
   const modifierKeyIds = ['K_SHIFT', 'K_ALT', 'K_CTRL', 'K_NUMERALS', 'K_SYMBOLS', 'K_CURRENCIES'];

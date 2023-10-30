@@ -6,6 +6,7 @@ import { GestureSequence, GestureStageReport } from '@keymanapp/gesture-recogniz
 import { GestureHandler } from '../gestureHandler.js';
 import { distributionFromDistanceMaps } from '@keymanapp/input-processor';
 import Modipress from './modipress.js';
+import { keySupportsModipress } from '../specsForLayout.js';
 
 /**
  * Represents a potential multitap gesture's implementation within KeymanWeb.
@@ -132,7 +133,10 @@ export default class Multitap implements GestureHandler {
     const keyIndex = baseDistribution.findIndex((entry) => entry.keySpec == this.baseKey.key.spec);
 
     if(keyIndex == -1) { // also covers undefined, but does not include 0.
-      console.warn("Could not find base key's probability for multitap correction");
+      // Modipress keys generally get left out of the key-correction calculations.
+      if(!keySupportsModipress(this.baseKey)) {
+        console.warn("Could not find base key's probability for multitap correction");
+      }
 
       // Decently recoverable; just use the simple-tap distances instead.
       return baseDistribution;
