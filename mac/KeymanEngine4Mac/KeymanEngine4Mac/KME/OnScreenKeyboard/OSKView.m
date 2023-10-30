@@ -12,7 +12,9 @@
 #import "MacVKCodes.h"
 #import "WindowsVKCodes.h"
 #import "NKey.h"
-#import "KMEngine.h"
+//#import "KMEngine.h"
+#import "CoreHelper.h"
+
 #include <Carbon/Carbon.h>
 
 @interface OSKView()
@@ -651,7 +653,7 @@
 - (unsigned short)MacKeyCode:(unsigned short)vkCode {
     unsigned short keyCode = USHRT_MAX;
     for (unsigned short i = 0; i < 0x80; i++) {
-        if (VKMap[i] == vkCode) {
+        if (VirtualKeyMap[i] == vkCode) {
             keyCode = i;
             break;
         }

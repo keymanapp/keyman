@@ -30,7 +30,7 @@ NSUInteger _failuresToRetrieveExpectedContext;
 
 - (void)checkContextIn:(id) client {
     if (!self.willDeleteNullChar && !self.contextOutOfDate && _failuresToRetrieveExpectedContext < 3) {
-        if (self.AppDelegate.debugMode) {
+        if (self.appDelegate.debugMode) {
             NSLog(@"Checking to see if we're in Google Docs (or some other site that can't give context).");
         }
         NSUInteger bufferLength = self.contextBuffer.length;
@@ -38,7 +38,7 @@ NSUInteger _failuresToRetrieveExpectedContext;
             NSUInteger location = [client selectedRange].location;
             
             if (location != NSNotFound && location > 0) {
-                if ([self AppDelegate].debugMode)
+                if ([self appDelegate].debugMode)
                     NSLog(@"Trying to get context up to location %lu", location);
                 NSString* clientContext = [self getLimitedContextFrom:client at:location];
                 if (clientContext == nil)
@@ -48,7 +48,7 @@ NSUInteger _failuresToRetrieveExpectedContext;
                     [self setInSiteThatDoesNotGiveContext];
                 }
                 else if (!clientContext.length) {
-                    if ([self AppDelegate].debugMode) {
+                    if ([self appDelegate].debugMode) {
                         NSLog(@"Expected context = '%@'", self.contextBuffer);
                         NSLog(@"Actual clientContext was empty");
                     }
@@ -59,7 +59,7 @@ NSUInteger _failuresToRetrieveExpectedContext;
                     unichar lastCodepointExpected = [self.contextBuffer characterAtIndex:bufferLength - 1];
                     unichar lastCodepointInClient = [clientContext characterAtIndex:clientContext.length - 1];
                     if (lastCodepointExpected != lastCodepointInClient) {
-                        if ([self AppDelegate].debugMode) {
+                        if ([self appDelegate].debugMode) {
                             NSLog(@"Expected context = '%@'", self.contextBuffer);
                             NSLog(@"Actual clientContext = '%@'", (clientContext == nil ? @"{nil}" : clientContext));
                             NSLog(@"Last character expected (in contextBuffer) = '%lu'", (unsigned long)lastCodepointExpected);
@@ -74,7 +74,7 @@ NSUInteger _failuresToRetrieveExpectedContext;
                         }
                     }
                     else {
-                        if ([self AppDelegate].debugMode) {
+                        if ([self appDelegate].debugMode) {
                             NSLog(@"We got what we were expecting from the client. We can stop checking.");
                         }
                         _failuresToRetrieveExpectedContext = NSUIntegerMax;
@@ -82,7 +82,7 @@ NSUInteger _failuresToRetrieveExpectedContext;
                 }
             }
             else {
-                if ([self AppDelegate].debugMode) {
+                if ([self appDelegate].debugMode) {
                     NSLog(@"bufferLength is %lu, but location was %lu.", bufferLength, location);
                 }
                 _failuresToRetrieveExpectedContext++;
@@ -95,7 +95,7 @@ NSUInteger _failuresToRetrieveExpectedContext;
 }
 
 - (void)setInSiteThatDoesNotGiveContext {
-    if ([self AppDelegate].debugMode) {
+    if ([self appDelegate].debugMode) {
         NSLog(@"Detected some editor (e.g., Google Docs) that can't provide context.");
     }
     _failuresToRetrieveExpectedContext = NSUIntegerMax;

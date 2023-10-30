@@ -41,4 +41,11 @@
   return kmxFile;
 }
 
+
++ (KMXFile *)getKmxFileForElNuerTests {
+  NSString *path = [[NSBundle bundleForClass:[KeymanEngineTestsStaticHelperMethods class]] pathForResource:@"el_nuer.kmx" ofType:nil];
+  KMXFile *kmxFile = [[KMXFile alloc] initWithFilePath:path];
+  return kmxFile;
+}
+
 @end

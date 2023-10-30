@@ -28,10 +28,17 @@
 /** NSUserDefaults keys */
 NSString *const kKMSelectedKeyboardKey = @"KMSelectedKeyboardKey";
 NSString *const kKMActiveKeyboardsKey = @"KMActiveKeyboardsKey";
-NSString *const kKMSavedStoresKey = @"KMSavedStoresKey";
+/**
+  The following constant "KMSavedStoresKey" is left here for documentation
+  though we have abandoned stores written to UserDefaults with this key because
+  they used a less-reliable numeric key prior to integration with Keyman Core.
+  It is replaced by the renamed "KMPersistedOptionsKey" which directly
+  represents what it is saving.
+ */
+NSString *const kKMDeprecatedPersistedOptionsKey = @"KMSavedStoresKey";
+NSString *const kKMPersistedOptionsKey = @"KMPersistedOptionsKey";
 NSString *const kKMAlwaysShowOSKKey = @"KMAlwaysShowOSKKey";
 NSString *const kKMUseVerboseLogging = @"KMUseVerboseLogging";
-NSString *const kKMLegacyApps = @"KMLegacyApps";
 
 NSString *const kKeymanKeyboardDownloadCompletedNotification = @"kKeymanKeyboardDownloadCompletedNotification";
 
@@ -106,6 +113,7 @@ NSString* _keymanDataPath = nil;
                                                    forEventClass:kInternetEventClass
                                                       andEventID:kAEGetURL];
 
+  // TODO: use addGlobalMonitorForEventsMatchingMask instead (since we are not modifying events)?
   self.lowLevelEventTap = CGEventTapCreate(kCGAnnotatedSessionEventTap,
                                            kCGHeadInsertEventTap,
                                            kCGEventTapOptionListenOnly,
@@ -117,9 +125,10 @@ NSString* _keymanDataPath = nil;
                                            nil);
 
   if (!self.lowLevelEventTap) {
-      NSLog(@"Can't tap into low level events!");
+      NSLog(@"Unable to create lowLevelEventTap!");
   }
   else {
+      NSLog(@"Successfully created lowLevelEventTap with CGEventTapCreate.");
       CFRelease(self.lowLevelEventTap);
   }
 
@@ -129,6 +138,15 @@ NSString* _keymanDataPath = nil;
 
   if (self.runLoopEventSrc && runLoop) {
       CFRunLoopAddSource(runLoop,  self.runLoopEventSrc, kCFRunLoopDefaultMode);
+  }
+}
+
+-(void)logDebugMessage:(NSString *)format, ... {
+  if (self.debugMode) {
+    va_list args;
+    va_start(args, format);
+    NSLogv(format, args);
+    va_end(args);
   }
 }
 
@@ -261,6 +279,8 @@ NSString* _keymanDataPath = nil;
     _lastServerWithOSKShowing = nil;
 }
 
+// TODO: revisit and remove what is no longer needed
+// TODO: better (less impactful) to replace with global event monitor? just monitors with no ability to modify events
 CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef event, void *refcon) {
     KMInputMethodAppDelegate *appDelegate = [KMInputMethodAppDelegate AppDelegate];
     if (appDelegate != nil) {
@@ -295,10 +315,10 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
         switch (type) {
             case kCGEventFlagsChanged:
                 if (appDelegate.debugMode)
-                    NSLog(@"System Event: flags changed: %x", (int) sysEvent.modifierFlags);
+                    NSLog(@"eventTapFunction: system event kCGEventFlagsChanged to: %x", (int) sysEvent.modifierFlags);
                 appDelegate.currentModifierFlags = sysEvent.modifierFlags;
                 if (appDelegate.currentModifierFlags & NSEventModifierFlagCommand) {
-                    appDelegate.contextChangingEventDetected = YES;
+                    appDelegate.contextChangedByLowLevelEvent = YES;
                 }
                 break;
 
@@ -306,15 +326,18 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
             case kCGEventLeftMouseDown:
             case kCGEventOtherMouseUp:
             case kCGEventOtherMouseDown:
-                appDelegate.contextChangingEventDetected = YES;
+                NSLog(@"Event tap context invalidation flagged due to event: %@", event);
+                appDelegate.contextChangedByLowLevelEvent = YES;
                 break;
 
             case kCGEventKeyDown:
-                // Pass back delete events through to the input method event handler
+                NSLog(@"Event tap handling kCGEventKeyDown for keyCode: %hu", sysEvent.keyCode);
+               // Pass back delete events through to the input method event handler
                 // because some 'legacy' apps don't allow us to see back delete events
                 // that we have synthesized (and we need to see them, for serialization
                 // of events)
                 if(sysEvent.keyCode == kVK_Delete && appDelegate.inputController != nil) {
+                    NSLog(@"Event tap handling kVK_Delete.");
                     [appDelegate.inputController handleDeleteBackLowLevel:sysEvent];
                 }
 
@@ -359,7 +382,7 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
                     case kVK_ForwardDelete:
                         // Text modification by the forward delete key should reset context, but
                         // note that normal Delete (aka Bksp) is already managed by Keyman correctly.
-                        appDelegate.contextChangingEventDetected = YES;
+                        appDelegate.contextChangedByLowLevelEvent = YES;
                         break;
                 }
                 break;
@@ -377,8 +400,7 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
 
 - (KMEngine *)kme {
     if (_kme == nil) {
-        _kme = [[KMEngine alloc] initWithKMX:nil contextBuffer:self.contextBuffer];
-        [_kme setDebugMode:self.debugMode];
+        _kme = [[KMEngine alloc] initWithKMX:nil context:self.contextBuffer verboseLogging:self.debugMode];
     }
 
     return _kme;
@@ -410,50 +432,52 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
         [_oskWindow.window setTitle:self.oskWindowTitle];
 }
 
-- (void)loadSavedStores {
+- (void)readPersistedOptions {
     NSUserDefaults *userData = [NSUserDefaults standardUserDefaults];
-    NSDictionary *allSavedStores = [userData dictionaryForKey:kKMSavedStoresKey];
-    if (!allSavedStores) return;
-    NSDictionary *savedStores = [allSavedStores objectForKey:_selectedKeyboard];
-    if (!savedStores) return;
+    NSDictionary *allPersistedOptions = [userData dictionaryForKey:kKMPersistedOptionsKey];
+    if (!allPersistedOptions) {
+      return;
+    }
+    NSDictionary *persistedOptionsForSelectedKeyboard = [allPersistedOptions objectForKey:_selectedKeyboard];
+    if (!persistedOptionsForSelectedKeyboard) {
+        NSLog(@"no persisted options found in UserDefaults for keyboard %@ ", _selectedKeyboard);
+        return;
+    }
 
-    NSNumberFormatter *fmt = [[NSNumberFormatter alloc] init];
-    fmt.numberStyle = NSNumberFormatterDecimalStyle;
-
-    for (NSString *key in savedStores) {
-        NSString *value = [savedStores objectForKey:key];
-        NSUInteger storeID = [[fmt numberFromString:key] unsignedIntegerValue];
-        [self.kme setStore:(DWORD)storeID withValue:value];
+  // TODO pass array instead of making repeated calls
+    for (NSString *key in persistedOptionsForSelectedKeyboard) {
+        NSString *value = [persistedOptionsForSelectedKeyboard objectForKey:key];
+        NSLog(@"persisted options found in UserDefaults for keyboard %@, key: %@, value: %@", _selectedKeyboard, key, value);
+        [self.kme setCoreOptions:key withValue:value];
     }
 }
 
-- (void)saveStore:(NSNumber *)storeKey withValue:(NSString* )value {
-    NSString *storeKeyStr = [storeKey stringValue];
+- (void)writePersistedOptions:(NSString *)storeKey withValue:(NSString* )value {
     NSUserDefaults *userData = [NSUserDefaults standardUserDefaults];
-    NSDictionary *allSavedStores = [userData dictionaryForKey:kKMSavedStoresKey];
-    NSDictionary *savedStores;
+    NSDictionary *allPersistedOptions = [userData dictionaryForKey:kKMPersistedOptionsKey];
+    NSDictionary *persistedOptionsForSelectedKeyboard;
 
-    if (allSavedStores) {
-        savedStores = [allSavedStores objectForKey:_selectedKeyboard];
+    if (allPersistedOptions) {
+      persistedOptionsForSelectedKeyboard = [allPersistedOptions objectForKey:_selectedKeyboard];
     }
 
-    if (savedStores) {
-        NSMutableDictionary *newSavedStores = [savedStores mutableCopy];
-        [newSavedStores setObject:value forKey:storeKeyStr];
-        savedStores = newSavedStores;
+    if (persistedOptionsForSelectedKeyboard) {
+        NSMutableDictionary *newSavedStores = [persistedOptionsForSelectedKeyboard mutableCopy];
+       [newSavedStores setObject:value forKey:storeKey];
+       persistedOptionsForSelectedKeyboard = newSavedStores;
     } else {
-        savedStores = [[NSDictionary alloc] initWithObjectsAndKeys:value, storeKeyStr, nil];
+        persistedOptionsForSelectedKeyboard = [[NSDictionary alloc] initWithObjectsAndKeys:value, storeKey, nil];
     }
 
-    if (allSavedStores) {
-        NSMutableDictionary *newAllSavedStores = [allSavedStores mutableCopy];
-        [newAllSavedStores setObject:savedStores forKey:_selectedKeyboard];
-        allSavedStores = newAllSavedStores;
+    if (allPersistedOptions) {
+        NSMutableDictionary *newAllSavedStores = [allPersistedOptions mutableCopy];
+        [newAllSavedStores setObject:persistedOptionsForSelectedKeyboard forKey:_selectedKeyboard];
+        allPersistedOptions = newAllSavedStores;
     } else {
-        allSavedStores = [[NSDictionary alloc] initWithObjectsAndKeys:savedStores, _selectedKeyboard, nil];
+        allPersistedOptions = [[NSDictionary alloc] initWithObjectsAndKeys:persistedOptionsForSelectedKeyboard, _selectedKeyboard, nil];
     }
 
-    [userData setObject:allSavedStores forKey:kKMSavedStoresKey];
+    [userData setObject:allPersistedOptions forKey:kKMPersistedOptionsKey];
     [userData synchronize];
 }
 
@@ -511,14 +535,6 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
         }
     }
     return _keymanDataPath;
-}
-
-/**
- * Returns the list of user-default legacy apps
- */
-- (NSArray *)legacyAppsUserDefaults {
-    NSUserDefaults *userData = [NSUserDefaults standardUserDefaults];
-    return [userData arrayForKey:kKMLegacyApps];
 }
 
 /**
@@ -756,7 +772,7 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
     _contextBuffer = [contextBuffer mutableCopy];
     if (_contextBuffer.length)
         [_contextBuffer replaceOccurrencesOfString:@"\0" withString:[NSString nullChar] options:0 range:NSMakeRange(0, 1)];
-    [self.kme setContextBuffer:self.contextBuffer];
+    [self.kme setCoreContextIfNeeded:self.contextBuffer];
 }
 
 - (void)awakeFromNib {
@@ -866,7 +882,7 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
     [self setKvk:kvk];
     [self setKeyboardName:[kmxInfo objectForKey:kKMKeyboardNameKey]];
     [self setKeyboardIcon:[kmxInfo objectForKey:kKMKeyboardIconKey]];
-    [self loadSavedStores];
+    [self readPersistedOptions];
 }
 
 // defaults to the whatever keyboard happens to be first in the list
@@ -925,7 +941,7 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
     [self setKeyboardIcon:[kmxInfo objectForKey:kKMKeyboardIconKey]];
     [self setContextBuffer:nil];
     [self setSelectedKeyboard:path];
-    [self loadSavedStores];
+    [self readPersistedOptions];
     if (kvk != nil && self.alwaysShowOSK)
         [self showOSK];
 }
@@ -1273,8 +1289,10 @@ extern const CGKeyCode kProcessPendingBuffer;
 - (void)postKeyboardEventWithSource: (CGEventSourceRef)source code:(CGKeyCode) virtualKey postCallback:(PostEventCallback)postEvent{
 
     CGEventRef ev = CGEventCreateKeyboardEvent (source, virtualKey, true); //down
-    if (postEvent)
-        postEvent(ev);
+    if (postEvent) {
+      NSLog(@"postKeyboardEventWithSource, keycode: %d", virtualKey);
+      postEvent(ev);
+    }
     CFRelease(ev);
     if (virtualKey != kProcessPendingBuffer) { // special 0xFF code is not a real key-press, so no "up" is needed
         ev = CGEventCreateKeyboardEvent (source, virtualKey, false); //up
