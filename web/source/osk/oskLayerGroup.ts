@@ -42,8 +42,8 @@ namespace com.keyman.osk {
         const layerObj = new OSKLayer(vkbd, layout, layer);
         this.layers[layer.id] = layerObj;
 
-        // Always make the first layer visible
-        layerObj.element.style.display = (n==0 ? 'block' : 'none');
+        // Always make the 'default' layer visible by default.
+        layerObj.element.style.display = (layer.id == 'default' ? 'block' : 'none');
 
         // Add layer to group
         lDiv.appendChild(layerObj.element);
