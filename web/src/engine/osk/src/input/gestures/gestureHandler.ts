@@ -13,6 +13,16 @@ export interface GestureHandler {
   readonly hasModalVisualization: boolean;
 
   /**
+   * Indicates whether or not the handler is responsible for emitting keystrokes itself
+   * or if default handling should take effect.
+   *
+   * Default handling is predicated on there being corresponding DOM elements for a key,
+   * so multitaps and flicks can't be handled via the default mechanism.  (Unless we
+   * want to spin up dummy elements for them.)
+   */
+  readonly directlyEmitsKeys: boolean;
+
+  /**
    * Implementations of this method should return an appropriate statistic distribution
    * for the likelihood of most-relevant keys that may have been intended for the
    * most recent keystroke generated.  Alternatively, returning `null` or `undefined`

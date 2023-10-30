@@ -5,6 +5,8 @@ import { KeyElement } from "../../keyElement.js";
 import { GestureHandler } from './gestureHandler.js';
 
 export class HeldRepeater implements GestureHandler {
+  readonly directlyEmitsKeys = true;
+
   static readonly INITIAL_DELAY = 500;
   static readonly REPEAT_DELAY = 100;
 

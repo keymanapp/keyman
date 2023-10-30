@@ -36,9 +36,9 @@ export interface GestureParams {
     flickDist: number,
 
     /**
-     * The maximum amount of movement allowed for a longpress before it is aborted in favor
-     * of roaming touch and/or a timer reset.  Only applied when roaming touch behaviors are
-     * permitted / when flicks are disabled.
+     * The maximum amount of raw-distance movement allowed for a longpress before it is
+     * aborted in favor of roaming touch and/or a timer reset.  Only applied when
+     * roaming touch behaviors are permitted / when flicks are disabled.
      *
      * This threshold is not applied if the movement meets all criteria to trigger a
      * flick-shortcut but the distance traveled.
@@ -63,6 +63,24 @@ export interface GestureParams {
      * be considered part of a multitap.
      */
     holdLength: number;
+  },
+  flick: {
+    /**
+     * The minimum _net_ touch-path distance that must be traversed to "lock in" on
+     * a flick gesture.  When keys support both longpresses and flicks, this distance
+     * must be traversed before the longpress timer elapses.
+     *
+     * This distance does _not_ trigger an actual flick keystroke; it is intended to
+     * ensure that paths meeting this criteria have the chance to meet the full
+     * distance criteria for a flick even if longpresses are also supported on a key.
+     */
+    startDist: number,
+
+    /**
+     * The minimum _net_ touch-path distance that must be traversed for flicks
+     * to be triggered.
+     */
+    triggerDist: number
   }
 }
 
@@ -76,6 +94,10 @@ export const DEFAULT_GESTURE_PARAMS: GestureParams = {
   multitap: {
     waitLength: 500,
     holdLength: 500
+  },
+  flick: {
+    startDist: 5,
+    triggerDist: 20
   }
 }
 
@@ -121,7 +143,7 @@ export function gestureSetForLayout(layerGroup: OSKLayerGroup, params: GesturePa
         } else {
           return false;
         }
-      case 'flick':
+      case 'flick-start':
         // This is a gesture-start check; there won't yet be any directional info available.
         return !!keySpec.flick;
       default:
@@ -183,11 +205,11 @@ export function gestureSetForLayout(layerGroup: OSKLayerGroup, params: GesturePa
   ];
 
   if(layout.hasFlicks) {
-    // TODO:
-    // gestureModels.push // flick-start
-    // gestureModels.push // flick-end
+    gestureModels.push(withKeySpecFiltering(flickStartModel(params), 0));
+    gestureModels.push(flickEndModel(params));
+    gestureModels.push(FlickRejectModel);
 
-    // defaultSet.push('flick-start');
+    defaultSet.push('flick-start');
   } else {
     // A post-roam version of longpress with the up-flick shortcut disabled but roaming still on.
     gestureModels.push(withKeySpecFiltering(longpressModelWithRoaming(params), 0));
@@ -222,6 +244,36 @@ export const InstantContactResolutionModel: ContactModel = {
   pathResolutionAction: 'resolve',
   pathModel: {
     evaluate: (path) => 'resolve'
+  }
+}
+
+export function flickStartContactModel(params: GestureParams): ContactModel {
+  return {
+    itemPriority: 1,
+    pathModel: {
+      evaluate: (path) => path.stats.netDistance > params.flick.startDist ? 'resolve' : null
+    },
+    pathResolutionAction: 'resolve',
+    pathInheritance: 'chop'
+  }
+}
+
+export function flickEndContactModel(params: GestureParams): ContactModel {
+  return {
+    itemPriority: 1,
+    pathModel: {
+      evaluate: (path) => {
+        // Remove `path.isComplete` to have an instant-trigger once the distance threshold is reached.
+        if(path.isComplete && path.stats.netDistance > params.flick.triggerDist) {
+          // We _could_ add other criteria if desired, such as for straightness.
+          // - What's the angle variance look like?
+          // - or, take a regression & look at the coefficient of determination.
+          return 'resolve';
+        }
+      }
+    },
+    pathResolutionAction: 'resolve',
+    pathInheritance: 'full'
   }
 }
 
@@ -531,6 +583,61 @@ export function longpressModelWithRoaming(params: GestureParams): GestureModel<a
         replace: 'longpress-roam'
       }
     }
+  }
+}
+
+export function flickStartModel(params: GestureParams): GestureModel<any> {
+  return {
+    id: 'flick-start',
+    resolutionPriority: 3,
+    contacts: [
+      {
+        model: flickStartContactModel(params)
+      }
+    ],
+    resolutionAction: {
+      type: 'chain',
+      item: 'none',
+      next: 'flick-end',
+    },
+  }
+}
+
+export function flickEndModel(params: GestureParams): GestureModel<any> {
+  return {
+    id: 'flick-end',
+    resolutionPriority: 0,
+    contacts: [
+      {
+        model: flickEndContactModel(params)
+      },
+    ],
+    rejectionActions: {
+      path: {
+        type: 'replace',
+        replace: 'flick-reject'
+      }
+    },
+    resolutionAction: {
+      type: 'complete',
+      item: 'current'
+    }
+  }
+}
+
+export const FlickRejectModel: GestureModel<any> = {
+  id: 'flick-reject',
+  resolutionPriority: 5,
+  contacts: [
+    // None - exists as a way to have a different model-id for flick-rejection.
+  ],
+  sustainTimer: {
+    duration: 0,
+    expectedResult: true
+  },
+  resolutionAction: {
+    type: 'complete',
+    item: 'base'
   }
 }
 

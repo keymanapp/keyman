@@ -22,6 +22,8 @@ import { GestureParams } from '../specsForLayout.js';
  * displayed, selection of the subkey is inherently asynchronous.
  */
 export default class SubkeyPopup implements GestureHandler {
+  readonly directlyEmitsKeys = false;
+
   public readonly element: HTMLDivElement;
   public readonly shim: HTMLDivElement;
 

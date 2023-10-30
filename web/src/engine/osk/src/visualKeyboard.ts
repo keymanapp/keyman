@@ -55,6 +55,7 @@ import SubkeyPopup from './input/gestures/browser/subkeyPopup.js';
 import Multitap from './input/gestures/browser/multitap.js';
 import { GestureHandler } from './input/gestures/gestureHandler.js';
 import Modipress from './input/gestures/browser/modipress.js';
+import Flick from './input/gestures/browser/flick.js';
 
 interface KeyRuleEffects {
   contextToken?: number,
@@ -503,9 +504,9 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
 
         let keyResult: KeyRuleEffects = null;
 
-        // Multitaps do special key-mapping stuff internally and produce + raise their
-        // key events directly.
-        if(gestureKey && !(handlers && handlers[0] instanceof Multitap)) {
+        // Multitaps and flicks do special key-mapping stuff internally and produce + raise
+        // their key events directly.
+        if(gestureKey && !(handlers && handlers[0].directlyEmitsKeys)) {
           let correctionKeyDistribution: KeyDistribution;
           const baseDistanceMap = this.getSimpleTapCorrectionDistances(coordSource.currentSample, gestureKey.key.spec as ActiveKey);
 
@@ -567,9 +568,16 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
             gestureSequence.stageReports[0].sources[0].baseItem,
             DEFAULT_GESTURE_PARAMS
           )];
-        } else if(baseItem.key.spec.multitap && (gestureStage.matchedId == 'initial-tap' || gestureStage.matchedId == 'multitap' || gestureStage.matchedId == 'modipress-start')) {
+        } else if(baseItem?.key.spec.multitap && (gestureStage.matchedId == 'initial-tap' || gestureStage.matchedId == 'multitap' || gestureStage.matchedId == 'modipress-start')) {
           // Likewise - mere construction is enough.
           handlers = [new Multitap(gestureSequence, this, baseItem, keyResult.contextToken)];
+        } else if(gestureStage.matchedId.indexOf('flick') > -1) {
+          handlers = [new Flick(
+            gestureSequence,
+            this,
+            gestureSequence.stageReports[0].sources[0].baseItem,
+            DEFAULT_GESTURE_PARAMS
+          )];
         }
 
         if(gestureStage.matchedId.includes('modipress') && gestureStage.matchedId.includes('-start')) {

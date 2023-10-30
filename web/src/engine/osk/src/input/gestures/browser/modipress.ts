@@ -9,6 +9,8 @@ import { GestureHandler } from '../gestureHandler.js';
  *
  */
 export default class Modipress implements GestureHandler {
+  readonly directlyEmitsKeys = true;
+
   private completionCallback: () => void;
   private originalLayer: string;
   private shouldRestore: boolean = false;
