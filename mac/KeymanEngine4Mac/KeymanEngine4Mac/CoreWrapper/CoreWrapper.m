@@ -267,16 +267,15 @@ const int CORE_ENVIRONMENT_ARRAY_LENGTH = 6;
   NSMutableString *contextString = [[NSMutableString alloc]init];
 
   if (contextLength==0) {
-    [self.coreHelper logDebugMessage:@"***context is empty."];
+    [self.coreHelper logDebugMessage:@"CoreWrapper getContextAsStringUsingCore, context is empty."];
   } else {
     km_core_status result = km_core_context_get(context, &contextItemsArray);
     if (result==KM_CORE_STATUS_OK) {
       for (int i = 0; i < contextLength; i++) {
         km_core_context_item contextItem = contextItemsArray[i];
         if (contextItem.type == KM_CORE_CT_CHAR) {
-          const unichar unicodeChar = contextItem.character;
-          NSString *charString = [NSString stringWithCharacters:&unicodeChar length:1];
-          [contextString appendString:charString];
+          NSString *unicodeString = [self.coreHelper utf32ValueToString:contextItem.character];
+          [contextString appendString:unicodeString];
         }
       }
     }
@@ -287,7 +286,8 @@ const int CORE_ENVIRONMENT_ARRAY_LENGTH = 6;
   if (contextItemsArray) {
     km_core_context_items_dispose(contextItemsArray);
   }
-  
+
+  [self.coreHelper logDebugMessage:@"CoreWrapper getContextAsStringUsingCore = %@", immutableString];
   return immutableString;
 }
 

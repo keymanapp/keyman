@@ -326,19 +326,19 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
             case kCGEventLeftMouseDown:
             case kCGEventOtherMouseUp:
             case kCGEventOtherMouseDown:
-            NSLog(@"Event tap context invalidation flagged due to event: %@", event);
+                NSLog(@"Event tap context invalidation flagged due to event: %@", event);
                 appDelegate.contextChangedByLowLevelEvent = YES;
                 break;
 
             case kCGEventKeyDown:
-            NSLog(@"Event tap handling kCGEventKeyDown for keyCode: %hu", sysEvent.keyCode);
+                NSLog(@"Event tap handling kCGEventKeyDown for keyCode: %hu", sysEvent.keyCode);
                // Pass back delete events through to the input method event handler
                 // because some 'legacy' apps don't allow us to see back delete events
                 // that we have synthesized (and we need to see them, for serialization
                 // of events)
                 if(sysEvent.keyCode == kVK_Delete && appDelegate.inputController != nil) {
                     NSLog(@"Event tap handling kVK_Delete.");
-                   [appDelegate.inputController handleDeleteBackLowLevel:sysEvent];
+                    [appDelegate.inputController handleDeleteBackLowLevel:sysEvent];
                 }
 
                 switch(sysEvent.keyCode) {
@@ -400,7 +400,7 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
 
 - (KMEngine *)kme {
     if (_kme == nil) {
-       _kme = [[KMEngine alloc] initWithKMX:nil context:self.contextBuffer verboseLogging:self.debugMode];
+        _kme = [[KMEngine alloc] initWithKMX:nil context:self.contextBuffer verboseLogging:self.debugMode];
     }
 
     return _kme;
@@ -435,12 +435,13 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
 - (void)readPersistedOptions {
     NSUserDefaults *userData = [NSUserDefaults standardUserDefaults];
     NSDictionary *allPersistedOptions = [userData dictionaryForKey:kKMPersistedOptionsKey];
-    if (!allPersistedOptions) return;
-    NSDictionary *persistedOptionsForSelectedKeyboard = [allPersistedOptions objectForKey:_selectedKeyboard];
-
-  if (!persistedOptionsForSelectedKeyboard) {
-      NSLog(@"no persisted options found in UserDefaults for keyboard %@ ", _selectedKeyboard);
+    if (!allPersistedOptions) {
       return;
+    }
+    NSDictionary *persistedOptionsForSelectedKeyboard = [allPersistedOptions objectForKey:_selectedKeyboard];
+    if (!persistedOptionsForSelectedKeyboard) {
+        NSLog(@"no persisted options found in UserDefaults for keyboard %@ ", _selectedKeyboard);
+        return;
     }
 
   // TODO pass array instead of making repeated calls

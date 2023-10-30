@@ -43,19 +43,12 @@ const CGKeyCode kKeymanEventKeyCode = 0xFF;
 
   [self.appDelegate logDebugMessage:@"sendKeyDown keyCode %lu to app %@ with pid %d", (unsigned long)keyCode, appName, processId];
 
-  CGEventFlags KMEventModifierKeyman = 1 << 24;
-
   if (keyCode < 0x100) {
     CGEventRef cgevent = [event CGEvent];
 
     // use source from event to generate new event
     CGEventSourceRef source = CGEventCreateSourceFromEvent(cgevent);
     CGEventRef keyDownEvent = CGEventCreateKeyboardEvent(source, (CGKeyCode)keyCode, true);
-
-    CGEventFlags modifierFlags = CGEventGetFlags(keyDownEvent);
-    modifierFlags = modifierFlags | KMEventModifierKeyman;
-    CGEventSetFlags(keyDownEvent, modifierFlags);
-    modifierFlags = CGEventGetFlags(keyDownEvent);
 
     // TODO: add version check
     CGEventPostToPid(processId, keyDownEvent);

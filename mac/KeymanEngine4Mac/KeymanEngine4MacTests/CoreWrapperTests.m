@@ -69,6 +69,12 @@ CoreWrapper *mockWrapper;
   XCTAssert(endAction.actionType==EndAction, @"Expected EndAction");
 }
 
-
+- (void)testgetContextAsString_ContextContainsEmojis_ReturnsSameContext  {
+  NSString *kmxPath = [CoreTestStaticHelperMethods getKmxFilePathTestMacEngine];
+  CoreWrapper *core = [[CoreWrapper alloc] initWithHelper: [CoreTestStaticHelperMethods helper] kmxFilePath:kmxPath];
+  [core setContext:@"🤔?👍🏻✅"];
+  NSString *finalContext = core.context;
+  XCTAssert([finalContext isEqualToString:@"🤔?👍🏻✅"], @"Expected '🤔?👍🏻✅' in context buffer");
+}
 
 @end

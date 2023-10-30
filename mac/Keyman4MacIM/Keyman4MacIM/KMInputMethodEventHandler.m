@@ -274,8 +274,7 @@ NSRange _previousSelRange;
     // actually be useful if client respondsToSelector:@selector(attributedSubstringFromRange:), but even then
     // we'd only want to do it if we have actually moved from our previous location. Otherwise, we wouldn't be
     // able to handle dead keys correctly.)
-    if (self.appDelegate.contextChangedByLowLevelEvent)
-    {
+    if (self.appDelegate.contextChangedByLowLevelEvent) {
         if (!_contextOutOfDate) {
           [self.appDelegate logDebugMessage:@"Low-level event requires context to be re-retrieved."];
         }
@@ -306,105 +305,12 @@ NSRange _previousSelRange;
   return [self applyKeymanCoreActions:actions event:event client:sender];
 }
 
-/*
--(void)applyKeymanEngineActions:(NSArray*)actions event: (NSEvent *)event in:(id) sender  {
-  BOOL deleteBackPosted = NO;
-  
-  for (NSDictionary *action in actions) {
-      NSString *actionType = [[action allKeys] objectAtIndex:0];
-      if ([self.appDelegate debugMode]) {
-          NSLog(@"Handling %@ action...", actionType);
-          NSLog(@"contextBuffer = \"%@\"", self.contextBuffer.length?[self.contextBuffer codeString]:@"{empty}");
-      }
-
-      if ([actionType isEqualToString:Q_STR]) {
-          NSString *output = [action objectForKey:actionType];
-          if ([self.appDelegate debugMode])
-              NSLog(@"output = %@", output);
-          if (deleteBackPosted)
-          {
-              [self appendPendingBuffer:output];
-              if ([self.appDelegate debugMode])
-                  NSLog(@"pendingBuffer = %@", [self pendingBuffer]);
-          }
-          else {
-              NSUInteger nc = [self.contextBuffer deleteLastNullChars];
-              // Each null in the context buffer presumably corresponds to a space we inserted when
-              // processing the Q_BACK, which we now need to replace with the text we're inserting.
-              if (nc > 0) {
-                  NSUInteger pos = [self getSelectionRangefromClient:sender].location;
-                  if ([self.appDelegate debugMode]) {
-                      NSLog(@"nc = %lu", nc);
-                      NSLog(@"pos = %lu", pos);
-                  }
-                  if (pos >= nc && pos != NSNotFound) {
-                      if ([self.appDelegate debugMode]) {
-                          NSLog(@"Replacement index = %lu", pos - nc);
-                          NSLog(@"Replacement length = %lu", nc);
-                      }
-                      [sender insertText:output replacementRange:NSMakeRange(pos - nc, nc)];
-                      _previousSelRange.location += output.length - nc;
-                      _previousSelRange.length = 0;
-                  }
-              }
-              else {
-                  [self replaceExistingSelectionIn:sender with:output];
-              }
-          }
-
-          // Even if the characters to insert are pending, we want to append them to the context buffer now.
-          // Waiting until they are inserted would probably be safe, but on the off-chance that the engine
-          // generates additional actions beyond this current one, we want to be sure that the context reflects
-          // the state as it *will* be when all the posted/pending events have been processed.
-          [self.contextBuffer appendString:output];
-      }
-      else if ([actionType isEqualToString:Q_BACK]) {
-          NSLog(@"self.contextBuffer %@", self.contextBuffer);
-
-          [self.contextBuffer deleteLastNullChars];
-          NSUInteger dk = [self.contextBuffer deleteLastDeadkeys];
-          NSInteger n = [[action objectForKey:actionType] integerValue] - dk;
-          NSUInteger dc = [[self.contextBuffer lastNChars:n] deadKeyCount];
-          // n is now the number of characters to delete from the context buffer
-          // (which could include deadkeys the client doesn't know about).
-          [self.contextBuffer deleteLastNChars:n];
-          n -= dc;
-
-        NSLog(@"number of characters to delete %ld", (long)n);
-          // n is now the number of characters to delete from the client.
-          if (n > 0) {
-              deleteBackPosted = [self deleteBack:n in:sender for: event];
-          }
-      }
-      else if ([actionType isEqualToString:Q_DEADKEY]) {
-          [self.contextBuffer deleteLastNullChars];
-          NSUInteger x = [[action objectForKey:actionType] unsignedIntegerValue];
-          [self.contextBuffer appendDeadkey:x];
-      }
-      else if ([actionType isEqualToString:Q_NUL]) {
-          continue;
-      }
-      else if ([actionType isEqualToString:Q_RETURN]) {
-      }
-      else if ([actionType isEqualToString:Q_BEEP]) {
-          [[NSSound soundNamed:@"Tink"] play];
-      }
-      else if ([actionType isEqualToString:Q_SAVEOPT]) {
-          NSDictionary *save = [action objectForKey:actionType];
-          NSNumber *storeKey = [save allKeys][0];
-          NSString *value = [save objectForKey:storeKey];
-          [self.appDelegate saveStore:storeKey withValue:value];
-      }
-  }
-}
-*/
-
 - (NSArray*) processEventWithKeymanEngine:(NSEvent *)event in:(id) sender {
   NSArray* actions = nil;
   if (self.appDelegate.lowLevelEventTap != nil) {
       NSEvent *eventWithOriginalModifierFlags = [NSEvent keyEventWithType:event.type location:event.locationInWindow modifierFlags:self.appDelegate.currentModifierFlags timestamp:event.timestamp windowNumber:event.windowNumber context:event.context characters:event.characters charactersIgnoringModifiers:event.charactersIgnoringModifiers isARepeat:event.isARepeat keyCode:event.keyCode];
-    actions = [self.kme processEvent:eventWithOriginalModifierFlags];
-    [self.appDelegate logDebugMessage:@"processEventWithKeymanEngine, using AppDelegate.currentModifierFlags %lu, instead of event.modifiers = %lu", (unsigned long)self.appDelegate.currentModifierFlags, (unsigned long)event.modifierFlags];
+      actions = [self.kme processEvent:eventWithOriginalModifierFlags];
+      [self.appDelegate logDebugMessage:@"processEventWithKeymanEngine, using AppDelegate.currentModifierFlags %lu, instead of event.modifiers = %lu", (unsigned long)self.appDelegate.currentModifierFlags, (unsigned long)event.modifierFlags];
   }
   else {
       // Depending on the client app and the keyboard, using the passed-in event as it is should work okay.
@@ -706,8 +612,7 @@ NSRange _previousSelRange;
 }
 
 - (void) handleContextChangedByLowLevelEvent {
-  if (self.appDelegate.contextChangedByLowLevelEvent)
-  {
+  if (self.appDelegate.contextChangedByLowLevelEvent) {
     if (!self.contextChanged) {
       [self.appDelegate logDebugMessage:@"Low-level event has changed the context."];
       self.contextChanged = YES;
@@ -882,17 +787,13 @@ NSRange _previousSelRange;
 -(void)executeCompositeOperation:(KMActionOperation*)operation keyDownEvent:(nonnull NSEvent *)event client:(id) client {
   [self.appDelegate logDebugMessage:@"KXMInputMethodHandler executeCompositeOperation, composite operation: %@", operation];
   
-  if ((operation.isTextOnlyScenario)) {
+  if (operation.isTextOnlyScenario) {
     [self.appDelegate logDebugMessage:@"KXMInputMethodHandler executeCompositeOperation, text only scenario"];
     [self insertAndReplaceTextForOperation:operation client:client];
-  }
-      
-  if (operation.isBackspaceOnlyScenario) {
+  } else if (operation.isBackspaceOnlyScenario) {
     [self.appDelegate logDebugMessage:@"KXMInputMethodHandler executeCompositeOperation, backspace only scenario"];
     [self sendEventsForOperation: event actionOperation:operation];
-  }
-
-  if ((operation.isTextAndBackspaceScenario)) {
+  } else if (operation.isTextAndBackspaceScenario) {
     if (self.apiCompliance.mustBackspaceUsingEvents) {
       [self.appDelegate logDebugMessage:@"KXMInputMethodHandler executeCompositeOperation, text and backspace scenario with events"];
      [self sendEventsForOperation: event actionOperation:operation];

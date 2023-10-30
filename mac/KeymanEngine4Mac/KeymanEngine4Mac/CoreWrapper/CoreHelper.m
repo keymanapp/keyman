@@ -164,9 +164,9 @@ UInt32 VirtualKeyMap[VIRTUAL_KEY_ARRAY_SIZE];
  */
 -(NSString*)utf32ValueToString:(UInt32)scalarValue {
   NSData * characterData = [[NSData alloc] initWithBytes:&scalarValue length:sizeof(scalarValue)];
-  [self logDebugMessage:@"characterData: '%@'", characterData];
 
   NSString *characterString=[[NSString alloc] initWithBytes:[characterData bytes] length:[characterData length] encoding:NSUTF32LittleEndianStringEncoding];
+  [self logDebugMessage:@"utf32ValueToString data: '%@', string: %@", characterData, characterString];
   return characterString;
 }
 

@@ -22,7 +22,8 @@
 
 @interface KMCoreActionHandler ()
 
-typedef enum {BackspacesOnly,
+typedef enum {
+  BackspacesOnly,
   CharactersOnly,
   BackspaceBeforeCharacter,
   CharacterBeforeBackspace,
@@ -69,8 +70,7 @@ typedef enum {BackspacesOnly,
   
   // first, loop through the actions to summarize the contents
   // only looking at characters and backspaces of characters
-  for (CoreAction *action in [actions objectEnumerator])
-  {
+  for (CoreAction *action in [actions objectEnumerator]) {
     if (action.isCharacter) {
       containsCharacters = YES;
       if (!containsBackspaces) {
@@ -176,7 +176,7 @@ typedef enum {BackspacesOnly,
 }
 
 /**
- * For backspaces needed before text, insert with replace is possible, but some clients do not support replace
+ * For backspaces needed before text, we will insert after backspaces are completed
  */
 -(KMActionHandlerResult*)buildResultForBackspacesBeforeText {
   [self.appDelegate logDebugMessage:@"buildResultForBackspacesBeforeText"];
