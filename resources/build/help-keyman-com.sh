@@ -5,6 +5,8 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 . "${THIS_SCRIPT%/*}/../../resources/build/build-utils.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
+. "$KEYMAN_ROOT/resources/build/ci/pull-requests.inc.sh"
+
 #
 # Allows us to check for existence of subfolders in help/
 #
