@@ -1,5 +1,14 @@
 # Keyman Version History
 
+## 17.0.201 alpha 2023-10-28
+
+* fix(core): build: support -t parameter correctly (#9820)
+* fix(developer): handle displayMap correctly with 'fill from layout' (#9861)
+
+## 17.0.200 alpha 2023-10-27
+
+* chore(developer,common,core): update to latest CLDR v44 (#9842)
+
 ## 17.0.199 alpha 2023-10-26
 
 * fix(developer): handle xml errors in package compiler (#9821)

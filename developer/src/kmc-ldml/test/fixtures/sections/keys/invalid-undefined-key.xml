@@ -2,15 +2,13 @@
 
 <!DOCTYPE keyboard3 SYSTEM "../../../../../../../resources/standards-data/ldml-keyboards/techpreview/dtd/ldmlKeyboard3.dtd">
 <keyboard3 locale="mt" conformsTo="techpreview">
-  <names>
-    <name value="keys-minimal" />
-  </names>
+  <info name="keys-minimal"/>
 
   <keys>
-    <key id="grave" to="🪦" />
+    <key id="grave" output="🪦" />
   </keys>
 
-  <layers form="us">
+  <layers formId="us">
     <layer id="base">
       <row keys="foo" />
     </layer>

@@ -2,8 +2,6 @@
 
 <!DOCTYPE keyboard3 SYSTEM "../../../../../../../resources/standards-data/ldml-keyboards/techpreview/dtd/ldmlKeyboard3.dtd">
 <keyboard3 locale="en-*" conformsTo="techpreview">
-  <names>
-    <name value="invalid-loca" />
-  </names>
+  <info name="invalid-loca"/>
   <keys />
 </keyboard3>
