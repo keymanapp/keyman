@@ -96,8 +96,8 @@ export const DEFAULT_GESTURE_PARAMS: GestureParams = {
     holdLength: 500
   },
   flick: {
-    startDist: 5,
-    triggerDist: 20
+    startDist: 10,
+    triggerDist: 40 // should probably be based on row-height?
   }
 }
 
