@@ -8,9 +8,9 @@ export const
 // See also builder.js: specialCharacters; web/source/osk/oskKey.ts: specialCharacters
 export const
   CSpecialText10: string = '*Shift*\0*Enter*\0*Tab*\0*BkSp*\0*Menu*\0*Hide*\0*Alt*\0*Ctrl*\0*Caps*\0' +
-    '*ABC*\0*abc*\0*123*\0*Symbol*\0*Currency*\0*Shifted*\0*AltGr*\0*TabLeft*',
+    '*ABC*\0*abc*\0*123*\0*Symbol*\0*Currency*\0*Shifted*\0*AltGr*\0*TabLeft*\0',
   // these names were added in Keyman 14
-  CSpecialText14: string = '*LTREnter*\0*LTRBkSp*\0*RTLEnter*\0*RTLBkSp*\0*ShiftLock*\0*ShiftedLock*\0*ZWNJ*\0*ZWNJiOS*\0*ZWNJAndroid*',
+  CSpecialText14: string = '*LTREnter*\0*LTRBkSp*\0*RTLEnter*\0*RTLBkSp*\0*ShiftLock*\0*ShiftedLock*\0*ZWNJ*\0*ZWNJiOS*\0*ZWNJAndroid*\0',
   CSpecialText14ZWNJ: string = '*ZWNJ*\0*ZWNJiOS*\0*ZWNJAndroid*',
   CSpecialText14Map: string[][] = [
     ['*LTREnter*', '*Enter*'],
@@ -31,6 +31,17 @@ export const
     ['*ZWNJGeneric*', '<|>']
   ];
 
+  // Map for checking minimum versions and Special Text
+  export const CSpecialText = new Map<number, string>([
+    [10, CSpecialText10],
+    [11, CSpecialText10],
+    [12, CSpecialText10],
+    [13, CSpecialText10],
+    [14, CSpecialText14 + CSpecialText10],
+    [15, CSpecialText14 + CSpecialText10],
+    [16, CSpecialText14 + CSpecialText10],
+    [17, CSpecialText17 + CSpecialText14 + CSpecialText10]
+  ]);
 
 // These correspond to TSS_ values in kmx.ts
 export const

@@ -1,7 +1,7 @@
 import { KMX, Osk, TouchLayout, TouchLayoutFileReader, TouchLayoutFileWriter } from "@keymanapp/common-types";
-import { callbacks, IsKeyboardVersion14OrLater, IsKeyboardVersion15OrLater, IsKeyboardVersion17OrLater } from "./compiler-globals.js";
+import { callbacks, fk, IsKeyboardVersion14OrLater, IsKeyboardVersion15OrLater, IsKeyboardVersion17OrLater } from "./compiler-globals.js";
 import { JavaScript_Key } from "./javascript-strings.js";
-import { TRequiredKey, CRequiredKeys, CSpecialText10, CSpecialText14, CSpecialText14ZWNJ, CSpecialText14Map, CSpecialText17, CSpecialText17ZWNJ, CSpecialText17Map } from "./constants.js";
+import { TRequiredKey, CRequiredKeys, CSpecialText, CSpecialText14ZWNJ, CSpecialText14Map, CSpecialText17ZWNJ, CSpecialText17Map } from "./constants.js";
 import { KeymanWebTouchStandardKeyNames, KMWAdditionalKeyNames, VKeyNames } from "./keymanweb-key-codes.js";
 import { KmwCompilerMessages } from "./messages.js";
 
@@ -144,11 +144,9 @@ function CheckKey(
     // Keyman versions before 14 do not support '*special*' labels on non-special keys.
     // ZWNJ use, however, is safe because it will be transformed in function
     // TransformSpecialKeys14 to '<|>',  which does not require the custom OSK font.
-    if((CSpecialText10.includes(FText) || CSpecialText14.includes(FText) || CSpecialText17.includes(FText)) &&
-        !CSpecialText14ZWNJ.includes(FText) &&
-        !IsKeyboardVersion14OrLater() &&
-        !CSpecialText17ZWNJ.includes(FText) &&
-        !IsKeyboardVersion17OrLater() &&
+    const mapVersion = (fk.fileVersion > 17 ? 17 : fk.fileVersion < 10 ? 10 : fk.fileVersion);
+    const specialText = CSpecialText.get(mapVersion);
+    if(specialText.includes(FText) &&
         !([TouchLayout.TouchLayoutKeySp.special, TouchLayout.TouchLayoutKeySp.specialActive].includes(FKeyType))) {
       callbacks.reportMessage(KmwCompilerMessages.Warn_TouchLayoutSpecialLabelOnNormalKey({
         keyId: FId,
