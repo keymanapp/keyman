@@ -173,6 +173,15 @@ export class TouchpointCoordinator<HoveredItemType, StateToken=any> extends Even
     touchpoint.path.on('invalidated', () => {
       // GestureSequence _should_ handle any other cleanup internally as fallout
       // from the path being cancelled.
+      //
+      // That said, it's handled asynchronously... but we can give a synchronous signal
+      // through the next block of code, allowing cleanup to occur earlier during
+      // recovery states.
+
+      const owningSequence = this.activeGestures.find((entry) => entry.allSourceIds.includes(touchpoint.identifier));
+      if(owningSequence) {
+        owningSequence.cancel();
+      }
 
       // To consider: should it specially mark if it 'completed' due to cancellation,
       // or is that safe to infer from the tracked GestureSource(s)?
@@ -183,8 +192,6 @@ export class TouchpointCoordinator<HoveredItemType, StateToken=any> extends Even
       this._activeSources = this._activeSources.splice(i, 1);
     });
     touchpoint.path.on('complete', () => {
-      // TODO: on cancellation, is there any other cleanup to be done?
-
       // Also mark the touchpoint as no longer active.
       let i = this._activeSources.indexOf(touchpoint);
       this._activeSources = this._activeSources.splice(i, 1);

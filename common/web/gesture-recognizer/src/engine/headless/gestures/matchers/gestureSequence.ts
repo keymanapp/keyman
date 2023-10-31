@@ -96,6 +96,7 @@ export class GestureSequence<Type> extends EventEmitter<EventMap<Type>> {
   private pushedSelector?: MatcherSelector<Type>;
 
   private gestureConfig: GestureModelDefs<Type>;
+  private markedComplete: boolean = false;
 
   // Note:  the first stage will be available under `stageReports` after awaiting a simple Promise.resolve().
   constructor(
@@ -110,6 +111,16 @@ export class GestureSequence<Type> extends EventEmitter<EventMap<Type>> {
     this.selector = selector;
     this.selector.on('rejectionwithaction', this.modelResetHandler);
     this.once('complete', () => {
+      if(this.pushedSelector) {
+        // The `popSelector` method is responsible for triggering cascading cancellations if
+        // there are nested GestureSequences.
+        //
+        // As this tends to affect which gestures are permitted, it's important this is done
+        // any time the GestureSequence is cancelled or completed, for any reason.
+        this.touchpointCoordinator?.popSelector(this.pushedSelector);
+        this.pushedSelector = null;
+      }
+
       this.selector.off('rejectionwithaction', this.modelResetHandler);
       this.selector.dropSourcesWithIds(this.allSourceIds);
 
@@ -193,13 +204,10 @@ export class GestureSequence<Type> extends EventEmitter<EventMap<Type>> {
       });
 
       if(!selection.result.matched) {
-        if(this.pushedSelector) {
-          // The `popSelector` method is responsible for triggering cascading cancellations if
-          // there are nested GestureSequences.
-          this.touchpointCoordinator?.popSelector(this.pushedSelector);
+        if(!this.markedComplete) {
+          this.markedComplete = true;
+          this.emit('complete');
         }
-
-        this.emit('complete');
         return;
       }
     }
@@ -274,13 +282,11 @@ export class GestureSequence<Type> extends EventEmitter<EventMap<Type>> {
         }
       }
     } else {
-      if(this.pushedSelector) {
-        this.touchpointCoordinator?.popSelector(this.pushedSelector);
-        this.pushedSelector = null;
-      }
-
       // Any extra finalization stuff should go here, before the event, if needed.
-      this.emit('complete');
+      if(!this.markedComplete) {
+        this.markedComplete = true;
+        this.emit('complete');
+      }
     }
   }
 
@@ -305,7 +311,11 @@ export class GestureSequence<Type> extends EventEmitter<EventMap<Type>> {
 
   public cancel() {
     const sources = this.stageReports[this.stageReports.length - 1].sources;
-    sources.forEach((src) => src.terminate(true));
+    sources.forEach((src) => src.baseSource.isPathComplete || src.baseSource.terminate(true));
+    if(!this.markedComplete) {
+      this.markedComplete = true;
+      this.emit('complete');
+    }
   }
 }
 
