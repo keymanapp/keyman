@@ -5,7 +5,7 @@ import { ActiveKey, ActiveKeyBase, ActiveSubKey, KeyDistribution } from '@keyman
 import { ConfigChangeClosure, CumulativePathStats, GestureRecognizerConfiguration, GestureSequence, PaddedZoneSource } from '@keymanapp/gesture-recognizer';
 import { GestureHandler } from '../gestureHandler.js';
 import { distributionFromDistanceMaps } from '@keymanapp/input-processor';
-import { GestureParams } from '../specsForLayout.js';
+import { DEFAULT_GESTURE_PARAMS, GestureParams } from '../specsForLayout.js';
 
 const OrderedFlickDirections = ['n', 'ne', 'e', 'se', 's', 'sw', 'w', 'nw'] as const;
 
@@ -50,8 +50,9 @@ export default class Flick implements GestureHandler {
 
     this.baseKeyDistances = vkbd.getSimpleTapCorrectionDistances(sequence.stageReports[0].sources[0].path.stats.initialSample, this.baseSpec)
 
+    const baseSource = sequence.stageReports[0].sources[0].baseSource;
     this.sequence.on('stage', (result) => {
-      const pathStats = result.sources[0].path.stats;
+      const pathStats = baseSource.path.stats;
       this.computedFlickDistribution = this.flickDistribution(pathStats);
       const selection = this.computedFlickDistribution[0].keySpec;
 

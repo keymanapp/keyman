@@ -566,7 +566,7 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
             configChanger,
             this,
             gestureSequence.stageReports[0].sources[0].baseItem,
-            DEFAULT_GESTURE_PARAMS
+            this.gestureParams
           )];
         } else if(baseItem?.key.spec.multitap && (gestureStage.matchedId == 'initial-tap' || gestureStage.matchedId == 'multitap' || gestureStage.matchedId == 'modipress-start')) {
           // Likewise - mere construction is enough.
@@ -577,7 +577,7 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
             configChanger,
             this,
             gestureSequence.stageReports[0].sources[0].baseItem,
-            DEFAULT_GESTURE_PARAMS
+            this.gestureParams
           )];
         }
 
@@ -1173,8 +1173,9 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
     const paddingZone = this.gestureEngine.config.maxRoamingBounds as PaddedZoneSource;
     paddingZone.updatePadding([-0.333 * this.currentLayer.rowHeight]);
 
-    const longpressShortcutThreshold = 0.25 * this.currentLayer.rowHeight;
-    this.gestureParams.longpress.flickDist = longpressShortcutThreshold;
+    this.gestureParams.longpress.flickDist = 0.25 * this.currentLayer.rowHeight;
+    this.gestureParams.flick.startDist     = 0.25 * this.currentLayer.rowHeight;
+    this.gestureParams.flick.triggerDist   = 0.75 * this.currentLayer.rowHeight;
 
     // Needs the refreshed layout info to work correctly.
     if(this.currentLayer) {
