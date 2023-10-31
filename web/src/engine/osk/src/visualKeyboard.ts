@@ -412,7 +412,33 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
       // highlighting it)
       const trackingEntry = sourceTrackingMap[source.identifier] = {
         source: source,
-        roamingHighlightHandler: (sample) => {
+        roamingHighlightHandler: null,
+        key: source.currentSample.item,
+        previewHost: previewHost
+      }
+
+      const endHighlighting = () => {
+        trackingEntry.previewHost?.cancel();
+        if(trackingEntry.key) {
+          this.highlightKey(trackingEntry.key, false);
+          trackingEntry.key = null;
+        }
+      }
+
+      // Note:  GestureSource does not currently auto-terminate if there are no
+      // remaining matchable gestures.  Though, we shouldn't facilitate roaming
+      // anyway if we've turned it off.
+      if(this.kbdLayout.hasFlicks) {
+        trackingEntry.roamingHighlightHandler = (sample) => {
+          const key = sample.item;
+          const oldKey = sourceTrackingMap[source.identifier].key;
+
+          if(key != oldKey) {
+            endHighlighting();
+          }
+        };
+      } else {
+        trackingEntry.roamingHighlightHandler = (sample) => {
           // Maintain highlighting
           const key = sample.item;
           const oldKey = sourceTrackingMap[source.identifier].key;
@@ -429,32 +455,12 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
             trackingEntry.previewHost = previewHost;
             sourceTrackingMap[source.identifier].key = key;
           }
-        },
-        key: source.currentSample.item,
-        previewHost: previewHost
-      }
-
-      const endHighlighting = () => {
-        if(trackingEntry.key) {
-          this.highlightKey(trackingEntry.key, false);
-          trackingEntry.key = null;
         }
       }
 
       source.path.on('invalidated', endHighlighting);
       source.path.on('complete', endHighlighting);
-
-      // TODO:  any other 'invalidated' / 'complete' handling needed?
-      // If so, separate handler - it likely needs to be disabled once the first gesture-component
-      // match happens, unlike the highlighting part.
-
       source.path.on('step', trackingEntry.roamingHighlightHandler);
-
-      source.path.on('step', (sample) => {
-        // // Do... something based on the potential gesture types that could arise, as appropriate.
-        // // Should be useful for selecting a hint type, etc.
-        // source.potentialModelMatchIds
-      })
     });
 
     //
@@ -483,7 +489,7 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
       // This should probably vary based on the type of gesture.
       gestureSequence.on('stage', (gestureStage, configChanger) => {
         const existingPreviewHost = gestureSequence.allSourceIds.map((id) => {
-          return sourceTrackingMap[id].previewHost;
+          return sourceTrackingMap[id]?.previewHost;
         }).find((obj) => !!obj);
 
         let handlers: GestureHandler[] = gestureHandlerMap.get(gestureSequence);
