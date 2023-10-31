@@ -5,7 +5,8 @@ import { ActiveKey, ActiveKeyBase, ActiveSubKey, KeyDistribution } from '@keyman
 import { ConfigChangeClosure, CumulativePathStats, GestureRecognizerConfiguration, GestureSequence, PaddedZoneSource } from '@keymanapp/gesture-recognizer';
 import { GestureHandler } from '../gestureHandler.js';
 import { distributionFromDistanceMaps } from '@keymanapp/input-processor';
-import { DEFAULT_GESTURE_PARAMS, GestureParams } from '../specsForLayout.js';
+import { GestureParams } from '../specsForLayout.js';
+import { GesturePreviewHost } from '../../../keyboard-layout/gesturePreviewHost.js';
 
 const OrderedFlickDirections = ['n', 'ne', 'e', 'se', 's', 'sw', 'w', 'nw'] as const;
 
@@ -40,11 +41,14 @@ export default class Flick implements GestureHandler {
     configChanger: ConfigChangeClosure<KeyElement>,
     vkbd: VisualKeyboard,
     e: KeyElement,
-    gestureParams: GestureParams
+    gestureParams: GestureParams,
+    previewHost: GesturePreviewHost
   ) {
     this.sequence = sequence;
     this.gestureParams = gestureParams;
     this.baseSpec = e.key.spec as ActiveKey;
+
+    sequence.on('complete', () => previewHost.cancel());
 
     // May be worth a temporary alt config:  global roaming, rather than auto-canceling.
 

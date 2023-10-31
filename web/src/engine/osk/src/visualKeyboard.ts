@@ -56,6 +56,8 @@ import Multitap from './input/gestures/browser/multitap.js';
 import { GestureHandler } from './input/gestures/gestureHandler.js';
 import Modipress from './input/gestures/browser/modipress.js';
 import Flick from './input/gestures/browser/flick.js';
+import { GesturePreviewHost } from './keyboard-layout/gesturePreviewHost.js';
+import OSKBaseKey from './keyboard-layout/oskBaseKey.js';
 
 interface KeyRuleEffects {
   contextToken?: number,
@@ -210,6 +212,7 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
 
   // Popup key management
   keytip: KeyTip;
+  gesturePreviewHost: GesturePreviewHost;
   globeHint: GlobeHint;
 
   activeGestures: GestureHandler[] = [];
@@ -388,7 +391,8 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
     const sourceTrackingMap: Record<string, {
       source: GestureSource<KeyElement, string>,
       roamingHighlightHandler: (sample: InputSample<KeyElement, string>) => void,
-      key: KeyElement
+      key: KeyElement,
+      previewHost: GesturePreviewHost
     }> = {};
 
     const gestureHandlerMap = new Map<GestureSequence<KeyElement>, GestureHandler[]>();
@@ -396,6 +400,14 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
     // Now to set up event-handling links.
     // This handler should probably vary based on the keyboard: do we allow roaming touches or not?
     recognizer.on('inputstart', (source) => {
+      // Yay for closure-capture mechanics:  we can "keep a lock" on this newly-starting
+      // gesture's highlighted key here.
+      const previewHost = this.highlightKey(source.currentSample.item, true);
+      if(previewHost) {
+        this.gesturePreviewHost?.cancel();
+        this.gesturePreviewHost = previewHost;
+      }
+
       // Make sure we're tracking the source and its currently-selected item (the latter, as we're
       // highlighting it)
       const trackingEntry = sourceTrackingMap[source.identifier] = {
@@ -407,16 +419,20 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
 
           if(key != oldKey) {
             this.highlightKey(oldKey, false);
-            this.highlightKey(key, true);
+            this.gesturePreviewHost?.cancel();
+
+            const previewHost = this.highlightKey(key, true);
+            if(previewHost) {
+              this.gesturePreviewHost = previewHost;
+            }
+
+            trackingEntry.previewHost = previewHost;
             sourceTrackingMap[source.identifier].key = key;
           }
         },
-        key: source.currentSample.item
+        key: source.currentSample.item,
+        previewHost: previewHost
       }
-
-      // Yay for closure-capture mechanics:  we can "keep a lock" on this newly-starting
-      // gesture's highlighted key here.
-      this.highlightKey(trackingEntry.key, true);
 
       const endHighlighting = () => {
         if(trackingEntry.key) {
@@ -458,12 +474,18 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
         // Multitouch does reference tracking data for a source after its completion,
         // but only while still permitting new touches.  If we're here, that time is over.
         for(let id of gestureSequence.allSourceIds) {
+        // If the original preview host lives on, ensure it's cancelled now.
+          sourceTrackingMap[id].previewHost?.cancel();
           delete sourceTrackingMap[id];
         }
       });
 
       // This should probably vary based on the type of gesture.
       gestureSequence.on('stage', (gestureStage, configChanger) => {
+        const existingPreviewHost = gestureSequence.allSourceIds.map((id) => {
+          return sourceTrackingMap[id].previewHost;
+        }).find((obj) => !!obj);
+
         let handlers: GestureHandler[] = gestureHandlerMap.get(gestureSequence);
 
         // Disable roaming-touch highlighting (and current highlighting) for all
@@ -552,6 +574,9 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
         // specialized handlers for the remainder of the sequence.
         // Should work for modipresses, too... I think.
         if(gestureStage.matchedId == 'special-key-start' && gestureKey.key.spec.baseKeyID == 'K_BKSP') {
+          // There shouldn't be a preview host for special keys... but it doesn't hurt to add the check.
+          existingPreviewHost?.cancel();
+
           // Possible enhancement:  maybe update the held location for the backspace if there's movement?
           // But... that seems pretty low-priority.
           //
@@ -559,6 +584,8 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
           // handle everything that remains for the backspace from here.
           handlers = [new HeldRepeater(gestureSequence, () => this.modelKeyClick(gestureKey, coord))];
         } else if(gestureStage.matchedId.indexOf('longpress') > -1) {
+          existingPreviewHost?.cancel();
+
           // Matches:  'longpress', 'longpress-reset'.
           // Likewise.
           handlers = [new SubkeyPopup(
@@ -569,6 +596,10 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
             this.gestureParams
           )];
         } else if(baseItem?.key.spec.multitap && (gestureStage.matchedId == 'initial-tap' || gestureStage.matchedId == 'multitap' || gestureStage.matchedId == 'modipress-start')) {
+          // For now, but worth changing later!
+          // Idea:  if the preview weren't hosted by the key, but instead had a key-lookalike overlay.
+          // Then it would float above any layer, even after layer swaps.
+          existingPreviewHost?.cancel();
           // Likewise - mere construction is enough.
           handlers = [new Multitap(gestureSequence, this, baseItem, keyResult.contextToken)];
         } else if(gestureStage.matchedId.indexOf('flick') > -1) {
@@ -577,11 +608,13 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
             configChanger,
             this,
             gestureSequence.stageReports[0].sources[0].baseItem,
-            this.gestureParams
+            this.gestureParams,
+            existingPreviewHost
           )];
-        }
+        } else if(gestureStage.matchedId.includes('modipress') && gestureStage.matchedId.includes('-start')) {
+          // There shouldn't be a preview host for modipress keys... but it doesn't hurt to add the check.
+          existingPreviewHost?.cancel();
 
-        if(gestureStage.matchedId.includes('modipress') && gestureStage.matchedId.includes('-start')) {
           if(this.layerLocked) {
             console.warn("Unexpected state:  modipress start attempt during an active modipress");
           } else {
@@ -600,6 +633,9 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
             handlers.push(modipressHandler);
             this.activeModipress = modipressHandler;
           }
+        } else {
+          // Probably an initial-tap or a simple-tap.
+          existingPreviewHost?.cancel();
         }
 
         if(handlers) {
@@ -614,12 +650,9 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
               if(handler instanceof Modipress) {
                 handler.cancel();
               }
-            })
+            });
           });
         }
-
-        // TODO:  depending upon the gesture type, what sort of UI shifts should happen to
-        // facilitate follow-up stages?
       })
     });
 
@@ -1044,20 +1077,28 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
    *  @param    {Object}    key   key affected
    *  @param    {boolean}   on    add or remove highlighting
    **/
-  highlightKey(key: KeyElement, on: boolean) {
+  highlightKey(key: KeyElement, on: boolean): GesturePreviewHost {
     // Do not change element class unless a key
     if (!key || !key.key || (key.className == '') || (key.className.indexOf('kmw-key-row') >= 0)) return;
 
     // For phones, use key preview rather than highlighting the key,
-    var usePreview = (this.keytip != null) && key.key.allowsKeyTip();
+    const usePreview = key.key.allowsKeyTip();
+    const modalVizActive = this.activeGestures.find((handler) => handler.hasModalVisualization);
+
+    // If the subkey menu (or a different modal visualization) is active, do not show the key tip -
+    // even if for a different contact point.
+    on = modalVizActive ? false : on;
+
+    if(!on) {
+      key.key.highlight(on);
+      return null;
+    }
 
     if (usePreview) {
-      this.showKeyTip(key, on);
-    } else {
-      // No key tip should be shown. In some cases (e.g. multitap), we
-      // may still have a tip visible so let's always hide in that case
-      this.showKeyTip(null, false);
       key.key.highlight(on);
+      return this.showGesturePreview(key);
+    } else {
+      return null;
     }
   }
 
@@ -1447,25 +1488,26 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
   };
 
   /**
-   * Add (or remove) the keytip preview (if KeymanWeb on a phone device)
+   * Add (or remove) the gesture preview (if KeymanWeb on a phone device)
    *
    * @param   {Object}  key   HTML key element
    * @param   {boolean} on    show or hide
+   * @returns  A GesturePreviewHost instance usable for visualizing a gesture.
    */
-  showKeyTip(key: KeyElement, on: boolean) {
-    var tip = this.keytip;
+  showGesturePreview(key: KeyElement) {
+    const tip = this.keytip;
+
+    const previewHost = new GesturePreviewHost(key, !!tip);
 
     if (tip == null) {
+      const baseKey = key.key as OSKBaseKey;
+      baseKey.setPreview(previewHost);
       return;
+    } else {
+      tip.show(key, true, this, previewHost);
     }
 
-    const modalVizActive = this.activeGestures.find((handler) => handler.hasModalVisualization);
-
-    // If the subkey menu (or a different modal visualization) is active, do not show the key tip -
-    // even if for a different contact point.
-    on = modalVizActive ? false : on;
-
-    tip.show(key, on, this);
+    return previewHost;
   };
 
   /**
@@ -1510,7 +1552,7 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
       window.clearTimeout(this.deleting);
     }
 
-    this.keytip?.show(null, false, this);
+    this.keytip?.show(null, false, this, null);
   }
 
   lockLayer(enable: boolean) {

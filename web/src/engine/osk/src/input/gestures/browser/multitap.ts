@@ -101,6 +101,7 @@ export default class Multitap implements GestureHandler {
       }
       keyEvent.keyDistribution = this.currentStageKeyDistribution(baseDistances);
 
+      // TODO for future:  multitap previews.
       vkbd.raiseKeyEvent(keyEvent, null);
 
       // Now that the key has been processed, with a layer possibly changed as a result...

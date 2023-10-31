@@ -48,7 +48,7 @@ export default class KeyTip implements KeyTipInterface {
     this.constrain = constrain;
   }
 
-  show(key: KeyElement, on: boolean, vkbd: VisualKeyboard) {
+  show(key: KeyElement, on: boolean, vkbd: VisualKeyboard, previewHost: GesturePreviewHost) {
     // Create and display the preview
     // If !key.offsetParent, the OSK is probably hidden.  Either way, it's a half-
     // decent null-guard check.
@@ -106,11 +106,6 @@ export default class KeyTip implements KeyTipInterface {
         kts.fontSize = key.key.getIdealFontSize(vkbd, key.key.keyText, scaleStyle, true);
       }
 
-      const oldHost = this.preview;
-      this.previewHost = new GesturePreviewHost(key, true);
-      this.preview = this.previewHost.element;
-      this.tip.replaceChild(this.preview, oldHost);
-
       // Adjust shape if at edges
       var xOverflow = (canvasWidth - xWidth) / 2;
       if(xLeft < xOverflow) {
@@ -145,6 +140,15 @@ export default class KeyTip implements KeyTipInterface {
       }
 
       kts.display = 'block';
+
+      const oldHost = this.preview;
+      this.previewHost = previewHost;
+
+      if(previewHost) {
+        this.preview = this.previewHost.element;
+        this.tip.replaceChild(this.preview, oldHost);
+        previewHost.setCancellationHandler(() => this.show(null, false, vkbd, null));
+      }
     } else { // Hide the key preview
       this.element.style.display = 'none';
       this.previewHost = null;

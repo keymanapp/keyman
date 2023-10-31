@@ -171,18 +171,22 @@ export default class OSKBaseKey extends OSKKey {
     return skIcon;
   }
 
-  public highlight(on: boolean): void {
-    super.highlight(on);
+  public setPreview(previewHost: GesturePreviewHost) {
     const oldPreview = this.preview;
 
-    if(on && this.allowsKeyTip()) {
-      this.previewHost = new GesturePreviewHost(this.btn, false);
+    if(previewHost) {
+      this.previewHost = previewHost;
       this.preview = this.previewHost.element;
     } else {
       this.previewHost = null;
       this.preview = document.createElement('div');
       this.preview.style.display = 'none';
     }
+
+    previewHost.setCancellationHandler(() => {
+      this.setPreview(null);
+    });
+
     this.btn.replaceChild(this.preview, oldPreview);
   }
 

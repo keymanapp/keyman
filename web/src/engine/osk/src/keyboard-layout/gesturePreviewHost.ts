@@ -23,6 +23,8 @@ export class GesturePreviewHost {
   private lpPreview: HTMLDivElement = null;
   private readonly mtStyling: boolean;
 
+  private onCancel: () => void;
+
   get element(): HTMLDivElement {
     return this.div;
   }
@@ -138,6 +140,15 @@ export class GesturePreviewHost {
 
       base.appendChild(skIcon);
     }
+  }
+
+  public cancel() {
+    this.onCancel?.();
+    this.onCancel = null;
+  }
+
+  public setCancellationHandler(handler: () => void) {
+    this.onCancel = handler;
   }
 
   // These may not exist like this longterm.
