@@ -16,10 +16,8 @@ jobs:
     runs-on: ubuntu-22.04
     outputs:
       VERSION: ${{ steps.version_step.outputs.VERSION }}
-      PRERELEASE_TAG: ${{ steps.prerelease_tag.outputs.PRERELEASE_TAG }}
       GIT_SHA: ${{ steps.set_status.outputs.GIT_SHA }}
-      GHA_TEST_BUILD: ${{ github.event.client_payload.isTestBuild }}
-      GHA_BRANCH: ${{ github.event.client_payload.branch }}
+      PRERELEASE_TAG: ${{ steps.prerelease_tag.outputs.PRERELEASE_TAG }}
     steps:
     - name: Checkout
       uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c #v3.3.0
@@ -53,10 +51,14 @@ jobs:
         ./scripts/deb-packaging.sh --gha dependencies
 
     - name: Build source package
+      id: build_source_package
       run: |
-        TIER=$(cat TIER.md)
-        export TIER
+        export TIER=$(cat TIER.md)
+        export GHA_TEST_BUILD="${{ github.event.client_payload.isTestBuild }}"
+        export GHA_BRANCH="${{ github.event.client_payload.branch }}"
         echo "TIER=$TIER" >> $GITHUB_ENV
+        echo "GHA_TEST_BUILD=${GHA_TEST_BUILD}" >> $GITHUB_ENV
+        echo "GHA_BRANCH=${GHA_BRANCH}" >> $GITHUB_ENV
         cd linux
         ./scripts/deb-packaging.sh --gha source
 
