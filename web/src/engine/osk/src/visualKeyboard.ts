@@ -432,7 +432,9 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
         const flickScroller = buildFlickScroller(source, source.path.coords[0], previewHost, DEFAULT_GESTURE_PARAMS);
 
         trackingEntry.roamingHighlightHandler = (sample) => {
-          flickScroller(sample);
+          if(source.baseItem.key.spec.flick) {
+            flickScroller(sample);
+          }
 
           const key = sample.item;
           const oldKey = sourceTrackingMap[source.identifier].key;
@@ -1228,7 +1230,7 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
     paddingZone.updatePadding([-0.333 * this.currentLayer.rowHeight]);
 
     this.gestureParams.longpress.flickDist = 0.25 * this.currentLayer.rowHeight;
-    this.gestureParams.flick.startDist     = 0.25 * this.currentLayer.rowHeight;
+    this.gestureParams.flick.startDist     = 0.1  * this.currentLayer.rowHeight;
     this.gestureParams.flick.triggerDist   = 0.75 * this.currentLayer.rowHeight;
 
     // Needs the refreshed layout info to work correctly.

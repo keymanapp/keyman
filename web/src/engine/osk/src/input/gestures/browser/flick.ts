@@ -142,10 +142,7 @@ export default class Flick implements GestureHandler {
     const roamBounding = new PaddedZoneSource(vkbd.element, [
       // top
       basePadding * 2, // be extra-loose for the top!
-      // left, right
       basePadding,
-      // bottom: ensure the recognition zone includes the row of the base key.
-      // basePadding is already negative, but bottomDistance isn't.
       basePadding
     ]);
 
