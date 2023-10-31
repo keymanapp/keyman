@@ -1316,6 +1316,9 @@ KMX_BOOL CheckContextStatementPositions(PKMX_WCHAR context) {
           AddWarningBool(CWARN_IfShouldBeAtStartOfContext);
         }
         break;
+      case CODE_EXTENDED:
+        AddCompileError(CERR_VirtualKeyInContext);
+        break;
       default:
         hadContextChar = TRUE;
       }

@@ -1,6 +1,6 @@
 import 'mocha';
 import { assert } from 'chai';
-import { CompilerMessages } from '../src/compiler/messages.js';
+import { CompilerMessages, KmnCompilerMessages } from '../src/compiler/messages.js';
 import { TestCompilerCallbacks, verifyCompilerMessagesObject } from '@keymanapp/developer-test-helpers';
 import { makePathToFixture } from './helpers/index.js';
 import { KmnCompiler } from '../src/main.js';
@@ -54,15 +54,22 @@ describe('CompilerMessages', function () {
   // CERR_DuplicateGroup
 
   it('should generate CERR_DuplicateGroup if the kmn contains two groups with the same name', async function() {
-    await testForMessage(this, ['invalid-keyboards', 'cerr_duplicate_group.kmn'], 0x302071); //TODO: consolidate messages from kmcmplib, CompilerMessages.CERR_DuplicateGroup
+    await testForMessage(this, ['invalid-keyboards', 'error_duplicate_group.kmn'], KmnCompilerMessages.ERROR_DuplicateGroup); //TODO: consolidate messages from kmcmplib, CompilerMessages.CERR_DuplicateGroup
     assert.equal(callbacks.messages[0].message, "A group with this name has already been defined. Group 'ខ្មែរ' declared on line 9");
   });
 
   // CERR_DuplicateStore
 
   it('should generate CERR_DuplicateStore if the kmn contains two stores with the same name', async function() {
-    await testForMessage(this, ['invalid-keyboards', 'cerr_duplicate_store.kmn'], 0x302072); //TODO: consolidate messages from kmcmplib, CompilerMessages.CERR_DuplicateStore
+    await testForMessage(this, ['invalid-keyboards', 'error_duplicate_store.kmn'], KmnCompilerMessages.ERROR_DuplicateStore);
     assert.equal(callbacks.messages[0].message, "A store with this name has already been defined. Store 'ខ្មែរ' declared on line 11");
+  });
+
+  // CERR_VirtualKeyInContext
+
+  it('should generate ERROR_VirtualKeyInContext if a virtual key is found in the context part of a rule', async function() {
+    await testForMessage(this, ['invalid-keyboards', 'error_virtual_key_in_context.kmn'], KmnCompilerMessages.ERROR_VirtualKeyInContext);
+    assert.equal(callbacks.messages[0].message, "Virtual keys are not permitted in context");
   });
 
 });
