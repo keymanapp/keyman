@@ -344,11 +344,11 @@ body div.kmw-key-shift-on span.kmw-key-text {font-family:SpecialOSK !important;f
 #kmw-popup-callout {
   position: absolute;
   display: block;
-  background-color: #fdfdfe;
-  border-radius: 0 0 5px 5px;
+  border-color: transparent;
+  border-top-color: #fdfdfe;
+  border-style: solid;
   z-index: 10002;
   pointer-events:none;
-  border-bottom: solid 1px #8a8d90;
   box-sizing: border-box;
 }
 
@@ -487,7 +487,7 @@ div.android div.kmw-keytip-cap {
 
   /* Style for callout used on phones */
   #kmw-popup-callout {
-    background-color: #0f1319;
+    border-top-color: #0f1319;
   }
 }
 

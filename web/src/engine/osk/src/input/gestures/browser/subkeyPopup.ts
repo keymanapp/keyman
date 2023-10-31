@@ -9,6 +9,9 @@ import { GestureHandler } from '../gestureHandler.js';
 import { CorrectionLayout, CorrectionLayoutEntry, distributionFromDistanceMaps, keyTouchDistances } from '@keymanapp/input-processor';
 import { GestureParams } from '../specsForLayout.js';
 
+const SUBKEY_MENU_VERT_OFFSET = 3;
+const CORNER_ROUNDING = 5;
+
 /**
  * Represents a 'realized' longpress gesture's default implementation
  * within KeymanWeb.  Once a touch sequence has been confirmed to
@@ -30,6 +33,7 @@ export default class SubkeyPopup implements GestureHandler {
   private currentSelection: KeyElement;
 
   private callout: HTMLDivElement;
+  private readonly menuWidth: number;
 
   public readonly baseKey: KeyElement;
   public readonly subkeys: KeyElement[];
@@ -115,7 +119,8 @@ export default class SubkeyPopup implements GestureHandler {
     var nKeys=subKeySpec.length,nRows,nCols;
     nRows=Math.min(Math.ceil(nKeys/9),2);
     nCols=Math.ceil(nKeys/nRows);
-    ss.width=(nCols*e.offsetWidth+nCols*5)+'px';
+    this.menuWidth = (nCols*e.offsetWidth+nCols*5);
+    ss.width = this.menuWidth+'px';
 
     // Add nested button elements for each sub-key
     this.subkeys = [];
@@ -268,7 +273,7 @@ export default class SubkeyPopup implements GestureHandler {
 
     let _BoxRect = _Box.getBoundingClientRect();
     let rowElementRect = rowElement.getBoundingClientRect();
-    ss.top = (rowElementRect.top - _BoxRect.top - subKeys.offsetHeight - 3) + 'px';
+    ss.top = (rowElementRect.top - _BoxRect.top - subKeys.offsetHeight - SUBKEY_MENU_VERT_OFFSET) + 'px';
 
     // Make the popup keys visible
     ss.visibility='visible';
@@ -289,9 +294,9 @@ export default class SubkeyPopup implements GestureHandler {
     }
 
     // Add the callout
-    if(vkbd.device.formFactor == DeviceSpec.FormFactor.Phone && vkbd.device.OS == DeviceSpec.OperatingSystem.iOS) {
-      this.callout = this.addCallout(e, delta, vkbd.element);
-    }
+    // if(vkbd.device.formFactor == DeviceSpec.FormFactor.Phone && vkbd.device.OS == DeviceSpec.OperatingSystem.iOS) {
+    this.callout = this.addCallout(e, delta, vkbd.element);
+    // }
   }
 
   /**
@@ -303,7 +308,8 @@ export default class SubkeyPopup implements GestureHandler {
   addCallout(key: KeyElement, delta: number, _Box: HTMLElement): HTMLDivElement {
     delta = delta || 0;
 
-    let calloutHeight = key.offsetHeight - delta + 6;
+    const STUB_HEIGHT = 6 + SUBKEY_MENU_VERT_OFFSET;
+    let calloutHeight = key.offsetHeight - delta + STUB_HEIGHT;
 
     if(calloutHeight > 0) {
       var cc = document.createElement('div'), ccs = cc.style;
@@ -318,11 +324,30 @@ export default class SubkeyPopup implements GestureHandler {
       // We're going to adjust the top of the box to ensure it stays
       // pixel aligned, otherwise we can get antialiasing artifacts
       // that look ugly
-      let top = Math.floor(keyRect.top - _BoxRect.top - 9 + delta);
+      let top = Math.floor(keyRect.top - _BoxRect.top - STUB_HEIGHT + delta);
       ccs.top = top + 'px';
-      ccs.left = (keyRect.left - _BoxRect.left) + 'px';
-      ccs.width = keyRect.width + 'px';
-      ccs.height = (keyRect.bottom - _BoxRect.top - top - 1) + 'px'; //(height - 1) + 'px';
+
+      const targetHeight = keyRect.height / 5 + STUB_HEIGHT;
+      const maxHeight = keyRect.bottom - _BoxRect.top - top - 1;
+      const selectedHeight = maxHeight < targetHeight ? maxHeight : targetHeight;
+      ccs.borderTopWidth = (selectedHeight) + 'px';
+
+      const STUB_RATIO = targetHeight > STUB_HEIGHT
+        ? targetHeight / (targetHeight - STUB_HEIGHT)
+        : 1;
+
+      const DESIRED_BASE_WIDTH = keyRect.width * STUB_RATIO;
+      const MAX_WIDTH = this.menuWidth - 2 * CORNER_ROUNDING;
+      const TARGET_BASE_WIDTH = MAX_WIDTH < DESIRED_BASE_WIDTH ? MAX_WIDTH : DESIRED_BASE_WIDTH;
+
+      const BASE_LEFT = (keyRect.left - _BoxRect.left - (TARGET_BASE_WIDTH - keyRect.width)/2);
+      const OVERRUN_RIGHT = Math.max(0, (BASE_LEFT + TARGET_BASE_WIDTH) - (_BoxRect.right - CORNER_ROUNDING));
+      const OVERRUN_LEFT =  Math.max(0, CORNER_ROUNDING-BASE_LEFT);
+
+      ccs.left = (keyRect.left - _BoxRect.left - (TARGET_BASE_WIDTH - keyRect.width)/2 + OVERRUN_LEFT) /*- ADJUSTMENT*/ + 'px';
+      ccs.borderLeftWidth  = TARGET_BASE_WIDTH/2 - OVERRUN_LEFT  + 'px';
+      ccs.borderRightWidth = TARGET_BASE_WIDTH/2 - OVERRUN_RIGHT + 'px';
+
 
       // Return callout element, to allow removal later
       return cc;
