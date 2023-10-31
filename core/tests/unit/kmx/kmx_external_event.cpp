@@ -25,7 +25,7 @@
  * - km_core_event with the event KM_CORE_EVENT_KEYBOARD_ACTIVATED
  */
 
-using namespace km::kbp::kmx;
+using namespace km::core::kmx;
 
 km_core_option_item test_env_opts[] =
 {
@@ -37,12 +37,12 @@ int error_args() {
   return 1;
 }
 
-void test_external_event(const km::kbp::path &source_file){
+void test_external_event(const km::core::path &source_file){
 
   km_core_keyboard * test_kb = nullptr;
   km_core_state * test_state = nullptr;
 
-  km::kbp::path full_path = source_file;
+  km::core::path full_path = source_file;
 
   try_status(km_core_keyboard_load(full_path.native().c_str(), &test_kb));
 
@@ -79,7 +79,7 @@ int main(int argc, char *argv []) {
     }
   }
   console_color::enabled = console_color::isaterminal() || arg_color;
-  km::kbp::kmx::g_debug_ToConsole = TRUE;
+  km::core::kmx::g_debug_ToConsole = TRUE;
 
 #ifdef __EMSCRIPTEN__
   test_external_event(get_wasm_file_path(argv[first_arg]));

@@ -4,8 +4,8 @@
  * Keyman Core - KMX Extended String unit tests
  */
 
-#ifndef KMN_KBP
-#define KMN_KBP
+#ifndef KM_CORE_LIBRARY
+#define KM_CORE_LIBRARY
 #endif
 #ifndef USE_CHAR16_T
 #define USE_CHAR16_T
@@ -21,7 +21,7 @@
 #include <kmx_file.h>
 #include <test_assert.h>
 
-using namespace km::kbp::kmx;
+using namespace km::core::kmx;
 using namespace std;
 
 #define U_1F609_WINKING_FACE u"\U0001F609"

@@ -11,12 +11,12 @@ menuDropdown.onclick = (value) => {
   menuDropdown.set(''); // we never show an 'active' package
   if(value == '#install-keyman') {
     let href = '';
-    switch(keyman.util.device.OS) {
-      case 'iOS':     href = 'https://keyman.com/go/developer/'+versionMajor+'/ios-app'; break;
-      case 'Android': href = 'https://keyman.com/go/developer/'+versionMajor+'/android-app'; break;
-      case 'Linux':   href = 'https://keyman.com/linux/download'; break;
-      case 'Windows': href = 'https://keyman.com/go/download/keyman-windows'; break;
-      case 'MacOSX':  href = 'https://keyman.com/go/download/keyman-mac'; break;
+    switch(keyman.config.hostDevice.OS) {   // note: KeymanWeb internal API
+      case 'ios':     href = 'https://keyman.com/go/developer/'+versionMajor+'/ios-app'; break;
+      case 'android': href = 'https://keyman.com/go/developer/'+versionMajor+'/android-app'; break;
+      case 'linux':   href = 'https://keyman.com/linux/download'; break;
+      case 'windows': href = 'https://keyman.com/go/download/keyman-windows'; break;
+      case 'macosx':  href = 'https://keyman.com/go/download/keyman-mac'; break;
       default:        href = 'https://keyman.com/downloads'; break;
     }
     location.href = href;

@@ -175,6 +175,19 @@ export default class KeymanEngine extends KeymanEngineBase<BrowserConfiguration,
 
     await super.init(totalOptions);
 
+    // Used by keymanweb.com; if no keyboard-cookie exists, we need this to trigger
+    // default-stub selection on mobile devices so that a keyboard - and thus, the
+    // globe key - are accessible.
+    //
+    // The `super` call above initializes `keyboardRequisitioner`, as needed here.
+    this.keyboardRequisitioner.cloudQueryEngine.once('unboundregister', () => {
+      if(!this.contextManager.activeKeyboard?.keyboard) {
+        // Autoselects this.keyboardRequisitioner.cache.defaultStub, which will be
+        // set to an actual keyboard on mobile devices.
+        this.setActiveKeyboard('', '');
+      }
+    });
+
     this.contextManager.initialize();  // will seek to attach to the page, which requires document.body
 
     // Capture the saved-keyboard string now, before we load any keyboards/stubs
@@ -213,6 +226,8 @@ export default class KeymanEngine extends KeymanEngineBase<BrowserConfiguration,
     // If we tracked cloud requests and awaited a Promise.all on pending queries,
     // we could handle that too.
     this.contextManager.restoreSavedKeyboard(savedKeyboardStr);
+
+    await Promise.resolve();
   }
 
   get register(): (x: CloudQueryResult) => void {
