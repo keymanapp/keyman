@@ -23,11 +23,14 @@ developer-tests: \
   model-ts-parser \
   package-info \
   kmc \
+  kmc-analyze \
   kmc-keyboard-info \
+  kmc-kmn \
   kmc-ldml \
   kmc-model \
   kmc-model-info \
-  kmc-package
+  kmc-package \
+  kmcmplib
 
 # ----------------------------------------------------------------------
 
@@ -72,8 +75,16 @@ kmc: .virtual
   cd $(DEVELOPER_ROOT)\src\kmc
   $(MAKE) $(TARGET)
 
+kmc-analyze: .virtual
+  cd $(DEVELOPER_ROOT)\src\kmc-analyze
+  $(MAKE) $(TARGET)
+
 kmc-keyboard-info: .virtual
   cd $(DEVELOPER_ROOT)\src\kmc-keyboard-info
+  $(MAKE) $(TARGET)
+
+kmc-kmn: .virtual
+  cd $(DEVELOPER_ROOT)\src\kmc-kmn
   $(MAKE) $(TARGET)
 
 kmc-ldml: .virtual
@@ -90,6 +101,10 @@ kmc-model-info: .virtual
 
 kmc-package: .virtual
   cd $(DEVELOPER_ROOT)\src\kmc-package
+  $(MAKE) $(TARGET)
+
+kmcmplib: .virtual
+  cd $(DEVELOPER_ROOT)\src\kmcmplib
   $(MAKE) $(TARGET)
 
 # ----------------------------------------------------------------------
