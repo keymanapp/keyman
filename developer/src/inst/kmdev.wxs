@@ -164,7 +164,7 @@
       </Component>
 
       <Component>
-        <File Name="kmnkbp0-0.dll" KeyPath="yes" />
+        <File Name="keymancore-1.dll" KeyPath="yes" />
       </Component>
 
       <Component>

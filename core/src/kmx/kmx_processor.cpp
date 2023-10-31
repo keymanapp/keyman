@@ -3,7 +3,7 @@
 #include "kmx/kmx_processor.hpp"
 #include <map>
 
-using namespace km::kbp;
+using namespace km::core;
 using namespace kmx;
 
 // TODO consolodate with appint.cpp and put in public library.
@@ -38,7 +38,7 @@ km_core_status kmx_processor::validate() const {
   return _valid ? KM_CORE_STATUS_OK : KM_CORE_STATUS_INVALID_KEYBOARD;
 }
 
-kmx_processor::kmx_processor(kbp::path p) {
+kmx_processor::kmx_processor(core::path p) {
   p.replace_extension(".kmx");
   _valid = bool(_kmx.Load(p.c_str()));
 
@@ -283,8 +283,8 @@ kmx_processor::process_event(
     switch (c->type) {
     case KM_CORE_CT_CHAR:
       {
-        km::kbp::kmx::char16_single buf;
-        const int len = km::kbp::kmx::Utf32CharToUtf16(c->character, buf);
+        km::core::kmx::char16_single buf;
+        const int len = km::core::kmx::Utf32CharToUtf16(c->character, buf);
         ctxt.append(buf.ch, len);
       }
       break;

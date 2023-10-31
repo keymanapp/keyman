@@ -24,7 +24,7 @@ include /usr/share/dpkg/pkg-info.mk
 	dh $@ --with-python3
 
 override_dh_auto_configure:
-	# keymankeyboardprocessor - we need to configure and build core before
+	# keyman core - we need to configure and build core before
 	# we can configure ibus-keyman!
 	core/build.sh --no-tests configure:arch build:arch -- \
 		--wrap-mode=nodownload --prefix=/usr --sysconfdir=/etc \

@@ -16,7 +16,7 @@
 #include "keyboard.hpp"
 
 namespace km {
-namespace kbp
+namespace core
 {
   class abstract_processor
   {
@@ -75,7 +75,7 @@ namespace kbp
      * updateing the state as required.
      *
      * @param   state  An opaque pointer to a state object
-     * @return  km_core_status  `KM_CORE_STATUS_OK`: On success. Else KB_KBP_ error code
+     * @return  km_core_status  `KM_CORE_STATUS_OK`: On success. Else KB_CORE_ error code
      */
     virtual km_core_status
     process_queued_actions(
@@ -127,7 +127,7 @@ namespace kbp
 
   json & operator << (json &j, abstract_processor const &opts);
 
-} // namespace kbp
+} // namespace core
 } // namespace km
 
-struct km_core_keyboard : public km::kbp::abstract_processor {};
+struct km_core_keyboard : public km::core::abstract_processor {};

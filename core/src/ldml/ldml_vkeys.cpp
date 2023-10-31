@@ -9,7 +9,7 @@
 #include "kmx_file.h"
 
 namespace km {
-namespace kbp {
+namespace core {
 namespace ldml {
 
 vkeys::vkeys() : vkey_to_string() {
@@ -78,5 +78,5 @@ vkeys::lookup(const vkey_id& id) const {
 }
 
 }  // namespace ldml
-}  // namespace kbp
+}  // namespace core
 }  // namespace km

@@ -12,7 +12,7 @@
 //
 //  core/tools/ldml-const-builder/build.sh clean build run
 //
-// To update keyboardprocessor_ldml.h, and commit the result.
+// To update keyman_core_ldml.h, and commit the result.
 //
 // It is not updated automatically.
 

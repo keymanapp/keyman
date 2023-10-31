@@ -15,7 +15,7 @@
 #include "processor.hpp"
 
 namespace km {
-namespace kbp
+namespace core
 {
   class kmx_processor : public abstract_processor
   {
@@ -82,5 +82,5 @@ namespace kbp
 
   };
 
-} // namespace kbp
+} // namespace core
 } // namespace km

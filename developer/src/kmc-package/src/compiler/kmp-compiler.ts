@@ -29,6 +29,7 @@ export class KmpCompiler {
   public transformKpsToKmpObject(kpsFilename: string): KmpJsonFile.KmpJsonFile {
     const kps = this.loadKpsFile(kpsFilename);
     if(!kps) {
+      // errors will already have been reported by loadKpsFile
       return null;
     }
     return this.transformKpsFileToKmpObject(kpsFilename, kps);
@@ -48,10 +49,18 @@ export class KmpCompiler {
         let parser = new xml2js.Parser({
           explicitArray: false
         });
-        // TODO: add unit test for xml errors parsing .kps file
-        parser.parseString(data, (e: unknown, r: unknown) => { if(e) throw e; a = r as KpsFile.KpsPackage });
+
+        try {
+          parser.parseString(data, (e: unknown, r: unknown) => { if(e) throw e; a = r as KpsFile.KpsPackage });
+        } catch(e) {
+          this.callbacks.reportMessage(CompilerMessages.Error_InvalidPackageFile({e}));
+        }
         return a;
     })();
+
+    if(!kpsPackage) {
+      return null;
+    }
 
     const kps: KpsFile.KpsFile = kpsPackage.Package;
     return kps;

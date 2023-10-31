@@ -8,7 +8,7 @@
 #include "kmx_base.h"
 
 namespace km {
-namespace kbp {
+namespace core {
 namespace kmx {
 
 #define MAXACTIONQUEUE  1024
@@ -59,6 +59,6 @@ public:
 };
 
 } // namespace kmx
-} // namespace kbp
+} // namespace core
 } // namespace km
 
