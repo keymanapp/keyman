@@ -107,13 +107,13 @@ builder_describe_outputs \
   configure:mac-arm64       /core/build/mac-arm64/$BUILDER_CONFIGURATION/build.ninja \
   configure:arch            /core/build/arch/$BUILDER_CONFIGURATION/build.ninja \
   configure:wasm            /core/build/wasm/$BUILDER_CONFIGURATION/build.ninja \
-  build:x86                 /core/build/x86/$BUILDER_CONFIGURATION/src/libkmnkbp0.a \
-  build:x64                 /core/build/x64/$BUILDER_CONFIGURATION/src/libkmnkbp0.a \
-  build:mac                 /core/build/mac/$BUILDER_CONFIGURATION/libkmnkbp0.a \
-  build:mac-x86_64          /core/build/mac-x86_64/$BUILDER_CONFIGURATION/src/libkmnkbp0.a \
-  build:mac-arm64           /core/build/mac-arm64/$BUILDER_CONFIGURATION/src/libkmnkbp0.a \
-  build:arch                /core/build/arch/$BUILDER_CONFIGURATION/src/libkmnkbp0.a \
-  build:wasm                /core/build/wasm/$BUILDER_CONFIGURATION/src/libkmnkbp0.a
+  build:x86                 /core/build/x86/$BUILDER_CONFIGURATION/src/libkeymancore.a \
+  build:x64                 /core/build/x64/$BUILDER_CONFIGURATION/src/libkeymancore.a \
+  build:mac                 /core/build/mac/$BUILDER_CONFIGURATION/libkeymancore.a \
+  build:mac-x86_64          /core/build/mac-x86_64/$BUILDER_CONFIGURATION/src/libkeymancore.a \
+  build:mac-arm64           /core/build/mac-arm64/$BUILDER_CONFIGURATION/src/libkeymancore.a \
+  build:arch                /core/build/arch/$BUILDER_CONFIGURATION/src/libkeymancore.a \
+  build:wasm                /core/build/wasm/$BUILDER_CONFIGURATION/src/libkeymancore.a
 
 # Import our standard compiler defines; this is copied from
 # /resources/build/meson/standard.meson.build by build.sh, because meson doesn't
@@ -157,9 +157,9 @@ do_action build
 
 if builder_start_action build:mac; then
   lipo -create \
-    "$KEYMAN_ROOT/core/build/mac-x86_64/$BUILDER_CONFIGURATION/src/libkmnkbp0.a" \
-    "$KEYMAN_ROOT/core/build/mac-arm64/$BUILDER_CONFIGURATION/src/libkmnkbp0.a" \
-    -output "$KEYMAN_ROOT/core/build/mac/$BUILDER_CONFIGURATION/libkmnkbp0.a"
+    "$KEYMAN_ROOT/core/build/mac-x86_64/$BUILDER_CONFIGURATION/src/libkeymancore.a" \
+    "$KEYMAN_ROOT/core/build/mac-arm64/$BUILDER_CONFIGURATION/src/libkeymancore.a" \
+    -output "$KEYMAN_ROOT/core/build/mac/$BUILDER_CONFIGURATION/libkeymancore.a"
   builder_finish_action success build:mac
 fi
 

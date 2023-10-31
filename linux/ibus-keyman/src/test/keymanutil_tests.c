@@ -30,13 +30,32 @@ _get_tst_options_key(gchar* testname) {
   return result;
 }
 
+void
+_delete_tst_kbds_key() {
+  g_autoptr(GSettings) settings = g_settings_new(KEYMAN_DCONF_ENGINE_NAME);
+  g_settings_reset(settings, KEYMAN_DCONF_KEYBOARDS_KEY);
+}
+
+void
+_set_tst_kbds_key(gchar** keyboards) {
+  g_autoptr(GSettings) settings = g_settings_new(KEYMAN_DCONF_ENGINE_NAME);
+  g_settings_set_strv(settings, KEYMAN_DCONF_KEYBOARDS_KEY, (const gchar* const*)keyboards);
+}
+
+gchar**
+_get_tst_kbds_key() {
+  g_autoptr(GSettings) settings = g_settings_new(KEYMAN_DCONF_ENGINE_NAME);
+  return g_settings_get_strv(settings, KEYMAN_DCONF_KEYBOARDS_KEY);
+}
+
 kmp_keyboard*
-_get_tst_kmp_keyboard(gchar* version, gchar** languages) {
+_get_tst_kmp_keyboard(gchar* version, gchar** languages, gchar* id) {
+  g_assert(id != NULL);
   kmp_keyboard* keyboard = g_new0(kmp_keyboard, 1);
   keyboard->name         = g_strdup("Testing");
-  keyboard->id           = g_strdup("tst");
+  keyboard->id           = g_strdup(id);
   keyboard->version      = g_strdup(version);
-  keyboard->kmx_file     = g_strdup("tst.kmx");
+  keyboard->kmx_file     = g_strdup_printf("%s.kmx", id);
   keyboard->kvk_file     = g_strdup("");
   keyboard->languages    = NULL;
   for (gchar* lang = *languages++; lang; lang = *languages++) {
@@ -87,6 +106,22 @@ _free_tst_kb_data(add_keyboard_data* kb_data) {
 }
 
 G_DEFINE_AUTOPTR_CLEANUP_FUNC(add_keyboard_data, _free_tst_kb_data)
+
+// Newer glib versions have g_assert_cmpstrv which would allow to do
+// g_assert_cmpstrv(result, keyboards);
+// but unfortunately Ubuntu 20.04 Focal doesn't have that, so we roll
+// our own
+void
+_kmn_assert_cmpstrv(gchar** result, gchar** expected) {
+  g_assert_nonnull(result);
+  g_assert_nonnull(expected);
+  int i = 0;
+  for (; result[i] && expected[i]; i++) {
+    g_assert_cmpstr(result[i], ==, expected[i]);
+  }
+  g_assert_null(result[i]);
+  g_assert_null(expected[i]);
+}
 
 //----------------------------------------------------------------------------------------------
 void
@@ -179,6 +214,247 @@ test_keyman_put_options_todconf__existing_key() {
 
 //----------------------------------------------------------------------------------------------
 void
+test_keyman_get_custom_keyboard_dictionary__values() {
+  // Initialize
+  gchar* keyboards[] = {"fr:/tmp/test/test.kmx", "en:/tmp/foo/foo.kmx", "fr:/tmp/foo/foo.kmx", NULL};
+  _set_tst_kbds_key(keyboards);
+
+  // Execute
+  g_autoptr(GHashTable) result = keyman_get_custom_keyboard_dictionary();
+
+  // Verify
+  GPtrArray* value = g_hash_table_lookup(result, "/tmp/test/test.kmx");
+  g_assert_cmpint(value->len, ==, 1);
+  cust_kbd* pdata = value->pdata[0];
+  g_assert_cmpstr(pdata->lang->id, ==, "fr");
+  g_assert_cmpstr(pdata->kb_id_with_lang, ==, "fr:/tmp/test/test.kmx");
+
+  value = g_hash_table_lookup(result, "/tmp/foo/foo.kmx");
+  g_assert_cmpint(value->len, ==, 2);
+  pdata = value->pdata[0];
+  g_assert_cmpstr(pdata->lang->id, ==, "en");
+  g_assert_cmpstr(pdata->kb_id_with_lang, ==, "en:/tmp/foo/foo.kmx");
+  pdata = value->pdata[1];
+  g_assert_cmpstr(pdata->lang->id, ==, "fr");
+  g_assert_cmpstr(pdata->kb_id_with_lang, ==, "fr:/tmp/foo/foo.kmx");
+
+  // Cleanup
+  _delete_tst_kbds_key();
+}
+
+void
+test_keyman_get_custom_keyboard_dictionary__invalid() {
+  // Initialize
+  gchar* keyboards[] = {"/tmp/test/test.kmx", NULL};
+  _set_tst_kbds_key(keyboards);
+
+  // Execute
+  g_autoptr(GHashTable) result = keyman_get_custom_keyboard_dictionary();
+
+  // Verify
+  g_assert_nonnull(result);
+
+  // Cleanup
+  _delete_tst_kbds_key();
+}
+
+void
+test_keyman_get_custom_keyboard_dictionary__empty() {
+  // Initialize
+  gchar* keyboards[] = {NULL};
+  _set_tst_kbds_key(keyboards);
+
+  // Execute
+  g_autoptr(GHashTable) result = keyman_get_custom_keyboard_dictionary();
+
+  // Verify
+  g_assert_null(result);
+
+  // Cleanup
+  _delete_tst_kbds_key();
+}
+
+void
+test_keyman_get_custom_keyboard_dictionary__null() {
+  // Initialize
+  _delete_tst_kbds_key();
+
+  // Execute
+  g_autoptr(GHashTable) result = keyman_get_custom_keyboard_dictionary();
+
+  // Verify
+  g_assert_null(result);
+
+  // Cleanup
+  _delete_tst_kbds_key();
+}
+
+//----------------------------------------------------------------------------------------------
+void
+test_keyman_set_custom_keyboards__new_key() {
+  // Initialize
+  _delete_tst_kbds_key();
+  gchar* keyboards[] = {"fr:/tmp/test/test.kmx", NULL};
+
+  // Execute
+  keyman_set_custom_keyboards(keyboards);
+
+  // Verify
+  g_auto(GStrv) result = _get_tst_kbds_key();
+  g_assert_nonnull(result);
+  _kmn_assert_cmpstrv(result, keyboards);
+
+  // Cleanup
+  _delete_tst_kbds_key();
+}
+
+void
+test_keyman_set_custom_keyboards__overwrite_key() {
+  // Initialize
+  gchar* initialKbds[] = {"fr:/tmp/test/test.kmx", NULL};
+  _set_tst_kbds_key(initialKbds);
+
+  gchar* keyboards[] = {"fr:/tmp/test/test.kmx", "en:/tmp/foo/foo.kmx", NULL};
+
+  // Execute
+  keyman_set_custom_keyboards(keyboards);
+
+  // Verify
+  g_auto(GStrv) result = _get_tst_kbds_key();
+  g_assert_nonnull(result);
+  _kmn_assert_cmpstrv(result, keyboards);
+
+  // Cleanup
+  _delete_tst_kbds_key();
+}
+
+void
+test_keyman_set_custom_keyboards__delete_key_NULL() {
+  // Initialize
+  gchar* initialKbds[] = {"fr:/tmp/test/test.kmx", NULL};
+  _set_tst_kbds_key(initialKbds);
+
+  // Execute
+  keyman_set_custom_keyboards(NULL);
+
+  // Verify
+  g_auto(GStrv) result = _get_tst_kbds_key();
+  gchar* expected[] = {NULL};
+  g_assert_nonnull(result);
+  _kmn_assert_cmpstrv(result, expected);
+
+  // Cleanup
+  _delete_tst_kbds_key();
+}
+
+void
+test_keyman_set_custom_keyboards__delete_key_empty_array() {
+  // Initialize
+  gchar* initialKbds[] = {"fr:/tmp/test/test.kmx", NULL};
+  _set_tst_kbds_key(initialKbds);
+
+  gchar* keyboards[] = {NULL};
+
+  // Execute
+  keyman_set_custom_keyboards(keyboards);
+
+  // Verify
+  g_auto(GStrv) result = _get_tst_kbds_key();
+  g_assert_nonnull(result);
+  _kmn_assert_cmpstrv(result, keyboards);
+
+  // Cleanup
+  _delete_tst_kbds_key();
+}
+
+void
+test_keyman_set_custom_keyboards__invalid_values() {
+  // Initialize
+  _delete_tst_kbds_key();
+  gchar* keyboards[] = {"invalid", "fr:/tmp/test/test.kmx", "", ":/tmp/bla.kmx", "fr:", NULL};
+
+  // Execute
+  keyman_set_custom_keyboards(keyboards);
+
+  // Verify
+  g_auto(GStrv) result = _get_tst_kbds_key();
+  g_assert_nonnull(result);
+  gchar* expected[] = {"fr:/tmp/test/test.kmx", NULL};
+  _kmn_assert_cmpstrv(result, expected);
+
+  // Cleanup
+  _delete_tst_kbds_key();
+}
+
+//----------------------------------------------------------------------------------------------
+void
+test_keyman_get_custom_keyboards__value() {
+  // Initialize
+  gchar* keyboards[] = {"fr:/tmp/test/test.kmx", NULL};
+  _set_tst_kbds_key(keyboards);
+
+  // Execute
+  g_auto(GStrv) result = keyman_get_custom_keyboards();
+
+  // Verify
+  g_assert_nonnull(result);
+  _kmn_assert_cmpstrv(result, keyboards);
+
+  // Cleanup
+  _delete_tst_kbds_key();
+}
+
+void
+test_keyman_get_custom_keyboards__invalid_values() {
+  // Initialize
+  gchar* keyboards[] = {"invalid", "fr:/tmp/test/test.kmx", "", NULL};
+  _set_tst_kbds_key(keyboards);
+
+  // Execute
+  g_auto(GStrv) result = keyman_get_custom_keyboards();
+
+  // Verify
+  gchar* expected[] = {"fr:/tmp/test/test.kmx", NULL};
+  g_assert_nonnull(result);
+  _kmn_assert_cmpstrv(result, expected);
+
+  // Cleanup
+  _delete_tst_kbds_key();
+}
+
+void
+test_keyman_get_custom_keyboards__no_key() {
+  // Initialize
+  _delete_tst_kbds_key();
+
+  // Execute
+  g_auto(GStrv) result = keyman_get_custom_keyboards();
+
+  // Verify
+  g_assert_null(result);
+
+  // Cleanup
+  _delete_tst_kbds_key();
+}
+
+void
+test_keyman_get_custom_keyboards__empty() {
+  // Initialize
+  gchar* keyboards[] = {NULL};
+  _set_tst_kbds_key(keyboards);
+
+  // Execute
+  g_auto(GStrv) result = keyman_get_custom_keyboards();
+
+  // Verify
+  g_assert_null(result);
+
+  // Cleanup
+  _delete_tst_kbds_key();
+}
+
+//----------------------------------------------------------------------------------------------
+void
 test_ibus_keyman_engine_desc_new__all_set() {
   // Execute
   g_autoptr(IBusEngineDesc) desc = ibus_keyman_engine_desc_new("name", "longname", "description", "copyright", "lang", "license", "author", "icon", "layout", "version");
@@ -254,12 +530,13 @@ void
 test_get_engine_for_language__null_language() {
   // Initialize
   gchar* languages[]        = {"en:English", NULL};
-  g_autoptr(kmp_keyboard) keyboard    = _get_tst_kmp_keyboard("1.0", languages);
+  g_autoptr(kmp_keyboard) keyboard    = _get_tst_kmp_keyboard("1.0", languages, "tst");
   g_autoptr(kmp_info) info            = _get_tst_kmp_info("Copyright by me", "My Author", "myauthor@example.com");
   g_autoptr(keyboard_details) details = _get_tst_keyboard_details("my description", "MIT");
+  kmp_language lang                   = {NULL, NULL};
 
   // Execute
-  g_autoptr(IBusEngineDesc) desc = get_engine_for_language(keyboard, info, details, "/tmp", NULL, NULL);
+  g_autoptr(IBusEngineDesc) desc = get_engine_for_language(keyboard, info, details, "/tmp", &lang);
 
   // Verify
   g_assert_null(desc);
@@ -269,12 +546,13 @@ void
 test_get_engine_for_language__empty_language() {
   // Initialize
   gchar* languages[]        = {"en:English", NULL};
-  g_autoptr(kmp_keyboard) keyboard    = _get_tst_kmp_keyboard("1.0", languages);
+  g_autoptr(kmp_keyboard) keyboard    = _get_tst_kmp_keyboard("1.0", languages, "tst");
   g_autoptr(kmp_info) info            = _get_tst_kmp_info("Copyright by me", "My Author", "myauthor@example.com");
   g_autoptr(keyboard_details) details = _get_tst_keyboard_details("my description", "MIT");
+  kmp_language lang                   = {"", ""};
 
   // Execute
-  g_autoptr(IBusEngineDesc) desc = get_engine_for_language(keyboard, info, details, "/tmp", "", "");
+  g_autoptr(IBusEngineDesc) desc = get_engine_for_language(keyboard, info, details, "/tmp", &lang);
 
   // Verify
   g_assert_null(desc);
@@ -284,12 +562,13 @@ void
 test_get_engine_for_language__one_language() {
   // Initialize
   gchar* languages[]        = {"en:English", NULL};
-  g_autoptr(kmp_keyboard) keyboard    = _get_tst_kmp_keyboard("1.0", languages);
+  g_autoptr(kmp_keyboard) keyboard    = _get_tst_kmp_keyboard("1.0", languages, "tst");
   g_autoptr(kmp_info) info            = _get_tst_kmp_info("Copyright by me", "My Author", "myauthor@example.com");
   g_autoptr(keyboard_details) details = _get_tst_keyboard_details("my description", "MIT");
+  kmp_language lang                   = {"English", "en"};
 
   // Execute
-  g_autoptr(IBusEngineDesc) desc = get_engine_for_language(keyboard, info, details, "/tmp", "en", "English");
+  g_autoptr(IBusEngineDesc) desc = get_engine_for_language(keyboard, info, details, "/tmp", &lang);
 
   // Verify
   g_assert_cmpstr(ibus_engine_desc_get_name(desc), ==, "en:/tmp/tst.kmx");
@@ -301,12 +580,13 @@ void
 test_get_engine_for_language__one_unknown_language() {
   // Initialize
   gchar* languages[]        = {"foo:Foo", NULL};
-  g_autoptr(kmp_keyboard) keyboard    = _get_tst_kmp_keyboard("1.0", languages);
+  g_autoptr(kmp_keyboard) keyboard    = _get_tst_kmp_keyboard("1.0", languages, "tst");
   g_autoptr(kmp_info) info            = _get_tst_kmp_info("Copyright by me", "My Author", "myauthor@example.com");
   g_autoptr(keyboard_details) details = _get_tst_keyboard_details("my description", "MIT");
+  kmp_language lang                   = {"Foo", "foo"};
 
   // Execute
-  g_autoptr(IBusEngineDesc) desc = get_engine_for_language(keyboard, info, details, "/tmp", "foo", "Foo");
+  g_autoptr(IBusEngineDesc) desc = get_engine_for_language(keyboard, info, details, "/tmp", &lang);
 
   // Verify
   g_assert_cmpstr(ibus_engine_desc_get_name(desc), ==, "foo:/tmp/tst.kmx");
@@ -318,12 +598,13 @@ void
 test_get_engine_for_language__different_languages() {
   // Initialize
   gchar* languages[]        = {"en:English", NULL};
-  g_autoptr(kmp_keyboard) keyboard    = _get_tst_kmp_keyboard("1.0", languages);
+  g_autoptr(kmp_keyboard) keyboard    = _get_tst_kmp_keyboard("1.0", languages, "tst");
   g_autoptr(kmp_info) info            = _get_tst_kmp_info("Copyright by me", "My Author", "myauthor@example.com");
   g_autoptr(keyboard_details) details = _get_tst_keyboard_details("my description", "MIT");
+  kmp_language lang                   = {"Foo", "foo"};
 
   // Execute
-  g_autoptr(IBusEngineDesc) desc = get_engine_for_language(keyboard, info, details, "/tmp", "foo", "Foo");
+  g_autoptr(IBusEngineDesc) desc = get_engine_for_language(keyboard, info, details, "/tmp", &lang);
 
   // Verify
   g_assert_cmpstr(ibus_engine_desc_get_name(desc), ==, "foo:/tmp/tst.kmx");
@@ -335,12 +616,13 @@ void
 test_get_engine_for_language__no_kbd_language() {
   // Initialize
   gchar* languages[]        = {NULL};
-  g_autoptr(kmp_keyboard) keyboard    = _get_tst_kmp_keyboard("1.0", languages);
+  g_autoptr(kmp_keyboard) keyboard    = _get_tst_kmp_keyboard("1.0", languages, "tst");
   g_autoptr(kmp_info) info            = _get_tst_kmp_info("Copyright by me", "My Author", "myauthor@example.com");
   g_autoptr(keyboard_details) details = _get_tst_keyboard_details("my description", "MIT");
+  kmp_language lang                   = {"English", "en"};
 
   // Execute
-  g_autoptr(IBusEngineDesc) desc = get_engine_for_language(keyboard, info, details, "/tmp", "en", "English");
+  g_autoptr(IBusEngineDesc) desc = get_engine_for_language(keyboard, info, details, "/tmp", &lang);
 
   // Verify
   g_assert_cmpstr(ibus_engine_desc_get_name(desc), ==, "en:/tmp/tst.kmx");
@@ -348,12 +630,15 @@ test_get_engine_for_language__no_kbd_language() {
   g_assert_cmpstr(ibus_engine_desc_get_language(desc), ==, "en");
 }
 
+extern GHashTable* custom_keyboards;
+
 //----------------------------------------------------------------------------------------------
 void
 test_keyman_add_keyboard__no_language() {
   // Initialize
-  gchar* languages[]         = {NULL};
-  g_autoptr(kmp_keyboard) keyboard     = _get_tst_kmp_keyboard("1.0", languages);
+  gchar* languages[] = {NULL};
+  custom_keyboards                 = g_hash_table_new_full(g_str_hash, g_str_equal, g_free, (GDestroyNotify)g_ptr_array_unref);
+  g_autoptr(kmp_keyboard) keyboard     = _get_tst_kmp_keyboard("1.0", languages, "tst");
   g_autoptr(add_keyboard_data) kb_data = _get_tst_keyboard_data();
 
   // Execute
@@ -369,8 +654,9 @@ test_keyman_add_keyboard__no_language() {
 void
 test_keyman_add_keyboard__one_language() {
   // Initialize
-  gchar* languages[]         = {"en:English", NULL};
-  g_autoptr(kmp_keyboard) keyboard     = _get_tst_kmp_keyboard("1.0", languages);
+  gchar* languages[] = {"en:English", NULL};
+  custom_keyboards                 = g_hash_table_new_full(g_str_hash, g_str_equal, g_free, (GDestroyNotify)g_ptr_array_unref);
+  g_autoptr(kmp_keyboard) keyboard     = _get_tst_kmp_keyboard("1.0", languages, "tst");
   g_autoptr(add_keyboard_data) kb_data = _get_tst_keyboard_data();
 
   // Execute
@@ -386,8 +672,9 @@ test_keyman_add_keyboard__one_language() {
 void
 test_keyman_add_keyboard__two_languages() {
   // Initialize
-  gchar* languages[]         = {"en:English", "fr:French", NULL};
-  g_autoptr(kmp_keyboard) keyboard     = _get_tst_kmp_keyboard("1.0", languages);
+  gchar* languages[] = {"en:English", "fr:French", NULL};
+  custom_keyboards                 = g_hash_table_new_full(g_str_hash, g_str_equal, g_free, (GDestroyNotify)g_ptr_array_unref);
+  g_autoptr(kmp_keyboard) keyboard     = _get_tst_kmp_keyboard("1.0", languages, "tst");
   g_autoptr(add_keyboard_data) kb_data = _get_tst_keyboard_data();
 
   // Execute
@@ -405,10 +692,81 @@ test_keyman_add_keyboard__two_languages() {
 }
 
 void
+test_keyman_add_keyboard__one_language_plus_custom() {
+  // Initialize
+  gchar* languages[]                   = {"en:English", NULL};
+  custom_keyboards                     = g_hash_table_new_full(g_str_hash, g_str_equal, g_free, (GDestroyNotify)g_ptr_array_unref);
+  g_hash_table_insert(custom_keyboards, g_strdup("/tmp/tst.kmx"), g_ptr_array_new_full(1, g_free));
+  GPtrArray* language_keyboards = g_hash_table_lookup(custom_keyboards, "/tmp/tst.kmx");
+  cust_kbd* data                = g_new0(cust_kbd, 1);
+  data->kb_id_with_lang         = g_strdup("ldb:/tmp/tst.kmx");
+  data->lang                    = g_new0(kmp_language, 1);
+  data->lang->id                = g_strdup("ldb");
+  g_ptr_array_add(language_keyboards, data);
+  g_autoptr(kmp_keyboard) keyboard     = _get_tst_kmp_keyboard("1.0", languages, "tst");
+  g_autoptr(add_keyboard_data) kb_data = _get_tst_keyboard_data();
+
+  // Execute
+  keyman_add_keyboard(keyboard, kb_data);
+
+  // Verify
+  g_assert_nonnull(kb_data->engines_list->data);
+  IBusEngineDesc* desc = (IBusEngineDesc*)kb_data->engines_list->data;
+  g_assert_cmpstr(ibus_engine_desc_get_name(desc), ==, "en:/tmp/tst.kmx");
+  g_assert_nonnull(kb_data->engines_list->next);
+  g_assert_nonnull(kb_data->engines_list->next->data);
+  desc = (IBusEngineDesc*)kb_data->engines_list->next->data;
+  g_assert_cmpstr(ibus_engine_desc_get_name(desc), ==, "ldb:/tmp/tst.kmx");
+  g_assert_null(kb_data->engines_list->next->next);
+}
+
+void
+test_keyman_add_keyboard__one_language_plus_two_custom() {
+  // Initialize
+  gchar* languages[]            = {"en:English", NULL};
+  custom_keyboards              = g_hash_table_new_full(g_str_hash, g_str_equal, g_free, (GDestroyNotify)g_ptr_array_unref);
+  g_hash_table_insert(custom_keyboards, g_strdup("/tmp/tst.kmx"), g_ptr_array_new_full(1, g_free));
+  GPtrArray* language_keyboards = g_hash_table_lookup(custom_keyboards, "/tmp/tst.kmx");
+  cust_kbd* data                = g_new0(cust_kbd, 1);
+  data->kb_id_with_lang         = g_strdup("ldb:/tmp/tst.kmx");
+  data->lang                    = g_new0(kmp_language, 1);
+  data->lang->id                = g_strdup("ldb");
+  g_ptr_array_add(language_keyboards, data);
+  data                          = g_new0(cust_kbd, 1);
+  data->kb_id_with_lang         = g_strdup("lda:/tmp/tst.kmx");
+  data->lang                    = g_new0(kmp_language, 1);
+  data->lang->id                = g_strdup("lda");
+  g_ptr_array_add(language_keyboards, data);
+  g_autoptr(kmp_keyboard) keyboard     = _get_tst_kmp_keyboard("1.0", languages, "tst");
+  g_autoptr(add_keyboard_data) kb_data = _get_tst_keyboard_data();
+
+  // Execute
+  keyman_add_keyboard(keyboard, kb_data);
+
+  // Verify
+  GList* list = kb_data->engines_list;
+  g_assert_nonnull(list);
+  IBusEngineDesc* desc = (IBusEngineDesc*)list->data;
+  g_assert_cmpstr(ibus_engine_desc_get_name(desc), ==, "en:/tmp/tst.kmx");
+  g_assert_nonnull(list->next);
+  list = list->next;
+  g_assert_nonnull(list->data);
+  desc = (IBusEngineDesc*)list->data;
+  g_assert_cmpstr(ibus_engine_desc_get_name(desc), ==, "ldb:/tmp/tst.kmx");
+  g_assert_nonnull(list->next);
+  list = list->next;
+  g_assert_nonnull(list->data);
+  desc = (IBusEngineDesc*)list->data;
+  g_assert_cmpstr(ibus_engine_desc_get_name(desc), ==, "lda:/tmp/tst.kmx");
+  g_assert_null(list->next);
+}
+
+void
 test_keyman_add_keyboard__prev_engine_adding_same_version() {
   // Initialize
-  gchar* languages[]         = {"en:English", NULL};
-  g_autoptr(kmp_keyboard) keyboard     = _get_tst_kmp_keyboard("1.0", languages);
+  gchar* languages[] = {"en:English", NULL};
+  custom_keyboards                     = g_hash_table_new_full(g_str_hash, g_str_equal, g_free, (GDestroyNotify)g_ptr_array_unref);
+  g_autoptr(kmp_keyboard) keyboard     = _get_tst_kmp_keyboard("1.0", languages, "tst");
   g_autoptr(add_keyboard_data) kb_data = _get_tst_keyboard_data();
   IBusEngineDesc* desc = ibus_keyman_engine_desc_new("en:/usr/share/keyman/tst.kmx", "Testing", NULL, NULL, "en", NULL, NULL, "", "us", "1.0");
   kb_data->engines_list = g_list_append(kb_data->engines_list, desc);
@@ -426,8 +784,9 @@ test_keyman_add_keyboard__prev_engine_adding_same_version() {
 void
 test_keyman_add_keyboard__prev_engine_adding_newer_version() {
   // Initialize
-  gchar* languages[]         = {"en:English", "fr:French", NULL};  // New version adds French
-  g_autoptr(kmp_keyboard) keyboard     = _get_tst_kmp_keyboard("1.1", languages);
+  gchar* languages[] = {"en:English", "fr:French", NULL};  // New version adds French
+  custom_keyboards                     = g_hash_table_new_full(g_str_hash, g_str_equal, g_free, (GDestroyNotify)g_ptr_array_unref);
+  g_autoptr(kmp_keyboard) keyboard     = _get_tst_kmp_keyboard("1.1", languages, "tst");
   g_autoptr(add_keyboard_data) kb_data = _get_tst_keyboard_data();
   IBusEngineDesc* desc =
       ibus_keyman_engine_desc_new("en:/usr/share/keyman/tst.kmx", "Testing", NULL, NULL, "en", NULL, NULL, "", "us", "1.0");
@@ -457,8 +816,9 @@ test_keyman_add_keyboard__prev_engine_adding_newer_version_9593() {
   // the list.
 
   // Initialize
-  gchar* languages[]         = {"en:English", "fr:French", NULL};  // New version adds French
-  g_autoptr(kmp_keyboard) keyboard     = _get_tst_kmp_keyboard("1.10", languages);
+  gchar* languages[] = {"en:English", "fr:French", NULL};  // New version adds French
+  custom_keyboards                     = g_hash_table_new_full(g_str_hash, g_str_equal, g_free, (GDestroyNotify)g_ptr_array_unref);
+  g_autoptr(kmp_keyboard) keyboard     = _get_tst_kmp_keyboard("1.10", languages, "tst");
   g_autoptr(add_keyboard_data) kb_data = _get_tst_keyboard_data();
   IBusEngineDesc* desc =
       ibus_keyman_engine_desc_new("en:/usr/share/keyman/tst.kmx", "Testing", NULL, NULL, "en", NULL, NULL, "", "us", "1.9");
@@ -485,8 +845,9 @@ test_keyman_add_keyboard__prev_engine_adding_newer_version_9593() {
 void
 test_keyman_add_keyboard__prev_engine_adding_older_version() {
   // Initialize
-  gchar* languages[]         = {"en:English", "fr:French", NULL};  // Old version has additional French
-  g_autoptr(kmp_keyboard) keyboard     = _get_tst_kmp_keyboard("0.9", languages);
+  gchar* languages[] = {"en:English", "fr:French", NULL};  // Old version has additional French
+  custom_keyboards                     = g_hash_table_new_full(g_str_hash, g_str_equal, g_free, (GDestroyNotify)g_ptr_array_unref);
+  g_autoptr(kmp_keyboard) keyboard     = _get_tst_kmp_keyboard("0.9", languages, "tst");
   g_autoptr(add_keyboard_data) kb_data = _get_tst_keyboard_data();
   IBusEngineDesc* desc =
       ibus_keyman_engine_desc_new("en:/usr/share/keyman/tst.kmx", "Testing", NULL, NULL, "en", NULL, NULL, "", "us", "1.0");
@@ -621,6 +982,46 @@ test_keyman_add_keyboards_from_dir__prev_keyboards() {
   g_assert_cmpstr(ibus_engine_desc_get_name(desc), ==, expected_name);
 }
 
+void
+test_keyman_add_keyboards_from_dir__one_language_plus_two_different_custom() {
+  // Initialize
+  g_autoptr(GList) keyboards = NULL;
+  g_autoptr(gchar) kmp_dir   = g_dir_make_tmp(NULL, NULL);
+  copy_test_data(kmp_dir, "kmp1.json");
+
+  custom_keyboards = g_hash_table_new_full(g_str_hash, g_str_equal, g_free, (GDestroyNotify)g_ptr_array_unref);
+  gchar* kmx_path  = g_strdup_printf("%s/test1.kmx", kmp_dir);
+  g_hash_table_insert(custom_keyboards, g_strdup(kmx_path), g_ptr_array_new_full(1, g_free));
+  GPtrArray* language_keyboards = g_hash_table_lookup(custom_keyboards, kmx_path);
+  cust_kbd* data                = g_new0(cust_kbd, 1);
+  data->kb_id_with_lang         = g_strdup_printf("ldb:%s", kmx_path);
+  data->lang                    = g_new0(kmp_language, 1);
+  data->lang->id                = g_strdup("ldb");
+  g_ptr_array_add(language_keyboards, data);
+
+  // This custom keyboard will be ignored since we don't have this keyboard installed
+  g_hash_table_insert(custom_keyboards, g_strdup("/tmp/foo.kmx"), g_ptr_array_new_full(1, g_free));
+  language_keyboards    = g_hash_table_lookup(custom_keyboards, "/tmp/foo.kmx");
+  data                  = g_new0(cust_kbd, 1);
+  data->kb_id_with_lang = g_strdup("lda:/tmp/foo.kmx");
+  data->lang            = g_new0(kmp_language, 1);
+  data->lang->id        = g_strdup("foo");
+  g_ptr_array_add(language_keyboards, data);
+
+  // Execute
+  keyman_add_keyboards_from_dir(kmp_dir, &keyboards);
+
+  // Verify
+  g_assert_cmpint(g_list_length(keyboards), ==, 2);
+
+  IBusEngineDesc* desc             = IBUS_ENGINE_DESC(keyboards->data);
+  g_autofree gchar* expected_name = g_strdup_printf("bza:%s/test1.kmx", kmp_dir);
+  g_assert_cmpstr(ibus_engine_desc_get_name(desc), ==, expected_name);
+  desc                            = IBUS_ENGINE_DESC(keyboards->next->data);
+  expected_name                   = g_strdup_printf("ldb:%s/test1.kmx", kmp_dir);
+  g_assert_cmpstr(ibus_engine_desc_get_name(desc), ==, expected_name);
+}
+
 //----------------------------------------------------------------------------------------------
 void
 print_usage() {
@@ -655,6 +1056,24 @@ int main(int argc, char* argv[]) {
   g_test_add_func("/keymanutil/keyman_put_options_todconf/other_keys", test_keyman_put_options_todconf__other_keys);
   g_test_add_func("/keymanutil/keyman_put_options_todconf/existing_key", test_keyman_put_options_todconf__existing_key);
 
+  g_test_add_func("/keymanutil/keyman_get_custom_keyboard_dictionary/values", test_keyman_get_custom_keyboard_dictionary__values);
+  g_test_add_func("/keymanutil/keyman_get_custom_keyboard_dictionary/invalid", test_keyman_get_custom_keyboard_dictionary__invalid);
+  g_test_add_func("/keymanutil/keyman_get_custom_keyboard_dictionary/empty", test_keyman_get_custom_keyboard_dictionary__empty);
+  g_test_add_func("/keymanutil/keyman_get_custom_keyboard_dictionary/null", test_keyman_get_custom_keyboard_dictionary__null);
+
+  g_test_add_func("/keymanutil/keyman_set_custom_keyboards/new_key", test_keyman_set_custom_keyboards__new_key);
+  g_test_add_func("/keymanutil/keyman_set_custom_keyboards/overwrite_key", test_keyman_set_custom_keyboards__overwrite_key);
+  g_test_add_func("/keymanutil/keyman_set_custom_keyboards/delete_key_NULL", test_keyman_set_custom_keyboards__delete_key_NULL);
+  g_test_add_func(
+      "/keymanutil/keyman_set_custom_keyboards/delete_key_empty_array",
+      test_keyman_set_custom_keyboards__delete_key_empty_array);
+  g_test_add_func("/keymanutil/keyman_set_custom_keyboards/invalid_values", test_keyman_set_custom_keyboards__invalid_values);
+
+  g_test_add_func("/keymanutil/keyman_get_custom_keyboards/value", test_keyman_get_custom_keyboards__value);
+  g_test_add_func("/keymanutil/keyman_get_custom_keyboards/invalid_values", test_keyman_get_custom_keyboards__invalid_values);
+  g_test_add_func("/keymanutil/keyman_get_custom_keyboards/no_key", test_keyman_get_custom_keyboards__no_key);
+  g_test_add_func("/keymanutil/keyman_get_custom_keyboards/empty", test_keyman_get_custom_keyboards__empty);
+
   g_test_add_func("/keymanutil/ibus_keyman_engine_desc_new/all_set", test_ibus_keyman_engine_desc_new__all_set);
   g_test_add_func("/keymanutil/ibus_keyman_engine_desc_new/only_description", test_ibus_keyman_engine_desc_new__only_description);
   g_test_add_func("/keymanutil/ibus_keyman_engine_desc_new/only_copyright", test_ibus_keyman_engine_desc_new__only_copyright);
@@ -672,6 +1091,8 @@ int main(int argc, char* argv[]) {
   g_test_add_func("/keymanutil/keyman_add_keyboard/no_language", test_keyman_add_keyboard__no_language);
   g_test_add_func("/keymanutil/keyman_add_keyboard/one_language", test_keyman_add_keyboard__one_language);
   g_test_add_func("/keymanutil/keyman_add_keyboard/two_languages", test_keyman_add_keyboard__two_languages);
+  g_test_add_func("/keymanutil/keyman_add_keyboard/one_language_plus_custom", test_keyman_add_keyboard__one_language_plus_custom);
+  g_test_add_func("/keymanutil/keyman_add_keyboard/one_language_plus_two_custom", test_keyman_add_keyboard__one_language_plus_two_custom);
   g_test_add_func(
       "/keymanutil/keyman_add_keyboard/prev_engine_adding_same_version",
       test_keyman_add_keyboard__prev_engine_adding_same_version);
@@ -690,6 +1111,9 @@ int main(int argc, char* argv[]) {
   g_test_add_func("/keymanutil/keyman_add_keyboards_from_dir/one_dir", test_keyman_add_keyboards_from_dir__one_dir);
   g_test_add_func("/keymanutil/keyman_add_keyboards_from_dir/two_langs", test_keyman_add_keyboards_from_dir__two_langs);
   g_test_add_func("/keymanutil/keyman_add_keyboards_from_dir/prev_keyboards", test_keyman_add_keyboards_from_dir__prev_keyboards);
+  g_test_add_func(
+      "/keymanutil/keyman_add_keyboards_from_dir/one_language_plus_two_different_custom",
+      test_keyman_add_keyboards_from_dir__one_language_plus_two_different_custom);
 
   // Run tests
   int retVal = g_test_run();
