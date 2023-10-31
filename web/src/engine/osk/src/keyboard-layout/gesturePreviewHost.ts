@@ -20,8 +20,7 @@ export class GesturePreviewHost {
   private readonly previewImgContainer: HTMLDivElement;
 
   private flickPreviews = new Map<string, HTMLDivElement>;
-  private lpPreview: HTMLDivElement = null;
-  private readonly mtStyling: boolean;
+  private hintLabel: HTMLDivElement = null;
 
   private onCancel: () => void;
 
@@ -30,10 +29,6 @@ export class GesturePreviewHost {
   }
 
   constructor(key: KeyElement, isPhone: boolean) {
-    // Temporary "force all to be on" switch.  Is within constructor so it can
-    // update during a demo.
-    const DEMO_ALL = false || window['GESTURE_DEMO'];
-
     const keySpec = key.key.spec;
 
     const base = this.div = document.createElement('div');
@@ -44,9 +39,6 @@ export class GesturePreviewHost {
 
     // We want this to be distinct from the base element so that we can scroll it;
     // this matters greatly for doing flick things.
-    //
-    // Note:  should probably put multitap style & longpress subkey bit one layer up;
-    // it looks REALLY odd when the multitap style scrolls.
     const previewImgContainer = this.previewImgContainer = document.createElement('div');
     this.previewImgContainer.id = 'kmw-preview-img-container';
 
@@ -58,19 +50,13 @@ export class GesturePreviewHost {
     // Re-use the text value from the base key's label.
     label.textContent = key.key.label.textContent;
 
-    this.mtStyling = DEMO_ALL || keySpec.multitap;
-    if(this.mtStyling) {
-      // Shifts the layout to provide a rough multitap visualization
-      base.classList.add('kmw-multitap-preview'); // to indicate multitap presence.
-    }
-
     this.div.appendChild(this.previewImgContainer);
 
-    if(DEMO_ALL || keySpec.flick) {
+    if(keySpec.flick) {
       const flickSpec = keySpec.flick || {};
 
       for(const dir of FLICK_DIRS) {
-        if(DEMO_ALL || (flickSpec[dir])) {
+        if(flickSpec[dir]) {
           const index = FLICK_DIRS.indexOf(dir);
           const isDiag = (index % 2) == 1;
 
@@ -122,24 +108,20 @@ export class GesturePreviewHost {
       }
     }
 
-    // const neFlick = DEMO_ALL || keySpec.flick && keySpec.flick.ne;
-    if(DEMO_ALL || keySpec.sk) {
-      const skIcon = this.lpPreview = document.createElement('div');
-      skIcon.className='kmw-key-popup-icon';
-      skIcon.textContent = '\u2022';
-      skIcon.style.fontWeight='bold';
+    // const hintLabel = this.hintLabel = document.createElement('div');
+    // hintLabel.className='kmw-key-popup-icon';
+    // hintLabel.textContent = keySpec == keySpec.hintSrc ? keySpec.hint : keySpec.hintSrc?.text;
+    // hintLabel.style.fontWeight= hintLabel.textContent == '\u2022' ? 'bold' : '';
 
-      // Default positioning puts it far too close to the flick-preview bit.
-      let yAdjustment = DEMO_ALL || keySpec.multitap ? 1 : 0;
-      yAdjustment += isPhone ? 2 : 0;
-      skIcon.style.marginTop = `-${yAdjustment}px`;
+    // // Default positioning puts it far too close to the flick-preview bit.
+    // let yAdjustment = 0;
+    // hintLabel.style.marginTop = `-${yAdjustment}px`;
 
-      // b/c multitap's border forces position shifting
-      let xAdjustment = DEMO_ALL || keySpec.multitap ? 3 : 0;
-      skIcon.style.marginRight = `-${xAdjustment}px`;
+    // // b/c multitap's border forces position shifting
+    // let xAdjustment = 0;
+    // hintLabel.style.marginRight = `-${xAdjustment}px`;
 
-      base.appendChild(skIcon);
-    }
+    // base.appendChild(hintLabel);
   }
 
   public cancel() {
@@ -152,25 +134,18 @@ export class GesturePreviewHost {
   }
 
   // These may not exist like this longterm.
-  private clearMultitap() {
-    if(this.mtStyling) {
-      this.div.classList.add('multitap-clear');
-    }
-  }
-
   private clearFlick() {
     for(const pair of this.flickPreviews.entries()) {
       pair[1].classList.add('flick-clear');
     }
   }
 
-  private clearLongpress() {
-    this.lpPreview?.classList.add('longpress-clear');
+  private clearHint() {
+    this.hintLabel?.classList.add('hint-clear');
   }
 
-  private clearAll() {
-    this.clearMultitap();
+  public clearAll() {
     this.clearFlick();
-    this.clearLongpress();
+    this.clearHint();
   }
 }

@@ -386,26 +386,7 @@ body div.kmw-key-shift-on span.kmw-key-text {font-family:SpecialOSK !important;f
   transition: 0.5s linear border;
 }
 
-#kmw-gesture-preview.kmw-multitap-preview {
-  position: absolute;
-  margin-top: 1px;
-  margin-left: 1px;
-  margin-bottom: 1px;
-  margin-right: 1px;
-  border-right: 2px darkgray dotted;
-  border-bottom: 2px darkgray dotted;
-}
-
-#kmw-gesture-preview.kmw-multitap-preview.multitap-clear {
-  /* Because on some devices, 1px border may not equal 1px positioning!
-   * Use of full transparency removes the (visual) border but keeps
-   * altered positioning intact, avoiding any animation thereof.
-   */
-  border-right: 2px transparent dotted;
-  border-bottom: 2px transparent dotted;
-}
-
-.kmw-key-popup-icon.longpress-clear {
+.kmw-key-popup-icon.hint-clear {
   color: transparent;
   transition: 0.5s linear all;
 }
