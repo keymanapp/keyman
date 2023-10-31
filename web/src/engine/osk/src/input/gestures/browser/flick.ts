@@ -102,7 +102,6 @@ export default class Flick implements GestureHandler {
     this.baseKeyDistances = vkbd.getSimpleTapCorrectionDistances(sequence.stageReports[0].sources[0].path.stats.initialSample, this.baseSpec)
     const baseSource = sequence.stageReports[0].sources[0].baseSource;
 
-    const baseSource = sequence.stageReports[0].sources[0].baseSource;
     this.sequence.on('stage', (result) => {
       const pathStats = baseSource.path.stats;
       this.computedFlickDistribution = this.flickDistribution(pathStats);
