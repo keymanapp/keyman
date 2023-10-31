@@ -122,7 +122,9 @@ export default class Flick implements GestureHandler {
     });
 
     const baseCoord = baseSource.path.coords[0];
-    baseSource.path.on('step', buildFlickScroller(baseSource, baseCoord, previewHost, this.gestureParams));
+    const flickScroller = buildFlickScroller(baseSource, baseCoord, previewHost, this.gestureParams);
+    flickScroller(baseSource.currentSample);
+    baseSource.path.on('step', flickScroller);
 
 
     // Be sure to extend roaming bounds a bit more than usual for flicks, as they can be quick motions.

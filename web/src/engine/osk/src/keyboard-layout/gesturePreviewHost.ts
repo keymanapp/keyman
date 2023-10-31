@@ -119,14 +119,11 @@ export class GesturePreviewHost {
   }
 
   // These may not exist like this longterm.
-  private clearFlick() {
+  public clearFlick() {
     this.previewImgContainer.style.marginTop = '0px';
     this.previewImgContainer.style.marginLeft = '0px';
-    // animate the return slightly?
 
-    for(const pair of this.flickPreviews.entries()) {
-      pair[1].classList.add('flick-clear');
-    }
+    this.previewImgContainer.classList.add('flick-clear');
   }
 
   private clearHint() {

@@ -497,6 +497,9 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
         }).find((obj) => !!obj);
 
         let handlers: GestureHandler[] = gestureHandlerMap.get(gestureSequence);
+        if(!handlers && existingPreviewHost && !gestureStage.matchedId.includes('flick')) {
+          existingPreviewHost.clearFlick();
+        }
 
         // Disable roaming-touch highlighting (and current highlighting) for all
         // touchpoints included in a gesture, even newly-included ones as they occur.
