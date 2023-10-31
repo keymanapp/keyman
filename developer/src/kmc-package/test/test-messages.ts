@@ -226,4 +226,11 @@ describe('CompilerMessages', function () {
       CompilerMessages.HINT_PackageContainsSourceFile);
   });
 
+  // ERROR_InvalidPackageFile
+
+  it('should generate ERROR_InvalidPackageFile if package source file contains invalid XML', async function() {
+    testForMessage(this, ['invalid', 'error_invalid_package_file.kps'],
+      CompilerMessages.ERROR_InvalidPackageFile);
+  });
+
 });

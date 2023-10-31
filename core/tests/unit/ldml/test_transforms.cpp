@@ -28,10 +28,10 @@
 // needed for streaming operators
 #include "utfcodec.hpp"
 
-using namespace km::kbp::ldml;
-using namespace km::kbp::kmx;
+using namespace km::core::ldml;
+using namespace km::core::kmx;
 
-// using km::kbp::kmx::u16cmp;
+// using km::core::kmx::u16cmp;
 
 int
 test_transforms() {

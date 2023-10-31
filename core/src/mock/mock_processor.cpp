@@ -70,9 +70,9 @@ namespace
 }
 
 namespace km {
-  namespace kbp
+  namespace core
   {
-    mock_processor::mock_processor(kbp::path const & path)
+    mock_processor::mock_processor(core::path const & path)
     : abstract_processor(
         keyboard_attributes(path.stem(), u"3.145", path.parent(), {
           option{KM_CORE_OPT_KEYBOARD, u"__test_point", u"not tiggered"},
@@ -228,5 +228,5 @@ namespace km {
     km_core_status mock_processor::validate() const { return KM_CORE_STATUS_OK; }
 
     km_core_status null_processor::validate() const { return KM_CORE_STATUS_INVALID_ARGUMENT; }
-  } // namespace kbp
+  } // namespace core
 } // namespace km

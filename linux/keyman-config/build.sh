@@ -16,7 +16,9 @@ builder_describe \
   "test" \
   "install                   install artifacts" \
   "uninstall                 uninstall artifacts" \
-  "--no-integration          don't run integration tests"
+  "--no-integration          don't run integration tests" \
+  "--report                  create coverage report" \
+  "--coverage                capture test coverage"
 
 builder_parse "$@"
 
@@ -44,7 +46,7 @@ execute_with_temp_schema() {
   TEMP_DATA_DIR=$(mktemp -d)
   SCHEMA_DIR="${TEMP_DATA_DIR}/glib-2.0/schemas"
   export XDG_DATA_DIRS="${TEMP_DATA_DIR}":${XDG_DATA_DIRS-}
-  export GSETTINGS_SCHEMA_DIR="${SCHEMA_DIR}"
+  export GSETTINGS_SCHEMA_DIR="${SCHEMA_DIR}:/usr/share/glib-2.0/schemas/:${GSETTINGS_SCHEMA_DIR-}"
   mkdir -p "${SCHEMA_DIR}"
   cp resources/com.keyman.gschema.xml "${SCHEMA_DIR}"/
   glib-compile-schemas "${SCHEMA_DIR}"
@@ -87,7 +89,19 @@ build_action() {
 }
 
 test_action() {
-  execute_with_temp_schema ./run-tests.sh
+  local options
+
+  if builder_has_option --coverage; then
+    options="--coverage"
+  else
+    options=""
+  fi
+  execute_with_temp_schema ./run-tests.sh "${options}"
+
+  if builder_has_option --report; then
+    builder_echo "Creating coverage report"
+    python3 -m coverage html --directory="$THIS_SCRIPT_PATH/build/coveragereport/" --data-file=build/.coverage
+  fi
 }
 
 install_action() {

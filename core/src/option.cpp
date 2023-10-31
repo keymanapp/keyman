@@ -12,7 +12,7 @@
 #include "processor.hpp"
 
 
-using namespace km::kbp;
+using namespace km::core;
 
 namespace
 {
@@ -44,7 +44,7 @@ option::option(km_core_option_scope s, char16_t const *k, char16_t const *v)
 }
 
 // TODO: Relocate this and fix it
-json & km::kbp::operator << (json &j, abstract_processor const &)
+json & km::core::operator << (json &j, abstract_processor const &)
 {
   j << json::object;
   // auto n = 0;

@@ -105,7 +105,7 @@ export class TouchEventEngine<HoveredItemType, StateToken = any> extends InputEv
     const newTouches = touchListToArray(event.changedTouches);
     // Maintain all touches in the `.touches` array that are NOT marked as `.changedTouches` (and therefore, new)
     this.maintainTouchpointsWithIds(allTouches
-      .filter((touch) => (newTouches.indexOf(touch) == -1))
+      .filter((touch1) => newTouches.findIndex(touch2 => touch1.identifier == touch2.identifier) == -1)
       .map((touch) => touch.identifier)
     );
 

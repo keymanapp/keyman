@@ -23,7 +23,7 @@
         VALUE "InternalName", "Keyman Core"
         VALUE "LegalCopyright", "© SIL International"
         VALUE "LegalTrademarks", ""
-        VALUE "OriginalFilename", "KMNKBP0-0.DLL"
+        VALUE "OriginalFilename", "KEYMANCORE1.DLL"
         VALUE "ProductName", "Keyman Core"
         VALUE "ProductVersion", KM_CORE_VERSION_STRING
         VALUE "Comments", ""

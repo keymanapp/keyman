@@ -107,7 +107,7 @@ KmxTestSource::is_token(const std::string token, std::string &line) {
 
 int
 KmxTestSource::load_source(
-    const km::kbp::path &path,
+    const km::core::path &path,
     std::string &keys,
     std::u16string &expected,
     std::u16string &context,
@@ -210,15 +210,15 @@ key_event
 KmxTestSource::char_to_event(char ch) {
   assert(ch >= 32);
   return {
-      km::kbp::kmx::s_char_to_vkey[(int)ch - 32].vk,
-      (uint16_t)(km::kbp::kmx::s_char_to_vkey[(int)ch - 32].shifted ? KM_CORE_MODIFIER_SHIFT : 0)};
+      km::core::kmx::s_char_to_vkey[(int)ch - 32].vk,
+      (uint16_t)(km::core::kmx::s_char_to_vkey[(int)ch - 32].shifted ? KM_CORE_MODIFIER_SHIFT : 0)};
 }
 
 uint16_t
 KmxTestSource::get_modifier(std::string const m) {
-  for (int i = 0; km::kbp::kmx::s_modifier_names[i].name; i++) {
-    if (m == km::kbp::kmx::s_modifier_names[i].name) {
-      return km::kbp::kmx::s_modifier_names[i].modifier;
+  for (int i = 0; km::core::kmx::s_modifier_names[i].name; i++) {
+    if (m == km::core::kmx::s_modifier_names[i].name) {
+      return km::core::kmx::s_modifier_names[i].modifier;
     }
   }
   return 0;
@@ -227,7 +227,7 @@ KmxTestSource::get_modifier(std::string const m) {
 km_core_virtual_key
 KmxTestSource::get_vk(std::string const &vk) {
   for (int i = 1; i < 256; i++) {
-    if (vk == km::kbp::kmx::s_key_names[i]) {
+    if (vk == km::core::kmx::s_key_names[i]) {
       return i;
     }
   }

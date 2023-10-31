@@ -376,22 +376,10 @@ export class MatcherSelector<Type, StateToken = any> extends EventEmitter<EventM
     return async (result: MatchResult<Type>) => {
       // Note:  is only called by GestureMatcher Promises that are resolving.
 
-      /*
-       * If we already had a gesture stage match, this will have already been fulfilled;
-       * bypass all match-handling.  Capturing `matchSynchronization` in a closure in this
-       * manner is important to ensure that the returned handler is "locked" to the
-       * currently-processing gesture stage.
-       */
-      for(let synchronizer of matchSynchronizers) {
-        if(synchronizer.isFulfilled) {
-          return;
-        }
-      }
+      // Do not bypass match handling just because a synchronization promise is fulfilled.
+      // If a source was force-cancelled, cascading to a call of this handler, we still
+      // need to perform internal state cleanup.
 
-      /* If cancellation was requested but not pre-filtered by the synchronizer setup, replace
-       * the result object.  The matcher's Promise may have resolved simultaneously with the
-       * winner but 'lost', a scenario that may require careful handling to clean up.
-       */
       if(matcher.isCancelled) {
         result = {
           matched: false,
@@ -420,11 +408,6 @@ export class MatcherSelector<Type, StateToken = any> extends EventEmitter<EventM
       if(matcherIndex == -1) {
         // It's already been handled; do not re-attempt.
         return;
-      }
-
-      if(matcher.isCancelled) {
-        // Fortunately, the rest of the code will help us recover from the state.
-        console.warn("Unexpected state:  a cancelled GestureMatcher was still listed as a possibility");
       }
 
       this.potentialMatchers.splice(matcherIndex, 1);
@@ -531,14 +514,6 @@ export class MatcherSelector<Type, StateToken = any> extends EventEmitter<EventM
 
           /*
            * Fulfills the contract set by `matchGesture`.
-           *
-           * Also, fulfilling the ManagedPromise acts as a synchronizer, partially facilitating the
-           * guarantee at the start of this closure.  It's set synchronously, so other gesture-matchers
-           * that call into this method will know that a match has already fulfilled for the matched
-           * source(s).  Any further matchers will be silently ignored, effectively cancelling them.
-           * However, this fails to handle the case where two separate calls to matcherSelectionFilter
-           * occur for the same matcher due to one source being added at a later point in time;
-           * this is what the `cancel`
            */
           tracker.matchPromise.resolve({matcher, result});
         }
