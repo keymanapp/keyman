@@ -27,6 +27,20 @@ typedef std::vector<KMX_DWORD> v_dw_1D;
 typedef std::vector<std::vector<KMX_DWORD> > v_dw_2D;
 typedef std::vector<std::vector<std::vector<KMX_DWORD> > > v_dw_3D;
 
+
+enum ShiftState {
+    Base = 0,                           // 0
+    Shft = 1,                           // 1
+    Ctrl = 2,                           // 2
+    ShftCtrl = Shft | Ctrl,             // 3
+    Menu = 4,                           // 4 -- NOT USED
+    ShftMenu = Shft | Menu,             // 5 -- NOT USED
+    MenuCtrl = Menu | Ctrl,             // 6
+    ShftMenuCtrl = Shft | Menu | Ctrl,  // 7
+    Xxxx = 8,                           // 8
+    ShftXxxx = Shft | Xxxx,             // 9
+};
+
 // Map of all US English virtual key codes that we can translate
 //
 const KMX_DWORD KMX_VKMap[] = {
@@ -202,7 +216,7 @@ const int Lin_KM__map_arr[70]={
 
 const int Lin_KM__map(int i);
 const int Lin_KM__map(int i, v_dw_3D &All_Vector);
-
+std::wstring  PrintKeymapForCodeReturnKeySym(GdkKeymap *keymap,guint keycode, ShiftState ss, int caps  );
 // this is what we return when we find an invalid character
 //_S2 Which character do we use in that case?  0 or FFFF or 32 or ??
 static KMX_DWORD returnIfCharInvalid = 32;

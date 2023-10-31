@@ -27,19 +27,6 @@
 #include "mc_kmxfile.h"
 #include "keymap.h"
 
-enum ShiftState {
-    Base = 0,                           // 0
-    Shft = 1,                           // 1
-    Ctrl = 2,                           // 2
-    ShftCtrl = Shft | Ctrl,             // 3
-    Menu = 4,                           // 4 -- NOT USED
-    ShftMenu = Shft | Menu,             // 5 -- NOT USED
-    MenuCtrl = Menu | Ctrl,             // 6
-    ShftMenuCtrl = Shft | Menu | Ctrl,  // 7
-    Xxxx = 8,                           // 8
-    ShftXxxx = Shft | Xxxx,             // 9
-};
-
 const int KMX_ShiftStateMap[] = {
   ISVIRTUALKEY,
   ISVIRTUALKEY | K_SHIFTFLAG,
@@ -642,7 +629,7 @@ std::wstring  get_VirtualKey_Other_from_iKey(KMX_DWORD iKey, ShiftState &ss, int
   return L"";
 }
 
-bool KMX_ImportRules(KMX_WCHAR *kbid, LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector,std::vector<KMX_DeadkeyMapping> *FDeadkeys, KMX_BOOL bDeadkeyConversion) {   // I4353   // I4552
+bool KMX_ImportRules(KMX_WCHAR *kbid, LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, GdkKeymap **keymap, std::vector<KMX_DeadkeyMapping> *FDeadkeys, KMX_BOOL bDeadkeyConversion) {   // I4353   // I4552
   KMX_Loader loader;
   const size_t BUF_sz= 256;
 
@@ -748,7 +735,14 @@ bool KMX_ImportRules(KMX_WCHAR *kbid, LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector,std
     //wprintf(L"this was ss %i - ikey %i\n",ss ,iKey);
           //_S2 TODO
           //_S2 get char  - do I need rc ?? ( was rc = ToUnicodeEx...)
-          std::wstring VK_Other = get_VirtualKey_Other_from_iKey(mapped_ikey, ss, caps, All_Vector);
+          std::wstring VK_Other_OLD = get_VirtualKey_Other_from_iKey(mapped_ikey, ss, caps, All_Vector);
+          std::wstring VK_Other= PrintKeymapForCodeReturnKeySym(  *keymap, mapped_ikey, ss, caps==0);
+
+
+          if ( VK_Other_OLD != VK_Other) {
+            if(VK_Other_OLD!=L"" )
+              wprintf(L"\nVK`s are different :-(  %s <--> %s  ",VK_Other_OLD.c_str() ,VK_Other.c_str());
+          }
 
           //std::wstring VK_Other = get_VirtualKey_Other_from_iKey(iKey, ss, caps, All_Vector);
           //wprintf(L"ikey : %i (mapped to %i ) SS (%i)  caps(%i) ----> returns  %s (%i)\n",          iKey, mapped_ikey , ss, caps, VK_Other.c_str(), (int) *( VK_Other.c_str()));
@@ -814,7 +808,6 @@ bool KMX_ImportRules(KMX_WCHAR *kbid, LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector,std
   //-------------------------------------------------------------
 
   int nDeadkey = 0;
-
   LPKMX_GROUP gp = new KMX_GROUP[kp->cxGroupArray+4];  // leave space for old
   memcpy(gp, kp->dpGroupArray, sizeof(KMX_GROUP) * kp->cxGroupArray);
 

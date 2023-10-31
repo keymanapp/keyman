@@ -2,27 +2,144 @@
 
 #include <xkbcommon/xkbcommon.h>
 
-/*
-static void PrintKeymapForCode(GdkKeymap *keymap, guint keycode)
-{
+std::wstring  PrintKeymapForCodeReturnKeySym(GdkKeymap *keymap,guint VK, ShiftState ss, int caps  ){
+ //GdkKeymap *keymap;
+  GdkModifierType consumed;
   GdkKeymapKey *maps;
+  GdkEventKey* event;
   guint *keyvals;
+  gint *n_entries;
+  gint count;
+  guint keycode;
+
+ GdkKeymapKey* keys;
+ gint n_keys;
+
+  gdk_keymap_get_entries_for_keyval(keymap, VK,&keys,&n_keys);
+
+  if( keys !=NULL) {
+    keycode = keys[n_keys-1].keycode;
+
+    for( int k=0; k< n_keys; k++) {
+      guint kc= keys[n_keys-1].keycode;
+    }
+  }
+
+  if (!gdk_keymap_get_entries_for_keycode(keymap, keycode, &maps, &keyvals, &count))
+    return L"1";
+
+
+  //unshifted
+  if (( ss == Base ) && ( caps == 0 )) {
+    GdkModifierType MOD_base = (GdkModifierType) ( ~GDK_MODIFIER_MASK );
+    gdk_keymap_translate_keyboard_state (keymap, keycode, MOD_base , 0, keyvals, NULL, NULL, & consumed);
+    return  std::wstring(1, (int) *keyvals);
+  }
+
+  //SHIFT+CAPS
+  else if ( ( ss == Shft ) && ( caps ==1 )) {
+    GdkModifierType MOD_ShiftCaps= (GdkModifierType) ((GDK_SHIFT_MASK | GDK_LOCK_MASK));
+    gdk_keymap_translate_keyboard_state (keymap, keycode, MOD_ShiftCaps , 0, keyvals, NULL, NULL, & consumed);
+    return  std::wstring(1, (int) *keyvals);
+
+  }
+
+  //Shift
+  else if (( ss == Shft ) && ( caps == 0 )) {
+    GdkModifierType MOD_Shift = (GdkModifierType) ( GDK_SHIFT_MASK );
+    gdk_keymap_translate_keyboard_state (keymap, keycode, MOD_Shift , 0, keyvals, NULL, NULL, & consumed);
+    return  std::wstring(1, (int) *keyvals);
+
+  }
+
+  //caps
+  else if (( ss == Base ) && ( caps == 1 )) {
+    GdkModifierType MOD_Caps = (GdkModifierType) ( GDK_LOCK_MASK );
+    gdk_keymap_translate_keyboard_state (keymap, keycode, MOD_Caps, 0, keyvals, NULL, NULL, & consumed);
+    return  std::wstring(1, (int) *keyvals);
+
+  }
+
+  /*//ALT-GR
+  else if {
+    GdkModifierType MOD_AltGr = (GdkModifierType) ( GDK_MOD5_MASK );
+    gdk_keymap_translate_keyboard_state (keymap, keycode, MOD_AltGr , 0, keyvals, NULL, NULL, & consumed);
+    return *keyvals;
+  }*/
+
+  else
+    return L"0";
+}
+
+static void PrintKeymapForCode(GdkKeymap *keymap, guint keycode) {
+  GdkModifierType consumed;
+  GdkKeymapKey *maps;
+  GdkEventKey* event;
+  guint *keyvals;
+  guint *keyvalsReturn;
+  gint *n_entries;
   gint count;
 
   if (!gdk_keymap_get_entries_for_keycode(keymap, keycode, &maps, &keyvals, &count))
     return;
-// group0 D, group1 fr, group2, group3 US,
+
   for (int i = 0; i < count; i++) {
     //if (maps[i].level > 0 || maps[i].group > 1)
      // continue;
     wprintf(L"    i=%d, keycode=%d, keyval=%d (%c), level=%d, group=%d\n",
     i, maps[i].keycode, keyvals[i], keyvals[i], maps[i].level, maps[i].group);
   }
-  //xkb_keymap_key_get_syms_by_level(keymap, keycode, )
+
+  for( int ii=10; ii<63; ii++) {
+
+    //unshifted
+    GdkModifierType A1 = (GdkModifierType) (event->state &  GDK_MODIFIER_MASK);
+    gdk_keymap_translate_keyboard_state (keymap, ii, (A1 ) , 0,keyvalsReturn, NULL, NULL, & consumed);
+          wprintf(L"\n ngdk_keymap_translate_keyboard_state: \t keycodeS=%u , n_entries %i\tUNSH: %s(%i)\t", ii, *n_entries, keyvalsReturn, *keyvalsReturn);
+
+    //caps
+    gdk_keymap_translate_keyboard_state (keymap, ii, GDK_LOCK_MASK , 0,keyvalsReturn, NULL, NULL, & consumed);
+          wprintf(L" CAPS: %s(%i)\t", keyvalsReturn, *keyvalsReturn);
+
+    //Shift
+    gdk_keymap_translate_keyboard_state (keymap, ii, GDK_SHIFT_MASK , 0,keyvalsReturn, NULL, NULL, & consumed);
+          wprintf(L" SH: %s(%i)\t", keyvalsReturn, *keyvalsReturn);
+
+    //SHIFT+CAPS
+    GdkModifierType A4 = (GdkModifierType) (event->state |  (GDK_SHIFT_MASK | GDK_LOCK_MASK));
+    gdk_keymap_translate_keyboard_state (keymap, ii,  A4 , 0,keyvalsReturn, NULL, NULL, & consumed);
+          wprintf(L" SH+CAPS: %s(%i)  \t", keyvalsReturn, *keyvalsReturn);
+
+    //ALT-GR
+    gdk_keymap_translate_keyboard_state (keymap, ii,  GDK_MOD5_MASK , 0,keyvalsReturn, NULL, NULL, & consumed);
+        //wprintf(L"\n NEU1 ngdk_keymap_translate_keyboard_state: \t hardware_keycodeS=%u, keyvalsReturn: %s\n", 52, keyvalsReturn);
+          wprintf(L" ALTGR: %s(%i)", keyvalsReturn, *keyvalsReturn);
+
+    //??
+    gdk_keymap_translate_keyboard_state (keymap, ii, GDK_MOD1_MASK , 0,keyvalsReturn, NULL, NULL, & consumed);
+        // wprintf(L" NEU1 ngdk_keymap_translate_keyboard_state: \t hardware_keycodeS=%u, keyvalsReturn: %s\n", 52, keyvalsReturn);
+          //wprintf(L"   A5: %s(%i)", keyvalsReturn, *keyvalsReturn);
+
+    //??
+    gdk_keymap_translate_keyboard_state (keymap, ii, GDK_MOD2_MASK , 0,keyvalsReturn, NULL, NULL, & consumed);
+          //wprintf(L" NEU1 ngdk_keymap_translate_keyboard_state: \t hardware_keycodeS=%u, keyvalsReturn: %s\n", 52, keyvalsReturn);
+          //wprintf(L"   A6: %s(%i)", keyvalsReturn, *keyvalsReturn);
+
+    //??
+    gdk_keymap_translate_keyboard_state (keymap, ii, GDK_MOD3_MASK , 0,keyvalsReturn, NULL, NULL, & consumed);
+        // wprintf(L" NEU1 ngdk_keymap_translate_keyboard_state: \t hardware_keycodeS=%u, keyvalsReturn: %s\n", 52, keyvalsReturn);
+        // wprintf(L"   A7: %s(%i)", keyvalsReturn, *keyvalsReturn);
+
+    //??
+    GdkModifierType A8 = (GdkModifierType) (event->state & ~consumed & GDK_MODIFIER_MASK);
+    gdk_keymap_translate_keyboard_state (keymap, ii, GDK_MOD4_MASK , 0,keyvalsReturn, NULL, NULL, & consumed);
+          //wprintf(L" NEU1 ngdk_keymap_translate_keyboard_state: \t hardware_keycodeS=%u, keyvalsReturn: %s\n", 52, keyvalsReturn);
+          //wprintf(L"   A8: %s(%i)", keyvalsReturn, *keyvalsReturn);
+  }
+
   g_free(keyvals);
   g_free(maps);
 }
-*/
 
 int write_US_ToVector( v_dw_3D &vec,std::string language, const char* text) {
 
@@ -323,8 +440,7 @@ v_dw_2D create_empty_2D( int dim_rows,int dim_shifts) {
 KMX_DWORD writeKeyvalsFromKeymap(GdkKeymap *keymap, guint keycode, int shift_state_pos);
 int append_other_ToVector(v_dw_3D &All_Vector,GdkKeymap * keymap) {
 
-
-// _S2 can go later
+ // _S2 can go later
  //PrintKeymapForCode(keymap, 52);
  //Try_EberhardsXKB();
 
@@ -337,7 +453,6 @@ int append_other_ToVector(v_dw_3D &All_Vector,GdkKeymap * keymap) {
     wprintf(L"ERROR: can't create empty 2D-Vector\n");
     return 1;
   }
-
   All_Vector.push_back(Other_Vector2D);
   wprintf(L"   +++++++ dimensions of Vector after append_other_ToVector\t\t\t\t\t\t %li..%li..%li\n", All_Vector.size(), All_Vector[0].size(),All_Vector[0][0].size());
   wprintf(L"   ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n\n");
@@ -616,12 +731,12 @@ const int Lin_KM__map(int i, v_dw_3D &All_Vector) {
 //int vk0 = get_VirtualKey_Other_From_SC(dw, All_Vector);
 //int vk1 = get_VirtualKey_US_From_SC(dw, All_Vector);
 //int vk2 = get_VirtualKey_Other_Layer1_From_SC(dw, All_Vector);
-int vk3 = get_VirtualKey_Other_Layer2_From_SC(dw, All_Vector);
+/*int vk3 = get_VirtualKey_Other_Layer2_From_SC(dw, All_Vector);
 
 if ( i>160)
 {
   wprintf(L"dw = %i  i=%i ----> vk3=%i\n",dw,i, vk3);
-}
+}*/
 
 //return vk3;
 
