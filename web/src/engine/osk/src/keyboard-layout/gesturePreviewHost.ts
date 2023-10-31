@@ -57,8 +57,8 @@ export class GesturePreviewHost {
 
         // is in polar coords, origin toward north, clockwise.
         const coords = FlickNameCoordMap.get(dir);
-        const x = Math.sin(coords[0]);
-        const y = -Math.cos(coords[0]);
+        const x = -Math.sin(coords[0]); // Put 'e' flick at left
+        const y =  Math.cos(coords[0]); // Put 'n' flick at bottom
 
         if(x < 0) {
           ps.right = (-x * OVERFLOW_OFFSET * edgeLength) + 'px';
@@ -114,8 +114,8 @@ export class GesturePreviewHost {
     const scrollStyle = this.previewImgContainer.style;
     const edge = this.flickEdgeLength;
 
-    scrollStyle.marginLeft = `${edge * -x}px`;
-    scrollStyle.marginTop =  `${edge * -y}px`;
+    scrollStyle.marginLeft = `${edge * x}px`;
+    scrollStyle.marginTop =  `${edge * y}px`;
   }
 
   // These may not exist like this longterm.

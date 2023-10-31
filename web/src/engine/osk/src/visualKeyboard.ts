@@ -55,7 +55,7 @@ import SubkeyPopup from './input/gestures/browser/subkeyPopup.js';
 import Multitap from './input/gestures/browser/multitap.js';
 import { GestureHandler } from './input/gestures/gestureHandler.js';
 import Modipress from './input/gestures/browser/modipress.js';
-import Flick from './input/gestures/browser/flick.js';
+import Flick, { buildFlickScroller } from './input/gestures/browser/flick.js';
 import { GesturePreviewHost } from './keyboard-layout/gesturePreviewHost.js';
 import OSKBaseKey from './keyboard-layout/oskBaseKey.js';
 
@@ -429,7 +429,11 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
       // remaining matchable gestures.  Though, we shouldn't facilitate roaming
       // anyway if we've turned it off.
       if(this.kbdLayout.hasFlicks) {
+        const flickScroller = buildFlickScroller(source, source.path.coords[0], previewHost, DEFAULT_GESTURE_PARAMS);
+
         trackingEntry.roamingHighlightHandler = (sample) => {
+          flickScroller(sample);
+
           const key = sample.item;
           const oldKey = sourceTrackingMap[source.identifier].key;
 

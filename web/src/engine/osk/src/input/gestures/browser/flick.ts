@@ -2,7 +2,7 @@ import { type KeyElement } from '../../../keyElement.js';
 import VisualKeyboard from '../../../visualKeyboard.js';
 
 import { ActiveKey, ActiveKeyBase, ActiveSubKey, KeyDistribution } from '@keymanapp/keyboard-processor';
-import { ConfigChangeClosure, CumulativePathStats, GestureRecognizerConfiguration, GestureSequence, PaddedZoneSource } from '@keymanapp/gesture-recognizer';
+import { ConfigChangeClosure, CumulativePathStats, GestureRecognizerConfiguration, GestureSequence, GestureSource, InputSample, PaddedZoneSource } from '@keymanapp/gesture-recognizer';
 import { GestureHandler } from '../gestureHandler.js';
 import { distributionFromDistanceMaps } from '@keymanapp/input-processor';
 import { GestureParams } from '../specsForLayout.js';
@@ -22,6 +22,40 @@ export const FlickNameCoordMap = (() => {
 
   return map;
 })();
+
+export function buildFlickScroller(
+  baseSource: GestureSource<KeyElement>,
+  initialCoord: InputSample<KeyElement>,
+  previewHost: GesturePreviewHost,
+  gestureParams: GestureParams
+): (coord: InputSample<KeyElement>) => void {
+  return (coord: InputSample<KeyElement>) => {
+    baseSource.path.on('step', (coord) => {
+      const deltaX = coord.targetX - initialCoord.targetX;
+      const deltaY = coord.targetY - initialCoord.targetY;
+
+      const sqDist = deltaX * deltaX + deltaY * deltaY;
+
+      /*
+       * Accomplishes two things:
+       * 1) Ensures the coordinates for flick-preview scrolling don't overshoot
+       *    the preview key-cap
+       * 2) While allowing for _undershoot_ if "not quite there yet"
+       */
+      let divisor = Math.sqrt(sqDist);
+      const FUDGE_FACTOR = 1.1;
+      const FULL_SCROLL_MAG = FUDGE_FACTOR * gestureParams.flick.triggerDist;
+      if(divisor < FULL_SCROLL_MAG) {
+        divisor = FULL_SCROLL_MAG;
+      }
+
+      const previewX = deltaX / divisor;
+      const previewY = deltaY / divisor;
+
+      previewHost?.scrollFlickPreview(previewX, previewY);
+    });
+  }
+}
 
 /**
  * The maximum angle-difference, in radians, allowed before a potential flick
@@ -88,30 +122,8 @@ export default class Flick implements GestureHandler {
     });
 
     const baseCoord = baseSource.path.coords[0];
-    baseSource.path.on('step', (coord) => {
-      const deltaX = coord.targetX - baseCoord.targetX;
-      const deltaY = coord.targetY - baseCoord.targetY;
+    baseSource.path.on('step', buildFlickScroller(baseSource, baseCoord, previewHost, this.gestureParams));
 
-      const sqDist = deltaX * deltaX + deltaY * deltaY;
-
-      /*
-       * Accomplishes two things:
-       * 1) Ensures the coordinates for flick-preview scrolling don't overshoot
-       *    the preview key-cap
-       * 2) While allowing for _undershoot_ if "not quite there yet"
-       */
-      let divisor = Math.sqrt(sqDist);
-      const FUDGE_FACTOR = 1.2;
-      const FULL_SCROLL_MAG = FUDGE_FACTOR * gestureParams.flick.triggerDist;
-      if(divisor < FULL_SCROLL_MAG) {
-        divisor = FULL_SCROLL_MAG;
-      }
-
-      const previewX = deltaX / divisor;
-      const previewY = deltaY / divisor;
-
-      previewHost?.scrollFlickPreview(previewX, previewY);
-    });
 
     // Be sure to extend roaming bounds a bit more than usual for flicks, as they can be quick motions.
     const altConfig = this.buildPopupRecognitionConfig(vkbd);
