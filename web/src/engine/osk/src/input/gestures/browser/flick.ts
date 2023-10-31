@@ -8,7 +8,20 @@ import { distributionFromDistanceMaps } from '@keymanapp/input-processor';
 import { GestureParams } from '../specsForLayout.js';
 import { GesturePreviewHost } from '../../../keyboard-layout/gesturePreviewHost.js';
 
-const OrderedFlickDirections = ['n', 'ne', 'e', 'se', 's', 'sw', 'w', 'nw'] as const;
+export const OrderedFlickDirections = ['n', 'ne', 'e', 'se', 's', 'sw', 'w', 'nw'] as const;
+
+const PI = Math.PI;
+
+export const FlickNameCoordMap = (() => {
+  const map = new Map<typeof OrderedFlickDirections[number], [number, number]>();
+
+  const angleIncrement = PI / 4;
+  for(let i = 0; i < OrderedFlickDirections.length; i++) {
+    map.set(OrderedFlickDirections[i], [angleIncrement * i, 1]);
+  }
+
+  return map;
+})();
 
 /**
  * The maximum angle-difference, in radians, allowed before a potential flick
@@ -53,6 +66,7 @@ export default class Flick implements GestureHandler {
     // May be worth a temporary alt config:  global roaming, rather than auto-canceling.
 
     this.baseKeyDistances = vkbd.getSimpleTapCorrectionDistances(sequence.stageReports[0].sources[0].path.stats.initialSample, this.baseSpec)
+    const baseSource = sequence.stageReports[0].sources[0].baseSource;
 
     const baseSource = sequence.stageReports[0].sources[0].baseSource;
     this.sequence.on('stage', (result) => {
@@ -71,6 +85,32 @@ export default class Flick implements GestureHandler {
 
       // emit the keystroke
       vkbd.raiseKeyEvent(keyEvent, null);
+    });
+
+    const baseCoord = baseSource.path.coords[0];
+    baseSource.path.on('step', (coord) => {
+      const deltaX = coord.targetX - baseCoord.targetX;
+      const deltaY = coord.targetY - baseCoord.targetY;
+
+      const sqDist = deltaX * deltaX + deltaY * deltaY;
+
+      /*
+       * Accomplishes two things:
+       * 1) Ensures the coordinates for flick-preview scrolling don't overshoot
+       *    the preview key-cap
+       * 2) While allowing for _undershoot_ if "not quite there yet"
+       */
+      let divisor = Math.sqrt(sqDist);
+      const FUDGE_FACTOR = 1.2;
+      const FULL_SCROLL_MAG = FUDGE_FACTOR * gestureParams.flick.triggerDist;
+      if(divisor < FULL_SCROLL_MAG) {
+        divisor = FULL_SCROLL_MAG;
+      }
+
+      const previewX = deltaX / divisor;
+      const previewY = deltaY / divisor;
+
+      previewHost?.scrollFlickPreview(previewX, previewY);
     });
 
     // Be sure to extend roaming bounds a bit more than usual for flicks, as they can be quick motions.
@@ -142,20 +182,12 @@ export default class Flick implements GestureHandler {
       coord: [NaN, 0]
     }];
 
-    const PI = Math.PI;
-
-    const angleIncrement = PI / 4;
-    for(let i = 0; i < OrderedFlickDirections.length; i++) {
-      const spec = flickSet[OrderedFlickDirections[i]] as ActiveSubKey;
-      if(spec) {
-        keys.push({
-          spec: spec,
-          // Greatest possible angle difference:  Math.PI (180 degrees)
-          // So we'll scale the distance accordingly.
-          coord: [angleIncrement * i, 1]
-        });
-      }
-    }
+    keys = keys.concat(Object.keys(flickSet).map((dir: (typeof OrderedFlickDirections[number])) => {
+      return {
+        spec: flickSet[dir] as ActiveSubKey,
+        coord: FlickNameCoordMap.get(dir)
+      };
+    }));
 
     const angle = pathStats.angle;
     const TRIGGER_DIST = this.gestureParams.flick.triggerDist;
@@ -170,7 +202,7 @@ export default class Flick implements GestureHandler {
       const coord = entry.coord;
       if(!isNaN(coord[0])) {
         const angleDelta1 = angle - coord[0];
-        const angleDelta2 = 2*PI + coord[0] - angle; // because of angle wrap-around.
+        const angleDelta2 = 2 * PI + coord[0] - angle; // because of angle wrap-around.
 
         // NOTE:  max linear angle dist:  PI.
         angleDist = Math.min(angleDelta1 * angleDelta1, angleDelta2 * angleDelta2);

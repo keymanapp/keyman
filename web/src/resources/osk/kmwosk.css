@@ -367,13 +367,6 @@ body div.kmw-key-shift-on span.kmw-key-text {font-family:SpecialOSK !important;f
 
 .kmw-flick-preview {
   position: absolute;
-  font: 0.333em Arial;
-  color: #aaa;
-}
-
-.kmw-flick-preview.flick-clear {
-  color: transparent;
-  transition: 0.5s linear all;
 }
 
 #kmw-preview-img-container {

@@ -1503,7 +1503,10 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
   showGesturePreview(key: KeyElement) {
     const tip = this.keytip;
 
-    const previewHost = new GesturePreviewHost(key, !!tip);
+    const keyCS = getComputedStyle(key);
+    const parsedHeight = Number.parseInt(keyCS.height, 10);
+    const parsedWidth  = Number.parseInt(keyCS.width,  10);
+    const previewHost = new GesturePreviewHost(key, !!tip, Math.max(parsedWidth, parsedHeight));
 
     if (tip == null) {
       const baseKey = key.key as OSKBaseKey;

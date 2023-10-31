@@ -1,19 +1,8 @@
 import { ActiveKey } from "@keymanapp/keyboard-processor";
 import { KeyElement } from "../keyElement.js";
+import { FlickNameCoordMap, OrderedFlickDirections } from "../input/gestures/browser/flick.js";
 
 const FLICK_DIRS = ['n', 'ne', 'e', 'se', 's', 'sw', 'w', 'nw'] as const;
-
-const FLICK_PREVIEW_CHAR = {
-  n: '\ufe3f',
-  s: '\ufe40',
-  nw: '\u2329',
-  w: '\u2329',
-  sw: '\u232a',
-  ne: '\u232a',
-  e: '\u232a',
-  se: '\u2329'
-}
-
 export class GesturePreviewHost {
   private readonly div: HTMLDivElement;
   private readonly label: HTMLSpanElement;
@@ -21,6 +10,7 @@ export class GesturePreviewHost {
 
   private flickPreviews = new Map<string, HTMLDivElement>;
   private hintLabel: HTMLDivElement = null;
+  private flickEdgeLength: number;
 
   private onCancel: () => void;
 
@@ -28,8 +18,9 @@ export class GesturePreviewHost {
     return this.div;
   }
 
-  constructor(key: KeyElement, isPhone: boolean) {
+  constructor(key: KeyElement, isPhone: boolean, edgeLength: number) {
     const keySpec = key.key.spec;
+    this.flickEdgeLength = edgeLength;
 
     const base = this.div = document.createElement('div');
     base.className='kmw-gesture-preview';
@@ -55,57 +46,43 @@ export class GesturePreviewHost {
     if(keySpec.flick) {
       const flickSpec = keySpec.flick || {};
 
-      for(const dir of FLICK_DIRS) {
-        if(flickSpec[dir]) {
-          const index = FLICK_DIRS.indexOf(dir);
-          const isDiag = (index % 2) == 1;
+      Object.keys(flickSpec).forEach((dir: typeof OrderedFlickDirections[number]) => {
+        const flickPreview = document.createElement('div');
+        flickPreview.className = 'kmw-flick-preview kmw-key-text';
+        flickPreview.textContent = flickSpec[dir].text;
 
-          const arrowEle = document.createElement('div');
-          arrowEle.className = 'kmw-flick-preview';
-          arrowEle.textContent = FLICK_PREVIEW_CHAR[dir];
+        const ps /* preview style */ = flickPreview.style;
 
-          let angle: number;
+        const OVERFLOW_OFFSET = 1.41; //141;
 
-          // The different characters selected here are because of how each is
-          // spaced on its line; a pure rotation of a single variant fails to
-          // align the rendered glyphs of opposite sides correctly.
+        // is in polar coords, origin toward north, clockwise.
+        const coords = FlickNameCoordMap.get(dir);
+        const x = Math.sin(coords[0]);
+        const y = -Math.cos(coords[0]);
 
-          if(dir.includes('w')) {
-            arrowEle.style.left = isDiag ? '15%' : '5%';
-            angle = (index - 6) * 45;
-            arrowEle.style.marginTop = isDiag ? '0px' : '-1px';
-          } else if(dir.includes('e')) {
-            arrowEle.style.right = isDiag ? '15%' : '5%';
-            angle = (index - 2) * 45;
-            arrowEle.style.marginTop = isDiag ? '0px' : '-1px';
-          } else {
-            arrowEle.style.left = '50%';
-            arrowEle.style.transform = 'translateX(-50%)';
-            angle = 0;
-          }
-
-          const isSouthward = dir.includes('s');
-          if(angle && isSouthward) {
-            angle += 180;
-          }
-
-          // The two glyphs below may not render identically to their left & right
-          // variants on certain devices, unfortunately.
-          if(dir.includes('n')) {
-            arrowEle.style.top = isDiag ? '10%' : '0%';
-          } else if(isSouthward) {
-            arrowEle.style.bottom = isDiag ? '10%' : '0%';
-          } else {
-            arrowEle.style.top = '50%';
-            arrowEle.style.transform = 'translateY(-50%) ';
-          }
-
-          arrowEle.style.transform = arrowEle.style.transform + `rotate(${angle}deg)`;
-
-          this.flickPreviews.set(dir, arrowEle);
-          previewImgContainer.appendChild(arrowEle);
+        if(x < 0) {
+          ps.right = (-x * OVERFLOW_OFFSET * edgeLength) + 'px';
+        } else if(x > 0) {
+          ps.left  = ( x * OVERFLOW_OFFSET * edgeLength) + 'px';
+        } else {
+          ps.left = '0px';
+          ps.right = '0px';
+          ps.textAlign = 'center';
         }
-      }
+
+        if(y < 0) {
+          ps.bottom = (-y * OVERFLOW_OFFSET * edgeLength) + 'px';
+        } else if(y > 0) {
+          ps.top    = ( y * OVERFLOW_OFFSET * edgeLength) + 'px';
+        } else {
+          ps.top = '0px';
+          ps.bottom = '0px';
+          ps.lineHeight = '100%';
+        }
+
+        this.flickPreviews.set(dir, flickPreview);
+        previewImgContainer.appendChild(flickPreview);
+      });
     }
 
     // const hintLabel = this.hintLabel = document.createElement('div');
@@ -133,8 +110,20 @@ export class GesturePreviewHost {
     this.onCancel = handler;
   }
 
+  public scrollFlickPreview(x: number, y: number) {
+    const scrollStyle = this.previewImgContainer.style;
+    const edge = this.flickEdgeLength;
+
+    scrollStyle.marginLeft = `${edge * -x}px`;
+    scrollStyle.marginTop =  `${edge * -y}px`;
+  }
+
   // These may not exist like this longterm.
   private clearFlick() {
+    this.previewImgContainer.style.marginTop = '0px';
+    this.previewImgContainer.style.marginLeft = '0px';
+    // animate the return slightly?
+
     for(const pair of this.flickPreviews.entries()) {
       pair[1].classList.add('flick-clear');
     }
