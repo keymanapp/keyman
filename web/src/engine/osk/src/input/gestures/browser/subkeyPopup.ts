@@ -147,7 +147,8 @@ export default class SubkeyPopup implements GestureHandler {
       this.selectDefaultSubkey(e, elements /* == this.element */);
     }
 
-    vkbd.topContainer.appendChild(this.element);
+    vkbd.element.appendChild(this.element);
+    // The shim should probably fade the banner, too.
     vkbd.topContainer.appendChild(this.shim);
 
     // Must be placed after its `.element` has been inserted into the DOM.
@@ -289,7 +290,7 @@ export default class SubkeyPopup implements GestureHandler {
 
     // Add the callout
     if(vkbd.device.formFactor == DeviceSpec.FormFactor.Phone && vkbd.device.OS == DeviceSpec.OperatingSystem.iOS) {
-      this.callout = this.addCallout(e, delta, vkbd.topContainer);
+      this.callout = this.addCallout(e, delta, vkbd.element);
     }
   }
 

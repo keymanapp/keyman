@@ -1559,7 +1559,7 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
 
     // Always append to _Box (since cleared during OSK Load)
     if (this.keytip && this.keytip.element) {
-      this.topContainer.appendChild(this.keytip.element);
+      this.element.appendChild(this.keytip.element);
     }
   };
 
