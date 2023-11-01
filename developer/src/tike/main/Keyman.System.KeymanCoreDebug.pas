@@ -147,7 +147,7 @@ const KM_CORE_DEBUG_FLAG_OUTPUTKEYSTROKE    = $0001;
 function km_core_state_debug_set(
   state: pkm_core_state;
   value: integer
-): km_core_status; cdecl; external kmnkbp0 delayed;
+): km_core_status; cdecl; external keymancore delayed;
 
 ///
 /// Get current debug tracing status
@@ -158,7 +158,7 @@ function km_core_state_debug_set(
 ///
 function km_core_state_debug_get(
   state: pkm_core_state
-): uint8_t; cdecl; external kmnkbp0 delayed;
+): uint8_t; cdecl; external keymancore delayed;
 
 ///
 /// Read current debug trace log
@@ -173,7 +173,7 @@ function km_core_state_debug_get(
 function km_core_state_debug_items(
   state: pkm_core_state;
   num_items: PCardinal
-): pkm_core_state_debug_item; cdecl; external kmnkbp0 delayed;
+): pkm_core_state_debug_item; cdecl; external keymancore delayed;
 
 implementation
 

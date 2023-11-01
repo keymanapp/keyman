@@ -8,7 +8,7 @@
 #include "keyboard.hpp"
 #include "jsonpp.hpp"
 
-using namespace km::kbp;
+using namespace km::core;
 
 
 inline
@@ -54,7 +54,7 @@ keyboard_attributes & keyboard_attributes::operator = (keyboard_attributes &&rhs
 }
 
 
-json & km::kbp::operator << (json & j, km::kbp::keyboard_attributes const & kb)
+json & km::core::operator << (json & j, km::core::keyboard_attributes const & kb)
 {
   j << json::object
       << "id" << kb.id

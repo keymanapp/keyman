@@ -57,14 +57,17 @@ fi
 
 if builder_start_action verify; then
   tar xf "${SRC_PKG}"
-  if [ ! -f debian/libkmnkbp0-0.symbols ]; then
-    echo ":warning: Missing libkmnkbp0-0.symbols file" >&2
+  if [ ! -f debian/libkeymancore.symbols ]; then
+    echo ":warning: Missing libkeymancore.symbols file" >&2
   else
+    PKG_NAME=libkeymancore
+    LIB_NAME=libkeymancore
+
     tmpDir=$(mktemp -d)
     dpkg -x "${BIN_PKG}" "$tmpDir"
     cd debian
-    dpkg-gensymbols -v"${PKG_VERSION}" -plibkmnkbp0-0 -e"${tmpDir}"/usr/lib/x86_64-linux-gnu/libkmnkbp0.so* -Olibkmnkbp0-0.symbols -c4
-    echo ":heavy_check_mark: libkmnkbp0-0 API didn't change" >&2
+    dpkg-gensymbols -v"${PKG_VERSION}" -p${PKG_NAME} -e"${tmpDir}"/usr/lib/x86_64-linux-gnu/${LIB_NAME}.so* -O${PKG_NAME}.symbols -c4
+    echo ":heavy_check_mark: ${LIB_NAME} API didn't change" >&2
   fi
   builder_finish_action success verify
   exit 0

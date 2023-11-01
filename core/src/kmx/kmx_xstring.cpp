@@ -9,10 +9,10 @@
 #include "kmx_processevent.h"
 #include "utfcodec.hpp"
 
-using namespace km::kbp;
+using namespace km::core;
 using namespace kmx;
 
-const km_core_cp *km::kbp::kmx::u16chr(const km_core_cp *p, km_core_cp ch) {
+const km_core_cp *km::core::kmx::u16chr(const km_core_cp *p, km_core_cp ch) {
   while (*p) {
     if (*p == ch) return p;
     p++;
@@ -20,7 +20,7 @@ const km_core_cp *km::kbp::kmx::u16chr(const km_core_cp *p, km_core_cp ch) {
   return ch == 0 ? p : NULL;
 }
 
-const km_core_cp *km::kbp::kmx::u16cpy(km_core_cp *dst, const km_core_cp *src) {
+const km_core_cp *km::core::kmx::u16cpy(km_core_cp *dst, const km_core_cp *src) {
   km_core_cp *o = dst;
   while (*src) {
     *dst++ = *src++;
@@ -29,7 +29,7 @@ const km_core_cp *km::kbp::kmx::u16cpy(km_core_cp *dst, const km_core_cp *src) {
   return o;
 }
 
-const km_core_cp *km::kbp::kmx::u16ncpy(km_core_cp *dst, const km_core_cp *src, size_t max) {
+const km_core_cp *km::core::kmx::u16ncpy(km_core_cp *dst, const km_core_cp *src, size_t max) {
   km_core_cp *o = dst;
   while (*src && max > 0) {
     *dst++ = *src++;
@@ -42,7 +42,7 @@ const km_core_cp *km::kbp::kmx::u16ncpy(km_core_cp *dst, const km_core_cp *src, 
   return o;
 }
 
-size_t km::kbp::kmx::u16len(const km_core_cp *p) {
+size_t km::core::kmx::u16len(const km_core_cp *p) {
   int i = 0;
   while (*p) {
     p++;
@@ -51,7 +51,7 @@ size_t km::kbp::kmx::u16len(const km_core_cp *p) {
   return i;
 }
 
-int km::kbp::kmx::u16cmp(const km_core_cp *p, const km_core_cp *q) {
+int km::core::kmx::u16cmp(const km_core_cp *p, const km_core_cp *q) {
   while (*p && *q) {
     if (*p != *q) return *p - *q;
     p++;
@@ -60,7 +60,7 @@ int km::kbp::kmx::u16cmp(const km_core_cp *p, const km_core_cp *q) {
   return *p - *q;
 }
 
-int km::kbp::kmx::u16icmp(const km_core_cp *p, const km_core_cp *q) {
+int km::core::kmx::u16icmp(const km_core_cp *p, const km_core_cp *q) {
   while (*p && *q) {
     if (toupper(*p) != toupper(*q)) return *p - *q;
     p++;
@@ -69,7 +69,7 @@ int km::kbp::kmx::u16icmp(const km_core_cp *p, const km_core_cp *q) {
   return *p - *q;
 }
 
-int km::kbp::kmx::u16ncmp(const km_core_cp *p, const km_core_cp *q, size_t count) {
+int km::core::kmx::u16ncmp(const km_core_cp *p, const km_core_cp *q, size_t count) {
   while (*p && *q && count) {
     if (*p != *q) return *p - *q;
     p++;
@@ -81,7 +81,7 @@ int km::kbp::kmx::u16ncmp(const km_core_cp *p, const km_core_cp *q, size_t count
   return 0;
 }
 
-km_core_cp *km::kbp::kmx::u16tok(km_core_cp *p, km_core_cp ch, km_core_cp **ctx) {
+km_core_cp *km::core::kmx::u16tok(km_core_cp *p, km_core_cp ch, km_core_cp **ctx) {
   if (!p) {
     p = *ctx;
     if (!p) return NULL;
@@ -103,7 +103,7 @@ km_core_cp *km::kbp::kmx::u16tok(km_core_cp *p, km_core_cp ch, km_core_cp **ctx)
   return p;
 }
 
-km_core_cp *km::kbp::kmx::u16dup(km_core_cp *src) {
+km_core_cp *km::core::kmx::u16dup(km_core_cp *src) {
   km_core_cp *dup = new km_core_cp[u16len(src) + 1];
   memcpy(dup, src, (u16len(src) + 1) * sizeof(km_core_cp));
   return dup;
@@ -120,7 +120,7 @@ km_core_cp *km::kbp::kmx::u16dup(km_core_cp *src) {
 *
 * xstrlen calculates the length of a string, ignoring some special chars.
 */
-PKMX_WCHAR km::kbp::kmx::incxstr(PKMX_WCHAR p) {
+PKMX_WCHAR km::core::kmx::incxstr(PKMX_WCHAR p) {
 
   if (*p == 0)
     return p;
@@ -154,7 +154,7 @@ PKMX_WCHAR km::kbp::kmx::incxstr(PKMX_WCHAR p) {
   return p;
 }
 
-PKMX_WCHAR km::kbp::kmx::decxstr(PKMX_WCHAR p, PKMX_WCHAR pStart)
+PKMX_WCHAR km::core::kmx::decxstr(PKMX_WCHAR p, PKMX_WCHAR pStart)
 {
   PKMX_WCHAR q;
 
@@ -197,7 +197,7 @@ PKMX_WCHAR km::kbp::kmx::decxstr(PKMX_WCHAR p, PKMX_WCHAR pStart)
   return p;
 }
 
-int km::kbp::kmx::xstrlen_ignoreifopt(PKMX_WCHAR p)
+int km::core::kmx::xstrlen_ignoreifopt(PKMX_WCHAR p)
 {
   int i;
   for(i = 0; *p; i++, p=incxstr(p))
@@ -207,21 +207,21 @@ int km::kbp::kmx::xstrlen_ignoreifopt(PKMX_WCHAR p)
   return i;
 }
 
-int km::kbp::kmx::xstrlen(PKMX_WCHAR p)
+int km::core::kmx::xstrlen(PKMX_WCHAR p)
 {
   int i;
   for(i = 0; *p; i++, p=incxstr(p));
   return i;
 }
 
-int km::kbp::kmx::xstrpos(PKMX_WCHAR p1, PKMX_WCHAR p)
+int km::core::kmx::xstrpos(PKMX_WCHAR p1, PKMX_WCHAR p)
 {
   int i;
   for(i = 0; p < p1; p = incxstr(p), i++);
   return i;
 }
 
-PKMX_WCHAR km::kbp::kmx::xstrchr(PKMX_WCHAR buf, PKMX_WCHAR chr)
+PKMX_WCHAR km::core::kmx::xstrchr(PKMX_WCHAR buf, PKMX_WCHAR chr)
 {
   for(PKMX_WCHAR q = incxstr(buf); *buf; buf = q, q = incxstr(buf))
     if(!u16ncmp(buf, chr, (intptr_t)(q-buf)))
@@ -229,14 +229,14 @@ PKMX_WCHAR km::kbp::kmx::xstrchr(PKMX_WCHAR buf, PKMX_WCHAR chr)
   return NULL;
 }
 
-int km::kbp::kmx::xchrcmp(PKMX_WCHAR ch1, PKMX_WCHAR ch2)
+int km::core::kmx::xchrcmp(PKMX_WCHAR ch1, PKMX_WCHAR ch2)
 {
   PKMX_WCHAR nch1 = incxstr(ch1);
   if(nch1 == ch1) return *ch2 - *ch1; /* comparing *ch2 to nul */
   return u16ncmp(ch1, ch2, (intptr_t)(nch1-ch1));
 }
 
-PKMX_WCHAR km::kbp::kmx::strtowstr(PKMX_CHAR in)
+PKMX_WCHAR km::core::kmx::strtowstr(PKMX_CHAR in)
 {
   PKMX_WCHAR result;
 
@@ -247,7 +247,7 @@ PKMX_WCHAR km::kbp::kmx::strtowstr(PKMX_CHAR in)
   return result;
 }
 
-PKMX_CHAR km::kbp::kmx::wstrtostr(PKMX_WCHAR in)
+PKMX_CHAR km::core::kmx::wstrtostr(PKMX_WCHAR in)
 {
   PKMX_CHAR result;
 

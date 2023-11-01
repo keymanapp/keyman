@@ -13,7 +13,7 @@
 #include "processor.hpp"
 #include "state.hpp"
 
-using namespace km::kbp;
+using namespace km::core;
 
 km_core_status
 km_core_state_debug_set(

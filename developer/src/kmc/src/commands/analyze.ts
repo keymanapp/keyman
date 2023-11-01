@@ -21,13 +21,13 @@ interface AnalysisActivityOptions /* not inheriting from CompilerBaseOptions */ 
 };
 
 export function declareAnalyze(program: Command) {
-  let command = program.command('analyze [infile...]');
+  let command = program.command('analyze');
   declareOskCharUse(command);
   declareOskRewrite(command);
 }
 
 function declareOskCharUse(command: Command) {
-  let subCommand = command.command('osk-char-use');
+  let subCommand = command.command('osk-char-use [infile...]');
   BaseOptions.addLogLevel(subCommand);
   subCommand
     .description('Analyze On Screen Keyboards for character usage')
@@ -52,7 +52,7 @@ function declareOskCharUse(command: Command) {
 }
 
 function declareOskRewrite(command: Command) {
-  let subCommand = command.command('osk-rewrite-from-char-use');
+  let subCommand = command.command('osk-rewrite-from-char-use [infile...]');
   subCommand
     .description('Rewrite On Screen Keyboard files from source mapping; given file.ext, output is written to file-pua.ext')
     .addOption(new Option('-m, --mapping-file <filename>', 'JSON mapping file to read from').makeOptionMandatory())
