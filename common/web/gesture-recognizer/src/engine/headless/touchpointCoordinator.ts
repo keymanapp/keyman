@@ -112,7 +112,12 @@ export class TouchpointCoordinator<HoveredItemType, StateToken=any> extends Even
 
     touchpoint.setGestureMatchInspector(buildGestureMatchInspector(selector));
 
-    // We wait for the source to fully pass through the gesture-model spin-up phase; there's a chanc
+    /* We wait for the source to fully pass through the gesture-model spin-up phase; there's
+     * a chance that the new source will complete an existing gesture instantly without being
+     * locked to it, resulting in activation of a different `stateToken`.
+     *
+     * This, in turn, can affect what the initial 'item' for the new gesture will be.
+     */
     const modelingSpinupPromise = selector.matchGesture(touchpoint, getGestureModelSet(modelDefs, selector.baseGestureSetId));
     modelingSpinupPromise.then(async (selectionPromiseHost) => {
       this.emit('inputstart', touchpoint);
@@ -181,6 +186,15 @@ export class TouchpointCoordinator<HoveredItemType, StateToken=any> extends Even
     touchpoint.path.on('invalidated', () => {
       // GestureSequence _should_ handle any other cleanup internally as fallout
       // from the path being cancelled.
+      //
+      // That said, it's handled asynchronously... but we can give a synchronous signal
+      // through the next block of code, allowing cleanup to occur earlier during
+      // recovery states.
+
+      const owningSequence = this.activeGestures.find((entry) => entry.allSourceIds.includes(touchpoint.identifier));
+      if(owningSequence) {
+        owningSequence.cancel();
+      }
 
       // To consider: should it specially mark if it 'completed' due to cancellation,
       // or is that safe to infer from the tracked GestureSource(s)?
@@ -191,8 +205,6 @@ export class TouchpointCoordinator<HoveredItemType, StateToken=any> extends Even
       this._activeSources = this._activeSources.splice(i, 1);
     });
     touchpoint.path.on('complete', () => {
-      // TODO: on cancellation, is there any other cleanup to be done?
-
       // Also mark the touchpoint as no longer active.
       let i = this._activeSources.indexOf(touchpoint);
       this._activeSources = this._activeSources.splice(i, 1);

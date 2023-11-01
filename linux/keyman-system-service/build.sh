@@ -17,7 +17,9 @@ builder_describe \
   "test" \
   "install                   install artifacts" \
   "uninstall                 uninstall artifacts" \
-  "--no-integration          don't run integration tests"
+  "--no-integration          don't run integration tests" \
+  "--report                  create coverage report" \
+  "--coverage                capture test coverage"
 
 builder_parse "$@"
 
@@ -33,35 +35,55 @@ else
 fi
 MESON_PATH="build/$(uname -m)/$MESON_TARGET"
 
+clean_action() {
+  rm -rf "$THIS_SCRIPT_PATH/build/"
+}
+
+check_missing_coverage_configuration() {
+  if builder_has_option --coverage && [ -d "$MESON_PATH" ]; then
+    # It's possible that we got configured because we're a dependency of ibus-keyman
+    # in which case the `--coverage` option wasn't passed along.
+    cd "$MESON_PATH"
+    if ! ninja -t targets | grep -q coverage-html ; then
+      cd "$THIS_SCRIPT_PATH"
+      clean_action
+    fi
+    cd "$THIS_SCRIPT_PATH"
+  fi
+}
+
+configure_action() {
+  # shellcheck disable=SC2086,SC2154
+  meson setup ${MESON_COVERAGE} --werror --buildtype $MESON_TARGET "${builder_extra_params[@]}" "$MESON_PATH"
+}
+
+test_action() {
+  # shellcheck disable=SC2086,SC2154
+  meson test --print-errorlogs $builder_verbose
+  if builder_has_option --coverage; then
+    # Note: requires lcov > 1.16 to properly work (see https://github.com/mesonbuild/meson/issues/6747)
+    ninja coverage-html
+  fi
+}
+
+check_missing_coverage_configuration
+
 builder_describe_outputs \
   configure "${MESON_PATH}/build.ninja" \
   build "${MESON_PATH}/src/keyman-system-service"
 
-builder_run_action clean rm -rf "$THIS_SCRIPT_PATH/build/"
-
-# shellcheck disable=SC2086
-builder_run_action configure meson setup "$MESON_PATH" --werror --buildtype $MESON_TARGET "${builder_extra_params[@]}"
-
-if builder_start_action build; then
-  cd "$MESON_PATH"
-  ninja
-  builder_finish_action success build
+if builder_has_option --coverage; then
+  MESON_COVERAGE=-Db_coverage=true
+else
+  MESON_COVERAGE=
 fi
 
-if builder_start_action test; then
-  cd "$MESON_PATH"
-  meson test --print-errorlogs $builder_verbose
-  builder_finish_action success test
-fi
+builder_run_action clean       clean_action
+builder_run_action configure   configure_action
 
-if builder_start_action install; then
-  cd "$MESON_PATH"
-  ninja install
-  builder_finish_action success install
-fi
+[ -d "$MESON_PATH" ] && cd "$MESON_PATH"
 
-if builder_start_action uninstall; then
-  cd "$MESON_PATH"
-  ninja uninstall
-  builder_finish_action success uninstall
-fi
+builder_run_action build       ninja
+builder_run_action test        test_action
+builder_run_action install     ninja install
+builder_run_action uninstall   ninja uninstall

@@ -8,7 +8,7 @@
 
 #include <kmx/kmx_processevent.h>
 
-using namespace km::kbp;
+using namespace km::core;
 using namespace kmx;
 
 void KMX_DebugItems::push_item(

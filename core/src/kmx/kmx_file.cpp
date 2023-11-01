@@ -6,7 +6,7 @@
 #include <assert.h>
 #include "kmx_file_validator.hpp"
 
-using namespace km::kbp;
+using namespace km::core;
 using namespace kmx;
 
 #if defined(_WIN32) || defined(_WIN64)
@@ -20,7 +20,7 @@ KMX_BOOL KMX_ProcessEvent::Load(km_core_path_name KeyboardName)
   return TRUE;
 }
 
-const int km::kbp::kmx::CODE__SIZE[] = {
+const int km::core::kmx::CODE__SIZE[] = {
     -1,  // undefined                0x00
     1,   // CODE_ANY                 0x01
     2,   // CODE_INDEX               0x02
