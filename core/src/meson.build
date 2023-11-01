@@ -1,5 +1,5 @@
 # Copyright:    © 2018-2022 SIL International.
-# Description:  Cross platform build script to compile libkmnkbp.
+# Description:  Cross platform build script to compile libkeymancore.
 # Create Date:  2 Oct 2018
 # Authors:      Tim Eves (TSE)
 #
@@ -7,7 +7,7 @@
 version_res = []
 
 # TODO: shouldn't this be defined only for dylib and not static lib?
-defns += ['-DKMN_KBP_EXPORTING']
+defns += ['-DKM_CORE_LIBRARY_EXPORTING']
 
 if cpp_compiler.get_id() == 'msvc'
   defns += ['-DUNICODE']
@@ -18,7 +18,7 @@ endif
 
 if cpp_compiler.get_id() == 'emscripten'
   # TODO: why do we need this defn here?
-  defns += ['-DKMN_KBP']
+  defns += ['-DKM_CORE_LIBRARY']
 endif
 
 # ICU4C is used for repertoire tests and core implementation
@@ -42,10 +42,12 @@ endif
 
 
 kmx_files = files(
+  'action.cpp',
   'option.cpp',
   'keyboard.cpp',
   'state.cpp',
   'debuglog.cpp',
+  'km_core_action_api.cpp',
   'km_core_context_api.cpp',
   'km_core_keyboard_api.cpp',
   'km_core_options_api.cpp',
@@ -74,6 +76,7 @@ kmx_files = files(
 )
 
 api_files = files(
+  'km_core_action_api.cpp',
   'km_core_context_api.cpp',
   'km_core_keyboard_api.cpp',
   'km_core_options_api.cpp',
@@ -83,6 +86,7 @@ api_files = files(
 )
 
 core_files = files(
+  'action.cpp',
   'option.cpp',
   'keyboard.cpp',
   'state.cpp',
@@ -94,7 +98,7 @@ mock_files = files(
   'mock/mock_processor.cpp',
 )
 
-lib = library('kmnkbp0',
+lib = library('keymancore',
   api_files,
   core_files,
   kmx_files,
@@ -111,11 +115,11 @@ lib = library('kmnkbp0',
 
 headerdirs = [ '.', 'keyman' ] # subdirectories of ${prefix}/include to add to header path
 
-kmnkbp = declare_dependency(link_with: lib, include_directories: inc, dependencies: [icu_uc, icu_i18n])
+keymancore = declare_dependency(link_with: lib, include_directories: inc, dependencies: [icu_uc, icu_i18n])
 
 pkg = import('pkgconfig')
 pkg.generate(
-    name: 'keyman_kmn_processor',
+    name: 'keyman_core',
     version: meson.project_version(),
     description: 'Keyman processor for KMN keyboards.',
     subdirs: headerdirs,

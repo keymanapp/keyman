@@ -6,14 +6,14 @@
 #include "state.hpp"
 #include <keyman/keyman_core_api_consts.h>
 
-using namespace km::kbp;
+using namespace km::core;
 using namespace kmx;
 
 /* Globals */
 
-KMX_BOOL km::kbp::kmx::g_debug_ToConsole = FALSE;
-KMX_BOOL km::kbp::kmx::g_debug_KeymanLog = TRUE;
-KMX_BOOL km::kbp::kmx::g_silent = FALSE;
+KMX_BOOL km::core::kmx::g_debug_ToConsole = FALSE;
+KMX_BOOL km::core::kmx::g_debug_KeymanLog = TRUE;
+KMX_BOOL km::core::kmx::g_silent = FALSE;
 
 /*
 * KMX_ProcessEvent
@@ -84,7 +84,7 @@ KMX_BOOL KMX_ProcessEvent::ProcessEvent(
 ) {
   LPKEYBOARD kbd = m_keyboard.Keyboard;
 
-  m_kbp_state = state;
+  m_core_state = state;
 
   // If debugging is enabled, then ...
   DeleteInternalDebugItems();
@@ -106,7 +106,7 @@ KMX_BOOL KMX_ProcessEvent::ProcessEvent(
 
   if (kbd->StartGroup[BEGIN_UNICODE] == (KMX_DWORD) -1) {
     DebugLog("Non-Unicode keyboards are not supported.");
-    m_kbp_state = nullptr;
+    m_core_state = nullptr;
     return FALSE;
   }
 
@@ -124,7 +124,7 @@ KMX_BOOL KMX_ProcessEvent::ProcessEvent(
   }
 
   if (!isKeyDown) {
-    m_kbp_state = nullptr;
+    m_core_state = nullptr;
     return FALSE;
   }
 
@@ -149,7 +149,7 @@ KMX_BOOL KMX_ProcessEvent::ProcessEvent(
     DeleteInternalDebugItems();
   }
 
-  m_kbp_state = nullptr;
+  m_core_state = nullptr;
 
   return !fOutputKeystroke;
 }
@@ -488,7 +488,7 @@ int KMX_ProcessEvent::PostString(PKMX_WCHAR str, LPKEYBOARD lpkb, PKMX_WCHAR end
 
       case CODE_CALL:
         p++;
-        m_kbp_state->imx_callback(*p-1);
+        m_core_state->imx_callback(*p-1);
         FoundUse = TRUE;
         break;
       case CODE_USE:          // use another group
@@ -519,7 +519,7 @@ int KMX_ProcessEvent::PostString(PKMX_WCHAR str, LPKEYBOARD lpkb, PKMX_WCHAR end
       case CODE_RESETOPT:
         p++;
         n1 = *p - 1;
-        GetOptions()->Reset(m_kbp_state->processor(), n1);
+        GetOptions()->Reset(m_core_state->processor(), n1);
         break;
       case CODE_SAVEOPT:
         p++;
@@ -792,8 +792,8 @@ PKMX_WCHAR KMX_ProcessEvent::GetSystemStore(LPKEYBOARD kb, KMX_DWORD SystemID)
 
 void KMX_ProcessEvent::CreateInternalDebugItems() {
   assert(m_debug_items == nullptr);
-  assert(m_kbp_state != nullptr);
-  m_debug_items = new KMX_DebugItems(&m_kbp_state->debug_items());
+  assert(m_core_state != nullptr);
+  m_debug_items = new KMX_DebugItems(&m_core_state->debug_items());
   m_options.SetInternalDebugItems(m_debug_items);
 }
 

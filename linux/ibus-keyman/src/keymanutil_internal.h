@@ -13,6 +13,11 @@ typedef struct {
   gchar *kmp_dir;
 } add_keyboard_data;
 
+typedef struct {
+  kmp_language *lang;
+  gchar *kb_id_with_lang;
+} cust_kbd;
+
 IBusEngineDesc *ibus_keyman_engine_desc_new(
     gchar *file_name,
     gchar *name,
@@ -30,9 +35,11 @@ IBusEngineDesc *get_engine_for_language(
     kmp_info *info,
     keyboard_details *kbd_details,
     gchar *kmp_dir,
-    gchar *lang_id,
-    gchar *lang_name);
+    kmp_language *lang);
 
+gchar** keyman_get_custom_keyboards();
+void keyman_set_custom_keyboards(gchar ** keyboards);
+GHashTable * keyman_get_custom_keyboard_dictionary();
 void keyman_add_keyboard(gpointer data, gpointer user_data);
 void keyman_add_keyboards_from_dir(gpointer data, gpointer user_data);
 

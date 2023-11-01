@@ -23,8 +23,20 @@ builder_describe \
   "test" \
   "install                   install artifacts" \
   "uninstall                 uninstall artifacts" \
-  "--no-integration+         don't run integration tests"
+  "--no-integration+         don't run integration tests" \
+  "--coverage+               capture test coverage" \
+  "--report+                 create coverage report" \
+  "--open                    open the coverage reports in the browser"
 
 builder_parse "$@"
 
 builder_run_child_actions clean configure build test install uninstall
+
+test_action() {
+  if builder_has_option --open; then
+    builder_echo "Opening coverage reports in browser..."
+    xdg-open "file://${THIS_SCRIPT_PATH}/CodeCoverageReports.html"
+  fi
+}
+
+builder_run_action test test_action

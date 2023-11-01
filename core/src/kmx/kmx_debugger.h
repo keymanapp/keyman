@@ -14,7 +14,7 @@
 #include <debug.hpp>
 
 namespace km {
-namespace kbp {
+namespace core {
 namespace kmx {
 
 class KMX_DebugItems
@@ -143,5 +143,5 @@ KMX_DebugItems::push_rule_exit(
 }
 
 } // namespace kmx
-} // namespace kbp
+} // namespace core
 } // namespace km

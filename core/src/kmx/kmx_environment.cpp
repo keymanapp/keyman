@@ -7,7 +7,7 @@
 #include <state.hpp>
 #include <option.hpp>
 
-using namespace km::kbp;
+using namespace km::core;
 using namespace kmx;
 
 namespace {

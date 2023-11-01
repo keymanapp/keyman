@@ -243,8 +243,8 @@ get_context_keys(std::u16string context) {
           G_LOG_DOMAIN, __FILE__, __LINE__, G_STRFUNC, "We can only deal with ASCII characters in the context", utf8, "", "");
     }
     result.push_back(
-        {km::kbp::kmx::s_char_to_vkey[(int)utf8[0] - 32].vk,
-         (uint16_t)(km::kbp::kmx::s_char_to_vkey[(int)utf8[0] - 32].shifted ? KM_CORE_MODIFIER_SHIFT : 0)});
+        {km::core::kmx::s_char_to_vkey[(int)utf8[0] - 32].vk,
+         (uint16_t)(km::core::kmx::s_char_to_vkey[(int)utf8[0] - 32].shifted ? KM_CORE_MODIFIER_SHIFT : 0)});
   }
   return result;
 }

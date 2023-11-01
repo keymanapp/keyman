@@ -20,13 +20,13 @@
 class json;
 
 namespace km {
-namespace kbp
+namespace core
 {
   class keyboard_attributes : public km_core_keyboard_attrs
   {
     std::u16string      _keyboard_id;
     std::u16string      _version_string;
-    kbp::path           _folder_path;
+    core::path           _folder_path;
     std::vector<option> _default_opts;
 
     void render();
@@ -48,7 +48,7 @@ namespace kbp
     keyboard_attributes & operator = (keyboard_attributes const &) = delete;
     keyboard_attributes & operator = (keyboard_attributes &&);
 
-    friend json & operator << (json &, km::kbp::keyboard_attributes const &);
+    friend json & operator << (json &, km::core::keyboard_attributes const &);
 
     options_store const &   default_opts_store() const noexcept { return _default_opts; }
     options_store &         default_opts_store() noexcept { return _default_opts; }
@@ -56,7 +56,7 @@ namespace kbp
     path_type const     &   path() const noexcept { return _folder_path; }
   };
 
-  json & operator << (json &, km::kbp::keyboard_attributes const &);
+  json & operator << (json &, km::core::keyboard_attributes const &);
 
-} // namespace kbp
+} // namespace core
 } // namespace km
