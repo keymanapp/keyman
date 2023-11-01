@@ -11,7 +11,7 @@
 #endif
 
 namespace km {
-namespace kbp {
+namespace core {
 namespace kmx {
 
 typedef struct tagSTORE
@@ -95,5 +95,5 @@ typedef struct tagKMSTATE
 enum ProcessStringReturn { psrPostMessages, psrCheckMatches };
 
 } // namespace kmx
-} // namespace kbp
+} // namespace core
 } // namespace km

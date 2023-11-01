@@ -80,8 +80,8 @@ apply_action(
         },
         {act.character}});
     {
-      km::kbp::kmx::char16_single buf;
-      const int len = km::kbp::kmx::Utf32CharToUtf16(act.character, buf);
+      km::core::kmx::char16_single buf;
+      const int len = km::core::kmx::Utf32CharToUtf16(act.character, buf);
       for(int i=0; i<len; i++) {
         text_store.push_back(buf.ch[i]);
       }
@@ -163,7 +163,7 @@ apply_action(
 }
 
 int
-run_test(const km::kbp::path &source, const km::kbp::path &compiled) {
+run_test(const km::core::path &source, const km::core::path &compiled) {
   std::string keys = "";
   std::u16string expected = u"", context = u"";
   km::tests::kmx_options options;
@@ -334,7 +334,7 @@ int main(int argc, char *argv[]) {
   }
   console_color::enabled = console_color::isaterminal() || arg_color;
 
-  km::kbp::kmx::g_debug_ToConsole = TRUE;
+  km::core::kmx::g_debug_ToConsole = TRUE;
 
 #ifdef __EMSCRIPTEN__
   return run_test(get_wasm_file_path(argv[first_arg]), get_wasm_file_path(argv[first_arg + 1]));

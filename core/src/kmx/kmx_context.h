@@ -10,7 +10,7 @@
 #define MAXCONTEXT 64
 
 namespace km {
-namespace kbp {
+namespace core {
 namespace kmx {
 
 class KMX_Context
@@ -118,5 +118,5 @@ public:
 };
 
 } // namespace kmx
-} // namespace kbp
+} // namespace core
 } // namespace km

@@ -28,7 +28,7 @@ builder_describe "Build Keyman ldml-keyboard-constants package" \
 
 builder_describe_outputs \
   configure     /node_modules \
-  build         /core/include/ldml/build/keyboardprocessor_ldml.js
+  build         /core/include/ldml/build/keyman_core_ldml.js
 
 builder_parse "$@"
 
