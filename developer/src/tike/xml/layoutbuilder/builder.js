@@ -863,10 +863,17 @@ $(function() {
 
   this.rescale = function () {
     builder.saveUndo();
-    var keyId = builder.selectedKey().data('id');
+    const k = builder.selectedKey();
+    const keyId = k.data('id');
+    const keyItems = $('#kbd .key').filter((_index,item) => $(item).data('id') === keyId);
+    const keyItemIndex = keyItems.indexOf(k.length ? k[0] : null);
     builder.prepareLayer();
-    if (keyId !== null)
-      builder.selectKey($('#kbd .key').filter(function (index) { return $(this).data('id') === keyId; }).first());
+    if (keyId !== null && keyItemIndex >= 0) {
+      const newKeyItems = $('#kbd .key').filter((_index,item) => $(item).data('id') === keyId);
+      if(keyItemIndex < newKeyItems.length) {
+        builder.selectKey(newKeyItems[keyItemIndex]);
+      }
+    }
   };
 
   this.translateFlickArrayToObject = function(flicks) {
