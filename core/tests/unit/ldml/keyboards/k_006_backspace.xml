@@ -1,12 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<!--
-from https://github.com/unicode-org/cldr/blob/keyboard-preview/docs/ldml/tr35-keyboards.md#element-transform
-
-@@keys: [K_T][K_A][K_B][K_BKSP]
-@@expected: t
-
--->
 <!DOCTYPE keyboard3 SYSTEM "../../../../../resources/standards-data/ldml-keyboards/techpreview/dtd/ldmlKeyboard3.dtd">
 <keyboard3 locale="en" conformsTo="techpreview">
   <info author="srl295" indicator="🙀" layout="qwerty" normalization="NFC" />

@@ -105,10 +105,7 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        # Currently not building mantic until ibus version on mantic stabilizied
-        # and we can provide a patched version
-        # dist: [focal, jammy, lunar, mantic]
-        dist: [focal, jammy, lunar]
+        dist: [focal, jammy, lunar, mantic]
         arch: [amd64]
 
     runs-on: ubuntu-latest
@@ -222,7 +219,7 @@ jobs:
         echo "::endgroup::"
 
   api_verification:
-    name: Verify API for libkmnkbp0.so
+    name: Verify API for libkeymancore.so
     needs: [sourcepackage, binary_packages]
     runs-on: ubuntu-latest
 
@@ -245,16 +242,17 @@ jobs:
     - name: Verify API
       run: |
         cd linux
+        PKG_NAME=libkeymancore
         SRC_PKG="${GITHUB_WORKSPACE}/artifacts/keyman-srcpkg/keyman_${{ needs.sourcepackage.outputs.VERSION }}-1.debian.tar.xz" \
-        BIN_PKG="${GITHUB_WORKSPACE}/artifacts/keyman-binarypkgs/libkmnkbp0-0_${{ needs.sourcepackage.outputs.VERSION }}-1${{ needs.sourcepackage.outputs.PRERELEASE_TAG }}+jammy1_amd64.deb" \
+        BIN_PKG="${GITHUB_WORKSPACE}/artifacts/keyman-binarypkgs/${PKG_NAME}_${{ needs.sourcepackage.outputs.VERSION }}-1${{ needs.sourcepackage.outputs.PRERELEASE_TAG }}+jammy1_amd64.deb" \
         PKG_VERSION="${{ needs.sourcepackage.outputs.VERSION }}" \
         ./scripts/deb-packaging.sh --gha verify 2>> $GITHUB_STEP_SUMMARY
 
     - name: Archive .symbols file
       uses: actions/upload-artifact@0b7f8abb1508181956e8e162db84b466c27e18ce # v3.1.2
       with:
-        name: libkmnkbp0-0.symbols
-        path: linux/debian/libkmnkbp0-0.symbols
+        name: libkeymancore.symbols
+        path: linux/debian/libkeymancore.symbols
       if: always()
 
   set_status:

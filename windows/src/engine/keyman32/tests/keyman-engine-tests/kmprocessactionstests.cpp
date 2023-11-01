@@ -49,7 +49,7 @@ TEST_F(KMPROCESSACTIONS, processMarkertest) {
   WCHAR callbuf[MAXCONTEXT];
   AITIP testApp;
   WCHAR expectedContext[] = {UC_SENTINEL, CODE_DEADKEY, 2, 0};
-  uintptr_t marker               = 2;
+  uint32_t marker               = 2;
   km_core_action_item itemAddMarker = {KM_CORE_IT_MARKER, {0,}, {marker}};
 
   processMarker(&testApp, &itemAddMarker);
@@ -67,7 +67,7 @@ TEST_F(KMPROCESSACTIONS, processBackDeadkeytest) {
   km_core_action_item itemAddChar = {KM_CORE_IT_CHAR, {0,}, {'A'}};
 
   processUnicodeChar(&testApp, &itemAddChar);
-  uintptr_t marker                 = 2;
+  uint32_t marker                 = 2;
   km_core_action_item itemAddMarker = {KM_CORE_IT_MARKER, {0,}, {marker}};
   processMarker(&testApp, &itemAddMarker);
   km_core_action_item itemBackSpace = {KM_CORE_IT_BACK};

@@ -216,14 +216,14 @@ window.onload = function() {
 
     if(newOSK) {
       document.getElementById('osk-host').removeChild(newOSK.element);
-      keyman.osk = null;
+      keyman.osk = null;  // Note: undocumented KeymanWeb API
     }
 
     // Create a new on screen keyboard view and tell KeymanWeb that
     // we are using the targetDevice for context input.
-    newOSK = new keyman.views.InlinedOSKView(keyman, { device: targetDevice });
-    keyman.core.contextDevice = targetDevice;
-    keyman.osk = newOSK;
+    newOSK = new keyman.views.InlinedOSKView(keyman, { device: targetDevice });  // Note: KeymanWeb internal API
+    keyman.core.contextDevice = targetDevice;  // Note: KeymanWeb internal API
+    keyman.osk = newOSK;  // Note: undocumented KeymanWeb API
 
     if(document.body.offsetWidth < targetDevice.dimensions[0]) {
       newOSK.setSize('320px', '200px');
@@ -237,8 +237,8 @@ window.onload = function() {
 
   keyman.addEventListener('keyboardchange', function(keyboardProperties) {
     if(newOSK) {
-      keyman.osk = newOSK;
-      newOSK.activeKeyboard = keyman.contextManager.activeKeyboard;  // Private API refs on both sides
+      keyman.osk = newOSK;  // Note: undocumented KeymanWeb API
+      newOSK.activeKeyboard = keyman.contextManager.activeKeyboard;  // Note: undocumented KeymanWeb API refs on both sides
     }
     keyboardDropdown.set(keyboardProperties.internalName);
     window.sessionStorage.setItem('current-keyboard', keyboardProperties.internalName);
@@ -284,7 +284,7 @@ function unloadKeyboardsAndModels() {
   const lastModel = keyman.core.activeModel;
   if(lastModel) {
     console.log('Unregistering model '+lastModel.id);
-    keyman.removeModel(lastModel.id);
+    keyman.removeModel(lastModel.id);  // Note: undocumented KeymanWeb API
   }
 
   modelDropdown.removeAll();

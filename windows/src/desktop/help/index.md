@@ -33,7 +33,6 @@ frequently asked questions, tutorials, and videos.
 ### [Advanced Topics](advanced/)
 * [Character Map](basic/toolbox/character-map)
 * [Hotkeys](start/hotkey_set)
-* [Text Services Framework Addin](advanced/text_services_framework)
 * [Use Word macros to switch keyboard and font](https://help.keyman.com/kb/93)
 * [Application Programming Interface (API)](https://help.keyman.com/developer/engine/desktop/current-version/api/)
 * [Keyman for Windows version history](https://help.keyman.com/products/windows/version-history)

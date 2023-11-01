@@ -3,7 +3,7 @@
 #include "kmx_base.h"
 
 namespace km {
-namespace kbp {
+namespace core {
 namespace kmx {
 
 #define VK_SPACE  0x20
@@ -32,5 +32,5 @@ namespace kmx {
 KMX_BOOL MapUSCharToVK(KMX_WORD ch, PKMX_WORD puKey, PKMX_DWORD puShiftFlags);
 
 } // namespace kmx
-} // namespace kbp
+} // namespace core
 } // namespace km

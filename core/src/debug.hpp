@@ -13,7 +13,7 @@
 #include <keyman/keyman_core_api_debug.h>
 
 namespace km {
-namespace kbp
+namespace core
 {
 
 class debug_items : public std::vector<km_core_state_debug_item>
@@ -66,6 +66,6 @@ void debug_items::set_enabled(bool value) noexcept {
   _is_enabled = value;
 }
 
-} // namespace kbp
+} // namespace core
 } // namespace km
 
