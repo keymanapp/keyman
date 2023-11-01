@@ -18,7 +18,7 @@
 #include "ldml/ldml_processor.hpp"
 #include "mock/mock_processor.hpp"
 
-using namespace km::kbp;
+using namespace km::core;
 
 namespace
 {

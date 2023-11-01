@@ -9,6 +9,7 @@ describe('testdata-tests', function() {
   it('should-build-testdata-fixtures', async function() {
     // Let's build test-fr.json
     // It should match test-fr.json (built from test-fr.xml)
+    // Note! There's another test case against similar data, in common/web/types/test/ldml-keyboard/test-ldml-keyboard-testdata-reader.ts
 
     const inputFilename = makePathToFixture('test-fr.xml');
     const jsonFilename = makePathToFixture('test-fr.json');
@@ -19,6 +20,6 @@ describe('testdata-tests', function() {
 
     const jsonData = JSON.parse(readFileSync(jsonFilename, 'utf-8'));
 
-    assert.deepEqual(testData, jsonData);
+    assert.deepEqual(testData, jsonData, 'parsed +test-fr.xml should match -test-fr.json');
   });
 });

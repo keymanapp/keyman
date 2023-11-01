@@ -229,7 +229,11 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
     } else {
       this._layerId = value;
       this.layerGroup.activeLayerId = value;
-      this.gestureEngine.stateToken = value;
+
+      // Does not exist for documentation keyboards!
+      if(this.gestureEngine) {
+        this.gestureEngine.stateToken = value;
+      }
     }
 
     if(changedLayer) {

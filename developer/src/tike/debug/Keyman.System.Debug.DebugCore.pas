@@ -85,7 +85,7 @@ var
 begin
   if not KeymanCoreLoaded then
   begin
-    path := TKeymanPaths.KeymanCoreLibraryPath(kmnkbp0);
+    path := TKeymanPaths.KeymanCoreLibraryPath(keymancore);
     try
       _km_core_set_library_path(path);
     except

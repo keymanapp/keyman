@@ -389,8 +389,8 @@ export class KeyboardInfoCompiler {
       keyboard_info.languages[language] = {};
     }
 
-    const fontSource = kmpJsonData.keyboards.map(e => e.displayFont).concat(...kmpJsonData.keyboards.map(e => e.webDisplayFonts ?? []));
-    const oskFontSource = kmpJsonData.keyboards.map(e => e.oskFont).concat(...kmpJsonData.keyboards.map(e => e.webOskFonts ?? []));
+    const fontSource = [].concat(...kmpJsonData.keyboards.map(e => e.displayFont ? [e.displayFont] : []), ...kmpJsonData.keyboards.map(e => e.webDisplayFonts ?? []));
+    const oskFontSource = [].concat(...kmpJsonData.keyboards.map(e => e.oskFont ? [e.oskFont] : []), ...kmpJsonData.keyboards.map(e => e.webOskFonts ?? []));
 
     for(const bcp47 of Object.keys(keyboard_info.languages)) {
       const language = keyboard_info.languages[bcp47];

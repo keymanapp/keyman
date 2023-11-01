@@ -21,6 +21,8 @@ export default class Multitap implements GestureHandler {
   public readonly baseContextToken: number;
   public readonly hasModalVisualization = false;
 
+  private readonly originalLayer: string;
+
   private readonly multitaps: ActiveSubKey[];
   private tapIndex = 0;
   private modipress: Modipress;
@@ -37,6 +39,8 @@ export default class Multitap implements GestureHandler {
     this.baseContextToken = contextToken;
     this.multitaps = [e.key.spec].concat(e.key.spec.multitap);
     this.sequence = source;
+
+    this.originalLayer = vkbd.layerId;
 
     // // For multitaps, keeping the key highlighted makes sense.  I think.
     // this.baseKey.key.highlight(true);
@@ -98,6 +102,11 @@ export default class Multitap implements GestureHandler {
         baseDistances.set(coord.item.key.spec, p);
       }
       keyEvent.keyDistribution = this.currentStageKeyDistribution(baseDistances);
+
+      // When _some_ multitap keys support layer-swapping but others don't,
+      // landing on a non-swap key should preserve the original layer... even
+      // if no such 'nextLayer' is specified by default.
+      keyEvent.kNextLayer ||= this.originalLayer;
 
       vkbd.raiseKeyEvent(keyEvent, null);
 

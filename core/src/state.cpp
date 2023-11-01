@@ -9,7 +9,7 @@
 #include "processor.hpp"
 #include <keyman/keyman_core_api_consts.h>
 
-using namespace km::kbp;
+using namespace km::core;
 
 void actions::push_persist(option const &opt) {
   assert(empty() || back().type != KM_CORE_IT_END);
@@ -35,7 +35,7 @@ void actions::push_capslock(bool turnOn) {
 }
 
 
-state::state(km::kbp::abstract_processor & ap, km_core_option_item const *env)
+state::state(km::core::abstract_processor & ap, km_core_option_item const *env)
   : _processor(ap)
 {
   for (; env && env->key != nullptr; env++) {
