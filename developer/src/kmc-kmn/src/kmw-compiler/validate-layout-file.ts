@@ -109,7 +109,7 @@ function CheckKey(
   //
 
   if(FId.trim() == '') {
-    if(!([TouchLayout.TouchLayoutKeySp.blank, TouchLayout.TouchLayoutKeySp.spacer].includes(FKeyType)) && FNextLayer == '') {
+    if(!([TouchLayout.TouchLayoutKeySp.blank, TouchLayout.TouchLayoutKeySp.spacer].includes(FKeyType))) {
       callbacks.reportMessage(KmwCompilerMessages.Warn_TouchLayoutUnidentifiedKey({layerId: layer.id}));
     }
     return true;
