@@ -146,9 +146,15 @@ export default class Flick implements GestureHandler {
       basePadding
     ]);
 
+    let safeBounds = vkbd.gestureEngine.config.safeBounds;
+    if(vkbd.isEmbedded) {
+      safeBounds = new PaddedZoneSource(safeBounds, [basePadding, 0, 0]);
+    }
+
     return {
       ...vkbd.gestureEngine.config,
-      maxRoamingBounds: roamBounding
+      maxRoamingBounds: roamBounding,
+      safeBounds: safeBounds // if embedded, ensure top boundary extends outside the WebView!
     }
   }
 
