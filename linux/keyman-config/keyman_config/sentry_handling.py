@@ -143,6 +143,11 @@ class SentryErrorHandling:
                     scope.set_tag('os.version', os_release['VERSION'])
             except OSError as e:
                 logging.debug(f'System does not have os_release file: {e.strerror}')
+            except AttributeError:
+                logging.debug('System does not have platform.freedesktop_os_release() method')
+            except:
+                logging.debug(
+                    'Got exception trying to access platform.freedesktop_os_release()  method or os_release information')
         logging.info("Initialized Sentry error reporting")
 
     def _raven_initialize(self):

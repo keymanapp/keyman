@@ -22,14 +22,14 @@
 BOOL IntLoadKeyboardOptionsRegistrytoCore(LPCSTR key, LPINTKEYBOARDINFO kp, km_core_state* const state);
 void IntSaveKeyboardOptionCoretoRegistry(LPCSTR REGKey, LPINTKEYBOARDINFO kp, LPCWSTR key, LPWSTR value);
 
-static km_core_cp* CloneKMKBPCP(const km_core_cp* cp) {
+static km_core_cp* CloneKeymanCoreCP(const km_core_cp* cp) {
   LPCWSTR buf      = reinterpret_cast<LPCWSTR>(cp);
   km_core_cp* clone = new km_core_cp[wcslen(buf) + 1];
   wcscpy_s(reinterpret_cast<LPWSTR>(clone), wcslen(buf) + 1, buf);
   return clone;
 }
 
-static km_core_cp* CloneKMKBPCPFromWSTR(LPWSTR buf) {
+static km_core_cp* CloneKeymanCoreCPFromWSTR(LPWSTR buf) {
   km_core_cp* clone = new km_core_cp[wcslen(buf) + 1];
   wcscpy_s(reinterpret_cast<LPWSTR>(clone), wcslen(buf) + 1, buf);
   return clone;
@@ -90,9 +90,9 @@ BOOL IntLoadKeyboardOptionsRegistrytoCore(LPCSTR key, LPINTKEYBOARDINFO kp, km_c
     LPCWSTR coreKey = reinterpret_cast<LPCWSTR>(kpc->key);
     WCHAR val[256];
     if (hasData && r.ReadString(coreKey, val, sizeof(val) / sizeof(val[0])) && val[0]) {
-      keyboardOpts[n].value = CloneKMKBPCPFromWSTR(val);
+      keyboardOpts[n].value = CloneKeymanCoreCPFromWSTR(val);
     } else {
-      keyboardOpts[n].value = CloneKMKBPCP(kpc->value);
+      keyboardOpts[n].value = CloneKeymanCoreCP(kpc->value);
     }
     n++;
   }

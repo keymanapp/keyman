@@ -36,7 +36,7 @@ describe('Custom Punctuation', function () {
 
     // The model compositor is responsible for adding this to the display as
     // string.
-    var composite = new ModelCompositor(model);
+    var composite = new ModelCompositor(model, true);
     var suggestions =  composite.predict([{ sample: { insert: 'o', deleteLeft: 0 }, p: 1.00 }], {
       left: 'Hrll', startOfBuffer: false, endOfBuffer: true
     });
@@ -81,7 +81,7 @@ describe('Custom Punctuation', function () {
 
       // The model compositor is responsible for adding this to the display as
       // string.
-      var composite = new ModelCompositor(model);
+      var composite = new ModelCompositor(model, true);
       var suggestions =  composite.predict([{ sample: { insert: 'ᚋ', deleteLeft: 0 }, p: 1.00 }], {
         left: '᚛ᚈᚑ', startOfBuffer: false, endOfBuffer: true
       });

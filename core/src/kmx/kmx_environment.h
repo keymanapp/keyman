@@ -5,7 +5,7 @@
 #include "kmx_base.h"
 
 namespace km {
-namespace kbp {
+namespace core {
 namespace kmx {
 
 class KMX_Environment {
@@ -30,5 +30,5 @@ public:
 };
 
 } // namespace kmx
-} // namespace kbp
+} // namespace core
 } // namespace km

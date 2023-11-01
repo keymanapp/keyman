@@ -10,7 +10,7 @@
         "node_modules"
     ],
     "files": [
-        "keyboardprocessor_ldml.ts",
+        "keyman_core_ldml.ts",
         "ldml-const-builder.ts"
     ]
 }

@@ -5,12 +5,12 @@ test_files = [
   '../src/KeymanSystemServiceClient.cpp',
 ]
 
-kmnkbp_tests_lib = cc.find_library(
-  'kmnkbp-tests', # meson will prefix 'lib'
+keymancore_tests_lib = cc.find_library(
+  'keymancore-tests', # meson will prefix 'lib'
   dirs: [ core_dir / 'build/arch' / get_option('buildtype') / 'tests/kmx_test_source' ]
 )
 
-test_deps = [gtk, ibus, icu, json_glib, kmnkbp_lib, kmnkbp_tests_lib, systemd]
+test_deps = [gtk, ibus, icu, json_glib, keymancore_lib, keymancore_tests_lib, systemd]
 dbus_deps = [gtk, systemd]
 
 test_env = [
