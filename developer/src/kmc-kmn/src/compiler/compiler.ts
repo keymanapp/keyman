@@ -9,7 +9,7 @@ TODO: implement additional interfaces:
 import { UnicodeSetParser, UnicodeSet, Osk, VisualKeyboard, KvkFileReader } from '@keymanapp/common-types';
 import { CompilerCallbacks, CompilerEvent, CompilerOptions, KeymanFileTypes, KvkFileWriter, KvksFileReader } from '@keymanapp/common-types';
 import loadWasmHost from '../import/kmcmplib/wasm-host.js';
-import { CompilerMessages, mapErrorFromKmcmplib } from './messages.js';
+import { CompilerMessages, mapErrorFromKmcmplib } from './kmn-compiler-messages.js';
 import { WriteCompiledKeyboard } from '../kmw-compiler/kmw-compiler.js';
 
 export interface CompilerResultFile {
