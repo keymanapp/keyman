@@ -171,6 +171,10 @@
         <File Name="keyboard_info.schema.json" Source="..\..\..\common\schemas\keyboard_info\" KeyPath="yes" />
       </Component>
 
+      <Component>
+        <File Name="kmp.schema.json" Source="..\..\..\common\schemas\kmp\" KeyPath="yes" />
+      </Component>
+
       <!-- Data Files -->
 
       <Component>
