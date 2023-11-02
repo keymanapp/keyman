@@ -199,7 +199,9 @@ export class KeyboardInfoCompiler {
       keyboard_info.jsFilename = this.callbacks.path.basename(sources.jsFilename);
       // Always overwrite with actual file size
       keyboard_info.jsFileSize = this.callbacks.fileSize(sources.jsFilename);
+      /* c8 ignore next 5 */
       if(keyboard_info.jsFileSize === undefined) {
+        // not normally reached, already checked in loadJsFile
         this.callbacks.reportMessage(KeyboardInfoCompilerMessages.Error_FileDoesNotExist({filename:sources.jsFilename}));
         return null;
       }
