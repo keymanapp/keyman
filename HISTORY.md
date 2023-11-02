@@ -1,5 +1,36 @@
 # Keyman Version History
 
+## 17.0.203 alpha 2023-10-30
+
+* fix(linux): Fix uninstallation of shared keyboard (#9880)
+* chore: include ci/pull-requests.inc.sh for help uploads (#9897)
+
+## 17.0.202 alpha 2023-10-30
+
+* chore(common): unify pull-request creation scripts (#9888)
+* epic: Keyman Core for Mac (#7857)
+
+## 17.0.201 alpha 2023-10-28
+
+* fix(core): build: support -t parameter correctly (#9820)
+* fix(developer): handle displayMap correctly with 'fill from layout' (#9861)
+
+## 17.0.200 alpha 2023-10-27
+
+* chore(developer,common,core): update to latest CLDR v44 (#9842)
+
+## 17.0.199 alpha 2023-10-26
+
+* fix(developer): handle xml errors in package compiler (#9821)
+* fix(developer): server download Keyman link (#9822)
+* chore(common): handle invalid XML in kpj-file-reader (#9824)
+* fix(developer): reduce confusion in Unicode fields in touch layout editor (#9839)
+
+## 17.0.198 alpha 2023-10-25
+
+* chore(common): Add entries from 16.0 HISTORY.md (#9826)
+* feat(core): new actions APIs (#9828)
+
 ## 17.0.197 alpha 2023-10-24
 
 * chore(linux): Rename (lib)kmnkbp to (lib)keymancore  ️ (#9793)

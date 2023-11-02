@@ -3,7 +3,7 @@ import { callbacks, IsKeyboardVersion14OrLater, IsKeyboardVersion15OrLater } fro
 import { JavaScript_Key } from "./javascript-strings.js";
 import { TRequiredKey, CRequiredKeys, CSpecialText10, CSpecialText14, CSpecialText14ZWNJ, CSpecialText14Map } from "./constants.js";
 import { KeymanWebTouchStandardKeyNames, KMWAdditionalKeyNames, VKeyNames } from "./keymanweb-key-codes.js";
-import { KmwCompilerMessages } from "./messages.js";
+import { KmwCompilerMessages } from "./kmw-compiler-messages.js";
 
 
 interface VLFOutput {
@@ -109,7 +109,7 @@ function CheckKey(
   //
 
   if(FId.trim() == '') {
-    if(!([TouchLayout.TouchLayoutKeySp.blank, TouchLayout.TouchLayoutKeySp.spacer].includes(FKeyType)) && FNextLayer == '') {
+    if(!([TouchLayout.TouchLayoutKeySp.blank, TouchLayout.TouchLayoutKeySp.spacer].includes(FKeyType))) {
       callbacks.reportMessage(KmwCompilerMessages.Warn_TouchLayoutUnidentifiedKey({layerId: layer.id}));
     }
     return true;
@@ -207,13 +207,17 @@ export function ValidateLayoutFile(fk: KMX.KEYBOARD, FDebug: boolean, sLayoutFil
   let reader = new TouchLayoutFileReader();
   let data: TouchLayout.TouchLayoutFile;
   try {
+    if(!callbacks.fs.existsSync(sLayoutFile)) {
+      callbacks.reportMessage(KmwCompilerMessages.Error_TouchLayoutFileDoesNotExist({filename: sLayoutFile}));
+      return null;
+    }
     data = reader.read(callbacks.loadFile(sLayoutFile));
     if(!data) {
       throw new Error('Unknown error reading touch layout file');
     }
   } catch(e) {
-    callbacks.reportMessage(KmwCompilerMessages.Error_InvalidTouchLayoutFile({msg: (e??'Unspecified error').toString()}));
-    return {output:null, result: false};
+    callbacks.reportMessage(KmwCompilerMessages.Error_InvalidTouchLayoutFileFormat({msg: (e??'Unspecified error').toString()}));
+    return null;
   }
 
   let result: boolean = true;

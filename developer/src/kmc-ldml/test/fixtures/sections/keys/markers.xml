@@ -2,18 +2,22 @@
 
 <!DOCTYPE keyboard3 SYSTEM "../../../../../../../resources/standards-data/ldml-keyboards/techpreview/dtd/ldmlKeyboard3.dtd">
 <keyboard3 locale="mt" conformsTo="techpreview">
-  <names>
-    <name value="keys-markers" />
-  </names>
+  <info name="keys-markers"/>
 
   <keys>
-    <key id="ww" to="\m{w}" flicks="flickw" longPress="\m{w}" longPressDefault="\m{w}" multiTap="\m{w}" />
-    <flicks id="flickw">
-        <flick directions="nw" to="\m{w}" />
-    </flicks>
+    <key id="aa" output="\m{aa}" />
+    <key id="bb" output="\m{bb}" />
+    <key id="cc" output="\m{cc}" />
+    <key id="dd" output="\m{dd}" />
+    <key id="ww" output="\m{w}" flickId="flickw" longPressKeyIds="aa bb" longPressDefaultKeyId="bb" multiTapKeyIds="cc" />
   </keys>
+  <flicks>
+    <flick id="flickw">
+      <flickSegment directions="nw" keyId="dd" />
+    </flick>
+  </flicks>
 
-  <layers form="iso">
+  <layers formId="iso">
     <layer id="base">
       <row keys="ww" />
     </layer>
