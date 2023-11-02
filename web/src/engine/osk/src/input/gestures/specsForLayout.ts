@@ -4,12 +4,10 @@ import {
   InputSample
 } from '@keymanapp/gesture-recognizer';
 
-
-// // TODO:  can only use directly once updates from the base feature-branch propagate through ancestors.
-// import {
-//   type TouchLayout
-// } from '@keymanapp/common-types';
-// import type ButtonClasses = TouchLayout.TouchLayoutKeySp;
+import {
+  TouchLayout
+} from '@keymanapp/common-types';
+import ButtonClasses = TouchLayout.TouchLayoutKeySp;
 
 import {
   deepCopy
@@ -80,7 +78,6 @@ export const DEFAULT_GESTURE_PARAMS: GestureParams = {
 }
 
 export function keySupportsModipress(key: KeyElement) {
-  // Future enhancement idea:  allow some extra way for a key to say "hi, I'm modipressable".
   const keySpec = key.key.spec;
   const modifierKeyIds = ['K_SHIFT', 'K_ALT', 'K_CTRL', 'K_NUMERALS', 'K_SYMBOLS', 'K_CURRENCIES'];
   for(const modKeyId of modifierKeyIds) {
@@ -90,7 +87,7 @@ export function keySupportsModipress(key: KeyElement) {
   }
 
   // Allows special-formatted keys with a next-layer property to be modipressable.
-  return keySpec.sp > 0 /* ButtonClasses.normal */ && keySpec.sp < 8 /* ButtonClasses.deadkey */ && !!keySpec.nextlayer;
+  return keySpec.sp > ButtonClasses.normal && keySpec.sp < ButtonClasses.deadkey && !!keySpec.nextlayer;
 }
 
 /**
