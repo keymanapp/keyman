@@ -1,3 +1,5 @@
+import { KMX } from "@keymanapp/common-types";
+
 export enum TRequiredKey {
   K_LOPT='K_LOPT', K_BKSP='K_BKSP', K_ENTER='K_ENTER'
 }; // I4447
