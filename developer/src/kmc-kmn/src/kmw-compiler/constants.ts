@@ -33,15 +33,17 @@ export const
 
   // Map for checking minimum versions and Special Text
   export const CSpecialText = new Map<number, string>([
-    [10, CSpecialText10],
-    [11, CSpecialText10],
-    [12, CSpecialText10],
-    [13, CSpecialText10],
-    [14, CSpecialText14 + CSpecialText10],
-    [15, CSpecialText14 + CSpecialText10],
-    [16, CSpecialText14 + CSpecialText10],
-    [17, CSpecialText17 + CSpecialText14 + CSpecialText10]
+    [KMX.KMXFile.VERSION_100, CSpecialText10],
+    [KMX.KMXFile.VERSION_110, CSpecialText10],
+    [KMX.KMXFile.VERSION_120, CSpecialText10],
+    [KMX.KMXFile.VERSION_130, CSpecialText10],
+    [KMX.KMXFile.VERSION_140, CSpecialText14 + CSpecialText10],
+    [KMX.KMXFile.VERSION_150, CSpecialText14 + CSpecialText10],
+    [KMX.KMXFile.VERSION_160, CSpecialText14 + CSpecialText10],
+    [KMX.KMXFile.VERSION_170, CSpecialText17 + CSpecialText14 + CSpecialText10]
   ]);
+  export const CSpecialTextMinVer = KMX.KMXFile.VERSION_100;
+  export const CSpecialTextMaxVer = KMX.KMXFile.VERSION_170;
 
 // These correspond to TSS_ values in kmx.ts
 export const

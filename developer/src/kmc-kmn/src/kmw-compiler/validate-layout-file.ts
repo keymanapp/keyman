@@ -144,7 +144,7 @@ function CheckKey(
     // Keyman versions before 14 do not support '*special*' labels on non-special keys.
     // ZWNJ use, however, is safe because it will be transformed in function
     // TransformSpecialKeys14 to '<|>',  which does not require the custom OSK font.
-    const mapVersion = (fk.fileVersion > 17 ? 17 : fk.fileVersion < 10 ? 10 : fk.fileVersion);
+    const mapVersion = (fk.fileVersion > CSpecialTextMaxVer ? CSpecialTextMaxVer : fk.fileVersion < CSpecialTextMinVer ? CSpecialTextMinVer : fk.fileVersion);
     const specialText = CSpecialText.get(mapVersion);
     if(specialText.includes(FText) &&
         !([TouchLayout.TouchLayoutKeySp.special, TouchLayout.TouchLayoutKeySp.specialActive].includes(FKeyType))) {
