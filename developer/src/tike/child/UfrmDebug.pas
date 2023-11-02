@@ -900,7 +900,7 @@ procedure TfrmDebug.ExecuteEventAction(n: Integer);
     state: TMemoSelectionState;
   begin
     state := SaveMemoSelectionState;
-    // Line breaks: replace \n with \r\n so line breaks work
+    // Line breaks: replace \r (0x0D) with \r\n (0x0D 0x0A) so line breaks work
     memo.SelText := ReplaceStr(Text, #$0D, #$0D#$0A);
     memo.SelStart := memo.SelStart + memo.SelLength;  // I1603
     memo.SelLength := 0;
