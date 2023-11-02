@@ -592,16 +592,20 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
         // Potential long-term idea:  only handle the first stage; delegate future stages to
         // specialized handlers for the remainder of the sequence.
         // Should work for modipresses, too... I think.
-        if(gestureStage.matchedId == 'special-key-start' && gestureKey.key.spec.baseKeyID == 'K_BKSP') {
-          // There shouldn't be a preview host for special keys... but it doesn't hurt to add the check.
-          existingPreviewHost?.cancel();
+        if(gestureStage.matchedId == 'special-key-start') {
+          if(gestureKey.key.spec.baseKeyID == 'K_BKSP') {
+            // There shouldn't be a preview host for special keys... but it doesn't hurt to add the check.
+            existingPreviewHost?.cancel();
 
-          // Possible enhancement:  maybe update the held location for the backspace if there's movement?
-          // But... that seems pretty low-priority.
-          //
-          // Merely constructing the instance is enough; it'll link into the sequence's events and
-          // handle everything that remains for the backspace from here.
-          handlers = [new HeldRepeater(gestureSequence, () => this.modelKeyClick(gestureKey, coord))];
+            // Possible enhancement:  maybe update the held location for the backspace if there's movement?
+            // But... that seems pretty low-priority.
+            //
+            // Merely constructing the instance is enough; it'll link into the sequence's events and
+            // handle everything that remains for the backspace from here.
+            handlers = [new HeldRepeater(gestureSequence, () => this.modelKeyClick(gestureKey, coord))];
+          } else if(gestureKey.key.spec.baseKeyID == "K_LOPT") {
+            gestureSequence.on('complete', () => this.emit('globekey', gestureKey, false));
+          }
         } else if(gestureStage.matchedId.indexOf('longpress') > -1) {
           existingPreviewHost?.cancel();
 
