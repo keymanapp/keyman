@@ -143,7 +143,8 @@ export class BrowserDriver {
       await Promise.race([defermentPromise.corePromise, timedPromise(50)]);
       if(!defermentPromise.isFulfilled) {
         // Acts as a 'canary' that something is wrong.
-        throw new Error("No 'keyevent' detected for the specified touch!");
+        const sourceType = keyman.config.hostDevice.touchable ? 'touch' : 'click';
+        throw new Error(`No 'keyevent' detected for the specified ${sourceType} targeting key ${eventSpec.keyID}!`);
       }
     } finally {
       // The alt-layer needs to be maintained until the key is generated.
@@ -154,6 +155,11 @@ export class BrowserDriver {
         keyman.osk.vkbd.refreshLayout();
       }
     }
+
+      // Ensure any lingering gesture-system-internal Promises have a chance to clear.
+      // (Timeouts use the 'macrotask' queue, which waits for all pending microtasks to clear first.)
+      // Certain tests (involving layer-shift keys & AltGr emulation) need the extra chance.
+      await timedPromise(0);
   }
 
   // Execution of a test sequence depends on the testing environment; integrated
