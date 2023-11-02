@@ -233,8 +233,8 @@ export class KmnCompilerMessages {
 
   static ERROR_DuplicateGroup                                 = SevError | 0x071;
   static ERROR_DuplicateStore                                 = SevError | 0x072;
-
   static ERROR_RepeatedBegin                                  = SevError | 0x073;
+  static ERROR_VirtualKeyInContext                            = SevError | 0x074;
 
   static WARN_TooManyWarnings                                 = SevWarn | 0x080;
   static WARN_OldVersion                                      = SevWarn | 0x081;
