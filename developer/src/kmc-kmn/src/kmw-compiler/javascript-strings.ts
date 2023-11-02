@@ -2,7 +2,7 @@ import { TSentinelRecord, GetSuppChar, ExpandSentinel, incxstr, xstrlen, xstrlen
 import { KMX } from "@keymanapp/common-types";
 
 import { callbacks, FCallFunctions, FFix183_LadderLength, FMnemonic, FTabStop, FUnreachableKeys, IsKeyboardVersion10OrLater, IsKeyboardVersion14OrLater, kmxResult, nl, options } from "./compiler-globals.js";
-import { KmwCompilerMessages } from "./messages.js";
+import { KmwCompilerMessages } from "./kmw-compiler-messages.js";
 import { FormatModifierAsBitflags, RuleIsExcludedByPlatform } from "./kmw-compiler.js";
 import { KMXCodeNames, SValidIdentifierCharSet, UnreachableKeyCodes, USEnglishShift, USEnglishUnshift, USEnglishValues } from "./constants.js";
 import { KMWVKeyNames, TKeymanWebTouchStandardKey, VKeyNames } from "./keymanweb-key-codes.js";
