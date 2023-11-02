@@ -54,7 +54,7 @@ describe('CompilerMessages', function () {
   // CERR_DuplicateGroup
 
   it('should generate CERR_DuplicateGroup if the kmn contains two groups with the same name', async function() {
-    await testForMessage(this, ['invalid-keyboards', 'error_duplicate_group.kmn'], KmnCompilerMessages.ERROR_DuplicateGroup); //TODO: consolidate messages from kmcmplib, CompilerMessages.CERR_DuplicateGroup
+    await testForMessage(this, ['invalid-keyboards', 'error_duplicate_group.kmn'], KmnCompilerMessages.ERROR_DuplicateGroup);
     assert.equal(callbacks.messages[0].message, "A group with this name has already been defined. Group 'ខ្មែរ' declared on line 9");
   });
 
