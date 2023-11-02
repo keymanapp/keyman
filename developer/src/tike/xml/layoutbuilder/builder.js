@@ -40,14 +40,16 @@ $(function() {
     builder.selectSubKey(subKey);
   }
 
-  $('#selPlatformPresentation').change(function () {
+  builder.selPlatformPresentationChange = function () {
     let lastSelection = builder.saveSelection();
     builder.selectKey(null, false);
     builder.selectSubKey(null);
     builder.prepareLayer();
     builder.restoreSelection(lastSelection);
     builder.saveState();
-  });
+  }
+
+  $('#selPlatformPresentation').change(builder.selPlatformPresentationChange);
 
   builder.removeAllSubKeys = function() {
     $('#sub-key-groups .key').remove();
