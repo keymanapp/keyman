@@ -145,9 +145,31 @@ public:
     //                                                  If there is no translation, the function returns 0.
     //                                                  SC -> VK
     this->m_vk = get_VirtualKey_Other_From_SC(scanCode, All_Vector);
+   // this->m_vk = get_VirtualKey_Other_From_SC_NEW(scanCode, All_Vector, keymap, scanCode,scanCode);
+    //this->m_vk = get_VirtualKey_Other_From_SC_GDK_dw( All_Vector, keymap, scanCode,scanCode);  // use gdk to get vk`s
+
     this->m_hkl = hkl;
     this->m_sc = scanCode;
   }
+
+  KMX_VirtualKey(UINT scanCode, KMX_HKL hkl, v_dw_3D All_Vector, GdkKeymap **keymap) {
+    // _S2 this->m_vk = MapVirtualKeyEx(scanCode, 1, hkl);  // second para= 1: MAPVK_VSC_TO_VK =1
+    //                                                  The first parameter is a scan code and is
+    //                                                  translated into a virtual-key code that does not
+    //                                                  distinguish between left- and right-hand keys.
+    //                                                  If there is no translation, the function returns 0.
+    //                                                  SC -> VK
+    this->m_vk = get_VirtualKey_Other_From_SC(scanCode, All_Vector);
+    this->m_hkl = hkl;
+    this->m_sc = scanCode ;
+  }
+
+void set_SC(UINT value){
+  this->m_sc = value;
+}
+void set_VK(UINT value){
+  this->m_vk = value;
+}
 
   UINT VK() {
     return this->m_vk;
@@ -596,8 +618,11 @@ std::wstring  get_VirtualKey_Other_from_iKey(KMX_DWORD iKey, ShiftState &ss, int
   // _S2 this will find the correct row in All_Vector
   //( e.g. get_position_From_VirtualKey_Other(65 ,All_Vector ) returns 25
   // All_Vector[25] contains SC(38), unshifted A (97) shifted A (65) )
-  KMX_DWORD pos = get_position_From_VirtualKey_Other(iKey, All_Vector);
-
+  KMX_DWORD pos = get_position_From_VirtualKey_Other(iKey, All_Vector,99);
+   /*KMX_DWORD pos0 = get_position_From_VirtualKey_Other(iKey, All_Vector,0);
+   KMX_DWORD pos1 = get_position_From_VirtualKey_Other(iKey, All_Vector,1);
+   KMX_DWORD pos2 = get_position_From_VirtualKey_Other(iKey, All_Vector,2);
+   KMX_DWORD pos3 = get_position_From_VirtualKey_Other(iKey, All_Vector,99);*/
   int icaps;
   if (ss >9)
     return L"";
@@ -665,15 +690,29 @@ bool KMX_ImportRules(KMX_WCHAR *kbid, LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, Gd
     // _S2 this does not find exactly the same keys as the windows version does(windows finds more)
     // but the ones we need for mcompile are there
   //for(UINT sc = 0x01; sc <= 0x7f; sc++) {
-  for(UINT sc = 0x0; sc <= 0x7f; sc++) {
-    KMX_VirtualKey *key = new KMX_VirtualKey(sc, hkl, All_Vector);      // _S2 get this from my Vector
+
+//should be 54 (= unshifted)
+//KMX_VirtualKey *key1 = new KMX_VirtualKey(15, hkl, All_Vector, keymap);
+//should be 65 (=shifted)
+//KMX_VirtualKey *key2 = new KMX_VirtualKey(38, hkl, All_Vector, keymap);
+
+
+  for(UINT sc = 0x01; sc <= 0x7f; sc++) {
+    // KMX_VirtualKey *key = new KMX_VirtualKey(sc, hkl, All_Vector);      // _S2 get this from my Vector
+    KMX_VirtualKey *key = new KMX_VirtualKey(sc, hkl, All_Vector, keymap);      // _S2 get this from my Vector
     uint key_vk = key->VK() ;
+    std::wstring s= PrintKeymapForCodeReturnKeySym2( *keymap, (guint) sc , All_Vector, Shft, 0 );
+    if ( !s.empty() );
+      UINT in1_dw = (UINT)(*s.c_str());
+
+    key->set_VK( in1_dw) ;
     wprintf(L" sc= %i ---  VK = %i (%c)\n",sc,key_vk,key_vk);
-   if(key->VK() != 0) {
-      rgKey[key->VK()] = key;
+    if((key->VK() != 0) && (key->VK() <256)) {
+        rgKey[key->VK()] = key;
     } else {
-      delete key;
+        delete key;
     }
+
   }
 
   for(UINT ke = VK_NUMPAD0; ke <= VK_NUMPAD9; ke++) {
@@ -710,7 +749,7 @@ bool KMX_ImportRules(KMX_WCHAR *kbid, LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, Gd
   }
 */
   // _S2 test rgkey can go later
-  for(UINT iKey = 160; iKey < rgKey.size(); iKey++) {
+  for(UINT iKey = 0; iKey < rgKey.size(); iKey++) {
       if(rgKey[iKey] != NULL) {
           wprintf(L" Key Nr %i is available\n",iKey);
       }
@@ -730,13 +769,24 @@ bool KMX_ImportRules(KMX_WCHAR *kbid, LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, Gd
           continue;
         }
 
+int Keypos =  get_position_From_VirtualKey_Other(mapped_ikey , All_Vector, 2);
+UINT pp = (UINT) All_Vector[1][Keypos][0];
+
+
+
         for(int caps = 0; caps <= 1; caps++) {
 
     //wprintf(L"this was ss %i - ikey %i\n",ss ,iKey);
           //_S2 TODO
           //_S2 get char  - do I need rc ?? ( was rc = ToUnicodeEx...)
           std::wstring VK_Other_OLD = get_VirtualKey_Other_from_iKey(mapped_ikey, ss, caps, All_Vector);
-          std::wstring VK_Other= PrintKeymapForCodeReturnKeySym(  *keymap, mapped_ikey, ss, caps==0);
+          //std::wstring VK_Other= PrintKeymapForCodeReturnKeySym(  *keymap, mapped_ikey, All_Vector, ss, caps);
+          std::wstring VK_Other= PrintKeymapForCodeReturnKeySym(  *keymap, pp, All_Vector, ss, caps);
+
+
+
+
+
 
 
           if ( VK_Other_OLD != VK_Other) {
@@ -765,7 +815,7 @@ bool KMX_ImportRules(KMX_WCHAR *kbid, LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, Gd
             //_S2 TODO
             // fill m_rgss and m_rgfDeadkey ( m_rgfDeadkey will be done later)
             //rgKey[iKey]->KMX_SetShiftState(ss, VK_Other, false, (caps == 0));
-           rgKey[iKey]->KMX_SetShiftState(ss, VK_Other, false, (caps == 0));
+           rgKey[iKey]->KMX_SetShiftState(ss, VK_Other, false, (caps));
           //}  // from rc==1
         // } // from rc > 0
 

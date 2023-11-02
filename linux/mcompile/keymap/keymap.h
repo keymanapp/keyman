@@ -217,6 +217,9 @@ const int Lin_KM__map_arr[70]={
 const int Lin_KM__map(int i);
 const int Lin_KM__map(int i, v_dw_3D &All_Vector);
 std::wstring  PrintKeymapForCodeReturnKeySym(GdkKeymap *keymap,guint keycode, ShiftState ss, int caps  );
+std::wstring  PrintKeymapForCodeReturnKeySym(GdkKeymap *keymap, guint VK, v_dw_3D &All_Vector, ShiftState ss, int caps  );
+std::wstring  PrintKeymapForCodeReturnKeySym2(GdkKeymap *keymap, guint VK, v_dw_3D &All_Vector, ShiftState ss, int caps  );
+
 // this is what we return when we find an invalid character
 //_S2 Which character do we use in that case?  0 or FFFF or 32 or ??
 static KMX_DWORD returnIfCharInvalid = 32;
@@ -245,18 +248,25 @@ v_dw_2D create_empty_2D(int dim_rows, int dim_shifts);
 
 // query All_Vector
 // return the VirtualKey of the Other Keyboard for given Scancode
+KMX_DWORD get_VirtualKey_Other_From_SC(KMX_DWORD SC , v_dw_3D &All_Vector, GdkKeymap **keymap);
 KMX_DWORD get_VirtualKey_Other_From_SC(KMX_DWORD SC , v_dw_3D &All_Vector);
+KMX_DWORD get_VirtualKey_Other_From_SC_GDK(KMX_DWORD SC , v_dw_3D &All_Vector);
+KMX_DWORD get_VirtualKey_Other_From_SC_NEW(KMX_DWORD SC , v_dw_3D &All_Vector,GdkKeymap **keymap,KMX_DWORD SC1,KMX_DWORD SC2);
 KMX_DWORD get_VirtualKey_Other_Layer1_From_SC(KMX_DWORD SC , v_dw_3D &All_Vector);
 KMX_DWORD get_VirtualKey_Other_Layer2_From_SC(KMX_DWORD SC , v_dw_3D &All_Vector);
+
+KMX_DWORD get_VirtualKey_Other_From_SC_GDK_dw(v_dw_3D &All_Vector, GdkKeymap **keymap, KMX_DWORD keycode ,  guint VK);
 
 // return the VirtualKey of the US Keyboard for given Scancode
 KMX_DWORD get_VirtualKey_US_From_SC(KMX_DWORD SC , v_dw_3D &All_Vector);
 // return the Scancode of for given VirtualKey of Other Keyboard
 KMX_DWORD get_SC_From_VirtualKey_Other(KMX_DWORD VK_Other , v_dw_3D &All_Vector);
-// return the Scancode of for given VirtualKey of Other US
+// return the Scancode of for given VirtualKey of  US
 KMX_DWORD get_SC_From_VirtualKey_US(KMX_DWORD VK_US , v_dw_3D &All_Vector);
-// return the Scancode of for given VirtualKey of Other US
+// return the Scancode of for given VirtualKey of Other
 KMX_DWORD get_position_From_VirtualKey_Other(KMX_DWORD VK_US , v_dw_3D &All_Vector);
+// return the Scancode of for given VirtualKey of Other in specific column. If column > available columns look in all columns;
+KMX_DWORD get_position_From_VirtualKey_Other(KMX_DWORD VK_Other , v_dw_3D &All_Vector, int which_columns);
 
 bool IsKeyIn_VKMap(UINT SC);
 

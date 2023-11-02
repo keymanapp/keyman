@@ -1,13 +1,39 @@
 #include "keymap.h"
 
 #include <xkbcommon/xkbcommon.h>
+void GDK_Check(guint keyval){
 
-std::wstring  PrintKeymapForCodeReturnKeySym(GdkKeymap *keymap,guint VK, ShiftState ss, int caps  ){
- //GdkKeymap *keymap;
+gchar * gg =  gdk_keyval_name (keyval);
+guint to_up = gdk_keyval_to_upper ( keyval);
+
+guint to_low =gdk_keyval_to_lower ( keyval);
+gboolean is_up= gdk_keyval_is_upper ( keyval);
+gboolean is_low=gdk_keyval_is_lower ( keyval);
+guint kv__frrom= gdk_keyval_from_name ((const gchar *) gg);
+guint32 uni= gdk_keyval_to_unicode ( keyval);
+
+gchar * gg1 =  gdk_keyval_name (keyval);
+guint lower;
+guint upper;
+gdk_keyval_convert_case (*gg1,    &lower,&upper);
+gdk_keyval_convert_case (GDK_KEY_A,    &lower,&upper);
+gdk_keyval_convert_case (66,    &lower,&upper);
+
+
+/*guint *lower; guint *upper;
+gdk_keyval_convert_case (GDK_KEY_A,    lower,upper);
+gdk_keyval_convert_case (GDK_KEY_a,    lower,upper);
+gdk_keyval_convert_case (GDK_KEY_4,    lower,upper);
+gdk_keyval_convert_case (GDK_KEY_dollar,    lower,upper);*/
+}
+
+std::wstring  PrintKeymapForCodeReturnKeySym(GdkKeymap *keymap, guint VK, v_dw_3D &All_Vector, ShiftState ss, int caps  ){
+//GdkKeymap *keymap;
   GdkModifierType consumed;
   GdkKeymapKey *maps;
   GdkEventKey* event;
   guint *keyvals;
+  guint *keyvals_shift;
   gint *n_entries;
   gint count;
   guint keycode;
@@ -15,15 +41,133 @@ std::wstring  PrintKeymapForCodeReturnKeySym(GdkKeymap *keymap,guint VK, ShiftSt
  GdkKeymapKey* keys;
  gint n_keys;
 
+/*GDK_Check(38);
+GDK_Check(17);*/
+
+
   gdk_keymap_get_entries_for_keyval(keymap, VK,&keys,&n_keys);
 
-  if( keys !=NULL) {
-    keycode = keys[n_keys-1].keycode;
 
-    for( int k=0; k< n_keys; k++) {
-      guint kc= keys[n_keys-1].keycode;
-    }
+  int pos_1 =get_position_From_VirtualKey_Other(VK , All_Vector, 99);
+  // wprintf(L" get_position_From_VirtualKey_Other %i of VK%i (%c) \n", pos_1, VK,VK);
+  keycode = All_Vector[1][pos_1][0];
+
+
+GDK_Check(keycode);
+  if (!gdk_keymap_get_entries_for_keycode(keymap, keycode, &maps, &keyvals, &count))
+    return L"1";
+
+
+  //unshifted
+  if (( ss == Base ) && ( caps == 0 )) {
+    GdkModifierType MOD_base = (GdkModifierType) ( ~GDK_MODIFIER_MASK );
+    gdk_keymap_translate_keyboard_state (keymap, keycode, MOD_base , 0, keyvals, NULL, NULL, & consumed);
+
+
+    std::wstring rV1= std::wstring(1, (int) *keyvals);
+
+    gchar * gg1 =  gdk_keyval_name (*keyvals);
+    guint lower;
+    guint upper;
+    gdk_keyval_convert_case (*gg1,    &lower,&upper);
+    std::wstring rv2= std::wstring(1, (int) upper);
+    std::wstring rv1= std::wstring(1, (int) *keyvals);
+
+    //return rv2;
+    return  std::wstring(1, (int) *keyvals);
   }
+
+  //SHIFT+CAPS
+  else if ( ( ss == Shft ) && ( caps ==1 )) {
+    GdkModifierType MOD_ShiftCaps= (GdkModifierType) ((GDK_SHIFT_MASK | GDK_LOCK_MASK));
+    gdk_keymap_translate_keyboard_state (keymap, keycode, MOD_ShiftCaps , 0, keyvals, NULL, NULL, & consumed);
+
+    std::wstring rV1= std::wstring(1, (int) *keyvals);
+
+    gchar * gg1 =  gdk_keyval_name (*keyvals);
+    guint lower;
+    guint upper;
+    gdk_keyval_convert_case (*gg1,    &lower,&upper);
+    std::wstring rv2= std::wstring(1, (int) upper);
+
+    std::wstring rv1= std::wstring(1, (int) *keyvals);
+    //return rv2;
+    return  std::wstring(1, (int) *keyvals);
+
+  }
+
+  //Shift
+  else if (( ss == Shft ) && ( caps == 0 )) {
+    GdkModifierType MOD_Shift = (GdkModifierType) ( GDK_SHIFT_MASK );
+    gdk_keymap_translate_keyboard_state (keymap, keycode, MOD_Shift , 0, keyvals, NULL, NULL, & consumed);
+
+    std::wstring rV1= std::wstring(1, (int) *keyvals);
+
+
+gchar * gg1 =  gdk_keyval_name (*keyvals);
+guint lower;
+guint upper;
+gdk_keyval_convert_case (*gg1,    &lower,&upper);
+
+
+//keyvals_shift = gg1;
+    std::wstring rv2= std::wstring(1, (int) upper);
+
+    std::wstring rv1= std::wstring(1, (int) *keyvals);
+    return  std::wstring(1, (int) *keyvals);
+
+  }
+
+  //caps
+  else if (( ss == Base ) && ( caps == 1 )) {
+    GdkModifierType MOD_Caps = (GdkModifierType) ( GDK_LOCK_MASK );
+    gdk_keymap_translate_keyboard_state (keymap, keycode, MOD_Caps, 0, keyvals, NULL, NULL, & consumed);
+
+    std::wstring rV1= std::wstring(1, (int) *keyvals);
+
+    gchar * gg1 =  gdk_keyval_name (*keyvals);
+    guint lower;
+    guint upper;
+    gdk_keyval_convert_case (*gg1,    &lower,&upper);
+    std::wstring rv2= std::wstring(1, (int) upper);
+    std::wstring rv1= std::wstring(1, (int) *keyvals);
+
+    //return rv2;
+    return  std::wstring(1, (int) *keyvals);
+
+  }
+  éÉ22
+  /*//ALT-GR
+  else if {
+    GdkModifierType MOD_AltGr = (GdkModifierType) ( GDK_MOD5_MASK );
+    gdk_keymap_translate_keyboard_state (keymap, keycode, MOD_AltGr , 0, keyvals, NULL, NULL, & consumed);
+    return *keyvals;
+  }*/
+
+  else
+    return L"0";
+}
+
+
+std::wstring  PrintKeymapForCodeReturnKeySym2(GdkKeymap *keymap, guint VK, v_dw_3D &All_Vector, ShiftState ss, int caps  ){
+
+  GdkModifierType consumed;
+  GdkKeymapKey *maps;
+  GdkEventKey* event;
+  guint *keyvals;
+  guint *keyvals_shift;
+  gint *n_entries;
+  gint count;
+  guint keycode;
+
+  GdkKeymapKey* keys;
+  gint n_keys;
+
+  gdk_keymap_get_entries_for_keyval(keymap, VK,&keys,&n_keys);
+
+  int pos_1 =get_position_From_VirtualKey_Other(VK , All_Vector, 99);
+  wprintf(L" get_position_From_VirtualKey_Other %i of VK%i (%c) \n", pos_1, VK,VK);
+  keycode = All_Vector[1][pos_1][0];
 
   if (!gdk_keymap_get_entries_for_keycode(keymap, keycode, &maps, &keyvals, &count))
     return L"1";
@@ -33,6 +177,7 @@ std::wstring  PrintKeymapForCodeReturnKeySym(GdkKeymap *keymap,guint VK, ShiftSt
   if (( ss == Base ) && ( caps == 0 )) {
     GdkModifierType MOD_base = (GdkModifierType) ( ~GDK_MODIFIER_MASK );
     gdk_keymap_translate_keyboard_state (keymap, keycode, MOD_base , 0, keyvals, NULL, NULL, & consumed);
+
     return  std::wstring(1, (int) *keyvals);
   }
 
@@ -48,6 +193,19 @@ std::wstring  PrintKeymapForCodeReturnKeySym(GdkKeymap *keymap,guint VK, ShiftSt
   else if (( ss == Shft ) && ( caps == 0 )) {
     GdkModifierType MOD_Shift = (GdkModifierType) ( GDK_SHIFT_MASK );
     gdk_keymap_translate_keyboard_state (keymap, keycode, MOD_Shift , 0, keyvals, NULL, NULL, & consumed);
+
+    std::wstring rV1= std::wstring(1, (int) *keyvals);
+
+/*
+gchar * gg1 =  gdk_keyval_name (*keyvals);
+guint lower;
+guint upper;
+gdk_keyval_convert_case (*gg1,    &lower,&upper);
+
+
+//keyvals_shift = gg1;
+    std::wstring rv2= std::wstring(1, (int) upper);*/
+
     return  std::wstring(1, (int) *keyvals);
 
   }
@@ -637,6 +795,65 @@ KMX_DWORD get_VirtualKey_Other_Layer2_From_SC(KMX_DWORD SC , v_dw_3D &All_Vector
 
 // query All_Vector
 // return RETURN NON SHIFTED CHAR [1]  the VirtualKey of the Other Keyboard for given Scancode
+KMX_DWORD get_VirtualKey_Other_From_SC_NEW(KMX_DWORD SC , v_dw_3D &All_Vector,GdkKeymap **keymap, KMX_DWORD SC1,KMX_DWORD SC2){
+  //GdkKeymap *keymap;
+  GdkModifierType consumed;
+  GdkKeymapKey *maps;
+  GdkEventKey* event;
+  guint *keyvals;
+  gint *n_entries;
+  gint count;
+  guint keycode;
+
+ GdkKeymapKey* keys;
+ gint n_keys;
+
+//GdkKeymap* keymap1 =keymap;
+//GdkKeymap *keymap2=keymap;;
+GdkKeymap **keymap3=keymap;
+GdkKeymap *keymap4 = * keymap;
+KMX_DWORD SC_geht = 38;
+
+  //unshifted
+    GdkModifierType MOD_base = (GdkModifierType) ( GDK_SHIFT_MASK );
+
+   int asdfghj=9;
+    gdk_keymap_translate_keyboard_state (keymap4, SC_geht, MOD_base , 0, keyvals, NULL, NULL, & consumed);
+
+  g_free(keyvals);
+  g_free(maps);
+
+  KMX_DWORD retVal= (KMX_DWORD) 97;
+  return retVal;
+
+
+  for( int i=0; i< (int)All_Vector[0].size();i++) {
+    //number keys return unshifted value ( e.g. 1 not !)
+    if(SC <= 19) {
+      if ( All_Vector[0][i][0] == SC)
+        return All_Vector[1][i][1];
+    }
+
+    // other keys
+    if((SC > 19) ) {
+      if ( All_Vector[0][i][0] == SC) {
+
+        // normal capital characters return the value of capital char ( e.g. A)
+        if ((All_Vector[1][i][2] >= 65 ) && (All_Vector[1][i][2] < 91 ))
+          return All_Vector[1][i][2];
+
+        // special characters return Keyman defined values (e.g. VK_ACCENT)
+        else
+          //return All_Vector[1][i][1];
+          return map_To_VK(SC);
+      }
+    }
+  }
+return 0;
+}
+
+// query All_Vector
+// return RETURN NON SHIFTED CHAR [1]  the VirtualKey of the Other Keyboard for given Scancode
 KMX_DWORD get_VirtualKey_Other_From_SC(KMX_DWORD SC , v_dw_3D &All_Vector){
   
   for( int i=0; i< (int)All_Vector[0].size();i++) {
@@ -663,6 +880,38 @@ KMX_DWORD get_VirtualKey_Other_From_SC(KMX_DWORD SC , v_dw_3D &All_Vector){
   }
 return 0;
 }
+
+
+// query All_Vector
+// return RETURN NON SHIFTED CHAR [1]  the VirtualKey of the Other Keyboard for given Scancode
+KMX_DWORD get_VirtualKey_Other_From_SC_BAK(KMX_DWORD SC , v_dw_3D &All_Vector){
+
+  for( int i=0; i< (int)All_Vector[0].size();i++) {
+    //number keys return unshifted value ( e.g. 1 not !)
+    if(SC <= 19) {
+      if ( All_Vector[0][i][0] == SC)
+        return All_Vector[1][i][1];
+    }
+
+    // other keys
+    if((SC > 19) ) {
+      if ( All_Vector[0][i][0] == SC) {
+
+        // normal capital characters return the value of capital char ( e.g. A)
+        if ((All_Vector[1][i][2] >= 65 ) && (All_Vector[1][i][2] < 91 ))
+          return All_Vector[1][i][2];
+
+        // special characters return Keyman defined values (e.g. VK_ACCENT)
+        else
+          //return All_Vector[1][i][1];
+          return map_To_VK(SC);
+      }
+    }
+  }
+return 0;
+}
+
+
 // _S2 not needed, can go later
 // return RETURN NON SHIFTED CHAR [1]  the VirtualKey of the US Keyboard for given Scancode
 KMX_DWORD get_VirtualKey_US_From_SC(KMX_DWORD SC , v_dw_3D &All_Vector){
@@ -710,6 +959,32 @@ KMX_DWORD get_position_From_VirtualKey_Other(KMX_DWORD VK_Other , v_dw_3D &All_V
   }
   return 0;    //_S2 what do I return if not found??
 }
+KMX_DWORD get_position_From_VirtualKey_Other(KMX_DWORD VK_Other , v_dw_3D &All_Vector, int which_columns) {
+ // find correct row of char in US
+if((which_columns <1  ) )
+  return 0;
+
+// search all columns
+if(which_columns >(int)All_Vector[1][0].size()) {
+  for( int i=0; i< (int)All_Vector[1][0].size();i++) {
+    for( int j=0; j< (int)All_Vector[1].size()-1;j++) {
+    if ( ( All_Vector[1][j][i] == VK_Other ) )
+      return j;
+    }
+  }
+}
+
+else {
+ for( int j=0; j< (int)All_Vector[1].size()-1;j++) {
+    if ( ( All_Vector[1][j][which_columns] == VK_Other ) )
+     return j;
+  }
+}
+
+  return 0;    //_S2 what do I return if not found??
+
+}
+
 
 // _S2 maybe not needed
 bool IsKeyIn_VKMap(UINT SC) {
@@ -740,7 +1015,7 @@ if ( i>160)
 
 //return vk3;
 
-
+int dw=0;
 
   //if (i == 32  ) return   ; /*        */5
       //if (i == 186 ) return 252;  /* Ü      */
