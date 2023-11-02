@@ -114,7 +114,8 @@
               },
               {
                 "id": "K_X",
-                "text": "*Enter*"
+                "text": "*Enter*",
+                "sp": "1"
               },
               {
                 "id": "K_C",
