@@ -48,6 +48,7 @@ begin
   logtext := '';
 
   // TODO: log-level as opt?
+  // TODO: embed in server for better performance
   cmdline := Format('"%s" build --log-format tsv --log-level info "%s"', [TKeymanDeveloperPaths.KmcPath, infile]);
   if outfile <> '' then
     cmdline := cmdline + Format(' --out-file "%s"', [outfile]);
@@ -57,6 +58,8 @@ begin
     cmdline := cmdline + ' --no-compiler-warnings-as-errors';
   if FGlobalProject.Options.WarnDeprecatedCode then
     cmdline := cmdline + ' --no-warn-deprecated-code';
+  if debug then
+    cmdline := cmdline + ' --debug';
 
   Result := TUtilExecute.Console(cmdline, ExtractFileDir(infile), logtext, ec);
 
