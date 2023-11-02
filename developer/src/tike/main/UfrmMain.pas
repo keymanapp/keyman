@@ -440,7 +440,6 @@ uses
   Keyman.System.CEFManager,
 
   CharMapDropTool,
-  compile,
   HTMLHelpViewer,
   KLog,
   KeymanVersion,

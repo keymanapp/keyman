@@ -6,9 +6,6 @@
         <Projects Include="keyboard-js-info\KeyboardJSInfoTestSuite.dproj">
             <Dependencies/>
         </Projects>
-        <Projects Include="kmcomp-x64-structures\passtructsize\passtructsize.dproj">
-            <Dependencies/>
-        </Projects>
         <Projects Include="kmconvert\kmconverttest.dproj">
             <Dependencies/>
         </Projects>
@@ -37,15 +34,6 @@
     </Target>
     <Target Name="KeyboardJSInfoTestSuite:Make">
         <MSBuild Projects="keyboard-js-info\KeyboardJSInfoTestSuite.dproj" Targets="Make"/>
-    </Target>
-    <Target Name="passtructsize">
-        <MSBuild Projects="kmcomp-x64-structures\passtructsize\passtructsize.dproj"/>
-    </Target>
-    <Target Name="passtructsize:Clean">
-        <MSBuild Projects="kmcomp-x64-structures\passtructsize\passtructsize.dproj" Targets="Clean"/>
-    </Target>
-    <Target Name="passtructsize:Make">
-        <MSBuild Projects="kmcomp-x64-structures\passtructsize\passtructsize.dproj" Targets="Make"/>
     </Target>
     <Target Name="kmconverttest">
         <MSBuild Projects="kmconvert\kmconverttest.dproj"/>
