@@ -72,4 +72,12 @@ describe('CompilerMessages', function () {
     assert.equal(callbacks.messages[0].message, "Virtual keys are not permitted in context");
   });
 
+  // WARN_TouchLayoutUnidentifiedKey
+
+  it('should generate WARN_TouchLayoutUnidentifiedKey if a key has no identifier in the touch layout', async function() {
+    await testForMessage(this, ['invalid-keyboards', 'warn_touch_layout_unidentified_key.kmn'], KmnCompilerMessages.WARN_TouchLayoutUnidentifiedKey);
+    // TODO(lowpri): that message could be slightly more helpful!
+    assert.equal(callbacks.messages[0].message, "A key on layer \"default\" has no identifier.");
+  });
+
 });
