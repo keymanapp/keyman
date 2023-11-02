@@ -488,13 +488,19 @@ export class KeyboardInfoCompiler {
       return null;
     }
 
+    const fontData = this.callbacks.loadFile(this.callbacks.resolveFilename(kpsFilename, sourcePath));
+    if(!fontData) {
+      this.callbacks.reportMessage(KeyboardInfoCompilerMessages.Error_FileDoesNotExist({filename: sourcePath}));
+      return null;
+    }
+
     const result = {
-      family: await getFontFamily(this.callbacks.loadFile(this.callbacks.resolveFilename(kpsFilename, sourcePath))),
+      family: await getFontFamily(fontData),
       source
     };
 
     if(!result.family) {
-      this.callbacks.reportMessage(KeyboardInfoCompilerMessages.Error_FileDoesNotExist({filename: sourcePath}));
+      this.callbacks.reportMessage(KeyboardInfoCompilerMessages.Error_FontFileCannotBeRead({filename: sourcePath}));
       return null;
     }
     return result;
