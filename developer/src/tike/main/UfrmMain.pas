@@ -362,6 +362,8 @@ type
     function OpenModelEditor(FFileName: string): TfrmTikeEditor;
     procedure DoCloseCleanup;
 
+    procedure RefreshProjectMRU;
+
   protected
     procedure WndProc(var Message: TMessage); override;
     procedure CreateWnd; override;
@@ -512,10 +514,11 @@ begin
   modActionsMain := TmodActionsMain.Create(Self);
   modActionsModelEditor := TmodActionsModelEditor.Create(Self);
 
+  FChildWindows := TChildWindowList.Create;
+
   FProjectMRU := TMRUList.Create('Project');
   FProjectMRU.OnChange := ProjectMRUChange;
-
-  FChildWindows := TChildWindowList.Create;
+  FProjectMRU.Load;
 
   ShowDebug(False);
 
@@ -863,6 +866,9 @@ var
   i: Integer;
 begin
   FWndProcInit := False;
+
+  RefreshProjectMRU;
+
   for i := 0 to FChildWindows.Count - 1 do
     if FChildWindows[i] is TfrmTikeEditor then
       with FChildWindows[i] as TfrmTikeEditor do
@@ -1548,6 +1554,11 @@ begin
   finally
     Screen.Cursor := crDefault;
   end;
+end;
+
+procedure TfrmKeymanDeveloper.RefreshProjectMRU;
+begin
+  FProjectMRU.Load;
 end;
 
 function TfrmKeymanDeveloper.ProjectForm: TfrmProject;
