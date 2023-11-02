@@ -1,7 +1,7 @@
 import { KMX, Osk, TouchLayout, TouchLayoutFileReader, TouchLayoutFileWriter } from "@keymanapp/common-types";
 import { callbacks, fk, IsKeyboardVersion14OrLater, IsKeyboardVersion15OrLater, IsKeyboardVersion17OrLater } from "./compiler-globals.js";
 import { JavaScript_Key } from "./javascript-strings.js";
-import { TRequiredKey, CRequiredKeys, CSpecialText, CSpecialText14Map, CSpecialText17Map } from "./constants.js";
+import { TRequiredKey, CRequiredKeys, CSpecialText, CSpecialText14Map, CSpecialText17Map, CSpecialTextMinVer, CSpecialTextMaxVer } from "./constants.js";
 import { KeymanWebTouchStandardKeyNames, KMWAdditionalKeyNames, VKeyNames } from "./keymanweb-key-codes.js";
 import { KmwCompilerMessages } from "./messages.js";
 
