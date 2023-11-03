@@ -183,7 +183,7 @@ export default class OSKBaseKey extends OSKKey {
       this.preview.style.display = 'none';
     }
 
-    previewHost.setCancellationHandler(() => {
+    previewHost?.setCancellationHandler(() => {
       this.setPreview(null);
     });
 

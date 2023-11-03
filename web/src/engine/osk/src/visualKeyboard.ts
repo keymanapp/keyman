@@ -423,6 +423,10 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
 
       const endHighlighting = () => {
         trackingEntry.previewHost?.cancel();
+        // If we ever allow concurrent previews, check if it exists and matches
+        // a VisualKeyboard-tracked entry; if so, clear that too.
+        this.gesturePreviewHost = null;
+        trackingEntry.previewHost = null;
         if(trackingEntry.key) {
           this.highlightKey(trackingEntry.key, false);
           trackingEntry.key = null;
@@ -490,7 +494,8 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
         // Multitouch does reference tracking data for a source after its completion,
         // but only while still permitting new touches.  If we're here, that time is over.
         for(let id of gestureSequence.allSourceIds) {
-        // If the original preview host lives on, ensure it's cancelled now.
+          // If the original preview host lives on, ensure it's cancelled now.
+          this.gesturePreviewHost = null;
           sourceTrackingMap[id].previewHost?.cancel();
           delete sourceTrackingMap[id];
         }
@@ -1524,7 +1529,7 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
     if (tip == null) {
       const baseKey = key.key as OSKBaseKey;
       baseKey.setPreview(previewHost);
-      return;
+      return previewHost;
     } else {
       tip.show(key, true, this, previewHost);
     }
