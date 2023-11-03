@@ -894,11 +894,55 @@ bool normalize_nfd(std::u16string &str) {
 }
 
 bool normalize_nfd_markers(std::u16string &str, marker_map &_kmn_unused(map)) {
+  // TODO-LDML
   return normalize_nfd(str);
 }
 
-bool normalize_nfd_markers(std::u32string &str, marker_map &_kmn_unused(map)) {
-  return normalize_nfd(str);
+/**
+ * TODO-LDML:
+ *  - doesn't support >1 marker per char - may need a set instead of a map!
+ *  - ideally this should be used on a normalization safe subsequence
+ */
+bool normalize_nfd_markers(std::u32string &str, marker_map &map) {
+  /** original string, but no markers */
+  std::u32string str_unmarked = remove_markers(str, map);
+  /** original string, no markers, NFD */
+  std::u32string str_unmarked_nfd = str_unmarked;
+  if(!normalize_nfd(str_unmarked_nfd)) {
+    return false; // normalize failed.
+  } else if (map.size() == 0) {
+    // no markers. Return the normalized unmarked str
+    str = str_unmarked_nfd;
+  } else if (str_unmarked_nfd == str_unmarked) {
+    // Normalization produced no change when markers were removed.
+    // So, we'll call this a no-op.
+  } else {
+    // need to reconstitute.
+    marker_map map2(map); // make a copy of the map
+    // clear the string
+    str.clear();
+    // add the end-of-text marker
+    {
+      const auto ch = MARKER_BEFORE_EOT;
+      const auto m = map2.find(ch);
+      if (m != map2.end()) {
+        prepend_marker(str, m->second);
+        map2.erase(ch); // remove it
+      }
+    }
+    // go from end to beginning of string
+    for(auto p = str_unmarked_nfd.rbegin(); p != str_unmarked_nfd.rend(); p++) {
+      const auto ch = *p;
+      str.insert(0, 1, ch); // prepend
+
+      const auto m = map2.find(ch);
+      if (m != map2.end()) {
+        prepend_marker(str, m->second);
+        map2.erase(ch); // remove it
+      }
+    }
+  }
+  return true; // all OK
 }
 
 bool normalize_nfc(std::u32string &str) {

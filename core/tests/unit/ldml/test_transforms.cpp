@@ -528,6 +528,16 @@ int test_normalize() {
     zassert_string_equal(dst, expect);
     assert_equal(map.size(), 0);
   }
+  {
+    marker_map map;
+    std::cout << __FILE__ << ":" << __LINE__ << "   - medium test" << std::endl;
+    const std::u32string src    = U"6e\U00000300\U00000320";  // swapped
+    const std::u32string expect = U"6e\U00000320\U00000300";  // correct NFD
+    std::u32string dst          = src;
+    assert(normalize_nfd_markers(dst, map));
+    zassert_string_equal(dst, expect);
+    assert_equal(map.size(), 0);
+  }
 
   {
     marker_map map;
@@ -551,12 +561,10 @@ int test_normalize() {
   {
     marker_map map;
     std::cout << __FILE__ << ":" << __LINE__ << "   - complex test" << std::endl;
-    const std::u32string src =
-        U"6\U0000ffff\U00000008\U00000001e\U0000ffff\U00000008\U00000002\U00000320\U0000ffff\U00000008\U00000003\U00000300"
-        U"\U0000ffff\U00000008\U00000004";
+    const std::u32string src = // already in order: 320+300
+        U"6\U0000ffff\U00000008\U00000001e\U0000ffff\U00000008\U00000002\U00000320\U0000ffff\U00000008\U00000003\U00000300\U0000ffff\U00000008\U00000004";
     const std::u32string expect =
-        U"6\U0000ffff\U00000008\U00000001e\U0000ffff\U00000008\U00000002\U00000320\U0000ffff\U00000008\U00000003\U00000300"
-        U"\U0000ffff\U00000008\U00000004";
+        U"6\U0000ffff\U00000008\U00000001e\U0000ffff\U00000008\U00000002\U00000320\U0000ffff\U00000008\U00000003\U00000300\U0000ffff\U00000008\U00000004";
     std::u32string dst = src;
     assert(normalize_nfd_markers(dst, map));
     zassert_string_equal(dst, expect);
@@ -564,6 +572,27 @@ int test_normalize() {
     assert_equal(map[U'e'], 0x1L);
     assert_equal(map[0x0320], 0x2L);
     assert_equal(map[0x0300], 0x3L);
+    assert_equal(map[MARKER_BEFORE_EOT], 0x4L);
+
+  }
+  {
+    marker_map map;
+    std::cout << __FILE__ << ":" << __LINE__ << "   - complex test2" << std::endl;
+    const std::u32string src = // out of order, 300-320
+        U"6\U0000ffff\U00000008\U00000001e\U0000ffff\U00000008\U00000002\U00000300\U0000ffff\U00000008\U00000003\U00000320\U0000ffff\U00000008\U00000004";
+    const std::u32string expect =
+        U"6\U0000ffff\U00000008\U00000001e\U0000ffff\U00000008\U00000003\U00000320\U0000ffff\U00000008\U00000002\U00000300\U0000ffff\U00000008\U00000004";
+    std::u32string dst = src;
+    assert(normalize_nfd_markers(dst, map));
+    if (dst != expect) {
+      std::cout << "dst: " << Debug_UnicodeString(dst) << std::endl;
+      std::cout << "exp: " << Debug_UnicodeString(expect) << std::endl;
+    }
+    zassert_string_equal(dst, expect);
+    assert_equal(map.size(), 4);
+    assert_equal(map[U'e'], 0x1L);
+    assert_equal(map[0x0320], 0x3L);
+    assert_equal(map[0x0300], 0x2L);
     assert_equal(map[MARKER_BEFORE_EOT], 0x4L);
 
   }

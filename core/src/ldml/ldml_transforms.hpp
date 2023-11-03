@@ -289,7 +289,7 @@ public:
 // string routines
 
 /** indicates that the marker was before the end of text. */
-const char32_t MARKER_BEFORE_EOT = km::kbp::kmx::Uni_FFFE_NONCHARACTER;
+const char32_t MARKER_BEFORE_EOT = km::core::kmx::Uni_FFFE_NONCHARACTER;
 
 /** map from following-char to marker number. */
 typedef std::map<char32_t, KMX_DWORD> marker_map;
@@ -319,6 +319,14 @@ inline std::u32string remove_markers(const std::u32string &str, marker_map &mark
   return remove_markers(str, &markers);
 }
 
+/** prepend the marker string in UC_SENTINEL format to the str */
+inline static void prepend_marker(std::u32string &str, KMX_DWORD marker);
+
+void
+prepend_marker(std::u32string &str, KMX_DWORD marker) {
+  km_core_usv triple[] = {LDML_UC_SENTINEL, LDML_MARKER_CODE, marker};
+  str.insert(0, triple, 3);
+}
 
 }  // namespace ldml
 }  // namespace core

@@ -457,7 +457,7 @@ ldml_processor::context_to_string(km_core_state *state, std::u32string &str, boo
       } else if (last_type == KM_CORE_BT_MARKER) {
         assert(km::core::kmx::is_valid_marker(c->marker));
         if (include_markers) {
-          prepend_marker(str, c->marker);
+          ldml::prepend_marker(str, c->marker);
         }
       } else {
         break;
