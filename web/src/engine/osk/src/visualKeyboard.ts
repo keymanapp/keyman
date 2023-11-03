@@ -529,12 +529,10 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
           // Once the best coord to use for fat-finger calculations has been determined:
           const shouldLockLayer = handlers && (handlers[0] instanceof SubkeyPopup) && handlers[0].shouldLockLayer;
           try {
-            if(shouldLockLayer) {
-              this.lockLayer(true);
-            }
+            shouldLockLayer && this.lockLayer(true);
             keyResult = this.modelKeyClick(gestureStage.item, coord);
           } finally {
-            this.lockLayer(false);
+            shouldLockLayer && this.lockLayer(false);
           }
 
         }
@@ -580,9 +578,7 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
           if(this.layerLocked) {
             console.warn("Unexpected state:  modipress start attempt during an active modipress");
           } else {
-            if(!handlers) {
-              handlers = [];
-            }
+            handlers ||= [];
 
             const modipressHandler = new Modipress(gestureSequence, this, () => {
               const index = handlers.indexOf(modipressHandler);
