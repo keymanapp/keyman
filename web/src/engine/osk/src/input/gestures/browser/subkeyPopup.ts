@@ -295,7 +295,7 @@ export default class SubkeyPopup implements GestureHandler {
 
     // Add the callout
     // if(vkbd.device.formFactor == DeviceSpec.FormFactor.Phone && vkbd.device.OS == DeviceSpec.OperatingSystem.iOS) {
-    this.callout = this.addCallout(e, delta, vkbd.element);
+    this.callout = this.addCallout(e, delta, vkbd.element, vkbd.topContainer);
     // }
   }
 
@@ -305,7 +305,7 @@ export default class SubkeyPopup implements GestureHandler {
    * @param   {Object}  key   HTML key element
    * @return  {Object}        callout object
    */
-  addCallout(key: KeyElement, delta: number, _Box: HTMLElement): HTMLDivElement {
+  addCallout(key: KeyElement, delta: number, host: HTMLElement, _Box: HTMLElement): HTMLDivElement {
     delta = delta || 0;
 
     const STUB_HEIGHT = 6 + SUBKEY_MENU_VERT_OFFSET;
@@ -314,7 +314,7 @@ export default class SubkeyPopup implements GestureHandler {
     if(calloutHeight > 0) {
       var cc = document.createElement('div'), ccs = cc.style;
       cc.id = 'kmw-popup-callout';
-      _Box.appendChild(cc);
+      host.appendChild(cc);
 
       // Create the callout
       let keyRect = key.getBoundingClientRect();
