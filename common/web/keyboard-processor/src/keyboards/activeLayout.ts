@@ -318,10 +318,10 @@ export class ActiveKeyBase {
     if(key.id == 'K_SHIFT' && displayLayer == 'default' && layout.formFactor != 'desktop') {
       /* Extra requirements:
        *
-       * 1. The SHIFT key must not specify subkeys or have already-specified multitaps.
+       * 1. The SHIFT key must not specify longpress keys or have already-specified multitaps.
        *
-       *    Note:  touch layouts specified on desktop layouts often do specify subkeys;
-       *    utilized modifiers aside from 'shift' become subkeys of K_SHIFT)
+       *    Note:  touch layouts specified on desktop layouts often do specify longpress keys;
+       *    utilized modifiers aside from 'shift' become longpress keys under K_SHIFT)
        *
        * 2. There exists a specified 'caps' layer.  Otherwise, there's no destination for
        *    the default multitap.
