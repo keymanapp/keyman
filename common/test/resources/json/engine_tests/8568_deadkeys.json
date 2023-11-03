@@ -1,0 +1,95 @@
+{
+  "specVersion": "14.0",
+  "keyboard": {
+    "id": "test_8568_deadkeys",
+    "name": "Testcase for deadkeys bug (#8568)",
+    "filename": "resources/keyboards/test_8568_deadkeys.js",
+    "languages": [
+      {
+        "id": "en",
+        "name": "English",
+        "region": "World"
+      }
+    ]
+  },
+  "inputTestSets": [
+    {
+      "constraint": {
+        "target": "hardware",
+        "validOSList": null,
+        "validBrowsers": null
+      },
+      "testSet": [
+        {
+          "inputs": [
+            {
+              "type": "key",
+              "keyCode": 88,
+              "states": 9728,
+              "modifiers": 0,
+              "modifierChanged": false,
+              "isVirtualKey": true,
+              "eventSpec": {
+                "type": "key",
+                "key": "x",
+                "code": "KeyX",
+                "keyCode": 88,
+                "location": 0,
+                "modifierSet": 32
+              }
+            },
+            {
+              "type": "key",
+              "keyCode": 70,
+              "states": 9728,
+              "modifiers": 0,
+              "modifierChanged": false,
+              "isVirtualKey": true,
+              "eventSpec": {
+                "type": "key",
+                "key": "f",
+                "code": "KeyF",
+                "keyCode": 70,
+                "location": 0,
+                "modifierSet": 32
+              }
+            },
+            {
+              "type": "key",
+              "keyCode": 8,
+              "states": 9728,
+              "modifiers": 0,
+              "modifierChanged": false,
+              "isVirtualKey": true,
+              "eventSpec": {
+                "type": "key",
+                "key": "Backspace",
+                "code": "Backspace",
+                "keyCode": 8,
+                "location": 0,
+                "modifierSet": 32
+              }
+            },
+            {
+              "type": "key",
+              "keyCode": 8,
+              "states": 9728,
+              "modifiers": 0,
+              "modifierChanged": false,
+              "isVirtualKey": true,
+              "eventSpec": {
+                "type": "key",
+                "key": "Backspace",
+                "code": "Backspace",
+                "keyCode": 8,
+                "location": 0,
+                "modifierSet": 32
+              }
+            }
+          ],
+          "output": "pass"
+        }
+      ]
+    }
+  ]
+}

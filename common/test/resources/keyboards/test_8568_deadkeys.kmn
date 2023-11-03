@@ -1,0 +1,12 @@
+store(&VERSION) "10.0"
+store(&TARGETS) 'any windows'
+store(&NAME) 'Testcase for deadkeys bug (#8568)'
+store(&COPYRIGHT) '© 2023 SIL International'
+begin Unicode > use(main)
+
+group(main) using keys
+c Test for #8568: BKSP should not remove deadkeys.
+c See also common/test/keyboards/baseline/k_020___deadkeys_and_backspace.kmn
+  + 'x' > 'c' dk(A) 'e'
+  'c' 'e' + [K_BKSP]       > 'fail'
+  'c' dk(A) 'e' + [K_BKSP] > 'pass'
