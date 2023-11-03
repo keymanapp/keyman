@@ -34,7 +34,7 @@ export default class Modipress implements GestureHandler {
         vkbd.layerId = this.originalLayer;
         vkbd.updateState();
       }
-      completionCallback && completionCallback();
+      completionCallback?.();
     };
 
     vkbd.lockLayer(true);
@@ -58,13 +58,13 @@ export default class Modipress implements GestureHandler {
   }
 
   get completed(): boolean {
-    return this.completionCallback === undefined;
+    return this.completionCallback === null;
   }
 
   cancel() {
     const callback = this.completionCallback;
     this.completionCallback = null;
-    callback && callback();
+    callback?.();
     this.source.cancel();
   }
 
