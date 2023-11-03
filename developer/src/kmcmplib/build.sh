@@ -47,6 +47,7 @@ Libraries will be built in 'build/<target>/<configuration>/src'.
   * <configuration>: 'debug' or 'release' (see --debug flag)
   * All parameters after '--' are passed to meson or ninja
 " \
+  "@/common/include" \
   "clean" \
   "configure" \
   "build" \
