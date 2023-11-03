@@ -107,12 +107,8 @@ export default class InputProcessor {
       if(keyEvent.baseTranscriptionToken) {
         const transcription = this.contextCache.get(keyEvent.baseTranscriptionToken);
         if(transcription) {
-          const rewindingTransform = transcription.preInput.buildTransformFrom(outputTarget);
-          outputTarget.apply(rewindingTransform);
-
-          // For multitaps, we must also restore the original deadkeys.
-          outputTarget.deadkeys().clear();
-          transcription.preInput.deadkeys().dks.forEach((dk) => outputTarget.deadkeys().add(dk));
+          // Restores full context, including deadkeys in their exact pre-keystroke state.
+          outputTarget.restoreTo(transcription.preInput);
         } else {
           console.warn('The base context for the multitap could not be found');
         }

@@ -54,7 +54,7 @@ export default class KeymanEngine<
       }
     }
 
-    if(this.keyEventRefocus) { // && event.isSynthetic // as in, is from the OSK.
+    if(this.keyEventRefocus) {
       // Do anything needed to guarantee that the outputTarget stays active (`app/browser`: maintains focus).
       // (Interaction with the OSK may have de-focused the element providing active context;
       // we want to restore it in case the user swaps back to the hardware keyboard afterward.)

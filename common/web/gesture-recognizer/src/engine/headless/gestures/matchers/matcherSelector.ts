@@ -323,6 +323,25 @@ export class MatcherSelector<Type, StateToken = any> extends EventEmitter<EventM
           currentSample.item = source.currentRecognizerConfig.itemIdentifier(currentSample, null);
           unmatchedSource.baseItem = currentSample.item;
         }
+
+        const newlyMatched = extendableMatcherSet.find((entry) => entry.result);
+
+        // If the incoming Source triggered a match AND is included in the model,
+        // do not build new independent models for it.
+        if(newlyMatched && newlyMatched.allSourceIds.includes(source.identifier)) {
+          matchPromise.resolve({
+            matcher: null,
+            result: {
+              matched: false,
+              action: {
+                type: 'complete',
+                item: null
+              }
+            }
+          });
+
+          return;
+        }
       }
     }
 
