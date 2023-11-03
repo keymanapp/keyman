@@ -6,7 +6,10 @@ import { GestureSequence } from '@keymanapp/gesture-recognizer';
 import { GestureHandler } from '../gestureHandler.js';
 
 /**
+ * Represents a potential modipress gesture's implementation within KeymanWeb, including
+ * modipresses generated at the end of multitap sequences.
  *
+ * This involves "locking" the current layer in place until the modipress is complete.
  */
 export default class Modipress implements GestureHandler {
   private completionCallback: () => void;
@@ -29,7 +32,7 @@ export default class Modipress implements GestureHandler {
         vkbd.layerId = this.originalLayer;
         vkbd.updateState();
       }
-      completionCallback && completionCallback();
+      completionCallback?.();
     };
 
     vkbd.lockLayer(true);
@@ -53,13 +56,13 @@ export default class Modipress implements GestureHandler {
   }
 
   get completed(): boolean {
-    return this.completionCallback === undefined;
+    return this.completionCallback === null;
   }
 
   cancel() {
     const callback = this.completionCallback;
     this.completionCallback = null;
-    callback && callback();
+    callback?.();
     this.source.cancel();
   }
 

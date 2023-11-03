@@ -42,16 +42,11 @@ export default class Multitap implements GestureHandler {
 
     this.originalLayer = vkbd.layerId;
 
-    // // For multitaps, keeping the key highlighted makes sense.  I think.
-    // this.baseKey.key.highlight(true);
-
     source.on('complete', () => {
       if(source.stageReports.length > 1) {
       }
-      if(this.modipress) {
-        this.modipress.cancel();
-      }
-      // this.currentSelection?.key.highlight(false);
+
+      this.modipress?.cancel();
       this.clear();
     });
 
