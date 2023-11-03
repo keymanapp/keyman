@@ -1,0 +1,13 @@
+store(&VERSION) "10.0"
+store(&TARGETS) 'web'
+store(&NAME) 'test context(n) in output, #9930, v10.0'
+
+begin Unicode > use(main)
+
+group(main) using keys
+
+store(liveQwerty) 'qwerty'
+store(deadQwerty) dk(q) dk(w) dk(e) dk(r) dk(t) dk(y)
+
+c any/index with deadkeys in stores.
+any(liveQwerty) '1' + '!' > '?' index(deadQwerty, 1) context(2)
