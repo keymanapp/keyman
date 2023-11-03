@@ -61,7 +61,6 @@
     "exclude-after-remap": true,
     "exclude": [
       "src/import/",
-      "src/kmw-compiler",
       "test/"
     ]
   },

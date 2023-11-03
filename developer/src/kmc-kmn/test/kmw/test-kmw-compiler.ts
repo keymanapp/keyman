@@ -35,11 +35,11 @@ describe('KeymanWeb Compiler', function() {
     callbacks.clear();
   });
 
-  it('should compile a complex keyboard', async function() {
+  it('should compile a complex keyboard', function() {
     run_test_keyboard(kmnCompiler, 'khmer_angkor');
   });
 
-  it('should handle option stores', async function() {
+  it('should handle option stores', function() {
     //
     // This is enough to verify that the option store is set appropriately with
     // KLOAD because the fixture has that code present:
@@ -49,7 +49,7 @@ describe('KeymanWeb Compiler', function() {
     run_test_keyboard(kmnCompiler, 'test_options');
   });
 
-  it('should translate every "character style" key correctly', async function() {
+  it('should translate every "character style" key correctly', function() {
     //
     // This is enough to verify that every character style key is encoded in the
     // same way as the fixture.
@@ -57,8 +57,24 @@ describe('KeymanWeb Compiler', function() {
     run_test_keyboard(kmnCompiler, 'test_keychars');
   });
 
-  it('should handle readonly groups', async function() {
+  it('should handle readonly groups', function() {
     run_test_keyboard(kmnCompiler, 'test_readonly_groups');
+  });
+
+  it('should handle context(n) in output of rule, v10.0 generation', function() {
+    run_test_keyboard(kmnCompiler, 'test_contextn_in_output');
+  });
+
+  it('should handle context(n) in output of rule, v9.0 generation', function() {
+    run_test_keyboard(kmnCompiler, 'test_contextn_in_output_9');
+  });
+
+  it('should handle context(n) in context part of rule, v9.0 generation', function() {
+    run_test_keyboard(kmnCompiler, 'test_context_in_context_9');
+  });
+
+  it('should handle context(n) in context part of rule, v10.0 generation', function() {
+    run_test_keyboard(kmnCompiler, 'test_context_in_context');
   });
 });
 
