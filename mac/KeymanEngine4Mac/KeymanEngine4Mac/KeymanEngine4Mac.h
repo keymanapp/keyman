@@ -29,6 +29,7 @@ FOUNDATION_EXPORT const unsigned char KeymanEngine4MacVersionString[];
 #import <KeymanEngine4Mac/ActionArrayOptimizer.h>
 #import <KeymanEngine4Mac/CoreHelper.h>
 #import <KeymanEngine4Mac/CoreAction.h>
+#import <KeymanEngine4Mac/CoreKeyOutput.h>
 #import "KMkeyViewProtocol.h"
 #import "OSKView.h"
 #import "TimerTarget.h"
