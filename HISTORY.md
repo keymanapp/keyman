@@ -1,5 +1,17 @@
 # Keyman Version History
 
+## 17.0.205 alpha 2023-11-03
+
+* fix(developer): use KeymanWeb.Codes for 17.0+ (#9913)
+* fix(developer): don't use osk-always-visible on touch devices (#9917)
+* chore(linux): Improve repository_dispatch (#9865)
+* chore(linux): Refactor deb-packaging.sh script (#9866)
+* chore(linux): Add Core API version number (#9877)
+* fix(developer): kmc code generation for context(n) in context (#9932)
+* chore(developer): remove obsolete 'Allow Multiple Instances' and 'Use Legacy Compiler' options (#9934)
+* chore(developer): common/include dep for kmcmplib (#9935)
+* feat(common): ldml update to WIP cldr data (#9919)
+
 ## 17.0.204 alpha 2023-11-02
 
 * fix(web): fixes doc-kbd display of default layer when it's not defined first (#9891)
