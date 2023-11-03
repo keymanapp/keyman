@@ -87,7 +87,19 @@ export function keySupportsModipress(key: KeyElement) {
   }
 
   // Allows special-formatted keys with a next-layer property to be modipressable.
-  return keySpec.sp > ButtonClasses.normal && keySpec.sp < ButtonClasses.deadkey && !!keySpec.nextlayer;
+  if(!keySpec.nextlayer) {
+    return false;
+  } else {
+    switch(keySpec.sp) {
+      case ButtonClasses.special:
+      case ButtonClasses.specialActive:
+      case ButtonClasses.customSpecial:
+      case ButtonClasses.customSpecialActive:
+        return true;
+      default: // .normal, .spacer, .blank, .deadkey
+        return false;
+    }
+  }
 }
 
 /**
