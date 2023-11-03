@@ -125,11 +125,11 @@ export class PaddedZoneSource implements RecognitionZoneSource {
   getBoundingClientRect(): DOMRect {
     const rootZone = this.root.getBoundingClientRect();
 
-    return DOMRect.fromRect({
-      x: rootZone.x + this.edgePadding.x,
-      y: rootZone.y + this.edgePadding.y,
-      width:  rootZone.width  - this.edgePadding.w,
-      height: rootZone.height - this.edgePadding.h
-    });
+    return new DOMRect(
+      /*x:*/ rootZone.x + this.edgePadding.x,
+      /*y:*/ rootZone.y + this.edgePadding.y,
+      /*width:*/  rootZone.width  - this.edgePadding.w,
+      /*height:*/ rootZone.height - this.edgePadding.h
+    );
   }
 }
