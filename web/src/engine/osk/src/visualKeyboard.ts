@@ -526,10 +526,12 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
             correctionKeyDistribution = distributionFromDistanceMaps(baseDistanceMap);
           }
 
-          // Once the best coord to use for fat-finger calculations has been determined:
-          const shouldLockLayer = handlers && (handlers[0] instanceof SubkeyPopup) && handlers[0].shouldLockLayer;
+          // If there's no active modipress, but there WAS one when the longpress started,
+          // keep the layer locked for the keystroke.
+          const shouldLockLayer = !this.layerLocked && handlers && (handlers[0] instanceof SubkeyPopup) && handlers[0].shouldLockLayer;
           try {
             shouldLockLayer && this.lockLayer(true);
+            // Once the best coord to use for fat-finger calculations has been determined:
             keyResult = this.modelKeyClick(gestureStage.item, coord);
           } finally {
             shouldLockLayer && this.lockLayer(false);
