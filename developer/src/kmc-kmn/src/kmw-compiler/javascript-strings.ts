@@ -490,7 +490,7 @@ function JavaScript_CompositeContextValue(fk: KMX.KEYBOARD, fkp: KMX.KEY, pwsz: 
           `this.s${JavaScript_Name(rec.Any.StoreIndex, rec.Any.Store.dpName)})`;
         break;
       default:
-        callbacks.reportMessage(KmwCompilerMessages.Error_NotSupportedInKeymanWebContext({code: GetCodeName(rec.Code)}));
+        callbacks.reportMessage(KmwCompilerMessages.Error_NotSupportedInKeymanWebContext({line: fkp.Line, code: GetCodeName(rec.Code)}));
         Result += '/*.*/ 0 ';
       }
     }
@@ -579,7 +579,7 @@ function JavaScript_FullContextValue(fk: KMX.KEYBOARD, fkp: KMX.KEY, pwsz: strin
           `o:${rec.Index.Index}}`;   // I4611
         break;
       default:
-        callbacks.reportMessage(KmwCompilerMessages.Error_NotSupportedInKeymanWebContext({code: GetCodeName(rec.Code)}));
+        callbacks.reportMessage(KmwCompilerMessages.Error_NotSupportedInKeymanWebContext({line: fkp.Line, code: GetCodeName(rec.Code)}));
         Result += '/*.*/ 0 ';
       }
     }
@@ -677,7 +677,7 @@ export function JavaScript_OutputString(fk: KMX.KEYBOARD, FTabStops: string, fkp
           // These have no output for a context emit
           break;
       default:
-        callbacks.reportMessage(KmwCompilerMessages.Error_NotSupportedInKeymanWebContext({code: GetCodeName(recContext.Code)}));
+        callbacks.reportMessage(KmwCompilerMessages.Error_NotSupportedInKeymanWebContext({line: fkp.Line, code: GetCodeName(recContext.Code)}));
         Result += nlt + '/*.*/ ';   // I4611
       }
     }
@@ -885,7 +885,7 @@ export function JavaScript_OutputString(fk: KMX.KEYBOARD, FTabStops: string, fkp
         len = -1;
         break;
       default:
-        callbacks.reportMessage(KmwCompilerMessages.Error_NotSupportedInKeymanWebOutput({code: GetCodeName(rec.Code)}));
+        callbacks.reportMessage(KmwCompilerMessages.Error_NotSupportedInKeymanWebOutput({line: fkp.Line, code: GetCodeName(rec.Code)}));
         Result += '';
       }
     }
