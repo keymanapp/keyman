@@ -36,17 +36,17 @@ export class KmwCompilerMessages extends KmnCompilerMessages {
   static Warn_OptionStoreNameInvalid = (o:{name:string}) => m(this.WARN_OptionStoreNameInvalid,
     `The option store ${o.name} should be named with characters in the range A-Z, a-z, 0-9 and _ only.`);
 
-  static Error_VirtualCharacterKeysNotSupportedInKeymanWeb = () => m(this.ERROR_VirtualCharacterKeysNotSupportedInKeymanWeb,
-    `Virtual character keys not currently supported in KeymanWeb`);
+  static Error_VirtualCharacterKeysNotSupportedInKeymanWeb = (o:{line:number}) => m(this.ERROR_VirtualCharacterKeysNotSupportedInKeymanWeb,
+    `Virtual character keys not currently supported in KeymanWeb`, o);
 
-  static Error_VirtualKeysNotValidForMnemonicLayouts = () => m(this.ERROR_VirtualKeysNotValidForMnemonicLayouts,
-    `Virtual keys are not valid for mnemonic layouts`);
+  static Error_VirtualKeysNotValidForMnemonicLayouts = (o:{line:number}) => m(this.ERROR_VirtualKeysNotValidForMnemonicLayouts,
+    `Virtual keys are not valid for mnemonic layouts`, o);
 
-  static Warn_ExtendedShiftFlagsNotSupportedInKeymanWeb = (o:{flags:string}) => m(this.WARN_ExtendedShiftFlagsNotSupportedInKeymanWeb,
-    `Extended shift flags ${o.flags} are not supported in KeymanWeb`);
+  static Warn_ExtendedShiftFlagsNotSupportedInKeymanWeb = (o:{line:number,flags:string}) => m(this.WARN_ExtendedShiftFlagsNotSupportedInKeymanWeb,
+    `Extended shift flags ${o.flags} are not supported in KeymanWeb`, o);
 
-  static Hint_UnreachableKeyCode = (o:{key:string}) => m(this.HINT_UnreachableKeyCode,
-    `The rule will never be matched for key ${o.key} because its key code is never fired.`);
+  static Hint_UnreachableKeyCode = (o:{line:number,key:string}) => m(this.HINT_UnreachableKeyCode,
+    `The rule will never be matched for key ${o.key} because its key code is never fired.`, o);
 
   static Error_NotSupportedInKeymanWebStore = (o:{code:string,store:string}) => m(this.ERROR_NotSupportedInKeymanWebStore,
     `'${o.code}' is not currently supported in store '${o.store}' when used by any or index for web and touch targets`);
@@ -57,11 +57,11 @@ export class KmwCompilerMessages extends KmnCompilerMessages {
   static Error_NotSupportedInKeymanWebOutput = (o:{line:number, code:string}) => m(this.ERROR_NotSupportedInKeymanWebOutput,
     `Statement '${o.code}' is not currently supported in output for web and touch targets`, o);
 
-  static Warn_HelpFileMissing = (o:{filename: string, e:any}) => m(this.WARN_HelpFileMissing,
-    `File ${o.filename} could not be loaded: ${(o.e??'').toString()}`);
+  static Warn_HelpFileMissing = (o:{line:number, helpFilename:string, e:any}) => m(this.WARN_HelpFileMissing,
+    `File ${o.helpFilename} could not be loaded: ${(o.e??'').toString()}`,o);
 
-  static Warn_EmbedJsFileMissing = (o:{filename: string, e:any}) => m(this.WARN_EmbedJsFileMissing,
-    `File ${o.filename} could not be loaded: ${(o.e??'').toString()}`);
+  static Warn_EmbedJsFileMissing = (o:{line:number, jsFilename: string, e:any}) => m(this.WARN_EmbedJsFileMissing,
+    `File ${o.jsFilename} could not be loaded: ${(o.e??'').toString()}`, o);
 
   static Warn_TouchLayoutMissingLayer = (o:{keyId:string, platformName:string, layerId:string, nextLayer:string}) => m(this.WARN_TouchLayoutMissingLayer,
     `Key "${o.keyId}" on platform "${o.platformName}", layer "${o.layerId}", references a missing layer "${o.nextLayer}"`);
@@ -91,8 +91,8 @@ export class KmwCompilerMessages extends KmnCompilerMessages {
 
   // Following messages are kmw-compiler only, so use KmwCompiler error namespace
 
-  static Error_NotAnyRequiresVersion14 = () => m(this.ERROR_NotAnyRequiresVersion14,
-    `Statement notany in context() match requires version 14.0+ of KeymanWeb`);
+  static Error_NotAnyRequiresVersion14 = (o:{line: number}) => m(this.ERROR_NotAnyRequiresVersion14,
+    `Statement notany in context() match requires version 14.0+ of KeymanWeb`, o);
   static ERROR_NotAnyRequiresVersion14 = SevError | 0x0001;
 
   static Error_TouchLayoutIdentifierRequires15 = (o:{keyId:string, platformName:string, layerId:string}) => m(this.ERROR_TouchLayoutIdentifierRequires15,

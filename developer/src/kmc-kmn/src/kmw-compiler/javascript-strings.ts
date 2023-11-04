@@ -233,7 +233,7 @@ export function JavaScript_Rules(keyboard: KMX.KEYBOARD, fMnemonic: boolean, fgp
 export function JavaScript_Shift(fkp: KMX.KEY, FMnemonic: boolean): number {
   if (FMnemonic) {
     if (fkp.ShiftFlags & KMX.KMXFile.VIRTUALCHARKEY) {
-      callbacks.reportMessage(KmwCompilerMessages.Error_VirtualCharacterKeysNotSupportedInKeymanWeb());
+      callbacks.reportMessage(KmwCompilerMessages.Error_VirtualCharacterKeysNotSupportedInKeymanWeb({line:fkp.Line}));
       return 0;
     }
 
@@ -241,7 +241,7 @@ export function JavaScript_Shift(fkp: KMX.KEY, FMnemonic: boolean): number {
       // We prohibit K_ keys for mnemonic layouts. We don't block T_ and U_ keys.
       // TODO: this doesn't resolve the issue of, e.g. SHIFT+K_SPACE
       // https://github.com/keymanapp/keyman/issues/265
-      callbacks.reportMessage(KmwCompilerMessages.Error_VirtualKeysNotValidForMnemonicLayouts());
+      callbacks.reportMessage(KmwCompilerMessages.Error_VirtualKeysNotValidForMnemonicLayouts({line:fkp.Line}));
       return 0;
     }
   }
@@ -254,13 +254,13 @@ export function JavaScript_Shift(fkp: KMX.KEY, FMnemonic: boolean): number {
 
     // Non-chiral support only and no support for state keys
     if (fkp.ShiftFlags & (KMX.KMXFile.LCTRLFLAG | KMX.KMXFile.RCTRLFLAG | KMX.KMXFile.LALTFLAG | KMX.KMXFile.RALTFLAG)) {   // I4118
-      callbacks.reportMessage(KmwCompilerMessages.Warn_ExtendedShiftFlagsNotSupportedInKeymanWeb({flags: 'LALT, RALT, LCTRL, RCTRL'}));
+      callbacks.reportMessage(KmwCompilerMessages.Warn_ExtendedShiftFlagsNotSupportedInKeymanWeb({line:fkp.Line, flags: 'LALT, RALT, LCTRL, RCTRL'}));
     }
 
     if (fkp.ShiftFlags & (
       KMX.KMXFile.CAPITALFLAG | KMX.KMXFile.NOTCAPITALFLAG | KMX.KMXFile.NUMLOCKFLAG | KMX.KMXFile.NOTNUMLOCKFLAG |
       KMX.KMXFile.SCROLLFLAG | KMX.KMXFile.NOTSCROLLFLAG)) {   // I4118
-      callbacks.reportMessage(KmwCompilerMessages.Warn_ExtendedShiftFlagsNotSupportedInKeymanWeb({flags: 'CAPS and NCAPS'}));
+      callbacks.reportMessage(KmwCompilerMessages.Warn_ExtendedShiftFlagsNotSupportedInKeymanWeb({line:fkp.Line, flags: 'CAPS and NCAPS'}));
     }
 
     return KMX.KMXFile.ISVIRTUALKEY | (fkp.ShiftFlags & (KMX.KMXFile.K_SHIFTFLAG | KMX.KMXFile.K_CTRLFLAG | KMX.KMXFile.K_ALTFLAG));
@@ -378,7 +378,7 @@ export function JavaScript_Key(fkp: KMX.KEY, FMnemonic: boolean): number {
 
   if (Result == 0 || Result >= TKeymanWebTouchStandardKey.K_LOPT) {   // I4141
     if(!FUnreachableKeys.includes(fkp)) {
-      callbacks.reportMessage(KmwCompilerMessages.Hint_UnreachableKeyCode({key: FormatKeyForErrorMessage(fkp,FMnemonic)}));
+      callbacks.reportMessage(KmwCompilerMessages.Hint_UnreachableKeyCode({line:fkp.Line, key: FormatKeyForErrorMessage(fkp,FMnemonic)}));
       FUnreachableKeys.push(fkp);
     }
   }
@@ -667,7 +667,7 @@ export function JavaScript_OutputString(fk: KMX.KEYBOARD, FTabStops: string, fkp
         // #917: Minimum version required is 14.0: the KCXO function was only added for 14.0
         // Note that this is checked in compiler.cpp as well, so this error can probably never occur
         if(!IsKeyboardVersion14OrLater()) {
-          callbacks.reportMessage(KmwCompilerMessages.Error_NotAnyRequiresVersion14());
+          callbacks.reportMessage(KmwCompilerMessages.Error_NotAnyRequiresVersion14({line:fkp.Line}));
         }
         Result += nlt + `k.KCXO(${len},t,${AdjustIndex(fkp.dpContext, xstrlen(fkp.dpContext))},${AdjustIndex(fkp.dpContext, ContextIndex)+1});`;
         break;

@@ -84,7 +84,7 @@ describe('CompilerMessages', function () {
 
   it('should generate ERROR_NotSupportedInKeymanWebOutput if a rule has `return` in the output', async function() {
     await testForMessage(this, ['invalid-keyboards', 'error_not_supported_in_keyman_web_output.kmn'], KmnCompilerMessages.ERROR_NotSupportedInKeymanWebOutput);
-    assert.equal(callbacks.messages[0].message, "Statement \"return\" is not currently supported in output");
+    assert.equal(callbacks.messages[0].message, "Statement 'return' is not currently supported in output for web and touch targets");
   });
 
 });
