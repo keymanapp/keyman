@@ -1,5 +1,3 @@
-import { KmnCompiler } from "@keymanapp/kmc-kmn";
-import { NodeCompilerCallbacks } from "./NodeCompilerCallbacks.js";
 import Sentry from "@sentry/node";
 import KEYMAN_VERSION from "@keymanapp/keyman-version";
 import { spawnChild } from "./spawnAwait.js";
@@ -10,52 +8,9 @@ import { spawnChild } from "./spawnAwait.js";
  */
 const CLOSE_TIMEOUT = 2000;
 
-const cli = process.argv.join(' ');
 let isInit = false;
 
 export class KeymanSentry {
-  static isTestCL() {
-    // Note single hyphen match which matches other Developer console app
-    // implementations, but this will also work with
-    // --sentry-client-test-exception, so we get the best of both worlds.
-    // This parameter is undocumented by design
-    return cli.includes('-sentry-client-test-exception');
-  }
-
-  static async runTestIfCLRequested() {
-    if(KeymanSentry.isTestCL()) {
-      await KeymanSentry.test();
-      console.error('Unexpected return from KeymanSentry.test');
-      process.exit(1);
-    }
-  }
-
-  static async test() {
-    KeymanSentry.init();
-    if(cli.includes('kmcmplib')) {
-      const compiler = new KmnCompiler();
-      const callbacks = new NodeCompilerCallbacks({});
-      if(!await compiler.init(callbacks)) {
-        throw new Error('Failed to instantiate WASM compiler');
-      }
-      try {
-        compiler.testSentry();
-      } catch(e: any) {
-        await KeymanSentry.captureException(e);
-      }
-    } else if(cli.includes('event')) {
-      const eventId = Sentry.captureMessage('Test message from -sentry-client-test-exception event');
-      await Sentry.close(CLOSE_TIMEOUT);
-      console.log(`Captured test message with id ${eventId}`);
-      process.exit(0);
-    } else {
-      try {
-        throw new Error('Test error from -sentry-client-test-exception event');
-      } catch(e: any) {
-        await KeymanSentry.captureException(e);
-      }
-    }
-  }
 
   static async isEnabled() {
     if(process.argv.includes('--no-error-reporting')) {
@@ -115,14 +70,22 @@ export class KeymanSentry {
     return null;
   }
 
-  static async captureException(e: any) {
+  static captureMessage(message: string) {
+    if(isInit) {
+      return Sentry.captureMessage(message);
+    } else {
+      return null;
+    }
+  }
+
+  static async captureException(e: any): Promise<never> {
     if(isInit) {
       const eventId = Sentry.captureException(e);
       process.stderr.write(`
       Fatal error: ${(e??'').toString()}
       `);
       this.writeSentryMessage(eventId);
-      this.close();
+      await this.close();
 
       // For local development, we don't want to bury the trace; we need the cast to avoid
       // TS2367 (comparison appears to be unintentional)
@@ -137,7 +100,7 @@ export class KeymanSentry {
 
   static async close() {
     if(isInit) {
-      await Sentry.close(2000);
+      await Sentry.close(CLOSE_TIMEOUT);
     }
   }
 }
