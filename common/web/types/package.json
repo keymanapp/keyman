@@ -18,8 +18,7 @@
     "build": "tsc -b",
     "build:schema": "ajv compile",
     "lint": "eslint .",
-    "test": "npm run lint && cd test && tsc -b && cd .. && c8 --skip-full --reporter=lcov --reporter=text mocha",
-    "prepublishOnly": "npm run build"
+    "test": "npm run lint && cd test && tsc -b && cd .. && c8 --skip-full --reporter=lcov --reporter=text mocha"
   },
   "author": "Marc Durdin <marc@keyman.com> (https://github.com/mcdurdin)",
   "license": "MIT",

@@ -15,8 +15,7 @@
     "bundle-kmc": "esbuild build/src/kmc.js --bundle --platform=node --target=es2022 > build/cjs-src/kmc.cjs",
     "bundle-kmlmc": "esbuild build/src/kmlmc.js --bundle --platform=node --target=es2022 > build/cjs-src/kmlmc.cjs",
     "bundle-kmlmp": "esbuild build/src/kmlmp.js --bundle --platform=node --target=es2022 > build/cjs-src/kmlmp.cjs",
-    "test": "eslint . && cd test && tsc -b && cd .. && mocha",
-    "prepublishOnly": "npm run build"
+    "test": "eslint . && cd test && tsc -b && cd .. && mocha"
   },
   "type": "module",
   "author": "Marc Durdin <marc@keyman.com> (https://github.com/mcdurdin)",
