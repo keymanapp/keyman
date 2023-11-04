@@ -81,10 +81,11 @@ NSMutableArray *servers;
         NSRunningApplication *currApp = [[NSWorkspace sharedWorkspace] frontmostApplication];
         NSString *clientAppId = [currApp bundleIdentifier];
         if ([self.AppDelegate debugMode]) {
-            NSLog(@"New active app %@", clientAppId);
-            NSLog(@"sender %@", sender);
+            NSLog(@"activateServer, new active app: '%@', sender %@", clientAppId, sender);
         }
-        
+ 
+      // TODO: uncomment? commented the browser cases to see how they work with core code
+      /*
         // Most things in Safari work well using the normal way, but Google Docs doesn't.
         if ([clientAppId isEqual: @"com.apple.Safari"]) {
             _eventHandler = [[KMInputMethodSafariClientEventHandler alloc] init];
@@ -98,6 +99,9 @@ NSMutableArray *servers;
             // where we don't necessarily have any access to the current client.
             _eventHandler = [[KMInputMethodEventHandler alloc] initWithClient:clientAppId client:sender];
         }
+*/
+      _eventHandler = [[KMInputMethodEventHandler alloc] initWithClient:clientAppId client:sender];
+
     }
 }
 

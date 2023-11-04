@@ -2,14 +2,12 @@
 
 <!DOCTYPE keyboard3 SYSTEM "../../../../../../../resources/standards-data/ldml-keyboards/techpreview/dtd/ldmlKeyboard3.dtd">
 <keyboard3 locale="mt" conformsTo="techpreview">
-  <names>
-    <name value="disp-maximal" />
-  </names>
+  <info name="disp-maximal"/>
 
   <displays>
-    <display id="g" display="(g)"/>
-    <display to="f" display="(f)"/> <!-- Note: in opposite lexical order, as the compiler will sort -->
-    <display to="${eee}" display="(${eee})"/>
+    <display keyId="g" display="(g)"/>
+    <display output="f" display="(f)"/> <!-- Note: in opposite lexical order, as the compiler will sort -->
+    <display output="${eee}" display="(${eee})"/>
     <displayOptions baseCharacter="x" />
   </displays>
 

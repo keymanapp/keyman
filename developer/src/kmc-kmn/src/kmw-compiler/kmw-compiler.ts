@@ -1,8 +1,8 @@
 import { KMX, CompilerOptions, CompilerCallbacks, KvkFileReader, VisualKeyboard, KmxFileReader, KvkFile } from "@keymanapp/common-types";
 import { ExpandSentinel, incxstr, xstrlen } from "./util.js";
-import { options, nl, FTabStop, setupGlobals, IsKeyboardVersion10OrLater, callbacks, FFix183_LadderLength, FCallFunctions, fk } from "./compiler-globals.js";
+import { options, nl, FTabStop, setupGlobals, IsKeyboardVersion10OrLater, callbacks, FFix183_LadderLength, FCallFunctions, fk, IsKeyboardVersion17OrLater } from "./compiler-globals.js";
 import { JavaScript_ContextMatch, JavaScript_KeyAsString, JavaScript_Name, JavaScript_OutputString, JavaScript_Rules, JavaScript_Shift, JavaScript_ShiftAsString, JavaScript_Store, zeroPadHex } from './javascript-strings.js';
-import { KmwCompilerMessages } from "./messages.js";
+import { KmwCompilerMessages } from "./kmw-compiler-messages.js";
 import { ValidateLayoutFile } from "./validate-layout-file.js";
 import { VisualKeyboardFromFile } from "./visual-keyboard-compiler.js";
 import { CompilerResult, STORETYPE_DEBUG, STORETYPE_OPTION, STORETYPE_RESERVED } from "../compiler/compiler.js";
@@ -157,9 +157,12 @@ export function WriteCompiledKeyboard(
     sLayoutFilename = callbacks.resolveFilename(kmnfile, sLayoutFilename);
 
     let result = ValidateLayoutFile(keyboard, options.saveDebug, sLayoutFilename, sVKDictionary, kmxResult.displayMap);
-    if(!result.result) {
+    if(!result) {
       sLayoutFile = '';
-      callbacks.reportMessage(KmwCompilerMessages.Error_TouchLayoutFileInvalid({filename:sLayoutFilename}));
+      return null;
+    } else if(!result.result) {
+      sLayoutFile = '';
+      callbacks.reportMessage(KmwCompilerMessages.Error_InvalidTouchLayoutFile({filename:sLayoutFilename}));
       return null;
     } else {
       sLayoutFile = result.output;
@@ -435,8 +438,13 @@ function GetKeyboardModifierBitmask(keyboard: KMX.KEYBOARD, fMnemonic: boolean):
 function JavaScript_SetupDebug() {
   if(IsKeyboardVersion10OrLater()) {
     if(options.saveDebug) {
-      return 'var modCodes = keyman.osk.modifierCodes;'+nl+
-             FTabStop+'var keyCodes = keyman.osk.keyCodes;'+nl;
+      if(IsKeyboardVersion17OrLater()) {
+        return 'var modCodes = KeymanWeb.Codes.modifierCodes;'+nl+
+              FTabStop+'var keyCodes = KeymanWeb.Codes.keyCodes;'+nl;
+      } else {
+        return 'var modCodes = keyman.osk.modifierCodes;'+nl+
+              FTabStop+'var keyCodes = keyman.osk.keyCodes;'+nl;
+      }
     }
   }
   return '';

@@ -2,9 +2,7 @@
 
 <!DOCTYPE keyboard3 SYSTEM "../../../../../../../resources/standards-data/ldml-keyboards/techpreview/dtd/ldmlKeyboard3.dtd">
 <keyboard3 locale="mt" conformsTo="techpreview">
-  <names>
-    <name value="loca-minimal" />
-  </names>
+  <info name="loca-minimal"/>
 
   <keys />
 </keyboard3>

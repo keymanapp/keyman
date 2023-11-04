@@ -37,7 +37,7 @@ export class BuildKeyboardInfo extends BuildActivity {
     const lastCommitDate = getLastGitCommitDate(project.projectPath);
 
     const compiler = new KeyboardInfoCompiler(callbacks);
-    const data = compiler.writeKeyboardInfoFile({
+    const data = await compiler.writeKeyboardInfoFile({
       kmpFilename:  project.resolveOutputFilePath(kps, KeymanFileTypes.Source.Package, KeymanFileTypes.Binary.Package),
       kpsFilename: project.resolveInputFilePath(kps),
       jsFilename: jsFilename && fs.existsSync(jsFilename) ? jsFilename : undefined,

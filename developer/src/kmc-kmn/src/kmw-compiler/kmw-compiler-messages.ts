@@ -1,4 +1,4 @@
-import { KmnCompilerMessages } from "../compiler/messages.js";
+import { KmnCompilerMessages } from "../compiler/kmn-compiler-messages.js";
 import { CompilerErrorNamespace, CompilerErrorSeverity, CompilerMessageSpec as m } from "@keymanapp/common-types";
 
 const Namespace = CompilerErrorNamespace.KmwCompiler;
@@ -19,7 +19,7 @@ export class KmwCompilerMessages extends KmnCompilerMessages {
 
   static Error_InvalidBegin = () => m(this.ERROR_InvalidBegin,
     `A "begin unicode" statement is required to compile a KeymanWeb keyboard`);
-  static Error_TouchLayoutFileInvalid = (o:{filename:string}) => m(this.ERROR_InvalidTouchLayoutFile,
+  static Error_InvalidTouchLayoutFile = (o:{filename:string}) => m(this.ERROR_InvalidTouchLayoutFile,
     `Touch layout file ${o.filename} is not valid`);
   static Warn_DontMixChiralAndNonChiralModifiers = () => m(this.WARN_DontMixChiralAndNonChiralModifiers,
     `This keyboard contains Ctrl,Alt and LCtrl,LAlt,RCtrl,RAlt sets of modifiers. Use only one or the other set for web target.`);
@@ -55,8 +55,6 @@ export class KmwCompilerMessages extends KmnCompilerMessages {
     `Key "${o.keyId}" on platform "${o.platformName}", layer "${o.layerId}" does not have the key type "Special" or "Special (active)" but has the label "${o.label}". This feature is only supported in Keyman 14 or later`);
   static Error_InvalidKeyCode = (o:{keyId: string}) => m(this.ERROR_InvalidKeyCode,
     `Invalid key identifier "${o.keyId}"`);
-  static Error_InvalidTouchLayoutFile = (o:{msg: string}) => m(this.ERROR_InvalidTouchLayoutFile,
-    `Invalid touch layout file: ${o.msg}`);
   static Warn_TouchLayoutFontShouldBeSameForAllPlatforms = () => m(this.WARN_TouchLayoutFontShouldBeSameForAllPlatforms,
     `The touch layout font should be the same for all platforms.`);
   static Warn_TouchLayoutMissingRequiredKeys = (o:{layerId:string, platformName:string, missingKeys:string}) => m(this.WARN_TouchLayoutMissingRequiredKeys,
@@ -71,4 +69,12 @@ export class KmwCompilerMessages extends KmnCompilerMessages {
   static Error_TouchLayoutIdentifierRequires15 = (o:{keyId:string, platformName:string, layerId:string}) => m(this.ERROR_TouchLayoutIdentifierRequires15,
     `Key "${o.keyId}" on "${o.platformName}", layer "${o.layerId}" has a multi-part identifier which requires version 15.0 or newer.`);
   static ERROR_TouchLayoutIdentifierRequires15 = SevError | 0x0002;
+
+  static Error_InvalidTouchLayoutFileFormat = (o:{msg: string}) => m(this.ERROR_InvalidTouchLayoutFileFormat,
+    `Invalid touch layout file: ${o.msg}`);
+  static ERROR_InvalidTouchLayoutFileFormat = SevError | 0x0003;
+
+  static Error_TouchLayoutFileDoesNotExist = (o:{filename:string}) => m(this.ERROR_TouchLayoutFileDoesNotExist,
+    `Touch layout file ${o.filename} does not exist`);
+  static ERROR_TouchLayoutFileDoesNotExist = SevError | 0x0004;
 };

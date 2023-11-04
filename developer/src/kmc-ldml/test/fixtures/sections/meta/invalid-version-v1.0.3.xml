@@ -4,9 +4,7 @@
 <keyboard3 locale="mt" conformsTo="techpreview">
   <version number="v1.0.3" />
 
-  <names>
-    <name value="meta-minimal" />
-  </names>
+  <info name="meta-minimal"/>
 
   <keys />
 </keyboard3>

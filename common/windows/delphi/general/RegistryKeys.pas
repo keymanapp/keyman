@@ -103,8 +103,7 @@ const
 
   SRegValue_Engine_OEMProductPath = 'oem product path';
 
-//  SRegValue_UnknownLayoutID         = 'unknown layout id';                          // LM
-    SRegValue_Legacy_Default_UnknownLayoutID = '000005FE';   // I4220
+  SRegValue_Legacy_Default_UnknownLayoutID = '000005FE';   // I4220
 
   SRegValue_KeymanDebug             = 'debug';                                      // CU
 
@@ -112,10 +111,7 @@ const
 
   SRegValue_ShowStartup             = 'show startup';                        // CU
   SRegValue_ShowWelcome             = 'show welcome';                        // CU
-  //SRegValue_NoCheckAssociations     = 'no check associations';                      // CU
   SRegValue_UseAdvancedInstall      = 'use advanced install';                       // CU
-
-//TOUCH    SRegValue_UseTouchLayout          = 'use touch layout';                           // CU, default false
 
   SRegValue_AltGrCtrlAlt                = 'simulate altgr';                         // CU
   SRegValue_KeyboardHotKeysAreToggle    = 'hotkeys are toggles';                    // CU
@@ -170,9 +166,6 @@ const
 
   SRegValue_DeadkeyConversionMode       = 'deadkey conversion mode';                // CU   // I4552
   SRegValue_UnderlyingLayout            = 'underlying layout';                      // CU
-
-//  SRegKey_AppInitDLLs                   = 'Software\Microsoft\Windows NT\CurrentVersion\Windows';  // LM
-//  SRegValue_AppInitDLLs                 = 'AppInit_DLLs';                                          // LM
 
   SRegKey_KeyboardLayoutToggle          = 'keyboard layout\toggle';                 // CU  // I2522
   SRegValue_Toggle_Hotkey               = 'Hotkey';
@@ -272,10 +265,6 @@ const
   SRegValue_CPIUP_CachedLanguageName = 'CachedLanguageName';
   SRegValue_CPIUP_InputMethodOverride = 'InputMethodOverride';
 
-  { User profile keys }
-
-  //SRegKey_NTProfileList = 'Software\Microsoft\Windows NT\CurrentVersion\ProfileList';
-
   { Font keys }
 
   SRegKey_FontList_LM   = 'Software\Microsoft\Windows\CurrentVersion\Fonts';           // LM
@@ -318,13 +307,6 @@ const
   SRegKey_IDETestFonts_CU        = SRegKey_IDE_CU                 + '\TestFonts';           // CU
   SRegKey_IDEVisualKeyboard_CU   = SRegKey_IDE_CU                 + '\VisualKeyboard';      // CU
   SRegKey_IDEToolbars_CU         = SRegKey_IDE_CU                 + '\Toolbars';            // CU
-//  SRegKey_KCT                 = SRegKey_KeymanDeveloper_CU     + '\KCT';               // LM CU
-//  SRegKey_KCTFiles            = SRegKey_KCT_CU                 + '\Files';             // CU
-
-//  SRegKey_IDEOnline          = SRegKey_IDE_CU                + '\Online';              // CU
-//  SRegKey_IDE_BrandingPackTest = SRegKey_IDE_CU              + '\Branding Pack\Test';  // CU   // I4873
-
-//  SRegKey_CRM                = SRegKey_KeymanDeveloper    + '\CRM';                 // CU
 
   SRegValue_CheckForUpdates   = 'check for updates'; // CU
   SRegValue_LastUpdateCheckTime = 'last update check time'; // CU
@@ -335,8 +317,6 @@ const
 
   SRegValue_KeepInTouchShown = 'keep in touch shown'; // CU. bool   // I4658
 
-  //SRegValue_OnlineUsername    = 'online username';
-  //SRegValue_OnlinePassword    = 'online password';
   SRegValue_OnlineLogin = 'online login';
 
   { SRegKey_CRM values }
@@ -349,7 +329,6 @@ const
 
   { SRegKey_KeymanDeveloper values }
 
-  //SRegValue_ShowStartup             = 'show startup';                           // CU -- see Keyman option of same name
   SRegValue_Evaluation              = 'evaluation';                                 // CU
   SRegValue_ActiveProject           = 'active project';                             // CU
 
@@ -364,7 +343,6 @@ const
 
   SRegValue_IDEMRU                 = 'MRU';                                        // CU
   SRegValue_CharMapSize             = 'char map size';                              // CU
-//SRegValue_IDERegressionTestPath  = 'regression test path';                       // CU
 
   { SRegKey_IDEVisualKeyboard values }
 
@@ -393,8 +371,6 @@ const
   SRegValue_IDEOptAutoSaveBeforeCompiling = 'auto save before compiling'; // CU
   SRegValue_IDEOptOSKAutoSaveBeforeImporting = 'osk auto save before importing'; // CU
 
-  SRegValue_IDEOptUseLegacyCompiler = 'use legacy compiler'; // CU
-
   // Note: keeping 'web host port' reg value name to ensure settings maintained
   //       from version 14.0 and earlier of Keyman Developer. Other values are
   //       new with Keyman Developer 15.0
@@ -409,8 +385,6 @@ const
   SRegValue_IDEOptCharMapDisableDatabaseLookups = 'char map disable database lookups';  // CU
   SRegValue_IDEOptCharMapAutoLookup             = 'char map auto lookup';               // CU
 
-  SRegValue_IDEOptMultipleInstances = 'multiple instances';                         // CU
-
   SRegValue_IDEOptOpenKeyboardFilesInSourceView = 'open keyboard files in source view';  // CU   // I4751
 
   SRegValue_IDEDisplayTheme = 'display theme';   // I4796
@@ -424,10 +398,6 @@ const
   CRegValue_IDEOpt_WebLadderLength_Default = 100;
 
   SRegValue_IDEOpt_DefaultProjectPath = 'default project path';
-
-  { SRegKey_KCT values }
-
-//  SRegValue_KCTTemplatePath = 'template path';                                      // LM
 
 {-------------------------------------------------------------------------------
  - Shared keys and values                                                      -
