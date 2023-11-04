@@ -482,7 +482,7 @@ function JavaScript_CompositeContextValue(fk: KMX.KEYBOARD, fkp: KMX.KEY, pwsz: 
         Cur--; // don't increment on ifsystemstore -- correlates with AdjustIndex function   // I3910
         break;
       case KMX.KMXFile.CODE_CONTEXTEX:   // I3980
-        Result += `k.KCCM(${Len-Cur},${Len-rec.ContextEx.Index+1},t)`;
+        Result += `k.KCCM(${Len-Cur},${Len-rec.ContextEx.Index},t)`;
         break;
       case KMX.KMXFile.CODE_NOTANY:   // I3981
         CheckStoreForInvalidFunctions(fk, fkp, rec.Any.Store);  // I1520
@@ -572,7 +572,7 @@ function JavaScript_FullContextValue(fk: KMX.KEYBOARD, fkp: KMX.KEY, pwsz: strin
         FullContext += `{t:'a',a:this.s${JavaScript_Name(rec.Any.StoreIndex, rec.Any.Store.dpName)},n:1}`;
         break;
       case KMX.KMXFile.CODE_CONTEXTEX:
-        FullContext += `{t:'c',c:${rec.ContextEx.Index}}`;   // I4611
+        FullContext += `{t:'c',c:${rec.ContextEx.Index+1}}`;   // I4611
         break;
       case KMX.KMXFile.CODE_INDEX:
         FullContext += `{t:'i',i:this.s${JavaScript_Name(rec.Index.StoreIndex, rec.Index.Store.dpName)},`+
