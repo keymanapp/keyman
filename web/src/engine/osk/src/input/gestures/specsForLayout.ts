@@ -115,6 +115,10 @@ export function gestureSetForLayout(layerGroup: OSKLayerGroup, params: GesturePa
 
   // To be used among the `allowsInitialState` contact-model specifications as needed.
   const gestureKeyFilter = (key: KeyElement, gestureId: string) => {
+    if(!key) {
+      return false;
+    }
+
     const keySpec = key.key.spec;
     switch(gestureId) {
       case 'modipress-start':
@@ -160,7 +164,7 @@ export function gestureSetForLayout(layerGroup: OSKLayerGroup, params: GesturePa
         contact.model = {
           ...contact.model,
           allowsInitialState: (sample, ancestorSample, key) => {
-            return baseInitialStateCheck(sample, ancestorSample, key) && gestureKeyFilter(key, modelId);
+            return gestureKeyFilter(key, modelId) && baseInitialStateCheck(sample, ancestorSample, key);
           }
         };
       }
@@ -384,7 +388,7 @@ export const SpecialKeyStartModel: GestureModel<KeyElement> = {
           // But, to get started... we can just use a simple hardcoded approach.
           const modifierKeyIds = ['K_LOPT', 'K_ROPT', 'K_BKSP'];
           for(const modKeyId of modifierKeyIds) {
-            if(baseItem.key.spec.id == modKeyId) {
+            if(baseItem?.key.spec.id == modKeyId) {
               return true;
             }
           }
