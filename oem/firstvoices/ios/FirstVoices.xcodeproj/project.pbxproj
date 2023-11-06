@@ -650,9 +650,11 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = FirstVoices/FirstVoices.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
 				CODE_SIGN_STYLE = Manual;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = D7TR486TEH;
+				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = D7TR486TEH;
 				INFOPLIST_FILE = FirstVoices/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 12.2;
 				KEYMAN_ROOT = "$(SRCROOT)/../../..";
@@ -666,6 +668,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
 				PROVISIONING_PROFILE_SPECIFIER = "FirstVoices Keyboards Development";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = FirstVoices_Keyboards;
 				SWIFT_OBJC_BRIDGING_HEADER = "";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 4.2;
