@@ -26,7 +26,7 @@ export class KMXPlusMetadataCompiler {
     // TSS_NAME: User friendly name of keyboard
     keyboard.stores.push({
       dpName: '&NAME',
-      dpString: kmxplus.name?.names?.[0]?.value ?? 'unknown',  // Empty name should not happen, so ok to use 'unknown' here
+      dpString: kmxplus.meta?.name?.value ?? 'unknown',  // Empty name should not happen, so ok to use 'unknown' here
       dwSystemID: KMXFile.TSS_NAME
     });
 

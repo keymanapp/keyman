@@ -3,6 +3,15 @@ run-name: "Ubuntu packaging - ${{ github.event.client_payload.branch }} (branch 
 on:
   repository_dispatch:
     types: ['deb-release-packaging:*', 'deb-pr-packaging:*']
+
+# Input:
+# buildSha:    The SHA of the commit to build, e.g. of the branch or
+#              refs/pull/1234/merge for PR
+# headSha:     The SHA of the branch head. Same as buildSha for regular
+#              builds, SHA of refs/pull/1234/head for PRs
+# branch:      The branch to build, for a PR in the form `PR-1234`
+# isTestBuild: false for Releases, otherwise true
+
 env:
   COLOR_GREEN: "\e[32m"
   GH_TOKEN: ${{ github.token }}
@@ -17,26 +26,21 @@ jobs:
     outputs:
       VERSION: ${{ steps.version_step.outputs.VERSION }}
       PRERELEASE_TAG: ${{ steps.prerelease_tag.outputs.PRERELEASE_TAG }}
-      GIT_SHA: ${{ steps.set_status.outputs.GIT_SHA }}
-      GHA_TEST_BUILD: ${{ github.event.client_payload.isTestBuild }}
-      GHA_BRANCH: ${{ github.event.client_payload.branch }}
     steps:
     - name: Checkout
       uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c #v3.3.0
       with:
-        ref: '${{ github.event.client_payload.ref }}'
+        ref: '${{ github.event.client_payload.buildSha }}'
 
     - name: Set pending status on PR builds
       id: set_status
       if: github.event.client_payload.isTestBuild == 'true'
       shell: bash
       run: |
-        GIT_SHA="${{ github.event.client_payload.sha }}"
-        echo "GIT_SHA=$GIT_SHA" >> $GITHUB_OUTPUT
         gh api \
           --method POST \
           -H "Accept: application/vnd.github+json" \
-          /repos/$GITHUB_REPOSITORY/statuses/$GIT_SHA \
+          /repos/$GITHUB_REPOSITORY/statuses/${{ github.event.client_payload.headSha }} \
           -f state='pending' \
           -f target_url="$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID" \
           -f description='Debian packaging started' \
@@ -53,10 +57,14 @@ jobs:
         ./scripts/deb-packaging.sh --gha dependencies
 
     - name: Build source package
+      id: build_source_package
       run: |
-        TIER=$(cat TIER.md)
-        export TIER
+        export TIER=$(cat TIER.md)
+        export GHA_TEST_BUILD="${{ github.event.client_payload.isTestBuild }}"
+        export GHA_BRANCH="${{ github.event.client_payload.branch }}"
         echo "TIER=$TIER" >> $GITHUB_ENV
+        echo "GHA_TEST_BUILD=${GHA_TEST_BUILD}" >> $GITHUB_ENV
+        echo "GHA_BRANCH=${GHA_BRANCH}" >> $GITHUB_ENV
         cd linux
         ./scripts/deb-packaging.sh --gha source
 
@@ -84,7 +92,7 @@ jobs:
         if [ "${{ github.event.client_payload.isTestBuild }}" == "true" ]; then
           echo ":checkered_flag: **Test build of version ${{ steps.version_step.outputs.VERSION }} for ${{ github.event.client_payload.branch }}**" >> $GITHUB_STEP_SUMMARY
         else
-          echo ":ship: **Release build of ${{ github.event.client_payload.branch }} branch (${{ github.event.client_payload.ref}}), version ${{ steps.version_step.outputs.VERSION }}**" >> $GITHUB_STEP_SUMMARY
+          echo ":ship: **Release build of ${{ github.event.client_payload.branch }} branch (${{ github.event.client_payload.branch}}), version ${{ steps.version_step.outputs.VERSION }}**" >> $GITHUB_STEP_SUMMARY
         fi
         echo "" >> $GITHUB_STEP_SUMMARY
         echo ":gift: Generated source package:" >> $GITHUB_STEP_SUMMARY
@@ -227,7 +235,7 @@ jobs:
     - name: Checkout
       uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c #v3.3.0
       with:
-        ref: '${{ github.event.client_payload.ref }}'
+        ref: '${{ github.event.client_payload.buildSha }}'
 
     - name: Download Artifacts
       uses: actions/download-artifact@9bc31d5ccc31df68ecc42ccf4149144866c47d8a # v3.0.2
@@ -284,7 +292,7 @@ jobs:
         gh api \
           --method POST \
           -H "Accept: application/vnd.github+json" \
-          /repos/$GITHUB_REPOSITORY/statuses/${{ needs.sourcepackage.outputs.GIT_SHA }} \
+          /repos/$GITHUB_REPOSITORY/statuses/${{ github.event.client_payload.headSha }} \
           -f state="$RESULT" \
           -f target_url="$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID" \
           -f description="$MSG" \

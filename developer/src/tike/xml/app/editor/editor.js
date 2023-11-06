@@ -56,6 +56,13 @@ async function loadSettings() {
       mode = 'text';
     }
 
+    // handle ctrl+click to open new window by passing it back to TIKE
+    const openerService = {
+      open: function (resource, _options) {
+        window.open(resource.toString(), '_blank');
+      }
+    };
+
     editor = monaco.editor.create(document.getElementById('editor'), {
       language: mode,
       minimap: {
@@ -64,6 +71,8 @@ async function loadSettings() {
       glyphMargin: true,
       lineNumbersMinChars: 2,
       disableMonospaceOptimizations: true
+    }, {
+      openerService
     });
 
     $.get("/app/source/file",

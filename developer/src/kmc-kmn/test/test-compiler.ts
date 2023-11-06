@@ -69,8 +69,8 @@ describe('Compiler class', function() {
         assert(fs.existsSync(outFile));
         const outfileData = fs.readFileSync(outFile);
         const fixtureData = fs.readFileSync(fixtureName);
-        assert.equal(outfileData.byteLength, fixtureData.byteLength);
-        assert.deepEqual(outfileData, fixtureData);
+        assert.equal(outfileData.byteLength, fixtureData.byteLength, `file ${file} has the wrong byte length`);
+        assert.deepEqual(outfileData, fixtureData, `file ${file} does not match fixture`);
       }
     }
   });
@@ -89,7 +89,11 @@ describe('Compiler class', function() {
     const resultingKmxfile = __dirname + '/caps_lock_layer_3620.kmx';
     const resultingKvkfile = __dirname + '/caps_lock_layer_3620.kvk';
 
-    assert.isTrue(compiler.run(infile, {saveDebug: true, shouldAddCompilerVersion: false}));
+    assert.isTrue(compiler.run(infile, {
+      saveDebug: true,
+      shouldAddCompilerVersion: false,
+      outFile: resultingKmxfile,
+    }));
 
     assert.isTrue(fs.existsSync(resultingKmxfile));
     assert.isTrue(fs.existsSync(resultingKvkfile));

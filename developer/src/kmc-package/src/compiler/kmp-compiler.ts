@@ -2,9 +2,8 @@ import * as xml2js from 'xml2js';
 import JSZip from 'jszip';
 import KEYMAN_VERSION from "@keymanapp/keyman-version";
 
-import { CompilerCallbacks, KeymanFileTypes, KvkFile } from '@keymanapp/common-types';
+import { KmpJsonFile, KpsFile, SchemaValidators, CompilerCallbacks, KeymanFileTypes, KvkFile } from '@keymanapp/common-types';
 import { CompilerMessages } from './messages.js';
-import { KmpJsonFile, KpsFile } from '@keymanapp/common-types';
 import { PackageMetadataCollector } from './package-metadata-collector.js';
 import { KmpInfWriter } from './kmp-inf-writer.js';
 import { transcodeToCP1252 } from './cp1252.js';
@@ -29,9 +28,21 @@ export class KmpCompiler {
   public transformKpsToKmpObject(kpsFilename: string): KmpJsonFile.KmpJsonFile {
     const kps = this.loadKpsFile(kpsFilename);
     if(!kps) {
+      // errors will already have been reported by loadKpsFile
       return null;
     }
-    return this.transformKpsFileToKmpObject(kpsFilename, kps);
+    const kmp = this.transformKpsFileToKmpObject(kpsFilename, kps);
+    if(!kmp) {
+      return null;
+    }
+
+    // Verify that the generated kmp.json validates with the kmp.json schema
+    if(!SchemaValidators.default.kmp(kmp)) {
+      // This is an internal error, so throwing an exception is appropriate
+      throw new Error(JSON.stringify((<any>SchemaValidators.default.kmp).errors));
+    }
+
+    return kmp;
   }
 
   public loadKpsFile(kpsFilename: string): KpsFile.KpsFile {
@@ -48,10 +59,18 @@ export class KmpCompiler {
         let parser = new xml2js.Parser({
           explicitArray: false
         });
-        // TODO: add unit test for xml errors parsing .kps file
-        parser.parseString(data, (e: unknown, r: unknown) => { if(e) throw e; a = r as KpsFile.KpsPackage });
+
+        try {
+          parser.parseString(data, (e: unknown, r: unknown) => { if(e) throw e; a = r as KpsFile.KpsPackage });
+        } catch(e) {
+          this.callbacks.reportMessage(CompilerMessages.Error_InvalidPackageFile({e}));
+        }
         return a;
     })();
+
+    if(!kpsPackage) {
+      return null;
+    }
 
     const kps: KpsFile.KpsFile = kpsPackage.Package;
     return kps;

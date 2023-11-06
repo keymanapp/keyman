@@ -57,5 +57,9 @@ export class KeyboardInfoCompilerMessages {
   static Error_OutputValidation = (o:{message: any}) => m(this.ERROR_OutputValidation,
     `Validating output: ${o.message}.`);
   static ERROR_OutputValidation = SevError | 0x000D;
+
+  static Error_FontFileCannotBeRead = (o:{filename: string}) => m(this.ERROR_FontFileCannotBeRead,
+    `Font ${o.filename} could not be parsed to extract a font family.`);
+  static ERROR_FontFileCannotBeRead = SevError | 0x000E;
 }
 

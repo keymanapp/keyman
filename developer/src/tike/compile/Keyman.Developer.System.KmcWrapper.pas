@@ -17,6 +17,7 @@ uses
   System.Classes,
   System.SysUtils,
 
+  Keyman.Developer.System.Project.Project,
   Keyman.Developer.System.Project.ProjectLog,
   Keyman.Developer.System.KeymanDeveloperPaths,
   compile,
@@ -47,15 +48,18 @@ begin
   logtext := '';
 
   // TODO: log-level as opt?
+  // TODO: embed in server for better performance
   cmdline := Format('"%s" build --log-format tsv --log-level info "%s"', [TKeymanDeveloperPaths.KmcPath, infile]);
   if outfile <> '' then
     cmdline := cmdline + Format(' --out-file "%s"', [outfile]);
-  if ProjectFile.Project.Options.CompilerWarningsAsErrors then
+  if FGlobalProject.Options.CompilerWarningsAsErrors then
     cmdline := cmdline + ' --compiler-warnings-as-errors'
   else
     cmdline := cmdline + ' --no-compiler-warnings-as-errors';
-  if not ProjectFile.Project.Options.WarnDeprecatedCode then
+  if FGlobalProject.Options.WarnDeprecatedCode then
     cmdline := cmdline + ' --no-warn-deprecated-code';
+  if debug then
+    cmdline := cmdline + ' --debug';
 
   Result := TUtilExecute.Console(cmdline, ExtractFileDir(infile), logtext, ec);
 
@@ -63,8 +67,8 @@ begin
 
   if not Result then
   begin
-    ProjectFile.Project.Log(plsError, infile,
-      Format('Compiler failed to start with error %d: %s', [GetLastError, SysErrorMessage(GetLastError)]), CERR_ERROR, 0);
+    FGlobalProject.Log(plsError, infile,
+       Format('Compiler failed to start with error %d: %s', [GetLastError, SysErrorMessage(GetLastError)]), CERR_ERROR, 0);
   end;
 
   Result := Result and (ec = 0);
@@ -93,7 +97,7 @@ begin
         else if msgType = 'warn' then
         begin
           state := plsWarning;
-          if ProjectFile.Project.Options.CompilerWarningsAsErrors then
+          if FGlobalProject.Options.CompilerWarningsAsErrors then
             Result := False;
         end
         else if msgType = 'error' then
@@ -108,10 +112,10 @@ begin
         end
         else // assume msgType = 'info'
           state := plsInfo;
-        ProjectFile.Project.Log(state, msgFilename, msgText, msgCode, msgLine);
+        FGlobalProject.Log(state, msgFilename, msgText, msgCode, msgLine);
       end
       else
-        ProjectFile.Project.Log(plsInfo, infile, line, 0, 0);
+        FGlobalProject.Log(plsInfo, infile, line, 0, 0);
     end;
   finally
     s.Free;
