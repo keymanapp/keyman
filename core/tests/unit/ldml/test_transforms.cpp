@@ -545,9 +545,7 @@ int test_normalize() {
     const std::u32string src =
         U"6\U0000ffff\U00000008\U00000001e\U0000ffff\U00000008\U00000002\U00000320\U0000ffff\U00000008\U00000003\U00000300"
         U"\U0000ffff\U00000008\U00000004";
-    const std::u32string expect =
-        U"6\U0000ffff\U00000008\U00000001e\U0000ffff\U00000008\U00000002\U00000320\U0000ffff\U00000008\U00000003\U00000300"
-        U"\U0000ffff\U00000008\U00000004";
+    const std::u32string expect = src;
     std::u32string dst = src;
     assert(normalize_nfd_markers(dst, map));
     zassert_string_equal(dst, expect);
@@ -563,8 +561,7 @@ int test_normalize() {
     std::cout << __FILE__ << ":" << __LINE__ << "   - complex test" << std::endl;
     const std::u32string src = // already in order: 320+300
         U"6\U0000ffff\U00000008\U00000001e\U0000ffff\U00000008\U00000002\U00000320\U0000ffff\U00000008\U00000003\U00000300\U0000ffff\U00000008\U00000004";
-    const std::u32string expect =
-        U"6\U0000ffff\U00000008\U00000001e\U0000ffff\U00000008\U00000002\U00000320\U0000ffff\U00000008\U00000003\U00000300\U0000ffff\U00000008\U00000004";
+    const std::u32string expect = src;
     std::u32string dst = src;
     assert(normalize_nfd_markers(dst, map));
     zassert_string_equal(dst, expect);
