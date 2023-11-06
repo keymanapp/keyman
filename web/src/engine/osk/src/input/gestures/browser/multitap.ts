@@ -42,6 +42,16 @@ export default class Multitap implements GestureHandler {
     this.multitaps = [e.key.spec].concat(e.key.spec.multitap);
     this.sequence = source;
 
+    const startModipress = (tap) => {
+      // In case of a previous modipress that somehow wasn't cleared.
+      this.modipress?.clear();
+
+      const modipressHandler = new Modipress(source, vkbd, () => {
+        this.modipress = vkbd.activeModipress = null;
+      });
+      this.modipress = vkbd.activeModipress = modipressHandler;
+    }
+
     this.originalLayer = vkbd.layerId;
 
     source.on('complete', () => {
@@ -109,14 +119,16 @@ export default class Multitap implements GestureHandler {
 
       // Now that the key has been processed, with a layer possibly changed as a result...
       if(tap.matchedId == 'modipress-multitap-start') {
-        const modipressHandler = new Modipress(source, vkbd, () => {
-          this.modipress = vkbd.activeModipress = null;
-        });
-        this.modipress = vkbd.activeModipress = modipressHandler;
+        startModipress(tap);
       }
     };
 
     source.on('stage', stageHandler);
+
+    const initialTap = source.stageReports[0];
+    if(initialTap.matchedId == 'modipress-start') {
+      startModipress(source.stageReports[0]);
+    }
 
     /* In theory, setting up a specialized recognizer config limited to the base key's surface area
      * would be pretty ideal - it'd provide automatic cancellation if anywhere else were touched.

@@ -42,11 +42,13 @@ export default class Modipress implements GestureHandler {
     source.on('stage', (stage) => {
       const stageName = stage.matchedId;
       if(stageName.includes('modipress') && stageName.includes('-end')) {
-        this.cancel();
+        this.clear();
       } else if(stageName.includes('modipress') && stageName.includes('-hold')) {
         this.shouldRestore = true;
       }
     });
+
+    source.on('complete', () => this.cancel());
   }
 
   get isLocked(): boolean {
@@ -61,10 +63,14 @@ export default class Modipress implements GestureHandler {
     return this.completionCallback === null;
   }
 
-  cancel() {
+  clear() {
     const callback = this.completionCallback;
     this.completionCallback = null;
     callback?.();
+  }
+
+  cancel() {
+    this.clear();
     this.source.cancel();
   }
 
