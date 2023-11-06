@@ -147,6 +147,7 @@ function CheckKey(
     const mapVersion = (fk.fileVersion > CSpecialTextMaxVer ? CSpecialTextMaxVer : fk.fileVersion < CSpecialTextMinVer ? CSpecialTextMinVer : fk.fileVersion);
     const specialText = CSpecialText.get(mapVersion);
     if(specialText.includes(FText) &&
+        !IsKeyboardVersion14OrLater() &&
         !([TouchLayout.TouchLayoutKeySp.special, TouchLayout.TouchLayoutKeySp.specialActive].includes(FKeyType))) {
       callbacks.reportMessage(KmwCompilerMessages.Warn_TouchLayoutSpecialLabelOnNormalKey({
         keyId: FId,

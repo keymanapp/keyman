@@ -36,9 +36,9 @@ export const
   // Map for checking minimum versions and Special Text
   export const CSpecialText = new Map<number, string>([
     [KMX.KMXFile.VERSION_100, CSpecialText10],
-    [KMX.KMXFile.VERSION_110, CSpecialText10],
-    [KMX.KMXFile.VERSION_120, CSpecialText10],
-    [KMX.KMXFile.VERSION_130, CSpecialText10],
+    // [KMX.KMXFile.VERSION_110, CSpecialText10], - this file version does not exist
+    // [KMX.KMXFile.VERSION_120, CSpecialText10], - this file version does not exist
+    // [KMX.KMXFile.VERSION_130, CSpecialText10], - this file version does not exist
     [KMX.KMXFile.VERSION_140, CSpecialText14 + CSpecialText10],
     [KMX.KMXFile.VERSION_150, CSpecialText14 + CSpecialText10],
     [KMX.KMXFile.VERSION_160, CSpecialText14 + CSpecialText10],
