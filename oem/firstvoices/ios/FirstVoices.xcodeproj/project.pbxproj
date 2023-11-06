@@ -14,6 +14,8 @@
 		2990208E278FF402004F18CF /* KeyboardTableController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2990208D278FF402004F18CF /* KeyboardTableController.swift */; };
 		2990209127901DD7004F18CF /* KeyboardDetailCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2990209027901DD7004F18CF /* KeyboardDetailCell.swift */; };
 		2993F6E62791621D009E1352 /* KeyboardDetailController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2993F6E52791621D009E1352 /* KeyboardDetailController.swift */; };
+		29946C182AF8EFC5007EA0E3 /* Zip.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 29946C172AF8EFC5007EA0E3 /* Zip.xcframework */; };
+		29946C192AF8F017007EA0E3 /* Zip.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 29946C172AF8EFC5007EA0E3 /* Zip.xcframework */; };
 		37C183B922932AD2009F9EFD /* FVKeyboardList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37C183B822932AD2009F9EFD /* FVKeyboardList.swift */; };
 		37C183BD2293321C009F9EFD /* Instructions in Resources */ = {isa = PBXBuildFile; fileRef = 37C183BC2293321C009F9EFD /* Instructions */; };
 		37EA1F23228A1F57003E710C /* FVInputViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37EA1F22228A1F57003E710C /* FVInputViewController.swift */; };
@@ -103,6 +105,7 @@
 		2990208D278FF402004F18CF /* KeyboardTableController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardTableController.swift; sourceTree = "<group>"; };
 		2990209027901DD7004F18CF /* KeyboardDetailCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardDetailCell.swift; sourceTree = "<group>"; };
 		2993F6E52791621D009E1352 /* KeyboardDetailController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardDetailController.swift; sourceTree = "<group>"; };
+		29946C172AF8EFC5007EA0E3 /* Zip.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = Zip.xcframework; path = Carthage/Build/Zip.xcframework; sourceTree = "<group>"; };
 		37C183B822932AD2009F9EFD /* FVKeyboardList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FVKeyboardList.swift; sourceTree = "<group>"; };
 		37C183BC2293321C009F9EFD /* Instructions */ = {isa = PBXFileReference; lastKnownFileType = folder; name = Instructions; path = FirstVoices/Instructions; sourceTree = "<group>"; };
 		37EA1F22228A1F57003E710C /* FVInputViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FVInputViewController.swift; sourceTree = "<group>"; };
@@ -151,6 +154,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				29946C182AF8EFC5007EA0E3 /* Zip.xcframework in Frameworks */,
 				CEBD341D2654D76800EB2EA8 /* ObjcExceptionBridging.xcframework in Frameworks */,
 				CEBD341F2654D76900EB2EA8 /* Reachability.xcframework in Frameworks */,
 				CEBD34222654D76B00EB2EA8 /* Sentry.xcframework in Frameworks */,
@@ -164,6 +168,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				29946C192AF8F017007EA0E3 /* Zip.xcframework in Frameworks */,
 				CEDB327F265C9C58000A2009 /* DeviceKit.xcframework in Frameworks */,
 				CEDB3280265C9C58000A2009 /* ObjcExceptionBridging.xcframework in Frameworks */,
 				CEDB3281265C9C58000A2009 /* Reachability.xcframework in Frameworks */,
@@ -284,6 +289,7 @@
 		98C9A9FB1BFC19ED009E9A4F /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				29946C172AF8EFC5007EA0E3 /* Zip.xcframework */,
 				CEBD34082654D5AA00EB2EA8 /* ObjcExceptionBridging.xcframework */,
 				CEBD340C2654D5AB00EB2EA8 /* Reachability.xcframework */,
 				CEBD34092654D5AA00EB2EA8 /* Sentry.xcframework */,
@@ -650,11 +656,9 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = FirstVoices/FirstVoices.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
 				CODE_SIGN_STYLE = Manual;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = D7TR486TEH;
-				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = D7TR486TEH;
 				INFOPLIST_FILE = FirstVoices/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 12.2;
 				KEYMAN_ROOT = "$(SRCROOT)/../../..";
@@ -668,7 +672,6 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
 				PROVISIONING_PROFILE_SPECIFIER = "FirstVoices Keyboards Development";
-				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = FirstVoices_Keyboards;
 				SWIFT_OBJC_BRIDGING_HEADER = "";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 4.2;
