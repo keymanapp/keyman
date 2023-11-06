@@ -6,11 +6,11 @@ class TrayStub {
   public shutdown() {};
 };
 
-let tray = new TrayStub();
-
-if(os.platform() == 'win32') {
-  const { Win32Tray } = await import('./win32-tray.js');
-  tray = new Win32Tray();
+export async function initTray() {
+  let tray = new TrayStub();
+  if(os.platform() == 'win32') {
+    const { Win32Tray } = await import('./win32-tray.js');
+    tray = new Win32Tray();
+  }
+  return tray;
 }
-
-export default tray;

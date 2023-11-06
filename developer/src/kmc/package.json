@@ -35,6 +35,7 @@
   },
   "dependencies": {
     "@keymanapp/common-types": "*",
+    "@keymanapp/developer-utils": "*",
     "@keymanapp/keyman-version": "*",
     "@keymanapp/kmc-analyze": "*",
     "@keymanapp/kmc-keyboard-info": "*",
@@ -49,6 +50,9 @@
     "commander": "^10.0.0",
     "supports-color": "^9.4.0"
   },
+  "bundleDependencies": [
+    "@keymanapp/developer-utils"
+  ],
   "files": [
     "build/src/"
   ],
