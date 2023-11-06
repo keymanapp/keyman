@@ -648,6 +648,10 @@ describe("MatcherSelector", function () {
         assert.deepEqual(selection1.result, {matched: false, action: { type: 'complete', item: null }});
         assert.isTrue(sources[0].path.isComplete);
 
+        // Make sure the macroqueue has a chance to process; the second tap must first cancel the
+        // potential multitap, and moving past that involves waiting on the macroqueue.
+        await timedPromise(0);
+
         await Promise.race([completion, selectionPromises[1]]);
         assert.equal(await promiseStatus(selectionPromises[1]), PromiseStatuses.PROMISE_RESOLVED);
 

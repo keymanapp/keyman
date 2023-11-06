@@ -244,8 +244,8 @@ export class GestureSequence<Type, StateToken = any> extends EventEmitter<EventM
 
     if(nextModels.length > 0) {
       // Note:  if a 'push', that should be handled by an event listener from the main engine driver (or similar)
-      const promise = this.selector.matchGesture(selection.matcher, nextModels);
-      promise.then(this.selectionHandler);
+      const modelingSpinupPromise = this.selector.matchGesture(selection.matcher, nextModels);
+      modelingSpinupPromise.then(async (selectionHost) => this.selectionHandler(await selectionHost.selectionPromise));
 
       // Handling 'setchange' resolution actions (where one gesture enables a different gesture set for others
       // while active.  Example case: modipress.)

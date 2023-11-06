@@ -376,13 +376,15 @@ export function simulateSelectorInput<Type>(
       const selector = new gestures.matchers.MatcherSelector<Type>();
 
       // TS can't resolve the two-typed parameter to two separate overloads of the same method, it seems.
-      selectionPromises.push(selector.matchGesture(source as any, input.specSet));
+      const pendingModelStart = selector.matchGesture(source as any, input.specSet);
+      pendingModelStart.then((matchWaitHost) => selectionPromises.push(matchWaitHost.selectionPromise));
 
       return selector;
     },
     addSource: (obj, source) => {
       // TS can't resolve the two-typed parameter to two separate overloads of the same method, it seems.
-      selectionPromises.push(obj.matchGesture(source as any, input.specSet));
+      const pendingModelStart = obj.matchGesture(source as any, input.specSet);
+      pendingModelStart.then((matchWaitHost) => selectionPromises.push(matchWaitHost.selectionPromise));
     },
     update: () => {}
   }
