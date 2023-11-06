@@ -1,12 +1,27 @@
+store(&NAME) 'Testcases for deadkeys bug (#8568)'
+c Description: Tests deadkey backspacing
+c See also common/test/keyboards/baseline/k_020___deadkeys_and_backspace.kmn
+c 1. One deadkey in context                   dk(1) + BKSP = nul
+c 2. One char and one deadkey in context      'a' dk(2) + BKSP = nul
+c 3. One deadkey and one char in context      dk(3) 'a' + BKSP = nul
+c 4. Two deadkeys in a row in context         dk(4a) dk(4b) + BKSP = nul
+c 5. One char and two deadkeys in context     'a' dk(5a) dk(5b) 'b' + BKSP = 'a'
+c 6. One char and two deadkeys and one char and two deadkeys in context     'a' dk(6a) dk(6b) 'b' dk(6c) dk(6d) + BKSP = 'a'
+c 7. Two chars and one deadkey in between in context: 'c' (dk7) 'd' + BKSP = 'ok'
+
 store(&VERSION) "10.0"
 store(&TARGETS) 'any windows'
-store(&NAME) 'Testcase for deadkeys bug (#8568)'
 store(&COPYRIGHT) '© 2023 SIL International'
+
 begin Unicode > use(main)
 
 group(main) using keys
-c Test for #8568: BKSP should not remove deadkeys.
-c See also common/test/keyboards/baseline/k_020___deadkeys_and_backspace.kmn
-  + 'x' > 'c' dk(A) 'e'
-  'c' 'e' + [K_BKSP]       > 'fail'
-  'c' dk(A) 'e' + [K_BKSP] > 'pass'
+  + '1' > dk(1)
+  + '2' > 'a' dk(2)
+  + '3' > dk(3) 'a'
+  + '4' > dk(4a) dk(4b)
+  + '5' > 'a' dk(5a) dk(5b) 'b'
+  + '6' > 'a' dk(6a) dk(6b) 'b' dk(6c) dk(6d)
+  + '7' > 'c' dk(7) 'de'
+  'c' 'd' + [K_BKSP]       > 'fail'
+  'c' dk(7) 'd' + [K_BKSP] > 'pass'
