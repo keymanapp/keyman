@@ -14,6 +14,7 @@ cd "$THIS_SCRIPT_PATH"
 
 builder_describe "Build Keyman Developer Server" \
   @/common/web/keyman-version \
+  @/developer/src/common/web/utils \
   @/web \
   clean \
   configure \

@@ -3,7 +3,6 @@ import { NodeCompilerCallbacks } from "./NodeCompilerCallbacks.js";
 import { KeymanSentry } from '@keymanapp/developer-utils';
 
 const cli = process.argv.join(' ');
-const CLOSE_TIMEOUT = 2000;
 
 export class TestKeymanSentry {
   static isTestCL() {

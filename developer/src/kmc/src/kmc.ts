@@ -11,6 +11,7 @@ import KEYMAN_VERSION from "@keymanapp/keyman-version";
 import { TestKeymanSentry } from './util/TestKeymanSentry.js';
 
 await TestKeymanSentry.runTestIfCLRequested();
+KeymanSentry.init();
 try {
   await run();
 } catch(e) {
