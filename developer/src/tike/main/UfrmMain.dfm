@@ -2935,8 +2935,8 @@ inherited frmKeymanDeveloper: TfrmKeymanDeveloper
       object OpenProject1: TMenuItem
         Action = modActionsMain.actProjectOpen
       end
-      object SaveProjectAs1: TMenuItem
-        Action = modActionsMain.actProjectSaveAs
+      object OpenProjectFolder1: TMenuItem
+        Action = modActionsMain.actProjectOpenFolder
       end
       object CloseProject1: TMenuItem
         Action = modActionsMain.actProjectClose
@@ -2950,7 +2950,7 @@ inherited frmKeymanDeveloper: TfrmKeymanDeveloper
       object N26: TMenuItem
         Caption = '-'
       end
-      object Addtoproject1: TMenuItem
+      object mnuProjectAddToProject: TMenuItem
         Caption = 'A&dd to project'
         object CurrentEditorFile1: TMenuItem
           Action = modActionsMain.actProjectAddCurrentEditorFile

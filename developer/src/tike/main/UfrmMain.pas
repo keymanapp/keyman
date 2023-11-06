@@ -208,12 +208,11 @@ type
     CodeFont1: TMenuItem;
     NewProject1: TMenuItem;
     OpenProject1: TMenuItem;
-    SaveProjectAs1: TMenuItem;
     N25: TMenuItem;
     mnuProjectsRecent: TMenuItem;
     N26: TMenuItem;
     N27: TMenuItem;
-    Addtoproject1: TMenuItem;
+    mnuProjectAddToProject: TMenuItem;
     CurrentEditorFile1: TMenuItem;
     OtherFiles1: TMenuItem;
     ProjectSettings1: TMenuItem;
@@ -285,6 +284,7 @@ type
     Stopserver1: TMenuItem;
     ToolButton13: TToolButton;
     ToolButton16: TToolButton;
+    OpenProjectFolder1: TMenuItem;
     procedure FormCreate(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure mnuFileClick(Sender: TObject);
@@ -550,10 +550,11 @@ begin
   RemoveOldestTikeTestFonts(False);
 
   if (FActiveProject <> '') and not FileExists(FActiveProject) then
+    // TODO: we need to support folder-based projects here
     FActiveProject := '';
 
   if FActiveProject <> '' then
-    LoadGlobalProjectUI(ptUnknown, FActiveProject, True);
+    LoadGlobalProjectUI(ptUnknown, FActiveProject);
 
   InitDock;
 
@@ -629,10 +630,7 @@ begin
     begin
       if IsGlobalProjectUIReady then
       begin
-        if FGlobalProject.Untitled
-          then FGlobalProject.PersistUntitledProject  // I1010: Persist untitled project
-          else FGlobalProject.Save;   // I4691
-
+        FGlobalProject.Save;   // I4691
         WriteString(SRegValue_ActiveProject, FGlobalProject.FileName);
       end
       else
@@ -1159,8 +1157,16 @@ var
 begin
   if not IsGlobalProjectUIReady then
   begin
+    // TODO: we need to open the parent folder as a project, if possible
     // This can happen if we get a file opened via Explorer.
-    modActionsMain.NewProject(ptKeyboard);
+    ShowMessage('TODO -- open parent folder as project');
+    Exit(nil);
+  end;
+
+  if DirectoryExists(FFileName) then
+  begin
+    // This is an attempt to open a project folder?
+    // TODO
   end;
 
   Result := nil;
@@ -1426,6 +1432,9 @@ begin
   end;
 
   mnuProjectsRecent.Enabled := FProjectMRU.FileCount > 0;
+
+  mnuProjectAddToProject.Visible := not IsGlobalProjectUIReady or
+    (FGlobalProject.Options.Version = pv10);
 end;
 
 procedure TfrmKeymanDeveloper.mnuProjectRecentFileClick(Sender: TObject);
@@ -1520,9 +1529,8 @@ procedure TfrmKeymanDeveloper.UpdateCaption;
 begin
   if not IsGlobalProjectUIReady then
     Caption := 'Keyman Developer'
-  else if FGlobalProject.Untitled
-    then Caption := '(Untitled project) - Keyman Developer'
-    else Caption := ChangeFileExt(ExtractFileName(FGlobalProject.FileName), '') + ' - Keyman Developer';
+  else
+    Caption := ChangeFileExt(ExtractFileName(FGlobalProject.FileName), '') + ' - Keyman Developer';
 end;
 
 procedure TfrmKeymanDeveloper.UpdateChildCaption(Window: TfrmTikeChild);

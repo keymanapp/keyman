@@ -94,7 +94,7 @@ type
   end;
 
 type
-  TKeymanProjectType = (kptUnknown, kptBasic, kptBlank, kptImportWindowsKeyboard, kptBlankLexicalModel, kptWordlistLexicalModel);
+  TKeymanProjectType = (kptUnknown, kptBasic, kptImportWindowsKeyboard, kptWordlistLexicalModel);
 
 implementation
 

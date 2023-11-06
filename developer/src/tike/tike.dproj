@@ -559,6 +559,7 @@
             <FormType>dfm</FormType>
         </DCCReference>
         <DCCReference Include="compile\Keyman.Developer.System.KmcWrapper.pas"/>
+        <DCCReference Include="project\Keyman.Developer.UI.Project.UpgradeProject.pas"/>
         <None Include="Profiling\AQtimeModule1.aqt"/>
         <BuildConfiguration Include="Debug">
             <Key>Cfg_2</Key>
