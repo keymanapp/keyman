@@ -1,18 +1,18 @@
 (*
   Name:             UfrmRegressionTests
   Copyright:        Copyright (C) 2003-2017 SIL International.
-  Documentation:    
-  Description:      
+  Documentation:
+  Description:
   Create Date:      3 May 2011
 
   Modified Date:    22 Jun 2015
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
+  Bugs:
+  Todo:
+  Notes:
   History:          03 May 2011 - mcdurdin - I2890 - Record diagnostic data when encountering registry errors
                     22 Jun 2015 - mcdurdin - I4771 - Update regressiontest app for Engine and Developer 9.0
 *)
@@ -136,7 +136,6 @@ uses
 
   keymanapi_TLB,
   DebugUtils,
-  compile,
   ErrorControlledRegistry,
   keyman32_int,
   msctf,
@@ -476,7 +475,7 @@ begin
     end
     else if (s[1] = 'U') or (s[1] = 'u') then
     begin
-      Result := Result + '?';  
+      Result := Result + '?';
       sout := sout + wchr(StrToInt('$' + Copy(s, 3, 4)));
       delete(s, 1, 6);
     end
