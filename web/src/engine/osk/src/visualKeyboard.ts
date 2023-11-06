@@ -572,6 +572,9 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
             gestureSequence.stageReports[0].sources[0].baseItem,
             this.gestureParams
           )];
+
+          // baseItem is sometimes null during a keyboard-swap... for app/browser touch-based language menus.
+          // not ideal, but it is what it is; just let it pass by for now.
         } else if(baseItem?.key.spec.multitap && (gestureStage.matchedId == 'initial-tap' || gestureStage.matchedId == 'multitap' || gestureStage.matchedId == 'modipress-start')) {
           // Likewise - mere construction is enough.
           handlers = [new Multitap(gestureSequence, this, baseItem, keyResult.contextToken)];

@@ -542,7 +542,7 @@ export class ContextTracker extends CircularArray<TrackedContextState> {
           if(doublecheckContext.left != context.left) {
             continue;
           }
-        } else if(priorMatchState.taggedContext.left != context.left) {
+        } else if(priorMatchState.taggedContext?.left != context.left) {
           continue;
         }
 
