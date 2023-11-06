@@ -23,8 +23,7 @@ export class GesturePreviewHost {
     this.flickEdgeLength = edgeLength;
 
     const base = this.div = document.createElement('div');
-    base.className='kmw-gesture-preview';
-    base.id = 'kmw-gesture-preview';
+    base.className = base.id = 'kmw-gesture-preview';
 
     base.style.pointerEvents='none';
 
@@ -53,7 +52,12 @@ export class GesturePreviewHost {
 
         const ps /* preview style */ = flickPreview.style;
 
-        const OVERFLOW_OFFSET = 1.41; //141;
+        /* With edge lengths of 1, to keep flick-text invisible at the start, the
+         * hypotenuse for an inter-cardinal path is sqrt(2).  To keep a perfect circle
+         * for all flicks, then, requires the straight-edge length for pure cardinal
+         * paths to match - sqrt(2).
+         */
+        const OVERFLOW_OFFSET = 1.4142;
 
         // is in polar coords, origin toward north, clockwise.
         const coords = FlickNameCoordMap.get(dir);
