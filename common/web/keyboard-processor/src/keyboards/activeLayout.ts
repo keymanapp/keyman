@@ -57,7 +57,9 @@ const KeyTypesOfKeyMap = {
   default: 'boolean'
 } as const;
 
-const KeyTypesOfFlickList = ['n', 's', 'e', 'w', 'ne', 'nw', 'se', 'sw'] as const;
+// Keep in this specific order: it's the ordering of priority for default hint selection when
+// based on available hints.  (i.e., `layout.defaultHint == 'flick'`)
+const KeyTypesOfFlickList = ['n', 'ne', 'e', 'se', 's', 'sw', 'w', 'nw'] as const;
 
 export class ActiveKeyBase {
   static readonly DEFAULT_PAD=15;          // Padding to left of key, in virtual units
@@ -75,6 +77,11 @@ export class ActiveKeyBase {
   /** WARNING - DO NOT USE DIRECTLY outside of @keymanapp/keyboard-processor! */
   id: TouchLayout.TouchLayoutKeyId;
   text: string;
+  hint?: string;
+  hintSrc?: TouchLayout.TouchLayoutSubKey | TouchLayout.TouchLayoutKey;
+
+  font?: string;
+  fontsize?: string;
 
   // These are fine.
   width?: number;
@@ -348,8 +355,64 @@ export class ActiveKeyBase {
     aKey.displayLayer = displayLayer;
     aKey.layer = aKey.layer || displayLayer;
 
+    ActiveKeyBase.determineHint(aKey, layout.defaultHint);
+
     // Compute the key's base KeyEvent properties for use in future event generation
     aKey.constructBaseKeyEvent(keyboard, layout, displayLayer);
+  }
+
+  private static determineHint(spec: ActiveKey, defaultHint: TouchLayout.TouchLayoutDefaultHint): void {
+    // If a hint was directly specified, don't override it.
+    if(spec.hint) {
+      spec.hintSrc = spec;
+      return;
+    }
+
+    // Is more compact than writing 8 separate cases.
+    if(defaultHint?.includes('flick-')) {
+      if(spec.flick) {
+        // 6 = length of 'flick-'
+        const dir = defaultHint.substring(6);
+
+        if(spec.flick[dir]?.text) {
+          spec.hintSrc = spec.flick[dir];
+        }
+      }
+
+      return;
+    }
+
+    switch(defaultHint) {
+      case 'none':
+        return;
+      case 'multitap':
+        if(spec.multitap) {
+          spec.hintSrc = spec.multitap[0];
+        }
+        return;
+      case 'flick':
+        if(spec.flick) {
+          for(const key of KeyTypesOfFlickList) {
+            if(spec.flick[key]) {
+              spec.hintSrc = spec.flick[key];
+              return;
+            }
+          }
+        }
+        return;
+      case 'longpress':
+        if(spec.sk) {
+          spec.hintSrc = spec.sk[0];
+        }
+        return;
+      case 'dot':
+      default:
+        if(spec.sk) {
+          spec.hint = '\u2022';
+          spec.hintSrc = spec;
+        }
+        return;
+    }
   }
 
   private constructBaseKeyEvent(keyboard: Keyboard, layout: ActiveLayout, displayLayer: string) {
