@@ -7,3 +7,4 @@ export { default as ContextWindow } from './text/contextWindow.js';
 export { default as ModelSpec } from './text/prediction/modelSpec.js';
 export { default as LanguageProcessor, StateChangeEnum } from './text/prediction/languageProcessor.js';
 export { default as PredictionContext } from './text/prediction/predictionContext.js';
+export { TranscriptionCache } from './transcriptionCache.js';
