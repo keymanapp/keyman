@@ -2,19 +2,18 @@ inherited frmNewModelProjectParameters: TfrmNewModelProjectParameters
   BorderIcons = [biSystemMenu]
   BorderStyle = bsDialog
   Caption = 'New Wordlist Lexical Model Project'
-  ClientHeight = 510
-  ClientWidth = 412
+  ClientHeight = 402
+  ClientWidth = 756
   OldCreateOrder = True
   Position = poScreenCenter
   OnDestroy = FormDestroy
-  ExplicitTop = -8
-  ExplicitWidth = 418
-  ExplicitHeight = 539
+  ExplicitWidth = 762
+  ExplicitHeight = 431
   PixelsPerInch = 96
   TextHeight = 13
   object lblFileName: TLabel
     Left = 8
-    Top = 423
+    Top = 311
     Width = 46
     Height = 13
     Caption = 'Model &ID:'
@@ -22,7 +21,7 @@ inherited frmNewModelProjectParameters: TfrmNewModelProjectParameters
   end
   object lblPath: TLabel
     Left = 8
-    Top = 287
+    Top = 149
     Width = 26
     Height = 13
     Caption = '&Path:'
@@ -30,7 +29,7 @@ inherited frmNewModelProjectParameters: TfrmNewModelProjectParameters
   end
   object lblAuthorID: TLabel
     Left = 8
-    Top = 342
+    Top = 230
     Width = 51
     Height = 13
     Caption = 'Aut&hor ID:'
@@ -61,8 +60,8 @@ inherited frmNewModelProjectParameters: TfrmNewModelProjectParameters
     FocusControl = editAuthor
   end
   object lblLanguages: TLabel
-    Left = 9
-    Top = 146
+    Left = 348
+    Top = 114
     Width = 52
     Height = 13
     Caption = '&Languages'
@@ -70,14 +69,14 @@ inherited frmNewModelProjectParameters: TfrmNewModelProjectParameters
   end
   object lblBCP47: TLabel
     Left = 8
-    Top = 369
+    Top = 257
     Width = 90
     Height = 13
     Caption = '&Primary Language:'
   end
   object lblUniq: TLabel
     Left = 8
-    Top = 396
+    Top = 284
     Width = 67
     Height = 13
     Caption = 'Uni&que Name:'
@@ -93,13 +92,13 @@ inherited frmNewModelProjectParameters: TfrmNewModelProjectParameters
   end
   object Bevel1: TBevel
     Left = 8
-    Top = 317
-    Width = 397
-    Height = 2
+    Top = 205
+    Width = 317
+    Height = 4
   end
   object lblProjectFilename: TLabel
     Left = 8
-    Top = 450
+    Top = 338
     Width = 77
     Height = 13
     Caption = 'Project &filename'
@@ -113,40 +112,48 @@ inherited frmNewModelProjectParameters: TfrmNewModelProjectParameters
     Caption = 'Fu&ll copyright:'
     FocusControl = editFullCopyright
   end
+  object Label2: TLabel
+    Left = 347
+    Top = 10
+    Width = 53
+    Height = 13
+    Caption = '&Description'
+    FocusControl = memoDescription
+  end
   object editModelID: TEdit
     Left = 120
-    Top = 420
+    Top = 308
     Width = 205
     Height = 21
     TabStop = False
     ParentColor = True
     ReadOnly = True
-    TabOrder = 14
+    TabOrder = 15
     OnChange = editModelIDChange
   end
   object cmdBrowse: TButton
-    Left = 332
-    Top = 284
+    Left = 120
+    Top = 173
     Width = 73
     Height = 21
     Caption = '&Browse...'
-    TabOrder = 10
+    TabOrder = 6
     OnClick = cmdBrowseClick
   end
   object editPath: TEdit
     Left = 120
-    Top = 284
+    Top = 146
     Width = 205
     Height = 21
-    TabOrder = 9
+    TabOrder = 5
     OnChange = editPathChange
   end
   object editAuthorID: TEdit
     Left = 120
-    Top = 339
+    Top = 227
     Width = 205
     Height = 21
-    TabOrder = 11
+    TabOrder = 12
     OnChange = editModelIDComponentChange
   end
   object editCopyright: TEdit
@@ -175,28 +182,28 @@ inherited frmNewModelProjectParameters: TfrmNewModelProjectParameters
     OnChange = editAuthorChange
   end
   object cmdOK: TButton
-    Left = 252
-    Top = 479
+    Left = 302
+    Top = 367
     Width = 73
     Height = 25
     Caption = 'OK'
     Default = True
-    TabOrder = 16
+    TabOrder = 17
     OnClick = cmdOKClick
   end
   object cmdCancel: TButton
-    Left = 331
-    Top = 479
+    Left = 381
+    Top = 367
     Width = 73
     Height = 25
     Cancel = True
     Caption = 'Cancel'
     ModalResult = 2
-    TabOrder = 17
+    TabOrder = 18
   end
   object gridLanguages: TStringGrid
-    Left = 8
-    Top = 167
+    Left = 347
+    Top = 135
     Width = 317
     Height = 102
     ColCount = 2
@@ -204,7 +211,7 @@ inherited frmNewModelProjectParameters: TfrmNewModelProjectParameters
     FixedCols = 0
     RowCount = 9
     Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goColSizing, goRowSelect]
-    TabOrder = 5
+    TabOrder = 8
     OnClick = gridLanguagesClick
     OnDblClick = gridLanguagesDblClick
     ColWidths = (
@@ -212,47 +219,47 @@ inherited frmNewModelProjectParameters: TfrmNewModelProjectParameters
       64)
   end
   object cmdAddLanguage: TButton
-    Left = 332
-    Top = 167
+    Left = 671
+    Top = 135
     Width = 73
     Height = 25
     Caption = '&Add...'
-    TabOrder = 6
+    TabOrder = 9
     OnClick = cmdAddLanguageClick
   end
   object cmdEditLanguage: TButton
-    Left = 332
-    Top = 198
+    Left = 671
+    Top = 166
     Width = 73
     Height = 25
     Caption = '&Edit...'
-    TabOrder = 7
+    TabOrder = 10
     OnClick = cmdEditLanguageClick
   end
   object cmdRemoveLanguage: TButton
-    Left = 332
-    Top = 229
+    Left = 671
+    Top = 197
     Width = 73
     Height = 25
     Caption = '&Remove'
-    TabOrder = 8
+    TabOrder = 11
     OnClick = cmdRemoveLanguageClick
   end
   object editUniq: TEdit
     Left = 120
-    Top = 393
+    Top = 281
     Width = 205
     Height = 21
-    TabOrder = 13
+    TabOrder = 14
     OnChange = editModelIDComponentChange
   end
   object cbBCP47: TComboBox
     Left = 120
-    Top = 366
+    Top = 254
     Width = 205
     Height = 21
     Style = csDropDownList
-    TabOrder = 12
+    TabOrder = 13
     OnClick = editModelIDComponentChange
   end
   object editModelName: TEdit
@@ -265,13 +272,13 @@ inherited frmNewModelProjectParameters: TfrmNewModelProjectParameters
   end
   object editProjectFilename: TEdit
     Left = 120
-    Top = 447
+    Top = 335
     Width = 284
     Height = 21
     TabStop = False
     ParentColor = True
     ReadOnly = True
-    TabOrder = 15
+    TabOrder = 16
   end
   object editFullCopyright: TEdit
     Left = 120
@@ -280,5 +287,13 @@ inherited frmNewModelProjectParameters: TfrmNewModelProjectParameters
     Height = 21
     TabOrder = 3
     OnChange = editFullCopyrightChange
+  end
+  object memoDescription: TMemo
+    Left = 347
+    Top = 31
+    Width = 398
+    Height = 79
+    TabOrder = 7
+    OnChange = memoDescriptionChange
   end
 end
