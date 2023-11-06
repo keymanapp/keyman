@@ -140,9 +140,6 @@ export class KMXFile {
   public static readonly VERSION_80 =  0x00000800;
   public static readonly VERSION_90 =  0x00000900;
   public static readonly VERSION_100 = 0x00000A00;
-  public static readonly VERSION_110 = 0x00000B00;
-  public static readonly VERSION_120 = 0x00000C00;
-  public static readonly VERSION_130 = 0x00000D00;
   public static readonly VERSION_140 = 0x00000E00;
   public static readonly VERSION_150 = 0x00000F00;
 
