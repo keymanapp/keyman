@@ -217,6 +217,7 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
       throw new Error(`Keyboard ${this.layoutKeyboard.id} does not have a layer with id ${value}`);
     } else {
       this._layerId = value;
+      this.layerGroup.activeLayerId = value;
 
       // Does not exist for documentation keyboards!
       if(this.gestureEngine) {
@@ -1127,20 +1128,12 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
       this.nextLayer = this.currentLayer.nextlayer;
     }
 
-    for (n = 0; n < b.length; n++) {
-      let layerElement = <HTMLDivElement>b[n];
-      if (layerElement['layer'] == this.layerId) {
-        layerElement.style.display = 'block';
-        //b[n].style.visibility='visible';
+    // Will toggle the CSS style `display` attribute for affected layers.
+    this.layerGroup.activeLayerId = this.layerId;
 
-        // Most functions that call this one often indicate a change in modifier
-        // or state key state.  Keep it updated!
-        this._UpdateVKShiftStyle();
-      } else {
-        layerElement.style.display = 'none';
-        //layerElement.style.visibility='hidden';
-      }
-    }
+    // Most functions that call this one often indicate a change in modifier
+    // or state key state.  Keep it updated!
+    this._UpdateVKShiftStyle();
   }
 
   /**
@@ -1388,7 +1381,7 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
     // Select the layer to display, and adjust sizes
     if (layout != null) {
       kbdObj.layerId = layerId;
-      kbdObj.gestureEngine.stateToken = layerId;
+      kbdObj.layerGroup.activeLayerId = layerId;
 
       // This still feels fairly hacky... but something IS needed to constrain the height.
       // There are plans to address related concerns through some of the later aspects of

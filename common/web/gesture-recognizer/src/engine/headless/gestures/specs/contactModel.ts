@@ -6,7 +6,7 @@ type SimpleStringResult = 'resolve' | 'reject';
 
 export type PointModelResolution = SimpleStringResult;
 
-export interface ContactModel<Type> {
+export interface ContactModel<Type, StateToken = any> {
   pathModel: PathModel,
   pathResolutionAction: PointModelResolution,
 
@@ -66,6 +66,7 @@ export interface ContactModel<Type> {
   readonly allowsInitialState?: (
     incomingSample: InputSample<Type>,
     comparisonSample?: InputSample<Type>,
-    baseItem?: Type
+    baseItem?: Type,
+    stateToken?: StateToken
   ) => boolean;
 }

@@ -4,6 +4,7 @@ import { GestureModel, GestureResolution, GestureResolutionSpec, RejectionDefaul
 
 import { ManagedPromise, TimeoutPromise } from "@keymanapp/web-utils";
 import { FulfillmentCause, PathMatcher } from "./pathMatcher.js";
+import { ItemIdentifier } from "../../../configuration/gestureRecognizerConfiguration.js";
 
 /**
  * This interface specifies the minimal data necessary for setting up gesture-selection
@@ -18,12 +19,12 @@ import { FulfillmentCause, PathMatcher } from "./pathMatcher.js";
  * of this interface, they can be integrated into the gesture-sequence staging system -
  * even if not matched directly by the recognizer itself.
  */
-export interface PredecessorMatch<Type> {
+export interface PredecessorMatch<Type, StateToken> {
   readonly sources: GestureSource<Type>[];
   readonly allSourceIds: string[];
-  readonly primaryPath: GestureSource<Type>;
+  readonly primaryPath: GestureSource<Type, StateToken>;
   readonly result: MatchResult<Type>;
-  readonly model?: GestureModel<Type>;
+  readonly model?: GestureModel<Type, any>;
   readonly baseItem: Type;
 }
 
@@ -37,9 +38,9 @@ export interface MatchResultSpec {
   readonly action: GestureResolutionSpec
 }
 
-export class GestureMatcher<Type> implements PredecessorMatch<Type> {
+export class GestureMatcher<Type, StateToken = any> implements PredecessorMatch<Type, StateToken> {
   private sustainTimerPromise?: TimeoutPromise;
-  public readonly model: GestureModel<Type>;
+  public readonly model: GestureModel<Type, StateToken>;
 
   private readonly pathMatchers: PathMatcher<Type>[];
 
@@ -55,7 +56,7 @@ export class GestureMatcher<Type> implements PredecessorMatch<Type> {
 
   private _isCancelled: boolean = false;
 
-  private readonly predecessor?: PredecessorMatch<Type>;
+  private readonly predecessor?: PredecessorMatch<Type, StateToken>;
 
   private readonly publishedPromise: ManagedPromise<MatchResult<Type>>; // unsure on the actual typing at the moment.
   private _result: MatchResult<Type>;
@@ -64,7 +65,10 @@ export class GestureMatcher<Type> implements PredecessorMatch<Type> {
     return this.publishedPromise.corePromise;
   }
 
-  constructor(model: GestureModel<Type>, sourceObj: GestureSource<Type> | PredecessorMatch<Type>) {
+  constructor(
+    model: GestureModel<Type, StateToken>,
+    sourceObj: GestureSource<Type> | PredecessorMatch<Type, StateToken>
+  ) {
     /* c8 ignore next 5 */
     if(!model || !sourceObj) {
       throw new Error("Construction of GestureMatcher requires a gesture-model spec and a source for related contact points.");
@@ -244,6 +248,15 @@ export class GestureMatcher<Type> implements PredecessorMatch<Type> {
       const matcher = this.pathMatchers[i];
       const contactSpec = this.model.contacts[i];
 
+      /* Future TODO:
+       * This should probably include "committing" the state token and items used by the subview,
+       * should they differ from the base source's original values.
+       *
+       * That said, this is only a 'polish' task, as we aren't actually relying on the base source
+       * once we've started identifying gestures.  It'll likely only matter if external users
+       * desire to utilize the recognizer.
+       */
+
       // If the path already terminated, no need to evaluate further for this contact point.
       if(matcher.source.isPathComplete) {
         continue;
@@ -348,11 +361,14 @@ export class GestureMatcher<Type> implements PredecessorMatch<Type> {
     // Add it early, as we need it to be accessible for reference via .primaryPath stuff below.
     this.pathMatchers.push(contactModel);
 
+    let ancestorSource: GestureSource<Type> = null;
     let baseItem: Type = null;
     // If there were no existing contacts but a predecessor exists and a sustain timer
     // has been specified, it needs special base-item handling.
     if(!existingContacts && this.predecessor && this.model.sustainTimer) {
+      ancestorSource = this.predecessor.primaryPath;
       const baseItemMode = this.model.sustainTimer.baseItem ?? 'result';
+      let baseStateToken: StateToken;
 
       switch(baseItemMode) {
         case 'none':
@@ -360,9 +376,11 @@ export class GestureMatcher<Type> implements PredecessorMatch<Type> {
           break;
         case 'base':
           baseItem = this.predecessor.primaryPath.baseItem;
+          baseStateToken = this.predecessor.primaryPath.stateToken;
           break;
         case 'result':
           baseItem = this.predecessor.result.action.item;
+          baseStateToken = this.predecessor.primaryPath.currentSample.stateToken;
           break;
       }
 
@@ -370,22 +388,46 @@ export class GestureMatcher<Type> implements PredecessorMatch<Type> {
       // continuation and successor to `predecessor.primaryPath`. Its base `item`
       // should reflect this.
       simpleSource.baseItem = baseItem ?? simpleSource.baseItem;
+      simpleSource.stateToken = baseStateToken;
+
+      // May be missing during unit tests.
+      if(simpleSource.currentRecognizerConfig) {
+        simpleSource.currentSample.item = simpleSource.currentRecognizerConfig.itemIdentifier({
+            ...simpleSource.currentSample,
+            stateToken: baseStateToken
+          },
+          null
+        );
+      }
     } else {
       // just use the highest-priority item source's base item and call it a day.
       // There's no need to refer to some previously-existing source for comparison.
       baseItem = this.primaryPath.baseItem;
+      ancestorSource = this.primaryPath;
     }
 
     if(contactSpec.model.allowsInitialState) {
-      const initialStateCheck = contactSpec.model.allowsInitialState(simpleSource.currentSample, this.primaryPath?.currentSample, baseItem);
+      const initialStateCheck = contactSpec.model.allowsInitialState(
+        simpleSource.currentSample,
+        ancestorSource.currentSample,
+        baseItem,
+        ancestorSource.stateToken
+      );
 
       if(!initialStateCheck) {
+        // The initial state check failed, and we should not permanently establish a
+        // pathMatcher for a source that failed to meet initial conditions.
+        this.pathMatchers.pop();
+
         this.finalize(false, 'path');
       }
     }
 
     // Now that we've done the initial-state check, we can check for instantly-matching path models.
-    contactModel.update();
+    const result = contactModel.update();
+    if(result.type == 'reject' && this.model.id == 'modipress-multitap-end') {
+      console.log('temp');
+    }
 
     contactModel.promise.then((resolution) => {
       this.finalize(resolution.type == 'resolve', resolution.cause);

@@ -3,15 +3,15 @@ import * as gestures from "../index.js";
 // Prototype spec for the main gesture & gesture-set definitions.
 // A work in-progress.  Should probably land somewhere within headless/gestures/specs/.
 // ... with the following two functions, as well.
-export interface GestureModelDefs<Type> {
-  gestures: gestures.specs.GestureModel<Type>[],
+export interface GestureModelDefs<Type, StateToken = any> {
+  gestures: gestures.specs.GestureModel<Type, StateToken>[],
   sets: {
     default: string[],
   } & Record<string, string[]>;
 }
 
 
-export function getGestureModel<Type>(defs: GestureModelDefs<Type>, id: string): gestures.specs.GestureModel<Type> {
+export function getGestureModel<Type, StateToken>(defs: GestureModelDefs<Type, StateToken>, id: string): gestures.specs.GestureModel<Type, StateToken> {
   const result = defs.gestures.find((spec) => spec.id == id);
   if(!result) {
     throw new Error(`Could not find spec for gesture with id '${id}'`);
@@ -20,7 +20,7 @@ export function getGestureModel<Type>(defs: GestureModelDefs<Type>, id: string):
   return result;
 }
 
-export function getGestureModelSet<Type>(defs: GestureModelDefs<Type>, id: string): gestures.specs.GestureModel<Type>[] {
+export function getGestureModelSet<Type, StateToken>(defs: GestureModelDefs<Type, StateToken>, id: string): gestures.specs.GestureModel<Type, StateToken>[] {
   let idSet = defs.sets[id];
   if(!idSet) {
     throw new Error(`Could not find a defined gesture-set with id '${id}'`);
@@ -42,4 +42,4 @@ export const EMPTY_GESTURE_DEFS = {
   sets: {
     default: []
   }
-} as GestureModelDefs<any>
+} as GestureModelDefs<any, any>

@@ -83,7 +83,7 @@ type ResolutionStruct = ResolutionChain | ResolutionComplete;
 export type GestureResolutionSpec   = ResolutionStruct & ResolutionItemSpec;
 export type GestureResolution<Type> = (ResolutionStruct | RejectionDefault | RejectionReplace) & ResolutionItem<Type>;
 
-export interface GestureModel<Type> {
+export interface GestureModel<Type, StateToken = any> {
   // Gestures may want to say "build gesture of type `id`" for a followup-gesture.
   readonly id: string;
 
@@ -97,7 +97,7 @@ export interface GestureModel<Type> {
   // One or more "touchpath models" - how a touchpath matching this gesture would look, based on its
   // ordinal position.  (Same order as in the TrackedInput)
   readonly contacts: {
-    model: ContactModel<Type>,
+    model: ContactModel<Type, StateToken>,
     /**
      * Indicates that the corresponding GestureSource should not be considered part of the
      * Gesture sequence being matched, acting more as a separate gesture that 'triggers' a state

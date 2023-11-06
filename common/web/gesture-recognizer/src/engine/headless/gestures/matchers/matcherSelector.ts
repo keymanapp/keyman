@@ -1,29 +1,30 @@
 import EventEmitter from "eventemitter3";
 
-import { ManagedPromise } from "@keymanapp/web-utils";
+import { ManagedPromise, timedPromise } from "@keymanapp/web-utils";
 
 import { GestureSource, GestureSourceSubview } from "../../gestureSource.js";
 import { GestureMatcher, MatchResult, PredecessorMatch } from "./gestureMatcher.js";
 import { GestureModel } from "../specs/gestureModel.js";
-import { GestureSequence } from "./index.js";
 
-interface GestureSourceTracker<Type> {
+interface GestureSourceTracker<Type, StateToken> {
   /**
    * Should be the actual GestureSource instance, not a subview thereof.
    * Each `GestureMatcher` will construct its own 'subview' into the GestureSource
    * based on its model's needs.
    */
   source: GestureSource<Type>;
-  matchPromise: ManagedPromise<MatcherSelection<Type>>;
+  matchPromise: ManagedPromise<MatcherSelection<Type, StateToken>>;
 }
 
-export interface MatcherSelection<Type> {
-  matcher: PredecessorMatch<Type>,
+export interface MatcherSelection<Type, StateToken = any> {
+  matcher: PredecessorMatch<Type, StateToken>,
   result: MatchResult<Type>
 }
 
-interface EventMap<Type> {
-  'rejectionwithaction': (selection: MatcherSelection<Type>, replaceModelWith: (replacementModel: GestureModel<Type>) => void) => void;
+interface EventMap<Type, StateToken> {
+  'rejectionwithaction': (
+    selection: MatcherSelection<Type, StateToken>,
+    replaceModelWith: (replacementModel: GestureModel<Type, StateToken>) => void) => void;
 }
 
 /**
@@ -38,11 +39,20 @@ interface EventMap<Type> {
  * GestureSource, the Promise will resolve when the last potential model is rejected,
  * providing values indicating match failure and the action to be taken.
  */
-export class MatcherSelector<Type> extends EventEmitter<EventMap<Type>> {
-  private _sourceSelector: GestureSourceTracker<Type>[] = [];
-  private potentialMatchers: GestureMatcher<Type>[] = [];
+export class MatcherSelector<Type, StateToken = any> extends EventEmitter<EventMap<Type, StateToken>> {
+  private _sourceSelector: GestureSourceTracker<Type, StateToken>[] = [];
+  private potentialMatchers: GestureMatcher<Type, StateToken>[] = [];
+
+  public stateToken: StateToken;
 
   public readonly baseGestureSetId: string;
+
+  /**
+   * Used to force synchronization during `matchGesture` setup in case
+   * of two simultaneous inputs that both require deferral to previously-
+   * existing matchers that could resolve first.
+   */
+  private pendingMatchSetup?: Promise<void>;
 
   constructor(baseSetId?: string) {
     super();
@@ -119,10 +129,10 @@ export class MatcherSelector<Type> extends EventEmitter<EventMap<Type>> {
    * @param source
    * @param gestureModelSet
    */
-  public matchGesture(
-    source: GestureSource<Type>,
-    gestureModelSet: GestureModel<Type>[]
-  ): Promise<MatcherSelection<Type>>;
+  public async matchGesture(
+    source: GestureSource<Type, StateToken>,
+    gestureModelSet: GestureModel<Type, StateToken>[]
+  ): Promise<MatcherSelection<Type, StateToken>>;
 
   /**
    * Facilitates matching a new stage in an ongoing gesture-stage sequence based on a previously-
@@ -130,15 +140,15 @@ export class MatcherSelector<Type> extends EventEmitter<EventMap<Type>> {
    * @param source
    * @param gestureModelSet
    */
-  public matchGesture(
-    priorStageMatcher: PredecessorMatch<Type>,
-    gestureModelSet: GestureModel<Type>[]
-  ): Promise<MatcherSelection<Type>>;
+  public async matchGesture(
+    priorStageMatcher: PredecessorMatch<Type, StateToken>,
+    gestureModelSet: GestureModel<Type, StateToken>[]
+  ): Promise<MatcherSelection<Type, StateToken>>;
 
-  public matchGesture(
-    source: GestureSource<Type> | PredecessorMatch<Type>,
-    gestureModelSet: GestureModel<Type>[]
-  ): Promise<MatcherSelection<Type>> {
+  public async matchGesture(
+    source: GestureSource<Type> | PredecessorMatch<Type, StateToken>,
+    gestureModelSet: GestureModel<Type, StateToken>[]
+  ): Promise<MatcherSelection<Type, StateToken>> {
     /*
      * To be clear, this _starts_ the source-tracking process.  It's an async process, though.
      *
@@ -150,15 +160,27 @@ export class MatcherSelector<Type> extends EventEmitter<EventMap<Type>> {
       ? [source instanceof GestureSourceSubview ? source.baseSource : source]
       : (source.sources as GestureSourceSubview<Type>[]).map((source) => source.baseSource);
 
+    // Defining these as locals helps the TS type-checker better infer types within
+    // this method; a later assignment to `source` will remove its ability to infer
+    // `source`'s type at this point.
+    let unmatchedSource = sourceNotYetStaged ? source : null;
+    const priorMatcher = sourceNotYetStaged ? null: source;
+
+    if(this.pendingMatchSetup) {
+      // If a prior call is still waiting on the `await` below, wait for it to clear
+      // entirely before proceeding; there could be effects for how the next part below is processed.
+      await this.pendingMatchSetup;
+    }
+
     if(sourceNotYetStaged) {
       // Cancellation before a first stage is possible; in this case, there's no sequence
       // to trigger cleanup.  We can do that here.
-      source.path.on('invalidated', () => {
-        this.dropSourcesWithIds([source.identifier]);
+      unmatchedSource.path.on('invalidated', () => {
+        this.dropSourcesWithIds([unmatchedSource.identifier]);
       })
     }
 
-    const matchPromise = new ManagedPromise<MatcherSelection<Type>>();
+    const matchPromise = new ManagedPromise<MatcherSelection<Type, StateToken>>();
 
     /*
      * First...
@@ -174,7 +196,7 @@ export class MatcherSelector<Type> extends EventEmitter<EventMap<Type>> {
 
       // Sets up source selectors - the object that matches a source against its Promise.
       // Promises only resolve once, after all - once called, a "selection" has been made.
-      const sourceSelectors: GestureSourceTracker<Type> = {
+      const sourceSelectors: GestureSourceTracker<Type, StateToken> = {
         source: src,
         matchPromise: matchPromise
       };
@@ -200,19 +222,48 @@ export class MatcherSelector<Type> extends EventEmitter<EventMap<Type>> {
         // Answer is not yet clear; perhaps work on gesture-staging will help indicate if this would
         // be useful... and how it should act, if so.
 
-        matcher.addContact(source);
+        matcher.addContact(unmatchedSource);
         matcher.promise.then(this.matcherSelectionFilter(matcher, synchronizationSet));
       });
 
-      // In theory, we _could_ do a quick `await` post-loop to see if anything has instantly resolved,
-      // shortcutting if there's an instant match... but that does make unit testing a bit less intuitive.
+      if(extendableMatcherSet.length > 0) {
+        const originalStateToken = this.stateToken;
+
+        /* We need to wait for any and all pending promises to resolve after the previous loop -
+         * if any gesture models have resolved, it is possible that our consumer may alter the
+         * active state token as a consequence... and expect that to be used for the source if it
+         * corresponds to a newly-starting gesture.  See #7173 and compare with the simple-tap
+         * shortcut in which a new second tap instantly resolves the first.  (If the resolved
+         * tap changes the active layer - the 'state token' here - that's what this addresses.)
+         *
+         * The easiest and cleanest way to ensure all Promises that can resolve, do so before
+         * proceeding:  `setTimeout` uses the macrotask queue, while `Promise`s resolve on the
+         * microtask queue.  Thus, awaiting completion of a 0-sec timeout lets everything
+         * that can fulfill do so before this proceeds.
+         *
+         * Reference: https://javascript.info/event-loop
+         */
+
+        const pendingMatchGesture = new ManagedPromise<void>();
+        this.pendingMatchSetup = pendingMatchGesture.corePromise;
+        await timedPromise(0);
+        this.pendingMatchSetup = null;
+        pendingMatchGesture.resolve();
+
+        // stateToken may have shifted by the time we regain control here.
+        const incomingStateToken = this.stateToken;
+
+        if(originalStateToken != incomingStateToken) {
+          unmatchedSource = unmatchedSource.constructSubview(false, true, incomingStateToken);
+        }
+      }
     }
 
     /**
      * In either case, time to spin up gesture models limited to new sources, that don't combine with
      * already-active ones.  This could be the first stage in a sequence or a followup to a prior stage.
      */
-    let newMatchers = gestureModelSet.map((model) => new GestureMatcher(model, source));
+    let newMatchers = gestureModelSet.map((model) => new GestureMatcher(model, unmatchedSource || priorMatcher));
 
     // If any newly-activating models are disqualified due to initial conditions, don't add them.
     newMatchers = newMatchers.filter((matcher) => !matcher.result || matcher.result.matched !== false);
@@ -319,7 +370,7 @@ export class MatcherSelector<Type> extends EventEmitter<EventMap<Type>> {
     });
   }
 
-  private matcherSelectionFilter(matcher: GestureMatcher<Type>, matchSynchronizers: ManagedPromise<any>[]) {
+  private matcherSelectionFilter(matcher: GestureMatcher<Type, StateToken>, matchSynchronizers: ManagedPromise<any>[]) {
     // Returns a closure-captured Promise-resolution handler used by individual GestureMatchers managed
     // by this class instance.
     return async (result: MatchResult<Type>) => {
@@ -405,7 +456,7 @@ export class MatcherSelector<Type> extends EventEmitter<EventMap<Type>> {
       if(!result.matched) {
         // There is an action to be resolved...
         // But we didn't actually MATCH a gesture.
-        const replacer = (replacementModel: GestureModel<Type>) => {
+        const replacer = (replacementModel: GestureModel<Type, StateToken>) => {
           const replacementMatcher = new GestureMatcher(replacementModel, matcher);
 
           /* IMPORTANT: verify that the replacement model is initially valid.

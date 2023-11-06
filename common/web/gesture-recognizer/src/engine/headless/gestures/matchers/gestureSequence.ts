@@ -7,7 +7,7 @@ import { GestureModel, GestureResolution } from "../specs/gestureModel.js";
 import { MatcherSelection, MatcherSelector } from "./matcherSelector.js";
 import { GestureRecognizerConfiguration, TouchpointCoordinator } from "../../../index.js";
 
-export class GestureStageReport<Type> {
+export class GestureStageReport<Type, StateToken = any> {
   /**
    * The id of the GestureModel spec that was matched at this stage of the
    * GestureSequence.
@@ -28,7 +28,7 @@ export class GestureStageReport<Type> {
 
   public readonly allSourceIds: string[];
 
-  constructor(selection: MatcherSelection<Type>) {
+  constructor(selection: MatcherSelection<Type, StateToken>) {
     const { matcher, result } = selection;
     this.matchedId = matcher?.model.id;
     this.linkType = result.action.type;
@@ -74,35 +74,35 @@ interface PopConfig {
 
 export type ConfigChangeClosure<Type> = (configStackCommand: PushConfig<Type> | PopConfig) => void;
 
-interface EventMap<Type> {
+interface EventMap<Type, StateToken> {
   stage: (
-    stageReport: GestureStageReport<Type>,
+    stageReport: GestureStageReport<Type, StateToken>,
     changeConfiguration: ConfigChangeClosure<Type>
   ) => void;
   complete: () => void;
 }
 
-export class GestureSequence<Type> extends EventEmitter<EventMap<Type>> {
-  public stageReports: GestureStageReport<Type>[];
+export class GestureSequence<Type, StateToken = any> extends EventEmitter<EventMap<Type, StateToken>> {
+  public stageReports: GestureStageReport<Type, StateToken>[];
 
   // It's not specific to just this sequence... but it does have access to
   // the potential next stages.
-  private selector: MatcherSelector<Type>;
+  private selector: MatcherSelector<Type, StateToken>;
 
   // We need this reference in order to properly handle 'setchange' resolution actions when staging.
   private touchpointCoordinator: TouchpointCoordinator<Type>;
   // Selectors have locked-in 'base gesture sets'; this is only non-null if
   // in a 'setchange' action.
-  private pushedSelector?: MatcherSelector<Type>;
+  private pushedSelector?: MatcherSelector<Type, StateToken>;
 
-  private gestureConfig: GestureModelDefs<Type>;
+  private gestureConfig: GestureModelDefs<Type, StateToken>;
   private markedComplete: boolean = false;
 
   // Note:  the first stage will be available under `stageReports` after awaiting a simple Promise.resolve().
   constructor(
-    firstSelectionMatch: MatcherSelection<Type>,
-    gestureModelDefinitions: GestureModelDefs<Type>,
-    selector: MatcherSelector<Type>,
+    firstSelectionMatch: MatcherSelection<Type, StateToken>,
+    gestureModelDefinitions: GestureModelDefs<Type, StateToken>,
+    selector: MatcherSelector<Type, StateToken>,
     touchpointCoordinator: TouchpointCoordinator<Type>
   ) {
     super();
@@ -185,8 +185,8 @@ export class GestureSequence<Type> extends EventEmitter<EventMap<Type>> {
       return potentialMatches;
     }
 
-  private readonly selectionHandler = (selection: MatcherSelection<Type>) => {
-    const matchReport = new GestureStageReport<Type>(selection);
+  private readonly selectionHandler = (selection: MatcherSelection<Type, StateToken>) => {
+    const matchReport = new GestureStageReport<Type, StateToken>(selection);
     if(selection.matcher) {
       this.stageReports.push(matchReport);
     }
@@ -275,10 +275,12 @@ export class GestureSequence<Type> extends EventEmitter<EventMap<Type>> {
 
         if(selection.result.action.type == 'chain') {
           const targetSet = selection.result.action.selectionMode;
-          // push the new one.
-          const changedSetSelector = new MatcherSelector<Type>(targetSet);
-          this.pushedSelector = changedSetSelector;
-          this.touchpointCoordinator?.pushSelector(changedSetSelector);
+          if(targetSet) {
+            // push the new one.
+            const changedSetSelector = new MatcherSelector<Type, StateToken>(targetSet);
+            this.pushedSelector = changedSetSelector;
+            this.touchpointCoordinator?.pushSelector(changedSetSelector);
+          }
         }
       }
     } else {
@@ -290,7 +292,10 @@ export class GestureSequence<Type> extends EventEmitter<EventMap<Type>> {
     }
   }
 
-  private readonly modelResetHandler = (selection: MatcherSelection<Type>, replaceModelWith: (model: GestureModel<Type>) => void) => {
+  private readonly modelResetHandler = (
+    selection: MatcherSelection<Type, StateToken>,
+    replaceModelWith: (model: GestureModel<Type, StateToken>) => void
+  ) => {
     const sourceIds = selection.matcher.allSourceIds;
 
     // If none of the sources involved match a source already included in the sequence, bypass
@@ -319,11 +324,11 @@ export class GestureSequence<Type> extends EventEmitter<EventMap<Type>> {
   }
 }
 
-export function modelSetForAction<Type>(
+export function modelSetForAction<Type, StateToken>(
   action: GestureResolution<Type>,
-  gestureModelDefinitions: GestureModelDefs<Type>,
+  gestureModelDefinitions: GestureModelDefs<Type, StateToken>,
   activeSetId: string
-): GestureModel<Type>[] {
+): GestureModel<Type, StateToken>[] {
   switch(action.type) {
     case 'none':
     case 'complete':

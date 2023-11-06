@@ -118,9 +118,6 @@ export class BrowserDriver {
         upEvent['buttons'] = 0;
       }
 
-      oskKeyElement.dispatchEvent(downEvent);
-      oskKeyElement.dispatchEvent(upEvent);
-
       // Note:  our gesture engine's internal structure means that even simple keystrokes like this
       // involve async processing.  We'll need to sync up.
       const defermentPromise = new ManagedPromise<void>();
@@ -128,11 +125,26 @@ export class BrowserDriver {
       // Easiest way to resolve?  Just wait for the key event.  Currently, our integration tests
       // at this level only use simple-taps, so there shouldn't be any cases that emit multiple
       // key events at this time.
-      keyman.osk.on('keyevent', () => { defermentPromise.resolve() });
+      //
+      // Certain key events (modifier keys) do trigger on 'keydown', so we establish this handler
+      // first.
+      keyman.osk.once('keyevent', () => { defermentPromise.resolve() });
+
+
+      // Allow the 'touchdown' event to resolve fully before proceeding.  There is a bit
+      // of asynchronicity involved within the gesture-recognition engine.
+      oskKeyElement.dispatchEvent(downEvent);
+      await timedPromise(0);
+
+      oskKeyElement.dispatchEvent(upEvent);
 
       // Just in case something goes wrong and no event occurs, we apply a timeout to keep
       // the tests moving along.
       await Promise.race([defermentPromise.corePromise, timedPromise(50)]);
+      if(!defermentPromise.isFulfilled) {
+        // Acts as a 'canary' that something is wrong.
+        throw new Error("No 'keyevent' detected for the specified touch!");
+      }
     } finally {
       // The alt-layer needs to be maintained until the key is generated.
       if(targetLayer != originalLayer) {

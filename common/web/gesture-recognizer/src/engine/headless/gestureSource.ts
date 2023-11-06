@@ -4,8 +4,8 @@ import { GestureRecognizerConfiguration, preprocessRecognizerConfig } from "../c
 import { Nonoptional } from "../nonoptional.js";
 import { MatcherSelector } from "./gestures/matchers/matcherSelector.js";
 
-export function buildGestureMatchInspector<Type>(selector: MatcherSelector<Type>) {
-  return (source: GestureSource<Type, any>) => {
+export function buildGestureMatchInspector<Type, StateToken>(selector: MatcherSelector<Type, StateToken>) {
+  return (source: GestureSource<Type, StateToken>) => {
     return selector.potentialMatchersForSource(source).map((matcher) => matcher.model.id);
   };
 }
@@ -171,10 +171,16 @@ export class GestureSource<HoveredItemType, StateToken=any> {
    * @param preserveBaseItem If `true`, the 'subview' will denote its base item as the same
    * as its source.  If `false`, the base item for the 'subview' will be set to the `item` entry
    * from the most recently-observed path coordinate.
+   * @param stateTokenOverride  Setting this to a 'truthy' value will remap all included samples, using that as
+   *                            the new state token.
    * @returns
    */
-  public constructSubview(startAtEnd: boolean, preserveBaseItem: boolean): GestureSourceSubview<HoveredItemType, StateToken> {
-    return new GestureSourceSubview(this, this.recognizerConfigStack, startAtEnd, preserveBaseItem);
+  public constructSubview(
+    startAtEnd: boolean,
+    preserveBaseItem: boolean,
+    stateTokenOverride?: StateToken
+  ): GestureSourceSubview<HoveredItemType, StateToken> {
+    return new GestureSourceSubview(this, this.recognizerConfigStack, startAtEnd, preserveBaseItem, stateTokenOverride);
   }
 
   /**
@@ -249,16 +255,22 @@ export class GestureSourceSubview<HoveredItemType, StateToken = any> extends Ges
 
   /**
    * Constructs a new "Subview" into an existing GestureSource instance.  Future updates of the base
-   *  GestureSource will automatically be included until this instance's `disconnect` method is called.
-   * @param identifier     The system identifier for the input point's events.
-   * @param initialHoveredItem  The initiating event's original target element
-   * @param isFromTouch    `true` if sourced from a `TouchEvent`; `false` otherwise.
+   * GestureSource will automatically be included until this instance's `disconnect` method is called.
+   * @param source         The "original" GestureSource for this "subview".
+   * @param configStack    `source.recognizerConfigStack`.  Must be separately provided due to TS limitations.
+   * @param startAtEnd     `true` if only the latest sample should be included in the "subview".
+   *                       `false` includes all samples from `source` instead.
+   * @param preserveBaseItem  `true` if `source`'s base item should be preserved; `false` if it should be reset
+   *                          based upon the latest sample.
+   * @param stateTokenOverride  Setting this to a 'truthy' value will remap all included samples, using that as
+   *                            the new state token.
    */
   constructor(
     source: GestureSource<HoveredItemType>,
     configStack: typeof GestureSource.prototype['recognizerConfigStack'],
     startAtEnd: boolean,
-    preserveBaseItem: boolean
+    preserveBaseItem: boolean,
+    stateTokenOverride?: StateToken
   ) {
     let mayUpdate = true;
     let start = 0;
@@ -277,6 +289,7 @@ export class GestureSourceSubview<HoveredItemType, StateToken = any> extends Ges
     super(source.rawIdentifier, configStack, source.isFromTouch);
 
     const baseSource = this._baseSource = source instanceof GestureSourceSubview ? source._baseSource : source;
+    this.stateToken = stateTokenOverride ?? source.stateToken;
 
     /**
      * Provides a coordinate-system translation for source subviews.
@@ -286,7 +299,23 @@ export class GestureSourceSubview<HoveredItemType, StateToken = any> extends Ges
       const translation = this.recognizerTranslation;
       // Provide a coordinate-system translation for source subviews.
       // The base version still needs to use the original coord system, though.
-      return {...sample, targetX: sample.targetX - translation.x, targetY: sample.targetY - translation.y};
+      const transformedSample = {...sample, targetX: sample.targetX - translation.x, targetY: sample.targetY - translation.y};
+
+      // If the subview is operating from the perspective of a different state token than its base source,
+      // its samples' item fields will need correction.
+      //
+      // This can arise during multitap-like scenarios.
+      if(this.stateToken != baseSource.stateToken) {
+        transformedSample.item = this.currentRecognizerConfig.itemIdentifier(
+          {
+            ...sample,
+            stateToken: this.stateToken
+          },
+          null
+        );
+      }
+
+      return transformedSample;
     }
 
     // Note: we don't particularly need subviews to track the actual coords aside from

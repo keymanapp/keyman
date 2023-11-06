@@ -8,6 +8,8 @@ import { Nonoptional } from "../nonoptional.js";
 import { PaddedZoneSource } from "./paddedZoneSource.js";
 import { RecognitionZoneSource } from "./recognitionZoneSource.js";
 
+export type ItemIdentifier<ItemType, StateToken> = (coord: Omit<InputSample<any, StateToken>, 'item'>, target: EventTarget) => ItemType;
+
 // For example, customization of a longpress timer's length need not be readonly.
 export interface GestureRecognizerConfiguration<HoveredItemType, StateToken = any> {
   /**
@@ -84,10 +86,11 @@ export interface GestureRecognizerConfiguration<HoveredItemType, StateToken = an
    *                Its `stateToken` will match the most recently set value for its corresponding
    *                `GestureSource` if continuing one; otherwise, it'll use the one currently set
    *                at the gesture-engine level.
-   * @param target  The `EventTarget` (`Node` or `Element`) provided by the corresponding input event.
+   * @param target  The `EventTarget` (`Node` or `Element`) provided by the corresponding input event,
+   *                if available.  May be `null/undefined`.
    * @returns
    */
-  readonly itemIdentifier?: (coord: Omit<InputSample<any, StateToken>, 'item'>, target: EventTarget) => HoveredItemType;
+  readonly itemIdentifier?: ItemIdentifier<HoveredItemType, StateToken>;
 }
 
 export function preprocessRecognizerConfig<HoveredItemType, StateToken = any>(
