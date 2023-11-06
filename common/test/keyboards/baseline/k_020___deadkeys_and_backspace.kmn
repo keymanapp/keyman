@@ -7,7 +7,7 @@ c 4. Two deadkeys in a row in context         dk(4a) dk(4b) + BKSP = nul
 c 5. One char and two deadkeys in context     'a' dk(5a) dk(5b) 'b' + BKSP = 'a'
 c 6. One char and two deadkeys and one char and two deadkeys in context     'a' dk(6a) dk(6b) 'b' dk(6c) dk(6d) + BKSP = 'a'
 c 7. Two chars and one deadkey in between in context: 'c' (dk7) 'd' + BKSP = 'ok'
-c keys: [K_1][K_BKSP][K_2][K_BKSP][K_3][K_BKSP][K_4][K_BKSP][K_5][K_BKSP][K_6][K_BKSP][K_7][K_BKSP]
+c keys: [K_1][K_BKSP][K_2][K_BKSP][K_3][K_BKSP][K_4][K_BKSP][K_5][K_BKSP][K_6][K_BKSP][K_7][K_BKSP] [K_BKSP]
 c expected: 78aa ok
 c context: 7890
 
@@ -23,6 +23,6 @@ group(main) using keys
 + '4' > dk(4a) dk(4b)
 + '5' > 'a' dk(5a) dk(5b) 'b'
 + '6' > 'a' dk(6a) dk(6b) 'b' dk(6c) dk(6d)
-+ '7' > 'c' dk(7) 'd'
++ '7' > 'c' dk(7) 'd' 'e'
 'c' 'd' + [K_BKSP]       > ' fail'
 'c' dk(7) 'd' + [K_BKSP] > ' ok'
