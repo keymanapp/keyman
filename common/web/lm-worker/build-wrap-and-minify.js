@@ -34,7 +34,7 @@ if(MINIFY) {
     sourcemap: 'external',
     sourcesContent: DEBUG,
     minify: true,
-    keepNames: true,
+    keepNames: false, // Do NOT enable - will break under Android 5.0 / Chrome 35 environments!
     target: 'es5',
     outfile: `build/lib/worker-main.polyfilled.min.js`
   });

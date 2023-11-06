@@ -51,6 +51,7 @@ await esbuild.build(embeddedWorkerBuildOptions);
 const minifiedProfilingOptions = {
   ...embeddedWorkerBuildOptions,
   minify: true,
+  keepNames: false, // Do NOT enable - will break under Android 5.0 / Chrome 35 environments!
   metafile: true,
   write: false // don't actually write the file.
 }
