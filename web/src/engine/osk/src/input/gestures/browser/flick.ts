@@ -49,25 +49,20 @@ export function buildFlickScroller(
   return (coord: InputSample<KeyElement>) => {
     const lockedAngle = lockedAngleForDir(lockedDir);
 
-    let divisor  =  Math.max(0, calcLockedDistance(baseSource.path.stats, lockedDir) - gestureParams.flick.dirLockDist);
-    const deltaX =  Math.sin(lockedAngle) * divisor;
-    const deltaY = -Math.cos(lockedAngle) * divisor;
+    const maxProgressDist = gestureParams.flick.triggerDist - gestureParams.flick.dirLockDist;
+    let progressDist =  Math.max(0, calcLockedDistance(baseSource.path.stats, lockedDir) - gestureParams.flick.dirLockDist);
 
-    /*
-     * Accomplishes two things:
-     * 1) Ensures the coordinates for flick-preview scrolling don't overshoot
-     *    the preview key-cap
-     * 2) While allowing for _undershoot_ if "not quite there yet"
-     */
-    const FUDGE_FACTOR = 1; //1.2;
-    const FULL_SCROLL_MAG = FUDGE_FACTOR * (gestureParams.flick.triggerDist - gestureParams.flick.dirLockDist);
-    // Prevents overshoot.
-    if(divisor < FULL_SCROLL_MAG) {
-      divisor = FULL_SCROLL_MAG;
-    }
+    // Make progress appear slightly less than it really is; 'near complete' slides thus actually are, so
+    // the user doesn't get aggrevated by 'near misses' in that regard.
+    //
+    // With 0.7, a flick-slide that looks 70% complete will actually be 100% complete.
+    // This is about when the flick's key-cap preview starts becoming "mostly visible".
+    const FUDGE_SCALE_FACTOR = 0.7;
+    // Prevent overshoot
+    let slidePc = Math.min(1, FUDGE_SCALE_FACTOR * progressDist / maxProgressDist);
 
-    const previewX = deltaX / divisor;
-    const previewY = deltaY / divisor;
+    const previewX =  Math.sin(lockedAngle) * slidePc;
+    const previewY = -Math.cos(lockedAngle) * slidePc;
 
     previewHost?.scrollFlickPreview(previewX, previewY);
   }
