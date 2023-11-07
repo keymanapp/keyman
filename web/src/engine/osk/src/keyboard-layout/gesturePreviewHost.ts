@@ -28,9 +28,9 @@ export class GesturePreviewHost {
     return this.div;
   }
 
-  constructor(key: KeyElement, isPhone: boolean, edgeLength: number) {
+  constructor(key: KeyElement, isPhone: boolean, width: number, height: number) {
     const keySpec = key.key.spec;
-    this.flickEdgeLength = edgeLength;
+    const edgeLength = this.flickEdgeLength = Math.max(width, height);
 
     const base = this.div = document.createElement('div');
     base.className = base.id = 'kmw-gesture-preview';
@@ -51,8 +51,6 @@ export class GesturePreviewHost {
     label.textContent = key.key.label.textContent;
 
     this.div.appendChild(this.previewImgContainer);
-    const width = Number.parseInt(getComputedStyle(this.div).width, 10) || this.flickEdgeLength;
-    const height = Number.parseInt(getComputedStyle(this.div).height, 10) || this.flickEdgeLength;
 
     if(keySpec.flick) {
       const flickSpec = keySpec.flick || {};
@@ -69,7 +67,7 @@ export class GesturePreviewHost {
         const x = -Math.sin(coords[0]); // Put 'e' flick at left
         const y =  Math.cos(coords[0]); // Put 'n' flick at bottom
 
-        ps.width = width + 'px';
+        ps.width = '100%';
         ps.textAlign = 'center';
 
         if(x < 0) {
@@ -80,8 +78,8 @@ export class GesturePreviewHost {
           ps.left = '0px';
         }
 
-        ps.height = height + 'px';
-        ps.lineHeight = height + 'px';
+        ps.height = '100%';
+        ps.lineHeight = '100%';
         if(y < 0) {
           ps.bottom = (-y * FLICK_OVERFLOW_OFFSET * edgeLength) + 'px';
         } else if(y > 0) {
@@ -109,6 +107,15 @@ export class GesturePreviewHost {
     // hintLabel.style.marginRight = `-${xAdjustment}px`;
 
     // base.appendChild(hintLabel);
+  }
+
+  public refreshLayout() {
+    const compStyle = getComputedStyle(this.div);
+    const height = Number.parseInt(compStyle.height, 10);
+
+    this.flickPreviews.forEach((ele) => {
+      ele.style.lineHeight = ele.style.height = `${height}px`;
+    });
   }
 
   public cancel() {

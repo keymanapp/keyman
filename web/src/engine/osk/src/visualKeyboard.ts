@@ -1513,7 +1513,7 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
     const keyCS = getComputedStyle(key);
     const parsedHeight = Number.parseInt(keyCS.height, 10);
     const parsedWidth  = Number.parseInt(keyCS.width,  10);
-    const previewHost = new GesturePreviewHost(key, !!tip, Math.max(parsedWidth, parsedHeight));
+    const previewHost = new GesturePreviewHost(key, !!tip, parsedWidth, parsedHeight);
 
     if (tip == null) {
       const baseKey = key.key as OSKBaseKey;
@@ -1522,6 +1522,8 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
     } else {
       tip.show(key, true, this, previewHost);
     }
+
+    previewHost.refreshLayout();
 
     return previewHost;
   };
