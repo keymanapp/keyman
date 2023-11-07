@@ -3,15 +3,12 @@
 #include "filesystem.h"     // _S2 needed?
 #include <typeinfo>
 
-KMX_BOOL KMX_LoadKeyboard(char16_t* fileName, LPKMX_KEYBOARD* lpKeyboard);
-
 KMX_BOOL KMX_VerifyKeyboard(LPKMX_BYTE filebase, KMX_DWORD sz);
 
 LPKMX_KEYBOARD KMX_FixupKeyboard(PKMX_BYTE bufp, PKMX_BYTE base, KMX_DWORD dwFileSize);
 
 KMX_BOOL KMX_SaveKeyboard(LPKMX_KEYBOARD kbd, PKMX_WCHAR filename) {
 
-  wprintf(L"#### KMX_SaveKeyboard of mc_kmxfile started\n");
   FILE *fp;
   fp = Open_File(filename, u"wb");
 
@@ -34,13 +31,11 @@ KMX_BOOL KMX_SaveKeyboard(LPKMX_KEYBOARD kbd, PKMX_WCHAR filename) {
     return FALSE;
   }
 
-  wprintf(L"#### KMX_SaveKeyboard of mc_kmxfile ended\n");
   return TRUE;
 }
 
 KMX_DWORD KMX_WriteCompiledKeyboard(LPKMX_KEYBOARD fk, FILE* hOutfile, KMX_BOOL FSaveDebug) {
 
-  wprintf(L" ##### KMX_WriteCompiledKeyboard of mc_kmxfile started\n");
 	LPKMX_GROUP fgp;
 	LPKMX_STORE fsp;
 	LPKMX_KEY fkp;
@@ -75,7 +70,6 @@ KMX_DWORD KMX_WriteCompiledKeyboard(LPKMX_KEYBOARD fk, FILE* hOutfile, KMX_BOOL 
 		if( fgp->dpMatch ) size += u16len(fgp->dpMatch)*2 + 2;
 		if( fgp->dpNoMatch ) size += u16len(fgp->dpNoMatch)*2 + 2;
 	}
-
 
 	for(i = 0; i < fk->cxStoreArray; i++)
 	{
@@ -216,7 +210,6 @@ KMX_DWORD KMX_WriteCompiledKeyboard(LPKMX_KEYBOARD fk, FILE* hOutfile, KMX_BOOL 
 
 	delete[] buf;
 
-  wprintf(L" ##### KMX_WriteCompiledKeyboard of mc_kmxfile ended\n");
 	return CERR_None;
 }
 
@@ -226,6 +219,7 @@ PKMX_WCHAR KMX_StringOffset(PKMX_BYTE base, KMX_DWORD offset) {
 }
 
 #ifdef KMX_64BIT
+
 /**
   CopyKeyboard will copy the data read into bufp from x86-sized structures into
   x64-sized structures starting at `base`
@@ -318,7 +312,7 @@ LPKMX_KEYBOARD KMX_CopyKeyboard(PKMX_BYTE bufp, PKMX_BYTE base)
 */
 
 LPKMX_KEYBOARD KMX_FixupKeyboard(PKMX_BYTE bufp, PKMX_BYTE base, KMX_DWORD dwFileSize) {
-  wprintf(L"  ##### KMX_FixupKeyboard of mcompile started\n");
+
   UNREFERENCED_PARAMETER(dwFileSize);
 
   KMX_DWORD i, j;
@@ -358,13 +352,11 @@ LPKMX_KEYBOARD KMX_FixupKeyboard(PKMX_BYTE bufp, PKMX_BYTE base, KMX_DWORD dwFil
 		}
 	}
 
-  wprintf(L"  ##### KMX_FixupKeyboard of mcompile ended\n");
   return kbp;
 }
 #endif
 
 KMX_BOOL KMX_LoadKeyboard(char16_t* fileName, LPKMX_KEYBOARD* lpKeyboard) {
-  wprintf(L"\n##### KMX_LoadKeyboard of mc_kmxfile started #####\n");
 
   PKMX_BYTE buf;
   FILE* fp;
@@ -418,7 +410,7 @@ KMX_BOOL KMX_LoadKeyboard(char16_t* fileName, LPKMX_KEYBOARD* lpKeyboard) {
   if (!buf) {
     fclose(fp);
     KMX_LogError(L"LogErr1: Not allocmem\n" );
-                                // _S2 delete [] buf; ????
+                                // _S2 QUESTION delete [] buf; ????
     return FALSE;
   }
 
@@ -431,7 +423,7 @@ KMX_BOOL KMX_LoadKeyboard(char16_t* fileName, LPKMX_KEYBOARD* lpKeyboard) {
   if (fread(filebase, 1, sz, fp) < (size_t)sz) {
     KMX_LogError(L"LogError1: Could not read file\n" );
     fclose(fp);
-    // _S2 delete [] buf; ????
+    // _S2 QUESTION delete [] buf; ????
     return FALSE;
   }
 
@@ -446,7 +438,7 @@ KMX_BOOL KMX_LoadKeyboard(char16_t* fileName, LPKMX_KEYBOARD* lpKeyboard) {
 
   if (!KMX_VerifyKeyboard(filebase, sz)) {
     KMX_LogError(L"LogError1: errVerifyKeyboard\n" );
-    // _S2 delete [] buf; ????
+    // _S2 QUESTION delete [] buf; ????
     return FALSE;
   }
 
@@ -459,7 +451,7 @@ KMX_BOOL KMX_LoadKeyboard(char16_t* fileName, LPKMX_KEYBOARD* lpKeyboard) {
 
   if (!kbp) {
     KMX_LogError(L"LogError1: errFixupKeyboard\n" );
-    //  _S2 delete [] buf; ????
+    //  _S2 QUESTION delete [] buf; ????
 
     return FALSE;
   }
@@ -470,9 +462,8 @@ KMX_BOOL KMX_LoadKeyboard(char16_t* fileName, LPKMX_KEYBOARD* lpKeyboard) {
     return FALSE;
   }
   *lpKeyboard = kbp;
-  // _S2 delete [] buf; ????
+  // _S2 QUESTION delete [] buf; ????
 
- wprintf(L"##### KMX_LoadKeyboard of mc_kmxfile ended #####\n");
   return TRUE;
 }
 

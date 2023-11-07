@@ -27,167 +27,52 @@ typedef std::vector<KMX_DWORD> v_dw_1D;
 typedef std::vector<std::vector<KMX_DWORD> > v_dw_2D;
 typedef std::vector<std::vector<std::vector<KMX_DWORD> > > v_dw_3D;
 
+
+enum ShiftState {
+    Base = 0,                           // 0
+    Shft = 1,                           // 1
+    Ctrl = 2,                           // 2
+    ShftCtrl = Shft | Ctrl,             // 3
+    Menu = 4,                           // 4 -- NOT USED
+    ShftMenu = Shft | Menu,             // 5 -- NOT USED
+    MenuCtrl = Menu | Ctrl,             // 6
+    ShftMenuCtrl = Shft | Menu | Ctrl,  // 7
+    Xxxx = 8,                           // 8
+    ShftXxxx = Shft | Xxxx,             // 9
+};
+
 // Map of all US English virtual key codes that we can translate
-//
 const KMX_DWORD KMX_VKMap[] = {
   'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',
   '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
 
   //_S2 those might not work correctly yet*/
-  /*VK_SPACE,
-  VK_ACCENT, VK_HYPHEN, VK_EQUAL,
-  VK_LBRKT, VK_RBRKT, VK_BKSLASH,
-  VK_COLON, VK_QUOTE,
-  VK_COMMA, VK_PERIOD, VK_SLASH,
-  VK_xDF, VK_OEM_102,*/
+
+  VK_ACCENT,    /*   192 VK_OEM_3 */
+  VK_HYPHEN,    /* - 189 VK_OEM_MINUS */
+  VK_EQUAL,     /* = 187 VK_OEM_PLUS */
+
+  VK_LBRKT,     /* [ 219 VK_OEM_4 */
+  VK_RBRKT,     /* ] 221 VK_OEM_6 */
+  VK_BKSLASH,   /* \ 220 VK_OEM_5 */
+
+  VK_COLON,     /* ; 186 VK_OEM_1  or ö */
+  VK_QUOTE,     /* ' 222 VK_OEM_7  or Ä */
+
+  VK_COMMA,     /* , 188 VK_OEM_COMMA */
+  VK_PERIOD,    /* . 190 VK_OEM_PERIOD */
+  VK_SLASH,     /* / 191 VK_OEM_2 */
+
+  VK_SPACE,     /*   32 */
+
+  VK_xDF,       /* ß (?) 223*/
+  VK_OEM_102,   /* < > | 226 */
+
   0
 };
 
-// mapping between Linux keycodes and keyman SC
-const int keycode_map_old[67]={
-  0,   /* */
-  0,   /* */
-  0,   /* */
-  0,   /* */
-  0,   /* */
-  0,   /* */
-  0,   /* */
-  0,   /* */
-  0,   /* */
-  0,   /* */
-  2,   /*10. 1 */
-  3,   /*11. 2 */
-  4,   /*12. 3 */
-  5,   /*13. 4 */
-  6,   /*14. 5 */
-  7,   /*15. 6 */
-  8,   /*16. 7 */
-  9,   /*17. 8 */
-  10,  /*18. 9 */
-  11,  /*19. 0 */
-  12,  /*20. MINUS */
-  13,  /*21. EQUALS*/
-      14,  /*22. BACKSPACE*/
-      15,  /*23. TAB*/
-  16,   /* 24. Q */
-  17,  /* 25. W */
-  18,  /* 26. E */
-  19,  /* 27. R */
-  20,  /* 28. T */
-  21,  /* 29. Z */
-  22,  /* 30. U */
-  23,  /* 31. I*/
-  24,  /* 32. O*/
-  25,  /* 33. P*/
-  26,  /*34. LEFTBRACE*/
-  27,  /*35. RIGHTBRACE*/
-      28,  /*36. ENTER*/
-      29,  /*37. LEFTCTRL*/
-  30,  /* 38. A */
-  31,  /* 39. S */
-  32,  /* 40. D */
-  33,  /* 41. F */
-  34,  /* 42. G */
-  35,  /* 43. H */
-  36,  /* 44. J */
-  37,  /* 45. K */
-  38,  /* 46. L */
-  39,   /*47. SEMICOLON*/
-  40,   /*48. APOSTROPHE*/
-      41,   /*49. GRAVE*/
-      42,   /*50. LEFTSHIFT*/
-      43,   /*51. BACKSLASH*/
-  44,  /*52. Z */
-  45,  /*53. X */
-  46,  /*54. C */
-  47,  /*55. V */
-  48,  /*56. B */
-  49,  /*57. N */
-  50,  /*58. M */
-  51,  /*59. COMMA */
-  52,  /*60. DOT */
-      53,  /*61. SLASH */
-      54,  /*62. R_SHIFT */
-      55,  /*63. * */
-      56,  /*64. LEFTALT*/
-      57,  /*65. SPACE*/
-      58  /*66. CAPSLOCK*/
-};
-
-
-// mapping between Linux keycodes and keyman SC
-const int keycode_map[67]={
-  0,   /* */
-  10,   /*10. 1 */
-  11,   /*11. 2 */
-  12,   /*12. 3 */
-  13,   /*13. 4 */
-  14,   /*14. 5 */
-  15,   /*15. 6 */
-  16,   /*16. 7 */
-  17,   /*17. 8 */
-  18,  /*18. 9 */
-  19,  /*19. 0 */
-  20,  /*20. MINUS */
-  21,  /*21. EQUALS*/
-      22,  /*22. BACKSPACE*/
-      23,  /*23. TAB*/
-  0,   /* */
-  24,   /* 16.. Q */
-  25,  /* 7. W */
-  26,  /* 18. E */
-  27,  /* 19. R */
-  28,  /* 20. T */
-  29,  /* 21. Z */
-  30,  /* 22. U */
-  31,  /* 23. I*/
-  32,  /* 24. O*/
-  33,  /* 25. P*/
-  34,  /*26. LEFTBRACE*/
-  35,  /*27. RIGHTBRACE*/
-      36,  /*28. ENTER*/
-      37,  /*29. LEFTCTRL*/
-  38,  /* 30. A */
-  39,  /* 31. S */
-  40,  /* 32. D */
-  41,  /* 33. F */
-  42,  /* 34. G */
-  43,  /* 35. H */
-  44,  /* 36. J */
-  45,  /* 37. K */
-  46,  /* 38. L */
-  47,   /*39. SEMICOLON*/
-  48,   /*40. APOSTROPHE*/
-      49,   /*41. GRAVE*/
-      50,   /*42. LEFTSHIFT*/
-      51,   /*43. BACKSLASH*/
-  52,  /*44. Z */
-  53,  /*45. X */
-  54,  /*46. C */
-  55,  /*47. V */
-  56,  /*48. B */
-  57,  /*49. N */
-  58,  /*50. M */
-  59,  /*51. COMMA */
-  60,  /*52. DOT */
-      61,  /*53. SLASH */
-      62,  /*54. R_SHIFT */
-      63,  /*55. * */
-      64,  /*56. LEFTALT*/
-      65,  /*57. SPACE*/
-      66 , /*58. CAPSLOCK*/
-  0,   /* */
-  0,   /* */
-  0,   /* */
-  0,   /* */
-  0,   /* */
-  0,   /* */
-  0,   /* */
-  0    /* */
-};
-
+//_S2 QUESTION Which character do we use in that case?  0 or FFFF or 32 or ??
 // this is what we return when we find an invalid character
-//_S2 Which character do we use in that case?  0 or FFFF or 32 or ??
 static KMX_DWORD returnIfCharInvalid = 32;
 
 // takes a std::wstring (=contents of line symbols-file ) and returns the (int) value of the character
@@ -205,15 +90,11 @@ bool createCompleteRow_US(v_str_1D &complete_List, FILE *fpp, const char *text, 
 // 2nd step: write contents to 3D vector
 int split_US_To_3D_Vector(v_dw_3D &all_US, v_str_1D completeList);
 
-// replace Name of Key (e.g. <AD06>)  wih Keycode ( e.g. 15 )
-int replace_PosKey_with_Keycode(std::string in);
-
+// replace Name of Key (e.g. <AD06>)  wih Keycode ( e.g. 0x15 )
+int replace_PosKey_with_Keycode_use_Lin(std::string  in);
 
 // create an empty 2D vector containing "--" in all fields
 v_dw_2D create_empty_2D(int dim_rows, int dim_shifts);
-
-// get Keyvals from VectorFile.txt and insert into All_Vector
-bool InsertKeyvalsFromVectorFile(v_dw_3D &All_Vector);
 
 // query All_Vector
 // return the VirtualKey of the Other Keyboard for given Scancode
@@ -222,12 +103,12 @@ KMX_DWORD get_VirtualKey_Other_From_SC(KMX_DWORD SC , v_dw_3D &All_Vector);
 KMX_DWORD get_VirtualKey_US_From_SC(KMX_DWORD SC , v_dw_3D &All_Vector);
 // return the Scancode of for given VirtualKey of Other Keyboard
 KMX_DWORD get_SC_From_VirtualKey_Other(KMX_DWORD VK_Other , v_dw_3D &All_Vector);
-// return the Scancode of for given VirtualKey of Other US
+// return the Scancode of for given VirtualKey of  US
 KMX_DWORD get_SC_From_VirtualKey_US(KMX_DWORD VK_US , v_dw_3D &All_Vector);
-// return the Scancode of for given VirtualKey of Other US
-KMX_DWORD get_position_From_VirtualKey_US(KMX_DWORD VK_US , v_dw_3D &All_Vector);
-
-#if USE_GDK
+// return the Scancode of for given VirtualKey of Other
+KMX_DWORD get_position_From_VirtualKey_Other(KMX_DWORD VK_US , v_dw_3D &All_Vector);
+// return the Scancode of for given VirtualKey of Other in specific column. If column > available columns look in all columns;
+KMX_DWORD get_position_From_VirtualKey_Other(KMX_DWORD VK_Other , v_dw_3D &All_Vector, int which_columns);
 
 // initialize GDK
 bool InitializeGDK(GdkKeymap **keymap,int argc, gchar *argv[]);
@@ -238,24 +119,12 @@ int createOneVectorFromBothKeyboards(v_dw_3D &All_Vector,GdkKeymap *keymap);
 // append characters using GDK to 3D-Vector (Data for Other Language on [1][ ][ ]  )
 int append_other_ToVector(v_dw_3D &All_Vector, GdkKeymap *keymap);
 
-// get Keyvals from keymap and insert into All_Vector
-bool InsertKeyvalsFromKeymap(v_dw_3D &All_Vector,GdkKeymap * keymap);
-
 // find Keyvals to fill into 2D-Vector of Other Language
 KMX_DWORD getKeyvalsFromKeymap(GdkKeymap *keymap, guint keycode, int shift_state_pos);
-#endif
 
+// mapping between Linux keycodes and keyman SC
+const int Lin_KM__map(int i, v_dw_3D &All_Vector);
 
-// testing of Vector contents ( first row of US and Other)
-bool test(v_dw_3D &V);
-bool test_single(v_dw_3D &V) ;
-
-// this is for using mcompile without gdk to be able to debug in VSCode: (can be deleted later)
-// In mcompile using gdk: Read values of keyboard with help of GDK.
-// in mcompile WITHOUT using GDK: use gdk once to read values-> store them in file Vectorfile.txt
-// Vectorfile.txt will then be used to find & append Values of OtherKeyboard to Vector
-bool writeVectorToFile(v_dw_3D V);
-bool writeFileToVector(v_dw_3D& complete_Vector, const char* infile);
-bool CompareVector_To_VectorOfFile(v_dw_3D All_Vector,v_dw_3D File_Vector);
+std::wstring getKeySyms_according_to_Shiftstate(GdkKeymap *keymap, guint VK, v_dw_3D &All_Vector, ShiftState ss, int caps  );
 
 # endif /*KEYMAP_H*/

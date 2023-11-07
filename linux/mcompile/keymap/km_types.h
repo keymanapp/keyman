@@ -4,8 +4,6 @@
 
 #include <stdint.h>
 
-#define X_test  0xFF1234
-
 /*
 #if defined(_WIN32) || defined(_WIN64)
 #define snprintf _snprintf
@@ -47,7 +45,7 @@ typedef char16_t   KMX_WCHAR;           // _S2
 typedef KMX_WCHAR* PKMX_WCHAR;          // _S2
 typedef wchar_t*   PWSTR;               // _S2 needs to be removed/ wchart-> char16
 typedef PWSTR      PKMX_WCHART;         // _S2 needs to be removed/ wchart-> char16
-typedef const wchar_t*  PCKMX_WCHART;   // _S2 needs to be removed/?
+//typedef const wchar_t*  PCKMX_WCHART;   // _S2 needs to be removed/?
 
 typedef char*      LPSTR;               // _S2 needs to be removed?
 typedef LPSTR      LPKMX_STR;           // _S2 needs to be removed?
@@ -61,6 +59,7 @@ typedef uint8_t*   PKMX_BYTE;           // _S2 needs to be removed?
 typedef char       KMX_CHAR;            // _S2 needs to be removed/?
 typedef char*      PKMX_STR;            // _S2 needs to be removed/?
 
+typedef unsigned int UINT;              // _S2 needs to be removed/?
 typedef unsigned char   BYTE;           // _S2 needs to be removed?
 typedef unsigned long  DWORD;           // _S2 needs to be removed/?
 typedef unsigned short WORD;            // _S2 needs to be removed/?
@@ -68,7 +67,6 @@ typedef wchar_t*     LPWSTR;            // _S2 needs to be removed/?
 typedef WCHAR*       PWCHAR;            // _S2 needs to be removed/?
 
 typedef KMX_CHAR*  PKMX_CHAR;           // _S2 needs to be removed/?
-typedef unsigned int UINT;              // _S2 needs to be removed/?
 
 typedef int        BOOL;                // _S2 needs to be removed/? or is it int32_t??
 
@@ -133,7 +131,7 @@ typedef KMX_UCHAR* KMX_PUCHAR;
 #define VK_CANCEL   0x09
 #define VK_DECIMAL  0x5B*/
 
-
+// _S2 correct?? Do I need NUMPAD??
 #define VK_NUMPAD0  96
 #define VK_NUMPAD1  97
 #define VK_NUMPAD2  98
@@ -147,5 +145,13 @@ typedef KMX_UCHAR* KMX_PUCHAR;
 #define VK_DIVIDE   111
 #define VK_CANCEL   3
 #define VK_DECIMAL  110
+
+#define VK_OEM_CLEAR      0xFE
+#define VK_LSHIFT         0xA0
+#define VK_RSHIFT         0xA1
+#define VK_LCONTROL       0xA2
+#define VK_RCONTROL       0xA3
+#define VK_LMENU          0xA4
+#define VK_RMENU          0xA5
 
 #endif /*KM_TYPES*/

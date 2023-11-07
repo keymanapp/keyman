@@ -21,26 +21,8 @@
                     31 Dec 2014 - mcdurdin - I4549 - V9.0 - Mnemonic layout recompiler does not translate Lctrl Ralt for deadkeys correctly
                     06 Feb 2015 - mcdurdin - I4552 - V9.0 - Add mnemonic recompile option to ignore deadkeys
                     08 Apr 2015 - mcdurdin - I4651 - V9.0 - Mnemonic layout recompiler maps AltGr+VK_BKSLASH rather than VK_OEM_102
-
-This is a copy of win/src/eng/mcompile.cpp
-there are 2 options to run mcompile
-    -u ( which will be done later)
-    -d ( which will be done here )
-
-mcompile -d runs 4 important steps:
-    -LoadKeyboard();                                    -> started to exchange for being cross platform  ( old version is to the right )
-    -int out = run_DoConvert_Part1_getMap(argc,argv);   -> there is a version for getting the mapping (keymap.cpp) but it uses string. At the end we will need to se char16_t
-    -run_DoConvert_Part2_TranslateKeyboard();           ->
-    -SaveKeyboard();                                    ->
-
 */
-
-// REMEMBER in this VM now debugs with meson compile AND with F5 !!! ( because launch.json has configuration: "Debug with Meson")
-// To debug with VSC (F5):
-// cd to:                   /Projects/keyman/keyman/linux/mcompile/keymap/build_mcompile
-// run :                    meson compile  ( executable is created - TODO after each change !)
-// cursor in mcompile.cpp:  F5
-
+//_S2
 // in /Projects/keyman/keyman/linux/mcompile/keymap/build_mcompile
 // run with:
 //./mcompile -d in.kmx bla.dll 0407 out.kmx
@@ -56,7 +38,7 @@ mcompile -d runs 4 important steps:
 
 KMX_BOOL KMX_DoConvert(LPKMX_KEYBOARD kbd, PKMX_WCHAR kbid, KMX_BOOL bDeadkeyConversion, gint argc, gchar *argv[]);
 
-bool KMX_ImportRules(KMX_WCHAR *kbid, LPKMX_KEYBOARD kp,v_dw_3D &All_Vector,std::vector<KMX_DeadkeyMapping> *KMX_FDeadkeys, KMX_BOOL bDeadkeyConversion); // I4353   // I4327
+bool KMX_ImportRules(KMX_WCHAR *kbid, LPKMX_KEYBOARD kp,v_dw_3D &All_Vector, GdkKeymap **keymap,std::vector<KMX_DeadkeyMapping> *KMX_FDeadkeys, KMX_BOOL bDeadkeyConversion); // I4353   // I4327
 
 std::vector<KMX_DeadkeyMapping> KMX_FDeadkeys; // I4353
 
@@ -90,26 +72,25 @@ int run(int argc, std::vector<std::u16string> str_argv, char* argv_ch[] = NULL){
     argv.push_back(cmdl_par);
   }
 
- wprintf(L"##### started run\n");
- test_helpers();
+  wprintf(L"##### started run\n");
 
-    if(argc < 3 || (argc < 5 && u16cmp(argv[1], u"-u") != 0)) {   // I4273// I4273
-     wprintf(
-          L"Usage: mcompile -u infile.kmx outfile.kmx\n"
-          L"       mcompile [-d] infile.kmx kbdfile.dll kbid outfile.kmx\n"
-          L"  With -u parameter, converts keyboard from ANSI to Unicode\n"
-          L"  Otherwise, mcompile converts a Keyman mnemonic layout to a\n"
-          L"  positional one based on the Windows keyboard\n"
-          L"  layout file given by kbdfile.dll\n\n"
-          L"  kbid should be a hexadecimal number e.g. 409 for US English\n"
-          L"  -d   convert deadkeys to plain keys\n");   // I4552
+  if(argc < 3 || (argc < 5 && u16cmp(argv[1], u"-u") != 0)) {   // I4273// I4273
+    wprintf(
+        L"Usage: mcompile -u infile.kmx outfile.kmx\n"
+        L"       mcompile [-d] infile.kmx kbdfile.dll kbid outfile.kmx\n"
+        L"  With -u parameter, converts keyboard from ANSI to Unicode\n"
+        L"  Otherwise, mcompile converts a Keyman mnemonic layout to a\n"
+        L"  positional one based on the Windows keyboard\n"
+        L"  layout file given by kbdfile.dll\n\n"
+        L"  kbid should be a hexadecimal number e.g. 409 for US English\n"
+        L"  -d   convert deadkeys to plain keys\n");   // I4552
 
-     return 1;
-   }
+    return 1;
+  }
 
-//-_S2 -------u option will be done later----------------------
+  // _S2 QUESTION -------u option will be done later. Do we need it?? ----------------------
 
- /* if(wcscmp(argv[1], L"-u") == 0) { // I4273
+    /* if(wcscmp(argv[1], L"-u") == 0) { // I4273
     wchar_t *infile = argv[2], *outfile = argv[3];
 
     LPKEYBOARD kmxfile;
@@ -128,8 +109,8 @@ int run(int argc, std::vector<std::u16string> str_argv, char* argv_ch[] = NULL){
     delete[] kmxfile;
 
     return 0;   // I4279
-  }*/
-//-----------------------------
+    }*/
+  //-----------------------------
 
   int bDeadkeyConversion = u16cmp(argv[1], u"-d") == 0; // I4552
   int n = (bDeadkeyConversion ? 2 : 1);
@@ -161,7 +142,6 @@ int run(int argc, std::vector<std::u16string> str_argv, char* argv_ch[] = NULL){
   //  switch the shift state from the VIRTUALCHARKEY to VIRTUALKEY, without changing any
   //  other properties of the key.
   //
-
   // 3. Write the new keyman keyboard file
 
 
@@ -179,7 +159,7 @@ int run(int argc, std::vector<std::u16string> str_argv, char* argv_ch[] = NULL){
   }*/
 
 #else  // LINUX
-// _S2 do I need all parameters?-no
+// _S2 ToDo :do I need all parameters?-no
   if(KMX_DoConvert( kmxfile,  kbid,  bDeadkeyConversion, argc, (gchar**) argv_ch)) { // I4552F
     KMX_SaveKeyboard(kmxfile, outfile);
 }
@@ -191,7 +171,7 @@ int run(int argc, std::vector<std::u16string> str_argv, char* argv_ch[] = NULL){
   wprintf(L"mmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm end\n");
   return 0 ;
 }
-
+// _S2 TODO which version of VKShiftStates do we use ?
 // comment from win-version
 // Map of all shift states that we will work with
 //const UINT VKShiftState[] = {0, K_SHIFTFLAG, LCTRLFLAG|RALTFLAG, K_SHIFTFLAG|LCTRLFLAG|RALTFLAG, 0xFFFF};
@@ -229,7 +209,6 @@ KMX_BOOL KMX_SetKeyboardToPositional(LPKMX_KEYBOARD kbd) {
 KMX_DWORD  KMX_VKUSToVKUnderlyingLayout(v_dw_3D &All_Vector,KMX_DWORD inUS) {
   // loop and find char in US; then return char of Other
   for( int i=0; i< (int)All_Vector[0].size();i++) {
-    // lists entries of all_vector
     for( int j=1; j< (int)All_Vector[0][0].size();j++) {
       if((inUS == All_Vector[0][i][j] )) {
         return  All_Vector[1][i][2];
@@ -239,10 +218,17 @@ KMX_DWORD  KMX_VKUSToVKUnderlyingLayout(v_dw_3D &All_Vector,KMX_DWORD inUS) {
   return inUS;
 }
 
-// _S2 this will definitely give wrong results!!!!
-KMX_WORD KMX_VKUnderlyingLayoutToVKUS(KMX_WORD VKey) {
-  // _S2 TODO adapt for mcompile linux
-  return VKey;
+// takes capital letter of Other returns cpital character of US keyboard
+KMX_WORD KMX_VKUnderlyingLayoutToVKUS(v_dw_3D &All_Vector,KMX_DWORD inOther) {
+ // loop and find char in Other; then return char of US
+  for( int i=0; i< (int)All_Vector[1].size();i++) {
+    for( int j=1; j< (int)All_Vector[1][0].size();j++) {
+      if((inOther == All_Vector[1][i][j] )) {
+        return  All_Vector[0][i][2];
+      }
+    }
+  }
+  return inOther;
 }
 
 
@@ -250,10 +236,15 @@ KMX_WORD KMX_VKUnderlyingLayoutToVKUS(KMX_WORD VKey) {
 KMX_DWORD KMX_CharFromVK(v_dw_3D &All_Vector,KMX_DWORD vkUnderlying, KMX_UINT VKShiftState, KMX_WCHAR* DeadKey){
 
   KMX_UINT VKShiftState_lin;
-  if (VKShiftState == 0 )      VKShiftState_lin =0;
-  if (VKShiftState == 16)      VKShiftState_lin =1;
-  if (VKShiftState == 9 )      VKShiftState_lin =2;
-  if (VKShiftState == 25)      VKShiftState_lin =3;
+
+  /* 0000 0000 */
+  if (VKShiftState == 0 )      VKShiftState_lin = 0;
+  /* 0001 0000 */
+  if (VKShiftState == 16)      VKShiftState_lin = 1;
+  /* 0000 1001 */
+  if (VKShiftState == 9 )      VKShiftState_lin = 2;
+   /* 0001 1001 */
+  if (VKShiftState == 25)      VKShiftState_lin = 3;
 
   // loop and find vkUnderlying in Other; then return char with correct shiftstate
   for( int i=0; i< (int)All_Vector[1].size();i++) {
@@ -265,7 +256,6 @@ KMX_DWORD KMX_CharFromVK(v_dw_3D &All_Vector,KMX_DWORD vkUnderlying, KMX_UINT VK
   return vkUnderlying;
 }
 
-#if USE_GDK
 bool InitializeGDK(GdkKeymap **keymap,int argc, gchar *argv[]){
 // get keymap of keyboard layout in use
 
@@ -304,12 +294,10 @@ int createOneVectorFromBothKeyboards(v_dw_3D &All_Vector,GdkKeymap *keymap){
   }
   return 0;
 }
-#endif
 
 
 KMX_BOOL KMX_DoConvert(LPKMX_KEYBOARD kbd, PKMX_WCHAR kbid, KMX_BOOL bDeadkeyConversion, gint argc, gchar *argv[]) {
 
-  wprintf(L"\n##### KMX_DoConvert of mcompile started #####\n");
   KMX_WCHAR DeadKey;
 
   if(!KMX_SetKeyboardToPositional(kbd)) return FALSE;
@@ -320,9 +308,7 @@ KMX_BOOL KMX_DoConvert(LPKMX_KEYBOARD kbd, PKMX_WCHAR kbid, KMX_BOOL bDeadkeyCon
   // evident for the 102nd key on UK, for example, where \ can be generated with VK_OEM_102 or AltGr+VK_QUOTE.
   // For now, we get the least shifted version, which is hopefully adequate.
 
-#if USE_GDK
-  wprintf(L"USE_GDK is 1 ****************************************** \n");
-  // _S2 first version with GTK - change later to  XklGetGroupNames  und XklGetCurrentState  as Eberhard suggested
+  // _S2 TODO first version with GTK - change later to  XklGetGroupNames  und XklGetCurrentState  as Eberhard suggested
   //_ init gdk
   GdkKeymap *keymap;
   if(InitializeGDK(&keymap , argc,  argv)) {
@@ -336,29 +322,6 @@ KMX_BOOL KMX_DoConvert(LPKMX_KEYBOARD kbd, PKMX_WCHAR kbid, KMX_BOOL bDeadkeyCon
     wprintf(L"ERROR: can't create one vector from both keyboards\n");
     return FALSE;
   }
-#else
-  wprintf(L"USE_GDK is 0 ****************************************** \n");
-
-  // create vector
-  v_dw_3D All_Vector;
-  if(createOneVectorFromBothKeyboards(All_Vector)){
-    wprintf(L"ERROR: can't create one vector from both keyboards\n");
-    return FALSE;
-  }
-#endif
-//--------------------------------------------------------------------------------
-/*
-  //_S2 this is to use a file and a vector instead of GDK-functions so debugging is easier...not needed later...
-  v_dw_3D complete_Vector;
-  //bool writeVec_OK =  writeVectorToFile(All_Vector);
-  bool WriteFileOK =  writeFileToVector( complete_Vector,"/Projects/keyman/keyman/linux/mcompile/keymap/VectorFile.txt" );
-  bool isEqual= CompareVector_To_VectorOfFile( All_Vector, complete_Vector);
-  wprintf(L" vectors are equal: %i\n",isEqual);    // this mmeans both file are equal and All_Vector contains correct data*/
-//test(All_Vector);
-
-//test_In_Out(All_Vector);
-
-//--------------------------------------------------------------------------------
 
   const wchar_t* ERROR = L"   ";
 
@@ -368,18 +331,17 @@ KMX_BOOL KMX_DoConvert(LPKMX_KEYBOARD kbd, PKMX_WCHAR kbid, KMX_BOOL bDeadkeyCon
     // Loop through each possible key on the keyboard
     for (int i = 0;KMX_VKMap[i]; i++) { // I4651
 
-      // _S2 why were those 2 functions originally not done in 1 step ??
       KMX_DWORD vkUnderlying = KMX_VKUSToVKUnderlyingLayout(All_Vector,(int) KMX_VKMap[i] );
 
       KMX_WCHAR ch = KMX_CharFromVK(All_Vector,vkUnderlying, VKShiftState[j], &DeadKey);
 
-      //_S2 marker in output if difference is not 32= (unshifted-shifted ) - can go later
+      //_S2 marker in wprintf if difference is not 32= (unshifted-shifted ) - can go later
       if (!( ((int) KMX_VKMap[i] == ch ) || ((int) KMX_VKMap[i] == (int) ch -32)    )  )
         ERROR = L" !!!";
       else
         ERROR = L" ";
 
-    wprintf(L"  DoConvert-read i:  %i \t(KMX_VKMap): %i (%c)  \t--->  vkUnderlying: %i (%c)    \tshiftstate[%i]: ( %i )   \t---- >  ch: %i (%c)  \t%ls  \t%ls\n" , i,(int) KMX_VKMap[i],(int)KMX_VKMap[i],  vkUnderlying,vkUnderlying, j, VKShiftState[j] ,  ch ,ch ,  ((int) vkUnderlying != (int) KMX_VKMap[i] ) ? L" *** ": L"", ERROR);
+      //wprintf(L"  DoConvert-read i:  %i \t(KMX_VKMap): %i (%c)  \t--->  vkUnderlying: %i (%c)    \tshiftstate[%i]: ( %i )   \t---- >  ch: %i (%c)  \t%ls  \t%ls\n" , i,(int) KMX_VKMap[i],(int)KMX_VKMap[i],  vkUnderlying,vkUnderlying, j, VKShiftState[j] ,  ch ,ch ,  ((int) vkUnderlying != (int) KMX_VKMap[i] ) ? L" *** ": L"", ERROR);
       //LogError("--- VK_%d -> VK_%d [%c] dk=%d", VKMap[i], vkUnderlying, ch == 0 ? 32 : ch, DeadKey);
 
       /* _S2 ToDo
@@ -389,30 +351,23 @@ KMX_BOOL KMX_DoConvert(LPKMX_KEYBOARD kbd, PKMX_WCHAR kbid, KMX_BOOL bDeadkeyCon
         }
       }*/
 
-  //wprintf(L"     switch with  ch: %i (%c)......\n" ,  ch,ch);
+      //wprintf(L"     switch with  ch: %i (%c)......\n" ,  ch,ch);
       switch(ch) {
 
         case 0x0000: break;
 
-        // _S2 deadkeys will be done later
+        // _S2 TODO deadkeys will be done later
         //case 0xFFFF: ConvertDeadkey(kbd, VKMap[i], VKShiftState[j], DeadKey); break;
         default:     KMX_TranslateKeyboard(kbd, KMX_VKMap[i], VKShiftState[j], ch);
       }
     }
   }
-wprintf(L"\n##### KMX_ReportUnconvertedKeyboardRules of mcompile will start #####\n");
 
   KMX_ReportUnconvertedKeyboardRules(kbd);
 
-// _S2 convert mcompile Step1: use (wrong) Datatype WCHAR (=wchar_t)
-// _S2 convert mcompile Step2: use (OK) Datatype KMX_WCHAR (=char16_t)
-
-  if(!KMX_ImportRules(kbid, kbd, All_Vector, &KMX_FDeadkeys, bDeadkeyConversion)) {   // I4353   // I4552
+  if(!KMX_ImportRules(kbid, kbd, All_Vector, &keymap, &KMX_FDeadkeys, bDeadkeyConversion)) {   // I4353   // I4552
     return FALSE;
   }
-/**/
-
-  wprintf(L"\n##### KMX_DoConvert of mcompile ended #####\n");
   return TRUE;
 }
 
@@ -433,7 +388,6 @@ void KMX_LogError(const KMX_WCHART* m1,int m2, LPKMX_KEY key) {
 //
 void KMX_TranslateKey(LPKMX_KEY key, KMX_WORD vk, KMX_UINT shift, KMX_WCHAR ch) {
 
-  //wprintf(L"\n     ##### KMX_TranslateKey of mcompile started #### with vk: %i (%c) shift: %i ch: %i (%c)......" , vk,vk, shift, ch,ch);
   // The weird LCTRL+RALT is Windows' way of mapping the AltGr key.
   // We store that as just RALT, and use the option "Simulate RAlt with Ctrl+Alt"
   // to provide an alternate..
@@ -446,8 +400,7 @@ void KMX_TranslateKey(LPKMX_KEY key, KMX_WORD vk, KMX_UINT shift, KMX_WCHAR ch) 
     //LogError(L"Converted mnemonic rule on line %d, + '%c' TO + [%x K_%d]", key->Line, key->Key, shift, vk);
     key->ShiftFlags = ISVIRTUALKEY | shift;
     key->Key = vk;
-
-//wprintf(L"ISVIRTUALKEY: %i , shift: %i, key->ShiftFlags for mnemonic=  %i\n", ISVIRTUALKEY,shift, key->ShiftFlags);
+    //wprintf(L"ISVIRTUALKEY: %i , shift: %i, key->ShiftFlags for mnemonic=  %i\n", ISVIRTUALKEY,shift, key->ShiftFlags);
     //wprintf(L"     1 and changed, %i (%c)  %i (%c) ", ch,ch, vk,vk);
   } else if(key->ShiftFlags & VIRTUALCHARKEY && key->Key == ch) {
     // Key is a virtual character key with a hard-coded shift state.
@@ -458,65 +411,48 @@ void KMX_TranslateKey(LPKMX_KEY key, KMX_WORD vk, KMX_UINT shift, KMX_WCHAR ch) 
     //LogError(L"Converted mnemonic virtual char key rule on line %d, + [%x '%c'] TO + [%x K_%d]", key->Line, key->ShiftFlags, key->Key, key->ShiftFlags & ~VIRTUALCHARKEY, vk);
     key->ShiftFlags &= ~VIRTUALCHARKEY;
     key->Key = vk;
-
-//wprintf(L"key->ShiftFlags for VIRTUALCHARKEY=  %i", key->ShiftFlags);
+    //wprintf(L"key->ShiftFlags for VIRTUALCHARKEY=  %i", key->ShiftFlags);
     //wprintf(L"     2 and changed, vk: %i (%c) --->  %i (%c) ", vk,vk, ch,ch);
   }
-
-  //wprintf(L"\n     ##### KMX_TranslateKey of mcompile ended ##### \n");
-  //wprintf(L"key->ShiftFlags: %i, key->Key: %i\n", key->ShiftFlags,key->Key);
 }
 
 void KMX_TranslateGroup(LPKMX_GROUP group, KMX_WORD vk, KMX_UINT shift, KMX_WCHAR ch) {
-
-  //wprintf(L"\n   ##### KMX_TranslateGroup of mcompile started #####\n");
   for(unsigned int i = 0; i < group->cxKeyArray; i++) {
     KMX_TranslateKey(&group->dpKeyArray[i], vk, shift, ch);
   }
-
-  //wprintf(L"   ##### KMX_TranslateGroup of mcompile ended #####\n");
 }
 
 void KMX_TranslateKeyboard(LPKMX_KEYBOARD kbd, KMX_WORD vk, KMX_UINT shift, KMX_WCHAR ch) {
-  //wprintf(L"\n ##### KMX_TranslateKeyboard of mcompile started #####\n");
 //if((shift & (LCTRLFLAG|RALTFLAG)) == (LCTRLFLAG|RALTFLAG)){
-  //wprintf(L"     ##### KMX_TranslateKeyboard of mcompile started #### with vk: %i (%c) shift: %i ch: %i (%c)......(shift & (LCTRLFLAG|RALTFLAG)) %i == (LCTRLFLAG|RALTFLAG)%i): %i \n" , vk,vk, shift, ch,ch,  (shift & (LCTRLFLAG|RALTFLAG)) , (LCTRLFLAG|RALTFLAG),  (shift & (LCTRLFLAG|RALTFLAG))  == (LCTRLFLAG|RALTFLAG));
   for(unsigned int i = 0; i < kbd->cxGroupArray; i++) {
     if(kbd->dpGroupArray[i].fUsingKeys) {
       KMX_TranslateGroup(&kbd->dpGroupArray[i], vk, shift, ch);
     }
   }
-  //wprintf(L" ##### KMX_TranslateKeyboard of mcompile ended #####\n");
 }
 
 void KMX_ReportUnconvertedKeyRule(LPKMX_KEY key) {
   if(key->ShiftFlags == 0) {
     //KMX_LogError(L"Did not find a match for mnemonic rule on line %d, + '%c' > ...", key->Line, key->Key);
-   //wprintf(L" Sab Did not find a match for mnemonic rule on line %d, + '%c' > ...\n", key->Line, key->Key);
-   //MX_LogError(L"Did not find a match for mnemonic rule on line %d,\n", key->Line);
+    //wprintf(L" SAB Did not find a match for mnemonic rule on line %d, + '%c' > ...\n", key->Line, key->Key);
   } else if(key->ShiftFlags & VIRTUALCHARKEY) {
     //KMX_LogError(L"Did not find a match for mnemonic virtual character key rule on line %d, + [%x '%c'] > ...", key->Line, key->ShiftFlags, key->Key);
     //wprintf(L"SAB Did not find a match for mnemonic virtual character key rule on line %d, + [%x '%c'] > ...\n", key->Line, key->ShiftFlags, key->Key);
-    //KMX_LogError(L"Did not find a match for mnemonic virtual character key rule on line %d, \n", key->Line);
   }
 }
 
 void KMX_ReportUnconvertedGroupRules(LPKMX_GROUP group) {
-  wprintf(L"\n ##### KMX_ReportUnconvertedGroupRules of mcompile started #####\n");
   for(unsigned int i = 0; i < group->cxKeyArray; i++) {
     KMX_ReportUnconvertedKeyRule(&group->dpKeyArray[i]);
   }
-  wprintf(L"\n ##### KMX_ReportUnconvertedGroupRules of mcompile ended #####\n");
 }
 
 void KMX_ReportUnconvertedKeyboardRules(LPKMX_KEYBOARD kbd) {
-  wprintf(L"\n ##### KMX_ReportUnconvertedKeyboardRules of mcompile started #####\n");
   for(unsigned int i = 0; i < kbd->cxGroupArray; i++) {
     if(kbd->dpGroupArray[i].fUsingKeys) {
       KMX_ReportUnconvertedGroupRules(&kbd->dpGroupArray[i]);
     }
   }
-  wprintf(L"\n ##### KMX_ReportUnconvertedKeyboardRules of mcompile ended #####\n");
 }
 
 
@@ -525,7 +461,6 @@ void KMX_ReportUnconvertedKeyboardRules(LPKMX_KEYBOARD kbd) {
 
 
 // ---- old copy code from here ----------------------------------------------------------
-
 
 /*
 BOOL ConvertKeyboardToUnicode(LPKEYBOARD kbd); // I4273
