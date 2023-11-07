@@ -100,6 +100,9 @@ namespace core {
       */
      static void remove_text(km_core_state *state, std::u32string &str, size_t length);
 
+     /** process a key */
+     void process_key(km_core_state *state, km_core_virtual_key vk, uint16_t modifier_state) const;
+
      /** process a typed key */
      void process_key_string(km_core_state *state, const std::u16string &key_str) const;
 

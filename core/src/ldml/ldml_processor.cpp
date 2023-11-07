@@ -194,25 +194,14 @@ ldml_processor::process_event(
     state->actions().clear();
 
     switch (vk) {
+    // Currently, only one VK gets spoecial treatment.
     // Special handling for backspace VK
     case KM_CORE_VKEY_BKSP:
       process_backspace(state);
       break;
     default:
     // all other VKs
-      {
-        // Look up the key
-        const std::u16string key_str = keys.lookup(vk, modifier_state);
-
-        if (key_str.empty()) {
-          // no key was found, so pass the keystroke on to the Engine
-          state->actions().push_invalidate_context();
-          state->actions().push_emit_keystroke();
-          break; // ----- commit and exit
-        }
-
-        process_key_string(state, key_str);
-      } // end of processing a 'normal' vk
+      process_key(state, vk, modifier_state);
     } // end of switch
     // end of normal processing: commit and exit
     state->actions().commit();
@@ -227,19 +216,60 @@ ldml_processor::process_event(
 void
 ldml_processor::process_backspace(km_core_state *state) const {
   if (!!bksp_transforms) {
-    // TODO-LDML: process bksp
-    // std::u16string outputString;
-    // // don't bother if no backspace transforms!
-    // // TODO-LDML: unroll ctxt into a str
-    // std::u16string ctxtstr;
-    // for (size_t i = 0; i < ctxt.size(); i++) {
-    //   ctxtstr.append(ctxt[i]);
-    // }
-    // const size_t matchedContext = transforms->apply(ctxtstr, outputString);
+
+    std::u32string old_ctxtstr_nfc;
+    (void)context_to_string(state, old_ctxtstr_nfc, false);
+    assert(ldml::normalize_nfc_markers(old_ctxtstr_nfc)); // TODO-LDML: else fail?
+
+    // context string in NFD
+    std::u32string ctxtstr;
+    (void)context_to_string(state, ctxtstr, true);  // with markers
+    // no key to add here
+    assert(ldml::normalize_nfd_markers(ctxtstr));  // TODO-LDML: else fail?
+
+    /** transform output string */
+    std::u32string outputString;
+    /** how many chars of the ctxtstr to replace */
+    size_t matchedContext = 0;  // zero if no transforms
+
+    matchedContext = bksp_transforms->apply(ctxtstr, outputString);
+
+
+    if (matchedContext > 0) {
+      // drop last 'matchedContext':
+      ctxtstr.resize(ctxtstr.length() - matchedContext);
+      ctxtstr.append(outputString);  // TODO-LDML: should be able to do a normalization-safe append here.
+      ldml::marker_map markers;
+      assert(ldml::normalize_nfd_markers(ctxtstr, markers));  // TODO-LDML: Need marker-safe normalize here.
+
+      // Ok. We've done all the happy manipulations.
+
+      /** NFC and no markers */
+      std::u32string ctxtstr_cleanedup = ldml::remove_markers(ctxtstr);
+      assert(ldml::normalize_nfc_markers(ctxtstr_cleanedup));
+
+      // find common prefix.
+      // For example, if the context previously had "aaBBBBB" and it is changing to "aaCCC" then we will have:
+      // - old_ctxtstr_changed = "BBBBB"
+      // - new_ctxtstr_changed = "CCC"
+      // So the BBBBB needs to be removed and then CCC added.
+      auto ctxt_prefix =
+          mismatch(old_ctxtstr_nfc.begin(), old_ctxtstr_nfc.end(), ctxtstr_cleanedup.begin(), ctxtstr_cleanedup.end());
+      /** The part of the old string to be removed */
+      std::u32string old_ctxtstr_changed(ctxt_prefix.first, old_ctxtstr_nfc.end());
+      /** The new context to be added */
+      std::u32string new_ctxtstr_changed(ctxt_prefix.second, ctxtstr_cleanedup.end());
+
+      // drop the old suffix. Note: this mutates old_ctxtstr_changed.
+      remove_text(state, old_ctxtstr_changed, old_ctxtstr_changed.length());
+      assert(old_ctxtstr_changed.length() == 0);
+      return; // The transform took care of the backspacing.
+    }  // else, fall through to default processing below.
   }
 
   // Find out what the last actual character was and remove it.
   // attempt to get the last char
+  // TODO-LDML: emoji backspace
   auto end = state->context().rbegin();
   if (end != state->context().rend()) {
     if ((*end).type == KM_CORE_CT_CHAR) {
@@ -260,6 +290,20 @@ ldml_processor::process_backspace(km_core_state *state) const {
     be sensible about backspacing because we know nothing.
   */
   state->actions().push_backspace(KM_CORE_BT_UNKNOWN);
+}
+
+void
+ldml_processor::process_key(km_core_state *state, km_core_virtual_key vk, uint16_t modifier_state) const {
+  // Look up the key
+  const std::u16string key_str = keys.lookup(vk, modifier_state);
+
+  if (key_str.empty()) {
+    // no key was found, so pass the keystroke on to the Engine
+    state->actions().push_invalidate_context();
+    state->actions().push_emit_keystroke();
+  } else {
+    process_key_string(state, key_str);
+  }
 }
 
 void
