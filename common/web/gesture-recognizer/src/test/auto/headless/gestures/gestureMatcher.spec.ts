@@ -13,6 +13,8 @@ import { ManagedPromise, timedPromise } from '@keymanapp/web-utils';
 import { simulateMultiSourceMatcherInput } from "../../../resources/simulateMultiSourceInput.js";
 
 import {
+  FlickEndModel,
+  FlickStartModel,
   LongpressModel,
   MultitapModel,
   SimpleTapModel,
@@ -20,6 +22,8 @@ import {
 } from './isolatedGestureSpecs.js';
 
 import {
+  FlickEndThreshold,
+  FlickStartThreshold,
   LongpressDistanceThreshold,
   MainLongpressSourceModel
 } from './isolatedPathSpecs.js';
@@ -302,9 +306,81 @@ describe("GestureMatcher", function() {
     });
   });
 
-  describe.skip("Flicks", function() {
-    it("Actual expectations for flick behavior still in flux - cannot spec yet", async function() {
+  describe("Flicks", function() {
+    describe("Initial stage", function() {
+      it("resolve: threshold crossed", async function() {
+        const turtle = new TouchpathTurtle({
+          targetX: 1,
+          targetY: 1,
+          t: 100,
+          item: 'a'
+        });
+        turtle.move(45, FlickStartThreshold+1, 40, 2);
+        turtle.commitPending();
 
+        const {
+          sources,
+          modelMatcherPromise,
+          executor
+        } = simulateMultiSourceMatcherInput([
+          { type: 'sequence', samples: turtle.path, terminate: false }
+        ], this.fakeClock, FlickStartModel);
+
+        let completion = executor();
+        const modelMatcher = await modelMatcherPromise;
+        await Promise.race([completion, modelMatcher.promise]);
+
+        assert.equal(await promiseStatus(modelMatcher.promise), PromiseStatuses.PROMISE_RESOLVED);
+        assert.equal(await promiseStatus(completion), PromiseStatusModule.PROMISE_PENDING);
+
+        assert.deepEqual(await modelMatcher.promise, {matched: true, action: { type: 'chain', item: null, next: 'flick-end'}});
+        assert.isFalse(sources[0].path.isComplete);
+
+        const finalStats = modelMatcher.sources[0].path.stats;
+        assert.isAtLeast(finalStats.netDistance, FlickStartThreshold);
+
+        // Allow the rest of the simulation to play out; it's easy cleanup that way.
+        await completion;
+      });
+    });
+
+    describe("Final stage", function() {
+      it("resolve: threshold crossed", async function() {
+        const baseTurtle = new TouchpathTurtle({
+          targetX: 1,
+          targetY: 1,
+          t: 100,
+          item: 'a'
+        });
+        baseTurtle.move(45, FlickStartThreshold+1, 40, 2);
+        baseTurtle.move(45, FlickEndThreshold - FlickStartThreshold, 160, 8);
+        baseTurtle.hoveredItem = 'a+';
+        baseTurtle.commitPending();
+
+        const {
+          sources,
+          modelMatcherPromise,
+          executor
+        } = simulateMultiSourceMatcherInput([
+          { type: 'sequence', samples: baseTurtle.path, preplayCount: 3, terminate: true }
+        ], this.fakeClock, FlickEndModel);
+
+        let completion = executor();
+        const modelMatcher = await modelMatcherPromise;
+        await Promise.race([completion, modelMatcher.promise]);
+
+        assert.equal(await promiseStatus(modelMatcher.promise), PromiseStatuses.PROMISE_RESOLVED);
+        assert.equal(await promiseStatus(completion), PromiseStatusModule.PROMISE_PENDING);
+
+        assert.deepEqual(await modelMatcher.promise, {matched: true, action: { type: 'complete', item: 'a+'}});
+        assert.isTrue(sources[0].path.isComplete);
+
+        const finalStats = modelMatcher.sources[0].path.stats;
+        assert.isAtLeast(finalStats.netDistance, FlickEndThreshold);
+
+        // Allow the rest of the simulation to play out; it's easy cleanup that way.
+        await completion;
+      });
     });
   });
 
