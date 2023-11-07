@@ -1,7 +1,7 @@
 import { type KeyElement } from '../../../keyElement.js';
 import VisualKeyboard from '../../../visualKeyboard.js';
 
-import { ActiveKey, ActiveKeyBase, ActiveSubKey, KeyDistribution } from '@keymanapp/keyboard-processor';
+import { ActiveKey, ActiveKeyBase, ActiveSubKey, KeyDistribution, KeyEvent } from '@keymanapp/keyboard-processor';
 import { ConfigChangeClosure, CumulativePathStats, GestureRecognizerConfiguration, GestureSequence, GestureSource, InputSample, PaddedZoneSource } from '@keymanapp/gesture-recognizer';
 import { GestureHandler } from '../gestureHandler.js';
 import { distributionFromDistanceMaps } from '@keymanapp/input-processor';
@@ -23,37 +23,53 @@ export const FlickNameCoordMap = (() => {
   return map;
 })();
 
+function lockedAngleForDir(lockedDir: typeof OrderedFlickDirections[number]) {
+  return Math.PI / 4 * OrderedFlickDirections.indexOf(lockedDir);
+}
+
+function calcLockedDistance(pathStats: CumulativePathStats<any>, lockedDir: typeof OrderedFlickDirections[number]) {
+  const lockedAngle = lockedAngleForDir(lockedDir);
+
+  const deltaX = pathStats.lastSample.targetX - pathStats.initialSample.targetX;
+  const deltaY = pathStats.lastSample.targetY - pathStats.initialSample.targetY;
+
+  const projY = Math.max(0, -deltaY * Math.cos(lockedAngle));
+  const projX = Math.max(0,  deltaX * Math.sin(lockedAngle));
+
+  return Math.sqrt(projX * projX + projY * projY);
+}
+
 export function buildFlickScroller(
   baseSource: GestureSource<KeyElement>,
   initialCoord: InputSample<KeyElement>,
+  lockedDir: typeof OrderedFlickDirections[number],
   previewHost: GesturePreviewHost,
   gestureParams: GestureParams
 ): (coord: InputSample<KeyElement>) => void {
   return (coord: InputSample<KeyElement>) => {
-    baseSource.path.on('step', (coord) => {
-      const deltaX = coord.targetX - initialCoord.targetX;
-      const deltaY = coord.targetY - initialCoord.targetY;
+    const lockedAngle = lockedAngleForDir(lockedDir);
 
-      const sqDist = deltaX * deltaX + deltaY * deltaY;
+    let divisor  =  Math.max(0, calcLockedDistance(baseSource.path.stats, lockedDir) - gestureParams.flick.dirLockDist);
+    const deltaX =  Math.sin(lockedAngle) * divisor;
+    const deltaY = -Math.cos(lockedAngle) * divisor;
 
-      /*
-       * Accomplishes two things:
-       * 1) Ensures the coordinates for flick-preview scrolling don't overshoot
-       *    the preview key-cap
-       * 2) While allowing for _undershoot_ if "not quite there yet"
-       */
-      let divisor = Math.sqrt(sqDist);
-      const FUDGE_FACTOR = 1.1;
-      const FULL_SCROLL_MAG = FUDGE_FACTOR * gestureParams.flick.triggerDist;
-      if(divisor < FULL_SCROLL_MAG) {
-        divisor = FULL_SCROLL_MAG;
-      }
+    /*
+     * Accomplishes two things:
+     * 1) Ensures the coordinates for flick-preview scrolling don't overshoot
+     *    the preview key-cap
+     * 2) While allowing for _undershoot_ if "not quite there yet"
+     */
+    const FUDGE_FACTOR = 1; //1.2;
+    const FULL_SCROLL_MAG = FUDGE_FACTOR * (gestureParams.flick.triggerDist - gestureParams.flick.dirLockDist);
+    // Prevents overshoot.
+    if(divisor < FULL_SCROLL_MAG) {
+      divisor = FULL_SCROLL_MAG;
+    }
 
-      const previewX = deltaX / divisor;
-      const previewY = deltaY / divisor;
+    const previewX = deltaX / divisor;
+    const previewY = deltaY / divisor;
 
-      previewHost?.scrollFlickPreview(previewX, previewY);
-    });
+    previewHost?.scrollFlickPreview(previewX, previewY);
   }
 }
 
@@ -61,11 +77,11 @@ export function buildFlickScroller(
  * The maximum angle-difference, in radians, allowed before a potential flick
  * is to be considered less likely than its base key.
  *
- * A 90 degree tolerance (Math.PI / 2) + a 'n' flick will consider any angle
+ * A 60 degree tolerance (Math.PI / 3) + a 'n' flick will consider most angles
  * north of the x-axis more likely than the base key - thus including
  * 'nw' and 'ne' and some 'w' and 'e' paths.
  */
-const MAX_TOLERANCE_ANGLE_SKEW = Math.PI / 2;
+const MAX_TOLERANCE_ANGLE_SKEW = Math.PI / 3;
 
 /**
  * Represents a flick gesture's implementation within KeymanWeb, including
@@ -82,6 +98,8 @@ export default class Flick implements GestureHandler {
 
   private baseKeyDistances: Map<ActiveKeyBase, number>;
   private computedFlickDistribution: KeyDistribution;
+  private lockedDir: typeof OrderedFlickDirections[number];
+  private lockedSelectable: ActiveSubKey;
 
   constructor(
     sequence: GestureSequence<KeyElement, string>,
@@ -104,27 +122,46 @@ export default class Flick implements GestureHandler {
 
     this.sequence.on('stage', (result) => {
       const pathStats = baseSource.path.stats;
-      this.computedFlickDistribution = this.flickDistribution(pathStats);
-      const selection = this.computedFlickDistribution[0].keySpec;
+      this.computedFlickDistribution = this.flickDistribution(pathStats, true);
 
-      // If the best match is the base key but the user input an otherwise valid flick...
-      // nothing is sufficiently likely:  abort!
-      if(result.matchedId == 'flick-end' && selection == this.baseSpec) {
+      const selection = this.lockedSelectable ?? this.computedFlickDistribution[0].keySpec;
+      if(result.matchedId == 'flick-mid') {
+        if(selection == this.baseSpec) {
+          sequence.cancel();
+          this.cancel();
+          return;
+        }
+
+        const dir = Object.keys(this.baseSpec.flick).find(
+          (dir) => this.baseSpec.flick[dir] == selection
+        ) as typeof OrderedFlickDirections[number];
+
+        this.lockedDir = dir;
+        this.lockedSelectable = selection;
+
+        const baseCoord = baseSource.path.coords[0];
+        const flickScroller = buildFlickScroller(baseSource, baseCoord, dir, previewHost, this.gestureParams);
+        flickScroller(baseSource.currentSample);
+        baseSource.path.on('step', flickScroller);
+
         return;
       }
 
-      const keyEvent = vkbd.keyEventFromSpec(selection);
+      let keyEvent: KeyEvent;
+      const projectedDistance = calcLockedDistance(pathStats, this.lockedDir);
+      if(projectedDistance < this.gestureParams.flick.dirLockDist) {
+        keyEvent = vkbd.keyEventFromSpec(this.baseSpec);
+      } else if(projectedDistance >= this.gestureParams.flick.triggerDist) {
+        keyEvent = vkbd.keyEventFromSpec(selection);
+      } else {
+        return;
+      }
+
       keyEvent.keyDistribution = this.currentStageKeyDistribution(this.baseKeyDistances);
 
       // emit the keystroke
       vkbd.raiseKeyEvent(keyEvent, null);
     });
-
-    const baseCoord = baseSource.path.coords[0];
-    const flickScroller = buildFlickScroller(baseSource, baseCoord, previewHost, this.gestureParams);
-    flickScroller(baseSource.currentSample);
-    baseSource.path.on('step', flickScroller);
-
 
     // Be sure to extend roaming bounds a bit more than usual for flicks, as they can be quick motions.
     const altConfig = this.buildPopupRecognitionConfig(vkbd);
@@ -168,7 +205,8 @@ export default class Flick implements GestureHandler {
    * @param pathStats
    * @returns
    */
-  flickDistribution(pathStats: CumulativePathStats) {
+  flickDistribution(pathStats: CumulativePathStats, ignoreThreshold?: boolean) {
+    // NOTE:  does not consider flick direction-locking.
     const flickSet = this.baseSpec.flick;
 
     /* Time to compute flick corrections!
@@ -210,7 +248,7 @@ export default class Flick implements GestureHandler {
     // Determine whether or not the flick distance-threshold has been passed...
     // and how close it is to being passed if not yet passed.
     const TRIGGER_DIST = this.gestureParams.flick.triggerDist;
-    const baseDist = Math.min(TRIGGER_DIST, pathStats.netDistance);
+    const baseDist = Math.min(TRIGGER_DIST, ignoreThreshold ? TRIGGER_DIST : pathStats.netDistance);
     const distThresholdRatio = baseDist / TRIGGER_DIST;
 
     let totalMass = 0;

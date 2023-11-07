@@ -436,39 +436,22 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
       // Note:  GestureSource does not currently auto-terminate if there are no
       // remaining matchable gestures.  Though, we shouldn't facilitate roaming
       // anyway if we've turned it off.
-      if(this.kbdLayout.hasFlicks) {
-        const flickScroller = buildFlickScroller(source, source.path.coords[0], previewHost, DEFAULT_GESTURE_PARAMS);
+      trackingEntry.roamingHighlightHandler = (sample) => {
+        // Maintain highlighting
+        const key = sample.item;
+        const oldKey = sourceTrackingMap[source.identifier].key;
 
-        trackingEntry.roamingHighlightHandler = (sample) => {
-          if(source.baseItem.key.spec.flick) {
-            flickScroller(sample);
+        if(key != oldKey) {
+          this.highlightKey(oldKey, false);
+          this.gesturePreviewHost?.cancel();
+
+          const previewHost = this.highlightKey(key, true);
+          if(previewHost) {
+            this.gesturePreviewHost = previewHost;
           }
 
-          const key = sample.item;
-          const oldKey = sourceTrackingMap[source.identifier].key;
-
-          if(key != oldKey) {
-            endHighlighting();
-          }
-        };
-      } else {
-        trackingEntry.roamingHighlightHandler = (sample) => {
-          // Maintain highlighting
-          const key = sample.item;
-          const oldKey = sourceTrackingMap[source.identifier].key;
-
-          if(key != oldKey) {
-            this.highlightKey(oldKey, false);
-            this.gesturePreviewHost?.cancel();
-
-            const previewHost = this.highlightKey(key, true);
-            if(previewHost) {
-              this.gesturePreviewHost = previewHost;
-            }
-
-            trackingEntry.previewHost = previewHost;
-            sourceTrackingMap[source.identifier].key = key;
-          }
+          trackingEntry.previewHost = previewHost;
+          sourceTrackingMap[source.identifier].key = key;
         }
       }
 
@@ -1245,6 +1228,7 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
 
     this.gestureParams.longpress.flickDist = 0.25 * this.currentLayer.rowHeight;
     this.gestureParams.flick.startDist     = 0.1  * this.currentLayer.rowHeight;
+    this.gestureParams.flick.dirLockDist   = 0.25 * this.currentLayer.rowHeight;
     this.gestureParams.flick.triggerDist   = 0.75 * this.currentLayer.rowHeight;
 
     // Needs the refreshed layout info to work correctly.
