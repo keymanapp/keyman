@@ -206,10 +206,11 @@ export default class Flick implements GestureHandler {
     }));
 
     const angle = pathStats.angle;
+
+    // Determine whether or not the flick distance-threshold has been passed...
+    // and how close it is to being passed if not yet passed.
     const TRIGGER_DIST = this.gestureParams.flick.triggerDist;
     const baseDist = Math.min(TRIGGER_DIST, pathStats.netDistance);
-
-    // The 1.001:  makes the opposite direction ever-so-slightly less likely than the base key.
     const distThresholdRatio = baseDist / TRIGGER_DIST;
 
     let totalMass = 0;
@@ -220,7 +221,7 @@ export default class Flick implements GestureHandler {
         const angleDelta1 = angle - coord[0];
         const angleDelta2 = 2 * PI + coord[0] - angle; // because of angle wrap-around.
 
-        // NOTE:  max linear angle dist:  PI.
+        // NOTE:  max linear angle dist:  PI.  (Angles are between 0 and 2*PI.)
         angleDist = Math.min(angleDelta1 * angleDelta1, angleDelta2 * angleDelta2);
       }
 

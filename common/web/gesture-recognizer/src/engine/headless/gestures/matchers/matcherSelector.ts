@@ -340,7 +340,15 @@ export class MatcherSelector<Type, StateToken = any> extends EventEmitter<EventM
             }
           });
 
-          return;
+          return {
+            selectionPromise: Promise.resolve({
+              result: {
+                action: null,
+                matched: false
+              },
+              matcher: null
+            })
+          };
         }
       }
     }
