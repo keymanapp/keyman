@@ -14,7 +14,6 @@
 		2990208E278FF402004F18CF /* KeyboardTableController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2990208D278FF402004F18CF /* KeyboardTableController.swift */; };
 		2990209127901DD7004F18CF /* KeyboardDetailCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2990209027901DD7004F18CF /* KeyboardDetailCell.swift */; };
 		2993F6E62791621D009E1352 /* KeyboardDetailController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2993F6E52791621D009E1352 /* KeyboardDetailController.swift */; };
-		29946C192AF8F017007EA0E3 /* Zip.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 29946C172AF8EFC5007EA0E3 /* Zip.xcframework */; };
 		29946C1A2AF9E087007EA0E3 /* Zip.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 29946C172AF8EFC5007EA0E3 /* Zip.xcframework */; };
 		29946C1B2AF9E087007EA0E3 /* Zip.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 29946C172AF8EFC5007EA0E3 /* Zip.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		37C183B922932AD2009F9EFD /* FVKeyboardList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37C183B822932AD2009F9EFD /* FVKeyboardList.swift */; };
@@ -170,7 +169,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				29946C192AF8F017007EA0E3 /* Zip.xcframework in Frameworks */,
 				CEDB327F265C9C58000A2009 /* DeviceKit.xcframework in Frameworks */,
 				CEDB3280265C9C58000A2009 /* ObjcExceptionBridging.xcframework in Frameworks */,
 				CEDB3281265C9C58000A2009 /* Reachability.xcframework in Frameworks */,
