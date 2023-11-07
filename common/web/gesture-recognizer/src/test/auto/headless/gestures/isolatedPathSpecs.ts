@@ -46,7 +46,7 @@ export const LongpressFlickDistanceThreshold = 6;
 export const MainLongpressSourceModelWithShortcut: ContactModel = {
   ...MainLongpressSourceModel,
   pathModel: {
-    evaluate: (path) => {
+    evaluate: (path, baseStats) => {
       const stats = path.stats;
 
       // Adds up-flick support!
@@ -54,7 +54,7 @@ export const MainLongpressSourceModelWithShortcut: ContactModel = {
         return 'resolve';
       }
 
-      return MainLongpressSourceModel.pathModel.evaluate(path);
+      return MainLongpressSourceModel.pathModel.evaluate(path, baseStats);
     }
   }
 }
