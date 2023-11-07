@@ -132,6 +132,7 @@ uses
   UframeTextEditor, UfrmDebug, ExtShiftState,
   ImgList, MenuImgList,
   KeyboardParser, TextFileFormat, dmActionsKeyboardEditor,
+  dmActionsDebugger,
   VisualKeyboard, UframeOnScreenKeyboardEditor,
   KeymanDeveloperUtils,
   OnScreenKeyboard, KMDActionInterfaces,

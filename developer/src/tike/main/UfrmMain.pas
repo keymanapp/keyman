@@ -88,22 +88,52 @@ interface
 
 uses
   System.UITypes,
-  Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms,
-  ComCtrls, ImgList, Menus, StdCtrls, ExtCtrls, ToolWin, Buttons,
-  KeymanDeveloperUtils, UfrmMDIChild, UfrmMDIEditor,
+  Windows,
+  Messages,
+  SysUtils,
+  Classes,
+  Graphics,
+  Controls,
+  Forms,
+  ComCtrls,
+  ImgList,
+  Menus,
+  StdCtrls,
+  ExtCtrls,
+  ToolWin,
+  Buttons,
+  KeymanDeveloperUtils,
+  UfrmMDIChild,
+  UfrmMDIEditor,
   MenuImgList,
   Keyman.Developer.System.Project.Project,
-  Keyman.Developer.UI.Project.UfrmProject, CharacterMapSettings,
+  Keyman.Developer.UI.Project.UfrmProject,
+  CharacterMapSettings,
   mrulist,
   UfrmUnicodeDataStatus,
   CharacterDragObject,
   Keyman.Developer.UI.dmActionsModelEditor,
-  dmActionsMain, UnicodeData, UserMessages, webhelp,
-  dmActionsKeyboardEditor, Dialogs, UfrmTike, AppEvnts,
+  UnicodeData,
+  UserMessages,
+  webhelp,
+  dmActionsDebugger,
+  dmActionsKeyboardEditor,
+  dmActionsMain,
+  Dialogs,
+  UfrmTike,
+  AppEvnts,
   DropTarget,
-  System.ImageList, Winapi.ActiveX, CloseButtonPageControl, JvComponentBase,
-  JvDockControlForm, JvDockTree, JvDockVIDStyle, JvDockVSNetStyle,
-  JvAppRegistryStorage, Vcl.ActnMan, Vcl.ActnCtrls;
+  System.ImageList,
+  Winapi.ActiveX,
+  CloseButtonPageControl,
+  JvComponentBase,
+  JvDockControlForm,
+  JvDockTree,
+  JvDockVIDStyle,
+  JvDockVSNetStyle,
+  JvAppRegistryStorage,
+  Vcl.ActnMan,
+  Vcl.ActnCtrls;
 
 type
   TfrmKeymanDeveloper = class(TTikeForm, IUnicodeDataUIManager, IDragDrop)
@@ -512,6 +542,7 @@ begin
 
   modActionsTextEditor := TmodActionsTextEditor.Create(Self);
   modActionsKeyboardEditor := TmodActionsKeyboardEditor.Create(Self);
+  modActionsDebugger := TmodActionsDebugger.Create(Self);
   modActionsMain := TmodActionsMain.Create(Self);
   modActionsModelEditor := TmodActionsModelEditor.Create(Self);
 
@@ -1048,7 +1079,7 @@ procedure TfrmKeymanDeveloper.cbDebugSystemKeyboardItemClick(Sender: TObject);
 begin
   if cbDebugSystemKeyboard.ItemIndex < 0 then
     cbDebugSystemKeyboard.ItemIndex := 0;
-  modActionsKeyboardEditor.SelectDebugSystemKeyboard(cbDebugSystemKeyboard.Items.Objects[cbDebugSystemKeyboard.ItemIndex] as TSystemKeyboardItem);
+  modActionsDebugger.SelectDebugSystemKeyboard(cbDebugSystemKeyboard.Items.Objects[cbDebugSystemKeyboard.ItemIndex] as TSystemKeyboardItem);
   //actDebugSystemKeyboard
 end;
 
@@ -1061,10 +1092,10 @@ begin
 }
   if cbDebugSystemKeyboard.Items.Count < 2 then
   begin
-    //modActionsKeyboardEditor.SelectedSystemKeyboard;
+    //modActionsDebugger.SelectedSystemKeyboard;
     FillSystemKeyboardList(cbDebugSystemKeyboard.Items);
   end;
-  //modActionsKeyboardEditor.SetupDebugSystemKeyboard(cbDebugSystemKeyboard.Strings);
+  //modActionsDebugger.SetupDebugSystemKeyboard(cbDebugSystemKeyboard.Strings);
 end;
 
 {-------------------------------------------------------------------------------

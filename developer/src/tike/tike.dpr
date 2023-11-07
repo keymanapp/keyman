@@ -151,7 +151,7 @@ uses
   ErrorControlledRegistry in '..\..\..\common\windows\delphi\vcl\ErrorControlledRegistry.pas',
   UframeBitmapEditor in 'main\UframeBitmapEditor.pas' {frameBitmapEditor: TFrame},
   UfrmMessages in 'main\UfrmMessages.pas' {frmMessages},
-  dmActionsKeyboardEditor in 'actions\dmActionsKeyboardEditor.pas' {modActionsKeyboardEditor: TDataModule},
+  dmActionsDebugger in 'actions\dmActionsDebugger.pas' {modActionsDebugger: TDataModule},
   dmActionsMain in 'actions\dmActionsMain.pas' {modActionsMain: TDataModule},
   dmActionsTextEditor in 'actions\dmActionsTextEditor.pas' {modActionsTextEditor: TDataModule},
   UfrmCharacterMapNew in '..\..\..\common\windows\delphi\charmap\UfrmCharacterMapNew.pas' {frmCharacterMapNew},
@@ -286,7 +286,8 @@ uses
   Keyman.Developer.System.Project.xmlLdmlProjectFile in 'project\Keyman.Developer.System.Project.xmlLdmlProjectFile.pas',
   Keyman.Developer.System.Project.xmlLdmlProjectFileAction in 'project\Keyman.Developer.System.Project.xmlLdmlProjectFileAction.pas',
   Keyman.Developer.UI.Project.xmlLdmlProjectFileUI in 'project\Keyman.Developer.UI.Project.xmlLdmlProjectFileUI.pas',
-  Keyman.Developer.UI.UfrmLdmlKeyboardEditor in 'child\Keyman.Developer.UI.UfrmLdmlKeyboardEditor.pas' {frmLdmlKeyboardEditor};
+  Keyman.Developer.UI.UfrmLdmlKeyboardEditor in 'child\Keyman.Developer.UI.UfrmLdmlKeyboardEditor.pas' {frmLdmlKeyboardEditor},
+  dmActionsKeyboardEditor in 'actions\dmActionsKeyboardEditor.pas' {modActionsKeyboardEditor: TDataModule};
 
 {$R *.RES}
 {$R ICONS.RES}
@@ -316,7 +317,8 @@ begin
           Application.Title := 'Keyman Developer';
           if TikeActive then Exit;
           Application.CreateForm(TmodWebHttpServer, modWebHttpServer);
-          try
+  Application.CreateForm(TmodActionsKeyboardEditor, modActionsKeyboardEditor);
+  try
             Application.CreateForm(TfrmKeymanDeveloper, frmKeymanDeveloper);
             Application.Run;
           finally

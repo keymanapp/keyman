@@ -345,8 +345,8 @@
         <DCCReference Include="main\UfrmMessages.pas">
             <Form>frmMessages</Form>
         </DCCReference>
-        <DCCReference Include="actions\dmActionsKeyboardEditor.pas">
-            <Form>modActionsKeyboardEditor</Form>
+        <DCCReference Include="actions\dmActionsDebugger.pas">
+            <Form>modActionsDebugger</Form>
             <DesignClass>TDataModule</DesignClass>
         </DCCReference>
         <DCCReference Include="actions\dmActionsMain.pas">
@@ -566,6 +566,11 @@
         <DCCReference Include="child\Keyman.Developer.UI.UfrmLdmlKeyboardEditor.pas">
             <Form>frmLdmlKeyboardEditor</Form>
             <FormType>dfm</FormType>
+        </DCCReference>
+        <DCCReference Include="actions\dmActionsKeyboardEditor.pas">
+            <Form>modActionsKeyboardEditor</Form>
+            <FormType>dfm</FormType>
+            <DesignClass>TDataModule</DesignClass>
         </DCCReference>
         <None Include="Profiling\AQtimeModule1.aqt"/>
         <BuildConfiguration Include="Debug">
