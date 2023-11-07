@@ -201,20 +201,9 @@ public final class KMManager {
 
   private static KMManager.SpacebarText spacebarText = KMManager.SpacebarText.LANGUAGE_KEYBOARD; // must match default given in kmwbase.ts
 
-  // Tiling colored background generated from https://elmah.io/tools/base64-image-encoder/
-  // TODO: Replace with image/css?
-  public static final String KM_BANNER_THEME_BLACK =
-    "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABoAAAARCAIAAABM7ytaAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAAEnQAABJ0Ad5mH3gAAAAVSURBVDhPYxgFo2AUjIJRQDpgYAAABT8AAcEGbxwAAAAASUVORK5CYII=";
-  public static final String KM_BANNER_THEME_WHITE =
-    "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABoAAAARCAYAAADDjbwNAAAABHNCSVQICAgIfAhkiAAAACNJREFUOI1j/P///38GOgAmelgyatGoRaMWjVo0atGoRQQAAD1MBB5gNLThAAAAAElFTkSuQmCCBT8AAcEGbxwAAAAASUVORK5CYII=";
-  public static final String KM_BANNER_THEME_KEYMAN =
-    "data:image/png;base64,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";
-
-  // Green banner for testing as a contrast to the Android styling.
-  // TODO: remove this after testing.
-  public static final String KM_BANNER_THEME_GREEN =
-    "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABoAAAARCAYAAADDjbwNAAAABHNCSVQICAgIfAhkiAAAACNJREFUOI1j9PnP8J+BDoCJHpaMWjRq0ahFoxaNWjRqEQEAAG4mAmxMRRQ1AAAAAElFTkSuQmCCBT8AAcEGbxwAAAAASUVORK5CYII=";
-
+  // Paths relative to assets folder for banner themes
+  public static final String KM_BANNER_THEME_BLACK = "svg/black_banner.svg";
+  public static final String KM_BANNER_THEME_WHITE = "svg/white_banner.svg";
 
   protected static KMKeyboard InAppKeyboard = null;
   protected static KMKeyboard SystemKeyboard = null;
@@ -295,6 +284,8 @@ public final class KMManager {
   public static final String KMDefault_AssetPackages = "packages";
   public static final String KMDefault_LexicalModelPackages = "models";
 
+  public static final String KMDefault_AssetSVG = "svg";
+
   // Default Keyboard Info
   public static final String KMDefault_PackageID = "sil_euro_latin";
   public static final String KMDefault_KeyboardID = "sil_euro_latin";
@@ -344,6 +335,10 @@ public final class KMManager {
 
   public static String getCloudDir() {
     return getResourceRoot() + KMDefault_UndefinedPackageID + File.separator;
+  }
+
+  public static String getSVGDir() {
+    return getResourceRoot() + KMDefault_AssetSVG + File.separator;
   }
 
   public static FormFactor getFormFactor() {
@@ -853,6 +848,16 @@ public final class KMManager {
       // Copy default keyboard font
       copyAsset(context, KMDefault_KeyboardFont, "", true);
       copyAsset(context, KMFilename_JSPolyfill, "", true);
+
+      // SVG directory for banner themes
+      File svgDir = new File(getSVGDir());
+      if (!svgDir.exists()) {
+        svgDir.mkdir();
+      }
+      String[] svgFiles = assetManager.list(KMDefault_AssetSVG);
+      for (String svgFile : svgFiles) {
+        copyAsset(context, svgFile, KMDefault_AssetSVG, true);
+      }
 
       // Keyboard packages directory
       File packagesDir = new File(getPackagesDir());

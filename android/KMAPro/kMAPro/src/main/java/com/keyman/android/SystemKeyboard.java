@@ -42,6 +42,9 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
   private static ExtractedText exText = null;
   private KMHardwareKeyboardInterpreter interpreter = null;
 
+  // Paths relative to assets folder for banner themes
+  public static final String KM_BANNER_THEME_KEYMAN = "svg/keyman_banner.svg";
+
   private static final String TAG = "SystemKeyboard";
 
   /**
@@ -71,7 +74,7 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
     KMManager.SpacebarText spacebarText = KMManager.SpacebarText.fromString(prefs.getString(KeymanSettingsActivity.spacebarTextKey, KMManager.SpacebarText.LANGUAGE_KEYBOARD.toString()));
     KMManager.setSpacebarText(spacebarText);
 
-    KMManager.setBannerImage(KeyboardType.KEYBOARD_TYPE_SYSTEM, KMManager.KM_BANNER_THEME_KEYMAN);
+    KMManager.setBannerImage(KeyboardType.KEYBOARD_TYPE_SYSTEM, KM_BANNER_THEME_KEYMAN);
     KMManager.setBanner(KeyboardType.KEYBOARD_TYPE_SYSTEM, KMManager.BannerType.IMAGE);
 
     boolean mayHaveHapticFeedback = prefs.getBoolean(KeymanSettingsActivity.hapticFeedbackKey, false);
