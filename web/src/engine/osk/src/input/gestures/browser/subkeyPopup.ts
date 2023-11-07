@@ -61,10 +61,12 @@ export default class SubkeyPopup implements GestureHandler {
 
     source.on('stage', () => {
       const key = this.currentSelection;
-      const keyEvent = vkbd.keyEventFromSpec(key.key.spec);
-      keyEvent.keyDistribution = this.currentStageKeyDistribution();
+      if(key) {
+        const keyEvent = vkbd.keyEventFromSpec(key.key.spec);
+        keyEvent.keyDistribution = this.currentStageKeyDistribution();
 
-      vkbd.raiseKeyEvent(keyEvent, key);
+        vkbd.raiseKeyEvent(keyEvent, key);
+      }
     });
 
     // From here, we want to make decisions based on only the subkey-menu portion of the gesture path.
