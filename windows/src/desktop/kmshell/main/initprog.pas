@@ -146,6 +146,8 @@ uses
   utilkmshell,
   utildir,
 
+  BackgroundUpdate,
+
   KeyboardTIPCheck,
 
   ValidateKeymanInstalledSystemKeyboards,
@@ -441,9 +443,9 @@ begin
     Exit;
   end;
 
-  with TOnlineUpdateCheck.Create(nil, True, True) do
+  with TBackgroundUpdate.Create(nil, True, True) do
     try
-      UpdateState := CheckBackgroundState;
+      UpdateState := CheckRegistryState;
     finally
       Free;
     end;
@@ -451,12 +453,18 @@ begin
   begin
     /// Moving this to OnlineUpdateCheck
     KL.Log('initprog fmBackgroundUpdateCheck');
-    with TOnlineUpdateCheck.Create(nil, True, True) do
+    with TBackgroundUpdate.Create(nil, True, True) do
     try
-      ProcessBackgroundInstall
+      HandleCheck;
     finally
       Free;
     end;
+//    with TOnlineUpdateCheck.Create(nil, True, True) do
+//    try
+//      ProcessBackgroundInstall
+//    finally
+//      Free;
+//    end;
   end;
 
   if not FSilent or (FMode = fmUpgradeMnemonicLayout) then   // I4553
