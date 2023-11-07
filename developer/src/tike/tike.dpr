@@ -285,7 +285,8 @@ uses
   Keyman.Developer.UI.Project.UpgradeProject in 'project\Keyman.Developer.UI.Project.UpgradeProject.pas',
   Keyman.Developer.System.Project.xmlLdmlProjectFile in 'project\Keyman.Developer.System.Project.xmlLdmlProjectFile.pas',
   Keyman.Developer.System.Project.xmlLdmlProjectFileAction in 'project\Keyman.Developer.System.Project.xmlLdmlProjectFileAction.pas',
-  Keyman.Developer.UI.Project.xmlLdmlProjectFileUI in 'project\Keyman.Developer.UI.Project.xmlLdmlProjectFileUI.pas';
+  Keyman.Developer.UI.Project.xmlLdmlProjectFileUI in 'project\Keyman.Developer.UI.Project.xmlLdmlProjectFileUI.pas',
+  Keyman.Developer.UI.UfrmLdmlKeyboardEditor in 'child\Keyman.Developer.UI.UfrmLdmlKeyboardEditor.pas' {frmLdmlKeyboardEditor};
 
 {$R *.RES}
 {$R ICONS.RES}
@@ -315,7 +316,7 @@ begin
           Application.Title := 'Keyman Developer';
           if TikeActive then Exit;
           Application.CreateForm(TmodWebHttpServer, modWebHttpServer);
-  try
+          try
             Application.CreateForm(TfrmKeymanDeveloper, frmKeymanDeveloper);
             Application.Run;
           finally

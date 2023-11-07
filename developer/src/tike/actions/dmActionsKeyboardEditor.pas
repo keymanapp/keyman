@@ -153,6 +153,8 @@ uses
   Keyman.Developer.System.Project.ProjectFile,
   Keyman.Developer.UI.Project.ProjectFileUI,
   Keyman.Developer.UI.Project.UfrmProject,
+  Keyman.Developer.UI.UfrmLdmlKeyboardEditor,
+  Keyman.Developer.System.Project.xmlLdmlProjectFile,
   UframeTextEditor,
   UfrmKeymanWizard,
   UfrmDebug,
@@ -164,7 +166,14 @@ uses
 
 {$R *.dfm}
 
-function ActiveEditor: TfrmKeymanWizard;
+function ActiveLdmlKeyboardEditor: TfrmLdmlKeyboardEditor;
+begin
+  if Assigned(frmKeymanDeveloper.ActiveChild) and (frmKeymanDeveloper.ActiveChild is TfrmLdmlKeyboardEditor)
+    then Result := frmKeymanDeveloper.ActiveChild as TfrmLdmlKeyboardEditor
+    else Result := nil;
+end;
+
+function ActiveKmnKeyboardEditor: TfrmKeymanWizard;
 begin
   if Assigned(frmKeymanDeveloper.ActiveChild) and (frmKeymanDeveloper.ActiveChild is TfrmKeymanWizard)
     then Result := frmKeymanDeveloper.ActiveChild as TfrmKeymanWizard
@@ -178,9 +187,14 @@ begin
     else Result := nil;
 end;
 
-function ActiveProjectFile: TkmnProjectFile;
+function ActiveLdmlKeyboardProjectFile: TxmlLdmlProjectFile;
 begin
-  Result := ActiveEditor.ProjectFile as TkmnProjectFile;
+  Result := ActiveLdmlKeyboardEditor.ProjectFile as TxmlLdmlProjectFile;
+end;
+
+function ActiveKmnKeyboardProjectFile: TkmnProjectFile;
+begin
+  Result := ActiveKmnKeyboardEditor.ProjectFile as TkmnProjectFile;
 end;
 
 function ActivePackageProjectFile: TkpsProjectFile;
@@ -199,7 +213,7 @@ begin
   begin
     if not Assigned(Action.OnUpdate) then
     begin
-      Enabled := ActiveEditor <> nil;
+      Enabled := ActiveKmnKeyboardEditor <> nil;
       if not Enabled then Handled := True;
     end;
   end;
@@ -209,44 +223,44 @@ end;
 
 procedure TmodActionsKeyboardEditor.actDebugDebuggerModeExecute(Sender: TObject);
 begin
-  if ActiveEditor.DebugForm.UIStatus = duiTest then
-    ActiveEditor.DebugForm.UIStatus := duiReadyForInput;
+  if ActiveKmnKeyboardEditor.DebugForm.UIStatus = duiTest then
+    ActiveKmnKeyboardEditor.DebugForm.UIStatus := duiReadyForInput;
 end;
 
 procedure TmodActionsKeyboardEditor.actDebugDebuggerModeUpdate(Sender: TObject);
 begin
-  actDebugDebuggerMode.Checked := (ActiveEditor <> nil) and (ActiveEditor.DebugForm.UIStatus <> duiTest);
+  actDebugDebuggerMode.Checked := (ActiveKmnKeyboardEditor <> nil) and (ActiveKmnKeyboardEditor.DebugForm.UIStatus <> duiTest);
 end;
 
 procedure TmodActionsKeyboardEditor.actDebugPauseExecute(Sender: TObject);
 begin
-  if ActiveEditor.DebugForm.UIStatus = duiPaused
-    then ActiveEditor.DebugForm.Unpause
-    else ActiveEditor.DebugForm.Pause;
+  if ActiveKmnKeyboardEditor.DebugForm.UIStatus = duiPaused
+    then ActiveKmnKeyboardEditor.DebugForm.Unpause
+    else ActiveKmnKeyboardEditor.DebugForm.Pause;
 end;
 
 procedure TmodActionsKeyboardEditor.actDebugPauseUpdate(Sender: TObject);
 begin
   actDebugPause.Enabled :=
-    (ActiveEditor <> nil) and
+    (ActiveKmnKeyboardEditor <> nil) and
     IsDebuggerVisible and
     not IsDebuggerInTestMode and
-    (ActiveEditor.DebugForm.UIStatus in [duiPaused, duiFocusedForInput, duiReadyForInput]);
+    (ActiveKmnKeyboardEditor.DebugForm.UIStatus in [duiPaused, duiFocusedForInput, duiReadyForInput]);
 
   if actDebugPause.Enabled
-    then actDebugPause.Checked := ActiveEditor.DebugForm.UIStatus = duiPaused
+    then actDebugPause.Checked := ActiveKmnKeyboardEditor.DebugForm.UIStatus = duiPaused
     else actDebugPause.Checked := False;
 end;
 
 procedure TmodActionsKeyboardEditor.actDebugRunExecute(Sender: TObject);
 begin
-  ActiveEditor.DebugForm.Run;
+  ActiveKmnKeyboardEditor.DebugForm.Run;
 end;
 
 procedure TmodActionsKeyboardEditor.actDebugRunUpdate(Sender: TObject);
 begin
   actDebugRun.Enabled := IsDebuggerVisible and not IsDebuggerInTestMode and 
-    (ActiveEditor.DebugForm.UIStatus = duiDebugging);
+    (ActiveKmnKeyboardEditor.DebugForm.UIStatus = duiDebugging);
 end;
 
 procedure TmodActionsKeyboardEditor.actDebugSelectSystemKeyboardExecute(Sender: TObject);
@@ -255,7 +269,8 @@ var
 begin
   if SelectSystemKeyboard(frmKeymanDeveloper, FKeyboardID) then
   begin
-    //ActiveEditor.DebugForm.SetSystemKeyboardID(FKeyboardID);   // I3655
+    // TODO: this is disabled?
+    //ActiveKmnKeyboardEditor.DebugForm.SetSystemKeyboardID(FKeyboardID);   // I3655
   end;
 end;
 
@@ -266,18 +281,18 @@ end;
 
 procedure TmodActionsKeyboardEditor.actDebugSetClearBreakpointExecute(Sender: TObject);
 begin
-  if ActiveEditor.DebugForm.IsBreakPointLine(ActiveMemo.SelectedRow)
-    then ActiveEditor.DebugForm.ClearBreakpoint(ActiveMemo.SelectedRow)
-    else ActiveEditor.DebugForm.SetBreakpoint(ActiveMemo.SelectedRow);
+  if ActiveKmnKeyboardEditor.DebugForm.IsBreakPointLine(ActiveMemo.SelectedRow)
+    then ActiveKmnKeyboardEditor.DebugForm.ClearBreakpoint(ActiveMemo.SelectedRow)
+    else ActiveKmnKeyboardEditor.DebugForm.SetBreakpoint(ActiveMemo.SelectedRow);
 end;
 
 procedure TmodActionsKeyboardEditor.actDebugSetClearBreakpointUpdate(Sender: TObject);
 begin
-  if (ActiveEditor <> nil) and (ActiveMemo <> nil) and Assigned(ActiveEditor.DebugForm) then
+  if (ActiveKmnKeyboardEditor <> nil) and (ActiveMemo <> nil) and Assigned(ActiveKmnKeyboardEditor.DebugForm) then
   begin
     actDebugSetClearBreakpoint.Enabled := True;
     actDebugSetClearBreakpoint.Visible := True;
-    if ActiveEditor.DebugForm.IsBreakPointLine(ActiveMemo.SelectedRow)
+    if ActiveKmnKeyboardEditor.DebugForm.IsBreakPointLine(ActiveMemo.SelectedRow)
       then actDebugSetClearBreakpoint.Caption := 'Clear &Breakpoint'
       else actDebugSetClearBreakpoint.Caption := 'Set &Breakpoint';
   end
@@ -291,152 +306,152 @@ end;
 procedure TmodActionsKeyboardEditor.actDebugSingleStepModeExecute(
   Sender: TObject);
 begin
-  ActiveEditor.DebugForm.SingleStepMode := not ActiveEditor.DebugForm.SingleStepMode;
+  ActiveKmnKeyboardEditor.DebugForm.SingleStepMode := not ActiveKmnKeyboardEditor.DebugForm.SingleStepMode;
 end;
 
 procedure TmodActionsKeyboardEditor.actDebugSingleStepModeUpdate(Sender: TObject);
 begin
   actDebugSingleStepMode.Enabled := IsDebuggerVisible and not IsDebuggerInTestMode;
   if actDebugSingleStepMode.Enabled
-    then actDebugSingleStepMode.Checked := ActiveEditor.DebugForm.SingleStepMode
+    then actDebugSingleStepMode.Checked := ActiveKmnKeyboardEditor.DebugForm.SingleStepMode
     else actDebugSingleStepMode.Checked := False;
 end;
 
 procedure TmodActionsKeyboardEditor.actDebugStartDebuggerExecute(Sender: TObject);
 begin
-  ActiveEditor.StartDebugging;
+  ActiveKmnKeyboardEditor.StartDebugging;
 end;
 
 procedure TmodActionsKeyboardEditor.actDebugStartDebuggerUpdate(Sender: TObject);
 begin
-  actDebugStartDebugger.Enabled := (ActiveEditor <> nil) and not ActiveEditor.IsDebugVisible;
+  actDebugStartDebugger.Enabled := (ActiveKmnKeyboardEditor <> nil) and not ActiveKmnKeyboardEditor.IsDebugVisible;
 end;
 
 procedure TmodActionsKeyboardEditor.actDebugStepForwardExecute(Sender: TObject);
 begin
-  ActiveEditor.DebugForm.StepForward;
+  ActiveKmnKeyboardEditor.DebugForm.StepForward;
 end;
 
 procedure TmodActionsKeyboardEditor.actDebugStepForwardUpdate(Sender: TObject);
 begin
   actDebugStepForward.Enabled := IsDebuggerVisible and not IsDebuggerInTestMode  and
-    (ActiveEditor.DebugForm.UIStatus = duiDebugging);
+    (ActiveKmnKeyboardEditor.DebugForm.UIStatus = duiDebugging);
 end;
 
 procedure TmodActionsKeyboardEditor.actDebugStopDebuggerExecute(
   Sender: TObject);
 begin
-  ActiveEditor.StopDebugging;
+  ActiveKmnKeyboardEditor.StopDebugging;
 end;
 
 procedure TmodActionsKeyboardEditor.actDebugStopDebuggerUpdate(Sender: TObject);
 begin
-  actDebugStopDebugger.Enabled := (ActiveEditor <> nil) and ActiveEditor.IsDebugVisible;
+  actDebugStopDebugger.Enabled := (ActiveKmnKeyboardEditor <> nil) and ActiveKmnKeyboardEditor.IsDebugVisible;
 end;
 
 procedure TmodActionsKeyboardEditor.actDebugSwitchToDebuggerWindowExecute(
   Sender: TObject);
 begin
-  ActiveEditor.DebugForm.SetFocus;
+  ActiveKmnKeyboardEditor.DebugForm.SetFocus;
 end;
 
 procedure TmodActionsKeyboardEditor.actDebugSwitchToDebuggerWindowUpdate(
   Sender: TObject);
 begin
-  actDebugSwitchToDebuggerWindow.Enabled := (ActiveEditor <> nil) and ActiveEditor.IsDebugVisible and
-    ((Screen.ActiveControl = nil) or (Screen.ActiveControl.Owner <> ActiveEditor.DebugForm));
+  actDebugSwitchToDebuggerWindow.Enabled := (ActiveKmnKeyboardEditor <> nil) and ActiveKmnKeyboardEditor.IsDebugVisible and
+    ((Screen.ActiveControl = nil) or (Screen.ActiveControl.Owner <> ActiveKmnKeyboardEditor.DebugForm));
 end;
 
 procedure TmodActionsKeyboardEditor.actDebugTestModeExecute(Sender: TObject);
 begin
-  ActiveEditor.DebugForm.UIStatus := duiTest;
+  ActiveKmnKeyboardEditor.DebugForm.UIStatus := duiTest;
 end;
 
 procedure TmodActionsKeyboardEditor.actDebugTestModeUpdate(Sender: TObject);
 begin
-  actDebugTestMode.Enabled := (ActiveEditor <> nil);
-  actDebugTestMode.Checked := actDebugTestMode.Enabled and (ActiveEditor.DebugForm.UIStatus = duiTest);
+  actDebugTestMode.Enabled := (ActiveKmnKeyboardEditor <> nil);
+  actDebugTestMode.Checked := actDebugTestMode.Enabled and (ActiveKmnKeyboardEditor.DebugForm.UIStatus = duiTest);
 end;
 
 procedure TmodActionsKeyboardEditor.actDebugViewCallStackExecute(Sender: TObject);
 begin
-  ActiveEditor.DebugStatusForm.Visible := True;
-  ActiveEditor.DebugStatusForm.pagesDebug.ActivePage := ActiveEditor.DebugStatusForm.tabDebugCallStack;
+  ActiveKmnKeyboardEditor.DebugStatusForm.Visible := True;
+  ActiveKmnKeyboardEditor.DebugStatusForm.pagesDebug.ActivePage := ActiveKmnKeyboardEditor.DebugStatusForm.tabDebugCallStack;
 end;
 
 procedure TmodActionsKeyboardEditor.actDebugViewCallStackUpdate(
   Sender: TObject);
 begin
-  actDebugViewCallStack.Enabled := (ActiveEditor <> nil) and ActiveEditor.IsDebugVisible;
+  actDebugViewCallStack.Enabled := (ActiveKmnKeyboardEditor <> nil) and ActiveKmnKeyboardEditor.IsDebugVisible;
 end;
 
 procedure TmodActionsKeyboardEditor.actDebugViewDeadkeysExecute(Sender: TObject);
 begin
-  ActiveEditor.DebugStatusForm.Visible := True;
-  ActiveEditor.DebugStatusForm.pagesDebug.ActivePage := ActiveEditor.DebugStatusForm.tabDebugDeadkeys;
+  ActiveKmnKeyboardEditor.DebugStatusForm.Visible := True;
+  ActiveKmnKeyboardEditor.DebugStatusForm.pagesDebug.ActivePage := ActiveKmnKeyboardEditor.DebugStatusForm.tabDebugDeadkeys;
 end;
 
 procedure TmodActionsKeyboardEditor.actDebugViewDeadkeysUpdate(Sender: TObject);
 begin
-  actDebugViewDeadkeys.Enabled := (ActiveEditor <> nil) and ActiveEditor.IsDebugVisible;
+  actDebugViewDeadkeys.Enabled := (ActiveKmnKeyboardEditor <> nil) and ActiveKmnKeyboardEditor.IsDebugVisible;
 end;
 
 procedure TmodActionsKeyboardEditor.actDebugViewDefaultFontExecute(Sender: TObject);
 begin
-  ActiveEditor.DebugForm.UpdateFont(nil);
+  ActiveKmnKeyboardEditor.DebugForm.UpdateFont(nil);
 end;
 
 procedure TmodActionsKeyboardEditor.actDebugViewDefaultFontUpdate(Sender: TObject);
 begin
   actDebugViewDefaultFont.Enabled := IsDebuggerVisible;
   actDebugViewDefaultFont.Checked := actDebugViewDefaultFont.Enabled and
-    ActiveEditor.DebugForm.DefaultFont;
+    ActiveKmnKeyboardEditor.DebugForm.DefaultFont;
 end;
 
 procedure TmodActionsKeyboardEditor.actDebugViewFontExecute(Sender: TObject);
 begin
-  dlgFont.Font := ActiveEditor.DebugForm.memo.Font;
+  dlgFont.Font := ActiveKmnKeyboardEditor.DebugForm.memo.Font;
   if dlgFont.Execute then
-    ActiveEditor.DebugForm.UpdateFont(dlgFont.Font);
+    ActiveKmnKeyboardEditor.DebugForm.UpdateFont(dlgFont.Font);
 end;
 
 procedure TmodActionsKeyboardEditor.actDebugViewFontUpdate(Sender: TObject);
 begin
   actDebugViewFont.Enabled := IsDebuggerVisible;
-  actDebugViewFont.Checked := actDebugViewFont.Enabled and not ActiveEditor.DebugForm.DefaultFont;
+  actDebugViewFont.Checked := actDebugViewFont.Enabled and not ActiveKmnKeyboardEditor.DebugForm.DefaultFont;
 end;
 
 procedure TmodActionsKeyboardEditor.actDebugViewRegressionTestingExecute(Sender: TObject);
 begin
-  ActiveEditor.DebugStatusForm.Visible := True;
-  ActiveEditor.DebugStatusForm.pagesDebug.ActivePage := ActiveEditor.DebugStatusForm.tabDebugRegressionTesting;
+  ActiveKmnKeyboardEditor.DebugStatusForm.Visible := True;
+  ActiveKmnKeyboardEditor.DebugStatusForm.pagesDebug.ActivePage := ActiveKmnKeyboardEditor.DebugStatusForm.tabDebugRegressionTesting;
 end;
 
 procedure TmodActionsKeyboardEditor.actDebugViewRegressionTestingUpdate(Sender: TObject);
 begin
-  actDebugViewRegressionTesting.Enabled := (ActiveEditor <> nil) and ActiveEditor.IsDebugVisible;
+  actDebugViewRegressionTesting.Enabled := (ActiveKmnKeyboardEditor <> nil) and ActiveKmnKeyboardEditor.IsDebugVisible;
 end;
 
 procedure TmodActionsKeyboardEditor.actDebugViewStateExecute(Sender: TObject);
 begin
-  ActiveEditor.DebugStatusForm.Visible := True;
-  ActiveEditor.DebugStatusForm.pagesDebug.ActivePage := ActiveEditor.DebugStatusForm.tabDebugKey;
+  ActiveKmnKeyboardEditor.DebugStatusForm.Visible := True;
+  ActiveKmnKeyboardEditor.DebugStatusForm.pagesDebug.ActivePage := ActiveKmnKeyboardEditor.DebugStatusForm.tabDebugKey;
 end;
 
 procedure TmodActionsKeyboardEditor.actDebugViewStateUpdate(Sender: TObject);
 begin
-  actDebugViewState.Enabled := (ActiveEditor <> nil) and ActiveEditor.IsDebugVisible;
+  actDebugViewState.Enabled := (ActiveKmnKeyboardEditor <> nil) and ActiveKmnKeyboardEditor.IsDebugVisible;
 end;
 
 procedure TmodActionsKeyboardEditor.actDebugViewElementsExecute(Sender: TObject);
 begin
-  ActiveEditor.DebugStatusForm.Visible := True;
-  ActiveEditor.DebugStatusForm.pagesDebug.ActivePage := ActiveEditor.DebugStatusForm.tabDebugStores;
+  ActiveKmnKeyboardEditor.DebugStatusForm.Visible := True;
+  ActiveKmnKeyboardEditor.DebugStatusForm.pagesDebug.ActivePage := ActiveKmnKeyboardEditor.DebugStatusForm.tabDebugStores;
 end;
 
 procedure TmodActionsKeyboardEditor.actDebugViewElementsUpdate(Sender: TObject);
 begin
-  actDebugViewElements.Enabled := (ActiveEditor <> nil) and ActiveEditor.IsDebugVisible;
+  actDebugViewElements.Enabled := (ActiveKmnKeyboardEditor <> nil) and ActiveKmnKeyboardEditor.IsDebugVisible;
 end;
 
 { ---- Keyboard Menu ---- }
@@ -449,13 +464,13 @@ begin
 
   frmMessages.Clear;   // I4686
 
-  if ActiveEditor <> nil then
+  if ActiveKmnKeyboardEditor <> nil then
   begin
-    if not ActiveEditor.PrepareForBuild(DebugReset) then
+    if not ActiveKmnKeyboardEditor.PrepareForBuild(DebugReset) then
       Exit;
 
-    if (ActiveProjectFile.UI as TProjectFileUI).DoAction(pfaCompile, False) and DebugReset then   // I4686
-      ActiveEditor.StartDebugging;
+    if (ActiveKmnKeyboardProjectFile.UI as TProjectFileUI).DoAction(pfaCompile, False) and DebugReset then   // I4686
+      ActiveKmnKeyboardEditor.StartDebugging;
   end
   else if ActivePackageEditor <> nil then
   begin
@@ -469,7 +484,7 @@ procedure TmodActionsKeyboardEditor.actKeyboardCompileUpdate(Sender: TObject);
 begin
   // TODO: Split Keyboard menu and package editor functions
   actKeyboardCompile.Enabled :=
-    (ActiveEditor <> nil) or
+    (ActiveKmnKeyboardEditor <> nil) or
     (ActivePackageEditor <> nil) or
     ((frmKeymanDeveloper.ActiveChild is TfrmProject) and (FGlobalProject <> nil));
 
@@ -478,38 +493,38 @@ begin
     else actKeyboardCompile.ShortCut := scNone;
 
   frmKeymanDeveloper.mnuKeyboard.Visible := True;
-  frmKeymanDeveloper.mnuDebug.Visible := ActiveEditor <> nil;
+  frmKeymanDeveloper.mnuDebug.Visible := ActiveKmnKeyboardEditor <> nil;
 end;
 
 procedure TmodActionsKeyboardEditor.actKeyboardFontHelperExecute(
   Sender: TObject);
 begin
-  (ActiveProjectFile.UI as TProjectFileUI).DoAction(pfaFontHelper, False)   // I4687
+  (ActiveKmnKeyboardProjectFile.UI as TProjectFileUI).DoAction(pfaFontHelper, False)   // I4687
 end;
 
 procedure TmodActionsKeyboardEditor.actKeyboardFontsExecute(Sender: TObject);   // I4057
 begin
-  (ActiveProjectFile.UI as TProjectFileUI).DoAction(pfaFontDialog, False);   // I4687
+  (ActiveKmnKeyboardProjectFile.UI as TProjectFileUI).DoAction(pfaFontDialog, False);   // I4687
 end;
 
 procedure TmodActionsKeyboardEditor.actKeyboardIncludeDebugInformationExecute(Sender: TObject);
 begin
-  (ActiveProjectFile.UI as TkmnProjectFileUI).Debug := not (ActiveProjectFile.UI as TkmnProjectFileUI).Debug;   // I4687
+  (ActiveKmnKeyboardProjectFile.UI as TkmnProjectFileUI).Debug := not (ActiveKmnKeyboardProjectFile.UI as TkmnProjectFileUI).Debug;   // I4687
 end;
 
 procedure TmodActionsKeyboardEditor.actKeyboardIncludeDebugInformationUpdate(
   Sender: TObject);
 begin
-  actKeyboardIncludeDebugInformation.Enabled := ActiveEditor <> nil;
-  if (ActiveEditor <> nil) and (ActiveProjectFile <> nil)
-    then actKeyboardIncludeDebugInformation.Checked := (ActiveProjectFile.UI as TkmnProjectFileUI).Debug   // I4687
+  actKeyboardIncludeDebugInformation.Enabled := ActiveKmnKeyboardEditor <> nil;
+  if (ActiveKmnKeyboardEditor <> nil) and (ActiveKmnKeyboardProjectFile <> nil)
+    then actKeyboardIncludeDebugInformation.Checked := (ActiveKmnKeyboardProjectFile.UI as TkmnProjectFileUI).Debug   // I4687
     else actKeyboardIncludeDebugInformation.Checked := False;
 end;
 
 procedure TmodActionsKeyboardEditor.actKeyboardInstallExecute(Sender: TObject);
 begin
   try
-    (ActiveProjectFile.UI as TProjectFileUI).DoAction(pfaInstall, False);   // I4687
+    (ActiveKmnKeyboardProjectFile.UI as TProjectFileUI).DoAction(pfaInstall, False);   // I4687
     //WideShowMessage('Keyboard installed successfully.');
   except
     on E:EOleException do // I654
@@ -521,20 +536,20 @@ end;
 
 procedure TmodActionsKeyboardEditor.actKeyboardTestExecute(Sender: TObject);
 begin
-  ActiveEditor.DebugForm.UIStatus := duiTest;
-  ActiveEditor.StartDebugging(True);
+  ActiveKmnKeyboardEditor.DebugForm.UIStatus := duiTest;
+  ActiveKmnKeyboardEditor.StartDebugging(True);
 end;
 
 procedure TmodActionsKeyboardEditor.actKeyboardTestKeymanWebExecute(
   Sender: TObject);
 begin
-  (ActiveProjectFile.UI as TProjectFileUI).DoAction(pfaTestKeymanWeb, False);   // I4687
+  (ActiveKmnKeyboardProjectFile.UI as TProjectFileUI).DoAction(pfaTestKeymanWeb, False);   // I4687
 end;
 
 procedure TmodActionsKeyboardEditor.actKeyboardUninstallExecute(Sender: TObject);
 begin
   try
-    if (ActiveProjectFile.UI as TProjectFileUI).DoAction(pfaUninstall, False)
+    if (ActiveKmnKeyboardProjectFile.UI as TProjectFileUI).DoAction(pfaUninstall, False)
       then ShowMessage('Keyboard uninstalled successfully.')
       else ShowMessage('Failed to uninstall keyboard.');
   except
@@ -547,19 +562,19 @@ end;
 
 function TmodActionsKeyboardEditor.IsDebuggerInTestMode: Boolean;
 begin
-  Result := (ActiveEditor <> nil) and (ActiveEditor.DebugForm.UIStatus = duiTest);
+  Result := (ActiveKmnKeyboardEditor <> nil) and (ActiveKmnKeyboardEditor.DebugForm.UIStatus = duiTest);
 end;
 
 function TmodActionsKeyboardEditor.IsDebuggerVisible: Boolean;
 begin
-  Result := (ActiveEditor <> nil) and ActiveEditor.IsDebugVisible;
+  Result := (ActiveKmnKeyboardEditor <> nil) and ActiveKmnKeyboardEditor.IsDebugVisible;
 end;
 
 procedure TmodActionsKeyboardEditor.SelectDebugSystemKeyboard(k: TSystemKeyboardItem);
 begin
 //TODO: #1225, #1074 (note both menu item and toolbar combo are hidden while this is not working)
 //  if IsDebuggerVisible then   // I3655
-//    ActiveEditor.DebugForm.SetSystemKeyboardID(k.KeyboardID);
+//    ActiveKmnKeyboardEditor.DebugForm.SetSystemKeyboardID(k.KeyboardID);
 end;
 
 end.

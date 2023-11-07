@@ -563,6 +563,10 @@
         <DCCReference Include="project\Keyman.Developer.System.Project.xmlLdmlProjectFile.pas"/>
         <DCCReference Include="project\Keyman.Developer.System.Project.xmlLdmlProjectFileAction.pas"/>
         <DCCReference Include="project\Keyman.Developer.UI.Project.xmlLdmlProjectFileUI.pas"/>
+        <DCCReference Include="child\Keyman.Developer.UI.UfrmLdmlKeyboardEditor.pas">
+            <Form>frmLdmlKeyboardEditor</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
         <None Include="Profiling\AQtimeModule1.aqt"/>
         <BuildConfiguration Include="Debug">
             <Key>Cfg_2</Key>
