@@ -526,7 +526,7 @@ div.android div.kmw-keytip-cap {
 .kmw-wait-graphic{width:100%;min-height:19px;background:url('ajax-loader.gif') no-repeat;background-position:center top;}
 .kmw-alert-text{margin:10px;white-space:default;font-family:Arial,sans-serif;}
 
-.kmw-spacebar-caption{font:0.6em Arial !important;color:rgba(0,0,0,0.25);}
+.kmw-spacebar-caption{font:1em Arial !important;color:rgba(0,0,0,0.25);}
 
 /* Probably best to make this its own CSS that can be optionally included? */
 @media (prefers-color-scheme: dark) {
