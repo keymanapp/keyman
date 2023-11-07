@@ -22,7 +22,7 @@ import { GestureParams } from '../specsForLayout.js';
  * displayed, selection of the subkey is inherently asynchronous.
  */
 export default class SubkeyPopup implements GestureHandler {
-  readonly directlyEmitsKeys = false;
+  readonly directlyEmitsKeys = true;
 
   public readonly element: HTMLDivElement;
   public readonly shim: HTMLDivElement;
@@ -57,6 +57,14 @@ export default class SubkeyPopup implements GestureHandler {
     source.on('complete', () => {
       this.currentSelection?.key.highlight(false);
       this.clear();
+    });
+
+    source.on('stage', () => {
+      const key = this.currentSelection;
+      const keyEvent = vkbd.keyEventFromSpec(key.key.spec);
+      keyEvent.keyDistribution = this.currentStageKeyDistribution();
+
+      vkbd.raiseKeyEvent(keyEvent, key);
     });
 
     // From here, we want to make decisions based on only the subkey-menu portion of the gesture path.
