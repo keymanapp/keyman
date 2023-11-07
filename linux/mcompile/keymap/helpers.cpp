@@ -833,4 +833,3 @@ bool get_US_Keysym_From_OtherKeysym(v_str_3D &All_Vector, int inOther, int &OutU
   MyCoutW(L"  #### get_US_Char_FromOther of keymap ended", 1);
   return true;
 }*/
-
