@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 17.0.207 alpha 2023-11-07
+
+* refactor(web): Link to `index.html` in test pages (#9953)
+* feat(developer): Add more non-printing characters (#9846)
+
 ## 17.0.206 alpha 2023-11-06
 
 * chore(developer): remove compile.pas and CompileErrorCodes.pas (#9924)
