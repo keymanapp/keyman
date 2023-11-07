@@ -1,0 +1,22 @@
+/***
+   Keyman Engine for Android
+   Copyright 2023 SIL International
+***/
+
+/*
+  imagebanner.css: CSS for theming image banner (separate from KeymanWeb assets).
+  Image banner can be themed with .svg file
+*/
+
+.phone.android .kmw-banner-image {
+  /*background-color: #000; /* Or make this white? */
+  background-image: url('svg/white_banner.svg');
+  position:absolute;
+}
+
+.tablet.android .kmw-banner-image {
+  background-color: #b4b4b8;
+  position:relative;
+  height: 100%;
+  width: 100%;  
+}

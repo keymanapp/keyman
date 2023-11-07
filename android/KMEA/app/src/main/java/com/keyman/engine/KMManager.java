@@ -313,6 +313,9 @@ public final class KMManager {
   protected static final String KMFilename_Osk_Ttf_Font = "keymanweb-osk.ttf";
   protected static final String KMFilename_JSPolyfill = "es6-shim.min.js";
 
+  // CSS for image banner theming
+  protected static final String KMFilename_ImageBannerCss = "imagebanner.css";
+
   // Deprecated by KeyboardController.KMFilename_Installed_KeyboardsList
   public static final String KMFilename_KeyboardsList = "keyboards_list.dat";
 
@@ -847,6 +850,9 @@ public final class KMManager {
       // Copy default keyboard font
       copyAsset(context, KMDefault_KeyboardFont, "", true);
       copyAsset(context, KMFilename_JSPolyfill, "", true);
+
+      // Copy image banner css
+      copyAsset(context, KMFilename_ImageBannerCss, "", true);
 
       // SVG directory for banner themes
       File svgDir = new File(getSVGDir());

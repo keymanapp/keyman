@@ -136,6 +136,7 @@ export class ImageBanner extends Banner {
       console.log("Loading img with src '" + imagePath + "'");
     }
     this.img = document.createElement('img');
+    this.img.className = "kmw-banner-image";
     this.img.setAttribute('src', imagePath);
     let ds = this.img.style;
     ds.width = '100%';
