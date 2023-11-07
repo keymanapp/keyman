@@ -16,8 +16,7 @@
 
 const LPCTSTR SFolderKeymanRoot = TEXT("\\Keyman");
 
-unsigned int
-EnginePostInstall(MSIHANDLE hInstall) {
+extern "C" __declspec(dllexport) unsigned int EnginePostInstall(MSIHANDLE hInstall) {
   HANDLE hFile;
 
   // Find %appdata% path
@@ -36,7 +35,7 @@ EnginePostInstall(MSIHANDLE hInstall) {
       }
     }
 
-    // Create file
+    // Create file handle
     hFile = CreateFile(path, READ_CONTROL | WRITE_DAC, 0, NULL, OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS, NULL);
     if (hFile == INVALID_HANDLE_VALUE) {
       DWORD errorCode    = GetLastError();
@@ -83,7 +82,6 @@ EnginePostInstall(MSIHANDLE hInstall) {
   return ERROR_SUCCESS;
 }
 
-unsigned int
-PreUninstall() {
+extern "C" __declspec(dllexport) unsigned int PreUninstall() {
   return 1;
 }
