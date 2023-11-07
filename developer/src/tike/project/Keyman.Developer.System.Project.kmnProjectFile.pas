@@ -1,18 +1,18 @@
 (*
   Name:             Keyman.Developer.System.Project.kmnProjectFile
   Copyright:        Copyright (C) SIL International.
-  Documentation:    
-  Description:      
+  Documentation:
+  Description:
   Create Date:      1 Aug 2006
 
   Modified Date:    24 Aug 2015
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
+  Bugs:
+  Todo:
+  Notes:
   History:          01 Aug 2006 - mcdurdin - Add loading and saving from XML
                     23 Aug 2006 - mcdurdin - Add CompileKeyboardToWeb function
                     28 Sep 2006 - mcdurdin - Editions
@@ -47,7 +47,7 @@
                     03 Aug 2015 - mcdurdin - I4823 - Note in compile log if symbols are included in build
                     24 Aug 2015 - mcdurdin - I4865 - Add treat hints and warnings as errors into project
                     24 Aug 2015 - mcdurdin - I4866 - Add warn on deprecated features to project and compile
-                    
+
 *)
 unit Keyman.Developer.System.Project.kmnProjectFile;  // I3306   // I4687   // I4688   // I4692
 
@@ -73,7 +73,6 @@ type
     FHeader_Copyright: WideString;
     FTargets: TKeymanTargets;
     FKVKFileName: string;
-    FWarnAsError: Boolean;   // I4706
 
     function GetOutputFilename: string;
     function GetTargetFilename: string;
@@ -85,13 +84,12 @@ type
     property KVKFileName: string read FKVKFileName;
     property IsDebug: Boolean read FDebug;
   public
-    procedure Load(node: IXMLNode; LoadState: Boolean); override;   // I4698
-    procedure Save(node: IXMLNode; SaveState: Boolean); override;   // I4698
+    procedure Load(node: IXMLNode); override;   // I4698
+    procedure Save(node: IXMLNode); override;   // I4698
     procedure LoadState(node: IXMLNode); override;   // I4698
     procedure SaveState(node: IXMLNode); override;   // I4698
 
     property Debug: Boolean read FDebug write FDebug;
-    property WarnAsError: Boolean read FWarnAsError write FWarnAsError;   // I4706
 
     property OutputFilename: string read GetOutputFilename;
     property TargetFilename: string read GetTargetFilename;
@@ -119,15 +117,13 @@ uses
  - TkmnProjectFile                                                             -
  -------------------------------------------------------------------------------}
 
-procedure TkmnProjectFile.Save(node: IXMLNode; SaveState: Boolean);   // I4698
+procedure TkmnProjectFile.Save(node: IXMLNode);   // I4698
 begin
-  inherited Save(node, SaveState);   // I4698
+  inherited Save(node);   // I4698
   node := node.AddChild('Details');
   if FHeader_Name <> '' then node.AddChild('Name').NodeValue := FHeader_Name;
   if FHeader_Copyright <> '' then node.AddChild('Copyright').NodeValue := FHeader_Copyright;
   if FHeader_Message <> '' then node.AddChild('Message').NodeValue := FHeader_Message;
-
-  if SaveState then node.AddChild('Debug').NodeValue := FDebug;   // I4698
 end;
 
 procedure TkmnProjectFile.SaveState(node: IXMLNode);   // I4698
@@ -136,22 +132,15 @@ begin
   node.AddChild('Debug').NodeValue := FDebug;
 end;
 
-procedure TkmnProjectFile.Load(node: IXMLNode; LoadState: Boolean);   // I4698
+procedure TkmnProjectFile.Load(node: IXMLNode);   // I4698
 begin
-  inherited Load(node, LoadState);
+  inherited Load(node);
 
   if node.ChildNodes.IndexOf('Details') < 0 then Exit;
   node := node.ChildNodes['Details'];
   if node.ChildNodes.IndexOf('Name') >= 0 then FHeader_Name := VarToWideStr(node.ChildValues['Name']);
   if node.ChildNodes.IndexOf('Copyright') >= 0 then FHeader_Copyright := VarToWideStr(node.ChildValues['Copyright']);
   if node.ChildNodes.IndexOf('Message') >= 0 then FHeader_Message := VarToWideStr(node.ChildValues['Message']);
-
-  if LoadState then
-  try
-    if node.ChildNodes.IndexOf('Debug') >= 0 then FDebug := node.ChildValues['Debug'];
-  except
-    FDebug := False;
-  end;
 end;
 
 procedure TkmnProjectFile.LoadState(node: IXMLNode);   // I4698

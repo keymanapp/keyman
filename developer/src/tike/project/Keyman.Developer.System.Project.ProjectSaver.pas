@@ -136,7 +136,7 @@ begin
   begin
     node := root.AddChild('Files');
     for i := 0 to FProject.Files.Count - 1 do
-      FProject.Files[i].Save(node.AddChild('File'), False);
+      FProject.Files[i].Save(node.AddChild('File'));
   end;
 
   if FFileName <> '' then

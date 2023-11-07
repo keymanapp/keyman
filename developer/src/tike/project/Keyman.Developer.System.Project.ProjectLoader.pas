@@ -100,6 +100,7 @@ var
   doc: IXMLDocument;
   node, root: IXMLNode;
   pf: TProjectFile;
+  hasUserState: Boolean;
 begin
   try
     doc := LoadXMLDocument(FFileName);
@@ -107,6 +108,8 @@ begin
     on E:Exception do
       raise EProjectLoader.Create('Error loading project file: '+E.Message);
   end;
+
+  hasUserState := FileExists(ChangeFileExt(FFileName, Ext_ProjectSourceUser));
 
   root := doc.DocumentElement;
   if root.NodeName <> 'KeymanDeveloperProject' then
@@ -164,7 +167,9 @@ begin
         begin
           // I1152 - Avoid crashes when .kpj file is invalid
           pf := CreateProjectFile(FProject, ExpandFileNameClean(FFileName, node.ChildValues['Filepath']), nil);
-          pf.Load(node, True);
+          pf.Load(node);
+          if not hasUserState then
+            pf.LoadState(node);
         end;
       end;
     end;
@@ -181,7 +186,9 @@ begin
         n := FProject.Files.IndexOfID(node.ChildValues['ParentFileID']);
         if n < 0 then Continue;
         pf := CreateProjectFile(FProject, ExpandFileNameClean(FFileName, node.ChildValues['Filepath']), FProject.Files[n]);
-        pf.Load(node, True);
+        pf.Load(node);
+        if not hasUserState then
+          pf.LoadState(node);
       end;
     end;
 
