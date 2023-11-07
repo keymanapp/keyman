@@ -404,6 +404,7 @@ begin
   if Command = 'fileaddnew' then
   begin
     { create a new file, add it to the project }
+    Assert(FGlobalProject.Options.Version = pv10);
     with TfrmNewFileDetails.Create(Self) do
     try
       BaseFileName := FGlobalProject.FileName;
@@ -421,6 +422,7 @@ begin
   else if Command = 'fileaddexisting' then
   begin
     { locate an existing file, add it to the project }
+    Assert(FGlobalProject.Options.Version = pv10);
     FFileType := FileTypeFromParamType;
 
     dlgOpenFile.Filter := GetFileTypeFilter(FFileType, FDefaultExtension);
@@ -479,6 +481,7 @@ begin
   end
   else if Command = 'removefile' then
   begin
+    Assert(FGlobalProject.Options.Version = pv10);
     pf := SelectedProjectFile;
     if Assigned(pf) then
     begin
