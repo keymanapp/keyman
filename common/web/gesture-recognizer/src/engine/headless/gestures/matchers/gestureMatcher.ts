@@ -421,6 +421,7 @@ export class GestureMatcher<Type, StateToken = any> implements PredecessorMatch<
       }
     }
 
+    contactModel.update();
     // Now that we've done the initial-state check, we can check for instantly-matching path models.
     contactModel.promise.then((resolution) => {
       this.finalize(resolution.type == 'resolve', resolution.cause);
