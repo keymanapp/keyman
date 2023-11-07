@@ -24,8 +24,8 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
   public static Context context;
   private KMTextView textView;
 
-  // Paths relative to assets folder for banner themes
-  private static String BANNER_THEME_GREEN = "svg/green_banner.svg";
+  // Paths relative to assets folder for banner themes. Change this for custom banner
+  private static String BANNER_THEME_KMSAMPLE1 = "svg/green_banner.svg";
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -58,7 +58,6 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
     KMManager.addKeyboard(this, kbInfo);
 
     // Add a dictionary
-    /*
     HashMap<String, String>lexicalModelInfo = new HashMap<String, String>();
     lexicalModelInfo.put(KMManager.KMKey_PackageID, "example.ta.wordlist");
     lexicalModelInfo.put(KMManager.KMKey_LanguageID, "ta");
@@ -67,7 +66,6 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
     lexicalModelInfo.put(KMManager.KMKey_LexicalModelVersion, "1.0");
     KMManager.addLexicalModel(context, lexicalModelInfo);
     KMManager.registerAssociatedLexicalModel("ta");
-     */
   }
 
   @Override
@@ -129,9 +127,10 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
   public void onKeyboardShown() {
     // Handle Keyman keyboard shown event here if needed
 
-    // Set the in-app banner image here. Doesn't work in KMManager.init
-    KMManager.setBannerImage(KeyboardType.KEYBOARD_TYPE_INAPP, BANNER_THEME_GREEN);
-    KMManager.setBanner(KeyboardType.KEYBOARD_TYPE_INAPP, KMManager.BannerType.IMAGE);
+    // Uncomment these lines if the app doesn't use a dictionary
+    // and wants to set the in-app banner image here.
+    //KMManager.setBannerImage(KeyboardType.KEYBOARD_TYPE_INAPP, BANNER_THEME_KMSAMPLE1);
+    //KMManager.setBanner(KeyboardType.KEYBOARD_TYPE_INAPP, KMManager.BannerType.IMAGE);
   }
 
   @Override

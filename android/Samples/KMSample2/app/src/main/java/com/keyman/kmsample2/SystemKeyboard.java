@@ -27,10 +27,8 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
   private static View inputView = null;
   private KMHardwareKeyboardInterpreter interpreter = null;
 
-  // Theme for light-blue banner. Replace the string with your custom theme by uploading a color image to https://elmah.io/tools/base64-image-encoder/
-  public static final String KM_BANNER_THEME_KMSAMPLE2 =
-    "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAYYAAAAaCAYAAACzU/tpAAAABHNCSVQICAgIfAhkiAAAABl0RVh0U29mdHdhcmUAZ25vbWUtc2NyZWVuc2hvdO8Dvz4AAAAtdEVYdENyZWF0aW9uIFRpbWUAVGh1IDI2IE9jdCAyMDIzIDA5OjMwOjI5IEFNICswN6UZZDEAAAB5SURBVHic7dUxAYAwAMCwMbdTiA8MsWdPFcCRKOjXa93POwDgmF8HAPAvxgBAGAMAYQwAhDEAEMYAQBgDAGEMAIQxABDGAEAYAwBhDACEMQAQxgBAGAMAYQwAhDEAEMYAQBgDAGEMAIQxABDGAEAYAwBhDACEMQAQGyB8AyU9yxQXAAAAAElFTkSuQmCC";
-
+  // Paths relative to assets folder for banner themes. Change this for custom banner
+  public static final String BANNER_THEME_KMSAMPLE2 = "svg/green_banner.svg";
 
   /**
    * Main initialization of the input method component. Be sure to call
@@ -75,7 +73,7 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
 
     // Uncomment these two lines if keyboard doesn't use a dictionary.
     // The suggestion banner is replaced with this color.
-    //KMManager.setBannerImage(KeyboardType.KEYBOARD_TYPE_SYSTEM, KM_BANNER_THEME_KMSAMPLE2);
+    //KMManager.setBannerImage(KeyboardType.KEYBOARD_TYPE_SYSTEM, BANNER_THEME_KMSAMPLE2);
     //KMManager.setBanner(KeyboardType.KEYBOARD_TYPE_SYSTEM, KMManager.BannerType.IMAGE);
   }
 

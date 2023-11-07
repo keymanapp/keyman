@@ -36,7 +36,6 @@ import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
-import android.os.health.SystemHealthManager;
 import android.text.InputType;
 import android.util.Log;
 import android.view.HapticFeedbackConstants;
@@ -1423,7 +1422,7 @@ public final class KMManager {
    * @return boolean - Success
    */
   public static boolean setBannerOptions(boolean mayPredict) {
-    String url = KMString.format("setBannerOptions(%b)", mayPredict); // TODO?
+    String url = KMString.format("setBannerOptions(%b)", mayPredict);
     if (InAppKeyboard != null) {
       InAppKeyboard.loadJavascript(url);
     }
