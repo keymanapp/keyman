@@ -4,7 +4,6 @@
 
 int write_US_ToVector( v_dw_3D &vec,std::string language, const char* text) {
 
-  // _S2 relative path !!
   std::string FullPathName = "/usr/share/X11/xkb/symbols/" + language;
 
   const char* path = FullPathName.c_str();
@@ -402,7 +401,7 @@ KMX_DWORD get_VirtualKey_US_From_SC(KMX_DWORD SC , v_dw_3D &All_Vector){
       return All_Vector[0][i][1] ;
     }
   }
-  return 0;    //_S2 what do I return if not found??
+  return 0;    //_S2 TODO what do I return if not found??
 }
 
 // return the Scancode of for given VirtualKey of Other Keyboard
@@ -413,7 +412,7 @@ KMX_DWORD get_SC_From_VirtualKey_Other(KMX_DWORD VK_Other , v_dw_3D &All_Vector)
       return All_Vector[1][i][0] ;
     }
   }
-  return 0;    //_S2 what do I return if not found??
+  return 0;    //_S2 TODO what do I return if not found??
 }
 
 // return the Scancode of for given VirtualKey of Other US
@@ -424,7 +423,7 @@ KMX_DWORD get_SC_From_VirtualKey_US(KMX_DWORD VK_US , v_dw_3D &All_Vector){
       return All_Vector[0][i][0] ;
     }
   }
-  return 0;    //_S2 what do I return if not found??
+  return 0;    //_S2 TODO what do I return if not found??
 }
 
 // returns the position in All_Vector where VK_Other is found
@@ -450,7 +449,7 @@ KMX_DWORD get_position_From_VirtualKey_Other(KMX_DWORD VK_Other , v_dw_3D &All_V
       }
   }
 
-  return 0;    //_S2 what do I return if not found??
+  return 0;    //_S2 TODO what do I return if not found??
 
 }
 

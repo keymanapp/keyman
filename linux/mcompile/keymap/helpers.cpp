@@ -782,3 +782,55 @@ gdk_keyval_convert_case (*gg1,    &lower,&upper);
     return L"0";
 }
 
+/*
+bool  write_rgKey_ToFile(std::vector<KMX_VirtualKey*> rgKey ){
+  std::string RGKey_FileName="/Projects/keyman/keyman/linux/mcompile/keymap/rgKey_lin.txt";
+
+  std::wofstream TxTFile(RGKey_FileName);
+  for ( int i=0; i< rgKey.size();i++) {
+    if(rgKey[i] != NULL) {
+        TxTFile << rgKey[i]->VK() << "-" << rgKey[i]->SC()<< " -> ( " << rgKey[i]->KMX_GetShiftState(Base, 0) << "-" << rgKey[i]->KMX_GetShiftState(Base, 1) << " )"
+        << " *-* ( " << rgKey[i]->KMX_GetShiftState(Shft, 0) << "-" << rgKey[i]->KMX_GetShiftState(Shft, 1) << " )";
+        TxTFile << "\n";
+    }
+  }
+  TxTFile.close();
+  return true;
+}
+
+
+
+
+  // _S2 can go later: check if all correct
+  /*write_rgKey_ToFile(rgKey)  ;
+  v_dw_2D  V_lin,V_win,V_map;
+  write_RGKEY_FileToVector(V_lin, "rgKey_lin.txt");
+  write_RGKEY_FileToVector(V_win, "rgKey_Win.txt");
+  write_RGKEY_FileToVector(V_map, "map.txt");
+  CompareVector_To_VectorOfFile_RGKEY( V_win, V_lin,V_map);*/
+
+
+
+
+/*   // _S2 maybe not needed
+bool get_US_Keysym_From_OtherKeysym(v_str_3D &All_Vector, int inOther, int &OutUS){
+
+  MyCoutW(L"  #### get_US_Char_FromOther of keymap started", 1);
+  // loop and find char in Other; then find char of US
+  for( int i=0; i< All_Vector[1].size();i++) {
+    for( int j=1; j< (int)All_Vector[1][0].size();j++) {
+
+      int KeysymUS = (int) *All_Vector[0][i][j].c_str();
+      int KeysymOther  = (int) *All_Vector[1][i][j].c_str();
+      std::wstring KeysymUS_wstr = wstring_from_string(All_Vector[1][i][j]);
+
+      if( inOther == KeysymOther ) {
+          OutUS = KeysymUS;
+        return true;
+      }
+    }
+  }
+  MyCoutW(L"  #### get_US_Char_FromOther of keymap ended", 1);
+  return true;
+}*/
+

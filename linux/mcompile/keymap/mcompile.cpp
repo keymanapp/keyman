@@ -1410,27 +1410,3 @@ wprintf(L"    in Us   %i  and KeysymsUS %i : \n",   inUS ,KeysymUS  );
 }
 */
 
-
-
-/*   // _S2 maybe not needed
-bool get_US_Keysym_From_OtherKeysym(v_str_3D &All_Vector, int inOther, int &OutUS){
-
-  MyCoutW(L"  #### get_US_Char_FromOther of keymap started", 1);
-  // loop and find char in Other; then find char of US
-  for( int i=0; i< All_Vector[1].size();i++) {
-    for( int j=1; j< (int)All_Vector[1][0].size();j++) {
-
-      int KeysymUS = (int) *All_Vector[0][i][j].c_str();
-      int KeysymOther  = (int) *All_Vector[1][i][j].c_str();
-      std::wstring KeysymUS_wstr = wstring_from_string(All_Vector[1][i][j]);
-
-      if( inOther == KeysymOther ) {
-          OutUS = KeysymUS;
-        return true;
-      }
-    }
-  }
-  MyCoutW(L"  #### get_US_Char_FromOther of keymap ended", 1);
-  return true;
-}*/
-

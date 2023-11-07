@@ -144,6 +144,8 @@ public:
     //                                                  distinguish between left- and right-hand keys.
     //                                                  If there is no translation, the function returns 0.
     //                                                  SC -> VK
+    //_S2 QUESTION I tried to use gdk_translate-function in get_VirtualKey_Other_From_SC_GDK_dw which was not possible so I use a setter afterwards
+    //_S2 QUESTION  Wy did it give me an error?
     this->m_vk = get_VirtualKey_Other_From_SC(scanCode, All_Vector);
    // this->m_vk = get_VirtualKey_Other_From_SC_NEW(scanCode, All_Vector, keymap, scanCode,scanCode);
     //this->m_vk = get_VirtualKey_Other_From_SC_GDK_dw( All_Vector, keymap, scanCode,scanCode);  // use gdk to get vk`s
@@ -573,21 +575,7 @@ int KMX_GetMaxDeadkeyIndex(KMX_WCHAR *p) {
   return n;
 }
 
-// _S2 has to go !!
-bool  write_rgKey_ToFile(std::vector<KMX_VirtualKey*> rgKey ){
-  std::string RGKey_FileName="/Projects/keyman/keyman/linux/mcompile/keymap/rgKey_lin.txt";
 
-  std::wofstream TxTFile(RGKey_FileName);
-  for ( int i=0; i< rgKey.size();i++) {
-    if(rgKey[i] != NULL) {
-        TxTFile << rgKey[i]->VK() << "-" << rgKey[i]->SC()<< " -> ( " << rgKey[i]->KMX_GetShiftState(Base, 0) << "-" << rgKey[i]->KMX_GetShiftState(Base, 1) << " )"
-        << " *-* ( " << rgKey[i]->KMX_GetShiftState(Shft, 0) << "-" << rgKey[i]->KMX_GetShiftState(Shft, 1) << " )";
-        TxTFile << "\n";
-    }
-  }
-  TxTFile.close();
-  return true;
-}
 
 bool is_Letter(int pos, v_dw_3D & All_Vector){
   if( ( All_Vector[1][pos][1] == All_Vector[1][pos][2] + 32)  )
@@ -852,15 +840,6 @@ UINT pp = (UINT) All_Vector[1][Keypos][0];
     }
   }
 
-
-
-  // _S2 can go later: check if all correct
-  /*write_rgKey_ToFile(rgKey)  ;
-  v_dw_2D  V_lin,V_win,V_map;
-  write_RGKEY_FileToVector(V_lin, "rgKey_lin.txt");
-  write_RGKEY_FileToVector(V_win, "rgKey_Win.txt");
-  write_RGKEY_FileToVector(V_map, "map.txt");
-  CompareVector_To_VectorOfFile_RGKEY( V_win, V_lin,V_map);*/
 
   //std::vector< int > TestValues = {48,49,50,52,53,54,55,56,57,54,65,89,189,188};
   //std::vector< int > TestValues = {48,49,50,52,53,54,55,56};
