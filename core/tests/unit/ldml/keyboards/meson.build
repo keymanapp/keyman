@@ -39,6 +39,7 @@ tests_with_testdata = [
   'k_008_transform_norm',
   'k_020_fr', # TODO-LDML: move to cldr above (fix vkey)
   'k_200_reorder_nod_Lana',
+  'k_201_reorder_esk',
   'k_210_marker',
 ]
 

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE keyboardTest3 SYSTEM "../../../../../resources/standards-data/ldml-keyboards/techpreview/dtd/ldmlKeyboardTest3.dtd">
+<keyboardTest3 conformsTo="techpreview">
+  <info keyboard="k_201_reorder_esk.xml" author="Team Keyboard" name="esk-reorder-test" />
+  <tests name="basic">
+    <!-- these are also in C++ form, search for test_reorder_esk -->
+    <test name="1short">
+      <startContext to="" />
+      <keystroke key="a" />
+      <keystroke key="x" />
+      <keystroke key="overbar" />
+      <check result="a\u0305x" />
+    </test>
+    <test name="2longer">
+      <startContext to="" />
+      <keystroke key="a" />
+      <keystroke key="z" />
+      <keystroke key="overbar" />
+      <keystroke key="x" />
+      <keystroke key="underbar" />
+      <check result="a\u0332\u0305xz" />
+    </test>
+  </tests>
+</keyboardTest3>
