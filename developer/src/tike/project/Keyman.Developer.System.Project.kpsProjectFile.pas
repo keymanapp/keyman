@@ -61,6 +61,7 @@ type
     function GetRelativeOrder: Integer; override;
     procedure GetFileParameters; override;
   public
+    function IsCompilable: Boolean; override;
     procedure Load(node: IXMLNode); override;   // I4698
     procedure Save(node: IXMLNode); override;   // I4698
 
@@ -158,6 +159,11 @@ end;
 function TkpsProjectFile.GetTargetInstallerFilename: string;
 begin
   Result := OwnerProject.GetTargetFilename(ChangeFileExt(ExtractFileName(FMSIFileName),'') + '-' + ChangeFileExt(ExtractFileName(OutputFilename), '') + '.exe', Filename, FileVersion);
+end;
+
+function TkpsProjectFile.IsCompilable: Boolean;
+begin
+  Result := True;
 end;
 
 procedure TkpsProjectFile.Load(node: IXMLNode);   // I4698

@@ -560,6 +560,9 @@
         </DCCReference>
         <DCCReference Include="compile\Keyman.Developer.System.KmcWrapper.pas"/>
         <DCCReference Include="project\Keyman.Developer.UI.Project.UpgradeProject.pas"/>
+        <DCCReference Include="project\Keyman.Developer.System.Project.xmlLdmlProjectFile.pas"/>
+        <DCCReference Include="project\Keyman.Developer.System.Project.xmlLdmlProjectFileAction.pas"/>
+        <DCCReference Include="project\Keyman.Developer.UI.Project.xmlLdmlProjectFileUI.pas"/>
         <None Include="Profiling\AQtimeModule1.aqt"/>
         <BuildConfiguration Include="Debug">
             <Key>Cfg_2</Key>

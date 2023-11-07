@@ -282,7 +282,10 @@ uses
   Keyman.Developer.UI.UfrmEditRelatedPackage in 'dialogs\relatedPackages\Keyman.Developer.UI.UfrmEditRelatedPackage.pas' {frmEditRelatedPackage},
   Keyman.Developer.UI.UfrmEditPackageWebFonts in 'dialogs\packageWebFonts\Keyman.Developer.UI.UfrmEditPackageWebFonts.pas' {frmEditPackageWebFonts},
   Keyman.Developer.System.KmcWrapper in 'compile\Keyman.Developer.System.KmcWrapper.pas',
-  Keyman.Developer.UI.Project.UpgradeProject in 'project\Keyman.Developer.UI.Project.UpgradeProject.pas';
+  Keyman.Developer.UI.Project.UpgradeProject in 'project\Keyman.Developer.UI.Project.UpgradeProject.pas',
+  Keyman.Developer.System.Project.xmlLdmlProjectFile in 'project\Keyman.Developer.System.Project.xmlLdmlProjectFile.pas',
+  Keyman.Developer.System.Project.xmlLdmlProjectFileAction in 'project\Keyman.Developer.System.Project.xmlLdmlProjectFileAction.pas',
+  Keyman.Developer.UI.Project.xmlLdmlProjectFileUI in 'project\Keyman.Developer.UI.Project.xmlLdmlProjectFileUI.pas';
 
 {$R *.RES}
 {$R ICONS.RES}

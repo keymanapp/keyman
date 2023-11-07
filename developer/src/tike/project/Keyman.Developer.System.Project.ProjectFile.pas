@@ -265,6 +265,9 @@ type
     constructor Create(AProject: TProject; AFileName: string; AParent: TProjectFile); virtual;
     destructor Destroy; override;
 
+    function IsCompilable: Boolean; virtual;
+    class function IsFileTypeSupported(const Filename: string): Boolean; virtual;
+
     procedure Load(node: IXMLNode); virtual;   // I4698
     procedure LoadState(node: IXMLNode); virtual;   // I4698
     procedure Save(node: IXMLNode); virtual;   // I4698
@@ -569,6 +572,19 @@ begin
     if Result = nil then
       Result := FGlobalProject;
   end;
+end;
+
+function TProjectFile.IsCompilable: Boolean;
+begin
+  Result := False;
+end;
+
+class function TProjectFile.IsFileTypeSupported(
+  const Filename: string): Boolean;
+begin
+  // assumes that if we are registered for the file type extension, then we can
+  // handle the file. For example, .xml LDML keyboards
+  Result := True;
 end;
 
 procedure TProjectFile.Load(node: IXMLNode);   // I4698
@@ -969,7 +985,7 @@ end;
 function IsLMDLKeyboardFile(filename: string): Boolean;
   if EndsText('.xml', filename) then
   begin
-    Result := Pos('ldmlKeyboard.dtd', ReadUtf8FileText(ff)) > 0;
+    Result := Pos('ldmlKeyboard3.dtd', ReadUtf8FileText(ff)) > 0;
   end
   else
     Result := False;

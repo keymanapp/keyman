@@ -86,7 +86,7 @@ var
   node, root: IXMLNode;
   defopts: TProjectOptionsRecord;
 begin
-  if FProject.IsDefaultProject(pv20) then
+  if FProject.IsDefaultProject(pv20) and (FFileName <> '') then
   begin
     if FileExists(FFileName) then
       System.SysUtils.DeleteFile(FFileName);

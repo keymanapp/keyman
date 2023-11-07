@@ -43,6 +43,7 @@ type
 
     property IsDebug: Boolean read FDebug;
   public
+    function IsCompilable: Boolean; override;
     procedure LoadState(node: IXMLNode); override;   // I4698
     procedure SaveState(node: IXMLNode); override;   // I4698
 
@@ -104,6 +105,11 @@ begin
   // which fixes the reference counting.
   FTempFileVersion := FileVersion;
   Result := OwnerProject.GetTargetFilename(OutputFileName, FileName, FTempFileVersion);
+end;
+
+function TmodelTsProjectFile.IsCompilable: Boolean;
+begin
+  Result := True;
 end;
 
 procedure TmodelTsProjectFile.GetFileParameters;

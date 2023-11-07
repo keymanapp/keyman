@@ -84,6 +84,7 @@ type
     property KVKFileName: string read FKVKFileName;
     property IsDebug: Boolean read FDebug;
   public
+    function IsCompilable: Boolean; override;
     procedure Load(node: IXMLNode); override;   // I4698
     procedure Save(node: IXMLNode); override;   // I4698
     procedure LoadState(node: IXMLNode); override;   // I4698
@@ -168,6 +169,11 @@ begin
   // which fixes the reference counting.
   FTempFileVersion := FileVersion;
   Result := OwnerProject.GetTargetFilename(OutputFileName, FileName, FTempFileVersion);
+end;
+
+function TkmnProjectFile.IsCompilable: Boolean;
+begin
+  Result := True;
 end;
 
 procedure TkmnProjectFile.GetFileParameters;
