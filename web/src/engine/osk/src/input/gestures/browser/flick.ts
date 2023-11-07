@@ -27,7 +27,7 @@ function lockedAngleForDir(lockedDir: typeof OrderedFlickDirections[number]) {
   return Math.PI / 4 * OrderedFlickDirections.indexOf(lockedDir);
 }
 
-function calcLockedDistance(pathStats: CumulativePathStats<any>, lockedDir: typeof OrderedFlickDirections[number]) {
+export function calcLockedDistance(pathStats: CumulativePathStats<any>, lockedDir: typeof OrderedFlickDirections[number]) {
   const lockedAngle = lockedAngleForDir(lockedDir);
 
   const deltaX = pathStats.lastSample.targetX - pathStats.initialSample.targetX;
@@ -100,6 +100,7 @@ export default class Flick implements GestureHandler {
   private computedFlickDistribution: KeyDistribution;
   private lockedDir: typeof OrderedFlickDirections[number];
   private lockedSelectable: ActiveSubKey;
+  private flickScroller: (coord: InputSample<KeyElement, any>) => void;
 
   constructor(
     sequence: GestureSequence<KeyElement, string>,
@@ -124,29 +125,34 @@ export default class Flick implements GestureHandler {
       const pathStats = baseSource.path.stats;
       this.computedFlickDistribution = this.flickDistribution(pathStats, true);
 
-      const selection = this.lockedSelectable ?? this.computedFlickDistribution[0].keySpec;
-      if(result.matchedId == 'flick-mid') {
-        if(selection == this.baseSpec) {
+      const baseSelection = this.computedFlickDistribution[0].keySpec;
+      if(result.matchedId == 'flick-mid' || result.matchedId == 'flick-reset') {
+        if(baseSelection == this.baseSpec) {
           sequence.cancel();
           this.cancel();
           return;
         }
 
         const dir = Object.keys(this.baseSpec.flick).find(
-          (dir) => this.baseSpec.flick[dir] == selection
+          (dir) => this.baseSpec.flick[dir] == baseSelection
         ) as typeof OrderedFlickDirections[number];
 
         this.lockedDir = dir;
-        this.lockedSelectable = selection;
+        this.lockedSelectable = baseSelection;
 
         const baseCoord = baseSource.path.coords[0];
-        const flickScroller = buildFlickScroller(baseSource, baseCoord, dir, previewHost, this.gestureParams);
-        flickScroller(baseSource.currentSample);
-        baseSource.path.on('step', flickScroller);
+        if(this.flickScroller) {
+          // Clear any previously-set scroller.
+          baseSource.path.off('step', this.flickScroller);
+        }
+        this.flickScroller = buildFlickScroller(baseSource, baseCoord, dir, previewHost, this.gestureParams);
+        this.flickScroller(baseSource.currentSample);
+        baseSource.path.on('step', this.flickScroller);
 
         return;
       }
 
+      const selection = this.lockedSelectable ?? baseSelection;
       let keyEvent: KeyEvent;
       const projectedDistance = calcLockedDistance(pathStats, this.lockedDir);
       if(projectedDistance < this.gestureParams.flick.dirLockDist) {

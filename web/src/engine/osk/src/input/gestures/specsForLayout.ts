@@ -16,6 +16,8 @@ import OSKLayerGroup from '../../keyboard-layout/oskLayerGroup.js';
 
 import { type KeyElement } from '../../keyElement.js';
 
+import { calcLockedDistance } from './browser/flick.js';
+
 import specs = gestures.specs;
 
 export interface GestureParams {
@@ -226,6 +228,7 @@ export function gestureSetForLayout(layerGroup: OSKLayerGroup, params: GesturePa
   if(layout.hasFlicks) {
     gestureModels.push(withKeySpecFiltering(flickStartModel(params), 0));
     gestureModels.push(flickMidModel(params));
+    gestureModels.push(flickResetModel(params));
     gestureModels.push(flickEndModel(params));
 
     defaultSet.push('flick-start');
@@ -282,19 +285,18 @@ export function flickMidContactModel(params: GestureParams): ContactModel {
     itemPriority: 1,
     pathModel: {
       evaluate: (path, baseStats) => {
-        // Straightness heuristic:  we hard-commit to a direction based on the first stage's
-        // initial direction, allowing only that direction & its immediate neighbors.
-        const directions = [ baseStats.cardinalDirection, path.stats.cardinalDirection ];
-        directions.sort((a, b) => b.length - a.length);
-        // If both directions are intercardinal but not the same intercardinal, reject.
-        if(directions[1].length == 2 && directions[0] != directions[1]) {
-          return 'reject';
-          // index 0 is either length 1 or 2; either way, it should include index 1's char.
-        } else if(directions[0].indexOf(directions[1]) == -1) {
-          return 'reject';
-        }
+        // // Straightness heuristic:  we hard-commit to a direction based on the first stage's
+        // // initial direction, allowing only that direction & its immediate neighbors.
+        // const directions = [ baseStats.cardinalDirection, path.stats.cardinalDirection ];
+        // directions.sort((a, b) => b.length - a.length);
+        // // If both directions are intercardinal but not the same intercardinal, reject.
+        // if(directions[1].length == 2 && directions[0] != directions[1]) {
+        //   return 'reject';
+        //   // index 0 is either length 1 or 2; either way, it should include index 1's char.
+        // } else if(directions[0].indexOf(directions[1]) == -1) {
+        //   return 'reject';
+        // }
 
-        // Remove `path.isComplete` to have an instant-trigger once the distance threshold is reached.
         if(path.stats.netDistance >= params.flick.dirLockDist) {
           // We _could_ add other criteria if desired, such as for straightness.
           // - What's the angle variance look like?
@@ -313,12 +315,14 @@ export function flickEndContactModel(params: GestureParams): ContactModel {
   return {
     itemPriority: 1,
     pathModel: {
-      evaluate: (path) => {
+      evaluate: (path, baseStats) => {
         if(path.isComplete) {
           // The Flick handler class will sort out the mess once the path is complete.
           // Note:  if we wanted auto-triggering once the threshold distance were met,
           // we'd need to move its related logic into this method.
           return 'resolve';
+        } else if(calcLockedDistance(path.stats, baseStats.cardinalDirection as any) < params.flick.dirLockDist) {
+          return 'reject';
         }
       }
     },
@@ -671,6 +675,18 @@ export function flickMidModel(params: GestureParams): GestureModel<any> {
   }
 }
 
+export function flickResetModel(params: GestureParams): GestureModel<any> {
+  const base = flickMidModel(params);
+  return {
+    ...base,
+    id: 'flick-reset',
+    resolutionAction: {
+      type: 'chain',
+      next: 'flick-end'
+    }
+  };
+}
+
 export function flickEndModel(params: GestureParams): GestureModel<any> {
   return {
     id: 'flick-end',
@@ -680,6 +696,12 @@ export function flickEndModel(params: GestureParams): GestureModel<any> {
         model: flickEndContactModel(params)
       },
     ],
+    rejectionActions: {
+      path: {
+        type: 'replace',
+        replace: 'flick-reset'
+      }
+    },
     resolutionAction: {
       type: 'complete',
       item: 'current'
