@@ -106,3 +106,47 @@ export const SubkeySelectModel: ContactModel = {
     }
   }
 }
+
+export const FlickStartThreshold = 5;
+export const FlickStartContactModel: ContactModel = {
+  itemPriority: 1,
+  pathModel: {
+    evaluate: (path) => path.stats.netDistance > FlickStartThreshold ? 'resolve' : null
+  },
+  pathResolutionAction: 'resolve',
+  pathInheritance: 'chop'
+}
+
+export const FlickEndThreshold = 20;
+export const FlickEndContactModel: ContactModel = {
+  itemPriority: 1,
+  pathModel: {
+    evaluate: (path, baseStats) => {
+      if(!baseStats) {
+        throw Error("Missing data for the previous flick stage");
+      }
+
+      // Straightness heuristic:  we hard-commit to a direction based on the first stage's
+      // initial direction, allowing only that direction & its immediate neighbors.
+      const directions = [ baseStats.cardinalDirection, path.stats.cardinalDirection];
+      directions.sort((a, b) => b.length - a.length);
+      // If both directions are intercardinal but not the same intercardinal, reject.
+      if(directions[1].length == 2 && directions[0] != directions[1]) {
+        return 'reject';
+        // index 0 is either length 1 or 2; either way, it should include index 1's char.
+      } else if(directions[0].indexOf(directions[1]) == -1) {
+        return 'reject';
+      }
+
+      // Remove `path.isComplete` to have an instant-trigger once the distance threshold is reached.
+      if(path.isComplete && path.stats.netDistance >= FlickEndThreshold) {
+        // We _could_ add other criteria if desired, such as for straightness.
+        // - What's the angle variance look like?
+        // - or, take a regression & look at the coefficient of determination.
+        return 'resolve';
+      }
+    }
+  },
+  pathResolutionAction: 'resolve',
+  pathInheritance: 'full'
+}
