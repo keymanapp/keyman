@@ -103,6 +103,9 @@ namespace core {
      /** process a typed key */
      void process_key_string(km_core_state *state, const std::u16string &key_str) const;
 
+     /** process a backspace */
+     void process_backspace(km_core_state *state) const;
+
      /**
       * add the string+marker portion of the context to the beginning of str.
       * Stop when a non-string and non-marker is hit.

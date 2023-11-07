@@ -169,6 +169,21 @@ verify_context(std::u16string& text_store, km_core_state* &test_state, std::vect
     km_core_cp *buf = new km_core_cp[n];
     try_status(km_core_context_items_to_utf16(citems, buf, &n));
     std::cout << "context   : " << string_to_hex(buf) << " [" << buf << "]" << std::endl;
+    std::cout << "testcontext ";
+    for (auto i = test_context.begin(); i < test_context.end(); i++) {
+      switch(i->type) {
+        case KM_CORE_CT_CHAR:
+          std::cout << "U+" << std::hex << i->character << std::dec << " ";
+          break;
+        case KM_CORE_CT_MARKER:
+          std::cout << "\\m{" << i->character << "} ";
+          break;
+        default:
+          std::cout << "type#" << i->type << " ";
+      }
+    }
+    std::cout << std::endl;
+    std::cout << "context   : " << string_to_hex(buf) << " [" << buf << "]" << std::endl;
 
     // Verify that both our local test_context and the core's test_state.context have
     // not diverged

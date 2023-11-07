@@ -303,11 +303,19 @@ bool normalize_nfd(std::u16string &str);
  * @return false on failure
  **/
 bool normalize_nfd_markers(std::u32string &str, marker_map &markers);
-/** Normalize a u16string inplace to NFD, retaining markers.
+bool normalize_nfd_markers(std::u16string &str, marker_map &markers);
+inline bool normalize_nfd_markers(std::u32string &str);
+inline bool normalize_nfd_markers(std::u16string &str);
+
+/** Normalize a u32string inplace to NFC, retaining markers.
  * @param markers will be populated with marker chars
  * @return false on failure
  **/
-bool normalize_nfd_markers(std::u16string &str, marker_map &markers);
+bool normalize_nfc_markers(std::u32string &str, marker_map &markers);
+bool normalize_nfc_markers(std::u16string &str, marker_map &markers);
+inline bool normalize_nfc_markers(std::u32string &str);
+inline bool normalize_nfc_markers(std::u16string &str);
+
 /** Normalize a u32string inplace to NFC. @return false on failure */
 bool normalize_nfc(std::u32string &str);
 /** Normalize a u16string inplace to NFC. @return false on failure */
@@ -327,6 +335,26 @@ prepend_marker(std::u32string &str, KMX_DWORD marker) {
   km_core_usv triple[] = {LDML_UC_SENTINEL, LDML_MARKER_CODE, marker};
   str.insert(0, triple, 3);
 }
+
+bool normalize_nfd_markers(std::u16string &str) {
+  marker_map m;
+  return normalize_nfd_markers(str, m);
+}
+
+bool normalize_nfc_markers(std::u16string &str) {
+  marker_map m;
+  return normalize_nfc_markers(str, m);
+}
+bool normalize_nfd_markers(std::u32string &str) {
+  marker_map m;
+  return normalize_nfd_markers(str, m);
+}
+
+bool normalize_nfc_markers(std::u32string &str) {
+  marker_map m;
+  return normalize_nfc_markers(str, m);
+}
+
 
 }  // namespace ldml
 }  // namespace core
