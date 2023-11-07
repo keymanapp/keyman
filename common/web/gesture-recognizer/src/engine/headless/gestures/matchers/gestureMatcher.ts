@@ -422,12 +422,6 @@ export class GestureMatcher<Type, StateToken = any> implements PredecessorMatch<
       }
     }
 
-    // Now that we've done the initial-state check, we can check for instantly-matching path models.
-    const result = contactModel.update();
-    if(result.type == 'reject' && this.model.id == 'modipress-multitap-end') {
-      console.log('temp');
-    }
-
     contactModel.promise.then((resolution) => {
       this.finalize(resolution.type == 'resolve', resolution.cause);
     });
