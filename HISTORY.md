@@ -1,5 +1,13 @@
 # Keyman Version History
 
+## 17.0.208 alpha 2023-11-08
+
+* fix(web): Fix clearing of deadkeys (#9944)
+* fix(web): Ignore `osk-always-visible` on non-desktop devices (#9951)
+* fix(linux): Fix baseline tests (#9967)
+* chore(linux): Fix GHA triggering (#9965)
+* fix(linux): Fix trigger for baseline tests (#9968)
+
 ## 17.0.207 alpha 2023-11-07
 
 * refactor(web): Link to `index.html` in test pages (#9953)
