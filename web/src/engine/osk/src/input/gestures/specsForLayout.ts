@@ -969,7 +969,8 @@ export const ModipressEndModel: GestureModel<any> = {
   resolutionAction: {
     type: 'complete',
     // Key was already emitted from the 'modipress-start' stage.
-    item: 'none'
+    item: 'none',
+    awaitNested: true
   }
 }
 

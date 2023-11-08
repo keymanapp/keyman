@@ -80,7 +80,7 @@ export class MatcherSelector<Type, StateToken = any> extends EventEmitter<EventM
     return this.potentialMatchers.filter((matcher) => matcher.allSourceIds.find((id) => id == source.identifier));
   }
 
-  public cascadeTermination() {
+  public cascadeTermination(): Promise<any> {
     const potentialMatchers = this.potentialMatchers;
     const matchersToCancel = potentialMatchers.filter((matcher) => !matcher.model.sustainWhenNested);
 
@@ -132,6 +132,8 @@ export class MatcherSelector<Type, StateToken = any> extends EventEmitter<EventM
     });
 
     matchersToCancel.forEach((matcher) => matcher.cancel());
+
+    return Promise.all(matchersToPreserve.map((matcher) => matcher.promise));
   }
 
   /**

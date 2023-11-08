@@ -185,7 +185,7 @@ export class GestureSequence<Type, StateToken = any> extends EventEmitter<EventM
       return potentialMatches;
     }
 
-  private readonly selectionHandler = (selection: MatcherSelection<Type, StateToken>) => {
+  private readonly selectionHandler = async (selection: MatcherSelection<Type, StateToken>) => {
     const matchReport = new GestureStageReport<Type, StateToken>(selection);
     if(selection.matcher) {
       this.stageReports.push(matchReport);
@@ -196,10 +196,11 @@ export class GestureSequence<Type, StateToken = any> extends EventEmitter<EventM
       return matchSource instanceof GestureSourceSubview ? matchSource.baseSource : matchSource;
     }) ?? [];
 
-    if(selection.result.action.type == 'complete' || selection.result.action.type == 'none') {
+    const actionType = selection.result.action.type;
+    if(actionType == 'complete' || actionType == 'none') {
       sources.forEach((source) => {
         if(!source.isPathComplete) {
-          source.terminate(selection.result.action.type == 'none');
+          source.terminate(actionType == 'none');
         }
       });
 
@@ -209,6 +210,13 @@ export class GestureSequence<Type, StateToken = any> extends EventEmitter<EventM
           this.emit('complete');
         }
         return;
+      }
+    }
+
+    if(actionType == 'complete' && selection.result.action.awaitNested) {
+      const nestedSustainPromise = this.pushedSelector && this.touchpointCoordinator?.popSelector(this.pushedSelector);
+      if(actionType == 'complete' && nestedSustainPromise && selection.result.action.awaitNested) {
+        await nestedSustainPromise;
       }
     }
 
@@ -250,7 +258,7 @@ export class GestureSequence<Type, StateToken = any> extends EventEmitter<EventM
 
       // Handling 'setchange' resolution actions (where one gesture enables a different gesture set for others
       // while active.  Example case: modipress.)
-      if(selection.result.action.type == 'chain' && selection.result.action.selectionMode == this.pushedSelector?.baseGestureSetId) {
+      if(actionType == 'chain' && selection.result.action.selectionMode == this.pushedSelector?.baseGestureSetId) {
         // do nothing; maintain the existing 'selectionMode' behavior
       } else {
         // pop the old one, if it exists - if it matches our expectations for a current one.
@@ -274,7 +282,7 @@ export class GestureSequence<Type, StateToken = any> extends EventEmitter<EventM
          * can then use that to trigger cancellation of the subkey-selection mode.
          */
 
-        if(selection.result.action.type == 'chain') {
+        if(actionType == 'chain') {
           const targetSet = selection.result.action.selectionMode;
           if(targetSet) {
             // push the new one.

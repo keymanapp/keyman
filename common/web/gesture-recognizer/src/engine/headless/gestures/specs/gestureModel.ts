@@ -42,7 +42,7 @@ export interface ResolutionChain {
    * Followup gesture-models must also specify the alternate model set in order to maintain it during
    * transition between components.  Leaving it `undefined` in a followup will fully cancel the
    * alternate gesture-component selection mode and any gestures activated during the alternate
-   * selection mode (unless `sustainIfNested` is `true` for the processing gesture model).
+   * selection mode (unless `sustainWhenNested` is `true` for the processing gesture model).
    *
    * Changing to a different ID will do the likewise, then reactivate the alternate gesture-selection
    * mode with the newly-specified gesture-model set target.
@@ -51,7 +51,8 @@ export interface ResolutionChain {
 }
 
 export interface ResolutionComplete {
-  type: 'complete'
+  type: 'complete',
+  awaitNested?: boolean
 }
 
 export interface RejectionDefault {
