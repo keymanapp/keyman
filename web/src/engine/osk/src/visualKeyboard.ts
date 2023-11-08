@@ -132,8 +132,8 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
   /**
    * Tweakable gesture parameters referenced by supported gestures and the gesture engine.
    */
-  readonly gestureParams: GestureParams = {
-    ...DEFAULT_GESTURE_PARAMS
+  readonly gestureParams: GestureParams<KeyElement> = {
+    ...DEFAULT_GESTURE_PARAMS,
   };
 
   // Legacy alias, maintaining a reference for code built against older
@@ -387,6 +387,11 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
 
         return this.layerGroup.findNearestKey(sample);
       }
+    };
+
+    this.gestureParams.longpress.permitsFlick = (key) => {
+      const flickSpec = key?.key.spec.flick;
+      return !flickSpec || !(flickSpec.n || flickSpec.nw || flickSpec.ne);
     };
 
     const recognizer = new GestureRecognizer(gestureSetForLayout(this.layerGroup, this.gestureParams), config);

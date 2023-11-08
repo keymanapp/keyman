@@ -20,7 +20,7 @@ import { calcLockedDistance } from './browser/flick.js';
 
 import specs = gestures.specs;
 
-export interface GestureParams {
+export interface GestureParams<Item = any> {
   longpress: {
     /**
      * Allows enabling or disabling the longpress up-flick shortcut for keyboards that do not
@@ -28,7 +28,7 @@ export interface GestureParams {
      *
      * Will be ignored (in favor of `false`) for keyboards that do have defined flicks.
      */
-    permitFlick: boolean,
+    permitsFlick: (item?: Item) => boolean,
 
     /**
      * The minimum _net_ distance traveled before a longpress flick-shortcut will trigger.
@@ -91,7 +91,7 @@ export interface GestureParams {
 
 export const DEFAULT_GESTURE_PARAMS: GestureParams = {
   longpress: {
-    permitFlick: true,
+    permitsFlick: () => true,
     flickDist: 5,
     waitLength: 500,
     noiseTolerance: 10
@@ -174,7 +174,7 @@ export function gestureSetForLayout(layerGroup: OSKLayerGroup, params: GesturePa
 
   const _initialTapModel: GestureModel<KeyElement> = deepCopy(layout.hasFlicks ? initialTapModel(params) : initialTapModelWithReset(params));
   const simpleTapModel: GestureModel<KeyElement> = deepCopy(layout.hasFlicks ? SimpleTapModel : SimpleTapModelWithReset);
-  const longpressModel: GestureModel<KeyElement> = deepCopy(layout.hasFlicks ? basicLongpressModel(params) : longpressModelWithShortcut(params));
+  const longpressModel: GestureModel<KeyElement> = deepCopy(longpressModelWithShortcut(params, true, !layout.hasFlicks));
 
   // #region Functions for implementing and/or extending path initial-state checks
   function withKeySpecFiltering(model: GestureModel<KeyElement>, contactIndices: number | number[]) {
@@ -235,7 +235,7 @@ export function gestureSetForLayout(layerGroup: OSKLayerGroup, params: GesturePa
     defaultSet.push('flick-start');
   } else {
     // A post-roam version of longpress with the up-flick shortcut disabled but roaming still on.
-    gestureModels.push(withKeySpecFiltering(longpressModelWithRoaming(params), 0));
+    gestureModels.push(withKeySpecFiltering(longpressModelAfterRoaming(params), 0));
   }
 
   return {
@@ -325,38 +325,16 @@ export function flickEndContactModel(params: GestureParams): ContactModel {
   }
 }
 
-
-export function BasicLongpressContactModel(params: GestureParams): ContactModel {
+export function LongpressContactModelWithShortcut(params: GestureParams, enabledFlicks: boolean, resetForRoaming: boolean): ContactModel {
   const spec = params.longpress;
 
   return {
-    itemChangeAction: 'reject',
     itemPriority: 0,
     pathResolutionAction: 'resolve',
     timer: {
       duration: spec.waitLength,
       expectedResult: true
     },
-    pathModel: {
-      evaluate: (path) => {
-        if(path.isComplete) {
-          return 'reject';
-        }
-
-        return null;
-      }
-    }
-  };
-}
-
-export function LongpressContactModelWithShortcut(params: GestureParams, enabledFlicks?: false | undefined): ContactModel {
-  const spec = params.longpress;
-  const base = BasicLongpressContactModel(params);
-
-  return {
-    ...base,
-    // We want to selectively ignore this during an up-flick.
-    itemChangeAction: undefined,
     pathModel: {
       evaluate: (path) => {
         const stats = path.stats;
@@ -368,13 +346,18 @@ export function LongpressContactModelWithShortcut(params: GestureParams, enabled
          * The 'indexOf' allows 'n', 'nw', and 'ne' - approx 67.5 degrees on
          * each side of due N in total.
          */
-        if((enabledFlicks ?? spec.permitFlick) && (stats.cardinalDirection?.indexOf('n') != -1 ?? false)) {
+        if((enabledFlicks && spec.permitsFlick(stats.lastSample.item)) && (stats.cardinalDirection?.indexOf('n') != -1 ?? false)) {
           if(stats.netDistance > spec.flickDist) {
             return 'resolve';
           }
-        } else {
-          // If roaming, reject (so that we restart)
+        } else if(resetForRoaming) {
+          // If roaming, reject if the path has moved significantly (so that we restart)
           if(stats.rawDistance > spec.noiseTolerance || stats.lastSample.item != stats.initialSample.item) {
+            return 'reject';
+          }
+        } else {
+          // If not roaming, reject when the base key changes.
+          if(stats.lastSample.item != stats.initialSample.item) {
             return 'reject';
           }
         }
@@ -509,48 +492,25 @@ export const SpecialKeyEndModel: GestureModel<any> = {
 }
 
 /**
- * The flickless, roaming-touch-less version.
+ * The base model for longpresses, with considerable configurability.
+ *
+ * @param params         The common gesture configuration object for the gesture set under construction.
+ * @param allowShortcut  If `true` and certain conditions are also met, enables an 'up-flick shortcut' to
+ *                       bypass the longpress timer.
+ *
+ *                       Conditions:
+ *                       - the key has no northish flicks (nw, n, ne)
+ *                       - the common gesture configuration permits the shortcut where supported
+ * @param allowRoaming   Indicates whether "roaming touch" mode should be supported.
  */
-export function basicLongpressModel(params: GestureParams): GestureModel<any> {
-  return {
+export function longpressModelWithShortcut(params: GestureParams, allowShortcut: boolean, allowRoaming: boolean): GestureModel<any> {
+  const base: GestureModel<any> = {
     id: 'longpress',
     resolutionPriority: 0,
     contacts: [
       {
         model: {
-          // Is the version without the up-flick shortcut.
-          ...BasicLongpressContactModel(params),
-          itemPriority: 1,
-          pathInheritance: 'chop'
-        },
-        endOnResolve: false
-      }, {
-        model: InstantContactRejectionModel
-      }
-    ],
-    resolutionAction: {
-      type: 'chain',
-      next: 'subkey-select',
-      selectionMode: 'none',
-      item: 'none'
-    }
-  }
-}
-
-/**
- * For use when a layout doesn't have flicks; has the up-flick shortcut
- * and facilitates roaming-touch.
- */
-export function longpressModelWithShortcut(params: GestureParams): GestureModel<any> {
-  return {
-    ...basicLongpressModel(params),
-
-    id: 'longpress',
-    resolutionPriority: 0,
-    contacts: [
-      {
-        model: {
-          ...LongpressContactModelWithShortcut(params),
+          ...LongpressContactModelWithShortcut(params, allowShortcut, allowRoaming),
           itemPriority: 1,
           pathInheritance: 'chop'
         },
@@ -565,68 +525,34 @@ export function longpressModelWithShortcut(params: GestureParams): GestureModel<
       selectionMode: 'none',
       item: 'none'
     },
+  }
 
-    /*
-     * Note:  these actions make sense in a 'roaming-touch' context, but not when
-     * flicks are also enabled.
-     */
-    rejectionActions: {
-      item: {
-        type: 'replace',
-        replace: 'longpress-roam'
-      },
-      path: {
-        type: 'replace',
-        replace: 'longpress-roam'
+  if(allowRoaming) {
+    return {
+      ...base,
+      rejectionActions: {
+        path: {
+          type: 'replace',
+          replace: 'longpress-roam'
+        }
       }
     }
+  } else {
+    return base;
   }
 }
 
 /**
- * For use when a layout doesn't have flicks; has the up-flick shortcut
- * and facilitates roaming-touch.
+ * For use for transitioning out of roaming-touch.
  */
-export function longpressModelWithRoaming(params: GestureParams): GestureModel<any> {
+export function longpressModelAfterRoaming(params: GestureParams): GestureModel<any> {
+  // The longpress-shortcut is always disabled for keys reached by roaming (param 2)
+  // Only used when roaming is permitted; continued roaming should be allowed. (param 3)
+  const base = longpressModelWithShortcut(params, false, true);
+
   return {
-    ...basicLongpressModel(params),
-
-    id: 'longpress-roam',
-    resolutionPriority: 0,
-    contacts: [
-      {
-        model: {
-          // false - disabled shortcut regardless of params
-          ...LongpressContactModelWithShortcut(params, false),
-          itemPriority: 1,
-          pathInheritance: 'chop'
-        },
-        endOnResolve: false
-      }, {
-        model: InstantContactRejectionModel
-      }
-    ],
-    resolutionAction: {
-      type: 'chain',
-      next: 'subkey-select',
-      selectionMode: 'none',
-      item: 'none'
-    },
-
-    /*
-     * Note:  these actions make sense in a 'roaming-touch' context, but not when
-     * flicks are also enabled.
-     */
-    rejectionActions: {
-      item: {
-        type: 'replace',
-        replace: 'longpress-roam'
-      },
-      path: {
-        type: 'replace',
-        replace: 'longpress-roam'
-      }
-    }
+    ...base,
+    id: 'longpress-roam'
   }
 }
 
