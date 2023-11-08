@@ -658,9 +658,20 @@ export function flickMidModel(params: GestureParams): GestureModel<any> {
     resolutionPriority: 0,
     contacts: [
       {
-        model: flickMidContactModel(params)
-      },
+        model: flickMidContactModel(params),
+        endOnReject: true,
+      }, {
+        model: InstantContactRejectionModel,
+        resetOnResolve: true,
+      }
     ],
+    rejectionActions: {
+      // Only 'rejects' in this form if the path is completed before direction-locking state.
+      path: {
+        type: 'replace',
+        replace: 'flick-reset-end'
+      }
+    },
     resolutionAction: {
       type: 'chain',
       item: 'none',
@@ -674,13 +685,6 @@ export function flickResetModel(params: GestureParams): GestureModel<any> {
   return {
     ...base,
     id: 'flick-reset',
-    rejectionActions: {
-      // Only 'rejects' in this form if the path is completed before direction-locking state.
-      path: {
-        type: 'replace',
-        replace: 'flick-reset-end'
-      }
-    },
     resolutionAction: {
       type: 'chain',
       next: 'flick-end'
@@ -710,6 +714,10 @@ export function flickEndModel(params: GestureParams): GestureModel<any> {
       {
         model: flickEndContactModel(params)
       },
+      {
+        model: InstantContactResolutionModel,
+        resetOnResolve: true
+      }
     ],
     rejectionActions: {
       path: {

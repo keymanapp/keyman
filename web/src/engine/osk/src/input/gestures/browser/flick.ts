@@ -167,12 +167,11 @@ export default class Flick implements GestureHandler {
   private emitKey(vkbd: VisualKeyboard, selection: ActiveKeyBase, pathStats: CumulativePathStats<any>) {
     let keyEvent: KeyEvent;
     const projectedDistance = calcLockedDistance(pathStats, this.lockedDir);
-    if(projectedDistance < this.gestureParams.flick.dirLockDist) {
-      keyEvent = vkbd.keyEventFromSpec(this.baseSpec);
-    } else if(projectedDistance >= this.gestureParams.flick.triggerDist) {
+    if(projectedDistance > this.gestureParams.flick.triggerDist) {
       keyEvent = vkbd.keyEventFromSpec(selection);
     } else {
-      return;
+      // Even if mid-way between base key and actual key.
+      keyEvent = vkbd.keyEventFromSpec(this.baseSpec);
     }
 
     keyEvent.keyDistribution = this.currentStageKeyDistribution(this.baseKeyDistances);

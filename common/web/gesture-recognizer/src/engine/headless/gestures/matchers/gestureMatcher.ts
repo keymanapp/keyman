@@ -264,9 +264,7 @@ export class GestureMatcher<Type, StateToken = any> implements PredecessorMatch<
       if(matched && contactSpec.endOnResolve) {
         matcher.source.terminate(false);
       } else if(!matched && contactSpec.endOnReject) {
-        // Ending due to gesture-rejection effectively means to cancel the path,
-        // so signal exactly that.
-        matcher.source.terminate(true);
+        matcher.source.terminate(false);
       }
     }
   }
