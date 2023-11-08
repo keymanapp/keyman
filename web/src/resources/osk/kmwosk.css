@@ -274,6 +274,19 @@
 .kmw-key-popup-icon{position:absolute;display:block;visibility:visible;right:4%;top:1%;/*width:8px;height:8px;*/
       font-size:0.5em;color:#aaa; line-height:initial}
 
+/* For certain form-factors, #aaa blends in with the special-key background-color _way_ too well. */
+/* e.g: .phone.ios .kmw-key.kmw-key-special {background-color:#b2b9c5;} */
+.kmw-key-special .kmw-key-popup-icon {
+  color: #ddd;
+}
+
+@media (prefers-color-scheme: dark) {
+  /* But not in dark mode. */
+  .kmw-key-special .kmw-key-popup-icon {
+    color: #aaa;
+  }
+}
+
 /*.phone .kmw-key-popup-icon{right:6%;top:-2px;width:8px;height:8px;text-align:right;}
 .desktop .kmw-key-popup-icon{right:4%;top:0;width:8px;height:8px;} */
 
