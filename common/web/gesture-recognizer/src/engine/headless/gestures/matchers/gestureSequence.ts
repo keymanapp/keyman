@@ -6,6 +6,7 @@ import { GestureMatcher, MatchResult, PredecessorMatch } from "./gestureMatcher.
 import { GestureModel, GestureResolution } from "../specs/gestureModel.js";
 import { MatcherSelection, MatcherSelector } from "./matcherSelector.js";
 import { GestureRecognizerConfiguration, TouchpointCoordinator } from "../../../index.js";
+import { ManagedPromise } from "@keymanapp/web-utils";
 
 export class GestureStageReport<Type, StateToken = any> {
   /**
@@ -213,10 +214,21 @@ export class GestureSequence<Type, StateToken = any> extends EventEmitter<EventM
       }
     }
 
-    if(actionType == 'complete' && selection.result.action.awaitNested) {
-      const nestedSustainPromise = this.pushedSelector && this.touchpointCoordinator?.popSelector(this.pushedSelector);
-      if(actionType == 'complete' && nestedSustainPromise && selection.result.action.awaitNested) {
-        await nestedSustainPromise;
+    if(actionType == 'complete' && selection.result.action.awaitNested && this.touchpointCoordinator) {
+      const sustainedSources = (this.pushedSelector && this.touchpointCoordinator?.popSelector(this.pushedSelector)) ?? [];
+      if(sustainedSources.length > 0) {
+        this.pushedSelector = null;
+      }
+
+      const sustainCompletionPromises = sustainedSources.map((source) => {
+        const promise = new ManagedPromise<void>();
+        source.path.on('invalidated', () => promise.resolve());
+        source.path.on('complete', () => promise.resolve());
+        return promise.corePromise;
+      });
+
+      if(actionType == 'complete' && sustainCompletionPromises.length > 0 && selection.result.action.awaitNested) {
+        await Promise.all(sustainCompletionPromises);
       }
     }
 

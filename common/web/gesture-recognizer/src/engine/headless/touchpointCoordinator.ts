@@ -92,13 +92,13 @@ export class TouchpointCoordinator<HoveredItemType, StateToken=any> extends Even
 
     // If there are any models active with the `sustainWhenNested` property,
     // the following Promise resolves once those are also completed.
-    const sustainCompletionPromise = selector.cascadeTermination();
+    const sustainedSources = selector.cascadeTermination();
 
     this.selectorStack.splice(index, 1);
     // Make sure the current state token is set at this stage.
     this.currentSelector.stateToken = this.stateToken;
 
-    return sustainCompletionPromise;
+    return sustainedSources;
   }
 
   public selectorStackIncludes(selector: MatcherSelector<HoveredItemType, StateToken>): boolean {

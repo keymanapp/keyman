@@ -636,7 +636,8 @@ export function flickMidModel(params: GestureParams): GestureModel<any> {
       type: 'chain',
       item: 'none',
       next: 'flick-end'
-    }
+    },
+    sustainWhenNested: true
   }
 }
 
@@ -671,7 +672,8 @@ export const FlickResetEndModel: GestureModel<any> = {
   resolutionAction: {
     type: 'complete',
     item: 'base'
-  }
+  },
+  sustainWhenNested: true
 };
 
 export function flickEndModel(params: GestureParams): GestureModel<any> {
@@ -696,7 +698,8 @@ export function flickEndModel(params: GestureParams): GestureModel<any> {
     resolutionAction: {
       type: 'complete',
       item: 'current'
-    }
+    },
+    sustainWhenNested: true
   }
 }
 

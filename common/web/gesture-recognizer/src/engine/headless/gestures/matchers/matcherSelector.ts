@@ -80,7 +80,11 @@ export class MatcherSelector<Type, StateToken = any> extends EventEmitter<EventM
     return this.potentialMatchers.filter((matcher) => matcher.allSourceIds.find((id) => id == source.identifier));
   }
 
-  public cascadeTermination(): Promise<any> {
+  /**
+   *
+   * @returns An array of all sources that will live on in `sustainWhenNested` mode.
+   */
+  public cascadeTermination(): GestureSource<Type, any>[] {
     const potentialMatchers = this.potentialMatchers;
     const matchersToCancel = potentialMatchers.filter((matcher) => !matcher.model.sustainWhenNested);
 
@@ -133,7 +137,7 @@ export class MatcherSelector<Type, StateToken = any> extends EventEmitter<EventM
 
     matchersToCancel.forEach((matcher) => matcher.cancel());
 
-    return Promise.all(matchersToPreserve.map((matcher) => matcher.promise));
+    return this._sourceSelector.map((data) => data.source);
   }
 
   /**
