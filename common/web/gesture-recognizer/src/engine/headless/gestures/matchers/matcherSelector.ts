@@ -36,6 +36,7 @@ interface EventMap<Type, StateToken> {
  */
 interface AsyncPromiseReturner<Type> {
   selectionPromise: Promise<Type>;
+  sustainModeWithoutMatch?: boolean;
 }
 
 /**
@@ -64,6 +65,8 @@ export class MatcherSelector<Type, StateToken = any> extends EventEmitter<EventM
    * existing matchers that could resolve first.
    */
   private pendingMatchSetup?: Promise<void>;
+
+  private sustainMode: boolean = false;
 
   constructor(baseSetId?: string) {
     super();
@@ -136,6 +139,7 @@ export class MatcherSelector<Type, StateToken = any> extends EventEmitter<EventM
     });
 
     matchersToCancel.forEach((matcher) => matcher.cancel());
+    this.sustainMode = true;
 
     return this._sourceSelector.map((data) => data.source);
   }
@@ -347,16 +351,26 @@ export class MatcherSelector<Type, StateToken = any> extends EventEmitter<EventM
           });
 
           return {
-            selectionPromise: Promise.resolve({
-              result: {
-                action: null,
-                matched: false
-              },
-              matcher: null
-            })
+            selectionPromise: matchPromise.corePromise
           };
         }
       }
+    }
+
+    // If in a sustain mode, no new models may launch; only existing sequences are allowed to continue.
+    if(this.sustainMode) {
+      matchPromise.resolve({
+        matcher: null,
+        result: {
+          matched: false,
+          action: {
+            type: 'complete',
+            item: null
+          }
+        }
+      });
+
+      return { selectionPromise: matchPromise.corePromise, sustainModeWithoutMatch: true };
     }
 
     /**

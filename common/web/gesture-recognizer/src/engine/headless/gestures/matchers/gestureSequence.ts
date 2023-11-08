@@ -214,11 +214,8 @@ export class GestureSequence<Type, StateToken = any> extends EventEmitter<EventM
       }
     }
 
-    if(actionType == 'complete' && selection.result.action.awaitNested && this.touchpointCoordinator) {
-      const sustainedSources = (this.pushedSelector && this.touchpointCoordinator?.popSelector(this.pushedSelector)) ?? [];
-      if(sustainedSources.length > 0) {
-        this.pushedSelector = null;
-      }
+    if(actionType == 'complete' && selection.result.action.awaitNested && this.touchpointCoordinator && this.pushedSelector) {
+      const sustainedSources = this.pushedSelector.cascadeTermination() ?? [];
 
       const sustainCompletionPromises = sustainedSources.map((source) => {
         const promise = new ManagedPromise<void>();
@@ -227,9 +224,12 @@ export class GestureSequence<Type, StateToken = any> extends EventEmitter<EventM
         return promise.corePromise;
       });
 
-      if(actionType == 'complete' && sustainCompletionPromises.length > 0 && selection.result.action.awaitNested) {
+      if(sustainCompletionPromises.length > 0) {
         await Promise.all(sustainCompletionPromises);
       }
+
+      this.touchpointCoordinator?.popSelector(this.pushedSelector);
+      this.pushedSelector = null;
     }
 
     // Raise the event, providing a functor that allows the listener to specify an alt config for the next stage.

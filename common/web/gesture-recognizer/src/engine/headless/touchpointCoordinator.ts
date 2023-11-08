@@ -5,6 +5,7 @@ import { MatcherSelection, MatcherSelector } from "./gestures/matchers/matcherSe
 import { GestureSequence } from "./gestures/matchers/gestureSequence.js";
 import { GestureModelDefs, getGestureModel, getGestureModelSet } from "./gestures/specs/gestureModelDefs.js";
 import { GestureModel } from "./gestures/specs/gestureModel.js";
+import { timedPromise } from "@keymanapp/web-utils";
 
 interface EventMap<HoveredItemType, StateToken> {
   /**
@@ -77,6 +78,10 @@ export class TouchpointCoordinator<HoveredItemType, StateToken=any> extends Even
   }
 
   public popSelector(selector: MatcherSelector<HoveredItemType, StateToken>) {
+    if(!selector) {
+      return;
+    }
+
     /* c8 ignore start */
     if(this.selectorStack.length <= 1) {
       throw new Error("May not pop the original, base gesture selector.");
@@ -114,55 +119,84 @@ export class TouchpointCoordinator<HoveredItemType, StateToken=any> extends Even
     this.inputEngines.push(engine);
   }
 
-  private readonly onNewTrackedPath = (touchpoint: GestureSource<HoveredItemType>) => {
+  private readonly onNewTrackedPath = async (touchpoint: GestureSource<HoveredItemType>) => {
     this.addSimpleSourceHooks(touchpoint);
     const modelDefs = this.gestureModelDefinitions;
+
+    let potentialSelector: MatcherSelector<HoveredItemType, StateToken>;
+    let selectionPromise: Promise<MatcherSelection<HoveredItemType, StateToken>>;
+    do {
+      potentialSelector = this.currentSelector;
+
+      /* We wait for the source to fully pass through the gesture-model spin-up phase; there's
+      * a chance that the new source will complete an existing gesture instantly without being
+      * locked to it, resulting in activation of a different `stateToken`.
+      *
+      * This, in turn, can affect what the initial 'item' for the new gesture will be.
+      */
+      const modelingSpinupPromise = potentialSelector.matchGesture(touchpoint, getGestureModelSet(modelDefs, potentialSelector.baseGestureSetId));
+      const modelingSpinupResults = await modelingSpinupPromise;
+
+      if(modelingSpinupResults.sustainModeWithoutMatch) {
+        /* May need to do a state-token change check & update the item; an `awaitNested` 'complete' action
+         * may have been pending in the meantime that could have triggered a change.
+         *
+         * (The MatcherSelector's state token will not have been updated b/c it will have already been popped,
+         * and because it's popped, it should not be responsible for managing the new GestureSource -
+         * including shifts in state token.)
+         *
+         * Current actual use-case:  deferred modipress due to ongoing flick, auto-completed by new incoming touch.
+         */
+        touchpoint.path.coords.forEach((coord) => {
+          coord.stateToken = this.stateToken;
+          coord.item = touchpoint.currentRecognizerConfig.itemIdentifier(coord, null);
+        });
+        continue;
+      } else {
+        selectionPromise = modelingSpinupResults.selectionPromise;
+        break;
+      }
+
+      // Can only happen if a `sustainWhenNested` model state is resolved, nested within
+      // a gesture whose completion action requests `awaitNested`.
+    } while(potentialSelector != this.currentSelector);
+
     const selector = this.currentSelector;
 
     touchpoint.setGestureMatchInspector(buildGestureMatchInspector(selector));
+    this.emit('inputstart', touchpoint);
 
-    /* We wait for the source to fully pass through the gesture-model spin-up phase; there's
-     * a chance that the new source will complete an existing gesture instantly without being
-     * locked to it, resulting in activation of a different `stateToken`.
-     *
-     * This, in turn, can affect what the initial 'item' for the new gesture will be.
-     */
-    const modelingSpinupPromise = selector.matchGesture(touchpoint, getGestureModelSet(modelDefs, selector.baseGestureSetId));
-    modelingSpinupPromise.then(async (selectionPromiseHost) => {
-      this.emit('inputstart', touchpoint);
+    const selection = await selectionPromise;
 
-      const selection = await selectionPromiseHost.selectionPromise;
+    // Any related 'push' mechanics that may still be lingering are currently handled by GestureSequence
+    // during its 'completion' processing.  (See `GestureSequence.selectionHandler`.)
+    if(selection.result.matched == false) {
+      return;
+    }
 
-      // Any related 'push' mechanics that may still be lingering are currently handled by GestureSequence
-      // during its 'completion' processing.  (See `GestureSequence.selectionHandler`.)
-      if(selection.result.matched == false) {
+    // For multitouch gestures, only report the gesture **once**.
+    const sourceIDs = selection.matcher.allSourceIds;
+    for(let sequence of this._activeGestures) {
+      if(!!sequence.allSourceIds.find((id1) => !!sourceIDs.find((id2) => id1 == id2))) {
+        // We've already established (and thus, already reported) a GestureSequence for this selection.
         return;
       }
+    }
 
-      // For multitouch gestures, only report the gesture **once**.
-      const sourceIDs = selection.matcher.allSourceIds;
-      for(let sequence of this._activeGestures) {
-        if(!!sequence.allSourceIds.find((id1) => !!sourceIDs.find((id2) => id1 == id2))) {
-          // We've already established (and thus, already reported) a GestureSequence for this selection.
-          return;
-        }
+    const gestureSequence = new GestureSequence(selection, modelDefs, this.currentSelector, this);
+    this._activeGestures.push(gestureSequence);
+    gestureSequence.on('complete', () => {
+      // When the GestureSequence is fully complete and all related `firstSelectionPromise`s have
+      // had the chance to resolve, drop the reference; prevent memory leakage.
+      const index = this._activeGestures.indexOf(gestureSequence);
+      if(index != -1) {
+        this._activeGestures.splice(index, 1);
       }
-
-      const gestureSequence = new GestureSequence(selection, modelDefs, this.currentSelector, this);
-      this._activeGestures.push(gestureSequence);
-      gestureSequence.on('complete', () => {
-        // When the GestureSequence is fully complete and all related `firstSelectionPromise`s have
-        // had the chance to resolve, drop the reference; prevent memory leakage.
-        const index = this._activeGestures.indexOf(gestureSequence);
-        if(index != -1) {
-          this._activeGestures.splice(index, 1);
-        }
-      });
-
-      // Could track sequences easily enough; the question is how to tell when to 'let go'.
-
-      this.emit('recognizedgesture', gestureSequence);
     });
+
+    // Could track sequences easily enough; the question is how to tell when to 'let go'.
+
+    this.emit('recognizedgesture', gestureSequence);
   }
 
   public get activeGestures(): GestureSequence<HoveredItemType, StateToken>[] {
