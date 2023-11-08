@@ -12,8 +12,8 @@ c    verifying that deadkeys are preserved with the first backspace event:
 c    'c' (dk7) 'de' + BKSP + BKSP = 'ok'
 
 c keys: [K_1][K_BKSP][K_2][K_BKSP][K_3][K_BKSP][K_4][K_BKSP][K_5][K_BKSP][K_6][K_BKSP][K_7][K_BKSP][K_BKSP]
-c expected: 78aa ok
-c context: 7890
+c expected: wxaa ok
+c context: wxyz
 
 store(&VERSION) '9.0'
 
