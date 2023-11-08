@@ -51,7 +51,7 @@ uses
 
   Keyman.Developer.UI.UfrmMessageDlgWithSave,
   UfrmMain,
-  UfrmEditor,
+  Keyman.Developer.UI.UfrmLdmlKeyboardEditor,
   UfrmMDIEditor,
   UKeymanTargets,
   UmodWebHttpServer,
@@ -236,9 +236,9 @@ end;
 
 function TxmlLdmlProjectFileUI.DebugKeyboard(FSilent: Boolean): Boolean;
 var
-  editor: TfrmEditor;
+  editor: TfrmLdmlKeyboardEditor;
 begin
-  editor := frmKeymanDeveloper.OpenEditor(ProjectFile.FileName, TfrmEditor) as TfrmEditor;
+  editor := frmKeymanDeveloper.OpenEditor(ProjectFile.FileName, TfrmLdmlKeyboardEditor) as TfrmLdmlKeyboardEditor;
 //  editor.StartDebugging;
   Result := True;
 end;

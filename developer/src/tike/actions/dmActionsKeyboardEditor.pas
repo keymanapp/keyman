@@ -61,8 +61,6 @@ type
     actKeyboardFontHelper: TAction;
     actKeyboardFonts: TAction;
     procedure actKeyboardCompileExecute(Sender: TObject);
-    procedure actionsKeyboardEditorUpdate(Action: TBasicAction;
-      var Handled: Boolean);
     procedure actKeyboardIncludeDebugInformationExecute(Sender: TObject);
     procedure actKeyboardInstallExecute(Sender: TObject);
     procedure actKeyboardUninstallExecute(Sender: TObject);
@@ -72,6 +70,12 @@ type
     procedure actKeyboardFontHelperExecute(Sender: TObject);
     procedure actKeyboardFontsExecute(Sender: TObject);
     procedure actKeyboardCompileUpdate(Sender: TObject);
+    procedure actKeyboardInstallUpdate(Sender: TObject);
+    procedure actKeyboardUninstallUpdate(Sender: TObject);
+    procedure actKeyboardTestUpdate(Sender: TObject);
+    procedure actKeyboardTestKeymanWebUpdate(Sender: TObject);
+    procedure actKeyboardFontHelperUpdate(Sender: TObject);
+    procedure actKeyboardFontsUpdate(Sender: TObject);
   end;
 
 var
@@ -129,32 +133,56 @@ end;
 
 function ActiveLdmlKeyboardProjectFile: TxmlLdmlProjectFile;
 begin
-  Result := ActiveLdmlKeyboardEditor.ProjectFile as TxmlLdmlProjectFile;
+  if ActiveLdmlKeyboardEditor = nil
+    then Result := nil
+    else Result := ActiveLdmlKeyboardEditor.ProjectFile as TxmlLdmlProjectFile;
 end;
 
 function ActiveKmnKeyboardProjectFile: TkmnProjectFile;
 begin
-  Result := ActiveKmnKeyboardEditor.ProjectFile as TkmnProjectFile;
+  if ActiveKmnKeyboardEditor = nil
+    then Result := nil
+    else Result := ActiveKmnKeyboardEditor.ProjectFile as TkmnProjectFile;
 end;
 
 function ActivePackageProjectFile: TkpsProjectFile;
 begin
-  Result := ActivePackageEditor.ProjectFile as TkpsProjectFile;
+  if ActivePackageEditor = nil
+    then Result := nil
+    else Result := ActivePackageEditor.ProjectFile as TkpsProjectFile;
 end;
 
-procedure TmodActionsKeyboardEditor.actionsKeyboardEditorUpdate(Action: TBasicAction; var Handled: Boolean);
+function ActiveProjectFileUI: TProjectFileUI;
 begin
-  with Action as TAction do
-  begin
-    if not Assigned(Action.OnUpdate) then
-    begin
-      Enabled := ActiveKmnKeyboardEditor <> nil;
-      if not Enabled then Handled := True;
-    end;
-  end;
+  if ActiveKmnKeyboardProjectFile <> nil then
+    Result := ActiveKmnKeyboardProjectFile.UI as TProjectFileUI
+  else if ActiveLdmlKeyboardProjectFile <> nil then
+    Result := ActiveLdmlKeyboardProjectFile.UI as TProjectFileUI
+  else if ActivePackageProjectFile <> nil then
+    Result := ActivePackageProjectFile.UI as TProjectFileUI
+  else
+    Result := nil;
 end;
 
 { ---- Keyboard Menu ---- }
+
+procedure TmodActionsKeyboardEditor.actKeyboardCompileUpdate(Sender: TObject);
+begin
+  // TODO: Split Keyboard menu and package editor functions
+  actKeyboardCompile.Enabled :=
+    (ActiveKmnKeyboardEditor <> nil) or
+    (ActiveLdmlKeyboardEditor <> nil) or
+    (ActivePackageEditor <> nil) or
+    ((frmKeymanDeveloper.ActiveChild is TfrmProject) and (FGlobalProject <> nil));
+
+  if actKeyboardCompile.Enabled
+    then actKeyboardCompile.ShortCut := Vcl.Menus.Shortcut(VK_F7, [])
+    else actKeyboardCompile.ShortCut := scNone;
+
+  // This is a little side-effecty
+  frmKeymanDeveloper.mnuKeyboard.Visible := True;
+  frmKeymanDeveloper.mnuDebug.Visible := ActiveKmnKeyboardEditor <> nil;
+end;
 
 procedure TmodActionsKeyboardEditor.actKeyboardCompileExecute(Sender: TObject);   // I4504
 var
@@ -169,63 +197,76 @@ begin
     if not ActiveKmnKeyboardEditor.PrepareForBuild(DebugReset) then
       Exit;
 
-    if (ActiveKmnKeyboardProjectFile.UI as TProjectFileUI).DoAction(pfaCompile, False) and DebugReset then   // I4686
+    if ActiveProjectFileUI.DoAction(pfaCompile, False) and DebugReset then   // I4686
       ActiveKmnKeyboardEditor.StartDebugging;
+  end
+  else if ActiveLdmlKeyboardEditor <> nil then
+  begin
+    ActiveProjectFileUI.DoAction(pfaCompile, False);
   end
   else if ActivePackageEditor <> nil then
   begin
-    (ActivePackageProjectFile.UI as TProjectFileUI).DoAction(pfaCompile, False);
+    ActiveProjectFileUI.DoAction(pfaCompile, False);
   end
   else if frmKeymanDeveloper.ActiveChild is TfrmProject then
+  begin
     (frmKeymanDeveloper.ActiveChild as TfrmProject).CompileAll;
+  end;
 end;
 
-procedure TmodActionsKeyboardEditor.actKeyboardCompileUpdate(Sender: TObject);
+//------------------------------------------------------------------------------
+
+procedure TmodActionsKeyboardEditor.actKeyboardFontHelperUpdate(
+  Sender: TObject);
 begin
-  // TODO: Split Keyboard menu and package editor functions
-  actKeyboardCompile.Enabled :=
-    (ActiveKmnKeyboardEditor <> nil) or
-    (ActivePackageEditor <> nil) or
-    ((frmKeymanDeveloper.ActiveChild is TfrmProject) and (FGlobalProject <> nil));
-
-  if actKeyboardCompile.Enabled
-    then actKeyboardCompile.ShortCut := Vcl.Menus.Shortcut(VK_F7, [])
-    else actKeyboardCompile.ShortCut := scNone;
-
-  frmKeymanDeveloper.mnuKeyboard.Visible := True;
-  frmKeymanDeveloper.mnuDebug.Visible := ActiveKmnKeyboardEditor <> nil;
+   actKeyboardFontHelper.Enabled := (ActiveKmnKeyboardProjectFile <> nil);
 end;
 
 procedure TmodActionsKeyboardEditor.actKeyboardFontHelperExecute(
   Sender: TObject);
 begin
-  (ActiveKmnKeyboardProjectFile.UI as TProjectFileUI).DoAction(pfaFontHelper, False)   // I4687
+  ActiveProjectFileUI.DoAction(pfaFontHelper, False)   // I4687
+end;
+
+//------------------------------------------------------------------------------
+
+procedure TmodActionsKeyboardEditor.actKeyboardFontsUpdate(Sender: TObject);
+begin
+   actKeyboardFonts.Enabled := (ActiveKmnKeyboardProjectFile <> nil);
 end;
 
 procedure TmodActionsKeyboardEditor.actKeyboardFontsExecute(Sender: TObject);   // I4057
 begin
-  (ActiveKmnKeyboardProjectFile.UI as TProjectFileUI).DoAction(pfaFontDialog, False);   // I4687
+  ActiveProjectFileUI.DoAction(pfaFontDialog, False);   // I4687
 end;
 
-procedure TmodActionsKeyboardEditor.actKeyboardIncludeDebugInformationExecute(Sender: TObject);
-begin
-  (ActiveKmnKeyboardProjectFile.UI as TkmnProjectFileUI).Debug := not (ActiveKmnKeyboardProjectFile.UI as TkmnProjectFileUI).Debug;   // I4687
-end;
+//------------------------------------------------------------------------------
 
 procedure TmodActionsKeyboardEditor.actKeyboardIncludeDebugInformationUpdate(
   Sender: TObject);
 begin
   actKeyboardIncludeDebugInformation.Enabled := ActiveKmnKeyboardEditor <> nil;
   if (ActiveKmnKeyboardEditor <> nil) and (ActiveKmnKeyboardProjectFile <> nil)
-    then actKeyboardIncludeDebugInformation.Checked := (ActiveKmnKeyboardProjectFile.UI as TkmnProjectFileUI).Debug   // I4687
+    then actKeyboardIncludeDebugInformation.Checked := (ActiveProjectFileUI as TkmnProjectFileUI).Debug   // I4687
     else actKeyboardIncludeDebugInformation.Checked := False;
+end;
+
+procedure TmodActionsKeyboardEditor.actKeyboardIncludeDebugInformationExecute(Sender: TObject);
+begin
+  (ActiveProjectFileUI as TkmnProjectFileUI).Debug := not (ActiveProjectFileUI as TkmnProjectFileUI).Debug;   // I4687
+end;
+
+//------------------------------------------------------------------------------
+
+procedure TmodActionsKeyboardEditor.actKeyboardInstallUpdate(Sender: TObject);
+begin
+  actKeyboardInstall.Enabled := ActiveProjectFileUI <> nil;
 end;
 
 procedure TmodActionsKeyboardEditor.actKeyboardInstallExecute(Sender: TObject);
 begin
   try
-    (ActiveKmnKeyboardProjectFile.UI as TProjectFileUI).DoAction(pfaInstall, False);   // I4687
-    //WideShowMessage('Keyboard installed successfully.');
+    ActiveProjectFileUI.DoAction(pfaInstall, False);   // I4687
   except
     on E:EOleException do // I654
     begin
@@ -234,22 +275,45 @@ begin
   end;
 end;
 
+//------------------------------------------------------------------------------
+
+procedure TmodActionsKeyboardEditor.actKeyboardTestUpdate(Sender: TObject);
+begin
+  actKeyboardTest.Enabled := (ActiveKmnKeyboardEditor <> nil);
+  // TODO: test xml keyboards in editor
+end;
+
 procedure TmodActionsKeyboardEditor.actKeyboardTestExecute(Sender: TObject);
 begin
   ActiveKmnKeyboardEditor.DebugForm.UIStatus := duiTest;
   ActiveKmnKeyboardEditor.StartDebugging(True);
 end;
 
+//------------------------------------------------------------------------------
+
+procedure TmodActionsKeyboardEditor.actKeyboardTestKeymanWebUpdate(
+  Sender: TObject);
+begin
+  actKeyboardTestKeymanWeb.Enabled := (ActiveKmnKeyboardEditor <> nil);
+end;
+
 procedure TmodActionsKeyboardEditor.actKeyboardTestKeymanWebExecute(
   Sender: TObject);
 begin
-  (ActiveKmnKeyboardProjectFile.UI as TProjectFileUI).DoAction(pfaTestKeymanWeb, False);   // I4687
+  ActiveProjectFileUI.DoAction(pfaTestKeymanWeb, False);   // I4687
+end;
+
+//------------------------------------------------------------------------------
+
+procedure TmodActionsKeyboardEditor.actKeyboardUninstallUpdate(Sender: TObject);
+begin
+  actKeyboardUninstall.Enabled := ActiveProjectFileUI <> nil;
 end;
 
 procedure TmodActionsKeyboardEditor.actKeyboardUninstallExecute(Sender: TObject);
 begin
   try
-    if (ActiveKmnKeyboardProjectFile.UI as TProjectFileUI).DoAction(pfaUninstall, False)
+    if ActiveProjectFileUI.DoAction(pfaUninstall, False)
       then ShowMessage('Keyboard uninstalled successfully.')
       else ShowMessage('Failed to uninstall keyboard.');
   except

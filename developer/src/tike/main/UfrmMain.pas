@@ -480,8 +480,10 @@ uses
   Keyman.Developer.System.Project.ProjectFileType,
   Keyman.Developer.System.Project.WelcomeRenderer,
   Keyman.Developer.System.Project.ProjectLog,
+  Keyman.Developer.System.Project.XmlLdmlProjectFile,
   Keyman.Developer.UI.Project.ProjectFileUI,
   Keyman.Developer.UI.Project.ProjectUI,
+  Keyman.Developer.UI.UfrmLdmlKeyboardEditor,
   Keyman.Developer.UI.UfrmWordlistEditor,
   Keyman.Developer.UI.UfrmModelEditor,
   TextFileFormat,
@@ -1092,10 +1094,10 @@ begin
 }
   if cbDebugSystemKeyboard.Items.Count < 2 then
   begin
-    //modActionsDebugger.SelectedSystemKeyboard;
+    //modActionsKeyboardEditor.SelectedSystemKeyboard;
     FillSystemKeyboardList(cbDebugSystemKeyboard.Items);
   end;
-  //modActionsDebugger.SetupDebugSystemKeyboard(cbDebugSystemKeyboard.Strings);
+  //modActionsKeyboardEditor.SetupDebugSystemKeyboard(cbDebugSystemKeyboard.Strings);
 end;
 
 {-------------------------------------------------------------------------------
@@ -1226,6 +1228,8 @@ begin
         else if ext = '.kvks' then Result := OpenKVKEditor(FFileName)
         else if ext = '.bmp'  then Result := OpenEditor(FFileName, TfrmBitmapEditor)
         else if ext = '.tsv'  then Result := OpenTSVEditor(FFileName)
+        else if (ext = '.xml') and TxmlLdmlProjectFile.IsFileTypeSupported(FFileName) then
+          Result := OpenEditor(FFileName, TfrmLdmlKeyboardEditor)
         else if FileHasModelTsExt(FFileName) then Result := OpenModelEditor(FFileName)
         else                       Result := OpenEditor(FFileName, TfrmEditor);
 
