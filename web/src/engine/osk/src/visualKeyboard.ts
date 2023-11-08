@@ -435,6 +435,8 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
         }
       }
 
+      // Fix:  if flicks enabled, no roaming.
+
       // Note:  GestureSource does not currently auto-terminate if there are no
       // remaining matchable gestures.  Though, we shouldn't facilitate roaming
       // anyway if we've turned it off.
@@ -447,13 +449,15 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
           this.highlightKey(oldKey, false);
           this.gesturePreviewHost?.cancel();
 
-          const previewHost = this.highlightKey(key, true);
-          if(previewHost) {
-            this.gesturePreviewHost = previewHost;
-          }
+          if(!this.kbdLayout.hasFlicks) {
+            const previewHost = this.highlightKey(key, true);
+            if(previewHost) {
+              this.gesturePreviewHost = previewHost;
+            }
 
-          trackingEntry.previewHost = previewHost;
-          sourceTrackingMap[source.identifier].key = key;
+            trackingEntry.previewHost = previewHost;
+            sourceTrackingMap[source.identifier].key = key;
+          }
         }
       }
 

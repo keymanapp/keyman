@@ -458,11 +458,6 @@ export const SubkeySelectContactModel: ContactModel = {
 // func at the top.
 type GestureModel<Type> = specs.GestureModel<Type>;
 
-// TODO:  customization of the gesture models depending upon properties of the keyboard.
-// - has flicks?  no longpress shortcut, also no longpress reset(?)
-// - modipress:  keyboard-specific modifier keys - which may require inspection of a
-//   key's properties.
-
 export const SpecialKeyStartModel: GestureModel<KeyElement> = {
   id: 'special-key-start',
   resolutionPriority: 0,

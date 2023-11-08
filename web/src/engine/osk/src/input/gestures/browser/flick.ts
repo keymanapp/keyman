@@ -2,7 +2,7 @@ import { type KeyElement } from '../../../keyElement.js';
 import VisualKeyboard from '../../../visualKeyboard.js';
 
 import { ActiveKey, ActiveKeyBase, ActiveSubKey, KeyDistribution, KeyEvent } from '@keymanapp/keyboard-processor';
-import { ConfigChangeClosure, CumulativePathStats, GestureRecognizerConfiguration, GestureSequence, GestureSource, InputSample, PaddedZoneSource } from '@keymanapp/gesture-recognizer';
+import { ConfigChangeClosure, CumulativePathStats, GestureRecognizerConfiguration, GestureSequence, GestureSource, InputSample, PaddedZoneSource, RecognitionZoneSource } from '@keymanapp/gesture-recognizer';
 import { GestureHandler } from '../gestureHandler.js';
 import { distributionFromDistanceMaps } from '@keymanapp/input-processor';
 import { GestureParams } from '../specsForLayout.js';
@@ -128,8 +128,8 @@ export default class Flick implements GestureHandler {
         return;
       } else if(result.matchedId == 'flick-mid' || result.matchedId == 'flick-reset') {
         if(baseSelection == this.baseSpec) {
-          sequence.cancel();
-          this.cancel();
+          // Do not store a locked direction; the direction we WOULD lock has
+          // no valid flick available.
           return;
         }
 
@@ -181,26 +181,21 @@ export default class Flick implements GestureHandler {
   }
 
   private buildPopupRecognitionConfig(vkbd: VisualKeyboard): GestureRecognizerConfiguration<KeyElement, string> {
-    const rowHeight = vkbd.layerGroup.layers['default'].rowHeight
+    const roamBounding: RecognitionZoneSource = {
+      getBoundingClientRect() {
+        // We don't want to actually use Number.NEGATIVE_INFINITY or Number.POSITIVE_INFINITY
+        // because that produces a DOMRect with a few NaN fields, and we don't want _that_.
 
-    const basePadding = -2 * rowHeight;  // extends bounds by the absolute value.
-
-    const roamBounding = new PaddedZoneSource(vkbd.element, [
-      // top
-      basePadding * 2, // be extra-loose for the top!
-      basePadding,
-      basePadding
-    ]);
-
-    let safeBounds = vkbd.gestureEngine.config.safeBounds;
-    if(vkbd.isEmbedded) {
-      safeBounds = new PaddedZoneSource(safeBounds, [basePadding, 0, 0]);
+        // Way larger than any screen resolution should ever be.
+        const base = Number.MAX_SAFE_INTEGER;
+        return new DOMRect(-base, -base, 2*base, 2*base);
+      }
     }
 
     return {
       ...vkbd.gestureEngine.config,
       maxRoamingBounds: roamBounding,
-      safeBounds: safeBounds // if embedded, ensure top boundary extends outside the WebView!
+      safeBounds: roamBounding // if embedded, ensure top boundary extends outside the WebView!
     }
   }
 
