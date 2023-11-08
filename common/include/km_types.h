@@ -76,11 +76,17 @@ typedef KMX_UCHAR* KMX_PUCHAR;
   members. Note we are assuming that COMP_KEYBOARD is aligned because it is
   always the start of the file, so will be at the start of any buffer which will
   automatically be aligned correctly.
+
+  TODO: consider using c++11 alignas
 */
-#ifdef __EMSCRIPTEN__
+#if defined(__EMSCRIPTEN__) || defined (__GNUC__) || defined (__clang__)
 typedef KMX_DWORD __attribute__((aligned(1))) KMX_DWORD_unaligned;
 typedef KMX_BOOL  __attribute__((aligned(1))) KMX_BOOL_unaligned;
 typedef KMX_WORD  __attribute__((aligned(1))) KMX_WORD_unaligned;
+#elif defined(_MSC_VER)
+typedef KMX_DWORD __declspec(align(1)) KMX_DWORD_unaligned;
+typedef KMX_BOOL  __declspec(align(1)) KMX_BOOL_unaligned;
+typedef KMX_WORD  __declspec(align(1)) KMX_WORD_unaligned;
 #else
 // TODO: consider other platforms
 #define KMX_DWORD_unaligned KMX_DWORD
