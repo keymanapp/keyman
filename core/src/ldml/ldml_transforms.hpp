@@ -156,11 +156,12 @@ public:
 
 /** a single char, categorized according to reorder rules*/
 struct reorder_sort_key {
-  km_core_usv ch;         // the single char value
+  km_core_usv ch;        // the single char value
   signed char primary;   // primary order value
   size_t secondary;      // index position
   signed char tertiary;  // tertiary value, defaults to 0
   size_t quaternary;     // index again
+  bool is_tertiary_base;  // remember that this key was a tertiary base
 
   /** @returns -1, 0, 1 depending on ordering */
   int compare(const reorder_sort_key &other) const;
@@ -212,6 +213,11 @@ public:
    * @return 0 if no match otherwise length matched
    */
   size_t match_end(std::u32string &str, size_t offset, size_t len) const;
+
+  /** @returns -1, 0, 1 depending on ordering */
+  int compare(const reorder_entry &other) const;
+  bool operator<(const reorder_entry &other) const;
+  bool operator>(const reorder_entry &other) const;
 
 public:
   element_list elements;

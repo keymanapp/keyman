@@ -447,7 +447,8 @@ test_reorder_esk() {
       {
         element_list e;
         e.emplace_back(0x305, (2 << LDML_ELEM_FLAGS_TERTIARY_BITSHIFT));
-        e.emplace_back(0x302, (2 << LDML_ELEM_FLAGS_TERTIARY_BITSHIFT));
+        // (should be a unicodeset, but for simplicity we're dropping the U+302)
+        // e.emplace_back(0x302, (2 << LDML_ELEM_FLAGS_TERTIARY_BITSHIFT));
         rg.list.emplace_back(e);
       }
       // <reorder from="x" order="1" />
