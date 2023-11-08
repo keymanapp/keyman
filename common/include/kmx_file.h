@@ -7,24 +7,6 @@
 
 #include <km_types.h>
 
-/*
-  When we read .kmx files, they have no alignment guarantees, so we need to tell
-  the compiler to generate unaligned-safe code for accesses to COMP_ structure
-  members. Note we are assuming that COMP_KEYBOARD is aligned because it is
-  always the start of the file, so will be at the start of any buffer which will
-  automatically be aligned correctly.
-*/
-#ifdef __EMSCRIPTEN__
-typedef KMX_DWORD __attribute__((aligned(1))) KMX_DWORD_unaligned;
-typedef KMX_BOOL  __attribute__((aligned(1))) KMX_BOOL_unaligned;
-typedef KMX_WORD  __attribute__((aligned(1))) KMX_WORD_unaligned;
-#else
-// TODO: consider other platforms
-#define KMX_DWORD_unaligned KMX_DWORD
-#define KMX_BOOL_unaligned  KMX_BOOL
-#define KMX_WORD_unaligned  KMX_WORD
-#endif
-
 #ifdef KM_CORE_LIBRARY
 // TODO: move this to a common namespace keyman::common::kmx_file or similar in the future
 namespace km {
