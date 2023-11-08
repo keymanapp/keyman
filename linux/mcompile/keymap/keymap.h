@@ -122,9 +122,13 @@ int append_other_ToVector(v_dw_3D &All_Vector, GdkKeymap *keymap);
 // find Keyvals to fill into 2D-Vector of Other Language
 KMX_DWORD getKeyvalsFromKeymap(GdkKeymap *keymap, guint keycode, int shift_state_pos);
 
-// mapping between Linux keycodes and keyman SC
+// _S2 TODO How to do mapping between Linux keycodes and keyman SC
 const int Lin_KM__map(int i, v_dw_3D &All_Vector);
+KMX_DWORD  map_To_VK(KMX_DWORD SC);
+KMX_DWORD  mapChar_To_VK(KMX_DWORD chr );
+KMX_DWORD  mapVK_To_char(KMX_DWORD SC );
 
 std::wstring getKeySyms_according_to_Shiftstate(GdkKeymap *keymap, guint VK, v_dw_3D &All_Vector, ShiftState ss, int caps  );
 std::wstring  PrintKeymapForCodeReturnKeySym2(GdkKeymap *keymap, guint VK, v_dw_3D &All_Vector, ShiftState ss, int caps  );
+
 # endif /*KEYMAP_H*/

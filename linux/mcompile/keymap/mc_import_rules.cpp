@@ -144,11 +144,7 @@ public:
     //                                                  distinguish between left- and right-hand keys.
     //                                                  If there is no translation, the function returns 0.
     //                                                  SC -> VK
-    //_S2 QUESTION I tried to use gdk_translate-function in get_VirtualKey_Other_From_SC_GDK_dw which was not possible so I use a setter afterwards
-    //_S2 QUESTION  Wy did it give me an error?
-    this->m_vk = get_VirtualKey_Other_From_SC(scanCode, All_Vector);
-   // this->m_vk = get_VirtualKey_Other_From_SC_NEW(scanCode, All_Vector, keymap, scanCode,scanCode);
-    //this->m_vk = get_VirtualKey_Other_From_SC_GDK_dw( All_Vector, keymap, scanCode,scanCode);  // use gdk to get vk`s
+     this->m_vk = get_VirtualKey_Other_From_SC(scanCode, All_Vector);
 
     this->m_hkl = hkl;
     this->m_sc = scanCode;
@@ -161,19 +157,22 @@ public:
     //                                                  distinguish between left- and right-hand keys.
     //                                                  If there is no translation, the function returns 0.
     //                                                  SC -> VK
+    //_S2 QUESTION I tried to use gdk_translate-function in get_VirtualKey_Other_From_SC_GDK_dw which was not possible so I use a setter afterwards
+    //_S2 QUESTION  Wy did it give me an error?
+    // this->m_vk = get_VirtualKey_Other_From_SC_NEW(scanCode, All_Vector, keymap, scanCode,scanCode);
+    //this->m_vk = get_VirtualKey_Other_From_SC_GDK_dw( All_Vector, keymap, scanCode,scanCode);  // use gdk to get vk`s
     this->m_vk = get_VirtualKey_Other_From_SC(scanCode, All_Vector);
-
-   //this->m_vk = get_VirtualKey_Other_From_SC_NEW(scanCode, All_Vector, keymap, scanCode,scanCode);
     this->m_hkl = hkl;
     this->m_sc = scanCode ;
   }
 
-void set_SC(UINT value){
-  this->m_sc = value;
-}
-void set_VK(UINT value){
-  this->m_vk = value;
-}
+  void set_SC(UINT value){
+    this->m_sc = value;
+  }
+
+  void set_VK(UINT value){
+    this->m_vk = value;
+  }
 
   UINT VK() {
     return this->m_vk;
@@ -705,9 +704,11 @@ bool KMX_ImportRules(KMX_WCHAR *kbid, LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, Gd
     KMX_VirtualKey *key = new KMX_VirtualKey(sc, hkl, All_Vector, keymap);
     std::wstring str= getKeySyms_according_to_Shiftstate( *keymap, (guint) sc , All_Vector, Shft, 0 );
 
+int sedfzhjkl=99;
     // use str to fill key->vk
     if ( !str.empty() );
-      key->set_VK( (UINT)(*str.c_str())) ;
+      //key->set_VK( (UINT)(*str.c_str())) ;
+      key->set_VK( (UINT)(mapVK_To_char(sc))) ;
 
     /*wprintf(L" sc= %i ---  VK = %i (%c)\n",sc,key_vk,key_vk);*/
     if((key->VK() != 0) && (key->VK() <256)) {
@@ -785,6 +786,7 @@ UINT VK_vec = (UINT) All_Vector[1][Keypos][0];
          std::wstring VK_Other = PrintKeymapForCodeReturnKeySym2( *keymap, VK_vec, All_Vector, ss,  caps  );
 
 
+
           //std::wstring VK_Other1= PrintKeymapForCodeReturnKeySym(  *keymap, pp, All_Vector, ss, caps);
 
 
@@ -810,6 +812,7 @@ UINT VK_vec = (UINT) All_Vector[1][Keypos][0];
 
             //_S2 TODO fill m_rgfDeadkey ( m_rgfDeadkey will be done later)
             //rgKey[iKey]->KMX_SetShiftState(ss, VK_Other, false, (caps==0));
+            //rgKey[iKey]->KMX_SetShiftState(ss, VK_Other, false, (caps));
             rgKey[iKey]->KMX_SetShiftState(ss, VK_Other, false, (caps));
 
 

@@ -338,16 +338,15 @@ KMX_DWORD getKeyvalsFromKeymap(GdkKeymap *keymap, guint keycode, int shift_state
   return out;
 }
 
-// _S2 TODO is this correct ??
-KMX_DWORD  map_To_VK(KMX_DWORD SC ){
+KMX_DWORD  mapVK_To_char(KMX_DWORD SC ){
   // if there is a Keyman VK.. defined map to Keyman VKcode
 
  // if ( SC == 49)   return   VK_BKSLASH;     /* ; 220          = ` oder ^ */
  // if ( SC == 20)   return   VK_LBRKT;       /* ; 219          = - oder ß */
  // if ( SC == 21)   return   VK_RBRKT;       /* ; 221          = = oder ' */
 
- // if ( SC == 34)   return   VK_COLON;       /* ; 186 VK_OEM_4 = [ oder ü */
- // if ( SC == 35)   return   VK_EQUAL;       /* ; 187          = ] oder + */
+  if ( SC == 34)   return   VK_COLON;       /* ; 186 VK_OEM_4 = [ oder ü */
+  if ( SC == 35)   return   VK_EQUAL;       /* ; 187          = ] oder + */
 
  // if ( SC == 47)   return   VK_ACCENT;      /* ; 192 VK_OEM_1 = : oder ö */
  // if ( SC == 48)   return   VK_QUOTE;       /* ' 222 VK_OEM_7 = " oder Ä */
@@ -360,6 +359,30 @@ KMX_DWORD  map_To_VK(KMX_DWORD SC ){
  // if ( SC == 65)   return   VK_SPACE;       /* ;  32 VK_SPACE =   oder   */
  // else
     return SC;
+}
+// _S2 TODO is this correct ??
+KMX_DWORD  mapChar_To_VK(KMX_DWORD chr ){
+  // if there is a Keyman VK.. defined map to Keyman VKcode
+
+ // if ( SC == 49)   return   VK_BKSLASH;     /* ; 220          = ` oder ^ */
+ // if ( SC == 20)   return   VK_LBRKT;       /* ; 219          = - oder ß */
+ // if ( SC == 21)   return   VK_RBRKT;       /* ; 221          = = oder ' */
+
+  if ( chr == VK_COLON)   return   220;       /* ; 186 VK_OEM_4 = [ oder ü */
+  if ( chr == 187)        return   42;       /* ; 186 VK_OEM_4 = [ oder ü */
+ // if ( SC == 35)   return   VK_EQUAL;       /* ; 187          = ] oder + */
+
+ // if ( SC == 47)   return   VK_ACCENT;      /* ; 192 VK_OEM_1 = : oder ö */
+ // if ( SC == 48)   return   VK_QUOTE;       /* ' 222 VK_OEM_7 = " oder Ä */
+ // if ( SC == 51)   return   VK_SLASH;       /* ; 191          = \ oder # */
+
+ // if ( SC == 59)   return   VK_COMMA;       /* ; 188          = , oder , */
+ // if ( SC == 60)   return   VK_PERIOD;      /* ; 190          = . oder . */
+ // if ( SC == 61)   return   VK_HYPHEN;      /* ; 189          = / oder - */
+
+ // if ( SC == 65)   return   VK_SPACE;       /* ;  32 VK_SPACE =   oder   */
+ // else
+    return chr;
 }
 
 // _S2 TODO Do I need to use All_Vector  ??
@@ -383,7 +406,7 @@ KMX_DWORD get_VirtualKey_Other_From_SC(KMX_DWORD SC , v_dw_3D &All_Vector){
         // special characters return Keyman defined values (e.g. VK_ACCENT)
         else
           //return All_Vector[1][i][1];
-          return map_To_VK(SC);
+          return mapVK_To_char(SC);
       }
     }
   }
@@ -453,7 +476,7 @@ KMX_DWORD get_position_From_VirtualKey_Other(KMX_DWORD VK_Other , v_dw_3D &All_V
 
 }
 
-// _S2 TODO is this correct?
+// _S2 TODO How to do mapping between Linux keycodes and keyman SC
 const int Lin_KM__map(int i, v_dw_3D &All_Vector) {
   // MAP:
   // VK KEYMAN-STYLE  ->  KEYCODE LINUX-STYLE
@@ -462,46 +485,43 @@ const int Lin_KM__map(int i, v_dw_3D &All_Vector) {
   // finds  59th row (not value 59)
   int dw=0;
   //if (i == 32  ) return   ; /*        */5
-      //if (i == 186 ) return 252;  /* Ü      */
-      //if (i == 187 )          {wprintf(L" swapped:  i (%i) to 43  \n",dw,i);       return  43;  }/* + *    */
+      if (i == 186 ) return 220;  /* Ü      */
+      if (i == 187 ) return  42;  /* + *    */
       //if (i == 188 )          {wprintf(L" swapped:  i (%i) to 59  \n",dw,i);       return  59;  }/* COMMA  */
       //if (i == 189 )          {wprintf(L" swapped:  i (%i) to 95  \n",dw,i);       return  95;  }/*   - _  */
       //if (i == 190 )          {wprintf(L" swapped:  i (%i) to 58  \n",dw,i);       return  58;  }/* PERIOD */
       //if (i == 191 )          {wprintf(L" swapped:  i (%i) to 35  \n",dw,i);       return  35;   }/* #  '   */
-      //if (i == 191 )  {wprintf(L" swapped:  i (%i) to 63  \n",dw,i);       return  63; }/*       */
-      //if (i == 214 )  {wprintf(L" swapped:  i (%i) to 192  \n",dw,i);       return 192;  }/*  Ö     */
+      //if (i == 191 )          {wprintf(L" swapped:  i (%i) to 63  \n",dw,i);       return  63; }/*       */
+      //if (i == 214 )          {wprintf(L" swapped:  i (%i) to 192  \n",dw,i);       return 192;  }/*  Ö     */
       //if (i == 219 )          {wprintf(L" swapped:  i (%i) to 223  \n",dw,i);       return 223;  }/*  Sharp-S+  ?  */
       //if (i == 220 )          {wprintf(L" swapped:  i (%i) to 92  \n",dw,i);       return  92;  }/*  ^ °   */
-        //if (i == 221 )     {wprintf(L" swapped:  i (%i) to 180  \n",dw,i);       return 180;  }/*  ' `   */
-        //if (i == 223 )  {wprintf(L" swapped:  i (%i) to 59  \n",dw,i);       return    ; }/*       */
+      //if (i == 221 )          {wprintf(L" swapped:  i (%i) to 180  \n",dw,i);       return 180;  }/*  ' `   */
+      //if (i == 223 )          {wprintf(L" swapped:  i (%i) to 59  \n",dw,i);       return    ; }/*       */
 
       //if (i == 226 )          {wprintf(L" swapped:  i (%i) to 60  \n",dw,i);       return  60;  }/*  < >   */
       //if (i == 65105 )        {wprintf(L" swapped:  i (%i) to 92  \n",dw,i);       return  92; }/*    */
 
-        //  e.g. rgKey[192]  contains character 214
+      //  e.g. rgKey[192]  contains character 214
       //if (i == 192 )          {wprintf(L" swapped:  i (%i) to 214  \n",dw,i);       return 214;  }/* Ö      */
       //if (i == 186 )          {wprintf(L" swapped:  i (%i) to 220  \n",dw,i);       return 220;  }/* Ü      */
       //if (i == 222 )          {wprintf(L" swapped:  i (%i) to 196  \n",dw,i);       return 196;  }/* Ä      */
-      if (i == 222 )          {wprintf(L" swapped:  i (%i) to 196  \n",dw,i);       return 196;  }/* Ä      */
+      if (i == 220)             {wprintf(L" swapped:  i (%i) to 196  \n",dw,i);       return 186;  }/* Ä      */
+      if (i == 42)              {wprintf(L" swapped:  i (%i) to 196  \n",dw,i);       return 187;  }/* +      */
 
   return i;
 }
 
 // _S2 TODO
-std::wstring  getKeySyms_according_to_Shiftstate(GdkKeymap *keymap, guint VK, v_dw_3D &All_Vector, ShiftState ss, int caps  ){
+std::wstring  getKeySyms_according_to_Shiftstate(GdkKeymap *keymap, guint keycode, v_dw_3D &All_Vector, ShiftState ss, int caps  ){
 
   GdkModifierType consumed;
   GdkKeymapKey *maps;
   guint *keyvals;
   gint count;
-  guint keycode;
   GdkKeymapKey* keys;
   gint n_keys;
   guint lowerCase;
   guint upperCase;
-
-  int pos_1 =get_position_From_VirtualKey_Other(VK , All_Vector, 0);
-  keycode = All_Vector[1][pos_1][0];
 
   // _S2 TODO what to return if it fails?
   if (!gdk_keymap_get_entries_for_keycode(keymap, keycode, &maps, &keyvals, &count))
