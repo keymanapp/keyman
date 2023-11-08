@@ -248,7 +248,7 @@ export default abstract class OSKKey {
 
     // Don't add extra padding to height - multiplying with MAX_Y_PROPORTION already gives
     // padding
-    let textHeight = fontHeight ? fontHeight : 0;
+    let textHeight = fontHeight ?? 0;
     if(style.height && style.height.indexOf('px') != -1) {
       keyHeight = Number.parseFloat(style.height.substring(0, style.height.indexOf('px')));
     }
