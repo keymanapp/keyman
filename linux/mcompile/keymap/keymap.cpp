@@ -342,23 +342,23 @@ KMX_DWORD getKeyvalsFromKeymap(GdkKeymap *keymap, guint keycode, int shift_state
 KMX_DWORD  map_To_VK(KMX_DWORD SC ){
   // if there is a Keyman VK.. defined map to Keyman VKcode
 
-  if ( SC == 49)   return   VK_BKSLASH;     /* ; 220          = ` oder ^ */
-  if ( SC == 20)   return   VK_LBRKT;       /* ; 219          = - oder ß */
-  if ( SC == 21)   return   VK_RBRKT;       /* ; 221          = = oder ' */
+ // if ( SC == 49)   return   VK_BKSLASH;     /* ; 220          = ` oder ^ */
+ // if ( SC == 20)   return   VK_LBRKT;       /* ; 219          = - oder ß */
+ // if ( SC == 21)   return   VK_RBRKT;       /* ; 221          = = oder ' */
 
-  if ( SC == 34)   return   VK_COLON;       /* ; 186 VK_OEM_4 = [ oder ü */
-  if ( SC == 35)   return   VK_EQUAL;       /* ; 187          = ] oder + */
+ // if ( SC == 34)   return   VK_COLON;       /* ; 186 VK_OEM_4 = [ oder ü */
+ // if ( SC == 35)   return   VK_EQUAL;       /* ; 187          = ] oder + */
 
-  if ( SC == 47)   return   VK_ACCENT;      /* ; 192 VK_OEM_1 = : oder ö */
-  if ( SC == 48)   return   VK_QUOTE;       /* ' 222 VK_OEM_7 = " oder Ä */
-  if ( SC == 51)   return   VK_SLASH;       /* ; 191          = \ oder # */
+ // if ( SC == 47)   return   VK_ACCENT;      /* ; 192 VK_OEM_1 = : oder ö */
+ // if ( SC == 48)   return   VK_QUOTE;       /* ' 222 VK_OEM_7 = " oder Ä */
+ // if ( SC == 51)   return   VK_SLASH;       /* ; 191          = \ oder # */
 
-  if ( SC == 59)   return   VK_COMMA;       /* ; 188          = , oder , */
-  if ( SC == 60)   return   VK_PERIOD;      /* ; 190          = . oder . */
-  if ( SC == 61)   return   VK_HYPHEN;      /* ; 189          = / oder - */
+ // if ( SC == 59)   return   VK_COMMA;       /* ; 188          = , oder , */
+ // if ( SC == 60)   return   VK_PERIOD;      /* ; 190          = . oder . */
+ // if ( SC == 61)   return   VK_HYPHEN;      /* ; 189          = / oder - */
 
-  if ( SC == 65)   return   VK_SPACE;       /* ;  32 VK_SPACE =   oder   */
-  else
+ // if ( SC == 65)   return   VK_SPACE;       /* ;  32 VK_SPACE =   oder   */
+ // else
     return SC;
 }
 
@@ -463,24 +463,25 @@ const int Lin_KM__map(int i, v_dw_3D &All_Vector) {
   int dw=0;
   //if (i == 32  ) return   ; /*        */5
       //if (i == 186 ) return 252;  /* Ü      */
-      if (i == 187 )          {wprintf(L" swapped:  i (%i) to 43  \n",dw,i);       return  43;  }/* + *    */
-      if (i == 188 )          {wprintf(L" swapped:  i (%i) to 59  \n",dw,i);       return  59;  }/* COMMA  */
-      if (i == 189 )          {wprintf(L" swapped:  i (%i) to 95  \n",dw,i);       return  95;  }/*   - _  */
-      if (i == 190 )          {wprintf(L" swapped:  i (%i) to 58  \n",dw,i);       return  58;  }/* PERIOD */
-      if (i == 191 )          {wprintf(L" swapped:  i (%i) to 35  \n",dw,i);       return  35;   }/* #  '   */
+      //if (i == 187 )          {wprintf(L" swapped:  i (%i) to 43  \n",dw,i);       return  43;  }/* + *    */
+      //if (i == 188 )          {wprintf(L" swapped:  i (%i) to 59  \n",dw,i);       return  59;  }/* COMMA  */
+      //if (i == 189 )          {wprintf(L" swapped:  i (%i) to 95  \n",dw,i);       return  95;  }/*   - _  */
+      //if (i == 190 )          {wprintf(L" swapped:  i (%i) to 58  \n",dw,i);       return  58;  }/* PERIOD */
+      //if (i == 191 )          {wprintf(L" swapped:  i (%i) to 35  \n",dw,i);       return  35;   }/* #  '   */
       //if (i == 191 )  {wprintf(L" swapped:  i (%i) to 63  \n",dw,i);       return  63; }/*       */
       //if (i == 214 )  {wprintf(L" swapped:  i (%i) to 192  \n",dw,i);       return 192;  }/*  Ö     */
-      if (i == 219 )          {wprintf(L" swapped:  i (%i) to 223  \n",dw,i);       return 223;  }/*  Sharp-S+  ?  */
-      if (i == 220 )          {wprintf(L" swapped:  i (%i) to 92  \n",dw,i);       return  92;  }/*  ^ °   */
+      //if (i == 219 )          {wprintf(L" swapped:  i (%i) to 223  \n",dw,i);       return 223;  }/*  Sharp-S+  ?  */
+      //if (i == 220 )          {wprintf(L" swapped:  i (%i) to 92  \n",dw,i);       return  92;  }/*  ^ °   */
         //if (i == 221 )     {wprintf(L" swapped:  i (%i) to 180  \n",dw,i);       return 180;  }/*  ' `   */
         //if (i == 223 )  {wprintf(L" swapped:  i (%i) to 59  \n",dw,i);       return    ; }/*       */
 
-      if (i == 226 )          {wprintf(L" swapped:  i (%i) to 60  \n",dw,i);       return  60;  }/*  < >   */
-      if (i == 65105 )        {wprintf(L" swapped:  i (%i) to 92  \n",dw,i);       return  92; }/*    */
+      //if (i == 226 )          {wprintf(L" swapped:  i (%i) to 60  \n",dw,i);       return  60;  }/*  < >   */
+      //if (i == 65105 )        {wprintf(L" swapped:  i (%i) to 92  \n",dw,i);       return  92; }/*    */
 
         //  e.g. rgKey[192]  contains character 214
-      if (i == 192 )          {wprintf(L" swapped:  i (%i) to 214  \n",dw,i);       return 214;  }/* Ö      */
-      if (i == 186 )          {wprintf(L" swapped:  i (%i) to 220  \n",dw,i);       return 220;  }/* Ü      */
+      //if (i == 192 )          {wprintf(L" swapped:  i (%i) to 214  \n",dw,i);       return 214;  }/* Ö      */
+      //if (i == 186 )          {wprintf(L" swapped:  i (%i) to 220  \n",dw,i);       return 220;  }/* Ü      */
+      //if (i == 222 )          {wprintf(L" swapped:  i (%i) to 196  \n",dw,i);       return 196;  }/* Ä      */
       if (i == 222 )          {wprintf(L" swapped:  i (%i) to 196  \n",dw,i);       return 196;  }/* Ä      */
 
   return i;
@@ -560,3 +561,72 @@ std::wstring  getKeySyms_according_to_Shiftstate(GdkKeymap *keymap, guint VK, v_
   else
     return L"0";
 }
+
+
+std::wstring  PrintKeymapForCodeReturnKeySym2(GdkKeymap *keymap, guint VK, v_dw_3D &All_Vector, ShiftState ss, int caps  ){
+
+  GdkModifierType consumed;
+  GdkKeymapKey *maps;
+  GdkEventKey* event;
+  guint *keyvals;
+  guint *keyvals_shift;
+  gint *n_entries;
+  gint count;
+  guint keycode;
+
+  GdkKeymapKey* keys;
+  gint n_keys;
+
+  gdk_keymap_get_entries_for_keyval(keymap, VK,&keys,&n_keys);
+
+  int pos_1 =get_position_From_VirtualKey_Other(VK , All_Vector, 0);
+  //wprintf(L" get_position_From_VirtualKey_Other %i of VK%i (%c) \n", pos_1, VK,VK);
+  keycode = All_Vector[1][pos_1][0];
+
+  if (!gdk_keymap_get_entries_for_keycode(keymap, keycode, &maps, &keyvals, &count))
+    return L"1";
+
+
+  //unshifted
+  if (( ss == Base ) && ( caps == 0 )) {
+    GdkModifierType MOD_base = (GdkModifierType) ( ~GDK_MODIFIER_MASK );
+    gdk_keymap_translate_keyboard_state (keymap, keycode, MOD_base , 0, keyvals, NULL, NULL, & consumed);
+    return  std::wstring(1, (int) *keyvals);
+  }
+
+  //SHIFT+CAPS
+  else if ( ( ss == Shft ) && ( caps ==1 )) {
+    GdkModifierType MOD_ShiftCaps= (GdkModifierType) ((GDK_SHIFT_MASK | GDK_LOCK_MASK));
+    gdk_keymap_translate_keyboard_state (keymap, keycode, MOD_ShiftCaps , 0, keyvals, NULL, NULL, & consumed);
+    return  std::wstring(1, (int) *keyvals);
+
+  }
+
+  //Shift
+  else if (( ss == Shft ) && ( caps == 0 )) {
+    GdkModifierType MOD_Shift = (GdkModifierType) ( GDK_SHIFT_MASK );
+    gdk_keymap_translate_keyboard_state (keymap, keycode, MOD_Shift , 0, keyvals, NULL, NULL, & consumed);
+    std::wstring rV1= std::wstring(1, (int) *keyvals);
+    return  std::wstring(1, (int) *keyvals);
+
+  }
+
+  //caps
+  else if (( ss == Base ) && ( caps == 1 )) {
+    GdkModifierType MOD_Caps = (GdkModifierType) ( GDK_LOCK_MASK );
+    gdk_keymap_translate_keyboard_state (keymap, keycode, MOD_Caps, 0, keyvals, NULL, NULL, & consumed);
+    return  std::wstring(1, (int) *keyvals);
+
+  }
+
+  /*//ALT-GR
+  else if {
+    GdkModifierType MOD_AltGr = (GdkModifierType) ( GDK_MOD5_MASK );
+    gdk_keymap_translate_keyboard_state (keymap, keycode, MOD_AltGr , 0, keyvals, NULL, NULL, & consumed);
+    return *keyvals;
+  }*/
+
+  else
+    return L"0";
+}
+

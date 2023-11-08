@@ -773,10 +773,26 @@ bool KMX_ImportRules(KMX_WCHAR *kbid, LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, Gd
           continue;
         }
 
+// _S2 TODO get Keyval from GDK
+int Keypos =  get_position_From_VirtualKey_Other(mapped_ikey , All_Vector, 99);
+UINT VK_vec = (UINT) All_Vector[1][Keypos][0];
+
         for(int caps = 0; caps <= 1; caps++) {
 
           //_S2 TODO get char  - do I need rc ?? ( was rc = ToUnicodeEx...)
-          std::wstring VK_Other = get_VirtualKey_Other_from_iKey(mapped_ikey, ss, caps, All_Vector);
+          std::wstring VK_Other_OLD = get_VirtualKey_Other_from_iKey(mapped_ikey, ss, caps, All_Vector);
+          // std::wstring VK_Other1= getKeySyms_according_to_Shiftstate(  *keymap, VK_vec, All_Vector, ss, caps);
+         std::wstring VK_Other = PrintKeymapForCodeReturnKeySym2( *keymap, VK_vec, All_Vector, ss,  caps  );
+
+
+          //std::wstring VK_Other1= PrintKeymapForCodeReturnKeySym(  *keymap, pp, All_Vector, ss, caps);
+
+
+
+          if ( VK_Other_OLD != VK_Other) {
+            if(VK_Other!=L"" )
+              wprintf(L"\nVK`s are different :-(  %s <--> %s  ",VK_Other.c_str() ,VK_Other_OLD.c_str());
+          }
 
           //_S2 TODO do I need that ??
           //if rc >0: it got 1 or more char AND buffer is empty ( nothing inside ) {
@@ -793,7 +809,8 @@ bool KMX_ImportRules(KMX_WCHAR *kbid, LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, Gd
             }
 
             //_S2 TODO fill m_rgfDeadkey ( m_rgfDeadkey will be done later)
-            rgKey[iKey]->KMX_SetShiftState(ss, VK_Other, false, (caps==0));
+            //rgKey[iKey]->KMX_SetShiftState(ss, VK_Other, false, (caps==0));
+            rgKey[iKey]->KMX_SetShiftState(ss, VK_Other, false, (caps));
 
 
         //_S2 TODO
