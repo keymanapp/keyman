@@ -91,6 +91,13 @@ end;
 procedure TxmlLdmlProjectFile.Save(node: IXMLNode);   // I4698
 begin
   inherited Save(node);   // I4698
+
+  // We override the FileType set by TProjectFile so that we
+  // can distinguish .xml keyboard files in the project view
+  // from other arbitrary .xml files that may be in the project
+  // FileType is _only_ used by the project view xsl files
+  node.ChildValues['FileType'] := '.xml-ldml-keyboard';
+
   node := node.AddChild('Details');
   if FHeader_Name <> '' then node.AddChild('Name').NodeValue := FHeader_Name;
 end;

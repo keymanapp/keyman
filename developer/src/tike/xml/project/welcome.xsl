@@ -80,7 +80,7 @@
         <xsl:with-param name="caption">Open</xsl:with-param>
         <xsl:with-param name="command">keyman:openfile?id=<xsl:value-of select="ID" /></xsl:with-param>
       </xsl:call-template>
-      <xsl:if test="FileType='.kmn' or FileType='.kps' or FileType='.kpp'">
+      <xsl:if test="FileType='.kmn' or FileType='.kps' or FileType='.xml-ldml-keyboard'">
         <xsl:call-template name="menuitem">
           <xsl:with-param name="caption">View Source</xsl:with-param>
           <xsl:with-param name="command">keyman:viewfilesource?id=<xsl:value-of select="ID" /></xsl:with-param>

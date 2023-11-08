@@ -67,14 +67,14 @@
           <xsl:with-param name="caption">Build all</xsl:with-param>
           <xsl:with-param name="command">keyman:compileall</xsl:with-param>
           <xsl:with-param name="enabled">
-            <xsl:if test="not(KeymanDeveloperProject/Files/File[(FileType='.kps' or FileType='.kmn') and not (ParentFileID)])">false</xsl:if>
+            <xsl:if test="not(KeymanDeveloperProject/Files/File[(FileType='.kps' or FileType='.kmn' or FileType='.xml-ldml-keyboard') and not (ParentFileID)])">false</xsl:if>
           </xsl:with-param>
         </xsl:call-template>
         <xsl:call-template name="button">
           <xsl:with-param name="caption">Clean all</xsl:with-param>
           <xsl:with-param name="command">keyman:cleanall</xsl:with-param>
           <xsl:with-param name="enabled">
-            <xsl:if test="not(KeymanDeveloperProject/Files/File[(FileType='.kps' or FileType='.kmn') and not (ParentFileID)])">false</xsl:if>
+            <xsl:if test="not(KeymanDeveloperProject/Files/File[(FileType='.kps' or FileType='.kmn' or FileType='.xml-ldml-keyboard') and not (ParentFileID)])">false</xsl:if>
           </xsl:with-param>
           <xsl:with-param name="width">auto</xsl:with-param>
         </xsl:call-template>
