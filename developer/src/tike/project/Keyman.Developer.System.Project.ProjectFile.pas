@@ -984,17 +984,6 @@ begin
   end;
 end;
 
-{
-function IsLMDLKeyboardFile(filename: string): Boolean;
-  if EndsText('.xml', filename) then
-  begin
-    Result := Pos('ldmlKeyboard3.dtd', ReadUtf8FileText(ff)) > 0;
-  end
-  else
-    Result := False;
-end;
-}
-
 function TProject.CanUpgrade: Boolean;
 var
   i: Integer;
@@ -1015,12 +1004,12 @@ begin
   if Options.BuildPath.Contains('$SOURCEPATH') then
   begin
     Result := False;
-    FUpgradeMessages.Add('The BuildPath option contains "$SOURCEPATH"');
+    FUpgradeMessages.Add('The BuildPath project setting contains the "$SOURCEPATH" tag, which is no longer supported');
   end;
   if Options.BuildPath.Contains('$VERSION') then
   begin
     Result := False;
-    FUpgradeMessages.Add('The BuildPath option contains "$VERSION"');
+    FUpgradeMessages.Add('The BuildPath project setting contains the "$VERSION" tag, which is no longer supported');
   end;
 
   for i := 0 to Files.Count - 1 do
@@ -1037,7 +1026,7 @@ begin
       Continue;
     end;
 
-    FUpgradeMessages.Add('File '+Files[i].FileName+' is outside the project folder');
+    FUpgradeMessages.Add('File '+Files[i].FileName+' is outside the project folder. All primary source files must be in the same folder as the project file, or in a subfolder.');
     Result := False;
   end;
 end;
