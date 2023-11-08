@@ -109,19 +109,24 @@ export default class Flick implements GestureHandler {
     this.gestureParams = gestureParams;
     this.baseSpec = e.key.spec as ActiveKey;
 
-    sequence.on('complete', () => previewHost.cancel());
-
     // May be worth a temporary alt config:  global roaming, rather than auto-canceling.
 
     this.baseKeyDistances = vkbd.getSimpleTapCorrectionDistances(sequence.stageReports[0].sources[0].path.stats.initialSample, this.baseSpec)
     const baseSource = sequence.stageReports[0].sources[0].baseSource;
+
+    sequence.on('complete', () => {
+      previewHost.cancel()
+    });
 
     this.sequence.on('stage', (result) => {
       const pathStats = baseSource.path.stats;
       this.computedFlickDistribution = this.flickDistribution(pathStats, true);
 
       const baseSelection = this.computedFlickDistribution[0].keySpec;
-      if(result.matchedId == 'flick-mid' || result.matchedId == 'flick-reset') {
+      if(result.matchedId == 'flick-reset-end') {
+        this.emitKey(vkbd, this.baseSpec, baseSource.path.stats);
+        return;
+      } else if(result.matchedId == 'flick-mid' || result.matchedId == 'flick-reset') {
         if(baseSelection == this.baseSpec) {
           sequence.cancel();
           this.cancel();
@@ -148,20 +153,7 @@ export default class Flick implements GestureHandler {
       }
 
       const selection = this.lockedSelectable ?? baseSelection;
-      let keyEvent: KeyEvent;
-      const projectedDistance = calcLockedDistance(pathStats, this.lockedDir);
-      if(projectedDistance < this.gestureParams.flick.dirLockDist) {
-        keyEvent = vkbd.keyEventFromSpec(this.baseSpec);
-      } else if(projectedDistance >= this.gestureParams.flick.triggerDist) {
-        keyEvent = vkbd.keyEventFromSpec(selection);
-      } else {
-        return;
-      }
-
-      keyEvent.keyDistribution = this.currentStageKeyDistribution(this.baseKeyDistances);
-
-      // emit the keystroke
-      vkbd.raiseKeyEvent(keyEvent, null);
+      this.emitKey(vkbd, selection, pathStats);
     });
 
     // Be sure to extend roaming bounds a bit more than usual for flicks, as they can be quick motions.
@@ -170,6 +162,23 @@ export default class Flick implements GestureHandler {
       type: 'push',
       config: altConfig
     });
+  }
+
+  private emitKey(vkbd: VisualKeyboard, selection: ActiveKeyBase, pathStats: CumulativePathStats<any>) {
+    let keyEvent: KeyEvent;
+    const projectedDistance = calcLockedDistance(pathStats, this.lockedDir);
+    if(projectedDistance < this.gestureParams.flick.dirLockDist) {
+      keyEvent = vkbd.keyEventFromSpec(this.baseSpec);
+    } else if(projectedDistance >= this.gestureParams.flick.triggerDist) {
+      keyEvent = vkbd.keyEventFromSpec(selection);
+    } else {
+      return;
+    }
+
+    keyEvent.keyDistribution = this.currentStageKeyDistribution(this.baseKeyDistances);
+
+    // emit the keystroke
+    vkbd.raiseKeyEvent(keyEvent, null);
   }
 
   private buildPopupRecognitionConfig(vkbd: VisualKeyboard): GestureRecognizerConfiguration<KeyElement, string> {

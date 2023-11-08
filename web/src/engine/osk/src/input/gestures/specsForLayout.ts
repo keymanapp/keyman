@@ -229,6 +229,7 @@ export function gestureSetForLayout(layerGroup: OSKLayerGroup, params: GesturePa
     gestureModels.push(withKeySpecFiltering(flickStartModel(params), 0));
     gestureModels.push(flickMidModel(params));
     gestureModels.push(flickResetModel(params));
+    gestureModels.push(FlickResetEndModel);
     gestureModels.push(flickEndModel(params));
 
     defaultSet.push('flick-start');
@@ -284,24 +285,17 @@ export function flickMidContactModel(params: GestureParams): ContactModel {
   return {
     itemPriority: 1,
     pathModel: {
-      evaluate: (path, baseStats) => {
-        // // Straightness heuristic:  we hard-commit to a direction based on the first stage's
-        // // initial direction, allowing only that direction & its immediate neighbors.
-        // const directions = [ baseStats.cardinalDirection, path.stats.cardinalDirection ];
-        // directions.sort((a, b) => b.length - a.length);
-        // // If both directions are intercardinal but not the same intercardinal, reject.
-        // if(directions[1].length == 2 && directions[0] != directions[1]) {
-        //   return 'reject';
-        //   // index 0 is either length 1 or 2; either way, it should include index 1's char.
-        // } else if(directions[0].indexOf(directions[1]) == -1) {
-        //   return 'reject';
-        // }
-
-        if(path.stats.netDistance >= params.flick.dirLockDist) {
+      evaluate: (path) => {
+        // Since 'flick-end' depends on projection to a perfectly-aligned cardinal or
+        // intercardinal, we need to perform the projection here in order to avoid
+        // immediate rejection if the 'true' net distance isn't properly aligned.
+        if(calcLockedDistance(path.stats, path.stats.cardinalDirection as any) >= params.flick.dirLockDist) {
           // We _could_ add other criteria if desired, such as for straightness.
           // - What's the angle variance look like?
           // - or, take a regression & look at the coefficient of determination.
           return 'resolve';
+        } else if(path.isComplete) {
+          return 'reject';
         }
       }
     },
@@ -680,12 +674,33 @@ export function flickResetModel(params: GestureParams): GestureModel<any> {
   return {
     ...base,
     id: 'flick-reset',
+    rejectionActions: {
+      // Only 'rejects' in this form if the path is completed before direction-locking state.
+      path: {
+        type: 'replace',
+        replace: 'flick-reset-end'
+      }
+    },
     resolutionAction: {
       type: 'chain',
       next: 'flick-end'
     }
   };
 }
+
+export const FlickResetEndModel: GestureModel<any> = {
+  id: 'flick-reset-end',
+  resolutionPriority: 1,
+  contacts: [],
+  sustainTimer: {
+    duration: 0,
+    expectedResult: true
+  },
+  resolutionAction: {
+    type: 'complete',
+    item: 'base'
+  }
+};
 
 export function flickEndModel(params: GestureParams): GestureModel<any> {
   return {
