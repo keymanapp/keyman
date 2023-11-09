@@ -1,6 +1,5 @@
 #include "mc_kmxfile.h"
 #include "u16.h"
-#include "filesystem.h"     // _S2 needed?
 #include <typeinfo>
 
 KMX_BOOL KMX_VerifyKeyboard(LPKMX_BYTE filebase, KMX_DWORD sz);

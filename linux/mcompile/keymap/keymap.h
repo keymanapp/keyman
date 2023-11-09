@@ -109,6 +109,8 @@ KMX_DWORD get_SC_From_VirtualKey_US(KMX_DWORD VK_US , v_dw_3D &All_Vector);
 KMX_DWORD get_position_From_VirtualKey_Other(KMX_DWORD VK_US , v_dw_3D &All_Vector);
 // return the Scancode of for given VirtualKey of Other in specific column. If column > available columns look in all columns;
 KMX_DWORD get_position_From_VirtualKey_Other(KMX_DWORD VK_Other , v_dw_3D &All_Vector, int which_columns);
+// return the Scancode of for given VirtualKey using GDK
+KMX_DWORD get_position_From_GDK(GdkKeymap *keymap, UINT mapped_ikey);
 
 // initialize GDK
 bool InitializeGDK(GdkKeymap **keymap,int argc, gchar *argv[]);

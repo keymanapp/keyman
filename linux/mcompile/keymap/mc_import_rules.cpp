@@ -332,7 +332,7 @@ int i4 = this->KMX_IsXxxxGrCapsEqualToXxxxShift() ? 8 : 0;
         if (st.size() == 0) {
           // No character assigned here
         }
-        // _S2 deadkeys don work yet
+        // _S2 deadkeys don't work yet
         else if (this->m_rgfDeadKey[(int)ss][caps]) {
           // It's a dead key, append an @ sign.
           key->dpContext = new KMX_WCHAR[1];
@@ -690,8 +690,6 @@ bool KMX_ImportRules(KMX_WCHAR *kbid, LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, Gd
   // values in it. Then, store the SC in each valid VK so it can act as both a 
   // flag that the VK is valid, and it can store the SC value.
     // _S2 this does not find exactly the same keys as the windows version does(windows finds more)
-    // but the ones we need for mcompile are there
-
 
   for(UINT sc = 0x01; sc <= 0x7f; sc++) {
     KMX_VirtualKey *key = new KMX_VirtualKey(sc, hkl, All_Vector, keymap);
@@ -780,16 +778,29 @@ bool KMX_ImportRules(KMX_WCHAR *kbid, LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, Gd
           continue;
         }
 
-// _S2 TODO get Keyval from GDK
-int Keypos =  get_position_From_VirtualKey_Other(mapped_ikey , All_Vector, 99);
-UINT VK_vec = (UINT) All_Vector[1][Keypos][0];
+        // _S2 TODO get Keyval from GDK  get the keyval(nr of key )for e.g.52  -> 52 is printed out by key 13)
+        //int Keypos =  get_position_From_VirtualKey_Other(mapped_ikey , All_Vector, 99);
+        //UINT VK_vec = (UINT) All_Vector[1][Keypos][0];
+
+        // _S2 get_position_From_GDK gives wrong values for 0,65,94,126 which are not processed correctly -> "what do I return if not found..."
+        KMX_DWORD keypos_GDK=  get_position_From_GDK( *keymap,  mapped_ikey );
+
+        //if ( VK_vec != keypos_GDK)
+        //  wprintf(L" DIFFFFERERNT !!!!!!! , %i -- %i\n", VK_vec,keypos_GDK );
+
+        // _S2 TODO this needs to go !! it's temporary until we decide what to return if not found. At the moment we return 0 in this case which is a problem for gdk
+        // _S2 to avoid Gdk-CRITICAL **: 16:41:42.662: gdk_keymap_get_entries_for_keyval: assertion 'keyval != 0' failed we set keypos_GDK to a value
+        if (keypos_GDK ==0)
+          keypos_GDK = 49;
+
 
         for(int caps = 0; caps <= 1; caps++) {
 
           //_S2 TODO get char  - do I need rc ?? ( was rc = ToUnicodeEx...)
           std::wstring VK_Other_OLD = get_VirtualKey_Other_from_iKey(mapped_ikey, ss, caps, All_Vector);
           // std::wstring VK_Other1= getKeySyms_according_to_Shiftstate(  *keymap, VK_vec, All_Vector, ss, caps);
-          std::wstring VK_Other = PrintKeymapForCodeReturnKeySym2( *keymap, VK_vec, All_Vector, ss,  caps  );
+          //std::wstring VK_Other = PrintKeymapForCodeReturnKeySym2( *keymap, VK_vec, All_Vector, ss,  caps  );
+          std::wstring VK_Other = PrintKeymapForCodeReturnKeySym2( *keymap, keypos_GDK, All_Vector, ss,  caps  );
 
 
           /*  _S2 can go later
@@ -849,6 +860,7 @@ UINT VK_vec = (UINT) All_Vector[1][Keypos][0];
   memcpy(gp, kp->dpGroupArray, sizeof(KMX_GROUP) * kp->cxGroupArray);
 
   //
+
   // Find the current highest deadkey index
   //
 
@@ -876,9 +888,10 @@ UINT VK_vec = (UINT) All_Vector[1][Keypos][0];
   for (UINT iKey = 0; iKey < rgKey.size(); iKey++) {
     if ((rgKey[iKey] != NULL) && rgKey[iKey]->KMX_IsKeymanUsedKey() && (!rgKey[iKey]->KMX_IsEmpty())) {
       nKeys+= rgKey[iKey]->KMX_GetKeyCount(loader.MaxShiftState());
-      wprintf(L" iKey = %i, Delta:  %i \n", iKey, rgKey[iKey]->KMX_GetKeyCount(loader.MaxShiftState()));
+      //wprintf(L" iKey = %i, Delta:  %i \n", iKey, rgKey[iKey]->KMX_GetKeyCount(loader.MaxShiftState()));
     }
   }
+
 
   nDeadkey++; // ensure a 1-based index above the max deadkey value already in the keyboard
 
@@ -897,7 +910,7 @@ int STOP;
 
   for (UINT iKey = 0; iKey < rgKey.size(); iKey++) {
     if ((rgKey[iKey] != NULL) && rgKey[iKey]->KMX_IsKeymanUsedKey() && (!rgKey[iKey]->KMX_IsEmpty())) {
-      wprintf(L"********************************* I use Key Nr %i\n",iKey);
+      //wprintf(L"********************************* I use Key Nr %i\n",iKey);
       // for each item, 
       if(rgKey[iKey]->KMX_LayoutRow(loader.MaxShiftState(), &gp->dpKeyArray[nKeys], &alDead, nDeadkey, bDeadkeyConversion, All_Vector)) {   // I4552
         nKeys+=rgKey[iKey]->KMX_GetKeyCount(loader.MaxShiftState());

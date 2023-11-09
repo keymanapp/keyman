@@ -476,6 +476,22 @@ KMX_DWORD get_position_From_VirtualKey_Other(KMX_DWORD VK_Other , v_dw_3D &All_V
 
 }
 
+// returns Keyval which hold the Keysym (in unshifted, shifted)
+KMX_DWORD get_position_From_GDK(GdkKeymap *keymap, UINT KeySym ) {
+  GdkKeymapKey *maps;
+  guint *keyvals;
+  gint count;
+
+  for (int k=0; k<255 ; k++ ){
+    if (gdk_keymap_get_entries_for_keycode (keymap, k, &maps, &keyvals, &count)) {
+      if ( (keyvals[0] == KeySym) || (keyvals[1] == KeySym) ) {
+        return (KMX_DWORD) maps[0].keycode;
+      }
+    }
+  }
+  return 0;    //_S2 TODO what do I return if not found??
+}
+
 // _S2 TODO How to do mapping between Linux keycodes and keyman SC
 const int Lin_KM__map(int i, v_dw_3D &All_Vector) {
   // MAP:

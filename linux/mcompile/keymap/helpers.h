@@ -1,3 +1,7 @@
+// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+//_S2 do not review - all this will be deleted later
+// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
 #pragma once
 #ifndef HELPERS_H
 #define HELPERS_H
@@ -6,9 +10,6 @@
 #include "mc_savekeyboard.h"
 #include "mc_kmxfile.h"
 #include "keymap.h"
-
-
-//_S2 do not review - all this will be deleted later
 
 // why again here?
 typedef std::vector<std::string> v_str_1D;
