@@ -788,8 +788,8 @@ bool KMX_ImportRules(KMX_WCHAR *kbid, LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, Gd
         //if ( VK_vec != keypos_GDK)
         //  wprintf(L" DIFFFFERERNT !!!!!!! , %i -- %i\n", VK_vec,keypos_GDK );
 
-        // _S2 TODO this needs to go !! it's temporary until we decide what to return if not found. At the moment we return 0 in this case which is a problem for gdk
-        // _S2 to avoid Gdk-CRITICAL **: 16:41:42.662: gdk_keymap_get_entries_for_keyval: assertion 'keyval != 0' failed we set keypos_GDK to a value
+        // _S2 TODO this needs to go !! it's TEMPORARY until we decide what to return if not found. At the moment we return 0 in this case which is a problem for gdk
+        // _S2 to avoid Gdk-CRITICAL **: 16:41:42.662: gdk_keymap_get_entries_for_keyval: assertion 'keyval != 0' failed: we set keypos_GDK to a value
         if (keypos_GDK ==0)
           keypos_GDK = 49;
 
