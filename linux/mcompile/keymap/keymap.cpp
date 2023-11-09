@@ -619,7 +619,6 @@ std::wstring  PrintKeymapForCodeReturnKeySym2(GdkKeymap *keymap, guint VK, v_dw_
     GdkModifierType MOD_ShiftCaps= (GdkModifierType) ((GDK_SHIFT_MASK | GDK_LOCK_MASK));
     gdk_keymap_translate_keyboard_state (keymap, keycode, MOD_ShiftCaps , 0, keyvals, NULL, NULL, & consumed);
     return  std::wstring(1, (int) *keyvals);
-
   }
 
   //Shift
@@ -628,7 +627,6 @@ std::wstring  PrintKeymapForCodeReturnKeySym2(GdkKeymap *keymap, guint VK, v_dw_
     gdk_keymap_translate_keyboard_state (keymap, keycode, MOD_Shift , 0, keyvals, NULL, NULL, & consumed);
     std::wstring rV1= std::wstring(1, (int) *keyvals);
     return  std::wstring(1, (int) *keyvals);
-
   }
 
   //caps
@@ -636,7 +634,6 @@ std::wstring  PrintKeymapForCodeReturnKeySym2(GdkKeymap *keymap, guint VK, v_dw_
     GdkModifierType MOD_Caps = (GdkModifierType) ( GDK_LOCK_MASK );
     gdk_keymap_translate_keyboard_state (keymap, keycode, MOD_Caps, 0, keyvals, NULL, NULL, & consumed);
     return  std::wstring(1, (int) *keyvals);
-
   }
 
   /*//ALT-GR

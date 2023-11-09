@@ -144,7 +144,9 @@ public:
     //                                                  distinguish between left- and right-hand keys.
     //                                                  If there is no translation, the function returns 0.
     //                                                  SC -> VK
-     this->m_vk = get_VirtualKey_Other_From_SC(scanCode, All_Vector);
+    //_S2 QUESTION I tried to use gdk_translate-function in get_VirtualKey_Other_From_SC_GDK_dw which was not possible so I use a setter afterwards
+    //_S2 QUESTION  Wy did it give me an error?
+    this->m_vk = get_VirtualKey_Other_From_SC(scanCode, All_Vector);
 
     this->m_hkl = hkl;
     this->m_sc = scanCode;
@@ -157,22 +159,21 @@ public:
     //                                                  distinguish between left- and right-hand keys.
     //                                                  If there is no translation, the function returns 0.
     //                                                  SC -> VK
-    //_S2 QUESTION I tried to use gdk_translate-function in get_VirtualKey_Other_From_SC_GDK_dw which was not possible so I use a setter afterwards
-    //_S2 QUESTION  Wy did it give me an error?
-    // this->m_vk = get_VirtualKey_Other_From_SC_NEW(scanCode, All_Vector, keymap, scanCode,scanCode);
-    //this->m_vk = get_VirtualKey_Other_From_SC_GDK_dw( All_Vector, keymap, scanCode,scanCode);  // use gdk to get vk`s
     this->m_vk = get_VirtualKey_Other_From_SC(scanCode, All_Vector);
+   // this->m_vk = get_VirtualKey_Other_From_SC_NEW(scanCode, All_Vector, keymap, scanCode,scanCode);
+    //this->m_vk = get_VirtualKey_Other_From_SC_GDK_dw( All_Vector, keymap, scanCode,scanCode);  // use gdk to get vk`s
+
+   //this->m_vk = get_VirtualKey_Other_From_SC_NEW(scanCode, All_Vector, keymap, scanCode,scanCode);
     this->m_hkl = hkl;
     this->m_sc = scanCode ;
   }
 
-  void set_SC(UINT value){
-    this->m_sc = value;
-  }
-
-  void set_VK(UINT value){
-    this->m_vk = value;
-  }
+void set_SC(UINT value){
+  this->m_sc = value;
+}
+void set_VK(UINT value){
+  this->m_vk = value;
+}
 
   UINT VK() {
     return this->m_vk;
@@ -263,6 +264,20 @@ public:
     int nkeys = 0;
 
     // Get the CAPSLOCK value
+
+bool   b1= this->KMX_IsCapsEqualToShift();
+bool   b2= this->KMX_IsSGCAPS();
+bool   b3= this->KMX_IsAltGrCapsEqualToAltGrShift();
+bool   b4= this->KMX_IsXxxxGrCapsEqualToXxxxShift() ;
+
+int i1 = this->KMX_IsCapsEqualToShift() ? 1 : 0;
+int i2 = this->KMX_IsSGCAPS() ? 2 : 0;
+int i3 = this->KMX_IsAltGrCapsEqualToAltGrShift() ? 4 : 0;
+int i4 = this->KMX_IsXxxxGrCapsEqualToXxxxShift() ? 8 : 0;
+
+
+
+
     int capslock =
         (this->KMX_IsCapsEqualToShift() ? 1 : 0) |
         (this->KMX_IsSGCAPS() ? 2 : 0) |
@@ -676,39 +691,16 @@ bool KMX_ImportRules(KMX_WCHAR *kbid, LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, Gd
   // flag that the VK is valid, and it can store the SC value.
     // _S2 this does not find exactly the same keys as the windows version does(windows finds more)
     // but the ones we need for mcompile are there
-  //for(UINT sc = 0x01; sc <= 0x7f; sc++) {
-
-//should be 54 (= unshifted)
-//KMX_VirtualKey *key1 = new KMX_VirtualKey(15, hkl, All_Vector, keymap);
-//should be 65 (=shifted)
-//KMX_VirtualKey *key2 = new KMX_VirtualKey(38, hkl, All_Vector, keymap);
-
-//------------------------------------
-
-/*//for(UINT sc = 0x01; sc <= 0x7f; sc++) {
-   for(UINT sc = 0x0; sc <= 0x7f; sc++) {
-     KMX_VirtualKey *key = new KMX_VirtualKey(sc, hkl, All_Vector);      // _S2 get this from my Vector
-     uint key_vk = key->VK() ;
-+    wprintf(L" sc= %i ---  VK = %i (%c)\n",sc,key_vk,key_vk);
-    if(key->VK() != 0) {
-       rgKey[key->VK()] = key;
-     } else {*/
-
-
-
-//---------------------------
-
 
 
   for(UINT sc = 0x01; sc <= 0x7f; sc++) {
     KMX_VirtualKey *key = new KMX_VirtualKey(sc, hkl, All_Vector, keymap);
     std::wstring str= getKeySyms_according_to_Shiftstate( *keymap, (guint) sc , All_Vector, Shft, 0 );
 
-int sedfzhjkl=99;
-    // use str to fill key->vk
+    // _S2 QUESTION How to use keymap to fill key->vk correctly
+    // use str to edit  key->vk
     if ( !str.empty() );
-      //key->set_VK( (UINT)(*str.c_str())) ;
-      key->set_VK( (UINT)(mapVK_To_char(sc))) ;
+      key->set_VK( (UINT)(*str.c_str())) ;
 
     /*wprintf(L" sc= %i ---  VK = %i (%c)\n",sc,key_vk,key_vk);*/
     if((key->VK() != 0) && (key->VK() <256)) {
@@ -759,7 +751,21 @@ int sedfzhjkl=99;
       }
   }
 
-  // _S2 This part is not finished completely. It still needs some work..
+  // _S2 QUIESTION !!!
+  // Different characters on Windows and Lunux for shift/Caps-states:
+  //        Windows                      Linux
+  // none/caps/shift/caps+Shift <=> none/caps/shift/caps+Shift
+  //        a A A a             <=>      a A A a
+  //        ö Ö Ö ö             <=>      ö Ö Ö ö
+  //        1 ! ! 1             <=>      1 1 ! !     ( on US keyboard)
+  //        & 1 1 &             <=>      & 1 1 &     ( on FR keyboard)
+  //        ù % % ù             <=>      ù Ù % %     (!!!)
+  //        ' # # '             <=>      # # ' '
+  //        - - _ _             <=>      - - _ _
+  //
+  // in which order would we place them in rgKey[] ??
+  // this affects counting of keys in functions KMX_GetKeyCount/KMX_IsCapsEqualToShift
+
 
   // _S2 in this part we skip shiftstates 4, 5, 8, 9
   for(UINT iKey = 0; iKey < rgKey.size(); iKey++) {
@@ -783,18 +789,14 @@ UINT VK_vec = (UINT) All_Vector[1][Keypos][0];
           //_S2 TODO get char  - do I need rc ?? ( was rc = ToUnicodeEx...)
           std::wstring VK_Other_OLD = get_VirtualKey_Other_from_iKey(mapped_ikey, ss, caps, All_Vector);
           // std::wstring VK_Other1= getKeySyms_according_to_Shiftstate(  *keymap, VK_vec, All_Vector, ss, caps);
-         std::wstring VK_Other = PrintKeymapForCodeReturnKeySym2( *keymap, VK_vec, All_Vector, ss,  caps  );
+          std::wstring VK_Other = PrintKeymapForCodeReturnKeySym2( *keymap, VK_vec, All_Vector, ss,  caps  );
 
 
-
-          //std::wstring VK_Other1= PrintKeymapForCodeReturnKeySym(  *keymap, pp, All_Vector, ss, caps);
-
-
-
+          /*  _S2 can go later
           if ( VK_Other_OLD != VK_Other) {
             if(VK_Other!=L"" )
               wprintf(L"\nVK`s are different :-(  %s <--> %s  ",VK_Other.c_str() ,VK_Other_OLD.c_str());
-          }
+          }*/
 
           //_S2 TODO do I need that ??
           //if rc >0: it got 1 or more char AND buffer is empty ( nothing inside ) {
@@ -812,7 +814,6 @@ UINT VK_vec = (UINT) All_Vector[1][Keypos][0];
 
             //_S2 TODO fill m_rgfDeadkey ( m_rgfDeadkey will be done later)
             //rgKey[iKey]->KMX_SetShiftState(ss, VK_Other, false, (caps==0));
-            //rgKey[iKey]->KMX_SetShiftState(ss, VK_Other, false, (caps));
             rgKey[iKey]->KMX_SetShiftState(ss, VK_Other, false, (caps));
 
 
@@ -875,6 +876,7 @@ UINT VK_vec = (UINT) All_Vector[1][Keypos][0];
   for (UINT iKey = 0; iKey < rgKey.size(); iKey++) {
     if ((rgKey[iKey] != NULL) && rgKey[iKey]->KMX_IsKeymanUsedKey() && (!rgKey[iKey]->KMX_IsEmpty())) {
       nKeys+= rgKey[iKey]->KMX_GetKeyCount(loader.MaxShiftState());
+      wprintf(L" iKey = %i, Delta:  %i \n", iKey, rgKey[iKey]->KMX_GetKeyCount(loader.MaxShiftState()));
     }
   }
 
