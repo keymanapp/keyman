@@ -357,8 +357,9 @@ export class MatcherSelector<Type, StateToken = any> extends EventEmitter<EventM
       }
     }
 
-    // If in a sustain mode, no new models may launch; only existing sequences are allowed to continue.
-    if(this.sustainMode) {
+    // If in a sustain mode, no models for new sources may launch;
+    // only existing sequences are allowed to continue.
+    if(this.sustainMode && unmatchedSource) {
       matchPromise.resolve({
         matcher: null,
         result: {
@@ -568,6 +569,10 @@ export class MatcherSelector<Type, StateToken = any> extends EventEmitter<EventM
         // There is an action to be resolved...
         // But we didn't actually MATCH a gesture.
         const replacer = (replacementModel: GestureModel<Type, StateToken>) => {
+         if(this.sustainMode && !replacementModel.sustainWhenNested) {
+            return;
+          }
+
           const replacementMatcher = new GestureMatcher(replacementModel, matcher);
 
           /* IMPORTANT: verify that the replacement model is initially valid.
