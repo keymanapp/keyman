@@ -79,7 +79,7 @@ function triggerGitHubActionsBuild() {
     GIT_HEAD_SHA="${GIT_BUILD_SHA}"
     GIT_EVENT_TYPE="${GITHUB_ACTION}: release@${VERSION_WITH_TAG}"
   elif [[ $GIT_BRANCH != stable-* ]] && [[ $GIT_BRANCH =~ [0-9]+ ]]; then
-    GIT_BUILD_SHA="$(git rev-parse "refs/pull/${GIT_BRANCH}/merge")"
+    GIT_BUILD_SHA="$(git rev-parse "refs/pull/${GIT_BRANCH}/head")"
     GIT_HEAD_SHA="$(git rev-parse "refs/pull/${GIT_BRANCH}/head")"
     GIT_EVENT_TYPE="${GITHUB_ACTION}: PR #${GIT_BRANCH}"
     GIT_BRANCH="PR-${GIT_BRANCH}"

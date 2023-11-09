@@ -1,5 +1,6 @@
 import * as path from "path";
 import * as url from 'url';
+import { shutdown } from './shutdown.js';
 
 // TODO: this is a Windows-only tray icon. There are a number of
 // cross-platform solutions but none of them are wonderful. We
@@ -76,7 +77,7 @@ export class Win32Tray {
           WindowsConsole.hideConsole();
           break;
         case 'item-id-exit':
-          process.exit(0);
+          shutdown();
       }
     });
 

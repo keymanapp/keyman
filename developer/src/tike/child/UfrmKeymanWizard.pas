@@ -571,7 +571,6 @@ uses
   CharacterInfo,
   CharMapDropTool,
   Clipbrd,
-  compile,
   dmActionsMain,
   KeymanDeveloperOptions,
   KeymanVersion,
@@ -2993,7 +2992,6 @@ begin
     Free;
   end;
 
-  TProject.CompilerMessageFile := ProjectFile;
   frmMessages.Clear;
   w := TKmcWrapper.Create;
   try
@@ -3007,7 +3005,6 @@ begin
     w.Free;
     DeleteFile(KMNFileName);
   end;
-  TProject.CompilerMessageFile := nil;
 end;
 
 procedure TfrmKeymanWizard.OSKImportKMXFinished(Sender: TObject; KMXFileName: TTempFile);   // I4181

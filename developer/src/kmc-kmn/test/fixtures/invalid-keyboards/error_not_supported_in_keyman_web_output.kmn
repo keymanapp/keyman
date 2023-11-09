@@ -1,0 +1,11 @@
+c Tests ERROR_NotSupportedInKeymanWebOutput for `return`
+
+store(&NAME) 'ERROR_NotSupportedInKeymanWebOutput'
+store(&VERSION) '9.0'
+store(&TARGETS) 'web'
+
+begin unicode > use(main)
+
+group(main) using keys
+
++ 'a' > return

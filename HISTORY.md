@@ -1,5 +1,26 @@
 # Keyman Version History
 
+## 17.0.208 alpha 2023-11-08
+
+* fix(web): Fix clearing of deadkeys (#9944)
+* fix(web): Ignore `osk-always-visible` on non-desktop devices (#9951)
+* fix(linux): Fix baseline tests (#9967)
+* chore(linux): Fix GHA triggering (#9965)
+* fix(linux): Fix trigger for baseline tests (#9968)
+
+## 17.0.207 alpha 2023-11-07
+
+* refactor(web): Link to `index.html` in test pages (#9953)
+* feat(developer): Add more non-printing characters (#9846)
+
+## 17.0.206 alpha 2023-11-06
+
+* chore(developer): remove compile.pas and CompileErrorCodes.pas (#9924)
+* chore(common): remove prepublish step from package.json (#9937)
+* feat(developer): provide line number for some kmw compiler messages (#9938)
+* fix(developer): Sentry in Server should honour reporting settings (#9940)
+* fix(developer): resilience in loading Server config and cache files (#9941)
+
 ## 17.0.205 alpha 2023-11-03
 
 * fix(developer): use KeymanWeb.Codes for 17.0+ (#9913)
