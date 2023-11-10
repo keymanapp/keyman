@@ -304,7 +304,32 @@ bool write_RGKEY_FileToVector(v_dw_2D& shift_states, const char* infile) {
   fclose(fp);
   return(0);
 }
+KMX_DWORD get_VirtualKey_Other_From_SC(KMX_DWORD SC , v_dw_3D &All_Vector) {
 
+  for( int i=0; i< (int)All_Vector[0].size();i++) {
+    //number keys return unshifted value ( e.g. 1, not !)
+    if(SC <= 19) {
+      if ( All_Vector[0][i][0] == SC)
+        return All_Vector[1][i][1];
+    }
+
+    // other keys
+    if((SC > 19) ) {
+      if ( All_Vector[0][i][0] == SC) {
+
+        // normal capital characters return the value of capital char ( e.g. A)
+        if ((All_Vector[1][i][2] >= 65 ) && (All_Vector[1][i][2] < 91 ))
+          return All_Vector[1][i][2];
+
+        // special characters return Keyman defined values (e.g. VK_ACCENT)
+        else
+          //return All_Vector[1][i][1];
+          return mapVK_To_char(SC);
+      }
+    }
+  }
+return 0;
+}
 bool test_In_Out(v_dw_3D All_Vector){
 
   for ( int i=0; i<61;i++)

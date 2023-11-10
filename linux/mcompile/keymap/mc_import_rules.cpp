@@ -109,18 +109,18 @@ private:
 
 public:
 // _S2 can be deleted later
-  KMX_VirtualKey(KMX_HKL hkl, UINT KMX_virtualKey) {/*
+ /* KMX_VirtualKey(KMX_HKL hkl, UINT KMX_virtualKey) {
     this->m_sc = MapVirtualKeyEx(virtualKey, 0, hkl);
     this->m_hkl = hkl;
     this->m_vk = KMX_virtualKey;
-    memset(this->m_rgfDeadKey,0,sizeof(this->m_rgfDeadKey));*/
-  }
+    memset(this->m_rgfDeadKey,0,sizeof(this->m_rgfDeadKey));
+  }*/
   // _S2 can be deleted later
-  KMX_VirtualKey(UINT scanCode, KMX_HKL hkl) {
+  /*KMX_VirtualKey(UINT scanCode, KMX_HKL hkl) {
     //    this->m_vk = MapVirtualKeyEx(scanCode, 1, hkl);
     this->m_hkl = hkl;
     this->m_sc = scanCode;
-  }
+  }*/
 
 
   KMX_VirtualKey(KMX_HKL hkl, UINT KMX_virtualKey, v_dw_3D All_Vector) {/*
@@ -137,20 +137,17 @@ public:
     memset(this->m_rgfDeadKey,0,sizeof(this->m_rgfDeadKey));
   }
 
-  KMX_VirtualKey(UINT scanCode, KMX_HKL hkl, v_dw_3D All_Vector) {
+  /*KMX_VirtualKey(UINT scanCode, KMX_HKL hkl, v_dw_3D All_Vector) {
     // _S2 this->m_vk = MapVirtualKeyEx(scanCode, 1, hkl);  // second para= 1: MAPVK_VSC_TO_VK =1
     //                                                  The first parameter is a scan code and is
     //                                                  translated into a virtual-key code that does not
     //                                                  distinguish between left- and right-hand keys.
     //                                                  If there is no translation, the function returns 0.
     //                                                  SC -> VK
-    //_S2 QUESTION I tried to use gdk_translate-function in get_VirtualKey_Other_From_SC_GDK_dw which was not possible so I use a setter afterwards
-    //_S2 QUESTION  Wy did it give me an error?
     this->m_vk = get_VirtualKey_Other_From_SC(scanCode, All_Vector);
-
     this->m_hkl = hkl;
     this->m_sc = scanCode;
-  }
+  }*/
 
   KMX_VirtualKey(UINT scanCode, KMX_HKL hkl, v_dw_3D All_Vector, GdkKeymap **keymap) {
     // _S2 this->m_vk = MapVirtualKeyEx(scanCode, 1, hkl);  // second para= 1: MAPVK_VSC_TO_VK =1
@@ -159,11 +156,15 @@ public:
     //                                                  distinguish between left- and right-hand keys.
     //                                                  If there is no translation, the function returns 0.
     //                                                  SC -> VK
-    this->m_vk = get_VirtualKey_Other_From_SC(scanCode, All_Vector);
-   // this->m_vk = get_VirtualKey_Other_From_SC_NEW(scanCode, All_Vector, keymap, scanCode,scanCode);
-    //this->m_vk = get_VirtualKey_Other_From_SC_GDK_dw( All_Vector, keymap, scanCode,scanCode);  // use gdk to get vk`s
+    //KMX_DWORD old = get_VirtualKey_Other_From_SC(scanCode, All_Vector);
+    this->m_vk = get_VirtualKey_Other_GDK(*keymap, scanCode);
 
-   //this->m_vk = get_VirtualKey_Other_From_SC_NEW(scanCode, All_Vector, keymap, scanCode,scanCode);
+/* _S2 can go later
+    if( this->m_vk != old)
+      wprintf(L" not the same !!!!!!!!!!!!!!!!!!!!!!!!! scanCode%i: %i(%c) -- %i(%c)\n",scanCode, this->m_vk, this->m_vk, old,old);
+   else
+      wprintf(L" all good  ................... scanCode%i: %i(%c) -- %i(%c)\n",scanCode, this->m_vk, this->m_vk, old,old);
+ */
     this->m_hkl = hkl;
     this->m_sc = scanCode ;
   }
@@ -842,6 +843,7 @@ bool KMX_ImportRules(KMX_WCHAR *kbid, LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, Gd
 
   //_S2 this gan co later
   //std::vector< int > TestValues = {48,49,50,52,53,54,55,56,57,54,65,89,189,188};
+  //std::vector< int > TestValues = {48,49,50,51,52,53,54,55,56,57,65,66,67,88,89,90, 176,177,196,214,220};
   std::vector< int > TestValues = {48,49,50,51,52,53,54,55,56,57,65,66,67,88,89,90};
  // std::vector< int > TestValues = {65};
   wprintf(L"-----------------\nNow some tests:\n");

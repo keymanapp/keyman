@@ -329,7 +329,7 @@ KMX_DWORD getKeyvalsFromKeymap(GdkKeymap *keymap, guint keycode, int shift_state
   // _S2 if out of range of what ( ascii??) return 0 or other value ?
   if (out > 255) {
     wprintf(L"out of range: found value out( %i) for keycode = %i /shift_state_pos %i      (49= TLDE 21= VK_EQUALS on US keyboard) \n", out,keycode,shift_state_pos);
-    out = 0;
+    //out = 0;
   }
 
   g_free(keyvals);
@@ -385,11 +385,11 @@ KMX_DWORD  mapChar_To_VK(KMX_DWORD chr ){
     return chr;
 }
 
-// _S2 TODO Do I need to use All_Vector  ??
-KMX_DWORD get_VirtualKey_Other_From_SC(KMX_DWORD SC , v_dw_3D &All_Vector){
+// _S2 This can go later
+/*KMX_DWORD get_VirtualKey_Other_From_SC(KMX_DWORD SC , v_dw_3D &All_Vector) {
 
   for( int i=0; i< (int)All_Vector[0].size();i++) {
-    //number keys return unshifted value ( e.g. 1 not !)
+    //number keys return unshifted value ( e.g. 1, not !)
     if(SC <= 19) {
       if ( All_Vector[0][i][0] == SC)
         return All_Vector[1][i][1];
@@ -412,8 +412,41 @@ KMX_DWORD get_VirtualKey_Other_From_SC(KMX_DWORD SC , v_dw_3D &All_Vector){
   }
 return 0;
 }
+*/
 
+KMX_DWORD get_VirtualKey_Other_GDK( GdkKeymap *keymap, KMX_DWORD keycode) {
 
+  GdkModifierType consumed;
+  GdkKeymapKey *maps;
+  guint *keyvals;
+  guint lowerCase;
+  guint upperCase;
+  gint count;
+
+  if (!gdk_keymap_get_entries_for_keycode(keymap, keycode, &maps, &keyvals, &count))
+    return 0;
+
+  //Shift
+    //GdkModifierType MOD_Shift = (GdkModifierType) (  ~consumed & GDK_SHIFT_MASK );
+    GdkModifierType MOD_Shift = (GdkModifierType) ( GDK_SHIFT_MASK );
+    gdk_keymap_translate_keyboard_state (keymap, keycode, MOD_Shift , 0, keyvals, NULL, NULL, & consumed);
+
+    for (int i = 0; i < count; i++) {
+      if (maps[i].level > 1 || maps[i].group > 1)
+        continue;
+
+      gchar * kv_name =  gdk_keyval_name (keyvals[i]);
+
+      if ( keyvals[i]>0)
+        gdk_keyval_convert_case (*kv_name, &lowerCase, &upperCase);
+
+      // _S2 is ( lowerCase == upperCase )  true for all number keys for all keyboards?
+      if ( lowerCase == upperCase )
+        return  (KMX_DWORD)  upperCase;
+    }
+    return  (KMX_DWORD) *keyvals;
+return 0;
+}
 
 // _S2 not needed?, can go later?
 // return RETURN NON SHIFTED CHAR [1]  the VirtualKey of the US Keyboard for given Scancode
@@ -560,24 +593,7 @@ std::wstring  getKeySyms_according_to_Shiftstate(GdkKeymap *keymap, guint keycod
 
   //Shift
   else if (( ss == Shft ) && ( caps == 0 )) {
-    GdkModifierType MOD_Shift = (GdkModifierType) ( GDK_SHIFT_MASK );
-    gdk_keymap_translate_keyboard_state (keymap, keycode, MOD_Shift , 0, keyvals, NULL, NULL, & consumed);
-    std::wstring rV1= std::wstring(1, (int) *keyvals);
-
-    for (int i = 0; i < count; i++) {
-      if (maps[i].level > 1 || maps[i].group > 1)
-        continue;
-
-      gchar * gch =  gdk_keyval_name (keyvals[i]);
-
-      if ( keyvals[i]>0)
-        gdk_keyval_convert_case (*gch, &lowerCase, &upperCase);
-
-      // _S2 is ( lowerCase == upperCase )  true for all number keys for all keyboards?
-      if ( lowerCase == upperCase )
-        return  std::wstring(1, (int) upperCase);
-    }
-    return rV1;
+    return std::wstring(1, (int) get_VirtualKey_Other_GDK(keymap,  keycode));
   }
 
   //caps
@@ -609,7 +625,6 @@ std::wstring  PrintKeymapForCodeReturnKeySym2(GdkKeymap *keymap, guint VK, v_dw_
   gint *n_entries;
   gint count;
   guint keycode;
-
   GdkKeymapKey* keys;
   gint n_keys;
 
