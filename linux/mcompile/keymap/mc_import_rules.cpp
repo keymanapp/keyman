@@ -150,31 +150,10 @@ public:
   }*/
 
   KMX_VirtualKey(UINT scanCode, KMX_HKL hkl, v_dw_3D All_Vector, GdkKeymap **keymap) {
-    // _S2 this->m_vk = MapVirtualKeyEx(scanCode, 1, hkl);  // second para= 1: MAPVK_VSC_TO_VK =1
-    //                                                  The first parameter is a scan code and is
-    //                                                  translated into a virtual-key code that does not
-    //                                                  distinguish between left- and right-hand keys.
-    //                                                  If there is no translation, the function returns 0.
-    //                                                  SC -> VK
-    //KMX_DWORD old = get_VirtualKey_Other_From_SC(scanCode, All_Vector);
     this->m_vk = get_VirtualKey_Other_GDK(*keymap, scanCode);
-
-/* _S2 can go later
-    if( this->m_vk != old)
-      wprintf(L" not the same !!!!!!!!!!!!!!!!!!!!!!!!! scanCode%i: %i(%c) -- %i(%c)\n",scanCode, this->m_vk, this->m_vk, old,old);
-   else
-      wprintf(L" all good  ................... scanCode%i: %i(%c) -- %i(%c)\n",scanCode, this->m_vk, this->m_vk, old,old);
- */
     this->m_hkl = hkl;
     this->m_sc = scanCode ;
   }
-
-void set_SC(UINT value){
-  this->m_sc = value;
-}
-void set_VK(UINT value){
-  this->m_vk = value;
-}
 
   UINT VK() {
     return this->m_vk;
@@ -661,23 +640,23 @@ bool KMX_ImportRules(KMX_WCHAR *kbid, LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, Gd
   KMX_Loader loader;
   const size_t BUF_sz= 256;
 
-                                                                                        // _S2 do I need that for Linux??
-                                                                                        KMX_WCHAR inputHKL[12];
-                                                                                        u16sprintf(inputHKL,BUF_sz ,L"%08.8x", (unsigned int) u16tol(kbid, NULL, 16));   // _S2 wsprintf(inputHKL, L"%08.8x", (unsigned int) wcstol(kbid, NULL, 16));
+  // _S2 do I need that for Linux??
+  KMX_WCHAR inputHKL[12];
+  u16sprintf(inputHKL,BUF_sz ,L"%08.8x", (unsigned int) u16tol(kbid, NULL, 16));   // _S2 wsprintf(inputHKL, L"%08.8x", (unsigned int) wcstol(kbid, NULL, 16));
 
 
-                                                                                        /*
-                                                                                          // _S2 do I need that for Linux??
-                                                                                          int cKeyboards = GetKeyboardLayoutList(0, NULL);
-                                                                                          HKL *rghkl = new HKL[cKeyboards];
-                                                                                          GetKeyboardLayoutList(cKeyboards, rghkl);
-                                                                                          HKL hkl = LoadKeyboardLayout(inputHKL, KLF_NOTELLSHELL);
-                                                                                          if(hkl == NULL) {
-                                                                                              puts("Sorry, that keyboard does not seem to be valid.");
-                                                                                              delete[] rghkl;
-                                                                                              return false;
-                                                                                          }
-                                                                                          */
+  /*
+    // _S2 do I need that for Linux??
+    int cKeyboards = GetKeyboardLayoutList(0, NULL);
+    HKL *rghkl = new HKL[cKeyboards];
+    GetKeyboardLayoutList(cKeyboards, rghkl);
+    HKL hkl = LoadKeyboardLayout(inputHKL, KLF_NOTELLSHELL);
+    if(hkl == NULL) {
+        puts("Sorry, that keyboard does not seem to be valid.");
+        delete[] rghkl;
+        return false;
+    }
+    */
   KMX_HKL hkl = NULL;               //_S2 added: but can I do this?? hkl is not needed in Linux??
 
   BYTE lpKeyState[256];// = new KeysEx[256];
@@ -694,20 +673,12 @@ bool KMX_ImportRules(KMX_WCHAR *kbid, LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, Gd
 
   for(UINT sc = 0x01; sc <= 0x7f; sc++) {
     KMX_VirtualKey *key = new KMX_VirtualKey(sc, hkl, All_Vector, keymap);
-    std::wstring str= get_KeyVals_according_to_Shiftstate( *keymap, (guint) sc , Shft, 0 );
-
-    // _S2 QUESTION How to use keymap to fill key->vk correctly
-    // use str to edit  key->vk
-    if ( !str.empty() );
-      key->set_VK( (UINT)(*str.c_str())) ;
-
-    /*wprintf(L" sc= %i ---  VK = %i (%c)\n",sc,key_vk,key_vk);*/
+    // _S2 is there a better solution than   && (key->VK() <256)
     if((key->VK() != 0) && (key->VK() <256)) {
         rgKey[key->VK()] = key;
     } else {
         delete key;
     }
-
   }
 
   for(UINT ke = VK_NUMPAD0; ke <= VK_NUMPAD9; ke++) {

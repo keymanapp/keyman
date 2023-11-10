@@ -72,7 +72,7 @@ int run(int argc, std::vector<std::u16string> str_argv, char* argv_ch[] = NULL){
     argv.push_back(cmdl_par);
   }
 
-  wprintf(L"##### started run\n");
+
 
   if(argc < 3 || (argc < 5 && u16cmp(argv[1], u"-u") != 0)) {   // I4273// I4273
     wprintf(

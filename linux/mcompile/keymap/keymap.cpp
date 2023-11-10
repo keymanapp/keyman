@@ -444,8 +444,8 @@ KMX_DWORD get_VirtualKey_Other_GDK( GdkKeymap *keymap, KMX_DWORD keycode) {
       if ( lowerCase == upperCase )
         return  (KMX_DWORD)  upperCase;
     }
-    return  (KMX_DWORD) *keyvals;
-return 0;
+    return  (KMX_DWORD) *keyvals;  //_S2 what to return if >255
+return 0;   //_S2 what to return if not found
 }
 
 // _S2 not needed, can go later
@@ -566,8 +566,6 @@ std::wstring  get_KeyVals_according_to_Shiftstate(GdkKeymap *keymap, guint keyco
   GdkKeymapKey *maps;
   guint *keyvals;
   gint count;
-  guint lowerCase;
-  guint upperCase;
 
   // _S2 TODO what to return if it fails?
   if (!gdk_keymap_get_entries_for_keycode(keymap, keycode, &maps, &keyvals, &count))
