@@ -1,39 +1,45 @@
 #pragma once
-#include "km_types.h"
+#ifndef MC_KMXFILE_H
+#define MC_KMXFILE_H
 
-KMX_DWORD TEST;
+#include "km_types.h"
+#include "kmx_file.h"
+#include "filesystem.h"
+#include "mcompile.h"
+
+#include <iostream>		// _S2 can be removed later
 
 #ifndef _KMXFILE_H
 #define _KMXFILE_H
 
-typedef struct tagSTORE {
+
+typedef struct KMX_tagSTORE {
 	KMX_DWORD dwSystemID;
-	PKMX_WCHART dpName;
-	PKMX_WCHART dpString;
-} STORE, *LPSTORE;
+	PKMX_WCHAR dpName;
+	PKMX_WCHAR dpString;
+} KMX_STORE, *LPKMX_STORE;
 
 
-typedef struct tagKEY {
+typedef struct KMX_tagKEY {
 	KMX_WCHAR Key;
 	KMX_DWORD Line;
 	KMX_DWORD ShiftFlags;
-	PKMX_WCHART dpOutput;
-	PKMX_WCHART dpContext;
-} KEY, *LPKEY;
+	PKMX_WCHAR dpOutput;
+	PKMX_WCHAR dpContext;
+} KMX_KEY, *LPKMX_KEY;
 
 
-typedef struct tagGROUP {
-	PKMX_WCHART dpName;
-	LPKEY dpKeyArray;		// [LPKEY] address of first item in key array
-	PKMX_WCHART dpMatch;
-	PKMX_WCHART dpNoMatch;
-	KMX_DWORD cxKeyArray;		// in array entries
-	KMX_BOOL  fUsingKeys;		// group(xx) [using keys] <-- specified or not
-} GROUP, *LPGROUP;
+typedef struct KMX_tagGROUP {
+	KMX_WCHAR* dpName;
+	LPKMX_KEY dpKeyArray;		// [LPKEY] address of first item in key array
+	PKMX_WCHAR dpMatch;
+	PKMX_WCHAR dpNoMatch;
+	KMX_DWORD cxKeyArray;		// in array entries  // _S2 was DWORD
+	int32_t  fUsingKeys;		// group(xx) [using keys] <-- specified or not
+} KMX_GROUP, *LPKMX_GROUP;
 
 
-
-typedef struct tagKEYBOARD {
+typedef struct KMX_tagKEYBOARD {
 	KMX_DWORD dwIdentifier;		// Keyman compiled keyboard id
 
 	KMX_DWORD dwFileVersion;	// Version of the file - Keyman 4.0 is 0x0400
@@ -46,8 +52,8 @@ typedef struct tagKEYBOARD {
 	KMX_DWORD cxStoreArray;		// in array entries
 	KMX_DWORD cxGroupArray;		// in array entries
 
-	LPSTORE dpStoreArray;	// [LPSTORE] address of first item in store array, from start of file
-	LPGROUP dpGroupArray;	// [LPGROUP] address of first item in group array, from start of file
+	LPKMX_STORE dpStoreArray;	// [LPSTORE] address of first item in store array, from start of file
+	LPKMX_GROUP dpGroupArray;	// [LPGROUP] address of first item in group array, from start of file
 
 	KMX_DWORD StartGroup[2];	// index of starting groups [2 of them]
 							// Ansi=0, Unicode=1
@@ -56,24 +62,24 @@ typedef struct tagKEYBOARD {
 
 	KMX_DWORD dwHotKey;			// standard windows hotkey (hiword=shift/ctrl/alt stuff, loword=vkey)
 
-	//PKMX_WCHART dpName;			// offset of name
-	//PKMX_WCHART dpLanguageName;	// offset of language name;
-	//PKMX_WCHART dpCopyright;		// offset of copyright
-	//PKMX_WCHART dpMessage;		// offset of message in Keyboard About box
+	//PWSTR dpName;			// offset of name
+	//PWSTR dpLanguageName;	// offset of language name;
+	//PWSTR dpCopyright;		// offset of copyright
+	//PWSTR dpMessage;		// offset of message in Keyboard About box
 
 	KMX_DWORD dpBitmapOffset;	// 0038 offset of the bitmaps in the file
 	KMX_DWORD dwBitmapSize;		// 003C size in bytes of the bitmaps
 	//HBITMAP	hBitmap;		// handle to the bitmap in the file;
-} KEYBOARD, *LPKEYBOARD;
-
-KMX_BOOL LoadKeyboard(LPKMX_WCHART fileName, LPKEYBOARD *lpKeyboard);		// _S2 LPKEYBOARD ok to leave as is??
-
-#endif
+} KMX_KEYBOARD, *LPKMX_KEYBOARD;
 
 
+KMX_BOOL KMX_LoadKeyboard(char16_t* fileName, LPKMX_KEYBOARD *lpKeyboard);
 
+KMX_BOOL KMX_SaveKeyboard(LPKMX_KEYBOARD kbd, PKMX_WCHAR filename);
 
+KMX_DWORD KMX_WriteCompiledKeyboard(LPKMX_KEYBOARD fk, FILE* hOutfile, KMX_BOOL FSaveDebug);
 
+#endif // _KMXFILE_H
 
 //---------------------old----------------------------------------
 /*
@@ -145,3 +151,5 @@ BOOL LoadKeyboard(LPWSTR fileName, LPKEYBOARD *lpKeyboard);
 #endif
 */
 
+
+#endif /*MC_KMXFILE_H*/

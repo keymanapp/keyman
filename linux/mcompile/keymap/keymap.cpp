@@ -1,61 +1,49 @@
 #include "keymap.h"
 
-/*
-static void PrintKeymapForCode(GdkKeymap *keymap, guint keycode)
-{
-  GdkKeymapKey *maps;
-  guint *keyvals;
-  gint count;
+#include <xkbcommon/xkbcommon.h>
 
-  if (!gdk_keymap_get_entries_for_keycode(keymap, keycode, &maps, &keyvals, &count))
-    return;
+int write_US_ToVector( v_dw_3D &vec,std::string language, const char* text) {
 
-  for (int i = 0; i < count; i++) {
-    if (maps[i].level > 0 || maps[i].group > 1)
-      continue;
-    printf("    i=%d, keycode=%d, keyval=%d (%c), level=%d, group=%d\n", i, maps[i].keycode, keyvals[i], keyvals[i], maps[i].level, maps[i].group);
-  }
-
-  g_free(keyvals);
-  g_free(maps);
-}
-*/
-
-void write_US_ToVector( v_str_3D &vec,std::string language, const char* text) {
-  // ? CHECK if ran OK-> return 0/1
   std::string FullPathName = "/usr/share/X11/xkb/symbols/" + language;
 
   const char* path = FullPathName.c_str();
   FILE* fp = fopen((path), "r");
-  if ( !fp)
-    printf("could not open file!");
+  if ( !fp) {
+    wprintf(L"ERROR: could not open file!\n");
+    return 1;
+  }
 
   // create 1D-vector of the complete line
   v_str_1D Vector_completeUS;
-  CreateCompleteRow_US(Vector_completeUS,fp , text, language);
+  if( createCompleteRow_US(Vector_completeUS,fp , text, language)) {
+    wprintf(L"ERROR: can't Create complete row US \n");
+    return 1;
+  }
 
   // split contents of 1D Vector to 3D vector
-  Split_US_To_3D_Vector( vec,Vector_completeUS);
+  if( split_US_To_3D_Vector( vec,Vector_completeUS)) {
+    return 1;
+  }
+  wprintf(L"\n   ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
+  wprintf(L"   +++++++ dimensions of Vector after split_US_To_3D_Vector (languages..characters..shiftstates)\t %li..%li..%li\n", vec.size(), vec[0].size(),vec[0][0].size());
 
-  printf("+++++++ dimensions of Vector after write_US_ToVector\t\t %li..%li..%li\n", vec.size(), vec[0].size(),vec[0][0].size());
   fclose(fp);
+  return 0;
 }
 
-void  CreateCompleteRow_US(v_str_1D &complete_List, FILE* fp, const char* text, std::string language) {
+bool  createCompleteRow_US(v_str_1D &complete_List, FILE* fp, const char* text, std::string language) {
   // in the Configuration file we find the appopriate paragraph between "xkb_symbol <text>" and the next xkb_symbol
-  // and then copy all rows starting with "key <" to a v1D-Vector
+  // and then copy all rows starting with "key <" to a 1D-Vector
 
-  // ? CHECK if ran OK-> return 0/1
   int buffer_size = 512;
   char buffer[buffer_size];
   bool print_OK   = false;
   const char* key = "key <";
   std::string str_txt(text);
   std::string xbk_mark = "xkb_symbol";
-  // TODO define folder to store File in
+  // _S2 TODO define folder to store File in
   std::ofstream KeyboardFile("File_" + language + ".txt");
 
-  printf("Keyboard %s\n", text);
   KeyboardFile << "Keyboard" << text << "\n";
 
   if (fp) {
@@ -72,30 +60,93 @@ void  CreateCompleteRow_US(v_str_1D &complete_List, FILE* fp, const char* text, 
 
       // as long as we are in the same xkb_symbol layout block and find "key <" we push the whole line into a 1D-vector
       if ((print_OK) && (std::string(str_buf).find(key) != std::string::npos)) {
-        printf("%s", buffer);
         complete_List.push_back(buffer);
         KeyboardFile << buffer;
       }
     }
   }
-  printf("-°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°° \n");
+  complete_List.push_back("    key <SPCE>  { [ space,        space] };");
+  //complete_List.push_back("    key <AC12>  { [ backslash,    bar  ] };");
+
+  if (complete_List.size() <1) {
+    wprintf(L"ERROR: can't create row from US \n");
+    return 1;
+  }
+  return 0;
 }
 
-void Split_US_To_3D_Vector(v_str_3D &all_US,v_str_1D completeList) {
-  // 1: take the whole line of the 1D-Vector and remove unwanted characters.
-  // 2: seperate the name e.g. key<AD06> and the shiftstates
-  // 3: push Names/Shiftstates to shift_states and then shiftstates to All_US, our 3D-Vector holding all Elements
+KMX_DWORD convertNamesToValue(std::wstring tok_wstr){
+  std::map<std::wstring, KMX_DWORD > first;
 
-  // ? CHECK if ran OK-> return 0/1
+  first[L"exclam"]           =  33;
+  first[L"at"]               =  64;
+  first[L"numbersign"]       =  35;
+  first[L"dollar"]           =  36;
+  first[L"percent"]          =  37;
+  first[L"dead_circumflex"]  =  94;
+  first[L"ampersand"]        =  38;
+  first[L"asterisk"]         =  42;
+  first[L"parenleft"]        =  40;
+  first[L"parenright"]       =  41;
+
+  first[L"minus"]            =  45;
+  first[L"underscore"]       =  95;
+  first[L"equal"]            =  61;
+  first[L"plus"]             =  43;
+  first[L"bracketleft"]      =  91;
+  first[L"braceleft"]        = 123;
+  first[L"bracketright"]     =  93;
+  first[L"braceright"]       = 125;
+  first[L"semicolon"]        =  59;
+  first[L"colon"]            =  58;
+  first[L"apostrophe"]       =  39;
+  first[L"quotedbl"]         =  34;
+  first[L"backslash"]        =  92;
+  first[L"bar"]              = 124;
+  first[L"comma"]            =  44;
+  first[L"less"]             =  60;
+  first[L"period"]           =  46;
+  first[L"greater"]          =  62;
+  first[L"slash"]            =  47;
+  first[L"question"]         =  63;
+  first[L"space"]            =  32;
+
+  first[L"dead_acute"]     =   180;
+  first[L"grave"]          =    96;
+  first[L"ssharp"]         =   223;
+  //first[L" ??   "]           =   VK_OEM_102;    /* DE =  226 ' " ? VK_OEM_102 */
+
+  if ( tok_wstr.size() == 1) {
+    return (KMX_DWORD) ( *tok_wstr.c_str() );;
+  }
+  else {
+		std::map<std::wstring, KMX_DWORD > ::iterator it;
+		for (it = first.begin(); it != first.end(); ++it) {
+			if (it->first == tok_wstr)
+				return it->second;
+		}
+  }
+  return returnIfCharInvalid;
+}
+
+int split_US_To_3D_Vector(v_dw_3D &all_US,v_str_1D completeList) {
+  // 1: take the whole line of the 1D-Vector and remove unwanted characters.
+  // 2: seperate the name e.g. key<AD06> from the shiftstates
+  // 3: convert to KMX_DWORD
+  // 4: push Names/Shiftstates to shift_states and then shift_states to All_US, our 3D-Vector holding all Elements
+
   std::vector<char> delim{' ', '[', ']', '}', ';', '\t', '\n'};
   char split_bracel = '{';
   char split_char_komma  = ',';
-  std::string empty  = "--";
+  int Keycde;
   v_str_1D tokens;
-  v_str_2D shift_states;
+  v_dw_1D tokens_dw;
+  v_dw_2D shift_states;
+  KMX_DWORD tokens_int;
+  std::wstring tok_wstr;
 
-  // go through the whole vector
-  for (int k = 0; k < (int)completeList.size() - 1; k++) {
+  // loop through the whole vector
+  for (int k = 0; k < (int)completeList.size() ; k++) {
 
     // remove all unwanted char
     for (int i = 0; i < (int) delim.size(); i++) {
@@ -109,355 +160,503 @@ void Split_US_To_3D_Vector(v_str_3D &all_US,v_str_1D completeList) {
       std::istringstream split1(completeList[k]);
       for (std::string each; std::getline(split1, each, split_bracel); tokens.push_back(each));
 
-      // replace keys names with number (<AD06> with 29,...)
-
-      // ? CHECK if ran OK-> return 0/1
-      int Keycde = replace_PosKey_with_Keycode(tokens[0]);
+      // replace keys names with Keycode (<AD06> with 21,...)
+      Keycde = replace_PosKey_with_Keycode_use_Lin(tokens[0]);
       tokens[0] = std::to_string(Keycde);
 
       // seperate rest of the vector to its elements and push to 'tokens'
       std::istringstream split(tokens[1]);
       tokens.pop_back();
-      for (std::string each; std::getline(split, each, split_char_komma); tokens.push_back(each));
-      //printf("### 5 Split_US_To_3D_Vector: tokens: size:%li...tokens[0]-[4]:-name:%s\tShiftstates:%s--%s--%s--%s---.\n", tokens.size(),tokens[0].c_str(),tokens[1].c_str(),tokens[2].c_str(),tokens[3].c_str(),tokens[4].c_str());
 
-      // at the moment we only use the first 2 shiftstates (non-shift+shift) so get rid of all others
-      int surplus = tokens.size() - shift_state_count -1;
-      for( int j=0; j < surplus;j++) {
-        tokens.pop_back();
+      for (std::string each; std::getline(split, each, split_char_komma); tokens.push_back(each));
+
+      // now convert all to KMX_DWORD and fill tokens
+      tokens_dw.push_back((KMX_DWORD) Keycde);
+
+      for ( int i = 1; i< (int) tokens.size();i++) {
+
+        // replace a name with a single character ( a -> a  ; equal -> = ) 
+        tokens_int = convertNamesToValue( wstring_from_string(tokens[i]));
+        tokens_dw.push_back(tokens_int);
       }
 
+      //wprintf(L"  Keyval  %i:   %i (%c) --- %i (%c)  \n", tokens_dw[0],tokens_dw[1],tokens_dw[1], tokens_dw[2], tokens_dw[2]);
+   
       // now push result to shift_states
-      shift_states.push_back(tokens);
+      shift_states.push_back(tokens_dw);
+      tokens_dw.clear();
       tokens.clear();
     }
   }
   all_US.push_back(shift_states);
 
-  // ? CHECK if ran OK, vector size is correct -> return 0/1
-  //printf("### 6 Split_US_To_3D_clearVector %li..%li..%li\n", all_US.size(), all_US[0].size(),all_US[0][0].size());
+  if ( all_US.size() == 0) {
+    wprintf(L"ERROR: Can't split US to 3D-Vector\n");
+    return 1;
+  }
+  return 0;
 }
 
-int replace_PosKey_with_Keycode(std::string  in) {
-  int out=0;
-  if      ( in == "key<TLDE>")    out = 49;   //correct ???
-  else if ( in == "key<AE01>")    out = 10;
-  else if ( in == "key<AE02>")    out = 11;
-  else if ( in == "key<AE03>")    out = 12;
-  else if ( in == "key<AE04>")    out = 13;
-  else if ( in == "key<AE05>")    out = 14;
-  else if ( in == "key<AE06>")    out = 15;
-  else if ( in == "key<AE07>")    out = 16;
-  else if ( in == "key<AE08>")    out = 17;
-  else if ( in == "key<AE09>")    out = 18;
-  else if ( in == "key<AE10>")    out = 19;
-  else if ( in == "key<AE11>")    out = 20;
-  else if ( in == "key<AE12>")    out = 21;
+int replace_PosKey_with_Keycode_use_Lin(std::string  in) {
+  int out = returnIfCharInvalid;
 
-  else if ( in == "key<AD01>")    out = 24;
-  else if ( in == "key<AD02>")    out = 25;
-  else if ( in == "key<AD03>")    out = 26;
-  else if ( in == "key<AD04>")    out = 27;
-  else if ( in == "key<AD05>")    out = 28;
-  else if ( in == "key<AD06>")    out = 29;
-  else if ( in == "key<AD07>")    out = 30;
-  else if ( in == "key<AD08>")    out = 31;
-  else if ( in == "key<AD09>")    out = 32;
-  else if ( in == "key<AD10>")    out = 33;
-  else if ( in == "key<AD11>")    out = 34;
-  else if ( in == "key<AD12>")    out = 35;
+// _S2 these are the Scancode-Values we use in Keyman ( = like the windows scancodes)
+  //     NAME IN SYMBOLS-FILE      KEYCODE (LIN STYLE)      (WIN STYLE)       VK_US      VK_DE
+                                             /*on US keyb;*/
+  if      ( in == "key<TLDE>")    out = 49;                /*                VK_  */  // TOASK correct ???
+  else if ( in == "key<AE01>")    out = 10;                /* 0X02           VK_1 */
+  else if ( in == "key<AE02>")    out = 11;                /* 0X03           VK_2  */
+  else if ( in == "key<AE03>")    out = 12;                /* 0X04           VK_3  */
+  else if ( in == "key<AE04>")    out = 13;                /* 0X05           VK_4  */
+  else if ( in == "key<AE05>")    out = 14;                /* 0X06           VK_5  */
+  else if ( in == "key<AE06>")    out = 15;                /* 0X07           VK_6  */
+  else if ( in == "key<AE07>")    out = 16;                /* 0X08           VK_7  */
+  else if ( in == "key<AE08>")    out = 17;                /* 0X09           VK_8  */
+  else if ( in == "key<AE09>")    out = 18;                /* 0X0A           VK_9  */
+  else if ( in == "key<AE10>")    out = 19;                /* 0X0B           VK_0  */
+  else if ( in == "key<AE11>")    out = 20; /*out = 61;*/  /* 0X0C           VK_MINUS   de ẞ*/
+  else if ( in == "key<AE12>")    out = 21;                /* 0X0D           VK_EQUALS  DE ' */
 
-  else if ( in == "key<AC01>")    out = 38;
-  else if ( in == "key<AC02>")    out = 39;
-  else if ( in == "key<AC03>")    out = 40;
-  else if ( in == "key<AC04>")    out = 41;
-  else if ( in == "key<AC05>")    out = 42;
-  else if ( in == "key<AC06>")    out = 43;
-  else if ( in == "key<AC07>")    out = 44;
-  else if ( in == "key<AC08>")    out = 45;
-  else if ( in == "key<AC09>")    out = 46;
-  else if ( in == "key<AC10>")    out = 47;
-  else if ( in == "key<AC11>")    out = 48;
-  else if ( in == "key<AC12>")    out = 49;
+  else if ( in == "key<AD01>")    out = 24;                /* 0X10            VK_Q  */
+  else if ( in == "key<AD02>")    out = 25;                /* 0X11            VK_W  */
+  else if ( in == "key<AD03>")    out = 26;                /* 0X12            VK_E  */
+  else if ( in == "key<AD04>")    out = 27;                /* 0X13            VK_R  */
+  else if ( in == "key<AD05>")    out = 28;                /* 0X14            VK_T  */
+  else if ( in == "key<AD06>")    out = 29; /*out = 52;*/  /* 0X15            VK_Y  */
+  else if ( in == "key<AD07>")    out = 30;                /* 0X16            VK_U  */
+  else if ( in == "key<AD08>")    out = 31;                /* 0X17            VK_I  */
+  else if ( in == "key<AD09>")    out = 32;                /* 0X18            VK_O  */
+  else if ( in == "key<AD10>")    out = 33;                /* 0X19            VK_P  */
+  else if ( in == "key<AD11>")    out = 34; /*out = 17;*/  /* 0X1A            VK_LEFTBRACE   DE Ü */
+  else if ( in == "key<AD12>")    out = 35; /*out = 18;*/  /* 0X1B            VK_RIGHTBRACE  DE + */
 
-  else if ( in == "key<AB01>")    out = 52;
-  else if ( in == "key<AB02>")    out = 53;
-  else if ( in == "key<AB03>")    out = 54;
-  else if ( in == "key<AB04>")    out = 55;
-  else if ( in == "key<AB05>")    out = 56;
-  else if ( in == "key<AB06>")    out = 57;
-  else if ( in == "key<AB07>")    out = 58;
-  else if ( in == "key<AB08>")    out = 59;
-  else if ( in == "key<AB09>")    out = 60;
-  else if ( in == "key<AB10>")    out = 61;
-  else if ( in == "key<BKSL>")    out = 62;   //correct ???
-  else if ( in == "key<LSGT>")    out = 51;   //correct ???
+  else if ( in == "key<AC01>")    out = 38;                /* 0X1E            VK_A  */
+  else if ( in == "key<AC02>")    out = 39;                /* 0X1F            VK_S  */
+  else if ( in == "key<AC03>")    out = 40;                /* 0X20            VK_D  */
+  else if ( in == "key<AC04>")    out = 41;                /* 0X21            VK_F  */
+  else if ( in == "key<AC05>")    out = 42;                /* 0X22            VK_G  */
+  else if ( in == "key<AC06>")    out = 43;                /* 0X23            VK_H  */
+  else if ( in == "key<AC07>")    out = 44;                /* 0X24            VK_J  */
+  else if ( in == "key<AC08>")    out = 45;                /* 0X25            VK_K  */
+  else if ( in == "key<AC09>")    out = 46;                /* 0X26            VK_L  */
+  else if ( in == "key<AC10>")    out = 47; /*out = 59;*/  /* 0X27            VK_SEMICOLON  DE Ö*/
+  else if ( in == "key<AC11>")    out = 48; /*out = 51;*/  /* 0X28            VK_APOSTROPHE DE Ä */
+  //else if ( in == "key<AC12>")    out = 51; /*out = 20;*/  /* 0X29            VK_GRAVE  DE # */
+
+  else if ( in == "key<AB01>")    out = 52; /*out = 29;*/  /* 0X2C            VK_Z  */
+  else if ( in == "key<AB02>")    out = 53;                /* 0X2D            VK_X  */
+  else if ( in == "key<AB03>")    out = 54;                /* 0X2E            VK_C  */
+  else if ( in == "key<AB04>")    out = 55;                /* 0X2F            VK_V  */
+  else if ( in == "key<AB05>")    out = 56;                /* 0X30            VK_B  */
+  else if ( in == "key<AB06>")    out = 57;                /* 0X31            VK_N  */
+  else if ( in == "key<AB07>")    out = 58;                /* 0X32            VK_M  */
+  else if ( in == "key<AB08>")    out = 59;                /* 0X33            VK_ COMMA */
+  else if ( in == "key<AB09>")    out = 60;                /* 0X34            VK_DOT  */
+  else if ( in == "key<AB10>")    out = 61; /*out = 16;*/  /* 0X35            VK_SLASH  DE - */
+  else if ( in == "key<BKSL>")    out = 51;                /* 0X29            VK_BKSLASH  */
+  else if ( in == "key<LSGT>")    out = 63;                /* 0X37            VK_RIGHTSHIFT  */
+  else if ( in == "key<SPCE>")    out = 65;                /* 0X20 ?? 39?     VK_SPACE  */
+
   return out;
 }
 
-void append_other_ToVector(v_str_3D &All_Vector,GdkKeymap * keymap) {
+v_dw_2D create_empty_2D( int dim_rows,int dim_shifts) {
 
-  // create a 2D vector all fill0ed with "--" and push to 3D-Vector
-  // ? CHECK if ran OK-> return 0/1
-  v_str_2D Other_Vector2D = create_empty_2D(All_Vector[0].size(),All_Vector[0][0].size());
-  All_Vector.push_back(Other_Vector2D);
-
-  printf("+++++++ dimensions of Vector after append_other_ToVector\t %li..%li..%li\n", All_Vector.size(), All_Vector[0].size(),All_Vector[0][0].size());  
-
-  for(int i =1; i< (int) All_Vector[1].size()-1;i++)
-  {
-    // get key name US stored in [0][i][0] and copy to name in other-block[1][i][0]
-    All_Vector[1][i][0] = All_Vector[0][i][0];
-
-    // write this value to 3D- Vector
-    All_Vector[1][i][0+1] = GetKeyvalsFromKeymap(keymap,stoi(All_Vector[1][i][0]),0);   //shift state: unshifted:0
-    All_Vector[1][i][1+1] = GetKeyvalsFromKeymap(keymap,stoi(All_Vector[1][i][0]),1);   //shift state: shifted:1
-    //printf("Keycodes US->Other:   %d(US): %s %s ---- (other):%s,  %s,  %s  \n",stoi(All_Vector[1][i][0]),All_Vector[0][i][1].c_str(),All_Vector[0][i][2].c_str(),All_Vector[1][i][1].c_str(),All_Vector[1][i][2].c_str(),All_Vector[1][i][3].c_str());  
-  }
-  // ? CHECK if ran OK, vector size is correct -> return 0/1
-}
-
-v_str_2D create_empty_2D( int dim_rows,int dim_shifts)
-{
-  std::string empty = "--";
-  v_str_1D shifts;
-  v_str_2D all;
+  v_dw_1D shifts;
+  v_dw_2D Vector_2D;
 
   for ( int i=0; i< dim_rows;i++) {
     for ( int j=0; j< dim_shifts;j++) {
-      shifts.push_back(empty);
+      shifts.push_back(returnIfCharInvalid);
     }
-    all.push_back(shifts);
+    Vector_2D.push_back(shifts);
     shifts.clear();
   }
-  //printf("+++++++ dimensions of Vector after create_empty_2D\t\t %li..%li..%li\n", all.size(), all[0].size(),all[1].size());
-  return all;
+  return Vector_2D;
 }
 
-int GetKeyvalsFromKeymap(GdkKeymap *keymap, guint keycode, int shift_state_pos) {
+int append_other_ToVector(v_dw_3D &All_Vector,GdkKeymap * keymap) {
+
+  // create a 2D vector all filled with " " and push to 3D-Vector
+  v_dw_2D Other_Vector2D = create_empty_2D(All_Vector[0].size(),All_Vector[0][0].size());
+
+  if (Other_Vector2D.size() == 0) {
+    wprintf(L"ERROR: can't create empty 2D-Vector\n");
+    return 1;
+  }
+  All_Vector.push_back(Other_Vector2D);
+  wprintf(L"   +++++++ dimensions of Vector after append_other_ToVector\t\t\t\t\t\t %li..%li..%li\n", All_Vector.size(), All_Vector[0].size(),All_Vector[0][0].size());
+  wprintf(L"   ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n\n");
+
+  if (All_Vector.size() < 2) {
+    wprintf(L"ERROR: creation of 3D-Vector failed\n");
+    return 1;
+  }
+
+  for(int i =0; i< (int) All_Vector[1].size();i++) {
+
+    // get key name US stored in [0][i][0] and copy to name in "other"-block[1][i][0]
+    All_Vector[1][i][0] = All_Vector[0][i][0];
+
+    // get Keyvals of this key and copy to unshifted/shifted in "other"-block[1][i][1] / block[1][i][2]
+    All_Vector[1][i][0+1] = getKeyvalsFromKeymap(keymap,All_Vector[0][i][0],0);   //shift state: unshifted:0
+    All_Vector[1][i][1+1] = getKeyvalsFromKeymap(keymap,All_Vector[0][i][0],1);   //shift state: shifted:1
+
+    //wprintf(L" Keycodes US dw        :   %d (US): -- %i (%c)  -- %i (%c) ---- (other): %i (%c)  --  %i(%c)    \n",(All_Vector[1][i][0]),All_Vector[0][i][1],All_Vector[0][i][1],All_Vector[0][i][2],All_Vector[0][i][2],All_Vector[1][i][1] ,All_Vector[1][i][1],All_Vector[1][i][2],All_Vector[1][i][2]);
+    //wprintf(L"   Keycodes ->Other dw:-:   %d (US): -- %i (%c)  -- %i (%c)   \n\n",(All_Vector[1][i][0]),All_Vector[1][i][1],All_Vector[1][i][1],All_Vector[1][i][2],All_Vector[1][i][2]);
+  }
+  return 0;
+}
+
+KMX_DWORD getKeyvalsFromKeymap(GdkKeymap *keymap, guint keycode, int shift_state_pos) {
   GdkKeymapKey *maps;
   guint *keyvals;
   gint count;
-  int out;
+  KMX_DWORD out;
 
   if (!gdk_keymap_get_entries_for_keycode(keymap, keycode, &maps, &keyvals, &count))
     return 0;
   //if(!gdk_wayland_keymap_get_entries_for_keycode(keymap, keycode, &maps, &keyvals, &count))
-  //  return 0;
+  //  return 0;    https://codebrowser.dev/gtk/gtk/gdk/wayland/gdkkeys-wayland.c.html
 
-  if (!(shift_state_pos < count))
+  if (!(shift_state_pos <= count))
     return 0;
 
-  out = keyvals[shift_state_pos];
+  out =(KMX_DWORD)  keyvals[shift_state_pos];
+
+  // _S2 QUESTION
+  // _S2 what is 65104-65106, 65506, 21840
+  // _S2 if out of range of what ( ascii??) return 0 or other value ?
+  if (out > 255) {
+    wprintf(L"out of range: found value out( %i) for keycode = %i /shift_state_pos %i      (49= TLDE 21= VK_EQUALS on US keyboard) \n", out,keycode,shift_state_pos);
+    //out = 0;
+  }
 
   g_free(keyvals);
   g_free(maps);
+
   return out;
 }
 
-void extract_difference( v_str_3D &All_Vector)
-{
-  // ? CHECK if ran OK-> return 0/1
-  // TODO define which Folder; find better name
-  std::ofstream Map_File("Map_US.txt");
-  std::string diff =" ";
+KMX_DWORD  mapVK_To_char(KMX_DWORD SC ){
+  // if there is a Keyman VK.. defined map to Keyman VKcode
 
-  printf("-----------------------------------------------------------------------------------------------------------------------------------------------\n");
-  std::cout << "Nr of \n" ;
-  std::cout << "Key: " <<  "\t Character US (no shift) " <<  "  Character US (shift) "<<  "\t\tCharacter other (no shift)" <<  "\tCharacter other (shift)   difference \n" ;
-  printf("-----------------------------------------------------------------------------------------------------------------------------------------------\n");
+ // if ( SC == 49)   return   VK_BKSLASH;     /* ; 220          = ` oder ^ */
+ // if ( SC == 20)   return   VK_LBRKT;       /* ; 219          = - oder ß */
+ // if ( SC == 21)   return   VK_RBRKT;       /* ; 221          = = oder ' */
 
-  Map_File <<"--------------------------------------------------------------------------------------------------------------------------------------------\n";
-  Map_File << "Nr of \n" ;
-  Map_File << "Key: " <<  "\t Character US (no shift) " <<  "  Character US (shift) "<<  "\t\tCharacter other (no shift)" <<  "\tCharacter other (shift)   difference \n" ;
-  Map_File <<"--------------------------------------------------------------------------------------------------------------------------------------------\n";
+  if ( SC == 34)   return   VK_COLON;       /* ; 186 VK_OEM_4 = [ oder ü */
+  if ( SC == 35)   return   VK_EQUAL;       /* ; 187          = ] oder + */
 
-  for ( int k=0; k<(int)All_Vector[0].size()-1; k++) {
-    if (All_Vector[0][k][1] == All_Vector[1][k][1])
-      diff =" ";
-    else
-      diff =" *** ";
-    // ? CHECK if index exists
-    std::cout << All_Vector[0][k][0] << "\t " <<+(*(All_Vector[0][k][1].c_str()))<< "\t("<< All_Vector[0][k][1] <<")"<<std::setw(20-All_Vector[0][k][1].size())<<  +(*(All_Vector[0][k][2].c_str()))<< "\t("<< All_Vector[0][k][2] <<")"<<std::setw(20-All_Vector[0][k][2].size())<< "\t...\t"<< +(*(All_Vector[1][k][1].c_str()))<< "\t("<< All_Vector[1][k][1] <<")"<<std::setw(24-All_Vector[1][k][1].size())<<   +(*(All_Vector[1][k][2].c_str()))<< "\t("<< All_Vector[1][k][2] <<")"<<std::setw(20-All_Vector[1][k][2].size())<< diff <<"\n";
-    Map_File  << All_Vector[0][k][0] << " \t "<<+(*(All_Vector[0][k][1].c_str()))<< "\t("<< All_Vector[0][k][1] <<")"<<std::setw(20-All_Vector[0][k][1].size())<<  +(*(All_Vector[0][k][2].c_str()))<< "\t("<< All_Vector[0][k][2] <<")"<<std::setw(20-All_Vector[0][k][2].size())<< "\t...\t"<< +(*(All_Vector[1][k][1].c_str()))<< "\t("<< All_Vector[1][k][1] <<")"<<std::setw(24-All_Vector[1][k][1].size())<<   +(*(All_Vector[1][k][2].c_str()))<< "\t("<< All_Vector[1][k][2] <<")"<<std::setw(20-All_Vector[1][k][2].size())<< diff << "\n";
-  }
+ // if ( SC == 47)   return   VK_ACCENT;      /* ; 192 VK_OEM_1 = : oder ö */
+ // if ( SC == 48)   return   VK_QUOTE;       /* ' 222 VK_OEM_7 = " oder Ä */
+ // if ( SC == 51)   return   VK_SLASH;       /* ; 191          = \ oder # */
 
-  // ? CHECK if ran OK, return 0/1
-  Map_File.close();
+ // if ( SC == 59)   return   VK_COMMA;       /* ; 188          = , oder , */
+ // if ( SC == 60)   return   VK_PERIOD;      /* ; 190          = . oder . */
+ // if ( SC == 61)   return   VK_HYPHEN;      /* ; 189          = / oder - */
+
+ // if ( SC == 65)   return   VK_SPACE;       /* ;  32 VK_SPACE =   oder   */
+ // else
+    return SC;
+}
+// _S2 TODO is this correct ??
+KMX_DWORD  mapChar_To_VK(KMX_DWORD chr ){
+  // if there is a Keyman VK.. defined map to Keyman VKcode
+
+ // if ( SC == 49)   return   VK_BKSLASH;     /* ; 220          = ` oder ^ */
+ // if ( SC == 20)   return   VK_LBRKT;       /* ; 219          = - oder ß */
+ // if ( SC == 21)   return   VK_RBRKT;       /* ; 221          = = oder ' */
+
+  if ( chr == VK_COLON)   return   220;       /* ; 186 VK_OEM_4 = [ oder ü */
+  if ( chr == 187)        return   42;       /* ; 186 VK_OEM_4 = [ oder ü */
+ // if ( SC == 35)   return   VK_EQUAL;       /* ; 187          = ] oder + */
+
+ // if ( SC == 47)   return   VK_ACCENT;      /* ; 192 VK_OEM_1 = : oder ö */
+ // if ( SC == 48)   return   VK_QUOTE;       /* ' 222 VK_OEM_7 = " oder Ä */
+ // if ( SC == 51)   return   VK_SLASH;       /* ; 191          = \ oder # */
+
+ // if ( SC == 59)   return   VK_COMMA;       /* ; 188          = , oder , */
+ // if ( SC == 60)   return   VK_PERIOD;      /* ; 190          = . oder . */
+ // if ( SC == 61)   return   VK_HYPHEN;      /* ; 189          = / oder - */
+
+ // if ( SC == 65)   return   VK_SPACE;       /* ;  32 VK_SPACE =   oder   */
+ // else
+    return chr;
 }
 
-std::string get_Other_Char_FromUS( std::string in , v_str_3D &All_Vector) {
-  std::string diff;
-  // find correct row of char in US
-  for( int i=0; i< (int) All_Vector[0].size()-1;i++) {
-    for( int j=0; j< (int)All_Vector[0][0].size()-1;j++) {
-      if  ( All_Vector[0][i][j] == in ) {
-        if ( All_Vector[0][i][j] != All_Vector[1][i][j])
-          diff =" **  ";
-          // ? CHECK if Index exists
-        std::cout << "US -> Other: "<<  std::setw(5)<<diff<<All_Vector[0][i][j] << std::setw(15-All_Vector[0][i][j].size())<< All_Vector[1][i][j] <<"\n";
-        return All_Vector[1][i][j] ;
+// _S2 This can go later
+/*KMX_DWORD get_VirtualKey_Other_From_SC(KMX_DWORD SC , v_dw_3D &All_Vector) {
+
+  for( int i=0; i< (int)All_Vector[0].size();i++) {
+    //number keys return unshifted value ( e.g. 1, not !)
+    if(SC <= 19) {
+      if ( All_Vector[0][i][0] == SC)
+        return All_Vector[1][i][1];
+    }
+
+    // other keys
+    if((SC > 19) ) {
+      if ( All_Vector[0][i][0] == SC) {
+
+        // normal capital characters return the value of capital char ( e.g. A)
+        if ((All_Vector[1][i][2] >= 65 ) && (All_Vector[1][i][2] < 91 ))
+          return All_Vector[1][i][2];
+
+        // special characters return Keyman defined values (e.g. VK_ACCENT)
+        else
+          //return All_Vector[1][i][1];
+          return mapVK_To_char(SC);
       }
     }
   }
-  std::cout << "US -> Other:      (" <<  in << ": no match)\n";
-  return "-";
+return 0;
+}
+*/
+
+KMX_DWORD get_VirtualKey_Other_GDK( GdkKeymap *keymap, KMX_DWORD keycode) {
+
+  GdkModifierType consumed;
+  GdkKeymapKey *maps;
+  guint *keyvals;
+  guint lowerCase;
+  guint upperCase;
+  gint count;
+
+  if (!gdk_keymap_get_entries_for_keycode(keymap, keycode, &maps, &keyvals, &count))
+    return 0;
+
+  //Shift
+    //GdkModifierType MOD_Shift = (GdkModifierType) (  ~consumed & GDK_SHIFT_MASK );
+    GdkModifierType MOD_Shift = (GdkModifierType) ( GDK_SHIFT_MASK );
+    gdk_keymap_translate_keyboard_state (keymap, keycode, MOD_Shift , 0, keyvals, NULL, NULL, & consumed);
+
+    for (int i = 0; i < count; i++) {
+      if (maps[i].level > 1 || maps[i].group > 1)
+        continue;
+
+      gchar * kv_name =  gdk_keyval_name (keyvals[i]);
+
+      if ( keyvals[i]>0)
+        gdk_keyval_convert_case (*kv_name, &lowerCase, &upperCase);
+
+      // _S2 is ( lowerCase == upperCase )  true for all number keys for all keyboards?
+      if ( lowerCase == upperCase )
+        return  (KMX_DWORD)  upperCase;
+    }
+    return  (KMX_DWORD) *keyvals;  //_S2 what to return if >255
+return 0;   //_S2 what to return if not found
 }
 
-std::string get_US_Char_FromOther(std::string in , v_str_3D &All_Vector) {
-  std::string diff;
-  // find correct row of char in other
-  for( int i=0; i< (int)All_Vector[1].size()-1;i++) {
-    for( int j=0; j< (int)All_Vector[1][0].size()-1;j++) {
-      if  ( All_Vector[1][i][j] == in ) {
-        if ( All_Vector[0][i][j] != All_Vector[1][i][j])
-          diff =" **  ";
-        // ? CHECK if Index exists
-        std::cout << "Other -> US: "<<  std::setw(5)<<diff<<All_Vector[1][i][j] << std::setw(15-All_Vector[0][i][j].size())<<  All_Vector[0][i][j] <<"\n";
-        return All_Vector[0][i][j];
-        }
-      }
-    }
-    std::cout << "Other -> US:      (" <<  in << ": no match)\n";
-    return "-";
-  }
-
-std::string getKeyNrOf_USChar(std::string in , v_str_3D &All_Vector) {
+// _S2 not needed, can go later
+// return RETURN NON SHIFTED CHAR [1]  the VirtualKey of the US Keyboard for given Scancode
+KMX_DWORD get_VirtualKey_US_From_SC(KMX_DWORD SC , v_dw_3D &All_Vector){
   // find correct row of char in US
   for( int i=0; i< (int)All_Vector[0].size()-1;i++) {
-    for( int j=0; j< (int)All_Vector[0][0].size()-1;j++) {
-      if  ( All_Vector[0][i][j] == in ) {
-        // ? CHECK if index exists
-        std::cout << "KeyNr of US char: \t"<< All_Vector[0][i][j] << " -> " << All_Vector[0][i][0] <<"\n";
-        return All_Vector[0][i][0] ;
-      }
+    if  ( All_Vector[0][i][0] == SC ) {
+      return All_Vector[0][i][1] ;
     }
   }
-  return "-";
+  return 0;    //_S2 TODO what do I return if not found??
 }
 
-std::string getKeyNrOf_OtherChar(std::string in , v_str_3D &All_Vector) {
+// return the Scancode of for given VirtualKey of Other Keyboard
+KMX_DWORD get_SC_From_VirtualKey_Other(KMX_DWORD VK_Other , v_dw_3D &All_Vector){
   // find correct row of char in US
   for( int i=0; i< (int)All_Vector[1].size()-1;i++) {
-    for( int j=0; j< (int)All_Vector[1][0].size()-1;j++) {
-      if  ( All_Vector[1][i][j] == in ) {
-        // ? CHECK if index exists
-        std::cout << "KeyNr of Other char : \t"<< All_Vector[1][i][j] << " -> " << All_Vector[1][i][0] <<"\n";
-        return All_Vector[1][i][0] ;
+    if  ( All_Vector[1][i][1] == VK_Other ) {
+      return All_Vector[1][i][0] ;
+    }
+  }
+  return 0;    //_S2 TODO what do I return if not found??
+}
+
+// return the Scancode of for given VirtualKey of Other US
+KMX_DWORD get_SC_From_VirtualKey_US(KMX_DWORD VK_US , v_dw_3D &All_Vector){
+  // find correct row of char in US
+  for( int i=0; i< (int)All_Vector[0].size()-1;i++) {
+    if  ( All_Vector[0][i][2] == VK_US ) {
+      return All_Vector[0][i][0] ;
+    }
+  }
+  return 0;    //_S2 TODO what do I return if not found??
+}
+
+// returns the position in All_Vector where VK_Other is found
+KMX_DWORD get_position_From_VirtualKey_Other(KMX_DWORD VK_Other , v_dw_3D &All_Vector, int which_columns) {
+  // find correct row of char in US
+  if((which_columns <0  ) )
+    return 0;
+
+  // search all columns
+  if(which_columns >(int)All_Vector[1][0].size()) {
+    for( int i=1; i< (int)All_Vector[1][0].size();i++) {
+      for( int j=0; j< (int)All_Vector[1].size()-1;j++) {
+      if ( ( All_Vector[1][j][i] == VK_Other ) )
+        return j;
       }
     }
   }
-  return "-";
-}
 
-bool test(v_str_3D &V) {
-// ? CHECK if index exists
-  printf("\n+++++++++ print some characters of US and Other +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
-
-  for ( int k=13; k<43; k++) {
-    std::cout   << " row 1 (US)......" << V[0][k][0]<< ".."  << V[0][k][1]<< ".."<< V[0][k][2]<< ".."  << V[0][k][3]<< ".."  << V[0][k][4]<< "..\n"   ;
-    if (V.size()>1)
-      std::cout << "   row 1 (Other).."<< V[1][k][0]<< ".."  << V[1][k][1]<< ".."<< V[1][k][2]<< ".."  << V[1][k][3]<< ".."  << V[1][k][4]<< "..\n" ;
-  }
-  printf("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");        
-  return true;
-}
-
-void test_in_out(v_str_3D &All_Vector) {
-std::string diff;
-  printf("-----------------------------------------------------------------------------------------------------------------------------------------------\n");
-   //checks mapping between US and other
-  std::string a = get_Other_Char_FromUS( "z", All_Vector);
-  std::string aa = get_Other_Char_FromUS( "Z", All_Vector);
-  std::string aaa = get_Other_Char_FromUS( "y", All_Vector);
-  std::string aaaa = get_Other_Char_FromUS( "Y", All_Vector);
-
-  std::string b = get_US_Char_FromOther( "z", All_Vector);
-  std::string bb = get_US_Char_FromOther( "Z", All_Vector);
-  std::string bbb = get_US_Char_FromOther( "y", All_Vector);
-  std::string bbbb = get_US_Char_FromOther( "Y", All_Vector);
-
-  std::string c = getKeyNrOf_OtherChar( "z", All_Vector);
-  std::string cc = getKeyNrOf_OtherChar( "Z", All_Vector);
-  std::string ccc = getKeyNrOf_OtherChar( "y", All_Vector);
-  std::string cccc = getKeyNrOf_OtherChar( "Y", All_Vector);
-
-  std::string d = getKeyNrOf_USChar( "z", All_Vector);
-  std::string dd = getKeyNrOf_USChar( "Z", All_Vector);
-  std::string ddd = getKeyNrOf_USChar( "y", All_Vector);
-  std::string dddd = getKeyNrOf_USChar( "Y", All_Vector);
-
-  std::cout << "get_Other_Char_FromUS z-Z-y-Y: "  << ".." << a<< ".." <<aa<< ".." <<aaa<< ".." <<aaaa<< ".." << "\n";
-  std::cout << "get_US_Char_FromOther z-Z-y-Y: "  << ".." << b<< ".." <<bb<< ".." <<bbb<< ".." <<bbbb<< ".." << "\n";
-  std::cout << "getKeyNrOf_OtherChar z-Z-y-Y: "   << ".." << c<< ".." <<cc<< ".." <<ccc<< ".." <<cccc<< ".." << "\n";
-  std::cout << "getKeyNrOf_USChar z-Z-y-Y: "      << ".." << d<< ".." <<dd<< ".." <<ddd<< ".." <<dddd<< ".." << "\n";
-}
-
-void print_simple_map_US(v_str_3D &All_Vector, int shiftstate){
-  std::string out,diff;
-  // ? CHECK if ran OK-> return 0/1
-  printf("-----------------------------------------------------------------------------------------------------------------------------------------------\n");
-  for ( int i=0; i< (int)All_Vector[0].size();i++) {
-    out =get_Other_Char_FromUS(All_Vector[0][i][shiftstate], All_Vector);
-  }
-}
-
-void print_simple_map_Other(v_str_3D &All_Vector, int shiftstate){
-  std::string out, diff;
-  // ? CHECK if ran OK-> return 0/1
-  printf("-----------------------------------------------------------------------------------------------------------------------------------------------\n");
-  for ( int i=0; i< (int)All_Vector[0].size();i++) {
-    out = get_US_Char_FromOther(All_Vector[0][i][shiftstate], All_Vector);
-  }
-}
-
-void test_specific_Characters(v_str_3D &All_Vector){
-  printf("-----------------------------------------------------------------------------------------------------------------------------------------------\n");
-  v_str_1D in {"a", "b", "m", "w", "x", "y", "z"};
-  std::string  out;
-  for( int i=0; i< (int) in.size()-1; i++) {
-    out = get_Other_Char_FromUS(in[i], All_Vector);
-  }
-}
-
-
-//--------------------------------------
-int main(gint argc, gchar *argv[])
-{
-  gdk_init(&argc, &argv);
-  GdkDisplay *display = gdk_display_get_default();
-  if (!display) {
-    printf("ERROR: can't get display\n");
-    return 1;
-  }
-  GdkKeymap *keymap = gdk_keymap_get_for_display(display);
-  if (!keymap) {
-    printf("ERROR: Can't get keymap\n");
-    gdk_display_close(display);
-    return 2;
+  else {
+    for( int j=0; j< (int)All_Vector[1].size()-1;j++) {
+        if ( ( All_Vector[1][j][which_columns] == VK_Other ) )
+        return j;
+      }
   }
 
-  // write content of xkb_symbols to 3D Vector
-  // I assume we use Keyboard US basic as base
-  std::string US_language    = "us";
-  const char* text_us        = "xkb_symbols \"basic\"";
-
-  v_str_3D All_Vector;
-  write_US_ToVector(All_Vector,US_language, text_us);
-  //test(All_Vector);
-
-  // add contents of other keyboard to vector
-  append_other_ToVector(All_Vector,keymap);
-  //test(All_Vector);
-
-  extract_difference(All_Vector);
-  //test_in_out(All_Vector);
-
-  //print_simple_map_US(All_Vector,1);    // 1 = non-shift
-  //print_simple_map_Other(All_Vector,1); // 1 = non-shift
-  test_specific_Characters(All_Vector);
-  gdk_display_close(display);
-
-  printf("°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°° end\n");
-  return 0;
+  return 0;    //_S2 TODO what do I return if not found??
 }
+
+// returns Keyval which hold the Keysym (in unshifted, shifted)
+KMX_DWORD get_position_From_GDK(GdkKeymap *keymap, UINT KeySym ) {
+  GdkKeymapKey *maps;
+  guint *keyvals;
+  gint count;
+
+  for (int k=0; k<255 ; k++ ){
+    if (gdk_keymap_get_entries_for_keycode (keymap, k, &maps, &keyvals, &count)) {
+      if ( (keyvals[0] == KeySym) || (keyvals[1] == KeySym) ) {
+        return (KMX_DWORD) maps[0].keycode;
+      }
+    }
+  }
+  return 0;    //_S2 TODO what do I return if not found??
+}
+
+// _S2 TODO How to do mapping between Linux keycodes and keyman SC
+const int Lin_KM__map(int i, v_dw_3D &All_Vector) {
+  // MAP:
+  // VK KEYMAN-STYLE  ->  KEYCODE LINUX-STYLE
+  // e.g 188 -> 59
+  //All_Vector_[ 1 ][ in which line of US did find the value 58 ][ take second or third column wherever I find 58 ]]
+  // finds  59th row (not value 59)
+  int dw=0;
+  //if (i == 32  ) return   ; /*        */5
+      if (i == 186 ) return 220;  /* Ü      */
+      if (i == 187 ) return  42;  /* + *    */
+      //if (i == 188 )          {wprintf(L" swapped:  i (%i) to 59  \n",dw,i);       return  59;  }/* COMMA  */
+      //if (i == 189 )          {wprintf(L" swapped:  i (%i) to 95  \n",dw,i);       return  95;  }/*   - _  */
+      //if (i == 190 )          {wprintf(L" swapped:  i (%i) to 58  \n",dw,i);       return  58;  }/* PERIOD */
+      //if (i == 191 )          {wprintf(L" swapped:  i (%i) to 35  \n",dw,i);       return  35;   }/* #  '   */
+      //if (i == 191 )          {wprintf(L" swapped:  i (%i) to 63  \n",dw,i);       return  63; }/*       */
+      //if (i == 214 )          {wprintf(L" swapped:  i (%i) to 192  \n",dw,i);       return 192;  }/*  Ö     */
+      //if (i == 219 )          {wprintf(L" swapped:  i (%i) to 223  \n",dw,i);       return 223;  }/*  Sharp-S+  ?  */
+      //if (i == 220 )          {wprintf(L" swapped:  i (%i) to 92  \n",dw,i);       return  92;  }/*  ^ °   */
+      //if (i == 221 )          {wprintf(L" swapped:  i (%i) to 180  \n",dw,i);       return 180;  }/*  ' `   */
+      //if (i == 223 )          {wprintf(L" swapped:  i (%i) to 59  \n",dw,i);       return    ; }/*       */
+
+      //if (i == 226 )          {wprintf(L" swapped:  i (%i) to 60  \n",dw,i);       return  60;  }/*  < >   */
+      //if (i == 65105 )        {wprintf(L" swapped:  i (%i) to 92  \n",dw,i);       return  92; }/*    */
+
+      //  e.g. rgKey[192]  contains character 214
+      //if (i == 192 )          {wprintf(L" swapped:  i (%i) to 214  \n",dw,i);       return 214;  }/* Ö      */
+      //if (i == 186 )          {wprintf(L" swapped:  i (%i) to 220  \n",dw,i);       return 220;  }/* Ü      */
+      //if (i == 222 )          {wprintf(L" swapped:  i (%i) to 196  \n",dw,i);       return 196;  }/* Ä      */
+      if (i == 220)             {wprintf(L" swapped:  i (%i) to 196  \n",dw,i);       return 186;  }/* Ä      */
+      if (i == 42)              {wprintf(L" swapped:  i (%i) to 196  \n",dw,i);       return 187;  }/* +      */
+
+  return i;
+}
+
+// _S2 TODO
+std::wstring  get_KeyVals_according_to_Shiftstate(GdkKeymap *keymap, guint keycode, ShiftState ss, int caps  ){
+
+  GdkModifierType consumed;
+  GdkKeymapKey *maps;
+  guint *keyvals;
+  gint count;
+
+  // _S2 TODO what to return if it fails?
+  if (!gdk_keymap_get_entries_for_keycode(keymap, keycode, &maps, &keyvals, &count))
+    return L"1";
+
+
+  //unshifted
+  if (( ss == Base ) && ( caps == 0 )) {
+    GdkModifierType MOD_base = (GdkModifierType) ( ~GDK_MODIFIER_MASK );
+    gdk_keymap_translate_keyboard_state (keymap, keycode, MOD_base , 0, keyvals, NULL, NULL, & consumed);
+    return  std::wstring(1, (int) *keyvals);
+  }
+
+  //SHIFT+CAPS
+  else if ( ( ss == Shft ) && ( caps ==1 )) {
+    GdkModifierType MOD_ShiftCaps= (GdkModifierType) ((GDK_SHIFT_MASK | GDK_LOCK_MASK));
+    gdk_keymap_translate_keyboard_state (keymap, keycode, MOD_ShiftCaps , 0, keyvals, NULL, NULL, & consumed);
+    return  std::wstring(1, (int) *keyvals);
+  }
+
+  //Shift
+  else if (( ss == Shft ) && ( caps == 0 )) {
+    return std::wstring(1, (int) get_VirtualKey_Other_GDK(keymap,  keycode));
+  }
+
+  //caps
+  else if (( ss == Base ) && ( caps == 1 )) {
+    GdkModifierType MOD_Caps = (GdkModifierType) ( GDK_LOCK_MASK );
+    gdk_keymap_translate_keyboard_state (keymap, keycode, MOD_Caps, 0, keyvals, NULL, NULL, & consumed);
+    return  std::wstring(1, (int) *keyvals);
+  }
+
+  /*//ALT-GR
+  else if {
+    GdkModifierType MOD_AltGr = (GdkModifierType) ( GDK_MOD5_MASK );
+    gdk_keymap_translate_keyboard_state (keymap, keycode, MOD_AltGr , 0, keyvals, NULL, NULL, & consumed);
+    return *keyvals;
+  }*/
+
+  else
+    return L"0";
+}
+
+
+std::wstring  get_KeySyms_according_to_Shiftstate(GdkKeymap *keymap, guint keycode, ShiftState ss, int caps  ){
+
+  GdkModifierType consumed;
+  GdkKeymapKey *maps;
+  guint *keyvals;
+  gint count;
+
+  if (!gdk_keymap_get_entries_for_keycode(keymap, keycode, &maps, &keyvals, &count))
+    return L"1";
+
+  //unshifted
+  if (( ss == Base ) && ( caps == 0 )) {
+    GdkModifierType MOD_base = (GdkModifierType) ( ~GDK_MODIFIER_MASK );
+    gdk_keymap_translate_keyboard_state (keymap, keycode, MOD_base , 0, keyvals, NULL, NULL, & consumed);
+    return  std::wstring(1, (int) *keyvals);
+  }
+
+  //SHIFT+CAPS
+  else if ( ( ss == Shft ) && ( caps ==1 )) {
+    GdkModifierType MOD_ShiftCaps= (GdkModifierType) ((GDK_SHIFT_MASK | GDK_LOCK_MASK));
+    gdk_keymap_translate_keyboard_state (keymap, keycode, MOD_ShiftCaps , 0, keyvals, NULL, NULL, & consumed);
+    return  std::wstring(1, (int) *keyvals);
+  }
+
+  //Shift
+  else if (( ss == Shft ) && ( caps == 0 )) {
+    GdkModifierType MOD_Shift = (GdkModifierType) ( GDK_SHIFT_MASK );
+    gdk_keymap_translate_keyboard_state (keymap, keycode, MOD_Shift , 0, keyvals, NULL, NULL, & consumed);
+    std::wstring rV1= std::wstring(1, (int) *keyvals);
+    return  std::wstring(1, (int) *keyvals);
+  }
+
+  //caps
+  else if (( ss == Base ) && ( caps == 1 )) {
+    GdkModifierType MOD_Caps = (GdkModifierType) ( GDK_LOCK_MASK );
+    gdk_keymap_translate_keyboard_state (keymap, keycode, MOD_Caps, 0, keyvals, NULL, NULL, & consumed);
+    return  std::wstring(1, (int) *keyvals);
+  }
+
+  /*//ALT-GR
+  else if {
+    GdkModifierType MOD_AltGr = (GdkModifierType) ( GDK_MOD5_MASK );
+    gdk_keymap_translate_keyboard_state (keymap, keycode, MOD_AltGr , 0, keyvals, NULL, NULL, & consumed);
+    return *keyvals;
+  }*/
+
+  else
+    return L"0";
+}
+

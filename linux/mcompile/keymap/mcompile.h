@@ -19,20 +19,31 @@
 
 
 
+#ifndef MCOMPILE_H
+#define MCOMPILE_H
 #include <vector>
-#include "km_types.h"
+#include "keymap.h"
+#include "helpers.h"
 
-void LogError(PKMX_WCHART message, ...);
+#include "mc_kmxfile.h"
 
+int run(int argc, std::vector<std::u16string>  str_argv, char* argv[]);
 
-struct DeadkeyMapping {   // I4353
-  KMX_WCHART deadkey, dkid;
+void KMX_LogError(const KMX_WCHART* m1, int m2 = 0);
+
+//void KMX_LogError(const KMX_WCHART* m1, int m2 = 0, LPKMX_KEY key =NULL);
+
+struct KMX_DeadkeyMapping {   // I4353
+  KMX_WCHAR deadkey, dkid;
   KMX_UINT shift;
   KMX_WORD vk;
 };
 
-extern std::vector<DeadkeyMapping> FDeadkeys;   // I4353
+extern std::vector<KMX_DeadkeyMapping> KMX_FDeadkeys;   // I4353
 
+// _S2 is this correct here???
+KMX_WORD KMX_VKUnderlyingLayoutToVKUS(KMX_WORD VKey);
+KMX_WORD KMX_VKUnderlyingLayoutToVKUS(v_dw_3D &All_Vector,KMX_DWORD inOther);
 
 //--------------------old 
 /*
@@ -49,3 +60,5 @@ struct DeadkeyMapping {   // I4353
 
 extern std::vector<DeadkeyMapping> FDeadkeys;   // I4353
 */
+
+#endif /*MCOMPILE_H*/

@@ -4,9 +4,14 @@
 */
 
 #pragma once
+#ifndef KMX_FILE_H
+#define KMX_FILE_H
 
 #include <km_types.h>
 
+//_S2 what is this and do we need it???
+#define UNREFERENCED_PARAMETER(P)   (P)
+#define TRUNCATE ((size_t)-1)
 #ifdef KMN_KBP
 // TODO: move this to a common namespace keyman::common::kmx_file or similar in the future
 namespace km {
@@ -296,13 +301,13 @@ namespace kmx {
 #define K_MODIFIERFLAG  0x007F
 #define K_NOTMODIFIERFLAG 0xFF00   // I4548
 
-struct COMP_STORE {
+struct KMX_COMP_STORE {
   KMX_DWORD dwSystemID;
   KMX_DWORD dpName;
   KMX_DWORD dpString;
   };
 
-struct COMP_KEY {
+struct KMX_COMP_KEY {
   KMX_WORD Key;
   KMX_WORD _reserved;
   KMX_DWORD Line;
@@ -311,7 +316,8 @@ struct COMP_KEY {
   KMX_DWORD dpContext;
   };
 
-struct COMP_GROUP {
+
+struct KMX_COMP_GROUP {
   KMX_DWORD dpName;
   KMX_DWORD dpKeyArray;   // [LPKEY] address of first item in key array
   KMX_DWORD dpMatch;
@@ -320,7 +326,7 @@ struct COMP_GROUP {
   KMX_BOOL  fUsingKeys;   // group(xx) [using keys] <-- specified or not
   };
 
-struct COMP_KEYBOARD {
+struct KMX_COMP_KEYBOARD {
   KMX_DWORD dwIdentifier;   // 0000 Keyman compiled keyboard id
 
   KMX_DWORD dwFileVersion;  // 0004 Version of the file - Keyman 4.0 is 0x0400
@@ -346,7 +352,7 @@ struct COMP_KEYBOARD {
   KMX_DWORD dwBitmapSize;   // 003C size in bytes of the bitmaps
 };
 
-struct COMP_KEYBOARD_KMXPLUSINFO {
+struct KMX_COMP_KEYBOARD_KMXPLUSINFO {
   KMX_DWORD dpKMXPlus;      // 0040 offset of KMXPlus data, <sect> header is first
   KMX_DWORD dwKMXPlusSize;  // 0044 size in bytes of entire KMXPlus data
 };
@@ -354,15 +360,16 @@ struct COMP_KEYBOARD_KMXPLUSINFO {
 /**
  * Only valid if comp_keyboard.dwFlags&KF_KMXPLUS
  */
-struct COMP_KEYBOARD_EX {
-  COMP_KEYBOARD             header;    // 0000 see COMP_KEYBOARD
-  COMP_KEYBOARD_KMXPLUSINFO kmxplus;   // 0040 see COMP_KEYBOARD_EXTRA
+struct KMX_COMP_KEYBOARD_EX {
+  KMX_COMP_KEYBOARD             header;    // 0000 see COMP_KEYBOARD
+  KMX_COMP_KEYBOARD_KMXPLUSINFO kmxplus;   // 0040 see COMP_KEYBOARD_EXTRA
 };
 
-typedef COMP_KEYBOARD *PCOMP_KEYBOARD;
-typedef COMP_STORE *PCOMP_STORE;
-typedef COMP_KEY *PCOMP_KEY;
-typedef COMP_GROUP *PCOMP_GROUP;
+typedef KMX_COMP_KEYBOARD *PKMX_COMP_KEYBOARD;
+typedef KMX_COMP_STORE *PKMX_COMP_STORE;
+typedef KMX_COMP_KEY *PKMX_COMP_KEY;
+typedef KMX_COMP_GROUP *PKMX_COMP_GROUP;
+
 
 extern const int CODE__SIZE[];
 #define CODE__SIZE_MAX 5
@@ -372,13 +379,14 @@ extern const int CODE__SIZE[];
 #define KEYBOARDFILEGROUP_SIZE  24
 #define KEYBOARDFILEKEY_SIZE    20
 
-static_assert(sizeof(COMP_STORE) == KEYBOARDFILESTORE_SIZE, "COMP_STORE must be KEYBOARDFILESTORE_SIZE bytes");
-static_assert(sizeof(COMP_KEY) == KEYBOARDFILEKEY_SIZE, "COMP_KEY must be KEYBOARDFILEKEY_SIZE bytes");
-static_assert(sizeof(COMP_GROUP) == KEYBOARDFILEGROUP_SIZE, "COMP_GROUP must be KEYBOARDFILEGROUP_SIZE bytes");
-static_assert(sizeof(COMP_KEYBOARD) == KEYBOARDFILEHEADER_SIZE, "COMP_KEYBOARD must be KEYBOARDFILEHEADER_SIZE bytes");
+static_assert(sizeof(KMX_COMP_STORE) == KEYBOARDFILESTORE_SIZE, "COMP_STORE must be KEYBOARDFILESTORE_SIZE bytes");
+static_assert(sizeof(KMX_COMP_KEY) == KEYBOARDFILEKEY_SIZE, "COMP_KEY must be KEYBOARDFILEKEY_SIZE bytes");
+static_assert(sizeof(KMX_COMP_GROUP) == KEYBOARDFILEGROUP_SIZE, "COMP_GROUP must be KEYBOARDFILEGROUP_SIZE bytes");
+static_assert(sizeof(KMX_COMP_KEYBOARD) == KEYBOARDFILEHEADER_SIZE, "COMP_KEYBOARD must be KEYBOARDFILEHEADER_SIZE bytes");
 
 #ifdef KMN_KBP
 } // namespace kmx
 } // namespace kbp
 } // namespace km
 #endif
+#endif /*KMX_FILE_H*/

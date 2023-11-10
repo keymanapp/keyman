@@ -1,11 +1,28 @@
-project('keymap', 'c', 'cpp',
+project('mcompile', 'c', 'cpp',
         license: 'MIT',
         meson_version: '>=1.0')
 
-gtk = dependency('gtk+-3.0', version: '>= 2.4')
+#do I need a Version of dependency?
+gtk =         dependency('gtk+-3.0', version: '>= 2.4')
+x11 =         dependency('x11',  version: '>= 1.6')
+xkb =         dependency('xkbcommon')
+libxklavier = dependency('libxklavier')
 
-keymap = executable(
-  'keymap',
-  sources: ['keymap.cpp'],
-  dependencies: [gtk]
-)
+deps = [gtk, x11, xkb,libxklavier]
+
+cpp_files = files(
+    'helpers.cpp',
+    'keymap.cpp',
+    'mcompile.cpp',
+    'filesystem.cpp',
+    'mc_kmxfile.cpp',
+    'mc_savekeyboard.cpp',
+    'mc_import_rules.cpp',
+    'u16.cpp',)
+
+mcompile = executable(
+    'mcompile',
+    sources: [cpp_files],
+    dependencies: deps
+    )
+
