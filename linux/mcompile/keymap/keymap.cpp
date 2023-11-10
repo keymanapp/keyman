@@ -448,7 +448,7 @@ KMX_DWORD get_VirtualKey_Other_GDK( GdkKeymap *keymap, KMX_DWORD keycode) {
 return 0;
 }
 
-// _S2 not needed?, can go later?
+// _S2 not needed, can go later
 // return RETURN NON SHIFTED CHAR [1]  the VirtualKey of the US Keyboard for given Scancode
 KMX_DWORD get_VirtualKey_US_From_SC(KMX_DWORD SC , v_dw_3D &All_Vector){
   // find correct row of char in US
@@ -506,7 +506,6 @@ KMX_DWORD get_position_From_VirtualKey_Other(KMX_DWORD VK_Other , v_dw_3D &All_V
   }
 
   return 0;    //_S2 TODO what do I return if not found??
-
 }
 
 // returns Keyval which hold the Keysym (in unshifted, shifted)
@@ -561,14 +560,12 @@ const int Lin_KM__map(int i, v_dw_3D &All_Vector) {
 }
 
 // _S2 TODO
-std::wstring  getKeySyms_according_to_Shiftstate(GdkKeymap *keymap, guint keycode, v_dw_3D &All_Vector, ShiftState ss, int caps  ){
+std::wstring  get_KeyVals_according_to_Shiftstate(GdkKeymap *keymap, guint keycode, ShiftState ss, int caps  ){
 
   GdkModifierType consumed;
   GdkKeymapKey *maps;
   guint *keyvals;
   gint count;
-  GdkKeymapKey* keys;
-  gint n_keys;
   guint lowerCase;
   guint upperCase;
 
@@ -615,28 +612,15 @@ std::wstring  getKeySyms_according_to_Shiftstate(GdkKeymap *keymap, guint keycod
 }
 
 
-std::wstring  PrintKeymapForCodeReturnKeySym2(GdkKeymap *keymap, guint VK, v_dw_3D &All_Vector, ShiftState ss, int caps  ){
+std::wstring  get_KeySyms_according_to_Shiftstate(GdkKeymap *keymap, guint keycode, ShiftState ss, int caps  ){
 
   GdkModifierType consumed;
   GdkKeymapKey *maps;
-  GdkEventKey* event;
   guint *keyvals;
-  guint *keyvals_shift;
-  gint *n_entries;
   gint count;
-  guint keycode;
-  GdkKeymapKey* keys;
-  gint n_keys;
-
-  gdk_keymap_get_entries_for_keyval(keymap, VK,&keys,&n_keys);
-
-  int pos_1 =get_position_From_VirtualKey_Other(VK , All_Vector, 0);
-  //wprintf(L" get_position_From_VirtualKey_Other %i of VK%i (%c) \n", pos_1, VK,VK);
-  keycode = All_Vector[1][pos_1][0];
 
   if (!gdk_keymap_get_entries_for_keycode(keymap, keycode, &maps, &keyvals, &count))
     return L"1";
-
 
   //unshifted
   if (( ss == Base ) && ( caps == 0 )) {

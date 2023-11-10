@@ -617,11 +617,11 @@ bool is_Edges(int pos, v_dw_3D & All_Vector){
 }
 
 
-// _S2 where to put this??
+// _S2 can go later
 std::wstring  get_VirtualKey_Other_from_iKey(KMX_DWORD iKey, ShiftState &ss, int &caps, v_dw_3D &All_Vector) {
 
   // _S2 this will find the correct row in All_Vector
-  //( e.g. get_position_From_VirtualKey_Other(65 ,All_Vector ) returns 25
+  //( e.g. get_position_From_VirtualKey_Other(65 ,All_Vector.99 ) returns 25
   // All_Vector[25] contains SC(38), unshifted A (97) shifted A (65) )
   KMX_DWORD pos = get_position_From_VirtualKey_Other(iKey, All_Vector,99);
 
@@ -694,7 +694,7 @@ bool KMX_ImportRules(KMX_WCHAR *kbid, LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, Gd
 
   for(UINT sc = 0x01; sc <= 0x7f; sc++) {
     KMX_VirtualKey *key = new KMX_VirtualKey(sc, hkl, All_Vector, keymap);
-    std::wstring str= getKeySyms_according_to_Shiftstate( *keymap, (guint) sc , All_Vector, Shft, 0 );
+    std::wstring str= get_KeyVals_according_to_Shiftstate( *keymap, (guint) sc , Shft, 0 );
 
     // _S2 QUESTION How to use keymap to fill key->vk correctly
     // use str to edit  key->vk
@@ -779,7 +779,7 @@ bool KMX_ImportRules(KMX_WCHAR *kbid, LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, Gd
           continue;
         }
 
-        // _S2 TODO get Keyval from GDK  get the keyval(nr of key )for e.g.52  -> 52 is printed out by key 13)
+        // _S2 can go later
         //int Keypos =  get_position_From_VirtualKey_Other(mapped_ikey , All_Vector, 99);
         //UINT VK_vec = (UINT) All_Vector[1][Keypos][0];
 
@@ -799,10 +799,7 @@ bool KMX_ImportRules(KMX_WCHAR *kbid, LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, Gd
 
           //_S2 TODO get char  - do I need rc ?? ( was rc = ToUnicodeEx...)
           std::wstring VK_Other_OLD = get_VirtualKey_Other_from_iKey(mapped_ikey, ss, caps, All_Vector);
-          // std::wstring VK_Other1= getKeySyms_according_to_Shiftstate(  *keymap, VK_vec, All_Vector, ss, caps);
-          //std::wstring VK_Other = PrintKeymapForCodeReturnKeySym2( *keymap, VK_vec, All_Vector, ss,  caps  );
-          std::wstring VK_Other = PrintKeymapForCodeReturnKeySym2( *keymap, keypos_GDK, All_Vector, ss,  caps  );
-
+          std::wstring VK_Other = get_KeySyms_according_to_Shiftstate( *keymap, keypos_GDK, ss, caps);
 
           /*  _S2 can go later
           if ( VK_Other_OLD != VK_Other) {

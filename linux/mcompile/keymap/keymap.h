@@ -3,9 +3,6 @@
 #ifndef KEYMAP_H
 #define KEYMAP_H
 
-// _S2 can go later; is for use of mcompile with GDK or with VectorFile
-#define USE_GDK 1
-
 #include <X11/XKBlib.h>
 #include <X11/Xlib.h>
 #include <gdk/gdk.h>
@@ -99,15 +96,15 @@ v_dw_2D create_empty_2D(int dim_rows, int dim_shifts);
 // query All_Vector
 // return the VirtualKey of the Other Keyboard for given Scancode
 //KMX_DWORD get_VirtualKey_Other_From_SC(KMX_DWORD SC , v_dw_3D &All_Vector);
-// return the VirtualKey of the US Keyboard for given Scancode
+// _S2 can go later return the VirtualKey of the US Keyboard for given Scancode
 KMX_DWORD get_VirtualKey_US_From_SC(KMX_DWORD SC , v_dw_3D &All_Vector);
 // return the Scancode of for given VirtualKey of Other Keyboard
 KMX_DWORD get_SC_From_VirtualKey_Other(KMX_DWORD VK_Other , v_dw_3D &All_Vector);
-// return the Scancode of for given VirtualKey of  US
+// _S2 can go later return the Scancode of for given VirtualKey of  US
 KMX_DWORD get_SC_From_VirtualKey_US(KMX_DWORD VK_US , v_dw_3D &All_Vector);
-// return the Scancode of for given VirtualKey of Other
-KMX_DWORD get_position_From_VirtualKey_Other(KMX_DWORD VK_US , v_dw_3D &All_Vector);
-// return the Scancode of for given VirtualKey of Other in specific column. If column > available columns look in all columns;
+// _S2 can go later return the Scancode of for given VirtualKey of Other
+//KMX_DWORD get_position_From_VirtualKey_Other(KMX_DWORD VK_US , v_dw_3D &All_Vector);
+// _S2 can go later return the Scancode of for given VirtualKey of Other in specific column. If column > available columns look in all columns;
 KMX_DWORD get_position_From_VirtualKey_Other(KMX_DWORD VK_Other , v_dw_3D &All_Vector, int which_columns);
 // return the Scancode of for given VirtualKey using GDK
 KMX_DWORD get_position_From_GDK(GdkKeymap *keymap, UINT mapped_ikey);
@@ -133,7 +130,9 @@ KMX_DWORD  map_To_VK(KMX_DWORD SC);
 KMX_DWORD  mapChar_To_VK(KMX_DWORD chr );
 KMX_DWORD  mapVK_To_char(KMX_DWORD SC );
 
-std::wstring getKeySyms_according_to_Shiftstate(GdkKeymap *keymap, guint VK, v_dw_3D &All_Vector, ShiftState ss, int caps  );
-std::wstring  PrintKeymapForCodeReturnKeySym2(GdkKeymap *keymap, guint VK, v_dw_3D &All_Vector, ShiftState ss, int caps  );
+// returns Keyvals fo ra given key (for unshifted: finds the Name of the Key e.g.  A or 1 )
+std::wstring get_KeyVals_according_to_Shiftstate(GdkKeymap *keymap, guint VK, ShiftState ss, int caps);
+// returns KeySyms fo ra given key (for unshifted: finds the Keysym according to Shiftstate e.g. a;A or 1;! )
+std::wstring get_KeySyms_according_to_Shiftstate(GdkKeymap *keymap, guint VK, ShiftState ss, int caps);
 
 # endif /*KEYMAP_H*/
