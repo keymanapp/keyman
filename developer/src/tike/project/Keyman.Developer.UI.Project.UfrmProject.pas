@@ -288,6 +288,8 @@ begin
   ClearMessages;
   for i := 0 to FGlobalProject.Files.Count - 1 do
   begin
+    if not FGlobalProject.Files[i].IsSourceFile then
+      Continue;
     if FGlobalProject.Files[i].IsCompilable and
       not (FGlobalProject.Files[i] is TkpsProjectFile) then
     begin
@@ -296,6 +298,8 @@ begin
   end;
   for i := 0 to FGlobalProject.Files.Count - 1 do
   begin
+    if not FGlobalProject.Files[i].IsSourceFile then
+      Continue;
     if FGlobalProject.Files[i] is TkpsProjectFile then
       if not (FGlobalProject.Files[i].UI as TProjectFileUI).DoAction(pfaCompile, False) then Exit;   // I4687
   end;
@@ -509,6 +513,8 @@ begin
     ClearMessages;
     for i := 0 to FGlobalProject.Files.Count - 1 do
     begin
+      if not FGlobalProject.Files[i].IsSourceFile then
+        Continue;
       (FGlobalProject.Files[i].UI as TProjectFileUI).DoAction(pfaClean, False);   // I4687
     end;
   end
@@ -517,6 +523,9 @@ begin
     ClearMessages;
     for i := 0 to FGlobalProject.Files.Count - 1 do
     begin
+      if not FGlobalProject.Files[i].IsSourceFile then
+        Continue;
+
       if (FGlobalProject.Files[i] is TkmnProjectFile) or
           (FGlobalProject.Files[i] is TxmlLdmlProjectFile) then
         (FGlobalProject.Files[i].UI as TProjectFileUI).DoAction(pfaCompile, False);   // I4687
@@ -527,6 +536,8 @@ begin
     ClearMessages;
     for i := 0 to FGlobalProject.Files.Count - 1 do
     begin
+      if not FGlobalProject.Files[i].IsSourceFile then
+        Continue;
       if (FGlobalProject.Files[i] is TkmnProjectFile) or
           (FGlobalProject.Files[i] is TxmlLdmlProjectFile) then
         (FGlobalProject.Files[i].UI as TProjectFileUI).DoAction(pfaClean, False);
@@ -537,6 +548,8 @@ begin
     ClearMessages;
     for i := 0 to FGlobalProject.Files.Count - 1 do
     begin
+      if not FGlobalProject.Files[i].IsSourceFile then
+        Continue;
       if FGlobalProject.Files[i] is TmodelTsProjectFile then
         (FGlobalProject.Files[i].UI as TProjectFileUI).DoAction(pfaCompile, False);   // I4687
     end;
@@ -546,6 +559,8 @@ begin
     ClearMessages;
     for i := 0 to FGlobalProject.Files.Count - 1 do
     begin
+      if not FGlobalProject.Files[i].IsSourceFile then
+        Continue;
       if FGlobalProject.Files[i] is TmodelTsProjectFile then
         (FGlobalProject.Files[i].UI as TProjectFileUI).DoAction(pfaClean, False);
     end;
@@ -556,6 +571,8 @@ begin
     ClearMessages;
     for i := 0 to FGlobalProject.Files.Count - 1 do
     begin
+      if not FGlobalProject.Files[i].IsSourceFile then
+        Continue;
       if FGlobalProject.Files[i] is TkpsProjectFile then
         (FGlobalProject.Files[i].UI as TProjectFileUI).DoAction(pfaCompile, False);
     end;
@@ -565,6 +582,8 @@ begin
     ClearMessages;
     for i := 0 to FGlobalProject.Files.Count - 1 do
     begin
+      if not FGlobalProject.Files[i].IsSourceFile then
+        Continue;
       if FGlobalProject.Files[i] is TkpsProjectFile then
         (FGlobalProject.Files[i].UI as TProjectFileUI).DoAction(pfaClean, False);
     end;

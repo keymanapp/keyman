@@ -266,6 +266,7 @@ type
     destructor Destroy; override;
 
     function IsCompilable: Boolean; virtual;
+    function IsSourceFile: Boolean; virtual;
     class function IsFileTypeSupported(const Filename: string): Boolean; virtual;
 
     procedure Load(node: IXMLNode); virtual;   // I4698
@@ -585,6 +586,34 @@ begin
   // assumes that if we are registered for the file type extension, then we can
   // handle the file. For example, .xml LDML keyboards
   Result := True;
+end;
+
+function TProjectFile.IsSourceFile: Boolean;
+var
+  FilePath, SourcePath: string;
+begin
+  // An file that is a sub-file of another one is never a source file
+  if Assigned(FParent) then
+    Exit(False);
+
+  // If no project is assigned, this is an unsupported mode (loading without
+  // project is no longer supported in 17.0+) but we don't want to crash so
+  // we'll just treat this as a source file
+  if not Assigned(FProject) then
+    Exit(True);
+
+  // We don't restrict builds to sourcepath files for v1.0 projects
+  if FProject.Options.Version = pv10 then
+    Exit(True);
+
+  // If no sourcepath is defined, then we'll build any files
+  if FProject.Options.SourcePath = '' then
+    Exit(True);
+
+  // Only return true if the file is directly in the ProjectOptions.SourcePath folder
+  SourcePath := ReplaceStr(IncludeTrailingPathDelimiter(FProject.ResolveProjectPath(FProject.Options.SourcePath)), '/', '\');
+  FilePath := ReplaceStr(ExtractFilePath(FFileName), '/', '\');
+  Result := SameFileName(SourcePath, FilePath);
 end;
 
 procedure TProjectFile.Load(node: IXMLNode);   // I4698
@@ -943,16 +972,18 @@ end;
 ///
 function TProject.PopulateFiles: Boolean;
 var
-  SourcePath: string;
+  ProjectPath: string;
 begin
   if FOptions.Version <> pv20 then
     raise EProjectLoader.Create('PopulateFiles can only be called on a v2.0 project');
 
-  SourcePath := ExtractFilePath(FileName);
-  if not DirectoryExists(SourcePath) then
+  FFiles.Clear;
+
+  ProjectPath := ExtractFilePath(FileName);
+  if not DirectoryExists(ProjectPath) then
     Exit(False);
 
-  PopulateFolder(SourcePath);
+  PopulateFolder(ProjectPath);
 
   Result := True;
 end;
@@ -1042,6 +1073,9 @@ begin
     raise Exception.Create('Unexpected: Upgrade was called when CanUpgrade=False');
 
   Options.Version := pv20;
+
+  if DirectoryExists(ExtractFilePath(FileName) + 'source') then
+    Options.SourcePath := '$PROJECTPATH\source';
 
   for i := Files.Count - 1 downto 0 do
   begin
