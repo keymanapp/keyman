@@ -1,17 +1,18 @@
 import { ActiveKey, Codes, DeviceSpec } from '@keymanapp/keyboard-processor';
 import { landscapeView } from 'keyman/engine/dom-utils';
 
-import OSKKey, { OSKKeySpec } from './oskKey.js';
+import OSKKey from './oskKey.js';
 import { KeyData, KeyElement, link } from '../keyElement.js';
 import OSKRow from './oskRow.js';
 import VisualKeyboard from '../visualKeyboard.js';
+import { ParsedLengthStyle } from '../lengthStyle.js';
 
 
 export default class OSKBaseKey extends OSKKey {
   private capLabel: HTMLDivElement;
   public readonly row: OSKRow;
 
-  constructor(spec: OSKKeySpec, layer: string, row: OSKRow) {
+  constructor(spec: ActiveKey, layer: string, row: OSKRow) {
     super(spec, layer);
     this.row = row;
   }
@@ -81,12 +82,6 @@ export default class OSKBaseKey extends OSKKey {
         bsk[bsn].layer = btn.key.layer
       }
     }
-
-    // If a subkey array is defined, add an icon
-    var skIcon = document.createElement('div');
-    skIcon.className='kmw-key-popup-icon';
-    //kDiv.appendChild(skIcon);
-    btn.appendChild(skIcon);
   }
 
   construct(vkbd: VisualKeyboard): HTMLDivElement {
@@ -120,11 +115,52 @@ export default class OSKBaseKey extends OSKKey {
       btn['subKeys']=null;
     }
 
+    // If a subkey array is defined, add an icon
+    const skIcon = this.generateHint();
+    btn.appendChild(skIcon);
+
     // Add text to button and button to placeholder div
     kDiv.appendChild(btn);
 
     // The 'return value' of this process.
     return this.square = kDiv;
+  }
+
+  public generateHint(): HTMLDivElement {
+    // If a hint is defined, add an icon
+    const skIcon = document.createElement('div');
+    // Ensure that we use the keyboard's text font for hints.
+    skIcon.className='kmw-key-popup-icon';
+
+    const hintSpec = this.spec.hintSrc;
+    if(!hintSpec) {
+      return skIcon;
+    }
+
+    if(hintSpec.font) {
+      skIcon.style.fontFamily = hintSpec.font;
+    } else {
+      skIcon.classList.add('kmw-key-text');
+    }
+
+    if(hintSpec.fontsize) {
+      const parsed = new ParsedLengthStyle(hintSpec.fontsize);
+      // From kmwosk.css: .kmw-key-popup-icon { font-size: 0.5em }
+      // The spec says to overwrite that, but we still want half-size compared to the text
+      // as a key-cap.
+      skIcon.style.fontSize = parsed.scaledBy(0.5).styleString;
+    }
+
+    // If the base key itself is the source of the hint text, we use `hint` directly.
+    // Otherwise, we present the source subkey's key cap as the hint.
+    const text = hintSpec == this.spec ? this.spec.hint : hintSpec.text;
+    if(text == '\u2022') {
+      // The original, pre-17.0 longpress dot-hint used bold-face styling.
+      skIcon.style.fontWeight='bold';
+    }
+    skIcon.textContent = text;
+
+    return skIcon;
   }
 
   public refreshLayout(vkbd: VisualKeyboard) {

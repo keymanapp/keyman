@@ -37,6 +37,7 @@
     "test": "gosh build.sh test"
   },
   "dependencies": {
+    "@keymanapp/common-types": "*",
     "@keymanapp/models-types": "*",
     "@keymanapp/keyman-version": "*",
     "@keymanapp/web-utils": "*",

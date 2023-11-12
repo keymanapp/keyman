@@ -14,10 +14,6 @@ export { type KeyElement } from './keyElement.js';
 export { type default as OSKBaseKey } from './keyboard-layout/oskBaseKey.js';
 export { type default as GlobeHint } from './globehint.interface.js';
 export { type default as KeyTip } from './keytip.interface.js';
-export { type default as PendingGesture } from './input/gestures/pendingGesture.interface.js';
-export { type default as RealizedGesture } from './input/gestures/realizedGesture.interface.js';
-export { type OSKKeySpec } from './keyboard-layout/oskKey.js';
-export { type default as InputEventCoordinate } from './input/inputEventCoordinate.js';
 export { type default as EmbeddedGestureConfig } from './config/embeddedGestureConfig.js';
 
 export { default as Activator, StaticActivator } from './views/activator.js';
