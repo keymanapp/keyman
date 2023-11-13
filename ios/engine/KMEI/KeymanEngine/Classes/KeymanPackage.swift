@@ -455,10 +455,17 @@ public class KeymanPackage {
   }
   
   static public func clearDirectory(destination: URL) throws {
-    let fileArray = try FileManager.default.contentsOfDirectory(atPath: destination.path)
-    try fileArray.forEach { file in
-        let fileUrl = destination.appendingPathComponent(file)
-      try FileManager.default.removeItem(atPath: fileUrl.path)
+    // First check to see if directory exists. If not, then do nothing.
+    var isDirectory: ObjCBool = false
+    if(FileManager.default.fileExists(atPath: destination.path, isDirectory: &isDirectory)){
+      if (isDirectory.boolValue) {
+        // it exists and is actually a directory, so remove every file it contains
+        let fileArray = try FileManager.default.contentsOfDirectory(atPath: destination.path)
+        try fileArray.forEach { file in
+            let fileUrl = destination.appendingPathComponent(file)
+          try FileManager.default.removeItem(atPath: fileUrl.path)
+        }
+      }
     }
   }
 
