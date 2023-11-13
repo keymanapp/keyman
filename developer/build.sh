@@ -40,4 +40,6 @@ builder_describe \
 
 builder_parse "$@"
 
+builder_run_action configure cp "$KEYMAN_ROOT/common/resources/fonts/keymanweb-osk.ttf" "$KEYMAN_ROOT/developer/src/tike/xml/layoutbuilder/"
+
 builder_run_child_actions clean configure build test
