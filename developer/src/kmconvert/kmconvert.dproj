@@ -181,7 +181,6 @@
         <DCCReference Include="..\common\delphi\general\KeyboardFonts.pas"/>
         <DCCReference Include="..\..\..\common\windows\delphi\ui\Keyman.System.Util.RenderLanguageIcon.pas"/>
         <DCCReference Include="..\..\..\common\windows\delphi\general\utilicon.pas"/>
-        <DCCReference Include="..\common\delphi\compiler\CompileErrorCodes.pas"/>
         <DCCReference Include="Keyman.Developer.System.ModelProjectTemplate.pas"/>
         <DCCReference Include="..\TIKE\project\Keyman.Developer.System.Project.modelTsProjectFile.pas"/>
         <DCCReference Include="..\TIKE\project\Keyman.Developer.System.Project.wordlistTsvProjectFile.pas">

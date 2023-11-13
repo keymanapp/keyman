@@ -964,8 +964,10 @@ export default abstract class OSKView extends EventEmitter<EventMap> implements 
    * Performs the _actual_ logic and functionality involved in hiding the OSK.
    */
   protected finalizeHide() {
-    if(document.body.className.indexOf('osk-always-visible') >= 0) {
-      return;
+    if (document.body.className.indexOf('osk-always-visible') >= 0) {
+      if (this.hostDevice.formFactor == 'desktop') {
+        return;
+      }
     }
 
     if(this._Box) {

@@ -134,7 +134,6 @@
         </DCCReference>
         <DCCReference Include="..\..\..\common\windows\delphi\general\RegistryKeys.pas"/>
         <DCCReference Include="..\..\..\common\windows\delphi\general\VersionInfo.pas"/>
-        <DCCReference Include="..\common\delphi\compiler\compile.pas"/>
         <DCCReference Include="main\KeymanDeveloperOptions.pas"/>
         <DCCReference Include="debug\UfrmKeyTest.pas">
             <Form>frmKeyTest</Form>
@@ -413,7 +412,6 @@
         <DCCReference Include="dialogs\UfrmKeyboardFonts.pas">
             <Form>frmKeyboardFonts</Form>
         </DCCReference>
-        <DCCReference Include="..\common\delphi\compiler\CompileErrorCodes.pas"/>
         <DCCReference Include="..\common\delphi\general\KeyboardFonts.pas"/>
         <DCCReference Include="..\..\..\common\windows\delphi\general\JsonUtil.pas"/>
         <DCCReference Include="main\TikeUnicodeData.pas"/>

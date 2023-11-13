@@ -17,7 +17,6 @@ developer-tests: \
   compile-supplementary-support \
   keyboard-js-info \
   kmcomp \
-  kmcomp-x64-structures \
   kmconvert \
   kmx-file-languages \
   model-ts-parser \
@@ -48,10 +47,6 @@ kmx-file-languages: .virtual
 
 kmcomp: .virtual
   cd $(DEVELOPER_ROOT)\src\test\auto\kmcomp
-  $(MAKE) $(TARGET)
-
-kmcomp-x64-structures: .virtual
-  cd $(DEVELOPER_ROOT)\src\test\auto\kmcomp-x64-structures
   $(MAKE) $(TARGET)
 
 kmconvert: .virtual
