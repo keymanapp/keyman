@@ -142,6 +142,8 @@ export class SuggestionBanner extends Banner {
 
   private manager: SuggestionInputManager;
 
+  readonly type = 'suggestion';
+
   private _predictionContext: PredictionContext;
 
   static readonly TOUCHED_CLASS: string = 'kmw-suggest-touched';

@@ -89,6 +89,8 @@ export abstract class Banner {
    * @param keyboardProperties
    */
   public configureForKeyboard(keyboard: Keyboard, keyboardProperties: KeyboardProperties) { }
+
+  abstract get type();
 }
 
 /**
@@ -100,4 +102,6 @@ export class BlankBanner extends Banner {
   constructor() {
     super(0);
   }
+
+  readonly type = 'blank';
 }
