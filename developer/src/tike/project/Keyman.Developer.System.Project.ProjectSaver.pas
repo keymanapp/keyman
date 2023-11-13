@@ -83,7 +83,7 @@ procedure TProjectSaver.Execute;   // I4698
 var
   i: Integer;
   doc: IXMLDocument;
-  node, root: IXMLNode;
+  filenode, node, root: IXMLNode;
   defopts: TProjectOptionsRecord;
 begin
   if FProject.IsDefaultProject(pv20) and (FFileName <> '') then
@@ -136,7 +136,24 @@ begin
   begin
     node := root.AddChild('Files');
     for i := 0 to FProject.Files.Count - 1 do
-      FProject.Files[i].Save(node.AddChild('File'));
+    begin
+      filenode := node.AddChild('File');
+
+      // For xsl renderer, we have additional metadata we provide for v2.0
+      // projects, at least until we replace the project view with a tree
+      // structure
+      if (FFileName = '') then
+      begin
+        if FProject.Files[i].IsSourceFile
+          then filenode.AddChild('IsInSourcePath').NodeValue := 'true'
+          else filenode.AddChild('IsInSourcePath').NodeValue := 'false';
+        if FProject.Files[i].IsCompilable
+          then filenode.AddChild('IsCompilable').NodeValue := 'true'
+          else filenode.AddChild('IsCompilable').NodeValue := 'false';
+      end;
+
+      FProject.Files[i].Save(filenode);
+    end;
   end;
 
   if FFileName <> '' then
