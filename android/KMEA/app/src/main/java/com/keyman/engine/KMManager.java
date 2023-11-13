@@ -852,7 +852,7 @@ public final class KMManager {
       copyAsset(context, KMFilename_JSPolyfill, "", true);
 
       // Copy image banner css
-      copyAsset(context, KMFilename_ImageBannerCss, "", true);
+      //copyAsset(context, KMFilename_ImageBannerCss, "", true);
 
       // SVG directory for banner themes
       File svgDir = new File(getSVGDir());
@@ -1463,11 +1463,11 @@ public final class KMManager {
    * @param {String} path
    * @return
    */
-  public static boolean setBannerImage(KeyboardType keyboard, String path) {
+  public static boolean setBannerImage(KeyboardType keyboard, String htmlPath, String svgPath) {
     if (keyboard == KeyboardType.KEYBOARD_TYPE_INAPP && InAppKeyboard != null) {
-      InAppKeyboard.setBannerImage(path);
+      InAppKeyboard.setBannerImage(htmlPath, svgPath);
     } else if (keyboard == KeyboardType.KEYBOARD_TYPE_SYSTEM && SystemKeyboard != null) {
-      SystemKeyboard.setBannerImage(path);
+      SystemKeyboard.setBannerImage(htmlPath, svgPath);
     } else {
       Log.d(TAG, "setBannerImage but keyboard is null");
       return false;

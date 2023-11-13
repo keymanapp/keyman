@@ -663,16 +663,25 @@ final class KMKeyboard extends WebView {
     return this.bannerImagePath;
   }
 
-  public void setBannerImage(String path) {
-    this.bannerImagePath = path; // Save the path in case delayed initialization is needed
+  public void setBannerImage(String htmlPath, String svgPath) {
+    // Read the banner html contents
+    String contents = FileUtils.readContents(context, htmlPath);
+
+    // If $BANNER string exists, replace with actual path
+    File bannerPath = new File(KMManager.getResourceRoot(), svgPath);
+    if (bannerPath.exists()) {
+      contents = contents.replace("$BANNER", bannerPath.getAbsolutePath());
+    }
+
+    this.bannerImagePath = contents; // Save the path in case delayed initialization is needed
     String logString = "";
-    if (path != null && path.contains("base64") || path.length() > 256) {
+    if (contents != null && contents.contains("base64") || contents.length() > 256) {
       logString = "<base64 image>";
     } else {
-      logString = path;
+      logString = contents;
     }
     KMLog.LogInfo(TAG, KMString.format("Banner image path: (%s).", logString));
-    String jsString = KMString.format("setBannerImage('%s')", path);
+    String jsString = KMString.format("setBannerImage('%s')", contents);
     loadJavascript(jsString);
   }
 
