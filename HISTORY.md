@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 17.0.209 alpha 2023-11-13
+
+* docs(windows): update meson and emscripten details (#9933)
+* fix(web): Increase size of spacebar text (#9954)
+
 ## 17.0.208 alpha 2023-11-08
 
 * fix(web): Fix clearing of deadkeys (#9944)
