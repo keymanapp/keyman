@@ -453,6 +453,14 @@ public class KeymanPackage {
       complete(nil)
     }
   }
+  
+  static public func clearDirectory(destination: URL) throws {
+    let fileArray = try FileManager.default.contentsOfDirectory(atPath: destination.path)
+    try fileArray.forEach { file in
+        let fileUrl = destination.appendingPathComponent(file)
+      try FileManager.default.removeItem(atPath: fileUrl.path)
+    }
+  }
 
   static public func extract(fileUrl: URL, destination: URL) throws -> KeymanPackage? {
     try unzipFile(fileUrl: fileUrl, destination: destination)
