@@ -23,7 +23,7 @@ export const FlickNameCoordMap = (() => {
   return map;
 })();
 
-function lockedAngleForDir(lockedDir: typeof OrderedFlickDirections[number]) {
+export function lockedAngleForDir(lockedDir: typeof OrderedFlickDirections[number]) {
   return Math.PI / 4 * OrderedFlickDirections.indexOf(lockedDir);
 }
 
@@ -36,7 +36,9 @@ export function calcLockedDistance(pathStats: CumulativePathStats<any>, lockedDi
   const projY = Math.max(0, -deltaY * Math.cos(lockedAngle));
   const projX = Math.max(0,  deltaX * Math.sin(lockedAngle));
 
-  return Math.sqrt(projX * projX + projY * projY);
+  // For intercardinals, note that Math.cos and Math.sin essentially result in component factors of sqrt(2);
+  // essentially, we've already taken the sqrt of distance.
+  return projX + projY;
 }
 
 export function buildFlickScroller(
@@ -76,7 +78,7 @@ export function buildFlickScroller(
  * north of the x-axis more likely than the base key - thus including
  * 'nw' and 'ne' and some 'w' and 'e' paths.
  */
-const MAX_TOLERANCE_ANGLE_SKEW = Math.PI / 3;
+export const MAX_TOLERANCE_ANGLE_SKEW = Math.PI / 3;
 
 /**
  * Represents a flick gesture's implementation within KeymanWeb, including
@@ -126,7 +128,18 @@ export default class Flick implements GestureHandler {
       if(result.matchedId == 'flick-reset-end') {
         this.emitKey(vkbd, this.baseSpec, baseSource.path.stats);
         return;
-      } else if(result.matchedId == 'flick-mid' || result.matchedId == 'flick-reset') {
+      } else if(result.matchedId == 'flick-reset') {
+        // Instant transitions to flick-mid state; entry indicates a lock "reset".
+        // Cancel the flick-viz bit.
+        if(this.flickScroller) {
+          this.flickScroller(baseSource.currentSample);
+          // Clear any previously-set scroller.
+          baseSource.path.off('step', this.flickScroller);
+        }
+        this.lockedDir = null;
+        this.lockedSelectable = null;
+        return;
+      } else if(result.matchedId == 'flick-mid') {
         if(baseSelection == this.baseSpec) {
           // Do not store a locked direction; the direction we WOULD lock has
           // no valid flick available.

@@ -7,7 +7,7 @@ type SimpleStringResult = 'resolve' | 'reject';
 export type PointModelResolution = SimpleStringResult;
 
 export interface ContactModel<Type, StateToken = any> {
-  pathModel: PathModel,
+  pathModel: PathModel<Type>,
   pathResolutionAction: PointModelResolution,
 
   // If multiple touchpoints are active, determines which point's item 'wins' for
