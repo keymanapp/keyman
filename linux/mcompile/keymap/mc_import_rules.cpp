@@ -123,19 +123,18 @@ public:
   }*/
 
 
-  KMX_VirtualKey(KMX_HKL hkl, UINT KMX_virtualKey, v_dw_3D All_Vector) {/*
+  /*KMX_VirtualKey(KMX_HKL hkl, UINT KMX_virtualKey, v_dw_3D All_Vector) {
     this->m_sc = MapVirtualKeyEx(virtualKey, 0, hkl); // second para =0: MAPVK_VK_TO_VSC=1
                                                         //the uCode parameter is a virtual-key code and is
                                                         //translated into a scan code. If it is a virtual-key
                                                         //code that does not distinguish between left- and
                                                         //right-hand keys, the left-hand scan code is returned.
-                                                        //If there is no translation, the function returns 0.*/
-
+                                                        //If there is no translation, the function returns 0.
     this->m_sc = get_SC_From_VirtualKey_Other(KMX_virtualKey, All_Vector);
     this->m_hkl = hkl;
     this->m_vk = KMX_virtualKey;
     memset(this->m_rgfDeadKey,0,sizeof(this->m_rgfDeadKey));
-  }
+  }*/
 
   /*KMX_VirtualKey(UINT scanCode, KMX_HKL hkl, v_dw_3D All_Vector) {
     // _S2 this->m_vk = MapVirtualKeyEx(scanCode, 1, hkl);  // second para= 1: MAPVK_VSC_TO_VK =1
@@ -153,6 +152,13 @@ public:
     this->m_vk = get_VirtualKey_Other_GDK(*keymap, scanCode);
     this->m_hkl = hkl;
     this->m_sc = scanCode ;
+  }
+
+  KMX_VirtualKey(KMX_HKL hkl,UINT scanCode,  v_dw_3D All_Vector, GdkKeymap **keymap) {
+    this->m_vk = get_VirtualKey_Other_GDK(*keymap, scanCode);
+    this->m_hkl = hkl;
+    this->m_sc = scanCode ;
+    // _S2 ?? memset(this->m_rgfDeadKey,0,sizeof(this->m_rgfDeadKey));
   }
 
   UINT VK() {
@@ -682,12 +688,12 @@ bool KMX_ImportRules(KMX_WCHAR *kbid, LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, Gd
   }
 
   for(UINT ke = VK_NUMPAD0; ke <= VK_NUMPAD9; ke++) {
-      rgKey[ke] = new KMX_VirtualKey(hkl, ke, All_Vector);
+      rgKey[ke] = new KMX_VirtualKey(hkl, ke, All_Vector, keymap);
   }
 
-  rgKey[VK_DIVIDE] = new KMX_VirtualKey(hkl, VK_DIVIDE, All_Vector);
-  rgKey[VK_CANCEL] = new KMX_VirtualKey(hkl, VK_CANCEL, All_Vector);
-  rgKey[VK_DECIMAL] = new KMX_VirtualKey(hkl, VK_DECIMAL, All_Vector);
+  rgKey[VK_DIVIDE] = new KMX_VirtualKey(hkl, VK_DIVIDE, All_Vector, keymap);
+  rgKey[VK_CANCEL] = new KMX_VirtualKey(hkl, VK_CANCEL, All_Vector, keymap);
+  rgKey[VK_DECIMAL] = new KMX_VirtualKey(hkl, VK_DECIMAL, All_Vector, keymap);
 
 /*
  // _S2 do we need special shift state now or later?

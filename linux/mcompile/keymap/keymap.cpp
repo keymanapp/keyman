@@ -110,6 +110,8 @@ KMX_DWORD convertNamesToValue(std::wstring tok_wstr){
   first[L"slash"]            =  47;
   first[L"question"]         =  63;
   first[L"space"]            =  32;
+  first[L"asciitilde"]       = 126;
+  first[L"asciicircum"]      = 136;
 
   first[L"dead_acute"]     =   180;
   first[L"grave"]          =    96;

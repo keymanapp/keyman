@@ -70,7 +70,8 @@ const KMX_DWORD KMX_VKMap[] = {
 
 //_S2 QUESTION Which character do we use in that case?  0 or FFFF or 32 or ??
 // this is what we return when we find an invalid character
-static KMX_DWORD returnIfCharInvalid = 32;
+//static KMX_DWORD returnIfCharInvalid = 32;
+static KMX_DWORD returnIfCharInvalid = 0;
 
 // takes a std::wstring (=contents of line symbols-file ) and returns the (int) value of the character
 KMX_DWORD convertNamesToValue(std::wstring tok_wstr);
@@ -98,7 +99,7 @@ v_dw_2D create_empty_2D(int dim_rows, int dim_shifts);
 //KMX_DWORD get_VirtualKey_Other_From_SC(KMX_DWORD SC , v_dw_3D &All_Vector);
 // _S2 can go later return the VirtualKey of the US Keyboard for given Scancode
 KMX_DWORD get_VirtualKey_US_From_SC(KMX_DWORD SC , v_dw_3D &All_Vector);
-// return the Scancode of for given VirtualKey of Other Keyboard
+// _S2 can go later return the Scancode of for given VirtualKey of Other Keyboard
 KMX_DWORD get_SC_From_VirtualKey_Other(KMX_DWORD VK_Other , v_dw_3D &All_Vector);
 // _S2 can go later return the Scancode of for given VirtualKey of  US
 KMX_DWORD get_SC_From_VirtualKey_US(KMX_DWORD VK_US , v_dw_3D &All_Vector);
@@ -106,6 +107,7 @@ KMX_DWORD get_SC_From_VirtualKey_US(KMX_DWORD VK_US , v_dw_3D &All_Vector);
 //KMX_DWORD get_position_From_VirtualKey_Other(KMX_DWORD VK_US , v_dw_3D &All_Vector);
 // _S2 can go later return the Scancode of for given VirtualKey of Other in specific column. If column > available columns look in all columns;
 KMX_DWORD get_position_From_VirtualKey_Other(KMX_DWORD VK_Other , v_dw_3D &All_Vector, int which_columns);
+
 // return the Scancode of for given VirtualKey using GDK
 KMX_DWORD get_position_From_GDK(GdkKeymap *keymap, UINT mapped_ikey);
 

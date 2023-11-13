@@ -323,7 +323,7 @@ KMX_BOOL KMX_DoConvert(LPKMX_KEYBOARD kbd, PKMX_WCHAR kbid, KMX_BOOL bDeadkeyCon
     return FALSE;
   }
 
-  const wchar_t* ERROR = L"   ";
+ // const wchar_t* ERROR = L"   ";
 
   for (int j = 0; VKShiftState[j] != 0xFFFF; j++) { // I4651
   wprintf(L"\n");
@@ -344,11 +344,11 @@ KMX_BOOL KMX_DoConvert(LPKMX_KEYBOARD kbd, PKMX_WCHAR kbid, KMX_BOOL bDeadkeyCon
       //LogError("--- VK_%d -> VK_%d [%c] dk=%d", VKMap[i], vkUnderlying, ch == 0 ? 32 : ch, DeadKey);
 
       // _S2 ToDo
-      /*if(bDeadkeyConversion) {   // I4552
+      if(bDeadkeyConversion) {   // I4552
         if(ch == 0xFFFF) {
           ch = DeadKey;
         }
-      }*/
+      }
 
       //wprintf(L"     switch with  ch: %i (%c)......\n" ,  ch,ch);
       switch(ch) {
