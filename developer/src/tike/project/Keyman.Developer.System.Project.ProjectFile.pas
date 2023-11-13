@@ -172,9 +172,6 @@ type
 
     property Busy: Boolean read FBusy write FBusy;
     property MustSave: Boolean read FMustSave write FMustSave;
-
-  public
-    class var CompilerMessageFile: TProjectFile;   // I4694
   end;
 
   { TProjectFile and associated classes }
@@ -311,9 +308,6 @@ const
   WM_USER_ProjectUpdateDisplayState = WM_USER;
 
 function GlobalProjectStateWndHandle: THandle;
-function ProjectCompilerMessage(line: Integer; msgcode: LongWord; text: PAnsiChar): Integer; stdcall;  // I3310   // I4694
-function ProjectCompilerMessageW(line: Integer; msgcode: LongWord; const text: string): Integer;
-procedure ProjectCompilerMessageClear;
 
 function ProjectTypeFromString(s: string): TProjectType;
 function ProjectTypeToString(pt: TProjectType): string;
@@ -329,7 +323,6 @@ uses
   System.StrUtils,
   System.Variants,
 
-  CompileErrorCodes,
   Keyman.Developer.System.Project.Project,
   Keyman.Developer.System.Project.ProjectFileType,
   Keyman.Developer.System.Project.ProjectLoader,
@@ -1152,64 +1145,6 @@ begin
     pfs.Value := Value;
     Add(pfs);
   end;
-end;
-
-const
-  MAX_MESSAGES = 100;
-
-var
-  MessageCount: Integer = 0;
-
-procedure ProjectCompilerMessageClear;
-begin
-  MessageCount := 0;
-end;
-
-function ProjectCompilerMessage(line: Integer; msgcode: LongWord; text: PAnsiChar): Integer; stdcall;  // I3310   // I4694
-begin
-  Result := ProjectCompilerMessageW(line, msgcode, String_AtoU(text));
-end;
-
-function ProjectCompilerMessageW(line: Integer; msgcode: LongWord; const text: string): Integer;  // I3310   // I4694
-const // from compile.pas
-  CERR_FATAL   = $00008000;
-  CERR_ERROR   = $00004000;
-  CERR_WARNING = $00002000;
-  CERR_HINT    = $00001000;
-  CWARN_Info =   $0000208A;
-var
-  FLogState: TProjectLogState;
-begin
-  FLogState := plsInfo;
-
-  if msgcode <> CWARN_Info then
-    case msgcode and $F000 of
-      CERR_HINT:    FLogState := plsHint;
-      CERR_WARNING: FLogState := plsWarning;
-      CERR_ERROR:   FLogState := plsError;
-      CERR_FATAL:   FLogState := plsFatal;
-    end;
-
-  if FLogState = plsWarning then   // I4706
-    TProject.CompilerMessageFile.FHasWarning := True;
-
-  if FLogState in [plsWarning, plsError, plsFatal] then
-  begin
-    Inc(MessageCount);
-    if MessageCount > MAX_MESSAGES then
-      Exit(1);
-  end;
-
-  TProject.CompilerMessageFile.Log(FLogState, text, msgcode, line);   // I4706
-
-  if (FLogState <> plsInfo) and (MessageCount = MAX_MESSAGES) then
-    TProject.CompilerMessageFile.Log(
-      plsWarning,
-      Format('More than %d warnings or errors received; suppressing further messages', [MAX_MESSAGES]),
-      CWARN_TooManyErrorsOrWarnings,
-      line);
-
-  Result := 1;
 end;
 
 { TProjectOptions }

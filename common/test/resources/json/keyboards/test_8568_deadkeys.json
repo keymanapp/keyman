@@ -1,0 +1,10 @@
+{
+  "id": "test_8568_deadkeys",
+  "name":"Testcase for deadkeys bug (#8568)",
+  "languages":{
+    "id":"en",
+    "name": "English",
+    "region": "World"
+  },
+  "filename":"resources/keyboards/test_8568_deadkeys.js"
+}

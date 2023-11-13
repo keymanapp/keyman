@@ -4,9 +4,7 @@
 <keyboard3 locale="mt" conformsTo="techpreview">
   <version number="1.0" /> <!-- invalid because it's not "1.0.0" as required by semver -->
 
-  <names>
-    <name value="meta-minimal" />
-  </names>
+  <info name="meta-minimal"/>
 
   <keys />
 </keyboard3>

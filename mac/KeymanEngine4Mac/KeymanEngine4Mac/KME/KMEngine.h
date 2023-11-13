@@ -14,25 +14,18 @@
 
 //#define USE_ALERT_SHOW_HELP_TO_FORCE_EASTER_EGG_CRASH_FROM_ENGINE
 
-extern NSString *const Q_STR;
-extern NSString *const Q_BACK;
-extern NSString *const Q_DEADKEY;
-extern NSString *const Q_NUL;
-extern NSString *const Q_BEEP;
-extern NSString *const Q_RETURN;
-extern NSString *const Q_SAVEOPT;
-
-extern DWORD VKMap[0x80];
-
 @interface KMEngine : NSObject
 
 @property (weak, nonatomic) KMXFile *kmx;
 @property (assign, nonatomic) BOOL debugMode;
 
-- (id)initWithKMX:(KMXFile *)kmx contextBuffer:(NSString *)ctxBuf;
-- (void)setContextBuffer:(NSString *)ctxBuf;
-- (NSString *)contextBuffer;
-- (void)setStore:(DWORD)storeID withValue:(NSString *)value;
+- (id)initWithKMX:(KMXFile *)kmx context:(NSString *)ctxBuf verboseLogging:(BOOL)enableDebugLogging;
+- (NSString *)getCoreContext;
+- (void)clearCoreContext;
+- (void)setCoreContextIfNeeded:(NSString *)context;
+- (void)setCoreContext:(NSString *)context;
+
+- (void)setCoreOptions:(NSString *)key withValue:(NSString *)value;
 - (NSArray *)processEvent:(NSEvent *)event;
 - (void)setUseVerboseLogging:(BOOL)useVerboseLogging;
 

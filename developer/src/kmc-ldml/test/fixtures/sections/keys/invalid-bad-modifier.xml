@@ -2,14 +2,12 @@
 
 <!DOCTYPE keyboard3 SYSTEM "../../../../../../../resources/standards-data/ldml-keyboards/techpreview/dtd/ldmlKeyboard3.dtd">
 <keyboard3 locale="mt" conformsTo="techpreview">
-  <names>
-    <name value="keys-minimal" />
-  </names>
+  <info name="keys-minimal"/>
 
   <keys />
 
-  <layers form="us">
-    <layer id="base" modifier="altR-shift"> <!-- invalid, should be "altR shift" -->
+  <layers formId="us">
+    <layer id="base" modifiers="altR-shift"> <!-- invalid, should be "altR shift" -->
       <row keys="a b c" />
     </layer>
   </layers>

@@ -3,13 +3,13 @@
   "languages": {
     "km": {
       "oskFont": {
-        "family": "khmer_angkor Keyman OSK Font",
+        "family": "Khmer Busra Kbd",
         "source": [
           "khmer_busra_kbd.ttf"
         ]
       },
       "font": {
-        "family": "khmer_angkor Keyman Display Font",
+        "family": "Khmer Mondulkiri",
         "source": [
           "Mondulkiri-R.ttf"
         ]

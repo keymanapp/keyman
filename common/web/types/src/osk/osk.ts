@@ -25,7 +25,7 @@ export function parseMapping(mapping: any) {
   if(!SchemaValidators.displayMap(<any>mapping))
   /* c8 ignore next 3 */
   {
-    throw new Error((<any>SchemaValidators.displayMap).errorsText());
+    throw new Error(JSON.stringify((<any>SchemaValidators.displayMap).errors));
   }
 
   let map: PuaMap = {};
