@@ -58,6 +58,18 @@ class KeymanPackageTests: XCTestCase {
     }
   }
 
+  func testKeyboardPackage_clearNonexistentDirectory_doesNothing() throws {
+    let cacheDirectory = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask)[0]
+    let destinationDirectory = cacheDirectory.appendingPathComponent("doesnotexist")
+
+    do {
+      // clear directory
+      try KeymanPackage.clearDirectory(destination: destinationDirectory)
+      } catch {
+        XCTFail("error clearing the nonexistent directory \(error)")
+      }
+  }
+
   func testKeyboardPackage_clearEmptyDirectory_throwsNoError() throws {
     let cacheDirectory = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask)[0]
     let destinationDirectory = cacheDirectory.appendingPathComponent("destination")
