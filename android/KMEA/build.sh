@@ -87,7 +87,7 @@ if builder_start_action build:engine; then
   cp "$KEYMAN_WEB_ROOT/build/app/resources/osk/ajax-loader.gif" "$ENGINE_ASSETS/ajax-loader.gif"
   cp "$KEYMAN_WEB_ROOT/build/app/resources/osk/kmwosk.css" "$ENGINE_ASSETS/kmwosk.css"
   cp "$KEYMAN_WEB_ROOT/build/app/resources/osk/globe-hint.css" "$ENGINE_ASSETS/globe-hint.css"
-  cp "$KEYMAN_WEB_ROOT/build/app/resources/osk/keymanweb-osk.ttf" "$ENGINE_ASSETS/keymanweb-osk.ttf"
+  cp "$KEYMAN_ROOT/common/resources/fonts/keymanweb-osk.ttf" "$ENGINE_ASSETS/keymanweb-osk.ttf"
 
   cp "$KEYMAN_ROOT/node_modules/@sentry/browser/build/bundle.min.js" "$ENGINE_ASSETS/sentry.min.js"
   cp "$KEYMAN_ROOT/common/web/sentry-manager/build/lib/index.js" "$ENGINE_ASSETS/keyman-sentry.js"
