@@ -9,6 +9,7 @@ import { ImageBanner } from './imageBanner.js';
 import OSKViewComponent from '../components/oskViewComponent.interface.js';
 import { ParsedLengthStyle } from '../lengthStyle.js';
 import { SuggestionBanner } from './suggestionBanner.js';
+import { HTMLBanner } from './htmlBanner.js';
 
 /**
  * This object is used to specify options by both `BannerManager.getOptions`
@@ -181,6 +182,12 @@ export class BannerController {
    * Builds a banner for use when predictions are not active, supporting a single image.
    */
   public readonly ImageBanner = ImageBanner;
+
+  /**
+   * Builds a banner for use when predictions are not active, supporting a more generalized
+   * content pattern than ImageBanner via `innerHTML` specifications.
+   */
+  public readonly HTMLBanner = HTMLBanner;
 
   constructor(bannerView: BannerView, hostDevice: DeviceSpec, predictionContext?: PredictionContext) {
     // Step 1 - establish the container element.  Must come before this.setOptions.
