@@ -44,7 +44,7 @@ typedef NS_ENUM(NSInteger, ClientCapability) {
 - (void)checkContextIn:(id)client;
 - (void)replaceExistingSelectionIn:(id)client with:(NSString *) text;
 - (void)insertPendingBufferTextIn:(id)client;
-- (KMInputMethodAppDelegate *)AppDelegate;
+- (KMInputMethodAppDelegate *)appDelegate;
 - (NSMutableString *)contextBuffer;
 - (NSString *)getLimitedContextFrom:(id)sender at:(NSUInteger) len;
 // Return the pending buffer.  If it is NIL create it.

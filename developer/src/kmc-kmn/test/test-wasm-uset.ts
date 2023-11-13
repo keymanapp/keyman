@@ -2,7 +2,7 @@ import 'mocha';
 import { assert } from 'chai';
 import { KmnCompiler } from '../src/main.js';
 import { TestCompilerCallbacks } from '@keymanapp/developer-test-helpers';
-import { CompilerMessages } from '../src/compiler/messages.js';
+import { CompilerMessages } from '../src/compiler/kmn-compiler-messages.js';
 import { compilerErrorFormatCode } from '@keymanapp/common-types';
 
 describe('Compiler UnicodeSet function', function() {

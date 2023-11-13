@@ -90,7 +90,6 @@ type
     cbEditorTheme: TComboBox;
     lblEditorCustomTheme: TLabel;
     lblEditorTheme: TLabel;
-    chkAllowMultipleInstances: TCheckBox;
     gbDefaultProjectPath: TGroupBox;
     editDefaultProjectPath: TEdit;
     cmdBrowseDefaultProjectPath: TButton;
@@ -105,7 +104,6 @@ type
     gbServer: TGroupBox;
     chkListLocalURLs: TCheckBox;
     cmdConfigureServer: TButton;
-    chkUseLegacyCompiler: TCheckBox;
     procedure FormCreate(Sender: TObject);
     procedure cmdOKClick(Sender: TObject);
     procedure cmdDefaultFontClick(Sender: TObject);
@@ -195,12 +193,8 @@ begin
     chkAutoSaveBeforeCompiling.Checked :=          AutoSaveBeforeCompiling;
     chkOSKAutoSaveBeforeImporting.Checked :=       OSKAutoSaveBeforeImporting;
 
-    chkUseLegacyCompiler.Checked := UseLegacyCompiler;
-
     chkCharMapAutoLookup.Checked := CharMapAutoLookup;
     chkCharMapDisableDatabaseLookups.Checked := CharMapDisableDatabaseLookups;
-
-    chkAllowMultipleInstances.Checked := AllowMultipleInstances;
 
     chkOpenKeyboardFilesInSourceView.Checked := OpenKeyboardFilesInSourceView;   // I4751
 
@@ -298,14 +292,10 @@ begin
     AutoSaveBeforeCompiling          := chkAutoSaveBeforeCompiling.Checked;
     OSKAutoSaveBeforeImporting       := chkOSKAutoSaveBeforeImporting.Checked;
 
-    UseLegacyCompiler := chkUseLegacyCompiler.Checked;
-
     ServerUseLocalAddresses := chkListLocalURLs.Checked;
 
     CharMapAutoLookup := chkCharMapAutoLookup.Checked;
     CharMapDisableDatabaseLookups := chkCharMapDisableDatabaseLookups.Checked;
-
-    AllowMultipleInstances := chkAllowMultipleInstances.Checked;
 
     OpenKeyboardFilesInSourceView := chkOpenKeyboardFilesInSourceView.Checked;   // I4751
 

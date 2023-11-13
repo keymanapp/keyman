@@ -73,7 +73,7 @@ Libraries will be built in 'build/<target>/<configuration>/src'.
   "uninstall                       uninstall libraries from current system" \
   "${archtargets[@]}" \
   "--no-tests                      do not configure tests (used by other projects)" \
-  "--test=opt_tests,-t             test[s] to run (space separated)"
+  "--test,-t=opt_tests             test[s] to run (space separated)"
 
 builder_parse "$@"
 
@@ -165,6 +165,11 @@ fi
 
 # -------------------------------------------------------------------------------
 
+testparams="${builder_extra_params[@]}"
+if builder_has_option --test; then
+  testparams="$opt_tests $testparams"
+fi
+
 do_action test
 
 if builder_start_action test:mac; then
@@ -173,7 +178,7 @@ if builder_start_action test:mac; then
   # available
   target=mac-`uname -m`
   MESON_PATH="$KEYMAN_ROOT/core/build/$target/$BUILDER_CONFIGURATION"
-  meson test -C "$MESON_PATH" "${builder_extra_params[@]}"
+  meson test -C "$MESON_PATH" $testparams
   builder_finish_action success test:mac
 fi
 

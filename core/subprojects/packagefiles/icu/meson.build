@@ -85,6 +85,11 @@ if get_option('default_library') == 'static'
   if cpp.get_argument_syntax() == 'msvc'
     library_prefix = ''
     library_suffix = ''
+  elif host_machine.system() == 'darwin'
+    # TODO-LDML: should be switchable via meson parameters.
+    # TODO-LDML: xcode has a flexibility problem here, so droppinh the suffixes
+    library_prefix = 's'
+    library_suffix = ''
   else
     library_prefix = 's'
     if get_option('buildtype') == 'debug'
