@@ -76,7 +76,7 @@ static const int KEYMAN_FIRST_KEYBOARD_MENUITEM_INDEX = 0;
 @property (nonatomic, assign) CFMachPortRef lowLevelEventTap;
 @property (nonatomic, assign) CFRunLoopSourceRef runLoopEventSrc;
 @property (nonatomic, assign) BOOL sleeping;
-@property (nonatomic, assign) BOOL contextChangingEventDetected;
+@property (nonatomic, assign) BOOL contextChangedByLowLevelEvent;
 @property (nonatomic, strong) OSKWindowController *oskWindow;
 @property (nonatomic, strong) NSString *keyboardName;
 @property (nonatomic, strong) NSImage *keyboardIcon;
@@ -97,10 +97,11 @@ static const int KEYMAN_FIRST_KEYBOARD_MENUITEM_INDEX = 0;
 @property (nonatomic, assign) BOOL useNullChar;
 @property (nonatomic, assign) BOOL debugMode;
 
+- (void)logDebugMessage:(NSString *)format, ...;
 - (NSMenu *)menu;
 - (void)saveActiveKeyboards;
-- (void)loadSavedStores;
-- (void)saveStore:(NSNumber *)storeKey withValue:(NSString* )value;
+- (void)readPersistedOptions;
+- (void)writePersistedOptions:(NSString *)storeKey withValue:(NSString* )value;
 - (void)showAboutWindow;
 - (void)showOSK;
 - (void)showConfigurationWindow;
@@ -127,7 +128,6 @@ static const int KEYMAN_FIRST_KEYBOARD_MENUITEM_INDEX = 0;
 - (void)postKeyboardEventWithSource: (CGEventSourceRef)source code:(CGKeyCode) virtualKey postCallback:(PostEventCallback)postEvent;
 - (KeymanVersionInfo)versionInfo;
 - (NSString *)keymanDataPath;
-- (NSArray *)legacyAppsUserDefaults;
 - (void)registerConfigurationWindow:(NSWindowController *)window;
 @end
 

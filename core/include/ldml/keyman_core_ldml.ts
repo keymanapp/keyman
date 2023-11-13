@@ -33,7 +33,6 @@ export type SectionIdent =
   'list' |
   'loca' |
   'meta' |
-  'name' |
   'strs' |
   'tran' |
   'uset' |
@@ -312,7 +311,7 @@ class Constants {
   /**
    *  Length of each item in the 'keys' flick elements sub-table
    */
-  readonly length_keys_flick_element = 12;
+  readonly length_keys_flick_element = 8;
   /**
    * Length of each item in the 'keys.kmap' key map subtable
    */
@@ -327,16 +326,6 @@ class Constants {
    * 1 if the key is a gap
    */
   readonly keys_key_flags_gap         = 0x00000002;
-
-  /**
-   * 1 if the key is transform=no
-   */
-  readonly keys_key_flags_notransform = 0x00000004;
-
-  /**
-   * 0 if to is a char, 1 if it is a string
-   */
-  readonly keys_flick_flags_extend      = 0x00000001;
 
   /* ------------------------------------------------------------------
    * layr section
@@ -406,30 +395,9 @@ class Constants {
    */
   readonly length_meta = 36;
   /**
-   * bitwise or value for fallback=omit in meta.settings
+   * bitwise or value for normalization=disabled in meta.settings
    */
-  readonly meta_settings_fallback_omit = 1;
-  /**
-   * bitwise or value for transformFailure=omit in meta.settings
-   */
-  readonly meta_settings_transformFailure_omit = 2;
-  /**
-   * bitwise or value for transformPartial=hide in meta.settings
-   */
-  readonly meta_settings_transformPartial_hide = 4;
-
-  /* ------------------------------------------------------------------
-    * name section
-      ------------------------------------------------------------------ */
-
-  /**
-   * Minimum length of the 'name' section not including variable parts
-   */
-  readonly length_name = 12;
-  /**
-   *  Length of each item in the 'name' section variable part
-   */
-  readonly length_name_item = 4;
+  readonly meta_settings_normalization_disabled = 1;
 
   /* ------------------------------------------------------------------
     * strs section
@@ -537,7 +505,6 @@ class Constants {
       list: 'list',
       loca: 'loca',
       meta: 'meta',
-      name: 'name',
       sect: 'sect',
       strs: 'strs',
       tran: 'tran',

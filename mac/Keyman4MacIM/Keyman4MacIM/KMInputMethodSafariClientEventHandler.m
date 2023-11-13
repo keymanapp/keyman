@@ -65,7 +65,7 @@ BOOL _preserveContextForNextCmdA;
     // In Google Docs (i.e., "legacy mode" when there is an existing selection, the inserted characters
     // stay selected. The following clears the selection.
     if (self.legacyMode) {
-        if ([self.AppDelegate debugMode])
+        if ([self.appDelegate debugMode])
             NSLog(@"Sending Command-Shift-A to clear selection in Google Docs");
         _preserveContextForNextCmdA = YES;
         ProcessSerialNumber psn;

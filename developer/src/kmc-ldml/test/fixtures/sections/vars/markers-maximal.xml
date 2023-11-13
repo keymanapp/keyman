@@ -10,16 +10,14 @@
 -->
 <!DOCTYPE keyboard3 SYSTEM "../../../../../../../resources/standards-data/ldml-keyboards/techpreview/dtd/ldmlKeyboard3.dtd">
 <keyboard3 locale="mt" conformsTo="techpreview">
-  <names>
-    <name value="vars-markers-maximal" />
-  </names>
+  <info name="vars-markers-maximal"/>
 
   <displays>
-    <display to="\m{m}" display="Ⓜ️" />
+    <display output="\m{m}" display="Ⓜ️" />
   </displays>
 
   <keys>
-    <key id="m" to="\m{m}" />
+    <key id="m" output="\m{m}" />
   </keys>
 
   <!-- from spec -->

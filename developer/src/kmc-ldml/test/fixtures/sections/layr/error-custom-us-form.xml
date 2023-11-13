@@ -2,14 +2,12 @@
 
 <!DOCTYPE keyboard3 SYSTEM "../../../../../../../resources/standards-data/ldml-keyboards/techpreview/dtd/ldmlKeyboard3.dtd">
 <keyboard3 locale="und" conformsTo="techpreview">
-  <names>
-    <name value="layr-hint-custom-form" />
-  </names>
+  <info name="layr-hint-custom-form"/>
 
   <keys>
-    <key id="one" to="1" />
-    <key id="two" to="2" />
-    <key id="three" to="3" />
+    <key id="one" output="1" />
+    <key id="two" output="2" />
+    <key id="three" output="3" />
   </keys>
   <forms>
     <!-- this will emit a warning about custom scancodes -->
@@ -18,7 +16,7 @@
       <scanCodes codes="25 12 FF" />
     </form>
   </forms>
-  <layers form="us">
+  <layers formId="us">
     <layer id="base">
       <row keys="one two three" />
     </layer>

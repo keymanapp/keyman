@@ -122,9 +122,6 @@ block(sectitems)
   6d 65 74 61
   diff(sect,meta)
 
-  6e 61 6d 65
-  diff(sect,name)
-
   73 74 72 73
   diff(sect,strs)
 
@@ -249,12 +246,32 @@ block(endelem)
 block(keys)                         # struct COMP_KMXPLUS_KEYS {
   6b 65 79 73                       #   KMX_DWORD header.ident;   // 0000 Section name - keys
   sizeof(keys)                      #   KMX_DWORD header.size;    // 0004 Section length
-  02 00 00 00                       #   KMX_DWORD keyCount
+  04 00 00 00                       #   KMX_DWORD keyCount
   01 00 00 00                       #   KMX_DWORD flicksCount
   00 00 00 00                       #   KMX_DWORD flickCount
   02 00 00 00                       #   KMX_DWORD kmapCount;          // 0008 number of kmap
   # keys
-  # (#0000) hmaqtugha
+  # (#0000) a
+  61 00 00 00                       #   'a'
+  00 00 00 00                       #   KMX_DWORD flags = extend
+  index(strNull,strA,2)             #   KMXPLUS_STR 'a' (key id)
+  00 00 00 00                       #   KMXPLUS_STR switch
+  0A 00 00 00                       #   KMX_DWORD width*10
+  00 00 00 00                       # TODO: index(listNull,listNull,4)        #   LIST longPress
+  00 00 00 00                       #   STR longPressDefault
+  00 00 00 00                       # TODO: index(listNull,listNull,4)        #   LIST multiTap
+  00 00 00 00                       #  flicks
+  # (#0001) e
+  65 00 00 00                       #   'e'
+  00 00 00 00                       #   KMX_DWORD flags = extend
+  index(strNull,strElemBkspFrom2,2)  #   KMXPLUS_STR 'e' (key id)
+  00 00 00 00                       #   KMXPLUS_STR switch
+  0A 00 00 00                       #   KMX_DWORD width*10
+  00 00 00 00                       # TODO: index(listNull,listNull,4)        #   LIST longPress
+  00 00 00 00                       #   STR longPressDefault
+  00 00 00 00                       # TODO: index(listNull,listNull,4)        #   LIST multiTap
+  00 00 00 00                       #  flicks
+  # (#0002) hmaqtugha
   27 01 00 00                       #   UTF-32    'U+0127'
   00 00 00 00                       #   KMX_DWORD (flags: none)
   index(strNull,strHmaqtugha,2)     #   KMXPLUS_STR 'hmaqtugha'
@@ -264,7 +281,7 @@ block(keys)                         # struct COMP_KMXPLUS_KEYS {
   00 00 00 00                       #   STR longPressDefault
   00 00 00 00 # TODO: index(listNull,listNull,4)        #   LIST multiTap
   00 00 00 00                       #   flicks 0
-  # (#0001) that
+  # (#0003) that
   index(strNull,strKeys,2)          #   KMXPLUS_STR 'U+0127'
   01 00 00 00                       #   KMX_DWORD flags = extend
   index(strNull,strThat,2)          #   KMXPLUS_STR 'hmaqtugha'
@@ -284,10 +301,19 @@ block(keys)                         # struct COMP_KMXPLUS_KEYS {
   #00 00 00 00                       #   LIST directions
   #00 00 00 01                       #   flags
   #00 00 00 00                       #   str: to
-  # kmapdata:
 
-  31 00 00 00  00 00 00 00  01 00 00 00  # KMX_DWORD vkey, mod, key;
-  c0 00 00 00  00 00 00 00  00 00 00 00  # KMX_DWORD vkey, mod, key;
+  # kmapdata:
+  # note that 'a' and 'e' are omitted, as they aren't on the layers (just from gestures)
+
+  # #0
+  31 00 00 00                        #  KMX_DWORD vkey
+  00 00 00 00                        #  KMX_DWORD modifiers (none)
+  03 00 00 00                        #  KMX_DWORD key index (that)
+
+  # #1
+  c0 00 00 00                        #  KMX_DWORD vkey
+  00 00 00 00                        #  KMX_DWORD modifiers (none)
+  02 00 00 00                        #  KMX_DWORD key index (hmaqtugha)
 
 
 # ----------------------------------------------------------------------------------------------------
@@ -372,20 +398,10 @@ block(meta)                         # struct COMP_KMXPLUS_META {
   index(strNull,strAuthor,2)        #   KMXPLUS_STR author;
   index(strNull,strConformsTo,2)    #   KMXPLUS_STR conform;
   index(strNull,strLayout,2)        #   KMXPLUS_STR layout;
-  index(strNull,strNorm,2)          #   KMXPLUS_STR normalization;
+  index(strNull,strName,2)          #   KMXPLUS_STR name;
   index(strNull,strIndicator,2)     #   KMXPLUS_STR indicator;
   index(strNull,strVersion,2)       #   KMXPLUS_STR version;
   00 00 00 00                       #   KMX_DWORD settings;
-                                    # };
-# ----------------------------------------------------------------------------------------------------
-# store_targets_name
-# ----------------------------------------------------------------------------------------------------
-
-block(name)                         # struct COMP_KMXPLUS_META {
-  6e 61 6d 65                       #   KMX_DWORD header.ident;   // 0000 Section name - name
-  sizeof(name)                      #   KMX_DWORD header.size;    // 0004 Section length
-  01 00 00 00                       #   KMX_DWORD count;          // 0008 number of names
-  index(strNull,strName,2)          #   KMXPLUS_STR name;         // 000C+ name string entry = 'TestKbd'
                                     # };
 
 # ----------------------------------------------------------------------------------------------------
@@ -404,7 +420,6 @@ block(strs)                         #  struct COMP_KMXPLUS_STRS {
 
   diff(strs,strNull)       sizeof(strNull,2)
   diff(strs,strVersion)    sizeof(strVersion,2)
-  diff(strs,strNorm)       sizeof(strNorm,2)
   diff(strs,strName)       sizeof(strName,2)
   diff(strs,strFromSet)     sizeof(strFromSet,2)
   diff(strs,strUSet)       sizeof(strUSet,2)
@@ -439,7 +454,6 @@ block(strs)                         #  struct COMP_KMXPLUS_STRS {
 #str #00
   block(strNull)             block(x) 00 00                                             # the zero-length string
   block(strVersion)          31 00 2e 00 30 00 2e 00 30 00   block(x) 00 00             # '1.0.0'
-  block(strNorm)             4e 00 46 00 43 00   block(x) 00 00                         # 'NFC'
   block(strName)             54 00 65 00 73 00 74 00 4b 00 62 00 64 00   block(x) 00 00 # 'TestKbd'
   block(strFromSet)          5B 00 5C 00 75 00 31 00 41 00 37 00 35 00 2D 00 5C 00 75 00 31 00 41 00 37 00 39 00 5D 00 block(x) 00 00 # [\u1a75-\u1a79]
   block(strUSet)             5b 00 61 00 62 00 63 00 5d 00 block(x) 00 00               # '[abc]'

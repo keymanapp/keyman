@@ -17,8 +17,7 @@
     "build": "tsc -b",
     "lint": "eslint .",
     "test": "npm run lint && cd test && tsc -b && cd .. && c8 --reporter=lcov --reporter=text mocha",
-    "coverage": "npm test",
-    "prepublishOnly": "npm run build"
+    "coverage": "npm test"
   },
   "author": "Marc Durdin <marc@keyman.com> (https://github.com/mcdurdin)",
   "contributors": [

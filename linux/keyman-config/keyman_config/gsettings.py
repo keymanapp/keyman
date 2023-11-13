@@ -74,10 +74,13 @@ class GSettings():
             else:
                 process = subprocess.run(args, capture_output=True)
                 if process.returncode == 0:
-                    value = eval(process.stdout)
-                else:
-                    value = None
-                    logging.warning('Could not convert to sources')
+                    output = process.stdout
+                    if output.decode('utf-8').startswith('['):
+                        value = eval(output)
+                        return value
+
+                logging.debug('Could not convert to sources')
+                return None
         else:
             variant = self.schema.get_value(key)
             value = self._convert_variant_to_array(variant)
