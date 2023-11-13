@@ -102,6 +102,18 @@ export default class InputProcessor {
         this.keyboardInterface.activeKeyboard = keyEvent.srcKeyboard;
       }
 
+      // Support for multitap context reversion; multitap keys should act as if they were
+      // the first thing typed since `preInput`, the state before the original base key.
+      if(keyEvent.baseTranscriptionToken) {
+        const transcription = this.contextCache.get(keyEvent.baseTranscriptionToken);
+        if(transcription) {
+          // Restores full context, including deadkeys in their exact pre-keystroke state.
+          outputTarget.restoreTo(transcription.preInput);
+        } else {
+          console.warn('The base context for the multitap could not be found');
+        }
+      }
+
       return this._processKeyEvent(keyEvent, outputTarget);
     } finally {
       if(kbdMismatch) {

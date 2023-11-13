@@ -27,7 +27,7 @@ describe('Event Management', function() {
     teardownKMW();
   });
 
-  it('Keystroke-based onChange event generation', function() {
+  it('Keystroke-based onChange event generation', async function() {
     var simple_A = {"type":"key","key":"a","code":"KeyA","keyCode":65,"modifierSet":0,"location":0};
     var event = new KMWRecorder.PhysicalInputEventSpec(simple_A);
 
@@ -40,7 +40,7 @@ describe('Event Management', function() {
     keyman.setActiveElement(ele);
 
     let eventDriver = new KMWRecorder.BrowserDriver(ele);
-    eventDriver.simulateEvent(event);
+    await eventDriver.simulateEvent(event);
 
     let focusEvent = new FocusEvent('blur', {relatedTarget: ele});
     ele.dispatchEvent(focusEvent);
@@ -71,14 +71,14 @@ describe('Event Management', function() {
     await eventDriver.simulateEvent(event);
 
     let focusEvent = new FocusEvent('blur', {relatedTarget: ele});
-    ele.dispatchEvent(focusEvent);
+    await ele.dispatchEvent(focusEvent);
 
     // Asserts that the handler is called.  As the handler clears itself, it will only
     // remain set if it hasn't been called.
     assert.isNull(ele.onchange, '`onchange` handler was not called');
   });
 
-  it('Keystroke-based onInput event generation', function() {
+  it('Keystroke-based onInput event generation', async function() {
     var simple_A = {"type":"key","key":"a","code":"KeyA","keyCode":65,"modifierSet":0,"location":0};
     var event = new KMWRecorder.PhysicalInputEventSpec(simple_A);
 
@@ -93,9 +93,9 @@ describe('Event Management', function() {
     });
 
     let eventDriver = new KMWRecorder.BrowserDriver(ele);
-    eventDriver.simulateEvent(event);
-    eventDriver.simulateEvent(event);
-    eventDriver.simulateEvent(event);
+    await eventDriver.simulateEvent(event);
+    await eventDriver.simulateEvent(event);
+    await eventDriver.simulateEvent(event);
 
     assert.equal(counterObj.i, fin, "Event handler not called the expected number of times");
   });

@@ -83,7 +83,7 @@ export class TrackedContextState {
       this.tokens = source.tokens.map(function(token) {
         let copy = new TrackedContextToken();
         copy.raw = token.raw;
-        copy.replacements = [].concat(token.replacements)
+        copy.replacements = [].concat(token.replacements);
         copy.activeReplacementId = token.activeReplacementId;
         copy.transformDistributions = [].concat(token.transformDistributions);
 
@@ -98,7 +98,7 @@ export class TrackedContextState {
       const lexicalModel = this.model = obj.model;
       this.taggedContext = obj.taggedContext;
 
-      if(lexicalModel && lexicalModel.traverseFromRoot) {
+      if(lexicalModel?.traverseFromRoot) {
         // We need to construct a separate search space from other ContextStates.
         //
         // In case we are unable to perfectly track context (say, due to multitaps)

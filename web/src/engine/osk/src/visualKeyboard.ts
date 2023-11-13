@@ -12,7 +12,10 @@ import {
   KeyEvent,
   Layouts,
   StateKeyMap,
-  LayoutKey
+  LayoutKey,
+  ActiveSubKey,
+  timedPromise,
+  ActiveKeyBase
 } from '@keymanapp/keyboard-processor';
 
 import { buildCorrectiveLayout, distributionFromDistanceMaps, keyTouchDistances } from '@keymanapp/input-processor';
@@ -28,6 +31,8 @@ import {
 
 import { createStyleSheet, getAbsoluteX, getAbsoluteY, StylesheetManager } from 'keyman/engine/dom-utils';
 
+import { KeyEventHandler, KeyEventResultCallback } from 'keyman/engine/events';
+
 import GlobeHint from './globehint.interface.js';
 import KeyboardView from './components/keyboardView.interface.js';
 import { type KeyElement, getKeyFrom } from './keyElement.js';
@@ -37,7 +42,6 @@ import OSKLayer from './keyboard-layout/oskLayer.js';
 import OSKLayerGroup from './keyboard-layout/oskLayerGroup.js';
 import { LengthStyle, ParsedLengthStyle } from './lengthStyle.js';
 import { defaultFontSize, getFontSizeStyle } from './fontSizeUtils.js';
-import PendingMultiTap, { PendingMultiTapState } from './input/gestures/browser/pendingMultiTap.js';
 import InternalKeyTip from './input/gestures/browser/keytip.js';
 import CommonConfiguration from './config/commonConfiguration.js';
 
@@ -46,6 +50,7 @@ import { DEFAULT_GESTURE_PARAMS, GestureParams, gestureSetForLayout } from './in
 import { getViewportScale } from './screenUtils.js';
 import { HeldRepeater } from './input/gestures/heldRepeater.js';
 import SubkeyPopup from './input/gestures/browser/subkeyPopup.js';
+import Multitap from './input/gestures/browser/multitap.js';
 import { GestureHandler } from './input/gestures/gestureHandler.js';
 
 export interface VisualKeyboardConfiguration extends CommonConfiguration {
@@ -97,7 +102,7 @@ interface EventMap {
    * Note:  the following code block was originally used to integrate with the keyboard & input
    * processors, but it requires entanglement with components external to this OSK module.
    */
-  'keyevent': (event: KeyEvent) => void,
+  'keyevent': KeyEventHandler,
 
   'hiderequested': (keyElement: KeyElement) => void,
 
@@ -199,9 +204,6 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
   globeHint: GlobeHint;
 
   activeGestures: GestureHandler[] = [];
-
-  // Multi-tap gesture management
-  pendingMultiTap: PendingMultiTap;
 
   // The keyboard object corresponding to this VisualKeyboard.
   public readonly layoutKeyboard: Keyboard;
@@ -413,6 +415,7 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
       const endHighlighting = () => {
         if(trackingEntry.key) {
           this.highlightKey(trackingEntry.key, false);
+          trackingEntry.key = null;
         }
       }
 
@@ -455,13 +458,30 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
         // Disable roaming-touch highlighting (and current highlighting) for all
         // touchpoints included in a gesture, even newly-included ones as they occur.
         for(let id of gestureStage.allSourceIds) {
-          const trackingEntry = sourceTrackingMap[id];
-          if(trackingEntry.key) {
-            this.highlightKey(trackingEntry.key, false);
-            trackingEntry.key = null;
+          const clearRoaming = (trackingEntry: typeof sourceTrackingMap['']) => {
+            if(trackingEntry.key) {
+              this.highlightKey(trackingEntry.key, false);
+              trackingEntry.key = null;
+            }
+
+            trackingEntry.source.path.off('step', trackingEntry.roamingHighlightHandler);
           }
 
-          trackingEntry.source.path.off('step', trackingEntry.roamingHighlightHandler);
+          const trackingEntry = sourceTrackingMap[id];
+
+          if(trackingEntry) {
+            clearRoaming(trackingEntry);
+          } else {
+            // May arise during multitaps, as the 'wait' stage instantly accepts new incoming
+            // sources before they are reported fully to the `inputstart` event.
+            const _id = id;
+            timedPromise(0).then(() => {
+              const tracker = sourceTrackingMap[_id];
+              if(tracker) {
+                clearRoaming(tracker);
+              }
+            });
+          }
         }
 
 
@@ -479,36 +499,41 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
           coord = coordSource.currentSample;
         }
 
-        if(gestureKey) {
+        let keyResult: {
+          contextToken?: number
+        } = null;
+
+        // Multitaps do special key-mapping stuff internally and produce + raise their
+        // key events directly.
+        if(gestureKey && !(handler instanceof Multitap)) {
           let correctionKeyDistribution: KeyDistribution;
+          const baseDistanceMap = this.getSimpleTapCorrectionDistances(coord, gestureKey.key.spec as ActiveKey);
 
-          if(gestureStage.matchedId == 'multitap') {
-            // TODO:  examine sequence, determine rota-style index to apply; select THAT item instead.
-          }
-
-          if(gestureStage.matchedId == 'subkey-select') {
-            if(!handler) {
-              throw new Error("Invalid state - reference to subkey menu is missing");
-            }
-            // TODO:  examine subkey menu, determine proper set of fat-finger alternates.
-            correctionKeyDistribution = handler.currentStageKeyDistribution();
+          if(handler) {
+            // Certain gestures (especially flicks) like to consider the base layout as part
+            // of their corrective-distribution calculations.
+            //
+            // May be `null` for gestures that don't need custom correction handling,
+            // such as modipresses or initial/simple-tap keystrokes.
+            correctionKeyDistribution = handler.currentStageKeyDistribution(baseDistanceMap);
           }
 
           if(!correctionKeyDistribution) {
-            correctionKeyDistribution = this.getSimpleTapCorrectionProbabilities(coord, gestureKey.key.spec as ActiveKey);
+            correctionKeyDistribution = distributionFromDistanceMaps(baseDistanceMap);
           }
 
           // Once the best coord to use for fat-finger calculations has been determined:
-          this.modelKeyClick(gestureStage.item, coord, correctionKeyDistribution);
+          keyResult = this.modelKeyClick(gestureStage.item, coord);
         }
 
         // Outside of passing keys along... the handling of later stages is delegated
         // to gesture-specific handling classes.
-        if(gestureSequence.stageReports.length > 1) {
+        if(gestureSequence.stageReports.length > 1 && gestureStage.matchedId != 'modipress-end') {
           return;
         }
 
         // So, if this is the first stage, this is where we need to perform that delegation.
+        const baseItem = gestureSequence.stageReports[0].item;
 
         // -- Scratch-space as gestures start becoming integrated --
         // Reordering may follow at some point.
@@ -533,6 +558,9 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
             gestureSequence.stageReports[0].sources[0].baseItem,
             DEFAULT_GESTURE_PARAMS
           );
+        } else if(baseItem.key.spec.multitap && (gestureStage.matchedId == 'initial-tap' || gestureStage.matchedId == 'multitap' || gestureStage.matchedId == 'modipress-start')) {
+          // Likewise - mere construction is enough.
+          handler = new Multitap(gestureSequence, this, baseItem, keyResult.contextToken);
         }
 
         if(handler) {
@@ -743,7 +771,7 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
    * @param keySpec The spec of the key directly triggered by the input event.  May be for a subkey.
    * @returns
    */
-  getSimpleTapCorrectionProbabilities(input: InputSample<KeyElement, string>, keySpec?: ActiveKey): KeyDistribution {
+  getSimpleTapCorrectionDistances(input: InputSample<KeyElement, string>, keySpec?: ActiveKey): Map<ActiveKeyBase, number> {
     // TODO: It'd be nice to optimize by keeping these off when unused, but the wiring
     //       necessary would get in the way of modularization at the moment.
     // let keyman = com.keyman.singleton;
@@ -764,113 +792,8 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
     let kbdAspectRatio = width / height;
 
     const correctiveLayout = buildCorrectiveLayout(this.kbdLayout.getLayer(this.layerId), kbdAspectRatio);
-    const rawSqDistances = keyTouchDistances(touchKbdPos, correctiveLayout);
-    return distributionFromDistanceMaps(rawSqDistances);
+    return keyTouchDistances(touchKbdPos, correctiveLayout);
   }
-
-  //#region Input handling start
-
-  // /**
-  //  * The main OSK touch start event handler
-  //  *
-  //  *  @param  {Event} e   touch start event object
-  //  *
-  //  */
-  // touch(input: InputEventCoordinate) {
-  //   // Identify the key touched
-  //   var t = <HTMLElement>input.target, key = this.keyTarget(t);
-
-  //   // Special function keys need immediate action
-  //   if (is not special key) {
-  //     if (!this.keyPending) {
-  //       this.initGestures(key, input);
-  //     }
-  //   }
-  // }
-
-  // /**
-  //  * OSK touch release event handler
-  //  *
-  //  *  @param  {Event} e   touch release event object
-  //  *
-  //  **/
-  // release(input: InputEventCoordinate): void {
-  //   // Prevent incorrect multi-touch behaviour if native or device popup visible
-  //   var t = this.currentTarget;
-
-  //   // Clear repeated backspace if active, preventing 'sticky' behavior.
-  //   this.cancelDelete();
-
-  //   // Multi-Tap
-  //   if (this.pendingMultiTap && this.pendingMultiTap.realized) {
-  //     // Ignore pending key if we've just handled a multitap
-  //     this.pendingMultiTap = null;
-
-  //     this.highlightKey(this.keyPending, false);
-  //     this.keyPending = null;
-  //     this.touchPending = null;
-
-  //     return;
-  //   }
-
-  //   if (this.pendingMultiTap && this.pendingMultiTap.cancelled) {
-  //     this.pendingMultiTap = null;
-  //   }
-  // }
-
-  // moveCancel(input: InputEventCoordinate): void {
-  //   // Update all gesture tracking.  The function returns true if further input processing
-  //   // should be blocked.  (Keeps the subkey array operating when the input coordinate has
-  //   // moved outside the OSK's boundaries.)
-  //   if (this.updateGestures(null, this.keyPending, input)) {
-  //     return;
-  //   }
-
-  //   this.cancelDelete();
-  // }
-
-  // /**
-  //  * OSK touch move event handler
-  //  *
-  //  *  @param  {Event} e   touch move event object
-  //  *
-  //  **/
-  // moveOver(input: InputEventCoordinate): void {
-  //   // Shouldn't be possible, but just in case.
-  //   if (this.touchCount == 0) {
-  //     this.cancelDelete();
-  //     return;
-  //   }
-
-  //   // Get touch position
-  //   const x = input.x - window.pageXOffset;
-  //   const y = input.y - window.pageYOffset;
-
-  //   // Move target key and highlighting
-  //   this.touchPending = input;
-  //   // Operates on viewport-based coordinates, not page-based.
-  //   var t1 = <HTMLElement>document.elementFromPoint(x, y);
-  //   const key0 = this.keyPending;
-  //   let key1 = this.keyTarget(t1); // Not only gets base keys, but also gets popup keys!
-
-  //   // Cancels if it's a multitouch attempt.
-
-  //   // Do not attempt to support reselection of target key for overlapped keystrokes.
-  //   // Perform _after_ ensuring possible sticky keys have been cancelled.
-  //   if (input.activeInputCount > 1) {
-  //     return;
-  //   }
-
-  //   // Gesture-updates should probably be a separate call from other touch-move aspects.
-
-  //   // Update all gesture tracking.  The function returns true if further input processing
-  //   // should be blocked.
-  //   if (this.updateGestures(key1, key0, input)) {
-  //     return;
-  //   }
-  // }
-
-  //#endregion
 
   /**
    * Get the current key target from the touch point element within the key
@@ -930,7 +853,7 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
       keyEvent.keyDistribution = keyDistribution;
     }
 
-    this.raiseKeyEvent(keyEvent, e);
+    return this.raiseKeyEvent(keyEvent, e);
   }
 
   initKeyEvent(e: KeyElement) {
@@ -948,6 +871,11 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
       return null;
     }
 
+    // Return the event object.
+    return this.keyEventFromSpec(keySpec);
+  }
+
+  keyEventFromSpec(keySpec: ActiveKey | ActiveSubKey) {
     //let core = com.keyman.singleton.core; // only singleton-based ref currently needed here.
 
     // Start:  mirrors _GetKeyEventProperties
@@ -992,6 +920,8 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
     if (!layer) {
       return;
     }
+
+    this.gestureEngine.stateToken = layerId;
 
     // So... through KMW 14, we actually never tracked the capsKey, numKey, and scrollKey
     // properly for keyboard-defined layouts - only _default_, desktop-style layouts.
@@ -1460,79 +1390,6 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
     }
   }
 
-  // /**
-  //  * Initializes all supported gestures given a base key and the triggering touch coordinates.
-  //  * @param key     The gesture's base key
-  //  * @param touch   The starting touch coordinates for the gesture
-  //  * @returns
-  //  */
-  // initGestures(key: KeyElement, input: InputEventCoordinate) {
-
-  //   if (this.pendingMultiTap) {
-  //     switch (this.pendingMultiTap.incrementTouch(key)) {
-  //       case PendingMultiTapState.Cancelled:
-  //         this.pendingMultiTap = null;
-  //         break;
-  //       case PendingMultiTapState.Realized:
-  //         // Don't initialize any other gestures if the
-  //         // multi tap is realized; we cleanup on touch
-  //         // release because we need to cancel the base
-  //         // key action
-  //         return;
-  //     }
-  //   }
-
-  //   if (!this.pendingMultiTap && PendingMultiTap.isValidTarget(this, key)) {
-  //     // We are only going to support double-tap on Shift
-  //     // in Keyman 15, so we pass in the constant count = 2
-  //     this.pendingMultiTap = new PendingMultiTap(this, key, 2);
-  //     this.pendingMultiTap.timeout.then(() => {
-  //       this.pendingMultiTap = null;
-  //     });
-  //   }
-  // }
-
-  // /**
-  //  * Updates all currently-pending and activated gestures.
-  //  *
-  //  * @param currentKey    The key currently underneath the most recent touch coordinate
-  //  * @param previousKey   The previously-selected key
-  //  * @param input         The current mouse or touch coordinate for the gesture
-  //  * @returns true if should fully capture input, false if input should 'fall through'.
-  //  */
-  // updateGestures(currentKey: KeyElement, previousKey: KeyElement, input: InputEventCoordinate): boolean {
-  //   let key0 = previousKey;
-  //   let key1 = currentKey;
-
-  //   if(!currentKey && this.pendingMultiTap) {
-  //     this.pendingMultiTap.cancel();
-  //     this.pendingMultiTap = null;
-  //   }
-
-  //   // Clear previous key highlighting, allow subkey controller to highlight as appropriate.
-  //   if (this.subkeyGesture) {
-  //     if (key0) {
-  //       key0.key.highlight(false);
-  //     }
-  //     this.subkeyGesture.updateTouch(input);
-
-  //     this.keyPending = null;
-  //     this.touchPending = null;
-
-  //     return true;
-  //   }
-
-  //   this.currentTarget = null;
-
-  //   // If there is an active popup menu (which can occur from the previous block),
-  //   // a subkey popup exists; do not allow base key output.
-  //   if (this.subkeyGesture || this.pendingSubkey) {
-  //     return true;
-  //   }
-
-  //   return false;
-  // }
-
   optionKey(e: KeyElement, keyName: string, keyDown: boolean) {
     if (keyName.indexOf('K_LOPT') >= 0) {
       this.emit('globekey', e, keyDown);
@@ -1616,9 +1473,19 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
     // Exclude menu and OSK hide keys from normal click processing
     if(keyEvent.kName == 'K_LOPT' || keyEvent.kName == 'K_ROPT') {
       this.optionKey(e, keyEvent.kName, true);
-      return true;
+      return {};
     }
 
-    this.emit('keyevent', keyEvent);
+    let callbackData: {
+      contextToken?: number
+    } = { };
+
+    const keyEventCallback: KeyEventResultCallback = (result, error) => {
+      callbackData.contextToken = result?.transcription?.token;
+    }
+
+    this.emit('keyevent', keyEvent, keyEventCallback);
+
+    return callbackData;
   }
 }

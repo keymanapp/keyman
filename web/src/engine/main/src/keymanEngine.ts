@@ -7,7 +7,7 @@ import { KeyboardRequisitioner, ModelCache, ModelSpec, toUnprefixedKeyboardId as
 import { EngineConfiguration, InitOptionSpec } from "./engineConfiguration.js";
 import KeyboardInterface from "./keyboardInterface.js";
 import { ContextManagerBase } from "./contextManagerBase.js";
-import { KeyEventHandler } from './keyEventSource.interface.js';
+import { KeyEventHandler } from 'keyman/engine/events';
 import HardKeyboardBase from "./hardKeyboard.js";
 import { LegacyAPIEvents } from "./legacyAPIEvents.js";
 import { EventNames, EventListener, LegacyEventEmitter } from "keyman/engine/events";

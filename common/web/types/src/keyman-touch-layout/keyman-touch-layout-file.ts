@@ -41,7 +41,19 @@ export interface TouchLayoutRow {
 
 type Key_Type = 'T'|'K'|'U'|'t'|'k'|'u';
 type Key_Id = string;
+
 export type TouchLayoutKeyId = `${Key_Type}_${Key_Id}`; // pattern = /^[TKUtku]_[a-zA-Z0-9_]+$/
+
+/**
+ * Denotes private-use identifiers that should be considered 'reserved'.
+ */
+export const PRIVATE_USE_IDS = [
+  /**
+   * A private-use identifier used by KeymanWeb for the default multitap-into-caps-layer key
+   * for keyboards with a caps layer while not defining multitaps on shift.
+   */
+  'T_*_MT_SHIFT_TO_CAPS'
+] as const;
 
 /* A map of key field names with values matching the `typeof` the corresponding property
  * exists in common/web/keyboard-processor, keyboards/activeLayout.ts.

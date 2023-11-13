@@ -21,7 +21,7 @@ import {
   type SystemStoreMutationHandler
 } from '@keymanapp/keyboard-processor';
 import { createUnselectableElement, getAbsoluteX, getAbsoluteY, StylesheetManager } from 'keyman/engine/dom-utils';
-import { EventListener, EventNames, LegacyEventEmitter } from 'keyman/engine/events';
+import { EventListener, EventNames, KeyEventHandler, KeyEventSourceInterface, LegacyEventEmitter } from 'keyman/engine/events';
 
 import Configuration from '../config/viewConfiguration.js';
 import Activator, { StaticActivator } from './activator.js';
@@ -66,7 +66,7 @@ export interface EventMap {
    * Note:  the following code block was originally used to integrate with the keyboard & input
    * processors, but it requires entanglement with components external to this OSK module.
    */
-  'keyevent': (event: KeyEvent) => void,
+  'keyevent': KeyEventHandler,
 
   /**
    * Indicates that the globe key has either been pressed (`on` == `true`)
@@ -115,7 +115,9 @@ export interface EventMap {
   pointerinteraction: (promise: Promise<void>) => void;
 }
 
-export default abstract class OSKView extends EventEmitter<EventMap> implements MinimalCodesInterface {
+export default abstract class OSKView
+  extends EventEmitter<EventMap>
+  implements MinimalCodesInterface, KeyEventSourceInterface<EventMap> {
   _Box: HTMLDivElement;
   readonly legacyEvents = new LegacyEventEmitter<LegacyOSKEventMap>();
 
@@ -811,7 +813,7 @@ export default abstract class OSKView extends EventEmitter<EventMap> implements 
       isEmbedded: this.config.isEmbedded
     });
 
-    vkbd.on('keyevent', (keyEvent) => this.emit('keyevent', keyEvent));
+    vkbd.on('keyevent', (keyEvent, callback) => this.emit('keyevent', keyEvent, callback));
     vkbd.on('globekey', (keyElement, on) => this.emit('globekey', keyElement, on));
     vkbd.on('hiderequested', (keyElement) => {
       this.doHide(true);
