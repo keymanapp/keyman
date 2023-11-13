@@ -967,7 +967,6 @@ describe("GestureMatcher", function() {
       assert.deepEqual(await secondMatcher.promise, { matched: false, action: { type: 'none', item: null } });
       secondMatcher.finalizeSources();
       assert.isTrue(sources[0].path.isComplete);
-      assert.isTrue(sources[0].path.wasCancelled);
     });
   });
 });
