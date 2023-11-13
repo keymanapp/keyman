@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE keyboard3 SYSTEM "../../../../../../../resources/standards-data/ldml-keyboards/techpreview/dtd/ldmlKeyboard3.dtd">
+<keyboard3 locale="mt" conformsTo="techpreview">
+  <info name="meta-hint-normalization"/>
+  <settings normalization="disabled" />
+  <keys />
+</keyboard3>

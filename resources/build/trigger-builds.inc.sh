@@ -69,32 +69,33 @@ function triggerGitHubActionsBuild() {
   local IS_TEST_BUILD="$1"
   local GITHUB_ACTION="$2"
   local GIT_BRANCH="${3:-master}"
-  local GIT_REF GIT_SHA
+  local GIT_BUILD_SHA GIT_HEAD_SHA
 
-  local GITHUB_SERVER=https://api.github.com/repos/keymanapp/keyman/dispatches
+  local GITHUB_SERVER=https://api.github.com/repos/keymanapp/keyman
 
   if [ "${action:-""}" == "commit" ]; then
     # This will only be true if we created and pushed a tag
-    GIT_REF="refs/tags/release@$VERSION_WITH_TAG"
-    GIT_SHA="$(git rev-parse "${GIT_REF}")"
+    GIT_BUILD_SHA="$(git rev-parse "refs/tags/release@$VERSION_WITH_TAG")"
+    GIT_HEAD_SHA="${GIT_BUILD_SHA}"
     GIT_EVENT_TYPE="${GITHUB_ACTION}: release@${VERSION_WITH_TAG}"
   elif [[ $GIT_BRANCH != stable-* ]] && [[ $GIT_BRANCH =~ [0-9]+ ]]; then
-    GIT_REF="refs/pull/${GIT_BRANCH}/merge"
-    GIT_SHA="$(git rev-parse "refs/pull/${GIT_BRANCH}/head")"
+    GIT_BUILD_SHA="$(git rev-parse "refs/pull/${GIT_BRANCH}/head")"
+    GIT_HEAD_SHA="$(git rev-parse "refs/pull/${GIT_BRANCH}/head")"
     GIT_EVENT_TYPE="${GITHUB_ACTION}: PR #${GIT_BRANCH}"
     GIT_BRANCH="PR-${GIT_BRANCH}"
   else
-    GIT_REF="refs/heads/${GIT_BRANCH}"
-    GIT_SHA="$(git rev-parse "${GIT_REF}")"
+    GIT_BUILD_SHA="$(git rev-parse "refs/heads/${GIT_BRANCH}")"
+    GIT_HEAD_SHA="${GIT_BUILD_SHA}"
     GIT_EVENT_TYPE="${GITHUB_ACTION}: ${GIT_BRANCH}"
   fi
 
-  local DATA="{\"event_type\": \"$GIT_EVENT_TYPE\", \
-      \"client_payload\": { \
-        \"ref\": \"$GIT_REF\", \
-        \"sha\": \"$GIT_SHA\", \
-        \"branch\": \"$GIT_BRANCH\", \
-        \"isTestBuild\": \"$IS_TEST_BUILD\" \
+  local DATA="{
+    \"event_type\": \"$GIT_EVENT_TYPE\", \
+    \"client_payload\": { \
+      \"buildSha\": \"$GIT_BUILD_SHA\", \
+      \"headSha\": \"$GIT_HEAD_SHA\", \
+      \"branch\": \"$GIT_BRANCH\", \
+      \"isTestBuild\": \"$IS_TEST_BUILD\" \
     }}"
 
   echo "GitHub Action Data: $DATA"
@@ -106,5 +107,5 @@ function triggerGitHubActionsBuild() {
     --header "Accept: application/vnd.github+json" \
     --header "Authorization: token $GITHUB_TOKEN" \
     --data "$DATA" \
-    $GITHUB_SERVER
+    ${GITHUB_SERVER}/dispatches
 }

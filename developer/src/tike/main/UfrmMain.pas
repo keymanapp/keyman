@@ -283,6 +283,8 @@ type
     N11: TMenuItem;
     Startserver1: TMenuItem;
     Stopserver1: TMenuItem;
+    ToolButton13: TToolButton;
+    ToolButton16: TToolButton;
     procedure FormCreate(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure mnuFileClick(Sender: TObject);
@@ -325,7 +327,6 @@ type
 
     //procedure ChildWindowsChange(Sender: TObject);
     procedure WMUserFormShown(var Message: TMessage); message WM_USER_FORMSHOWN;
-    procedure WMUserLoadRegFiles(var Message: TMessage); message WM_USER_LOADREGFILES;
     procedure WMUserInputLangChange(var Message: TMessage); message WM_USER_INPUTLANGCHANGE;
 
     procedure UpdateFileMRU;
@@ -361,6 +362,8 @@ type
     procedure ActivateActiveChild;
     function OpenModelEditor(FFileName: string): TfrmTikeEditor;
     procedure DoCloseCleanup;
+
+    procedure RefreshProjectMRU;
 
   protected
     procedure WndProc(var Message: TMessage); override;
@@ -436,7 +439,6 @@ uses
   Keyman.System.CEFManager,
 
   CharMapDropTool,
-  compile,
   HTMLHelpViewer,
   KLog,
   KeymanVersion,
@@ -512,10 +514,11 @@ begin
   modActionsMain := TmodActionsMain.Create(Self);
   modActionsModelEditor := TmodActionsModelEditor.Create(Self);
 
+  FChildWindows := TChildWindowList.Create;
+
   FProjectMRU := TMRUList.Create('Project');
   FProjectMRU.OnChange := ProjectMRUChange;
-
-  FChildWindows := TChildWindowList.Create;
+  FProjectMRU.Load;
 
   ShowDebug(False);
 
@@ -756,31 +759,6 @@ begin
     PostMessage(FChildWindows[i].Handle, WM_USER_INPUTLANGCHANGE, Message.wParam, Message.LParam);
 end;
 
-procedure TfrmKeymanDeveloper.WMUserLoadRegFiles(var Message: TMessage);
-var
-  i: Integer;
-  s: TStringList;
-  t: string;
-begin
-  s := TStringList.Create;
-  with TRegistryErrorControlled.Create do  // I2890
-  try
-    RootKey := HKEY_CURRENT_USER;
-    if not OpenKey(SRegKey_IDEFiles_CU, True) then  // I2890
-      RaiseLastRegistryError;
-
-    GetValueNames(s);
-    for i := 0 to s.Count - 1 do
-    begin
-      t := ReadString(s[i]);
-      DeleteValue(s[i]);
-      OpenFile(t, False);
-    end;
-  finally
-    Free;
-  end;
-end;
-
 const
   SPI_GETKEYBOARDCUES = $100A;
 var
@@ -863,6 +841,9 @@ var
   i: Integer;
 begin
   FWndProcInit := False;
+
+  RefreshProjectMRU;
+
   for i := 0 to FChildWindows.Count - 1 do
     if FChildWindows[i] is TfrmTikeEditor then
       with FChildWindows[i] as TfrmTikeEditor do
@@ -1548,6 +1529,11 @@ begin
   finally
     Screen.Cursor := crDefault;
   end;
+end;
+
+procedure TfrmKeymanDeveloper.RefreshProjectMRU;
+begin
+  FProjectMRU.Load;
 end;
 
 function TfrmKeymanDeveloper.ProjectForm: TfrmProject;

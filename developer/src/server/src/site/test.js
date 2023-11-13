@@ -42,6 +42,10 @@ function enableControls(enable) {
 let keymanInitialized = false;
 enableControls(false);
 
+if(!keyman.util.isTouchDevice()) {
+  document.body.className = 'osk-always-visible';
+}
+
 keyman.init({
   ui:'button',
   resources:'/resource/',

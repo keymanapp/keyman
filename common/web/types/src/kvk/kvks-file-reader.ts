@@ -84,7 +84,7 @@ export default class KVKSFileReader {
 
   public validate(source: KVKSourceFile): void {
     if(!SchemaValidators.kvks(source)) {
-      throw new Error((<any>SchemaValidators.kvks).errorsText());
+      throw new Error(JSON.stringify((<any>SchemaValidators.kvks).errors));
     }
   }
 

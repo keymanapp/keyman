@@ -14,6 +14,7 @@ import handleIncKeyboardsCss from './handlers/inc/keyboards-css.js';
 import { Environment } from './version-data.js';
 import { configuration } from './config.js';
 import chalk from 'chalk';
+import { shutdown } from './shutdown.js';
 
 export default function setupRoutes(app: express.Express, upload: multer.Multer, wsServer: ws.WebSocketServer, environment: Environment ) {
 
@@ -97,7 +98,7 @@ export default function setupRoutes(app: express.Express, upload: multer.Multer,
 
   /* Localhost only routes -- todo /api/internal/ vs /api/... */
 
-  app.post('/api/shutdown', (_req,res) => { setTimeout(() => process.exit(0), 100); res.send('ok'); });
+  app.post('/api/shutdown', (_req,res) => { setTimeout(shutdown, 100); res.send('ok'); });
 
   appGetData(app, /\/data\/keyboard\/(.+)\.js$/, data.keyboards);
   appGetData(app, /\/data\/model\/(.+)\.model\.js$/, data.models);

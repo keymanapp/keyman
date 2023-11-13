@@ -89,9 +89,9 @@ do_test() {
   local target=$1
   builder_start_action test:$target || return 0
   if [[ $target =~ ^(x86|x64)$ ]]; then
-    cmd //C build.bat $target $BUILDER_CONFIGURATION test "${builder_extra_params[@]}"
+    cmd //C build.bat $target $BUILDER_CONFIGURATION test $testparams
   else
-    meson test -C "$MESON_PATH" "${builder_extra_params[@]}"
+    meson test -C "$MESON_PATH" $testparams
   fi
   builder_finish_action success test:$target
 }
