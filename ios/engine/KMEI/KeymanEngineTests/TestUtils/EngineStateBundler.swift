@@ -8,7 +8,8 @@
 
 import Foundation
 import XCTest
-import Zip
+import ZIPFoundation
+
 @testable import KeymanEngine
 
 extension TestUtils {
@@ -28,6 +29,7 @@ extension TestUtils {
       return FileManager.default.urls(for: .libraryDirectory, in: .userDomainMask)[0].appendingPathComponent("Preferences")
     }
 
+    /*
     static func createBundle(withName name: String) throws -> XCTAttachment {
       let tempDirectory = FileManager.default.temporaryDirectory
       let bundleConstructionURL = tempDirectory.appendingPathComponent("\(name).bundle")
@@ -64,12 +66,20 @@ extension TestUtils {
         try FileManager.default.moveItem(at: pListPath.appendingPathComponent(testEngineFilename), to: pListPath.appendingPathComponent(appGroupFilename))
       }
 
-      let attachmentFile = try Zip.quickZipFiles([bundleConstructionURL], fileName: "bundleArchive")
-      log.info("Archive source: \(bundleConstructionURL)")
-      let attachment = XCTAttachment(contentsOfFile: attachmentFile)
-      attachment.lifetime = .keepAlways
-
-      return attachment
+      let archiveURL = bundleConstructionURL.appendingPathComponent("bundleArchive.zip")
+      do {
+        let attachmentFile = try Archive(url: archiveURL, accessMode: .create)
+        log.info("archiveURL: \(archiveURL)")
+        let attachment = XCTAttachment(contentsOfFile: archiveURL)
+        attachment.lifetime = .keepAlways
+        return attachment
+      }
+      catch let error {
+        print (error.localizedDescription)
+        return XCTAttachment(string: error.localizedDescription)
+      }
     }
+     
+     */
   }
 }

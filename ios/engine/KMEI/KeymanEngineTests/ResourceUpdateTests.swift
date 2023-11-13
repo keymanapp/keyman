@@ -57,10 +57,12 @@ class ResourceUpdateTests: XCTestCase {
 
     wait(for: [queryExpectation], timeout: 5)
 
+    /*
     // Uses the XCTest 'attachment' system to retrieve the desired file.
     self.add(try TestUtils.EngineStateBundler.createBundle(withName: "khmer_angkor update base"))
 
     log.info("Bundle archived and attached to test's report.")
+     */
   }
 
   func testCacheCurrent() {
