@@ -479,6 +479,7 @@ uses
   Keyman.Developer.System.Project.ProjectFile,
   Keyman.Developer.System.Project.ProjectFileType,
   Keyman.Developer.System.Project.WelcomeRenderer,
+  Keyman.Developer.System.Project.ProjectLoader,
   Keyman.Developer.System.Project.ProjectLog,
   Keyman.Developer.System.Project.XmlLdmlProjectFile,
   Keyman.Developer.UI.Project.ProjectFileUI,
@@ -587,7 +588,17 @@ begin
     FActiveProject := '';
 
   if FActiveProject <> '' then
-    LoadGlobalProjectUI(ptUnknown, FActiveProject);
+  begin
+    try
+      LoadGlobalProjectUI(ptUnknown, FActiveProject);
+    except
+      on E:EProjectLoader do
+      begin
+        // Message will be displayed by LoadGlobalProjectUI
+        FreeGlobalProjectUI;
+      end;
+    end;
+  end;
 
   InitDock;
 

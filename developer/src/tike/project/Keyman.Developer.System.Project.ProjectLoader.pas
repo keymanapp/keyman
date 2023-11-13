@@ -121,7 +121,11 @@ begin
   if node <> nil then
   begin
     if not VarIsNull(node.ChildValues['Version']) then
+    begin
       FProject.Options.Version := ProjectVersionFromString(VarToStr(node.ChildValues['Version']));
+      if FProject.Options.Version = pvUnknown then
+        raise EProjectLoader.Create('This project format is version '+VarToStr(node.ChildValues['Version'])+', which is not supported by this version of Keyman Developer.');
+    end;
 
     // Set default project options based on what we learned above
     FProject.Options.Assign(DefaultProjectOptions[FProject.Options.Version]);
