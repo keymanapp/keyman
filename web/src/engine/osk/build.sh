@@ -30,7 +30,7 @@ builder_describe "Builds the Keyman Engine for Web's On-Screen Keyboard package 
 
 builder_describe_outputs \
   configure   /node_modules \
-              /web/src/resources/osk/keymanweb-osk.ttf \
+  configure   /web/src/resources/osk/keymanweb-osk.ttf \
   build       /web/build/$SUBPROJECT_NAME/lib/index.mjs
 
 builder_parse "$@"
