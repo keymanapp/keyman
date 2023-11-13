@@ -26,6 +26,7 @@ export interface PredecessorMatch<Type, StateToken> {
   readonly result: MatchResult<Type>;
   readonly model?: GestureModel<Type, any>;
   readonly baseItem: Type;
+  readonly predecessor?: PredecessorMatch<Type, StateToken>;
 }
 
 export interface MatchResult<Type> {
@@ -56,7 +57,7 @@ export class GestureMatcher<Type, StateToken = any> implements PredecessorMatch<
 
   private _isCancelled: boolean = false;
 
-  private readonly predecessor?: PredecessorMatch<Type, StateToken>;
+  readonly predecessor?: PredecessorMatch<Type, StateToken>;
 
   private readonly publishedPromise: ManagedPromise<MatchResult<Type>>; // unsure on the actual typing at the moment.
   private _result: MatchResult<Type>;

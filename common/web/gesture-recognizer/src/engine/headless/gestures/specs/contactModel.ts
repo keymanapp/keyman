@@ -24,7 +24,15 @@ export interface ContactModel<Type, StateToken = any> {
    */
   timer?: {
     duration: number,
-    expectedResult: boolean;
+    expectedResult: boolean,
+    /**
+     * If not defined or set to `false`, any already-elapsed time for the source will be
+     * not be considered; the matching timer will start fresh.
+     *
+     * If `true`, the timer will use the inherited `path.stats.duration` stat as an
+     * offset that has already elapsed, counting it against the timer.
+     */
+    inheritElapsed?: boolean
   }
 
   // This field is primarly used at the `GestureMatcher` level, rather than the

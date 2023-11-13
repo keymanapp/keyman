@@ -193,9 +193,22 @@ export class MatcherSelector<Type, StateToken = any> extends EventEmitter<EventM
      * 'detached', a state not compatible with the needs of this method.
      */
     const sourceNotYetStaged = source instanceof GestureSource;
+
+    const determinePredecessorSources = (source: PredecessorMatch<Type, StateToken>) => {
+      const directSources = (source.sources as GestureSourceSubview<Type>[]).map((source => source.baseSource));
+
+      if(directSources && directSources.length > 0) {
+        return directSources;
+      } else if(!source.predecessor) {
+        return [];
+      } else {
+        return determinePredecessorSources(source.predecessor);
+      }
+    }
+
     const sources = sourceNotYetStaged
       ? [source instanceof GestureSourceSubview ? source.baseSource : source]
-      : (source.sources as GestureSourceSubview<Type>[]).map((source) => source.baseSource);
+      : determinePredecessorSources(source);
 
     // Defining these as locals helps the TS type-checker better infer types within
     // this method; a later assignment to `source` will remove its ability to infer
@@ -309,6 +322,33 @@ export class MatcherSelector<Type, StateToken = any> extends EventEmitter<EventM
 
           currentSample.item = source.currentRecognizerConfig.itemIdentifier(currentSample, null);
           unmatchedSource.baseItem = currentSample.item;
+        }
+
+        const newlyMatched = extendableMatcherSet.find((entry) => entry.result);
+
+        // If the incoming Source triggered a match AND is included in the model,
+        // do not build new independent models for it.
+        if(newlyMatched && newlyMatched.allSourceIds.includes(source.identifier)) {
+          matchPromise.resolve({
+            matcher: null,
+            result: {
+              matched: false,
+              action: {
+                type: 'complete',
+                item: null
+              }
+            }
+          });
+
+          return {
+            selectionPromise: Promise.resolve({
+              result: {
+                action: null,
+                matched: false
+              },
+              matcher: null
+            })
+          };
         }
       }
     }
@@ -451,9 +491,6 @@ export class MatcherSelector<Type, StateToken = any> extends EventEmitter<EventM
       const matchedContactIds = matcher.allSourceIds;
 
       const sourceMetadata = matchedContactIds.map((id) => {
-        // It is fine if there is no match; we build tracking only so far as the most recent
-        // predecessor for disambiguation, so the initial tap/source for a third tap of a
-        // multitap will not be accessible here.
         return this._sourceSelector.find((metadata) => metadata.source.identifier == id);
       }).filter((entry) => !!entry); // remove `undefined` entries, as they're irrelevant.
 

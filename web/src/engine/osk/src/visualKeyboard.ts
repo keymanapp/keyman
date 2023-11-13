@@ -15,7 +15,9 @@ import {
   LayoutKey,
   ActiveSubKey,
   timedPromise,
-  ActiveKeyBase
+  ActiveKeyBase,
+  isEmptyTransform,
+  SystemStoreIDs
 } from '@keymanapp/keyboard-processor';
 
 import { buildCorrectiveLayout, distributionFromDistanceMaps, keyTouchDistances } from '@keymanapp/input-processor';
@@ -52,6 +54,12 @@ import { HeldRepeater } from './input/gestures/heldRepeater.js';
 import SubkeyPopup from './input/gestures/browser/subkeyPopup.js';
 import Multitap from './input/gestures/browser/multitap.js';
 import { GestureHandler } from './input/gestures/gestureHandler.js';
+import Modipress from './input/gestures/browser/modipress.js';
+
+interface KeyRuleEffects {
+  contextToken?: number,
+  alteredText?: boolean
+};
 
 export interface VisualKeyboardConfiguration extends CommonConfiguration {
   /**
@@ -140,6 +148,7 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
   readonly config: VisualKeyboardConfiguration;
 
   private _layerId: string = "default";
+  layerLocked: boolean = false;
   layerIndex: number = 0; // the index of the default layer
   readonly isRTL: boolean;
 
@@ -181,7 +190,6 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
   // fontSize: string;
 
   // State-related properties
-  keyPending: KeyElement;
   deleteKey: KeyElement;
   deleting: number; // Tracks a timer id for repeated deletions.
   nextLayer: string;
@@ -204,6 +212,7 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
   globeHint: GlobeHint;
 
   activeGestures: GestureHandler[] = [];
+  activeModipress: Modipress = null;
 
   // The keyboard object corresponding to this VisualKeyboard.
   public readonly layoutKeyboard: Keyboard;
@@ -385,7 +394,7 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
       key: KeyElement
     }> = {};
 
-    const gestureHandlerMap = new Map<GestureSequence<KeyElement>, GestureHandler>();
+    const gestureHandlerMap = new Map<GestureSequence<KeyElement>, GestureHandler[]>();
 
     // Now to set up event-handling links.
     // This handler should probably vary based on the keyboard: do we allow roaming touches or not?
@@ -437,6 +446,11 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
 
     //
     recognizer.on('recognizedgesture', (gestureSequence) => {
+      // If we receive a new gesture while there's an active modipress state, 'lock' it immediately;
+      // the state has been utilized, so we want to return to the original layer when the modipress
+      // key is released.
+      this.activeModipress?.setLocked();
+
       // The highlighting-disablement part of `onRoamingSourceEnd` is 100% safe, so we can leave
       // that running.
 
@@ -453,7 +467,7 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
 
       // This should probably vary based on the type of gesture.
       gestureSequence.on('stage', (gestureStage, configChanger) => {
-        let handler: GestureHandler = gestureHandlerMap.get(gestureSequence);
+        let handlers: GestureHandler[] = gestureHandlerMap.get(gestureSequence);
 
         // Disable roaming-touch highlighting (and current highlighting) for all
         // touchpoints included in a gesture, even newly-included ones as they occur.
@@ -488,42 +502,41 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
         // First, if we've configured the gesture to generate a keystroke, let's handle that.
         const gestureKey = gestureStage.item;
 
-        let coordSource = gestureStage.sources[0];
-        let coord: InputSample<KeyElement, string> = null;
-        if(coordSource) {
-          // TODO:  should probably vary depending upon `gestureStage.matchedId`
-          // (certain types should probably use the base coord... or even from
-          // a prior stage of the sequence as appropriate.)
-          //
-          // This is the coordinate used as the basis for fat-finger calculations.
-          coord = coordSource.currentSample;
-        }
+        const coordSource = gestureStage.sources[0];
+        const coord: InputSample<KeyElement, string> = coordSource ? coordSource.currentSample : null;
 
-        let keyResult: {
-          contextToken?: number
-        } = null;
+        let keyResult: KeyRuleEffects = null;
 
         // Multitaps do special key-mapping stuff internally and produce + raise their
         // key events directly.
-        if(gestureKey && !(handler instanceof Multitap)) {
+        if(gestureKey && !(handlers && handlers[0] instanceof Multitap)) {
           let correctionKeyDistribution: KeyDistribution;
-          const baseDistanceMap = this.getSimpleTapCorrectionDistances(coord, gestureKey.key.spec as ActiveKey);
+          const baseDistanceMap = this.getSimpleTapCorrectionDistances(coordSource.currentSample, gestureKey.key.spec as ActiveKey);
 
-          if(handler) {
+          if(handlers) {
             // Certain gestures (especially flicks) like to consider the base layout as part
             // of their corrective-distribution calculations.
             //
             // May be `null` for gestures that don't need custom correction handling,
             // such as modipresses or initial/simple-tap keystrokes.
-            correctionKeyDistribution = handler.currentStageKeyDistribution(baseDistanceMap);
+            correctionKeyDistribution = handlers[0].currentStageKeyDistribution(baseDistanceMap);
           }
 
           if(!correctionKeyDistribution) {
             correctionKeyDistribution = distributionFromDistanceMaps(baseDistanceMap);
           }
 
-          // Once the best coord to use for fat-finger calculations has been determined:
-          keyResult = this.modelKeyClick(gestureStage.item, coord);
+          // If there's no active modipress, but there WAS one when the longpress started,
+          // keep the layer locked for the keystroke.
+          const shouldLockLayer = !this.layerLocked && handlers && (handlers[0] instanceof SubkeyPopup) && handlers[0].shouldLockLayer;
+          try {
+            shouldLockLayer && this.lockLayer(true);
+            // Once the best coord to use for fat-finger calculations has been determined:
+            keyResult = this.modelKeyClick(gestureStage.item, coord);
+          } finally {
+            shouldLockLayer && this.lockLayer(false);
+          }
+
         }
 
         // Outside of passing keys along... the handling of later stages is delegated
@@ -547,27 +560,56 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
           //
           // Merely constructing the instance is enough; it'll link into the sequence's events and
           // handle everything that remains for the backspace from here.
-          handler = new HeldRepeater(gestureSequence, () => this.modelKeyClick(gestureKey, coord));
+          handlers = [new HeldRepeater(gestureSequence, () => this.modelKeyClick(gestureKey, coord))];
         } else if(gestureStage.matchedId.indexOf('longpress') > -1) {
           // Matches:  'longpress', 'longpress-reset'.
           // Likewise.
-          handler = new SubkeyPopup(
+          handlers = [new SubkeyPopup(
             gestureSequence,
             configChanger,
             this,
             gestureSequence.stageReports[0].sources[0].baseItem,
             DEFAULT_GESTURE_PARAMS
-          );
-        } else if(baseItem.key.spec.multitap && (gestureStage.matchedId == 'initial-tap' || gestureStage.matchedId == 'multitap' || gestureStage.matchedId == 'modipress-start')) {
+          )];
+          // baseItem is sometimes null during a keyboard-swap... for app/browser touch-based language menus.
+          // not ideal, but it is what it is; just let it pass by for now.
+        } else if(baseItem?.key.spec.multitap && (gestureStage.matchedId == 'initial-tap' || gestureStage.matchedId == 'multitap' || gestureStage.matchedId == 'modipress-start')) {
           // Likewise - mere construction is enough.
-          handler = new Multitap(gestureSequence, this, baseItem, keyResult.contextToken);
+          handlers = [new Multitap(gestureSequence, this, baseItem, keyResult.contextToken)];
         }
 
-        if(handler) {
-          this.activeGestures.push(handler);
-          gestureHandlerMap.set(gestureSequence, handler);
+        if(gestureStage.matchedId.includes('modipress') && gestureStage.matchedId.includes('-start')) {
+          if(this.layerLocked) {
+            console.warn("Unexpected state:  modipress start attempt during an active modipress");
+          } else {
+            handlers ||= [];
+
+            const modipressHandler = new Modipress(gestureSequence, this, () => {
+              const index = handlers.indexOf(modipressHandler);
+              if(index > -1) {
+                handlers.splice(index, 1);
+              }
+              this.activeModipress = null;
+            });
+
+            handlers.push(modipressHandler);
+            this.activeModipress = modipressHandler;
+          }
+        }
+
+        if(handlers) {
+          this.activeGestures = this.activeGestures.concat(handlers);
+          gestureHandlerMap.set(gestureSequence, handlers);
           gestureSequence.on('complete', () => {
-            this.activeGestures = this.activeGestures.filter((gesture) => gesture != handler);
+            const completingHandlers = this.activeGestures.filter(handler => handlers.includes(handler));
+            this.activeGestures = this.activeGestures.filter((handler) => !handlers.includes(handler));
+
+            // Robustness check; make extra-sure that we can safely leave a modipress state.
+            completingHandlers.forEach((handler) => {
+              if(handler instanceof Modipress) {
+                handler.cancel();
+              }
+            })
           });
         }
 
@@ -1464,24 +1506,30 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
       window.clearTimeout(this.deleting);
     }
 
-    this.keyPending = null;
-
     this.keytip?.show(null, false, this);
   }
 
-  raiseKeyEvent(keyEvent: KeyEvent, e: KeyElement) {
+  lockLayer(enable: boolean) {
+    this.layerLocked = enable;
+  }
+
+  raiseKeyEvent(keyEvent: KeyEvent, e: KeyElement): KeyRuleEffects {
     // Exclude menu and OSK hide keys from normal click processing
     if(keyEvent.kName == 'K_LOPT' || keyEvent.kName == 'K_ROPT') {
       this.optionKey(e, keyEvent.kName, true);
       return {};
     }
 
-    let callbackData: {
-      contextToken?: number
-    } = { };
+    let callbackData: KeyRuleEffects = {};
 
     const keyEventCallback: KeyEventResultCallback = (result, error) => {
       callbackData.contextToken = result?.transcription?.token;
+      const transform = result?.transcription?.transform;
+      callbackData.alteredText = result && (!transform || isEmptyTransform(transform));
+    }
+
+    if(this.layerLocked) {
+      keyEvent.kNextLayer = this.layerId;
     }
 
     this.emit('keyevent', keyEvent, keyEventCallback);

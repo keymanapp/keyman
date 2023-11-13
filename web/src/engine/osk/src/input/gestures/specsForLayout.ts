@@ -4,7 +4,10 @@ import {
   InputSample
 } from '@keymanapp/gesture-recognizer';
 
-import PathModel = gestures.specs.PathModel;
+import {
+  TouchLayout
+} from '@keymanapp/common-types';
+import ButtonClasses = TouchLayout.TouchLayoutKeySp;
 
 import {
   deepCopy
@@ -74,6 +77,31 @@ export const DEFAULT_GESTURE_PARAMS: GestureParams = {
   }
 }
 
+export function keySupportsModipress(key: KeyElement) {
+  const keySpec = key.key.spec;
+  const modifierKeyIds = ['K_SHIFT', 'K_ALT', 'K_CTRL', 'K_NUMERALS', 'K_SYMBOLS', 'K_CURRENCIES'];
+  for(const modKeyId of modifierKeyIds) {
+    if(keySpec.id == modKeyId) {
+      return true;
+    }
+  }
+
+  // Allows special-formatted keys with a next-layer property to be modipressable.
+  if(!keySpec.nextlayer) {
+    return false;
+  } else {
+    switch(keySpec.sp) {
+      case ButtonClasses.special:
+      case ButtonClasses.specialActive:
+      case ButtonClasses.customSpecial:
+      case ButtonClasses.customSpecialActive:
+        return true;
+      default: // .normal, .spacer, .blank, .deadkey
+        return false;
+    }
+  }
+}
+
 /**
  * Defines the set of gestures appropriate for use with the specified Keyman keyboard.
  * @param layerGroup  The active keyboard's layer group
@@ -87,8 +115,14 @@ export function gestureSetForLayout(layerGroup: OSKLayerGroup, params: GesturePa
 
   // To be used among the `allowsInitialState` contact-model specifications as needed.
   const gestureKeyFilter = (key: KeyElement, gestureId: string) => {
+    if(!key) {
+      return false;
+    }
+
     const keySpec = key.key.spec;
     switch(gestureId) {
+      case 'modipress-start':
+        return keySupportsModipress(key);
       case 'special-key-start':
         return ['K_LOPT', 'K_ROPT', 'K_BKSP'].indexOf(keySpec.baseKeyID) != -1;
       case 'longpress':
@@ -130,7 +164,7 @@ export function gestureSetForLayout(layerGroup: OSKLayerGroup, params: GesturePa
         contact.model = {
           ...contact.model,
           allowsInitialState: (sample, ancestorSample, key) => {
-            return baseInitialStateCheck(sample, ancestorSample, key) && gestureKeyFilter(key, modelId);
+            return gestureKeyFilter(key, modelId) && baseInitialStateCheck(sample, ancestorSample, key);
           }
         };
       }
@@ -150,7 +184,9 @@ export function gestureSetForLayout(layerGroup: OSKLayerGroup, params: GesturePa
     SpecialKeyEndModel,
     SubkeySelectModel,
     withKeySpecFiltering(ModipressStartModel, 0),
+    modipressHoldModel(params),
     ModipressEndModel,
+    ModipressMultitapTransitionModel,
     withKeySpecFiltering(modipressMultitapStartModel(params), 0),
     modipressMultitapEndModel(params)
   ];
@@ -275,6 +311,19 @@ export const ModipressContactStartModel: ContactModel = {
   }
 }
 
+export const ModipressContactHoldModel: ContactModel = {
+  itemPriority: -1,
+  itemChangeAction: 'resolve',
+  pathResolutionAction: 'resolve',
+  pathModel: {
+    evaluate: (path) => {
+      if(path.isComplete) {
+        return 'reject';
+      }
+    }
+  }
+}
+
 export const ModipressContactEndModel: ContactModel = {
   itemPriority: -1,
   itemChangeAction: 'resolve',
@@ -339,7 +388,7 @@ export const SpecialKeyStartModel: GestureModel<KeyElement> = {
           // But, to get started... we can just use a simple hardcoded approach.
           const modifierKeyIds = ['K_LOPT', 'K_ROPT', 'K_BKSP'];
           for(const modKeyId of modifierKeyIds) {
-            if(baseItem.key.spec.id == modKeyId) {
+            if(baseItem?.key.spec.id == modKeyId) {
               return true;
             }
           }
@@ -679,17 +728,7 @@ export const ModipressStartModel: GestureModel<KeyElement> = {
       model: {
         ...ModipressContactStartModel,
         allowsInitialState(incomingSample, comparisonSample, baseItem) {
-          // TODO:  needs better abstraction, probably.
-
-          // But, to get started... we can just use a simple hardcoded approach.
-          const modifierKeyIds = ['K_SHIFT', 'K_ALT', 'K_CTRL'];
-          for(const modKeyId of modifierKeyIds) {
-            if(baseItem.key.spec.id == modKeyId) {
-              return true;
-            }
-          }
-
-          return false;
+          return keySupportsModipress(baseItem);
         },
         itemChangeAction: 'reject',
         itemPriority: 1
@@ -698,9 +737,67 @@ export const ModipressStartModel: GestureModel<KeyElement> = {
   ],
   resolutionAction: {
     type: 'chain',
-    next: 'modipress-end',
+    next: 'modipress-hold',
     selectionMode: 'modipress',
     item: 'current' // return the modifier key ID so that we know to shift to it!
+  }
+}
+
+export function modipressHoldModel(params: GestureParams): GestureModel<any> {
+  return {
+    id: 'modipress-hold',
+    resolutionPriority: 5,
+    contacts: [
+      {
+        model: {
+          ...ModipressContactHoldModel,
+          itemChangeAction: 'reject',
+          pathInheritance: 'full',
+          timer: {
+            duration: params.multitap.holdLength,
+            expectedResult: true,
+            // If entered due to 'reject' on 'modipress-multitap-end',
+            // we want to immediately resolve.
+            inheritElapsed: true
+          }
+        }
+      }
+    ],
+    // To be clear:  any time modipress-hold is triggered and the timer duration elapses,
+    // we disable any potential to multitap on the modipress key.
+    resolutionAction: {
+      type: 'chain',
+      next: 'modipress-end',
+      selectionMode: 'modipress',
+      // Key was already emitted from the 'modipress-start' stage.
+      item: 'none'
+    },
+    rejectionActions: {
+      path: {
+        type: 'replace',
+        // Because SHIFT -> CAPS multitap is a thing.  Shift gets handled as a modipress first.
+        // Modipresses resolve before multitaps... unless there's a model designed to handle & disambiguate both.
+        replace: 'modipress-end-multitap-transition'
+      }
+    }
+  }
+}
+
+export const ModipressMultitapTransitionModel: GestureModel<any> = {
+  id: 'modipress-end-multitap-transition',
+  resolutionPriority: 5,
+  contacts: [
+    // None.  This exists as an intermediate state to transition from
+    // a basic modipress into a combined multitap + modipress.
+  ],
+  sustainTimer: {
+    duration: 0,
+    expectedResult: true
+  },
+  resolutionAction: {
+    type: 'chain',
+    next: 'modipress-multitap-start',
+    item: 'none'
   }
 }
 
@@ -717,10 +814,7 @@ export const ModipressEndModel: GestureModel<any> = {
     }
   ],
   resolutionAction: {
-    type: 'chain',
-    // Because SHIFT -> CAPS multitap is a thing.  Shift gets handled as a modipress first.
-    // Modipresses resolve before multitaps... unless there's a model designed to handle & disambiguate both.
-    next: 'modipress-multitap-start',
+    type: 'complete',
     // Key was already emitted from the 'modipress-start' stage.
     item: 'none'
   }
@@ -739,17 +833,8 @@ export function modipressMultitapStartModel(params: GestureParams): GestureModel
             if(incomingSample.item != baseItem) {
               return false;
             }
-            // TODO:  needs better abstraction, probably.
 
-            // But, to get started... we can just use a simple hardcoded approach.
-            const modifierKeyIds = ['K_SHIFT', 'K_ALT', 'K_CTRL'];
-            for(const modKeyId of modifierKeyIds) {
-              if(baseItem.key.spec.id == modKeyId) {
-                return true;
-              }
-            }
-
-            return false;
+            return keySupportsModipress(baseItem);
           },
           itemChangeAction: 'reject',
           itemPriority: 1
@@ -781,7 +866,6 @@ export function modipressMultitapEndModel(params: GestureParams): GestureModel<a
           itemChangeAction: 'reject',
           pathInheritance: 'full',
           timer: {
-            // will need something similar for base modipress.
             duration: params.multitap.holdLength,
             expectedResult: false
           }
@@ -791,7 +875,6 @@ export function modipressMultitapEndModel(params: GestureParams): GestureModel<a
     resolutionAction: {
       type: 'chain',
       // Because SHIFT -> CAPS multitap is a thing.  Shift gets handled as a modipress first.
-      // TODO:  maybe be selective about it:  if the tap occurs within a set amount of time?
       next: 'modipress-multitap-start',
       // Key was already emitted from the 'modipress-start' stage.
       item: 'none'

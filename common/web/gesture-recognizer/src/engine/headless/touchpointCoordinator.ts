@@ -96,6 +96,10 @@ export class TouchpointCoordinator<HoveredItemType, StateToken=any> extends Even
     this.currentSelector.stateToken = this.stateToken;
   }
 
+  public selectorStackIncludes(selector: MatcherSelector<HoveredItemType, StateToken>): boolean {
+    return this.selectorStack.includes(selector);
+  }
+
   public get currentSelector() {
     return this.selectorStack[this.selectorStack.length-1];
   }

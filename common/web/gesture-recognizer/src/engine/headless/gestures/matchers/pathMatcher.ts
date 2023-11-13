@@ -49,7 +49,8 @@ export class PathMatcher<Type, StateToken = any> {
     this.source = source;
 
     if(model.timer) {
-      this.timerPromise = new TimeoutPromise(model.timer.duration);
+      const offset = model.timer.inheritElapsed ? Math.min(source.path.stats.duration, model.timer.duration) : 0;
+      this.timerPromise = new TimeoutPromise(model.timer.duration - offset);
 
       this.publishedPromise.then(() => {
         this.timerPromise.resolve(false);
