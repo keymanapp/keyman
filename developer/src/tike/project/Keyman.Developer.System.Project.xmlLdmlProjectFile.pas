@@ -145,10 +145,6 @@ begin
 end;
 
 procedure TxmlLdmlProjectFile.GetFileParameters;
-var
-  j: Integer;
-  value: WideString;
-  FVersion: string;   // I4701
 begin
   FHeader_Name := '';
   FKVKFileName := '';
