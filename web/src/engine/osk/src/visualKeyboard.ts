@@ -550,7 +550,7 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
 
         let keyResult: KeyRuleEffects = null;
 
-        // Multitaps and flicks do special key-mapping stuff internally and produce + raise
+        // Longpresses, multitaps and flicks do special key-mapping stuff internally and produce + raise
         // their key events directly.
         if(gestureKey && !(handlers && handlers[0].directlyEmitsKeys)) {
           let correctionKeyDistribution: KeyDistribution;
