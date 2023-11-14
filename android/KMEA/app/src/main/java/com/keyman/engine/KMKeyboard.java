@@ -416,6 +416,7 @@ final class KMKeyboard extends WebView {
       currentBanner = KMManager.BannerType.HTML;
     }
 
+    showBanner(true);
     // Since there's always a banner, no need to update setLayoutParams()
   }
 

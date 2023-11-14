@@ -503,8 +503,8 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
 
   @Override
   public void onKeyboardShown() {
-    // Set the in-app HTML banner here. Doesn't work in KMManager.init
-    //BannerController.setHTMLBanner(this, KeyboardType.KEYBOARD_TYPE_INAPP);
+    // Refresh banner theme
+    BannerController.setHTMLBanner(this, KeyboardType.KEYBOARD_TYPE_INAPP);
     resizeTextView(true);
   }
 

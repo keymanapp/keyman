@@ -12,11 +12,7 @@ import java.io.File;
 public class BannerController {
 
   // Paths relative to assets folder for banner themes
-  public static final String KM_BANNER_THEME_PHONE = "svg/phone_banner.html";
-  public static final String KM_BANNER_THEME_TABLET = "svg/tablet_banner.html";
   public static final String KM_BANNER_THEME_KEYMAN = "svg/banner.html";
-
-  // Paths relative to assets folder for banner themes
   public static final String KM_BANNER_THEME_KEYMAN_SVG = "svg/keyman_banner.svg";
 
 
