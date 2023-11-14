@@ -270,7 +270,7 @@ var
   FInPackages: Boolean;
   FInStrings: Boolean;
   location: TInstallInfoFileLocation;
-  val, nm: WideString;
+  s, val, nm: string;
   pack: TInstallInfoPackage;
   packLocation: TInstallInfoPackageFileLocation;
   FVersion, FMSIFileName: string;
@@ -286,16 +286,17 @@ begin
 
     for i := 0 to Count - 1 do
     begin
-      if Trim(Strings[i]) = '' then Continue;
+      s := Trim(Strings[i]);
+      if s = '' then Continue;
 
-      nm := KeyNames[i];
-      val := ValueFromIndex[i];
+      nm := Trim(KeyNames[i]);
+      val := Trim(ValueFromIndex[i]);
 
-      if Copy(Strings[i], 1, 1) = '[' then
+      if Copy(s, 1, 1) = '[' then
       begin
-        FInSetup := WideSameText(Strings[i], '[Setup]');
-        FInPackages := WideSameText(Strings[i], '[Packages]');
-        FInStrings := WideSameText(Strings[i], '[Strings]');
+        FInSetup := WideSameText(s, '[Setup]');
+        FInPackages := WideSameText(s, '[Packages]');
+        FInStrings := WideSameText(s, '[Strings]');
       end
       else if FInSetup then
       begin
@@ -318,7 +319,7 @@ begin
         end;
       end
       else if FInStrings then
-        FStrings.Add(Strings[i]);
+        FStrings.Add(s);
     end;
 
     if System.SysUtils.FileExists(FMSIFileName) then  // I3476
