@@ -294,7 +294,7 @@ export default class SubkeyPopup implements GestureHandler {
     }
 
     // Add the callout
-    this.callout = this.addCallout(e, delta, vkbd.element, vkbd.topContainer);
+    this.callout = this.addCallout(e, delta, vkbd.element, vkbd.topContainer, vkbd.device.formFactor == 'tablet');
   }
 
   /**
@@ -303,8 +303,14 @@ export default class SubkeyPopup implements GestureHandler {
    * @param   {Object}  key   HTML key element
    * @return  {Object}        callout object
    */
-  addCallout(key: KeyElement, delta: number, host: HTMLElement, _Box: HTMLElement): HTMLDivElement {
+  addCallout(key: KeyElement, delta: number, host: HTMLElement, _Box: HTMLElement, isTablet: boolean): HTMLDivElement {
     delta = delta || 0;
+
+    // Uses content-box styling, so ignores border aspects for reported positions.
+    /**
+     * "Computed Menu Style"
+     */
+    const cms = getComputedStyle(this.element);
 
     const STUB_HEIGHT = 6 + SUBKEY_MENU_VERT_OFFSET;
     let calloutHeight = key.offsetHeight - delta + STUB_HEIGHT;
@@ -322,10 +328,20 @@ export default class SubkeyPopup implements GestureHandler {
       // We're going to adjust the top of the box to ensure it stays
       // pixel aligned, otherwise we can get antialiasing artifacts
       // that look ugly
-      let top = Math.floor(keyRect.top - _BoxRect.top - STUB_HEIGHT + delta);
+      let top = Math.floor(
+        Number.parseInt(cms.top, 10) +
+        Number.parseInt(cms.height, 10) +
+        // Padding is not included in content-box (or in content-box's top positioning)...
+        // but half the padding-top seems useful on all tested devices.
+        // Not sure exactly why.
+        Number.parseInt(cms.paddingTop, 10)/2 +
+        Number.parseInt(cms.paddingBottom, 10)
+      );
       ccs.top = top + 'px';
 
-      const targetHeight = keyRect.height / 5 + STUB_HEIGHT;
+      // Shorten the callout if the subkey menu is being constrained within WebView bounds, thus
+      // overlapping the base key.  Do so (mostly) proportionally to how much is obscured.
+      const targetHeight = (keyRect.height - delta) / 5 + STUB_HEIGHT;
       const maxHeight = keyRect.bottom - _BoxRect.top - top - 1;
       const selectedHeight = maxHeight < targetHeight ? maxHeight : targetHeight;
       ccs.borderTopWidth = (selectedHeight) + 'px';

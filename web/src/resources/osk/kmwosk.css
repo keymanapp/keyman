@@ -545,7 +545,7 @@ div.android div.kmw-keytip-cap {
   border-color: transparent;
   border-top-color: #fdfdfe;
   border-style: solid;
-  z-index: 10002;
+  z-index: 10003;
   pointer-events:none;
   box-sizing: border-box;
 }
