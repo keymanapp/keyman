@@ -305,6 +305,9 @@ public final class KMManager {
 
   public static final String KMFilename_LexicalModelsList = "lexical_models_list.dat";
 
+  public static final String KMBLACK_BANNER = "<div style=\"background: black; width: 100%; height: 100%; position: absolute; left: 0; top: 0\"></div>";
+  public static final String KMGRAY_BANNER = "<div style=\"background: #b4b4b8; width: 100%; height: 100%; position: absolute; left: 0; top: 0\"></div>";
+
   private static Context appContext;
 
   public static String getResourceRoot() {
@@ -657,6 +660,15 @@ public final class KMManager {
     keyboard.setWebViewClient(webViewClient);
     keyboard.addJavascriptInterface(new KMKeyboardJSHandler(appContext, keyboard), "jsInterface");
     keyboard.loadKeyboard();
+
+    // For apps that don't specify an HTML banner, specify a default phone/tablet HTML banner
+    if (getFormFactor() == FormFactor.PHONE) {
+      keyboard.setHTMLBanner(KMBLACK_BANNER);
+    } else {
+      keyboard.setHTMLBanner(KMGRAY_BANNER);
+    }
+    keyboard.setBanner(KMManager.BannerType.HTML);
+    keyboard.showBanner(true);
 
     setEngineWebViewVersionStatus(appContext, keyboard);
   }

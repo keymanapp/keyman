@@ -27,9 +27,6 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
   private static View inputView = null;
   private KMHardwareKeyboardInterpreter interpreter = null;
 
-  // Paths relative to assets folder for banner themes. Change this for custom banner
-  public static final String BANNER_THEME_KMSAMPLE2 = "svg/green_banner.svg";
-
   /**
    * Main initialization of the input method component. Be sure to call
    * to super class.
@@ -70,11 +67,6 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
     lexicalModelInfo.put(KMManager.KMKey_LexicalModelVersion, "1.0");
     KMManager.addLexicalModel(this, lexicalModelInfo);
     KMManager.registerAssociatedLexicalModel("ta");
-
-    // Uncomment these two lines if keyboard doesn't use a dictionary.
-    // The suggestion banner is replaced with this color.
-    //KMManager.setBannerImage(KeyboardType.KEYBOARD_TYPE_SYSTEM, BANNER_THEME_KMSAMPLE2);
-    //KMManager.setBanner(KeyboardType.KEYBOARD_TYPE_SYSTEM, KMManager.BannerType.IMAGE);
   }
 
   @Override

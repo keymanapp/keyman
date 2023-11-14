@@ -126,11 +126,6 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
   @Override
   public void onKeyboardShown() {
     // Handle Keyman keyboard shown event here if needed
-
-    // Uncomment these lines if the app doesn't use a dictionary
-    // and wants to set the in-app banner image here.
-    //KMManager.setBannerImage(KeyboardType.KEYBOARD_TYPE_INAPP, BANNER_THEME_KMSAMPLE1);
-    //KMManager.setBanner(KeyboardType.KEYBOARD_TYPE_INAPP, KMManager.BannerType.IMAGE);
   }
 
   @Override
