@@ -136,11 +136,10 @@ get_api_version_in_symbols_file() {
 
 is_api_version_updated() {
   local NEW_VERSION OLD_VERSION
-  git checkout "${GIT_SHA}" -- "debian/${PKG_NAME}.symbols"
-  NEW_VERSION=$(get_api_version_in_symbols_file)
   git checkout "${GIT_BASE}" -- "debian/${PKG_NAME}.symbols"
   OLD_VERSION=$(get_api_version_in_symbols_file)
   git checkout "${GIT_SHA}" -- "debian/${PKG_NAME}.symbols"
+  NEW_VERSION=$(get_api_version_in_symbols_file)
   if (( NEW_VERSION > OLD_VERSION )); then
     return 0
   fi
