@@ -529,6 +529,15 @@ div.android div.kmw-keytip-cap {
   box-sizing: content-box;
 }
 
+.tablet.ios #kmw-popup-keys {padding: 4px 7px 0px 0px;}
+.phone.ios #kmw-popup-keys {padding: 4px 5px 0px 0px;}
+
+.tablet.ios #kmw-popup-keys .kmw-key{border:none;}
+.phone.ios  #kmw-popup-keys .kmw-key{border:none;}
+
+.phone.android #kmw-popup-keys {border:none; border-radius: 2px; background-color:#333333; padding:5px 5px 0 0;}
+.tablet.android #kmw-popup-keys {border:1px solid #eee; border-radius: 3px; background-color:#888; padding:8px 12px 4px 4px;}
+
 /* Style for callout used on phones */
 #kmw-popup-callout {
   position: absolute;
@@ -539,24 +548,6 @@ div.android div.kmw-keytip-cap {
   z-index: 10002;
   pointer-events:none;
   box-sizing: border-box;
-}
-
-.tablet.ios #kmw-popup-keys {padding: 4px 7px 0px 0px;}
-.phone.ios #kmw-popup-keys {padding: 4px 5px 0px 0px;}
-
-.tablet.ios #kmw-popup-keys .kmw-key{border:none;}
-.phone.ios  #kmw-popup-keys .kmw-key{border:none;}
-
-.phone.android #kmw-popup-keys {border:none; border-radius: 2px; background-color:#333333; padding:5px 5px 0 0;}
-.tablet.android #kmw-popup-keys {border:1px solid #eee; border-radius: 3px; background-color:#888; padding:8px 12px 4px 4px;}
-
-.kmw-embedded .phone.ios #kmw-popup-keys,
-.kmw-embedded .tablet.ios #kmw-popup-keys,
-.kmw-embedded .phone.android #kmw-popup-keys {
-  padding-bottom: 4px;
-}
-.kmw-embedded .tablet.android #kmw-popup-keys {
-  padding-bottom: 8px;
 }
 
 .phone.android #kmw-popup-callout {
