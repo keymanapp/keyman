@@ -76,7 +76,7 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
 
     KMManager.setHTMLBanner(KeyboardType.KEYBOARD_TYPE_SYSTEM, KM_BANNER_THEME_KEYMAN, KM_BANNER_THEME_KEYMAN_SVG);
     KMManager.setBanner(KeyboardType.KEYBOARD_TYPE_SYSTEM, KMManager.BannerType.HTML);
-    KMManager.showBanner(false);
+    KMManager.showBanner(true);
 
     boolean mayHaveHapticFeedback = prefs.getBoolean(KeymanSettingsActivity.hapticFeedbackKey, false);
     KMManager.setHapticFeedback(mayHaveHapticFeedback);

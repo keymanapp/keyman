@@ -500,9 +500,13 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
   @Override
   public void onKeyboardShown() {
     // Set the in-app HTML banner here. Doesn't work in KMManager.init
-    KMManager.setHTMLBanner(KeyboardType.KEYBOARD_TYPE_INAPP, "svg/banner.html", KMManager.KM_BANNER_THEME_WHITE);
+    if (KMManager.getFormFactor() == KMManager.FormFactor.PHONE) {
+      KMManager.setHTMLBanner(KeyboardType.KEYBOARD_TYPE_INAPP, "svg/banner.html", KMManager.KM_BANNER_THEME_BLACK);
+    } else {
+      KMManager.setHTMLBanner(KeyboardType.KEYBOARD_TYPE_INAPP, "svg/banner.html", KMManager.KM_BANNER_THEME_GRAY);
+    }
     KMManager.setBanner(KeyboardType.KEYBOARD_TYPE_INAPP, KMManager.BannerType.HTML);
-    KMManager.showBanner(false);
+    KMManager.showBanner(true);
     resizeTextView(true);
   }
 

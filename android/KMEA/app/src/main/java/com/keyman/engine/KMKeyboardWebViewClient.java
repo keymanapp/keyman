@@ -173,7 +173,7 @@ public final class KMKeyboardWebViewClient extends WebViewClient {
       if (KMManager.currentLexicalModel != null) {
         modelPredictionPref = prefs.getBoolean(KMManager.getLanguagePredictionPreferenceKey(KMManager.currentLexicalModel.get(KMManager.KMKey_LanguageID)), true);
       }
-      kmKeyboard.showBanner(isModelActive && modelPredictionPref);
+      KMManager.setBannerOptions(isModelActive && modelPredictionPref);
       RelativeLayout.LayoutParams params = KMManager.getKeyboardLayoutParams();
       kmKeyboard.setLayoutParams(params);
     } else if (url.indexOf("suggestPopup") >= 0) {
