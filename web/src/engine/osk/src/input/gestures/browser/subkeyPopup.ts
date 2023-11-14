@@ -294,9 +294,7 @@ export default class SubkeyPopup implements GestureHandler {
     }
 
     // Add the callout
-    // if(vkbd.device.formFactor == DeviceSpec.FormFactor.Phone && vkbd.device.OS == DeviceSpec.OperatingSystem.iOS) {
     this.callout = this.addCallout(e, delta, vkbd.element, vkbd.topContainer);
-    // }
   }
 
   /**
