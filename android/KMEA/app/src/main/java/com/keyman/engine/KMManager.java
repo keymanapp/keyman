@@ -191,11 +191,6 @@ public final class KMManager {
 
   private static KMManager.SpacebarText spacebarText = KMManager.SpacebarText.LANGUAGE_KEYBOARD; // must match default given in kmwbase.ts
 
-  // Paths relative to assets folder for banner themes
-  public static final String KM_BANNER_THEME_BLACK = "svg/black_banner.svg";
-  public static final String KM_BANNER_THEME_GRAY = "svg/gray_banner.svg";
-  public static final String KM_BANNER_THEME_WHITE = "svg/white_banner.svg";
-
   protected static KMKeyboard InAppKeyboard = null;
   protected static KMKeyboard SystemKeyboard = null;
   protected static KMKeyboardWebViewClient InAppKeyboardWebViewClient = null;
@@ -1444,16 +1439,16 @@ public final class KMManager {
   }
 
   /**
-   * Set the path to use with the image banner
+   * Set the HTML content to use with the HTML banner
    * @param {KeyboardType} keyboard
-   * @param {String} path
-   * @return
+   * @param {String} HTMl string
+   * @return {boolean}
    */
-  public static boolean setHTMLBanner(KeyboardType keyboard, String htmlPath, String svgPath) {
+  public static boolean setHTMLBanner(KeyboardType keyboard, String htmlContent) {
     if (keyboard == KeyboardType.KEYBOARD_TYPE_INAPP && InAppKeyboard != null) {
-      InAppKeyboard.setHTMLBanner(htmlPath, svgPath);
+      InAppKeyboard.setHTMLBanner(htmlContent);
     } else if (keyboard == KeyboardType.KEYBOARD_TYPE_SYSTEM && SystemKeyboard != null) {
-      SystemKeyboard.setHTMLBanner(htmlPath, svgPath);
+      SystemKeyboard.setHTMLBanner(htmlContent);
     } else {
       Log.d(TAG, "setHTMLBanner() but keyboard is null");
       return false;

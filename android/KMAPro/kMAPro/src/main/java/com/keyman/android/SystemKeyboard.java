@@ -6,6 +6,7 @@ package com.keyman.android;
 
 import com.tavultesoft.kmapro.BuildConfig;
 import com.tavultesoft.kmapro.KeymanSettingsActivity;
+import com.keyman.android.BannerController;
 import com.keyman.engine.KMManager;
 import com.keyman.engine.KMManager.KeyboardType;
 import com.keyman.engine.KMHardwareKeyboardInterpreter;
@@ -42,9 +43,6 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
   private static ExtractedText exText = null;
   private KMHardwareKeyboardInterpreter interpreter = null;
 
-  // Paths relative to assets folder for banner themes
-  public static final String KM_BANNER_THEME_KEYMAN = "svg/banner.html";
-  public static final String KM_BANNER_THEME_KEYMAN_SVG = "svg/keyman_banner.svg";
   private static final String TAG = "SystemKeyboard";
 
   /**
@@ -74,9 +72,7 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
     KMManager.SpacebarText spacebarText = KMManager.SpacebarText.fromString(prefs.getString(KeymanSettingsActivity.spacebarTextKey, KMManager.SpacebarText.LANGUAGE_KEYBOARD.toString()));
     KMManager.setSpacebarText(spacebarText);
 
-    KMManager.setHTMLBanner(KeyboardType.KEYBOARD_TYPE_SYSTEM, KM_BANNER_THEME_KEYMAN, KM_BANNER_THEME_KEYMAN_SVG);
-    KMManager.setBanner(KeyboardType.KEYBOARD_TYPE_SYSTEM, KMManager.BannerType.HTML);
-    KMManager.showBanner(true);
+    BannerController.setHTMLBanner(this, KeyboardType.KEYBOARD_TYPE_SYSTEM);
 
     boolean mayHaveHapticFeedback = prefs.getBoolean(KeymanSettingsActivity.hapticFeedbackKey, false);
     KMManager.setHapticFeedback(mayHaveHapticFeedback);

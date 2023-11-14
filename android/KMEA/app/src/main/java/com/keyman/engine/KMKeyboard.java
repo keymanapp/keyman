@@ -646,16 +646,7 @@ final class KMKeyboard extends WebView {
     return this.htmlBannerString;
   }
 
-  public void setHTMLBanner(String htmlPath, String svgPath) {
-    // Read the banner html contents
-    String contents = FileUtils.readContents(context, htmlPath);
-
-    // If $BANNER string exists, replace with actual path
-    File bannerPath = new File(KMManager.getResourceRoot(), svgPath);
-    if (bannerPath.exists()) {
-      contents = contents.replace("$BANNER", bannerPath.getAbsolutePath());
-    }
-
+  public void setHTMLBanner(String contents) {
     this.htmlBannerString = contents;
     KMLog.LogInfo(TAG, KMString.format("HTML Banner string: (%s).", contents));
     String jsString = KMString.format("setBannerHTML('%s')", contents);

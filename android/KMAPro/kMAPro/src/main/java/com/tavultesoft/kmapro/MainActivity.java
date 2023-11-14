@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.keyman.android.CheckInstallReferrer;
+import com.keyman.android.BannerController;
 import com.keyman.engine.BaseActivity;
 import com.keyman.engine.KMHelpFileActivity;
 import com.keyman.engine.KMKeyboardDownloaderActivity;
@@ -500,13 +501,7 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
   @Override
   public void onKeyboardShown() {
     // Set the in-app HTML banner here. Doesn't work in KMManager.init
-    if (KMManager.getFormFactor() == KMManager.FormFactor.PHONE) {
-      KMManager.setHTMLBanner(KeyboardType.KEYBOARD_TYPE_INAPP, "svg/banner.html", KMManager.KM_BANNER_THEME_BLACK);
-    } else {
-      KMManager.setHTMLBanner(KeyboardType.KEYBOARD_TYPE_INAPP, "svg/banner.html", KMManager.KM_BANNER_THEME_GRAY);
-    }
-    KMManager.setBanner(KeyboardType.KEYBOARD_TYPE_INAPP, KMManager.BannerType.HTML);
-    KMManager.showBanner(true);
+    BannerController.setHTMLBanner(this, KeyboardType.KEYBOARD_TYPE_INAPP);
     resizeTextView(true);
   }
 
