@@ -271,10 +271,10 @@ ldml_processor::process_key_string(km_core_state *state, const std::u16string &k
   // so that we don't have to reconvert it inside the transform code.
   std::u32string key_str32 = kmx::u16string_to_u32string(key_str);
   assert(ldml::normalize_nfd_markers(key_str32)); // TODO-LDML: else fail?
-  // extract context string, in NFC
-  std::u32string old_ctxtstr_nfc;
-  (void)context_to_string(state, old_ctxtstr_nfc, false);
-  assert(ldml::normalize_nfc_markers(old_ctxtstr_nfc)); // TODO-LDML: else fail?
+  // extract context string, in NFD
+  std::u32string old_ctxtstr_nfd;
+  (void)context_to_string(state, old_ctxtstr_nfd, false);
+  assert(ldml::normalize_nfd_markers(old_ctxtstr_nfd)); // TODO-LDML: else fail?
 
   // context string in NFD
   std::u32string ctxtstr;
@@ -304,18 +304,18 @@ ldml_processor::process_key_string(km_core_state *state, const std::u16string &k
 
   // Ok. We've done all the happy manipulations.
 
-  /** NFC and no markers */
+  /** NFD and no markers */
   std::u32string ctxtstr_cleanedup = ldml::remove_markers(ctxtstr);
-  assert(ldml::normalize_nfc_markers(ctxtstr_cleanedup));
+  assert(ldml::normalize_nfd_markers(ctxtstr_cleanedup));
 
   // find common prefix.
   // For example, if the context previously had "aaBBBBB" and it is changing to "aaCCC" then we will have:
   // - old_ctxtstr_changed = "BBBBB"
   // - new_ctxtstr_changed = "CCC"
   // So the BBBBB needs to be removed and then CCC added.
-  auto ctxt_prefix = mismatch(old_ctxtstr_nfc.begin(), old_ctxtstr_nfc.end(), ctxtstr_cleanedup.begin(), ctxtstr_cleanedup.end());
+  auto ctxt_prefix = mismatch(old_ctxtstr_nfd.begin(), old_ctxtstr_nfd.end(), ctxtstr_cleanedup.begin(), ctxtstr_cleanedup.end());
   /** The part of the old string to be removed */
-  std::u32string old_ctxtstr_changed(ctxt_prefix.first,old_ctxtstr_nfc.end());
+  std::u32string old_ctxtstr_changed(ctxt_prefix.first,old_ctxtstr_nfd.end());
   /** The new context to be added */
   std::u32string new_ctxtstr_changed(ctxt_prefix.second,ctxtstr_cleanedup.end());
 

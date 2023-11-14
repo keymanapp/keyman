@@ -28,6 +28,9 @@
 
 #include "ldml_test_source.hpp"
 #include "debuglog.h"
+
+#include "ldml/ldml_transforms.hpp"
+
 namespace {
 
 bool g_beep_found = false;
@@ -279,6 +282,7 @@ run_test(const km::core::path &source, const km::core::path &compiled, km::tests
 
       verify_context(text_store, test_state, test_context);
     } else if (action.type == km::tests::LDML_ACTION_CHECK_EXPECTED) {
+      assert(km::core::ldml::normalize_nfd(action.string)); // TODO-LDML: should be NFC
       std::cout << "- check expected" << std::endl;
       std::cout << "expected  : " << string_to_hex(action.string) << " [" << action.string << "]" << std::endl;
       std::cout << "text store: " << string_to_hex(text_store) << " [" << text_store << "]" << std::endl;
