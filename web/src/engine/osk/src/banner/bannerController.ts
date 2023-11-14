@@ -2,7 +2,7 @@ import { DeviceSpec } from '@keymanapp/web-utils';
 import type { PredictionContext, StateChangeEnum } from '@keymanapp/input-processor';
 import { ImageBanner } from './imageBanner.js';
 import { SuggestionBanner } from './suggestionBanner.js';
-import { BannerView, BannerOptions, BannerType } from './bannerView.js';
+import { BannerView } from './bannerView.js';
 import { Banner } from './banner.js';
 import { BlankBanner } from './blankBanner.js';
 import { HTMLBanner } from './htmlBanner.js';
@@ -36,15 +36,22 @@ export class BannerController {
     this.inactiveBanner = new BlankBanner();
   }
 
+  /**
+   * Specifies the `Banner` instance to use when predictive-text is _not_ available to the user.
+   *
+   * Defaults to a hidden, "blank" `Banner` if not otherwise specified.  Changes to its value
+   * when predictive-text is not active will result in banner hot-swapping.
+   *
+   * The assigned instance will persist until directly changed through a new assignment,
+   * regardless of any keyboard swaps and/or activations of the suggestion banner that may
+   * occur in the meantime.
+   */
   public get inactiveBanner() {
     return this._inactiveBanner;
   }
 
   public set inactiveBanner(banner: Banner) {
-    if(!banner) {
-      banner = new BlankBanner();
-    }
-    this._inactiveBanner = banner;
+    this._inactiveBanner = banner ?? new BlankBanner();
 
     if(!(this.container.banner instanceof SuggestionBanner)) {
       this.container.banner = banner;
