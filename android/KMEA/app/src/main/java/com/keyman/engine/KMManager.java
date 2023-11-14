@@ -25,32 +25,21 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.AssetManager;
 import android.content.res.Configuration;
-import android.graphics.Bitmap;
-import android.graphics.RectF;
 import android.graphics.Typeface;
 import android.inputmethodservice.InputMethodService;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.net.Uri;
 import android.os.Build;
-import android.os.Handler;
 import android.os.IBinder;
-import android.os.Looper;
 import android.text.InputType;
 import android.util.Log;
-import android.view.HapticFeedbackConstants;
-import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.inputmethod.EditorInfo;
-import android.view.inputmethod.ExtractedText;
-import android.view.inputmethod.ExtractedTextRequest;
 import android.view.inputmethod.InputConnection;
 import android.view.inputmethod.InputMethodManager;
-import android.webkit.JavascriptInterface;
 import android.webkit.WebView;
-import android.webkit.WebViewClient;
 import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
 
@@ -71,7 +60,6 @@ import com.keyman.engine.packages.JSONUtils;
 import com.keyman.engine.packages.LexicalModelPackageProcessor;
 import com.keyman.engine.packages.PackageProcessor;
 import com.keyman.engine.util.BCP47;
-import com.keyman.engine.util.CharSequenceUtil;
 import com.keyman.engine.util.DependencyUtil;
 import com.keyman.engine.util.DependencyUtil.LibraryType;
 import com.keyman.engine.util.FileUtils;
@@ -157,12 +145,13 @@ public final class KMManager {
     }
   };
 
+  // Maps to enum BannerType in bannerView.ts
   public enum BannerType {
     BLANK,
     IMAGE,
-    SUGGESTION;
+    SUGGESTION,
+    HTML;
 
-    // Maps to enum BannerType in bannerView.ts
     public static BannerType fromString(String mode) {
       if (mode == null) return BLANK;
       switch (mode) {
@@ -172,12 +161,14 @@ public final class KMManager {
           return IMAGE;
         case "suggestion":
           return SUGGESTION;
+        case "html":
+          return HTML;
       }
       return BLANK;
     }
 
     public String toString() {
-      String modes[] = { "blank", "image", "suggestion"};
+      String modes[] = { "blank", "image", "suggestion", "html"};
       return modes[this.ordinal()];
     }
   }
@@ -202,6 +193,7 @@ public final class KMManager {
 
   // Paths relative to assets folder for banner themes
   public static final String KM_BANNER_THEME_BLACK = "svg/black_banner.svg";
+  public static final String KM_BANNER_THEME_GRAY = "svg/gray_banner.svg";
   public static final String KM_BANNER_THEME_WHITE = "svg/white_banner.svg";
 
   protected static KMKeyboard InAppKeyboard = null;
@@ -312,9 +304,6 @@ public final class KMManager {
   protected static final String KMFilename_KmwGlobeHintCss = "globe-hint.css";
   protected static final String KMFilename_Osk_Ttf_Font = "keymanweb-osk.ttf";
   protected static final String KMFilename_JSPolyfill = "es6-shim.min.js";
-
-  // CSS for image banner theming
-  protected static final String KMFilename_ImageBannerCss = "imagebanner.css";
 
   // Deprecated by KeyboardController.KMFilename_Installed_KeyboardsList
   public static final String KMFilename_KeyboardsList = "keyboards_list.dat";
@@ -851,10 +840,7 @@ public final class KMManager {
       copyAsset(context, KMDefault_KeyboardFont, "", true);
       copyAsset(context, KMFilename_JSPolyfill, "", true);
 
-      // Copy image banner css
-      //copyAsset(context, KMFilename_ImageBannerCss, "", true);
-
-      // SVG directory for banner themes
+      // SVG directory for html banner themes
       File svgDir = new File(getSVGDir());
       if (!svgDir.exists()) {
         svgDir.mkdir();
@@ -1463,23 +1449,23 @@ public final class KMManager {
    * @param {String} path
    * @return
    */
-  public static boolean setBannerImage(KeyboardType keyboard, String htmlPath, String svgPath) {
+  public static boolean setHTMLBanner(KeyboardType keyboard, String htmlPath, String svgPath) {
     if (keyboard == KeyboardType.KEYBOARD_TYPE_INAPP && InAppKeyboard != null) {
-      InAppKeyboard.setBannerImage(htmlPath, svgPath);
+      InAppKeyboard.setHTMLBanner(htmlPath, svgPath);
     } else if (keyboard == KeyboardType.KEYBOARD_TYPE_SYSTEM && SystemKeyboard != null) {
-      SystemKeyboard.setBannerImage(htmlPath, svgPath);
+      SystemKeyboard.setHTMLBanner(htmlPath, svgPath);
     } else {
-      Log.d(TAG, "setBannerImage but keyboard is null");
+      Log.d(TAG, "setHTMLBanner() but keyboard is null");
       return false;
     }
     return true;
   }
 
-  public static String getBannerImage(KeyboardType keyboard) {
+  public static String getHTMLBanner(KeyboardType keyboard) {
     if (keyboard == KeyboardType.KEYBOARD_TYPE_INAPP && InAppKeyboard != null) {
-      return InAppKeyboard.getBannerImage();
+      return InAppKeyboard.getHTMLBanner();
     } else if (keyboard == KeyboardType.KEYBOARD_TYPE_SYSTEM && SystemKeyboard != null) {
-      return SystemKeyboard.getBannerImage();
+      return SystemKeyboard.getHTMLBanner();
     }
     return "";
   }

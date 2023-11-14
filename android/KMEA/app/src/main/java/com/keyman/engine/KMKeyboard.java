@@ -7,13 +7,11 @@ package com.keyman.engine;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import com.keyman.engine.BaseActivity;
 import com.keyman.engine.data.Keyboard;
 import com.keyman.engine.data.KeyboardController;
 import com.keyman.engine.KMManager.KeyboardType;
@@ -25,19 +23,11 @@ import com.keyman.engine.util.FileUtils;
 import com.keyman.engine.util.KMLog;
 import com.keyman.engine.util.KMString;
 
-import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
-import android.content.pm.PackageManager;
 import android.content.res.Configuration;
-import android.graphics.Color;
-import android.graphics.Rect;
-import android.graphics.RectF;
-import android.graphics.Typeface;
-import android.os.Build;
-import android.os.Bundle;
 import android.os.Handler;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -46,7 +36,6 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.view.inputmethod.ExtractedText;
 import android.view.inputmethod.ExtractedTextRequest;
@@ -56,12 +45,9 @@ import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.widget.Button;
-import android.widget.FrameLayout;
-import android.widget.GridLayout;
 import android.widget.PopupWindow;
 import android.widget.PopupWindow.OnDismissListener;
 import android.widget.RelativeLayout;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import io.sentry.Breadcrumb;
@@ -87,7 +73,7 @@ final class KMKeyboard extends WebView {
   /**
    * Current banner state.
    */
-  protected static KMManager.BannerType currentBanner = KMManager.BannerType.IMAGE;
+  protected static KMManager.BannerType currentBanner = KMManager.BannerType.HTML;
 
   private static String txtFont = "";
   private static String oskFont = null;
@@ -96,9 +82,9 @@ final class KMKeyboard extends WebView {
   private GestureDetector gestureDetector;
   private static ArrayList<OnKeyboardEventListener> kbEventListeners = null;
 
-  // Stores the current image for use by the Banner
+  // Stores the current html string for use by the Banner
   // when predictive text is not active
-  protected String bannerImagePath;
+  protected String htmlBannerString = "";
 
   // Facilitates a 'lazy init' - we'll only check the preference when it matters,
   // rather than at construction time.
@@ -395,8 +381,8 @@ final class KMKeyboard extends WebView {
 
     int bannerHeight = KMManager.getBannerHeight(context);
     int oskHeight = KMManager.getKeyboardHeight(context);
-    if (this.bannerImagePath != null) {
-      loadJavascript(KMString.format("setBannerImage('%s')", this.bannerImagePath));
+    if (this.htmlBannerString != null && !this.htmlBannerString.isEmpty()) {
+      loadJavascript(KMString.format("setBannerHTML('%s')", this.htmlBannerString));
     }
     loadJavascript(KMString.format("setBannerHeight(%d)", bannerHeight));
     loadJavascript(KMString.format("setOskWidth(%d)", newConfig.screenWidthDp));
@@ -427,12 +413,10 @@ final class KMKeyboard extends WebView {
     //reset banner state if new language has no lexical model
     if (currentBanner == KMManager.BannerType.SUGGESTION
         && associatedLexicalModel == null) {
-      setBanner(KMManager.BannerType.IMAGE);
+      currentBanner = KMManager.BannerType.HTML;
     }
 
-    if(keyboardChanged) {
-      setLayoutParams(KMManager.getKeyboardLayoutParams());
-    }
+    // Since there's always a banner, no need to update setLayoutParams()
   }
 
   /**
@@ -655,15 +639,14 @@ final class KMKeyboard extends WebView {
   }
 
   public void setBanner(KMManager.BannerType bannerType) {
-    String jsString = KMString.format("setBanner('%s')", bannerType.toString());
-    loadJavascript(jsString);
+    currentBanner = bannerType;
   }
 
-  public String getBannerImage() {
-    return this.bannerImagePath;
+  public String getHTMLBanner() {
+    return this.htmlBannerString;
   }
 
-  public void setBannerImage(String htmlPath, String svgPath) {
+  public void setHTMLBanner(String htmlPath, String svgPath) {
     // Read the banner html contents
     String contents = FileUtils.readContents(context, htmlPath);
 
@@ -673,15 +656,9 @@ final class KMKeyboard extends WebView {
       contents = contents.replace("$BANNER", bannerPath.getAbsolutePath());
     }
 
-    this.bannerImagePath = contents; // Save the path in case delayed initialization is needed
-    String logString = "";
-    if (contents != null && contents.contains("base64") || contents.length() > 256) {
-      logString = "<base64 image>";
-    } else {
-      logString = contents;
-    }
-    KMLog.LogInfo(TAG, KMString.format("Banner image path: (%s).", logString));
-    String jsString = KMString.format("setBannerImage('%s')", contents);
+    this.htmlBannerString = contents;
+    KMLog.LogInfo(TAG, KMString.format("HTML Banner string: (%s).", contents));
+    String jsString = KMString.format("setBannerHTML('%s')", contents);
     loadJavascript(jsString);
   }
 

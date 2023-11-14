@@ -74,8 +74,9 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
     KMManager.SpacebarText spacebarText = KMManager.SpacebarText.fromString(prefs.getString(KeymanSettingsActivity.spacebarTextKey, KMManager.SpacebarText.LANGUAGE_KEYBOARD.toString()));
     KMManager.setSpacebarText(spacebarText);
 
-    KMManager.setBannerImage(KeyboardType.KEYBOARD_TYPE_SYSTEM, KM_BANNER_THEME_KEYMAN, KM_BANNER_THEME_KEYMAN_SVG);
-    KMManager.setBanner(KeyboardType.KEYBOARD_TYPE_SYSTEM, KMManager.BannerType.IMAGE);
+    KMManager.setHTMLBanner(KeyboardType.KEYBOARD_TYPE_SYSTEM, KM_BANNER_THEME_KEYMAN, KM_BANNER_THEME_KEYMAN_SVG);
+    KMManager.setBanner(KeyboardType.KEYBOARD_TYPE_SYSTEM, KMManager.BannerType.HTML);
+    KMManager.showBanner(false);
 
     boolean mayHaveHapticFeedback = prefs.getBoolean(KeymanSettingsActivity.hapticFeedbackKey, false);
     KMManager.setHapticFeedback(mayHaveHapticFeedback);

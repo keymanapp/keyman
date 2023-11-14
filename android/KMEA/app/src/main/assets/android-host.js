@@ -9,6 +9,8 @@ var device = window.jsInterface.getDeviceType();
 var oskHeight = Math.ceil(window.jsInterface.getKeyboardHeight() / window.devicePixelRatio);
 var oskWidth = 0;
 var bannerHeight = 0;
+var bannerImagePath = '';
+var bannerHTMLContents = '';
 var fragmentToggle = 0;
 
 var sentryManager = new KeymanSentryManager({
@@ -57,35 +59,26 @@ function init() {
 }
 
 function showBanner(flag) {
-  window.console.log("setOptions{'alwaysShow': " + flag + "}");
-  if (keyman.osk) {
-    keyman.osk.bannerController.setOptions({"alwaysShow": flag});
-  }
-}
-
-// If KeymanWeb banner currently blank, set to bannerType
-// @param type 'blank' | 'image' | 'suggestion' - A plain-text string
-//             representing the type of Banner to set active.
-function setBanner(bannerType) {
-  if (keyman.osk && keyman.osk.bannerController) {
-    window.console.log('setBanner: current KMW banner is: ' + keyman.osk.bannerController.activeType);
-    window.console.log('setBanner: options are: ' + JSON.stringify(keyman.osk.bannerController.getOptions()));
-    if (keyman.osk.bannerController.activeType == 'blank') {
-      keyman.osk.bannerController.setBanner(bannerType);
+  window.console.log("Setting banner display for dictionaryless keyboards to " + flag);
+  window.console.log("bannerHTMLContents: " + bannerHTMLContents);
+  var bc = keyman.osk.bannerController;
+  if (bc) {
+    if (bannerHTMLContents != '') {
+      bc.inactiveBanner = flag ? new bc.HTMLBanner(bannerHTMLContents) : null;
+    } else {
+      bc.inactiveBanner = flag ? new bc.ImageBanner(bannerImgPath) : null;
     }
-  } else {
-    window.console.log('Not overriding banner');
   }
 }
 
-// Set the path to use for the image banner
-// path - String starting with "data:image/png;base64,"
 function setBannerImage(path) {
-  if (keyman.osk) {
-    keyman.osk.bannerController.setOptions({
-      "imagePath": path,
-      "alwaysShow": true});
-  }
+  bannerImgPath = path;
+}
+
+// Set the HTML banner to use when predictive-text is not available
+// contents - HTML content to use for the banner
+function setBannerHTML(contents) {
+  bannerHTMLContents = contents;
 }
 
 function notifyHost(event, params) {
