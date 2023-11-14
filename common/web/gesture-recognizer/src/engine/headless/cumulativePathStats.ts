@@ -190,22 +190,22 @@ export class CumulativePathStats<Type = any> {
    *
    * Refer to https://en.wikipedia.org/wiki/Catastrophic_cancellation.
    */
-  private baseSample?: InputSample<any>;
+  private baseSample?: InputSample<Type>;
 
   /**
    * The initial sample included by this instance's computed stats.  Needed for
    * the 'directness' properties.
    */
-  private _initialSample?: InputSample<any>;
+  private _initialSample?: InputSample<Type>;
 
-  private _lastSample?: InputSample<any>;
-  private followingSample?: InputSample<any>;
+  private _lastSample?: InputSample<Type>;
+  private followingSample?: InputSample<Type>;
   private _sampleCount = 0;
 
   constructor();
-  constructor(sample: InputSample<any>);
+  constructor(sample: InputSample<Type>);
   constructor(instance: CumulativePathStats<Type>);
-  constructor(obj?: InputSample<any> | CumulativePathStats<Type>) {
+  constructor(obj?: InputSample<Type> | CumulativePathStats<Type>) {
     if(!obj) {
       return;
     }
