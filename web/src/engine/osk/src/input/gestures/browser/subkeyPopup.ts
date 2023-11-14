@@ -157,12 +157,13 @@ export default class SubkeyPopup implements GestureHandler {
     const subkeyStyle = this.subkeys[0].style;
     const subkeyHeight = Number.parseInt(subkeyStyle.height, 10);
     const basePadding = -0.666 * subkeyHeight;  // extends bounds by the absolute value.
+    const topScalar = 3;
 
     const bottomDistance = underlyingKeyBounding.bottom - baseBounding.bottom;
 
     const roamBounding = new PaddedZoneSource(this.element, [
       // top
-      basePadding * 2, // be extra-loose for the top!
+      basePadding * topScalar, // be extra-loose for the top!
       // left, right
       basePadding,
       // bottom: ensure the recognition zone includes the row of the base key.
@@ -174,13 +175,19 @@ export default class SubkeyPopup implements GestureHandler {
     const topContainerBounding = topContainer.getBoundingClientRect();
     // Uses the top boundary from `roamBounding` unless the OSK's main element has a more
     // permissive top boundary.
-    const topPadding = Math.min(baseBounding.top + basePadding - topContainerBounding.top, 0);
-    const sustainBounding = new PaddedZoneSource(topContainer, [topPadding, 0, 0])
+    const topPadding = Math.min(baseBounding.top + basePadding * topScalar - topContainerBounding.top, 0);
+    const sustainBounding = new PaddedZoneSource(topContainer, [topPadding * topScalar, 0, 0]);
+
+    let safeBounds = vkbd.gestureEngine.config.safeBounds;
+    if(vkbd.isEmbedded) {
+      safeBounds = new PaddedZoneSource(safeBounds, [topPadding * topScalar, 0, 0]);
+    }
 
     return {
       targetRoot: this.element,
       inputStartBounds: vkbd.element,
       maxRoamingBounds: sustainBounding,
+      safeBounds: safeBounds, // if embedded, ensure top boundary extends outside the WebView!
       itemIdentifier: (coord, target) => {
         const roamingRect = roamBounding.getBoundingClientRect();
 

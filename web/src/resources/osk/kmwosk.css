@@ -345,6 +345,54 @@ body div.kmw-key-shift-on span.kmw-key-text {font-family:SpecialOSK !important;f
   z-index: 10002;
 }
 
+#kmw-gesture-preview {
+  position: absolute;
+  display: block;
+  z-index: 1;
+  border-radius: inherit;
+  top: 0px;
+  left: 0px;
+  right: 0px;
+  bottom: 0px;
+  /* Clip anything that 'scrolls' past the preview's boundaries.*/
+  overflow: hidden;
+  /* Hides the base key entirely; this prevents artifacting should positioning vary a bit. */
+  background-color: inherit;
+}
+
+#kmw-gesture-base-label {
+  top: 50%;
+  transform: translateY(-50%);
+  position: absolute;
+  display: block;
+  width: 100%;
+}
+
+.kmw-flick-preview {
+  position: absolute;
+}
+
+#kmw-preview-img-container {
+  position: absolute;
+
+  /* Facilitates scrolling animation to match a flick */
+  height: 100%;
+  width: 100%;
+
+  transition: 0.5s linear border;
+}
+
+#kmw-preview-img-container.flick-clear {
+  transition: margin 0.25s linear ease-in-out;
+  margin-left: 0px !important;
+  margin-top: 0px !important;
+}
+
+.kmw-key-popup-icon.hint-clear {
+  color: transparent;
+  transition: 0.5s linear all;
+}
+
 /* Key preview styles */
 
 div.ios div.kmw-keytip, div.android div.kmw-keytip {
@@ -402,6 +450,8 @@ div.android div.kmw-keytip {
 div.android div.kmw-keytip-tip {
   border-radius: 6px;
   background: #999;
+  /* Needed in order to properly 'anchor' the gesture-preview */
+  position: relative;
 }
 
 div.android div.kmw-keytip-cap {

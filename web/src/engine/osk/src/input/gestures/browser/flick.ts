@@ -2,12 +2,60 @@ import { type KeyElement } from '../../../keyElement.js';
 import VisualKeyboard from '../../../visualKeyboard.js';
 
 import { ActiveKey, ActiveKeyBase, ActiveSubKey, KeyDistribution } from '@keymanapp/keyboard-processor';
-import { ConfigChangeClosure, CumulativePathStats, GestureRecognizerConfiguration, GestureSequence, PaddedZoneSource } from '@keymanapp/gesture-recognizer';
+import { ConfigChangeClosure, CumulativePathStats, GestureRecognizerConfiguration, GestureSequence, GestureSource, InputSample, PaddedZoneSource } from '@keymanapp/gesture-recognizer';
 import { GestureHandler } from '../gestureHandler.js';
 import { distributionFromDistanceMaps } from '@keymanapp/input-processor';
-import { DEFAULT_GESTURE_PARAMS, GestureParams } from '../specsForLayout.js';
+import { GestureParams } from '../specsForLayout.js';
+import { GesturePreviewHost } from '../../../keyboard-layout/gesturePreviewHost.js';
 
-const OrderedFlickDirections = ['n', 'ne', 'e', 'se', 's', 'sw', 'w', 'nw'] as const;
+export const OrderedFlickDirections = ['n', 'ne', 'e', 'se', 's', 'sw', 'w', 'nw'] as const;
+
+const PI = Math.PI;
+
+export const FlickNameCoordMap = (() => {
+  const map = new Map<typeof OrderedFlickDirections[number], [number, number]>();
+
+  const angleIncrement = PI / 4;
+  for(let i = 0; i < OrderedFlickDirections.length; i++) {
+    map.set(OrderedFlickDirections[i], [angleIncrement * i, 1]);
+  }
+
+  return map;
+})();
+
+export function buildFlickScroller(
+  baseSource: GestureSource<KeyElement>,
+  initialCoord: InputSample<KeyElement>,
+  previewHost: GesturePreviewHost,
+  gestureParams: GestureParams
+): (coord: InputSample<KeyElement>) => void {
+  return (coord: InputSample<KeyElement>) => {
+    baseSource.path.on('step', (coord) => {
+      const deltaX = coord.targetX - initialCoord.targetX;
+      const deltaY = coord.targetY - initialCoord.targetY;
+
+      const sqDist = deltaX * deltaX + deltaY * deltaY;
+
+      /*
+       * Accomplishes two things:
+       * 1) Ensures the coordinates for flick-preview scrolling don't overshoot
+       *    the preview key-cap
+       * 2) While allowing for _undershoot_ if "not quite there yet"
+       */
+      let divisor = Math.sqrt(sqDist);
+      const FUDGE_FACTOR = 1.1;
+      const FULL_SCROLL_MAG = FUDGE_FACTOR * gestureParams.flick.triggerDist;
+      if(divisor < FULL_SCROLL_MAG) {
+        divisor = FULL_SCROLL_MAG;
+      }
+
+      const previewX = deltaX / divisor;
+      const previewY = deltaY / divisor;
+
+      previewHost?.scrollFlickPreview(previewX, previewY);
+    });
+  }
+}
 
 /**
  * The maximum angle-difference, in radians, allowed before a potential flick
@@ -40,17 +88,20 @@ export default class Flick implements GestureHandler {
     configChanger: ConfigChangeClosure<KeyElement>,
     vkbd: VisualKeyboard,
     e: KeyElement,
-    gestureParams: GestureParams
+    gestureParams: GestureParams,
+    previewHost: GesturePreviewHost
   ) {
     this.sequence = sequence;
     this.gestureParams = gestureParams;
     this.baseSpec = e.key.spec as ActiveKey;
 
+    sequence.on('complete', () => previewHost.cancel());
+
     // May be worth a temporary alt config:  global roaming, rather than auto-canceling.
 
     this.baseKeyDistances = vkbd.getSimpleTapCorrectionDistances(sequence.stageReports[0].sources[0].path.stats.initialSample, this.baseSpec)
-
     const baseSource = sequence.stageReports[0].sources[0].baseSource;
+
     this.sequence.on('stage', (result) => {
       const pathStats = baseSource.path.stats;
       this.computedFlickDistribution = this.flickDistribution(pathStats);
@@ -69,6 +120,12 @@ export default class Flick implements GestureHandler {
       vkbd.raiseKeyEvent(keyEvent, null);
     });
 
+    const baseCoord = baseSource.path.coords[0];
+    const flickScroller = buildFlickScroller(baseSource, baseCoord, previewHost, this.gestureParams);
+    flickScroller(baseSource.currentSample);
+    baseSource.path.on('step', flickScroller);
+
+
     // Be sure to extend roaming bounds a bit more than usual for flicks, as they can be quick motions.
     const altConfig = this.buildPopupRecognitionConfig(vkbd);
     configChanger({
@@ -85,16 +142,19 @@ export default class Flick implements GestureHandler {
     const roamBounding = new PaddedZoneSource(vkbd.element, [
       // top
       basePadding * 2, // be extra-loose for the top!
-      // left, right
       basePadding,
-      // bottom: ensure the recognition zone includes the row of the base key.
-      // basePadding is already negative, but bottomDistance isn't.
       basePadding
     ]);
 
+    let safeBounds = vkbd.gestureEngine.config.safeBounds;
+    if(vkbd.isEmbedded) {
+      safeBounds = new PaddedZoneSource(safeBounds, [basePadding, 0, 0]);
+    }
+
     return {
       ...vkbd.gestureEngine.config,
-      maxRoamingBounds: roamBounding
+      maxRoamingBounds: roamBounding,
+      safeBounds: safeBounds // if embedded, ensure top boundary extends outside the WebView!
     }
   }
 
@@ -138,20 +198,12 @@ export default class Flick implements GestureHandler {
       coord: [NaN, 0]
     }];
 
-    const PI = Math.PI;
-
-    const angleIncrement = PI / 4;
-    for(let i = 0; i < OrderedFlickDirections.length; i++) {
-      const spec = flickSet[OrderedFlickDirections[i]] as ActiveSubKey;
-      if(spec) {
-        keys.push({
-          spec: spec,
-          // Greatest possible angle difference:  Math.PI (180 degrees)
-          // So we'll scale the distance accordingly.
-          coord: [angleIncrement * i, 1]
-        });
-      }
-    }
+    keys = keys.concat(Object.keys(flickSet).map((dir: (typeof OrderedFlickDirections[number])) => {
+      return {
+        spec: flickSet[dir] as ActiveSubKey,
+        coord: FlickNameCoordMap.get(dir)
+      };
+    }));
 
     const angle = pathStats.angle;
 
@@ -167,7 +219,7 @@ export default class Flick implements GestureHandler {
       const coord = entry.coord;
       if(!isNaN(coord[0])) {
         const angleDelta1 = angle - coord[0];
-        const angleDelta2 = 2*PI + coord[0] - angle; // because of angle wrap-around.
+        const angleDelta2 = 2 * PI + coord[0] - angle; // because of angle wrap-around.
 
         // NOTE:  max linear angle dist:  PI.  (Angles are between 0 and 2*PI.)
         angleDist = Math.min(angleDelta1 * angleDelta1, angleDelta2 * angleDelta2);

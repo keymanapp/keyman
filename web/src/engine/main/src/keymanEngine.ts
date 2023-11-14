@@ -306,7 +306,10 @@ export default class KeymanEngine<
     }
     this._osk = value;
     if(value) {
-      value.activeKeyboard = this.contextManager.activeKeyboard;
+      // Don't build an OSK if no keyboard is available yet; avoid the extra flash.
+      if(this.contextManager.activeKeyboard) {
+        value.activeKeyboard = this.contextManager.activeKeyboard;
+      }
       value.on('keyevent', this.keyEventListener);
       this.core.keyboardProcessor.layerStore.handler = value.layerChangeHandler;
     }

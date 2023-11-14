@@ -260,8 +260,12 @@ export class ActiveKeyBase {
 
     // And now for generalized type validation. -----------------------------------------
 
-    // Object.entries does require Android 54... but we do polyfill within the Android app.  Should be 'fine'.
-    for(const [key, value] of Object.entries(KeyTypesOfKeyMap)) {
+    // WARNING:  Object.values and Object.entries is NOT polyfilled by es6-shim and thus
+    // is NOT available within the Android app in extremely early APIs.
+    // Object.entries requires Android 54.
+
+    for(const key of Object.keys(KeyTypesOfKeyMap)) {
+      const value = KeyTypesOfKeyMap[key as keyof typeof KeyTypesOfKeyMap];
       switch(value) {
         case 'subkeys':
           const arr = rawKey[key] as LayoutSubKey[];

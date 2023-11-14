@@ -110,6 +110,8 @@ export default class Multitap implements GestureHandler {
       }
       keyEvent.keyDistribution = this.currentStageKeyDistribution(baseDistances);
 
+      // TODO for future:  multitap previews.
+
       // When _some_ multitap keys support layer-swapping but others don't,
       // landing on a non-swap key should preserve the original layer... even
       // if no such 'nextLayer' is specified by default.
