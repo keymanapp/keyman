@@ -187,9 +187,6 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
     KMManager.SpacebarText spacebarText = KMManager.SpacebarText.fromString(prefs.getString(KeymanSettingsActivity.spacebarTextKey, KMManager.SpacebarText.LANGUAGE_KEYBOARD.toString()));
     KMManager.setSpacebarText(spacebarText);
 
-    // Set the in-app HTML banner (replaces the default black banner)
-    BannerController.setHTMLBanner(this, KeyboardType.KEYBOARD_TYPE_INAPP);
-
     checkHapticFeedback();
 
     setContentView(R.layout.activity_main);
