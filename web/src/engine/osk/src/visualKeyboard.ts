@@ -55,6 +55,7 @@ import SubkeyPopup from './input/gestures/browser/subkeyPopup.js';
 import Multitap from './input/gestures/browser/multitap.js';
 import { GestureHandler } from './input/gestures/gestureHandler.js';
 import Modipress from './input/gestures/browser/modipress.js';
+import Flick from './input/gestures/browser/flick.js';
 
 interface KeyRuleEffects {
   contextToken?: number,
@@ -507,9 +508,9 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
 
         let keyResult: KeyRuleEffects = null;
 
-        // Multitaps do special key-mapping stuff internally and produce + raise their
-        // key events directly.
-        if(gestureKey && !(handlers && handlers[0] instanceof Multitap)) {
+        // Multitaps and flicks do special key-mapping stuff internally and produce + raise
+        // their key events directly.
+        if(gestureKey && !(handlers && handlers[0].directlyEmitsKeys)) {
           let correctionKeyDistribution: KeyDistribution;
           const baseDistanceMap = this.getSimpleTapCorrectionDistances(coordSource.currentSample, gestureKey.key.spec as ActiveKey);
 
@@ -569,13 +570,22 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
             configChanger,
             this,
             gestureSequence.stageReports[0].sources[0].baseItem,
-            DEFAULT_GESTURE_PARAMS
+            this.gestureParams
           )];
+
           // baseItem is sometimes null during a keyboard-swap... for app/browser touch-based language menus.
           // not ideal, but it is what it is; just let it pass by for now.
         } else if(baseItem?.key.spec.multitap && (gestureStage.matchedId == 'initial-tap' || gestureStage.matchedId == 'multitap' || gestureStage.matchedId == 'modipress-start')) {
           // Likewise - mere construction is enough.
           handlers = [new Multitap(gestureSequence, this, baseItem, keyResult.contextToken)];
+        } else if(gestureStage.matchedId.indexOf('flick') > -1) {
+          handlers = [new Flick(
+            gestureSequence,
+            configChanger,
+            this,
+            gestureSequence.stageReports[0].sources[0].baseItem,
+            this.gestureParams
+          )];
         }
 
         if(gestureStage.matchedId.includes('modipress') && gestureStage.matchedId.includes('-start')) {
@@ -1168,8 +1178,9 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
     const paddingZone = this.gestureEngine.config.maxRoamingBounds as PaddedZoneSource;
     paddingZone.updatePadding([-0.333 * this.currentLayer.rowHeight]);
 
-    const longpressShortcutThreshold = 0.25 * this.currentLayer.rowHeight;
-    this.gestureParams.longpress.flickDist = longpressShortcutThreshold;
+    this.gestureParams.longpress.flickDist = 0.25 * this.currentLayer.rowHeight;
+    this.gestureParams.flick.startDist     = 0.25 * this.currentLayer.rowHeight;
+    this.gestureParams.flick.triggerDist   = 0.75 * this.currentLayer.rowHeight;
 
     // Needs the refreshed layout info to work correctly.
     if(this.currentLayer) {

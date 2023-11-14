@@ -12,6 +12,8 @@ import { GestureHandler } from '../gestureHandler.js';
  * This involves "locking" the current layer in place until the modipress is complete.
  */
 export default class Modipress implements GestureHandler {
+  readonly directlyEmitsKeys = true;
+
   private completionCallback: () => void;
   private originalLayer: string;
   private shouldRestore: boolean = false;

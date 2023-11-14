@@ -22,6 +22,8 @@ import { GestureParams } from '../specsForLayout.js';
  * displayed, selection of the subkey is inherently asynchronous.
  */
 export default class SubkeyPopup implements GestureHandler {
+  readonly directlyEmitsKeys = false;
+
   public readonly element: HTMLDivElement;
   public readonly shim: HTMLDivElement;
 
@@ -160,7 +162,7 @@ export default class SubkeyPopup implements GestureHandler {
 
     const roamBounding = new PaddedZoneSource(this.element, [
       // top
-      basePadding,
+      basePadding * 2, // be extra-loose for the top!
       // left, right
       basePadding,
       // bottom: ensure the recognition zone includes the row of the base key.

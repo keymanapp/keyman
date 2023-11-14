@@ -17,6 +17,8 @@ import { keySupportsModipress } from '../specsForLayout.js';
  * * Proper selection of the appropriate multitap key for subsequent taps.
  */
 export default class Multitap implements GestureHandler {
+  readonly directlyEmitsKeys = true;
+
   public readonly baseKey: KeyElement;
   public readonly baseContextToken: number;
   public readonly hasModalVisualization = false;
@@ -27,7 +29,7 @@ export default class Multitap implements GestureHandler {
   private tapIndex = 0;
   private modipress: Modipress;
 
-  private sequence: GestureSequence<KeyElement, string>;
+  private readonly sequence: GestureSequence<KeyElement, string>;
 
   constructor(
     source: GestureSequence<KeyElement, string>,
