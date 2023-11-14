@@ -504,19 +504,8 @@ export function specialKeyStartModel(): GestureModel<KeyElement> {
       {
         model: {
           ...instantContactResolutionModel(),
-          allowsInitialState: (incoming, dummy, baseItem) => {
-            // TODO:  needs better abstraction, probably.
-
-            // But, to get started... we can just use a simple hardcoded approach.
-            const modifierKeyIds = ['K_LOPT', 'K_ROPT', 'K_BKSP'];
-            for(const modKeyId of modifierKeyIds) {
-              if(baseItem?.key.spec.id == modKeyId) {
-                return true;
-              }
-            }
-
-            return false;
-          }
+          // Filtering is done via `gestureKeyFilter` as defined within `gestureSetForLayout` above.
+          // If we've gotten to this point, we're already safe to assume the base key is valid.
         },
         endOnResolve: false  // keyboard-selection longpress - would be nice to not need to lift the finger
                             // in app/browser form.
