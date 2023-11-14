@@ -184,7 +184,7 @@ struct COMP_KMXPLUS_META {
   KMXPLUS_STR author;
   KMXPLUS_STR conform;
   KMXPLUS_STR layout;
-  KMXPLUS_STR normalization;
+  KMXPLUS_STR name;
   KMXPLUS_STR indicator;
   KMXPLUS_STR version;
   KMX_DWORD_unaligned settings;
@@ -195,28 +195,6 @@ struct COMP_KMXPLUS_META {
 };
 
 static_assert(sizeof(struct COMP_KMXPLUS_META) == LDML_LENGTH_META, "mismatched size of section meta");
-
-/* ------------------------------------------------------------------
- * name section
-   ------------------------------------------------------------------ */
-
-struct COMP_KMXPLUS_NAME_ENTRY {
-    KMXPLUS_STR name;
-};
-
-struct COMP_KMXPLUS_NAME {
-  static const KMXPLUS_IDENT IDENT = LDML_SECTIONID_NAME;
-  COMP_KMXPLUS_HEADER header;
-  KMX_DWORD_unaligned count;
-  COMP_KMXPLUS_NAME_ENTRY entries[];
-  /**
-   * @brief True if section is valid.
-   */
-  bool valid(KMX_DWORD length) const;
-};
-
-static_assert(sizeof(struct COMP_KMXPLUS_NAME) % 0x4 == 0, "Structs prior to variable part should align to 32-bit boundary");
-static_assert(sizeof(struct COMP_KMXPLUS_NAME) == LDML_LENGTH_NAME, "mismatched size of section name");
 
 /* ------------------------------------------------------------------
  * strs section
@@ -512,9 +490,7 @@ struct COMP_KMXPLUS_KEYS {
 
 struct COMP_KMXPLUS_KEYS_FLICK_ELEMENT {
   KMXPLUS_LIST directions;
-  KMX_DWORD_unaligned flags;
-  KMXPLUS_STR to; // string or codepoint
-  /** get the 'to' string if a char */
+  KMXPLUS_STR to; // string
   std::u16string get_to_string() const;
 };
 

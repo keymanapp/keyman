@@ -18,8 +18,8 @@ describe('ldml keyboard xml reader tests', function () {
       errors: [CommonTypesMessages.Error_SchemaValidationError({
         instancePath: '/keyboard3',
         keyword: 'required',
-        message: `must have required property 'names'`,
-        params: 'missingProperty="names"',
+        message: `must have required property 'info'`,
+        params: 'missingProperty="info"',
       })],
     },
     {
@@ -37,9 +37,9 @@ describe('ldml keyboard xml reader tests', function () {
         assert.ok(source?.keyboard3?.keys);
         const k = pluckKeysFromKeybag(source?.keyboard3?.keys.key, ['a', 'b', 'c']);
         assert.sameDeepOrderedMembers(k, [
-          {id: 'a', to: 'a'},
-          {id: 'b', to: 'b'},
-          {id: 'c', to: 'c'},
+          {id: 'a', output: 'a'},
+          {id: 'b', output: 'b'},
+          {id: 'c', output: 'c'},
         ]);
         // all of the keys are implied imports here
         assert.isTrue(ImportStatus.isImpliedImport(source?.keyboard3?.keys.key.find(({id}) => id === 'a')));
@@ -52,9 +52,9 @@ describe('ldml keyboard xml reader tests', function () {
         assert.ok(source?.keyboard3?.keys);
         const k = pluckKeysFromKeybag(source?.keyboard3?.keys.key, ['a', 'b', 'c']);
         assert.sameDeepOrderedMembers(k, [
-          {id: 'a', to: 'a'},
-          {id: 'b', to: 'b'},
-          {id: 'c', to: 'c'},
+          {id: 'a', output: 'a'},
+          {id: 'b', output: 'b'},
+          {id: 'c', output: 'c'},
         ]);
       },
     },
@@ -64,10 +64,10 @@ describe('ldml keyboard xml reader tests', function () {
         assert.ok(source?.keyboard3?.keys);
         const k = pluckKeysFromKeybag(source?.keyboard3?.keys.key, ['a', 'b', 'c']);
         assert.sameDeepOrderedMembers(k, [
-          {id: 'a', to: 'a'},
-          {id: 'b', to: 'b'},
-          {id: 'c', to: 'c'},
-          {id: 'a', to: 'å'}, // overridden
+          {id: 'a', output: 'a'},
+          {id: 'b', output: 'b'},
+          {id: 'c', output: 'c'},
+          {id: 'a', output: 'å'}, // overridden
         ]);
       },
     },
@@ -77,13 +77,13 @@ describe('ldml keyboard xml reader tests', function () {
         assert.ok(source?.keyboard3?.keys);
         const k = pluckKeysFromKeybag(source?.keyboard3?.keys.key, ['a', 'b', 'c', 'zz', 'hash', 'hyphen']);
         assert.sameDeepOrderedMembers(k, [
-          {id: 'a', to: 'a'},       // implied
-          {id: 'b', to: 'b'},
-          {id: 'c', to: 'c'},
-          {id: 'hash', to: '#'},    // imported symbols
-          {id: 'hyphen', to: '-'},
-          {id: 'zz', to: 'zz'},     // new key
-          {id: 'hash', to: '##'},   // override
+          { id: 'a',      output: 'a' },       // implied
+          { id: 'b',      output: 'b' },
+          { id: 'c',      output: 'c' },
+          { id: 'hash',   output: '#' },    // imported symbols
+          { id: 'hyphen', output: '-' },
+          { id: 'zz',     output: 'zz' },     // new key
+          { id: 'hash',   output: '##' },   // override
         ]);
         // 'a' is an implied import
         assert.isTrue(ImportStatus.isImpliedImport(k.find(({id}) => id === 'a')));
@@ -136,7 +136,7 @@ describe('ldml keyboard xml reader tests', function () {
         CommonTypesMessages.Error_ImportWrongRoot({
           base: null,
           path: 'techpreview/keys-Zyyy-punctuation.xml',
-          subtag: 'names',
+          subtag: 'flicks',
         }),
       ],
     },

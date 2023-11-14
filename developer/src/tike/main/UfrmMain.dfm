@@ -176,7 +176,7 @@ inherited frmKeymanDeveloper: TfrmKeymanDeveloper
     object panToolbar: TPanel
       Left = 11
       Top = 2
-      Width = 421
+      Width = 448
       Height = 23
       AutoSize = True
       BevelOuter = bvNone
@@ -184,7 +184,7 @@ inherited frmKeymanDeveloper: TfrmKeymanDeveloper
       object ToolBar1: TToolBar
         Left = 0
         Top = 0
-        Width = 270
+        Width = 301
         Height = 23
         Align = alNone
         AutoSize = True
@@ -192,6 +192,7 @@ inherited frmKeymanDeveloper: TfrmKeymanDeveloper
         Caption = 'ToolBar1'
         Images = lstImages
         TabOrder = 0
+        Wrapable = False
         object ToolButton1: TToolButton
           Left = 0
           Top = 0
@@ -282,9 +283,22 @@ inherited frmKeymanDeveloper: TfrmKeymanDeveloper
           ImageIndex = 56
           Style = tbsSeparator
         end
+        object ToolButton16: TToolButton
+          Left = 270
+          Top = 0
+          Action = modActionsKeyboardEditor.actKeyboardCompile
+        end
+        object ToolButton13: TToolButton
+          Left = 293
+          Top = 0
+          Width = 8
+          Caption = 'ToolButton13'
+          ImageIndex = 57
+          Style = tbsSeparator
+        end
       end
       object cbTextFileFormat: TComboBox
-        Left = 276
+        Left = 303
         Top = 1
         Width = 145
         Height = 21

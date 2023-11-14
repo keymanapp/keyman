@@ -11,10 +11,10 @@
         "display": {
           "type": "string"
         },
-        "id": {
+        "keyId": {
           "type": "string"
         },
-        "to": {
+        "output": {
           "type": "string"
         }
       },
@@ -62,25 +62,9 @@
     "flick": {
       "additionalProperties": false,
       "properties": {
-        "directions": {
-          "type": "string"
-        },
-        "to": {
-          "type": "string"
-        }
-      },
-      "required": [
-        "directions",
-        "to"
-      ],
-      "type": "object"
-    },
-    "flicks": {
-      "additionalProperties": false,
-      "properties": {
-        "flick": {
+        "flickSegment": {
           "items": {
-            "$ref": "#/definitions/flick"
+            "$ref": "#/definitions/flickSegment"
           },
           "minItems": 1,
           "type": "array"
@@ -96,9 +80,49 @@
         }
       },
       "required": [
-        "flick",
+        "flickSegment",
         "id"
       ],
+      "type": "object"
+    },
+    "flickSegment": {
+      "additionalProperties": false,
+      "properties": {
+        "directions": {
+          "type": "string"
+        },
+        "keyId": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "directions",
+        "keyId"
+      ],
+      "type": "object"
+    },
+    "flicks": {
+      "additionalProperties": false,
+      "properties": {
+        "flick": {
+          "items": {
+            "$ref": "#/definitions/flick"
+          },
+          "type": "array"
+        },
+        "import": {
+          "items": {
+            "$ref": "#/definitions/import"
+          },
+          "type": "array"
+        },
+        "special": {
+          "items": {
+            "$ref": "#/definitions/special"
+          },
+          "type": "array"
+        }
+      },
       "type": "object"
     },
     "form": {
@@ -180,16 +204,19 @@
         "layout": {
           "type": "string"
         },
-        "normalization": {
+        "name": {
           "type": "string"
         }
       },
+      "required": [
+        "name"
+      ],
       "type": "object"
     },
     "key": {
       "additionalProperties": false,
       "properties": {
-        "flicks": {
+        "flickId": {
           "type": "string"
         },
         "gap": {
@@ -201,30 +228,24 @@
         "id": {
           "type": "string"
         },
-        "longPress": {
+        "layerId": {
           "type": "string"
         },
-        "longPressDefault": {
+        "longPressDefaultKeyId": {
           "type": "string"
         },
-        "multiTap": {
+        "longPressKeyIds": {
+          "type": "string"
+        },
+        "multiTapKeyIds": {
+          "type": "string"
+        },
+        "output": {
           "type": "string"
         },
         "stretch": {
           "enum": [
             "true"
-          ],
-          "type": "string"
-        },
-        "switch": {
-          "type": "string"
-        },
-        "to": {
-          "type": "string"
-        },
-        "transform": {
-          "enum": [
-            "no"
           ],
           "type": "string"
         },
@@ -240,12 +261,6 @@
     "keys": {
       "additionalProperties": false,
       "properties": {
-        "flicks": {
-          "items": {
-            "$ref": "#/definitions/flicks"
-          },
-          "type": "array"
-        },
         "import": {
           "items": {
             "$ref": "#/definitions/import"
@@ -273,7 +288,7 @@
         "id": {
           "type": "string"
         },
-        "modifier": {
+        "modifiers": {
           "type": "string"
         },
         "row": {
@@ -298,7 +313,7 @@
     "layers": {
       "additionalProperties": false,
       "properties": {
-        "form": {
+        "formId": {
           "type": "string"
         },
         "import": {
@@ -324,7 +339,7 @@
         }
       },
       "required": [
-        "form"
+        "formId"
       ],
       "type": "object"
     },
@@ -350,46 +365,6 @@
           "type": "array"
         }
       },
-      "type": "object"
-    },
-    "name": {
-      "additionalProperties": false,
-      "properties": {
-        "value": {
-          "type": "string"
-        }
-      },
-      "required": [
-        "value"
-      ],
-      "type": "object"
-    },
-    "names": {
-      "additionalProperties": false,
-      "properties": {
-        "import": {
-          "items": {
-            "$ref": "#/definitions/import"
-          },
-          "type": "array"
-        },
-        "name": {
-          "items": {
-            "$ref": "#/definitions/name"
-          },
-          "minItems": 1,
-          "type": "array"
-        },
-        "special": {
-          "items": {
-            "$ref": "#/definitions/special"
-          },
-          "type": "array"
-        }
-      },
-      "required": [
-        "name"
-      ],
       "type": "object"
     },
     "reorder": {
@@ -462,9 +437,9 @@
     "settings": {
       "additionalProperties": false,
       "properties": {
-        "fallback": {
+        "normalization": {
           "enum": [
-            "omit"
+            "disabled"
           ],
           "type": "string"
         }
@@ -650,6 +625,9 @@
         "displays": {
           "$ref": "#/definitions/displays"
         },
+        "flicks": {
+          "$ref": "#/definitions/flicks"
+        },
         "forms": {
           "$ref": "#/definitions/forms"
         },
@@ -677,9 +655,6 @@
         "locales": {
           "$ref": "#/definitions/locales"
         },
-        "names": {
-          "$ref": "#/definitions/names"
-        },
         "settings": {
           "$ref": "#/definitions/settings"
         },
@@ -703,7 +678,7 @@
         }
       },
       "required": [
-        "names",
+        "info",
         "locale",
         "conformsTo"
       ],

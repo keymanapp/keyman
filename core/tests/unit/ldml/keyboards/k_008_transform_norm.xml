@@ -6,30 +6,26 @@ from https://github.com/unicode-org/cldr/blob/keyboard-preview/docs/ldml/tr35-ke
 -->
 <!DOCTYPE keyboard3 SYSTEM "../../../../../resources/standards-data/ldml-keyboards/techpreview/dtd/ldmlKeyboard3.dtd">
 <keyboard3 locale="en" conformsTo="techpreview">
-  <info author="srl295" indicator="🙀" layout="qwerty" normalization="NFC" />
-
-  <names>
-    <name value="k_008_transform_norm" />
-  </names>
+  <info author="srl295" indicator="🙀" layout="qwerty"  name="k_008_transform_norm"/>
 
   <keys>
-    <key id="u-0320" to="\u{0320}" /> <!-- ◌̠ -->
-    <key id="u-0300" to="\u{0300}" /> <!-- ◌̀ -->
-    <key id="u-00e8" to="\u{00e8}" /> <!-- è -->
-    <key id="nfd" to="e\u{0320}\u{0300}" />
-    <key id="nfc" to="\u{00E8}\u{0320}" />
-    <key id="not-nfd" to="e\u{0300}\u{0320}" />
+    <key id="u-0320" output="\u{0320}" /> <!-- ◌̠ -->
+    <key id="u-0300" output="\u{0300}" /> <!-- ◌̀ -->
+    <key id="u-00e8" output="\u{00e8}" /> <!-- è -->
+    <key id="nfd" output="e\u{0320}\u{0300}" />
+    <key id="nfc" output="\u{00E8}\u{0320}" />
+    <key id="not-nfd" output="e\u{0300}\u{0320}" />
   </keys>
 
-  <layers form="us">
-    <layer modifier="none" id="base">
+  <layers formId="us">
+    <layer modifiers="none" id="base">
       <row keys="u-0320 1 2 3 4 5 6 7 8 9 0" />
       <row keys="q w e r t y u i o p" />
       <row keys="a s d f g h j k l" />
       <row keys="z x c v b n m" />
       <row keys="space" />
     </layer>
-    <layer modifier="shift" id="shift">
+    <layer modifiers="shift" id="shift">
       <row keys="u-0300 u-00e8 nfd nfc not-nfd" />
     </layer>
   </layers>

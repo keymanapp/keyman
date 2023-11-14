@@ -2,9 +2,8 @@ import * as xml2js from 'xml2js';
 import JSZip from 'jszip';
 import KEYMAN_VERSION from "@keymanapp/keyman-version";
 
-import { CompilerCallbacks, KeymanFileTypes, KvkFile } from '@keymanapp/common-types';
+import { KmpJsonFile, KpsFile, SchemaValidators, CompilerCallbacks, KeymanFileTypes, KvkFile } from '@keymanapp/common-types';
 import { CompilerMessages } from './messages.js';
-import { KmpJsonFile, KpsFile } from '@keymanapp/common-types';
 import { PackageMetadataCollector } from './package-metadata-collector.js';
 import { KmpInfWriter } from './kmp-inf-writer.js';
 import { transcodeToCP1252 } from './cp1252.js';
@@ -32,7 +31,18 @@ export class KmpCompiler {
       // errors will already have been reported by loadKpsFile
       return null;
     }
-    return this.transformKpsFileToKmpObject(kpsFilename, kps);
+    const kmp = this.transformKpsFileToKmpObject(kpsFilename, kps);
+    if(!kmp) {
+      return null;
+    }
+
+    // Verify that the generated kmp.json validates with the kmp.json schema
+    if(!SchemaValidators.default.kmp(kmp)) {
+      // This is an internal error, so throwing an exception is appropriate
+      throw new Error(JSON.stringify((<any>SchemaValidators.default.kmp).errors));
+    }
+
+    return kmp;
   }
 
   public loadKpsFile(kpsFilename: string): KpsFile.KpsFile {

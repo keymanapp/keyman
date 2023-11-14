@@ -64,27 +64,17 @@ export class Loca extends Section {
 
 export enum KeyboardSettings {
   none = 0,
-  fallback = constants.meta_settings_fallback_omit,
-  transformFailure = constants.meta_settings_transformFailure_omit,
-  transformPartial = constants.meta_settings_transformPartial_hide,
+  normalizationDisabled = constants.meta_settings_normalization_disabled,
 };
-
-export enum Meta_NormalizationForm { NFC='NFC', NFD='NFD', other='other' };
 
 export class Meta extends Section {
   author: StrsItem;
   conform: StrsItem;
   layout: StrsItem;
-  normalization: StrsItem;
+  name: StrsItem;
   indicator: StrsItem;
   version: StrsItem; // semver version string, defaults to "0"
   settings: KeyboardSettings;
-};
-
-// 'name'
-
-export class Name extends Section {
-  names: StrsItem[] = [];
 };
 
 // 'strs'
@@ -502,8 +492,7 @@ export class KeysFlicks {
 
 export class KeysFlick {
   directions: ListItem;
-  flags: number;
-  to: StrsItem;
+  keyId: StrsItem;
 };
 
 export class Keys extends Section {
@@ -571,7 +560,6 @@ export interface KMXPlusData {
     list?: List; // list is ignored in-memory
     loca?: Loca;
     meta?: Meta;
-    name?: Name;
     strs?: Strs; // strs is ignored in-memory
     tran?: Tran;
     uset?: Uset; // uset is ignored in-memory
@@ -618,9 +606,6 @@ export class KMXPlusFile extends KMXFile {
   public readonly COMP_PLUS_LOCA: any;
 
   public readonly COMP_PLUS_META: any;
-
-  public readonly COMP_PLUS_NAME_ITEM: any;
-  public readonly COMP_PLUS_NAME: any;
 
   public readonly COMP_PLUS_STRS_ITEM: any;
   public readonly COMP_PLUS_STRS: any;
@@ -752,7 +737,6 @@ export class KMXPlusFile extends KMXFile {
 
     this.COMP_PLUS_KEYS_FLICK = new r.Struct({
       directions: LIST_REF, // list
-      flags: r.uint32le,
       to: STR_OR_CHAR32, // str | codepoint
     });
 
@@ -832,22 +816,13 @@ export class KMXPlusFile extends KMXFile {
       author: STR_REF, //str
       conform: STR_REF, //str
       layout: STR_REF, //str
-      normalization: STR_REF, //str
+      name: STR_REF, //str
       indicator: STR_REF, //str
       version: STR_REF, //str
-      settings: r.uint32le, //new r.Bitfield(r.uint32le, ['fallback', 'transformFailure', 'transformPartial'])
+      settings: r.uint32le, //new r.Bitfield(r.uint32le, ['normalizationDisabled'])
     });
 
-    // 'name'
-
-    this.COMP_PLUS_NAME_ITEM = r.uint32le; //str
-
-    this.COMP_PLUS_NAME = new r.Struct({
-      ident: IDENT,
-      size: r.uint32le,
-      count: r.uint32le,
-      items: new r.Array(this.COMP_PLUS_NAME_ITEM, 'count')
-    });
+    // 'name' is gone
 
     // 'ordr' now part of 'tran'
 
@@ -937,19 +912,7 @@ export class KMXPlusFile extends KMXFile {
       varEntries: new r.Array(this.COMP_PLUS_VARS_ITEM, 'varCount'),
     });
 
-    // 'vkey'
-
-    this.COMP_PLUS_VKEY_ITEM = new r.Struct({
-      vkey: r.uint32le,
-      target: r.uint32le
-    });
-
-    this.COMP_PLUS_VKEY = new r.Struct({
-      ident: IDENT,
-      size: r.uint32le,
-      count: r.uint32le,
-      items: new r.Array(this.COMP_PLUS_VKEY_ITEM, 'count')
-    });
+    // 'vkey' is removed
 
     // Aliases
 

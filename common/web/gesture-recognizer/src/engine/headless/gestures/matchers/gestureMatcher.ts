@@ -127,6 +127,9 @@ export class GestureMatcher<Type, StateToken = any> implements PredecessorMatch<
         baseContact = srcContact.baseSource;
       }
 
+      // No need to filter out already-matched contact points, and doing so is more trouble
+      // than its worth.
+
       const contactSpec = model.contacts[touchpointIndex];
       /* c8 ignore next 3 */
       if(!contactSpec) {
@@ -417,12 +420,6 @@ export class GestureMatcher<Type, StateToken = any> implements PredecessorMatch<
 
         this.finalize(false, 'path');
       }
-    }
-
-    // Now that we've done the initial-state check, we can check for instantly-matching path models.
-    const result = contactModel.update();
-    if(result.type == 'reject' && this.model.id == 'modipress-multitap-end') {
-      console.log('temp');
     }
 
     contactModel.promise.then((resolution) => {

@@ -530,10 +530,7 @@ export default class KeyboardProcessor extends EventEmitter<EventMap> {
       return false;
     }
 
-    if(Levent.Lcode == 8) {
-      // I3318 (always clear deadkeys after backspace)
-      outputTarget.deadkeys().clear();
-    } else if(Levent.isModifier) {
+    if(Levent.isModifier) {
       this.activeKeyboard.notify(Levent.Lcode, outputTarget, isKeyDown ? 1 : 0);
       // For eventual integration - we bypass an OSK update for physical keystrokes when in touch mode.
       if(!Levent.device.touchable) {

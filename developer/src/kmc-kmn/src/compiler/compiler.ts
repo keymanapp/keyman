@@ -9,7 +9,7 @@ TODO: implement additional interfaces:
 import { UnicodeSetParser, UnicodeSet, Osk, VisualKeyboard, KvkFileReader } from '@keymanapp/common-types';
 import { CompilerCallbacks, CompilerEvent, CompilerOptions, KeymanFileTypes, KvkFileWriter, KvksFileReader } from '@keymanapp/common-types';
 import loadWasmHost from '../import/kmcmplib/wasm-host.js';
-import { CompilerMessages, mapErrorFromKmcmplib } from './messages.js';
+import { CompilerMessages, mapErrorFromKmcmplib } from './kmn-compiler-messages.js';
 import { WriteCompiledKeyboard } from '../kmw-compiler/kmw-compiler.js';
 
 export interface CompilerResultFile {
@@ -280,6 +280,9 @@ export class KmnCompiler implements UnicodeSetParser {
 
       if(result.extra.displayMapFilename) {
         result.displayMap = this.loadDisplayMapping(infile, result.extra.displayMapFilename)
+        if(!result.displayMap) {
+          return null;
+        }
       }
 
       if(result.extra.kvksFilename) {
@@ -295,6 +298,12 @@ export class KmnCompiler implements UnicodeSetParser {
 
       if(wasm_result.extra.targets & COMPILETARGETS_JS) {
         wasm_options.target = 1; // CKF_KEYMANWEB TODO use COMPILETARGETS_JS
+
+        // We always want debug data in the intermediate .kmx, so that error
+        // messages from KMW compiler can give line numbers in .kmn. This
+        // should have no impact on the final .js if options.debug is false
+        wasm_options.saveDebug = true;
+
         wasm_result = Module.kmcmp_compile(infile, wasm_options, wasm_interface);
         if(!wasm_result.result) {
           return null;
@@ -406,6 +415,10 @@ export class KmnCompiler implements UnicodeSetParser {
     try {
       // Expected file format: displaymap.schema.json
       const data = this.callbacks.loadFile(displayMapFilename);
+      if(!data) {
+        this.callbacks.reportMessage(CompilerMessages.Error_FileNotFound({filename: displayMapFilename}));
+        return null;
+      }
       const mapping = JSON.parse(new TextDecoder().decode(data));
       return Osk.parseMapping(mapping);
     } catch(e) {
