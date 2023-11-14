@@ -24,6 +24,7 @@ if(_debug) {
 var oskHeight = 0;
 var oskWidth = 0;
 var bannerHeight = 0;
+var bannerImgPath = '';
 
 var sentryManager = new KeymanSentryManager({
     hostPlatform: "ios"
@@ -73,14 +74,13 @@ function verifyLoaded() {
 
 function showBanner(flag) {
     console.log("Setting banner display for dictionaryless keyboards to " + flag);
-    keyman.osk.bannerController.setOptions({'alwaysShow': flag});
+
+    var bc = keyman.osk.bannerController;
+    bc.inactiveBanner = flag ? new bc.ImageBanner(bannerImgPath) : null;
 }
 
 function setBannerImage(path) {
-    var kmw=window['keyman'];
-    if(kmw.osk) {
-        kmw.osk.bannerController.setOptions({"imagePath": path});
-    }
+    bannerImgPath = path;
 }
 
 function setBannerHeight(h) {
