@@ -4,11 +4,12 @@ import { DeviceSpec } from '@keymanapp/web-utils';
 import type { PredictionContext, StateChangeEnum } from '@keymanapp/input-processor';
 import { createUnselectableElement } from 'keyman/engine/dom-utils';
 
-import { Banner, BlankBanner } from './banner.js';
+import { Banner } from './banner.js';
 import { ImageBanner } from './imageBanner.js';
 import OSKViewComponent from '../components/oskViewComponent.interface.js';
 import { ParsedLengthStyle } from '../lengthStyle.js';
 import { SuggestionBanner } from './suggestionBanner.js';
+import { BlankBanner } from './blankBanner.js';
 
 /**
  * This object is used to specify options by both `BannerManager.getOptions`
