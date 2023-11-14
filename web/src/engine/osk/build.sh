@@ -29,7 +29,6 @@ builder_describe "Builds the Keyman Engine for Web's On-Screen Keyboard package 
 # "upload-symbols   Uploads build product to Sentry for error report symbolification.  Only defined for $DOC_BUILD_EMBED_WEB" \
 
 builder_describe_outputs \
-  configure   /node_modules \
   configure   /web/src/resources/osk/keymanweb-osk.ttf \
   build       /web/build/$SUBPROJECT_NAME/lib/index.mjs
 
