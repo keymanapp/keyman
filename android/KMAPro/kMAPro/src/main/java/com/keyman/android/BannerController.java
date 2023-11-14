@@ -25,12 +25,8 @@ public class BannerController {
       return;
     }
 
-    String htmlPath = (keyboardType == KMManager.KeyboardType.KEYBOARD_TYPE_SYSTEM) ?
-      KM_BANNER_THEME_KEYMAN :
-        (KMManager.getFormFactor() == KMManager.FormFactor.PHONE) ?
-        KM_BANNER_THEME_PHONE : KM_BANNER_THEME_TABLET;
-
-    String contents = FileUtils.readContents(context, htmlPath);
+    // Always use Keyman banner theme
+    String contents = FileUtils.readContents(context, KM_BANNER_THEME_KEYMAN);
 
     // If $BANNER string exists, replace with actual path
     File bannerPath = new File(KMManager.getResourceRoot(), KM_BANNER_THEME_KEYMAN_SVG);
