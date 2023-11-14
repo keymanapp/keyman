@@ -16,8 +16,7 @@
   "scripts": {
     "build": "tsc -b",
     "lint": "eslint .",
-    "test": "npm run lint",
-    "prepublishOnly": "npm run build"
+    "test": "npm run lint"
   },
   "license": "MIT",
   "bugs": {
@@ -26,7 +25,8 @@
   "dependencies": {
     "@keymanapp/common-types": "*",
     "@keymanapp/developer-utils": "*",
-    "@keymanapp/kmc-package": "*"
+    "@keymanapp/kmc-package": "*",
+    "ttfmeta": "^1.1.2"
   },
   "bundleDependencies": [
     "@keymanapp/developer-utils"

@@ -41,8 +41,7 @@ interface BUILDER_KEYS_FLICKS {
  */
 interface BUILDER_KEYS_FLICK {
   directions: BUILDER_LIST_REF; // list of cardinal/intercardinal directions
-  flags: number; //
-  to: BUILDER_STR_REF | number; // str or single codepoint
+  to: BUILDER_STR_REF; // str
 };
 
 
@@ -106,8 +105,7 @@ export function build_keys(kmxplus: KMXPlusData, sect_strs: BUILDER_STRS, sect_l
     flicks._flicks.forEach((flick) => {
       keys.flick.push({
         directions: build_list_index(sect_list, flick.directions),
-        flags: flick.flags,
-        to: build_strs_index(sect_strs, flick.to),
+        to: build_strs_index(sect_strs, flick.keyId),
       });
       keys.flickCount++;
     });

@@ -15,9 +15,9 @@ export class LdmlKeyboardVisualKeyboardCompiler {
     result.header.unicodeFont = {...VisualKeyboard.DEFAULT_KVK_FONT};
 
     for(let layers of source.keyboard3.layers) {
-      const hardware = layers.form;
+      const { formId } = layers;
       for(let layer of layers.layer) {
-        this.compileHardwareLayer(source, result, layer, hardware);
+        this.compileHardwareLayer(source, result, layer, formId);
       }
     }
     return result;
@@ -56,7 +56,7 @@ export class LdmlKeyboardVisualKeyboardCompiler {
         vk.keys.push({
           flags: VisualKeyboard.VisualKeyboardKeyFlags.kvkkUnicode,
           shift: shift,
-          text: keydef.to, // TODO-LDML: displays
+          text: keydef.output, // TODO-LDML: displays
           vkey: keymap[y][x],
         });
       }

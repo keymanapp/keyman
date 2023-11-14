@@ -1384,6 +1384,8 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
     // Add a faint border
     kbd.style.border = '1px solid #ccc';
 
+    kbdObj.updateState(); // double-ensure that the 'default' layer is properly displayed.
+
     // Once the element is inserted into the DOM, refresh the layout so that proper text scaling may apply.
     const detectAndHandleInsertion = () => {
       if(document.contains(kbd)) {

@@ -10,8 +10,10 @@
 tests_from_cldr = [
   'ja-Latn',
   'pt-t-k0-abnt2',
-  'fr-t-k0-azerty',
+  # 'fr-t-k0-optimise', (not yet)
+  # 'fr-t-k0-test',
   'pcm',
+  'bn',
 ]
 
 tests_without_testdata = [

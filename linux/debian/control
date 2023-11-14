@@ -26,6 +26,7 @@ Build-Depends:
  python3-requests,
  python3-requests-cache,
  python3-setuptools,
+ quilt,
  meson (>= 0.53),
  ninja-build,
  libevdev-dev,

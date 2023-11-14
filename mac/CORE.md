@@ -1,0 +1,1 @@
+New feature: Keyman Core in Keyman Engine for Mac

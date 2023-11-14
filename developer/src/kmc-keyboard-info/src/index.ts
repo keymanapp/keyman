@@ -4,7 +4,7 @@
  */
 
 import { minKeymanVersion } from "./min-keyman-version.js";
-import { KeyboardInfoFile, KeyboardInfoFileIncludes, KeyboardInfoFilePlatform } from "./keyboard-info-file.js";
+import { KeyboardInfoFile, KeyboardInfoFileIncludes, KeyboardInfoFileLanguageFont, KeyboardInfoFilePlatform } from "./keyboard-info-file.js";
 import { KeymanFileTypes, CompilerCallbacks, KmpJsonFile, KmxFileReader, KMX, KeymanTargets } from "@keymanapp/common-types";
 import { KeyboardInfoCompilerMessages } from "./messages.js";
 import langtags from "./imports/langtags.js";
@@ -12,6 +12,7 @@ import { validateMITLicense } from "@keymanapp/developer-utils";
 import { KmpCompiler } from "@keymanapp/kmc-package";
 
 import { SchemaValidators } from "@keymanapp/common-types";
+import { getFontFamily } from "./font-family.js";
 
 const regionNames = new Intl.DisplayNames(['en'], { type: "region" });
 const scriptNames = new Intl.DisplayNames(['en'], { type: "script" });
@@ -76,9 +77,9 @@ export class KeyboardInfoCompiler {
    *
    * @param sources                     Details on files from which to extract metadata
    */
-  public writeKeyboardInfoFile(
+  public async writeKeyboardInfoFile(
     sources: KeyboardInfoSources
-  ): Uint8Array {
+  ): Promise<Uint8Array> {
 
     // TODO(lowpri): work from .kpj and nothing else as input. Blocked because
     // .kpj work is largely in kmc at present, so that would need to move to
@@ -178,7 +179,9 @@ export class KeyboardInfoCompiler {
     // each of the keyboards in the kmp.json file, and merge into a single array
     // of identifiers in the .keyboard_info file.
 
-    this.fillLanguages(keyboard_info, kmpJsonData);
+    if(!await this.fillLanguages(sources.kpsFilename, keyboard_info, kmpJsonData)) {
+      return null;
+    }
 
     // If a last commit date is not given, then just use the current time
     keyboard_info.lastModifiedDate = sources.lastCommitDate ?? (new Date).toISOString();
@@ -376,7 +379,7 @@ export class KeyboardInfoCompiler {
     return text;
   }
 
-  private fillLanguages(keyboard_info: KeyboardInfoFile, kmpJsonData:  KmpJsonFile.KmpJsonFile) {
+  private async fillLanguages(kpsFilename: string, keyboard_info: KeyboardInfoFile, kmpJsonData:  KmpJsonFile.KmpJsonFile): Promise<boolean> {
     // Collapse language data from multiple keyboards
     const languages =
       kmpJsonData.keyboards.reduce((a, e) => [].concat(a, (e.languages ?? []).map((f) => f.id)), []);
@@ -417,17 +420,17 @@ export class KeyboardInfoCompiler {
       //
 
       if(fontSource.length) {
-        language.font = {
-          family: keyboard_info.id + ' Keyman Display Font',
-          source: fontSource
-        };
+        language.font = await this.fontSourceToKeyboardInfoFont(kpsFilename, kmpJsonData, fontSource);
+        if(language.font == null) {
+          return false;
+        }
       }
 
       if(oskFontSource.length) {
-        language.oskFont = {
-          family: keyboard_info.id + ' Keyman OSK Font',
-          source: oskFontSource
-        };
+        language.oskFont = await this.fontSourceToKeyboardInfoFont(kpsFilename, kmpJsonData, oskFontSource);
+        if(language.oskFont == null) {
+          return false;
+        }
       }
 
       //
@@ -463,6 +466,45 @@ export class KeyboardInfoCompiler {
         ''
       );
     }
+    return true;
   }
+
+  async fontSourceToKeyboardInfoFont(kpsFilename: string, kmpJsonData: KmpJsonFile.KmpJsonFile, source: string[]): Promise<KeyboardInfoFileLanguageFont> {
+    // locate a .ttf, .otf, or .woff font file
+    const ttf = source.find(file => file.endsWith('.ttf') || file.endsWith('.otf') || file.endsWith('.woff'));
+    if(!ttf) {
+      return {
+        // If we can't find a matching font, we'll just use the filename of the first font
+        family: this.callbacks.path.basename(source[0]),
+        source: source
+      }
+    }
+
+    // The font sources already have path information stripped, but we can
+    // find the matching file from the list of files in the package.
+    const sourcePath = kmpJsonData.files.find(file => ('/' + file.name.replaceAll('\\', '/')).endsWith('/'+ttf))?.name;
+    if(!sourcePath) {
+      this.callbacks.reportMessage(KeyboardInfoCompilerMessages.Error_FileDoesNotExist({filename: ttf}));
+      return null;
+    }
+
+    const fontData = this.callbacks.loadFile(this.callbacks.resolveFilename(kpsFilename, sourcePath));
+    if(!fontData) {
+      this.callbacks.reportMessage(KeyboardInfoCompilerMessages.Error_FileDoesNotExist({filename: sourcePath}));
+      return null;
+    }
+
+    const result = {
+      family: await getFontFamily(fontData),
+      source
+    };
+
+    if(!result.family) {
+      this.callbacks.reportMessage(KeyboardInfoCompilerMessages.Error_FontFileCannotBeRead({filename: sourcePath}));
+      return null;
+    }
+    return result;
+  }
+
 }
 
