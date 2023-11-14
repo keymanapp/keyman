@@ -464,7 +464,7 @@ const char *Debug_UnicodeString(::std::u32string s, int x) {
   bufout[x][0] = 0;
   for (q = bufout[x]; (intptr_t)(q-bufout[x]) < (128*7) && p != s.end(); p++)
   {
-    snprintf(q, MEDIUM_BUF_SIZ - (q - bufout[x]), "U+%4.6X ", *p);
+    snprintf(q, MEDIUM_BUF_SIZ - (q - bufout[x]), "U+%4.6X ", (unsigned int)*p);
     q = strchr(q, 0);
   }
   return bufout[x];
