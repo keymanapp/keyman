@@ -54,7 +54,7 @@ export class BannerController {
     this._inactiveBanner = banner ?? new BlankBanner();
 
     if(!(this.container.banner instanceof SuggestionBanner)) {
-      this.container.banner = banner;
+      this.container.banner = this._inactiveBanner;
     }
   }
 
