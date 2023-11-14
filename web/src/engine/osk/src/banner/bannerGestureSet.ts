@@ -7,10 +7,10 @@ import {
 } from '@keymanapp/gesture-recognizer';
 
 import { BannerSuggestion } from './banner.js';
-import { SimpleTapModelWithReset } from "../input/gestures/specsForLayout.js";
+import { simpleTapModelWithReset } from "../input/gestures/specsForLayout.js";
 
 export const BannerSimpleTap: gestures.specs.GestureModel<BannerSuggestion> = {
-  ...deepCopy(SimpleTapModelWithReset),
+  ...deepCopy(simpleTapModelWithReset()),
   resolutionAction: {
     type: 'complete',
     item: 'current'
@@ -22,6 +22,6 @@ export const BANNER_GESTURE_SET: GestureModelDefs<BannerSuggestion> = {
     BannerSimpleTap
   ],
   sets: {
-    default: [SimpleTapModelWithReset.id]
+    default: [BannerSimpleTap.id]
   }
 }
