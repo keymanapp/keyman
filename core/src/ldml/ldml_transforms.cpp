@@ -466,15 +466,13 @@ transform_entry::init() {
     return false;
   }
   // TODO-LDML: if we have mapFrom, may need to do other processing.
-  const std::u16string patstr = km::core::kmx::u32string_to_u16string(fFrom);
+  std::u16string patstr = km::core::kmx::u32string_to_u16string(fFrom);
+  // normalize, including markers
+  normalize_nfd_markers(patstr);
   UErrorCode status           = U_ZERO_ERROR;
-  /* const */ icu::UnicodeString patustr_raw = icu::UnicodeString(patstr.data(), (int32_t)patstr.length());
+  /* const */ icu::UnicodeString patustr = icu::UnicodeString(patstr.data(), (int32_t)patstr.length());
   // add '$' to match to end
-  patustr_raw.append(u'$');
-  icu::UnicodeString patustr;
-  const icu::Normalizer2 *nfd = icu::Normalizer2::getNFDInstance(status);
-  // NFD normalize on pattern creation
-  nfd->normalize(patustr_raw, patustr, status);
+  patustr.append(u'$'); // TODO-LDML: may need to escape some markers. Marker #91 will look like a `[` to the pattern
   fFromPattern.reset(icu::RegexPattern::compile(patustr, 0, status));
   return (UASSERT_SUCCESS(status));
 }
@@ -556,7 +554,7 @@ transform_entry::apply(const std::u32string &input, std::u32string &output) cons
   }
   const icu::Normalizer2 *nfd = icu::Normalizer2::getNFDInstance(status);
   icu::UnicodeString rustr2;
-  nfd->normalize(rustr, rustr2, status);
+  nfd->normalize(rustr, rustr2, status); // TODO-LDML: must be normalize with markers!
   UASSERT_SUCCESS(status);
   // here we replace the match output.
   icu::UnicodeString entireOutput = matcher->replaceFirst(rustr2, status);
@@ -567,7 +565,7 @@ transform_entry::apply(const std::u32string &input, std::u32string &output) cons
 
   // normalize the replaced string
   icu::UnicodeString outu;
-  nfd->normalize(outu_raw, outu, status);
+  nfd->normalize(outu_raw, outu, status); // TODO-LDML: must be normalize with markers!
   UASSERT_SUCCESS(status);
 
   // Special case if there's no output, save some allocs
@@ -585,8 +583,6 @@ transform_entry::apply(const std::u32string &input, std::u32string &output) cons
     outu.toUTF32((UChar32 *)s, out32len + 1, status);
     UASSERT_SUCCESS(status);
     output.assign(s, out32len);
-    // now, build a u32string
-    std::u32string out32(s, out32len);
     // clean up buffer
     delete [] s;
   }
@@ -893,9 +889,14 @@ bool normalize_nfd(std::u16string &str) {
   return normalize(nfd, str, status);
 }
 
-bool normalize_nfd_markers(std::u16string &str, marker_map &_kmn_unused(map)) {
-  // TODO-LDML
-  return normalize_nfd(str);
+bool normalize_nfd_markers(std::u16string &str, marker_map &map) {
+  std::u32string rstr = km::core::kmx::u16string_to_u32string(str);
+  if(!normalize_nfd_markers(rstr, map)) {
+    return false;
+  } else {
+    str = km::core::kmx::u32string_to_u16string(rstr);
+    return true;
+  }
 }
 
 void add_back_markers(std::u32string &str, const std::u32string &src, const marker_map &map) {

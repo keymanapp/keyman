@@ -508,7 +508,6 @@ int test_strutils() {
     assert_equal(map[0x0300], 0x3L);
     assert_equal(map[MARKER_BEFORE_EOT], 0x4L);
   }
-
   return EXIT_SUCCESS;
 }
 
@@ -592,6 +591,23 @@ int test_normalize() {
     assert_equal(map[0x0300], 0x2L);
     assert_equal(map[MARKER_BEFORE_EOT], 0x4L);
 
+  }
+
+  {
+    // u"4è\U0000ffff\b\U00000001̠"
+    marker_map map;
+    std::cout << __FILE__ << ":" << __LINE__ << "   - complex test 4a" << std::endl;
+    const std::u32string src    = U"4e\u0300\uFFFF\b\u0001\u0320";
+    const std::u32string expect = U"4e\uFFFF\b\u0001\u0320\u0300";
+    std::u32string dst = src;
+    assert(normalize_nfd_markers(dst, map));
+    if (dst != expect) {
+      std::cout << "dst: " << Debug_UnicodeString(dst) << std::endl;
+      std::cout << "exp: " << Debug_UnicodeString(expect) << std::endl;
+    }
+    zassert_string_equal(dst, expect);
+    assert_equal(map.size(), 1);
+    assert_equal(map[0x0320], 0x1L);
   }
 
   return EXIT_SUCCESS;
