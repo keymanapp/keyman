@@ -85,8 +85,8 @@ function triggerGitHubActionsBuild() {
     GIT_EVENT_TYPE="${GITHUB_ACTION}: PR #${GIT_BRANCH}"
     JSON=$(curl -s "${GITHUB_SERVER}/pulls/${GIT_BRANCH}")
     GIT_USER="$(echo "$JSON" | $JQ -r '.user.login')"
-    GIT_BASE_REF="$(echo "$JSON" | $JQ -r '.base.ref')"
-    GIT_BASE_BRANCH="${GIT_BASE_REF}"
+    GIT_BASE_BRANCH="$(echo "$JSON" | $JQ -r '.base.ref')"
+    GIT_BASE_REF="$(git rev-parse "${GIT_BASE_BRANCH}")"
     GIT_BRANCH="PR-${GIT_BRANCH}"
   else
     GIT_BUILD_SHA="$(git rev-parse "refs/heads/${GIT_BRANCH}")"

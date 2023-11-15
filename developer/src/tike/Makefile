@@ -6,6 +6,7 @@
 
 build: version.res manifest.res icons dirs xml xsd pull-core
     cd $(DEVELOPER_ROOT)\src\tike
+		$(COPY) $(KEYMAN_ROOT)\common\resources\fonts\keymanweb-osk.ttf $(DEVELOPER_ROOT)\src\tike\xml\layoutbuilder\keymanweb-osk.ttf
     $(DELPHI_MSBUILD) tike.dproj "/p:Platform=Win32"
     $(SENTRYTOOL_DELPHIPREP) $(WIN32_TARGET_PATH)\tike.exe -dpr tike.dpr
     $(TDS2DBG) $(WIN32_TARGET_PATH)\tike.exe
