@@ -1468,6 +1468,11 @@ public final class KMManager {
     return true;
   }
 
+  /**
+   * Get the HTML content associated with the HTML banner
+   * @param {KeyboardType} keyboard
+   * @return {String}
+   */
   public static String getHTMLBanner(KeyboardType keyboard) {
     if (keyboard == KeyboardType.KEYBOARD_TYPE_INAPP && InAppKeyboard != null) {
       return InAppKeyboard.getHTMLBanner();

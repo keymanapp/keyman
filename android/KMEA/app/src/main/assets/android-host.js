@@ -59,8 +59,8 @@ function init() {
 }
 
 function showBanner(flag) {
-  window.console.log("Setting banner display for dictionaryless keyboards to " + flag);
-  window.console.log("bannerHTMLContents: " + bannerHTMLContents);
+  console_debug("Setting banner display for dictionaryless keyboards to " + flag);
+  console_debug("bannerHTMLContents: " + bannerHTMLContents);
   var bc = keyman.osk.bannerController;
   if (bc) {
     if (bannerHTMLContents != '') {

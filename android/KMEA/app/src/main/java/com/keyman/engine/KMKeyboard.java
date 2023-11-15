@@ -649,7 +649,6 @@ final class KMKeyboard extends WebView {
 
   public void setHTMLBanner(String contents) {
     this.htmlBannerString = contents;
-    KMLog.LogInfo(TAG, KMString.format("HTML Banner string: (%s).", contents));
     String jsString = KMString.format("setBannerHTML('%s')", contents);
     loadJavascript(jsString);
   }

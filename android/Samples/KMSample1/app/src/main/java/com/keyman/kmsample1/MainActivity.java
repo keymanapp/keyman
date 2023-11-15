@@ -24,9 +24,6 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
   public static Context context;
   private KMTextView textView;
 
-  // Paths relative to assets folder for banner themes. Change this for custom banner
-  private static String BANNER_THEME_KMSAMPLE1 = "svg/green_banner.svg";
-
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     setTheme(R.style.AppTheme);
