@@ -149,10 +149,8 @@ PowerShell.
 # Elevated PowerShell
 # for *much* faster download, hide progress bar (PowerShell/PowerShell#2138)
 $ProgressPreference = 'SilentlyContinue'
-choco install git jq python ninja pandoc
+choco install git jq python ninja pandoc meson
 refreshenv
-# choco meson (0.55) is too old, 1.0 required:
-python -m pip install meson
 ```
 
 **Environment variables**:
@@ -183,7 +181,7 @@ You can use Windows Settings to add these environment variables permanently:
 * KeymanWeb
 
 **Requirements**:
-* emscripten 3.1.32
+* emscripten 3.1.40
 * node.js 18+
 * [openjdk 11](https://learn.microsoft.com/en-us/java/openjdk/download#openjdk-11)+
 
@@ -193,7 +191,7 @@ You can use Windows Settings to add these environment variables permanently:
 # for *much* faster download, hide progress bar (PowerShell/PowerShell#2138)
 $ProgressPreference = 'SilentlyContinue'
 
-choco install emscripten
+choco install emscripten --version 3.1.40
 ```
 
 Note: emscripten very unhelpfully overwrites JAVA_HOME, and adds its own

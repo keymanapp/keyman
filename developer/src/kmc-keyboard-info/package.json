@@ -16,8 +16,7 @@
   "scripts": {
     "build": "tsc -b",
     "lint": "eslint .",
-    "test": "npm run lint",
-    "prepublishOnly": "npm run build"
+    "test": "npm run lint"
   },
   "license": "MIT",
   "bugs": {

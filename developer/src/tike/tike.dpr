@@ -315,10 +315,8 @@ begin
           Application.MainFormOnTaskBar := True;
           Application.Initialize;
           Application.Title := 'Keyman Developer';
-          if TikeActive then Exit;
           Application.CreateForm(TmodWebHttpServer, modWebHttpServer);
-  Application.CreateForm(TmodActionsKeyboardEditor, modActionsKeyboardEditor);
-  try
+          try
             Application.CreateForm(TfrmKeymanDeveloper, frmKeymanDeveloper);
             Application.Run;
           finally

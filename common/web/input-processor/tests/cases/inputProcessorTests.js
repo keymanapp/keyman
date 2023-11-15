@@ -7,6 +7,7 @@ const require = createRequire(import.meta.url);
 import { InputProcessor } from '@keymanapp/input-processor';
 import { KeyboardInterface, MinimalKeymanGlobal, Mock } from '@keymanapp/keyboard-processor';
 import { NodeKeyboardLoader } from '@keymanapp/keyboard-processor/node-keyboard-loader';
+import { KeyboardTest } from '@keymanapp/recorder-core';
 
 import { Worker } from '@keymanapp/lexical-model-layer/node';
 import * as utils from '@keymanapp/web-utils';
@@ -174,5 +175,53 @@ describe('InputProcessor', function() {
         assert.isNotNull(behavior);
       });
     });
+  });
+
+  describe('Deadkeys bug #8568 - backspace should not reset all deadkeys', function () {
+    let keyboardWithHarness;
+    let testJSONtext = fs.readFileSync(require.resolve('@keymanapp/common-test-resources/json/engine_tests/8568_deadkeys.json'));
+    // For convenience we define the key sequence in a test file although we don't use the
+    // rest of the recorder stuff since it uses only KeyboardProcessor, not InputProcessor.
+    let testDefinitions = new KeyboardTest(JSON.parse(testJSONtext));
+
+    before(async function () {
+      // Load the keyboard.
+      let keyboardLoader = new NodeKeyboardLoader(new KeyboardInterface({}, MinimalKeymanGlobal));
+      const keyboard = await keyboardLoader.loadKeyboardFromPath(require.resolve('@keymanapp/common-test-resources/keyboards/test_8568_deadkeys.js'));
+      keyboardWithHarness = keyboardLoader.harness;
+      keyboardWithHarness.activeKeyboard = keyboard;
+
+      // This part provides extra assurance that the keyboard properly loaded.
+      assert.equal(keyboard.id, "Keyboard_test_8568_deadkeys");
+    });
+
+    for (let testSet of testDefinitions.inputTestSets[0]['testSet']) {
+      it(testSet.msg ?? 'test', function() {
+        this.timeout(32); // ms
+        let core = new InputProcessor(device);
+        let context = new Mock("", 0);
+
+        core.keyboardProcessor.keyboardInterface = keyboardWithHarness;
+        let keyboard = keyboardWithHarness.activeKeyboard;
+
+        for (let keystroke of testSet.inputs) {
+          let keyEvent = {
+            Lcode: keystroke.keyCode,
+            Lmodifiers: keystroke.modifiers,
+            LmodifierChange: keystroke.modifierChanged,
+            vkCode: keystroke.vkCode,
+            Lstates: keystroke.states,
+            kName: '',
+            device: device,
+            isSynthetic: false,
+            LisVirtualKey: keyboard.definesPositionalOrMnemonic // Only false for 1.0 keyboards.
+          };
+
+          let behavior = core.processKeyEvent(keyEvent, context);
+          assert.isNotNull(behavior);
+        }
+        assert.equal(context.getText(), testSet.output);
+      });
+    }
   });
 });

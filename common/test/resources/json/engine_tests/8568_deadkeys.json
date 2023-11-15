@@ -1,0 +1,308 @@
+{
+  "specVersion": "14.0",
+  "keyboard": {
+    "id": "test_8568_deadkeys",
+    "name": "Testcase for deadkeys bug (#8568)",
+    "filename": "resources/keyboards/test_8568_deadkeys.js",
+    "languages": [
+      {
+        "id": "en",
+        "name": "English",
+        "region": "World"
+      }
+    ]
+  },
+  "inputTestSets": [
+    {
+      "constraint": {
+        "target": "hardware",
+        "validOSList": null,
+        "validBrowsers": null
+      },
+      "testSet": [
+        {
+          "msg": "1. One deadkey in context",
+          "inputs": [
+            {
+              "type": "key",
+              "keyCode": 49,
+              "states": 9728,
+              "modifiers": 0,
+              "modifierChanged": false,
+              "isVirtualKey": true,
+              "eventSpec": {
+                "type": "key",
+                "key": "1",
+                "code": "Key1",
+                "keyCode": 49,
+                "location": 0,
+                "modifierSet": 32
+              }
+            },
+            {
+              "type": "key",
+              "keyCode": 8,
+              "states": 9728,
+              "modifiers": 0,
+              "modifierChanged": false,
+              "isVirtualKey": true,
+              "eventSpec": {
+                "type": "key",
+                "key": "Backspace",
+                "code": "Backspace",
+                "keyCode": 8,
+                "location": 0,
+                "modifierSet": 32
+              }
+            }
+          ],
+          "output": ""
+        },
+        {
+          "msg": "2. One char and one deadkey in context",
+          "inputs": [
+            {
+              "type": "key",
+              "keyCode": 50,
+              "states": 9728,
+              "modifiers": 0,
+              "modifierChanged": false,
+              "isVirtualKey": true,
+              "eventSpec": {
+                "type": "key",
+                "key": "2",
+                "code": "Key2",
+                "keyCode": 50,
+                "location": 0,
+                "modifierSet": 32
+              }
+            },
+            {
+              "type": "key",
+              "keyCode": 8,
+              "states": 9728,
+              "modifiers": 0,
+              "modifierChanged": false,
+              "isVirtualKey": true,
+              "eventSpec": {
+                "type": "key",
+                "key": "Backspace",
+                "code": "Backspace",
+                "keyCode": 8,
+                "location": 0,
+                "modifierSet": 32
+              }
+            }
+          ],
+          "output": ""
+        },
+        {
+          "msg": "3. One deadkey and one char in context",
+          "inputs": [
+            {
+              "type": "key",
+              "keyCode": 51,
+              "states": 9728,
+              "modifiers": 0,
+              "modifierChanged": false,
+              "isVirtualKey": true,
+              "eventSpec": {
+                "type": "key",
+                "key": "3",
+                "code": "Key3",
+                "keyCode": 51,
+                "location": 0,
+                "modifierSet": 32
+              }
+            },
+            {
+              "type": "key",
+              "keyCode": 8,
+              "states": 9728,
+              "modifiers": 0,
+              "modifierChanged": false,
+              "isVirtualKey": true,
+              "eventSpec": {
+                "type": "key",
+                "key": "Backspace",
+                "code": "Backspace",
+                "keyCode": 8,
+                "location": 0,
+                "modifierSet": 32
+              }
+            }
+          ],
+          "output": ""
+        },
+        {
+          "msg": "4. Two deadkeys in a row in context",
+          "inputs": [
+            {
+              "type": "key",
+              "keyCode": 52,
+              "states": 9728,
+              "modifiers": 0,
+              "modifierChanged": false,
+              "isVirtualKey": true,
+              "eventSpec": {
+                "type": "key",
+                "key": "4",
+                "code": "Key4",
+                "keyCode": 52,
+                "location": 0,
+                "modifierSet": 32
+              }
+            },
+            {
+              "type": "key",
+              "keyCode": 8,
+              "states": 9728,
+              "modifiers": 0,
+              "modifierChanged": false,
+              "isVirtualKey": true,
+              "eventSpec": {
+                "type": "key",
+                "key": "Backspace",
+                "code": "Backspace",
+                "keyCode": 8,
+                "location": 0,
+                "modifierSet": 32
+              }
+            }
+          ],
+          "output": ""
+        },
+        {
+          "msg": "5. One char and two deadkeys in context",
+          "inputs": [
+            {
+              "type": "key",
+              "keyCode": 53,
+              "states": 9728,
+              "modifiers": 0,
+              "modifierChanged": false,
+              "isVirtualKey": true,
+              "eventSpec": {
+                "type": "key",
+                "key": "5",
+                "code": "Key5",
+                "keyCode": 53,
+                "location": 0,
+                "modifierSet": 32
+              }
+            },
+            {
+              "type": "key",
+              "keyCode": 8,
+              "states": 9728,
+              "modifiers": 0,
+              "modifierChanged": false,
+              "isVirtualKey": true,
+              "eventSpec": {
+                "type": "key",
+                "key": "Backspace",
+                "code": "Backspace",
+                "keyCode": 8,
+                "location": 0,
+                "modifierSet": 32
+              }
+            }
+          ],
+          "output": "a"
+        },
+        {
+          "msg": "6. One char and two deadkeys and one char and two deadkeys in context",
+          "inputs": [
+            {
+              "type": "key",
+              "keyCode": 54,
+              "states": 9728,
+              "modifiers": 0,
+              "modifierChanged": false,
+              "isVirtualKey": true,
+              "eventSpec": {
+                "type": "key",
+                "key": "6",
+                "code": "Key6",
+                "keyCode": 54,
+                "location": 0,
+                "modifierSet": 32
+              }
+            },
+            {
+              "type": "key",
+              "keyCode": 8,
+              "states": 9728,
+              "modifiers": 0,
+              "modifierChanged": false,
+              "isVirtualKey": true,
+              "eventSpec": {
+                "type": "key",
+                "key": "Backspace",
+                "code": "Backspace",
+                "keyCode": 8,
+                "location": 0,
+                "modifierSet": 32
+              }
+            }
+          ],
+          "output": "a"
+        },
+        {
+          "msg": "7. Two chars and one deadkey in between in context",
+          "inputs": [
+            {
+              "type": "key",
+              "keyCode": 55,
+              "states": 9728,
+              "modifiers": 0,
+              "modifierChanged": false,
+              "isVirtualKey": true,
+              "eventSpec": {
+                "type": "key",
+                "key": "7",
+                "code": "Key7",
+                "keyCode": 55,
+                "location": 0,
+                "modifierSet": 32
+              }
+            },
+            {
+              "type": "key",
+              "keyCode": 8,
+              "states": 9728,
+              "modifiers": 0,
+              "modifierChanged": false,
+              "isVirtualKey": true,
+              "eventSpec": {
+                "type": "key",
+                "key": "Backspace",
+                "code": "Backspace",
+                "keyCode": 8,
+                "location": 0,
+                "modifierSet": 32
+              }
+            },
+            {
+              "type": "key",
+              "keyCode": 8,
+              "states": 9728,
+              "modifiers": 0,
+              "modifierChanged": false,
+              "isVirtualKey": true,
+              "eventSpec": {
+                "type": "key",
+                "key": "Backspace",
+                "code": "Backspace",
+                "keyCode": 8,
+                "location": 0,
+                "modifierSet": 32
+              }
+            }
+          ],
+          "output": "pass"
+        }
+      ]
+    }
+  ]
+}
