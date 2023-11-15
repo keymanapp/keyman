@@ -13,7 +13,6 @@ uses
   UfrmAboutTike in 'dialogs\UfrmAboutTike.pas' {frmAboutTike},
   RegistryKeys in '..\..\..\common\windows\delphi\general\RegistryKeys.pas',
   VersionInfo in '..\..\..\common\windows\delphi\general\VersionInfo.pas',
-  compile in '..\common\delphi\compiler\compile.pas',
   KeymanDeveloperOptions in 'main\KeymanDeveloperOptions.pas',
   UfrmKeyTest in 'debug\UfrmKeyTest.pas' {frmKeyTest},
   KeymanDeveloperUtils in 'main\KeymanDeveloperUtils.pas',
@@ -182,7 +181,6 @@ uses
   TempFileManager in '..\..\..\common\windows\delphi\general\TempFileManager.pas',
   UfrmKeymanWizard in 'child\UfrmKeymanWizard.pas' {frmKeymanWizard},
   UfrmKeyboardFonts in 'dialogs\UfrmKeyboardFonts.pas' {frmKeyboardFonts},
-  CompileErrorCodes in '..\common\delphi\compiler\CompileErrorCodes.pas',
   KeyboardFonts in '..\common\delphi\general\KeyboardFonts.pas',
   JsonUtil in '..\..\..\common\windows\delphi\general\JsonUtil.pas',
   TikeUnicodeData in 'main\TikeUnicodeData.pas',
@@ -311,9 +309,8 @@ begin
           Application.MainFormOnTaskBar := True;
           Application.Initialize;
           Application.Title := 'Keyman Developer';
-          if TikeActive then Exit;
           Application.CreateForm(TmodWebHttpServer, modWebHttpServer);
-  try
+          try
             Application.CreateForm(TfrmKeymanDeveloper, frmKeymanDeveloper);
             Application.Run;
           finally

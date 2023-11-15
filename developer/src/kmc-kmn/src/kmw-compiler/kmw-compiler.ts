@@ -1,8 +1,8 @@
 import { KMX, CompilerOptions, CompilerCallbacks, KvkFileReader, VisualKeyboard, KmxFileReader, KvkFile } from "@keymanapp/common-types";
 import { ExpandSentinel, incxstr, xstrlen } from "./util.js";
-import { options, nl, FTabStop, setupGlobals, IsKeyboardVersion10OrLater, callbacks, FFix183_LadderLength, FCallFunctions, fk } from "./compiler-globals.js";
+import { options, nl, FTabStop, setupGlobals, IsKeyboardVersion10OrLater, callbacks, FFix183_LadderLength, FCallFunctions, fk, IsKeyboardVersion17OrLater } from "./compiler-globals.js";
 import { JavaScript_ContextMatch, JavaScript_KeyAsString, JavaScript_Name, JavaScript_OutputString, JavaScript_Rules, JavaScript_Shift, JavaScript_ShiftAsString, JavaScript_Store, zeroPadHex } from './javascript-strings.js';
-import { KmwCompilerMessages } from "./messages.js";
+import { KmwCompilerMessages } from "./kmw-compiler-messages.js";
 import { ValidateLayoutFile } from "./validate-layout-file.js";
 import { VisualKeyboardFromFile } from "./visual-keyboard-compiler.js";
 import { CompilerResult, STORETYPE_DEBUG, STORETYPE_OPTION, STORETYPE_RESERVED } from "../compiler/compiler.js";
@@ -53,6 +53,12 @@ export function WriteCompiledKeyboard(
 
   setupGlobals(callbacks, opts, FDebug?'  ':'', FDebug?'\r\n':'', kmxResult, keyboard, kmnfile);
 
+  const isStoreType = (index:number, type: number) => !!(kmxResult.extra.stores[index].storeType & type);
+  const isDebugStore = (index: number) => isStoreType(index, STORETYPE_DEBUG);
+  const isReservedStore = (index: number) => isStoreType(index, STORETYPE_RESERVED);
+  const isOptionStore = (index: number) => isStoreType(index, STORETYPE_OPTION);
+  const getStoreLine = (index: number) => kmxResult.extra.stores[index].line;
+
   let vMnemonic: number = 0;
   let sRTL: string = "", sHelp: string = "''", sHelpFile: string = "",
       sEmbedJSFilename: string = "", sEmbedCSSFilename: string = "";
@@ -63,6 +69,7 @@ export function WriteCompiledKeyboard(
   let sModifierBitmask: string;
   let FOptionStores: string;
   let FKeyboardVersion = "1.0";
+  let sHelpFileStoreIndex, sEmbedJSStoreIndex, sEmbedCSSStoreIndex;
 
   let result = "";
 	// Locate the name of the keyboard
@@ -76,6 +83,7 @@ export function WriteCompiledKeyboard(
     }
     else if (fsp.dpName == 'HelpFile' || fsp.dwSystemID == KMX.KMXFile.TSS_KMW_HELPFILE) {
       sHelpFile = fsp.dpString;
+      sHelpFileStoreIndex = i;
     }
     else if (fsp.dpName == 'Help' || fsp.dwSystemID == KMX.KMXFile.TSS_KMW_HELPTEXT) {
       sHelp = '"'+RequotedString(fsp.dpString)+'"';
@@ -85,9 +93,11 @@ export function WriteCompiledKeyboard(
     }
     else if (fsp.dpName == 'EmbedJS' || fsp.dwSystemID == KMX.KMXFile.TSS_KMW_EMBEDJS) {
       sEmbedJSFilename = fsp.dpString;
+      sEmbedJSStoreIndex = i;
     }
     else if (fsp.dpName == 'EmbedCSS' || fsp.dwSystemID == KMX.KMXFile.TSS_KMW_EMBEDCSS) {   // I4368
       sEmbedCSSFilename = fsp.dpString;
+      sEmbedCSSStoreIndex = i;
     }
     else if (fsp.dpName == 'RTL' || fsp.dwSystemID == KMX.KMXFile.TSS_KMW_RTL) {
       sRTL = fsp.dpString == '1' ? FTabStop+'this.KRTL=1;'+nl : '';   // I3681
@@ -121,7 +131,7 @@ export function WriteCompiledKeyboard(
       sHelp = html.replace(/\r/g, '').replace(/\n/g, ' ');
       sHelp = requote(sHelp);
     } catch(e) {
-      callbacks.reportMessage(KmwCompilerMessages.Warn_HelpFileMissing({filename: sHelpFile, e}));
+      callbacks.reportMessage(KmwCompilerMessages.Warn_HelpFileMissing({line: getStoreLine(sHelpFileStoreIndex), helpFilename: sHelpFile, e}));
       sHelp = '';
     }
   }
@@ -133,7 +143,7 @@ export function WriteCompiledKeyboard(
       const data = callbacks.loadFile(sEmbedJSFilename);
       sEmbedJS = new TextDecoder().decode(data);
     } catch(e) {
-      callbacks.reportMessage(KmwCompilerMessages.Warn_EmbedJsFileMissing({filename: sEmbedJSFilename, e}));
+      callbacks.reportMessage(KmwCompilerMessages.Warn_EmbedJsFileMissing({line: getStoreLine(sEmbedJSStoreIndex), jsFilename: sEmbedJSFilename, e}));
       sEmbedJS = '';
     }
   }
@@ -147,7 +157,7 @@ export function WriteCompiledKeyboard(
       if(sEmbedCSS != '' && !sEmbedCSS.endsWith('\r\n')) sEmbedCSS += '\r\n';  // match CompileKeymanWeb.pas
     } catch(e) {
       // TODO(lowpri): rename error constant to Warn_EmbedFileMissing
-      callbacks.reportMessage(KmwCompilerMessages.Warn_EmbedJsFileMissing({filename: sEmbedCSSFilename, e}));
+      callbacks.reportMessage(KmwCompilerMessages.Warn_EmbedJsFileMissing({line: getStoreLine(sEmbedCSSStoreIndex), jsFilename: sEmbedCSSFilename, e}));
       sEmbedCSS = '';
     }
   }
@@ -157,9 +167,12 @@ export function WriteCompiledKeyboard(
     sLayoutFilename = callbacks.resolveFilename(kmnfile, sLayoutFilename);
 
     let result = ValidateLayoutFile(keyboard, options.saveDebug, sLayoutFilename, sVKDictionary, kmxResult.displayMap);
-    if(!result.result) {
+    if(!result) {
       sLayoutFile = '';
-      callbacks.reportMessage(KmwCompilerMessages.Error_TouchLayoutFileInvalid({filename:sLayoutFilename}));
+      return null;
+    } else if(!result.result) {
+      sLayoutFile = '';
+      callbacks.reportMessage(KmwCompilerMessages.Error_InvalidTouchLayoutFile({filename:sLayoutFilename}));
       return null;
     } else {
       sLayoutFile = result.output;
@@ -218,12 +231,6 @@ export function WriteCompiledKeyboard(
   if (sEmbedCSS != '') {   // I4368
     result += `${FTabStop}this.KCSS="${RequotedString(sEmbedCSS)}";${nl}`;
   }
-
-  const isStoreType = (index:number, type: number) => !!(kmxResult.extra.stores[index].storeType & type);
-  const isDebugStore = (index: number) => isStoreType(index, STORETYPE_DEBUG);
-  const isReservedStore = (index: number) => isStoreType(index, STORETYPE_RESERVED);
-  const isOptionStore = (index: number) => isStoreType(index, STORETYPE_OPTION);
-  const getStoreLine = (index: number) => kmxResult.extra.stores[index].line;
 
 	// Write the stores out
   FOptionStores = '';
@@ -435,8 +442,13 @@ function GetKeyboardModifierBitmask(keyboard: KMX.KEYBOARD, fMnemonic: boolean):
 function JavaScript_SetupDebug() {
   if(IsKeyboardVersion10OrLater()) {
     if(options.saveDebug) {
-      return 'var modCodes = keyman.osk.modifierCodes;'+nl+
-             FTabStop+'var keyCodes = keyman.osk.keyCodes;'+nl;
+      if(IsKeyboardVersion17OrLater()) {
+        return 'var modCodes = KeymanWeb.Codes.modifierCodes;'+nl+
+              FTabStop+'var keyCodes = KeymanWeb.Codes.keyCodes;'+nl;
+      } else {
+        return 'var modCodes = keyman.osk.modifierCodes;'+nl+
+              FTabStop+'var keyCodes = keyman.osk.keyCodes;'+nl;
+      }
     }
   }
   return '';

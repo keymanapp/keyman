@@ -73,7 +73,7 @@ export class LdmlKeyboardKeymanWebCompiler {
       // `${tab}${this.setupDebug()}${nl}` + ? we may use this for modifierBitmask in future
       // `${tab}this._v=(typeof keyman!="undefined"&&typeof keyman.version=="string")?parseInt(keyman.version,10):9;${nl}` + ? we probably don't need this, it's for back-compat
       `${tab}this.KI="${sName}";${nl}` +
-      `${tab}this.KN=${JSON.stringify(source.keyboard3.names.name[0])};${nl}` +
+      `${tab}this.KN=${JSON.stringify(source.keyboard3.info.name)};${nl}` +
       `${tab}this.KMINVER=${JSON.stringify(MINIMUM_KMW_VERSION)};${nl}` +
       `${tab}this.KV=${this.compileVisualKeyboard(source)};${nl}` +
       `${tab}this.KDU=${displayUnderlying ? '1' : '0'};${nl}` +

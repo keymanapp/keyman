@@ -25,6 +25,7 @@
 + (KMXFile *)getKmxFileForCipherMusicTests;
 + (KMXFile *)getKmxFileForSilIpaTests;
 + (KMXFile *)getKmxFileForIndexOffsetTests;
++ (KMXFile *)getKmxFileForElNuerTests;
 @end
 
 #endif /* KeymanEngineTestsStaticHelperMethods_h */

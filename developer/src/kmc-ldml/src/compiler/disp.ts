@@ -11,8 +11,8 @@ import { MarkerTracker, MarkerUse } from "./marker-tracker.js";
 
 export class DispCompiler extends SectionCompiler {
   static validateMarkers(keyboard: LDMLKeyboard.LKKeyboard, mt : MarkerTracker): boolean {
-    keyboard.displays?.display?.forEach(({ to }) =>
-      mt.add(MarkerUse.match, MarkerParser.allReferences(to)));
+    keyboard.displays?.display?.forEach(({ output }) =>
+      mt.add(MarkerUse.match, MarkerParser.allReferences(output)));
     // no marker references in 'id'
     return true;
   }
@@ -28,23 +28,23 @@ export class DispCompiler extends SectionCompiler {
     const ids = new Set();
 
     if (this.keyboard3.displays?.display) {
-      for (const { to, id } of this.keyboard3.displays?.display) {
-        if ((to && id) || (!to && !id)) {
-          this.callbacks.reportMessage(CompilerMessages.Error_DisplayNeedsToOrId({ to, id }));
+      for (const { output, keyId } of this.keyboard3.displays?.display) {
+        if ((output && keyId) || (!output && !keyId)) {
+          this.callbacks.reportMessage(CompilerMessages.Error_DisplayNeedsToOrId({ output, keyId }));
           return false;
-        } else if (to) {
-          if (tos.has(to)) {
-            this.callbacks.reportMessage(CompilerMessages.Error_DisplayIsRepeated({ to }));
+        } else if (output) {
+          if (tos.has(output)) {
+            this.callbacks.reportMessage(CompilerMessages.Error_DisplayIsRepeated({ output }));
             return false;
           } else {
-            tos.add(to);
+            tos.add(output);
           }
-        } else if (id) {
-          if (ids.has(id)) {
-            this.callbacks.reportMessage(CompilerMessages.Error_DisplayIsRepeated({ id }));
+        } else if (keyId) {
+          if (ids.has(keyId)) {
+            this.callbacks.reportMessage(CompilerMessages.Error_DisplayIsRepeated({ keyId }));
             return false;
           } else {
-            ids.add(id);
+            ids.add(keyId);
           }
         }
       }
@@ -61,12 +61,12 @@ export class DispCompiler extends SectionCompiler {
 
     // displays
     result.disps = this.keyboard3.displays?.display.map(display => ({
-      to: sections.strs.allocString(display.to, {
+      to: sections.strs.allocString(display.output, {
         stringVariables: true,
         markers: true,
         unescape: true,
       }, sections),
-      id: sections.strs.allocString(display.id), // not escaped, not substituted
+      id: sections.strs.allocString(display.keyId), // not escaped, not substituted
       display: sections.strs.allocString(display.display, {
         stringVariables: true,
         unescape: true,

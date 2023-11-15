@@ -759,9 +759,15 @@ procedure TfrmDebug.ExecuteEventAction(n: Integer);
         begin
           Assert(m >= 1);
           Assert(memo.Text[m] <> #$FFFC);
+          // Delete surrogate pairs
           if (m > 1) and
               Uni_IsSurrogate2(memo.Text[m]) and
               Uni_IsSurrogate1(memo.Text[m-1]) then
+            Dec(m, 2)
+          // Delete \r\n line breaks
+          else if (m > 1) and
+              (memo.Text[m] = #$0A) and
+              (memo.Text[m-1] = #$0D) then
             Dec(m, 2)
           else
             Dec(m);
@@ -894,7 +900,8 @@ procedure TfrmDebug.ExecuteEventAction(n: Integer);
     state: TMemoSelectionState;
   begin
     state := SaveMemoSelectionState;
-    memo.SelText := Text;
+    // Line breaks: replace \r (0x0D) with \r\n (0x0D 0x0A) so line breaks work
+    memo.SelText := ReplaceStr(Text, #$0D, #$0D#$0A);
     memo.SelStart := memo.SelStart + memo.SelLength;  // I1603
     memo.SelLength := 0;
     RealignMemoSelectionState(state);

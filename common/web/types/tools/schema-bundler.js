@@ -15,6 +15,7 @@ await esbuild.build({
     'obj/schemas/keyman-touch-layout.clean.spec.validator.cjs',
     'obj/schemas/keyman-touch-layout.spec.validator.cjs',
     'obj/schemas/keyboard_info.schema.validator.cjs',
+    'obj/schemas/kmp.schema.validator.cjs',
   ],
   bundle: true,
   format: 'esm',

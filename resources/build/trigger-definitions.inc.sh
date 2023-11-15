@@ -11,7 +11,7 @@ available_platforms=(android common_web common_windows common_mac common_linux i
 
 watch_android='web|common/models|common/predictive-text|common/web'
 watch_ios='web|common/models|common/predictive-text|common/web'
-watch_linux='core'
+watch_linux='core|common/test/keyboards/baseline'
 watch_mac='core'
 watch_web='common/models|common/predictive-text|common/web|core'
 watch_windows='common|core|web'

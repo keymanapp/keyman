@@ -1,3 +1,5 @@
+import { KMX } from "@keymanapp/common-types";
+
 export enum TRequiredKey {
   K_LOPT='K_LOPT', K_BKSP='K_BKSP', K_ENTER='K_ENTER'
 }; // I4447
@@ -8,9 +10,9 @@ export const
 // See also builder.js: specialCharacters; web/source/osk/oskKey.ts: specialCharacters
 export const
   CSpecialText10: string = '*Shift*\0*Enter*\0*Tab*\0*BkSp*\0*Menu*\0*Hide*\0*Alt*\0*Ctrl*\0*Caps*\0' +
-    '*ABC*\0*abc*\0*123*\0*Symbol*\0*Currency*\0*Shifted*\0*AltGr*\0*TabLeft*',
+    '*ABC*\0*abc*\0*123*\0*Symbol*\0*Currency*\0*Shifted*\0*AltGr*\0*TabLeft*\0',
   // these names were added in Keyman 14
-  CSpecialText14: string = '*LTREnter*\0*LTRBkSp*\0*RTLEnter*\0*RTLBkSp*\0*ShiftLock*\0*ShiftedLock*\0*ZWNJ*\0*ZWNJiOS*\0*ZWNJAndroid*',
+  CSpecialText14: string = '*LTREnter*\0*LTRBkSp*\0*RTLEnter*\0*RTLBkSp*\0*ShiftLock*\0*ShiftedLock*\0*ZWNJ*\0*ZWNJiOS*\0*ZWNJAndroid*\0',
   CSpecialText14ZWNJ: string = '*ZWNJ*\0*ZWNJiOS*\0*ZWNJAndroid*',
   CSpecialText14Map: string[][] = [
     ['*LTREnter*', '*Enter*'],
@@ -21,9 +23,29 @@ export const
     ['*ShiftedLock*', '*Shifted*'],
     ['*ZWNJ*', '<|>'],
     ['*ZWNJiOS*', '<|>'],
-    ['*ZWNJAndroid*', '<|>']
+    ['*ZWNJAndroid*', '<|>'],
+  ],
+  // these names were added in Keyman 17
+  CSpecialText17: string = '*Sp*\0*NBSp*\0*NarNBSp*\0*EnQ*\0*EmQ*\0*EnSp*\0*EmSp*\0*PunctSp*\0' +
+    '*ThSp*\0*HSp*\0*ZWSp*\0*ZWJ*\0*WJ*\0*CGJ*\0*LTRM*\0*RTLM*\0*SH*\0*HTab*\0',
+  CSpecialText17ZWNJ: string = '*ZWNJGeneric*',
+  CSpecialText17Map: string[][] = [
+    ['*ZWNJGeneric*', '<|>']
   ];
 
+  // Map for checking minimum versions and Special Text
+  export const CSpecialText = new Map<number, string>([
+    [KMX.KMXFile.VERSION_100, CSpecialText10],
+    // [KMX.KMXFile.VERSION_110, CSpecialText10], - this file version does not exist
+    // [KMX.KMXFile.VERSION_120, CSpecialText10], - this file version does not exist
+    // [KMX.KMXFile.VERSION_130, CSpecialText10], - this file version does not exist
+    [KMX.KMXFile.VERSION_140, CSpecialText14 + CSpecialText10],
+    [KMX.KMXFile.VERSION_150, CSpecialText14 + CSpecialText10],
+    [KMX.KMXFile.VERSION_160, CSpecialText14 + CSpecialText10],
+    [KMX.KMXFile.VERSION_170, CSpecialText17 + CSpecialText14 + CSpecialText10]
+  ]);
+  export const CSpecialTextMinVer = KMX.KMXFile.VERSION_100;
+  export const CSpecialTextMaxVer = KMX.KMXFile.VERSION_170;
 
 // These correspond to TSS_ values in kmx.ts
 export const
