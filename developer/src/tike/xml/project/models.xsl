@@ -162,11 +162,13 @@
         <xsl:with-param name="command">keyman:openbuildfolder?id=<xsl:value-of select="ID" />
         </xsl:with-param>
       </xsl:call-template>
-      <xsl:call-template name="menuitem">
-        <xsl:with-param name="caption">Remove from Project</xsl:with-param>
-        <xsl:with-param name="command">keyman:removefile?id=<xsl:value-of select="ID" />
-        </xsl:with-param>
-      </xsl:call-template>
+      <xsl:if test="KeymanDeveloperProject/Options/Version != '2.0' or not(KeymanDeveloperProject/Options/Version)">
+        <xsl:call-template name="menuitem">
+          <xsl:with-param name="caption">Remove from Project</xsl:with-param>
+          <xsl:with-param name="command">keyman:removefile?id=<xsl:value-of select="ID" />
+          </xsl:with-param>
+        </xsl:call-template>
+      </xsl:if>
     </div>
   </xsl:template>
 
@@ -193,11 +195,13 @@
         <xsl:with-param name="command">keyman:opencontainingfolder?id=<xsl:value-of select="ID" />
         </xsl:with-param>
       </xsl:call-template>
-      <xsl:call-template name="menuitem">
-        <xsl:with-param name="caption">Remove from Project</xsl:with-param>
-        <xsl:with-param name="command">keyman:removefile?id=<xsl:value-of select="ID" />
-        </xsl:with-param>
-      </xsl:call-template>
+      <xsl:if test="/KeymanDeveloperProject/Options/Version != '2.0' or not(/KeymanDeveloperProject/Options/Version)">
+        <xsl:call-template name="menuitem">
+          <xsl:with-param name="caption">Remove from Project</xsl:with-param>
+          <xsl:with-param name="command">keyman:removefile?id=<xsl:value-of select="ID" />
+          </xsl:with-param>
+        </xsl:call-template>
+      </xsl:if>
     </div>
   </xsl:template>
 </xsl:stylesheet>

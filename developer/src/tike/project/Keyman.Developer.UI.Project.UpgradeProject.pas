@@ -44,7 +44,8 @@ begin
     Exit;
   end;
 
-  case MessageDlg('The current project can be upgraded to Keyman Developer 17.0 format. Do you wish to upgrade it (recommended)?',
+  case MessageDlg('The current project can be upgraded to Keyman Developer 17.0 format. Do you wish to upgrade it (recommended)?'#13#10#13#10+
+      'Note: upgraded projects will not be readable by older versions of Keyman Developer.',
       mtConfirmation, mbYesNoCancel, 0) of
     mrNo: Exit;
     mrCancel: Exit(urCancelled);
