@@ -661,15 +661,16 @@ public final class KMManager {
     keyboard.addJavascriptInterface(new KMKeyboardJSHandler(appContext, keyboard), "jsInterface");
     keyboard.loadKeyboard();
 
-    // For apps that don't specify an HTML banner, specify a default phone/tablet HTML banner
-    if (getFormFactor() == FormFactor.PHONE) {
-      keyboard.setHTMLBanner(KMBLACK_BANNER);
-    } else {
-      keyboard.setHTMLBanner(KMGRAY_BANNER);
+    if (!isTestMode()) {
+      // For apps that don't specify an HTML banner, specify a default phone/tablet HTML banner
+      if (getFormFactor() == FormFactor.PHONE) {
+        keyboard.setHTMLBanner(KMBLACK_BANNER);
+      } else {
+        keyboard.setHTMLBanner(KMGRAY_BANNER);
+      }
+      keyboard.setBanner(KMManager.BannerType.HTML);
+      keyboard.showBanner(true);
     }
-    keyboard.setBanner(KMManager.BannerType.HTML);
-    keyboard.showBanner(true);
-
     setEngineWebViewVersionStatus(appContext, keyboard);
   }
 
@@ -1421,7 +1422,7 @@ public final class KMManager {
    * @return boolean - Success
    */
   public static boolean setBannerOptions(boolean mayPredict) {
-    String url = KMString.format("setBannerOptions(%b)", mayPredict);
+    String url = KMString.format("setBannerOptions(%s)", mayPredict);
     if (InAppKeyboard != null) {
       InAppKeyboard.loadJavascript(url);
     }
