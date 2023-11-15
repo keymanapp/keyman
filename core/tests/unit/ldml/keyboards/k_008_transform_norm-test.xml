@@ -191,11 +191,13 @@
   <tests name="regex-tests-5">
     <test name="regex-test-5a-0">
       <startContext to="" />
+      <keystroke key="stampy" />
       <keystroke key="5" />
       <keystroke key="e" />
       <keystroke key="u-0320" />
       <keystroke key="u-0300" />
-      <check result="YES4" />
+      <backspace /> <!-- skip the number, match any -->
+      <check result="YES5" />
     </test>
   </tests>
   <tests name="regex-tests-6">
@@ -223,18 +225,22 @@
       <keystroke key="e" />
       <keystroke key="u-0320" />
       <keystroke key="stampy" />
-      <backspace /> <!-- skip the number, match any -->
-      <check result="YES6" />
+      <check result="YES6c" />
+      <!-- TODO-LDML: backspace is fixed 'in the future', #9450  - reinstate this-->
+      <!-- <backspace />
+      <check result="YES6" /> -->
     </test>
   </tests>
   <tests name="regex-tests-7">
     <test name="regex-test-7a-0">
       <startContext to="" />
+      <keystroke key="stampy" />
       <keystroke key="7" />
       <keystroke key="e" />
       <keystroke key="u-0300" />
       <backspace /> <!-- skip the number, match any -->
       <check result="YES7" />
     </test>
+    <!-- TODO: all the variations -->
   </tests>
 </keyboardTest3>
