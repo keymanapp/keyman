@@ -527,8 +527,11 @@ export class SuggestionBanner extends Banner {
     const textStyle = getComputedStyle(this.options[0].container.firstChild as HTMLSpanElement);
 
     const targetWidth = this.width / SuggestionBanner.LONG_SUGGESTION_DISPLAY_LIMIT;
-    const textLeftPad = new ParsedLengthStyle(textStyle.paddingLeft   || '2px');   // computedStyle will fail if the element's not in the DOM yet.
-    const textRightPad = new ParsedLengthStyle(textStyle.paddingRight || '2px');
+
+    // computedStyle will fail if the element's not in the DOM yet.
+    // Seeks to get the values specified within kmwosk.css.
+    const textLeftPad = new ParsedLengthStyle(textStyle.paddingLeft   || '4px');
+    const textRightPad = new ParsedLengthStyle(textStyle.paddingRight || '4px');
 
     let optionFormat: BannerSuggestionFormatSpec = {
       paddingWidth: textLeftPad.val + textRightPad.val, // Assumes fixed px padding.
