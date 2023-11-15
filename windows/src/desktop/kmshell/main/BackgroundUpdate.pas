@@ -12,7 +12,7 @@
 
   Bugs:
   Todo:
-  Notes:
+  Notes: For the state diagram in mermaid mdgit stat ../BackgroundUpdateStateDiagram.md
   History:
 *)
 unit BackgroundUpdate;
@@ -38,6 +38,7 @@ type
   TBackgroundUpdateResult = (oucUnknown, oucShutDown, oucSuccess, oucNoUpdates, oucUpdatesAvailable, oucFailure, oucOffline);
 
   TUpdateState = (usIdle, usUpdateAvailable, usDownloading, usWaitingRestart, usInstalling, usRetry, usWaitingPostInstall);
+
   { Keyboard Package Params }
   TBackgroundUpdateParamsPackage = record
     ID: string;
@@ -90,7 +91,7 @@ type
     procedure Exit; virtual; abstract;
     procedure HandleCheck; virtual; abstract;
     procedure HandleDownload; virtual; abstract;
-    procedure HandleKmShell; virtual; abstract;
+    function HandleKmShell : Integer; virtual; abstract;
     procedure HandleInstall; virtual; abstract;
     procedure HandleMSIInstallComplete; virtual; abstract;
     procedure HandleAbort; virtual; abstract;
@@ -107,7 +108,7 @@ type
     procedure Exit; override;
     procedure HandleCheck; override;
     procedure HandleDownload; override;
-    procedure HandleKmShell; override;
+    function HandleKmShell : Integer; override;
     procedure HandleInstall; override;
     procedure HandleMSIInstallComplete; override;
     procedure HandleAbort; override;
@@ -120,7 +121,7 @@ type
     procedure Exit; override;
     procedure HandleCheck; override;
     procedure HandleDownload; override;
-    procedure HandleKmShell; override;
+    function HandleKmShell : Integer; override;
     procedure HandleInstall; override;
     procedure HandleMSIInstallComplete; override;
     procedure HandleAbort; override;
@@ -174,7 +175,7 @@ type
     procedure Exit; override;
     procedure HandleCheck; override;
     procedure HandleDownload; override;
-    procedure HandleKmShell; override;
+    function  HandleKmShell : Integer; override;
     procedure HandleInstall; override;
     procedure HandleMSIInstallComplete; override;
     procedure HandleAbort; override;
@@ -187,7 +188,7 @@ type
     procedure Exit; override;
     procedure HandleCheck; override;
     procedure HandleDownload; override;
-    procedure HandleKmShell; override;
+    function  HandleKmShell : Integer; override;
     procedure HandleInstall; override;
     procedure HandleMSIInstallComplete; override;
     procedure HandleAbort; override;
@@ -212,7 +213,7 @@ type
     procedure Exit; override;
     procedure HandleCheck; override;
     procedure HandleDownload; override;
-    procedure HandleKmShell; override;
+    function  HandleKmShell : Integer; override;
     procedure HandleInstall; override;
     procedure HandleMSIInstallComplete; override;
     procedure HandleAbort; override;
@@ -225,7 +226,7 @@ type
     procedure Exit; override;
     procedure HandleCheck; override;
     procedure HandleDownload; override;
-    procedure HandleKmShell; override;
+    function  HandleKmShell : Integer; override;
     procedure HandleInstall; override;
     procedure HandleMSIInstallComplete; override;
     procedure HandleAbort; override;
@@ -238,7 +239,7 @@ type
     procedure Exit; override;
     procedure HandleCheck; override;
     procedure HandleDownload; override;
-    procedure HandleKmShell; override;
+    function  HandleKmShell : Integer; override;
     procedure HandleInstall; override;
     procedure HandleMSIInstallComplete; override;
     procedure HandleAbort; override;
@@ -275,6 +276,7 @@ type
     FWaitingPostInstall: WaitingPostInstallState;
     function GetState: TStateClass;
     procedure SetState(const Value: TStateClass);
+    function ConvertEnumState(const TEnumState: TUpdateState): TStateClass;
 
     procedure ShutDown;
 
@@ -298,6 +300,7 @@ type
     destructor Destroy; override;
 
     procedure   HandleCheck;
+    function    HandleKmShell : Integer;
     procedure   HandleDownload;
     procedure   HandleInstall;
     procedure   HandleMSIInstallComplete;
@@ -352,10 +355,13 @@ uses
 
 const
   SPackageUpgradeFilename = 'upgrade_packages.inf';
+  kmShellContinue = 0;
+  kmShellExit = 1;
 
 { TBackgroundUpdate }
 
 constructor TBackgroundUpdate.Create(AOwner: TCustomForm; AForce, ASilent: Boolean);
+var TSerailsedState : TUpdateState;
 begin
   inherited Create;
 
@@ -374,9 +380,8 @@ begin
   FInstalling := InstallingState.Create(Self);
   FRetry := RetryState.Create(Self);
   FWaitingPostInstall := WaitingPostInstallState.Create(Self);
-  state := IdleState;
-
-
+  // Check the Registry setting.
+  state := ConvertEnumState(CheckRegistryState);
   KL.Log('TBackgroundUpdate.Create');
 end;
 
@@ -594,9 +599,30 @@ begin
 
 end;
 
+function TBackgroundUpdate.ConvertEnumState(const TEnumState: TUpdateState) : TStateClass;
+begin
+  case  TEnumState of
+    usIdle: Result := IdleState;
+    usUpdateAvailable: Result := UpdateAvailableState;
+    usDownloading: Result := DownloadingState;
+    usWaitingRestart: Result := WaitingRestartState;
+    usInstalling: Result := InstallingState;
+    usRetry: Result := RetryState;
+    usWaitingPostInstall: Result := WaitingPostInstallState;
+  else
+    // Log error unknown state setting to idle
+    Result := IdleState;
+  end;
+end;
+
 procedure TBackgroundUpdate.HandleCheck;
 begin
   CurrentState.HandleCheck;
+end;
+
+function TBackgroundUpdate.HandleKmShell;
+begin
+  Result := CurrentState.HandleKmShell;
 end;
 
 procedure TBackgroundUpdate.HandleDownload;
@@ -673,9 +699,10 @@ begin
   // Implement your logic here
 end;
 
-procedure IdleState.HandleKmShell;
+function IdleState.HandleKmShell;
 begin
   // Implement your logic here
+  Result := kmShellContinue;
 end;
 
 procedure IdleState.HandleInstall;
@@ -726,9 +753,13 @@ begin
   ChangeState(DownloadingState);
 end;
 
-procedure UpdateAvailableState.HandleKmShell;
+function UpdateAvailableState.HandleKmShell;
 begin
-  // Implement your logic here
+  if bucStateContext.FAuto then
+  begin
+    bucStateContext.CurrentState.HandleDownload ;
+  end;
+  Result := kmShellContinue;
 end;
 
 procedure UpdateAvailableState.HandleInstall;
@@ -762,7 +793,10 @@ begin
   DownloadResult := DownloadUpdatesBackground;
   if DownloadResult then
   begin
-    ChangeState(InstallingState);
+    if bucStateContext.IsKeymanRunning then
+      ChangeState(WaitingRestartState)
+    else
+      ChangeState(InstallingState);
   end
   else
   begin
@@ -786,9 +820,20 @@ begin
   // We are already downloading do nothing
 end;
 
-procedure DownloadingState.HandleKmShell;
+function DownloadingState.HandleKmShell;
+var DownloadResult : Boolean;
 begin
-  // Implement your logic here
+  DownloadResult := DownloadUpdatesBackground;
+  // TODO check if keyman is running then send to Waiting Restart
+  if DownloadResult then
+  begin
+    ChangeState(InstallingState);
+  end
+  else
+  begin
+    ChangeState(RetryState);
+  end;
+  Result := kmShellContinue;
 end;
 
 procedure DownloadingState.HandleInstall;
@@ -902,9 +947,13 @@ begin
   // Implement your logic here
 end;
 
-procedure WaitingRestartState.HandleKmShell;
+function WaitingRestartState.HandleKmShell;
 begin
-  // Implement your logic here
+  // Check downloaded cache if available then
+  // change state intalling
+  // else then change to idle and handle checkupdates state
+  bucStateContext.SetRegistryState(usUpdateAvailable);
+  Result := kmShellContinue;
 end;
 
 procedure WaitingRestartState.HandleInstall;
@@ -976,7 +1025,11 @@ begin
     //Exit(False);
 
   if not FResult then
-    // Log messageShowMessage(SysErrorMessage(GetLastError));
+  begin
+     KL.Log('TBackgroundUpdate.InstallingState.DoInstall: Result = '+IntToStr(Ord(FResult)));
+     // Log messageShowMessage(SysErrorMessage(GetLastError));
+  end;
+
   Result := FResult;
 end;
 
@@ -1006,13 +1059,14 @@ begin
     // to installing the main keyman executable.
     if DoInstallKeyman(SavePath + ExtractFileName(fileName)) then
     begin
-       ChangeState(WaitingPostInstallState)
+       KL.Log('TBackgroundUpdate.InstallingState.Enter: DoInstall OK');
     end
     else
     begin
         // TODO: clean failed download
         // TODO: Do we do a retry on install? probably not
         // install error log the error.
+        KL.Log('TBackgroundUpdate.InstallingState.Enter: DoInstall fail');
         ChangeState(IdleState);
     end
 end;
@@ -1032,9 +1086,10 @@ begin
   // Implement your logic here
 end;
 
-procedure InstallingState.HandleKmShell;
+function InstallingState.HandleKmShell;
 begin
-  // Implement your logic here
+  // Result = exit straight away as we are installing (MSI installer)
+  Result := kmShellExit;
 end;
 
 procedure InstallingState.HandleInstall;
@@ -1081,9 +1136,10 @@ begin
   // Implement your logic here
 end;
 
-procedure RetryState.HandleKmShell;
+function RetryState.HandleKmShell;
 begin
-  // Implement your logic here
+  // TODO Implement retry
+  Result := kmShellContinue
 end;
 
 procedure RetryState.HandleInstall;
@@ -1130,9 +1186,12 @@ begin
   // Handle Download
 end;
 
-procedure WaitingPostInstallState.HandleKmShell;
+function WaitingPostInstallState.HandleKmShell;
 begin
-  // Handle KmShell
+  // TODO maybe have a counter if we get called in this state
+  // to many time we need
+  HandleMSIInstallComplete;
+  Result := kmShellContinue;
 end;
 
 procedure WaitingPostInstallState.HandleInstall;

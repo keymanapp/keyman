@@ -445,27 +445,20 @@ begin
 
   with TBackgroundUpdate.Create(nil, True, True) do
     try
-      UpdateState := CheckRegistryState;
+      if (FMode = fmBackgroundUpdateCheck) then
+      begin
+        HandleCheck;
+        Exit;
+      end
+      else
+      begin
+        if HandleKmShell = 1 then
+          Exit;
+      end;
     finally
       Free;
     end;
-  if ((FMode = fmBackgroundUpdateCheck) or (UpdateState <> usIdle)) then
-  begin
-    /// Moving this to OnlineUpdateCheck
-    KL.Log('initprog fmBackgroundUpdateCheck');
-    with TBackgroundUpdate.Create(nil, True, True) do
-    try
-      HandleCheck;
-    finally
-      Free;
-    end;
-//    with TOnlineUpdateCheck.Create(nil, True, True) do
-//    try
-//      ProcessBackgroundInstall
-//    finally
-//      Free;
-//    end;
-  end;
+
 
   if not FSilent or (FMode = fmUpgradeMnemonicLayout) then   // I4553
   begin
