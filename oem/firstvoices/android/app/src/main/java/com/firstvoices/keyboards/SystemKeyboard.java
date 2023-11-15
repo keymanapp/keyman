@@ -20,6 +20,7 @@ import android.view.inputmethod.ExtractedTextRequest;
 import android.view.inputmethod.InputConnection;
 import android.widget.FrameLayout;
 
+import com.firstvoices.android.BannerController;
 import com.keyman.engine.KMManager;
 import com.keyman.engine.KMManager.KeyboardType;
 import com.keyman.engine.KMHardwareKeyboardInterpreter;
@@ -33,9 +34,6 @@ import io.sentry.android.core.SentryAndroid;
 import io.sentry.Sentry;
 
 public class SystemKeyboard extends InputMethodService implements OnKeyboardEventListener {
-    public static final String FV_BANNER_THEME_GOLD =
-      "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADsAAAApCAYAAACLO1EjAAAABHNCSVQICAgIfAhkiAAAABl0RVh0U29mdHdhcmUAZ25vbWUtc2NyZWVuc2hvdO8Dvz4AAAAtdEVYdENyZWF0aW9uIFRpbWUAVGh1IDI2IE9jdCAyMDIzIDA4OjE0OjE5IEFNICswN115VJ8AAABRSURBVGiB7c8BEYAgAMBAIIspKWRMbaF3zz7BNu99PeMQ6++ALzWralbVrKpZVbOqZlXNqppVNatqVtWsqllVs6pmVc2qmlU1q2pW1azqqNkXOKcClnCmxkcAAAAASUVORK5CYII=";
-
     private View inputView = null;
     private static ExtractedText exText = null;
     private KMHardwareKeyboardInterpreter interpreter = null;
@@ -67,8 +65,8 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
         interpreter = new KMHardwareKeyboardInterpreter(getApplicationContext(), KeyboardType.KEYBOARD_TYPE_SYSTEM);
         KMManager.setInputMethodService(this); // for HW interface
 
-        KMManager.setBannerImage(KeyboardType.KEYBOARD_TYPE_SYSTEM, FV_BANNER_THEME_GOLD);
-        KMManager.setBanner(KeyboardType.KEYBOARD_TYPE_SYSTEM, KMManager.BannerType.IMAGE);
+        // Set the system keyboard HTML banner
+        BannerController.setHTMLBanner(this, KeyboardType.KEYBOARD_TYPE_SYSTEM);
     }
 
     @Override

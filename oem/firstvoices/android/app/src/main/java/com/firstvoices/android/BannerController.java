@@ -1,4 +1,4 @@
-package com.keyman.android;
+package com.firstvoices.android;
 
 import android.content.Context;
 
@@ -10,8 +10,8 @@ import java.io.File;
 public class BannerController {
 
   // Paths relative to assets folder for banner themes
-  public static final String KM_BANNER_THEME_KEYMAN = "svg/banner.html";
-  public static final String KM_BANNER_THEME_KEYMAN_SVG = "svg/keyman_banner.svg";
+  public static final String BANNER_THEME_FV = "svg/banner.html";
+  public static final String BANNER_THEME_FV_SVG = "svg/teal-logo.svg";
 
 
   public static void setHTMLBanner(Context context, KMManager.KeyboardType keyboardType) {
@@ -19,11 +19,11 @@ public class BannerController {
       return;
     }
 
-    // Always use Keyman banner theme
-    String contents = FileUtils.readContents(context, KM_BANNER_THEME_KEYMAN);
+    // Always use FirstVoices banner theme
+    String contents = FileUtils.readContents(context, BANNER_THEME_FV);
 
     // If $BANNER string exists, replace with actual path
-    File bannerPath = new File(KMManager.getResourceRoot(), KM_BANNER_THEME_KEYMAN_SVG);
+    File bannerPath = new File(KMManager.getResourceRoot(), BANNER_THEME_FV_SVG);
     if (bannerPath.exists()) {
       contents = contents.replace("$BANNER", bannerPath.getAbsolutePath());
     }
