@@ -617,8 +617,6 @@ begin
 end;
 
 procedure TProjectFile.Load(node: IXMLNode);   // I4698
-var
-  i: Integer;
 begin
   if node.ChildNodes.IndexOf('ID') >= 0 then
     FID := CleanID(VarToWideStr(node.ChildValues['ID']));
@@ -651,8 +649,6 @@ begin
 end;
 
 procedure TProjectFile.Save(node: IXMLNode);   // I4698
-var
-  I: Integer;
 begin
   node.AddChild('ID').NodeValue := FID;
   node.AddChild('Filename').NodeValue := ExtractFileName(FFileName);
@@ -1019,6 +1015,7 @@ function TProject.CanUpgrade: Boolean;
 var
   i: Integer;
   Path: string;
+  SourcePath: string;
 begin
   if FOptions.Version = pv20 then
   begin
@@ -1043,6 +1040,8 @@ begin
     FUpgradeMessages.Add('The BuildPath project setting contains the "$VERSION" tag, which is no longer supported');
   end;
 
+  SourcePath := '?';
+
   for i := 0 to Files.Count - 1 do
   begin
     if Assigned(Files[i].Parent) then
@@ -1051,6 +1050,21 @@ begin
     end;
 
     Path := ExtractRelativePath(FileName, Files[i].FileName);
+
+    // Ensure all compileable files
+    if Files[i].IsCompilable then
+    begin
+      if SourcePath = '?' then
+      begin
+        SourcePath := ExtractFileDir(Path)
+      end
+      else if not SameFileName(SourcePath, ExtractFileDir(Path)) then
+      begin
+        FUpgradeMessages.Add('File '+Files[i].FileName+' is not in the same folder as at least one other source file. All primary source files must be in the same folder.');
+        Result := False;
+      end;
+    end;
+
     if IsRelativePath(Path) and not Path.StartsWith('..') then
     begin
       // Path is in same folder or a subfolder of the project
@@ -1074,8 +1088,17 @@ begin
 
   Options.Version := pv20;
 
-  if DirectoryExists(ExtractFilePath(FileName) + 'source') then
-    Options.SourcePath := '$PROJECTPATH\source';
+  // Set location of all source files, default to 'source' if no source files
+  // are present in the project
+  Options.SourcePath := '$PROJECTPATH\source';
+  for i := 0 to Files.Count - 1 do
+  begin
+    if Files[i].IsCompilable then
+    begin
+      Options.SourcePath := '$PROJECTPATH\' + ExtractFileDir(ExtractRelativePath(FFileName, Files[i].FileName));
+      Break;
+    end;
+  end;
 
   for i := Files.Count - 1 downto 0 do
   begin

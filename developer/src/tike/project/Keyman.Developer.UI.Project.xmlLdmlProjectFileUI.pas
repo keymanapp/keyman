@@ -21,7 +21,6 @@ type
   TxmlLdmlProjectFileUI = class(TOpenableProjectFileUI)
   private
     function TestKeymanWeb(FSilent: Boolean): Boolean;
-    function DebugKeyboard(FSilent: Boolean): Boolean;
     function InstallKeyboard: Boolean;
     function UninstallKeyboard: Boolean;
     function GetProjectFile: TxmlLdmlProjectFileAction;
@@ -232,15 +231,6 @@ end;
 function TxmlLdmlProjectFileUI.UninstallKeyboard: Boolean;
 begin
   Result := KeymanDeveloperUtils.UninstallKeyboard(ChangeFileExt(ExtractFileName(ProjectFile.FileName), ''));
-end;
-
-function TxmlLdmlProjectFileUI.DebugKeyboard(FSilent: Boolean): Boolean;
-var
-  editor: TfrmLdmlKeyboardEditor;
-begin
-  editor := frmKeymanDeveloper.OpenEditor(ProjectFile.FileName, TfrmLdmlKeyboardEditor) as TfrmLdmlKeyboardEditor;
-//  editor.StartDebugging;
-  Result := True;
 end;
 
 function TxmlLdmlProjectFileUI.TestKeyboardState(FCompiledName: string; FSilent: Boolean): Boolean;
