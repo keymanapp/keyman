@@ -4,6 +4,7 @@ import * as kmcLdml from '@keymanapp/kmc-ldml';
 import { KvkFileWriter, CompilerCallbacks, LDMLKeyboardXMLSourceFileReader, CompilerOptions, defaultCompilerOptions, KeymanFileTypes } from '@keymanapp/common-types';
 import { BuildActivity } from './BuildActivity.js';
 import { fileURLToPath } from 'url';
+import { InfrastructureMessages } from '../../messages/infrastructureMessages.js';
 
 export class BuildLdmlKeyboard extends BuildActivity {
   public get name(): string { return 'LDML keyboard'; }
@@ -20,21 +21,32 @@ export class BuildLdmlKeyboard extends BuildActivity {
     const outFileBase = path.basename(fileBaseName, path.extname(fileBaseName));
     const outFileDir = path.dirname(fileBaseName);
 
+    try {
+      fs.mkdirSync(outFileDir, {recursive: true});
+    } catch(e) {
+      callbacks.reportMessage(InfrastructureMessages.Error_CannotCreateFolder({folderName:outFileDir, e}));
+      return false;
+    }
+
     if(kmx && kvk) {
       const outFileKmx = path.join(outFileDir, outFileBase + KeymanFileTypes.Binary.Keyboard);
+      // TODO: console needs to be replaced with InfrastructureMessages
       console.log(`Writing compiled keyboard to ${outFileKmx}`);
       fs.writeFileSync(outFileKmx, kmx);
 
       const outFileKvk = path.join(outFileDir, outFileBase + KeymanFileTypes.Binary.VisualKeyboard);
+      // TODO: console needs to be replaced with InfrastructureMessages
       console.log(`Writing compiled visual keyboard to ${outFileKvk}`);
       fs.writeFileSync(outFileKvk, kvk);
     } else {
+      // TODO: console needs to be replaced with InfrastructureMessages
       console.error(`An error occurred compiling ${infile}`);
       return false;
     }
 
     if(kmw) {
       const outFileKmw = path.join(outFileDir, outFileBase + KeymanFileTypes.Binary.WebKeyboard);
+      // TODO: console needs to be replaced with InfrastructureMessages
       console.log(`Writing compiled js keyboard to ${outFileKmw}`);
       fs.writeFileSync(outFileKmw, kmw);
     }
