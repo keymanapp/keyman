@@ -46,6 +46,8 @@
         </div>
       </div>
 
+      <xsl:call-template name="upgrade-warning" />
+
       <div style="padding: 0 10px 10px 10px;">
         <xsl:call-template name="button">
           <xsl:with-param name="caption">Open project folder</xsl:with-param>

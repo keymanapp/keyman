@@ -112,6 +112,7 @@ uses
   Keyman.Developer.System.Project.Project,
   Keyman.Developer.UI.Project.ProjectUI,
   Keyman.Developer.UI.Project.ProjectFileUI,
+  keyman.Developer.UI.Project.UpgradeProject,
   Keyman.Developer.System.Project.ProjectFileType,
   typinfo,
   ErrorControlledRegistry,
@@ -343,6 +344,8 @@ begin
     modActionsMain.actProjectNew.Execute
   else if Command = 'openproject' then
     modActionsMain.actProjectOpen.Execute
+  else if Command = 'openprojectfolder' then
+    modActionsMain.actProjectOpenFolder.Execute
   else if Command = 'editfile' then // MRU
   begin
     if SelectedMRUFileName <> '' then
@@ -569,6 +572,11 @@ begin
     ClearMessages;
     pf := SelectedProjectFile;
     if Assigned(pf) then (pf.UI as TProjectFileUI).DoAction(pfaCompile, False);
+  end
+  else if Command = 'upgradeproject' then
+  begin
+    TryUpgradeProject(FGlobalProject);
+    ProjectRefresh(nil);
   end
   else if Command = 'checkforupdates' then
   begin

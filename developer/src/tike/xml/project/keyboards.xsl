@@ -68,17 +68,21 @@
         </div>
       </div>
 
+      <xsl:call-template name="upgrade-warning" />
+
       <div class='filelist' id="keyboardlist">
         <xsl:call-template name="button">
           <xsl:with-param name="caption">New keyboard...</xsl:with-param>
           <xsl:with-param name="command">keyman:fileaddnew?type=keyboard</xsl:with-param>
           <xsl:with-param name="width">auto</xsl:with-param>
         </xsl:call-template>
-        <xsl:call-template name="button">
-          <xsl:with-param name="caption">Add existing keyboard...</xsl:with-param>
-          <xsl:with-param name="command">keyman:fileaddexisting?type=keyboard</xsl:with-param>
-          <xsl:with-param name="width">auto</xsl:with-param>
-        </xsl:call-template>
+        <xsl:if test="KeymanDeveloperProject/Options/Version != '2.0' or not(KeymanDeveloperProject/Options/Version)">
+          <xsl:call-template name="button">
+            <xsl:with-param name="caption">Add existing keyboard...</xsl:with-param>
+            <xsl:with-param name="command">keyman:fileaddexisting?type=keyboard</xsl:with-param>
+            <xsl:with-param name="width">auto</xsl:with-param>
+          </xsl:call-template>
+        </xsl:if>
         |
         <xsl:call-template name="button">
           <xsl:with-param name="caption">Build all</xsl:with-param>

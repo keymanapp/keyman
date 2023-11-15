@@ -57,6 +57,10 @@
                 <xsl:with-param name="caption">Open Existing Project...</xsl:with-param>
                 <xsl:with-param name="command">keyman:openproject</xsl:with-param>
               </xsl:call-template>
+              <xsl:call-template name="button">
+                <xsl:with-param name="caption">Open Existing Project Folder...</xsl:with-param>
+                <xsl:with-param name="command">keyman:openprojectfolder</xsl:with-param>
+              </xsl:call-template>
             </div>
           </div>
 

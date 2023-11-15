@@ -56,17 +56,21 @@
         </div>
       </div>
 
+      <xsl:call-template name="upgrade-warning" />
+
       <div class='filelist' id="modellist">
         <xsl:call-template name="button">
           <xsl:with-param name="caption">New model...</xsl:with-param>
           <xsl:with-param name="command">keyman:fileaddnew?type=model</xsl:with-param>
           <xsl:with-param name="width">auto</xsl:with-param>
         </xsl:call-template>
-        <xsl:call-template name="button">
-          <xsl:with-param name="caption">Add existing model...</xsl:with-param>
-          <xsl:with-param name="command">keyman:fileaddexisting?type=model</xsl:with-param>
-          <xsl:with-param name="width">auto</xsl:with-param>
-        </xsl:call-template>
+        <xsl:if test="KeymanDeveloperProject/Options/Version != '2.0' or not(KeymanDeveloperProject/Options/Version)">
+          <xsl:call-template name="button">
+            <xsl:with-param name="caption">Add existing model...</xsl:with-param>
+            <xsl:with-param name="command">keyman:fileaddexisting?type=model</xsl:with-param>
+            <xsl:with-param name="width">auto</xsl:with-param>
+          </xsl:call-template>
+        </xsl:if>
         |
         <xsl:call-template name="button">
           <xsl:with-param name="caption">Build all</xsl:with-param>
