@@ -25,6 +25,7 @@ type
     FProjectType: TKeymanProjectType;
     FTargets: TKeymanTargets;
     FFullCopyright: string;
+    FDescription: string;
 
   protected
     const
@@ -61,6 +62,7 @@ type
     property Targets: TKeymanTargets read FTargets;
 
     property Name: string read FName write FName;
+    property Description: string read FDescription write FDescription;
     property Copyright: string read FCopyright write FCopyright;
     property FullCopyright: string read FFullCopyright write FFullCopyright;
     property Author: string read FAuthor write FAuthor;
@@ -235,10 +237,12 @@ begin
   end;
 
   s := ReplaceStr(s, '$NAME', FName);
+  s := ReplaceStr(s, '$ID', FId);
   s := ReplaceStr(s, '$VERSION', FVersion);
   s := ReplaceStr(s, '$COPYRIGHT', FCopyright);
   s := ReplaceStr(s, '$FULLCOPYRIGHT', FFullCopyright);
   s := ReplaceStr(s, '$AUTHOR', FAuthor);
+  s := ReplaceStr(s, '$DESCRIPTION', FDescription);
   s := ReplaceStr(s, '$DATE', FormatDateTime('yyyy-mm-dd', Now));
   if Pos('$LANGUAGES_KEYBOARD_INFO', s) > 0 then
     s := ReplaceStr(s, '$LANGUAGES_KEYBOARD_INFO', GetLanguageTagListForKeyboardInfo);
