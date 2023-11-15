@@ -265,6 +265,7 @@ uses
   Keyman.System.KeyboardUtils,
   Keyman.Developer.System.Project.Project,
   Keyman.Developer.System.Project.ProjectFileType,
+  Keyman.Developer.System.Project.ProjectLoader,
   Keyman.Developer.System.ServerAPI,
   Keyman.Developer.UI.Project.ProjectFileUI,
   Keyman.Developer.UI.Project.ProjectUI,
@@ -613,7 +614,18 @@ begin
     if not SaveAndCloseAllFiles then Exit;
     FreeGlobalProjectUI;
   end;
-  LoadGlobalProjectUI(ptUnknown, FileName);   // I4687
+  try
+    LoadGlobalProjectUI(ptUnknown, FileName);   // I4687
+  except
+    on E:EProjectLoader do
+    begin
+      // Message will be displayed by LoadGlobalProjectUI
+      FreeGlobalProjectUI;
+      frmKeymanDeveloper.ShowProject;
+      frmKeymanDeveloper.UpdateCaption;
+      Exit;
+    end;
+  end;
   frmKeymanDeveloper.ProjectMRU.Add(FGlobalProject.FileName);
   frmKeymanDeveloper.ShowProject;
   frmKeymanDeveloper.UpdateCaption;

@@ -86,7 +86,7 @@ type
   TProjectState = (psCreating, psReady, psLoading, psSaving, psDestroying);
   TProjectType = (ptUnknown, ptKeyboard, ptLexicalModel); // distinct from utilfiletypes.TKeymanProjectType
 
-  TProjectVersion = (pv10, pv20);
+  TProjectVersion = (pvUnknown, pv10, pv20);
 
   TProjectOptionsRecord = record
     BuildPath: string;
@@ -114,7 +114,17 @@ type
     function EqualsRecord(source: TProjectOptionsRecord): Boolean;
   end;
 
-const DefaultProjectOptions: array[TProjectVersion] of TProjectOptionsRecord = ((
+const DefaultProjectOptions: array[TProjectVersion] of TProjectOptionsRecord = (
+( // unknown version, this is unused
+  BuildPath: '';
+  SourcePath: '';
+  CompilerWarningsAsErrors: False;
+  WarnDeprecatedCode: False;
+  CheckFilenameConventions: False;
+  SkipMetadatafiles: False;
+  ProjectType: ptKeyboard;
+  Version: pvUnknown
+), ( // 1.0
   BuildPath: '';
   SourcePath: '';
   CompilerWarningsAsErrors: False;
@@ -123,7 +133,7 @@ const DefaultProjectOptions: array[TProjectVersion] of TProjectOptionsRecord = (
   SkipMetadatafiles: True;
   ProjectType: ptKeyboard;
   Version: pv10
-), (
+), ( // 2.0
   BuildPath: '$PROJECTPATH/build';
   SourcePath: '$PROJECTPATH/source';
   CompilerWarningsAsErrors: False;
@@ -1472,12 +1482,13 @@ function ProjectVersionFromString(s: string): TProjectVersion;
 begin
   if SameText(s, '1.0') then Result := pv10
   else if SameText(s, '2.0') then Result := pv20
-  else Result := pv10; // TODO is this adequate?
+  else Result := pvUnknown;
 end;
 
 function ProjectVersionToString(pv: TProjectVersion): string;
 begin
   case pv of
+    pvUnknown: Result := '';
     pv10: Result := '1.0';
     pv20: Result := '2.0';
   end;
