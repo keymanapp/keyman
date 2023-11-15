@@ -9,8 +9,34 @@ import { GestureHandler } from '../gestureHandler.js';
 import { CorrectionLayout, CorrectionLayoutEntry, distributionFromDistanceMaps, keyTouchDistances } from '@keymanapp/input-processor';
 import { GestureParams } from '../specsForLayout.js';
 
+/**
+ * The fraction of the base key's height to add to an unconstrained subkey-menu
+ * callout.
+ */
+const CALLOUT_ROW_HEIGHT_RATIO = 0.2;
+
+/**
+ * The max fraction of a base key's width to use for a subkey-menu callout
+ */
+const MAX_CALLOUT_KEY_WIDTH = 1.2;
+
+/**
+ * Space to keep between the top of the base key and the bottom of the subkey menu,
+ * if possible.
+ */
 const SUBKEY_MENU_VERT_OFFSET = 3;
-const CORNER_ROUNDING = 5;
+
+/**
+ * Should match the margin-left style value for 'kmw-key-square-ex' in kmwosk.css
+ * if possible.
+ */
+const SUBKEY_DEFAULT_MARGIN_LEFT = 5;
+
+/**
+ * The minimum pixel-height value to use for subkey-menu callout height when not
+ * obscured by an overlapping subkey menu (due to WebView boundary constraint effects)
+ */
+const CALLOUT_BASE_HEIGHT = 6 + SUBKEY_MENU_VERT_OFFSET;
 
 /**
  * Represents a 'realized' longpress gesture's default implementation
@@ -119,7 +145,8 @@ export default class SubkeyPopup implements GestureHandler {
     var nKeys=subKeySpec.length,nRows,nCols;
     nRows=Math.min(Math.ceil(nKeys/9),2);
     nCols=Math.ceil(nKeys/nRows);
-    this.menuWidth = (nCols*e.offsetWidth+nCols*5);
+
+    this.menuWidth = (nCols*e.offsetWidth + nCols*SUBKEY_DEFAULT_MARGIN_LEFT);
     ss.width = this.menuWidth+'px';
 
     // Add nested button elements for each sub-key
@@ -300,8 +327,10 @@ export default class SubkeyPopup implements GestureHandler {
   /**
    * Add a callout for popup keys (if KeymanWeb on a phone device)
    *
-   * @param   {Object}  key   HTML key element
-   * @return  {Object}        callout object
+   * @param   {Object}  key    HTML key element
+   * @param   {number}  delta  The pixel offset for the callout from the position it would have if not
+   *                           constrained due to WebView boundaries.
+   * @return  {Object}         callout object
    */
   addCallout(key: KeyElement, delta: number, host: HTMLElement, _Box: HTMLElement, isTablet: boolean): HTMLDivElement {
     delta = delta || 0;
@@ -311,57 +340,61 @@ export default class SubkeyPopup implements GestureHandler {
      * "Computed Menu Style"
      */
     const cms = getComputedStyle(this.element);
+    const borderRadius = Math.max(Number.parseInt(cms.borderRadius), 0);
 
-    const STUB_HEIGHT = 6 + SUBKEY_MENU_VERT_OFFSET;
-    let calloutHeight = key.offsetHeight - delta + STUB_HEIGHT;
+    // Create the callout
+    let keyRect = key.getBoundingClientRect();
+    let _BoxRect = _Box.getBoundingClientRect();
 
-    if(calloutHeight > 0) {
-      var cc = document.createElement('div'), ccs = cc.style;
+    // Set position and style
+    // We're going to adjust the top of the box to ensure it stays
+    // pixel aligned, otherwise we can get antialiasing artifacts
+    // that look ugly
+    let calloutTop = Math.floor(
+      Number.parseInt(cms.top, 10) +
+      Number.parseInt(cms.height, 10) +
+      // Padding is not included in content-box (or in content-box's top positioning)...
+      // but half the padding-top seems useful on all tested devices.
+      // Not sure exactly why.
+      Number.parseInt(cms.paddingTop, 10)/2 +
+      Number.parseInt(cms.paddingBottom, 10)
+    );
+
+    const calloutProportionalHeight = CALLOUT_ROW_HEIGHT_RATIO * (keyRect.height - delta);
+    const maxProportionalHeight = CALLOUT_ROW_HEIGHT_RATIO * keyRect.height;
+
+    const targetHeight = calloutProportionalHeight + CALLOUT_BASE_HEIGHT;
+    const calloutDownscaleRatio = targetHeight / (maxProportionalHeight + CALLOUT_BASE_HEIGHT)
+
+    // Shorten the callout if the subkey menu is being constrained within WebView bounds, thus
+    // overlapping the base key.  Do so (mostly) proportionally to how much is obscured.
+    const maxHeight = (keyRect.bottom - _BoxRect.top) - calloutTop - 1;
+    const selectedHeight = maxHeight < targetHeight ? maxHeight : targetHeight;
+
+    if(selectedHeight > 0) {
+      const cc = document.createElement('div');
+      const ccs = cc.style;
       cc.id = 'kmw-popup-callout';
       host.appendChild(cc);
 
-      // Create the callout
-      let keyRect = key.getBoundingClientRect();
-      let _BoxRect = _Box.getBoundingClientRect();
-
-      // Set position and style
-      // We're going to adjust the top of the box to ensure it stays
-      // pixel aligned, otherwise we can get antialiasing artifacts
-      // that look ugly
-      let top = Math.floor(
-        Number.parseInt(cms.top, 10) +
-        Number.parseInt(cms.height, 10) +
-        // Padding is not included in content-box (or in content-box's top positioning)...
-        // but half the padding-top seems useful on all tested devices.
-        // Not sure exactly why.
-        Number.parseInt(cms.paddingTop, 10)/2 +
-        Number.parseInt(cms.paddingBottom, 10)
-      );
-      ccs.top = top + 'px';
-
-      // Shorten the callout if the subkey menu is being constrained within WebView bounds, thus
-      // overlapping the base key.  Do so (mostly) proportionally to how much is obscured.
-      const targetHeight = (keyRect.height - delta) / 5 + STUB_HEIGHT;
-      const maxHeight = keyRect.bottom - _BoxRect.top - top - 1;
-      const selectedHeight = maxHeight < targetHeight ? maxHeight : targetHeight;
+      ccs.top = calloutTop + 'px';
       ccs.borderTopWidth = (selectedHeight) + 'px';
 
-      const STUB_RATIO = targetHeight > STUB_HEIGHT
-        ? targetHeight / (targetHeight - STUB_HEIGHT)
-        : 1;
+      const calloutKeyWidthRatio = MAX_CALLOUT_KEY_WIDTH * calloutDownscaleRatio;
 
-      const DESIRED_BASE_WIDTH = keyRect.width * STUB_RATIO;
-      const MAX_WIDTH = this.menuWidth - 2 * CORNER_ROUNDING;
-      const TARGET_BASE_WIDTH = MAX_WIDTH < DESIRED_BASE_WIDTH ? MAX_WIDTH : DESIRED_BASE_WIDTH;
+      const desiredCalloutWidth = keyRect.width * calloutKeyWidthRatio;
+      const maxCalloutWidth = this.menuWidth - 2 * borderRadius;
+      const targetCalloutWidth = maxCalloutWidth < desiredCalloutWidth ? maxCalloutWidth : desiredCalloutWidth;
 
-      const BASE_LEFT = (keyRect.left - _BoxRect.left - (TARGET_BASE_WIDTH - keyRect.width)/2);
-      const OVERRUN_RIGHT = Math.max(0, (BASE_LEFT + TARGET_BASE_WIDTH) - (_BoxRect.right - CORNER_ROUNDING));
-      const OVERRUN_LEFT =  Math.max(0, CORNER_ROUNDING-BASE_LEFT);
+      const calloutLeftOffset = (keyRect.left - _BoxRect.left - (targetCalloutWidth - keyRect.width)/2);
 
-      ccs.left = (keyRect.left - _BoxRect.left - (TARGET_BASE_WIDTH - keyRect.width)/2 + OVERRUN_LEFT) /*- ADJUSTMENT*/ + 'px';
-      ccs.borderLeftWidth  = TARGET_BASE_WIDTH/2 - OVERRUN_LEFT  + 'px';
-      ccs.borderRightWidth = TARGET_BASE_WIDTH/2 - OVERRUN_RIGHT + 'px';
+      // Avoid letting the callout overrun screen bounds or overshooting the transition to curved borders
+      const calloutRightOverrun = Math.max(0, (calloutLeftOffset + targetCalloutWidth) - (_BoxRect.right - borderRadius));
+      const calloutLeftOverrun =  Math.max(0, borderRadius-calloutLeftOffset);
 
+      ccs.left = (keyRect.left - _BoxRect.left - (targetCalloutWidth - keyRect.width)/2 + calloutLeftOverrun) /*- ADJUSTMENT*/ + 'px';
+      ccs.borderLeftWidth  = targetCalloutWidth/2 - calloutLeftOverrun  + 'px';
+      ccs.borderRightWidth = targetCalloutWidth/2 - calloutRightOverrun + 'px';
 
       // Return callout element, to allow removal later
       return cc;
