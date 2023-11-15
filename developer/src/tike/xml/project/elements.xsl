@@ -2,6 +2,23 @@
 
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:k="http://www.tavultesoft.com/xml/70">
 
+<!-- IsInSourcePath and IsCompilable props are injected by ProjectSaver.pas for render time only -->
+<xsl:variable name="ParentFiles" select="/KeymanDeveloperProject/Files/File[not(ParentFileID)]" />
+<xsl:variable name="SourcePathFiles" select="$ParentFiles[
+  IsInSourcePath='true' or
+  /KeymanDeveloperProject/Options/Version != '2.0'
+]" />
+<xsl:variable name="SourceKeyboardFiles" select="$SourcePathFiles[FileType='.kmn' or FileType='.xml-ldml-keyboard']" />
+<xsl:variable name="SourcePackageFiles" select="$SourcePathFiles[FileType='.kps']" />
+<xsl:variable name="SourceModelFiles" select="$SourcePathFiles[FileType='.ts' or FileType='.tsv']" />
+<xsl:variable name="SourceFiles" select="$SourcePathFiles[FileType='.kmn' or FileType='.xml-ldml-keyboard' or FileType='.kps' or FileType='.model.ts']" />
+<xsl:variable name="NonSourceFiles" select="$ParentFiles[
+    IsInSourcePath != 'true' or
+    (FileType != '.kmn' and FileType != '.kps' and FileType != '.xml-ldml-keyboard' and FileType != '.ts' and FileType != '.tsv') or
+    /KeymanDeveloperProject/Options/Version != '2.0'
+  ]" />
+
+
 <xsl:template name="head">
   <head>
     <script src="/app/lib/sentry/bundle.min.js"><xsl:text> </xsl:text></script>

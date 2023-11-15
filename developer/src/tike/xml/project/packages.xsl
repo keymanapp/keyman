@@ -99,7 +99,7 @@
         <br />
 
         <div>
-          <xsl:for-each select="/KeymanDeveloperProject/Files/File[FileType='.kps' and not(ParentFileID)]">
+          <xsl:for-each select="$SourcePackageFiles">
             <xsl:variable name="FileState" select="/KeymanDeveloperProject/FileStates/FileState[ID=current()/ID]" />
             <xsl:call-template name="file">
               <xsl:with-param name="file_description"><xsl:if test="string-length(Details/Name) &gt; 0">(<xsl:value-of select="Details/Name" />)</xsl:if></xsl:with-param>

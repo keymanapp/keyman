@@ -120,7 +120,7 @@
         <br />
 
         <div>
-          <xsl:for-each select="KeymanDeveloperProject/Files/File[(FileType='.kmn' or FileType='.xml-ldml-keyboard') and not(ParentFileID)]">
+          <xsl:for-each select="$SourceKeyboardFiles">
             <xsl:variable name="FileState" select="/KeymanDeveloperProject/FileStates/FileState[ID=current()/ID]" />
             <xsl:call-template name="file">
               <xsl:with-param name="file_description">

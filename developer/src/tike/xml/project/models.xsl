@@ -108,7 +108,7 @@
         <br />
 
         <div>
-          <xsl:for-each select="KeymanDeveloperProject/Files/File[(FileType='.ts' or FileType='.tsv') and not(ParentFileID)]">
+          <xsl:for-each select="$SourceModelFiles">
             <xsl:variable name="FileState" select="/KeymanDeveloperProject/FileStates/FileState[ID=current()/ID]" />
             <xsl:call-template name="file">
               <xsl:with-param name="file_description">
