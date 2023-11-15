@@ -629,7 +629,10 @@ begin
   node.AddChild('Filename').NodeValue := ExtractFileName(FFileName);
   node.AddChild('Filepath').NodeValue := ExtractRelativePath(FProject.FileName, FFileName);
   node.AddChild('FileVersion').NodeValue := FFileVersion;   // I4701
-  node.AddChild('FileType').NodeValue := ExtractFileExt(FFileName);;
+
+  // Note: FileType is only ever written in Delphi code; it is used by xsl
+  // transforms for rendering
+  node.AddChild('FileType').NodeValue := ExtractFileExt(FFileName);
   if Assigned(FParent) then
     node.AddChild('ParentFileID').NodeValue := FParent.ID;
 end;

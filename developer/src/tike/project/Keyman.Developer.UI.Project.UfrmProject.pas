@@ -109,6 +109,7 @@ uses
   Keyman.Developer.System.Project.kmnProjectFile,
   Keyman.Developer.System.Project.kpsProjectFile,
   Keyman.Developer.System.Project.modelTsProjectFile,
+  Keyman.Developer.System.Project.xmlLdmlProjectFile,
   Keyman.Developer.System.Project.Project,
   Keyman.Developer.UI.Project.ProjectUI,
   Keyman.Developer.UI.Project.ProjectFileUI,
@@ -470,6 +471,8 @@ begin
     pf := SelectedProjectFile;
     if Assigned(pf) and (pf is TkmnProjectFile) then
       OpenContainingFolder((pf as TkmnProjectFile).TargetFileName)
+    else if Assigned(pf) and (pf is TxmlLdmlProjectFile) then
+      OpenContainingFolder((pf as TxmlLdmlProjectFile).TargetFileName)
     else if Assigned(pf) and (pf is TkpsProjectFile) then
       OpenContainingFolder((pf as TkpsProjectFile).TargetFileName)
     else if Assigned(pf) and (pf is TmodelTsProjectFile) then
@@ -514,7 +517,8 @@ begin
     ClearMessages;
     for i := 0 to FGlobalProject.Files.Count - 1 do
     begin
-      if FGlobalProject.Files[i] is TkmnProjectFile then
+      if (FGlobalProject.Files[i] is TkmnProjectFile) or
+          (FGlobalProject.Files[i] is TxmlLdmlProjectFile) then
         (FGlobalProject.Files[i].UI as TProjectFileUI).DoAction(pfaCompile, False);   // I4687
     end;
   end
@@ -523,7 +527,8 @@ begin
     ClearMessages;
     for i := 0 to FGlobalProject.Files.Count - 1 do
     begin
-      if FGlobalProject.Files[i] is TkmnProjectFile then
+      if (FGlobalProject.Files[i] is TkmnProjectFile) or
+          (FGlobalProject.Files[i] is TxmlLdmlProjectFile) then
         (FGlobalProject.Files[i].UI as TProjectFileUI).DoAction(pfaClean, False);
     end;
   end

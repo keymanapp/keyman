@@ -62,14 +62,14 @@
           <xsl:with-param name="caption">Build all</xsl:with-param>
           <xsl:with-param name="command">keyman:compileall</xsl:with-param>
           <xsl:with-param name="enabled">
-            <xsl:if test="not(KeymanDeveloperProject/Files/File[(FileType='.kps' or FileType='.kmn' or FileType='.ts' or FileType='.tsv') and not (ParentFileID)])">false</xsl:if>
+            <xsl:if test="not(KeymanDeveloperProject/Files/File[(FileType='.kps' or FileType='.kmn' or FileType='.xml-ldml-keyboard' or FileType='.ts' or FileType='.tsv') and not (ParentFileID)])">false</xsl:if>
           </xsl:with-param>
         </xsl:call-template>
         <xsl:call-template name="button">
           <xsl:with-param name="caption">Clean all</xsl:with-param>
           <xsl:with-param name="command">keyman:cleanall</xsl:with-param>
           <xsl:with-param name="enabled">
-            <xsl:if test="not(KeymanDeveloperProject/Files/File[(FileType='.kps' or FileType='.kmn' or FileType='.ts' or FileType='.tsv') and not (ParentFileID)])">false</xsl:if>
+            <xsl:if test="not(KeymanDeveloperProject/Files/File[(FileType='.kps' or FileType='.kmn' or FileType='.xml-ldml-keyboard' or FileType='.ts' or FileType='.tsv') and not (ParentFileID)])">false</xsl:if>
           </xsl:with-param>
           <xsl:with-param name="width">auto</xsl:with-param>
         </xsl:call-template>
@@ -78,7 +78,7 @@
         <br />
 
         <div>
-          <xsl:for-each select="/KeymanDeveloperProject/Files/File[FileType!='.kps' and FileType!='.kmn' and FileType!='.ts' and FileType!='.tsv' and not(ParentFileID)]">
+          <xsl:for-each select="/KeymanDeveloperProject/Files/File[FileType!='.kps' and FileType!='.kmn' and FileType!='.xml-ldml-keyboard' and FileType!='.ts' and FileType!='.tsv' and not(ParentFileID)]">
             <xsl:variable name="FileState" select="/KeymanDeveloperProject/FileStates/FileState[ID=current()/ID]" />
             <xsl:call-template name="file">
               <xsl:with-param name="file_description"></xsl:with-param>
@@ -90,7 +90,7 @@
     </div>
   </xsl:template>
 
-  <xsl:template mode="options_menu" match="/KeymanDeveloperProject/Files/File[FileType!='.kps' and FileType!='.kmn' and FileType!='.ts' and FileType!='.tsv']" >
+  <xsl:template mode="options_menu" match="/KeymanDeveloperProject/Files/File[FileType!='.kps' and FileType!='.kmn' and FileType!='.xml-ldml-keyboard' and FileType!='.ts' and FileType!='.tsv']" >
     <div class="menu">
       <xsl:attribute name="id">menu_options_<xsl:value-of select="ID"/></xsl:attribute>
       <xsl:call-template name="menuitem">
