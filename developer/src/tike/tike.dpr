@@ -31,7 +31,7 @@ uses
   Keyman.Developer.System.Project.kpsProjectFile in 'project\Keyman.Developer.System.Project.kpsProjectFile.pas',
   Keyman.Developer.System.Project.kmxProjectFile in 'project\Keyman.Developer.System.Project.kmxProjectFile.pas',
   Keyman.Developer.System.Project.modelTsProjectFile in 'project\Keyman.Developer.System.Project.modelTsProjectFile.pas',
-  Keyman.Developer.UI.Project.UfrmProjectSettings in 'project\Keyman.Developer.UI.Project.UfrmProjectSettings.pas' {frmProjectSettings},
+  Keyman.Developer.UI.Project.UfrmProjectSettings20 in 'project\Keyman.Developer.UI.Project.UfrmProjectSettings20.pas' {frmProjectSettings20},
   Keyman.Developer.UI.Project.ProjectFileUI in 'project\Keyman.Developer.UI.Project.ProjectFileUI.pas',
   Keyman.Developer.UI.Project.ProjectUI in 'project\Keyman.Developer.UI.Project.ProjectUI.pas',
   Keyman.Developer.UI.Project.ProjectUIFileType in 'project\Keyman.Developer.UI.Project.ProjectUIFileType.pas',
@@ -151,7 +151,7 @@ uses
   ErrorControlledRegistry in '..\..\..\common\windows\delphi\vcl\ErrorControlledRegistry.pas',
   UframeBitmapEditor in 'main\UframeBitmapEditor.pas' {frameBitmapEditor: TFrame},
   UfrmMessages in 'main\UfrmMessages.pas' {frmMessages},
-  dmActionsKeyboardEditor in 'actions\dmActionsKeyboardEditor.pas' {modActionsKeyboardEditor: TDataModule},
+  dmActionsDebugger in 'actions\dmActionsDebugger.pas' {modActionsDebugger: TDataModule},
   dmActionsMain in 'actions\dmActionsMain.pas' {modActionsMain: TDataModule},
   dmActionsTextEditor in 'actions\dmActionsTextEditor.pas' {modActionsTextEditor: TDataModule},
   UfrmCharacterMapNew in '..\..\..\common\windows\delphi\charmap\UfrmCharacterMapNew.pas' {frmCharacterMapNew},
@@ -281,7 +281,14 @@ uses
   Keyman.Developer.UI.UfrmEditLanguageExample in 'dialogs\examples\Keyman.Developer.UI.UfrmEditLanguageExample.pas' {frmEditLanguageExample},
   Keyman.Developer.UI.UfrmEditRelatedPackage in 'dialogs\relatedPackages\Keyman.Developer.UI.UfrmEditRelatedPackage.pas' {frmEditRelatedPackage},
   Keyman.Developer.UI.UfrmEditPackageWebFonts in 'dialogs\packageWebFonts\Keyman.Developer.UI.UfrmEditPackageWebFonts.pas' {frmEditPackageWebFonts},
-  Keyman.Developer.System.KmcWrapper in 'compile\Keyman.Developer.System.KmcWrapper.pas';
+  Keyman.Developer.System.KmcWrapper in 'compile\Keyman.Developer.System.KmcWrapper.pas',
+  Keyman.Developer.UI.Project.UpgradeProject in 'project\Keyman.Developer.UI.Project.UpgradeProject.pas',
+  Keyman.Developer.System.Project.xmlLdmlProjectFile in 'project\Keyman.Developer.System.Project.xmlLdmlProjectFile.pas',
+  Keyman.Developer.System.Project.xmlLdmlProjectFileAction in 'project\Keyman.Developer.System.Project.xmlLdmlProjectFileAction.pas',
+  Keyman.Developer.UI.Project.xmlLdmlProjectFileUI in 'project\Keyman.Developer.UI.Project.xmlLdmlProjectFileUI.pas',
+  Keyman.Developer.UI.UfrmLdmlKeyboardEditor in 'child\Keyman.Developer.UI.UfrmLdmlKeyboardEditor.pas' {frmLdmlKeyboardEditor},
+  dmActionsKeyboardEditor in 'actions\dmActionsKeyboardEditor.pas' {modActionsKeyboardEditor: TDataModule},
+  Keyman.Developer.UI.Project.UfrmProjectSettings in 'project\Keyman.Developer.UI.Project.UfrmProjectSettings.pas' {frmProjectSettings};
 
 {$R *.RES}
 {$R ICONS.RES}

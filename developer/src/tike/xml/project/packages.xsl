@@ -49,28 +49,32 @@
         </div>
       </div>
 
+      <xsl:call-template name="upgrade-warning" />
+
       <div class='filelist' id="packagelist">
         <xsl:call-template name="button">
           <xsl:with-param name="caption">New package...</xsl:with-param>
           <xsl:with-param name="command">keyman:fileaddnew?type=package</xsl:with-param>
         </xsl:call-template>
-        <xsl:call-template name="button">
-          <xsl:with-param name="caption">Add existing package...</xsl:with-param>
-          <xsl:with-param name="command">keyman:fileaddexisting?type=package</xsl:with-param>
-        </xsl:call-template>
+        <xsl:if test="KeymanDeveloperProject/Options/Version != '2.0' or not(KeymanDeveloperProject/Options/Version)">
+          <xsl:call-template name="button">
+            <xsl:with-param name="caption">Add existing package...</xsl:with-param>
+            <xsl:with-param name="command">keyman:fileaddexisting?type=package</xsl:with-param>
+          </xsl:call-template>
+        </xsl:if>
         |
         <xsl:call-template name="button">
           <xsl:with-param name="caption">Build all</xsl:with-param>
           <xsl:with-param name="command">keyman:compileall</xsl:with-param>
           <xsl:with-param name="enabled">
-            <xsl:if test="not(KeymanDeveloperProject/Files/File[(FileType='.kps' or FileType='.kmn') and not (ParentFileID)])">false</xsl:if>
+            <xsl:if test="not(KeymanDeveloperProject/Files/File[(FileType='.kps' or FileType='.kmn' or FileType='.xml-ldml-keyboard') and not (ParentFileID)])">false</xsl:if>
           </xsl:with-param>
         </xsl:call-template>
         <xsl:call-template name="button">
           <xsl:with-param name="caption">Clean all</xsl:with-param>
           <xsl:with-param name="command">keyman:cleanall</xsl:with-param>
           <xsl:with-param name="enabled">
-            <xsl:if test="not(KeymanDeveloperProject/Files/File[(FileType='.kps' or FileType='.kmn') and not (ParentFileID)])">false</xsl:if>
+            <xsl:if test="not(KeymanDeveloperProject/Files/File[(FileType='.kps' or FileType='.kmn' or FileType='.xml-ldml-keyboard') and not (ParentFileID)])">false</xsl:if>
           </xsl:with-param>
           <xsl:with-param name="width">auto</xsl:with-param>
         </xsl:call-template>
@@ -95,7 +99,7 @@
         <br />
 
         <div>
-          <xsl:for-each select="/KeymanDeveloperProject/Files/File[FileType='.kps' and not(ParentFileID)]">
+          <xsl:for-each select="$SourcePackageFiles">
             <xsl:variable name="FileState" select="/KeymanDeveloperProject/FileStates/FileState[ID=current()/ID]" />
             <xsl:call-template name="file">
               <xsl:with-param name="file_description"><xsl:if test="string-length(Details/Name) &gt; 0">(<xsl:value-of select="Details/Name" />)</xsl:if></xsl:with-param>
@@ -142,10 +146,12 @@
         <xsl:with-param name="command">keyman:openbuildfolder?id=<xsl:value-of select="ID" />
         </xsl:with-param>
       </xsl:call-template>
-      <xsl:call-template name="menuitem">
-        <xsl:with-param name="caption">Remove from Project</xsl:with-param>
-        <xsl:with-param name="command">keyman:removefile?id=<xsl:value-of select="ID" /></xsl:with-param>
-      </xsl:call-template>
+      <xsl:if test="/KeymanDeveloperProject/Options/Version != '2.0' or not(/KeymanDeveloperProject/Options/Version)">
+        <xsl:call-template name="menuitem">
+          <xsl:with-param name="caption">Remove from Project</xsl:with-param>
+          <xsl:with-param name="command">keyman:removefile?id=<xsl:value-of select="ID" /></xsl:with-param>
+        </xsl:call-template>
+      </xsl:if>
     </div>
   </xsl:template>
 

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<KeymanDeveloperProject>
+  <Options>
+    <BuildPath>$PROJECTPATH\build</BuildPath>
+    <SourcePath>$PROJECTPATH\source</SourcePath>
+    <CompilerWarningsAsErrors>True</CompilerWarningsAsErrors>
+    <WarnDeprecatedCode>True</WarnDeprecatedCode>
+    <CheckFilenameConventions>False</CheckFilenameConventions>
+    <ProjectType>keyboard</ProjectType>
+    <!-- ERROR_UnsupportedProjectVersion -->
+    <Version>3.0</Version>
+  </Options>
+</KeymanDeveloperProject>

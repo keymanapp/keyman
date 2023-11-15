@@ -25,8 +25,7 @@ uses
   Keyman.Developer.UI.Project.ProjectFileUI;
 
 function GetGlobalProjectUI: TProjectUI;
-function LoadGlobalProjectUI(pt: TProjectType; AFilename: string; ALoadPersistedUntitledProject: Boolean = False): TProjectUI;
-function NewGlobalProjectUI(pt: TProjectType): TProjectUI;
+function LoadGlobalProjectUI(pt: TProjectType; AFilename: string): TProjectUI;
 procedure FreeGlobalProjectUI;
 function IsGlobalProjectUIReady: Boolean;
 
@@ -52,22 +51,17 @@ begin
   FreeAndNil(FGlobalProject);
 end;
 
-function LoadGlobalProjectUI(pt: TProjectType; AFilename: string; ALoadPersistedUntitledProject: Boolean = False): TProjectUI;
+function LoadGlobalProjectUI(pt: TProjectType; AFilename: string): TProjectUI;
 begin
   Assert(not Assigned(FGlobalProject));
-  Result := TProjectUI.Create(pt, AFilename, ALoadPersistedUntitledProject);   // I4687
-  FGlobalProject := Result;
-end;
-
-function NewGlobalProjectUI(pt: TProjectType): TProjectUI;
-var
-  FSessionUntitledProjectFilename: string;
-begin
-  Assert(not Assigned(FGlobalProject));
-  FSessionUntitledProjectFilename := TProject.GetUntitledProjectFilename(True);
-  if FileExists(FSessionUntitledProjectFilename) then
-    DeleteFile(FSessionUntitledProjectFilename);
-  Result := TProjectUI.Create(pt, '', False);   // I4687
+  if DirectoryExists(AFilename) then
+  begin
+    // Load a directory-based project
+    if AFilename.EndsWith('\') then
+      AFilename := AFilename.Substring(0, AFilename.Length-1);
+    AFilename := AFilename + '\' + ExtractFileName(AFilename) + '.kpj';
+  end;
+  Result := TProjectUI.Create(pt, AFilename);   // I4687
   FGlobalProject := Result;
 end;
 

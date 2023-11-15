@@ -207,7 +207,7 @@ uses
   Keyman.Developer.System.HelpTopics,
 
   ActiveX,
-  dmActionsKeyboardEditor,
+  dmActionsDebugger,
   dmActionsMain,
   Glossary,
   Keyman.Developer.System.Project.ProjectLog,
@@ -1386,7 +1386,7 @@ end;
 
 procedure TfrmDebug.cmdStopClick(Sender: TObject);
 begin
-  modActionsKeyboardEditor.actDebugStopDebugger.Execute;
+  modActionsDebugger.actDebugStopDebugger.Execute;
 end;
 
 { TDebugBreakpoint }
