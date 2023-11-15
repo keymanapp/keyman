@@ -11,8 +11,7 @@ public class BannerController {
 
   // Paths relative to assets folder for banner themes
   public static final String BANNER_THEME_FV = "svg/banner.html";
-  public static final String BANNER_THEME_FV_SVG = "svg/teal-logo.svg";
-
+  public static final String BANNER_THEME_FV_SVG = "svg/red-logo.svg";
 
   public static void setHTMLBanner(Context context, KMManager.KeyboardType keyboardType) {
     if (keyboardType == KMManager.KeyboardType.KEYBOARD_TYPE_UNDEFINED) {
