@@ -86,7 +86,7 @@ var
   node, root: IXMLNode;
   defopts: TProjectOptionsRecord;
 begin
-  if FProject.IsDefaultProject(pv20) then
+  if FProject.IsDefaultProject(pv20) and (FFileName <> '') then
   begin
     if FileExists(FFileName) then
       System.SysUtils.DeleteFile(FFileName);
@@ -136,7 +136,7 @@ begin
   begin
     node := root.AddChild('Files');
     for i := 0 to FProject.Files.Count - 1 do
-      FProject.Files[i].Save(node.AddChild('File'), False);
+      FProject.Files[i].Save(node.AddChild('File'));
   end;
 
   if FFileName <> '' then

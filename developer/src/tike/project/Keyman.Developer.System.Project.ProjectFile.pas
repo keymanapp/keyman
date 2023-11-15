@@ -265,9 +265,12 @@ type
     constructor Create(AProject: TProject; AFileName: string; AParent: TProjectFile); virtual;
     destructor Destroy; override;
 
-    procedure Load(node: IXMLNode; LoadState: Boolean); virtual;   // I4698
+    function IsCompilable: Boolean; virtual;
+    class function IsFileTypeSupported(const Filename: string): Boolean; virtual;
+
+    procedure Load(node: IXMLNode); virtual;   // I4698
     procedure LoadState(node: IXMLNode); virtual;   // I4698
-    procedure Save(node: IXMLNode; SaveState: Boolean); virtual;   // I4698
+    procedure Save(node: IXMLNode); virtual;   // I4698
     procedure SaveState(node: IXMLNode); virtual;   // I4698
 
     procedure AddFreeNotification(AClient: IProjectFileFreeNotification);
@@ -571,7 +574,20 @@ begin
   end;
 end;
 
-procedure TProjectFile.Load(node: IXMLNode; LoadState: Boolean);   // I4698
+function TProjectFile.IsCompilable: Boolean;
+begin
+  Result := False;
+end;
+
+class function TProjectFile.IsFileTypeSupported(
+  const Filename: string): Boolean;
+begin
+  // assumes that if we are registered for the file type extension, then we can
+  // handle the file. For example, .xml LDML keyboards
+  Result := True;
+end;
+
+procedure TProjectFile.Load(node: IXMLNode);   // I4698
 var
   i: Integer;
 begin
@@ -579,17 +595,6 @@ begin
     FID := CleanID(VarToWideStr(node.ChildValues['ID']));
   if node.ChildNodes.IndexOf('ParentFileID') >= 0 then
     FParentFileID := CleanID(VarToWideStr(node.ChildValues['ParentFileID']));
-
-  if LoadState then
-  begin
-    FIDEState.Clear;
-    if node.ChildNodes.IndexOf('IDEState') >= 0 then
-    begin
-      node := node.ChildNodes.Nodes['IDEState'];
-      for i := 0 to node.ChildNodes.Count - 1 do
-        FIDEState[node.ChildNodes[i].NodeName] := node.ChildNodes[i].NodeValue;
-    end;
-  end;
 end;
 
 procedure TProjectFile.LoadState(node: IXMLNode);   // I4698
@@ -616,7 +621,7 @@ begin
   FNotifiers.Remove(AClient);
 end;
 
-procedure TProjectFile.Save(node: IXMLNode; SaveState: Boolean);   // I4698
+procedure TProjectFile.Save(node: IXMLNode);   // I4698
 var
   I: Integer;
 begin
@@ -627,21 +632,6 @@ begin
   node.AddChild('FileType').NodeValue := ExtractFileExt(FFileName);;
   if Assigned(FParent) then
     node.AddChild('ParentFileID').NodeValue := FParent.ID;
-
-  if SaveState then
-  begin
-    node.AddChild('FullPath').NodeValue := FFileName;
-
-    if FIDEState.Count > 0 then
-    begin
-      node := node.AddChild('IDEState');
-      for I := 0 to FIDEState.Count - 1 do
-      begin
-        with node.AddChild(TProjectFileState(FIDEState.Get(I)).Name) do
-          NodeValue := TProjectFileState(FIDEState.Get(I)).Value;
-      end;
-    end;
-  end;
 end;
 
 procedure TProjectFile.SaveState(node: IXMLNode);   // I4698
@@ -995,7 +985,7 @@ end;
 function IsLMDLKeyboardFile(filename: string): Boolean;
   if EndsText('.xml', filename) then
   begin
-    Result := Pos('ldmlKeyboard.dtd', ReadUtf8FileText(ff)) > 0;
+    Result := Pos('ldmlKeyboard3.dtd', ReadUtf8FileText(ff)) > 0;
   end
   else
     Result := False;

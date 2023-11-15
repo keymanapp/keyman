@@ -88,22 +88,52 @@ interface
 
 uses
   System.UITypes,
-  Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms,
-  ComCtrls, ImgList, Menus, StdCtrls, ExtCtrls, ToolWin, Buttons,
-  KeymanDeveloperUtils, UfrmMDIChild, UfrmMDIEditor,
+  Windows,
+  Messages,
+  SysUtils,
+  Classes,
+  Graphics,
+  Controls,
+  Forms,
+  ComCtrls,
+  ImgList,
+  Menus,
+  StdCtrls,
+  ExtCtrls,
+  ToolWin,
+  Buttons,
+  KeymanDeveloperUtils,
+  UfrmMDIChild,
+  UfrmMDIEditor,
   MenuImgList,
   Keyman.Developer.System.Project.Project,
-  Keyman.Developer.UI.Project.UfrmProject, CharacterMapSettings,
+  Keyman.Developer.UI.Project.UfrmProject,
+  CharacterMapSettings,
   mrulist,
   UfrmUnicodeDataStatus,
   CharacterDragObject,
   Keyman.Developer.UI.dmActionsModelEditor,
-  dmActionsMain, UnicodeData, UserMessages, webhelp,
-  dmActionsKeyboardEditor, Dialogs, UfrmTike, AppEvnts,
+  UnicodeData,
+  UserMessages,
+  webhelp,
+  dmActionsDebugger,
+  dmActionsKeyboardEditor,
+  dmActionsMain,
+  Dialogs,
+  UfrmTike,
+  AppEvnts,
   DropTarget,
-  System.ImageList, Winapi.ActiveX, CloseButtonPageControl, JvComponentBase,
-  JvDockControlForm, JvDockTree, JvDockVIDStyle, JvDockVSNetStyle,
-  JvAppRegistryStorage, Vcl.ActnMan, Vcl.ActnCtrls;
+  System.ImageList,
+  Winapi.ActiveX,
+  CloseButtonPageControl,
+  JvComponentBase,
+  JvDockControlForm,
+  JvDockTree,
+  JvDockVIDStyle,
+  JvDockVSNetStyle,
+  JvAppRegistryStorage,
+  Vcl.ActnMan,
+  Vcl.ActnCtrls;
 
 type
   TfrmKeymanDeveloper = class(TTikeForm, IUnicodeDataUIManager, IDragDrop)
@@ -449,8 +479,10 @@ uses
   Keyman.Developer.System.Project.ProjectFileType,
   Keyman.Developer.System.Project.WelcomeRenderer,
   Keyman.Developer.System.Project.ProjectLog,
+  Keyman.Developer.System.Project.XmlLdmlProjectFile,
   Keyman.Developer.UI.Project.ProjectFileUI,
   Keyman.Developer.UI.Project.ProjectUI,
+  Keyman.Developer.UI.UfrmLdmlKeyboardEditor,
   Keyman.Developer.UI.UfrmWordlistEditor,
   Keyman.Developer.UI.UfrmModelEditor,
   TextFileFormat,
@@ -511,6 +543,7 @@ begin
 
   modActionsTextEditor := TmodActionsTextEditor.Create(Self);
   modActionsKeyboardEditor := TmodActionsKeyboardEditor.Create(Self);
+  modActionsDebugger := TmodActionsDebugger.Create(Self);
   modActionsMain := TmodActionsMain.Create(Self);
   modActionsModelEditor := TmodActionsModelEditor.Create(Self);
 
@@ -1022,7 +1055,7 @@ procedure TfrmKeymanDeveloper.cbDebugSystemKeyboardItemClick(Sender: TObject);
 begin
   if cbDebugSystemKeyboard.ItemIndex < 0 then
     cbDebugSystemKeyboard.ItemIndex := 0;
-  modActionsKeyboardEditor.SelectDebugSystemKeyboard(cbDebugSystemKeyboard.Items.Objects[cbDebugSystemKeyboard.ItemIndex] as TSystemKeyboardItem);
+  modActionsDebugger.SelectDebugSystemKeyboard(cbDebugSystemKeyboard.Items.Objects[cbDebugSystemKeyboard.ItemIndex] as TSystemKeyboardItem);
   //actDebugSystemKeyboard
 end;
 
@@ -1169,6 +1202,8 @@ begin
         else if ext = '.kvks' then Result := OpenKVKEditor(FFileName)
         else if ext = '.bmp'  then Result := OpenEditor(FFileName, TfrmBitmapEditor)
         else if ext = '.tsv'  then Result := OpenTSVEditor(FFileName)
+        else if (ext = '.xml') and TxmlLdmlProjectFile.IsFileTypeSupported(FFileName) then
+          Result := OpenEditor(FFileName, TfrmLdmlKeyboardEditor)
         else if FileHasModelTsExt(FFileName) then Result := OpenModelEditor(FFileName)
         else                       Result := OpenEditor(FFileName, TfrmEditor);
 

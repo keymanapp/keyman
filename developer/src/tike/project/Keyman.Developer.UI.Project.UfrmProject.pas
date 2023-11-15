@@ -287,8 +287,8 @@ begin
   ClearMessages;
   for i := 0 to FGlobalProject.Files.Count - 1 do
   begin
-    if (FGlobalProject.Files[i] is TkmnProjectFile) or
-      (FGlobalProject.Files[i] is TmodelTsProjectFile) then
+    if FGlobalProject.Files[i].IsCompilable and
+      not (FGlobalProject.Files[i] is TkpsProjectFile) then
     begin
       if not (FGlobalProject.Files[i].UI as TProjectFileUI).DoAction(pfaCompile, False) then Exit;   // I4687
     end;
