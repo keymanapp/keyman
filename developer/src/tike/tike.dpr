@@ -31,7 +31,7 @@ uses
   Keyman.Developer.System.Project.kpsProjectFile in 'project\Keyman.Developer.System.Project.kpsProjectFile.pas',
   Keyman.Developer.System.Project.kmxProjectFile in 'project\Keyman.Developer.System.Project.kmxProjectFile.pas',
   Keyman.Developer.System.Project.modelTsProjectFile in 'project\Keyman.Developer.System.Project.modelTsProjectFile.pas',
-  Keyman.Developer.UI.Project.UfrmProjectSettings in 'project\Keyman.Developer.UI.Project.UfrmProjectSettings.pas' {frmProjectSettings},
+  Keyman.Developer.UI.Project.UfrmProjectSettings20 in 'project\Keyman.Developer.UI.Project.UfrmProjectSettings20.pas' {frmProjectSettings20},
   Keyman.Developer.UI.Project.ProjectFileUI in 'project\Keyman.Developer.UI.Project.ProjectFileUI.pas',
   Keyman.Developer.UI.Project.ProjectUI in 'project\Keyman.Developer.UI.Project.ProjectUI.pas',
   Keyman.Developer.UI.Project.ProjectUIFileType in 'project\Keyman.Developer.UI.Project.ProjectUIFileType.pas',
@@ -287,7 +287,8 @@ uses
   Keyman.Developer.System.Project.xmlLdmlProjectFileAction in 'project\Keyman.Developer.System.Project.xmlLdmlProjectFileAction.pas',
   Keyman.Developer.UI.Project.xmlLdmlProjectFileUI in 'project\Keyman.Developer.UI.Project.xmlLdmlProjectFileUI.pas',
   Keyman.Developer.UI.UfrmLdmlKeyboardEditor in 'child\Keyman.Developer.UI.UfrmLdmlKeyboardEditor.pas' {frmLdmlKeyboardEditor},
-  dmActionsKeyboardEditor in 'actions\dmActionsKeyboardEditor.pas' {modActionsKeyboardEditor: TDataModule};
+  dmActionsKeyboardEditor in 'actions\dmActionsKeyboardEditor.pas' {modActionsKeyboardEditor: TDataModule},
+  Keyman.Developer.UI.Project.UfrmProjectSettings in 'project\Keyman.Developer.UI.Project.UfrmProjectSettings.pas' {frmProjectSettings};
 
 {$R *.RES}
 {$R ICONS.RES}

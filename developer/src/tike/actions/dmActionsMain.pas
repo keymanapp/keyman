@@ -269,6 +269,9 @@ uses
   Keyman.Developer.UI.Project.ProjectFileUI,
   Keyman.Developer.UI.Project.ProjectUI,
   Keyman.Developer.UI.Project.UfrmNewProject,
+  Keyman.Developer.UI.Project.UfrmProject,
+  Keyman.Developer.UI.Project.UfrmProjectSettings,
+  Keyman.Developer.UI.Project.UfrmProjectSettings20,
   GlobalProxySettings,
   RegistryKeys,
   TextFileFormat,
@@ -291,8 +294,6 @@ uses
   UfrmOSKEditor,
   UfrmPackageEditor,
   UmodWebHttpServer,
-  Keyman.Developer.UI.Project.UfrmProject,
-  Keyman.Developer.UI.Project.UfrmProjectSettings,
   Upload_Settings,
   utilexecute,
   UfrmMDIChild;
@@ -630,12 +631,16 @@ begin
 end;
 
 procedure TmodActionsMain.actProjectSettingsExecute(Sender: TObject);
+var
+  frm: TForm;
 begin
-  with TfrmProjectSettings.Create(Screen.ActiveForm) do   // I4688
+  if FGlobalProject.Options.Version = pv10
+    then frm := TfrmProjectSettings.Create(Screen.ActiveForm)   // I4688
+    else frm := TfrmProjectSettings20.Create(Screen.ActiveForm);
   try
-    ShowModal;
+    frm.ShowModal;
   finally
-    Free;
+    frm.Free;
   end;
 end;
 

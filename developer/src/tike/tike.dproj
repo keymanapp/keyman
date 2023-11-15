@@ -162,8 +162,8 @@
         <DCCReference Include="project\Keyman.Developer.System.Project.kpsProjectFile.pas"/>
         <DCCReference Include="project\Keyman.Developer.System.Project.kmxProjectFile.pas"/>
         <DCCReference Include="project\Keyman.Developer.System.Project.modelTsProjectFile.pas"/>
-        <DCCReference Include="project\Keyman.Developer.UI.Project.UfrmProjectSettings.pas">
-            <Form>frmProjectSettings</Form>
+        <DCCReference Include="project\Keyman.Developer.UI.Project.UfrmProjectSettings20.pas">
+            <Form>frmProjectSettings20</Form>
         </DCCReference>
         <DCCReference Include="project\Keyman.Developer.UI.Project.ProjectFileUI.pas"/>
         <DCCReference Include="project\Keyman.Developer.UI.Project.ProjectUI.pas"/>
@@ -571,6 +571,10 @@
             <Form>modActionsKeyboardEditor</Form>
             <FormType>dfm</FormType>
             <DesignClass>TDataModule</DesignClass>
+        </DCCReference>
+        <DCCReference Include="project\Keyman.Developer.UI.Project.UfrmProjectSettings.pas">
+            <Form>frmProjectSettings</Form>
+            <FormType>dfm</FormType>
         </DCCReference>
         <None Include="Profiling\AQtimeModule1.aqt"/>
         <BuildConfiguration Include="Debug">
