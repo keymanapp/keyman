@@ -81,12 +81,12 @@ function triggerGitHubActionsBuild() {
     GIT_BASE_REF="$(git rev-parse "${GIT_BUILD_SHA}^")"
     GIT_EVENT_TYPE="${GITHUB_ACTION}: release@${VERSION_WITH_TAG}"
   elif [[ $GIT_BRANCH != stable-* ]] && [[ $GIT_BRANCH =~ [0-9]+ ]]; then
-    GIT_BUILD_SHA="$(git rev-parse "refs/pull/${GIT_BRANCH}/head")"
-    GIT_EVENT_TYPE="${GITHUB_ACTION}: PR #${GIT_BRANCH}"
     JSON=$(curl -s "${GITHUB_SERVER}/pulls/${GIT_BRANCH}")
+    GIT_BUILD_SHA="$(echo "$JSON" | $JQ -r '.head.sha')"
+    GIT_EVENT_TYPE="${GITHUB_ACTION}: PR #${GIT_BRANCH}"
     GIT_USER="$(echo "$JSON" | $JQ -r '.user.login')"
     GIT_BASE_BRANCH="$(echo "$JSON" | $JQ -r '.base.ref')"
-    GIT_BASE_REF="$(git rev-parse "${GIT_BASE_BRANCH}")"
+    GIT_BASE_REF="$(echo "$JSON" | $JQ -r '.base.sha')"
     GIT_BRANCH="PR-${GIT_BRANCH}"
   else
     GIT_BUILD_SHA="$(git rev-parse "refs/heads/${GIT_BRANCH}")"
