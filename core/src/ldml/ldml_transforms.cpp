@@ -45,16 +45,16 @@ element::is_uset() const {
   return (flags & LDML_ELEM_FLAGS_TYPE) == LDML_ELEM_FLAGS_TYPE_USET;
 }
 
-signed char
+reorder_weight
 element::get_order() const {
   unsigned char uorder = ((flags & LDML_ELEM_FLAGS_ORDER_MASK) >> LDML_ELEM_FLAGS_ORDER_BITSHIFT);
-  return (signed char)uorder;
+  return (reorder_weight)uorder; // unsigned to signed
 }
 
-signed char
+reorder_weight
 element::get_tertiary() const {
   unsigned char uorder = ((flags & LDML_ELEM_FLAGS_TERTIARY_MASK) >> LDML_ELEM_FLAGS_TERTIARY_BITSHIFT);
-  return (signed char)uorder;
+  return (reorder_weight)uorder; // unsigned to signed
 }
 
 bool
@@ -93,19 +93,19 @@ element::dump() const {
 
 int
 reorder_sort_key::compare(const reorder_sort_key &other) const {
-  int primaryResult    = (int)primary    - (int)other.primary;
-  int secondaryResult  = (int)secondary  - (int)other.secondary;
-  int tertiaryResult   = (int)tertiary   - (int)other.tertiary;
-  int quaternaryResult = (int)quaternary - (int)other.quaternary;
+  auto primaryResult    = primary    - other.primary;
+  auto secondaryResult  = secondary  - other.secondary;
+  auto tertiaryResult   = tertiary   - other.tertiary;
+  auto quaternaryResult = quaternary - other.quaternary;
 
   if (primaryResult) {
-    return primaryResult;
+    return (int)primaryResult;
   } else if (secondaryResult) {
-    return secondaryResult;
+    return (int)secondaryResult;
   } else if (tertiaryResult) {
-    return tertiaryResult;
+    return (int)tertiaryResult;
   } else if (quaternaryResult) {
-    return quaternaryResult;
+    return (int)quaternaryResult;
   } else {
     // We don't expect to get here.  quaternaryResult is the string index, which
     // should be unequal.
@@ -131,8 +131,8 @@ reorder_sort_key::from(const std::u32string &str) {
   // construct a 'baseline' sort key, that is, in the absence of
   // any match rules.
   std::deque<reorder_sort_key> keylist;
-  auto s   = str.begin();  // str iterator
-  size_t c = 0;            // str index
+  auto s           = str.begin();  // str iterator
+  reorder_weight c = 0;            // str index
   for (auto e = str.begin(); e < str.end(); e++, s++, c++) {
     // primary    weight: 0
     // seconary   weight: c (the string index)
@@ -215,9 +215,9 @@ std::deque<reorder_sort_key> &
 element_list::update_sort_key(size_t offset, std::deque<reorder_sort_key> &key) const {
   /** string index */
   size_t c = 0;
-  bool have_last_base             = false;
-  signed char last_base_primary   = -1;
-  signed char last_base_secondary = -1;
+  bool have_last_base                = false;
+  reorder_weight last_base_primary   = -1;
+  reorder_weight last_base_secondary = -1;
   for (auto e = begin(); e < end(); e++, c++) {
     /** position in the key */
     auto n = offset + c;
@@ -418,7 +418,7 @@ reorder_group::apply(std::u32string &str) const {
   // recombine into a string by pulling out the 'ch' value
   // that's in each sortkey element.
   std::u32string newSuffix;
-  size_t q = sort_keys.begin()->quaternary; // start with the first quaternary
+  signed char q = sort_keys.begin()->quaternary; // start with the first quaternary
   for (auto e = sort_keys.begin(); e < sort_keys.end(); e++, q++) {
     if (q != e->quaternary) {
       // something rearranged in this subrange, because the quaternary values are out of order.
