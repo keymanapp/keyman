@@ -68,6 +68,16 @@ import io.sentry.Breadcrumb;
 import io.sentry.Sentry;
 import io.sentry.SentryLevel;
 
+class JSQueueEntry {
+  public String call;
+  public boolean pause;
+
+  JSQueueEntry(String call, boolean pauseAfterCall) {
+    this.call = call;
+    this.pause = pauseAfterCall;
+  }
+}
+
 final class KMKeyboard extends WebView {
   private static final String TAG = "KMKeyboard";
   private final Context context;
@@ -80,7 +90,7 @@ final class KMKeyboard extends WebView {
   private boolean shouldIgnoreSelectionChange = false;
 
   protected KeyboardType keyboardType = KeyboardType.KEYBOARD_TYPE_UNDEFINED;
-  protected ArrayList<String> javascriptAfterLoad = new ArrayList<String>();
+  protected ArrayList<JSQueueEntry> javascriptAfterLoad = new ArrayList<>();
 
   private static String currentKeyboard = null;
 
@@ -173,7 +183,7 @@ final class KMKeyboard extends WebView {
     }
 
     if (KMManager.isKeyboardLoaded(this.keyboardType) && !shouldIgnoreTextChange) {
-      this.loadJavascript(KMString.format("updateKMText('%s')", kmText));
+      this.loadJavascript(KMString.format("updateKMText('%s')", kmText), false);
       result = true;
     }
 
@@ -190,7 +200,7 @@ final class KMKeyboard extends WebView {
         updateText(icText.text.toString());
       }
     }
-    this.loadJavascript(KMString.format("updateKMSelectionRange(%d,%d)", selStart, selEnd));
+    this.loadJavascript(KMString.format("updateKMSelectionRange(%d,%d)", selStart, selEnd), false);
     result = true;
 
     return result;
@@ -301,8 +311,8 @@ final class KMKeyboard extends WebView {
     setBackgroundColor(0);
   }
 
-  public void loadJavascript(String func) {
-    this.javascriptAfterLoad.add(func);
+  public void loadJavascript(String func, boolean pauseAfterCall) {
+    this.javascriptAfterLoad.add(new JSQueueEntry(func, pauseAfterCall));
 
     if((keyboardType == KeyboardType.KEYBOARD_TYPE_INAPP && KMManager.InAppKeyboardWebViewClient.getKeyboardLoaded()) ||
       (keyboardType == KeyboardType.KEYBOARD_TYPE_SYSTEM && KMManager.SystemKeyboardWebViewClient.getKeyboardLoaded())) {
@@ -321,15 +331,25 @@ final class KMKeyboard extends WebView {
       this.postDelayed(new Runnable() {
         @Override
         public void run() {
-          if(javascriptAfterLoad.size() > 0) {
-            loadUrl("javascript:" + javascriptAfterLoad.get(0));
-            javascriptAfterLoad.remove(0);
-            // Make sure we didn't reset the page in the middle of the queue!
-            if(keyboardSet) {
-              if (javascriptAfterLoad.size() > 0) {
-                callJavascriptAfterLoad();
-              }
+          StringBuilder allCalls = new StringBuilder();
+          if(javascriptAfterLoad.size() == 0) {
+            return;
+          }
+
+          while(javascriptAfterLoad.size() > 0) {
+            JSQueueEntry entry = javascriptAfterLoad.remove(0);
+            allCalls.append(entry.call);
+            allCalls.append(";");
+
+            if(entry.pause) {
+              break;
             }
+          }
+
+          loadUrl("javascript:" + allCalls.toString());
+
+          if(javascriptAfterLoad.size() > 0 && keyboardSet) {
+            callJavascriptAfterLoad();
           }
         }
       }, 1);
@@ -339,18 +359,18 @@ final class KMKeyboard extends WebView {
   public void hideKeyboard() {
 
     String jsString = "hideKeyboard()";
-    loadJavascript(jsString);
+    loadJavascript(jsString, false);
   }
 
   public void showKeyboard() {
     String jsString = "showKeyboard()";
-    loadJavascript(jsString);
+    loadJavascript(jsString, false);
   }
 
   public void executeHardwareKeystroke(int code, int shift, int lstates, int eventModifiers) {
     String jsFormat = "executeHardwareKeystroke(%d,%d, %d, %d)";
     String jsString = KMString.format(jsFormat, code, shift, lstates, eventModifiers);
-    loadJavascript(jsString);
+    loadJavascript(jsString, false);
   }
 
   @SuppressLint("ClickableViewAccessibility")
@@ -378,7 +398,7 @@ final class KMKeyboard extends WebView {
     // Ensure window is loaded for javascript functions
     loadJavascript(KMString.format(
       "window.onload = function(){ setOskWidth(\"%d\");"+
-      "setOskHeight(\"0\"); };", kbWidth));
+      "setOskHeight(\"0\"); };", kbWidth), false);
     if (this.getShouldShowHelpBubble()) {
       this.showHelpBubbleAfterDelay(2000);
     }
@@ -400,9 +420,9 @@ final class KMKeyboard extends WebView {
 
     int bannerHeight = KMManager.getBannerHeight(context);
     int oskHeight = KMManager.getKeyboardHeight(context);
-    loadJavascript(KMString.format("setBannerHeight(%d)", bannerHeight));
-    loadJavascript(KMString.format("setOskWidth(%d)", newConfig.screenWidthDp));
-    loadJavascript(KMString.format("setOskHeight(%d)", oskHeight));
+    loadJavascript(KMString.format("setBannerHeight(%d)", bannerHeight), false);
+    loadJavascript(KMString.format("setOskWidth(%d)", newConfig.screenWidthDp), false);
+    loadJavascript(KMString.format("setOskHeight(%d)", oskHeight), false);
 
     this.dismissHelpBubble();
 
@@ -633,7 +653,7 @@ final class KMKeyboard extends WebView {
     }
 
     String jsString = KMString.format("setKeymanLanguage(%s)", reg.toString());
-    loadJavascript(jsString);
+    loadJavascript(jsString, false);
 
     this.packageID = packageID;
     this.keyboardID = keyboardID;
@@ -907,13 +927,13 @@ final class KMKeyboard extends WebView {
         suggestionJSON = null;
         suggestionMenuWindow = null;
         String jsString = "popupVisible(0)";
-        loadJavascript(jsString);
+        loadJavascript(jsString, false);
       }
     });
 
     suggestionMenuWindow.showAtLocation(KMKeyboard.this, Gravity.TOP | Gravity.LEFT, posX , posY);
     String jsString = "popupVisible(1)";
-    loadJavascript(jsString);
+    loadJavascript(jsString, false);
 
     return;
   }
@@ -995,7 +1015,7 @@ final class KMKeyboard extends WebView {
       textWrapper.put("text", hintText);
 
       // signalHelpBubbleDismissal - defined in android-host.js, gives a helpBubbleDismissed signal.
-      loadJavascript("keyman.showGlobeHint(" + textWrapper.toString() + ".text, signalHelpBubbleDismissal);");
+      loadJavascript("keyman.showGlobeHint(" + textWrapper.toString() + ".text, signalHelpBubbleDismissal);", false);
     } catch(JSONException e) {
       KMLog.LogException(TAG, "", e);
       return;
@@ -1023,7 +1043,7 @@ final class KMKeyboard extends WebView {
   }
 
   protected void dismissHelpBubble() {
-    loadJavascript("keyman.hideGlobeHint();");
+    loadJavascript("keyman.hideGlobeHint();", false);
   }
 
   public static void addOnKeyboardEventListener(OnKeyboardEventListener listener) {
@@ -1055,7 +1075,7 @@ final class KMKeyboard extends WebView {
 
   public void setSpacebarText(KMManager.SpacebarText mode) {
     String jsString = KMString.format("setSpacebarText('%s')", mode.toString());
-    loadJavascript(jsString);
+    loadJavascript(jsString, false);
   }
 
   /* Implement handleTouchEvent to catch long press gesture without using Android system default time

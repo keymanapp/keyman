@@ -1333,12 +1333,12 @@ public final class KMManager {
     if (isKeyboardLoaded(KeyboardType.KEYBOARD_TYPE_INAPP) && !InAppKeyboard.shouldIgnoreTextChange() && modelFileExists) {
       params = getKeyboardLayoutParams();
       InAppKeyboard.setLayoutParams(params);
-      InAppKeyboard.loadJavascript(KMString.format("enableSuggestions(%s, %s, %s)", model, mayPredict, mayCorrect));
+      InAppKeyboard.loadJavascript(KMString.format("enableSuggestions(%s, %s, %s)", model, mayPredict, mayCorrect), false);
     }
     if (isKeyboardLoaded(KeyboardType.KEYBOARD_TYPE_SYSTEM) && !SystemKeyboard.shouldIgnoreTextChange() && modelFileExists) {
       params = getKeyboardLayoutParams();
       SystemKeyboard.setLayoutParams(params);
-      SystemKeyboard.loadJavascript(KMString.format("enableSuggestions(%s, %s, %s)", model, mayPredict, mayCorrect));
+      SystemKeyboard.loadJavascript(KMString.format("enableSuggestions(%s, %s, %s)", model, mayPredict, mayCorrect), false);
     }
     return true;
   }
@@ -1351,11 +1351,11 @@ public final class KMManager {
 
     String url = KMString.format("deregisterModel('%s')", modelID);
     if (InAppKeyboard != null) {
-      InAppKeyboard.loadJavascript(url);
+      InAppKeyboard.loadJavascript(url, false);
     }
 
     if (SystemKeyboard != null) {
-      SystemKeyboard.loadJavascript(url);
+      SystemKeyboard.loadJavascript(url, false);
     }
     return true;
   }
@@ -1373,11 +1373,11 @@ public final class KMManager {
     public static boolean setBannerOptions(boolean mayPredict) {
     String url = KMString.format("setBannerOptions(%s)", mayPredict);
     if (InAppKeyboard != null) {
-      InAppKeyboard.loadJavascript(url);
+      InAppKeyboard.loadJavascript(url, false);
     }
 
     if (SystemKeyboard != null) {
-      SystemKeyboard.loadJavascript(url);
+      SystemKeyboard.loadJavascript(url, false);
     }
     return true;
   }
@@ -1868,12 +1868,12 @@ public final class KMManager {
 
   public static void applyKeyboardHeight(Context context, int height) {
     if (isKeyboardLoaded(KeyboardType.KEYBOARD_TYPE_INAPP)) {
-      InAppKeyboard.loadJavascript(KMString.format("setOskHeight('%s')", height));
+      InAppKeyboard.loadJavascript(KMString.format("setOskHeight('%s')", height), false);
       RelativeLayout.LayoutParams params = getKeyboardLayoutParams();
       InAppKeyboard.setLayoutParams(params);
     }
     if (isKeyboardLoaded(KeyboardType.KEYBOARD_TYPE_SYSTEM)) {
-      SystemKeyboard.loadJavascript(KMString.format("setOskHeight('%s')", height));
+      SystemKeyboard.loadJavascript(KMString.format("setOskHeight('%s')", height), false);
       RelativeLayout.LayoutParams params = getKeyboardLayoutParams();
       SystemKeyboard.setLayoutParams(params);
     }
@@ -1944,11 +1944,11 @@ public final class KMManager {
   public static void setNumericLayer(KeyboardType kbType) {
     if (kbType == KeyboardType.KEYBOARD_TYPE_INAPP) {
       if (isKeyboardLoaded(KeyboardType.KEYBOARD_TYPE_INAPP) && !InAppKeyboard.shouldIgnoreTextChange()) {
-        InAppKeyboard.loadJavascript("setNumericLayer()");
+        InAppKeyboard.loadJavascript("setNumericLayer()", false);
       }
     } else if (kbType == KeyboardType.KEYBOARD_TYPE_SYSTEM) {
       if (isKeyboardLoaded(KeyboardType.KEYBOARD_TYPE_SYSTEM) && !SystemKeyboard.shouldIgnoreTextChange()) {
-        SystemKeyboard.loadJavascript("setNumericLayer()");
+        SystemKeyboard.loadJavascript("setNumericLayer()", false);
       }
     }
   }
@@ -1987,11 +1987,11 @@ public final class KMManager {
   public static void resetContext(KeyboardType kbType) {
     if (kbType == KeyboardType.KEYBOARD_TYPE_INAPP) {
       if (isKeyboardLoaded(KeyboardType.KEYBOARD_TYPE_INAPP)) {
-        InAppKeyboard.loadJavascript("resetContext()");
+        InAppKeyboard.loadJavascript("resetContext()", true);
       }
     } else if (kbType == KeyboardType.KEYBOARD_TYPE_SYSTEM) {
       if (isKeyboardLoaded(KeyboardType.KEYBOARD_TYPE_SYSTEM)) {
-        SystemKeyboard.loadJavascript("resetContext()");
+        SystemKeyboard.loadJavascript("resetContext()", true);
       }
     }
   }
