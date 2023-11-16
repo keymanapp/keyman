@@ -47,6 +47,11 @@ inline bool uassert_success(const char *file, int line, const char *function, UE
 
 using km::core::kmx::SimpleUSet;
 
+/** a reorder weight, such as primary, secondary, etc. */
+typedef signed char reorder_weight;
+
+
+
 /**
  * Type of a group
  */
@@ -71,9 +76,9 @@ public:
   /** @returns true if tertiary base bit set */
   bool is_tertiary_base() const;
   /** @returns the primary order */
-  signed char get_order() const;
+  reorder_weight get_order() const;
   /** @returns the tertiary order */
-  signed char get_tertiary() const;
+  reorder_weight get_tertiary() const;
   /** @returns raw elem flags */
   KMX_DWORD get_flags() const;
   /** @returns true if matches this character*/
@@ -156,11 +161,12 @@ public:
 
 /** a single char, categorized according to reorder rules*/
 struct reorder_sort_key {
-  km_core_usv ch;         // the single char value
-  signed char primary;   // primary order value
-  size_t secondary;      // index position
-  signed char tertiary;  // tertiary value, defaults to 0
-  size_t quaternary;     // index again
+  km_core_usv ch;        // the single char value
+  reorder_weight primary;   // primary order value
+  reorder_weight secondary;      // index position
+  reorder_weight tertiary;  // tertiary value, defaults to 0
+  reorder_weight quaternary;     // index again
+  bool is_tertiary_base;  // remember that this key was a tertiary base
 
   /** @returns -1, 0, 1 depending on ordering */
   int compare(const reorder_sort_key &other) const;
@@ -212,6 +218,11 @@ public:
    * @return 0 if no match otherwise length matched
    */
   size_t match_end(std::u32string &str, size_t offset, size_t len) const;
+
+  /** @returns -1, 0, 1 depending on ordering */
+  int compare(const reorder_entry &other) const;
+  bool operator<(const reorder_entry &other) const;
+  bool operator>(const reorder_entry &other) const;
 
 public:
   element_list elements;

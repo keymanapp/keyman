@@ -15,15 +15,22 @@
 #define zassert_string_equal(actual, expected)                                                                               \
   {                                                                                                                          \
     if (actual != expected) {                                                                                                \
-      std::wcerr << __FILE__ << ":" << __LINE__ << ": " << console_color::fg(console_color::BRIGHT_RED) << "got: " << actual \
-                 << " expected " << expected << console_color::reset() << std::endl;                                         \
+      std::wcerr << __FILE__ << ":" << __LINE__ << ": " << console_color::fg(console_color::BRIGHT_RED) << "got: " << km::core::kmx::Debug_UnicodeString(actual, 0) \
+                 << " expected " << km::core::kmx::Debug_UnicodeString(expected, 1) << console_color::reset() << std::endl;                                         \
       return EXIT_FAILURE;                                                                                                   \
     }                                                                                                                        \
   }
 #endif
 
 #ifndef zassert_equal
-#define zassert_equal(actual, expected) zassert_string_equal(actual, expected)
+#define zassert_equal(actual, expected)                                                                             \
+  {                                                                                                                          \
+    if (actual != expected) {                                                                                                \
+      std::wcerr << __FILE__ << ":" << __LINE__ << ": " << console_color::fg(console_color::BRIGHT_RED) << "got: " << actual \
+                 << " expected " << expected << console_color::reset() << std::endl;                                         \
+      return EXIT_FAILURE;                                                                                                   \
+    }                                                                                                                        \
+  }
 #endif
 
 // needed for streaming operators
@@ -151,6 +158,22 @@ int
 test_reorder_standalone() {
   std::cout << "== " << __FUNCTION__ << std::endl;
 
+  std::cout << __FILE__ << ":" << __LINE__ << " - element API test " << std::endl;
+  // element API test - not a real element, just here for testing
+  {
+    element es(U'a', 0xF4500000 | LDML_ELEM_FLAGS_PREBASE | LDML_ELEM_FLAGS_TERTIARY_BASE);  // tertiary -12, primary 80
+    std::cout << "es flags" << std::hex << es.get_flags() << std::dec << std::endl;
+    // verify element metadata
+    assert_equal(es.is_uset(), false);
+    assert_equal(es.get_order(), 0x50);
+    assert_equal(es.get_tertiary(), -12);
+    assert_equal(es.is_prebase(), true);
+    assert_equal(es.is_tertiary_base(), true);
+    // verify element matching
+    assert_equal(es.matches(U'a'), true);
+    assert_equal(es.matches(U'b'), false);
+  }
+
   std::cout << __FILE__ << ":" << __LINE__ << " - nod-Lana " << std::endl;
   {
     const std::u32string roasts[] = {
@@ -172,17 +195,17 @@ test_reorder_standalone() {
     assert_equal(toneMarks.contains(0x1A76), true);
     assert_equal(toneMarks.contains(0x1A60), false);
 
-    std::cout << __FILE__ << ":" << __LINE__ << " - element test " << std::endl;
+    std::cout << __FILE__ << ":" << __LINE__ << " - element API test " << std::endl;
     // element test
     {
-      element es(U'a', 0xF4500000 | LDML_ELEM_FLAGS_PREBASE | LDML_ELEM_FLAGS_TERTIARY_BASE);  // tertiary -12, primary 80
+      element es(U'a', (80 << LDML_ELEM_FLAGS_ORDER_BITSHIFT)  | LDML_ELEM_FLAGS_PREBASE);  // tertiary -12, primary 80
       std::cout << "es flags" << std::hex << es.get_flags() << std::dec << std::endl;
       // verify element metadata
       assert_equal(es.is_uset(), false);
       assert_equal(es.get_order(), 0x50);
-      assert_equal(es.get_tertiary(), -12);
+      assert_equal(es.get_tertiary(), 0);
       assert_equal(es.is_prebase(), true);
-      assert_equal(es.is_tertiary_base(), true);
+      assert_equal(es.is_tertiary_base(), false);
       // verify element matching
       assert_equal(es.matches(U'a'), true);
       assert_equal(es.matches(U'b'), false);
@@ -228,7 +251,7 @@ test_reorder_standalone() {
       l.update_sort_key(0, keylist);
       std::cout << __FILE__ << ":" << __LINE__ << "  updated sortkey" << std::endl;
       assert_equal(keylist.size(), 2);
-      size_t secondary = 0;
+      reorder_weight secondary = 0;
       for (auto i = keylist.begin(); i < keylist.end(); i++) {
         i->dump();
         assert_equal(i->secondary, secondary);
@@ -239,7 +262,7 @@ test_reorder_standalone() {
 
       // spot check first sortkey
       assert_equal(keylist.begin()->primary, 80);
-      assert_equal(keylist.begin()->tertiary, -12);
+      assert_equal(keylist.begin()->tertiary, 0);
       assert_equal(keylist.begin()->ch, 0x61);
       std::cout << __FILE__ << ":" << __LINE__ << "  sorted sortkey" << std::endl;
 
@@ -401,6 +424,133 @@ test_reorder_standalone() {
         size_t len = tr.apply(text, output);
         zassert_string_equal(output, U"");
         assert_equal(len, 0);
+      }
+    }
+  }
+  return EXIT_SUCCESS;
+}
+
+
+// this test case is also in XML form under 'k_201_*'
+int
+test_reorder_esk() {
+  std::cout << "== " << __FUNCTION__ << std::endl;
+
+  std::cout << __FILE__ << ":" << __LINE__ << " - k_201_reorder_esk (tertiary reordering) " << std::endl;
+  {
+    // now setup the rules
+    // rules are a little bit simplified, having only the vowel 'a'
+
+    std::cout << "now prepare the reorder elements" << std::endl;
+    transforms tr;
+    {
+      reorder_group rg;
+
+      // <reorder from="a" order="0" tertiaryBase="true" />
+      {
+        element_list e;
+        e.emplace_back(U'a', (0 << LDML_ELEM_FLAGS_ORDER_BITSHIFT) | LDML_ELEM_FLAGS_TERTIARY_BASE);
+        rg.list.emplace_back(e);
+      }
+
+      // <reorder from="[\u{0332}]" tertiary="1" />
+      {
+        element_list e;
+        e.emplace_back(0x0332, (1 << LDML_ELEM_FLAGS_TERTIARY_BITSHIFT));
+        rg.list.emplace_back(e);
+      }
+      // <reorder from="[\u{0305}\u{0302}]" tertiary="2" />
+      {
+        element_list e;
+        e.emplace_back(0x305, (2 << LDML_ELEM_FLAGS_TERTIARY_BITSHIFT));
+        // (should be a unicodeset, but for simplicity we're dropping the U+302)
+        // e.emplace_back(0x302, (2 << LDML_ELEM_FLAGS_TERTIARY_BITSHIFT));
+        rg.list.emplace_back(e);
+      }
+      // <reorder from="x" order="1" />
+      {
+        element_list e;
+        e.emplace_back(U'x', (1 << LDML_ELEM_FLAGS_ORDER_BITSHIFT));
+        rg.list.emplace_back(e);
+      }
+      // <reorder from="y" order="2" />
+      {
+        element_list e;
+        e.emplace_back(U'y', (2 << LDML_ELEM_FLAGS_ORDER_BITSHIFT));
+        rg.list.emplace_back(e);
+      }
+      // <reorder from="z" order="3" />
+      {
+        element_list e;
+        e.emplace_back(U'z', (3 << LDML_ELEM_FLAGS_ORDER_BITSHIFT));
+        rg.list.emplace_back(e);
+      }
+
+      tr.addGroup(rg);
+    }
+
+    // now actually test it
+    std::cout << __FILE__ << ":" << __LINE__ << " - cases " << std::endl;
+    const std::u32string orig_expect[] = {
+      // 1short
+      U"ax\u0305",          // orig
+      U"a\u0305x",          // expect
+
+      // 2longer
+      U"az\u0305x\u0332",   // orig
+      U"a\u0332\u0305xz",   // expect
+    };
+    // TODO-LDML: move this into test code perhaps
+    for (size_t r = 0; r < sizeof(orig_expect) / sizeof(orig_expect[0]); r+= 2) {
+      const auto &orig   = orig_expect[r + 0];
+      const auto &expect = orig_expect[r + 1];
+      std::cout << __FILE__ << ":" << __LINE__ << " - trying str #" << r+1 << "=" << orig << std::endl;
+      // try apply with string
+      {
+          std::cout << "- try apply(text, output)" << std::endl;
+          std::u32string text = orig;
+          std::u32string output;
+          size_t len = tr.apply(text, output);
+          if (len == 0) {
+            std::cout << " (did not apply)" << std::endl;
+          } else {
+            std::cout << " applied, matchLen= " << len << std::endl;
+            text.resize(text.size()-len); // shrink
+            text.append(output);
+            std::cout << " = " << text << std::endl;
+          }
+          zassert_string_equal(text, expect);
+      }
+      // try all-at-once
+      {
+        std::cout << "- try apply(text)" << std::endl;
+        std::u32string text = orig;
+        if (!tr.apply(text)) {
+          std::cout << " (did not apply)" << std::endl;
+        } else if (text == orig) {
+          std::cout << " (suboptimal: apply returned true but made no change)" << std::endl;
+        } else {
+          std::cout << " changed to " << text;
+        }
+        zassert_string_equal(text, expect);
+        std::cout << " matched (converting all at once)!" << std::endl;
+      }
+      // simulate typing this one char at a time;
+      {
+        std::cout << "- try key-at-a-time" << std::endl;
+        std::u32string text;
+        for (auto ch = orig.begin(); ch < orig.end(); ch++) {
+          // append the string
+          text.append(1, *ch);
+          std::cout << "-: " << text << std::endl;
+          if (!tr.apply(text)) {
+            std::cout << " (did not apply)" << std::endl;
+          }
+        }
+        // now the moment of truth
+        zassert_string_equal(text, expect);
+        std::cout << " matched! (converting char at a time)" << std::endl;
+        std::cout << std::endl;
       }
     }
   }
@@ -636,6 +786,10 @@ main(int argc, const char *argv[]) {
   }
 
   if (test_reorder_standalone() != EXIT_SUCCESS) {
+    rc = EXIT_FAILURE;
+  }
+
+  if (test_reorder_esk() != EXIT_SUCCESS) {
     rc = EXIT_FAILURE;
   }
 
