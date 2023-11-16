@@ -747,12 +747,10 @@ public final class KMManager {
     // KMKeyboard
     if (InAppKeyboard != null) {
       RelativeLayout.LayoutParams params = getKeyboardLayoutParams();
-      InAppKeyboard.setLayoutParams(params);
       InAppKeyboard.onConfigurationChanged(newConfig);
     }
     if (SystemKeyboard != null) {
       RelativeLayout.LayoutParams params = getKeyboardLayoutParams();
-      SystemKeyboard.setLayoutParams(params);
       SystemKeyboard.onConfigurationChanged(newConfig);
     }
   }
