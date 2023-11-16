@@ -1,10 +1,26 @@
 import * as gestures from "../index.js";
 
-// Prototype spec for the main gesture & gesture-set definitions.
-// A work in-progress.  Should probably land somewhere within headless/gestures/specs/.
-// ... with the following two functions, as well.
 export interface GestureModelDefs<Type, StateToken = any> {
+  /**
+   * The full set of gesture models to be utilized by the gesture-recognition engine.
+   */
   gestures: gestures.specs.GestureModel<Type, StateToken>[],
+
+  /**
+   * Sets _of sets_ of gesture models accessible as initial gesture stages while
+   * within various states of the gesture-engine.
+   *
+   * `'default'` must be specified, as it is the default state.
+   *
+   * A 'chain'-type model resolution has the option to specify a `selectionMode` property;
+   * the value set there will activate a different gesture-recognition mode _for new
+   * gestures_ corresponding to the sets specified here.
+   *
+   * These sets may be defined to either restrict the range of options for new incoming
+   * gestures or to restrict them.  Specifying an empty set will disable all incoming
+   * gestures while the alternate state is active, allowing one gesture to block any
+   * further gestures from starting until it is completed.
+   */
   sets: {
     default: string[],
   } & Record<string, string[]>;

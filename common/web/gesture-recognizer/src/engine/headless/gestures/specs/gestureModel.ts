@@ -83,6 +83,15 @@ type ResolutionStruct = ResolutionChain | ResolutionComplete;
 export type GestureResolutionSpec   = ResolutionStruct & ResolutionItemSpec;
 export type GestureResolution<Type> = (ResolutionStruct | RejectionDefault | RejectionReplace) & ResolutionItem<Type>;
 
+/**
+ * Represents the criteria necessary to fulfill one stage of an ongoing gesture;
+ * essentially, one 'state' on a time-based finite-state-machine representing
+ * a full gesture (as processed by `GestureSequence`).
+ *
+ * For example, a longpress interaction on a keyboard may consist of two stages:
+ * 1. The actual "hold and wait" that longpress is known for.
+ * 2. Selection of a key from the menu that appears afterward.
+ */
 export interface GestureModel<Type, StateToken = any> {
   // Gestures may want to say "build gesture of type `id`" for a followup-gesture.
   readonly id: string;
