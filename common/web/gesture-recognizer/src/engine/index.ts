@@ -1,3 +1,5 @@
+import { validateModelDefs } from './headless/gestures/specs/modelDefValidator.js';
+
 export { ConstructingSegment } from './headless/subsegmentation/constructingSegment.js';
 export { CumulativePathStats } from './headless/cumulativePathStats.js';
 export { GestureModelDefs } from './headless/gestures/specs/gestureModelDefs.js';
@@ -19,5 +21,6 @@ export { TouchpointCoordinator } from "./headless/touchpointCoordinator.js";
 export { ViewportZoneSource } from './configuration/viewportZoneSource.js';
 
 export * as gestures from './headless/gestures/index.js';
+export { validateModelDefs } from './headless/gestures/specs/modelDefValidator.js';
 
 // TODO:  export other odds & ends.
