@@ -251,7 +251,7 @@ test_reorder_standalone() {
       l.update_sort_key(0, keylist);
       std::cout << __FILE__ << ":" << __LINE__ << "  updated sortkey" << std::endl;
       assert_equal(keylist.size(), 2);
-      size_t secondary = 0;
+      reorder_weight secondary = 0;
       for (auto i = keylist.begin(); i < keylist.end(); i++) {
         i->dump();
         assert_equal(i->secondary, secondary);
