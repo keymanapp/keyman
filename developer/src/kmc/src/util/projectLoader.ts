@@ -47,6 +47,10 @@ function loadProjectFromFile(infile: string, callbacks: CompilerCallbacks): Keym
   let kpj = null;
   try {
     kpj = reader.read(kpjData);
+    if(kpj.KeymanDeveloperProject?.Options?.Version && kpj.KeymanDeveloperProject.Options.Version != "1.0" && kpj.KeymanDeveloperProject.Options.Version != "2.0") {
+      callbacks.reportMessage(InfrastructureMessages.Error_UnsupportedProjectVersion({version: kpj.KeymanDeveloperProject.Options.Version}));
+      return null;
+    }
     reader.validate(kpj);
   } catch(e) {
     callbacks.reportMessage(InfrastructureMessages.Error_InvalidProjectFile({message: (e??'').toString()}));

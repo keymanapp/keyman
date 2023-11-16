@@ -1,5 +1,35 @@
 # Keyman Version History
 
+## 17.0.211 alpha 2023-11-15
+
+* fix(windows): setup.inf generation had whitespace (#10000)
+* feat(developer): Support v2.0 projects in TIKE (#9949)
+* feat(developer): New Project - Description field and tweaks (#9950)
+* chore(developer): hide 'Remove From Project' for v2.0 projects (#9956)
+* feat(developer): Support loading XML LDML keyboards in TIKE (#9963)
+* feat(developer): show .xml LDML keyboards in project (#9964)
+* fix(developer): kmc build ldml keyboard should create output folder (#9966)
+* fix(developer): Project upgrade messages now show in Messages panel (#9969)
+* feat(developer): Project Settings Form for 17.0+ projects (#9984)
+* chore(developer): only build source files (#9985)
+* chore(developer): manage SourcePath in project upgrade (#9986)
+* feat(developer): handle errors loading projects (#9989)
+* chore(developer): show only source path files in project views (#9995)
+* chore(developer): handle project version checks cleanly in kmc (#9996)
+* fix(common): dx: don't call exit(0) on failure (#10005)
+* fix(linux): Improve triggering of packaging GHA (#10009)
+* chore(web,developer): Move keymanweb-osk.ttf to common/resources (#9993)
+
+## 17.0.210 alpha 2023-11-14
+
+* docs(common): Update CODEOWNERS for web (#9997)
+* chore(core): Add additional API checks (#9867)
+
+## 17.0.209 alpha 2023-11-13
+
+* docs(windows): update meson and emscripten details (#9933)
+* fix(web): Increase size of spacebar text (#9954)
+
 ## 17.0.208 alpha 2023-11-08
 
 * fix(web): Fix clearing of deadkeys (#9944)

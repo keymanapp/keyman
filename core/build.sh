@@ -165,7 +165,7 @@ fi
 
 # -------------------------------------------------------------------------------
 
-testparams="${builder_extra_params[@]}"
+testparams="${builder_extra_params[@]} --print-errorlogs"
 if builder_has_option --test; then
   testparams="$opt_tests $testparams"
 fi

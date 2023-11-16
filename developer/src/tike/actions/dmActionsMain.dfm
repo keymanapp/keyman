@@ -32,6 +32,17 @@ object modActionsMain: TmodActionsMain
       OnExecute = actViewCharacterIdentifierExecute
       OnUpdate = actViewCharacterIdentifierUpdate
     end
+    object actProjectOpenFolder: TBrowseForFolder
+      Category = 'Project'
+      Caption = 'Open Project Folder...'
+      DialogCaption = 'Open Project Folder'
+      BrowseOptions = []
+      BrowseOptionsEx = []
+      Hint = 'Open Project Folder|Opens an existing project folder'
+      ShortCut = 24655
+      UseFileDialog = True
+      OnAccept = actProjectOpenFolderAccept
+    end
     object actFileOpen: TFileOpen
       Category = 'File'
       Caption = '&Open...'
@@ -248,21 +259,7 @@ object modActionsMain: TmodActionsMain
       Dialog.Options = [ofHideReadOnly, ofPathMustExist, ofFileMustExist, ofEnableSizing]
       Hint = 'Open Project|Opens an existing project'
       ImageIndex = 28
-      ShortCut = 16463
       OnAccept = actProjectOpenAccept
-    end
-    object actProjectSaveAs: TFileSaveAs
-      Category = 'Project'
-      Caption = 'Save Project &As...'
-      Dialog.DefaultExt = 'kpj'
-      Dialog.Filter = 'Keyman Developer Project Files (*.kpj)|*.kpj|All Files (*.*)|*.*'
-      Dialog.Options = [ofOverwritePrompt, ofHideReadOnly, ofPathMustExist, ofEnableSizing]
-      Dialog.Title = 'Save Project As'
-      Dialog.OnCanClose = actProjectSaveAsSaveDialogCanClose
-      Hint = 'Save Project As|Saves the current project with a new name'
-      BeforeExecute = actProjectSaveAsBeforeExecute
-      OnAccept = actProjectSaveAsAccept
-      OnUpdate = actProjectSaveAsUpdate
     end
     object actProjectAddCurrentEditorFile: TAction
       Category = 'Project'

@@ -88,22 +88,52 @@ interface
 
 uses
   System.UITypes,
-  Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms,
-  ComCtrls, ImgList, Menus, StdCtrls, ExtCtrls, ToolWin, Buttons,
-  KeymanDeveloperUtils, UfrmMDIChild, UfrmMDIEditor,
+  Windows,
+  Messages,
+  SysUtils,
+  Classes,
+  Graphics,
+  Controls,
+  Forms,
+  ComCtrls,
+  ImgList,
+  Menus,
+  StdCtrls,
+  ExtCtrls,
+  ToolWin,
+  Buttons,
+  KeymanDeveloperUtils,
+  UfrmMDIChild,
+  UfrmMDIEditor,
   MenuImgList,
   Keyman.Developer.System.Project.Project,
-  Keyman.Developer.UI.Project.UfrmProject, CharacterMapSettings,
+  Keyman.Developer.UI.Project.UfrmProject,
+  CharacterMapSettings,
   mrulist,
   UfrmUnicodeDataStatus,
   CharacterDragObject,
   Keyman.Developer.UI.dmActionsModelEditor,
-  dmActionsMain, UnicodeData, UserMessages, webhelp,
-  dmActionsKeyboardEditor, Dialogs, UfrmTike, AppEvnts,
+  UnicodeData,
+  UserMessages,
+  webhelp,
+  dmActionsDebugger,
+  dmActionsKeyboardEditor,
+  dmActionsMain,
+  Dialogs,
+  UfrmTike,
+  AppEvnts,
   DropTarget,
-  System.ImageList, Winapi.ActiveX, CloseButtonPageControl, JvComponentBase,
-  JvDockControlForm, JvDockTree, JvDockVIDStyle, JvDockVSNetStyle,
-  JvAppRegistryStorage, Vcl.ActnMan, Vcl.ActnCtrls;
+  System.ImageList,
+  Winapi.ActiveX,
+  CloseButtonPageControl,
+  JvComponentBase,
+  JvDockControlForm,
+  JvDockTree,
+  JvDockVIDStyle,
+  JvDockVSNetStyle,
+  JvAppRegistryStorage,
+  Vcl.ActnMan,
+  Vcl.ActnCtrls;
 
 type
   TfrmKeymanDeveloper = class(TTikeForm, IUnicodeDataUIManager, IDragDrop)
@@ -208,12 +238,11 @@ type
     CodeFont1: TMenuItem;
     NewProject1: TMenuItem;
     OpenProject1: TMenuItem;
-    SaveProjectAs1: TMenuItem;
     N25: TMenuItem;
     mnuProjectsRecent: TMenuItem;
     N26: TMenuItem;
     N27: TMenuItem;
-    Addtoproject1: TMenuItem;
+    mnuProjectAddToProject: TMenuItem;
     CurrentEditorFile1: TMenuItem;
     OtherFiles1: TMenuItem;
     ProjectSettings1: TMenuItem;
@@ -285,6 +314,7 @@ type
     Stopserver1: TMenuItem;
     ToolButton13: TToolButton;
     ToolButton16: TToolButton;
+    OpenProjectFolder1: TMenuItem;
     procedure FormCreate(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure mnuFileClick(Sender: TObject);
@@ -448,9 +478,12 @@ uses
   Keyman.Developer.System.Project.ProjectFile,
   Keyman.Developer.System.Project.ProjectFileType,
   Keyman.Developer.System.Project.WelcomeRenderer,
+  Keyman.Developer.System.Project.ProjectLoader,
   Keyman.Developer.System.Project.ProjectLog,
+  Keyman.Developer.System.Project.XmlLdmlProjectFile,
   Keyman.Developer.UI.Project.ProjectFileUI,
   Keyman.Developer.UI.Project.ProjectUI,
+  Keyman.Developer.UI.UfrmLdmlKeyboardEditor,
   Keyman.Developer.UI.UfrmWordlistEditor,
   Keyman.Developer.UI.UfrmModelEditor,
   TextFileFormat,
@@ -511,6 +544,7 @@ begin
 
   modActionsTextEditor := TmodActionsTextEditor.Create(Self);
   modActionsKeyboardEditor := TmodActionsKeyboardEditor.Create(Self);
+  modActionsDebugger := TmodActionsDebugger.Create(Self);
   modActionsMain := TmodActionsMain.Create(Self);
   modActionsModelEditor := TmodActionsModelEditor.Create(Self);
 
@@ -549,10 +583,21 @@ begin
   RemoveOldestTikeTestFonts(False);
 
   if (FActiveProject <> '') and not FileExists(FActiveProject) then
+    // TODO: we need to support folder-based projects here
     FActiveProject := '';
 
   if FActiveProject <> '' then
-    LoadGlobalProjectUI(ptUnknown, FActiveProject, True);
+  begin
+    try
+      LoadGlobalProjectUI(ptUnknown, FActiveProject);
+    except
+      on E:EProjectLoader do
+      begin
+        // Message will be displayed by LoadGlobalProjectUI
+        FreeGlobalProjectUI;
+      end;
+    end;
+  end;
 
   InitDock;
 
@@ -628,10 +673,7 @@ begin
     begin
       if IsGlobalProjectUIReady then
       begin
-        if FGlobalProject.Untitled
-          then FGlobalProject.PersistUntitledProject  // I1010: Persist untitled project
-          else FGlobalProject.Save;   // I4691
-
+        FGlobalProject.Save;   // I4691
         WriteString(SRegValue_ActiveProject, FGlobalProject.FileName);
       end
       else
@@ -1024,7 +1066,7 @@ procedure TfrmKeymanDeveloper.cbDebugSystemKeyboardItemClick(Sender: TObject);
 begin
   if cbDebugSystemKeyboard.ItemIndex < 0 then
     cbDebugSystemKeyboard.ItemIndex := 0;
-  modActionsKeyboardEditor.SelectDebugSystemKeyboard(cbDebugSystemKeyboard.Items.Objects[cbDebugSystemKeyboard.ItemIndex] as TSystemKeyboardItem);
+  modActionsDebugger.SelectDebugSystemKeyboard(cbDebugSystemKeyboard.Items.Objects[cbDebugSystemKeyboard.ItemIndex] as TSystemKeyboardItem);
   //actDebugSystemKeyboard
 end;
 
@@ -1133,8 +1175,16 @@ var
 begin
   if not IsGlobalProjectUIReady then
   begin
+    // TODO: we need to open the parent folder as a project, if possible
     // This can happen if we get a file opened via Explorer.
-    modActionsMain.NewProject(ptKeyboard);
+    ShowMessage('TODO -- open parent folder as project');
+    Exit(nil);
+  end;
+
+  if DirectoryExists(FFileName) then
+  begin
+    // This is an attempt to open a project folder?
+    // TODO
   end;
 
   Result := nil;
@@ -1163,6 +1213,8 @@ begin
         else if ext = '.kvks' then Result := OpenKVKEditor(FFileName)
         else if ext = '.bmp'  then Result := OpenEditor(FFileName, TfrmBitmapEditor)
         else if ext = '.tsv'  then Result := OpenTSVEditor(FFileName)
+        else if (ext = '.xml') and TxmlLdmlProjectFile.IsFileTypeSupported(FFileName) then
+          Result := OpenEditor(FFileName, TfrmLdmlKeyboardEditor)
         else if FileHasModelTsExt(FFileName) then Result := OpenModelEditor(FFileName)
         else                       Result := OpenEditor(FFileName, TfrmEditor);
 
@@ -1400,6 +1452,9 @@ begin
   end;
 
   mnuProjectsRecent.Enabled := FProjectMRU.FileCount > 0;
+
+  mnuProjectAddToProject.Visible := not IsGlobalProjectUIReady or
+    (FGlobalProject.Options.Version = pv10);
 end;
 
 procedure TfrmKeymanDeveloper.mnuProjectRecentFileClick(Sender: TObject);
@@ -1494,9 +1549,8 @@ procedure TfrmKeymanDeveloper.UpdateCaption;
 begin
   if not IsGlobalProjectUIReady then
     Caption := 'Keyman Developer'
-  else if FGlobalProject.Untitled
-    then Caption := '(Untitled project) - Keyman Developer'
-    else Caption := ChangeFileExt(ExtractFileName(FGlobalProject.FileName), '') + ' - Keyman Developer';
+  else
+    Caption := ChangeFileExt(ExtractFileName(FGlobalProject.FileName), '') + ' - Keyman Developer';
 end;
 
 procedure TfrmKeymanDeveloper.UpdateChildCaption(Window: TfrmTikeChild);
