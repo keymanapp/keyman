@@ -382,7 +382,7 @@ final class KMKeyboard extends WebView {
     int bannerHeight = KMManager.getBannerHeight(context);
     int oskHeight = KMManager.getKeyboardHeight(context);
     if (this.htmlBannerString != null && !this.htmlBannerString.isEmpty()) {
-      loadJavascript(KMString.format("setBannerHTML('%s')", this.htmlBannerString));
+      setHTMLBanner(this.htmlBannerString);
     }
     loadJavascript(KMString.format("setBannerHeight(%d)", bannerHeight));
     loadJavascript(KMString.format("setOskWidth(%d)", newConfig.screenWidthDp));
@@ -649,7 +649,8 @@ final class KMKeyboard extends WebView {
 
   public void setHTMLBanner(String contents) {
     this.htmlBannerString = contents;
-    String jsString = KMString.format("setBannerHTML('%s')", contents);
+    String jsString = KMString.format("setBannerHTML(%s)",
+      JSONObject.quote(this.htmlBannerString));
     loadJavascript(jsString);
   }
 
