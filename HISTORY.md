@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 17.0.212 alpha 2023-11-16
+
+* chore(web): splits banner.ts into separate files per banner type (#9987)
+* refactor(web): inactive banner management (#9988)
+
 ## 17.0.211 alpha 2023-11-15
 
 * fix(windows): setup.inf generation had whitespace (#10000)
