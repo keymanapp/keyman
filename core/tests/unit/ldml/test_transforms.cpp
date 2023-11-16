@@ -158,6 +158,22 @@ int
 test_reorder_standalone() {
   std::cout << "== " << __FUNCTION__ << std::endl;
 
+  std::cout << __FILE__ << ":" << __LINE__ << " - element API test " << std::endl;
+  // element API test - not a real element, just here for testing
+  {
+    element es(U'a', 0xF4500000 | LDML_ELEM_FLAGS_PREBASE | LDML_ELEM_FLAGS_TERTIARY_BASE);  // tertiary -12, primary 80
+    std::cout << "es flags" << std::hex << es.get_flags() << std::dec << std::endl;
+    // verify element metadata
+    assert_equal(es.is_uset(), false);
+    assert_equal(es.get_order(), 0x50);
+    assert_equal(es.get_tertiary(), -12);
+    assert_equal(es.is_prebase(), true);
+    assert_equal(es.is_tertiary_base(), true);
+    // verify element matching
+    assert_equal(es.matches(U'a'), true);
+    assert_equal(es.matches(U'b'), false);
+  }
+
   std::cout << __FILE__ << ":" << __LINE__ << " - nod-Lana " << std::endl;
   {
     const std::u32string roasts[] = {
@@ -179,17 +195,17 @@ test_reorder_standalone() {
     assert_equal(toneMarks.contains(0x1A76), true);
     assert_equal(toneMarks.contains(0x1A60), false);
 
-    std::cout << __FILE__ << ":" << __LINE__ << " - element test " << std::endl;
+    std::cout << __FILE__ << ":" << __LINE__ << " - element API test " << std::endl;
     // element test
     {
-      element es(U'a', 0xF4500000 | LDML_ELEM_FLAGS_PREBASE | LDML_ELEM_FLAGS_TERTIARY_BASE);  // tertiary -12, primary 80
+      element es(U'a', (80 << LDML_ELEM_FLAGS_ORDER_BITSHIFT)  | LDML_ELEM_FLAGS_PREBASE);  // tertiary -12, primary 80
       std::cout << "es flags" << std::hex << es.get_flags() << std::dec << std::endl;
       // verify element metadata
       assert_equal(es.is_uset(), false);
       assert_equal(es.get_order(), 0x50);
-      assert_equal(es.get_tertiary(), -12);
+      assert_equal(es.get_tertiary(), 0);
       assert_equal(es.is_prebase(), true);
-      assert_equal(es.is_tertiary_base(), true);
+      assert_equal(es.is_tertiary_base(), false);
       // verify element matching
       assert_equal(es.matches(U'a'), true);
       assert_equal(es.matches(U'b'), false);
@@ -246,7 +262,7 @@ test_reorder_standalone() {
 
       // spot check first sortkey
       assert_equal(keylist.begin()->primary, 80);
-      assert_equal(keylist.begin()->tertiary, -12);
+      assert_equal(keylist.begin()->tertiary, 0);
       assert_equal(keylist.begin()->ch, 0x61);
       std::cout << __FILE__ << ":" << __LINE__ << "  sorted sortkey" << std::endl;
 

@@ -236,7 +236,7 @@ element_list::update_sort_key(size_t offset, std::deque<reorder_sort_key> &key) 
     k.tertiary         = e->get_tertiary();
     k.is_tertiary_base = e->is_tertiary_base();
 
-    if (k.tertiary != 0) {
+    if (k.tertiary != 0 && n > 0) {
       // search backwards for a base
       auto n2 = n;
       // TODO-LDML: odd loop here because n2 is signed.
