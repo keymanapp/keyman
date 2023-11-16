@@ -10,10 +10,7 @@
 #include <algorithm>
 #include <string>
 #include "kmx/kmx_xstring.h"
-
-#ifndef assert
-#define assert(x) ((void)0)
-#endif
+#include <assert.h>
 
 namespace km {
 namespace core {
@@ -1004,7 +1001,6 @@ std::u32string remove_markers(const std::u32string &str, marker_map *markers) {
     }
 
     // #2 LDML_MARKER_CODE
-    assert(*i == LDML_MARKER_CODE);
     if (*i != LDML_MARKER_CODE) {
       continue; // can't process this, get out
     }
