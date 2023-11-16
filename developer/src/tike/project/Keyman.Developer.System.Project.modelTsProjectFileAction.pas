@@ -64,7 +64,7 @@ begin
   ForceDirectories(ExtractFileDir(TargetFileName));
   Result := CompileModelFile(Self, FileName, TargetFileName, IsDebug);
 
-  if HasCompileWarning and (WarnAsError or OwnerProject.Options.CompilerWarningsAsErrors) then Result := False;   // I4706
+  if HasCompileWarning and OwnerProject.Options.CompilerWarningsAsErrors then Result := False;   // I4706
 
   if Result
     then Log(plsSuccess, Format('''%s'' was compiled successfully  to ''%s''.', [FileName, TargetFileName]), 0, 0)   // I4504

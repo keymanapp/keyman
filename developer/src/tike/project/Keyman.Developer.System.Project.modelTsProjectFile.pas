@@ -34,7 +34,6 @@ type
   TmodelTsProjectFile = class(TOpenableProjectFile)
   private
     FDebug: Boolean;
-    FWarnAsError: Boolean;
     FTestKeyboard: string;   // I4706
 
     function GetTargetFilename: string;
@@ -44,15 +43,12 @@ type
 
     property IsDebug: Boolean read FDebug;
   public
-    procedure Load(node: IXMLNode; LoadState: Boolean); override;   // I4698
-    procedure Save(node: IXMLNode; SaveState: Boolean); override;   // I4698
+    function IsCompilable: Boolean; override;
     procedure LoadState(node: IXMLNode); override;   // I4698
     procedure SaveState(node: IXMLNode); override;   // I4698
 
     property Debug: Boolean read FDebug write FDebug;
     property TestKeyboard: string read FTestKeyboard write FTestKeyboard;
-
-    property WarnAsError: Boolean read FWarnAsError write FWarnAsError;   // I4706
 
     property TargetFilename: string read GetTargetFilename;
   end;
@@ -70,26 +66,11 @@ uses
  - TmodelTsProjectFile                                                             -
  -------------------------------------------------------------------------------}
 
-procedure TmodelTsProjectFile.Save(node: IXMLNode; SaveState: Boolean);   // I4698
-begin
-  inherited Save(node, SaveState);   // I4698
-  if SaveState then
-    Self.SaveState(node);   // I4698
-end;
-
 procedure TmodelTsProjectFile.SaveState(node: IXMLNode);   // I4698
 begin
   inherited SaveState(node);
   node.AddChild('Debug').NodeValue := FDebug;
   node.AddChild('TestKeyboard').NodeValue := FTestKeyboard;
-end;
-
-procedure TmodelTsProjectFile.Load(node: IXMLNode; LoadState: Boolean);   // I4698
-begin
-  inherited Load(node, LoadState);
-
-  if LoadState then
-    Self.LoadState(node);
 end;
 
 procedure TmodelTsProjectFile.LoadState(node: IXMLNode);   // I4698
@@ -124,6 +105,11 @@ begin
   // which fixes the reference counting.
   FTempFileVersion := FileVersion;
   Result := OwnerProject.GetTargetFilename(OutputFileName, FileName, FTempFileVersion);
+end;
+
+function TmodelTsProjectFile.IsCompilable: Boolean;
+begin
+  Result := True;
 end;
 
 procedure TmodelTsProjectFile.GetFileParameters;

@@ -233,6 +233,7 @@ begin
     kps.Info.Desc[PackageInfo_Name] := Name;
     kps.Info.Desc[PackageInfo_Copyright] := Copyright;
     kps.Info.Desc[PackageInfo_Author] := Author;
+    kps.Info.Desc[PackageInfo_Description] := Description;
     kps.KPSOptions.FollowKeyboardVersion := True;
     kps.FileName := GetPackageFilename;
 

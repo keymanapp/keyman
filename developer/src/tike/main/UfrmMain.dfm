@@ -75,7 +75,7 @@ inherited frmKeymanDeveloper: TfrmKeymanDeveloper
         Top = 0
         Width = 82
         Height = 22
-        Action = modActionsKeyboardEditor.actDebugTestMode
+        Action = modActionsDebugger.actDebugTestMode
         AllowAllUp = True
         GroupIndex = 1
       end
@@ -84,7 +84,7 @@ inherited frmKeymanDeveloper: TfrmKeymanDeveloper
         Top = 0
         Width = 98
         Height = 22
-        Action = modActionsKeyboardEditor.actDebugDebuggerMode
+        Action = modActionsDebugger.actDebugDebuggerMode
         AllowAllUp = True
         GroupIndex = 2
       end
@@ -120,7 +120,7 @@ inherited frmKeymanDeveloper: TfrmKeymanDeveloper
         object ToolButton21: TToolButton
           Left = 8
           Top = 0
-          Action = modActionsKeyboardEditor.actDebugStopDebugger
+          Action = modActionsDebugger.actDebugStopDebugger
         end
         object ToolButton23: TToolButton
           Left = 31
@@ -133,7 +133,7 @@ inherited frmKeymanDeveloper: TfrmKeymanDeveloper
         object ToolButton22: TToolButton
           Left = 39
           Top = 0
-          Action = modActionsKeyboardEditor.actDebugSingleStepMode
+          Action = modActionsDebugger.actDebugSingleStepMode
         end
         object ToolButton24: TToolButton
           Left = 62
@@ -146,17 +146,17 @@ inherited frmKeymanDeveloper: TfrmKeymanDeveloper
         object ToolButton25: TToolButton
           Left = 70
           Top = 0
-          Action = modActionsKeyboardEditor.actDebugStepForward
+          Action = modActionsDebugger.actDebugStepForward
         end
         object ToolButton26: TToolButton
           Left = 93
           Top = 0
-          Action = modActionsKeyboardEditor.actDebugRun
+          Action = modActionsDebugger.actDebugRun
         end
         object ToolButton27: TToolButton
           Left = 116
           Top = 0
-          Action = modActionsKeyboardEditor.actDebugPause
+          Action = modActionsDebugger.actDebugPause
         end
         object ToolButton28: TToolButton
           Left = 139
@@ -169,7 +169,7 @@ inherited frmKeymanDeveloper: TfrmKeymanDeveloper
         object ToolButton29: TToolButton
           Left = 147
           Top = 0
-          Action = modActionsKeyboardEditor.actDebugSetClearBreakpoint
+          Action = modActionsDebugger.actDebugSetClearBreakpoint
         end
       end
     end
@@ -2935,8 +2935,8 @@ inherited frmKeymanDeveloper: TfrmKeymanDeveloper
       object OpenProject1: TMenuItem
         Action = modActionsMain.actProjectOpen
       end
-      object SaveProjectAs1: TMenuItem
-        Action = modActionsMain.actProjectSaveAs
+      object OpenProjectFolder1: TMenuItem
+        Action = modActionsMain.actProjectOpenFolder
       end
       object CloseProject1: TMenuItem
         Action = modActionsMain.actProjectClose
@@ -2950,7 +2950,7 @@ inherited frmKeymanDeveloper: TfrmKeymanDeveloper
       object N26: TMenuItem
         Caption = '-'
       end
-      object Addtoproject1: TMenuItem
+      object mnuProjectAddToProject: TMenuItem
         Caption = 'A&dd to project'
         object CurrentEditorFile1: TMenuItem
           Action = modActionsMain.actProjectAddCurrentEditorFile
@@ -3014,40 +3014,40 @@ inherited frmKeymanDeveloper: TfrmKeymanDeveloper
     object mnuDebug: TMenuItem
       Caption = '&Debug'
       object SetBreakpoint1: TMenuItem
-        Action = modActionsKeyboardEditor.actDebugSetClearBreakpoint
+        Action = modActionsDebugger.actDebugSetClearBreakpoint
       end
       object N32: TMenuItem
         Caption = '-'
       end
       object StartDebugging1: TMenuItem
-        Action = modActionsKeyboardEditor.actDebugStartDebugger
+        Action = modActionsDebugger.actDebugStartDebugger
       end
       object StopDebugger1: TMenuItem
-        Action = modActionsKeyboardEditor.actDebugStopDebugger
+        Action = modActionsDebugger.actDebugStopDebugger
       end
       object N33: TMenuItem
         Caption = '-'
       end
       object ANSITestMode1: TMenuItem
-        Action = modActionsKeyboardEditor.actDebugANSITestMode
+        Action = modActionsDebugger.actDebugANSITestMode
       end
       object N34: TMenuItem
         Caption = '-'
       end
       object SingleStepMode1: TMenuItem
-        Action = modActionsKeyboardEditor.actDebugSingleStepMode
+        Action = modActionsDebugger.actDebugSingleStepMode
       end
       object N35: TMenuItem
         Caption = '-'
       end
       object StepForward1: TMenuItem
-        Action = modActionsKeyboardEditor.actDebugStepForward
+        Action = modActionsDebugger.actDebugStepForward
       end
       object Run1: TMenuItem
-        Action = modActionsKeyboardEditor.actDebugRun
+        Action = modActionsDebugger.actDebugRun
       end
       object Pause1: TMenuItem
-        Action = modActionsKeyboardEditor.actDebugPause
+        Action = modActionsDebugger.actDebugPause
       end
       object N36: TMenuItem
         Caption = '-'
@@ -3055,35 +3055,35 @@ inherited frmKeymanDeveloper: TfrmKeymanDeveloper
       object View2: TMenuItem
         Caption = '&View'
         object State1: TMenuItem
-          Action = modActionsKeyboardEditor.actDebugViewState
+          Action = modActionsDebugger.actDebugViewState
         end
         object Elements1: TMenuItem
-          Action = modActionsKeyboardEditor.actDebugViewElements
+          Action = modActionsDebugger.actDebugViewElements
         end
         object CallStack1: TMenuItem
-          Action = modActionsKeyboardEditor.actDebugViewCallStack
+          Action = modActionsDebugger.actDebugViewCallStack
         end
         object Deadkeys1: TMenuItem
-          Action = modActionsKeyboardEditor.actDebugViewDeadkeys
+          Action = modActionsDebugger.actDebugViewDeadkeys
         end
         object RegressionTesting1: TMenuItem
-          Action = modActionsKeyboardEditor.actDebugViewRegressionTesting
+          Action = modActionsDebugger.actDebugViewRegressionTesting
         end
         object N38: TMenuItem
           Caption = '-'
         end
         object Font1: TMenuItem
-          Action = modActionsKeyboardEditor.actDebugViewFont
+          Action = modActionsDebugger.actDebugViewFont
         end
         object UseEditorCharacterFont1: TMenuItem
-          Action = modActionsKeyboardEditor.actDebugViewDefaultFont
+          Action = modActionsDebugger.actDebugViewDefaultFont
         end
       end
       object N37: TMenuItem
         Caption = '-'
       end
       object SelectSystemKeyboard1: TMenuItem
-        Action = modActionsKeyboardEditor.actDebugSelectSystemKeyboard
+        Action = modActionsDebugger.actDebugSelectSystemKeyboard
       end
     end
     object mnuTools: TMenuItem

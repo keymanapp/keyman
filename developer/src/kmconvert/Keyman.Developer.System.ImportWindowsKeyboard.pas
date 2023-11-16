@@ -28,6 +28,7 @@ type
     FCopyright: string;
     FTargets: TKeymanTargets;
     FFullCopyright: string;
+    FDescription: string;
     function LoadKLIDDetails: Boolean;
     function ImportKeyboard(const DestinationFilename, DestinationKVKSFilename: string): Boolean;
     function GenerateIcon(const IconFilename: string): Boolean;
@@ -46,6 +47,7 @@ type
     function GetProjectFilename: string;
     procedure SetTargets(const Value: TKeymanTargets);
     procedure SetFullCopyright(const Value: string);
+    procedure SetDescription(const Value: string);
  public
     function Execute: Boolean; overload;
 
@@ -62,6 +64,7 @@ type
     property Version: string read FVersion write SetVersion;
     property BCP47Tags: string read FBCP47Tags write SetBCP47Tags;
     property Author: string read FAuthor write SetAuthor;
+    property Description: string read FDescription write SetDescription;
     property Targets: TKeymanTargets read FTargets write SetTargets;
 
     property ProjectFilename: string read GetProjectFilename;
@@ -151,6 +154,11 @@ begin
   FCopyright := Value;
 end;
 
+procedure TImportWindowsKeyboard.SetDescription(const Value: string);
+begin
+  FDescription := Value;
+end;
+
 procedure TImportWindowsKeyboard.SetDestinationPath(const Value: string);
 begin
   FDestinationPath := IncludeTrailingPathDelimiter(Value);
@@ -219,6 +227,7 @@ begin
     FTemplate.Copyright := FCopyright;
     FTemplate.FullCopyright := FFullCopyright;
     FTemplate.Author := FAuthor;
+    FTemplate.Description := FDescription;
     FTemplate.Version := FVersion;
     FTemplate.IncludeIcon := True;
 

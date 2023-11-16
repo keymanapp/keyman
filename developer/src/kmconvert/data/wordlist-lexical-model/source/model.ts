@@ -1,6 +1,6 @@
 /*
-  $NAME $VERSION generated from template.
-  
+  $NAME $VERSION
+
   This is a minimal lexical model source that uses a tab delimited wordlist.
   See documentation online at https://help.keyman.com/developer/ for
   additional parameters.
