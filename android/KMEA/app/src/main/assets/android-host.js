@@ -304,10 +304,6 @@ function hideKeyboard() {
   window.location.hash = 'hideKeyboard' + fragmentToggle;
 }
 
-function doResetContext() {
-  keyman.resetContext();
-}
-
 function showKeyboard() {
   // Refresh KMW OSK
   keyman.refreshOskLayout();

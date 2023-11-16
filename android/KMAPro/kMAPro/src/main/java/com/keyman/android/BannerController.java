@@ -11,7 +11,7 @@ public class BannerController {
 
   // Paths relative to assets folder for banner themes
   public static final String KM_BANNER_DIR = "banner";
-  public static final String KM_BANNER_THEME_KEYMAN = KM_BANNER_DIR + "/banner.html";
+  public static final String KM_BANNER_THEME_KEYMAN = "banner.html";
 
   public static void setHTMLBanner(Context context, KMManager.KeyboardType keyboardType) {
     if (keyboardType == KMManager.KeyboardType.KEYBOARD_TYPE_UNDEFINED) {
