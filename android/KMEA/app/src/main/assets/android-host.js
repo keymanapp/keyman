@@ -107,7 +107,6 @@ function setBannerHeight(h) {
 
   // Refresh KMW's OSK
   keyman.refreshOskLayout();
-  doResetContext();
 }
 
 function setOskHeight(h) {
@@ -118,7 +117,6 @@ function setOskHeight(h) {
     keyman.core.activeKeyboard.refreshLayouts();
   }
   keyman.refreshOskLayout();
-  doResetContext();
 }
 
 function setOskWidth(w) {
@@ -205,11 +203,16 @@ function enableSuggestions(model, mayPredict, mayCorrect) {
   keyman.core.languageProcessor.mayPredict = mayPredict;
   keyman.core.languageProcessor.mayCorrect = mayCorrect;
 
-  keyman.addModel(model);
+  registerModel(model);
 }
 
 function setBannerOptions(mayPredict) {
   keyman.core.languageProcessor.mayPredict = mayPredict;
+}
+
+function registerModel(model) {
+  //window.console.log('registerModel: ' + model);
+  keyman.addModel(model);
 }
 
 function resetContext() {
