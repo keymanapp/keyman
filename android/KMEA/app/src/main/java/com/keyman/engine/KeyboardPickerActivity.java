@@ -123,7 +123,7 @@ public final class KeyboardPickerActivity extends BaseActivity {
     listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
       @Override
       public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        switchKeyboard(position,dismissOnSelect && ! KMManager.isTestMode());
+        switchKeyboard(position);
         if (dismissOnSelect)
           finish();
       }
@@ -264,18 +264,6 @@ public final class KeyboardPickerActivity extends BaseActivity {
   }
 
   @Override
-  protected void onPause() {
-    super.onPause();
-
-    if (KMManager.InAppKeyboard != null) {
-      KMManager.InAppKeyboard.loadKeyboard();
-    }
-    if (KMManager.SystemKeyboard != null) {
-      KMManager.SystemKeyboard.loadKeyboard();
-    }
-  }
-
-  @Override
   public boolean onSupportNavigateUp() {
     onBackPressed();
     return true;
@@ -335,7 +323,7 @@ public final class KeyboardPickerActivity extends BaseActivity {
    * @param position the keyboard index in list
    * @param aPrepareOnly prepare switch, it is executed on keyboard reload
    */
-  private static void switchKeyboard(int position, boolean aPrepareOnly) {
+  private static void switchKeyboard(int position) {
     setSelection(position);
     int size = KeyboardController.getInstance().get().size();
     int listPosition = (position >= size) ? size-1 : position;
@@ -344,10 +332,7 @@ public final class KeyboardPickerActivity extends BaseActivity {
     String kbId = kbInfo.getKeyboardID();
     String langId = kbInfo.getLanguageID();
     String kbName = kbInfo.getKeyboardName();
-    if(aPrepareOnly)
-      KMManager.prepareKeyboardSwitch(pkgId, kbId, langId, kbName);
-    else
-      KMManager.setKeyboard(kbInfo);
+    KMManager.setKeyboard(kbInfo);
   }
 
   protected static boolean addKeyboard(Context context, Keyboard keyboardInfo) {
@@ -449,7 +434,7 @@ public final class KeyboardPickerActivity extends BaseActivity {
         adapter.notifyDataSetChanged();
       }
       if (position == curKbPos) {
-        switchKeyboard(0,false);
+        switchKeyboard(0);
       } else if(listView != null) { // A bit of a hack, since LanguageSettingsActivity calls this method too.
         curKbPos = KeyboardController.getInstance().getKeyboardIndex(KMKeyboard.currentKeyboard());
         setSelection(curKbPos);
