@@ -270,8 +270,6 @@ public final class KMManager {
   public static final String KMDefault_AssetPackages = "packages";
   public static final String KMDefault_LexicalModelPackages = "models";
 
-  public static final String KMDefault_AssetSVG = "svg";
-
   // Default Keyboard Info
   public static final String KMDefault_PackageID = "sil_euro_latin";
   public static final String KMDefault_KeyboardID = "sil_euro_latin";
@@ -324,10 +322,6 @@ public final class KMManager {
 
   public static String getCloudDir() {
     return getResourceRoot() + KMDefault_UndefinedPackageID + File.separator;
-  }
-
-  public static String getSVGDir() {
-    return getResourceRoot() + KMDefault_AssetSVG + File.separator;
   }
 
   public static FormFactor getFormFactor() {
@@ -828,6 +822,31 @@ public final class KMManager {
     return hasPermission(context, Manifest.permission.INTERNET);
   }
 
+  /**
+   * Copy HTML banner assets to the app
+   * @param context - The context
+   * @param path - Folder relative to assets/ containing the banner file.
+   * @return boolean - true if assets copied
+   */
+  public static boolean copyHTMLBannerAssets(Context context, String path) {
+    AssetManager assetManager = context.getAssets();
+    try {
+      File bannerDir = new File(getResourceRoot() + File.separator + path);
+      if (!bannerDir.exists()) {
+        bannerDir.mkdir();
+      }
+
+      String[] bannerFiles = assetManager.list(path);
+      for (String bannerFile : bannerFiles) {
+        copyAsset(context, bannerFile, path, true);
+      }
+      return true;
+    } catch (Exception e) {
+      KMLog.LogException(TAG, "copyHTMLBannerAssets() failed. Error: ", e);
+    }
+    return false;
+  }
+
   private static void copyAssets(Context context) {
     AssetManager assetManager = context.getAssets();
     try {
@@ -847,16 +866,6 @@ public final class KMManager {
       // Copy default keyboard font
       copyAsset(context, KMDefault_KeyboardFont, "", true);
       copyAsset(context, KMFilename_JSPolyfill, "", true);
-
-      // SVG directory for html banner themes
-      File svgDir = new File(getSVGDir());
-      if (!svgDir.exists()) {
-        svgDir.mkdir();
-      }
-      String[] svgFiles = assetManager.list(KMDefault_AssetSVG);
-      for (String svgFile : svgFiles) {
-        copyAsset(context, svgFile, KMDefault_AssetSVG, true);
-      }
 
       // Keyboard packages directory
       File packagesDir = new File(getPackagesDir());
