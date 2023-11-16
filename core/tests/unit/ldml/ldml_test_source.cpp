@@ -504,10 +504,15 @@ LdmlJsonTestSource::get_context() const {
 }
 
 int LdmlJsonTestSource::load(const nlohmann::json &data) {
-  this->data        = data;  // TODO-LDML
-  auto startContext = data["/startContext/to"_json_pointer];
-  context = LdmlTestSource::parse_u8_source_string(startContext);
-  assert(km::core::ldml::normalize_nfd(context)); // TODO-LDML: should be NFC
+  this->data        = data; // TODO-LDML: restructure to not need this pointer?
+  // TODO-LDML: Need an update to json.hpp to use contains()
+  // if (data.contains("/startContext"_json_pointer)) {
+  if (data.find("startContext") != data.end()) {
+    // only set startContext if present - it's optional.
+    auto startContext = data["/startContext/to"_json_pointer];
+    context = LdmlTestSource::parse_u8_source_string(startContext);
+    assert(km::core::ldml::normalize_nfd(context)); // TODO-LDML: should be NFC
+  }
   return 0;
 }
 
