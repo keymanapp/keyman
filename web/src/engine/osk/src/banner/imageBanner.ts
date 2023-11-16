@@ -8,6 +8,7 @@ import { Banner } from "./banner.js";
  */
 export class ImageBanner extends Banner {
   private img: HTMLElement;
+  readonly type;
 
   constructor(imagePath: string, height?: number) {
     if (imagePath.length > 0) {
@@ -19,6 +20,8 @@ export class ImageBanner extends Banner {
       super(0);
     }
 
+    this.type = 'image';
+
     if(imagePath.indexOf('base64') >=0) {
       console.log("Loading img from base64 data");
     } else {
@@ -27,6 +30,11 @@ export class ImageBanner extends Banner {
     this.img = document.createElement('img');
     this.img.setAttribute('src', imagePath);
     let ds = this.img.style;
+
+    // We may want to eliminate the width-spec in the future, once we're sure of
+    // no unintended side-effects for iOS's use of this banner.
+    //
+    // Maybe if/when we also add a style="background-color: #xxx" option.
     ds.width = '100%';
     ds.height = '100%';
     this.getDiv().appendChild(this.img);

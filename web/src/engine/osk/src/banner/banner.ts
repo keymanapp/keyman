@@ -89,4 +89,6 @@ export abstract class Banner {
    * @param keyboardProperties
    */
   public configureForKeyboard(keyboard: Keyboard, keyboardProperties: KeyboardProperties) { }
+
+  abstract get type();
 }

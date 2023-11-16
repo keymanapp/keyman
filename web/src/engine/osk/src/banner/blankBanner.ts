@@ -5,6 +5,7 @@ import { Banner } from "./banner.js";
  * Description    A banner of height 0 that should not be shown
  */
 export class BlankBanner extends Banner {
+  readonly type = 'blank';
 
   constructor() {
     super(0);

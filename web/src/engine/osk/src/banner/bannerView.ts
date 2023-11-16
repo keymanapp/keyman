@@ -17,7 +17,7 @@ export interface BannerOptions {
   imagePath?: string;
 }
 
-export type BannerType = "blank" | "image" | "suggestion";
+export type BannerType = "blank" | "image" | "suggestion" | "html";
 
 interface BannerViewEventMap {
   'bannerchange': () => void;
@@ -59,7 +59,11 @@ interface BannerViewEventMap {
  */
 export class BannerView implements OSKViewComponent {
   private bannerContainer: HTMLDivElement;
-  private activeBanner: Banner;
+
+  /**
+   * The currently active banner.
+   */
+  private currentBanner: Banner;
   private _activeBannerHeight: number = Banner.DEFAULT_HEIGHT;
 
   public readonly events = new EventEmitter<BannerViewEventMap>();
@@ -90,32 +94,31 @@ export class BannerView implements OSKViewComponent {
    * Applies any stylesheets needed by specific `Banner` instances.
    */
   public appendStyles() {
-    if(this.activeBanner) {
-      this.activeBanner.appendStyleSheet();
+    if(this.currentBanner) {
+      this.currentBanner.appendStyleSheet();
     }
   }
 
   public get banner(): Banner {
-    return this.activeBanner;
+    return this.currentBanner;
   }
 
   /**
-   * Sets the active `Banner` to the specified type, regardless of
-   * existing management logic settings.
-   *
-   * @param banner The `Banner` instance to set as active.
+   * The `Banner` actively being displayed to the user in the OSK's current state,
+   * whether a `SuggestionBanner` (with predictive-text active) or a different
+   * type for use when the predictive-text engine is inactive.
    */
   public set banner(banner: Banner) {
-    if(this.activeBanner) {
-      if(banner == this.activeBanner) {
+    if(this.currentBanner) {
+      if(banner == this.currentBanner) {
         return;
       } else {
-        let prevBanner = this.activeBanner;
-        this.activeBanner = banner;
+        let prevBanner = this.currentBanner;
+        this.currentBanner = banner;
         this.bannerContainer.replaceChild(banner.getDiv(), prevBanner.getDiv());
       }
     } else {
-      this.activeBanner = banner;
+      this.currentBanner = banner;
       if(banner) {
         this.bannerContainer.appendChild(banner.getDiv());
       }
@@ -132,8 +135,8 @@ export class BannerView implements OSKViewComponent {
    * Gets the height (in pixels) of the active `Banner` instance.
    */
   public get height(): number {
-    if(this.activeBanner) {
-      return this.activeBanner.height;
+    if(this.currentBanner) {
+      return this.currentBanner.height;
     } else {
       return 0;
     }
@@ -149,8 +152,8 @@ export class BannerView implements OSKViewComponent {
   public set activeBannerHeight(h: number) {
     this._activeBannerHeight = h;
 
-    if (this.activeBanner && !(this.activeBanner instanceof BlankBanner)) {
-      this.activeBanner.height = h;
+    if (this.currentBanner && !(this.currentBanner instanceof BlankBanner)) {
+      this.currentBanner.height = h;
     }
   }
 
