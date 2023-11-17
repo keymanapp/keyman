@@ -101,3 +101,146 @@ toOneChar(value: string) : number {
   }
   return value.codePointAt(0);
 }
+
+export function describeCodepoint(ch : number) : string {
+  const s = isValidUnicode(ch) ? String.fromCodePoint(ch) : "INVALID";
+  return `"${s}" (U+${Number(ch).toString(16)})`;
+}
+
+export enum BadStringType {
+  pua = 'pua',
+  unassigned = 'unassigned',
+  illegal = 'illegal',
+};
+
+// Following from kmx_xstring.h / .cpp
+
+const Uni_LEAD_SURROGATE_START = 0xD800;
+const Uni_LEAD_SURROGATE_END = 0xDBFF;
+const Uni_TRAIL_SURROGATE_START = 0xDC00;
+const Uni_TRAIL_SURROGATE_END = 0xDFFF;
+const Uni_SURROGATE_START = Uni_LEAD_SURROGATE_START;
+const Uni_SURROGATE_END = Uni_TRAIL_SURROGATE_END;
+const Uni_FD_NONCHARACTER_START = 0xFDD0;
+const Uni_FD_NONCHARACTER_END = 0xFDEF;
+const Uni_FFFE_NONCHARACTER = 0xFFFE;
+const Uni_PLANE_MASK = 0x1F0000;
+const Uni_MAX_CODEPOINT = 0x10FFFF;
+
+/**
+ * @brief True if a lead surrogate
+ * \def Uni_IsSurrogate1
+ */
+function Uni_IsSurrogate1(ch : number) {
+  return ((ch) >= Uni_LEAD_SURROGATE_START && (ch) <= Uni_LEAD_SURROGATE_END);
+}
+/**
+ * @brief True if a trail surrogate
+ * \def Uni_IsSurrogate2
+ */
+function Uni_IsSurrogate2(ch : number) {
+  return ((ch) >= Uni_TRAIL_SURROGATE_START && (ch) <= Uni_TRAIL_SURROGATE_END);
+}
+
+/**
+ * @brief True if any surrogate
+ * \def UniIsSurrogate
+*/
+function Uni_IsSurrogate(ch : number) {
+  return (Uni_IsSurrogate1(ch) || Uni_IsSurrogate2(ch));
+}
+
+function Uni_IsEndOfPlaneNonCharacter(ch : number) {
+  return (((ch) & Uni_FFFE_NONCHARACTER) == Uni_FFFE_NONCHARACTER); // matches FFFF or FFFE
+}
+
+function Uni_IsNoncharacter(ch : number) {
+  return (((ch) >= Uni_FD_NONCHARACTER_START && (ch) <= Uni_FD_NONCHARACTER_END) || Uni_IsEndOfPlaneNonCharacter(ch));
+}
+
+function Uni_InCodespace(ch : number) {
+  return ((ch) <= Uni_MAX_CODEPOINT);
+};
+
+function Uni_IsValid1(ch: number) {
+  return (Uni_InCodespace(ch) && !Uni_IsSurrogate(ch) && !Uni_IsNoncharacter(ch));
+}
+
+export function isValidUnicode(start: number, end?: number) {
+  if (!end) {
+    // single char
+    return Uni_IsValid1(start);
+  } else if (!Uni_IsValid1(end) || !Uni_IsValid1(start) || (end < start)) {
+    // start or end out of range, or inverted range
+    return false;
+  } else if ((start <= Uni_SURROGATE_END) && (end >= Uni_SURROGATE_START)) {
+    // contains some of the surrogate range
+    return false;
+  } else if ((start <= Uni_FD_NONCHARACTER_END) && (end >= Uni_FD_NONCHARACTER_START)) {
+    // contains some of the noncharacter range
+    return false;
+  } else if ((start & Uni_PLANE_MASK) != (end & Uni_PLANE_MASK)) {
+    // start and end are on different planes, meaning that the U+__FFFE/U+__FFFF noncharacters
+    // are contained.
+    // As a reminder, we already checked that start/end are themselves valid,
+    // so we know that 'end' is not on a noncharacter at end of plane.
+    return false;
+  } else {
+    return true;
+  }
+}
+
+export function isPUA(ch: number) {
+  return ((ch >= 0xE000 && ch <= 0xF8FF) ||
+    (ch >= 0xF0000 && ch <= 0xFFFFD) ||
+    (ch >= 0x100000 && ch <= 0x10FFFD));
+}
+
+class BadStringMap extends Map<BadStringType, Set<number>> {
+  public toString() : string {
+    if (!this.size) {
+      return "{}";
+    }
+    return Array.from(this.entries()).map(([t, s]) => `${t}: ${Array.from(s.values()).map(describeCodepoint).join(' ')}`).join(', ');
+  }
+}
+
+function getProblem(ch : number) : BadStringType {
+  if (!isValidUnicode(ch)) {
+    return BadStringType.illegal;
+  } else if(isPUA(ch)) {
+    return BadStringType.pua;
+  } else { // TODO-LDML: unassigned
+    return null;
+  }
+}
+
+export class BadStringAnalyzer {
+  /** add a string for analysis */
+  public add(s : string) {
+    for (const c of s) {
+      const ch = c.codePointAt(0);
+      const problem = getProblem(ch);
+      if (problem) {
+        this.addProblem(ch, problem);
+      }
+    }
+  }
+
+  private addProblem(ch : number, type : BadStringType) {
+    if (!this.m.has(type)) {
+      this.m.set(type, new Set<number>());
+    }
+    this.m.get(type).add(ch);
+  }
+
+  public analyze() : BadStringMap {
+    if (this.m.size == 0) {
+      return null;
+    } else {
+      return this.m;
+    }
+  }
+
+  private m = new BadStringMap();
+}
