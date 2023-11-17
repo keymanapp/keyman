@@ -12,7 +12,7 @@
 
   Bugs:
   Todo:
-  Notes: For the state diagram in mermaid mdgit stat ../BackgroundUpdateStateDiagram.md
+  Notes: For the state diagram in mermaid ../BackgroundUpdateStateDiagram.md
   History:
 *)
 unit BackgroundUpdate;
@@ -920,7 +920,7 @@ begin
    DoDownloadUpdatesBackgroundTest(DownloadBackGroundSavePath, DownloadResult);
 
   KL.Log('TBackgroundUpdate.DownloadUpdatesBackground: DownloadResult = '+IntToStr(Ord(DownloadResult)));
-  ShowMessage('TBackgroundUpdate.DownloadUpdatesBackground: DownloadResult = '+IntToStr(Ord(DownloadResult)));
+  //ShowMessage('TBackgroundUpdate.DownloadUpdatesBackground: DownloadResult = '+IntToStr(Ord(DownloadResult)));
   Result := DownloadResult;
 end;
 
@@ -929,7 +929,7 @@ end;
 procedure WaitingRestartState.Enter;
 begin
   // Enter DownloadingState
-  bucStateContext.SetRegistryState(usUpdateAvailable);
+  bucStateContext.SetRegistryState(usWaitingRestart);
 end;
 
 procedure WaitingRestartState.Exit;
@@ -952,8 +952,15 @@ begin
   // Check downloaded cache if available then
   // change state intalling
   // else then change to idle and handle checkupdates state
-  bucStateContext.SetRegistryState(usUpdateAvailable);
-  Result := kmShellContinue;
+ // if bucStateContext.IsKeymanRunning then
+      // stay as waiting
+      // log this is unexpected
+      //ChangeState(WaitingRestartState)
+   // else
+  //
+
+  ChangeState(UpdateAvailableState);
+  Result := kmShellExit;
 end;
 
 procedure WaitingRestartState.HandleInstall;
@@ -1204,12 +1211,12 @@ var SavePath: string;
     FileName: String;
     FileNames: TStringDynArray;
 begin
-KL.Log('ProcessBackground Install case :[ postinstall ]');
+      KL.Log('WaitingPostInstallState.HandleMSIInstallComplete');
       // TODO Remove cached files. Do any loging updating of files etc and then set back to idle
       SavePath := IncludeTrailingPathDelimiter(GetFolderPath(CSIDL_COMMON_APPDATA) + SFolder_CachedUpdateFiles);
       /// For testing using local user area cache
       SavePath := 'C:\Projects\rcswag\testCache';
-      KL.Log('ProcessBackground Install posInstall SavePath:'+ SavePath);
+      KL.Log('WaitingPostInstallState.HandleMSIInstallComplete remove SavePath:'+ SavePath);
 
       GetFileNamesInDirectory(SavePath, FileNames);
       for FileName in FileNames do
