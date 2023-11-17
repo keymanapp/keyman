@@ -66,13 +66,13 @@ function showBanner(flag) {
     if (bannerHTMLContents != '') {
       bc.inactiveBanner = flag ? new bc.HTMLBanner(bannerHTMLContents) : null;
     } else {
-      bc.inactiveBanner = flag ? new bc.ImageBanner(bannerImgPath) : null;
+      bc.inactiveBanner = flag ? new bc.ImageBanner(bannerImagePath) : null;
     }
   }
 }
 
 function setBannerImage(path) {
-  bannerImgPath = path;
+  bannerImagePath = path;
 }
 
 // Set the HTML banner to use when predictive-text is not available
