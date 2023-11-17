@@ -82,7 +82,7 @@ async function buildLdmlKeyboardToMemory(inputFilename: string, callbacks: Compi
   const builder = new kmcLdml.KMXBuilder(kmx, options.saveDebug);
   const kmx_binary = builder.compile();
 
-  const vkcompiler = new kmcLdml.LdmlKeyboardVisualKeyboardCompiler();
+  const vkcompiler = new kmcLdml.LdmlKeyboardVisualKeyboardCompiler(callbacks);
   const vk = vkcompiler.compile(source);
   const writer = new KvkFileWriter();
   const kvk_binary = writer.write(vk);
