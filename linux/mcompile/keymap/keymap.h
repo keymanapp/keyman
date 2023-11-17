@@ -510,13 +510,13 @@ KMX_DWORD get_SC_From_VirtualKey_US(KMX_DWORD VK_US , v_dw_3D &All_Vector);
 KMX_DWORD get_position_From_VirtualKey_Other(KMX_DWORD VK_Other , v_dw_3D &All_Vector, int which_columns);
 
 // return the Scancode of for given VirtualKey using GDK
-KMX_DWORD get_position_From_GDK(GdkKeymap *keymap, UINT mapped_ikey);
+KMX_DWORD get_KeyCode_From_KeyVal_GDK(GdkKeymap *keymap, UINT mapped_ikey);
 // can go later
 void Try_GDK(GdkKeymap *keymap, UINT KeySym );
 void Inspect_Key_S(GdkKeymap *keymap ) ;
 // return the VirtualKey of the Other Keyboard for given Scancode using GDK
 KMX_DWORD get_VirtualKey_Other_GDK( GdkKeymap *keymap, KMX_DWORD scanCode);
-UINT find_SC_Other_fromVK_GDK(UINT vk_US_187,GdkKeymap *keymap);
+UINT find_SC_Other_from_SC_US_GDK(UINT vk_US_187,GdkKeymap *keymap);
 // initialize GDK
 bool InitializeGDK(GdkKeymap **keymap,int argc, gchar *argv[]);
 

@@ -733,25 +733,6 @@ bool KMX_ImportRules(KMX_WCHAR *kbid, LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, Gd
       }
   }
 
- //Try_GDK( *keymap, 35 ) ;  // key 35(DE)  = 187= OEM_PLUS
- //Inspect_Key_S(*keymap);
-
-  // _S2 QUIESTION !!!
-  // Different characters on Windows and Lunux for shift/Caps-states:
-  //        Windows                      Linux
-  // none/caps/shift/caps+Shift <=> none/caps/shift/caps+Shift
-  //        a A A a             <=>      a A A a
-  //        ö Ö Ö ö             <=>      ö Ö Ö ö
-  //        1 ! ! 1             <=>      1 1 ! !     ( on US keyboard)
-  //        & 1 1 &             <=>      & 1 1 &     ( on FR keyboard)
-  //        ù % % ù             <=>      ù Ù % %     (!!!)
-  //        ' # # '             <=>      # # ' '
-  //        - - _ _             <=>      - - _ _
-  //
-  // in which order would we place them in rgKey[] ??
-  // this affects counting of keys in functions KMX_GetKeyCount/KMX_IsCapsEqualToShift
-
-
   // _S2 in this part we skip shiftstates 4, 5, 8, 9
   for(UINT iKey = 0; iKey < rgKey.size(); iKey++) {
     if(rgKey[iKey] != NULL) {
@@ -765,41 +746,21 @@ bool KMX_ImportRules(KMX_WCHAR *kbid, LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, Gd
           continue;
         }
 
-        // _S2 can go later
-        //int Keypos =  get_position_From_VirtualKey_Other(SC_Other , All_Vector, 99);
-        //UINT VK_vec = (UINT) All_Vector[1][Keypos][0];
-
-
-
-
-        // _S2 get_position_From_GDK gives wrong values for 0,65,94,126 which are not processed correctly -> "what do I return if not found..."
-        KMX_DWORD keypos_GDK=  get_position_From_GDK( *keymap,  SC_Other );
         KMX_DWORD SC_US;
         if( SC_Other>7)
-           SC_US=  (KMX_DWORD)(8+ USVirtualKeyToScanCode[ SC_Other ]);
-          else SC_US=0;
+          SC_US=  (KMX_DWORD)(8+ USVirtualKeyToScanCode[ SC_Other ]);
+        else SC_US = 0;
 
 //wprintf(L" for vk of %i we get Keycode US of %i  SC_Other %i: ( on Key US (%i) we find char %i (%c) ) \n", SC_Other, 8+USVirtualKeyToScanCode[SC_Other], 8+USVirtualKeyToScanCode[SC_Other] ,
 //8+USVirtualKeyToScanCode[SC_Other],get_VirtualKey_Other_GDK(*keymap, 8+USVirtualKeyToScanCode[SC_Other]),get_VirtualKey_Other_GDK(*keymap, 8+USVirtualKeyToScanCode[SC_Other]) );
 
 
-        // _S2 TODO this needs to go !! it's TEMPORARY until we decide what to return if not found. At the moment we return 0 in this case which is a problem for gdk
-        // _S2 to avoid Gdk-CRITICAL **: 16:41:42.662: gdk_keymap_get_entries_for_keyval: assertion 'keyval != 0' failed: we set keypos_GDK to a value
-        if (keypos_GDK ==0)
-          keypos_GDK = 49;
-
-
         for(int caps = 0; caps <= 1; caps++) {
 
           //_S2 TODO get char  - do I need rc ?? ( was rc = ToUnicodeEx...)
-          std::wstring VK_Other_OLD = get_VirtualKey_Other_from_iKey(SC_Other, ss, caps, All_Vector);
-          //std::wstring VK_Other2 = get_KeySyms_according_to_Shiftstate( *keymap, keypos_GDK, ss, caps);
+          //std::wstring VK_Other_OLD = get_VirtualKey_Other_from_iKey(SC_Other, ss, caps, All_Vector);
           std::wstring VK_Other = get_KeySyms_according_to_Shiftstate( *keymap, SC_US, ss, caps);
-          std::wstring VK_Other3 = get_KeySyms_according_to_Shiftstate( *keymap, SC_Other, ss, caps);
-          std::wstring VK_Other31 = get_KeySyms_according_to_Shiftstate( *keymap, 187, ss, caps);
-          std::wstring VK_Other32 = get_KeySyms_according_to_Shiftstate( *keymap, 221, ss, caps);
-          std::wstring VK_Other33 = get_KeySyms_according_to_Shiftstate( *keymap, 186, ss, caps);
-          //std::wstring VK_Other77 = get_KeySyms_according_to_Shiftstate( *keymap, SC_US, ss, caps);
+          //std::wstring VK_Other3 = get_KeySyms_according_to_Shiftstate( *keymap, SC_Other, ss, caps);
 
 
           //_S2 TODO do I need that ??

@@ -516,15 +516,15 @@ KMX_DWORD get_position_From_VirtualKey_Other(KMX_DWORD VK_Other , v_dw_3D &All_V
   return 0;    //_S2 TODO what do I return if not found??
 }
 
-// returns KeyCode which hold the Keysym (in unshifted, shifted)
-KMX_DWORD get_position_From_GDK(GdkKeymap *keymap, UINT KeySym ) {
+// returns KeyCode which hold the Keysym/Keyval (in unshifted, shifted)
+KMX_DWORD get_KeyCode_From_KeyVal_GDK(GdkKeymap *keymap, UINT Keyval ) {
   GdkKeymapKey *maps;
   guint *keyvals;
   gint count;
 
   for (int k=0; k<255 ; k++ ){
     if (gdk_keymap_get_entries_for_keycode (keymap, k, &maps, &keyvals, &count)) {
-      if ( (keyvals[0] == KeySym) || (keyvals[1] == KeySym) ) {
+      if ( (keyvals[0] == Keyval) || (keyvals[1] == Keyval) ) {
         return (KMX_DWORD) maps[0].keycode;
       }
     }
@@ -684,14 +684,14 @@ std::wstring  get_KeySyms_according_to_Shiftstate(GdkKeymap *keymap, guint keyco
 }
 
 // _S2 maybe not needed
-UINT find_SC_Other_fromVK_GDK(UINT vk_US,GdkKeymap *keymap) {
+UINT find_SC_Other_from_SC_US_GDK(UINT SC_US,GdkKeymap *keymap) {
   UINT SC__Other;
 
     for ( int i=0; i<255;i++) {
-      SC__Other= (UINT )get_position_From_GDK( keymap, i);
-      if(SC__Other==vk_US )
+      SC__Other= (UINT )get_KeyCode_From_KeyVal_GDK( keymap, i);
+      if(SC__Other==SC_US )
         return SC__Other;
     }
-  return vk_US;
+  return SC_US;
 }
 
