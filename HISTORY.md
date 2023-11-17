@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 17.0.213 alpha 2023-11-17
+
+* fix(linux): Fix packaging GHA (#10020)
+* fix(android): Always display HTML banner when suggestions aren't available (#9696)
+
 ## 17.0.212 alpha 2023-11-16
 
 * chore(web): splits banner.ts into separate files per banner type (#9987)
