@@ -118,18 +118,29 @@ export function loadTestdata(inputFilename: string, options: LdmlCompilerOptions
   return source;
 }
 
-export async function compileKeyboard(inputFilename: string, options: LdmlCompilerOptions): Promise<KMXPlusFile> {
+export async function compileKeyboard(inputFilename: string, options: LdmlCompilerOptions, validateMessages?: CompilerEvent[], expectFailValidate?: boolean, compileMessages?: CompilerEvent[]): Promise<KMXPlusFile> {
   const k = new LdmlKeyboardCompiler(compilerTestCallbacks, options);
   const source = k.load(inputFilename);
   checkMessages();
   assert.isNotNull(source, 'k.load should not have returned null');
 
-  const valid = k.validate(source);
-  checkMessages();
-  assert.isTrue(valid, 'k.validate should not have failed');
+  const valid = await k.validate(source);
+  if (validateMessages) {
+    assert.sameDeepMembers(compilerTestCallbacks.messages, validateMessages, "validation messages mismatch");
+    assert.notEqual(valid, expectFailValidate, 'validation failure');
+  } else {
+    checkMessages();
+    assert.isTrue(valid, 'k.validate should not have failed');
+  }
+
+  if (!valid) return null; // get out, if the above asserts didn't get us out.
 
   const kmx = await k.compile(source);
-  checkMessages();
+  if (compileMessages) {
+    assert.sameDeepMembers(compilerTestCallbacks.messages, compileMessages, "compiler messages mismatch");
+  } else {
+    checkMessages();
+  }
   assert.isNotNull(kmx, 'k.compile should not have returned null');
 
   // In order for the KMX file to be loaded by non-KMXPlus components, it is helpful
@@ -139,13 +150,13 @@ export async function compileKeyboard(inputFilename: string, options: LdmlCompil
   return kmx;
 }
 
-export function compileVisualKeyboard(inputFilename: string, options: LdmlCompilerOptions): VisualKeyboard.VisualKeyboard {
+export async function compileVisualKeyboard(inputFilename: string, options: LdmlCompilerOptions): Promise<VisualKeyboard.VisualKeyboard> {
   const k = new LdmlKeyboardCompiler(compilerTestCallbacks, options);
   const source = k.load(inputFilename);
   checkMessages();
   assert.isNotNull(source, 'k.load should not have returned null');
 
-  const valid = k.validate(source);
+  const valid = await k.validate(source);
   checkMessages();
   assert.isTrue(valid, 'k.validate should not have failed');
 

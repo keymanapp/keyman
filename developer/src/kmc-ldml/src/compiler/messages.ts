@@ -1,5 +1,4 @@
-import { CompilerErrorNamespace, CompilerErrorSeverity, CompilerMessageSpec as m } from "@keymanapp/common-types";
-
+import { util, CompilerErrorNamespace, CompilerErrorSeverity, CompilerMessageSpec as m } from "@keymanapp/common-types";
 // const SevInfo = CompilerErrorSeverity.Info | CompilerErrorNamespace.LdmlKeyboardCompiler;
 const SevHint = CompilerErrorSeverity.Hint | CompilerErrorNamespace.LdmlKeyboardCompiler;
 const SevWarn = CompilerErrorSeverity.Warn | CompilerErrorNamespace.LdmlKeyboardCompiler;
@@ -146,6 +145,18 @@ export class CompilerMessages {
   static Error_DisplayNeedsToOrId = (o:{output?: string, keyId?: string}) =>
   m(this.ERROR_DisplayNeedsToOrId, `display ${CompilerMessages.outputOrKeyId(o)} needs output= or keyId=, but not both`);
   static ERROR_DisplayNeedsToOrId = SevError | 0x0022;
+
+  static Hint_PUACharacters = (o: { count: number, lowestCh: number }) =>
+  m(this.HINT_PUACharacters, `File contained ${o.count} PUA character(s), including ${util.describeCodepoint(o.lowestCh)}`);
+  static HINT_PUACharacters = SevHint | 0x0023;
+
+  static Warn_UnassignedCharacters = (o: { count: number, lowestCh: number }) =>
+  m(this.WARN_UnassignedCharacters, `File contained ${o.count} unassigned character(s), including ${util.describeCodepoint(o.lowestCh)}`);
+  static WARN_UnassignedCharacters = SevWarn | 0x0024;
+
+  static Error_IllegalCharacters = (o: { count: number, lowestCh: number }) =>
+  m(this.ERROR_IllegalCharacters, `File contained ${o.count} illegal character(s), including ${util.describeCodepoint(o.lowestCh)}`);
+  static ERROR_IllegalCharacters = SevError | 0x0025;
 }
 
 

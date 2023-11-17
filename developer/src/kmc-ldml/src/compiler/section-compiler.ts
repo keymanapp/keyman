@@ -31,7 +31,8 @@ export abstract class SectionCompiler {
   public abstract compile(sections: KMXPlus.DependencySections): KMXPlus.Section;
 
   /**
-   * This is called after all other compile phases have completed, and provides an
+   * This is called after all other compile phases have completed,
+   * when being called by validate(), and provides an
    * opportunity for late error reporting, for example for invalid strings.
    * @param section the compiled section, if any.
    * @returns false if validate fails

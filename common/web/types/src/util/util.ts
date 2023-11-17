@@ -103,7 +103,14 @@ toOneChar(value: string) : number {
 }
 
 export function describeCodepoint(ch : number) : string {
-  const s = isValidUnicode(ch) ? String.fromCodePoint(ch) : "INVALID";
+  let s;
+  if (isPUA(ch)) {
+    s = "PUA";
+  } else if (isValidUnicode(ch)) {
+    s = String.fromCodePoint(ch);
+  } else {
+    s = "INVALID";
+  }
   return `"${s}" (U+${Number(ch).toString(16)})`;
 }
 
@@ -214,7 +221,6 @@ function getProblem(ch : number) : BadStringType {
     return null;
   }
 }
-
 export class BadStringAnalyzer {
   /** add a string for analysis */
   public add(s : string) {
