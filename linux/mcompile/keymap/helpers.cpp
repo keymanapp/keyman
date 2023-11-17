@@ -692,10 +692,282 @@ bool test_single(v_dw_3D &V) {
     }
   }
   return 0;    //_S2 what do I return if not found??
-}*/
+}*/// _S2 REMOVE
 
 
-// _S2 REMOVE
+void Inspect_Key_S(GdkKeymap *keymap ) {
+
+  guint KCode = 51;
+  guint Keyval_Base= 35;
+  guint Keyval_Shift = 39;
+  guint Keyval = Keyval_Base;
+
+  gchar* KeyvalName_Base;
+  char* KeyvalName_ch_Base;
+  gchar* KeyvalName_Shift;
+  char* KeyvalName_ch_Shift;
+
+  GdkKeymapKey* keys;
+  gint n_keys;
+
+  GdkKeymapKey *maps;
+  guint *keyvals;
+  guint *keyvals_shift;
+  gint *n_entries;
+  gint count;
+
+  GdkModifierType consumed;
+  //                     ___       ___       ___       ___
+  //                    | A |     | Ö |     | & |     | ' |
+  // Key                |_a_|     |_ö_|     |_6_|     |_#_|
+  // KCode                38        47        15        51
+  // Keyval Base          97       246        54        35
+  // Keyval Shift         65       214        38        39
+  // KeyValname(Base)     a    odiaresis       6       apostrophe
+  // KeyValname(Shift)    A    Odiaresis   ampersand   numbersign
+
+//---------------------------------------
+gchar * gc= gdk_keyval_name (214);
+gchar * gc0= gdk_keyval_name (65);
+//---------------------------------------
+std::string sr = "odiaeresis";
+gchar * chr=  (gchar*) sr.c_str(); ;
+guint gi= gdk_keyval_from_name (chr);
+//---------------------------------------
+Keyval= Keyval_Shift;
+  // finds ALL CHARACTERS ON KEY KCode for all levels and groups
+  // key 51 gr=0 (DE); lev=0   keyval 35(#)
+  // key 51 gr=0 (FR); lev=0   keyval 35(*)
+  // key 51 gr=0 (US); lev=0   keyval 35(\)
+  // key 51 gr=0 (ES); lev=0   keyval 35(\)
+  gdk_keymap_get_entries_for_keycode(keymap, KCode, &maps, &keyvals, &count);
+    wprintf(L"----------------------------\nprinting out the characters given by keypress of key SC/Keycode:%i\n",KCode);
+      for (int i = 0; i < count; i++) {
+        //if (maps[i].level > 0 || maps[i].group > 1)
+        // continue;
+        wprintf(L"    i=%d, keycode=%d, keyval=%d (%c), level=%d, group=%d\n",
+            i, maps[i].keycode, keyvals[i], keyvals[i], maps[i].level, maps[i].group);
+      }
+  // finds all levels, groups WHERE KEYVAL IS LOCATED 
+  // ' is on key 13, gr=0,lev=0  for swedish; 
+  // ' is on key 51, gr=0,lev=1  for german;
+  // ' is on key 48, gr=2,lev=0  for english?;
+  // ' is on key 48, gr=3,lev=0  for spanish?;
+  //gdk_keymap_get_entries_for_keyval(keymap, Keyval,&keys,&n_keys);
+  gdk_keymap_get_entries_for_keyval(keymap, Keyval,&keys,&n_keys);
+    wprintf(L"----------------------------\nprinting out the characters given by keypress of Keyval :%i\n",Keyval);
+      for (int i = 0; i < n_keys; i++) {
+        //if (maps[i].level > 0 || maps[i].group > 1)
+        // continue;
+        wprintf(L"    i=%d, Keyval=%d, (%c) keycode %i   group %i   level %i\n",
+            i,  Keyval,Keyval, keys[i].keycode,keys[i].group,keys[i].level);
+      }
+//---------------------------------------
+
+gint Key_on_DE;
+gint KeyVal_on_US;
+  Keyval = 214;
+  gdk_keymap_get_entries_for_keyval(keymap, Keyval,&keys,&n_keys);
+    wprintf(L"----------------------------\nprinting out the characters given by keypress of Keyval :%i\n",Keyval);
+      for (int i = 0; i < n_keys; i++) {
+        //if (maps[i].level > 0 || maps[i].group > 1)
+        // continue;
+        wprintf(L"    i=%d, Keyval=%d, (%c) keycode %i   group %i   level %i\n",
+            i,  Keyval,Keyval, keys[i].keycode,keys[i].group,keys[i].level);
+      }
+    for (int i = 0; i < n_keys; i++) {
+      if (keys[i].group ==0)
+         Key_on_DE = keys[i].keycode;
+    }
+
+  gdk_keymap_get_entries_for_keycode(keymap, Key_on_DE, &maps, &keyvals, &count);
+    wprintf(L"----------------------------\nprinting out the characters given by keypress of key SC/Keycode:%i\n",Key_on_DE);
+      for (int i = 0; i < count; i++) {
+        //if (maps[i].level > 0 || maps[i].group > 1)
+        // continue;
+        wprintf(L"    i=%d, keycode=%d, keyval=%d (%c), level=%d, group=%d\n",
+            i, maps[i].keycode, keyvals[i], keyvals[i], maps[i].level, maps[i].group);
+      }
+for (int i = 0; i < count; i++) {
+      if ((maps[i].group ==2 )&& (maps[i].level ==0))
+         KeyVal_on_US = maps[i].keycode;
+    }
+
+const UINT VK_US= ScanCodeToUSVirtualKey[KeyVal_on_US-8];
+const UINT VK_US2= USVirtualKeyToScanCode[KeyVal_on_US];
+
+GdkModifierType MOD_base = (GdkModifierType) ( ~GDK_MODIFIER_MASK );
+gdk_keymap_translate_keyboard_state (keymap, KCode, MOD_base , 0, keyvals, NULL, NULL, & consumed);
+std::wstring rV1= std::wstring(1, (int) *keyvals);
+
+  KeyvalName_Base = gdk_keyval_name (Keyval_Base);
+    KeyvalName_ch_Base = (char*) KeyvalName_Base;
+    std::string KeyvalName_str_Base(KeyvalName_ch_Base);
+  KeyvalName_Shift= gdk_keyval_name (Keyval_Shift);
+    KeyvalName_ch_Shift = (char*) KeyvalName_Shift;
+    std::string KeyvalName_str_Shift(KeyvalName_ch_Shift);
+
+
+  wprintf(L"   keyval_Base  %i has the name: %s ------ ",   Keyval_Base,  KeyvalName_str_Base.c_str());
+  wprintf(L"   keyval_Shift %i has the name: %s  \n",       Keyval_Shift, KeyvalName_str_Shift.c_str());
+  //wprintf(L"   keyval  ");
+int stop=99;
+
+}
+
+
+void Try_GDK(GdkKeymap *keymap, guint k ) {
+  GdkKeymapKey *maps;
+  guint *keyvals;
+  gint count;
+
+  // key 35(DE)  = 187= OEM_PLUS;
+
+gdk_keymap_get_entries_for_keycode (keymap, k, &maps, &keyvals, &count);
+wprintf(L"----------------------------\nprinting out the characters given by keypress of key SC/Keycode:%i\n",k);
+  for (int i = 0; i < count; i++) {
+    //if (maps[i].level > 0 || maps[i].group > 1)
+     // continue;
+    wprintf(L"    i=%d, keycode=%d, keyval=%d (%c), level=%d, group=%d\n",
+        i, maps[i].keycode, keyvals[i], keyvals[i], maps[i].level, maps[i].group);
+  }
+
+wprintf(L"----------------------------\n");
+// finds a character on a key(KeyNr/SC) according to shiftstate/caps
+// in: SC   out: AsciiChar
+
+  GdkModifierType consumed;
+   /* GdkModifierType MOD_base = (GdkModifierType) ( ~GDK_MODIFIER_MASK );
+    gdk_keymap_translate_keyboard_state (keymap, k, MOD_base , 0, keyvals, NULL, NULL, & consumed);
+    int kv= (int)*keyvals;
+    //std::wstring kv_ws=  std::wstring(1, (int) *keyvals);
+    wprintf(L"   gdk_keymap_translate_keyboard_state (keycode/SC %i) gives unshifted:   %i (%c)  --  ", k, kv,kv );
+
+    GdkModifierType MOD_Shift = (GdkModifierType) ( GDK_SHIFT_MASK );
+    gdk_keymap_translate_keyboard_state (keymap, k, MOD_Shift , 0, keyvals, NULL, NULL, & consumed);
+    int kv1= (int)*keyvals;
+    //std::wstring kv_ws1=  std::wstring(1, (int) *keyvals);
+    wprintf(L" and shifted  %i (%c)  \n", kv1,kv1 );*/
+
+for ( int iii=1; iii< 66;iii++)
+{
+  GdkModifierType consumed;
+    GdkModifierType MOD_base = (GdkModifierType) ( ~GDK_MODIFIER_MASK );
+    gdk_keymap_translate_keyboard_state (keymap, iii, MOD_base , 0, keyvals, NULL, NULL, & consumed);
+    int kv= (int)*keyvals;
+    //std::wstring kv_ws=  std::wstring(1, (int) *keyvals);
+    wprintf(L"   gdk_keymap_translate_keyboard_state (keycode/SC %i) gives unshifted:   %i (%c)  --  \t", iii, kv,kv );
+
+    GdkModifierType MOD_Shift = (GdkModifierType) ( GDK_SHIFT_MASK );
+    gdk_keymap_translate_keyboard_state (keymap, iii, MOD_Shift , 0, keyvals, NULL, NULL, & consumed);
+    int kv1= (int)*keyvals;
+    //std::wstring kv_ws1=  std::wstring(1, (int) *keyvals);
+    wprintf(L" and shifted  \t%i(%c)  \n", kv1,kv1 );
+
+}
+
+
+wprintf(L"----------------------------\n");
+// finds a character on a key(KeyNr/SC) according to shiftstate/caps
+// in: SC   out: AsciiChar
+  gchar * gch;
+  char * ch;
+
+
+
+  GdkModifierType consumedS;
+for ( int iii=1; iii< 66;iii++)
+{ /*gchar * gch1;
+    gch1 = gdk_keyval_name ((guint) iii);
+    std::string str_ch((char*)gch1);*/
+
+  gch = gdk_keyval_name ((guint) iii);
+  ch = (char*) gch;
+  std::string str_ch(ch);
+  //wprintf(L"   key nr %i has the name: -- %s  ",   iii, str_ch.c_str());
+
+
+    GdkModifierType MOD_base = (GdkModifierType) ( ~GDK_MODIFIER_MASK );
+    gdk_keymap_translate_keyboard_state (keymap, iii, MOD_base , 0, keyvals, NULL, NULL, & consumedS);
+    int kv= (int)*keyvals;
+    //std::wstring kv_ws=  std::wstring(1, (int) *keyvals);
+    wprintf(L"    (keycode/SC %i)  has the name: %s \t\t---- gives unshifted:   %i (%c)  --  \t", iii, str_ch.c_str(),kv,kv );
+
+    GdkModifierType MOD_Shift = (GdkModifierType) ( GDK_SHIFT_MASK );
+    gdk_keymap_translate_keyboard_state (keymap, iii, MOD_Shift , 0, keyvals, NULL, NULL, & consumedS);
+    int kv1= (int)*keyvals;
+    //std::wstring kv_ws1=  std::wstring(1, (int) *keyvals);
+    wprintf(L" and shifted  \t%i(%c)  \n", kv1,kv1 );
+
+}
+
+wprintf(L"----------------------------\n");
+  /*GdkKeymapKey **keys1;
+  guint kval = 42;
+  gint *n_keys;
+  gboolean gboo = gdk_keymap_get_entries_for_keyval ( keymap, kval,  keys1, n_keys);
+    wprintf(L"   gdk_keymap_get_entries_for_keyval gives  %i keys for this keyval( %i) :\n", *n_keys),(int) kval;
+
+        //for (int i = 0; i < *n_keys; i++) {
+        for (int i = 0; i < 1; i++) {
+          wprintf(L"   character 43 can be obtained by pressing %i keys:, keys1[%i]\n",
+              *n_keys, *keys1[i]);
+              int iii=99;
+        }*/
+
+wprintf(L"----------------------------\n");
+// converts the Ascii-nr to the name specified in symbols-file( 35 -> numbersign( KEY_numbersign);  65 -> A( KEY_A)
+// in: AsciiNr  out: name in symbolfile
+  gchar * gch1;
+  char * ch1;
+  guint *keyvalsU;
+  guint *keyvalsS;
+
+for ( int ii=10; ii<65;ii++) {
+  gch1 = gdk_keyval_name ((guint) ii);
+  ch1 = (char*) gch;
+  std::string str_ch1(ch1);
+  wprintf(L"   key nr %i has the name: -- %s \n ",   ii, str_ch1.c_str());
+
+  //g_free(keyvalsU);
+  //g_free(maps);
+
+  /*gdk_keymap_translate_keyboard_state (keymap, ii, MOD_Shift , 0, keyvalsS, NULL, NULL, & consumed);
+  int char_shifted = (int) *keyvalsS;*/
+
+ /* GdkModifierType MOD_base = (GdkModifierType) ( ~GDK_MODIFIER_MASK );
+  gdk_keymap_translate_keyboard_state (keymap, ii, MOD_base , 0, keyvalsS, NULL, NULL, & consumed);
+  int char_shifted = (int) *keyvalsS;*/
+
+  /*  GdkModifierType MOD_Shift = (GdkModifierType) ( GDK_SHIFT_MASK );
+  gdk_keymap_translate_keyboard_state (keymap, ii, MOD_base , 0, keyvalsU, NULL, NULL, & consumed);
+  int char_unshifted = (int) *keyvalsU;*/
+  
+  //wprintf(L"   key nr %i has the name: -- %ls     \t\tand prints -->  %c\t(%i)-\n ",   ii, gch.c_str(), char_shifted,char_shifted);
+
+  //wprintf(L",   %c (%i) -- %c (%i) \n",   ii,ii,char_shifted,char_shifted);
+}
+wprintf(L"----------------------------\n");
+// convert the content of a key which is more than 1 char long to the char ( plus -> +)
+// in: name  in symbolfile  out: Ascii-Nr
+std::string name = "plus";
+const char* name_ch = name.c_str();
+
+guint name_int= gdk_keyval_from_name (name_ch);
+wprintf(L"   key with name  '%s' has the (ASCII)value: :%i(%c)\n",  name.c_str(),  name_int,name_int);
+
+wprintf(L"----------------------------\n");
+
+guint32 g32= gdk_keyval_to_unicode ('R');
+wprintf(L"----------------------------\n");
+guint g= gdk_unicode_to_keyval  ('\u0052');
+wprintf(L"----------------------------\n");
+
+}
+
+
+
+
 std::wstring  PrintKeymapForCodeReturnKeySym(GdkKeymap *keymap, guint VK, v_dw_3D &All_Vector, ShiftState ss, int caps  ){
 //GdkKeymap *keymap;
   GdkModifierType consumed;

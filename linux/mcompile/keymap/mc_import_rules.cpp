@@ -677,10 +677,16 @@ bool KMX_ImportRules(KMX_WCHAR *kbid, LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, Gd
   // flag that the VK is valid, and it can store the SC value.
     // _S2 this does not find exactly the same keys as the windows version does(windows finds more)
 
+  int keycountS =0;
   for(UINT sc = 0x01; sc <= 0x7f; sc++) {
+    // fills m_vk with the VK of the US keyboard which is not right!!
+    // ( mcompile win uses MapVirtualKeyEx() to fill m_vk with the VK of the Other keyboard)
+    // Linux cant get a VK for the US Keyboard using USVirtualKeyToScanCode/ScanCodeToUSVirtualKey
+    // Linux cannot get a VK for Other Keyboard
+    // it could return SC if that helps
     KMX_VirtualKey *key = new KMX_VirtualKey(sc, hkl, All_Vector, keymap);
-    // _S2 is there a better solution than   && (key->VK() <256)
-    if((key->VK() != 0) && (key->VK() <256)) {
+    if((key->VK() != 0) ) {
+      keycountS++;
         rgKey[key->VK()] = key;
     } else {
         delete key;
@@ -727,6 +733,9 @@ bool KMX_ImportRules(KMX_WCHAR *kbid, LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, Gd
       }
   }
 
+ //Try_GDK( *keymap, 35 ) ;  // key 35(DE)  = 187= OEM_PLUS
+ //Inspect_Key_S(*keymap);
+
   // _S2 QUIESTION !!!
   // Different characters on Windows and Lunux for shift/Caps-states:
   //        Windows                      Linux
@@ -748,7 +757,7 @@ bool KMX_ImportRules(KMX_WCHAR *kbid, LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, Gd
     if(rgKey[iKey] != NULL) {
       WCHAR sbBuffer[256];     // Scratchpad we use many places
 
-      UINT mapped_ikey = Lin_KM__map(iKey, All_Vector);
+      UINT SC_Other = Lin_KM__map(iKey, All_Vector);
 
       for(ShiftState ss = Base; ss <= loader.MaxShiftState(); ss = (ShiftState)((int)ss + 1)) {
         if(ss == Menu || ss == ShftMenu) {
@@ -757,14 +766,22 @@ bool KMX_ImportRules(KMX_WCHAR *kbid, LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, Gd
         }
 
         // _S2 can go later
-        //int Keypos =  get_position_From_VirtualKey_Other(mapped_ikey , All_Vector, 99);
+        //int Keypos =  get_position_From_VirtualKey_Other(SC_Other , All_Vector, 99);
         //UINT VK_vec = (UINT) All_Vector[1][Keypos][0];
 
-        // _S2 get_position_From_GDK gives wrong values for 0,65,94,126 which are not processed correctly -> "what do I return if not found..."
-        KMX_DWORD keypos_GDK=  get_position_From_GDK( *keymap,  mapped_ikey );
 
-        //if ( VK_vec != keypos_GDK)
-        //  wprintf(L" DIFFFFERERNT !!!!!!! , %i -- %i\n", VK_vec,keypos_GDK );
+
+
+        // _S2 get_position_From_GDK gives wrong values for 0,65,94,126 which are not processed correctly -> "what do I return if not found..."
+        KMX_DWORD keypos_GDK=  get_position_From_GDK( *keymap,  SC_Other );
+        KMX_DWORD SC_US;
+        if( SC_Other>7)
+           SC_US=  (KMX_DWORD)(8+ USVirtualKeyToScanCode[ SC_Other ]);
+          else SC_US=0;
+
+//wprintf(L" for vk of %i we get Keycode US of %i  SC_Other %i: ( on Key US (%i) we find char %i (%c) ) \n", SC_Other, 8+USVirtualKeyToScanCode[SC_Other], 8+USVirtualKeyToScanCode[SC_Other] ,
+//8+USVirtualKeyToScanCode[SC_Other],get_VirtualKey_Other_GDK(*keymap, 8+USVirtualKeyToScanCode[SC_Other]),get_VirtualKey_Other_GDK(*keymap, 8+USVirtualKeyToScanCode[SC_Other]) );
+
 
         // _S2 TODO this needs to go !! it's TEMPORARY until we decide what to return if not found. At the moment we return 0 in this case which is a problem for gdk
         // _S2 to avoid Gdk-CRITICAL **: 16:41:42.662: gdk_keymap_get_entries_for_keyval: assertion 'keyval != 0' failed: we set keypos_GDK to a value
@@ -775,14 +792,15 @@ bool KMX_ImportRules(KMX_WCHAR *kbid, LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, Gd
         for(int caps = 0; caps <= 1; caps++) {
 
           //_S2 TODO get char  - do I need rc ?? ( was rc = ToUnicodeEx...)
-          std::wstring VK_Other_OLD = get_VirtualKey_Other_from_iKey(mapped_ikey, ss, caps, All_Vector);
-          std::wstring VK_Other = get_KeySyms_according_to_Shiftstate( *keymap, keypos_GDK, ss, caps);
+          std::wstring VK_Other_OLD = get_VirtualKey_Other_from_iKey(SC_Other, ss, caps, All_Vector);
+          //std::wstring VK_Other2 = get_KeySyms_according_to_Shiftstate( *keymap, keypos_GDK, ss, caps);
+          std::wstring VK_Other = get_KeySyms_according_to_Shiftstate( *keymap, SC_US, ss, caps);
+          std::wstring VK_Other3 = get_KeySyms_according_to_Shiftstate( *keymap, SC_Other, ss, caps);
+          std::wstring VK_Other31 = get_KeySyms_according_to_Shiftstate( *keymap, 187, ss, caps);
+          std::wstring VK_Other32 = get_KeySyms_according_to_Shiftstate( *keymap, 221, ss, caps);
+          std::wstring VK_Other33 = get_KeySyms_according_to_Shiftstate( *keymap, 186, ss, caps);
+          //std::wstring VK_Other77 = get_KeySyms_according_to_Shiftstate( *keymap, SC_US, ss, caps);
 
-          /*  _S2 can go later
-          if ( VK_Other_OLD != VK_Other) {
-            if(VK_Other!=L"" )
-              wprintf(L"\nVK`s are different :-(  %s <--> %s  ",VK_Other.c_str() ,VK_Other_OLD.c_str());
-          }*/
 
           //_S2 TODO do I need that ??
           //if rc >0: it got 1 or more char AND buffer is empty ( nothing inside ) {
@@ -821,7 +839,7 @@ bool KMX_ImportRules(KMX_WCHAR *kbid, LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, Gd
   std::vector< int > TestValues = {48,49,50,51,52,53,54,55,56,57,65,66,67,88,89,90};
  // std::vector< int > TestValues = {65};
   wprintf(L"-----------------\nNow some tests:\n");
-  for ( int i=0; i < TestValues.size();i++) {
+  for ( int i=0; i < (int) TestValues.size();i++) {
     wprintf(L"Results for %i\t: %s  %s  %s  %s   \n", TestValues[i], rgKey[TestValues[i]]->KMX_GetShiftState(Base,0).c_str(),   rgKey[TestValues[i]]->KMX_GetShiftState(Base,1).c_str() ,  rgKey[TestValues[i]]->KMX_GetShiftState(Shft,0).c_str(), rgKey[TestValues[i]]->KMX_GetShiftState(Shft,1).c_str());
   }
   wprintf(L"-----------------\n");
@@ -882,7 +900,6 @@ bool KMX_ImportRules(KMX_WCHAR *kbid, LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, Gd
   //
   // Fill in the new rules
   //
-int STOP;
 
   for (UINT iKey = 0; iKey < rgKey.size(); iKey++) {
     if ((rgKey[iKey] != NULL) && rgKey[iKey]->KMX_IsKeymanUsedKey() && (!rgKey[iKey]->KMX_IsEmpty())) {
