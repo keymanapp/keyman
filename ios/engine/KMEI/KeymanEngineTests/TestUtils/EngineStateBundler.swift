@@ -29,7 +29,6 @@ extension TestUtils {
       return FileManager.default.urls(for: .libraryDirectory, in: .userDomainMask)[0].appendingPathComponent("Preferences")
     }
 
-    /*
     static func createBundle(withName name: String) throws -> XCTAttachment {
       let tempDirectory = FileManager.default.temporaryDirectory
       let bundleConstructionURL = tempDirectory.appendingPathComponent("\(name).bundle")
@@ -68,7 +67,7 @@ extension TestUtils {
 
       let archiveURL = bundleConstructionURL.appendingPathComponent("bundleArchive.zip")
       do {
-        let attachmentFile = try Archive(url: archiveURL, accessMode: .create)
+        _ = try Archive(url: archiveURL, accessMode: .create)
         log.info("archiveURL: \(archiveURL)")
         let attachment = XCTAttachment(contentsOfFile: archiveURL)
         attachment.lifetime = .keepAlways
@@ -80,6 +79,5 @@ extension TestUtils {
       }
     }
      
-     */
   }
 }
