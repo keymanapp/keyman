@@ -4,7 +4,7 @@
 import 'mocha';
 import * as path from 'path';
 import { fileURLToPath } from 'url';
-import { SectionCompiler } from '../../src/compiler/section-compiler.js';
+import { SectionCompiler, SectionCompilerNew } from '../../src/compiler/section-compiler.js';
 import { KMXPlus, LDMLKeyboardXMLSourceFileReader, VisualKeyboard, CompilerEvent, LDMLKeyboardTestDataXMLSourceFile, compilerEventFormat, LDMLKeyboard, UnicodeSetParser, CompilerCallbacks } from '@keymanapp/common-types';
 import { LdmlKeyboardCompiler } from '../../src/main.js'; // make sure main.js compiles
 import { assert } from 'chai';
@@ -52,7 +52,7 @@ afterEach(function() {
 });
 
 
-export async function loadSectionFixture(compilerClass: typeof SectionCompiler, filename: string, callbacks: TestCompilerCallbacks, dependencies?: typeof SectionCompiler[]): Promise<Section> {
+export async function loadSectionFixture(compilerClass: SectionCompilerNew, filename: string, callbacks: TestCompilerCallbacks, dependencies?: SectionCompilerNew[], postValidateFail?: boolean): Promise<Section> {
   callbacks.messages = [];
   const inputFilename = makePathToFixture(filename);
   const data = callbacks.loadFile(inputFilename);
@@ -83,13 +83,16 @@ export async function loadSectionFixture(compilerClass: typeof SectionCompiler, 
   compiler.dependencies.forEach(dep => assert.ok(sections[dep],
       `Required dependency '${dep}' for '${compiler.id}' was not supplied: Check the 'dependencies' argument to loadSectionFixture or testCompilationCases`));
 
-  return compiler.compile(sections);
+  const section = await compiler.compile(sections);
+  const postValidate = compiler.postValidate(section);
+  assert.equal(postValidate, !postValidateFail, `expected postValidate() to return ${!postValidateFail}`);
+  return section;
 }
 
 /**
  * Recursively load dependencies. Normally they are loaded in SECTION_COMPILERS order
  */
-async function loadDepsFor(sections: DependencySections, parentCompiler: SectionCompiler, source: LDMLKeyboardXMLSourceFile, callbacks: TestCompilerCallbacks, dependencies?: typeof SectionCompiler[]) {
+async function loadDepsFor(sections: DependencySections, parentCompiler: SectionCompiler, source: LDMLKeyboardXMLSourceFile, callbacks: TestCompilerCallbacks, dependencies?: SectionCompilerNew[]) {
   const parentId = parentCompiler.id;
   if (!dependencies) {
     // default dependencies
@@ -184,7 +187,11 @@ export interface CompilationCase {
   /**
    * Optional dependent sections to load.  Will be strs+list+elem if falsy.
    */
-  dependencies?: (typeof SectionCompiler)[];
+  dependencies?: (SectionCompilerNew)[];
+  /**
+   * Optional, if true, postValidate() must return false. (must be != postValidate())
+   */
+  postValidateFail?: boolean;
 }
 
 /**
@@ -193,7 +200,7 @@ export interface CompilationCase {
  * @param compiler argument to loadSectionFixture()
  * @param callbacks argument to loadSectionFixture()
  */
-export function testCompilationCases(compiler: typeof SectionCompiler, cases : CompilationCase[], dependencies?: (typeof SectionCompiler)[]) {
+export function testCompilationCases(compiler: SectionCompilerNew, cases : CompilationCase[], dependencies?: (SectionCompilerNew)[]) {
   // we need our own callbacks rather than using the global so messages don't get mixed
   const callbacks = new TestCompilerCallbacks();
   for (let testcase of cases) {

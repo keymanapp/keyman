@@ -207,6 +207,13 @@ export class LdmlKeyboardCompiler {
       kmx.kmxplus[section.id] = sect as any;
     }
 
+    // give all sections a chance to postValidate
+    for(let section of sections) {
+      if(!section.postValidate(kmx.kmxplus[section.id])) {
+        passed = false;
+      }
+    }
+
     return passed ? kmx : null;
   }
 }
