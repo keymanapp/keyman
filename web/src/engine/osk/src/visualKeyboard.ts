@@ -489,7 +489,7 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
         // but only while still permitting new touches.  If we're here, that time is over.
         for(let id of gestureSequence.allSourceIds) {
           // If the original preview host lives on, ensure it's cancelled now.
-          if(sourceTrackingMap[id].previewHost) {
+          if(sourceTrackingMap[id]?.previewHost) {
             this.gesturePreviewHost = null;
             sourceTrackingMap[id].previewHost.cancel();
           }
