@@ -82,7 +82,10 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
      * is called after creation and any configuration change. */
     @Override
     public void onInitializeInterface() {
-        super.onInitializeInterface();
+      super.onInitializeInterface();
+
+      // KeymanWeb reloaded, so we have to pass the banner again
+      BannerController.setHTMLBanner(this, KeyboardType.KEYBOARD_TYPE_SYSTEM);
     }
 
     /** Called by the framework when your view for creating input needs to

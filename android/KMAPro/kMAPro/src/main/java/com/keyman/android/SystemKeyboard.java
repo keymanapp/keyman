@@ -97,6 +97,9 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
   @Override
   public void onInitializeInterface() {
     super.onInitializeInterface();
+
+    // KeymanWeb reloaded, so we have to pass the banner again
+    BannerController.setHTMLBanner(this, KeyboardType.KEYBOARD_TYPE_SYSTEM);
   }
 
   /**
