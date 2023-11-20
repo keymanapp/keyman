@@ -63,8 +63,11 @@ export class TouchEventEngine<HoveredItemType, StateToken = any> extends InputEv
 
   private preventPropagation(e: TouchEvent) {
     // Standard event maintenance
-    e.preventDefault();
-    e.cancelBubble=true;
+    if(e.cancelable) {
+      // Chrome generates error-log messages if this is attempted while
+      // the condition is false.
+      e.preventDefault();
+    }
 
     if(typeof e.stopImmediatePropagation == 'function') {
       e.stopImmediatePropagation();
