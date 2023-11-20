@@ -28,6 +28,7 @@ TODO where to store VK_CANCEL.... in km_types.h or elsewhere?
 ToDo check up to 8 shiftstates ( find symbols-file with 8)
 TODO get_position_From_VirtualKey_US: take care of the other shiftstates
 ToDo make this better!!! get_VirtualKey_Other_From_SC
+ToDo use _free(keyvals);   g_free(maps);
 
 TODO next:
     - change mapping (win-lin) for writing All_Vector

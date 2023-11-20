@@ -76,7 +76,7 @@ int run(int argc, std::vector<std::u16string> str_argv, char* argv_ch[] = NULL){
 
   if(argc < 3 || (argc < 5 && u16cmp(argv[1], u"-u") != 0)) {   // I4273// I4273
     wprintf(
-        L"Usage: mcompile -u infile.kmx outfile.kmx\n"
+        L"Usage: mcompile -u infile.kmx outfile.kmx\n  (not available for Linux)"
         L"       mcompile [-d] infile.kmx kbdfile.dll kbid outfile.kmx\n"
         L"  With -u parameter, converts keyboard from ANSI to Unicode\n"
         L"  Otherwise, mcompile converts a Keyman mnemonic layout to a\n"
@@ -88,29 +88,7 @@ int run(int argc, std::vector<std::u16string> str_argv, char* argv_ch[] = NULL){
     return 1;
   }
 
-  // _S2 QUESTION -------u option will be done later. Do we need it?? ----------------------
-
-    /* if(wcscmp(argv[1], L"-u") == 0) { // I4273
-    wchar_t *infile = argv[2], *outfile = argv[3];
-
-    LPKEYBOARD kmxfile;
-
-    if(!LoadKeyboard(infile, &kmxfile)) {
-      LogError(L"Failed to load keyboard (%d)", GetLastError());
-      // replaced by _S2 KMX_LogError(L"Failed to load keyboard (%d)\n", errno );
-      return 3;
-    }
-
-    if(ConvertKeyboardToUnicode(kmxfile)) {
-      SaveKeyboard(kmxfile, outfile);
-    }
-
-    //DeleteReallocatedPointers(kmxfile); :TODO
-    delete[] kmxfile;
-
-    return 0;   // I4279
-    }*/
-  //-----------------------------
+  //  -u option was removed for Linux
 
   int bDeadkeyConversion = u16cmp(argv[1], u"-d") == 0; // I4552
   int n = (bDeadkeyConversion ? 2 : 1);

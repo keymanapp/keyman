@@ -594,12 +594,12 @@ int KMX_GetMaxDeadkeyIndex(KMX_WCHAR *p) {
 
 bool IsKeymanUsedKey_S2(std::wstring SC_Other) { 
 
-int SC_US = (int) (*SC_Other.c_str());
+  int SC_US = (int) (*SC_Other.c_str());
 
-    if ((SC_US>= 0x20 && SC_US <= 0x7A) || (SC_US >= 0x88 && SC_US < 0xFF))
-      return true;
-    else
-      return false;
+  if ((SC_US>= 0x20 && SC_US <= 0x7A) || (SC_US >= 0x88 && SC_US < 0xFF))
+    return true;
+  else
+    return false;
 
 }
 
@@ -743,18 +743,18 @@ bool KMX_ImportRules(KMX_WCHAR *kbid, LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, Gd
           std::wstring  VK_OtherTEST5 = get_KeySyms_according_to_Shiftstate( *keymap, 58, ShftMenu, 0);
           std::wstring  VK_OtherTEST7 = get_KeySyms_according_to_Shiftstate( *keymap, 58, ShftMenuCtrl, 0);
           std::wstring  VK_OtherTEST8 = get_KeySyms_according_to_Shiftstate( *keymap, 58, Xxxx, 0);
-           std::wstring VK_OtherTEST9 = get_KeySyms_according_to_Shiftstate( *keymap, 58, ShftXxxx, 0);
+          std::wstring  VK_OtherTEST9 = get_KeySyms_according_to_Shiftstate( *keymap, 58, ShftXxxx, 0);
           std::wstring  VK_OtherTEST10 = get_KeySyms_according_to_Shiftstate( *keymap, 58, Base, 1);
           std::wstring  VK_OtherTEST11 = get_KeySyms_according_to_Shiftstate( *keymap, 58, Shft, 1);
           std::wstring  VK_OtherTEST12 = get_KeySyms_according_to_Shiftstate( *keymap, 58, Ctrl, 1);
-           std::wstring VK_OtherTEST13 = get_KeySyms_according_to_Shiftstate( *keymap, 58, ShftCtrl, 1);
+          std::wstring  VK_OtherTEST13 = get_KeySyms_according_to_Shiftstate( *keymap, 58, ShftCtrl, 1);
           std::wstring  VK_OtherTEST14 = get_KeySyms_according_to_Shiftstate( *keymap, 58, Menu, 1);
           std::wstring  VK_OtherTEST15 = get_KeySyms_according_to_Shiftstate( *keymap, 58, ShftMenu, 1);
           std::wstring  VK_OtherTEST17 = get_KeySyms_according_to_Shiftstate( *keymap, 58, ShftMenuCtrl, 1);
-           std::wstring VK_OtherTEST18 = get_KeySyms_according_to_Shiftstate( *keymap, 58, Xxxx, 1);
-           std::wstring VK_OtherTEST19 = get_KeySyms_according_to_Shiftstate( *keymap, 58, ShftXxxx, 1);
+          std::wstring  VK_OtherTEST18 = get_KeySyms_according_to_Shiftstate( *keymap, 58, Xxxx, 1);
+          std::wstring  VK_OtherTEST19 = get_KeySyms_according_to_Shiftstate( *keymap, 58, ShftXxxx, 1);
          */
-          // _S2 needs to be changed - temporary to get the same keys as keyman does when using USVirtualKeyToScanCode
+          // _S2 needs to be changed - it's temporary to get the same keys as keyman does when using USVirtualKeyToScanCode
         if (!IsKeymanUsedKey_S2(VK_Other))
           VK_Other =L"\0";
 

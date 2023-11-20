@@ -326,8 +326,6 @@ KMX_DWORD getKeyvalsFromKeymap(GdkKeymap *keymap, guint keycode, int shift_state
 
   out =(KMX_DWORD)  keyvals[shift_state_pos];
 
-  // _S2 QUESTION
-  // _S2 what is 65104-65106, 65506, 21840
   // _S2 if out of range of what ( ascii??) return 0 or other value ?
   if (out > 255) {
     wprintf(L"out of range: found value out( %i) for keycode = %i /shift_state_pos %i      (49= TLDE 21= VK_EQUALS on US keyboard) \n", out,keycode,shift_state_pos);
@@ -386,36 +384,6 @@ KMX_DWORD  mapChar_To_VK(KMX_DWORD chr ){
  // else
     return chr;
 }
-
-// _S2 This can go later
-/*KMX_DWORD get_VirtualKey_Other_From_SC(KMX_DWORD SC , v_dw_3D &All_Vector) {
-
-  for( int i=0; i< (int)All_Vector[0].size();i++) {
-    //number keys return unshifted value ( e.g. 1, not !)
-    if(SC <= 19) {
-      if ( All_Vector[0][i][0] == SC)
-        return All_Vector[1][i][1];
-    }
-
-    // other keys
-    if((SC > 19) ) {
-      if ( All_Vector[0][i][0] == SC) {
-
-        // normal capital characters return the value of capital char ( e.g. A)
-        if ((All_Vector[1][i][2] >= 65 ) && (All_Vector[1][i][2] < 91 ))
-          return All_Vector[1][i][2];
-
-        // special characters return Keyman defined values (e.g. VK_ACCENT)
-        else
-          //return All_Vector[1][i][1];
-          return mapVK_To_char(SC);
-      }
-    }
-  }
-return 0;
-}
-*/
-
 KMX_DWORD get_VirtualKey_Other_GDK( GdkKeymap *keymap, KMX_DWORD keycode) {
 
   GdkModifierType consumed;

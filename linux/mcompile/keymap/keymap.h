@@ -496,8 +496,6 @@ int replace_PosKey_with_Keycode_use_Lin(std::string  in);
 v_dw_2D create_empty_2D(int dim_rows, int dim_shifts);
 
 // query All_Vector
-// return the VirtualKey of the Other Keyboard for given Scancode
-//KMX_DWORD get_VirtualKey_Other_From_SC(KMX_DWORD SC , v_dw_3D &All_Vector);
 // _S2 can go later return the VirtualKey of the US Keyboard for given Scancode
 KMX_DWORD get_VirtualKey_US_From_SC(KMX_DWORD SC , v_dw_3D &All_Vector);
 // _S2 can go later return the Scancode of for given VirtualKey of Other Keyboard
