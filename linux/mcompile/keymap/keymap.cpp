@@ -446,11 +446,16 @@ KMX_DWORD get_VirtualKey_Other_GDK( GdkKeymap *keymap, KMX_DWORD keycode) {
       if ( lowerCase == upperCase )
         return  (KMX_DWORD)  upperCase;
     }
+
+
+  // _S2 ToDo
+  // either it gives the correct rgkeys (all non-char filled with special char) or
+  // it gives not all rgkeys but nr, a-z are filled correctly
     // _S2 ToDo tidy up
     if ( keycode >7) {
       UINT VK_for_rgKey2 = ScanCodeToUSVirtualKey[keycode-8];
 
-   // return  (KMX_DWORD) *keyvals;  //_S2 what to return if >255
+    //return  (KMX_DWORD) *keyvals;}  //_S2 what to return if >255
     return  (KMX_DWORD) VK_for_rgKey2 ; }
 
   return 0;   //_S2 what to return if not found
@@ -594,7 +599,6 @@ std::wstring  get_KeyVals_according_to_Shiftstate(GdkKeymap *keymap, guint keyco
   if (!gdk_keymap_get_entries_for_keycode(keymap, keycode, &maps, &keyvals, &count))
     return L"1";
 
-
   //unshifted
   if (( ss == Base ) && ( caps == 0 )) {
     GdkModifierType MOD_base = (GdkModifierType) ( ~GDK_MODIFIER_MASK );
@@ -641,7 +645,8 @@ std::wstring  get_KeySyms_according_to_Shiftstate(GdkKeymap *keymap, guint keyco
   gint count;
 
   if (!gdk_keymap_get_entries_for_keycode(keymap, keycode, &maps, &keyvals, &count))
-    return L"1";
+    return L"\0";
+    //return L"1";
 
   //unshifted
   if (( ss == Base ) && ( caps == 0 )) {
@@ -672,15 +677,24 @@ std::wstring  get_KeySyms_according_to_Shiftstate(GdkKeymap *keymap, guint keyco
     return  std::wstring(1, (int) *keyvals);
   }
 
-  /*//ALT-GR
-  else if {
-    GdkModifierType MOD_AltGr = (GdkModifierType) ( GDK_MOD5_MASK );
+  //ALT-GR
+  else if (( ss == MenuCtrl ) && ( caps == 0 )){
+    GdkModifierType MOD_AltGr = (GdkModifierType) ( 144 );
     gdk_keymap_translate_keyboard_state (keymap, keycode, MOD_AltGr , 0, keyvals, NULL, NULL, & consumed);
-    return *keyvals;
-  }*/
+    return  std::wstring(1, (int) *keyvals);
+  }
+
+
+  //ALT-GR
+  else if (( ss == MenuCtrl ) && ( caps == 1 )){
+    GdkModifierType MOD_AltGr = (GdkModifierType) ( 144 );
+    gdk_keymap_translate_keyboard_state (keymap, keycode, MOD_AltGr , 0, keyvals, NULL, NULL, & consumed);
+    return  std::wstring(1, (int) *keyvals);
+  }
 
   else
-    return L"0";
+    return L"\0";
+    //return L"0";
 }
 
 // _S2 maybe not needed

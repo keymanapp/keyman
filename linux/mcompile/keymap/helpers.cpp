@@ -720,7 +720,7 @@ void Inspect_Key_S(GdkKeymap *keymap ) {
   //                     ___       ___       ___       ___
   //                    | A |     | Ö |     | & |     | ' |
   // Key                |_a_|     |_ö_|     |_6_|     |_#_|
-  // KCode                38        47        15        51
+  // KeyCode              38        47        15        51
   // Keyval Base          97       246        54        35
   // Keyval Shift         65       214        38        39
   // KeyValname(Base)     a    odiaresis       6       apostrophe
@@ -1429,3 +1429,67 @@ wprintf(L"    in Us   %i  and KeysymsUS %i : \n",   inUS ,KeysymUS  );
   return true;
 }
 */
+
+
+bool is_Letter(int pos, v_dw_3D & All_Vector){
+  if( ( All_Vector[1][pos][1] == All_Vector[1][pos][2] + 32)  )
+    return true;
+  return false;
+}
+
+bool is_Number(int pos, v_dw_3D & All_Vector){
+  if(  (All_Vector[1][pos][1] >= 48) && (All_Vector[1][pos][1]  <= 57)    )
+      return true;
+  return false;
+}
+
+bool is_Special(int pos, v_dw_3D & All_Vector){
+  if( !is_Number && !is_Letter)
+    return true;
+  return false;
+}
+
+bool is_Edges(int pos, v_dw_3D & All_Vector){
+  if( (All_Vector[1][pos][1] == 48))
+    return true;
+  return false;
+}
+// _S2 can go later
+std::wstring  get_VirtualKey_Other_from_iKey(KMX_DWORD iKey, ShiftState &ss, int &caps, v_dw_3D &All_Vector) {
+
+  // _S2 this will find the correct row in All_Vector
+  //( e.g. get_position_From_VirtualKey_Other(65 ,All_Vector.99 ) returns 25
+  // All_Vector[25] contains SC(38), unshifted A (97) shifted A (65) )
+  KMX_DWORD pos = get_position_From_VirtualKey_Other(iKey, All_Vector,99);
+
+  int icaps;
+  if (ss >9)
+    return L"";
+
+  if( ss < All_Vector[1][pos].size()-1) {
+
+    // ss 0,2,4...
+    if ( ss % 2 == 0) {
+      // aAAa  4$$4
+      if ( is_Letter(pos, All_Vector) || is_Number(pos, All_Vector))
+        icaps = ss+2-caps;
+      // ..::  ##''
+      else
+        icaps = ss+1;
+    }
+
+    // ss 1,3,5...
+    if ( ss % 2 == 1) {
+      // aAAa  4$$4
+      if ( is_Letter(pos, All_Vector) || is_Number(pos, All_Vector))
+        icaps = ss+caps;
+      // ..::  ##''
+      else
+        icaps = ss+1;
+    }
+
+    return std::wstring(1, (int) All_Vector[1][pos][icaps]);
+  }
+  return L"";
+}
+

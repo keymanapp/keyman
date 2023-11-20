@@ -300,6 +300,20 @@ int i4 = this->KMX_IsXxxxGrCapsEqualToXxxxShift() ? 8 : 0;
 
   bool KMX_LayoutRow(int MaxShiftState, LPKMX_KEY key, std::vector<DeadKey*> *deadkeys, int deadkeyBase, BOOL bDeadkeyConversion,v_dw_3D &All_Vector) {   // I4552
     // Get the CAPSLOCK value
+
+
+bool   b1= this->KMX_IsCapsEqualToShift();
+bool   b2= this->KMX_IsSGCAPS();
+bool   b3= this->KMX_IsAltGrCapsEqualToAltGrShift();
+bool   b4= this->KMX_IsXxxxGrCapsEqualToXxxxShift() ;
+
+int i1 = this->KMX_IsCapsEqualToShift() ? 1 : 0;
+int i2 = this->KMX_IsSGCAPS() ? 2 : 0;
+int i3 = this->KMX_IsAltGrCapsEqualToAltGrShift() ? 4 : 0;
+int i4 = this->KMX_IsXxxxGrCapsEqualToXxxxShift() ? 8 : 0;
+
+
+
     int capslock =
         (this->KMX_IsCapsEqualToShift() ? 1 : 0) |
         (this->KMX_IsSGCAPS() ? 2 : 0) |
@@ -324,6 +338,8 @@ int i4 = this->KMX_IsXxxxGrCapsEqualToXxxxShift() ? 8 : 0;
           key->dpContext = new KMX_WCHAR[1];
           *key->dpContext = 0;
           key->ShiftFlags = this->KMX_GetShiftStateValue(capslock, caps, (ShiftState) ss);
+
+            // _S2 this fun returns the shifted Char it goes wrog for numbers, special here!!
           key->Key = KMX_VKUnderlyingLayoutToVKUS(All_Vector,this->VK());
           key->Line = 0;
 
@@ -346,6 +362,7 @@ int i4 = this->KMX_IsXxxxGrCapsEqualToXxxxShift() ? 8 : 0;
           }
             
           if(isvalid) {
+            // _S2 this fun returns the shifted Char instead of keyname -> use gdk function!!
             key->Key = KMX_VKUnderlyingLayoutToVKUS(All_Vector,this->VK());
             key->Line = 0;
             key->ShiftFlags = this->KMX_GetShiftStateValue(capslock, caps, (ShiftState) ss);
@@ -575,70 +592,15 @@ int KMX_GetMaxDeadkeyIndex(KMX_WCHAR *p) {
   return n;
 }
 
+bool IsKeymanUsedKey_S2(std::wstring SC_Other) { 
 
+int SC_US = (int) (*SC_Other.c_str());
 
-bool is_Letter(int pos, v_dw_3D & All_Vector){
-  if( ( All_Vector[1][pos][1] == All_Vector[1][pos][2] + 32)  )
-    return true;
-  return false;
-}
-
-bool is_Number(int pos, v_dw_3D & All_Vector){
-  if(  (All_Vector[1][pos][1] >= 48) && (All_Vector[1][pos][1]  <= 57)    )
+    if ((SC_US>= 0x20 && SC_US <= 0x7A) || (SC_US >= 0x88 && SC_US < 0xFF))
       return true;
-  return false;
-}
+    else
+      return false;
 
-bool is_Special(int pos, v_dw_3D & All_Vector){
-  if( !is_Number && !is_Letter)
-    return true;
-  return false;
-}
-
-bool is_Edges(int pos, v_dw_3D & All_Vector){
-  if( (All_Vector[1][pos][1] == 48))
-    return true;
-  return false;
-}
-
-
-// _S2 can go later
-std::wstring  get_VirtualKey_Other_from_iKey(KMX_DWORD iKey, ShiftState &ss, int &caps, v_dw_3D &All_Vector) {
-
-  // _S2 this will find the correct row in All_Vector
-  //( e.g. get_position_From_VirtualKey_Other(65 ,All_Vector.99 ) returns 25
-  // All_Vector[25] contains SC(38), unshifted A (97) shifted A (65) )
-  KMX_DWORD pos = get_position_From_VirtualKey_Other(iKey, All_Vector,99);
-
-  int icaps;
-  if (ss >9)
-    return L"";
-
-  if( ss < All_Vector[1][pos].size()-1) {
-
-    // ss 0,2,4...
-    if ( ss % 2 == 0) {
-      // aAAa  4$$4
-      if ( is_Letter(pos, All_Vector) || is_Number(pos, All_Vector))
-        icaps = ss+2-caps;
-      // ..::  ##''
-      else
-        icaps = ss+1;
-    }
-
-    // ss 1,3,5...
-    if ( ss % 2 == 1) {
-      // aAAa  4$$4
-      if ( is_Letter(pos, All_Vector) || is_Number(pos, All_Vector))
-        icaps = ss+caps;
-      // ..::  ##''
-      else
-        icaps = ss+1;
-    }
-
-    return std::wstring(1, (int) All_Vector[1][pos][icaps]);
-  }
-  return L"";
 }
 
 
@@ -685,7 +647,12 @@ bool KMX_ImportRules(KMX_WCHAR *kbid, LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, Gd
     // Linux cannot get a VK for Other Keyboard
     // it could return SC if that helps
     KMX_VirtualKey *key = new KMX_VirtualKey(sc, hkl, All_Vector, keymap);
-    if((key->VK() != 0) ) {
+
+  // _S2 ToDo
+  // either it gives the correct rgkeys (all non-char filled with special char) or
+  // it gives not all rgkeys but nr, a-z are filled correctly
+   if((key->VK() != 0) && (key->VK()< 255)) {  // if used without ScanCodeToUSVirtualKey[]
+   // if((key->VK() != 0) ) {
       keycountS++;
         rgKey[key->VK()] = key;
     } else {
@@ -751,6 +718,7 @@ bool KMX_ImportRules(KMX_WCHAR *kbid, LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, Gd
           SC_US=  (KMX_DWORD)(8+ USVirtualKeyToScanCode[ SC_Other ]);
         else SC_US = 0;
 
+
 //wprintf(L" for vk of %i we get Keycode US of %i  SC_Other %i: ( on Key US (%i) we find char %i (%c) ) \n", SC_Other, 8+USVirtualKeyToScanCode[SC_Other], 8+USVirtualKeyToScanCode[SC_Other] ,
 //8+USVirtualKeyToScanCode[SC_Other],get_VirtualKey_Other_GDK(*keymap, 8+USVirtualKeyToScanCode[SC_Other]),get_VirtualKey_Other_GDK(*keymap, 8+USVirtualKeyToScanCode[SC_Other]) );
 
@@ -763,10 +731,38 @@ bool KMX_ImportRules(KMX_WCHAR *kbid, LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, Gd
           //std::wstring VK_Other3 = get_KeySyms_according_to_Shiftstate( *keymap, SC_Other, ss, caps);
 
 
+         //std::wstring   VK_OtherTEST6 = get_KeySyms_according_to_Shiftstate( *keymap, 51, MenuCtrl, 0);
+         // std::wstring  VK_OtherTEST16 = get_KeySyms_according_to_Shiftstate( *keymap, 51, MenuCtrl, 1);
+
+          /*std::wstring VK_OtherTEST ;
+          std::wstring  VK_OtherTEST0 = get_KeySyms_according_to_Shiftstate( *keymap, 58, Base, 0);
+          std::wstring  VK_OtherTEST1= get_KeySyms_according_to_Shiftstate( *keymap, 58, Shft, 0);
+          std::wstring  VK_OtherTEST2 = get_KeySyms_according_to_Shiftstate( *keymap, 58, Ctrl, 0);
+          std::wstring  VK_OtherTEST3 = get_KeySyms_according_to_Shiftstate( *keymap, 58, ShftCtrl, 0);
+          std::wstring  VK_OtherTEST4 = get_KeySyms_according_to_Shiftstate( *keymap, 58, Menu, 0);
+          std::wstring  VK_OtherTEST5 = get_KeySyms_according_to_Shiftstate( *keymap, 58, ShftMenu, 0);
+          std::wstring  VK_OtherTEST7 = get_KeySyms_according_to_Shiftstate( *keymap, 58, ShftMenuCtrl, 0);
+          std::wstring  VK_OtherTEST8 = get_KeySyms_according_to_Shiftstate( *keymap, 58, Xxxx, 0);
+           std::wstring VK_OtherTEST9 = get_KeySyms_according_to_Shiftstate( *keymap, 58, ShftXxxx, 0);
+          std::wstring  VK_OtherTEST10 = get_KeySyms_according_to_Shiftstate( *keymap, 58, Base, 1);
+          std::wstring  VK_OtherTEST11 = get_KeySyms_according_to_Shiftstate( *keymap, 58, Shft, 1);
+          std::wstring  VK_OtherTEST12 = get_KeySyms_according_to_Shiftstate( *keymap, 58, Ctrl, 1);
+           std::wstring VK_OtherTEST13 = get_KeySyms_according_to_Shiftstate( *keymap, 58, ShftCtrl, 1);
+          std::wstring  VK_OtherTEST14 = get_KeySyms_according_to_Shiftstate( *keymap, 58, Menu, 1);
+          std::wstring  VK_OtherTEST15 = get_KeySyms_according_to_Shiftstate( *keymap, 58, ShftMenu, 1);
+          std::wstring  VK_OtherTEST17 = get_KeySyms_according_to_Shiftstate( *keymap, 58, ShftMenuCtrl, 1);
+           std::wstring VK_OtherTEST18 = get_KeySyms_according_to_Shiftstate( *keymap, 58, Xxxx, 1);
+           std::wstring VK_OtherTEST19 = get_KeySyms_according_to_Shiftstate( *keymap, 58, ShftXxxx, 1);
+         */
+          // _S2 needs to be changed - temporary to get the same keys as keyman does when using USVirtualKeyToScanCode
+        if (!IsKeymanUsedKey_S2(VK_Other))
+          VK_Other =L"\0";
+
           //_S2 TODO do I need that ??
           //if rc >0: it got 1 or more char AND buffer is empty ( nothing inside ) {
             if(VK_Other == L"") {
-              rgKey[iKey]->KMX_SetShiftState(ss, L"", false, (caps == 0));
+              //rgKey[iKey]->KMX_SetShiftState(ss, L"", false, (caps == 0));
+              rgKey[iKey]->KMX_SetShiftState(ss, L"", false, (caps));
             }
 
             //_S2 TODO
@@ -785,7 +781,7 @@ bool KMX_ImportRules(KMX_WCHAR *kbid, LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, Gd
         //_S2 TODO
         // _S2 handle deadkeys later
         // if rc <0:  it got a deadkey   {
-            // fill m_rgss and m_rgfDeadkey
+            // fill m_rgss and m_rgfDeadkey and alDead
             //SET_SHIFTSTATES( deadkey)   //sbuffer is value out of ToUnicodeEx / AllVector
             // do more stuff for deadkeys...
         // } from rc<0
@@ -838,12 +834,11 @@ bool KMX_ImportRules(KMX_WCHAR *kbid, LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, Gd
 
   kp->cxGroupArray++;
   gp = &kp->dpGroupArray[kp->cxGroupArray-1];
-
   UINT nKeys = 0;
   for (UINT iKey = 0; iKey < rgKey.size(); iKey++) {
     if ((rgKey[iKey] != NULL) && rgKey[iKey]->KMX_IsKeymanUsedKey() && (!rgKey[iKey]->KMX_IsEmpty())) {
       nKeys+= rgKey[iKey]->KMX_GetKeyCount(loader.MaxShiftState());
-      //wprintf(L" iKey = %i, Delta:  %i \n", iKey, rgKey[iKey]->KMX_GetKeyCount(loader.MaxShiftState()));
+      wprintf(L" iKey = %i, Delta:  %i \n", iKey, rgKey[iKey]->KMX_GetKeyCount(loader.MaxShiftState()));
     }
   }
 
