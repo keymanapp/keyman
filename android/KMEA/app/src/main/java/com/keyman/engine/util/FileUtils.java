@@ -4,16 +4,22 @@
 package com.keyman.engine.util;
 
 import android.content.Context;
+import android.content.res.AssetManager;
+import android.util.Log;
+
+import com.keyman.engine.KMManager;
 
 import org.json.JSONObject;
 import org.json.JSONArray;
 
 import java.io.BufferedInputStream;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.nio.charset.StandardCharsets;
@@ -246,6 +252,35 @@ public final class FileUtils {
     }
 
     return result;
+  }
+
+  /**
+   * Read the contents of asset file as a string
+   * Reference:  https://stackoverflow.com/questions/16110002/read-assets-file-as-string
+   * @param context
+   * @param path - path of file relative to assets folder
+   * @return String
+   */
+  public static String readContents(Context context, String path) {
+    StringBuilder sb = new StringBuilder();
+    String str = "";
+    AssetManager assetManager = context.getAssets();
+    try {
+      InputStream inputStream = assetManager.open(path);
+      if (inputStream == null) {
+        KMLog.LogInfo(TAG, "Unable to read contents of asset: " + path);
+        return str;
+      }
+      BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8));
+      while ((str = reader.readLine()) != null) {
+        sb.append(str);
+      }
+      reader.close();
+    } catch (Exception e) {
+      KMLog.LogException(TAG, "Error reading asset file", e);
+      return str;
+    }
+    return sb.toString();
   }
 
   /**
