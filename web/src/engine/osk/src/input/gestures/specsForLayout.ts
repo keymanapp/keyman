@@ -267,7 +267,7 @@ export const InstantContactResolutionModel: ContactModel = {
   itemPriority: 0,
   pathResolutionAction: 'resolve',
   pathModel: {
-    evaluate: (path) => 'resolve'
+    evaluate: (path) => 'resolve',
   }
 }
 
@@ -779,7 +779,7 @@ export function initialTapModel(params: GestureParams): GestureModel<any> {
           timer: {
             duration: params.multitap.holdLength,
             expectedResult: false
-          }
+          },
         },
         endOnResolve: true
       }, {
@@ -787,6 +787,7 @@ export function initialTapModel(params: GestureParams): GestureModel<any> {
         resetOnResolve: true
       }
     ],
+    sustainWhenNested: true,
     rejectionActions: {
       timer: {
         type: 'replace',
@@ -817,6 +818,7 @@ export const SimpleTapModel: GestureModel<any> = {
       resetOnResolve: true
     }
   ],
+  sustainWhenNested: true,
   resolutionAction: {
     type: 'complete',
     item: 'current'
@@ -917,6 +919,16 @@ export function modipressHoldModel(params: GestureParams): GestureModel<any> {
             inheritElapsed: true
           }
         }
+      }, {
+        // If a new touchpoint comes in while in this state, lock in the modipress
+        // and prevent multitapping on it, as a different key has been tapped before
+        // the multitap base key since the latter's release.
+        model: {
+          ...InstantContactResolutionModel,
+        },
+        // The incoming tap belongs to a different gesture; we just care to know that it
+        // happened.
+        resetOnResolve: true
       }
     ],
     // To be clear:  any time modipress-hold is triggered and the timer duration elapses,
@@ -1027,6 +1039,16 @@ export function modipressMultitapEndModel(params: GestureParams): GestureModel<a
             expectedResult: false
           }
         }
+      }, {
+        model: {
+          // If a new touchpoint comes in while in this state, lock in the modipress
+          // and prevent multitapping on it, as a different key has been tapped before
+          // the multitap base key since the latter's release.
+          ...InstantContactRejectionModel
+        },
+        // The incoming tap belongs to a different gesture; we just care to know that it
+        // happened.
+        resetOnResolve: true
       }
     ],
     resolutionAction: {

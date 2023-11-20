@@ -34,8 +34,8 @@ interface EventMap<Type, StateToken> {
  *
  * This allows us to bypass that, resolving yet providing a pending Promise.
  */
-interface AsyncPromiseReturner<Type> {
-  selectionPromise: Promise<Type>;
+interface SelectionSetupResults<Type> {
+  selectionPromise: Promise<MatcherSelection<Type, any>>;
   sustainModeWithoutMatch?: boolean;
 }
 
@@ -166,7 +166,7 @@ export class MatcherSelector<Type, StateToken = any> extends EventEmitter<EventM
   public async matchGesture(
     source: GestureSource<Type, StateToken>,
     gestureModelSet: GestureModel<Type, StateToken>[]
-  ): Promise<AsyncPromiseReturner<MatcherSelection<Type, StateToken>>>;
+  ): Promise<SelectionSetupResults<Type>>;
 
   /**
    * Facilitates matching a new stage in an ongoing gesture-stage sequence based on a previously-
@@ -190,12 +190,12 @@ export class MatcherSelector<Type, StateToken = any> extends EventEmitter<EventM
   public async matchGesture(
     priorStageMatcher: PredecessorMatch<Type, StateToken>,
     gestureModelSet: GestureModel<Type, StateToken>[]
-  ): Promise<AsyncPromiseReturner<MatcherSelection<Type, StateToken>>>;
+  ): Promise<SelectionSetupResults<Type>>;
 
   public async matchGesture(
     source: GestureSource<Type> | PredecessorMatch<Type, StateToken>,
     gestureModelSet: GestureModel<Type, StateToken>[]
-  ): Promise<AsyncPromiseReturner<MatcherSelection<Type, StateToken>>> {
+  ): Promise<SelectionSetupResults<Type>> {
     /*
      * To be clear, this _starts_ the source-tracking process.  It's an async process, though.
      *

@@ -42,7 +42,7 @@ export default class Multitap implements GestureHandler {
     this.multitaps = [e.key.spec].concat(e.key.spec.multitap);
     this.sequence = source;
 
-    const startModipress = (tap) => {
+    const startModipress = (tap: GestureStageReport<KeyElement, string>) => {
       // In case of a previous modipress that somehow wasn't cleared.
       this.modipress?.clear();
 
