@@ -72,12 +72,10 @@ extension TestUtils {
         let attachment = XCTAttachment(contentsOfFile: archiveURL)
         attachment.lifetime = .keepAlways
         return attachment
-      }
-      catch let error {
+      } catch let error {
         print (error.localizedDescription)
         return XCTAttachment(string: error.localizedDescription)
       }
-    }
-     
+    }     
   }
 }

@@ -462,7 +462,7 @@ public class KeymanPackage {
         // it exists and is actually a directory, so remove every file it contains
         let fileArray = try FileManager.default.contentsOfDirectory(atPath: destination.path)
         try fileArray.forEach { file in
-            let fileUrl = destination.appendingPathComponent(file)
+          let fileUrl = destination.appendingPathComponent(file)
           try FileManager.default.removeItem(atPath: fileUrl.path)
         }
       }
