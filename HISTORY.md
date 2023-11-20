@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 17.0.214 alpha 2023-11-20
+
+* fix(ios): fv: replace Zip framework to prevent crash on startup (#10018)
+
 ## 17.0.213 alpha 2023-11-17
 
 * fix(linux): Fix packaging GHA (#10020)
