@@ -6,7 +6,7 @@ import { GestureMatcher, MatchResult, PredecessorMatch } from "./gestureMatcher.
 import { GestureModel, GestureResolution } from "../specs/gestureModel.js";
 import { MatcherSelection, MatcherSelector } from "./matcherSelector.js";
 import { GestureRecognizerConfiguration, TouchpointCoordinator } from "../../../index.js";
-import { ManagedPromise } from "@keymanapp/web-utils";
+import { ManagedPromise, timedPromise } from "@keymanapp/web-utils";
 
 export class GestureStageReport<Type, StateToken = any> {
   /**
@@ -215,7 +215,9 @@ export class GestureSequence<Type, StateToken = any> extends EventEmitter<EventM
     }
 
     if(actionType == 'complete' && selection.result.action.awaitNested && this.touchpointCoordinator && this.pushedSelector) {
-      const sustainedSources = this.pushedSelector.cascadeTermination() ?? [];
+      // Cascade-terminade all nested selectors, but don't remove / pop them yet.
+      // Their selection mode remains valid while their gestures are sustained.
+      const sustainedSources = this.touchpointCoordinator?.sustainSelectorSubstack(this.pushedSelector);
 
       const sustainCompletionPromises = sustainedSources.map((source) => {
         const promise = new ManagedPromise<void>();
@@ -226,9 +228,17 @@ export class GestureSequence<Type, StateToken = any> extends EventEmitter<EventM
 
       if(sustainCompletionPromises.length > 0) {
         await Promise.all(sustainCompletionPromises);
+        // Ensure all nested gestures finish resolving first before continuing by
+        // waiting against the macroqueue.
+        await timedPromise(0);
       }
 
+      // Actually drops the selection-mode state once all is complete.
+      // The drop MUST come after the `await` above.
       this.touchpointCoordinator?.popSelector(this.pushedSelector);
+
+        // May still need it active?
+        // this.pushedSelector.off('rejectionwithaction', this.modelResetHandler);
       this.pushedSelector = null;
     }
 

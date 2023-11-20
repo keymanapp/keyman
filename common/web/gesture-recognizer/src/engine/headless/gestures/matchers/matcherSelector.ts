@@ -6,7 +6,6 @@ import { GestureSource, GestureSourceSubview } from "../../gestureSource.js";
 import { GestureMatcher, MatchResult, PredecessorMatch } from "./gestureMatcher.js";
 import { GestureModel } from "../specs/gestureModel.js";
 import { GestureSequence } from "./index.js";
-import { ItemIdentifier } from "../../../configuration/gestureRecognizerConfiguration.js";
 
 interface GestureSourceTracker<Type, StateToken> {
   /**
@@ -306,6 +305,9 @@ export class MatcherSelector<Type, StateToken = any> extends EventEmitter<EventM
 
         const pendingMatchGesture = new ManagedPromise<void>();
         this.pendingMatchSetup = pendingMatchGesture.corePromise;
+        await timedPromise(0);
+        // A second one, in case of a deferred modipress completion (via awaitNested)
+        // (which itself needs a macroqueue wait)
         await timedPromise(0);
         this.pendingMatchSetup = null;
         pendingMatchGesture.resolve();

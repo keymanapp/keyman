@@ -77,8 +77,44 @@ export class TouchpointCoordinator<HoveredItemType, StateToken=any> extends Even
     selector.on('rejectionwithaction', this.modelResetHandler);
   }
 
+  public sustainSelectorSubstack(selector: MatcherSelector<HoveredItemType, StateToken>) {
+    if(!selector) {
+      return [];
+    }
+
+    // If it's already been popped, just silently return.
+    const index = this.selectorStack.indexOf(selector);
+    if(index == -1) {
+      return [];
+    }
+
+    /* c8 ignore start */
+    if(this.selectorStack.length <= 1) {
+      throw new Error("May not force the original, base gesture selector into sustain mode.");
+    }
+    /* c8 ignore end */
+
+    let sustainedSources: GestureSource<HoveredItemType, any>[] = [];
+
+    for(let i = index; i < this.selectorStack.length; i++) {
+      selector = this.selectorStack[i];
+
+      // If there are any models active with the `sustainWhenNested` property,
+      // the following Promise resolves once those are also completed.
+      sustainedSources = sustainedSources.concat(selector.cascadeTermination());
+    }
+
+    return sustainedSources;
+  }
+
   public popSelector(selector: MatcherSelector<HoveredItemType, StateToken>) {
     if(!selector) {
+      return;
+    }
+
+    // If it's already been popped, just silently return.
+    const index = this.selectorStack.indexOf(selector);
+    if(index == -1) {
       return;
     }
 
@@ -86,24 +122,21 @@ export class TouchpointCoordinator<HoveredItemType, StateToken=any> extends Even
     if(this.selectorStack.length <= 1) {
       throw new Error("May not pop the original, base gesture selector.");
     }
-
-    const index = this.selectorStack.indexOf(selector);
-    if(index == -1) {
-      throw new Error("This selector has not been pushed onto the 'setChange' stack.");
-    }
     /* c8 ignore end */
 
-    selector.off('rejectionwithaction', this.modelResetHandler);
+    while(index < this.selectorStack.length) {
+      selector = this.selectorStack[index];
+      selector.off('rejectionwithaction', this.modelResetHandler);
 
-    // If there are any models active with the `sustainWhenNested` property,
-    // the following Promise resolves once those are also completed.
-    const sustainedSources = selector.cascadeTermination();
+      this.selectorStack.splice(index, 1);
+    }
 
-    this.selectorStack.splice(index, 1);
+    // Should be fine as-is for now b/c modipress is always a base-selector gesture and is
+    // the only thing modifying stateToken within KeymanWeb.  May need an async/await in
+    // the future if other things become able to manipulate state tokens with this engine.
+
     // Make sure the current state token is set at this stage.
     this.currentSelector.stateToken = this.stateToken;
-
-    return sustainedSources;
   }
 
   public selectorStackIncludes(selector: MatcherSelector<HoveredItemType, StateToken>): boolean {
@@ -170,7 +203,7 @@ export class TouchpointCoordinator<HoveredItemType, StateToken=any> extends Even
 
     // Any related 'push' mechanics that may still be lingering are currently handled by GestureSequence
     // during its 'completion' processing.  (See `GestureSequence.selectionHandler`.)
-    if(selection.result.matched == false) {
+    if(!selection || selection.result.matched == false) {
       return;
     }
 
