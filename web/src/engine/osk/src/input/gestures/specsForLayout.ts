@@ -219,7 +219,8 @@ export function gestureSetForLayout(layerGroup: OSKLayerGroup, params: GesturePa
     ModipressEndModel,
     ModipressMultitapTransitionModel,
     withKeySpecFiltering(modipressMultitapStartModel(params), 0),
-    modipressMultitapEndModel(params)
+    modipressMultitapEndModel(params),
+    modipressMultitapLockModel()
   ];
 
   const defaultSet = [
@@ -1054,9 +1055,37 @@ export function modipressMultitapEndModel(params: GestureParams): GestureModel<a
     rejectionActions: {
       timer: {
         type: 'replace',
-        replace: 'modipress-end'
+        replace: 'modipress-multitap-lock-transition'
+      },
+      path: {
+        type: 'replace',
+        replace: 'modipress-multitap-lock-transition'
       }
     }
   }
+}
+
+export function modipressMultitapLockModel(): GestureModel<any> {
+  return {
+    id: 'modipress-multitap-lock-transition',
+    resolutionPriority: 5,
+    contacts: [
+      // This exists as an intermediate state to transition from
+      // a modipress-multitap into a plain modipress without further
+      // multitap rota behavior.
+      {
+        model: {
+          ...InstantContactResolutionModel,
+          pathResolutionAction: 'resolve' // doesn't end the path; just lets it continue.
+        },
+      }
+    ],
+    resolutionAction: {
+      type: 'chain',
+      next: 'modipress-end',
+      selectionMode: 'modipress',
+      item: 'none'
+    }
+  };
 }
 // #endregion

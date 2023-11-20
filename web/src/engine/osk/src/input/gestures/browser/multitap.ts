@@ -77,6 +77,9 @@ export default class Multitap implements GestureHandler {
         case 'multitap-end':
         case 'simple-tap':
           return;
+        case 'modipress-multitap-lock-transition':
+          this.modipress?.setLocked();
+          return;
         // Once a multitap starts, it's better to emit keys on keydown; that way,
         // if a user holds long, they get what they see if they decide to stop,
         // but also have time to decide if they want to continue to what's next.
