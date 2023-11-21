@@ -4,7 +4,7 @@ import OSKBaseKey from '../../../keyboard-layout/oskBaseKey.js';
 import VisualKeyboard from '../../../visualKeyboard.js';
 
 import { DeviceSpec, KeyEvent, ActiveSubKey, KeyDistribution, ActiveKeyBase } from '@keymanapp/keyboard-processor';
-import { ConfigChangeClosure, GestureRecognizerConfiguration, GestureSequence, PaddedZoneSource } from '@keymanapp/gesture-recognizer';
+import { ConfigChangeClosure, GestureRecognizerConfiguration, GestureSequence, PaddedZoneSource, RecognitionZoneSource } from '@keymanapp/gesture-recognizer';
 import { GestureHandler } from '../gestureHandler.js';
 import { CorrectionLayout, CorrectionLayoutEntry, distributionFromDistanceMaps, keyTouchDistances } from '@keymanapp/input-processor';
 import { GestureParams } from '../specsForLayout.js';
@@ -182,23 +182,22 @@ export default class SubkeyPopup implements GestureHandler {
       -bottomDistance < basePadding ? -bottomDistance : basePadding
     ]);
 
-    const topContainer = vkbd.topContainer;
-    const topContainerBounding = topContainer.getBoundingClientRect();
-    // Uses the top boundary from `roamBounding` unless the OSK's main element has a more
-    // permissive top boundary.
-    const topPadding = Math.min(baseBounding.top + basePadding * topScalar - topContainerBounding.top, 0);
-    const sustainBounding = new PaddedZoneSource(topContainer, [topPadding * topScalar, 0, 0]);
+    const sustainBounding: RecognitionZoneSource = {
+      getBoundingClientRect() {
+        // We don't want to actually use Number.NEGATIVE_INFINITY or Number.POSITIVE_INFINITY
+        // because that produces a DOMRect with a few NaN fields, and we don't want _that_.
 
-    let safeBounds = vkbd.gestureEngine.config.safeBounds;
-    if(vkbd.isEmbedded) {
-      safeBounds = new PaddedZoneSource(safeBounds, [topPadding * topScalar, 0, 0]);
+        // Way larger than any screen resolution should ever be.
+        const base = Number.MAX_SAFE_INTEGER;
+        return new DOMRect(-base, -base, 2*base, 2*base);
+      },
     }
 
     return {
       targetRoot: this.element,
       inputStartBounds: vkbd.element,
       maxRoamingBounds: sustainBounding,
-      safeBounds: safeBounds, // if embedded, ensure top boundary extends outside the WebView!
+      safeBounds: sustainBounding, // if embedded, ensure top boundary extends outside the WebView!
       itemIdentifier: (coord, target) => {
         const roamingRect = roamBounding.getBoundingClientRect();
 

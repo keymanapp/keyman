@@ -132,8 +132,8 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
   /**
    * Tweakable gesture parameters referenced by supported gestures and the gesture engine.
    */
-  readonly gestureParams: GestureParams = {
-    ...DEFAULT_GESTURE_PARAMS
+  readonly gestureParams: GestureParams<KeyElement> = {
+    ...DEFAULT_GESTURE_PARAMS,
   };
 
   // Legacy alias, maintaining a reference for code built against older
@@ -389,6 +389,11 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
       }
     };
 
+    this.gestureParams.longpress.permitsFlick = (key) => {
+      const flickSpec = key?.key.spec.flick;
+      return !flickSpec || !(flickSpec.n || flickSpec.nw || flickSpec.ne);
+    };
+
     const recognizer = new GestureRecognizer(gestureSetForLayout(this.layerGroup, this.gestureParams), config);
     recognizer.stateToken = this.layerId;
 
@@ -435,6 +440,8 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
         }
       }
 
+      // Fix:  if flicks enabled, no roaming.
+
       // Note:  GestureSource does not currently auto-terminate if there are no
       // remaining matchable gestures.  Though, we shouldn't facilitate roaming
       // anyway if we've turned it off.
@@ -447,13 +454,15 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
           this.highlightKey(oldKey, false);
           this.gesturePreviewHost?.cancel();
 
-          const previewHost = this.highlightKey(key, true);
-          if(previewHost) {
-            this.gesturePreviewHost = previewHost;
-          }
+          if(!this.kbdLayout.hasFlicks) {
+            const previewHost = this.highlightKey(key, true);
+            if(previewHost) {
+              this.gesturePreviewHost = previewHost;
+            }
 
-          trackingEntry.previewHost = previewHost;
-          sourceTrackingMap[source.identifier].key = key;
+            trackingEntry.previewHost = previewHost;
+            sourceTrackingMap[source.identifier].key = key;
+          }
         }
       }
 
