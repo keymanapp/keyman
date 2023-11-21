@@ -460,16 +460,21 @@ public class KeymanPackage {
     if(FileManager.default.fileExists(atPath: destination.path, isDirectory: &isDirectory)){
       if (isDirectory.boolValue) {
         // it exists and is actually a directory, so remove every file it contains
+        log.info("   ***clearDirectory, destination exists:, \(destination)")
         let fileArray = try FileManager.default.contentsOfDirectory(atPath: destination.path)
+        log.info("   ***clearDirectory, files to remove:, \(fileArray)")
         try fileArray.forEach { file in
-            let fileUrl = destination.appendingPathComponent(file)
+          let fileUrl = destination.appendingPathComponent(file)
           try FileManager.default.removeItem(atPath: fileUrl.path)
         }
       }
+    } else {
+      log.info("   ***clearDirectory, destination does not exist:, \(destination)")
     }
   }
 
   static public func extract(fileUrl: URL, destination: URL) throws -> KeymanPackage? {
+    log.info("   ***extract, archiveUrl, \(fileUrl) \n   to destination\(destination)")
     try unzipFile(fileUrl: fileUrl, destination: destination)
     return try KeymanPackage.parse(destination)
   }

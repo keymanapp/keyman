@@ -375,6 +375,8 @@ public class ResourceFileManager {
     do {
       try copyWithOverwrite(from: package.sourceFolder,
                             to: Storage.active.packageDir(for: package)!)
+      let fileArray = try FileManager.default.contentsOfDirectory(atPath: Storage.active.packageDir(for: package)!.path)
+      log.info("   ***installed files in \(Storage.active.packageDir(for: package)!): \(fileArray)")
     } catch {
       log.error("Could not create installation directory and/or copy resources: \(error)")
       throw KMPError.fileSystem
