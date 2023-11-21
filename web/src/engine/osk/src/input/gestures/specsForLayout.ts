@@ -678,7 +678,8 @@ export function flickResetModel(params: GestureParams): GestureModel<any> {
     resolutionAction: {
       type: 'chain',
       next: 'flick-mid'
-    }
+    },
+    sustainWhenNested: true
   };
 }
 
