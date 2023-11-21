@@ -1295,10 +1295,11 @@ KMX_DWORD CheckStatementOffsets(PFILE_KEYBOARD fk, PFILE_GROUP gp, PKMX_WCHAR co
 }
 
 /**
- *Checks that the order of statements in the context matches the specification
+ * Checks that the order of statements in the context matches the specification.
  *   Rule structure: [context] ['+' key] '>' output
  *   Context structure: [nul] [if()|baselayout()|platform()]+ [char|any|context()|deadkey()|dk()|index()|notany()|outs()]
- * Test that nul is first, then if(), baselayout(), platform() statements are before any other content
+ * Test that nul is first, then if(), baselayout(), platform() statements are before any other content.
+ * Also verifies that virtual keys are not found in the context.
  */
 KMX_BOOL CheckContextStatementPositions(PKMX_WCHAR context) {
   KMX_BOOL hadContextChar = FALSE;
@@ -1315,6 +1316,9 @@ KMX_BOOL CheckContextStatementPositions(PKMX_WCHAR context) {
         if (hadContextChar) {
           AddWarningBool(CWARN_IfShouldBeAtStartOfContext);
         }
+        break;
+      case CODE_EXTENDED:
+        AddCompileError(CERR_VirtualKeyInContext);
         break;
       default:
         hadContextChar = TRUE;

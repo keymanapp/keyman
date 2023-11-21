@@ -97,13 +97,13 @@ describe('layr', function () {
       errors: [
         CompilerMessages.Error_InvalidModifier({
           layer: 'base',
-          modifier: 'altR-shift'
+          modifiers: 'altR-shift'
         }),
       ],
     },
     {
       subpath: 'sections/layr/invalid-multi-hardware.xml',
-      errors: [CompilerMessages.Error_ExcessHardware({ form: 'iso' })],
+      errors: [CompilerMessages.Error_ExcessHardware({ formId: 'iso' })],
     },
     {
       // missing layer element

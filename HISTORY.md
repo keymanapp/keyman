@@ -1,5 +1,77 @@
 # Keyman Version History
 
+## 17.0.208 alpha 2023-11-08
+
+* fix(web): Fix clearing of deadkeys (#9944)
+* fix(web): Ignore `osk-always-visible` on non-desktop devices (#9951)
+* fix(linux): Fix baseline tests (#9967)
+* chore(linux): Fix GHA triggering (#9965)
+* fix(linux): Fix trigger for baseline tests (#9968)
+
+## 17.0.207 alpha 2023-11-07
+
+* refactor(web): Link to `index.html` in test pages (#9953)
+* feat(developer): Add more non-printing characters (#9846)
+
+## 17.0.206 alpha 2023-11-06
+
+* chore(developer): remove compile.pas and CompileErrorCodes.pas (#9924)
+* chore(common): remove prepublish step from package.json (#9937)
+* feat(developer): provide line number for some kmw compiler messages (#9938)
+* fix(developer): Sentry in Server should honour reporting settings (#9940)
+* fix(developer): resilience in loading Server config and cache files (#9941)
+
+## 17.0.205 alpha 2023-11-03
+
+* fix(developer): use KeymanWeb.Codes for 17.0+ (#9913)
+* fix(developer): don't use osk-always-visible on touch devices (#9917)
+* chore(linux): Improve repository_dispatch (#9865)
+* chore(linux): Refactor deb-packaging.sh script (#9866)
+* chore(linux): Add Core API version number (#9877)
+* fix(developer): kmc code generation for context(n) in context (#9932)
+* chore(developer): remove obsolete 'Allow Multiple Instances' and 'Use Legacy Compiler' options (#9934)
+* chore(developer): common/include dep for kmcmplib (#9935)
+* feat(common): ldml update to WIP cldr data (#9919)
+
+## 17.0.204 alpha 2023-11-02
+
+* fix(web): fixes doc-kbd display of default layer when it's not defined first (#9891)
+* fix(developer): compiler crash when no project loaded (#9898)
+* fix(developer): debug flag for compiling keyboards (#9901)
+* chore(developer): verify kmp.json output from kmc-package (#9844)
+* fix(developer): Project MRU now saves correctly (#9902)
+* chore(common): fixup SchemaValidators error handling (#9903)
+* chore(developer): change field label to 'Related Package ID' in Related Packages dialog (#9904)
+* fix(developer): open editor links in new window (#9905)
+* fix(developer): enable and update unit tests (#9907)
+* fix(developer): layout builder - maintain presentation during undo (#9914)
+* feat(developer): extract font family from .ttf in kmc-keyboard-info (#9859)
+* fix(developer): raise error if virtual key in context string (#9908)
+* feat(developer): Compile button in TIKE toolbar (#9910)
+* chore(developer): rename messages.ts for clarity (#9920)
+* fix(developer): warn if layer switch key is missing ID (#9921)
+* fix(developer): restore selection in layout builder even with duplicate ids (#9922)
+* fix(developer): enable line breaks in debugger (#9906)
+
+## 17.0.203 alpha 2023-10-30
+
+* fix(linux): Fix uninstallation of shared keyboard (#9880)
+* chore: include ci/pull-requests.inc.sh for help uploads (#9897)
+
+## 17.0.202 alpha 2023-10-30
+
+* chore(common): unify pull-request creation scripts (#9888)
+* epic: Keyman Core for Mac (#7857)
+
+## 17.0.201 alpha 2023-10-28
+
+* fix(core): build: support -t parameter correctly (#9820)
+* fix(developer): handle displayMap correctly with 'fill from layout' (#9861)
+
+## 17.0.200 alpha 2023-10-27
+
+* chore(developer,common,core): update to latest CLDR v44 (#9842)
+
 ## 17.0.199 alpha 2023-10-26
 
 * fix(developer): handle xml errors in package compiler (#9821)

@@ -10,7 +10,7 @@ import { CompilerCallbacks, CompilerEvent,
 import { InfrastructureMessages } from '../messages/infrastructureMessages.js';
 import chalk from 'chalk';
 import supportsColor from 'supports-color';
-import { KeymanSentry } from './KeymanSentry.js';
+import { KeymanSentry } from '@keymanapp/developer-utils';
 
 const color = chalk.default;
 const severityColors: {[value in CompilerErrorSeverity]: chalk.Chalk} = {

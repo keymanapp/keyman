@@ -12,14 +12,15 @@ project('keyman_core', 'cpp', 'c',
                            'cpp_std=c++14',
                            'b_vscrt=static_from_buildtype',
                            'warning_level=2'],
-        meson_version: '>=0.53.0')
+        meson_version: '>=0.57.0')
 
 # Import our standard compiler defines; this is copied from
 # /resources/build/standard.meson.build by build.sh, because
 # meson doesn't allow us to reference a file outside its root
 subdir('resources')
 
-lib_version = '1.0.0'
+fs = import('fs')
+lib_version = fs.read('CORE_API_VERSION.md').strip()
 
 py = import('python')
 python = py.find_installation()

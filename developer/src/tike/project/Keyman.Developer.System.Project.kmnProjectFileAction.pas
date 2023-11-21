@@ -28,7 +28,6 @@ uses
   System.Variants,
   Winapi.Windows,
 
-  compile,
   Keyman.Developer.System.Project.ProjectLog,
   Keyman.System.KeyboardUtils,
   Keyman.Developer.System.KmcWrapper;

@@ -7,7 +7,6 @@ import { KeysCompiler } from './keys.js';
 import { LayrCompiler } from './layr.js';
 import { LocaCompiler } from './loca.js';
 import { MetaCompiler } from './meta.js';
-import { NameCompiler } from './name.js';
 import { VarsCompiler } from './vars.js';
 import { StrsCompiler, ElemCompiler, ListCompiler, UsetCompiler } from './empty-compiler.js';
 
@@ -35,7 +34,6 @@ export const SECTION_COMPILERS = [
   LayrCompiler,
   LocaCompiler,
   MetaCompiler,
-  NameCompiler,
   TranCompiler,
 ];
 

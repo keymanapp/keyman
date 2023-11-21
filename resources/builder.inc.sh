@@ -845,6 +845,8 @@ builder_describe() {
       description="$(builder_trim "${sub[@]:1}")"
     fi
 
+    local original_value="$value"
+
     if [[ $value =~ ^: ]]; then
       # Parameter is a target
       local target_path=
@@ -939,9 +941,9 @@ builder_describe() {
     fi
 
     if [[ -z "${description}" ]]; then
-      description=$(_builder_get_default_description "$value")
+      description=$(_builder_get_default_description "$original_value")
     fi
-    _builder_params[${value}]="$description"
+    _builder_params[${original_value}]="$description"
 
     shift
   done
@@ -1482,7 +1484,7 @@ builder_display_usage() {
   echo "Actions: "
 
   for e in "${_builder_actions[@]}"; do
-    if _builder_item_in_glob_array "$e" "${_builder_params[@]}"; then
+    if [[ ! -z "${_builder_params[$e]+x}" ]]; then
       description="${_builder_params[$e]}"
     else
       description=$(_builder_get_default_description "$e")
@@ -1494,7 +1496,7 @@ builder_display_usage() {
   echo "Targets: "
 
   for e in "${_builder_targets[@]}"; do
-    if _builder_item_in_glob_array "$e" "${_builder_params[@]}"; then
+    if [[ ! -z "${_builder_params[$e]+x}" ]]; then
       description="${_builder_params[$e]}"
     else
       description=$(_builder_get_default_description "$e")

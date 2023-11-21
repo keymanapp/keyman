@@ -12,9 +12,9 @@ inherited frmEditRelatedPackage: TfrmEditRelatedPackage
   object lblPackageID: TLabel
     Left = 8
     Top = 11
-    Width = 58
+    Width = 98
     Height = 13
-    Caption = '&Package ID:'
+    Caption = 'Related &Package ID:'
     FocusControl = editPackageID
   end
   object cmdOK: TButton
@@ -38,7 +38,7 @@ inherited frmEditRelatedPackage: TfrmEditRelatedPackage
     TabOrder = 3
   end
   object editPackageID: TEdit
-    Left = 94
+    Left = 112
     Top = 8
     Width = 131
     Height = 21
@@ -46,9 +46,9 @@ inherited frmEditRelatedPackage: TfrmEditRelatedPackage
     OnChange = FieldChange
   end
   object chkDeprecates: TCheckBox
-    Left = 94
+    Left = 112
     Top = 35
-    Width = 187
+    Width = 105
     Height = 17
     Caption = 'Deprecated'
     TabOrder = 1

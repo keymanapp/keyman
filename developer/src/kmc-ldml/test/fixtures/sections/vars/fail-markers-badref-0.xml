@@ -6,15 +6,13 @@ This will fail because the two markers given don't exist anywhere.
 -->
 <!DOCTYPE keyboard3 SYSTEM "../../../../../../../resources/standards-data/ldml-keyboards/techpreview/dtd/ldmlKeyboard3.dtd">
 <keyboard3 locale="mt" conformsTo="techpreview">
-  <names>
-    <name value="vars-markers-badref-0" />
-  </names>
+  <info name="vars-markers-badref-0"/>
 
   <displays>
     <!-- Not ok, nobody emits this, so this display doesn't make sense -->
-    <display to="\m{doesnt_exist_1}" display="¬" />
+    <display output="\m{doesnt_exist_1}" display="¬" />
     <!-- OK - it is in the strings list.  Could warn that it matches no keys -->
-    <display to="\m{maybe_emitted}" display="‽" />
+    <display output="\m{maybe_emitted}" display="‽" />
   </displays>
 
   <variables>

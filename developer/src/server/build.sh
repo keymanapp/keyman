@@ -14,6 +14,7 @@ cd "$THIS_SCRIPT_PATH"
 
 builder_describe "Build Keyman Developer Server" \
   @/common/web/keyman-version \
+  @/developer/src/common/web/utils \
   @/web \
   clean \
   configure \
@@ -105,7 +106,7 @@ function installer_server() {
   # Remove @keymanapp devDependencies because they won't install outside the
   # monorepo context
   cat package.json | "$JQ" \
-    '. | del(.devDependencies."@keymanapp/resources-gosh") | del(.devDependencies."@keymanapp/keyman-version")' \
+    '. | del(.devDependencies."@keymanapp/resources-gosh") | del(.devDependencies."@keymanapp/keyman-version") | del(.dependencies."@keymanapp/developer-utils")' \
     > "$PRODBUILDTEMP/package.json"
 
   pushd "$PRODBUILDTEMP"
@@ -117,6 +118,7 @@ function installer_server() {
   # @keymanapp/keyman-version is required in build/ now but we need to copy it in manually
   mkdir -p "$PRODBUILDTEMP/node_modules/@keymanapp/"
   cp -R "$KEYMAN_ROOT/node_modules/@keymanapp/keyman-version/" "$PRODBUILDTEMP/node_modules/@keymanapp/"
+  cp -R "$KEYMAN_ROOT/node_modules/@keymanapp/developer-utils/" "$PRODBUILDTEMP/node_modules/@keymanapp/"
 
   # We'll build in the $KEYMAN_ROOT/developer/bin/server/ folder
   rm -rf "$KEYMAN_ROOT/developer/bin/server/"

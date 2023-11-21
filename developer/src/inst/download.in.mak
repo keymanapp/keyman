@@ -122,6 +122,7 @@ make-kmc-install-zip: copy-schemas
         sentry.dll sentry.x64.dll \
         kmdecomp.exe \
         keyboard_info.schema.json \
+        kmp.schema.json \
         keyman-touch-layout.spec.json keyman-touch-layout.clean.spec.json \
         xml\layoutbuilder\*.keyman-touch-layout \
         projects\* \
@@ -136,4 +137,5 @@ copy-schemas:
     copy $(KEYMAN_ROOT)\common\schemas\keyman-touch-layout\keyman-touch-layout.spec.json $(DEVELOPER_ROOT)\bin
     copy $(KEYMAN_ROOT)\common\schemas\keyman-touch-layout\keyman-touch-layout.clean.spec.json $(DEVELOPER_ROOT)\bin
     copy $(KEYMAN_ROOT)\common\schemas\displaymap\displaymap.schema.json $(DEVELOPER_ROOT)\bin
+    copy $(KEYMAN_ROOT)\common\schemas\kmp\kmp.schema.json $(DEVELOPER_ROOT)\bin
 

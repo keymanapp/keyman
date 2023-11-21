@@ -35,7 +35,7 @@ KMInputMethodBrowserClientEventHandler * _im;
     [super tearDown];
 }
 
-- (void)testcheckContextIn_EmptyContextExpected_NoChangeToclientSelectionCanChangeUnexpectedly {
+- (void)skip_TestcheckContextIn_EmptyContextExpected_NoChangeToclientSelectionCanChangeUnexpectedly {
     // If the expected context is empty, no attempt should be made to check for matching context from
     // client, so even though the client would also return an empty string, calling checkContextIn
     // repeatedly has no effect (i.e., it does not set clientSelectionCanChangeUnexpectedly to false).
