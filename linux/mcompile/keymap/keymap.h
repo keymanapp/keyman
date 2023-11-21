@@ -38,8 +38,7 @@ enum ShiftState {
     ShftXxxx = Shft | Xxxx,             // 9
 };
 
-const UINT USVirtualKeyToScanCode[256] =
-{
+const UINT USVirtualKeyToScanCode[256] = {
 	0x00, // L"K_?00",				// &H0
 	0x00, // L"K_LBUTTON",			// &H1
 	0x00, // L"K_RBUTTON",			// &H2
@@ -438,7 +437,6 @@ const UINT ScanCodeToUSVirtualKey[128] = {
   0x00  // 0x7f => No match
 };
 
-
 // Map of all US English virtual key codes that we can translate
 const KMX_DWORD KMX_VKMap[] = {
   'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',
@@ -477,9 +475,9 @@ static KMX_DWORD returnIfCharInvalid = 0;
 // takes a std::wstring (=contents of line symbols-file ) and returns the (int) value of the character
 KMX_DWORD convertNamesToValue(std::wstring tok_wstr);
 
-// create a Vector with all entries of  Vector+ keymap
-int createOneVectorFromBothKeyboards(v_dw_3D &All_Vector);
 
+// create a Vector with all entries of  Vector
+int createOneVectorFromBothKeyboards(v_dw_3D &All_Vector);
 // read configuration file, split and write to 3D-Vector (Data for US on [0][ ][ ]  )
 int write_US_ToVector(v_dw_3D &vec, std::string language, const char *text);
 
@@ -495,47 +493,44 @@ int replace_PosKey_with_Keycode_use_Lin(std::string  in);
 // create an empty 2D vector containing "--" in all fields
 v_dw_2D create_empty_2D(int dim_rows, int dim_shifts);
 
-// query All_Vector
-// _S2 can go later return the VirtualKey of the US Keyboard for given Scancode
-KMX_DWORD get_VirtualKey_US_From_SC(KMX_DWORD SC , v_dw_3D &All_Vector);
-// _S2 can go later return the Scancode of for given VirtualKey of Other Keyboard
-KMX_DWORD get_SC_From_VirtualKey_Other(KMX_DWORD VK_Other , v_dw_3D &All_Vector);
-// _S2 can go later return the Scancode of for given VirtualKey of  US
-KMX_DWORD get_SC_From_VirtualKey_US(KMX_DWORD VK_US , v_dw_3D &All_Vector);
-// _S2 can go later return the Scancode of for given VirtualKey of Other
-//KMX_DWORD get_position_From_VirtualKey_Other(KMX_DWORD VK_US , v_dw_3D &All_Vector);
-// _S2 can go later return the Scancode of for given VirtualKey of Other in specific column. If column > available columns look in all columns;
-KMX_DWORD get_position_From_VirtualKey_Other(KMX_DWORD VK_Other , v_dw_3D &All_Vector, int which_columns);
-
 // return the Scancode of for given VirtualKey using GDK
 KMX_DWORD get_KeyCode_From_KeyVal_GDK(GdkKeymap *keymap, UINT mapped_ikey);
-// can go later
-void Try_GDK(GdkKeymap *keymap, UINT KeySym );
-void Inspect_Key_S(GdkKeymap *keymap ) ;
+
 // return the VirtualKey of the Other Keyboard for given Scancode using GDK
 KMX_DWORD get_VirtualKey_Other_GDK( GdkKeymap *keymap, KMX_DWORD scanCode);
-UINT find_SC_Other_from_SC_US_GDK(UINT vk_US_187,GdkKeymap *keymap);
+
 // initialize GDK
 bool InitializeGDK(GdkKeymap **keymap,int argc, gchar *argv[]);
 
-// create a Vector with all entries of both keymaps
-int createOneVectorFromBothKeyboards(v_dw_3D &All_Vector,GdkKeymap *keymap);
-
+//_S2 needed?
 // append characters using GDK to 3D-Vector (Data for Other Language on [1][ ][ ]  )
 int append_other_ToVector(v_dw_3D &All_Vector, GdkKeymap *keymap);
 
 // find Keyvals to fill into 2D-Vector of Other Language
 KMX_DWORD getKeyvalsFromKeymap(GdkKeymap *keymap, guint keycode, int shift_state_pos);
 
-// _S2 TODO How to do mapping between Linux keycodes and keyman SC
-const int Lin_KM__map(int i, v_dw_3D &All_Vector);
-KMX_DWORD  map_To_VK(KMX_DWORD SC);
-KMX_DWORD  mapChar_To_VK(KMX_DWORD chr );
-KMX_DWORD  mapVK_To_char(KMX_DWORD SC );
-
-// returns Keyvals fo ra given key (for unshifted: finds the Name of the Key e.g.  A or 1 )
-std::wstring get_KeyVals_according_to_Shiftstate(GdkKeymap *keymap, guint VK, ShiftState ss, int caps);
 // returns KeySyms fo ra given key (for unshifted: finds the Keysym according to Shiftstate e.g. a;A or 1;! )
 std::wstring get_KeySyms_according_to_Shiftstate(GdkKeymap *keymap, guint VK, ShiftState ss, int caps);
+
+
+// _S2 needed?
+// can go later
+void Try_GDK(GdkKeymap *keymap, UINT KeySym );
+void Inspect_Key_S(GdkKeymap *keymap ) ;
+UINT find_SC_Other_from_SC_US_GDK(UINT vk_US_187,GdkKeymap *keymap);
+// _S2 needed?
+// create a Vector with all entries of both keymaps+ keymap
+int createOneVectorFromBothKeyboards(v_dw_3D &All_Vector,GdkKeymap *keymap);
+
+//needed?
+// returns Keyvals fo ra given key (for unshifted: finds the Name of the Key e.g.  A or 1 )
+std::wstring get_KeyVals_according_to_Shiftstate(GdkKeymap *keymap, guint VK, ShiftState ss, int caps);
+
+// _S2 TODO How to do mapping between Linux keycodes and keyman SC
+const int Lin_KM__map(int i, v_dw_3D &All_Vector);
+
+KMX_DWORD  mapChar_To_VK(KMX_DWORD chr );
+
+KMX_DWORD  mapVK_To_char(KMX_DWORD SC );
 
 # endif /*KEYMAP_H*/

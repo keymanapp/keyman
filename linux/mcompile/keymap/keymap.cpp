@@ -338,52 +338,6 @@ KMX_DWORD getKeyvalsFromKeymap(GdkKeymap *keymap, guint keycode, int shift_state
   return out;
 }
 
-KMX_DWORD  mapVK_To_char(KMX_DWORD SC ){
-  // if there is a Keyman VK.. defined map to Keyman VKcode
-
- // if ( SC == 49)   return   VK_BKSLASH;     /* ; 220          = ` oder ^ */
- // if ( SC == 20)   return   VK_LBRKT;       /* ; 219          = - oder ß */
- // if ( SC == 21)   return   VK_RBRKT;       /* ; 221          = = oder ' */
-
- // if ( SC == 34)   return   VK_COLON;       /* ; 186 VK_OEM_4 = [ oder ü */
-  //if ( SC == 35)   return   VK_EQUAL;       /* ; 187          = ] oder + */
-
- // if ( SC == 47)   return   VK_ACCENT;      /* ; 192 VK_OEM_1 = : oder ö */
- // if ( SC == 48)   return   VK_QUOTE;       /* ' 222 VK_OEM_7 = " oder Ä */
- // if ( SC == 51)   return   VK_SLASH;       /* ; 191          = \ oder # */
-
- // if ( SC == 59)   return   VK_COMMA;       /* ; 188          = , oder , */
- // if ( SC == 60)   return   VK_PERIOD;      /* ; 190          = . oder . */
- // if ( SC == 61)   return   VK_HYPHEN;      /* ; 189          = / oder - */
-
- // if ( SC == 65)   return   VK_SPACE;       /* ;  32 VK_SPACE =   oder   */
- // else
-    return SC;
-}
-// _S2 TODO is this correct ??
-KMX_DWORD  mapChar_To_VK(KMX_DWORD chr ){
-  // if there is a Keyman VK.. defined map to Keyman VKcode
-
- // if ( SC == 49)   return   VK_BKSLASH;     /* ; 220          = ` oder ^ */
- // if ( SC == 20)   return   VK_LBRKT;       /* ; 219          = - oder ß */
- // if ( SC == 21)   return   VK_RBRKT;       /* ; 221          = = oder ' */
-
- // if ( chr == VK_COLON)   return   220;       /* ; 186 VK_OEM_4 = [ oder ü */
-//  if ( chr == 187)        return   42;       /* ; 186 VK_OEM_4 = [ oder ü */
- // if ( SC == 35)   return   VK_EQUAL;       /* ; 187          = ] oder + */
-
- // if ( SC == 47)   return   VK_ACCENT;      /* ; 192 VK_OEM_1 = : oder ö */
- // if ( SC == 48)   return   VK_QUOTE;       /* ' 222 VK_OEM_7 = " oder Ä */
- // if ( SC == 51)   return   VK_SLASH;       /* ; 191          = \ oder # */
-
- // if ( SC == 59)   return   VK_COMMA;       /* ; 188          = , oder , */
- // if ( SC == 60)   return   VK_PERIOD;      /* ; 190          = . oder . */
- // if ( SC == 61)   return   VK_HYPHEN;      /* ; 189          = / oder - */
-
- // if ( SC == 65)   return   VK_SPACE;       /* ;  32 VK_SPACE =   oder   */
- // else
-    return chr;
-}
 KMX_DWORD get_VirtualKey_Other_GDK( GdkKeymap *keymap, KMX_DWORD keycode) {
 
   GdkModifierType consumed;
@@ -429,97 +383,6 @@ KMX_DWORD get_VirtualKey_Other_GDK( GdkKeymap *keymap, KMX_DWORD keycode) {
   return 0;   //_S2 what to return if not found
 }
 
-// _S2 not needed, can go later
-// return RETURN NON SHIFTED CHAR [1]  the VirtualKey of the US Keyboard for given Scancode
-KMX_DWORD get_VirtualKey_US_From_SC(KMX_DWORD SC , v_dw_3D &All_Vector){
-  // find correct row of char in US
-  for( int i=0; i< (int)All_Vector[0].size()-1;i++) {
-    if  ( All_Vector[0][i][0] == SC ) {
-      return All_Vector[0][i][1] ;
-    }
-  }
-  return 0;    //_S2 TODO what do I return if not found??
-}
-
-// return the Scancode of for given VirtualKey of Other Keyboard
-KMX_DWORD get_SC_From_VirtualKey_Other(KMX_DWORD VK_Other , v_dw_3D &All_Vector){
-  // find correct row of char in US
-  for( int i=0; i< (int)All_Vector[1].size()-1;i++) {
-    if  ( All_Vector[1][i][1] == VK_Other ) {
-      return All_Vector[1][i][0] ;
-    }
-  }
-  return 0;    //_S2 TODO what do I return if not found??
-}
-
-// return the Scancode of for given VirtualKey of Other US
-KMX_DWORD get_SC_From_VirtualKey_US(KMX_DWORD VK_US , v_dw_3D &All_Vector){
-  // find correct row of char in US
-  for( int i=0; i< (int)All_Vector[0].size()-1;i++) {
-    if  ( All_Vector[0][i][2] == VK_US ) {
-      return All_Vector[0][i][0] ;
-    }
-  }
-  return 0;    //_S2 TODO what do I return if not found??
-}
-
-// returns the position in All_Vector where VK_Other is found
-KMX_DWORD get_position_From_VirtualKey_Other(KMX_DWORD VK_Other , v_dw_3D &All_Vector, int which_columns) {
-  // find correct row of char in US
-  if((which_columns <0  ) )
-    return 0;
-
-  // search all columns
-  if(which_columns >(int)All_Vector[1][0].size()) {
-    for( int i=1; i< (int)All_Vector[1][0].size();i++) {
-      for( int j=0; j< (int)All_Vector[1].size()-1;j++) {
-      if ( ( All_Vector[1][j][i] == VK_Other ) )
-        return j;
-      }
-    }
-  }
-
-  else {
-    for( int j=0; j< (int)All_Vector[1].size()-1;j++) {
-        if ( ( All_Vector[1][j][which_columns] == VK_Other ) )
-        return j;
-      }
-  }
-
-  return 0;    //_S2 TODO what do I return if not found??
-}
-
-// returns KeyCode which hold the Keysym/Keyval (in unshifted, shifted)
-KMX_DWORD get_KeyCode_From_KeyVal_GDK(GdkKeymap *keymap, UINT Keyval ) {
-  GdkKeymapKey *maps;
-  guint *keyvals;
-  gint count;
-
-  for (int k=0; k<255 ; k++ ){
-    if (gdk_keymap_get_entries_for_keycode (keymap, k, &maps, &keyvals, &count)) {
-      if ( (keyvals[0] == Keyval) || (keyvals[1] == Keyval) ) {
-        return (KMX_DWORD) maps[0].keycode;
-      }
-    }
-  }
-  return 0;    //_S2 TODO what do I return if not found??
-}
-// returns KeyCode which holds the Keysym (in unshifted, shifted)
-/*KMX_DWORD get_SC_From_Keycode_GDK(GdkKeymap *keymap, UINT SC ) {
-  GdkKeymapKey *maps;
-  guint *keyvals;
-  gint count;
-
-  for (int k=0; k<255 ; k++ ){
-    if (gdk_keymap_get_entries_for_keycode (keymap, k, &maps, &keyvals, &count)) {
-      if ( (keyvals[0] == SC) || (keyvals[1] == SC) ) {
-        return (KMX_DWORD) maps[0].keycode;
-      }
-    }
-  }
-  return 0;    //_S2 TODO what do I return if not found??
-}*/
-
 // _S2 TODO How to do mapping between Linux keycodes and keyman SC
 const int Lin_KM__map(int i, v_dw_3D &All_Vector) {
   // MAP:
@@ -554,56 +417,6 @@ const int Lin_KM__map(int i, v_dw_3D &All_Vector) {
 
   return i;
 }
-
-// _S2 TODO
-std::wstring  get_KeyVals_according_to_Shiftstate(GdkKeymap *keymap, guint keycode, ShiftState ss, int caps  ){
-
-  GdkModifierType consumed;
-  GdkKeymapKey *maps;
-  guint *keyvals;
-  gint count;
-
-  // _S2 TODO what to return if it fails?
-  if (!gdk_keymap_get_entries_for_keycode(keymap, keycode, &maps, &keyvals, &count))
-    return L"1";
-
-  //unshifted
-  if (( ss == Base ) && ( caps == 0 )) {
-    GdkModifierType MOD_base = (GdkModifierType) ( ~GDK_MODIFIER_MASK );
-    gdk_keymap_translate_keyboard_state (keymap, keycode, MOD_base , 0, keyvals, NULL, NULL, & consumed);
-    return  std::wstring(1, (int) *keyvals);
-  }
-
-  //SHIFT+CAPS
-  else if ( ( ss == Shft ) && ( caps ==1 )) {
-    GdkModifierType MOD_ShiftCaps= (GdkModifierType) ((GDK_SHIFT_MASK | GDK_LOCK_MASK));
-    gdk_keymap_translate_keyboard_state (keymap, keycode, MOD_ShiftCaps , 0, keyvals, NULL, NULL, & consumed);
-    return  std::wstring(1, (int) *keyvals);
-  }
-
-  //Shift
-  else if (( ss == Shft ) && ( caps == 0 )) {
-    return std::wstring(1, (int) get_VirtualKey_Other_GDK(keymap,  keycode));
-  }
-
-  //caps
-  else if (( ss == Base ) && ( caps == 1 )) {
-    GdkModifierType MOD_Caps = (GdkModifierType) ( GDK_LOCK_MASK );
-    gdk_keymap_translate_keyboard_state (keymap, keycode, MOD_Caps, 0, keyvals, NULL, NULL, & consumed);
-    return  std::wstring(1, (int) *keyvals);
-  }
-
-  /*//ALT-GR
-  else if {
-    GdkModifierType MOD_AltGr = (GdkModifierType) ( GDK_MOD5_MASK );
-    gdk_keymap_translate_keyboard_state (keymap, keycode, MOD_AltGr , 0, keyvals, NULL, NULL, & consumed);
-    return *keyvals;
-  }*/
-
-  else
-    return L"0";
-}
-
 
 std::wstring  get_KeySyms_according_to_Shiftstate(GdkKeymap *keymap, guint keycode, ShiftState ss, int caps  ){
 
@@ -664,6 +477,56 @@ std::wstring  get_KeySyms_according_to_Shiftstate(GdkKeymap *keymap, guint keyco
     return L"\0";
     //return L"0";
 }
+
+// _S2 TODO
+/*std::wstring  get_KeyVals_according_to_Shiftstate(GdkKeymap *keymap, guint keycode, ShiftState ss, int caps  ){
+
+  GdkModifierType consumed;
+  GdkKeymapKey *maps;
+  guint *keyvals;
+  gint count;
+
+  // _S2 TODO what to return if it fails?
+  if (!gdk_keymap_get_entries_for_keycode(keymap, keycode, &maps, &keyvals, &count))
+    return L"1";
+
+  //unshifted
+  if (( ss == Base ) && ( caps == 0 )) {
+    GdkModifierType MOD_base = (GdkModifierType) ( ~GDK_MODIFIER_MASK );
+    gdk_keymap_translate_keyboard_state (keymap, keycode, MOD_base , 0, keyvals, NULL, NULL, & consumed);
+    return  std::wstring(1, (int) *keyvals);
+  }
+
+  //SHIFT+CAPS
+  else if ( ( ss == Shft ) && ( caps ==1 )) {
+    GdkModifierType MOD_ShiftCaps= (GdkModifierType) ((GDK_SHIFT_MASK | GDK_LOCK_MASK));
+    gdk_keymap_translate_keyboard_state (keymap, keycode, MOD_ShiftCaps , 0, keyvals, NULL, NULL, & consumed);
+    return  std::wstring(1, (int) *keyvals);
+  }
+
+  //Shift
+  else if (( ss == Shft ) && ( caps == 0 )) {
+    return std::wstring(1, (int) get_VirtualKey_Other_GDK(keymap,  keycode));
+  }
+
+  //caps
+  else if (( ss == Base ) && ( caps == 1 )) {
+    GdkModifierType MOD_Caps = (GdkModifierType) ( GDK_LOCK_MASK );
+    gdk_keymap_translate_keyboard_state (keymap, keycode, MOD_Caps, 0, keyvals, NULL, NULL, & consumed);
+    return  std::wstring(1, (int) *keyvals);
+  }
+
+  //ALT-GR
+  //else if {
+ //   GdkModifierType MOD_AltGr = (GdkModifierType) ( GDK_MOD5_MASK );
+    gdk_keymap_translate_keyboard_state (keymap, keycode, MOD_AltGr , 0, keyvals, NULL, NULL, & consumed);
+    return *keyvals;
+  }
+
+  else
+    return L"0";
+}
+*/
 
 // _S2 maybe not needed
 UINT find_SC_Other_from_SC_US_GDK(UINT SC_US,GdkKeymap *keymap) {
