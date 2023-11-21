@@ -196,42 +196,7 @@ ldml_processor::process_event(
     switch (vk) {
     // Special handling for backspace VK
     case KM_CORE_VKEY_BKSP:
-      {
-        if (!!bksp_transforms) {
-          // TODO-LDML: process bksp
-          // std::u16string outputString;
-          // // don't bother if no backspace transforms!
-          // // TODO-LDML: unroll ctxt into a str
-          // std::u16string ctxtstr;
-          // for (size_t i = 0; i < ctxt.size(); i++) {
-          //   ctxtstr.append(ctxt[i]);
-          // }
-          // const size_t matchedContext = transforms->apply(ctxtstr, outputString);
-        }
-        KMX_DWORD last_char = 0UL;
-        // attempt to get the last char
-        auto end = state->context().rbegin();
-        if(end != state->context().rend()) {
-          if((*end).type == KM_CORE_CT_CHAR) {
-            last_char = (*end).character;
-            // TODO-LDML: markers!
-          }
-        }
-        if (last_char == 0UL) {
-          /*
-            We couldn't find a character at end of context (context is empty),
-            so we'll pass the backspace keystroke on to the app to process; the
-            app might want to use backspace to move between contexts or delete
-            a text box, etc. Or it might be a legacy app and we've had our caret
-            dumped in somewhere unknown, so we will have to depend on the app to
-            be sensible about backspacing because we know nothing.
-          */
-          state->actions().push_backspace(KM_CORE_BT_UNKNOWN);
-        } else {
-          state->actions().push_backspace(KM_CORE_BT_CHAR, last_char);
-          state->context().pop_back();
-        }
-      }
+      process_backspace(state);
       break;
     default:
     // all other VKs
@@ -260,6 +225,44 @@ ldml_processor::process_event(
 }
 
 void
+ldml_processor::process_backspace(km_core_state *state) const {
+  if (!!bksp_transforms) {
+    // TODO-LDML: process bksp
+    // std::u16string outputString;
+    // // don't bother if no backspace transforms!
+    // // TODO-LDML: unroll ctxt into a str
+    // std::u16string ctxtstr;
+    // for (size_t i = 0; i < ctxt.size(); i++) {
+    //   ctxtstr.append(ctxt[i]);
+    // }
+    // const size_t matchedContext = transforms->apply(ctxtstr, outputString);
+  }
+
+  // Find out what the last actual character was and remove it.
+  // attempt to get the last char
+  auto end = state->context().rbegin();
+  if (end != state->context().rend()) {
+    if ((*end).type == KM_CORE_CT_CHAR) {
+      state->actions().push_backspace(KM_CORE_BT_CHAR, (*end).character);
+      state->context().pop_back();
+      return;
+    } else if ((*end).type == KM_CORE_BT_MARKER) {
+      state->actions().push_backspace(KM_CORE_BT_MARKER, (*end).marker);
+      state->context().pop_back();
+    }
+  }
+  /*
+    We couldn't find a character at end of context (context is empty),
+    so we'll pass the backspace keystroke on to the app to process; the
+    app might want to use backspace to move between contexts or delete
+    a text box, etc. Or it might be a legacy app and we've had our caret
+    dumped in somewhere unknown, so we will have to depend on the app to
+    be sensible about backspacing because we know nothing.
+  */
+  state->actions().push_backspace(KM_CORE_BT_UNKNOWN);
+}
+
+void
 ldml_processor::process_key_string(km_core_state *state, const std::u16string &key_str) const {
   // We know that key_str is not empty per the caller.
   assert(!key_str.empty());
@@ -267,19 +270,18 @@ ldml_processor::process_key_string(km_core_state *state, const std::u16string &k
   // we convert the keys str to UTF-32 here instead of using the emit_text() overload
   // so that we don't have to reconvert it inside the transform code.
   std::u32string key_str32 = kmx::u16string_to_u32string(key_str);
-  assert(ldml::normalize_nfd(key_str32)); // TODO-LDML: else fail?
-
-  // extract context string, in NFC
-  std::u32string old_ctxtstr_nfc;
-  (void)context_to_string(state, old_ctxtstr_nfc, false);
-  assert(ldml::normalize_nfc(old_ctxtstr_nfc)); // TODO-LDML: else fail?
+  assert(ldml::normalize_nfd_markers(key_str32)); // TODO-LDML: else fail?
+  // extract context string, in NFD
+  std::u32string old_ctxtstr_nfd;
+  (void)context_to_string(state, old_ctxtstr_nfd, false);
+  assert(ldml::normalize_nfd_markers(old_ctxtstr_nfd)); // TODO-LDML: else fail?
 
   // context string in NFD
   std::u32string ctxtstr;
   (void)context_to_string(state, ctxtstr, true); // with markers
   // add the newly added key output to ctxtstr
   ctxtstr.append(key_str32);
-  assert(ldml::normalize_nfd(ctxtstr)); // TODO-LDML: else fail?
+  assert(ldml::normalize_nfd_markers(ctxtstr)); // TODO-LDML: else fail?
 
   /** transform output string */
   std::u32string outputString;
@@ -297,25 +299,38 @@ ldml_processor::process_key_string(km_core_state *state, const std::u16string &k
   // drop last 'matchedContext':
   ctxtstr.resize(ctxtstr.length() - matchedContext);
   ctxtstr.append(outputString); // TODO-LDML: should be able to do a normalization-safe append here.
-  assert(ldml::normalize_nfd(ctxtstr)); // TODO-LDML: else fail?
+  ldml::marker_map markers;
+  assert(ldml::normalize_nfd_markers(ctxtstr, markers)); // TODO-LDML: Need marker-safe normalize here.
 
   // Ok. We've done all the happy manipulations.
 
-  /** NFC and no markers */
-  std::u32string ctxtstr_cleanedup = ctxtstr;
-  // TODO-LDML: remove markers!
-  assert(ldml::normalize_nfc(ctxtstr_cleanedup)); // TODO-LDML: else fail?
+  /** NFD and no markers */
+  std::u32string ctxtstr_cleanedup = ldml::remove_markers(ctxtstr);
+  assert(ldml::normalize_nfd_markers(ctxtstr_cleanedup));
 
-  // find common prefix
-  auto ctxt_prefix = mismatch(old_ctxtstr_nfc.begin(), old_ctxtstr_nfc.end(), ctxtstr_cleanedup.begin(), ctxtstr_cleanedup.end());
-  /** the part of the old str that changed */
-  std::u32string old_ctxtstr_changed(ctxt_prefix.first,old_ctxtstr_nfc.end());
+  // find common prefix.
+  // For example, if the context previously had "aaBBBBB" and it is changing to "aaCCC" then we will have:
+  // - old_ctxtstr_changed = "BBBBB"
+  // - new_ctxtstr_changed = "CCC"
+  // So the BBBBB needs to be removed and then CCC added.
+  auto ctxt_prefix = mismatch(old_ctxtstr_nfd.begin(), old_ctxtstr_nfd.end(), ctxtstr_cleanedup.begin(), ctxtstr_cleanedup.end());
+  /** The part of the old string to be removed */
+  std::u32string old_ctxtstr_changed(ctxt_prefix.first,old_ctxtstr_nfd.end());
+  /** The new context to be added */
   std::u32string new_ctxtstr_changed(ctxt_prefix.second,ctxtstr_cleanedup.end());
 
   // drop the old suffix. Note: this mutates old_ctxtstr_changed.
   remove_text(state, old_ctxtstr_changed, old_ctxtstr_changed.length());
   assert(old_ctxtstr_changed.length() == 0);
+  // old_ctxtstr_changed is now empty because it's been removed.
+  // context is "aa" in the above example.
   emit_text(state, new_ctxtstr_changed);
+
+  // TODO-LDML: need to emit marker here - need to emit text w/ markers, and handle appropriately.
+  // // TODO-LDML: 1-marker hack! need to support a string with intermixed markers.
+  if (key_str32.length() == 3 && key_str32[0] == LDML_UC_SENTINEL && key_str32[1] == LDML_MARKER_CODE) {
+    emit_marker(state, key_str32[2]);
+  }
 }
 
 void
@@ -334,18 +349,7 @@ ldml_processor::remove_text(km_core_state *state, std::u32string &str, size_t le
       str.pop_back();
       state->actions().push_backspace(KM_CORE_BT_CHAR, c->character);  // Cause prior char to be removed
     } else if (type == KM_CORE_BT_MARKER) {
-      // it's a marker, 'worth' 3 uchars
-      assert(length >= 3);
-      assert(lastCtx == c->marker);  // end of list
-      length -= 3;
-      // pop off the three-part sentinel string (in reverse order of course)
-      assert(str.back() == c->marker); // marker #
-      str.pop_back();
-      assert(str.back() == LDML_MARKER_CODE);
-      str.pop_back();
-      assert(str.back() == LDML_UC_SENTINEL);
-      str.pop_back();
-      // push a special backspace to delete the marker
+      // just pop off any markers.
       state->actions().push_backspace(KM_CORE_BT_MARKER, c->marker);
     }
   }
@@ -433,7 +437,7 @@ ldml_processor::context_to_string(km_core_state *state, std::u32string &str, boo
       } else if (last_type == KM_CORE_BT_MARKER) {
         assert(km::core::kmx::is_valid_marker(c->marker));
         if (include_markers) {
-          prepend_marker(str, c->marker);
+          ldml::prepend_marker(str, c->marker);
         }
       } else {
         break;

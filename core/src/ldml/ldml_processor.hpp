@@ -103,6 +103,9 @@ namespace core {
      /** process a typed key */
      void process_key_string(km_core_state *state, const std::u16string &key_str) const;
 
+     /** process a backspace */
+     void process_backspace(km_core_state *state) const;
+
      /**
       * add the string+marker portion of the context to the beginning of str.
       * Stop when a non-string and non-marker is hit.
@@ -111,15 +114,6 @@ namespace core {
       */
      static size_t context_to_string(km_core_state *state, std::u32string &str, bool include_markers = true);
 
-     /** prepend the marker string in UC_SENTINEL format to the str */
-     inline static void prepend_marker(std::u32string &str, KMX_DWORD marker);
   };
-
-  void
-  ldml_processor::prepend_marker(std::u32string &str, KMX_DWORD marker) {
-     km_core_usv triple[] = {LDML_UC_SENTINEL, LDML_MARKER_CODE, marker};
-     str.insert(0, triple, 3);
-  }
-
 } // namespace core
 } // namespace km
