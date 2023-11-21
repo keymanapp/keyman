@@ -150,12 +150,14 @@ public:
 
   KMX_VirtualKey(UINT scanCode, KMX_HKL hkl, v_dw_3D All_Vector, GdkKeymap **keymap) {
     this->m_vk = get_VirtualKey_Other_GDK(*keymap, scanCode);
+    // _s2  correct?  this->m_vk = get_VirtualKey_US( scanCode)
     this->m_hkl = hkl;
     this->m_sc = scanCode ;
   }
 
   KMX_VirtualKey(KMX_HKL hkl,UINT scanCode,  v_dw_3D All_Vector, GdkKeymap **keymap) {
     this->m_vk = get_VirtualKey_Other_GDK(*keymap, scanCode);
+    // _s2  correct?  this->m_vk = get_VirtualKey_US( scanCode)
     this->m_hkl = hkl;
     this->m_sc = scanCode ;
     // _S2 ?? memset(this->m_rgfDeadKey,0,sizeof(this->m_rgfDeadKey));
@@ -723,35 +725,35 @@ bool KMX_ImportRules(KMX_WCHAR *kbid, LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, Gd
 
 
         for(int caps = 0; caps <= 1; caps++) {
-
+              // _S2 this is not VK_Other but keysym_other
           //_S2 TODO get char  - do I need rc ?? ( was rc = ToUnicodeEx...)
           //std::wstring VK_Other_OLD = get_VirtualKey_Other_from_iKey(SC_Other, ss, caps, All_Vector);
-          std::wstring VK_Other = get_KeySyms_according_to_Shiftstate( *keymap, SC_US, ss, caps);
-          //std::wstring VK_Other3 = get_KeySyms_according_to_Shiftstate( *keymap, SC_Other, ss, caps);
+          std::wstring VK_Other = get_KeyVals_according_to_keycode_and_Shiftstate( *keymap, SC_US, ss, caps);
+          //std::wstring VK_Other3 = get_KeyVals_according_to_keycode_and_Shiftstate( *keymap, SC_Other, ss, caps);
 
 
-         //std::wstring   VK_OtherTEST6 = get_KeySyms_according_to_Shiftstate( *keymap, 51, MenuCtrl, 0);
-         // std::wstring  VK_OtherTEST16 = get_KeySyms_according_to_Shiftstate( *keymap, 51, MenuCtrl, 1);
+         //std::wstring   VK_OtherTEST6 = get_KeyVals_according_to_keycode_and_Shiftstate( *keymap, 51, MenuCtrl, 0);
+         // std::wstring  VK_OtherTEST16 = get_KeyVals_according_to_keycode_and_Shiftstate( *keymap, 51, MenuCtrl, 1);
 
           /*std::wstring VK_OtherTEST ;
-          std::wstring  VK_OtherTEST0 = get_KeySyms_according_to_Shiftstate( *keymap, 58, Base, 0);
-          std::wstring  VK_OtherTEST1= get_KeySyms_according_to_Shiftstate( *keymap, 58, Shft, 0);
-          std::wstring  VK_OtherTEST2 = get_KeySyms_according_to_Shiftstate( *keymap, 58, Ctrl, 0);
-          std::wstring  VK_OtherTEST3 = get_KeySyms_according_to_Shiftstate( *keymap, 58, ShftCtrl, 0);
-          std::wstring  VK_OtherTEST4 = get_KeySyms_according_to_Shiftstate( *keymap, 58, Menu, 0);
-          std::wstring  VK_OtherTEST5 = get_KeySyms_according_to_Shiftstate( *keymap, 58, ShftMenu, 0);
-          std::wstring  VK_OtherTEST7 = get_KeySyms_according_to_Shiftstate( *keymap, 58, ShftMenuCtrl, 0);
-          std::wstring  VK_OtherTEST8 = get_KeySyms_according_to_Shiftstate( *keymap, 58, Xxxx, 0);
-          std::wstring  VK_OtherTEST9 = get_KeySyms_according_to_Shiftstate( *keymap, 58, ShftXxxx, 0);
-          std::wstring  VK_OtherTEST10 = get_KeySyms_according_to_Shiftstate( *keymap, 58, Base, 1);
-          std::wstring  VK_OtherTEST11 = get_KeySyms_according_to_Shiftstate( *keymap, 58, Shft, 1);
-          std::wstring  VK_OtherTEST12 = get_KeySyms_according_to_Shiftstate( *keymap, 58, Ctrl, 1);
-          std::wstring  VK_OtherTEST13 = get_KeySyms_according_to_Shiftstate( *keymap, 58, ShftCtrl, 1);
-          std::wstring  VK_OtherTEST14 = get_KeySyms_according_to_Shiftstate( *keymap, 58, Menu, 1);
-          std::wstring  VK_OtherTEST15 = get_KeySyms_according_to_Shiftstate( *keymap, 58, ShftMenu, 1);
-          std::wstring  VK_OtherTEST17 = get_KeySyms_according_to_Shiftstate( *keymap, 58, ShftMenuCtrl, 1);
-          std::wstring  VK_OtherTEST18 = get_KeySyms_according_to_Shiftstate( *keymap, 58, Xxxx, 1);
-          std::wstring  VK_OtherTEST19 = get_KeySyms_according_to_Shiftstate( *keymap, 58, ShftXxxx, 1);
+          std::wstring  VK_OtherTEST0 = get_KeyVals_according_to_keycode_and_Shiftstate( *keymap, 58, Base, 0);
+          std::wstring  VK_OtherTEST1= get_KeyVals_according_to_keycode_and_Shiftstate( *keymap, 58, Shft, 0);
+          std::wstring  VK_OtherTEST2 = get_KeyVals_according_to_keycode_and_Shiftstate( *keymap, 58, Ctrl, 0);
+          std::wstring  VK_OtherTEST3 = get_KeyVals_according_to_keycode_and_Shiftstate( *keymap, 58, ShftCtrl, 0);
+          std::wstring  VK_OtherTEST4 = get_KeyVals_according_to_keycode_and_Shiftstate( *keymap, 58, Menu, 0);
+          std::wstring  VK_OtherTEST5 = get_KeyVals_according_to_keycode_and_Shiftstate( *keymap, 58, ShftMenu, 0);
+          std::wstring  VK_OtherTEST7 = get_KeyVals_according_to_keycode_and_Shiftstate( *keymap, 58, ShftMenuCtrl, 0);
+          std::wstring  VK_OtherTEST8 = get_KeyVals_according_to_keycode_and_Shiftstate( *keymap, 58, Xxxx, 0);
+          std::wstring  VK_OtherTEST9 = get_KeyVals_according_to_keycode_and_Shiftstate( *keymap, 58, ShftXxxx, 0);
+          std::wstring  VK_OtherTEST10 = get_KeyVals_according_to_keycode_and_Shiftstate( *keymap, 58, Base, 1);
+          std::wstring  VK_OtherTEST11 = get_KeyVals_according_to_keycode_and_Shiftstate( *keymap, 58, Shft, 1);
+          std::wstring  VK_OtherTEST12 = get_KeyVals_according_to_keycode_and_Shiftstate( *keymap, 58, Ctrl, 1);
+          std::wstring  VK_OtherTEST13 = get_KeyVals_according_to_keycode_and_Shiftstate( *keymap, 58, ShftCtrl, 1);
+          std::wstring  VK_OtherTEST14 = get_KeyVals_according_to_keycode_and_Shiftstate( *keymap, 58, Menu, 1);
+          std::wstring  VK_OtherTEST15 = get_KeyVals_according_to_keycode_and_Shiftstate( *keymap, 58, ShftMenu, 1);
+          std::wstring  VK_OtherTEST17 = get_KeyVals_according_to_keycode_and_Shiftstate( *keymap, 58, ShftMenuCtrl, 1);
+          std::wstring  VK_OtherTEST18 = get_KeyVals_according_to_keycode_and_Shiftstate( *keymap, 58, Xxxx, 1);
+          std::wstring  VK_OtherTEST19 = get_KeyVals_according_to_keycode_and_Shiftstate( *keymap, 58, ShftXxxx, 1);
          */
           // _S2 needs to be changed - it's temporary to get the same keys as keyman does when using USVirtualKeyToScanCode
         if (!IsKeymanUsedKey_S2(VK_Other))

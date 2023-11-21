@@ -621,8 +621,8 @@ bool InsertKeyvalsFromKeymap(v_dw_3D &All_Vector,GdkKeymap * keymap){
     All_Vector[1][i][0] = All_Vector[0][i][0];
 
     // get Keyvals of this key and copy to unshifted/shifted in "other"-block[1][i][1] / block[1][i][2]
-    All_Vector[1][i][0+1] = getKeyvalsFromKeymap(keymap,(All_Vector[1][i][0]),0);   //shift state: unshifted:0
-    All_Vector[1][i][1+1] = getKeyvalsFromKeymap(keymap,(All_Vector[1][i][0]),1);   //shift state: shifted:1
+    All_Vector[1][i][0+1] = getKeyvalsFromKeyCode(keymap,(All_Vector[1][i][0]),0);   //shift state: unshifted:0
+    All_Vector[1][i][1+1] = getKeyvalsFromKeyCode(keymap,(All_Vector[1][i][0]),1);   //shift state: shifted:1
 
     //wprintf(L" Keycodes US dw        :   %d (US): -- %i (%c)  -- %i (%c) ---- (other): %i (%c)  --  %i(%c)    \n",(All_Vector[1][i][0]),All_Vector[0][i][1],All_Vector[0][i][1],All_Vector[0][i][2],All_Vector[0][i][2],All_Vector[1][i][1] ,All_Vector[1][i][1],All_Vector[1][i][2],All_Vector[1][i][2]);
     //wprintf(L"   Keycodes ->Other dw:-:   %d (US): -- %i (%c)  -- %i (%c)   \n\n",(All_Vector[1][i][0]),All_Vector[1][i][1],All_Vector[1][i][1],All_Vector[1][i][2],All_Vector[1][i][2]);
@@ -637,8 +637,8 @@ KMX_DWORD writeKeyvalsFromKeymap(GdkKeymap *keymap, guint keycode, int shift_sta
   KMX_DWORD out;
   for ( int ii =1; ii< 255;ii++) {
 
-  KMX_DWORD out = getKeyvalsFromKeymap(keymap,ii,0);
-  KMX_DWORD out2= getKeyvalsFromKeymap(keymap,ii,1);
+  KMX_DWORD out = getKeyvalsFromKeyCode(keymap,ii,0);
+  KMX_DWORD out2= getKeyvalsFromKeyCode(keymap,ii,1);
   wprintf(L" ii = %i  --> keymap = %i (%c)..%i(%c) \n",ii, out,out, out2,out2);
   }
 }
@@ -1777,5 +1777,56 @@ std::wstring rV1= std::wstring(1, (int) *keyvals);
 int stop=99;
 
 }
+
+
+// _S2 TODO
+/*std::wstring  get_KeyVals_according_to_Shiftstate(GdkKeymap *keymap, guint keycode, ShiftState ss, int caps  ){
+
+  GdkModifierType consumed;
+  GdkKeymapKey *maps;
+  guint *keyvals;
+  gint count;
+
+  // _S2 TODO what to return if it fails?
+  if (!gdk_keymap_get_entries_for_keycode(keymap, keycode, &maps, &keyvals, &count))
+    return L"1";
+
+  //unshifted
+  if (( ss == Base ) && ( caps == 0 )) {
+    GdkModifierType MOD_base = (GdkModifierType) ( ~GDK_MODIFIER_MASK );
+    gdk_keymap_translate_keyboard_state (keymap, keycode, MOD_base , 0, keyvals, NULL, NULL, & consumed);
+    return  std::wstring(1, (int) *keyvals);
+  }
+
+  //SHIFT+CAPS
+  else if ( ( ss == Shft ) && ( caps ==1 )) {
+    GdkModifierType MOD_ShiftCaps= (GdkModifierType) ((GDK_SHIFT_MASK | GDK_LOCK_MASK));
+    gdk_keymap_translate_keyboard_state (keymap, keycode, MOD_ShiftCaps , 0, keyvals, NULL, NULL, & consumed);
+    return  std::wstring(1, (int) *keyvals);
+  }
+
+  //Shift
+  else if (( ss == Shft ) && ( caps == 0 )) {
+    return std::wstring(1, (int) get_VirtualKey_Other_GDK(keymap,  keycode));
+  }
+
+  //caps
+  else if (( ss == Base ) && ( caps == 1 )) {
+    GdkModifierType MOD_Caps = (GdkModifierType) ( GDK_LOCK_MASK );
+    gdk_keymap_translate_keyboard_state (keymap, keycode, MOD_Caps, 0, keyvals, NULL, NULL, & consumed);
+    return  std::wstring(1, (int) *keyvals);
+  }
+
+  //ALT-GR
+  //else if {
+ //   GdkModifierType MOD_AltGr = (GdkModifierType) ( GDK_MOD5_MASK );
+    gdk_keymap_translate_keyboard_state (keymap, keycode, MOD_AltGr , 0, keyvals, NULL, NULL, & consumed);
+    return *keyvals;
+  }
+
+  else
+    return L"0";
+}
+*/
 
 

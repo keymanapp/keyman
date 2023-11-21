@@ -473,11 +473,11 @@ const KMX_DWORD KMX_VKMap[] = {
 static KMX_DWORD returnIfCharInvalid = 0;
 
 // takes a std::wstring (=contents of line symbols-file ) and returns the (int) value of the character
-KMX_DWORD convertNamesToValue(std::wstring tok_wstr);
-
+KMX_DWORD convertNamesToASCIIValue(std::wstring tok_wstr);
 
 // create a Vector with all entries of  Vector
 int createOneVectorFromBothKeyboards(v_dw_3D &All_Vector);
+
 // read configuration file, split and write to 3D-Vector (Data for US on [0][ ][ ]  )
 int write_US_ToVector(v_dw_3D &vec, std::string language, const char *text);
 
@@ -488,16 +488,18 @@ bool createCompleteRow_US(v_str_1D &complete_List, FILE *fpp, const char *text, 
 int split_US_To_3D_Vector(v_dw_3D &all_US, v_str_1D completeList);
 
 // replace Name of Key (e.g. <AD06>)  wih Keycode ( e.g. 0x15 )
-int replace_PosKey_with_Keycode_use_Lin(std::string  in);
+int replace_KeyName_with_Keycode(std::string  in);
 
 // create an empty 2D vector containing "--" in all fields
-v_dw_2D create_empty_2D(int dim_rows, int dim_shifts);
+v_dw_2D create_empty_2D_Vector(int dim_rows, int dim_shifts);
 
 // return the Scancode of for given VirtualKey using GDK
-KMX_DWORD get_KeyCode_From_KeyVal_GDK(GdkKeymap *keymap, UINT mapped_ikey);
+KMX_DWORD get_KeyCode_From_KeyVal_GDK(GdkKeymap *keymap, UINT Keyval);
 
 // return the VirtualKey of the Other Keyboard for given Scancode using GDK
 KMX_DWORD get_VirtualKey_Other_GDK( GdkKeymap *keymap, KMX_DWORD scanCode);
+
+KMX_DWORD get_VirtualKey_US( KMX_DWORD keycode);
 
 // initialize GDK
 bool InitializeGDK(GdkKeymap **keymap,int argc, gchar *argv[]);
@@ -507,10 +509,10 @@ bool InitializeGDK(GdkKeymap **keymap,int argc, gchar *argv[]);
 int append_other_ToVector(v_dw_3D &All_Vector, GdkKeymap *keymap);
 
 // find Keyvals to fill into 2D-Vector of Other Language
-KMX_DWORD getKeyvalsFromKeymap(GdkKeymap *keymap, guint keycode, int shift_state_pos);
+KMX_DWORD getKeyvalsFromKeyCode(GdkKeymap *keymap, guint keycode, int shift_state_pos);
 
 // returns KeySyms fo ra given key (for unshifted: finds the Keysym according to Shiftstate e.g. a;A or 1;! )
-std::wstring get_KeySyms_according_to_Shiftstate(GdkKeymap *keymap, guint VK, ShiftState ss, int caps);
+std::wstring get_KeyVals_according_to_keycode_and_Shiftstate(GdkKeymap *keymap, guint VK, ShiftState ss, int caps);
 
 
 // _S2 needed?
@@ -523,9 +525,6 @@ UINT find_SC_Other_from_SC_US_GDK(UINT vk_US_187,GdkKeymap *keymap);
 int createOneVectorFromBothKeyboards(v_dw_3D &All_Vector,GdkKeymap *keymap);
 
 //needed?
-// returns Keyvals fo ra given key (for unshifted: finds the Name of the Key e.g.  A or 1 )
-std::wstring get_KeyVals_according_to_Shiftstate(GdkKeymap *keymap, guint VK, ShiftState ss, int caps);
-
 // _S2 TODO How to do mapping between Linux keycodes and keyman SC
 const int Lin_KM__map(int i, v_dw_3D &All_Vector);
 

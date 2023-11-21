@@ -51,6 +51,9 @@ KMX_DWORD get_SC_From_VirtualKey_US(KMX_DWORD VK_US , v_dw_3D &All_Vector);
 KMX_DWORD get_position_From_VirtualKey_Other(KMX_DWORD VK_US , v_dw_3D &All_Vector);
 // _S2 can go later return the Scancode of for given VirtualKey of Other in specific column. If column > available columns look in all columns;
 KMX_DWORD get_position_From_VirtualKey_Other(KMX_DWORD VK_Other , v_dw_3D &All_Vector, int which_columns);
-
+/*
+// returns Keyvals fo ra given key (for unshifted: finds the Name of the Key e.g.  A or 1 )
+std::wstring get_KeyVals_according_to_Shiftstate(GdkKeymap *keymap, guint VK, ShiftState ss, int caps);
+*/
 //std::wstring  get_VirtualKey_US_from_iKey(KMX_DWORD iKey, ShiftState &ss, int &caps, v_dw_3D &All_Vector);
 #endif /* HELPERS_H*/
