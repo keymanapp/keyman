@@ -56,8 +56,8 @@ export default class OSKLayerGroup {
       const layerObj = new OSKLayer(vkbd, layout, layer);
       this.layers[layer.id] = layerObj;
 
-      // Always make the first layer visible
-      layerObj.element.style.display = (n==0 ? 'block' : 'none');
+      // Always make the 'default' layer visible by default.
+      layerObj.element.style.display = (layer.id == 'default' ? 'block' : 'none');
 
       // Add layer to group
       lDiv.appendChild(layerObj.element);
@@ -124,7 +124,7 @@ export default class OSKLayerGroup {
      * We want to avoid doing it sooner in case another lookup occurs before the standard
      * async reflow, as that could trigger expensive "layout thrashing" effects.
      *
-     * In the case that a gesture-source's path needs to be remapped do a different layer,
+     * In the case that a gesture-source's path needs to be remapped to a different layer,
      * multiple synchronous calls to this method may occur.  This is a pattern that may
      * result during input layer-remapping used to solve issues like #7173 and possibly
      * also during multitap operations.

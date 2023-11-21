@@ -93,6 +93,8 @@ export interface GestureParams<Item = any> {
 export const DEFAULT_GESTURE_PARAMS: GestureParams = {
   longpress: {
     permitsFlick: () => true,
+    // Note:  actual runtime value is determined at runtime based upon row height.
+    // See `VisualKeyboard.refreshLayout`, CTRL-F "Step 3".
     flickDist: 5,
     waitLength: 500,
     noiseTolerance: 10
@@ -101,6 +103,8 @@ export const DEFAULT_GESTURE_PARAMS: GestureParams = {
     waitLength: 500,
     holdLength: 500
   },
+  // Note:  all actual runtime values are determined at runtime based upon row height.
+  // See `VisualKeyboard.refreshLayout`, CTRL-F "Step 3".
   flick: {
     startDist: 10,
     dirLockDist: 20,
@@ -293,8 +297,7 @@ function determineLockFromStats(pathStats: CumulativePathStats<KeyElement>) {
   let bestDir: typeof supportedDirs[number];
   let bestLockedDist = 0;
 
-  for(let i = 0; i < supportedDirs.length; i++) {
-    const dir = supportedDirs[i];
+  for(const dir of supportedDirs) {
     const lockedDist = calcLockedDistance(pathStats, dir);
     if(lockedDist > bestLockedDist) {
       bestLockedDist = lockedDist;

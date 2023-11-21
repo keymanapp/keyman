@@ -75,7 +75,6 @@ uses
   KeyboardFonts in '..\common\delphi\general\KeyboardFonts.pas',
   Keyman.System.Util.RenderLanguageIcon in '..\..\..\common\windows\delphi\ui\Keyman.System.Util.RenderLanguageIcon.pas',
   utilicon in '..\..\..\common\windows\delphi\general\utilicon.pas',
-  CompileErrorCodes in '..\common\delphi\compiler\CompileErrorCodes.pas',
   Keyman.Developer.System.ModelProjectTemplate in 'Keyman.Developer.System.ModelProjectTemplate.pas',
   Keyman.Developer.System.Project.modelTsProjectFile in '..\TIKE\project\Keyman.Developer.System.Project.modelTsProjectFile.pas',
   Keyman.Developer.System.Project.wordlistTsvProjectFile in '..\TIKE\project\Keyman.Developer.System.Project.wordlistTsvProjectFile.pas',

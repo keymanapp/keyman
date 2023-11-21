@@ -28,13 +28,11 @@ else
   END_STEP=""
 fi
 
-if builder_start_action dependencies; then
+dependencies_action() {
   sudo mk-build-deps --install --tool='apt-get -o Debug::pkgProblemResolver=yes --no-install-recommends --yes' debian/control
-  builder_finish_action success dependencies
-  exit 0
-fi
+}
 
-if builder_start_action source; then
+source_action() {
   echo "${START_STEP}Make source package for keyman${COLOR_RESET}"
 
   echo "${START_STEP}reconfigure${COLOR_RESET}"
@@ -50,25 +48,23 @@ if builder_start_action source; then
   echo "${END_STEP}"
 
   mv builddebs/* "${OUTPUT_PATH:-..}"
+}
 
-  builder_finish_action success source
-  exit 0
-fi
-
-if builder_start_action verify; then
+verify_action() {
   tar xf "${SRC_PKG}"
-  if [ ! -f debian/libkeymancore.symbols ]; then
-    echo ":warning: Missing libkeymancore.symbols file" >&2
+  PKG_NAME=libkeymancore
+  LIB_NAME=libkeymancore
+  if [ ! -f debian/${PKG_NAME}.symbols ]; then
+    echo ":warning: Missing ${PKG_NAME}.symbols file" >&2
   else
-    PKG_NAME=libkeymancore
-    LIB_NAME=libkeymancore
-
     tmpDir=$(mktemp -d)
     dpkg -x "${BIN_PKG}" "$tmpDir"
     cd debian
     dpkg-gensymbols -v"${PKG_VERSION}" -p${PKG_NAME} -e"${tmpDir}"/usr/lib/x86_64-linux-gnu/${LIB_NAME}.so* -O${PKG_NAME}.symbols -c4
     echo ":heavy_check_mark: ${LIB_NAME} API didn't change" >&2
   fi
-  builder_finish_action success verify
-  exit 0
-fi
+}
+
+builder_run_action dependencies  dependencies_action
+builder_run_action source        source_action
+builder_run_action verify        verify_action

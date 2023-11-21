@@ -571,7 +571,6 @@ uses
   CharacterInfo,
   CharMapDropTool,
   Clipbrd,
-  compile,
   dmActionsMain,
   KeymanDeveloperOptions,
   KeymanVersion,
@@ -2944,8 +2943,7 @@ end;
 
 procedure TfrmKeymanWizard.OSKImportKMX(Sender: TObject; var KMXFileName: TTempFile);   // I4181
 var
-  KMNFileName: TTempFile;
-  KMXFileName2: string;
+  KMNFileName: string;
   sw: WideString;
   kbdparser: TKeyboardParser;
   FEncoding: TEncoding;
@@ -2953,7 +2951,7 @@ var
   w: TKmcWrapper;
 begin
   KMXFileName := TTempFileManager.Get('.kmx');   // I4181
-  KMNFileName := TTempFileManager.Get('.kmn');   // I4181
+  KMNFileName := ExtractFilePath(Filename) + '__temp_osk_import_' + ExtractFileName(Filename);
 
   kbdparser := TKeyboardParser.Create;
   try
@@ -2989,18 +2987,15 @@ begin
   with TStringList.Create do  // I3337
   try
     Text := sw;
-    SaveToFile(KMNFileName.Name, FEncoding);   // I4181
+    SaveToFile(KMNFileName, FEncoding);   // I4181
   finally
     Free;
   end;
 
-  KMXFileName2 := KMXFileName.Name;   // I4181
-
-  TProject.CompilerMessageFile := ProjectFile;
   frmMessages.Clear;
   w := TKmcWrapper.Create;
   try
-    if not w.Compile(ProjectFile, KMNFileName.Name, KMXFileName2, False) then
+    if not w.Compile(ProjectFile, KMNFileName, KMXFileName.Name, False) then
     begin
       frmMessages.DoShowForm;
       ShowMessage('There were errors compiling the keyboard to convert to the On Screen Keyboard.');
@@ -3008,9 +3003,8 @@ begin
     end;
   finally
     w.Free;
+    DeleteFile(KMNFileName);
   end;
-  FreeAndNil(KMNFileName);   // I4181
-  TProject.CompilerMessageFile := nil;
 end;
 
 procedure TfrmKeymanWizard.OSKImportKMXFinished(Sender: TObject; KMXFileName: TTempFile);   // I4181

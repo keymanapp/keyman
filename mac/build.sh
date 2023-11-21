@@ -354,6 +354,13 @@ execCodeSign() {
 
 if $DO_KEYMANENGINE ; then
     builder_heading "Building Keyman Engine"
+    if [ "$CONFIG" == "Debug" ]; then
+        $KEYMAN_ROOT/core/build.sh configure:mac --debug --no-tests
+        $KEYMAN_ROOT/core/build.sh build:mac --debug --no-tests
+    else
+        $KEYMAN_ROOT/core/build.sh configure:mac --no-tests
+        $KEYMAN_ROOT/core/build.sh build:mac --no-tests
+    fi
     execBuildCommand $ENGINE_NAME "xcodebuild -project \"$KME4M_PROJECT_PATH\" $BUILD_OPTIONS $BUILD_ACTIONS $TEST_ACTION -scheme $ENGINE_NAME"
     execBuildCommand "$ENGINE_NAME dSYM file" "dsymutil \"$KME4M_BASE_PATH/build/$CONFIG/$ENGINE_NAME.framework/Versions/A/$ENGINE_NAME\" -o \"$KME4M_BASE_PATH/build/$CONFIG/$ENGINE_NAME.framework.dSYM\""
     updatePlist "$KME4M_BASE_PATH/build/$CONFIG/$ENGINE_NAME.framework/Resources/Info.plist" "Keyman Engine"

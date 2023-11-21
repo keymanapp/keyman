@@ -129,6 +129,9 @@ export class GestureMatcher<Type, StateToken = any> implements PredecessorMatch<
         baseContact = srcContact.baseSource;
       }
 
+      // No need to filter out already-matched contact points, and doing so is more trouble
+      // than its worth.
+
       const contactSpec = model.contacts[touchpointIndex];
       /* c8 ignore next 3 */
       if(!contactSpec) {
@@ -421,6 +424,7 @@ export class GestureMatcher<Type, StateToken = any> implements PredecessorMatch<
 
     contactModel.update();
     // Now that we've done the initial-state check, we can check for instantly-matching path models.
+
     contactModel.promise.then((resolution) => {
       this.finalize(resolution.type == 'resolve', resolution.cause);
     });

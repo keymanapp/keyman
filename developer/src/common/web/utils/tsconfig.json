@@ -10,7 +10,8 @@
       },
     },
   "include": [
-    "./*.ts", "src/validate-mit-license.ts",
+    "index.ts",
+    "src/**/*.ts",
   ],
   "references": [
     { "path": "../../../../../common/web/types/" },

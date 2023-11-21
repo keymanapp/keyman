@@ -59,6 +59,7 @@ export default class SubkeyPopup implements GestureHandler {
       this.clear();
     });
 
+    // When subkey-selection is fully triggered, emit the selected key.
     source.on('stage', () => {
       const key = this.currentSelection;
       if(key) {

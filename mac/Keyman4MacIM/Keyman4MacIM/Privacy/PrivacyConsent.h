@@ -17,6 +17,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, strong) PrivacyWindowController *privacyDialog;
 @property (nonatomic, copy, nullable) void (^completionHandler)(void);
 + (PrivacyConsent *)shared;
+- (BOOL)checkAccessibility;
 - (void)requestPrivacyAccess:(void (^)(void))withCompletionHandler;
 @end
 

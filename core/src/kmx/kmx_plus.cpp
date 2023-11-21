@@ -209,7 +209,7 @@ COMP_KMXPLUS_META::valid(KMX_DWORD _kmn_unused(length)) const {
   DebugLog(" author:\t#0x%X\n", author);
   DebugLog(" conform:\t#0x%X\n", conform);
   DebugLog(" layout:\t#0x%X\n", layout);
-  DebugLog(" normalization:\t#0x%X\n", normalization);
+  DebugLog(" name:\t#0x%X\n", name);
   DebugLog(" indicator:\t#0x%X\n", indicator);
   DebugLog(" settings:\t0x%X\n", settings);
   return true;
@@ -227,9 +227,9 @@ COMP_KMXPLUS_DISP::valid(KMX_DWORD _kmn_unused(length)) const {
     DebugLog("disp: baseCharacter str#0x%X", baseCharacter);
   }
   for (KMX_DWORD i=0; i<count; i++) {
-    DebugLoad("disp#%d: to: str0x%X -> str0x%X", i, entries[i].to, entries[i].display);
-    if (entries[i].to == 0 || entries[i].display == 0) {
-      DebugLog("disp to: or display: has a zero string");
+    DebugLoad("disp#%d: id: str0x%X to: str0x%X -> str0x%X", i, entries[i].id, entries[i].to, entries[i].display);
+    if ((entries[i].to == 0 && entries[i].id == 0) || entries[i].display == 0) {
+      DebugLog("disp must have either keyId/output, and must have display");
       assert(false);
       return false;
     }
@@ -812,7 +812,7 @@ COMP_KMXPLUS_KEYS_Helper::setKeys(const COMP_KMXPLUS_KEYS *newKeys) {
         is_valid = false;
         assert(is_valid);
       }
-      DebugLoad("<flick> %d: to=0x%X, directions=0x%X, flags=0x%X", i, e.to, e.directions, e.flags);
+      DebugLoad("<flick> %d: to=0x%X, directions=0x%X", i, e.to, e.directions);
     }
     // now the kmap
     DebugLoad(" kmap count: #0x%X", key2->kmapCount);

@@ -2,9 +2,7 @@
 
 <!DOCTYPE keyboard3 SYSTEM "../../../../../../../resources/standards-data/ldml-keyboards/techpreview/dtd/ldmlKeyboard3.dtd">
 <keyboard3 locale="mt" conformsTo="techpreview">
-  <names>
-    <name value="disp-maximal" />
-  </names>
+  <info name="disp-maximal"/>
 
   <displays>
     <displayOptions baseCharacter="x" />

@@ -39,9 +39,9 @@ export class LDMLKeyboardXMLSourceFileReader {
   private boxArrays(source: any) : boolean {
     if (source?.keyboard3) {
       if (!source.keyboard3.keys) {
+        // Note: this is here to put a substrate for the imported keys
         source.keyboard3.keys = {
           key: [],
-          flicks: [],
         };
       }
       if (!source.keyboard3.keys.import) {
@@ -58,9 +58,8 @@ export class LDMLKeyboardXMLSourceFileReader {
     }
     boxXmlArray(source?.keyboard3, 'layers');
     boxXmlArray(source?.keyboard3?.displays, 'display');
-    boxXmlArray(source?.keyboard3?.names, 'name');
     boxXmlArray(source?.keyboard3?.keys, 'key');
-    boxXmlArray(source?.keyboard3?.keys, 'flicks');
+    boxXmlArray(source?.keyboard3?.flicks, 'flick');
     boxXmlArray(source?.keyboard3?.locales, 'locale');
     boxXmlArray(source?.keyboard3, 'transforms');
     if(source?.keyboard3?.layers) {
@@ -79,9 +78,10 @@ export class LDMLKeyboardXMLSourceFileReader {
         boxXmlArray(form, 'scanCodes');
       }
     }
-    if(source?.keyboard3?.keys?.flicks) {
-      for(let flicks of source?.keyboard3?.keys?.flicks) {
-        boxXmlArray(flicks, 'flick');
+    if(source?.keyboard3?.flicks) {
+      boxXmlArray(source?.keyboard3?.flicks, 'flick');
+      for(let flick of source?.keyboard3?.flicks?.flick) {
+        boxXmlArray(flick, 'flickSegment');
       }
     }
     if(source?.keyboard3?.variables) {
@@ -98,13 +98,13 @@ export class LDMLKeyboardXMLSourceFileReader {
         }
       }
     }
-    return this.boxImportsAndSpecials(source, 'keyboard');
+    return this.boxImportsAndSpecials(source, 'keyboard3');
   }
 
   /**
    * Recurse over object, boxing up any specials or imports
    * @param obj any object to be traversed
-   * @param subtag the leafmost enclosing tag such as 'keyboard'
+   * @param subtag the leafmost enclosing tag such as 'keyboard3'
    * @returns true on success, false on failure
    */
   private boxImportsAndSpecials(obj: any, subtag: string) : boolean {
