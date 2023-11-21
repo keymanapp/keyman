@@ -107,6 +107,28 @@ export default class OSKLayerGroup {
       throw new Error(`Layer id ${layerId} could not be found`);
     }
 
+    this.blinkLayer(layer);
+
+    return this.nearestKey(coord, layer);
+  }
+
+  /**
+   * Temporarily enables the specified layer for page layout calculations and
+   * queues an immediate reversion to the 'true' active layer at the earliest
+   * opportunity on the JS microtask queue.
+   * @param layer
+   */
+  public blinkLayer(arg: OSKLayer | string) {
+    if(typeof arg === 'string') {
+      const layerId = arg;
+      arg = this.layers[layerId];
+      if(!arg) {
+        throw new Error(`Layer id ${layerId} could not be found`);
+      }
+    }
+
+    const layer = arg;
+
     // Note:  we do NOT manipulate `._activeLayerId` here!  This is designed
     // explicitly to be temporary.
     if(layer.element.style.display != 'block') {
@@ -139,9 +161,7 @@ export default class OSKLayerGroup {
         layer.element.style.display = 'none';
         trueLayer.element.style.display = 'block';
       }
-    })
-
-    return this.nearestKey(coord, layer);
+    });
   }
 
   private nearestKey(coord: Omit<InputSample<KeyElement>, 'item'>, layer: OSKLayer): KeyElement {

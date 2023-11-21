@@ -49,6 +49,16 @@ export default class KeyTip implements KeyTipInterface {
   }
 
   show(key: KeyElement, on: boolean, vkbd: VisualKeyboard, previewHost: GesturePreviewHost) {
+    // During quick input sequences - especially during a multitap-modipress - it's possible
+    // for a user to request a preview for a key from a layer that is currently active, but
+    // currently not visible due to need previously-requested layout calcs for a different layer.
+    if(on) {
+      // Necessary for `key.offsetParent` and client-rect methods referenced below.
+      // Will not unnecessarily force reflow if the layer is already in proper document flow,
+      // but otherwise restores it.
+      vkbd.layerGroup.blinkLayer(key.key.spec.displayLayer);
+    }
+
     // Create and display the preview
     // If !key.offsetParent, the OSK is probably hidden.  Either way, it's a half-
     // decent null-guard check.
