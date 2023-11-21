@@ -371,6 +371,12 @@ export class GestureSourceSubview<HoveredItemType, StateToken = any> extends Ges
       baseSource.path.off('invalidated', invalidatedHook);
       baseSource.path.off('step',        stepHook);
     }
+
+    // If the path was already completed, that should be reflected here, too.
+    if(baseSource.isPathComplete) {
+      this.path.terminate((baseSource.path.wasCancelled));
+      this.disconnect();
+    }
   }
 
   private get recognizerTranslation() {
