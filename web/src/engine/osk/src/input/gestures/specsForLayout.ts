@@ -11,9 +11,9 @@ import {
 import ButtonClasses = TouchLayout.TouchLayoutKeySp;
 
 import {
+  ActiveLayout,
   deepCopy
 } from '@keymanapp/keyboard-processor';
-import OSKLayerGroup from '../../keyboard-layout/oskLayerGroup.js';
 
 import { type KeyElement } from '../../keyElement.js';
 
@@ -137,6 +137,16 @@ export function keySupportsModipress(key: KeyElement) {
   }
 }
 
+interface LayoutGestureSupportFlags {
+  hasFlicks: boolean,
+  hasMultitaps: boolean,
+  hasLongpresses: boolean
+}
+
+// Simple compile-time validation that OSKLayerGroup's spec object provides the fields expected above.
+let dummy: ActiveLayout;
+let dummy2: LayoutGestureSupportFlags = dummy;
+
 /**
  * Defines the set of gestures appropriate for use with the specified Keyman keyboard.
  * @param layerGroup  The active keyboard's layer group
@@ -145,9 +155,7 @@ export function keySupportsModipress(key: KeyElement) {
  *                    immediate effect during gesture processing.
  * @returns
  */
-export function gestureSetForLayout(layerGroup: OSKLayerGroup, params: GestureParams): GestureModelDefs<KeyElement, string> {
-  const layout = layerGroup.spec;
-
+export function gestureSetForLayout(flags: LayoutGestureSupportFlags, params: GestureParams): GestureModelDefs<KeyElement, string> {
   // To be used among the `allowsInitialState` contact-model specifications as needed.
   const gestureKeyFilter = (key: KeyElement, gestureId: string) => {
     if(!key) {
@@ -164,7 +172,7 @@ export function gestureSetForLayout(layerGroup: OSKLayerGroup, params: GesturePa
         return !!keySpec.sk;
       case 'multitap-start':
       case 'modipress-multitap-start':
-        if(layout.hasMultitaps) {
+        if(flags.hasMultitaps) {
           return !!keySpec.multitap;
         } else {
           return false;
@@ -177,9 +185,9 @@ export function gestureSetForLayout(layerGroup: OSKLayerGroup, params: GesturePa
     }
   };
 
-  const _initialTapModel: GestureModel<KeyElement> = deepCopy(layout.hasFlicks ? initialTapModel(params) : initialTapModelWithReset(params));
-  const _simpleTapModel: GestureModel<KeyElement> = deepCopy(layout.hasFlicks ? simpleTapModel() : simpleTapModelWithReset());
-  const longpressModel: GestureModel<KeyElement> = deepCopy(longpressModelWithShortcut(params, true, !layout.hasFlicks));
+  const _initialTapModel: GestureModel<KeyElement> = deepCopy(flags.hasFlicks ? initialTapModel(params) : initialTapModelWithReset(params));
+  const _simpleTapModel: GestureModel<KeyElement> = deepCopy(flags.hasFlicks ? simpleTapModel() : simpleTapModelWithReset());
+  const longpressModel: GestureModel<KeyElement> = deepCopy(longpressModelWithShortcut(params, true, !flags.hasFlicks));
 
   // #region Functions for implementing and/or extending path initial-state checks
   function withKeySpecFiltering(model: GestureModel<KeyElement>, contactIndices: number | number[]) {
@@ -232,7 +240,7 @@ export function gestureSetForLayout(layerGroup: OSKLayerGroup, params: GesturePa
     longpressModel.id, _initialTapModel.id, _modipressStartModel.id, specialStartModel.id
   ];
 
-  if(layout.hasFlicks) {
+  if(flags.hasFlicks) {
     gestureModels.push(withKeySpecFiltering(flickStartModel(params), 0));
     gestureModels.push(flickMidModel(params));
     gestureModels.push(flickResetModel(params));
