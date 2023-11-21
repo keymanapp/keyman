@@ -533,37 +533,15 @@ export class MatcherSelector<Type, StateToken = any> extends EventEmitter<EventM
        * other matchers.
        */
       if(result.action.type == 'none') {
-        // Check - are there any remaining matchers compatible with the rejected matcher's sources?
-        const remainingMatcherStats = sourceMetadata.map((tracker) => {
-          return {
-            tracker: tracker,
-            // We need to inspect each matcher's `contacts` entries for references to the source.
-            pendingCount: this.potentialMatchers.filter((matcher) => {
-              return !!matcher.allSourceIds.find((id) => tracker.source.identifier == id);
-            }).length // and tally up a count at the end.
-          };
-        });
+        this.finalizeMatcherlessTrackers(sourceMetadata);
 
-        // If we just rejected the last possible matcher for a tracked gesture-source...
-        // then, for each such affected source...
-        for(const stat of remainingMatcherStats) {
-          if(stat.pendingCount == 0) {
-            // ... report the failure and signal to close-out that source / stop tracking it.
-            stat.tracker.matchPromise.resolve({
-              matcher: null,
-              result: {
-                matched: false,
-                action: {
-                  type: 'complete',
-                  item: null
-                }
-              }
-            });
-          }
-        }
-
-        // Again, we allow any other matchers against the represented sources to REMAIN AS THEY ARE.
-        // This is a "didn't resolve" case - we only matched against a "path reset" case.
+        /* We allow any other matchers against the represented sources to REMAIN AS THEY ARE.
+         * Special handling is only needed once none are left, which is what the
+         * `finalizeMatcherlessTrackers` call represents.
+         *
+         * This isn't generally a "no matches available case; it's a "_this_ model didn't match"
+         * case that only _sometimes_ happens to be the final "match not available" case.
+         */
         return;
       }
 
@@ -572,6 +550,7 @@ export class MatcherSelector<Type, StateToken = any> extends EventEmitter<EventM
         // But we didn't actually MATCH a gesture.
         const replacer = (replacementModel: GestureModel<Type, StateToken>) => {
          if(this.sustainMode && !replacementModel.sustainWhenNested) {
+            this.finalizeMatcherlessTrackers(sourceMetadata);
             return;
           }
 
@@ -589,6 +568,9 @@ export class MatcherSelector<Type, StateToken = any> extends EventEmitter<EventM
            * GestureSequence containing a finished GestureSource once said state is reached.
            */
           if(replacementMatcher.result && replacementMatcher.result.matched == false) {
+            // If this occurs, and it was the last possible tracker, we need to resolve its
+            // `matchGesture` promise.
+            this.finalizeMatcherlessTrackers(sourceMetadata);
             return;
           }
 
@@ -622,6 +604,8 @@ export class MatcherSelector<Type, StateToken = any> extends EventEmitter<EventM
           * could trigger a simple-tap.
           */
           losingMatchers.forEach((matcher) => {
+            // Triggers resolution of remaining matchers for the model-match, but that's
+            // asynchronous.
             matcher.cancel();
           });
 
@@ -635,7 +619,53 @@ export class MatcherSelector<Type, StateToken = any> extends EventEmitter<EventM
            */
           tracker.matchPromise.resolve({matcher, result});
         }
+
+        // No use of `finalizeMatcherlessTrackers` here; this is the path where we DO get
+        // and signal (that last resolve above) a successful gesture-model match.
       }
     };
+  }
+
+  /**
+   * This internal method provides common-case finalization for cases in which
+   * all available gesture models for at least one source have resolved with none
+   * matching it.  This includes triggering resolution of `Promise`s returned by the
+   * `matchGesture` call(s) corresponding to the now-unmatchable source(s).
+   *
+   * In short, this method should be called at any point where the Selector
+   * may go from having one or more potential active matchers to zero for at
+   * least one GestureSource.
+   * @param trackers
+   * @returns
+   */
+  private finalizeMatcherlessTrackers(trackers: GestureSourceTracker<Type, StateToken>[]) {
+    // Check - are there any remaining matchers compatible with the rejected matcher's sources?
+    const remainingMatcherStats = trackers.map((tracker) => {
+      return {
+        tracker: tracker,
+        // We need to inspect each matcher's `contacts` entries for references to the source.
+        pendingCount: this.potentialMatchers.filter((matcher) => {
+          return !!matcher.allSourceIds.find((id) => tracker.source.identifier == id);
+        }).length // and tally up a count at the end.
+      };
+    });
+
+    // If we just rejected the last possible matcher for a tracked gesture-source...
+    // then, for each such affected source...
+    for(const stat of remainingMatcherStats) {
+      if(stat.pendingCount == 0) {
+        // ... report the failure and signal to close-out that source / stop tracking it.
+        stat.tracker.matchPromise.resolve({
+          matcher: null,
+          result: {
+            matched: false,
+            action: {
+              type: 'complete',
+              item: null
+            }
+          }
+        });
+      }
+    }
   }
 }
