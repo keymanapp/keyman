@@ -425,8 +425,10 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
         trackingEntry.previewHost?.cancel();
         // If we ever allow concurrent previews, check if it exists and matches
         // a VisualKeyboard-tracked entry; if so, clear that too.
-        this.gesturePreviewHost = null;
-        trackingEntry.previewHost = null;
+        if(previewHost) {
+          this.gesturePreviewHost = null;
+          trackingEntry.previewHost = null;
+        }
         if(trackingEntry.key) {
           this.highlightKey(trackingEntry.key, false);
           trackingEntry.key = null;
@@ -436,39 +438,22 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
       // Note:  GestureSource does not currently auto-terminate if there are no
       // remaining matchable gestures.  Though, we shouldn't facilitate roaming
       // anyway if we've turned it off.
-      if(this.kbdLayout.hasFlicks) {
-        const flickScroller = buildFlickScroller(source, source.path.coords[0], previewHost, DEFAULT_GESTURE_PARAMS);
+      trackingEntry.roamingHighlightHandler = (sample) => {
+        // Maintain highlighting
+        const key = sample.item;
+        const oldKey = sourceTrackingMap[source.identifier].key;
 
-        trackingEntry.roamingHighlightHandler = (sample) => {
-          if(source.baseItem.key.spec.flick) {
-            flickScroller(sample);
+        if(key != oldKey) {
+          this.highlightKey(oldKey, false);
+          this.gesturePreviewHost?.cancel();
+
+          const previewHost = this.highlightKey(key, true);
+          if(previewHost) {
+            this.gesturePreviewHost = previewHost;
           }
 
-          const key = sample.item;
-          const oldKey = sourceTrackingMap[source.identifier].key;
-
-          if(key != oldKey) {
-            endHighlighting();
-          }
-        };
-      } else {
-        trackingEntry.roamingHighlightHandler = (sample) => {
-          // Maintain highlighting
-          const key = sample.item;
-          const oldKey = sourceTrackingMap[source.identifier].key;
-
-          if(key != oldKey) {
-            this.highlightKey(oldKey, false);
-            this.gesturePreviewHost?.cancel();
-
-            const previewHost = this.highlightKey(key, true);
-            if(previewHost) {
-              this.gesturePreviewHost = previewHost;
-            }
-
-            trackingEntry.previewHost = previewHost;
-            sourceTrackingMap[source.identifier].key = key;
-          }
+          trackingEntry.previewHost = previewHost;
+          sourceTrackingMap[source.identifier].key = key;
         }
       }
 
@@ -495,8 +480,10 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
         // but only while still permitting new touches.  If we're here, that time is over.
         for(let id of gestureSequence.allSourceIds) {
           // If the original preview host lives on, ensure it's cancelled now.
-          this.gesturePreviewHost = null;
-          sourceTrackingMap[id].previewHost?.cancel();
+          if(sourceTrackingMap[id].previewHost) {
+            this.gesturePreviewHost = null;
+            sourceTrackingMap[id].previewHost.cancel();
+          }
           delete sourceTrackingMap[id];
         }
       });
@@ -1125,7 +1112,11 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
 
     if (usePreview) {
       key.key.highlight(on);
-      return this.showGesturePreview(key);
+      if(this.gesturePreviewHost) {
+        return null; // do not override lingering previews for still-active gestures.
+      } else {
+        return this.showGesturePreview(key);
+      }
     } else {
       return null;
     }
@@ -1245,6 +1236,7 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
 
     this.gestureParams.longpress.flickDist = 0.25 * this.currentLayer.rowHeight;
     this.gestureParams.flick.startDist     = 0.1  * this.currentLayer.rowHeight;
+    this.gestureParams.flick.dirLockDist   = 0.25 * this.currentLayer.rowHeight;
     this.gestureParams.flick.triggerDist   = 0.75 * this.currentLayer.rowHeight;
 
     // Needs the refreshed layout info to work correctly.
@@ -1531,7 +1523,7 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
     const keyCS = getComputedStyle(key);
     const parsedHeight = Number.parseInt(keyCS.height, 10);
     const parsedWidth  = Number.parseInt(keyCS.width,  10);
-    const previewHost = new GesturePreviewHost(key, !!tip, Math.max(parsedWidth, parsedHeight));
+    const previewHost = new GesturePreviewHost(key, !!tip, parsedWidth, parsedHeight);
 
     if (tip == null) {
       const baseKey = key.key as OSKBaseKey;
@@ -1540,6 +1532,8 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
     } else {
       tip.show(key, true, this, previewHost);
     }
+
+    previewHost.refreshLayout();
 
     return previewHost;
   };

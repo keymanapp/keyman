@@ -15,7 +15,11 @@ import {
   MainLongpressSourceModelWithShortcut,
   ModipressStartModel,
   ModipressEndModel,
-  SimpleTapModel
+  SimpleTapModel,
+  FlickStartThreshold,
+  FlickStartContactModel,
+  FlickEndContactModel,
+  FlickEndThreshold
 } from './isolatedPathSpecs.js';
 
 async function simulateSequence(
@@ -59,9 +63,182 @@ describe("PathMatcher", function() {
     this.fakeClock.restore();
   })
 
-  describe.skip("Flick:  primary path modeling", function() {
-    it("Actual expectations for flick behavior still in flux - cannot spec yet", async function() {
+  describe("Flick:  primary path modeling", function() {
+    describe('Initial stage', function() {
+      it("resolve (simple)", async function() {
+        const emulatedContactPoint = new GestureSource<string>(1, null, true);
+        const modelMatcher = new gestures.matchers.PathMatcher(FlickStartContactModel, emulatedContactPoint);
 
+        const startSample = {
+          targetX: 1,
+          targetY: 1,
+          t: 100,
+          item: 'a'
+        };
+
+        const endSample = {
+          targetX: FlickStartThreshold+1,
+          targetY: FlickStartThreshold+1,
+          t: 200,
+          item: 'a'
+        };
+
+        const samples = [startSample, endSample];
+        // In case of unexpected errors during sample or cancel simulation.
+        await simulateSequence(samples, this.fakeClock, emulatedContactPoint, modelMatcher, {terminate: false});
+
+        assert.equal(await promiseStatus(modelMatcher.promise), PromiseStatuses.PROMISE_RESOLVED);
+        assert.deepEqual(await modelMatcher.promise, {type: 'resolve', cause: 'path'});
+      });
+
+      it("resolve (complex): verify *net* distance, not *raw*", async function() {
+        const emulatedContactPoint = new GestureSource<string>(1, null, true);
+        const modelMatcher = new gestures.matchers.PathMatcher(FlickStartContactModel, emulatedContactPoint);
+
+        const startSample = {
+          targetX: 1,
+          targetY: 1,
+          t: 100,
+          item: 'a'
+        };
+
+        const baseSamples = [
+          startSample,
+          {...startSample, targetX: 2, t: 110},
+          {...startSample, targetX: 2, targetY: 2, t: 120},
+          {...startSample, targetY: 2, t: 130}
+        ];
+
+        // NOTE:  total distance traveled should exceed FlickStartThreshold.
+        // Each `baseSamples` bit added gives a 'raw distance' of 4 aside from the first (3).
+        const samples = baseSamples.concat(baseSamples.map((entry) => {
+          return {...entry, t: entry.t+40};
+        })).concat(baseSamples.map((entry) => {
+          return {...entry, t: entry.t+80};
+        }));
+
+        // In case of unexpected errors during sample or cancel simulation.
+        await simulateSequence(samples, this.fakeClock, emulatedContactPoint, modelMatcher, {terminate: false});
+
+        // See NOTE above.  This test is intended to test a specific configuration condition and will
+        // not do so if the .isAbove assertion below does not hold.
+        assert.isAbove(emulatedContactPoint.path.stats.rawDistance, FlickStartThreshold, "Test precondition invalidated!");
+        assert.equal(await promiseStatus(modelMatcher.promise), PromiseStatuses.PROMISE_PENDING);
+
+        // Now to properly complete the flick-start path.
+        await simulateSequence([
+          {
+            targetX: FlickStartThreshold,
+            targetY: FlickStartThreshold,
+            item: 'a',
+            t: samples[samples.length-1].t + 10
+          }
+        ], this.fakeClock, emulatedContactPoint, modelMatcher, {terminate: false});
+
+        assert.equal(await promiseStatus(modelMatcher.promise), PromiseStatuses.PROMISE_RESOLVED);
+        assert.deepEqual(await modelMatcher.promise, {type: 'resolve', cause: 'path'});
+      });
+    });
+
+    describe("Second stage", async function() {
+      let commonBase;
+
+      before(async function() {
+        const emulatedContactPoint = new GestureSource<string>(1, null, true);
+        const modelMatcher = new gestures.matchers.PathMatcher(FlickStartContactModel, emulatedContactPoint);
+
+        const startSample = {
+          targetX: 1,
+          targetY: 1,
+          t: 100,
+          item: 'a'
+        };
+
+        const endSample = {
+          targetX: FlickStartThreshold+1,
+          targetY: FlickStartThreshold+1,
+          t: 200,
+          item: 'a'
+        };
+
+        const samples = [startSample, endSample];
+        // In case of unexpected errors during sample or cancel simulation.
+        await simulateSequence(samples, this.fakeClock, emulatedContactPoint, modelMatcher, {terminate: false});
+
+        commonBase = {
+          samples: samples,
+          stats: emulatedContactPoint.path.stats
+        };
+      });
+
+      it("resolve (simple)", async function() {
+        const emulatedContactPoint = new GestureSource<string>(1, null, true);
+        commonBase.samples.forEach((entry) => emulatedContactPoint.path.extend(entry));
+
+        const modelMatcher = new gestures.matchers.PathMatcher(FlickEndContactModel, emulatedContactPoint, commonBase.stats);
+
+        const endSample = {
+          targetX: FlickEndThreshold+1,
+          targetY: FlickEndThreshold+1,
+          t: 400,
+          item: 'a+'
+        };
+
+        const samples = [endSample];
+
+        // terminate: true - we don't autotrigger on reaching the threshold.  (Can go to 'false' if we
+        // enable auto-termination upon reaching the threshold.)
+        await simulateSequence(samples, this.fakeClock, emulatedContactPoint, modelMatcher, {terminate: true});
+
+        assert.equal(await promiseStatus(modelMatcher.promise), PromiseStatuses.PROMISE_RESOLVED);
+        assert.deepEqual(await modelMatcher.promise, {type: 'resolve', cause: 'path'});
+      });
+
+      it("resolve (mild divergence)", async function() {
+        const emulatedContactPoint = new GestureSource<string>(1, null, true);
+        commonBase.samples.forEach((entry) => emulatedContactPoint.path.extend(entry));
+
+        const modelMatcher = new gestures.matchers.PathMatcher(FlickEndContactModel, emulatedContactPoint, commonBase.stats);
+
+        const endSample = {
+          targetX: FlickEndThreshold+1,
+          targetY: 1,
+          t: 400,
+          item: 'a+'
+        };
+
+        const samples = [endSample];
+
+        // terminate: true - we don't autotrigger on reaching the threshold.  (Can go to 'false' if we
+        // enable auto-termination upon reaching the threshold.)
+        await simulateSequence(samples, this.fakeClock, emulatedContactPoint, modelMatcher, {terminate: true});
+
+        assert.equal(await promiseStatus(modelMatcher.promise), PromiseStatuses.PROMISE_RESOLVED);
+        assert.deepEqual(await modelMatcher.promise, {type: 'resolve', cause: 'path'});
+      });
+
+      it("reject (divergent direction)", async function() {
+        const emulatedContactPoint = new GestureSource<string>(1, null, true);
+        commonBase.samples.forEach((entry) => emulatedContactPoint.path.extend(entry));
+
+        const modelMatcher = new gestures.matchers.PathMatcher(FlickEndContactModel, emulatedContactPoint, commonBase.stats);
+
+        const endSample = {
+          targetX: 1 - FlickEndThreshold,
+          targetY: 1,
+          t: 400,
+          item: 'a+'
+        };
+
+        const samples = [endSample];
+
+        // terminate: true - we don't autotrigger on reaching the threshold.  (Can go to 'false' if we
+        // enable auto-termination upon reaching the threshold.)
+        await simulateSequence(samples, this.fakeClock, emulatedContactPoint, modelMatcher, {terminate: false});
+
+        assert.equal(await promiseStatus(modelMatcher.promise), PromiseStatuses.PROMISE_RESOLVED);
+        assert.deepEqual(await modelMatcher.promise, {type: 'reject', cause: 'path'});
+      });
     });
   });
 

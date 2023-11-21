@@ -10,6 +10,10 @@ type GestureModel<Type> = gestures.specs.GestureModel<Type>;
 interface SimSpecSequence<Type> {
   type: 'sequence',
   samples: InputSample<Type>[],
+  /**
+   * The number of samples to 'preplay' before simulation, as if they'd already occurred.
+   */
+  preplayCount?: number,
   terminate: boolean
 }
 
@@ -126,11 +130,19 @@ function prepareSourceForRawSequence<Type>(
   isFirstSample: boolean
 ): ReturnType<typeof prepareSimContact<Type>> {
   const simpleSource = new GestureSource<Type>(simSourceIdSeed++, null, true);
+  const preplayCount = contactSpec.preplayCount ?? 0;
+  if(contactSpec.samples.length < preplayCount) {
+    throw new Error("Not enough samples specified to preplay any");
+  }
+
+  for(let i=0; i < preplayCount; i++) {
+    simpleSource.path.extend(contactSpec.samples[i]);
+  }
 
   const promise = timedPromise(startTime).then(() => {
     if(!isFirstSample) {
       // Acceptance of new contact points requires an existing sample.
-      simpleSource.update(contactSpec.samples[0]);
+      simpleSource.update(contactSpec.samples[preplayCount]);
     }
 
     return simpleSource;
@@ -257,7 +269,7 @@ function simulateMultiSourceInput<OutputType, Type>(
     const sequenceSpec = sequences[i] as SimSpecSequence<Type>;
     const simpleSource = contacts[i];
 
-    const sequence = sequenceSpec.samples;
+    const sequence = [].concat(sequenceSpec.samples).splice(sequenceSpec.preplayCount);
     const sequencePromises = sequence.map((sample) => {
       return timedPromise(sample.t).then(async () => {
         const testObj = await testObjPromise;

@@ -439,7 +439,7 @@ export class MatcherSelector<Type, StateToken = any> extends EventEmitter<EventM
 
   public dropSourcesWithIds(idsToClean: string[]) {
     for(const id of idsToClean) {
-      const index = this._sourceSelector.findIndex((entry) => entry.source.identifier);
+      const index = this._sourceSelector.findIndex((entry) => entry.source.identifier == id);
       if(index > -1) {
         // Ensure that any pending MatcherSelector and/or GestureSequence promises dependent
         // on the source fully resolve (with cancellation).

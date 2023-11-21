@@ -4,6 +4,44 @@ import specTypeDefs = gestures.specs;
 
 type GestureModel = specTypeDefs.GestureModel<string>;
 
+export const FlickStartModel: GestureModel = {
+  id: 'flick-start',
+  resolutionPriority: 1,
+  contacts: [
+    {
+      model: {
+        ...specs.FlickStartContactModel,
+        itemPriority: 3,
+      },
+      endOnResolve: false
+    }
+  ],
+  resolutionAction: {
+    type: 'chain',
+    next: 'flick-end',
+    item: 'none'
+  }
+}
+
+export const FlickEndModel: GestureModel = {
+  id: 'flick-end',
+  resolutionPriority: 1,
+  contacts: [
+    {
+      model: {
+        ...specs.FlickEndContactModel,
+        itemPriority: 3,
+        pathInheritance: 'full'
+      },
+      endOnResolve: true
+    }
+  ],
+  resolutionAction: {
+    type: 'complete',
+    item: 'current'
+  }
+}
+
 // Is kind of a mix of the two longpress styles.
 export const LongpressModel: GestureModel = {
   id: 'longpress',

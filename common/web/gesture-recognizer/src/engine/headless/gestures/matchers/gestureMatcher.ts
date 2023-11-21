@@ -5,6 +5,8 @@ import { GestureModel, GestureResolution, GestureResolutionSpec, RejectionDefaul
 import { ManagedPromise, TimeoutPromise } from "@keymanapp/web-utils";
 import { FulfillmentCause, PathMatcher } from "./pathMatcher.js";
 import { ItemIdentifier } from "../../../configuration/gestureRecognizerConfiguration.js";
+import { GesturePath } from "../../gesturePath.js";
+import { CumulativePathStats } from "../../cumulativePathStats.js";
 
 /**
  * This interface specifies the minimal data necessary for setting up gesture-selection
@@ -146,14 +148,14 @@ export class GestureMatcher<Type, StateToken = any> implements PredecessorMatch<
           return;
         case 'full':
           contact = srcContact.constructSubview(false, true);
-          this.addContactInternal(contact);
+          this.addContactInternal(contact, srcContact.path.stats);
           continue;
         case 'partial':
           preserveBaseItem = true;
           // Intentional fall-through
         case 'chop':
           contact = srcContact.constructSubview(true, preserveBaseItem);
-          this.addContactInternal(contact);
+          this.addContactInternal(contact, srcContact.path.stats);
           break;
       }
     }
@@ -265,9 +267,7 @@ export class GestureMatcher<Type, StateToken = any> implements PredecessorMatch<
       if(matched && contactSpec.endOnResolve) {
         matcher.source.terminate(false);
       } else if(!matched && contactSpec.endOnReject) {
-        // Ending due to gesture-rejection effectively means to cancel the path,
-        // so signal exactly that.
-        matcher.source.terminate(true);
+        matcher.source.terminate(false);
       }
     }
   }
@@ -345,19 +345,19 @@ export class GestureMatcher<Type, StateToken = any> implements PredecessorMatch<
       throw new Error(`The specified gesture model does not support more than ${existingContacts} contact points.`);
     }
 
-    this.addContactInternal(simpleSource.constructSubview(false, true));
+    this.addContactInternal(simpleSource.constructSubview(false, true), null);
   }
 
   public get result() {
     return this._result;
   }
 
-  private addContactInternal(simpleSource: GestureSourceSubview<Type>) {
+  private addContactInternal(simpleSource: GestureSourceSubview<Type>, basePathStats: CumulativePathStats<Type>) {
     // The number of already-active contacts tracked for this gesture
     const existingContacts = this.pathMatchers.length;
 
     const contactSpec = this.model.contacts[existingContacts];
-    const contactModel = new PathMatcher(contactSpec.model, simpleSource);
+    const contactModel = new PathMatcher(contactSpec.model, simpleSource, new CumulativePathStats(basePathStats));
     // Add it early, as we need it to be accessible for reference via .primaryPath stuff below.
     this.pathMatchers.push(contactModel);
 
@@ -421,6 +421,9 @@ export class GestureMatcher<Type, StateToken = any> implements PredecessorMatch<
         this.finalize(false, 'path');
       }
     }
+
+    contactModel.update();
+    // Now that we've done the initial-state check, we can check for instantly-matching path models.
 
     contactModel.promise.then((resolution) => {
       this.finalize(resolution.type == 'resolve', resolution.cause);
