@@ -1,6 +1,6 @@
 import EventEmitter from "eventemitter3";
 import { InputEngineBase } from "./inputEngineBase.js";
-import { buildGestureMatchInspector, GestureSource } from "./gestureSource.js";
+import { GestureSource } from "./gestureSource.js";
 import { MatcherSelection, MatcherSelector } from "./gestures/matchers/matcherSelector.js";
 import { GestureSequence } from "./gestures/matchers/gestureSequence.js";
 import { GestureModelDefs, getGestureModel, getGestureModelSet } from "./gestures/specs/gestureModelDefs.js";
@@ -147,6 +147,17 @@ export class TouchpointCoordinator<HoveredItemType, StateToken=any> extends Even
     return this.selectorStack[this.selectorStack.length-1];
   }
 
+  private buildGestureMatchInspector(selector: MatcherSelector<HoveredItemType, StateToken>) {
+    return (source: GestureSource<HoveredItemType, StateToken>) => {
+      // Get the selectors at the time of the call, not at the time of the functor's construction.
+      const selectorIndex = this.selectorStack.indexOf(selector);
+      const selectors = this.selectorStack.slice(selectorIndex);
+
+      return selectors.map((selector) => selector.potentialMatchersForSource(source).map((matcher) => matcher.model.id))
+                      .reduce((flattened, entry) => flattened.concat(entry));
+    };
+  }
+
   protected addEngine(engine: InputEngineBase<HoveredItemType, StateToken>) {
     engine.on('pointstart', this.onNewTrackedPath);
     this.inputEngines.push(engine);
@@ -196,7 +207,7 @@ export class TouchpointCoordinator<HoveredItemType, StateToken=any> extends Even
 
     const selector = this.currentSelector;
 
-    touchpoint.setGestureMatchInspector(buildGestureMatchInspector(selector));
+    touchpoint.setGestureMatchInspector(this.buildGestureMatchInspector(selector));
     this.emit('inputstart', touchpoint);
 
     const selection = await selectionPromise;

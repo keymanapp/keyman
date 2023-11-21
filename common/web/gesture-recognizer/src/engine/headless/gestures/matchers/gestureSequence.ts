@@ -154,7 +154,7 @@ export class GestureSequence<Type, StateToken = any> extends EventEmitter<EventM
     return this.selector?.baseGestureSetId ?? null;
   }
 
-    /**
+  /**
    * Returns an array of IDs for gesture models that are still valid for the `GestureSource`'s
    * current state.  They will be specified in descending `resolutionPriority` order.
    */
@@ -165,6 +165,11 @@ export class GestureSequence<Type, StateToken = any> extends EventEmitter<EventM
         return [];
       }
 
+      const selectors = [ this.selector ];
+      if(this.pushedSelector) {
+        selectors.push(this.pushedSelector);
+      }
+
       // The new round of model-matching is based on the sources used by the previous round.
       // This is important; 'sustainTimer' gesture models may rely on a now-terminated source
       // from that previous round (like with multitaps).
@@ -172,9 +177,11 @@ export class GestureSequence<Type, StateToken = any> extends EventEmitter<EventM
       const trackedSources = lastStageReport.sources;
 
       const potentialMatches = trackedSources.map((source) => {
-        return this.selector.potentialMatchersForSource(source)
+        return selectors.map((selector) => selector.potentialMatchersForSource(source)
           .map((matcher) => matcher.model.id)
-      }).reduce((deduplicated, arr) => {
+        )
+      }).reduce((flattened, arr) => flattened.concat(arr))
+      .reduce((deduplicated, arr) => {
         for(let entry of arr) {
           if(deduplicated.indexOf(entry) == -1) {
             deduplicated.push(entry);
@@ -214,7 +221,7 @@ export class GestureSequence<Type, StateToken = any> extends EventEmitter<EventM
       }
     }
 
-    if(actionType == 'complete' && selection.result.action.awaitNested && this.touchpointCoordinator && this.pushedSelector) {
+    if(actionType == 'complete' && this.touchpointCoordinator && this.pushedSelector) {
       // Cascade-terminade all nested selectors, but don't remove / pop them yet.
       // Their selection mode remains valid while their gestures are sustained.
       const sustainedSources = this.touchpointCoordinator?.sustainSelectorSubstack(this.pushedSelector);
@@ -226,7 +233,7 @@ export class GestureSequence<Type, StateToken = any> extends EventEmitter<EventM
         return promise.corePromise;
       });
 
-      if(sustainCompletionPromises.length > 0) {
+      if(sustainCompletionPromises.length > 0 && selection.result.action.awaitNested) {
         await Promise.all(sustainCompletionPromises);
         // Ensure all nested gestures finish resolving first before continuing by
         // waiting against the macroqueue.
