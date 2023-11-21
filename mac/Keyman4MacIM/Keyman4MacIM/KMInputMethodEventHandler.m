@@ -291,8 +291,8 @@ NSRange _previousSelRange;
 
   output = [self processEventWithKeymanEngine:event in:sender];
   if (output == nil) {
-    [self checkEventForSentryEasterEgg:event];
-    return NO;
+      [self checkEventForSentryEasterEgg:event];
+      return NO;
   }
   
   return [self applyKeymanCoreActions:output event:event client:sender];
@@ -309,7 +309,7 @@ NSRange _previousSelRange;
       // Depending on the client app and the keyboard, using the passed-in event as it is should work okay.
       // Keyboards that depend on chirality support will not work. And command-key actions that change the
       // context might go undetected in some apps, resulting in errant behavior for subsequent typing.
-    coreKeyOutput = [self.kme processEvent:event];
+      coreKeyOutput = [self.kme processEvent:event];
   }
   [self.appDelegate logDebugMessage:@"processEventWithKeymanEngine, coreKeyOutput = %@", coreKeyOutput];
   return coreKeyOutput;
@@ -737,8 +737,8 @@ NSRange _previousSelRange;
 
     // if we are told to emit the keystroke, then be sure to say that we have not handled the event
     if ((handledEvent) && (output.emitKeystroke)) {
-      [self.appDelegate logDebugMessage:@"   *** InputMethodEventHandler applyKeymanCoreActions: emit keystroke is forcing event as not handled"];
-      handledEvent = NO;
+        [self.appDelegate logDebugMessage:@"   *** InputMethodEventHandler applyKeymanCoreActions: emit keystroke is forcing event as not handled"];
+        handledEvent = NO;
     }
     
     return handledEvent;
@@ -763,7 +763,7 @@ NSRange _previousSelRange;
   } else if (output.isDeleteAndInsertScenario) {
     if (self.apiCompliance.mustBackspaceUsingEvents) {
       [self.appDelegate logDebugMessage:@"KXMInputMethodHandler applyOutputToTextInputClient, delete and insert scenario with events"];
-     [self sendEvents:event forOutput:output];
+      [self sendEvents:event forOutput:output];
     } else {
       [self.appDelegate logDebugMessage:@"KXMInputMethodHandler applyOutputToTextInputClient, delete and insert scenario with insert API"];
       // directly insert text and handle backspaces by using replace
@@ -775,7 +775,6 @@ NSRange _previousSelRange;
 }
 
 -(void)applyNonTextualOutput:(CoreKeyOutput*)output {
-  
   if(output.optionsToPersist.count>0) {
     for(NSString *key in output.optionsToPersist) {
       NSString *value = [output.optionsToPersist objectForKey:key];
@@ -810,12 +809,12 @@ NSRange _previousSelRange;
   [self insertAndReplaceText:output.textToInsert deleteCount:output.codePointsToDeleteBeforeInsert client:client];
 }
 
-
 /**
  * If we need to do something in response to a single action, then do it here.
  * Most of the interesting work is done in executeCompositeOperation, and
  * much of the other work is done when updating the context.
  */
+/*
 -(void)executeSimpleOperation:(KMActionOperation*)operation keyDownEvent:(nonnull NSEvent *)event {
   CoreAction *action = operation.action;
   if (action != nil) {
@@ -846,7 +845,6 @@ NSRange _previousSelRange;
   }
 }
 
-/*
 -(void)executeCompositeOperation:(KMActionOperation*)operation keyDownEvent:(nonnull NSEvent *)event client:(id) client {
   [self.appDelegate logDebugMessage:@"KXMInputMethodHandler executeCompositeOperation, composite operation: %@", operation];
   
@@ -868,10 +866,6 @@ NSRange _previousSelRange;
   }
 }
 */
-
--(void)insertAndReplaceTextForOperation:(KMActionOperation*)operation client:(id) client {
-  [self insertAndReplaceText:operation.textToInsert deleteCount:operation.backspaceCount client:client];
-}
 
 /**
  * This directly inserts text and applies backspaces for the operation by replacing existing text with the new text.
@@ -912,7 +906,6 @@ NSRange _previousSelRange;
     [self.apiCompliance testComplianceAfterInsert:client];
   }
 }
-
 
 -(void)sendEvents:(NSEvent *)event forOutput:(CoreKeyOutput*)output {
   if (output.hasCodePointsToDelete) {
