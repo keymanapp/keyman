@@ -6,6 +6,7 @@ import { GestureSequence } from "./gestures/matchers/gestureSequence.js";
 import { GestureModelDefs, getGestureModel, getGestureModelSet } from "./gestures/specs/gestureModelDefs.js";
 import { GestureModel } from "./gestures/specs/gestureModel.js";
 import { timedPromise } from "@keymanapp/web-utils";
+import { InputSample } from "./inputSample.js";
 
 interface EventMap<HoveredItemType, StateToken> {
   /**
@@ -182,6 +183,12 @@ export class TouchpointCoordinator<HoveredItemType, StateToken=any> extends Even
       const modelingSpinupResults = await modelingSpinupPromise;
 
       if(modelingSpinupResults.sustainModeWithoutMatch) {
+
+        const correctSample = (sample: InputSample<HoveredItemType, StateToken>) => {
+          sample.stateToken = this.stateToken;
+          sample.item = touchpoint.currentRecognizerConfig.itemIdentifier(sample, null);
+        };
+
         /* May need to do a state-token change check & update the item; an `awaitNested` 'complete' action
          * may have been pending in the meantime that could have triggered a change.
          *
@@ -191,10 +198,15 @@ export class TouchpointCoordinator<HoveredItemType, StateToken=any> extends Even
          *
          * Current actual use-case:  deferred modipress due to ongoing flick, auto-completed by new incoming touch.
          */
-        touchpoint.path.coords.forEach((coord) => {
-          coord.stateToken = this.stateToken;
-          coord.item = touchpoint.currentRecognizerConfig.itemIdentifier(coord, null);
-        });
+        touchpoint.path.coords.forEach(correctSample);
+
+        // Don't forget to also correct the `stateToken` and `baseItem`!
+        touchpoint.stateToken = this.stateToken;
+        touchpoint.baseItem = touchpoint.path.coords[0].item;
+
+        // Also, in case a contact model's path-eval references data via stats...
+        correctSample(touchpoint.path.stats.initialSample);
+        correctSample(touchpoint.path.stats.lastSample);
         continue;
       } else {
         selectionPromise = modelingSpinupResults.selectionPromise;
