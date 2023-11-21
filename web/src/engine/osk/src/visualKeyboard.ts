@@ -394,7 +394,7 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
       return !flickSpec || !(flickSpec.n || flickSpec.nw || flickSpec.ne);
     };
 
-    const recognizer = new GestureRecognizer(gestureSetForLayout(this.layerGroup, this.gestureParams), config);
+    const recognizer = new GestureRecognizer(gestureSetForLayout(this.kbdLayout, this.gestureParams), config);
     recognizer.stateToken = this.layerId;
 
     const sourceTrackingMap: Record<string, {

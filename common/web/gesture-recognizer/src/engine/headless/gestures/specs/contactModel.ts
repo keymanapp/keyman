@@ -6,6 +6,12 @@ type SimpleStringResult = 'resolve' | 'reject';
 
 export type PointModelResolution = SimpleStringResult;
 
+/**
+ * Represents the full criteria necessary to match one active contact point
+ * against its owning `GestureModel`.  Path-matching aspects are delegated
+ * to `.pathModel`, but other aspects of matching are checked against the
+ * other fields of this type.
+ */
 export interface ContactModel<Type, StateToken = any> {
   pathModel: PathModel<Type>,
   pathResolutionAction: PointModelResolution,
@@ -49,6 +55,8 @@ export interface ContactModel<Type, StateToken = any> {
    *
    * Note that for gestures reachable by _optional_ chaining, only the first two modes
    * are properly supported.  Exclusive chaining may safely use all four.
+   *
+   * If not specified, 'chop' inheritance will be used as the default.
    */
   pathInheritance?: 'reject' | 'chop' | 'partial' | 'full';
 
