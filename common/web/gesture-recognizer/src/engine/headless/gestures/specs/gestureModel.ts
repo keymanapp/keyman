@@ -112,6 +112,9 @@ export interface GestureModel<Type, StateToken = any> {
      * Indicates that the corresponding GestureSource should not be considered part of the
      * Gesture sequence being matched, acting more as a separate gesture that 'triggers' a state
      * change in the current gesture being processed.
+     *
+     * Only takes effect if a model instantly resolves or rejects upon being considered for
+     * inclusion in the model.
      */
     resetOnResolve?: boolean,
     /**
