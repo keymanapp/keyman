@@ -41,7 +41,6 @@
           <ul>
             <li><a><xsl:attribute name="href">keyman:link?url=<xsl:value-of select="/Keyman/keyman-com"/>/</xsl:attribute>keyman.com</a></li>
             <li><a href="keyman:support_diagnostics"><xsl:value-of select="$locale/string[@name='S_Menu_Diagnostics_Diagnostics']"/></a></li>
-            <li><a href="keyman:support_updatecheck"><xsl:value-of select="$locale/string[@name='S_Button_CheckForUpdates']"/></a></li>
             <li><a>
               <xsl:attribute name="href">keyman:link?url=<xsl:value-of select="/Keyman/keyman-com" />/go/<xsl:value-of select="/Keyman/version-info/@versionRelease" />/support</xsl:attribute
               ><xsl:value-of select="$locale/string[@name='S_Button_OnlineSupport']"/></a></li>
