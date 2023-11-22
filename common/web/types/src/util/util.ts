@@ -104,20 +104,21 @@ toOneChar(value: string) : number {
 
 export function describeCodepoint(ch : number) : string {
   let s;
-  if (isPUA(ch)) {
-    s = "PUA";
-  } else if (isValidUnicode(ch)) {
-    s = String.fromCodePoint(ch);
+  const p = getProblem(ch);
+  if (p != null) {
+    // for example: 'PUA (U+E010)'
+    s = p;
   } else {
-    s = "INVALID";
+    // for example: '"a" (U+61)'
+    s = `"${String.fromCodePoint(ch)}"`;
   }
-  return `"${s}" (U+${Number(ch).toString(16)})`;
+  return `${s} (U+${Number(ch).toString(16).toUpperCase()})`;
 }
 
 export enum BadStringType {
-  pua = 'pua',
-  unassigned = 'unassigned',
-  illegal = 'illegal',
+  pua = 'PUA',
+  unassigned = 'Unassigned',
+  illegal = 'Illegal',
 };
 
 // Following from kmx_xstring.h / .cpp
