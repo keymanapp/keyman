@@ -741,18 +741,8 @@ NSRange _previousSelRange;
     [self.appDelegate logDebugMessage:@"KXMInputMethodHandler applyOutputToTextInputClient, insert only scenario"];
     [self insertAndReplaceTextForOutput:output client:client];
   } else if (output.isDeleteOnlyScenario) {
-    /*
-    // TODO: is pass through scenario handled by emit? if so delete this conditional
-    // if we have a single delete because the backspace key was pressed,
-    // let it pass through by returning NO in the handleEvent call
-    if ((event.keyCode == kVK_Delete) && (output.codePointsToDeleteBeforeInsert == 1)) {
-      [self.appDelegate logDebugMessage:@"KXMInputMethodHandler applyOutputToTextInputClient, delete only *pass through* scenario"];
-      handledEvent = NO;
-    } else {
-     */
       [self.appDelegate logDebugMessage:@"KXMInputMethodHandler applyOutputToTextInputClient, delete only scenario"];
       [self sendEvents:event forOutput:output];
-    //}
   } else if (output.isDeleteAndInsertScenario) {
     if (self.apiCompliance.mustBackspaceUsingEvents) {
       [self.appDelegate logDebugMessage:@"KXMInputMethodHandler applyOutputToTextInputClient, delete and insert scenario with events"];
@@ -807,7 +797,7 @@ NSRange _previousSelRange;
 }
 
 -(void)insertAndReplaceTextForOutput:(CoreKeyOutput*)output client:(id) client {
-  [self insertAndReplaceText:output.textToInsert deleteCount:output.codePointsToDeleteBeforeInsert client:client];
+  [self insertAndReplaceText:output.textToInsert deleteCount:(int)output.codePointsToDeleteBeforeInsert client:client];
 }
 
 /**
