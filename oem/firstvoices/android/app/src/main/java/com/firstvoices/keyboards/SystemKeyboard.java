@@ -20,6 +20,7 @@ import android.view.inputmethod.ExtractedTextRequest;
 import android.view.inputmethod.InputConnection;
 import android.widget.FrameLayout;
 
+import com.firstvoices.android.BannerController;
 import com.keyman.engine.KMManager;
 import com.keyman.engine.KMManager.KeyboardType;
 import com.keyman.engine.KMHardwareKeyboardInterpreter;
@@ -33,7 +34,6 @@ import io.sentry.android.core.SentryAndroid;
 import io.sentry.Sentry;
 
 public class SystemKeyboard extends InputMethodService implements OnKeyboardEventListener {
-
     private View inputView = null;
     private static ExtractedText exText = null;
     private KMHardwareKeyboardInterpreter interpreter = null;
@@ -64,6 +64,9 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
 
         interpreter = new KMHardwareKeyboardInterpreter(getApplicationContext(), KeyboardType.KEYBOARD_TYPE_SYSTEM);
         KMManager.setInputMethodService(this); // for HW interface
+
+        // Set the system keyboard HTML banner
+        BannerController.setHTMLBanner(this, KeyboardType.KEYBOARD_TYPE_SYSTEM);
     }
 
     @Override
@@ -79,7 +82,10 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
      * is called after creation and any configuration change. */
     @Override
     public void onInitializeInterface() {
-        super.onInitializeInterface();
+      super.onInitializeInterface();
+
+      // KeymanWeb reloaded, so we have to pass the banner again
+      BannerController.setHTMLBanner(this, KeyboardType.KEYBOARD_TYPE_SYSTEM);
     }
 
     /** Called by the framework when your view for creating input needs to

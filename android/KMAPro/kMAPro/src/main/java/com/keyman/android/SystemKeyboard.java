@@ -6,6 +6,7 @@ package com.keyman.android;
 
 import com.tavultesoft.kmapro.BuildConfig;
 import com.tavultesoft.kmapro.KeymanSettingsActivity;
+import com.keyman.android.BannerController;
 import com.keyman.engine.KMManager;
 import com.keyman.engine.KMManager.KeyboardType;
 import com.keyman.engine.KMHardwareKeyboardInterpreter;
@@ -71,6 +72,9 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
     KMManager.SpacebarText spacebarText = KMManager.SpacebarText.fromString(prefs.getString(KeymanSettingsActivity.spacebarTextKey, KMManager.SpacebarText.LANGUAGE_KEYBOARD.toString()));
     KMManager.setSpacebarText(spacebarText);
 
+    // Set the system keyboard HTML banner
+    BannerController.setHTMLBanner(this, KeyboardType.KEYBOARD_TYPE_SYSTEM);
+
     boolean mayHaveHapticFeedback = prefs.getBoolean(KeymanSettingsActivity.hapticFeedbackKey, false);
     KMManager.setHapticFeedback(mayHaveHapticFeedback);
 
@@ -93,6 +97,9 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
   @Override
   public void onInitializeInterface() {
     super.onInitializeInterface();
+
+    // KeymanWeb reloaded, so we have to pass the banner again
+    BannerController.setHTMLBanner(this, KeyboardType.KEYBOARD_TYPE_SYSTEM);
   }
 
   /**
