@@ -7,7 +7,7 @@
 //
 
 import Foundation
-import Zip
+import ZIPFoundation
 
 // KMPErrors may be passed to UIAlertControllers, so they need localization.
 public enum KMPError : String, Error {
@@ -443,24 +443,45 @@ public class KeymanPackage {
   
   @available(*, deprecated, message: "Use of the completion block is unnecessary; this method now returns synchronously.")
   static public func extract(fileUrl: URL, destination: URL, complete: @escaping (KeymanPackage?) -> Void) throws {
-    try unzipFile(fileUrl: fileUrl, destination: destination) {
-      do {
-        let package = try KeymanPackage.parse(destination)
-        complete(package)
-      } catch {
-        SentryManager.captureAndLog(error, sentryLevel: .info)
-        complete(nil)
+    let fileManager = FileManager()
+    do {
+      try fileManager.unzipItem(at: fileUrl, to: destination)
+      let package = try KeymanPackage.parse(destination)
+      complete(package)
+    } catch {
+      SentryManager.captureAndLog(error, sentryLevel: .info)
+      complete(nil)
+    }
+  }
+  
+  static public func clearDirectory(destination: URL) throws {
+    // First check to see if directory exists. If not, then do nothing.
+    var isDirectory: ObjCBool = false
+    if(FileManager.default.fileExists(atPath: destination.path, isDirectory: &isDirectory)){
+      if (isDirectory.boolValue) {
+        // it exists and is actually a directory, so remove every file it contains
+        log.info("   ***clearDirectory, destination exists:, \(destination)")
+        let fileArray = try FileManager.default.contentsOfDirectory(atPath: destination.path)
+        log.info("   ***clearDirectory, files to remove:, \(fileArray)")
+        try fileArray.forEach { file in
+          let fileUrl = destination.appendingPathComponent(file)
+          try FileManager.default.removeItem(atPath: fileUrl.path)
+        }
       }
+    } else {
+      log.info("   ***clearDirectory, destination does not exist:, \(destination)")
     }
   }
 
   static public func extract(fileUrl: URL, destination: URL) throws -> KeymanPackage? {
+    log.info("   ***extract, archiveUrl, \(fileUrl) \n   to destination\(destination)")
     try unzipFile(fileUrl: fileUrl, destination: destination)
     return try KeymanPackage.parse(destination)
   }
 
   static public func unzipFile(fileUrl: URL, destination: URL, complete: @escaping () -> Void = {}) throws {
-    try Zip.unzipFile(fileUrl, destination: destination, overwrite: true, password: nil)
+    let fileManager = FileManager()
+    try fileManager.unzipItem(at: fileUrl, to: destination)
     complete()
   }
 
