@@ -216,7 +216,7 @@ export class LanguageMenu {
     if(device.OS == 'ios') {
       if(device.formFactor == 'phone') {
         barWidth=(landscapeView() ? 36 : 0);
-        maxHeight=(window.innerHeight-barWidth-16)*util.getViewportScale();
+        maxHeight=(window.innerHeight-barWidth-16)*util.getViewportScale(device.formFactor);
       } else if(device.formFactor == 'tablet') {
         barWidth=(landscapeView() ? 16 : 0);
         maxHeight=(maxHeight-barWidth);
@@ -316,7 +316,7 @@ export class LanguageMenu {
     langs.sort();
 
     // Get current scale factor (reciprocal of viewport scale)
-    var scale=Math.round(100/util.getViewportScale())/100;
+    var scale=Math.round(100/util.getViewportScale(device.formFactor))/100;
 
     var dx,lgBar,i,kb,activeLanguageIndex=-1;
     for(k=0; k<langs.length; k++) {

@@ -314,7 +314,7 @@ export default class FloatingOSKView extends OSKView {
 
     // Correct for viewport scaling (iOS - Android 4.2 does not want this, at least on Galaxy Tab 3))
     if(this.targetDevice.OS == DeviceSpec.OperatingSystem.iOS) {
-      height=height/getViewportScale();
+      height=height/getViewportScale(this.targetDevice.formFactor);
     }
 
     return height;
