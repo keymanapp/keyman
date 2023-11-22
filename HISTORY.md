@@ -1,5 +1,13 @@
 # Keyman Version History
 
+## 16.0.143 stable 2023-11-22
+
+* chore(android): Update targetSdkVersion from 31 to 33 (#9823)
+* chore(linux): Exclude environment.sh from build (#9814)
+* chore(mac): move from altool to notarytool (#9896)
+* fix(web): fixes doc-kbd display of default layer when it's not defined first (#9892)
+* fix(ios): fv: replace Zip framework to prevent crash on startup (#9958)
+
 ## 16.0.142 stable 2023-10-20
 
 * chore(linux): Update debian changelog (#9326)
