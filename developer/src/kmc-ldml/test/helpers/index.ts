@@ -146,7 +146,7 @@ export function compileVisualKeyboard(inputFilename: string, options: LdmlCompil
   checkMessages();
   assert.isTrue(valid, 'k.validate should not have failed');
 
-  const vk = (new LdmlKeyboardVisualKeyboardCompiler()).compile(source);
+  const vk = (new LdmlKeyboardVisualKeyboardCompiler(compilerTestCallbacks)).compile(source);
   checkMessages();
   assert.isNotNull(vk, 'LdmlKeyboardVisualKeyboardCompiler.compile should not have returned null');
 
