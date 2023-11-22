@@ -6,7 +6,6 @@ import { GestureSource, GestureSourceSubview } from "../../gestureSource.js";
 import { GestureMatcher, MatchResult, PredecessorMatch } from "./gestureMatcher.js";
 import { GestureModel } from "../specs/gestureModel.js";
 import { GestureSequence } from "./index.js";
-import { ItemIdentifier } from "../../../configuration/gestureRecognizerConfiguration.js";
 
 interface GestureSourceTracker<Type, StateToken> {
   /**
@@ -34,8 +33,9 @@ interface EventMap<Type, StateToken> {
  *
  * This allows us to bypass that, resolving yet providing a pending Promise.
  */
-interface AsyncPromiseReturner<Type> {
-  selectionPromise: Promise<Type>;
+interface SelectionSetupResults<Type> {
+  selectionPromise: Promise<MatcherSelection<Type, any>>;
+  sustainModeWithoutMatch?: boolean;
 }
 
 /**
@@ -65,6 +65,8 @@ export class MatcherSelector<Type, StateToken = any> extends EventEmitter<EventM
    */
   private pendingMatchSetup?: Promise<void>;
 
+  private sustainMode: boolean = false;
+
   constructor(baseSetId?: string) {
     super();
     this.baseGestureSetId = baseSetId || 'default';
@@ -80,7 +82,11 @@ export class MatcherSelector<Type, StateToken = any> extends EventEmitter<EventM
     return this.potentialMatchers.filter((matcher) => matcher.allSourceIds.find((id) => id == source.identifier));
   }
 
-  public cascadeTermination() {
+  /**
+   *
+   * @returns An array of all sources that will live on in `sustainWhenNested` mode.
+   */
+  public cascadeTermination(): GestureSource<Type, any>[] {
     const potentialMatchers = this.potentialMatchers;
     const matchersToCancel = potentialMatchers.filter((matcher) => !matcher.model.sustainWhenNested);
 
@@ -132,6 +138,9 @@ export class MatcherSelector<Type, StateToken = any> extends EventEmitter<EventM
     });
 
     matchersToCancel.forEach((matcher) => matcher.cancel());
+    this.sustainMode = true;
+
+    return this._sourceSelector.map((data) => data.source);
   }
 
   /**
@@ -156,7 +165,7 @@ export class MatcherSelector<Type, StateToken = any> extends EventEmitter<EventM
   public async matchGesture(
     source: GestureSource<Type, StateToken>,
     gestureModelSet: GestureModel<Type, StateToken>[]
-  ): Promise<AsyncPromiseReturner<MatcherSelection<Type, StateToken>>>;
+  ): Promise<SelectionSetupResults<Type>>;
 
   /**
    * Facilitates matching a new stage in an ongoing gesture-stage sequence based on a previously-
@@ -180,12 +189,12 @@ export class MatcherSelector<Type, StateToken = any> extends EventEmitter<EventM
   public async matchGesture(
     priorStageMatcher: PredecessorMatch<Type, StateToken>,
     gestureModelSet: GestureModel<Type, StateToken>[]
-  ): Promise<AsyncPromiseReturner<MatcherSelection<Type, StateToken>>>;
+  ): Promise<SelectionSetupResults<Type>>;
 
   public async matchGesture(
     source: GestureSource<Type> | PredecessorMatch<Type, StateToken>,
     gestureModelSet: GestureModel<Type, StateToken>[]
-  ): Promise<AsyncPromiseReturner<MatcherSelection<Type, StateToken>>> {
+  ): Promise<SelectionSetupResults<Type>> {
     /*
      * To be clear, this _starts_ the source-tracking process.  It's an async process, though.
      *
@@ -297,6 +306,9 @@ export class MatcherSelector<Type, StateToken = any> extends EventEmitter<EventM
         const pendingMatchGesture = new ManagedPromise<void>();
         this.pendingMatchSetup = pendingMatchGesture.corePromise;
         await timedPromise(0);
+        // A second one, in case of a deferred modipress completion (via awaitNested)
+        // (which itself needs a macroqueue wait)
+        await timedPromise(0);
         this.pendingMatchSetup = null;
         pendingMatchGesture.resolve();
 
@@ -341,16 +353,27 @@ export class MatcherSelector<Type, StateToken = any> extends EventEmitter<EventM
           });
 
           return {
-            selectionPromise: Promise.resolve({
-              result: {
-                action: null,
-                matched: false
-              },
-              matcher: null
-            })
+            selectionPromise: matchPromise.corePromise
           };
         }
       }
+    }
+
+    // If in a sustain mode, no models for new sources may launch;
+    // only existing sequences are allowed to continue.
+    if(this.sustainMode && unmatchedSource) {
+      matchPromise.resolve({
+        matcher: null,
+        result: {
+          matched: false,
+          action: {
+            type: 'complete',
+            item: null
+          }
+        }
+      });
+
+      return { selectionPromise: matchPromise.corePromise, sustainModeWithoutMatch: true };
     }
 
     /**
@@ -510,37 +533,15 @@ export class MatcherSelector<Type, StateToken = any> extends EventEmitter<EventM
        * other matchers.
        */
       if(result.action.type == 'none') {
-        // Check - are there any remaining matchers compatible with the rejected matcher's sources?
-        const remainingMatcherStats = sourceMetadata.map((tracker) => {
-          return {
-            tracker: tracker,
-            // We need to inspect each matcher's `contacts` entries for references to the source.
-            pendingCount: this.potentialMatchers.filter((matcher) => {
-              return !!matcher.allSourceIds.find((id) => tracker.source.identifier == id);
-            }).length // and tally up a count at the end.
-          };
-        });
+        this.finalizeMatcherlessTrackers(sourceMetadata);
 
-        // If we just rejected the last possible matcher for a tracked gesture-source...
-        // then, for each such affected source...
-        for(const stat of remainingMatcherStats) {
-          if(stat.pendingCount == 0) {
-            // ... report the failure and signal to close-out that source / stop tracking it.
-            stat.tracker.matchPromise.resolve({
-              matcher: null,
-              result: {
-                matched: false,
-                action: {
-                  type: 'complete',
-                  item: null
-                }
-              }
-            });
-          }
-        }
-
-        // Again, we allow any other matchers against the represented sources to REMAIN AS THEY ARE.
-        // This is a "didn't resolve" case - we only matched against a "path reset" case.
+        /* We allow any other matchers against the represented sources to REMAIN AS THEY ARE.
+         * Special handling is only needed once none are left, which is what the
+         * `finalizeMatcherlessTrackers` call represents.
+         *
+         * This isn't generally a "no matches available case; it's a "_this_ model didn't match"
+         * case that only _sometimes_ happens to be the final "match not available" case.
+         */
         return;
       }
 
@@ -548,6 +549,11 @@ export class MatcherSelector<Type, StateToken = any> extends EventEmitter<EventM
         // There is an action to be resolved...
         // But we didn't actually MATCH a gesture.
         const replacer = (replacementModel: GestureModel<Type, StateToken>) => {
+         if(this.sustainMode && !replacementModel.sustainWhenNested) {
+            this.finalizeMatcherlessTrackers(sourceMetadata);
+            return;
+          }
+
           const replacementMatcher = new GestureMatcher(replacementModel, matcher);
 
           /* IMPORTANT: verify that the replacement model is initially valid.
@@ -562,6 +568,9 @@ export class MatcherSelector<Type, StateToken = any> extends EventEmitter<EventM
            * GestureSequence containing a finished GestureSource once said state is reached.
            */
           if(replacementMatcher.result && replacementMatcher.result.matched == false) {
+            // If this occurs, and it was the last possible tracker, we need to resolve its
+            // `matchGesture` promise.
+            this.finalizeMatcherlessTrackers(sourceMetadata);
             return;
           }
 
@@ -595,6 +604,8 @@ export class MatcherSelector<Type, StateToken = any> extends EventEmitter<EventM
           * could trigger a simple-tap.
           */
           losingMatchers.forEach((matcher) => {
+            // Triggers resolution of remaining matchers for the model-match, but that's
+            // asynchronous.
             matcher.cancel();
           });
 
@@ -608,7 +619,53 @@ export class MatcherSelector<Type, StateToken = any> extends EventEmitter<EventM
            */
           tracker.matchPromise.resolve({matcher, result});
         }
+
+        // No use of `finalizeMatcherlessTrackers` here; this is the path where we DO get
+        // and signal (that last resolve above) a successful gesture-model match.
       }
     };
+  }
+
+  /**
+   * This internal method provides common-case finalization for cases in which
+   * all available gesture models for at least one source have resolved with none
+   * matching it.  This includes triggering resolution of `Promise`s returned by the
+   * `matchGesture` call(s) corresponding to the now-unmatchable source(s).
+   *
+   * In short, this method should be called at any point where the Selector
+   * may go from having one or more potential active matchers to zero for at
+   * least one GestureSource.
+   * @param trackers
+   * @returns
+   */
+  private finalizeMatcherlessTrackers(trackers: GestureSourceTracker<Type, StateToken>[]) {
+    // Check - are there any remaining matchers compatible with the rejected matcher's sources?
+    const remainingMatcherStats = trackers.map((tracker) => {
+      return {
+        tracker: tracker,
+        // We need to inspect each matcher's `contacts` entries for references to the source.
+        pendingCount: this.potentialMatchers.filter((matcher) => {
+          return !!matcher.allSourceIds.find((id) => tracker.source.identifier == id);
+        }).length // and tally up a count at the end.
+      };
+    });
+
+    // If we just rejected the last possible matcher for a tracked gesture-source...
+    // then, for each such affected source...
+    for(const stat of remainingMatcherStats) {
+      if(stat.pendingCount == 0) {
+        // ... report the failure and signal to close-out that source / stop tracking it.
+        stat.tracker.matchPromise.resolve({
+          matcher: null,
+          result: {
+            matched: false,
+            action: {
+              type: 'complete',
+              item: null
+            }
+          }
+        });
+      }
+    }
   }
 }

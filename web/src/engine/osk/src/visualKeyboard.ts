@@ -394,7 +394,7 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
       return !flickSpec || !(flickSpec.n || flickSpec.nw || flickSpec.ne);
     };
 
-    const recognizer = new GestureRecognizer(gestureSetForLayout(this.layerGroup, this.gestureParams), config);
+    const recognizer = new GestureRecognizer(gestureSetForLayout(this.kbdLayout, this.gestureParams), config);
     recognizer.stateToken = this.layerId;
 
     const sourceTrackingMap: Record<string, {
@@ -489,7 +489,7 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
         // but only while still permitting new touches.  If we're here, that time is over.
         for(let id of gestureSequence.allSourceIds) {
           // If the original preview host lives on, ensure it's cancelled now.
-          if(sourceTrackingMap[id].previewHost) {
+          if(sourceTrackingMap[id]?.previewHost) {
             this.gesturePreviewHost = null;
             sourceTrackingMap[id].previewHost.cancel();
           }
@@ -1449,6 +1449,8 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
     }
     // Add a faint border
     kbd.style.border = '1px solid #ccc';
+
+    kbdObj.updateState(); // double-ensure that the 'default' layer is properly displayed.
 
     // Once the element is inserted into the DOM, refresh the layout so that proper text scaling may apply.
     const detectAndHandleInsertion = () => {

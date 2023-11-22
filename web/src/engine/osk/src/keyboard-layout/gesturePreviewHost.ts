@@ -2,10 +2,6 @@ import { ActiveKey } from "@keymanapp/keyboard-processor";
 import { KeyElement } from "../keyElement.js";
 import { FlickNameCoordMap, OrderedFlickDirections } from "../input/gestures/browser/flick.js";
 
-const FLICK_DIRS = ['n', 'ne', 'e', 'se', 's', 'sw', 'w', 'nw'] as const;
-
-
-
 /**With edge lengths of 1, to keep flick-text invisible at the start, the
  * hypotenuse for an inter-cardinal path is sqrt(2).  To keep a perfect circle
  * for all flicks, then, requires the straight-edge length for pure cardinal
@@ -92,21 +88,6 @@ export class GesturePreviewHost {
         previewImgContainer.appendChild(flickPreview);
       });
     }
-
-    // const hintLabel = this.hintLabel = document.createElement('div');
-    // hintLabel.className='kmw-key-popup-icon';
-    // hintLabel.textContent = keySpec == keySpec.hintSrc ? keySpec.hint : keySpec.hintSrc?.text;
-    // hintLabel.style.fontWeight= hintLabel.textContent == '\u2022' ? 'bold' : '';
-
-    // // Default positioning puts it far too close to the flick-preview bit.
-    // let yAdjustment = 0;
-    // hintLabel.style.marginTop = `-${yAdjustment}px`;
-
-    // // b/c multitap's border forces position shifting
-    // let xAdjustment = 0;
-    // hintLabel.style.marginRight = `-${xAdjustment}px`;
-
-    // base.appendChild(hintLabel);
   }
 
   public refreshLayout() {

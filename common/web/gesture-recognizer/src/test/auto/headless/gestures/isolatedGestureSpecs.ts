@@ -152,13 +152,6 @@ export const SubkeySelectModel: GestureModel = {
       },
       endOnResolve: true,
       endOnReject: true
-    }, {
-      // A second touch while selecting a subkey will trigger instant cancellation
-      // of subkey mode.  (With this setting in place, anyway.)
-      //
-      // Might not be ideal for actual production... but it does have benefits for
-      // unit testing the gesture-matching engine.
-      model: specs.InstantRejectionModel
     }
   ],
   resolutionAction: {

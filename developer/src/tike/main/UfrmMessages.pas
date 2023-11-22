@@ -162,7 +162,6 @@ procedure TfrmMessages.Clear;
 begin
   FMessageItems.Clear;
   memoMessage.Clear;
-  ProjectCompilerMessageClear;
 end;
 
 procedure TfrmMessages.memoMessageDblClick(Sender: TObject);

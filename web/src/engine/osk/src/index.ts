@@ -21,6 +21,8 @@ export { default as SimpleActivator } from './views/simpleActivator.js';
 export { default as TwoStateActivator } from './views/twoStateActivator.js';
 export { ParsedLengthStyle } from './lengthStyle.js';
 
+export { gestureSetForLayout, DEFAULT_GESTURE_PARAMS } from './input/gestures/specsForLayout.js'
+
 // PredictionContext is exported from input-processor, not the OSK.
 
 // More things will likely need to be added.

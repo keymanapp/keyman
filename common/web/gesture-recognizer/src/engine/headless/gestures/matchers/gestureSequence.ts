@@ -6,6 +6,7 @@ import { GestureMatcher, MatchResult, PredecessorMatch } from "./gestureMatcher.
 import { GestureModel, GestureResolution } from "../specs/gestureModel.js";
 import { MatcherSelection, MatcherSelector } from "./matcherSelector.js";
 import { GestureRecognizerConfiguration, TouchpointCoordinator } from "../../../index.js";
+import { ManagedPromise, timedPromise } from "@keymanapp/web-utils";
 
 export class GestureStageReport<Type, StateToken = any> {
   /**
@@ -153,7 +154,7 @@ export class GestureSequence<Type, StateToken = any> extends EventEmitter<EventM
     return this.selector?.baseGestureSetId ?? null;
   }
 
-    /**
+  /**
    * Returns an array of IDs for gesture models that are still valid for the `GestureSource`'s
    * current state.  They will be specified in descending `resolutionPriority` order.
    */
@@ -164,6 +165,11 @@ export class GestureSequence<Type, StateToken = any> extends EventEmitter<EventM
         return [];
       }
 
+      const selectors = [ this.selector ];
+      if(this.pushedSelector) {
+        selectors.push(this.pushedSelector);
+      }
+
       // The new round of model-matching is based on the sources used by the previous round.
       // This is important; 'sustainTimer' gesture models may rely on a now-terminated source
       // from that previous round (like with multitaps).
@@ -171,9 +177,11 @@ export class GestureSequence<Type, StateToken = any> extends EventEmitter<EventM
       const trackedSources = lastStageReport.sources;
 
       const potentialMatches = trackedSources.map((source) => {
-        return this.selector.potentialMatchersForSource(source)
+        return selectors.map((selector) => selector.potentialMatchersForSource(source)
           .map((matcher) => matcher.model.id)
-      }).reduce((deduplicated, arr) => {
+        )
+      }).reduce((flattened, arr) => flattened.concat(arr))
+      .reduce((deduplicated, arr) => {
         for(let entry of arr) {
           if(deduplicated.indexOf(entry) == -1) {
             deduplicated.push(entry);
@@ -185,7 +193,7 @@ export class GestureSequence<Type, StateToken = any> extends EventEmitter<EventM
       return potentialMatches;
     }
 
-  private readonly selectionHandler = (selection: MatcherSelection<Type, StateToken>) => {
+  private readonly selectionHandler = async (selection: MatcherSelection<Type, StateToken>) => {
     const matchReport = new GestureStageReport<Type, StateToken>(selection);
     if(selection.matcher) {
       this.stageReports.push(matchReport);
@@ -196,10 +204,11 @@ export class GestureSequence<Type, StateToken = any> extends EventEmitter<EventM
       return matchSource instanceof GestureSourceSubview ? matchSource.baseSource : matchSource;
     }) ?? [];
 
-    if(selection.result.action.type == 'complete' || selection.result.action.type == 'none') {
+    const actionType = selection.result.action.type;
+    if(actionType == 'complete' || actionType == 'none') {
       sources.forEach((source) => {
         if(!source.isPathComplete) {
-          source.terminate(selection.result.action.type == 'none');
+          source.terminate(actionType == 'none');
         }
       });
 
@@ -210,6 +219,34 @@ export class GestureSequence<Type, StateToken = any> extends EventEmitter<EventM
         }
         return;
       }
+    }
+
+    if(actionType == 'complete' && this.touchpointCoordinator && this.pushedSelector) {
+      // Cascade-terminade all nested selectors, but don't remove / pop them yet.
+      // Their selection mode remains valid while their gestures are sustained.
+      const sustainedSources = this.touchpointCoordinator?.sustainSelectorSubstack(this.pushedSelector);
+
+      const sustainCompletionPromises = sustainedSources.map((source) => {
+        const promise = new ManagedPromise<void>();
+        source.path.on('invalidated', () => promise.resolve());
+        source.path.on('complete', () => promise.resolve());
+        return promise.corePromise;
+      });
+
+      if(sustainCompletionPromises.length > 0 && selection.result.action.awaitNested) {
+        await Promise.all(sustainCompletionPromises);
+        // Ensure all nested gestures finish resolving first before continuing by
+        // waiting against the macroqueue.
+        await timedPromise(0);
+      }
+
+      // Actually drops the selection-mode state once all is complete.
+      // The drop MUST come after the `await` above.
+      this.touchpointCoordinator?.popSelector(this.pushedSelector);
+
+        // May still need it active?
+        // this.pushedSelector.off('rejectionwithaction', this.modelResetHandler);
+      this.pushedSelector = null;
     }
 
     // Raise the event, providing a functor that allows the listener to specify an alt config for the next stage.
@@ -244,17 +281,18 @@ export class GestureSequence<Type, StateToken = any> extends EventEmitter<EventM
     }
 
     if(nextModels.length > 0) {
-      // Note:  if a 'push', that should be handled by an event listener from the main engine driver (or similar)
-      const modelingSpinupPromise = this.selector.matchGesture(selection.matcher, nextModels);
-      modelingSpinupPromise.then(async (selectionHost) => this.selectionHandler(await selectionHost.selectionPromise));
+      // Note:  resolve selection-mode changes FIRST, before building the next GestureModel in the sequence.
+      // If a selection-mode change is triggered, any openings for new contacts on the next model can only
+      // be fulfilled if handled by the corresponding (pushed) selector, rather than the sequence's base selector.
 
       // Handling 'setchange' resolution actions (where one gesture enables a different gesture set for others
       // while active.  Example case: modipress.)
-      if(selection.result.action.type == 'chain' && selection.result.action.selectionMode == this.pushedSelector?.baseGestureSetId) {
+      if(actionType == 'chain' && selection.result.action.selectionMode == this.pushedSelector?.baseGestureSetId) {
         // do nothing; maintain the existing 'selectionMode' behavior
       } else {
         // pop the old one, if it exists - if it matches our expectations for a current one.
         if(this.pushedSelector) {
+          this.pushedSelector.off('rejectionwithaction', this.modelResetHandler);
           this.touchpointCoordinator?.popSelector(this.pushedSelector);
           this.pushedSelector = null;
         }
@@ -274,16 +312,32 @@ export class GestureSequence<Type, StateToken = any> extends EventEmitter<EventM
          * can then use that to trigger cancellation of the subkey-selection mode.
          */
 
-        if(selection.result.action.type == 'chain') {
+        if(actionType == 'chain') {
           const targetSet = selection.result.action.selectionMode;
           if(targetSet) {
             // push the new one.
             const changedSetSelector = new MatcherSelector<Type, StateToken>(targetSet);
+            changedSetSelector.on('rejectionwithaction', this.modelResetHandler);
             this.pushedSelector = changedSetSelector;
             this.touchpointCoordinator?.pushSelector(changedSetSelector);
           }
         }
       }
+
+      /* If a selector has been pushed, we need to delegate the next gesture model in the chain
+       * to it in case it has extra contacts, as those will be processed under the pushed selector.
+       *
+       * Example case:  a modipress + multitap key should prevent further multitap if a second,
+       * unrelated key is tapped.  Detecting that second tap is only possible via the pushed
+       * selector.
+       *
+       * Future models in the chain are still drawn from the _current_ selector.
+       */
+      const nextStageSelector = this.pushedSelector ?? this.selector;
+
+      // Note:  if a 'push', that should be handled by an event listener from the main engine driver (or similar)
+      const modelingSpinupPromise = nextStageSelector.matchGesture(selection.matcher, nextModels);
+      modelingSpinupPromise.then(async (selectionHost) => this.selectionHandler(await selectionHost.selectionPromise));
     } else {
       // Any extra finalization stuff should go here, before the event, if needed.
       if(!this.markedComplete) {
@@ -304,6 +358,10 @@ export class GestureSequence<Type, StateToken = any> extends EventEmitter<EventM
     //
     // This works even for multitaps because we include the most recent ancestor sources in
     // `allSourceIds` - that one will match here.
+    //
+    // Also sufficiently handles cases where selection is delegated to the pushedSelector,
+    // since new gestures under the alternate state won't include a source id from the base
+    // sequence.
     if(this.allSourceIds.find((a) => sourceIds.indexOf(a) == -1)) {
       return;
     }

@@ -1,9 +1,9 @@
 import { KMX, Osk, TouchLayout, TouchLayoutFileReader, TouchLayoutFileWriter } from "@keymanapp/common-types";
-import { callbacks, IsKeyboardVersion14OrLater, IsKeyboardVersion15OrLater } from "./compiler-globals.js";
+import { callbacks, fk, IsKeyboardVersion14OrLater, IsKeyboardVersion15OrLater, IsKeyboardVersion17OrLater } from "./compiler-globals.js";
 import { JavaScript_Key } from "./javascript-strings.js";
-import { TRequiredKey, CRequiredKeys, CSpecialText10, CSpecialText14, CSpecialText14ZWNJ, CSpecialText14Map } from "./constants.js";
+import { TRequiredKey, CRequiredKeys, CSpecialText, CSpecialText14Map, CSpecialText17Map, CSpecialTextMinVer, CSpecialTextMaxVer } from "./constants.js";
 import { KeymanWebTouchStandardKeyNames, KMWAdditionalKeyNames, VKeyNames } from "./keymanweb-key-codes.js";
-import { KmwCompilerMessages } from "./messages.js";
+import { KmwCompilerMessages } from "./kmw-compiler-messages.js";
 
 
 interface VLFOutput {
@@ -109,7 +109,7 @@ function CheckKey(
   //
 
   if(FId.trim() == '') {
-    if(!([TouchLayout.TouchLayoutKeySp.blank, TouchLayout.TouchLayoutKeySp.spacer].includes(FKeyType)) && FNextLayer == '') {
+    if(!([TouchLayout.TouchLayoutKeySp.blank, TouchLayout.TouchLayoutKeySp.spacer].includes(FKeyType))) {
       callbacks.reportMessage(KmwCompilerMessages.Warn_TouchLayoutUnidentifiedKey({layerId: layer.id}));
     }
     return true;
@@ -144,8 +144,9 @@ function CheckKey(
     // Keyman versions before 14 do not support '*special*' labels on non-special keys.
     // ZWNJ use, however, is safe because it will be transformed in function
     // TransformSpecialKeys14 to '<|>',  which does not require the custom OSK font.
-    if((CSpecialText10.includes(FText) || CSpecialText14.includes(FText)) &&
-        !CSpecialText14ZWNJ.includes(FText) &&
+    const mapVersion = Math.max(Math.min(fk.fileVersion, CSpecialTextMaxVer), CSpecialTextMinVer);
+    const specialText = CSpecialText.get(mapVersion);
+    if(specialText.includes(FText) &&
         !IsKeyboardVersion14OrLater() &&
         !([TouchLayout.TouchLayoutKeySp.special, TouchLayout.TouchLayoutKeySp.specialActive].includes(FKeyType))) {
       callbacks.reportMessage(KmwCompilerMessages.Warn_TouchLayoutSpecialLabelOnNormalKey({
@@ -199,6 +200,22 @@ function TransformSpecialKeys14(FDebug: boolean, sLayoutFile: string): string {
   return sLayoutFile;
 }
 
+function TransformSpecialKeys17(FDebug: boolean, sLayoutFile: string): string {
+  // Rewrite Special key labels that are only supported in Keyman 17+
+  // This code is a little ugly but effective.
+  if(!IsKeyboardVersion17OrLater()) {
+    for(let i = 0; i < CSpecialText17Map.length; i++) {
+      // Assumes the JSON output format will not change
+      if(FDebug) {
+        sLayoutFile = sLayoutFile.replaceAll('"text": "'+CSpecialText17Map[i][0]+'"', '"text": this._v>16 ? "'+CSpecialText17Map[i][0]+'" : "'+CSpecialText17Map[i][1]+'"');
+      } else {
+        sLayoutFile = sLayoutFile.replaceAll('"text":"'+CSpecialText17Map[i][0]+'"', '"text":this._v>16?"'+CSpecialText17Map[i][0]+'":"'+CSpecialText17Map[i][1]+'"');
+      }
+    }
+  }
+  return sLayoutFile;
+}
+
 export function ValidateLayoutFile(fk: KMX.KEYBOARD, FDebug: boolean, sLayoutFile: string, sVKDictionary: string, displayMap: Osk.PuaMap): VLFOutput {   // I4060   // I4139
   let FDictionary: string[] = sVKDictionary.split(/\s+/);
 
@@ -207,13 +224,17 @@ export function ValidateLayoutFile(fk: KMX.KEYBOARD, FDebug: boolean, sLayoutFil
   let reader = new TouchLayoutFileReader();
   let data: TouchLayout.TouchLayoutFile;
   try {
+    if(!callbacks.fs.existsSync(sLayoutFile)) {
+      callbacks.reportMessage(KmwCompilerMessages.Error_TouchLayoutFileDoesNotExist({filename: sLayoutFile}));
+      return null;
+    }
     data = reader.read(callbacks.loadFile(sLayoutFile));
     if(!data) {
       throw new Error('Unknown error reading touch layout file');
     }
   } catch(e) {
-    callbacks.reportMessage(KmwCompilerMessages.Error_InvalidTouchLayoutFile({msg: (e??'Unspecified error').toString()}));
-    return {output:null, result: false};
+    callbacks.reportMessage(KmwCompilerMessages.Error_InvalidTouchLayoutFileFormat({msg: (e??'Unspecified error').toString()}));
+    return null;
   }
 
   let result: boolean = true;
@@ -281,6 +302,8 @@ export function ValidateLayoutFile(fk: KMX.KEYBOARD, FDebug: boolean, sLayoutFil
   sLayoutFile = writer.compile(data);
 
   sLayoutFile = TransformSpecialKeys14(FDebug, sLayoutFile);
+
+  sLayoutFile = TransformSpecialKeys17(FDebug, sLayoutFile);
 
   return {
     output: sLayoutFile,

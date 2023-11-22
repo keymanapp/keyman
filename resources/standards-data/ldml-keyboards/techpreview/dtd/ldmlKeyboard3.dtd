@@ -10,7 +10,7 @@ The CLDR Keyboard Subcommittee is currently developing major changes to the CLDR
 Please view the subcommittee page for the most recent information.
 <https://cldr.unicode.org/index/keyboard-workgroup> -->
 
-<!ELEMENT keyboard3 ( import*, locales?, version?, info?, names, settings?, displays?, keys?, forms?, layers*, variables?, transforms*, special* ) >
+<!ELEMENT keyboard3 ( import*, locales?, version?, info, settings?, displays?, keys?, flicks?, forms?, layers*, variables?, transforms*, special* ) >
     <!--@TECHPREVIEW-->
 <!ATTLIST keyboard3 locale CDATA #REQUIRED >
     <!--@MATCH:validity/bcp47-wellformed-->
@@ -45,11 +45,11 @@ Please view the subcommittee page for the most recent information.
 
 <!ELEMENT info EMPTY >
     <!--@TECHPREVIEW-->
-<!ATTLIST info author CDATA #IMPLIED >
+<!ATTLIST info name CDATA #REQUIRED >
     <!--@MATCH:any-->
     <!--@VALUE-->
-<!ATTLIST info normalization CDATA #IMPLIED >
-    <!--@MATCH:literal/NFC, NFD, other-->
+<!ATTLIST info author CDATA #IMPLIED >
+    <!--@MATCH:any-->
     <!--@VALUE-->
 <!ATTLIST info layout CDATA #IMPLIED >
     <!--@MATCH:any-->
@@ -58,23 +58,10 @@ Please view the subcommittee page for the most recent information.
     <!--@MATCH:any-->
     <!--@VALUE-->
 
-<!ELEMENT names ( import*, name+, special* ) >
-    <!--@TECHPREVIEW-->
-
-<!ELEMENT name EMPTY >
-    <!--@ORDERED-->
-    <!--@TECHPREVIEW-->
-<!ATTLIST name value CDATA #REQUIRED >
-    <!--@MATCH:any-->
-    <!--@VALUE-->
-
-<!ELEMENT special ANY >
-    <!--@TECHPREVIEW-->
-
 <!ELEMENT settings EMPTY >
     <!--@ORDERED-->
     <!--@TECHPREVIEW-->
-<!ATTLIST settings fallback (omit) #IMPLIED >
+<!ATTLIST settings normalization (disabled) #IMPLIED >
     <!--@VALUE-->
 
 <!ELEMENT displays ( import*, display*, displayOptions*, special* ) >
@@ -82,9 +69,9 @@ Please view the subcommittee page for the most recent information.
 
 <!ELEMENT display EMPTY >
     <!--@TECHPREVIEW-->
-<!ATTLIST display id NMTOKEN #IMPLIED >
+<!ATTLIST display keyId NMTOKEN #IMPLIED >
     <!--@MATCH:any-->
-<!ATTLIST display to CDATA #IMPLIED >
+<!ATTLIST display output CDATA #IMPLIED >
     <!--@MATCH:any-->
     <!--@ALLOWS_UESC-->
 <!ATTLIST display display CDATA #REQUIRED >
@@ -99,56 +86,56 @@ Please view the subcommittee page for the most recent information.
     <!--@VALUE-->
     <!--@ALLOWS_UESC-->
 
-<!ELEMENT keys ( import*, ( key | flicks )*, special* ) >
+<!ELEMENT special ANY >
+    <!--@TECHPREVIEW-->
+
+<!ELEMENT keys ( import*, key*, special* ) >
     <!--@TECHPREVIEW-->
 
 <!ELEMENT key EMPTY >
     <!--@TECHPREVIEW-->
 <!ATTLIST key id NMTOKEN #REQUIRED >
     <!--@MATCH:any-->
-<!ATTLIST key flicks NMTOKEN #IMPLIED >
+<!ATTLIST key flickId NMTOKEN #IMPLIED >
     <!--@MATCH:any-->
 <!ATTLIST key gap (true) #IMPLIED >
     <!--@VALUE-->
-<!ATTLIST key to CDATA #IMPLIED >
+<!ATTLIST key output CDATA #IMPLIED >
     <!--@MATCH:any-->
     <!--@VALUE-->
     <!--@ALLOWS_UESC-->
-<!ATTLIST key longPress CDATA #IMPLIED >
+<!ATTLIST key longPressKeyIds NMTOKENS #IMPLIED >
     <!--@MATCH:any-->
     <!--@VALUE-->
-    <!--@ALLOWS_UESC-->
-<!ATTLIST key longPressDefault CDATA #IMPLIED >
+<!ATTLIST key longPressDefaultKeyId NMTOKEN #IMPLIED >
     <!--@MATCH:any-->
     <!--@VALUE-->
-    <!--@ALLOWS_UESC-->
-<!ATTLIST key multiTap CDATA #IMPLIED >
+<!ATTLIST key multiTapKeyIds NMTOKENS #IMPLIED >
+    <!--@MATCH:any-->
     <!--@VALUE-->
-    <!--@ALLOWS_UESC-->
 <!ATTLIST key stretch (true) #IMPLIED >
     <!--@VALUE-->
-<!ATTLIST key switch NMTOKEN #IMPLIED >
+<!ATTLIST key layerId NMTOKEN #IMPLIED >
     <!--@MATCH:any-->
-    <!--@VALUE-->
-<!ATTLIST key transform (no) #IMPLIED >
     <!--@VALUE-->
 <!ATTLIST key width CDATA #IMPLIED >
     <!--@MATCH:range/0.01~100.0-->
     <!--@VALUE-->
 
-<!ELEMENT flicks ( flick+, special* ) >
+<!ELEMENT flicks ( import*, flick*, special* ) >
+
+<!ELEMENT flick ( flickSegment+, special* ) >
     <!--@TECHPREVIEW-->
-<!ATTLIST flicks id NMTOKEN #REQUIRED >
+<!ATTLIST flick id NMTOKEN #REQUIRED >
     <!--@MATCH:any-->
 
-<!ELEMENT flick EMPTY >
+<!ELEMENT flickSegment EMPTY >
     <!--@TECHPREVIEW-->
-<!ATTLIST flick directions NMTOKENS #REQUIRED >
+<!ATTLIST flickSegment directions NMTOKENS #REQUIRED >
     <!--@MATCH:regex/(n|e|s|w|ne|nw|se|sw)([ ]+(n|e|s|w|ne|nw|se|sw))*-->
-<!ATTLIST flick to CDATA #REQUIRED >
+<!ATTLIST flickSegment keyId NMTOKEN #REQUIRED >
     <!--@MATCH:any-->
     <!--@VALUE-->
-    <!--@ALLOWS_UESC-->
 
 <!ELEMENT forms ( import*, form*, special* ) >
     <!--@TECHPREVIEW-->
@@ -166,7 +153,7 @@ Please view the subcommittee page for the most recent information.
 
 <!ELEMENT layers ( import*, layer*, special* ) >
     <!--@TECHPREVIEW-->
-<!ATTLIST layers form NMTOKEN #REQUIRED >
+<!ATTLIST layers formId NMTOKEN #REQUIRED >
     <!--@MATCH:any-->
 <!ATTLIST layers minDeviceWidth CDATA #IMPLIED >
     <!--@MATCH:range/1~999-->
@@ -175,7 +162,7 @@ Please view the subcommittee page for the most recent information.
     <!--@TECHPREVIEW-->
 <!ATTLIST layer id NMTOKEN #IMPLIED >
     <!--@MATCH:any-->
-<!ATTLIST layer modifier NMTOKENS #IMPLIED >
+<!ATTLIST layer modifiers NMTOKENS #IMPLIED >
     <!--@MATCH:regex/(none|([A-Za-z0-9]+)( [A-Za-z0-9]+)*)-->
 
 <!ELEMENT row EMPTY >

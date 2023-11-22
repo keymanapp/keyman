@@ -70,7 +70,7 @@ export class TouchLayoutFileReader {
     if(!SchemaValidators.touchLayoutClean(source))
     /* c8 ignore next 3 */
     {
-      throw new Error((<any>SchemaValidators.touchLayoutClean).errors);
+      throw new Error(JSON.stringify((<any>SchemaValidators.touchLayoutClean).errors));
     }
   }
 

@@ -11,9 +11,9 @@ import {
 import ButtonClasses = TouchLayout.TouchLayoutKeySp;
 
 import {
+  ActiveLayout,
   deepCopy
 } from '@keymanapp/keyboard-processor';
-import OSKLayerGroup from '../../keyboard-layout/oskLayerGroup.js';
 
 import { type KeyElement } from '../../keyElement.js';
 
@@ -93,6 +93,8 @@ export interface GestureParams<Item = any> {
 export const DEFAULT_GESTURE_PARAMS: GestureParams = {
   longpress: {
     permitsFlick: () => true,
+    // Note:  actual runtime value is determined at runtime based upon row height.
+    // See `VisualKeyboard.refreshLayout`, CTRL-F "Step 3".
     flickDist: 5,
     waitLength: 500,
     noiseTolerance: 10
@@ -101,6 +103,8 @@ export const DEFAULT_GESTURE_PARAMS: GestureParams = {
     waitLength: 500,
     holdLength: 500
   },
+  // Note:  all actual runtime values are determined at runtime based upon row height.
+  // See `VisualKeyboard.refreshLayout`, CTRL-F "Step 3".
   flick: {
     startDist: 10,
     dirLockDist: 20,
@@ -133,6 +137,16 @@ export function keySupportsModipress(key: KeyElement) {
   }
 }
 
+interface LayoutGestureSupportFlags {
+  hasFlicks: boolean,
+  hasMultitaps: boolean,
+  hasLongpresses: boolean
+}
+
+// Simple compile-time validation that OSKLayerGroup's spec object provides the fields expected above.
+let dummy: ActiveLayout;
+let dummy2: LayoutGestureSupportFlags = dummy;
+
 /**
  * Defines the set of gestures appropriate for use with the specified Keyman keyboard.
  * @param layerGroup  The active keyboard's layer group
@@ -141,9 +155,7 @@ export function keySupportsModipress(key: KeyElement) {
  *                    immediate effect during gesture processing.
  * @returns
  */
-export function gestureSetForLayout(layerGroup: OSKLayerGroup, params: GestureParams): GestureModelDefs<KeyElement, string> {
-  const layout = layerGroup.spec;
-
+export function gestureSetForLayout(flags: LayoutGestureSupportFlags, params: GestureParams): GestureModelDefs<KeyElement, string> {
   // To be used among the `allowsInitialState` contact-model specifications as needed.
   const gestureKeyFilter = (key: KeyElement, gestureId: string) => {
     if(!key) {
@@ -160,7 +172,7 @@ export function gestureSetForLayout(layerGroup: OSKLayerGroup, params: GesturePa
         return !!keySpec.sk;
       case 'multitap-start':
       case 'modipress-multitap-start':
-        if(layout.hasMultitaps) {
+        if(flags.hasMultitaps) {
           return !!keySpec.multitap;
         } else {
           return false;
@@ -173,9 +185,9 @@ export function gestureSetForLayout(layerGroup: OSKLayerGroup, params: GesturePa
     }
   };
 
-  const _initialTapModel: GestureModel<KeyElement> = deepCopy(layout.hasFlicks ? initialTapModel(params) : initialTapModelWithReset(params));
-  const simpleTapModel: GestureModel<KeyElement> = deepCopy(layout.hasFlicks ? SimpleTapModel : SimpleTapModelWithReset);
-  const longpressModel: GestureModel<KeyElement> = deepCopy(longpressModelWithShortcut(params, true, !layout.hasFlicks));
+  const _initialTapModel: GestureModel<KeyElement> = deepCopy(flags.hasFlicks ? initialTapModel(params) : initialTapModelWithReset(params));
+  const _simpleTapModel: GestureModel<KeyElement> = deepCopy(flags.hasFlicks ? simpleTapModel() : simpleTapModelWithReset());
+  const longpressModel: GestureModel<KeyElement> = deepCopy(longpressModelWithShortcut(params, true, !flags.hasFlicks));
 
   // #region Functions for implementing and/or extending path initial-state checks
   function withKeySpecFiltering(model: GestureModel<KeyElement>, contactIndices: number | number[]) {
@@ -205,32 +217,35 @@ export function gestureSetForLayout(layerGroup: OSKLayerGroup, params: GesturePa
   }
   // #endregion
 
-  const gestureModels = [
+  const specialStartModel = specialKeyStartModel();
+  const _modipressStartModel = modipressStartModel();
+  const gestureModels: GestureModel<KeyElement>[] = [
     withKeySpecFiltering(longpressModel, 0),
     withKeySpecFiltering(multitapStartModel(params), 0),
     multitapEndModel(params),
     _initialTapModel,
-    simpleTapModel,
-    withKeySpecFiltering(SpecialKeyStartModel, 0),
-    SpecialKeyEndModel,
-    SubkeySelectModel,
-    withKeySpecFiltering(ModipressStartModel, 0),
+    _simpleTapModel,
+    withKeySpecFiltering(specialStartModel, 0),
+    specialKeyEndModel(),
+    subkeySelectModel(),
+    withKeySpecFiltering(_modipressStartModel, 0),
     modipressHoldModel(params),
-    ModipressEndModel,
-    ModipressMultitapTransitionModel,
+    modipressEndModel(),
+    modipressMultitapTransitionModel(),
     withKeySpecFiltering(modipressMultitapStartModel(params), 0),
-    modipressMultitapEndModel(params)
+    modipressMultitapEndModel(params),
+    modipressMultitapLockModel()
   ];
 
   const defaultSet = [
-    longpressModel.id, _initialTapModel.id, ModipressStartModel.id, SpecialKeyStartModel.id
+    longpressModel.id, _initialTapModel.id, _modipressStartModel.id, specialStartModel.id
   ];
 
-  if(layout.hasFlicks) {
+  if(flags.hasFlicks) {
     gestureModels.push(withKeySpecFiltering(flickStartModel(params), 0));
     gestureModels.push(flickMidModel(params));
     gestureModels.push(flickResetModel(params));
-    gestureModels.push(FlickResetEndModel);
+    gestureModels.push(flickResetEndModel());
     gestureModels.push(flickEndModel(params));
 
     defaultSet.push('flick-start');
@@ -243,7 +258,7 @@ export function gestureSetForLayout(layerGroup: OSKLayerGroup, params: GesturePa
     gestures: gestureModels,
     sets: {
       default: defaultSet,
-      modipress: defaultSet.filter((entry) => entry != ModipressStartModel.id), // no nested modipressing
+      modipress: defaultSet.filter((entry) => entry != _modipressStartModel.id), // no nested modipressing
       none: []
     }
   }
@@ -255,20 +270,24 @@ export function gestureSetForLayout(layerGroup: OSKLayerGroup, params: GesturePa
 
 type ContactModel = specs.ContactModel<any>;
 
-export const InstantContactRejectionModel: ContactModel = {
-  itemPriority: 0,
-  pathResolutionAction: 'reject',
-  pathModel: {
-    evaluate: (path) => 'resolve'
-  }
+export function instantContactRejectionModel(): ContactModel {
+  return {
+    itemPriority: 0,
+    pathResolutionAction: 'reject',
+    pathModel: {
+      evaluate: (path) => 'resolve'
+    }
+  };
 }
 
-export const InstantContactResolutionModel: ContactModel = {
-  itemPriority: 0,
-  pathResolutionAction: 'resolve',
-  pathModel: {
-    evaluate: (path) => 'resolve'
-  }
+export function instantContactResolutionModel(): ContactModel {
+  return {
+    itemPriority: 0,
+    pathResolutionAction: 'resolve',
+    pathModel: {
+      evaluate: (path) => 'resolve'
+    }
+  };
 }
 
 export function flickStartContactModel(params: GestureParams): ContactModel {
@@ -293,8 +312,7 @@ function determineLockFromStats(pathStats: CumulativePathStats<KeyElement>) {
   let bestDir: typeof supportedDirs[number];
   let bestLockedDist = 0;
 
-  for(let i = 0; i < supportedDirs.length; i++) {
-    const dir = supportedDirs[i];
+  for(const dir of supportedDirs) {
     const lockedDist = calcLockedDistance(pathStats, dir);
     if(lockedDist > bestLockedDist) {
       bestLockedDist = lockedDist;
@@ -364,7 +382,7 @@ export function flickEndContactModel(params: GestureParams): ContactModel {
   }
 }
 
-export function LongpressContactModelWithShortcut(params: GestureParams, enabledFlicks: boolean, resetForRoaming: boolean): ContactModel {
+export function longpressContactModelWithShortcut(params: GestureParams, enabledFlicks: boolean, resetForRoaming: boolean): ContactModel {
   const spec = params.longpress;
 
   return {
@@ -411,62 +429,72 @@ export function LongpressContactModelWithShortcut(params: GestureParams, enabled
   }
 }
 
-export const ModipressContactStartModel: ContactModel = {
-  itemPriority: -1,
-  pathResolutionAction: 'resolve',
-  pathModel: {
-    // Consideration of whether the underlying item supports the corresponding
-    // gesture will be handled elsewhere.
-    evaluate: (path) => 'resolve'
-  }
+export function modipressContactStartModel(): ContactModel {
+  return {
+    itemPriority: -1,
+    pathResolutionAction: 'resolve',
+    pathModel: {
+      // Consideration of whether the underlying item supports the corresponding
+      // gesture will be handled elsewhere.
+      evaluate: (path) => 'resolve'
+    }
+  };
 }
 
-export const ModipressContactHoldModel: ContactModel = {
-  itemPriority: -1,
-  itemChangeAction: 'resolve',
-  pathResolutionAction: 'resolve',
-  pathModel: {
-    evaluate: (path) => {
-      if(path.isComplete) {
-        return 'reject';
+export function modipressContactHoldModel(): ContactModel {
+  return {
+    itemPriority: -1,
+    itemChangeAction: 'resolve',
+    pathResolutionAction: 'resolve',
+    pathModel: {
+      evaluate: (path) => {
+        if(path.isComplete) {
+          return 'reject';
+        }
       }
     }
   }
 }
 
-export const ModipressContactEndModel: ContactModel = {
-  itemPriority: -1,
-  itemChangeAction: 'resolve',
-  pathResolutionAction: 'resolve',
-  pathModel: {
-    evaluate: (path) => {
-      if(path.isComplete) {
-        return 'resolve';
+export function modipressContactEndModel(): ContactModel {
+  return {
+    itemPriority: -1,
+    itemChangeAction: 'resolve',
+    pathResolutionAction: 'resolve',
+    pathModel: {
+      evaluate: (path) => {
+        if(path.isComplete) {
+          return 'resolve';
+        }
       }
     }
-  }
+  };
 }
 
-export const SimpleTapContactModel: ContactModel = {
-  itemPriority: 0,
-  itemChangeAction: 'reject',
-  pathResolutionAction: 'resolve',
-  pathModel: {
-    evaluate: (path) => {
-      if(path.isComplete && !path.wasCancelled) {
-        return 'resolve';
+export function simpleTapContactModel(): ContactModel {
+  return {
+    itemPriority: 0,
+    itemChangeAction: 'reject',
+    pathResolutionAction: 'resolve',
+    pathModel: {
+      evaluate: (path) => {
+        if(path.isComplete && !path.wasCancelled) {
+          return 'resolve';
+        }
       }
     }
-  }
+  };
 }
 
-export const SubkeySelectContactModel: ContactModel = {
-  itemPriority: 0,
-  pathResolutionAction: 'resolve',
-  pathModel: {
-    evaluate: (path) => {
-      if(path.isComplete && !path.wasCancelled) {
-        return 'resolve';
+export function subkeySelectContactModel(): ContactModel {
+  return {
+    itemPriority: 0,
+    pathResolutionAction: 'resolve',
+    pathModel: {
+      evaluate: (path) => {
+        if(path.isComplete && !path.wasCancelled) {
+          return 'resolve';
+        }
       }
     }
   }
@@ -480,54 +508,47 @@ export const SubkeySelectContactModel: ContactModel = {
 // func at the top.
 type GestureModel<Type> = specs.GestureModel<Type>;
 
-export const SpecialKeyStartModel: GestureModel<KeyElement> = {
-  id: 'special-key-start',
-  resolutionPriority: 0,
-  contacts : [
-    {
-      model: {
-        ...InstantContactResolutionModel,
-        allowsInitialState: (incoming, dummy, baseItem) => {
-          // TODO:  needs better abstraction, probably.
-
-          // But, to get started... we can just use a simple hardcoded approach.
-          const modifierKeyIds = ['K_LOPT', 'K_ROPT', 'K_BKSP'];
-          for(const modKeyId of modifierKeyIds) {
-            if(baseItem?.key.spec.id == modKeyId) {
-              return true;
-            }
-          }
-
-          return false;
-        }
-      },
-      endOnResolve: false  // keyboard-selection longpress - would be nice to not need to lift the finger
-                           // in app/browser form.
+export function specialKeyStartModel(): GestureModel<KeyElement> {
+  return {
+    id: 'special-key-start',
+    resolutionPriority: 0,
+    contacts : [
+      {
+        model: {
+          ...instantContactResolutionModel(),
+          // Filtering is done via `gestureKeyFilter` as defined within `gestureSetForLayout` above.
+          // If we've gotten to this point, we're already safe to assume the base key is valid.
+        },
+        endOnResolve: false  // keyboard-selection longpress - would be nice to not need to lift the finger
+                            // in app/browser form.
+      }
+    ],
+    resolutionAction: {
+      type: 'chain',
+      next: 'special-key-end',
+      item: 'current'
     }
-  ],
-  resolutionAction: {
-    type: 'chain',
-    next: 'special-key-end',
-    item: 'current'
-  }
+  };
 }
 
-export const SpecialKeyEndModel: GestureModel<any> = {
-  id: 'special-key-end',
-  resolutionPriority: 0,
-  contacts : [
-    {
-      model: {
-        ...SimpleTapContactModel,
-        itemChangeAction: 'resolve'
-      },
-      endOnResolve: true,
+export function specialKeyEndModel(): GestureModel<any> {
+  return {
+    id: 'special-key-end',
+    resolutionPriority: 0,
+    contacts : [
+      {
+        model: {
+          ...simpleTapContactModel(),
+          itemChangeAction: 'resolve'
+        },
+        endOnResolve: true,
+      }
+    ],
+    resolutionAction: {
+      type: 'complete',
+      item: 'none'
     }
-  ],
-  resolutionAction: {
-    type: 'complete',
-    item: 'none'
-  }
+  };
 }
 
 /**
@@ -549,13 +570,13 @@ export function longpressModelWithShortcut(params: GestureParams, allowShortcut:
     contacts: [
       {
         model: {
-          ...LongpressContactModelWithShortcut(params, allowShortcut, allowRoaming),
+          ...longpressContactModelWithShortcut(params, allowShortcut, allowRoaming),
           itemPriority: 1,
           pathInheritance: 'chop'
         },
         endOnResolve: false
       }, {
-        model: InstantContactRejectionModel
+        model: instantContactRejectionModel()
       }
     ],
     resolutionAction: {
@@ -621,7 +642,7 @@ export function flickMidModel(params: GestureParams): GestureModel<any> {
         model: flickMidContactModel(params),
         endOnReject: true,
       }, {
-        model: InstantContactRejectionModel,
+        model: instantContactRejectionModel(),
         resetOnResolve: true,
       }
     ],
@@ -636,7 +657,8 @@ export function flickMidModel(params: GestureParams): GestureModel<any> {
       type: 'chain',
       item: 'none',
       next: 'flick-end'
-    }
+    },
+    sustainWhenNested: true
   }
 }
 
@@ -648,7 +670,7 @@ export function flickResetModel(params: GestureParams): GestureModel<any> {
     contacts: [
       {
         model: {
-          ...InstantContactResolutionModel,
+          ...instantContactResolutionModel(),
           pathInheritance: 'full'
         },
       }
@@ -656,22 +678,25 @@ export function flickResetModel(params: GestureParams): GestureModel<any> {
     resolutionAction: {
       type: 'chain',
       next: 'flick-mid'
-    }
+    },
+    sustainWhenNested: true
   };
 }
 
-export const FlickResetEndModel: GestureModel<any> = {
-  id: 'flick-reset-end',
-  resolutionPriority: 1,
-  contacts: [],
-  sustainTimer: {
-    duration: 0,
-    expectedResult: true
-  },
-  resolutionAction: {
-    type: 'complete',
-    item: 'base'
-  }
+export function flickResetEndModel(): GestureModel<any> {
+  return {
+    id: 'flick-reset-end',
+    resolutionPriority: 1,
+    contacts: [],
+    sustainTimer: {
+      duration: 0,
+      expectedResult: true
+    },
+    resolutionAction: {
+      type: 'complete',
+      item: 'base'
+    }
+  };
 };
 
 export function flickEndModel(params: GestureParams): GestureModel<any> {
@@ -683,7 +708,7 @@ export function flickEndModel(params: GestureParams): GestureModel<any> {
         model: flickEndContactModel(params)
       },
       {
-        model: InstantContactResolutionModel,
+        model: instantContactResolutionModel(),
         resetOnResolve: true
       }
     ],
@@ -696,7 +721,8 @@ export function flickEndModel(params: GestureParams): GestureModel<any> {
     resolutionAction: {
       type: 'complete',
       item: 'current'
-    }
+    },
+    sustainWhenNested: true
   }
 }
 
@@ -707,7 +733,7 @@ export function multitapStartModel(params: GestureParams): GestureModel<any> {
     contacts: [
       {
         model: {
-          ...InstantContactResolutionModel,
+          ...instantContactResolutionModel(),
           itemPriority: 1,
           pathInheritance: 'reject',
           allowsInitialState(incomingSample, comparisonSample, baseItem) {
@@ -736,7 +762,7 @@ export function multitapEndModel(params: GestureParams): GestureModel<any> {
     contacts: [
       {
         model: {
-          ...SimpleTapContactModel,
+          ...simpleTapContactModel(),
           itemPriority: 1,
           timer: {
             duration: params.multitap.holdLength,
@@ -745,7 +771,7 @@ export function multitapEndModel(params: GestureParams): GestureModel<any> {
         },
         endOnResolve: true
       }, {
-        model: InstantContactResolutionModel,
+        model: instantContactResolutionModel(),
         resetOnResolve: true
       }
     ],
@@ -770,20 +796,21 @@ export function initialTapModel(params: GestureParams): GestureModel<any> {
     contacts: [
       {
         model: {
-          ...SimpleTapContactModel,
+          ...simpleTapContactModel(),
           pathInheritance: 'chop',
           itemPriority: 1,
           timer: {
             duration: params.multitap.holdLength,
             expectedResult: false
-          }
+          },
         },
         endOnResolve: true
       }, {
-        model: InstantContactResolutionModel,
+        model: instantContactResolutionModel(),
         resetOnResolve: true
       }
     ],
+    sustainWhenNested: true,
     rejectionActions: {
       timer: {
         type: 'replace',
@@ -798,26 +825,29 @@ export function initialTapModel(params: GestureParams): GestureModel<any> {
   }
 }
 
-export const SimpleTapModel: GestureModel<any> = {
-  id: 'simple-tap',
-  resolutionPriority: 1,
-  contacts: [
-    {
-      model: {
-        ...SimpleTapContactModel,
-        pathInheritance: 'chop',
-        itemPriority: 1
-      },
-      endOnResolve: true
-    }, {
-      model: InstantContactResolutionModel,
-      resetOnResolve: true
+export function simpleTapModel(): GestureModel<any> {
+  return {
+    id: 'simple-tap',
+    resolutionPriority: 1,
+    contacts: [
+      {
+        model: {
+          ...simpleTapContactModel(),
+          pathInheritance: 'chop',
+          itemPriority: 1
+        },
+        endOnResolve: true
+      }, {
+        model: instantContactResolutionModel(),
+        resetOnResolve: true
+      }
+    ],
+    sustainWhenNested: true,
+    resolutionAction: {
+      type: 'complete',
+      item: 'current'
     }
-  ],
-  resolutionAction: {
-    type: 'complete',
-    item: 'current'
-  }
+  };
 }
 
 export function initialTapModelWithReset(params: GestureParams): GestureModel<any> {
@@ -834,65 +864,65 @@ export function initialTapModelWithReset(params: GestureParams): GestureModel<an
   }
 }
 
-export const SimpleTapModelWithReset: GestureModel<any> = {
-  ...SimpleTapModel,
-  rejectionActions: {
-    ...SimpleTapModel.rejectionActions,
-    item: {
-      type: 'replace',
-      replace: 'simple-tap'
+export function simpleTapModelWithReset(): GestureModel<any> {
+  const simpleModel = simpleTapModel();
+  return {
+    ...simpleModel,
+    rejectionActions: {
+      ...simpleModel.rejectionActions,
+      item: {
+        type: 'replace',
+        replace: 'simple-tap'
+      }
     }
   }
 }
 
-export const SubkeySelectModel: GestureModel<any> = {
-  id: 'subkey-select',
-  resolutionPriority: 0,
-  contacts: [
-    {
-      model: {
-        ...SubkeySelectContactModel,
-        pathInheritance: 'full',
-        itemPriority: 1
-      },
-      endOnResolve: true,
-      endOnReject: true
-    }, {
-      // A second touch while selecting a subkey will trigger instant cancellation
-      // of subkey mode.  (With this setting in place, anyway.)
-      //
-      // Might not be ideal for actual production... but it does have benefits for
-      // unit testing the gesture-matching engine.
-      model: InstantContactRejectionModel
-    }
-  ],
-  resolutionAction: {
-    type: 'complete',
-    item: 'current'
-  },
-  sustainWhenNested: true
+export function subkeySelectModel(): GestureModel<any> {
+  return {
+    id: 'subkey-select',
+    resolutionPriority: 0,
+    contacts: [
+      {
+        model: {
+          ...subkeySelectContactModel(),
+          pathInheritance: 'full',
+          itemPriority: 1
+        },
+        endOnResolve: true,
+        endOnReject: true
+      }
+    ],
+    resolutionAction: {
+      type: 'complete',
+      item: 'current'
+    },
+    sustainWhenNested: true
+  };
 }
 
-export const ModipressStartModel: GestureModel<KeyElement> = {
-  id: 'modipress-start',
-  resolutionPriority: 5,
-  contacts: [
-    {
-      model: {
-        ...ModipressContactStartModel,
-        allowsInitialState(incomingSample, comparisonSample, baseItem) {
-          return keySupportsModipress(baseItem);
-        },
-        itemChangeAction: 'reject',
-        itemPriority: 1
+export function modipressStartModel(): GestureModel<KeyElement> {
+  return {
+    id: 'modipress-start',
+    resolutionPriority: 5,
+    contacts: [
+      {
+        model: {
+          ...modipressContactStartModel(),
+          allowsInitialState(incomingSample, comparisonSample, baseItem) {
+            return keySupportsModipress(baseItem);
+          },
+          itemChangeAction: 'reject',
+          itemPriority: 1
+        }
       }
+    ],
+    resolutionAction: {
+      type: 'chain',
+      next: 'modipress-hold',
+      selectionMode: 'modipress',
+      item: 'current' // return the modifier key ID so that we know to shift to it!
     }
-  ],
-  resolutionAction: {
-    type: 'chain',
-    next: 'modipress-hold',
-    selectionMode: 'modipress',
-    item: 'current' // return the modifier key ID so that we know to shift to it!
   }
 }
 
@@ -903,7 +933,7 @@ export function modipressHoldModel(params: GestureParams): GestureModel<any> {
     contacts: [
       {
         model: {
-          ...ModipressContactHoldModel,
+          ...modipressContactHoldModel(),
           itemChangeAction: 'reject',
           pathInheritance: 'full',
           timer: {
@@ -914,6 +944,16 @@ export function modipressHoldModel(params: GestureParams): GestureModel<any> {
             inheritElapsed: true
           }
         }
+      }, {
+        // If a new touchpoint comes in while in this state, lock in the modipress
+        // and prevent multitapping on it, as a different key has been tapped before
+        // the multitap base key since the latter's release.
+        model: {
+          ...instantContactResolutionModel(),
+        },
+        // The incoming tap belongs to a different gesture; we just care to know that it
+        // happened.
+        resetOnResolve: true
       }
     ],
     // To be clear:  any time modipress-hold is triggered and the timer duration elapses,
@@ -936,40 +976,45 @@ export function modipressHoldModel(params: GestureParams): GestureModel<any> {
   }
 }
 
-export const ModipressMultitapTransitionModel: GestureModel<any> = {
-  id: 'modipress-end-multitap-transition',
-  resolutionPriority: 5,
-  contacts: [
-    // None.  This exists as an intermediate state to transition from
-    // a basic modipress into a combined multitap + modipress.
-  ],
-  sustainTimer: {
-    duration: 0,
-    expectedResult: true
-  },
-  resolutionAction: {
-    type: 'chain',
-    next: 'modipress-multitap-start',
-    item: 'none'
+export function modipressMultitapTransitionModel(): GestureModel<any> {
+  return {
+    id: 'modipress-end-multitap-transition',
+    resolutionPriority: 5,
+    contacts: [
+      // None.  This exists as an intermediate state to transition from
+      // a basic modipress into a combined multitap + modipress.
+    ],
+    sustainTimer: {
+      duration: 0,
+      expectedResult: true
+    },
+    resolutionAction: {
+      type: 'chain',
+      next: 'modipress-multitap-start',
+      item: 'none'
+    }
   }
 }
 
-export const ModipressEndModel: GestureModel<any> = {
-  id: 'modipress-end',
-  resolutionPriority: 5,
-  contacts: [
-    {
-      model: {
-        ...ModipressContactEndModel,
-        itemChangeAction: 'reject',
-        pathInheritance: 'full'
+export function modipressEndModel(): GestureModel<any> {
+  return {
+    id: 'modipress-end',
+    resolutionPriority: 5,
+    contacts: [
+      {
+        model: {
+          ...modipressContactEndModel(),
+          itemChangeAction: 'reject',
+          pathInheritance: 'full'
+        }
       }
+    ],
+    resolutionAction: {
+      type: 'complete',
+      // Key was already emitted from the 'modipress-start' stage.
+      item: 'none',
+      awaitNested: true
     }
-  ],
-  resolutionAction: {
-    type: 'complete',
-    // Key was already emitted from the 'modipress-start' stage.
-    item: 'none'
   }
 }
 
@@ -980,7 +1025,7 @@ export function modipressMultitapStartModel(params: GestureParams): GestureModel
     contacts: [
       {
         model: {
-          ...ModipressContactStartModel,
+          ...modipressContactStartModel(),
           pathInheritance: 'reject',
           allowsInitialState(incomingSample, comparisonSample, baseItem) {
             if(incomingSample.item != baseItem) {
@@ -1015,7 +1060,7 @@ export function modipressMultitapEndModel(params: GestureParams): GestureModel<a
     contacts: [
       {
         model: {
-          ...ModipressContactEndModel,
+          ...modipressContactEndModel(),
           itemChangeAction: 'reject',
           pathInheritance: 'full',
           timer: {
@@ -1023,6 +1068,16 @@ export function modipressMultitapEndModel(params: GestureParams): GestureModel<a
             expectedResult: false
           }
         }
+      }, {
+        model: {
+          // If a new touchpoint comes in while in this state, lock in the modipress
+          // and prevent multitapping on it, as a different key has been tapped before
+          // the multitap base key since the latter's release.
+          ...instantContactRejectionModel()
+        },
+        // The incoming tap belongs to a different gesture; we just care to know that it
+        // happened.
+        resetOnResolve: true
       }
     ],
     resolutionAction: {
@@ -1035,9 +1090,37 @@ export function modipressMultitapEndModel(params: GestureParams): GestureModel<a
     rejectionActions: {
       timer: {
         type: 'replace',
-        replace: 'modipress-end'
+        replace: 'modipress-multitap-lock-transition'
+      },
+      path: {
+        type: 'replace',
+        replace: 'modipress-multitap-lock-transition'
       }
     }
   }
+}
+
+export function modipressMultitapLockModel(): GestureModel<any> {
+  return {
+    id: 'modipress-multitap-lock-transition',
+    resolutionPriority: 5,
+    contacts: [
+      // This exists as an intermediate state to transition from
+      // a modipress-multitap into a plain modipress without further
+      // multitap rota behavior.
+      {
+        model: {
+          ...instantContactResolutionModel(),
+          pathResolutionAction: 'resolve' // doesn't end the path; just lets it continue.
+        },
+      }
+    ],
+    resolutionAction: {
+      type: 'chain',
+      next: 'modipress-end',
+      selectionMode: 'modipress',
+      item: 'none'
+    }
+  };
 }
 // #endregion

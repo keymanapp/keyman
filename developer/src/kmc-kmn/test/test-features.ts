@@ -32,7 +32,7 @@ describe('Keyboard compiler features', async function() {
     it(`should build a version ${v[0]} keyboard`, function() {
       const fixtureName = makePathToFixture('features', `version_${v[1]}.kmn`);
 
-      const result = compiler.runCompiler(fixtureName, `version_${v[1]}.kmx`, {saveDebug: true});
+      const result = compiler.runCompiler(fixtureName, {outFile: `version_${v[1]}.kmx`, saveDebug: true});
       if(result === null) callbacks.printMessages();
       assert.isNotNull(result);
 

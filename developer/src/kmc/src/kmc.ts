@@ -6,10 +6,12 @@
 import { Command, Option } from 'commander';
 import { declareBuild } from './commands/build.js';
 import { declareAnalyze } from './commands/analyze.js';
-import { KeymanSentry } from './util/KeymanSentry.js';
+import { KeymanSentry } from '@keymanapp/developer-utils';
 import KEYMAN_VERSION from "@keymanapp/keyman-version";
+import { TestKeymanSentry } from './util/TestKeymanSentry.js';
 
-await KeymanSentry.runTestIfCLRequested();
+await TestKeymanSentry.runTestIfCLRequested();
+KeymanSentry.init();
 try {
   await run();
 } catch(e) {

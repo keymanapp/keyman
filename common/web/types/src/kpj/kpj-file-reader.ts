@@ -42,7 +42,7 @@ export class KPJFileReader {
       if(!SchemaValidators.kpj90(source)) {
         // If the legacy schema also does not validate, then we will only report
         // the errors against the modern schema
-        throw new Error((<any>SchemaValidators.kpj).errors);
+        throw new Error(JSON.stringify((<any>SchemaValidators.kpj).errors));
       }
     }
   }

@@ -42,7 +42,7 @@ export interface ResolutionChain {
    * Followup gesture-models must also specify the alternate model set in order to maintain it during
    * transition between components.  Leaving it `undefined` in a followup will fully cancel the
    * alternate gesture-component selection mode and any gestures activated during the alternate
-   * selection mode (unless `sustainIfNested` is `true` for the processing gesture model).
+   * selection mode (unless `sustainWhenNested` is `true` for the processing gesture model).
    *
    * Changing to a different ID will do the likewise, then reactivate the alternate gesture-selection
    * mode with the newly-specified gesture-model set target.
@@ -51,7 +51,8 @@ export interface ResolutionChain {
 }
 
 export interface ResolutionComplete {
-  type: 'complete'
+  type: 'complete',
+  awaitNested?: boolean
 }
 
 export interface RejectionDefault {
@@ -83,6 +84,15 @@ type ResolutionStruct = ResolutionChain | ResolutionComplete;
 export type GestureResolutionSpec   = ResolutionStruct & ResolutionItemSpec;
 export type GestureResolution<Type> = (ResolutionStruct | RejectionDefault | RejectionReplace) & ResolutionItem<Type>;
 
+/**
+ * Represents the criteria necessary to fulfill one stage of an ongoing gesture;
+ * essentially, one 'state' on a time-based finite-state-machine representing
+ * a full gesture (as processed by `GestureSequence`).
+ *
+ * For example, a longpress interaction on a keyboard may consist of two stages:
+ * 1. The actual "hold and wait" that longpress is known for.
+ * 2. Selection of a key from the menu that appears afterward.
+ */
 export interface GestureModel<Type, StateToken = any> {
   // Gestures may want to say "build gesture of type `id`" for a followup-gesture.
   readonly id: string;
@@ -102,6 +112,9 @@ export interface GestureModel<Type, StateToken = any> {
      * Indicates that the corresponding GestureSource should not be considered part of the
      * Gesture sequence being matched, acting more as a separate gesture that 'triggers' a state
      * change in the current gesture being processed.
+     *
+     * Only takes effect if a model instantly resolves or rejects upon being considered for
+     * inclusion in the model.
      */
     resetOnResolve?: boolean,
     /**

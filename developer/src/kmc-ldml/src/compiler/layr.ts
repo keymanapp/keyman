@@ -23,8 +23,8 @@ export class LayrCompiler extends SectionCompiler {
     let hardwareLayers = 0;
     // let touchLayers = 0;
     this.keyboard3.layers?.forEach((layers) => {
-      const { form } = layers;
-      if (form === 'touch') {
+      const { formId } = layers;
+      if (formId === 'touch') {
         // touchLayers++;
         // multiple touch layers are OK
         totalLayerCount += layers.layer?.length;
@@ -34,14 +34,14 @@ export class LayrCompiler extends SectionCompiler {
         hardwareLayers++;
         if (hardwareLayers > 1) {
           valid = false;
-          this.callbacks.reportMessage(CompilerMessages.Error_ExcessHardware({form}));
+          this.callbacks.reportMessage(CompilerMessages.Error_ExcessHardware({formId}));
         }
       }
       layers.layer.forEach((layer) => {
-        const { modifier, id } = layer;
+        const { modifiers, id } = layer;
         totalLayerCount++;
-        if (!validModifier(modifier)) {
-          this.callbacks.reportMessage(CompilerMessages.Error_InvalidModifier({ modifier, layer: id }));
+        if (!validModifier(modifiers)) {
+          this.callbacks.reportMessage(CompilerMessages.Error_InvalidModifier({ modifiers, layer: id }));
           valid = false;
         }
       });
@@ -58,7 +58,7 @@ export class LayrCompiler extends SectionCompiler {
     const sect = new Layr();
 
     sect.lists = this.keyboard3.layers.map((layers) => {
-      const hardware = sections.strs.allocString(layers.form);
+      const hardware = sections.strs.allocString(layers.formId);
       // Already validated in validate
       const list: LayrList = {
         hardware,

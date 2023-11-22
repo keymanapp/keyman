@@ -103,7 +103,16 @@ export class GestureMatcher<Type, StateToken = any> implements PredecessorMatch<
       : predecessor.sources;
 
     const sourceTouchpoints = unfilteredSourceTouchpoints.map((entry) => {
-      return entry.isPathComplete ? null : entry;
+      if(source && entry == source) {
+        // Due to internal delays that can occur when an incoming tap triggers
+        // completion of a previously-existing gesture but is not included in it
+        // (`resetOnResolve` mechanics), it is technically possible for a very
+        // quick tap to be 'complete' by the time we start trying to match
+        // against it on some devices.  We should still try in such cases.
+        return source;
+      } else {
+        return entry.isPathComplete ? null : entry;
+      }
     }).reduce((cleansed, entry) => {
       return entry ? cleansed.concat(entry) : cleansed;
     }, [] as GestureSource<Type>[]);
@@ -128,6 +137,9 @@ export class GestureMatcher<Type, StateToken = any> implements PredecessorMatch<
         srcContact.disconnect();  // prevent further updates from mangling tracked path info.
         baseContact = srcContact.baseSource;
       }
+
+      // No need to filter out already-matched contact points, and doing so is more trouble
+      // than its worth.
 
       const contactSpec = model.contacts[touchpointIndex];
       /* c8 ignore next 3 */
@@ -421,6 +433,7 @@ export class GestureMatcher<Type, StateToken = any> implements PredecessorMatch<
 
     contactModel.update();
     // Now that we've done the initial-state check, we can check for instantly-matching path models.
+
     contactModel.promise.then((resolution) => {
       this.finalize(resolution.type == 'resolve', resolution.cause);
     });

@@ -56,8 +56,8 @@ export default class OSKLayerGroup {
       const layerObj = new OSKLayer(vkbd, layout, layer);
       this.layers[layer.id] = layerObj;
 
-      // Always make the first layer visible
-      layerObj.element.style.display = (n==0 ? 'block' : 'none');
+      // Always make the 'default' layer visible by default.
+      layerObj.element.style.display = (layer.id == 'default' ? 'block' : 'none');
 
       // Add layer to group
       lDiv.appendChild(layerObj.element);
@@ -107,6 +107,28 @@ export default class OSKLayerGroup {
       throw new Error(`Layer id ${layerId} could not be found`);
     }
 
+    this.blinkLayer(layer);
+
+    return this.nearestKey(coord, layer);
+  }
+
+  /**
+   * Temporarily enables the specified layer for page layout calculations and
+   * queues an immediate reversion to the 'true' active layer at the earliest
+   * opportunity on the JS microtask queue.
+   * @param layer
+   */
+  public blinkLayer(arg: OSKLayer | string) {
+    if(typeof arg === 'string') {
+      const layerId = arg;
+      arg = this.layers[layerId];
+      if(!arg) {
+        throw new Error(`Layer id ${layerId} could not be found`);
+      }
+    }
+
+    const layer = arg;
+
     // Note:  we do NOT manipulate `._activeLayerId` here!  This is designed
     // explicitly to be temporary.
     if(layer.element.style.display != 'block') {
@@ -124,7 +146,7 @@ export default class OSKLayerGroup {
      * We want to avoid doing it sooner in case another lookup occurs before the standard
      * async reflow, as that could trigger expensive "layout thrashing" effects.
      *
-     * In the case that a gesture-source's path needs to be remapped do a different layer,
+     * In the case that a gesture-source's path needs to be remapped to a different layer,
      * multiple synchronous calls to this method may occur.  This is a pattern that may
      * result during input layer-remapping used to solve issues like #7173 and possibly
      * also during multitap operations.
@@ -139,9 +161,7 @@ export default class OSKLayerGroup {
         layer.element.style.display = 'none';
         trueLayer.element.style.display = 'block';
       }
-    })
-
-    return this.nearestKey(coord, layer);
+    });
   }
 
   private nearestKey(coord: Omit<InputSample<KeyElement>, 'item'>, layer: OSKLayer): KeyElement {
