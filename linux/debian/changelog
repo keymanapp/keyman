@@ -1,8 +1,10 @@
-keyman (16.0.141-2) UNRELEASED; urgency=medium
+keyman (16.0.143-1) unstable; urgency=medium
 
   * Fix failure to build source after successful build (Closes #1046776)
+  * New upstream release.
+  * Re-release to Debian
 
- -- Eberhard Beilharz <eb1@sil.org>  Thu, 31 Aug 2023 17:30:34 +0200
+ -- Eberhard Beilharz <eb1@sil.org>  Wed, 22 Nov 2023 15:24:59 +0100
 
 keyman (16.0.141-1) unstable; urgency=medium
 
