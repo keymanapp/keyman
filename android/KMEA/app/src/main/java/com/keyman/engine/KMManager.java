@@ -1334,13 +1334,13 @@ public final class KMManager {
       params = getKeyboardLayoutParams();
 
       // Do NOT re-layout here; it'll be triggered once the banner loads.
-      InAppKeyboard.loadJavascript(KMString.format("enableSuggestions(%s, %s, %s)", model, mayPredict, mayCorrect), false);
+      InAppKeyboard.loadJavascript(KMString.format("enableSuggestions(%s, %s, %s)", model, mayPredict, mayCorrect));
     }
     if (isKeyboardLoaded(KeyboardType.KEYBOARD_TYPE_SYSTEM) && !SystemKeyboard.shouldIgnoreTextChange() && modelFileExists) {
       params = getKeyboardLayoutParams();
 
       // Do NOT re-layout here; it'll be triggered once the banner loads.
-      SystemKeyboard.loadJavascript(KMString.format("enableSuggestions(%s, %s, %s)", model, mayPredict, mayCorrect), false);
+      SystemKeyboard.loadJavascript(KMString.format("enableSuggestions(%s, %s, %s)", model, mayPredict, mayCorrect));
     }
     return true;
   }
@@ -1353,11 +1353,11 @@ public final class KMManager {
 
     String url = KMString.format("deregisterModel('%s')", modelID);
     if (InAppKeyboard != null) {
-      InAppKeyboard.loadJavascript(url, false);
+      InAppKeyboard.loadJavascript(url);
     }
 
     if (SystemKeyboard != null) {
-      SystemKeyboard.loadJavascript(url, false);
+      SystemKeyboard.loadJavascript(url);
     }
     return true;
   }
@@ -1375,11 +1375,11 @@ public final class KMManager {
     public static boolean setBannerOptions(boolean mayPredict) {
     String url = KMString.format("setBannerOptions(%s)", mayPredict);
     if (InAppKeyboard != null) {
-      InAppKeyboard.loadJavascript(url, false);
+      InAppKeyboard.loadJavascript(url);
     }
 
     if (SystemKeyboard != null) {
-      SystemKeyboard.loadJavascript(url, false);
+      SystemKeyboard.loadJavascript(url);
     }
     return true;
   }
@@ -1870,12 +1870,12 @@ public final class KMManager {
 
   public static void applyKeyboardHeight(Context context, int height) {
     if (isKeyboardLoaded(KeyboardType.KEYBOARD_TYPE_INAPP)) {
-      InAppKeyboard.loadJavascript(KMString.format("setOskHeight('%s')", height), false);
+      InAppKeyboard.loadJavascript(KMString.format("setOskHeight('%s')", height));
       RelativeLayout.LayoutParams params = getKeyboardLayoutParams();
       InAppKeyboard.setLayoutParams(params);
     }
     if (isKeyboardLoaded(KeyboardType.KEYBOARD_TYPE_SYSTEM)) {
-      SystemKeyboard.loadJavascript(KMString.format("setOskHeight('%s')", height), false);
+      SystemKeyboard.loadJavascript(KMString.format("setOskHeight('%s')", height));
       RelativeLayout.LayoutParams params = getKeyboardLayoutParams();
       SystemKeyboard.setLayoutParams(params);
     }
@@ -1946,11 +1946,11 @@ public final class KMManager {
   public static void setNumericLayer(KeyboardType kbType) {
     if (kbType == KeyboardType.KEYBOARD_TYPE_INAPP) {
       if (isKeyboardLoaded(KeyboardType.KEYBOARD_TYPE_INAPP) && !InAppKeyboard.shouldIgnoreTextChange()) {
-        InAppKeyboard.loadJavascript("setNumericLayer()", false);
+        InAppKeyboard.loadJavascript("setNumericLayer()");
       }
     } else if (kbType == KeyboardType.KEYBOARD_TYPE_SYSTEM) {
       if (isKeyboardLoaded(KeyboardType.KEYBOARD_TYPE_SYSTEM) && !SystemKeyboard.shouldIgnoreTextChange()) {
-        SystemKeyboard.loadJavascript("setNumericLayer()", false);
+        SystemKeyboard.loadJavascript("setNumericLayer()");
       }
     }
   }
