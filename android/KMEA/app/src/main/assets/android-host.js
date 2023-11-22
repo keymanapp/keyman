@@ -8,6 +8,9 @@ if(window.parent && window.parent.jsInterface && !window.jsInterface) {
 var device = window.jsInterface.getDeviceType();
 var oskHeight = Math.ceil(window.jsInterface.getKeyboardHeight() / window.devicePixelRatio);
 var oskWidth = 0;
+var bannerHeight = 0;
+var bannerImagePath = '';
+var bannerHTMLContents = '';
 var fragmentToggle = 0;
 
 var sentryManager = new KeymanSentryManager({
@@ -37,11 +40,13 @@ function init() {
     oninserttext: insertText,
     root:'./'
   }).then(function () {  // Note:  For non-upgraded API 21, arrow functions will break the keyboard!
-    const bannerHeight = Math.ceil(window.jsInterface.getDefaultBannerHeight() / window.devicePixelRatio);
+    bannerHeight = Math.ceil(window.jsInterface.getDefaultBannerHeight() / window.devicePixelRatio);
+    if (bannerHeight > 0) {
 
-    // The OSK is not available until initialization is complete.
-    keyman.osk.bannerView.activeBannerHeight = bannerHeight;
-    keyman.refreshOskLayout();
+      // The OSK is not available until initialization is complete.
+      keyman.osk.bannerView.activeBannerHeight = bannerHeight;
+      keyman.refreshOskLayout();
+    }
   });
 
   keyman.addEventListener('keyboardloaded', setIsChiral);
@@ -51,6 +56,29 @@ function init() {
   document.body.addEventListener('touchend', loadDefaultKeyboard);
 
   notifyHost('pageLoaded');
+}
+
+function showBanner(flag) {
+  console_debug("Setting banner display for dictionaryless keyboards to " + flag);
+  console_debug("bannerHTMLContents: " + bannerHTMLContents);
+  var bc = keyman.osk.bannerController;
+  if (bc) {
+    if (bannerHTMLContents != '') {
+      bc.inactiveBanner = flag ? new bc.HTMLBanner(bannerHTMLContents) : null;
+    } else {
+      bc.inactiveBanner = flag ? new bc.ImageBanner(bannerImagePath) : null;
+    }
+  }
+}
+
+function setBannerImage(path) {
+  bannerImagePath = path;
+}
+
+// Set the HTML banner to use when predictive-text is not available
+// contents - HTML content to use for the banner
+function setBannerHTML(contents) {
+  bannerHTMLContents = contents;
 }
 
 function notifyHost(event, params) {
@@ -65,12 +93,19 @@ function notifyHost(event, params) {
 }
 
 // Update the KMW banner height
+// h is in dpi (different from iOS)
 function setBannerHeight(h) {
   if (h > 0) {
-    var osk = keyman.osk;
-    osk.banner.height = Math.ceil(h / window.devicePixelRatio);
+    // The banner itself may not be loaded yet.  This will preemptively help set
+    // its eventual display height.
+    bannerHeight = Math.ceil(h / window.devicePixelRatio);
+
+    if (keyman.osk) {
+      keyman.osk.bannerView.activeBannerHeight = bannerHeight;
+    }  
   }
-  // Refresh KMW OSK
+
+  // Refresh KMW's OSK
   keyman.refreshOskLayout();
 }
 

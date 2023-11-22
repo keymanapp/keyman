@@ -25,6 +25,7 @@
 		1645D5952036C6FF0076C51B /* KeymanPackage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1645D5942036C6FF0076C51B /* KeymanPackage.swift */; };
 		1645D5972036C9F80076C51B /* KMPKeyboard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1645D5962036C9F80076C51B /* KMPKeyboard.swift */; };
 		165EB3A12098993900040A69 /* KeyboardError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 165EB3A02098993900040A69 /* KeyboardError.swift */; };
+		296EF2C72AFA26C700E3E384 /* ZIPFoundation.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 296EF2C62AFA26C700E3E384 /* ZIPFoundation.xcframework */; };
 		377D10DE26846B8900467431 /* SpacebarTextViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 377D10DD26846B8900467431 /* SpacebarTextViewController.swift */; };
 		6CD5DFAA150F6DC8007A5DDE /* icon.png in Resources */ = {isa = PBXBuildFile; fileRef = 6CD5DFA8150F6DC8007A5DDE /* icon.png */; };
 		6CD5DFAB150F6DC8007A5DDE /* icon@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 6CD5DFA9150F6DC8007A5DDE /* icon@2x.png */; };
@@ -121,7 +122,6 @@
 		CE5C8BE324B5B3BA00FAFB7F /* Queries+LexicalModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE5C8BE224B5B3BA00FAFB7F /* Queries+LexicalModel.swift */; };
 		CE5C8BE524B5BD1C00FAFB7F /* QueryModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE5C8BE424B5BD1C00FAFB7F /* QueryModelTests.swift */; };
 		CE5EDDC526522EAA001733AC /* XCGLogger.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = CE5EDDC026522EA9001733AC /* XCGLogger.xcframework */; };
-		CE5EDDC626522EAA001733AC /* Zip.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = CE5EDDC126522EA9001733AC /* Zip.xcframework */; };
 		CE5EDDC726522EAA001733AC /* Sentry.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = CE5EDDC226522EAA001733AC /* Sentry.xcframework */; };
 		CE5EDDC826522EAA001733AC /* Reachability.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = CE5EDDC326522EAA001733AC /* Reachability.xcframework */; };
 		CE5EDDC926522EAA001733AC /* ObjcExceptionBridging.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = CE5EDDC426522EAA001733AC /* ObjcExceptionBridging.xcframework */; };
@@ -308,6 +308,7 @@
 		2949146F2738DA6700400732 /* ff-NG */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "ff-NG"; path = "ff-NG.lproj/ResourceInfoView.strings"; sourceTree = "<group>"; };
 		294914702738DD7400400732 /* ff-NG */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "ff-NG"; path = "ff-NG.lproj/Localizable.strings"; sourceTree = "<group>"; };
 		294914712738DD9700400732 /* ff-NG */ = {isa = PBXFileReference; lastKnownFileType = text.plist.stringsdict; name = "ff-NG"; path = "ff-NG.lproj/Localizable.stringsdict"; sourceTree = "<group>"; };
+		296EF2C62AFA26C700E3E384 /* ZIPFoundation.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = ZIPFoundation.xcframework; path = ../../Carthage/Build/ZIPFoundation.xcframework; sourceTree = "<group>"; };
 		297810FE297FAEDF007C886D /* kn */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = kn; path = kn.lproj/ResourceInfoView.strings; sourceTree = "<group>"; };
 		297810FF297FAEF8007C886D /* kn */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = kn; path = kn.lproj/Localizable.strings; sourceTree = "<group>"; };
 		29781100297FAF06007C886D /* kn */ = {isa = PBXFileReference; lastKnownFileType = text.plist.stringsdict; name = kn; path = kn.lproj/Localizable.stringsdict; sourceTree = "<group>"; };
@@ -436,7 +437,6 @@
 		CE5C8BE424B5BD1C00FAFB7F /* QueryModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QueryModelTests.swift; sourceTree = "<group>"; };
 		CE5EDDBB26522EA3001733AC /* DeviceKit.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = DeviceKit.xcframework; path = ../../Carthage/Build/DeviceKit.xcframework; sourceTree = "<group>"; };
 		CE5EDDC026522EA9001733AC /* XCGLogger.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = XCGLogger.xcframework; path = ../../Carthage/Build/XCGLogger.xcframework; sourceTree = "<group>"; };
-		CE5EDDC126522EA9001733AC /* Zip.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = Zip.xcframework; path = ../../Carthage/Build/Zip.xcframework; sourceTree = "<group>"; };
 		CE5EDDC226522EAA001733AC /* Sentry.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = Sentry.xcframework; path = ../../Carthage/Build/Sentry.xcframework; sourceTree = "<group>"; };
 		CE5EDDC326522EAA001733AC /* Reachability.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = Reachability.xcframework; path = ../../Carthage/Build/Reachability.xcframework; sourceTree = "<group>"; };
 		CE5EDDC426522EAA001733AC /* ObjcExceptionBridging.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = ObjcExceptionBridging.xcframework; path = ../../Carthage/Build/ObjcExceptionBridging.xcframework; sourceTree = "<group>"; };
@@ -560,8 +560,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				296EF2C72AFA26C700E3E384 /* ZIPFoundation.xcframework in Frameworks */,
 				CE5EDDC526522EAA001733AC /* XCGLogger.xcframework in Frameworks */,
-				CE5EDDC626522EAA001733AC /* Zip.xcframework in Frameworks */,
 				CE5EDDD52652372A001733AC /* DeviceKit.xcframework in Frameworks */,
 				CE5EDDC726522EAA001733AC /* Sentry.xcframework in Frameworks */,
 				CE5EDDC826522EAA001733AC /* Reachability.xcframework in Frameworks */,
@@ -949,11 +949,11 @@
 		F243888114BBD43000A3E055 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				296EF2C62AFA26C700E3E384 /* ZIPFoundation.xcframework */,
 				CE5EDDC426522EAA001733AC /* ObjcExceptionBridging.xcframework */,
 				CE5EDDC326522EAA001733AC /* Reachability.xcframework */,
 				CE5EDDC226522EAA001733AC /* Sentry.xcframework */,
 				CE5EDDC026522EA9001733AC /* XCGLogger.xcframework */,
-				CE5EDDC126522EA9001733AC /* Zip.xcframework */,
 				CE5EDDBB26522EA3001733AC /* DeviceKit.xcframework */,
 				9A079DE52231A69D00581263 /* Foundation.framework */,
 			);
