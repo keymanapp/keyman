@@ -20,9 +20,10 @@ extern "C" __declspec(dllexport) unsigned int EnginePostInstall(MSIHANDLE hInsta
   HANDLE hFile;
 
   // Find %appdata% path
-  TCHAR path[MAX_PATH];
-  if (SUCCEEDED(SHGetFolderPathW(NULL, CSIDL_COMMON_APPDATA, NULL, 0, path))) {
-    _tcscat_s(path, SFolderKeymanRoot);
+  PWSTR path = new wchar_t[MAX_PATH];
+
+  if (SUCCEEDED(SHGetKnownFolderPath(FOLDERID_ProgramData, 0, NULL, &path))) {
+    wcscat_s(path, MAX_PATH, SFolderKeymanRoot);
 
     // Create directory if it does not exist
     if (GetFileAttributes(path) == INVALID_FILE_ATTRIBUTES) {
@@ -79,6 +80,7 @@ extern "C" __declspec(dllexport) unsigned int EnginePostInstall(MSIHANDLE hInsta
     CloseHandle(hFile);
   }
 
+  CoTaskMemFree(path);
   return ERROR_SUCCESS;
 }
 
