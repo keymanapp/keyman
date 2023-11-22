@@ -1989,11 +1989,11 @@ public final class KMManager {
   public static void resetContext(KeyboardType kbType) {
     if (kbType == KeyboardType.KEYBOARD_TYPE_INAPP) {
       if (isKeyboardLoaded(KeyboardType.KEYBOARD_TYPE_INAPP)) {
-        InAppKeyboard.loadJavascript("resetContext()", true);
+        InAppKeyboard.loadJavascript("resetContext()");
       }
     } else if (kbType == KeyboardType.KEYBOARD_TYPE_SYSTEM) {
       if (isKeyboardLoaded(KeyboardType.KEYBOARD_TYPE_SYSTEM)) {
-        SystemKeyboard.loadJavascript("resetContext()", true);
+        SystemKeyboard.loadJavascript("resetContext()");
       }
     }
   }
