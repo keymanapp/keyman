@@ -25,32 +25,21 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.AssetManager;
 import android.content.res.Configuration;
-import android.graphics.Bitmap;
-import android.graphics.RectF;
 import android.graphics.Typeface;
 import android.inputmethodservice.InputMethodService;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.net.Uri;
 import android.os.Build;
-import android.os.Handler;
 import android.os.IBinder;
-import android.os.Looper;
 import android.text.InputType;
 import android.util.Log;
-import android.view.HapticFeedbackConstants;
-import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.inputmethod.EditorInfo;
-import android.view.inputmethod.ExtractedText;
-import android.view.inputmethod.ExtractedTextRequest;
 import android.view.inputmethod.InputConnection;
 import android.view.inputmethod.InputMethodManager;
-import android.webkit.JavascriptInterface;
 import android.webkit.WebView;
-import android.webkit.WebViewClient;
 import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
 
@@ -71,7 +60,6 @@ import com.keyman.engine.packages.JSONUtils;
 import com.keyman.engine.packages.LexicalModelPackageProcessor;
 import com.keyman.engine.packages.PackageProcessor;
 import com.keyman.engine.util.BCP47;
-import com.keyman.engine.util.CharSequenceUtil;
 import com.keyman.engine.util.DependencyUtil;
 import com.keyman.engine.util.DependencyUtil.LibraryType;
 import com.keyman.engine.util.FileUtils;
@@ -156,6 +144,34 @@ public final class KMManager {
       return modes[this.ordinal()];
     }
   };
+
+  // Maps to enum BannerType in bannerView.ts
+  public enum BannerType {
+    BLANK,
+    IMAGE,
+    SUGGESTION,
+    HTML;
+
+    public static BannerType fromString(String mode) {
+      if (mode == null) return BLANK;
+      switch (mode) {
+        case "BLANK":
+          return BLANK;
+        case "image":
+          return IMAGE;
+        case "suggestion":
+          return SUGGESTION;
+        case "html":
+          return HTML;
+      }
+      return BLANK;
+    }
+
+    public String toString() {
+      String modes[] = { "blank", "image", "suggestion", "html"};
+      return modes[this.ordinal()];
+    }
+  }
 
   protected static InputMethodService IMService;
 
@@ -286,6 +302,9 @@ public final class KMManager {
   public static final String KMFilename_KeyboardsList = "keyboards_list.dat";
 
   public static final String KMFilename_LexicalModelsList = "lexical_models_list.dat";
+
+  public static final String KMBLACK_BANNER = "<div style=\"background: black; width: 100%; height: 100%; position: absolute; left: 0; top: 0\"></div>";
+  public static final String KMGRAY_BANNER = "<div style=\"background: #b4b4b8; width: 100%; height: 100%; position: absolute; left: 0; top: 0\"></div>";
 
   private static Context appContext;
 
@@ -636,6 +655,16 @@ public final class KMManager {
     keyboard.addJavascriptInterface(new KMKeyboardJSHandler(appContext, keyboard), "jsInterface");
     keyboard.loadKeyboard();
 
+    if (!isTestMode()) {
+      // For apps that don't specify an HTML banner, specify a default phone/tablet HTML banner
+      if (getFormFactor() == FormFactor.PHONE) {
+        keyboard.setHTMLBanner(KMBLACK_BANNER);
+      } else {
+        keyboard.setHTMLBanner(KMGRAY_BANNER);
+      }
+      keyboard.setBanner(KMManager.BannerType.HTML);
+      keyboard.showBanner(true);
+    }
     setEngineWebViewVersionStatus(appContext, keyboard);
   }
 
@@ -791,6 +820,31 @@ public final class KMManager {
 
   public static boolean hasInternetPermission(Context context) {
     return hasPermission(context, Manifest.permission.INTERNET);
+  }
+
+  /**
+   * Copy HTML banner assets to the app
+   * @param context - The context
+   * @param path - Folder relative to assets/ containing the banner file.
+   * @return boolean - true if assets copied
+   */
+  public static boolean copyHTMLBannerAssets(Context context, String path) {
+    AssetManager assetManager = context.getAssets();
+    try {
+      File bannerDir = new File(getResourceRoot() + File.separator + path);
+      if (!bannerDir.exists()) {
+        bannerDir.mkdir();
+      }
+
+      String[] bannerFiles = assetManager.list(path);
+      for (String bannerFile : bannerFiles) {
+        copyAsset(context, bannerFile, path, true);
+      }
+      return true;
+    } catch (Exception e) {
+      KMLog.LogException(TAG, "copyHTMLBannerAssets() failed. Error: ", e);
+    }
+    return false;
   }
 
   private static void copyAssets(Context context) {
@@ -1372,7 +1426,13 @@ public final class KMManager {
     KeyboardPickerActivity.deleteLexicalModel(context, position, silenceNotification);
   }
 
-    public static boolean setBannerOptions(boolean mayPredict) {
+  /**
+   * setBannerOptions - Update KMW whether to generate predictions.
+   *                    For now, also display banner
+   * @param mayPredict - boolean whether KMW should generate predictions
+   * @return boolean - Success
+   */
+  public static boolean setBannerOptions(boolean mayPredict) {
     String url = KMString.format("setBannerOptions(%s)", mayPredict);
     if (InAppKeyboard != null) {
       InAppKeyboard.loadJavascript(url);
@@ -1380,6 +1440,73 @@ public final class KMManager {
 
     if (SystemKeyboard != null) {
       SystemKeyboard.loadJavascript(url);
+    }
+
+    return true;
+  }
+
+  /**
+   * Update KeymanWeb banner type
+   * @param {KeyboardType} keyboard
+   * @param {BannerType} bannerType
+   * @return status
+   */
+  public static boolean setBanner(KeyboardType keyboard, BannerType bannerType) {
+    if (keyboard == KeyboardType.KEYBOARD_TYPE_INAPP && InAppKeyboard != null) {
+      InAppKeyboard.setBanner(bannerType);
+    } else if (keyboard == KeyboardType.KEYBOARD_TYPE_SYSTEM && SystemKeyboard != null) {
+      SystemKeyboard.setBanner(bannerType);
+    } else {
+      return false;
+    }
+    return true;
+  }
+
+  /**
+   * Set the HTML content to use with the HTML banner
+   * @param {KeyboardType} keyboard
+   * @param {String} HTMl string
+   * @return {boolean}
+   */
+  public static boolean setHTMLBanner(KeyboardType keyboard, String htmlContent) {
+    if (keyboard == KeyboardType.KEYBOARD_TYPE_INAPP && InAppKeyboard != null) {
+      InAppKeyboard.setHTMLBanner(htmlContent);
+    } else if (keyboard == KeyboardType.KEYBOARD_TYPE_SYSTEM && SystemKeyboard != null) {
+      SystemKeyboard.setHTMLBanner(htmlContent);
+    } else {
+      Log.d(TAG, "setHTMLBanner() but keyboard is null");
+      return false;
+    }
+    return true;
+  }
+
+  /**
+   * Get the HTML content associated with the HTML banner
+   * @param {KeyboardType} keyboard
+   * @return {String}
+   */
+  public static String getHTMLBanner(KeyboardType keyboard) {
+    if (keyboard == KeyboardType.KEYBOARD_TYPE_INAPP && InAppKeyboard != null) {
+      return InAppKeyboard.getHTMLBanner();
+    } else if (keyboard == KeyboardType.KEYBOARD_TYPE_SYSTEM && SystemKeyboard != null) {
+      return SystemKeyboard.getHTMLBanner();
+    }
+    return "";
+  }
+
+  /**
+   * showBanner - Update KMW whether to display banner.
+   *              For now, always keep displaying banner
+   * @param flag - boolean whether KMW should display banner
+   * @return boolean - Success
+   */
+  public static boolean showBanner(boolean flag) {
+    if (InAppKeyboard != null) {
+      InAppKeyboard.showBanner(flag);
+    }
+
+    if (SystemKeyboard != null) {
+      SystemKeyboard.showBanner(flag);
     }
     return true;
   }
@@ -1847,9 +1974,9 @@ public final class KMManager {
 
   public static int getBannerHeight(Context context) {
     int bannerHeight = 0;
-    if (InAppKeyboard != null && InAppKeyboard.currentBanner().equals(KMKeyboard.KM_BANNER_STATE_SUGGESTION)) {
+    if (InAppKeyboard != null && InAppKeyboard.getBanner() != BannerType.BLANK) {
       bannerHeight = (int) context.getResources().getDimension(R.dimen.banner_height);
-    } else if (SystemKeyboard != null && SystemKeyboard.currentBanner().equals(KMKeyboard.KM_BANNER_STATE_SUGGESTION)) {
+    } else if (SystemKeyboard != null && SystemKeyboard.getBanner() != BannerType.BLANK) {
       bannerHeight = (int) context.getResources().getDimension(R.dimen.banner_height);
     }
     return bannerHeight;

@@ -9,7 +9,7 @@
       <keystroke key="a" />
       <keystroke key="b" />
       <backspace />
-      <check result="ta" /> <!-- TODO-LDML: #9760 Should be 't' due to backspace transform -->
+      <check result="t" />
     </test>
   </tests>
 </keyboardTest3>

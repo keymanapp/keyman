@@ -7,13 +7,11 @@ package com.keyman.engine;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import com.keyman.engine.BaseActivity;
 import com.keyman.engine.data.Keyboard;
 import com.keyman.engine.data.KeyboardController;
 import com.keyman.engine.KMManager.KeyboardType;
@@ -25,19 +23,11 @@ import com.keyman.engine.util.FileUtils;
 import com.keyman.engine.util.KMLog;
 import com.keyman.engine.util.KMString;
 
-import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
-import android.content.pm.PackageManager;
 import android.content.res.Configuration;
-import android.graphics.Color;
-import android.graphics.Rect;
-import android.graphics.RectF;
-import android.graphics.Typeface;
-import android.os.Build;
-import android.os.Bundle;
 import android.os.Handler;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -46,7 +36,6 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.view.inputmethod.ExtractedText;
 import android.view.inputmethod.ExtractedTextRequest;
@@ -56,12 +45,9 @@ import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.widget.Button;
-import android.widget.FrameLayout;
-import android.widget.GridLayout;
 import android.widget.PopupWindow;
 import android.widget.PopupWindow.OnDismissListener;
 import android.widget.RelativeLayout;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import io.sentry.Breadcrumb;
@@ -93,18 +79,9 @@ final class KMKeyboard extends WebView {
   private static String currentKeyboard = null;
 
   /**
-   * Banner state value: "blank" - no banner available.
-   */
-  protected static final String KM_BANNER_STATE_BLANK = "blank";
-  /**
-   * Banner state value: "suggestion" - dictionary suggestions are shown.
-   */
-  protected static final String KM_BANNER_STATE_SUGGESTION = "suggestion";
-
-  /**
    * Current banner state.
    */
-  protected static String currentBanner = KM_BANNER_STATE_BLANK;
+  protected static KMManager.BannerType currentBanner = KMManager.BannerType.HTML;
 
   private static String txtFont = "";
   private static String oskFont = null;
@@ -112,6 +89,10 @@ final class KMKeyboard extends WebView {
   private final String fontUndefined = "undefined";
   private GestureDetector gestureDetector;
   private static ArrayList<OnKeyboardEventListener> kbEventListeners = null;
+
+  // Stores the current html string for use by the Banner
+  // when predictive text is not active
+  protected String htmlBannerString = "";
 
   // Facilitates a 'lazy init' - we'll only check the preference when it matters,
   // rather than at construction time.
@@ -414,6 +395,9 @@ final class KMKeyboard extends WebView {
 
     int bannerHeight = KMManager.getBannerHeight(context);
     int oskHeight = KMManager.getKeyboardHeight(context);
+    if (this.htmlBannerString != null && !this.htmlBannerString.isEmpty()) {
+      setHTMLBanner(this.htmlBannerString);
+    }
     loadJavascript(KMString.format("setBannerHeight(%d)", bannerHeight));
     loadJavascript(KMString.format("setOskWidth(%d)", newConfig.screenWidthDp));
     loadJavascript(KMString.format("setOskHeight(%d)", oskHeight));
@@ -439,22 +423,15 @@ final class KMKeyboard extends WebView {
     return currentKeyboard;
   }
 
-  public static void setCurrentBanner(String banner) {
-    currentBanner = banner;
-  }
-
-  public static String currentBanner() { return currentBanner; }
-
   protected void toggleSuggestionBanner(HashMap<String, String> associatedLexicalModel, boolean keyboardChanged) {
     //reset banner state if new language has no lexical model
-    if (currentBanner != null && currentBanner.equals(KM_BANNER_STATE_SUGGESTION)
+    if (currentBanner == KMManager.BannerType.SUGGESTION
         && associatedLexicalModel == null) {
-      setCurrentBanner(KMKeyboard.KM_BANNER_STATE_BLANK);
+      currentBanner = KMManager.BannerType.HTML;
     }
 
-    if(keyboardChanged) {
-      setLayoutParams(KMManager.getKeyboardLayoutParams());
-    }
+    showBanner(true);
+    // Since there's always a banner, no need to update setLayoutParams()
   }
 
   /**
@@ -665,6 +642,30 @@ final class KMKeyboard extends WebView {
     KeyboardEventHandler.notifyListeners(kbEventListeners, keyboardType, EventType.KEYBOARD_CHANGED, currentKeyboard);
 
     return retVal;
+  }
+
+  public void showBanner(boolean flag) {
+    String jsString = KMString.format("showBanner(%b)", flag);
+    loadJavascript(jsString);
+  }
+
+  public KMManager.BannerType getBanner() {
+    return currentBanner;
+  }
+
+  public void setBanner(KMManager.BannerType bannerType) {
+    currentBanner = bannerType;
+  }
+
+  public String getHTMLBanner() {
+    return this.htmlBannerString;
+  }
+
+  public void setHTMLBanner(String contents) {
+    this.htmlBannerString = contents;
+    String jsString = KMString.format("setBannerHTML(%s)",
+      JSONObject.quote(this.htmlBannerString));
+    loadJavascript(jsString);
   }
 
   public void setChirality(boolean flag) {

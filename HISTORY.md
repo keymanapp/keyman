@@ -1,5 +1,19 @@
 # Keyman Version History
 
+## 17.0.214 alpha 2023-11-20
+
+* fix(ios): fv: replace Zip framework to prevent crash on startup (#10018)
+
+## 17.0.213 alpha 2023-11-17
+
+* fix(linux): Fix packaging GHA (#10020)
+* fix(android): Always display HTML banner when suggestions aren't available (#9696)
+
+## 17.0.212 alpha 2023-11-16
+
+* chore(web): splits banner.ts into separate files per banner type (#9987)
+* refactor(web): inactive banner management (#9988)
+
 ## 17.0.211 alpha 2023-11-15
 
 * fix(windows): setup.inf generation had whitespace (#10000)
