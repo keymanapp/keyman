@@ -38,6 +38,8 @@ enum ShiftState {
     ShftXxxx = Shft | Xxxx,             // 9
 };
 
+int map_VKShiftState_to_Lin(int VKShiftState);
+
 const UINT USVirtualKeyToScanCode[256] = {
 	0x00, // L"K_?00",				// &H0
 	0x00, // L"K_LBUTTON",			// &H1
@@ -444,6 +446,8 @@ const KMX_DWORD KMX_VKMap[] = {
 
   //_S2 those might not work correctly yet*/
 
+  VK_SPACE,     /*   32 */
+
   VK_ACCENT,    /*   192 VK_OEM_3 */
   VK_HYPHEN,    /* - 189 VK_OEM_MINUS */
   VK_EQUAL,     /* = 187 VK_OEM_PLUS */
@@ -458,8 +462,6 @@ const KMX_DWORD KMX_VKMap[] = {
   VK_COMMA,     /* , 188 VK_OEM_COMMA */
   VK_PERIOD,    /* . 190 VK_OEM_PERIOD */
   VK_SLASH,     /* / 191 VK_OEM_2 */
-
-  VK_SPACE,     /*   32 */
 
   VK_xDF,       /* ß (?) 223*/
   VK_OEM_102,   /* < > | 226 */
@@ -518,7 +520,7 @@ std::wstring get_KeyVals_according_to_keycode_and_Shiftstate(GdkKeymap *keymap, 
 // _S2 needed?
 // can go later
 void Try_GDK(GdkKeymap *keymap, UINT KeySym );
-void Inspect_Key_S(GdkKeymap *keymap ) ;
+void Inspect_Key_S(GdkKeymap *keymap );
 UINT find_SC_Other_from_SC_US_GDK(UINT vk_US_187,GdkKeymap *keymap);
 // _S2 needed?
 // create a Vector with all entries of both keymaps+ keymap

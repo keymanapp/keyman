@@ -148,7 +148,7 @@ int split_US_To_3D_Vector(v_dw_3D &all_US,v_str_1D completeList) {
   std::wstring tok_wstr;
 
   // loop through the whole vector
-  for (int k = 0; k < (int)completeList.size() ; k++) {
+  for (int k = 0; k < (int)completeList.size(); k++) {
 
     // remove all unwanted char
     for (int i = 0; i < (int) delim.size(); i++) {
@@ -205,25 +205,25 @@ int replace_KeyName_with_Keycode(std::string  in) {
 // _S2 these are the Scancode-Values we use in Keyman ( = like the windows scancodes)
   //     NAME IN SYMBOLS-FILE      KEYCODE (LIN STYLE)      (WIN STYLE)       VK_US      VK_DE
                                              /*on US keyb;*/
-  if      ( in == "key<TLDE>")    out = 49;                /*                VK_  */  // TOASK correct ???
-  else if ( in == "key<AE01>")    out = 10;                /* 0X02           VK_1 */
-  else if ( in == "key<AE02>")    out = 11;                /* 0X03           VK_2  */
-  else if ( in == "key<AE03>")    out = 12;                /* 0X04           VK_3  */
-  else if ( in == "key<AE04>")    out = 13;                /* 0X05           VK_4  */
-  else if ( in == "key<AE05>")    out = 14;                /* 0X06           VK_5  */
-  else if ( in == "key<AE06>")    out = 15;                /* 0X07           VK_6  */
-  else if ( in == "key<AE07>")    out = 16;                /* 0X08           VK_7  */
-  else if ( in == "key<AE08>")    out = 17;                /* 0X09           VK_8  */
-  else if ( in == "key<AE09>")    out = 18;                /* 0X0A           VK_9  */
-  else if ( in == "key<AE10>")    out = 19;                /* 0X0B           VK_0  */
+  if      ( in == "key<TLDE>")    out = 49;               /*                VK_  */  // TOASK correct ???
+  else if ( in == "key<AE01>")    out = 10;              /* 0X02           VK_1 */
+  else if ( in == "key<AE02>")    out = 11;              /* 0X03           VK_2  */
+  else if ( in == "key<AE03>")    out = 12;              /* 0X04           VK_3  */
+  else if ( in == "key<AE04>")    out = 13;              /* 0X05           VK_4  */
+  else if ( in == "key<AE05>")    out = 14;              /* 0X06           VK_5  */
+  else if ( in == "key<AE06>")    out = 15;              /* 0X07           VK_6  */
+  else if ( in == "key<AE07>")    out = 16;              /* 0X08           VK_7  */
+  else if ( in == "key<AE08>")    out = 17;              /* 0X09           VK_8  */
+  else if ( in == "key<AE09>")    out = 18;              /* 0X0A           VK_9  */
+  else if ( in == "key<AE10>")    out = 19;              /* 0X0B           VK_0  */
   else if ( in == "key<AE11>")    out = 20; /*out = 61;*/  /* 0X0C           VK_MINUS   de ẞ*/
-  else if ( in == "key<AE12>")    out = 21;                /* 0X0D           VK_EQUALS  DE ' */
+  else if ( in == "key<AE12>")    out = 21;              /* 0X0D           VK_EQUALS  DE ' */
 
-  else if ( in == "key<AD01>")    out = 24;                /* 0X10            VK_Q  */
-  else if ( in == "key<AD02>")    out = 25;                /* 0X11            VK_W  */
-  else if ( in == "key<AD03>")    out = 26;                /* 0X12            VK_E  */
-  else if ( in == "key<AD04>")    out = 27;                /* 0X13            VK_R  */
-  else if ( in == "key<AD05>")    out = 28;                /* 0X14            VK_T  */
+  else if ( in == "key<AD01>")    out = 24;              /* 0X10            VK_Q  */
+  else if ( in == "key<AD02>")    out = 25;              /* 0X11            VK_W  */
+  else if ( in == "key<AD03>")    out = 26;              /* 0X12            VK_E  */
+  else if ( in == "key<AD04>")    out = 27;              /* 0X13            VK_R  */
+  else if ( in == "key<AD05>")    out = 28;              /* 0X14            VK_T  */
   else if ( in == "key<AD06>")    out = 29; /*out = 52;*/  /* 0X15            VK_Y  */
   else if ( in == "key<AD07>")    out = 30;                /* 0X16            VK_U  */
   else if ( in == "key<AD08>")    out = 31;                /* 0X17            VK_I  */
@@ -380,7 +380,7 @@ KMX_DWORD get_VirtualKey_Other_GDK( GdkKeymap *keymap, KMX_DWORD keycode) {
       UINT VK_for_rgKey2 = ScanCodeToUSVirtualKey[keycode-8];
 
     //return  (KMX_DWORD) *keyvals;}  //_S2 what to return if >255
-    return  (KMX_DWORD) VK_for_rgKey2 ; }
+    return  (KMX_DWORD) VK_for_rgKey2; }
 
   return 0;   //_S2 what to return if not found
 }
@@ -470,7 +470,8 @@ std::wstring  get_KeyVals_according_to_keycode_and_Shiftstate(GdkKeymap *keymap,
 
   //ALT-GR
   else if (( ss == MenuCtrl ) && ( caps == 0 )){
-    GdkModifierType MOD_AltGr = (GdkModifierType) ( 144 );
+    //GdkModifierType MOD_AltGr = (GdkModifierType) ( 144 );
+    GdkModifierType MOD_AltGr = (GdkModifierType) ( (GDK_MOD2_MASK | GDK_MOD5_MASK) );
     gdk_keymap_translate_keyboard_state (keymap, keycode, MOD_AltGr , 0, keyvals, NULL, NULL, & consumed);
     return  std::wstring(1, (int) *keyvals);
   }
@@ -478,7 +479,8 @@ std::wstring  get_KeyVals_according_to_keycode_and_Shiftstate(GdkKeymap *keymap,
 
   //ALT-GR
   else if (( ss == MenuCtrl ) && ( caps == 1 )){
-    GdkModifierType MOD_AltGr = (GdkModifierType) ( 144 );
+    //GdkModifierType MOD_AltGr = (GdkModifierType) ( 146 );
+    GdkModifierType MOD_AltGr = (GdkModifierType) ( (GDK_MOD2_MASK | GDK_MOD5_MASK | GDK_LOCK_MASK) );
     gdk_keymap_translate_keyboard_state (keymap, keycode, MOD_AltGr , 0, keyvals, NULL, NULL, & consumed);
     return  std::wstring(1, (int) *keyvals);
   }
@@ -500,3 +502,11 @@ UINT find_SC_Other_from_SC_US_GDK(UINT SC_US,GdkKeymap *keymap) {
   return SC_US;
 }
 
+
+int map_VKShiftState_to_Lin(int VKShiftState) {
+  if (VKShiftState == 0 )      return 0;		/* 0000 0000 */
+  if (VKShiftState == 16)      return 1;		/* 0001 0000 */
+  //if (VKShiftState == 9 )      return 2;		/* 0000 1001 */
+  //if (VKShiftState == 25)      return 3; 		/* 0001 1001 */
+  return VKShiftState;
+}
