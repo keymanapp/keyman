@@ -1,5 +1,12 @@
 # Keyman Version History
 
+## 17.0.215 alpha 2023-11-22
+
+* feat(core): ldml marker normalization (#9761)
+* feat(core): ldml backspace transform (#9960)
+* feat(core): ldml tertiary reordering (#9962)
+* fix(web): fixes OSK viewport scaling on iOS devices (#10035)
+
 ## 17.0.214 alpha 2023-11-20
 
 * fix(ios): fv: replace Zip framework to prevent crash on startup (#10018)
