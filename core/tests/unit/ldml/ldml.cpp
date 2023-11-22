@@ -128,16 +128,9 @@ apply_action(
         assert(context.back().character == ch);
         context.pop_back();
       } else {
-        assert(act.backspace.expected_type == KM_CORE_BT_UNKNOWN); // else it must be unknown
-        // pop to first character or empty
-        while (!context.empty() && context.back().type != KM_CORE_CT_CHAR) {
-          // pop off all non-character entries
-          context.pop_back();
-        }
-        if (!context.empty()) {
-          // pop off the next character
-          context.pop_back();
-        }
+        // assume it's otherwise KM-coRE_BT_UNKNOWN
+        assert(act.backspace.expected_type == KM_CORE_BT_UNKNOWN);
+        assert(context.empty()); // if KM_CORE_BT_UNKNOWN, context should be empty.
       }
     }
     break;
