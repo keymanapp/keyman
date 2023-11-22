@@ -26,7 +26,6 @@ FOUNDATION_EXPORT const unsigned char KeymanEngine4MacVersionString[];
 #import <KeymanEngine4Mac/NFont.h>
 #import <KeymanEngine4Mac/NSString+XString.h>
 #import <KeymanEngine4Mac/CoreWrapper.h>
-#import <KeymanEngine4Mac/ActionArrayOptimizer.h>
 #import <KeymanEngine4Mac/CoreHelper.h>
 #import <KeymanEngine4Mac/CoreAction.h>
 #import <KeymanEngine4Mac/CoreKeyOutput.h>

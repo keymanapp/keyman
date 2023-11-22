@@ -10,7 +10,6 @@
 #import <KeymanEngine4Mac/KeymanEngine4Mac.h>
 #import <Carbon/Carbon.h> /* For kVK_ constants. */
 #import "KeySender.h"
-#import "KMCoreActionHandler.h"
 #import "TextApiCompliance.h"
 
 @import Sentry;

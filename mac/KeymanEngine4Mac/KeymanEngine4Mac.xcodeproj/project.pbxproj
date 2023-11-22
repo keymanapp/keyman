@@ -8,11 +8,9 @@
 
 /* Begin PBXBuildFile section */
 		2993C32C29B1D92E00FB5E95 /* CoreAction.m in Sources */ = {isa = PBXBuildFile; fileRef = 2993C32229B1D92E00FB5E95 /* CoreAction.m */; };
-		2993C32D29B1D92E00FB5E95 /* ActionArrayOptimizer.m in Sources */ = {isa = PBXBuildFile; fileRef = 2993C32329B1D92E00FB5E95 /* ActionArrayOptimizer.m */; };
 		2993C32E29B1D92E00FB5E95 /* CoreWrapper.m in Sources */ = {isa = PBXBuildFile; fileRef = 2993C32429B1D92E00FB5E95 /* CoreWrapper.m */; };
 		2993C32F29B1D92E00FB5E95 /* CoreHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 2993C32529B1D92E00FB5E95 /* CoreHelper.m */; };
 		2993C33229B1D92E00FB5E95 /* CoreWrapper.h in Headers */ = {isa = PBXBuildFile; fileRef = 2993C32829B1D92E00FB5E95 /* CoreWrapper.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		2993C33329B1D92E00FB5E95 /* ActionArrayOptimizer.h in Headers */ = {isa = PBXBuildFile; fileRef = 2993C32929B1D92E00FB5E95 /* ActionArrayOptimizer.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		2993C33429B1D92E00FB5E95 /* CoreAction.h in Headers */ = {isa = PBXBuildFile; fileRef = 2993C32A29B1D92E00FB5E95 /* CoreAction.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		2993C33529B1D92E00FB5E95 /* CoreHelper.h in Headers */ = {isa = PBXBuildFile; fileRef = 2993C32B29B1D92E00FB5E95 /* CoreHelper.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		2993C33829B1DD6900FB5E95 /* libkeymancore.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 2993C33729B1DD6900FB5E95 /* libkeymancore.a */; };
@@ -83,11 +81,9 @@
 
 /* Begin PBXFileReference section */
 		2993C32229B1D92E00FB5E95 /* CoreAction.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CoreAction.m; sourceTree = "<group>"; };
-		2993C32329B1D92E00FB5E95 /* ActionArrayOptimizer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ActionArrayOptimizer.m; sourceTree = "<group>"; };
 		2993C32429B1D92E00FB5E95 /* CoreWrapper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CoreWrapper.m; sourceTree = "<group>"; };
 		2993C32529B1D92E00FB5E95 /* CoreHelper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CoreHelper.m; sourceTree = "<group>"; };
 		2993C32829B1D92E00FB5E95 /* CoreWrapper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CoreWrapper.h; sourceTree = "<group>"; };
-		2993C32929B1D92E00FB5E95 /* ActionArrayOptimizer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ActionArrayOptimizer.h; sourceTree = "<group>"; };
 		2993C32A29B1D92E00FB5E95 /* CoreAction.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CoreAction.h; sourceTree = "<group>"; };
 		2993C32B29B1D92E00FB5E95 /* CoreHelper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CoreHelper.h; sourceTree = "<group>"; };
 		2993C33729B1DD6900FB5E95 /* libkeymancore.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libkeymancore.a; path = ../../core/build/mac/debug/libkeymancore.a; sourceTree = "<group>"; };
@@ -182,8 +178,6 @@
 				2993C32429B1D92E00FB5E95 /* CoreWrapper.m */,
 				2993C32A29B1D92E00FB5E95 /* CoreAction.h */,
 				2993C32229B1D92E00FB5E95 /* CoreAction.m */,
-				2993C32329B1D92E00FB5E95 /* ActionArrayOptimizer.m */,
-				2993C32929B1D92E00FB5E95 /* ActionArrayOptimizer.h */,
 				29A1971C2AF091E600512A37 /* CoreKeyOutput.h */,
 				29A1971D2AF091E600512A37 /* CoreKeyOutput.m */,
 			);
@@ -354,7 +348,6 @@
 				981880711BC1EA5800A1FBA5 /* KeyLabelCell.h in Headers */,
 				981880731BC1EA5800A1FBA5 /* KeyView.h in Headers */,
 				2993C33529B1D92E00FB5E95 /* CoreHelper.h in Headers */,
-				2993C33329B1D92E00FB5E95 /* ActionArrayOptimizer.h in Headers */,
 				2993C33229B1D92E00FB5E95 /* CoreWrapper.h in Headers */,
 				9818806F1BC1EA5800A1FBA5 /* KeyLabel.h in Headers */,
 				981880751BC1EA5800A1FBA5 /* OSKKey.h in Headers */,
@@ -507,7 +500,6 @@
 				9818807C1BC1EE9700A1FBA5 /* TimerTarget.m in Sources */,
 				980053381B37C9B50088DDDD /* NKey.m in Sources */,
 				981880701BC1EA5800A1FBA5 /* KeyLabel.m in Sources */,
-				2993C32D29B1D92E00FB5E95 /* ActionArrayOptimizer.m in Sources */,
 				981880721BC1EA5800A1FBA5 /* KeyLabelCell.m in Sources */,
 				981880781BC1EA5800A1FBA5 /* OSKView.m in Sources */,
 				2993C32E29B1D92E00FB5E95 /* CoreWrapper.m in Sources */,

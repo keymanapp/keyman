@@ -17,7 +17,6 @@
 #import "CoreHelper.h"
 #import "CoreAction.h"
 #import "keyman_core_api.h"
-#import "ActionArrayOptimizer.h"
 #import "MacVKCodes.h"
 #import "WindowsVKCodes.h"
 
@@ -25,7 +24,6 @@ const int VIRTUAL_KEY_ARRAY_SIZE = 0x80;
 UInt32 VirtualKeyMap[VIRTUAL_KEY_ARRAY_SIZE];
 
 @interface CoreHelper()
-@property (strong, nonatomic, readonly) ActionArrayOptimizer *optimizer;
 @end
 
 
@@ -73,7 +71,6 @@ UInt32 VirtualKeyMap[VIRTUAL_KEY_ARRAY_SIZE];
   self = [super init];
   if (self) {
     _debugMode = debugMode;
-    _optimizer = [[ActionArrayOptimizer alloc] init];
     [self initVirtualKeyMapping];
   }
   return self;
