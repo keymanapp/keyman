@@ -9,6 +9,8 @@ export default class KeyTip implements KeyTipInterface {
   public key: KeyElement;
   public state: boolean = false;
 
+  private orientation: 'up' | 'down' = 'down';
+
   //  -----
   // |     | <-- tip
   // |  x  | <-- preview
@@ -82,7 +84,11 @@ export default class KeyTip implements KeyTipInterface {
       const _Box = vkbd.topContainer as HTMLDivElement;
       const _BoxRect = _Box.getBoundingClientRect();
       const keyRect = key.getBoundingClientRect();
-      let y = (keyRect.bottom - _BoxRect.top + 1);
+
+      let y: number;
+      const orientation = this.orientation;
+      const distFromTop = keyRect.bottom - _BoxRect.top;
+      y = (distFromTop + (orientation == 'up' ? 1 : -1));
       let ySubPixelPadding = y - Math.floor(y);
 
       // Canvas dimensions must be set explicitly to prevent clipping
@@ -91,6 +97,16 @@ export default class KeyTip implements KeyTipInterface {
       let canvasHeight = Math.ceil(2.3 * xHeight) + (ySubPixelPadding); //
 
       kts.top = 'auto';
+
+      if(orientation == 'down') {
+        y += canvasHeight - xHeight;
+        this.tip.style.bottom = '0px';
+        this.tip.style.top = 'unset';
+      } else {
+        this.tip.style.bottom = '';
+        this.tip.style.top = ''; // set by CSS
+      }
+
       kts.bottom = Math.floor(_BoxRect.height - y) + 'px';
       kts.textAlign = 'center';
       kts.overflow = 'visible';
@@ -139,9 +155,17 @@ export default class KeyTip implements KeyTipInterface {
       this.cap.style.width = xWidth + 'px';
       this.tip.style.height = halfHeight + 'px';
 
-      this.cap.style.top = (halfHeight - 3) + 'px';
-      this.cap.style.height = (keyRect.bottom - _BoxRect.top - Math.floor(y - canvasHeight) - (halfHeight)) + 'px'; //(halfHeight + 3 + ySubPixelPadding) + 'px';
+      const capOffset = 3;
+      if(orientation == 'up') {
+        this.cap.style.top = (halfHeight - capOffset) + 'px';
+        this.cap.style.bottom = '';
+      } else {
+        this.cap.style.top = '';
+        this.cap.style.bottom = (halfHeight - capOffset) + 'px';
+      }
+      this.cap.style.height = (distFromTop - Math.floor(y) + canvasHeight - (orientation == 'up' ? halfHeight : -capOffset * 2)) + 'px'; //(halfHeight + 3 + ySubPixelPadding) + 'px';
 
+      // let delta: number = 0;
       if(this.constrain && tipHeight + bottomY > oskHeight) {
         const delta = tipHeight + bottomY - oskHeight;
         kts.height = (canvasHeight-delta) + 'px';
