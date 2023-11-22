@@ -542,6 +542,7 @@ NSString * names[nCombinations];
     XCTAssert(!output.emitKeystroke, @"expected to emit nothing");
 }
 
+// TODO: enable after resolving issue getting options from Keyman Core
 - (void)testArmenianMnemonic_triggerPersistOptions_ReturnsOptions {
     KMXFile *kmxFile = [KeymanEngineTestsStaticHelperMethods getKmxFileForArmenianMnemonicTests];
     KMEngine *engine = [[KMEngine alloc] initWithKMX:kmxFile context:@"√" verboseLogging:YES];

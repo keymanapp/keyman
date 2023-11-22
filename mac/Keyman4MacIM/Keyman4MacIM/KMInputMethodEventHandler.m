@@ -716,28 +716,18 @@ NSRange _previousSelRange;
 }
 
 /**
- * Returns YES if we have applied an event to the client.
- * If NO, then (passthrough case) we are instructing the OS to apply the original event.
- * If any of the returned actions result in a change to the client, then return YES.
- * Changes to the client may be executed with insertText or by generating a KeyDown event.
- * For a CharacterAction, return YES after applying the character to the client.
- * For a BackspaceAction:
- * -return NO if this is the only action (besides End)
- * -return YES after generating a backspace event
+ * Returns NO if we have not applied an event to the client or if Keyman Core determines that we should emit the keystroke
  */
 -(BOOL)applyKeymanCoreActions:(CoreKeyOutput*)output event: (NSEvent*)event client:(id) client {
     [self.appDelegate logDebugMessage:@"   *** InputMethodEventHandler applyKeymanCoreActions: output = %@ ", output];
 
-    BOOL handledEvent = NO;
-
-    // TODO: queue up the text to insert if we are emitting the keystroke
-  
-    handledEvent = [self applyKeyOutputToTextInputClient:output keyDownEvent:event client:client];
+    BOOL handledEvent = [self applyKeyOutputToTextInputClient:output keyDownEvent:event client:client];
     [self applyNonTextualOutput:output];
 
-    // if we are told to emit the keystroke, then be sure to say that we have not handled the event
-    if ((handledEvent) && (output.emitKeystroke)) {
-        [self.appDelegate logDebugMessage:@"   *** InputMethodEventHandler applyKeymanCoreActions: emit keystroke is forcing event as not handled"];
+    // if output from Keyman Core indicates to emit the keystroke,
+    // then return NO, so that the OS still handles the event
+    if (output.emitKeystroke) {
+        [self.appDelegate logDebugMessage:@"   *** InputMethodEventHandler applyKeymanCoreActions: emit keystroke true, returning false for handledEvent"];
         handledEvent = NO;
     }
     
@@ -751,15 +741,18 @@ NSRange _previousSelRange;
     [self.appDelegate logDebugMessage:@"KXMInputMethodHandler applyOutputToTextInputClient, insert only scenario"];
     [self insertAndReplaceTextForOutput:output client:client];
   } else if (output.isDeleteOnlyScenario) {
+    /*
+    // TODO: is pass through scenario handled by emit? if so delete this conditional
     // if we have a single delete because the backspace key was pressed,
     // let it pass through by returning NO in the handleEvent call
     if ((event.keyCode == kVK_Delete) && (output.codePointsToDeleteBeforeInsert == 1)) {
       [self.appDelegate logDebugMessage:@"KXMInputMethodHandler applyOutputToTextInputClient, delete only *pass through* scenario"];
       handledEvent = NO;
     } else {
+     */
       [self.appDelegate logDebugMessage:@"KXMInputMethodHandler applyOutputToTextInputClient, delete only scenario"];
       [self sendEvents:event forOutput:output];
-    }
+    //}
   } else if (output.isDeleteAndInsertScenario) {
     if (self.apiCompliance.mustBackspaceUsingEvents) {
       [self.appDelegate logDebugMessage:@"KXMInputMethodHandler applyOutputToTextInputClient, delete and insert scenario with events"];
@@ -775,9 +768,19 @@ NSRange _previousSelRange;
 }
 
 -(void)applyNonTextualOutput:(CoreKeyOutput*)output {
-  if(output.optionsToPersist.count>0) {
-    for(NSString *key in output.optionsToPersist) {
-      NSString *value = [output.optionsToPersist objectForKey:key];
+  [self persistOptions:output.optionsToPersist];
+  
+  [self applyCapsLock:output.capsLockState];
+  
+  if (output.alert) {
+    NSBeep();
+  }
+}
+
+-(void) persistOptions:(NSDictionary*)options{
+  if(options.count>0) {
+    for(NSString *key in options) {
+      NSString *value = [options objectForKey:key];
       if(key && value) {
         [self.appDelegate logDebugMessage:@"applyNonTextualOutput calling writePersistedOptions, key: %@, value: %@", key, value];
         [self.appDelegate writePersistedOptions:key withValue:value];
@@ -786,86 +789,26 @@ NSRange _previousSelRange;
         [self.appDelegate logDebugMessage:@"applyNonTextualOutput, invalid values in optionsToPersist, not writing to UserDefaults, key: %@, value: %@", key, value];
       }
     }
-    
-    switch(output.capsLockState) {
-      case On:
-        //TODO: handle this
-        break;
-      case Off:
-        //TODO: handle this
-        break;
-      case Unchanged:
-        // do nothing
-        break;
-    }
-    
-    if (output.alert) {
-      NSBeep();
-    }
+  }
+}
+
+-(void) applyCapsLock:(CapsLockState)capsLockState {
+  switch(capsLockState) {
+    case On:
+      //TODO: handle this
+      break;
+    case Off:
+      //TODO: handle this
+      break;
+    case Unchanged:
+      // do nothing
+      break;
   }
 }
 
 -(void)insertAndReplaceTextForOutput:(CoreKeyOutput*)output client:(id) client {
   [self insertAndReplaceText:output.textToInsert deleteCount:output.codePointsToDeleteBeforeInsert client:client];
 }
-
-/**
- * If we need to do something in response to a single action, then do it here.
- * Most of the interesting work is done in executeCompositeOperation, and
- * much of the other work is done when updating the context.
- */
-/*
--(void)executeSimpleOperation:(KMActionOperation*)operation keyDownEvent:(nonnull NSEvent *)event {
-  CoreAction *action = operation.action;
-  if (action != nil) {
-    [self.appDelegate logDebugMessage:@"KXMInputMethodHandler executeSimpleOperation: %@", operation];
-  }
-  switch(action.actionType) {
-    case AlertAction:
-      NSBeep();
-      break;
-    case PersistOptionAction:
-      if(action.key && action.value) {
-        [self.appDelegate logDebugMessage:@"PersistOptionAction calling writePersistedOptions, key: %@, value: %@", action.key, action.value];
-        [self.appDelegate writePersistedOptions:action.key withValue:action.value];
-      }
-      else {
-        [self.appDelegate logDebugMessage:@"Invalid values for PersistOptionAction, not writing to UserDefaults, key: %@, value: %@", action.key, action.value];
-      }
-      break;
-    case InvalidateContextAction:
-      self.contextChanged = YES;
-      break;
-    case CapsLockAction: {
-      //TODO: handle this somewhere
-      break;
-    }
-    default:
-      break;
-  }
-}
-
--(void)executeCompositeOperation:(KMActionOperation*)operation keyDownEvent:(nonnull NSEvent *)event client:(id) client {
-  [self.appDelegate logDebugMessage:@"KXMInputMethodHandler executeCompositeOperation, composite operation: %@", operation];
-  
-  if (operation.isTextOnlyScenario) {
-    [self.appDelegate logDebugMessage:@"KXMInputMethodHandler executeCompositeOperation, text only scenario"];
-    [self insertAndReplaceTextForOperation:operation client:client];
-  } else if (operation.isBackspaceOnlyScenario) {
-    [self.appDelegate logDebugMessage:@"KXMInputMethodHandler executeCompositeOperation, backspace only scenario"];
-    [self sendEventsForOutput:event actionOperation:operation];
-  } else if (operation.isTextAndBackspaceScenario) {
-    if (self.apiCompliance.mustBackspaceUsingEvents) {
-      [self.appDelegate logDebugMessage:@"KXMInputMethodHandler executeCompositeOperation, text and backspace scenario with events"];
-     [self sendEventsForOutput:event actionOperation:operation];
-    } else {
-      [self.appDelegate logDebugMessage:@"KXMInputMethodHandler executeCompositeOperation, text and backspace scenario with insert API"];
-      // directly insert text and handle backspaces by using replace
-      [self insertAndReplaceTextForOperation:operation client:client];
-    }
-  }
-}
-*/
 
 /**
  * This directly inserts text and applies backspaces for the operation by replacing existing text with the new text.
@@ -901,6 +844,7 @@ NSRange _previousSelRange;
   } else {
     replacementRange = notFoundRange;
   }
+  
   [client insertText:text replacementRange:replacementRange];
   if (self.apiCompliance.isComplianceUncertain) {
     [self.apiCompliance testComplianceAfterInsert:client];

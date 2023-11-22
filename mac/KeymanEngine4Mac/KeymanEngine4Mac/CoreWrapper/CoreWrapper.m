@@ -198,8 +198,7 @@ const int CORE_ENVIRONMENT_ARRAY_LENGTH = 6;
     optionsDictionary = [[NSDictionary alloc] init];
     NSString *key = [self.coreHelper createNSStringFromUnicharString:optionsKey];
     NSString *value = [self.coreHelper createNSStringFromUnicharString:optionsValue];
-    //[optionsDictionary insertValue:value inPropertyWithKey:key];
-    [optionsDictionary insertValue:@"one" inPropertyWithKey:@"1"];
+    [optionsDictionary insertValue:value inPropertyWithKey:key];
   }
 /*
   if (options) {
