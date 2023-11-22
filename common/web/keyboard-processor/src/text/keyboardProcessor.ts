@@ -570,6 +570,9 @@ export default class KeyboardProcessor extends EventEmitter<EventMap> {
 
   resetContext(target?: OutputTarget) {
     this.layerId = 'default';
+
+    // Make sure all deadkeys for the context get cleared properly.
+    target?.resetContext();
     this.keyboardInterface.resetContextCache();
 
     // May be null if it's a keyboard swap.
