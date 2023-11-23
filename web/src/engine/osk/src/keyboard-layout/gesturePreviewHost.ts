@@ -21,7 +21,6 @@ export class GesturePreviewHost extends EventEmitter<EventMap> {
   private readonly previewImgContainer: HTMLDivElement;
 
   private flickPreviews = new Map<string, HTMLDivElement>;
-  private hintLabel: HTMLDivElement = null;
   private flickEdgeLength: number;
 
   private orientation: 'up' | 'down' = 'up';
@@ -140,12 +139,7 @@ export class GesturePreviewHost extends EventEmitter<EventMap> {
     this.previewImgContainer.classList.add('flick-clear');
   }
 
-  private clearHint() {
-    this.hintLabel?.classList.add('hint-clear');
-  }
-
   public clearAll() {
     this.clearFlick();
-    this.clearHint();
   }
 }
