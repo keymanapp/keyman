@@ -149,7 +149,9 @@ function onStateChange(change) {
   keyman.refreshOskLayout();
 
   fragmentToggle = (fragmentToggle + 1) % 100;
-  window.location.hash = 'refreshBannerHeight-'+fragmentToggle;
+  if(change != 'configured') {
+    window.location.hash = 'refreshBannerHeight-'+fragmentToggle;
+  }
 }
 
 // Query KMW if a given keyboard uses chiral modifiers.
