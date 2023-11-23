@@ -43,16 +43,9 @@
 #include "pch.h"   // I4128   // I4287
 #include "serialkeyeventclient.h"
 
-
-AIWin2000Unicode::AIWin2000Unicode()
-{
-	context = new AppContext;
+AIWin2000Unicode::AIWin2000Unicode() {
 }
-
-AIWin2000Unicode::~AIWin2000Unicode()
-{
-	delete context;
-}
+AIWin2000Unicode::~AIWin2000Unicode(){}
 
 /* Information functions */
 
@@ -68,7 +61,7 @@ BOOL AIWin2000Unicode::HandleWindow(HWND ahwnd)
 	if(hwnd != ahwnd)
 	{
 		hwnd = ahwnd;
-		context->Reset();
+    ResetContext();
 	}
 	return TRUE;
 }
@@ -87,33 +80,23 @@ BOOL AIWin2000Unicode::IsUnicode()
 
 /* Context functions */
 
-void AIWin2000Unicode::ReadContext()
-{
+BOOL AIWin2000Unicode::ReadContext(PWSTR buf) {
+  UNREFERENCED_PARAMETER(buf);
+  return FALSE;
 }
 
-void AIWin2000Unicode::AddContext(WCHAR ch)  //I2436
+BOOL AIWin2000Unicode::ResetContext()
 {
-  context->Add(ch);
-}
-
-void AIWin2000Unicode::ResetContext()
-{
-	context->Reset();
-}
-
-WCHAR *AIWin2000Unicode::ContextBuf(int n)
-{
-	return context->Buf(n);
-}
-
-WCHAR *AIWin2000Unicode::ContextBufMax(int n)
-{
-	return context->BufMax(n);
-}
-
-void AIWin2000Unicode::SetContext(const WCHAR* buf)
-{
-  return context->Set(buf);
+  PKEYMAN64THREADDATA _td = ThreadGlobals();
+  if (!_td) {
+    return FALSE;
+  }
+  if (!_td->lpActiveKeyboard || !_td->lpActiveKeyboard->lpCoreKeyboardState) {
+    SendDebugMessageFormat(0, sdmAIDefault, 0, "ResetContext: no active keyboard state");
+    return FALSE;
+  }
+  km_core_state_context_clear(_td->lpActiveKeyboard->lpCoreKeyboardState);
+  return TRUE;
 }
 
 BYTE SavedKbdState[256];
@@ -124,40 +107,6 @@ BOOL AIWin2000Unicode::SendActions()   // I4196
     PostMessage(*Globals::hwndIM(), wm_keymanim_contextchanged, 0, 0);
   }
 	return PostKeys();
-}
-
-BOOL AIWin2000Unicode::QueueAction(int ItemType, DWORD dwData)
-{
-	int result = AppIntegration::QueueAction(ItemType, dwData);
-
-  //SendDebugMessageFormat(hwnd, sdmAIDefault, 0, "App::QueueAction ItemType=%d dwData=%x", ItemType, dwData);
-
-	switch(ItemType)
-	{
-	case QIT_VKEYDOWN:
-		break;
-
-	case QIT_DEADKEY:
-		context->Add(UC_SENTINEL);
-		context->Add(CODE_DEADKEY);
-		context->Add((WORD) dwData);
-		break;
-
-	case QIT_CHAR:
-		context->Add((WORD) dwData);
-		break;
-
-	case QIT_BACK:
-		if(dwData & BK_BACKSPACE)
-			while(context->CharIsDeadkey()) context->Delete();
-		//if(dwData == CODE_DEADKEY) break;
-		context->Delete();
-		if(dwData & BK_BACKSPACE)
-			while(context->CharIsDeadkey()) context->Delete();
-		break;
-	}
-
-	return result;
 }
 
 // I1512 - SendInput with VK_PACKET for greater robustness

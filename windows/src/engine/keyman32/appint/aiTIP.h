@@ -38,9 +38,6 @@
 class AITIP : public AIWin2000Unicode
 {
 private:
-  void MergeContextWithCache(PWSTR buf, AppContext *context);   // I4262
-
-private:
   BOOL useLegacy;
 
 	BOOL PostKeys();
@@ -50,28 +47,14 @@ public:
 	AITIP();
 	~AITIP();
 
-  /**
-   * Copy the member context
-   *
-   * @param[out]  savedContext  the copied context
-   */
-  void CopyContext(AppContext *savedContext);
-
-   /**
-   * Restore the passed context to the member context
-   *
-   * @param  savedContext  the context to restore
-   */
-  void RestoreContextOnly(AppContext *savedContext);
-
 	/* Information functions */
 
 	virtual BOOL CanHandleWindow(HWND ahwnd);
 	virtual BOOL IsUnicode();
 
 	/* Context functions */
-
-	virtual void ReadContext();
+// TODO: #10052 Add doxy comments
+	virtual BOOL ReadContext(PWSTR buf);
 
 	/* Queue and sending functions */
 
