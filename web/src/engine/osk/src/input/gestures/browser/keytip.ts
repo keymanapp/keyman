@@ -4,8 +4,7 @@ import KeyTipInterface from '../../../keytip.interface.js';
 import VisualKeyboard from '../../../visualKeyboard.js';
 import { GesturePreviewHost } from '../../../keyboard-layout/gesturePreviewHost.js';
 
-// FIXME:  should be 'up' in production.
-const DEFAULT_TIP_ORIENTATION = 'down';
+const DEFAULT_TIP_ORIENTATION = 'up';
 
 export default class KeyTip implements KeyTipInterface {
   public readonly element: HTMLDivElement;
