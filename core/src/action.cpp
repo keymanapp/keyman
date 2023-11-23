@@ -95,13 +95,15 @@ km_core_actions * km::core::action_item_list_to_actions_object(
         output.push_back({KM_CORE_CT_MARKER,{0},{action_items->marker}});
         break;
       case KM_CORE_IT_PERSIST_OPT:
+      {
         // TODO: lowpri: replace existing item if already present in options vector?
-        options.push_back(km::core::option(
-          static_cast<km_core_option_scope>(action_items->option->scope),
+        km::core::option opt(static_cast<km_core_option_scope>(action_items->option->scope),
           action_items->option->key,
           action_items->option->value
-        ));
+        );
+        options.push_back(opt.release()); // hand over memory management of the option item to the action struct
         break;
+      }
       default:
         assert(false);
     }

@@ -34,9 +34,14 @@ namespace core
     option & operator=(option const & rhs);
     option & operator=(option && rhs);
 
+    /**
+     * Returns contents of this object as a C struct, releasing memory
+     * management of key and value, and invalidates this object.
+     */
+    km_core_option_item release();
+
     bool empty() const;
   };
-
 
   inline
   option::option(km_core_option_scope s,
