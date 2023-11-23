@@ -35,29 +35,10 @@
 // This can be customised with HKLM\Software\Keyman\Keyman Engine\zap virtual key code
 #define _VK_PREFIX_DEFAULT    0x0E
 
-struct AIDEBUGKEYINFO
-{
-	UINT VirtualKey;
-	DWORD shiftFlags;
-	WCHAR Character, DeadKeyCharacter;
-	BOOL IsUp;
-};
-
 class AITIP : public AIWin2000Unicode
 {
 private:
-	int WM_KEYMANDEBUG_CANDEBUG,
-		WM_KEYMANDEBUG_GETUNICODESTATUS,
-		WM_KEYMANDEBUG_GETCONTEXT,
-		WM_KEYMANDEBUG_ACTION,
-		WM_KEYMANDEBUG_RULEMATCH;
-
-	BOOL FIsDebugControlWindow;
-	HWND GetDebugControlWindow();
-	void Debug_FillContextBuffer();
   void MergeContextWithCache(PWSTR buf, AppContext *context);   // I4262
-
-	static BOOL IsDebugControlWindow(HWND hwnd);
 
 private:
   BOOL useLegacy;
@@ -68,8 +49,6 @@ private:
 public:
 	AITIP();
 	~AITIP();
-
-  BOOL DebugControlled();
 
   /**
    * Copy the member context
@@ -85,13 +64,9 @@ public:
    */
   void RestoreContextOnly(AppContext *savedContext);
 
-	virtual BOOL QueueAction(int ItemType, DWORD dwData);
-
 	/* Information functions */
 
 	virtual BOOL CanHandleWindow(HWND ahwnd);
-	virtual BOOL IsWindowHandled(HWND ahwnd);
-	virtual BOOL HandleWindow(HWND ahwnd);
 	virtual BOOL IsUnicode();
 
 	/* Context functions */

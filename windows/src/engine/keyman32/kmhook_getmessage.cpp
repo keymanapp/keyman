@@ -266,11 +266,6 @@ LRESULT _kmnGetMessageProc(int nCode, WPARAM wParam, LPARAM lParam)
 		SendDebugMessageFormat(0, sdmInternat, 0, "GetMessage: wm_keymanshift %x %x", mp->wParam, mp->lParam);
     SelectApplicationIntegration();
 		if(!_td->app->IsWindowHandled(mp->hwnd)) _td->app->HandleWindow(mp->hwnd);
-		if(_td->app->DebugControlled())
-		{
-			if(mp->wParam == 1) *Globals::ShiftState() = (DWORD) mp->lParam;
-			else *Globals::ShiftState() = 0;
-		}
 		return CallNextHookEx(Globals::get_hhookGetMessage(), nCode, wParam, lParam);
 	}
 

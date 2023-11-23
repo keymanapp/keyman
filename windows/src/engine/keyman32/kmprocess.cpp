@@ -138,16 +138,7 @@ BOOL ProcessHook()
   if(!_td) return FALSE;
 
   fOutputKeystroke = FALSE;  // TODO: 5442 no longer needs to be global once we use core processor
-  //
-  // If we are running in the debugger, don't do a second run through
-  //
 
-  if(_td->app->DebugControlled() && !_td->TIPFUpdateable) {   // I4287
-    if(_td->state.vkey == VK_ESCAPE || (_td->state.vkey >= VK_PRIOR && _td->state.vkey <= VK_DOWN) || (_td->state.vkey == VK_DELETE)) return FALSE;   // I4033   // I4826   // I4845
-    else return TRUE;
-  }
-
-	//app->NoSetShift = FALSE;
   _td->app->ReadContext();
 
 	if(_td->state.msg.message == wm_keymankeydown) {   // I4827
@@ -214,17 +205,6 @@ BOOL ProcessHook()
       //
       fOutputKeystroke = FALSE;
     }
-  }
-
-  if (fOutputKeystroke && _td->app->DebugControlled()) {
-		// The debug memo does not receive default key events because
-		// we capture them all here. So we synthesize the key event for
-		// the debugger.
-    _td->app->QueueAction(QIT_VSHIFTDOWN, Globals::get_ShiftState());
-    _td->app->QueueAction(QIT_VKEYDOWN, _td->state.vkey);
-    _td->app->QueueAction(QIT_VKEYUP, _td->state.vkey);
-    _td->app->QueueAction(QIT_VSHIFTUP, Globals::get_ShiftState());
-    fOutputKeystroke = FALSE;
   }
 
 	if(*Globals::hwndIM() == 0 || *Globals::hwndIMAlways())
