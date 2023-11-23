@@ -4,12 +4,14 @@ import KeyTipInterface from '../../../keytip.interface.js';
 import VisualKeyboard from '../../../visualKeyboard.js';
 import { GesturePreviewHost } from '../../../keyboard-layout/gesturePreviewHost.js';
 
+const DEFAULT_TIP_ORIENTATION = 'up';
+
 export default class KeyTip implements KeyTipInterface {
   public readonly element: HTMLDivElement;
   public key: KeyElement;
   public state: boolean = false;
 
-  private orientation: 'up' | 'down' = 'down';
+  private orientation: 'up' | 'down' = DEFAULT_TIP_ORIENTATION;
 
   //  -----
   // |     | <-- tip
@@ -23,15 +25,18 @@ export default class KeyTip implements KeyTipInterface {
   private readonly tip: HTMLDivElement;
   private previewHost: GesturePreviewHost;
   private preview: HTMLDivElement;
+  private readonly vkbd: VisualKeyboard;
 
   private readonly constrain: boolean;
+  private readonly reorient: (orientation: 'up' | 'down') => void;
 
   /**
    *
    * @param constrain keep the keytip within the bounds of the overall OSK.
    *                  Will probably be handled via function in a later pass.
    */
-  constructor(constrain: boolean) {
+  constructor(vkbd: VisualKeyboard, constrain: boolean) {
+    this.vkbd = vkbd;
     let tipElement = this.element=document.createElement('div');
     tipElement.className='kmw-keytip';
     tipElement.id = 'kmw-keytip';
@@ -48,9 +53,16 @@ export default class KeyTip implements KeyTipInterface {
     this.cap.className = 'kmw-keytip-cap';
 
     this.constrain = constrain;
+
+    this.reorient = (orientation: 'up' | 'down') => {
+      this.orientation = orientation;
+      this.show(this.key, this.state, this.previewHost);
+    }
   }
 
-  show(key: KeyElement, on: boolean, vkbd: VisualKeyboard, previewHost: GesturePreviewHost) {
+  show(key: KeyElement, on: boolean, previewHost: GesturePreviewHost) {
+    const vkbd = this.vkbd;
+
     // During quick input sequences - especially during a multitap-modipress - it's possible
     // for a user to request a preview for a key from a layer that is currently active, but
     // currently not visible due to need previously-requested layout calcs for a different layer.
@@ -175,20 +187,32 @@ export default class KeyTip implements KeyTipInterface {
 
       kts.display = 'block';
 
+      if(this.previewHost == previewHost) {
+        return;
+      }
+
       const oldHost = this.preview;
+
+      if(this.previewHost) {
+        this.previewHost.off('preferredOrientation', this.reorient);
+      }
       this.previewHost = previewHost;
 
       if(previewHost) {
+        this.previewHost.on('preferredOrientation', this.reorient);
         this.preview = this.previewHost.element;
         this.tip.replaceChild(this.preview, oldHost);
-        previewHost.setCancellationHandler(() => this.show(null, false, vkbd, null));
+        previewHost.setCancellationHandler(() => this.show(null, false, null));
       }
     } else { // Hide the key preview
       this.element.style.display = 'none';
+      this.previewHost?.off('preferredOrientation', this.reorient);
       this.previewHost = null;
       const oldPreview = this.preview;
       this.preview = document.createElement('div');
       this.tip.replaceChild(this.preview, oldPreview);
+
+      this.orientation = DEFAULT_TIP_ORIENTATION;
     }
 
     // Save the key preview state

@@ -1,4 +1,6 @@
 import { ActiveKey } from "@keymanapp/keyboard-processor";
+import { EventEmitter } from "eventemitter3";
+
 import { KeyElement } from "../keyElement.js";
 import { FlickNameCoordMap, OrderedFlickDirections } from "../input/gestures/browser/flick.js";
 
@@ -9,7 +11,11 @@ import { FlickNameCoordMap, OrderedFlickDirections } from "../input/gestures/bro
  */
 const FLICK_OVERFLOW_OFFSET = 1.4142;
 
-export class GesturePreviewHost {
+interface EventMap {
+  preferredOrientation: (orientation: 'up'|'down') => void;
+}
+
+export class GesturePreviewHost extends EventEmitter<EventMap> {
   private readonly div: HTMLDivElement;
   private readonly label: HTMLSpanElement;
   private readonly previewImgContainer: HTMLDivElement;
@@ -18,6 +24,8 @@ export class GesturePreviewHost {
   private hintLabel: HTMLDivElement = null;
   private flickEdgeLength: number;
 
+  private orientation: 'up' | 'down' = 'up';
+
   private onCancel: () => void;
 
   get element(): HTMLDivElement {
@@ -25,6 +33,8 @@ export class GesturePreviewHost {
   }
 
   constructor(key: KeyElement, isPhone: boolean, width: number, height: number) {
+    super();
+
     const keySpec = key.key.spec;
     const edgeLength = this.flickEdgeLength = Math.max(width, height);
 
@@ -114,6 +124,12 @@ export class GesturePreviewHost {
 
     scrollStyle.marginLeft = `${edge * x}px`;
     scrollStyle.marginTop =  `${edge * y}px`;
+
+    const preferredOrientation = y < 0 ? 'down' : 'up';
+    if(this.orientation != preferredOrientation) {
+      this.orientation = preferredOrientation;
+      this.emit('preferredOrientation', preferredOrientation);
+    }
   }
 
   // These may not exist like this longterm.

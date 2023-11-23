@@ -1539,7 +1539,7 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
       baseKey.setPreview(previewHost);
       return previewHost;
     } else {
-      tip.show(key, true, this, previewHost);
+      tip.show(key, true, previewHost);
     }
 
     previewHost.refreshLayout();
@@ -1555,7 +1555,7 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
       if (this.keytip == null) {
         // For now, should only be true (in production) when keyman.isEmbedded == true.
         let constrainPopup = this.isEmbedded;
-        this.keytip = new InternalKeyTip(constrainPopup);
+        this.keytip = new InternalKeyTip(this, constrainPopup);
       }
     }
 
@@ -1589,7 +1589,7 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
       window.clearTimeout(this.deleting);
     }
 
-    this.keytip?.show(null, false, this, null);
+    this.keytip?.show(null, false, null);
   }
 
   lockLayer(enable: boolean) {
