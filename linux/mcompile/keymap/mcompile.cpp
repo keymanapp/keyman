@@ -325,7 +325,7 @@ KMX_BOOL KMX_DoConvert(LPKMX_KEYBOARD kbd, PKMX_WCHAR kbid, KMX_BOOL bDeadkeyCon
       KMX_WCHAR ch = KMX_CharFromVK(All_Vector,vkUnderlying, VKShiftState[j], &DeadKey);*/
 
       UINT scUnderlying =  KMX_VKUSToSCUnderlyingLayout(KMX_VKMap[i]);
-      KMX_WCHAR  ch= KMX_CharFromSC(keymap, VKShiftState[j], scUnderlying, &DeadKey);
+      KMX_WCHAR ch = KMX_CharFromSC(keymap, VKShiftState[j], scUnderlying, &DeadKey);
 
       //wprintf(L"  DoConvert-read i:  %i \t(KMX_VKMap): %i (%c)  \t--->  vkUnderlying: %i (%c)    \tshiftstate[%i]: ( %i )   \t---- >  ch: %i (%c)  \t%ls  \t%ls\n" , i,(int) KMX_VKMap[i],(int)KMX_VKMap[i],  vkUnderlying,vkUnderlying, j, VKShiftState[j] ,  ch ,ch ,  ((int) vkUnderlying != (int) KMX_VKMap[i] ) ? L" *** ": L"", ERROR);
       //LogError("--- VK_%d -> VK_%d [%c] dk=%d", VKMap[i], vkUnderlying, ch == 0 ? 32 : ch, DeadKey);
@@ -341,7 +341,6 @@ KMX_BOOL KMX_DoConvert(LPKMX_KEYBOARD kbd, PKMX_WCHAR kbid, KMX_BOOL bDeadkeyCon
       switch(ch) {
 
         case 0x0000: break;
-
         // _S2 TODO deadkeys will be done later
         //case 0xFFFF: ConvertDeadkey(kbd, VKMap[i], VKShiftState[j], DeadKey); break;
         default:     KMX_TranslateKeyboard(kbd, KMX_VKMap[i], VKShiftState[j], ch);
@@ -422,10 +421,10 @@ void KMX_TranslateKeyboard(LPKMX_KEYBOARD kbd, KMX_WORD vk, KMX_UINT shift, KMX_
 void KMX_ReportUnconvertedKeyRule(LPKMX_KEY key) {
   if(key->ShiftFlags == 0) {
     //KMX_LogError(L"Did not find a match for mnemonic rule on line %d, + '%c' > ...", key->Line, key->Key);
-    //wprintf(L" _S2 Did not find a match for mnemonic rule on line %d, + '%c' > ...\n", key->Line, key->Key);
+    wprintf(L" _S2 Did not find a match for mnemonic rule on line %d, + '%c' > ...\n", key->Line, key->Key);
   } else if(key->ShiftFlags & VIRTUALCHARKEY) {
     //KMX_LogError(L"Did not find a match for mnemonic virtual character key rule on line %d, + [%x '%c'] > ...", key->Line, key->ShiftFlags, key->Key);
-    //wprintf(L"_S2 Did not find a match for mnemonic virtual character key rule on line %d, + [%x '%c'] > ...\n", key->Line, key->ShiftFlags, key->Key);
+    wprintf(L"_S2 Did not find a match for mnemonic virtual character key rule on line %d, + [%x '%c'] > ...\n", key->Line, key->ShiftFlags, key->Key);
   }
 }
 

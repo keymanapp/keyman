@@ -385,13 +385,56 @@ KMX_DWORD get_VirtualKey_Other_GDK( GdkKeymap *keymap, KMX_DWORD keycode) {
   return 0;   //_S2 what to return if not found
 }
 
-KMX_DWORD get_VirtualKey_US( KMX_DWORD keycode) {
-
+KMX_DWORD get_VKUS_fromKeyCode( KMX_DWORD keycode) {
     if ( keycode >7)
       return (KMX_DWORD) ScanCodeToUSVirtualKey[keycode-8];
-
   return 0;   //_S2 what to return if not found
 }
+KMX_DWORD get_KeyCode_fromVKUS( KMX_DWORD VK_US) {
+  if( VK_US > 7)
+    return (KMX_DWORD)(8+ USVirtualKeyToScanCode[ VK_US ]);
+  else
+    return 0;
+}
+
+// _S2 this needs to go; only to check if mcompile gives the same end result.
+// _S2 helps to force filling rgkey[VK_DE]
+UINT map_Ikey_DE(UINT iKey) {
+  if (iKey == 186 )  return 219;
+  if (iKey == 187 )  return 221;
+  if (iKey == 188 )     return 188;
+  if (iKey == 189 )  return 191;
+  if (iKey == 190 )     return 190;
+  if (iKey == 191 )  return 220;
+  if (iKey == 192 )  return 186;
+  if (iKey == 219 )  return 189;
+  if (iKey == 220 )  return 192;
+  if (iKey == 221 )  return  187;
+  if (iKey == 222 )     return 222;
+  if (iKey == 226 )     return 226;
+  return iKey;
+}
+
+// _S2 this needs to go; only to check if mcompile gives the same end result.
+// _S2 helps to force filling rgkey[VK_FR]
+UINT map_Ikey_FR(UINT iKey) {
+  if (iKey == 186 )  return 221;
+  if (iKey == 187 )     return 187;
+  if (iKey == 188 )  return 77;
+  if (iKey == 189 )  return 223;
+  if (iKey == 190 )  return 188;
+  if (iKey == 191 )  return 190;
+  if (iKey == 192 )  return 222;
+  if (iKey == 219 )  return 189;
+  if (iKey == 220 )     return 220;
+  if (iKey == 221 )  return 219;
+  if (iKey == 222 )  return 192;
+  if (iKey == 223 )  return 191;
+  if (iKey == 226 )     return 226;
+  if (iKey == 77  )  return 186;
+  return iKey;
+}
+
 
 // _S2 TODO How to do mapping between Linux keycodes and keyman SC
 const int Lin_KM__map(int i, v_dw_3D &All_Vector) {
@@ -476,7 +519,6 @@ std::wstring  get_KeyVals_according_to_keycode_and_Shiftstate(GdkKeymap *keymap,
     return  std::wstring(1, (int) *keyvals);
   }
 
-
   //ALT-GR
   else if (( ss == MenuCtrl ) && ( caps == 1 )){
     //GdkModifierType MOD_AltGr = (GdkModifierType) ( 146 );
@@ -487,7 +529,6 @@ std::wstring  get_KeyVals_according_to_keycode_and_Shiftstate(GdkKeymap *keymap,
 
   else
     return L"\0";
-    //return L"0";
 }
 
 // _S2 maybe not needed

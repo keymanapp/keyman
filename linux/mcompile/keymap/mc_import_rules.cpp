@@ -597,12 +597,12 @@ int KMX_GetMaxDeadkeyIndex(KMX_WCHAR *p) {
   return n;
 }
 
-bool IsKeymanUsedKey_S2(std::wstring SC_Other) { 
+bool IsKeymanUsedKeyVal(std::wstring Keyval) {
 
-  int SC_ = (int) (*SC_Other.c_str());
+  int KV = (int) (*Keyval.c_str());
 
-  //           32           122               136           256
-  if ((SC_>= 0x20 && SC_ <= 0x7A) || (SC_ >= 0x88 && SC_ < 0xFF))
+  //         32            122             136          256
+  if ((KV >= 0x20 && KV <= 0x7A) || (KV >= 0x88 && KV < 0xFF))
     return true;
   else
     return false;
@@ -665,6 +665,9 @@ bool KMX_ImportRules(KMX_WCHAR *kbid, LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, Gd
     }
   }
 
+  // _S2  remove! only for testing helps to force filling rgkey[VK_DE]
+  rgKey[223] = new KMX_VirtualKey(hkl, 223, All_Vector, keymap);
+
   for(UINT ke = VK_NUMPAD0; ke <= VK_NUMPAD9; ke++) {
       rgKey[ke] = new KMX_VirtualKey(hkl, ke, All_Vector, keymap);
   }
@@ -710,7 +713,11 @@ bool KMX_ImportRules(KMX_WCHAR *kbid, LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, Gd
     if(rgKey[iKey] != NULL) {
       WCHAR sbBuffer[256];     // Scratchpad we use many places
 
-      UINT SC_Other = Lin_KM__map(iKey, All_Vector);
+      UINT VK_Other = Lin_KM__map(iKey, All_Vector);
+
+      // _S2 only for testing can go later helps to force filling rgkey[VK_DE]
+      UINT iKey_DE = map_Ikey_DE(iKey);
+      UINT iKey_FR = map_Ikey_FR(iKey);
 
       for(ShiftState ss = Base; ss <= loader.MaxShiftState(); ss = (ShiftState)((int)ss + 1)) {
         if(ss == Menu || ss == ShftMenu) {
@@ -718,19 +725,20 @@ bool KMX_ImportRules(KMX_WCHAR *kbid, LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, Gd
           continue;
         }
 
-        KMX_DWORD SC_US;
-        if( SC_Other>7)
-          SC_US=  (KMX_DWORD)(8+ USVirtualKeyToScanCode[ SC_Other ]);
-        else SC_US = 0;
+
+      // KMX_DWORD SC_US = get_KeyCode_fromVKUS(iKey);    // _S2 needs to be here late
+      KMX_DWORD SC_US = get_KeyCode_fromVKUS(iKey_DE);    // _S2 only for testing can go later helps to force filling rgkey[VK_DE]
+      //KMX_DWORD SC_US = get_KeyCode_fromVKUS(iKey_FR);  // _S2 only for testing can go later helps to force filling rgkey[VK_DE]
 
 
-//wprintf(L" for vk of %i we get Keycode US of %i  SC_Other %i: ( on Key US (%i) we find char %i (%c) ) \n", SC_Other, 8+USVirtualKeyToScanCode[SC_Other], 8+USVirtualKeyToScanCode[SC_Other] ,
-//8+USVirtualKeyToScanCode[SC_Other],get_VirtualKey_Other_GDK(*keymap, 8+USVirtualKeyToScanCode[SC_Other]),get_VirtualKey_Other_GDK(*keymap, 8+USVirtualKeyToScanCode[SC_Other]) );
+//wprintf(L" for vk of %i we get Keycode US of %i  VK_Other %i: ( on Key US (%i) we find char %i (%c) ) \n",
+// VK_Other, 8+USVirtualKeyToScanCode[VK_Other], 8+USVirtualKeyToScanCode[VK_Other] ,
+//8+USVirtualKeyToScanCode[VK_Other],get_VirtualKey_Other_GDK(*keymap, 8+USVirtualKeyToScanCode[VK_Other]),get_VirtualKey_Other_GDK(*keymap, 8+USVirtualKeyToScanCode[VK_Other]) );
 
 
         for(int caps = 0; caps <= 1; caps++) {
           //_S2 TODO get char  - do I need rc ?? ( was rc = ToUnicodeEx...)
-          //std::wstring KeyVal_Other_OLD = get_VirtualKey_Other_from_iKey(SC_Other, ss, caps, All_Vector);
+          //std::wstring KeyVal_Other_OLD = get_VirtualKey_Other_from_iKey(VK_Other, ss, caps, All_Vector);
           std::wstring KeyVal_Other = get_KeyVals_according_to_keycode_and_Shiftstate( *keymap, SC_US, ss, caps);
           std::wstring KeyVal_Other3 = get_KeyVals_according_to_keycode_and_Shiftstate( *keymap, SC_US, ss, caps);
 
@@ -761,9 +769,9 @@ int testval= 38;
           std::wstring  KeyVal_OtherTEST20 = get_KeyVals_according_to_keycode_and_Shiftstate( *keymap, testval, MenuCtrl, 0);
           std::wstring  KeyVal_OtherTEST21 = get_KeyVals_according_to_keycode_and_Shiftstate( *keymap, testval, MenuCtrl, 1);
 
-          // _S2 needs to be changed - it's temporary to get the same keys as keyman does when using USVirtualKeyToScanCode
-        if (!IsKeymanUsedKey_S2(KeyVal_Other))
-          KeyVal_Other =L"\0";
+          // _S2 needs to be changed - it's temporary to get the same keys as keyman does when using USVirtualKeyToScanCode prevents chars like ሴ
+        if (!IsKeymanUsedKeyVal(KeyVal_Other))
+          KeyVal_Other = L"\0";
 
           //_S2 TODO do I need that ??
           //if rc >0: it got 1 or more char AND buffer is empty ( nothing inside ) {

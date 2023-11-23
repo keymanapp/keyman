@@ -501,7 +501,11 @@ KMX_DWORD get_KeyCode_From_KeyVal_GDK(GdkKeymap *keymap, UINT Keyval);
 // return the VirtualKey of the Other Keyboard for given Scancode using GDK
 KMX_DWORD get_VirtualKey_Other_GDK( GdkKeymap *keymap, KMX_DWORD scanCode);
 
-KMX_DWORD get_VirtualKey_US( KMX_DWORD keycode);
+KMX_DWORD get_VKUS_fromKeyCode( KMX_DWORD keycode);
+KMX_DWORD get_KeyCode_fromVKUS( KMX_DWORD VK_US);
+
+UINT map_Ikey_DE(UINT iKey);
+UINT map_Ikey_FR(UINT iKey);
 
 // initialize GDK
 bool InitializeGDK(GdkKeymap **keymap,int argc, gchar *argv[]);
