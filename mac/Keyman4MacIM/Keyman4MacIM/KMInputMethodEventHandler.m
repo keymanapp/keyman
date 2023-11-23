@@ -501,7 +501,7 @@ NSRange _previousSelRange;
 
     // if output from Keyman Core indicates to emit the keystroke,
     // then return NO, so that the OS still handles the event
-    if (output.emitKeystroke) {
+    if (handledEvent && output.emitKeystroke) {
         [self.appDelegate logDebugMessage:@"   *** InputMethodEventHandler applyKeymanCoreActions: emit keystroke true, returning false for handledEvent"];
         handledEvent = NO;
     }
@@ -516,8 +516,14 @@ NSRange _previousSelRange;
     [self.appDelegate logDebugMessage:@"KXMInputMethodHandler applyOutputToTextInputClient, insert only scenario"];
     [self insertAndReplaceTextForOutput:output client:client];
   } else if (output.isDeleteOnlyScenario) {
+    if ((event.keyCode == kVK_Delete) && output.codePointsToDeleteBeforeInsert == 1) {
+      // let the delete pass through in the original event rather than sending a new delete
+      [self.appDelegate logDebugMessage:@"KXMInputMethodHandler applyOutputToTextInputClient, delete only scenario"];
+      handledEvent = NO;
+    } else {
       [self.appDelegate logDebugMessage:@"KXMInputMethodHandler applyOutputToTextInputClient, delete only scenario"];
       [self sendEvents:event forOutput:output];
+    }
   } else if (output.isDeleteAndInsertScenario) {
     if (self.apiCompliance.mustBackspaceUsingEvents) {
       [self.appDelegate logDebugMessage:@"KXMInputMethodHandler applyOutputToTextInputClient, delete and insert scenario with events"];
