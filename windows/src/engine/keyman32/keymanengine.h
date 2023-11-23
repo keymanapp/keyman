@@ -92,13 +92,6 @@ typedef struct tagINTKEYBOARDINFO
   km_core_keyboard_imx* lpIMXList;
 } INTKEYBOARDINFO, * LPINTKEYBOARDINFO;
 
-typedef struct tagINI
-{
-  int MsgStackSize;
-  int MaxKeyboards;
-  int ContextStackSize;
-} INI;
-
 typedef struct tagKMSTATE
 {
   BOOL NoMatches;
