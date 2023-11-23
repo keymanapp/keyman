@@ -7,6 +7,7 @@ import { NodeCompilerCallbacks } from '../src/util/NodeCompilerCallbacks.js';
 import { CompilerErrorNamespace } from '@keymanapp/common-types';
 import { unitTestEndpoints } from '../src/commands/build.js';
 import { KmnCompilerMessages } from '@keymanapp/kmc-kmn';
+import { defaultCompilerOptions, CompilerOptions} from '@keymanapp/common-types';
 
 describe('InfrastructureMessages', function () {
   it('should have a valid InfrastructureMessages object', function() {
@@ -48,14 +49,19 @@ describe('InfrastructureMessages', function () {
       `ERROR_FileTypeNotRecognized not generated, instead got: `+JSON.stringify(ncb.messages,null,2));
   });
 
+// ERROR_OutFileNotValidForProjects
+
+it('should generate ERROR_OutFileNotValidForProjects if an output file is specified for a project build', async function() {
+  const ncb = new NodeCompilerCallbacks({logLevel: 'silent'});
+  const projectPath = makePathToFixture('kpj-2.0/khmer_angkor', 'khmer_angkor.kpj');
+  const outFilePath = makePathToFixture('kpj-2.0/khmer_angkor', 'khmer_angkor.kmx');
+  const options: CompilerOptions = {...defaultCompilerOptions, outFile: outFilePath};
+  await unitTestEndpoints.build(projectPath, ncb, options);
+  assert.isTrue(ncb.hasMessage(InfrastructureMessages.ERROR_OutFileNotValidForProjects),
+    `ERROR_OutFileNotValidForProjects not generated, instead got: `+JSON.stringify(ncb.messages,null,2));
+});
+
 /*
-
-  // ERROR_OutFileNotValidForProjects
-
-  it('should generate ERROR_OutFileNotValidForProjects if an output file is specified for a project build', async function() {
-    await testForMessage(this, ['invalid-keyboards', 'error_out_file_not_valid_for_projects.kpj'], CompilerMessages.ERROR_OutFileNotValidForProjects);
-  });
-
   // ERROR_InvalidProjectFile
 
   it('should generate ERROR_InvalidProjectFile if a project file is invalid', async function() {
