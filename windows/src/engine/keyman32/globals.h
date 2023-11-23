@@ -263,12 +263,10 @@ typedef struct tagKEYMAN64THREADDATA
 
 extern UINT
   wm_keyman,						// user message - ignore msg
-  wm_kmdebug,						//  " "  "  "   - debugging
   wm_keyman_control,				// messages to main Keyman window - replaces WM_USER+*
   wm_keyman_control_internal,       // messages to all windows to notify of changes to Keyman   // I4412
   wm_keymankeydown,
   wm_keymankeyup,
-  wm_keymandebug,
   wm_keyman_grabwindowproc,
   wm_keyman_refresh,
   wm_kmgetactivekeymanid,

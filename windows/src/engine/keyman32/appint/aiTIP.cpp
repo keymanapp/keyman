@@ -234,14 +234,7 @@ extern "C" __declspec(dllexport) BOOL WINAPI TIPProcessKey(WPARAM wParam, LPARAM
 AITIP::AITIP() {
   ::AIWin2000Unicode();   // I3574
 
-  FIsDebugControlWindow = FALSE;
   useLegacy = FALSE;
-
-	WM_KEYMANDEBUG_CANDEBUG         = RegisterWindowMessage("WM_KEYMANDEBUG_CANDEBUG");
-	WM_KEYMANDEBUG_GETUNICODESTATUS = RegisterWindowMessage("WM_KEYMANDEBUG_GETUNICODESTATUS");
-	WM_KEYMANDEBUG_GETCONTEXT       = RegisterWindowMessage("WM_KEYMANDEBUG_GETCONTEXT");
-	WM_KEYMANDEBUG_ACTION           = RegisterWindowMessage("WM_KEYMANDEBUG_ACTION");
-	WM_KEYMANDEBUG_RULEMATCH        = RegisterWindowMessage("WM_KEYMANDEBUG_RULEMATCH");
 }
 
 AITIP::~AITIP() {
@@ -252,15 +245,6 @@ AITIP::~AITIP() {
 BOOL AITIP::CanHandleWindow(HWND ahwnd) {
   UNREFERENCED_PARAMETER(ahwnd);
   return TRUE;   // I3574
-}
-
-BOOL AITIP::HandleWindow(HWND ahwnd) {
-  FIsDebugControlWindow = IsDebugControlWindow(ahwnd);
-  return AIWin2000Unicode::HandleWindow(ahwnd);   // I3574
-}
-
-BOOL AITIP::IsWindowHandled(HWND ahwnd) {
-  return AIWin2000Unicode::IsWindowHandled(ahwnd);   // I3574
 }
 
 BOOL AITIP::IsUnicode() {
@@ -335,11 +319,6 @@ void AITIP::MergeContextWithCache(PWSTR buf, AppContext *local_context) {   // I
 }
 
 void AITIP::ReadContext() {
-  if(DebugControlled()) {
-    Debug_FillContextBuffer();
-    return;
-  }
-
 	WCHAR buf[MAXCONTEXT];
   PKEYMAN64THREADDATA _td = ThreadGlobals();
   if(!_td) return;
@@ -376,44 +355,7 @@ void AITIP::RestoreContextOnly(AppContext *savedContext) {
 
 /* Output actions */
 
-BOOL AITIP::QueueAction(int ItemType, DWORD dwData) {
-	if(DebugControlled()) {
-	  switch(ItemType) {
-	  case QIT_VKEYDOWN:
-      if((dwData & QVK_KEYMASK) <= VK__MAX && VKContextReset[(BYTE) dwData]) context->Reset();  // I3438   // I4370
-		  break;
-
-	  case QIT_DEADKEY:
-		  context->Add(UC_SENTINEL);   // I4370
-		  context->Add(CODE_DEADKEY);   // I4370
-		  context->Add((WORD) dwData);   // I4370
-		  break;
-
-	  case QIT_CHAR:
-		  context->Add((WORD) dwData);   // I4370
-		  break;
-
-	  case QIT_BACK:
-		  if(dwData & BK_BACKSPACE)
-			  while(context->CharIsDeadkey()) context->Delete();   // I4370
-		  context->Delete();   // I4370
-		  if(dwData & BK_BACKSPACE)
-			  while(context->CharIsDeadkey()) context->Delete();   // I4370
-		  break;
-	  }
-
-		SendMessage(GetDebugControlWindow(), WM_KEYMANDEBUG_ACTION, ItemType, dwData);
-    return TRUE;
-  }
-
-  return AIWin2000Unicode::QueueAction(ItemType, dwData);   // I3575
-}
-
 BOOL AITIP::SendActions() {  // I4196
-  if(DebugControlled()) {
-    return TRUE;
-  }
-
   PKEYMAN64THREADDATA _td = ThreadGlobals();
   if(!_td) return FALSE;
 
@@ -503,90 +445,4 @@ DWORD TSFShiftToShift(LPARAM shift)   // I3588
   else if(shift & TF_MOD_LCONTROL) res |= LCTRLFLAG;
   if(shift & TF_MOD_RCONTROL) res |= RCTRLFLAG;
   return res;
-}
-
-/* Debug Integration */
-
-BOOL AITIP::IsDebugControlWindow(HWND hwnd)
-{
-	static int WM_KEYMANDEBUG_CANDEBUG = RegisterWindowMessage("WM_KEYMANDEBUG_CANDEBUG");
-  DWORD_PTR dwResult;
-	SendMessageTimeout(hwnd, WM_KEYMANDEBUG_CANDEBUG, 0, 0, SMTO_BLOCK, 50, &dwResult);
-  return dwResult != 0;
-}
-
-HWND AITIP::GetDebugControlWindow()
-{
-	if(!FIsDebugControlWindow) return NULL;
-	return hwnd;
-}
-
-BOOL AITIP::DebugControlled()
-{
-	return FIsDebugControlWindow;
-}
-
-void AITIP::Debug_FillContextBuffer()
-{
-	WCHAR buf[MAXCONTEXT];
-	if(DebugControlled() &&
-			SendMessage(GetDebugControlWindow(), WM_KEYMANDEBUG_GETCONTEXT, MAXCONTEXT, (LPARAM) buf))
-	{
-		context->Set(buf);    // I4370
-		SendDebugMessageFormat(0, sdmKeyboard, 0, "AIDebugger::FillContextBuffer(%ls)", buf);
-	}
-	else
-	{
-		context->Reset();   // I4370
-		SendDebugMessageFormat(0, sdmKeyboard, 0, "AIDebugger::FillContextBuffer()-Reset");
-	}
-}
-
-#define MAXSTOREOFFSETS	20
-
-struct AIDEBUGINFO
-{
-	int cbSize;
-	int ItemType;
-	PWSTR Context, Output;
-	LPKEY Rule;
-	LPGROUP Group;
-	DWORD_PTR Flags;
-	WORD StoreOffsets[MAXSTOREOFFSETS*2+1];	// pairs--store, char position, terminated by 0xFFFF
-};
-
-void FillStoreOffsets(AIDEBUGINFO *di)
-{
-	int i, n;
-	PWSTR p;
-
-  PKEYMAN64THREADDATA _td = ThreadGlobals();
-  if(!_td) return;
-
-	for(i = n = 0, p = di->Rule->dpContext; *p; p = incxstr(p), i++)
-	{
-		if(*p == UC_SENTINEL && (*(p+1) == CODE_ANY || *(p+1) == CODE_NOTANY))
-		{
-			di->StoreOffsets[n++] = *(p+2) - 1;
-			di->StoreOffsets[n++] = _td->IndexStack[i];
-		}
-		if(*p == UC_SENTINEL && *(p+1) == CODE_INDEX)
-		{
-			di->StoreOffsets[n++] = *(p+2) - 1;
-			di->StoreOffsets[n++] = _td->IndexStack[*(p+3) - 1];
-		}
-		if(n == MAXSTOREOFFSETS*2) break;
-	}
-
-	if(n < MAXSTOREOFFSETS*2 - 1)
-		for(p = di->Rule->dpOutput; *p; p = incxstr(p))
-		{
-			if(*p == UC_SENTINEL && *(p+1) == CODE_INDEX)
-			{
-				di->StoreOffsets[n++] = *(p+2) - 1;
-				di->StoreOffsets[n++] = _td->IndexStack[*(p+3) - 1];
-			}
-			if(n == MAXSTOREOFFSETS*2) break;
-		}
-	di->StoreOffsets[n] = 0xFFFF;
 }
