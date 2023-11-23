@@ -71,7 +71,7 @@
 BOOL fOutputKeystroke;
 
 char *getcontext_debug() {
-  
+
   PKEYMAN64THREADDATA _td = ThreadGlobals();
   if (!_td || !_td->lpActiveKeyboard || !_td->lpActiveKeyboard->lpCoreKeyboardState){
         return "";
@@ -79,7 +79,7 @@ char *getcontext_debug() {
 
   WCHAR buf[(MAXCONTEXT * 3) + 1];  // *3 if every context item was a deadkey
   km_core_context_item *citems = nullptr;
-  
+
   if (KM_CORE_STATUS_OK != km_core_context_get(
     km_core_state_context(_td->lpActiveKeyboard->lpCoreKeyboardState), &citems)) {
     km_core_context_items_dispose(citems);
@@ -92,7 +92,7 @@ char *getcontext_debug() {
     return "";
   }
   km_core_context_items_dispose(citems);
-	return Debug_UnicodeString(buf);
+  return Debug_UnicodeString(buf);
 
 }
 

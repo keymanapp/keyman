@@ -34,7 +34,7 @@ private:
 
 public:
   AIWin2000Unicode();
-	~AIWin2000Unicode();
+  ~AIWin2000Unicode();
 
 	/* Information functions */
 

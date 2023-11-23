@@ -83,7 +83,10 @@ public:
 	virtual BOOL IsUnicode() = 0;
 
 	/* Context functions */
-
+  /**
+    * Reads the current application context upto MAXCONTEXT length into the supplied buffer.
+    * @param  buf      The data buffer to copy current application context
+    */
 	virtual BOOL ReadContext(PWSTR buf) = 0;
 	virtual BOOL ResetContext() = 0;
 

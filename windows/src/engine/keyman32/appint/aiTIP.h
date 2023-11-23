@@ -53,7 +53,11 @@ public:
 	virtual BOOL IsUnicode();
 
 	/* Context functions */
-// TODO: #10052 Add doxy comments
+
+ /**
+   * Reads the current application context upto MAXCONTEXT length into the supplied buffer.
+   * @param  buf      The data buffer to copy current application context
+   */
 	virtual BOOL ReadContext(PWSTR buf);
 
 	/* Queue and sending functions */

@@ -14,11 +14,10 @@
 
   Bugs:
   Todo:
-  Notes:
+  Notes: AppContext is retained to support calldll with the external interface for the 3rd party IMX keyboards
+         that worked with KMX formatted Context Strings. It is also used once for debug logging the ProcessHook.
   History:
 */
-// AppContext is only kept here to support calldll with interface for the 3rdparty apps that worked with
-// KMX formated Context. It is also used in one place for debug logs.
 
 class AppContext {
 private:
