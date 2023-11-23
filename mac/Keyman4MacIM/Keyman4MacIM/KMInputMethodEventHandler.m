@@ -170,59 +170,6 @@ NSRange _previousSelRange;
     return self.appDelegate.contextBuffer;
 }
 
-- (NSRange)getSelectionRangefromClient:(id)client {
-    switch (_clientCanProvideSelectionInfo) {
-        case Unknown:
-            if ([client respondsToSelector:@selector(selectedRange)]) {
-                NSRange selRange = [client selectedRange];
-                if (selRange.location != NSNotFound || selRange.length != NSNotFound) {
-                    _clientCanProvideSelectionInfo = Yes;
-                    [self.appDelegate logDebugMessage:@"Client can provide selection info."];
-                    [self.appDelegate logDebugMessage:@"selRange.location: %lu", (unsigned long)selRange.location];
-                    [self.appDelegate logDebugMessage:@"selRange.length: %lu", (unsigned long)selRange.length];
-                    return selRange;
-                }
-            }
-            _clientCanProvideSelectionInfo = No;
-            // REVIEW: For now, if the client reports its location as "not found", we're stuck assuming that we're
-            // still in the same location in the context. This may be totally untrue, but if the client can't report
-            // its location, we have nothing else to go on.
-            _clientSelectionCanChangeUnexpectedly = NO;
-            [self.appDelegate logDebugMessage:@"Client can NOT provide selection info!"];
-            // fall through
-        case No:
-            return NSMakeRange(NSNotFound, NSNotFound);
-        case Yes:
-        case Unreliable:
-        {
-            NSRange selRange = [client selectedRange];
-            [self.appDelegate logDebugMessage:@"selRange.location: %lu", (unsigned long)selRange.location];
-            return selRange;
-        }
-    }
-}
-
-- (void)updateContextBuffer:(id)sender {
-      [self.appDelegate logDebugMessage:@"*** updateContextBuffer ***"];
-      [self.appDelegate logDebugMessage:@"sender: %@", sender];
-
-    NSRange selRange = [self getSelectionRangefromClient: sender];
-
-    // Since client can't tell us the actual current position, we assume the previously known location in the context.
-    // (It won't matter anyway if the client also fails to report its context.)
-    NSUInteger len = (_clientCanProvideSelectionInfo != Yes) ? _previousSelRange.length : selRange.location;
-    NSString *preBuffer = [self getLimitedContextFrom:sender at:len];
-
-    // REVIEW: If there is ever a situation where preBuffer gets some text but the client reports its
-    // selectedRange as not found, we probably can't reliably assume that the current location is really
-    // at the end of the "preBuffer", so maybe we just need to assume no context.
-    [self.appDelegate setContextBuffer:preBuffer.length?[NSMutableString stringWithString:preBuffer]:nil];
-    _contextOutOfDate = NO;
-      [self.appDelegate logDebugMessage:@"contextBuffer = \"%@\"", self.contextBuffer.length?[self.contextBuffer codeString]:@"{empty}"];
-      [self.appDelegate logDebugMessage:@"***"];
-    _previousSelRange = selRange;
-}
-
 -(NSString *)getLimitedContextFrom:(id)sender at:(NSUInteger) len {
     if (![sender respondsToSelector:@selector(attributedSubstringFromRange:)])
         return nil;
@@ -258,31 +205,6 @@ NSRange _previousSelRange;
 {
     NSMutableString*        buffer = [self pendingBuffer];
     [buffer setString:string];
-}
-
-// Append to (creating if necessary) the pending buffer.
--(void)appendPendingBuffer:(NSString*)string
-{
-    NSMutableString*        buffer = [self pendingBuffer];
-    [buffer appendString:string];
-}
-
-- (void)updateContextBufferIfNeeded:(id)client {
-    // REVIEW: if self.appDelegate.lowLevelEventTap == nil under what circumstances might we be able to safely
-    // re-get the context? (Probably clientCanProvideSelectionInfo would need to be true, and it would only
-    // actually be useful if client respondsToSelector:@selector(attributedSubstringFromRange:), but even then
-    // we'd only want to do it if we have actually moved from our previous location. Otherwise, we wouldn't be
-    // able to handle dead keys correctly.)
-    if (self.appDelegate.contextChangedByLowLevelEvent) {
-        if (!_contextOutOfDate) {
-          [self.appDelegate logDebugMessage:@"Low-level event requires context to be re-retrieved."];
-        }
-        _contextOutOfDate = YES;
-        self.appDelegate.contextChangedByLowLevelEvent = NO;
-    }
-
-    if (_contextOutOfDate)
-        [self updateContextBuffer:client];
 }
 
 - (BOOL) handleEventWithKeymanEngine:(NSEvent *)event in:(id) sender {
@@ -337,7 +259,6 @@ NSRange _previousSelRange;
       }
   }
 }
-
 
 - (void)processUnhandledDeleteBack:(id)client updateEngineContext:(BOOL *)updateEngineContext {
     if ([self.appDelegate debugMode]) {
@@ -408,162 +329,17 @@ NSRange _previousSelRange;
     if(event.keyCode == kVK_Delete && _legacyMode && [self pendingBuffer].length > 0) {
         BOOL updateEngineContext = YES;
         if ([self.appDelegate debugMode]) {
-            NSLog(@"legacy: delete-back received, processing");
+            NSLog(@"legacy: handleDeleteBackLowLevel, delete-back received, processing");
         }
         [self processUnhandledDeleteBack:self.senderForDeleteBack updateEngineContext: &updateEngineContext];
         self.ignoreNextDeleteBackHighLevel = YES;
+    } else {
+      if ([self.appDelegate debugMode]) {
+          NSLog(@"handleDeleteBackLowLevel: not processing...");
+      }
     }
 
     return self.ignoreNextDeleteBackHighLevel;
-}
-
-- (BOOL)deleteBack:(NSUInteger)n in:(id) client for:(NSEvent *) event {
-    if ([self.appDelegate debugMode])
-        NSLog(@"Attempting to back-delete %li characters.", n);
-    NSRange selectedRange = [self getSelectionRangefromClient:client];
-    NSInteger pos = selectedRange.location;
-  
-    NSLog(@"delete at position %ld", (long)pos);
-    NSLog(@"_legacyMode: %s", _legacyMode?"yes":"no");
-    if (!_legacyMode)
-        [self deleteBack:n at: pos in: client];
-    if (_legacyMode)
-        return [self deleteBackLegacy:n at: pos with: selectedRange for: event];
-
-    return NO;
-}
-
-- (void)deleteBack:(NSUInteger)n at:(NSUInteger) pos in:(id)client {
-    if ([self.appDelegate debugMode]) {
-        NSLog(@"Using Apple IM-compliant mode.");
-        NSLog(@"pos = %lu", pos);
-    }
-
-    if (pos >= n && pos != NSNotFound) {
-        NSInteger preCharPos = pos - (n+1);
-        if ((preCharPos) >= 0) {
-            NSUInteger nbrOfPreCharacters;
-            NSString *preChar = nil;
-
-            // This regex will look back through the context until it finds a *known* base
-            // character because some (non-legacy) apps (e.g., Mail) do not properly handle sending
-            // combining marks on their own via insertText. One potentially negative implication
-            // of this is that if the script should happen to contain characters whose class is
-            // not known, it will skip over them and keep looking, so it could end up using a
-            // longer string of characters than otherwise necessary. This could result in a
-            // mildly jarring visual experience for the user if the app refreshes the diplay
-            // between the time the characters are removed and re-inserted. But presumbly this
-            // algorithm will eventually find either a known base character or get all the way back
-            // to the start of the context, so if it doesn't find a known base character, it will
-            // fall back to just attempting the insert with whatever it does find. I believe this
-            // will always work and should at least work as reliably as the old version of the code,
-            // which always used just a single character regardless of its class.
-            NSError *error = NULL;
-            NSRegularExpression *regexNonCombiningMark = [NSRegularExpression regularExpressionWithPattern:@"\\P{M}" options:NSRegularExpressionCaseInsensitive error:&error];
-
-            for (nbrOfPreCharacters = 1; YES; nbrOfPreCharacters++, preCharPos--) {
-                if ([client respondsToSelector:@selector(attributedSubstringFromRange:)])
-                    preChar = [[client attributedSubstringFromRange:NSMakeRange(preCharPos, nbrOfPreCharacters)] string];
-                if (!preChar) {
-                    if ([self.appDelegate debugMode]) {
-                        NSLog(@"Client apparently doesn't implement attributedSubstringFromRange. Attempting to get preChar from context...");
-                    }
-                    if (self.contextBuffer != nil && preCharPos < self.contextBuffer.length) {
-                        preChar = [self.contextBuffer substringWithRange:NSMakeRange(preCharPos, 1)];
-                    }
-                    if (!preChar)
-                        break;
-                }
-                if ([self.appDelegate debugMode])
-                    NSLog(@"Testing preChar: %@", preChar);
-
-                if ([regexNonCombiningMark numberOfMatchesInString:preChar options:NSMatchingAnchored range:NSMakeRange(0, 1)] > 0)
-                    break;
-                if (preCharPos == 0) {
-                    if ([self.appDelegate debugMode]) {
-                        NSLog(@"Failed to find a base character!");
-                    }
-                    break;
-                }
-                if ([self.appDelegate debugMode]) {
-                    NSLog(@"Have not yet found a base character. nbrOfPreCharacters = %lu", nbrOfPreCharacters);
-                }
-            }
-            if (preChar) {
-                if ([self.appDelegate debugMode]) {
-                    NSLog(@"preChar (to insert at %lu) = \"%@\"", preCharPos, preChar);
-                }
-                [client insertText:preChar replacementRange:NSMakeRange(preCharPos, n+nbrOfPreCharacters)];
-            }
-            else {
-                if ([self.appDelegate debugMode]) {
-                    NSLog(@"Switching to legacy mode - client apparently doesn't implement attributedSubstringFromRange and no previous character in context buffer.");
-                }
-                _legacyMode = YES; // client apparently doesn't implement attributedSubstringFromRange.
-            }
-        }
-        else {
-            if ([self.appDelegate debugMode])
-                NSLog(@"No previous character to use for replacement - replacing range with space");
-            [client insertText:@" " replacementRange:NSMakeRange(pos - n, n)];
-            [self.contextBuffer appendNullChar];
-        }
-    }
-}
-
-- (BOOL)deleteBackLegacy:(NSUInteger)n at:(NSUInteger) pos with:(NSRange) selectedRange for:(NSEvent *) event {
-    NSLog(@"deleteBackLegacy");
-   if (self.contextBuffer != nil && (pos == 0 || pos == NSNotFound)) {
-        pos = self.contextBuffer.length + n;
-    }
-
-    if ([self.appDelegate debugMode]) {
-        NSLog(@"Using Legacy mode.");
-        NSLog(@"pos = %lu", pos);
-    }
-
-    if (pos >= n) {
-        // n is now the number of delete-backs we need to post (plus one more if there is selected text)
-        if ([self.appDelegate debugMode]) {
-            NSLog(@"Legacy mode: calling postDeleteBacks");
-            if (_clientCanProvideSelectionInfo == No || _clientCanProvideSelectionInfo == Unreliable)
-                NSLog(@"Cannot trust client to report accurate selection length - assuming no selection.");
-        }
-
-        if (_pendingBuffer != nil && [[self pendingBuffer] length] > 0) {
-            // We shouldn't be sending out characters before the corresponding Delete Back events are received
-            // if this does happen, that's unexpected...
-            NSLog(@"Legacy mode: ERROR: did not find expected Delete Back event");
-        }
-
-        // Note: If pos is "not found", most likely the client can't accurately report the location. This might be
-        // dangerous, but for now let's go ahead and attempt to delete the characters we think should be there.
-
-        if (_clientCanProvideSelectionInfo == Yes && selectedRange.length > 0)
-            n++; // First delete-back will delete the existing selection.
-        [self postDeleteBacks:n for:event];
-
-        CFRelease(_sourceFromOriginalEvent);
-        _sourceFromOriginalEvent = nil;
-        return YES;
-    }
-    return NO;
-}
-
-- (void)postDeleteBacks:(NSUInteger)count for:(NSEvent *) event {
-    _numberOfPostedDeletesToExpect = count;
-
-    _sourceFromOriginalEvent = CGEventCreateSourceFromEvent([event CGEvent]);
-
-    for (int db = 0; db < count; db++)
-    {
-        if ([self.appDelegate debugMode]) {
-            NSLog(@"Posting a delete (down/up) at kCGHIDEventTap.");
-        }
-        [self.appDelegate postKeyboardEventWithSource:_sourceFromOriginalEvent code:kVK_Delete postCallback:^(CGEventRef eventToPost) {
-            CGEventPost(kCGHIDEventTap, eventToPost);
-        }];
-    }
 }
 
 - (void)initiatePendingBufferProcessing:(id)sender {
