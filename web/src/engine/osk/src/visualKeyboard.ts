@@ -1538,7 +1538,6 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
     if (tip == null) {
       const baseKey = key.key as OSKBaseKey;
       baseKey.setPreview(previewHost);
-      return previewHost;
     } else {
       tip.show(key, true, previewHost);
     }
