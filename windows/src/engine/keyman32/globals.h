@@ -54,10 +54,6 @@
 
 #include <evntprov.h>
 
-#define GLOBAL_ContextStackSize 80
-#define GLOBAL_MsgStackSize 80
-#define GLOBAL_MaxKeyboards 32
-
 #include "serialkeyeventclient.h"
 #include "SharedBuffers.h"
 
@@ -66,8 +62,6 @@
 class Globals
 {
 public:
-	//static INI *Ini();
-
 	static HHOOK *hhookGetMessage();
 	static HHOOK *hhookCallWndProc();
 
@@ -196,15 +190,8 @@ typedef struct tagKEYMAN64THREADDATA
   LPINTKEYBOARDINFO lpKeyboards;			// keyboard definitions
   LPINTKEYBOARDINFO lpActiveKeyboard;
 
-   // I3616
-  LPMSG msgbuf;						// Message buffer (alloc at runtime)
-
   int nKeyboards;						// nLoadedKeyboards
   int nLanguages;           // I1087 //TODO UNUSED
-
-  LPWORD IndexStack;
-  LPWSTR miniContext;
-  int miniContextIfLen;
 
   KMSTATE state;
 

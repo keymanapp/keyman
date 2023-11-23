@@ -157,27 +157,9 @@ void UninitDebuggingEx();
 BOOL UninitialiseProcess(BOOL Lock)
 {
   if(!Globals_ProcessInitialised()) return TRUE;
-
-	ReleaseKeyboards(Lock);
-
-	UninitDebuggingEx();
-
-  PKEYMAN64THREADDATA _td = ThreadGlobals(); // This is safe because of Globals_ProcessInitialised call above
-  if(_td)
-  {
-	  if(_td->msgbuf) delete _td->msgbuf;
-	  _td->msgbuf = NULL;
-
-	  if(_td->IndexStack) delete _td->IndexStack;
-	  _td->IndexStack = NULL;
-
-    if (_td->miniContext) delete _td->miniContext;
-    _td->miniContext = NULL;
-
-    if (_td->msgbuf) delete _td->msgbuf;
-    _td->msgbuf = NULL;
-  }
-	return TRUE;
+  ReleaseKeyboards(Lock);
+  UninitDebuggingEx();
+  return TRUE;
 }
 
 LONG FStartedInitialise = FALSE;
@@ -239,33 +221,7 @@ BOOL InitThread(HWND hwnd)
     // I2448 - Removed "|| _td->FInitialised" -- this should not be included because sometimes it can be re-initialised.
   }
 
-  // TODO: Check if we are initialising again and don't reallocate memory.  This can happen if Keyman is restarted
-
   _td->FInitialising = TRUE;  // Control re-entrancy, this is thread safe because the variable is per-thread
-
-	_td->IndexStack = new WORD[GLOBAL_ContextStackSize]; //Globals::Ini()->ContextStackSize];  // I3158   // I3524
-	if(!_td->IndexStack)
-	{
- 	  SendDebugMessage(hwnd, sdmGlobal, 0, "InitialiseProcess: Failed to allocate memory for IndexStack");
-    SetLastError(ERROR_KEYMAN_MEMORY_ALLOCATION_FAILED);  // I3143   // I3523
-  	return FALSE;
-  }
-
-	_td->miniContext = new WCHAR[GLOBAL_ContextStackSize]; //Globals::Ini()->ContextStackSize];  // I3158   // I3524
-	if(!_td->miniContext)
-	{
- 	  SendDebugMessage(hwnd, sdmGlobal, 0, "InitialiseProcess: Failed to allocate memory for miniContext");
-    SetLastError(ERROR_KEYMAN_MEMORY_ALLOCATION_FAILED);  // I3143   // I3523
- 	  return FALSE;
- 	}
-
-	_td->msgbuf = new MSG[GLOBAL_MsgStackSize]; //Globals::Ini()->MsgStackSize];  // I3158   // I3524
-	if(!_td->msgbuf)
-	{
- 	  SendDebugMessage(hwnd, sdmGlobal, 0, "InitialiseProcess: Failed to allocate memory for msgbuf");
-    SetLastError(ERROR_KEYMAN_MEMORY_ALLOCATION_FAILED);  // I3143   // I3523
-	  return FALSE;
-  }
 
 	RefreshKeyboards(TRUE);
 
@@ -315,10 +271,6 @@ BOOL InitialiseProcess(HWND hwnd)
 	wm_test_keyman_functioning = RegisterWindowMessage("wm_test_keyman_functioning");
 
 	DoChangeWindowMessageFilter();
-
-  //GetINIAdvanced();   /* I163x - Fix crash due to memory corruption - Globals::Ini not initialized before use - only appeared to happen on x64? */  // I3158   // I3524
-
-	SendDebugMessageFormat(hwnd, sdmGlobal, 0, "ContextStackSize: %d", GLOBAL_ContextStackSize); // Globals::Ini()->ContextStackSize); // I3158   // I3524
 
   return InitThread(hwnd);
 }
@@ -460,13 +412,6 @@ extern "C" BOOL _declspec(dllexport) WINAPI Keyman_Initialise(HWND Handle, BOOL 
 
 	return TRUE;
 }
-
-/*void GetINIAdvanced(void) // I3158   // I3524
-{
-	Globals::Ini()->ContextStackSize = 80;
-	Globals::Ini()->MsgStackSize = 80;
-	Globals::Ini()->MaxKeyboards = 32;
-}*/
 
 extern "C" BOOL _declspec(dllexport) WINAPI Keyman_StartExit(void)  // I3092
 {
