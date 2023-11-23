@@ -102,7 +102,7 @@ function setBannerHeight(h) {
 
     if (keyman.osk) {
       keyman.osk.bannerView.activeBannerHeight = bannerHeight;
-    }  
+    }
   }
 
   // Refresh KMW's OSK
@@ -149,9 +149,7 @@ function onStateChange(change) {
   keyman.refreshOskLayout();
 
   fragmentToggle = (fragmentToggle + 1) % 100;
-  if(change != 'configured') { // doesn't change the display; only initiates suggestions.
-    window.location.hash = 'refreshBannerHeight-'+fragmentToggle+'+change='+change;
-  }
+  window.location.hash = 'refreshBannerHeight-'+fragmentToggle;
 }
 
 // Query KMW if a given keyboard uses chiral modifiers.
