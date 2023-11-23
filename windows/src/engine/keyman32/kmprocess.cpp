@@ -82,7 +82,6 @@ char *getcontext_debug() {
 
   if (KM_CORE_STATUS_OK != km_core_context_get(
     km_core_state_context(_td->lpActiveKeyboard->lpCoreKeyboardState), &citems)) {
-    km_core_context_items_dispose(citems);
     return "";
   }
 
@@ -110,7 +109,7 @@ Process_Event_Core(PKEYMAN64THREADDATA _td) {
     km_core_context_status result;
     result = km_core_state_context_set_if_needed(_td->lpActiveKeyboard->lpCoreKeyboardState, reinterpret_cast<const km_core_cp *>(&application_context));
     if (result == KM_CORE_CONTEXT_STATUS_ERROR || result == KM_CORE_CONTEXT_STATUS_INVALID_ARGUMENT) {
-      SendDebugMessageFormat(0, sdmGlobal, 0, "ProcessEvent SetContext if needed Result:False %d ", FALSE);
+      SendDebugMessageFormat(0, sdmGlobal, 0, "Process_Event_Core: km_core_state_context_set_if_needed returned [%d]", result);
     }
   }
 

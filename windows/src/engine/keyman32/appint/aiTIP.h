@@ -56,7 +56,8 @@ public:
 
  /**
    * Reads the current application context upto MAXCONTEXT length into the supplied buffer.
-   * @param  buf      The data buffer to copy current application context
+   * @param  buf      The data buffer to copy current application context into, must
+   *                  be MAXCONTEXT WCHARs or larger.
    */
 	virtual BOOL ReadContext(PWSTR buf);
 

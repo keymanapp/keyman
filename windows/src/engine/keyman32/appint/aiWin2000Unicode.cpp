@@ -82,6 +82,9 @@ BOOL AIWin2000Unicode::IsUnicode()
 
 BOOL AIWin2000Unicode::ReadContext(PWSTR buf) {
   UNREFERENCED_PARAMETER(buf);
+  // We cannot read any context from legacy apps, so we return a 
+  // failure here -- telling Core to maintain its own cached 
+  // context.
   return FALSE;
 }
 
