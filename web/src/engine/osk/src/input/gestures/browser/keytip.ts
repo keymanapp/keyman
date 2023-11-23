@@ -4,7 +4,8 @@ import KeyTipInterface from '../../../keytip.interface.js';
 import VisualKeyboard from '../../../visualKeyboard.js';
 import { GesturePreviewHost } from '../../../keyboard-layout/gesturePreviewHost.js';
 
-const DEFAULT_TIP_ORIENTATION = 'up';
+// FIXME:  should be 'up' in production.
+const DEFAULT_TIP_ORIENTATION = 'down';
 
 export default class KeyTip implements KeyTipInterface {
   public readonly element: HTMLDivElement;
@@ -175,7 +176,8 @@ export default class KeyTip implements KeyTipInterface {
         this.cap.style.top = '';
         this.cap.style.bottom = (halfHeight - capOffset) + 'px';
       }
-      this.cap.style.height = (distFromTop - Math.floor(y) + canvasHeight - (orientation == 'up' ? halfHeight : -capOffset * 2)) + 'px'; //(halfHeight + 3 + ySubPixelPadding) + 'px';
+      const defaultCapHeight = (distFromTop - Math.floor(y) + canvasHeight - (orientation == 'up' ? halfHeight : -capOffset * 2));
+      this.cap.style.height = defaultCapHeight + 'px';
 
       // let delta: number = 0;
       if(this.constrain && tipHeight + bottomY > oskHeight) {
@@ -183,6 +185,9 @@ export default class KeyTip implements KeyTipInterface {
         kts.height = (canvasHeight-delta) + 'px';
         const hx = Math.max(0, (canvasHeight-delta)-(canvasHeight/2) + 2);
         this.cap.style.height = hx + 'px';
+      } else if(bottomY < 0) { // we'll assume that we always constrain at the OSK's bottom.
+        kts.bottom = '0px';
+        this.cap.style.height = (defaultCapHeight + bottomY) + 'px';
       }
 
       kts.display = 'block';
