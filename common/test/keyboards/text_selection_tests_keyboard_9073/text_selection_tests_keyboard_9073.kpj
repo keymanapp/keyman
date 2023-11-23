@@ -9,7 +9,7 @@
   </Options>
   <Files>
     <File>
-      <ID>id_af1590e09d357f1c16c9a1fe9991a9d4</ID>
+      <ID>id_dda967022de452e1fe199096e795f0ab</ID>
       <Filename>text_selection_tests_keyboard_9073.kmn</Filename>
       <Filepath>source\text_selection_tests_keyboard_9073.kmn</Filepath>
       <FileVersion>1.0</FileVersion>
@@ -59,15 +59,15 @@
       <FileType>.keyboard_info</FileType>
     </File>
     <File>
-      <ID>id_0993fe0cb7835cdfb2a101ceccc03e85</ID>
+      <ID>id_bbf31cea8a9cfe0cb838f67055690bf8</ID>
       <Filename>text_selection_tests_keyboard_9073.ico</Filename>
       <Filepath>source\text_selection_tests_keyboard_9073.ico</Filepath>
       <FileVersion></FileVersion>
       <FileType>.ico</FileType>
-      <ParentFileID>id_af1590e09d357f1c16c9a1fe9991a9d4</ParentFileID>
+      <ParentFileID>id_dda967022de452e1fe199096e795f0ab</ParentFileID>
     </File>
     <File>
-      <ID>id_aff9466042ad8bb0edf57fea7134c373</ID>
+      <ID>id_b8f7a473cac52dd0436273de657cdf46</ID>
       <Filename>text_selection_tests_keyboard_9073.kmx</Filename>
       <Filepath>source\..\build\text_selection_tests_keyboard_9073.kmx</Filepath>
       <FileVersion></FileVersion>
@@ -75,7 +75,7 @@
       <ParentFileID>id_ba932837e6a67a86abc409a393242255</ParentFileID>
     </File>
     <File>
-      <ID>id_c463c12f68ab14a1f91927146a1942b8</ID>
+      <ID>id_73d0cd87e78d9b8d7f514809dbb36a47</ID>
       <Filename>text_selection_tests_keyboard_9073.js</Filename>
       <Filepath>source\..\build\text_selection_tests_keyboard_9073.js</Filepath>
       <FileVersion></FileVersion>
@@ -83,7 +83,7 @@
       <ParentFileID>id_ba932837e6a67a86abc409a393242255</ParentFileID>
     </File>
     <File>
-      <ID>id_4a6d9dbdd46a11790e170f92ffe90a6b</ID>
+      <ID>id_71aafc060dc3251e4bb611ea539dc8e0</ID>
       <Filename>text_selection_tests_keyboard_9073.kvk</Filename>
       <Filepath>source\..\build\text_selection_tests_keyboard_9073.kvk</Filepath>
       <FileVersion></FileVersion>
