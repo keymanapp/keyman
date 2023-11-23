@@ -18,6 +18,8 @@ group(main) using keys
 
 + '`' > dk(1)
 
++ [K_T] > U+0009 c TAB
+
 'a' dk(1) 'b' + [K_BKSP] > 'ok1'
 'a' 'b' + [K_BKSP] > 'fail1'
 'a' dk(1) + [K_BKSP] > 'fail2'
