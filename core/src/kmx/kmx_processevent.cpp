@@ -443,6 +443,7 @@ int KMX_ProcessEvent::PostString(PKMX_WCHAR str, LPKEYBOARD lpkb, PKMX_WCHAR end
      switch(*(++p))
      {
       case CODE_EXTENDED:       // Start of a virtual key section w/shift codes
+        // virtual keys in output are not supported
         p++; // modifier
         p++; // vkey
         p++; // CODE_EXTENDEDEND
