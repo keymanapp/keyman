@@ -453,6 +453,7 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
         if(key != oldKey) {
           this.highlightKey(oldKey, false);
           this.gesturePreviewHost?.cancel();
+          this.gesturePreviewHost = null;
 
           if(!this.kbdLayout.hasFlicks) {
             const previewHost = this.highlightKey(key, true);
