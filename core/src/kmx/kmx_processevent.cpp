@@ -434,7 +434,7 @@ int KMX_ProcessEvent::PostString(PKMX_WCHAR str, LPKEYBOARD lpkb, PKMX_WCHAR end
   PKMX_WCHAR p, q, temp;
   LPSTORE s;
   int n1, n2;
-  int i, n, shift;
+  int i, n;
   KMX_BOOL FoundUse = FALSE;
   // TODO: Refactor to use incxstr
   for(p = str; *p && (p < endstr || !endstr); p++)
@@ -443,21 +443,9 @@ int KMX_ProcessEvent::PostString(PKMX_WCHAR str, LPKEYBOARD lpkb, PKMX_WCHAR end
      switch(*(++p))
      {
       case CODE_EXTENDED:       // Start of a virtual key section w/shift codes
-        p++;
-
-        shift = *p; //(*p<<8) | *(p+1);
-        m_actions.QueueAction(QIT_VSHIFTDOWN, shift);
-
-        p++;
-
-        m_actions.QueueAction(QIT_VKEYDOWN, *p);
-        m_actions.QueueAction(QIT_VKEYUP, *p);
-
-        m_actions.QueueAction(QIT_VSHIFTUP, shift);
-
+        p++; // modifier
+        p++; // vkey
         p++; // CODE_EXTENDEDEND
-        ////// CODE_EXTENDEDEND will be incremented by loop
-
         break;
 
       case CODE_DEADKEY:        // A deadkey to be output
