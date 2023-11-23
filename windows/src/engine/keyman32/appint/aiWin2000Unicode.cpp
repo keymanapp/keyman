@@ -88,18 +88,12 @@ BOOL AIWin2000Unicode::ReadContext(PWSTR buf) {
   return FALSE;
 }
 
-BOOL AIWin2000Unicode::ResetContext()
+void AIWin2000Unicode::ResetContext()
 {
   PKEYMAN64THREADDATA _td = ThreadGlobals();
-  if (!_td) {
-    return FALSE;
+  if (_td && _td->lpActiveKeyboard && _td->lpActiveKeyboard->lpCoreKeyboardState) {
+    km_core_state_context_clear(_td->lpActiveKeyboard->lpCoreKeyboardState);
   }
-  if (!_td->lpActiveKeyboard || !_td->lpActiveKeyboard->lpCoreKeyboardState) {
-    SendDebugMessageFormat(0, sdmAIDefault, 0, "ResetContext: no active keyboard state");
-    return FALSE;
-  }
-  km_core_state_context_clear(_td->lpActiveKeyboard->lpCoreKeyboardState);
-  return TRUE;
 }
 
 BYTE SavedKbdState[256];

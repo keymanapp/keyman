@@ -88,7 +88,7 @@ public:
     * @param  buf      The data buffer to copy current application context
     */
 	virtual BOOL ReadContext(PWSTR buf) = 0;
-	virtual BOOL ResetContext() = 0;
+	virtual void ResetContext() = 0;
 
 	/* Queue and sending functions */
 

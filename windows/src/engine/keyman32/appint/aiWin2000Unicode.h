@@ -46,7 +46,7 @@ public:
 	/* Context functions */
 
 	virtual BOOL ReadContext(PWSTR buf);
-	virtual BOOL ResetContext();
+	virtual void ResetContext();
  
 	/* Queue and sending functions */
 
