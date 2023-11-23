@@ -9,6 +9,7 @@ store(&VISUALKEYBOARD) 'gesture_prototyping.kvks'
 store(&LAYOUTFILE) 'gesture_prototyping.keyman-touch-layout'
 
 begin Unicode > use(main)
+begin PostKeystroke > use(postKeystroke)
 
 c This tells Keyman which keys should have casing behavior applied
 $keymanweb: store(&CasedKeys) [K_A] .. [K_Z]
@@ -19,3 +20,7 @@ store(default-alpha) 'a' .. 'z'     'A' .. 'Z'
 group(main) using keys
 
 $keymanweb: + any(default-alpha) > index(default-alpha, 1)
+
+group(postKeystroke) readonly
+
+if(&newLayer = "") if(&layer = 'shift') > layer('default')
