@@ -1,11 +1,11 @@
 import { assert } from 'chai';
-import { CumulativePathStats, InputSample } from '@keymanapp/gesture-recognizer';
+import { RegressiblePathStats, InputSample } from '@keymanapp/gesture-recognizer';
 
 import { TouchpathTurtle } from '#tools';
 
-describe("CumulativePathStats", function() {
+describe("RegressiblePathStats", function() {
   it("Sample count = 0", function() {
-    let stats = new CumulativePathStats();
+    let stats = new RegressiblePathStats();
 
     assert.equal(stats.duration, 0);
     assert.equal(stats.angle, undefined);
@@ -18,7 +18,7 @@ describe("CumulativePathStats", function() {
   });
 
   it("Sample count = 1", function() {
-    let stats = new CumulativePathStats();
+    let stats = new RegressiblePathStats();
     stats = stats.extend({
       targetX: 4,
       targetY: 8,
@@ -48,7 +48,7 @@ describe("CumulativePathStats", function() {
       });
     }
 
-    let stats = new CumulativePathStats();
+    let stats = new RegressiblePathStats();
 
     for(const sample of samples) {
       stats = stats.extend(sample);
@@ -84,16 +84,16 @@ describe("CumulativePathStats", function() {
       });
     }
 
-    let stats = new CumulativePathStats();
-    let preStats: CumulativePathStats[]  = [];
-    let postStats: CumulativePathStats[] = [];
+    let stats = new RegressiblePathStats();
+    let preStats: RegressiblePathStats[]  = [];
+    let postStats: RegressiblePathStats[] = [];
 
     for(const sample of samples) {
       const initialValue = stats;
       // The constructor provides a deep-copy mechanism.
-      preStats.push(new CumulativePathStats(initialValue));
+      preStats.push(new RegressiblePathStats(initialValue));
       stats = stats.extend(sample);
-      postStats.push(new CumulativePathStats(initialValue));
+      postStats.push(new RegressiblePathStats(initialValue));
     }
 
     // The one not-immutable part:  `.followingSample`.  It's needed for some of the
@@ -124,7 +124,7 @@ describe("CumulativePathStats", function() {
       });
     }
 
-    let stats = new CumulativePathStats();
+    let stats = new RegressiblePathStats();
 
     for(const sample of samples) {
       stats = stats.extend(sample);
@@ -162,7 +162,7 @@ describe("CumulativePathStats", function() {
       });
     }
 
-    let firstHalfStats = new CumulativePathStats();
+    let firstHalfStats = new RegressiblePathStats();
 
     for(const sample of sampleSet1) {
       firstHalfStats = firstHalfStats.extend(sample);
@@ -188,7 +188,7 @@ describe("CumulativePathStats", function() {
       });
     }
 
-    let secondHalfStats = new CumulativePathStats();
+    let secondHalfStats = new RegressiblePathStats();
     let combinedStats   = firstHalfStats;
 
     for(const sample of sampleSet2) {
@@ -233,7 +233,7 @@ describe("CumulativePathStats", function() {
   });
 
   it("Renormalization", () => {
-    let stats = new CumulativePathStats();
+    let stats = new RegressiblePathStats();
 
     const turtle = new TouchpathTurtle({
       targetX: 50,
@@ -246,7 +246,7 @@ describe("CumulativePathStats", function() {
       stats = stats.extend(sample);
     });
 
-    function assertMatchingStats(actual: CumulativePathStats, expected: CumulativePathStats) {
+    function assertMatchingStats(actual: RegressiblePathStats, expected: RegressiblePathStats) {
       assert.equal(actual.duration, expected.duration);
       assert.equal(actual.sampleCount, expected.sampleCount);
 

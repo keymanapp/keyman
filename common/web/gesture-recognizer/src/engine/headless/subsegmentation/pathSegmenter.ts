@@ -1,5 +1,6 @@
 import { ConstructingSegment } from "./constructingSegment.js";
-import { CumulativePathStats, PathCoordAxis, sigMinus } from "../cumulativePathStats.js";
+import { PathCoordAxis } from "../cumulativePathStats.js";
+import { RegressiblePathStats, sigMinus } from "../regressiblePathStats.js";
 import { InputSample } from "../inputSample.js";
 import { Segment, SegmentImplementation } from "./segment.js";
 import { SegmentClass, SegmentClassifier, SegmentClassifierConfig } from "../segmentClassifier.js";
@@ -146,19 +147,19 @@ export interface Subsegmentation {
   /**
    * The stats for observations comprising the subsegment.
    */
-  stats: CumulativePathStats;
+  stats: RegressiblePathStats;
 
   /**
    * The cumulative stats up to the subsegment's endpoint, including
    * accumulated components that precede the subsegment entirely.
    */
-  endingAccumulation: CumulativePathStats;
+  endingAccumulation: RegressiblePathStats;
 
   /**
    * The cumulative stats up to the point before the subsegment's start
    * point, not including any accumulation for components within the subsegment.
    */
-  baseAccumulation: CumulativePathStats;
+  baseAccumulation: RegressiblePathStats;
 }
 
 /**
@@ -184,7 +185,7 @@ export class SegmentationSplit {
   /**
    * The properties of the full interval being segmented, before the split.
    */
-  readonly union: CumulativePathStats;
+  readonly union: RegressiblePathStats;
 
   /**
    * Provides segmented-regression statistics & fitting values on the two specified axes /
@@ -200,17 +201,17 @@ export class SegmentationSplit {
     /**
      * The linear regression for the underlying `pre` (earlier) subsegment.
      */
-    pre:   typeof CumulativePathStats.regression.prototype;
+    pre:   typeof RegressiblePathStats.regression.prototype;
 
     /**
      * The linear regression for the underlying `post` (later) subsegment.
      */
-    post:  typeof CumulativePathStats.regression.prototype;
+    post:  typeof RegressiblePathStats.regression.prototype;
 
     /**
      * The linear, unsegmented regression for the underlying `union` (combined) subsegment.
      */
-    union: typeof CumulativePathStats.regression.prototype;
+    union: typeof RegressiblePathStats.regression.prototype;
 
     constructor(host: SegmentationSplit, dependentAxis: PathCoordAxis, independentAxis: PathCoordAxis) {
       if(dependentAxis == independentAxis) {
@@ -373,8 +374,8 @@ export class SegmentationSplit {
     this.union = post.endingAccumulation.deaccumulate(pre.baseAccumulation);
   }
 
-  static fromTrackedStats(steppedStats: CumulativePathStats[],
-                          baseAccumulation: CumulativePathStats,
+  static fromTrackedStats(steppedStats: RegressiblePathStats[],
+                          baseAccumulation: RegressiblePathStats,
                           splitIndex: number) {
     let intervalEndStats = steppedStats[splitIndex];
     const pre: Subsegmentation = {
@@ -521,7 +522,7 @@ export class PathSegmenter {
    * batched into `choppedStats`) once their respective points on the
    * path have been fully processed.
    */
-  private steppedCumulativeStats: CumulativePathStats[];
+  private steppedCumulativeStats: RegressiblePathStats[];
 
   /**
    * Tracks the segment currently under construction.
@@ -550,7 +551,7 @@ export class PathSegmenter {
    * Represents the cumulative statistics of all points on the path
    * that lie on already-fully-segmented parts of it.
    */
-  private choppedStats: CumulativePathStats = null;
+  private choppedStats: RegressiblePathStats = null;
 
   /**
    * A closure used to 'forward' generated Segments, generally to their public-facing
@@ -601,7 +602,7 @@ export class PathSegmenter {
       this.hasStarted = true;
 
       const startSegment = new SegmentImplementation();
-      startSegment.updateStats(new CumulativePathStats(sample));
+      startSegment.updateStats(new RegressiblePathStats(sample));
       startSegment.classifyType(SegmentClass.START);
       startSegment.resolve();
 
@@ -662,7 +663,7 @@ export class PathSegmenter {
     // As ConstructingSegment is designed to work with -sequences- of samples, it's less
     // useful here... and unnecessary, as we already have all the info we need.
     const endSegment = new SegmentImplementation();
-    endSegment.updateStats(new CumulativePathStats(finalAccumulation.lastSample));
+    endSegment.updateStats(new RegressiblePathStats(finalAccumulation.lastSample));
     endSegment.classifyType(SegmentClass.END);
     endSegment.resolve();
 
@@ -679,11 +680,11 @@ export class PathSegmenter {
    * @param timeDelta
    */
   private observe(sample: InputSample<any>, timeDelta: number) {
-    let cumulativeStats: CumulativePathStats;
+    let cumulativeStats: RegressiblePathStats;
     if(this.steppedCumulativeStats.length) {
       cumulativeStats = this.steppedCumulativeStats[this.steppedCumulativeStats.length-1];
     } else {
-      cumulativeStats = new CumulativePathStats();
+      cumulativeStats = new RegressiblePathStats();
     }
 
     sample = {... sample, t: sample.t + timeDelta};

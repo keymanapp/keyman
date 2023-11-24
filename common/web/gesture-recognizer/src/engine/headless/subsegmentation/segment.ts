@@ -1,4 +1,4 @@
-import { CumulativePathStats } from "../cumulativePathStats.js";
+import { RegressiblePathStats } from "../regressiblePathStats.js";
 import { InputSample } from "../inputSample.js";
 import { type SegmentClass } from "../segmentClassifier.js";
 
@@ -36,7 +36,7 @@ export class Segment {
 
   private _type?: SegmentClass;
 
-  private _stats: CumulativePathStats | JSONSegment;
+  private _stats: RegressiblePathStats | JSONSegment;
 
   private _recognitionPromise: Promise<SegmentClass>;
   private _recognitionPromiseResolver: (type: SegmentClass | PromiseLike<SegmentClass>) => void;
@@ -99,7 +99,7 @@ export class Segment {
     this._peakSpeed = speed;
   }
 
-  protected updateStats(totalStats: CumulativePathStats) {
+  protected updateStats(totalStats: RegressiblePathStats) {
     if(this._isResolved) {
       throw new Error("May not modify a resolved segment!");
     }
@@ -128,7 +128,7 @@ export class Segment {
    * The starting point of this touchpath segment.
    */
   get initialCoord(): InputSample<any> {
-    if(this._stats instanceof CumulativePathStats) {
+    if(this._stats instanceof RegressiblePathStats) {
       return this._stats.initialSample;
     } else {
       return this._stats.initialCoord;
@@ -139,7 +139,7 @@ export class Segment {
    * The ending point of this touchpath segment.
    */
   get lastCoord(): InputSample<any> {
-    if(this._stats instanceof CumulativePathStats) {
+    if(this._stats instanceof RegressiblePathStats) {
       return this._stats.lastSample;
     } else {
       return this._stats.lastCoord;
@@ -158,7 +158,7 @@ export class Segment {
    * the distance between `initialCoord` and `lastCoord` (ignoring time).
    */
   get distance(): number {
-    if(this._stats instanceof CumulativePathStats) {
+    if(this._stats instanceof RegressiblePathStats) {
       return this._stats.netDistance;
     } else {
       return this._stats.distance;
@@ -269,7 +269,7 @@ export class SegmentImplementation extends Segment {
     super.setPeakSpeed(speed);
   }
 
-  public updateStats(stats: CumulativePathStats) {
+  public updateStats(stats: RegressiblePathStats) {
     super.updateStats(stats);
   }
 

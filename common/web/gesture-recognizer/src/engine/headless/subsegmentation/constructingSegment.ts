@@ -1,5 +1,5 @@
 import { SegmentClassifier } from "../segmentClassifier.js";
-import { CumulativePathStats } from "../cumulativePathStats.js";
+import { RegressiblePathStats } from "../regressiblePathStats.js";
 import { SegmentationSplit, Subsegmentation } from "./pathSegmenter.js";
 import { SegmentImplementation } from "./segment.js";
 import { SubsegmentCompatibilityAnalyzer } from "./subsegmentCompatibilityAnalyzer.js";
@@ -20,7 +20,7 @@ export class ConstructingSegment {
    * Marks previously-accumulated stats on the touchpath for the portion that precedes
    * the in-construction Segment.
    */
-  readonly baseAccumulation: CumulativePathStats;
+  readonly baseAccumulation: RegressiblePathStats;
 
   /**
    * Notes all subsegments identified as part of the overall segment being constructed.
@@ -59,7 +59,7 @@ export class ConstructingSegment {
    * @param accumulation
    * @returns
    */
-  private buildIntervalFromBase(accumulation: CumulativePathStats) {
+  private buildIntervalFromBase(accumulation: RegressiblePathStats) {
     return accumulation.deaccumulate(this.baseAccumulation);
   }
 
@@ -67,7 +67,7 @@ export class ConstructingSegment {
    * Returns the stats accumulation covering all currently-committed subsegments.
    * May be `null` if there are no committed subsegments.
    */
-  public get committedInterval(): CumulativePathStats {
+  public get committedInterval(): RegressiblePathStats {
     return this.committedIntervalAsSubsegmentation.stats;
   }
 
