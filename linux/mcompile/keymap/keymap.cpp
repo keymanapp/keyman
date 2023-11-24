@@ -481,6 +481,14 @@ std::wstring  get_KeyVals_according_to_keycode_and_Shiftstate(GdkKeymap *keymap,
   if (!gdk_keymap_get_entries_for_keycode(keymap, keycode, &maps, &keyvals, &count))
     return L"\0";
     //return L"1";
+// _S2 remove! only for testing helps to force filling rgkey[VK_DE]
+if((keycode == 49) && (ss == Base))  return L"^";
+if((keycode == 21) && (ss == Base))  return L"'";
+if((keycode == 21) && (ss == Shft))  return L"`";
+if((keycode == 21) && (ss == Base) && (caps == 1))  return L"'";
+if((keycode == 20) && (ss == Base) && (caps == 1))  return L"ß";            //L"ẞ";
+if((keycode == 20) && (ss == ShftMenuCtrl) && (caps == 0))  return L"ß";    //L"ẞ";
+if((keycode == 20) && (ss == ShftMenuCtrl) && (caps == 1))  return L"ß";    //L"ẞ";
 
   //unshifted
   if (( ss == Base ) && ( caps == 0 )) {

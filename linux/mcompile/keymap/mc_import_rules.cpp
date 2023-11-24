@@ -599,12 +599,22 @@ int KMX_GetMaxDeadkeyIndex(KMX_WCHAR *p) {
 
 bool IsKeymanUsedKeyVal(std::wstring Keyval) {
 
+
+
   int KV = (int) (*Keyval.c_str());
 
-  //         32            122             136          256
-  if ((KV >= 0x20 && KV <= 0x7A) || (KV >= 0x88 && KV < 0xFF))
+  //         32            127              196          256
+  if  ((KV >= 0x20 && KV <= 0x7F) || (KV >= 0xC4 && KV < 198)  ||
+       (KV >= 199  && KV < 208)   || (KV >= 209 && KV < 216)   || (KV >= 217 && KV < 229)  ||
+       (KV >= 231 && KV < 240)    || (KV >= 241 && KV < 248)   || (KV >= 249 && KV < 0xFF) ||
+       (KV == 128) || (KV == 178) || (KV == 167) || (KV == 179)|| (KV == 176)|| (KV == 181)   )
+
+
+  //         32            127             136          256
+  //if ((KV >= 0x20 && KV <= 0x7F) || (KV == 214)|| (KV == 246)|| (KV ==196)|| (KV == 228) || (KV ==220)|| (KV == 252)|| (KV ==223)|| (KV == 186))
     return true;
   else
+
     return false;
 
 }
@@ -702,11 +712,11 @@ bool KMX_ImportRules(KMX_WCHAR *kbid, LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, Gd
   }
 */
   // _S2 test rgkey can go later
-  for(UINT iKey = 100; iKey < rgKey.size(); iKey++) {
+  /*for(UINT iKey = 100; iKey < rgKey.size(); iKey++) {
       if(rgKey[iKey] != NULL) {
           wprintf(L" Key Nr %i is available\n",iKey);
       }
-  }
+  }*/
 
   // _S2 in this part we skip shiftstates 4, 5, 8, 9
   for(UINT iKey = 0; iKey < rgKey.size(); iKey++) {
@@ -806,15 +816,28 @@ int testval= 38;
   }
 
   //_S2 this gan co later
-  //std::vector< int > TestValues = {48,49,50,52,53,54,55,56,57,54,65,89,189,188};
-  //std::vector< int > TestValues = {48,49,50,51,52,53,54,55,56,57,65,66,67,88,89,90, 176,177,196,214,220};
-  std::vector< int > TestValues = {48,49,50,51,52,53,54,55,56,57,65,66,67,88,89,90};
- // std::vector< int > TestValues = {65};
+  std::vector< int > TestValues = {48,49,50,51,52,53,54,55,56,57,65,66,67,88,89,90, 186,187,188,189,191,191,192,219,220,221,222,223,226};
   wprintf(L"-----------------\nNow some tests:\n");
+  wprintf(L"                  Base          Caps            Shift           Shfit+Caps     MenuCtrl         MenuCtrl+Caps \n");
+
   for ( int i=0; i < (int) TestValues.size();i++) {
-    wprintf(L"Results for %i\t: %s  %s  %s  %s   \n", TestValues[i], rgKey[TestValues[i]]->KMX_GetShiftState(Base,0).c_str(),   rgKey[TestValues[i]]->KMX_GetShiftState(Base,1).c_str() ,  rgKey[TestValues[i]]->KMX_GetShiftState(Shft,0).c_str(), rgKey[TestValues[i]]->KMX_GetShiftState(Shft,1).c_str());
+    std::wstring wws = rgKey[TestValues[i]]->get_m_rgss(0,0);
+    wprintf(L"Results for %i\t: %ls (%i)  \t%ls (%i)   \t%ls (%i)   \t%ls (%i)   \t%ls (%i)   \t%ls (%i)   \n",
+    TestValues[i],
+    rgKey[TestValues[i]]->get_m_rgss(0,0).c_str(), rgKey[TestValues[i]]->get_m_rgss(0,0)[0],
+    rgKey[TestValues[i]]->get_m_rgss(0,1).c_str(), rgKey[TestValues[i]]->get_m_rgss(0,1)[0],
+    rgKey[TestValues[i]]->get_m_rgss(1,0).c_str(), rgKey[TestValues[i]]->get_m_rgss(1,0)[0],
+    rgKey[TestValues[i]]->get_m_rgss(1,1).c_str(), rgKey[TestValues[i]]->get_m_rgss(1,1)[0],
+    rgKey[TestValues[i]]->get_m_rgss(6,0).c_str(), rgKey[TestValues[i]]->get_m_rgss(6,0)[0],
+    rgKey[TestValues[i]]->get_m_rgss(6,1).c_str(), rgKey[TestValues[i]]->get_m_rgss(6,1)[0],
+    rgKey[TestValues[i]]->get_m_rgss(7,0).c_str(), rgKey[TestValues[i]]->get_m_rgss(7,0)[0],
+    rgKey[TestValues[i]]->get_m_rgss(7,1).c_str(), rgKey[TestValues[i]]->get_m_rgss(7,1)[0]
+    );
   }
   wprintf(L"-----------------\n");
+
+
+
 
   //-------------------------------------------------------------
   // Now that we've collected the key data, we need to
@@ -850,10 +873,13 @@ int testval= 38;
   kp->cxGroupArray++;
   gp = &kp->dpGroupArray[kp->cxGroupArray-1];
   UINT nKeys = 0;
+  int sab_nr = 0;
   for (UINT iKey = 0; iKey < rgKey.size(); iKey++) {
     if ((rgKey[iKey] != NULL) && rgKey[iKey]->KMX_IsKeymanUsedKey() && (!rgKey[iKey]->KMX_IsEmpty())) {
       nKeys+= rgKey[iKey]->KMX_GetKeyCount(loader.MaxShiftState());
-    }
+      wprintf(L" iKey = %i, Delta:  %i -> Sum %i\n", iKey, rgKey[iKey]->KMX_GetKeyCount(loader.MaxShiftState()),  nKeys);
+      sab_nr ++;
+   }
   }
 
 
@@ -866,7 +892,6 @@ int testval= 38;
   gp->cxKeyArray = nKeys;
   gp->dpKeyArray = new KMX_KEY[gp->cxKeyArray];
   nKeys = 0;
-
   //
   // Fill in the new rules
   //
