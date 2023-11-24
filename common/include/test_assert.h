@@ -22,7 +22,7 @@
              << console_color::reset() \
              << std::endl \
              << "  " << (exprText) << std::endl; \
-  std::exit(100*__LINE__+(result)); \
+  std::exit(EXIT_FAILURE); \
 }
 
 #ifdef try_status
@@ -55,7 +55,7 @@
              << std::endl \
              << "expected: " << (expected) << std::endl \
              << "actual:   " << (actual) << std::endl; \
-    std::exit(100*__LINE__); \
+    std::exit(EXIT_FAILURE); \
   } \
 }
 
@@ -70,6 +70,6 @@
              << std::endl \
              << "expected: " << Debug_UnicodeString((PKMX_WCHAR)(expected)) << std::endl \
              << "actual:   " << Debug_UnicodeString((PKMX_WCHAR)(actual)) << std::endl; \
-    std::exit(100*__LINE__); \
+    std::exit(EXIT_FAILURE); \
   } \
 }

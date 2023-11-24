@@ -9,7 +9,6 @@ export class LdmlKeyboardKeymanWebCompiler {
   private readonly options: LdmlCompilerOptions;
   private readonly nl: string;
   private readonly tab: string;
-
   constructor(private callbacks: CompilerCallbacks, options?: LdmlCompilerOptions) {
     this.options = { ...options };
     this.nl = this.options.saveDebug ? "\n" : '';
@@ -18,7 +17,7 @@ export class LdmlKeyboardKeymanWebCompiler {
 
   public compileVisualKeyboard(source: LDMLKeyboard.LDMLKeyboardXMLSourceFile) {
     const nl = this.nl, tab = this.tab;
-    const vkc = new LdmlKeyboardVisualKeyboardCompiler();
+    const vkc = new LdmlKeyboardVisualKeyboardCompiler(this.callbacks);
     const vk: VisualKeyboard.VisualKeyboard = vkc.compile(source);
 
     let result =

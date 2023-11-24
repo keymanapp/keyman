@@ -6,7 +6,7 @@ import {
   InputSample
 } from '@keymanapp/gesture-recognizer';
 
-import { BannerSuggestion } from './banner.js';
+import { BannerSuggestion } from './suggestionBanner.js';
 import { simpleTapModelWithReset } from "../input/gestures/specsForLayout.js";
 
 export const BannerSimpleTap: gestures.specs.GestureModel<BannerSuggestion> = {

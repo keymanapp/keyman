@@ -92,13 +92,6 @@ typedef struct tagINTKEYBOARDINFO
   km_core_keyboard_imx* lpIMXList;
 } INTKEYBOARDINFO, * LPINTKEYBOARDINFO;
 
-typedef struct tagINI
-{
-  int MsgStackSize;
-  int MaxKeyboards;
-  int ContextStackSize;
-} INI;
-
 typedef struct tagKMSTATE
 {
   BOOL NoMatches;
@@ -124,14 +117,7 @@ LRESULT CALLBACK kmnLowLevelKeyboardProc(   // I4124
 BOOL ReleaseStateMemoryCore(km_core_state** state);
 BOOL ReleaseKeyboardMemoryCore(km_core_keyboard** kbd);
 
-void PostGETNEXT(HWND hwnd);
-BOOL CompareMsg(LPMSG MsgA, LPMSG MsgB);
 BOOL ProcessHook();	// returns FALSE on error or key not matched [only for AITip]
-BOOL ProcessMessage( LPMSG mp );
-BOOL ProcessGroup(LPGROUP gp);
-BOOL ContextMatch(LPKEY kkp);
-int PostString(PWSTR str, LPMSG mp, LPKEYBOARD lpkb, PWSTR endstr);
-BOOL LoadAllKeymanKeyboards(DWORD layout);
 
 BOOL IsSysTrayWindow(HWND hwnd);
 
@@ -149,7 +135,6 @@ BOOL SelectKeyboard(DWORD KeymanID);
 extern "C" DWORD  _declspec(dllexport) WINAPI GetActiveKeymanID();
 
 BOOL GetKeyboardFileName(LPSTR kbname, LPSTR buf, int nbuf);
-BOOL LoadKeyboard(LPSTR fileName, LPKEYBOARD *lpKeyboard);
 BOOL LoadlpKeyboard(int i);
 
 PSTR wstrtostr(PCWSTR in);

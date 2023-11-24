@@ -10,10 +10,7 @@
 #include <algorithm>
 #include <string>
 #include "kmx/kmx_xstring.h"
-
-#ifndef assert
-#define assert(x) ((void)0)
-#endif
+#include <assert.h>
 
 namespace km {
 namespace core {
@@ -48,16 +45,16 @@ element::is_uset() const {
   return (flags & LDML_ELEM_FLAGS_TYPE) == LDML_ELEM_FLAGS_TYPE_USET;
 }
 
-signed char
+reorder_weight
 element::get_order() const {
   unsigned char uorder = ((flags & LDML_ELEM_FLAGS_ORDER_MASK) >> LDML_ELEM_FLAGS_ORDER_BITSHIFT);
-  return (signed char)uorder;
+  return (reorder_weight)uorder; // unsigned to signed
 }
 
-signed char
+reorder_weight
 element::get_tertiary() const {
   unsigned char uorder = ((flags & LDML_ELEM_FLAGS_TERTIARY_MASK) >> LDML_ELEM_FLAGS_TERTIARY_BITSHIFT);
-  return (signed char)uorder;
+  return (reorder_weight)uorder; // unsigned to signed
 }
 
 bool
@@ -96,19 +93,19 @@ element::dump() const {
 
 int
 reorder_sort_key::compare(const reorder_sort_key &other) const {
-  int primaryResult    = (int)primary    - (int)other.primary;
-  int secondaryResult  = (int)secondary  - (int)other.secondary;
-  int tertiaryResult   = (int)tertiary   - (int)other.tertiary;
-  int quaternaryResult = (int)quaternary - (int)other.quaternary;
+  auto primaryResult    = primary    - other.primary;
+  auto secondaryResult  = secondary  - other.secondary;
+  auto tertiaryResult   = tertiary   - other.tertiary;
+  auto quaternaryResult = quaternary - other.quaternary;
 
   if (primaryResult) {
-    return primaryResult;
+    return (int)primaryResult;
   } else if (secondaryResult) {
-    return secondaryResult;
+    return (int)secondaryResult;
   } else if (tertiaryResult) {
-    return tertiaryResult;
+    return (int)tertiaryResult;
   } else if (quaternaryResult) {
-    return quaternaryResult;
+    return (int)quaternaryResult;
   } else {
     // We don't expect to get here.  quaternaryResult is the string index, which
     // should be unequal.
@@ -134,14 +131,14 @@ reorder_sort_key::from(const std::u32string &str) {
   // construct a 'baseline' sort key, that is, in the absence of
   // any match rules.
   std::deque<reorder_sort_key> keylist;
-  auto s   = str.begin();  // str iterator
-  size_t c = 0;            // str index
+  auto s           = str.begin();  // str iterator
+  reorder_weight c = 0;            // str index
   for (auto e = str.begin(); e < str.end(); e++, s++, c++) {
     // primary    weight: 0
     // seconary   weight: c (the string index)
     // tertiary   weight: 0
     // quaternary weight: c (the index again)
-    keylist.emplace_back(reorder_sort_key{*s, 0, c, 0, c});
+    keylist.emplace_back(reorder_sort_key{*s, 0, c, 0, c, false});
   }
   return keylist;
 }
@@ -149,7 +146,9 @@ reorder_sort_key::from(const std::u32string &str) {
 void
 reorder_sort_key::dump() const {
   // for debugging…
-  DebugLog("- U+%04X\t(%d, %d, %d, %d)", ch, (int)primary, (int)secondary, (int)tertiary, (int)quaternary);
+  DebugLog(
+      "- U+%04X\t(%d, %d, %d, %d) %c", ch, (int)primary, (int)secondary, (int)tertiary, (int)quaternary,
+      is_tertiary_base ? 'T' : ' ');
 }
 
 size_t
@@ -216,9 +215,14 @@ std::deque<reorder_sort_key> &
 element_list::update_sort_key(size_t offset, std::deque<reorder_sort_key> &key) const {
   /** string index */
   size_t c = 0;
+  bool have_last_base                = false;
+  reorder_weight last_base_primary   = -1;
+  reorder_weight last_base_secondary = -1;
   for (auto e = begin(); e < end(); e++, c++) {
+    /** position in the key */
+    auto n = offset + c;
     /** update this key */
-    auto &k = key.at(offset + c);
+    auto &k = key.at(n);
     // we double check that the character matches. otherwise something
     // has really gone awry, because we shouldn't be here if this element list doesn't apply.
     if (!e->matches(k.ch)) {
@@ -228,9 +232,30 @@ element_list::update_sort_key(size_t offset, std::deque<reorder_sort_key> &key) 
       assert(e->matches(k.ch));        // double check that this element matches
     }
     // we only update primary and tertiary weights
-    k.primary  = e->get_order();
-    // TODO-LDML: need more detailed tertiary work
-    k.tertiary = e->get_tertiary();
+    k.primary          = e->get_order();
+    k.tertiary         = e->get_tertiary();
+    k.is_tertiary_base = e->is_tertiary_base();
+
+    if (k.tertiary != 0 && n > 0) {
+      // search backwards for a base
+      auto n2 = n;
+      // TODO-LDML: odd loop here because n2 is signed.
+      do {
+        n2--;
+        auto &k2 = key.at(n2);
+        if (k2.is_tertiary_base) {
+          last_base_primary   = k2.primary;
+          last_base_secondary = k2.secondary;
+          have_last_base      = true;
+        }
+      } while (!have_last_base && n2 > 0);
+      // we may not have found the base. but the common case is that the base is found.
+      if (have_last_base) {
+        // copy the primary and secondary from the last_base
+        k.primary   = last_base_primary;
+        k.secondary = last_base_secondary;
+      }
+    }
 #if KMXPLUS_DEBUG_TRANSFORM
     DebugTran("Updating at +%d", c);
     k.dump();
@@ -272,6 +297,29 @@ reorder_entry::match_end(std::u32string &str, size_t offset, size_t len) const {
     }
   }
   return match_len;
+}
+
+int
+reorder_entry::compare(const reorder_entry &other) const {
+  if (this == &other) {
+    return 0;
+  } else if (elements.size() < other.elements.size()) {
+    return -1;
+  } else if (elements.size() > other.elements.size()) {
+    return 1;
+  } else {
+    return 0; // punt
+  }
+}
+
+bool
+reorder_entry::operator<(const reorder_entry &other) const {
+  return (compare(other) < 0);
+}
+
+bool
+reorder_entry::operator>(const reorder_entry &other) const {
+  return (compare(other) > 0);
 }
 
 bool
@@ -352,7 +400,9 @@ reorder_group::apply(std::u32string &str) const {
   /** pointer to the beginning of the current run. */
   std::deque<reorder_sort_key>::iterator run_start = sort_keys.begin();
   for(auto e = run_start; e != sort_keys.end(); e++) {
-    if ((e->primary == 0) && (e != run_start)) { // it's a base
+    // find the actual beginning base: primary weight = 0 and tertiary = 0.
+    // (tertiary chars will have primary=0 BUT will have tertiary nonzero.)
+    if ((e->primary == 0) && (e->tertiary == 0) && (e != run_start)) {
       auto run_end = e - 1;
       DebugTran("Sorting subrange quaternary=[%d..]", run_start->quaternary);
       std::sort(run_start, run_end);  // reversed because it's a reverse iterator…?
@@ -368,7 +418,7 @@ reorder_group::apply(std::u32string &str) const {
   // recombine into a string by pulling out the 'ch' value
   // that's in each sortkey element.
   std::u32string newSuffix;
-  size_t q = sort_keys.begin()->quaternary; // start with the first quaternary
+  signed char q = sort_keys.begin()->quaternary; // start with the first quaternary
   for (auto e = sort_keys.begin(); e < sort_keys.end(); e++, q++) {
     if (q != e->quaternary) {
       // something rearranged in this subrange, because the quaternary values are out of order.
@@ -466,15 +516,13 @@ transform_entry::init() {
     return false;
   }
   // TODO-LDML: if we have mapFrom, may need to do other processing.
-  const std::u16string patstr = km::core::kmx::u32string_to_u16string(fFrom);
+  std::u16string patstr = km::core::kmx::u32string_to_u16string(fFrom);
+  // normalize, including markers
+  normalize_nfd_markers(patstr);
   UErrorCode status           = U_ZERO_ERROR;
-  /* const */ icu::UnicodeString patustr_raw = icu::UnicodeString(patstr.data(), (int32_t)patstr.length());
+  /* const */ icu::UnicodeString patustr = icu::UnicodeString(patstr.data(), (int32_t)patstr.length());
   // add '$' to match to end
-  patustr_raw.append(u'$');
-  icu::UnicodeString patustr;
-  const icu::Normalizer2 *nfd = icu::Normalizer2::getNFDInstance(status);
-  // NFD normalize on pattern creation
-  nfd->normalize(patustr_raw, patustr, status);
+  patustr.append(u'$'); // TODO-LDML: may need to escape some markers. Marker #91 will look like a `[` to the pattern
   fFromPattern.reset(icu::RegexPattern::compile(patustr, 0, status));
   return (UASSERT_SUCCESS(status));
 }
@@ -556,7 +604,7 @@ transform_entry::apply(const std::u32string &input, std::u32string &output) cons
   }
   const icu::Normalizer2 *nfd = icu::Normalizer2::getNFDInstance(status);
   icu::UnicodeString rustr2;
-  nfd->normalize(rustr, rustr2, status);
+  nfd->normalize(rustr, rustr2, status); // TODO-LDML: must be normalize with markers!
   UASSERT_SUCCESS(status);
   // here we replace the match output.
   icu::UnicodeString entireOutput = matcher->replaceFirst(rustr2, status);
@@ -567,7 +615,7 @@ transform_entry::apply(const std::u32string &input, std::u32string &output) cons
 
   // normalize the replaced string
   icu::UnicodeString outu;
-  nfd->normalize(outu_raw, outu, status);
+  nfd->normalize(outu_raw, outu, status); // TODO-LDML: must be normalize with markers!
   UASSERT_SUCCESS(status);
 
   // Special case if there's no output, save some allocs
@@ -585,8 +633,6 @@ transform_entry::apply(const std::u32string &input, std::u32string &output) cons
     outu.toUTF32((UChar32 *)s, out32len + 1, status);
     UASSERT_SUCCESS(status);
     output.assign(s, out32len);
-    // now, build a u32string
-    std::u32string out32(s, out32len);
     // clean up buffer
     delete [] s;
   }
@@ -845,6 +891,7 @@ transforms::load(
           return nullptr;
         }
       }
+      std::sort(newGroup.list.begin(), newGroup.list.end()); // sort list by size, so that longer matches match last
       transforms->addGroup(newGroup);
     } else {
       // internal error - some other type - should have been caught by validation
@@ -863,16 +910,6 @@ transforms::load(
 
 // string manipulation
 
-bool normalize_nfd(std::u32string &str) {
-  std::u16string rstr = km::core::kmx::u32string_to_u16string(str);
-  if(!normalize_nfd(rstr)) {
-    return false;
-  } else {
-    str = km::core::kmx::u16string_to_u32string(rstr);
-    return true;
-  }
-}
-
 /** internal function to normalize with a specified mode */
 static bool normalize(const icu::Normalizer2 *n, std::u16string &str, UErrorCode &status) {
   UASSERT_SUCCESS(status);
@@ -886,12 +923,103 @@ static bool normalize(const icu::Normalizer2 *n, std::u16string &str, UErrorCode
   return U_SUCCESS(status);
 }
 
+bool normalize_nfd(std::u32string &str) {
+  std::u16string rstr = km::core::kmx::u32string_to_u16string(str);
+  if(!normalize_nfd(rstr)) {
+    return false;
+  } else {
+    str = km::core::kmx::u16string_to_u32string(rstr);
+    return true;
+  }
+}
+
 bool normalize_nfd(std::u16string &str) {
   UErrorCode status = U_ZERO_ERROR;
   const icu::Normalizer2 *nfd = icu::Normalizer2::getNFDInstance(status);
   UASSERT_SUCCESS(status);
   return normalize(nfd, str, status);
 }
+
+bool normalize_nfd_markers(std::u16string &str, marker_map &map) {
+  std::u32string rstr = km::core::kmx::u16string_to_u32string(str);
+  if(!normalize_nfd_markers(rstr, map)) {
+    return false;
+  } else {
+    str = km::core::kmx::u32string_to_u16string(rstr);
+    return true;
+  }
+}
+
+void add_back_markers(std::u32string &str, const std::u32string &src, const marker_map &map) {
+  // need to reconstitute.
+  marker_map map2(map);  // make a copy of the map
+  // clear the string
+  str.clear();
+  // add the end-of-text marker
+  {
+    const auto ch = MARKER_BEFORE_EOT;
+    const auto m  = map2.find(ch);
+    if (m != map2.end()) {
+      prepend_marker(str, m->second);
+      map2.erase(ch);  // remove it
+    }
+  }
+  // go from end to beginning of string
+  for (auto p = src.rbegin(); p != src.rend(); p++) {
+    const auto ch = *p;
+    str.insert(0, 1, ch);  // prepend
+
+    const auto m = map2.find(ch);
+    if (m != map2.end()) {
+      prepend_marker(str, m->second);
+      map2.erase(ch);  // remove it
+    }
+  }
+}
+
+/**
+ * TODO-LDML:
+ *  - doesn't support >1 marker per char - may need a set instead of a map!
+ *  - ideally this should be used on a normalization safe subsequence
+ */
+bool normalize_nfd_markers(std::u32string &str, marker_map &map) {
+  /** original string, but no markers */
+  std::u32string str_unmarked = remove_markers(str, map);
+  /** original string, no markers, NFD */
+  std::u32string str_unmarked_nfd = str_unmarked;
+  if(!normalize_nfd(str_unmarked_nfd)) {
+    return false; // normalize failed.
+  } else if (map.size() == 0) {
+    // no markers. Return the normalized unmarked str
+    str = str_unmarked_nfd;
+  } else if (str_unmarked_nfd == str_unmarked) {
+    // Normalization produced no change when markers were removed.
+    // So, we'll call this a no-op.
+  } else {
+    add_back_markers(str, str_unmarked_nfd, map);
+  }
+  return true; // all OK
+}
+
+bool normalize_nfc_markers(std::u32string &str, marker_map &map) {
+  /** original string, but no markers */
+  std::u32string str_unmarked = remove_markers(str, map);
+  /** original string, no markers, NFC */
+  std::u32string str_unmarked_nfc = str_unmarked;
+  if(!normalize_nfc(str_unmarked_nfc)) {
+    return false; // normalize failed.
+  } else if (map.size() == 0) {
+    // no markers. Return the normalized unmarked str
+    str = str_unmarked_nfc;
+  } else if (str_unmarked_nfc == str_unmarked) {
+    // Normalization produced no change when markers were removed.
+    // So, we'll call this a no-op.
+  } else {
+    add_back_markers(str, str_unmarked_nfc, map);
+  }
+  return true; // all OK
+}
+
 
 bool normalize_nfc(std::u32string &str) {
   std::u16string rstr = km::core::kmx::u32string_to_u16string(str);
@@ -908,6 +1036,52 @@ bool normalize_nfc(std::u16string &str) {
   const icu::Normalizer2 *nfc = icu::Normalizer2::getNFCInstance(status);
   UASSERT_SUCCESS(status);
   return normalize(nfc, str, status);
+}
+
+std::u32string remove_markers(const std::u32string &str, marker_map *markers) {
+  std::u32string out;
+  auto i = str.begin();
+  auto last = i;
+  for (i = find(i, str.end(), LDML_UC_SENTINEL); i != str.end(); i = find(i, str.end(), LDML_UC_SENTINEL)) {
+    // append any prefix (from prior pos'n to here)
+    out.append(last, i);
+
+    // #1: LDML_UC_SENTINEL (what we searched for)
+    assert(*i == LDML_UC_SENTINEL); // assert that find() worked
+    i++;
+    last = i;
+    if (i == str.end()) {
+      break; // hit end
+    }
+
+    // #2 LDML_MARKER_CODE
+    if (*i != LDML_MARKER_CODE) {
+      continue; // can't process this, get out
+    }
+    i++;
+    last = i;
+    if (i == str.end()) {
+      break; // hit end
+    }
+
+    // #3 marker number
+    const KMX_DWORD marker_no = *i;
+    assert(marker_no >= LDML_MARKER_MIN_INDEX && marker_no <= LDML_MARKER_MAX_INDEX);
+    i++; // if end, we'll break out of the loop
+    last = i;
+
+    // record the marker
+    if (markers != nullptr) {
+      if (i == str.end()) {
+        markers->emplace(MARKER_BEFORE_EOT, marker_no);
+      } else {
+        markers->emplace(*i, marker_no);
+      }
+    }
+  }
+  // get the suffix between the last marker and the end
+  out.append(last, str.end());
+  return out;
 }
 
 }  // namespace ldml

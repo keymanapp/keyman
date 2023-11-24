@@ -61,6 +61,28 @@ ldml = executable('ldml',
     objects: lib.extract_all_objects(recursive: false),
     )
 
+
+# Build and run additional test_kmx_plus test
+
+e = executable('test_kmx_plus', 'test_kmx_plus.cpp',
+    'ldml_test_utils.cpp',
+    cpp_args: defns + warns,
+    include_directories: [inc, libsrc, '../../../../developer/src/ext/json'],
+    link_args: links + tests_flags,
+    dependencies: [icu_uc, icu_i18n],
+    objects: lib.extract_all_objects(recursive: false))
+test('test_kmx_plus', e, suite: 'ldml')
+
+# run transforms / ldml utilities unit test
+
+t = executable('test_transforms', 'test_transforms.cpp',
+    cpp_args: defns + warns,
+    include_directories: [inc, libsrc, '../../../../developer/src/ext/json'],
+    link_args: links + tests_flags,
+    dependencies: [icu_uc, icu_i18n],
+    objects: lib.extract_all_objects(recursive: false))
+test('test_transforms', t, suite: 'ldml')
+
 # Run tests on all keyboards (`tests` defined in keyboards/meson.build)
 
 foreach kbd : tests
@@ -77,22 +99,3 @@ foreach kbd : invalid_tests
   test(kbd, ldml, args: [kbd_src, kbd_obj], suite: 'ldml-invalid-keyboards')
   # todo: consider if we should use `should_fail: true`?
 endforeach
-
-# Build and run additional test_kmx_plus test
-
-e = executable('test_kmx_plus', 'test_kmx_plus.cpp',
-    'ldml_test_utils.cpp',
-    cpp_args: defns + warns,
-    include_directories: [inc, libsrc, '../../../../developer/src/ext/json'],
-    link_args: links + tests_flags,
-    dependencies: [icu_uc, icu_i18n],
-    objects: lib.extract_all_objects(recursive: false))
-test('test_kmx_plus', e, suite: 'ldml')
-
-t = executable('test_transforms', 'test_transforms.cpp',
-    cpp_args: defns + warns,
-    include_directories: [inc, libsrc, '../../../../developer/src/ext/json'],
-    link_args: links + tests_flags,
-    dependencies: [icu_uc, icu_i18n],
-    objects: lib.extract_all_objects(recursive: false))
-test('test_transforms', t, suite: 'ldml')

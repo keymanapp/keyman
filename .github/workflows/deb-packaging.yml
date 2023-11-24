@@ -1,15 +1,16 @@
 name: "Ubuntu packaging"
-run-name: "Ubuntu packaging - ${{ github.event.client_payload.branch }} (branch ${{ github.head_ref }}), by @${{ github.actor }}"
+run-name: "Ubuntu packaging - ${{ github.event.client_payload.branch }} (branch ${{ github.event.client_payload.baseBranch }}), by @${{ github.event.client_payload.user }}"
 on:
   repository_dispatch:
     types: ['deb-release-packaging:*', 'deb-pr-packaging:*']
 
 # Input:
 # buildSha:    The SHA of the commit to build, e.g. of the branch or
-#              refs/pull/1234/merge for PR
-# headSha:     The SHA of the branch head. Same as buildSha for regular
-#              builds, SHA of refs/pull/1234/head for PRs
+#              refs/pull/1234/head for PR
 # branch:      The branch to build, for a PR in the form `PR-1234`
+# baseBranch:  For a PR the base branch, otherwise the same as `branch`
+# baseRef:     The ref of the previous commit. For a PR the same as `baseBranch`.
+# user:        The user that triggered the build or created the PR
 # isTestBuild: false for Releases, otherwise true
 
 env:
@@ -40,7 +41,7 @@ jobs:
         gh api \
           --method POST \
           -H "Accept: application/vnd.github+json" \
-          /repos/$GITHUB_REPOSITORY/statuses/${{ github.event.client_payload.headSha }} \
+          /repos/$GITHUB_REPOSITORY/statuses/${{ github.event.client_payload.buildSha }} \
           -f state='pending' \
           -f target_url="$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID" \
           -f description='Debian packaging started' \
@@ -236,6 +237,7 @@ jobs:
       uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c #v3.3.0
       with:
         ref: '${{ github.event.client_payload.buildSha }}'
+        fetch-depth: 0
 
     - name: Download Artifacts
       uses: actions/download-artifact@9bc31d5ccc31df68ecc42ccf4149144866c47d8a # v3.0.2
@@ -251,10 +253,12 @@ jobs:
       run: |
         cd linux
         PKG_NAME=libkeymancore
-        SRC_PKG="${GITHUB_WORKSPACE}/artifacts/keyman-srcpkg/keyman_${{ needs.sourcepackage.outputs.VERSION }}-1.debian.tar.xz" \
-        BIN_PKG="${GITHUB_WORKSPACE}/artifacts/keyman-binarypkgs/${PKG_NAME}_${{ needs.sourcepackage.outputs.VERSION }}-1${{ needs.sourcepackage.outputs.PRERELEASE_TAG }}+jammy1_amd64.deb" \
-        PKG_VERSION="${{ needs.sourcepackage.outputs.VERSION }}" \
-        ./scripts/deb-packaging.sh --gha verify 2>> $GITHUB_STEP_SUMMARY
+        ./scripts/deb-packaging.sh \
+          --gha \
+          --bin-pkg "${GITHUB_WORKSPACE}/artifacts/keyman-binarypkgs/${PKG_NAME}_${{ needs.sourcepackage.outputs.VERSION }}-1${{ needs.sourcepackage.outputs.PRERELEASE_TAG }}+jammy1_amd64.deb" \
+          --git-sha "${{ github.event.client_payload.buildSha }}" \
+          --git-base "${{ github.event.client_payload.baseRef }}" \
+          verify 2>> $GITHUB_STEP_SUMMARY
 
     - name: Archive .symbols file
       uses: actions/upload-artifact@0b7f8abb1508181956e8e162db84b466c27e18ce # v3.1.2
@@ -292,7 +296,7 @@ jobs:
         gh api \
           --method POST \
           -H "Accept: application/vnd.github+json" \
-          /repos/$GITHUB_REPOSITORY/statuses/${{ github.event.client_payload.headSha }} \
+          /repos/$GITHUB_REPOSITORY/statuses/${{ github.event.client_payload.buildSha }} \
           -f state="$RESULT" \
           -f target_url="$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID" \
           -f description="$MSG" \

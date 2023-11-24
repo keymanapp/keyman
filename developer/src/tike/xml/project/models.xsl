@@ -56,17 +56,21 @@
         </div>
       </div>
 
+      <xsl:call-template name="upgrade-warning" />
+
       <div class='filelist' id="modellist">
         <xsl:call-template name="button">
           <xsl:with-param name="caption">New model...</xsl:with-param>
           <xsl:with-param name="command">keyman:fileaddnew?type=model</xsl:with-param>
           <xsl:with-param name="width">auto</xsl:with-param>
         </xsl:call-template>
-        <xsl:call-template name="button">
-          <xsl:with-param name="caption">Add existing model...</xsl:with-param>
-          <xsl:with-param name="command">keyman:fileaddexisting?type=model</xsl:with-param>
-          <xsl:with-param name="width">auto</xsl:with-param>
-        </xsl:call-template>
+        <xsl:if test="KeymanDeveloperProject/Options/Version != '2.0' or not(KeymanDeveloperProject/Options/Version)">
+          <xsl:call-template name="button">
+            <xsl:with-param name="caption">Add existing model...</xsl:with-param>
+            <xsl:with-param name="command">keyman:fileaddexisting?type=model</xsl:with-param>
+            <xsl:with-param name="width">auto</xsl:with-param>
+          </xsl:call-template>
+        </xsl:if>
         |
         <xsl:call-template name="button">
           <xsl:with-param name="caption">Build all</xsl:with-param>
@@ -104,7 +108,7 @@
         <br />
 
         <div>
-          <xsl:for-each select="KeymanDeveloperProject/Files/File[(FileType='.ts' or FileType='.tsv') and not(ParentFileID)]">
+          <xsl:for-each select="$SourceModelFiles">
             <xsl:variable name="FileState" select="/KeymanDeveloperProject/FileStates/FileState[ID=current()/ID]" />
             <xsl:call-template name="file">
               <xsl:with-param name="file_description">
@@ -158,11 +162,13 @@
         <xsl:with-param name="command">keyman:openbuildfolder?id=<xsl:value-of select="ID" />
         </xsl:with-param>
       </xsl:call-template>
-      <xsl:call-template name="menuitem">
-        <xsl:with-param name="caption">Remove from Project</xsl:with-param>
-        <xsl:with-param name="command">keyman:removefile?id=<xsl:value-of select="ID" />
-        </xsl:with-param>
-      </xsl:call-template>
+      <xsl:if test="KeymanDeveloperProject/Options/Version != '2.0' or not(KeymanDeveloperProject/Options/Version)">
+        <xsl:call-template name="menuitem">
+          <xsl:with-param name="caption">Remove from Project</xsl:with-param>
+          <xsl:with-param name="command">keyman:removefile?id=<xsl:value-of select="ID" />
+          </xsl:with-param>
+        </xsl:call-template>
+      </xsl:if>
     </div>
   </xsl:template>
 
@@ -189,11 +195,13 @@
         <xsl:with-param name="command">keyman:opencontainingfolder?id=<xsl:value-of select="ID" />
         </xsl:with-param>
       </xsl:call-template>
-      <xsl:call-template name="menuitem">
-        <xsl:with-param name="caption">Remove from Project</xsl:with-param>
-        <xsl:with-param name="command">keyman:removefile?id=<xsl:value-of select="ID" />
-        </xsl:with-param>
-      </xsl:call-template>
+      <xsl:if test="/KeymanDeveloperProject/Options/Version != '2.0' or not(/KeymanDeveloperProject/Options/Version)">
+        <xsl:call-template name="menuitem">
+          <xsl:with-param name="caption">Remove from Project</xsl:with-param>
+          <xsl:with-param name="command">keyman:removefile?id=<xsl:value-of select="ID" />
+          </xsl:with-param>
+        </xsl:call-template>
+      </xsl:if>
     </div>
   </xsl:template>
 </xsl:stylesheet>

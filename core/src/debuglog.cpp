@@ -451,6 +451,25 @@ const char *Debug_UnicodeString(::std::u16string s, int x) {
   return bufout[x];
 }
 
+const char *Debug_UnicodeString(::std::u32string s, int x) {
+  if (!ShouldDebug()) {
+    return "";
+  }
+#ifdef _MSC_VER
+  __declspec(thread)
+#endif
+  static char bufout[2][MEDIUM_BUF_SIZ];
+  auto p = s.begin();
+  char *q;
+  bufout[x][0] = 0;
+  for (q = bufout[x]; (intptr_t)(q-bufout[x]) < (128*7) && p != s.end(); p++)
+  {
+    snprintf(q, MEDIUM_BUF_SIZ - (q - bufout[x]), "U+%4.6X ", (unsigned int)*p);
+    q = strchr(q, 0);
+  }
+  return bufout[x];
+}
+
 void write_console(KMX_BOOL error, const wchar_t *fmt, ...) {
   if (!g_silent || error) {
     va_list vars;

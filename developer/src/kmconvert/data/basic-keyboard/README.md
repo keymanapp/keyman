@@ -1,14 +1,13 @@
 $NAME keyboard
 ==============
 
-Version $VERSION
-
 Description
 -----------
-$NAME generated from template
+$DESCRIPTION
 
 Links
 -----
+Keyboard Homepage: https://keyman.com/keyboards/$ID
 
 Copyright
 ---------

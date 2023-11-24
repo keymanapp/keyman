@@ -331,7 +331,7 @@ export default class KeymanEngine<
         id: this.core?.activeModel?.id || ''
       },
       osk: {
-        banner: this.osk?.bannerController?.activeType ?? '',
+        banner: this.osk?.banner?.banner.type ?? '',
         layer: this.osk?.vkbd?.layerId || ''
       }
     };

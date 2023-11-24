@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.keyman.android.CheckInstallReferrer;
+import com.keyman.android.BannerController;
 import com.keyman.engine.BaseActivity;
 import com.keyman.engine.KMHelpFileActivity;
 import com.keyman.engine.KMKeyboardDownloaderActivity;
@@ -499,6 +500,8 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
 
   @Override
   public void onKeyboardShown() {
+    // Refresh banner theme
+    BannerController.setHTMLBanner(this, KeyboardType.KEYBOARD_TYPE_INAPP);
     resizeTextView(true);
   }
 
