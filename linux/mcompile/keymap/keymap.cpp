@@ -400,6 +400,8 @@ KMX_DWORD get_KeyCode_fromVKUS( KMX_DWORD VK_US) {
 // _S2 this needs to go; only to check if mcompile gives the same end result.
 // _S2 helps to force filling rgkey[VK_DE]
 UINT map_Ikey_DE(UINT iKey) {
+  if (iKey == 89 )  return 90;
+  if (iKey == 90 )  return 89;
   if (iKey == 186 )  return 219;
   if (iKey == 187 )  return 221;
   if (iKey == 188 )     return 188;

@@ -175,6 +175,11 @@ public:
     return m_rgss[i][j];
   }
 
+  // _S2 can go later
+  void set_sc(int i) {
+    this->m_sc=i;
+  }
+
   std::wstring KMX_GetShiftState(ShiftState shiftState, bool capsLock) {
     return this->m_rgss[(UINT)shiftState][(capsLock ? 1 : 0)];
   }
@@ -303,7 +308,7 @@ int i4 = this->KMX_IsXxxxGrCapsEqualToXxxxShift() ? 8 : 0;
     return nkeys;
   }
 
-  bool KMX_LayoutRow(int MaxShiftState, LPKMX_KEY key, std::vector<DeadKey*> *deadkeys, int deadkeyBase, BOOL bDeadkeyConversion,v_dw_3D &All_Vector) {   // I4552
+  bool KMX_LayoutRow(int MaxShiftState, LPKMX_KEY key, std::vector<DeadKey*> *deadkeys, int deadkeyBase, BOOL bDeadkeyConversion,v_dw_3D &All_Vector, GdkKeymap * keymap) {   // I4552
     // Get the CAPSLOCK value
 
 
@@ -333,6 +338,7 @@ int i4 = this->KMX_IsXxxxGrCapsEqualToXxxxShift() ? 8 : 0;
       for (int caps = 0; caps <= 1; caps++) {
         std::wstring st = this->KMX_GetShiftState((ShiftState) ss, (caps == 1));
         PKMX_WCHAR p;  // was PWSTR p;
+        PKMX_WCHAR q;
 
         if (st.size() == 0) {
           // No character assigned here
@@ -344,7 +350,8 @@ int i4 = this->KMX_IsXxxxGrCapsEqualToXxxxShift() ? 8 : 0;
           *key->dpContext = 0;
           key->ShiftFlags = this->KMX_GetShiftStateValue(capslock, caps, (ShiftState) ss);
             // _S2 this fun returns the shifted Char it goes wrog for numbers, special here!!
-          key->Key = KMX_VKUnderlyingLayoutToVKUS(All_Vector,this->VK());
+          //key->Key = KMX_VKUnderlyingLayoutToVKUS(All_Vector,this->VK());
+          key->Key = KMX_VKUnderlyingLayoutToVKUS_GDK(keymap,this->VK());
           key->Line = 0;
 
           if(bDeadkeyConversion) {   // I4552
@@ -365,15 +372,18 @@ int i4 = this->KMX_IsXxxxGrCapsEqualToXxxxShift() ? 8 : 0;
             if(st[ich] < 0x20 || st[ich] == 0x7F) { isvalid=false; break; }
           }
           if(isvalid) {
-            // _S2 this fun returns the shifted Char instead of keyname -> use gdk function!!
-            key->Key = KMX_VKUnderlyingLayoutToVKUS(All_Vector,this->VK());
+            //key->Key = KMX_VKUnderlyingLayoutToVKUS(All_Vector,this->VK());
+            key->Key = KMX_VKUnderlyingLayoutToVKUS_GDK(keymap,this->VK());
         std::wstring w1_S2 = get_m_rgss(ss,caps);
-        wprintf(L"  ---  %ls  ",w1_S2.c_str());
+        wprintf(L"\n KMX_VKUnderlyingLayoutToVKUS_GD writes  %ls  %c",w1_S2.c_str(), key->Key );
             key->Line = 0;
+            // _S2 _differences in sstateflag probably from here and KMX_IsCapsEqualToShift...
             key->ShiftFlags = this->KMX_GetShiftStateValue(capslock, caps, (ShiftState) ss);
             key->dpContext = new KMX_WCHAR; *key->dpContext = 0;
             p = key->dpOutput = new KMX_WCHAR[st.size() + 1];
-            for(size_t ich = 0; ich < st.size(); ich++) *p++ = st[ich];
+            for(size_t ich = 0; ich < st.size(); ich++) {
+              q=p;
+              *p++ = st[ich];}
             *p = 0;
             key++;
           }
@@ -725,9 +735,25 @@ bool KMX_ImportRules(KMX_WCHAR *kbid, LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, Gd
 
       UINT VK_Other = Lin_KM__map(iKey, All_Vector);
 
-      // _S2 only for testing can go later helps to force filling rgkey[VK_DE]
+      // _S2 only for testing can go later helps to force filling rgkey[VK_DE]---v----
       UINT iKey_DE = map_Ikey_DE(iKey);
       UINT iKey_FR = map_Ikey_FR(iKey);
+      if ( rgKey[iKey]->VK() == 89   ) rgKey[iKey]->set_sc(52);
+      if ( rgKey[iKey]->VK() == 90   ) rgKey[iKey]->set_sc(29);
+      if ( rgKey[iKey]->VK() == 186  ) rgKey[iKey]->set_sc(34);
+      if ( rgKey[iKey]->VK() == 187  ) rgKey[iKey]->set_sc(35);
+      if ( rgKey[iKey]->VK() == 188  ) rgKey[iKey]->set_sc(59);
+      if ( rgKey[iKey]->VK() == 189  ) rgKey[iKey]->set_sc(61);
+      if ( rgKey[iKey]->VK() == 190  ) rgKey[iKey]->set_sc(60);
+      if ( rgKey[iKey]->VK() == 191  ) rgKey[iKey]->set_sc(51);
+      if ( rgKey[iKey]->VK() == 192  ) rgKey[iKey]->set_sc(47);
+      if ( rgKey[iKey]->VK() == 219  ) rgKey[iKey]->set_sc(20);
+      if ( rgKey[iKey]->VK() == 220  ) rgKey[iKey]->set_sc(49);
+      if ( rgKey[iKey]->VK() == 221  ) rgKey[iKey]->set_sc(21);
+      if ( rgKey[iKey]->VK() == 222  ) rgKey[iKey]->set_sc(48);
+      if ( rgKey[iKey]->VK() == 226  ) rgKey[iKey]->set_sc(94);
+
+      // _S2 only for testing can go later helps to force filling rgkey[VK_DE]---^----
 
       for(ShiftState ss = Base; ss <= loader.MaxShiftState(); ss = (ShiftState)((int)ss + 1)) {
         if(ss == Menu || ss == ShftMenu) {
@@ -901,7 +927,7 @@ int testval= 38;
       //wprintf(L"********************************* I use Key Nr %i\n",iKey);
       // for each item, 
       wprintf(L" \n iKey = %i, nKeys %i + Delta:\t%i", iKey,nKeys, rgKey[iKey]->KMX_GetKeyCount(loader.MaxShiftState()));
-      if(rgKey[iKey]->KMX_LayoutRow(loader.MaxShiftState(), &gp->dpKeyArray[nKeys], &alDead, nDeadkey, bDeadkeyConversion, All_Vector)) {   // I4552
+      if(rgKey[iKey]->KMX_LayoutRow(loader.MaxShiftState(), &gp->dpKeyArray[nKeys], &alDead, nDeadkey, bDeadkeyConversion, All_Vector,*keymap)) {   // I4552
         nKeys+=rgKey[iKey]->KMX_GetKeyCount(loader.MaxShiftState());
       }
     }

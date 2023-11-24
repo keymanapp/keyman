@@ -215,6 +215,16 @@ KMX_WORD KMX_VKUnderlyingLayoutToVKUS(v_dw_3D &All_Vector,KMX_DWORD inOther) {
   }
   return inOther;
 }
+
+KMX_WCHART KMX_VKUnderlyingLayoutToVKUS_GDK(GdkKeymap* keymap,KMX_DWORD VK_US) {
+
+  KMX_WORD VK_DE = ( KMX_WORD ) map_Ikey_DE(VK_US);
+  if(VK_DE!= VK_US)
+    return VK_DE;
+  else
+    return VK_US;
+}
+
 // takes VK of Other keyboard and returns character of Other keyboard with shiftstate VKShiftState[j]
 KMX_DWORD KMX_CharFromVK(v_dw_3D &All_Vector,KMX_DWORD vkUnderlying, KMX_UINT VKShiftState, KMX_WCHAR* DeadKey){
 
