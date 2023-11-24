@@ -318,40 +318,6 @@ export class RegressiblePathStats<Type = any> extends CumulativePathStats<Type> 
   }
 
   /**
-   * In order to mitigate the accumulation of small floating-point errors during the
-   * various accumulations performed by this class, the domain of incoming values
-   * is remapped near to the origin via axis-specific mapping constants.
-   * @param dim
-   * @returns
-   */
-  protected mappingConstant(dim: StatAxis) {
-    if(!this.baseSample) {
-      return undefined;
-    }
-
-    if(dim == 't') {
-      return this.baseSample.t;
-    } else if(dim == 'x') {
-      return this.baseSample.targetX;
-    } else if(dim == 'y') {
-      return this.baseSample.targetY;
-    } else {
-      return 0;
-    }
-  }
-
-  /**
-   * Gets the statistical mean, utilizing the internal 'mapped' coordinate space.
-   * This is the version compatible with cross-sums and squared-sums.
-   * @param dim
-   * @returns
-   */
-  protected mappedMean(dim: StatAxis) {
-    // super.mean() is basically this; we map it here, though.
-    return this.rawLinearSums[dim] / this.sampleCount;
-  }
-
-  /**
    * Gets the statistical mean value of the samples observed during the represented
    * interval on the specified axis.
    * @param dim
