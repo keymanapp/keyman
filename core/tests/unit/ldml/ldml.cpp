@@ -27,6 +27,9 @@
 #include <kmx/kmx_xstring.h>  // for surrogate pair macros
 
 #include "ldml_test_source.hpp"
+#include "debuglog.h"
+
+#include "ldml/ldml_transforms.hpp"
 
 namespace {
 
@@ -105,6 +108,7 @@ apply_action(
       assert(!context.empty());
       assert(context.back().type == KM_CORE_CT_MARKER);
       context.pop_back();
+      // no change to text store.
     } else if (text_store.length() > 0) {
       assert(!context.empty() && !text_store.empty());
       km_core_usv ch = text_store.back();
@@ -118,11 +122,16 @@ apply_action(
           text_store.pop_back();
         }
       }
-      assert(ch == act.backspace.expected_value);
-
-      assert(context.back().type == KM_CORE_CT_CHAR);
-      assert(context.back().character == ch);
-      context.pop_back();
+      if (act.backspace.expected_type == KM_CORE_BT_CHAR) {
+        assert(ch == act.backspace.expected_value);
+        assert(context.back().type == KM_CORE_CT_CHAR);
+        assert(context.back().character == ch);
+        context.pop_back();
+      } else {
+        // assume it's otherwise KM-coRE_BT_UNKNOWN
+        assert(act.backspace.expected_type == KM_CORE_BT_UNKNOWN);
+        assert(context.empty()); // if KM_CORE_BT_UNKNOWN, context should be empty.
+      }
     }
     break;
   case KM_CORE_IT_PERSIST_OPT:
@@ -155,6 +164,21 @@ verify_context(std::u16string& text_store, km_core_state* &test_state, std::vect
     try_status(km_core_context_items_to_utf16(citems, nullptr, &n));
     km_core_cp *buf = new km_core_cp[n];
     try_status(km_core_context_items_to_utf16(citems, buf, &n));
+    std::cout << "context   : " << string_to_hex(buf) << " [" << buf << "]" << std::endl;
+    std::cout << "testcontext ";
+    for (auto i = test_context.begin(); i < test_context.end(); i++) {
+      switch(i->type) {
+        case KM_CORE_CT_CHAR:
+          std::cout << "U+" << std::hex << i->character << std::dec << " ";
+          break;
+        case KM_CORE_CT_MARKER:
+          std::cout << "\\m{" << i->character << "} ";
+          break;
+        default:
+          std::cout << "type#" << i->type << " ";
+      }
+    }
+    std::cout << std::endl;
     std::cout << "context   : " << string_to_hex(buf) << " [" << buf << "]" << std::endl;
 
     // Verify that both our local test_context and the core's test_state.context have
@@ -216,7 +240,8 @@ run_test(const km::core::path &source, const km::core::path &compiled, km::tests
     // handle backspace here
     if (action.type == km::tests::LDML_ACTION_KEY_EVENT) {
       auto &p = action.k;
-      std::cout << "- key action: 0x" << std::hex << p.vk << "/modifier 0x" << p.modifier_state << std::dec << std::endl;
+      std::cout << "- key action: " << km::core::kmx::Debug_VirtualKey(p.vk) << "/modifier " << km::core::kmx::Debug_ModifierName(p.modifier_state) << " 0x" << p.modifier_state
+                << std::dec << std::endl;
       // Because a normal system tracks caps lock state itself,
       // we mimic that in the tests. We assume caps lock state is
       // updated on key_down before the processor receives the
@@ -250,6 +275,7 @@ run_test(const km::core::path &source, const km::core::path &compiled, km::tests
 
       verify_context(text_store, test_state, test_context);
     } else if (action.type == km::tests::LDML_ACTION_CHECK_EXPECTED) {
+      assert(km::core::ldml::normalize_nfd(action.string)); // TODO-LDML: should be NFC
       std::cout << "- check expected" << std::endl;
       std::cout << "expected  : " << string_to_hex(action.string) << " [" << action.string << "]" << std::endl;
       std::cout << "text store: " << string_to_hex(text_store) << " [" << text_store << "]" << std::endl;

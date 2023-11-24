@@ -202,6 +202,8 @@ export default class KeymanEngine<
 
     this.contextManager.configure({
       resetContext: (target) => {
+        // Could reset the target's deadkeys here, but it's really more of a 'core' task.
+        // So we delegate that to keyboard-processor.
         this.core.resetContext(target);
       },
       predictionContext: new PredictionContext(this.core.languageProcessor, this.core.keyboardProcessor),
@@ -323,7 +325,7 @@ export default class KeymanEngine<
         id: this.core?.activeModel?.id || ''
       },
       osk: {
-        banner: this.osk?.bannerController?.activeType ?? '',
+        banner: this.osk?.banner?.banner.type ?? '',
         layer: this.osk?.vkbd?.layerId || ''
       }
     };

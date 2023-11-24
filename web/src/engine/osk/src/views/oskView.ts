@@ -1,6 +1,7 @@
 import EventEmitter from 'eventemitter3';
 
-import BannerView, { BannerController } from '../banner/bannerView.js';
+import { BannerView } from '../banner/bannerView.js';
+import { BannerController } from '../banner/bannerController.js';
 import OSKViewComponent from '../components/oskViewComponent.interface.js';
 import EmptyView from '../components/emptyView.js';
 import HelpPageView from '../components/helpPageView.js';

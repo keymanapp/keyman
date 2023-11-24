@@ -81,7 +81,11 @@ export class InfrastructureMessages {
   static ERROR_CannotCreateFolder = SevError | 0x0011;
 
   static Error_InvalidProjectFolder = (o:{folderName:string}) => m(this.ERROR_InvalidProjectFolder,
-    `The folder ${o.folderName} does not appear to be a Keyman Developer project`);
+    `The folder ${o.folderName} does not appear to be a Keyman Developer project.`);
   static ERROR_InvalidProjectFolder = SevError | 0x0012;
+
+  static Error_UnsupportedProjectVersion = (o:{version:string}) => m(this.ERROR_UnsupportedProjectVersion,
+    `Project version ${o.version} is not supported by this version of Keyman Developer.`);
+  static ERROR_UnsupportedProjectVersion = SevError | 0x0013;
 }
 

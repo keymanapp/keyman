@@ -1,12 +1,11 @@
 import EventEmitter from 'eventemitter3';
 
-import { Banner, BlankBanner, ImageBanner, SuggestionBanner } from './banner.js';
+import { createUnselectableElement } from 'keyman/engine/dom-utils';
+
+import { Banner } from './banner.js';
 import OSKViewComponent from '../components/oskViewComponent.interface.js';
 import { ParsedLengthStyle } from '../lengthStyle.js';
-
-import { DeviceSpec } from '@keymanapp/web-utils';
-import type { PredictionContext, StateChangeEnum } from '@keymanapp/input-processor';
-import { createUnselectableElement } from 'keyman/engine/dom-utils';
+import { BlankBanner } from './blankBanner.js';
 
 /**
  * This object is used to specify options by both `BannerManager.getOptions`
@@ -18,7 +17,7 @@ export interface BannerOptions {
   imagePath?: string;
 }
 
-export type BannerType = "blank" | "image" | "suggestion";
+export type BannerType = "blank" | "image" | "suggestion" | "html";
 
 interface BannerViewEventMap {
   'bannerchange': () => void;
@@ -58,9 +57,13 @@ interface BannerViewEventMap {
  *       needs to reserve this space (i.e: Keyman for iOS),
  *       rather than as its standalone app.
  */
-export default class BannerView implements OSKViewComponent {
+export class BannerView implements OSKViewComponent {
   private bannerContainer: HTMLDivElement;
-  private activeBanner: Banner;
+
+  /**
+   * The currently active banner.
+   */
+  private currentBanner: Banner;
   private _activeBannerHeight: number = Banner.DEFAULT_HEIGHT;
 
   public readonly events = new EventEmitter<BannerViewEventMap>();
@@ -91,32 +94,31 @@ export default class BannerView implements OSKViewComponent {
    * Applies any stylesheets needed by specific `Banner` instances.
    */
   public appendStyles() {
-    if(this.activeBanner) {
-      this.activeBanner.appendStyleSheet();
+    if(this.currentBanner) {
+      this.currentBanner.appendStyleSheet();
     }
   }
 
   public get banner(): Banner {
-    return this.activeBanner;
+    return this.currentBanner;
   }
 
   /**
-   * Sets the active `Banner` to the specified type, regardless of
-   * existing management logic settings.
-   *
-   * @param banner The `Banner` instance to set as active.
+   * The `Banner` actively being displayed to the user in the OSK's current state,
+   * whether a `SuggestionBanner` (with predictive-text active) or a different
+   * type for use when the predictive-text engine is inactive.
    */
   public set banner(banner: Banner) {
-    if(this.activeBanner) {
-      if(banner == this.activeBanner) {
+    if(this.currentBanner) {
+      if(banner == this.currentBanner) {
         return;
       } else {
-        let prevBanner = this.activeBanner;
-        this.activeBanner = banner;
+        let prevBanner = this.currentBanner;
+        this.currentBanner = banner;
         this.bannerContainer.replaceChild(banner.getDiv(), prevBanner.getDiv());
       }
     } else {
-      this.activeBanner = banner;
+      this.currentBanner = banner;
       if(banner) {
         this.bannerContainer.appendChild(banner.getDiv());
       }
@@ -133,8 +135,8 @@ export default class BannerView implements OSKViewComponent {
    * Gets the height (in pixels) of the active `Banner` instance.
    */
   public get height(): number {
-    if(this.activeBanner) {
-      return this.activeBanner.height;
+    if(this.currentBanner) {
+      return this.currentBanner.height;
     } else {
       return 0;
     }
@@ -150,8 +152,8 @@ export default class BannerView implements OSKViewComponent {
   public set activeBannerHeight(h: number) {
     this._activeBannerHeight = h;
 
-    if (this.activeBanner && !(this.activeBanner instanceof BlankBanner)) {
-      this.activeBanner.height = h;
+    if (this.currentBanner && !(this.currentBanner instanceof BlankBanner)) {
+      this.currentBanner.height = h;
     }
   }
 
@@ -160,154 +162,4 @@ export default class BannerView implements OSKViewComponent {
   }
 
   public refreshLayout() {};
-}
-
-export class BannerController {
-  private _activeType: BannerType;
-  private _options: BannerOptions = {};
-  private container: BannerView;
-  private alwaysShow: boolean;
-  private imagePath?: string = "";
-
-  private predictionContext?: PredictionContext;
-
-  private readonly hostDevice: DeviceSpec;
-
-  public static readonly DEFAULT_OPTIONS: BannerOptions = {
-    alwaysShow: false,
-    imagePath: ""
-  }
-
-  constructor(bannerView: BannerView, hostDevice: DeviceSpec, predictionContext?: PredictionContext) {
-    // Step 1 - establish the container element.  Must come before this.setOptions.
-    this.hostDevice = hostDevice;
-    this.container = bannerView;
-    this.predictionContext = predictionContext;
-
-    // Initialize with the default options - any 'manually set' options come post-construction.
-    // This will also automatically set the default banner in place.
-    this.setOptions(BannerController.DEFAULT_OPTIONS);
-  }
-
-  /**
-   * This function corresponds to `keyman.osk.banner.getOptions`.
-   *
-   * Gets the current control settings in use by `BannerManager`.
-   */
-  public getOptions(): BannerOptions {
-    let retObj = {};
-
-    for(let key in this._options) {
-      retObj[key] = this._options[key];
-    }
-
-    return retObj;
-  }
-
-  /**
-   * This function corresponds to `keyman.osk.banner.setOptions`.
-   *
-   * Sets options used to tweak the automatic `Banner`
-   * control logic used by `BannerManager`.
-   * @param optionSpec An object specifying one or more of the following options:
-   * * `persistentBanner` (boolean) When `true`, ensures that a `Banner`
-   *   is always displayed, even when no predictive model exists
-   *   for the active language.
-   *
-   *   Default: `false`
-   * * `imagePath` (URL string) Specifies the file path to use for an
-   *   `ImageBanner` when `persistentBanner` is `true` and no predictive model exists.
-   *
-   *   Default: `''`.
-   * * `enablePredictions` (boolean) Turns KMW predictions
-   *   on (when `true`) and off (when `false`).
-   *
-   *   Default:  `true`.
-   */
-  public setOptions(optionSpec: BannerOptions) {
-    for(let key in optionSpec) {
-      switch(key) {
-        // Each defined option may require specialized handling.
-        case 'alwaysShow':
-          // Determines the banner type to activate.
-          this.alwaysShow = optionSpec[key];
-          break;
-        case 'imagePath':
-          // Determines the image file to use for ImageBanners.
-          this.imagePath = optionSpec[key];
-          break;
-        default:
-          // Invalid option specified!
-      }
-      this._options[key] = optionSpec[key];
-
-      // If no banner instance exists yet, go with a safe, blank initialization.
-      if(!this.container.banner) {
-        this.selectBanner('inactive');
-      }
-    }
-  }
-
-  /**
-   * Sets the active `Banner` to the specified type, regardless of
-   * existing management logic settings.
-   *
-   * @param type `'blank' | 'image' | 'suggestion'` - A plain-text string
-   *        representing the type of `Banner` to set active.
-   * @param height - Optional banner height in pixels.
-   */
-  public setBanner(type: BannerType) {
-    var banner: Banner;
-
-    let oldBanner = this.container.banner;
-    if(oldBanner instanceof SuggestionBanner) {
-      this.predictionContext.off('update', oldBanner.onSuggestionUpdate);
-    }
-
-    switch(type) {
-      case 'blank':
-        banner = new BlankBanner();
-        break;
-      case 'image':
-        banner = new ImageBanner(this.imagePath, this.container.activeBannerHeight);
-        break;
-      case 'suggestion':
-        let suggestBanner = banner = new SuggestionBanner(this.hostDevice, this.container.activeBannerHeight);
-        suggestBanner.predictionContext = this.predictionContext;
-        suggestBanner.events.on('apply', (selection) => this.predictionContext.accept(selection.suggestion));
-
-        this.predictionContext.on('update', suggestBanner.onSuggestionUpdate);
-        break;
-      default:
-        throw new Error("Invalid type specified for the banner!");
-    }
-
-    this._activeType = type;
-
-    if(banner) {
-      this.container.banner = banner;
-    }
-  }
-
-  /**
-   * Handles `LanguageProcessor`'s `'statechange'` events,
-   * allowing logic to automatically hot-swap `Banner`s as needed.
-   * @param state
-   */
-  selectBanner(state: StateChangeEnum) {
-    // Only display a SuggestionBanner when LanguageProcessor states it is active.
-    if(state == 'active' || state == 'configured') {
-      this.setBanner('suggestion');
-    } else if(state == 'inactive') {
-      if(this.alwaysShow) {
-        this.setBanner('image');
-      } else {
-        this.setBanner('blank');
-      }
-    }
-  }
-
-  public get activeType(): BannerType {
-    return this._activeType;
-  }
 }

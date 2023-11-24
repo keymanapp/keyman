@@ -4,14 +4,12 @@
   <info keyboard="k_007_transform_rgx.xml" author="Team Keyboard" name="marker" />
   <tests name="regex-tests">
     <test name="regex-test-basic">
-      <startContext to="" />
       <keystroke key="a" />
       <keystroke key="grave" />
       <keystroke key="e" />
       <check result="e`a" />
     </test>
     <test name="regex-test-map">
-      <startContext to="" />
       <keystroke key="A" />
       <keystroke key="grave" />
       <check result="a" />

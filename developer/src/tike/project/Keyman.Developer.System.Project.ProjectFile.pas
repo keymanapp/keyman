@@ -83,6 +83,68 @@ uses
   utilfiletypes;
 
 type
+  TProjectState = (psCreating, psReady, psLoading, psSaving, psDestroying);
+  TProjectType = (ptUnknown, ptKeyboard, ptLexicalModel); // distinct from utilfiletypes.TKeymanProjectType
+
+  TProjectVersion = (pvUnknown, pv10, pv20);
+
+  TProjectOptionsRecord = record
+    BuildPath: string;
+    SourcePath: string;
+    CompilerWarningsAsErrors: Boolean;
+    WarnDeprecatedCode: Boolean;
+    CheckFilenameConventions: Boolean;
+    SkipMetadataFiles: Boolean;
+    ProjectType: TProjectType;
+    Version: TProjectVersion;
+  end;
+
+  TProjectOptions = class
+    BuildPath: string;
+    SourcePath: string;
+    CompilerWarningsAsErrors: Boolean;
+    WarnDeprecatedCode: Boolean;
+    CheckFilenameConventions: Boolean;
+    SkipMetadataFiles: Boolean;
+    ProjectType: TProjectType;
+    Version: TProjectVersion;
+  public
+    procedure Assign(source: TProjectOptions); overload;
+    procedure Assign(source: TProjectOptionsRecord); overload;
+    function EqualsRecord(source: TProjectOptionsRecord): Boolean;
+  end;
+
+const DefaultProjectOptions: array[TProjectVersion] of TProjectOptionsRecord = (
+( // unknown version, this is unused
+  BuildPath: '';
+  SourcePath: '';
+  CompilerWarningsAsErrors: False;
+  WarnDeprecatedCode: False;
+  CheckFilenameConventions: False;
+  SkipMetadatafiles: False;
+  ProjectType: ptKeyboard;
+  Version: pvUnknown
+), ( // 1.0
+  BuildPath: '';
+  SourcePath: '';
+  CompilerWarningsAsErrors: False;
+  WarnDeprecatedCode: True;
+  CheckFilenameConventions: False;
+  SkipMetadatafiles: True;
+  ProjectType: ptKeyboard;
+  Version: pv10
+), ( // 2.0
+  BuildPath: '$PROJECTPATH/build';
+  SourcePath: '$PROJECTPATH/source';
+  CompilerWarningsAsErrors: False;
+  WarnDeprecatedCode: True;
+  CheckFilenameConventions: False;
+  SkipMetadatafiles: False;
+  ProjectType: ptKeyboard;
+  Version: pv20
+));
+
+type
   { Forward declarations }
 
   IProjectFileFreeNotification = interface;
@@ -90,10 +152,6 @@ type
   TProjectFileList = class;
   TProjectFile = class;
   TProjectFileStates = class;
-  TProjectOptions = class;
-
-  TProjectState = (psCreating, psReady, psLoading, psSaving, psDestroying);
-  TProjectType = (ptUnknown, ptKeyboard, ptLexicalModel); // distinct from utilfiletypes.TKeymanProjectType
 
   { TProject }
 
@@ -111,50 +169,54 @@ type
     FDisplayState: WideString;
     FMRU: TMRUList;
     FOptions: TProjectOptions;
+    FUpgradeMessages: TStrings;
 
-    procedure SetFileName(Value: string);
     function ImportFromIni(FileName: string): Boolean;
     function LoadFromXML(FileName: string): Boolean;
     function ExpandMemberFileName(Root, FileName: string): string;
-    function GetSavedFileName: string;
-    function GetUntitled: Boolean;
     //procedure ChildRefresh(Sender: TObject);
     procedure ListNotify(Item: TProjectFile; Action: TListNotification);
     procedure ChildRefresh(Sender: TObject);
     procedure MRUChange(Sender: TObject);
     procedure UpdateFileParameters;
-    procedure LoadPersistedUntitledProject;
-    function GetSavedUserFileName: string;
+    function GetUserFileName: string;
+    function ResolveProjectPath(APath: string): string;
+    procedure PopulateFolder(const path: string);
+    function GetTargetFilename10(ATargetFile, ASourceFile,
+      AVersion: string): string;
+    function GetTargetFilename20(ATargetFile, ASourceFile,
+      AVersion: string): string;
   protected
     procedure DoRefresh; virtual;
     procedure DoRefreshCaption; virtual;
 
     property State: TProjectState read FState;
-    property SavedFileName: string read GetSavedFileName;
-    property SavedUserFileName: string read GetSavedUserFileName;
 
   public
     procedure Log(AState: TProjectLogState; Filename, Msg: string; MsgCode, line: Integer); virtual;
 
-    constructor Create(AProjectType: TProjectType; AFileName: string; ALoadPersistedUntitledProject: Boolean = False); virtual;
+    constructor Create(AProjectType: TProjectType; AFileName: string); virtual;
     destructor Destroy; override;
 
     procedure Refresh;
 
-    procedure PersistUntitledProject;
-
     function Render: WideString;
+
+    function IsDefaultProject(Version: TProjectVersion): Boolean;
 
     function Load: Boolean; virtual;   // I4694
     function Save: Boolean; virtual;   // I4694
     function SaveUser: Boolean; virtual;   // I4694
+    function PopulateFiles: Boolean;
 
     class function StandardTemplatePath: string;
     class function StringsTemplatePath: string;
 
-    class function GetUntitledProjectFilename(CurrentProcess: Boolean): string;
-
     function GetTargetFilename(ATargetFile, ASourceFile, AVersion: string): string;   // I4688
+
+    function CanUpgrade: Boolean;
+    function Upgrade: Boolean;
+    property UpgradeMessages: TStrings read FUpgradeMessages;
 
     //procedure AddMRU(const FFileName: string);
     property MRU: TMRUList read FMRU;
@@ -163,9 +225,8 @@ type
 
     function FindFile(AFileName: string): TProjectFile;
 
-    //property StandardTemplatePath: string read GetStandardTemplatePath;
-    property FileName: string read FFileName write SetFileName;
-    property Untitled: Boolean read GetUntitled;
+    property FileName: string read FFileName;
+    property UserFileName: string read GetUserFileName;
 
     property Files: TProjectFileList read FFiles;
     property DisplayState: WideString read FDisplayState write FDisplayState;
@@ -214,9 +275,13 @@ type
     constructor Create(AProject: TProject; AFileName: string; AParent: TProjectFile); virtual;
     destructor Destroy; override;
 
-    procedure Load(node: IXMLNode; LoadState: Boolean); virtual;   // I4698
+    function IsCompilable: Boolean; virtual;
+    function IsSourceFile: Boolean; virtual;
+    class function IsFileTypeSupported(const Filename: string): Boolean; virtual;
+
+    procedure Load(node: IXMLNode); virtual;   // I4698
     procedure LoadState(node: IXMLNode); virtual;   // I4698
-    procedure Save(node: IXMLNode; SaveState: Boolean); virtual;   // I4698
+    procedure Save(node: IXMLNode); virtual;   // I4698
     procedure SaveState(node: IXMLNode); virtual;   // I4698
 
     procedure AddFreeNotification(AClient: IProjectFileFreeNotification);
@@ -288,22 +353,6 @@ type
     procedure ProjectFileDestroying(ProjectFile: TProjectFile);
   end;
 
-  TProjectOptions = class   // I4688
-  private
-    FBuildPath: string;
-    FWarnDeprecatedCode: Boolean;   // I4866
-    FCompilerWarningsAsErrors: Boolean;   // I4865
-    FCheckFilenameConventions: Boolean;
-    FProjectType: TProjectType;
-  public
-    constructor Create;
-    property BuildPath: string read FBuildPath write FBuildPath;
-    property WarnDeprecatedCode: Boolean read FWarnDeprecatedCode write FWarnDeprecatedCode;   // I4866
-    property CompilerWarningsAsErrors: Boolean read FCompilerWarningsAsErrors write FCompilerWarningsAsErrors;   // I4865
-    property CheckFilenameConventions: Boolean read FCheckFilenameConventions write FCheckFilenameConventions;
-    property ProjectType: TProjectType read FProjectType write FProjectType;
-  end;
-
 const
   WM_USER_ProjectUpdateDisplayState = WM_USER;
 
@@ -311,6 +360,8 @@ function GlobalProjectStateWndHandle: THandle;
 
 function ProjectTypeFromString(s: string): TProjectType;
 function ProjectTypeToString(pt: TProjectType): string;
+function ProjectVersionFromString(s: string): TProjectVersion;
+function ProjectVersionToString(pv: TProjectVersion): string;
 
 implementation
 
@@ -534,25 +585,53 @@ begin
   end;
 end;
 
-procedure TProjectFile.Load(node: IXMLNode; LoadState: Boolean);   // I4698
+function TProjectFile.IsCompilable: Boolean;
+begin
+  Result := False;
+end;
+
+class function TProjectFile.IsFileTypeSupported(
+  const Filename: string): Boolean;
+begin
+  // assumes that if we are registered for the file type extension, then we can
+  // handle the file. For example, .xml LDML keyboards
+  Result := True;
+end;
+
+function TProjectFile.IsSourceFile: Boolean;
 var
-  i: Integer;
+  FilePath, SourcePath: string;
+begin
+  // An file that is a sub-file of another one is never a source file
+  if Assigned(FParent) then
+    Exit(False);
+
+  // If no project is assigned, this is an unsupported mode (loading without
+  // project is no longer supported in 17.0+) but we don't want to crash so
+  // we'll just treat this as a source file
+  if not Assigned(FProject) then
+    Exit(True);
+
+  // We don't restrict builds to sourcepath files for v1.0 projects
+  if FProject.Options.Version = pv10 then
+    Exit(True);
+
+  // If no sourcepath is defined, then we'll build any files
+  if FProject.Options.SourcePath = '' then
+    Exit(True);
+
+  // Only return true if the file is directly in the ProjectOptions.SourcePath folder
+  SourcePath := ReplaceStr(IncludeTrailingPathDelimiter(FProject.ResolveProjectPath(FProject.Options.SourcePath)), '/', '\');
+  FilePath := ReplaceStr(ExtractFilePath(FFileName), '/', '\');
+  Result := SameFileName(SourcePath, FilePath);
+end;
+
+procedure TProjectFile.Load(node: IXMLNode);   // I4698
 begin
   if node.ChildNodes.IndexOf('ID') >= 0 then
     FID := CleanID(VarToWideStr(node.ChildValues['ID']));
   if node.ChildNodes.IndexOf('ParentFileID') >= 0 then
     FParentFileID := CleanID(VarToWideStr(node.ChildValues['ParentFileID']));
-
-  if LoadState then
-  begin
-    FIDEState.Clear;
-    if node.ChildNodes.IndexOf('IDEState') >= 0 then
-    begin
-      node := node.ChildNodes.Nodes['IDEState'];
-      for i := 0 to node.ChildNodes.Count - 1 do
-        FIDEState[node.ChildNodes[i].NodeName] := node.ChildNodes[i].NodeValue;
-    end;
-  end;
 end;
 
 procedure TProjectFile.LoadState(node: IXMLNode);   // I4698
@@ -579,32 +658,18 @@ begin
   FNotifiers.Remove(AClient);
 end;
 
-procedure TProjectFile.Save(node: IXMLNode; SaveState: Boolean);   // I4698
-var
-  I: Integer;
+procedure TProjectFile.Save(node: IXMLNode);   // I4698
 begin
   node.AddChild('ID').NodeValue := FID;
   node.AddChild('Filename').NodeValue := ExtractFileName(FFileName);
   node.AddChild('Filepath').NodeValue := ExtractRelativePath(FProject.FileName, FFileName);
   node.AddChild('FileVersion').NodeValue := FFileVersion;   // I4701
-  node.AddChild('FileType').NodeValue := ExtractFileExt(FFileName);;
+
+  // Note: FileType is only ever written in Delphi code; it is used by xsl
+  // transforms for rendering
+  node.AddChild('FileType').NodeValue := ExtractFileExt(FFileName);
   if Assigned(FParent) then
     node.AddChild('ParentFileID').NodeValue := FParent.ID;
-
-  if SaveState then
-  begin
-    node.AddChild('FullPath').NodeValue := FFileName;
-
-    if FIDEState.Count > 0 then
-    begin
-      node := node.AddChild('IDEState');
-      for I := 0 to FIDEState.Count - 1 do
-      begin
-        with node.AddChild(TProjectFileState(FIDEState.Get(I)).Name) do
-          NodeValue := TProjectFileState(FIDEState.Get(I)).Value;
-      end;
-    end;
-  end;
 end;
 
 procedure TProjectFile.SaveState(node: IXMLNode);   // I4698
@@ -680,11 +745,17 @@ begin
   end;
 end;
 
-constructor TProject.Create(AProjectType: TProjectType; AFileName: string; ALoadPersistedUntitledProject: Boolean = False);
+constructor TProject.Create(AProjectType: TProjectType; AFileName: string);
 var
   i: Integer;
 begin
-  FOptions := TProjectOptions.Create;   // I4688
+  Assert(AFileName <> '');
+
+  FUpgradeMessages := TStringList.Create;
+
+  // Assumes v1.0 by default
+  FOptions := TProjectOptions.Create;
+  FOptions.Assign(DefaultProjectOptions[pv10]);
 
   if AProjectType = ptUnknown
     then FOptions.ProjectType := ptKeyboard
@@ -702,19 +773,9 @@ begin
 
   FMustSave := False;
 
-  if (FFileName = '') and (ALoadPersistedUntitledProject) then
+  if not Load then   // I4703
   begin
-    FMustSave := True;
-    LoadPersistedUntitledProject; // I1010: Persist untitled project
-  end
-  else if not Load then   // I4703
-  begin
-    FFileName := '';
-    if not Load then
-    begin
-      FMustSave := True;
-      LoadPersistedUntitledProject;   // I4703
-    end;
+    raise EProjectLoader.Create('Unable to load project '+FFileName);
   end;
 
   FBusy := True;
@@ -734,6 +795,7 @@ begin
   FState := psDestroying;
   FFiles.Free;
   FMRU.Free;
+  FreeandNil(FUpgradeMessages);
   FreeAndNil(FOptions);   // I4688
   inherited Destroy;
 end;
@@ -744,12 +806,6 @@ end;
 
 procedure TProject.DoRefreshCaption;   // I4687
 begin
-end;
-
-procedure TProject.SetFileName(Value: string);
-begin
-  FFileName := Value;
-  DoRefreshCaption;   // I4687
 end;
 
 procedure TProject.ListNotify(Item: TProjectFile; Action: TListNotification);
@@ -776,9 +832,9 @@ begin
   FState := psLoading;
   try
     SetLength(buf, 32);
-    if FileExists(SavedFileName) then
+    if FileExists(FileName) then
     begin
-      with TFileStream.Create(SavedFileName, fmOpenRead) do
+      with TFileStream.Create(FileName, fmOpenRead) do
       try
         Read(buf[0], 32);  // I3310
       finally
@@ -786,11 +842,12 @@ begin
       end;
 
       if (buf[0] = Ord('<')) or ((TEncoding.GetBufferEncoding(buf, encoding) > 0) and (encoding = TEncoding.UTF8))  // I3310, I3473
-        then Result := LoadFromXML(SavedFileName)
-        else Result := ImportFromIni(SavedFileName);
+        then Result := LoadFromXML(FileName)
+        else Result := ImportFromIni(FileName);
     end
-    else if DirectoryExists(ExtractFilePath(SavedFileName)) then
-      Result := Save { Create a temporary project file }
+    else if DirectoryExists(ExtractFilePath(FileName)) then
+      // This will fall back to a 2.0 folder load
+      Result := LoadFromXML(FileName)
     else
     begin
       Result := False;
@@ -803,38 +860,9 @@ begin
   end;
 end;
 
-// I1010: Persist untitled project - begin
-
-procedure TProject.LoadPersistedUntitledProject;
-begin
-  FFileName := TProject.GetUntitledProjectFilename(False);
-  try
-    Load;
-  finally
-    FFileName := '';
-  end;
-end;
-
 procedure TProject.Log(AState: TProjectLogState; Filename, Msg: string; MsgCode, line: Integer);
 begin
   // Do nothing
-end;
-
-procedure TProject.PersistUntitledProject;
-var
-  path: string;
-begin
-  path := TProject.GetUntitledProjectFilename(False);
-
-  FState := psSaving;
-  with TProjectSaver.Create(Self, path) do
-  try
-    Execute;
-  finally
-    Free;
-  end;
-
-  FState := psReady;
 end;
 
 procedure TProject.Refresh;   // I4687
@@ -847,8 +875,22 @@ var
   doc, userdoc, xsl: IXMLDomDocument;
   FLastDir: string;
   i: Integer;
+  saver: TProjectSaver;
+  xml, xmluser: string;
 begin
-  if not FileExists(SavedFileName) then Save;
+  FState := psSaving;
+  try
+    saver := TProjectSaver.Create(Self, '');
+    try
+      saver.Execute;
+      xml := saver.XML;
+      xmluser := saver.XMLUser;
+    finally
+      saver.Free;
+    end;
+  finally
+    FState := psReady;
+  end;
 
   Result := '';
   FLastDir := GetCurrentDir;
@@ -857,24 +899,21 @@ begin
     doc := MSXMLDOMDocumentFactory.CreateDOMDocument;
     try
       doc.async := False;
-      doc.load(SavedFileName);
+      doc.loadXML(xml);
 
       //
       // Inject the user settings to the loaded file
       //
 
-      if FileExists(SavedUserFileName) then   // I4698
-      begin
-        userdoc := MSXMLDOMDocumentFactory.CreateDOMDocument;
-        try
-          userdoc.async := False;
-          userdoc.load(SavedUserFileName);
+      userdoc := MSXMLDOMDocumentFactory.CreateDOMDocument;
+      try
+        userdoc.async := False;
+        userdoc.loadXML(xmluser);
 
-          for i := 0 to userdoc.documentElement.childNodes.length - 1 do
-            doc.documentElement.appendChild(userdoc.documentElement.childNodes.item[i].cloneNode(true));
-        finally
-          userdoc := nil;
-        end;
+        for i := 0 to userdoc.documentElement.childNodes.length - 1 do
+          doc.documentElement.appendChild(userdoc.documentElement.childNodes.item[i].cloneNode(true));
+      finally
+        userdoc := nil;
       end;
 
       //
@@ -901,7 +940,190 @@ begin
   end;
 end;
 
-// I1010: Persist untitled project - end
+function ReadUtf8FileText(const filename: string): string;
+var
+  ss: TStringStream;
+begin
+  ss := TStringStream.Create('', TEncoding.UTF8);
+  try
+    ss.LoadFromFile(filename);
+    Result := ss.DataString;
+  finally
+    ss.Free;
+  end;
+end;
+
+function IsKeymanFile(filename: string): Boolean;
+begin
+  filename := filename.ToLower;
+  Result :=
+    filename.EndsWith('.model.ts') or
+//  filename.EndsWith('.kpj') or
+    filename.EndsWith('.kmn') or
+    filename.EndsWith('.xml') or
+    filename.EndsWith('.kps') or
+    filename.EndsWith('.kvks') or
+    filename.EndsWith('.keyman-touch-layout');
+end;
+
+function TProject.IsDefaultProject(Version: TProjectVersion): Boolean;
+begin
+  Result := FOptions.EqualsRecord(DefaultProjectOptions[Version]);
+end;
+
+///
+/// Adds all files in project folder to the in-memory project data
+/// @param projectFilename Full path to project.kpj (even if the file doesn't exist)
+///
+///
+function TProject.PopulateFiles: Boolean;
+var
+  ProjectPath: string;
+begin
+  if FOptions.Version <> pv20 then
+    raise EProjectLoader.Create('PopulateFiles can only be called on a v2.0 project');
+
+  FFiles.Clear;
+
+  ProjectPath := ExtractFilePath(FileName);
+  if not DirectoryExists(ProjectPath) then
+    Exit(False);
+
+  PopulateFolder(ProjectPath);
+
+  Result := True;
+end;
+
+procedure TProject.PopulateFolder(const path: string);
+var
+  ff: string;
+  f: TSearchRec;
+begin
+  if FindFirst(path + '*', faDirectory, f) = 0 then
+  begin
+    repeat
+      ff := path + f.Name;
+
+      if (f.Name = '.') or (f.Name = '..') then
+      begin
+        Continue;
+      end;
+
+      if (f.Attr and faDirectory) = faDirectory then
+      begin
+        PopulateFolder(ff + '\');
+        Continue;
+      end;
+
+      CreateProjectFile(Self, ff, nil);
+    until FindNext(f) <> 0;
+    System.SysUtils.FindClose(f);
+  end;
+end;
+
+function TProject.CanUpgrade: Boolean;
+var
+  i: Integer;
+  Path: string;
+  SourcePath: string;
+begin
+  if FOptions.Version = pv20 then
+  begin
+    Exit(False);
+  end;
+
+  FUpgradeMessages.Clear;
+  Result := True;
+
+  // Things that block upgrade:
+  // 1. invalid paths in Options
+  // 2. contained file paths outside the project folder (primary files only)
+
+  if Options.BuildPath.Contains('$SOURCEPATH') then
+  begin
+    Result := False;
+    FUpgradeMessages.Add('The BuildPath project setting contains the "$SOURCEPATH" tag, which is no longer supported');
+  end;
+  if Options.BuildPath.Contains('$VERSION') then
+  begin
+    Result := False;
+    FUpgradeMessages.Add('The BuildPath project setting contains the "$VERSION" tag, which is no longer supported');
+  end;
+
+  SourcePath := '?';
+
+  for i := 0 to Files.Count - 1 do
+  begin
+    if Assigned(Files[i].Parent) then
+    begin
+      Continue;
+    end;
+
+    Path := ExtractRelativePath(FileName, Files[i].FileName);
+
+    // Ensure all compileable files
+    if Files[i].IsCompilable then
+    begin
+      if SourcePath = '?' then
+      begin
+        SourcePath := ExtractFileDir(Path)
+      end
+      else if not SameFileName(SourcePath, ExtractFileDir(Path)) then
+      begin
+        FUpgradeMessages.Add('File '+Files[i].FileName+' is not in the same folder as at least one other source file. All primary source files must be in the same folder.');
+        Result := False;
+      end;
+    end;
+
+    if IsRelativePath(Path) and not Path.StartsWith('..') then
+    begin
+      // Path is in same folder or a subfolder of the project
+      Continue;
+    end;
+
+    FUpgradeMessages.Add('File '+Files[i].FileName+' is outside the project folder. All primary source files must be in the same folder as the project file, or in a subfolder.');
+    Result := False;
+  end;
+end;
+
+function TProject.Upgrade: Boolean;
+var
+  i: Integer;
+begin
+  if Options.Version = pv20 then
+    raise Exception.Create('Unexpected: Upgrade was called when already version 2.0');
+
+  if not CanUpgrade then
+    raise Exception.Create('Unexpected: Upgrade was called when CanUpgrade=False');
+
+  Options.Version := pv20;
+
+  // Set location of all source files, default to 'source' if no source files
+  // are present in the project
+  Options.SourcePath := '$PROJECTPATH\source';
+  for i := 0 to Files.Count - 1 do
+  begin
+    if Files[i].IsCompilable then
+    begin
+      Options.SourcePath := '$PROJECTPATH\' + ExtractFileDir(ExtractRelativePath(FFileName, Files[i].FileName));
+      Break;
+    end;
+  end;
+
+  for i := Files.Count - 1 downto 0 do
+  begin
+    if Assigned(Files[i].Parent) then
+    begin
+      Files.Delete(i);
+    end;
+  end;
+
+  Save;
+
+  PopulateFiles;
+
+  Result := True;
+end;
 
 function TProject.LoadFromXML(FileName: string): Boolean;
 begin
@@ -972,7 +1194,7 @@ function TProject.Save: Boolean;
 begin
   FState := psSaving;
   try
-    with TProjectSaver.Create(Self, SavedFileName) do
+    with TProjectSaver.Create(Self, FileName) do
     try
       Execute;
     finally
@@ -989,7 +1211,7 @@ function TProject.SaveUser: Boolean;
 begin
   FState := psSaving;
   try
-    with TProjectSaver.Create(Self, SavedFileName) do
+    with TProjectSaver.Create(Self, FileName) do
     try
       SaveUser;
     finally
@@ -1002,19 +1224,17 @@ begin
   Result := True;
 end;
 
-function TProject.GetSavedFileName: string;
+function TProject.GetUserFileName: string;
 begin
-  if FFileName = ''
-    then Result := TProject.GetUntitledProjectFilename(True)   // I4181
-    else Result := FFileName;
+  Result := ChangeFileExt(FileName, Ext_ProjectSourceUser);
 end;
 
-function TProject.GetSavedUserFileName: string;
+function TProject.ResolveProjectPath(APath: string): string;
 begin
-  Result := ChangeFileExt(SavedFileName, Ext_ProjectSourceUser);
+  Result := ReplaceText(APath, '$PROJECTPATH', ExtractFileDir(ExpandFileName(FFileName)));
 end;
 
-function TProject.GetTargetFilename(ATargetFile, ASourceFile, AVersion: string): string;   // I4688
+function TProject.GetTargetFilename10(ATargetFile, ASourceFile, AVersion: string): string;   // I4688
 begin
   Result := Trim(Options.BuildPath);
   if Result = '' then Result := '$SOURCEPATH';
@@ -1022,12 +1242,30 @@ begin
 
   // Replace placeholders in the target path
   Result := ReplaceText(Result, '$SOURCEPATH', ExtractFileDir(ExpandFileName(ASourceFile)));
-  if FFileName = '' // if we have an unsaved project, use the source path for project path
-    then Result := ReplaceText(Result, '$PROJECTPATH', ExtractFileDir(ExpandFileName(ASourceFile)))
-    else Result := ReplaceText(Result, '$PROJECTPATH', ExtractFileDir(ExpandFileName(FFileName)));
+  Result := ReplaceText(Result, '$PROJECTPATH', ExtractFileDir(ExpandFileName(FFileName)));
   Result := ReplaceText(Result, '$VERSION', AVersion);
 
   Result := Result + ExtractFileName(ATargetFile);
+end;
+
+function TProject.GetTargetFilename20(ATargetFile, ASourceFile, AVersion: string): string;   // I4688
+begin
+  Result := Trim(Options.BuildPath);
+  if Result = '' then
+  begin
+    Exit(ExtractFilePath(ExpandFileName(ASourceFile)) + ExtractFileName(ATargetFile));
+  end;
+
+  Result := IncludeTrailingPathDelimiter(Result);
+  Result := ResolveProjectPath(Result);
+  Result := Result + ExtractFileName(ATargetFile);
+end;
+
+function TProject.GetTargetFilename(ATargetFile, ASourceFile, AVersion: string): string;   // I4688
+begin
+  if Options.Version = pv10
+    then Result := GetTargetFilename10(ATargetFile, ASourceFile, AVersion)
+    else Result := GetTargetFilename20(ATargetFile, ASourceFile, AVersion);
 end;
 
 class function TProject.StandardTemplatePath: string; //(const FileName: string): string;
@@ -1038,13 +1276,6 @@ end;
 class function TProject.StringsTemplatePath: string;
 begin
   Result := GetXMLTemplatePath + 'project\';
-end;
-
-class function TProject.GetUntitledProjectFilename(CurrentProcess: Boolean): string;
-begin
-  if CurrentProcess
-    then Result := GetFolderPath(CSIDL_APPDATA) + SFolderKeymanDeveloper + '\Untitled.' + IntToStr(GetCurrentProcessId) + Ext_ProjectSource
-    else Result := GetFolderPath(CSIDL_APPDATA) + SFolderKeymanDeveloper + '\Untitled' + Ext_ProjectSource;
 end;
 
 procedure TProject.UpdateFileParameters;   // I4688   // I4710
@@ -1069,20 +1300,6 @@ begin
       Inc(i);
   end;
 end;
-
-function TProject.GetUntitled: Boolean;
-begin
-  Result := FFileName = '';
-end;
-
-{procedure TProject.ChildRefresh(Sender: TObject);
-begin
-  if FState = psReady then
-  begin
-    Save;
-    Refresh;
-  end;
-end;}
 
 function TProject.FindFile(AFileName: string): TProjectFile;
 var
@@ -1149,12 +1366,41 @@ end;
 
 { TProjectOptions }
 
-constructor TProjectOptions.Create;
+procedure TProjectOptions.Assign(source: TProjectOptions);
 begin
-  WarnDeprecatedCode := True;   // I4866
-  CompilerWarningsAsErrors := False;   // I4865
-  CheckFilenameConventions := True; // default to TRUE for new projects
-  ProjectType := ptKeyboard;
+  Self.BuildPath := source.BuildPath;
+  Self.SourcePath := source.SourcePath;
+  Self.CompilerWarningsAsErrors := source.CompilerWarningsAsErrors;
+  Self.WarnDeprecatedCode := source.WarnDeprecatedCode;
+  Self.CheckFilenameConventions := source.CheckFilenameConventions;
+  Self.SkipMetadataFiles := source.SkipMetadataFiles;
+  Self.ProjectType := source.ProjectType;
+  Self.Version := Source.Version;
+end;
+
+procedure TProjectOptions.Assign(source: TProjectOptionsRecord);
+begin
+  Self.BuildPath := source.BuildPath;
+  Self.SourcePath := source.SourcePath;
+  Self.CompilerWarningsAsErrors := source.CompilerWarningsAsErrors;
+  Self.WarnDeprecatedCode := source.WarnDeprecatedCode;
+  Self.CheckFilenameConventions := source.CheckFilenameConventions;
+  Self.SkipMetadataFiles := source.SkipMetadataFiles;
+  Self.ProjectType := source.ProjectType;
+  Self.Version := Source.Version;
+end;
+
+function TProjectOptions.EqualsRecord(source: TProjectOptionsRecord): Boolean;
+begin
+  Result :=
+    (Self.BuildPath = source.BuildPath) and
+    (Self.SourcePath = source.SourcePath) and
+    (Self.CompilerWarningsAsErrors = source.CompilerWarningsAsErrors) and
+    (Self.WarnDeprecatedCode = source.WarnDeprecatedCode) and
+    (Self.CheckFilenameConventions = source.CheckFilenameConventions) and
+    (Self.SkipMetadataFiles = source.SkipMetadataFiles) and
+    (Self.ProjectType = source.ProjectType) and
+    (Self.Version = Source.Version);
 end;
 
 type
@@ -1232,14 +1478,25 @@ begin
   end;
 end;
 
+function ProjectVersionFromString(s: string): TProjectVersion;
+begin
+  if SameText(s, '1.0') then Result := pv10
+  else if SameText(s, '2.0') then Result := pv20
+  else Result := pvUnknown;
+end;
+
+function ProjectVersionToString(pv: TProjectVersion): string;
+begin
+  case pv of
+    pvUnknown: Result := '';
+    pv10: Result := '1.0';
+    pv20: Result := '2.0';
+  end;
+end;
+
 initialization
   FGlobalProjectStateWnd := TGlobalProjectStateWnd.Create;
 finalization
   // Deletes temporary session-local project
-  if FileExists(TProject.GetUntitledProjectFilename(True)) then
-    System.SysUtils.DeleteFile(TProject.GetUntitledProjectFilename(True));
-  if FileExists(ChangeFileExt(TProject.GetUntitledProjectFilename(True),Ext_ProjectSourceUser)) then
-    System.SysUtils.DeleteFile(ChangeFileExt(TProject.GetUntitledProjectFilename(True),Ext_ProjectSourceUser));
-
   FGlobalProjectStateWnd.Free;
 end.
