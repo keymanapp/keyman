@@ -1331,6 +1331,7 @@ KMX_BOOL CheckContextStatementPositions(PKMX_WCHAR context) {
 
   return TRUE;
 }
+
 /**
  *  Checks if a use() statement is followed by other content in the output of a rule
  */
@@ -1342,6 +1343,22 @@ KMX_DWORD CheckUseStatementsInOutput(PKMX_WCHAR output) {
       hasUse = TRUE;
     } else if (hasUse) {
       AddWarning(CWARN_UseNotLastStatementInRule);
+      break;
+    }
+  }
+  return CERR_None;
+}
+
+/**
+ * Warn if output has virtual keys in it, which is not supported by Core at all,
+ * but was unofficially supported, but never worked properly, in Keyman for
+ * Windows for many years
+ */
+KMX_DWORD CheckVirtualKeysInOutput(PKMX_WCHAR output) {
+  PKMX_WCHAR p;
+  for (p = output; *p; p = incxstr(p)) {
+    if (*p == UC_SENTINEL && *(p + 1) == CODE_EXTENDED) {
+      AddWarning(CWARN_VirtualKeyInOutput);
       break;
     }
   }
@@ -1470,6 +1487,11 @@ KMX_DWORD ProcessKeyLineImpl(PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX_BOOL IsUnico
   // Test that use() statements are not followed by other content
   if ((msg = CheckUseStatementsInOutput(pklOut)) != CERR_None) {
     return msg;   // I4867
+  }
+
+  // Warn if virtual keys are used in the output, as they are unsupported by Core
+  if ((msg = CheckVirtualKeysInOutput(pklOut)) != CERR_None) {
+    return msg;
   }
 
   if (gp->fReadOnly) {
