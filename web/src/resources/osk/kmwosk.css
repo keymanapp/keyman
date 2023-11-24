@@ -342,18 +342,6 @@ body div.kmw-key-shift span.kmw-key-text {font-family:SpecialOSK !important;font
 body div.kmw-key-shift-on span.kmw-key-text {font-family:SpecialOSK !important;font-size:1em !important;}
 #kmw-popup-keys div.kmw-key-shift span.kmw-key-text {font-family:SpecialOSK !important;}
 
-/* Style for callout used on phones */
-#kmw-popup-callout {
-  position: absolute;
-  display: block;
-  background-color: #fdfdfe;
-  border-radius: 0 0 5px 5px;
-  z-index: 10002;
-  pointer-events:none;
-  border-bottom: solid 1px #8a8d90;
-  box-sizing: border-box;
-}
-
 #kmw-keytip {
   z-index: 10002;
 }
@@ -486,11 +474,6 @@ div.android div.kmw-keytip-cap {
   div.ios div.kmw-keytip-cap {
     border-top: solid 1px #0f1319;
   }
-
-  /* Style for callout used on phones */
-  #kmw-popup-callout {
-    background-color: #0f1319;
-  }
 }
 
 /* Box styles for keyboard-specific OSK (e.g. EuroLatin) and if no keyboard active (desktop only) */
@@ -557,9 +540,35 @@ div.android div.kmw-keytip-cap {
 .phone.android #kmw-popup-keys {border:none; border-radius: 2px; background-color:#333333; padding:5px 5px 0 0;}
 .tablet.android #kmw-popup-keys {border:1px solid #eee; border-radius: 3px; background-color:#888; padding:8px 12px 4px 4px;}
 
+/* Style for callout used on phones */
+#kmw-popup-callout {
+  position: absolute;
+  display: block;
+  border-color: transparent;
+  border-top-color: #fdfdfe;
+  border-style: solid;
+  z-index: 10003;
+  pointer-events:none;
+  box-sizing: border-box;
+}
+
+.phone.android #kmw-popup-callout {
+  border-top-color: #333333;
+}
+
+.tablet.android #kmw-popup-callout {
+  border-top-color: #888;
+}
+
 @media (prefers-color-scheme: dark) {
+  /* Should we do different dark-mode styling for Android than for iOS? */
+  /* These were selected for iOS, just to be clear. */
   #kmw-popup-keys {
     background-color: #0f1319;
+  }
+
+  #kmw-popup-callout {
+    border-top-color: #0f1319;
   }
 }
 
