@@ -21,7 +21,7 @@ export default class NodeProctor extends Proctor {
     this.keyboardWithHarness = kbdHarness;
   }
 
-  beforeAll() {
+  async beforeAll() {
     //
   }
 
@@ -47,7 +47,7 @@ export default class NodeProctor extends Proctor {
     return true;
   }
 
-  simulateSequence(sequence: TestSequence<any>, target?: OutputTarget): string {
+  async simulateSequence(sequence: TestSequence<any>, target?: OutputTarget): Promise<string> {
     // Start with an empty OutputTarget and a fresh KeyboardProcessor.
     if(!target) {
       target = new Mock();

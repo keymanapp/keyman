@@ -38,7 +38,6 @@ module.exports = {
   // list of files / patterns to load in the browser
   files: [
     {pattern: 'web/src/test/auto/dom/kbdLoader.mjs', type: 'module', watched: true, served: true, included: false},
-    {pattern: 'web/src/test/auto/dom/timedPromise.mjs', type: 'module', watched: true, served: true, included: false},
 
     {pattern: 'web/src/test/auto/dom/test_init_check.js', type: 'module'},         // Ensures that tests will initialize properly
     'common/test/resources/timeout-adapter.js',  // Handles configuration timeout setup at runtime.

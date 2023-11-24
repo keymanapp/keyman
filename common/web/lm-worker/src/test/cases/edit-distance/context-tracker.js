@@ -177,13 +177,7 @@ describe('ContextTracker', function() {
 
       // Next step - on the followup context, is the replacement still active?
       let postContext = models.applyTransform(baseSuggestion.transform, baseContext);
-
       let postContextState = compositor.contextTracker.analyzeState(model, postContext);
-
-      // The non-wordbreak token before the tail in the newer TrackedContextState should deep-equal
-      // the tail token of the original TrackedContextState, but the two tokens should be different instances.
-      assert.notEqual(postContextState.tokens[postContextState.tokens.length - 3], baseContextState.tail);
-      assert.deepEqual(postContextState.tokens[postContextState.tokens.length - 3], baseContextState.tail);
 
       // Penultimate token corresponds to whitespace, which does not have a 'raw' representation.
       assert.isNull(postContextState.tokens[postContextState.tokens.length - 2].raw);

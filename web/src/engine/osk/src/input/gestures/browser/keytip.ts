@@ -2,6 +2,7 @@ import OSKBaseKey from '../../../keyboard-layout/oskBaseKey.js';
 import { KeyElement } from '../../../keyElement.js';
 import KeyTipInterface from '../../../keytip.interface.js';
 import VisualKeyboard from '../../../visualKeyboard.js';
+import { GesturePreviewHost } from '../../../keyboard-layout/gesturePreviewHost.js';
 
 export default class KeyTip implements KeyTipInterface {
   public readonly element: HTMLDivElement;
@@ -10,7 +11,7 @@ export default class KeyTip implements KeyTipInterface {
 
   //  -----
   // |     | <-- tip
-  // |  x  | <-- label
+  // |  x  | <-- preview
   // |_   _|
   //  |   |
   //  |   |  <-- cap
@@ -18,7 +19,8 @@ export default class KeyTip implements KeyTipInterface {
 
   private readonly cap: HTMLDivElement;
   private readonly tip: HTMLDivElement;
-  private readonly label: HTMLSpanElement;
+  private previewHost: GesturePreviewHost;
+  private preview: HTMLDivElement;
 
   private readonly constrain: boolean;
 
@@ -38,16 +40,15 @@ export default class KeyTip implements KeyTipInterface {
 
     tipElement.appendChild(this.tip = document.createElement('div'));
     tipElement.appendChild(this.cap = document.createElement('div'));
-    this.tip.appendChild(this.label = document.createElement('span'));
+    this.tip.appendChild(this.preview = document.createElement('div'));
 
     this.tip.className = 'kmw-keytip-tip';
     this.cap.className = 'kmw-keytip-cap';
-    this.label.className = 'kmw-keytip-label';
 
     this.constrain = constrain;
   }
 
-  show(key: KeyElement, on: boolean, vkbd: VisualKeyboard) {
+  show(key: KeyElement, on: boolean, vkbd: VisualKeyboard, previewHost: GesturePreviewHost) {
     // Create and display the preview
     // If !key.offsetParent, the OSK is probably hidden.  Either way, it's a half-
     // decent null-guard check.
@@ -105,8 +106,6 @@ export default class KeyTip implements KeyTipInterface {
         kts.fontSize = key.key.getIdealFontSize(vkbd, key.key.keyText, scaleStyle, true);
       }
 
-      this.label.textContent = kc.textContent;
-
       // Adjust shape if at edges
       var xOverflow = (canvasWidth - xWidth) / 2;
       if(xLeft < xOverflow) {
@@ -141,8 +140,21 @@ export default class KeyTip implements KeyTipInterface {
       }
 
       kts.display = 'block';
+
+      const oldHost = this.preview;
+      this.previewHost = previewHost;
+
+      if(previewHost) {
+        this.preview = this.previewHost.element;
+        this.tip.replaceChild(this.preview, oldHost);
+        previewHost.setCancellationHandler(() => this.show(null, false, vkbd, null));
+      }
     } else { // Hide the key preview
       this.element.style.display = 'none';
+      this.previewHost = null;
+      const oldPreview = this.preview;
+      this.preview = document.createElement('div');
+      this.tip.replaceChild(this.preview, oldPreview);
     }
 
     // Save the key preview state

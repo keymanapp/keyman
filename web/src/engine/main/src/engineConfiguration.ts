@@ -98,7 +98,7 @@ export class EngineConfiguration extends EventEmitter<EventMap> {
   debugReport(): Record<string, any> {
     return {
       hostDevice: this.hostDevice,
-      initialized: this.deferForInitialization.hasFinalized
+      initialized: this.deferForInitialization.isResolved
     }
   }
 

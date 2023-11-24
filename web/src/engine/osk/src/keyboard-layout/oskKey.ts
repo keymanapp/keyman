@@ -1,41 +1,16 @@
-import { ActiveKey, ButtonClass, DeviceSpec, LayoutKey } from '@keymanapp/keyboard-processor';
+import { ActiveKey, ActiveSubKey, ButtonClass, DeviceSpec, LayoutKey } from '@keymanapp/keyboard-processor';
+import { TouchLayout } from '@keymanapp/common-types';
+import TouchLayoutFlick = TouchLayout.TouchLayoutFlick;
+
 // At present, we don't use @keymanapp/keyman.  Just `keyman`.  (Refer to <root>/web/package.json.)
 import { getAbsoluteX, getAbsoluteY } from 'keyman/engine/dom-utils';
 
 import { getFontSizeStyle } from '../fontSizeUtils.js';
-import InputEventCoordinate from '../input/inputEventCoordinate.js';
 import specialChars from '../specialCharacters.js';
 import buttonClassNames from '../buttonClassNames.js';
 
 import { KeyElement } from '../keyElement.js';
 import VisualKeyboard from '../visualKeyboard.js';
-
-export class OSKKeySpec implements LayoutKey {
-  id: string;
-
-  // Only set (within @keymanapp/keyboard-processor) for keys actually specified in a loaded layout
-  baseKeyID?: string;
-  coreID?: string;
-  elementID?: string;
-
-  text?: string;
-  sp?: ButtonClass;
-  width: number;
-  layer?: string; // The key will derive its base modifiers from this property - may not equal the layer on which it is displayed.
-  nextlayer?: string;
-  pad?: number;
-  sk?: OSKKeySpec[];
-  default?: boolean;
-
-  constructor(id: string, text?: string, width?: number, sp?: ButtonClass, nextlayer?: string, pad?: number) {
-    this.id = id;
-    this.text = text;
-    this.width = width ? width : 50;
-    this.sp = sp;
-    this.nextlayer = nextlayer;
-    this.pad = pad;
-  }
-}
 
 export default abstract class OSKKey {
   // Only set here to act as an alias for code built against legacy versions.
@@ -44,7 +19,7 @@ export default abstract class OSKKey {
   static readonly BUTTON_CLASSES = buttonClassNames;
 
   static readonly HIGHLIGHT_CLASS = 'kmw-key-touched';
-  readonly spec: OSKKeySpec;
+  readonly spec: ActiveKey | ActiveSubKey;
 
   btn: KeyElement;
   label: HTMLSpanElement;
@@ -55,7 +30,7 @@ export default abstract class OSKKey {
    */
   readonly layer: string;
 
-  constructor(spec: OSKKeySpec, layer: string) {
+  constructor(spec: ActiveKey | ActiveSubKey, layer: string) {
     this.spec = spec;
     this.layer = layer;
   }
@@ -403,19 +378,6 @@ export default abstract class OSKKey {
     t.innerText = keyText;
 
     return t;
-  }
-
-  public isUnderTouch(input: InputEventCoordinate): boolean {
-    let x = input.x;
-    let y = input.y;
-
-    let btn = this.btn;
-    let x0 = getAbsoluteX(btn);
-    let y0 = getAbsoluteY(btn);
-    let x1 = x0 + btn.offsetWidth;
-    let y1 = y0 + btn.offsetHeight;
-
-    return (x > x0 && x < x1 && y > y0 && y < y1);
   }
 
   public refreshLayout(vkbd: VisualKeyboard) {

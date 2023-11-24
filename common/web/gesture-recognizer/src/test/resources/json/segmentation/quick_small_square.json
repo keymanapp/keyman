@@ -1,0 +1,502 @@
+{
+  "inputs": [
+    {
+      "isFromTouch": false,
+      "path": {
+        "coords": [
+          {
+            "targetX": 64,
+            "targetY": 95,
+            "t": 1311
+          },
+          {
+            "targetX": 65,
+            "targetY": 95,
+            "t": 1356
+          },
+          {
+            "targetX": 65,
+            "targetY": 94,
+            "t": 1397
+          },
+          {
+            "targetX": 66,
+            "targetY": 94,
+            "t": 1403
+          },
+          {
+            "targetX": 67,
+            "targetY": 93,
+            "t": 1427
+          },
+          {
+            "targetX": 68,
+            "targetY": 92,
+            "t": 1436
+          },
+          {
+            "targetX": 70,
+            "targetY": 92,
+            "t": 1453
+          },
+          {
+            "targetX": 74,
+            "targetY": 90,
+            "t": 1470
+          },
+          {
+            "targetX": 78,
+            "targetY": 90,
+            "t": 1485
+          },
+          {
+            "targetX": 80,
+            "targetY": 89,
+            "t": 1502
+          },
+          {
+            "targetX": 81,
+            "targetY": 89,
+            "t": 1519
+          },
+          {
+            "targetX": 82,
+            "targetY": 89,
+            "t": 1583
+          },
+          {
+            "targetX": 82,
+            "targetY": 88,
+            "t": 1588
+          },
+          {
+            "targetX": 83,
+            "targetY": 88,
+            "t": 1602
+          },
+          {
+            "targetX": 84,
+            "targetY": 88,
+            "t": 1623
+          },
+          {
+            "targetX": 85,
+            "targetY": 88,
+            "t": 1637
+          },
+          {
+            "targetX": 86,
+            "targetY": 88,
+            "t": 1653
+          },
+          {
+            "targetX": 87,
+            "targetY": 88,
+            "t": 1670
+          },
+          {
+            "targetX": 87,
+            "targetY": 89,
+            "t": 1687
+          },
+          {
+            "targetX": 87,
+            "targetY": 91,
+            "t": 1703
+          },
+          {
+            "targetX": 87,
+            "targetY": 94,
+            "t": 1720
+          },
+          {
+            "targetX": 87,
+            "targetY": 98,
+            "t": 1736
+          },
+          {
+            "targetX": 86,
+            "targetY": 100,
+            "t": 1753
+          },
+          {
+            "targetX": 85,
+            "targetY": 102,
+            "t": 1769
+          },
+          {
+            "targetX": 85,
+            "targetY": 104,
+            "t": 1786
+          },
+          {
+            "targetX": 84,
+            "targetY": 105,
+            "t": 1802
+          },
+          {
+            "targetX": 84,
+            "targetY": 106,
+            "t": 1819
+          },
+          {
+            "targetX": 84,
+            "targetY": 107,
+            "t": 1836
+          },
+          {
+            "targetX": 84,
+            "targetY": 108,
+            "t": 1853
+          },
+          {
+            "targetX": 84,
+            "targetY": 109,
+            "t": 1870
+          },
+          {
+            "targetX": 83,
+            "targetY": 109,
+            "t": 2025
+          },
+          {
+            "targetX": 82,
+            "targetY": 110,
+            "t": 2050
+          },
+          {
+            "targetX": 81,
+            "targetY": 110,
+            "t": 2054
+          },
+          {
+            "targetX": 79,
+            "targetY": 111,
+            "t": 2069
+          },
+          {
+            "targetX": 76,
+            "targetY": 113,
+            "t": 2086
+          },
+          {
+            "targetX": 72,
+            "targetY": 115,
+            "t": 2103
+          },
+          {
+            "targetX": 67,
+            "targetY": 115,
+            "t": 2119
+          },
+          {
+            "targetX": 59,
+            "targetY": 117,
+            "t": 2136
+          },
+          {
+            "targetX": 55,
+            "targetY": 117,
+            "t": 2153
+          },
+          {
+            "targetX": 54,
+            "targetY": 117,
+            "t": 2169
+          },
+          {
+            "targetX": 54,
+            "targetY": 116,
+            "t": 2247
+          },
+          {
+            "targetX": 54,
+            "targetY": 115,
+            "t": 2256
+          },
+          {
+            "targetX": 54,
+            "targetY": 114,
+            "t": 2269
+          },
+          {
+            "targetX": 55,
+            "targetY": 113,
+            "t": 2286
+          },
+          {
+            "targetX": 56,
+            "targetY": 110,
+            "t": 2303
+          },
+          {
+            "targetX": 57,
+            "targetY": 107,
+            "t": 2320
+          },
+          {
+            "targetX": 58,
+            "targetY": 104,
+            "t": 2336
+          },
+          {
+            "targetX": 58,
+            "targetY": 101,
+            "t": 2353
+          },
+          {
+            "targetX": 58,
+            "targetY": 99,
+            "t": 2369
+          },
+          {
+            "targetX": 59,
+            "targetY": 96,
+            "t": 2386
+          },
+          {
+            "targetX": 59,
+            "targetY": 94,
+            "t": 2403
+          },
+          {
+            "targetX": 59,
+            "targetY": 93,
+            "t": 2419
+          }
+        ],
+        "segments": [
+          {
+            "type": "start",
+            "duration": 0,
+            "speed": 0,
+            "distance": 0,
+            "peakSpeed": 0,
+            "initialCoord": {
+              "targetX": 64,
+              "targetY": 95,
+              "t": 1311
+            },
+            "lastCoord": {
+              "targetX": 64,
+              "targetY": 95,
+              "t": 1311
+            }
+          },
+          {
+            "type": "hold",
+            "duration": 116,
+            "cardinalDirection": "ne",
+            "speed": 0.031082338581586114,
+            "distance": 3.605551275463989,
+            "angle": 0.982793723247329,
+            "peakSpeed": 0.13182899759552083,
+            "initialCoord": {
+              "targetX": 64,
+              "targetY": 95,
+              "t": 1311
+            },
+            "lastCoord": {
+              "targetX": 67,
+              "targetY": 93,
+              "t": 1427
+            }
+          },
+          {
+            "type": "move",
+            "duration": 75,
+            "cardinalDirection": "e",
+            "speed": 0.1813529401164726,
+            "distance": 13.601470508735444,
+            "angle": 1.2722973952087173,
+            "peakSpeed": 0.25612532898360546,
+            "initialCoord": {
+              "targetX": 67,
+              "targetY": 93,
+              "t": 1427
+            },
+            "lastCoord": {
+              "targetX": 80,
+              "targetY": 89,
+              "t": 1502
+            }
+          },
+          {
+            "type": "hold",
+            "duration": 100,
+            "cardinalDirection": "e",
+            "speed": 0.0316227766016838,
+            "distance": 3.1622776601683795,
+            "angle": 1.2490457723982544,
+            "peakSpeed": 0.13494939128109834,
+            "initialCoord": {
+              "targetX": 80,
+              "targetY": 89,
+              "t": 1502
+            },
+            "lastCoord": {
+              "targetX": 83,
+              "targetY": 88,
+              "t": 1602
+            }
+          },
+          {
+            "type": "hold",
+            "duration": 101,
+            "cardinalDirection": "se",
+            "speed": 0.04950495049504951,
+            "distance": 5,
+            "angle": 2.214297435588181,
+            "peakSpeed": 0.12381054324594641,
+            "initialCoord": {
+              "targetX": 83,
+              "targetY": 88,
+              "t": 1602
+            },
+            "lastCoord": {
+              "targetX": 87,
+              "targetY": 91,
+              "t": 1703
+            }
+          },
+          {
+            "type": "move",
+            "duration": 167,
+            "cardinalDirection": "s",
+            "speed": 0.10927118317900994,
+            "distance": 18.24828759089466,
+            "angle": 3.3067413310044196,
+            "peakSpeed": 0.24454192969112268,
+            "initialCoord": {
+              "targetX": 87,
+              "targetY": 91,
+              "t": 1703
+            },
+            "lastCoord": {
+              "targetX": 84,
+              "targetY": 109,
+              "t": 1870
+            }
+          },
+          {
+            "type": "hold",
+            "duration": 120,
+            "speed": 0,
+            "distance": 0,
+            "peakSpeed": 0,
+            "initialCoord": {
+              "targetX": 84,
+              "targetY": 109,
+              "t": 1870
+            },
+            "lastCoord": {
+              "targetX": 84,
+              "targetY": 109,
+              "t": 1990
+            }
+          },
+          {
+            "type": "move",
+            "duration": 96,
+            "cardinalDirection": "sw",
+            "speed": 0.09316949906249124,
+            "distance": 8.94427190999916,
+            "angle": 4.2487413713838835,
+            "peakSpeed": 0.2189241813015378,
+            "initialCoord": {
+              "targetX": 84,
+              "targetY": 109,
+              "t": 1990
+            },
+            "lastCoord": {
+              "targetX": 76,
+              "targetY": 113,
+              "t": 2086
+            }
+          },
+          {
+            "type": "move",
+            "duration": 67,
+            "cardinalDirection": "w",
+            "speed": 0.3190680347228649,
+            "distance": 21.37755832643195,
+            "angle": 4.524167475079919,
+            "peakSpeed": 0.43356375433908684,
+            "initialCoord": {
+              "targetX": 76,
+              "targetY": 113,
+              "t": 2086
+            },
+            "lastCoord": {
+              "targetX": 55,
+              "targetY": 117,
+              "t": 2153
+            }
+          },
+          {
+            "type": "hold",
+            "duration": 103,
+            "cardinalDirection": "nw",
+            "speed": 0.021709397839803784,
+            "distance": 2.23606797749979,
+            "angle": 5.81953769817878,
+            "peakSpeed": 0.0872031157857499,
+            "initialCoord": {
+              "targetX": 55,
+              "targetY": 117,
+              "t": 2153
+            },
+            "lastCoord": {
+              "targetX": 54,
+              "targetY": 115,
+              "t": 2256
+            }
+          },
+          {
+            "type": "move",
+            "duration": 207,
+            "cardinalDirection": "n",
+            "speed": 0.10899047509834278,
+            "distance": 22.561028345356956,
+            "angle": 0.2234766011406333,
+            "peakSpeed": 0.2057511322731059,
+            "initialCoord": {
+              "targetX": 54,
+              "targetY": 115,
+              "t": 2256
+            },
+            "lastCoord": {
+              "targetX": 59,
+              "targetY": 93,
+              "t": 2463
+            }
+          },
+          {
+            "type": "end",
+            "duration": 0,
+            "speed": 0,
+            "distance": 0,
+            "peakSpeed": 0,
+            "initialCoord": {
+              "targetX": 59,
+              "targetY": 93,
+              "t": 2463
+            },
+            "lastCoord": {
+              "targetX": 59,
+              "targetY": 93,
+              "t": 2463
+            }
+          }
+        ],
+        "wasCancelled": false
+      }
+    }
+  ],
+  "config": {
+    "deviceStyle": "screen2",
+    "roamingStyle": "bounds1",
+    "receiverStyle": "full",
+    "safeZoneStyle": "safe-loose"
+  }
+}
