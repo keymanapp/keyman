@@ -178,7 +178,6 @@ export default class KeyTip implements KeyTipInterface {
       const defaultCapHeight = (distFromTop - Math.floor(y) + canvasHeight - (orientation == 'up' ? halfHeight : -capOffset * 2));
       this.cap.style.height = defaultCapHeight + 'px';
 
-      // let delta: number = 0;
       if(this.constrain && tipHeight + bottomY > oskHeight) {
         const delta = tipHeight + bottomY - oskHeight;
         kts.height = (canvasHeight-delta) + 'px';
