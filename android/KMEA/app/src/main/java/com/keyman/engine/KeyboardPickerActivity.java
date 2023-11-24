@@ -51,6 +51,7 @@ import android.widget.Toast;
 import androidx.appcompat.widget.Toolbar;
 
 public final class KeyboardPickerActivity extends BaseActivity {
+  private boolean hasDeleted = false;
 
   //TODO: view instances should not be static
   private static Toolbar toolbar = null;
@@ -140,6 +141,7 @@ public final class KeyboardPickerActivity extends BaseActivity {
             public boolean onMenuItemClick(MenuItem item) {
               if (item.getItemId() == R.id.popup_delete) {
                 deleteKeyboard(context, position);
+                KeyboardPickerActivity.this.hasDeleted = true;
                 return true;
               } else {
                 return false;
@@ -261,6 +263,23 @@ public final class KeyboardPickerActivity extends BaseActivity {
 
     if (!shouldCheckKeyboardUpdates)
       return;
+  }
+
+  @Override
+  protected void onPause() {
+    super.onPause();
+
+    if (this.hasDeleted) {
+      this.hasDeleted = false;
+
+      if (KMManager.InAppKeyboard != null) {
+        KMManager.InAppKeyboard.loadKeyboard();
+      }
+
+      if (KMManager.SystemKeyboard != null) {
+        KMManager.SystemKeyboard.loadKeyboard();
+      }
+    }
   }
 
   @Override
