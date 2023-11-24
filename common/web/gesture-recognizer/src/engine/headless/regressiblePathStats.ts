@@ -29,14 +29,16 @@ export function sigMinus(operand1: number, operand2: number) {
 }
 
 /**
- * As the name suggests, this class facilitates tracking of cumulative mathematical values, etc
- * necessary to perform the statistical operations necessary for path segmentation.
+ * This class further extends `CumulativePathStats` to provide many other potentially-
+ * useful statistical features, many of which are very useful for path segmentation.
  *
- * Instances of this class are immutable.
+ * Instances of this class may be considered immutable externally.
+ *
+ * In Keyman 17.0, this class tree-shakes out.
  */
 export class RegressiblePathStats<Type = any> extends CumulativePathStats<Type> {
   /**
-   * Provides linear-regression statistics & fitting values based on the underlying `CumulativePathStats`
+   * Provides linear-regression statistics & fitting values based on the underlying `RegressiblePathStats`
    * object used to generate it.  All operations are O(1).
    */
   static readonly regression = class RegressionFromSums {
@@ -48,7 +50,7 @@ export class RegressiblePathStats<Type = any> extends CumulativePathStats<Type> 
 
     /**
      *
-     * @param mainStats       The `CumulativePathStats` instance to base all regression data on.
+     * @param mainStats       The `RegressiblePathStats` instance to base all regression data on.
      * @param dependentAxis   The 'output' axis / dimension; the axis whose behavior should be predicted based on
      *                        existing data of its relationship with the independent axis.
      * @param independentAxis The 'input' axis/dimension.

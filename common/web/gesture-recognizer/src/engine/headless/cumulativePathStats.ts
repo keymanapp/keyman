@@ -22,9 +22,11 @@ type StatAxis = PathCoordAxis | 'v';
 
 /**
  * As the name suggests, this class facilitates tracking of cumulative mathematical values, etc
- * necessary to perform the statistical operations necessary for path segmentation.
+ * useful for interpretation of a contact point's path as it relates to gestures.
  *
- * Instances of this class are immutable.
+ * Instances of this class may be considered immutable externally.
+ *
+ * A subclass with properties useful for path segmentation: `RegressiblePathStats`.
  */
 export class CumulativePathStats<Type = any> {
   protected rawLinearSums  = {'x': 0, 'y': 0, 't': 0, 'v': 0};
