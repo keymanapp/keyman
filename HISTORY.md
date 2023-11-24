@@ -1,5 +1,12 @@
 # Keyman Version History
 
+## 17.0.217 alpha 2023-11-24
+
+* feat(developer): warn on usage of virtual keys in rule output (#10062)
+* fix(core): memory management of options in action struct (#10073)
+* chore(linux): Update debian changelog (#10047)
+* chore(core): Add test keyboard for text selection tests (#10026)
+
 ## 17.0.216 alpha 2023-11-23
 
 * fix(common): kmx struct alignment (#9977)
