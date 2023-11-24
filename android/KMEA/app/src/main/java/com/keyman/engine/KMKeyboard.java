@@ -54,14 +54,6 @@ import io.sentry.Breadcrumb;
 import io.sentry.Sentry;
 import io.sentry.SentryLevel;
 
-class JSQueueEntry {
-  public String call;
-
-  JSQueueEntry(String call) {
-    this.call = call;
-  }
-}
-
 final class KMKeyboard extends WebView {
   private static final String TAG = "KMKeyboard";
   private final Context context;
@@ -74,7 +66,7 @@ final class KMKeyboard extends WebView {
   private boolean shouldIgnoreSelectionChange = false;
 
   protected KeyboardType keyboardType = KeyboardType.KEYBOARD_TYPE_UNDEFINED;
-  protected ArrayList<JSQueueEntry> javascriptAfterLoad = new ArrayList<>();
+  protected ArrayList<String> javascriptAfterLoad = new ArrayList<>();
 
   private static String currentKeyboard = null;
 
@@ -291,7 +283,7 @@ final class KMKeyboard extends WebView {
   }
 
   public void loadJavascript(String func) {
-    this.javascriptAfterLoad.add(new JSQueueEntry(func));
+    this.javascriptAfterLoad.add(func);
 
     if((keyboardType == KeyboardType.KEYBOARD_TYPE_INAPP && KMManager.InAppKeyboardWebViewClient.getKeyboardLoaded()) ||
       (keyboardType == KeyboardType.KEYBOARD_TYPE_SYSTEM && KMManager.SystemKeyboardWebViewClient.getKeyboardLoaded())) {
@@ -316,8 +308,8 @@ final class KMKeyboard extends WebView {
           }
 
           while(javascriptAfterLoad.size() > 0) {
-            JSQueueEntry entry = javascriptAfterLoad.remove(0);
-            allCalls.append(entry.call);
+            String entry = javascriptAfterLoad.remove(0);
+            allCalls.append(entry);
             allCalls.append(";");
           }
 
