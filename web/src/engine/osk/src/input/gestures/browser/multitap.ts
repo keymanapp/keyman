@@ -42,7 +42,7 @@ export default class Multitap implements GestureHandler {
     this.multitaps = [e.key.spec].concat(e.key.spec.multitap);
     this.sequence = source;
 
-    const startModipress = (tap) => {
+    const startModipress = (tap: GestureStageReport<KeyElement, string>) => {
       // In case of a previous modipress that somehow wasn't cleared.
       this.modipress?.clear();
 
@@ -76,6 +76,9 @@ export default class Multitap implements GestureHandler {
         case 'modipress-end':
         case 'multitap-end':
         case 'simple-tap':
+          return;
+        case 'modipress-multitap-lock-transition':
+          this.modipress?.setLocked();
           return;
         // Once a multitap starts, it's better to emit keys on keydown; that way,
         // if a user holds long, they get what they see if they decide to stop,

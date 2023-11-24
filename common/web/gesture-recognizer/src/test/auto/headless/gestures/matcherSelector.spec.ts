@@ -649,7 +649,9 @@ describe("MatcherSelector", function () {
         assert.isTrue(sources[0].path.isComplete);
 
         // Make sure the macroqueue has a chance to process; the second tap must first cancel the
-        // potential multitap, and moving past that involves waiting on the macroqueue.
+        // potential multitap, and moving past that includes 1 wait on the macroqueue... which may
+        // be scheduled after the first such wait below, hence the second.
+        await timedPromise(0);
         await timedPromise(0);
 
         await Promise.race([completion, selectionPromises[1]]);
@@ -657,6 +659,7 @@ describe("MatcherSelector", function () {
 
         // Ignoring the multi-tap leadup and starting a new gesture-stage sequence instead...
         const selection2 = await selectionPromises[1];
+        assert.isOk(selection2);
         assert.deepEqual(selection2.result, {matched: true, action: { type: 'chain', item: 'b', next: 'multitap' }});
         assert.deepEqual(selection2.matcher.model, SimpleTapModel);
         assert.isTrue(sources[0].path.isComplete);

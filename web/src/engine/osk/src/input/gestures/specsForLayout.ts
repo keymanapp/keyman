@@ -233,7 +233,8 @@ export function gestureSetForLayout(flags: LayoutGestureSupportFlags, params: Ge
     modipressEndModel(),
     modipressMultitapTransitionModel(),
     withKeySpecFiltering(modipressMultitapStartModel(params), 0),
-    modipressMultitapEndModel(params)
+    modipressMultitapEndModel(params),
+    modipressMultitapLockModel()
   ];
 
   const defaultSet = [
@@ -656,7 +657,8 @@ export function flickMidModel(params: GestureParams): GestureModel<any> {
       type: 'chain',
       item: 'none',
       next: 'flick-end'
-    }
+    },
+    sustainWhenNested: true
   }
 }
 
@@ -676,7 +678,8 @@ export function flickResetModel(params: GestureParams): GestureModel<any> {
     resolutionAction: {
       type: 'chain',
       next: 'flick-mid'
-    }
+    },
+    sustainWhenNested: true
   };
 }
 
@@ -718,7 +721,8 @@ export function flickEndModel(params: GestureParams): GestureModel<any> {
     resolutionAction: {
       type: 'complete',
       item: 'current'
-    }
+    },
+    sustainWhenNested: true
   }
 }
 
@@ -798,7 +802,7 @@ export function initialTapModel(params: GestureParams): GestureModel<any> {
           timer: {
             duration: params.multitap.holdLength,
             expectedResult: false
-          }
+          },
         },
         endOnResolve: true
       }, {
@@ -806,6 +810,7 @@ export function initialTapModel(params: GestureParams): GestureModel<any> {
         resetOnResolve: true
       }
     ],
+    sustainWhenNested: true,
     rejectionActions: {
       timer: {
         type: 'replace',
@@ -837,6 +842,7 @@ export function simpleTapModel(): GestureModel<any> {
         resetOnResolve: true
       }
     ],
+    sustainWhenNested: true,
     resolutionAction: {
       type: 'complete',
       item: 'current'
@@ -885,13 +891,6 @@ export function subkeySelectModel(): GestureModel<any> {
         },
         endOnResolve: true,
         endOnReject: true
-      }, {
-        // A second touch while selecting a subkey will trigger instant cancellation
-        // of subkey mode.  (With this setting in place, anyway.)
-        //
-        // Might not be ideal for actual production... but it does have benefits for
-        // unit testing the gesture-matching engine.
-        model: instantContactRejectionModel()
       }
     ],
     resolutionAction: {
@@ -945,6 +944,16 @@ export function modipressHoldModel(params: GestureParams): GestureModel<any> {
             inheritElapsed: true
           }
         }
+      }, {
+        // If a new touchpoint comes in while in this state, lock in the modipress
+        // and prevent multitapping on it, as a different key has been tapped before
+        // the multitap base key since the latter's release.
+        model: {
+          ...instantContactResolutionModel(),
+        },
+        // The incoming tap belongs to a different gesture; we just care to know that it
+        // happened.
+        resetOnResolve: true
       }
     ],
     // To be clear:  any time modipress-hold is triggered and the timer duration elapses,
@@ -1003,7 +1012,8 @@ export function modipressEndModel(): GestureModel<any> {
     resolutionAction: {
       type: 'complete',
       // Key was already emitted from the 'modipress-start' stage.
-      item: 'none'
+      item: 'none',
+      awaitNested: true
     }
   }
 }
@@ -1058,6 +1068,16 @@ export function modipressMultitapEndModel(params: GestureParams): GestureModel<a
             expectedResult: false
           }
         }
+      }, {
+        model: {
+          // If a new touchpoint comes in while in this state, lock in the modipress
+          // and prevent multitapping on it, as a different key has been tapped before
+          // the multitap base key since the latter's release.
+          ...instantContactRejectionModel()
+        },
+        // The incoming tap belongs to a different gesture; we just care to know that it
+        // happened.
+        resetOnResolve: true
       }
     ],
     resolutionAction: {
@@ -1070,9 +1090,37 @@ export function modipressMultitapEndModel(params: GestureParams): GestureModel<a
     rejectionActions: {
       timer: {
         type: 'replace',
-        replace: 'modipress-end'
+        replace: 'modipress-multitap-lock-transition'
+      },
+      path: {
+        type: 'replace',
+        replace: 'modipress-multitap-lock-transition'
       }
     }
   }
+}
+
+export function modipressMultitapLockModel(): GestureModel<any> {
+  return {
+    id: 'modipress-multitap-lock-transition',
+    resolutionPriority: 5,
+    contacts: [
+      // This exists as an intermediate state to transition from
+      // a modipress-multitap into a plain modipress without further
+      // multitap rota behavior.
+      {
+        model: {
+          ...instantContactResolutionModel(),
+          pathResolutionAction: 'resolve' // doesn't end the path; just lets it continue.
+        },
+      }
+    ],
+    resolutionAction: {
+      type: 'chain',
+      next: 'modipress-end',
+      selectionMode: 'modipress',
+      item: 'none'
+    }
+  };
 }
 // #endregion

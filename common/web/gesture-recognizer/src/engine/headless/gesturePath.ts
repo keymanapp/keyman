@@ -128,8 +128,9 @@ export class GesturePath<Type, StateToken = any> extends EventEmitter<EventMap<T
   terminate(cancel: boolean = false) {
     /* c8 ignore next 3 */
     if(this._isComplete) {
-      throw new Error("Invalid state:  this GesturePath has already terminated.");
+      return;
     }
+
     this._wasCancelled = cancel;
     this._isComplete = true;
 

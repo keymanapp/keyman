@@ -22,6 +22,16 @@ class ContextHost extends Mock {
     }
   }
 
+  restoreTo(original: OutputTarget): void {
+    const reversionTransform = original.buildTransformFrom(this);
+
+    super.restoreTo(original);
+
+    if(this.oninserttext) {
+      this.oninserttext(reversionTransform.deleteLeft, reversionTransform.insert, reversionTransform.deleteRight);
+    }
+  }
+
   // In app/webview, apps are expected to immediately update the selection range AFTER
   // changing the context's text.
   setText(text: string): void {
