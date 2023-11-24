@@ -6,7 +6,6 @@
   <repertoire chars="[ħ]" type="simple" name="minus-khmer" />
   <tests name="tiny-tests">
     <test name="tiny-test">
-      <startContext to=""/> <!-- empty start context -->
       <keystroke key="hmaqtugha"/>
       <keystroke key="that"/>
       <keystroke key="hmaqtugha"/>

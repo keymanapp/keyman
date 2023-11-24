@@ -110,16 +110,6 @@ begin
       Result := ShowNewProjectParameters(Owner);
     kptWordlistLexicalModel:
       Result := ShowNewModelProjectParameters(Owner);
-    kptBlankLexicalModel:
-      begin
-        modActionsMain.NewProject(ptLexicalModel);
-        Result := True;
-      end;
-    kptBlank:
-      begin
-        modActionsMain.NewProject(ptKeyboard);
-        Result := True;
-      end;
     kptImportWindowsKeyboard:
       Result := ShowImportWindowsKeyboard(Owner);
   end;
@@ -152,12 +142,8 @@ begin
     Result := kptUnknown
   else if lvItems.Selected.Caption = 'Basic' then
     Result := kptBasic
-  else if lvItems.Selected.Caption = 'Blank' then
-    Result := kptBlank
   else if lvItems.Selected.Caption = 'Import Windows Keyboard' then
     Result := kptImportWindowsKeyboard
-  else if lvItems.Selected.Caption = 'Blank Lexical Model' then
-    Result := kptBlankLexicalModel
   else if lvItems.Selected.Caption = 'Wordlist Lexical Model' then
     Result := kptWordlistLexicalModel
   else
@@ -190,13 +176,9 @@ begin
       'Creates a keyboard project that matches the folder structure used in '+
       'the Keyman keyboards repository and includes all basic files '+
       'needed for a keyboard project.';
-    kptBlank: lblDescription.Caption :=
-      'Creates a blank, untitled keyboard project.';
     kptImportWindowsKeyboard: lblDescription.Caption :=
       'Creates a new keyboard project, importing from a Windows system keyboard '+
       'and generating all the basic files needed for a keyboard project.';
-    kptBlankLexicalModel: lblDescription.Caption :=
-      'Creates a blank, untitled lexical model project.';
     kptWordlistLexicalModel: lblDescription.Caption :=
       'Creates a new lexical model project that matches the folder structure used in '+
       'the Keyman lexical-models repository and includes all basic files '+

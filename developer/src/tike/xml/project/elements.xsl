@@ -2,6 +2,23 @@
 
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:k="http://www.tavultesoft.com/xml/70">
 
+<!-- IsInSourcePath and IsCompilable props are injected by ProjectSaver.pas for render time only -->
+<xsl:variable name="ParentFiles" select="/KeymanDeveloperProject/Files/File[not(ParentFileID)]" />
+<xsl:variable name="SourcePathFiles" select="$ParentFiles[
+  IsInSourcePath='true' or
+  /KeymanDeveloperProject/Options/Version != '2.0'
+]" />
+<xsl:variable name="SourceKeyboardFiles" select="$SourcePathFiles[FileType='.kmn' or FileType='.xml-ldml-keyboard']" />
+<xsl:variable name="SourcePackageFiles" select="$SourcePathFiles[FileType='.kps']" />
+<xsl:variable name="SourceModelFiles" select="$SourcePathFiles[FileType='.ts' or FileType='.tsv']" />
+<xsl:variable name="SourceFiles" select="$SourcePathFiles[FileType='.kmn' or FileType='.xml-ldml-keyboard' or FileType='.kps' or FileType='.model.ts']" />
+<xsl:variable name="NonSourceFiles" select="$ParentFiles[
+    IsInSourcePath != 'true' or
+    (FileType != '.kmn' and FileType != '.kps' and FileType != '.xml-ldml-keyboard' and FileType != '.ts' and FileType != '.tsv') or
+    /KeymanDeveloperProject/Options/Version != '2.0'
+  ]" />
+
+
 <xsl:template name="head">
   <head>
     <script src="/app/lib/sentry/bundle.min.js"><xsl:text> </xsl:text></script>
@@ -252,6 +269,21 @@
         <xsl:attribute name="src">res/icon32_<xsl:value-of select="$type" />.<xsl:value-of select="$icontype" /></xsl:attribute>
       </img><br />.<xsl:value-of select="translate($type,'abcdefghijklmnopqrstuvwxyz','ABCDEFGHIJKLMNOPQRSTUVWXYZ')" />
     </a></td>
+  </xsl:template>
+
+  <!-- Upgrades -->
+
+  <xsl:template name="upgrade-warning">
+    <xsl:if test="KeymanDeveloperProject/Options/Version != '2.0' or not(KeymanDeveloperProject/Options/Version)">
+    <div class="upgrade-warning">
+      <p>⚠️ This project file is in an old format. You should upgrade it to the Keyman Developer 17.0 project format.
+        <xsl:call-template name="button">
+          <xsl:with-param name="caption">Upgrade project</xsl:with-param>
+          <xsl:with-param name="command">keyman:upgradeproject</xsl:with-param>
+        </xsl:call-template>
+      </p>
+    </div>
+  </xsl:if>
   </xsl:template>
 
 </xsl:stylesheet>

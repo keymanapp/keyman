@@ -9,8 +9,8 @@ That will very roughly correspond to <https://github.com/unicode-org/cldr/tree/k
 
 Each directory contains:
 
-- `ldmlKeyboard.dtd` - the DTD file
-- `ldmlKeyboard.xsd` - the XSD file, automatically converted from the DTD using
+- `ldmlKeyboard3.dtd` - the DTD file
+- `ldmlKeyboard3.xsd` - the XSD file, automatically converted from the DTD using
   Visual Studio, hand tweaked as necessary
 - `ldml-keyboard3.schema.json` - the JSON schema file, automatically converted
   from the XSD using xsd2json (https://github.com/Mermade/jgeXml), hand tweaked

@@ -73,9 +73,9 @@ candle-locale:
 #
 
 setup-inf:
-  echo [Setup] > setup.inf
-  echo Version=$VersionWin >> setup.inf
-  echo MSIFileName=keymandesktop.msi >> setup.inf
-  echo MSIOptions= >> setup.inf
-  echo License=license.html >> setup.inf
-  echo [Packages] >> setup.inf
+  echo [Setup]>setup.inf
+  echo Version=$VersionWin>>setup.inf
+  echo MSIFileName=keymandesktop.msi>>setup.inf
+  echo MSIOptions=>>setup.inf
+  echo License=license.html>>setup.inf
+  echo [Packages]>>setup.inf

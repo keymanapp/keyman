@@ -217,9 +217,7 @@ var
   i: Integer;
 begin
   inherited;
-  if FGlobalProject.Untitled
-    then FRootPath := FKeymanDeveloperOptions.DefaultProjectPath
-    else FRootPath := ExtractFilePath(FGlobalProject.FileName);
+  FRootPath := ExtractFilePath(FGlobalProject.FileName);
 
   lvItems.Selected := lvItems.Items[0];
   lvItems.ItemFocused := lvItems.Items[0];

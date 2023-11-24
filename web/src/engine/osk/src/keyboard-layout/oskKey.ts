@@ -183,6 +183,7 @@ export default abstract class OSKKey {
   /**
    * Calculate the font size required for a key cap, scaling to fit longer text
    * @param vkbd
+   * @param text
    * @param style     specification for the desired base font size
    * @param override  if true, don't use the font spec from the button, just use the passed in spec
    * @returns         font size as a style string
@@ -214,14 +215,15 @@ export default abstract class OSKKey {
     const MAX_X_PROPORTION = 0.90;
     const MAX_Y_PROPORTION = 0.90;
     const X_PADDING = 2;
-    const Y_PADDING = 2;
 
     var fontHeight: number, keyHeight: number;
     if(metrics.fontBoundingBoxAscent) {
       fontHeight = metrics.fontBoundingBoxAscent + metrics.fontBoundingBoxDescent;
     }
 
-    let textHeight = fontHeight ? fontHeight + Y_PADDING : 0;
+    // Don't add extra padding to height - multiplying with MAX_Y_PROPORTION already gives
+    // padding
+    let textHeight = fontHeight ?? 0;
     if(style.height && style.height.indexOf('px') != -1) {
       keyHeight = Number.parseFloat(style.height.substring(0, style.height.indexOf('px')));
     }
