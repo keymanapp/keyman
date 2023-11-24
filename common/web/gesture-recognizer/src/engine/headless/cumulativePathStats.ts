@@ -253,17 +253,6 @@ export class CumulativePathStats<Type = any> {
   }
 
   /**
-   * Gets the statistical mean, utilizing the internal 'mapped' coordinate space.
-   * This is the version compatible with cross-sums and squared-sums.
-   * @param dim
-   * @returns
-   */
-  protected mappedMean(dim: StatAxis) {
-    // super.mean() is basically this; we map it here, though.
-    return this.rawLinearSums[dim] / this.sampleCount;
-  }
-
-  /**
    * Gets the statistical mean value of the samples observed during the represented
    * interval on the specified axis.
    * @param dim
@@ -272,7 +261,7 @@ export class CumulativePathStats<Type = any> {
   public mean(dim: StatAxis) {
     // This external-facing version needs to provide values in 'external'-friendly
     // coordinate space.
-    return this.mappedMean(dim) + this.mappingConstant(dim);
+    return this.rawLinearSums[dim] / this.sampleCount + this.mappingConstant(dim);
   }
 
   /**
