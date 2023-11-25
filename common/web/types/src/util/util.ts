@@ -134,6 +134,14 @@ const Uni_FD_NONCHARACTER_END = 0xFDEF;
 const Uni_FFFE_NONCHARACTER = 0xFFFE;
 const Uni_PLANE_MASK = 0x1F0000;
 const Uni_MAX_CODEPOINT = 0x10FFFF;
+// plane 0, 15, and 16 PUA
+const Uni_PUA_00_START =   0xE000;
+const Uni_PUA_00_END   =   0xF8FF;
+const Uni_PUA_15_START = 0x0F0000;
+const Uni_PUA_15_END   = 0x0FFFFD;
+const Uni_PUA_16_START = 0x100000;
+const Uni_PUA_16_END   = 0x10FFFD;
+
 
 /**
  * @brief True if a lead surrogate
@@ -199,9 +207,9 @@ export function isValidUnicode(start: number, end?: number) {
 }
 
 export function isPUA(ch: number) {
-  return ((ch >= 0xE000 && ch <= 0xF8FF) ||
-    (ch >= 0xF0000 && ch <= 0xFFFFD) ||
-    (ch >= 0x100000 && ch <= 0x10FFFD));
+  return ((ch >= Uni_PUA_00_START && ch <= Uni_PUA_00_END) ||
+    (ch >= Uni_PUA_15_START && ch <= Uni_PUA_15_END) ||
+    (ch >= Uni_PUA_16_START && ch <= Uni_PUA_16_END));
 }
 
 class BadStringMap extends Map<BadStringType, Set<number>> {
