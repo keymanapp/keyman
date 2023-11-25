@@ -349,8 +349,6 @@ begin
     modActionsMain.actProjectNew.Execute
   else if Command = 'openproject' then
     modActionsMain.actProjectOpen.Execute
-  else if Command = 'openprojectfolder' then
-    modActionsMain.actProjectOpenFolder.Execute
   else if Command = 'editfile' then // MRU
   begin
     if SelectedMRUFileName <> '' then

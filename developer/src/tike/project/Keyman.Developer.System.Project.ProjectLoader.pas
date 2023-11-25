@@ -48,7 +48,6 @@ type
     FFileName: string;
     FProject: TProject;
     procedure LoadUser;
-    procedure LoadDefaultProjectFromFolder;
     procedure LoadProjectFromFile;   // I4698
   public
     constructor Create(AProject: TProject; AFileName: string);
@@ -80,20 +79,8 @@ end;
 
 procedure TProjectLoader.Execute;   // I4698
 begin
-  if FileExists(FFileName) or (FFileName = '')
-    then LoadProjectFromFile
-    else LoadDefaultProjectFromFolder;
+  LoadProjectFromFile;
 end;
-
-procedure TProjectLoader.LoadDefaultProjectFromFolder;
-begin
-  FProject.Options.Assign(DefaultProjectOptions[pv20]);
-  if not FProject.PopulateFiles then
-    // TODO: This seems somewhat arbitrary and troublesome. Better to load the
-    //       folder and give warnings about file layout
-    raise EProjectLoader.Create('Not a Keyman Developer project folder');
-end;
-
 
 procedure TProjectLoader.LoadProjectFromFile;
 var

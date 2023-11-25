@@ -845,9 +845,6 @@ begin
         then Result := LoadFromXML(FileName)
         else Result := ImportFromIni(FileName);
     end
-    else if DirectoryExists(ExtractFilePath(FileName)) then
-      // This will fall back to a 2.0 folder load
-      Result := LoadFromXML(FileName)
     else
     begin
       Result := False;
