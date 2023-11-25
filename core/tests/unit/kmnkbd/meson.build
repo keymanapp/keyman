@@ -17,6 +17,7 @@ endif
 local_defns = ['-DKM_CORE_LIBRARY_STATIC']
 tests = [
   ['action-api', 'action_api.cpp'],
+  ['action-set-api', 'action_set_api.cpp'],
   ['context-api', 'context_api.cpp'],
   ['keyboard-api', 'keyboard_api.cpp'],
   ['options-api', 'options_api.cpp'],

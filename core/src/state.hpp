@@ -152,8 +152,11 @@ public:
     void imx_deregister_callback();
 
     void imx_callback(uint32_t imx_id);
-};
 
+    bool set_actions(
+      km_core_actions const &actions
+    );
+  };
 } // namespace core
 } // namespace km
 
