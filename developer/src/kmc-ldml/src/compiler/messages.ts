@@ -147,15 +147,15 @@ export class CompilerMessages {
   static ERROR_DisplayNeedsToOrId = SevError | 0x0022;
 
   static Hint_PUACharacters = (o: { count: number, lowestCh: number }) =>
-  m(this.HINT_PUACharacters, `File contained ${o.count} PUA character(s), including ${util.describeCodepoint(o.lowestCh)}`);
+  m(this.HINT_PUACharacters, `File contains ${o.count} PUA character(s), including ${util.describeCodepoint(o.lowestCh)}`);
   static HINT_PUACharacters = SevHint | 0x0023;
 
   static Warn_UnassignedCharacters = (o: { count: number, lowestCh: number }) =>
-  m(this.WARN_UnassignedCharacters, `File contained ${o.count} unassigned character(s), including ${util.describeCodepoint(o.lowestCh)}`);
+  m(this.WARN_UnassignedCharacters, `File contains ${o.count} unassigned character(s), including ${util.describeCodepoint(o.lowestCh)}`);
   static WARN_UnassignedCharacters = SevWarn | 0x0024;
 
   static Error_IllegalCharacters = (o: { count: number, lowestCh: number }) =>
-  m(this.ERROR_IllegalCharacters, `File contained ${o.count} illegal character(s), including ${util.describeCodepoint(o.lowestCh)}`);
+  m(this.ERROR_IllegalCharacters, `File contains ${o.count} illegal character(s), including ${util.describeCodepoint(o.lowestCh)}`);
   static ERROR_IllegalCharacters = SevError | 0x0025;
 }
 

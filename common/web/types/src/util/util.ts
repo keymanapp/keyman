@@ -167,7 +167,7 @@ function Uni_IsNoncharacter(ch : number) {
 }
 
 function Uni_InCodespace(ch : number) {
-  return ((ch) <= Uni_MAX_CODEPOINT);
+  return (ch >= 0 && ch <= Uni_MAX_CODEPOINT);
 };
 
 function Uni_IsValid1(ch: number) {

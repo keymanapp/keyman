@@ -9,8 +9,11 @@ import { CompilerMessages } from '../src/compiler/messages.js';
 describe('compiler-tests', function() {
   this.slow(500); // 0.5 sec -- json schema validation takes a while
 
+  before(function() {
+    compilerTestCallbacks.clear();
+  });
+  
   it('should-build-fixtures', async function() {
-    compilerTestCallbacks.messages = [];
     // Let's build basic.xml
     // It should match basic.kmx (built from basic.txt)
 
@@ -34,42 +37,36 @@ describe('compiler-tests', function() {
   });
 
   it('should handle non existent files', () => {
-    compilerTestCallbacks.messages = [];
     const filename = 'DOES_NOT_EXIST.xml';
     const k = new LdmlKeyboardCompiler(compilerTestCallbacks, { ...compilerTestOptions, saveDebug: true, shouldAddCompilerVersion: false });
     const source = k.load(filename);
     assert.notOk(source, `Trying to load(${filename})`);
   });
   it('should handle unparseable files', () => {
-    compilerTestCallbacks.messages = [];
     const filename = makePathToFixture('basic-kvk.txt'); // not an .xml file
     const k = new LdmlKeyboardCompiler(compilerTestCallbacks, { ...compilerTestOptions, saveDebug: true, shouldAddCompilerVersion: false });
     const source = k.load(filename);
     assert.notOk(source, `Trying to load(${filename})`);
   });
   it('should handle not-valid files', () => {
-    compilerTestCallbacks.messages = [];
     const filename = makePathToFixture('test-fr.xml'); // not a keyboard .xml file
     const k = new LdmlKeyboardCompiler(compilerTestCallbacks, { ...compilerTestOptions, saveDebug: true, shouldAddCompilerVersion: false });
     const source = k.load(filename);
     assert.notOk(source, `Trying to load(${filename})`);
   });
   it('should handle non existent test files', () => {
-    compilerTestCallbacks.messages = [];
     const filename = 'DOES_NOT_EXIST.xml';
     const k = new LdmlKeyboardCompiler(compilerTestCallbacks, { ...compilerTestOptions, saveDebug: true, shouldAddCompilerVersion: false });
     const source = k.loadTestData(filename);
     assert.notOk(source, `Trying to loadTestData(${filename})`);
   });
   it('should handle unparseable test files', () => {
-    compilerTestCallbacks.messages = [];
     const filename = makePathToFixture('basic-kvk.txt'); // not an .xml file
     const k = new LdmlKeyboardCompiler(compilerTestCallbacks, { ...compilerTestOptions, saveDebug: true, shouldAddCompilerVersion: false });
     const source = k.load(filename);
     assert.notOk(source, `Trying to loadTestData(${filename})`);
   });
   it('should fail on illegal chars', async function() {
-    compilerTestCallbacks.messages = [];
     const inputFilename = makePathToFixture('sections/strs/invalid-illegal.xml');
     const kmx = await compileKeyboard(inputFilename, { ...compilerTestOptions, saveDebug: true, shouldAddCompilerVersion: false },
       [
@@ -84,7 +81,6 @@ describe('compiler-tests', function() {
     assert.isNull(kmx); // should fail post-validate
   });
   it('should hint on pua chars', async function() {
-    compilerTestCallbacks.messages = [];
     const inputFilename = makePathToFixture('sections/strs/hint-pua.xml');
     // Compile the keyboard
     const kmx = await compileKeyboard(inputFilename, { ...compilerTestOptions, saveDebug: true, shouldAddCompilerVersion: false },
@@ -101,7 +97,6 @@ describe('compiler-tests', function() {
   });
   it.skip('should warn on unassigned chars', async function() {
     // unassigned not implemented yet
-    compilerTestCallbacks.messages = [];
     const inputFilename = makePathToFixture('sections/strs/warn-unassigned.xml');
     const kmx = await compileKeyboard(inputFilename, { ...compilerTestOptions, saveDebug: true, shouldAddCompilerVersion: false },
       [
