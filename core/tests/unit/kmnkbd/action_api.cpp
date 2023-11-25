@@ -374,6 +374,7 @@ int main(int argc, char *argv []) {
   test_alert();
   test_emit_keystroke();
   test_invalidate_context();
+  test_persist_opt();
 
   // context -- todo move to another file
   test_context_set_if_needed();

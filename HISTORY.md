@@ -1,5 +1,23 @@
 # Keyman Version History
 
+## 17.0.217 alpha 2023-11-24
+
+* feat(developer): warn on usage of virtual keys in rule output (#10062)
+* fix(core): memory management of options in action struct (#10073)
+* chore(linux): Update debian changelog (#10047)
+* chore(core): Add test keyboard for text selection tests (#10026)
+
+## 17.0.216 alpha 2023-11-23
+
+* fix(common): kmx struct alignment (#9977)
+* fix(developer): vis kbd callbacks instead of throw (#9979)
+* fix(core): dx: ldml: startContext should be optional in ldml test data (#10021)
+* chore(windows): remove `wm_keymandebug` messages and functions (#10055)
+* chore(windows): remove legacy LoadKeyboard (#10057)
+* chore(windows): remove unused globals relating to old keyboard debugging (#10058)
+* chore(core): remove vkey output from kmx processor (#10060)
+* fix(web): app/webview did not clear deadkeys on context-reset (#10039)
+
 ## 17.0.215 alpha 2023-11-22
 
 * feat(core): ldml marker normalization (#9761)
