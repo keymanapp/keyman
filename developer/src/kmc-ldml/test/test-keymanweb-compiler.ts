@@ -22,7 +22,7 @@ describe('LdmlKeyboardKeymanWebCompiler', function() {
     assert.isNotNull(source, 'k.load should not have returned null');
 
     // Sanity check ... this is also checked in other tests
-    const valid = k.validate(source);
+    const valid = await k.validate(source);
     checkMessages();
     assert.isTrue(valid, 'k.validate should not have failed');
 
