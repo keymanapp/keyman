@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 17.0.218 alpha 2023-11-27
+
+* feat(developer): ldml: err/hint on illegal/pua chars (#10029)
+
 ## 17.0.217 alpha 2023-11-24
 
 * feat(developer): warn on usage of virtual keys in rule output (#10062)
