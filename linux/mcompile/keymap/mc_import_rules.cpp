@@ -203,15 +203,16 @@ public:
         (stShift.compare(stShiftCaps) != 0)));
   }
 
+// _S2 is character ()
   bool KMX_IsCapsEqualToShift() {
-    std::wstring stBase = this->KMX_GetShiftState(Base, false);
-    std::wstring stShift = this->KMX_GetShiftState(Shft, false);
-    std::wstring stCaps = this->KMX_GetShiftState(Base, true);
+    std::wstring stBase = this->KMX_GetShiftState(Base, false);     // 0,0  a 4 ß
+    std::wstring stShift = this->KMX_GetShiftState(Shft, false);    // 0,0  A $ ?
+    std::wstring stCaps = this->KMX_GetShiftState(Base, true);      // 0,0  A 4 ẞ
     return (
-        (stBase.size() > 0) &&
-        (stShift.size() > 0) &&
-        (stBase.compare(stShift) != 0) &&
-        (stShift.compare(stCaps) == 0));
+        (stBase.size() > 0) &&                                      // char inside
+        (stShift.size() > 0) &&                                     // char inside
+        (stBase.compare(stShift) != 0) &&                           // stBase != stShft
+        (stShift.compare(stCaps) == 0));                            // stShft == stCaps
   }
 
   bool KMX_IsAltGrCapsEqualToAltGrShift() {
@@ -252,6 +253,8 @@ public:
   }
 
   UINT KMX_GetShiftStateValue(int capslock, int caps, ShiftState ss) {
+     wprintf(L"GetShiftStateValue takes capslock: %i, caps: %i, ss: %i and returns: %i\n", capslock, caps, ss, KMX_ShiftStateMap[(int)ss] |
+      (capslock ? (caps ? CAPITALFLAG : NOTCAPITALFLAG) : 0));
     return 
       KMX_ShiftStateMap[(int)ss] |
       (capslock ? (caps ? CAPITALFLAG : NOTCAPITALFLAG) : 0);
@@ -261,25 +264,12 @@ public:
     int nkeys = 0;
 
     // Get the CAPSLOCK value
-
-bool   b1= this->KMX_IsCapsEqualToShift();
-bool   b2= this->KMX_IsSGCAPS();
-bool   b3= this->KMX_IsAltGrCapsEqualToAltGrShift();
-bool   b4= this->KMX_IsXxxxGrCapsEqualToXxxxShift();
-
-int i1 = this->KMX_IsCapsEqualToShift() ? 1 : 0;
-int i2 = this->KMX_IsSGCAPS() ? 2 : 0;
-int i3 = this->KMX_IsAltGrCapsEqualToAltGrShift() ? 4 : 0;
-int i4 = this->KMX_IsXxxxGrCapsEqualToXxxxShift() ? 8 : 0;
-
-
-
-
-    int capslock =
+    //_S2 not used
+    /*int capslock =
         (this->KMX_IsCapsEqualToShift() ? 1 : 0) |
         (this->KMX_IsSGCAPS() ? 2 : 0) |
         (this->KMX_IsAltGrCapsEqualToAltGrShift() ? 4 : 0) |
-        (this->KMX_IsXxxxGrCapsEqualToXxxxShift() ? 8 : 0);
+        (this->KMX_IsXxxxGrCapsEqualToXxxxShift() ? 8 : 0);*/
 
     for (int ss = 0; ss <= MaxShiftState; ss++) {
       if (ss == Menu || ss == ShftMenu) {
@@ -323,12 +313,59 @@ int i3 = this->KMX_IsAltGrCapsEqualToAltGrShift() ? 4 : 0;
 int i4 = this->KMX_IsXxxxGrCapsEqualToXxxxShift() ? 8 : 0;
 
 
+    // _S2 original:
+    /*int capslock =
+        (this->IsCapsEqualToShift() ? 1 : 0) |
+        (this->IsSGCAPS() ? 2 : 0) |
+        (this->IsAltGrCapsEqualToAltGrShift() ? 4 : 0) |
+        (this->IsXxxxGrCapsEqualToXxxxShift() ? 8 : 0);*/
 
-    int capslock =
+
+// _S2  change! only for testing helps to force filling rgkey[VK_DE]
+int capslock;
+
+    // numbers:
+    if( (this->m_vk>=48) && (this->m_vk<=57) ) {
+      capslock =
+        (this->KMX_IsCapsEqualToShift() ? 0 : 1) |
+        (this->KMX_IsSGCAPS() ? 2 : 0) |
+        (this->KMX_IsAltGrCapsEqualToAltGrShift() ? 4 : 0) |
+        (this->KMX_IsXxxxGrCapsEqualToXxxxShift() ? 8 : 0);
+    }
+    // characters:
+    else if( (this->m_vk>=65) && (this->m_vk<=90) ) {
+      capslock =
         (this->KMX_IsCapsEqualToShift() ? 1 : 0) |
         (this->KMX_IsSGCAPS() ? 2 : 0) |
         (this->KMX_IsAltGrCapsEqualToAltGrShift() ? 4 : 0) |
         (this->KMX_IsXxxxGrCapsEqualToXxxxShift() ? 8 : 0);
+    }
+    // ä,ö,ü:
+    else if( (this->m_vk==32) ||(this->m_vk==186) ||(this->m_vk==192)|| (this->m_vk==222) ) {
+      capslock =
+        (this->KMX_IsCapsEqualToShift() ? 1 : 0) |
+        (this->KMX_IsSGCAPS() ? 2 : 0) |
+        (this->KMX_IsAltGrCapsEqualToAltGrShift() ? 4 : 0) |
+        (this->KMX_IsXxxxGrCapsEqualToXxxxShift() ? 8 : 0);
+    }
+    // < and _:
+    else if( (this->m_vk==189) || (this->m_vk==220) || (this->m_vk==221) || (this->m_vk==226) ) {
+      capslock =
+        (this->KMX_IsCapsEqualToShift() ? 1 : 0) |
+        (this->KMX_IsSGCAPS() ? 2 : 0) |
+        (this->KMX_IsAltGrCapsEqualToAltGrShift() ? 4 : 0) |
+        (this->KMX_IsXxxxGrCapsEqualToXxxxShift() ? 8 : 0);
+    }
+    // punctuation Char:
+    else {
+      capslock =
+        (this->KMX_IsCapsEqualToShift() ? 0 : 1) |
+        (this->KMX_IsSGCAPS() ? 2 : 0) |
+        (this->KMX_IsAltGrCapsEqualToAltGrShift() ? 4 : 0) |
+        (this->KMX_IsXxxxGrCapsEqualToXxxxShift() ? 8 : 0);
+    }
+
+
 
     for (int ss = 0; ss <= MaxShiftState; ss++) {
       if (ss == Menu || ss == ShftMenu) {
@@ -375,7 +412,9 @@ int i4 = this->KMX_IsXxxxGrCapsEqualToXxxxShift() ? 8 : 0;
             //key->Key = KMX_VKUnderlyingLayoutToVKUS(All_Vector,this->VK());
             key->Key = KMX_VKUnderlyingLayoutToVKUS_GDK(keymap,this->VK());
         std::wstring w1_S2 = get_m_rgss(ss,caps);
-        wprintf(L"\n KMX_VKUnderlyingLayoutToVKUS_GD writes  %ls  %c",w1_S2.c_str(), key->Key );
+        //wprintf(L"\n KMX_VKUnderlyingLayoutToVKUS_GD writes  %ls  %c",w1_S2.c_str(), key->Key );
+
+            wprintf(L" this->VK(): %i ", this->VK());
             key->Line = 0;
             // _S2 _differences in sstateflag probably from here and KMX_IsCapsEqualToShift...
             key->ShiftFlags = this->KMX_GetShiftStateValue(capslock, caps, (ShiftState) ss);
@@ -752,7 +791,6 @@ bool KMX_ImportRules(KMX_WCHAR *kbid, LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, Gd
       if ( rgKey[iKey]->VK() == 221  ) rgKey[iKey]->set_sc(21);
       if ( rgKey[iKey]->VK() == 222  ) rgKey[iKey]->set_sc(48);
       if ( rgKey[iKey]->VK() == 226  ) rgKey[iKey]->set_sc(94);
-
       // _S2 only for testing can go later helps to force filling rgkey[VK_DE]---^----
 
       for(ShiftState ss = Base; ss <= loader.MaxShiftState(); ss = (ShiftState)((int)ss + 1)) {
@@ -776,34 +814,10 @@ bool KMX_ImportRules(KMX_WCHAR *kbid, LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, Gd
           //_S2 TODO get char  - do I need rc ?? ( was rc = ToUnicodeEx...)
           //std::wstring KeyVal_Other_OLD = get_VirtualKey_Other_from_iKey(VK_Other, ss, caps, All_Vector);
           std::wstring KeyVal_Other = get_KeyVals_according_to_keycode_and_Shiftstate( *keymap, SC_US, ss, caps);
-          std::wstring KeyVal_Other3 = get_KeyVals_according_to_keycode_and_Shiftstate( *keymap, SC_US, ss, caps);
 
 
          //std::wstring   KeyVal_OtherTEST6 = get_KeyVals_according_to_keycode_and_Shiftstate( *keymap, 51, MenuCtrl, 0);
          // std::wstring  KeyVal_OtherTEST16 = get_KeyVals_according_to_keycode_and_Shiftstate( *keymap, 51, MenuCtrl, 1);
-
-int testval= 38;
-          std::wstring KeyVal_OtherTEST;
-          std::wstring  KeyVal_OtherTEST0 = get_KeyVals_according_to_keycode_and_Shiftstate( *keymap, testval, Base, 0);
-          std::wstring  KeyVal_OtherTEST1= get_KeyVals_according_to_keycode_and_Shiftstate( *keymap, testval, Shft, 0);
-          std::wstring  KeyVal_OtherTEST2 = get_KeyVals_according_to_keycode_and_Shiftstate( *keymap, testval, Ctrl, 0);
-          std::wstring  KeyVal_OtherTEST3 = get_KeyVals_according_to_keycode_and_Shiftstate( *keymap, testval, ShftCtrl, 0);
-          std::wstring  KeyVal_OtherTEST4 = get_KeyVals_according_to_keycode_and_Shiftstate( *keymap, testval, Menu, 0);
-          std::wstring  KeyVal_OtherTEST5 = get_KeyVals_according_to_keycode_and_Shiftstate( *keymap, testval, ShftMenu, 0);
-          std::wstring  KeyVal_OtherTEST7 = get_KeyVals_according_to_keycode_and_Shiftstate( *keymap, testval, ShftMenuCtrl, 0);
-          std::wstring  KeyVal_OtherTEST8 = get_KeyVals_according_to_keycode_and_Shiftstate( *keymap, testval, Xxxx, 0);
-          std::wstring  KeyVal_OtherTEST9 = get_KeyVals_according_to_keycode_and_Shiftstate( *keymap, testval, ShftXxxx, 0);
-          std::wstring  KeyVal_OtherTEST10 = get_KeyVals_according_to_keycode_and_Shiftstate( *keymap, testval, Base, 1);
-          std::wstring  KeyVal_OtherTEST11 = get_KeyVals_according_to_keycode_and_Shiftstate( *keymap, testval, Shft, 1);
-          std::wstring  KeyVal_OtherTEST12 = get_KeyVals_according_to_keycode_and_Shiftstate( *keymap, testval, Ctrl, 1);
-          std::wstring  KeyVal_OtherTEST13 = get_KeyVals_according_to_keycode_and_Shiftstate( *keymap, testval, ShftCtrl, 1);
-          std::wstring  KeyVal_OtherTEST14 = get_KeyVals_according_to_keycode_and_Shiftstate( *keymap, testval, Menu, 1);
-          std::wstring  KeyVal_OtherTEST15 = get_KeyVals_according_to_keycode_and_Shiftstate( *keymap, testval, ShftMenu, 1);
-          std::wstring  KeyVal_OtherTEST17 = get_KeyVals_according_to_keycode_and_Shiftstate( *keymap, testval, ShftMenuCtrl, 1);
-          std::wstring  KeyVal_OtherTEST18 = get_KeyVals_according_to_keycode_and_Shiftstate( *keymap, testval, Xxxx, 1);
-          std::wstring  KeyVal_OtherTEST19 = get_KeyVals_according_to_keycode_and_Shiftstate( *keymap, testval, ShftXxxx, 1);
-          std::wstring  KeyVal_OtherTEST20 = get_KeyVals_according_to_keycode_and_Shiftstate( *keymap, testval, MenuCtrl, 0);
-          std::wstring  KeyVal_OtherTEST21 = get_KeyVals_according_to_keycode_and_Shiftstate( *keymap, testval, MenuCtrl, 1);
 
           // _S2 needs to be changed - it's temporary to get the same keys as keyman does when using USVirtualKeyToScanCode prevents chars like ሴ
         if (!IsKeymanUsedKeyVal(KeyVal_Other))
@@ -848,16 +862,15 @@ int testval= 38;
 
   for ( int i=0; i < (int) TestValues.size();i++) {
     std::wstring wws = rgKey[TestValues[i]]->get_m_rgss(0,0);
-    wprintf(L"Results for %i\t: %ls (%i)  \t%ls (%i)   \t%ls (%i)   \t%ls (%i)   \t%ls (%i)   \t%ls (%i)   \n",
-    TestValues[i],
-    rgKey[TestValues[i]]->get_m_rgss(0,0).c_str(), rgKey[TestValues[i]]->get_m_rgss(0,0)[0],
-    rgKey[TestValues[i]]->get_m_rgss(0,1).c_str(), rgKey[TestValues[i]]->get_m_rgss(0,1)[0],
-    rgKey[TestValues[i]]->get_m_rgss(1,0).c_str(), rgKey[TestValues[i]]->get_m_rgss(1,0)[0],
-    rgKey[TestValues[i]]->get_m_rgss(1,1).c_str(), rgKey[TestValues[i]]->get_m_rgss(1,1)[0],
-    rgKey[TestValues[i]]->get_m_rgss(6,0).c_str(), rgKey[TestValues[i]]->get_m_rgss(6,0)[0],
-    rgKey[TestValues[i]]->get_m_rgss(6,1).c_str(), rgKey[TestValues[i]]->get_m_rgss(6,1)[0],
-    rgKey[TestValues[i]]->get_m_rgss(7,0).c_str(), rgKey[TestValues[i]]->get_m_rgss(7,0)[0],
-    rgKey[TestValues[i]]->get_m_rgss(7,1).c_str(), rgKey[TestValues[i]]->get_m_rgss(7,1)[0]
+    wprintf(L"Results for %i\t: %ls (%i)  \t%ls (%i)   \t%ls (%i)   \t%ls (%i)   \t%ls (%i)   \t%ls (%i)   \n",    TestValues[i],
+      rgKey[TestValues[i]]->get_m_rgss(0,0).c_str(), rgKey[TestValues[i]]->get_m_rgss(0,0)[0],
+      rgKey[TestValues[i]]->get_m_rgss(0,1).c_str(), rgKey[TestValues[i]]->get_m_rgss(0,1)[0],
+      rgKey[TestValues[i]]->get_m_rgss(1,0).c_str(), rgKey[TestValues[i]]->get_m_rgss(1,0)[0],
+      rgKey[TestValues[i]]->get_m_rgss(1,1).c_str(), rgKey[TestValues[i]]->get_m_rgss(1,1)[0],
+      rgKey[TestValues[i]]->get_m_rgss(6,0).c_str(), rgKey[TestValues[i]]->get_m_rgss(6,0)[0],
+      rgKey[TestValues[i]]->get_m_rgss(6,1).c_str(), rgKey[TestValues[i]]->get_m_rgss(6,1)[0],
+      rgKey[TestValues[i]]->get_m_rgss(7,0).c_str(), rgKey[TestValues[i]]->get_m_rgss(7,0)[0],
+      rgKey[TestValues[i]]->get_m_rgss(7,1).c_str(), rgKey[TestValues[i]]->get_m_rgss(7,1)[0]
     );
   }
   wprintf(L"-----------------\n");
@@ -921,12 +934,12 @@ int testval= 38;
   //
   // Fill in the new rules
   //
-
+int STOP=0;  // _S2 LayoutRow: VKToUnderlying should work OK; GetSSValue not checked yet, but this is definitely different
   for (UINT iKey = 0; iKey < rgKey.size(); iKey++) {
     if ((rgKey[iKey] != NULL) && rgKey[iKey]->KMX_IsKeymanUsedKey() && (!rgKey[iKey]->KMX_IsEmpty())) {
       //wprintf(L"********************************* I use Key Nr %i\n",iKey);
       // for each item, 
-      wprintf(L" \n iKey = %i, nKeys %i + Delta:\t%i", iKey,nKeys, rgKey[iKey]->KMX_GetKeyCount(loader.MaxShiftState()));
+      //wprintf(L" \n iKey = %i, nKeys %i + Delta:\t%i", iKey,nKeys, rgKey[iKey]->KMX_GetKeyCount(loader.MaxShiftState()));
       if(rgKey[iKey]->KMX_LayoutRow(loader.MaxShiftState(), &gp->dpKeyArray[nKeys], &alDead, nDeadkey, bDeadkeyConversion, All_Vector,*keymap)) {   // I4552
         nKeys+=rgKey[iKey]->KMX_GetKeyCount(loader.MaxShiftState());
       }
@@ -942,6 +955,7 @@ int testval= 38;
   for(UINT i = 0; i < kp->cxGroupArray - 1; i++, gp2++) {
     if(gp2->fUsingKeys && gp2->dpNoMatch == NULL) {
       KMX_WCHAR *p = gp2->dpNoMatch = new KMX_WCHAR[4];
+      KMX_WCHAR *q = p;
       *p++ = UC_SENTINEL;
       *p++ = CODE_USE;
       *p++ = (KMX_WCHAR)(kp->cxGroupArray);
@@ -966,6 +980,7 @@ int testval= 38;
           kkp2->ShiftFlags = kkp->ShiftFlags;
           kkp2->Line = 0;
           KMX_WCHAR *p = kkp2->dpOutput = new KMX_WCHAR[4];
+          KMX_WCHAR *q=p;
           *p++ = UC_SENTINEL;
           *p++ = CODE_USE;
           *p++ = (KMX_WCHAR)(kp->cxGroupArray);
