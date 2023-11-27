@@ -335,7 +335,7 @@ export default class HardwareEventKeyboard extends HardKeyboard {
   _KeyUp: (e: KeyboardEvent) => boolean = (e) => {
     const target = eventOutputTarget(e);
     var Levent = preprocessKeyboardEvent(e, this.processor, this.hardDevice);
-    if(Levent == null) {
+    if(Levent == null || target == null) {
       return true;
     }
 
