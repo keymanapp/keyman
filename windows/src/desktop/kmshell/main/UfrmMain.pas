@@ -350,7 +350,6 @@ begin
 
   else if command = 'update_checknow' then Update_CheckNow
 
-
   else if command = 'contact_support' then Support_ContactSupport(params)   // I4390
 
   else if command = 'opensite' then OpenSite(params)

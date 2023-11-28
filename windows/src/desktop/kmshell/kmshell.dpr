@@ -200,7 +200,7 @@ begin
         Application.Initialize;
         Application.Title := 'Keyman Configuration';
         Application.CreateForm(TmodWebHttpServer, modWebHttpServer);
-  try
+        try
           Run;
         finally
           FreeAndNil(modWebHttpServer);
