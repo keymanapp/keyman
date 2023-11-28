@@ -148,6 +148,7 @@ type
     procedure OpenSite(params: TStringList);
     procedure DoApply;
     procedure DoRefresh;
+    procedure Update_CheckNow;
 
   protected
     procedure FireCommand(const command: WideString; params: TStringList); override;
@@ -202,6 +203,7 @@ uses
   UfrmTextEditor,
   uninstall,
   Upload_Settings,
+  UpdateXMLRenderer,
   utildir,
   utilexecute,
   utilkmshell,
@@ -301,6 +303,7 @@ begin
     FXMLRenderers.Add(TOptionsXMLRenderer.Create(FXMLRenderers));
     FXMLRenderers.Add(TLanguagesXMLRenderer.Create(FXMLRenderers));
     FXMLRenderers.Add(TSupportXMLRenderer.Create(FXMLRenderers));
+    FXMLRenderers.Add(TUpdateXMLRenderer.Create(FXMLRenderers));
 
     xml := FXMLRenderers.RenderToString(s);
     sharedData.Init(
@@ -344,6 +347,8 @@ begin
   else if command = 'support_online' then Support_Online
   else if command = 'support_updatecheck' then Support_UpdateCheck
   else if command = 'support_proxyconfig' then Support_ProxyConfig
+
+  else if command = 'update_checknow' then Update_CheckNow
 
   else if command = 'contact_support' then Support_ContactSupport(params)   // I4390
 
@@ -813,6 +818,17 @@ begin
   finally
     Free;
   end;
+end;
+
+procedure TfrmMain.Update_CheckNow;
+begin
+  with TOnlineUpdateCheck.Create(Self, True, True, True) do
+  try
+    Run;
+  finally
+    Free;
+  end;
+  DoRefresh;
 end;
 
 procedure TfrmMain.TntFormCloseQuery(Sender: TObject; var CanClose: Boolean);

@@ -1093,17 +1093,9 @@ th
   height: 16px;
 }
 
-#keepintouch_content {
+#update_content {
   height: 100%;
   overflow: hidden;
-}
-
-#keepintouch_frame {
-  box-sizing: border-box;
-  width:100%;
-  height:100%;
-  border:none;
-  user-select: none;
 }
 
 /* QRCodes */
