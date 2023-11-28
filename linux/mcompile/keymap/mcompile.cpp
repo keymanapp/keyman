@@ -39,6 +39,7 @@
 KMX_BOOL KMX_DoConvert(LPKMX_KEYBOARD kbd, PKMX_WCHAR kbid, KMX_BOOL bDeadkeyConversion, gint argc, gchar *argv[]);
 
 bool KMX_ImportRules(KMX_WCHAR *kbid, LPKMX_KEYBOARD kp,v_dw_3D &All_Vector, GdkKeymap **keymap,std::vector<KMX_DeadkeyMapping> *KMX_FDeadkeys, KMX_BOOL bDeadkeyConversion); // I4353   // I4327
+bool KMX_Lin_ImportRules_Lin(KMX_WCHAR *kbid, LPKMX_KEYBOARD kp,v_dw_3D &All_Vector, GdkKeymap **keymap,std::vector<KMX_DeadkeyMapping> *KMX_FDeadkeys, KMX_BOOL bDeadkeyConversion); // I4353   // I4327
 
 std::vector<KMX_DeadkeyMapping> KMX_FDeadkeys; // I4353
 
@@ -251,8 +252,19 @@ KMX_DWORD KMX_CharFromVK(v_dw_3D &All_Vector,KMX_DWORD vkUnderlying, KMX_UINT VK
 
 // takes SC of Other keyboard and returns character of Other keyboard with shiftstate VKShiftState[j]
 KMX_WCHAR  KMX_CharFromSC(GdkKeymap *keymap, KMX_UINT VKShiftState, UINT SC_OTHER, KMX_WCHAR* DeadKey) {
+
   int VKShiftState_lin = map_VKShiftState_to_Lin(VKShiftState);
   KMX_DWORD KeyvalOther = getKeyvalsFromKeyCode(keymap,SC_OTHER, VKShiftState_lin);
+
+  // _S2 which value??
+  // _S2 what to return for deadkeys ? 65106? dead-acute? or what else?
+  if (KeyvalOther > 65000) {
+    std::string ws((const char*) gdk_keyval_name (KeyvalOther));
+    std::u16string u16s = u16string_from_string(ws);
+    *DeadKey = *(KMX_WCHAR*) u16s.c_str();
+    return 0xFFFF;
+  }
+
   return (KMX_WCHAR) KeyvalOther;
 }
 
@@ -360,6 +372,7 @@ KMX_BOOL KMX_DoConvert(LPKMX_KEYBOARD kbd, PKMX_WCHAR kbid, KMX_BOOL bDeadkeyCon
 
   KMX_ReportUnconvertedKeyboardRules(kbd);
 
+  //if(!KMX_Lin_ImportRules_Lin(kbid, kbd, All_Vector, &keymap, &KMX_FDeadkeys, bDeadkeyConversion)) {   // I4353   // I4552
   if(!KMX_ImportRules(kbid, kbd, All_Vector, &keymap, &KMX_FDeadkeys, bDeadkeyConversion)) {   // I4353   // I4552
     return FALSE;
   }
