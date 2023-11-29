@@ -1,5 +1,12 @@
 # Keyman Version History
 
+## 17.0.219 alpha 2023-11-29
+
+* fix(developer): path separator for kmc-package (#10064)
+* fix(developer): projects 2.0 internal path enumeration (#10016)
+* fix(web): Fix attachment-api tests (#10085)
+* fix(web): Also move source map (#10089)
+
 ## 17.0.218 alpha 2023-11-27
 
 * feat(developer): ldml: err/hint on illegal/pua chars (#10029)
