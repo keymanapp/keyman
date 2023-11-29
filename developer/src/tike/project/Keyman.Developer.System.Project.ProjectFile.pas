@@ -134,8 +134,8 @@ const DefaultProjectOptions: array[TProjectVersion] of TProjectOptionsRecord = (
   ProjectType: ptKeyboard;
   Version: pv10
 ), ( // 2.0
-  BuildPath: '$PROJECTPATH/build';
-  SourcePath: '$PROJECTPATH/source';
+  BuildPath: '$PROJECTPATH\build';
+  SourcePath: '$PROJECTPATH\source';
   CompilerWarningsAsErrors: False;
   WarnDeprecatedCode: True;
   CheckFilenameConventions: False;
@@ -621,8 +621,8 @@ begin
     Exit(True);
 
   // Only return true if the file is directly in the ProjectOptions.SourcePath folder
-  SourcePath := ReplaceStr(IncludeTrailingPathDelimiter(FProject.ResolveProjectPath(FProject.Options.SourcePath)), '/', '\');
-  FilePath := ReplaceStr(ExtractFilePath(FFileName), '/', '\');
+  SourcePath := DosSlashes(FProject.ResolveProjectPath(FProject.Options.SourcePath));
+  FilePath := DosSlashes(ExtractFilePath(FFileName));
   Result := SameFileName(SourcePath, FilePath);
 end;
 
@@ -662,7 +662,7 @@ procedure TProjectFile.Save(node: IXMLNode);   // I4698
 begin
   node.AddChild('ID').NodeValue := FID;
   node.AddChild('Filename').NodeValue := ExtractFileName(FFileName);
-  node.AddChild('Filepath').NodeValue := ExtractRelativePath(FProject.FileName, FFileName);
+  node.AddChild('Filepath').NodeValue := ExtractRelativePath(FProject.FileName, DosSlashes(FFileName));
   node.AddChild('FileVersion').NodeValue := FFileVersion;   // I4701
 
   // Note: FileType is only ever written in Delphi code; it is used by xsl
@@ -978,18 +978,21 @@ end;
 ///
 function TProject.PopulateFiles: Boolean;
 var
-  ProjectPath: string;
+  SourcePath, ProjectPath: string;
 begin
   if FOptions.Version <> pv20 then
     raise EProjectLoader.Create('PopulateFiles can only be called on a v2.0 project');
 
   FFiles.Clear;
 
-  ProjectPath := ExtractFilePath(FileName);
+  ProjectPath := ExpandFileName(ExtractFilePath(FileName));
   if not DirectoryExists(ProjectPath) then
     Exit(False);
 
   PopulateFolder(ProjectPath);
+  SourcePath := ResolveProjectPath(FOptions.SourcePath);
+  if not SameFileName(ProjectPath, SourcePath) and DirectoryExists(SourcePath) then
+    PopulateFolder(SourcePath);
 
   Result := True;
 end;
@@ -999,19 +1002,13 @@ var
   ff: string;
   f: TSearchRec;
 begin
-  if FindFirst(path + '*', faDirectory, f) = 0 then
+  if FindFirst(path + '*', 0, f) = 0 then
   begin
     repeat
       ff := path + f.Name;
 
       if (f.Name = '.') or (f.Name = '..') then
       begin
-        Continue;
-      end;
-
-      if (f.Attr and faDirectory) = faDirectory then
-      begin
-        PopulateFolder(ff + '\');
         Continue;
       end;
 
@@ -1231,7 +1228,7 @@ end;
 
 function TProject.ResolveProjectPath(APath: string): string;
 begin
-  Result := ReplaceText(APath, '$PROJECTPATH', ExtractFileDir(ExpandFileName(FFileName)));
+  Result := IncludeTrailingPathDelimiter(ReplaceText(APath, '$PROJECTPATH', ExtractFileDir(ExpandFileName(FFileName))));
 end;
 
 function TProject.GetTargetFilename10(ATargetFile, ASourceFile, AVersion: string): string;   // I4688
@@ -1256,7 +1253,6 @@ begin
     Exit(ExtractFilePath(ExpandFileName(ASourceFile)) + ExtractFileName(ATargetFile));
   end;
 
-  Result := IncludeTrailingPathDelimiter(Result);
   Result := ResolveProjectPath(Result);
   Result := Result + ExtractFileName(ATargetFile);
 end;
