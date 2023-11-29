@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <!--
-@@keys: [K_BKQUOTE]
+@@keys: [K_BKQUOTE][K_1][K_ENTER]
 @@expected: \u0061
 -->
 
@@ -11,7 +11,7 @@
   <!-- only implied keys - the <keys/> element is omitted. -->
   <layers formId="us">
     <layer id="base">
-      <row keys="a" /> <!-- number row -->
+      <row keys="a gap" /> <!-- number row -->
     </layer>
   </layers>
 

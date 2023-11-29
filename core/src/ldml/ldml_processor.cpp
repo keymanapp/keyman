@@ -252,13 +252,15 @@ ldml_processor::process_backspace(km_core_state *state) const {
 void
 ldml_processor::process_key(km_core_state *state, km_core_virtual_key vk, uint16_t modifier_state) const {
   // Look up the key
-  const std::u16string key_str = keys.lookup(vk, modifier_state);
+  bool found = false;
+  const std::u16string key_str = keys.lookup(vk, modifier_state, found);
 
-  if (key_str.empty()) {
+  if (!found) {
     // no key was found, so pass the keystroke on to the Engine
     state->actions().push_invalidate_context();
     state->actions().push_emit_keystroke();
-  } else {
+  } else if (!key_str.empty()) {
+    // TODO-LDML: skip processing empty (gap) keys?
     process_key_string(state, key_str);
   }
 }
