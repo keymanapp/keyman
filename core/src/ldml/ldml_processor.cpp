@@ -172,45 +172,50 @@ bool ldml_processor::queue_action(
 
 km_core_status
 ldml_processor::process_event(
-  km_core_state *state,
-  km_core_virtual_key vk,
-  uint16_t modifier_state,
-  uint8_t is_key_down,
-  uint16_t /*event_flags*/ // TODO-LDML: unused... for now...
+    km_core_state *state,
+    km_core_virtual_key vk,
+    uint16_t modifier_state,
+    uint8_t is_key_down,
+    uint16_t /*event_flags*/  // TODO-LDML: unused... for now...
 ) {
   assert(state);
   if (!state)
     return KM_CORE_STATUS_INVALID_ARGUMENT;
 
-  if (!is_key_down) {
-    // TODO: Implement caps lock handling
-    state->actions().clear();
-    state->actions().commit();
-    return KM_CORE_STATUS_OK;
-  }
-
   try {
     // At the start of every process_event always clear the action_items
     state->actions().clear();
 
-    switch (vk) {
-    // Currently, only one VK gets spoecial treatment.
-    // Special handling for backspace VK
-    case KM_CORE_VKEY_BKSP:
-      process_backspace(state);
-      break;
-    default:
-    // all other VKs
-      process_key(state, vk, modifier_state);
-    } // end of switch
-    // end of normal processing: commit and exit
-    state->actions().commit();
+    if (!is_key_down) {
+      process_key_up(state, vk, modifier_state);
+    } else {
+      switch (vk) {
+      // Currently, only one VK gets spoecial treatment.
+      // Special handling for backspace VK
+      case KM_CORE_VKEY_BKSP:
+        process_backspace(state);
+        break;
+      default:
+        // all other VKs
+        process_key_down(state, vk, modifier_state);
+      } // end of switch
+    } // end of normal processing
+
+    // all key-up and key-down events end up here.
+    state->actions().commit();  // always commit
+    return KM_CORE_STATUS_OK;
   } catch (std::bad_alloc &) {
+    // out of memory, clean up and get out
     state->actions().clear();
     return KM_CORE_STATUS_NO_MEM;
   }
+}
 
-  return KM_CORE_STATUS_OK;
+void
+ldml_processor::process_key_up(km_core_state *state, km_core_virtual_key _kmn_unused(vk), uint16_t _kmn_unused(modifier_state))
+    const {
+  // TODO-LDML: Implement caps lock handling
+  state->actions().clear();  // TODO-LDML: Why is clear here?
 }
 
 void
@@ -250,17 +255,16 @@ ldml_processor::process_backspace(km_core_state *state) const {
 }
 
 void
-ldml_processor::process_key(km_core_state *state, km_core_virtual_key vk, uint16_t modifier_state) const {
+ldml_processor::process_key_down(km_core_state *state, km_core_virtual_key vk, uint16_t modifier_state) const {
   // Look up the key
   bool found = false;
   const std::u16string key_str = keys.lookup(vk, modifier_state, found);
 
   if (!found) {
     // no key was found, so pass the keystroke on to the Engine
-    state->actions().push_invalidate_context();
-    state->actions().push_emit_keystroke();
+    emit_invalidate_passthrough_keystroke(state);
   } else if (!key_str.empty()) {
-    // TODO-LDML: skip processing empty (gap) keys?
+    // TODO-LDML: Right now we take no action on empty (i.e. gap) keys. Should we take other action?
     process_key_string(state, key_str);
   }
 }
@@ -438,6 +442,11 @@ ldml_processor::emit_marker(km_core_state *state, KMX_DWORD marker_no) {
   assert(km::core::kmx::is_valid_marker(marker_no));
   state->actions().push_marker(marker_no);
   state->context().push_marker(marker_no);
+}
+
+void ldml_processor::emit_invalidate_passthrough_keystroke(km_core_state *state) {
+  state->actions().push_invalidate_context();
+  state->actions().push_emit_keystroke();
 }
 
 size_t
