@@ -78,10 +78,8 @@ static BOOL processPersistOpt(
 }
 
 static BOOL processInvalidateContext(
-  AITIP* app,
-  km_core_state* keyboardState
+  AITIP* app
 ) {
-  km_core_context_clear(km_core_state_context(keyboardState));
   app->ResetContext();
   return TRUE;
 }
@@ -158,7 +156,7 @@ BOOL ProcessActions(BOOL* emitKeyStroke)
       continueProcessingActions = TRUE;
       break;
     case KM_CORE_IT_INVALIDATE_CONTEXT:
-      continueProcessingActions = processInvalidateContext(_td->app, _td->lpActiveKeyboard->lpCoreKeyboardState);
+      continueProcessingActions = processInvalidateContext(_td->app);
       break;
     case KM_CORE_IT_CAPSLOCK:
       continueProcessingActions = processCapsLock(act, !_td->state.isDown, _td->TIPFUpdateable, FALSE);
@@ -202,7 +200,7 @@ ProcessActionsNonUpdatableParse(BOOL* emitKeyStroke) {
       continueProcessingActions = processCapsLock(act, !_td->state.isDown, _td->TIPFUpdateable, FALSE);
       break;
     case KM_CORE_IT_INVALIDATE_CONTEXT:
-      continueProcessingActions = processInvalidateContext(_td->app, _td->lpActiveKeyboard->lpCoreKeyboardState);
+      continueProcessingActions = processInvalidateContext(_td->app);
       break;
     }
     if (!continueProcessingActions) {
@@ -228,7 +226,7 @@ ProcessActionsExternalEvent() {
       continueProcessingActions = processCapsLock(act, !_td->state.isDown, FALSE, TRUE);
       break;
     case KM_CORE_IT_INVALIDATE_CONTEXT:
-      continueProcessingActions = processInvalidateContext(_td->app, _td->lpActiveKeyboard->lpCoreKeyboardState);
+      continueProcessingActions = processInvalidateContext(_td->app);
       break;
     }
     if (!continueProcessingActions) {
