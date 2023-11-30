@@ -1571,6 +1571,12 @@ std::string sr = "odiaeresis";
 gchar * chr=  (gchar*) sr.c_str(); ;
 guint gi= gdk_keyval_from_name (chr);
 //---------------------------------------
+//guint32 gdk_keyval_to_unicode (guint keyval);
+guint32  gg323 = gdk_keyval_to_unicode (65106);
+//---------------------------------------
+//guint gdk_unicode_to_keyval (guint32 wc);
+guint GGGIII= gdk_unicode_to_keyval (gg323);
+//---------------------------------------
 Keyval= Keyval_Shift;
   // finds ALL CHARACTERS ON KEY KCode for all levels and groups
   // key 51 gr=0 (DE); lev=0   keyval 35(#)
@@ -1690,12 +1696,48 @@ void Inspect_Key_S(GdkKeymap *keymap ) {
   // KeyValname(Shift)    A    Odiaresis   ampersand   numbersign
 
 //---------------------------------------
-gchar * gc= gdk_keyval_name (214);
-gchar * gc0= gdk_keyval_name (65);
+gchar * gc= gdk_keyval_name (729);
+gchar * gc0= gdk_keyval_name (94);
 //---------------------------------------
-std::string sr = "odiaeresis";
+std::string sr = "dead_acute";
 gchar * chr=  (gchar*) sr.c_str(); ;
 guint gi= gdk_keyval_from_name (chr);
+//---------------------------------------
+/*std::string sr4= "acute";
+gchar * chr4=  (gchar*) sr4.c_str(); ;
+guint gi4= gdk_keyval_from_name (chr4);
+//---------------------------------------
+std::string sr1= "dead_grave";
+gchar * chr1=  (gchar*) sr1.c_str(); ;
+guint gi1= gdk_keyval_from_name (chr1);
+//---------------------------------------
+std::string sr2 = "grave";
+gchar * chr2=  (gchar*) sr2.c_str(); ;
+guint gi2= gdk_keyval_from_name (chr2);
+//---------------------------------------
+std::string sr21 = "dead_abovedot";
+gchar * chr21=  (gchar*) sr21.c_str(); ;
+guint gi21= gdk_keyval_from_name (chr21);*/
+//---------------------------------------
+//---------------------------------------
+//guint32 gdk_keyval_to_unicode (guint keyval);
+/*guint32  gg323 = gdk_keyval_to_unicode (65106);
+guint32  gz = gdk_keyval_to_unicode (65);
+guint32  gz1 = gdk_keyval_to_unicode (220);
+guint32  gz2 = gdk_keyval_to_unicode (7838);
+//---------------------------------------
+//guint gdk_unicode_to_keyval (guint32 wc);
+guint GGGIII= gdk_unicode_to_keyval (gg323);
+guint GGGIII2= gdk_unicode_to_keyval (gz2);
+guint GGGIII3= gdk_unicode_to_keyval (gz);
+guint GGGIII4= gdk_unicode_to_keyval (gz1);
+//guint GGGIII2 =gdk_unicode_to_keyval (L"\u1E9E");
+//gchar * gc2= gdk_keyval_name ((int) \u1E9E);
+wchar_t w[] = L"\u1E9E";
+wchar_t ww[] = L"A";
+unsigned int Alef = (unsigned int) L'ẞ';
+guint GGII4= gdk_unicode_to_keyval (Alef);
+guint GGI4= gdk_unicode_to_keyval ((unsigned int) L'ẞ');*/
 //---------------------------------------
 Keyval= Keyval_Shift;
   // finds ALL CHARACTERS ON KEY KCode for all levels and groups
@@ -1729,7 +1771,7 @@ Keyval= Keyval_Shift;
 
 gint Key_on_DE;
 gint KeyVal_on_US;
-  Keyval = 214;
+  Keyval = 38;
   gdk_keymap_get_entries_for_keyval(keymap, Keyval,&keys,&n_keys);
     wprintf(L"----------------------------\nprinting out the characters given by keypress of Keyval :%i\n",Keyval);
       for (int i = 0; i < n_keys; i++) {
@@ -1738,7 +1780,7 @@ gint KeyVal_on_US;
         wprintf(L"    i=%d, Keyval=%d, (%c) keycode %i   group %i   level %i\n",
             i,  Keyval,Keyval, keys[i].keycode,keys[i].group,keys[i].level);
       }
-    for (int i = 0; i < n_keys; i++) {
+    for (int i = 1; i < n_keys; i++) {
       if (keys[i].group ==0)
          Key_on_DE = keys[i].keycode;
     }

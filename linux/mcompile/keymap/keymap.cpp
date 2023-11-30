@@ -78,44 +78,57 @@ bool  createCompleteRow_US(v_str_1D &complete_List, FILE* fp, const char* text, 
 KMX_DWORD convertNamesToASCIIValue(std::wstring tok_wstr){
   std::map<std::wstring, KMX_DWORD > first;
 
-  first[L"exclam"]           =  33;
-  first[L"at"]               =  64;
-  first[L"numbersign"]       =  35;
-  first[L"dollar"]           =  36;
-  first[L"percent"]          =  37;
-  first[L"dead_circumflex"]  =  94;
-  first[L"ampersand"]        =  38;
-  first[L"asterisk"]         =  42;
-  first[L"parenleft"]        =  40;
-  first[L"parenright"]       =  41;
 
-  first[L"minus"]            =  45;
-  first[L"underscore"]       =  95;
-  first[L"equal"]            =  61;
-  first[L"plus"]             =  43;
-  first[L"bracketleft"]      =  91;
-  first[L"braceleft"]        = 123;
-  first[L"bracketright"]     =  93;
-  first[L"braceright"]       = 125;
-  first[L"semicolon"]        =  59;
-  first[L"colon"]            =  58;
-  first[L"apostrophe"]       =  39;
-  first[L"quotedbl"]         =  34;
-  first[L"backslash"]        =  92;
-  first[L"bar"]              = 124;
-  first[L"comma"]            =  44;
-  first[L"less"]             =  60;
-  first[L"period"]           =  46;
-  first[L"greater"]          =  62;
-  first[L"slash"]            =  47;
-  first[L"question"]         =  63;
-  first[L"space"]            =  32;
-  first[L"asciitilde"]       = 126;
-  first[L"asciicircum"]      = 136;
+  first[L"ampersand"]         =  38;
+  first[L"apostrophe"]        =  39;
+  first[L"asciicircum"]       = 136;
+  first[L"asciitilde"]        = 126;
+  first[L"asterisk"]          =  42;
+  first[L"at"]                =  64;
+  first[L"backslash"]         =  92;
+  first[L"bar"]               = 124;
+  first[L"braceleft"]         = 123;
+  first[L"braceright"]        = 125;
+  first[L"bracketleft"]       =  91;
+  first[L"bracketright"]      =  93;
+  first[L"colon"]             =  58;
+  first[L"comma"]             =  44;
+  first[L"dollar"]            =  36;
+  first[L"equal"]             =  61;
+  first[L"exclam"]            =  33;
+  first[L"grave"]             =  96;
+  first[L"greater"]           =  62;
+  first[L"less"]              =  60;
+  first[L"minus"]             =  45;
+  first[L"numbersign"]        =  35;
+  first[L"parenleft"]         =  40;
+  first[L"parenright"]        =  41;
+  first[L"percent"]           =  37;
+  first[L"period"]            =  46;
+  first[L"plus"]              =  43;
+  first[L"question"]          =  63;
+  first[L"quotedbl"]          =  34;
+  first[L"semicolon"]         =  59;
+  first[L"slash"]             =  47;
+  first[L"space"]             =  32;
+  first[L"ssharp"]            = 223;
+  first[L"underscore"]        =  95;
 
-  first[L"dead_acute"]     =   180;
-  first[L"grave"]          =    96;
-  first[L"ssharp"]         =   223;
+  // _S2 those deadkeys + space:
+  first[L"dead_abovedot"]     = 729;
+  first[L"dead_abovering"]    = 730;
+  first[L"dead_acute"]        = 180;   //39 180 ??
+  first[L"dead_breve"]        = 728;
+  first[L"dead_caron"]        = 711;
+  first[L"dead_cedilla"]      = 184;
+  first[L"dead_circumflex"]   =  94;
+  first[L"dead_diaeresis"]    = 168;
+  first[L"dead_doubleacute"]  = 733;
+  first[L"dead_grave"]        =  96;
+  first[L"dead_ogonek"]       = 731;
+  first[L"dead_perispomeni"]  = 126;
+  first[L"dead_tilde"]        = 126;
+
   //first[L" ??   "]           =   VK_OEM_102;    /* DE =  226 ' " ? VK_OEM_102 */
 
   if ( tok_wstr.size() == 1) {

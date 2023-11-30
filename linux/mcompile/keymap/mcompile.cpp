@@ -256,12 +256,10 @@ KMX_WCHAR  KMX_CharFromSC(GdkKeymap *keymap, KMX_UINT VKShiftState, UINT SC_OTHE
   int VKShiftState_lin = map_VKShiftState_to_Lin(VKShiftState);
   KMX_DWORD KeyvalOther = getKeyvalsFromKeyCode(keymap,SC_OTHER, VKShiftState_lin);
 
-  // _S2 which value??
-  // _S2 what to return for deadkeys ? 65106? dead-acute? or what else?
-  if (KeyvalOther > 65000) {
+  // _S2  how to detect deadkeys ?     KeyvalOther > 255?  KeyvalOther > 65100 ?  or what else?
+  if (KeyvalOther > 255) {
     std::string ws((const char*) gdk_keyval_name (KeyvalOther));
-    std::u16string u16s = u16string_from_string(ws);
-    *DeadKey = *(KMX_WCHAR*) u16s.c_str();
+    *DeadKey = convertNamesToASCIIValue( wstring_from_string(ws));
     return 0xFFFF;
   }
 
@@ -352,7 +350,6 @@ KMX_BOOL KMX_DoConvert(LPKMX_KEYBOARD kbd, PKMX_WCHAR kbid, KMX_BOOL bDeadkeyCon
       //wprintf(L"  DoConvert-read i:  %i \t(KMX_VKMap): %i (%c)  \t--->  vkUnderlying: %i (%c)    \tshiftstate[%i]: ( %i )   \t---- >  ch: %i (%c)  \t%ls  \t%ls\n" , i,(int) KMX_VKMap[i],(int)KMX_VKMap[i],  vkUnderlying,vkUnderlying, j, VKShiftState[j] ,  ch ,ch ,  ((int) vkUnderlying != (int) KMX_VKMap[i] ) ? L" *** ": L"", ERROR);
       //LogError("--- VK_%d -> VK_%d [%c] dk=%d", VKMap[i], vkUnderlying, ch == 0 ? 32 : ch, DeadKey);
 
-      // _S2 ToDo
       if(bDeadkeyConversion) {   // I4552
         if(ch == 0xFFFF) {
           ch = DeadKey;
