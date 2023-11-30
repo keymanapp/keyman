@@ -636,7 +636,7 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
           trackingEntry.previewHost = null;
 
           gestureSequence.on('complete', () => {
-            existingPreviewHost.cancel();
+            existingPreviewHost?.cancel();
             this.gesturePreviewHost = null;
           })
 
