@@ -55,25 +55,26 @@ describe('InfrastructureMessages', function () {
       `ERROR_FileTypeNotRecognized not generated, instead got: `+JSON.stringify(ncb.messages,null,2));
   });
 
-// ERROR_OutFileNotValidForProjects
+  // ERROR_OutFileNotValidForProjects
 
-it('should generate ERROR_OutFileNotValidForProjects if an output file is specified for a project build', async function() {
-  const ncb = new NodeCompilerCallbacks({logLevel: 'silent'});
-  const projectPath = makePathToFixture('kpj-2.0/khmer_angkor', 'khmer_angkor.kpj');
-  const outFilePath = makePathToFixture('kpj-2.0/khmer_angkor', 'khmer_angkor.kmx');
-  const options: CompilerOptions = {...defaultCompilerOptions};
-  await unitTestEndpoints.build(projectPath, outFilePath, ncb, options);
-  assert.isTrue(ncb.hasMessage(InfrastructureMessages.ERROR_OutFileNotValidForProjects),
-    `ERROR_OutFileNotValidForProjects not generated, instead got: `+JSON.stringify(ncb.messages,null,2));
-});
+  it('should generate ERROR_OutFileNotValidForProjects if an output file is specified for a project build', async function() {
+    const ncb = new NodeCompilerCallbacks({logLevel: 'silent'});
+    const projectPath = makePathToFixture('kpj-2.0/khmer_angkor', 'khmer_angkor.kpj');
+    const outFilePath = makePathToFixture('kpj-2.0/khmer_angkor', 'khmer_angkor.kmx');
+    const options: CompilerOptions = {...defaultCompilerOptions};
+    await unitTestEndpoints.build(projectPath, outFilePath, ncb, options);
+    assert.isTrue(ncb.hasMessage(InfrastructureMessages.ERROR_OutFileNotValidForProjects),
+      `ERROR_OutFileNotValidForProjects not generated, instead got: `+JSON.stringify(ncb.messages,null,2));
+  });
 
-/*
   // ERROR_InvalidProjectFile
 
   it('should generate ERROR_InvalidProjectFile if a project file is invalid', async function() {
-    await testForMessage(this, ['invalid-keyboards', 'error_invalid_project_file.kpj'], CompilerMessages.ERROR_InvalidProjectFile);
+    const ncb = new NodeCompilerCallbacks({logLevel: 'silent'});
+    await unitTestEndpoints.build(makePathToFixture('invalid-project', 'error_invalid_project_file.kpj'), '', ncb, {});
+    assert.isTrue(ncb.hasMessage(InfrastructureMessages.ERROR_InvalidProjectFile),
+      `ERROR_InvalidProjectFile not generated, instead got: `+JSON.stringify(ncb.messages,null,2));
   });
-  */
 
   // ERROR_InvalidProjectFolder (invalid source folder)
 
