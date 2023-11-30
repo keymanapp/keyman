@@ -911,27 +911,11 @@ bool KMX_ImportRules(KMX_WCHAR *kbid, LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, Gd
           continue;
         }
 
-
        KMX_DWORD SC_US = get_KeyCode_fromVKUS(iKey);
-
-//wprintf(L" for vk of %i we get Keycode US of %i  VK_Other %i: ( on Key US (%i) we find char %i (%c) ) \n",
-// VK_Other, 8+USVirtualKeyToScanCode[VK_Other], 8+USVirtualKeyToScanCode[VK_Other] ,
-//8+USVirtualKeyToScanCode[VK_Other],get_VirtualKey_Other_GDK(*keymap, 8+USVirtualKeyToScanCode[VK_Other]),get_VirtualKey_Other_GDK(*keymap, 8+USVirtualKeyToScanCode[VK_Other]) );
-
 
         for(int caps = 0; caps <= 1; caps++) {
           //_S2 TODO get char  - do I need rc ?? ( was rc = ToUnicodeEx...)
-          //std::wstring KeyVal_Other_OLD = get_VirtualKey_Other_from_iKey(VK_Other, ss, caps, All_Vector);
-          std::wstring KeyVal_Other = get_KeyVals_according_to_keycode_and_Shiftstate( *keymap, SC_US, ss, caps);
-
-
-         //std::wstring   KeyVal_OtherTEST6 = get_KeyVals_according_to_keycode_and_Shiftstate( *keymap, 51, MenuCtrl, 0);
-         // std::wstring  KeyVal_OtherTEST16 = get_KeyVals_according_to_keycode_and_Shiftstate( *keymap, 51, MenuCtrl, 1);
-
-          // _S2 needs to be changed - it's temporary to get the same keys as keyman does when using USVirtualKeyToScanCode prevents chars like ሴ
-        if (!IsKeymanUsedKeyVal(KeyVal_Other))
-          KeyVal_Other = L"@";
-          // KeyVal_Other = L"\0";  _S2 what to return if not found
+          std::wstring KeyVal_Other = get_KeyVals_according_to_keycode_and_Shiftstate_new( *keymap, SC_US, ss, caps);
 
           //_S2 TODO do I need that ??
           //if rc >0: it got 1 or more char AND buffer is empty ( nothing inside ) {
@@ -984,9 +968,6 @@ bool KMX_ImportRules(KMX_WCHAR *kbid, LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, Gd
     );
   }
   wprintf(L"-----------------\n");
-
-
-
 
   //-------------------------------------------------------------
   // Now that we've collected the key data, we need to

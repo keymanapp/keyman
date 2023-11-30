@@ -256,7 +256,8 @@ KMX_WCHAR  KMX_CharFromSC(GdkKeymap *keymap, KMX_UINT VKShiftState, UINT SC_OTHE
   int VKShiftState_lin = map_VKShiftState_to_Lin(VKShiftState);
   KMX_DWORD KeyvalOther = getKeyvalsFromKeyCode(keymap,SC_OTHER, VKShiftState_lin);
 
-  // _S2  how to detect deadkeys ?     KeyvalOther > 255?  KeyvalOther > 65100 ?  or what else?
+  // _S2  how to detect deadkeys ?  KeyvalOther >deadkeyThreshold   KeyvalOther > 255?  KeyvalOther > 65000 ?  or what else?
+  //if (KeyvalOther > deadkeyThreshold) {
   if (KeyvalOther > 255) {
     std::string ws((const char*) gdk_keyval_name (KeyvalOther));
     *DeadKey = convertNamesToASCIIValue( wstring_from_string(ws));

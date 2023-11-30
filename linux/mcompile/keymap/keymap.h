@@ -474,6 +474,9 @@ const KMX_DWORD KMX_VKMap[] = {
 //static KMX_DWORD returnIfCharInvalid = 32;
 static KMX_DWORD returnIfCharInvalid = 0;
 
+//_S2 QUESTION Which threshold ( from what int value onwards is a character considered deadkey? 65000 28000?, > 255? ??
+static KMX_DWORD deadkeyThreshold = 65000;
+
 // takes a std::wstring (=contents of line symbols-file ) and returns the (int) value of the character
 KMX_DWORD convertNamesToASCIIValue(std::wstring tok_wstr);
 
@@ -517,8 +520,9 @@ int append_other_ToVector(v_dw_3D &All_Vector, GdkKeymap *keymap);
 KMX_DWORD getKeyvalsFromKeyCode(GdkKeymap *keymap, guint keycode, int shift_state_pos);
 
 // returns KeySyms fo ra given key (for unshifted: finds the Keysym according to Shiftstate e.g. a;A or 1;! )
-std::wstring get_KeyVals_according_to_keycode_and_Shiftstate(GdkKeymap *keymap, guint VK, ShiftState ss, int caps);
+std::wstring get_KeyVals_according_to_keycode_and_Shiftstate_new(GdkKeymap *keymap, guint VK, ShiftState ss, int caps);
 
+bool IsKeymanUsedKeyVal(std::wstring Keyval);
 
 // _S2 needed?
 // can go later
