@@ -429,6 +429,7 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
 
       const endHighlighting = () => {
         // The base call will occur before our "is this a multitap?" check otherwise.
+        // That check will unset the field so that it's unaffected by this check.
         timedPromise(0).then(() => {
           const previewHost = trackingEntry.previewHost;
 

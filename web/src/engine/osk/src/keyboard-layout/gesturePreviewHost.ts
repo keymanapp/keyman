@@ -14,6 +14,7 @@ const FLICK_OVERFLOW_OFFSET = 1.4142;
 
 interface EventMap {
   preferredOrientation: (orientation: PhoneKeyTipOrientation) => void;
+  startFade: () => void;
 }
 
 export class GesturePreviewHost extends EventEmitter<EventMap> {
@@ -140,6 +141,8 @@ export class GesturePreviewHost extends EventEmitter<EventMap> {
   public setMultitapHint(current: string, next: string) {
     this.label.textContent = current;
     this.hintLabel.textContent = next;
+
+    this.emit('startFade');
 
     this.clearFlick();
   }

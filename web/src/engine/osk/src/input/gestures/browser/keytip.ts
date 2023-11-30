@@ -214,6 +214,12 @@ export default class KeyTip implements KeyTipInterface {
         this.preview = this.previewHost.element;
         this.tip.replaceChild(this.preview, oldHost);
         previewHost.setCancellationHandler(() => this.show(null, false, null));
+        previewHost.on('startFade', () => {
+          this.element.classList.remove('kmw-preview-fade');
+          // Note:  a reflow is needed to reset the transition animation.
+          this.element.offsetWidth;
+          this.element.classList.add('kmw-preview-fade');
+        });
       }
     } else { // Hide the key preview
       this.element.style.display = 'none';
@@ -222,6 +228,7 @@ export default class KeyTip implements KeyTipInterface {
       const oldPreview = this.preview;
       this.preview = document.createElement('div');
       this.tip.replaceChild(this.preview, oldPreview);
+      this.element.classList.remove('kmw-preview-fade');
 
       this.orientation = DEFAULT_TIP_ORIENTATION;
     }
