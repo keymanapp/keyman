@@ -1,6 +1,7 @@
 // Page-global variable definitions.
 {
 var inputCounter = 0;
+var kmw = keyman;
 }
 
 function generateDiagnosticDiv(elem) {
