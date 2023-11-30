@@ -695,7 +695,8 @@ export function flickResetEndModel(): GestureModel<any> {
     resolutionAction: {
       type: 'complete',
       item: 'base'
-    }
+    },
+    sustainWhenNested: true
   };
 };
 

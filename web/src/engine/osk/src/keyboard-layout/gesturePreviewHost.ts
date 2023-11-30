@@ -1,6 +1,9 @@
 import { ActiveKey } from "@keymanapp/keyboard-processor";
+import EventEmitter from "eventemitter3";
+
 import { KeyElement } from "../keyElement.js";
 import { FlickNameCoordMap, OrderedFlickDirections } from "../input/gestures/browser/flick.js";
+import { PhoneKeyTipOrientation } from "../input/gestures/browser/keytip.js";
 
 /**With edge lengths of 1, to keep flick-text invisible at the start, the
  * hypotenuse for an inter-cardinal path is sqrt(2).  To keep a perfect circle
@@ -9,14 +12,19 @@ import { FlickNameCoordMap, OrderedFlickDirections } from "../input/gestures/bro
  */
 const FLICK_OVERFLOW_OFFSET = 1.4142;
 
-export class GesturePreviewHost {
+interface EventMap {
+  preferredOrientation: (orientation: PhoneKeyTipOrientation) => void;
+}
+
+export class GesturePreviewHost extends EventEmitter<EventMap> {
   private readonly div: HTMLDivElement;
   private readonly label: HTMLSpanElement;
   private readonly previewImgContainer: HTMLDivElement;
 
   private flickPreviews = new Map<string, HTMLDivElement>;
-  private hintLabel: HTMLDivElement = null;
   private flickEdgeLength: number;
+
+  private orientation: PhoneKeyTipOrientation = 'top';
 
   private onCancel: () => void;
 
@@ -25,6 +33,8 @@ export class GesturePreviewHost {
   }
 
   constructor(key: KeyElement, isPhone: boolean, width: number, height: number) {
+    super();
+
     const keySpec = key.key.spec;
     const edgeLength = this.flickEdgeLength = Math.max(width, height);
 
@@ -114,6 +124,12 @@ export class GesturePreviewHost {
 
     scrollStyle.marginLeft = `${edge * x}px`;
     scrollStyle.marginTop =  `${edge * y}px`;
+
+    const preferredOrientation = y < 0 ? 'bottom' : 'top';
+    if(this.orientation != preferredOrientation) {
+      this.orientation = preferredOrientation;
+      this.emit('preferredOrientation', preferredOrientation);
+    }
   }
 
   // These may not exist like this longterm.
@@ -124,12 +140,7 @@ export class GesturePreviewHost {
     this.previewImgContainer.classList.add('flick-clear');
   }
 
-  private clearHint() {
-    this.hintLabel?.classList.add('hint-clear');
-  }
-
   public clearAll() {
     this.clearFlick();
-    this.clearHint();
   }
 }
