@@ -113,13 +113,12 @@ export default class KeyTip implements KeyTipInterface {
 
       kts.top = 'auto';
 
+      const unselectedOrientation = orientation == 'top' ? 'bottom' : 'top';
+      this.tip.classList.remove(`${CSS_PREFIX}${unselectedOrientation}`);
+      this.tip.classList.add(`${CSS_PREFIX}${orientation}`);
+
       if(orientation == 'bottom') {
         y += canvasHeight - xHeight;
-        this.tip.style.bottom = '0px';
-        this.tip.style.top = 'unset';
-      } else {
-        this.tip.style.bottom = '';
-        this.tip.style.top = ''; // set by CSS
       }
 
       kts.bottom = Math.floor(_BoxRect.height - y) + 'px';
@@ -171,12 +170,13 @@ export default class KeyTip implements KeyTipInterface {
       this.tip.style.height = halfHeight + 'px';
 
       const capOffset = 3;
+      const capStart = (halfHeight - capOffset) + 'px';
       if(orientation == 'top') {
-        this.cap.style.top = (halfHeight - capOffset) + 'px';
+        this.cap.style.top = capStart;
         this.cap.style.bottom = '';
       } else {
         this.cap.style.top = '';
-        this.cap.style.bottom = (halfHeight - capOffset) + 'px';
+        this.cap.style.bottom = capStart;
       }
       const defaultCapHeight = (distFromTop - Math.floor(y) + canvasHeight - (orientation == 'top' ? halfHeight : -capOffset * 2));
       this.cap.style.height = defaultCapHeight + 'px';
