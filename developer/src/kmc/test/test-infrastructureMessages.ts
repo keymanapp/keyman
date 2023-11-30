@@ -61,6 +61,8 @@ describe('InfrastructureMessages', function () {
       `ERROR_OutFileNotValidForProjects not generated, instead got: `+JSON.stringify(ncb.messages,null,2));
   });
 
+  // ERROR_InvalidProjectFile
+
   it('should generate ERROR_InvalidProjectFile if a project file is invalid', async function() {
     const ncb = new NodeCompilerCallbacks({logLevel: 'silent'});
     await unitTestEndpoints.build(makePathToFixture('invalid-project', 'error_invalid_project_file.kpj'), ncb, {});
