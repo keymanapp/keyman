@@ -252,7 +252,7 @@ public:
     return (this->m_vk >= 0x20 && this->m_vk <= 0x5F) || (this->m_vk >= 0x88);
   }
 
-  UINT KMX_GetShiftStateValue(int capslock, int caps, ShiftState ss) {
+UINT KMX_GetShiftStateValue(int capslock, int caps, ShiftState ss) {
      wprintf(L"GetShiftStateValue takes capslock: %i, caps: %i, ss: %i and returns: %i\n", capslock, caps, ss, KMX_ShiftStateMap[(int)ss] |
       (capslock ? (caps ? CAPITALFLAG : NOTCAPITALFLAG) : 0));
     return 
@@ -314,56 +314,12 @@ int i4 = this->KMX_IsXxxxGrCapsEqualToXxxxShift() ? 8 : 0;
 
 
     // _S2 original:
-    /*int capslock =
-        (this->IsCapsEqualToShift() ? 1 : 0) |
-        (this->IsSGCAPS() ? 2 : 0) |
-        (this->IsAltGrCapsEqualToAltGrShift() ? 4 : 0) |
-        (this->IsXxxxGrCapsEqualToXxxxShift() ? 8 : 0);*/
-
-
-// _S2  change! only for testing helps to force filling rgkey[VK_DE]
-int capslock;
-
-    // numbers:
-    if( (this->m_vk>=48) && (this->m_vk<=57) ) {
-      capslock =
-        (this->KMX_IsCapsEqualToShift() ? 0 : 1) |
-        (this->KMX_IsSGCAPS() ? 2 : 0) |
-        (this->KMX_IsAltGrCapsEqualToAltGrShift() ? 4 : 0) |
-        (this->KMX_IsXxxxGrCapsEqualToXxxxShift() ? 8 : 0);
-    }
-    // characters:
-    else if( (this->m_vk>=65) && (this->m_vk<=90) ) {
-      capslock =
+    int capslock =
         (this->KMX_IsCapsEqualToShift() ? 1 : 0) |
         (this->KMX_IsSGCAPS() ? 2 : 0) |
         (this->KMX_IsAltGrCapsEqualToAltGrShift() ? 4 : 0) |
         (this->KMX_IsXxxxGrCapsEqualToXxxxShift() ? 8 : 0);
-    }
-    // ä,ö,ü:
-    else if( (this->m_vk==32) ||(this->m_vk==186) ||(this->m_vk==192)|| (this->m_vk==222) ) {
-      capslock =
-        (this->KMX_IsCapsEqualToShift() ? 1 : 0) |
-        (this->KMX_IsSGCAPS() ? 2 : 0) |
-        (this->KMX_IsAltGrCapsEqualToAltGrShift() ? 4 : 0) |
-        (this->KMX_IsXxxxGrCapsEqualToXxxxShift() ? 8 : 0);
-    }
-    // < and _:
-    else if( (this->m_vk==189) || (this->m_vk==220) || (this->m_vk==221) || (this->m_vk==226) ) {
-      capslock =
-        (this->KMX_IsCapsEqualToShift() ? 1 : 0) |
-        (this->KMX_IsSGCAPS() ? 2 : 0) |
-        (this->KMX_IsAltGrCapsEqualToAltGrShift() ? 4 : 0) |
-        (this->KMX_IsXxxxGrCapsEqualToXxxxShift() ? 8 : 0);
-    }
-    // punctuation Char:
-    else {
-      capslock =
-        (this->KMX_IsCapsEqualToShift() ? 0 : 1) |
-        (this->KMX_IsSGCAPS() ? 2 : 0) |
-        (this->KMX_IsAltGrCapsEqualToAltGrShift() ? 4 : 0) |
-        (this->KMX_IsXxxxGrCapsEqualToXxxxShift() ? 8 : 0);
-    }
+
 
 
 
@@ -902,9 +858,6 @@ bool KMX_ImportRules(KMX_WCHAR *kbid, LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, Gd
     }
   }
 
-  // _S2  remove! only for testing helps to force filling rgkey[VK_DE]
-  rgKey[223] = new KMX_VirtualKey(hkl, 223, All_Vector, keymap);
-
   for(UINT ke = VK_NUMPAD0; ke <= VK_NUMPAD9; ke++) {
       rgKey[ke] = new KMX_VirtualKey(hkl, ke, All_Vector, keymap);
   }
@@ -952,24 +905,6 @@ bool KMX_ImportRules(KMX_WCHAR *kbid, LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, Gd
 
       UINT VK_Other = Lin_KM__map(iKey, All_Vector);
 
-      // _S2 only for testing can go later helps to force filling rgkey[VK_DE]---v----
-      UINT iKey_DE = map_Ikey_DE(iKey);
-      if ( rgKey[iKey]->VK() == 89   ) rgKey[iKey]->set_sc(52);
-      if ( rgKey[iKey]->VK() == 90   ) rgKey[iKey]->set_sc(29);
-      if ( rgKey[iKey]->VK() == 186  ) rgKey[iKey]->set_sc(34);
-      if ( rgKey[iKey]->VK() == 187  ) rgKey[iKey]->set_sc(35);
-      if ( rgKey[iKey]->VK() == 188  ) rgKey[iKey]->set_sc(59);
-      if ( rgKey[iKey]->VK() == 189  ) rgKey[iKey]->set_sc(61);
-      if ( rgKey[iKey]->VK() == 190  ) rgKey[iKey]->set_sc(60);
-      if ( rgKey[iKey]->VK() == 191  ) rgKey[iKey]->set_sc(51);
-      if ( rgKey[iKey]->VK() == 192  ) rgKey[iKey]->set_sc(47);
-      if ( rgKey[iKey]->VK() == 219  ) rgKey[iKey]->set_sc(20);
-      if ( rgKey[iKey]->VK() == 220  ) rgKey[iKey]->set_sc(49);
-      if ( rgKey[iKey]->VK() == 221  ) rgKey[iKey]->set_sc(21);
-      if ( rgKey[iKey]->VK() == 222  ) rgKey[iKey]->set_sc(48);
-      if ( rgKey[iKey]->VK() == 226  ) rgKey[iKey]->set_sc(94);
-      // _S2 only for testing can go later helps to force filling rgkey[VK_DE]---^----
-
       for(ShiftState ss = Base; ss <= loader.MaxShiftState(); ss = (ShiftState)((int)ss + 1)) {
         if(ss == Menu || ss == ShftMenu) {
           // Alt and Shift+Alt don't work, so skip them
@@ -977,9 +912,7 @@ bool KMX_ImportRules(KMX_WCHAR *kbid, LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, Gd
         }
 
 
-      // KMX_DWORD SC_US = get_KeyCode_fromVKUS(iKey);    // _S2 needs to be here late
-      KMX_DWORD SC_US = get_KeyCode_fromVKUS(iKey_DE);    // _S2 only for testing can go later helps to force filling rgkey[VK_DE]
-
+       KMX_DWORD SC_US = get_KeyCode_fromVKUS(iKey);
 
 //wprintf(L" for vk of %i we get Keycode US of %i  VK_Other %i: ( on Key US (%i) we find char %i (%c) ) \n",
 // VK_Other, 8+USVirtualKeyToScanCode[VK_Other], 8+USVirtualKeyToScanCode[VK_Other] ,
@@ -997,7 +930,8 @@ bool KMX_ImportRules(KMX_WCHAR *kbid, LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, Gd
 
           // _S2 needs to be changed - it's temporary to get the same keys as keyman does when using USVirtualKeyToScanCode prevents chars like ሴ
         if (!IsKeymanUsedKeyVal(KeyVal_Other))
-          KeyVal_Other = L"\0";
+          KeyVal_Other = L"@";
+          // KeyVal_Other = L"\0";  _S2 what to return if not found
 
           //_S2 TODO do I need that ??
           //if rc >0: it got 1 or more char AND buffer is empty ( nothing inside ) {
@@ -1032,7 +966,7 @@ bool KMX_ImportRules(KMX_WCHAR *kbid, LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, Gd
   }
 
   //_S2 this gan co later
-  std::vector< int > TestValues = {48,49,50,51,52,53,54,55,56,57,65,66,67,88,89,90, 186,187,188,189,191,191,192,219,220,221,222,223,226};
+  std::vector< int > TestValues = {48,49,50,51,52,53,54,55,56,57,65,66,67,88,89,90, 186,187,188,189,191,191,192,219,220,221};
   wprintf(L"-----------------\nNow some tests:\n");
   wprintf(L"                  Base          Caps            Shift           Shfit+Caps     MenuCtrl         MenuCtrl+Caps \n");
 
