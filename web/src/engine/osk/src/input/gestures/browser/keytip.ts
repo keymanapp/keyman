@@ -4,14 +4,17 @@ import KeyTipInterface from '../../../keytip.interface.js';
 import VisualKeyboard from '../../../visualKeyboard.js';
 import { GesturePreviewHost } from '../../../keyboard-layout/gesturePreviewHost.js';
 
-const DEFAULT_TIP_ORIENTATION = 'up';
+const CSS_PREFIX = 'kmw-';
+const DEFAULT_TIP_ORIENTATION = 'top';
+
+export type PhoneKeyTipOrientation = 'top' | 'bottom';
 
 export default class KeyTip implements KeyTipInterface {
   public readonly element: HTMLDivElement;
   public key: KeyElement;
   public state: boolean = false;
 
-  private orientation: 'up' | 'down' = DEFAULT_TIP_ORIENTATION;
+  private orientation: PhoneKeyTipOrientation = DEFAULT_TIP_ORIENTATION;
 
   //  -----
   // |     | <-- tip
@@ -28,7 +31,7 @@ export default class KeyTip implements KeyTipInterface {
   private readonly vkbd: VisualKeyboard;
 
   private readonly constrain: boolean;
-  private readonly reorient: (orientation: 'up' | 'down') => void;
+  private readonly reorient: (orientation: PhoneKeyTipOrientation) => void;
 
   /**
    *
@@ -54,7 +57,7 @@ export default class KeyTip implements KeyTipInterface {
 
     this.constrain = constrain;
 
-    this.reorient = (orientation: 'up' | 'down') => {
+    this.reorient = (orientation: PhoneKeyTipOrientation) => {
       this.orientation = orientation;
       this.show(this.key, this.state, this.previewHost);
     }
@@ -100,7 +103,7 @@ export default class KeyTip implements KeyTipInterface {
       let y: number;
       const orientation = this.orientation;
       const distFromTop = keyRect.bottom - _BoxRect.top;
-      y = (distFromTop + (orientation == 'up' ? 1 : -1));
+      y = (distFromTop + (orientation == 'top' ? 1 : -1));
       let ySubPixelPadding = y - Math.floor(y);
 
       // Canvas dimensions must be set explicitly to prevent clipping
@@ -110,7 +113,7 @@ export default class KeyTip implements KeyTipInterface {
 
       kts.top = 'auto';
 
-      if(orientation == 'down') {
+      if(orientation == 'bottom') {
         y += canvasHeight - xHeight;
         this.tip.style.bottom = '0px';
         this.tip.style.top = 'unset';
@@ -168,14 +171,14 @@ export default class KeyTip implements KeyTipInterface {
       this.tip.style.height = halfHeight + 'px';
 
       const capOffset = 3;
-      if(orientation == 'up') {
+      if(orientation == 'top') {
         this.cap.style.top = (halfHeight - capOffset) + 'px';
         this.cap.style.bottom = '';
       } else {
         this.cap.style.top = '';
         this.cap.style.bottom = (halfHeight - capOffset) + 'px';
       }
-      const defaultCapHeight = (distFromTop - Math.floor(y) + canvasHeight - (orientation == 'up' ? halfHeight : -capOffset * 2));
+      const defaultCapHeight = (distFromTop - Math.floor(y) + canvasHeight - (orientation == 'top' ? halfHeight : -capOffset * 2));
       this.cap.style.height = defaultCapHeight + 'px';
 
       if(this.constrain && tipHeight + bottomY > oskHeight) {
@@ -185,7 +188,7 @@ export default class KeyTip implements KeyTipInterface {
         this.cap.style.height = hx + 'px';
       } else if(bottomY < 0) { // we'll assume that we always constrain at the OSK's bottom.
         kts.bottom = '0px';
-        this.cap.style.height = (defaultCapHeight + bottomY) + 'px';
+        this.cap.style.height = Math.max(0, defaultCapHeight + bottomY) + 'px';
       }
 
       kts.display = 'block';

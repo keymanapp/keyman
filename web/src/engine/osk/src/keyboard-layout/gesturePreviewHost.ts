@@ -3,6 +3,7 @@ import EventEmitter from "eventemitter3";
 
 import { KeyElement } from "../keyElement.js";
 import { FlickNameCoordMap, OrderedFlickDirections } from "../input/gestures/browser/flick.js";
+import { PhoneKeyTipOrientation } from "../input/gestures/browser/keytip.js";
 
 /**With edge lengths of 1, to keep flick-text invisible at the start, the
  * hypotenuse for an inter-cardinal path is sqrt(2).  To keep a perfect circle
@@ -12,7 +13,7 @@ import { FlickNameCoordMap, OrderedFlickDirections } from "../input/gestures/bro
 const FLICK_OVERFLOW_OFFSET = 1.4142;
 
 interface EventMap {
-  preferredOrientation: (orientation: 'up'|'down') => void;
+  preferredOrientation: (orientation: PhoneKeyTipOrientation) => void;
 }
 
 export class GesturePreviewHost extends EventEmitter<EventMap> {
@@ -23,7 +24,7 @@ export class GesturePreviewHost extends EventEmitter<EventMap> {
   private flickPreviews = new Map<string, HTMLDivElement>;
   private flickEdgeLength: number;
 
-  private orientation: 'up' | 'down' = 'up';
+  private orientation: PhoneKeyTipOrientation = 'top';
 
   private onCancel: () => void;
 
@@ -124,7 +125,7 @@ export class GesturePreviewHost extends EventEmitter<EventMap> {
     scrollStyle.marginLeft = `${edge * x}px`;
     scrollStyle.marginTop =  `${edge * y}px`;
 
-    const preferredOrientation = y < 0 ? 'down' : 'up';
+    const preferredOrientation = y < 0 ? 'bottom' : 'top';
     if(this.orientation != preferredOrientation) {
       this.orientation = preferredOrientation;
       this.emit('preferredOrientation', preferredOrientation);
