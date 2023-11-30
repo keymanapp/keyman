@@ -1,4 +1,4 @@
-import { ActiveKey } from "@keymanapp/keyboard-processor";
+import { ActiveKey, ActiveKeyBase } from "@keymanapp/keyboard-processor";
 import EventEmitter from "eventemitter3";
 
 import { KeyElement } from "../keyElement.js";
@@ -135,6 +135,13 @@ export class GesturePreviewHost extends EventEmitter<EventMap> {
 
   public setCancellationHandler(handler: () => void) {
     this.onCancel = handler;
+  }
+
+  public setMultitapHint(current: string, next: string) {
+    this.label.textContent = current;
+    this.hintLabel.textContent = next;
+
+    this.clearFlick();
   }
 
   public scrollFlickPreview(x: number, y: number) {
