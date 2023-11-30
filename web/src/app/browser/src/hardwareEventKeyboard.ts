@@ -267,7 +267,7 @@ export default class HardwareEventKeyboard extends HardKeyboard {
       }
     });
 
-    page.off('disabled', (Pelem) => {
+    page.on('disabled', (Pelem) => {
       const target = outputTargetForElement(Pelem);
 
       if(!(target instanceof DesignIFrame)) {
