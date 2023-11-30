@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 17.0.220 alpha 2023-11-30
+
+* fix(core): set_if_needed updates an empty cached context (#10098)
+* fix(core): check for null termination (#10101)
+
 ## 17.0.219 alpha 2023-11-29
 
 * fix(developer): path separator for kmc-package (#10064)
