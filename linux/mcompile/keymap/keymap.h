@@ -505,7 +505,6 @@ KMX_DWORD get_VKUS_fromKeyCode( KMX_DWORD keycode);
 KMX_DWORD get_KeyCode_fromVKUS( KMX_DWORD VK_US);
 
 UINT map_Ikey_DE(UINT iKey);
-UINT map_Ikey_FR(UINT iKey);
 
 // initialize GDK
 bool InitializeGDK(GdkKeymap **keymap,int argc, gchar *argv[]);
@@ -525,7 +524,7 @@ std::wstring get_KeyVals_according_to_keycode_and_Shiftstate(GdkKeymap *keymap, 
 // can go later
 void Try_GDK(GdkKeymap *keymap, UINT KeySym );
 void Inspect_Key_S(GdkKeymap *keymap );
-UINT find_SC_Other_from_SC_US_GDK(UINT vk_US_187,GdkKeymap *keymap);
+//UINT find_SC_Other_from_SC_US_GDK(UINT vk_US_187,GdkKeymap *keymap);
 // _S2 needed?
 // create a Vector with all entries of both keymaps+ keymap
 int createOneVectorFromBothKeyboards(v_dw_3D &All_Vector,GdkKeymap *keymap);

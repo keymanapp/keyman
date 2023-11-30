@@ -114,7 +114,6 @@ KMX_DWORD convertNamesToASCIIValue(std::wstring tok_wstr){
   first[L"ssharp"]            = 223;
   first[L"underscore"]        =  95;
 
-  // _S2 those deadkeys + space:
   first[L"dead_abovedot"]     = 729;
   first[L"dead_abovering"]    = 730;
   first[L"dead_acute"]        = 180;   //39 180 ??
@@ -352,7 +351,7 @@ KMX_DWORD getKeyvalsFromKeyCode(GdkKeymap *keymap, guint keycode, int shift_stat
   return out;
 }
 
-// _S2 do we need that?
+// _S2 do we need that - it does the same as get_KeyCode_fromVKUS
 KMX_DWORD get_VirtualKey_Other_GDK( GdkKeymap *keymap, KMX_DWORD keycode) {
 
   GdkModifierType consumed;
@@ -429,27 +428,6 @@ UINT map_Ikey_DE(UINT iKey) {
   if (iKey == 226 )     return 226;
   return iKey;
 }
-
-// _S2 this needs to go; only to check if mcompile gives the same end result.
-// _S2 helps to force filling rgkey[VK_FR]
-UINT map_Ikey_FR(UINT iKey) {
-  if (iKey == 186 )  return 221;
-  if (iKey == 187 )     return 187;
-  if (iKey == 188 )  return 77;
-  if (iKey == 189 )  return 223;
-  if (iKey == 190 )  return 188;
-  if (iKey == 191 )  return 190;
-  if (iKey == 192 )  return 222;
-  if (iKey == 219 )  return 189;
-  if (iKey == 220 )     return 220;
-  if (iKey == 221 )  return 219;
-  if (iKey == 222 )  return 192;
-  if (iKey == 223 )  return 191;
-  if (iKey == 226 )     return 226;
-  if (iKey == 77  )  return 186;
-  return iKey;
-}
-
 
 // _S2 TODO How to do mapping between Linux keycodes and keyman SC
 const int Lin_KM__map(int i, v_dw_3D &All_Vector) {
@@ -554,17 +532,6 @@ if((keycode == 20) && (ss == ShftMenuCtrl) && (caps == 1))  return L"ß";    //L
     return L"\0";
 }
 
-// _S2 maybe not needed
-UINT find_SC_Other_from_SC_US_GDK(UINT SC_US,GdkKeymap *keymap) {
-  UINT SC__Other;
-
-    for ( int i=0; i<255;i++) {
-      SC__Other= (UINT )get_KeyCode_From_KeyVal_GDK( keymap, i);
-      if(SC__Other==SC_US )
-        return SC__Other;
-    }
-  return SC_US;
-}
 
 
 int map_VKShiftState_to_Lin(int VKShiftState) {

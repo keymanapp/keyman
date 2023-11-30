@@ -1872,3 +1872,379 @@ int stop=99;
 */
 
 
+// _S2 this needs to go; only to check if mcompile gives the same end result.
+// _S2 helps to force filling rgkey[VK_FR]
+UINT map_Ikey_FR(UINT iKey) {
+  if (iKey == 186 )  return 221;
+  if (iKey == 187 )     return 187;
+  if (iKey == 188 )  return 77;
+  if (iKey == 189 )  return 223;
+  if (iKey == 190 )  return 188;
+  if (iKey == 191 )  return 190;
+  if (iKey == 192 )  return 222;
+  if (iKey == 219 )  return 189;
+  if (iKey == 220 )     return 220;
+  if (iKey == 221 )  return 219;
+  if (iKey == 222 )  return 192;
+  if (iKey == 223 )  return 191;
+  if (iKey == 226 )     return 226;
+  if (iKey == 77  )  return 186;
+  return iKey;
+}
+
+
+
+/*bool KMX_Lin_ImportRules_Lin(KMX_WCHAR *kbid, LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, GdkKeymap **keymap, std::vector<KMX_DeadkeyMapping> *FDeadkeys, KMX_BOOL bDeadkeyConversion) {   // I4353   // I4552
+  KMX_Loader loader;
+  const size_t BUF_sz= 256;
+  //Inspect_kp(kp);   // _ _S2 only open for inspecting; if used when running the program it will crash :-( )
+  KMX_HKL hkl = NULL;               //_S2 added: but can I do this?? hkl is not needed in Linux??
+
+  BYTE lpKeyState[256];// = new KeysEx[256];
+                                                    std::vector<KMX_VirtualKey*> rgKey; //= new VirtualKey[256];
+  std::vector<DeadKey*> alDead;
+
+  KMX_VirtualKey* rgKey_single = new KMX_VirtualKey(1, hkl, All_Vector, keymap);
+  UINT nkeys_single =0;
+
+  rgKey.resize(256);
+
+                                                    // _S2 scroll through OTHER
+                                                    // Scroll through the Scan Code (SC) values and get the valid Virtual Key (VK)
+                                                    // values in it. Then, store the SC in each valid VK so it can act as both a 
+                                                    // flag that the VK is valid, and it can store the SC value.
+                                                    for(UINT sc = 0x01; sc <= 0x7f; sc++) {
+                                                      // fills m_vk with the VK of the US keyboard which is not right!!
+                                                      // ( mcompile win uses MapVirtualKeyEx() to fill m_vk with the VK of the Other keyboard)
+                                                      // Linux cant get a VK for the US Keyboard using USVirtualKeyToScanCode/ScanCodeToUSVirtualKey
+                                                      // Linux cannot get a VK for Other Keyboard
+                                                      // it could return SC if that helps
+                                                      KMX_VirtualKey *key = new KMX_VirtualKey(sc, hkl, All_Vector, keymap);
+                                                    if((key->VK() != 0) && (key->VK()< 255)) {  // if used without ScanCodeToUSVirtualKey[]
+                                                          rgKey[key->VK()] = key;
+                                                      } else {
+                                                          delete key;
+                                                      }
+                                                    }
+
+                                                    for(UINT ke = VK_NUMPAD0; ke <= VK_NUMPAD9; ke++) {
+                                                        rgKey[ke] = new KMX_VirtualKey(hkl, ke, All_Vector, keymap);
+                                                    }
+
+                                                    rgKey[VK_DIVIDE] = new KMX_VirtualKey(hkl, VK_DIVIDE, All_Vector, keymap);
+                                                    rgKey[VK_CANCEL] = new KMX_VirtualKey(hkl, VK_CANCEL, All_Vector, keymap);
+                                                    rgKey[VK_DECIMAL] = new KMX_VirtualKey(hkl, VK_DECIMAL, All_Vector, keymap);
+
+
+// // _S2 do we need special shift state now or later?
+//  // See if there is a special shift state added
+//  for(UINT vk = 0; vk <= VK_OEM_CLEAR; vk++) {
+//      UINT sc = MapVirtualKeyEx(vk, 0, hkl);
+//      UINT vkL = MapVirtualKeyEx(sc, 1, hkl);
+//      UINT vkR = MapVirtualKeyEx(sc, 3, hkl);
+//      if((vkL != vkR) &&
+//          (vk != vkL)) {
+//          switch(vk) {
+//              case VK_LCONTROL:
+//              case VK_RCONTROL:
+//              case VK_LSHIFT:
+//              case VK_RSHIFT:
+//              case VK_LMENU:
+//              case VK_RMENU:
+//                  break;
+//
+//              default:
+//                  loader.Set_XxxxVk(vk);
+//                  break;
+//          }
+//      }
+//  }
+
+
+
+                                                    // _S2 in this part we skip shiftstates 4, 5, 8, 9
+                                                    for(UINT iKey = 0; iKey < rgKey.size(); iKey++) {
+                                                      if(rgKey[iKey] != NULL) {
+                                                        WCHAR sbBuffer[256];     // Scratchpad we use many places
+
+                                                        for(ShiftState ss = Base; ss <= loader.MaxShiftState(); ss = (ShiftState)((int)ss + 1)) {
+                                                          if(ss == Menu || ss == ShftMenu) {
+                                                            continue;          // Alt and Shift+Alt don't work, so skip them
+                                                          }
+
+                                                        KMX_DWORD SC_US = get_KeyCode_fromVKUS(iKey);    // _S2 only for testing can go later helps to force filling rgkey[VK_DE]
+
+                                                          for(int caps = 0; caps <= 1; caps++) {
+                                                            //_S2 TODO get char  - do I need rc ?? ( was rc = ToUnicodeEx...)
+                                                            std::wstring KeyVal_Other = get_KeyVals_according_to_keycode_and_Shiftstate( *keymap, SC_US, ss, caps);
+
+                                                            if (!IsKeymanUsedKeyVal(KeyVal_Other))
+                                                                      KeyVal_Other = L"\0";
+
+                                                            //_S2 TODO do I need that ??
+                                                            //if rc >0: it got 1 or more char AND buffer is empty ( nothing inside ) {
+                                                              if(KeyVal_Other == L"") {
+                                                                //rgKey[iKey]->KMX_SetShiftState(ss, L"", false, (caps == 0));
+                                                                rgKey[iKey]->KMX_SetShiftState(ss, L"", false, (caps));
+                                                                rgKey_single->KMX_SetShiftState(ss, L"", false, (caps));
+                                                              }
+
+                                                              //_S2 TODO
+                                                              //else   // if rc ==1 : it got 1  char && +40 in Buffer CTRl pressed    {
+                                                                  //It's dealing with control characters. If ToUnicodeEx gets VK_A with the Ctrl key pressed,
+                                                                  //it will write 0x01 to sBuffer[0] , without Ctrl it's 0x41. The if detects this case.
+                                                                  //&& CTRl +0x40 in the buffer ( which indicates a ctrl press)   
+                                                              if( (ss == Ctrl || ss == ShftCtrl) //&& CTRl +0x40 in the buffer ( which indicates a ctrl press)   //) {
+                                                                continue;
+                                                              }
+
+                                                              //_S2 TODO fill m_rgfDeadkey ( m_rgfDeadkey will be done later)
+                                                              //rgKey[iKey]->KMX_SetShiftState(ss, KeyVal_Other, false, (caps==0));
+                                                              rgKey[iKey]->KMX_SetShiftState(ss, KeyVal_Other, false, (caps));
+                                                              rgKey_single->KMX_SetShiftState(ss, KeyVal_Other, false, (caps));
+                                                              //if( KeyVal_Other != L"")
+                                                              if( IsKeymanUsedKeyVal(KeyVal_Other) )
+                                                                nkeys_single ++ ;
+                                                              int ertzu=888;
+
+
+                                                          //_S2 TODO
+                                                          // _S2 handle deadkeys later
+                                                          // if rc <0:  it got a deadkey   {
+                                                              // fill m_rgss and m_rgfDeadkey and alDead
+                                                              //SET_SHIFTSTATES( deadkey)   //sbuffer is value out of ToUnicodeEx / AllVector
+                                                              // do more stuff for deadkeys...
+                                                          // } from rc<0
+                                                          }
+                                                        }
+                                                      }
+                                                    }
+
+
+  //-------------------------------------------------------------
+  // Now that we've collected the key data, we need to
+  // translate it to kmx and append to the existing keyboard
+  //-------------------------------------------------------------
+
+  int nDeadkey = 0;
+  LPKMX_GROUP gp = new KMX_GROUP[kp->cxGroupArray+4];  // leave space for old
+  memcpy(gp, kp->dpGroupArray, sizeof(KMX_GROUP) * kp->cxGroupArray);
+
+  //
+
+  // Find the current highest deadkey index
+  //
+
+  kp->dpGroupArray = gp;
+  for(UINT i = 0; i < kp->cxGroupArray; i++, gp++) {
+    //if(gp->fUsingKeys && gp->dpNoMatch == NULL) {   // I4550
+     // WCHAR *p = gp->dpNoMatch = new WCHAR[4];
+     // *p++ = UC_SENTINEL;
+     // *p++ = CODE_USE;
+     // *p++ = (WCHAR)(kp->cxGroupArray + 1);
+     // *p = 0;
+    //}
+    LPKMX_KEY kkp = gp->dpKeyArray;
+
+    for(UINT j = 0; j < gp->cxKeyArray; j++, kkp++) {
+      nDeadkey = std::max(nDeadkey, KMX_GetMaxDeadkeyIndex(kkp->dpContext));
+      nDeadkey = std::max(nDeadkey, KMX_GetMaxDeadkeyIndex(kkp->dpOutput));
+    }
+  }
+
+                                                      // _S2 find nkeys
+  //                                                     kp->cxGroupArray++;
+  //                                                    gp = &kp->dpGroupArray[kp->cxGroupArray-1];
+  //                                                    UINT nKeys = 0;
+  //                                                    for (UINT iKey = 0; iKey < rgKey.size(); iKey++) {
+  //                                                      if ((rgKey[iKey] != NULL) && rgKey[iKey]->KMX_IsKeymanUsedKey() && (!rgKey[iKey]->KMX_IsEmpty())) {
+  //                                                        nKeys+= rgKey[iKey]->KMX_GetKeyCount(loader.MaxShiftState());
+  //                                                        wprintf(L" iKey = %i, Delta:  %i -> Sum %i\n", iKey, rgKey[iKey]->KMX_GetKeyCount(loader.MaxShiftState()),  nKeys);
+  //                                                   }
+  //                                                    }
+
+  nDeadkey++; // ensure a 1-based index above the max deadkey value already in the keyboard
+
+  gp->fUsingKeys = TRUE;
+  gp->dpMatch = NULL;
+  gp->dpName = NULL;
+  gp->dpNoMatch = NULL;
+  //gp->cxKeyArray = nKeys;
+  gp->cxKeyArray = nkeys_single;
+  gp->dpKeyArray = new KMX_KEY[gp->cxKeyArray];
+  UINT nKeys = 0;
+
+
+                                                      //
+                                                      // Fill in the new rules
+                                                      //
+                                                      for (UINT iKey = 0; iKey < rgKey.size(); iKey++) {
+                                                        if ((rgKey[iKey] != NULL) && rgKey[iKey]->KMX_IsKeymanUsedKey() && (!rgKey[iKey]->KMX_IsEmpty())) {
+                                                            if(rgKey[iKey]->KMX_LayoutRow_Lin(loader.MaxShiftState(), &gp->dpKeyArray[nKeys], &alDead, nDeadkey, bDeadkeyConversion, All_Vector,*keymap)) {   // I4552
+                                                            //if(rgKey_single->KMX_LayoutRow_Lin(loader.MaxShiftState(), &gp->dpKeyArray[nKeys], &alDead, nDeadkey, bDeadkeyConversion, All_Vector,*keymap)) {   // I4552
+
+                                                            nKeys+=rgKey[iKey]->KMX_GetKeyCount(loader.MaxShiftState());
+                                                            wprintf(L"nKeys sum: %i\n", nKeys);
+                                                          }
+                                                        }
+                                                      }
+
+    // ---------------------------------------------------------------------------------------------
+
+    // A  _S2 Look at the character in the key rule,
+
+    //       e.g. + 'y' > '...  (so, key->Key == 'y' && key->ShiftFlags == 0)
+    KMX_WCHAR key_key;
+    KMX_DWORD key_shiftFlag;
+    // ---------------------------------------------------------------------------------------------
+    // B  _S2 Find the key data by finding 'y' keyval in the target layout. (DE?)
+    // ---------------------------------------------------------------------------------------------
+    // C  _S2 Look up the scan code (and modifiers) associated with that keyval.
+    // ---------------------------------------------------------------------------------------------
+    // D  _S2 Use that scan code to get the US english vkey equivalent via ScanCodeToUSVirtualKey[]
+    // ---------------------------------------------------------------------------------------------
+    // E  _S2 Rewrite the key rule to + [K_Z] > ...
+    // ---------------------------------------------------------------------------------------------
+    // F  _S2 Nuance needed around modifier keys (so it may need to be + [SHIFT K_Z] for 'Y', for example).
+    // ---------------------------------------------------------------------------------------------
+    // Keyval(DE) -> SC_DE -> SC_US -> VK_US
+    // ---------------------------------------------------------------------------------------------
+
+
+  // _S2 no changes here after removing rgkey
+  gp->cxKeyArray = nKeys;
+
+  //
+  // Add nomatch control to each terminating 'using keys' group   // I4550
+  //
+  LPKMX_GROUP gp2 = kp->dpGroupArray;
+  for(UINT i = 0; i < kp->cxGroupArray - 1; i++, gp2++) {
+    if(gp2->fUsingKeys && gp2->dpNoMatch == NULL) {
+      KMX_WCHAR *p = gp2->dpNoMatch = new KMX_WCHAR[4];
+      KMX_WCHAR *q = p;
+      *p++ = UC_SENTINEL;
+      *p++ = CODE_USE;
+      *p++ = (KMX_WCHAR)(kp->cxGroupArray);
+      *p = 0;
+
+      // _S2 TODO not sure if this works OK -> we need to use more shiftstates than base+Shift
+      // I4550 - Each place we have a nomatch > use(baselayout) (this last group), we need to add all
+      // the AltGr and ShiftAltGr combinations as rules to allow them to be matched as well.  Yes, this
+      // loop is not very efficient but it's not worthy of optimisation.
+      //
+      UINT j;
+      LPKMX_KEY kkp;
+      for(j = 0, kkp = gp->dpKeyArray; j < gp->cxKeyArray; j++, kkp++) {
+        wprintf(L"key: kkp->key%i(%c) and SFlag %i\n",kkp->Key,kkp->Key,kkp->ShiftFlags );
+        //wprintf(L"key: gp ->key%i(%c) and SFlag %i\n",gp->dpKeyArray->Key,gp->dpKeyArray->Key,gp->dpKeyArray->ShiftFlags );
+        //wprintf(L"key: gp2->key%i(%c) and SFlag %i\n",gp2->dpKeyArray->Key,gp2->dpKeyArray->Key,gp2->dpKeyArray->ShiftFlags );
+        //wprintf(L"key: kp ->key%i(%c) and SFlag %i\n",kp->dpGroupArray->dpKeyArray->Key,kp->dpGroupArray->dpKeyArray->Key,kp->dpGroupArray->dpKeyArray->ShiftFlags );
+        //&& CTRl +0x40 in the buffer ( which indicates a ctrl press)   //
+        if((kkp->ShiftFlags & (K_CTRLFLAG|K_ALTFLAG|LCTRLFLAG|LALTFLAG|RCTRLFLAG|RALTFLAG)) != 0) {
+          gp2->cxKeyArray++;
+          LPKMX_KEY kkp2 = new KMX_KEY[gp2->cxKeyArray];
+          memcpy(kkp2, gp2->dpKeyArray, sizeof(KMX_KEY)*(gp2->cxKeyArray-1));
+          gp2->dpKeyArray = kkp2;
+          kkp2 = &kkp2[gp2->cxKeyArray-1];
+          kkp2->dpContext = new KMX_WCHAR; *kkp2->dpContext = 0;
+          kkp2->Key = kkp->Key;
+          kkp2->ShiftFlags = kkp->ShiftFlags;
+          kkp2->Line = 0;
+          KMX_WCHAR *p = kkp2->dpOutput = new KMX_WCHAR[4];
+          KMX_WCHAR *q=p;
+          *p++ = UC_SENTINEL;
+          *p++ = CODE_USE;
+          *p++ = (KMX_WCHAR)(kp->cxGroupArray);
+          *p = 0;
+        }
+      }
+    }
+  }
+
+  if (alDead.size() > 0 && !bDeadkeyConversion) {   // I4552
+    kp->cxGroupArray++;
+
+    KMX_WCHAR *p = gp->dpMatch = new KMX_WCHAR[4];
+    *p++ = UC_SENTINEL;
+    *p++ = CODE_USE;
+    *p++ = (KMX_WCHAR) kp->cxGroupArray;
+    *p = 0;
+
+    gp++;
+
+    gp->fUsingKeys = FALSE;
+    gp->dpMatch = NULL;
+    gp->dpName = NULL;
+    gp->dpNoMatch = NULL;
+    gp->cxKeyArray = alDead.size();
+    LPKMX_KEY kkp = gp->dpKeyArray = new KMX_KEY[alDead.size()];
+
+    LPKMX_STORE sp = new KMX_STORE[kp->cxStoreArray + alDead.size() * 2];
+    memcpy(sp, kp->dpStoreArray, sizeof(KMX_STORE) * kp->cxStoreArray);
+
+    kp->dpStoreArray = sp;
+
+    sp = &sp[kp->cxStoreArray];
+    int nStoreBase = kp->cxStoreArray;
+    kp->cxStoreArray += alDead.size() * 2;
+
+    for(UINT i = 0; i < alDead.size(); i++) {
+      DeadKey *dk = alDead[i];
+
+      sp->dpName = NULL;
+      sp->dwSystemID = 0;
+      sp->dpString = new KMX_WCHAR[dk->KMX_Count() + 1];
+      for(int j = 0; j < dk->KMX_Count(); j++)
+        sp->dpString[j] = dk->KMX_GetBaseCharacter(j);
+      sp->dpString[dk->KMX_Count()] = 0;
+      sp++;
+
+      sp->dpName = NULL;
+      sp->dwSystemID = 0;
+      sp->dpString = new KMX_WCHAR[dk->KMX_Count() + 1];
+      for(int j = 0; j < dk->KMX_Count(); j++)
+        sp->dpString[j] = dk->KMX_GetCombinedCharacter(j);
+      sp->dpString[dk->KMX_Count()] = 0;
+      sp++;
+
+      kkp->Line = 0;
+      kkp->ShiftFlags = 0;
+      kkp->Key = 0;
+      KMX_WCHAR *p = kkp->dpContext = new KMX_WCHAR[8];
+      *p++ = UC_SENTINEL;
+      *p++ = CODE_DEADKEY;
+      *p++ = KMX_DeadKeyMap(dk->KMX_DeadCharacter(), &alDead, nDeadkey, FDeadkeys);   // I4353
+      // *p++ = nDeadkey+i;
+      *p++ = UC_SENTINEL;
+      *p++ = CODE_ANY;
+      *p++ = nStoreBase + i*2 + 1;
+      *p = 0;
+
+      p = kkp->dpOutput = new KMX_WCHAR[5];
+      *p++ = UC_SENTINEL;
+      *p++ = CODE_INDEX;
+      *p++ = nStoreBase + i*2 + 2;
+      *p++ = 2;
+      *p = 0;
+
+      kkp++;
+    }
+  }
+return true;
+}*/
+
+
+
+
+
+// _S2 maybe not needed
+UINT find_SC_Other_from_SC_US_GDK(UINT SC_US,GdkKeymap *keymap) {
+  UINT SC__Other;
+
+    for ( int i=0; i<255;i++) {
+      SC__Other= (UINT )get_KeyCode_From_KeyVal_GDK( keymap, i);
+      if(SC__Other==SC_US )
+        return SC__Other;
+    }
+  return SC_US;
+}
