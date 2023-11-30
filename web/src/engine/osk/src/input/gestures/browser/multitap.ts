@@ -56,6 +56,12 @@ export default class Multitap implements GestureHandler {
 
     this.originalLayer = vkbd.layerId;
 
+    const tapLookahead = (offset) => (this.tapIndex + offset) % this.multitaps.length;
+
+    const updatePreview = () => {
+      previewHost?.setMultitapHint(this.multitaps[tapLookahead(0)].text, this.multitaps[tapLookahead(1)].text);
+    }
+
     source.on('complete', () => {
       this.modipress?.cancel();
       this.clear();
@@ -90,11 +96,9 @@ export default class Multitap implements GestureHandler {
       }
 
       // For rota-style behavior
-      this.tapIndex = (this.tapIndex + 1) % this.multitaps.length;
+      this.tapIndex = tapLookahead(1);
       const selection = this.multitaps[this.tapIndex];
-      const nextSel = (this.tapIndex == this.multitaps.length - 1) ? this.multitaps[0] : this.multitaps[this.tapIndex+1];
-
-      previewHost?.setMultitapHint(selection.text, nextSel.text);
+      updatePreview();
 
       const keyEvent = vkbd.keyEventFromSpec(selection);
       keyEvent.baseTranscriptionToken = this.baseContextToken;
@@ -139,7 +143,7 @@ export default class Multitap implements GestureHandler {
 
     // For this specific instance, we'll go ahead and directly maintain the preview;
     // a touch just ended, and all other updates occur on the start of a new touch.
-    previewHost?.setMultitapHint(this.multitaps[0].text, this.multitaps[1].text);
+    updatePreview();
 
     /* In theory, setting up a specialized recognizer config limited to the base key's surface area
      * would be pretty ideal - it'd provide automatic cancellation if anywhere else were touched.
