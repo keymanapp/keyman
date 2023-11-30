@@ -262,6 +262,10 @@ void km_core_state_imx_deregister_callback(km_core_state *state)
 }
 
 bool is_context_valid(km_core_cp const * context, km_core_cp const * cached_context) {
+  if (context == nullptr || cached_context == nullptr || *cached_context == NULL) {
+    // If the cached_context is "empty" then it needs updating
+    return false;
+  }
   km_core_cp const* context_p = context;
   while(*context_p) {
     context_p++;

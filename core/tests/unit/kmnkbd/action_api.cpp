@@ -258,6 +258,27 @@ void test_context_set_if_needed_different_context() {
   teardown();
 }
 
+void test_context_set_if_needed_cached_context_cleared() {
+  km_core_cp const *application_context = u"This is a test";
+  km_core_cp const *cached_context =      u"";
+  setup("k_000___null_keyboard.kmx", cached_context);
+  km_core_state_context_clear(test_state);
+  assert(km_core_state_context_set_if_needed(test_state, application_context) == KM_CORE_CONTEXT_STATUS_UPDATED);
+  assert(!is_identical_context(cached_context));
+  assert(is_identical_context(application_context));
+  teardown();
+}
+
+void test_context_set_if_needed_application_context_empty() {
+  km_core_cp const *application_context = u"";
+  km_core_cp const *cached_context =      u"This is a test";
+  setup("k_000___null_keyboard.kmx", cached_context);
+  assert(km_core_state_context_set_if_needed(test_state, application_context) == KM_CORE_CONTEXT_STATUS_UPDATED);
+  assert(!is_identical_context(cached_context));
+  assert(is_identical_context(application_context));
+  teardown();
+}
+
 void test_context_set_if_needed_app_context_is_longer() {
   km_core_cp const *application_context = u"Longer This is a test";
   km_core_cp const *cached_context =             u"This is a test";
@@ -319,6 +340,8 @@ void test_context_set_if_needed_cached_context_has_markers() {
 void test_context_set_if_needed() {
   test_context_set_if_needed_identical_context();
   test_context_set_if_needed_different_context();
+  test_context_set_if_needed_cached_context_cleared();
+  test_context_set_if_needed_application_context_empty();
   test_context_set_if_needed_app_context_is_longer();
   test_context_set_if_needed_app_context_is_shorter();
   test_context_set_if_needed_cached_context_has_markers();
