@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 16.0.144 stable 2023-11-30
+
+* chore(linux): Update debian changelog (#10046)
+* fix(android/app) Disable in-app Browser (#10077)
+
 ## 16.0.143 stable 2023-11-22
 
 * chore(android): Update targetSdkVersion from 31 to 33 (#9823)
