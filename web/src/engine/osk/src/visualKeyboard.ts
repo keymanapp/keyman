@@ -44,7 +44,8 @@ import OSKLayer from './keyboard-layout/oskLayer.js';
 import OSKLayerGroup from './keyboard-layout/oskLayerGroup.js';
 import { LengthStyle, ParsedLengthStyle } from './lengthStyle.js';
 import { defaultFontSize, getFontSizeStyle } from './fontSizeUtils.js';
-import InternalKeyTip from './input/gestures/browser/keytip.js';
+import PhoneKeyTip from './input/gestures/browser/keytip.js';
+import { TabletKeyTip } from './input/gestures/browser/tabletPreview.js';
 import CommonConfiguration from './config/commonConfiguration.js';
 
 import { DEFAULT_GESTURE_PARAMS, GestureParams, gestureSetForLayout } from './input/gestures/specsForLayout.js';
@@ -1533,7 +1534,7 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
     const keyCS = getComputedStyle(key);
     const parsedHeight = Number.parseInt(keyCS.height, 10);
     const parsedWidth  = Number.parseInt(keyCS.width,  10);
-    const previewHost = new GesturePreviewHost(key, !!tip, parsedWidth, parsedHeight);
+    const previewHost = new GesturePreviewHost(key, this.device.formFactor == 'phone', parsedWidth, parsedHeight);
 
     if (tip == null) {
       const baseKey = key.key as OSKBaseKey;
@@ -1551,11 +1552,13 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
    *  Create a key preview element for phone devices
    */
   createKeyTip() {
-    if(this.device.formFactor == 'phone') {
-      if (this.keytip == null) {
+    if (this.keytip == null) {
+      if(this.device.formFactor == 'phone') {
         // For now, should only be true (in production) when keyman.isEmbedded == true.
         let constrainPopup = this.isEmbedded;
-        this.keytip = new InternalKeyTip(this, constrainPopup);
+        this.keytip = new PhoneKeyTip(this, constrainPopup);
+      } else {
+        this.keytip = new TabletKeyTip(this);
       }
     }
 

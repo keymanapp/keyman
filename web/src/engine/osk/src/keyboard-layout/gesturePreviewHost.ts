@@ -19,6 +19,7 @@ interface EventMap {
 export class GesturePreviewHost extends EventEmitter<EventMap> {
   private readonly div: HTMLDivElement;
   private readonly label: HTMLSpanElement;
+  private readonly hintLabel: HTMLSpanElement;
   private readonly previewImgContainer: HTMLDivElement;
 
   private flickPreviews = new Map<string, HTMLDivElement>;
@@ -98,6 +99,24 @@ export class GesturePreviewHost extends EventEmitter<EventMap> {
         previewImgContainer.appendChild(flickPreview);
       });
     }
+
+    const hintLabel = this.hintLabel = document.createElement('div');
+    hintLabel.className='kmw-key-popup-icon';
+
+    if(!isPhone) {
+      hintLabel.textContent = keySpec == keySpec.hintSrc ? keySpec.hint : keySpec.hintSrc?.text;
+      hintLabel.style.fontWeight= hintLabel.textContent == '\u2022' ? 'bold' : '';
+    }
+
+    // Default positioning puts it far too close to the flick-preview bit.
+    let yAdjustment = 0;
+    hintLabel.style.marginTop = `-${yAdjustment}px`;
+
+    // b/c multitap's border forces position shifting
+    let xAdjustment = 0;
+    hintLabel.style.marginRight = `-${xAdjustment}px`;
+
+    base.appendChild(hintLabel);
   }
 
   public refreshLayout() {
@@ -119,6 +138,8 @@ export class GesturePreviewHost extends EventEmitter<EventMap> {
   }
 
   public scrollFlickPreview(x: number, y: number) {
+    this.clearHint();
+
     const scrollStyle = this.previewImgContainer.style;
     const edge = this.flickEdgeLength * FLICK_OVERFLOW_OFFSET;
 
@@ -138,6 +159,10 @@ export class GesturePreviewHost extends EventEmitter<EventMap> {
     this.previewImgContainer.style.marginLeft = '0px';
 
     this.previewImgContainer.classList.add('flick-clear');
+  }
+
+  public clearHint() {
+    this.hintLabel.classList.add('hint-clear');
   }
 
   public clearAll() {
