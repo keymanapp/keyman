@@ -39,7 +39,10 @@ interface BannerSuggestionFormatSpec {
   /**
    * The font style (font-size, font-family) to use for suggestion-banner display text.
    */
-  styleForFont: CSSStyleDeclaration,
+  styleForFont: {
+    fontSize:   typeof CSSStyleDeclaration.prototype.fontSize,
+    fontFamily: typeof CSSStyleDeclaration.prototype.fontFamily
+  },
 
   /**
    * Sets a target width to use when 'collapsing' suggestions.  Only affects those long
@@ -78,6 +81,10 @@ export class BannerSuggestion {
     let display = this.display = createUnselectableElement('span');
     display.className = 'kmw-suggestion-text';
     this.container.appendChild(display);
+  }
+
+  get computedStyle() {
+    return getComputedStyle(this.display);
   }
 
   private constructRoot() {
@@ -520,7 +527,13 @@ export class SuggestionBanner extends Banner {
   public onSuggestionUpdate = (suggestions: Suggestion[]): void => {
     this.currentSuggestions = suggestions;
 
-    const fontStyle = getComputedStyle(this.options[0].div);
+    const fontStyleBase = this.options[0].computedStyle;
+    // Do NOT just re-use the returned object from the line above; it may spontaneously change
+    // (in a bad way) when the underlying span is replaced!
+    const fontStyle = {
+      fontSize: fontStyleBase.fontSize,
+      fontFamily: fontStyleBase.fontFamily
+    }
     const emSizeStr = getComputedStyle(document.body).fontSize;
     const emSize    = getFontSizeStyle(emSizeStr).val;
 
