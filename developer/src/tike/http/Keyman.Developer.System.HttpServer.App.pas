@@ -43,6 +43,7 @@ uses
 
   JsonUtil,
   KeymanDeveloperOptions,
+  Keyman.Developer.System.Project.Project,
   Keyman.Developer.System.Project.ProjectFile,
   Keyman.Developer.System.Project.WelcomeRenderer,
   RedistFiles;
@@ -112,7 +113,7 @@ procedure TAppHttpResponder.RespondProject(doc: string; AContext: TIdContext;
     end;
 
     // Transform the .kpj
-    with TProject.Create(ptUnknown, path) do
+    with TProject.Create(ptUnknown, path, True) do
     try
       AResponseInfo.ContentType := 'text/html; charset=UTF-8';
       AResponseInfo.ContentText := Render;

@@ -288,7 +288,12 @@ uses
   Keyman.Developer.UI.Project.xmlLdmlProjectFileUI in 'project\Keyman.Developer.UI.Project.xmlLdmlProjectFileUI.pas',
   Keyman.Developer.UI.UfrmLdmlKeyboardEditor in 'child\Keyman.Developer.UI.UfrmLdmlKeyboardEditor.pas' {frmLdmlKeyboardEditor},
   dmActionsKeyboardEditor in 'actions\dmActionsKeyboardEditor.pas' {modActionsKeyboardEditor: TDataModule},
-  Keyman.Developer.UI.Project.UfrmProjectSettings in 'project\Keyman.Developer.UI.Project.UfrmProjectSettings.pas' {frmProjectSettings};
+  Keyman.Developer.UI.Project.UfrmProjectSettings in 'project\Keyman.Developer.UI.Project.UfrmProjectSettings.pas' {frmProjectSettings},
+  Keyman.Developer.System.TikeCommandLine in 'main\Keyman.Developer.System.TikeCommandLine.pas',
+  Keyman.Developer.System.MultiProcess in 'main\Keyman.Developer.System.MultiProcess.pas',
+  Keyman.Developer.System.TikeMultiProcess in 'main\Keyman.Developer.System.TikeMultiProcess.pas',
+  Keyman.System.CopyDataHelper in 'main\Keyman.System.CopyDataHelper.pas',
+  Keyman.Developer.System.ProjectOwningFile in 'main\Keyman.Developer.System.ProjectOwningFile.pas';
 
 {$R *.RES}
 {$R ICONS.RES}
@@ -304,6 +309,12 @@ const
 begin
   TKeymanSentryClient.Start(TSentryClientVcl, kscpDeveloper, LOGGER_DEVELOPER_IDE_TIKE);
   try
+
+    case TikeCommandLine.Process of
+      pclExit:
+        Exit;
+    end;
+
     try
       CoInitFlags := COINIT_APARTMENTTHREADED;
 
@@ -317,7 +328,7 @@ begin
           Application.Initialize;
           Application.Title := 'Keyman Developer';
           Application.CreateForm(TmodWebHttpServer, modWebHttpServer);
-          try
+  try
             Application.CreateForm(TfrmKeymanDeveloper, frmKeymanDeveloper);
             Application.Run;
           finally
