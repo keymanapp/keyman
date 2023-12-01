@@ -51,6 +51,21 @@ void KMX_ReportUnconvertedKeyRule(LPKMX_KEY key);
 void KMX_ReportUnconvertedGroupRules(LPKMX_GROUP group);
 void KMX_ReportUnconvertedKeyboardRules(LPKMX_KEYBOARD kbd);
 
+int KMX_GetDeadkeys(WORD DeadKey, WORD *OutputPairs) ;
+
+
+int KMX_GetDeadkeys_NT(WORD DeadKey, WORD *OutputPairs);  // returns array of [USVK, ch] pairs
+int KMX_GetDeadkeys_NT_x64(WORD DeadKey, WORD *OutputPairs);  // returns array of [USVK, ch] pairs
+void KMX_AddDeadkeyRule(LPKMX_KEYBOARD kbd, KMX_WCHAR deadkey, KMX_WORD vk, UINT shift);
+
+void KMX_TranslateDeadkeyKeyboard(LPKMX_KEYBOARD kbd, KMX_WCHAR deadkey, KMX_WORD vk, UINT shift, KMX_WORD ch);
+void KMX_TranslateDeadkeyGroup(LPKMX_GROUP group,KMX_WCHAR deadkey, KMX_WORD vk, UINT shift, KMX_WORD ch);
+void KMX_TranslateDeadkeyKey(LPKMX_KEY key, KMX_WCHAR deadkey, KMX_WORD vk, UINT shift, KMX_WORD ch);
+
+
+KMX_WORD KMX_VKUSToVKUnderlyingLayout_S2(KMX_WORD VKey);
+KMX_WORD KMX_VKUnderlyingLayoutToVKUS_S2(KMX_WORD VKey);
+
 #if defined(_WIN32) || defined(_WIN64)
   int wmain(int argc, wchar_t* argv[]) {
     std::vector<std::u16string> str_argv_16 = convert_argvW_to_Vector_u16str( argc, argv);
@@ -306,6 +321,102 @@ int createOneVectorFromBothKeyboards(v_dw_3D &All_Vector,GdkKeymap *keymap){
   return 0;
 }
 
+KMX_WCHAR KMX_GetUniqueDeadkeyID(LPKMX_KEYBOARD kbd, KMX_WCHAR deadkey) {
+  KMX_WCHAR noneS2;
+  /*LPGROUP gp;
+  LPKEY kp;
+  LPSTORE sp;
+  UINT i, j;
+  WCHAR dkid = 0;
+  static WCHAR s_next_dkid = 0;
+  static dkidmap *s_dkids = NULL;
+  static int s_ndkids = 0;
+
+  if(!kbd) {
+    if(s_dkids) {
+      delete s_dkids;
+    }
+    s_dkids = NULL;
+    s_ndkids = 0;
+    s_next_dkid = 0;
+    return 0;
+  }
+
+  for(int i = 0; i < s_ndkids; i++) {
+    if(s_dkids[i].src_deadkey == deadkey) {
+      return s_dkids[i].dst_deadkey;
+    }
+  }
+
+  if(s_next_dkid != 0) {
+    s_dkids = (dkidmap*) realloc(s_dkids, sizeof(dkidmap) * (s_ndkids+1));
+    s_dkids[s_ndkids].src_deadkey = deadkey;
+    return s_dkids[s_ndkids++].dst_deadkey = ++s_next_dkid;
+  }
+
+  for(i = 0, gp = kbd->dpGroupArray; i < kbd->cxGroupArray; i++, gp++) {
+    for(j = 0, kp = gp->dpKeyArray; j < gp->cxKeyArray; j++, kp++) {
+      dkid = max(dkid, ScanXStringForMaxDeadkeyID(kp->dpContext));
+      dkid = max(dkid, ScanXStringForMaxDeadkeyID(kp->dpOutput));
+    }
+    dkid = max(dkid, ScanXStringForMaxDeadkeyID(gp->dpMatch));
+    dkid = max(dkid, ScanXStringForMaxDeadkeyID(gp->dpNoMatch));
+  }
+
+  for(i = 0, sp = kbd->dpStoreArray; i < kbd->cxStoreArray; i++, sp++) {
+    dkid = max(dkid, ScanXStringForMaxDeadkeyID(sp->dpString));
+  }
+
+  s_dkids = (dkidmap*) realloc(s_dkids, sizeof(dkidmap) * (s_ndkids+1));
+  s_dkids[s_ndkids].src_deadkey = deadkey;
+  return s_dkids[s_ndkids++].dst_deadkey = s_next_dkid = ++dkid;*/
+  return noneS2;
+}
+
+void KMX_ConvertDeadkey(LPKMX_KEYBOARD kbd, KMX_WORD vk, UINT shift, KMX_WCHAR deadkey) {
+  KMX_WORD deadkeys[512], *pdk;
+
+  // Lookup the deadkey table for the deadkey in the physical keyboard
+  // Then for each character, go through and map it through
+
+KMX_WCHAR dkid = KMX_GetUniqueDeadkeyID(kbd, deadkey);
+
+  // Add the deadkey to the mapping table for use in the import rules phase
+  KMX_DeadkeyMapping KMX_deadkeyMapping = { deadkey, dkid, shift, vk };   // I4353
+  KMX_FDeadkeys.push_back(KMX_deadkeyMapping); //dkid, vk, shift);   // I4353
+
+  KMX_AddDeadkeyRule(kbd, dkid, vk, shift);
+
+  KMX_GetDeadkeys(deadkey, pdk = deadkeys);  // returns array of [usvk, ch_out] pairs
+  while(*pdk) {
+    // Look up the ch
+    // _S2 the new function returns KMX_DWORD
+    UINT vkUnderlying = KMX_VKUnderlyingLayoutToVKUS_S2(*pdk);
+    KMX_TranslateDeadkeyKeyboard(kbd, dkid, vkUnderlying, *(pdk+1), *(pdk+2));
+    pdk+=3;
+  }
+}
+
+KMX_WORD KMX_VKUSToVKUnderlyingLayout_S2(KMX_WORD VKey) {
+  /*if(IsWow64()) {
+    return VKUSToVKUnderlyingLayout_NT_x64(VKey);
+  } else {
+    return VKUSToVKUnderlyingLayout_NT(VKey);
+  }*/
+  KMX_WORD retu ;
+  return retu;
+}
+
+KMX_WORD KMX_VKUnderlyingLayoutToVKUS_S2(KMX_WORD VKey) {
+ /* if(IsWow64()) {
+    return VKUnderlyingLayoutToVKUS_NT_x64(VKey);
+  } else {
+    return VKUnderlyingLayoutToVKUS_NT(VKey);
+  }*/
+  KMX_WORD retu ;
+  return retu;
+}
+
 KMX_BOOL KMX_DoConvert(LPKMX_KEYBOARD kbd, PKMX_WCHAR kbid, KMX_BOOL bDeadkeyConversion, gint argc, gchar *argv[]) {
 
   KMX_WCHAR DeadKey;
@@ -362,7 +473,7 @@ KMX_BOOL KMX_DoConvert(LPKMX_KEYBOARD kbd, PKMX_WCHAR kbid, KMX_BOOL bDeadkeyCon
 
         case 0x0000: break;
         // _S2 TODO deadkeys will be done later
-        //case 0xFFFF: ConvertDeadkey(kbd, VKMap[i], VKShiftState[j], DeadKey); break;
+        case 0xFFFF: KMX_ConvertDeadkey(kbd, KMX_VKMap[i], VKShiftState[j], DeadKey); break;
         default:     KMX_TranslateKeyboard(kbd, KMX_VKMap[i], VKShiftState[j], ch);
       }
     }
@@ -463,11 +574,125 @@ void KMX_ReportUnconvertedKeyboardRules(LPKMX_KEYBOARD kbd) {
   }
 }
 
+void KMX_AddDeadkeyRule(LPKMX_KEYBOARD kbd, KMX_WCHAR deadkey, KMX_WORD vk, UINT shift) {
+  // The weird LCTRL+RALT is Windows' way of mapping the AltGr key.
+  // We store that as just RALT, and use the option "Simulate RAlt with Ctrl+Alt"
+  // to provide an alternate..
+  /*if((shift & (LCTRLFLAG|RALTFLAG)) == (LCTRLFLAG|RALTFLAG)) // I4549
+    shift &= ~LCTRLFLAG;
+
+  // If the first group is not a matching-keys group, then we need to add into
+  // each subgroup, otherwise just the match group
+  for(unsigned int i = 0; i < kbd->cxGroupArray; i++) {
+    if(kbd->dpGroupArray[i].fUsingKeys) {
+      LPKMX_KEY keys = new KEY[kbd->dpGroupArray[i].cxKeyArray + 1];
+      memcpy(keys+1, kbd->dpGroupArray[i].dpKeyArray, kbd->dpGroupArray[i].cxKeyArray * sizeof(KEY));
+      keys[0].dpContext = new WCHAR[1];
+      keys[0].dpContext[0] = 0;
+      keys[0].dpOutput = new WCHAR[4]; // UC_SENTINEL, CODE_DEADKEY, deadkey_value, 0
+      keys[0].dpOutput[0] = UC_SENTINEL;
+      keys[0].dpOutput[1] = CODE_DEADKEY;
+      keys[0].dpOutput[2] = deadkey; // TODO: translate to unique index
+      keys[0].dpOutput[3] = 0;
+      keys[0].Key = vk;
+      keys[0].Line = 0;
+      keys[0].ShiftFlags = shift | ISVIRTUALKEY;
+      kbd->dpGroupArray[i].dpKeyArray = keys;
+      kbd->dpGroupArray[i].cxKeyArray++;
+      //LogError("Add deadkey rule:  + [%d K_%d] > dk(%d)", shift, vk, deadkey);
+      if(i == kbd->StartGroup[1]) break;  // If this is the initial group, that's all we need to do.
+    }
+  }*/
+}
 
 
+int KMX_GetDeadkeys(WORD DeadKey, WORD *OutputPairs) {
+  /*if(IsWow64()) {
+    return KMX_GetDeadkeys_NT_x64(DeadKey, OutputPairs);
+  } else {
+    return KMX_GetDeadkeys_NT(DeadKey, OutputPairs);
+  }*/
+}
 
+int KMX_GetDeadkeys_NT_x64(WORD DeadKey, WORD *OutputPairs) {
+  /*WORD *p = OutputPairs, shift;
+	for(int i = 0; KbdTables_x64->pDeadKey[i].dwBoth; i++) {
+		if(HIWORD(KbdTables_x64->pDeadKey[i].dwBoth) == DeadKey) {
+			WORD vk = CharToUSVK_NT_x64(LOWORD(KbdTables_x64->pDeadKey[i].dwBoth), &shift);
+      if(vk != 0) {
+        *p++ = vk;
+        *p++ = shift;
+        *p++ = KbdTables_x64->pDeadKey[i].wchComposed;
+      } else {
+        LogError(L"Warning: complex deadkey not supported.");
+      }
+		}
+	}
+  *p = 0;
+  return (INT_PTR)(p-OutputPairs);*/
+}
 
+int KMX_GetDeadkeys_NT(WORD DeadKey, WORD *OutputPairs) {
+  /*WORD *p = OutputPairs, shift;
+	for(int i = 0; KbdTables->pDeadKey[i].dwBoth; i++) {
+		if(HIWORD(KbdTables->pDeadKey[i].dwBoth) == DeadKey) {
+			WORD vk = CharToUSVK_NT(LOWORD(KbdTables->pDeadKey[i].dwBoth), &shift);
+      if(vk != 0) {
+        *p++ = vk;
+        *p++ = shift;
+        *p++ = KbdTables->pDeadKey[i].wchComposed;
+      } else {
+        LogError(L"Warning: complex deadkey not supported.");
+      }
+		}
+	}
+  *p = 0;
+  return (INT_PTR)(p-OutputPairs);*/
+  return 999;
+}
 
+void KMX_TranslateDeadkeyKey(LPKMX_KEY key, KMX_WCHAR deadkey, KMX_WORD vk, UINT shift, KMX_WORD ch) {
+  /*if((key->ShiftFlags == 0 || key->ShiftFlags & VIRTUALCHARKEY) && key->Key == ch) {
+
+    // The weird LCTRL+RALT is Windows' way of mapping the AltGr key.
+    // We store that as just RALT, and use the option "Simulate RAlt with Ctrl+Alt"
+    // to provide an alternate..
+    if((shift & (LCTRLFLAG|RALTFLAG)) == (LCTRLFLAG|RALTFLAG))   // I4327
+      shift &= ~LCTRLFLAG;
+
+    if(key->ShiftFlags == 0) {
+      //LogError("Converted mnemonic rule on line %d, + '%c' TO dk(%d) + [%x K_%d]", key->Line, key->Key, deadkey, shift, vk);
+      key->ShiftFlags = ISVIRTUALKEY | shift;
+    } else {
+      //LogError("Converted mnemonic virtual char key rule on line %d, + [%x '%c'] TO dk(%d) + [%x K_%d]", key->Line, key->ShiftFlags, key->Key, deadkey, key->ShiftFlags & ~VIRTUALCHARKEY, vk);
+      key->ShiftFlags &= ~VIRTUALCHARKEY;
+    }
+
+    int len = wcslen(key->dpContext);
+    PWSTR context = new WCHAR[len + 4];
+    memcpy(context, key->dpContext, len * sizeof(WCHAR));
+    context[len] = UC_SENTINEL;
+    context[len+1] = CODE_DEADKEY;
+    context[len+2] = deadkey;
+    context[len+3] = 0;
+    key->dpContext = context;
+    key->Key = vk;
+  }*/
+}
+
+void KMX_TranslateDeadkeyGroup(LPKMX_GROUP group,KMX_WCHAR deadkey, KMX_WORD vk, UINT shift, KMX_WORD ch) {
+  for(unsigned int i = 0; i < group->cxKeyArray; i++) {
+    KMX_TranslateDeadkeyKey(&group->dpKeyArray[i], deadkey, vk, shift, ch);
+  }
+}
+
+void KMX_TranslateDeadkeyKeyboard(LPKMX_KEYBOARD kbd, KMX_WCHAR deadkey, KMX_WORD vk, UINT shift, KMX_WORD ch) {
+  for(unsigned int i = 0; i < kbd->cxGroupArray; i++) {
+    if(kbd->dpGroupArray[i].fUsingKeys) {
+      KMX_TranslateDeadkeyGroup(&kbd->dpGroupArray[i], deadkey, vk, shift, ch);
+    }
+  }
+}
 // ---- old copy code from here ----------------------------------------------------------
 
 /*
@@ -547,36 +772,7 @@ void TranslateDeadkeyKeyboard(LPKEYBOARD kbd, WCHAR deadkey, WORD vk, UINT shift
   }
 }
 
-void AddDeadkeyRule(LPKEYBOARD kbd, WCHAR deadkey, WORD vk, UINT shift) {
-  // The weird LCTRL+RALT is Windows' way of mapping the AltGr key.
-  // We store that as just RALT, and use the option "Simulate RAlt with Ctrl+Alt"
-  // to provide an alternate..
-  if((shift & (LCTRLFLAG|RALTFLAG)) == (LCTRLFLAG|RALTFLAG)) // I4549
-    shift &= ~LCTRLFLAG;
 
-  // If the first group is not a matching-keys group, then we need to add into
-  // each subgroup, otherwise just the match group
-  for(unsigned int i = 0; i < kbd->cxGroupArray; i++) {
-    if(kbd->dpGroupArray[i].fUsingKeys) {
-      LPKEY keys = new KEY[kbd->dpGroupArray[i].cxKeyArray + 1];
-      memcpy(keys+1, kbd->dpGroupArray[i].dpKeyArray, kbd->dpGroupArray[i].cxKeyArray * sizeof(KEY));
-      keys[0].dpContext = new WCHAR[1];
-      keys[0].dpContext[0] = 0;
-      keys[0].dpOutput = new WCHAR[4]; // UC_SENTINEL, CODE_DEADKEY, deadkey_value, 0
-      keys[0].dpOutput[0] = UC_SENTINEL;
-      keys[0].dpOutput[1] = CODE_DEADKEY;
-      keys[0].dpOutput[2] = deadkey; // TODO: translate to unique index
-      keys[0].dpOutput[3] = 0;
-      keys[0].Key = vk;
-      keys[0].Line = 0;
-      keys[0].ShiftFlags = shift | ISVIRTUALKEY;
-      kbd->dpGroupArray[i].dpKeyArray = keys;
-      kbd->dpGroupArray[i].cxKeyArray++;
-      //LogError("Add deadkey rule:  + [%d K_%d] > dk(%d)", shift, vk, deadkey);
-      if(i == kbd->StartGroup[1]) break;  // If this is the initial group, that's all we need to do.
-    }
-  }
-}
 
 WCHAR ScanXStringForMaxDeadkeyID(LPWSTR str) {
   WCHAR dkid = 0;
@@ -596,81 +792,8 @@ struct dkidmap {
   WCHAR src_deadkey, dst_deadkey;
 };
 
-WCHAR GetUniqueDeadkeyID(LPKEYBOARD kbd, WCHAR deadkey) {
-  LPGROUP gp;
-  LPKEY kp;
-  LPSTORE sp;
-  UINT i, j;
-  WCHAR dkid = 0;
-  static WCHAR s_next_dkid = 0;
-  static dkidmap *s_dkids = NULL;
-  static int s_ndkids = 0;
-
-  if(!kbd) {
-    if(s_dkids) {
-      delete s_dkids;
-    }
-    s_dkids = NULL;
-    s_ndkids = 0;
-    s_next_dkid = 0;
-    return 0;
-  }
-
-  for(int i = 0; i < s_ndkids; i++) {
-    if(s_dkids[i].src_deadkey == deadkey) {
-      return s_dkids[i].dst_deadkey;
-    }
-  }
-
-  if(s_next_dkid != 0) {
-    s_dkids = (dkidmap*) realloc(s_dkids, sizeof(dkidmap) * (s_ndkids+1));
-    s_dkids[s_ndkids].src_deadkey = deadkey;
-    return s_dkids[s_ndkids++].dst_deadkey = ++s_next_dkid;
-  }
-
-  for(i = 0, gp = kbd->dpGroupArray; i < kbd->cxGroupArray; i++, gp++) {
-    for(j = 0, kp = gp->dpKeyArray; j < gp->cxKeyArray; j++, kp++) {
-      dkid = max(dkid, ScanXStringForMaxDeadkeyID(kp->dpContext));
-      dkid = max(dkid, ScanXStringForMaxDeadkeyID(kp->dpOutput));
-    }
-    dkid = max(dkid, ScanXStringForMaxDeadkeyID(gp->dpMatch));
-    dkid = max(dkid, ScanXStringForMaxDeadkeyID(gp->dpNoMatch));
-  }
-
-  for(i = 0, sp = kbd->dpStoreArray; i < kbd->cxStoreArray; i++, sp++) {
-    dkid = max(dkid, ScanXStringForMaxDeadkeyID(sp->dpString));
-  }
-
-  s_dkids = (dkidmap*) realloc(s_dkids, sizeof(dkidmap) * (s_ndkids+1));
-  s_dkids[s_ndkids].src_deadkey = deadkey;
-  return s_dkids[s_ndkids++].dst_deadkey = s_next_dkid = ++dkid;
-}
-
-
-void ConvertDeadkey(LPKEYBOARD kbd, WORD vk, UINT shift, WCHAR deadkey) {
-  WORD deadkeys[512], *pdk;
-
-  // Lookup the deadkey table for the deadkey in the physical keyboard
-  // Then for each character, go through and map it through
-
-  WCHAR dkid = GetUniqueDeadkeyID(kbd, deadkey);
-
-  // Add the deadkey to the mapping table for use in the import rules phase
-  DeadkeyMapping deadkeyMapping = { deadkey, dkid, shift, vk };   // I4353
-  FDeadkeys.push_back(deadkeyMapping); //dkid, vk, shift);   // I4353
-
-  AddDeadkeyRule(kbd, dkid, vk, shift);
-
-  GetDeadkeys(deadkey, pdk = deadkeys);  // returns array of [usvk, ch_out] pairs
-  while(*pdk) {
-    // Look up the ch
-    UINT vkUnderlying = VKUnderlyingLayoutToVKUS(*pdk);
-    TranslateDeadkeyKeyboard(kbd, dkid, vkUnderlying, *(pdk+1), *(pdk+2));
-    pdk+=3;
-  }
-}
-
 */
+
 
 
 //---------old- - original code------------------------------------------

@@ -849,9 +849,7 @@ bool KMX_ImportRules(KMX_WCHAR *kbid, LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, Gd
   // _S2 ToDo
   // either it gives the correct rgkeys (all non-char filled with special char) or
   // it gives not all rgkeys but nr, a-z are filled correctly
-   if((key->VK() != 0) && (key->VK()< 255)) {  // if used without ScanCodeToUSVirtualKey[]
-   // if((key->VK() != 0) ) {
-      keycountS++;
+   if((key->VK() != 0) ) {
         rgKey[key->VK()] = key;
     } else {
         delete key;
@@ -950,7 +948,7 @@ bool KMX_ImportRules(KMX_WCHAR *kbid, LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, Gd
   }
 
   //_S2 this gan co later
-  std::vector< int > TestValues = {48,49,50,51,52,53,54,55,56,57,65,66,67,88,89,90, 186,187,188,189,191,191,192,219,220,221};
+  std::vector< int > TestValues = {48,49,50,51,52,53,54,55,56,57,65,66,67,88,89,90, 186,187,188,189,191,191,192,219,220,221,222,226};
   wprintf(L"-----------------\nNow some tests:\n");
   wprintf(L"                  Base          Caps            Shift           Shfit+Caps     MenuCtrl         MenuCtrl+Caps \n");
 
