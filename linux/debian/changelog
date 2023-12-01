@@ -1,3 +1,10 @@
+keyman (16.0.143-1.1) UNRELEASED; urgency=medium
+
+  [Dandan Zhang]
+  * Add support for loong64 (closes: #1057134)
+
+ -- Eberhard Beilharz <eb1@sil.org>  Thu, 30 Nov 2023 17:52:16 +0100
+
 keyman (16.0.143-1) unstable; urgency=medium
 
   * Fix failure to build source after successful build (Closes #1046776)
