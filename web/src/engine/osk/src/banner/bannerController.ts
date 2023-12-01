@@ -68,7 +68,8 @@ export class BannerController {
 
     const oldBanner = this.container.banner;
     if(oldBanner instanceof SuggestionBanner) {
-      this.predictionContext.off('update', oldBanner.onSuggestionUpdate);
+      // Frees all handlers, etc registered previously by the banner.
+      oldBanner.predictionContext = null;
     }
 
     if(!on) {
@@ -78,7 +79,7 @@ export class BannerController {
       suggestBanner.predictionContext = this.predictionContext;
       suggestBanner.events.on('apply', (selection) => this.predictionContext.accept(selection.suggestion));
 
-      this.predictionContext.on('update', suggestBanner.onSuggestionUpdate);
+      // Registers for prediction-engine events & handles its needed connections.
       this.container.banner = suggestBanner;
     }
   }
@@ -91,5 +92,11 @@ export class BannerController {
   selectBanner(state: StateChangeEnum) {
     // Only display a SuggestionBanner when LanguageProcessor states it is active.
     this.activateBanner(state == 'active' || state == 'configured');
+  }
+
+  public shutdown() {
+    if(this.container.banner instanceof SuggestionBanner) {
+      this.container.banner.predictionContext = null;
+    }
   }
 }

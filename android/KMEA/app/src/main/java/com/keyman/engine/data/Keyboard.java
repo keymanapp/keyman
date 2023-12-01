@@ -16,11 +16,13 @@ import com.keyman.engine.util.FileUtils;
 import com.keyman.engine.util.KMLog;
 import com.keyman.engine.util.KMString;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
 import java.io.Serializable;
+import java.util.ArrayList;
 
 public class Keyboard extends LanguageResource implements Serializable {
   private static final String TAG = "Keyboard";
@@ -169,6 +171,91 @@ public class Keyboard extends LanguageResource implements Serializable {
       }
     }
     return o;
+  }
+
+  private String getKeyboardRoot(Context context) {
+    String keyboardRoot = context.getDir("data", Context.MODE_PRIVATE).toString() +
+      File.separator;
+
+    if (packageID.equals(KMManager.KMDefault_UndefinedPackageID)) {
+      return keyboardRoot + KMManager.KMDefault_UndefinedPackageID + File.separator;
+    } else {
+      return keyboardRoot + KMManager.KMDefault_AssetPackages + File.separator + packageID + File.separator;
+    }
+  }
+
+  public String getKeyboardPath(Context context) {
+    String keyboardID = this.getKeyboardID();
+    String keyboardVersion = this.getVersion();
+    if (packageID.equals(KMManager.KMDefault_UndefinedPackageID)) {
+      return getKeyboardRoot(context) + keyboardID + "-" + keyboardVersion + ".js";
+    } else {
+      return getKeyboardRoot(context) + keyboardID + ".js";
+    }
+  }
+
+  public String toStub(Context context) {
+    JSONObject stubObj = new JSONObject();
+
+    try {
+      stubObj.put("KN", this.getKeyboardName());
+      stubObj.put("KI", "Keyboard_" + this.getKeyboardID());
+      stubObj.put("KLC", this.getLanguageID());
+      stubObj.put("KL", this.getLanguageName());
+      stubObj.put("KF", this.getKeyboardPath(context));
+      stubObj.put("KP", this.getPackageID());
+
+      String displayFont = this.getFont();
+      if(displayFont != null) {
+        stubObj.put("KFont", this.buildDisplayFontObject(displayFont, context));
+      }
+
+      String oskFont = this.getOSKFont();
+      if(oskFont != null) {
+        stubObj.put("KOskFont", this.buildDisplayFontObject(oskFont, context));
+      }
+
+      String displayName = this.getDisplayName();
+      if(displayName != null) {
+        stubObj.put("displayName", displayName);
+      }
+
+      return stubObj.toString();
+    } catch(JSONException e) {
+      KMLog.LogException(TAG, "", e);
+      return null;
+    }
+  }
+
+  /**
+   * Take a font JSON object and adjust to pass to JS
+   * 1. Replace "source" keys for "files" keys
+   * 2. Create full font paths for .ttf or .svg
+   * @param font String font JSON object as a string
+   * @return JSONObject of modified font information with full paths. If font is invalid, return `null`
+   */
+  private JSONObject buildDisplayFontObject(String font, Context context) {
+    if(font == null || font.equals("")) {
+      return null;
+    }
+
+    String keyboardRoot = this.getKeyboardRoot(context);
+
+    try {
+      if (FileUtils.hasFontExtension(font)) {
+        JSONObject jfont = new JSONObject();
+        jfont.put(KMManager.KMKey_FontFamily, font.substring(0, font.length() - 4));
+        JSONArray jfiles = new JSONArray();
+        jfiles.put(keyboardRoot + font);
+        jfont.put(KMManager.KMKey_FontFiles, jfiles);
+        return jfont;
+      } else {
+        return null;
+      }
+    } catch (JSONException e) {
+      KMLog.LogException(TAG, "Failed to make font for '"+font+"'", e);
+      return null;
+    }
   }
 
   /**
