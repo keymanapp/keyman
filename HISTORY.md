@@ -1,5 +1,15 @@
 # Keyman Version History
 
+## 17.0.221 alpha 2023-12-01
+
+* chore(windows): removed cached context windows engine (#10065)
+* change(android): flishy flashy mitigation, round 1 (#10017)
+* change(android): smoother keyboard initialization (#10022)
+* fix(android): no suggestions available when swapping pred-text target language (#10061)
+* chore(developer): require project file to exist (#10092)
+* chore(linux): Add support for loong64 architecture (#10109)
+* fix(web): Don't throw errors after detach (#10086)
+
 ## 17.0.220 alpha 2023-11-30
 
 * fix(core): set_if_needed updates an empty cached context (#10098)
