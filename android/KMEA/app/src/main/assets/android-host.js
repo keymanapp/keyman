@@ -34,6 +34,10 @@ function init() {
   keyman.getOskHeight = getOskHeight;
   keyman.getOskWidth = getOskWidth;
   keyman.beepKeyboard = beepKeyboard;
+
+  // Readies the keyboard stub for instant loading during the init process.
+  KeymanWeb.registerStub(JSON.parse(jsInterface.initialKeyboard()));
+
   keyman.init({
     'embeddingApp':device,
     'fonts':'packages/',

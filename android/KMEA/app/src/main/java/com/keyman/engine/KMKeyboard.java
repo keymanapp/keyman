@@ -214,10 +214,8 @@ final class KMKeyboard extends WebView {
         }
 
         // Send console errors to Sentry in case they're missed by KMW sentryManager
-        // (Ignoring spurious message "No keyboard stubs exist = ...")
-        // TODO: Fix base error rather than trying to ignore it "No keyboard stubs exist"
 
-        if ((cm.messageLevel() == ConsoleMessage.MessageLevel.ERROR) && (!cm.message().startsWith("No keyboard stubs exist"))) {
+        if (cm.messageLevel() == ConsoleMessage.MessageLevel.ERROR) {
           // Make Toast notification of error and send log about falling back to default keyboard (ignore language ID)
           // Sanitize sourceId info
           String NAVIGATION_PATTERN = "^(.*)?(keyboard\\.html#[^-]+)-.*$";
