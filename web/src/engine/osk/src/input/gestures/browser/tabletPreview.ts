@@ -17,9 +17,9 @@ export class TabletKeyTip implements KeyTipInterface {
   private readonly vkbd: VisualKeyboard;
 
   /**
-   *
-   * @param constrain keep the keytip within the bounds of the overall OSK.
-   *                  Will probably be handled via function in a later pass.
+   * Pre-builds a reusable element to serve as a gesture-preview host for selected keys
+   * on tablet-form factor devices.  This element hovers over the keyboard, staying in
+   * place (and on top) even when the layer changes.
    */
   constructor(vkbd: VisualKeyboard) {
     this.vkbd = vkbd;

@@ -108,14 +108,6 @@ export class GesturePreviewHost extends EventEmitter<EventMap> {
       hintLabel.style.fontWeight= hintLabel.textContent == '\u2022' ? 'bold' : '';
     }
 
-    // Default positioning puts it far too close to the flick-preview bit.
-    let yAdjustment = 0;
-    hintLabel.style.marginTop = `-${yAdjustment}px`;
-
-    // b/c multitap's border forces position shifting
-    let xAdjustment = 0;
-    hintLabel.style.marginRight = `-${xAdjustment}px`;
-
     base.appendChild(hintLabel);
   }
 
