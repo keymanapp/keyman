@@ -14,7 +14,10 @@ builder_describe "Build Keyman Developer web utility module" \
   "clean" \
   "configure" \
   "build" \
-  "test"
+  "test" \
+  publish \
+  pack \
+  "--dry-run,-n              don't actually publish, just dry run"
 
 builder_describe_outputs \
   configure     /node_modules \
@@ -34,3 +37,6 @@ if builder_start_action test; then
   c8 --reporter=lcov --reporter=text --exclude-after-remap mocha
   builder_finish_action success test
 fi
+
+builder_run_action publish    builder_publish_to_npm
+builder_run_action pack       builder_publish_to_pack
