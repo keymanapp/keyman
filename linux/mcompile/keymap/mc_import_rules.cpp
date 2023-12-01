@@ -665,70 +665,6 @@ public:
   }*/
 };
 
-// _S2 where to put this??
-const int CODE__SIZE[] = {
-   -1,   // undefined                0x00
-    1,   // CODE_ANY                 0x01
-    2,   // CODE_INDEX               0x02
-    0,   // CODE_CONTEXT             0x03
-    0,   // CODE_NUL                 0x04
-    1,   // CODE_USE                 0x05
-    0,   // CODE_RETURN              0x06
-    0,   // CODE_BEEP                0x07
-    1,   // CODE_DEADKEY             0x08
-   -1,  // unused                   0x09
-    2,   // CODE_EXTENDED            0x0A
-   -1,  // CODE_EXTENDEDEND         0x0B (unused)
-    1,   // CODE_SWITCH              0x0C
-   -1,  // CODE_KEY                 0x0D (never used)
-    0,   // CODE_CLEARCONTEXT        0x0E
-    1,   // CODE_CALL                0x0F
-   -1,  // UC_SENTINEL_EXTENDEDEND  0x10 (not valid with UC_SENTINEL)
-    1,   // CODE_CONTEXTEX           0x11
-    1,   // CODE_NOTANY              0x12
-    2,   // CODE_SETOPT              0x13
-    3,   // CODE_IFOPT               0x14
-    1,   // CODE_SAVEOPT             0x15
-    1,   // CODE_RESETOPT            0x16
-    3,   // CODE_IFSYSTEMSTORE       0x17
-    2    // CODE_SETSYSTEMSTORE      0x18
-};
-
-// _S2 where to put this??
-PKMX_WCHAR KMX_incxstr(PKMX_WCHAR p) {
-
-  if (*p == 0)
-    return p;
-  if (*p != UC_SENTINEL) {
-    if (*p >= 0xD800 && *p <= 0xDBFF && *(p + 1) >= 0xDC00 && *(p + 1) <= 0xDFFF)
-      return p + 2;
-    return p + 1;
-  }
-  // UC_SENTINEL(FFFF) with UC_SENTINEL_EXTENDEDEND(0x10) == variable length
-  if (*(p + 1) == CODE_EXTENDED) {
-    p += 2;
-    while (*p && *p != UC_SENTINEL_EXTENDEDEND)
-      p++;
-
-    if (*p == 0)        return p;
-    return p + 1;
-  }
-
-  if (*(p + 1) > CODE_LASTCODE || CODE__SIZE[*(p + 1)] == -1) {
-    return p + 1;
-  }
-
-  int deltaptr = 2 + CODE__SIZE[*(p + 1)];
-
-  // check for \0 between UC_SENTINEL(FFFF) and next printable character
-  for (int i = 0; i < deltaptr; i++) {
-    if (*p == 0)
-      return p;
-    p++;
-  }
-  return p;
-}
-
 int KMX_GetMaxDeadkeyIndex(KMX_WCHAR *p) {
   int n = 0;
   while(p && *p) {
@@ -743,65 +679,6 @@ int KMX_GetMaxDeadkeyIndex(KMX_WCHAR *p) {
   return n;
 }
 
-bool IsKeymanUsedKeyVal(std::wstring Keyval) {
-
-
-
-  int KV = (int) (*Keyval.c_str());
-
-  //         32            127              196          256
-  if  ((KV >= 0x20 && KV <= 0x7F) || (KV >= 0xC4 && KV < 198)  ||
-       (KV >= 199  && KV < 208)   || (KV >= 209 && KV < 216)   || (KV >= 217 && KV < 229)  ||
-       (KV >= 231 && KV < 240)    || (KV >= 241 && KV < 248)   || (KV >= 249 && KV < 0xFF) ||
-       (KV == 128) || (KV == 178) || (KV == 167) || (KV == 179)|| (KV == 176)|| (KV == 181)   )
-
-
-  //         32            127             136          256
-  //if ((KV >= 0x20 && KV <= 0x7F) || (KV == 214)|| (KV == 246)|| (KV ==196)|| (KV == 228) || (KV ==220)|| (KV == 252)|| (KV ==223)|| (KV == 186))
-    return true;
-  else
-
-    return false;
-
-}
-
-void Inspect_kp(LPKMX_KEYBOARD kp) {
-  wprintf(L"-------\n");
-  wprintf(L"-------\n");
-  wprintf(L"-------\n");
-  wprintf(L"kp has %i groups and %i keys\n",kp->cxGroupArray, kp->dpGroupArray->cxKeyArray);
-  wprintf(L"-------\n");
-
-//for ( int i=0; i<150;i++) {
-for ( int i=0; i<kp->dpGroupArray->cxKeyArray;i++) {
-  wprintf(L"key nr :%i has key:%i(%c)  Line:%i  Shiftflags:%i Output %c (%d)\n",i,kp->dpGroupArray->dpKeyArray->Key,kp->dpGroupArray->dpKeyArray->Key,
-     kp->dpGroupArray->dpKeyArray->Line,kp->dpGroupArray->dpKeyArray->ShiftFlags ,kp->dpGroupArray->dpKeyArray->dpOutput,*kp->dpGroupArray->dpKeyArray->dpOutput );
-  kp->dpGroupArray->dpKeyArray++;
-}
-  wprintf(L"-------\n");
-  wprintf(L"-------\n");
-  wprintf(L"-------\n");
-}
-
-
-void Inspect_gp(KMX_tagGROUP* gp) {
-  for (int i = 0; i < gp->cxKeyArray; i++) {
-    wprintf(L"key nr : has key:%i(%c)  Line:%i  Shiftflags:%i Output %c (%d)\n",  gp->dpKeyArray->Key, gp->dpKeyArray->Key,
-      gp->dpKeyArray->Line, gp->dpKeyArray->ShiftFlags, gp->dpKeyArray->dpOutput, *gp->dpKeyArray->dpOutput);
-   // gp->cxKeyArray++;
-  }
-}
-
-void Inspect_key(LPKMX_KEY key) {
-  //for (int i = 0; i < gp->cxKeyArray; i++) {
-    wprintf(L"key nr : has key:%i(%c)  Line:%i  Shiftflags:%i Output \n",  key->Key, key->Key,
-      key->Line, key->ShiftFlags);
-    /*wprintf(L"key nr : has key:%i(%c)  Line:%i  Shiftflags:%i Output %c (%d)\n",  key->Key, key->Key,
-      key->Line, key->ShiftFlags, key->dpOutput, *key->dpOutput);*/
-   // gp->cxKeyArray++;
- // }
-}
-
 bool KMX_ImportRules(KMX_WCHAR *kbid, LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, GdkKeymap **keymap, std::vector<KMX_DeadkeyMapping> *FDeadkeys, KMX_BOOL bDeadkeyConversion) {   // I4353   // I4552
   KMX_Loader loader;
   const size_t BUF_sz= 256;
@@ -810,19 +687,6 @@ bool KMX_ImportRules(KMX_WCHAR *kbid, LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, Gd
   KMX_WCHAR inputHKL[12];
   u16sprintf(inputHKL,BUF_sz ,L"%08.8x", (unsigned int) u16tol(kbid, NULL, 16));   // _S2 wsprintf(inputHKL, L"%08.8x", (unsigned int) wcstol(kbid, NULL, 16));
 
-
-  /*
-    // _S2 do I need that for Linux??
-    int cKeyboards = GetKeyboardLayoutList(0, NULL);
-    HKL *rghkl = new HKL[cKeyboards];
-    GetKeyboardLayoutList(cKeyboards, rghkl);
-    HKL hkl = LoadKeyboardLayout(inputHKL, KLF_NOTELLSHELL);
-    if(hkl == NULL) {
-        puts("Sorry, that keyboard does not seem to be valid.");
-        delete[] rghkl;
-        return false;
-    }
-    */
   KMX_HKL hkl = NULL;               //_S2 added: but can I do this?? hkl is not needed in Linux??
 
   BYTE lpKeyState[256];// = new KeysEx[256];
@@ -1157,4 +1021,127 @@ int STOP=0;  // _S2 LayoutRow: VKToUnderlying should work OK; GetSSValue not che
   }
   //Inspect_kp(kp);
 return true;
+}
+
+
+// _S2 where to put this??
+const int CODE__SIZE[] = {
+   -1,   // undefined                0x00
+    1,   // CODE_ANY                 0x01
+    2,   // CODE_INDEX               0x02
+    0,   // CODE_CONTEXT             0x03
+    0,   // CODE_NUL                 0x04
+    1,   // CODE_USE                 0x05
+    0,   // CODE_RETURN              0x06
+    0,   // CODE_BEEP                0x07
+    1,   // CODE_DEADKEY             0x08
+   -1,  // unused                   0x09
+    2,   // CODE_EXTENDED            0x0A
+   -1,  // CODE_EXTENDEDEND         0x0B (unused)
+    1,   // CODE_SWITCH              0x0C
+   -1,  // CODE_KEY                 0x0D (never used)
+    0,   // CODE_CLEARCONTEXT        0x0E
+    1,   // CODE_CALL                0x0F
+   -1,  // UC_SENTINEL_EXTENDEDEND  0x10 (not valid with UC_SENTINEL)
+    1,   // CODE_CONTEXTEX           0x11
+    1,   // CODE_NOTANY              0x12
+    2,   // CODE_SETOPT              0x13
+    3,   // CODE_IFOPT               0x14
+    1,   // CODE_SAVEOPT             0x15
+    1,   // CODE_RESETOPT            0x16
+    3,   // CODE_IFSYSTEMSTORE       0x17
+    2    // CODE_SETSYSTEMSTORE      0x18
+};
+
+// _S2 where to put this??
+PKMX_WCHAR KMX_incxstr(PKMX_WCHAR p) {
+
+  if (*p == 0)
+    return p;
+  if (*p != UC_SENTINEL) {
+    if (*p >= 0xD800 && *p <= 0xDBFF && *(p + 1) >= 0xDC00 && *(p + 1) <= 0xDFFF)
+      return p + 2;
+    return p + 1;
+  }
+  // UC_SENTINEL(FFFF) with UC_SENTINEL_EXTENDEDEND(0x10) == variable length
+  if (*(p + 1) == CODE_EXTENDED) {
+    p += 2;
+    while (*p && *p != UC_SENTINEL_EXTENDEDEND)
+      p++;
+
+    if (*p == 0)        return p;
+    return p + 1;
+  }
+
+  if (*(p + 1) > CODE_LASTCODE || CODE__SIZE[*(p + 1)] == -1) {
+    return p + 1;
+  }
+
+  int deltaptr = 2 + CODE__SIZE[*(p + 1)];
+
+  // check for \0 between UC_SENTINEL(FFFF) and next printable character
+  for (int i = 0; i < deltaptr; i++) {
+    if (*p == 0)
+      return p;
+    p++;
+  }
+  return p;
+}
+
+bool IsKeymanUsedKeyVal(std::wstring Keyval) {
+
+
+
+  int KV = (int) (*Keyval.c_str());
+
+  //         32            127              196          256
+  if  ((KV >= 0x20 && KV <= 0x7F) || (KV >= 0xC4 && KV < 198)  ||
+       (KV >= 199  && KV < 208)   || (KV >= 209 && KV < 216)   || (KV >= 217 && KV < 229)  ||
+       (KV >= 231 && KV < 240)    || (KV >= 241 && KV < 248)   || (KV >= 249 && KV < 0xFF) ||
+       (KV == 128) || (KV == 178) || (KV == 167) || (KV == 179)|| (KV == 176)|| (KV == 181)   )
+
+
+  //         32            127             136          256
+  //if ((KV >= 0x20 && KV <= 0x7F) || (KV == 214)|| (KV == 246)|| (KV ==196)|| (KV == 228) || (KV ==220)|| (KV == 252)|| (KV ==223)|| (KV == 186))
+    return true;
+  else
+
+    return false;
+
+}
+
+void Inspect_kp(LPKMX_KEYBOARD kp) {
+  wprintf(L"-------\n");
+  wprintf(L"-------\n");
+  wprintf(L"-------\n");
+  wprintf(L"kp has %i groups and %i keys\n",kp->cxGroupArray, kp->dpGroupArray->cxKeyArray);
+  wprintf(L"-------\n");
+
+//for ( int i=0; i<150;i++) {
+for ( int i=0; i<kp->dpGroupArray->cxKeyArray;i++) {
+  wprintf(L"key nr :%i has key:%i(%c)  Line:%i  Shiftflags:%i Output %c (%d)\n",i,kp->dpGroupArray->dpKeyArray->Key,kp->dpGroupArray->dpKeyArray->Key,
+     kp->dpGroupArray->dpKeyArray->Line,kp->dpGroupArray->dpKeyArray->ShiftFlags ,kp->dpGroupArray->dpKeyArray->dpOutput,*kp->dpGroupArray->dpKeyArray->dpOutput );
+  kp->dpGroupArray->dpKeyArray++;
+}
+  wprintf(L"-------\n");
+  wprintf(L"-------\n");
+  wprintf(L"-------\n");
+}
+
+void Inspect_gp(KMX_tagGROUP* gp) {
+  for (int i = 0; i < gp->cxKeyArray; i++) {
+    wprintf(L"key nr : has key:%i(%c)  Line:%i  Shiftflags:%i Output %c (%d)\n",  gp->dpKeyArray->Key, gp->dpKeyArray->Key,
+      gp->dpKeyArray->Line, gp->dpKeyArray->ShiftFlags, gp->dpKeyArray->dpOutput, *gp->dpKeyArray->dpOutput);
+   // gp->cxKeyArray++;
+  }
+}
+
+void Inspect_key(LPKMX_KEY key) {
+  //for (int i = 0; i < gp->cxKeyArray; i++) {
+    wprintf(L"key nr : has key:%i(%c)  Line:%i  Shiftflags:%i Output \n",  key->Key, key->Key,
+      key->Line, key->ShiftFlags);
+    /*wprintf(L"key nr : has key:%i(%c)  Line:%i  Shiftflags:%i Output %c (%d)\n",  key->Key, key->Key,
+      key->Line, key->ShiftFlags, key->dpOutput, *key->dpOutput);*/
+   // gp->cxKeyArray++;
+ // }
 }

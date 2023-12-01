@@ -2,6 +2,83 @@
 
 #include <xkbcommon/xkbcommon.h>
 
+
+int map_VKShiftState_to_Lin(int VKShiftState) {
+  if (VKShiftState == 0 )      return 0;		/* 0000 0000 */
+  if (VKShiftState == 16)      return 1;		/* 0001 0000 */
+  //if (VKShiftState == 9 )      return 2;		/* 0000 1001 */
+  //if (VKShiftState == 25)      return 3; 		/* 0001 1001 */
+  return VKShiftState;
+}
+
+KMX_DWORD convertNamesToASCIIValue(std::wstring tok_wstr){
+  std::map<std::wstring, KMX_DWORD > first;
+
+
+  first[L"ampersand"]         =  38;
+  first[L"apostrophe"]        =  39;
+  first[L"asciicircum"]       = 136;
+  first[L"asciitilde"]        = 126;
+  first[L"asterisk"]          =  42;
+  first[L"at"]                =  64;
+  first[L"backslash"]         =  92;
+  first[L"bar"]               = 124;
+  first[L"braceleft"]         = 123;
+  first[L"braceright"]        = 125;
+  first[L"bracketleft"]       =  91;
+  first[L"bracketright"]      =  93;
+  first[L"colon"]             =  58;
+  first[L"comma"]             =  44;
+  first[L"dollar"]            =  36;
+  first[L"equal"]             =  61;
+  first[L"exclam"]            =  33;
+  first[L"grave"]             =  96;
+  first[L"greater"]           =  62;
+  first[L"less"]              =  60;
+  first[L"minus"]             =  45;
+  first[L"numbersign"]        =  35;
+  first[L"parenleft"]         =  40;
+  first[L"parenright"]        =  41;
+  first[L"percent"]           =  37;
+  first[L"period"]            =  46;
+  first[L"plus"]              =  43;
+  first[L"question"]          =  63;
+  first[L"quotedbl"]          =  34;
+  first[L"semicolon"]         =  59;
+  first[L"slash"]             =  47;
+  first[L"space"]             =  32;
+  first[L"ssharp"]            = 223;
+  first[L"underscore"]        =  95;
+
+  first[L"dead_abovedot"]     = 729;
+  first[L"dead_abovering"]    = 730;
+  first[L"dead_acute"]        = 180;   //39 180 ??
+  first[L"dead_breve"]        = 728;
+  first[L"dead_caron"]        = 711;
+  first[L"dead_cedilla"]      = 184;
+  first[L"dead_circumflex"]   =  94;
+  first[L"dead_diaeresis"]    = 168;
+  first[L"dead_doubleacute"]  = 733;
+  first[L"dead_grave"]        =  96;
+  first[L"dead_ogonek"]       = 731;
+  first[L"dead_perispomeni"]  = 126;
+  first[L"dead_tilde"]        = 126;
+
+  //first[L" ??   "]           =   VK_OEM_102;    /* DE =  226 ' " ? VK_OEM_102 */
+
+  if ( tok_wstr.size() == 1) {
+    return (KMX_DWORD) ( *tok_wstr.c_str() );;
+  }
+  else {
+		std::map<std::wstring, KMX_DWORD > ::iterator it;
+		for (it = first.begin(); it != first.end(); ++it) {
+			if (it->first == tok_wstr)
+				return it->second;
+		}
+  }
+  return returnIfCharInvalid;
+}
+
 int write_US_ToVector( v_dw_3D &vec,std::string language, const char* text) {
 
   std::string FullPathName = "/usr/share/X11/xkb/symbols/" + language;
@@ -75,142 +152,6 @@ bool  createCompleteRow_US(v_str_1D &complete_List, FILE* fp, const char* text, 
   return 0;
 }
 
-KMX_DWORD convertNamesToASCIIValue(std::wstring tok_wstr){
-  std::map<std::wstring, KMX_DWORD > first;
-
-
-  first[L"ampersand"]         =  38;
-  first[L"apostrophe"]        =  39;
-  first[L"asciicircum"]       = 136;
-  first[L"asciitilde"]        = 126;
-  first[L"asterisk"]          =  42;
-  first[L"at"]                =  64;
-  first[L"backslash"]         =  92;
-  first[L"bar"]               = 124;
-  first[L"braceleft"]         = 123;
-  first[L"braceright"]        = 125;
-  first[L"bracketleft"]       =  91;
-  first[L"bracketright"]      =  93;
-  first[L"colon"]             =  58;
-  first[L"comma"]             =  44;
-  first[L"dollar"]            =  36;
-  first[L"equal"]             =  61;
-  first[L"exclam"]            =  33;
-  first[L"grave"]             =  96;
-  first[L"greater"]           =  62;
-  first[L"less"]              =  60;
-  first[L"minus"]             =  45;
-  first[L"numbersign"]        =  35;
-  first[L"parenleft"]         =  40;
-  first[L"parenright"]        =  41;
-  first[L"percent"]           =  37;
-  first[L"period"]            =  46;
-  first[L"plus"]              =  43;
-  first[L"question"]          =  63;
-  first[L"quotedbl"]          =  34;
-  first[L"semicolon"]         =  59;
-  first[L"slash"]             =  47;
-  first[L"space"]             =  32;
-  first[L"ssharp"]            = 223;
-  first[L"underscore"]        =  95;
-
-  first[L"dead_abovedot"]     = 729;
-  first[L"dead_abovering"]    = 730;
-  first[L"dead_acute"]        = 180;   //39 180 ??
-  first[L"dead_breve"]        = 728;
-  first[L"dead_caron"]        = 711;
-  first[L"dead_cedilla"]      = 184;
-  first[L"dead_circumflex"]   =  94;
-  first[L"dead_diaeresis"]    = 168;
-  first[L"dead_doubleacute"]  = 733;
-  first[L"dead_grave"]        =  96;
-  first[L"dead_ogonek"]       = 731;
-  first[L"dead_perispomeni"]  = 126;
-  first[L"dead_tilde"]        = 126;
-
-  //first[L" ??   "]           =   VK_OEM_102;    /* DE =  226 ' " ? VK_OEM_102 */
-
-  if ( tok_wstr.size() == 1) {
-    return (KMX_DWORD) ( *tok_wstr.c_str() );;
-  }
-  else {
-		std::map<std::wstring, KMX_DWORD > ::iterator it;
-		for (it = first.begin(); it != first.end(); ++it) {
-			if (it->first == tok_wstr)
-				return it->second;
-		}
-  }
-  return returnIfCharInvalid;
-}
-
-int split_US_To_3D_Vector(v_dw_3D &all_US,v_str_1D completeList) {
-  // 1: take the whole line of the 1D-Vector and remove unwanted characters.
-  // 2: seperate the name e.g. key<AD06> from the shiftstates
-  // 3: convert to KMX_DWORD
-  // 4: push Names/Shiftstates to shift_states and then shift_states to All_US, our 3D-Vector holding all Elements
-
-  std::vector<char> delim{' ', '[', ']', '}', ';', '\t', '\n'};
-  char split_bracel = '{';
-  char split_char_komma  = ',';
-  int Keycde;
-  v_str_1D tokens;
-  v_dw_1D tokens_dw;
-  v_dw_2D shift_states;
-  KMX_DWORD tokens_int;
-  std::wstring tok_wstr;
-
-  // loop through the whole vector
-  for (int k = 0; k < (int)completeList.size(); k++) {
-
-    // remove all unwanted char
-    for (int i = 0; i < (int) delim.size(); i++) {
-      completeList[k].erase(remove(completeList[k].begin(), completeList[k].end(), delim[i]), completeList[k].end());
-    }
-
-    // only lines with ("key<.. are of interest
-    if (completeList[k].find("key<") != std::string::npos) {
-
-      //split off the key names
-      std::istringstream split1(completeList[k]);
-      for (std::string each; std::getline(split1, each, split_bracel); tokens.push_back(each));
-
-      // replace keys names with Keycode (<AD06> with 21,...)
-      Keycde = replace_KeyName_with_Keycode(tokens[0]);
-      tokens[0] = std::to_string(Keycde);
-
-      // seperate rest of the vector to its elements and push to 'tokens'
-      std::istringstream split(tokens[1]);
-      tokens.pop_back();
-
-      for (std::string each; std::getline(split, each, split_char_komma); tokens.push_back(each));
-
-      // now convert all to KMX_DWORD and fill tokens
-      tokens_dw.push_back((KMX_DWORD) Keycde);
-
-      for ( int i = 1; i< (int) tokens.size();i++) {
-
-        // replace a name with a single character ( a -> a  ; equal -> = ) 
-        tokens_int = convertNamesToASCIIValue( wstring_from_string(tokens[i]));
-        tokens_dw.push_back(tokens_int);
-      }
-
-      //wprintf(L"  Keyval  %i:   %i (%c) --- %i (%c)  \n", tokens_dw[0],tokens_dw[1],tokens_dw[1], tokens_dw[2], tokens_dw[2]);
-   
-      // now push result to shift_states
-      shift_states.push_back(tokens_dw);
-      tokens_dw.clear();
-      tokens.clear();
-    }
-  }
-  all_US.push_back(shift_states);
-
-  if ( all_US.size() == 0) {
-    wprintf(L"ERROR: Can't split US to 3D-Vector\n");
-    return 1;
-  }
-  return 0;
-}
-
 int replace_KeyName_with_Keycode(std::string  in) {
   int out = returnIfCharInvalid;
 
@@ -272,6 +213,74 @@ int replace_KeyName_with_Keycode(std::string  in) {
   else if ( in == "key<SPCE>")    out = 65;                /* 0X20 ?? 39?     VK_SPACE  */
 
   return out;
+}
+
+int split_US_To_3D_Vector(v_dw_3D &all_US,v_str_1D completeList) {
+  // 1: take the whole line of the 1D-Vector and remove unwanted characters.
+  // 2: seperate the name e.g. key<AD06> from the shiftstates
+  // 3: convert to KMX_DWORD
+  // 4: push Names/Shiftstates to shift_states and then shift_states to All_US, our 3D-Vector holding all Elements
+
+  std::vector<char> delim{' ', '[', ']', '}', ';', '\t', '\n'};
+  char split_bracel = '{';
+  char split_char_komma  = ',';
+  int Keycde;
+  v_str_1D tokens;
+  v_dw_1D tokens_dw;
+  v_dw_2D shift_states;
+  KMX_DWORD tokens_int;
+  std::wstring tok_wstr;
+
+  // loop through the whole vector
+  for (int k = 0; k < (int)completeList.size(); k++) {
+
+    // remove all unwanted char
+    for (int i = 0; i < (int) delim.size(); i++) {
+      completeList[k].erase(remove(completeList[k].begin(), completeList[k].end(), delim[i]), completeList[k].end());
+    }
+
+    // only lines with ("key<.. are of interest
+    if (completeList[k].find("key<") != std::string::npos) {
+
+      //split off the key names
+      std::istringstream split1(completeList[k]);
+      for (std::string each; std::getline(split1, each, split_bracel); tokens.push_back(each));
+
+      // replace keys names with Keycode (<AD06> with 21,...)
+      Keycde = replace_KeyName_with_Keycode(tokens[0]);
+      tokens[0] = std::to_string(Keycde);
+
+      // seperate rest of the vector to its elements and push to 'tokens'
+      std::istringstream split(tokens[1]);
+      tokens.pop_back();
+
+      for (std::string each; std::getline(split, each, split_char_komma); tokens.push_back(each));
+
+      // now convert all to KMX_DWORD and fill tokens
+      tokens_dw.push_back((KMX_DWORD) Keycde);
+
+      for ( int i = 1; i< (int) tokens.size();i++) {
+
+        // replace a name with a single character ( a -> a  ; equal -> = )
+        tokens_int = convertNamesToASCIIValue( wstring_from_string(tokens[i]));
+        tokens_dw.push_back(tokens_int);
+      }
+
+      //wprintf(L"  Keyval  %i:   %i (%c) --- %i (%c)  \n", tokens_dw[0],tokens_dw[1],tokens_dw[1], tokens_dw[2], tokens_dw[2]);
+
+      // now push result to shift_states
+      shift_states.push_back(tokens_dw);
+      tokens_dw.clear();
+      tokens.clear();
+    }
+  }
+  all_US.push_back(shift_states);
+
+  if ( all_US.size() == 0) {
+    wprintf(L"ERROR: Can't split US to 3D-Vector\n");
+    return 1;
+  }
+  return 0;
 }
 
 v_dw_2D create_empty_2D_Vector( int dim_rows,int dim_shifts) {
@@ -402,6 +411,7 @@ KMX_DWORD get_VKUS_fromKeyCode( KMX_DWORD keycode) {
       return (KMX_DWORD) ScanCodeToUSVirtualKey[keycode-8];
   return 0;   //_S2 what to return if not found
 }
+
 KMX_DWORD get_KeyCode_fromVKUS( KMX_DWORD VK_US) {
   if( VK_US > 7) {
   KMX_DWORD test = (KMX_DWORD)(8+ USVirtualKeyToScanCode[ VK_US ]);
@@ -538,13 +548,4 @@ std::wstring  get_KeyVals_according_to_keycode_and_Shiftstate_new(GdkKeymap *key
   }
 
   return  convert_DeadkeyValues_ToChar((int) *keyvals);;
-}
-
-
-int map_VKShiftState_to_Lin(int VKShiftState) {
-  if (VKShiftState == 0 )      return 0;		/* 0000 0000 */
-  if (VKShiftState == 16)      return 1;		/* 0001 0000 */
-  //if (VKShiftState == 9 )      return 2;		/* 0000 1001 */
-  //if (VKShiftState == 25)      return 3; 		/* 0001 1001 */
-  return VKShiftState;
 }

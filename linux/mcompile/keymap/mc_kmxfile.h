@@ -34,7 +34,7 @@ typedef struct KMX_tagGROUP {
 	LPKMX_KEY dpKeyArray;		// [LPKEY] address of first item in key array
 	PKMX_WCHAR dpMatch;
 	PKMX_WCHAR dpNoMatch;
-	KMX_DWORD cxKeyArray;		// in array entries  // _S2 was DWORD
+	KMX_DWORD cxKeyArray;		// in array entries
 	int32_t  fUsingKeys;		// group(xx) [using keys] <-- specified or not
 } KMX_GROUP, *LPKMX_GROUP;
 

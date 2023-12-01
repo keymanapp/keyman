@@ -24,6 +24,7 @@ typedef std::vector<KMX_DWORD> v_dw_1D;
 typedef std::vector<std::vector<KMX_DWORD> > v_dw_2D;
 typedef std::vector<std::vector<std::vector<KMX_DWORD> > > v_dw_3D;
 
+// _S2 sort declarations/definitions to mcompile or keymaap..
 
 enum ShiftState {
     Base = 0,                           // 0
@@ -37,8 +38,6 @@ enum ShiftState {
     Xxxx = 8,                           // 8
     ShftXxxx = Shft | Xxxx,             // 9
 };
-
-int map_VKShiftState_to_Lin(int VKShiftState);
 
 const UINT USVirtualKeyToScanCode[256] = {
 	0x00, // L"K_?00",				// &H0
@@ -444,8 +443,6 @@ const KMX_DWORD KMX_VKMap[] = {
   'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',
   '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
 
-  //_S2 those might not work correctly yet*/
-
   VK_SPACE,     /*   32 */
 
   VK_ACCENT,    /*   192 VK_OEM_3 */
@@ -477,11 +474,14 @@ static KMX_DWORD returnIfCharInvalid = 0;
 //_S2 QUESTION Which threshold ( from what int value onwards is a character considered deadkey? 65000 28000?, > 255? ??
 static KMX_DWORD deadkeyThreshold = 65000;
 
+int map_VKShiftState_to_Lin(int VKShiftState);
+
 // takes a std::wstring (=contents of line symbols-file ) and returns the (int) value of the character
 KMX_DWORD convertNamesToASCIIValue(std::wstring tok_wstr);
 
-// create a Vector with all entries of  Vector
-int createOneVectorFromBothKeyboards(v_dw_3D &All_Vector);
+// create a Vector with all entries of both keymaps+ keymap
+int createOneVectorFromBothKeyboards(v_dw_3D &All_Vector,GdkKeymap *keymap);
+//int createOneVectorFromBothKeyboards(v_dw_3D &All_Vector);
 
 // read configuration file, split and write to 3D-Vector (Data for US on [0][ ][ ]  )
 int write_US_ToVector(v_dw_3D &vec, std::string language, const char *text);
@@ -489,32 +489,24 @@ int write_US_ToVector(v_dw_3D &vec, std::string language, const char *text);
 // 1. step: read complete Row of Configuration file US
 bool createCompleteRow_US(v_str_1D &complete_List, FILE *fpp, const char *text, std::string language);
 
-// 2nd step: write contents to 3D vector
-int split_US_To_3D_Vector(v_dw_3D &all_US, v_str_1D completeList);
-
 // replace Name of Key (e.g. <AD06>)  wih Keycode ( e.g. 0x15 )
 int replace_KeyName_with_Keycode(std::string  in);
+
+// 2nd step: write contents to 3D vector
+int split_US_To_3D_Vector(v_dw_3D &all_US, v_str_1D completeList);
 
 // create an empty 2D vector containing "--" in all fields
 v_dw_2D create_empty_2D_Vector(int dim_rows, int dim_shifts);
 
-// return the Scancode of for given VirtualKey using GDK
-KMX_DWORD get_KeyCode_From_KeyVal_GDK(GdkKeymap *keymap, UINT Keyval);
-
-// return the VirtualKey of the Other Keyboard for given Scancode using GDK
-KMX_DWORD get_VirtualKey_Other_GDK( GdkKeymap *keymap, KMX_DWORD scanCode);
-
-KMX_DWORD get_VKUS_fromKeyCode( KMX_DWORD keycode);
-KMX_DWORD get_KeyCode_fromVKUS( KMX_DWORD VK_US);
-
-UINT map_Ikey_DE(UINT iKey);
+//_S2 needed?
+// append characters using GDK to 3D-Vector (Data for Other Language on [1][ ][ ]  )
+int append_other_ToVector(v_dw_3D &All_Vector, GdkKeymap *keymap);
 
 // initialize GDK
 bool InitializeGDK(GdkKeymap **keymap,int argc, gchar *argv[]);
 
-//_S2 needed?
-// append characters using GDK to 3D-Vector (Data for Other Language on [1][ ][ ]  )
-int append_other_ToVector(v_dw_3D &All_Vector, GdkKeymap *keymap);
+// return the Scancode of for given VirtualKey using GDK
+KMX_DWORD get_KeyCode_From_KeyVal_GDK(GdkKeymap *keymap, UINT Keyval);
 
 // find Keyvals to fill into 2D-Vector of Other Language
 KMX_DWORD getKeyvalsFromKeyCode(GdkKeymap *keymap, guint keycode, int shift_state_pos);
@@ -522,23 +514,26 @@ KMX_DWORD getKeyvalsFromKeyCode(GdkKeymap *keymap, guint keycode, int shift_stat
 // returns KeySyms fo ra given key (for unshifted: finds the Keysym according to Shiftstate e.g. a;A or 1;! )
 std::wstring get_KeyVals_according_to_keycode_and_Shiftstate_new(GdkKeymap *keymap, guint VK, ShiftState ss, int caps);
 
+// return the VirtualKey of the Other Keyboard for given Scancode using GDK
+KMX_DWORD get_VirtualKey_Other_GDK( GdkKeymap *keymap, KMX_DWORD scanCode);
+
+KMX_DWORD get_VKUS_fromKeyCode( KMX_DWORD keycode);
+
+KMX_DWORD get_KeyCode_fromVKUS( KMX_DWORD VK_US);
+
 bool IsKeymanUsedKeyVal(std::wstring Keyval);
 
+
+//UINT find_SC_Other_from_SC_US_GDK(UINT vk_US_187,GdkKeymap *keymap);
+
+UINT map_Ikey_DE(UINT iKey);
 // _S2 needed?
 // can go later
 void Try_GDK(GdkKeymap *keymap, UINT KeySym );
-void Inspect_Key_S(GdkKeymap *keymap );
-//UINT find_SC_Other_from_SC_US_GDK(UINT vk_US_187,GdkKeymap *keymap);
-// _S2 needed?
-// create a Vector with all entries of both keymaps+ keymap
-int createOneVectorFromBothKeyboards(v_dw_3D &All_Vector,GdkKeymap *keymap);
-
-//needed?
+void Inspect_Key_S(GdkKeymap *keymap );//needed?
 // _S2 TODO How to do mapping between Linux keycodes and keyman SC
 const int Lin_KM__map(int i, v_dw_3D &All_Vector);
-
 KMX_DWORD  mapChar_To_VK(KMX_DWORD chr );
-
 KMX_DWORD  mapVK_To_char(KMX_DWORD SC );
 
 # endif /*KEYMAP_H*/
