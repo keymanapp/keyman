@@ -45,6 +45,8 @@ extern std::vector<KMX_DeadkeyMapping> KMX_FDeadkeys;   // I4353
 KMX_WORD KMX_VKUnderlyingLayoutToVKUS(KMX_WORD VKey);
 KMX_WORD KMX_VKUnderlyingLayoutToVKUS(v_dw_3D &All_Vector,KMX_DWORD inOther);
 KMX_WCHART KMX_VKUnderlyingLayoutToVKUS_GDK(GdkKeymap* keymap,KMX_DWORD inOther);
+
+PKMX_WCHAR KMX_incxstr(PKMX_WCHAR p);
 //--------------------old 
 /*
 #include <vector>
