@@ -150,11 +150,11 @@ export class GesturePreviewHost extends EventEmitter<EventMap> {
     this.previewImgContainer.style.marginTop = '0px';
     this.previewImgContainer.style.marginLeft = '0px';
 
-    this.previewImgContainer.classList.add('flick-clear');
+    this.previewImgContainer.classList.add('kmw-flick-clear');
   }
 
   public clearHint() {
-    this.hintLabel.classList.add('hint-clear');
+    this.hintLabel.classList.add('kmw-hint-clear');
   }
 
   public clearAll() {

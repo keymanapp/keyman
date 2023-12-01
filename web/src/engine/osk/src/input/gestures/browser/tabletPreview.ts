@@ -52,9 +52,8 @@ export class TabletKeyTip implements KeyTipInterface {
     // Create and display the preview
     // If !key.offsetParent, the OSK is probably hidden.  Either way, it's a half-
     // decent null-guard check.
-    if(on && key.offsetParent) {
+    if(on && key?.offsetParent) {
       // May need adjustment for borders if ever enabled for the desktop form-factor target.
-      // const _Box = this.vkbd.topContainer;
       const hostRect = this.vkbd.element.getBoundingClientRect();
       const keyRect = key.getBoundingClientRect();
 
@@ -99,7 +98,7 @@ export class TabletKeyTip implements KeyTipInterface {
       }
     } else { // Hide the key preview
       this.element.style.display = 'none';
-      this.element.className = `${BASE_CLASS}`;
+      this.element.className = BASE_CLASS;
 
       this.previewHost = null;
       const oldPreview = this.preview;

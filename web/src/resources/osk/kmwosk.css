@@ -391,13 +391,13 @@ body div.kmw-key-shift-on span.kmw-key-text {font-family:SpecialOSK !important;f
   transition: 0.5s linear border;
 }
 
-#kmw-preview-img-container.flick-clear {
+#kmw-preview-img-container.kmw-flick-clear {
   transition: margin 0.25s linear ease-in-out;
   margin-left: 0px !important;
   margin-top: 0px !important;
 }
 
-.kmw-key-popup-icon.hint-clear {
+.kmw-key-popup-icon.kmw-hint-clear {
   color: transparent;
   transition: 0.5s linear all;
 }
