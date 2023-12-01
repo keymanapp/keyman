@@ -383,7 +383,7 @@
   height: 100%;
   content: '';
   top: 0;
-  z-index:10999;  /* z-indexes this _behind_ the 'option' element that hosts the scrollable zone. */
+  z-index:10000;  /* z-indexes this _behind_ the 'option' element that hosts the scrollable zone. */
   user-select: none;
   pointer-events: none; /* Ensures click-through! But apparently not touch-through. */
   touch-action: none; /* Doesn't seem to allow touch-through, though - even with touch-action: none */
@@ -417,7 +417,7 @@
 }
 
 .kmw-banner-bar .kmw-banner-separator {border-left: solid 1px #8a8d90; width: 0px; vertical-align: middle; height: 45%; display: inline-block;}
-.kmw-banner-bar .kmw-suggest-option {display:inline-block; text-align: center; height: 85%; position: relative; z-index: 11000}
+.kmw-banner-bar .kmw-suggest-option {display:inline-block; text-align: center; height: 85%; position: relative; z-index: 10001}
 .kmw-suggestion-text {
   color:#fff;
   line-height: normal;
