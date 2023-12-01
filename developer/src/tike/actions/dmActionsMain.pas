@@ -138,7 +138,6 @@ type
     actToolsWebConfigure: TAction;
     actToolsWebStartServer: TAction;
     actToolsWebStopServer: TAction;
-    actProjectOpenFolder: TBrowseForFolder;
     procedure actFileNewExecute(Sender: TObject);
     procedure DataModuleCreate(Sender: TObject);
     procedure actFileOpenAccept(Sender: TObject);
@@ -238,7 +237,6 @@ type
     procedure actToolsWebStartServerUpdate(Sender: TObject);
     procedure actToolsWebStopServerExecute(Sender: TObject);
     procedure actToolsWebStopServerUpdate(Sender: TObject);
-    procedure actProjectOpenFolderAccept(Sender: TObject);
   private
     function CheckFilenameConventions(FileName: string): Boolean;
     function SaveAndCloseAllFiles: Boolean;
@@ -593,17 +591,10 @@ begin
   OpenProject(actProjectOpen.Dialog.FileName);
 end;
 
-procedure TmodActionsMain.actProjectOpenFolderAccept(Sender: TObject);
-begin
-  if not frmKeymanDeveloper.BeforeOpenProject then
-    Exit;
-  OpenProject(actProjectOpenFolder.Folder);
-end;
-
 procedure TmodActionsMain.OpenProject(FileName: WideString);
 begin
   FileName := ExpandUNCFileName(FileName);
-  if (FileName <> '') and not FileExists(FileName) and not DirectoryExists(FileName) then
+  if (FileName <> '') and not FileExists(FileName) then
   begin
     ShowMessage('The project '+FileName+' does not exist.');
     Exit;

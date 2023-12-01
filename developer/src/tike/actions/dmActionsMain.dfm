@@ -32,17 +32,6 @@ object modActionsMain: TmodActionsMain
       OnExecute = actViewCharacterIdentifierExecute
       OnUpdate = actViewCharacterIdentifierUpdate
     end
-    object actProjectOpenFolder: TBrowseForFolder
-      Category = 'Project'
-      Caption = 'Open Project Folder...'
-      DialogCaption = 'Open Project Folder'
-      BrowseOptions = []
-      BrowseOptionsEx = []
-      Hint = 'Open Project Folder|Opens an existing project folder'
-      ShortCut = 24655
-      UseFileDialog = True
-      OnAccept = actProjectOpenFolderAccept
-    end
     object actFileOpen: TFileOpen
       Category = 'File'
       Caption = '&Open...'
@@ -259,6 +248,7 @@ object modActionsMain: TmodActionsMain
       Dialog.Options = [ofHideReadOnly, ofPathMustExist, ofFileMustExist, ofEnableSizing]
       Hint = 'Open Project|Opens an existing project'
       ImageIndex = 28
+      ShortCut = 24655
       OnAccept = actProjectOpenAccept
     end
     object actProjectAddCurrentEditorFile: TAction
