@@ -19,7 +19,7 @@ import { MarkerTracker, MarkerUse } from "./marker-tracker.js";
 
 type TransformCompilerType = 'simple' | 'backspace';
 
-export class TransformCompiler<T extends TransformCompilerType, TranBase extends Tran> extends SectionCompiler {
+export abstract class TransformCompiler<T extends TransformCompilerType, TranBase extends Tran> extends SectionCompiler {
 
   static validateMarkers(keyboard: LDMLKeyboard.LKKeyboard, mt : MarkerTracker): boolean {
     keyboard?.transforms?.forEach(transforms =>

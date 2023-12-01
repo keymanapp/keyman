@@ -87,4 +87,11 @@ describe('CompilerMessages', function () {
     assert.equal(callbacks.messages[0].message, "Statement 'return' is not currently supported in output for web and touch targets");
   });
 
+  // WARN_VirtualKeyInOutput
+
+  it('should generate WARN_VirtualKeyInOutput if a virtual key is found in the output part of a rule', async function() {
+    await testForMessage(this, ['invalid-keyboards', 'warn_virtual_key_in_output.kmn'], KmnCompilerMessages.WARN_VirtualKeyInOutput);
+    assert.equal(callbacks.messages[0].message, "Virtual keys are not supported in output");
+  });
+
 });

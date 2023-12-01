@@ -83,6 +83,7 @@
             <xsl:call-template name="file">
               <xsl:with-param name="file_description"></xsl:with-param>
               <xsl:with-param name="file_has_details">false</xsl:with-param>
+              <xsl:with-param name="file_relative_path">true</xsl:with-param>
             </xsl:call-template>
           </xsl:for-each>
         </div>
