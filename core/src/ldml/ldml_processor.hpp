@@ -100,8 +100,22 @@ namespace core {
       */
      static void remove_text(km_core_state *state, std::u32string &str, size_t length);
 
+     /** process a key */
+     void process_key(km_core_state *state, km_core_virtual_key vk, uint16_t modifier_state) const;
+
      /** process a typed key */
      void process_key_string(km_core_state *state, const std::u16string &key_str) const;
+
+     /** process a backspace */
+     void process_backspace(km_core_state *state) const;
+
+     /**
+      * common function for outputting a string with transforms/normalization applied.
+      * @param str string to output (such as from a key), or empty
+      * @param with_transforms transforms to use or nullptr
+      * @returns length of matched input context
+      */
+     size_t process_output(km_core_state *state, const std::u32string &str, ldml::transforms *with_transforms) const;
 
      /**
       * add the string+marker portion of the context to the beginning of str.
@@ -111,15 +125,6 @@ namespace core {
       */
      static size_t context_to_string(km_core_state *state, std::u32string &str, bool include_markers = true);
 
-     /** prepend the marker string in UC_SENTINEL format to the str */
-     inline static void prepend_marker(std::u32string &str, KMX_DWORD marker);
   };
-
-  void
-  ldml_processor::prepend_marker(std::u32string &str, KMX_DWORD marker) {
-     km_core_usv triple[] = {LDML_UC_SENTINEL, LDML_MARKER_CODE, marker};
-     str.insert(0, triple, 3);
-  }
-
 } // namespace core
 } // namespace km

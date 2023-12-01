@@ -155,8 +155,7 @@
             <transform from="\m{q}\m{X}" to="\u{09CD}\u{200C}" /> <!-- virama + zwnj-->
         </transformGroup>
           <!-- TODO: document these -->
-          <!-- TODO-LDML: not working, probably due to #9707 -->
-          <!-- <transformGroup>
+          <transformGroup>
             <reorder from="\u{09BC}" tertiary="3"/>
             <reorder from="\u{09CD}[\u{0980}\u{0985}-\u{098C}\u{098F}\u{0990}\u{0993}-\u{09A8}\u{09AA}-\u{09B0}\u{09B2}\u{09B6}-\u{09B9}\u{09BD}\u{09DC}\u{09DD}\u{09DF}-\u{09E1}\u{09E6}-\u{09F1}\u{09FC}]" order="10" tertiaryBase="true"/>
             <reorder from="\u{09CD}[\u{200C}\u{200D}][\u{0980}\u{0985}-\u{098C}\u{098F}\u{0990}\u{0993}-\u{09A8}\u{09AA}-\u{09B0}\u{09B2}\u{09B6}-\u{09B9}\u{09BD}\u{09DC}\u{09DD}\u{09DF}-\u{09E1}\u{09E6}-\u{09F1}\u{09FC}]" order="10" tertiaryBase="true"/>
@@ -167,6 +166,6 @@
             <reorder from="\u{0981}" order="85"/>
             <reorder from="[\u{0982}\u{0983}]" order="95"/>
             <reorder from="\u{09FE}" order="117"/>
-        </transformGroup> -->
+        </transformGroup>
     </transforms>
 </keyboard3>

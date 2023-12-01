@@ -4,12 +4,11 @@
   <info keyboard="k_006_backspace.xml" author="Team Keyboard" name="backspace" />
   <tests name="backspace">
     <test name="regex-test-0-a">
-      <startContext to="" />
       <keystroke key="t" />
       <keystroke key="a" />
       <keystroke key="b" />
       <backspace />
-      <check result="ta" /> <!-- TODO-LDML: #9760 Should be 't' due to backspace transform -->
+      <check result="t" />
     </test>
   </tests>
 </keyboardTest3>

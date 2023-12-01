@@ -146,7 +146,11 @@ export interface StrsOptions {
 };
 
 export class Strs extends Section {
-  strings: StrsItem[] = [ new StrsItem('') ]; // C7043: The null string is always requierd
+  /** the in-memory string table */
+  strings: StrsItem[] = [ new StrsItem('') ]; // C7043: The null string is always required
+
+  /** for validating */
+  allProcessedStrings = new Set<string>();
   /**
    * Allocate a StrsItem given the string, unescaping if necessary.
    * @param s escaped string
@@ -157,6 +161,11 @@ export class Strs extends Section {
   allocString(s?: string, opts?: StrsOptions, sections?: DependencySections): StrsItem {
     // Run the string processing pipeline
     s = Strs.processString(s, opts, sections);
+
+    // add to the set, for testing
+    if (s) {
+      this.allProcessedStrings.add(s);
+    }
 
     // if it's a single char, don't push it into the strs table
     if (opts?.singleOk && isOneChar(s)) {

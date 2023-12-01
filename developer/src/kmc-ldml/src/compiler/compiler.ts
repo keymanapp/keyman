@@ -147,8 +147,8 @@ export class LdmlKeyboardCompiler {
    * @param     source
    * @returns   true if the file validates
    */
-  public validate(source: LDMLKeyboardXMLSourceFile): boolean {
-    return !!this.compile(source);
+  public async validate(source: LDMLKeyboardXMLSourceFile): Promise<boolean> {
+    return !!(await this.compile(source, true));
   }
 
   /**
@@ -157,7 +157,7 @@ export class LdmlKeyboardCompiler {
    * @param   source  in-memory representation of LDML keyboard xml file
    * @returns         KMXPlusFile intermediate file
    */
-  public async compile(source: LDMLKeyboardXMLSourceFile): Promise<KMXPlus.KMXPlusFile> {
+  public async compile(source: LDMLKeyboardXMLSourceFile, postValidate?: boolean): Promise<KMXPlus.KMXPlusFile> {
     const sections = this.buildSections(source);
     let passed = true;
 
@@ -205,6 +205,15 @@ export class LdmlKeyboardCompiler {
         throw new Error(`Internal error: section ${section.id} would be assigned twice`);
       }
       kmx.kmxplus[section.id] = sect as any;
+    }
+
+    // give all sections a chance to postValidate
+    if (postValidate) {
+      for(let section of sections) {
+        if(!section.postValidate(kmx.kmxplus[section.id])) {
+          passed = false;
+        }
+      }
     }
 
     return passed ? kmx : null;

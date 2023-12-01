@@ -1,8 +1,9 @@
 import { LDMLKeyboard, KMXPlus, CompilerCallbacks } from "@keymanapp/common-types";
 import { SectionIdent, constants } from '@keymanapp/ldml-keyboard-constants';
 
-/* istanbul ignore next */
-export class SectionCompiler {
+/** newable interface to SectionCompiler c'tor */
+export type SectionCompilerNew = new (source: LDMLKeyboard.LDMLKeyboardXMLSourceFile, callbacks: CompilerCallbacks) => SectionCompiler;
+export abstract class SectionCompiler {
   protected readonly keyboard3: LDMLKeyboard.LKKeyboard;
   protected readonly callbacks: CompilerCallbacks;
 
@@ -11,16 +12,32 @@ export class SectionCompiler {
     this.callbacks = callbacks;
   }
 
-  /* c8 ignore next 11 */
-  public get id(): SectionIdent {
-    throw Error(`Internal Error: id() not implemented`);
-  }
+  public abstract get id(): SectionIdent;
 
-  public compile(sections: KMXPlus.DependencySections): KMXPlus.Section {
-    throw Error(`Internal Error: compile() not implemented`);
-  }
-
+  /**
+   * This is called before compile.
+   * @returns false if this compiler failed to validate.
+   */
   public validate(): boolean {
+    return true;
+  }
+
+  /**
+   * Perform the compilation for this section, returning the correct Section subclass
+   * object.
+   *
+   * @param sections any declared dependency sections per dependencies()
+   */
+  public abstract compile(sections: KMXPlus.DependencySections): KMXPlus.Section;
+
+  /**
+   * This is called after all other compile phases have completed,
+   * when being called by validate(), and provides an
+   * opportunity for late error reporting, for example for invalid strings.
+   * @param section the compiled section, if any.
+   * @returns false if validate fails
+   */
+  public postValidate(section?: KMXPlus.Section): boolean {
     return true;
   }
 

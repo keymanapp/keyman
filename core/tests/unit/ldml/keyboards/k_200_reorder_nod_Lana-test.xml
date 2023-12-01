@@ -4,12 +4,10 @@
   <info keyboard="k_200_reorder_nod_Lana.xml" author="Team Keyboard" name="nod-Lana" />
   <tests name="reorder-tests">
     <test name="roast00-orig-emit">
-      <startContext to="" />
       <emit to="\u1A21\u1A60\u1A45\u1A6B\u1A76" />
       <check result="\u1A21\u1A60\u1A45\u1A6B\u1A76" />
     </test>
     <test name="roast01-orig-key">
-      <startContext to="" />
       <keystroke key="kha" />
       <check result="\u1A21" />
       <keystroke key="sakot" />
@@ -22,12 +20,10 @@
       <check result="\u1A21\u1A60\u1A45\u1A6B\u1A76" />
     </test>
     <test name="roast02-orig-1key">
-      <startContext to="" />
       <keystroke key="roast" />
       <check result="\u1A21\u1A60\u1A45\u1A6B\u1A76" />
     </test>
     <test name="roast1-upper-first">
-      <startContext to="" />
       <keystroke key="kha" />
       <keystroke key="o" />
       <keystroke key="t2" />
@@ -36,7 +32,6 @@
       <check result="\u1A21\u1A60\u1A45\u1A6B\u1A76" />
     </test>
     <test name="roast2-upper-first-nfc">
-      <startContext to="" />
       <keystroke key="kha" />
       <keystroke key="o" />
       <keystroke key="sakot" />
@@ -45,7 +40,6 @@
       <check result="\u1A21\u1A60\u1A45\u1A6B\u1A76" />
     </test>
     <test name="roast3-tone-after-lower">
-      <startContext to="" />
       <keystroke key="kha" />
       <keystroke key="o" />
       <keystroke key="sakot" />

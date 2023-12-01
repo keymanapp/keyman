@@ -140,7 +140,7 @@ export class KmpCompiler {
     if(kps.Files && kps.Files.File) {
       kmp.files = this.arrayWrap(kps.Files.File).map((file: KpsFile.KpsFileContentFile) => {
         return {
-          name: file.Name.trim(),
+          name: file.Name.trim().replaceAll('\\','/'),
           description: file.Description.trim(),
           copyLocation: parseInt(file.CopyLocation, 10) || undefined
           // note: we don't emit fileType as that is not permitted in kmp.json

@@ -1,5 +1,60 @@
 # Keyman Version History
 
+## 17.0.220 alpha 2023-11-30
+
+* fix(core): set_if_needed updates an empty cached context (#10098)
+* fix(core): check for null termination (#10101)
+
+## 17.0.219 alpha 2023-11-29
+
+* fix(developer): path separator for kmc-package (#10064)
+* fix(developer): projects 2.0 internal path enumeration (#10016)
+* fix(web): Fix attachment-api tests (#10085)
+* fix(web): Also move source map (#10089)
+
+## 17.0.218 alpha 2023-11-27
+
+* feat(developer): ldml: err/hint on illegal/pua chars (#10029)
+
+## 17.0.217 alpha 2023-11-24
+
+* feat(developer): warn on usage of virtual keys in rule output (#10062)
+* fix(core): memory management of options in action struct (#10073)
+* chore(linux): Update debian changelog (#10047)
+* chore(core): Add test keyboard for text selection tests (#10026)
+
+## 17.0.216 alpha 2023-11-23
+
+* fix(common): kmx struct alignment (#9977)
+* fix(developer): vis kbd callbacks instead of throw (#9979)
+* fix(core): dx: ldml: startContext should be optional in ldml test data (#10021)
+* chore(windows): remove `wm_keymandebug` messages and functions (#10055)
+* chore(windows): remove legacy LoadKeyboard (#10057)
+* chore(windows): remove unused globals relating to old keyboard debugging (#10058)
+* chore(core): remove vkey output from kmx processor (#10060)
+* fix(web): app/webview did not clear deadkeys on context-reset (#10039)
+
+## 17.0.215 alpha 2023-11-22
+
+* feat(core): ldml marker normalization (#9761)
+* feat(core): ldml backspace transform (#9960)
+* feat(core): ldml tertiary reordering (#9962)
+* fix(web): fixes OSK viewport scaling on iOS devices (#10035)
+
+## 17.0.214 alpha 2023-11-20
+
+* fix(ios): fv: replace Zip framework to prevent crash on startup (#10018)
+
+## 17.0.213 alpha 2023-11-17
+
+* fix(linux): Fix packaging GHA (#10020)
+* fix(android): Always display HTML banner when suggestions aren't available (#9696)
+
+## 17.0.212 alpha 2023-11-16
+
+* chore(web): splits banner.ts into separate files per banner type (#9987)
+* refactor(web): inactive banner management (#9988)
+
 ## 17.0.211 alpha 2023-11-15
 
 * fix(windows): setup.inf generation had whitespace (#10000)
