@@ -13,6 +13,10 @@
 #include <AclAPI.h>
 #include <Windows.h>
 #include <Msi.h>
+#include <initguid.h>
+#include <comdef.h>
+#include <msctf.h>
+#include <atlbase.h>
 
 const LPCTSTR SFolderKeymanRoot = TEXT("\\Keyman");
 
@@ -84,6 +88,54 @@ extern "C" __declspec(dllexport) unsigned int EnginePostInstall(MSIHANDLE hInsta
   return ERROR_SUCCESS;
 }
 
+// Define the CLS ID for KMTip Text Service
+DEFINE_GUID(c_clsidKMTipTextService, 0xFE0420F1, 0x38D1, 0x4B4C, 0x96, 0xBF, 0xE7, 0xE2, 0x0A, 0x74, 0xCF, 0xB7);
+
+// Define the CLASS_TF_InputProcessorProfiles constant
+DEFINE_GUID(CLASS_TF_InputProcessorProfiles, 0x33C53A50, 0xF456, 0x4884, 0xB0, 0x49, 0x85, 0xFD, 0x64, 0x3E, 0xCF, 0xED);
+
+DEFINE_GUID(IID_ITfInputProcessorProfiles, 0x1F02B6C5, 0x7842, 0x4EE6, 0x8A, 0x0B, 0x9A, 0x24, 0x18, 0x3A, 0x95, 0xCA);
+
+// Unregister the TIP
+void UnregisterTIPAndItsProfiles(const CLSID& AClsid) {
+  HRESULT hr;
+  CComPtr<ITfInputProcessorProfiles> pInputProcessorProfiles;
+  CComPtr<ITfInputProcessorProfileMgr> pInputProcessorProfileMgr;
+  CComPtr<IEnumTfInputProcessorProfiles> ippEnum;
+
+  // Create an instance of ITF Input Processor Profiles
+  hr = CoCreateInstance(
+      CLASS_TF_InputProcessorProfiles, NULL, CLSCTX_INPROC_SERVER, IID_ITfInputProcessorProfiles,
+      (void**)&pInputProcessorProfiles);
+  if (FAILED(hr))
+    throw _com_error(hr);
+
+  // Query for ITfInputProcessorProfileMgr interface
+  hr = pInputProcessorProfiles->QueryInterface(IID_ITfInputProcessorProfileMgr, (void**)&pInputProcessorProfileMgr);
+  if (FAILED(hr))
+    throw _com_error(hr);
+
+  // Enumerate the profiles
+  hr = pInputProcessorProfileMgr->EnumProfiles(0, &ippEnum);
+  if (FAILED(hr))
+    throw _com_error(hr);
+}
+
 extern "C" __declspec(dllexport) unsigned int PreUninstall() {
-  return 1;
+  // Initialize COM
+  HRESULT hr = CoInitializeEx(NULL, COINIT_APARTMENTTHREADED);
+  if (SUCCEEDED(hr)) {
+    try {
+      UnregisterTIPAndItsProfiles(c_clsidKMTipTextService);
+    } catch (...) {
+      // Swallow exceptions so we don't break the uninstall
+    }
+
+    // Clean up COM
+    CoUninitialize();
+  }
+  else
+    throw _com_error(hr);
+
+  return ERROR_SUCCESS;
 }
