@@ -159,6 +159,7 @@ export class BannerSuggestion {
       this._textWidth = 0;
     }
 
+    this.currentWidth = this.collapsedWidth;
     this.updateLayout();
   }
 
@@ -427,6 +428,7 @@ export class SuggestionBanner extends Banner {
       if(on && classes.indexOf(cs) < 0) {
         elem.className=classes+cs;
         if(this.highlightAnimation) {
+          this.highlightAnimation.cancel();
           this.highlightAnimation.decouple();
         }
 
@@ -526,6 +528,8 @@ export class SuggestionBanner extends Banner {
    */
   public onSuggestionUpdate = (suggestions: Suggestion[]): void => {
     this.currentSuggestions = suggestions;
+    // Immediately stop all animations and reset options accordingly.
+    this.highlightAnimation?.cancel();
 
     const fontStyleBase = this.options[0].computedStyle;
     // Do NOT just re-use the returned object from the line above; it may spontaneously change
@@ -764,6 +768,7 @@ class SuggestionExpandContractAnimation {
   }
 
   public decouple() {
+    this.cancel();
     this.scrollContainer = null;
   }
 
@@ -771,6 +776,11 @@ class SuggestionExpandContractAnimation {
     this.startTimestamp = null;
     window.cancelAnimationFrame(this.pendingAnimation);
     this.pendingAnimation = null;
+  }
+
+  cancel() {
+    this.clear();
+    this.option.currentWidth = this.option.collapsedWidth;
   }
 
   public expand() {
