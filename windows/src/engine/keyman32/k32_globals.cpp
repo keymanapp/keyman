@@ -72,7 +72,6 @@
 UINT
   //TODO: consolidate these messages -- they are probably not all required now
   wm_keyman = 0,						// user message - ignore msg   // I3594
-	wm_kmdebug = 0,						//  " "  "  "   - debugging
 
 	wm_keymankeydown = 0,
 	wm_keymankeyup = 0,
@@ -218,9 +217,6 @@ BOOL Globals_ProcessInitialised()
 
 #pragma data_seg(".SHARDATA")
 
-//static INI     // I3158   // I3524
-//    f_Ini = {0};								// KEYMAN.INI options
-
 static HHOOK
     f_hhookGetMessage = NULL,				// GETMESSAGE hook handle
     f_hhookCallWndProc = NULL;			// CALLWNDPROC hook handle
@@ -295,8 +291,6 @@ DWORD	//static
 	f_ShiftState = 0;
 
 HANDLE f_hLockMutex = 0;
-
-//INI   *Globals::Ini()                 { return &f_Ini;                }  // I3158   // I3524
 
 HHOOK *Globals::hhookGetMessage()     { return &f_hhookGetMessage;    }
 HHOOK *Globals::hhookCallWndProc()    { return &f_hhookCallWndProc;   }
@@ -428,11 +422,6 @@ BOOL Globals::ResetControllers()  // I3092
 
   f_MasterController = NULL;
   f_MaxControllerThreads = 0;
-  /*   I3158   // I3524
-  f_Ini.ContextStackSize = 0;
-  f_Ini.MaxKeyboards = 0;
-  f_Ini.MsgStackSize = 0;
-  */
   f_hhookCallWndProc = NULL;
   f_hhookGetMessage = NULL;
 #ifndef _WIN64
