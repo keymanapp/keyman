@@ -1,6 +1,5 @@
 {
   "name": "@keymanapp/developer-utils",
-  "private": true,
   "description": "Keyman Developer utilities",
   "type": "module",
   "exports": {
@@ -28,5 +27,14 @@
     "require": [
       "source-map-support/register"
     ]
+  },
+  "author": "Marc Durdin <marc@keyman.com> (https://github.com/mcdurdin)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/keymanapp/keyman/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/keymanapp/keyman.git"
   }
 }
