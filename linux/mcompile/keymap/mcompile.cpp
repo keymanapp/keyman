@@ -55,10 +55,10 @@ void KMX_TranslateDeadkeyKeyboard(LPKMX_KEYBOARD kbd, KMX_WCHAR deadkey, KMX_WOR
 void KMX_TranslateDeadkeyGroup(LPKMX_GROUP group,KMX_WCHAR deadkey, KMX_WORD vk, UINT shift, KMX_WORD ch);
 void KMX_TranslateDeadkeyKey(LPKMX_KEY key, KMX_WCHAR deadkey, KMX_WORD vk, UINT shift, KMX_WORD ch);
 
-int KMX_GetDeadkeys(WORD DeadKey, WORD *OutputPairs) ;
+int KMX_GetDeadkeys(KMX_WORD DeadKey, KMX_WORD *OutputPairs) ;
 
-int KMX_GetDeadkeys_NT(WORD DeadKey, WORD *OutputPairs);  // returns array of [USVK, ch] pairs
-int KMX_GetDeadkeys_NT_x64(WORD DeadKey, WORD *OutputPairs);  // returns array of [USVK, ch] pairs
+int KMX_GetDeadkeys_NT(KMX_WORD DeadKey, KMX_WORD *OutputPairs);  // returns array of [USVK, ch] pairs
+int KMX_GetDeadkeys_NT_x64(KMX_WORD DeadKey, KMX_WORD *OutputPairs);  // returns array of [USVK, ch] pairs
 void KMX_AddDeadkeyRule(LPKMX_KEYBOARD kbd, KMX_WCHAR deadkey, KMX_WORD vk, UINT shift);
 
 
@@ -471,12 +471,17 @@ KMX_BOOL KMX_DoConvert(LPKMX_KEYBOARD kbd, PKMX_WCHAR kbid, KMX_BOOL bDeadkeyCon
 
   // create vector
   v_dw_3D All_Vector;
-  if(createOneVectorFromBothKeyboards(All_Vector,keymap)){
+  if(createOneVectorFromBothKeyboards(All_Vector, keymap)){
     wprintf(L"ERROR: can't create one vector from both keyboards\n");
     return FALSE;
   }
 
- // const wchar_t* ERROR = L"   ";
+  // create dk_createDK_ComposeTable
+  v_dw_2D  dk_ComposeTable;
+  if(createDK_ComposeTable(dk_ComposeTable)){
+    wprintf(L"ERROR: can't create dk_ComposeTable\n");
+    return FALSE;
+  }
 
   for (int j = 0; VKShiftState[j] != 0xFFFF; j++) { // I4651
   wprintf(L"\n");
@@ -600,7 +605,7 @@ KMX_WCHAR  KMX_CharFromSC(GdkKeymap *keymap, KMX_UINT VKShiftState, UINT SC_OTHE
   //if (KeyvalOther > deadkeyThreshold) {
   if (KeyvalOther > 255) {
     std::string ws((const char*) gdk_keyval_name (KeyvalOther));
-    *DeadKey = convertNamesToASCIIValue( wstring_from_string(ws));
+    *DeadKey = convertNamesToIntegerValue( wstring_from_string(ws));
     return 0xFFFF;
   }
 
@@ -666,7 +671,8 @@ KMX_WORD KMX_VKUnderlyingLayoutToVKUS_S2(KMX_WORD VKey) {
   return retu;
 }
 
-int KMX_GetDeadkeys(WORD DeadKey, WORD *OutputPairs) {
+int KMX_GetDeadkeys(KMX_WORD DeadKey, KMX_WORD *OutputPairs) {
+  int asdfghjk=0;
   /*if(IsWow64()) {
     return KMX_GetDeadkeys_NT_x64(DeadKey, OutputPairs);
   } else {
@@ -674,7 +680,7 @@ int KMX_GetDeadkeys(WORD DeadKey, WORD *OutputPairs) {
   }*/
 }
 
-int KMX_GetDeadkeys_NT_x64(WORD DeadKey, WORD *OutputPairs) {
+int KMX_GetDeadkeys_NT_x64(KMX_WORD DeadKey, KMX_WORD *OutputPairs) {
   /*WORD *p = OutputPairs, shift;
 	for(int i = 0; KbdTables_x64->pDeadKey[i].dwBoth; i++) {
 		if(HIWORD(KbdTables_x64->pDeadKey[i].dwBoth) == DeadKey) {
@@ -692,7 +698,7 @@ int KMX_GetDeadkeys_NT_x64(WORD DeadKey, WORD *OutputPairs) {
   return (INT_PTR)(p-OutputPairs);*/
 }
 
-int KMX_GetDeadkeys_NT(WORD DeadKey, WORD *OutputPairs) {
+int KMX_GetDeadkeys_NT(KMX_WORD DeadKey, KMX_WORD *OutputPairs) {
   /*WORD *p = OutputPairs, shift;
 	for(int i = 0; KbdTables->pDeadKey[i].dwBoth; i++) {
 		if(HIWORD(KbdTables->pDeadKey[i].dwBoth) == DeadKey) {

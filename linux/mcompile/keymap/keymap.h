@@ -477,7 +477,7 @@ static KMX_DWORD deadkeyThreshold = 65000;
 int map_VKShiftState_to_Lin(int VKShiftState);
 
 // takes a std::wstring (=contents of line symbols-file ) and returns the (int) value of the character
-KMX_DWORD convertNamesToASCIIValue(std::wstring tok_wstr);
+KMX_DWORD convertNamesToIntegerValue(std::wstring tok_wstr);
 
 // create a Vector with all entries of both keymaps+ keymap
 int createOneVectorFromBothKeyboards(v_dw_3D &All_Vector,GdkKeymap *keymap);
@@ -522,7 +522,6 @@ KMX_DWORD get_VKUS_fromKeyCode( KMX_DWORD keycode);
 KMX_DWORD get_KeyCode_fromVKUS( KMX_DWORD VK_US);
 
 bool IsKeymanUsedKeyVal(std::wstring Keyval);
-
 
 //UINT find_SC_Other_from_SC_US_GDK(UINT vk_US_187,GdkKeymap *keymap);
 

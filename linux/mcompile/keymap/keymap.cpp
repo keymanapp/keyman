@@ -11,9 +11,8 @@ int map_VKShiftState_to_Lin(int VKShiftState) {
   return VKShiftState;
 }
 
-KMX_DWORD convertNamesToASCIIValue(std::wstring tok_wstr){
+KMX_DWORD convertNamesToIntegerValue(std::wstring tok_wstr){
   std::map<std::wstring, KMX_DWORD > first;
-
 
   first[L"ampersand"]         =  38;
   first[L"apostrophe"]        =  39;
@@ -63,6 +62,9 @@ KMX_DWORD convertNamesToASCIIValue(std::wstring tok_wstr){
   first[L"dead_ogonek"]       = 731;
   first[L"dead_perispomeni"]  = 126;
   first[L"dead_tilde"]        = 126;
+
+
+  first[L"acute accent"]      = 0xB4;
 
   //first[L" ??   "]           =   VK_OEM_102;    /* DE =  226 ' " ? VK_OEM_102 */
 
@@ -262,7 +264,7 @@ int split_US_To_3D_Vector(v_dw_3D &all_US,v_str_1D completeList) {
       for ( int i = 1; i< (int) tokens.size();i++) {
 
         // replace a name with a single character ( a -> a  ; equal -> = )
-        tokens_int = convertNamesToASCIIValue( wstring_from_string(tokens[i]));
+        tokens_int = convertNamesToIntegerValue( wstring_from_string(tokens[i]));
         tokens_dw.push_back(tokens_int);
       }
 
@@ -485,7 +487,7 @@ std::wstring convert_DeadkeyValues_ToChar(int in) {
     return  std::wstring(1, in);
   } else {
     std::string long_name((const char*) gdk_keyval_name (in));          // 6510 => "dead_circumflex "
-    lname = convertNamesToASCIIValue( wstring_from_string(long_name));     // "dead_circumflex " => 94
+    lname = convertNamesToIntegerValue( wstring_from_string(long_name));     // "dead_circumflex " => 94
 
     if (lname != returnIfCharInvalid) {
       std::wstring ss   = std::wstring(1, lname );
@@ -549,3 +551,4 @@ std::wstring  get_KeyVals_according_to_keycode_and_Shiftstate_new(GdkKeymap *key
 
   return  convert_DeadkeyValues_ToChar((int) *keyvals);;
 }
+

@@ -25,6 +25,8 @@
 #include "keymap.h"
 #include "helpers.h"
 
+#include "deadkey.h"
+
 #include "mc_kmxfile.h"
 
 void KMX_LogError(const KMX_WCHART* m1, int m2 = 0);
