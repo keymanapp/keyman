@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 17.0.222 alpha 2023-12-02
+
+* fix(common): publish @keymanapp/developer-utils as npm module (#10118)
+
 ## 17.0.221 alpha 2023-12-01
 
 * chore(windows): removed cached context windows engine (#10065)
