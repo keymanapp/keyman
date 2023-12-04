@@ -7,7 +7,8 @@ import {
   GestureRecognizerConfiguration,
   GestureSource,
   InputSample,
-  PaddedZoneSource
+  PaddedZoneSource,
+  RecognitionZoneSource
 } from '@keymanapp/gesture-recognizer';
 
 import { BANNER_GESTURE_SET } from './bannerGestureSet.js';
@@ -18,11 +19,13 @@ import EventEmitter from 'eventemitter3';
 import { ParsedLengthStyle } from '../lengthStyle.js';
 import { getFontSizeStyle } from '../fontSizeUtils.js';
 import { getTextMetrics } from '../keyboard-layout/getTextMetrics.js';
-
+import { BannerScrollState } from './bannerScrollState.js';
 
 const TOUCHED_CLASS: string = 'kmw-suggest-touched';
 const BANNER_CLASS: string = 'kmw-suggest-banner';
 const BANNER_SCROLLER_CLASS = 'kmw-suggest-banner-scroller';
+
+const BANNER_VERT_ROAMING_HEIGHT_RATIO = 0.666;
 
 /**
  * Defines various parameters used by `BannerSuggestion` instances for layout and formatting.
@@ -293,13 +296,11 @@ export class BannerSuggestion {
 
   public highlight(on: boolean) {
     const elem = this.div;
-    let classes = elem.className;
-    let cs = ' ' + TOUCHED_CLASS;
 
-    if(on && classes.indexOf(cs) < 0) {
-      elem.className=classes+cs;
+    if(on) {
+      elem.classList.add(TOUCHED_CLASS);
     } else {
-      elem.className=classes.replace(cs,'');
+      elem.classList.remove(TOUCHED_CLASS);
     }
   }
 
@@ -362,10 +363,15 @@ export class SuggestionBanner extends Banner {
 
   private hostDevice: DeviceSpec;
 
+  /**
+   * The banner 'container', which is also the root element for banner scrolling.
+   */
   private readonly container: HTMLElement;
   private highlightAnimation: SuggestionExpandContractAnimation;
 
   private gestureEngine: GestureRecognizer<BannerSuggestion>;
+  private scrollState: BannerScrollState;
+  private selectionBounds: RecognitionZoneSource;
 
   private _predictionContext: PredictionContext;
 
@@ -443,11 +449,32 @@ export class SuggestionBanner extends Banner {
       return null;
     }
 
+    // Auto-cancels suggestion-selection if the finger moves too far; having very generous
+    // safe-zone settings also helps keep scrolls active on demo pages, etc.
+    const safeBounds = new PaddedZoneSource(this.getDiv(), [-Number.MAX_SAFE_INTEGER]);
+    this.selectionBounds = new PaddedZoneSource(
+      this.getDiv(),
+      [-BANNER_VERT_ROAMING_HEIGHT_RATIO * this.height, -Number.MAX_SAFE_INTEGER]
+    );
+
     const config: GestureRecognizerConfiguration<BannerSuggestion> = {
       targetRoot: this.getDiv(),
-      maxRoamingBounds: new PaddedZoneSource(this.getDiv(), [-0.333 * this.height]),
+      maxRoamingBounds: safeBounds,
+      safeBounds: safeBounds,
       // touchEventRoot:  this.element, // is the default
       itemIdentifier: (sample, target: HTMLElement) => {
+        const selBounds = this.selectionBounds.getBoundingClientRect();
+
+        // Step 1:  is the coordinate within the range we permit for selecting _anything_?
+        if(sample.clientX < selBounds.left || sample.clientX > selBounds.right) {
+          return null;
+        }
+        if(sample.clientY < selBounds.top || sample.clientY > selBounds.bottom) {
+          return null;
+        }
+
+        // Step 2: find the best-matching selection.
+
         let bestMatch: BannerSuggestion = null;
         let bestDist = Number.MAX_VALUE;
 
@@ -482,6 +509,25 @@ export class SuggestionBanner extends Banner {
       suggestion: null
     };
 
+    const markSelection = (suggestion: BannerSuggestion) => {
+      suggestion.highlight(true);
+      if(this.highlightAnimation) {
+        this.highlightAnimation.cancel();
+        this.highlightAnimation.decouple();
+      }
+
+      this.highlightAnimation = new SuggestionExpandContractAnimation(this.container, suggestion, false);
+      this.highlightAnimation.expand();
+    }
+
+    const clearSelection = (suggestion: BannerSuggestion) => {
+      suggestion.highlight(false);
+      if(!this.highlightAnimation) {
+        this.highlightAnimation = new SuggestionExpandContractAnimation(this.container, suggestion, false);
+      }
+      this.highlightAnimation.collapse();
+    }
+
     engine.on('inputstart', (source) => {
       // The banner does not support multi-touch - if one is still current, block all others.
       if(sourceTracker.source) {
@@ -489,46 +535,45 @@ export class SuggestionBanner extends Banner {
         return;
       }
 
+      this.scrollState = new BannerScrollState(source.currentSample, this.container.scrollLeft);
+      const suggestion = source.baseItem;
+
       sourceTracker.source = source;
       sourceTracker.scrollingHandler = (sample) => {
-        // Maintain highlighting
-        const suggestion = sample.item;
+        const newScrollLeft = this.scrollState.updateTo(sample);
+        this.highlightAnimation.setBaseScroll(newScrollLeft);
 
-        if(suggestion != sourceTracker.suggestion) {
-          sourceTracker.suggestion?.highlight(false);
-          sourceTracker.suggestion?.div.classList.remove(TOUCHED_CLASS);
-          suggestion.highlight(true);
+          // Only re-enable the original suggestion, even if the touchpoint finds
+          // itself over a different suggestion.  Might happen if a scroll boundary
+          // is reached.
+        const incoming = sample.item ? suggestion : null;
 
-          const elem = suggestion.div;
-          if(!elem.classList.contains(TOUCHED_CLASS)) {
-            elem.classList.add(TOUCHED_CLASS);
-            if(this.highlightAnimation) {
-              this.highlightAnimation.cancel();
-              this.highlightAnimation.decouple();
-            }
-
-            this.highlightAnimation = new SuggestionExpandContractAnimation(this.container, suggestion, false);
-            this.highlightAnimation.expand();
-          } else {
-            elem.classList.remove(TOUCHED_CLASS);
-            if(!this.highlightAnimation) {
-              this.highlightAnimation = new SuggestionExpandContractAnimation(this.container, suggestion, false);
-            }
-            this.highlightAnimation.collapse();
+        // It's possible to cancel selection while still scrolling.
+        if(incoming != sourceTracker.suggestion) {
+          if(sourceTracker.suggestion) {
+            clearSelection(sourceTracker.suggestion);
           }
 
-          sourceTracker.suggestion = suggestion;
+          sourceTracker.suggestion = incoming;
+          if(incoming) {
+            markSelection(incoming);
+          }
         }
       };
+
       sourceTracker.suggestion = source.currentSample.item;
+      markSelection(sourceTracker.suggestion);
 
       source.currentSample.item.highlight(true);
 
       const terminationHandler = () => {
-        sourceTracker.suggestion.highlight(false);
+        if(sourceTracker.suggestion) {
+          clearSelection(sourceTracker.suggestion);
+          sourceTracker.suggestion = null;
+        }
+
         sourceTracker.source = null;
         sourceTracker.scrollingHandler = null;
-        sourceTracker.suggestion = null;
       }
 
       source.path.on('complete', terminationHandler);
@@ -540,9 +585,11 @@ export class SuggestionBanner extends Banner {
       // The actual result comes in via the sequence's `stage` event.
       sequence.once('stage', (result) => {
         const suggestion = result.item; // Should also == sourceTracker.suggestion.
-        if(suggestion) {
+        if(suggestion && !this.scrollState.hasScrolled) {
           this.predictionContext.accept(suggestion.suggestion);
         }
+
+        this.scrollState = null;
       });
     });
 
@@ -555,7 +602,9 @@ export class SuggestionBanner extends Banner {
     // Ensure the banner's extended recognition zone is based on proper, up-to-date layout info.
     // Note:  during banner init, `this.gestureEngine` may only be defined after
     // the first call to this setter!
-    (this.gestureEngine?.config.maxRoamingBounds as PaddedZoneSource)?.updatePadding([-0.333 * this.height]);
+    (this.selectionBounds as PaddedZoneSource)?.updatePadding(
+      [-BANNER_VERT_ROAMING_HEIGHT_RATIO * this.height, -Number.MAX_SAFE_INTEGER]
+    );
 
     return result;
   }

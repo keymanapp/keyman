@@ -36,7 +36,7 @@ export class BannerScrollState {
     let prevCoord = this.curCoord;
     this.curCoord = coord;
 
-    let delta = this.baseCoord.targetX - this.curCoord.targetX + this.baseScrollLeft
+    let delta = this.baseCoord.targetX - this.curCoord.targetX + this.baseScrollLeft;
     // Track the total amount of scrolling used, even if just a pixel-wide back and forth wiggle.
     this.totalLength += Math.abs(this.curCoord.targetX - prevCoord.targetX);
 
