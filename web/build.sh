@@ -117,12 +117,12 @@ fi
 
 coverage_action() {
   builder_echo "Creating coverage report..."
-  pushd .. > /dev/null
+  cd "$KEYMAN_ROOT"
   mkdir -p web/build/coverage/tmp
   find . -type f -name coverage-\*.json -print0 | xargs -0 cp -t web/build/coverage/tmp
   c8 report --config web/.c8rc.json ---reporter html --clean=false --reports-dir=web/build/coverage
   rm -rf web/build/coverage/tmp
-  popd > /dev/null || return
+  cd web
 }
 
 builder_run_action coverage coverage_action
