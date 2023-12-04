@@ -8,6 +8,7 @@ import { CompilerErrorNamespace } from '@keymanapp/common-types';
 import { unitTestEndpoints } from '../src/commands/build.js';
 import { KmnCompilerMessages } from '@keymanapp/kmc-kmn';
 import { defaultCompilerOptions, CompilerOptions} from '@keymanapp/common-types';
+import { loadProject } from '../src/util/projectLoader.js';
 
 describe('InfrastructureMessages', function () {
   it('should have a valid InfrastructureMessages object', function() {
@@ -69,6 +70,16 @@ describe('InfrastructureMessages', function () {
     assert.isTrue(ncb.hasMessage(InfrastructureMessages.ERROR_InvalidProjectFile),
       `ERROR_InvalidProjectFile not generated, instead got: `+JSON.stringify(ncb.messages,null,2));
   });
+
+  // ERROR_NotAProjectFile
+
+  it('should generate ERROR_InvalidProjectFile if a project file is invalid', async function() {
+    const ncb = new NodeCompilerCallbacks({logLevel: 'silent'});
+    const projectPath = makePathToFixture('invalid-project', 'error_not_a_project_file.xxx')
+    loadProject(projectPath, ncb);
+    assert.isTrue(ncb.hasMessage(InfrastructureMessages.ERROR_NotAProjectFile),
+    `ERROR_NotAProjectFile not generated, instead got: `+JSON.stringify(ncb.messages,null,2));
+});
 
   // HINT_FilenameHasDifferingCase
 
