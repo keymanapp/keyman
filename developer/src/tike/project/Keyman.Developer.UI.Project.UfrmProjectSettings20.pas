@@ -1,22 +1,22 @@
 (*
   Name:             Keyman.Developer.UI.Project.UfrmProjectSettings
   Copyright:        Copyright (C) SIL International.
-  Documentation:    
-  Description:      
+  Documentation:
+  Description:
   Create Date:      4 May 2015
 
   Modified Date:    24 Aug 2015
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
+  Bugs:
+  Todo:
+  Notes:
   History:          04 May 2015 - mcdurdin - I4688 - V9.0 - Add build path to project settings
                     24 Aug 2015 - mcdurdin - I4865 - Add treat hints and warnings as errors into project
                     24 Aug 2015 - mcdurdin - I4866 - Add warn on deprecated features to project and compile
-                    
+
 *)
 unit Keyman.Developer.UI.Project.UfrmProjectSettings20;   // I4688
 
@@ -54,12 +54,13 @@ implementation
 {$R *.dfm}
 
 uses
-  Keyman.Developer.System.Project.Project;
+  Keyman.Developer.System.Project.Project,
+  utildir;
 
 procedure TfrmProjectSettings20.cmdOKClick(Sender: TObject);
 begin
-  FGlobalProject.Options.BuildPath := Trim(editOutputPath.Text);
-  FGlobalProject.Options.SourcePath := Trim(editSourcePath.Text);
+  FGlobalProject.Options.BuildPath := Trim(DosSlashes(editOutputPath.Text));
+  FGlobalProject.Options.SourcePath := Trim(DosSlashes(editSourcePath.Text));
   FGlobalProject.Options.SkipMetadataFiles := not chkBuildMetadataFiles.Checked;
   FGlobalProject.Options.CompilerWarningsAsErrors := chkCompilerWarningsAsErrors.Checked;   // I4865
   FGlobalProject.Options.WarnDeprecatedCode := chkWarnDeprecatedCode.Checked;   // I4866

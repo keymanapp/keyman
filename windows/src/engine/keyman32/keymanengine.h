@@ -126,7 +126,6 @@ BOOL IsSysTrayWindow(HWND hwnd);
 
 BOOL InitialiseProcess(HWND hwnd);
 BOOL UninitialiseProcess(BOOL Lock);
-BOOL IsKeyboardUnicode();
 
 BOOL IsFocusedThread();
 
@@ -231,6 +230,7 @@ void keybd_shift(LPINPUT pInputs, int* n, BOOL isReset, LPBYTE const kbd);
 #include "keymancontrol.h"
 #include "keyboardoptions.h"
 #include "kmprocessactions.h"
+#include "appcontext.h"
 
 #include "syskbd.h"
 #include "vkscancodes.h"

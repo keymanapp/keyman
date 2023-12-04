@@ -66,6 +66,7 @@ uses
   Keyman.Developer.System.Project.ProjectFiles,
   Keyman.Developer.System.Project.ProjectFileType,
 
+  utildir,
   utilfiletypes;
 
 { TProjectLoader }
@@ -131,10 +132,10 @@ begin
     FProject.Options.Assign(DefaultProjectOptions[FProject.Options.Version]);
 
     if not VarIsNull(node.ChildValues['BuildPath']) then
-      FProject.Options.BuildPath := VarToStr(node.ChildValues['BuildPath']);
+      FProject.Options.BuildPath := DosSlashes(VarToStr(node.ChildValues['BuildPath']));
 
     if not VarIsNull(node.ChildValues['SourcePath']) then
-      FProject.Options.SourcePath := VarToStr(node.ChildValues['SourcePath']);
+      FProject.Options.SourcePath := DosSlashes(VarToStr(node.ChildValues['SourcePath']));
 
     if not VarIsNull(node.ChildValues['CompilerWarningsAsErrors']) then
       FProject.Options.CompilerWarningsAsErrors := node.ChildValues['CompilerWarningsAsErrors'];

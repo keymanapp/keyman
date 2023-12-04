@@ -43,6 +43,14 @@ option::option(km_core_option_scope s, char16_t const *k, char16_t const *v)
   }
 }
 
+km_core_option_item
+option::release() {
+  km_core_option_item opt = *this;
+  key = nullptr;
+  value = nullptr;
+  return opt;
+}
+
 // TODO: Relocate this and fix it
 json & km::core::operator << (json &j, abstract_processor const &)
 {

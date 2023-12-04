@@ -66,7 +66,7 @@ final class KMKeyboard extends WebView {
   private boolean shouldIgnoreSelectionChange = false;
 
   protected KeyboardType keyboardType = KeyboardType.KEYBOARD_TYPE_UNDEFINED;
-  protected ArrayList<String> javascriptAfterLoad = new ArrayList<String>();
+  protected ArrayList<String> javascriptAfterLoad = new ArrayList<>();
 
   private static String currentKeyboard = null;
 
@@ -214,10 +214,8 @@ final class KMKeyboard extends WebView {
         }
 
         // Send console errors to Sentry in case they're missed by KMW sentryManager
-        // (Ignoring spurious message "No keyboard stubs exist = ...")
-        // TODO: Fix base error rather than trying to ignore it "No keyboard stubs exist"
 
-        if ((cm.messageLevel() == ConsoleMessage.MessageLevel.ERROR) && (!cm.message().startsWith("No keyboard stubs exist"))) {
+        if (cm.messageLevel() == ConsoleMessage.MessageLevel.ERROR) {
           // Make Toast notification of error and send log about falling back to default keyboard (ignore language ID)
           // Sanitize sourceId info
           String NAVIGATION_PATTERN = "^(.*)?(keyboard\\.html#[^-]+)-.*$";
@@ -302,15 +300,21 @@ final class KMKeyboard extends WebView {
       this.postDelayed(new Runnable() {
         @Override
         public void run() {
-          if(javascriptAfterLoad.size() > 0) {
-            loadUrl("javascript:" + javascriptAfterLoad.get(0));
-            javascriptAfterLoad.remove(0);
-            // Make sure we didn't reset the page in the middle of the queue!
-            if(keyboardSet) {
-              if (javascriptAfterLoad.size() > 0) {
-                callJavascriptAfterLoad();
-              }
-            }
+          StringBuilder allCalls = new StringBuilder();
+          if(javascriptAfterLoad.size() == 0) {
+            return;
+          }
+
+          while(javascriptAfterLoad.size() > 0) {
+            String entry = javascriptAfterLoad.remove(0);
+            allCalls.append(entry);
+            allCalls.append(";");
+          }
+
+          loadUrl("javascript:" + allCalls.toString());
+
+          if(javascriptAfterLoad.size() > 0 && keyboardSet) {
+            callJavascriptAfterLoad();
           }
         }
       }, 1);
