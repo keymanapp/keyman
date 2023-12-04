@@ -12,32 +12,14 @@ type
   TProcessCommandLine = (pclRun, pclExit);
 
 type
-  TLaunchProject = class
-  strict private
-    FProjectFilename: string;
-    FFilenames: TStringList;
-  public
-    constructor Create(const AProjectFilename: string);
-    destructor Destroy; override;
-    property ProjectFilename: string read FProjectFilename;
-    property Filenames: TStringList read FFilenames;
-  end;
-
-  TLaunchProjects = class(TObjectList<TLaunchProject>)
-  public
-    function Find(const ProjectFilename: string): TLaunchProject;
-  end;
-
-type
   TTikeCommandLine = class
   strict private
     FProcesses: TTikeProcessList;
   private
     FStartupProjectPath: string;
     FStartupFilenames: TArray<string>;
-    function PassProjectToRunningProcess(const project: TLaunchProject): Boolean;
-    function LaunchNewInstance(const project: TLaunchProject): Boolean;
     function ProcessSubProcess: Boolean;
+    function GetFilenamesFromCommandLine(filenames: TStringList): Boolean;
   public
     constructor Create;
     destructor Destroy; override;
@@ -53,28 +35,13 @@ implementation
 
 uses
   System.SysUtils,
+  Vcl.Dialogs,
   Winapi.Windows,
 
   ErrorControlledRegistry,
-  Keyman.Developer.System.ProjectOwningFile,
+  Keyman.Developer.System.LaunchProjects,
   RegistryKeys,
   utilexecute;
-
-{ TLaunchProject }
-
-constructor TLaunchProject.Create(const AProjectFilename: string);
-begin
-  inherited Create;
-  FProjectFilename := AProjectFilename;
-  FFilenames := TStringList.Create;
-end;
-
-destructor TLaunchProject.Destroy;
-begin
-  FFilenames.Free;
-  inherited Destroy;
-end;
-
 
 { TTikeCommandLine }
 
@@ -112,17 +79,73 @@ begin
   inherited Destroy;
 end;
 
+function TTikeCommandLine.GetFilenamesFromCommandLine(filenames: TStringList): Boolean;
+var
+  filename, missingFilenames: string;
+  NoMoreSwitches: Boolean;
+  i: Integer;
+begin
+  missingFilenames := '';
+  NoMoreSwitches := False;
+
+  for i := 1 to ParamCount do
+  begin
+    if not NoMoreSwitches and ParamStr(i).StartsWith('-') then
+    begin
+      // We will treat all `-x` and `--x` parameters as command-line switches,
+      // which provides forward compatibility for when we want to support
+      // additional switches. A single `--` parameter tells us that remaining
+      // parameters are filenames, even if they start with `-`.
+      if ParamStr(i) = '--' then
+        NoMoreSwitches := True;
+      Continue;
+    end;
+
+    filename := ExpandFileName(ParamStr(i));
+    if FileExists(filename)
+      then filenames.Add(filename)
+      else missingFilenames := missingFilenames + '• ' + filename + #13#10;
+  end;
+
+  if missingFilenames <> '' then
+  begin
+    ShowMessage('The following file(s) could not be found:'#13#10+missingFilenames);
+    if filenames.Count = 0 then
+      // If we only had bogus filenames passed in then we should abort
+      Exit(False);
+  end;
+
+  Result := True;
+end;
+
+function TTikeCommandLine.ProcessSubProcess: Boolean;
+var
+  i: Integer;
+begin
+  if (ParamStr(1) <> '--sub-process') or (ParamCount < 2) then
+  begin
+    Exit(False);
+  end;
+
+  // TODO(lowpri): Consider error handling
+
+  FStartupProjectPath := ParamStr(2);
+  SetLength(FStartupFilenames, ParamCount - 2);
+  for i := 3 to ParamCount do
+  begin
+    FStartupFilenames[i-3] := ParamStr(i);
+  end;
+
+  Result := True;
+end;
+
 /// Reads filenames passed on command line, and determines if they should be
 /// opened in an existing instance of Keyman Developer or in this instance, or
 /// even in multiple new instances
 function TTikeCommandLine.Process: TProcessCommandLine;
 var
-  i: Integer;
-  filename: string;
   filenames: TStringList;
-  newProjects, launchProjects: TLaunchProjects;
-  p: TLaunchProject;
-  projectFilename: string;
+  projects: TLaunchProjects;
 begin
   // If launched by LaunchNewInstance then we'll process that and continue
   if ProcessSubProcess then
@@ -131,14 +154,11 @@ begin
   end;
 
   filenames := TStringList.Create;
-  launchProjects := TLaunchProjects.Create;
-  newProjects := TLaunchProjects.Create(False);
+  projects := TLaunchProjects.Create(True);
   try
-    // TODO: are there any other parameters passed to TIKE?
-    for i := 1 to ParamCount do
-    begin
-      filenames.Add(ExpandFileName(ParamStr(i)));
-    end;
+    // Collect filenames passed in on command line
+    if not GetFilenamesFromCommandLine(filenames) then
+      Exit(pclExit);
 
     if filenames.Count = 0 then
     begin
@@ -153,101 +173,27 @@ begin
       Exit(pclRun);
     end;
 
-    for filename in filenames do
+    // Sort filenames into project groupings
+
+    projects.GroupFilenamesIntoProjects(filenames);
+
+    // Launch new processes or load files into existing processes
+
+    if not projects.LaunchAll(FProcesses)
+      then Result := pclExit
+      else Result := pclRun;
+
+    if Assigned(projects.StartupProject) then
     begin
-      projectFilename := FindOwnerProjectForFile(filename);
-
-      p := launchProjects.Find(projectFilename);
-      if p = nil then
-      begin
-        p := TLaunchProject.Create(projectFilename);
-        launchProjects.Add(p);
-      end;
-      p.Filenames.Add(filename);
-    end;
-
-    // First, hand off files to existing processes, based on project folder
-    for p in launchProjects do
-    begin
-      if not PassProjectToRunningProcess(p) then
-      begin
-        newProjects.Add(p);
-      end;
-    end;
-
-    // If we've already passed all filenames off, then we're done
-    if newProjects.Count = 0 then
-    begin
-      Exit(pclExit);
-    end;
-
-    // If there's more than one project left, then we need to launch new
-    // processes for each one; we'll take the first for ourselves
-    FStartupFilenames := newProjects[0].Filenames.ToStringArray;
-    FStartupProjectPath := newProjects[0].ProjectFilename;
-
-    newProjects.Delete(0);
-    for p in newProjects do
-    begin
-      LaunchNewInstance(p);
+      // LaunchAll will leave one startup project for this current process
+      // instance to load
+      FStartupFilenames := projects.StartupProject.Filenames.ToStringArray;
+      FStartupProjectPath := projects.StartupProject.ProjectFilename;
     end;
   finally
+    projects.Free;
     filenames.Free;
   end;
-
-  Result := pclRun;
-end;
-
-function TTikeCommandLine.LaunchNewInstance(const project: TLaunchProject): Boolean;
-var
-  filename, cmdline: string;
-begin
-  cmdline := '"'+ParamStr(0)+'" --sub-process "'+project.ProjectFilename+'"';
-  for filename in project.Filenames do
-    cmdline := cmdline + ' "'+filename+'"';
-
-  Result := TUtilExecute.Execute(cmdline, GetCurrentDir, SW_SHOWNORMAL);
-end;
-
-function TTikeCommandLine.ProcessSubProcess: Boolean;
-var
-  i: Integer;
-begin
-  if (ParamStr(1) <> '--sub-process') or (ParamCount < 2) then
-  begin
-    Exit(False);
-  end;
-
-  // TODO: Consider error handling
-
-  FStartupProjectPath := ParamStr(2);
-  SetLength(FStartupFilenames, ParamCount - 2);
-  for i := 3 to ParamCount do
-  begin
-    FStartupFilenames[i-3] := ParamStr(i);
-  end;
-
-  Result := True;
-end;
-
-function TTikeCommandLine.PassProjectToRunningProcess(const project: TLaunchProject): Boolean;
-var
-  tp: TTikeProcess;
-  filename: string;
-begin
-  for tp in FProcesses do
-  begin
-    if tp.OwnsProject(project.ProjectFilename) then
-    begin
-      Result := True;
-      for filename in project.Filenames do
-      begin
-        tp.OpenFile(filename);
-      end;
-      Exit;
-    end;
-  end;
-  Result := False;
 end;
 
 var
@@ -258,20 +204,6 @@ begin
   if not Assigned(FInstance) then
     FInstance := TTikeCommandLine.Create;
   Result := FInstance;
-end;
-
-{ TLaunchProjects }
-
-function TLaunchProjects.Find(const ProjectFilename: string): TLaunchProject;
-begin
-  for Result in Self do
-  begin
-    if Result.ProjectFilename = ProjectFilename then
-    begin
-      Exit;
-    end;
-  end;
-  Result := nil;
 end;
 
 initialization

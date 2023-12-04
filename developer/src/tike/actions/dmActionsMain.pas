@@ -334,11 +334,8 @@ begin
 end;
 
 procedure TmodActionsMain.actFileOpenAccept(Sender: TObject);
-var
-  i: Integer;
 begin
-  for i := 0 to actFileOpen.Dialog.Files.Count - 1 do
-    frmKeymanDeveloper.OpenFileInProject(actFileOpen.Dialog.Files[i]);
+  frmKeymanDeveloper.OpenFilesInProject(actFileOpen.Dialog.Files.ToStringArray);
 end;
 
 procedure TmodActionsMain.actFileOpenUpdate(Sender: TObject);

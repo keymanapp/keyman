@@ -387,8 +387,8 @@ type
 
     { IDropTarget }
 
-    procedure Drop(const FileNames: array of string);
-    function DropAllowed(const FileNames: array of string): Boolean;
+    procedure Drop(const FileNames: TArray<string>);
+    function DropAllowed(const FileNames: TArray<string>): Boolean;
     procedure InitDock;
     procedure LoadDockLayout;
     procedure SaveDockLayout;
@@ -445,7 +445,7 @@ type
 
     function OpenEditor(FFileName: string; frmClass: TfrmTikeEditorClass): TfrmTikeEditor;
     function OpenFile(FFileName: string; FCloseNewFile: Boolean): TfrmTikeChild;
-    procedure OpenFileInProject(FFileName: string);
+    procedure OpenFilesInProject(FFileNames: TArray<string>);
 
     procedure HelpTopic(s: string); overload;
     procedure HelpTopic(Sender: TTIKEForm); overload;
@@ -481,6 +481,7 @@ uses
   Keyman.System.KeymanSentryClient,
   Keyman.Developer.UI.TikeOnlineUpdateCheck,
   GlobalProxySettings,
+  Keyman.Developer.System.LaunchProjects,
   Keyman.Developer.System.Project.ProjectFile,
   Keyman.Developer.System.Project.ProjectFileType,
   Keyman.Developer.System.Project.WelcomeRenderer,
@@ -488,6 +489,7 @@ uses
   Keyman.Developer.System.Project.ProjectLog,
   Keyman.Developer.System.Project.XmlLdmlProjectFile,
   Keyman.Developer.System.TikeCommandLine,
+  Keyman.Developer.System.TikeMultiProcess,
   Keyman.Developer.UI.Project.ProjectFileUI,
   Keyman.Developer.UI.Project.ProjectUI,
   Keyman.Developer.UI.UfrmLdmlKeyboardEditor,
@@ -1207,12 +1209,55 @@ begin
   PostMessage(TfrmTikeChild(pages.Pages[Index].Tag).Handle, WM_CLOSE, 0, 0);
 end;
 
-procedure TfrmKeymanDeveloper.OpenFileInProject(FFileName: string);
+procedure TfrmKeymanDeveloper.OpenFilesInProject(FFileNames: TArray<string>);
+var
+  filename: string;
+  filenames: TStringList;
+  projects: TLaunchProjects;
+  p: TLaunchProject;
+  FProcesses: TTikeProcessList;
 begin
+  if Length(FFileNames) = 0 then
+    Exit;
+
   // Uses the TTikeCommandLine pattern to open the resulting file either locally
   // or in a remote process
-  // TODO
-  OpenFile(FFileName, True);
+  FProcesses := TikeMultiProcess.Enumerate;
+  projects := TLaunchProjects.Create(False);
+  filenames := TStringList.Create;
+  try
+    filenames.AddStrings(FFileNames);
+    FFileNames := [];
+
+    // Sort filenames into project groupings
+    projects.GroupFilenamesIntoProjects(filenames);
+
+    // Look for the current instance's project in the list of projects, and
+    // capture its list of filenames separately
+    if IsGlobalProjectUIReady then
+    begin
+      for p in projects do
+      begin
+        if SameFileName(p.ProjectFilename, FGlobalProject.FileName) then
+        begin
+          FFileNames := p.Filenames.ToStringArray;
+          projects.Remove(p);
+          Break;
+        end;
+      end;
+    end;
+
+    // Launch new processes or load files into existing processes
+    projects.LaunchAll(FProcesses);
+  finally
+    filenames.Free;
+    projects.Free;
+    FProcesses.Free;
+  end;
+
+  // Finally, open the remaining files which belong to this instance's project
+  for filename in FFileNames do
+    OpenFile(filename, True);
 end;
 
 function TfrmKeymanDeveloper.OpenFile(FFileName: string; FCloseNewFile: Boolean): TfrmTikeChild;
@@ -1253,6 +1298,12 @@ begin
 
       if ext = Ext_ProjectSource then
       begin
+        if SameFileName(GetGlobalProjectUI.FileName, FFileName) then
+        begin
+          ShowProject;
+          Exit;
+        end;
+
         if BeforeOpenProject then
           modActionsMain.OpenProject(FFileName);
       end
@@ -1420,23 +1471,19 @@ end;
 procedure TfrmKeymanDeveloper.mnuFileRecentFileClick(Sender: TObject);
 begin
   with Sender as TMenuItem do
-    OpenFileInProject(Hint);
+    OpenFilesInProject([Hint]);
 end;
 
 {-------------------------------------------------------------------------------
  - Drag and Drop functionality                                                 -
  -------------------------------------------------------------------------------}
 
-procedure TfrmKeymanDeveloper.Drop(const FileNames: array of string);
-var
-  i: Integer;
+procedure TfrmKeymanDeveloper.Drop(const FileNames: TArray<string>);
 begin
-  for i := Low(Filenames) to High(Filenames) do
-    OpenFileInProject(Filenames[i]);
+  OpenFilesInProject(FileNames);
 end;
 
-function TfrmKeymanDeveloper.DropAllowed(
-  const FileNames: array of string): Boolean;
+function TfrmKeymanDeveloper.DropAllowed(const FileNames: TArray<string>): Boolean;
 begin
   Result := True;
 end;

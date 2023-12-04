@@ -133,13 +133,6 @@ end;
 
 function TTikeProcess.OpenFile(const filename: string): Boolean;
 begin
-  if SameFileName(filename, ProjectFilename) then
-  begin
-    // We always accept opening the project that is already open,
-    // so just bring the process to the front
-    Exit(FocusProcess);
-  end;
-
   if not TCopyDataHelper.SendData(0, WindowHandle, TCopyDataCommand.CD_OPENFILE, filename) then
   begin
     // The target app did not receive the data
