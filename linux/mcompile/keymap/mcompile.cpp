@@ -55,8 +55,7 @@ void KMX_TranslateDeadkeyKeyboard(LPKMX_KEYBOARD kbd, KMX_WCHAR deadkey, KMX_WOR
 void KMX_TranslateDeadkeyGroup(LPKMX_GROUP group,KMX_WCHAR deadkey, KMX_WORD vk, UINT shift, KMX_WORD ch);
 void KMX_TranslateDeadkeyKey(LPKMX_KEY key, KMX_WCHAR deadkey, KMX_WORD vk, UINT shift, KMX_WORD ch);
 
-int KMX_GetDeadkeys(KMX_WORD DeadKey, KMX_WORD *OutputPairs) ;
-
+int KMX_GetDeadkeys(v_dw_2D & dk_ComposeTable, KMX_WORD DeadKey, KMX_WORD *OutputPairs);
 void KMX_AddDeadkeyRule(LPKMX_KEYBOARD kbd, KMX_WCHAR deadkey, KMX_WORD vk, UINT shift);
 
 
@@ -351,7 +350,6 @@ struct KMX_dkidmap {
 };
 
 KMX_WCHAR KMX_GetUniqueDeadkeyID(LPKMX_KEYBOARD kbd, KMX_WCHAR deadkey) {
-  KMX_WCHAR noneS2;
   LPKMX_GROUP gp;
   LPKMX_KEY kp;
   LPKMX_STORE sp;
@@ -404,9 +402,12 @@ KMX_WCHAR KMX_GetUniqueDeadkeyID(LPKMX_KEYBOARD kbd, KMX_WCHAR deadkey) {
 void KMX_ConvertDeadkey(LPKMX_KEYBOARD kbd, KMX_WORD vk, UINT shift, KMX_WCHAR deadkey, GdkKeymap * keymap) {
   KMX_WORD deadkeys[512], *pdk;
 
+  // create dk_createDK_ComposeTable
+  v_dw_2D  dk_Table;
+  create_DKTable(dk_Table);
+
   // Lookup the deadkey table for the deadkey in the physical keyboard
   // Then for each character, go through and map it through
-
   KMX_WCHAR dkid = KMX_GetUniqueDeadkeyID(kbd, deadkey);                                              // _S2 OK Conversion easy  - should work right away
 
   // Add the deadkey to the mapping table for use in the import rules phase
@@ -414,7 +415,7 @@ void KMX_ConvertDeadkey(LPKMX_KEYBOARD kbd, KMX_WORD vk, UINT shift, KMX_WCHAR d
   KMX_FDeadkeys.push_back(KMX_deadkeyMapping); //dkid, vk, shift);   // I4353
 
   KMX_AddDeadkeyRule(kbd, dkid, vk, shift);                                                           // _S2 OK Conversion easy  - should work right away
-  KMX_GetDeadkeys(deadkey, pdk = deadkeys);  // returns array of [usvk, ch_out] pairs                 // _S2    Conversion hard but similar to keys remove _NT86,...
+  KMX_GetDeadkeys(dk_Table, deadkey, pdk = deadkeys);  // returns array of [usvk, ch_out] pairs                 // _S2    Conversion hard but similar to keys remove _NT86,...
 
   while(*pdk) {
     // Look up the ch
@@ -471,13 +472,6 @@ KMX_BOOL KMX_DoConvert(LPKMX_KEYBOARD kbd, PKMX_WCHAR kbid, KMX_BOOL bDeadkeyCon
   v_dw_3D All_Vector;
   if(createOneVectorFromBothKeyboards(All_Vector, keymap)){
     wprintf(L"ERROR: can't create one vector from both keyboards\n");
-    return FALSE;
-  }
-
-  // create dk_createDK_ComposeTable
-  v_dw_2D  dk_ComposeTable;
-  if(create_DKTable(dk_ComposeTable)){
-    wprintf(L"ERROR: can't create dk_ComposeTable\n");
     return FALSE;
   }
 
@@ -665,26 +659,16 @@ KMX_WORD KMX_VKUSToVKUnderlyingLayout_S2(KMX_WORD VKey) {
 }
 
 KMX_WORD KMX_VKUnderlyingLayoutToVKUS_S2(KMX_WORD VKey) {
- /* if(IsWow64()) {
-    return VKUnderlyingLayoutToVKUS_NT_x64(VKey);
-  } else {
-    return VKUnderlyingLayoutToVKUS_NT(VKey);
-  }*/
   KMX_WORD retu ;
   return retu;
 }
 
-int KMX_GetDeadkeys(KMX_WORD DeadKey, KMX_WORD *OutputPairs) {
+int KMX_GetDeadkeys(v_dw_2D & dk_Table, KMX_WORD DeadKey, KMX_WORD *OutputPairs) {
   KMX_WORD *p = OutputPairs, shift;
   KMX_DWORD shift_S2;
 
-  //_S2 make static!
-  // create dk_createDK_ComposeTable
-  v_dw_2D  dk_ComposeTable;
-  create_DKTable(dk_ComposeTable);
-
   v_dw_2D  dk_CombinationTable;
-  find_all_dk_combinations(&dk_ComposeTable, dk_CombinationTable, DeadKey);
+  find_all_dk_combinations(&dk_Table, dk_CombinationTable, DeadKey);
 
   for ( int i=0; i< dk_CombinationTable.size()-1;i++) {
     KMX_WORD vk = getKeyname(dk_CombinationTable[i][1], shift_S2);
