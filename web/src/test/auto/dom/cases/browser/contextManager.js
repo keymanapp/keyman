@@ -10,7 +10,7 @@ import { KeyboardHarness, MinimalKeymanGlobal } from '/@keymanapp/keyboard-proce
 import { DOMKeyboardLoader } from '/@keymanapp/keyboard-processor/build/lib/dom-keyboard-loader.mjs';
 import { loadKeyboardsFromStubs } from '../../kbdLoader.mjs';
 
-import timedPromise from '../../timedPromise.mjs';
+import { timedPromise } from '/@keymanapp/web-utils/build/lib/index.mjs';
 import sinon from '/node_modules/sinon/pkg/sinon-esm.js';
 
 const assert = chai.assert;

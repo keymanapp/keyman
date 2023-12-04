@@ -122,7 +122,7 @@ export default class KeymanEngine extends KeymanEngineBase<BrowserConfiguration,
     }
 
     this._ui = module;
-    if(this.config.deferForInitialization.hasResolved) {
+    if(this.config.deferForInitialization.isFulfilled) {
       module.initialize();
     }
   }
@@ -165,7 +165,7 @@ export default class KeymanEngine extends KeymanEngineBase<BrowserConfiguration,
 
     // Deferred keyboard loading + shortcutting if a different init call on the engine has
     // already fully resolved.
-    if(this.config.deferForInitialization.hasFinalized) {
+    if(this.config.deferForInitialization.isResolved) {
       // abort!  Maybe throw an error, too.
       return Promise.resolve();
     }

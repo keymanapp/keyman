@@ -1,0 +1,808 @@
+{
+  "inputs": [
+    {
+      "isFromTouch": true,
+      "path": {
+        "coords": [
+          {
+            "targetX": 83,
+            "targetY": 25,
+            "t": 512159
+          },
+          {
+            "targetX": 83,
+            "targetY": 33,
+            "t": 512303
+          },
+          {
+            "targetX": 83,
+            "targetY": 34,
+            "t": 512335
+          },
+          {
+            "targetX": 83,
+            "targetY": 37,
+            "t": 512351
+          },
+          {
+            "targetX": 82,
+            "targetY": 38,
+            "t": 512368
+          },
+          {
+            "targetX": 82,
+            "targetY": 40,
+            "t": 512385
+          },
+          {
+            "targetX": 82,
+            "targetY": 41,
+            "t": 512401
+          },
+          {
+            "targetX": 82,
+            "targetY": 44,
+            "t": 512418
+          },
+          {
+            "targetX": 82,
+            "targetY": 45,
+            "t": 512435
+          },
+          {
+            "targetX": 82,
+            "targetY": 46,
+            "t": 512451
+          },
+          {
+            "targetX": 80,
+            "targetY": 46,
+            "t": 512468
+          },
+          {
+            "targetX": 79,
+            "targetY": 46,
+            "t": 512484
+          },
+          {
+            "targetX": 79,
+            "targetY": 48,
+            "t": 512501
+          },
+          {
+            "targetX": 79,
+            "targetY": 48,
+            "t": 512518
+          },
+          {
+            "targetX": 79,
+            "targetY": 49,
+            "t": 512535
+          },
+          {
+            "targetX": 78,
+            "targetY": 49,
+            "t": 512551
+          },
+          {
+            "targetX": 78,
+            "targetY": 50,
+            "t": 512568
+          },
+          {
+            "targetX": 78,
+            "targetY": 52,
+            "t": 512584
+          },
+          {
+            "targetX": 75,
+            "targetY": 52,
+            "t": 512601
+          },
+          {
+            "targetX": 75,
+            "targetY": 53,
+            "t": 512618
+          },
+          {
+            "targetX": 74,
+            "targetY": 53,
+            "t": 512635
+          },
+          {
+            "targetX": 74,
+            "targetY": 54,
+            "t": 512651
+          },
+          {
+            "targetX": 71,
+            "targetY": 54,
+            "t": 512668
+          },
+          {
+            "targetX": 70,
+            "targetY": 54,
+            "t": 512685
+          },
+          {
+            "targetX": 70,
+            "targetY": 53,
+            "t": 512702
+          },
+          {
+            "targetX": 68,
+            "targetY": 53,
+            "t": 512718
+          },
+          {
+            "targetX": 66,
+            "targetY": 54,
+            "t": 512735
+          },
+          {
+            "targetX": 63,
+            "targetY": 53,
+            "t": 512751
+          },
+          {
+            "targetX": 62,
+            "targetY": 53,
+            "t": 512768
+          },
+          {
+            "targetX": 62,
+            "targetY": 53,
+            "t": 512785
+          },
+          {
+            "targetX": 59,
+            "targetY": 53,
+            "t": 512802
+          },
+          {
+            "targetX": 56,
+            "targetY": 53,
+            "t": 512818
+          },
+          {
+            "targetX": 54,
+            "targetY": 53,
+            "t": 512835
+          },
+          {
+            "targetX": 51,
+            "targetY": 53,
+            "t": 512851
+          },
+          {
+            "targetX": 48,
+            "targetY": 53,
+            "t": 512868
+          },
+          {
+            "targetX": 46,
+            "targetY": 53,
+            "t": 512885
+          },
+          {
+            "targetX": 42,
+            "targetY": 53,
+            "t": 512902
+          },
+          {
+            "targetX": 39,
+            "targetY": 53,
+            "t": 512918
+          },
+          {
+            "targetX": 38,
+            "targetY": 53,
+            "t": 512935
+          },
+          {
+            "targetX": 35,
+            "targetY": 53,
+            "t": 512951
+          },
+          {
+            "targetX": 32,
+            "targetY": 53,
+            "t": 512968
+          },
+          {
+            "targetX": 30,
+            "targetY": 53,
+            "t": 512984
+          },
+          {
+            "targetX": 30,
+            "targetY": 53,
+            "t": 513002
+          },
+          {
+            "targetX": 28,
+            "targetY": 53,
+            "t": 513018
+          },
+          {
+            "targetX": 27,
+            "targetY": 53,
+            "t": 513035
+          },
+          {
+            "targetX": 24,
+            "targetY": 53,
+            "t": 513051
+          },
+          {
+            "targetX": 23,
+            "targetY": 53,
+            "t": 513068
+          },
+          {
+            "targetX": 22,
+            "targetY": 53,
+            "t": 513084
+          },
+          {
+            "targetX": 20,
+            "targetY": 53,
+            "t": 513102
+          },
+          {
+            "targetX": 19,
+            "targetY": 53,
+            "t": 513118
+          },
+          {
+            "targetX": 16,
+            "targetY": 53,
+            "t": 513135
+          },
+          {
+            "targetX": 14,
+            "targetY": 53,
+            "t": 513152
+          },
+          {
+            "targetX": 12,
+            "targetY": 53,
+            "t": 513168
+          },
+          {
+            "targetX": 10,
+            "targetY": 53,
+            "t": 513184
+          },
+          {
+            "targetX": 10,
+            "targetY": 53,
+            "t": 513201
+          },
+          {
+            "targetX": 8,
+            "targetY": 53,
+            "t": 513218
+          },
+          {
+            "targetX": 7,
+            "targetY": 53,
+            "t": 513234
+          },
+          {
+            "targetX": 6,
+            "targetY": 53,
+            "t": 513251
+          },
+          {
+            "targetX": 6,
+            "targetY": 53,
+            "t": 513285
+          },
+          {
+            "targetX": 4,
+            "targetY": 53,
+            "t": 513319
+          },
+          {
+            "targetX": 3,
+            "targetY": 53,
+            "t": 513368
+          },
+          {
+            "targetX": 2,
+            "targetY": 52,
+            "t": 513385
+          },
+          {
+            "targetX": -1,
+            "targetY": 52,
+            "t": 513401
+          },
+          {
+            "targetX": -2,
+            "targetY": 50,
+            "t": 513418
+          },
+          {
+            "targetX": -5,
+            "targetY": 50,
+            "t": 513434
+          },
+          {
+            "targetX": -6,
+            "targetY": 49,
+            "t": 513452
+          },
+          {
+            "targetX": -6,
+            "targetY": 48,
+            "t": 513468
+          },
+          {
+            "targetX": -8,
+            "targetY": 48,
+            "t": 513485
+          },
+          {
+            "targetX": -10,
+            "targetY": 46,
+            "t": 513518
+          },
+          {
+            "targetX": -10,
+            "targetY": 45,
+            "t": 513535
+          },
+          {
+            "targetX": -12,
+            "targetY": 44,
+            "t": 513551
+          },
+          {
+            "targetX": -13,
+            "targetY": 44,
+            "t": 513568
+          },
+          {
+            "targetX": -13,
+            "targetY": 44,
+            "t": 513585
+          },
+          {
+            "targetX": -13,
+            "targetY": 42,
+            "t": 513618
+          },
+          {
+            "targetX": -13,
+            "targetY": 41,
+            "t": 513635
+          },
+          {
+            "targetX": -14,
+            "targetY": 40,
+            "t": 513652
+          },
+          {
+            "targetX": -14,
+            "targetY": 40,
+            "t": 513668
+          },
+          {
+            "targetX": -14,
+            "targetY": 38,
+            "t": 513685
+          },
+          {
+            "targetX": -14,
+            "targetY": 37,
+            "t": 513701
+          },
+          {
+            "targetX": -14,
+            "targetY": 36,
+            "t": 513719
+          },
+          {
+            "targetX": -14,
+            "targetY": 36,
+            "t": 513735
+          },
+          {
+            "targetX": -14,
+            "targetY": 34,
+            "t": 513752
+          },
+          {
+            "targetX": -14,
+            "targetY": 32,
+            "t": 513768
+          },
+          {
+            "targetX": -14,
+            "targetY": 29,
+            "t": 513802
+          },
+          {
+            "targetX": -14,
+            "targetY": 28,
+            "t": 513835
+          },
+          {
+            "targetX": -14,
+            "targetY": 26,
+            "t": 513851
+          },
+          {
+            "targetX": -14,
+            "targetY": 24,
+            "t": 513868
+          },
+          {
+            "targetX": -14,
+            "targetY": 22,
+            "t": 513885
+          },
+          {
+            "targetX": -14,
+            "targetY": 21,
+            "t": 513901
+          },
+          {
+            "targetX": -14,
+            "targetY": 20,
+            "t": 513919
+          },
+          {
+            "targetX": -14,
+            "targetY": 20,
+            "t": 513934
+          },
+          {
+            "targetX": -14,
+            "targetY": 18,
+            "t": 513952
+          },
+          {
+            "targetX": -14,
+            "targetY": 17,
+            "t": 513968
+          },
+          {
+            "targetX": -14,
+            "targetY": 16,
+            "t": 513985
+          },
+          {
+            "targetX": -14,
+            "targetY": 14,
+            "t": 514001
+          },
+          {
+            "targetX": -16,
+            "targetY": 13,
+            "t": 514018
+          },
+          {
+            "targetX": -17,
+            "targetY": 12,
+            "t": 514035
+          },
+          {
+            "targetX": -17,
+            "targetY": 10,
+            "t": 514051
+          },
+          {
+            "targetX": -17,
+            "targetY": 8,
+            "t": 514068
+          },
+          {
+            "targetX": -17,
+            "targetY": 8,
+            "t": 514085
+          },
+          {
+            "targetX": -17,
+            "targetY": 5,
+            "t": 514101
+          },
+          {
+            "targetX": -17,
+            "targetY": 4,
+            "t": 514118
+          },
+          {
+            "targetX": -17,
+            "targetY": 2,
+            "t": 514135
+          },
+          {
+            "targetX": -17,
+            "targetY": 0,
+            "t": 514151
+          },
+          {
+            "targetX": -17,
+            "targetY": 0,
+            "t": 514168
+          },
+          {
+            "targetX": -17,
+            "targetY": -2,
+            "t": 514184
+          },
+          {
+            "targetX": -17,
+            "targetY": -3,
+            "t": 514201
+          },
+          {
+            "targetX": -17,
+            "targetY": -4,
+            "t": 514219
+          },
+          {
+            "targetX": -17,
+            "targetY": -4,
+            "t": 514235
+          },
+          {
+            "targetX": -17,
+            "targetY": -6,
+            "t": 514251
+          },
+          {
+            "targetX": -17,
+            "targetY": -7,
+            "t": 514268
+          },
+          {
+            "targetX": -17,
+            "targetY": -8,
+            "t": 514284
+          },
+          {
+            "targetX": -17,
+            "targetY": -10,
+            "t": 514335
+          },
+          {
+            "targetX": -17,
+            "targetY": -11,
+            "t": 514351
+          },
+          {
+            "targetX": -17,
+            "targetY": -12,
+            "t": 514368
+          },
+          {
+            "targetX": -17,
+            "targetY": -12,
+            "t": 514485
+          },
+          {
+            "targetX": -16,
+            "targetY": -12,
+            "t": 514518
+          },
+          {
+            "targetX": -13,
+            "targetY": -14,
+            "t": 514535
+          },
+          {
+            "targetX": -13,
+            "targetY": -15,
+            "t": 514551
+          },
+          {
+            "targetX": -12,
+            "targetY": -15,
+            "t": 514602
+          },
+          {
+            "targetX": -10,
+            "targetY": -15,
+            "t": 514618
+          },
+          {
+            "targetX": -6,
+            "targetY": -15,
+            "t": 514635
+          },
+          {
+            "targetX": -5,
+            "targetY": -15,
+            "t": 514652
+          },
+          {
+            "targetX": -2,
+            "targetY": -15,
+            "t": 514701
+          },
+          {
+            "targetX": -1,
+            "targetY": -15,
+            "t": 514718
+          },
+          {
+            "targetX": 0,
+            "targetY": -15,
+            "t": 514735
+          },
+          {
+            "targetX": 2,
+            "targetY": -15,
+            "t": 514751
+          },
+          {
+            "targetX": 3,
+            "targetY": -15,
+            "t": 514768
+          },
+          {
+            "targetX": 6,
+            "targetY": -15,
+            "t": 514785
+          },
+          {
+            "targetX": 7,
+            "targetY": -15,
+            "t": 514801
+          },
+          {
+            "targetX": 10,
+            "targetY": -15,
+            "t": 514818
+          },
+          {
+            "targetX": 11,
+            "targetY": -15,
+            "t": 514834
+          },
+          {
+            "targetX": 14,
+            "targetY": -15,
+            "t": 514869
+          },
+          {
+            "targetX": 15,
+            "targetY": -15,
+            "t": 514885
+          },
+          {
+            "targetX": 16,
+            "targetY": -15,
+            "t": 514918
+          },
+          {
+            "targetX": 18,
+            "targetY": -15,
+            "t": 514934
+          },
+          {
+            "targetX": 19,
+            "targetY": -15,
+            "t": 514952
+          },
+          {
+            "targetX": 20,
+            "targetY": -15,
+            "t": 514968
+          },
+          {
+            "targetX": 23,
+            "targetY": -15,
+            "t": 515018
+          },
+          {
+            "targetX": 27,
+            "targetY": -15,
+            "t": 515034
+          },
+          {
+            "targetX": 31,
+            "targetY": -15,
+            "t": 515052
+          },
+          {
+            "targetX": 35,
+            "targetY": -14,
+            "t": 515068
+          },
+          {
+            "targetX": 36,
+            "targetY": -15,
+            "t": 515085
+          },
+          {
+            "targetX": 38,
+            "targetY": -15,
+            "t": 515101
+          },
+          {
+            "targetX": 39,
+            "targetY": -15,
+            "t": 515118
+          },
+          {
+            "targetX": 40,
+            "targetY": -15,
+            "t": 515134
+          },
+          {
+            "targetX": 42,
+            "targetY": -15,
+            "t": 515168
+          },
+          {
+            "targetX": 43,
+            "targetY": -15,
+            "t": 515185
+          },
+          {
+            "targetX": 44,
+            "targetY": -15,
+            "t": 515251
+          },
+          {
+            "targetX": 46,
+            "targetY": -15,
+            "t": 515268
+          },
+          {
+            "targetX": 46,
+            "targetY": -15,
+            "t": 515285
+          },
+          {
+            "targetX": 47,
+            "targetY": -15,
+            "t": 515301
+          },
+          {
+            "targetX": 48,
+            "targetY": -15,
+            "t": 515335
+          },
+          {
+            "targetX": 50,
+            "targetY": -15,
+            "t": 515352
+          },
+          {
+            "targetX": 50,
+            "targetY": -15,
+            "t": 515368
+          },
+          {
+            "targetX": 51,
+            "targetY": -15,
+            "t": 515385
+          },
+          {
+            "targetX": 52,
+            "targetY": -15,
+            "t": 515535
+          },
+          {
+            "targetX": 51,
+            "targetY": -15,
+            "t": 515552
+          }
+        ],
+        "wasCancelled": false
+      }
+    }
+  ],
+  "config": {
+    "deviceStyle": "screen4",
+    "roamingStyle": "bounds4",
+    "receiverStyle": "popup",
+    "safeZoneStyle": "safe-default"
+  }
+}

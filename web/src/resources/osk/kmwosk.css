@@ -257,7 +257,9 @@
 .tablet .kmw-key {border-radius:8px;overflow:visible;border:solid 2px #999999;box-shadow: 0px -1px 1px 0px rgba(0,0,0,1) inset;}
 
 .tablet .kmw-key-label{position:absolute;left:7%;top:2%;font:0.5em Arial;color:#aaa;background-color:transparent;z-index:10000;}
-.tablet .kmw-key-text{position:relative;left:0;top:0;-webkit-user-select:none;}
+.tablet .kmw-key-text {
+  -webkit-user-select:none;
+}
 
 .tablet.ios .kmw-key-layer-group {background-color: #cfd3d9}
 .tablet.ios .kmw-key {border: none; border-bottom: solid 1px #8a8d90; box-shadow:none; border-radius: 5px;}
@@ -348,10 +350,22 @@
 .desktop .kmw-key-label{position:absolute;left:2px;top:2px;font:0.5em Arial;color:#888;background-color:transparent;}
 
 /* Popup icon style (and content)*/
-.kmw-key-popup-icon::before{content:'\2022';}
-
 .kmw-key-popup-icon{position:absolute;display:block;visibility:visible;right:4%;top:1%;/*width:8px;height:8px;*/
-      font:bold 0.5em Arial;color:#aaa;}
+      font-size:0.5em;color:#aaa; line-height:initial}
+
+/* For certain form-factors, #aaa blends in with the special-key background-color _way_ too well. */
+/* e.g: .phone.ios .kmw-key.kmw-key-special {background-color:#b2b9c5;} */
+.kmw-key-special .kmw-key-popup-icon {
+  color: #ddd;
+}
+
+@media (prefers-color-scheme: dark) {
+  /* But not in dark mode. */
+  .kmw-key-special .kmw-key-popup-icon {
+    color: #aaa;
+  }
+}
+
 /*.phone .kmw-key-popup-icon{right:6%;top:-2px;width:8px;height:8px;text-align:right;}
 .desktop .kmw-key-popup-icon{right:4%;top:0;width:8px;height:8px;} */
 
@@ -462,28 +476,71 @@ body div.kmw-key-shift span.kmw-key-text {font-family:SpecialOSK !important;font
 body div.kmw-key-shift-on span.kmw-key-text {font-family:SpecialOSK !important;font-size:1em !important;}
 #kmw-popup-keys div.kmw-key-shift span.kmw-key-text {font-family:SpecialOSK !important;}
 
-/* Style for callout used on phones */
-#kmw-popup-callout {
-  position: absolute;
-  display: block;
-  background-color: #fdfdfe;
-  border-radius: 0 0 5px 5px;
-  z-index: 10002;
-  pointer-events:none;
-  border-bottom: solid 1px #8a8d90;
-  box-sizing: border-box;
-}
-
 #kmw-keytip {
   z-index: 10002;
 }
 
+#kmw-gesture-preview {
+  position: absolute;
+  display: block;
+  z-index: 1;
+  border-radius: inherit;
+  top: 0px;
+  left: 0px;
+  right: 0px;
+  bottom: 0px;
+  /* Clip anything that 'scrolls' past the preview's boundaries.*/
+  overflow: hidden;
+  /* Hides the base key entirely; this prevents artifacting should positioning vary a bit. */
+  background-color: inherit;
+}
+
+#kmw-gesture-base-label {
+  top: 50%;
+  transform: translateY(-50%);
+  position: absolute;
+  display: block;
+  width: 100%;
+}
+
+.kmw-flick-preview {
+  position: absolute;
+}
+
+#kmw-preview-img-container {
+  position: absolute;
+
+  /* Facilitates scrolling animation to match a flick */
+  height: 100%;
+  width: 100%;
+
+  transition: 0.5s linear border;
+}
+
+#kmw-preview-img-container.flick-clear {
+  transition: margin 0.25s linear ease-in-out;
+  margin-left: 0px !important;
+  margin-top: 0px !important;
+}
+
+.kmw-key-popup-icon.hint-clear {
+  color: transparent;
+  transition: 0.5s linear all;
+}
+
 /* Key preview styles */
+
+div.kmw-keytip-tip.kmw-top {
+  top: 0;
+}
+
+div.kmw-keytip-tip.kmw-bottom {
+  bottom: 0;
+}
 
 div.ios div.kmw-keytip, div.android div.kmw-keytip {
   position: absolute;
   left: 0;
-  top: 0;
   width: 3em;
   height: 3em;
   overflow: visible;
@@ -494,13 +551,13 @@ div.ios div.kmw-keytip {
 }
 
 div.ios div.kmw-keytip-tip {
-  position: absolute;
-  top: 0;
-  width: 100%;
   border-radius: 6px 6px 4px 4px;
   border: solid 1px #cccccc;
   border-bottom: solid 1px #8a8d90;
   box-sizing: border-box;
+  /* Needed in order to properly 'anchor' the gesture-preview */
+  position: absolute;
+  width: 100%;
 }
 
 div.ios div.kmw-keytip-cap, div.android div.kmw-keytip-cap {
@@ -535,6 +592,9 @@ div.android div.kmw-keytip {
 div.android div.kmw-keytip-tip {
   border-radius: 6px;
   background: #999;
+  /* Needed in order to properly 'anchor' the gesture-preview */
+  position: absolute;
+  width: 100%;
 }
 
 div.android div.kmw-keytip-cap {
@@ -555,11 +615,6 @@ div.android div.kmw-keytip-cap {
 
   div.ios div.kmw-keytip-cap {
     border-top: solid 1px #0f1319;
-  }
-
-  /* Style for callout used on phones */
-  #kmw-popup-callout {
-    background-color: #0f1319;
   }
 }
 
@@ -627,9 +682,35 @@ div.android div.kmw-keytip-cap {
 .phone.android #kmw-popup-keys {border:none; border-radius: 2px; background-color:#333333; padding:5px 5px 0 0;}
 .tablet.android #kmw-popup-keys {border:1px solid #eee; border-radius: 3px; background-color:#888; padding:8px 12px 4px 4px;}
 
+/* Style for callout used on phones */
+#kmw-popup-callout {
+  position: absolute;
+  display: block;
+  border-color: transparent;
+  border-top-color: #fdfdfe;
+  border-style: solid;
+  z-index: 10003;
+  pointer-events:none;
+  box-sizing: border-box;
+}
+
+.phone.android #kmw-popup-callout {
+  border-top-color: #333333;
+}
+
+.tablet.android #kmw-popup-callout {
+  border-top-color: #888;
+}
+
 @media (prefers-color-scheme: dark) {
+  /* Should we do different dark-mode styling for Android than for iOS? */
+  /* These were selected for iOS, just to be clear. */
   #kmw-popup-keys {
     background-color: #0f1319;
+  }
+
+  #kmw-popup-callout {
+    border-top-color: #0f1319;
   }
 }
 

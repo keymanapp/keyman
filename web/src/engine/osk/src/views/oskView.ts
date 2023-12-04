@@ -22,7 +22,7 @@ import {
   type SystemStoreMutationHandler
 } from '@keymanapp/keyboard-processor';
 import { createUnselectableElement, getAbsoluteX, getAbsoluteY, StylesheetManager } from 'keyman/engine/dom-utils';
-import { EventListener, EventNames, LegacyEventEmitter } from 'keyman/engine/events';
+import { EventListener, EventNames, KeyEventHandler, KeyEventSourceInterface, LegacyEventEmitter } from 'keyman/engine/events';
 
 import Configuration from '../config/viewConfiguration.js';
 import Activator, { StaticActivator } from './activator.js';
@@ -67,7 +67,7 @@ export interface EventMap {
    * Note:  the following code block was originally used to integrate with the keyboard & input
    * processors, but it requires entanglement with components external to this OSK module.
    */
-  'keyevent': (event: KeyEvent) => void,
+  'keyevent': KeyEventHandler,
 
   /**
    * Indicates that the globe key has either been pressed (`on` == `true`)
@@ -116,7 +116,9 @@ export interface EventMap {
   pointerinteraction: (promise: Promise<void>) => void;
 }
 
-export default abstract class OSKView extends EventEmitter<EventMap> implements MinimalCodesInterface {
+export default abstract class OSKView
+  extends EventEmitter<EventMap>
+  implements MinimalCodesInterface, KeyEventSourceInterface<EventMap> {
   _Box: HTMLDivElement;
   readonly legacyEvents = new LegacyEventEmitter<LegacyOSKEventMap>();
 
@@ -701,14 +703,17 @@ export default abstract class OSKView extends EventEmitter<EventMap> implements 
     // Instantly resets the OSK container, erasing / delinking the previously-loaded keyboard.
     this._Box.innerHTML = '';
 
+    // Since we cleared all inner HTML, that means we cleared the stylesheets, too.
+    this.uiStyleSheetManager.unlinkAll();
+    this.kbdStyleSheetManager.unlinkAll();
+
+    // Install the default OSK stylesheets - but don't have it managed by the keyboard-specific stylesheet manager.
+    // We wish to maintain kmwosk.css whenever keyboard-specific styles are reset/removed.
     // Temp-hack:  embedded products prefer their stylesheet, etc linkages without the /osk path component.
     let subpath = 'osk/';
     if(this.config.isEmbedded) {
       subpath = '';
     }
-
-    // Install the default OSK stylesheet - but don't have it managed by the keyboard-specific stylesheet manager.
-    // We wish to maintain kmwosk.css whenever keyboard-specific styles are reset/removed.
     for(let sheetFile of OSKView.STYLESHEET_FILES) {
       const sheetHref = `${this.config.pathConfig.resources}/${subpath}${sheetFile}`;
       this.uiStyleSheetManager.linkExternalSheet(sheetHref);
@@ -811,7 +816,7 @@ export default abstract class OSKView extends EventEmitter<EventMap> implements 
       isEmbedded: this.config.isEmbedded
     });
 
-    vkbd.on('keyevent', (keyEvent) => this.emit('keyevent', keyEvent));
+    vkbd.on('keyevent', (keyEvent, callback) => this.emit('keyevent', keyEvent, callback));
     vkbd.on('globekey', (keyElement, on) => this.emit('globekey', keyElement, on));
     vkbd.on('hiderequested', (keyElement) => {
       this.doHide(true);
@@ -854,7 +859,7 @@ export default abstract class OSKView extends EventEmitter<EventMap> implements 
       //
       // Also, only change the layer ID itself if there is an actual corresponding layer
       // in the OSK.
-      if(this.vkbd?.layerGroup.layers[newValue]) {
+      if(this.vkbd?.layerGroup.layers[newValue] && !this.vkbd?.layerLocked) {
         this.vkbd.layerId = newValue;
         // Ensure that the layer's spacebar is properly captioned.
         this.vkbd.showLanguage();

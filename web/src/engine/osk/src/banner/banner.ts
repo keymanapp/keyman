@@ -1,4 +1,16 @@
 import { Keyboard, KeyboardProperties } from '@keymanapp/keyboard-processor';
+import { type PredictionContext } from '@keymanapp/input-processor';
+
+import {
+  GestureRecognizer,
+  GestureRecognizerConfiguration,
+  GestureSource,
+  InputSample,
+  PaddedZoneSource
+} from '@keymanapp/gesture-recognizer';
+
+import { BANNER_GESTURE_SET } from './bannerGestureSet.js';
+
 import { createUnselectableElement } from 'keyman/engine/dom-utils';
 
 // Base class for a banner above the keyboard in the OSK
@@ -50,7 +62,7 @@ export abstract class Banner {
    * @return       {boolean}   true if the banner styling changed
    * Description   Update the height and display styling of the banner
    */
-  private update() : boolean {
+  protected update() : boolean {
     let ds = this.div.style;
     let currentHeightStyle = ds.height;
     let currentDisplayStyle = ds.display;
