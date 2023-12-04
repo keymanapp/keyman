@@ -151,7 +151,7 @@ bool km::core::state::set_actions(
   // number of codepoints (not codeunits!) to delete from app context.
 
   for(unsigned int i = 0; i < actions.code_points_to_delete; i++) {
-    _actions.push_backspace(KM_CORE_BT_CHAR, 0); //(*end).character);
+    _actions.push_backspace(KM_CORE_BT_CHAR, 0); // expected value is not known
   }
 
   for(auto output = actions.output; *output; output++) {

@@ -248,6 +248,29 @@ void test_persist_opt() {
 }
 
 //-------------------------------------------------------------------------------------
+
+void test_caps_lock() {
+  puts("test_caps_lock");
+
+  const km_core_action_item action_items[] = {
+    caps_action_item(KM_CORE_CAPS_ON),
+    // invalidate_context_action_item(),
+    end_action_item()
+  };
+
+  const km_core_actions actions = {
+    0, // unsigned int code_points_to_delete;
+    test_empty_output, // km_core_usv* output;
+    test_env_opts, // km_core_option_item* persist_options;
+    KM_CORE_FALSE, // km_core_bool do_alert;
+    KM_CORE_FALSE, // km_core_bool emit_keystroke;
+    KM_CORE_CAPS_ON // new_caps_lock_state;
+  };
+
+  run_test(action_items, actions);
+}
+
+//-------------------------------------------------------------------------------------
 // Launcher
 //-------------------------------------------------------------------------------------
 
@@ -289,6 +312,7 @@ int main(int argc, char *argv []) {
   test_emit_keystroke();
   test_invalidate_context();
   test_persist_opt();
+  test_caps_lock();
 }
 
 //-------------------------------------------------------------------------------------
