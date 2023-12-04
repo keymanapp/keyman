@@ -47,6 +47,7 @@ KMX_WORD KMX_VKUnderlyingLayoutToVKUS(KMX_WORD VKey);
 KMX_WORD KMX_VKUnderlyingLayoutToVKUS(v_dw_3D &All_Vector,KMX_DWORD inOther);
 // _S2 sure KMX_WCHART ??? not KMX_WCHAR ??
 KMX_WCHART KMX_VKUnderlyingLayoutToVKUS_GDK(GdkKeymap* keymap,KMX_DWORD inOther);
+KMX_WCHAR KMX_VKUnderlyingLayoutToVKUS_GDK2(GdkKeymap* keymap,KMX_DWORD inOther);
 
 PKMX_WCHAR KMX_incxstr(PKMX_WCHAR p);
 //--------------------old 

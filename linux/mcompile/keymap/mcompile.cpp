@@ -57,8 +57,6 @@ void KMX_TranslateDeadkeyKey(LPKMX_KEY key, KMX_WCHAR deadkey, KMX_WORD vk, UINT
 
 int KMX_GetDeadkeys(KMX_WORD DeadKey, KMX_WORD *OutputPairs) ;
 
-int KMX_GetDeadkeys_NT(KMX_WORD DeadKey, KMX_WORD *OutputPairs);  // returns array of [USVK, ch] pairs
-int KMX_GetDeadkeys_NT_x64(KMX_WORD DeadKey, KMX_WORD *OutputPairs);  // returns array of [USVK, ch] pairs
 void KMX_AddDeadkeyRule(LPKMX_KEYBOARD kbd, KMX_WCHAR deadkey, KMX_WORD vk, UINT shift);
 
 
@@ -403,7 +401,7 @@ KMX_WCHAR KMX_GetUniqueDeadkeyID(LPKMX_KEYBOARD kbd, KMX_WCHAR deadkey) {
   return s_dkids[s_ndkids++].dst_deadkey = s_next_dkid = ++dkid;
 }
 
-void KMX_ConvertDeadkey(LPKMX_KEYBOARD kbd, KMX_WORD vk, UINT shift, KMX_WCHAR deadkey) {
+void KMX_ConvertDeadkey(LPKMX_KEYBOARD kbd, KMX_WORD vk, UINT shift, KMX_WCHAR deadkey, GdkKeymap * keymap) {
   KMX_WORD deadkeys[512], *pdk;
 
   // Lookup the deadkey table for the deadkey in the physical keyboard
@@ -421,7 +419,7 @@ void KMX_ConvertDeadkey(LPKMX_KEYBOARD kbd, KMX_WORD vk, UINT shift, KMX_WCHAR d
   while(*pdk) {
     // Look up the ch
     // _S2 the new function returns KMX_DWORD
-    UINT vkUnderlying = KMX_VKUnderlyingLayoutToVKUS_S2(*pdk);                                        // _S2    Conversion medium use my gdk-funct 
+    UINT vkUnderlying = KMX_VKUnderlyingLayoutToVKUS_GDK(keymap, *pdk);                               // _S2    Conversion medium use my gdk-funct
     KMX_TranslateDeadkeyKeyboard(kbd, dkid, vkUnderlying, *(pdk+1), *(pdk+2));                        // _S2 OK Conversion easy - should work right away
     pdk+=3;
   }
@@ -478,7 +476,7 @@ KMX_BOOL KMX_DoConvert(LPKMX_KEYBOARD kbd, PKMX_WCHAR kbid, KMX_BOOL bDeadkeyCon
 
   // create dk_createDK_ComposeTable
   v_dw_2D  dk_ComposeTable;
-  if(createDK_ComposeTable(dk_ComposeTable)){
+  if(create_DKTable(dk_ComposeTable)){
     wprintf(L"ERROR: can't create dk_ComposeTable\n");
     return FALSE;
   }
@@ -508,7 +506,7 @@ KMX_BOOL KMX_DoConvert(LPKMX_KEYBOARD kbd, PKMX_WCHAR kbid, KMX_BOOL bDeadkeyCon
       //wprintf(L"     switch with  ch: %i (%c)......\n" ,  ch,ch);
       switch(ch) {
         case 0x0000: break;
-        case 0xFFFF: KMX_ConvertDeadkey(kbd, KMX_VKMap[i], VKShiftState[j], DeadKey); break;
+        case 0xFFFF: KMX_ConvertDeadkey(kbd, KMX_VKMap[i], VKShiftState[j], DeadKey, keymap); break;
         default:     KMX_TranslateKeyboard(kbd, KMX_VKMap[i], VKShiftState[j], ch);
       }
     }
@@ -571,6 +569,11 @@ KMX_WCHART KMX_VKUnderlyingLayoutToVKUS_GDK(GdkKeymap* keymap,KMX_DWORD VK_US) {
     return VK_DE;
   else
     return VK_US;
+}// _S2 sure KMX_WCHART ??? not KMX_WCHAR ??
+
+KMX_WCHAR KMX_VKUnderlyingLayoutToVKUS_GDK2(GdkKeymap* keymap,KMX_DWORD VK_Other) {
+
+    return VK_Other;
 }
 // takes VK of Other keyboard and returns character of Other keyboard with shiftstate VKShiftState[j]
 KMX_DWORD KMX_CharFromVK(v_dw_3D &All_Vector,KMX_DWORD vkUnderlying, KMX_UINT VKShiftState, KMX_WCHAR* DeadKey){
@@ -672,49 +675,30 @@ KMX_WORD KMX_VKUnderlyingLayoutToVKUS_S2(KMX_WORD VKey) {
 }
 
 int KMX_GetDeadkeys(KMX_WORD DeadKey, KMX_WORD *OutputPairs) {
-  int asdfghjk=0;
-  /*if(IsWow64()) {
-    return KMX_GetDeadkeys_NT_x64(DeadKey, OutputPairs);
-  } else {
-    return KMX_GetDeadkeys_NT(DeadKey, OutputPairs);
-  }*/
-}
+  KMX_WORD *p = OutputPairs, shift;
+  KMX_DWORD shift_S2;
 
-int KMX_GetDeadkeys_NT_x64(KMX_WORD DeadKey, KMX_WORD *OutputPairs) {
-  /*WORD *p = OutputPairs, shift;
-	for(int i = 0; KbdTables_x64->pDeadKey[i].dwBoth; i++) {
-		if(HIWORD(KbdTables_x64->pDeadKey[i].dwBoth) == DeadKey) {
-			WORD vk = CharToUSVK_NT_x64(LOWORD(KbdTables_x64->pDeadKey[i].dwBoth), &shift);
-      if(vk != 0) {
-        *p++ = vk;
-        *p++ = shift;
-        *p++ = KbdTables_x64->pDeadKey[i].wchComposed;
-      } else {
-        LogError(L"Warning: complex deadkey not supported.");
-      }
-		}
-	}
-  *p = 0;
-  return (INT_PTR)(p-OutputPairs);*/
-}
+  //_S2 make static!
+  // create dk_createDK_ComposeTable
+  v_dw_2D  dk_ComposeTable;
+  create_DKTable(dk_ComposeTable);
 
-int KMX_GetDeadkeys_NT(KMX_WORD DeadKey, KMX_WORD *OutputPairs) {
-  /*WORD *p = OutputPairs, shift;
-	for(int i = 0; KbdTables->pDeadKey[i].dwBoth; i++) {
-		if(HIWORD(KbdTables->pDeadKey[i].dwBoth) == DeadKey) {
-			WORD vk = CharToUSVK_NT(LOWORD(KbdTables->pDeadKey[i].dwBoth), &shift);
-      if(vk != 0) {
-        *p++ = vk;
-        *p++ = shift;
-        *p++ = KbdTables->pDeadKey[i].wchComposed;
-      } else {
-        LogError(L"Warning: complex deadkey not supported.");
-      }
-		}
-	}
+  v_dw_2D  dk_CombinationTable;
+  find_all_dk_combinations(&dk_ComposeTable, dk_CombinationTable, DeadKey);
+
+  for ( int i=0; i< dk_CombinationTable.size()-1;i++) {
+    KMX_WORD vk = getKeyname(dk_CombinationTable[i][1], shift_S2);
+    if(vk != 0) {
+          *p++ = vk;
+          *p++ = shift_S2;
+          *p++ = dk_CombinationTable[i][2];
+        }
+        //else {
+        //  LogError(L"Warning: complex deadkey not supported.");
+      // }
+  }
   *p = 0;
-  return (INT_PTR)(p-OutputPairs);*/
-  return 999;
+  return (p-OutputPairs);
 }
 
 
