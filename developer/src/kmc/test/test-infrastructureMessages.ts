@@ -86,6 +86,16 @@ describe('InfrastructureMessages', function () {
       `ERROR_FileTypeNotFound not generated, instead got: `+JSON.stringify(ncb.messages,null,2));
   });
 
+  // ERROR_NotAProjectFile
+
+  it('should generate ERROR_NotAProjectFile if a project file is not the correct type', async function() {
+    const ncb = new NodeCompilerCallbacks({logLevel: 'silent'});
+    const projectPath = makePathToFixture('invalid-project', 'error_not_a_project_file.xxx')
+    loadProject(projectPath, ncb);
+    assert.isTrue(ncb.hasMessage(InfrastructureMessages.ERROR_NotAProjectFile),
+    `ERROR_NotAProjectFile not generated, instead got: `+JSON.stringify(ncb.messages,null,2));
+  });
+
   // HINT_FilenameHasDifferingCase
 
   it('should generate HINT_FilenameHasDifferingCase if a referenced file has differing case', async function() {
