@@ -56,11 +56,11 @@ void KMX_TranslateDeadkeyGroup(LPKMX_GROUP group,KMX_WCHAR deadkey, KMX_WORD vk,
 void KMX_TranslateDeadkeyKey(LPKMX_KEY key, KMX_WCHAR deadkey, KMX_WORD vk, UINT shift, KMX_WORD ch);
 
 int KMX_GetDeadkeys(v_dw_2D & dk_ComposeTable, KMX_WORD DeadKey, KMX_WORD *OutputPairs);
+int KMX_GetDeadkeys(v_dw_2D & dk_Table, KMX_WORD DeadKey, KMX_WORD *OutputPairs, KMX_WORD sc);
 void KMX_AddDeadkeyRule(LPKMX_KEYBOARD kbd, KMX_WCHAR deadkey, KMX_WORD vk, UINT shift);
 
 
 KMX_WORD KMX_VKUSToVKUnderlyingLayout_S2(KMX_WORD VKey);
-KMX_WORD KMX_VKUnderlyingLayoutToVKUS_S2(KMX_WORD VKey);
 KMX_UINT  KMX_VKUSToSCUnderlyingLayout(KMX_DWORD VirtualKeyUS);
 KMX_WCHAR  KMX_CharFromSC(GdkKeymap *keymap, KMX_UINT VKShiftState, UINT SC_OTHER, KMX_WCHAR* DeadKey);
 
@@ -300,6 +300,7 @@ void KMX_AddDeadkeyRule(LPKMX_KEYBOARD kbd, KMX_WCHAR deadkey, KMX_WORD vk, UINT
   // We store that as just RALT, and use the option "Simulate RAlt with Ctrl+Alt"
   // to provide an alternate..
   if((shift & (LCTRLFLAG|RALTFLAG)) == (LCTRLFLAG|RALTFLAG)) // I4549
+
     shift &= ~LCTRLFLAG;
 
   // If the first group is not a matching-keys group, then we need to add into
@@ -399,7 +400,7 @@ KMX_WCHAR KMX_GetUniqueDeadkeyID(LPKMX_KEYBOARD kbd, KMX_WCHAR deadkey) {
   return s_dkids[s_ndkids++].dst_deadkey = s_next_dkid = ++dkid;
 }
 
-void KMX_ConvertDeadkey(LPKMX_KEYBOARD kbd, KMX_WORD vk, UINT shift, KMX_WCHAR deadkey, GdkKeymap * keymap) {
+void KMX_ConvertDeadkey(LPKMX_KEYBOARD kbd, KMX_WORD vk, UINT shift, KMX_WCHAR deadkey, v_dw_3D &All_Vector) {
   KMX_WORD deadkeys[512], *pdk;
 
   // create dk_createDK_ComposeTable
@@ -408,20 +409,19 @@ void KMX_ConvertDeadkey(LPKMX_KEYBOARD kbd, KMX_WORD vk, UINT shift, KMX_WCHAR d
 
   // Lookup the deadkey table for the deadkey in the physical keyboard
   // Then for each character, go through and map it through
-  KMX_WCHAR dkid = KMX_GetUniqueDeadkeyID(kbd, deadkey);                                              // _S2 OK Conversion easy  - should work right away
+  KMX_WCHAR dkid = KMX_GetUniqueDeadkeyID(kbd, deadkey);
 
   // Add the deadkey to the mapping table for use in the import rules phase
-  KMX_DeadkeyMapping KMX_deadkeyMapping = { deadkey, dkid, shift, vk };   // I4353
+  KMX_DeadkeyMapping KMX_deadkeyMapping = { deadkey, dkid, shift, vk};    // I4353
   KMX_FDeadkeys.push_back(KMX_deadkeyMapping); //dkid, vk, shift);   // I4353
 
-  KMX_AddDeadkeyRule(kbd, dkid, vk, shift);                                                           // _S2 OK Conversion easy  - should work right away
-  KMX_GetDeadkeys(dk_Table, deadkey, pdk = deadkeys);  // returns array of [usvk, ch_out] pairs                 // _S2    Conversion hard but similar to keys remove _NT86,...
+  KMX_AddDeadkeyRule(kbd, dkid, vk, shift);
+  KMX_GetDeadkeys(dk_Table, deadkey, pdk = deadkeys);  // returns array of [usvk, ch_out] pairs
 
   while(*pdk) {
     // Look up the ch
-    // _S2 the new function returns KMX_DWORD
-    UINT vkUnderlying = KMX_VKUnderlyingLayoutToVKUS_GDK(keymap, *pdk);                               // _S2    Conversion medium use my gdk-funct
-    KMX_TranslateDeadkeyKeyboard(kbd, dkid, vkUnderlying, *(pdk+1), *(pdk+2));                        // _S2 OK Conversion easy - should work right away
+    UINT vkUnderlying = KMX_VKUnderlyingLayoutToVKUS(All_Vector, *pdk);
+    KMX_TranslateDeadkeyKeyboard(kbd, dkid, vkUnderlying, *(pdk+1), *(pdk+2));
     pdk+=3;
   }
 }
@@ -500,7 +500,7 @@ KMX_BOOL KMX_DoConvert(LPKMX_KEYBOARD kbd, PKMX_WCHAR kbid, KMX_BOOL bDeadkeyCon
       //wprintf(L"     switch with  ch: %i (%c)......\n" ,  ch,ch);
       switch(ch) {
         case 0x0000: break;
-        case 0xFFFF: KMX_ConvertDeadkey(kbd, KMX_VKMap[i], VKShiftState[j], DeadKey, keymap); break;
+        case 0xFFFF: KMX_ConvertDeadkey(kbd, KMX_VKMap[i], VKShiftState[j], DeadKey, All_Vector); break;
         default:     KMX_TranslateKeyboard(kbd, KMX_VKMap[i], VKShiftState[j], ch);
       }
     }
@@ -531,6 +531,7 @@ UINT  KMX_VKUSToSCUnderlyingLayout(KMX_DWORD VirtualKeyUS) {
   UINT SC_OTHER = SC_US;  // not neccessary but to understand what we do
   return  SC_OTHER;
 }
+
 // takes capital letter of US returns cpital character of Other keyboard
 KMX_DWORD  KMX_VKUSToVKUnderlyingLayout(v_dw_3D &All_Vector,KMX_DWORD inUS) {
   // loop and find char in US; then return char of Other
@@ -544,7 +545,7 @@ KMX_DWORD  KMX_VKUSToVKUnderlyingLayout(v_dw_3D &All_Vector,KMX_DWORD inUS) {
   return inUS;
 }
 // takes capital letter of Other returns cpital character of US keyboard
-KMX_WORD KMX_VKUnderlyingLayoutToVKUS(v_dw_3D &All_Vector,KMX_DWORD inOther) {
+KMX_WORD VKUS(v_dw_3D &All_Vector,KMX_DWORD inOther) {
  // loop and find char in Other; then return char of US
   for( int i=0; i< (int)All_Vector[1].size();i++) {
     for( int j=1; j< (int)All_Vector[1][0].size();j++) {
@@ -555,6 +556,25 @@ KMX_WORD KMX_VKUnderlyingLayoutToVKUS(v_dw_3D &All_Vector,KMX_DWORD inOther) {
   }
   return inOther;
 }
+
+
+
+KMX_WCHAR KMX_VKUnderlyingLayoutToVKUS(v_dw_3D All_Vector, KMX_DWORD VK_US) {
+
+  KMX_DWORD VK_Other;
+
+  for( int i=0; i< (int)All_Vector[0].size()-1 ;i++) {
+    for( int j=1; j< (int)All_Vector[0][0].size();j++) {
+      if ( ( All_Vector[0][i][j] == VK_US ) ) {
+        VK_Other = All_Vector[1][i][j];;
+        return VK_Other;
+      }
+    }
+  }
+  return VK_US;
+}
+
+
 // _S2 sure KMX_WCHART ??? not KMX_WCHAR ??
 KMX_WCHART KMX_VKUnderlyingLayoutToVKUS_GDK(GdkKeymap* keymap,KMX_DWORD VK_US) {
 
@@ -565,9 +585,9 @@ KMX_WCHART KMX_VKUnderlyingLayoutToVKUS_GDK(GdkKeymap* keymap,KMX_DWORD VK_US) {
     return VK_US;
 }// _S2 sure KMX_WCHART ??? not KMX_WCHAR ??
 
-KMX_WCHAR KMX_VKUnderlyingLayoutToVKUS_GDK2(GdkKeymap* keymap,KMX_DWORD VK_Other) {
+KMX_WCHAR KMX_SCKUnderlyingLayoutToVKUS_GDK2(GdkKeymap* keymap,KMX_DWORD SC_Other) {
 
-    return VK_Other;
+    return SC_Other;
 }
 // takes VK of Other keyboard and returns character of Other keyboard with shiftstate VKShiftState[j]
 KMX_DWORD KMX_CharFromVK(v_dw_3D &All_Vector,KMX_DWORD vkUnderlying, KMX_UINT VKShiftState, KMX_WCHAR* DeadKey){
@@ -648,20 +668,32 @@ int createOneVectorFromBothKeyboards(v_dw_3D &All_Vector,GdkKeymap *keymap){
   return 0;
 }
 
-KMX_WORD KMX_VKUSToVKUnderlyingLayout_S2(KMX_WORD VKey) {
-  /*if(IsWow64()) {
-    return VKUSToVKUnderlyingLayout_NT_x64(VKey);
-  } else {
-    return VKUSToVKUnderlyingLayout_NT(VKey);
-  }*/
-  KMX_WORD retu ;
-  return retu;
+
+
+int KMX_GetDeadkeys(v_dw_2D & dk_Table, KMX_WORD DeadKey, KMX_WORD *OutputPairs, KMX_WORD sc) {
+  KMX_WORD *p = OutputPairs, shift;
+  KMX_DWORD shift_S2;
+
+  v_dw_2D  dk_CombinationTable;
+  find_all_dk_combinations(&dk_Table, dk_CombinationTable, DeadKey);
+
+  for ( int i=0; i< dk_CombinationTable.size()-1;i++) {
+    KMX_WORD vk = getKeyname(dk_CombinationTable[i][1], shift_S2);
+    if(vk != 0) {
+          *p++ = vk;
+          *p++ = shift_S2;
+          *p++ = dk_CombinationTable[i][2];
+          int sdfghj0ç = 88;
+        }
+        //else {
+        //  LogError(L"Warning: complex deadkey not supported.");
+      // }
+  }
+  *p = 0;
+  return (p-OutputPairs);
 }
 
-KMX_WORD KMX_VKUnderlyingLayoutToVKUS_S2(KMX_WORD VKey) {
-  KMX_WORD retu ;
-  return retu;
-}
+
 
 int KMX_GetDeadkeys(v_dw_2D & dk_Table, KMX_WORD DeadKey, KMX_WORD *OutputPairs) {
   KMX_WORD *p = OutputPairs, shift;

@@ -36,18 +36,21 @@ struct KMX_DeadkeyMapping {   // I4353
   KMX_WCHAR deadkey, dkid;
   KMX_UINT shift;
   KMX_WORD vk;
+  KMX_WORD sc;
 };
 
 extern std::vector<KMX_DeadkeyMapping> KMX_FDeadkeys;   // I4353
 
 int run(int argc, std::vector<std::u16string>  str_argv, char* argv[]);
 
-// _S2 is this correct here???
-KMX_WORD KMX_VKUnderlyingLayoutToVKUS(KMX_WORD VKey);
-KMX_WORD KMX_VKUnderlyingLayoutToVKUS(v_dw_3D &All_Vector,KMX_DWORD inOther);
 // _S2 sure KMX_WCHART ??? not KMX_WCHAR ??
 KMX_WCHART KMX_VKUnderlyingLayoutToVKUS_GDK(GdkKeymap* keymap,KMX_DWORD inOther);
+
 KMX_WCHAR KMX_VKUnderlyingLayoutToVKUS_GDK2(GdkKeymap* keymap,KMX_DWORD inOther);
+KMX_WCHAR KMX_VKUnderlyingLayoutToVKUS(v_dw_3D All_Vector,KMX_DWORD SC_US);
+
+
+KMX_WCHAR KMX_SCUnderlyingLayoutToVKUS_GDK(GdkKeymap* keymap,KMX_DWORD inOther);
 
 PKMX_WCHAR KMX_incxstr(PKMX_WCHAR p);
 //--------------------old 
