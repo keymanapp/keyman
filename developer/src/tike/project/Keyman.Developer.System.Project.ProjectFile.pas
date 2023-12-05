@@ -144,6 +144,11 @@ const DefaultProjectOptions: array[TProjectVersion] of TProjectOptionsRecord = (
   Version: pv20
 ));
 
+{ TODO: this will be enabled in 18.0; see #10113
+const
+  C_ProjectStandardFilename = 'keyman.kpj';
+}
+
 type
   { Forward declarations }
 
@@ -195,7 +200,7 @@ type
   public
     procedure Log(AState: TProjectLogState; Filename, Msg: string; MsgCode, line: Integer); virtual;
 
-    constructor Create(AProjectType: TProjectType; AFileName: string); virtual;
+    constructor Create(AProjectType: TProjectType; AFileName: string; ALoad: Boolean); virtual;
     destructor Destroy; override;
 
     procedure Refresh;
@@ -353,10 +358,6 @@ type
     procedure ProjectFileDestroying(ProjectFile: TProjectFile);
   end;
 
-const
-  WM_USER_ProjectUpdateDisplayState = WM_USER;
-
-function GlobalProjectStateWndHandle: THandle;
 
 function ProjectTypeFromString(s: string): TProjectType;
 function ProjectTypeToString(pt: TProjectType): string;
@@ -581,7 +582,10 @@ begin
     if Assigned(FParent) then
       Result := FParent.OwnerProject;
     if Result = nil then
+    begin
+      // TODO: RAISE ERROR
       Result := FGlobalProject;
+    end;
   end;
 end;
 
@@ -745,7 +749,7 @@ begin
   end;
 end;
 
-constructor TProject.Create(AProjectType: TProjectType; AFileName: string);
+constructor TProject.Create(AProjectType: TProjectType; AFileName: string; ALoad: Boolean);
 var
   i: Integer;
 begin
@@ -773,7 +777,7 @@ begin
 
   FMustSave := False;
 
-  if not Load then   // I4703
+  if ALoad and not Load then   // I4703
   begin
     raise EProjectLoader.Create('Unable to load project '+FFileName);
   end;
@@ -1396,65 +1400,6 @@ begin
     (Self.Version = Source.Version);
 end;
 
-type
-  TGlobalProjectStateWnd = class
-  private
-    procedure WndProc(var Message: TMessage);
-    constructor Create;
-    destructor Destroy; override;
-  end;
-
-var
-  FGlobalProjectStateWnd: TGlobalProjectStateWnd = nil;
-
-  // Make this a global to prevent potential race
-  // condition causing an access violation. If it
-  // is an invalid window handle or 0 at destruction time,
-  // it's no big deal...
-  FGlobalProjectStateWndHandle: THandle = 0;
-
-{ TGlobalProjectStateWnd }
-
-constructor TGlobalProjectStateWnd.Create;
-begin
-  inherited Create;
-  FGlobalProjectStateWndHandle := AllocateHWnd(WndProc);
-end;
-
-destructor TGlobalProjectStateWnd.Destroy;
-var
-  h: THandle;
-begin
-  h := FGlobalProjectStateWndHandle;
-  FGlobalProjectStateWndHandle := 0;
-  DeallocateHWnd(h);
-  inherited Destroy;
-end;
-
-procedure TGlobalProjectStateWnd.WndProc(var Message: TMessage);
-var
-  PPath, PDisplayState: PChar;
-begin
-  if Message.Msg = WM_USER_ProjectUpdateDisplayState then
-  begin
-    PPath := PChar(Message.WParam);
-    PDisplayState := PChar(Message.LParam);
-    if Assigned(FGlobalProject) and (FGlobalProject.FileName = PPath) then
-    begin
-      FGlobalProject.DisplayState := PDisplayState;
-      FGlobalProject.SaveUser;
-    end;
-    StrDispose(PDisplayState);
-    StrDispose(PPath);
-  end;
-  DefWindowProc(FGlobalProjectStateWndHandle, Message.Msg, Message.WParam, Message.LParam);
-end;
-
-function GlobalProjectStateWndHandle: THandle;
-begin
-  Result := FGlobalProjectStateWndHandle;
-end;
-
 function ProjectTypeFromString(s: string): TProjectType;
 begin
   if SameText(s, 'keyboard') then Result := ptKeyboard
@@ -1487,9 +1432,4 @@ begin
   end;
 end;
 
-initialization
-  FGlobalProjectStateWnd := TGlobalProjectStateWnd.Create;
-finalization
-  // Deletes temporary session-local project
-  FGlobalProjectStateWnd.Free;
 end.

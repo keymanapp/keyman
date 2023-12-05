@@ -334,11 +334,8 @@ begin
 end;
 
 procedure TmodActionsMain.actFileOpenAccept(Sender: TObject);
-var
-  i: Integer;
 begin
-  for i := 0 to actFileOpen.Dialog.Files.Count - 1 do
-    frmKeymanDeveloper.OpenFile(actFileOpen.Dialog.Files[i], True);
+  frmKeymanDeveloper.OpenFilesInProject(actFileOpen.Dialog.Files.ToStringArray);
 end;
 
 procedure TmodActionsMain.actFileOpenUpdate(Sender: TObject);
@@ -1047,9 +1044,9 @@ end;
 procedure TmodActionsMain.DataModuleCreate(Sender: TObject);
 begin
   actFileOpen.Dialog.Filter :=
-    'Keyman source files|*.kmn;*.kps;*.txt;*.bmp;*.ico;*.kpj;*.kvk;*.kvks;*.model.ts;*.tsv|'+
+    'Keyman source files|*.kmn;*.kps;*.txt;*.bmp;*.ico;*.kpj;*.kvk;*.kvks;*.model.ts;*.tsv;*.xml|'+
     'Projects files (*.kpj)|*.kpj|'+
-    'Keyboard files (*.kmn)|*.kmn|'+
+    'Keyboard files (*.kmn, *.xml)|*.kmn;*.xml|'+
     'Package files (*.kps)|*.kps|'+
     'Model files (*.model.ts)|*.model.ts|'+
     'Wordlist files (*.tsv)|*.tsv|'+
