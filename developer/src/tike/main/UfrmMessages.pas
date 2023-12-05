@@ -162,7 +162,6 @@ procedure TfrmMessages.Clear;
 begin
   FMessageItems.Clear;
   memoMessage.Clear;
-  ProjectCompilerMessageClear;
 end;
 
 procedure TfrmMessages.memoMessageDblClick(Sender: TObject);
@@ -182,6 +181,12 @@ begin
 
   mi := FMessageItems[line] as TMessageItem;
   FFilename := mi.FileName;
+
+  if FFileName = FGlobalProject.FileName then
+  begin
+    frmKeymanDeveloper.ShowProject;
+    Exit;
+  end;
 
   frm := frmKeymanDeveloper.FindEditorByFileName(FFileName);
   if not Assigned(frm) then

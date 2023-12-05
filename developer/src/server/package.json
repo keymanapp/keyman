@@ -10,6 +10,7 @@
   "license": "MIT",
   "dependencies": {
     "@sentry/node": "^6.16.1",
+    "@keymanapp/developer-utils": "*",
     "chalk": "^4.1.2",
     "express": "^4.17.2",
     "multer": "^1.4.5-lts.1",

@@ -44,6 +44,7 @@ const char *Debug_UnicodeString(PKMX_WCHAR s, int x = 0);
  * @return pointer to temporary buffer
  */
 const char *Debug_UnicodeString(std::u16string s, int x = 0);
+const char *Debug_UnicodeString(std::u32string s, int x = 0);
 const char *Debug_ModifierName(KMX_UINT modifiers);
 
 inline KMX_BOOL ShouldDebug() {

@@ -1,6 +1,6 @@
 import 'mocha';
 import {assert} from 'chai';
-import {unescapeString, UnescapeError, isOneChar, toOneChar, unescapeOneQuadString} from '../../src/util/util.js';
+import {unescapeString, UnescapeError, isOneChar, toOneChar, unescapeOneQuadString, BadStringAnalyzer, isValidUnicode, describeCodepoint, isPUA, BadStringType} from '../../src/util/util.js';
 
 describe('test UTF32 functions()', function() {
   it('should properly categorize strings', () => {
@@ -66,5 +66,148 @@ describe('test unescapeOneQuadString()', () => {
   it('should fail when it needs to fail', () => {
     assert.throws(() => unescapeOneQuadString(null), null);
     assert.throws(() => unescapeOneQuadString('\uFFFFFFFFFFFF'));
+  });
+});
+
+function titleize(o : any) {
+  const s = JSON.stringify(o);
+  if (!s) {
+    return `''`;
+  } else if (s.length < 10) {
+    return s;
+  } else {
+    return s.substring(0,10)+'…';
+  }
+}
+
+describe('test bad char functions', () => {
+  it('should match test_kmx_xstring.cpp', () => {
+    function Uni_IsValid(start: number, end?: number) {
+      return [ start, end ];
+    }
+    function assert_equal(range: number[], expect : boolean) {
+      const [start, end] = range;
+      if (end) {
+        assert.equal(isValidUnicode(start, end), expect, `for ${describeCodepoint(start)}-${describeCodepoint(end)}}`);
+      } else {
+        // if branch just for the message
+        assert.equal(isValidUnicode(start), expect, `for ${describeCodepoint(start)}`);
+      }
+    }
+    // following lines are from test_kmx_xstring.cpp
+    assert_equal(Uni_IsValid(0x0000), true);
+    assert_equal(Uni_IsValid(0x0127), true);
+    assert_equal(Uni_IsValid('🙀'.codePointAt(0)), true);
+    assert_equal(Uni_IsValid(0xDECAFBAD), false); // out of range
+    assert_equal(Uni_IsValid(0x566D4128), false);
+    assert_equal(Uni_IsValid(0xFFFF), false); // nonchar
+    assert_equal(Uni_IsValid(0xFFFE), false); // nonchar
+    assert_equal(Uni_IsValid(0x10FFFF), false); // nonchar
+    assert_equal(Uni_IsValid(0x10FFFE), false); // nonchar
+    assert_equal(Uni_IsValid(0x01FFFF), false); // nonchar
+    assert_equal(Uni_IsValid(0x01FFFE), false); // nonchar
+    assert_equal(Uni_IsValid(0x02FFFF), false); // nonchar
+    assert_equal(Uni_IsValid(0x02FFFE), false); // nonchar
+    assert_equal(Uni_IsValid(0xFDD1), false); // nonchar
+    assert_equal(Uni_IsValid(0xD800), false); // orphaned surrogate
+    assert_equal(Uni_IsValid(0xFDD0), false); // nonchar
+    assert_equal(Uni_IsValid(0x100000, 0x10FFFD), true);
+    assert_equal(Uni_IsValid(0x10, 0x20), true);
+    assert_equal(Uni_IsValid(0x100000, 0x10FFFD), true);
+    assert_equal(Uni_IsValid(0x0000, 0xD7FF), true);
+    assert_equal(Uni_IsValid(0xD800, 0xDFFF), false); // orphaned surrogate
+    assert_equal(Uni_IsValid(0xE000, 0xFDCF), true);
+    assert_equal(Uni_IsValid(0xFDD0, 0xFDEF), false);
+    assert_equal(Uni_IsValid(0xFDF0, 0xFDFF), true);
+    assert_equal(Uni_IsValid(0xFDF0, 0xFFFD), true);
+    assert_equal(Uni_IsValid(0, 0x10FFFF), false);         // ends with nonchar
+    assert_equal(Uni_IsValid(0, 0x10FFFD), false);         // contains lots o' nonchars
+    assert_equal(Uni_IsValid(0x20, 0x10), false);          // swapped
+    assert_equal(Uni_IsValid(0xFDEF, 0xFDF0), false);      // just outside range
+    assert_equal(Uni_IsValid(0x0000, 0x010000), false);    // crosses noncharacter plane boundary and other stuff
+    assert_equal(Uni_IsValid(0x010000, 0x020000), false);  // crosses noncharacter plane boundary
+    assert_equal(Uni_IsValid(0x0000, 0xFFFF), false);      // crosses other BMP prohibited and plane boundary
+    assert_equal(Uni_IsValid(0x0000, 0xFFFD), false);      // crosses other BMP prohibited
+    assert_equal(Uni_IsValid(0x0000, 0xE000), false);      // crosses surrogate space
+    assert_equal(Uni_IsValid(0x0000, 0x20FFFF), false);      // out of bounds
+    assert_equal(Uni_IsValid(0x10FFFD, 0x20FFFF), false);      // out of bounds
+  });
+  it('should detect non-PUA', () => {
+    const strs = "abcd" +
+    ([
+      0xF900,
+      0xFFFFF,
+    ].map(ch => String.fromCodePoint(ch)).join(''));
+    for (const s of strs) {
+      const ch = s.codePointAt(0);
+      assert.isFalse(isPUA(ch), describeCodepoint(ch));
+    }
+  });
+  it('should detect PUA', () => {
+    const strs = "\uE010" +
+      ([
+        0xE000,0xE001,0xE002,
+        0xF000,
+        0xF800,
+        0xF8FF,
+
+        0x0F0000,
+        0x0FFFFD,
+
+        0x100000,
+        0x10FFFD
+      ].map(ch => String.fromCodePoint(ch)).join(''));
+    for (const s of strs) {
+      const ch = s.codePointAt(0);
+      assert.isTrue(isPUA(ch), describeCodepoint(ch));
+    }
+  });
+});
+
+describe('test BadStringAnalyzer', () => {
+  describe('should return nothing for all valid strings', () => {
+    const cases = [
+      [],
+      ['a',],
+      ['a', 'b',]
+    ];
+    for (const strs of cases) {
+      const title = titleize(strs);
+      it(`should analyze ${title}`, () => {
+        const bsa = new BadStringAnalyzer();
+        for (const s of strs) {
+          bsa.add(s);
+        }
+        const m = bsa.analyze();
+        assert.isNull(m, `${title}`);
+      });
+    }
+  });
+  describe('should return nothing for all valid strings', () => {
+    it('should handle a case with some odd strs in it', () => {
+      const strs = "But you can call me “\uE010\uFDD0\uFFFE\uD800”, for short." +
+      ([
+        0xF800,
+        0x05FFFF,
+        0x102222,
+        0x04FFFE,
+      ].map(ch => String.fromCodePoint(ch)).join(''));
+
+      const bsa = new BadStringAnalyzer();
+      for (const s of strs) {
+        bsa.add(s);
+      }
+      const m = bsa.analyze();
+      assert.isNotNull(m);
+      assert.containsAllKeys(m, [BadStringType.pua, BadStringType.illegal]);
+      assert.sameDeepMembers(Array.from(m.get(BadStringType.pua).values()), [
+        0xE010,0xF800, 0x102222,
+      ], `pua analysis`);
+      assert.sameDeepMembers(Array.from(m.get(BadStringType.illegal).values()), [
+        0xFDD0,0xD800,0xFFFE,
+        0x05FFFF,
+        0x04FFFE,
+      ], `illegal analysis`);
+    });
   });
 });

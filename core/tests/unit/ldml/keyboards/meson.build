@@ -10,8 +10,10 @@
 tests_from_cldr = [
   'ja-Latn',
   'pt-t-k0-abnt2',
-  'fr-t-k0-azerty',
+  # 'fr-t-k0-optimise', (not yet)
+  # 'fr-t-k0-test',
   'pcm',
+  'bn',
 ]
 
 tests_without_testdata = [
@@ -37,6 +39,7 @@ tests_with_testdata = [
   'k_008_transform_norm',
   'k_020_fr', # TODO-LDML: move to cldr above (fix vkey)
   'k_200_reorder_nod_Lana',
+  'k_201_reorder_esk',
   'k_210_marker',
 ]
 

@@ -164,17 +164,13 @@ public final class KMKeyboardWebViewClient extends WebViewClient {
       // for the rest of the lifetime of this keyboard instance.
       kmKeyboard.setShouldShowHelpBubble(false);
     } else if (url.indexOf("refreshBannerHeight") >= 0) {
-      int start = url.indexOf("change=") + 7;
-      String change = url.substring(start);
-      boolean isModelActive = change.equals("active");
       // appContext instead of context?
       SharedPreferences prefs = context.getSharedPreferences(context.getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
       boolean modelPredictionPref = false;
       if (KMManager.currentLexicalModel != null) {
         modelPredictionPref = prefs.getBoolean(KMManager.getLanguagePredictionPreferenceKey(KMManager.currentLexicalModel.get(KMManager.KMKey_LanguageID)), true);
       }
-      kmKeyboard.setCurrentBanner((isModelActive && modelPredictionPref) ?
-        KMKeyboard.KM_BANNER_STATE_SUGGESTION : KMKeyboard.KM_BANNER_STATE_BLANK);
+      KMManager.setBannerOptions(modelPredictionPref);
       RelativeLayout.LayoutParams params = KMManager.getKeyboardLayoutParams();
       kmKeyboard.setLayoutParams(params);
     } else if (url.indexOf("suggestPopup") >= 0) {

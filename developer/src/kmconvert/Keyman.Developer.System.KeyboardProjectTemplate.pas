@@ -201,20 +201,13 @@ var
 begin
   kpj := TProject.Create(ptKeyboard, GetProjectFilename);
   try
+    kpj.Options.Version := pv20;
     kpj.Options.BuildPath := '$PROJECTPATH\' + SFolder_Build;
+    kpj.Options.SourcePath := '$PROJECTPATH\' + SFolder_Source;
     kpj.Options.WarnDeprecatedCode := True;
     kpj.Options.CompilerWarningsAsErrors := True;
     kpj.Options.CheckFilenameConventions := True;
-
-    // Add keyboard and package to project
-    kpj.Files.Add(TkmnProjectFile.Create(kpj, GetKeyboardFilename, nil));
-    kpj.Files.Add(TkpsProjectFile.Create(kpj, GetPackageFilename, nil));
-
-    // Add metadata files to project
-    kpj.Files.Add(TOpenableProjectFile.Create(kpj, BasePath + ID + '\' + SFile_HistoryMD, nil));
-    kpj.Files.Add(TOpenableProjectFile.Create(kpj, BasePath + ID + '\' + SFile_LicenseMD, nil));
-    kpj.Files.Add(TOpenableProjectFile.Create(kpj, BasePath + ID + '\' + SFile_ReadmeMD, nil));
-
+    kpj.Options.SkipMetadataFiles := False;
     kpj.Save;
   finally
     kpj.Free;
@@ -233,6 +226,7 @@ begin
     kps.Info.Desc[PackageInfo_Name] := Name;
     kps.Info.Desc[PackageInfo_Copyright] := Copyright;
     kps.Info.Desc[PackageInfo_Author] := Author;
+    kps.Info.Desc[PackageInfo_Description] := Description;
     kps.KPSOptions.FollowKeyboardVersion := True;
     kps.FileName := GetPackageFilename;
 

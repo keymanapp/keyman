@@ -1,5 +1,161 @@
 # Keyman Version History
 
+## 17.0.223 alpha 2023-12-04
+
+* chore(web): Add option to create test coverage report file (#10124)
+
+## 17.0.222 alpha 2023-12-02
+
+* fix(common): publish @keymanapp/developer-utils as npm module (#10118)
+
+## 17.0.221 alpha 2023-12-01
+
+* chore(windows): removed cached context windows engine (#10065)
+* change(android): flishy flashy mitigation, round 1 (#10017)
+* change(android): smoother keyboard initialization (#10022)
+* fix(android): no suggestions available when swapping pred-text target language (#10061)
+* chore(developer): require project file to exist (#10092)
+* chore(linux): Add support for loong64 architecture (#10109)
+* fix(web): Don't throw errors after detach (#10086)
+
+## 17.0.220 alpha 2023-11-30
+
+* fix(core): set_if_needed updates an empty cached context (#10098)
+* fix(core): check for null termination (#10101)
+
+## 17.0.219 alpha 2023-11-29
+
+* fix(developer): path separator for kmc-package (#10064)
+* fix(developer): projects 2.0 internal path enumeration (#10016)
+* fix(web): Fix attachment-api tests (#10085)
+* fix(web): Also move source map (#10089)
+
+## 17.0.218 alpha 2023-11-27
+
+* feat(developer): ldml: err/hint on illegal/pua chars (#10029)
+
+## 17.0.217 alpha 2023-11-24
+
+* feat(developer): warn on usage of virtual keys in rule output (#10062)
+* fix(core): memory management of options in action struct (#10073)
+* chore(linux): Update debian changelog (#10047)
+* chore(core): Add test keyboard for text selection tests (#10026)
+
+## 17.0.216 alpha 2023-11-23
+
+* fix(common): kmx struct alignment (#9977)
+* fix(developer): vis kbd callbacks instead of throw (#9979)
+* fix(core): dx: ldml: startContext should be optional in ldml test data (#10021)
+* chore(windows): remove `wm_keymandebug` messages and functions (#10055)
+* chore(windows): remove legacy LoadKeyboard (#10057)
+* chore(windows): remove unused globals relating to old keyboard debugging (#10058)
+* chore(core): remove vkey output from kmx processor (#10060)
+* fix(web): app/webview did not clear deadkeys on context-reset (#10039)
+
+## 17.0.215 alpha 2023-11-22
+
+* feat(core): ldml marker normalization (#9761)
+* feat(core): ldml backspace transform (#9960)
+* feat(core): ldml tertiary reordering (#9962)
+* fix(web): fixes OSK viewport scaling on iOS devices (#10035)
+
+## 17.0.214 alpha 2023-11-20
+
+* fix(ios): fv: replace Zip framework to prevent crash on startup (#10018)
+
+## 17.0.213 alpha 2023-11-17
+
+* fix(linux): Fix packaging GHA (#10020)
+* fix(android): Always display HTML banner when suggestions aren't available (#9696)
+
+## 17.0.212 alpha 2023-11-16
+
+* chore(web): splits banner.ts into separate files per banner type (#9987)
+* refactor(web): inactive banner management (#9988)
+
+## 17.0.211 alpha 2023-11-15
+
+* fix(windows): setup.inf generation had whitespace (#10000)
+* feat(developer): Support v2.0 projects in TIKE (#9949)
+* feat(developer): New Project - Description field and tweaks (#9950)
+* chore(developer): hide 'Remove From Project' for v2.0 projects (#9956)
+* feat(developer): Support loading XML LDML keyboards in TIKE (#9963)
+* feat(developer): show .xml LDML keyboards in project (#9964)
+* fix(developer): kmc build ldml keyboard should create output folder (#9966)
+* fix(developer): Project upgrade messages now show in Messages panel (#9969)
+* feat(developer): Project Settings Form for 17.0+ projects (#9984)
+* chore(developer): only build source files (#9985)
+* chore(developer): manage SourcePath in project upgrade (#9986)
+* feat(developer): handle errors loading projects (#9989)
+* chore(developer): show only source path files in project views (#9995)
+* chore(developer): handle project version checks cleanly in kmc (#9996)
+* fix(common): dx: don't call exit(0) on failure (#10005)
+* fix(linux): Improve triggering of packaging GHA (#10009)
+* chore(web,developer): Move keymanweb-osk.ttf to common/resources (#9993)
+
+## 17.0.210 alpha 2023-11-14
+
+* docs(common): Update CODEOWNERS for web (#9997)
+* chore(core): Add additional API checks (#9867)
+
+## 17.0.209 alpha 2023-11-13
+
+* docs(windows): update meson and emscripten details (#9933)
+* fix(web): Increase size of spacebar text (#9954)
+
+## 17.0.208 alpha 2023-11-08
+
+* fix(web): Fix clearing of deadkeys (#9944)
+* fix(web): Ignore `osk-always-visible` on non-desktop devices (#9951)
+* fix(linux): Fix baseline tests (#9967)
+* chore(linux): Fix GHA triggering (#9965)
+* fix(linux): Fix trigger for baseline tests (#9968)
+
+## 17.0.207 alpha 2023-11-07
+
+* refactor(web): Link to `index.html` in test pages (#9953)
+* feat(developer): Add more non-printing characters (#9846)
+
+## 17.0.206 alpha 2023-11-06
+
+* chore(developer): remove compile.pas and CompileErrorCodes.pas (#9924)
+* chore(common): remove prepublish step from package.json (#9937)
+* feat(developer): provide line number for some kmw compiler messages (#9938)
+* fix(developer): Sentry in Server should honour reporting settings (#9940)
+* fix(developer): resilience in loading Server config and cache files (#9941)
+
+## 17.0.205 alpha 2023-11-03
+
+* fix(developer): use KeymanWeb.Codes for 17.0+ (#9913)
+* fix(developer): don't use osk-always-visible on touch devices (#9917)
+* chore(linux): Improve repository_dispatch (#9865)
+* chore(linux): Refactor deb-packaging.sh script (#9866)
+* chore(linux): Add Core API version number (#9877)
+* fix(developer): kmc code generation for context(n) in context (#9932)
+* chore(developer): remove obsolete 'Allow Multiple Instances' and 'Use Legacy Compiler' options (#9934)
+* chore(developer): common/include dep for kmcmplib (#9935)
+* feat(common): ldml update to WIP cldr data (#9919)
+
+## 17.0.204 alpha 2023-11-02
+
+* fix(web): fixes doc-kbd display of default layer when it's not defined first (#9891)
+* fix(developer): compiler crash when no project loaded (#9898)
+* fix(developer): debug flag for compiling keyboards (#9901)
+* chore(developer): verify kmp.json output from kmc-package (#9844)
+* fix(developer): Project MRU now saves correctly (#9902)
+* chore(common): fixup SchemaValidators error handling (#9903)
+* chore(developer): change field label to 'Related Package ID' in Related Packages dialog (#9904)
+* fix(developer): open editor links in new window (#9905)
+* fix(developer): enable and update unit tests (#9907)
+* fix(developer): layout builder - maintain presentation during undo (#9914)
+* feat(developer): extract font family from .ttf in kmc-keyboard-info (#9859)
+* fix(developer): raise error if virtual key in context string (#9908)
+* feat(developer): Compile button in TIKE toolbar (#9910)
+* chore(developer): rename messages.ts for clarity (#9920)
+* fix(developer): warn if layer switch key is missing ID (#9921)
+* fix(developer): restore selection in layout builder even with duplicate ids (#9922)
+* fix(developer): enable line breaks in debugger (#9906)
+
 ## 17.0.203 alpha 2023-10-30
 
 * fix(linux): Fix uninstallation of shared keyboard (#9880)

@@ -26,6 +26,7 @@ Build-Depends:
  python3-requests,
  python3-requests-cache,
  python3-setuptools,
+ quilt,
  meson (>= 0.53),
  ninja-build,
  libevdev-dev,
@@ -108,7 +109,7 @@ Description: Keyman for Linux configuration
  information about Keyman keyboard packages.
 
 Package: libkeymancore-dev
-Architecture: amd64 arm64 armel armhf i386 mipsel mips64el ppc64el riscv64
+Architecture: amd64 arm64 armel armhf i386 loong64 mipsel mips64el ppc64el riscv64
 Section: libdevel
 Depends:
  libkeymancore (= ${binary:Version}),
@@ -134,7 +135,7 @@ Description: Development files for Keyman keyboard processing library
  This package contains development headers and libraries.
 
 Package: libkeymancore
-Architecture: amd64 arm64 armel armhf i386 mipsel mips64el ppc64el riscv64
+Architecture: amd64 arm64 armel armhf i386 loong64 mipsel mips64el ppc64el riscv64
 Section: libs
 Pre-Depends:
  ${misc:Pre-Depends},
@@ -162,7 +163,7 @@ Description: Keyman keyboard processing library
  and applies rules from compiled Keyman keyboard files.
 
 Package: ibus-keyman
-Architecture: amd64 arm64 armel armhf i386 mipsel mips64el ppc64el riscv64
+Architecture: amd64 arm64 armel armhf i386 loong64 mipsel mips64el ppc64el riscv64
 Depends:
  ibus (>= 1.3.7),
  libkeymancore (= ${binary:Version}),

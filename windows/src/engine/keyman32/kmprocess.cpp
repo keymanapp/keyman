@@ -70,23 +70,29 @@
 
 BOOL fOutputKeystroke;
 
-/*char *getcontext()
-{
-	WCHAR buf[128];
-	static char bufout[128];
-  PKEYMAN64THREADDATA _td = ThreadGlobals();
-  if(!_td) return "";
-	_td->app->GetWindowContext(buf, 128);
-	WideCharToMultiByte(CP_ACP, 0, buf, -1, bufout, 128, NULL, NULL);
-	return bufout;
-}*/
-
-
 char *getcontext_debug() {
-  //return "";
+
   PKEYMAN64THREADDATA _td = ThreadGlobals();
-  if(!_td) return "";
-	return Debug_UnicodeString(_td->app->ContextBufMax(128));
+  if (!_td || !_td->lpActiveKeyboard || !_td->lpActiveKeyboard->lpCoreKeyboardState){
+        return "";
+  }
+
+  WCHAR buf[(MAXCONTEXT * 3) + 1];  // *3 if every context item was a deadkey
+  km_core_context_item *citems = nullptr;
+
+  if (KM_CORE_STATUS_OK != km_core_context_get(
+    km_core_state_context(_td->lpActiveKeyboard->lpCoreKeyboardState), &citems)) {
+    return "";
+  }
+
+  DWORD context_length = (DWORD)km_core_context_item_list_size(citems);
+  if (!ContextItemToAppContext(citems, buf, context_length)) {
+    km_core_context_items_dispose(citems);
+    return "";
+  }
+  km_core_context_items_dispose(citems);
+  return Debug_UnicodeString(buf);
+
 }
 
 /**
@@ -98,14 +104,15 @@ char *getcontext_debug() {
 
 static BOOL
 Process_Event_Core(PKEYMAN64THREADDATA _td) {
-  PWSTR contextBuf = _td->app->ContextBufMax(MAXCONTEXT);
-  km_core_context_item *citems = nullptr;
-  ContextItemsFromAppContext(contextBuf, &citems);
-  if (KM_CORE_STATUS_OK != km_core_context_set(km_core_state_context(_td->lpActiveKeyboard->lpCoreKeyboardState), citems)) {
-    km_core_context_items_dispose(citems);
-    return FALSE;
+  WCHAR application_context[MAXCONTEXT];
+  if (_td->app->ReadContext(application_context)) {
+    km_core_context_status result;
+    result = km_core_state_context_set_if_needed(_td->lpActiveKeyboard->lpCoreKeyboardState, reinterpret_cast<const km_core_cp *>(application_context));
+    if (result == KM_CORE_CONTEXT_STATUS_ERROR || result == KM_CORE_CONTEXT_STATUS_INVALID_ARGUMENT) {
+      SendDebugMessageFormat(0, sdmGlobal, 0, "Process_Event_Core: km_core_state_context_set_if_needed returned [%d]", result);
+    }
   }
-  km_core_context_items_dispose(citems);
+
   SendDebugMessageFormat(
       0, sdmGlobal, 0, "ProcessEvent: vkey[%d] ShiftState[%d] isDown[%d]", _td->state.vkey,
       static_cast<uint16_t>(Globals::get_ShiftState() & (KM_CORE_MODIFIER_MASK_ALL | KM_CORE_MODIFIER_MASK_CAPS)), (uint8_t)_td->state.isDown);
@@ -138,17 +145,6 @@ BOOL ProcessHook()
   if(!_td) return FALSE;
 
   fOutputKeystroke = FALSE;  // TODO: 5442 no longer needs to be global once we use core processor
-  //
-  // If we are running in the debugger, don't do a second run through
-  //
-
-  if(_td->app->DebugControlled() && !_td->TIPFUpdateable) {   // I4287
-    if(_td->state.vkey == VK_ESCAPE || (_td->state.vkey >= VK_PRIOR && _td->state.vkey <= VK_DOWN) || (_td->state.vkey == VK_DELETE)) return FALSE;   // I4033   // I4826   // I4845
-    else return TRUE;
-  }
-
-	//app->NoSetShift = FALSE;
-  _td->app->ReadContext();
 
 	if(_td->state.msg.message == wm_keymankeydown) {   // I4827
     if (ShouldDebug(sdmKeyboard)) {
@@ -216,25 +212,11 @@ BOOL ProcessHook()
     }
   }
 
-  if (fOutputKeystroke && _td->app->DebugControlled()) {
-		// The debug memo does not receive default key events because
-		// we capture them all here. So we synthesize the key event for
-		// the debugger.
-    _td->app->QueueAction(QIT_VSHIFTDOWN, Globals::get_ShiftState());
-    _td->app->QueueAction(QIT_VKEYDOWN, _td->state.vkey);
-    _td->app->QueueAction(QIT_VKEYUP, _td->state.vkey);
-    _td->app->QueueAction(QIT_VSHIFTUP, Globals::get_ShiftState());
-    fOutputKeystroke = FALSE;
-  }
-
 	if(*Globals::hwndIM() == 0 || *Globals::hwndIMAlways())
 	{
 		_td->app->SetCurrentShiftState(Globals::get_ShiftState());
 		_td->app->SendActions();   // I4196
 	}
-  // output context for debugging
-  // PWSTR contextBuf = _td->app->ContextBufMax(MAXCONTEXT);
-  // SendDebugMessageFormat(0, sdmAIDefault, 0, "Kmprocess::ProcessHook After cxt=%s", Debug_UnicodeString(contextBuf, 1));
 
 	return !fOutputKeystroke;
 }

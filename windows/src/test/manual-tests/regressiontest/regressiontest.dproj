@@ -117,7 +117,6 @@
 			<DCCReference Include="..\..\..\..\common\windows\delphi\general\VersionInfo.pas"/>
 			<DCCReference Include="..\..\..\..\common\windows\delphi\general\klog.pas"/>
 			<DCCReference Include="..\..\global\delphi\general\keyman32_int.pas"/>
-			<DCCReference Include="..\..\..\..\developer\src\common\delphi\compiler\compile.pas"/>
 			<DCCReference Include="..\..\global\delphi\general\SystemDebugPath.pas"/>
 			<DCCReference Include="..\..\global\delphi\winapi\msctf.pas"/>
 			<DCCReference Include="DebugUtils.pas"/>

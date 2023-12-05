@@ -1,6 +1,7 @@
 import EventEmitter from 'eventemitter3';
 
-import BannerView, { BannerController } from '../banner/bannerView.js';
+import { BannerView } from '../banner/bannerView.js';
+import { BannerController } from '../banner/bannerController.js';
 import OSKViewComponent from '../components/oskViewComponent.interface.js';
 import EmptyView from '../components/emptyView.js';
 import HelpPageView from '../components/helpPageView.js';
@@ -689,6 +690,7 @@ export default abstract class OSKView extends EventEmitter<EventMap> implements 
   private loadActiveKeyboard() {
     this.setBoxStyling();
 
+    // Do not erase / 'shutdown' the banner-controller; we simply re-use its elements.
     if(this.vkbd) {
       this.vkbd.shutdown();
     }
@@ -964,8 +966,10 @@ export default abstract class OSKView extends EventEmitter<EventMap> implements 
    * Performs the _actual_ logic and functionality involved in hiding the OSK.
    */
   protected finalizeHide() {
-    if(document.body.className.indexOf('osk-always-visible') >= 0) {
-      return;
+    if (document.body.className.indexOf('osk-always-visible') >= 0) {
+      if (this.hostDevice.formFactor == 'desktop') {
+        return;
+      }
     }
 
     if(this._Box) {
@@ -1132,6 +1136,8 @@ export default abstract class OSKView extends EventEmitter<EventMap> implements 
 
     this.kbdStyleSheetManager.unlinkAll();
     this.uiStyleSheetManager.unlinkAll();
+
+    this.bannerController.shutdown();
   }
 
   /**

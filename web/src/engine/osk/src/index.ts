@@ -4,7 +4,7 @@ export { default as OSKView } from './views/oskView.js';
 export { default as FloatingOSKView, FloatingOSKViewConfiguration } from './views/floatingOskView.js';
 export { default as AnchoredOSKView } from './views/anchoredOskView.js';
 export { default as InlinedOSKView } from './views/inlinedOskView.js';
-export { BannerController } from './banner/bannerView.js';
+export { BannerController } from './banner/bannerController.js';
 // Is referenced by at least one desktop UI module.
 export { FloatingOSKCookie as FloatingOSKViewCookie } from './views/floatingOskCookie.js';
 export { default as VisualKeyboard } from './visualKeyboard.js';
@@ -19,6 +19,8 @@ export { type default as RealizedGesture } from './input/gestures/realizedGestur
 export { type OSKKeySpec } from './keyboard-layout/oskKey.js';
 export { type default as InputEventCoordinate } from './input/inputEventCoordinate.js';
 export { type default as EmbeddedGestureConfig } from './config/embeddedGestureConfig.js';
+
+export { getViewportScale } from './screenUtils.js';
 
 export { default as Activator, StaticActivator } from './views/activator.js';
 export { default as SimpleActivator } from './views/simpleActivator.js';

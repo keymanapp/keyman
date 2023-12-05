@@ -1338,7 +1338,7 @@ inherited frmKeymanWizard: TfrmKeymanWizard
             Top = 33
             Width = 137
             Height = 25
-            Action = modActionsKeyboardEditor.actDebugStartDebugger
+            Action = modActionsDebugger.actDebugStartDebugger
             TabOrder = 1
           end
           object cmdCompile: TButton

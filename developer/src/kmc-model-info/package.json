@@ -18,8 +18,7 @@
   "scripts": {
     "build": "tsc -b",
     "lint": "eslint .",
-    "test": "npm run lint",
-    "prepublishOnly": "npm run build"
+    "test": "npm run lint"
   },
   "author": "Marc Durdin <marc@keyman.com> (https://github.com/mcdurdin)",
   "contributors": [
@@ -35,9 +34,6 @@
     "@keymanapp/models-types": "*",
     "@keymanapp/developer-utils": "*"
   },
-  "bundleDependencies": [
-    "@keymanapp/developer-utils"
-  ],
   "devDependencies": {
     "@types/chai": "^4.1.7",
     "@types/mocha": "^5.2.7",

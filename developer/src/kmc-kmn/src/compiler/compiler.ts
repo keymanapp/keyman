@@ -298,6 +298,12 @@ export class KmnCompiler implements UnicodeSetParser {
 
       if(wasm_result.extra.targets & COMPILETARGETS_JS) {
         wasm_options.target = 1; // CKF_KEYMANWEB TODO use COMPILETARGETS_JS
+
+        // We always want debug data in the intermediate .kmx, so that error
+        // messages from KMW compiler can give line numbers in .kmn. This
+        // should have no impact on the final .js if options.debug is false
+        wasm_options.saveDebug = true;
+
         wasm_result = Module.kmcmp_compile(infile, wasm_options, wasm_interface);
         if(!wasm_result.result) {
           return null;

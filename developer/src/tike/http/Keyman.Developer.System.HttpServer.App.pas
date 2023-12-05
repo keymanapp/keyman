@@ -104,7 +104,7 @@ procedure TAppHttpResponder.RespondProject(doc: string; AContext: TIdContext;
 
     path := CrackUTF8ZeroExtendedString(ARequestInfo.CommandType, ARequestInfo.Params.Values['path']);
 
-    if (Path <> '') and (not FileExists(path) or not SameText(ExtractFileExt(path), Ext_ProjectSource)) then
+    if (Path <> '') and (not DirectoryExists(ExtractFileDir(path)) or not SameText(ExtractFileExt(path), Ext_ProjectSource)) then
     begin
       AResponseInfo.ResponseNo := 404;
       AResponseInfo.ResponseText := 'Project file '+path+' does not exist.';
@@ -191,7 +191,7 @@ procedure TAppHttpResponder.RespondProject(doc: string; AContext: TIdContext;
 
     // Saving state
 
-    if (Path <> '') and (not FileExists(path) or not SameText(ExtractFileExt(path), Ext_ProjectSource)) then
+    if (Path <> '') and (not DirectoryExists(ExtractFileDir(path)) or not SameText(ExtractFileExt(path), Ext_ProjectSource)) then
     begin
       AResponseInfo.ResponseNo := 404;
       AResponseInfo.ResponseText := 'Project file '+path+' does not exist.';

@@ -11,6 +11,11 @@ type
     function Compile(ProjectFile: TProjectFile; const infile, outfile: string; debug: Boolean): Boolean;
   end;
 
+const
+  // TODO: these are still used for messages raised from the IDE, perhaps need to be factored out
+  CERR_ERROR   = $00004000;
+  CERR_WARNING = $00002000;
+
 implementation
 
 uses
@@ -20,7 +25,6 @@ uses
   Keyman.Developer.System.Project.Project,
   Keyman.Developer.System.Project.ProjectLog,
   Keyman.Developer.System.KeymanDeveloperPaths,
-  compile,
   utilexecute;
 
 { TKmcWrapper }

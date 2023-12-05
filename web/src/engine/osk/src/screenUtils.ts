@@ -1,16 +1,17 @@
 import { landscapeView } from "keyman/engine/dom-utils";
+import { DeviceSpec } from "@keymanapp/web-utils";
 
 /**
  * Get viewport scale factor for this document
  *
  * @return      {number}
  */
-export function getViewportScale(): number {
+export function getViewportScale(formFactor: DeviceSpec.FormFactor): number {
   // This can sometimes fail with some browsers if called before document defined,
   // so catch the exception
   try {
     // For emulation of iOS on a desktop device, use a default value
-    if(this.device.formFactor == 'desktop') {
+    if(formFactor == 'desktop') {
       return 1;
     }
 

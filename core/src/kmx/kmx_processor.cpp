@@ -6,7 +6,7 @@
 using namespace km::core;
 using namespace kmx;
 
-// TODO consolodate with appint.cpp and put in public library.
+
 static KMX_BOOL ContextItemsFromAppContext(KMX_WCHAR *buf, km_core_context_item** outPtr)
 {
   assert(buf);
@@ -204,12 +204,6 @@ kmx_processor::internal_process_queued_actions(km_core_state *state) {
       break;
     case QIT_EMIT_KEYSTROKE:
       state->actions().push_emit_keystroke();
-      break;
-    case QIT_VKEYDOWN:
-    case QIT_VKEYUP:
-    case QIT_VSHIFTDOWN:
-    case QIT_VSHIFTUP:
-      // TODO: eliminate??
       break;
     case QIT_CHAR:
       state->context().push_character(a.dwData);
