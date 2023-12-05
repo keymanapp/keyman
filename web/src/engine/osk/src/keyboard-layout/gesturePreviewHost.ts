@@ -109,14 +109,6 @@ export class GesturePreviewHost extends EventEmitter<EventMap> {
       hintLabel.style.fontWeight= hintLabel.textContent == '\u2022' ? 'bold' : '';
     }
 
-    // Default positioning puts it far too close to the flick-preview bit.
-    let yAdjustment = 0;
-    hintLabel.style.marginTop = `-${yAdjustment}px`;
-
-    // b/c multitap's border forces position shifting
-    let xAdjustment = 0;
-    hintLabel.style.marginRight = `-${xAdjustment}px`;
-
     base.appendChild(hintLabel);
   }
 
@@ -168,11 +160,11 @@ export class GesturePreviewHost extends EventEmitter<EventMap> {
     this.previewImgContainer.style.marginTop = '0px';
     this.previewImgContainer.style.marginLeft = '0px';
 
-    this.previewImgContainer.classList.add('flick-clear');
+    this.previewImgContainer.classList.add('kmw-flick-clear');
   }
 
   public clearHint() {
-    this.hintLabel.classList.add('hint-clear');
+    this.hintLabel.classList.add('kmw-hint-clear');
   }
 
   public clearAll() {

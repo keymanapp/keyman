@@ -17,9 +17,9 @@ export class TabletKeyTip implements KeyTipInterface {
   private readonly vkbd: VisualKeyboard;
 
   /**
-   *
-   * @param constrain keep the keytip within the bounds of the overall OSK.
-   *                  Will probably be handled via function in a later pass.
+   * Pre-builds a reusable element to serve as a gesture-preview host for selected keys
+   * on tablet-form factor devices.  This element hovers over the keyboard, staying in
+   * place (and on top) even when the layer changes.
    */
   constructor(vkbd: VisualKeyboard) {
     this.vkbd = vkbd;
@@ -52,10 +52,12 @@ export class TabletKeyTip implements KeyTipInterface {
     // Create and display the preview
     // If !key.offsetParent, the OSK is probably hidden.  Either way, it's a half-
     // decent null-guard check.
-    if(on && key.offsetParent) {
+    if(on && key?.offsetParent) {
       // May need adjustment for borders if ever enabled for the desktop form-factor target.
-      // const _Box = this.vkbd.topContainer;
-      const hostRect = this.vkbd.element.getBoundingClientRect();
+
+      // Note:  this.vkbd does not set relative or absolute positioning.  Nearest positioned
+      // ancestor = the OSKView's _Box, accessible as this.vkbd.topContainer.
+      const hostRect = this.vkbd.topContainer.getBoundingClientRect();
       const keyRect = key.getBoundingClientRect();
 
       // Used to apply box-shadow overlay styling when the preview is for a key on a layer not
@@ -105,7 +107,7 @@ export class TabletKeyTip implements KeyTipInterface {
       }
     } else { // Hide the key preview
       this.element.style.display = 'none';
-      this.element.className = `${BASE_CLASS}`;
+      this.element.className = BASE_CLASS;
 
       this.previewHost = null;
       const oldPreview = this.preview;
