@@ -761,7 +761,8 @@
               },
               {
                 "id": "K_0",
-                "text": "0"
+                "text": "0",
+                "layer": "default"
               },
               {
                 "id": "K_SPACE",
