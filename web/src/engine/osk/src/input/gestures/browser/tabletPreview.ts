@@ -54,7 +54,10 @@ export class TabletKeyTip implements KeyTipInterface {
     // decent null-guard check.
     if(on && key?.offsetParent) {
       // May need adjustment for borders if ever enabled for the desktop form-factor target.
-      const hostRect = this.vkbd.element.getBoundingClientRect();
+
+      // Note:  this.vkbd does not set relative or absolute positioning.  Nearest positioned
+      // ancestor = the OSKView's _Box, accessible as this.vkbd.topContainer.
+      const hostRect = this.vkbd.topContainer.getBoundingClientRect();
       const keyRect = key.getBoundingClientRect();
 
       // Used to apply box-shadow overlay styling when the preview is for a key on a layer not
