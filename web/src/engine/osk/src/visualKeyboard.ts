@@ -371,7 +371,9 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
       mouseEventRoot: document.body,
       // Note: at this point in execution, the value will evaluate to NaN!  Height hasn't been set yet.
       // BUT:  we need to establish the instance now; we can update it later when height _is_ set.
-      maxRoamingBounds: new PaddedZoneSource(this.element, [NaN]),
+      //
+      // Allow keys to be preserved while the contact point is within banner space + a small fudge-factor.
+      maxRoamingBounds: new PaddedZoneSource(this.topContainer, [NaN]),
       // touchEventRoot:  this.element, // is the default
       itemIdentifier: (sample, target) => {
         /* ALWAYS use the findNearestKey function.
@@ -450,17 +452,14 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
         const key = sample.item;
         const oldKey = sourceTrackingMap[source.identifier].key;
 
-        if(key != oldKey) {
+        if(!this.kbdLayout.hasFlicks && key != oldKey) {
           this.highlightKey(oldKey, false);
           this.gesturePreviewHost?.cancel();
           this.gesturePreviewHost = null;
 
-          if(!this.kbdLayout.hasFlicks) {
-            const previewHost = this.highlightKey(key, true);
-            if(previewHost) {
-              this.gesturePreviewHost = previewHost;
-            }
-
+          const previewHost = this.highlightKey(key, true);
+          if(previewHost) {
+            this.gesturePreviewHost = previewHost;
             trackingEntry.previewHost = previewHost;
             sourceTrackingMap[source.identifier].key = key;
           }
