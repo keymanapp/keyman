@@ -284,11 +284,7 @@ export class ActiveKey implements LayoutKey {
       if(!keyboard.definesPositionalOrMnemonic) {
         // Not the best pattern, but currently safe - we don't look up any properties of any of the
         // arguments in this use case, and the object's scope is extremely limited.
-        Lkc.Lcode = KeyMapping._USKeyCodeToCharCode(keyboard.constructKeyEvent(null, null, {
-          K_CAPS: false,
-          K_NUMLOCK: false,
-          K_SCROLL: false
-        }));
+        Lkc.Lcode = KeyMapping._USKeyCodeToCharCode(keyboard.constructNullKeyEvent(null, null));
         Lkc.LisVirtualKey=false;
       }
     }
