@@ -85,7 +85,9 @@ uses
   KeymanPaths in '..\..\..\common\windows\delphi\general\KeymanPaths.pas',
   Keyman.System.Standards.LangTagsRegistry in '..\..\..\common\windows\delphi\standards\Keyman.System.Standards.LangTagsRegistry.pas',
   Keyman.Developer.System.Project.UrlRenderer in '..\TIKE\project\Keyman.Developer.System.Project.UrlRenderer.pas',
-  Keyman.System.LexicalModelUtils in '..\common\delphi\lexicalmodels\Keyman.System.LexicalModelUtils.pas';
+  Keyman.System.LexicalModelUtils in '..\common\delphi\lexicalmodels\Keyman.System.LexicalModelUtils.pas',
+  KeymanDeveloperOptions in '..\tike\main\KeymanDeveloperOptions.pas',
+  Keyman.Developer.System.KeymanDeveloperPaths in '..\tike\main\Keyman.Developer.System.KeymanDeveloperPaths.pas';
 
 {$R icons.RES}
 {$R version.res}
