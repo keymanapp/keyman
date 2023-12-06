@@ -69,6 +69,7 @@ type
     FServerNgrokToken: string;
     FServerNgrokRegion: string;
     FServerKeepAlive: Boolean;
+    FPromptToUpgradeProjects: Boolean;
     procedure CloseRegistry;
     procedure OpenRegistry;
     function regReadString(const nm, def: string): string;
@@ -102,6 +103,7 @@ type
     property DebuggerAutoResetBeforeCompiling: Boolean read FDebuggerAutoResetBeforeCompiling write FDebuggerAutoResetBeforeCompiling;
     property AutoSaveBeforeCompiling: Boolean read FAutoSaveBeforeCompiling write FAutoSaveBeforeCompiling;
     property OSKAutoSaveBeforeImporting: Boolean read FOSKAutoSaveBeforeImporting write FOSKAutoSaveBeforeImporting;
+    property PromptToUpgradeProjects: Boolean read FPromptToUpgradeProjects write FPromptToUpgradeProjects;
 
     property ReportErrors: Boolean read FReportErrors write FReportErrors;
     property ReportUsage: Boolean read FReportUsage write FReportUsage;
@@ -211,6 +213,7 @@ begin
     FDebuggerAutoResetBeforeCompiling := regReadBool(SRegValue_IDEOptDebuggerAutoResetBeforeCompiling, False);
     FAutoSaveBeforeCompiling := regReadBool(SRegValue_IDEOptAutoSaveBeforeCompiling, False);
     FOSKAutoSaveBeforeImporting := regReadBool(SRegValue_IDEOptOSKAutoSaveBeforeImporting, False);
+    FPromptToUpgradeProjects := regReadBool(SRegValue_IDEOptPromptToUpgradeProjects, True);
 
     FServerDefaultPort := regReadInt(SRegValue_IDEOptServerPort, 8008);
     FServerKeepAlive := regReadBool(SRegValue_IDEOptServerKeepAlive, False);
@@ -270,6 +273,7 @@ begin
     regWriteBool(SRegValue_IDEOptDebuggerAutoResetBeforeCompiling, FDebuggerAutoResetBeforeCompiling);
     regWriteBool(SRegValue_IDEOptAutoSaveBeforeCompiling, FAutoSaveBeforeCompiling);
     regWriteBool(SRegValue_IDEOptOSKAutoSaveBeforeImporting, FOSKAutoSaveBeforeImporting);
+    regWriteBool(SRegValue_IDEOptPromptToUpgradeProjects, FPromptToUpgradeProjects);
 
     regWriteInt(SRegValue_IDEOptServerPort, FServerDefaultPort);
     regWriteBool(SRegValue_IDEOptServerKeepAlive, FServerKeepAlive);
