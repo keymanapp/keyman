@@ -28,6 +28,7 @@ KMX_DWORD convertNamesToIntegerValue(std::wstring tok_wstr){
   first[L"bracketright"]      =  93;
   first[L"colon"]             =  58;
   first[L"comma"]             =  44;
+  first[L"diaeresis"]         = 168;
   first[L"dollar"]            =  36;
   first[L"equal"]             =  61;
   first[L"exclam"]            =  33;
@@ -346,6 +347,9 @@ KMX_DWORD getKeyvalsFromKeyCode(GdkKeymap *keymap, guint keycode, int shift_stat
   //  return 0;    https://codebrowser.dev/gtk/gtk/gdk/wayland/gdkkeys-wayland.c.html
 
   if (!(shift_state_pos <= count))
+    return 0;
+
+  if (!(keycode <= 64))
     return 0;
 
   out =(KMX_DWORD)  keyvals[shift_state_pos];

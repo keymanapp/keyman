@@ -253,8 +253,8 @@ public:
   }
 
 UINT KMX_GetShiftStateValue(int capslock, int caps, ShiftState ss) {
-     wprintf(L"GetShiftStateValue takes capslock: %i, caps: %i, ss: %i and returns: %i\n", capslock, caps, ss, KMX_ShiftStateMap[(int)ss] |
-      (capslock ? (caps ? CAPITALFLAG : NOTCAPITALFLAG) : 0));
+     //wprintf(L"GetShiftStateValue takes capslock: %i, caps: %i, ss: %i and returns: %i\n", capslock, caps, ss, KMX_ShiftStateMap[(int)ss] |
+      //(capslock ? (caps ? CAPITALFLAG : NOTCAPITALFLAG) : 0));
     return 
       KMX_ShiftStateMap[(int)ss] |
       (capslock ? (caps ? CAPITALFLAG : NOTCAPITALFLAG) : 0);
@@ -321,8 +321,6 @@ int i4 = this->KMX_IsXxxxGrCapsEqualToXxxxShift() ? 8 : 0;
         (this->KMX_IsXxxxGrCapsEqualToXxxxShift() ? 8 : 0);
 
 
-
-
     for (int ss = 0; ss <= MaxShiftState; ss++) {
       if (ss == Menu || ss == ShftMenu) {
         // Alt and Shift+Alt don't work, so skip them
@@ -370,7 +368,7 @@ int i4 = this->KMX_IsXxxxGrCapsEqualToXxxxShift() ? 8 : 0;
         std::wstring w1_S2 = get_m_rgss(ss,caps);
         //wprintf(L"\n KMX_VKUnderlyingLayoutToVKUS_GD writes  %ls  %c",w1_S2.c_str(), key->Key );
 
-            wprintf(L" this->VK(): %i ", this->VK());
+            //wprintf(L" this->VK(): %i ", this->VK());
             key->Line = 0;
             // _S2 _differences in sstateflag probably from here and KMX_IsCapsEqualToShift...
             key->ShiftFlags = this->KMX_GetShiftStateValue(capslock, caps, (ShiftState) ss);
@@ -869,7 +867,7 @@ bool KMX_ImportRules(KMX_WCHAR *kbid, LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, Gd
   for (UINT iKey = 0; iKey < rgKey.size(); iKey++) {
     if ((rgKey[iKey] != NULL) && rgKey[iKey]->KMX_IsKeymanUsedKey() && (!rgKey[iKey]->KMX_IsEmpty())) {
       nKeys+= rgKey[iKey]->KMX_GetKeyCount(loader.MaxShiftState());
-      wprintf(L" iKey = %i, Delta:  %i -> Sum %i\n", iKey, rgKey[iKey]->KMX_GetKeyCount(loader.MaxShiftState()),  nKeys);
+      //wprintf(L" iKey = %i, Delta:  %i -> Sum %i\n", iKey, rgKey[iKey]->KMX_GetKeyCount(loader.MaxShiftState()),  nKeys);
       sab_nr ++;
    }
   }

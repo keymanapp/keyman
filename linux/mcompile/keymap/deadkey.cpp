@@ -34,18 +34,27 @@ void find_all_dk_combinations(v_dw_2D * p_dk_ComposeTable, v_dw_2D  &dk_Combinat
 	}
 }
 
-// _S2 quick&dirty needs to be changed !!
-KMX_DWORD getKeyname(KMX_DWORD in, KMX_DWORD &shift) {
-	if ( (in >=65) && (in <= 90)) {
-		shift=1;
-		return in;
-	}
-	else { 	
-		shift=0;
-		return (in-32);	
+KMX_DWORD KMX_getKeyname(KMX_DWORD KVal, KMX_DWORD &shift, GdkKeymap* keymap) {
+
+  guint Keyval = (guint) KVal;
+  GdkKeymapKey* keys;
+  gint n_keys;
+
+	// _S2 QUESTION can I assume that the win keyname is always the uppercase(level1) value??
+	KMX_DWORD Name = (KMX_DWORD) gdk_keyval_to_upper (KVal);
+	if( Keyval !=0) {
+		gdk_keymap_get_entries_for_keyval(keymap, Keyval, &keys, &n_keys);
+		for (int i = 0; i < n_keys; i++) {
+			if (keys[i].group == 0) {
+				shift = keys[i].level;
+				return Name;
+			}
 		}
+	}
+	return Name;
 }	
 
+// _S2 QUESTION is this the right place to get dk from? if not wher are they stored?
 KMX_DWORD create_DKTable(v_dw_2D & dk_ComposeTable){
 
   // values taken from: https://help.ubuntu.com/community/GtkDeadKeyTable#Latin

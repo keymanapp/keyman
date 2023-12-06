@@ -55,7 +55,7 @@ void KMX_TranslateDeadkeyKeyboard(LPKMX_KEYBOARD kbd, KMX_WCHAR deadkey, KMX_WOR
 void KMX_TranslateDeadkeyGroup(LPKMX_GROUP group,KMX_WCHAR deadkey, KMX_WORD vk, UINT shift, KMX_WORD ch);
 void KMX_TranslateDeadkeyKey(LPKMX_KEY key, KMX_WCHAR deadkey, KMX_WORD vk, UINT shift, KMX_WORD ch);
 
-int KMX_GetDeadkeys(v_dw_2D & dk_ComposeTable, KMX_WORD DeadKey, KMX_WORD *OutputPairs);
+int KMX_GetDeadkeys(v_dw_2D & dk_ComposeTable, KMX_WORD DeadKey, KMX_WORD *OutputPairs, GdkKeymap* keymap);
 int KMX_GetDeadkeys(v_dw_2D & dk_Table, KMX_WORD DeadKey, KMX_WORD *OutputPairs, KMX_WORD sc);
 void KMX_AddDeadkeyRule(LPKMX_KEYBOARD kbd, KMX_WCHAR deadkey, KMX_WORD vk, UINT shift);
 
@@ -229,10 +229,10 @@ void KMX_TranslateKeyboard(LPKMX_KEYBOARD kbd, KMX_WORD vk, KMX_UINT shift, KMX_
 void KMX_ReportUnconvertedKeyRule(LPKMX_KEY key) {
   if(key->ShiftFlags == 0) {
     //KMX_LogError(L"Did not find a match for mnemonic rule on line %d, + '%c' > ...", key->Line, key->Key);
-    wprintf(L" _S2 Did not find a match for mnemonic rule on line %d, + '%c' > ...\n", key->Line, key->Key);
+    //wprintf(L" _S2 Did not find a match for mnemonic rule on line %d, + '%c' > ...\n", key->Line, key->Key);
   } else if(key->ShiftFlags & VIRTUALCHARKEY) {
     //KMX_LogError(L"Did not find a match for mnemonic virtual character key rule on line %d, + [%x '%c'] > ...", key->Line, key->ShiftFlags, key->Key);
-    wprintf(L"_S2 Did not find a match for mnemonic virtual character key rule on line %d, + [%x '%c'] > ...\n", key->Line, key->ShiftFlags, key->Key);
+    //wprintf(L"_S2 Did not find a match for mnemonic virtual character key rule on line %d, + [%x '%c'] > ...\n", key->Line, key->ShiftFlags, key->Key);
   }
 }
 
@@ -400,7 +400,7 @@ KMX_WCHAR KMX_GetUniqueDeadkeyID(LPKMX_KEYBOARD kbd, KMX_WCHAR deadkey) {
   return s_dkids[s_ndkids++].dst_deadkey = s_next_dkid = ++dkid;
 }
 
-void KMX_ConvertDeadkey(LPKMX_KEYBOARD kbd, KMX_WORD vk, UINT shift, KMX_WCHAR deadkey, v_dw_3D &All_Vector) {
+void KMX_ConvertDeadkey(LPKMX_KEYBOARD kbd, KMX_WORD vk, UINT shift, KMX_WCHAR deadkey, v_dw_3D &All_Vector, GdkKeymap* keymap) {
   KMX_WORD deadkeys[512], *pdk;
 
   // create dk_createDK_ComposeTable
@@ -416,7 +416,7 @@ void KMX_ConvertDeadkey(LPKMX_KEYBOARD kbd, KMX_WORD vk, UINT shift, KMX_WCHAR d
   KMX_FDeadkeys.push_back(KMX_deadkeyMapping); //dkid, vk, shift);   // I4353
 
   KMX_AddDeadkeyRule(kbd, dkid, vk, shift);
-  KMX_GetDeadkeys(dk_Table, deadkey, pdk = deadkeys);  // returns array of [usvk, ch_out] pairs
+  KMX_GetDeadkeys(dk_Table, deadkey, pdk = deadkeys, keymap);  // returns array of [usvk, ch_out] pairs
 
   while(*pdk) {
     // Look up the ch
@@ -486,7 +486,7 @@ KMX_BOOL KMX_DoConvert(LPKMX_KEYBOARD kbd, PKMX_WCHAR kbid, KMX_BOOL bDeadkeyCon
       KMX_WCHAR ch = KMX_CharFromVK(All_Vector,vkUnderlying, VKShiftState[j], &DeadKey);*/
 
       UINT scUnderlying =  KMX_VKUSToSCUnderlyingLayout(KMX_VKMap[i]);
-      KMX_WCHAR ch = KMX_CharFromSC(keymap, VKShiftState[j], scUnderlying, &DeadKey);
+      KMX_WCHAR ch = KMX_CharFromSC(keymap, VKShiftState[j], scUnderlying, &DeadKey); // _S2 ch is of Other KB
 
       //wprintf(L"  DoConvert-read i:  %i \t(KMX_VKMap): %i (%c)  \t--->  vkUnderlying: %i (%c)    \tshiftstate[%i]: ( %i )   \t---- >  ch: %i (%c)  \t%ls  \t%ls\n" , i,(int) KMX_VKMap[i],(int)KMX_VKMap[i],  vkUnderlying,vkUnderlying, j, VKShiftState[j] ,  ch ,ch ,  ((int) vkUnderlying != (int) KMX_VKMap[i] ) ? L" *** ": L"", ERROR);
       //LogError("--- VK_%d -> VK_%d [%c] dk=%d", VKMap[i], vkUnderlying, ch == 0 ? 32 : ch, DeadKey);
@@ -500,7 +500,7 @@ KMX_BOOL KMX_DoConvert(LPKMX_KEYBOARD kbd, PKMX_WCHAR kbid, KMX_BOOL bDeadkeyCon
       //wprintf(L"     switch with  ch: %i (%c)......\n" ,  ch,ch);
       switch(ch) {
         case 0x0000: break;
-        case 0xFFFF: KMX_ConvertDeadkey(kbd, KMX_VKMap[i], VKShiftState[j], DeadKey, All_Vector); break;
+        case 0xFFFF: KMX_ConvertDeadkey(kbd, KMX_VKMap[i], VKShiftState[j], DeadKey, All_Vector, keymap); break;
         default:     KMX_TranslateKeyboard(kbd, KMX_VKMap[i], VKShiftState[j], ch);
       }
     }
@@ -650,7 +650,6 @@ bool InitializeGDK(GdkKeymap **keymap,int argc, gchar *argv[]){
 }
 
 int createOneVectorFromBothKeyboards(v_dw_3D &All_Vector,GdkKeymap *keymap){
-
   std::string US_language    = "us";
   const char* text_us        = "xkb_symbols \"basic\"";
   //const char* text_us        = "xkb_symbols \"intl\"";
@@ -668,9 +667,8 @@ int createOneVectorFromBothKeyboards(v_dw_3D &All_Vector,GdkKeymap *keymap){
   return 0;
 }
 
+int KMX_GetDeadkeys(v_dw_2D & dk_Table, KMX_WORD DeadKey, KMX_WORD *OutputPairs, GdkKeymap* keymap) {
 
-
-int KMX_GetDeadkeys(v_dw_2D & dk_Table, KMX_WORD DeadKey, KMX_WORD *OutputPairs, KMX_WORD sc) {
   KMX_WORD *p = OutputPairs, shift;
   KMX_DWORD shift_S2;
 
@@ -678,32 +676,7 @@ int KMX_GetDeadkeys(v_dw_2D & dk_Table, KMX_WORD DeadKey, KMX_WORD *OutputPairs,
   find_all_dk_combinations(&dk_Table, dk_CombinationTable, DeadKey);
 
   for ( int i=0; i< dk_CombinationTable.size()-1;i++) {
-    KMX_WORD vk = getKeyname(dk_CombinationTable[i][1], shift_S2);
-    if(vk != 0) {
-          *p++ = vk;
-          *p++ = shift_S2;
-          *p++ = dk_CombinationTable[i][2];
-          int sdfghj0ç = 88;
-        }
-        //else {
-        //  LogError(L"Warning: complex deadkey not supported.");
-      // }
-  }
-  *p = 0;
-  return (p-OutputPairs);
-}
-
-
-
-int KMX_GetDeadkeys(v_dw_2D & dk_Table, KMX_WORD DeadKey, KMX_WORD *OutputPairs) {
-  KMX_WORD *p = OutputPairs, shift;
-  KMX_DWORD shift_S2;
-
-  v_dw_2D  dk_CombinationTable;
-  find_all_dk_combinations(&dk_Table, dk_CombinationTable, DeadKey);
-
-  for ( int i=0; i< dk_CombinationTable.size()-1;i++) {
-    KMX_WORD vk = getKeyname(dk_CombinationTable[i][1], shift_S2);
+    KMX_WORD vk = KMX_getKeyname(dk_CombinationTable[i][1], shift_S2, keymap);
     if(vk != 0) {
           *p++ = vk;
           *p++ = shift_S2;

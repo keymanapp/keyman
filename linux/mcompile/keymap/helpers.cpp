@@ -776,7 +776,7 @@ for ( int iii=1; iii< 66;iii++)
 }
 
 wprintf(L"----------------------------\n");
-  /*GdkKeymapKey **keys1;
+  GdkKeymapKey **keys1;
   guint kval = 42;
   gint *n_keys;
   gboolean gboo = gdk_keymap_get_entries_for_keyval ( keymap, kval,  keys1, n_keys);
@@ -787,7 +787,7 @@ wprintf(L"----------------------------\n");
           wprintf(L"   character 43 can be obtained by pressing %i keys:, keys1[%i]\n",
               *n_keys, *keys1[i]);
               int iii=99;
-        }*/
+        }
 
 wprintf(L"----------------------------\n");
 // converts the Ascii-nr to the name specified in symbols-file( 35 -> numbersign( KEY_numbersign);  65 -> A( KEY_A)
@@ -1699,7 +1699,7 @@ void Inspect_Key_S(GdkKeymap *keymap ) {
 gchar * gc= gdk_keyval_name (729);
 gchar * gc0= gdk_keyval_name (94);
 //---------------------------------------
-std::string sr = "dead_acute";
+std::string sr = "dead_macron";
 gchar * chr=  (gchar*) sr.c_str(); ;
 guint gi= gdk_keyval_from_name (chr);
 //---------------------------------------
@@ -1819,6 +1819,7 @@ std::wstring rV1= std::wstring(1, (int) *keyvals);
 int stop=99;
 
 }
+
 
 
 // _S2 TODO
