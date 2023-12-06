@@ -250,7 +250,14 @@ function Keyboard_gesture_prototyping()
                   {
                     "text": "*ShiftLock*",
                     "id": "T_new_991",
+                    "sp": "1",
                     "nextlayer": "caps"
+                  },
+                  {
+                    "text": "*Shift*",
+                    "id": "T_new_107",
+                    "sp": "1",
+                    "nextlayer": "default"
                   }
                 ]
               },

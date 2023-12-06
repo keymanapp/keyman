@@ -332,7 +332,7 @@ export class ActiveKeyBase {
        *
        */
       if(!key.sk && !key.multitap && !!layout.layer.find((entry) => entry.id == 'caps')) {
-        key.multitap = [Layouts.dfltShiftMultitap];
+        key.multitap = [Layouts.dfltShiftMultitap, Layouts.dfltShiftRotaDefault];
       }
     }
 

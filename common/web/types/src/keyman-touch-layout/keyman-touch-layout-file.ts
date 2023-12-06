@@ -49,10 +49,11 @@ export type TouchLayoutKeyId = `${Key_Type}_${Key_Id}`; // pattern = /^[TKUtku]_
  */
 export const PRIVATE_USE_IDS = [
   /**
-   * A private-use identifier used by KeymanWeb for the default multitap-into-caps-layer key
+   * Private-use identifiers used by KeymanWeb for the default multitap-into-caps-layer key
    * for keyboards with a caps layer while not defining multitaps on shift.
    */
-  'T_*_MT_SHIFT_TO_CAPS'
+  'T_*_MT_SHIFT_TO_CAPS',
+  'T_*_MT_SHIFT_ROTA_TO_DEFAULT'
 ] as const;
 
 /* A map of key field names with values matching the `typeof` the corresponding property
