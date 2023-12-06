@@ -134,6 +134,7 @@ describe('kpj-file-reader', function () {
       callbacks.printMessages();
     }
     assert.equal(callbacks.messages.length, 0);
+    assert.lengthOf(kpj.KeymanDeveloperProject.Files.File, 0);
     const project = reader.transform(path, kpj);
     assert.equal(callbacks.messages.length, 0);
     assert.isNotNull(project);
@@ -146,6 +147,7 @@ describe('kpj-file-reader', function () {
     const kpj = reader.read(input);
     reader.validate(kpj);
     assert.equal(callbacks.messages.length, 0);
+    assert.lengthOf(kpj.KeymanDeveloperProject.Files.File, 0);
     const project = reader.transform(path, kpj);
     assert.equal(callbacks.messages.length, 0);
     assert.isNotNull(project);
