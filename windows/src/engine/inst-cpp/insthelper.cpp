@@ -17,6 +17,8 @@
 #include <comdef.h>
 #include <msctf.h>
 #include <atlbase.h>
+#include<sstream>
+#include<iomanip>
 
 const LPCTSTR SFolderKeymanRoot = TEXT("\\Keyman");
 
@@ -96,12 +98,71 @@ DEFINE_GUID(CLASS_TF_InputProcessorProfiles, 0x33C53A50, 0xF456, 0x4884, 0xB0, 0
 
 DEFINE_GUID(IID_ITfInputProcessorProfiles, 0x1F02B6C5, 0x7842, 0x4EE6, 0x8A, 0x0B, 0x9A, 0x24, 0x18, 0x3A, 0x95, 0xCA);
 
+const DWORD ILOT_UNINSTALL = 1;
+
+std::wstring
+GuidToWString(const GUID& guid) {
+  wchar_t guidCStr[40] = {0};
+  int length           = StringFromGUID2(guid, guidCStr, 40);
+
+  if (length > 0) {
+    // Successfully converted GUID to wstring
+    return std::wstring(guidCStr);
+  } else {
+    // Handle the error, for example, return an empty wstring
+    return std::wstring();
+  }
+}
+
+std::wstring
+GetLayoutInstallString(int LangID, const GUID& guidProfile) {
+  std::wostringstream result;
+
+  result << std::hex << std::setw(4) << std::setfill(L'0') << LangID << L":" << GuidToWString(c_clsidKMTipTextService)
+         << GuidToWString(guidProfile);
+
+  return result.str();
+}
+
+bool
+InstallLayoutOrTip(const wchar_t* FLayoutInstallString, DWORD Flags) {
+  HMODULE hInputDll;
+  BOOL result = FALSE;
+
+  // Function pointer type for InstallLayoutOrTip
+  typedef BOOL(WINAPI * TInstallLayoutOrTipFunc)(const wchar_t*, DWORD);
+
+  // Load the DLL
+  hInputDll = LoadLibrary(L"input.dll");
+  if (!hInputDll) {
+    return false;
+  }
+
+  // Get the function pointer
+  TInstallLayoutOrTipFunc PInstallLayoutOrTip;
+  PInstallLayoutOrTip = (TInstallLayoutOrTipFunc)GetProcAddress(hInputDll, "InstallLayoutOrTip");
+  if (!PInstallLayoutOrTip) {
+    FreeLibrary(hInputDll);
+    return false;
+  }
+
+  // Call the function
+  result = PInstallLayoutOrTip(FLayoutInstallString, Flags);
+
+  // Free the DLL
+  FreeLibrary(hInputDll);
+
+  return result ? true : false;
+}
 // Unregister the TIP
 void UnregisterTIPAndItsProfiles(const CLSID& AClsid) {
   HRESULT hr;
   CComPtr<ITfInputProcessorProfiles> pInputProcessorProfiles;
   CComPtr<ITfInputProcessorProfileMgr> pInputProcessorProfileMgr;
   CComPtr<IEnumTfInputProcessorProfiles> ippEnum;
+  ULONG pcFetch;
+  TF_INPUTPROCESSORPROFILE profile;
+  std::wstring FLayoutInstallString;
 
   // Create an instance of ITF Input Processor Profiles
   hr = CoCreateInstance(
@@ -119,6 +180,15 @@ void UnregisterTIPAndItsProfiles(const CLSID& AClsid) {
   hr = pInputProcessorProfileMgr->EnumProfiles(0, &ippEnum);
   if (FAILED(hr))
     throw _com_error(hr);
+
+  // Unregister the input profiles installed through Keyman
+  while (ippEnum->Next(1, &profile, &pcFetch) == S_OK) {
+    if (profile.dwProfileType == TF_PROFILETYPE_INPUTPROCESSOR && IsEqualGUID(profile.clsid, AClsid)) {
+      FLayoutInstallString = GetLayoutInstallString(profile.langid, profile.guidProfile);
+      InstallLayoutOrTip(FLayoutInstallString.c_str(), ILOT_UNINSTALL);
+      pInputProcessorProfileMgr->UnregisterProfile(AClsid, profile.langid, profile.guidProfile, 0);
+    }
+  }
 }
 
 extern "C" __declspec(dllexport) unsigned int PreUninstall() {
