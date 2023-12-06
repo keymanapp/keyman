@@ -4,6 +4,7 @@ interface
 
 uses
   System.Generics.Collections,
+  System.Generics.Defaults,
   Keyman.Developer.System.MultiProcess;
 
 type
@@ -12,9 +13,15 @@ type
     ThreadID: Cardinal;
     ProjectFilename: string;
     SourcePath: string;
+    IsProjectOpen: Boolean;
+    IsTemporaryProject: Boolean;
     function OwnsProject(const filename: string): Boolean;
     function OpenFile(const filename: string): Boolean;
     function FocusProcess: Boolean;
+  private
+    function GetTitle: string;
+  public
+    property Title: string read GetTitle;
   end;
 
   TTikeProcessList = TObjectList<TTikeProcess>;
@@ -67,17 +74,34 @@ begin
   inherited Destroy;
 end;
 
+type
+  TSortByProjectFilename = class(TComparer<TTikeProcess>)
+    function Compare(const Left, Right: TTikeProcess): Integer; override;
+  end;
+
 function TTikeMultiProcess.Enumerate: TTikeProcessList;
 var
   tp: TTikeProcess;
   p: TMultiProcessInstance;
   j: TJSONValue;
   jo: TJSONObject;
+  SortByProjectFilename: TSortByProjectFilename;
 begin
   Result := TObjectList<TTikeProcess>.Create;
   MultiProcessCoordinator.Enumerate;
   for p in MultiProcessCoordinator.Processes do
   begin
+    if p.Identifier = '*' then
+    begin
+      tp := TTikeProcess.Create;
+      tp.IsProjectOpen := False;
+      tp.IsTemporaryProject := False;
+      tp.ProjectFilename := '';
+      tp.SourcePath := '';
+      tp.WindowHandle := p.Handle;
+      tp.ThreadID := p.ThreadId;
+      Result.Add(tp);
+    end;
     j := TJSONObject.ParseJSONValue(p.Identifier);
     try
       if (j = nil) or not (j is TJSONObject) then
@@ -93,7 +117,9 @@ begin
       end;
 
       tp := TTikeProcess.Create;
+      tp.IsProjectOpen := True;
       tp.ProjectFilename := jo.Values[JSON_Filename].Value;
+      tp.IsTemporaryProject := tp.ProjectFilename = '';
       tp.SourcePath := jo.Values[JSON_SourcePath].Value;
       tp.WindowHandle := p.Handle;
       tp.ThreadID := p.ThreadId;
@@ -101,6 +127,13 @@ begin
     finally
       j.Free;
     end;
+  end;
+
+  SortByProjectFilename := TSortByProjectFilename.Create;
+  try
+    Result.Sort(SortByProjectFilename);
+  finally
+    SortByProjectFilename.Free;
   end;
 end;
 
@@ -131,6 +164,16 @@ begin
   AttachThreadInput(GetCurrentThreadId, ThreadID, False);
 end;
 
+function TTikeProcess.GetTitle: string;
+begin
+  if not IsProjectOpen then
+    Result := '(No project loaded)'
+  else if IsTemporaryProject then
+    Result := 'Temporary Project'
+  else
+    Result := ProjectFilename;
+end;
+
 function TTikeProcess.OpenFile(const filename: string): Boolean;
 begin
   if not TCopyDataHelper.SendData(0, WindowHandle, TCopyDataCommand.CD_OPENFILE, filename) then
@@ -157,6 +200,14 @@ begin
     FInstance := TTikeMultiProcess.Create;
   end;
   Result := FInstance;
+end;
+
+{ TSortByProjectFilename }
+
+function TSortByProjectFilename.Compare(const Left,
+  Right: TTikeProcess): Integer;
+begin
+  Result := StrComp(PChar(Left.Title), PChar(Right.Title));
 end;
 
 initialization

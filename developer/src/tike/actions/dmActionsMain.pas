@@ -138,6 +138,7 @@ type
     actToolsWebConfigure: TAction;
     actToolsWebStartServer: TAction;
     actToolsWebStopServer: TAction;
+    actWindowNew: TAction;
     procedure actFileNewExecute(Sender: TObject);
     procedure DataModuleCreate(Sender: TObject);
     procedure actFileOpenAccept(Sender: TObject);
@@ -237,6 +238,7 @@ type
     procedure actToolsWebStartServerUpdate(Sender: TObject);
     procedure actToolsWebStopServerExecute(Sender: TObject);
     procedure actToolsWebStopServerUpdate(Sender: TObject);
+    procedure actWindowNewExecute(Sender: TObject);
   private
     function CheckFilenameConventions(FileName: string): Boolean;
     function SaveAndCloseAllFiles: Boolean;
@@ -1008,6 +1010,11 @@ end;
 procedure TmodActionsMain.actWindowCloseUpdate(Sender: TObject);
 begin
   actWindowClose.Enabled := Assigned(frmKeymanDeveloper.ActiveChild);
+end;
+
+procedure TmodActionsMain.actWindowNewExecute(Sender: TObject);
+begin
+  frmKeymanDeveloper.OpenNewWindow;
 end;
 
 procedure TmodActionsMain.actWindowNextExecute(Sender: TObject);
