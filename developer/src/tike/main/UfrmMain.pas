@@ -444,6 +444,7 @@ type
     procedure RefreshOptions;
 
     function OpenEditor(FFileName: string; frmClass: TfrmTikeEditorClass): TfrmTikeEditor;
+    procedure OpenProject(const filename: string);
     function OpenFile(FFileName: string; FCloseNewFile: Boolean): TfrmTikeChild;
     procedure OpenFilesInProject(FFileNames: TArray<string>);
 
@@ -1563,11 +1564,22 @@ begin
 end;
 
 procedure TfrmKeymanDeveloper.mnuProjectRecentFileClick(Sender: TObject);
+var
+  filename: string;
 begin
-  with Sender as TMenuItem do
+  filename := (Sender as TMenuItem).Hint;
+  OpenProject(filename);
+end;
+
+procedure TfrmKeymanDeveloper.OpenProject(const filename: string);
+begin
+  if IsGlobalProjectUIReady then
   begin
-    if BeforeOpenProject then
-      modActionsMain.OpenProject(Hint);
+    OpenFilesInProject([filename]);
+  end
+  else if BeforeOpenProject then
+  begin
+    modActionsMain.OpenProject(filename);
   end;
 end;
 

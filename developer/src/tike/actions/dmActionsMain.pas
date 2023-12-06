@@ -576,6 +576,7 @@ end;
 
 procedure TmodActionsMain.actProjectNewExecute(Sender: TObject);
 begin
+  // TODO: new process
   if not frmKeymanDeveloper.BeforeOpenProject then
     Exit;
   ShowNewProjectForm(frmKeymanDeveloper);
@@ -583,9 +584,7 @@ end;
 
 procedure TmodActionsMain.actProjectOpenAccept(Sender: TObject);
 begin
-  if not frmKeymanDeveloper.BeforeOpenProject then
-    Exit;
-  OpenProject(actProjectOpen.Dialog.FileName);
+  frmKeymanDeveloper.OpenProject(actProjectOpen.Dialog.FileName);
 end;
 
 procedure TmodActionsMain.OpenProject(FileName: WideString);
