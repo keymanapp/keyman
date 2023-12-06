@@ -82,6 +82,7 @@ type
                     fmMigrate, fmSplash, fmStart,
                     fmUpgradeKeyboards, fmOnlineUpdateCheck,// I2548
                     fmOnlineUpdateAdmin, fmTextEditor,
+                    fmBackgroundUpdateCheck,
                     fmFirstRun, // I2562
                     fmKeyboardWelcome,  // I2569
                     fmKeyboardPrint,  // I2329
@@ -120,6 +121,7 @@ uses
   KMShellHints,
   KeymanMutex,
   OnlineUpdateCheck,
+  RemoteUpdateCheck,
   RegistryKeys,
   UfrmBaseKeyboard,
   UfrmKeymanBase,
@@ -249,6 +251,7 @@ begin
       else if s = '-h'   then FMode := fmHelp
       else if s = '-t'   then FMode := fmTextEditor
       else if s = '-ouc' then FMode := fmOnlineUpdateCheck
+      else if s = '-buc' then FMode := fmBackgroundUpdateCheck
       else if s = '-basekeyboard' then FMode := fmBaseKeyboard   // I4169
       else if s = '-nowelcome'   then FNoWelcome := True
       else if s = '-kw' then FMode := fmKeyboardWelcome  // I2569
@@ -427,6 +430,19 @@ begin
     ShowMessage(MsgFromId(SKOSNotSupported));
     Exit;
   end;
+  // TODO: #10038  Will add this as part of the background update state machine
+  // for now just verifing the download happens via -buc switch.
+  with TRemoteUpdateCheck.Create(False, False) do
+    try
+      if (FMode = fmBackgroundUpdateCheck) then
+      begin
+        Run;
+        Exit;
+      end
+    finally
+      Free;
+    end;
+
 
   if not FSilent or (FMode = fmUpgradeMnemonicLayout) then   // I4553
   begin

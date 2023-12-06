@@ -178,7 +178,8 @@ uses
   Keyman.Configuration.System.HttpServer.App.Locale in 'web\Keyman.Configuration.System.HttpServer.App.Locale.pas',
   Keyman.System.AndroidStringToKeymanLocaleString in '..\..\..\..\common\windows\delphi\general\Keyman.System.AndroidStringToKeymanLocaleString.pas',
   UpdateXMLRenderer in 'render\UpdateXMLRenderer.pas',
-  Keyman.System.UpdateCheckStorage in 'main\Keyman.System.UpdateCheckStorage.pas';
+  Keyman.System.UpdateCheckStorage in 'main\Keyman.System.UpdateCheckStorage.pas',
+  RemoteUpdateCheck in 'main\RemoteUpdateCheck.pas';
 
 {$R VERSION.RES}
 {$R manifest.res}
@@ -200,7 +201,7 @@ begin
         Application.Initialize;
         Application.Title := 'Keyman Configuration';
         Application.CreateForm(TmodWebHttpServer, modWebHttpServer);
-        try
+  try
           Run;
         finally
           FreeAndNil(modWebHttpServer);
