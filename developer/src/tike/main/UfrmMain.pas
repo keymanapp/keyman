@@ -1462,7 +1462,7 @@ begin
     begin
       m := TMenuItem.Create(Self);
       m.Caption := '&'+IntToStr(i+1)+' '+FGlobalProject.MRU.EllipsisFile(i);
-      m.Hint := FGlobalProject.MRU.Files[i];
+      m.Tag := i;
       m.OnClick := mnuFileRecentFileClick;
       mnuFileRecent.Add(m);
     end;
@@ -1470,9 +1470,11 @@ begin
 end;
 
 procedure TfrmKeymanDeveloper.mnuFileRecentFileClick(Sender: TObject);
+var
+  filename: string;
 begin
-  with Sender as TMenuItem do
-    OpenFilesInProject([Hint]);
+  filename := FGlobalProject.MRU.Files[(Sender as TMenuItem).Tag];
+  OpenFilesInProject([filename]);
 end;
 
 {-------------------------------------------------------------------------------
@@ -1552,7 +1554,7 @@ begin
   begin
     m := TMenuItem.Create(Self);
     m.Caption := '&'+IntToStr(i+1)+' '+FProjectMRU.EllipsisFile(i);
-    m.Hint := FProjectMRU.Files[i];
+    m.Tag := i;
     m.OnClick := mnuProjectRecentFileClick;
     mnuProjectsRecent.Add(m);
   end;
@@ -1567,7 +1569,7 @@ procedure TfrmKeymanDeveloper.mnuProjectRecentFileClick(Sender: TObject);
 var
   filename: string;
 begin
-  filename := (Sender as TMenuItem).Hint;
+  filename := FProjectMRU.Files[(Sender as TMenuItem).Tag];
   OpenProject(filename);
 end;
 
