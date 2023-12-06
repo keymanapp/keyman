@@ -31,7 +31,18 @@ export class PathMatcher<Type, StateToken = any> {
   // `source` will continue to receive edits and may even change the instance
   // underlying the `path` field.
   public readonly source: GestureSource<Type>;
-  private readonly basePathStats: CumulativePathStats<Type>;
+
+  /**
+   * Holds the stats for the inherited portion of the path.
+   */
+  private readonly inheritedStats: CumulativePathStats<Type>;
+
+  /**
+   * Holds the path's stats at the time of the last `update()` call, as needed
+   * by PathModel's `evaluate` function.
+   */
+  // In regard to KeymanWeb, this exists to enhance flick-resetting behaviors.
+  private lastStats: CumulativePathStats<Type>;
 
   private readonly publishedPromise: ManagedPromise<PathMatchResult>
   private _result: PathMatchResult;
@@ -49,7 +60,8 @@ export class PathMatcher<Type, StateToken = any> {
     this.model = model;
     this.publishedPromise = new ManagedPromise<PathMatchResult>();
     this.source = source;
-    this.basePathStats = basePathStats;
+    this.inheritedStats = basePathStats;
+    this.lastStats = null;
 
     if(model.timer) {
       const offset = model.timer.inheritElapsed ? Math.min(source.path.stats.duration, model.timer.duration) : 0;
@@ -132,7 +144,8 @@ export class PathMatcher<Type, StateToken = any> {
       return this.finalize(result, 'item');
     } else {
       // Note:  is current path, not 'full path'.
-      const result = model.pathModel.evaluate(source.path, this.basePathStats) || 'continue';
+      const result = model.pathModel.evaluate(source.path, this.lastStats, source.baseItem, this.inheritedStats) || 'continue';
+      this.lastStats = source.path.stats;
 
       if(result != 'continue') {
         return this.finalize(result == 'resolve', 'path');

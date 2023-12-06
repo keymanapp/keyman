@@ -46,7 +46,7 @@ export const LongpressFlickDistanceThreshold = 6;
 export const MainLongpressSourceModelWithShortcut: ContactModel = {
   ...MainLongpressSourceModel,
   pathModel: {
-    evaluate: (path, baseStats) => {
+    evaluate: (path, priorStats, baseItem, baseStats) => {
       const stats = path.stats;
 
       // Adds up-flick support!
@@ -54,7 +54,7 @@ export const MainLongpressSourceModelWithShortcut: ContactModel = {
         return 'resolve';
       }
 
-      return MainLongpressSourceModel.pathModel.evaluate(path, baseStats);
+      return MainLongpressSourceModel.pathModel.evaluate(path, priorStats, baseItem, baseStats);
     }
   }
 }
@@ -121,7 +121,7 @@ export const FlickEndThreshold = 20;
 export const FlickEndContactModel: ContactModel = {
   itemPriority: 1,
   pathModel: {
-    evaluate: (path, baseStats) => {
+    evaluate: (path, priorStats, baseItem, baseStats) => {
       if(!baseStats) {
         throw Error("Missing data for the previous flick stage");
       }
