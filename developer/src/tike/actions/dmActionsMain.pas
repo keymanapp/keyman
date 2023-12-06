@@ -637,7 +637,11 @@ begin
     then frm := TfrmProjectSettings.Create(Screen.ActiveForm)   // I4688
     else frm := TfrmProjectSettings20.Create(Screen.ActiveForm);
   try
-    frm.ShowModal;
+    if frm.ShowModal = mrOk then
+    begin
+      if IsGlobalProjectUIReady then
+        FGlobalProject.Refresh;
+    end;
   finally
     frm.Free;
   end;
