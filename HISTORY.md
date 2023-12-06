@@ -1,5 +1,11 @@
 # Keyman Version History
 
+## 17.0.225 alpha 2023-12-06
+
+* feat(developer): Multi-process model for projects (#10114)
+* fix(developer): prevent opening .kpj in multiple processes (#10137)
+* fix(android/app): InfoActivity pass external links to browser (#10153)
+
 ## 17.0.224 alpha 2023-12-05
 
 * chore(linux): Update debian changelog (#10121)
