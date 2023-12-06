@@ -123,4 +123,32 @@ describe('kpj-file-reader', function () {
     assert.isEmpty(f.details);
     assert.lengthOf(f.childFiles, 0);
   });
+
+  it('should load a v1.0 keyboard project with missing <File>', function() {
+    const path = makePathToFixture('kpj', 'project-missing-file', 'project_missing_file.kpj');
+    const input = fs.readFileSync(path);
+    const reader = new KPJFileReader(callbacks);
+    const kpj = reader.read(input);
+    reader.validate(kpj);
+    if(callbacks.messages.length) {
+      callbacks.printMessages();
+    }
+    assert.equal(callbacks.messages.length, 0);
+    const project = reader.transform(path, kpj);
+    assert.equal(callbacks.messages.length, 0);
+    assert.isNotNull(project);
+  });
+
+  it('should load a v1.0 keyboard project with missing <Files>', function() {
+    const path = makePathToFixture('kpj', 'project-missing-file', 'project_missing_files.kpj');
+    const input = fs.readFileSync(path);
+    const reader = new KPJFileReader(callbacks);
+    const kpj = reader.read(input);
+    reader.validate(kpj);
+    assert.equal(callbacks.messages.length, 0);
+    const project = reader.transform(path, kpj);
+    assert.equal(callbacks.messages.length, 0);
+    assert.isNotNull(project);
+  });
+
 });
