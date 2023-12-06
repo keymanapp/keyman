@@ -282,9 +282,7 @@ export class ActiveKey implements LayoutKey {
 
       // Support version 1.0 KeymanWeb keyboards that do not define positional vs mnemonic
       if(!keyboard.definesPositionalOrMnemonic) {
-        // Not the best pattern, but currently safe - we don't look up any properties of any of the
-        // arguments in this use case, and the object's scope is extremely limited.
-        Lkc.Lcode = KeyMapping._USKeyCodeToCharCode(keyboard.constructNullKeyEvent(null, null));
+        Lkc.Lcode = KeyMapping._USKeyCodeToCharCode(Lkc);
         Lkc.LisVirtualKey=false;
       }
     }

@@ -502,7 +502,7 @@ export default class Keyboard {
     // Set the flags for the state keys - for desktop devices. For touch
     // devices, the only state key in use currently is Caps Lock, which is set
     // when the 'caps' layer is active in ActiveKey::constructBaseKeyEvent.
-    if(!Lkc.device?.touchable) {
+    if(!Lkc.device.touchable) {
       /*
        * For desktop-style keyboards, start from a blank slate.  They have a 'default'
        * (implicit 'NO_CAPS') layer but not a 'caps' layer.  With caps set, it just
