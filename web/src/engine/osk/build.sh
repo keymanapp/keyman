@@ -42,6 +42,6 @@ if builder_start_action configure; then
   builder_finish_action success configure
 fi
 
-builder_run_action clean rm -rf "$KEYMAN_ROOT/web/build/$SUBPROJECT_NAME"
-builder_run_action build compile $SUBPROJECT_NAME
-builder_run_action test test-headless osk
+builder_run_action clean rm -rf "${KEYMAN_ROOT}/web/build/${SUBPROJECT_NAME}"
+builder_run_action build compile "${SUBPROJECT_NAME}"
+builder_run_action test test-headless "${SUBPROJECT_NAME}"
