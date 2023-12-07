@@ -82,6 +82,9 @@ const ExtFileTypes: array[0..14] of TKMFileTypeInfo = (
 function GetFileTypeFromFileName(const FileName: string): TKMFileType;
 function GetFileTypeFilter(ft: TKMFileType; var DefaultExt: string): string;
 
+function IsProjectFile(const FileName: string): Boolean;
+
+// TODO-LDML: do we need to extend this to support .xml?
 function IsKeyboardFile(const FileName: string): Boolean;
 function RemoveFileExtension(Filename, Extension: string): string;
 
@@ -162,6 +165,11 @@ begin
   if SameText(Copy(Filename, LF-LE+1, LE), Extension)
     then Result := Copy(Filename, 1, LF-LE)
     else Result := Filename;
+end;
+
+function IsProjectFile(const FileName: string): Boolean;
+begin
+  Result := SameText(ExtractFileExt(FileName), Ext_ProjectSource);
 end;
 
 { TKeymanFileTypeInfo }

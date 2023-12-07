@@ -15,8 +15,8 @@ uses
 
 type
   IDragDrop = interface
-    function DropAllowed(const FileNames: array of string): Boolean;
-    procedure Drop(const FileNames: array of string);
+    function DropAllowed(const FileNames: TArray<string>): Boolean;
+    procedure Drop(const FileNames: TArray<string>);
   end;
 
   TDropTarget = class(TObject, IInterface, IDropTarget)

@@ -776,12 +776,10 @@ public final class KMManager {
     // KMKeyboard
     if (InAppKeyboard != null) {
       RelativeLayout.LayoutParams params = getKeyboardLayoutParams();
-      InAppKeyboard.setLayoutParams(params);
       InAppKeyboard.onConfigurationChanged(newConfig);
     }
     if (SystemKeyboard != null) {
       RelativeLayout.LayoutParams params = getKeyboardLayoutParams();
-      SystemKeyboard.setLayoutParams(params);
       SystemKeyboard.onConfigurationChanged(newConfig);
     }
   }
@@ -1386,12 +1384,14 @@ public final class KMManager {
     RelativeLayout.LayoutParams params;
     if (isKeyboardLoaded(KeyboardType.KEYBOARD_TYPE_INAPP) && !InAppKeyboard.shouldIgnoreTextChange() && modelFileExists) {
       params = getKeyboardLayoutParams();
-      InAppKeyboard.setLayoutParams(params);
+
+      // Do NOT re-layout here; it'll be triggered once the banner loads.
       InAppKeyboard.loadJavascript(KMString.format("enableSuggestions(%s, %s, %s)", model, mayPredict, mayCorrect));
     }
     if (isKeyboardLoaded(KeyboardType.KEYBOARD_TYPE_SYSTEM) && !SystemKeyboard.shouldIgnoreTextChange() && modelFileExists) {
       params = getKeyboardLayoutParams();
-      SystemKeyboard.setLayoutParams(params);
+
+      // Do NOT re-layout here; it'll be triggered once the banner loads.
       SystemKeyboard.loadJavascript(KMString.format("enableSuggestions(%s, %s, %s)", model, mayPredict, mayCorrect));
     }
     return true;
