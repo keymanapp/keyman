@@ -1,4 +1,4 @@
-import { GestureSource } from "@keymanapp/gesture-recognizer";
+import { GestureDebugSource, GestureSource } from "@keymanapp/gesture-recognizer";
 import { HostFixtureLayoutController } from "./hostFixtureLayoutController.js";
 import { RecordedCoordSequenceSet } from "./inputRecording.js";
 
@@ -7,11 +7,11 @@ import { RecordedCoordSequenceSet } from "./inputRecording.js";
  *  verification itself.
  */
 
-type WrappedInputSequence = GestureSource<any>;
+type WrappedInputSequence = GestureDebugSource<any>;
 
 export class SequenceRecorder {
   controller: HostFixtureLayoutController;
-  records:  {[identifier: string]: GestureSource<any>} = {};
+  records:  {[identifier: string]: GestureDebugSource<any>} = {};
 
   /**
    * Tracks the order in which each sequence was first detected.

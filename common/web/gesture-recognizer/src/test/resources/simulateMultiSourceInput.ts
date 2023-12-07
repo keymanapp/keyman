@@ -276,7 +276,7 @@ function simulateMultiSourceInput<OutputType, Type>(
         // We already committed the sample early, to facilitate new contact-point acceptance,
         // so we skip re-adding it here.  We DO allow all other update functionality to
         // proceed as normal, though.
-        if(simpleSource.path.coords[0] != sample && !simpleSource.isPathComplete) {
+        if(simpleSource.path.stats.initialSample != sample && !simpleSource.isPathComplete) {
           simpleSource.update(sample);
         }
 
