@@ -151,7 +151,7 @@ export class GestureSource<HoveredItemType, StateToken=any> {
    * The most recent path sample (coordinate) under consideration for this `GestureSource`.
    */
   public get currentSample(): InputSample<HoveredItemType, StateToken> {
-    return this.path.coords[this.path.coords.length-1];
+    return this.path.stats.lastSample;
   }
 
   /**
@@ -273,7 +273,7 @@ export class GestureSourceSubview<HoveredItemType, StateToken = any> extends Ges
     stateTokenOverride?: StateToken
   ) {
     let start = 0;
-    let length = source.path.coords.length;
+    let length = source.path.stats.sampleCount;
     if(source instanceof GestureSourceSubview) {
       start = source._baseStartIndex;
     }

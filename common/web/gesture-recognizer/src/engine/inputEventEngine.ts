@@ -68,7 +68,7 @@ export abstract class InputEventEngine<HoveredItemType, StateToken> extends Inpu
       return;
     }
 
-    const lastEntry = touchpoint.path.coords[touchpoint.path.coords.length-1];
+    const lastEntry = touchpoint.path.stats.lastSample;
     const sample = this.buildSampleFor(lastEntry.clientX, lastEntry.clientY, target, lastEntry.t, touchpoint);
 
     /* While an 'end' event immediately follows a 'move' if it occurred simultaneously,

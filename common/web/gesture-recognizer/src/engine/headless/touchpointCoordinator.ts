@@ -202,7 +202,7 @@ export class TouchpointCoordinator<HoveredItemType, StateToken=any> extends Even
 
         // Don't forget to also correct the `stateToken` and `baseItem`!
         touchpoint.stateToken = this.stateToken;
-        touchpoint.baseItem = touchpoint.path.coords[0].item;
+        touchpoint.baseItem = touchpoint.path.stats.initialSample.item;
 
         // Also, in case a contact model's path-eval references data via stats...
         correctSample(touchpoint.path.stats.initialSample);
