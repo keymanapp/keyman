@@ -97,10 +97,10 @@ let
   Module: any;
 
 export class KmnCompiler implements KeymanCompiler, UnicodeSetParser {
-  callbackID: string; // a unique numeric id added to globals with prefixed names
-  callbacks: CompilerCallbacks;
-  wasmExports: MallocAndFree;
-  options: KmnCompilerOptions;
+  private readonly callbackID: string; // a unique numeric id added to globals with prefixed names
+  private callbacks: CompilerCallbacks;
+  private wasmExports: MallocAndFree;
+  private options: KmnCompilerOptions;
 
   constructor() {
     this.callbackID = callbackPrefix + callbackProcIdentifier.toString();
@@ -109,7 +109,7 @@ export class KmnCompiler implements KeymanCompiler, UnicodeSetParser {
 
   public async init(callbacks: CompilerCallbacks, options: KmnCompilerOptions): Promise<boolean> {
     this.callbacks = callbacks;
-    this.options = options;
+    this.options = {...options};
     if(!Module) {
       try {
         Module = await loadWasmHost();
