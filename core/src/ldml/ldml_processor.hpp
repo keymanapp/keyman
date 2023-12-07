@@ -94,7 +94,7 @@ namespace core {
      /** emit a marker */
      static void emit_marker(km_core_state *state, KMX_DWORD marker);
      /** emit a pass-through and invalidate */
-     static void emit_invalidate_passthrough_keystroke(km_core_state *state);
+     static void emit_invalidate_passthrough_keystroke(km_core_state *state, km_core_virtual_key vk, uint16_t modifier_state);
 
      /**
       * Delete text from the state, by:
