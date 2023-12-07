@@ -285,7 +285,7 @@ size_t ldml_processor::process_output(km_core_state *state, const std::u32string
   assert(ldml::normalize_nfd_markers(nfd_str)); // TODO-LDML: else fail?
   // extract context string, in NFD
   std::u32string old_ctxtstr_nfd;
-  (void)context_to_string(state, old_ctxtstr_nfd, false);
+  (void)context_to_string(state, old_ctxtstr_nfd, true);
   assert(ldml::normalize_nfd_markers(old_ctxtstr_nfd)); // TODO-LDML: else fail?
 
   // context string in NFD
@@ -337,20 +337,23 @@ size_t ldml_processor::process_output(km_core_state *state, const std::u32string
   /** The new context to be added */
   std::u32string new_ctxtstr_changed(ctxt_prefix.second,ctxtstr_cleanedup.end());
 
-  // drop the old suffix. Note: this mutates old_ctxtstr_changed.
+  // FIRST drop the old suffix. Note: this mutates old_ctxtstr_changed.
+  // see remove_text() docs, this PUSHes actions, POPs context items, and TRIMS the string.
   remove_text(state, old_ctxtstr_changed, old_ctxtstr_changed.length());
   assert(old_ctxtstr_changed.length() == 0);
   // old_ctxtstr_changed is now empty because it's been removed.
   // context is "aa" in the above example.
 
+  // THEN add the new suffix, "CCC" in the above example
   emit_text(state, new_ctxtstr_changed);
+  // context is now "aaCCC"
 
   return matchedContext;
 }
 
 void
 ldml_processor::remove_text(km_core_state *state, std::u32string &str, size_t length) {
-  /** how many context items need to be removed */
+  /** track how many context items have been removed, via push_backspace() */
   size_t contextRemoved = 0;
   for (auto c = state->context().rbegin(); length > 0 && c != state->context().rend(); c++, contextRemoved++) {
     /** last char of context */
@@ -362,13 +365,27 @@ ldml_processor::remove_text(km_core_state *state, std::u32string &str, size_t le
       length--;
       assert(c->character == lastCtx);
       str.pop_back();
-      state->actions().push_backspace(KM_CORE_BT_CHAR, c->character);  // Cause prior char to be removed
+      // Cause prior char to be removed
+      state->actions().push_backspace(KM_CORE_BT_CHAR, c->character);
     } else if (type == KM_CORE_BT_MARKER) {
-      // just pop off any markers.
+      // It's a marker.
+      // need to be able to drop 3 chars
+      assert(length >= 3);
+      length -= 3;
+      // #3 - the marker.
+      assert(lastCtx == c->marker);
+      str.pop_back();
+      // #2 - the code
+      assert(str.back() == LDML_MARKER_CODE);
+      str.pop_back();
+      // #1 - the sentinel
+      assert(str.back() == UC_SENTINEL);
+      str.pop_back();
+      // cause marker to be removed
       state->actions().push_backspace(KM_CORE_BT_MARKER, c->marker);
     }
   }
-  // now, pop the right number of context items
+  // now, pop the context items
   for (size_t i = 0; i < contextRemoved; i++) {
     // we don't pop during the above loop because the iterator gets confused
     state->context().pop_back();

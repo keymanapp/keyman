@@ -97,7 +97,11 @@ namespace core {
      static void emit_invalidate_passthrough_keystroke(km_core_state *state);
 
      /**
-      * Delete text from the state.
+      * Delete text from the state, by:
+      *  1. calling actions().push_backspace() to push the appropriate backspaces
+      *  2. popping the same items from the context items
+      *  3. mutating 'str' by removing the same number of items.
+      * This function handles marker strings correctly.
       * @param str string with text to remove, from the end
       * @param length number of chars from the end of str to drop
       */
