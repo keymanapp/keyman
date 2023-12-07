@@ -57,6 +57,7 @@ export class TouchpointCoordinator<HoveredItemType, StateToken=any> extends Even
     replaceModelWith: (model: GestureModel<HoveredItemType, StateToken>) => void
   ) => {
     const sourceIds = selection.matcher.allSourceIds;
+    console.log(selection.matcher.model.id);
 
     // If there's an active gesture that uses a source noted in the selection, it's the responsibility
     // of an existing GestureSequence to handle this one.  The handler should bypass it for this round.
