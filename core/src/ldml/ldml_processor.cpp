@@ -322,8 +322,8 @@ size_t ldml_processor::process_output(km_core_state *state, const std::u32string
 
   // Ok. We've done all the happy manipulations.
 
-  /** NFD and no markers */
-  std::u32string ctxtstr_cleanedup = ldml::remove_markers(ctxtstr);
+  /** NFD w/ markers */
+  std::u32string ctxtstr_cleanedup = ctxtstr;
   assert(ldml::normalize_nfd_markers(ctxtstr_cleanedup));
 
   // find common prefix.
@@ -342,13 +342,8 @@ size_t ldml_processor::process_output(km_core_state *state, const std::u32string
   assert(old_ctxtstr_changed.length() == 0);
   // old_ctxtstr_changed is now empty because it's been removed.
   // context is "aa" in the above example.
-  emit_text(state, new_ctxtstr_changed);
 
-  // TODO-LDML: need to emit marker here - need to emit text w/ markers, and handle appropriately.
-  // // TODO-LDML: 1-marker hack! need to support a string with intermixed markers.
-  if (str.length() == 3 && str[0] == LDML_UC_SENTINEL && str[1] == LDML_MARKER_CODE) {
-    emit_marker(state, str[2]);
-  }
+  emit_text(state, new_ctxtstr_changed);
 
   return matchedContext;
 }
