@@ -545,34 +545,22 @@ KMX_DWORD  KMX_VKUSToVKUnderlyingLayout(v_dw_3D &All_Vector,KMX_DWORD inUS) {
   }
   return inUS;
 }
-// takes capital letter of Other returns cpital character of US keyboard
-KMX_WORD VKUS(v_dw_3D &All_Vector,KMX_DWORD inOther) {
- // loop and find char in Other; then return char of US
-  for( int i=0; i< (int)All_Vector[1].size();i++) {
-    for( int j=1; j< (int)All_Vector[1][0].size();j++) {
-      if((inOther == All_Vector[1][i][j] )) {
-        return  All_Vector[0][i][2];
-      }
-    }
-  }
-  return inOther;
-}
 
-KMX_WCHAR KMX_VKUnderlyingLayoutToVKUS(v_dw_3D All_Vector, KMX_DWORD VK_US) {
+KMX_WCHAR KMX_VKUnderlyingLayoutToVKUS(v_dw_3D All_Vector, KMX_DWORD VK_OTHER) {
 
-  KMX_DWORD VK_Other;
+  KMX_DWORD VK_US;
   for( int i=0; i< (int)All_Vector[0].size()-1 ;i++) {
     for( int j=1; j< (int)All_Vector[0][0].size();j++) {
-      if ( ( All_Vector[0][i][j] == VK_US ) ) {
-        VK_Other = All_Vector[1][i][j];;
-        return VK_Other;
+      if ( ( All_Vector[0][i][j] == VK_OTHER ) ) {
+        VK_US = All_Vector[1][i][j];;
+        return VK_US;
       }
     }
   }
-  return VK_US;
+  return VK_OTHER;
 }
 
-// _S2 sure KMX_WCHART ??? not KMX_WCHAR ??
+// _S2 sure KMX_WCHART ??? not KMX_WCHAR ??  not usable!!
 KMX_WCHART KMX_VKUnderlyingLayoutToVKUS_GDK(GdkKeymap* keymap,KMX_DWORD VK_US) {
 
   KMX_WORD VK_DE = ( KMX_WORD ) map_Ikey_DE(VK_US);

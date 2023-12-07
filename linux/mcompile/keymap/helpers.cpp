@@ -2380,3 +2380,17 @@ std::wstring  get_KeyVals_according_to_keycode_and_Shiftstate(GdkKeymap *keymap,
     return L"\0";
 }
 
+// takes capital letter of Other returns cpital character of US keyboard
+/*KMX_WORD VKUS(v_dw_3D &All_Vector,KMX_DWORD inOther) {
+ // loop and find char in Other; then return char of US
+  for( int i=0; i< (int)All_Vector[1].size();i++) {
+    for( int j=1; j< (int)All_Vector[1][0].size();j++) {
+      if((inOther == All_Vector[1][i][j] )) {
+        return  All_Vector[0][i][2];
+      }
+    }
+  }
+  return inOther;
+}*/
+
+

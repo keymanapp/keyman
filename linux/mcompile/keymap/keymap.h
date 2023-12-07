@@ -505,9 +505,6 @@ int append_other_ToVector(v_dw_3D &All_Vector, GdkKeymap *keymap);
 // initialize GDK
 bool InitializeGDK(GdkKeymap **keymap,int argc, gchar *argv[]);
 
-// return the Scancode of for given VirtualKey using GDK
-KMX_DWORD get_KeyCode_From_KeyVal_GDK(GdkKeymap *keymap, UINT Keyval);
-
 // find Keyvals to fill into 2D-Vector of Other Language
 KMX_DWORD getKeyvalsFromKeyCode(GdkKeymap *keymap, guint keycode, int shift_state_pos);
 
