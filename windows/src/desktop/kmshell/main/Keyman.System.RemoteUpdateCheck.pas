@@ -15,21 +15,18 @@
   Notes:
   History:
 *)
-unit RemoteUpdateCheck;  // I3306
+unit Keyman.System.RemoteUpdateCheck;  // I3306
 
 interface
 
 uses
   System.Classes,
   System.SysUtils,
-  System.UITypes,
-  System.IOUtils,
-  Vcl.Forms,
+  //System.UITypes,
+  //System.IOUtils,
   KeymanPaths,
-
   httpuploader,
   Keyman.System.UpdateCheckResponse,
-  UfrmDownloadProgress,
   OnlineUpdateCheck;
 
 type
@@ -78,8 +75,7 @@ implementation
 
 uses
   System.WideStrUtils,
-  Vcl.Dialogs,
-  Winapi.ShellApi,
+  //Winapi.ShellApi,
   Winapi.Windows,
   Winapi.WinINet,
 
@@ -92,15 +88,13 @@ uses
   ErrorControlledRegistry,
   RegistryKeys,
   Upload_Settings,
-  utildir,
-  utilexecute,
-  OnlineUpdateCheckMessages,
-  UfrmOnlineUpdateIcon,
-  UfrmOnlineUpdateNewVersion,
-  utilkmshell,
-  utilsystem,
-  utiluac,
-  versioninfo;
+  //utildir,
+  //utilexecute,
+  OnlineUpdateCheckMessages;
+  //utilkmshell,
+ // utilsystem,
+  //utiluac,
+  //versioninfo;
 
 { TRemoteUpdateCheck }
 
@@ -358,10 +352,12 @@ begin
             TUpdateCheckStorage.SaveUpdateCacheData(ucr);
             Result := FParams.Result;
           end
+          // TODO: #10038
+          // Integerate into state machine. in the download state
+          // the process can call LoadUpdateCacheData if needed to get the
+          // response result.
           else if (Length(FParams.Packages) > 0) or (FParams.Keyman.DownloadURL <> '') then
           begin
-            // TODO: Integrate in to the Background update state machine.
-            // for now just go straight to DownloadUpdates
             downloadResult := DownloadUpdates;
             if DownloadResult then
             begin

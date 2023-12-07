@@ -121,7 +121,7 @@ uses
   KMShellHints,
   KeymanMutex,
   OnlineUpdateCheck,
-  RemoteUpdateCheck,
+  Keyman.System.RemoteUpdateCheck,
   RegistryKeys,
   UfrmBaseKeyboard,
   UfrmKeymanBase,
