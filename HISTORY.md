@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 17.0.226 alpha 2023-12-07
+
+* fix(web): accidental suggestion-banner retoggle when disabling predictions (#10014)
+* fix(web): Fix null error with legacy keyboards (#10141)
+
 ## 17.0.225 alpha 2023-12-06
 
 * feat(developer): Multi-process model for projects (#10114)
