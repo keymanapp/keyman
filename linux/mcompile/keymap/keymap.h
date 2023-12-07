@@ -508,6 +508,9 @@ bool InitializeGDK(GdkKeymap **keymap,int argc, gchar *argv[]);
 // find Keyvals to fill into 2D-Vector of Other Language
 KMX_DWORD getKeyvalsFromKeyCode(GdkKeymap *keymap, guint keycode, int shift_state_pos);
 
+// take deadkey-value (e.g.65106) and return character (e.g. '^' )
+std::wstring convert_DeadkeyValues_ToChar(int in);
+
 // returns KeySyms fo ra given key (for unshifted: finds the Keysym according to Shiftstate e.g. a;A or 1;! )
 std::wstring get_KeyVals_according_to_keycode_and_Shiftstate_new(GdkKeymap *keymap, guint VK, ShiftState ss, int caps);
 

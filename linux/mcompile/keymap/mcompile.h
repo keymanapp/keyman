@@ -52,6 +52,14 @@ KMX_WCHAR KMX_VKUnderlyingLayoutToVKUS(v_dw_3D All_Vector,KMX_DWORD SC_US);
 KMX_WCHAR KMX_SCUnderlyingLayoutToVKUS_GDK(GdkKeymap* keymap,KMX_DWORD inOther);
 
 PKMX_WCHAR KMX_incxstr(PKMX_WCHAR p);
+
+UINT  KMX_VKUSToSCUnderlyingLayout(KMX_DWORD VirtualKeyUS);
+KMX_DWORD  KMX_VKUSToVKUnderlyingLayout(v_dw_3D &All_Vector,KMX_DWORD inUS);
+KMX_DWORD KMX_CharFromVK(v_dw_3D &All_Vector,KMX_DWORD vkUnderlying, KMX_UINT VKShiftState, KMX_WCHAR* DeadKey);
+KMX_WCHAR  KMX_CharFromSC(GdkKeymap *keymap, KMX_UINT VKShiftState, UINT SC_OTHER, KMX_WCHAR* DeadKey);
+int KMX_GetDeadkeys(v_dw_2D & dk_Table, KMX_WORD DeadKey, KMX_WORD *OutputPairs, GdkKeymap* keymap);
+
+
 //--------------------old 
 /*
 #include <vector>

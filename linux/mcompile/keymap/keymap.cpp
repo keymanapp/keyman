@@ -490,12 +490,12 @@ std::wstring convert_DeadkeyValues_ToChar(int in) {
       return L"\0";
     return  std::wstring(1, in);
   } else {
-    std::string long_name((const char*) gdk_keyval_name (in));          // 6510 => "dead_circumflex "
-    lname = convertNamesToIntegerValue( wstring_from_string(long_name));     // "dead_circumflex " => 94
+    std::string long_name((const char*) gdk_keyval_name (in));                // 65106 => "dead_circumflex "
+    lname = convertNamesToIntegerValue( wstring_from_string(long_name));      // "dead_circumflex " => 94
 
     if (lname != returnIfCharInvalid) {
       std::wstring ss   = std::wstring(1, lname );
-      return std::wstring(1, lname );                                      // 94 => "^"
+      return std::wstring(1, lname );                                         // 94 => "^"
     } else
       return L"\0";
   }

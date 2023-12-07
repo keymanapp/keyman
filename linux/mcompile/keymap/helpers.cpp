@@ -1719,9 +1719,9 @@ std::string sr21 = "dead_abovedot";
 gchar * chr21=  (gchar*) sr21.c_str(); ;
 guint gi21= gdk_keyval_from_name (chr21);*/
 //---------------------------------------
-//---------------------------------------
+//---------------------------------------*/
 //guint32 gdk_keyval_to_unicode (guint keyval);
-/*guint32  gg323 = gdk_keyval_to_unicode (65106);
+guint32  gg323 = gdk_keyval_to_unicode (65106);
 guint32  gz = gdk_keyval_to_unicode (65);
 guint32  gz1 = gdk_keyval_to_unicode (220);
 guint32  gz2 = gdk_keyval_to_unicode (7838);
@@ -1733,7 +1733,7 @@ guint GGGIII3= gdk_unicode_to_keyval (gz);
 guint GGGIII4= gdk_unicode_to_keyval (gz1);
 //guint GGGIII2 =gdk_unicode_to_keyval (L"\u1E9E");
 //gchar * gc2= gdk_keyval_name ((int) \u1E9E);
-wchar_t w[] = L"\u1E9E";
+/*wchar_t w[] = L"\u1E9E";
 wchar_t ww[] = L"A";
 unsigned int Alef = (unsigned int) L'ẞ';
 guint GGII4= gdk_unicode_to_keyval (Alef);
@@ -2392,5 +2392,4 @@ std::wstring  get_KeyVals_according_to_keycode_and_Shiftstate(GdkKeymap *keymap,
   }
   return inOther;
 }*/
-
 
