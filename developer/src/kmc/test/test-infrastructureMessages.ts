@@ -9,6 +9,7 @@ import { unitTestEndpoints } from '../src/commands/build.js';
 import { KmnCompilerMessages } from '@keymanapp/kmc-kmn';
 import { defaultCompilerOptions, CompilerOptions} from '@keymanapp/common-types';
 import { loadProject } from '../src/util/projectLoader.js';
+import { analyzeUnitTestEndpoints } from '../src/commands/analyze.js';
 
 describe('InfrastructureMessages', function () {
   it('should have a valid InfrastructureMessages object', function() {
@@ -80,6 +81,16 @@ describe('InfrastructureMessages', function () {
     loadProject(projectPath, ncb);
     assert.isTrue(ncb.hasMessage(InfrastructureMessages.ERROR_NotAProjectFile),
     `ERROR_NotAProjectFile not generated, instead got: `+JSON.stringify(ncb.messages,null,2));
+  });
+
+  // ERROR_UnknownFileFormat
+
+  it('should generate ERROR_UnknownFileFormat if an analyze osk-char-use mapping file is not the correct type', async function() {
+    const ncb = new NodeCompilerCallbacks({logLevel: 'silent'});
+    const options = {mappingFile: makePathToFixture('analyze', 'error_not_a_project_file.xxx')};
+    await analyzeUnitTestEndpoints.analyzeOskCharUse(ncb, [], options);
+    assert.isTrue(ncb.hasMessage(InfrastructureMessages.ERROR_UnknownFileFormat),
+      `ERROR_NotAProjectFile not generated, instead got: `+JSON.stringify(ncb.messages,null,2));
   });
 
   // HINT_FilenameHasDifferingCase
