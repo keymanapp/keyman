@@ -36,7 +36,6 @@ struct KMX_DeadkeyMapping {   // I4353
   KMX_WCHAR deadkey, dkid;
   KMX_UINT shift;
   KMX_WORD vk;
-  KMX_WORD sc;
 };
 
 extern std::vector<KMX_DeadkeyMapping> KMX_FDeadkeys;   // I4353

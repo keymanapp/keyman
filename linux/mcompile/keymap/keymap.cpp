@@ -349,7 +349,7 @@ KMX_DWORD getKeyvalsFromKeyCode(GdkKeymap *keymap, guint keycode, int shift_stat
   if (!(shift_state_pos <= count))
     return 0;
 
-  if (!(keycode <= 64))
+  if (!(keycode <= 94))
     return 0;
 
   out =(KMX_DWORD)  keyvals[shift_state_pos];

@@ -1668,7 +1668,7 @@ void Inspect_Key_S(GdkKeymap *keymap ) {
 
   guint KCode = 51;
   guint Keyval_Base= 35;
-  guint Keyval_Shift = 39;
+  guint Keyval_Shift = 60;
   guint Keyval = Keyval_Base;
 
   gchar* KeyvalName_Base;
@@ -1696,10 +1696,10 @@ void Inspect_Key_S(GdkKeymap *keymap ) {
   // KeyValname(Shift)    A    Odiaresis   ampersand   numbersign
 
 //---------------------------------------
-gchar * gc= gdk_keyval_name (729);
+gchar * gc= gdk_keyval_name (60);
 gchar * gc0= gdk_keyval_name (94);
 //---------------------------------------
-std::string sr = "dead_macron";
+std::string sr = "less";
 gchar * chr=  (gchar*) sr.c_str(); ;
 guint gi= gdk_keyval_from_name (chr);
 //---------------------------------------

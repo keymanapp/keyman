@@ -777,6 +777,17 @@ bool KMX_ImportRules(KMX_WCHAR *kbid, LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, Gd
           //_S2 TODO get char  - do I need rc ?? ( was rc = ToUnicodeEx...)
           std::wstring KeyVal_Other = get_KeyVals_according_to_keycode_and_Shiftstate_new( *keymap, SC_US, ss, caps);
 
+
+
+
+
+
+
+
+
+
+// _S2  brackets nor the same in if/else/else if blocks !!!!
+
           //_S2 TODO do I need that ??
           //if rc >0: it got 1 or more char AND buffer is empty ( nothing inside ) {
             if(KeyVal_Other == L"") {
@@ -792,12 +803,12 @@ bool KMX_ImportRules(KMX_WCHAR *kbid, LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, Gd
               continue;
             }
 
-            //_S2 TODO fill m_rgfDeadkey ( m_rgfDeadkey will be done later)
             //rgKey[iKey]->KMX_SetShiftState(ss, KeyVal_Other, false, (caps==0));
             rgKey[iKey]->KMX_SetShiftState(ss, KeyVal_Other, false, (caps));
 
 
         //_S2 TODO
+        // dk > 65000??? 
         // _S2 handle deadkeys later
         // if rc <0:  it got a deadkey   {
             // fill m_rgss and m_rgfDeadkey and alDead
