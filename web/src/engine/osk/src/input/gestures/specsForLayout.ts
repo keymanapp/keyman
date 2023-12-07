@@ -114,7 +114,7 @@ export const DEFAULT_GESTURE_PARAMS: GestureParams = {
   // See `VisualKeyboard.refreshLayout`, CTRL-F "Step 3".
   flick: {
     startDist: 10,
-    dirLockDist: 20,
+    dirLockDist: 25,
     triggerDist: 40 // should probably be based on row-height?
   }
 }
@@ -257,6 +257,7 @@ export function gestureSetForLayout(flags: LayoutGestureSupportFlags, params: Ge
     gestureModels.push(withKeySpecFiltering(flickStartModel(params), 0));
     gestureModels.push(flickMidModel(params));
     gestureModels.push(flickResetModel(params));
+    gestureModels.push(flickRestartModel(params));
     gestureModels.push(flickResetEndModel());
     gestureModels.push(flickEndModel(params));
 
@@ -309,7 +310,7 @@ export function flickStartContactModel(params: GestureParams): ContactModel {
       evaluate: (path) => path.stats.netDistance > params.flick.startDist ? 'resolve' : null
     },
     pathResolutionAction: 'resolve',
-    pathInheritance: 'chop'
+    pathInheritance: 'partial'
   }
 }
 
@@ -317,8 +318,8 @@ export function flickStartContactModel(params: GestureParams): ContactModel {
  * Determines the best direction to use for flick-locking and the total net distance
  * traveled in that direction.
  */
-function determineLockFromStats(pathStats: CumulativePathStats<KeyElement>) {
-  const flickSpec = pathStats.initialSample.item.key.spec.flick;
+function determineLockFromStats(pathStats: CumulativePathStats<KeyElement>, baseItem: KeyElement) {
+  const flickSpec = baseItem.key.spec.flick;
 
   const supportedDirs = Object.keys(flickSpec) as (typeof OrderedFlickDirections[number])[];
   let bestDir: typeof supportedDirs[number];
@@ -342,12 +343,12 @@ export function flickMidContactModel(params: GestureParams): gestures.specs.Cont
   return {
     itemPriority: 1,
     pathModel: {
-      evaluate: (path) => {
+      evaluate: (path, priorStats, baseItem) => {
         /*
          * Check whether or not there is a valid flick for which the path crosses the flick-dist
          * threshold while at a supported angle for flick-locking by the flick handler.
          */
-        const { dir, dist } = determineLockFromStats(path.stats);
+        const { dir, dist } = determineLockFromStats(path.stats, baseItem);
 
         // If the best supported flick direction meets the 'direction lock' threshold criteria,
         // only then do we allow transitioning to the 'locked flick' state.
@@ -375,14 +376,14 @@ export function flickEndContactModel(params: GestureParams): ContactModel {
   return {
     itemPriority: 1,
     pathModel: {
-      evaluate: (path, dummy, dummy2, baseStats) => {
+      evaluate: (path, priorStats, baseItem) => {
         if(path.isComplete) {
           // The Flick handler class will sort out the mess once the path is complete.
           // Note:  if we wanted auto-triggering once the threshold distance were met,
           // we'd need to move its related logic into this method.
           return 'resolve';
         } else {
-          const { dir } = determineLockFromStats(baseStats);
+          const { dir } = determineLockFromStats(path.stats, baseItem);
           if(calcLockedDistance(path.stats, dir) < params.flick.dirLockDist) {
             return 'reject';
           }
@@ -651,6 +652,33 @@ export function flickStartModel(params: GestureParams): GestureModel<any> {
   }
 }
 
+export function flickRestartModel(params: GestureParams): GestureModel<any> {
+  const base = flickStartModel(params);
+  return {
+    ...base,
+    contacts: [
+      {
+        ...base.contacts[0],
+        model: {
+          ...base.contacts[0].model,
+          baseCoordReplacer: (stats, key) => {
+            return null;
+          }
+        }
+      }
+    ],
+    id: 'flick-restart',
+    sustainWhenNested: true,
+    rejectionActions: {
+      // Only 'rejects' in this form if the path is completed before direction-locking state.
+      path: {
+        type: 'replace',
+        replace: 'flick-reset-end'
+      }
+    },
+  }
+}
+
 export function flickMidModel(params: GestureParams): GestureModel<any> {
   return {
     id: 'flick-mid',
@@ -688,14 +716,15 @@ export function flickResetModel(params: GestureParams): GestureModel<any> {
     contacts: [
       {
         model: {
+          // TODO: adjust.
           ...instantContactResolutionModel(),
-          pathInheritance: 'full'
+          pathInheritance: 'partial', // keep base item, but reset the path-stats.
         },
       }
     ],
     resolutionAction: {
       type: 'chain',
-      next: 'flick-mid'
+      next: 'flick-restart'
     },
     sustainWhenNested: true
   };
