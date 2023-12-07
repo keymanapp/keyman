@@ -91,6 +91,13 @@ export interface GestureRecognizerConfiguration<HoveredItemType, StateToken = an
    * @returns
    */
   readonly itemIdentifier?: ItemIdentifier<HoveredItemType, StateToken>;
+
+  /**
+   * When `true`, the engine will persistently record all coordinates visited by each `GestureSource`
+   * during its lifetime.  This is useful for debugging and for generating input recordings for
+   * use in automated testing.
+   */
+  readonly recordingMode?: boolean;
 }
 
 export function preprocessRecognizerConfig<HoveredItemType, StateToken = any>(
@@ -108,6 +115,7 @@ export function preprocessRecognizerConfig<HoveredItemType, StateToken = any>(
   processingConfig.safeBounds       = processingConfig.safeBounds       ?? new PaddedZoneSource([2]);
 
   processingConfig.itemIdentifier   = processingConfig.itemIdentifier   ?? (() => null);
+  processingConfig.recordingMode = !!processingConfig.recordingMode;
 
   if(!config.paddedSafeBounds) {
     let paddingArray = config.safeBoundPadding;

@@ -6,7 +6,8 @@ export { GestureRecognizer } from "./gestureRecognizer.js";
 export { GestureRecognizerConfiguration } from "./configuration/gestureRecognizerConfiguration.js";
 export { InputEngineBase } from "./headless/inputEngineBase.js";
 export { InputSample } from "./headless/inputSample.js";
-export { SerializedGesturePath, GesturePath } from "./headless/gesturePath.js";
+export { GesturePath } from "./headless/gesturePath.js";
+export { GestureDebugPath } from "./headless/gestureDebugPath.js"
 export { ConfigChangeClosure, GestureStageReport, GestureSequence } from "./headless/gestures/matchers/gestureSequence.js";
 export { SerializedGestureSource, GestureSource, buildGestureMatchInspector } from "./headless/gestureSource.js";
 export { MouseEventEngine } from "./mouseEventEngine.js";

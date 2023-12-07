@@ -1,5 +1,5 @@
 import { InputSample } from "./inputSample.js";
-import { SerializedGesturePath, GesturePath } from "./gesturePath.js";
+import { GesturePath } from "./gesturePath.js";
 import { GestureRecognizerConfiguration, preprocessRecognizerConfig } from "../configuration/gestureRecognizerConfiguration.js";
 import { Nonoptional } from "../nonoptional.js";
 import { MatcherSelector } from "./gestures/matchers/matcherSelector.js";
@@ -8,15 +8,6 @@ export function buildGestureMatchInspector<Type, StateToken>(selector: MatcherSe
   return (source: GestureSource<Type, StateToken>) => {
     return selector.potentialMatchersForSource(source).map((matcher) => matcher.model.id);
   };
-}
-
-/**
- * Documents the expected typing of serialized versions of the `GestureSource` class.
- */
-export type SerializedGestureSource<HoveredItemType = any, StateToken = any> = {
-  isFromTouch: boolean;
-  path: SerializedGesturePath<HoveredItemType, StateToken>;
-  // identifier is not included b/c it's only needed during live processing.
 }
 
 /**
@@ -38,7 +29,15 @@ export type SerializedGestureSource<HoveredItemType = any, StateToken = any> = {
  * gestures expect multiple, hence "simple".
  *
  */
-export class GestureSource<HoveredItemType, StateToken=any> {
+export class GestureSource<
+  HoveredItemType,
+  StateToken=any,
+  /**
+   * Not intended for non-default types outside of gesture-recognizer internals.  Is used to facilitate
+   * 'debug-mode' / 'recording-mode' paths.
+   */
+  PathType extends GesturePath<HoveredItemType, StateToken> = GesturePath<HoveredItemType, StateToken>
+> {
   /**
    * Indicates whether or not this tracked point's original source is a DOM `Touch`.
    */
@@ -50,11 +49,9 @@ export class GestureSource<HoveredItemType, StateToken=any> {
   public readonly rawIdentifier: number;
 
   // A full, uninterrupted recording of all samples observed during the lifetime of the touchpoint.
-  protected _path: GesturePath<HoveredItemType, StateToken>;
+  protected _path: PathType;
 
   protected _baseItem: HoveredItemType;
-
-  private static _jsonIdSeed: -1;
 
   // Assertion:  must always contain an index 0 - the base recognizer config.
   protected recognizerConfigStack: Nonoptional<GestureRecognizerConfiguration<HoveredItemType, StateToken>>[];
@@ -68,7 +65,7 @@ export class GestureSource<HoveredItemType, StateToken=any> {
   /**
    * Tracks the coordinates and timestamps of each update for the lifetime of this `GestureSource`.
    */
-  public get path(): GesturePath<HoveredItemType, StateToken> {
+  public get path(): PathType {
     return this._path;
   }
 
@@ -98,33 +95,22 @@ export class GestureSource<HoveredItemType, StateToken=any> {
    * @param identifier     The system identifier for the input point's events.
    * @param initialHoveredItem  The initiating event's original target element
    * @param isFromTouch    `true` if sourced from a `TouchEvent`; `false` otherwise.
+   * @param pathConstructor  A default, parameterless constructor for the `GesturePath` variant
+   *                         specified for the `PathType` generic parameter.
    */
   constructor(
     identifier: number,
     recognizerConfig: Nonoptional<GestureRecognizerConfiguration<HoveredItemType, StateToken>>
       | Nonoptional<GestureRecognizerConfiguration<HoveredItemType, StateToken>>[],
-    isFromTouch: boolean
+    isFromTouch: boolean,
+    // Sadly, `typeof PathType` isn't TS-legal.  This is the best way forward as a result.
+    pathConstructor?: typeof GesturePath
   ) {
     this.rawIdentifier = identifier;
     this.isFromTouch = isFromTouch;
-    this._path = new GesturePath();
+    this._path = (pathConstructor ? new pathConstructor() : new GesturePath()) as PathType;
 
     this.recognizerConfigStack = Array.isArray(recognizerConfig) ? recognizerConfig : [recognizerConfig];
-  }
-
-  /**
-   * Deserializes a GestureSource instance from its serialized-JSON form.
-   * @param jsonObj  The JSON representation to deserialize.
-   * @param identifier The unique identifier to assign to this instance.
-   */
-  public static deserialize(jsonObj: SerializedGestureSource, identifier: number) {
-    const id = identifier !== undefined ? identifier : this._jsonIdSeed++;
-    const isFromTouch = jsonObj.isFromTouch;
-    const path = GesturePath.deserialize(jsonObj.path);
-
-    const instance = new GestureSource(id, null, isFromTouch);
-    instance._path = path;
-    return instance;
   }
 
   public update(sample: InputSample<HoveredItemType, StateToken>) {
@@ -179,7 +165,7 @@ export class GestureSource<HoveredItemType, StateToken=any> {
     startAtEnd: boolean,
     preserveBaseItem: boolean,
     stateTokenOverride?: StateToken
-  ): GestureSourceSubview<HoveredItemType, StateToken> {
+  ): GestureSourceSubview<HoveredItemType, StateToken, PathType> {
     return new GestureSourceSubview(this, this.recognizerConfigStack, startAtEnd, preserveBaseItem, stateTokenOverride);
   }
 
@@ -229,26 +215,13 @@ export class GestureSource<HoveredItemType, StateToken=any> {
   public get currentRecognizerConfig() {
     return this.recognizerConfigStack[this.recognizerConfigStack.length-1];
   }
-
-  /**
-   * Creates a serialization-friendly version of this instance for use by
-   * `JSON.stringify`.
-   */
-  /* c8 ignore start */
-  toJSON(): SerializedGestureSource {
-    let jsonClone: SerializedGestureSource = {
-      isFromTouch: this.isFromTouch,
-      path: this.path.toJSON()
-    }
-
-    return jsonClone;
-    /* c8 ignore stop */
-    /* c8 ignore next 2 */
-    // esbuild or tsc seems to mangle the 'ignore stop' if put outside the ending brace.
-  }
 }
 
-export class GestureSourceSubview<HoveredItemType, StateToken = any> extends GestureSource<HoveredItemType, StateToken> {
+export class GestureSourceSubview<
+  HoveredItemType,
+  StateToken = any,
+  PathType extends GesturePath<HoveredItemType, StateToken> = GesturePath<HoveredItemType, StateToken>
+> extends GestureSource<HoveredItemType, StateToken, PathType> {
   private _baseSource: GestureSource<HoveredItemType, StateToken>
   private _baseStartIndex: number;
   private subviewDisconnector: () => void;
@@ -282,7 +255,7 @@ export class GestureSourceSubview<HoveredItemType, StateToken = any> extends Ges
     // entries, this gets tricky; race conditions are possible in which an extra input event
     // occurs before subviews can be spun up when starting a model-matcher in some scenarios.
 
-    super(source.rawIdentifier, configStack, source.isFromTouch);
+    super(source.rawIdentifier, configStack, source.isFromTouch, Object.getPrototypeOf(source.path).constructor);
 
     const baseSource = this._baseSource = source instanceof GestureSourceSubview ? source._baseSource : source;
     this.stateToken = stateTokenOverride ?? source.stateToken;
@@ -319,10 +292,6 @@ export class GestureSourceSubview<HoveredItemType, StateToken = any> extends Ges
       return transformedSample;
     }
 
-    // Note: we don't particularly need subviews to track the actual coords aside from
-    // tracking related stats data.  But... we don't have an "off-switch" for that yet.
-    let subpath: GesturePath<HoveredItemType, StateToken>;
-
     // Will hold the last sample _even if_ we don't save every coord that comes through.
     const lastSample = source.path.stats.lastSample;
 
@@ -335,15 +304,21 @@ export class GestureSourceSubview<HoveredItemType, StateToken = any> extends Ges
       this._baseStartIndex = start;
     }
 
-    subpath = new GesturePath<HoveredItemType, StateToken>();
-    for(let i=0; i < length; i++) {
-      // IMPORTANT:  also acts as a deep-copy of the sample; edits to it do not propagate to other
-      // subviews or the original `baseSource`.  Needed for multitaps that trigger system
-      // `stateToken` changes.
-      subpath.extend(translateSample(baseSource.path.coords[start + i]));
+    // For consistent handling both in and out of 'debugMode' - stats should be built solely
+    // based on existing stats.  Could try to add an assertion that the stats reasonably match
+    // when in debug mode, though.
+    if(startAtEnd) {
+      // The easy case:  we don't need to do any fancy stats-object manipulation.
+      if(source.path.stats.sampleCount) {
+        // Use the existing, empty one built by the .super() call and start anew.
+        // Do not pre-translate... for consistency with the translate call below.
+        this._path.extend(source.path.stats.lastSample);
+      }
+    } else {
+      // Inherit the path.
+      this._path = source.path.clone() as PathType;
     }
-
-    this._path = subpath;
+    this._path.translateCoordSystem(translateSample);
 
     if(preserveBaseItem) {
       // IMPORTANT:  inherits the _subview's_ base item, not the baseSource's version thereof.
