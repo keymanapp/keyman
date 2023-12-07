@@ -11,6 +11,6 @@ KMX_DWORD create_DKTable(v_dw_2D & dk_ComposeTable);
 KMX_DWORD find_dkCharacter(v_dw_2D * dk_ComposeTable, KMX_DWORD first, KMX_DWORD second );
 
 void find_all_dk_combinations(v_dw_2D * dk_ComposeTable, v_dw_2D & dk_CombinationTable, KMX_DWORD dk);
-KMX_DWORD KMX_getKeyname(KMX_DWORD KVal, KMX_DWORD &shift, GdkKeymap* keymap) ;
+KMX_DWORD KMX_changeKeynameToCapital(KMX_DWORD KVal, KMX_DWORD &shift, GdkKeymap* keymap) ;
 
 # endif /*DEADKEY_H*/

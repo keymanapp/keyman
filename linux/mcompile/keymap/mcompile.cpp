@@ -601,7 +601,7 @@ KMX_DWORD KMX_CharFromVK(v_dw_3D &All_Vector,KMX_DWORD vkUnderlying, KMX_UINT VK
 KMX_WCHAR  KMX_CharFromSC(GdkKeymap *keymap, KMX_UINT VKShiftState, UINT SC_OTHER, KMX_WCHAR* DeadKey) {
 
   int VKShiftState_lin = map_VKShiftState_to_Lin(VKShiftState);
-  KMX_DWORD KeyvalOther = getKeyvalsFromKeyCode(keymap,SC_OTHER, VKShiftState_lin);
+  KMX_DWORD KeyvalOther = getKeyvalsOtherFromKeyCode(keymap,SC_OTHER, VKShiftState_lin);
 
   // _S2  how to detect deadkeys ?  KeyvalOther >deadkeyThreshold   KeyvalOther > 255?  KeyvalOther > 65000 ?  or what else?
   //if (KeyvalOther > deadkeyThreshold) {
@@ -661,7 +661,7 @@ int KMX_GetDeadkeys(v_dw_2D & dk_Table, KMX_WORD DeadKey, KMX_WORD *OutputPairs,
   find_all_dk_combinations(&dk_Table, dk_CombinationTable, DeadKey);
 
   for ( int i=0; i< dk_CombinationTable.size()-1;i++) {
-    KMX_WORD vk = KMX_getKeyname(dk_CombinationTable[i][1], shift_S2, keymap);
+    KMX_WORD vk = KMX_changeKeynameToCapital(dk_CombinationTable[i][1], shift_S2, keymap);
     if(vk != 0) {
           *p++ = vk;
           *p++ = shift_S2;

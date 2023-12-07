@@ -34,7 +34,7 @@ void find_all_dk_combinations(v_dw_2D * p_dk_ComposeTable, v_dw_2D  &dk_Combinat
 	}
 }
 
-KMX_DWORD KMX_getKeyname(KMX_DWORD KVal, KMX_DWORD &shift, GdkKeymap* keymap) {
+KMX_DWORD KMX_changeKeynameToCapital(KMX_DWORD KVal, KMX_DWORD &shift, GdkKeymap* keymap) {
 
   guint Keyval = (guint) KVal;
   GdkKeymapKey* keys;
