@@ -236,7 +236,7 @@ export class PageContextAttachment extends EventEmitter<EventMap> {
     if(x instanceof x.ownerDocument.defaultView.HTMLTextAreaElement) {
       return true;
     } else if(x instanceof x.ownerDocument.defaultView.HTMLInputElement) {
-      if (x.type == 'text' || x.type == 'search') {
+      if (x.type == 'email' || x.type == 'search' || x.type == 'text' || x.type == 'url') {
         return true;
       }
     } else if(x instanceof x.ownerDocument.defaultView.HTMLIFrameElement) {
