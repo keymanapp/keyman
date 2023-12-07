@@ -1,4 +1,4 @@
-import { LDMLKeyboardXMLSourceFileReader, LDMLKeyboard, KMXPlus, CompilerCallbacks, LDMLKeyboardTestDataXMLSourceFile, UnicodeSetParser } from '@keymanapp/common-types';
+import { LDMLKeyboardXMLSourceFileReader, LDMLKeyboard, KMXPlus, CompilerCallbacks, LDMLKeyboardTestDataXMLSourceFile, UnicodeSetParser, KeymanCompiler, KeymanCompilerResult, KeymanCompilerArtifacts, defaultCompilerOptions, KMXBuilder, KvkFileWriter, KeymanCompilerArtifactOptional } from '@keymanapp/common-types';
 import { LdmlCompilerOptions } from './ldml-compiler-options.js';
 import { CompilerMessages } from './messages.js';
 import { BkspCompiler, TranCompiler } from './tran.js';
@@ -16,6 +16,9 @@ import KMXPlusFile = KMXPlus.KMXPlusFile;
 import DependencySections = KMXPlus.DependencySections;
 import { SectionIdent, constants } from '@keymanapp/ldml-keyboard-constants';
 import { KmnCompiler } from '@keymanapp/kmc-kmn';
+import { KMXPlusMetadataCompiler } from './metadata-compiler.js';
+import { LdmlKeyboardVisualKeyboardCompiler } from './visual-keyboard-compiler.js';
+import { LdmlKeyboardKeymanWebCompiler } from './keymanweb-compiler.js';
 
 export const SECTION_COMPILERS = [
   // These are in dependency order.
@@ -37,18 +40,93 @@ export const SECTION_COMPILERS = [
   TranCompiler,
 ];
 
-export class LdmlKeyboardCompiler {
-  private readonly callbacks: CompilerCallbacks;
-  private readonly options: LdmlCompilerOptions;
+export interface LdmlKeyboardCompilerArtifacts extends KeymanCompilerArtifacts {
+  kmx?: KeymanCompilerArtifactOptional;
+  kvk?: KeymanCompilerArtifactOptional;
+  js?: KeymanCompilerArtifactOptional;
+};
+
+export interface LdmlKeyboardCompilerResult extends KeymanCompilerResult {
+  artifacts: LdmlKeyboardCompilerArtifacts;
+};
+
+export class LdmlKeyboardCompiler implements KeymanCompiler {
+  private callbacks: CompilerCallbacks;
+  private options: LdmlCompilerOptions;
 
   // uset parser
   private usetparser?: UnicodeSetParser = undefined;
 
-  constructor (callbacks: CompilerCallbacks, options: LdmlCompilerOptions) {
-    this.options = {
-      ...options
-    };
+  async init(callbacks: CompilerCallbacks, options: LdmlCompilerOptions): Promise<boolean> {
+    this.options = {...options};
     this.callbacks = callbacks;
+    return true;
+  }
+
+  async run(inputFilename: string, outputFilename?: string): Promise<LdmlKeyboardCompilerResult> {
+
+    let compilerOptions: LdmlCompilerOptions = {
+      ...defaultCompilerOptions,
+      ...this.options,
+    };
+
+    let source = this.load(inputFilename);
+    if (!source) {
+      return null;
+    }
+    let kmx = await this.compile(source);
+    if (!kmx) {
+      return null;
+    }
+
+    // In order for the KMX file to be loaded by non-KMXPlus components, it is helpful
+    // to duplicate some of the metadata
+    KMXPlusMetadataCompiler.addKmxMetadata(kmx.kmxplus, kmx.keyboard, compilerOptions);
+
+    // Use the builder to generate the binary output file
+    const builder = new KMXBuilder(kmx, compilerOptions.saveDebug);
+    const kmx_binary = builder.compile();
+
+    const vkcompiler = new LdmlKeyboardVisualKeyboardCompiler(this.callbacks);
+    const vk = vkcompiler.compile(source);
+    const writer = new KvkFileWriter();
+    const kvk_binary = writer.write(vk);
+
+    // Note: we could have a step of generating source files here
+    // KvksFileWriter()...
+    // const tlcompiler = new kmc.TouchLayoutCompiler();
+    // const tl = tlcompiler.compile(source);
+    // const tlwriter = new TouchLayoutFileWriter();
+    const kmwcompiler = new LdmlKeyboardKeymanWebCompiler(this.callbacks, compilerOptions);
+    const kmw_string = kmwcompiler.compile(inputFilename, source);
+    const encoder = new TextEncoder();
+    const kmw_binary = encoder.encode(kmw_string);
+
+    outputFilename = outputFilename ?? inputFilename.replace(/\.xml$/, '.kmx');
+
+    return {
+      artifacts: {
+        kmx: { data: kmx_binary, filename: outputFilename },
+        kvk: { data: kvk_binary, filename: outputFilename.replace(/\.kmx$/, '.kvk') },
+        js: { data: kmw_binary, filename: outputFilename.replace(/\.kmx$/, '.js') },
+      }
+    };
+  }
+
+  async write(artifacts: LdmlKeyboardCompilerArtifacts): Promise<boolean> {
+    if(artifacts.kmx) {
+      this.callbacks.fs.writeFileSync(artifacts.kmx.filename, artifacts.kmx.data);
+    }
+
+    if(artifacts.kvk) {
+      this.callbacks.fs.writeFileSync(artifacts.kvk.filename, artifacts.kvk.data);
+    }
+
+    if(artifacts.js) {
+      this.callbacks.fs.writeFileSync(artifacts.js.filename, artifacts.js.data);
+    }
+
+    return true;
   }
 
   /**

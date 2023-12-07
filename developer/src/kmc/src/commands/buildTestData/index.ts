@@ -5,7 +5,7 @@ import { CompilerBaseOptions, CompilerCallbacks, defaultCompilerOptions, LDMLKey
 import { NodeCompilerCallbacks } from '../../util/NodeCompilerCallbacks.js';
 import { fileURLToPath } from 'url';
 
-export function buildTestData(infile: string, _options: any, commander: any) {
+export async function buildTestData(infile: string, _options: any, commander: any) {
   const options: CompilerBaseOptions = commander.optsWithGlobals();
 
   let compilerOptions: kmcLdml.LdmlCompilerOptions = {
@@ -18,7 +18,7 @@ export function buildTestData(infile: string, _options: any, commander: any) {
     }
   };
 
-  let testData = loadTestData(infile, compilerOptions);
+  let testData = await loadTestData(infile, compilerOptions);
   if (!testData) {
     return;
   }
@@ -31,12 +31,11 @@ export function buildTestData(infile: string, _options: any, commander: any) {
   fs.writeFileSync(outFileJson, JSON.stringify(testData, null, '  '));
 }
 
-function loadTestData(inputFilename: string, options: kmcLdml.LdmlCompilerOptions): LDMLKeyboardTestDataXMLSourceFile {
+async function loadTestData(inputFilename: string, options: kmcLdml.LdmlCompilerOptions): Promise<LDMLKeyboardTestDataXMLSourceFile> {
   const callbacks: CompilerCallbacks = new NodeCompilerCallbacks(options);
-  const k = new kmcLdml.LdmlKeyboardCompiler(callbacks, options);
-  let source = k.loadTestData(inputFilename);
-  if (!source) {
+  const k = new kmcLdml.LdmlKeyboardCompiler();
+  if(!await k.init(callbacks, options)) {
     return null;
   }
-  return source;
+  return await k.loadTestData(inputFilename);
 }
