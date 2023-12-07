@@ -37,11 +37,11 @@
     <IncludePath>$(ProjectDir)..\..\..\..\..\..\common\include;$(ProjectDir)..\..\..\..\..\..\core\include;$(ProjectDir)..\..\..\..\..\..\core\build\x86\$(Configuration)\include;$(ProjectDir)..\..\..\..\global\inc;$(ProjectDir)..\..;$(IncludePath)</IncludePath>
     <OutDir>$(ProjectDir)bin\$(Platform)\$(Configuration)\</OutDir>
     <IntDir>$(ProjectDir)obj\$(Platform)\$(Configuration)\</IntDir>
-    <LibraryPath>$(ProjectDir)..\..\..\..\..\..\core\build\x86\$(Configuration)\src;$(ProjectDir)..\..\..\..\..\..\core\build\rust\x86\$(Configuration);$(ProjectDir)..\..\..\kmtip\bin\Win32\$(Configuration);$(LibraryPath)</LibraryPath>
+    <LibraryPath>$(ProjectDir)..\..\..\..\..\..\core\build\x86\$(Configuration)\src;$(ProjectDir)..\..\..\..\kmtip\bin\Win32\$(Configuration);$(LibraryPath)</LibraryPath>
     <Microsoft-googletest-v140-windesktop-msvcstl-static-rt-static-Disable-gtest_main>true</Microsoft-googletest-v140-windesktop-msvcstl-static-rt-static-Disable-gtest_main>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <IncludePath>$(ProjectDir)..\..\..\..\global\inc;$(ProjectDir)..\..;$(IncludePath)</IncludePath>
+    <IncludePath>$(ProjectDir)..\..\..\..\..\..\common\include;$(ProjectDir)..\..\..\..\..\..\core\include;$(ProjectDir)..\..\..\..\..\..\core\build\x86\$(Configuration)\include;$(ProjectDir)..\..\..\..\global\inc;$(ProjectDir)..\..;$(IncludePath)</IncludePath>
     <OutDir>$(ProjectDir)bin\$(Platform)\$(Configuration)\</OutDir>
     <IntDir>$(ProjectDir)obj\$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
