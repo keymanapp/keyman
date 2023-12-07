@@ -59,7 +59,7 @@ export class LdmlKeyboardCompiler {
     if (this.usetparser === undefined) {
       // initialize
       const compiler = new KmnCompiler();
-      const ok = await compiler.init(this.callbacks);
+      const ok = await compiler.init(this.callbacks, null);
       if (ok) {
         this.usetparser = compiler;
       } else {
