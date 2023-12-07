@@ -80,6 +80,10 @@ export class GesturePath<Type, StateToken = any> extends EventEmitter<EventMap<T
     this._stats = this._stats.translateCoordSystem(functor);
   }
 
+  public replaceInitialSample(sample: InputSample<Type, StateToken>) {
+    this._stats = this._stats.replaceInitialSample(sample);
+  }
+
   /**
    * Extends the path with a newly-observed coordinate.
    * @param sample

@@ -222,6 +222,60 @@ export class CumulativePathStats<Type = any> {
     return result;
   }
 
+  public replaceInitialSample(sample: InputSample<Type>): CumulativePathStats<Type> {
+    let result = new CumulativePathStats(this);
+
+    return this._replaceInitialSample(result, sample);
+  }
+
+  protected _replaceInitialSample(result: CumulativePathStats<Type>, sample: InputSample<Type>) {
+    // if stats length == 0 or length == 1, is ezpz.  Could 'shortcut' things here.
+    if(this.sampleCount == 0) {
+      // Note:  if this error actually causes problems, 'silently failing' the call
+      // by insta-returning should be "fine" as far as actual gesture processing goes.
+      throw new Error("no sample available to replace");
+      // return;
+    }
+
+    // Re: the block above... obviously, don't replace if there IS no initial sample yet.
+    // It'll happen soon enough anyway.
+    const originalSample = result.initialSample;
+
+    if(this.sampleCount > 1) {
+      // Works fine re: cata-cancellation - `this.baseSample.___` cancels out.
+      const xDelta = sample.targetX - originalSample.targetX;
+      const yDelta = sample.targetY - originalSample.targetY;
+      const tDelta = sample.t       - originalSample.t;
+
+      result.rawLinearSums.x += xDelta;
+      result.rawLinearSums.y += yDelta;
+      result.rawLinearSums.t += tDelta;
+
+      /*
+       * `rawDistance` tracking.  Note:  this is kind of an approximation, as
+       * we aren't getting the true distance between the new first and the original
+       * second point.  But... it should be "good enough".
+       *
+       * If need be, we could always track "second sample" to be more precise about things
+       * here, though that would add a bit more logic overhead at low sample counts.
+       * (Note the logic interactions inherent in firstSample, secondSample, and lastSample.)
+       *
+       * This concern should be a low-priority detail for now - at the time of writing,
+       * rawDistance is currently only used by KeymanWeb for longpress up-flick thresholding,
+       * and that codepath doesn't do path-start rewriting.
+       */
+      const coordArcDeltaSq = xDelta * xDelta + yDelta * yDelta;
+      const coordArcDelta = Math.sqrt(coordArcDeltaSq);
+
+      result.coordArcSum     += coordArcDelta;
+    } else {
+      this._lastSample = sample;
+    }
+
+    // Do NOT change sampleCount; we're replacing the original.
+    return result;
+  }
+
   public get lastSample() {
     return this._lastSample;
   }

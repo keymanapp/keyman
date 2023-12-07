@@ -1,8 +1,11 @@
+import { CumulativePathStats } from "../../cumulativePathStats.js";
 import { InputSample } from "../../inputSample.js";
 import { PathModel } from "./pathModel.js";
 
 // pop - a signal to reverse actions taken in response to the most-recent 'push'.  (Generally, for 'modipress' gestures)
 type SimpleStringResult = 'resolve' | 'reject';
+
+export type SampleCoordReplacement<Type> = Pick<InputSample<Type>, 'clientX' | 'clientY'> & Partial<Pick<InputSample<Type>, 't'>>;
 
 export type PointModelResolution = SimpleStringResult;
 
@@ -59,6 +62,26 @@ export interface ContactModel<Type, StateToken = any> {
    * If not specified, 'chop' inheritance will be used as the default.
    */
   pathInheritance?: 'reject' | 'chop' | 'partial' | 'full';
+
+  /**
+   * An optional method that, when specified, may be used to overwrite the model's perceived
+   * initial coordinate for stat-tracking.  Only utilized if there is any pre-existing path
+   * to inherit.
+   *
+   * @param inheritedStats Full stats for any inherited portions of the path.  Note that
+   * `.initialSample` is the coordinate to be replaced.
+   *
+   * @param baseItem       The base item as determined by the `pathInheritance` setting.
+   *
+   * @returns              The input sample to use as the stat-tracking base coordinate.
+   * Non-coordinate properties will be replaced and maintained internally after the call
+   * is complete.
+   *
+   * If `t` is left unspecified, the original coord's timestamp will be maintained.
+   *
+   * If the return value is `null` or `undefined`, the original `.initialSample` will be preserved.
+   */
+  baseCoordReplacer?: (inheritedStats: CumulativePathStats<Type>, baseItem: Type) => SampleCoordReplacement<Type>;
 
   /**
    * Used to either instantly resolve or reject this component of a gesture based on

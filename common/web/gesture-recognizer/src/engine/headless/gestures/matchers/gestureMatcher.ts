@@ -5,6 +5,8 @@ import { GestureModel, GestureResolution, GestureResolutionSpec, RejectionDefaul
 import { ManagedPromise, TimeoutPromise } from "@keymanapp/web-utils";
 import { FulfillmentCause, PathMatcher } from "./pathMatcher.js";
 import { CumulativePathStats } from "../../cumulativePathStats.js";
+import { SampleCoordReplacement } from "../specs/contactModel.js";
+import { processSampleClientCoords } from "../../../inputEventEngine.js";
 
 /**
  * This interface specifies the minimal data necessary for setting up gesture-selection
@@ -410,6 +412,29 @@ export class GestureMatcher<Type, StateToken = any> implements PredecessorMatch<
       // There's no need to refer to some previously-existing source for comparison.
       baseItem = this.primaryPath.baseItem;
       ancestorSource = this.primaryPath;
+    }
+
+
+    if(contactSpec.model.baseCoordReplacer) {
+      const originalStats = simpleSource.path.stats;
+      const replacementSampleBase = contactSpec.model.baseCoordReplacer(originalStats, baseItem);
+
+      if(replacementSampleBase) {
+        // 1. Complete the sample
+        const replacementSample = {
+          ...processSampleClientCoords(
+            simpleSource.currentRecognizerConfig,
+            replacementSampleBase.clientX,
+            replacementSampleBase.clientY
+          ),
+          t: (replacementSampleBase.t || replacementSampleBase.t === 0) ? replacementSampleBase.t : originalStats.initialSample.t,
+          item: baseItem,
+          stateToken: simpleSource.stateToken
+        };
+
+        // 2. Replace it within the source's path-stats.
+        simpleSource.path.stats.replaceInitialSample(replacementSample);
+      }
     }
 
     if(contactSpec.model.allowsInitialState) {
