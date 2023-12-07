@@ -56,11 +56,10 @@ void KMX_TranslateDeadkeyGroup(LPKMX_GROUP group,KMX_WCHAR deadkey, KMX_WORD vk,
 void KMX_TranslateDeadkeyKey(LPKMX_KEY key, KMX_WCHAR deadkey, KMX_WORD vk, UINT shift, KMX_WORD ch);
 
 int KMX_GetDeadkeys(v_dw_2D & dk_ComposeTable, KMX_WORD DeadKey, KMX_WORD *OutputPairs, GdkKeymap* keymap);
-int KMX_GetDeadkeys(v_dw_2D & dk_Table, KMX_WORD DeadKey, KMX_WORD *OutputPairs, KMX_WORD sc);
+//int KMX_GetDeadkeys(v_dw_2D & dk_Table, KMX_WORD DeadKey, KMX_WORD *OutputPairs, KMX_WORD sc);
 void KMX_AddDeadkeyRule(LPKMX_KEYBOARD kbd, KMX_WCHAR deadkey, KMX_WORD vk, UINT shift);
 
 
-KMX_WORD KMX_VKUSToVKUnderlyingLayout_S2(KMX_WORD VKey);
 KMX_UINT  KMX_VKUSToSCUnderlyingLayout(KMX_DWORD VirtualKeyUS);
 KMX_WCHAR  KMX_CharFromSC(GdkKeymap *keymap, KMX_UINT VKShiftState, UINT SC_OTHER, KMX_WCHAR* DeadKey);
 
@@ -420,6 +419,7 @@ void KMX_ConvertDeadkey(LPKMX_KEYBOARD kbd, KMX_WORD vk, UINT shift, KMX_WCHAR d
 
   while(*pdk) {
     // Look up the ch
+    // go via SC
     UINT vkUnderlying = KMX_VKUnderlyingLayoutToVKUS(All_Vector, *pdk);
     KMX_TranslateDeadkeyKeyboard(kbd, dkid, vkUnderlying, *(pdk+1), *(pdk+2));
     pdk+=3;
@@ -481,7 +481,7 @@ KMX_BOOL KMX_DoConvert(LPKMX_KEYBOARD kbd, PKMX_WCHAR kbid, KMX_BOOL bDeadkeyCon
     // Loop through each possible key on the keyboard
     for (int i = 0;KMX_VKMap[i]; i++) { // I4651
 
-      // win goes via VK, Lin goes vie SC
+      // win goes via VK, Lin goes via SC
       /*KMX_DWORD vkUnderlying = KMX_VKUSToVKUnderlyingLayout(All_Vector,(int) KMX_VKMap[i] );
       KMX_WCHAR ch = KMX_CharFromVK(All_Vector,vkUnderlying, VKShiftState[j], &DeadKey);*/
 
@@ -601,7 +601,7 @@ KMX_DWORD KMX_CharFromVK(v_dw_3D &All_Vector,KMX_DWORD vkUnderlying, KMX_UINT VK
 KMX_WCHAR  KMX_CharFromSC(GdkKeymap *keymap, KMX_UINT VKShiftState, UINT SC_OTHER, KMX_WCHAR* DeadKey) {
 
   int VKShiftState_lin = map_VKShiftState_to_Lin(VKShiftState);
-  KMX_DWORD KeyvalOther = getKeyvalsOtherFromKeyCode(keymap,SC_OTHER, VKShiftState_lin);
+  KMX_DWORD KeyvalOther = getKeyvalsFromKeyCode(keymap,SC_OTHER, VKShiftState_lin);
 
   // _S2  how to detect deadkeys ?  KeyvalOther >deadkeyThreshold   KeyvalOther > 255?  KeyvalOther > 65000 ?  or what else?
   //if (KeyvalOther > deadkeyThreshold) {
@@ -610,7 +610,6 @@ KMX_WCHAR  KMX_CharFromSC(GdkKeymap *keymap, KMX_UINT VKShiftState, UINT SC_OTHE
     *DeadKey = convertNamesToIntegerValue( wstring_from_string(ws));
     return 0xFFFF;
   }
-
   return (KMX_WCHAR) KeyvalOther;
 }
 

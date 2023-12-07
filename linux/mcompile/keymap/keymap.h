@@ -506,7 +506,7 @@ int append_other_ToVector(v_dw_3D &All_Vector, GdkKeymap *keymap);
 bool InitializeGDK(GdkKeymap **keymap,int argc, gchar *argv[]);
 
 // find Keyvals to fill into 2D-Vector of Other Language
-KMX_DWORD getKeyvalsOtherFromKeyCode(GdkKeymap *keymap, guint keycode, int shift_state_pos);
+KMX_DWORD getKeyvalsFromKeyCode(GdkKeymap *keymap, guint keycode, int shift_state_pos);
 
 // returns KeySyms fo ra given key (for unshifted: finds the Keysym according to Shiftstate e.g. a;A or 1;! )
 std::wstring get_KeyVals_according_to_keycode_and_Shiftstate_new(GdkKeymap *keymap, guint VK, ShiftState ss, int caps);
