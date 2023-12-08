@@ -76,6 +76,7 @@
     <xsl:param name="file_description" />
     <xsl:param name="file_has_details" />
     <xsl:param name="file_has_no_options" />
+    <xsl:param name="file_relative_path" />
 
     <span tabindex="1" class="file" onmousedown="javascript:this.focus();">
       <xsl:attribute name="id">file<xsl:value-of select="ID"/></xsl:attribute>
@@ -103,7 +104,10 @@
       <div class="filename">
         <a tabindex="-1">
           <xsl:attribute name="href">keyman:editfile?id=<xsl:value-of select="ID"/></xsl:attribute>
-          <xsl:value-of select="Filename" />
+          <xsl:choose>
+            <xsl:when test="$file_relative_path = 'true'"><xsl:value-of select="Filepath" /></xsl:when>
+            <xsl:otherwise><xsl:value-of select="Filename" /></xsl:otherwise>
+          </xsl:choose>
         </a>
       </div>
       <div class="filedescription"><xsl:value-of select="$file_description"/></div>

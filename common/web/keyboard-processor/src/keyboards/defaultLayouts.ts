@@ -535,6 +535,15 @@ export class Layouts {
     nextlayer: 'caps'
   }
 
+  static dfltShiftRotaDefault: LayoutSubKey = {
+    // Needs to be something special and unique.  Typing restricts us from
+    // using a reserved key-id prefix, though.
+    id: "T_*_MT_SHIFT_ROTA_TO_DEFAULT",
+    text: '*Shift*',
+    sp: 1,
+    nextlayer: 'default'
+  }
+
   // Defines the default visual layout for a keyboard.
   /* c8 ignore start */
   static dfltLayout: LayoutSpec = {

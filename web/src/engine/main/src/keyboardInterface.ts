@@ -88,15 +88,21 @@ export default class KeyboardInterface<ContextManagerType extends ContextManager
     //
     // The mobile apps typically have fully-preconfigured paths, but Developer's
     // test-host page does not.
-    const pathConfig = this.engine.config.paths;
-    const stub = new KeyboardStub(Pstub, pathConfig.keyboards, pathConfig.fonts);
-    if(this.engine.keyboardRequisitioner?.cache.findMatchingStub(stub)) {
-      return 1;
-    }
+
+    const buildStub = () => {
+      const pathConfig = this.engine.config.paths;
+      return new KeyboardStub(Pstub, pathConfig.keyboards, pathConfig.fonts);
+    };
 
     if(!this.engine.config.deferForInitialization.isResolved) {
-      this.engine.config.deferForInitialization.then(() => this.engine.keyboardRequisitioner.cache.addStub(stub));
+      // pathConfig is not ready until KMW initializes, which prevents proper stub-building.
+      this.engine.config.deferForInitialization.then(() => this.engine.keyboardRequisitioner.cache.addStub(buildStub()));
     } else {
+      const stub = buildStub();
+
+      if(this.engine.keyboardRequisitioner?.cache.findMatchingStub(stub)) {
+        return 1;
+      }
       this.engine.keyboardRequisitioner.cache.addStub(stub);
     }
 

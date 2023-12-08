@@ -128,8 +128,10 @@ export default class LanguageProcessor extends EventEmitter<LanguageProcessorEve
 
     return this.lmEngine.loadModel(source, specType).then((config: Configuration) => {
       this.configuration = config;
-      this._state = 'configured';
-      this.emit('statechange', 'configured');
+      if(this.mayPredict) {
+        this._state = 'configured';
+        this.emit('statechange', 'configured');
+      }
     }).catch((error) => {
       // Does this provide enough logging information?
       let message: string;

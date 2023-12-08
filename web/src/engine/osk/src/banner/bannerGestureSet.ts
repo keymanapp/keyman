@@ -10,7 +10,7 @@ import { BannerSuggestion } from './suggestionBanner.js';
 import { simpleTapModelWithReset } from "../input/gestures/specsForLayout.js";
 
 export const BannerSimpleTap: gestures.specs.GestureModel<BannerSuggestion> = {
-  ...deepCopy(simpleTapModelWithReset()),
+  ...deepCopy(simpleTapModelWithReset(null)),
   resolutionAction: {
     type: 'complete',
     item: 'current'

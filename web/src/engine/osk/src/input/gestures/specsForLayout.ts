@@ -87,7 +87,14 @@ export interface GestureParams<Item = any> {
      * The minimum _net_ touch-path distance after which the direction will be locked.
      */
     dirLockDist: number
-  }
+  },
+  /**
+   * Indicates whether roaming-touch oriented behaviors should be enabled.
+   *
+   * Note that run-time adjustments to this property after initialization will
+   * not take affect, unlike the other properties of the overall parameter object.
+   */
+  roamingEnabled?: boolean;
 }
 
 export const DEFAULT_GESTURE_PARAMS: GestureParams = {
@@ -153,6 +160,9 @@ let dummy2: LayoutGestureSupportFlags = dummy;
  * @param params      A set of tweakable gesture parameters.  It will be closure-captured
  *                    and referred to by reference; changes to its values will take
  *                    immediate effect during gesture processing.
+ *
+ *                    If params.roamingEnabled is unset, it will be initialized by this
+ *                    method based upon layout properties.
  * @returns
  */
 export function gestureSetForLayout(flags: LayoutGestureSupportFlags, params: GestureParams): GestureModelDefs<KeyElement, string> {
@@ -185,9 +195,11 @@ export function gestureSetForLayout(flags: LayoutGestureSupportFlags, params: Ge
     }
   };
 
-  const _initialTapModel: GestureModel<KeyElement> = deepCopy(flags.hasFlicks ? initialTapModel(params) : initialTapModelWithReset(params));
-  const _simpleTapModel: GestureModel<KeyElement> = deepCopy(flags.hasFlicks ? simpleTapModel() : simpleTapModelWithReset());
-  const longpressModel: GestureModel<KeyElement> = deepCopy(longpressModelWithShortcut(params, true, !flags.hasFlicks));
+  const doRoaming = params.roamingEnabled ||= !flags.hasFlicks;
+
+  const _initialTapModel: GestureModel<KeyElement> = deepCopy(!doRoaming ? initialTapModel(params) : initialTapModelWithReset(params));
+  const _simpleTapModel: GestureModel<KeyElement> = deepCopy(!doRoaming ? simpleTapModel(params) : simpleTapModelWithReset(params));
+  const longpressModel: GestureModel<KeyElement> = deepCopy(longpressModelWithShortcut(params, true, doRoaming));
 
   // #region Functions for implementing and/or extending path initial-state checks
   function withKeySpecFiltering(model: GestureModel<KeyElement>, contactIndices: number | number[]) {
@@ -226,7 +238,7 @@ export function gestureSetForLayout(flags: LayoutGestureSupportFlags, params: Ge
     _initialTapModel,
     _simpleTapModel,
     withKeySpecFiltering(specialStartModel, 0),
-    specialKeyEndModel(),
+    specialKeyEndModel(params),
     subkeySelectModel(),
     withKeySpecFiltering(_modipressStartModel, 0),
     modipressHoldModel(params),
@@ -241,7 +253,7 @@ export function gestureSetForLayout(flags: LayoutGestureSupportFlags, params: Ge
     longpressModel.id, _initialTapModel.id, _modipressStartModel.id, specialStartModel.id
   ];
 
-  if(flags.hasFlicks) {
+  if(!doRoaming) {
     gestureModels.push(withKeySpecFiltering(flickStartModel(params), 0));
     gestureModels.push(flickMidModel(params));
     gestureModels.push(flickResetModel(params));
@@ -471,11 +483,17 @@ export function modipressContactEndModel(): ContactModel {
   };
 }
 
-export function simpleTapContactModel(): ContactModel {
+export function simpleTapContactModel(params: GestureParams, isNotInitial?: boolean): ContactModel {
+  // Snapshot at model construction; do not update if changed.
+  const roamingEnabled = params?.roamingEnabled ?? true; // ?? true - used by the banner.
+
   return {
     itemPriority: 0,
-    itemChangeAction: 'reject',
+    itemChangeAction: roamingEnabled ? 'reject' : undefined,
     pathResolutionAction: 'resolve',
+    // if roaming, a tap reset should set the base key.
+    // if not, block path resets.
+    pathInheritance: (!roamingEnabled && isNotInitial) ? 'full' : 'chop',
     pathModel: {
       evaluate: (path) => {
         if(path.isComplete && !path.wasCancelled) {
@@ -531,14 +549,14 @@ export function specialKeyStartModel(): GestureModel<KeyElement> {
   };
 }
 
-export function specialKeyEndModel(): GestureModel<any> {
+export function specialKeyEndModel(params: GestureParams): GestureModel<any> {
   return {
     id: 'special-key-end',
     resolutionPriority: 0,
     contacts : [
       {
         model: {
-          ...simpleTapContactModel(),
+          ...simpleTapContactModel(params),
           itemChangeAction: 'resolve'
         },
         endOnResolve: true,
@@ -763,7 +781,7 @@ export function multitapEndModel(params: GestureParams): GestureModel<any> {
     contacts: [
       {
         model: {
-          ...simpleTapContactModel(),
+          ...simpleTapContactModel(params),
           itemPriority: 1,
           timer: {
             duration: params.multitap.holdLength,
@@ -797,7 +815,7 @@ export function initialTapModel(params: GestureParams): GestureModel<any> {
     contacts: [
       {
         model: {
-          ...simpleTapContactModel(),
+          ...simpleTapContactModel(params),
           pathInheritance: 'chop',
           itemPriority: 1,
           timer: {
@@ -821,20 +839,19 @@ export function initialTapModel(params: GestureParams): GestureModel<any> {
     resolutionAction: {
       type: 'chain',
       next: 'multitap-start',
-      item: 'current'
+      item: 'base'
     }
   }
 }
 
-export function simpleTapModel(): GestureModel<any> {
+export function simpleTapModel(params: GestureParams): GestureModel<any> {
   return {
     id: 'simple-tap',
     resolutionPriority: 1,
     contacts: [
       {
         model: {
-          ...simpleTapContactModel(),
-          pathInheritance: 'chop',
+          ...simpleTapContactModel(params, true),
           itemPriority: 1
         },
         endOnResolve: true
@@ -846,7 +863,7 @@ export function simpleTapModel(): GestureModel<any> {
     sustainWhenNested: true,
     resolutionAction: {
       type: 'complete',
-      item: 'current'
+      item: 'base'
     }
   };
 }
@@ -865,8 +882,8 @@ export function initialTapModelWithReset(params: GestureParams): GestureModel<an
   }
 }
 
-export function simpleTapModelWithReset(): GestureModel<any> {
-  const simpleModel = simpleTapModel();
+export function simpleTapModelWithReset(params: GestureParams): GestureModel<any> {
+  const simpleModel = simpleTapModel(params);
   return {
     ...simpleModel,
     rejectionActions: {
