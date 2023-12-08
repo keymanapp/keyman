@@ -76,10 +76,25 @@ export class GesturePath<Type, StateToken = any> extends EventEmitter<EventMap<T
     return this._wasCancelled;
   }
 
+  /**
+   * Builds a new instance with equal stats and with translated initialSample and
+   * lastSample coordinates.  Further accumulation will be based upon the new
+   * coordinate system as well.
+   * @param functor
+   */
   public translateCoordSystem(functor: (sample: InputSample<Type, StateToken>) => InputSample<Type, StateToken>) {
     this._stats = this._stats.translateCoordSystem(functor);
   }
 
+  /**
+   * Builds a new instance with its initial sample replaced and stats updated
+   * to reflect the alternate starting position.
+   *
+   * Note that `rawDistance` adjustments are an approximation, not exact.  To
+   * be precise, for stats representing two more more samples, the distance
+   * between the original and new initial samples is added as a flat amount.
+   * @param sample
+   */
   public replaceInitialSample(sample: InputSample<Type, StateToken>) {
     this._stats = this._stats.replaceInitialSample(sample);
   }

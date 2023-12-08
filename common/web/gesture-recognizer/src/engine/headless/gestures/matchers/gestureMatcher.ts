@@ -433,7 +433,7 @@ export class GestureMatcher<Type, StateToken = any> implements PredecessorMatch<
         };
 
         // 2. Replace it within the source's path-stats.
-        simpleSource.path.stats.replaceInitialSample(replacementSample);
+        simpleSource.path.replaceInitialSample(replacementSample);
       }
     }
 

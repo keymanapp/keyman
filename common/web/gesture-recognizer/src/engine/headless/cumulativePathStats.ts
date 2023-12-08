@@ -240,6 +240,7 @@ export class CumulativePathStats<Type = any> {
     // Re: the block above... obviously, don't replace if there IS no initial sample yet.
     // It'll happen soon enough anyway.
     const originalSample = result.initialSample;
+    result._initialSample = sample;
 
     if(this.sampleCount > 1) {
       // Works fine re: cata-cancellation - `this.baseSample.___` cancels out.
@@ -269,7 +270,7 @@ export class CumulativePathStats<Type = any> {
 
       result.coordArcSum     += coordArcDelta;
     } else {
-      this._lastSample = sample;
+      result._lastSample = sample;
     }
 
     // Do NOT change sampleCount; we're replacing the original.
