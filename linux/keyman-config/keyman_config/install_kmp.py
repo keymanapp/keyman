@@ -13,7 +13,7 @@ from keyman_config.canonical_language_code_utils import CanonicalLanguageCodeUti
 from keyman_config.convertico import checkandsaveico, extractico
 from keyman_config.custom_keyboards import CustomKeyboards
 from keyman_config.dbus_util import get_keyman_config_service
-from keyman_config.fcitx_util import is_fcitx_running, restart_fcitx
+from keyman_config.fcitx_util import is_fcitx_running
 from keyman_config.get_kmp import (InstallLocation, get_keyboard_data,
                                    get_keyboard_dir, get_keyman_doc_dir,
                                    get_keyman_font_dir)
@@ -258,9 +258,7 @@ class InstallKmp():
         if not language:
             language = self._add_custom_keyboard(firstKeyboard, packageDir, requested_language)
 
-        if is_fcitx_running():
-            restart_fcitx()
-        else:
+        if not is_fcitx_running():
             restart_ibus()
 
         if is_fcitx_running():

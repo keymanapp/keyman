@@ -12,6 +12,3 @@ def is_fcitx_running():
     except Exception:
         return False
 
-
-def restart_fcitx():
-    subprocess.run(['fcitx5', '-r', '-d'])
