@@ -22,8 +22,6 @@ interface
 uses
   System.Classes,
   System.SysUtils,
-  //System.UITypes,
-  //System.IOUtils,
   KeymanPaths,
   httpuploader,
   Keyman.System.UpdateCheckResponse,
@@ -34,12 +32,6 @@ type
 
   TRemoteUpdateCheckResult = (wucUnknown, wucSuccess, wucNoUpdates, wucFailure, wucOffline);
 
-  TRemoteUpdateCheckParams = record
-    Keyman: TOnlineUpdateCheckParamsKeyman;
-    Packages: array of TOnlineUpdateCheckParamsPackage;
-    Result: TRemoteUpdateCheckResult;
-  end;
-
   TRemoteUpdateCheckDownloadParams = record
     TotalSize: Integer;
     TotalDownloads: Integer;
@@ -49,7 +41,7 @@ type
   TRemoteUpdateCheck = class
   private
     FForce: Boolean;
-    FParams: TRemoteUpdateCheckParams;
+    FRemoteResult: TRemoteUpdateCheckResult;
 
     FErrorMessage: string;
 
@@ -57,11 +49,10 @@ type
     FDownload: TRemoteUpdateCheckDownloadParams;
     FCheckOnly: Boolean;
 
-    function DownloadUpdates: Boolean;
-    procedure DoDownloadUpdates(SavePath: string; var Result: Boolean);
+    function DownloadUpdates(Params: TUpdateCheckResponse) : Boolean;
+    procedure DoDownloadUpdates(SavePath: string; Params: TUpdateCheckResponse;  var Result: Boolean);
     function DoRun: TRemoteUpdateCheckResult;
   public
-    function ResponseToParams(const ucr: TUpdateCheckResponse): TRemoteUpdateCheckParams;
 
     constructor Create(AForce : Boolean; ACheckOnly: Boolean = False);
     destructor Destroy; override;
@@ -75,7 +66,6 @@ implementation
 
 uses
   System.WideStrUtils,
-  //Winapi.ShellApi,
   Winapi.Windows,
   Winapi.WinINet,
 
@@ -88,13 +78,8 @@ uses
   ErrorControlledRegistry,
   RegistryKeys,
   Upload_Settings,
-  //utildir,
-  //utilexecute,
+
   OnlineUpdateCheckMessages;
-  //utilkmshell,
- // utilsystem,
-  //utiluac,
-  //versioninfo;
 
 { TRemoteUpdateCheck }
 
@@ -103,7 +88,7 @@ begin
   inherited Create;
 
   FShowErrors := True;
-  FParams.Result := wucUnknown;
+  FRemoteResult := wucUnknown;
 
   FForce := AForce;
   FCheckOnly := ACheckOnly;
@@ -117,7 +102,7 @@ begin
     LogMessage(FErrorMessage);
 
   KL.Log('TRemoteUpdateCheck.Destroy: FErrorMessage = '+FErrorMessage);
-  KL.Log('TRemoteUpdateCheck.Destroy: FParams.Result = '+IntToStr(Ord(FParams.Result)));
+  KL.Log('TRemoteUpdateCheck.Destroy: FRemoteResult = '+IntToStr(Ord(FRemoteResult)));
 
   inherited Destroy;
 end;
@@ -133,17 +118,16 @@ begin
     kmcom.Packages.Refresh;
   end;
 
-  FParams.Result := Result;
+  FRemoteResult := Result;
 end;
 
 
-procedure TRemoteUpdateCheck.DoDownloadUpdates(SavePath: string; var Result: Boolean);
+procedure TRemoteUpdateCheck.DoDownloadUpdates(SavePath: string; Params: TUpdateCheckResponse; var Result: Boolean);
 var
   i, downloadCount: Integer;
 
     function DownloadFile(const url, savepath: string): Boolean;
     begin
-      Result := False;
       with THttpUploader.Create(nil) do
       try
         Proxy.Server := GetProxySettings.Server;
@@ -181,40 +165,40 @@ begin
     FDownload.TotalDownloads := 0;
     downloadCount := 0;
 
-    for i := 0 to High(FParams.Packages) do
-      if FParams.Packages[i].Install then
+    // Keyboard Packages
+    for i := 0 to High(Params.Packages) do
       begin
         Inc(FDownload.TotalDownloads);
-        Inc(FDownload.TotalSize, FParams.Packages[i].DownloadSize);
-
-        FParams.Packages[i].SavePath := SavePath + FParams.Packages[i].FileName;
+        Inc(FDownload.TotalSize, Params.Packages[i].DownloadSize);
+        Params.Packages[i].SavePath := SavePath + Params.Packages[i].FileName;
       end;
 
-    if FParams.Keyman.Install then
-    begin
-      Inc(FDownload.TotalDownloads);
-      Inc(FDownload.TotalSize, FParams.Keyman.DownloadSize);
-      FParams.Keyman.SavePath := SavePath + FParams.Keyman.FileName;
-    end;
+    // Add the Keyman installer
+    Inc(FDownload.TotalDownloads);
+    Inc(FDownload.TotalSize, Params.InstallSize);
 
+    // Keyboard Packages
     FDownload.StartPosition := 0;
-    for i := 0 to High(FParams.Packages) do
-      if FParams.Packages[i].Install then
+    for i := 0 to High(Params.Packages) do
       begin
-        if not DownloadFile(FParams.Packages[i].DownloadURL, FParams.Packages[i].SavePath) then // I2742
+        if not DownloadFile(Params.Packages[i].DownloadURL, Params.Packages[i].SavePath) then // I2742
         begin
-          FParams.Packages[i].Install := False; // Download failed but install other files
+          Params.Packages[i].Install := False; // Download failed but install other files
         end
         else
           Inc(downloadCount);
-        FDownload.StartPosition := FDownload.StartPosition + FParams.Packages[i].DownloadSize;
+        FDownload.StartPosition := FDownload.StartPosition + Params.Packages[i].DownloadSize;
       end;
 
-    if FParams.Keyman.Install then
-      if not DownloadFile(FParams.Keyman.DownloadURL, FParams.Keyman.SavePath) then  // I2742
-      begin
-        FParams.Keyman.Install := False;  // Download failed but user wants to install other files
-      end;
+    // Keyamn Installer
+    if not DownloadFile(Params.InstallURL, SavePath + Params.FileName) then  // I2742
+    begin
+      // TODO record fail? and log  // Download failed but user wants to install other files
+    end
+    else
+    begin
+      Inc(downloadCount)
+    end;
 
     // There needs to be at least one file successfully downloaded to return
     // TRUE that files where downloaded
@@ -231,22 +215,14 @@ begin
   end;
 end;
 
-function TRemoteUpdateCheck.DownloadUpdates: Boolean;
+function TRemoteUpdateCheck.DownloadUpdates(Params: TUpdateCheckResponse): Boolean;
 var
-  i: Integer;
   DownloadBackGroundSavePath : String;
   DownloadResult : Boolean;
 begin
   DownloadBackGroundSavePath := IncludeTrailingPathDelimiter(TKeymanPaths.KeymanUpdateCachePath);
-  { For now lets download all the updates. Set all as true }
 
-  if FParams.Keyman.DownloadURL <> '' then
-    FParams.Keyman.Install := True;
-
-  for i := 0 to High(FParams.Packages) do
-    FParams.Packages[i].Install := True;
-
-  DoDownloadUpdates(DownloadBackGroundSavePath, DownloadResult);
+  DoDownloadUpdates(DownloadBackGroundSavePath, Params, DownloadResult);
   KL.Log('TRemoteUpdateCheck.DownloadUpdatesBackground: DownloadResult = '+IntToStr(Ord(DownloadResult)));
   Result := DownloadResult;
 
@@ -344,21 +320,21 @@ begin
       begin
         if ucr.Parse(Response.MessageBodyAsString, 'bundle', CKeymanVersionInfo.Version) then
         begin
-          ResponseToParams(ucr);
+          //ResponseToParams(ucr);
 
           if FCheckOnly then
           begin
             // TODO: Refactor this
             TUpdateCheckStorage.SaveUpdateCacheData(ucr);
-            Result := FParams.Result;
+            Result := FRemoteResult;
           end
           // TODO: #10038
           // Integerate into state machine. in the download state
           // the process can call LoadUpdateCacheData if needed to get the
           // response result.
-          else if (Length(FParams.Packages) > 0) or (FParams.Keyman.DownloadURL <> '') then
+          else if (Length(ucr.Packages) > 0) or (ucr.InstallURL <> '') then
           begin
-            downloadResult := DownloadUpdates;
+            downloadResult := DownloadUpdates(ucr);
             if DownloadResult then
             begin
               Result := wucSuccess;
@@ -398,52 +374,6 @@ begin
   finally
     Free;
   end;
-end;
-
-function TRemoteUpdateCheck.ResponseToParams(const ucr: TUpdateCheckResponse): TRemoteUpdateCheckParams;
-var
-  i, j, n: Integer;
-  pkg: IKeymanPackage;
-begin
-  SetLength(FParams.Packages,0);
-  for i := Low(ucr.Packages) to High(ucr.Packages) do
-  begin
-    n := kmcom.Packages.IndexOf(ucr.Packages[i].ID);
-    if n >= 0 then
-    begin
-      pkg := kmcom.Packages[n];
-      j := Length(FParams.Packages);
-      SetLength(FParams.Packages, j+1);
-      FParams.Packages[j].NewID := ucr.Packages[i].NewID;
-      FParams.Packages[j].ID := ucr.Packages[i].ID;
-      FParams.Packages[j].Description := ucr.Packages[i].Name;
-      FParams.Packages[j].OldVersion := pkg.Version;
-      FParams.Packages[j].NewVersion := ucr.Packages[i].NewVersion;
-      FParams.Packages[j].DownloadSize := ucr.Packages[i].DownloadSize;
-      FParams.Packages[j].DownloadURL := ucr.Packages[i].DownloadURL;
-      FParams.Packages[j].FileName := ucr.Packages[i].FileName;
-      pkg := nil;
-    end
-    else
-      FErrorMessage := 'Unable to find package '+ucr.Packages[i].ID;
-  end;
-
-  case ucr.Status of
-    ucrsNoUpdate:
-      begin
-        FErrorMessage := ucr.ErrorMessage;
-      end;
-    ucrsUpdateReady:
-      begin
-        FParams.Keyman.OldVersion := ucr.CurrentVersion;
-        FParams.Keyman.NewVersion := ucr.NewVersion;
-        FParams.Keyman.DownloadURL := ucr.InstallURL;
-        FParams.Keyman.DownloadSize := ucr.InstallSize;
-        FParams.Keyman.FileName := ucr.FileName;
-      end;
-  end;
-
-  Result := FParams;
 end;
 
  // temp wrapper for converting showmessage to logs don't know where
