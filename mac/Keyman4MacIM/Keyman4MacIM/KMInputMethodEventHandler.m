@@ -17,7 +17,8 @@
 @interface KMInputMethodEventHandler ()
 @property (nonatomic, retain) KeySender* keySender;
 @property (nonatomic, retain) TextApiCompliance* apiCompliance;
-@property int generatedBackspaceCount;
+@property NSUInteger generatedBackspaceCount;
+@property BOOL backspaceHandledLowLevel;
 @property (nonatomic, retain) NSString* clientApplicationId;
 @property NSString *queuedText;
 @property BOOL contextChanged;
@@ -27,12 +28,13 @@
 
 const CGKeyCode kProcessPendingBuffer = 0xFF;
 const NSUInteger kMaxContext = 80;
+const NSTimeInterval kQueuedTextEventDelayInSeconds = 0.1;
 
 //_pendingBuffer contains text that is ready to be sent to the client when all delete-backs are finished.
 NSMutableString* _pendingBuffer;
-NSUInteger _numberOfPostedDeletesToExpect = 0;
 CGKeyCode _keyCodeOfOriginalEvent;
 CGEventSourceRef _sourceFromOriginalEvent = nil;
+CGEventSourceRef _sourceForGeneratedEvent = nil;
 NSMutableString* _easterEggForSentry = nil;
 NSString* const kEasterEggText = @"Sentry force now";
 NSString* const kEasterEggKmxName = @"EnglishSpanish.kmx";
@@ -61,7 +63,6 @@ NSRange _previousSelRange;
     _keySender = [[KeySender alloc] init];
     _clientApplicationId = clientAppId;
     _generatedBackspaceCount = 0;
-  
     
     //BOOL legacy = [self isClientAppLegacy:clientAppId];
 
@@ -88,20 +89,18 @@ NSRange _previousSelRange;
 }
 
 - (void)deactivate {
-    if (_numberOfPostedDeletesToExpect > 0 || (_pendingBuffer != nil && _pendingBuffer.length > 0) ||
+    if (_generatedBackspaceCount > 0 || (_queuedText != nil && _queuedText.length > 0) ||
         _keyCodeOfOriginalEvent != 0 || _sourceFromOriginalEvent != nil)
     {
         if ([self.appDelegate debugMode]) {
             NSLog(@"ERROR: new app activated before previous app finished processing pending events!");
-            NSLog(@"  _numberOfPostedDeletesToExpect = %lu", _numberOfPostedDeletesToExpect);
-            NSLog(@"  pendingBuffer = \"%@\"", _pendingBuffer == nil ? @"(NIL)" : (NSString*)[self pendingBuffer]);
+            NSLog(@"  _generatedBackspaceCount = %lu", _generatedBackspaceCount);
+            NSLog(@"  _queuedText = \"%@\"", _queuedText == nil ? @"(NIL)" : (NSString*)[self queuedText]);
             NSLog(@"  _keyCodeOfOriginalEvent = %hu", _keyCodeOfOriginalEvent);
         }
-        _numberOfPostedDeletesToExpect = 0;
-        // If _sourceFromOriginalEvent != nil, we should probably attempt to release and clear it.
-        // [self dealloc]
-        _pendingBuffer = nil;
         _keyCodeOfOriginalEvent = 0;
+        _generatedBackspaceCount = 0;
+        _queuedText = nil;
     }
 }
 
@@ -110,6 +109,10 @@ NSRange _previousSelRange;
         CFRelease(_sourceFromOriginalEvent);
         _sourceFromOriginalEvent = nil;
     }
+  if (_sourceForGeneratedEvent != nil) {
+    CFRelease(_sourceForGeneratedEvent);
+    _sourceForGeneratedEvent = nil;
+  }
 }
 
 - (void)handleCommand:(NSEvent *)event {
@@ -208,6 +211,7 @@ NSRange _previousSelRange;
 }
 
 - (BOOL) handleEventWithKeymanEngine:(NSEvent *)event in:(id) sender {
+  [self.appDelegate logDebugMessage:@"handleEventWithKeymanEngine, event = %@", event];
   CoreKeyOutput *output = nil;
 
   output = [self processEventWithKeymanEngine:event in:sender];
@@ -260,86 +264,34 @@ NSRange _previousSelRange;
   }
 }
 
-- (void)processUnhandledDeleteBack:(id)client updateEngineContext:(BOOL *)updateEngineContext {
-    if ([self.appDelegate debugMode]) {
-        NSLog(@"Processing an unhandled delete-back...");
-        NSLog(@"_numberOfPostedDeletesToExpect = %lu", _numberOfPostedDeletesToExpect);
-    }
+/**
+ handleBackspace: handles generated for a subset of non-compliant apps (such as Adobe apps) that do
+ not support replacing text with the insertText API but also intercept events so that we do not see them in handleEvent.
+ Other apps, such as Word, show the event both in the low
+ level EventTap and in the normal IM handleEvent. Thus, we set a flag after
+ processing a backspace here so that we do not process it again in handleEvent.
+ Note that a backspace that we handle here should never be passed on to Keyman
+ Core for processing, as it is already the result of processing.
+*/
+- (void)handleBackspace:(NSEvent *)event {
+  [self.appDelegate logDebugMessage:@"KMInputMethodEventHandler handleBackspace, event = %@", event];
+  NSLog(@"  backspaceHandledLowLevel: %d, generatedBackspaceCount: %lu", _backspaceHandledLowLevel, (unsigned long)_generatedBackspaceCount);
+  self.backspaceHandledLowLevel = NO;
 
-    // If we have pending characters to insert following the delete-back, then
-    // the context buffer has already been properly set to reflect the deletions.
-    if ((_legacyMode && (_pendingBuffer == nil || _pendingBuffer.length == 0)) ||
-        (!_legacyMode && (!self.willDeleteNullChar)))
-    {
-        // Backspace clears last "real" character from buffer, plus any surrounding deadkeys
-        [self.contextBuffer deleteLastDeadkeys];
-        [self.contextBuffer deleteLastNChars:1];
-        if (_legacyMode) {
-            _previousSelRange.location -= 1;
-            _previousSelRange.length = 0;
-        }
-        [self.contextBuffer deleteLastDeadkeys];
+  if (self.generatedBackspaceCount > 0) {
+    self.generatedBackspaceCount--;
+    self.backspaceHandledLowLevel = YES;
+    
+    // if we just encountered the last backspace, then send event to insert queued text
+    if (self.generatedBackspaceCount == 0) {
+      [self performSelector:@selector(triggerInsertQueuedText:) withObject:event afterDelay:kQueuedTextEventDelayInSeconds];
     }
-    if (_numberOfPostedDeletesToExpect > 0) {
-        if (--_numberOfPostedDeletesToExpect == 0) {
-            if ([self.appDelegate debugMode])
-                NSLog(@"Processing final posted delete-back...");
-
-            self.willDeleteNullChar = NO;
-            if (_legacyMode) {
-                if (_pendingBuffer != nil && _pendingBuffer.length > 0) {
-                    if ([self.appDelegate debugMode])
-                        NSLog(@"Posting special code to tell IM to insert characters from pending buffer.");
-                    [self performSelector:@selector(initiatePendingBufferProcessing:) withObject:client afterDelay:0.1];
-                }
-            }
-            else {
-                if (!_sourceFromOriginalEvent) {
-                    NSLog(@"----- If not legacy mode, _sourceFromOriginalEvent should be retained until original code is posted -----");
-                }
-                else {
-                    if ([self.appDelegate debugMode]) {
-                        NSLog(@"Re-posting original (unhandled) code: %d", (int)_keyCodeOfOriginalEvent);
-                    }
-                    [self postKeyPressToFrontProcess:_keyCodeOfOriginalEvent from:_sourceFromOriginalEvent];
-                    _keyCodeOfOriginalEvent = 0;
-                    CFRelease(_sourceFromOriginalEvent);
-                    _sourceFromOriginalEvent = nil;
-                }
-            }
-            *updateEngineContext = NO;
-        }
-    }
-    else {
-        self.willDeleteNullChar = NO;
-    }
+  }
 }
 
-// handleDeleteBackLowLevel: handles the situation for Delete Back for
-// some 'legacy' mode apps such as Adobe apps, because when we inject
-// the Delete Back, it is passed through to the app but we never see it
-// in our normal handleEvent function. However, other apps, such as Word,
-// show the event both in the low level tap and in the normal IM
-// handleEvent. Thus, we set a flag after processing a Delete Back here so
-// that we don't accidentally process it twice. Note that a Delete Back that
-// we handle here should never be passed on to Keyman Engine for transform,
-// as it will be part of the output from the transform.
-- (BOOL)handleDeleteBackLowLevel:(NSEvent *)event {
-    self.ignoreNextDeleteBackHighLevel = NO;
-    if(event.keyCode == kVK_Delete && _legacyMode && [self pendingBuffer].length > 0) {
-        BOOL updateEngineContext = YES;
-        if ([self.appDelegate debugMode]) {
-            NSLog(@"legacy: handleDeleteBackLowLevel, delete-back received, processing");
-        }
-        [self processUnhandledDeleteBack:self.senderForDeleteBack updateEngineContext: &updateEngineContext];
-        self.ignoreNextDeleteBackHighLevel = YES;
-    } else {
-      if ([self.appDelegate debugMode]) {
-          NSLog(@"handleDeleteBackLowLevel: not processing...");
-      }
-    }
-
-    return self.ignoreNextDeleteBackHighLevel;
+- (void)triggerInsertQueuedText:(NSEvent *)event {
+  [self.appDelegate logDebugMessage:@"KMInputMethodEventHandler triggerInsertQueuedText"];
+  [self.keySender sendKeymanKeyCodeForEvent:event];
 }
 
 - (void)initiatePendingBufferProcessing:(id)sender {
@@ -391,6 +343,7 @@ NSRange _previousSelRange;
 
 // handleEvent implementation for core event processing
 - (BOOL)handleEvent:(NSEvent *)event client:(id)sender {
+  BOOL handled = NO;
   [self.appDelegate logDebugMessage:@"handleEvent event = %@", event];
 
   [self checkTextApiCompliance:sender];
@@ -398,52 +351,60 @@ NSRange _previousSelRange;
   // mouse movement requires that the context be invalidated
   [self handleContextChangedByLowLevelEvent];
 
-    if (event.type == NSKeyDown) {
-      [self reportContext:event forClient:sender];
-      
-      // indicates that our generated backspace event(s) are consumed
-      // and we can insert text that followed the backspace(s)
-      if (event.keyCode == kKeymanEventKeyCode) {
-        [self insertQueuedText: event client:sender];
-        return YES;
-      }
-
-      if(event.keyCode == kVK_Delete && self.generatedBackspaceCount > 0) {
-        self.generatedBackspaceCount--;
-        [self.appDelegate logDebugMessage:@"handleEvent KVK_Delete, reducing generatedBackspaceCount to %d ", self.generatedBackspaceCount];
-        return NO;
-      }
-    }
-    if (event.type == NSEventTypeFlagsChanged) {
-        // Mark the context as out of date for the command keys
-        switch([event keyCode]) {
-            case kVK_RightCommand:
-            case kVK_Command:
-                self.contextChanged = YES;
-                break;
-            case kVK_Shift:
-            case kVK_RightShift:
-            case kVK_CapsLock:
-            case kVK_Option:
-            case kVK_RightOption:
-            case kVK_Control:
-            case kVK_RightControl:
-                break;
-        }
-        return NO;
+  if (event.type == NSKeyDown) {
+    // indicates that our generated backspace event(s) are consumed
+    // and we can insert text that followed the backspace(s)
+    if (event.keyCode == kKeymanEventKeyCode) {
+      [self.appDelegate logDebugMessage:@"handleEvent, handling kKeymanEventKeyCode"];
+      [self insertQueuedText: event client:sender];
+      return YES;
     }
 
-    if ((event.modifierFlags & NSEventModifierFlagCommand) == NSEventModifierFlagCommand) {
-        [self handleCommand:event];
-        return NO; // let the client app handle all Command-key events.
+    // for some apps, handleEvent will not be called for the generated backspace
+    // but if it is, we need to let it pass through rather than process again in core
+    if((event.keyCode == kVK_Delete) && (self.backspaceHandledLowLevel)) {
+      [self.appDelegate logDebugMessage:@"handleEvent, allowing generated backspace to pass through"];
+      self.backspaceHandledLowLevel = NO;
+      // return NO to pass through to client app
+      return NO;
     }
+  }
+  
+  if (event.type == NSEventTypeFlagsChanged) {
+    [self handleFlagsChangedEvent:[event keyCode]];
+    return NO;
+  }
 
-    BOOL handled = [self handleEventWithKeymanEngine:event in: sender];
-    if (event.type == NSKeyDown) {
-      [self.appDelegate logDebugMessage:@"event, keycode: %u, characters='%@' handled by KeymanEngine: %@", event.keyCode, event.characters, handled?@"yes":@"no"];
-    }
+  if ((event.modifierFlags & NSEventModifierFlagCommand) == NSEventModifierFlagCommand) {
+    [self handleCommand:event];
+    return NO; // let the client app handle all Command-key events.
+  }
 
-    return handled;
+  if (event.type == NSKeyDown) {
+    [self reportContext:event forClient:sender];
+    handled = [self handleEventWithKeymanEngine:event in: sender];
+  }
+
+  [self.appDelegate logDebugMessage:@"event, keycode: %u, characters='%@' handled = %@", event.keyCode, event.characters, handled?@"yes":@"no"];
+  return handled;
+}
+
+-(void)handleFlagsChangedEvent:(short)keyCode {
+  // Mark the context as out of date for the command keys
+  switch(keyCode) {
+    case kVK_RightCommand:
+    case kVK_Command:
+      self.contextChanged = YES;
+      break;
+    case kVK_Shift:
+    case kVK_RightShift:
+    case kVK_CapsLock:
+    case kVK_Option:
+    case kVK_RightOption:
+    case kVK_Control:
+    case kVK_RightControl:
+      break;
+  }
 }
 
 /**
@@ -623,17 +584,24 @@ NSRange _previousSelRange;
 }
 
 -(void)sendEvents:(NSEvent *)event forOutput:(CoreKeyOutput*)output {
+  [self.appDelegate logDebugMessage:@"sendEvents called"];
+  
+  _sourceForGeneratedEvent = CGEventCreateSourceFromEvent([event CGEvent]);
+
+  self.generatedBackspaceCount = output.codePointsToDeleteBeforeInsert;
+  
   if (output.hasCodePointsToDelete) {
     for (int i = 0; i < output.codePointsToDeleteBeforeInsert; i++)
     {
-      self.generatedBackspaceCount++;
-      [self.keySender sendBackspaceforSourceEvent:event];
+      [self.appDelegate logDebugMessage:@"sendEvents queueing backspace"];
+      [self.keySender sendBackspaceforEventSource:_sourceForGeneratedEvent];
     }
   }
   
   if (output.hasTextToInsert) {
+    [self.appDelegate logDebugMessage:@"sendEvents, queueing text to insert: %@", output.textToInsert];
+    
     self.queuedText = output.textToInsert;
-    [self.keySender sendKeymanKeyCodeForEvent:event];
   }
 }
 
@@ -641,6 +609,7 @@ NSRange _previousSelRange;
   if (self.queuedText.length> 0) {
     [self.appDelegate logDebugMessage:@"insertQueuedText, inserting %@", self.queuedText];
     [self insertAndReplaceText:self.queuedText deleteCount:0 client:client];
+    self.queuedText = nil;
   } else {
     [self.appDelegate logDebugMessage:@"handleQueuedText called but no text to insert"];
   }

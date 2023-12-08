@@ -113,7 +113,6 @@ NSString* _keymanDataPath = nil;
                                                    forEventClass:kInternetEventClass
                                                       andEventID:kAEGetURL];
 
-  // TODO: use addGlobalMonitorForEventsMatchingMask instead (since we are not modifying events)?
   self.lowLevelEventTap = CGEventTapCreate(kCGAnnotatedSessionEventTap,
                                            kCGHeadInsertEventTap,
                                            kCGEventTapOptionListenOnly,
@@ -279,14 +278,12 @@ NSString* _keymanDataPath = nil;
     _lastServerWithOSKShowing = nil;
 }
 
-// TODO: revisit and remove what is no longer needed
-// TODO: better (less impactful) to replace with global event monitor? just monitors with no ability to modify events
 CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef event, void *refcon) {
     KMInputMethodAppDelegate *appDelegate = [KMInputMethodAppDelegate AppDelegate];
     if (appDelegate != nil) {
         if (type == kCGEventTapDisabledByTimeout || type == kCGEventTapDisabledByUserInput) {
             // kCGEventTapDisabledByUserInput most likely means we're "sleeping", in which case we want it to stay
-            // diabled until we get the wake-up call.
+            // disabled until we get the wake-up call.
             if (!appDelegate.sleeping) {
                 // REVIEW: We might need to consider putting in some kind of counter/flag to ensure that the very next
                 // event is not another disable so we don't end up in an endless cycle.
@@ -331,14 +328,14 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
                 break;
 
             case kCGEventKeyDown:
-                NSLog(@"Event tap handling kCGEventKeyDown for keyCode: %hu", sysEvent.keyCode);
-               // Pass back delete events through to the input method event handler
-                // because some 'legacy' apps don't allow us to see back delete events
-                // that we have synthesized (and we need to see them, for serialization
+                NSLog(@"Event tap keydown event, keyCode: %hu, event: %@", sysEvent.keyCode, event);
+                // Pass back low-level backspace events to the input method event handler
+                // because some non-compliant apps do not allow us to see backspace events
+                // that we have generated (and we need to see them, for serialization
                 // of events)
                 if(sysEvent.keyCode == kVK_Delete && appDelegate.inputController != nil) {
                     NSLog(@"Event tap handling kVK_Delete.");
-                    [appDelegate.inputController handleDeleteBackLowLevel:sysEvent];
+                    [appDelegate.inputController handleBackspace:sysEvent];
                 }
 
                 switch(sysEvent.keyCode) {

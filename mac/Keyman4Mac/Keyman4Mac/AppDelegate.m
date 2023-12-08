@@ -101,7 +101,6 @@ NSString *const kKMXFileKey = @"KMXFile";
     return YES;
 }
 
-// TODO: investigate -- event handler for OSK only?
 CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef event, void *refcon) {
     // If key map is not enable, return the event without modifying
     if (!isKeyMapEnabled)
@@ -114,15 +113,14 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
     BOOL handled = NO;
     
     if (type == NX_KEYDOWN) {
+        NSLog(@"AppDelegate eventTapFunction key down event: %@", event);
         // Key down event
         NSEvent *mEvent = [NSEvent eventWithCGEvent:event];
         KMEngine *kme = [[KMEngine alloc] initWithKMX:kmx context:contextBuffer verboseLogging:debugMode];
-        NSArray *actions = [kme processEvent:mEvent];
-        //if (debugMode)
-            NSLog(@"%@", actions);
-        for (CoreAction *action in actions) {
-            if (action.isCharacter) {
-                NSString *output = action.content;
+        CoreKeyOutput *coreKeyOutput = [kme processEvent:mEvent];
+        if (coreKeyOutput) {
+            if (coreKeyOutput.hasTextToInsert) {
+                NSString *output = coreKeyOutput.textToInsert;
                 UniChar *outCStr = (UniChar *)[output cStringUsingEncoding:NSUTF16StringEncoding];
                 unsigned short kc = [mEvent keyCode];
                 CGEventRef kEventDown = CGEventCreateKeyboardEvent(NULL, (CGKeyCode)kc, true);
@@ -135,80 +133,17 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
                 CFRelease(kEventDown);
                 CFRelease(kEventUp);
             }
-            else if (action.isMarkerBackspace) {
-                NSInteger n = action.backspaceCount;
-                NSUInteger dk = [contextBuffer deleteLastDeadkeys];
-                n -= dk;
-                
-                for (int i = 0; i < n; i++) {
-                    CGEventRef kEventDown = CGEventCreateKeyboardEvent(NULL, (CGKeyCode)51, true);
-                    CGEventRef kEventUp = CGEventCreateKeyboardEvent(NULL, (CGKeyCode)51, false);
-                    CGEventTapPostEvent(proxy, kEventDown);
-                    CGEventTapPostEvent(proxy, kEventUp);
-                    CFRelease(kEventDown);
-                    CFRelease(kEventUp);
-                }
-                
-              [contextBuffer deleteLastNChars:n];
-            }
-            else if (action.isMarker) {
-                [contextBuffer appendDeadkey:action.content];
-            }
-            else if (action.actionType == EndAction) {
-                continue;
-            }
-            else if (action.actionType == EmitKeystrokeAction) {
+            if (coreKeyOutput.emitKeystroke) {
                 return NULL;
             }
-            else if (action.actionType == AlertAction) {
+            if (coreKeyOutput.alert) {
                 [[NSSound soundNamed:@"Tink"] play];
             }
             
             handled = YES;
         }
-        
-        // Apply context changes if not handled
-        if (!handled) {
-            mEvent = [NSEvent eventWithCGEvent:event];
-            unsigned short keyCode = [mEvent keyCode];
-            if (keyCode <= 0x33) { // Main keys
-                if (keyCode == 0x24) // Enter
-                    [contextBuffer appendString:@"\n"];
-                else if (keyCode == 0x33) { // Backspace
-                    [contextBuffer deleteLastDeadkeys];
-                    [contextBuffer deleteLastNChars:1];
-                    [contextBuffer deleteLastDeadkeys];
-                }
-                else
-                    [contextBuffer appendString:[mEvent characters]];
-            }
-            else {
-                unichar ch = [[mEvent characters] characterAtIndex:0];
-                if (ch >= 0x2A && ch <= 0x39) // Numpad char range
-                    [contextBuffer appendString:[mEvent characters]];
-                else if (keyCode == 0x4C) // Enter (Numpad)
-                    [contextBuffer appendString:@"\n"];
-                else if (keyCode >= 0x7B && keyCode <= 0x7E) // Arrow keys
-                    contextBuffer = [NSMutableString stringWithString:@""]; // Clear context
-                else if (keyCode == 0x73 || keyCode == 0x77 || keyCode == 0x74 || keyCode == 0x79) {
-                    // Home, End, Page Up, Page Down
-                    contextBuffer = [NSMutableString stringWithString:@""]; // Clear context
-                }
-                else {
-                    // Other keys
-                }
-            }
-        }
-    }
-    else {
-        // Mouse button up event (left | right)
-        contextBuffer = [NSMutableString stringWithString:@""]; // Clear context
-        if (debugMode)
-            NSLog(@"Mouse event");
     }
     
-    if (debugMode)
-        NSLog(@"contextBuffer = %@\n***", [contextBuffer codeString]);
     return handled?NULL:event;
 }
 
