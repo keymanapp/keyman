@@ -51,6 +51,14 @@ function do_copy() {
   cp "$SENTRY_MANAGER_MAP"  "$KEYMAN_ROOT/$DEST/sentry-manager.js.map"
   cp "$SENTRY_SRC"          "$KEYMAN_ROOT/$DEST/sentry-bundle.min.js"
   cp "$SENTRY_MAP"          "$KEYMAN_ROOT/$DEST/sentry-bundle.min.js.map"
+
+  GESTURE_RECOGNIZER_BUILD="$KEYMAN_ROOT/common/web/gesture-recognizer/build/lib/."
+  GESTURE_RECOGNIZER_TARGET="$KEYMAN_ROOT/web/build/engine/gesture-recognizer/lib/"
+
+  if ! [ -d $GESTURE_RECOGNIZER_TARGET ]; then
+      mkdir -p $GESTURE_RECOGNIZER_TARGET
+  fi
+  cp -a $GESTURE_RECOGNIZER_BUILD $GESTURE_RECOGNIZER_TARGET
 }
 
 builder_run_action clean rm -rf "$KEYMAN_ROOT/$DEST"
