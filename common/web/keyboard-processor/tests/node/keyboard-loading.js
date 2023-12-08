@@ -58,6 +58,26 @@ describe('Headless keyboard loading', function() {
         assert.equal(err.message, 'k.KKM is not a function');
       }
     });
+
+    it('accurately determines supported gesture types', async () => {
+      // -- START: Standard Recorder-based unit test loading boilerplate --
+      let harness = new KeyboardHarness({}, MinimalKeymanGlobal);
+      let keyboardLoader = new NodeKeyboardLoader(harness);
+      let km_keyboard = await keyboardLoader.loadKeyboardFromPath(khmerPath);
+      // --  END:  Standard Recorder-based unit test loading boilerplate --
+
+      // `khmer_angkor` - supports longpresses, but not flicks or multitaps.
+
+      const desktopLayout = km_keyboard.layout('desktop');
+      assert.isFalse(desktopLayout.hasFlicks);
+      assert.isFalse(desktopLayout.hasLongpresses);
+      assert.isFalse(desktopLayout.hasMultitaps);
+
+      const mobileLayout = km_keyboard.layout('phone');
+      assert.isFalse(mobileLayout.hasFlicks);
+      assert.isTrue(mobileLayout.hasLongpresses);
+      assert.isFalse(mobileLayout.hasMultitaps);
+    });
   });
 
   describe('Full harness loading', () => {
