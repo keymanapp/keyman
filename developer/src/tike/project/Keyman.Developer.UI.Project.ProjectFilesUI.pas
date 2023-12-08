@@ -146,8 +146,11 @@ end;
 procedure TOpenableProjectFileUI.OpenFile;
 begin
   FMDIChild := frmKeymanDeveloper.OpenFile(ProjectFile.FileName, False);
-  FMDIChild.OnCloseFile := CloseFile;
-  FMDIChild.ProjectFile := ProjectFile;
+  if Assigned(FMDIChild) then
+  begin
+    FMDIChild.OnCloseFile := CloseFile;
+    FMDIChild.ProjectFile := ProjectFile;
+  end;
 end;
 
 function TOpenableProjectFileUI.WindowOpen: Boolean;

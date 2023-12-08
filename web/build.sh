@@ -22,6 +22,7 @@ builder_describe "Builds engine modules for Keyman Engine for Web (KMW)." \
   "configure" \
   "build" \
   "test" \
+  "coverage                  Create an HTML page with code coverage" \
   ":app/browser              The form of Keyman Engine for Web for use on websites" \
   ":app/webview              A puppetable version of KMW designed for use in a host app's WebView" \
   ":app/ui                   Builds KMW's desktop form-factor keyboard-selection UI modules" \
@@ -136,3 +137,15 @@ if builder_start_action build:engine/gestures; then
 
   builder_finish_action success build:engine/gestures;
 fi
+
+coverage_action() {
+  builder_echo "Creating coverage report..."
+  cd "$KEYMAN_ROOT"
+  mkdir -p web/build/coverage/tmp
+  find . -type f -name coverage-\*.json -print0 | xargs -0 cp -t web/build/coverage/tmp
+  c8 report --config web/.c8rc.json ---reporter html --clean=false --reports-dir=web/build/coverage
+  rm -rf web/build/coverage/tmp
+  cd web
+}
+
+builder_run_action coverage coverage_action

@@ -1,5 +1,38 @@
 # Keyman Version History
 
+## 17.0.226 alpha 2023-12-07
+
+* fix(web): accidental suggestion-banner retoggle when disabling predictions (#10014)
+* fix(web): Fix null error with legacy keyboards (#10141)
+
+## 17.0.225 alpha 2023-12-06
+
+* feat(developer): Multi-process model for projects (#10114)
+* fix(developer): prevent opening .kpj in multiple processes (#10137)
+* fix(android/app): InfoActivity pass external links to browser (#10153)
+
+## 17.0.224 alpha 2023-12-05
+
+* chore(linux): Update debian changelog (#10121)
+
+## 17.0.223 alpha 2023-12-04
+
+* chore(web): Add option to create test coverage report file (#10124)
+
+## 17.0.222 alpha 2023-12-02
+
+* fix(common): publish @keymanapp/developer-utils as npm module (#10118)
+
+## 17.0.221 alpha 2023-12-01
+
+* chore(windows): removed cached context windows engine (#10065)
+* change(android): flishy flashy mitigation, round 1 (#10017)
+* change(android): smoother keyboard initialization (#10022)
+* fix(android): no suggestions available when swapping pred-text target language (#10061)
+* chore(developer): require project file to exist (#10092)
+* chore(linux): Add support for loong64 architecture (#10109)
+* fix(web): Don't throw errors after detach (#10086)
+
 ## 17.0.220 alpha 2023-11-30
 
 * fix(core): set_if_needed updates an empty cached context (#10098)

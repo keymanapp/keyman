@@ -3,4 +3,4 @@ Depends: @,
  build-essential,
  libicu-dev,
  pkg-config,
-Architecture: amd64 arm64 armel armhf i386 mips64el mipsel ppc64el riscv64
+Architecture: amd64 arm64 armel armhf i386 loong64 mips64el mipsel ppc64el riscv64

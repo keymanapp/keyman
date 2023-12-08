@@ -8,13 +8,17 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 cd "$THIS_SCRIPT_PATH"
 
 . "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
+. "$KEYMAN_ROOT/resources/build/build-utils-ci.inc.sh"
 
 builder_describe "Build Keyman Developer web utility module" \
   "@/common/web/types" \
   "clean" \
   "configure" \
   "build" \
-  "test"
+  "test" \
+  publish \
+  pack \
+  "--dry-run,-n              don't actually publish, just dry run"
 
 builder_describe_outputs \
   configure     /node_modules \
@@ -34,3 +38,6 @@ if builder_start_action test; then
   c8 --reporter=lcov --reporter=text --exclude-after-remap mocha
   builder_finish_action success test
 fi
+
+builder_run_action publish    builder_publish_to_npm
+builder_run_action pack       builder_publish_to_pack
