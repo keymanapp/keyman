@@ -38,7 +38,17 @@ export interface ContactModel<Type, StateToken = any> {
      * If `true`, the timer will use the inherited `path.stats.duration` stat as an
      * offset that has already elapsed, counting it against the timer.
      */
-    inheritElapsed?: boolean
+    inheritElapsed?: boolean,
+    /**
+     * An optional timer-spec function parameter.  If specified and other conditions are met,
+     * this function will validate the model on the basis of the associated 'items'.
+     * @param currentItem
+     * @param baseItem
+     * @returns
+     * - `true` if the model is valid for the associated items, resulting in a model match
+     * - `false` if the model is invalid, leading to model rejection
+     */
+    validateItem?: (currentItem: Type, baseItem: Type) => boolean
   }
 
   // This field is primarly used at the `GestureMatcher` level, rather than the

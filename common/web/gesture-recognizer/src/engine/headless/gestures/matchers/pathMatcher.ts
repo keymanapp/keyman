@@ -75,7 +75,17 @@ export class PathMatcher<Type, StateToken = any> {
             t: timestamp
           });
         }
-        this.finalize(result == model.timer.expectedResult, 'timer');
+
+        if(result != model.timer.expectedResult) {
+          this.finalize(false, 'timer');
+        }
+
+        // Check for validation as needed.
+        if(!model.timer.validateItem) {
+          this.finalize(true, 'timer');
+        } else {
+          this.finalize(model.timer.validateItem(this.source.path.stats.lastSample.item, this.baseItem), 'timer');
+        }
       });
     }
   }

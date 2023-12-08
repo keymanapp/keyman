@@ -179,7 +179,9 @@ export function gestureSetForLayout(flags: LayoutGestureSupportFlags, params: Ge
       case 'special-key-start':
         return ['K_LOPT', 'K_ROPT', 'K_BKSP'].indexOf(keySpec.baseKeyID) != -1;
       case 'longpress':
-        return !!keySpec.sk;
+        // Always allow longpresses to start; we validate them at timer-end.
+        // This facilitates roaming+longpress interactions.
+        return true;
       case 'multitap-start':
       case 'modipress-multitap-start':
         if(flags.hasMultitaps) {
@@ -199,7 +201,7 @@ export function gestureSetForLayout(flags: LayoutGestureSupportFlags, params: Ge
 
   const _initialTapModel: GestureModel<KeyElement> = deepCopy(!doRoaming ? initialTapModel(params) : initialTapModelWithReset(params));
   const _simpleTapModel: GestureModel<KeyElement> = deepCopy(!doRoaming ? simpleTapModel(params) : simpleTapModelWithReset(params));
-  const longpressModel: GestureModel<KeyElement> = deepCopy(longpressModelWithShortcut(params, true, doRoaming));
+  const _longpressModel: GestureModel<KeyElement> = deepCopy(longpressModel(params, true, doRoaming));
 
   // #region Functions for implementing and/or extending path initial-state checks
   function withKeySpecFiltering(model: GestureModel<KeyElement>, contactIndices: number | number[]) {
@@ -232,7 +234,7 @@ export function gestureSetForLayout(flags: LayoutGestureSupportFlags, params: Ge
   const specialStartModel = specialKeyStartModel();
   const _modipressStartModel = modipressStartModel();
   const gestureModels: GestureModel<KeyElement>[] = [
-    withKeySpecFiltering(longpressModel, 0),
+    withKeySpecFiltering(_longpressModel, 0),
     withKeySpecFiltering(multitapStartModel(params), 0),
     multitapEndModel(params),
     _initialTapModel,
@@ -250,7 +252,7 @@ export function gestureSetForLayout(flags: LayoutGestureSupportFlags, params: Ge
   ];
 
   const defaultSet = [
-    longpressModel.id, _initialTapModel.id, _modipressStartModel.id, specialStartModel.id
+    _longpressModel.id, _initialTapModel.id, _modipressStartModel.id, specialStartModel.id
   ];
 
   if(!doRoaming) {
@@ -264,6 +266,9 @@ export function gestureSetForLayout(flags: LayoutGestureSupportFlags, params: Ge
   } else {
     // A post-roam version of longpress with the up-flick shortcut disabled but roaming still on.
     gestureModels.push(withKeySpecFiltering(longpressModelAfterRoaming(params), 0));
+    // Allows reactivation of longpress-eval when the base key changes if the timer elapses on
+    // a subkey-less key.
+    gestureModels.push(longpressRoamRestoration());
   }
 
   return {
@@ -394,7 +399,7 @@ export function flickEndContactModel(params: GestureParams): ContactModel {
   }
 }
 
-export function longpressContactModelWithShortcut(params: GestureParams, enabledFlicks: boolean, resetForRoaming: boolean): ContactModel {
+export function longpressContactModel(params: GestureParams, enabledFlicks: boolean, resetForRoaming: boolean): ContactModel {
   const spec = params.longpress;
 
   return {
@@ -402,7 +407,8 @@ export function longpressContactModelWithShortcut(params: GestureParams, enabled
     pathResolutionAction: 'resolve',
     timer: {
       duration: spec.waitLength,
-      expectedResult: true
+      expectedResult: true,
+      validateItem: (key: KeyElement) => !!key.key.spec.sk
     },
     pathModel: {
       evaluate: (path) => {
@@ -581,14 +587,14 @@ export function specialKeyEndModel(params: GestureParams): GestureModel<any> {
  *                       - the common gesture configuration permits the shortcut where supported
  * @param allowRoaming   Indicates whether "roaming touch" mode should be supported.
  */
-export function longpressModelWithShortcut(params: GestureParams, allowShortcut: boolean, allowRoaming: boolean): GestureModel<any> {
+export function longpressModel(params: GestureParams, allowShortcut: boolean, allowRoaming: boolean): GestureModel<any> {
   const base: GestureModel<any> = {
     id: 'longpress',
     resolutionPriority: 0,
     contacts: [
       {
         model: {
-          ...longpressContactModelWithShortcut(params, allowShortcut, allowRoaming),
+          ...longpressContactModel(params, allowShortcut, allowRoaming),
           itemPriority: 1,
           pathInheritance: 'chop'
         },
@@ -612,6 +618,12 @@ export function longpressModelWithShortcut(params: GestureParams, allowShortcut:
         path: {
           type: 'replace',
           replace: 'longpress-roam'
+        },
+        // The timer can fail if the key doesn't support subkeys.
+        // If it legit timed out, the gesture can't be continued anyway.
+        timer: {
+          type: 'replace',
+          replace: 'longpress-roam-restore'
         }
       }
     }
@@ -626,11 +638,50 @@ export function longpressModelWithShortcut(params: GestureParams, allowShortcut:
 export function longpressModelAfterRoaming(params: GestureParams): GestureModel<any> {
   // The longpress-shortcut is always disabled for keys reached by roaming (param 2)
   // Only used when roaming is permitted; continued roaming should be allowed. (param 3)
-  const base = longpressModelWithShortcut(params, false, true);
+  const base = longpressModel(params, false, true);
 
   return {
     ...base,
     id: 'longpress-roam'
+  }
+}
+
+// For reactivating longpress processing after changing base key (during roaming),
+// should the timer have elapsed on a key not supporting longpresses.
+export function longpressRoamRestoration(): GestureModel<any> {
+  return {
+    id: 'longpress-roam-restore',
+    contacts: [
+      {
+        model: {
+          pathModel: {
+            evaluate: (path) => {
+              // pretty much a placeholder.
+              return null;
+            }
+          },
+          // The actual trigger.
+          itemChangeAction: 'reject',
+          pathInheritance: 'full',
+          pathResolutionAction: 'reject',
+          itemPriority: 0
+        }
+      }
+    ],
+    resolutionPriority: -1,
+    // We rely on THIS path so it doesn't affect longpress logic, which currently expects the initial
+    // stage to be a successful longpress.
+    rejectionActions: {
+      item: {
+        type: 'replace',
+        replace: 'longpress-roam'
+      }
+    },
+    // is required by the type.
+    resolutionAction: {
+      type: 'chain',
+      next: 'longpress-roam'
+    }
   }
 }
 
