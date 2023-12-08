@@ -119,6 +119,36 @@ export const DEFAULT_GESTURE_PARAMS: GestureParams = {
   }
 }
 
+/**
+ * Gets the centroid (in client coordinates) of a key's element.
+ *
+ * Assumes that the key's layer is in the DOM and actively displayed.
+ * @param key
+ */
+function getKeyCentroid(key: KeyElement) {
+  // We don't layer-shift at present while a flick is active, so it's valid
+  // for current use-cases.  May need extension to closure in something
+  // to force the layer to be active in the future, though.
+  const keyRect = key.getBoundingClientRect();
+
+  return {
+    clientX: keyRect.left + keyRect.width/2,
+    clientY: keyRect.top + keyRect.height/2
+  };
+}
+
+// Is kept separate from prior method in case it becomes a closure in the future
+// & needs to be passed in as a parameter.
+function buildDistFromKeyCentroidFunctor(key: KeyElement) {
+  const keyCentroid = getKeyCentroid(key);
+
+  return (a: CumulativePathStats) => {
+    const dx = a.lastSample.clientX - keyCentroid.clientX;
+    const dy = a.lastSample.clientY - keyCentroid.clientY;
+    return Math.sqrt(dx*dx + dy*dy);
+  }
+}
+
 export function keySupportsModipress(key: KeyElement) {
   const keySpec = key.key.spec;
   const modifierKeyIds = ['K_SHIFT', 'K_ALT', 'K_CTRL', 'K_NUMERALS', 'K_SYMBOLS', 'K_CURRENCIES'];
@@ -257,6 +287,7 @@ export function gestureSetForLayout(flags: LayoutGestureSupportFlags, params: Ge
     gestureModels.push(withKeySpecFiltering(flickStartModel(params), 0));
     gestureModels.push(flickMidModel(params));
     gestureModels.push(flickResetModel(params));
+    gestureModels.push(flickResetCenteringModel(params));
     gestureModels.push(flickRestartModel(params));
     gestureModels.push(flickResetEndModel());
     gestureModels.push(flickEndModel(params));
@@ -652,7 +683,7 @@ export function flickStartModel(params: GestureParams): GestureModel<any> {
   }
 }
 
-export function flickRestartModel(params: GestureParams): GestureModel<any> {
+export function flickRestartModel(params: GestureParams): GestureModel<KeyElement> {
   const base = flickStartModel(params);
   return {
     ...base,
@@ -662,7 +693,14 @@ export function flickRestartModel(params: GestureParams): GestureModel<any> {
         model: {
           ...base.contacts[0].model,
           baseCoordReplacer: (stats, key) => {
-            return null;
+            const keyCentroid = getKeyCentroid(key);
+            // const calcDist = buildDistFromKeyCentroidFunctor(key);
+            // const distFromCenter = calcDist(stats);
+
+            // // uses 'partial' inheritance, so this is also the current coord.
+            // const currentCoord = stats.initialSample;
+
+            return keyCentroid;
           }
         }
       }
@@ -708,7 +746,7 @@ export function flickMidModel(params: GestureParams): GestureModel<any> {
   }
 }
 
-// exists to trigger a reset
+// Clears existing flick-scrolling & primes the flick-reset recentering mechanism.
 export function flickResetModel(params: GestureParams): GestureModel<any> {
   return {
     id: 'flick-reset',
@@ -716,9 +754,43 @@ export function flickResetModel(params: GestureParams): GestureModel<any> {
     contacts: [
       {
         model: {
-          // TODO: adjust.
           ...instantContactResolutionModel(),
           pathInheritance: 'partial', // keep base item, but reset the path-stats.
+        },
+      }
+    ],
+    resolutionAction: {
+      type: 'chain',
+      next: 'flick-reset-centering'
+    },
+    sustainWhenNested: true
+  };
+}
+
+export function flickResetCenteringModel(params: GestureParams): GestureModel<KeyElement> {
+  return {
+    id: 'flick-reset-centering',
+    resolutionPriority: 1,
+    contacts: [
+      {
+        model: {
+          pathModel: {
+            evaluate(path, priorStats, baseItem) {
+              priorStats ||= path.stats;
+
+              const calcDist = buildDistFromKeyCentroidFunctor(baseItem);
+
+              const newDist = calcDist(path.stats);
+              const oldDist = calcDist(priorStats);
+
+              if(oldDist < newDist) {
+                return 'resolve';
+              }
+            },
+          },
+          itemPriority: 0,
+          pathResolutionAction: 'resolve',
+          pathInheritance: 'full', // no need to re-reset.
         },
       }
     ],

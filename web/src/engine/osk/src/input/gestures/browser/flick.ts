@@ -128,7 +128,13 @@ export default class Flick implements GestureHandler {
       const baseSelection = this.computedFlickDistribution[0].keySpec;
 
       if(result.matchedId == 'flick-restart') {
+        // The gesture-engine's already done this, but we need an analogue for it here.
+        source.path.replaceInitialSample(result.sources[0].path.stats.initialSample);
         // Part of the flick-reset process.
+        return;
+      } if(result.matchedId == 'flick-reset-centering') {
+        // Part of the flick-reset process.
+        source = baseSource.constructSubview(true, true);
         return;
       } else if(result.matchedId == 'flick-reset-end') {
         this.emitKey(vkbd, this.baseSpec, source.path.stats);
@@ -149,7 +155,6 @@ export default class Flick implements GestureHandler {
           // Clean up the handlers; we're replacing the subview.
           source.disconnect();
         }
-        source = baseSource.constructSubview(true, true);
         return;
       } else if(result.matchedId == 'flick-mid') {
         if(baseSelection == this.baseSpec) {
