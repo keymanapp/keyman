@@ -15,14 +15,15 @@ import { CompilerMessages } from '../src/compiler/messages.js';
 
 const debug = false;
 
-describe('KmpCompiler', function () {
+describe('KmpCompiler', async function () {
   const MODELS : string[] = [
     'example.qaa.sencoten',
     'withfolders.qaa.sencoten',
   ];
 
   const callbacks = new TestCompilerCallbacks();
-  let kmpCompiler = new KmpCompiler(callbacks);
+  let kmpCompiler = new KmpCompiler();
+  assert.isTrue(await kmpCompiler.init(callbacks, null));
 
   for (let modelID of MODELS) {
     const kpsPath = modelID.includes('withfolders') ?
@@ -89,7 +90,9 @@ describe('KmpCompiler', function () {
     const kpsPath = makePathToFixture('khmer_angkor', 'source', 'khmer_angkor.kps');
     const kmpJsonRefPath = makePathToFixture('khmer_angkor', 'ref', 'kmp.json');
 
-    const kmpCompiler = new KmpCompiler(callbacks);
+    const kmpCompiler = new KmpCompiler();
+    assert.isTrue(await kmpCompiler.init(callbacks, null));
+
     const kmpJsonFixture: KmpJsonFile.KmpJsonFile = JSON.parse(fs.readFileSync(kmpJsonRefPath, 'utf-8'));
 
     // We override the fixture version so that we can compare with the compiler output
@@ -193,7 +196,8 @@ describe('KmpCompiler', function () {
     callbacks.clear();
 
     const kpsPath = makePathToFixture('absolute_path', 'source', 'absolute_path.kps');
-    const kmpCompiler = new KmpCompiler(callbacks);
+    const kmpCompiler = new KmpCompiler();
+    assert.isTrue(await kmpCompiler.init(callbacks, null));
 
     let kmpJson: KmpJsonFile.KmpJsonFile = null;
 

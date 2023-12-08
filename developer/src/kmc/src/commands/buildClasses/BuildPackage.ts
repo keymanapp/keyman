@@ -1,7 +1,6 @@
-import * as fs from 'fs';
 import { BuildActivity } from './BuildActivity.js';
 import { CompilerCallbacks, CompilerOptions, KeymanFileTypes } from '@keymanapp/common-types';
-import { KmpCompiler, PackageValidation } from '@keymanapp/kmc-package';
+import { KmpCompiler } from '@keymanapp/kmc-package';
 
 export class BuildPackage extends BuildActivity {
   public get name(): string { return 'Package'; }
@@ -12,35 +11,16 @@ export class BuildPackage extends BuildActivity {
 
     const outfile = this.getOutputFilename(infile, options);
 
-    //
-    // Load .kps source data
-    //
-
-    const kmpCompiler = new KmpCompiler(callbacks);
-    const kmpJsonData = kmpCompiler.transformKpsToKmpObject(infile);
-    if(!kmpJsonData) {
+    const kmpCompiler = new KmpCompiler();
+    if(!await kmpCompiler.init(callbacks, options)) {
       return false;
     }
 
-    //
-    // Validate the package file
-    //
-
-    const validation = new PackageValidation(callbacks, options);
-    if(!validation.validate(infile, kmpJsonData)) {
+    const result = await kmpCompiler.run(infile, outfile);
+    if(!result) {
       return false;
     }
 
-    //
-    // Build the .kmp package file
-    //
-
-    const data = await kmpCompiler.buildKmpFile(infile, kmpJsonData);
-    if(!data) {
-      return false;
-    }
-
-    fs.writeFileSync(outfile, data, 'binary');
-    return true;
+    return await kmpCompiler.write(result.artifacts);
   }
 }

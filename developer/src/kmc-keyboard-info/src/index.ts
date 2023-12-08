@@ -85,7 +85,11 @@ export class KeyboardInfoCompiler {
     // .kpj work is largely in kmc at present, so that would need to move to
     // a separate module.
 
-    const kmpCompiler = new KmpCompiler(this.callbacks);
+    const kmpCompiler = new KmpCompiler();
+    if(!await kmpCompiler.init(this.callbacks, {})) {
+      // Errors will have been emitted by KmpCompiler
+      return null;
+    }
     const kmpJsonData = kmpCompiler.transformKpsToKmpObject(sources.kpsFilename);
     if(!kmpJsonData) {
       // Errors will have been emitted by KmpCompiler

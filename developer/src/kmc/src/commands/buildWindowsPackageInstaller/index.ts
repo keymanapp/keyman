@@ -4,7 +4,7 @@ import { CompilerBaseOptions, CompilerCallbacks, defaultCompilerOptions } from '
 import { NodeCompilerCallbacks } from '../../util/NodeCompilerCallbacks.js';
 import { WindowsPackageInstallerCompiler, WindowsPackageInstallerSources } from '@keymanapp/kmc-package';
 
-interface WindowsPackageInstallerOptions extends CompilerBaseOptions {
+interface WindowsPackageInstallerCommandLineOptions extends CompilerBaseOptions {
   msi: string;
   exe: string;
   license: string;
@@ -15,7 +15,9 @@ interface WindowsPackageInstallerOptions extends CompilerBaseOptions {
 };
 
 export async function buildWindowsPackageInstaller(infile: string, _options: any, commander: any) {
-  const options: WindowsPackageInstallerOptions = commander.optsWithGlobals();
+  // TODO(lowpri): we probably should cleanup the options management here, move
+  // translation of command line options to kmc-* options into a separate module
+  const options: WindowsPackageInstallerCommandLineOptions = commander.optsWithGlobals();
   const sources: WindowsPackageInstallerSources = {
     licenseFilename: options.license,
     msiFilename: options.msi,
@@ -31,11 +33,8 @@ export async function buildWindowsPackageInstaller(infile: string, _options: any
   infile = fs.realpathSync.native(infile);
 
   const callbacks: CompilerCallbacks = new NodeCompilerCallbacks({...defaultCompilerOptions, ...options});
-  const compiler = new WindowsPackageInstallerCompiler(callbacks);
-
-  const buffer = await compiler.compile(infile, sources);
-  if(!buffer) {
-    // errors will have been reported already
+  const compiler = new WindowsPackageInstallerCompiler();
+  if(!await compiler.init(callbacks, {...options, sources})) {
     process.exit(1);
   }
 
@@ -43,5 +42,14 @@ export async function buildWindowsPackageInstaller(infile: string, _options: any
   const outFileBase = path.basename(fileBaseName, path.extname(fileBaseName));
   const outFileDir = path.dirname(fileBaseName);
   const outFileExe = path.join(outFileDir, outFileBase + '.exe');
-  fs.writeFileSync(outFileExe, buffer);
+
+  const result = await compiler.run(infile, outFileExe);
+  if(!result) {
+    // errors will have been reported already
+    process.exit(1);
+  }
+
+  if(!await compiler.write(result.artifacts)) {
+    process.exit(1);
+  }
 }
