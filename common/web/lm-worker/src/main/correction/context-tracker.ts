@@ -470,7 +470,7 @@ export class ContextTracker extends CircularArray<TrackedContextState> {
     return state;
   }
 
-  static modelContextState(tokenizedContext: USVString[],
+  private static modelContextState(tokenizedContext: USVString[],
                             transformDistribution: Distribution<Transform>,
                             lexicalModel: LexicalModel): TrackedContextState {
     let baseTokens = tokenizedContext.map(function(entry) {
