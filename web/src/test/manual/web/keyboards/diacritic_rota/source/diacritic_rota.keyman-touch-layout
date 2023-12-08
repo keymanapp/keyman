@@ -820,12 +820,13 @@
                 "id": "K_SHIFT",
                 "text": "*Shift*",
                 "width": 100,
-                "sp": 1,
+                "sp": 2,
                 "nextlayer": "default"
               },
               {
                 "id": "K_0",
-                "text": "0"
+                "text": "0",
+                "layer": "default"
               },
               {
                 "id": "K_PERIOD",

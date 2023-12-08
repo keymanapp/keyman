@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Package>
   <System>
-    <KeymanDeveloperVersion>17.0.185.0</KeymanDeveloperVersion>
+    <KeymanDeveloperVersion>17.0.219.0</KeymanDeveloperVersion>
     <FileVersion>7.0</FileVersion>
   </System>
   <Options>
@@ -55,11 +55,15 @@
   </Files>
   <Keyboards>
     <Keyboard>
-      <Name>Diacritic Rota</Name>
+      <Name>Diacritic 10-key Rota</Name>
       <ID>diacritic_rota</ID>
       <Version>1.0</Version>
-      <Languages/>
+      <Languages>
+        <Language ID="en">English</Language>
+      </Languages>
+      <Examples/>
     </Keyboard>
   </Keyboards>
+  <RelatedPackages/>
   <Strings/>
 </Package>
