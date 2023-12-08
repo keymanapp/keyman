@@ -201,6 +201,7 @@
 }
 
 .tablet.ios .kmw-key-layer-group {background-color: #cfd3d9}
+.tablet.ios .kmw-key.kmw-keypreview.kmw-preview-overlay { box-shadow: 0 0 5px 3px #cfd3d9 }
 .tablet.ios .kmw-key {border: none; border-bottom: solid 1px #8a8d90; box-shadow:none; border-radius: 5px;}
 .tablet.ios .kmw-key.kmw-key-default {color:#000;background-color:#fdfdfe;}
 .tablet.ios .kmw-key.kmw-key-shift,
@@ -214,6 +215,7 @@
 /* Probably best to make this its own CSS that can be optionally included? */
 @media (prefers-color-scheme: dark) {
   .tablet.ios .kmw-key-layer-group {background-color: #0f1319}
+  .tablet.ios .kmw-key.kmw-keypreview.kmw-preview-overlay { box-shadow: 0 0 5px 3px #0f1319 }
   .tablet.ios .kmw-key.kmw-key-default {color:#fff;background-color:#3d3d3e}
   .tablet.ios .kmw-key.kmw-key-shift,
   .tablet.ios .kmw-key.kmw-key-special {color:#fff;background-color:#595c62;}
@@ -226,6 +228,7 @@
 .tablet .kmw-key-row {-webkit-touch-callout:none;-webkit-user-select:none;-ms-user-select:none;user-select:none;-webkit-tap-highlight-color:rgba(0,0,0,0);}
 
 .tablet.android .kmw-key-layer-group {background-color: #333;}
+.tablet.android .kmw-key.kmw-keypreview.kmw-preview-overlay { box-shadow: 0 0 5px 3px #333 }
 .tablet.android .kmw-key {border: none; border-bottom: solid 1px #8a8d90; box-shadow:none; border-radius: 5px;}
 .tablet.android .kmw-key.kmw-key-default {color:#fff;background-color:#777;}
 .tablet.android .kmw-key.kmw-key-shift,
@@ -346,6 +349,11 @@ body div.kmw-key-shift-on span.kmw-key-text {font-family:SpecialOSK !important;f
   z-index: 10002;
 }
 
+.kmw-keypreview {
+  z-index: 10002;
+  position: absolute;
+}
+
 #kmw-gesture-preview {
   position: absolute;
   display: block;
@@ -383,13 +391,13 @@ body div.kmw-key-shift-on span.kmw-key-text {font-family:SpecialOSK !important;f
   transition: 0.5s linear border;
 }
 
-#kmw-preview-img-container.flick-clear {
+#kmw-preview-img-container.kmw-flick-clear {
   transition: margin 0.25s linear ease-in-out;
   margin-left: 0px !important;
   margin-top: 0px !important;
 }
 
-.kmw-key-popup-icon.hint-clear {
+.kmw-key-popup-icon.kmw-hint-clear {
   color: transparent;
   transition: 0.5s linear all;
 }
