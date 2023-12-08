@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.31313.79
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Keyman32", "keyman32\Keyman32.vcxproj", "{BD5564FB-35A5-4A3C-B96A-4A6578E2B593}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "keyman32-ver", "keyman32-ver\Keyman32-ver.vcxproj", "{BD5564FB-35A5-4A3C-B96A-4A6578E2B593}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "keyman64", "keyman64\keyman64.vcxproj", "{D1115FB2-230D-4FD8-90B9-982E49953D18}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "keyman64-ver", "keyman64-ver\keyman64-ver.vcxproj", "{D1115FB2-230D-4FD8-90B9-982E49953D18}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "keymanx64", "keymanx64\keymanx64.vcxproj", "{A34650EA-D6E8-4229-8091-6BF1443565B5}"
 EndProject
@@ -15,11 +15,15 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "mcompile", "mcompile\mcompi
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "kmrefresh", "kmrefresh\kmrefresh.vcxproj", "{A3B8F75F-E63E-434E-8A2A-034AD9B66571}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "keyman-engine-tests", "keyman32\tests\keyman-engine-tests\keyman-engine-tests.vcxproj", "{46399ED7-79A1-4E7E-BD96-4B1AEEC838AE}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "keyman-engine-tests", "keyman32-ver\tests\keyman-engine-tests\keyman-engine-tests.vcxproj", "{46399ED7-79A1-4E7E-BD96-4B1AEEC838AE}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "keyman-engine", "keyman32\keyman-engine.vcxproj", "{A7069186-5AE7-4504-8926-861B7A34BA9E}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "keyman-engine", "keyman32-ver\keyman-engine.vcxproj", "{A7069186-5AE7-4504-8926-861B7A34BA9E}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "testhost", "testhost\testhost.vcxproj", "{12818DA3-0472-49A5-96FC-A4808A1A77FA}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "keyman64", "keyman64\keyman64.vcxproj", "{CE480BDD-E112-488D-8684-ECBA8F46FF87}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "keyman32", "keyman32\keyman32.vcxproj", "{FA6F9217-E2BB-4586-ACD3-0DFB6C13A257}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -91,6 +95,18 @@ Global
 		{12818DA3-0472-49A5-96FC-A4808A1A77FA}.Release|Win32.Build.0 = Release|Win32
 		{12818DA3-0472-49A5-96FC-A4808A1A77FA}.Release|x64.ActiveCfg = Release|x64
 		{12818DA3-0472-49A5-96FC-A4808A1A77FA}.Release|x64.Build.0 = Release|x64
+		{CE480BDD-E112-488D-8684-ECBA8F46FF87}.Debug|Win32.ActiveCfg = Debug|x64
+		{CE480BDD-E112-488D-8684-ECBA8F46FF87}.Debug|x64.ActiveCfg = Debug|x64
+		{CE480BDD-E112-488D-8684-ECBA8F46FF87}.Debug|x64.Build.0 = Debug|x64
+		{CE480BDD-E112-488D-8684-ECBA8F46FF87}.Release|Win32.ActiveCfg = Release|x64
+		{CE480BDD-E112-488D-8684-ECBA8F46FF87}.Release|x64.ActiveCfg = Release|x64
+		{CE480BDD-E112-488D-8684-ECBA8F46FF87}.Release|x64.Build.0 = Release|x64
+		{FA6F9217-E2BB-4586-ACD3-0DFB6C13A257}.Debug|Win32.ActiveCfg = Debug|Win32
+		{FA6F9217-E2BB-4586-ACD3-0DFB6C13A257}.Debug|Win32.Build.0 = Debug|Win32
+		{FA6F9217-E2BB-4586-ACD3-0DFB6C13A257}.Debug|x64.ActiveCfg = Debug|Win32
+		{FA6F9217-E2BB-4586-ACD3-0DFB6C13A257}.Release|Win32.ActiveCfg = Release|Win32
+		{FA6F9217-E2BB-4586-ACD3-0DFB6C13A257}.Release|Win32.Build.0 = Release|Win32
+		{FA6F9217-E2BB-4586-ACD3-0DFB6C13A257}.Release|x64.ActiveCfg = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

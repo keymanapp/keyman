@@ -283,7 +283,7 @@ extern "C" BOOL _declspec(dllexport) WINAPI Keyman_GetInitialised(BOOL *FSingleA
 
 BOOL InitHooks()
 {
-  HINSTANCE hinst = GetModuleHandle(LIBRARY_NAME);
+  HINSTANCE hinst = g_hInstance;
 
 	*Globals::hhookGetMessage()   = SetWindowsHookExW(WH_GETMESSAGE,  (HOOKPROC) kmnGetMessageProc, hinst, Globals::get_FSingleThread());
   *Globals::hhookCallWndProc()  = SetWindowsHookExW(WH_CALLWNDPROC, (HOOKPROC) kmnCallWndProc,    hinst, Globals::get_FSingleThread());
@@ -336,7 +336,6 @@ extern "C" BOOL _declspec(dllexport) WINAPI Keyman_ResetInitialisation()  // I30
 
 extern "C" BOOL _declspec(dllexport) WINAPI Keyman_Initialise(HWND Handle, BOOL FSingleApp)
 {
-	HINSTANCE hinst;
 
   Globals::LoadDebugSettings();
 
@@ -364,8 +363,6 @@ extern "C" BOOL _declspec(dllexport) WINAPI Keyman_Initialise(HWND Handle, BOOL 
 		*Globals::FSingleThread() = 0;
 
   *Globals::InitialisingThread() = GetCurrentThreadId();   // I4326
-
-	hinst = GetModuleHandle(LIBRARY_NAME);
 
 	InitDebugging();
 
@@ -408,7 +405,7 @@ extern "C" BOOL _declspec(dllexport) WINAPI Keyman_Initialise(HWND Handle, BOOL 
 	*Globals::Keyman_Initialised() = TRUE;
 	RefreshKeyboards(TRUE);   // I4786
 
-  SendDebugMessageFormat(Handle, sdmGlobal, 0, "Keyman is now initialised");
+  SendDebugMessageFormat(Handle, sdmGlobal, 0, "Keyman_Initialise: Keyman is now initialised");
 
 	return TRUE;
 }

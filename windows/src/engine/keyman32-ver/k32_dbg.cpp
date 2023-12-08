@@ -91,7 +91,7 @@ void InitDebugging() {
 		SendDebugMessage(0, sdmKeyboard, 0, buf);
 		delete buf;
 
-		GetModuleFileName(GetModuleHandle(LIBRARY_NAME), fname, 260);
+		GetModuleFileName(GetModuleHandle(LIBRARY_NAME ".dll"), fname, 260);
 		sz = GetFileVersionInfoSize(fname, 0);
 		if(sz > 0)
 		{

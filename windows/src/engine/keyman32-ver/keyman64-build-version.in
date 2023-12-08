@@ -53,94 +53,14 @@
 */
 /***************************************************************************/   // I4006   // I4169
 
-#ifndef _KEYMAN64_H
-#define _KEYMAN64_H
-
-#ifndef _CRT_SECURE_CPP_OVERLOAD_STANDARD_NAMES
-#define _CRT_SECURE_CPP_OVERLOAD_STANDARD_NAMES 1
-#endif
-
-#ifndef _CRT_SECURE_CPP_OVERLOAD_STANDARD_NAMES_COUNT
-#define _CRT_SECURE_CPP_OVERLOAD_STANDARD_NAMES_COUNT 1
-#endif
-
-#ifndef _WIN32_WINNT
-#define _WIN32_WINNT 0x0600
-#endif
-
-#ifndef STRICT
-#define STRICT
-#endif
-
-#include <windows.h>
-#include <assert.h>
-#include <msctf.h>
-#include "../../../../common/windows/cpp/include/legacy_kmx_file.h"
-#include "../../../../common/windows/cpp/include/registry.h"
-#include "../../../../common/windows/cpp/include/unicode.h"
-#include "../../../../common/windows/cpp/include/xstring.h"
-#include "../../../../common/windows/cpp/include/legacy_kmx_memory.h"
+#ifndef _KEYMAN64_BUILD_VERSION_H
+#define _KEYMAN64_BUILD_VERSION_H
 
 #ifdef _WIN64
-#define LIBRARY_NAME "KEYMAN64"
+#define LIBRARY_NAME "keyman64-ver$VersionWithTag.dll"
 #else
-#define LIBRARY_NAME "KEYMAN32"
+#define LIBRARY_NAME "keyman32-ver$VersionWithTag.dll"
 #endif
 
-#define NOT_IMPLEMENTED assert(FALSE)
 
-
-#define ERROR_APP_MASK 0x20000000L
-#define ERROR_KEYMAN_ALREADY_INIT (ERROR_APP_MASK | 0x00000001L)
-#define ERROR_KEYMAN_SHUTTING_DOWN (ERROR_APP_MASK | 0x00000002L)
-#define ERROR_KEYMAN_TLS_OUT_OF_INDEXES (ERROR_APP_MASK | 0x00000003L)
-#define ERROR_KEYMAN_MEMORY_ALLOCATION_FAILED (ERROR_APP_MASK | 0x00000004L)
-#define ERROR_KEYMAN_CORRUPT (ERROR_APP_MASK | 0x00000005L)
-#define ERROR_KEYMAN_CANNOT_REINITIALISE_THREAD (ERROR_APP_MASK | 0x00000006L)
-#define ERROR_KEYMAN_CANNOT_LOAD_PRODUCTS (ERROR_APP_MASK | 0x00000007L)
-#define ERROR_KEYMAN_THREAD_DATA_NOT_READY (ERROR_APP_MASK | 0x00000008L)
-#define ERROR_KEYMAN_KEYBOARD_NOT_ACTIVE (ERROR_APP_MASK | 0x00000009L)
-#define ERROR_KEYMAN_TOO_MANY_CONTROLLERS (ERROR_APP_MASK | 0x0000000AL)
-
-/* RefreshKeyboards message parameters */
-
-#define KR_REQUEST_REFRESH  0
-#define KR_PRE_REFRESH      1
-#define KR_REFRESH          2
-#define KR_SETTINGS_CHANGED 3   // Broadcast when Keyman Configuration settings change
-
-/* WM_KEY* message analysis */
-
-#define KEYMSG_LPARAM_SCAN(lParam) ((BYTE)(((lParam) & 0xFF0000) >> 16))
-#define KEYMSG_FLAG_EXTENDED(lParam) (HIWORD(lParam) & KF_EXTENDED ? 1 : 0)
-#define KEYMSG_FLAG_DLGMODE(lParam) (HIWORD(lParam) & KF_DLGMODE ? 1 : 0)
-#define KEYMSG_FLAG_MENUMODE(lParam) (HIWORD(lParam) & KF_MENUMODE ? 1 : 0)
-#define KEYMSG_FLAG_ALTDOWN(lParam) (HIWORD(lParam) & KF_ALTDOWN ? 1 : 0)
-#define KEYMSG_FLAG_REPEAT(lParam) (HIWORD(lParam) & KF_REPEAT ? 1 : 0)
-#define KEYMSG_FLAG_UP(lParam) (HIWORD(lParam) & KF_UP ? 1 : 0)
-
-// TODO: Deprecate overloading of scancodes and use dwExtraInfo instead
-#define SCAN_FLAG_KEYMAN_KEY_EVENT          0xFF
-
-#define EXTRAINFO_FLAG_SERIALIZED_USER_KEY_EVENT 0x4B4D0000
-
-/***************************************************************************/
-// wm_keyman
-
-#define RWM_KEYMAN "wm_keyman"
-
-// wParam for wm_keyman
-// These messages should be posted to a window
-#define KM_DISABLEUI	1
-#define KM_ENABLEUI		2
-// These messages should be sent to a window
-//#define KM_GETUISTATE	3
-#define KM_FOCUSCHANGED	5		// Never use this flag: internal to Keyman
-#define KM_ACTIVECHANGED 6  // Never use this flag: internal to Keyman
-#define KM_EXITFLUSH  8 // Disconnects GetMessage hook
-
-#define KMF_WINDOWCHANGED 1
-
-/*********************************************************************/
-
-#endif	// _KEYMAN64_H
+#endif	// _KEYMAN64_BUILD_VERSION_H

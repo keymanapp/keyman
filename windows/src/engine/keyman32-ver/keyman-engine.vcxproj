@@ -12,7 +12,7 @@
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{A7069186-5AE7-4504-8926-861B7A34BA9E}</ProjectGuid>
-    <RootNamespace>Keyman32</RootNamespace>
+    <RootNamespace>Keyman32-ver</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -59,7 +59,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LibraryPath>$(ProjectDir)..\..\..\..\core\build\x86\$(Configuration)\src;$(ProjectDir)..\..\..\..\core\build\rust\x86\$(Configuration);$(LibraryPath)</LibraryPath>
-    <IncludePath>$(ProjectDir)..\..\..\..\common\include;$(ProjectDir)..\..\..\..\core\include;$(ProjectDir)..\..\..\..\core\build\x86\$(Configuration)\include;$(IncludePath)</IncludePath>
+    <IncludePath>$(ProjectDir)..\..\..\..\core\build\x86\$(Configuration)\include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <Midl>
@@ -67,7 +67,7 @@
       <MkTypLibCompatible>true</MkTypLibCompatible>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <TargetEnvironment>Win32</TargetEnvironment>
-      <TypeLibraryName>./Keyman32.tlb</TypeLibraryName>
+      <TypeLibraryName>./Keyman32-ver.tlb</TypeLibraryName>
       <HeaderFileName>
       </HeaderFileName>
     </Midl>
@@ -98,27 +98,27 @@
     </ResourceCompile>
     <Link>
       <AdditionalOptions>/verbose:lib /section:.SHARDATA,rws %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalDependencies>keymancore.lib;psapi.lib;rpcrt4.lib;version.lib;setupapi.lib;iphlpapi.lib;imm32.lib;crypt32.lib;wintrust.lib;imagehlp.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <OutputFile>./Keyman32$(Version_with_tag).dll</OutputFile>
+      <AdditionalDependencies>kmnkbp0.lib;psapi.lib;rpcrt4.lib;version.lib;setupapi.lib;iphlpapi.lib;imm32.lib;crypt32.lib;wintrust.lib;imagehlp.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <OutputFile>./Keyman32-ver$(Version_with_tag).dll</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <ModuleDefinitionFile>keyman32-ver.def</ModuleDefinitionFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <ProgramDatabaseFile>./Keyman32.pdb</ProgramDatabaseFile>
+      <ProgramDatabaseFile>./Keyman32-ver.pdb</ProgramDatabaseFile>
       <GenerateMapFile>true</GenerateMapFile>
-      <MapFileName>./Keyman32.map</MapFileName>
+      <MapFileName>./Keyman32-ver.map</MapFileName>
       <MapExports>false</MapExports>
       <SubSystem>Windows</SubSystem>
       <OptimizeReferences>true</OptimizeReferences>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <BaseAddress>0x1c100000</BaseAddress>
-      <ImportLibrary>./Keyman32.lib</ImportLibrary>
+      <ImportLibrary>./Keyman32-ver.lib</ImportLibrary>
       <TargetMachine>MachineX86</TargetMachine>
       <UACUIAccess>true</UACUIAccess>
       <TreatWarningAsError>true</TreatWarningAsError>
     </Link>
     <Bscmake>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <OutputFile>./Keyman32.bsc</OutputFile>
+      <OutputFile>./Keyman32-ver.bsc</OutputFile>
     </Bscmake>
     <Manifest>
       <AdditionalManifestFiles>
@@ -131,7 +131,7 @@
       <MkTypLibCompatible>true</MkTypLibCompatible>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <TargetEnvironment>Win32</TargetEnvironment>
-      <TypeLibraryName>./Keyman32.tlb</TypeLibraryName>
+      <TypeLibraryName>./Keyman32-ver.tlb</TypeLibraryName>
       <HeaderFileName>
       </HeaderFileName>
     </Midl>
@@ -160,24 +160,24 @@
     </ResourceCompile>
     <Link>
       <AdditionalOptions>/verbose:lib /section:.SHARDATA,rws %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalDependencies>keymancore.lib;psapi.lib;rpcrt4.lib;version.lib;setupapi.lib;iphlpapi.lib;imm32.lib;crypt32.lib;wintrust.lib;imagehlp.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <OutputFile>./Keyman32$(Version_with_tag).dll</OutputFile>
+      <AdditionalDependencies>kmnkbp0.lib;psapi.lib;rpcrt4.lib;version.lib;setupapi.lib;iphlpapi.lib;imm32.lib;crypt32.lib;wintrust.lib;imagehlp.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <OutputFile>./Keyman32-ver$(Version_with_tag).dll</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <ModuleDefinitionFile>keyman32-ver.def</ModuleDefinitionFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <ProgramDatabaseFile>./Keyman32.pdb</ProgramDatabaseFile>
+      <ProgramDatabaseFile>./Keyman32-ver.pdb</ProgramDatabaseFile>
       <GenerateMapFile>true</GenerateMapFile>
-      <MapFileName>./Keyman32.map</MapFileName>
+      <MapFileName>./Keyman32-ver.map</MapFileName>
       <SubSystem>Windows</SubSystem>
       <BaseAddress>0x1C100000</BaseAddress>
-      <ImportLibrary>./Keyman32.lib</ImportLibrary>
+      <ImportLibrary>./Keyman32-ver.lib</ImportLibrary>
       <TargetMachine>MachineX86</TargetMachine>
       <UACUIAccess>true</UACUIAccess>
       <TreatWarningAsError>true</TreatWarningAsError>
     </Link>
     <Bscmake>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <OutputFile>./Keyman32.bsc</OutputFile>
+      <OutputFile>./Keyman32-ver.bsc</OutputFile>
     </Bscmake>
     <Manifest>
       <AdditionalManifestFiles>

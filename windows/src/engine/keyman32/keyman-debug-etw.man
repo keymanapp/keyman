@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <instrumentationManifest
     xmlns="http://schemas.microsoft.com/win/2004/08/events"
     xmlns:win="http://manifests.microsoft.com/win/2004/08/windows/events"
@@ -15,8 +15,8 @@
       <provider name="Keyman-Debug-ETWProvider"
           guid="{DA621615-E08B-4283-918E-D2502D3757AE}"
           symbol="ProviderGuid"
-          resourceFileName="%CommonProgramFiles(x86)%\keyman\keyman engine\keyman32.dll"
-          messageFileName="%CommonProgramFiles(x86)%\keyman\keyman engine\keyman32.dll"
+          resourceFileName="%CommonProgramFiles(x86)%\Keyman\Keyman engine\keyman32.dll"
+          messageFileName="%CommonProgramFiles(x86)%\Keyman\Keyman engine\keyman32.dll"
           message="$(string.Provider.Name)">
         <maps>
           <valueMap name="Platform">

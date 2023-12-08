@@ -242,6 +242,9 @@ typedef struct tagKEYMAN64THREADDATA
   ISerialKeyEventClient *pSerialKeyEventClient;
   ISharedBufferManager *pSharedBufferManager;
 
+  /* Module handle for IMX Callback */
+
+  HMODULE hModuleProxy;
   /* Test host integration */
 
   CUSTOMPOSTKEYCALLBACKPROC CustomPostKeyCallback;

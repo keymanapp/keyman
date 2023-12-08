@@ -411,6 +411,8 @@ const
 
   SRegValue_RootPath                = 'root path';                                  // LM
   SRegValue_RegistrationKey         = 'registration key';                           // LM
+  SRegValue_Keyman32_Name           = 'keyman32 name';                              // LM
+  SRegValue_Keyman64_Name           = 'keyman64 name';                              // LM
 
   { Uninstall feedback keyboard list }
 

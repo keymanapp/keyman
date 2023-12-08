@@ -1,18 +1,18 @@
 (*
   Name:             utilkeyman
   Copyright:        Copyright (C) SIL International.
-  Documentation:    
-  Description:      
+  Documentation:
+  Description:
   Create Date:      20 Jun 2006
 
   Modified Date:    13 Mar 2015
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
+  Bugs:
+  Todo:
+  Notes:
   History:          20 Jun 2006 - mcdurdin - Initial version
                     01 Jun 2009 - mcdurdin - I2001 - use current user not local machine when testing root keyboard path
                     03 May 2011 - mcdurdin - I2890 - Record diagnostic data when encountering registry errors
@@ -53,6 +53,8 @@ function KeyboardIsPartOfPackage(KeyboardName: string; out PackageName: string):
 function PackageInstalled(const PackageName: string; var FIsAdmin: Boolean): Boolean;
 
 function GetKeyboardIconFileName(const KeyboardFileName: string): string;   // I3599
+
+function GetKeyman32Name: string;
 
 function GetKeymanInstallPath: string;
 
@@ -275,9 +277,25 @@ begin
   end;
 end;
 
+function GetKeyman32Name: string;
+
+begin
+  Result := '';
+  with TRegistryErrorControlled.Create do  // I2890
+  try
+    RootKey := HKEY_LOCAL_MACHINE;
+    if OpenKeyReadOnly(SRegKey_KeymanEngine_LM) and ValueExists(SRegValue_Keyman32_Name) then
+        Result := ReadString(SRegValue_Keyman32_Name);
+  finally
+    Free;
+  end;
+
+end;
+
 function GetKeymanInstallPath: string;
 var
   RootPath: string;
+  Keyman32Name: string;
 begin
   RootPath := ExtractFilePath(ParamStr(0));
   with TRegistryErrorControlled.Create do  // I2890
@@ -290,9 +308,9 @@ begin
     Free;
   end;
   Result := IncludeTrailingPathDelimiter(RootPath);
-
-  if not FileExists(Result + 'keyman32.dll') then
-    raise EKeymanNotInstalled.Create( 'The executable keyman32.dll could not '+
+  Keyman32Name := GetKeyman32Name;
+  if (Keyman32Name = '') or not FileExists(Result + Keyman32Name) then
+    raise EKeymanNotInstalled.Create( 'The executable '+Keyman32Name+' could not '+
       'be found.  You should reinstall.');
 end;
 

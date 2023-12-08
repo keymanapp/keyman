@@ -1,0 +1,30 @@
+# Copy files to correct names in \release; this file is munged by mkver to premake.mak
+#
+
+!include ..\..\defines.mak
+
+default:
+  echo Please don't call this file directly -- used by Makefile
+
+clean:
+    $(MSBUILD) $(MSBUILD_CLEAN) keyman32-ver.vcxproj
+
+signcode:
+    $(SIGNCODE) /d "Keyman Engine" $(PROGRAM)\engine\keyman32-ver$VersionWithTag.dll
+
+wrap-symbols:
+    $(SYMSTORE) $(PROGRAM)\engine\keyman32-ver$VersionWithTag.dll /t keyman-engine-windows
+    $(SYMSTORE) $(DEBUGPATH)\engine\keyman32-ver$VersionWithTag.pdb /t keyman-engine-windows
+
+
+
+install:
+    $(COPY) $(PROGRAM)\engine\keyman32-ver$VersionWithTag.dll "$(INSTALLPATH_KEYMANENGINE)\keyman32-ver$VersionWithTag.dll"
+    echo You may want to manually tweak keyman-debug-etw.man and fill in $(INSTALLPATH_KEYMANENGINE)\keyman32-ver$VersionWithTag.dll
+    echo and then run wevtutil im keyman-debug-etw.man to get the latest event tracing
+
+build:
+    $(MSBUILD) keyman32-ver.vcxproj $(MSBUILD_BUILD) "/p:VersionWithTag=$VersionWithTag;LIBRARY=keyman32-ver$VersionWithTag"
+    $(COPY) $(WIN32_TARGET_PATH)\keyman32-ver$VersionWithTag.dll $(PROGRAM)\engine
+    $(COPY) $(WIN32_TARGET_PATH)\keyman32-ver$VersionWithTag.pdb $(DEBUGPATH)\engine
+#   $(COPY) $(WIN32_TARGET_PATH)\keyman32-ver.lib $(OUTLIB) done by vcxproj
