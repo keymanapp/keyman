@@ -741,9 +741,8 @@ export default class ModelCompositor {
     // Designed for use when the caret has been directly moved and/or the context sourced from a different control
     // than before.
     if(this.contextTracker) {
-      let tokenizedContext = models.tokenize(this.lexicalModel.wordbreaker || wordBreakers.default, context);
-      let contextState = correction.ContextTracker.modelContextState(tokenizedContext.left, null, this.lexicalModel);
-      this.contextTracker.enqueue(contextState);
+      this.contextTracker.clearCache();
+      this.contextTracker.analyzeState(this.lexicalModel, context, null);
     }
   }
 
