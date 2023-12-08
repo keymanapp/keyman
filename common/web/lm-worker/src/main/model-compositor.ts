@@ -743,6 +743,8 @@ export default class ModelCompositor {
     if(this.contextTracker) {
       let tokenizedContext = models.tokenize(this.lexicalModel.wordbreaker || wordBreakers.default, context);
       let contextState = correction.ContextTracker.modelContextState(tokenizedContext.left, null, this.lexicalModel);
+
+      contextState.taggedContext = context;
       this.contextTracker.enqueue(contextState);
     }
   }

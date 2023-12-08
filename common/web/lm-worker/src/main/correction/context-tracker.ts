@@ -532,17 +532,20 @@ export class ContextTracker extends CircularArray<TrackedContextState> {
     if(tokenizedContext.left.length > 0) {
       for(let i = this.count - 1; i >= 0; i--) {
         const priorMatchState = this.item(i);
-        if(transformDistribution && transformDistribution.length > 0) {
+        const priorTaggedContext = priorMatchState.taggedContext;
+        if(priorTaggedContext && transformDistribution && transformDistribution.length > 0) {
           // Using the potential `matchState` + the incoming transform, do the results line up for
           // our observed context?  If not, skip it.
           //
           // Necessary to properly handle multitaps, as there are context rewinds that the
           // predictive-text engine is not otherwise warned about.
-          const doublecheckContext = applyTransform(transformDistribution[0].sample, priorMatchState.taggedContext);
+          //
+          // `priorTaggedContext` must not be `null`!
+          const doublecheckContext = applyTransform(transformDistribution[0].sample, priorTaggedContext);
           if(doublecheckContext.left != context.left) {
             continue;
           }
-        } else if(priorMatchState.taggedContext?.left != context.left) {
+        } else if(priorTaggedContext?.left != context.left) {
           continue;
         }
 
@@ -553,6 +556,7 @@ export class ContextTracker extends CircularArray<TrackedContextState> {
           // in the history.  However, if it's the most current already, there's no need
           // to refresh it.
           if(this.newest != resultState && this.newest != priorMatchState) {
+            // Already has a taggedContext.
             this.enqueue(priorMatchState);
           }
 
