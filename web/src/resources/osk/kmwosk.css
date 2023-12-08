@@ -349,9 +349,19 @@ body div.kmw-key-shift-on span.kmw-key-text {font-family:SpecialOSK !important;f
   z-index: 10002;
 }
 
+#kmw-keytip.kmw-preview-fade {
+  opacity: 0;
+  transition: 0.15s cubic-bezier(.42,0,.58,1) all 0.35s;
+}
+
 .kmw-keypreview {
   z-index: 10002;
   position: absolute;
+}
+
+.kmw-keypreview.kmw-preview-fade {
+  opacity: 0;
+  transition: 0.15s cubic-bezier(.42,0,.58,1) all 0.35s;
 }
 
 #kmw-gesture-preview {

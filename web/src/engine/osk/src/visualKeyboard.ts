@@ -430,17 +430,23 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
       }
 
       const endHighlighting = () => {
-        trackingEntry.previewHost?.cancel();
-        // If we ever allow concurrent previews, check if it exists and matches
-        // a VisualKeyboard-tracked entry; if so, clear that too.
-        if(previewHost) {
-          this.gesturePreviewHost = null;
-          trackingEntry.previewHost = null;
-        }
-        if(trackingEntry.key) {
-          this.highlightKey(trackingEntry.key, false);
-          trackingEntry.key = null;
-        }
+        // The base call will occur before our "is this a multitap?" check otherwise.
+        // That check will unset the field so that it's unaffected by this check.
+        timedPromise(0).then(() => {
+          const previewHost = trackingEntry.previewHost;
+
+          // If we ever allow concurrent previews, check if it exists and matches
+          // a VisualKeyboard-tracked entry; if so, clear that too.
+          if(previewHost) {
+            previewHost.cancel();
+            this.gesturePreviewHost = null;
+            trackingEntry.previewHost = null;
+          }
+          if(trackingEntry.key) {
+            this.highlightKey(trackingEntry.key, false);
+            trackingEntry.key = null;
+          }
+        })
       }
 
       // Fix:  if flicks enabled, no roaming.
@@ -509,6 +515,7 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
           existingPreviewHost.clearFlick();
         }
 
+        let trackingEntry: typeof sourceTrackingMap[string];
         // Disable roaming-touch highlighting (and current highlighting) for all
         // touchpoints included in a gesture, even newly-included ones as they occur.
         for(let id of gestureStage.allSourceIds) {
@@ -521,7 +528,7 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
             trackingEntry.source.path.off('step', trackingEntry.roamingHighlightHandler);
           }
 
-          const trackingEntry = sourceTrackingMap[id];
+          trackingEntry = sourceTrackingMap[id];
 
           if(trackingEntry) {
             clearRoaming(trackingEntry);
@@ -624,12 +631,16 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
           // baseItem is sometimes null during a keyboard-swap... for app/browser touch-based language menus.
           // not ideal, but it is what it is; just let it pass by for now.
         } else if(baseItem?.key.spec.multitap && (gestureStage.matchedId == 'initial-tap' || gestureStage.matchedId == 'multitap' || gestureStage.matchedId == 'modipress-start')) {
-          // For now, but worth changing later!
-          // Idea:  if the preview weren't hosted by the key, but instead had a key-lookalike overlay.
-          // Then it would float above any layer, even after layer swaps.
-          existingPreviewHost?.cancel();
-          // Likewise - mere construction is enough.
-          handlers = [new Multitap(gestureSequence, this, baseItem, keyResult.contextToken)];
+          // Detach the lifetime of the preview from the current touch.
+          trackingEntry.previewHost = null;
+
+          gestureSequence.on('complete', () => {
+            existingPreviewHost?.cancel();
+            this.gesturePreviewHost = null;
+          })
+
+          // Past that, mere construction of the class for delegation is enough.
+          handlers = [new Multitap(gestureSequence, this, baseItem, keyResult.contextToken, existingPreviewHost)];
         } else if(gestureStage.matchedId.indexOf('flick') > -1) {
           handlers = [new Flick(
             gestureSequence,
