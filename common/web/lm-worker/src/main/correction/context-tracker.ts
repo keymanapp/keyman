@@ -579,4 +579,10 @@ export class ContextTracker extends CircularArray<TrackedContextState> {
     this.enqueue(state);
     return state;
   }
+
+  clearCache() {
+    while(this.count > 0) {
+      this.dequeue();
+    }
+  }
 }
