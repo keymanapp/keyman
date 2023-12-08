@@ -85,6 +85,8 @@ export interface GestureParams<Item = any> {
 
     /**
      * The minimum _net_ touch-path distance after which the direction will be locked.
+     *
+     * Is currently also used as the max radius for valid flick-reset recentering targets.
      */
     dirLockDist: number
   },
@@ -407,14 +409,14 @@ export function flickEndContactModel(params: GestureParams): ContactModel {
   return {
     itemPriority: 1,
     pathModel: {
-      evaluate: (path, priorStats, baseItem) => {
+      evaluate: (path, priorStats, baseItem, baseStats) => {
         if(path.isComplete) {
           // The Flick handler class will sort out the mess once the path is complete.
           // Note:  if we wanted auto-triggering once the threshold distance were met,
           // we'd need to move its related logic into this method.
           return 'resolve';
         } else {
-          const { dir } = determineLockFromStats(path.stats, baseItem);
+          const { dir } = determineLockFromStats(baseStats, baseItem);
           if(calcLockedDistance(path.stats, dir) < params.flick.dirLockDist) {
             return 'reject';
           }
@@ -694,13 +696,39 @@ export function flickRestartModel(params: GestureParams): GestureModel<KeyElemen
           ...base.contacts[0].model,
           baseCoordReplacer: (stats, key) => {
             const keyCentroid = getKeyCentroid(key);
-            // const calcDist = buildDistFromKeyCentroidFunctor(key);
-            // const distFromCenter = calcDist(stats);
+            const calcDist = buildDistFromKeyCentroidFunctor(key);
 
-            // // uses 'partial' inheritance, so this is also the current coord.
-            // const currentCoord = stats.initialSample;
+            const coord = stats.initialSample;
+            const distFromCenter = calcDist(stats);
 
-            return keyCentroid;
+            // If the current coord is far off key and would trigger a flick, just recenter
+            // and let the intermediate models 'fall through', displaying the new target flick
+            // if possible.
+            if(distFromCenter > params.flick.triggerDist) {
+              return keyCentroid;
+            }
+
+            const dirLockDist = params.flick.dirLockDist;
+
+            // If we landed within the distance that'd trigger a direction-lock,
+            // no need to fully recenter; the current coord is "good enough".
+            if(distFromCenter < dirLockDist) {
+              return coord;
+            }
+
+            const projectionScalar = dirLockDist / distFromCenter;
+
+            // If the user didn't land close to the key's center, their "perceived"
+            // center for the gesture is likely different than the 'true' center.
+            const dx = coord.clientX - keyCentroid.clientX;
+            const dy = coord.clientY - keyCentroid.clientY;
+
+            // Maps the current coord to a coord on the edge of a circle centered
+            // on the key centroid at a radius of `dirLockDist` away.
+            return {
+              clientX: keyCentroid.clientX + dx * projectionScalar,
+              clientY: keyCentroid.clientY + dy * projectionScalar
+            };
           }
         }
       }
