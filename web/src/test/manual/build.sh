@@ -55,9 +55,7 @@ function do_copy() {
   GESTURE_RECOGNIZER_BUILD="$KEYMAN_ROOT/common/web/gesture-recognizer/build/lib/."
   GESTURE_RECOGNIZER_TARGET="$KEYMAN_ROOT/web/build/engine/gesture-recognizer/lib/"
 
-  if ! [ -d $GESTURE_RECOGNIZER_TARGET ]; then
-      mkdir -p $GESTURE_RECOGNIZER_TARGET
-  fi
+  mkdir -p "$GESTURE_RECOGNIZER_TARGET"
   cp -a $GESTURE_RECOGNIZER_BUILD $GESTURE_RECOGNIZER_TARGET
 }
 
