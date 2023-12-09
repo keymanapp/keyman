@@ -1,4 +1,3 @@
-import * as fs from 'fs';
 import { BuildActivity } from './BuildActivity.js';
 import { CompilerCallbacks, KeymanFileTypes } from '@keymanapp/common-types';
 import { ModelInfoCompiler } from '@keymanapp/kmc-model-info';
@@ -63,8 +62,7 @@ export class BuildModelInfo extends BuildActivity {
     }
 
     const lastCommitDate = getLastGitCommitDate(project.projectPath);
-    const compiler = new ModelInfoCompiler(callbacks);
-    const data = compiler.writeModelMetadataFile({
+    const sources = {
       model_id: callbacks.path.basename(project.projectPath, KeymanFileTypes.Source.Project),
       kmpJsonData,
       sourcePath: calculateSourcePath(infile),
@@ -73,18 +71,20 @@ export class BuildModelInfo extends BuildActivity {
       kpsFilename: project.resolveInputFilePath(kps),
       lastCommitDate,
       forPublishing: !!options.forPublishing,
-    });
+    };
+    const outputFilename = project.getOutputFilePath(KeymanFileTypes.Binary.ModelInfo);
 
-    if(data == null) {
+    const compiler = new ModelInfoCompiler();
+    if(!await compiler.init(callbacks, {sources})) {
+      return false;
+    }
+    const result = await compiler.run(infile, outputFilename);
+
+    if(result == null) {
       // Error messages have already been emitted by writeModelMetadataFile
       return false;
     }
 
-    fs.writeFileSync(
-      project.getOutputFilePath(KeymanFileTypes.Binary.ModelInfo),
-      data
-    );
-
-    return true;
+    return await compiler.write(result.artifacts);
   }
 }
