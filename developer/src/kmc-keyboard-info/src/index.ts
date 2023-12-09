@@ -5,7 +5,7 @@
 
 import { minKeymanVersion } from "./min-keyman-version.js";
 import { KeyboardInfoFile, KeyboardInfoFileIncludes, KeyboardInfoFileLanguageFont, KeyboardInfoFilePlatform } from "./keyboard-info-file.js";
-import { KeymanFileTypes, CompilerCallbacks, KmpJsonFile, KmxFileReader, KMX, KeymanTargets } from "@keymanapp/common-types";
+import { KeymanFileTypes, CompilerCallbacks, KmpJsonFile, KmxFileReader, KMX, KeymanTargets, KeymanCompiler, CompilerOptions, KeymanCompilerResult, KeymanCompilerArtifacts, KeymanCompilerArtifact } from "@keymanapp/common-types";
 import { KeyboardInfoCompilerMessages } from "./messages.js";
 import langtags from "./imports/langtags.js";
 import { validateMITLicense } from "@keymanapp/developer-utils";
@@ -24,7 +24,7 @@ const HelpRoot = 'https://help.keyman.com/keyboard/';
  * Build a dictionary of language tags from langtags.json
  */
 
-function init(): void {
+function preinit(): void {
   if(langtagsByTag['en']) {
     // Already initialized, we can reasonably assume that 'en' will always be in
     // langtags.json.
@@ -62,9 +62,30 @@ export interface KeyboardInfoSources {
   forPublishing: boolean;
 };
 
-export class KeyboardInfoCompiler {
-  constructor(private callbacks: CompilerCallbacks) {
-    init();
+export interface KeyboardInfoCompilerOptions extends CompilerOptions {
+  sources: KeyboardInfoSources;
+};
+
+export interface KeyboardInfoCompilerArtifacts extends KeymanCompilerArtifacts {
+  keyboard_info: KeymanCompilerArtifact;
+};
+
+export interface KeyboardInfoCompilerResult extends KeymanCompilerResult {
+  artifacts: KeyboardInfoCompilerArtifacts;
+};
+
+export class KeyboardInfoCompiler implements KeymanCompiler {
+  private callbacks: CompilerCallbacks;
+  private options: KeyboardInfoCompilerOptions;
+
+  constructor() {
+    preinit();
+  }
+
+  public async init(callbacks: CompilerCallbacks, options: KeyboardInfoCompilerOptions): Promise<boolean> {
+    this.callbacks = callbacks;
+    this.options = {...options};
+    return true;
   }
 
   /**
@@ -77,9 +98,8 @@ export class KeyboardInfoCompiler {
    *
    * @param sources                     Details on files from which to extract metadata
    */
-  public async writeKeyboardInfoFile(
-    sources: KeyboardInfoSources
-  ): Promise<Uint8Array> {
+  public async run(inputFilename: string, outputFilename?: string): Promise<KeyboardInfoCompilerResult> {
+    const sources = this.options.sources;
 
     // TODO(lowpri): work from .kpj and nothing else as input. Blocked because
     // .kpj work is largely in kmc at present, so that would need to move to
@@ -311,7 +331,22 @@ export class KeyboardInfoCompiler {
       }, null, 2));
     }
 
-    return new TextEncoder().encode(jsonOutput);
+    const data = new TextEncoder().encode(jsonOutput);
+    const result: KeyboardInfoCompilerResult = {
+      artifacts: {
+        keyboard_info: {
+          data,
+          filename: outputFilename ?? inputFilename.replace(/\.kpj$/, '.keyboard_info')
+        }
+      }
+    };
+
+    return result;
+  }
+
+  public async write(artifacts: KeyboardInfoCompilerArtifacts): Promise<boolean> {
+    this.callbacks.fs.writeFileSync(artifacts.keyboard_info.filename, artifacts.keyboard_info.data);
+    return true;
   }
 
   private mapKeymanTargetToPlatform(target: KeymanTargets.KeymanTarget): KeyboardInfoFilePlatform[] {
