@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 17.0.227 alpha 2023-12-08
+
+* fix(windows): debug includes libcmtd vs libcmt.dll (#10176)
+* fix(linux): Do not restart Fcitx (#10180)
+
 ## 17.0.226 alpha 2023-12-07
 
 * fix(web): accidental suggestion-banner retoggle when disabling predictions (#10014)
