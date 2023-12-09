@@ -94,7 +94,7 @@ export class GestureDebugPath<Type, StateToken = any> extends GesturePath<Type, 
   public translateCoordSystem(functor: (sample: InputSample<Type, StateToken>) => InputSample<Type, StateToken>) {
     super.translateCoordSystem(functor);
 
-    for(let i=0; i < this.coords.length; i++) {
+    for(let i=0; i < this.samples.length; i++) {
       this.samples[i] = functor(this.samples[i]);
     }
   }
