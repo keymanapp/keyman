@@ -143,6 +143,7 @@ const struct CompilerError CompilerErrors[] = {
     { CWARN_NulNotFirstStatementInContext                , "nul must be the first statement in the context"},
     { CWARN_IfShouldBeAtStartOfContext                   , "if, platform and baselayout should be at start of context (after nul, if present)"},
     { CWARN_KeyShouldIncludeNCaps                        , "Other rules which reference this key include CAPS or NCAPS modifiers, so this rule must include NCAPS modifier to avoid inconsistent matches"},
+    { CWARN_VirtualKeyInOutput                           , "Virtual keys are not supported in output"},
 
     { 0, nullptr }
   };

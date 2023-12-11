@@ -562,7 +562,9 @@ public class ResourcesUpdateTool implements KeyboardEventHandler.OnKeyboardDownl
 
   void tryFinalizeUpdate() {
     if (openUpdates.isEmpty()) {
-
+      // Trigger a host-page reset - we need to transition to the up-to-date versions.
+      // TODO: make it smoother.  Documented as #11097.
+      KMManager.clearKeyboardCache();
 
       if (failedUpdateCount > 0) {
         BaseActivity.makeToast(currentContext, R.string.update_failed, Toast.LENGTH_SHORT);

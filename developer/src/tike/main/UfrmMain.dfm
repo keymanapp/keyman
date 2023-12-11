@@ -2935,9 +2935,6 @@ inherited frmKeymanDeveloper: TfrmKeymanDeveloper
       object OpenProject1: TMenuItem
         Action = modActionsMain.actProjectOpen
       end
-      object OpenProjectFolder1: TMenuItem
-        Action = modActionsMain.actProjectOpenFolder
-      end
       object CloseProject1: TMenuItem
         Action = modActionsMain.actProjectClose
       end

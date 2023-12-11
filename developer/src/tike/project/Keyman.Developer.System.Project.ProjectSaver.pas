@@ -86,13 +86,6 @@ var
   filenode, node, root: IXMLNode;
   defopts: TProjectOptionsRecord;
 begin
-  if FProject.IsDefaultProject(pv20) and (FFileName <> '') then
-  begin
-    if FileExists(FFileName) then
-      System.SysUtils.DeleteFile(FFileName);
-    Exit;
-  end;
-
   defopts := DefaultProjectOptions[FProject.Options.Version];
 
   doc := NewXMLDocument();

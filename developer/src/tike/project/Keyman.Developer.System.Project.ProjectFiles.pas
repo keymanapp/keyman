@@ -70,5 +70,7 @@ initialization
   RegisterProjectFileType('.html', TOpenableProjectFile);  // I1769
   RegisterProjectFileType('.xml', TOpenableProjectFile);   // I1769
   RegisterProjectFileType('.js', TOpenableProjectFile);
+  RegisterProjectFileType('.kpj', TOpenableProjectFile);
+  RegisterProjectFileType('.user', TOpenableProjectFile);
 end.
 

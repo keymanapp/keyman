@@ -134,8 +134,8 @@ const DefaultProjectOptions: array[TProjectVersion] of TProjectOptionsRecord = (
   ProjectType: ptKeyboard;
   Version: pv10
 ), ( // 2.0
-  BuildPath: '$PROJECTPATH/build';
-  SourcePath: '$PROJECTPATH/source';
+  BuildPath: '$PROJECTPATH\build';
+  SourcePath: '$PROJECTPATH\source';
   CompilerWarningsAsErrors: False;
   WarnDeprecatedCode: True;
   CheckFilenameConventions: False;
@@ -143,6 +143,11 @@ const DefaultProjectOptions: array[TProjectVersion] of TProjectOptionsRecord = (
   ProjectType: ptKeyboard;
   Version: pv20
 ));
+
+{ TODO: this will be enabled in 18.0; see #10113
+const
+  C_ProjectStandardFilename = 'keyman.kpj';
+}
 
 type
   { Forward declarations }
@@ -195,7 +200,7 @@ type
   public
     procedure Log(AState: TProjectLogState; Filename, Msg: string; MsgCode, line: Integer); virtual;
 
-    constructor Create(AProjectType: TProjectType; AFileName: string); virtual;
+    constructor Create(AProjectType: TProjectType; AFileName: string; ALoad: Boolean); virtual;
     destructor Destroy; override;
 
     procedure Refresh;
@@ -353,10 +358,6 @@ type
     procedure ProjectFileDestroying(ProjectFile: TProjectFile);
   end;
 
-const
-  WM_USER_ProjectUpdateDisplayState = WM_USER;
-
-function GlobalProjectStateWndHandle: THandle;
 
 function ProjectTypeFromString(s: string): TProjectType;
 function ProjectTypeToString(pt: TProjectType): string;
@@ -581,7 +582,10 @@ begin
     if Assigned(FParent) then
       Result := FParent.OwnerProject;
     if Result = nil then
+    begin
+      // TODO: RAISE ERROR
       Result := FGlobalProject;
+    end;
   end;
 end;
 
@@ -621,8 +625,8 @@ begin
     Exit(True);
 
   // Only return true if the file is directly in the ProjectOptions.SourcePath folder
-  SourcePath := ReplaceStr(IncludeTrailingPathDelimiter(FProject.ResolveProjectPath(FProject.Options.SourcePath)), '/', '\');
-  FilePath := ReplaceStr(ExtractFilePath(FFileName), '/', '\');
+  SourcePath := DosSlashes(FProject.ResolveProjectPath(FProject.Options.SourcePath));
+  FilePath := DosSlashes(ExtractFilePath(FFileName));
   Result := SameFileName(SourcePath, FilePath);
 end;
 
@@ -662,7 +666,7 @@ procedure TProjectFile.Save(node: IXMLNode);   // I4698
 begin
   node.AddChild('ID').NodeValue := FID;
   node.AddChild('Filename').NodeValue := ExtractFileName(FFileName);
-  node.AddChild('Filepath').NodeValue := ExtractRelativePath(FProject.FileName, FFileName);
+  node.AddChild('Filepath').NodeValue := ExtractRelativePath(FProject.FileName, DosSlashes(FFileName));
   node.AddChild('FileVersion').NodeValue := FFileVersion;   // I4701
 
   // Note: FileType is only ever written in Delphi code; it is used by xsl
@@ -745,7 +749,7 @@ begin
   end;
 end;
 
-constructor TProject.Create(AProjectType: TProjectType; AFileName: string);
+constructor TProject.Create(AProjectType: TProjectType; AFileName: string; ALoad: Boolean);
 var
   i: Integer;
 begin
@@ -773,7 +777,7 @@ begin
 
   FMustSave := False;
 
-  if not Load then   // I4703
+  if ALoad and not Load then   // I4703
   begin
     raise EProjectLoader.Create('Unable to load project '+FFileName);
   end;
@@ -845,9 +849,6 @@ begin
         then Result := LoadFromXML(FileName)
         else Result := ImportFromIni(FileName);
     end
-    else if DirectoryExists(ExtractFilePath(FileName)) then
-      // This will fall back to a 2.0 folder load
-      Result := LoadFromXML(FileName)
     else
     begin
       Result := False;
@@ -978,18 +979,21 @@ end;
 ///
 function TProject.PopulateFiles: Boolean;
 var
-  ProjectPath: string;
+  SourcePath, ProjectPath: string;
 begin
   if FOptions.Version <> pv20 then
     raise EProjectLoader.Create('PopulateFiles can only be called on a v2.0 project');
 
   FFiles.Clear;
 
-  ProjectPath := ExtractFilePath(FileName);
+  ProjectPath := ExpandFileName(ExtractFilePath(FileName));
   if not DirectoryExists(ProjectPath) then
     Exit(False);
 
   PopulateFolder(ProjectPath);
+  SourcePath := ResolveProjectPath(FOptions.SourcePath);
+  if not SameFileName(ProjectPath, SourcePath) and DirectoryExists(SourcePath) then
+    PopulateFolder(SourcePath);
 
   Result := True;
 end;
@@ -999,19 +1003,13 @@ var
   ff: string;
   f: TSearchRec;
 begin
-  if FindFirst(path + '*', faDirectory, f) = 0 then
+  if FindFirst(path + '*', 0, f) = 0 then
   begin
     repeat
       ff := path + f.Name;
 
       if (f.Name = '.') or (f.Name = '..') then
       begin
-        Continue;
-      end;
-
-      if (f.Attr and faDirectory) = faDirectory then
-      begin
-        PopulateFolder(ff + '\');
         Continue;
       end;
 
@@ -1231,7 +1229,7 @@ end;
 
 function TProject.ResolveProjectPath(APath: string): string;
 begin
-  Result := ReplaceText(APath, '$PROJECTPATH', ExtractFileDir(ExpandFileName(FFileName)));
+  Result := IncludeTrailingPathDelimiter(ReplaceText(APath, '$PROJECTPATH', ExtractFileDir(ExpandFileName(FFileName))));
 end;
 
 function TProject.GetTargetFilename10(ATargetFile, ASourceFile, AVersion: string): string;   // I4688
@@ -1256,7 +1254,6 @@ begin
     Exit(ExtractFilePath(ExpandFileName(ASourceFile)) + ExtractFileName(ATargetFile));
   end;
 
-  Result := IncludeTrailingPathDelimiter(Result);
   Result := ResolveProjectPath(Result);
   Result := Result + ExtractFileName(ATargetFile);
 end;
@@ -1403,65 +1400,6 @@ begin
     (Self.Version = Source.Version);
 end;
 
-type
-  TGlobalProjectStateWnd = class
-  private
-    procedure WndProc(var Message: TMessage);
-    constructor Create;
-    destructor Destroy; override;
-  end;
-
-var
-  FGlobalProjectStateWnd: TGlobalProjectStateWnd = nil;
-
-  // Make this a global to prevent potential race
-  // condition causing an access violation. If it
-  // is an invalid window handle or 0 at destruction time,
-  // it's no big deal...
-  FGlobalProjectStateWndHandle: THandle = 0;
-
-{ TGlobalProjectStateWnd }
-
-constructor TGlobalProjectStateWnd.Create;
-begin
-  inherited Create;
-  FGlobalProjectStateWndHandle := AllocateHWnd(WndProc);
-end;
-
-destructor TGlobalProjectStateWnd.Destroy;
-var
-  h: THandle;
-begin
-  h := FGlobalProjectStateWndHandle;
-  FGlobalProjectStateWndHandle := 0;
-  DeallocateHWnd(h);
-  inherited Destroy;
-end;
-
-procedure TGlobalProjectStateWnd.WndProc(var Message: TMessage);
-var
-  PPath, PDisplayState: PChar;
-begin
-  if Message.Msg = WM_USER_ProjectUpdateDisplayState then
-  begin
-    PPath := PChar(Message.WParam);
-    PDisplayState := PChar(Message.LParam);
-    if Assigned(FGlobalProject) and (FGlobalProject.FileName = PPath) then
-    begin
-      FGlobalProject.DisplayState := PDisplayState;
-      FGlobalProject.SaveUser;
-    end;
-    StrDispose(PDisplayState);
-    StrDispose(PPath);
-  end;
-  DefWindowProc(FGlobalProjectStateWndHandle, Message.Msg, Message.WParam, Message.LParam);
-end;
-
-function GlobalProjectStateWndHandle: THandle;
-begin
-  Result := FGlobalProjectStateWndHandle;
-end;
-
 function ProjectTypeFromString(s: string): TProjectType;
 begin
   if SameText(s, 'keyboard') then Result := ptKeyboard
@@ -1494,9 +1432,4 @@ begin
   end;
 end;
 
-initialization
-  FGlobalProjectStateWnd := TGlobalProjectStateWnd.Create;
-finalization
-  // Deletes temporary session-local project
-  FGlobalProjectStateWnd.Free;
 end.

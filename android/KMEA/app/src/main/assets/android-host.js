@@ -34,6 +34,10 @@ function init() {
   keyman.getOskHeight = getOskHeight;
   keyman.getOskWidth = getOskWidth;
   keyman.beepKeyboard = beepKeyboard;
+
+  // Readies the keyboard stub for instant loading during the init process.
+  KeymanWeb.registerStub(JSON.parse(jsInterface.initialKeyboard()));
+
   keyman.init({
     'embeddingApp':device,
     'fonts':'packages/',
@@ -102,7 +106,7 @@ function setBannerHeight(h) {
 
     if (keyman.osk) {
       keyman.osk.bannerView.activeBannerHeight = bannerHeight;
-    }  
+    }
   }
 
   // Refresh KMW's OSK
@@ -149,8 +153,8 @@ function onStateChange(change) {
   keyman.refreshOskLayout();
 
   fragmentToggle = (fragmentToggle + 1) % 100;
-  if(change != 'configured') { // doesn't change the display; only initiates suggestions.
-    window.location.hash = 'refreshBannerHeight-'+fragmentToggle+'+change='+change;
+  if(change != 'configured') {
+    window.location.hash = 'refreshBannerHeight-'+fragmentToggle;
   }
 }
 

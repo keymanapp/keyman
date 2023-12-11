@@ -1,6 +1,7 @@
 package com.keyman.engine;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
@@ -20,6 +21,7 @@ import android.webkit.JavascriptInterface;
 import static android.content.Context.VIBRATOR_SERVICE;
 
 import com.keyman.engine.KMManager.KeyboardType;
+import com.keyman.engine.data.Keyboard;
 import com.keyman.engine.util.CharSequenceUtil;
 import com.keyman.engine.util.KMLog;
 
@@ -60,6 +62,21 @@ public class KMKeyboardJSHandler {
     DisplayMetrics dms = context.getResources().getDisplayMetrics();
     int kbWidth = (int) (dms.widthPixels / dms.density);
     return kbWidth;
+  }
+
+  @JavascriptInterface
+  public String initialKeyboard() {
+    // Note:  KMManager.getCurrentKeyboard() (and similar) will throw errors until the host-page is first fully
+    // loaded and has set a keyboard.  To allow the host-page to have earlier access, we instead get the stored
+    // keyboard index directly.
+    SharedPreferences prefs = context.getSharedPreferences(context.getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
+    int index = prefs.getInt(KMManager.KMKey_UserKeyboardIndex, 0);
+    if (index < 0) {
+      index = 0;
+    }
+
+    Keyboard kbd = KMManager.getKeyboardInfo(this.context, index);
+    return kbd.toStub(context);
   }
 
   // This annotation is required in Jelly Bean and later:
