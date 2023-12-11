@@ -27,6 +27,8 @@
 #include "mc_kmxfile.h"
 #include "keymap.h"
 
+int KMX_ToUnicodeEx(guint ScanCode, const BYTE *lpKeyState, PKMX_WCHAR pwszBuff, int cchBuff,  int shift_state, int caps, GdkKeymap *keymap =NULL);
+
 const int KMX_ShiftStateMap[] = {
   ISVIRTUALKEY,
   ISVIRTUALKEY | K_SHIFTFLAG,
@@ -185,6 +187,12 @@ public:
   }
   
   void KMX_SetShiftState(ShiftState shiftState, std::wstring value, bool isDeadKey, bool capsLock) {
+    this->m_rgfDeadKey[(UINT)shiftState][(capsLock ? 1 : 0)] = isDeadKey;
+    this->m_rgss[(UINT)shiftState][(capsLock ? 1 : 0)] = value;
+  }
+
+  void KMX_SetShiftState(ShiftState shiftState, std::u16string value16, bool isDeadKey, bool capsLock) {
+    std::wstring value = wstring_from_u16string(value16);
     this->m_rgfDeadKey[(UINT)shiftState][(capsLock ? 1 : 0)] = isDeadKey;
     this->m_rgss[(UINT)shiftState][(capsLock ? 1 : 0)] = value;
   }
@@ -408,8 +416,8 @@ public:
   ShiftState MaxShiftState() {
     return (Get_XxxxVk() == 0 ? ShftMenuCtrl : ShftXxxx);
   }
-/*
-  void FillKeyState(BYTE *lpKeyState, ShiftState ss, bool fCapsLock) {
+
+  void KMX_FillKeyState(KMX_BYTE *lpKeyState, ShiftState ss, bool fCapsLock) {
     lpKeyState[VK_SHIFT] = (((ss & Shft) != 0) ? 0x80 : 0x00);
     lpKeyState[VK_CONTROL] = (((ss & Ctrl) != 0) ? 0x80 : 0x00);
     lpKeyState[VK_MENU] = (((ss & Menu) != 0) ? 0x80 : 0x00);
@@ -419,7 +427,7 @@ public:
     }
     lpKeyState[VK_CAPITAL] = (fCapsLock ? 0x01 : 0x00);
   }
-
+/*
   bool IsControlChar(wchar_t ch) {
     return (ch < 0x0020) || (ch >= 0x007F && ch <= 0x009F);
   }
@@ -510,14 +518,15 @@ public:
     }
     return deadKey;
   }
+*/
 
-  void KMX_ClearKeyboardBuffer(UINT vk, UINT sc, HKL hkl) {
-    WCHAR sb[16];
+  void KMX_ClearKeyboardBuffer() {
+    KMX_WCHAR sb[16];
     int rc = 0;
-    do {
-      rc = ::ToUnicodeEx(vk, sc, lpKeyStateNull, sb, _countof(sb), 0, hkl);
-    } while(rc != 1 && rc != 0);
-  }*/
+    for( int i=0; i<16; i++) {
+      sb[i] = L'\0';
+    }
+  }
 };
 
 int KMX_GetMaxDeadkeyIndex(KMX_WCHAR *p) {
@@ -534,14 +543,29 @@ int KMX_GetMaxDeadkeyIndex(KMX_WCHAR *p) {
   return n;
 }
 
-int KMX_ToUnicodeEx(GdkKeymap *keymap, guint ScanCode, const BYTE *lpKeyState, PWCHAR pwszBuff, int cchBuff,  int shift_state, int caps) {
+// _S2 cchBuff remove?
+int KMX_ToUnicodeEx( guint ScanCode, const BYTE *lpKeyStccate, PWCHAR pwszBuff, int cchBuff,  int shift_state, int caps,GdkKeymap *keymap) {
 
   KMX_DWORD kvl= getKeyvalsFromKeyCode(keymap, ScanCode, shift_state);
 
-  std::wstring character = get_KeyVals_according_to_keycode_and_Shiftstate_new( keymap, ScanCode, ShiftState(shift_state), caps);
+  std::wstring character = get_KeyVals_according_to_keycode_and_Shiftstate_new(keymap, ScanCode, ShiftState(shift_state), caps);
   pwszBuff[0]= * (PWCHAR) character.c_str();
 
   if((kvl >=  0xfe50) && (kvl <=  0xfe93))
+    return -1;
+  else
+    return  1;
+}
+
+// _S2 cchBuff remove?
+int KMX_ToUnicodeEx(guint ScanCode, const BYTE *lpKeyState, PKMX_WCHAR pwszBuff, int cchBuff,  int shift_state, int caps,GdkKeymap *keymap) {
+
+  KMX_DWORD kvl= getKeyvalsFromKeyCode(keymap, ScanCode, shift_state);
+
+  std::wstring character = get_KeyVals_according_to_keycode_and_Shiftstate_new(keymap, ScanCode, ShiftState(shift_state), caps);
+  pwszBuff[0]= * (PWCHAR) character.c_str();
+
+  if((kvl >=  0xfe50) && (kvl <=  0xfe93)  )
     return -1;
   else
     return  1;
@@ -592,123 +616,109 @@ bool KMX_ImportRules(KMX_WCHAR *kbid, LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, Gd
   rgKey[VK_CANCEL] = new KMX_VirtualKey(hkl, VK_CANCEL, All_Vector, keymap);
   rgKey[VK_DECIMAL] = new KMX_VirtualKey(hkl, VK_DECIMAL, All_Vector, keymap);
 
-/*
- // _S2 do we need special shift state now or later?
-  // See if there is a special shift state added
-  for(UINT vk = 0; vk <= VK_OEM_CLEAR; vk++) {
-      UINT sc = MapVirtualKeyEx(vk, 0, hkl);
-      UINT vkL = MapVirtualKeyEx(sc, 1, hkl);
-      UINT vkR = MapVirtualKeyEx(sc, 3, hkl);
-      if((vkL != vkR) &&
-          (vk != vkL)) {
-          switch(vk) {
-              case VK_LCONTROL:
-              case VK_RCONTROL:
-              case VK_LSHIFT:
-              case VK_RSHIFT:
-              case VK_LMENU:
-              case VK_RMENU:
-                  break;
+  /*
+  // _S2 do we need special shift state now or later?
+    // See if there is a special shift state added
+    for(UINT vk = 0; vk <= VK_OEM_CLEAR; vk++) {
+        UINT sc = MapVirtualKeyEx(vk, 0, hkl);
+        UINT vkL = MapVirtualKeyEx(sc, 1, hkl);
+        UINT vkR = MapVirtualKeyEx(sc, 3, hkl);
+        if((vkL != vkR) &&
+            (vk != vkL)) {
+            switch(vk) {
+                case VK_LCONTROL:
+                case VK_RCONTROL:
+                case VK_LSHIFT:
+                case VK_RSHIFT:
+                case VK_LMENU:
+                case VK_RMENU:
+                    break;
 
-              default:
-                  loader.Set_XxxxVk(vk);
-                  break;
-          }
-      }
-  }
-*/
-  // _S2 test rgkey can go later
-  /*for(UINT iKey = 100; iKey < rgKey.size(); iKey++) {
-      if(rgKey[iKey] != NULL) {
-          wprintf(L" Key Nr %i is available\n",iKey);
-      }
-  }*/
-
-  // _S2 in this part we skip shiftstates 4, 5, 8, 9
-  for(UINT iKey = 0; iKey < rgKey.size(); iKey++) {
-    if(rgKey[iKey] != NULL) {
-      WCHAR sbBuffer[256];     // Scratchpad we use many places
-
-      UINT VK_Other = Lin_KM__map(iKey, All_Vector);
-
-      for(ShiftState ss = Base; ss <= loader.MaxShiftState(); ss = (ShiftState)((int)ss + 1)) {
-        if(ss == Menu || ss == ShftMenu) {
-          // Alt and Shift+Alt don't work, so skip them
-          continue;
+                default:
+                    loader.Set_XxxxVk(vk);
+                    break;
+            }
         }
+    }
+  */
+    // _S2 test rgkey can go later
+    /*for(UINT iKey = 100; iKey < rgKey.size(); iKey++) {
+        if(rgKey[iKey] != NULL) {
+            wprintf(L" Key Nr %i is available\n",iKey);
+        }
+    }*/
 
-       KMX_DWORD SC_US = get_KeyCode_fromVKUS(iKey);
+    // in this part we skip shiftstates 4, 5, 8, 9
+    for(UINT iKey = 0; iKey < rgKey.size(); iKey++) {
+      if(rgKey[iKey] != NULL) {
+        KMX_WCHAR sbBuffer[256];     // Scratchpad we use many places
 
-        for(int caps = 0; caps <= 1; caps++) {
-          //_S2 TODO get char  - do I need rc ?? ( was rc = ToUnicodeEx...)
-                  /*
-                  loader.ClearKeyboardBuffer(VK_DECIMAL, rgKey[VK_DECIMAL]->SC(), hkl);
-                  loader.FillKeyState(lpKeyState, ss, (caps == 0));
-                  int rc = ToUnicodeEx(rgKey[iKey]->VK(), rgKey[iKey]->SC(), lpKeyState, sbBuffer, _countof(sbBuffer), 0, hkl);
-                  */
+        for(ShiftState ss = Base; ss <= loader.MaxShiftState(); ss = (ShiftState)((int)ss + 1)) {
+          if(ss == Menu || ss == ShftMenu) {
+            // Alt and Shift+Alt don't work, so skip them
+            continue;
+          }
 
+          KMX_DWORD SC_US = get_KeyCode_fromVKUS(iKey);
 
+          for(int caps = 0; caps <= 1; caps++) {
+            // _S2 is THIS correct ???  Do we need  lpKeyState or is it just used in ToUnicodeEx??
+            loader.KMX_ClearKeyboardBuffer();
+            loader.KMX_FillKeyState(lpKeyState, ss, (caps == 0));
+            int rc = KMX_ToUnicodeEx(SC_US, lpKeyState, sbBuffer, sizeof(sbBuffer)/sizeof(WCHAR), ss, caps, *keymap) ;
 
-          std::wstring KeyVal_Other = get_KeyVals_according_to_keycode_and_Shiftstate_new( *keymap, SC_US, ss, caps);
-          int rc = KMX_ToUnicodeEx(*keymap, SC_US, lpKeyState, sbBuffer, sizeof(sbBuffer)/sizeof(WCHAR), ss, caps) ;
-
-          if(rc > 0) {
-           if(*sbBuffer == 0) {
-              //_S2 TODO do I need that ??
-            //if rc >0: it got 1 or more char AND buffer is empty ( nothing inside ) {
-              if(KeyVal_Other == L"") {
+            if(rc > 0) {
+              if(*sbBuffer == 0) {
                 //rgKey[iKey]->KMX_SetShiftState(ss, L"", false, (caps == 0));
                 rgKey[iKey]->KMX_SetShiftState(ss, L"", false, (caps));
               }
-            }
-            else {
-              /*if((rc == 1) &&   (ss == Ctrl || ss == ShftCtrl) &&  (rgKey[iKey]->VK() == ((UINT)sbBuffer[0] + 0x40))) {
-                    // ToUnicodeEx has an internal knowledge about those
-                    // VK_A ~ VK_Z keys to produce the control characters,
-                    // when the conversion rule is not provided in keyboard
-                    // layout files
-                    continue;
-                }*/
-              // if rc ==1 : it got 1  char && +40 in Buffer CTRl pressed  {
-              //It's dealing with control characters. If ToUnicodeEx gets VK_A with the Ctrl key pressed,
-              //it will write 0x01 to sBuffer[0] , without Ctrl it's 0x41. The if detects this case.
-              if( (ss == Ctrl || ss == ShftCtrl) ) {
-                //&& CTRl +0x40 in the buffer ( which indicates a ctrl press)
-              continue;
-            }
-            sbBuffer[rc] = 0;
-            //rgKey[iKey]->KMX_SetShiftState(ss, KeyVal_Other, false, (caps==0));
-            rgKey[iKey]->KMX_SetShiftState(ss, KeyVal_Other, false, (caps));    //_S2
-            int SDFGHJK=99;
+              else {
+                if((rc == 1) &&
+                  (ss == Ctrl || ss == ShftCtrl) &&
+                  (rgKey[iKey]->VK() == ((UINT)sbBuffer[0] + 0x40))) {
+                      // _S2 TODO is this the same behavior on Linux?
+                      // if rc ==1 : it got 1  char && +40 in Buffer CTRl pressed
+                      // It's dealing with control characters. If ToUnicodeEx gets
+                      // VK_A with the Ctrl key pressed, it will write 0x01 to sBuffer[0],
+                      // without Ctrl it's 0x41. The if detects this case.
+                      // && CTRl +0x40 in the buffer ( which indicates a ctrl press)
+
+                      // ToUnicodeEx has an internal knowledge about those
+                      // VK_A ~ VK_Z keys to produce the control characters,
+                      // when the conversion rule is not provided in keyboard
+                      // layout files
+                      continue;
+                  }
+                if( (ss == Ctrl || ss == ShftCtrl) ) {
+                continue;
+              }
+              sbBuffer[rc] = 0;
+              //rgKey[iKey]->KMX_SetShiftState(ss, KeyVal_Other, false, (caps==0));
+              rgKey[iKey]->KMX_SetShiftState(ss, sbBuffer, false, (caps));    //_S2
             }
           }
-         else if(rc < 0) {
-           //_S2 TODO
-            // _S2 handle deadkeys later
-            // if rc <0:  it got a deadkey   {
-                // fill m_rgss and m_rgfDeadkey and alDead
-                //SET_SHIFTSTATES( deadkey)   //sbuffer is value out of ToUnicodeEx / AllVector
-                // do more stuff for deadkeys...
-
+          else if(rc < 0) {
+            //_S2 TODO
             sbBuffer[2] = 0;
             //rgKey[iKey]->SetShiftState(ss, sbBuffer, true, (caps == 0));
-            rgKey[iKey]->KMX_SetShiftState(ss, KeyVal_Other, true, (caps ));
+            rgKey[iKey]->KMX_SetShiftState(ss, sbBuffer, true, (caps ));
 
             // It's a dead key; let's flush out whats stored in the keyboard state.
-            /*loader.ClearKeyboardBuffer(VK_DECIMAL, rgKey[VK_DECIMAL]->SC(), hkl);
+            loader.KMX_ClearKeyboardBuffer();
             DeadKey *dk = NULL;
             for(UINT iDead = 0; iDead < alDead.size(); iDead++) {
                 dk = alDead[iDead];
-                WCHAR dktest1 = dk->DeadCharacter();
-                WCHAR dktest2 = rgKey[iKey]->GetShiftState(ss, caps == 0)[0];
-                if(dk->DeadCharacter() == rgKey[iKey]->GetShiftState(ss, caps == 0)[0]) {
+                WCHAR dktest1 = dk->KMX_DeadCharacter();
+                WCHAR dktest2 = rgKey[iKey]->KMX_GetShiftState(ss, caps == 0)[0];
+                if(dk->KMX_DeadCharacter() == rgKey[iKey]->KMX_GetShiftState(ss, caps == 0)[0]) {
                     break;
                 }
                 dk = NULL;
             }
             if(dk == NULL) {
-              alDead.push_back(loader.ProcessDeadKey(iKey, ss, lpKeyState, rgKey, caps == 0, hkl));
-            }*/
+              //_S2 TODO
+              //alDead.push_back(loader.KMX_ProcessDeadKey(iKey, ss, lpKeyState, rgKey, caps == 0, hkl));
+            }
           }
         }
       }
@@ -722,7 +732,7 @@ bool KMX_ImportRules(KMX_WCHAR *kbid, LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, Gd
 
   for ( int i=0; i < (int) TestValues.size();i++) {
     std::wstring wws = rgKey[TestValues[i]]->get_m_rgss(0,0);
-    wprintf(L"Results for %i\t: %ls (%i)  \t%ls (%i)   \t%ls (%i)   \t%ls (%i)   \t%ls (%i)   \t%ls (%i)   \n",    TestValues[i],
+    wprintf(L"Results for %i / SC %i\t : %ls (%i)  \t%ls (%i)   \t%ls (%i)   \t%ls (%i)   \t%ls (%i)   \t%ls (%i)   \n",    TestValues[i], rgKey[TestValues[i]]->SC(),
       rgKey[TestValues[i]]->get_m_rgss(0,0).c_str(), rgKey[TestValues[i]]->get_m_rgss(0,0)[0],
       rgKey[TestValues[i]]->get_m_rgss(0,1).c_str(), rgKey[TestValues[i]]->get_m_rgss(0,1)[0],
       rgKey[TestValues[i]]->get_m_rgss(1,0).c_str(), rgKey[TestValues[i]]->get_m_rgss(1,0)[0],
@@ -923,10 +933,8 @@ int STOP=0;  // _S2 LayoutRow: VKToUnderlying should work OK; GetSSValue not che
       kkp++;
     }
   }
-  //Inspect_kp(kp);
 return true;
 }
-
 
 // _S2 where to put this??
 const int CODE__SIZE[] = {
@@ -1012,40 +1020,4 @@ bool IsKeymanUsedKeyVal(std::wstring Keyval) {
 
     return false;
 
-}
-
-void Inspect_kp(LPKMX_KEYBOARD kp) {
-  wprintf(L"-------\n");
-  wprintf(L"-------\n");
-  wprintf(L"-------\n");
-  wprintf(L"kp has %i groups and %i keys\n",kp->cxGroupArray, kp->dpGroupArray->cxKeyArray);
-  wprintf(L"-------\n");
-
-//for ( int i=0; i<150;i++) {
-for ( int i=0; i<kp->dpGroupArray->cxKeyArray;i++) {
-  wprintf(L"key nr :%i has key:%i(%c)  Line:%i  Shiftflags:%i Output %c (%d)\n",i,kp->dpGroupArray->dpKeyArray->Key,kp->dpGroupArray->dpKeyArray->Key,
-     kp->dpGroupArray->dpKeyArray->Line,kp->dpGroupArray->dpKeyArray->ShiftFlags ,kp->dpGroupArray->dpKeyArray->dpOutput,*kp->dpGroupArray->dpKeyArray->dpOutput );
-  kp->dpGroupArray->dpKeyArray++;
-}
-  wprintf(L"-------\n");
-  wprintf(L"-------\n");
-  wprintf(L"-------\n");
-}
-
-void Inspect_gp(KMX_tagGROUP* gp) {
-  for (int i = 0; i < gp->cxKeyArray; i++) {
-    wprintf(L"key nr : has key:%i(%c)  Line:%i  Shiftflags:%i Output %c (%d)\n",  gp->dpKeyArray->Key, gp->dpKeyArray->Key,
-      gp->dpKeyArray->Line, gp->dpKeyArray->ShiftFlags, gp->dpKeyArray->dpOutput, *gp->dpKeyArray->dpOutput);
-   // gp->cxKeyArray++;
-  }
-}
-
-void Inspect_key(LPKMX_KEY key) {
-  //for (int i = 0; i < gp->cxKeyArray; i++) {
-    wprintf(L"key nr : has key:%i(%c)  Line:%i  Shiftflags:%i Output \n",  key->Key, key->Key,
-      key->Line, key->ShiftFlags);
-    /*wprintf(L"key nr : has key:%i(%c)  Line:%i  Shiftflags:%i Output %c (%d)\n",  key->Key, key->Key,
-      key->Line, key->ShiftFlags, key->dpOutput, *key->dpOutput);*/
-   // gp->cxKeyArray++;
- // }
 }

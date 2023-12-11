@@ -7,8 +7,6 @@
 #include "filesystem.h"
 #include "mcompile.h"
 
-#include <iostream>		// _S2 can be removed later
-
 #ifndef _KMXFILE_H
 #define _KMXFILE_H
 

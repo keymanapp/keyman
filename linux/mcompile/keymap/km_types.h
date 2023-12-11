@@ -44,11 +44,11 @@ typedef WCHAR      KMX_WCHART;          // _S2 needs to be removed/ wchart-> cha
 typedef char16_t   KMX_WCHAR;           // _S2
 typedef KMX_WCHAR* PKMX_WCHAR;          // _S2
 typedef wchar_t*   PWSTR;               // _S2 needs to be removed/ wchart-> char16
-typedef PWSTR      PKMX_WCHART;         // _S2 needs to be removed/ wchart-> char16
+//typedef PWSTR      PKMX_WCHART;         // _S2 needs to be removed/ wchart-> char16
 //typedef const wchar_t*  PCKMX_WCHART;   // _S2 needs to be removed/?
 
 typedef char*      LPSTR;               // _S2 needs to be removed?
-typedef LPSTR      LPKMX_STR;           // _S2 needs to be removed?
+//typedef LPSTR      LPKMX_STR;           // _S2 needs to be removed?
 
 typedef uint8_t*   LPBYTE;              // _S2 needs to be removed/?
 typedef uint8_t*   LPKMX_BYTE;          // _S2 needs to be removed?
@@ -57,7 +57,7 @@ typedef uint8_t*   PBYTE;               // _S2 needs to be removed/?
 typedef uint8_t*   PKMX_BYTE;           // _S2 needs to be removed?
 
 typedef char       KMX_CHAR;            // _S2 needs to be removed/?
-typedef char*      PKMX_STR;            // _S2 needs to be removed/?
+//typedef char*      PKMX_STR;            // _S2 needs to be removed/?
 
 typedef unsigned int UINT;              // _S2 needs to be removed/?
 typedef unsigned char   BYTE;           // _S2 needs to be removed?
@@ -153,5 +153,11 @@ typedef KMX_UCHAR* KMX_PUCHAR;
 #define VK_RCONTROL       0xA3
 #define VK_LMENU          0xA4
 #define VK_RMENU          0xA5
+
+#define VK_SHIFT          0x10
+#define VK_CONTROL        0x11
+#define VK_MENU           0x12
+#define VK_PAUSE          0x13
+#define VK_CAPITAL        0x14
 
 #endif /*KM_TYPES*/

@@ -183,7 +183,6 @@ const UINT VKShiftState[] = {0, K_SHIFTFLAG,  0xFFFF};
 // correct shift state and key.  Adjust the LCTRL+RALT -> RALT if necessary
 //
 void KMX_TranslateKey(LPKMX_KEY key, KMX_WORD vk, KMX_UINT shift, KMX_WCHAR ch) {
-  // _S2 ToDos here?
   // The weird LCTRL+RALT is Windows' way of mapping the AltGr key.
   // We store that as just RALT, and use the option "Simulate RAlt with Ctrl+Alt"
   // to provide an alternate..
@@ -654,18 +653,19 @@ int createOneVectorFromBothKeyboards(v_dw_3D &All_Vector,GdkKeymap *keymap){
 int KMX_GetDeadkeys(v_dw_2D & dk_Table, KMX_WORD DeadKey, KMX_WORD *OutputPairs, GdkKeymap* keymap) {
 
   KMX_WORD *p = OutputPairs, shift;
-  KMX_DWORD shift_S2;
+  KMX_DWORD shift2;
 
   v_dw_2D  dk_CombinationTable;
   find_all_dk_combinations(&dk_Table, dk_CombinationTable, DeadKey);
 
   for ( int i=0; i< dk_CombinationTable.size()-1;i++) {
-    KMX_WORD vk = KMX_changeKeynameToCapital(dk_CombinationTable[i][1], shift_S2, keymap);
+    KMX_WORD vk = KMX_changeKeynameToCapital(dk_CombinationTable[i][1], shift2, keymap);
     if(vk != 0) {
           *p++ = vk;
-          *p++ = shift_S2;
+          *p++ = shift2;
           *p++ = dk_CombinationTable[i][2];
         }
+        // _S2 TODO
         //else {
         //  LogError(L"Warning: complex deadkey not supported.");
       // }

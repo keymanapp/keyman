@@ -1,7 +1,7 @@
 #include "keymap.h"
 #include "deadkey.h"
 
-// _S2 do I need the names somewhere???
+// _S2 do I need nameresult somewhere???
 v_dw_1D createLine(std::wstring  first, std::wstring second,  KMX_DWORD number,  std::wstring nameresult) {
 	v_dw_1D line;
 	line.push_back(convertNamesToIntegerValue(first));

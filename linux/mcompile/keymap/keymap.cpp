@@ -158,7 +158,7 @@ bool  createCompleteRow_US(v_str_1D &complete_List, FILE* fp, const char* text, 
 int replace_KeyName_with_Keycode(std::string  in) {
   int out = returnIfCharInvalid;
 
-// _S2 these are the Scancode-Values we use in Keyman ( = like the windows scancodes)
+// _S2 these are the Scancode-Values we use in Keyman ( =  the windows scancodes+8 )
   //     NAME IN SYMBOLS-FILE      KEYCODE (LIN STYLE)      (WIN STYLE)       VK_US      VK_DE
                                              /*on US keyb;*/
   if      ( in == "key<TLDE>")    out = 49;               /*                VK_  */  // TOASK correct ???
@@ -400,9 +400,6 @@ KMX_DWORD get_VirtualKey_Other_GDK( GdkKeymap *keymap, KMX_DWORD keycode) {
     }
 
 
-  // _S2 ToDo
-  // either it gives the correct rgkeys (all non-char filled with special char) or
-  // it gives not all rgkeys but nr, a-z are filled correctly
     // _S2 ToDo tidy up
     if ( keycode >7) {
       UINT VK_for_rgKey2 = ScanCodeToUSVirtualKey[keycode-8];
@@ -425,61 +422,6 @@ KMX_DWORD get_KeyCode_fromVKUS( KMX_DWORD VK_US) {
     return (KMX_DWORD)(8+ USVirtualKeyToScanCode[ VK_US ]);}
   else
     return 0;
-}
-
-// _S2 this needs to go; only to check if mcompile gives the same end result.
-// _S2 helps to force filling rgkey[VK_DE]
-UINT map_Ikey_DE(UINT iKey) {
-  if (iKey == 89 )  return 90;
-  if (iKey == 90 )  return 89;
-  if (iKey == 186 )  return 219;
-  if (iKey == 187 )  return 221;
-  if (iKey == 188 )     return 188;
-  if (iKey == 189 )  return 191;
-  if (iKey == 190 )     return 190;
-  if (iKey == 191 )  return 220;
-  if (iKey == 192 )  return 186;
-  if (iKey == 219 )  return 189;
-  if (iKey == 220 )  return 192;
-  if (iKey == 221 )  return  187;
-  if (iKey == 222 )     return 222;
-  if (iKey == 226 )     return 226;
-  return iKey;
-}
-
-// _S2 TODO How to do mapping between Linux keycodes and keyman SC
-const int Lin_KM__map(int i, v_dw_3D &All_Vector) {
-  // MAP:
-  // VK KEYMAN-STYLE  ->  KEYCODE LINUX-STYLE
-  // e.g 188 -> 59
-  //All_Vector_[ 1 ][ in which line of US did find the value 58 ][ take second or third column wherever I find 58 ]]
-  // finds  59th row (not value 59)
-  int dw=0;
-  //if (i == 32  ) return   ; /*        */5
-      //if (i == 186 ) return 220;  /* Ü      */
-      //if (i == 187 ) return  42;  /* + *    */
-      //if (i == 188 )          {wprintf(L" swapped:  i (%i) to 59  \n",dw,i);       return  59;  }/* COMMA  */
-      //if (i == 189 )          {wprintf(L" swapped:  i (%i) to 95  \n",dw,i);       return  95;  }/*   - _  */
-      //if (i == 190 )          {wprintf(L" swapped:  i (%i) to 58  \n",dw,i);       return  58;  }/* PERIOD */
-      //if (i == 191 )          {wprintf(L" swapped:  i (%i) to 35  \n",dw,i);       return  35;   }/* #  '   */
-      //if (i == 191 )          {wprintf(L" swapped:  i (%i) to 63  \n",dw,i);       return  63; }/*       */
-      //if (i == 214 )          {wprintf(L" swapped:  i (%i) to 192  \n",dw,i);       return 192;  }/*  Ö     */
-      //if (i == 219 )          {wprintf(L" swapped:  i (%i) to 223  \n",dw,i);       return 223;  }/*  Sharp-S+  ?  */
-      //if (i == 220 )          {wprintf(L" swapped:  i (%i) to 92  \n",dw,i);       return  92;  }/*  ^ °   */
-      //if (i == 221 )          {wprintf(L" swapped:  i (%i) to 180  \n",dw,i);       return 180;  }/*  ' `   */
-      //if (i == 223 )          {wprintf(L" swapped:  i (%i) to 59  \n",dw,i);       return    ; }/*       */
-
-      //if (i == 226 )          {wprintf(L" swapped:  i (%i) to 60  \n",dw,i);       return  60;  }/*  < >   */
-      //if (i == 65105 )        {wprintf(L" swapped:  i (%i) to 92  \n",dw,i);       return  92; }/*    */
-
-      //  e.g. rgKey[192]  contains character 214
-      //if (i == 192 )          {wprintf(L" swapped:  i (%i) to 214  \n",dw,i);       return 214;  }/* Ö      */
-      //if (i == 186 )          {wprintf(L" swapped:  i (%i) to 220  \n",dw,i);       return 220;  }/* Ü      */
-      //if (i == 222 )          {wprintf(L" swapped:  i (%i) to 196  \n",dw,i);       return 196;  }/* Ä      */
-      //if (i == 220)             {wprintf(L" swapped:  i (%i) to 196  \n",dw,i);       return 186;  }/* Ä      */
-      //if (i == 42)              {wprintf(L" swapped:  i (%i) to 196  \n",dw,i);       return 187;  }/* +      */
-
-  return i;
 }
 
 std::wstring convert_DeadkeyValues_ToChar(int in) {
@@ -592,7 +534,9 @@ std::wstring  get_KeyVals_according_to_keycode_and_Shiftstate_new(GdkKeymap *key
   else
     return L"\0";
 
-  return  std::wstring(1, (int) *keyvals);
-  //return  convert_DeadkeyValues_ToChar((int) *keyvals);
+  if((*keyvals >=  deadkey_min) && (*keyvals <=  deadkey_max) )
+    return  convert_DeadkeyValues_ToChar((int) *keyvals);
+  else
+   return  std::wstring(1, (int) *keyvals);
 }
 

@@ -5,6 +5,98 @@
 //_S2 do not review - all this will be deleted later
 // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
+// _S2 can go later
+void Inspect_kp(LPKMX_KEYBOARD kp) {
+  wprintf(L"-------\n");
+  wprintf(L"-------\n");
+  wprintf(L"-------\n");
+  wprintf(L"kp has %i groups and %i keys\n",kp->cxGroupArray, kp->dpGroupArray->cxKeyArray);
+  wprintf(L"-------\n");
+
+//for ( int i=0; i<150;i++) {
+for ( int i=0; i<kp->dpGroupArray->cxKeyArray;i++) {
+  wprintf(L"key nr :%i has key:%i(%c)  Line:%i  Shiftflags:%i Output %c (%d)\n",i,kp->dpGroupArray->dpKeyArray->Key,kp->dpGroupArray->dpKeyArray->Key,
+     kp->dpGroupArray->dpKeyArray->Line,kp->dpGroupArray->dpKeyArray->ShiftFlags ,kp->dpGroupArray->dpKeyArray->dpOutput,*kp->dpGroupArray->dpKeyArray->dpOutput );
+  kp->dpGroupArray->dpKeyArray++;
+}
+  wprintf(L"-------\n");
+  wprintf(L"-------\n");
+  wprintf(L"-------\n");
+}
+
+void Inspect_gp(KMX_tagGROUP* gp) {
+  for (int i = 0; i < gp->cxKeyArray; i++) {
+    wprintf(L"key nr : has key:%i(%c)  Line:%i  Shiftflags:%i Output %c (%d)\n",  gp->dpKeyArray->Key, gp->dpKeyArray->Key,
+      gp->dpKeyArray->Line, gp->dpKeyArray->ShiftFlags, gp->dpKeyArray->dpOutput, *gp->dpKeyArray->dpOutput);
+   // gp->cxKeyArray++;
+  }
+}
+
+void Inspect_key(LPKMX_KEY key) {
+  //for (int i = 0; i < gp->cxKeyArray; i++) {
+    wprintf(L"key nr : has key:%i(%c)  Line:%i  Shiftflags:%i Output \n",  key->Key, key->Key,
+      key->Line, key->ShiftFlags);
+    /*wprintf(L"key nr : has key:%i(%c)  Line:%i  Shiftflags:%i Output %c (%d)\n",  key->Key, key->Key,
+      key->Line, key->ShiftFlags, key->dpOutput, *key->dpOutput);*/
+   // gp->cxKeyArray++;
+ // }
+}
+
+// _S2 this needs to go; only to check if mcompile gives the same end result.
+// _S2 helps to force filling rgkey[VK_DE]
+UINT map_Ikey_DE(UINT iKey) {
+  if (iKey == 89 )  return 90;
+  if (iKey == 90 )  return 89;
+  if (iKey == 186 )  return 219;
+  if (iKey == 187 )  return 221;
+  if (iKey == 188 )     return 188;
+  if (iKey == 189 )  return 191;
+  if (iKey == 190 )     return 190;
+  if (iKey == 191 )  return 220;
+  if (iKey == 192 )  return 186;
+  if (iKey == 219 )  return 189;
+  if (iKey == 220 )  return 192;
+  if (iKey == 221 )  return  187;
+  if (iKey == 222 )     return 222;
+  if (iKey == 226 )     return 226;
+  return iKey;
+}
+
+// _S2 TODO How to do mapping between Linux keycodes and keyman SC
+const int Lin_KM__map(int i, v_dw_3D &All_Vector) {
+  // MAP:
+  // VK KEYMAN-STYLE  ->  KEYCODE LINUX-STYLE
+  // e.g 188 -> 59
+  //All_Vector_[ 1 ][ in which line of US did find the value 58 ][ take second or third column wherever I find 58 ]]
+  // finds  59th row (not value 59)
+  int dw=0;
+  //if (i == 32  ) return   ; /*        */5
+      //if (i == 186 ) return 220;  /* Ü      */
+      //if (i == 187 ) return  42;  /* + *    */
+      //if (i == 188 )          {wprintf(L" swapped:  i (%i) to 59  \n",dw,i);       return  59;  }/* COMMA  */
+      //if (i == 189 )          {wprintf(L" swapped:  i (%i) to 95  \n",dw,i);       return  95;  }/*   - _  */
+      //if (i == 190 )          {wprintf(L" swapped:  i (%i) to 58  \n",dw,i);       return  58;  }/* PERIOD */
+      //if (i == 191 )          {wprintf(L" swapped:  i (%i) to 35  \n",dw,i);       return  35;   }/* #  '   */
+      //if (i == 191 )          {wprintf(L" swapped:  i (%i) to 63  \n",dw,i);       return  63; }/*       */
+      //if (i == 214 )          {wprintf(L" swapped:  i (%i) to 192  \n",dw,i);       return 192;  }/*  Ö     */
+      //if (i == 219 )          {wprintf(L" swapped:  i (%i) to 223  \n",dw,i);       return 223;  }/*  Sharp-S+  ?  */
+      //if (i == 220 )          {wprintf(L" swapped:  i (%i) to 92  \n",dw,i);       return  92;  }/*  ^ °   */
+      //if (i == 221 )          {wprintf(L" swapped:  i (%i) to 180  \n",dw,i);       return 180;  }/*  ' `   */
+      //if (i == 223 )          {wprintf(L" swapped:  i (%i) to 59  \n",dw,i);       return    ; }/*       */
+
+      //if (i == 226 )          {wprintf(L" swapped:  i (%i) to 60  \n",dw,i);       return  60;  }/*  < >   */
+      //if (i == 65105 )        {wprintf(L" swapped:  i (%i) to 92  \n",dw,i);       return  92; }/*    */
+
+      //  e.g. rgKey[192]  contains character 214
+      //if (i == 192 )          {wprintf(L" swapped:  i (%i) to 214  \n",dw,i);       return 214;  }/* Ö      */
+      //if (i == 186 )          {wprintf(L" swapped:  i (%i) to 220  \n",dw,i);       return 220;  }/* Ü      */
+      //if (i == 222 )          {wprintf(L" swapped:  i (%i) to 196  \n",dw,i);       return 196;  }/* Ä      */
+      //if (i == 220)             {wprintf(L" swapped:  i (%i) to 196  \n",dw,i);       return 186;  }/* Ä      */
+      //if (i == 42)              {wprintf(L" swapped:  i (%i) to 196  \n",dw,i);       return 187;  }/* +      */
+
+  return i;
+}
+
 int append_other_ToVector(v_dw_3D &All_Vector) {
   InsertKeyvalsFromVectorFile(All_Vector);
   return 0;

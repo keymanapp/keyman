@@ -409,7 +409,6 @@ KMX_BOOL KMX_LoadKeyboard(char16_t* fileName, LPKMX_KEYBOARD* lpKeyboard) {
   if (!buf) {
     fclose(fp);
     KMX_LogError(L"LogErr1: Not allocmem\n" );
-                                // _S2 QUESTION delete [] buf; ????
     return FALSE;
   }
 
@@ -422,7 +421,6 @@ KMX_BOOL KMX_LoadKeyboard(char16_t* fileName, LPKMX_KEYBOARD* lpKeyboard) {
   if (fread(filebase, 1, sz, fp) < (size_t)sz) {
     KMX_LogError(L"LogError1: Could not read file\n" );
     fclose(fp);
-    // _S2 QUESTION delete [] buf; ????
     return FALSE;
   }
 
@@ -437,7 +435,6 @@ KMX_BOOL KMX_LoadKeyboard(char16_t* fileName, LPKMX_KEYBOARD* lpKeyboard) {
 
   if (!KMX_VerifyKeyboard(filebase, sz)) {
     KMX_LogError(L"LogError1: errVerifyKeyboard\n" );
-    // _S2 QUESTION delete [] buf; ????
     return FALSE;
   }
 
@@ -450,8 +447,6 @@ KMX_BOOL KMX_LoadKeyboard(char16_t* fileName, LPKMX_KEYBOARD* lpKeyboard) {
 
   if (!kbp) {
     KMX_LogError(L"LogError1: errFixupKeyboard\n" );
-    //  _S2 QUESTION delete [] buf; ????
-
     return FALSE;
   }
 
@@ -461,8 +456,6 @@ KMX_BOOL KMX_LoadKeyboard(char16_t* fileName, LPKMX_KEYBOARD* lpKeyboard) {
     return FALSE;
   }
   *lpKeyboard = kbp;
-  // _S2 QUESTION delete [] buf; ????
-
   return TRUE;
 }
 
