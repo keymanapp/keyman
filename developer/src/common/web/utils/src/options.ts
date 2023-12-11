@@ -35,6 +35,7 @@ export interface KeymanDeveloperOptions {
   "automatically report usage"?: boolean;
   "toolbar visible"?: boolean;
   "active project"?: string;
+  "prompt to upgrade projects"?: boolean;
 };
 
 type KeymanDeveloperOption = keyof KeymanDeveloperOptions;
