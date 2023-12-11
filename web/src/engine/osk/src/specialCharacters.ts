@@ -4,7 +4,7 @@ let specialCharacters = {
   '*Shift*':    8,
   '*Enter*':    5,
   '*Tab*':      6,
-  '*BkSp*':     4,
+  '*BkSp*':     4,   //filled shape denoting backspace, *BkSp1* is alternate outline shape
   '*Menu*':     11,
   '*Hide*':     10,
   '*Alt*':      25,
@@ -18,6 +18,7 @@ let specialCharacters = {
   '*Shifted*':  9,
   '*AltGr*':    2,
   '*TabLeft*':  7,
+  '*BkSp1*':    0x21, //outline shape denoting backspace, *BkSp* is alternate filled shape
   '*LAlt*':     0x56,
   '*RAlt*':     0x57,
   '*LCtrl*':    0x58,
