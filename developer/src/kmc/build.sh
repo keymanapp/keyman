@@ -89,6 +89,7 @@ readonly PACKAGES=(
   common/web/types
   common/models/types
   core/include/ldml
+  developer/src/common/web/utils
   developer/src/kmc-analyze
   developer/src/kmc-keyboard-info
   developer/src/kmc-kmn

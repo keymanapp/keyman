@@ -302,6 +302,8 @@ export class KmnCompilerMessages {
 
   static HINT_UnreachableRule                                 = SevHint | 0x0AE;
 
+  static WARN_VirtualKeyInOutput                              = SevWarn | 0x0AF;
+
   static FATAL_BufferOverflow                                 = SevFatal | 0x0C0;
   static FATAL_Break                                          = SevFatal | 0x0C1;
 };

@@ -176,6 +176,7 @@
   <ItemGroup>
     <ClCompile Include="..\..\global\cpp\kmtip_guids.cpp" />
     <ClCompile Include="$(KEYMAN_ROOT)\common\windows\cpp\src\xstring.cpp" />
+    <ClCompile Include="appcontext.cpp" />
     <ClCompile Include="appint\aiTIP.cpp">
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -354,6 +355,7 @@
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="appcontext.h" />
     <ClInclude Include="keymanengine.h" />
     <ClInclude Include="..\..\..\include\kmtip_guids.h" />
     <ClInclude Include="appint\aiTIP.h" />

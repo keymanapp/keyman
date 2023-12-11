@@ -42,5 +42,5 @@ export function outputTargetForElement(Ltarg: HTMLElement) {
 
   // Step 2:  With the most likely host element determined, obtain the corresponding OutputTarget
   // instance.
-  return Ltarg._kmwAttachment.interface;
+  return Ltarg._kmwAttachment?.interface;
 }

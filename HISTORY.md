@@ -1,5 +1,61 @@
 # Keyman Version History
 
+## 17.0.226 alpha 2023-12-07
+
+* fix(web): accidental suggestion-banner retoggle when disabling predictions (#10014)
+* fix(web): Fix null error with legacy keyboards (#10141)
+
+## 17.0.225 alpha 2023-12-06
+
+* feat(developer): Multi-process model for projects (#10114)
+* fix(developer): prevent opening .kpj in multiple processes (#10137)
+* fix(android/app): InfoActivity pass external links to browser (#10153)
+
+## 17.0.224 alpha 2023-12-05
+
+* chore(linux): Update debian changelog (#10121)
+
+## 17.0.223 alpha 2023-12-04
+
+* chore(web): Add option to create test coverage report file (#10124)
+
+## 17.0.222 alpha 2023-12-02
+
+* fix(common): publish @keymanapp/developer-utils as npm module (#10118)
+
+## 17.0.221 alpha 2023-12-01
+
+* chore(windows): removed cached context windows engine (#10065)
+* change(android): flishy flashy mitigation, round 1 (#10017)
+* change(android): smoother keyboard initialization (#10022)
+* fix(android): no suggestions available when swapping pred-text target language (#10061)
+* chore(developer): require project file to exist (#10092)
+* chore(linux): Add support for loong64 architecture (#10109)
+* fix(web): Don't throw errors after detach (#10086)
+
+## 17.0.220 alpha 2023-11-30
+
+* fix(core): set_if_needed updates an empty cached context (#10098)
+* fix(core): check for null termination (#10101)
+
+## 17.0.219 alpha 2023-11-29
+
+* fix(developer): path separator for kmc-package (#10064)
+* fix(developer): projects 2.0 internal path enumeration (#10016)
+* fix(web): Fix attachment-api tests (#10085)
+* fix(web): Also move source map (#10089)
+
+## 17.0.218 alpha 2023-11-27
+
+* feat(developer): ldml: err/hint on illegal/pua chars (#10029)
+
+## 17.0.217 alpha 2023-11-24
+
+* feat(developer): warn on usage of virtual keys in rule output (#10062)
+* fix(core): memory management of options in action struct (#10073)
+* chore(linux): Update debian changelog (#10047)
+* chore(core): Add test keyboard for text selection tests (#10026)
+
 ## 17.0.216 alpha 2023-11-23
 
 * fix(common): kmx struct alignment (#9977)

@@ -28,13 +28,17 @@ function GetGlobalProjectUI: TProjectUI;
 function LoadGlobalProjectUI(pt: TProjectType; AFilename: string): TProjectUI;
 procedure FreeGlobalProjectUI;
 function IsGlobalProjectUIReady: Boolean;
+function CreateTempGlobalProjectUI(pt: TProjectType): TProjectUI;
 
 implementation
 
 uses
   System.SysUtils,
+  Winapi.Windows,
 
-  Keyman.Developer.System.Project.Project;
+  Keyman.Developer.System.TikeMultiProcess,
+  Keyman.Developer.System.Project.Project,
+  utildir;
 
 function GetGlobalProjectUI: TProjectUI;
 begin
@@ -49,20 +53,53 @@ end;
 procedure FreeGlobalProjectUI;
 begin
   FreeAndNil(FGlobalProject);
+  TikeMultiProcess.CloseProject;
+end;
+
+function CreateTempGlobalProjectUI(pt: TProjectType): TProjectUI;
+var
+  kpj: TProject;
+  AFilename: string;
+begin
+  Assert(not Assigned(FGlobalProject));
+
+  AFileName := KGetTempFileName('.kpj');
+  System.SysUtils.DeleteFile(AFileName);
+
+  kpj := TProject.Create(pt, AFilename, False);
+  try
+    kpj.Options.Version := pv10;
+    kpj.Options.BuildPath := ''; //'$SOURCEPATH';
+    kpj.Options.WarnDeprecatedCode := True;
+    kpj.Options.CompilerWarningsAsErrors := True;
+    kpj.Options.CheckFilenameConventions := False;
+    kpj.Options.SkipMetadataFiles := True;
+    kpj.Save;
+  finally
+    kpj.Free;
+  end;
+
+  Result := TProjectUI.Create(pt, AFilename, True);
+  Result.IsTemporary := True;
+
+  FGlobalProject := Result;
+  TikeMultiProcess.OpenProject(
+    '', // We use the empty string to designate a temp project (* is no project)
+    FGlobalProject.GetTargetFilename(FGlobalProject.Options.SourcePath,
+      '', '')
+  );
 end;
 
 function LoadGlobalProjectUI(pt: TProjectType; AFilename: string): TProjectUI;
 begin
   Assert(not Assigned(FGlobalProject));
-  if DirectoryExists(AFilename) then
-  begin
-    // Load a directory-based project
-    if AFilename.EndsWith('\') then
-      AFilename := AFilename.Substring(0, AFilename.Length-1);
-    AFilename := AFilename + '\' + ExtractFileName(AFilename) + '.kpj';
-  end;
-  Result := TProjectUI.Create(pt, AFilename);   // I4687
+  Result := TProjectUI.Create(pt, AFilename, True);   // I4687
   FGlobalProject := Result;
+  TikeMultiProcess.OpenProject(
+    FGlobalProject.FileName,
+    FGlobalProject.GetTargetFilename(FGlobalProject.Options.SourcePath,
+      '', '')
+  );
 end;
 
 end.
