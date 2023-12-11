@@ -368,11 +368,12 @@ reorder_group::apply(std::u32string &str) const {
   // TODO-LDML: for now, assume matches entire string.
   // A needed optimization here would be to detect a common substring
   // at the end of the old and new strings, and keep the match_len
-  // minimal. This reduces thrash in core's context.
+  // minimal. This coudl reduce thrash in core's context.
+  // However, the calling code does check for a common substring with mismatch()
   size_t match_len = str.size();
 
   // 'prefix' is the unmatched string before the match
-  // TODO-LDML: right now, this is empty.
+  // TODO-LDML: right now, this is empty, because match_len is the entire size.
   std::u32string prefix = str;
   prefix.resize(str.size() - match_len);  // just the part before the matched part.
 
@@ -537,7 +538,9 @@ transform_entry::apply(const std::u32string &input, std::u32string &output) cons
   icu::UnicodeString matchustr  = icu::UnicodeString(matchstr.data(), (int32_t)matchstr.length());
   // TODO-LDML: create a new Matcher every time. These could be cached and reset.
   std::unique_ptr<icu::RegexMatcher> matcher(fFromPattern->matcher(matchustr, status));
-  UASSERT_SUCCESS(status);
+  if (!UASSERT_SUCCESS(status)) {
+    return 0; // TODO-LDML: return error
+  }
 
   if (!matcher->find(status)) { // i.e. matches somewhere, in this case at end of str
     return 0; // no match
@@ -547,7 +550,9 @@ transform_entry::apply(const std::u32string &input, std::u32string &output) cons
   // TODO-LDML: if we had an underlying UText this would be simpler.
   int32_t matchStart = matcher->start(status);
   int32_t matchEnd   = matcher->end(status);
-  UASSERT_SUCCESS(status);
+  if (!UASSERT_SUCCESS(status)) {
+    return 0; // TODO-LDML: return error
+  }
   // extract..
   const icu::UnicodeString substr = matchustr.tempSubStringBetween(matchStart, matchEnd);
   // preflight to UTF-32 to get length
@@ -574,7 +579,10 @@ transform_entry::apply(const std::u32string &input, std::u32string &output) cons
     // we actually need the group(1) string here.
     // this is only the content in parenthesis ()
     icu::UnicodeString group1 = matcher->group(1, status);
-    UASSERT_SUCCESS(status); // TODO-LDML: could be a malformed from pattern
+    if (!UASSERT_SUCCESS(status)) {
+      // TODO-LDML: could be a malformed from pattern
+      return 0; // TODO-LDML: return error
+    }
     // now, how long is group1 in UTF-32, hmm?
     UErrorCode preflightStatus = U_ZERO_ERROR; // throwaway status
     auto group1Len             = group1.toUTF32(nullptr, 0, preflightStatus);
@@ -582,7 +590,9 @@ transform_entry::apply(const std::u32string &input, std::u32string &output) cons
     assert(s != nullptr); // TODO-LDML: OOM
     // convert
     substr.toUTF32((UChar32 *)s, group1Len + 1, status);
-    UASSERT_SUCCESS(status);
+    if (!UASSERT_SUCCESS(status)) {
+      return 0; // TODO-LDML: memory issue
+    }
     std::u32string match32(s, group1Len); // taken from just group1
     // clean up buffer
     delete [] s;
@@ -605,18 +615,24 @@ transform_entry::apply(const std::u32string &input, std::u32string &output) cons
   const icu::Normalizer2 *nfd = icu::Normalizer2::getNFDInstance(status);
   icu::UnicodeString rustr2;
   nfd->normalize(rustr, rustr2, status); // TODO-LDML: must be normalize with markers!
-  UASSERT_SUCCESS(status);
+  if (!UASSERT_SUCCESS(status)) {
+    return 0;
+  }
   // here we replace the match output.
   icu::UnicodeString entireOutput = matcher->replaceFirst(rustr2, status);
-  UASSERT_SUCCESS(status); // TODO-LDML: could fail here due to bad input (syntax err)
-
+  if (!UASSERT_SUCCESS(status)) {
+    // TODO-LDML: could fail here due to bad input (syntax err)
+    return 0;
+  }
   // entireOutput includes all of 'input', but modified. Need to substring it.
   icu::UnicodeString outu_raw = entireOutput.tempSubString(matchStart);
 
   // normalize the replaced string
   icu::UnicodeString outu;
   nfd->normalize(outu_raw, outu, status); // TODO-LDML: must be normalize with markers!
-  UASSERT_SUCCESS(status);
+  if (!UASSERT_SUCCESS(status)) {
+    return 0; // TODO-LDML: probably memory/etc.
+  }
 
   // Special case if there's no output, save some allocs
   if (outu.length() == 0) {
@@ -627,14 +643,17 @@ transform_entry::apply(const std::u32string &input, std::u32string &output) cons
     // calculate how big the buffer is
     auto out32len              = outu.toUTF32(nullptr, 0, preflightStatus); // preflightStatus will be an err, because we know the buffer overruns zero bytes
     // allocate
-    char32_t *s                = new char32_t[out32len + 1];
-    assert(s != nullptr);
+    std::unique_ptr<char32_t> s(new char32_t[out32len + 1]);
+    assert(s);
+    if (!s) {
+      return 0; // TODO-LDML: allocation failed
+    }
     // convert
-    outu.toUTF32((UChar32 *)s, out32len + 1, status);
-    UASSERT_SUCCESS(status);
-    output.assign(s, out32len);
-    // clean up buffer
-    delete [] s;
+    outu.toUTF32((UChar32 *)(s.get()), out32len + 1, status);
+    if (!UASSERT_SUCCESS(status)) {
+      return 0; // TODO-LDML: memory isue
+    }
+    output.assign(s.get(), out32len);
   }
   return matchLen;
 }
