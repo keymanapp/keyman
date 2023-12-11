@@ -3,8 +3,6 @@ import { platform } from 'os';
 import { KmnCompiler } from '@keymanapp/kmc-kmn';
 import { CompilerOptions, CompilerCallbacks, KeymanFileTypes } from '@keymanapp/common-types';
 import { BuildActivity } from './BuildActivity.js';
-import * as fs from 'fs';
-import { InfrastructureMessages } from '../../messages/infrastructureMessages.js';
 
 export class BuildKmnKeyboard extends BuildActivity {
   public get name(): string { return 'Keyman keyboard'; }
@@ -13,29 +11,13 @@ export class BuildKmnKeyboard extends BuildActivity {
   public get description(): string { return 'Build a Keyman keyboard'; }
   public async build(infile: string, outfile: string, callbacks: CompilerCallbacks, options: CompilerOptions): Promise<boolean> {
     // We need to resolve paths to absolute paths before calling kmc-kmn
+    infile = getPosixAbsolutePath(infile);
     if(outfile) {
       outfile = getPosixAbsolutePath(outfile);
-      const folderName = path.dirname(outfile);
-      try {
-        fs.mkdirSync(folderName, {recursive: true});
-      } catch(e) {
-        callbacks.reportMessage(InfrastructureMessages.Error_CannotCreateFolder({folderName, e}));
-        return false;
-      }
     }
-    infile = getPosixAbsolutePath(infile);
 
     const compiler = new KmnCompiler();
-    if(!await compiler.init(callbacks, options)) {
-      return false;
-    }
-
-    const result = await compiler.run(infile, outfile);
-    if(!result) {
-      return false;
-    }
-
-    return await compiler.write(result.artifacts);
+    return await super.runCompiler(compiler, infile, outfile, callbacks, options);
   }
 }
 

@@ -43,21 +43,9 @@ export class BuildKeyboardInfo extends BuildActivity {
       lastCommitDate,
       forPublishing: !!options.forPublishing,
     };
-
-    const compiler = new KeyboardInfoCompiler();
-    if(!await compiler.init(callbacks, {sources})) {
-      return false;
-    }
-
     // Note: should we always ignore the passed-in output filename for .keyboard_info?
     const outputFilename = project.getOutputFilePath(KeymanFileTypes.Binary.KeyboardInfo);
-    const data = await compiler.run(infile, outputFilename);
-
-    if(data == null) {
-      // Error messages have already been emitted by KeyboardInfoCompiler
-      return false;
-    }
-
-    return await compiler.write(data.artifacts);
+    const compiler = new KeyboardInfoCompiler();
+    return await super.runCompiler(compiler, infile, outputFilename, callbacks, {...options, sources});
   }
 }

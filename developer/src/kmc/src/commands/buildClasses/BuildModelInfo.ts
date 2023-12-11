@@ -77,16 +77,6 @@ export class BuildModelInfo extends BuildActivity {
     const outputFilename = project.getOutputFilePath(KeymanFileTypes.Binary.ModelInfo);
 
     const compiler = new ModelInfoCompiler();
-    if(!await compiler.init(callbacks, {sources})) {
-      return false;
-    }
-    const result = await compiler.run(infile, outputFilename);
-
-    if(result == null) {
-      // Error messages have already been emitted by writeModelMetadataFile
-      return false;
-    }
-
-    return await compiler.write(result.artifacts);
+    return await super.runCompiler(compiler, infile, outputFilename, callbacks, {...options, sources});
   }
 }
