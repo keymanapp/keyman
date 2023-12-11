@@ -1,5 +1,16 @@
 # Keyman Version History
 
+## 17.0.228 alpha 2023-12-11
+
+* chore(mac): force detach of disk image during build after 5 failures (#10201)
+* chore(linux): Small refactoring to make it easier to read (#10196)
+* chore(common): Specify Keyman repo on GitHub actions (#10203)
+* chore(android,mac): Update Kibaku crowdin strings (#10174)
+* chore(android,mac): Update Mon crowdin strings (#10175)
+* fix(developer): crash loading a project when referenced .xml is missing (#10209)
+* feat(developer): kmc emit hint if project file is old version (#10158)
+* fix(common): kpj loader needs to handle empty Files element (#10157)
+
 ## 17.0.227 alpha 2023-12-08
 
 * fix(windows): debug includes libcmtd vs libcmt.dll (#10176)

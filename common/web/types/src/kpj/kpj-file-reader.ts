@@ -117,7 +117,13 @@ export class KPJFileReader {
    * @param source KVKSourceFile
    */
   private boxArrays(source: KPJFile) {
-    boxXmlArray(source.KeymanDeveloperProject?.Files, 'File');
+    if(!source.KeymanDeveloperProject) {
+      return source;
+    }
+    if(!source.KeymanDeveloperProject.Files || typeof source.KeymanDeveloperProject.Files == 'string') {
+      source.KeymanDeveloperProject.Files = {File:[]};
+    }
+    boxXmlArray(source.KeymanDeveloperProject.Files, 'File');
     return source;
   }
 }
