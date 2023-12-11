@@ -7,9 +7,9 @@ export class BuildPackage extends BuildActivity {
   public get sourceExtension(): KeymanFileTypes.Source { return KeymanFileTypes.Source.Package; }
   public get compiledExtension(): KeymanFileTypes.Binary { return KeymanFileTypes.Binary.Package; }
   public get description(): string  { return 'Build a Keyman package'; }
-  public async build(infile: string, callbacks: CompilerCallbacks, options: CompilerOptions): Promise<boolean> {
+  public async build(infile: string, outfile: string, callbacks: CompilerCallbacks, options: CompilerOptions): Promise<boolean> {
 
-    const outfile = this.getOutputFilename(infile, options);
+    outfile = this.getOutputFilename(infile, outfile);
 
     const kmpCompiler = new KmpCompiler();
     if(!await kmpCompiler.init(callbacks, options)) {

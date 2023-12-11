@@ -24,7 +24,7 @@ export class BuildModelInfo extends BuildActivity {
    * @param options
    * @returns
    */
-  public async build(infile: string, callbacks: CompilerCallbacks, options: ExtendedCompilerOptions): Promise<boolean> {
+  public async build(infile: string, _outfile: string, callbacks: CompilerCallbacks, options: ExtendedCompilerOptions): Promise<boolean> {
     if(!KeymanFileTypes.filenameIs(infile, KeymanFileTypes.Source.Project)) {
       // Even if the project file does not exist, we use its name as our reference
       // in order to avoid ambiguity
@@ -72,6 +72,8 @@ export class BuildModelInfo extends BuildActivity {
       lastCommitDate,
       forPublishing: !!options.forPublishing,
     };
+
+    // Note: should we always ignore the passed-in output filename for .model_info?
     const outputFilename = project.getOutputFilePath(KeymanFileTypes.Binary.ModelInfo);
 
     const compiler = new ModelInfoCompiler();

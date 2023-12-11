@@ -1,10 +1,11 @@
 import * as fs from 'fs';
 import * as path from 'path';
-import { CompilerBaseOptions, CompilerCallbacks, defaultCompilerOptions } from '@keymanapp/common-types';
+import { CompilerCallbacks, defaultCompilerOptions } from '@keymanapp/common-types';
 import { NodeCompilerCallbacks } from '../../util/NodeCompilerCallbacks.js';
 import { WindowsPackageInstallerCompiler, WindowsPackageInstallerSources } from '@keymanapp/kmc-package';
+import { CommandLineBaseOptions } from 'src/util/baseOptions.js';
 
-interface WindowsPackageInstallerCommandLineOptions extends CompilerBaseOptions {
+interface WindowsPackageInstallerCommandLineOptions extends CommandLineBaseOptions {
   msi: string;
   exe: string;
   license: string;
@@ -28,6 +29,8 @@ export async function buildWindowsPackageInstaller(infile: string, _options: any
     titleImageFilename: options.titleImage
   }
 
+  const outfile: string = options.outFile;
+
   // Normalize case for the filename and expand the path; this avoids false
   // positive case mismatches on input filenames and glommed paths
   infile = fs.realpathSync.native(infile);
@@ -38,7 +41,7 @@ export async function buildWindowsPackageInstaller(infile: string, _options: any
     process.exit(1);
   }
 
-  const fileBaseName = options.outFile ?? infile;
+  const fileBaseName = outfile ?? infile;
   const outFileBase = path.basename(fileBaseName, path.extname(fileBaseName));
   const outFileDir = path.dirname(fileBaseName);
   const outFileExe = path.join(outFileDir, outFileBase + '.exe');

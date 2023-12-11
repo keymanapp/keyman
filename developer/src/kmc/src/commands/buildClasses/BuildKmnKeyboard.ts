@@ -11,9 +11,8 @@ export class BuildKmnKeyboard extends BuildActivity {
   public get sourceExtension(): KeymanFileTypes.Source { return KeymanFileTypes.Source.KeymanKeyboard; }
   public get compiledExtension(): KeymanFileTypes.Binary { return KeymanFileTypes.Binary.Keyboard; }
   public get description(): string { return 'Build a Keyman keyboard'; }
-  public async build(infile: string, /*TODO: outfile?: string,*/ callbacks: CompilerCallbacks, options: CompilerOptions): Promise<boolean> {
+  public async build(infile: string, outfile: string, callbacks: CompilerCallbacks, options: CompilerOptions): Promise<boolean> {
     // We need to resolve paths to absolute paths before calling kmc-kmn
-    let outfile = options.outFile;//TODO: remove here
     if(outfile) {
       outfile = getPosixAbsolutePath(outfile);
       const folderName = path.dirname(outfile);

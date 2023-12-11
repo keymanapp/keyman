@@ -1,12 +1,13 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import * as kmcLdml from '@keymanapp/kmc-ldml';
-import { CompilerBaseOptions, CompilerCallbacks, defaultCompilerOptions, LDMLKeyboardTestDataXMLSourceFile, LDMLKeyboardXMLSourceFileReader } from '@keymanapp/common-types';
+import { CompilerCallbacks, defaultCompilerOptions, LDMLKeyboardTestDataXMLSourceFile, LDMLKeyboardXMLSourceFileReader } from '@keymanapp/common-types';
 import { NodeCompilerCallbacks } from '../../util/NodeCompilerCallbacks.js';
 import { fileURLToPath } from 'url';
+import { CommandLineBaseOptions } from 'src/util/baseOptions.js';
 
 export async function buildTestData(infile: string, _options: any, commander: any) {
-  const options: CompilerBaseOptions = commander.optsWithGlobals();
+  const options: CommandLineBaseOptions = commander.optsWithGlobals();
 
   let compilerOptions: kmcLdml.LdmlCompilerOptions = {
     ...defaultCompilerOptions,

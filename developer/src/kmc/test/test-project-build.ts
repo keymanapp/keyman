@@ -11,7 +11,7 @@ describe('BuildProject', function () {
   it('should build a keyboard project', async function() {
     const builder = new BuildProject();
     const path = makePathToFixture('relative_paths', 'k_000___null_keyboard.kpj');
-    let result = await builder.build(path, callbacks, {
+    let result = await builder.build(path, null, callbacks, {
       shouldAddCompilerVersion: false,
       compilerWarningsAsErrors: true,
       saveDebug: false,

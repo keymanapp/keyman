@@ -24,7 +24,7 @@ describe('InfrastructureMessages', function () {
     const expectedMessages = [InfrastructureMessages.FATAL_UnexpectedException];
 
     process.env.SENTRY_CLIENT_TEST_BUILD_EXCEPTION = '1';
-    await unitTestEndpoints.build(null, ncb, {});
+    await unitTestEndpoints.build(null, null, ncb, {});
     delete process.env.SENTRY_CLIENT_TEST_BUILD_EXCEPTION;
 
     assertMessagesEqual(ncb.messages, expectedMessages);
@@ -79,7 +79,7 @@ describe('InfrastructureMessages', function () {
       InfrastructureMessages.INFO_WarningsHaveFailedBuild,
       InfrastructureMessages.INFO_FileNotBuiltSuccessfully
     ];
-    await unitTestEndpoints.build(filename, ncb, {compilerWarningsAsErrors: true});
+    await unitTestEndpoints.build(filename, null, ncb, {compilerWarningsAsErrors: true});
     assertMessagesEqual(ncb.messages, expectedMessages);
   });
 
@@ -93,7 +93,7 @@ describe('InfrastructureMessages', function () {
       InfrastructureMessages.ERROR_UnsupportedProjectVersion,
       InfrastructureMessages.INFO_ProjectNotBuiltSuccessfully
     ];
-    await unitTestEndpoints.build(filename, ncb, {compilerWarningsAsErrors: true});
+    await unitTestEndpoints.build(filename, null, ncb, {compilerWarningsAsErrors: true});
     assertMessagesEqual(ncb.messages, expectedMessages);
   });
 });

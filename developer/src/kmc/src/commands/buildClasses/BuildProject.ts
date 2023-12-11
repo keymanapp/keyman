@@ -12,7 +12,12 @@ export class BuildProject extends BuildActivity {
   public get sourceExtension(): KeymanFileTypes.Source { return KeymanFileTypes.Source.Project; }
   public get compiledExtension(): KeymanFileTypes.Binary { return null; }
   public get description(): string  { return 'Build a keyboard or lexical model project'; }
-  public async build(infile: string, callbacks: CompilerCallbacks, options: ExtendedCompilerOptions): Promise<boolean> {
+  public async build(infile: string, outfile: string, callbacks: CompilerCallbacks, options: ExtendedCompilerOptions): Promise<boolean> {
+    if(outfile) {
+      callbacks.reportMessage(InfrastructureMessages.Error_OutFileNotValidForProjects());
+      return false;
+    }
+
     let builder = new ProjectBuilder(infile, callbacks, options);
     return builder.run();
   }
@@ -31,11 +36,6 @@ class ProjectBuilder {
   }
 
   async run(): Promise<boolean> {
-    if(this.options.outFile) {
-      this.callbacks.reportMessage(InfrastructureMessages.Error_OutFileNotValidForProjects());
-      return false;
-    }
-
     this.project = loadProject(this.infile, this.callbacks);
     if(!this.project) {
       return false;
@@ -97,7 +97,7 @@ class ProjectBuilder {
 
   async buildTarget(file: KeymanDeveloperProjectFile, activity: BuildActivity): Promise<boolean> {
     const options = {...this.options};
-    options.outFile = this.project.resolveOutputFilePath(file, activity.sourceExtension, activity.compiledExtension);
+    const outfile = this.project.resolveOutputFilePath(file, activity.sourceExtension, activity.compiledExtension);
     options.checkFilenameConventions = this.project.options.checkFilenameConventions ?? this.options.checkFilenameConventions;
     const infile = this.project.resolveInputFilePath(file);
 
@@ -105,9 +105,9 @@ class ProjectBuilder {
     const callbacks = new CompilerFileCallbacks(buildFilename, options, this.callbacks);
     callbacks.reportMessage(InfrastructureMessages.Info_BuildingFile({filename: infile, relativeFilename:buildFilename}));
 
-    fs.mkdirSync(path.dirname(options.outFile), {recursive:true});
+    fs.mkdirSync(path.dirname(outfile), {recursive:true});
 
-    let result = await activity.build(infile, callbacks, options);
+    let result = await activity.build(infile, outfile, callbacks, options);
 
     // check if we had a message that causes the build to be a failure
     // note: command line option here, if set, overrides project setting

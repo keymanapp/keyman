@@ -403,7 +403,6 @@ export interface CompilerBaseOptions {
    * Format of output for log to console
    */
   logFormat?: CompilerLogFormat;
-  outFile?: string; //TODO:REMOVE
   /**
    * Colorize log output, default is detected from console
    */

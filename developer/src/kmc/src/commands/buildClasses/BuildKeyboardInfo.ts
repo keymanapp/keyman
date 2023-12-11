@@ -13,7 +13,7 @@ export class BuildKeyboardInfo extends BuildActivity {
   public get sourceExtension(): KeymanFileTypes.Source { return KeymanFileTypes.Source.Project; }
   public get compiledExtension(): KeymanFileTypes.Binary { return KeymanFileTypes.Binary.KeyboardInfo; }
   public get description(): string { return 'Build a keyboard metadata file'; }
-  public async build(infile: string, callbacks: CompilerCallbacks, options: ExtendedCompilerOptions): Promise<boolean> {
+  public async build(infile: string, _outfile: string, callbacks: CompilerCallbacks, options: ExtendedCompilerOptions): Promise<boolean> {
     if(!KeymanFileTypes.filenameIs(infile, KeymanFileTypes.Source.Project)) {
       // Even if the project file does not exist, we use its name as our reference
       // in order to avoid ambiguity
@@ -48,6 +48,8 @@ export class BuildKeyboardInfo extends BuildActivity {
     if(!await compiler.init(callbacks, {sources})) {
       return false;
     }
+
+    // Note: should we always ignore the passed-in output filename for .keyboard_info?
     const outputFilename = project.getOutputFilePath(KeymanFileTypes.Binary.KeyboardInfo);
     const data = await compiler.run(infile, outputFilename);
 

@@ -10,10 +10,19 @@ export class BuildLdmlKeyboard extends BuildActivity {
   public get sourceExtension(): KeymanFileTypes.Source { return KeymanFileTypes.Source.LdmlKeyboard; }
   public get compiledExtension(): KeymanFileTypes.Binary { return KeymanFileTypes.Binary.Keyboard; }
   public get description(): string { return 'Build a LDML keyboard'; }
-  public async build(infile: string, callbacks: CompilerCallbacks, options: CompilerOptions): Promise<boolean> {
+  public async build(infile: string, outfile: string, callbacks: CompilerCallbacks, options: CompilerOptions): Promise<boolean> {
     // TODO-LDML: consider hardware vs touch -- touch-only layout will not have a .kvk
     // Compile:
-    const outfile = options.outFile; //TODO
+    // TODO: Consider if this mkdir should be in write()
+    // TODO: This pattern may be needed for kmc-kmn as well?
+    const outFileDir = callbacks.path.dirname(outfile ?? infile);
+
+    try {
+      fs.mkdirSync(outFileDir, {recursive: true});
+    } catch(e) {
+      callbacks.reportMessage(InfrastructureMessages.Error_CannotCreateFolder({folderName:outFileDir, e}));
+      return false;
+    }
 
     const ldmlCompilerOptions: kmcLdml.LdmlCompilerOptions = {...options, readerOptions: {
       importsPath: fileURLToPath(new URL(...LDMLKeyboardXMLSourceFileReader.defaultImportsURL))
@@ -26,17 +35,6 @@ export class BuildLdmlKeyboard extends BuildActivity {
 
     const result = await compiler.run(infile, outfile);
     if(!result) {
-      return false;
-    }
-
-    // TODO: Consider if this mkdir should be in write()
-    // TODO: This pattern may be needed for kmc-kmn as well?
-    const outFileDir = callbacks.path.dirname(outfile ?? infile);
-
-    try {
-      fs.mkdirSync(outFileDir, {recursive: true});
-    } catch(e) {
-      callbacks.reportMessage(InfrastructureMessages.Error_CannotCreateFolder({folderName:outFileDir, e}));
       return false;
     }
 

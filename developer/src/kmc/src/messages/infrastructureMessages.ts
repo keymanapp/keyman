@@ -87,5 +87,9 @@ export class InfrastructureMessages {
   static Error_UnsupportedProjectVersion = (o:{version:string}) => m(this.ERROR_UnsupportedProjectVersion,
     `Project version ${o.version} is not supported by this version of Keyman Developer.`);
   static ERROR_UnsupportedProjectVersion = SevError | 0x0013;
+
+  static Error_OutFileCanOnlyBeSpecifiedWithSingleInfile = () => m(this.ERROR_OutFileCanOnlyBeSpecifiedWithSingleInfile,
+    `Parameter -out-file can only be used with a single input file.`);
+  static ERROR_OutFileCanOnlyBeSpecifiedWithSingleInfile = SevError | 0x0014;
 }
 

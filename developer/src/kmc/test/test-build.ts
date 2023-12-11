@@ -34,7 +34,7 @@ describe('compilerWarningsAsErrors', function () {
       const builder = new BuildProject();
       const path = makePathToFixture('compiler-warnings-as-errors',
         `compiler_warnings_as_errors_${truth.kpj === true ? 'true' : (truth.kpj === false ? 'false' : 'undefined')}.kpj`);
-      const result = await builder.build(path, callbacks, {
+      const result = await builder.build(path, null, callbacks, {
         compilerWarningsAsErrors: truth.cli,
       });
       if(truth.result != result) {
