@@ -580,17 +580,7 @@ $(function() {
         $('input#inpKeyCap').css('display', 'block');
       }
       $('.kcontrol.wedge-horz,.kcontrol.wedge-vert,div#btnDelKey').css('display', 'block');
-      var rowOffset = $(key).parent().offset();
-      var offset = $(key).offset();
-
-      $('#wedgeAddRowAbove').offset({ left: rowOffset.left - 18, top: rowOffset.top - 7 });
-      $('#wedgeAddRowBelow').offset({ left: rowOffset.left - 18, top: rowOffset.top + $(key).parent().outerHeight() - 7 });
-      $('#wedgeAddKeyLeft').offset({ left: offset.left - 9, top: offset.top + $(key).outerHeight() + 2 });
-      $('#wedgeAddKeyRight').offset({ left: offset.left + $(key).outerWidth() - 7, top: offset.top + $(key).outerHeight() + 2 });
-      $('div#btnDelKey').offset({ left: offset.left + $(key).outerWidth() - 5, top: offset.top - 8 });
-      if(!builder.textControlsInToolbar()) {
-        $('input#inpKeyCap').offset({ left: offset.left + 16, top: offset.top + 4 }).width($(key).width() - 32);
-      }
+      builder.moveWedgesAround(key);
       this.prepareKey();
       let subKeys = $('#sub-key-groups div.key');
       if(subKeys.length) {
@@ -607,6 +597,22 @@ $(function() {
     }
     builder.saveState();
   };
+
+  this.moveWedgesAround = function(key) {
+    const scrollOffset = $('#kbd-scroll-container').offset();
+    const rowOffset = $(key).parent().offset();
+    const offset = $(key).offset();
+    const wedgeLeft = rowOffset.left < scrollOffset.left ? offset.left - 18 : rowOffset.left - 18;
+
+    $('#wedgeAddRowAbove').offset({ left: wedgeLeft, top: rowOffset.top - 7 });
+    $('#wedgeAddRowBelow').offset({ left: wedgeLeft, top: rowOffset.top + $(key).parent().outerHeight() - 7 });
+    $('#wedgeAddKeyLeft').offset({ left: offset.left - 9, top: offset.top + $(key).outerHeight() + 2 });
+    $('#wedgeAddKeyRight').offset({ left: offset.left + $(key).outerWidth() - 7, top: offset.top + $(key).outerHeight() + 2 });
+    $('div#btnDelKey').offset({ left: offset.left + $(key).outerWidth() - 5, top: offset.top - 8 });
+    if(!builder.textControlsInToolbar()) {
+      $('input#inpKeyCap').offset({ left: offset.left + 16, top: offset.top + 4 }).width($(key).width() - 32);
+    }
+  }
 
   this.selectedKey = function () {
     return $('#kbd .selected');
@@ -950,6 +956,12 @@ $(function() {
     }
   };
 
+  $('#kbd-scroll-container').on('scroll', function () {
+    const key = builder.selectedKey();
+    if(key) {
+      builder.moveWedgesAround(key[0]);
+    }
+  });
   $('#wedgeAddRowAbove').click(builder.wrapChange(function () {
     var row = builder.addRow('above'); builder.selectKey(builder.addKey('key', row));
   }, {rescale: true}));
