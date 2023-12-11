@@ -43,7 +43,7 @@ type KeymanDeveloperOption = keyof KeymanDeveloperOptions;
 let options: KeymanDeveloperOptions = null;
 let optionsLoaded = false;
 
-async function loadOptions(): Promise<KeymanDeveloperOptions> {
+export async function loadOptions(): Promise<KeymanDeveloperOptions> {
   if(optionsLoaded) {
     return options;
   }
@@ -77,7 +77,6 @@ async function loadOptions(): Promise<KeymanDeveloperOptions> {
   return options;
 }
 
-export async function getOption<T extends KeymanDeveloperOption>(valueName: T, defaultValue: KeymanDeveloperOptions[T]): Promise<KeymanDeveloperOptions[T]> {
-  const options = await loadOptions();
+export function getOption<T extends KeymanDeveloperOption>(valueName: T, defaultValue: KeymanDeveloperOptions[T]): KeymanDeveloperOptions[T] {
   return options[valueName] ?? defaultValue;
 }
