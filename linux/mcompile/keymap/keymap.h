@@ -473,6 +473,8 @@ static KMX_DWORD returnIfCharInvalid = 0;
 
 //_S2 QUESTION Which threshold ( from what int value onwards is a character considered deadkey? 65000 28000?, > 255? ??
 static KMX_DWORD deadkeyThreshold = 65000;
+static KMX_DWORD deadkey_min = 0xfe50;
+static KMX_DWORD deadkey_max = 0xfe93;
 
 int map_VKShiftState_to_Lin(int VKShiftState);
 
@@ -523,6 +525,8 @@ KMX_DWORD get_KeyCode_fromVKUS( KMX_DWORD VK_US);
 
 bool IsKeymanUsedKeyVal(std::wstring Keyval);
 
+std::wstring CodePointToWString(unsigned int codepoint);
+
 //UINT find_SC_Other_from_SC_US_GDK(UINT vk_US_187,GdkKeymap *keymap);
 
 UINT map_Ikey_DE(UINT iKey);
@@ -534,5 +538,6 @@ void Inspect_Key_S(GdkKeymap *keymap );//needed?
 const int Lin_KM__map(int i, v_dw_3D &All_Vector);
 KMX_DWORD  mapChar_To_VK(KMX_DWORD chr );
 KMX_DWORD  mapVK_To_char(KMX_DWORD SC );
+
 
 # endif /*KEYMAP_H*/

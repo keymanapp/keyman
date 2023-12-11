@@ -230,10 +230,10 @@ void KMX_TranslateKeyboard(LPKMX_KEYBOARD kbd, KMX_WORD vk, KMX_UINT shift, KMX_
 void KMX_ReportUnconvertedKeyRule(LPKMX_KEY key) {
   if(key->ShiftFlags == 0) {
     //KMX_LogError(L"Did not find a match for mnemonic rule on line %d, + '%c' > ...", key->Line, key->Key);
-    wprintf(L" _S2 Did not find a match for mnemonic rule on line %d, + '%c' > ...\n", key->Line, key->Key);
+    //wprintf(L" _S2 Did not find a match for mnemonic rule on line %d, + '%c' > ...\n", key->Line, key->Key);
   } else if(key->ShiftFlags & VIRTUALCHARKEY) {
     //KMX_LogError(L"Did not find a match for mnemonic virtual character key rule on line %d, + [%x '%c'] > ...", key->Line, key->ShiftFlags, key->Key);
-    wprintf(L"_S2 Did not find a match for mnemonic virtual character key rule on line %d, + [%x '%c'] > ...\n", key->Line, key->ShiftFlags, key->Key);
+    //wprintf(L"_S2 Did not find a match for mnemonic virtual character key rule on line %d, + [%x '%c'] > ...\n", key->Line, key->ShiftFlags, key->Key);
   }
 }
 
