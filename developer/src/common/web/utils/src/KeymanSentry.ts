@@ -20,7 +20,7 @@ export class KeymanSentry {
       return true;
     }
 
-    return getOption('automatically report errors', true);
+    return await getOption('automatically report errors', true);
   }
 
   static init() {

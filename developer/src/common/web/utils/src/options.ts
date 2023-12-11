@@ -43,7 +43,7 @@ type KeymanDeveloperOption = keyof KeymanDeveloperOptions;
 let options: KeymanDeveloperOptions = null;
 let optionsLoaded = false;
 
-function loadOptions(): KeymanDeveloperOptions {
+async function loadOptions(): Promise<KeymanDeveloperOptions> {
   if(optionsLoaded) {
     return options;
   }
@@ -52,9 +52,21 @@ function loadOptions(): KeymanDeveloperOptions {
   try {
     const optionsFile = path.join(os.homedir(), '.keymandeveloper', 'options.json');
     if(fs.existsSync(optionsFile)) {
-      const data = JSON.parse(fs.readFileSync(optionsFile, 'utf-8'));
-      if(typeof data == 'object') {
-        options = data;
+      for(let i = 0; i < 5; i++) {
+        try {
+          const data = JSON.parse(fs.readFileSync(optionsFile, 'utf-8'));
+          if(typeof data == 'object') {
+            options = data;
+          }
+          break;
+        } catch(e) {
+          if(e?.code == 'EBUSY') {
+            await new Promise(resolve => setTimeout(resolve, 500));
+          } else {
+            // give up, nothing to report here
+            break;
+          }
+        }
       }
     }
   } catch(e) {
@@ -65,7 +77,7 @@ function loadOptions(): KeymanDeveloperOptions {
   return options;
 }
 
-export function getOption<T extends KeymanDeveloperOption>(valueName: T, defaultValue: KeymanDeveloperOptions[T]): KeymanDeveloperOptions[T] {
-  const options = loadOptions();
+export async function getOption<T extends KeymanDeveloperOption>(valueName: T, defaultValue: KeymanDeveloperOptions[T]): Promise<KeymanDeveloperOptions[T]> {
+  const options = await loadOptions();
   return options[valueName] ?? defaultValue;
 }
