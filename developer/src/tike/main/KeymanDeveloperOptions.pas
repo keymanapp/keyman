@@ -33,7 +33,8 @@ uses
   Winapi.Windows,
 
   ErrorControlledRegistry,
-  RegistryKeys;
+  RegistryKeys,
+  Keyman.System.KeymanSentryClient;
 
 type
   TKeymanDeveloperOptions = class
@@ -69,6 +70,8 @@ type
     FServerNgrokToken: string;
     FServerNgrokRegion: string;
     FServerKeepAlive: Boolean;
+    FToolbarVisible: Boolean;
+    FStartupProjectPath: string;
     procedure CloseRegistry;
     procedure OpenRegistry;
     function regReadString(const nm, def: string): string;
@@ -123,9 +126,13 @@ type
     property ExternalEditorPath: WideString read FExternalEditorPath write FExternalEditorPath;
     property SMTPServer: string read FSMTPServer write FSMTPServer;   // I4506
     property TestEmailAddresses: string read FTestEmailAddresses write FTestEmailAddresses;   // I4506
+
+    property ToolbarVisible: Boolean read FToolbarVisible write FToolbarVisible;
+    property StartupProjectPath: string read FStartupProjectPath write FStartupProjectPath;
   end;
 
 function FKeymanDeveloperOptions: TKeymanDeveloperOptions;
+function LoadKeymanDeveloperSentryFlags: TKeymanSentryClientFlags;
 //procedure CreateKeymanDeveloperOptions;
 //procedure DestroyKeymanDeveloperOptions;
 
@@ -150,12 +157,64 @@ uses
   System.Classes,
   System.JSON,
   System.Math,
+  System.StrUtils,
   Winapi.ShlObj,
 
   JsonUtil,
   Keyman.Developer.System.KeymanDeveloperPaths,
   utilsystem,
   GetOSVersion;
+
+const
+  { SRegKey_IDEOptions values }
+  SRegKey_IDEOptions_CU          = SRegKey_IDE_CU                 + '\Options';             // CU
+
+  SRegValue_IDEOptLinkFontSizes    = 'link font sizes';                            // CU
+  SRegValue_IDEOptUseTabCharacter  = 'use tab char';                               // CU
+  SRegValue_IDEOptIndentSize       = 'indent size';                                // CU
+  SRegValue_IDEOptDocVirusCheck    = 'warn if packaging doc files';                // CU
+  SRegValue_IDEOptUseSyntaxHighlighting = 'use syntax highlighting';               // CU
+  SRegValue_IDEOptToolbarVisible   = 'toolbar visible';                            // CU
+  SRegValue_IDEOptUseOldDebugger   = 'use old debugger';                           // CU
+  SRegValue_IDEOptEditorTheme      = 'editor theme';                               // CU
+
+  SRegValue_IDEOptDebuggerBreakWhenExitingLine = 'debugger break when exiting line';    // CU
+  SRegValue_IDEOptDebuggerSingleStepAfterBreak = 'debugger single step after break';    // CU
+  SRegValue_IDEOptDebuggerShowStoreOffset      = 'debugger show store offset';          // CU
+  SRegValue_IDEOptDebuggerAutoRecompileWithDebugInfo = 'debugger recompile with debug info'; // CU
+
+  SRegValue_IDEOptDebuggerAutoResetBeforeCompiling = 'debugger auto reset before compilng'; // CU
+  SRegValue_IDEOptAutoSaveBeforeCompiling = 'auto save before compiling'; // CU
+  SRegValue_IDEOptOSKAutoSaveBeforeImporting = 'osk auto save before importing'; // CU
+
+  // Note: keeping 'web host port' reg value name to ensure settings maintained
+  //       from version 14.0 and earlier of Keyman Developer. Other values are
+  //       new with Keyman Developer 15.0
+  SRegValue_IDEOptServerPort = 'web host port';   // I4021
+  SRegValue_IDEOptServerKeepAlive = 'server keep alive';
+  SRegValue_IDEOptServerNgrokToken = 'server ngrok token';
+  SRegValue_IDEOptServerNgrokRegion = 'server ngrok region';
+  SRegValue_IDEOptServerUseLocalAddresses = 'server use local addresses';
+  SRegValue_IDEOptServerUseNgrok = 'server use ngrok';
+  SRegValue_IDEOptServerShowConsoleWindow = 'server show console window';
+
+  SRegValue_IDEOptCharMapDisableDatabaseLookups = 'char map disable database lookups';  // CU
+  SRegValue_IDEOptCharMapAutoLookup             = 'char map auto lookup';               // CU
+
+  SRegValue_IDEOptOpenKeyboardFilesInSourceView = 'open keyboard files in source view';  // CU   // I4751
+
+  SRegValue_IDEDisplayTheme = 'display theme';   // I4796
+
+  SRegValue_IDEOptExternalEditorPath = 'external editor path';                      // CU
+
+  SRegValue_IDEOptSMTPServer = 'smtp server';                                       // CU   // I4506
+  SRegValue_IDEOptTestEmailAddresses = 'test email addresses';                      // CU   // I4506
+
+  SRegValue_IDEOpt_WebLadderLength = 'web ladder length';                           // CU
+  CRegValue_IDEOpt_WebLadderLength_Default = 100;
+
+  SRegValue_IDEOpt_DefaultProjectPath = 'default project path';
+
 
 var
   AFKeymanDeveloperOptions: TKeymanDeveloperOptions = nil;
@@ -247,6 +306,10 @@ begin
       (reg.ReadInteger(SRegValue_AutomaticallyReportErrors) <> 0);
     FReportUsage := not reg.ValueExists(SRegValue_AutomaticallyReportUsage) or
       (reg.ReadInteger(SRegValue_AutomaticallyReportUsage) <> 0);
+
+    FToolbarVisible := regReadString(SRegValue_IDEOptToolbarVisible, '1') <> '0';
+
+    FStartupProjectPath := regReadString(SRegValue_ActiveProject, '');
   finally
     CloseRegistry;
   end;
@@ -301,6 +364,10 @@ begin
     // to write integers as a REG_SZ type and that's far too messy to change now.
     reg.WriteInteger(SRegValue_AutomaticallyReportErrors, IfThen(FReportErrors, 1, 0));
     reg.WriteInteger(SRegValue_AutomaticallyReportUsage, IfThen(FReportUsage, 1, 0));
+
+    reg.WriteString(SRegValue_IDEOptToolbarVisible, IfThen(FToolbarVisible, '1', '0'));
+
+    reg.WriteString(SRegValue_ActiveProject, FStartupProjectPath);
   finally
     CloseRegistry;
   end;
@@ -398,6 +465,15 @@ end;
 class function TKeymanDeveloperOptions.IsDefaultEditorTheme(s: string): Boolean;
 begin
   Result := DefaultEditorThemeItemIndex(s) >= 0;
+end;
+
+function LoadKeymanDeveloperSentryFlags: TKeymanSentryClientFlags;
+begin
+  Result := [kscfCaptureExceptions, kscfShowUI, kscfTerminate];
+  if FKeymanDeveloperOptions.ReportErrors then
+    Include(Result, kscfReportExceptions);
+  if FKeymanDeveloperOptions.ReportUsage then
+    Include(Result, kscfReportMessages);
 end;
 
 initialization

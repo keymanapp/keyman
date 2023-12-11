@@ -9,7 +9,8 @@ uses
 
 type
   TKeymanSentryClientProject = (kscpDesktop, kscpDeveloper);
-  TKeymanSentryClientFlags = set of (kscfCaptureExceptions, kscfShowUI, kscfTerminate);
+  TKeymanSentryClientFlags = set of (kscfCaptureExceptions, kscfShowUI, kscfTerminate,
+    kscfReportExceptions, kscfReportMessages);
   TKeymanSentryClient = class
   private
     class var FInstance: TKeymanSentryClient;
@@ -38,7 +39,7 @@ type
 
     class procedure Breadcrumb(const BreadcrumbType, Message: string; const Category: string = ''; const Level: string = 'info');
 
-    class procedure Start(SentryClientClass: TSentryClientClass; AProject: TKeymanSentryClientProject; const ALogger: string; AFlags: TKeymanSentryClientFlags = [kscfCaptureExceptions, kscfShowUI, kscfTerminate]);
+    class procedure Start(SentryClientClass: TSentryClientClass; AProject: TKeymanSentryClientProject; const ALogger: string; AFlags: TKeymanSentryClientFlags);
     class procedure Stop;
     class property Client: TSentryClient read FClient;
     class property Enabled: Boolean read GetEnabled;
@@ -52,6 +53,7 @@ type
     const S_Sentry_ViewEvent_URL = 'https://sentry.io/organizations/keyman/projects/%0:s/events/%1:s/'; // Do not localize
   end;
 
+function LoadKeymanDesktopSentryFlags(Default: TKeymanSEntryClientFlags = [kscfCaptureExceptions, kscfShowUI, kscfTerminate]): TKeymanSentryClientFlags;
 
 implementation
 
@@ -315,7 +317,7 @@ var
   reg: TRegistry;
   o: TSentryClientOptions;
   f: TSentryClientFlags;
-  path, RegKey: string;
+  path: string;
 begin
   Assert(not Assigned(FInstance));
 
@@ -350,29 +352,11 @@ begin
 
   // Load the registry settings for privacy settings
 
-  if AProject = kscpDesktop
-    then RegKey := SRegKey_KeymanEngine_CU
-    else RegKey := SRegKey_IDEOptions_CU;
+  if kscfReportExceptions in FFlags
+    then Include(f, scfReportExceptions);
 
-  reg := TRegistry.Create;
-  try
-    if reg.OpenKeyReadOnly(RegKey) then
-    begin
-      if not reg.ValueExists(SRegValue_AutomaticallyReportErrors) or
-          reg.ReadBool(SRegValue_AutomaticallyReportErrors) then
-        Include(f, scfReportExceptions);
-      if not reg.ValueExists(SRegValue_AutomaticallyReportUsage) or
-          reg.ReadBool(SRegValue_AutomaticallyReportUsage) then
-        Include(f, scfReportMessages);
-    end
-    else
-    begin
-      Include(f, scfReportExceptions);
-      Include(f, scfReportMessages);
-    end;
-  finally
-    reg.Free;
-  end;
+  if kscfReportMessages in FFlags
+    then Include(f, scfReportMessages);
 
   o.HandlerPath := ExtractFilePath(path) + 'crashpad_handler.exe';
   o.DatabasePath := TKeymanPaths.ErrorLogPath + 'sentry-'+SENTRY_SDK_VERSION+'-db';
@@ -465,6 +449,37 @@ begin
   n := 0;
   n := 1 / n;
   writeln(n); // We'll never get here, but this stops a compiler warning
+end;
+
+// These functions may be moved elsewhere in the future, but in order to remove
+// the registry load from TKeymanSentryClient, we'll start by extracting them
+// from the constructor
+
+function LoadKeymanDesktopSentryFlags(Default: TKeymanSentryClientFlags): TKeymanSentryClientFlags;
+var
+  reg: TRegistry;
+begin
+  Result := Default;
+
+  reg := TRegistry.Create;
+  try
+    if reg.OpenKeyReadOnly(SRegKey_KeymanEngine_CU) then
+    begin
+      if not reg.ValueExists(SRegValue_AutomaticallyReportErrors) or
+          reg.ReadBool(SRegValue_AutomaticallyReportErrors) then
+        Include(Result, kscfReportExceptions);
+      if not reg.ValueExists(SRegValue_AutomaticallyReportUsage) or
+          reg.ReadBool(SRegValue_AutomaticallyReportUsage) then
+        Include(Result, kscfReportMessages);
+    end
+    else
+    begin
+      Include(Result, kscfReportExceptions);
+      Include(Result, kscfReportMessages);
+    end;
+  finally
+    reg.Free;
+  end;
 end;
 
 
