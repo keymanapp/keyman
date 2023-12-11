@@ -874,7 +874,7 @@ $(function() {
     const k = builder.selectedKey();
     const keyId = k.data('id');
     const keyItems = $('#kbd .key').filter((_index,item) => $(item).data('id') === keyId);
-    const keyItemIndex = keyItems.indexOf(k.length ? k[0] : null);
+    const keyItemIndex = keyItems.toArray().indexOf(k.length ? k[0] : null);
     builder.prepareLayer();
     if (keyId !== null && keyItemIndex >= 0) {
       const newKeyItems = $('#kbd .key').filter((_index,item) => $(item).data('id') === keyId);
