@@ -258,12 +258,11 @@ class InstallKmp():
         if not language:
             language = self._add_custom_keyboard(firstKeyboard, packageDir, requested_language)
 
-        if not is_fcitx_running():
-            restart_ibus()
-
         if is_fcitx_running():
             return self._install_keyboards_to_fcitx()
-        elif is_gnome_shell():
+
+        restart_ibus()
+        if is_gnome_shell():
             return self._install_keyboards_to_gnome(keyboards, packageDir, language)
         else:
             return self._install_keyboards_to_ibus(keyboards, packageDir, language)
