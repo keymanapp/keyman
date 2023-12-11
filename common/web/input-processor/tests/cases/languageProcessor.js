@@ -56,8 +56,9 @@ describe('LanguageProcessor', function() {
     });
   });
 
-  describe('.predict', function() {
-    let compiler = new LexicalModelCompiler(callbacks);
+  describe('.predict', async function() {
+    let compiler = new LexicalModelCompiler();
+    assert.isTrue(await compiler.init(callbacks, {}));
     const MODEL_ID = 'example.qaa.trivial';
 
     // ES-module mode leaves out `__dirname`, so we rebuild it using other components.
