@@ -1,4 +1,5 @@
 import * as fs from 'fs';
+import * as path from 'path';
 import { CompilerCallbacks, CompilerOptions, KeymanCompiler, KeymanFileTypes } from "@keymanapp/common-types";
 import { InfrastructureMessages } from '../../messages/infrastructureMessages.js';
 
@@ -27,7 +28,7 @@ export abstract class BuildActivity {
   }
 
   private createOutputFolder(targetFilename: string, callbacks: CompilerCallbacks): boolean {
-    const targetFolder = callbacks.path.dirname(targetFilename);
+    const targetFolder = path.dirname(targetFilename);
 
     try {
       fs.mkdirSync(targetFolder, {recursive: true});

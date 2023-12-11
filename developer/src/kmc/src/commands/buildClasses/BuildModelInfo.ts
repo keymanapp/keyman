@@ -1,3 +1,4 @@
+import * as path from 'path';
 import { BuildActivity } from './BuildActivity.js';
 import { CompilerCallbacks, KeymanFileTypes } from '@keymanapp/common-types';
 import { ModelInfoCompiler } from '@keymanapp/kmc-model-info';
@@ -63,7 +64,7 @@ export class BuildModelInfo extends BuildActivity {
 
     const lastCommitDate = getLastGitCommitDate(project.projectPath);
     const sources = {
-      model_id: callbacks.path.basename(project.projectPath, KeymanFileTypes.Source.Project),
+      model_id: path.basename(project.projectPath, KeymanFileTypes.Source.Project),
       kmpJsonData,
       sourcePath: calculateSourcePath(infile),
       modelFileName: project.resolveOutputFilePath(model, KeymanFileTypes.Source.Model, KeymanFileTypes.Binary.Model),
