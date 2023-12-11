@@ -135,6 +135,7 @@ var
 {$IF NOT DEFINED(CONSOLE)}
   ApplicationTitle, CommandLine: string;
   tsysinfopath, enginepath: string;
+  keyman_root: string;
 {$ENDIF}
 begin
   if EventType = scetException then
@@ -176,23 +177,37 @@ begin
       ApplicationTitle := AppID;
 {$ENDIF}
 
-      CommandLine := Format('-c "%s" "%s" "%s" "%s" "%s" "%s"', [
+      CommandLine := Format('-c "%s" "%s" "%s" "%s" "%s" "%s" %s', [
         IfThen(EventID = '', '_', EventID),
         IfThen(ApplicationTitle = '', ChangeFileExt(ExtractFileName(ParamStr(0)),''), ApplicationTitle),
         AppID,
         ProjectName,
         EventClassName,
-        StringReplace(Message, '"', '""', [rfReplaceAll])
+        StringReplace(Message, '"', '""', [rfReplaceAll]),
+        IfThen(FClient.ReportExceptions, 'report', 'no-report')
       ]);
 
-      try
-        tsysinfopath := TKeymanPaths.KeymanEngineInstallPath('tsysinfo.exe');
-        enginepath := TKeymanPaths.KeymanEngineInstallPath('');
-      except
-        on E:EKeymanPath do
-        begin
-          tsysinfopath := '';
-          enginepath := '';
+      if TKeymanPaths.RunningFromSource(keyman_root) then
+      begin
+        enginepath := keyman_root + 'windows\bin\engine';
+        tsysinfopath := enginepath + '\tsysinfo.exe';
+      end
+      else if FileExists(ExtractFilePath(ParamStr(0)) + 'tsysinfo\tsysinfo.exe') then
+      begin
+        enginepath := ExtractFilePath(ParamStr(0)) + 'tsysinfo';
+        tsysinfopath := enginepath + '\tsysinfo.exe';
+      end
+      else
+      begin
+        try
+          tsysinfopath := TKeymanPaths.KeymanEngineInstallPath('tsysinfo.exe');
+          enginepath := TKeymanPaths.KeymanEngineInstallPath('');
+        except
+          on E:EKeymanPath do
+          begin
+            tsysinfopath := '';
+            enginepath := '';
+          end;
         end;
       end;
       if (tsysinfopath = '') or not TUtilExecute.Shell(0, tsysinfopath, enginepath, CommandLine) then
@@ -314,7 +329,6 @@ end;
 
 constructor TKeymanSentryClient.Create(SentryClientClass: TSentryClientClass; AProject: TKeymanSentryClientProject; const ALogger: string; AFlags: TKeymanSentryClientFlags);
 var
-  reg: TRegistry;
   o: TSentryClientOptions;
   f: TSentryClientFlags;
   path: string;
