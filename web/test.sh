@@ -27,21 +27,6 @@ builder_describe "Runs the Keyman Engine for Web unit-testing suites" \
 
 builder_parse "$@"
 
-if builder_start_action test:libraries; then
-  HEADLESS_FLAGS=
-
-  if builder_has_option --ci; then
-    HEADLESS_FLAGS=--ci
-  fi
-
-  # No --reporter option exists yet for the headless modules.
-
-  $KEYMAN_ROOT/common/web/keyboard-processor/build.sh test $HEADLESS_FLAGS
-  $KEYMAN_ROOT/common/web/input-processor/build.sh test $HEADLESS_FLAGS
-
-  builder_finish_action success test:libraries
-fi
-
 # Browser-based tests: common configs & kill-switches
 
 DO_BROWSER_TEST_SUITE=true
