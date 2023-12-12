@@ -125,24 +125,26 @@ end;
 procedure TRemoteUpdateCheck.DoDownloadUpdates(SavePath: string; Params: TUpdateCheckResponse; var Result: Boolean);
 var
   i, downloadCount: Integer;
+  http: THttpUploader;
+  fs: TFileStream;
 
     function DownloadFile(const url, savepath: string): Boolean;
     begin
-      with THttpUploader.Create(nil) do
+      http := THttpUploader.Create(nil);
       try
-        Proxy.Server := GetProxySettings.Server;
-        Proxy.Port := GetProxySettings.Port;
-        Proxy.Username := GetProxySettings.Username;
-        Proxy.Password := GetProxySettings.Password;
-        Request.Agent := API_UserAgent;
+        http.Proxy.Server := GetProxySettings.Server;
+        http.Proxy.Port := GetProxySettings.Port;
+        http.Proxy.Username := GetProxySettings.Username;
+        http.Proxy.Password := GetProxySettings.Password;
+        http.Request.Agent := API_UserAgent;
 
-        Request.SetURL(url);
-        Upload;
-        if Response.StatusCode = 200 then
+        http.Request.SetURL(url);
+        http.Upload;
+        if http.Response.StatusCode = 200 then
         begin
           fs := TFileStream.Create(savepath, fmCreate);
           try
-            fs.Write(Response.PMessageBody^, Response.MessageBodyLength);
+            fs.Write(http.Response.PMessageBody^, http.Response.MessageBodyLength);
           finally
             fs.Free;
           end;
@@ -153,7 +155,7 @@ var
           Result := False;
           Exit;
       finally
-        Free;
+        http.Free;
       end;
     end;
 
@@ -235,6 +237,8 @@ var
   ucr: TUpdateCheckResponse;
   pkg: IKeymanPackage;
   downloadResult: boolean;
+  registry: TRegistryErrorControlled;
+  http: THttpUploader;
 begin
   {FProxyHost := '';
   FProxyPort := 0;}
@@ -248,16 +252,16 @@ begin
 
   { Verify that it has been at least 7 days since last update check }
   try
-    with TRegistryErrorControlled.Create do  // I2890
+    registry := TRegistryErrorControlled.Create;  // I2890
     try
-      if OpenKeyReadOnly(SRegKey_KeymanDesktop_CU) then
+      if registry.OpenKeyReadOnly(SRegKey_KeymanDesktop_CU) then
       begin
-        if ValueExists(SRegValue_CheckForUpdates) and not ReadBool(SRegValue_CheckForUpdates) and not FForce then
+        if registry.ValueExists(SRegValue_CheckForUpdates) and not registry.ReadBool(SRegValue_CheckForUpdates) and not FForce then
         begin
           Result := wucNoUpdates;
           Exit;
         end;
-        if ValueExists(SRegValue_LastUpdateCheckTime) and (Now - ReadDateTime(SRegValue_LastUpdateCheckTime) < 7) and not FForce then
+        if registry.ValueExists(SRegValue_LastUpdateCheckTime) and (Now - registry.ReadDateTime(SRegValue_LastUpdateCheckTime) < 7) and not FForce then
         begin
           Result := wucNoUpdates;
           // TODO: This exit is just to remove the time check for testing.
@@ -271,7 +275,7 @@ begin
         end;}
       end;
     finally
-      Free;
+      registry.Free;
     end;
   except
     { we will not run the check if an error occurs reading the settings }
@@ -286,13 +290,13 @@ begin
   Result := wucNoUpdates;
 
   try
-    with THTTPUploader.Create(nil) do
+    http := THTTPUploader.Create(nil);
     try
-      Fields.Add('version', ansistring(CKeymanVersionInfo.Version));
-      Fields.Add('tier', ansistring(CKeymanVersionInfo.Tier));
+      http.Fields.Add('version', ansistring(CKeymanVersionInfo.Version));
+      http.Fields.Add('tier', ansistring(CKeymanVersionInfo.Tier));
       if FForce
-        then Fields.Add('manual', '1')
-        else Fields.Add('manual', '0');
+        then http.Fields.Add('manual', '1')
+        else http.Fields.Add('manual', '0');
 
       for i := 0 to kmcom.Packages.Count - 1 do
       begin
@@ -301,24 +305,24 @@ begin
         // Due to limitations in PHP parsing of query string parameters names with
         // space or period, we need to split the parameters up. The legacy pattern
         // is still supported on the server side. Relates to #4886.
-        Fields.Add(AnsiString('packageid_'+IntToStr(i)), AnsiString(pkg.ID));
-        Fields.Add(AnsiString('packageversion_'+IntToStr(i)), AnsiString(pkg.Version));
+        http.Fields.Add(AnsiString('packageid_'+IntToStr(i)), AnsiString(pkg.ID));
+        http.Fields.Add(AnsiString('packageversion_'+IntToStr(i)), AnsiString(pkg.Version));
         pkg := nil;
       end;
 
-      Proxy.Server := GetProxySettings.Server;
-      Proxy.Port := GetProxySettings.Port;
-      Proxy.Username := GetProxySettings.Username;
-      Proxy.Password := GetProxySettings.Password;
+      http.Proxy.Server := GetProxySettings.Server;
+      http.Proxy.Port := GetProxySettings.Port;
+      http.Proxy.Username := GetProxySettings.Username;
+      http.Proxy.Password := GetProxySettings.Password;
 
-      Request.HostName := API_Server;
-      Request.Protocol := API_Protocol;
-      Request.UrlPath := API_Path_UpdateCheck_Windows;
+      http.Request.HostName := API_Server;
+      http.Request.Protocol := API_Protocol;
+      http.Request.UrlPath := API_Path_UpdateCheck_Windows;
       //OnStatus :=
-      Upload;
-      if Response.StatusCode = 200 then
+      http.Upload;
+      if http.Response.StatusCode = 200 then
       begin
-        if ucr.Parse(Response.MessageBodyAsString, 'bundle', CKeymanVersionInfo.Version) then
+        if ucr.Parse(http.Response.MessageBodyAsString, 'bundle', CKeymanVersionInfo.Version) then
         begin
           //ResponseToParams(ucr);
 
@@ -348,9 +352,9 @@ begin
         end;
       end
       else
-        raise ERemoteUpdateCheck.Create('Error '+IntToStr(Response.StatusCode));
+        raise ERemoteUpdateCheck.Create('Error '+IntToStr(http.Response.StatusCode));
     finally
-      Free;
+      http.Free;
     end;
   except
     on E:EHTTPUploader do
@@ -367,12 +371,12 @@ begin
     end;
   end;
 
-  with TRegistryErrorControlled.Create do  // I2890
+  registry := TRegistryErrorControlled.Create;  // I2890
   try
-    if OpenKey(SRegKey_KeymanDesktop_CU, True) then
-      WriteDateTime(SRegValue_LastUpdateCheckTime, Now);
+    if registry.OpenKey(SRegKey_KeymanDesktop_CU, True) then
+      registry.WriteDateTime(SRegValue_LastUpdateCheckTime, Now);
   finally
-    Free;
+    registry.Free;
   end;
 end;
 
