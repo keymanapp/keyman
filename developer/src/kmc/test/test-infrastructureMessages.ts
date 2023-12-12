@@ -7,8 +7,12 @@ import { NodeCompilerCallbacks } from '../src/util/NodeCompilerCallbacks.js';
 import { CompilerErrorNamespace, CompilerEvent } from '@keymanapp/common-types';
 import { unitTestEndpoints } from '../src/commands/build.js';
 import { KmnCompilerMessages } from '@keymanapp/kmc-kmn';
+import { clearOptions } from '@keymanapp/developer-utils';
 
 describe('InfrastructureMessages', function () {
+
+  beforeEach(clearOptions);
+
   it('should have a valid InfrastructureMessages object', function() {
     return verifyCompilerMessagesObject(InfrastructureMessages, CompilerErrorNamespace.Infrastructure);
   });

@@ -1,4 +1,5 @@
 import { TestCompilerCallbacks } from '@keymanapp/developer-test-helpers';
+import { clearOptions } from '@keymanapp/developer-utils';
 import { assert } from 'chai';
 import 'mocha';
 import { BuildProject } from '../src/commands/buildClasses/BuildProject.js';
@@ -13,7 +14,10 @@ interface CompilerWarningsAsErrorsTruthTable {
 };
 
 describe('compilerWarningsAsErrors', function () {
-  beforeEach(() => callbacks.clear());
+  beforeEach(() => {
+    callbacks.clear();
+    clearOptions();
+  });
 
   // The CLI option should override the project setting
 
