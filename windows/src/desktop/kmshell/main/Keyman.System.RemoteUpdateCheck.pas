@@ -140,11 +140,11 @@ var
         Upload;
         if Response.StatusCode = 200 then
         begin
-          with TFileStream.Create(savepath, fmCreate) do
+          fs := TFileStream.Create(savepath, fmCreate);
           try
-            Write(Response.PMessageBody^, Response.MessageBodyLength);
+            fs.Write(Response.PMessageBody^, Response.MessageBodyLength);
           finally
-            Free;
+            fs.Free;
           end;
           Result := True;
         end
@@ -167,11 +167,11 @@ begin
 
     // Keyboard Packages
     for i := 0 to High(Params.Packages) do
-      begin
-        Inc(FDownload.TotalDownloads);
-        Inc(FDownload.TotalSize, Params.Packages[i].DownloadSize);
-        Params.Packages[i].SavePath := SavePath + Params.Packages[i].FileName;
-      end;
+    begin
+      Inc(FDownload.TotalDownloads);
+      Inc(FDownload.TotalSize, Params.Packages[i].DownloadSize);
+      Params.Packages[i].SavePath := SavePath + Params.Packages[i].FileName;
+    end;
 
     // Add the Keyman installer
     Inc(FDownload.TotalDownloads);
@@ -190,7 +190,7 @@ begin
         FDownload.StartPosition := FDownload.StartPosition + Params.Packages[i].DownloadSize;
       end;
 
-    // Keyamn Installer
+    // Keyman Installer
     if not DownloadFile(Params.InstallURL, SavePath + Params.FileName) then  // I2742
     begin
       // TODO record fail? and log  // Download failed but user wants to install other files
@@ -201,8 +201,8 @@ begin
     end;
 
     // There needs to be at least one file successfully downloaded to return
-    // TRUE that files where downloaded
-    if downloadCount > 0  then
+    // True that files were downloaded
+    if downloadCount > 0 then
       Result := True;
   except
     on E:EHTTPUploader do
