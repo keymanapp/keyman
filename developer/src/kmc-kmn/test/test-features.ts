@@ -5,7 +5,7 @@ import { TestCompilerCallbacks } from '@keymanapp/developer-test-helpers';
 import { makePathToFixture } from './helpers/index.js';
 import { KMX, KmxFileReader } from '@keymanapp/common-types';
 
-describe('Keyboard compiler features', async function() {
+describe('Keyboard compiler features', function() {
   let compiler: KmnCompiler = null;
   let callbacks: TestCompilerCallbacks = null;
 

@@ -15,15 +15,18 @@ import { CompilerMessages } from '../src/compiler/messages.js';
 
 const debug = false;
 
-describe('KmpCompiler', async function () {
+describe('KmpCompiler', function () {
   const MODELS : string[] = [
     'example.qaa.sencoten',
     'withfolders.qaa.sencoten',
   ];
-
   const callbacks = new TestCompilerCallbacks();
-  let kmpCompiler = new KmpCompiler();
-  assert.isTrue(await kmpCompiler.init(callbacks, null));
+  let kmpCompiler: KmpCompiler = null;
+
+  this.beforeAll(async function() {
+    kmpCompiler = new KmpCompiler();
+    assert.isTrue(await kmpCompiler.init(callbacks, null));
+  });
 
   for (let modelID of MODELS) {
     const kpsPath = modelID.includes('withfolders') ?

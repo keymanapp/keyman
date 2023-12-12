@@ -184,7 +184,7 @@ describe('InputProcessor', function() {
     // rest of the recorder stuff since it uses only KeyboardProcessor, not InputProcessor.
     let testDefinitions = new KeyboardTest(JSON.parse(testJSONtext));
 
-    before(async function () {
+    this.before(async function () {
       // Load the keyboard.
       let keyboardLoader = new NodeKeyboardLoader(new KeyboardInterface({}, MinimalKeymanGlobal));
       const keyboard = await keyboardLoader.loadKeyboardFromPath(require.resolve('@keymanapp/common-test-resources/keyboards/test_8568_deadkeys.js'));
