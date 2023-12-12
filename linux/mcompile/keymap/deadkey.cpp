@@ -11,6 +11,7 @@ v_dw_1D createLine(std::wstring  first, std::wstring second,  KMX_DWORD number, 
 	return line;
 }
 
+// _S2 used?
 KMX_DWORD find_dk_Character(v_dw_2D * p_dk_ComposeTable, KMX_DWORD first, KMX_DWORD second  ) {
   v_dw_2D  dk_ComposeTable = * p_dk_ComposeTable;
   for ( int i =0; i< (dk_ComposeTable).size()-1; i++) {

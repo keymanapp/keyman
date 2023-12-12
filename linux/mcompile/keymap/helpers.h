@@ -56,4 +56,8 @@ KMX_DWORD get_position_From_VirtualKey_Other(KMX_DWORD VK_Other , v_dw_3D &All_V
 std::wstring get_KeyVals_according_to_Shiftstate(GdkKeymap *keymap, guint VK, ShiftState ss, int caps);
 */
 //std::wstring  get_VirtualKey_US_from_iKey(KMX_DWORD iKey, ShiftState &ss, int &caps, v_dw_3D &All_Vector);
+
+//bool KMX_ImportRules_bak(KMX_WCHAR *kbid, LPKMX_KEYBOARD kp,v_dw_3D &All_Vector, GdkKeymap **keymap,std::vector<KMX_DeadkeyMapping> *KMX_FDeadkeys, KMX_BOOL bDeadkeyConversion); // I4353   // I4327
+//bool KMX_Lin_ImportRules_Lin(KMX_WCHAR *kbid, LPKMX_KEYBOARD kp,v_dw_3D &All_Vector, GdkKeymap **keymap,std::vector<KMX_DeadkeyMapping> *KMX_FDeadkeys, KMX_BOOL bDeadkeyConversion); // I4353   // I4327
+
 #endif /* HELPERS_H*/

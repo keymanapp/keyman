@@ -2994,7 +2994,7 @@ int IIII = ShiftState(shift_state);
   //std::wstring wws=   std::wstring(1, kvl);
   KMX_WCHAR DeadKey;
   //std::wstring wws=  
-   KMX_WCHAR val=  KMX_CharFromSC(keymap, shift_state, ScanCode, &DeadKey);
+   KMX_WCHAR val=  KMX_CharFromSC_underlying(keymap, shift_state, ScanCode, &DeadKey);
 KMX_DWORD dw= getKeyvalsFromKeyCode(keymap, ScanCode, ShiftState(shift_state));
 
 //std::wstring abc=  get_KeyVals_according_to_keycode_and_Shiftstate_new(keymap, ScanCode, ShiftState(shift_state), 0); 

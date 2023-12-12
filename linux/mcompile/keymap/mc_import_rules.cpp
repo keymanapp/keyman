@@ -1002,22 +1002,14 @@ PKMX_WCHAR KMX_incxstr(PKMX_WCHAR p) {
 
 bool IsKeymanUsedKeyVal(std::wstring Keyval) {
 
-
-
   int KV = (int) (*Keyval.c_str());
 
   //         32            127              196          256
-  if  ((KV >= 0x20 && KV <= 0x7F) || (KV >= 0xC4 && KV < 198)  ||
-       (KV >= 199  && KV < 208)   || (KV >= 209 && KV < 216)   || (KV >= 217 && KV < 229)  ||
-       (KV >= 231 && KV < 240)    || (KV >= 241 && KV < 248)   || (KV >= 249 && KV < 0xFF) ||
-       (KV == 128) || (KV == 178) || (KV == 167) || (KV == 179)|| (KV == 176)|| (KV == 181)   )
-
-
-  //         32            127             136          256
-  //if ((KV >= 0x20 && KV <= 0x7F) || (KV == 214)|| (KV == 246)|| (KV ==196)|| (KV == 228) || (KV ==220)|| (KV == 252)|| (KV ==223)|| (KV == 186))
-    return true;
+  if  ((KV >= 0x20 && KV <= 0x7F) || (KV >= 0xC4 && KV < 198)   ||
+       (KV >= 199  && KV < 208)   || (KV >= 209  && KV < 216)   || (KV >= 217 && KV < 229)  ||
+       (KV >= 231  && KV < 240)   || (KV >= 241  && KV < 248)   || (KV >= 249 && KV < 0xFF) ||
+       (KV == 128) || (KV == 178) || (KV == 167) || (KV == 179) || (KV == 176)|| (KV == 181) )
+  return true;
   else
-
     return false;
-
 }
