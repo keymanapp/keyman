@@ -153,7 +153,7 @@ export default class Flick implements GestureHandler {
         this.lockedDir = dir;
         this.lockedSelectable = baseSelection;
 
-        const baseCoord = baseSource.path.coords[0];
+        const baseCoord = baseSource.path.stats.initialSample;
         if(this.flickScroller) {
           // Clear any previously-set scroller.
           baseSource.path.off('step', this.flickScroller);

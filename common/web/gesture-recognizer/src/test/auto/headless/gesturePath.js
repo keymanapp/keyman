@@ -4,7 +4,7 @@ import path from 'path';
 import url from 'url';
 import fs from 'fs';
 
-import { GesturePath } from '@keymanapp/gesture-recognizer';
+import { GestureDebugPath } from '@keymanapp/gesture-recognizer';
 import { timedPromise } from '@keymanapp/web-utils';
 import { TouchpathTurtle } from '#tools';
 
@@ -27,7 +27,7 @@ describe("GesturePath", function() {
         delete rawPathObject.segments;
       }
 
-      let reconstructedPath = GesturePath.deserialize(rawPathObject);
+      let reconstructedPath = GestureDebugPath.deserialize(rawPathObject);
       assert.isFalse(reconstructedPath.wasCancelled);
 
       assert.sameDeepOrderedMembers(reconstructedPath.coords, rawPathObject.coords);
@@ -43,7 +43,7 @@ describe("GesturePath", function() {
         t: 0
       };
 
-      let path = new GesturePath();
+      let path = new GestureDebugPath();
       let turtle = new TouchpathTurtle(initialSample);
       turtle.on('sample', (sample) => path.extend(sample));
 
@@ -103,7 +103,7 @@ describe("GesturePath", function() {
       const spyEventComplete    = sinon.fake();
       const spyEventInvalidated = sinon.fake();
 
-      const touchpath = new GesturePath();
+      const touchpath = new GestureDebugPath();
       touchpath.on('step', spyEventStep);
       touchpath.on('complete', spyEventComplete);
       touchpath.on('invalidated', spyEventInvalidated);
@@ -136,7 +136,7 @@ describe("GesturePath", function() {
       const spyEventComplete    = sinon.fake();
       const spyEventInvalidated = sinon.fake();
 
-      const touchpath = new GesturePath();
+      const touchpath = new GestureDebugPath();
       touchpath.on('step', spyEventStep);
       touchpath.on('complete', spyEventComplete);
       touchpath.on('invalidated', spyEventInvalidated);
@@ -168,7 +168,7 @@ describe("GesturePath", function() {
       const spyEventComplete     = sinon.fake();
       const spyEventInvalidated  = sinon.fake();
 
-      const touchpath = new GesturePath();
+      const touchpath = new GestureDebugPath();
       touchpath.on('step', spyEventStep);
       touchpath.on('complete', spyEventComplete);
       touchpath.on('invalidated', spyEventInvalidated);
@@ -190,7 +190,7 @@ describe("GesturePath", function() {
       const spyEventComplete     = sinon.fake();
       const spyEventInvalidated  = sinon.fake();
 
-      const touchpath = new GesturePath();
+      const touchpath = new GestureDebugPath();
       touchpath.on('step', spyEventStep);
       touchpath.on('complete', spyEventComplete);
       touchpath.on('invalidated', spyEventInvalidated);
@@ -218,12 +218,12 @@ describe("GesturePath", function() {
       this.fakeClock.restore();
     })
 
-    it("path.segments + path.coords - no extra samples", async function() {
+    it("path.coords - no extra samples", async function() {
       const spyEventStep         = sinon.fake();
       const spyEventComplete     = sinon.fake();
       const spyEventInvalidated  = sinon.fake();
 
-      const touchpath = new GesturePath();
+      const touchpath = new GestureDebugPath();
       touchpath.on('step', spyEventStep);
       touchpath.on('complete', spyEventComplete);
       touchpath.on('invalidated', spyEventInvalidated);

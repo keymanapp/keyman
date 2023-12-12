@@ -4,8 +4,6 @@ import { GestureModel, GestureResolution, GestureResolutionSpec, RejectionDefaul
 
 import { ManagedPromise, TimeoutPromise } from "@keymanapp/web-utils";
 import { FulfillmentCause, PathMatcher } from "./pathMatcher.js";
-import { ItemIdentifier } from "../../../configuration/gestureRecognizerConfiguration.js";
-import { GesturePath } from "../../gesturePath.js";
 import { CumulativePathStats } from "../../cumulativePathStats.js";
 
 /**

@@ -1,4 +1,6 @@
 import {
+  GestureDebugPath,
+  GestureDebugSource,
   GestureSource,
   type InputSample
 } from "@keymanapp/gesture-recognizer";
@@ -187,7 +189,7 @@ export class InputSequenceSimulator<HoveredItemType> {
 
     this.controller.layoutConfiguration = new FixtureLayoutConfiguration(config);
 
-    const touchpoints = inputs.map((input, index) => GestureSource.deserialize(input, index));
+    const touchpoints = inputs.map((input, index) => GestureDebugSource.deserialize(input, index));
 
     /**
      * For each corresponding recorded sequence, notes the index of the sequence's
@@ -211,27 +213,29 @@ export class InputSequenceSimulator<HoveredItemType> {
       let selectedSequences = [-1];
 
       for(let index=0; index < inputs.length; index++) {
-        const touchpoint = GestureSource.deserialize(inputs[index], index);
+        const touchpoint = GestureDebugSource.deserialize(inputs[index], index);
+        const path = touchpoint.path as GestureDebugPath<any>;
         const indexInSequence = sequenceProgress[index];
 
         if(indexInSequence == Number.MAX_VALUE) {
           continue;
         }
 
-        if(touchpoint.path.coords[indexInSequence].t < minTimestamp) {
-          minTimestamp = touchpoint.path.coords[indexInSequence].t;
+        if(path.coords[indexInSequence].t < minTimestamp) {
+          minTimestamp = path.coords[indexInSequence].t;
           selectedSequences = [index];
-        } else if (touchpoint.path.coords[indexInSequence].t == minTimestamp) {
+        } else if (path.coords[indexInSequence].t == minTimestamp) {
           selectedSequences.push(index);
         }
       }
 
       const preprocessing = selectedSequences.map((inputIndex) => {
         const touchpoint = touchpoints[inputIndex];
+        const path = touchpoint.path as GestureDebugPath<any>;
         const indexInSequence = sequenceProgress[inputIndex];
 
         let appendEndEvent = false;
-        if(indexInSequence + 1 >= touchpoint.path.coords.length) {
+        if(indexInSequence + 1 >= path.coords.length) {
           sequenceProgress[inputIndex] = Number.MAX_VALUE;
           appendEndEvent = true;
         } else {
@@ -244,7 +248,7 @@ export class InputSequenceSimulator<HoveredItemType> {
           state = "start";
         }
 
-        const sample = touchpoint.path.coords[indexInSequence] as InputSample<HoveredItemType>;
+        const sample = path.coords[indexInSequence] as InputSample<HoveredItemType>;
 
         return {
           sample: sample,

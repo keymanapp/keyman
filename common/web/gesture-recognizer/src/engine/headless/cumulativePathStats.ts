@@ -18,7 +18,7 @@ export type PathCoordAxisPair = 'tx' | 'ty' | 'xy';
  * Sine and Cosine stats are currently excluded due to their necessary lack of statistical
  * independence.
  */
-type StatAxis = PathCoordAxis | 'v';
+type StatAxis = PathCoordAxis;
 
 /**
  * As the name suggests, this class facilitates tracking of cumulative mathematical values, etc
@@ -29,7 +29,7 @@ type StatAxis = PathCoordAxis | 'v';
  * A subclass with properties useful for path segmentation: `RegressiblePathStats`.
  */
 export class CumulativePathStats<Type = any> {
-  protected rawLinearSums  = {'x': 0, 'y': 0, 't': 0, 'v': 0};
+  protected rawLinearSums  = {'x': 0, 'y': 0, 't': 0};
 
   // Handles raw-distance stuff.
   private coordArcSum: number = 0;
@@ -86,6 +86,7 @@ export class CumulativePathStats<Type = any> {
     return this._extend(new CumulativePathStats(this), sample);
   }
 
+  // Pattern exists to facilitate subclasses if needed in the future:  see #11079 and #11080.
   protected _extend(result: CumulativePathStats<Type>, sample: InputSample<any>) {
     if(!result._initialSample) {
       result._initialSample = sample;
@@ -117,10 +118,6 @@ export class CumulativePathStats<Type = any> {
       const coordArcDelta = Math.sqrt(coordArcDeltaSq);
 
       result.coordArcSum     += coordArcDelta;
-
-      if(tDelta) {
-        result.rawLinearSums.v  += coordArcDelta   / tDelta;
-      }
     }
 
     result._lastSample = sample;
@@ -142,7 +139,7 @@ export class CumulativePathStats<Type = any> {
     return this._deaccumulate(result, subsetStats);
   }
 
-  public _deaccumulate(result: CumulativePathStats<Type>, subsetStats?: CumulativePathStats<Type>): CumulativePathStats<Type> {
+  protected _deaccumulate(result: CumulativePathStats<Type>, subsetStats?: CumulativePathStats<Type>): CumulativePathStats<Type> {
     // Possible addition:  use `this.buildRenormalized` on the returned version
     // if catastrophic cancellation effects (random, small floating point errors)
     // are not sufficiently mitigated & handled by the measures currently in place.
@@ -189,10 +186,6 @@ export class CumulativePathStats<Type = any> {
       // 'remaining' subset (operand 1 below) before the portion wholly within what remains (the result)
       result.coordArcSum     -= coordArcDelta;
       result.coordArcSum     -= subsetStats.coordArcSum;
-
-      if(tDelta) {
-        result.rawLinearSums.v  -= coordArcDelta   / tDelta;
-      }
     }
 
     result.sampleCount -= subsetStats.sampleCount;
@@ -205,6 +198,26 @@ export class CumulativePathStats<Type = any> {
 
     // initialSample, though, we need to update b/c of the 'directness' properties.
     result._initialSample = subsetStats.followingSample;
+
+    return result;
+  }
+
+  public translateCoordSystem(functor: (sample: InputSample<Type>) => InputSample<Type>): CumulativePathStats<Type> {
+    const result = new CumulativePathStats(this);
+
+    return this._translateCoordSystem(result, functor);
+  }
+
+  protected _translateCoordSystem(result: CumulativePathStats<Type>, functor: (sample: InputSample<Type>) => InputSample<Type>): CumulativePathStats<Type> {
+    if(this.sampleCount == 0) {
+      return result;
+    }
+
+    const singleSample = result.initialSample == result.lastSample;
+
+    result._initialSample = functor(result.initialSample);
+    result.baseSample = functor(result.baseSample);
+    result._lastSample = singleSample ? result._initialSample : functor(result.lastSample);
 
     return result;
   }
@@ -371,7 +384,6 @@ export class CumulativePathStats<Type = any> {
     return {
       angle: this.angle,
       cardinal: this.cardinalDirection,
-      speedMean: this.mean('v'),
       netDistance: this.netDistance,
       duration: this.duration,
       sampleCount: this.sampleCount,

@@ -1,5 +1,5 @@
 import { assert } from 'chai'
-import { GestureRecognizerConfiguration, GestureSource, InputSample } from '@keymanapp/gesture-recognizer';
+import { GestureDebugSource, GestureRecognizerConfiguration, GestureSource, InputSample } from '@keymanapp/gesture-recognizer';
 
 const helloSample: InputSample<string> = {
   targetX: 1,
@@ -71,7 +71,7 @@ const mockedShiftedConfig = {
 describe("GestureSource", function() {
   describe("Subviews", function() {
     it("construction:  preserve current path & base item", () => {
-      let source = new GestureSource<string>(0, null, true);
+      let source = new GestureDebugSource<string>(0, null, true);
       for(let i=0; i < simpleSampleSequence.length; i++) {
         source.update(simpleSampleSequence[i]);
       }
@@ -83,7 +83,7 @@ describe("GestureSource", function() {
     });
 
     it("construction:  preserve only most recent sample & base item", () => {
-      let source = new GestureSource<string>(0, null, true);
+      let source = new GestureDebugSource<string>(0, null, true);
       for(let i=0; i < simpleSampleSequence.length; i++) {
         source.update(simpleSampleSequence[i]);
       }
@@ -97,7 +97,7 @@ describe("GestureSource", function() {
     });
 
     it("construction:  preserve only most recent sample", () => {
-      let source = new GestureSource<string>(0, null, true);
+      let source = new GestureDebugSource<string>(0, null, true);
       for(let i=0; i < simpleSampleSequence.length; i++) {
         source.update(simpleSampleSequence[i]);
       }
@@ -111,7 +111,7 @@ describe("GestureSource", function() {
     });
 
     it("construction:  preserve current path & base item, with translation", () => {
-      let source = new GestureSource<string>(0, mockedInitialConfig as any, true);
+      let source = new GestureDebugSource<string>(0, mockedInitialConfig as any, true);
       for(let i=0; i < simpleSampleSequence.length; i++) {
         source.update(simpleSampleSequence[i]);
       }
@@ -137,7 +137,7 @@ describe("GestureSource", function() {
     });
 
     it("properly propagate updates", () => {
-      let source = new GestureSource<string>(0, null, true);
+      let source = new GestureDebugSource<string>(0, null, true);
       let subview = source.constructSubview(false, true);
 
       assert.equal(subview.path.coords.length, 0);
@@ -148,7 +148,7 @@ describe("GestureSource", function() {
     });
 
     it("may be disconnected from further updates", () => {
-      let source = new GestureSource<string>(0, null, true);
+      let source = new GestureDebugSource<string>(0, null, true);
       let subview = source.constructSubview(false, true);
 
       source.update(helloSample);
@@ -165,7 +165,7 @@ describe("GestureSource", function() {
     });
 
     it('is updated if constructed from "current" intermediate subview', () => {
-      let source = new GestureSource<string>(0, null, true);
+      let source = new GestureDebugSource<string>(0, null, true);
       let baseSubview = source.constructSubview(false, true);
 
       source.update(helloSample);
@@ -186,7 +186,7 @@ describe("GestureSource", function() {
     });
 
     it("propagate path termination (complete)",  () => {
-      let source = new GestureSource<string>(0, null, true);
+      let source = new GestureDebugSource<string>(0, null, true);
       let subview = source.constructSubview(true, true);
       let subview2 = source.constructSubview(true, true);
 
@@ -204,7 +204,7 @@ describe("GestureSource", function() {
     });
 
     it("acts read-only - does not allow direct mutations", () => {
-      let source = new GestureSource<string>(0, mockedInitialConfig as any, true);
+      let source = new GestureDebugSource<string>(0, mockedInitialConfig as any, true);
       let subview = source.constructSubview(false, true);
       source.update(helloSample);
       source.pushRecognizerConfig(mockedShiftedConfig as any);

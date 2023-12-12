@@ -5,7 +5,7 @@ import * as PromiseStatusModule from 'promise-status-async';
 const PromiseStatuses     = PromiseStatusModule.PromiseStatuses;
 import { assertingPromiseStatus as promiseStatus } from '../../../resources/assertingPromiseStatus.js';
 
-import { InputSample, GestureSource, gestures } from '@keymanapp/gesture-recognizer';
+import { InputSample, GestureSource, gestures, GestureDebugPath } from '@keymanapp/gesture-recognizer';
 
 import { TouchpathTurtle } from '#tools';
 import { ManagedPromise, timedPromise } from '@keymanapp/web-utils';
@@ -105,7 +105,7 @@ describe("GestureMatcher", function() {
 
 
       // Because 'chopped'.
-      assert.equal(secondMatcher.sources[0].path.coords.length, 1);
+      assert.equal(secondMatcher.sources[0].path.stats.sampleCount, 1);
       assert.deepEqual(sources[0].currentSample, waitCompletionSample);
       // because we 'chopped' the path, we use the current sample's item as the new base.
       assert.equal(secondMatcher.sources[0].baseItem, 'b');
@@ -173,7 +173,7 @@ describe("GestureMatcher", function() {
 
 
       // 'partial' path inheritance still drops the pre-existing path components...
-      assert.equal(secondMatcher.sources[0].path.coords.length, 1);
+      assert.equal(secondMatcher.sources[0].path.stats.sampleCount, 1);
       assert.deepEqual(sources[0].currentSample, waitCompletionSample);
       // ... but preserves the original base item.
       assert.equal(sources[0].baseItem, 'a');
@@ -283,8 +283,13 @@ describe("GestureMatcher", function() {
 
 
       // 'full' path inheritance maintains all pre-existing path components...
-      assert.equal(secondMatcher.sources[0].path.coords.length, sources[0].path.coords.length);
-      assert.deepEqual(secondMatcher.sources[0].path.coords, sources[0].path.coords)
+      assert.equal(secondMatcher.sources[0].path.stats.sampleCount, sources[0].path.stats.sampleCount);
+
+      assert.deepEqual(
+        (secondMatcher.sources[0].path as GestureDebugPath<string>).coords,
+        (sources[0].path as GestureDebugPath<string>).coords
+      );
+
       assert.deepEqual(sources[0].currentSample, waitCompletionSample);
       // ... and also preserves the original base item.
       assert.equal(sources[0].baseItem, 'a');

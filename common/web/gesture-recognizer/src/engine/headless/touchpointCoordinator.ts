@@ -7,6 +7,7 @@ import { GestureModelDefs, getGestureModel, getGestureModelSet } from "./gesture
 import { GestureModel } from "./gestures/specs/gestureModel.js";
 import { timedPromise } from "@keymanapp/web-utils";
 import { InputSample } from "./inputSample.js";
+import { GestureDebugPath } from "./gestureDebugPath.js";
 
 interface EventMap<HoveredItemType, StateToken> {
   /**
@@ -198,11 +199,13 @@ export class TouchpointCoordinator<HoveredItemType, StateToken=any> extends Even
          *
          * Current actual use-case:  deferred modipress due to ongoing flick, auto-completed by new incoming touch.
          */
-        touchpoint.path.coords.forEach(correctSample);
+        if(touchpoint.path instanceof GestureDebugPath) {
+          touchpoint.path.coords.forEach(correctSample);
+        }
 
         // Don't forget to also correct the `stateToken` and `baseItem`!
         touchpoint.stateToken = this.stateToken;
-        touchpoint.baseItem = touchpoint.path.coords[0].item;
+        touchpoint.baseItem = touchpoint.path.stats.initialSample.item;
 
         // Also, in case a contact model's path-eval references data via stats...
         correctSample(touchpoint.path.stats.initialSample);
