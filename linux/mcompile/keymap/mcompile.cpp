@@ -560,11 +560,11 @@ KMX_WCHAR KMX_get_KVUS_From_KVUnderlying_VEC(v_dw_3D All_Vector, KMX_DWORD VK_OT
 // _S2 sure KMX_WCHART ??? not KMX_WCHAR ??  not usable!!
 KMX_WCHART KMX_get_VKUnderlying_From_VKUS_GDK(GdkKeymap* keymap,KMX_DWORD VK_US) {
 
-  KMX_WORD VK_DE = ( KMX_WORD ) map_Ikey_DE(VK_US);
+  /*KMX_WORD VK_DE = ( KMX_WORD ) map_Ikey_DE(VK_US);
   if(VK_DE!= VK_US)
     return VK_DE;
   else
-    return VK_US;
+    return VK_US;*/
 }// _S2 sure KMX_WCHART ??? not KMX_WCHAR ??
 
 KMX_WCHAR KMX_SCKUnderlyingLayoutToVKUS_GDK2(GdkKeymap* keymap,KMX_DWORD SC_Other) {
@@ -597,6 +597,29 @@ KMX_DWORD KMX_get_CharUnderlying_according_to_keycode_and_Shiftstate_VEC(v_dw_3D
 }
 */
 
+KMX_DWORD KMX_get_KeyCodeUnderlying_From_KeycodeUS_VEC(v_dw_3D &All_Vector, KMX_DWORD KC_US, int Shiftstate) {
+
+  KMX_DWORD Character = 0;
+  // find character with that scancode
+  for( int i=0; i< (int)All_Vector[0].size()-1 ;i++) {
+    if ( ( All_Vector[0][i][0] == KC_US ) ) {
+      if ( Shiftstate+1 < All_Vector[0][i].size()-1)
+        Character = All_Vector[0][i][Shiftstate+1];
+      break;
+    }
+  }
+
+  //Find underlying SC of character
+  for( int i=0; i< (int)All_Vector[1].size()-1 ;i++) {
+    for( int j=1; j< (int)All_Vector[01][0].size();j++) {
+      if ( ( All_Vector[1][i][j] == Character ) ) {
+        KC_US = All_Vector[1][i][j];
+        return All_Vector[1][i][0];
+      }
+    }
+  }
+  return KC_US;
+}
 // takes SC of Other keyboard and returns character of Other keyboard with shiftstate VKShiftState[j]
 KMX_WCHAR  KMX_get_CharUnderlying_From_SCUnderlying_GDK(GdkKeymap *keymap, KMX_UINT VKShiftState, UINT SC_OTHER, KMX_WCHAR* DeadKey) {
 

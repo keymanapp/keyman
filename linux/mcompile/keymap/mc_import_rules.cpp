@@ -327,6 +327,8 @@ int i4 = this->KMX_IsXxxxGrCapsEqualToXxxxShift() ? 8 : 0;
         (this->KMX_IsAltGrCapsEqualToAltGrShift() ? 4 : 0) |
         (this->KMX_IsXxxxGrCapsEqualToXxxxShift() ? 8 : 0);
 
+        capslock=1;   // _S2
+
 
     for (int ss = 0; ss <= MaxShiftState; ss++) {
       if (ss == Menu || ss == ShftMenu) {
@@ -370,12 +372,9 @@ int i4 = this->KMX_IsXxxxGrCapsEqualToXxxxShift() ? 8 : 0;
             if(st[ich] < 0x20 || st[ich] == 0x7F) { isvalid=false; break; }
           }
           if(isvalid) {
-            //key->Key = KMX_get_KVUS_From_KVUnderlying_VEC(All_Vector,this->VK());
-            key->Key = KMX_get_VKUnderlying_From_VKUS_GDK(keymap,this->VK());
-        std::wstring w1_S2 = get_m_rgss(ss,caps);
-        //wprintf(L"\n KMX_get_KVUS_From_KVUnderlying_GD writes  %ls  %c",w1_S2.c_str(), key->Key );
+            KMX_DWORD SC_Underlying = KMX_get_KeyCodeUnderlying_From_KeycodeUS_VEC(All_Vector,this->SC(), ss);
+            key->Key = KMX_get_VKUS_From_KeyCodeUnderlying_GDK( keymap, SC_Underlying);
 
-            //wprintf(L" this->VK(): %i ", this->VK());
             key->Line = 0;
             // _S2 _differences in sstateflag probably from here and KMX_IsCapsEqualToShift...
             key->ShiftFlags = this->KMX_GetShiftStateValue(capslock, caps, (ShiftState) ss);

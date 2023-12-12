@@ -53,6 +53,8 @@ KMX_DWORD KMX_get_KVUnderlying_From_KVUS_VEC(v_dw_3D &All_Vector,KMX_DWORD inUS)
 //KMX_DWORD KMX_get_CharUnderlying_according_to_keycode_and_Shiftstate_VEC(v_dw_3D &All_Vector,KMX_DWORD vkUnderlying, KMX_UINT VKShiftState, KMX_WCHAR* DeadKey);
 KMX_WCHAR KMX_get_CharUnderlying_From_SCUnderlying_GDK(GdkKeymap *keymap, KMX_UINT VKShiftState, UINT SC_OTHER, KMX_WCHAR* DeadKey);
 
+KMX_DWORD KMX_get_KeyCodeUnderlying_From_KeycodeUS_VEC(v_dw_3D &All_Vector, KMX_DWORD VK_US, int Shiftstate);
+
 int KMX_GetDeadkeys(v_dw_2D & dk_Table, KMX_WORD DeadKey, KMX_WORD *OutputPairs, GdkKeymap* keymap);
 
 
