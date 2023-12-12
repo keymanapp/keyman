@@ -1,6 +1,6 @@
 import Sentry from "@sentry/node";
 import KEYMAN_VERSION from "@keymanapp/keyman-version";
-import { spawnChild } from "./spawnAwait.js";
+import { getOption } from "./options.js";
 
 /**
  * Maximum delay on shutdown of process to send pending events
@@ -20,25 +20,7 @@ export class KeymanSentry {
       return true;
     }
 
-    if(process.platform == 'win32') {
-      // TODO: move to a .keymandeveloperrc or .kmcrc file in the future?
-      // On Win32, check HKCU\SOFTWARE\Keyman\Keyman Developer\IDE\Options, automatically report errors [REG_DWORD] == 0x1
-      try {
-        const data = (await spawnChild('reg.exe', [
-          'query',
-          'HKEY_CURRENT_USER\\SOFTWARE\\Keyman\\Keyman Developer\\IDE\\Options',
-          '/v',
-          'automatically report errors'
-        ])).split(' ').pop().trim();
-        return data == '0x1';
-      } catch(e) {
-        // the registry entry doesn't exist, assume 'yes'
-        return true;
-      }
-    }
-
-    // Default if no user setting is found, is true
-    return true;
+    return getOption('automatically report errors', true);
   }
 
   static init() {

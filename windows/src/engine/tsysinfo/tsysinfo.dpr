@@ -71,7 +71,7 @@ const
   LOGGER_DESKTOP_ENGINE_TSYSINFO = TKeymanSentryClient.LOGGER_DESKTOP_ENGINE + '.tsysinfo';
 begin
   TKeymanSentryClient.Start(TSentryClientVcl, kscpDesktop, LOGGER_DESKTOP_ENGINE_TSYSINFO,
-    [kscfCaptureExceptions]); // no ui for exceptions, no termination
+    LoadKeymanDesktopSentryFlags([kscfCaptureExceptions])); // no ui for exceptions, no termination
   try
     if RunCrashReportHandler then
       Exit;

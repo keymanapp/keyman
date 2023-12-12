@@ -22,6 +22,9 @@ type
     const S_ServerConfigJson = 'config.json';
     class function ServerDataPath: string; static;
     class function ServerPath: string; static;
+
+    const S_OptionsJson = 'options.json';
+    class function OptionsPath: string; static;
   end;
 
 implementation
@@ -41,6 +44,11 @@ begin
   if TKeymanPaths.RunningFromSource(KeymanRoot)
     then Result := KeymanRoot + 'developer\src\inst\node\dist\node.exe'
     else Result := ExtractFilePath(ParamStr(0)) + 'node.js\node.exe';
+end;
+
+class function TKeymanDeveloperPaths.OptionsPath: string;
+begin
+  Result := GetFolderPath(CSIDL_PROFILE) + '.keymandeveloper\';
 end;
 
 class function TKeymanDeveloperPaths.ServerDataPath: string;

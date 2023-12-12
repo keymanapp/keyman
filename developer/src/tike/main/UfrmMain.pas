@@ -586,17 +586,8 @@ begin
   Application.HelpFile := GetHelpURL;   // I4677   // I4841
   mHHelp := TWebHookHelpSystem.Create(Application.HelpFile);   // I4677   // I4841
 
-  with TRegistryErrorControlled.Create do  // I2890
-  try
-    RootKey := HKEY_CURRENT_USER;
-    if OpenKeyReadOnly(SRegKey_IDEOptions_CU) then
-    begin
-      if ValueExists(SRegValue_IDEOptToolbarVisible) and (ReadString(SRegValue_IDEOptToolbarVisible) = '0') then
-        barTools.Visible := False;
-    end;
-  finally
-    Free;
-  end;
+  if not FKeymanDeveloperOptions.ToolbarVisible then
+    barTools.Visible := False;
 
   RemoveOldestTikeEditFonts(False);
   RemoveOldestTikeTestFonts(False);
@@ -683,25 +674,16 @@ begin
     FChildWindows[i].Release;   // I2595, probably not necessary
   end;
 
-  with TRegistryErrorControlled.Create do  // I2890
-  try
-    RootKey := HKEY_CURRENT_USER;
-    if OpenKey(SRegKey_IDEOptions_CU, True) then
-    begin
-      if IsGlobalProjectUIReady then
-      begin
-        FGlobalProject.Save;   // I4691
-        WriteString(SRegValue_ActiveProject, FGlobalProject.FileName);
-      end
-      else
-      begin
-        if ValueExists(SRegValue_ActiveProject) then
-          DeleteValue(SRegValue_ActiveProject);
-      end;
-    end;
-  finally
-    Free;
+  if IsGlobalProjectUIReady then
+  begin
+    FGlobalProject.Save;   // I4691
+    FKeymanDeveloperOptions.StartupProjectPath := FGlobalProject.FileName;
+  end
+  else
+  begin
+    FKeymanDeveloperOptions.StartupProjectPath := '';
   end;
+  FKeymanDeveloperOptions.Write;
 
   FreeAndNil(frmCharacterMapDock);
   FreeAndNil(frmCharacterIdentifier);   // I4807
