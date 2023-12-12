@@ -3140,6 +3140,16 @@ inherited frmKeymanDeveloper: TfrmKeymanDeveloper
         end
       end
     end
+    object mnuWindow: TMenuItem
+      Caption = '&Window'
+      OnClick = mnuWindowClick
+      object Newwindow1: TMenuItem
+        Action = modActionsMain.actWindowNew
+      end
+      object N12: TMenuItem
+        Caption = '-'
+      end
+    end
     object Help1: TMenuItem
       Caption = '&Help'
       object Contents1: TMenuItem

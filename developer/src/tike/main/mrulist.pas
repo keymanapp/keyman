@@ -53,6 +53,8 @@ type
     property OnChange: TNotifyEvent read FOnChange write FOnChange;
   end;
 
+function EllipsisFile(filename: string): string;
+
 implementation
 
 uses
@@ -231,15 +233,20 @@ begin
 end;
 
 function TMRUList.EllipsisFile(Index: Integer): string;
+begin
+  Result := mrulist.EllipsisFile(Files[Index]);
+end;
+
+function EllipsisFile(filename: string): string;
 var
   buffer: array[0..MAX_PATH] of char;
 begin
-  StrPCopy(buffer, Files[Index]);
+  StrPCopy(buffer, filename);
 
   if PathCompactPath(0, buffer, GetSystemMetrics(SM_CXSCREEN) div 3) then   // I4697
     Result := buffer  // This removes the terminating nul
   else
-    Result := ExtractFileName(Files[Index]);
+    Result := ExtractFileName(filename);
 end;
 
 function TMRUList.GetFile(Index: Integer): string;
