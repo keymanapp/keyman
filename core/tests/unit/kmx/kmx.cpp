@@ -147,6 +147,8 @@ apply_action(
     }
   } break;
   case KM_CORE_IT_INVALIDATE_CONTEXT:
+    context.clear();
+    text_store.clear();
     std::cout << "action: context invalidated (markers cleared)" << std::endl;
     break;
   case KM_CORE_IT_EMIT_KEYSTROKE:
