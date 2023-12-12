@@ -368,7 +368,7 @@ reorder_group::apply(std::u32string &str) const {
   // TODO-LDML: for now, assume matches entire string.
   // A needed optimization here would be to detect a common substring
   // at the end of the old and new strings, and keep the match_len
-  // minimal. This coudl reduce thrash in core's context.
+  // minimal. This could reduce thrash in core's context.
   // However, the calling code does check for a common substring with mismatch()
   size_t match_len = str.size();
 
