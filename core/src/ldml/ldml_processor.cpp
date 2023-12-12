@@ -73,7 +73,6 @@ ldml_processor::ldml_processor(path const & kb_path, const std::vector<uint8_t> 
       auto keyEntry = kplus.key2Helper.getKeys(kmapEntry->key);
       assert(keyEntry != nullptr);
 
-      // TODO-LDML: LDML_KEYS_KEY_FLAGS_NOTRANSFORM
       if (keyEntry->flags & LDML_KEYS_KEY_FLAGS_EXTEND) {
         if (nullptr == kplus.strs) {
           DebugLog("for keys: kplus.strs == nullptr"); // need a string table to get strings
