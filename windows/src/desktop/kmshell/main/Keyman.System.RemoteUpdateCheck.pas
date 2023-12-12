@@ -1,20 +1,9 @@
-(*
-  Name:             WebUpdateCheck
-  Copyright:        Copyright (C) SIL International.
-  Documentation:
-  Description:
-  Create Date:      5 Dec 2023
-
-  Modified Date:
-  Authors:          rcruickshank
-  Related Files:
-  Dependencies:
-
-  Bugs:
-  Todo:
-  Notes:
-  History:
-*)
+{
+  * Keyman is copyright (C) SIL International. MIT License.
+  *
+  * Keyman.System.RemoteUpdateCheck: Checks for keyboard package and Keyman
+                                     for Windows updates.
+}
 unit Keyman.System.RemoteUpdateCheck;  // I3306
 
 interface
@@ -195,7 +184,7 @@ begin
     // Keyman Installer
     if not DownloadFile(Params.InstallURL, SavePath + Params.FileName) then  // I2742
     begin
-      // TODO record fail? and log  // Download failed but user wants to install other files
+      // TODO: #10210record fail? and log  // Download failed but user wants to install other files
     end
     else
     begin
@@ -264,7 +253,7 @@ begin
         if registry.ValueExists(SRegValue_LastUpdateCheckTime) and (Now - registry.ReadDateTime(SRegValue_LastUpdateCheckTime) < 7) and not FForce then
         begin
           Result := wucNoUpdates;
-          // TODO: This exit is just to remove the time check for testing.
+          // TODO: #10210 This exit is just to remove the time check for testing.
           //Exit;
         end;
 
@@ -328,11 +317,10 @@ begin
 
           if FCheckOnly then
           begin
-            // TODO: Refactor this
             TUpdateCheckStorage.SaveUpdateCacheData(ucr);
             Result := FRemoteResult;
           end
-          // TODO: #10038
+          // TODO: ##10210
           // Integerate into state machine. in the download state
           // the process can call LoadUpdateCacheData if needed to get the
           // response result.
