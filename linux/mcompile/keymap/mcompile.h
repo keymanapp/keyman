@@ -45,14 +45,13 @@ int run(int argc, std::vector<std::u16string>  str_argv, char* argv[]);
 PKMX_WCHAR KMX_incxstr(PKMX_WCHAR p);
 
 // _S2 sure KMX_WCHART ??? not KMX_WCHAR ??
-KMX_WCHART KMX_VKUnderlyingLayoutToVKUS_GDK(GdkKeymap* keymap,KMX_DWORD inOther);
-KMX_WCHAR KMX_VKUnderlyingLayoutToVKUS_GDK2(GdkKeymap* keymap,KMX_DWORD inOther);
-KMX_WCHAR KMX_VKUnderlyingLayoutToVKUS(v_dw_3D All_Vector,KMX_DWORD SC_US);
-//KMX_WCHAR KMX_SCUnderlyingLayoutToVKUS_GDK(GdkKeymap* keymap,KMX_DWORD inOther);
-UINT  KMX_VKUSToSCUnderlying(KMX_DWORD VirtualKeyUS);
-KMX_DWORD KMX_VKUSToCharUnderlying(v_dw_3D &All_Vector,KMX_DWORD inUS);
-KMX_DWORD KMX_CharFromVK_underlying(v_dw_3D &All_Vector,KMX_DWORD vkUnderlying, KMX_UINT VKShiftState, KMX_WCHAR* DeadKey);
-KMX_WCHAR KMX_CharFromSC_underlying(GdkKeymap *keymap, KMX_UINT VKShiftState, UINT SC_OTHER, KMX_WCHAR* DeadKey);
+KMX_WCHART KMX_get_VKUnderlying_From_VKUS_GDK(GdkKeymap* keymap,KMX_DWORD inOther);
+//KMX_WCHAR KMX_get_KVUS_From_KVUnderlying_GDK2(GdkKeymap* keymap,KMX_DWORD inOther);
+KMX_WCHAR KMX_get_KVUS_From_KVUnderlying_VEC(v_dw_3D All_Vector,KMX_DWORD SC_US);
+UINT KMX_get_SCUnderlying_From_VKUS(KMX_DWORD VirtualKeyUS);
+KMX_DWORD KMX_get_KVUnderlying_From_KVUS_VEC(v_dw_3D &All_Vector,KMX_DWORD inUS);
+//KMX_DWORD KMX_get_CharUnderlying_according_to_keycode_and_Shiftstate_VEC(v_dw_3D &All_Vector,KMX_DWORD vkUnderlying, KMX_UINT VKShiftState, KMX_WCHAR* DeadKey);
+KMX_WCHAR KMX_get_CharUnderlying_From_SCUnderlying_GDK(GdkKeymap *keymap, KMX_UINT VKShiftState, UINT SC_OTHER, KMX_WCHAR* DeadKey);
 
 int KMX_GetDeadkeys(v_dw_2D & dk_Table, KMX_WORD DeadKey, KMX_WORD *OutputPairs, GdkKeymap* keymap);
 

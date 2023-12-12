@@ -39,6 +39,77 @@ enum ShiftState {
     ShftXxxx = Shft | Xxxx,             // 9
 };
 
+// Map of all US English virtual key codes that we can translate
+const KMX_DWORD KMX_VKMap[] = {
+  'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',
+  '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
+
+  VK_SPACE,     /*   32 */
+
+  VK_ACCENT,    /*   192 VK_OEM_3 */
+  VK_HYPHEN,    /* - 189 VK_OEM_MINUS */
+  VK_EQUAL,     /* = 187 VK_OEM_PLUS */
+
+  VK_LBRKT,     /* [ 219 VK_OEM_4 */
+  VK_RBRKT,     /* ] 221 VK_OEM_6 */
+  VK_BKSLASH,   /* \ 220 VK_OEM_5 */
+
+  VK_COLON,     /* ; 186 VK_OEM_1  or ö */
+  VK_QUOTE,     /* ' 222 VK_OEM_7  or Ä */
+
+  VK_COMMA,     /* , 188 VK_OEM_COMMA */
+  VK_PERIOD,    /* . 190 VK_OEM_PERIOD */
+  VK_SLASH,     /* / 191 VK_OEM_2 */
+
+  VK_xDF,       /* ß (?) 223*/
+  VK_OEM_102,   /* < > | 226 */
+
+  0
+};
+
+//_S2 QUESTION Which character do we use in that case?  0 or FFFF or 32 or ??
+// this is what we return when we find an invalid character
+//static KMX_DWORD returnIfCharInvalid = 32;
+static KMX_DWORD returnIfCharInvalid = 0;
+
+//_S2 QUESTION Which threshold ( from what int value onwards is a character considered deadkey? 65000 28000?, > 255? ??
+static KMX_DWORD deadkeyThreshold = 65000;
+static KMX_DWORD deadkey_min = 0xfe50;
+static KMX_DWORD deadkey_max = 0xfe93;
+
+int map_VKShiftState_to_Lin(int VKShiftState);
+
+// takes a std::wstring (=contents of line symbols-file ) and returns the (int) value of the character
+KMX_DWORD convertNamesToIntegerValue(std::wstring tok_wstr);
+
+// create a Vector with all entries of both keymaps+ keymap
+int createOneVectorFromBothKeyboards(v_dw_3D &All_Vector,GdkKeymap *keymap);
+//int createOneVectorFromBothKeyboards(v_dw_3D &All_Vector);
+
+// read configuration file, split and write to 3D-Vector (Data for US on [0][ ][ ]  )
+int write_US_ToVector(v_dw_3D &vec, std::string language, const char *text);
+
+// 1. step: read complete Row of Configuration file US
+bool createCompleteRow_US(v_str_1D &complete_List, FILE *fpp, const char *text, std::string language);
+
+// replace Name of Key (e.g. <AD06>)  wih Keycode ( e.g. 0x15 )
+int replace_KeyName_with_Keycode(std::string  in);
+
+// 2nd step: write contents to 3D vector
+int split_US_To_3D_Vector(v_dw_3D &all_US, v_str_1D completeList);
+
+// create an empty 2D vector containing "--" in all fields
+v_dw_2D create_empty_2D_Vector(int dim_rows, int dim_shifts);
+
+//_S2 needed?
+// append characters using GDK to 3D-Vector (Data for Other Language on [1][ ][ ]  )
+int append_other_ToVector(v_dw_3D &All_Vector, GdkKeymap *keymap);
+
+// initialize GDK
+bool InitializeGDK(GdkKeymap **keymap,int argc, gchar *argv[]);
+
+//------------------------------
+
 const UINT USVirtualKeyToScanCode[256] = {
 	0x00, // L"K_?00",				// &H0
 	0x00, // L"K_LBUTTON",			// &H1
@@ -438,90 +509,21 @@ const UINT ScanCodeToUSVirtualKey[128] = {
   0x00  // 0x7f => No match
 };
 
-// Map of all US English virtual key codes that we can translate
-const KMX_DWORD KMX_VKMap[] = {
-  'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',
-  '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
-
-  VK_SPACE,     /*   32 */
-
-  VK_ACCENT,    /*   192 VK_OEM_3 */
-  VK_HYPHEN,    /* - 189 VK_OEM_MINUS */
-  VK_EQUAL,     /* = 187 VK_OEM_PLUS */
-
-  VK_LBRKT,     /* [ 219 VK_OEM_4 */
-  VK_RBRKT,     /* ] 221 VK_OEM_6 */
-  VK_BKSLASH,   /* \ 220 VK_OEM_5 */
-
-  VK_COLON,     /* ; 186 VK_OEM_1  or ö */
-  VK_QUOTE,     /* ' 222 VK_OEM_7  or Ä */
-
-  VK_COMMA,     /* , 188 VK_OEM_COMMA */
-  VK_PERIOD,    /* . 190 VK_OEM_PERIOD */
-  VK_SLASH,     /* / 191 VK_OEM_2 */
-
-  VK_xDF,       /* ß (?) 223*/
-  VK_OEM_102,   /* < > | 226 */
-
-  0
-};
-
-//_S2 QUESTION Which character do we use in that case?  0 or FFFF or 32 or ??
-// this is what we return when we find an invalid character
-//static KMX_DWORD returnIfCharInvalid = 32;
-static KMX_DWORD returnIfCharInvalid = 0;
-
-//_S2 QUESTION Which threshold ( from what int value onwards is a character considered deadkey? 65000 28000?, > 255? ??
-static KMX_DWORD deadkeyThreshold = 65000;
-static KMX_DWORD deadkey_min = 0xfe50;
-static KMX_DWORD deadkey_max = 0xfe93;
-
-int map_VKShiftState_to_Lin(int VKShiftState);
-
-// takes a std::wstring (=contents of line symbols-file ) and returns the (int) value of the character
-KMX_DWORD convertNamesToIntegerValue(std::wstring tok_wstr);
-
-// create a Vector with all entries of both keymaps+ keymap
-int createOneVectorFromBothKeyboards(v_dw_3D &All_Vector,GdkKeymap *keymap);
-//int createOneVectorFromBothKeyboards(v_dw_3D &All_Vector);
-
-// read configuration file, split and write to 3D-Vector (Data for US on [0][ ][ ]  )
-int write_US_ToVector(v_dw_3D &vec, std::string language, const char *text);
-
-// 1. step: read complete Row of Configuration file US
-bool createCompleteRow_US(v_str_1D &complete_List, FILE *fpp, const char *text, std::string language);
-
-// replace Name of Key (e.g. <AD06>)  wih Keycode ( e.g. 0x15 )
-int replace_KeyName_with_Keycode(std::string  in);
-
-// 2nd step: write contents to 3D vector
-int split_US_To_3D_Vector(v_dw_3D &all_US, v_str_1D completeList);
-
-// create an empty 2D vector containing "--" in all fields
-v_dw_2D create_empty_2D_Vector(int dim_rows, int dim_shifts);
-
-//_S2 needed?
-// append characters using GDK to 3D-Vector (Data for Other Language on [1][ ][ ]  )
-int append_other_ToVector(v_dw_3D &All_Vector, GdkKeymap *keymap);
-
-// initialize GDK
-bool InitializeGDK(GdkKeymap **keymap,int argc, gchar *argv[]);
-
-// find Keyvals to fill into 2D-Vector of Other Language
-KMX_DWORD getKeyvalsFromKeyCode(GdkKeymap *keymap, guint keycode, int shift_state_pos);
-
 // take deadkey-value (e.g.65106) and return character (e.g. '^' )
 std::wstring convert_DeadkeyValues_ToChar(int in);
 
+// find Keyvals to fill into 2D-Vector of Other Language
+KMX_DWORD KMX_get_KeyvalsUnderlying_From_KeyCodeUnderlying_GDK(GdkKeymap *keymap, guint keycode, int shift_state_pos);
+
 // returns KeySyms fo ra given key (for unshifted: finds the Keysym according to Shiftstate e.g. a;A or 1;! )
-std::wstring get_KeyVals_according_to_keycode_and_Shiftstate_new(GdkKeymap *keymap, guint VK, ShiftState ss, int caps);
+std::wstring KMX_get_CharsUnderlying_according_to_keycode_and_Shiftstate_GDK(GdkKeymap *keymap, guint VK, ShiftState ss, int caps);
 
 // return the VirtualKey of the Other Keyboard for given Scancode using GDK
-KMX_DWORD get_VirtualKey_Other_GDK( GdkKeymap *keymap, KMX_DWORD scanCode);
+KMX_DWORD KMX_get_VKUS_From_KeyCodeUnderlying_GDK( GdkKeymap *keymap, KMX_DWORD scanCode);
 
-KMX_DWORD get_VKUS_fromKeyCode( KMX_DWORD keycode);
+//KMX_DWORD KMX_get_VKUS_From_KeyCodeUnderlying( KMX_DWORD keycode);
 
-KMX_DWORD get_KeyCode_fromVKUS( KMX_DWORD VK_US);
+KMX_DWORD KMX_get_KeyCodeUnderlying_From_VKUS( KMX_DWORD VK_US);
 
 bool IsKeymanUsedKeyVal(std::wstring Keyval);
 

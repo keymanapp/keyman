@@ -325,8 +325,8 @@ int append_other_ToVector(v_dw_3D &All_Vector,GdkKeymap * keymap) {
     All_Vector[1][i][0] = All_Vector[0][i][0];
 
     // get Keyvals of this key and copy to unshifted/shifted in "other"-block[1][i][1] / block[1][i][2]
-    All_Vector[1][i][0+1] = getKeyvalsFromKeyCode(keymap,All_Vector[0][i][0],0);   //shift state: unshifted:0
-    All_Vector[1][i][1+1] = getKeyvalsFromKeyCode(keymap,All_Vector[0][i][0],1);   //shift state: shifted:1
+    All_Vector[1][i][0+1] = KMX_get_KeyvalsUnderlying_From_KeyCodeUnderlying_GDK(keymap,All_Vector[0][i][0],0);   //shift state: unshifted:0
+    All_Vector[1][i][1+1] = KMX_get_KeyvalsUnderlying_From_KeyCodeUnderlying_GDK(keymap,All_Vector[0][i][0],1);   //shift state: shifted:1
 
     //wprintf(L" Keycodes US dw        :   %d (US): -- %i (%c)  -- %i (%c) ---- (other): %i (%c)  --  %i(%c)    \n",(All_Vector[1][i][0]),All_Vector[0][i][1],All_Vector[0][i][1],All_Vector[0][i][2],All_Vector[0][i][2],All_Vector[1][i][1] ,All_Vector[1][i][1],All_Vector[1][i][2],All_Vector[1][i][2]);
     //wprintf(L"   Keycodes ->Other dw:-:   %d (US): -- %i (%c)  -- %i (%c)   \n\n",(All_Vector[1][i][0]),All_Vector[1][i][1],All_Vector[1][i][1],All_Vector[1][i][2],All_Vector[1][i][2]);
@@ -334,8 +334,8 @@ int append_other_ToVector(v_dw_3D &All_Vector,GdkKeymap * keymap) {
   return 0;
 }
 
-// _S2 can I use gdk_keymap_translate_keyboard_state instead?
-KMX_DWORD getKeyvalsFromKeyCode(GdkKeymap *keymap, guint keycode, int shift_state_pos) {
+// _S2 can I use gdk_keymap_translate_keyboard_state instead? return s shifted + unshifted only- no altgr,...
+KMX_DWORD KMX_get_KeyvalsUnderlying_From_KeyCodeUnderlying_GDK(GdkKeymap *keymap, guint keycode, int shift_state_pos) {
   GdkKeymapKey *maps;
   guint *keyvals;
   gint count;
@@ -345,6 +345,8 @@ KMX_DWORD getKeyvalsFromKeyCode(GdkKeymap *keymap, guint keycode, int shift_stat
     return 0;
   //if(!gdk_wayland_keymap_get_entries_for_keycode(keymap, keycode, &maps, &keyvals, &count))
   //  return 0;    https://codebrowser.dev/gtk/gtk/gdk/wayland/gdkkeys-wayland.c.html
+
+// _S2 this will return 223 instaed of 7838 for UNICODE cher on DE keycode 20  ß ẞ ? ?
 
   if (!(shift_state_pos <= count))
     return 0;
@@ -367,8 +369,8 @@ KMX_DWORD getKeyvalsFromKeyCode(GdkKeymap *keymap, guint keycode, int shift_stat
   return out;
 }
 
-// _S2 do we need that - it does the same as get_KeyCode_fromVKUS
-KMX_DWORD get_VirtualKey_Other_GDK( GdkKeymap *keymap, KMX_DWORD keycode) {
+// _S2 do we need that - it does the same as KMX_get_KeyCodeUnderlying_From_VKUS
+KMX_DWORD KMX_get_VKUS_From_KeyCodeUnderlying_GDK( GdkKeymap *keymap, KMX_DWORD keycode) {
 
   GdkModifierType consumed;
   GdkKeymapKey *maps;
@@ -410,13 +412,13 @@ KMX_DWORD get_VirtualKey_Other_GDK( GdkKeymap *keymap, KMX_DWORD keycode) {
   return 0;   //_S2 what to return if not found
 }
 
-KMX_DWORD get_VKUS_fromKeyCode( KMX_DWORD keycode) {
+/*KMX_DWORD KMX_get_VKUS_From_KeyCodeUnderlying( KMX_DWORD keycode) {
     if ( keycode >7)
       return (KMX_DWORD) ScanCodeToUSVirtualKey[keycode-8];
   return 0;   //_S2 what to return if not found
-}
+}*/
 
-KMX_DWORD get_KeyCode_fromVKUS( KMX_DWORD VK_US) {
+KMX_DWORD KMX_get_KeyCodeUnderlying_From_VKUS( KMX_DWORD VK_US) {
   if( VK_US > 7) {
   KMX_DWORD test = (KMX_DWORD)(8+ USVirtualKeyToScanCode[ VK_US ]);
     return (KMX_DWORD)(8+ USVirtualKeyToScanCode[ VK_US ]);}
@@ -450,6 +452,7 @@ std::wstring convert_DeadkeyValues_ToChar(int in) {
   return L"\0";
 }
 
+
 std::wstring CodePointToWString(unsigned int codepoint) {
   std::wstring str;
 
@@ -469,7 +472,7 @@ std::wstring CodePointToWString(unsigned int codepoint) {
   return str;
 }
 
-std::wstring  get_KeyVals_according_to_keycode_and_Shiftstate_new(GdkKeymap *keymap, guint keycode, ShiftState ss, int caps  ){
+std::wstring  KMX_get_CharsUnderlying_according_to_keycode_and_Shiftstate_GDK(GdkKeymap *keymap, guint keycode, ShiftState ss, int caps  ){
 
   GdkModifierType consumed;
   GdkKeymapKey *maps;
@@ -534,9 +537,10 @@ std::wstring  get_KeyVals_according_to_keycode_and_Shiftstate_new(GdkKeymap *key
   else
     return L"\0";
 
-  if((*keyvals >=  deadkey_min) && (*keyvals <=  deadkey_max) )
+  //if((*keyvals >=  deadkey_min) && (*keyvals <=  deadkey_max) )
+  if((*keyvals >=  deadkey_min)  )
     return  convert_DeadkeyValues_ToChar((int) *keyvals);
   else
-   return  std::wstring(1, (int) *keyvals);
+    return  std::wstring(1, (int) *keyvals);
 }
 

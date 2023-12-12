@@ -151,14 +151,14 @@ public:
   }*/
 
   KMX_VirtualKey(UINT scanCode, KMX_HKL hkl, v_dw_3D All_Vector, GdkKeymap **keymap) {
-    this->m_vk = get_VirtualKey_Other_GDK(*keymap, scanCode);
+    this->m_vk = KMX_get_VKUS_From_KeyCodeUnderlying_GDK(*keymap, scanCode);
     // _s2  correct?  this->m_vk = get_VirtualKey_US( scanCode)
     this->m_hkl = hkl;
     this->m_sc = scanCode;
   }
 
   KMX_VirtualKey(KMX_HKL hkl,UINT scanCode,  v_dw_3D All_Vector, GdkKeymap **keymap) {
-    this->m_vk = get_VirtualKey_Other_GDK(*keymap, scanCode);
+    this->m_vk = KMX_get_VKUS_From_KeyCodeUnderlying_GDK(*keymap, scanCode);
     // _s2  correct?  this->m_vk = get_VirtualKey_US( scanCode)
     this->m_hkl = hkl;
     this->m_sc = scanCode;
@@ -348,8 +348,8 @@ int i4 = this->KMX_IsXxxxGrCapsEqualToXxxxShift() ? 8 : 0;
           *key->dpContext = 0;
           key->ShiftFlags = this->KMX_GetShiftStateValue(capslock, caps, (ShiftState) ss);
             // _S2 this fun returns the shifted Char it goes wrog for numbers, special here!!
-          //key->Key = KMX_VKUnderlyingLayoutToVKUS(All_Vector,this->VK());
-          key->Key = KMX_VKUnderlyingLayoutToVKUS_GDK(keymap,this->VK());
+          //key->Key = KMX_get_KVUS_From_KVUnderlying_VEC(All_Vector,this->VK());
+          key->Key = KMX_get_VKUnderlying_From_VKUS_GDK(keymap,this->VK());
           key->Line = 0;
 
           if(bDeadkeyConversion) {   // I4552
@@ -370,10 +370,10 @@ int i4 = this->KMX_IsXxxxGrCapsEqualToXxxxShift() ? 8 : 0;
             if(st[ich] < 0x20 || st[ich] == 0x7F) { isvalid=false; break; }
           }
           if(isvalid) {
-            //key->Key = KMX_VKUnderlyingLayoutToVKUS(All_Vector,this->VK());
-            key->Key = KMX_VKUnderlyingLayoutToVKUS_GDK(keymap,this->VK());
+            //key->Key = KMX_get_KVUS_From_KVUnderlying_VEC(All_Vector,this->VK());
+            key->Key = KMX_get_VKUnderlying_From_VKUS_GDK(keymap,this->VK());
         std::wstring w1_S2 = get_m_rgss(ss,caps);
-        //wprintf(L"\n KMX_VKUnderlyingLayoutToVKUS_GD writes  %ls  %c",w1_S2.c_str(), key->Key );
+        //wprintf(L"\n KMX_get_KVUS_From_KVUnderlying_GD writes  %ls  %c",w1_S2.c_str(), key->Key );
 
             //wprintf(L" this->VK(): %i ", this->VK());
             key->Line = 0;
@@ -546,12 +546,12 @@ int KMX_GetMaxDeadkeyIndex(KMX_WCHAR *p) {
 // _S2 cchBuff remove?
 int KMX_ToUnicodeEx( guint ScanCode, const BYTE *lpKeyStccate, PWCHAR pwszBuff, int cchBuff,  int shift_state, int caps,GdkKeymap *keymap) {
 
-  KMX_DWORD kvl= getKeyvalsFromKeyCode(keymap, ScanCode, shift_state);
+  KMX_DWORD kvl= KMX_get_KeyvalsUnderlying_From_KeyCodeUnderlying_GDK(keymap, ScanCode, shift_state);
 
-  std::wstring character = get_KeyVals_according_to_keycode_and_Shiftstate_new(keymap, ScanCode, ShiftState(shift_state), caps);
+  std::wstring character = KMX_get_CharsUnderlying_according_to_keycode_and_Shiftstate_GDK(keymap, ScanCode, ShiftState(shift_state), caps);
   pwszBuff[0]= * (PWCHAR) character.c_str();
 
-  if((kvl >=  0xfe50) && (kvl <=  0xfe93))
+  if((kvl >=  deadkey_min) && (kvl <=  deadkey_max))
     return -1;
   else
     return  1;
@@ -560,14 +560,12 @@ int KMX_ToUnicodeEx( guint ScanCode, const BYTE *lpKeyStccate, PWCHAR pwszBuff, 
 // _S2 cchBuff remove?
 int KMX_ToUnicodeEx(guint ScanCode, const BYTE *lpKeyState, PKMX_WCHAR pwszBuff, int cchBuff,  int shift_state, int caps,GdkKeymap *keymap) {
 
-  KMX_DWORD kvl= getKeyvalsFromKeyCode(keymap, ScanCode, shift_state);
-
-  std::wstring character = get_KeyVals_according_to_keycode_and_Shiftstate_new(keymap, ScanCode, ShiftState(shift_state), caps);
-  pwszBuff[0]= * (PWCHAR) character.c_str();
-
-  if((kvl >=  0xfe50) && (kvl <=  0xfe93)  )
+  KMX_DWORD kvl= KMX_get_KeyvalsUnderlying_From_KeyCodeUnderlying_GDK(keymap, ScanCode, shift_state);
+  if((kvl >=  deadkey_min) && (kvl <=  deadkey_max))
     return -1;
-  else
+
+  std::wstring character = KMX_get_CharsUnderlying_according_to_keycode_and_Shiftstate_GDK(keymap, ScanCode, ShiftState(shift_state), caps);
+  pwszBuff[0]= * (PWCHAR) character.c_str();
     return  1;
 }
 
@@ -659,7 +657,7 @@ bool KMX_ImportRules(KMX_WCHAR *kbid, LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, Gd
             continue;
           }
 
-          KMX_DWORD SC_US = get_KeyCode_fromVKUS(iKey);
+          KMX_DWORD SC_US = KMX_get_KeyCodeUnderlying_From_VKUS(iKey);
 
           for(int caps = 0; caps <= 1; caps++) {
             // _S2 is THIS correct ???  Do we need  lpKeyState or is it just used in ToUnicodeEx??
