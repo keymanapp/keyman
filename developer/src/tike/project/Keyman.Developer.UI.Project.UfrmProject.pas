@@ -359,7 +359,7 @@ begin
   else if Command = 'editfile' then // MRU
   begin
     if SelectedMRUFileName <> '' then
-      modActionsMain.OpenProject(SelectedMRUFileName);
+      frmKeymanDeveloper.OpenProject(SelectedMRUFileName);
   end
   else if Command = 'removefrommru' then
   begin

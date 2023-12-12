@@ -241,10 +241,7 @@ type
     procedure actWindowNewExecute(Sender: TObject);
   private
     function CheckFilenameConventions(FileName: string): Boolean;
-    function SaveAndCloseAllFiles: Boolean;
     procedure CloseProject;
-  public
-    procedure OpenProject(FileName: WideString);
   end;
 
 var
@@ -589,42 +586,13 @@ begin
   frmKeymanDeveloper.OpenProject(actProjectOpen.Dialog.FileName);
 end;
 
-procedure TmodActionsMain.OpenProject(FileName: WideString);
-begin
-  FileName := ExpandUNCFileName(FileName);
-  if (FileName <> '') and not FileExists(FileName) then
-  begin
-    ShowMessage('The project '+FileName+' does not exist.');
-    Exit;
-  end;
 
-  if IsGlobalProjectUIReady then
-  begin
-    if not SaveAndCloseAllFiles then Exit;
-    FreeGlobalProjectUI;
-  end;
-  try
-    LoadGlobalProjectUI(ptUnknown, FileName);   // I4687
-  except
-    on E:EProjectLoader do
-    begin
-      // Message will be displayed by LoadGlobalProjectUI
-      FreeGlobalProjectUI;
-      frmKeymanDeveloper.ShowProject;
-      frmKeymanDeveloper.UpdateCaption;
-      Exit;
-    end;
-  end;
-  frmKeymanDeveloper.ProjectMRU.Add(FGlobalProject.FileName);
-  frmKeymanDeveloper.ShowProject;
-  frmKeymanDeveloper.UpdateCaption;
-end;
 
 procedure TmodActionsMain.CloseProject;
 begin
   if IsGlobalProjectUIReady then
   begin
-    if not SaveAndCloseAllFiles then Exit;
+    if not frmKeymanDeveloper.SaveAndCloseAllFiles then Exit;
     FreeGlobalProjectUI;
   end;
   frmKeymanDeveloper.ShowProject;
@@ -1069,33 +1037,6 @@ begin
     'HTML files (*.htm, *.html)|*.htm?|'+
     'XML files (*.xml)|*.xml|'+
     'All files (*.*)|*.*';
-end;
-
-function TmodActionsMain.SaveAndCloseAllFiles: Boolean;
-var
-  i: Integer;
-begin
-  FGlobalProject.Save;
-  for i := 0 to frmKeymanDeveloper.ChildWindows.Count - 1 do
-  begin
-    if frmKeymanDeveloper.ChildWindows[i] is TfrmProject then
-      Continue;
-
-    if not frmKeymanDeveloper.ChildWindows[i].CloseQuery then
-      Exit(False);
-  end;
-
-  for i := 0 to frmKeymanDeveloper.ChildWindows.Count - 1 do
-  begin
-    if frmKeymanDeveloper.ChildWindows[i] is TfrmProject then
-      Continue;
-
-    frmKeymanDeveloper.ChildWindows[i].Visible := False;
-    frmKeymanDeveloper.ChildWindows[i].Parent := nil;
-    frmKeymanDeveloper.ChildWindows[i].Release;
-  end;
-
-  Result := True;
 end;
 
 end.

@@ -441,6 +441,8 @@ type
 
     procedure ShowDebug(AShow: Boolean);
 
+    function SaveAndCloseAllFiles: Boolean;
+
     property ActiveChild: TfrmTikeChild read GetActiveChild write SetActiveChild;
     property ActiveEditor: TfrmTikeEditor read GetActiveEditor;
     procedure FocusActiveChild;
@@ -452,6 +454,7 @@ type
 
     procedure RefreshOptions;
 
+    procedure OpenProjectInCurrentProcess(FileName: WideString);
     function OpenEditor(FFileName: string; frmClass: TfrmTikeEditorClass): TfrmTikeEditor;
     procedure OpenProject(const filename: string);
     function OpenFile(FFileName: string; FCloseNewFile: Boolean): TfrmTikeChild;
@@ -1316,7 +1319,7 @@ begin
         end;
 
         if BeforeOpenProject then
-          modActionsMain.OpenProject(FFileName);
+          OpenProjectInCurrentProcess(FFileName);
       end
       else
       begin
@@ -1353,6 +1356,38 @@ begin
   end;
 end;
 
+procedure TfrmKeymanDeveloper.OpenProjectInCurrentProcess(FileName: WideString);
+begin
+  FileName := ExpandUNCFileName(FileName);
+  if (FileName <> '') and not FileExists(FileName) then
+  begin
+    ShowMessage('The project '+FileName+' does not exist.');
+    Exit;
+  end;
+
+  if IsGlobalProjectUIReady then
+  begin
+    if not SaveAndCloseAllFiles then Exit;
+    FreeGlobalProjectUI;
+  end;
+
+  try
+    LoadGlobalProjectUI(ptUnknown, FileName);   // I4687
+  except
+    on E:EProjectLoader do
+    begin
+      // Message will be displayed by LoadGlobalProjectUI
+      FreeGlobalProjectUI;
+      ShowProject;
+      UpdateCaption;
+      Exit;
+    end;
+  end;
+  ProjectMRU.Add(FGlobalProject.FileName);
+  ShowProject;
+  UpdateCaption;
+end;
+
 function TfrmKeymanDeveloper.OpenKMNEditor(FFileName: string): TfrmTikeEditor;
 begin
   Result := OpenEditor(FFileName, TfrmKeymanWizard);
@@ -1382,6 +1417,33 @@ end;
 function TfrmKeymanDeveloper.OpenKVKEditor(FFileName: string): TfrmTikeEditor;
 begin
   Result := OpenEditor(FFileName, TfrmOSKEditor);
+end;
+
+function TfrmKeymanDeveloper.SaveAndCloseAllFiles: Boolean;
+var
+  i: Integer;
+begin
+  FGlobalProject.Save;
+  for i := 0 to FChildWindows.Count - 1 do
+  begin
+    if FChildWindows[i] is TfrmProject then
+      Continue;
+
+    if not FChildWindows[i].CloseQuery then
+      Exit(False);
+  end;
+
+  for i := 0 to FChildWindows.Count - 1 do
+  begin
+    if FChildWindows[i] is TfrmProject then
+      Continue;
+
+    FChildWindows[i].Visible := False;
+    FChildWindows[i].Parent := nil;
+    FChildWindows[i].Release;
+  end;
+
+  Result := True;
 end;
 
 function TfrmKeymanDeveloper.BeforeOpenProject: Boolean;
@@ -1593,11 +1655,13 @@ procedure TfrmKeymanDeveloper.OpenProject(const filename: string);
 begin
   if IsGlobalProjectUIReady then
   begin
+    // If we already have a project open, then we'll start a new instance
     OpenFilesInProject([filename]);
   end
   else if BeforeOpenProject then
   begin
-    modActionsMain.OpenProject(filename);
+    // No project is open, so we'll reuse the current instance
+    OpenProjectInCurrentProcess(filename);
   end;
 end;
 
