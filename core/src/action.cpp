@@ -17,7 +17,7 @@
 #include "state.hpp"
 #include "option.hpp"
 
-km_core_actions * km::core::action_item_list_to_actions_object(
+km_core_actions const * km::core::action_item_list_to_actions_object(
   km_core_action_item const *action_items
 ) {
   assert(action_items != nullptr);
@@ -137,4 +137,43 @@ km_core_actions * km::core::action_item_list_to_actions_object(
   // We now have a complete set of actions
 
   return actions.release();
+}
+
+
+// TODO: this is effectively the inverse of action_item_list_to_actions_object,
+//       and perhaps we should consider changing that function to be a member
+//       of state also, so that we can move memory management into state?
+bool km::core::state::set_actions(
+  km_core_actions const &actions
+) {
+  _actions.clear();
+
+  // number of codepoints (not codeunits!) to delete from app context.
+
+  for(unsigned int i = 0; i < actions.code_points_to_delete; i++) {
+    _actions.push_backspace(KM_CORE_BT_CHAR, 0); // expected value is not known
+  }
+
+  for(auto output = actions.output; *output; output++) {
+    _actions.push_character(*output);
+  }
+
+  for(auto opt = actions.persist_options; opt->scope; opt++) {
+    km::core::option opt0(static_cast<km_core_option_scope>(opt->scope), opt->key, opt->value);
+    _actions.push_persist(opt0);
+  }
+
+  if(actions.do_alert) {
+    _actions.push_alert();
+  }
+
+  if(actions.emit_keystroke) {
+    _actions.push_emit_keystroke();
+  }
+
+  if(actions.new_caps_lock_state != KM_CORE_CAPS_UNCHANGED) {
+    _actions.push_capslock(actions.new_caps_lock_state == KM_CORE_CAPS_ON);
+  }
+
+  return true;
 }

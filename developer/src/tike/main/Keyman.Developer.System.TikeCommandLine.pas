@@ -129,6 +129,14 @@ begin
 
   // TODO(lowpri): Consider error handling
 
+  if ParamStr(2) = '*' then
+  begin
+    // Asked to open a new empty project, via Window|New
+    FStartupProjectPath := '';
+    SetLength(FStartupFilenames, 0);
+    Exit(True);
+  end;
+
   FStartupProjectPath := ParamStr(2);
   SetLength(FStartupFilenames, ParamCount - 2);
   for i := 3 to ParamCount do

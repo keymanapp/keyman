@@ -425,7 +425,9 @@ export default class LanguageProcessor extends EventEmitter<LanguageProcessorEve
         this._state = state;
         this.emit('statechange', state);
 
-        if(this.isConfigured) {
+        // Only signal `'configured'` for a previously-loaded model if we're turning
+        // things back on; don't send it if deactivated!
+        if(flag && this.isConfigured) {
           this._state = 'configured';
           this.emit('statechange', 'configured');
         }
