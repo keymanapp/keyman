@@ -34,7 +34,7 @@ void test_two_backspaces() {
     end_action_item()
   };
 
-  km_core_actions *actions = km::core::action_item_list_to_actions_object(action_items);
+  km_core_actions const *actions = km::core::action_item_list_to_actions_object(action_items);
 
   assert(actions->code_points_to_delete == 1);
   assert(std::u32string(actions->output) == U"");
@@ -65,7 +65,7 @@ void test_marker_text_interleaved() {
     end_action_item()
   };
 
-  km_core_actions *actions = km::core::action_item_list_to_actions_object(action_items);
+  km_core_actions const *actions = km::core::action_item_list_to_actions_object(action_items);
 
   assert(actions->code_points_to_delete == 0);
   assert(std::u32string(actions->output) == U"ABD");
@@ -88,7 +88,7 @@ void test_alert() {
     end_action_item()
   };
 
-  km_core_actions *actions = km::core::action_item_list_to_actions_object(action_items);
+  km_core_actions const *actions = km::core::action_item_list_to_actions_object(action_items);
 
   assert(actions->code_points_to_delete == 0);
   assert(std::u32string(actions->output) == U"");
@@ -111,7 +111,7 @@ void test_emit_keystroke() {
     end_action_item()
   };
 
-  km_core_actions *actions = km::core::action_item_list_to_actions_object(action_items);
+  km_core_actions const *actions = km::core::action_item_list_to_actions_object(action_items);
 
   assert(actions->code_points_to_delete == 0);
   assert(std::u32string(actions->output) == U"");
@@ -135,7 +135,7 @@ void test_invalidate_context() {
     end_action_item()
   };
 
-  km_core_actions *actions = km::core::action_item_list_to_actions_object(action_items);
+  km_core_actions const *actions = km::core::action_item_list_to_actions_object(action_items);
 
   assert(actions->code_points_to_delete == 0);
   assert(std::u32string(actions->output) == U"");
@@ -164,7 +164,7 @@ void test_persist_opt() {
     end_action_item()
   };
 
-  km_core_actions *actions = km::core::action_item_list_to_actions_object(action_items);
+  km_core_actions const *actions = km::core::action_item_list_to_actions_object(action_items);
 
   assert(actions->code_points_to_delete == 0);
   assert(std::u32string(actions->output) == U"");

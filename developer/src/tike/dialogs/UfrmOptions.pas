@@ -104,6 +104,7 @@ type
     gbServer: TGroupBox;
     chkListLocalURLs: TCheckBox;
     cmdConfigureServer: TButton;
+    chkPromptToUpgradeProjects: TCheckBox;
     procedure FormCreate(Sender: TObject);
     procedure cmdOKClick(Sender: TObject);
     procedure cmdDefaultFontClick(Sender: TObject);
@@ -192,6 +193,7 @@ begin
     chkDebuggerAutoResetBeforeCompiling.Checked := DebuggerAutoResetBeforeCompiling;
     chkAutoSaveBeforeCompiling.Checked :=          AutoSaveBeforeCompiling;
     chkOSKAutoSaveBeforeImporting.Checked :=       OSKAutoSaveBeforeImporting;
+    chkPromptToUpgradeProjects.Checked :=          PromptToUpgradeProjects;
 
     chkCharMapAutoLookup.Checked := CharMapAutoLookup;
     chkCharMapDisableDatabaseLookups.Checked := CharMapDisableDatabaseLookups;
@@ -291,6 +293,7 @@ begin
     DebuggerAutoResetBeforeCompiling := chkDebuggerAutoResetBeforeCompiling.Checked;
     AutoSaveBeforeCompiling          := chkAutoSaveBeforeCompiling.Checked;
     OSKAutoSaveBeforeImporting       := chkOSKAutoSaveBeforeImporting.Checked;
+    PromptToUpgradeProjects          := chkPromptToUpgradeProjects.Checked;
 
     ServerUseLocalAddresses := chkListLocalURLs.Checked;
 

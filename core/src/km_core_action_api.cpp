@@ -19,7 +19,7 @@
 
 using namespace km::core;
 
-km_core_actions* km_core_state_get_actions(
+km_core_actions const * km_core_state_get_actions(
   km_core_state const *state
 ) {
   assert(state);
@@ -27,18 +27,16 @@ km_core_actions* km_core_state_get_actions(
     return nullptr;
   }
 
-  km_core_actions* actions = nullptr;
   auto action_items = km_core_state_action_items(state, nullptr);
   if(!action_items) {
     return nullptr;
   }
 
-  actions = action_item_list_to_actions_object(action_items);
-  return actions;
+  return action_item_list_to_actions_object(action_items);
 }
 
 km_core_status km_core_actions_dispose(
-  km_core_actions* actions
+  km_core_actions const * actions
 ) {
   if(actions == nullptr) {
     return KM_CORE_STATUS_OK;

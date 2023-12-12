@@ -73,6 +73,7 @@ type
     FServerKeepAlive: Boolean;
     FToolbarVisible: Boolean;
     FStartupProjectPath: string;
+    FPromptToUpgradeProjects: Boolean;
     json: TJSONObject;
     procedure OpenOptionsFileOrRegistry;
     function optReadString(const nm, def: string): string;
@@ -106,6 +107,7 @@ type
     property DebuggerAutoResetBeforeCompiling: Boolean read FDebuggerAutoResetBeforeCompiling write FDebuggerAutoResetBeforeCompiling;
     property AutoSaveBeforeCompiling: Boolean read FAutoSaveBeforeCompiling write FAutoSaveBeforeCompiling;
     property OSKAutoSaveBeforeImporting: Boolean read FOSKAutoSaveBeforeImporting write FOSKAutoSaveBeforeImporting;
+    property PromptToUpgradeProjects: Boolean read FPromptToUpgradeProjects write FPromptToUpgradeProjects;
 
     property ReportErrors: Boolean read FReportErrors write FReportErrors;
     property ReportUsage: Boolean read FReportUsage write FReportUsage;
@@ -172,6 +174,8 @@ const
   { SRegKey_IDEOptions values }
   SRegKey_IDEOptions_CU          = SRegKey_IDE_CU                 + '\Options';             // CU
 
+  { SRegKey_IDEOptions values }
+
   SRegValue_IDEOptLinkFontSizes    = 'link font sizes';                            // CU
   SRegValue_IDEOptUseTabCharacter  = 'use tab char';                               // CU
   SRegValue_IDEOptIndentSize       = 'indent size';                                // CU
@@ -189,6 +193,7 @@ const
   SRegValue_IDEOptDebuggerAutoResetBeforeCompiling = 'debugger auto reset before compilng'; // CU
   SRegValue_IDEOptAutoSaveBeforeCompiling = 'auto save before compiling'; // CU
   SRegValue_IDEOptOSKAutoSaveBeforeImporting = 'osk auto save before importing'; // CU
+  SRegValue_IDEOptPromptToUpgradeProjects = 'prompt to upgrade projects'; // CU
 
   // Note: keeping 'web host port' reg value name to ensure settings maintained
   //       from version 14.0 and earlier of Keyman Developer. Other values are
@@ -336,6 +341,7 @@ begin
     FDebuggerAutoResetBeforeCompiling := optReadBool(SRegValue_IDEOptDebuggerAutoResetBeforeCompiling, False);
     FAutoSaveBeforeCompiling := optReadBool(SRegValue_IDEOptAutoSaveBeforeCompiling, False);
     FOSKAutoSaveBeforeImporting := optReadBool(SRegValue_IDEOptOSKAutoSaveBeforeImporting, False);
+    FPromptToUpgradeProjects := optReadBool(SRegValue_IDEOptPromptToUpgradeProjects, True);
 
     FServerDefaultPort := optReadInt(SRegValue_IDEOptServerPort, 8008);
     FServerKeepAlive := optReadBool(SRegValue_IDEOptServerKeepAlive, False);
@@ -421,6 +427,7 @@ begin
     optWriteBool(SRegValue_IDEOptDebuggerAutoResetBeforeCompiling, FDebuggerAutoResetBeforeCompiling);
     optWriteBool(SRegValue_IDEOptAutoSaveBeforeCompiling, FAutoSaveBeforeCompiling);
     optWriteBool(SRegValue_IDEOptOSKAutoSaveBeforeImporting, FOSKAutoSaveBeforeImporting);
+    optWriteBool(SRegValue_IDEOptPromptToUpgradeProjects, FPromptToUpgradeProjects);
 
     optWriteInt(SRegValue_IDEOptServerPort, FServerDefaultPort);
     optWriteBool(SRegValue_IDEOptServerKeepAlive, FServerKeepAlive);

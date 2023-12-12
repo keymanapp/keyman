@@ -120,7 +120,6 @@ uses
   Keyman.System.LanguageCodeUtils,
   BCP47Tag,
   utilstr,
-  dmActionsMain,
   KeymanDeveloperOptions,
   Keyman.Developer.System.HelpTopics,
   Keyman.Developer.System.Project.Project,
@@ -128,7 +127,8 @@ uses
   Keyman.Developer.System.KeyboardProjectTemplate,
   Keyman.Developer.System.ProjectTemplate,
   Keyman.Developer.UI.UfrmSelectBCP47Language,
-  Keyman.System.KeyboardUtils;
+  Keyman.System.KeyboardUtils,
+  UfrmMain;
 
 // 1. project filename
 // 2. location
@@ -174,7 +174,7 @@ begin
         end;
       end;
 
-      modActionsMain.OpenProject(pt.ProjectFilename);
+      frmKeymanDeveloper.OpenProject(pt.ProjectFilename);
       Result := True;
 
     finally

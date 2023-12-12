@@ -354,7 +354,6 @@ const
   SRegValue_IDEVKbd_ExportBMPUnicode = 'export bmp unicode';                       // CU
   SRegValue_IDEVKbd_ExportBMPPixelWidth = 'export bmp pixel width';                // CU
 
-
 {-------------------------------------------------------------------------------
  - Shared keys and values                                                      -
  ------------------------------------------------------------------------------}
