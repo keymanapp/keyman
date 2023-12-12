@@ -14,7 +14,7 @@ type
     ProjectFilename: string;
     SourcePath: string;
     IsProjectOpen: Boolean;
-    IsTemporaryProject: Boolean;
+    function IsTemporaryProject: Boolean;
     function OwnsProject(const filename: string): Boolean;
     function OpenFile(const filename: string): Boolean;
     function FocusProcess: Boolean;
@@ -95,7 +95,6 @@ begin
     begin
       tp := TTikeProcess.Create;
       tp.IsProjectOpen := False;
-      tp.IsTemporaryProject := False;
       tp.ProjectFilename := '';
       tp.SourcePath := '';
       tp.WindowHandle := p.Handle;
@@ -119,7 +118,6 @@ begin
       tp := TTikeProcess.Create;
       tp.IsProjectOpen := True;
       tp.ProjectFilename := jo.Values[JSON_Filename].Value;
-      tp.IsTemporaryProject := tp.ProjectFilename = '';
       tp.SourcePath := jo.Values[JSON_SourcePath].Value;
       tp.WindowHandle := p.Handle;
       tp.ThreadID := p.ThreadId;
@@ -172,6 +170,11 @@ begin
     Result := 'Temporary Project'
   else
     Result := ProjectFilename;
+end;
+
+function TTikeProcess.IsTemporaryProject: Boolean;
+begin
+  Result := IsProjectOpen and (ProjectFilename = '');
 end;
 
 function TTikeProcess.OpenFile(const filename: string): Boolean;
