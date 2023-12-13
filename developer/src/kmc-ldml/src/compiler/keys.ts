@@ -480,46 +480,33 @@ export class KeysCompiler extends SectionCompiler {
     const mod = translateLayerAttrToModifier(layer);
     const keymap = this.getKeymapFromForm(hardware);
 
-    let y = -1;
-    for (let row of layer.row) {
-      y++;
+    // Iterate over rows (y) and cols (x) of the scancodes table.
+    // Any assigned keys will be used until we run out of keys in each row,
+    // and run out of rows. The rest will be reserved_gap.
 
-      const keys = row.keys.split(" ");
-      let x = -1;
-      for (let key of keys) {
-        x++;
+    for (let y = 0; y < keymap.length; y++) {
+      let keys : string[];
 
-        const vkey = keymap[y][x];
-        // TODO-LDML: we already validated that the key exists, above.
-        // So here we only need the ID?
-        // let keydef = this.keyboard3.keys?.key?.find(x => x.id == key);
+      // if there are keys, use them.
+      if (y < layer.row.length ) {
+        const row = layer.row[y];
+        keys = row.keys.split(" ");
+      } else {
+        keys = [];
+      }
 
+      // all columns in this row
+      for (let x = 0; x < keymap[y].length; x++) {
+        const vkey = keymap[y][x]; // from the scan table
+
+        let key = reserved_gap; // unless there's a key in this row
+        if (x < keys.length) {
+          key = keys[x];
+        }
         sect.kmap.push({
           vkey,
           mod,
           key, // key id, to be changed into key index at finalization
-        });
-      }
-      // push gaps to fill this row
-      while (++x < keymap[y].length) {
-        const vkey = keymap[y][x];
-        sect.kmap.push({
-          vkey,
-          mod,
-          key: reserved_gap,
-        });
-      }
-    }
-    // push rows to fill the layout
-    while (++y < keymap.length) {
-      let x = -1;
-      // push gaps to fill this row
-      while (++x < keymap[y].length) {
-        const vkey = keymap[y][x];
-        sect.kmap.push({
-          vkey,
-          mod,
-          key: reserved_gap,
         });
       }
     }
