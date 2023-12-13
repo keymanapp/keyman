@@ -643,7 +643,7 @@ transform_entry::apply(const std::u32string &input, std::u32string &output) cons
     // calculate how big the buffer is
     auto out32len              = outu.toUTF32(nullptr, 0, preflightStatus); // preflightStatus will be an err, because we know the buffer overruns zero bytes
     // allocate
-    std::unique_ptr<char32_t> s(new char32_t[out32len + 1]);
+    std::unique_ptr<char32_t[]> s(new char32_t[out32len + 1]);
     assert(s);
     if (!s) {
       return 0; // TODO-LDML: allocation failed
