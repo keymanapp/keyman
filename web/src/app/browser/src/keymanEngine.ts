@@ -20,7 +20,7 @@ import { PageIntegrationHandlers } from './context/pageIntegrationHandlers.js';
 import { LanguageMenu } from './languageMenu.js';
 import { setupOskListeners } from './oskConfiguration.js';
 import { whenDocumentReady } from './utils/documentReady.js';
-import { outputTargetForElement } from '../../../../build/engine/attachment/obj/outputTargetForElement.js';
+import { outputTargetForElement } from 'keyman/engine/attachment';
 
 import { UtilApiEndpoint} from './utilApiEndpoint.js';
 import { UIModule } from './uiModuleInterface.js';
