@@ -177,7 +177,7 @@ return [NSString stringWithFormat:@"complianceUncertain: %d, hasCompliantSelecti
                      [clientAppId isEqual: @"org.sil.app.builder.dictionary.DictionaryAppBuilder"] ||
                      //[clientAppId isEqual: @"com.microsoft.Word"] || // 2020-11-24[mcd]: Appears to work well in Word 16.43, disable legacy by default
                      [clientAppId isEqual: @"org.openoffice.script"] ||
-                     // Adobe apps automatically detected as non-compliant
+                     // 2023-12-13[sgs]: Adobe apps automatically detected as non-compliant 
                      //[clientAppId isEqual: @"com.adobe.illustrator"] ||
                      //[clientAppId isEqual: @"com.adobe.InDesign"] ||
                      //[clientAppId isEqual: @"com.adobe.Photoshop"] ||

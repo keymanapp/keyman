@@ -2,11 +2,9 @@
  * Keyman is copyright (C) SIL International. MIT License.
  * 
  * CoreKeyOutput.h
- * KeymanEngine4Mac
+ * Keyman
  * 
  * Created by Shawn Schantz on 2023-10-31.
- * 
- * Description...
  */
 
 #import <Foundation/Foundation.h>

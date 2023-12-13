@@ -58,13 +58,14 @@ UInt32 VirtualKeyMap[VIRTUAL_KEY_ARRAY_SIZE];
  * Return the string length (number of unicode scalar, or UTF32, values) excluding the terminating null.
  */
 -(unsigned long) scalarValueStringLength:(UTF32Char const *)string {
-    unsigned long length = 0lu;
-    if(NULL == string) return length;
-
-    while('\0' != string[length])
-        length++;
-
+  unsigned long length = 0lu;
+  if(NULL == string) {
     return length;
+  }
+  while('\0' != string[length]) {
+    length++;
+  }
+  return length;
 }
 
 -(instancetype)initWithDebugMode:(BOOL)debugMode {
@@ -181,10 +182,6 @@ UInt32 VirtualKeyMap[VIRTUAL_KEY_ARRAY_SIZE];
   
   if (utf32StringLength > 0) {
     characterString=[[NSString alloc] initWithBytes:utf32CString length:utf32StringLength*4 encoding:NSUTF32LittleEndianStringEncoding];
-    /*
-    NSData * characterData = [[NSData alloc] initWithBytes:utf32CString length:utf32StringLength*4];
-    [self logDebugMessage:@"utf32ValueToString data: '%@', string: %@", characterData, characterString];
-    */
   }
 
   return characterString;

@@ -33,9 +33,9 @@ const CGKeyCode kKeymanEventKeyCode = 0xFF;
   // Returns the frontmost app, which is the app that receives key events.
   NSRunningApplication *app = NSWorkspace.sharedWorkspace.frontmostApplication;
   pid_t processId = app.processIdentifier;
-  NSString *appName = app.localizedName;
+  NSString *bundleId = app.bundleIdentifier;
 
-  [self.appDelegate logDebugMessage:@"sendKeyDown keyCode %lu to app %@ with pid %d", (unsigned long)keyCode, appName, processId];
+  [self.appDelegate logDebugMessage:@"sendKeyDown keyCode %lu to app %@ with pid %d", (unsigned long)keyCode, bundleId, processId];
 
   if (keyCode < 0x100) {
     CGEventRef cgevent = [event CGEvent];
@@ -57,7 +57,7 @@ const CGKeyCode kKeymanEventKeyCode = 0xFF;
 }
 
 - (void)sendBackspaceforEventSource:(CGEventSourceRef)eventSource {
-  [self.appDelegate logDebugMessage:@"KeySender sendBackspaceforSourceEvent"];
+  [self.appDelegate logDebugMessage:@"KeySender sendBackspaceforEventSource"];
 
   [self postKeyboardEventWithSource:eventSource code:kVK_Delete postCallback:^(CGEventRef eventToPost) {
       CGEventPost(kCGHIDEventTap, eventToPost);
@@ -65,15 +65,19 @@ const CGKeyCode kKeymanEventKeyCode = 0xFF;
 }
 
 - (void)postKeyboardEventWithSource: (CGEventSourceRef)source code:(CGKeyCode) virtualKey postCallback:(PostEventCallback)postEvent{
+    
+  if (postEvent) {
+    [self.appDelegate logDebugMessage:@"KeySender postKeyboardEventWithSource for virtualKey: @%", virtualKey];
+  } else {
+    [self.appDelegate logDebugMessage:@"KeySender postKeyboardEventWithSource callback not specified", virtualKey];
+  }
 
-    CGEventRef ev = CGEventCreateKeyboardEvent (source, virtualKey, true); //down
-    if (postEvent)
-        postEvent(ev);
-    CFRelease(ev);
-    ev = CGEventCreateKeyboardEvent (source, virtualKey, false); //up
-    if (postEvent)
-        postEvent(ev);
-    CFRelease(ev);
+  CGEventRef ev = CGEventCreateKeyboardEvent (source, virtualKey, true); //down
+  postEvent(ev);
+  CFRelease(ev);
+  ev = CGEventCreateKeyboardEvent (source, virtualKey, false); //up
+  postEvent(ev);
+  CFRelease(ev);
 }
 
 /**
@@ -90,9 +94,9 @@ const CGKeyCode kKeymanEventKeyCode = 0xFF;
   // Returns the frontmost app, which is the app that receives key events.
   NSRunningApplication *app = NSWorkspace.sharedWorkspace.frontmostApplication;
   pid_t processId = app.processIdentifier;
-  NSString *appName = app.localizedName;
+  NSString *bundleId = app.bundleIdentifier;
   
-  [self.appDelegate logDebugMessage:@"sendKeymanKeyCodeForEvent keyCode %lu to app %@ with pid %d", (unsigned long)kKeymanEventKeyCode, appName, processId];
+  [self.appDelegate logDebugMessage:@"sendKeymanKeyCodeForEvent keyCode %lu to app %@ with pid %d", (unsigned long)kKeymanEventKeyCode, bundleId, processId];
   
   CGEventRef cgevent = [event CGEvent];
   

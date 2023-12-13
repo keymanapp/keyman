@@ -510,16 +510,14 @@ NSRange _previousSelRange;
 }
 
 -(void) persistOptions:(NSDictionary*)options{
-  if(options.count>0) {
-    for(NSString *key in options) {
-      NSString *value = [options objectForKey:key];
-      if(key && value) {
-        [self.appDelegate logDebugMessage:@"applyNonTextualOutput calling writePersistedOptions, key: %@, value: %@", key, value];
-        [self.appDelegate writePersistedOptions:key withValue:value];
-      }
-      else {
-        [self.appDelegate logDebugMessage:@"applyNonTextualOutput, invalid values in optionsToPersist, not writing to UserDefaults, key: %@, value: %@", key, value];
-      }
+  for(NSString *key in options) {
+    NSString *value = [options objectForKey:key];
+    if(key && value) {
+      [self.appDelegate logDebugMessage:@"applyNonTextualOutput calling writePersistedOptions, key: %@, value: %@", key, value];
+      [self.appDelegate writePersistedOptions:key withValue:value];
+    }
+    else {
+      [self.appDelegate logDebugMessage:@"applyNonTextualOutput, invalid values in optionsToPersist, not writing to UserDefaults, key: %@, value: %@", key, value];
     }
   }
 }
@@ -527,10 +525,10 @@ NSRange _previousSelRange;
 -(void) applyCapsLock:(CapsLockState)capsLockState {
   switch(capsLockState) {
     case On:
-      //TODO: handle this
+      //TODO: handle this, Issue #10244
       break;
     case Off:
-      //TODO: handle this
+      //TODO: handle this, Issue #10244
       break;
     case Unchanged:
       // do nothing
@@ -591,8 +589,7 @@ NSRange _previousSelRange;
   self.generatedBackspaceCount = output.codePointsToDeleteBeforeInsert;
   
   if (output.hasCodePointsToDelete) {
-    for (int i = 0; i < output.codePointsToDeleteBeforeInsert; i++)
-    {
+    for (int i = 0; i < output.codePointsToDeleteBeforeInsert; i++) {
       [self.appDelegate logDebugMessage:@"sendEvents queueing backspace"];
       [self.keySender sendBackspaceforEventSource:_sourceForGeneratedEvent];
     }

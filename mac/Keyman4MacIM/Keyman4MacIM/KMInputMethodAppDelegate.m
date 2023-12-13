@@ -336,6 +336,8 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
                 if(sysEvent.keyCode == kVK_Delete && appDelegate.inputController != nil) {
                     NSLog(@"Event tap handling kVK_Delete.");
                     [appDelegate.inputController handleBackspace:sysEvent];
+                } else {
+                  NSLog(@"Event tap not handling kVK_Delete, appDelegate.inputController = %@", appDelegate.inputController);
                 }
 
                 switch(sysEvent.keyCode) {

@@ -129,7 +129,6 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
                 CGEventKeyboardSetUnicodeString(kEventUp, output.length, outCStr);
                 CGEventTapPostEvent(proxy, kEventDown);
                 CGEventTapPostEvent(proxy, kEventUp);
-                [contextBuffer appendString:output];
                 CFRelease(kEventDown);
                 CFRelease(kEventUp);
             }
