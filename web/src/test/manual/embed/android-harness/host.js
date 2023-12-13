@@ -1,7 +1,7 @@
 let x = $('#iframe')[0];
 let ta = $('#ta')[0];
 
-let TEST_KEYBOARD = {
+const TEST_KEYBOARD = {
   KN: 'web_context_tests',
   KI: 'Keyboard_web_context_tests',
   KLC: 'en',
