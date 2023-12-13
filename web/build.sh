@@ -65,6 +65,28 @@ builder_run_child_actions configure
 
 ## Build actions
 
+build_action() {
+  tsc --project "${KEYMAN_ROOT}/web/src/test/auto/tsconfig.json"
+}
+
+test_action() {
+  TEST_OPTS=
+  if builder_has_option --ci; then
+    TEST_OPTS=--ci
+  fi
+  ./test.sh "${TEST_OPTS}"
+}
+
+coverage_action() {
+  builder_echo "Creating coverage report..."
+  cd "$KEYMAN_ROOT"
+  mkdir -p web/build/coverage/tmp
+  find . -type f -name coverage-\*.json -print0 | xargs -0 cp -t web/build/coverage/tmp
+  c8 report --config web/.c8rc.json ---reporter html --clean=false --reports-dir=web/build/coverage
+  rm -rf web/build/coverage/tmp
+  cd web
+}
+
 builder_run_child_actions build:engine/device-detect
 builder_run_child_actions build:engine/dom-utils
 builder_run_child_actions build:engine/element-wrappers
@@ -103,26 +125,12 @@ builder_run_child_actions build:tools
 # Some test pages refer to KMW tools.
 builder_run_child_actions build:test-pages
 
+# Build tests
+builder_run_action build build_action
+
+# Run tests
 builder_run_child_actions test
+builder_run_action test test_action
 
-if builder_start_action test; then
-  TEST_OPTS=
-  if builder_has_option --ci; then
-    TEST_OPTS=--ci
-  fi
-  ./test.sh $TEST_OPTS
-
-  builder_finish_action success test
-fi
-
-coverage_action() {
-  builder_echo "Creating coverage report..."
-  cd "$KEYMAN_ROOT"
-  mkdir -p web/build/coverage/tmp
-  find . -type f -name coverage-\*.json -print0 | xargs -0 cp -t web/build/coverage/tmp
-  c8 report --config web/.c8rc.json ---reporter html --clean=false --reports-dir=web/build/coverage
-  rm -rf web/build/coverage/tmp
-  cd web
-}
-
+# Create coverage report
 builder_run_action coverage coverage_action

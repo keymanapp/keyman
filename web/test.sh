@@ -100,7 +100,7 @@ fi
 
 # End common configs.
 
-builder_run_action test:dom karma start $KARMA_FLAGS "${KEYMAN_ROOT}/web/src/test/auto/dom/$CONFIG"
+builder_run_action test:dom karma start ${KARMA_FLAGS} "${KEYMAN_ROOT}/web/src/test/auto/dom/${CONFIG}"
 
 # The multi-browser test suite, which uses BrowserStack when run by our CI.
 if builder_start_action test:integrated; then
