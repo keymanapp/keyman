@@ -61,8 +61,6 @@ describe('LanguageProcessor', function() {
 
     this.beforeAll(async function() {
       compiler = new LexicalModelCompiler();
-      console.dir(compiler)
-      console.dir(compiler.init)
       assert.isTrue(await compiler.init(callbacks, {}));
     });
 
