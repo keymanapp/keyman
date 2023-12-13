@@ -94,6 +94,6 @@ export class InfrastructureMessages {
 
   static Error_OutFileCanOnlyBeSpecifiedWithSingleInfile = () => m(this.ERROR_OutFileCanOnlyBeSpecifiedWithSingleInfile,
     `Parameter --out-file can only be used with a single input file.`);
-  static ERROR_OutFileCanOnlyBeSpecifiedWithSingleInfile = SevError | 0x0014;
+  static ERROR_OutFileCanOnlyBeSpecifiedWithSingleInfile = SevError | 0x0015;
 }
 
