@@ -783,7 +783,6 @@ bool KMX_ImportRules(KMX_WCHAR *kbid, LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, Gd
       *p++ = (KMX_WCHAR)(kp->cxGroupArray);
       *p = 0;
 
-      // _S2 TODO not sure if this works OK -> we need to use more shiftstates than base+Shift
       // I4550 - Each place we have a nomatch > use(baselayout) (this last group), we need to add all
       // the AltGr and ShiftAltGr combinations as rules to allow them to be matched as well.  Yes, this
       // loop is not very efficient but it's not worthy of optimisation.
@@ -812,7 +811,6 @@ bool KMX_ImportRules(KMX_WCHAR *kbid, LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, Gd
     }
   }
 
-  // _S2 TODO not sure if this works OK -> we need to use deadkeys...
   // If we have deadkeys, then add a new group to translate the deadkeys per the deadkey tables
   // We only do this if not in deadkey conversion mode
   //

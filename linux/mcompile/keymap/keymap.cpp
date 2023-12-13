@@ -158,9 +158,9 @@ bool  createCompleteRow_US(v_str_1D &complete_List, FILE* fp, const char* text, 
 int replace_KeyName_with_Keycode(std::string  in) {
   int out = returnIfCharInvalid;
 
-  // _S2 these are the Scancode-Values we use in Keyman ( =  the windows scancodes+8 )
+  //  these are the Scancode-Values we use in Keyman ( =  the windows scancodes+8 )
   //     NAME IN SYMBOLS-FILE      KEYCODE (LIN STYLE)      (WIN STYLE)       VK_US      VK_DE
-                                             /*on US keyb;*/
+                                                        /*on US keyb;*/
   if      ( in == "key<TLDE>")    out = 49;               /*                VK_  */  // TOASK correct ???
   else if ( in == "key<AE01>")    out = 10;              /* 0X02           VK_1 */
   else if ( in == "key<AE02>")    out = 11;              /* 0X03           VK_2  */
@@ -334,7 +334,7 @@ int append_other_ToVector(v_dw_3D &All_Vector,GdkKeymap * keymap) {
   return 0;
 }
 
-// _S2 can I use gdk_keymap_translate_keyboard_state instead? return s shifted + unshifted only- no altgr,...
+// _S2 use gdk_keymap_translate_keyboard_state instead  return s shifted + unshifted only- no altgr,...
 KMX_DWORD KMX_get_KeyvalsUnderlying_From_KeyCodeUnderlying_GDK(GdkKeymap *keymap, guint keycode, int shift_state_pos) {
   GdkKeymapKey *maps;
   guint *keyvals;

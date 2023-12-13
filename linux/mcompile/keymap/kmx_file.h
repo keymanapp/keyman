@@ -9,7 +9,6 @@
 
 #include <km_types.h>
 
-//_S2 what is this and do we need it???
 #define UNREFERENCED_PARAMETER(P)   (P)
 #define TRUNCATE ((size_t)-1)
 #ifdef KMN_KBP
