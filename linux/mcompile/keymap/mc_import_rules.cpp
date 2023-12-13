@@ -327,8 +327,8 @@ int i4 = this->KMX_IsXxxxGrCapsEqualToXxxxShift() ? 8 : 0;
         (this->KMX_IsAltGrCapsEqualToAltGrShift() ? 4 : 0) |
         (this->KMX_IsXxxxGrCapsEqualToXxxxShift() ? 8 : 0);
 
-        capslock=1;   // _S2
-
+    // _S2 DESIGN NEEDED on how to replace capslock
+    capslock=1;   // _S2
 
     for (int ss = 0; ss <= MaxShiftState; ss++) {
       if (ss == Menu || ss == ShftMenu) {
@@ -372,11 +372,19 @@ int i4 = this->KMX_IsXxxxGrCapsEqualToXxxxShift() ? 8 : 0;
             if(st[ich] < 0x20 || st[ich] == 0x7F) { isvalid=false; break; }
           }
           if(isvalid) {
-            KMX_DWORD SC_Underlying = KMX_get_KeyCodeUnderlying_From_KeycodeUS_VEC(All_Vector,this->SC(), ss);
-            key->Key = KMX_get_VKUS_From_KeyCodeUnderlying_GDK( keymap, SC_Underlying);
+            // this is different to mcompile windows !!!!
+            // this->m_sc    stores SC-US = SCUnderlying
+            // this->m_vk    stores VK-US
+            // key->Key      stores VK-US
+            // key->dpOutput stores character Underlying
+
+            // _S2 confusing: since we sort rgkey by VKUS: is SC_Underlying the right SC or SC_Underlying_gdk?? it will be clear when we look at kmx/kmn-file
+            //KMX_DWORD SC_Underlying = KMX_get_KeyCodeUnderlying_From_KeycodeUS_VEC(All_Vector,this->SC(), ss);
+
+            KMX_DWORD SC_Underlying_gdk = KMX_get_KeyCodeUnderlying_From_KeycodeUS_GDK(keymap, All_Vector,this->SC(), (ShiftState) ss,  caps);
+            key->Key = KMX_get_VKUS_From_KeyCodeUnderlying_GDK( keymap, SC_Underlying_gdk);
 
             key->Line = 0;
-            // _S2 _differences in sstateflag probably from here and KMX_IsCapsEqualToShift...
             key->ShiftFlags = this->KMX_GetShiftStateValue(capslock, caps, (ShiftState) ss);
             key->dpContext = new KMX_WCHAR; *key->dpContext = 0;
             p = key->dpOutput = new KMX_WCHAR[st.size() + 1];
@@ -658,6 +666,7 @@ bool KMX_ImportRules(KMX_WCHAR *kbid, LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, Gd
 
           KMX_DWORD SC_US = KMX_get_KeyCodeUnderlying_From_VKUS(iKey);
 
+          // _S2 deadkey not finished; Ctrl, Shft +40 not tested
           for(int caps = 0; caps <= 1; caps++) {
             // _S2 is THIS correct ???  Do we need  lpKeyState or is it just used in ToUnicodeEx??
             loader.KMX_ClearKeyboardBuffer();

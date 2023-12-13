@@ -521,9 +521,11 @@ std::wstring KMX_get_CharsUnderlying_according_to_keycode_and_Shiftstate_GDK(Gdk
 // return the VirtualKey of the Other Keyboard for given Scancode using GDK
 KMX_DWORD KMX_get_VKUS_From_KeyCodeUnderlying_GDK( GdkKeymap *keymap, KMX_DWORD scanCode);
 
-//KMX_DWORD KMX_get_VKUS_From_KeyCodeUnderlying( KMX_DWORD keycode);
+KMX_DWORD KMX_get_VKUS_From_KeyCodeUnderlying( KMX_DWORD keycode);
 
 KMX_DWORD KMX_get_KeyCodeUnderlying_From_VKUS( KMX_DWORD VK_US);
+
+KMX_DWORD KMX_get_KeyCodeUnderlying_From_KeycodeUS_GDK(GdkKeymap *keymap, v_dw_3D &All_Vector,KMX_DWORD KC_US, ShiftState ss, int caps);
 
 bool IsKeymanUsedKeyVal(std::wstring Keyval);
 

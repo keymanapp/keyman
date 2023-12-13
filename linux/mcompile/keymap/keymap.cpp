@@ -412,11 +412,11 @@ KMX_DWORD KMX_get_VKUS_From_KeyCodeUnderlying_GDK( GdkKeymap *keymap, KMX_DWORD 
   return 0;   //_S2 what to return if not found
 }
 
-/*KMX_DWORD KMX_get_VKUS_From_KeyCodeUnderlying( KMX_DWORD keycode) {
+KMX_DWORD KMX_get_VKUS_From_KeyCodeUnderlying( KMX_DWORD keycode) {
     if ( keycode >7)
       return (KMX_DWORD) ScanCodeToUSVirtualKey[keycode-8];
   return 0;   //_S2 what to return if not found
-}*/
+}
 
 KMX_DWORD KMX_get_KeyCodeUnderlying_From_VKUS( KMX_DWORD VK_US) {
   if( VK_US > 7) {
@@ -544,3 +544,22 @@ std::wstring  KMX_get_CharsUnderlying_according_to_keycode_and_Shiftstate_GDK(Gd
     return  std::wstring(1, (int) *keyvals);
 }
 
+
+
+KMX_DWORD KMX_get_KeyCodeUnderlying_From_KeycodeUS_GDK(GdkKeymap *keymap, v_dw_3D &All_Vector,KMX_DWORD KC_US, ShiftState ss, int caps) {
+
+  KMX_DWORD Character;
+  std::wstring ws = KMX_get_CharsUnderlying_according_to_keycode_and_Shiftstate_GDK(keymap,  KC_US,  ss,  caps);
+  Character = *ws.c_str();
+
+  //Find underlying SC of character
+  for( int i=0; i< (int)All_Vector[1].size()-1 ;i++) {
+    for( int j=1; j< (int)All_Vector[01][0].size();j++) {
+      if ( ( All_Vector[1][i][j] == Character ) ) {
+        KC_US = All_Vector[1][i][j];
+        return All_Vector[1][i][0];
+      }
+    }
+  }
+  return KC_US;
+}
