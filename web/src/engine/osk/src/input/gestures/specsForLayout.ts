@@ -85,6 +85,8 @@ export interface GestureParams<Item = any> {
 
     /**
      * The minimum _net_ touch-path distance after which the direction will be locked.
+     *
+     * Is currently also used as the max radius for valid flick-reset recentering targets.
      */
     dirLockDist: number
   },
@@ -114,8 +116,38 @@ export const DEFAULT_GESTURE_PARAMS: GestureParams = {
   // See `VisualKeyboard.refreshLayout`, CTRL-F "Step 3".
   flick: {
     startDist: 10,
-    dirLockDist: 20,
+    dirLockDist: 25,
     triggerDist: 40 // should probably be based on row-height?
+  }
+}
+
+/**
+ * Gets the centroid (in client coordinates) of a key's element.
+ *
+ * Assumes that the key's layer is in the DOM and actively displayed.
+ * @param key
+ */
+function getKeyCentroid(key: KeyElement) {
+  // We don't layer-shift at present while a flick is active, so it's valid
+  // for current use-cases.  May need extension to closure in something
+  // to force the layer to be active in the future, though.
+  const keyRect = key.getBoundingClientRect();
+
+  return {
+    clientX: keyRect.left + keyRect.width/2,
+    clientY: keyRect.top + keyRect.height/2
+  };
+}
+
+// Is kept separate from prior method in case it becomes a closure in the future
+// & needs to be passed in as a parameter.
+function buildDistFromKeyCentroidFunctor(key: KeyElement) {
+  const keyCentroid = getKeyCentroid(key);
+
+  return (a: CumulativePathStats) => {
+    const dx = a.lastSample.clientX - keyCentroid.clientX;
+    const dy = a.lastSample.clientY - keyCentroid.clientY;
+    return Math.sqrt(dx*dx + dy*dy);
   }
 }
 
@@ -259,6 +291,8 @@ export function gestureSetForLayout(flags: LayoutGestureSupportFlags, params: Ge
     gestureModels.push(withKeySpecFiltering(flickStartModel(params), 0));
     gestureModels.push(flickMidModel(params));
     gestureModels.push(flickResetModel(params));
+    gestureModels.push(flickResetCenteringModel(params));
+    gestureModels.push(flickRestartModel(params));
     gestureModels.push(flickResetEndModel());
     gestureModels.push(flickEndModel(params));
 
@@ -314,7 +348,7 @@ export function flickStartContactModel(params: GestureParams): ContactModel {
       evaluate: (path) => path.stats.netDistance > params.flick.startDist ? 'resolve' : null
     },
     pathResolutionAction: 'resolve',
-    pathInheritance: 'chop'
+    pathInheritance: 'partial'
   }
 }
 
@@ -322,8 +356,8 @@ export function flickStartContactModel(params: GestureParams): ContactModel {
  * Determines the best direction to use for flick-locking and the total net distance
  * traveled in that direction.
  */
-function determineLockFromStats(pathStats: CumulativePathStats<KeyElement>) {
-  const flickSpec = pathStats.initialSample.item.key.spec.flick;
+function determineLockFromStats(pathStats: CumulativePathStats<KeyElement>, baseItem: KeyElement) {
+  const flickSpec = baseItem.key.spec.flick;
 
   const supportedDirs = Object.keys(flickSpec) as (typeof OrderedFlickDirections[number])[];
   let bestDir: typeof supportedDirs[number];
@@ -347,12 +381,12 @@ export function flickMidContactModel(params: GestureParams): gestures.specs.Cont
   return {
     itemPriority: 1,
     pathModel: {
-      evaluate: (path) => {
+      evaluate: (path, priorStats, baseItem) => {
         /*
          * Check whether or not there is a valid flick for which the path crosses the flick-dist
          * threshold while at a supported angle for flick-locking by the flick handler.
          */
-        const { dir, dist } = determineLockFromStats(path.stats);
+        const { dir, dist } = determineLockFromStats(path.stats, baseItem);
 
         // If the best supported flick direction meets the 'direction lock' threshold criteria,
         // only then do we allow transitioning to the 'locked flick' state.
@@ -380,14 +414,14 @@ export function flickEndContactModel(params: GestureParams): ContactModel {
   return {
     itemPriority: 1,
     pathModel: {
-      evaluate: (path, dummy, dummy2, baseStats) => {
+      evaluate: (path, priorStats, baseItem, baseStats) => {
         if(path.isComplete) {
           // The Flick handler class will sort out the mess once the path is complete.
           // Note:  if we wanted auto-triggering once the threshold distance were met,
           // we'd need to move its related logic into this method.
           return 'resolve';
         } else {
-          const { dir } = determineLockFromStats(baseStats);
+          const { dir } = determineLockFromStats(baseStats, baseItem);
           if(calcLockedDistance(path.stats, dir) < params.flick.dirLockDist) {
             return 'reject';
           }
@@ -702,6 +736,66 @@ export function flickStartModel(params: GestureParams): GestureModel<any> {
   }
 }
 
+export function flickRestartModel(params: GestureParams): GestureModel<KeyElement> {
+  const base = flickStartModel(params);
+  return {
+    ...base,
+    contacts: [
+      {
+        ...base.contacts[0],
+        model: {
+          ...base.contacts[0].model,
+          baseCoordReplacer: (stats, key) => {
+            const keyCentroid = getKeyCentroid(key);
+            const calcDist = buildDistFromKeyCentroidFunctor(key);
+
+            const coord = stats.initialSample;
+            const distFromCenter = calcDist(stats);
+
+            // If the current coord is far off key and would trigger a flick, just recenter
+            // and let the intermediate models 'fall through', displaying the new target flick
+            // if possible.
+            if(distFromCenter > params.flick.triggerDist) {
+              return keyCentroid;
+            }
+
+            const dirLockDist = params.flick.dirLockDist;
+
+            // If we landed within the distance that'd trigger a direction-lock,
+            // no need to fully recenter; the current coord is "good enough".
+            if(distFromCenter < dirLockDist) {
+              return coord;
+            }
+
+            const projectionScalar = dirLockDist / distFromCenter;
+
+            // If the user didn't land close to the key's center, their "perceived"
+            // center for the gesture is likely different than the 'true' center.
+            const dx = coord.clientX - keyCentroid.clientX;
+            const dy = coord.clientY - keyCentroid.clientY;
+
+            // Maps the current coord to a coord on the edge of a circle centered
+            // on the key centroid at a radius of `dirLockDist` away.
+            return {
+              clientX: keyCentroid.clientX + dx * projectionScalar,
+              clientY: keyCentroid.clientY + dy * projectionScalar
+            };
+          }
+        }
+      }
+    ],
+    id: 'flick-restart',
+    sustainWhenNested: true,
+    rejectionActions: {
+      // Only 'rejects' in this form if the path is completed before direction-locking state.
+      path: {
+        type: 'replace',
+        replace: 'flick-reset-end'
+      }
+    },
+  }
+}
+
 export function flickMidModel(params: GestureParams): GestureModel<any> {
   return {
     id: 'flick-mid',
@@ -731,7 +825,7 @@ export function flickMidModel(params: GestureParams): GestureModel<any> {
   }
 }
 
-// exists to trigger a reset
+// Clears existing flick-scrolling & primes the flick-reset recentering mechanism.
 export function flickResetModel(params: GestureParams): GestureModel<any> {
   return {
     id: 'flick-reset',
@@ -740,13 +834,48 @@ export function flickResetModel(params: GestureParams): GestureModel<any> {
       {
         model: {
           ...instantContactResolutionModel(),
-          pathInheritance: 'full'
+          pathInheritance: 'partial', // keep base item, but reset the path-stats.
         },
       }
     ],
     resolutionAction: {
       type: 'chain',
-      next: 'flick-mid'
+      next: 'flick-reset-centering'
+    },
+    sustainWhenNested: true
+  };
+}
+
+export function flickResetCenteringModel(params: GestureParams): GestureModel<KeyElement> {
+  return {
+    id: 'flick-reset-centering',
+    resolutionPriority: 1,
+    contacts: [
+      {
+        model: {
+          pathModel: {
+            evaluate(path, priorStats, baseItem) {
+              priorStats ||= path.stats;
+
+              const calcDist = buildDistFromKeyCentroidFunctor(baseItem);
+
+              const newDist = calcDist(path.stats);
+              const oldDist = calcDist(priorStats);
+
+              if(oldDist < newDist) {
+                return 'resolve';
+              }
+            },
+          },
+          itemPriority: 0,
+          pathResolutionAction: 'resolve',
+          pathInheritance: 'full', // no need to re-reset.
+        },
+      }
+    ],
+    resolutionAction: {
+      type: 'chain',
+      next: 'flick-restart'
     },
     sustainWhenNested: true
   };
