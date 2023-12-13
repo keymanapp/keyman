@@ -179,7 +179,9 @@ uses
   Keyman.System.AndroidStringToKeymanLocaleString in '..\..\..\..\common\windows\delphi\general\Keyman.System.AndroidStringToKeymanLocaleString.pas',
   UpdateXMLRenderer in 'render\UpdateXMLRenderer.pas',
   Keyman.System.UpdateCheckStorage in 'main\Keyman.System.UpdateCheckStorage.pas',
-  Keyman.System.RemoteUpdateCheck in 'main\Keyman.System.RemoteUpdateCheck.pas';
+  Keyman.System.RemoteUpdateCheck in 'main\Keyman.System.RemoteUpdateCheck.pas',
+  BackgroundUpdate in 'main\BackgroundUpdate.pas',
+  Keyman.System.DownloadUpdate in 'main\Keyman.System.DownloadUpdate.pas';
 
 {$R VERSION.RES}
 {$R manifest.res}

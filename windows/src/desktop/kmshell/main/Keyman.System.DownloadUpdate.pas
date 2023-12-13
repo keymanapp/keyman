@@ -31,7 +31,7 @@ const
   CheckPeriod: Integer = 7; // Days between checking for updates
 
 type
-  TRemoteUpdateCheckDownloadParams = record
+  TDownloadUpdateParams = record
     TotalSize: Integer;
     TotalDownloads: Integer;
     StartPosition: Integer;
@@ -41,7 +41,7 @@ type
   private
 
     FShowErrors: Boolean;
-    FDownload: TDownloadUpdateDownloadParams;
+    FDownload: TDownloadUpdateParams;
     FCheckOnly: Boolean;
 
     function DownloadUpdates(Params: TUpdateCheckResponse) : Boolean;
