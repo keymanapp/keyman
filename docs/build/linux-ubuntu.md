@@ -267,3 +267,21 @@ cd linux
 docker pull ubuntu:23.04 # (to make sure you have an up-to-date image)
 docker build . -t keymanapp/keyman-linux-builder:u23.04-node20 --build-arg OS_VERSION=23.04 --build-arg NODE_MAJOR=20
 ````
+
+### Using the builder with VSCode [Dev Containers](https://code.visualstudio.com/docs/devcontainers/tutorial)
+
+1. Save the following as `.devcontainer/devcontainer.json`, updating the `image` to match the Docker image built above.
+
+```json
+// file: .devcontainer/devcontainer.json
+{
+        "name": "Keyman Ubuntu 23.04",
+        "image": "keymanapp/keyman-linux-builder:u23.04-node18"
+}
+// For format details, see https://aka.ms/devcontainer.json. For config options, see the
+// README at: https://github.com/devcontainers/templates/tree/main/src/ubuntu
+```
+
+2. in VSCode, use the "Dev Containers: Open Folder In Container…" option and choose the Keyman directory.
+
+3. You will be given a window which is running VSCode inside this builder image, regardless of your host OS.
