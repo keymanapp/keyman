@@ -36,3 +36,21 @@ function mac_notarize() {
 
   rm -f "$NOTARYTOOL_LOG_PATH"
 }
+
+execCodeSign() {
+  # Allow the signing to fail up to 5 times (network transient error on timestamping)
+  local ret_code=0
+  local count=0
+  while (( count <  5 )); do
+    eval codesign "$@" || ret_code=$?
+    if [ $ret_code == 0 ]; then
+      return 0
+    fi
+    (( count++ ))
+    builder_echo "codesign attempt $count failed with error $ret_code"
+    sleep 5
+  done
+
+  builder_echo "*** codesign parameters: $@"
+  builder_die "Unable to sign component after 5 attempts (exit code $ret_code)"
+}

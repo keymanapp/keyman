@@ -334,22 +334,6 @@ updatePlist() {
     fi
 }
 
-execCodeSign() {
-    # Allow the signing to fail once (network transient error on timestamping)
-    typeset ret_code
-    set +e
-    eval codesign "$@"
-    ret_code=$?
-    if [ $ret_code != 0 ]; then
-        eval codesign "$@"
-        ret_code=$?
-        if [ $ret_code != 0 ]; then
-            builder_die "Unable to sign component (exit code $ret_code)"
-        fi
-    fi
-    set -e
-}
-
 ### Build Keyman Engine (kmx processor) ###
 
 if $DO_KEYMANENGINE ; then
@@ -448,7 +432,7 @@ if $PREPRELEASE || $NOTARIZE; then
     # We may need to re-run the code signing if a custom certificate has been passed in
     if [ ! -z "${CERTIFICATE_ID+x}" ]; then
       builder_heading "Signing with custom certificate (CERTIFICATE_ID environment variable)."
-      codesign --force --options runtime --entitlements Keyman4MacIM/Keyman.entitlements --deep --sign "${CERTIFICATE_ID}" "$TARGET_APP_PATH"
+      execCodeSign --force --options runtime --entitlements Keyman4MacIM/Keyman.entitlements --deep --sign "${CERTIFICATE_ID}" "$TARGET_APP_PATH"
     fi
 
     builder_heading "Zipping Keyman.app for notarization to $TARGET_ZIP_PATH"

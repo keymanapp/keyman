@@ -69,7 +69,7 @@ cp textinputsource/textinputsource "$TARGETAPP/Contents/MacOS/textinputsource"
 
 # NOW TO notarize...
 xattr -rc "$TARGETAPP"
-codesign --force --options runtime --deep --sign "${CERTIFICATE_ID}" "$TARGETAPP"
+execCodeSign --force --options runtime --deep --sign "${CERTIFICATE_ID}" "$TARGETAPP"
 
 #
 # Notarize the app (copied from ../build.sh)
