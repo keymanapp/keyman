@@ -426,7 +426,7 @@ std::wstring convert_DeadkeyValues_ToChar(int in) {
 
   KMX_DWORD lname;
 
-  if (in < deadkeyThreshold) {                                                // no deadkey; no Unicode
+  if (in <= deadkey_min) {                                                // no deadkey; no Unicode
     if (!IsKeymanUsedKeyVal(std::wstring(1, in)))
       return L"\0";
     return  std::wstring(1, in);

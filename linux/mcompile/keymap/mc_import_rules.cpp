@@ -682,7 +682,7 @@ bool KMX_ImportRules(KMX_WCHAR *kbid, LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, Gd
   }
 
   //_S2 this gan co later
-  std::vector< int > TestValues = {48,49,50,51,52,53,54,55,56,57,65,66,67,88,89,90, 186,187,188,189,191,191,192,219,220,221,222,226};
+  std::vector< int > TestValues = {40,44,48,49,50,51,52,53,54,55,56,57,65,66,67,88,89,90, 186,187,188,189,191,191,192,219,220,221,222,226};
   wprintf(L"-----------------\nNow some tests:\n");
   wprintf(L"                  Base          Caps            Shift           Shfit+Caps     MenuCtrl         MenuCtrl+Caps \n");
 
@@ -763,6 +763,7 @@ bool KMX_ImportRules(KMX_WCHAR *kbid, LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, Gd
     if ((rgKey[iKey] != NULL) && rgKey[iKey]->KMX_IsKeymanUsedKey() && (!rgKey[iKey]->KMX_IsEmpty())) {
       if(rgKey[iKey]->KMX_LayoutRow(loader.MaxShiftState(), &gp->dpKeyArray[nKeys], &alDead, nDeadkey, bDeadkeyConversion, All_Vector,*keymap)) {   // I4552
         nKeys+=rgKey[iKey]->KMX_GetKeyCount(loader.MaxShiftState());
+         wprintf(L" iKey = %i, Delta:  %i -> Sum %i\n", iKey, rgKey[iKey]->KMX_GetKeyCount(loader.MaxShiftState()),  nKeys);
       }
     }
   }
@@ -957,7 +958,7 @@ bool IsKeymanUsedKeyVal(std::wstring Keyval) {
   int KV = (int) (*Keyval.c_str());
 
   //         32            127              196          256
-  if  ((KV >= 0x20 && KV <= 0x7F) || (KV >= 0xC4 && KV < 198)   ||
+  if  ((KV >= 0x20 && KV <= 0x7F) || (KV >= 0x20 && KV <= 0x7F) || (KV >= 0xC4 && KV < 198) ||
        (KV >= 199  && KV < 208)   || (KV >= 209  && KV < 216)   || (KV >= 217 && KV < 229)  ||
        (KV >= 231  && KV < 240)   || (KV >= 241  && KV < 248)   || (KV >= 249 && KV < 0xFF) ||
        (KV == 128) || (KV == 178) || (KV == 167) || (KV == 179) || (KV == 176)|| (KV == 181) )
