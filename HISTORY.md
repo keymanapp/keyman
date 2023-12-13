@@ -1,5 +1,18 @@
 # Keyman Version History
 
+## 17.0.229 alpha 2023-12-13
+
+* chore(ios): FV certificate key (#10228)
+* feat(core): action struct to action items conversion (#10115)
+* fix(developer): various project fixes (#10151)
+* feat(developer): Add Window menu (#10154)
+* feat(developer): New Project opens in new process (#10155)
+* fix(developer): two errors in touch layout editor (#10211)
+* feat(developer): Move options to ~/.keymandeveloper/options.json (#10216)
+* feat(core): ldml improve key-not-found (#10090)
+* fix(core): remove a TODO-LDML (#10198)
+* fix(core): improve memory allocation issues in calling into icu (#10222)
+
 ## 17.0.228 alpha 2023-12-11
 
 * chore(mac): force detach of disk image during build after 5 failures (#10201)
