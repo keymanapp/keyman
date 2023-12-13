@@ -384,6 +384,7 @@ var
   kdl: IKeymanDefaultLanguage;
   FIcon: string;
   FMutex: TKeymanMutex;  // I2720
+  RemoteUpdateCheck: TRemoteUpdateCheck;
     function FirstKeyboardFileName: WideString;
     begin
       if KeyboardFileNames.Count = 0
@@ -432,15 +433,15 @@ begin
   end;
   // TODO: #10038  Will add this as part of the background update state machine
   // for now just verifing the download happens via -buc switch.
-  with TRemoteUpdateCheck.Create(False, False) do
+  RemoteUpdateCheck := TRemoteUpdateCheck.Create(False, False);
     try
       if (FMode = fmBackgroundUpdateCheck) then
       begin
-        Run;
+        RemoteUpdateCheck.Run;
         Exit;
       end
     finally
-      Free;
+      RemoteUpdateCheck.Free;
     end;
 
 
