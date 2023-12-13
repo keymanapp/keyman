@@ -62,6 +62,31 @@ UINT map_Ikey_DE(UINT iKey) {
   return iKey;
 }
 
+/* takes KV of Other keyboard and returns character of Other keyboard with shiftstate VKShiftState[j]
+KMX_DWORD KMX_get_CharUnderlying_according_to_keycode_and_Shiftstate_VEC(v_dw_3D &All_Vector,KMX_DWORD KVUnderlying, KMX_UINT VKShiftState, KMX_WCHAR* DeadKey){
+
+  KMX_UINT VKShiftState_lin;
+
+  // 0000 0000 
+  if (VKShiftState == 0 )      VKShiftState_lin = 0;
+  // 0001 0000 
+  if (VKShiftState == 16)      VKShiftState_lin = 1;
+  // 0000 1001 
+  if (VKShiftState == 9 )      VKShiftState_lin = 2;
+  // 0001 1001 
+  if (VKShiftState == 25)      VKShiftState_lin = 3;
+
+  // loop and find KVUnderlying in Other; then return char with correct shiftstate
+  for( int i=0; i< (int)All_Vector[1].size();i++) {
+      KMX_DWORD CharOther = All_Vector[1][i][2];
+      if( KVUnderlying == CharOther ) {
+        return All_Vector[1][i][VKShiftState_lin+1];    // [VKShiftState_lin+1] because we have the name of the key in All_Vector[1][i][0], so we need to get the one after this
+      }
+  }
+  return KVUnderlying;
+}
+*/
+
 // _S2 TODO How to do mapping between Linux keycodes and keyman SC
 const int Lin_KM__map(int i, v_dw_3D &All_Vector) {
   // MAP:
@@ -397,7 +422,7 @@ bool write_RGKEY_FileToVector(v_dw_2D& shift_states, const char* infile) {
   return(0);
 }
 
-KMX_DWORD get_VirtualKey_Other_From_SC(KMX_DWORD SC , v_dw_3D &All_Vector) {
+/*KMX_DWORD get_VirtualKey_Other_From_SC(KMX_DWORD SC , v_dw_3D &All_Vector) {
 
   for( int i=0; i< (int)All_Vector[0].size();i++) {
     //number keys return unshifted value ( e.g. 1, not !)
@@ -422,8 +447,8 @@ KMX_DWORD get_VirtualKey_Other_From_SC(KMX_DWORD SC , v_dw_3D &All_Vector) {
     }
   }
 return 0;
-}
-
+}*/
+/*
 bool test_In_Out(v_dw_3D All_Vector){
 
   for ( int i=0; i<61;i++)
@@ -476,7 +501,7 @@ bool test_In_Out(v_dw_3D All_Vector){
     }
   }
 }
-
+*/
 // ToDo write 2 func for return pos of Key_US and Pos of Key_Other
 // return the Scancode of for given VirtualKey of Other US
 KMX_DWORD get_position_From_VirtualKey_US(KMX_DWORD VK_US , v_dw_3D &All_Vector){

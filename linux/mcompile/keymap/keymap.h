@@ -67,9 +67,6 @@ const KMX_DWORD KMX_VKMap[] = {
   0
 };
 
-//_S2 QUESTION Which character do we use in that case?  0 or FFFF or 32 or ??
-// this is what we return when we find an invalid character
-//static KMX_DWORD returnIfCharInvalid = 32;
 static KMX_DWORD returnIfCharInvalid = 0;
 
 //_S2 QUESTION Which threshold ( from what int value onwards is a character considered deadkey? 65000 28000?, > 255? ??
@@ -101,7 +98,6 @@ int split_US_To_3D_Vector(v_dw_3D &all_US, v_str_1D completeList);
 // create an empty 2D vector containing "--" in all fields
 v_dw_2D create_empty_2D_Vector(int dim_rows, int dim_shifts);
 
-//_S2 needed?
 // append characters using GDK to 3D-Vector (Data for Other Language on [1][ ][ ]  )
 int append_other_ToVector(v_dw_3D &All_Vector, GdkKeymap *keymap);
 
@@ -530,18 +526,5 @@ KMX_DWORD KMX_get_KeyCodeUnderlying_From_KeycodeUS_GDK(GdkKeymap *keymap, v_dw_3
 bool IsKeymanUsedKeyVal(std::wstring Keyval);
 
 std::wstring CodePointToWString(unsigned int codepoint);
-
-//UINT find_SC_Other_from_SC_US_GDK(UINT vk_US_187,GdkKeymap *keymap);
-
-UINT map_Ikey_DE(UINT iKey);
-// _S2 needed?
-// can go later
-void Try_GDK(GdkKeymap *keymap, UINT KeySym );
-void Inspect_Key_S(GdkKeymap *keymap );//needed?
-// _S2 TODO How to do mapping between Linux keycodes and keyman SC
-const int Lin_KM__map(int i, v_dw_3D &All_Vector);
-KMX_DWORD  mapChar_To_VK(KMX_DWORD chr );
-KMX_DWORD  mapVK_To_char(KMX_DWORD SC );
-
 
 # endif /*KEYMAP_H*/

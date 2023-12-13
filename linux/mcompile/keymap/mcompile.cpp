@@ -227,10 +227,10 @@ void KMX_TranslateKeyboard(LPKMX_KEYBOARD kbd, KMX_WORD vk, KMX_UINT shift, KMX_
 void KMX_ReportUnconvertedKeyRule(LPKMX_KEY key) {
   if(key->ShiftFlags == 0) {
     //KMX_LogError(L"Did not find a match for mnemonic rule on line %d, + '%c' > ...", key->Line, key->Key);
-    //wprintf(L" _S2 Did not find a match for mnemonic rule on line %d, + '%c' > ...\n", key->Line, key->Key);
+    wprintf(L" _S2 Did not find a match for mnemonic rule on line %d, + '%c' > ...\n", key->Line, key->Key);
   } else if(key->ShiftFlags & VIRTUALCHARKEY) {
     //KMX_LogError(L"Did not find a match for mnemonic virtual character key rule on line %d, + [%x '%c'] > ...", key->Line, key->ShiftFlags, key->Key);
-    //wprintf(L"_S2 Did not find a match for mnemonic virtual character key rule on line %d, + [%x '%c'] > ...\n", key->Line, key->ShiftFlags, key->Key);
+    wprintf(L"_S2 Did not find a match for mnemonic virtual character key rule on line %d, + [%x '%c'] > ...\n", key->Line, key->ShiftFlags, key->Key);
   }
 }
 
@@ -485,9 +485,8 @@ KMX_BOOL KMX_DoConvert(LPKMX_KEYBOARD kbd, PKMX_WCHAR kbid, KMX_BOOL bDeadkeyCon
       KMX_WCHAR ch = KMX_get_CharUnderlying_according_to_keycode_and_Shiftstate_VEC(All_Vector,vkUnderlying, VKShiftState[j], &DeadKey);*/
 
       UINT scUnderlying =  KMX_get_SCUnderlying_From_VKUS(KMX_VKMap[i]);
-      KMX_WCHAR ch = KMX_get_CharUnderlying_From_SCUnderlying_GDK(keymap, VKShiftState[j], scUnderlying, &DeadKey); // _S2 ch is of Other KB
+      KMX_WCHAR ch = KMX_get_CharUnderlying_From_SCUnderlying_GDK(keymap, VKShiftState[j], scUnderlying, &DeadKey);
 
-      //wprintf(L"  DoConvert-read i:  %i \t(KMX_VKMap): %i (%c)  \t--->  vkUnderlying: %i (%c)    \tshiftstate[%i]: ( %i )   \t---- >  ch: %i (%c)  \t%ls  \t%ls\n" , i,(int) KMX_VKMap[i],(int)KMX_VKMap[i],  vkUnderlying,vkUnderlying, j, VKShiftState[j] ,  ch ,ch ,  ((int) vkUnderlying != (int) KMX_VKMap[i] ) ? L" *** ": L"", ERROR);
       //LogError("--- VK_%d -> VK_%d [%c] dk=%d", VKMap[i], vkUnderlying, ch == 0 ? 32 : ch, DeadKey);
 
       if(bDeadkeyConversion) {   // I4552
@@ -496,7 +495,6 @@ KMX_BOOL KMX_DoConvert(LPKMX_KEYBOARD kbd, PKMX_WCHAR kbid, KMX_BOOL bDeadkeyCon
         }
       }
 
-      //wprintf(L"     switch with  ch: %i (%c)......\n" ,  ch,ch);
       switch(ch) {
         case 0x0000: break;
         case 0xFFFF: KMX_ConvertDeadkey(kbd, KMX_VKMap[i], VKShiftState[j], DeadKey, All_Vector, keymap); break;
@@ -557,47 +555,13 @@ KMX_WCHAR KMX_get_KVUS_From_KVUnderlying_VEC(v_dw_3D All_Vector, KMX_DWORD VK_OT
   return VK_OTHER;
 }
 
-// _S2 sure KMX_WCHART ??? not KMX_WCHAR ??  not usable!!
-KMX_WCHART KMX_get_VKUnderlying_From_VKUS_GDK(GdkKeymap* keymap,KMX_DWORD VK_US) {
-
-  /*KMX_WORD VK_DE = ( KMX_WORD ) map_Ikey_DE(VK_US);
-  if(VK_DE!= VK_US)
-    return VK_DE;
-  else
-    return VK_US;*/
-}// _S2 sure KMX_WCHART ??? not KMX_WCHAR ??
 
 KMX_WCHAR KMX_SCKUnderlyingLayoutToVKUS_GDK2(GdkKeymap* keymap,KMX_DWORD SC_Other) {
 
     return SC_Other;
 }
 
-/* takes KV of Other keyboard and returns character of Other keyboard with shiftstate VKShiftState[j]
-KMX_DWORD KMX_get_CharUnderlying_according_to_keycode_and_Shiftstate_VEC(v_dw_3D &All_Vector,KMX_DWORD KVUnderlying, KMX_UINT VKShiftState, KMX_WCHAR* DeadKey){
-
-  KMX_UINT VKShiftState_lin;
-
-  // 0000 0000 
-  if (VKShiftState == 0 )      VKShiftState_lin = 0;
-  // 0001 0000 
-  if (VKShiftState == 16)      VKShiftState_lin = 1;
-  // 0000 1001 
-  if (VKShiftState == 9 )      VKShiftState_lin = 2;
-  // 0001 1001 
-  if (VKShiftState == 25)      VKShiftState_lin = 3;
-
-  // loop and find KVUnderlying in Other; then return char with correct shiftstate
-  for( int i=0; i< (int)All_Vector[1].size();i++) {
-      KMX_DWORD CharOther = All_Vector[1][i][2];
-      if( KVUnderlying == CharOther ) {
-        return All_Vector[1][i][VKShiftState_lin+1];    // [VKShiftState_lin+1] because we have the name of the key in All_Vector[1][i][0], so we need to get the one after this
-      }
-  }
-  return KVUnderlying;
-}
-*/
-
-KMX_DWORD KMX_get_KeyCodeUnderlying_From_KeycodeUS_VEC(v_dw_3D &All_Vector, KMX_DWORD KC_US, int Shiftstate) {
+KMX_DWORD KMX_get_SCUnderlying_From_SCUS_VEC(v_dw_3D &All_Vector, KMX_DWORD KC_US, int Shiftstate) {
 
   KMX_DWORD Character = 0;
   // find character with that scancode

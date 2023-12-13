@@ -1,7 +1,6 @@
 #include "keymap.h"
 #include "deadkey.h"
 
-// _S2 do I need nameresult somewhere???
 v_dw_1D createLine(std::wstring  first, std::wstring second,  KMX_DWORD number,  std::wstring nameresult) {
 	v_dw_1D line;
 	line.push_back(convertNamesToIntegerValue(first));
@@ -55,7 +54,7 @@ KMX_DWORD KMX_changeKeynameToCapital(KMX_DWORD KVal, KMX_DWORD &shift, GdkKeymap
 	return Name;
 }	
 
-// _S2 QUESTION is this the right place to get dk from? if not wher are they stored?
+// _S2 DESIGN NEEDED is this the right place to get dk from? if not wher are they stored?
 KMX_DWORD create_DKTable(v_dw_2D & dk_ComposeTable){
 
   // values taken from: https://help.ubuntu.com/community/GtkDeadKeyTable#Latin

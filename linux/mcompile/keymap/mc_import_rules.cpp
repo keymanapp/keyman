@@ -27,8 +27,8 @@
 #include "mc_kmxfile.h"
 #include "keymap.h"
 
-int KMX_ToUnicodeEx(guint ScanCode, const BYTE *lpKeyState, PKMX_WCHAR pwszBuff, int cchBuff,  int shift_state, int caps, GdkKeymap *keymap =NULL);
-
+int KMX_ToUnicodeEx(guint ScanCode, const BYTE *lpKeyState, PKMX_WCHAR pwszBuff,  int shift_state, int caps, GdkKeymap *keymap =NULL);
+int KMX_ToUnicodeEx(guint ScanCode, const BYTE *lpKeyState, PWCHAR pwszBuff, int shift_state, int caps,GdkKeymap *keymap);
 const int KMX_ShiftStateMap[] = {
   ISVIRTUALKEY,
   ISVIRTUALKEY | K_SHIFTFLAG,
@@ -110,56 +110,15 @@ private:
   std::wstring m_rgss[10][2];
 
 public:
-// _S2 can be deleted later
- /* KMX_VirtualKey(KMX_HKL hkl, UINT KMX_virtualKey) {
-    this->m_sc = MapVirtualKeyEx(virtualKey, 0, hkl);
-    this->m_hkl = hkl;
-    this->m_vk = KMX_virtualKey;
-    memset(this->m_rgfDeadKey,0,sizeof(this->m_rgfDeadKey));
-  }*/
-  // _S2 can be deleted later
-  /*KMX_VirtualKey(UINT scanCode, KMX_HKL hkl) {
-    //    this->m_vk = MapVirtualKeyEx(scanCode, 1, hkl);
-    this->m_hkl = hkl;
-    this->m_sc = scanCode;
-  }*/
-
-
-  /*KMX_VirtualKey(KMX_HKL hkl, UINT KMX_virtualKey, v_dw_3D All_Vector) {
-    this->m_sc = MapVirtualKeyEx(virtualKey, 0, hkl); // second para =0: MAPVK_VK_TO_VSC=1
-                                                        //the uCode parameter is a virtual-key code and is
-                                                        //translated into a scan code. If it is a virtual-key
-                                                        //code that does not distinguish between left- and
-                                                        //right-hand keys, the left-hand scan code is returned.
-                                                        //If there is no translation, the function returns 0.
-    this->m_sc = get_SC_From_VirtualKey_Other(KMX_virtualKey, All_Vector);
-    this->m_hkl = hkl;
-    this->m_vk = KMX_virtualKey;
-    memset(this->m_rgfDeadKey,0,sizeof(this->m_rgfDeadKey));
-  }*/
-
-  /*KMX_VirtualKey(UINT scanCode, KMX_HKL hkl, v_dw_3D All_Vector) {
-    // _S2 this->m_vk = MapVirtualKeyEx(scanCode, 1, hkl);  // second para= 1: MAPVK_VSC_TO_VK =1
-    //                                                  The first parameter is a scan code and is
-    //                                                  translated into a virtual-key code that does not
-    //                                                  distinguish between left- and right-hand keys.
-    //                                                  If there is no translation, the function returns 0.
-    //                                                  SC -> VK
-    this->m_vk = get_VirtualKey_Other_From_SC(scanCode, All_Vector);
-    this->m_hkl = hkl;
-    this->m_sc = scanCode;
-  }*/
 
   KMX_VirtualKey(UINT scanCode, KMX_HKL hkl, v_dw_3D All_Vector, GdkKeymap **keymap) {
     this->m_vk = KMX_get_VKUS_From_KeyCodeUnderlying_GDK(*keymap, scanCode);
-    // _s2  correct?  this->m_vk = get_VirtualKey_US( scanCode)
     this->m_hkl = hkl;
     this->m_sc = scanCode;
   }
 
   KMX_VirtualKey(KMX_HKL hkl,UINT scanCode,  v_dw_3D All_Vector, GdkKeymap **keymap) {
     this->m_vk = KMX_get_VKUS_From_KeyCodeUnderlying_GDK(*keymap, scanCode);
-    // _s2  correct?  this->m_vk = get_VirtualKey_US( scanCode)
     this->m_hkl = hkl;
     this->m_sc = scanCode;
     // _S2 ?? memset(this->m_rgfDeadKey,0,sizeof(this->m_rgfDeadKey));
@@ -211,7 +170,6 @@ public:
         (stShift.compare(stShiftCaps) != 0)));                      // stShift!= stShiftCaps
   }
 
-// _S2 is character ()
   bool KMX_IsCapsEqualToShift() {
     std::wstring stBase = this->KMX_GetShiftState(Base, false);     // 0,0  a 4 ß
     std::wstring stShift = this->KMX_GetShiftState(Shft, false);    // 1,0  A $ ?
@@ -320,7 +278,6 @@ int i2 = this->KMX_IsSGCAPS() ? 2 : 0;
 int i3 = this->KMX_IsAltGrCapsEqualToAltGrShift() ? 4 : 0;
 int i4 = this->KMX_IsXxxxGrCapsEqualToXxxxShift() ? 8 : 0;
 
-    // _S2 TODO capslock is not calculated corectly for linux. therefore key->ShiftFlags will be wrong for numbers, special characters
     int capslock =
         (this->KMX_IsCapsEqualToShift() ? 1 : 0) |
         (this->KMX_IsSGCAPS() ? 2 : 0) |
@@ -329,6 +286,7 @@ int i4 = this->KMX_IsXxxxGrCapsEqualToXxxxShift() ? 8 : 0;
 
     // _S2 DESIGN NEEDED on how to replace capslock
     capslock=1;   // _S2
+    // _S2 TODO capslock is not calculated corectly for linux. therefore key->ShiftFlags will be wrong for numbers, special characters
 
     for (int ss = 0; ss <= MaxShiftState; ss++) {
       if (ss == Menu || ss == ShftMenu) {
@@ -349,9 +307,8 @@ int i4 = this->KMX_IsXxxxGrCapsEqualToXxxxShift() ? 8 : 0;
           key->dpContext = new KMX_WCHAR[1];
           *key->dpContext = 0;
           key->ShiftFlags = this->KMX_GetShiftStateValue(capslock, caps, (ShiftState) ss);
-            // _S2 this fun returns the shifted Char it goes wrog for numbers, special here!!
           //key->Key = KMX_get_KVUS_From_KVUnderlying_VEC(All_Vector,this->VK());
-          key->Key = KMX_get_VKUnderlying_From_VKUS_GDK(keymap,this->VK());
+          // key->Key = KMX_get_VKUnderlying_From_VKUS_GDK(keymap,this->VK());
           key->Line = 0;
 
           if(bDeadkeyConversion) {   // I4552
@@ -379,7 +336,7 @@ int i4 = this->KMX_IsXxxxGrCapsEqualToXxxxShift() ? 8 : 0;
             // key->dpOutput stores character Underlying
 
             // _S2 confusing: since we sort rgkey by VKUS: is SC_Underlying the right SC or SC_Underlying_gdk?? it will be clear when we look at kmx/kmn-file
-            //KMX_DWORD SC_Underlying = KMX_get_KeyCodeUnderlying_From_KeycodeUS_VEC(All_Vector,this->SC(), ss);
+            //KMX_DWORD SC_Underlying = KMX_get_SCUnderlying_From_SCUS_VEC(All_Vector,this->SC(), ss);
 
             KMX_DWORD SC_Underlying_gdk = KMX_get_KeyCodeUnderlying_From_KeycodeUS_GDK(keymap, All_Vector,this->SC(), (ShiftState) ss,  caps);
             key->Key = KMX_get_VKUS_From_KeyCodeUnderlying_GDK( keymap, SC_Underlying_gdk);
@@ -390,7 +347,8 @@ int i4 = this->KMX_IsXxxxGrCapsEqualToXxxxShift() ? 8 : 0;
             p = key->dpOutput = new KMX_WCHAR[st.size() + 1];
             for(size_t ich = 0; ich < st.size(); ich++) {
               q=p;
-              *p++ = st[ich];}
+              *p++ = st[ich];
+            }
             *p = 0;
             key++;
           }
@@ -550,8 +508,7 @@ int KMX_GetMaxDeadkeyIndex(KMX_WCHAR *p) {
   return n;
 }
 
-// _S2 cchBuff remove?
-int KMX_ToUnicodeEx( guint ScanCode, const BYTE *lpKeyStccate, PWCHAR pwszBuff, int cchBuff,  int shift_state, int caps,GdkKeymap *keymap) {
+int KMX_ToUnicodeEx( guint ScanCode, const BYTE *lpKeyStccate, PWCHAR pwszBuff,  int shift_state, int caps,GdkKeymap *keymap) {
 
   KMX_DWORD kvl= KMX_get_KeyvalsUnderlying_From_KeyCodeUnderlying_GDK(keymap, ScanCode, shift_state);
 
@@ -564,8 +521,7 @@ int KMX_ToUnicodeEx( guint ScanCode, const BYTE *lpKeyStccate, PWCHAR pwszBuff, 
     return  1;
 }
 
-// _S2 cchBuff remove?
-int KMX_ToUnicodeEx(guint ScanCode, const BYTE *lpKeyState, PKMX_WCHAR pwszBuff, int cchBuff,  int shift_state, int caps,GdkKeymap *keymap) {
+int KMX_ToUnicodeEx(guint ScanCode, const BYTE *lpKeyState, PKMX_WCHAR pwszBuff, int shift_state, int caps,GdkKeymap *keymap) {
 
   KMX_DWORD kvl= KMX_get_KeyvalsUnderlying_From_KeyCodeUnderlying_GDK(keymap, ScanCode, shift_state);
   if((kvl >=  deadkey_min) && (kvl <=  deadkey_max))
@@ -579,10 +535,6 @@ int KMX_ToUnicodeEx(guint ScanCode, const BYTE *lpKeyState, PKMX_WCHAR pwszBuff,
 bool KMX_ImportRules(KMX_WCHAR *kbid, LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, GdkKeymap **keymap, std::vector<KMX_DeadkeyMapping> *FDeadkeys, KMX_BOOL bDeadkeyConversion) {   // I4353   // I4552
   KMX_Loader loader;
   const size_t BUF_sz= 256;
-//Inspect_kp(kp);
-  // _S2 do I need that for Linux??
-  KMX_WCHAR inputHKL[12];
-  u16sprintf(inputHKL,BUF_sz ,L"%08.8x", (unsigned int) u16tol(kbid, NULL, 16));   // _S2 wsprintf(inputHKL, L"%08.8x", (unsigned int) wcstol(kbid, NULL, 16));
 
   KMX_HKL hkl = NULL;               //_S2 added: but can I do this?? hkl is not needed in Linux??
 
@@ -592,18 +544,16 @@ bool KMX_ImportRules(KMX_WCHAR *kbid, LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, Gd
 
   rgKey.resize(256);
 
-  // _S2 scroll through OTHER
   // Scroll through the Scan Code (SC) values and get the valid Virtual Key (VK)
   // values in it. Then, store the SC in each valid VK so it can act as both a
   // flag that the VK is valid, and it can store the SC value.
-    // _S2 this does not find exactly the same keys as the windows version does(windows finds more)
 
   for(UINT sc = 0x01; sc <= 0x7f; sc++) {
-    // fills m_vk with the VK of the US keyboard which is not right!!
-    // ( mcompile win uses MapVirtualKeyEx() to fill m_vk with the VK of the Other keyboard)
+    // fills m_vk with the VK of the US keyboard
+    // ( mcompile win uses MapVirtualKeyEx() to fill m_vk with the VK of the Underlying keyboard)
     // Linux cant get a VK for the US Keyboard using USVirtualKeyToScanCode/ScanCodeToUSVirtualKey
-    // Linux cannot get a VK for Other Keyboard
-    // it could return SC if that helps
+    // Linux cannot get a VK for the underling Keyboard
+    // this "connection" is possible only while using All_Vector
     KMX_VirtualKey *key = new KMX_VirtualKey(sc, hkl, All_Vector, keymap);
 
    if((key->VK() != 0) ) {
@@ -671,7 +621,7 @@ bool KMX_ImportRules(KMX_WCHAR *kbid, LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, Gd
             // _S2 is THIS correct ???  Do we need  lpKeyState or is it just used in ToUnicodeEx??
             loader.KMX_ClearKeyboardBuffer();
             loader.KMX_FillKeyState(lpKeyState, ss, (caps == 0));
-            int rc = KMX_ToUnicodeEx(SC_US, lpKeyState, sbBuffer, sizeof(sbBuffer)/sizeof(WCHAR), ss, caps, *keymap) ;
+            int rc = KMX_ToUnicodeEx(SC_US, lpKeyState, sbBuffer, ss, caps, *keymap) ;
 
             if(rc > 0) {
               if(*sbBuffer == 0) {
@@ -804,19 +754,15 @@ bool KMX_ImportRules(KMX_WCHAR *kbid, LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, Gd
   gp->cxKeyArray = nKeys;
   gp->dpKeyArray = new KMX_KEY[gp->cxKeyArray];
   nKeys = 0;
+
+
   //
   // Fill in the new rules
   //
-
-int STOP=0;  // _S2 LayoutRow: VKToUnderlying should work OK; GetSSValue not checked yet, but this is definitely different
   for (UINT iKey = 0; iKey < rgKey.size(); iKey++) {
     if ((rgKey[iKey] != NULL) && rgKey[iKey]->KMX_IsKeymanUsedKey() && (!rgKey[iKey]->KMX_IsEmpty())) {
-      //wprintf(L"********************************* I use Key Nr %i\n",iKey);
-      // for each item,
-      //wprintf(L" \n iKey = %i, nKeys %i + Delta:\t%i", iKey,nKeys, rgKey[iKey]->KMX_GetKeyCount(loader.MaxShiftState()));
       if(rgKey[iKey]->KMX_LayoutRow(loader.MaxShiftState(), &gp->dpKeyArray[nKeys], &alDead, nDeadkey, bDeadkeyConversion, All_Vector,*keymap)) {   // I4552
         nKeys+=rgKey[iKey]->KMX_GetKeyCount(loader.MaxShiftState());
-        //Inspect_key(&gp->dpKeyArray[nKeys]);
       }
     }
   }
@@ -942,7 +888,7 @@ int STOP=0;  // _S2 LayoutRow: VKToUnderlying should work OK; GetSSValue not che
 return true;
 }
 
-// _S2 where to put this??
+// _S2 where is nthe best place to put this??
 const int CODE__SIZE[] = {
    -1,   // undefined                0x00
     1,   // CODE_ANY                 0x01
@@ -971,7 +917,7 @@ const int CODE__SIZE[] = {
     2    // CODE_SETSYSTEMSTORE      0x18
 };
 
-// _S2 where to put this??
+// _S2 where is nthe best place to put this??
 PKMX_WCHAR KMX_incxstr(PKMX_WCHAR p) {
 
   if (*p == 0)

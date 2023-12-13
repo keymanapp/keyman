@@ -158,7 +158,7 @@ bool  createCompleteRow_US(v_str_1D &complete_List, FILE* fp, const char* text, 
 int replace_KeyName_with_Keycode(std::string  in) {
   int out = returnIfCharInvalid;
 
-// _S2 these are the Scancode-Values we use in Keyman ( =  the windows scancodes+8 )
+  // _S2 these are the Scancode-Values we use in Keyman ( =  the windows scancodes+8 )
   //     NAME IN SYMBOLS-FILE      KEYCODE (LIN STYLE)      (WIN STYLE)       VK_US      VK_DE
                                              /*on US keyb;*/
   if      ( in == "key<TLDE>")    out = 49;               /*                VK_  */  // TOASK correct ???
@@ -356,20 +356,16 @@ KMX_DWORD KMX_get_KeyvalsUnderlying_From_KeyCodeUnderlying_GDK(GdkKeymap *keymap
 
   out =(KMX_DWORD)  keyvals[shift_state_pos];
 
-  // _S2 if out of range of what ( ascii??) return 0 or other value ?
-  //if (out > 255) {
   if (  (out >=  deadkey_min) && (out <=  deadkey_max) )   {
     wprintf(L"out of range: found deadkey value out( %i) for keycode = %i /shift_state_pos %i      (49= TLDE 21= VK_EQUALS on US keyboard) \n", out,keycode,shift_state_pos);
-    //out = 0;
   }
-
+  // _S2 g_free used everywhere?
   g_free(keyvals);
   g_free(maps);
 
   return out;
 }
 
-// _S2 do we need that - it does the same as KMX_get_KeyCodeUnderlying_From_VKUS
 KMX_DWORD KMX_get_VKUS_From_KeyCodeUnderlying_GDK( GdkKeymap *keymap, KMX_DWORD keycode) {
 
   GdkModifierType consumed;
