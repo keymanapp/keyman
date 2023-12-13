@@ -260,7 +260,7 @@ Once the image is built, it may be used to build parts of Keyman.
 
 ### Customizing the builder
 
-You can use Docker [build args](https://docs.docker.com/build/guide/build-args/) to customize the image build. As an example, the following will build an image explicitly with Ubuntu 23.04 and Node.js 21
+You can use Docker [build args](https://docs.docker.com/build/guide/build-args/) to customize the image build. As an example, the following will build an image explicitly with Ubuntu 23.04 and Node.js 20
 
 ```shell
 cd linux
