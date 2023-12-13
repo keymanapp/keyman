@@ -42,7 +42,7 @@ execCodeSign() {
   local ret_code=0
   local count=0
   while (( count <  5 )); do
-    eval codesign "$@" || ret_code=$?
+    codesign "$@" || ret_code=$?
     if [ $ret_code == 0 ]; then
       return 0
     fi
