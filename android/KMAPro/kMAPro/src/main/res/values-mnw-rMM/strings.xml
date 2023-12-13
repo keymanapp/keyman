@@ -26,7 +26,6 @@
   <!-- Context: Textfield prompt (&#8230; is the ellipsis character "...") -->
   <string name="textview_hint" comment="Prompt to start typing">စတက်လိက်ဒၞာဲဏံ&#8230;</string>
   <!-- Context: Splash screen (version/copyright info currently disabled -->
-  <string name="splash_blank" translatable="false" comment="Blank text while version info on splash page is disabled"></string>
   <!-- Context: Splash screen (version/copyright info currently disabled -->
   <!-- Context: Text Size dialog -->
   <string name="text_size" comment="Current text size (number)">အဝဲမလိက်: %1$d</string>

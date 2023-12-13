@@ -43,7 +43,8 @@ inline bool uassert_success(const char *file, int line, const char *function, UE
   }
 }
 
-#define UASSERT_SUCCESS(status) assert(U_SUCCESS(status)), uassert_success(__FILE__, __LINE__, __FUNCTION__, status)
+/** the first assert is for debug builds, the second triggers the debuglog and has the return value. */
+#define UASSERT_SUCCESS(status) (assert(U_SUCCESS(status)), uassert_success(__FILE__, __LINE__, __FUNCTION__, status))
 
 using km::core::kmx::SimpleUSet;
 

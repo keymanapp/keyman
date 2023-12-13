@@ -72,5 +72,7 @@ initialization
   RegisterProjectFileType('.js', TOpenableProjectFile);
   RegisterProjectFileType('.kpj', TOpenableProjectFile);
   RegisterProjectFileType('.user', TOpenableProjectFile);
+  RegisterProjectFileType('.keyman-touch-layout', TOpenableProjectFile);
+  RegisterProjectFileType('.keyboard_info', TOpenableProjectFile);
 end.
 

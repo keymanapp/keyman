@@ -69,3 +69,6 @@
 
 /* message displayed to alert user to need grant accessibility permission */
 "privacy-alert-text" = "ဂွံကၠောန်ကမၠောန်ခိုဟ်ဟ်မာန်ှဂှ် ကဳမာန်ဒးသုၚ်စောဲ နဲကဲဆက်စၠောံအကြာစက်ဂမၠိုၚ်ရ။\n\nအာပ္ဍဲ တၚ်ပလေဝ်သၞောတ်စက်၊ ပရေၚ်ဂီုဂၠီု ကေုာံ ပရေၚ်ဂီုဂၠီုပူဂဵု တုဲ ကဵုအခေါၚ်ညိ။\nကလေၚ်ပံက်ကၟာတ်စက်ညိ။";
+
+/* Text of menu item in Input Menu when no Keyboards are configured -- include parentheses  */
+"no-keyboard-configured-menu-placeholder" = "(ကဳဗုဒ် လဵုမွဲဟွံမွဲ)";

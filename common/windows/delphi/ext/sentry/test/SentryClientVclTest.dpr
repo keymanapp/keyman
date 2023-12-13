@@ -18,7 +18,7 @@ uses
 {$R *.res}
 
 begin
-  TKeymanSentryClient.Start(TSentryClientVcl, kscpDesktop, '');
+  TKeymanSentryClient.Start(TSentryClientVcl, kscpDesktop, '', [kscfCaptureExceptions, kscfShowUI, kscfTerminate]);
   try
     Application.Initialize;
     Application.MainFormOnTaskbar := True;

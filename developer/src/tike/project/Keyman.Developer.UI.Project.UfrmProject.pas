@@ -94,6 +94,7 @@ type
     procedure SetGlobalProject;
     procedure StartClose; override;
     procedure CompileAll;
+    procedure RefreshOptions; override;
   end;
 
 implementation
@@ -200,6 +201,12 @@ begin
   else
     cef.Navigate(modWebHttpServer.GetAppURL('project/welcome'));
   RefreshCaption;
+end;
+
+procedure TfrmProject.RefreshOptions;
+begin
+  inherited;
+  ProjectRefresh(nil);
 end;
 
 procedure TfrmProject.ProjectRefresh(Sender: TObject);
@@ -352,7 +359,7 @@ begin
   else if Command = 'editfile' then // MRU
   begin
     if SelectedMRUFileName <> '' then
-      modActionsMain.OpenProject(SelectedMRUFileName);
+      frmKeymanDeveloper.OpenProject(SelectedMRUFileName);
   end
   else if Command = 'removefrommru' then
   begin

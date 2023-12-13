@@ -41,6 +41,11 @@ class ProjectBuilder {
       return false;
     }
 
+    // Give a hint if the project is v1.0
+    if(this.project.options.version != '2.0') {
+      this.callbacks.reportMessage(InfrastructureMessages.Hint_ProjectIsVersion10());
+    }
+
     // Go through the various file types and build them
     for(let builder of buildActivities) {
       if(builder.sourceExtension == KeymanFileTypes.Source.Project) {
