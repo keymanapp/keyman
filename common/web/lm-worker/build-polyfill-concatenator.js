@@ -81,8 +81,6 @@ let sourceFileSet = [
   loadPolyfill('src/polyfills/array.fill.js', 'src/polyfills/array.fill.js'),
   // Needed for Android / Chromium browser pre-45.
   loadPolyfill('src/polyfills/array.findIndex.js', 'src/polyfills/array.findIndex.js'),
-  // Needed for Android / Chromium browser pre-45.
-  loadPolyfill('src/polyfills/array.from.js', 'src/polyfills/array.from.js'),
   // Needed for Android / Chromium browser pre-47.
   loadPolyfill('src/polyfills/array.includes.js', 'src/polyfills/array.includes.js'),
   // For Object.values, for iteration over object-based associate arrays.
