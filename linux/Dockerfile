@@ -39,12 +39,13 @@ RUN (yes | mk-build-deps --install /tmp/control) || true && \
 ARG NODE_MAJOR=18
 RUN apt-get install -q -y ca-certificates curl gnupg && curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg && echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_"${NODE_MAJOR}".x nodistro main" | tee /etc/apt/sources.list.d/nodesource.list && apt-get update && apt-get install nodejs -y
 
+ARG EMSCRIPTEN_VERSION=3.1.44
 # Install emscripten
 RUN cd /usr/share && \
   git clone https://github.com/emscripten-core/emsdk.git && \
   cd emsdk && \
-  ./emsdk install 3.1.44 && \
-  ./emsdk activate 3.1.44 && \
+  ./emsdk install ${EMSCRIPTEN_VERSION} && \
+  ./emsdk activate ${EMSCRIPTEN_VERSION} && \
   echo "#!/bin/bash" > /usr/bin/bashwrapper && \
   echo "export EMSCRIPTEN_BASE=/usr/share/emsdk/upstream/emscripten" >> /usr/bin/bashwrapper
 
