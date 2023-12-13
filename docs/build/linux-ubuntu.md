@@ -215,7 +215,7 @@ To build the docker image:
 
 ```shell
 cd linux
-docker pull ubuntu:latest
+docker pull ubuntu:latest # (to make sure you have an up-to-date image)
 docker build . -t keymanapp/keyman-linux-builder:latest
 ```
 
@@ -262,3 +262,13 @@ Once the image is built, it may be used to build parts of Keyman.
     keymanapp/keyman-linux-builder:latest \
     android/build.sh --debug
   ```
+
+### Customizing the builder
+
+You can use Docker [build args](https://docs.docker.com/build/guide/build-args/) to customize the image build. As an example, the following will build an image explicitly with Ubuntu 23.04 and Node.js 21
+
+```shell
+cd linux
+docker pull ubuntu:23.04 # (to make sure you have an up-to-date image)
+docker build . -t keymanapp/keyman-linux-builder:u23.04-node20 --build-arg OS_VERSION=23.04 --build-arg NODE_MAJOR=20
+````
