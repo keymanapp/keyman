@@ -9,6 +9,11 @@ import ListItem = KMXPlus.ListItem;
 import KeysFlicks = KMXPlus.KeysFlicks;
 import { allUsedKeyIdsInFlick, allUsedKeyIdsInKey, allUsedKeyIdsInLayers, calculateUniqueKeys, hashFlicks, hashKeys, translateLayerAttrToModifier, validModifier } from '../util/util.js';
 import { MarkerTracker, MarkerUse } from './marker-tracker.js';
+import { KeysKeys } from '../../../../../common/web/types/src/kmx/kmx-plus.js';
+
+/** reserved name for the special gap key. space is not allowed in key ids. */
+const reserved_gap = "gap (reserved)";
+
 
 export class KeysCompiler extends SectionCompiler {
   static validateMarkers(
@@ -193,7 +198,46 @@ export class KeysCompiler extends SectionCompiler {
       }
     } // else: TODO-LDML do nothing if only touch layers
 
+    // Now load the reserved keys and slip them in here
+    const reservedKeys = this.getReservedKeys(sections);
+    for (const key of reservedKeys.values()) {
+      sect.keys.push(key);
+    }
+
     return sect;
+  }
+
+  /** list of reserved keys, for tests */
+  public static readonly reserved_keys = [ reserved_gap ];
+  /** count of reserved keys, for tests */
+  public static readonly reserved_count = KeysCompiler.reserved_keys.length;
+
+  /** load up all reserved keys */
+  getReservedKeys(sections: KMXPlus.DependencySections) : Map<String, KeysKeys> {
+    const r = new Map<String, KeysKeys>();
+
+    // set up some constants..
+    const no_string = sections.strs.allocString('');
+    const no_list = sections.list.allocList([], {}, sections);
+
+    // now add the reserved key(s).
+    r.set(reserved_gap, {
+      flags: constants.keys_key_flags_gap | constants.keys_key_flags_extend,
+      id: sections.strs.allocString(reserved_gap),
+      flicks: '',
+      longPress: no_list,
+      longPressDefault: no_string,
+      multiTap: no_list,
+      switch: no_string,
+      to: no_string,
+      width: 1.0,
+    });
+
+    if (r.size !== KeysCompiler.reserved_count) {
+      throw Error(`Internal Error: KeysCompiler.reserved_count=${KeysCompiler.reserved_count} != ${r.size} actual reserved keys.`);
+    }
+
+    return r;
   }
 
   static addUsedGestureKeys(layerKeyIds: string[], keyBag: Map<string, LDMLKeyboard.LKKey>, usedKeys: Set<string>) {
@@ -445,14 +489,37 @@ export class KeysCompiler extends SectionCompiler {
       for (let key of keys) {
         x++;
 
+        const vkey = keymap[y][x];
         // TODO-LDML: we already validated that the key exists, above.
         // So here we only need the ID?
         // let keydef = this.keyboard3.keys?.key?.find(x => x.id == key);
 
         sect.kmap.push({
-          vkey: keymap[y][x],
-          mod: mod,
+          vkey,
+          mod,
           key, // key id, to be changed into key index at finalization
+        });
+      }
+      // push gaps to fill this row
+      while (++x < keymap[y].length) {
+        const vkey = keymap[y][x];
+        sect.kmap.push({
+          vkey,
+          mod,
+          key: reserved_gap,
+        });
+      }
+    }
+    // push rows to fill the layout
+    while (++y < keymap.length) {
+      let x = -1;
+      // push gaps to fill this row
+      while (++x < keymap[y].length) {
+        const vkey = keymap[y][x];
+        sect.kmap.push({
+          vkey,
+          mod,
+          key: reserved_gap,
         });
       }
     }
