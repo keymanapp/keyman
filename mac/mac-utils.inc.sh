@@ -41,8 +41,13 @@ execCodeSign() {
   # Allow the signing to fail up to 5 times (network transient error on timestamping)
   local ret_code=0
   local count=0
+  local method="$1"
+  shift
+  if [[ "$method" == direct ]]; then
+    method=
+  fi
   while (( count <  5 )); do
-    codesign "$@" || ret_code=$?
+    $method codesign "$@" || ret_code=$?
     if [ $ret_code == 0 ]; then
       return 0
     fi
