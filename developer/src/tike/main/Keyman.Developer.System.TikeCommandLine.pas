@@ -38,31 +38,17 @@ uses
   Vcl.Dialogs,
   Winapi.Windows,
 
-  ErrorControlledRegistry,
   Keyman.Developer.System.LaunchProjects,
-  RegistryKeys,
+  KeymanDeveloperOptions,
   utilexecute;
 
 { TTikeCommandLine }
 
 constructor TTikeCommandLine.Create;
-var
-  reg: TRegistryErrorControlled;
 begin
   inherited Create;
 
-  FStartupProjectPath := '';
-
-  reg := TRegistryErrorControlled.Create;  // I2890
-  try
-    if reg.OpenKeyReadOnly(SRegKey_IDEOptions_CU) then
-    begin
-      if reg.ValueExists(SRegValue_ActiveProject) then
-        FStartupProjectPath := reg.ReadString(SRegValue_ActiveProject);
-    end;
-  finally
-    reg.Free;
-  end;
+  FStartupProjectPath := FKeymanDeveloperOptions.StartupProjectPath;
 
   if (FStartupProjectPath <> '') and not FileExists(FStartupProjectPath) then
   begin
