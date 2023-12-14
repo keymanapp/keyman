@@ -1,5 +1,17 @@
 # Keyman Version History
 
+## 17.0.230 alpha 2023-12-14
+
+* fix(core): ldml: fix bad usage of unique_ptr (#10252)
+* chore(linux): docker: fix Node.js install, make customizable (#10251)
+* fix(web): unit test for null-null keyboard switch event from #10245 (#10253)
+* fix(web): fixes android-webview emulation Web test page (#10238)
+* epic: new gesture engine (#7324)
+* fix(mac): improve code signing robustness (#10243)
+* chore(mac): use core actions struct (#10066)
+* chore(common): Add entries from 16.0.144 HISTORY.md (#10260)
+* chore(web): Remove dead code (#10231)
+
 ## 17.0.229 alpha 2023-12-13
 
 * chore(ios): FV certificate key (#10228)
