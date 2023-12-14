@@ -5,11 +5,11 @@ import { SectionCompiler } from "./section-compiler.js";
 
 import DependencySections = KMXPlus.DependencySections;
 import Keys = KMXPlus.Keys;
+import KeysKeys = KMXPlus.KeysKeys;
 import ListItem = KMXPlus.ListItem;
 import KeysFlicks = KMXPlus.KeysFlicks;
 import { allUsedKeyIdsInFlick, allUsedKeyIdsInKey, allUsedKeyIdsInLayers, calculateUniqueKeys, hashFlicks, hashKeys, translateLayerAttrToModifier, validModifier } from '../util/util.js';
 import { MarkerTracker, MarkerUse } from './marker-tracker.js';
-import { KeysKeys } from '../../../../../common/web/types/src/kmx/kmx-plus.js';
 
 /** reserved name for the special gap key. space is not allowed in key ids. */
 const reserved_gap = "gap (reserved)";
