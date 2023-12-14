@@ -1,6 +1,15 @@
 let x = $('#iframe')[0];
 let ta = $('#ta')[0];
 
+const TEST_KEYBOARD = {
+  KN: 'web_context_tests',
+  KI: 'Keyboard_web_context_tests',
+  KLC: 'en',
+  KL: 'English',
+  KF: 'web_context_tests.js',
+  KP: 'web_context_tests'
+};
+
 window.jsInterface = {
   getDeviceType: function() {
     return 'AndroidMobile'; // 'AndroidTablet'
@@ -43,22 +52,14 @@ window.jsInterface = {
   dispatchKey(code, eventModifiers) {
     console.log('dispatchKey', code, eventModifiers);
   },
+  initialKeyboard() {
+    return JSON.stringify(TEST_KEYBOARD);
+  }
 };
 
 x.onload = function() {
   x.contentWindow.setOskWidth("240");
   x.contentWindow.setOskHeight("280");
-  window.setTimeout(function() {
-    let reg = {
-      KN: 'web_context_tests',
-      KI: 'Keyboard_web_context_tests',
-      KLC: 'en',
-      KL: 'English',
-      KF: 'web_context_tests.js',
-      KP: 'web_context_tests'
-    };
-    x.contentWindow.setKeymanLanguage(reg);
-  }, 10);
 }
 x.src='host/keyboard.html';
 
