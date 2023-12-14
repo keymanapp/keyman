@@ -3,7 +3,7 @@ import { assert } from 'chai';
 import 'mocha';
 import { TestCompilerCallbacks } from '@keymanapp/developer-test-helpers';
 import { makePathToFixture } from './helpers/index.js';
-import { KeyboardInfoCompiler, KeyboardInfoCompilerResult } from '../src/index.js';
+import { KeyboardInfoCompiler, KeyboardInfoCompilerResult } from '../src/keyboard-info-compiler.js';
 
 const callbacks = new TestCompilerCallbacks();
 
