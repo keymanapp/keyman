@@ -1256,8 +1256,8 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
     paddingZone.updatePadding([-0.333 * this.currentLayer.rowHeight]);
 
     this.gestureParams.longpress.flickDist = 0.25 * this.currentLayer.rowHeight;
-    this.gestureParams.flick.startDist     = 0.1  * this.currentLayer.rowHeight;
-    this.gestureParams.flick.dirLockDist   = 0.25 * this.currentLayer.rowHeight;
+    this.gestureParams.flick.startDist     = 0.15 * this.currentLayer.rowHeight;
+    this.gestureParams.flick.dirLockDist   = 0.35 * this.currentLayer.rowHeight;
     this.gestureParams.flick.triggerDist   = 0.75 * this.currentLayer.rowHeight;
 
     // Needs the refreshed layout info to work correctly.

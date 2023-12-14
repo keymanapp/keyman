@@ -135,85 +135,8 @@ begin
 end;
 
 function TxmlLdmlProjectFileUI.TestKeymanWeb(FSilent: Boolean): Boolean;   // I4409
-(*var
-  FCompiledName: string;
-  editor: TfrmTikeEditor;
-  wizard: TfrmEditor;
-  i: TKeyboardFont;
-  j: TKeyboardFont;
-  Found: Boolean;
-
-  function IsStandardFont(const FontName: string): Boolean;   // I4448
-  const
-    StandardFontNames: array[0..9] of string = (
-      'Arial', 'Calibri', 'Consolas', 'Courier New', 'Lucida Console', 'Lucida Sans Unicode', 'Segoe UI', 'Tahoma', 'Times New Roman', 'Verdana'
-      );
-  begin
-    Result := AnsiIndexText(FontName, StandardFontNames) >= 0;
-  end;
-
-  procedure RegisterFont(const fontname: string);
-  var
-    strm: TMemoryStream;
-  begin
-    if (fontname <> '') and not IsStandardFont(fontname) then
-    begin
-      strm := TMemoryStream.Create;
-      try
-        if TFontLoadUtil.LoadFontData(fontname, strm) and
-            TServerDebugAPI.Running then
-          TServerDebugAPI.RegisterFont(strm, fontname);
-      finally
-        strm.Free;
-      end;
-    end;
-  end;
 begin
-  editor := frmKeymanDeveloper.FindEditorByFileName(ProjectFile.FileName);   // I4021
-  if not Assigned(editor) or not (editor is TfrmKeymanWizard) then
-    Exit(False);
-  wizard := editor as TfrmKeymanWizard;
-
-  if ProjectFile.Targets * KMWKeymanTargets = [] then
-    Exit(False);
-
-  FCompiledName := ProjectFile.JSTargetFilename;
-  if FCompiledName = '' then
-    Exit(False);
-
-  if not TestKeyboardState(FCompiledName, FSilent) then
-    Exit(False);
-
-  // We register all fonts that are used by the layout,
-  // but just once for each reference!
-  for i := kfontChar to kfontTouchLayoutDesktop do
-  begin
-    Found := False;
-    for j := kfontChar to TKeyboardFont(Ord(i)-1) do
-      if Wizard.FontInfo[j].Name = Wizard.FontInfo[i].Name then
-      begin
-        Found := True;
-        Break;
-      end;
-    if not Found then
-      RegisterFont(Wizard.FontInfo[i].Name);
-  end;
-
-  if TServerUI.VerifyServerRunning then
-  begin
-    TServerDebugAPI.RegisterKeyboard(
-      FCompiledName,
-      ProjectFile.FileVersion,
-      // We only need to specify the char + osk fonts here
-      // as the others are referenced in the touch layout definition directly
-      Wizard.FontInfo[kfontChar].Name,
-      Wizard.FontInfo[kfontOSK].Name
-    );
-
-    wizard.NotifyStartedWebDebug;   // I4021
-  end;
-*)
-begin
+  // TODO (18.0): when we have web support for ldml keyboards
   Result := True;
 end;
 

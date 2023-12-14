@@ -35,6 +35,7 @@ type
     procedure GroupFilenamesIntoProjects(const Filenames: TStringList);
     function LaunchAll(AProcesses: TTikeProcessList): Boolean;
     function Find(const ProjectFilename: string): TLaunchProject;
+    class function LaunchNewEmptyInstance: Boolean;
     property ReserveStartupProject: Boolean read FReserveStartupProject;
     property StartupProject: TLaunchProject read GetStartupProject;
   end;
@@ -178,6 +179,14 @@ begin
       end;
     end;
   end;
+end;
+
+class function TLaunchProjects.LaunchNewEmptyInstance: Boolean;
+var
+  cmdline: string;
+begin
+  cmdline := '"'+ParamStr(0)+'" --sub-process *';
+  Result := TUtilExecute.Execute(cmdline, GetCurrentDir, SW_SHOWNORMAL);
 end;
 
 end.

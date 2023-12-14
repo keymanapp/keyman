@@ -33,6 +33,7 @@ function ParseJSONValue(const Data: string; var Offset: Integer): TJSONObject;  
 function JSONDateToDateTime(const Value: string; var DateTime: TDateTime): Boolean;
 function DateTimeToJSONDate(ADateTime: TDateTime): string;
 function LoadJSONFromFile(const Filename: string; var Offset: Integer): TJSONObject;
+procedure SaveJSONToFile(const Filename: string; const JSON: TJSONObject);
 
 implementation
 
@@ -150,6 +151,25 @@ begin
     Result := ParseJSONValue(ss.DataString, offset);
   finally
     ss.Free;
+  end;
+end;
+
+procedure SaveJSONToFile(const Filename: string; const JSON: TJSONObject);
+var
+  s: TStringList;
+  ss: TStringStream;
+begin
+  s := TStringList.Create;
+  try
+    PrettyPrintJSON(JSON, s, 2);
+    ss := TStringStream.Create(s.Text, TEncoding.UTF8);
+    try
+      ss.SaveToFile(Filename);
+    finally
+      ss.Free;
+    end;
+  finally
+    s.Free;
   end;
 end;
 

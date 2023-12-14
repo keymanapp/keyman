@@ -12,6 +12,7 @@ uses
   uCEFApplication,
   uCEFTypes,
 
+  KeymanDeveloperOptions,
   Keyman.Developer.System.TikeCommandLine,
   Keyman.System.CEFManager,
   Keyman.System.KeymanSentryClient,
@@ -36,7 +37,7 @@ begin
   Application.Initialize;
   Application.Title := 'Keyman Developer';
 
-  TKeymanSentryClient.Start(TSentryClientVcl, kscpDeveloper, LOGGER_DEVELOPER_IDE_TIKE);
+  TKeymanSentryClient.Start(TSentryClientVcl, kscpDeveloper, LOGGER_DEVELOPER_IDE_TIKE, LoadKeymanDeveloperSentryFlags);
   try
     try
       RunWithExceptionsHandled;

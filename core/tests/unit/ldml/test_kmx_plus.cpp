@@ -85,61 +85,71 @@ int test_ldml_vkeys() {
   ADD_VKEY("K_E", K_ALTFLAG|RCTRLFLAG);
 
 #undef ADD_VKEY
+  vk.add(km::tests::get_vk("K_F"), 0, u""); // K_F as a 'gap' key
+
+  bool found = false;
   assert_equal(vk.lookup(km::tests::get_vk(
-    "K_A"), 0), u"K_A-0");
+    "K_F"), 0, found), u"");
+  assert_equal(found, true); // K_F found, but empty string (gap)
   assert_equal(vk.lookup(km::tests::get_vk(
-    "K_A"), LCTRLFLAG), u"K_A-LCTRLFLAG");
+    "K_ENTER"), 0, found), u"");
+  assert_equal(found, false); // K_ENTER not found, empty string
   assert_equal(vk.lookup(km::tests::get_vk(
-    "K_A"), RCTRLFLAG), u"K_A-RCTRLFLAG");
+    "K_A"), 0, found), u"K_A-0");
+  assert_equal(found, true); // expect
   assert_equal(vk.lookup(km::tests::get_vk(
-    "K_A"), LALTFLAG), u"K_A-LALTFLAG");
+    "K_A"), LCTRLFLAG, found), u"K_A-LCTRLFLAG");
   assert_equal(vk.lookup(km::tests::get_vk(
-    "K_A"), RALTFLAG), u"K_A-RALTFLAG");
+    "K_A"), RCTRLFLAG, found), u"K_A-RCTRLFLAG");
+  assert_equal(vk.lookup(km::tests::get_vk(
+    "K_A"), LALTFLAG, found), u"K_A-LALTFLAG");
+  assert_equal(vk.lookup(km::tests::get_vk(
+    "K_A"), RALTFLAG, found), u"K_A-RALTFLAG");
 
   // now try either-side keys :should get the same result with either or both
   assert_equal(vk.lookup(km::tests::get_vk(
-    "K_B"), LCTRLFLAG), u"K_B-K_CTRLFLAG");
+    "K_B"), LCTRLFLAG, found), u"K_B-K_CTRLFLAG");
   assert_equal(vk.lookup(km::tests::get_vk(
-    "K_B"), RCTRLFLAG), u"K_B-K_CTRLFLAG");
+    "K_B"), RCTRLFLAG, found), u"K_B-K_CTRLFLAG");
   assert_equal(vk.lookup(km::tests::get_vk(
-    "K_B"), LCTRLFLAG|RCTRLFLAG), u"K_B-K_CTRLFLAG");
+    "K_B"), LCTRLFLAG|RCTRLFLAG, found), u"K_B-K_CTRLFLAG");
 
   assert_equal(vk.lookup(km::tests::get_vk(
-    "K_B"), LALTFLAG), u"K_B-K_ALTFLAG");
+    "K_B"), LALTFLAG, found), u"K_B-K_ALTFLAG");
   assert_equal(vk.lookup(km::tests::get_vk(
-    "K_B"), RALTFLAG), u"K_B-K_ALTFLAG");
+    "K_B"), RALTFLAG, found), u"K_B-K_ALTFLAG");
   assert_equal(vk.lookup(km::tests::get_vk(
-    "K_B"), LALTFLAG|RALTFLAG), u"K_B-K_ALTFLAG");
+    "K_B"), LALTFLAG|RALTFLAG, found), u"K_B-K_ALTFLAG");
 
   // OOOkay now try BOTH side
   assert_equal(vk.lookup(km::tests::get_vk(
-    "K_C"), LCTRLFLAG|LALTFLAG), u"K_C-K_ALTFLAG|K_CTRLFLAG");
+    "K_C"), LCTRLFLAG|LALTFLAG, found), u"K_C-K_ALTFLAG|K_CTRLFLAG");
   assert_equal(vk.lookup(km::tests::get_vk(
-    "K_C"), LCTRLFLAG|RALTFLAG), u"K_C-K_ALTFLAG|K_CTRLFLAG");
+    "K_C"), LCTRLFLAG|RALTFLAG, found), u"K_C-K_ALTFLAG|K_CTRLFLAG");
   assert_equal(vk.lookup(km::tests::get_vk(
-    "K_C"), RCTRLFLAG|LALTFLAG), u"K_C-K_ALTFLAG|K_CTRLFLAG");
+    "K_C"), RCTRLFLAG|LALTFLAG, found), u"K_C-K_ALTFLAG|K_CTRLFLAG");
   assert_equal(vk.lookup(km::tests::get_vk(
-    "K_C"), RCTRLFLAG|RALTFLAG), u"K_C-K_ALTFLAG|K_CTRLFLAG");
+    "K_C"), RCTRLFLAG|RALTFLAG, found), u"K_C-K_ALTFLAG|K_CTRLFLAG");
 
   // OOOkay now try either alt
   assert_equal(vk.lookup(km::tests::get_vk(
-    "K_D"), LCTRLFLAG|LALTFLAG), u"K_D-LALTFLAG|K_CTRLFLAG");
+    "K_D"), LCTRLFLAG|LALTFLAG, found), u"K_D-LALTFLAG|K_CTRLFLAG");
   assert_equal(vk.lookup(km::tests::get_vk(
-    "K_D"), LCTRLFLAG|RALTFLAG), u"K_D-RALTFLAG|K_CTRLFLAG");
+    "K_D"), LCTRLFLAG|RALTFLAG, found), u"K_D-RALTFLAG|K_CTRLFLAG");
   assert_equal(vk.lookup(km::tests::get_vk(
-    "K_D"), RCTRLFLAG|LALTFLAG), u"K_D-LALTFLAG|K_CTRLFLAG");
+    "K_D"), RCTRLFLAG|LALTFLAG, found), u"K_D-LALTFLAG|K_CTRLFLAG");
   assert_equal(vk.lookup(km::tests::get_vk(
-    "K_D"), RCTRLFLAG|RALTFLAG), u"K_D-RALTFLAG|K_CTRLFLAG");
+    "K_D"), RCTRLFLAG|RALTFLAG, found), u"K_D-RALTFLAG|K_CTRLFLAG");
 
   // OOOkay now try either ctrl
   assert_equal(vk.lookup(km::tests::get_vk(
-    "K_E"), LCTRLFLAG|LALTFLAG), u"K_E-K_ALTFLAG|LCTRLFLAG");
+    "K_E"), LCTRLFLAG|LALTFLAG, found), u"K_E-K_ALTFLAG|LCTRLFLAG");
   assert_equal(vk.lookup(km::tests::get_vk(
-    "K_E"), LCTRLFLAG|RALTFLAG), u"K_E-K_ALTFLAG|LCTRLFLAG");
+    "K_E"), LCTRLFLAG|RALTFLAG, found), u"K_E-K_ALTFLAG|LCTRLFLAG");
   assert_equal(vk.lookup(km::tests::get_vk(
-    "K_E"), RCTRLFLAG|LALTFLAG), u"K_E-K_ALTFLAG|RCTRLFLAG");
+    "K_E"), RCTRLFLAG|LALTFLAG, found), u"K_E-K_ALTFLAG|RCTRLFLAG");
   assert_equal(vk.lookup(km::tests::get_vk(
-    "K_E"), RCTRLFLAG|RALTFLAG), u"K_E-K_ALTFLAG|RCTRLFLAG");
+    "K_E"), RCTRLFLAG|RALTFLAG, found), u"K_E-K_ALTFLAG|RCTRLFLAG");
 
   return EXIT_SUCCESS;
 }
