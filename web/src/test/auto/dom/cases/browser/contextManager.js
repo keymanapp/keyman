@@ -531,9 +531,9 @@ describe('app/browser:  ContextManager', function () {
         // Even though it's to effectively the same keyboard, we reload it (in case its stub
         // has been replaced)
         assert.isTrue(beforekeyboardchange.calledOnce);
-        assert.isTrue(keyboardchange.calledOnce);
+        // Changing from null-to-null should be a non change; see keyman/keymanweb#96.
+        assert.isFalse(keyboardchange.calledOnce);
         assert.isTrue(keyboardasyncload.notCalled);
-        assert.equal(keyboardchange.firstCall.args[0], null);
       });
 
       it('activate: without .activeTarget, null -> null (touch)', async () => {
