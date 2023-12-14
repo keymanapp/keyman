@@ -10,6 +10,7 @@ import { KmnCompilerMessages } from '@keymanapp/kmc-kmn';
 import { defaultCompilerOptions, CompilerOptions} from '@keymanapp/common-types';
 import { loadProject } from '../src/util/projectLoader.js';
 import { analyzeUnitTestEndpoints } from '../src/commands/analyze.js';
+import { BuildKeyboardInfo } from '../src/commands/buildClasses/BuildKeyboardInfo.js';
 
 describe('InfrastructureMessages', function () {
   it('should have a valid InfrastructureMessages object', function() {
@@ -91,6 +92,17 @@ describe('InfrastructureMessages', function () {
     await analyzeUnitTestEndpoints.analyzeOskCharUse(ncb, [], options);
     assert.isTrue(ncb.hasMessage(InfrastructureMessages.ERROR_UnknownFileFormat),
       `ERROR_NotAProjectFile not generated, instead got: `+JSON.stringify(ncb.messages,null,2));
+  });
+
+  // ERROR_FileTypeNotFound (BuildKeyboardInfo)
+
+  it('should generate ERROR_FileTypeNotFound if a project file does not contain a .kps file entry (BuildKeyboardInfo)', async function() {
+    const buildKeyboardInfo = new BuildKeyboardInfo();
+    const projectPath = makePathToFixture('invalid-projects', 'error_file_type_not_found_kbd.kpj')
+    const ncb = new NodeCompilerCallbacks({logLevel: 'silent'});
+    await buildKeyboardInfo.build(projectPath, ncb, {});
+    assert.isTrue(ncb.hasMessage(InfrastructureMessages.ERROR_FileTypeNotFound),
+      `ERROR_FileTypeNotFound not generated, instead got: `+JSON.stringify(ncb.messages,null,2));
   });
 
   // HINT_FilenameHasDifferingCase
