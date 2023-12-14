@@ -28,7 +28,9 @@ export function forES6(config: esbuild.BuildOptions): esbuild.BuildOptions {
     conditions: ['es6-bundling'],
     // Even if they'd be tree-shaken out, esbuild will fall over from their presence
     // within an imported `@keymanapp/common-types`.
-    external: ['timers', 'buffer', 'events']
+    external: ['timers', 'buffer', 'events'],
+    // Available with ES6, but not necessarily with ES5.
+    keepNames: true
   };
 }
 
