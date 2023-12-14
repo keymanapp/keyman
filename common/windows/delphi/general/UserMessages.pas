@@ -50,6 +50,7 @@ const
 
   WM_USER_Modified = WM_USER + 124;
   WM_USER_UpdateCaption = WM_USER + 125;   // I4918
+  WM_USER_OpenFiles = WM_USER + 126;
 
 const
   // SyntaxHighlight

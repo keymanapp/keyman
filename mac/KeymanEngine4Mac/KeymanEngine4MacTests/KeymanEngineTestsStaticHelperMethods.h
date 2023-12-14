@@ -26,6 +26,7 @@
 + (KMXFile *)getKmxFileForSilIpaTests;
 + (KMXFile *)getKmxFileForIndexOffsetTests;
 + (KMXFile *)getKmxFileForElNuerTests;
++ (KMXFile *)getKmxFileForArmenianMnemonicTests;
 @end
 
 #endif /* KeymanEngineTestsStaticHelperMethods_h */

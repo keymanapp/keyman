@@ -1,6 +1,6 @@
 import EventEmitter from "eventemitter3";
 import { type KeyEvent, type RuleBehavior } from "@keymanapp/keyboard-processor";
-import KeyEventSourceInterface from './keyEventSource.interface.js';
+import { KeyEventSourceInterface } from 'keyman/engine/events';
 
 interface EventMap {
   /**
@@ -9,7 +9,7 @@ interface EventMap {
   'keyevent': (event: KeyEvent, callback?: (result: RuleBehavior, error?: Error) => void) => void
 }
 
-export default class HardKeyboard extends EventEmitter<EventMap> implements KeyEventSourceInterface { }
+export default class HardKeyboard extends EventEmitter<EventMap> implements KeyEventSourceInterface<EventMap> { }
 
 // Intended design:
 // - KeyEventKeyboard:  website-integrated handler for hardware-keystroke input; interprets DOM events.

@@ -1,0 +1,216 @@
+.bounds-legend {
+  background-color: black;
+}
+
+.receiver-legend {
+  background-color: beige;
+}
+
+.roaming-legend {
+  background-color: lightblue;
+}
+
+.shim-legend {
+  background-color: whitesmoke;
+}
+
+.safe-zone-legend {
+  border: 1px dashed black;
+}
+
+.safe-proximity-legend {
+  border: 1px dashed lightgray;
+}
+
+#demo-container {
+  max-width: fit-content;
+  max-height: fit-content;
+}
+
+#demo-container.screen4.bounds1.full {
+  padding: 20px 0px 0px 0px;
+}
+
+#demo-container.screen4.bounds2.full {
+  padding: 30px 10px 0px 10px;
+}
+
+#demo-container.bounds4.full {
+  padding: 0px 0px 45px 0px;
+}
+
+#demo-container.screen3.bounds4.full {
+  padding: 0px;
+}
+
+#demo-container.screen4.bounds4.full {
+  padding: 25px 0px 45px 0px;
+}
+
+.faux-screen {
+  margin: auto;
+  max-width: fit-content;
+  max-height: fit-content;
+  background-color: black;
+  border: 4px solid black;
+  position: relative;
+}
+
+.faux-screen-border {
+  border: 4px solid black;
+  position: absolute;
+  margin: -4px;
+  width: 100%;
+  height: 100%;
+  z-index: 100;
+  pointer-events: none;
+}
+
+.safe-zone {
+  border: 1px dashed black;
+  position: absolute;
+  z-index: 101;
+  pointer-events: none;
+}
+
+.safe-default .safe-zone {
+  margin: 2px;
+  width: calc(100% - 6px);
+  height: calc(100% - 6px);
+}
+
+.safe-loose .safe-zone {
+  margin: 4px;
+  width: calc(100% - 10px);
+  height: calc(100% - 10px);
+}
+
+.safe-generous .safe-zone {
+  margin: 16px;
+  width: calc(100% - 34px);
+  height: calc(100% - 34px);
+}
+
+.safe-proximity {
+  border: 1px dashed lightgray;
+  position: absolute;
+  pointer-events: none;
+}
+
+.safe-default .safe-proximity {
+  margin: 3px;
+  width: calc(100% - 8px);
+  height: calc(100% - 8px);
+}
+
+.safe-loose .safe-proximity {
+  margin: 5px;
+  width: calc(100% - 12px);
+  height: calc(100% - 12px);
+}
+
+.safe-generous .safe-proximity {
+  margin: 20px;
+  width: calc(100% - 42px);
+  height: calc(100% - 42px);
+}
+
+#faux-page {
+  margin: auto;
+  background-color: white;
+  max-width: fit-content;
+  max-height: fit-content;
+  overflow: visible;
+  position: relative;
+  z-index: 2
+}
+
+.screen1 #faux-page {
+  padding: 100px 2px 4px 20px;
+}
+
+.screen2 #faux-page {
+  padding: 180px 0px 0px 0px;
+}
+
+.screen3 #faux-page {
+  padding: 120px 20px 40px 20px;
+}
+
+.screen4 #faux-page {
+  padding: 0px;
+}
+
+.receiver-host {
+  margin: auto;
+  width:  240px;
+  height: 180px;
+  position: relative;
+  z-index: initial; /* resets z-index stacking, allowing the child "roaming-bounds" to be placed behind it */
+}
+
+.main-receiver { /* is the full ".full" definition */
+  user-select: none;
+  width:  100%;
+  height: 100%;
+  background-color: beige;
+  position: absolute;
+  top: 0px;
+  bottom: 0px;
+}
+
+.popup .main-receiver {
+  width: 160px;
+  height: 45px;
+  right: 0px;
+  bottom: 90px;
+  top: unset;
+}
+
+#simmed-shim {
+  position: absolute;
+  bottom: 0px;
+  left: 0px;
+  width: 100%;
+  height: 100%;
+  z-index: -2;
+  background-color: whitesmoke;
+  ;
+}
+
+#roaming-bounds {
+  position: absolute;
+  bottom: 0px;
+  left: 0px;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+  background-color: lightblue;
+  pointer-events: none;
+}
+
+.bounds1 #roaming-bounds {
+  bottom: 0px;
+  left: 0px;
+  width: 100%;
+  height: calc(100% + 25px);
+}
+
+.bounds2 #roaming-bounds {
+  bottom: -10px;
+  left: -10px;
+  width: calc(100% + 20px);
+  height: calc(100% + 40px);
+}
+
+.bounds3 #roaming-bounds {
+  width:  0%;
+  height: 0%;
+}
+
+.bounds4 #roaming-bounds {
+  bottom: -45px;
+  left: -25px;
+  width: calc(100% + 50px);
+  height: calc(100% + 70px);
+}

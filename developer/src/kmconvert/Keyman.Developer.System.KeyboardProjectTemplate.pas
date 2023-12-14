@@ -199,7 +199,7 @@ procedure TKeyboardProjectTemplate.WriteKPJ;
 var
   kpj: TProject;
 begin
-  kpj := TProject.Create(ptKeyboard, GetProjectFilename);
+  kpj := TProject.Create(ptKeyboard, GetProjectFilename, False);
   try
     kpj.Options.Version := pv20;
     kpj.Options.BuildPath := '$PROJECTPATH\' + SFolder_Build;

@@ -19,6 +19,7 @@ describe('BuildProject', function () {
       logLevel: 'info',
     });
     const messages = [
+      InfrastructureMessages.HINT_ProjectIsVersion10,
       InfrastructureMessages.INFO_BuildingFile, // kmn
       InfrastructureMessages.INFO_FileBuiltSuccessfully,
       InfrastructureMessages.INFO_BuildingFile, // kps

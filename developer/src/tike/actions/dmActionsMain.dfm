@@ -493,6 +493,11 @@ object modActionsMain: TmodActionsMain
       OnExecute = actToolsWebStopServerExecute
       OnUpdate = actToolsWebStopServerUpdate
     end
+    object actWindowNew: TAction
+      Category = 'Window'
+      Caption = '&New window'
+      OnExecute = actWindowNewExecute
+    end
   end
   object ActionManager1: TActionManager
     ActionBars = <

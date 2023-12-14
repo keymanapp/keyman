@@ -29,7 +29,7 @@ inherited frmOptions: TfrmOptions
         Top = 185
         Width = 125
         Height = 25
-        Caption = '&Proxy Settings...'
+        Caption = 'Prox&y Settings...'
         TabOrder = 4
         OnClick = cmdProxySettingsClick
       end
@@ -38,7 +38,7 @@ inherited frmOptions: TfrmOptions
         Top = 47
         Width = 401
         Height = 45
-        Caption = '&External Editor Path'
+        Caption = 'E&xternal Editor Path'
         TabOrder = 1
         object editExternalEditorPath: TEdit
           Left = 8
@@ -61,7 +61,7 @@ inherited frmOptions: TfrmOptions
         Top = 216
         Width = 125
         Height = 25
-        Caption = 'S&MTP Settings...'
+        Caption = '&SMTP Settings...'
         TabOrder = 5
         OnClick = cmdSMTPSettingsClick
       end
@@ -101,7 +101,7 @@ inherited frmOptions: TfrmOptions
           Top = 16
           Width = 69
           Height = 21
-          Caption = '&Browse...'
+          Caption = 'Bro&wse...'
           TabOrder = 1
           OnClick = cmdBrowseDefaultProjectPathClick
         end
@@ -119,7 +119,7 @@ inherited frmOptions: TfrmOptions
         Top = 181
         Width = 218
         Height = 17
-        Caption = '&Automatically save before importing OSK'
+        Caption = 'Au&tomatically save before importing OSK'
         TabOrder = 7
       end
       object gbPrivacy: TGroupBox
@@ -128,13 +128,13 @@ inherited frmOptions: TfrmOptions
         Width = 401
         Height = 73
         Caption = 'Privacy'
-        TabOrder = 8
+        TabOrder = 9
         object chkReportUsage: TCheckBox
           Left = 8
           Top = 44
           Width = 311
           Height = 17
-          Caption = '&Share anonymous usage statistics with keyman.com'
+          Caption = 'Share anonymous &usage statistics with keyman.com'
           TabOrder = 1
         end
         object chkReportErrors: TCheckBox
@@ -145,6 +145,14 @@ inherited frmOptions: TfrmOptions
           Caption = 'Automatically report &errors to keyman.com'
           TabOrder = 0
         end
+      end
+      object chkPromptToUpgradeProjects: TCheckBox
+        Left = 151
+        Top = 204
+        Width = 218
+        Height = 17
+        Caption = '&Prompt to upgrade projects to 17.0 format'
+        TabOrder = 8
       end
     end
     object tabEditor: TTabSheet

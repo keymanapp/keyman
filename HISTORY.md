@@ -1,5 +1,49 @@
 # Keyman Version History
 
+## 17.0.229 alpha 2023-12-13
+
+* chore(ios): FV certificate key (#10228)
+* feat(core): action struct to action items conversion (#10115)
+* fix(developer): various project fixes (#10151)
+* feat(developer): Add Window menu (#10154)
+* feat(developer): New Project opens in new process (#10155)
+* fix(developer): two errors in touch layout editor (#10211)
+* feat(developer): Move options to ~/.keymandeveloper/options.json (#10216)
+* feat(core): ldml improve key-not-found (#10090)
+* fix(core): remove a TODO-LDML (#10198)
+* fix(core): improve memory allocation issues in calling into icu (#10222)
+
+## 17.0.228 alpha 2023-12-11
+
+* chore(mac): force detach of disk image during build after 5 failures (#10201)
+* chore(linux): Small refactoring to make it easier to read (#10196)
+* chore(common): Specify Keyman repo on GitHub actions (#10203)
+* chore(android,mac): Update Kibaku crowdin strings (#10174)
+* chore(android,mac): Update Mon crowdin strings (#10175)
+* fix(developer): crash loading a project when referenced .xml is missing (#10209)
+* feat(developer): kmc emit hint if project file is old version (#10158)
+* fix(common): kpj loader needs to handle empty Files element (#10157)
+
+## 17.0.227 alpha 2023-12-08
+
+* fix(windows): debug includes libcmtd vs libcmt.dll (#10176)
+* fix(linux): Do not restart Fcitx (#10180)
+
+## 17.0.226 alpha 2023-12-07
+
+* fix(web): accidental suggestion-banner retoggle when disabling predictions (#10014)
+* fix(web): Fix null error with legacy keyboards (#10141)
+
+## 17.0.225 alpha 2023-12-06
+
+* feat(developer): Multi-process model for projects (#10114)
+* fix(developer): prevent opening .kpj in multiple processes (#10137)
+* fix(android/app): InfoActivity pass external links to browser (#10153)
+
+## 17.0.224 alpha 2023-12-05
+
+* chore(linux): Update debian changelog (#10121)
+
 ## 17.0.223 alpha 2023-12-04
 
 * chore(web): Add option to create test coverage report file (#10124)
@@ -1344,6 +1388,19 @@
 * feat(windows): configuration UI polish (#7206)
 * chore: move to 17.0-alpha (#7577)
 * chore: Move to 17.0 alpha
+
+## 16.0.144 stable 2023-11-30
+
+* chore(linux): Update debian changelog (#10046)
+* fix(android/app) Disable in-app Browser (#10077)
+
+## 16.0.143 stable 2023-11-22
+
+* chore(android): Update targetSdkVersion from 31 to 33 (#9823)
+* chore(linux): Exclude environment.sh from build (#9814)
+* chore(mac): move from altool to notarytool (#9896)
+* fix(web): fixes doc-kbd display of default layer when it's not defined first (#9892)
+* fix(ios): fv: replace Zip framework to prevent crash on startup (#9958)
 
 ## 16.0.142 stable 2023-10-20
 
