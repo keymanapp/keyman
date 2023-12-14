@@ -80,7 +80,7 @@ tests = [
   'k_046___deadkey_and_contextex',
   'k_047___caps_always_off_initially_on',
   'k_048___modifier_keys_keep_context',
-  'k_049___context_and_invalidate'
+  'k_049___enter_invalidates_context'
 ]
 
 node = find_program('node', required: true)
