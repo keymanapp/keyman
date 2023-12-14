@@ -3,6 +3,7 @@ import { LMLayer } from "@keymanapp/lexical-model-layer/web";
 import { OutputTarget, Transcription, Mock } from "@keymanapp/keyboard-processor";
 import ContextWindow from "../contextWindow.js";
 import ModelSpec from "./modelSpec.js"
+import { TranscriptionCache } from "../../transcriptionCache.js";
 
 /**
  * Corresponds to the 'suggestionsready' LanguageProcessor event.
@@ -60,17 +61,17 @@ export default class LanguageProcessor extends EventEmitter<LanguageProcessorEve
   private configuration?: Configuration;
   private currentPromise?: Promise<Suggestion[]>;
 
-  private recentTranscriptions: Transcription[] = [];
+  private readonly recentTranscriptions: TranscriptionCache;
 
   private _mayPredict: boolean = true;
   private _mayCorrect: boolean = true;
 
   private _state: StateChangeEnum = 'inactive';
 
-  private static readonly TRANSCRIPTION_BUFFER: 10 = 10;
-
-  public constructor(predictiveTextWorker: Worker, supportsRightDeletions: boolean = false) {
+  public constructor(predictiveTextWorker: Worker, transcriptionCache: TranscriptionCache, supportsRightDeletions: boolean = false) {
     super();
+
+    this.recentTranscriptions = transcriptionCache;
 
     // Establishes KMW's platform 'capabilities', which limit the range of context a LMLayer
     // model may expect.
@@ -359,11 +360,7 @@ export default class LanguageProcessor extends EventEmitter<LanguageProcessorEve
   }
 
   private recordTranscription(transcription: Transcription) {
-    this.recentTranscriptions.push(transcription);
-
-    if(this.recentTranscriptions.length > LanguageProcessor.TRANSCRIPTION_BUFFER) {
-      this.recentTranscriptions.splice(0, 1);
-    }
+    this.recentTranscriptions.save(transcription);
   }
 
   /**
@@ -374,11 +371,7 @@ export default class LanguageProcessor extends EventEmitter<LanguageProcessorEve
    * @returns The matching `Transcription`, or `null` none is found.
    */
   public getPredictionState(id: number): Transcription {
-    let match = this.recentTranscriptions.filter((t: Transcription) => {
-      return t.token == id;
-    })
-
-    return match.length == 0 ? null : match[0];
+    return this.recentTranscriptions.get(id);
   }
 
   public shutdown() {

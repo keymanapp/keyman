@@ -94,7 +94,7 @@ export default class KeyboardInterface<ContextManagerType extends ContextManager
       return new KeyboardStub(Pstub, pathConfig.keyboards, pathConfig.fonts);
     };
 
-    if(!this.engine.config.deferForInitialization.hasFinalized) {
+    if(!this.engine.config.deferForInitialization.isResolved) {
       // pathConfig is not ready until KMW initializes, which prevents proper stub-building.
       this.engine.config.deferForInitialization.then(() => this.engine.keyboardRequisitioner.cache.addStub(buildStub()));
     } else {

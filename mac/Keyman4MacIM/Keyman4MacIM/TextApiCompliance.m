@@ -177,10 +177,11 @@ return [NSString stringWithFormat:@"complianceUncertain: %d, hasCompliantSelecti
                      [clientAppId isEqual: @"org.sil.app.builder.dictionary.DictionaryAppBuilder"] ||
                      //[clientAppId isEqual: @"com.microsoft.Word"] || // 2020-11-24[mcd]: Appears to work well in Word 16.43, disable legacy by default
                      [clientAppId isEqual: @"org.openoffice.script"] ||
-                     [clientAppId isEqual: @"com.adobe.illustrator"] ||
-                     [clientAppId isEqual: @"com.adobe.InDesign"] ||
-                     [clientAppId isEqual: @"com.adobe.Photoshop"] ||
-                     [clientAppId isEqual: @"com.adobe.AfterEffects"] ||
+                     // 2023-12-13[sgs]: Adobe apps automatically detected as non-compliant 
+                     //[clientAppId isEqual: @"com.adobe.illustrator"] ||
+                     //[clientAppId isEqual: @"com.adobe.InDesign"] ||
+                     //[clientAppId isEqual: @"com.adobe.Photoshop"] ||
+                     //[clientAppId isEqual: @"com.adobe.AfterEffects"] ||
                      //[clientAppId isEqual: @"com.microsoft.VSCode"] || // 2023-05-29[sgs]: Works with 1.78.2, disable legacy by default
                      [clientAppId isEqual: @"com.google.Chrome"] ||
                      [clientAppId hasPrefix: @"net.java"] ||
