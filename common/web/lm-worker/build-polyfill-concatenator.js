@@ -91,7 +91,7 @@ let sourceFileSet = [
   // Needed to support Symbol.iterator, as used by the correction algorithm.
   // Needed for Android / Chromium browser pre-43.
   loadPolyfill('src/polyfills/symbol-es6.min.js', 'src/polyfills/symbol-es6.min.js'),
-  loadCompiledModuleFilePair('build/lib/worker-main.mjs', 'build/lib/worker-main.mjs')
+  loadCompiledModuleFilePair('build/lib/worker-main.js', 'build/lib/worker-main.js')
 ];
 
 let fullWorkerConcatenation = concatScriptsAndSourcemaps(sourceFileSet, "worker-main.polyfilled.js", separatorFile);

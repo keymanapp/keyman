@@ -50,7 +50,6 @@ function do_build() {
   fi
 
   # Declaration bundling.
-  tsc --emitDeclarationOnly --outFile ./build/lib/index.d.ts
   tsc --emitDeclarationOnly --outFile ./build/lib/worker-main.d.ts
 
   echo "Preparing the polyfills + worker for script-embedding"
