@@ -227,6 +227,7 @@ export abstract class ContextManagerBase<MainConfig extends EngineConfiguration>
   public async activateKeyboard(keyboardId: string, languageCode?: string, saveCookie?: boolean): Promise<boolean> {
     // TODO:  relocate default keyboard behavior here once we can also move core error handling for
     // unfound stubs here.
+    const wasNull = !this.activeKeyboard;
 
     // If there was a previous activation attempt set and still active for the specified keyboard target,
     // cancel it.  For exmaple, if the user selects a preloaded keyboard after having tried to select one
@@ -270,7 +271,9 @@ export abstract class ContextManagerBase<MainConfig extends EngineConfiguration>
     this.activateKeyboardForTarget(kbdStubPair, originalKeyboardTarget);
 
     // Only trigger `keyboardchange` events when they will affect the active context.
-    if(this.currentKeyboardSrcTarget() == originalKeyboardTarget) {
+    // (!wasNull || !!keyboard) - blocks events for `null` -> `null` transitions.
+    // (keyman/keymanweb.com#96)
+    if(this.currentKeyboardSrcTarget() == originalKeyboardTarget && (!wasNull || !!keyboard)) {
       // Perform standard context-reset ops, including the processing of new-context events.
       this.resetContext();
       // Will trigger KeymanEngine handler that passes keyboard to the OSK, displays it.

@@ -1,4 +1,4 @@
-import { ActiveKey } from "@keymanapp/keyboard-processor";
+import { ActiveKey, ActiveKeyBase } from "@keymanapp/keyboard-processor";
 import EventEmitter from "eventemitter3";
 
 import { KeyElement } from "../keyElement.js";
@@ -14,11 +14,13 @@ const FLICK_OVERFLOW_OFFSET = 1.4142;
 
 interface EventMap {
   preferredOrientation: (orientation: PhoneKeyTipOrientation) => void;
+  startFade: () => void;
 }
 
 export class GesturePreviewHost extends EventEmitter<EventMap> {
   private readonly div: HTMLDivElement;
   private readonly label: HTMLSpanElement;
+  private readonly hintLabel: HTMLSpanElement;
   private readonly previewImgContainer: HTMLDivElement;
 
   private flickPreviews = new Map<string, HTMLDivElement>;
@@ -98,6 +100,16 @@ export class GesturePreviewHost extends EventEmitter<EventMap> {
         previewImgContainer.appendChild(flickPreview);
       });
     }
+
+    const hintLabel = this.hintLabel = document.createElement('div');
+    hintLabel.className='kmw-key-popup-icon';
+
+    if(!isPhone) {
+      hintLabel.textContent = keySpec == keySpec.hintSrc ? keySpec.hint : keySpec.hintSrc?.text;
+      hintLabel.style.fontWeight= hintLabel.textContent == '\u2022' ? 'bold' : '';
+    }
+
+    base.appendChild(hintLabel);
   }
 
   public refreshLayout() {
@@ -118,7 +130,18 @@ export class GesturePreviewHost extends EventEmitter<EventMap> {
     this.onCancel = handler;
   }
 
+  public setMultitapHint(current: string, next: string) {
+    this.label.textContent = current;
+    this.hintLabel.textContent = next;
+
+    this.emit('startFade');
+
+    this.clearFlick();
+  }
+
   public scrollFlickPreview(x: number, y: number) {
+    this.clearHint();
+
     const scrollStyle = this.previewImgContainer.style;
     const edge = this.flickEdgeLength * FLICK_OVERFLOW_OFFSET;
 
@@ -137,7 +160,11 @@ export class GesturePreviewHost extends EventEmitter<EventMap> {
     this.previewImgContainer.style.marginTop = '0px';
     this.previewImgContainer.style.marginLeft = '0px';
 
-    this.previewImgContainer.classList.add('flick-clear');
+    this.previewImgContainer.classList.add('kmw-flick-clear');
+  }
+
+  public clearHint() {
+    this.hintLabel.classList.add('kmw-hint-clear');
   }
 
   public clearAll() {

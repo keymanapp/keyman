@@ -94,6 +94,7 @@ type
     procedure SetGlobalProject;
     procedure StartClose; override;
     procedure CompileAll;
+    procedure RefreshOptions; override;
   end;
 
 implementation
@@ -200,6 +201,12 @@ begin
   else
     cef.Navigate(modWebHttpServer.GetAppURL('project/welcome'));
   RefreshCaption;
+end;
+
+procedure TfrmProject.RefreshOptions;
+begin
+  inherited;
+  ProjectRefresh(nil);
 end;
 
 procedure TfrmProject.ProjectRefresh(Sender: TObject);
@@ -349,12 +356,10 @@ begin
     modActionsMain.actProjectNew.Execute
   else if Command = 'openproject' then
     modActionsMain.actProjectOpen.Execute
-  else if Command = 'openprojectfolder' then
-    modActionsMain.actProjectOpenFolder.Execute
   else if Command = 'editfile' then // MRU
   begin
     if SelectedMRUFileName <> '' then
-      modActionsMain.OpenProject(SelectedMRUFileName);
+      frmKeymanDeveloper.OpenProject(SelectedMRUFileName);
   end
   else if Command = 'removefrommru' then
   begin
@@ -442,9 +447,9 @@ begin
     pf := SelectedProjectFile;
     if Assigned(pf) then (pf.UI as TProjectFileUI).DefaultEvent(Self)   // I4687
     else if SelectedMRUFileName <> '' then
-      frmKeymanDeveloper.OpenFile(SelectedMRUFileName, True)
+      frmKeymanDeveloper.OpenFilesInProject([SelectedMRUFileName])
     else if Params.Values['name'] <> '' then
-      frmKeymanDeveloper.OpenFile(Params.Values['name'], True);
+      frmKeymanDeveloper.OpenFilesInProject([Params.Values['name']]);
   end
   else if Command = 'viewfilesource' then
   begin

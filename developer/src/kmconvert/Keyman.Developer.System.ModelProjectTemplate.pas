@@ -125,7 +125,7 @@ procedure TModelProjectTemplate.WriteKPJ;
 var
   kpj: TProject;
 begin
-  kpj := TProject.Create(ptLexicalModel, GetProjectFilename);
+  kpj := TProject.Create(ptLexicalModel, GetProjectFilename, False);
   try
     kpj.Options.BuildPath := '$PROJECTPATH\' + SFolder_Build;
     kpj.Options.WarnDeprecatedCode := True;

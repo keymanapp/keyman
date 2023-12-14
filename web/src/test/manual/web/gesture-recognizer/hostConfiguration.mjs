@@ -66,7 +66,7 @@ window.addEventListener('load', function() {
     paddedSafeBounds: document.getElementById('padded-safe-zone')
   };
 
-  recognizer = new GestureRecognizer(recognizerConfig);
+  recognizer = new GestureRecognizer({gestures: [], sets: []}, recognizerConfig);
 
   let recordingArr = [];
   let logElement = document.getElementById('event-log');

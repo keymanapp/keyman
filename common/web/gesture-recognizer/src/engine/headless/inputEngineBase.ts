@@ -2,6 +2,7 @@ import EventEmitter from "eventemitter3";
 
 import { GestureRecognizerConfiguration } from "../configuration/gestureRecognizerConfiguration.js";
 import { Nonoptional } from "../nonoptional.js";
+import { GestureDebugSource } from "./gestureDebugSource.js";
 import { GestureSource } from "./gestureSource.js";
 
 interface EventMap<HoveredItemType, StateToken> {
@@ -31,10 +32,12 @@ export abstract class InputEngineBase<HoveredItemType, StateToken = any> extends
   public stateToken: StateToken;
 
   protected readonly config: Nonoptional<GestureRecognizerConfiguration<HoveredItemType, StateToken>>;
+  private sourceConstructor: typeof GestureSource<HoveredItemType, StateToken, any>;
 
   public constructor(config: Nonoptional<GestureRecognizerConfiguration<HoveredItemType, StateToken>>) {
     super();
     this.config = config;
+    this.sourceConstructor = (config?.recordingMode ?? true) ? GestureDebugSource : GestureSource;
   }
 
   createTouchpoint(identifier: number, isFromTouch: boolean) {
@@ -44,7 +47,8 @@ export abstract class InputEngineBase<HoveredItemType, StateToken = any> extends
 
     this.identifierMap[identifier] = unique_id;
 
-    const source = new GestureSource<HoveredItemType, StateToken>(unique_id, this.config, isFromTouch);
+    // If debug mode is enabled, will enable persistent coordinate tracking.  Is off by default.
+    const source = new this.sourceConstructor(unique_id, this.config, isFromTouch);
     source.stateToken = this.stateToken;
 
     // Do not add here; it needs special managing for unit tests.

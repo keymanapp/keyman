@@ -2935,9 +2935,6 @@ inherited frmKeymanDeveloper: TfrmKeymanDeveloper
       object OpenProject1: TMenuItem
         Action = modActionsMain.actProjectOpen
       end
-      object OpenProjectFolder1: TMenuItem
-        Action = modActionsMain.actProjectOpenFolder
-      end
       object CloseProject1: TMenuItem
         Action = modActionsMain.actProjectClose
       end
@@ -3141,6 +3138,16 @@ inherited frmKeymanDeveloper: TfrmKeymanDeveloper
           Caption = '&Exception Test'
           OnClick = mnuToolsDebugTestsExceptionTestClick
         end
+      end
+    end
+    object mnuWindow: TMenuItem
+      Caption = '&Window'
+      OnClick = mnuWindowClick
+      object Newwindow1: TMenuItem
+        Action = modActionsMain.actWindowNew
+      end
+      object N12: TMenuItem
+        Caption = '-'
       end
     end
     object Help1: TMenuItem

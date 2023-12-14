@@ -18,7 +18,7 @@ export type PathCoordAxisPair = 'tx' | 'ty' | 'xy';
  * Sine and Cosine stats are currently excluded due to their necessary lack of statistical
  * independence.
  */
-type StatAxis = PathCoordAxis | 'v';
+type StatAxis = PathCoordAxis;
 
 /**
  * As the name suggests, this class facilitates tracking of cumulative mathematical values, etc
@@ -29,7 +29,7 @@ type StatAxis = PathCoordAxis | 'v';
  * A subclass with properties useful for path segmentation: `RegressiblePathStats`.
  */
 export class CumulativePathStats<Type = any> {
-  protected rawLinearSums  = {'x': 0, 'y': 0, 't': 0, 'v': 0};
+  protected rawLinearSums  = {'x': 0, 'y': 0, 't': 0};
 
   // Handles raw-distance stuff.
   private coordArcSum: number = 0;
@@ -86,6 +86,7 @@ export class CumulativePathStats<Type = any> {
     return this._extend(new CumulativePathStats(this), sample);
   }
 
+  // Pattern exists to facilitate subclasses if needed in the future:  see #11079 and #11080.
   protected _extend(result: CumulativePathStats<Type>, sample: InputSample<any>) {
     if(!result._initialSample) {
       result._initialSample = sample;
@@ -117,10 +118,6 @@ export class CumulativePathStats<Type = any> {
       const coordArcDelta = Math.sqrt(coordArcDeltaSq);
 
       result.coordArcSum     += coordArcDelta;
-
-      if(tDelta) {
-        result.rawLinearSums.v  += coordArcDelta   / tDelta;
-      }
     }
 
     result._lastSample = sample;
@@ -142,7 +139,7 @@ export class CumulativePathStats<Type = any> {
     return this._deaccumulate(result, subsetStats);
   }
 
-  public _deaccumulate(result: CumulativePathStats<Type>, subsetStats?: CumulativePathStats<Type>): CumulativePathStats<Type> {
+  protected _deaccumulate(result: CumulativePathStats<Type>, subsetStats?: CumulativePathStats<Type>): CumulativePathStats<Type> {
     // Possible addition:  use `this.buildRenormalized` on the returned version
     // if catastrophic cancellation effects (random, small floating point errors)
     // are not sufficiently mitigated & handled by the measures currently in place.
@@ -189,10 +186,6 @@ export class CumulativePathStats<Type = any> {
       // 'remaining' subset (operand 1 below) before the portion wholly within what remains (the result)
       result.coordArcSum     -= coordArcDelta;
       result.coordArcSum     -= subsetStats.coordArcSum;
-
-      if(tDelta) {
-        result.rawLinearSums.v  -= coordArcDelta   / tDelta;
-      }
     }
 
     result.sampleCount -= subsetStats.sampleCount;
@@ -206,6 +199,81 @@ export class CumulativePathStats<Type = any> {
     // initialSample, though, we need to update b/c of the 'directness' properties.
     result._initialSample = subsetStats.followingSample;
 
+    return result;
+  }
+
+  public translateCoordSystem(functor: (sample: InputSample<Type>) => InputSample<Type>): CumulativePathStats<Type> {
+    const result = new CumulativePathStats(this);
+
+    return this._translateCoordSystem(result, functor);
+  }
+
+  protected _translateCoordSystem(result: CumulativePathStats<Type>, functor: (sample: InputSample<Type>) => InputSample<Type>): CumulativePathStats<Type> {
+    if(this.sampleCount == 0) {
+      return result;
+    }
+
+    const singleSample = result.initialSample == result.lastSample;
+
+    result._initialSample = functor(result.initialSample);
+    result.baseSample = functor(result.baseSample);
+    result._lastSample = singleSample ? result._initialSample : functor(result.lastSample);
+
+    return result;
+  }
+
+  public replaceInitialSample(sample: InputSample<Type>): CumulativePathStats<Type> {
+    let result = new CumulativePathStats(this);
+
+    return this._replaceInitialSample(result, sample);
+  }
+
+  protected _replaceInitialSample(result: CumulativePathStats<Type>, sample: InputSample<Type>) {
+    // if stats length == 0 or length == 1, is ezpz.  Could 'shortcut' things here.
+    if(this.sampleCount == 0) {
+      // Note:  if this error actually causes problems, 'silently failing' the call
+      // by insta-returning should be "fine" as far as actual gesture processing goes.
+      throw new Error("no sample available to replace");
+      // return;
+    }
+
+    // Re: the block above... obviously, don't replace if there IS no initial sample yet.
+    // It'll happen soon enough anyway.
+    const originalSample = result.initialSample;
+    result._initialSample = sample;
+
+    if(this.sampleCount > 1) {
+      // Works fine re: cata-cancellation - `this.baseSample.___` cancels out.
+      const xDelta = sample.targetX - originalSample.targetX;
+      const yDelta = sample.targetY - originalSample.targetY;
+      const tDelta = sample.t       - originalSample.t;
+
+      result.rawLinearSums.x += xDelta;
+      result.rawLinearSums.y += yDelta;
+      result.rawLinearSums.t += tDelta;
+
+      /*
+       * `rawDistance` tracking.  Note:  this is kind of an approximation, as
+       * we aren't getting the true distance between the new first and the original
+       * second point.  But... it should be "good enough".
+       *
+       * If need be, we could always track "second sample" to be more precise about things
+       * here, though that would add a bit more logic overhead at low sample counts.
+       * (Note the logic interactions inherent in firstSample, secondSample, and lastSample.)
+       *
+       * This concern should be a low-priority detail for now - at the time of writing,
+       * rawDistance is currently only used by KeymanWeb for longpress up-flick thresholding,
+       * and that codepath doesn't do path-start rewriting.
+       */
+      const coordArcDeltaSq = xDelta * xDelta + yDelta * yDelta;
+      const coordArcDelta = Math.sqrt(coordArcDeltaSq);
+
+      result.coordArcSum     += coordArcDelta;
+    } else {
+      result._lastSample = sample;
+    }
+
+    // Do NOT change sampleCount; we're replacing the original.
     return result;
   }
 
@@ -371,7 +439,6 @@ export class CumulativePathStats<Type = any> {
     return {
       angle: this.angle,
       cardinal: this.cardinalDirection,
-      speedMean: this.mean('v'),
       netDistance: this.netDistance,
       duration: this.duration,
       sampleCount: this.sampleCount,

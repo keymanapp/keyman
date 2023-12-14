@@ -5,7 +5,7 @@ import VisualKeyboard from '../../../visualKeyboard.js';
 import { GesturePreviewHost } from '../../../keyboard-layout/gesturePreviewHost.js';
 
 const CSS_PREFIX = 'kmw-';
-const DEFAULT_TIP_ORIENTATION = 'top';
+const DEFAULT_TIP_ORIENTATION: PhoneKeyTipOrientation = 'top';
 
 export type PhoneKeyTipOrientation = 'top' | 'bottom';
 
@@ -127,8 +127,13 @@ export default class KeyTip implements KeyTipInterface {
       kts.width = canvasWidth+'px';
       kts.height = canvasHeight+'px';
 
+      // Some keyboards (such as `balochi_scientific`) do not _package_ a font but
+      // specify an extremely common one, such as Arial.  In such cases, .kmw-key-text
+      // custom styling doesn't exist, relying on the layer object to simply specify
+      // the font-family.
+      const layerFontFamily = this.vkbd.currentLayer.element.style.fontFamily;
       const ckts = getComputedStyle(vkbd.element);
-      kts.fontFamily = ckts.fontFamily;
+      kts.fontFamily = key.key.spec.font || layerFontFamily || ckts.fontFamily;
 
       var px=parseInt(ckts.fontSize,10);
       if(px == Number.NaN) {
@@ -209,6 +214,12 @@ export default class KeyTip implements KeyTipInterface {
         this.preview = this.previewHost.element;
         this.tip.replaceChild(this.preview, oldHost);
         previewHost.setCancellationHandler(() => this.show(null, false, null));
+        previewHost.on('startFade', () => {
+          this.element.classList.remove('kmw-preview-fade');
+          // Note:  a reflow is needed to reset the transition animation.
+          this.element.offsetWidth;
+          this.element.classList.add('kmw-preview-fade');
+        });
       }
     } else { // Hide the key preview
       this.element.style.display = 'none';
@@ -217,6 +228,7 @@ export default class KeyTip implements KeyTipInterface {
       const oldPreview = this.preview;
       this.preview = document.createElement('div');
       this.tip.replaceChild(this.preview, oldPreview);
+      this.element.classList.remove('kmw-preview-fade');
 
       this.orientation = DEFAULT_TIP_ORIENTATION;
     }

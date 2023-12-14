@@ -2,7 +2,7 @@ import { type KeyElement } from '../../../keyElement.js';
 import VisualKeyboard from '../../../visualKeyboard.js';
 
 import { ActiveKey, ActiveKeyBase, ActiveSubKey, KeyDistribution, KeyEvent } from '@keymanapp/keyboard-processor';
-import { ConfigChangeClosure, CumulativePathStats, GestureRecognizerConfiguration, GestureSequence, GestureSource, InputSample, PaddedZoneSource, RecognitionZoneSource } from '@keymanapp/gesture-recognizer';
+import { ConfigChangeClosure, CumulativePathStats, GestureRecognizerConfiguration, GestureSequence, GestureSource, GestureSourceSubview, InputSample, RecognitionZoneSource } from '@keymanapp/gesture-recognizer';
 import { GestureHandler } from '../gestureHandler.js';
 import { distributionFromDistanceMaps } from '@keymanapp/input-processor';
 import { GestureParams } from '../specsForLayout.js';
@@ -30,8 +30,9 @@ export function lockedAngleForDir(lockedDir: typeof OrderedFlickDirections[numbe
 export function calcLockedDistance(pathStats: CumulativePathStats<any>, lockedDir: typeof OrderedFlickDirections[number]) {
   const lockedAngle = lockedAngleForDir(lockedDir);
 
-  const deltaX = pathStats.lastSample.targetX - pathStats.initialSample.targetX;
-  const deltaY = pathStats.lastSample.targetY - pathStats.initialSample.targetY;
+  const rootCoord = pathStats.initialSample;
+  const deltaX = pathStats.lastSample.targetX - rootCoord.targetX;
+  const deltaY = pathStats.lastSample.targetY - rootCoord.targetY;
 
   const projY = Math.max(0, -deltaY * Math.cos(lockedAngle));
   const projX = Math.max(0,  deltaX * Math.sin(lockedAngle));
@@ -42,8 +43,7 @@ export function calcLockedDistance(pathStats: CumulativePathStats<any>, lockedDi
 }
 
 export function buildFlickScroller(
-  baseSource: GestureSource<KeyElement>,
-  initialCoord: InputSample<KeyElement>,
+  source: GestureSource<KeyElement>,
   lockedDir: typeof OrderedFlickDirections[number],
   previewHost: GesturePreviewHost,
   gestureParams: GestureParams
@@ -52,7 +52,7 @@ export function buildFlickScroller(
     const lockedAngle = lockedAngleForDir(lockedDir);
 
     const maxProgressDist = gestureParams.flick.triggerDist - gestureParams.flick.dirLockDist;
-    let progressDist =  Math.max(0, calcLockedDistance(baseSource.path.stats, lockedDir) - gestureParams.flick.dirLockDist);
+    let progressDist =  Math.max(0, calcLockedDistance(source.path.stats, lockedDir) - gestureParams.flick.dirLockDist);
 
     // Make progress appear slightly less than it really is; 'near complete' slides thus actually are, so
     // the user doesn't get aggrevated by 'near misses' in that regard.
@@ -115,29 +115,46 @@ export default class Flick implements GestureHandler {
 
     this.baseKeyDistances = vkbd.getSimpleTapCorrectionDistances(sequence.stageReports[0].sources[0].path.stats.initialSample, this.baseSpec)
     const baseSource = sequence.stageReports[0].sources[0].baseSource;
+    let source: GestureSource<KeyElement> = baseSource;
 
     sequence.on('complete', () => {
       previewHost.cancel()
     });
 
     this.sequence.on('stage', (result) => {
-      const pathStats = baseSource.path.stats;
+      const pathStats = source.path.stats;
       this.computedFlickDistribution = this.flickDistribution(pathStats, true);
 
       const baseSelection = this.computedFlickDistribution[0].keySpec;
-      if(result.matchedId == 'flick-reset-end') {
-        this.emitKey(vkbd, this.baseSpec, baseSource.path.stats);
+
+      if(result.matchedId == 'flick-restart') {
+        // The gesture-engine's already done this, but we need an analogue for it here.
+        source.path.replaceInitialSample(result.sources[0].path.stats.initialSample);
+        // Part of the flick-reset process.
+        return;
+      } if(result.matchedId == 'flick-reset-centering') {
+        // Part of the flick-reset process.
+        source = baseSource.constructSubview(true, true);
+        return;
+      } else if(result.matchedId == 'flick-reset-end') {
+        this.emitKey(vkbd, this.baseSpec, source.path.stats);
         return;
       } else if(result.matchedId == 'flick-reset') {
         // Instant transitions to flick-mid state; entry indicates a lock "reset".
         // Cancel the flick-viz bit.
         if(this.flickScroller) {
-          this.flickScroller(baseSource.currentSample);
+          this.flickScroller(source.currentSample);
           // Clear any previously-set scroller.
-          baseSource.path.off('step', this.flickScroller);
+          source.path.off('step', this.flickScroller);
         }
         this.lockedDir = null;
         this.lockedSelectable = null;
+
+        // Chops off the prior part of the path
+        if(source instanceof GestureSourceSubview) {
+          // Clean up the handlers; we're replacing the subview.
+          source.disconnect();
+        }
         return;
       } else if(result.matchedId == 'flick-mid') {
         if(baseSelection == this.baseSpec) {
@@ -153,14 +170,14 @@ export default class Flick implements GestureHandler {
         this.lockedDir = dir;
         this.lockedSelectable = baseSelection;
 
-        const baseCoord = baseSource.path.coords[0];
         if(this.flickScroller) {
           // Clear any previously-set scroller.
-          baseSource.path.off('step', this.flickScroller);
+          source.path.off('step', this.flickScroller);
         }
-        this.flickScroller = buildFlickScroller(baseSource, baseCoord, dir, previewHost, this.gestureParams);
-        this.flickScroller(baseSource.currentSample);
-        baseSource.path.on('step', this.flickScroller);
+
+        this.flickScroller = buildFlickScroller(source, dir, previewHost, this.gestureParams);
+        this.flickScroller(source.currentSample);
+        source.path.on('step', this.flickScroller);
 
         return;
       }

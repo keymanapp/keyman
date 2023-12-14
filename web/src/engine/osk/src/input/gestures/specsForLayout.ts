@@ -85,9 +85,18 @@ export interface GestureParams<Item = any> {
 
     /**
      * The minimum _net_ touch-path distance after which the direction will be locked.
+     *
+     * Is currently also used as the max radius for valid flick-reset recentering targets.
      */
     dirLockDist: number
-  }
+  },
+  /**
+   * Indicates whether roaming-touch oriented behaviors should be enabled.
+   *
+   * Note that run-time adjustments to this property after initialization will
+   * not take affect, unlike the other properties of the overall parameter object.
+   */
+  roamingEnabled?: boolean;
 }
 
 export const DEFAULT_GESTURE_PARAMS: GestureParams = {
@@ -107,8 +116,38 @@ export const DEFAULT_GESTURE_PARAMS: GestureParams = {
   // See `VisualKeyboard.refreshLayout`, CTRL-F "Step 3".
   flick: {
     startDist: 10,
-    dirLockDist: 20,
+    dirLockDist: 25,
     triggerDist: 40 // should probably be based on row-height?
+  }
+}
+
+/**
+ * Gets the centroid (in client coordinates) of a key's element.
+ *
+ * Assumes that the key's layer is in the DOM and actively displayed.
+ * @param key
+ */
+function getKeyCentroid(key: KeyElement) {
+  // We don't layer-shift at present while a flick is active, so it's valid
+  // for current use-cases.  May need extension to closure in something
+  // to force the layer to be active in the future, though.
+  const keyRect = key.getBoundingClientRect();
+
+  return {
+    clientX: keyRect.left + keyRect.width/2,
+    clientY: keyRect.top + keyRect.height/2
+  };
+}
+
+// Is kept separate from prior method in case it becomes a closure in the future
+// & needs to be passed in as a parameter.
+function buildDistFromKeyCentroidFunctor(key: KeyElement) {
+  const keyCentroid = getKeyCentroid(key);
+
+  return (a: CumulativePathStats) => {
+    const dx = a.lastSample.clientX - keyCentroid.clientX;
+    const dy = a.lastSample.clientY - keyCentroid.clientY;
+    return Math.sqrt(dx*dx + dy*dy);
   }
 }
 
@@ -153,6 +192,9 @@ let dummy2: LayoutGestureSupportFlags = dummy;
  * @param params      A set of tweakable gesture parameters.  It will be closure-captured
  *                    and referred to by reference; changes to its values will take
  *                    immediate effect during gesture processing.
+ *
+ *                    If params.roamingEnabled is unset, it will be initialized by this
+ *                    method based upon layout properties.
  * @returns
  */
 export function gestureSetForLayout(flags: LayoutGestureSupportFlags, params: GestureParams): GestureModelDefs<KeyElement, string> {
@@ -169,7 +211,9 @@ export function gestureSetForLayout(flags: LayoutGestureSupportFlags, params: Ge
       case 'special-key-start':
         return ['K_LOPT', 'K_ROPT', 'K_BKSP'].indexOf(keySpec.baseKeyID) != -1;
       case 'longpress':
-        return !!keySpec.sk;
+        // Always allow longpresses to start; we validate them at timer-end.
+        // This facilitates roaming+longpress interactions.
+        return true;
       case 'multitap-start':
       case 'modipress-multitap-start':
         if(flags.hasMultitaps) {
@@ -185,9 +229,11 @@ export function gestureSetForLayout(flags: LayoutGestureSupportFlags, params: Ge
     }
   };
 
-  const _initialTapModel: GestureModel<KeyElement> = deepCopy(flags.hasFlicks ? initialTapModel(params) : initialTapModelWithReset(params));
-  const _simpleTapModel: GestureModel<KeyElement> = deepCopy(flags.hasFlicks ? simpleTapModel() : simpleTapModelWithReset());
-  const longpressModel: GestureModel<KeyElement> = deepCopy(longpressModelWithShortcut(params, true, !flags.hasFlicks));
+  const doRoaming = params.roamingEnabled ||= !flags.hasFlicks;
+
+  const _initialTapModel: GestureModel<KeyElement> = deepCopy(!doRoaming ? initialTapModel(params) : initialTapModelWithReset(params));
+  const _simpleTapModel: GestureModel<KeyElement> = deepCopy(!doRoaming ? simpleTapModel(params) : simpleTapModelWithReset(params));
+  const _longpressModel: GestureModel<KeyElement> = deepCopy(longpressModel(params, true, doRoaming));
 
   // #region Functions for implementing and/or extending path initial-state checks
   function withKeySpecFiltering(model: GestureModel<KeyElement>, contactIndices: number | number[]) {
@@ -220,13 +266,13 @@ export function gestureSetForLayout(flags: LayoutGestureSupportFlags, params: Ge
   const specialStartModel = specialKeyStartModel();
   const _modipressStartModel = modipressStartModel();
   const gestureModels: GestureModel<KeyElement>[] = [
-    withKeySpecFiltering(longpressModel, 0),
+    withKeySpecFiltering(_longpressModel, 0),
     withKeySpecFiltering(multitapStartModel(params), 0),
     multitapEndModel(params),
     _initialTapModel,
     _simpleTapModel,
     withKeySpecFiltering(specialStartModel, 0),
-    specialKeyEndModel(),
+    specialKeyEndModel(params),
     subkeySelectModel(),
     withKeySpecFiltering(_modipressStartModel, 0),
     modipressHoldModel(params),
@@ -238,13 +284,15 @@ export function gestureSetForLayout(flags: LayoutGestureSupportFlags, params: Ge
   ];
 
   const defaultSet = [
-    longpressModel.id, _initialTapModel.id, _modipressStartModel.id, specialStartModel.id
+    _longpressModel.id, _initialTapModel.id, _modipressStartModel.id, specialStartModel.id
   ];
 
-  if(flags.hasFlicks) {
+  if(!doRoaming) {
     gestureModels.push(withKeySpecFiltering(flickStartModel(params), 0));
     gestureModels.push(flickMidModel(params));
     gestureModels.push(flickResetModel(params));
+    gestureModels.push(flickResetCenteringModel(params));
+    gestureModels.push(flickRestartModel(params));
     gestureModels.push(flickResetEndModel());
     gestureModels.push(flickEndModel(params));
 
@@ -252,6 +300,9 @@ export function gestureSetForLayout(flags: LayoutGestureSupportFlags, params: Ge
   } else {
     // A post-roam version of longpress with the up-flick shortcut disabled but roaming still on.
     gestureModels.push(withKeySpecFiltering(longpressModelAfterRoaming(params), 0));
+    // Allows reactivation of longpress-eval when the base key changes if the timer elapses on
+    // a subkey-less key.
+    gestureModels.push(longpressRoamRestoration());
   }
 
   return {
@@ -297,7 +348,7 @@ export function flickStartContactModel(params: GestureParams): ContactModel {
       evaluate: (path) => path.stats.netDistance > params.flick.startDist ? 'resolve' : null
     },
     pathResolutionAction: 'resolve',
-    pathInheritance: 'chop'
+    pathInheritance: 'partial'
   }
 }
 
@@ -305,8 +356,8 @@ export function flickStartContactModel(params: GestureParams): ContactModel {
  * Determines the best direction to use for flick-locking and the total net distance
  * traveled in that direction.
  */
-function determineLockFromStats(pathStats: CumulativePathStats<KeyElement>) {
-  const flickSpec = pathStats.initialSample.item.key.spec.flick;
+function determineLockFromStats(pathStats: CumulativePathStats<KeyElement>, baseItem: KeyElement) {
+  const flickSpec = baseItem.key.spec.flick;
 
   const supportedDirs = Object.keys(flickSpec) as (typeof OrderedFlickDirections[number])[];
   let bestDir: typeof supportedDirs[number];
@@ -330,12 +381,12 @@ export function flickMidContactModel(params: GestureParams): gestures.specs.Cont
   return {
     itemPriority: 1,
     pathModel: {
-      evaluate: (path) => {
+      evaluate: (path, priorStats, baseItem) => {
         /*
          * Check whether or not there is a valid flick for which the path crosses the flick-dist
          * threshold while at a supported angle for flick-locking by the flick handler.
          */
-        const { dir, dist } = determineLockFromStats(path.stats);
+        const { dir, dist } = determineLockFromStats(path.stats, baseItem);
 
         // If the best supported flick direction meets the 'direction lock' threshold criteria,
         // only then do we allow transitioning to the 'locked flick' state.
@@ -363,14 +414,14 @@ export function flickEndContactModel(params: GestureParams): ContactModel {
   return {
     itemPriority: 1,
     pathModel: {
-      evaluate: (path, baseStats) => {
+      evaluate: (path, priorStats, baseItem, baseStats) => {
         if(path.isComplete) {
           // The Flick handler class will sort out the mess once the path is complete.
           // Note:  if we wanted auto-triggering once the threshold distance were met,
           // we'd need to move its related logic into this method.
           return 'resolve';
         } else {
-          const { dir } = determineLockFromStats(baseStats);
+          const { dir } = determineLockFromStats(baseStats, baseItem);
           if(calcLockedDistance(path.stats, dir) < params.flick.dirLockDist) {
             return 'reject';
           }
@@ -382,7 +433,7 @@ export function flickEndContactModel(params: GestureParams): ContactModel {
   }
 }
 
-export function longpressContactModelWithShortcut(params: GestureParams, enabledFlicks: boolean, resetForRoaming: boolean): ContactModel {
+export function longpressContactModel(params: GestureParams, enabledFlicks: boolean, resetForRoaming: boolean): ContactModel {
   const spec = params.longpress;
 
   return {
@@ -390,7 +441,8 @@ export function longpressContactModelWithShortcut(params: GestureParams, enabled
     pathResolutionAction: 'resolve',
     timer: {
       duration: spec.waitLength,
-      expectedResult: true
+      expectedResult: true,
+      validateItem: (key: KeyElement) => !!key.key.spec.sk
     },
     pathModel: {
       evaluate: (path) => {
@@ -471,11 +523,17 @@ export function modipressContactEndModel(): ContactModel {
   };
 }
 
-export function simpleTapContactModel(): ContactModel {
+export function simpleTapContactModel(params: GestureParams, isNotInitial?: boolean): ContactModel {
+  // Snapshot at model construction; do not update if changed.
+  const roamingEnabled = params?.roamingEnabled ?? true; // ?? true - used by the banner.
+
   return {
     itemPriority: 0,
-    itemChangeAction: 'reject',
+    itemChangeAction: roamingEnabled ? 'reject' : undefined,
     pathResolutionAction: 'resolve',
+    // if roaming, a tap reset should set the base key.
+    // if not, block path resets.
+    pathInheritance: (!roamingEnabled && isNotInitial) ? 'full' : 'chop',
     pathModel: {
       evaluate: (path) => {
         if(path.isComplete && !path.wasCancelled) {
@@ -531,14 +589,14 @@ export function specialKeyStartModel(): GestureModel<KeyElement> {
   };
 }
 
-export function specialKeyEndModel(): GestureModel<any> {
+export function specialKeyEndModel(params: GestureParams): GestureModel<any> {
   return {
     id: 'special-key-end',
     resolutionPriority: 0,
     contacts : [
       {
         model: {
-          ...simpleTapContactModel(),
+          ...simpleTapContactModel(params),
           itemChangeAction: 'resolve'
         },
         endOnResolve: true,
@@ -563,14 +621,14 @@ export function specialKeyEndModel(): GestureModel<any> {
  *                       - the common gesture configuration permits the shortcut where supported
  * @param allowRoaming   Indicates whether "roaming touch" mode should be supported.
  */
-export function longpressModelWithShortcut(params: GestureParams, allowShortcut: boolean, allowRoaming: boolean): GestureModel<any> {
+export function longpressModel(params: GestureParams, allowShortcut: boolean, allowRoaming: boolean): GestureModel<any> {
   const base: GestureModel<any> = {
     id: 'longpress',
     resolutionPriority: 0,
     contacts: [
       {
         model: {
-          ...longpressContactModelWithShortcut(params, allowShortcut, allowRoaming),
+          ...longpressContactModel(params, allowShortcut, allowRoaming),
           itemPriority: 1,
           pathInheritance: 'chop'
         },
@@ -594,6 +652,12 @@ export function longpressModelWithShortcut(params: GestureParams, allowShortcut:
         path: {
           type: 'replace',
           replace: 'longpress-roam'
+        },
+        // The timer can fail if the key doesn't support subkeys.
+        // If it legit timed out, the gesture can't be continued anyway.
+        timer: {
+          type: 'replace',
+          replace: 'longpress-roam-restore'
         }
       }
     }
@@ -608,11 +672,50 @@ export function longpressModelWithShortcut(params: GestureParams, allowShortcut:
 export function longpressModelAfterRoaming(params: GestureParams): GestureModel<any> {
   // The longpress-shortcut is always disabled for keys reached by roaming (param 2)
   // Only used when roaming is permitted; continued roaming should be allowed. (param 3)
-  const base = longpressModelWithShortcut(params, false, true);
+  const base = longpressModel(params, false, true);
 
   return {
     ...base,
     id: 'longpress-roam'
+  }
+}
+
+// For reactivating longpress processing after changing base key (during roaming),
+// should the timer have elapsed on a key not supporting longpresses.
+export function longpressRoamRestoration(): GestureModel<any> {
+  return {
+    id: 'longpress-roam-restore',
+    contacts: [
+      {
+        model: {
+          pathModel: {
+            evaluate: (path) => {
+              // pretty much a placeholder.
+              return null;
+            }
+          },
+          // The actual trigger.
+          itemChangeAction: 'reject',
+          pathInheritance: 'full',
+          pathResolutionAction: 'reject',
+          itemPriority: 0
+        }
+      }
+    ],
+    resolutionPriority: -1,
+    // We rely on THIS path so it doesn't affect longpress logic, which currently expects the initial
+    // stage to be a successful longpress.
+    rejectionActions: {
+      item: {
+        type: 'replace',
+        replace: 'longpress-roam'
+      }
+    },
+    // is required by the type.
+    resolutionAction: {
+      type: 'chain',
+      next: 'longpress-roam'
+    }
   }
 }
 
@@ -629,6 +732,66 @@ export function flickStartModel(params: GestureParams): GestureModel<any> {
       type: 'chain',
       item: 'none',
       next: 'flick-mid',
+    },
+  }
+}
+
+export function flickRestartModel(params: GestureParams): GestureModel<KeyElement> {
+  const base = flickStartModel(params);
+  return {
+    ...base,
+    contacts: [
+      {
+        ...base.contacts[0],
+        model: {
+          ...base.contacts[0].model,
+          baseCoordReplacer: (stats, key) => {
+            const keyCentroid = getKeyCentroid(key);
+            const calcDist = buildDistFromKeyCentroidFunctor(key);
+
+            const coord = stats.initialSample;
+            const distFromCenter = calcDist(stats);
+
+            // If the current coord is far off key and would trigger a flick, just recenter
+            // and let the intermediate models 'fall through', displaying the new target flick
+            // if possible.
+            if(distFromCenter > params.flick.triggerDist) {
+              return keyCentroid;
+            }
+
+            const dirLockDist = params.flick.dirLockDist;
+
+            // If we landed within the distance that'd trigger a direction-lock,
+            // no need to fully recenter; the current coord is "good enough".
+            if(distFromCenter < dirLockDist) {
+              return coord;
+            }
+
+            const projectionScalar = dirLockDist / distFromCenter;
+
+            // If the user didn't land close to the key's center, their "perceived"
+            // center for the gesture is likely different than the 'true' center.
+            const dx = coord.clientX - keyCentroid.clientX;
+            const dy = coord.clientY - keyCentroid.clientY;
+
+            // Maps the current coord to a coord on the edge of a circle centered
+            // on the key centroid at a radius of `dirLockDist` away.
+            return {
+              clientX: keyCentroid.clientX + dx * projectionScalar,
+              clientY: keyCentroid.clientY + dy * projectionScalar
+            };
+          }
+        }
+      }
+    ],
+    id: 'flick-restart',
+    sustainWhenNested: true,
+    rejectionActions: {
+      // Only 'rejects' in this form if the path is completed before direction-locking state.
+      path: {
+        type: 'replace',
+        replace: 'flick-reset-end'
+      }
     },
   }
 }
@@ -662,7 +825,7 @@ export function flickMidModel(params: GestureParams): GestureModel<any> {
   }
 }
 
-// exists to trigger a reset
+// Clears existing flick-scrolling & primes the flick-reset recentering mechanism.
 export function flickResetModel(params: GestureParams): GestureModel<any> {
   return {
     id: 'flick-reset',
@@ -671,13 +834,48 @@ export function flickResetModel(params: GestureParams): GestureModel<any> {
       {
         model: {
           ...instantContactResolutionModel(),
-          pathInheritance: 'full'
+          pathInheritance: 'partial', // keep base item, but reset the path-stats.
         },
       }
     ],
     resolutionAction: {
       type: 'chain',
-      next: 'flick-mid'
+      next: 'flick-reset-centering'
+    },
+    sustainWhenNested: true
+  };
+}
+
+export function flickResetCenteringModel(params: GestureParams): GestureModel<KeyElement> {
+  return {
+    id: 'flick-reset-centering',
+    resolutionPriority: 1,
+    contacts: [
+      {
+        model: {
+          pathModel: {
+            evaluate(path, priorStats, baseItem) {
+              priorStats ||= path.stats;
+
+              const calcDist = buildDistFromKeyCentroidFunctor(baseItem);
+
+              const newDist = calcDist(path.stats);
+              const oldDist = calcDist(priorStats);
+
+              if(oldDist < newDist) {
+                return 'resolve';
+              }
+            },
+          },
+          itemPriority: 0,
+          pathResolutionAction: 'resolve',
+          pathInheritance: 'full', // no need to re-reset.
+        },
+      }
+    ],
+    resolutionAction: {
+      type: 'chain',
+      next: 'flick-restart'
     },
     sustainWhenNested: true
   };
@@ -763,7 +961,7 @@ export function multitapEndModel(params: GestureParams): GestureModel<any> {
     contacts: [
       {
         model: {
-          ...simpleTapContactModel(),
+          ...simpleTapContactModel(params),
           itemPriority: 1,
           timer: {
             duration: params.multitap.holdLength,
@@ -797,7 +995,7 @@ export function initialTapModel(params: GestureParams): GestureModel<any> {
     contacts: [
       {
         model: {
-          ...simpleTapContactModel(),
+          ...simpleTapContactModel(params),
           pathInheritance: 'chop',
           itemPriority: 1,
           timer: {
@@ -821,20 +1019,19 @@ export function initialTapModel(params: GestureParams): GestureModel<any> {
     resolutionAction: {
       type: 'chain',
       next: 'multitap-start',
-      item: 'current'
+      item: 'base'
     }
   }
 }
 
-export function simpleTapModel(): GestureModel<any> {
+export function simpleTapModel(params: GestureParams): GestureModel<any> {
   return {
     id: 'simple-tap',
     resolutionPriority: 1,
     contacts: [
       {
         model: {
-          ...simpleTapContactModel(),
-          pathInheritance: 'chop',
+          ...simpleTapContactModel(params, true),
           itemPriority: 1
         },
         endOnResolve: true
@@ -846,7 +1043,7 @@ export function simpleTapModel(): GestureModel<any> {
     sustainWhenNested: true,
     resolutionAction: {
       type: 'complete',
-      item: 'current'
+      item: 'base'
     }
   };
 }
@@ -865,8 +1062,8 @@ export function initialTapModelWithReset(params: GestureParams): GestureModel<an
   }
 }
 
-export function simpleTapModelWithReset(): GestureModel<any> {
-  const simpleModel = simpleTapModel();
+export function simpleTapModelWithReset(params: GestureParams): GestureModel<any> {
+  const simpleModel = simpleTapModel(params);
   return {
     ...simpleModel,
     rejectionActions: {

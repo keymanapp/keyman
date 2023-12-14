@@ -1,0 +1,13 @@
+{
+  "all": true,
+  "check-coverage": false,
+  "clean": true,
+  "exclude-after-remap": true,
+  "extension": [".ts", ".js"],
+  "reporter": ["text", "text-summary"],
+  "reports-dir": "build/coverage",
+  "src": [
+    "**/src/",
+    "../common/**/src"
+  ]
+}

@@ -22,6 +22,7 @@ builder_describe "Builds engine modules for Keyman Engine for Web (KMW)." \
   "configure" \
   "build" \
   "test" \
+  "coverage                  Create an HTML page with code coverage" \
   ":app/browser              The form of Keyman Engine for Web for use on websites" \
   ":app/webview              A puppetable version of KMW designed for use in a host app's WebView" \
   ":app/ui                   Builds KMW's desktop form-factor keyboard-selection UI modules" \
@@ -30,7 +31,6 @@ builder_describe "Builds engine modules for Keyman Engine for Web (KMW)." \
   ":engine/dom-utils         A common subset of function used for DOM calculations, layout, etc" \
   ":engine/events            Specialized classes utilized to support KMW API events" \
   ":engine/element-wrappers  Subset used to integrate with website elements" \
-  ":engine/gestures          The gesture-recognition engine used by KMW's OSK" \
   ":engine/main              Builds all common code used by KMW's app/-level targets" \
   ":engine/osk               Builds the Web OSK module" \
   ":engine/package-cache     Subset used to collate keyboards and request them from the cloud" \
@@ -116,23 +116,14 @@ if builder_start_action test; then
   builder_finish_action success test
 fi
 
-### Temporary tie-in for pre-modularization version of the gesture-recognizer
+coverage_action() {
+  builder_echo "Creating coverage report..."
+  cd "$KEYMAN_ROOT"
+  mkdir -p web/build/coverage/tmp
+  find . -type f -name coverage-\*.json -print0 | xargs -0 cp -t web/build/coverage/tmp
+  c8 report --config web/.c8rc.json ---reporter html --clean=false --reports-dir=web/build/coverage
+  rm -rf web/build/coverage/tmp
+  cd web
+}
 
-if builder_start_action build:engine/gestures; then
-  # Definition of global compile constants
-
-  GESTURE_RECOGNIZER_BUILD="$KEYMAN_ROOT/common/web/gesture-recognizer/build/lib/."
-  GESTURE_RECOGNIZER_TARGET="$KEYMAN_ROOT/web/build/engine/gesture-recognizer/lib/"
-
-  # Copy gesture-recognizer build artifacts into web-space for CI testing
-  # Note:  make sure this doesn't break once KeymanWeb actually uses the module!
-  if ! [ -d $GESTURE_RECOGNIZER_TARGET ]; then
-      mkdir -p $GESTURE_RECOGNIZER_TARGET
-  fi
-  cp -a $GESTURE_RECOGNIZER_BUILD $GESTURE_RECOGNIZER_TARGET
-
-  # Which could then have a parallel script for `prediction-mtnt` that downloads + extracts
-  # the current MTNT model.
-
-  builder_finish_action success build:engine/gestures;
-fi
+builder_run_action coverage coverage_action

@@ -1,18 +1,25 @@
 import { InputEngineBase } from "./headless/inputEngineBase.js";
 import { InputSample } from "./headless/inputSample.js";
 import { GestureSource } from "./headless/gestureSource.js";
+import { GestureRecognizerConfiguration } from "./index.js";
+
+export function processSampleClientCoords<Type, StateToken>(config: GestureRecognizerConfiguration<Type>, clientX: number, clientY: number) {
+  const targetRect = config.targetRoot.getBoundingClientRect();
+  return {
+    clientX: clientX,
+    clientY: clientY,
+    targetX: clientX - targetRect.left,
+    targetY: clientY - targetRect.top
+  } as InputSample<Type, StateToken>;
+}
 
 export abstract class InputEventEngine<HoveredItemType, StateToken> extends InputEngineBase<HoveredItemType, StateToken> {
   abstract registerEventHandlers(): void;
   abstract unregisterEventHandlers(): void;
 
   protected buildSampleFor(clientX: number, clientY: number, target: EventTarget, timestamp: number, source: GestureSource<HoveredItemType, StateToken>): InputSample<HoveredItemType, StateToken> {
-    const targetRect = this.config.targetRoot.getBoundingClientRect();
     const sample: InputSample<HoveredItemType, StateToken> = {
-      clientX: clientX,
-      clientY: clientY,
-      targetX: clientX - targetRect.left,
-      targetY: clientY - targetRect.top,
+      ...processSampleClientCoords(this.config, clientX, clientY),
       t: timestamp,
       stateToken: source?.stateToken ?? this.stateToken
     };
@@ -68,7 +75,7 @@ export abstract class InputEventEngine<HoveredItemType, StateToken> extends Inpu
       return;
     }
 
-    const lastEntry = touchpoint.path.coords[touchpoint.path.coords.length-1];
+    const lastEntry = touchpoint.path.stats.lastSample;
     const sample = this.buildSampleFor(lastEntry.clientX, lastEntry.clientY, target, lastEntry.t, touchpoint);
 
     /* While an 'end' event immediately follows a 'move' if it occurred simultaneously,

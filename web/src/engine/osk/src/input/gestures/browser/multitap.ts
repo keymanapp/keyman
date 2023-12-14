@@ -7,6 +7,7 @@ import { GestureHandler } from '../gestureHandler.js';
 import { distributionFromDistanceMaps } from '@keymanapp/input-processor';
 import Modipress from './modipress.js';
 import { keySupportsModipress } from '../specsForLayout.js';
+import { GesturePreviewHost } from '../../../keyboard-layout/gesturePreviewHost.js';
 
 /**
  * Represents a potential multitap gesture's implementation within KeymanWeb.
@@ -35,7 +36,8 @@ export default class Multitap implements GestureHandler {
     source: GestureSequence<KeyElement, string>,
     vkbd: VisualKeyboard,
     e: KeyElement,
-    contextToken: number
+    contextToken: number,
+    previewHost: GesturePreviewHost
   ) {
     this.baseKey = e;
     this.baseContextToken = contextToken;
@@ -54,10 +56,13 @@ export default class Multitap implements GestureHandler {
 
     this.originalLayer = vkbd.layerId;
 
-    source.on('complete', () => {
-      if(source.stageReports.length > 1) {
-      }
+    const tapLookahead = (offset) => (this.tapIndex + offset) % this.multitaps.length;
 
+    const updatePreview = () => {
+      previewHost?.setMultitapHint(this.multitaps[tapLookahead(0)].text, this.multitaps[tapLookahead(1)].text);
+    }
+
+    source.on('complete', () => {
       this.modipress?.cancel();
       this.clear();
     });
@@ -91,8 +96,9 @@ export default class Multitap implements GestureHandler {
       }
 
       // For rota-style behavior
-      this.tapIndex = (this.tapIndex + 1) % this.multitaps.length;
+      this.tapIndex = tapLookahead(1);
       const selection = this.multitaps[this.tapIndex];
+      updatePreview();
 
       const keyEvent = vkbd.keyEventFromSpec(selection);
       keyEvent.baseTranscriptionToken = this.baseContextToken;
@@ -134,6 +140,10 @@ export default class Multitap implements GestureHandler {
     if(initialTap.matchedId == 'modipress-start') {
       startModipress(source.stageReports[0]);
     }
+
+    // For this specific instance, we'll go ahead and directly maintain the preview;
+    // a touch just ended, and all other updates occur on the start of a new touch.
+    updatePreview();
 
     /* In theory, setting up a specialized recognizer config limited to the base key's surface area
      * would be pretty ideal - it'd provide automatic cancellation if anywhere else were touched.

@@ -93,15 +93,25 @@ namespace core {
      static void emit_text(km_core_state *state, km_core_usv ch);
      /** emit a marker */
      static void emit_marker(km_core_state *state, KMX_DWORD marker);
+     /** emit a pass-through and invalidate */
+     static void emit_invalidate_passthrough_keystroke(km_core_state *state, km_core_virtual_key vk, uint16_t modifier_state);
+
      /**
-      * Delete text from the state.
+      * Delete text from the state, by:
+      *  1. calling actions().push_backspace() to push the appropriate backspaces
+      *  2. popping the same items from the context items
+      *  3. mutating 'str' by removing the same number of items.
+      * This function handles marker strings correctly.
       * @param str string with text to remove, from the end
       * @param length number of chars from the end of str to drop
       */
      static void remove_text(km_core_state *state, std::u32string &str, size_t length);
 
-     /** process a key */
-     void process_key(km_core_state *state, km_core_virtual_key vk, uint16_t modifier_state) const;
+     /** process a key-up */
+     void process_key_up(km_core_state *state, km_core_virtual_key vk, uint16_t modifier_state) const;
+
+     /** process a key-down (if it wasn't handled exceptionally) */
+     void process_key_down(km_core_state *state, km_core_virtual_key vk, uint16_t modifier_state) const;
 
      /** process a typed key */
      void process_key_string(km_core_state *state, const std::u16string &key_str) const;

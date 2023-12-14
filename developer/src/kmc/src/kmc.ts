@@ -6,7 +6,7 @@
 import { Command, Option } from 'commander';
 import { declareBuild } from './commands/build.js';
 import { declareAnalyze } from './commands/analyze.js';
-import { KeymanSentry } from '@keymanapp/developer-utils';
+import { KeymanSentry, loadOptions } from '@keymanapp/developer-utils';
 import KEYMAN_VERSION from "@keymanapp/keyman-version";
 import { TestKeymanSentry } from './util/TestKeymanSentry.js';
 
@@ -23,6 +23,8 @@ try {
 await KeymanSentry.close();
 
 async function run() {
+  await loadOptions();
+
   /* Arguments */
 
   const program = new Command();

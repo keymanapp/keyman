@@ -47,7 +47,8 @@ export class HostFixtureLayoutController extends EventEmitter {
       targetRoot: document.getElementById('target-root'),
       maxRoamingBounds: document.getElementById('roaming-bounds'),
       safeBounds: document.getElementById('safe-zone'),
-      paddedSafeBounds: document.getElementById('padded-safe-zone')
+      paddedSafeBounds: document.getElementById('padded-safe-zone'),
+      recordingMode: true
     };
   };
 

@@ -44,7 +44,8 @@ import OSKLayer from './keyboard-layout/oskLayer.js';
 import OSKLayerGroup from './keyboard-layout/oskLayerGroup.js';
 import { LengthStyle, ParsedLengthStyle } from './lengthStyle.js';
 import { defaultFontSize, getFontSizeStyle } from './fontSizeUtils.js';
-import InternalKeyTip from './input/gestures/browser/keytip.js';
+import PhoneKeyTip from './input/gestures/browser/keytip.js';
+import { TabletKeyTip } from './input/gestures/browser/tabletPreview.js';
 import CommonConfiguration from './config/commonConfiguration.js';
 
 import { DEFAULT_GESTURE_PARAMS, GestureParams, gestureSetForLayout } from './input/gestures/specsForLayout.js';
@@ -371,7 +372,9 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
       mouseEventRoot: document.body,
       // Note: at this point in execution, the value will evaluate to NaN!  Height hasn't been set yet.
       // BUT:  we need to establish the instance now; we can update it later when height _is_ set.
-      maxRoamingBounds: new PaddedZoneSource(this.element, [NaN]),
+      //
+      // Allow keys to be preserved while the contact point is within banner space + a small fudge-factor.
+      maxRoamingBounds: new PaddedZoneSource(this.topContainer, [NaN]),
       // touchEventRoot:  this.element, // is the default
       itemIdentifier: (sample, target) => {
         /* ALWAYS use the findNearestKey function.
@@ -427,17 +430,23 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
       }
 
       const endHighlighting = () => {
-        trackingEntry.previewHost?.cancel();
-        // If we ever allow concurrent previews, check if it exists and matches
-        // a VisualKeyboard-tracked entry; if so, clear that too.
-        if(previewHost) {
-          this.gesturePreviewHost = null;
-          trackingEntry.previewHost = null;
-        }
-        if(trackingEntry.key) {
-          this.highlightKey(trackingEntry.key, false);
-          trackingEntry.key = null;
-        }
+        // The base call will occur before our "is this a multitap?" check otherwise.
+        // That check will unset the field so that it's unaffected by this check.
+        timedPromise(0).then(() => {
+          const previewHost = trackingEntry.previewHost;
+
+          // If we ever allow concurrent previews, check if it exists and matches
+          // a VisualKeyboard-tracked entry; if so, clear that too.
+          if(previewHost) {
+            previewHost.cancel();
+            this.gesturePreviewHost = null;
+            trackingEntry.previewHost = null;
+          }
+          if(trackingEntry.key) {
+            this.highlightKey(trackingEntry.key, false);
+            trackingEntry.key = null;
+          }
+        })
       }
 
       // Fix:  if flicks enabled, no roaming.
@@ -450,17 +459,14 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
         const key = sample.item;
         const oldKey = sourceTrackingMap[source.identifier].key;
 
-        if(key != oldKey) {
+        if(!this.kbdLayout.hasFlicks && key != oldKey) {
           this.highlightKey(oldKey, false);
           this.gesturePreviewHost?.cancel();
           this.gesturePreviewHost = null;
 
-          if(!this.kbdLayout.hasFlicks) {
-            const previewHost = this.highlightKey(key, true);
-            if(previewHost) {
-              this.gesturePreviewHost = previewHost;
-            }
-
+          const previewHost = this.highlightKey(key, true);
+          if(previewHost) {
+            this.gesturePreviewHost = previewHost;
             trackingEntry.previewHost = previewHost;
             sourceTrackingMap[source.identifier].key = key;
           }
@@ -509,6 +515,7 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
           existingPreviewHost.clearFlick();
         }
 
+        let trackingEntry: typeof sourceTrackingMap[string];
         // Disable roaming-touch highlighting (and current highlighting) for all
         // touchpoints included in a gesture, even newly-included ones as they occur.
         for(let id of gestureStage.allSourceIds) {
@@ -521,7 +528,7 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
             trackingEntry.source.path.off('step', trackingEntry.roamingHighlightHandler);
           }
 
-          const trackingEntry = sourceTrackingMap[id];
+          trackingEntry = sourceTrackingMap[id];
 
           if(trackingEntry) {
             clearRoaming(trackingEntry);
@@ -624,12 +631,16 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
           // baseItem is sometimes null during a keyboard-swap... for app/browser touch-based language menus.
           // not ideal, but it is what it is; just let it pass by for now.
         } else if(baseItem?.key.spec.multitap && (gestureStage.matchedId == 'initial-tap' || gestureStage.matchedId == 'multitap' || gestureStage.matchedId == 'modipress-start')) {
-          // For now, but worth changing later!
-          // Idea:  if the preview weren't hosted by the key, but instead had a key-lookalike overlay.
-          // Then it would float above any layer, even after layer swaps.
-          existingPreviewHost?.cancel();
-          // Likewise - mere construction is enough.
-          handlers = [new Multitap(gestureSequence, this, baseItem, keyResult.contextToken)];
+          // Detach the lifetime of the preview from the current touch.
+          trackingEntry.previewHost = null;
+
+          gestureSequence.on('complete', () => {
+            existingPreviewHost?.cancel();
+            this.gesturePreviewHost = null;
+          })
+
+          // Past that, mere construction of the class for delegation is enough.
+          handlers = [new Multitap(gestureSequence, this, baseItem, keyResult.contextToken, existingPreviewHost)];
         } else if(gestureStage.matchedId.indexOf('flick') > -1) {
           handlers = [new Flick(
             gestureSequence,
@@ -1245,8 +1256,8 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
     paddingZone.updatePadding([-0.333 * this.currentLayer.rowHeight]);
 
     this.gestureParams.longpress.flickDist = 0.25 * this.currentLayer.rowHeight;
-    this.gestureParams.flick.startDist     = 0.1  * this.currentLayer.rowHeight;
-    this.gestureParams.flick.dirLockDist   = 0.25 * this.currentLayer.rowHeight;
+    this.gestureParams.flick.startDist     = 0.15 * this.currentLayer.rowHeight;
+    this.gestureParams.flick.dirLockDist   = 0.35 * this.currentLayer.rowHeight;
     this.gestureParams.flick.triggerDist   = 0.75 * this.currentLayer.rowHeight;
 
     // Needs the refreshed layout info to work correctly.
@@ -1533,7 +1544,7 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
     const keyCS = getComputedStyle(key);
     const parsedHeight = Number.parseInt(keyCS.height, 10);
     const parsedWidth  = Number.parseInt(keyCS.width,  10);
-    const previewHost = new GesturePreviewHost(key, !!tip, parsedWidth, parsedHeight);
+    const previewHost = new GesturePreviewHost(key, this.device.formFactor == 'phone', parsedWidth, parsedHeight);
 
     if (tip == null) {
       const baseKey = key.key as OSKBaseKey;
@@ -1551,11 +1562,13 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
    *  Create a key preview element for phone devices
    */
   createKeyTip() {
-    if(this.device.formFactor == 'phone') {
-      if (this.keytip == null) {
+    if (this.keytip == null) {
+      if(this.device.formFactor == 'phone') {
         // For now, should only be true (in production) when keyman.isEmbedded == true.
         let constrainPopup = this.isEmbedded;
-        this.keytip = new InternalKeyTip(this, constrainPopup);
+        this.keytip = new PhoneKeyTip(this, constrainPopup);
+      } else {
+        this.keytip = new TabletKeyTip(this);
       }
     }
 
