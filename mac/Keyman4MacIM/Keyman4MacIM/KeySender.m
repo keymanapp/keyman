@@ -66,11 +66,12 @@ const CGKeyCode kKeymanEventKeyCode = 0xFF;
 
 - (void)postKeyboardEventWithSource: (CGEventSourceRef)source code:(CGKeyCode) virtualKey postCallback:(PostEventCallback)postEvent{
     
-  if (postEvent) {
-    [self.appDelegate logDebugMessage:@"KeySender postKeyboardEventWithSource for virtualKey: @%", virtualKey];
-  } else {
+  if (!postEvent) {
     [self.appDelegate logDebugMessage:@"KeySender postKeyboardEventWithSource callback not specified", virtualKey];
+    return;
   }
+  
+  [self.appDelegate logDebugMessage:@"KeySender postKeyboardEventWithSource for virtualKey: @%", virtualKey];
 
   CGEventRef ev = CGEventCreateKeyboardEvent (source, virtualKey, true); //down
   postEvent(ev);
