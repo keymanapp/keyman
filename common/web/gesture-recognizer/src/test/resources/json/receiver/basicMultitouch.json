@@ -1,0 +1,758 @@
+{
+  "inputs": [
+    {
+      "isFromTouch": true,
+      "path": {
+        "coords": [
+          {
+            "targetX": 46,
+            "targetY": 66,
+            "t": 6679,
+            "item": null
+          },
+          {
+            "targetX": 46,
+            "targetY": 59,
+            "t": 6935,
+            "item": null
+          },
+          {
+            "targetX": 46,
+            "targetY": 58,
+            "t": 6949,
+            "item": null
+          },
+          {
+            "targetX": 46,
+            "targetY": 57,
+            "t": 6983,
+            "item": null
+          },
+          {
+            "targetX": 46,
+            "targetY": 56,
+            "t": 7016,
+            "item": null
+          },
+          {
+            "targetX": 45,
+            "targetY": 55,
+            "t": 7049,
+            "item": null
+          },
+          {
+            "targetX": 45,
+            "targetY": 54,
+            "t": 7083,
+            "item": null
+          },
+          {
+            "targetX": 44,
+            "targetY": 54,
+            "t": 7099,
+            "item": null
+          },
+          {
+            "targetX": 44,
+            "targetY": 53,
+            "t": 7115,
+            "item": null
+          },
+          {
+            "targetX": 43,
+            "targetY": 52,
+            "t": 7166,
+            "item": null
+          },
+          {
+            "targetX": 42,
+            "targetY": 51,
+            "t": 7199,
+            "item": null
+          },
+          {
+            "targetX": 42,
+            "targetY": 50,
+            "t": 7232,
+            "item": null
+          },
+          {
+            "targetX": 41,
+            "targetY": 49,
+            "t": 7249,
+            "item": null
+          },
+          {
+            "targetX": 41,
+            "targetY": 48,
+            "t": 7265,
+            "item": null
+          },
+          {
+            "targetX": 41,
+            "targetY": 47,
+            "t": 7282,
+            "item": null
+          },
+          {
+            "targetX": 41,
+            "targetY": 46,
+            "t": 7298,
+            "item": null
+          },
+          {
+            "targetX": 41,
+            "targetY": 45,
+            "t": 7332,
+            "item": null
+          },
+          {
+            "targetX": 41,
+            "targetY": 44,
+            "t": 7348,
+            "item": null
+          },
+          {
+            "targetX": 41,
+            "targetY": 43,
+            "t": 7399,
+            "item": null
+          },
+          {
+            "targetX": 40,
+            "targetY": 43,
+            "t": 7483,
+            "item": null
+          },
+          {
+            "targetX": 40,
+            "targetY": 42,
+            "t": 7917,
+            "item": null
+          },
+          {
+            "targetX": 40,
+            "targetY": 42,
+            "t": 8151,
+            "item": null
+          },
+          {
+            "targetX": 40,
+            "targetY": 42,
+            "t": 8173,
+            "item": null
+          },
+          {
+            "targetX": 40,
+            "targetY": 42,
+            "t": 8183,
+            "item": null
+          },
+          {
+            "targetX": 40,
+            "targetY": 42,
+            "t": 8199,
+            "item": null
+          },
+          {
+            "targetX": 40,
+            "targetY": 42,
+            "t": 8215,
+            "item": null
+          },
+          {
+            "targetX": 40,
+            "targetY": 42,
+            "t": 8233,
+            "item": null
+          },
+          {
+            "targetX": 40,
+            "targetY": 42,
+            "t": 8249,
+            "item": null
+          },
+          {
+            "targetX": 40,
+            "targetY": 42,
+            "t": 8266,
+            "item": null
+          },
+          {
+            "targetX": 40,
+            "targetY": 42,
+            "t": 8283,
+            "item": null
+          },
+          {
+            "targetX": 40,
+            "targetY": 42,
+            "t": 8299,
+            "item": null
+          },
+          {
+            "targetX": 40,
+            "targetY": 42,
+            "t": 8315,
+            "item": null
+          },
+          {
+            "targetX": 40,
+            "targetY": 42,
+            "t": 8331,
+            "item": null
+          },
+          {
+            "targetX": 40,
+            "targetY": 42,
+            "t": 8348,
+            "item": null
+          },
+          {
+            "targetX": 40,
+            "targetY": 42,
+            "t": 8366,
+            "item": null
+          },
+          {
+            "targetX": 40,
+            "targetY": 42,
+            "t": 8383,
+            "item": null
+          },
+          {
+            "targetX": 40,
+            "targetY": 42,
+            "t": 8399,
+            "item": null
+          },
+          {
+            "targetX": 41,
+            "targetY": 42,
+            "t": 8406,
+            "item": null
+          },
+          {
+            "targetX": 41,
+            "targetY": 42,
+            "t": 8415,
+            "item": null
+          },
+          {
+            "targetX": 41,
+            "targetY": 42,
+            "t": 8431,
+            "item": null
+          },
+          {
+            "targetX": 41,
+            "targetY": 42,
+            "t": 8449,
+            "item": null
+          },
+          {
+            "targetX": 41,
+            "targetY": 42,
+            "t": 8466,
+            "item": null
+          },
+          {
+            "targetX": 41,
+            "targetY": 42,
+            "t": 8483,
+            "item": null
+          },
+          {
+            "targetX": 41,
+            "targetY": 42,
+            "t": 8499,
+            "item": null
+          },
+          {
+            "targetX": 41,
+            "targetY": 42,
+            "t": 8515,
+            "item": null
+          },
+          {
+            "targetX": 41,
+            "targetY": 42,
+            "t": 8531,
+            "item": null
+          },
+          {
+            "targetX": 41,
+            "targetY": 42,
+            "t": 8548,
+            "item": null
+          },
+          {
+            "targetX": 41,
+            "targetY": 42,
+            "t": 8566,
+            "item": null
+          },
+          {
+            "targetX": 41,
+            "targetY": 42,
+            "t": 8582,
+            "item": null
+          },
+          {
+            "targetX": 42,
+            "targetY": 42,
+            "t": 8589,
+            "item": null
+          },
+          {
+            "targetX": 42,
+            "targetY": 42,
+            "t": 8598,
+            "item": null
+          },
+          {
+            "targetX": 42,
+            "targetY": 42,
+            "t": 8615,
+            "item": null
+          },
+          {
+            "targetX": 42,
+            "targetY": 42,
+            "t": 8631,
+            "item": null
+          },
+          {
+            "targetX": 42,
+            "targetY": 42,
+            "t": 8649,
+            "item": null
+          },
+          {
+            "targetX": 42,
+            "targetY": 42,
+            "t": 8666,
+            "item": null
+          },
+          {
+            "targetX": 42,
+            "targetY": 42,
+            "t": 8682,
+            "item": null
+          },
+          {
+            "targetX": 42,
+            "targetY": 42,
+            "t": 8698,
+            "item": null
+          },
+          {
+            "targetX": 42,
+            "targetY": 42,
+            "t": 8715,
+            "item": null
+          },
+          {
+            "targetX": 42,
+            "targetY": 42,
+            "t": 8731,
+            "item": null
+          },
+          {
+            "targetX": 43,
+            "targetY": 42,
+            "t": 8765,
+            "item": null
+          },
+          {
+            "targetX": 42,
+            "targetY": 41,
+            "t": 9183,
+            "item": null
+          },
+          {
+            "targetX": 41,
+            "targetY": 40,
+            "t": 9231,
+            "item": null
+          },
+          {
+            "targetX": 40,
+            "targetY": 40,
+            "t": 9250,
+            "item": null
+          },
+          {
+            "targetX": 40,
+            "targetY": 39,
+            "t": 9265,
+            "item": null
+          },
+          {
+            "targetX": 38,
+            "targetY": 38,
+            "t": 9282,
+            "item": null
+          },
+          {
+            "targetX": 38,
+            "targetY": 37,
+            "t": 9299,
+            "item": null
+          },
+          {
+            "targetX": 37,
+            "targetY": 36,
+            "t": 9315,
+            "item": null
+          },
+          {
+            "targetX": 36,
+            "targetY": 35,
+            "t": 9331,
+            "item": null
+          },
+          {
+            "targetX": 35,
+            "targetY": 34,
+            "t": 9348,
+            "item": null
+          },
+          {
+            "targetX": 35,
+            "targetY": 33,
+            "t": 9365,
+            "item": null
+          },
+          {
+            "targetX": 34,
+            "targetY": 33,
+            "t": 9382,
+            "item": null
+          },
+          {
+            "targetX": 34,
+            "targetY": 32,
+            "t": 9414,
+            "item": null
+          },
+          {
+            "targetX": 33,
+            "targetY": 31,
+            "t": 9515,
+            "item": null
+          },
+          {
+            "targetX": 32,
+            "targetY": 30,
+            "t": 9548,
+            "item": null
+          },
+          {
+            "targetX": 32,
+            "targetY": 29,
+            "t": 9564,
+            "item": null
+          },
+          {
+            "targetX": 31,
+            "targetY": 29,
+            "t": 9581,
+            "item": null
+          },
+          {
+            "targetX": 31,
+            "targetY": 28,
+            "t": 9597,
+            "item": null
+          },
+          {
+            "targetX": 30,
+            "targetY": 27,
+            "t": 9615,
+            "item": null
+          },
+          {
+            "targetX": 30,
+            "targetY": 26,
+            "t": 9632,
+            "item": null
+          },
+          {
+            "targetX": 29,
+            "targetY": 25,
+            "t": 9648,
+            "item": null
+          },
+          {
+            "targetX": 29,
+            "targetY": 24,
+            "t": 9682,
+            "item": null
+          },
+          {
+            "targetX": 29,
+            "targetY": 23,
+            "t": 9732,
+            "item": null
+          }
+        ],
+        "wasCancelled": false
+      }
+    },
+    {
+      "isFromTouch": true,
+      "path": {
+        "coords": [
+          {
+            "targetX": 172,
+            "targetY": 95,
+            "t": 7871,
+            "item": null
+          },
+          {
+            "targetX": 172,
+            "targetY": 95,
+            "t": 7917,
+            "item": null
+          },
+          {
+            "targetX": 172,
+            "targetY": 85,
+            "t": 8151,
+            "item": null
+          },
+          {
+            "targetX": 172,
+            "targetY": 83,
+            "t": 8173,
+            "item": null
+          },
+          {
+            "targetX": 172,
+            "targetY": 80,
+            "t": 8183,
+            "item": null
+          },
+          {
+            "targetX": 172,
+            "targetY": 77,
+            "t": 8199,
+            "item": null
+          },
+          {
+            "targetX": 172,
+            "targetY": 74,
+            "t": 8215,
+            "item": null
+          },
+          {
+            "targetX": 172,
+            "targetY": 71,
+            "t": 8233,
+            "item": null
+          },
+          {
+            "targetX": 172,
+            "targetY": 68,
+            "t": 8249,
+            "item": null
+          },
+          {
+            "targetX": 172,
+            "targetY": 64,
+            "t": 8266,
+            "item": null
+          },
+          {
+            "targetX": 172,
+            "targetY": 61,
+            "t": 8283,
+            "item": null
+          },
+          {
+            "targetX": 172,
+            "targetY": 57,
+            "t": 8299,
+            "item": null
+          },
+          {
+            "targetX": 173,
+            "targetY": 54,
+            "t": 8315,
+            "item": null
+          },
+          {
+            "targetX": 173,
+            "targetY": 51,
+            "t": 8331,
+            "item": null
+          },
+          {
+            "targetX": 173,
+            "targetY": 48,
+            "t": 8348,
+            "item": null
+          },
+          {
+            "targetX": 173,
+            "targetY": 45,
+            "t": 8366,
+            "item": null
+          },
+          {
+            "targetX": 174,
+            "targetY": 42,
+            "t": 8383,
+            "item": null
+          },
+          {
+            "targetX": 174,
+            "targetY": 39,
+            "t": 8399,
+            "item": null
+          },
+          {
+            "targetX": 174,
+            "targetY": 39,
+            "t": 8406,
+            "item": null
+          },
+          {
+            "targetX": 174,
+            "targetY": 36,
+            "t": 8415,
+            "item": null
+          },
+          {
+            "targetX": 174,
+            "targetY": 33,
+            "t": 8431,
+            "item": null
+          },
+          {
+            "targetX": 175,
+            "targetY": 30,
+            "t": 8449,
+            "item": null
+          },
+          {
+            "targetX": 175,
+            "targetY": 27,
+            "t": 8466,
+            "item": null
+          },
+          {
+            "targetX": 175,
+            "targetY": 24,
+            "t": 8483,
+            "item": null
+          },
+          {
+            "targetX": 175,
+            "targetY": 21,
+            "t": 8499,
+            "item": null
+          },
+          {
+            "targetX": 176,
+            "targetY": 18,
+            "t": 8515,
+            "item": null
+          },
+          {
+            "targetX": 176,
+            "targetY": 14,
+            "t": 8531,
+            "item": null
+          },
+          {
+            "targetX": 177,
+            "targetY": 10,
+            "t": 8548,
+            "item": null
+          },
+          {
+            "targetX": 177,
+            "targetY": 6,
+            "t": 8566,
+            "item": null
+          },
+          {
+            "targetX": 177,
+            "targetY": 3,
+            "t": 8582,
+            "item": null
+          },
+          {
+            "targetX": 177,
+            "targetY": 3,
+            "t": 8589,
+            "item": null
+          },
+          {
+            "targetX": 178,
+            "targetY": 0,
+            "t": 8598,
+            "item": null
+          },
+          {
+            "targetX": 178,
+            "targetY": -3,
+            "t": 8615,
+            "item": null
+          },
+          {
+            "targetX": 179,
+            "targetY": -6,
+            "t": 8631,
+            "item": null
+          },
+          {
+            "targetX": 179,
+            "targetY": -9,
+            "t": 8649,
+            "item": null
+          },
+          {
+            "targetX": 180,
+            "targetY": -12,
+            "t": 8666,
+            "item": null
+          },
+          {
+            "targetX": 181,
+            "targetY": -15,
+            "t": 8682,
+            "item": null
+          },
+          {
+            "targetX": 182,
+            "targetY": -18,
+            "t": 8698,
+            "item": null
+          },
+          {
+            "targetX": 182,
+            "targetY": -22,
+            "t": 8715,
+            "item": null
+          },
+          {
+            "targetX": 183,
+            "targetY": -26,
+            "t": 8731,
+            "item": null
+          }
+        ],
+        "wasCancelled": true
+      }
+    }
+  ],
+  "config": {
+    "deviceStyle": "screen2",
+    "roamingStyle": "bounds1",
+    "receiverStyle": "full",
+    "safeZoneStyle": "safe-loose"
+  }
+}

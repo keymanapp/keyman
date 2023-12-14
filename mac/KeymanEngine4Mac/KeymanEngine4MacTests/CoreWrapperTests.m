@@ -58,15 +58,9 @@ CoreWrapper *mockWrapper;
   NSString *kmxPath = [CoreTestStaticHelperMethods getKmxFilePathTestMacEngine];
   CoreWrapper *core = [[CoreWrapper alloc] initWithHelper: [CoreTestStaticHelperMethods helper] kmxFilePath:kmxPath];
   
-  // expecting two actions: character action with 'Ç' and end action
-  NSArray *actions = [core processMacVirtualKey:MVK_A withModifiers:0 withKeyDown:YES];
-  XCTAssert(actions.count == 2, @"Expected 2 actions");
-  CoreAction *charAction = actions[0];
-  XCTAssert(charAction.actionType==CharacterAction, @"Expected CharacterAction");
-  NSString *content = charAction.content;
-  XCTAssert([content isEqualToString:@"\u00C7"], @"Expected capital C cedille (U+00C7)");
-  CoreAction *endAction = actions[1];
-  XCTAssert(endAction.actionType==EndAction, @"Expected EndAction");
+  // expecting character with 'Ç'
+  CoreKeyOutput *coreOutput = [core processMacVirtualKey:MVK_A withModifiers:0 withKeyDown:YES];
+  XCTAssert([coreOutput.textToInsert isEqualToString:@"\u00C7"], @"Expected capital C cedille (U+00C7)");
 }
 
 - (void)testgetContextAsString_ContextContainsEmojis_ReturnsSameContext  {

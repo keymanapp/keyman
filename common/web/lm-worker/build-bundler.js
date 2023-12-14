@@ -51,6 +51,9 @@ await esbuild.build(embeddedWorkerBuildOptions);
 const minifiedProfilingOptions = {
   ...embeddedWorkerBuildOptions,
   minify: true,
+  // Do NOT enable - will break under Android 5.0 / Chrome 35 environments, likely through Chrome 42.
+  // https://caniuse.com/mdn-javascript_builtins_function_name_configurable_true
+  keepNames: false,
   metafile: true,
   write: false // don't actually write the file.
 }
