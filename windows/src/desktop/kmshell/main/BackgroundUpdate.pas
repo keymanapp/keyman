@@ -352,7 +352,8 @@ uses
   UfrmOnlineUpdateNewVersion,
   utilsystem,
   utiluac,
-  versioninfo;
+  versioninfo,
+  Keyman.System.DownloadUpdate;
 
 const
   SPackageUpgradeFilename = 'upgrade_packages.inf';

@@ -253,7 +253,7 @@ begin
           Result := wucNoUpdates;
           Exit;
         end;
-        if ValueExists(SRegValue_LastUpdateCheckTime) and (Now - ReadDateTime(SRegValue_LastUpdateCheckTime) < CheckPeriod) and not FForce then
+        if registry.ValueExists(SRegValue_LastUpdateCheckTime) and (Now - registry.ReadDateTime(SRegValue_LastUpdateCheckTime) < CheckPeriod) and not FForce then
         begin
           Result := wucNoUpdates;
           // TODO: #10210 This exit is just to remove the time check for testing.

@@ -56,97 +56,119 @@ type
 
 implementation
 
+
+uses
+  GlobalProxySettings,
+  KLog,
+  keymanapi_TLB,
+  KeymanVersion,
+  Keyman.System.UpdateCheckStorage,
+  kmint,
+  ErrorControlledRegistry,
+  RegistryKeys,
+  Upload_Settings,
+  OnlineUpdateCheckMessages;
+
+ // temp wrapper for converting showmessage to logs don't know where
+ // if nt using klog
+ procedure LogMessage(LogMessage: string);
+ begin
+   KL.Log(LogMessage);
+ end;
+
 procedure TDownloadUpdate.DoDownloadUpdates(SavePath: string; Params: TUpdateCheckResponse; var Result: Boolean);
 var
   i, downloadCount: Integer;
+  http: THttpUploader;
+  fs: TFileStream;
 
     function DownloadFile(const url, savepath: string): Boolean;
     begin
-      with THttpUploader.Create(nil) do
       try
-        Proxy.Server := GetProxySettings.Server;
-        Proxy.Port := GetProxySettings.Port;
-        Proxy.Username := GetProxySettings.Username;
-        Proxy.Password := GetProxySettings.Password;
-        Request.Agent := API_UserAgent;
+        http := THttpUploader.Create(nil);
+        try
+          http.Proxy.Server := GetProxySettings.Server;
+          http.Proxy.Port := GetProxySettings.Port;
+          http.Proxy.Username := GetProxySettings.Username;
+          http.Proxy.Password := GetProxySettings.Password;
+          http.Request.Agent := API_UserAgent;
 
-        Request.SetURL(url);
-        Upload;
-        if Response.StatusCode = 200 then
+          http.Request.SetURL(url);
+          http.Upload;
+          if http.Response.StatusCode = 200 then
+          begin
+            fs := TFileStream.Create(savepath, fmCreate);
+            try
+              fs.Write(http.Response.PMessageBody^, http.Response.MessageBodyLength);
+            finally
+              fs.Free;
+            end;
+            Result := True;
+          end
+          else // I2742
+            // If it fails we set to false but will try the other files
+            Result := False;
+            Exit;
+        finally
+          http.Free;
+        end;
+      except
+        on E:EHTTPUploader do
         begin
-          with TFileStream.Create(savepath, fmCreate) do
-          try
-            Write(Response.PMessageBody^, Response.MessageBodyLength);
-          finally
-            Free;
-          end;
-          Result := True;
-        end
-        else // I2742
-          // If it fails we set to false but will try the other files
+          if (E.ErrorCode = 12007) or (E.ErrorCode = 12029)
+            then LogMessage(S_OnlineUpdate_UnableToContact)
+            else LogMessage(WideFormat(S_OnlineUpdate_UnableToContact_Error, [E.Message]));
           Result := False;
-          Exit;
-      finally
-        Free;
+        end;
       end;
     end;
-
 
 begin
   Result := False;
-  try
-    FDownload.TotalSize := 0;
-    FDownload.TotalDownloads := 0;
-    downloadCount := 0;
 
-    // Keyboard Packages
-    for i := 0 to High(Params.Packages) do
-      begin
-        Inc(FDownload.TotalDownloads);
-        Inc(FDownload.TotalSize, Params.Packages[i].DownloadSize);
-        Params.Packages[i].SavePath := SavePath + Params.Packages[i].FileName;
-      end;
+  FDownload.TotalSize := 0;
+  FDownload.TotalDownloads := 0;
+  downloadCount := 0;
 
-    // Add the Keyman installer
+  // Keyboard Packages
+  for i := 0 to High(Params.Packages) do
+  begin
     Inc(FDownload.TotalDownloads);
-    Inc(FDownload.TotalSize, Params.InstallSize);
-
-    // Keyboard Packages
-    FDownload.StartPosition := 0;
-    for i := 0 to High(Params.Packages) do
-      begin
-        if not DownloadFile(Params.Packages[i].DownloadURL, Params.Packages[i].SavePath) then // I2742
-        begin
-          Params.Packages[i].Install := False; // Download failed but install other files
-        end
-        else
-          Inc(downloadCount);
-        FDownload.StartPosition := FDownload.StartPosition + Params.Packages[i].DownloadSize;
-      end;
-
-    // Keyamn Installer
-    if not DownloadFile(Params.InstallURL, SavePath + Params.FileName) then  // I2742
-    begin
-      // TODO record fail? and log  // Download failed but user wants to install other files
-    end
-    else
-    begin
-      Inc(downloadCount)
-    end;
-
-    // There needs to be at least one file successfully downloaded to return
-    // TRUE that files where downloaded
-    if downloadCount > 0  then
-      Result := True;
-  except
-    on E:EHTTPUploader do
-    begin
-      if (E.ErrorCode = 12007) or (E.ErrorCode = 12029)
-        then LogMessage(S_OnlineUpdate_UnableToContact)
-        else LogMessage(WideFormat(S_OnlineUpdate_UnableToContact_Error, [E.Message]));
-      Result := False;
-    end;
+    Inc(FDownload.TotalSize, Params.Packages[i].DownloadSize);
+    Params.Packages[i].SavePath := SavePath + Params.Packages[i].FileName;
   end;
+
+  // Add the Keyman installer
+  Inc(FDownload.TotalDownloads);
+  Inc(FDownload.TotalSize, Params.InstallSize);
+
+  // Keyboard Packages
+  FDownload.StartPosition := 0;
+  for i := 0 to High(Params.Packages) do
+    begin
+      if not DownloadFile(Params.Packages[i].DownloadURL, Params.Packages[i].SavePath) then // I2742
+      begin
+        Params.Packages[i].Install := False; // Download failed but install other files
+      end
+      else
+        Inc(downloadCount);
+      FDownload.StartPosition := FDownload.StartPosition + Params.Packages[i].DownloadSize;
+    end;
+
+  // Keyman Installer
+  if not DownloadFile(Params.InstallURL, SavePath + Params.FileName) then  // I2742
+  begin
+    // TODO: #10210record fail? and log  // Download failed but user wants to install other files
+  end
+  else
+  begin
+    Inc(downloadCount)
+  end;
+
+  // There needs to be at least one file successfully downloaded to return
+  // True that files were downloaded
+  if downloadCount > 0 then
+    Result := True;
 end;
 
 function TDownloadUpdate.DownloadUpdates(Params: TUpdateCheckResponse): Boolean;
@@ -154,10 +176,11 @@ var
   DownloadBackGroundSavePath : String;
   DownloadResult : Boolean;
 begin
+  // DownloadBackGroundSavePath := IncludeTrailingPathDelimiter(GetFolderPath(CSIDL_COMMON_APPDATA) + SFolder_CachedUpdateFiles);
   DownloadBackGroundSavePath := IncludeTrailingPathDelimiter(TKeymanPaths.KeymanUpdateCachePath);
 
   DoDownloadUpdates(DownloadBackGroundSavePath, Params, DownloadResult);
-  KL.Log('TDownloadUpdate.DownloadUpdatesBackground: DownloadResult = '+IntToStr(Ord(DownloadResult)));
+  KL.Log('TRemoteUpdateCheck.DownloadUpdatesBackground: DownloadResult = '+IntToStr(Ord(DownloadResult)));
   Result := DownloadResult;
 
 end;
