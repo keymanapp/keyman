@@ -16,7 +16,9 @@ export class TestCompilerCallbacks implements CompilerCallbacks {
   }
 
   printMessages() {
-    process.stdout.write(CompilerError.formatEvent(this.messages));
+    if(this.messages.length) {
+      process.stdout.write(CompilerError.formatEvent(this.messages));
+    }
   }
 
   hasMessage(code: number): boolean {

@@ -74,6 +74,7 @@ export async function loadOptions(): Promise<KeymanDeveloperOptions> {
     // low level.
     options = {};
   }
+  optionsLoaded = true;
   return options;
 }
 

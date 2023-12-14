@@ -21,6 +21,14 @@ export enum CompilerErrorSeverity {
   Fatal =         0x400000, // OOM or should-not-happen internal problem
 };
 
+export const CompilerErrorSeverityValues = [
+  CompilerErrorSeverity.Info,
+  CompilerErrorSeverity.Hint,
+  CompilerErrorSeverity.Warn,
+  CompilerErrorSeverity.Error,
+  CompilerErrorSeverity.Fatal,
+]
+
 /**
  * Mask values for mapping compiler errors
  */
@@ -49,6 +57,9 @@ export class CompilerError {
   }
   static baseError(code: number): number {
     return code & CompilerErrorMask.BaseError;
+  }
+  static namespace(code: number): CompilerErrorNamespace {
+    return code & CompilerErrorMask.Namespace;
   }
   static formatSeverity(code: number): string {
     return errorSeverityName[CompilerError.severity(code)] ?? 'UNKNOWN';
@@ -143,6 +154,22 @@ export class CompilerError {
   static exceptionToString(e?: any) : string {
     return `${(e ?? 'unknown error').toString()}\n\nCall stack:\n${(e instanceof Error ? e.stack : (new Error()).stack)}`;
   }
+
+  /**
+   * Returns the corresponding error severity value from a partial name match,
+   * e.g. 'inf' returns CompilerErrorSeverity.Info, or returns null if not found
+   * @param name
+   * @returns
+   */
+  static severityNameToValue(name: string): CompilerErrorSeverity {
+    name = name.toLowerCase();
+    for(let level of CompilerErrorSeverityValues) {
+      if(errorSeverityName[level].startsWith(name)) {
+        return level;
+      }
+    }
+    return null;
+  }
 };
 
 /** @deprecated use `CompilerError.severity` instead */
@@ -170,6 +197,9 @@ export function compilerEventFormat(e : CompilerEvent | CompilerEvent[]) : strin
  * ranges must not be changed as external modules may depend on specific error
  * codes. Individual errors are defined at a compiler level, for example,
  * kmc-ldml/src/compiler/messages.ts.
+ *
+ * kmc defines a mapping between each namespace and the corresponding compiler's
+ * error reporting class in kmc/src/messages/messageNamespaces.ts
  */
 export enum CompilerErrorNamespace {
   /**
@@ -246,11 +276,22 @@ export interface CompilerFileSystemCallbacks {
   existsSync(name: string): boolean;
 }
 
+type CompilerErrorSeverityOverride = CompilerErrorSeverity | 'disable';
+export interface CompilerMessageOverrideMap {
+  [code:number]: CompilerErrorSeverityOverride;
+};
+
+export interface CompilerMessageOverride {
+  code: number;
+  level: CompilerErrorSeverityOverride;
+};
+
 export interface CompilerCallbackOptions {
   logLevel?: CompilerLogLevel;
   logFormat?: CompilerLogFormat;
   color?: boolean; // null or undefined == use console default
   compilerWarningsAsErrors?: boolean;
+  messageOverrides?: CompilerMessageOverrideMap;
 };
 
 export interface KeymanCompilerArtifact {
@@ -340,6 +381,28 @@ export class CompilerFileCallbacks implements CompilerCallbacks {
   }
 
   /**
+   *
+   * @param event
+   * @param overrides
+   * @returns true if event has been suppressed
+   */
+  static applyMessageOverridesToEvent(event: CompilerEvent, overrides: CompilerMessageOverrideMap) {
+    // Override event severity from user preference -- this will not override
+    // fatal or error events
+    const severity = overrides?.[CompilerError.error(event.code)] ??
+      CompilerError.severity(event.code);
+
+    if(severity == 'disable') {
+      return true;
+    }
+
+    // Override the default event severity with the command line option
+    event.code = severity | (event.code & ~CompilerErrorMask.Severity);
+
+    return false;
+  }
+
+  /**
    * Returns `true` if any message in the `messages` array is a Fatal or Error
    * message, and if `compilerWarningsAsErrors` is `true`, then also returns
    * `true` if any message is a Warning.
@@ -380,8 +443,11 @@ export class CompilerFileCallbacks implements CompilerCallbacks {
   }
 
   reportMessage(event: CompilerEvent): void {
+    const disable = CompilerFileCallbacks.applyMessageOverridesToEvent(event, this.options.messageOverrides);
     this.messages.push(event);
-    this.parent.reportMessage({filename: this.filename, ...event});
+    if(!disable) {
+      this.parent.reportMessage({filename: this.filename, ...event});
+    }
   }
 
   debug(msg: string): void {
