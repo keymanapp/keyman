@@ -30,14 +30,6 @@ const destFile = `build/lib/worker-main.wrapped${MINIFY ? '.min' : ''}.js`;
 
 const script = fs.readFileSync(sourceFile);
 
-// While it IS possible to do partial sourcemaps (without the sources, but with everything else) within the worker...
-// the resulting sourcemaps are -surprisingly- large - larger than the code itself!
-//
-// So... we don't use that strategy here.
-
-console.log();
-console.log(`Wrapping + generating final output: ${MINIFY ? 'minified' : 'unminified'} + ${DEBUG ? 'full sourcemaps' : 'reduced sourcemaps'}`);
-
 // Now, to build the wrapper...
 
 // First, let's build the encoded sourcemap.
@@ -49,6 +41,8 @@ function buildSrcMapString() {
   return `//# sourceMappingURL=data:application/json;charset=utf-8;base64,${encodedSrcMap}`;
 }
 
+// While it IS possible to do partial sourcemaps (without the sources, but with everything else) within the worker...
+// the resulting sourcemaps are -surprisingly- large - larger than the code itself!
 const srcMapString = DEBUG ? buildSrcMapString() : "";
 
 /*
@@ -67,7 +61,7 @@ let wrapper = `
 
 export var LMLayerWorkerCode = ${jsonEncoded};
 
-${MINIFY && "// Sourcemaps have been omitted for this release build." || ''}
+${!DEBUG && "// Sourcemaps have been omitted for this release build." || ''}
 export var LMLayerWorkerSourcemapComment = "${srcMapString}";
 
 // --END:LMLayerWorkerCode
