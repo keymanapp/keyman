@@ -1,7 +1,7 @@
 import EventEmitter from 'eventemitter3';
 
 import { DeviceSpec, InternalKeyboardFont } from "@keymanapp/keyboard-processor";
-import { nestedInstanceOf, wrapElement } from "keyman/engine/element-wrappers";
+import { Input, nestedInstanceOf, wrapElement } from "keyman/engine/element-wrappers";
 import {
   arrayFromNodeList,
   createStyleSheet,
@@ -236,7 +236,7 @@ export class PageContextAttachment extends EventEmitter<EventMap> {
     if(x instanceof x.ownerDocument.defaultView.HTMLTextAreaElement) {
       return true;
     } else if(x instanceof x.ownerDocument.defaultView.HTMLInputElement) {
-      if (x.type == 'email' || x.type == 'search' || x.type == 'text' || x.type == 'url') {
+      if (Input.isSupportedType(x.type)) {
         return true;
       }
     } else if(x instanceof x.ownerDocument.defaultView.HTMLIFrameElement) {
@@ -733,15 +733,8 @@ export class PageContextAttachment extends EventEmitter<EventMap> {
     let t2=document.getElementsByTagName('textarea');
 
     for(let i=0; i<t1.length; i++) {
-      switch(t1[i].type) {
-        case 'text':
-        case 'search':
-        case 'email':
-        case 'url':
-          if(t1[i].className.indexOf('kmw-disabled') < 0) {
-            eList.push({ip:t1[i], x: getAbsoluteX(t1[i]), y: getAbsoluteY(t1[i])});
-          }
-          break;
+      if (Input.isSupportedType(t1[i].type) && t1[i].className.indexOf('kmw-disabled') < 0) {
+        eList.push({ip:t1[i], x: getAbsoluteX(t1[i]), y: getAbsoluteY(t1[i])});
       }
     }
 
