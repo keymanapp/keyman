@@ -10,7 +10,7 @@ import { Command } from 'commander';
 import { PackageValidation, KmpCompiler } from '@keymanapp/kmc-package';
 import { SysExits } from './util/sysexits.js';
 import KEYMAN_VERSION from "@keymanapp/keyman-version";
-import { NodeCompilerCallbacks } from './messages/NodeCompilerCallbacks.js';
+import { NodeCompilerCallbacks } from './util/NodeCompilerCallbacks.js';
 
 let inputFilename: string;
 const program = new Command();
@@ -37,7 +37,7 @@ let outputFilename: string = program.opts().outFile ? program.opts().outFile : i
 // Load .kps source data
 //
 
-const callbacks = new NodeCompilerCallbacks();
+const callbacks = new NodeCompilerCallbacks({logLevel: 'info'});
 let kmpCompiler = new KmpCompiler(callbacks);
 let kmpJsonData = kmpCompiler.transformKpsToKmpObject(inputFilename);
 if(!kmpJsonData) {
@@ -48,7 +48,7 @@ if(!kmpJsonData) {
 // Validate the package file
 //
 
-const validation = new PackageValidation(callbacks);
+const validation = new PackageValidation(callbacks, {});
 if(!validation.validate(inputFilename, kmpJsonData)) {
   process.exit(1);
 }

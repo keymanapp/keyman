@@ -1,5 +1,6 @@
-import fs = require('fs');
-import { configuration } from './config';
+import { writeFileSync } from 'fs';
+import { configuration } from './config.js';
+import { loadJsonFile } from './load-json-file.js';
 
 export interface DebugObject {
   id: string;
@@ -96,7 +97,7 @@ export class SiteData {
   }
 
   private loadState() {
-    const state = fs.existsSync(configuration.cacheStateFilename) ? JSON.parse(fs.readFileSync(configuration.cacheStateFilename, 'utf-8')) : null;
+    const state = loadJsonFile(configuration.cacheStateFilename);
     this.loadDebugObject(DebugKeyboard, state?.keyboards, this.keyboards);
     this.loadDebugObject(DebugModel, state?.models, this.models);
     this.loadDebugObject(DebugFont, state?.fonts, this.fonts);
@@ -105,7 +106,7 @@ export class SiteData {
   }
 
   public saveState() {
-    fs.writeFileSync(configuration.cacheStateFilename, JSON.stringify(this, null, 2), 'utf-8');
+    writeFileSync(configuration.cacheStateFilename, JSON.stringify(this, null, 2), 'utf-8');
   }
 };
 

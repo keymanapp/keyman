@@ -1,5 +1,5 @@
 {
-    "extends": "../../../tsconfig.esm-base.json",
+    "extends": "../../../tsconfig.base.json",
     "compilerOptions": {
         "composite": true,
         "declaration": true,
@@ -10,7 +10,7 @@
         "node_modules"
     ],
     "files": [
-        "keyboardprocessor_ldml.ts",
+        "keyman_core_ldml.ts",
         "ldml-const-builder.ts"
     ]
 }

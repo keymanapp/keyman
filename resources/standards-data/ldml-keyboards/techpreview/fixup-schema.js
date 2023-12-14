@@ -48,12 +48,12 @@ function singleToArray(o) {
     }
 }
 
-if (data.title.endsWith('ldmlKeyboard.xsd')) {
-    if (data?.properties?.keyboard) {
-        data.properties.keyboard.type = 'object';
+if (data.title.endsWith('ldmlKeyboard3.xsd')) {
+    if (data?.properties?.keyboard3) {
+        data.properties.keyboard3.type = 'object';
     }
 
-    arrayToSingle(data?.properties?.keyboard?.properties?.vkeys);
+    arrayToSingle(data?.properties?.keyboard3?.properties?.vkeys);
     singleToArray(data?.definitions?.keys?.properties?.key);
     singleToArray(data?.definitions?.keys?.properties?.flicks);
     arrayToSingle(data?.definitions?.displays?.properties?.displayOptions);
@@ -78,6 +78,12 @@ if (data.title.endsWith('ldmlKeyboard.xsd')) {
       delete item.items.type;
       item.items['$ref'] = `#/definitions/${newName}`;
     }
+}
+
+if (data.title.endsWith('ldmlKeyboardTest3.xsd')) {
+  if (data?.properties?.keyboardTest3) {
+      data.properties.keyboardTest3.type = 'object';
+  }
 }
 
 // Write stuff

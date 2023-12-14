@@ -1,4 +1,4 @@
-import { DeviceSpec } from '@keymanapp/web-utils';
+import { DeviceSpec, ManagedPromise } from '@keymanapp/web-utils';
 import { type InternalKeyboardFont as KeyboardFont } from '@keymanapp/keyboard-processor';
 
 type FontFamilyStyleMap = {[family: string]: HTMLStyleElement};
@@ -26,6 +26,27 @@ export class StylesheetManager {
   linkStylesheet(sheet: HTMLStyleElement) {
     this.linkedSheets.push(sheet);
     this.linkNode.appendChild(sheet);
+  }
+
+  /**
+   * Provides a `Promise` that resolves when all currently-linked stylesheets have loaded.
+   * Any change to the set of linked sheets after the initial call will be ignored.
+   */
+  async allLoadedPromise() {
+    const promises: Promise<void>[] = [];
+
+    for(const sheetElem of this.linkedSheets) {
+      // Based on https://stackoverflow.com/a/21147238
+      if(sheetElem.sheet?.cssRules) {
+        promises.push(Promise.resolve());
+      } else {
+        const promise = new ManagedPromise<void>();
+        sheetElem.addEventListener('load', () => promise.resolve());
+        promises.push(promise.corePromise);
+      }
+    }
+
+    await Promise.all(promises);
   }
 
   /**
@@ -212,6 +233,8 @@ export class StylesheetManager {
         sheet.parentNode.removeChild(sheet);
       }
     }
+
+    this.linkedSheets.splice(0, this.linkedSheets.length);
   }
 }
 

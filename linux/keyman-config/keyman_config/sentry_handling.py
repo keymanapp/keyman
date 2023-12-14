@@ -1,11 +1,12 @@
 #!/usr/bin/python3
 import getpass
+import hashlib
 import importlib
 import logging
 import os
 import platform
 import sys
-from keyman_config.gsettings import GSettings
+import traceback
 from keyman_config.version import (
   __version__,
   __versionwithtag__,
@@ -48,7 +49,7 @@ class SentryErrorHandling:
             return (True, '')
 
     def is_sentry_enabled(self):
-        if 'unittest' in sys.modules.keys():
+        if self._is_unit_test():
             return (False, 'Running unit tests, not reporting to Sentry')
         elif self._get_environ_nosentry():
             return (False, 'Not reporting to Sentry because KEYMAN_NOSENTRY environment variable set')
@@ -75,6 +76,14 @@ class SentryErrorHandling:
     def _get_environ_nosentry(self):
         keyman_nosentry = os.environ.get('KEYMAN_NOSENTRY')
         return keyman_nosentry and (int(keyman_nosentry) == 1)
+
+    def _is_unit_test(self):  # sourcery skip: use-any, use-next
+        # The suggested refactorings (using any() or next()) don't work
+        # when testing on Ubuntu 20.04
+        for line in traceback.format_stack():
+            if '/unittest/' in line:
+                return True
+        return False
 
     def _handle_enabled(self, enabled):
         if enabled:
@@ -116,13 +125,29 @@ class SentryErrorHandling:
           integrations=[sentry_logging],
           before_send=self._before_send
         )
-        set_user({'id': hash(getpass.getuser())})
+        hash = hashlib.md5()
+        hash.update(getpass.getuser().encode())
+        set_user({'id': hash.hexdigest()})
         with configure_scope() as scope:
             scope.set_tag("app", os.path.basename(sys.argv[0]))
             scope.set_tag("pkgversion", __pkgversion__)
             scope.set_tag("platform", platform.platform())
             scope.set_tag("system", platform.system())
             scope.set_tag("tier", __tier__)
+            scope.set_tag("device", platform.node())
+            try:
+                os_release = platform.freedesktop_os_release()
+                scope.set_tag('os', os_release['PRETTY_NAME'])
+                scope.set_tag('os.name', os_release['NAME'])
+                if 'VERSION' in os_release:
+                    scope.set_tag('os.version', os_release['VERSION'])
+            except OSError as e:
+                logging.debug(f'System does not have os_release file: {e.strerror}')
+            except AttributeError:
+                logging.debug('System does not have platform.freedesktop_os_release() method')
+            except:
+                logging.debug(
+                    'Got exception trying to access platform.freedesktop_os_release()  method or os_release information')
         logging.info("Initialized Sentry error reporting")
 
     def _raven_initialize(self):

@@ -74,8 +74,9 @@
 #define VERSION_140 0x00000E00
 #define VERSION_150 0x00000F00
 #define VERSION_160 0x00001000
+#define VERSION_170 0x00001100
 #define VERSION_MIN	VERSION_50
-#define VERSION_MAX	VERSION_160
+#define VERSION_MAX	VERSION_170
 
 /*
  Special flag for WM_CHAR/WM_KEY???/WM_SYSKEY???: says that key has been
@@ -414,8 +415,6 @@ typedef struct _COMPILER_OPTIONS {
 typedef COMPILER_OPTIONS *PCOMPILER_OPTIONS;
 
 typedef int (CALLBACK *CompilerMessageProc)(int line, DWORD dwMsgCode, LPSTR szText);
-
-//extern "C" BOOL __declspec(dllexport) CompileKeyboardFile(PSTR pszInfile, PSTR pszOutfile, BOOL FSaveDebug, BOOL ACompilerWarningsAsErrors, BOOL AWarnDeprecatedCode, CompilerMessageProc pMsgProc);   // I4865   // I4866
 
 #endif		// _COMPILER_H
 

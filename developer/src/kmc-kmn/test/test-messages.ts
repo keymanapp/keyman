@@ -1,7 +1,6 @@
 import 'mocha';
-import path from 'path';
 import { assert } from 'chai';
-import { CompilerMessages } from '../src/compiler/messages.js';
+import { CompilerMessages, KmnCompilerMessages } from '../src/compiler/kmn-compiler-messages.js';
 import { TestCompilerCallbacks, verifyCompilerMessagesObject } from '@keymanapp/developer-test-helpers';
 import { makePathToFixture } from './helpers/index.js';
 import { KmnCompiler } from '../src/main.js';
@@ -28,10 +27,9 @@ describe('CompilerMessages', function () {
     assert(compiler.verifyInitialized());
 
     const kmnPath = makePathToFixture(...fixture);
-    const outfile = path.basename(kmnPath, '.kmn') + '.kmx';
 
     // Note: throwing away compile results (just to memory)
-    compiler.runCompiler(kmnPath, outfile, {saveDebug: true, shouldAddCompilerVersion: false});
+    compiler.runCompiler(kmnPath, {saveDebug: true, shouldAddCompilerVersion: false});
 
     if(messageId) {
       assert.isTrue(callbacks.hasMessage(messageId), `messageId ${messageId.toString(16)} not generated, instead got: `+JSON.stringify(callbacks.messages,null,2));
@@ -53,18 +51,47 @@ describe('CompilerMessages', function () {
     await testForMessage(this, ['invalid-keyboards', 'warn_invalid_vkey_in_kvks_file.kmn'], CompilerMessages.WARN_InvalidVkeyInKvksFile);
   });
 
-  // CERR_DuplicateGroup
+  // ERROR_DuplicateGroup
 
   it('should generate CERR_DuplicateGroup if the kmn contains two groups with the same name', async function() {
-    await testForMessage(this, ['invalid-keyboards', 'cerr_duplicate_group.kmn'], 0x302071); //TODO: consolidate messages from kmcmplib, CompilerMessages.CERR_DuplicateGroup
+    await testForMessage(this, ['invalid-keyboards', 'error_duplicate_group.kmn'], KmnCompilerMessages.ERROR_DuplicateGroup);
     assert.equal(callbacks.messages[0].message, "A group with this name has already been defined. Group 'ខ្មែរ' declared on line 9");
   });
 
-  // CERR_DuplicateStore
+  // ERROR_DuplicateStore
 
   it('should generate CERR_DuplicateStore if the kmn contains two stores with the same name', async function() {
-    await testForMessage(this, ['invalid-keyboards', 'cerr_duplicate_store.kmn'], 0x302072); //TODO: consolidate messages from kmcmplib, CompilerMessages.CERR_DuplicateStore
+    await testForMessage(this, ['invalid-keyboards', 'error_duplicate_store.kmn'], KmnCompilerMessages.ERROR_DuplicateStore);
     assert.equal(callbacks.messages[0].message, "A store with this name has already been defined. Store 'ខ្មែរ' declared on line 11");
+  });
+
+  // ERROR_VirtualKeyInContext
+
+  it('should generate ERROR_VirtualKeyInContext if a virtual key is found in the context part of a rule', async function() {
+    await testForMessage(this, ['invalid-keyboards', 'error_virtual_key_in_context.kmn'], KmnCompilerMessages.ERROR_VirtualKeyInContext);
+    assert.equal(callbacks.messages[0].message, "Virtual keys are not permitted in context");
+  });
+
+  // WARN_TouchLayoutUnidentifiedKey
+
+  it('should generate WARN_TouchLayoutUnidentifiedKey if a key has no identifier in the touch layout', async function() {
+    await testForMessage(this, ['invalid-keyboards', 'warn_touch_layout_unidentified_key.kmn'], KmnCompilerMessages.WARN_TouchLayoutUnidentifiedKey);
+    // TODO(lowpri): that message could be slightly more helpful!
+    assert.equal(callbacks.messages[0].message, "A key on layer \"default\" has no identifier.");
+  });
+
+  // ERROR_NotSupportedInKeymanWebOutput
+
+  it('should generate ERROR_NotSupportedInKeymanWebOutput if a rule has `return` in the output', async function() {
+    await testForMessage(this, ['invalid-keyboards', 'error_not_supported_in_keyman_web_output.kmn'], KmnCompilerMessages.ERROR_NotSupportedInKeymanWebOutput);
+    assert.equal(callbacks.messages[0].message, "Statement 'return' is not currently supported in output for web and touch targets");
+  });
+
+  // WARN_VirtualKeyInOutput
+
+  it('should generate WARN_VirtualKeyInOutput if a virtual key is found in the output part of a rule', async function() {
+    await testForMessage(this, ['invalid-keyboards', 'warn_virtual_key_in_output.kmn'], KmnCompilerMessages.WARN_VirtualKeyInOutput);
+    assert.equal(callbacks.messages[0].message, "Virtual keys are not supported in output");
   });
 
 });

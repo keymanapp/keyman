@@ -62,14 +62,15 @@ const
   Ext_LexicalModelPackageSource = '.model.kps';
   Ext_LexicalModelProject = '.model.kpj';
 
-const ExtFileTypes: array[0..13] of TKMFileTypeInfo = (
+const ExtFileTypes: array[0..14] of TKMFileTypeInfo = (
   (Ext: Ext_KeymanSource; FileType: ftKeymanSource),
   (Ext: Ext_PackageSource; FileType: ftPackageSource),
   (Ext: Ext_KeymanFile; FileType: ftKeymanFile),
   (Ext: Ext_PackageFile; FileType: ftPackageFile),
   (Ext: '.ttf'; FileType: ftFont),
   (Ext: '.otf'; FileType: ftFont),
-  (Ext: '.fon'; FileType: ftFont),
+  (Ext: '.woff'; FileType: ftFont),
+  (Ext: '.woff2'; FileType: ftFont),
   (Ext: '.ttc'; FileType: ftFont),
   (Ext: Ext_VisualKeyboard; FileType: ftVisualKeyboard),
   (Ext: Ext_VisualKeyboardSource; FileType: ftVisualKeyboardSource),
@@ -81,6 +82,9 @@ const ExtFileTypes: array[0..13] of TKMFileTypeInfo = (
 function GetFileTypeFromFileName(const FileName: string): TKMFileType;
 function GetFileTypeFilter(ft: TKMFileType; var DefaultExt: string): string;
 
+function IsProjectFile(const FileName: string): Boolean;
+
+// TODO-LDML: do we need to extend this to support .xml?
 function IsKeyboardFile(const FileName: string): Boolean;
 function RemoveFileExtension(Filename, Extension: string): string;
 
@@ -93,7 +97,7 @@ type
   end;
 
 type
-  TKeymanProjectType = (kptUnknown, kptBasic, kptBlank, kptImportWindowsKeyboard, kptBlankLexicalModel, kptWordlistLexicalModel);
+  TKeymanProjectType = (kptUnknown, kptBasic, kptImportWindowsKeyboard, kptWordlistLexicalModel);
 
 implementation
 
@@ -161,6 +165,11 @@ begin
   if SameText(Copy(Filename, LF-LE+1, LE), Extension)
     then Result := Copy(Filename, 1, LF-LE)
     else Result := Filename;
+end;
+
+function IsProjectFile(const FileName: string): Boolean;
+begin
+  Result := SameText(ExtractFileExt(FileName), Ext_ProjectSource);
 end;
 
 { TKeymanFileTypeInfo }

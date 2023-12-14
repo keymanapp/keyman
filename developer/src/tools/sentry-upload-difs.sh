@@ -30,15 +30,34 @@ cd "$KEYMAN_ROOT/developer/src"
 #
 
 [ -f ./samples/imsample/IMSample.pdb ] && rm -f ./samples/imsample/IMSample.pdb
-[ -f ./kmcmpdll/Win32/Release/kcframe.pdb ] && rm -f ./kmcmpdll/Win32/Release/kcframe.pdb
-[ -f ./kmcmpdll/Win32/Debug/kcframe.pdb ] && rm -f ./kmcmpdll/Win32/Debug/kcframe.pdb
-[ -f ./kmcmpdll/x64/Release/kcframe.x64.pdb ] && rm -f ./kmcmpdll/x64/Release/kcframe.x64.pdb
-[ -f ./kmcmpdll/x64/Debug/kcframe.x64.pdb ] && rm -f ./kmcmpdll/x64/Debug/kcframe.x64.pdb
 
 #
 # Upload the files
 #
 
+sourcemap_paths=(
+  ./TIKE/xml
+  ../bin/server
+  ./kmc/build
+  ./kmc-analyze/build
+  ./kmc-keyboard-info/build
+  ./kmc-kmn/build
+  ./kmc-ldml/build
+  ./kmc-model/build
+  ./kmc-model-info/build
+  ./kmc-package/build
+)
+
 echo "Uploading symbols for developer/"
-sentry-cli upload-dif -p keyman-developer -t breakpad -t pdb . --include-sources
-sentry-cli releases -p keyman-developer files "$VERSION_GIT_TAG" upload-sourcemaps ./TIKE/xml ../bin/server ./kmlmc/dist
+./kmc/node_modules/.bin/sentry-cli upload-dif \
+   --project keyman-developer \
+   --include-sources \
+   --no-zips \
+   .
+./kmc/node_modules/.bin/sentry-cli sourcemaps upload \
+   --org keyman \
+   --project keyman-developer \
+   --release "$VERSION_GIT_TAG"  \
+   --dist "$VERSION_ENVIRONMENT" \
+   --ext js --ext mjs --ext ts --ext map \
+   "${sourcemap_paths[@]}"

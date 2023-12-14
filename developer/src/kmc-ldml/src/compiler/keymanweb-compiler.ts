@@ -1,31 +1,27 @@
-import { CompilerCallbacks, VisualKeyboard, LDMLKeyboard, TouchLayoutFileWriter } from "@keymanapp/common-types";
-import { CompilerOptions } from "./compiler-options.js";
+import { CompilerCallbacks, VisualKeyboard, LDMLKeyboard, TouchLayoutFileWriter, KeymanFileTypes } from "@keymanapp/common-types";
+import { LdmlCompilerOptions } from "./ldml-compiler-options.js";
 import { TouchLayoutCompiler } from "./touch-layout-compiler.js";
 import { LdmlKeyboardVisualKeyboardCompiler } from "./visual-keyboard-compiler.js";
 
 const MINIMUM_KMW_VERSION = '16.0';
 
-export interface LdmlKeyboardKeymanWebCompilerOptions extends CompilerOptions {
-};
-
 export class LdmlKeyboardKeymanWebCompiler {
-  private readonly options: LdmlKeyboardKeymanWebCompilerOptions;
+  private readonly options: LdmlCompilerOptions;
   private readonly nl: string;
   private readonly tab: string;
-
-  constructor(private callbacks: CompilerCallbacks, options?: LdmlKeyboardKeymanWebCompilerOptions) {
+  constructor(private callbacks: CompilerCallbacks, options?: LdmlCompilerOptions) {
     this.options = { ...options };
-    this.nl = this.options.debug ? "\n" : '';
-    this.tab = this.options.debug ? "  " : '';
+    this.nl = this.options.saveDebug ? "\n" : '';
+    this.tab = this.options.saveDebug ? "  " : '';
   }
 
   public compileVisualKeyboard(source: LDMLKeyboard.LDMLKeyboardXMLSourceFile) {
     const nl = this.nl, tab = this.tab;
-    const vkc = new LdmlKeyboardVisualKeyboardCompiler();
+    const vkc = new LdmlKeyboardVisualKeyboardCompiler(this.callbacks);
     const vk: VisualKeyboard.VisualKeyboard = vkc.compile(source);
 
     let result =
-      `{F: '${vk.header.unicodeFont.size}pt ${JSON.stringify(vk.header.unicodeFont.name)}', `+
+      `{F: ' 1em ${JSON.stringify(vk.header.unicodeFont.name)}', `+
       `K102: ${vk.header.flags & VisualKeyboard.VisualKeyboardHeaderFlags.kvkh102 ? 1 : 0}};${nl}` + // TODO-LDML: escape ' and " in font name correctly
       `${tab}this.KV.KLS={${nl}` +
       `${tab}${tab}TODO_LDML: ${vk.keys.length}${nl}` +
@@ -38,12 +34,12 @@ export class LdmlKeyboardKeymanWebCompiler {
   public compileTouchLayout(source: LDMLKeyboard.LDMLKeyboardXMLSourceFile) {
     const tlcompiler = new TouchLayoutCompiler();
     const layout = tlcompiler.compileToJavascript(source);
-    const writer = new TouchLayoutFileWriter({formatted: this.options.debug});
+    const writer = new TouchLayoutFileWriter({formatted: this.options.saveDebug});
     return writer.compile(layout);
   }
 
   private cleanName(name: string): string {
-    let result = this.callbacks.path.basename(name, '.xml');
+    let result = this.callbacks.path.basename(name, KeymanFileTypes.Source.LdmlKeyboard);
     if(!result) {
       throw new Error(`Invalid file name ${name}`);
     }
@@ -76,13 +72,13 @@ export class LdmlKeyboardKeymanWebCompiler {
       // `${tab}${this.setupDebug()}${nl}` + ? we may use this for modifierBitmask in future
       // `${tab}this._v=(typeof keyman!="undefined"&&typeof keyman.version=="string")?parseInt(keyman.version,10):9;${nl}` + ? we probably don't need this, it's for back-compat
       `${tab}this.KI="${sName}";${nl}` +
-      `${tab}this.KN=${JSON.stringify(source.keyboard.names.name[0])};${nl}` +
+      `${tab}this.KN=${JSON.stringify(source.keyboard3.info.name)};${nl}` +
       `${tab}this.KMINVER=${JSON.stringify(MINIMUM_KMW_VERSION)};${nl}` +
       `${tab}this.KV=${this.compileVisualKeyboard(source)};${nl}` +
       `${tab}this.KDU=${displayUnderlying ? '1' : '0'};${nl}` +
       `${tab}this.KH="";${nl}` +  // TODO-LDML: help text not supported
       `${tab}this.KM=0;${nl}` +  // TODO-LDML: mnemonic layout not supported for LDML keyboards
-      `${tab}this.KBVER=${JSON.stringify(source.keyboard.version?.number || '0.0')};${nl}` +
+      `${tab}this.KBVER=${JSON.stringify(source.keyboard3.version?.number || '0.0')};${nl}` +
       `${tab}this.KMBM=${modifierBitmask};${nl}`;
 
     if(isRTL) {

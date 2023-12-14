@@ -1,19 +1,21 @@
 import { constants } from "@keymanapp/ldml-keyboard-constants";
-import { KMXPlusData, StrsItem } from "../kmx-plus.js";
-import { build_strs_index, BUILDER_STRS } from "./build-strs.js";
-import { BUILDER_SECTION } from "./builder-section.js";
+import { KMXPlusData, StrsItem, UsetItem } from "../kmx-plus.js";
+import { build_strs_index, BUILDER_STR_REF, BUILDER_STRS } from "./build-strs.js";
+import { BUILDER_SECTION, BUILDER_U32CHAR } from "./builder-section.js";
 
+/** reference from build_uset_index */
+export type BUILDER_USET_REF = number;
 
 interface BUILDER_USET_USET {
   range: number;
   count: number;
-  pattern: number; // str
+  pattern: BUILDER_STR_REF;
   _pattern: StrsItem; // for sorting
 };
 
 interface BUILDER_USET_RANGE {
-  start: number;
-  end: number;
+  start: BUILDER_U32CHAR; // uchar32
+  end: BUILDER_U32CHAR; // uchar32
 }
 
 export interface BUILDER_USET extends BUILDER_SECTION {
@@ -63,4 +65,24 @@ export function build_uset(kmxplus: KMXPlusData, sect_strs: BUILDER_STRS ) : BUI
   };
 
   return uset;
+}
+
+
+/**
+ * @returns uset index
+ */
+export function build_uset_index(sect_uset: BUILDER_USET, value: UsetItem) {
+  if(!(value instanceof UsetItem)) {
+    if (value === null) {
+      throw new Error('unexpected null UsetItem');
+    } else {
+      throw new Error('Expected UsetItem but got '+ value);
+    }
+  }
+
+  let result = sect_uset.usets.findIndex(v => v._pattern.value === value.str.value);
+  if(result < 0) {
+    throw new Error('unexpectedly missing UsetItem ' + value.uset.toString());
+  }
+  return result;
 }

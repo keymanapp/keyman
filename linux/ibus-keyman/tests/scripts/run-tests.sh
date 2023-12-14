@@ -4,13 +4,14 @@ set -eu
 TOP_SRCDIR=${top_srcdir:-$(realpath "$(dirname "$0")/../..")}
 TESTBASEDIR=${XDG_DATA_HOME:-$HOME/.local/share}/keyman
 TESTDIR=${TESTBASEDIR}/test_kmx
-PID_FILE=/tmp/ibus-keyman-test-pids
+CLEANUP_FILE=/tmp/ibus-keyman-test-cleanup
+PID_FILE=/tmp/ibus-keyman-test.pids
 ENV_FILE=/tmp/keyman-env.txt
 
 . "$(dirname "$0")"/test-helper.inc.sh
 
 local_cleanup() {
-  cleanup "$PID_FILE"
+  cleanup "$CLEANUP_FILE"
 }
 
 if [ -v KEYMAN_PKG_BUILD ]; then
@@ -18,8 +19,7 @@ if [ -v KEYMAN_PKG_BUILD ]; then
   # ibus requires to find /var/lib/dbus/machine-id or /etc/machine-id, otherwise it fails with:
   # "Bail out! IBUS-FATAL-WARNING: Unable to load /var/lib/dbus/machine-id: Failed to open file
   # “/var/lib/dbus/machine-id”: No such file or directory"
-  echo "1..1"
-  echo "ok 1 - Integration tests # SKIP on package build"
+  echo "1..0 # SKIP on package build"
   exit 0
 fi
 
@@ -63,7 +63,7 @@ function run_tests() {
 
   G_TEST_BUILDDIR="$(dirname "$0")/../../../build/$(arch)/${CONFIG}/tests"
 
-  setup "$DISPLAY_SERVER" "$ENV_FILE" "$PID_FILE"
+  setup "$DISPLAY_SERVER" "$ENV_FILE" "$CLEANUP_FILE" "$PID_FILE"
 
   echo "# NOTE: When the tests fail check /tmp/ibus-engine-keyman.log and /tmp/ibus-daemon.log!"
   echo ""
@@ -87,10 +87,10 @@ function run_tests() {
   #shellcheck disable=SC2086
   "${G_TEST_BUILDDIR:-../../build/$(arch)/${CONFIG}/tests}/ibus-keyman-tests" ${ARG_K-} ${ARG_TAP-} \
     ${ARG_VERBOSE-} ${ARG_DEBUG-} ${ARG_SURROUNDING_TEXT-} ${ARG_NO_SURROUNDING_TEXT-} \
-    --directory "$TESTDIR" --"${DISPLAY_SERVER}" ${TESTFILES[@]}
+    --directory "$TESTDIR" "${DISPLAY_SERVER}" ${TESTFILES[@]}
   echo "# Finished tests."
 
-  cleanup "$PID_FILE"
+  cleanup "$CLEANUP_FILE"
 }
 
 USE_WAYLAND=1
@@ -133,13 +133,14 @@ if [ ! -f "${G_TEST_BUILDDIR}/ibus-keyman-tests" ]; then
   G_TEST_BUILDDIR="${G_TEST_BUILDDIR:-../../build/$(arch)/release/tests}"
 fi
 
+echo > "$CLEANUP_FILE"
 echo > "$PID_FILE"
 trap local_cleanup EXIT SIGINT
 
 if [ "$USE_WAYLAND" == "1" ]; then
-  ( run_tests wayland "$@" )
+  run_tests --wayland "$@"
 fi
 
 if [ "$USE_X11" == "1" ]; then
-  ( run_tests x11 "$@" )
+  run_tests --x11 "$@"
 fi

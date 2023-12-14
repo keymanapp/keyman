@@ -93,9 +93,9 @@ Each element string is made up of elements with the following item structure:
 
   | Bit position | Meaning       | Description                               |
   |--------------|---------------|-------------------------------------------|
-  |       0      | tertiary_base | 1: tertiary_base is true                  |
-  |       1      | prebase       | 1: prebase is true                        |
-  |      2-3     | type          | `element` is 0: UTF-32LE, 1: str, 2: uset |
+  |      0-1     | type          | `element` is 0: UTF-32LE, 1: str, 2: uset |
+  |       2      | tertiary_base | 1: tertiary_base is true                  |
+  |       3      | prebase       | 1: prebase is true                        |
   |      4-15    | reserved      | reserved                                  |
   |     16-23    | order         | signed int: -128 to +127                  |
   |     24-31    | tertiary      | signed int: -128 to +127                  |
@@ -137,40 +137,20 @@ locale IDs (starting at offset 16) are in sorted binary order.
 | 8 |  32  | author        | str: Keyboard author                |
 |12 |  32  | conform       | str: CLDR 'conformsTo' version      |
 |16 |  32  | layout        | str: layout type                    |
-|20 |  32  | normalization | str: normalization mode             |
+|20 |  32  | name          | str: keyboard nme                   |
 |24 |  32  | indicator     | str: indicator                      |
-|28 |  32  | settings      | int: keyboard settings              |
+|28 |  32  | version       | str: keyboard version               |
+|32 |  32  | settings      | int: keyboard settings              |
 
 The `settings` is a 32-bit bitfield as below:
 
 | Bit position | Meaning          |  Description                 |
 |--------------|------------------|------------------------------|
-|       0      | fallback         | fallback=omit                |
-|       1      | transformFailure | transformFailure=omit        |
-|       2      | transformPartial | transformPartial=hide        |
+|       0      | normalization    | normalization=disabled       |
 
 ### C7043.2.8 `name`—Names
 
-Defines the names of the keyboard as found in the source `<names>` element.
-While this section is optional in the binary format, in practice it will always
-be present, as the source format requires at least one name.
-
-| ∆ | Bits | Name    | Description                              |
-|---|------|---------|------------------------------------------|
-| 0 |  32  | ident   | `name`                                   |
-| 4 |  32  | size    | int: Length of section                   |
-| 8 |  32  | count   | int: Number of names                     |
-
-Note that `count` is always ≥1, as the source format requires at least one name.
-
-For each name in `count`:
-
-| ∆ | Bits | Name    | Description                              |
-|---|------|---------|------------------------------------------|
-|16+|  32  | name    | str: A name for the keyboard             |
-
-Names are stored in source file order, and the semantic meaning of each name is
-not defined here.
+_Removed. See `meta.name`._
 
 ### C7043.2.9 Removed: `ordr`
 
@@ -259,8 +239,8 @@ For each transform in the subtable:
 |---|------|---------|------------------------------------------|
 | 0+|  32  | from    | str: processed regex of from= side       |
 | 4+|  32  | to      | str: output pattern                      |
-| 8+|  32  | mapFrom | elem: If not 0, elem of set var for $1   |
-| 8+|  32  | mapTo   | elem: If not 0, elem of set var for $1   |
+| 8+|  32  | mapFrom | str: name of set variable for 'from' $1  |
+| 8+|  32  | mapTo   | str: name of set variable for 'to'  $1   |
 
 - `from`: the source text, index into `elem` section.
 - `to`: sequence of Unicode codepoints that replace `from`. May be the null
@@ -271,6 +251,9 @@ For each transform in the subtable:
   - replace the entire matched `from` regex with the same indexed value in `mapTo`
   - `to` will be null in this case
   - Debugging note: The variables table can be searched for matching `elem` pointers.
+  - For example, from="($[upper])" to="$[1:lower]" will result in:
+    mapFrom: "upper"
+    mapTo:   "lower"
 
 ### C7043.2.11.2 `tran.reorders` subtable
 
@@ -287,23 +270,7 @@ For each reorder item:
 
 ### C7043.2.12 `vkey`—VKey Map
 
-| ∆ | Bits | Name    | Description                              |
-|---|------|---------|------------------------------------------|
-| 0 |  32  | ident   | `vkey`                                   |
-| 4 |  32  | size    | int: Length of section                   |
-| 8 |  32  | count   | int: Number of vkeys                     |
-
-The keys are sorted in binary order based on the `vkey` field.
-
-For each key:
-
-| ∆ | Bits | Name    | Description                              |
-|---|------|---------|------------------------------------------|
-|16+|  32  | vkey    | int: source vkey ID (0…255)              |
-|20+|  32  | target  | int: target vkey ID (0…255)              |
-
-- `vkey`: Is the standard vkey, 0-255
-- `target`: Is the target (resolved) vkey, 0-255.
+_Removed._
 
 ### C7043.2.13 `layr`—Layers list
 
@@ -330,26 +297,24 @@ There are `listCount` total lists.
 
 | ∆ | Bits | Name             | Description                                |
 |---|------|------------------|--------------------------------------------|
-| 0+|  32  | hardware         | int: enumeration for hardware layout       |
+| 0+|  32  | hardware         | str: name of hardware layout.              |
 | 4+|  32  | layer            | int: index to first layer element          |
 | 8+|  32  | count            | int: number of layer elements in this list |
 |12+|  32  | minDeviceWidth   | int: min device width in millimeters, or 0 |
 
-- `hardware`: an enumeration with the following values:
-  - 0: `touch` (non-hardware)
-  - 1: `abnt2`
-  - 2: `iso`
-  - 3: `jis`
-  - 4: `us`
+- `hardware` is the name of a form, or the string `touch`
 
 See UTS #35 section 7 for details about these values.
 
-Layer lists are sorted by `hardware` enum, then minDeviceWidth ascending.
+Layer lists are sorted by `hardware` string, then minDeviceWidth ascending.
 
 ### `layr.layers` subtable
 
 Each layer entry corresponds to one `<layer>` element
 There are `layerCount` total layer entries.
+Note that comma-separated modifiers in the XML will result in duplicate `layers` entries.
+For example, `id="abc" modifiers="none, shift caps"`  will result in two `layers` elements,
+both with `id="abc"`, but one with key flags of 0x0000 and one with keyflags of 0x0110.
 
 | ∆ | Bits | Name       | Description                                    |
 |---|------|------------|------------------------------------------------|
@@ -395,9 +360,13 @@ For each element:
 | ∆ | Bits | Name    | Description                              |
 |---|------|---------|------------------------------------------|
 |32+|  32  | to      | str: to string                           |
-|36+|  32  | display | str: output display string               |
+|36+|  32  | id      | str: id string                           |
+|40+|  32  | display | str: output display string               |
 
-Entries are sorted in a binary codepoint sort on the `to` field.
+Either `to` or `id` must be set, not both.
+Entries with an `to` field are sorted in a binary codepoint sort on the `to` field,
+followed by entries with an `id` field set sorted in a binary codepoint sort on the `id` field.
+
 
 ### C7043.2.15 `key2`—Extended keybag
 
@@ -425,9 +394,9 @@ For each key:
 | 8+|  32  | id               | str: key id                                              |
 |12+|  32  | switch           | str: layer id to switch to                               |
 |16+|  32  | width            | int: key width*10 (supports 0.1 as min width)            |
-|20+|  32  | longPress        | list: index into `list` section with longPress list or 0 |
-|24+|  32  | longPressDefault | str: default longpress target or 0                       |
-|28+|  32  | multiTap         | list: index into `list` section with multiTap list or 0  |
+|20+|  32  | longPress        | list: index into `list` section with longPress key id list or 0 |
+|24+|  32  | longPressDefault | str: default longpress key id or 0                           |
+|28+|  32  | multiTap         | list: index into `list` section with multiTap key id list or 0  |
 |32+|  32  | flicks           | int: index into `key2.flicks` subtable                   |
 
 - `id`: The original string id from XML. This may be 0 to save space (i.e. omit the string id).
@@ -437,10 +406,10 @@ For each key:
 |--------------|-----------|---------------------------------------------|
 |       0      | extend    | 0: `to` is a char, 1: `to` is a string      |
 |       1      | gap       | 1 if the key is a gap                       |
-|       2      | transform | 1 if the key is transform=no                |
 
 - `to`: If `extend` is 0, `to` is a UTF-32LE codepoint. If `extend` is 1, `to`
   is a 32 bit index into the `strs` table. The string may be zero-length.
+- `longPress`, `longPressDefault`, and `multiTap` refer to key ids or lists of key ids in this same `key2.keys` subtable.
 
 #### `key2.flicks` flick list subtable
 
@@ -464,20 +433,14 @@ For each flick element:
 | ∆ | Bits | Name             | Description                                              |
 |---|------|----------------  |----------------------------------------------------------|
 | 0+|  32  | directions       | list: index into `list` section with direction list      |
-| 8+|  32  | flags            | int: per-key flags                                       |
-|12+|  32  | to               | str: output string, or ucs32: output char, see flags     |
+| 8+|  32  | keyId            | str: id of key                                           |
 
 If this section is present, it must have a 'flick element' at position zero with directions=0, flags=0, and to=0 meaning 'no flick'.
 
 There is not a 'null' flick element at the end of each list.
 
-Elements are ordered by the `flicks.id`, and secondarily by the directions list id.
+Elements are ordered by the `flicks.keyId`, and secondarily by the directions list id.
 
-- `flags`: Flags is a 32-bit bitfield defined as below:
-
-| Bit position | Meaning   |  Description                                |
-|--------------|-----------|---------------------------------------------|
-|       0      | extend    | 0: `to` is a char, 1: `to` is a string      |
 
 #### `key2.kmap` key map subtable
 

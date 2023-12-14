@@ -11,7 +11,7 @@ available_platforms=(android common_web common_windows common_mac common_linux i
 
 watch_android='web|common/models|common/predictive-text|common/web'
 watch_ios='web|common/models|common/predictive-text|common/web'
-watch_linux='core'
+watch_linux='core|common/test/keyboards/baseline'
 watch_mac='core'
 watch_web='common/models|common/predictive-text|common/web|core'
 watch_windows='common|core|web'
@@ -34,9 +34,6 @@ watch_common_linux='common/linux|common/web'
 # These bc_x_y variables ARE used in trigger-builds.inc.sh by pattern so the names are important,
 # and you won't find them directly in a grep search.
 #
-# _Jenkins should be appended to any build configuration (pipeline) name that is from Jenkins,
-# not TeamCity.
-#
 # _GitHub should be appended to any build configuration name that is from GitHub, not TeamCity.
 
 # Test Build Configurations
@@ -46,7 +43,7 @@ bc_test_all=()
 
 bc_test_android=(KeymanAndroid_TestPullRequests KeymanAndroid_TestSamplesAndTestProjects)
 bc_test_ios=(Keyman_iOS_TestPullRequests Keyman_iOS_TestSamplesAndTestProjects)
-bc_test_linux=(KeymanLinux_TestPullRequests Keyman_Common_KPAPI_TestPullRequests_Linux pipeline-keyman-packaging_Jenkins deb-pr-packaging_GitHub)
+bc_test_linux=(KeymanLinux_TestPullRequests Keyman_Linux_Test_Integration Keyman_Common_KPAPI_TestPullRequests_Linux deb-pr-packaging_GitHub)
 bc_test_mac=(Keyman_KeymanMac_PullRequests Keyman_Common_KPAPI_TestPullRequests_macOS)
 bc_test_windows=(KeymanDesktop_TestPullRequests KeymanDesktop_TestPrRenderOnScreenKeyboards Keyman_Common_KPAPI_TestPullRequests_Windows)
 bc_test_web=(Keymanweb_TestPullRequests Keyman_Common_LMLayer_TestPullRequests Keyman_Common_KPAPI_TestPullRequests_WASM)
@@ -66,7 +63,7 @@ vcs_test=HttpsGithubComKeymanappKeymanPRs
 
 bc_master_android=(KeymanAndroid_Build)
 bc_master_ios=(Keyman_iOS_Master)
-bc_master_linux=(KeymanLinux_Master pipeline-keyman-packaging_Jenkins deb-release-packaging_GitHub)
+bc_master_linux=(KeymanLinux_Master deb-release-packaging_GitHub)
 bc_master_mac=(KeymanMac_Master)
 bc_master_windows=(Keyman_Build)
 bc_master_web=(Keymanweb_Build)
@@ -78,7 +75,7 @@ vcs_master=HttpsGithubComKeymanappKeyman
 
 bc_beta_android=(KeymanAndroid_Build)
 bc_beta_ios=(Keyman_iOS_Master)
-bc_beta_linux=(KeymanLinux_Master pipeline-keyman-packaging_Jenkins deb-release-packaging_GitHub)
+bc_beta_linux=(KeymanLinux_Master deb-release-packaging_GitHub)
 bc_beta_mac=(KeymanMac_Master)
 bc_beta_windows=(Keyman_Build)
 bc_beta_web=(Keymanweb_Build)
@@ -90,7 +87,7 @@ vcs_beta=HttpsGithubComKeymanappKeyman
 
 bc_stable_14_0_android=(KeymanAndroid_Build)
 bc_stable_14_0_ios=(Keyman_iOS_Master)
-bc_stable_14_0_linux=(KeymanLinux_Master pipeline-keyman-packaging_Jenkins deb-release-packaging_GitHub)
+bc_stable_14_0_linux=(KeymanLinux_Master deb-release-packaging_GitHub)
 bc_stable_14_0_mac=(KeymanMac_Master)
 bc_stable_14_0_windows=(Keyman_Build)
 bc_stable_14_0_web=(Keymanweb_Build)
@@ -105,7 +102,7 @@ vcs_stable_14_0=HttpsGithubComKeymanappKeyman
 
 bc_stable_15_0_android=(KeymanAndroid_Build)
 bc_stable_15_0_ios=(Keyman_iOS_Master)
-bc_stable_15_0_linux=(KeymanLinux_Master pipeline-keyman-packaging_Jenkins deb-release-packaging_GitHub)
+bc_stable_15_0_linux=(KeymanLinux_Master deb-release-packaging_GitHub)
 bc_stable_15_0_mac=(KeymanMac_Master)
 bc_stable_15_0_windows=(Keyman_Build)
 bc_stable_15_0_web=(Keymanweb_Build)
@@ -116,7 +113,7 @@ vcs_stable_15_0=HttpsGithubComKeymanappKeyman
 
 bc_stable_16_0_android=(KeymanAndroid_Build)
 bc_stable_16_0_ios=(Keyman_iOS_Master)
-bc_stable_16_0_linux=(KeymanLinux_Master pipeline-keyman-packaging_Jenkins)
+bc_stable_16_0_linux=(KeymanLinux_Master)
 bc_stable_16_0_mac=(KeymanMac_Master)
 bc_stable_16_0_windows=(Keyman_Build)
 bc_stable_16_0_web=(Keymanweb_Build)

@@ -21,6 +21,14 @@
 #   builder.inc.sh directly, or, just in the Keyman repo, via build-utils.sh.
 #
 
+# Exit on command failure and when using unset variables:
+set -eu
+
+#
+# Prevents 'clear' on exit of mingw64 bash shell
+#
+SHLVL=0
+
 # _builder_init is called internally at the bottom of this file after we have
 # all function declarations in place.
 function _builder_init() {
@@ -659,14 +667,14 @@ builder_trim() {
 # `/` is expected to be relative to repo root, not filesystem root. Otherwise,
 # it's relative to current script path, not current working directory. The
 # returned path will not have a prefix `/`, and will be relative to
-# `$KEYMAN_ROOT`. Assumes realpath is installed (brew coreutils on macOS).
+# `$REPO_ROOT`. Assumes realpath is installed (brew coreutils on macOS).
 #
 _builder_expand_relative_path() {
   local path="$1"
   if [[ "$path" =~ ^/ ]]; then
     echo "${path:1}"
   else
-    realpath --canonicalize-missing --relative-to="$KEYMAN_ROOT" "$THIS_SCRIPT_PATH/$path"
+    realpath --canonicalize-missing --relative-to="$REPO_ROOT" "$THIS_SCRIPT_PATH/$path"
   fi
 }
 
@@ -837,6 +845,8 @@ builder_describe() {
       description="$(builder_trim "${sub[@]:1}")"
     fi
 
+    local original_value="$value"
+
     if [[ $value =~ ^: ]]; then
       # Parameter is a target
       local target_path=
@@ -931,9 +941,9 @@ builder_describe() {
     fi
 
     if [[ -z "${description}" ]]; then
-      description=$(_builder_get_default_description "$value")
+      description=$(_builder_get_default_description "$original_value")
     fi
-    _builder_params[${value}]="$description"
+    _builder_params[${original_value}]="$description"
 
     shift
   done
@@ -1076,7 +1086,7 @@ _builder_add_chosen_action_target_dependencies() {
         # If there is a defined output for this dependency
         if [[ ! -z ${_builder_dep_path[$dep_output]+x} ]]; then
           # If the output for the dependency is missing, or we have --force-deps
-          if [[ ! -e "$KEYMAN_ROOT/${_builder_dep_path[$dep_output]}" ]] || builder_is_full_dep_build; then
+          if [[ ! -e "$REPO_ROOT/${_builder_dep_path[$dep_output]}" ]] || builder_is_full_dep_build; then
             # Add the dependency to the chosen action:target list
             if ! _builder_item_in_array "$dep_output" "${_builder_chosen_action_targets[@]}"; then
               _builder_chosen_action_targets+=($dep_output)
@@ -1143,8 +1153,8 @@ _builder_define_default_internal_dep() {
 #   2: depaction:deptarget   The dependency action and target
 # Example:
 #   builder_describe_internal_dependency \
-#     mac:build mac-x86_64:build \
-#     mac:build mac-arm64:build
+#     build:mac build:mac-x86_64 \
+#     build:mac build:mac-arm64
 #
 # Note: actions and targets must be fully specified, and this _must_
 # be called before either builder_describe_outputs or builder_parse in
@@ -1183,7 +1193,21 @@ builder_parse() {
     fi
 
     if [[ $key =~ ^- ]]; then
+
+      # Expand short -o to --option in options lookup
+      if [[ ! -z ${_builder_options_short[$key]+x} ]]; then
+        key=${_builder_options_short[$key]}
+      fi
+
       exp+=($key)
+      if [[ ! -z ${_builder_options_var[$key]+x} ]]; then
+        shift
+        if [[ $# -eq 0 ]]; then
+          _builder_parameter_error "$0" parameter "$key"
+        fi
+
+        exp+=("$1")
+      fi
     else
       # Expand comma separated values
       if [[ $key =~ : ]]; then
@@ -1283,10 +1307,6 @@ _builder_parse_expanded_parameters() {
     fi
     n=$((n + 1))
 
-    # Expand short -o to --option in options lookup
-    if [[ ! -z ${_builder_options_short[$key]+x} ]]; then
-      key=${_builder_options_short[$key]}
-    fi
     _builder_item_in_array "$key" "${_builder_options[@]}" && has_option=1 || has_option=0
 
     if (( has_action )) && (( has_target )); then
@@ -1315,9 +1335,6 @@ _builder_parse_expanded_parameters() {
       _builder_chosen_options+=("$key")
       if [[ ! -z ${_builder_options_var[$key]+x} ]]; then
         shift
-        if [[ $# -eq 0 ]]; then
-          _builder_parameter_error "$0" parameter "$key"
-        fi
         # Set the variable associated with this option to the next parameter value
         # A little bit of hoop jumping here to avoid issues with cygwin paths being
         # corrupted too early in the game
@@ -1467,7 +1484,7 @@ builder_display_usage() {
   echo "Actions: "
 
   for e in "${_builder_actions[@]}"; do
-    if _builder_item_in_glob_array "$e" "${_builder_params[@]}"; then
+    if [[ ! -z "${_builder_params[$e]+x}" ]]; then
       description="${_builder_params[$e]}"
     else
       description=$(_builder_get_default_description "$e")
@@ -1479,7 +1496,7 @@ builder_display_usage() {
   echo "Targets: "
 
   for e in "${_builder_targets[@]}"; do
-    if _builder_item_in_glob_array "$e" "${_builder_params[@]}"; then
+    if [[ ! -z "${_builder_params[$e]+x}" ]]; then
       description="${_builder_params[$e]}"
     else
       description=$(_builder_get_default_description "$e")
@@ -1584,7 +1601,7 @@ _builder_dep_output_defined() {
 }
 
 _builder_dep_output_exists() {
-  if _builder_dep_output_defined $1 && [[ -e "$KEYMAN_ROOT/${_builder_dep_path[$1]}" ]]; then
+  if _builder_dep_output_defined $1 && [[ -e "$REPO_ROOT/${_builder_dep_path[$1]}" ]]; then
     return 0
   else
     return 1
@@ -1663,7 +1680,7 @@ _builder_do_build_deps() {
     fi
 
     builder_set_module_has_been_built "$dep"
-    "$KEYMAN_ROOT/$dep/build.sh" "configure$dep_target" "build$dep_target" \
+    "$REPO_ROOT/$dep/build.sh" "configure$dep_target" "build$dep_target" \
       $builder_verbose \
       $builder_debug \
       $_builder_build_deps \

@@ -2,29 +2,18 @@
 
 ## Projects
 
-- [keyman-config](../../linux/keyman-config) - km-config and some other tools to install, uninstall
-  and view information about Keyman keyboard packages.
+- [keyman-config](../../linux/keyman-config) - `km-config` and some other tools
+  to install, uninstall and view information about Keyman keyboard packages.
 - [ibus-keyman](../../linux/ibus-keyman) - IBUS integration to use .kmp Keyman keyboards
+- [keyman-system-service](../../linux/keyman-system-service) - A DBus system service
+  that allows to perform keyboard related actions when running under Wayland.
 - [core](../../core) - common keyboardprocessor library
 
 See [license information](../../linux/LICENSE.md) about licensing.
 
 ## Linux Requirements/Setup
 
-- It is helpful to be using the [packages.sil.org](http://packages.sil.org) repo
-
-- Install packages required for building and developing Keyman for Linux
-
-  ```bash
-  sudo apt install cdbs debhelper libx11-dev autotools-dev build-essential \
-    dh-autoreconf flex bison libibus-1.0-dev python3-setuptools meson \
-    libjson-glib-dev libgtk-3-dev libxml2-utils help2man python3-lxml \
-    python3-magic python3-numpy python3-pil python3-pip python3-qrcode \
-    python3-requests python3-requests-cache python3 python3-gi dconf-cli \
-    dconf-editor cargo python3-dbus gir1.2-webkit2-4.0 ibus libglib2.0-bin \
-    liblocale-gettext-perl xvfb xserver-xephyr metacity mutter \
-    libicu-dev pkg-config
-  ```
+See [document in ../build](../build/linux-ubuntu.md).
 
 ## Compiling from Command Line
 
@@ -48,29 +37,11 @@ See [license information](../../linux/LICENSE.md) about licensing.
 
 - run `sudo linux/build.sh uninstall` to uninstall everything and put it back again
 
-#### Tmp install
-
-Used by TC for validating PRs
-
-Run `make tmpinstall` to build and install **keyboardprocessor** and **ibus-keyman** to `/tmp/keyman`
-
-This is only for testing the build, not for running **ibus-keyman** in ibus
-
-### Manually
-
-- **ibus-keyman** requires headers and lib from **keyboardprocessor**
-
-So
-
-- **keyboardprocessor** must be built before **ibus-keyman**
-
-For each project run `./build.sh && ./build.sh install`.
-
 ## Continuous integration
 
-Teamcity PR builds will run `make tmpinstall`
+Teamcity PR builds will run `linux/build.sh install`
 
-Master builds run `make tmpinstall` and create source packages
+Master builds run `linux/build.sh install` and create source packages
 
 Nightly and release builds upload the most recent new master build to <https://downloads.keyman.com>
 
@@ -81,14 +52,17 @@ for details on building Linux packages for Keyman.
 
 ## Testing
 
-### keyman-config
-
-The unit tests can be run with the following command:
+The tests can be run with the following command:
 
 ```bash
-cd linux/keyman-config
-./run-tests.sh
+linux/build.sh test
 ```
+
+To just run the unit tests without integration tests, add the
+`--no-integration` parameter.
+
+It's also possible to only run the tests for one of the subprojects. You
+can use `build.sh` in the subdirectory for that.
 
 ### ibus-keyman
 
@@ -112,6 +86,39 @@ scripts/run-tests
 
 The `run-tests` script accepts different arguments which can be seen with
 `scripts/run-tests --help`.
+
+### Code Coverage Report
+
+#### Prerequisites
+
+Code coverage reports require some additional tools: lcov, gcovr,
+libdatetime-perl, and coverage.
+
+You can install these with:
+
+```bash
+sudo apt update
+sudo apt install -y lcov libdatetime-perl gcovr
+pip3 install coverage
+```
+
+**Note:** You want lcov > 1.16, so you might have to download and install
+a newer version e.g. from <https://packages.ubuntu.com/mantic/lcov>.
+
+#### Creating and displaying code coverage reports
+
+All three projects (ibus-keyman, keyman-config, and keyman-system-service)
+can produce code coverage reports.
+
+Run `./build.sh --debug --coverage --report test` to create the report.
+
+**Note:** You might have to run `./build.sh clean` first.
+
+There's also an index page (`linux/CodecoverageReports.html`) that links to all
+three reports. You can run
+`linux/build.sh --debug --coverage --report --open --no-integration test`
+to create the coverage reports for all three Linux projects and open the
+index page in the browser.
 
 ## Running Keyman for Linux
 

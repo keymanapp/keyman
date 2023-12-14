@@ -16,6 +16,9 @@ builder_describe \
   "test" \
   "install                   install artifacts" \
   "uninstall                 uninstall artifacts" \
+  "--no-integration          don't run integration tests" \
+  "--report                  create coverage report" \
+  "--coverage                capture test coverage"
 
 builder_parse "$@"
 
@@ -25,8 +28,17 @@ builder_describe_outputs \
   build "/linux/keyman-config/keyman_config/standards/lang_tags_map.py"
 
 clean_action() {
-  rm -rf dist make_deb build keyman_config/version.py ./*.egg-info __pycache__ \
-    keyman_config/standards/lang_tags_map.py
+  rm -rf dist make_deb build ./*.egg-info keyman_config/version.py
+  find . \( -name __pycache__ -o -name keyman-config.mo \) -exec rm -rf {} +
+  rm -rf ../help/reference/km-*.md
+
+  # Don't delete this file during a package build because they are
+  # part of the source package. We can't generate it during a package
+  # build because we need to get data from the network which isn't
+  # available for package builds.
+  if [ -z "${KEYMAN_PKG_BUILD-}" ]; then
+    rm -rf keyman_config/standards/lang_tags_map.py
+  fi
 }
 
 execute_with_temp_schema() {
@@ -34,7 +46,7 @@ execute_with_temp_schema() {
   TEMP_DATA_DIR=$(mktemp -d)
   SCHEMA_DIR="${TEMP_DATA_DIR}/glib-2.0/schemas"
   export XDG_DATA_DIRS="${TEMP_DATA_DIR}":${XDG_DATA_DIRS-}
-  export GSETTINGS_SCHEMA_DIR="${SCHEMA_DIR}"
+  export GSETTINGS_SCHEMA_DIR="${SCHEMA_DIR}:/usr/share/glib-2.0/schemas/:${GSETTINGS_SCHEMA_DIR-}"
   mkdir -p "${SCHEMA_DIR}"
   cp resources/com.keyman.gschema.xml "${SCHEMA_DIR}"/
   glib-compile-schemas "${SCHEMA_DIR}"
@@ -77,7 +89,19 @@ build_action() {
 }
 
 test_action() {
-  execute_with_temp_schema ./run-tests.sh
+  local options
+
+  if builder_has_option --coverage; then
+    options="--coverage"
+  else
+    options=""
+  fi
+  execute_with_temp_schema ./run-tests.sh "${options}"
+
+  if builder_has_option --report; then
+    builder_echo "Creating coverage report"
+    python3 -m coverage html --directory="$THIS_SCRIPT_PATH/build/coveragereport/" --data-file=build/.coverage
+  fi
 }
 
 install_action() {

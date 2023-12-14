@@ -1,5 +1,5 @@
 import { constants, SectionIdent } from "@keymanapp/ldml-keyboard-constants";
-import { KMXPlus, LDMLKeyboard, CompilerCallbacks, VariableParser } from '@keymanapp/common-types';
+import { KMXPlus, LDMLKeyboard, CompilerCallbacks, VariableParser, MarkerParser } from '@keymanapp/common-types';
 import { SectionCompiler } from "./section-compiler.js";
 
 import Bksp = KMXPlus.Bksp;
@@ -15,10 +15,21 @@ import LKTransform = LDMLKeyboard.LKTransform;
 import LKTransforms = LDMLKeyboard.LKTransforms;
 import { verifyValidAndUnique } from "../util/util.js";
 import { CompilerMessages } from "./messages.js";
+import { MarkerTracker, MarkerUse } from "./marker-tracker.js";
 
 type TransformCompilerType = 'simple' | 'backspace';
 
-class TransformCompiler<T extends TransformCompilerType, TranBase extends Tran> extends SectionCompiler {
+export abstract class TransformCompiler<T extends TransformCompilerType, TranBase extends Tran> extends SectionCompiler {
+
+  static validateMarkers(keyboard: LDMLKeyboard.LKKeyboard, mt : MarkerTracker): boolean {
+    keyboard?.transforms?.forEach(transforms =>
+      transforms.transformGroup.forEach(transformGroup => {
+        transformGroup.transform?.forEach(({ to, from }) => {
+          mt.add(MarkerUse.emit, MarkerParser.allReferences(to));
+          mt.add(MarkerUse.consume, MarkerParser.allReferences(from));
+        })}));
+    return true;
+  }
 
   protected type: T;
 
@@ -30,7 +41,7 @@ class TransformCompiler<T extends TransformCompilerType, TranBase extends Tran> 
     const reportMessage = this.callbacks.reportMessage.bind(this.callbacks);
 
     let valid = true;
-    const transforms = this?.keyboard?.transforms;
+    const transforms = this?.keyboard3?.transforms;
     if (transforms) {
       const types : string[] = transforms.map(({type}) => type);
       if (!verifyValidAndUnique(types,
@@ -66,9 +77,10 @@ class TransformCompiler<T extends TransformCompilerType, TranBase extends Tran> 
     return valid;
   }
 
+  /* c8 ignore next 4 */
+  /** allocate a new TranBase subclass */
   protected newTran(): TranBase {
-    // needs to be overridden in the subclass
-    return null;
+    throw Error(`Internal Error: newTran() not implemented`);
   }
 
   private compileTransforms(sections: DependencySections, transforms: LKTransforms): TranBase {
@@ -84,6 +96,7 @@ class TransformCompiler<T extends TransformCompilerType, TranBase extends Tran> 
 
   private compileTransformGroup(sections: DependencySections, transformGroup: LKTransformGroup): TranGroup {
     if (transformGroup.reorder.length && transformGroup.transform.length) {
+      /* c8 ignore next 2 */
       // should have been caught by validate
       throw Error(`Internal error: transformGroup has both reorder and transform elements.`);
     } else if (transformGroup.reorder.length) {
@@ -91,6 +104,7 @@ class TransformCompiler<T extends TransformCompilerType, TranBase extends Tran> 
     } else if (transformGroup.transform.length) {
       return this.compileTransformTranGroup(sections, transformGroup.transform);
     } else {
+      /* c8 ignore next */
       throw Error(`Internal error: transformGroup has neither reorder nor transform elements.`);
     }
   }
@@ -107,12 +121,11 @@ class TransformCompiler<T extends TransformCompilerType, TranBase extends Tran> 
   private compileTransform(sections: DependencySections, transform: LKTransform) : TranTransform {
     let result = new TranTransform();
     let cookedFrom = transform.from;
-    let cookedTo = transform.to;
 
     cookedFrom = sections.vars.substituteStrings(cookedFrom, sections);
     // TODO: handle 'map' case
     const mapFrom = VariableParser.CAPTURE_SET_REFERENCE.exec(cookedFrom);
-    const mapTo = VariableParser.MAPPED_SET_REFERENCE.exec(cookedTo || '');
+    const mapTo = VariableParser.MAPPED_SET_REFERENCE.exec(transform.to || '');
     if (mapFrom && mapTo) { // TODO-LDML: error cases
       result.mapFrom = sections.strs.allocString(mapFrom[1]); // var name
       result.mapTo = sections.strs.allocString(mapTo[1]); // var name
@@ -120,15 +133,21 @@ class TransformCompiler<T extends TransformCompilerType, TranBase extends Tran> 
       result.mapFrom = sections.strs.allocString(''); // TODO-LDML
       result.mapTo = sections.strs.allocString(''); // TODO-LDML
     }
-
     cookedFrom = sections.vars.substituteSetRegex(cookedFrom, sections);
 
-    if (cookedTo) {
-      cookedTo = sections.vars.substituteStrings(cookedTo, sections);
-    }
+    // add in markers. idempotent if no markers.
+    cookedFrom = sections.vars.substituteMarkerString(cookedFrom, true);
 
-    result.from = sections.strs.allocAndUnescapeString(cookedFrom); // TODO-LDML: not unescaped here, done previously
-    result.to = sections.strs.allocAndUnescapeString(cookedTo); // TODO-LDML: not unescaped here, done previously
+    // cookedFrom is cooked above, since there's some special treatment
+    result.from = sections.strs.allocString(cookedFrom, {
+      unescape: true
+    }, sections);
+    // 'to' is handled via allocString
+    result.to = sections.strs.allocString(transform.to, {
+      stringVariables: true,
+      markers: true,
+      unescape: true,
+    }, sections);
     return result;
   }
 
@@ -143,13 +162,13 @@ class TransformCompiler<T extends TransformCompilerType, TranBase extends Tran> 
 
   private compileReorder(sections: DependencySections, reorder: LKReorder): TranReorder {
     let result = new TranReorder();
-    result.elements = sections.elem.allocElementString(sections.strs, reorder.from, reorder.order, reorder.tertiary, reorder.tertiaryBase, reorder.preBase);
-    result.before = sections.elem.allocElementString(sections.strs, reorder.before);
+    result.elements = sections.elem.allocElementString(sections, reorder.from, reorder.order, reorder.tertiary, reorder.tertiaryBase, reorder.preBase);
+    result.before = sections.elem.allocElementString(sections, reorder.before);
     return result;
   }
 
   public compile(sections: DependencySections): TranBase {
-    for(let t of this.keyboard.transforms) {
+    for(let t of this.keyboard3.transforms) {
       if(t.type == this.type) {
         // compile only the transforms of the correct type
         return this.compileTransforms(sections, t);
@@ -163,6 +182,7 @@ class TransformCompiler<T extends TransformCompilerType, TranBase extends Tran> 
       constants.section.list,
       constants.section.elem,
       constants.section.vars,
+      constants.section.uset,
     ]);
     defaults.delete(this.id);
     return defaults;

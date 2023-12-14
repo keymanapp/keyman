@@ -39,20 +39,15 @@ function unescapeOne(hex: string): string {
 }
 
 /**
- * Unescape one single quad string such as \u0127
+ * Unescape one single quad string such as \u0127.
+ * Throws exception if the string doesn't match MATCH_QUAD_ESCAPE
  * @param s input string
  * @returns output
  */
 export function unescapeOneQuadString(s: string): string {
-  if (!s) {
-    return s;
+  if (!s || !s.match(MATCH_QUAD_ESCAPE)) {
+    throw new UnescapeError(`Not a quad escape: ${s}`);
   }
-  /**
- * process one regex match
- * @param str ignored
- * @param matched the entire match such as '0127' or '22 22'
- * @returns the unescaped match
- */
   function processMatch(str: string, matched: string): string {
     return unescapeOne(matched);
   }
@@ -85,11 +80,11 @@ export function unescapeString(s: string): string {
   } catch(e) {
     if (e instanceof RangeError) {
       throw new UnescapeError(`Out of range while unescaping '${s}': ${e.message}`, { cause: e });
+      /* c8 ignore next 3 */
     } else {
-      throw e;
+      throw e; // pass through some other error
     }
   }
-
   return s;
 }
 
@@ -105,4 +100,162 @@ toOneChar(value: string) : number {
     throw Error(`Not a single char: ${value}`);
   }
   return value.codePointAt(0);
+}
+
+export function describeCodepoint(ch : number) : string {
+  let s;
+  const p = getProblem(ch);
+  if (p != null) {
+    // for example: 'PUA (U+E010)'
+    s = p;
+  } else {
+    // for example: '"a" (U+61)'
+    s = `"${String.fromCodePoint(ch)}"`;
+  }
+  return `${s} (U+${Number(ch).toString(16).toUpperCase()})`;
+}
+
+export enum BadStringType {
+  pua = 'PUA',
+  unassigned = 'Unassigned',
+  illegal = 'Illegal',
+};
+
+// Following from kmx_xstring.h / .cpp
+
+const Uni_LEAD_SURROGATE_START = 0xD800;
+const Uni_LEAD_SURROGATE_END = 0xDBFF;
+const Uni_TRAIL_SURROGATE_START = 0xDC00;
+const Uni_TRAIL_SURROGATE_END = 0xDFFF;
+const Uni_SURROGATE_START = Uni_LEAD_SURROGATE_START;
+const Uni_SURROGATE_END = Uni_TRAIL_SURROGATE_END;
+const Uni_FD_NONCHARACTER_START = 0xFDD0;
+const Uni_FD_NONCHARACTER_END = 0xFDEF;
+const Uni_FFFE_NONCHARACTER = 0xFFFE;
+const Uni_PLANE_MASK = 0x1F0000;
+const Uni_MAX_CODEPOINT = 0x10FFFF;
+// plane 0, 15, and 16 PUA
+const Uni_PUA_00_START =   0xE000;
+const Uni_PUA_00_END   =   0xF8FF;
+const Uni_PUA_15_START = 0x0F0000;
+const Uni_PUA_15_END   = 0x0FFFFD;
+const Uni_PUA_16_START = 0x100000;
+const Uni_PUA_16_END   = 0x10FFFD;
+
+
+/**
+ * @brief True if a lead surrogate
+ * \def Uni_IsSurrogate1
+ */
+function Uni_IsSurrogate1(ch : number) {
+  return ((ch) >= Uni_LEAD_SURROGATE_START && (ch) <= Uni_LEAD_SURROGATE_END);
+}
+/**
+ * @brief True if a trail surrogate
+ * \def Uni_IsSurrogate2
+ */
+function Uni_IsSurrogate2(ch : number) {
+  return ((ch) >= Uni_TRAIL_SURROGATE_START && (ch) <= Uni_TRAIL_SURROGATE_END);
+}
+
+/**
+ * @brief True if any surrogate
+ * \def UniIsSurrogate
+*/
+function Uni_IsSurrogate(ch : number) {
+  return (Uni_IsSurrogate1(ch) || Uni_IsSurrogate2(ch));
+}
+
+function Uni_IsEndOfPlaneNonCharacter(ch : number) {
+  return (((ch) & Uni_FFFE_NONCHARACTER) == Uni_FFFE_NONCHARACTER); // matches FFFF or FFFE
+}
+
+function Uni_IsNoncharacter(ch : number) {
+  return (((ch) >= Uni_FD_NONCHARACTER_START && (ch) <= Uni_FD_NONCHARACTER_END) || Uni_IsEndOfPlaneNonCharacter(ch));
+}
+
+function Uni_InCodespace(ch : number) {
+  return (ch >= 0 && ch <= Uni_MAX_CODEPOINT);
+};
+
+function Uni_IsValid1(ch: number) {
+  return (Uni_InCodespace(ch) && !Uni_IsSurrogate(ch) && !Uni_IsNoncharacter(ch));
+}
+
+export function isValidUnicode(start: number, end?: number) {
+  if (!end) {
+    // single char
+    return Uni_IsValid1(start);
+  } else if (!Uni_IsValid1(end) || !Uni_IsValid1(start) || (end < start)) {
+    // start or end out of range, or inverted range
+    return false;
+  } else if ((start <= Uni_SURROGATE_END) && (end >= Uni_SURROGATE_START)) {
+    // contains some of the surrogate range
+    return false;
+  } else if ((start <= Uni_FD_NONCHARACTER_END) && (end >= Uni_FD_NONCHARACTER_START)) {
+    // contains some of the noncharacter range
+    return false;
+  } else if ((start & Uni_PLANE_MASK) != (end & Uni_PLANE_MASK)) {
+    // start and end are on different planes, meaning that the U+__FFFE/U+__FFFF noncharacters
+    // are contained.
+    // As a reminder, we already checked that start/end are themselves valid,
+    // so we know that 'end' is not on a noncharacter at end of plane.
+    return false;
+  } else {
+    return true;
+  }
+}
+
+export function isPUA(ch: number) {
+  return ((ch >= Uni_PUA_00_START && ch <= Uni_PUA_00_END) ||
+    (ch >= Uni_PUA_15_START && ch <= Uni_PUA_15_END) ||
+    (ch >= Uni_PUA_16_START && ch <= Uni_PUA_16_END));
+}
+
+class BadStringMap extends Map<BadStringType, Set<number>> {
+  public toString() : string {
+    if (!this.size) {
+      return "{}";
+    }
+    return Array.from(this.entries()).map(([t, s]) => `${t}: ${Array.from(s.values()).map(describeCodepoint).join(' ')}`).join(', ');
+  }
+}
+
+function getProblem(ch : number) : BadStringType {
+  if (!isValidUnicode(ch)) {
+    return BadStringType.illegal;
+  } else if(isPUA(ch)) {
+    return BadStringType.pua;
+  } else { // TODO-LDML: unassigned
+    return null;
+  }
+}
+export class BadStringAnalyzer {
+  /** add a string for analysis */
+  public add(s : string) {
+    for (const c of s) {
+      const ch = c.codePointAt(0);
+      const problem = getProblem(ch);
+      if (problem) {
+        this.addProblem(ch, problem);
+      }
+    }
+  }
+
+  private addProblem(ch : number, type : BadStringType) {
+    if (!this.m.has(type)) {
+      this.m.set(type, new Set<number>());
+    }
+    this.m.get(type).add(ch);
+  }
+
+  public analyze() : BadStringMap {
+    if (this.m.size == 0) {
+      return null;
+    } else {
+      return this.m;
+    }
+  }
+
+  private m = new BadStringMap();
 }

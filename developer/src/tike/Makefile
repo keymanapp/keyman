@@ -6,15 +6,15 @@
 
 build: version.res manifest.res icons dirs xml xsd pull-core
     cd $(DEVELOPER_ROOT)\src\tike
+		$(COPY) $(KEYMAN_ROOT)\common\resources\fonts\keymanweb-osk.ttf $(DEVELOPER_ROOT)\src\tike\xml\layoutbuilder\keymanweb-osk.ttf
     $(DELPHI_MSBUILD) tike.dproj "/p:Platform=Win32"
     $(SENTRYTOOL_DELPHIPREP) $(WIN32_TARGET_PATH)\tike.exe -dpr tike.dpr
     $(TDS2DBG) $(WIN32_TARGET_PATH)\tike.exe
     $(COPY) $(WIN32_TARGET_PATH)\tike.exe $(DEVELOPER_PROGRAM)
     $(COPY) kmlmc.cmd $(DEVELOPER_PROGRAM)
-    $(COPY) kmlmi.cmd $(DEVELOPER_PROGRAM)
     $(COPY) kmlmp.cmd $(DEVELOPER_PROGRAM)
     $(COPY) kmc.cmd $(DEVELOPER_PROGRAM)
-    $(COPY) $(KEYMAN_ROOT)\core\build\x86\$(TARGET_PATH)\src\kmnkbp0-0.dll $(DEVELOPER_PROGRAM)
+    $(COPY) $(KEYMAN_ROOT)\core\build\x86\$(TARGET_PATH)\src\keymancore-1.dll $(DEVELOPER_PROGRAM)
     if exist $(WIN32_TARGET_PATH)\tike.dbg $(COPY) $(WIN32_TARGET_PATH)\tike.dbg $(DEVELOPER_DEBUGPATH)
 
 xsd:
@@ -67,7 +67,7 @@ clean: def-clean
 
 signcode:
     $(SIGNCODE) /d "Keyman Developer" $(DEVELOPER_PROGRAM)\tike.exe
-    $(SIGNCODE) /d "Keyman Core" $(DEVELOPER_PROGRAM)\kmnkbp0-0.dll
+    $(SIGNCODE) /d "Keyman Core" $(DEVELOPER_PROGRAM)\keymancore-1.dll
 # Sign the Sentry executables and libraries here
     $(SIGNCODE) /d "Keyman Developer" $(DEVELOPER_PROGRAM)\sentry.dll
     $(SIGNCODE) /d "Keyman Developer" $(DEVELOPER_PROGRAM)\sentry.x64.dll
@@ -79,7 +79,7 @@ wrap-symbols:
 
 install:
     $(COPY) $(DEVELOPER_PROGRAM)\tike.exe "$(INSTALLPATH_KEYMANDEVELOPER)\tike.exe"
-    $(COPY) $(DEVELOPER_PROGRAM)\kmnkbp0-0.dll "$(INSTALLPATH_KEYMANDEVELOPER)\kmnkbp0-0.dll"
+    $(COPY) $(DEVELOPER_PROGRAM)\keymancore-1.dll "$(INSTALLPATH_KEYMANDEVELOPER)\keymancore-1.dll"
 
 test-manifest:
 # test that linked manifest exists and correct

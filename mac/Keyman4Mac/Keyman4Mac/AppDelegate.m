@@ -13,9 +13,6 @@ static BOOL debugMode = YES;
 
 BOOL isKeyMapEnabled;
 const unsigned short keyMapSize = 0x80;
-unsigned short keyMap[0x80][4];
-//unsigned short VKMap[0x80];
-//pid_t processID = 0;
 
 // Dictionary keys
 NSString *const kContextBufferKey = @"ContextBuffer";
@@ -38,7 +35,6 @@ NSString *const kKMXFileKey = @"KMXFile";
     // Insert code here to initialize your application
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(windowDidResize:) name:NSWindowDidResizeNotification object:self.window];
     [self setKMXList];
-    //[self setVKMapping];
     self.kbData = [[NSMutableDictionary alloc] initWithCapacity:0];
     NSMutableString *contextBuffer = [NSMutableString stringWithString:@""];
     [self.kbData setObject:contextBuffer forKey:kContextBufferKey];
@@ -117,16 +113,14 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
     BOOL handled = NO;
     
     if (type == NX_KEYDOWN) {
+        NSLog(@"AppDelegate eventTapFunction key down event: %@", event);
         // Key down event
         NSEvent *mEvent = [NSEvent eventWithCGEvent:event];
-        KMEngine *kme = [[KMEngine alloc] initWithKMX:kmx contextBuffer:contextBuffer];
-        NSArray *actions = [kme processEvent:mEvent];
-        //if (debugMode)
-            NSLog(@"%@", actions);
-        for (NSDictionary *action in actions) {
-            NSString *actionType = [[action allKeys] objectAtIndex:0];
-            if ([actionType isEqualToString:Q_STR]) {
-                NSString *output = [action objectForKey:actionType];
+        KMEngine *kme = [[KMEngine alloc] initWithKMX:kmx context:contextBuffer verboseLogging:debugMode];
+        CoreKeyOutput *coreKeyOutput = [kme processEvent:mEvent];
+        if (coreKeyOutput) {
+            if (coreKeyOutput.hasTextToInsert) {
+                NSString *output = coreKeyOutput.textToInsert;
                 UniChar *outCStr = (UniChar *)[output cStringUsingEncoding:NSUTF16StringEncoding];
                 unsigned short kc = [mEvent keyCode];
                 CGEventRef kEventDown = CGEventCreateKeyboardEvent(NULL, (CGKeyCode)kc, true);
@@ -135,87 +129,20 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
                 CGEventKeyboardSetUnicodeString(kEventUp, output.length, outCStr);
                 CGEventTapPostEvent(proxy, kEventDown);
                 CGEventTapPostEvent(proxy, kEventUp);
-                [contextBuffer appendString:output];
                 CFRelease(kEventDown);
                 CFRelease(kEventUp);
             }
-            else if ([actionType isEqualToString:Q_BACK]) {
-                NSInteger n = [[action objectForKey:actionType] integerValue];
-                NSUInteger dk = [contextBuffer deleteLastDeadkeys];
-                n -= dk;
-                //NSUInteger dc = [contextBuffer deadCharCount];
-                //n -= dc;
-                
-                for (int i = 0; i < n; i++) {
-                    CGEventRef kEventDown = CGEventCreateKeyboardEvent(NULL, (CGKeyCode)51, true);
-                    CGEventRef kEventUp = CGEventCreateKeyboardEvent(NULL, (CGKeyCode)51, false);
-                    CGEventTapPostEvent(proxy, kEventDown);
-                    CGEventTapPostEvent(proxy, kEventUp);
-                    CFRelease(kEventDown);
-                    CFRelease(kEventUp);
-                }
-                
-                [contextBuffer deleteLastNChars:n/*+dc*/];
-            }
-            else if ([actionType isEqualToString:Q_DEADKEY]) {
-                NSUInteger x = [[action objectForKey:actionType] unsignedIntegerValue];
-                [contextBuffer appendDeadkey:x];
-            }
-            else if ([actionType isEqualToString:Q_NUL]) {
-                continue;
-            }
-            else if ([actionType isEqualToString:Q_RETURN]) {
+            if (coreKeyOutput.emitKeystroke) {
                 return NULL;
             }
-            else if ([actionType isEqualToString:Q_BEEP]) {
+            if (coreKeyOutput.alert) {
                 [[NSSound soundNamed:@"Tink"] play];
             }
             
             handled = YES;
         }
-        
-        // Apply context changes if not handled
-        if (!handled) {
-            mEvent = [NSEvent eventWithCGEvent:event];
-            unsigned short keyCode = [mEvent keyCode];
-            if (keyCode <= 0x33) { // Main keys
-                if (keyCode == 0x24) // Enter
-                    [contextBuffer appendString:@"\n"];
-                else if (keyCode == 0x33) { // Backspace
-                    [contextBuffer deleteLastDeadkeys];
-                    [contextBuffer deleteLastNChars:1];
-                    [contextBuffer deleteLastDeadkeys];
-                }
-                else
-                    [contextBuffer appendString:[mEvent characters]];
-            }
-            else {
-                unichar ch = [[mEvent characters] characterAtIndex:0];
-                if (ch >= 0x2A && ch <= 0x39) // Numpad char range
-                    [contextBuffer appendString:[mEvent characters]];
-                else if (keyCode == 0x4C) // Enter (Numpad)
-                    [contextBuffer appendString:@"\n"];
-                else if (keyCode >= 0x7B && keyCode <= 0x7E) // Arrow keys
-                    contextBuffer = [NSMutableString stringWithString:@""]; // Clear context
-                else if (keyCode == 0x73 || keyCode == 0x77 || keyCode == 0x74 || keyCode == 0x79) {
-                    // Home, End, Page Up, Page Down
-                    contextBuffer = [NSMutableString stringWithString:@""]; // Clear context
-                }
-                else {
-                    // Other keys
-                }
-            }
-        }
-    }
-    else {
-        // Mouse button up event (left | right)
-        contextBuffer = [NSMutableString stringWithString:@""]; // Clear context
-        if (debugMode)
-            NSLog(@"Mouse event");
     }
     
-    if (debugMode)
-        NSLog(@"contextBuffer = %@\n***", [contextBuffer codeString]);
     return handled?NULL:event;
 }
 

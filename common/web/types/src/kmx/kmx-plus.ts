@@ -6,6 +6,7 @@ import { isOneChar, toOneChar, unescapeString } from '../util/util.js';
 import { KMXFile } from './kmx.js';
 import { UnicodeSetParser, UnicodeSet } from '@keymanapp/common-types';
 import { VariableParser } from '../ldml-keyboard/pattern-parser.js';
+import { MarkerParser } from '../ldml-keyboard/pattern-parser.js';
 
 // Implementation of file structures from /core/src/ldml/C7043_ldml.md
 // Writer in kmx-builder.ts
@@ -18,6 +19,8 @@ export class Section {
  * Sections which are needed as dependencies.
  */
 export interface DependencySections extends KMXPlusData {
+  /** needed for UnicodeSet parsing */
+  usetparser?: UnicodeSetParser;
 }
 
 // 'sect'
@@ -30,12 +33,16 @@ export class Sect extends Section {};
 
 export class Elem extends Section {
   strings: ElementString[] = [];
-  constructor(strs: Strs) {
+  constructor(sections: DependencySections) {
     super();
-    this.strings.push(new ElementString(strs, '')); // C7043: null element string
+    this.strings.push(ElementString.fromStrings(sections, '')); // C7043: null element string
   }
-  allocElementString(strs: Strs, source: string | string[], order?: string, tertiary?: string, tertiary_base?: string, prebase?: string): ElementString {
-    let s = new ElementString(strs, source, order, tertiary, tertiary_base, prebase);
+  /**
+   * @param source if a string array, does not get reinterpreted as UnicodeSet. This is used with vars, etc. Or pass `["str"]` for an explicit 1-element elem.
+   * If it is a string, will be interpreted per reorder element ruls.
+   */
+  allocElementString(sections: DependencySections, source: string | string[], order?: string, tertiary?: string, tertiary_base?: string, prebase?: string): ElementString {
+    let s = ElementString.fromStrings(sections, source, order, tertiary, tertiary_base, prebase);
     let result = this.strings.find(item => item.isEqual(s));
     if(result === undefined) {
       result = s;
@@ -57,27 +64,17 @@ export class Loca extends Section {
 
 export enum KeyboardSettings {
   none = 0,
-  fallback = constants.meta_settings_fallback_omit,
-  transformFailure = constants.meta_settings_transformFailure_omit,
-  transformPartial = constants.meta_settings_transformPartial_hide,
+  normalizationDisabled = constants.meta_settings_normalization_disabled,
 };
-
-export enum Meta_NormalizationForm { NFC='NFC', NFD='NFD', other='other' };
 
 export class Meta extends Section {
   author: StrsItem;
   conform: StrsItem;
   layout: StrsItem;
-  normalization: StrsItem;
+  name: StrsItem;
   indicator: StrsItem;
   version: StrsItem; // semver version string, defaults to "0"
   settings: KeyboardSettings;
-};
-
-// 'name'
-
-export class Name extends Section {
-  names: StrsItem[] = [];
 };
 
 // 'strs'
@@ -136,44 +133,75 @@ export class CharStrsItem extends StrsItem {
   }
 };
 
+/** class for string manipulation options. These are in order of the pipeline. */
+export interface StrsOptions {
+  /** apply string variables (requires sections) */
+  stringVariables?: boolean;
+  /** apply markers (requires sections) */
+  markers?: boolean;
+  /** unescape with unescapeString */
+  unescape?: boolean;
+  /** string can be stored as a single CharStrsItem, not in strs table. */
+  singleOk?: boolean;
+};
+
 export class Strs extends Section {
-  strings: StrsItem[] = [ new StrsItem('') ]; // C7043: The null string is always requierd
+  /** the in-memory string table */
+  strings: StrsItem[] = [ new StrsItem('') ]; // C7043: The null string is always required
+
+  /** for validating */
+  allProcessedStrings = new Set<string>();
   /**
    * Allocate a StrsItem given the string, unescaping if necessary.
    * @param s escaped string
-   * @param singleOk if true, allocate a CharStrsItem (not in strs table) if single-char capable.
-   * @returns
+   * @param opts options for allocation
+   * @param sections other sections, if needed
+   * @returns StrsItem
    */
-  allocAndUnescapeString(s?: string, singleOk?: boolean): StrsItem {
-    return this.allocString(unescapeString(s), singleOk);
-  }
-  /**
-   * Allocate a StrsItem given the string.
-   * @param s string
-   * @param singleOk if true, allocate a CharStrsItem (not in strs table) if single-char capable.
-   * @returns
-   */
-  allocString(s?: string, singleOk?: boolean): StrsItem {
-    if(s === undefined || s === null) {
-      // undefined or null are always equivalent to empty string, see C7043
-      s = '';
+  allocString(s?: string, opts?: StrsOptions, sections?: DependencySections): StrsItem {
+    // Run the string processing pipeline
+    s = Strs.processString(s, opts, sections);
+
+    // add to the set, for testing
+    if (s) {
+      this.allProcessedStrings.add(s);
     }
 
-    if(typeof s !== 'string') {
-      throw new Error('alloc_string: s must be a string, undefined, or null.');
-    }
-
-    // if it's a single char, don't push it into the list
-    if (singleOk && isOneChar(s)) {
+    // if it's a single char, don't push it into the strs table
+    if (opts?.singleOk && isOneChar(s)) {
       return new CharStrsItem(s);
     }
 
+    // default: look to see if the string is already present
     let result = this.strings.find(item => item.value === s);
     if(result === undefined) {
+      // only add if not already present
       result = new StrsItem(s);
       this.strings.push(result);
     }
     return result;
+  }
+
+  /** process everything according to opts */
+  static processString(s: string, opts: StrsOptions, sections: DependencySections) {
+    s = s ?? '';
+    // type check everything else
+    if (typeof s !== 'string') {
+      throw new Error('alloc_string: s must be a string, undefined, or null.');
+    }
+    // substitute variables
+    if (opts?.stringVariables) {
+      s = sections.vars.substituteStrings(s, sections);
+    }
+    // substitute markers
+    if (opts?.markers) {
+      s = sections.vars.substituteMarkerString(s);
+    }
+    // unescape \u{…}
+    if (opts?.unescape) {
+      s = unescapeString(s);
+    }
+    return s;
   }
 };
 
@@ -227,6 +255,7 @@ export class Vars extends Section {
     });
   }
   substituteStrings(str: string, sections: DependencySections): string {
+    if (!str) return str;
     return str.replaceAll(VariableParser.STRING_REFERENCE, (_entire, id) => {
       const val = this.findStringVariableValue(id);
       if (val === null) {
@@ -286,6 +315,9 @@ export class Vars extends Section {
       return v[0];
     }
   }
+  substituteMarkerString(s : string, forMatch? : boolean) : string {
+    return MarkerParser.toSentinelString(s, this.markers, forMatch);
+  }
 };
 
 /**
@@ -299,7 +331,7 @@ export class VarsItem extends Section {
   constructor(id: string, value: string, sections: DependencySections) {
     super();
     this.id = sections.strs.allocString(id);
-    this.value = sections.strs.allocAndUnescapeString(value);
+    this.value = sections.strs.allocString(value, {unescape: true});
   }
 
   valid() : boolean {
@@ -310,10 +342,10 @@ export class VarsItem extends Section {
 export class UnicodeSetItem extends VarsItem {
   constructor(id: string, value: string, sections: DependencySections, usetparser: UnicodeSetParser) {
     super(id, value, sections);
-    // TODO-LDML: buffer size
-    this.unicodeSet = usetparser.parseUnicodeSet(value, 100);
-    // _unicodeSet may be null, indicating this is invalid.
-    // A message will have been set in that case.
+    const needRanges = sections.usetparser.sizeUnicodeSet(value);
+    if (needRanges >= 0) {
+      this.unicodeSet = sections.usetparser.parseUnicodeSet(value, needRanges);
+    } // otherwise: error (was recorded via callback)
   }
   unicodeSet?: UnicodeSet;
   valid() : boolean {
@@ -324,7 +356,7 @@ export class UnicodeSetItem extends VarsItem {
 export class SetVarItem extends VarsItem {
   constructor(id: string, value: string[], sections: DependencySections) {
     super(id, value.join(' '), sections);
-    this.items = sections.elem.allocElementString(sections.strs, value);
+    this.items = sections.elem.allocElementString(sections, value);
   }
   items: ElementString;
   valid() : boolean {
@@ -394,20 +426,10 @@ export class Bksp extends Tran {
   }
 };
 
-// 'vkey'
-
-export class VkeyItem {
-  vkey: number;
-  target: number;
-}
-
-export class Vkey extends Section {
-  vkeys: VkeyItem[] = [];
-};
-
 // 'disp'
 export class DispItem {
   to: StrsItem;
+  id: StrsItem;
   display: StrsItem;
 };
 
@@ -422,7 +444,7 @@ export class Disp extends Section {
  * In-memory `<layers>`
  */
 export class LayrList {
-  hardware: number;
+  hardware: StrsItem;
   layers: LayrEntry[] = [];
   minDeviceWidth: number; // millimeters
 };
@@ -479,8 +501,7 @@ export class KeysFlicks {
 
 export class KeysFlick {
   directions: ListItem;
-  flags: number;
-  to: StrsItem;
+  keyId: StrsItem;
 };
 
 export class Keys extends Section {
@@ -499,19 +520,14 @@ export class List extends Section {
    * Allocate a list from a space-separated list of items.
    * Note that passing undefined or null or `''` will
    * end up being the same as the empty list `[]`
-   * @param strs Strs section for allocation
    * @param s space-separated list of items
+   * @param opts string options
+   * @param sections sections
    * @returns a List object
    */
-  allocListFromSpaces(strs: Strs, s?: string): ListItem {
+  allocListFromSpaces(s: string, opts: StrsOptions, sections: DependencySections): ListItem {
     s = s ?? '';
-    return this.allocList(strs, s.split(' '));
-  }
-  allocListFromEscapedSpaces(strs: Strs, s?: string): ListItem {
-    if(s === undefined || s === null) {
-      s = '';
-    }
-    return this.allocList(strs, s.split(' ').map(unescapeString));
+    return this.allocList(s.split(' '), opts, sections);
   }
   /**
    * Return a List object referring to the string list.
@@ -521,7 +537,7 @@ export class List extends Section {
    * @param s string list to allocate
    * @returns
    */
-  allocList(strs: Strs, s?: string[]): ListItem {
+  allocList(s: string[], opts: StrsOptions, sections: DependencySections): ListItem {
     // Special case the 'null' list for [] or ['']
     if (!s || (s.length === 1 && s[0] === '')) {
       return this.lists[0];
@@ -529,14 +545,14 @@ export class List extends Section {
     let result = this.lists.find(item => item.isEqual(s));
     if(result === undefined) {
       // allocate a new ListItem
-      result = new ListItem(strs, s);
+      result = ListItem.fromStrings(s, opts, sections);
       this.lists.push(result);
     }
     return result;
   }
   constructor(strs: Strs) {
     super();
-    this.lists.push(new ListItem(strs, [])); // C7043: null element string
+    this.lists.push(ListItem.fromStrings([], {}, { strs })); // C7043: null element string
   }
   lists: ListItem[] = [];
 };
@@ -553,12 +569,10 @@ export interface KMXPlusData {
     list?: List; // list is ignored in-memory
     loca?: Loca;
     meta?: Meta;
-    name?: Name;
     strs?: Strs; // strs is ignored in-memory
     tran?: Tran;
     uset?: Uset; // uset is ignored in-memory
     vars?: Vars;
-    vkey?: Vkey;
 };
 
 export class KMXPlusFile extends KMXFile {
@@ -602,9 +616,6 @@ export class KMXPlusFile extends KMXFile {
 
   public readonly COMP_PLUS_META: any;
 
-  public readonly COMP_PLUS_NAME_ITEM: any;
-  public readonly COMP_PLUS_NAME: any;
-
   public readonly COMP_PLUS_STRS_ITEM: any;
   public readonly COMP_PLUS_STRS: any;
 
@@ -631,6 +642,14 @@ export class KMXPlusFile extends KMXFile {
     super();
     // Binary-correct structures matching kmx_plus.h
 
+    // helpers
+    const STR_REF       = r.uint32le;
+    const ELEM_REF      = r.uint32le;
+    const LIST_REF      = r.uint32le;
+    const STR_OR_CHAR32 = r.uint32le;
+    const CHAR32        = r.uint32le;
+    const STR_OR_CHAR32_OR_USET = r.uint32le;
+    const IDENT         = r.uint32le;
     // 'sect'
 
     this.COMP_PLUS_SECT_ITEM = new r.Struct({
@@ -639,7 +658,7 @@ export class KMXPlusFile extends KMXFile {
     });
 
     this.COMP_PLUS_SECT = new r.Struct({
-      ident: r.uint32le,
+      ident: IDENT,
       size: r.uint32le,
       total: r.uint32le,
       count: r.uint32le,
@@ -650,22 +669,23 @@ export class KMXPlusFile extends KMXFile {
 
     // 'disp'
     this.COMP_PLUS_DISP_ITEM = new r.Struct({
-      to: r.uint32le,
-      display: r.uint32le,
+      to: STR_REF,
+      id: STR_REF,
+      display: STR_REF,
     });
 
     this.COMP_PLUS_DISP = new r.Struct({
-      ident: r.uint32le,
+      ident: IDENT,
       size: r.uint32le,
       count: r.uint32le,
-      baseCharacter: r.uint32le,
+      baseCharacter: CHAR32,
       items: new r.Array(this.COMP_PLUS_DISP_ITEM, 'count'),
     });
 
     // 'elem'
 
     this.COMP_PLUS_ELEM_ELEMENT = new r.Struct({
-      element: r.uint32le,
+      element: STR_OR_CHAR32_OR_USET,
       flags: r.uint32le
     });
 
@@ -675,7 +695,7 @@ export class KMXPlusFile extends KMXFile {
     });
 
     this.COMP_PLUS_ELEM = new r.Struct({
-      ident: r.uint32le,
+      ident: IDENT,
       size: r.uint32le,
       count: r.uint32le,
       strings: new r.Array(this.COMP_PLUS_ELEM_STRING, 'count')
@@ -700,7 +720,7 @@ export class KMXPlusFile extends KMXFile {
     });
 
     this.COMP_PLUS_LAYR_LIST = new r.Struct({
-      hardware: r.uint32le, //enum
+      hardware: STR_REF, // str: hardware name
       layer: r.uint32le, // index into layers
       count: r.uint32le,
       minDeviceWidth: r.uint32le, // integer: millimeters
@@ -712,7 +732,7 @@ export class KMXPlusFile extends KMXFile {
     });
 
     this.COMP_PLUS_LAYR = new r.Struct({
-      ident: r.uint32le,
+      ident: IDENT,
       size: r.uint32le,
       listCount: r.uint32le,
       layerCount: r.uint32le,
@@ -725,26 +745,25 @@ export class KMXPlusFile extends KMXFile {
     });
 
     this.COMP_PLUS_KEYS_FLICK = new r.Struct({
-      directions: r.uint32le, // list
-      flags: r.uint32le,
-      to: r.uint32le, // str | codepoint
+      directions: LIST_REF, // list
+      to: STR_OR_CHAR32, // str | codepoint
     });
 
     this.COMP_PLUS_KEYS_FLICKS = new r.Struct({
       count: r.uint32le,
       flick: r.uint32le,
-      id: r.uint32le, // str
+      id: STR_REF, // str
     });
 
     this.COMP_PLUS_KEYS_KEY = new r.Struct({
-      to: r.uint32le, // str | codepoint
+      to: STR_OR_CHAR32, // str | codepoint
       flags: r.uint32le,
-      id: r.uint32le, // str
-      switch: r.uint32le, // str
+      id: STR_REF, // str
+      switch: STR_REF, // str
       width: r.uint32le, // width*10  ( 1 = 0.1 keys)
-      longPress: r.uint32le, // list index
-      longPressDefault: r.uint32le, // str
-      multiTap: r.uint32le, // list index
+      longPress: LIST_REF, // list index
+      longPressDefault: STR_REF, // str
+      multiTap: LIST_REF, // list index
       flicks: r.uint32le, // index into flicks table
     });
 
@@ -755,7 +774,7 @@ export class KMXPlusFile extends KMXFile {
     });
 
     this.COMP_PLUS_KEYS = new r.Struct({
-      ident: r.uint32le,
+      ident: IDENT,
       size: r.uint32le,
       keyCount: r.uint32le,
       flicksCount: r.uint32le,
@@ -775,11 +794,11 @@ export class KMXPlusFile extends KMXFile {
     });
 
     this.COMP_PLUS_LIST_INDEX = new r.Struct({
-      str: r.uint32le, // str
+      str: STR_REF, // str
     });
 
     this.COMP_PLUS_LIST = new r.Struct({
-      ident: r.uint32le,
+      ident: IDENT,
       size: r.uint32le,
       listCount: r.uint32le,
       indexCount: r.uint32le,
@@ -792,7 +811,7 @@ export class KMXPlusFile extends KMXFile {
     this.COMP_PLUS_LOCA_ITEM = r.uint32le; //str
 
     this.COMP_PLUS_LOCA = new r.Struct({
-      ident: r.uint32le,
+      ident: IDENT,
       size: r.uint32le,
       count: r.uint32le,
       items: new r.Array(this.COMP_PLUS_LOCA_ITEM, 'count')
@@ -801,27 +820,18 @@ export class KMXPlusFile extends KMXFile {
     // 'meta'
 
     this.COMP_PLUS_META = new r.Struct({
-      ident: r.uint32le,
+      ident: IDENT,
       size: r.uint32le,
-      author: r.uint32le, //str
-      conform: r.uint32le, //str
-      layout: r.uint32le, //str
-      normalization: r.uint32le, //str
-      indicator: r.uint32le, //str
-      version: r.uint32le, //str
-      settings: r.uint32le, //new r.Bitfield(r.uint32le, ['fallback', 'transformFailure', 'transformPartial'])
+      author: STR_REF, //str
+      conform: STR_REF, //str
+      layout: STR_REF, //str
+      name: STR_REF, //str
+      indicator: STR_REF, //str
+      version: STR_REF, //str
+      settings: r.uint32le, //new r.Bitfield(r.uint32le, ['normalizationDisabled'])
     });
 
-    // 'name'
-
-    this.COMP_PLUS_NAME_ITEM = r.uint32le; //str
-
-    this.COMP_PLUS_NAME = new r.Struct({
-      ident: r.uint32le,
-      size: r.uint32le,
-      count: r.uint32le,
-      items: new r.Array(this.COMP_PLUS_NAME_ITEM, 'count')
-    });
+    // 'name' is gone
 
     // 'ordr' now part of 'tran'
 
@@ -835,7 +845,7 @@ export class KMXPlusFile extends KMXFile {
     });
 
     this.COMP_PLUS_STRS = new r.Struct({
-      ident: r.uint32le,
+      ident: IDENT,
       size: r.uint32le,
       count: r.uint32le,
       items: new r.Array(this.COMP_PLUS_STRS_ITEM, 'count')
@@ -851,19 +861,19 @@ export class KMXPlusFile extends KMXFile {
     });
 
     this.COMP_PLUS_TRAN_TRANSFORM = new r.Struct({
-      from: r.uint32le, //str
-      to: r.uint32le, //str
-      mapFrom: r.uint32le, //elem
-      mapTo: r.uint32le //elem
+      from: STR_REF, //str
+      to: STR_REF, //str
+      mapFrom: ELEM_REF, //elem
+      mapTo: ELEM_REF //elem
     });
 
     this.COMP_PLUS_TRAN_REORDER = new r.Struct({
-      elements: r.uint32le, //elem
-      before: r.uint32le, //elem
+      elements: ELEM_REF, //elem
+      before: ELEM_REF, //elem
     });
 
     this.COMP_PLUS_TRAN = new r.Struct({
-      ident: r.uint32le,
+      ident: IDENT,
       size: r.uint32le,
       groupCount: r.uint32le,
       transformCount: r.uint32le,
@@ -877,16 +887,16 @@ export class KMXPlusFile extends KMXFile {
     this.COMP_PLUS_USET_USET = new r.Struct({
       range: r.uint32le,
       count: r.uint32le,
-      pattern: r.uint32le, // str
+      pattern: STR_REF, // str
     });
 
     this.COMP_PLUS_USET_RANGE = new r.Struct({
-      start: r.uint32le,
-      end: r.uint32le,
+      start: CHAR32,
+      end: CHAR32,
     });
 
     this.COMP_PLUS_USET = new r.Struct({
-      ident: r.uint32le,
+      ident: IDENT,
       size: r.uint32le,
       usetCount: r.uint32le,
       rangeCount: r.uint32le,
@@ -898,32 +908,20 @@ export class KMXPlusFile extends KMXFile {
 
     this.COMP_PLUS_VARS_ITEM = new r.Struct({
       type: r.uint32le,
-      id: r.uint32le, // str
-      value: r.uint32le, // str
-      elem: r.uint32le, // elem TODO-LDML
+      id: STR_REF, // str
+      value: STR_REF, // str
+      elem: ELEM_REF,
     });
 
     this.COMP_PLUS_VARS = new r.Struct({
-      ident: r.uint32le,
+      ident: IDENT,
       size: r.uint32le,
-      markers: r.uint32le, // list TODO-LDML
+      markers: LIST_REF,
       varCount: r.uint32le,
       varEntries: new r.Array(this.COMP_PLUS_VARS_ITEM, 'varCount'),
     });
 
-    // 'vkey'
-
-    this.COMP_PLUS_VKEY_ITEM = new r.Struct({
-      vkey: r.uint32le,
-      target: r.uint32le
-    });
-
-    this.COMP_PLUS_VKEY = new r.Struct({
-      ident: r.uint32le,
-      size: r.uint32le,
-      count: r.uint32le,
-      items: new r.Array(this.COMP_PLUS_VKEY_ITEM, 'count')
-    });
+    // 'vkey' is removed
 
     // Aliases
 

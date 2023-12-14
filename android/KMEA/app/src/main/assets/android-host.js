@@ -8,6 +8,9 @@ if(window.parent && window.parent.jsInterface && !window.jsInterface) {
 var device = window.jsInterface.getDeviceType();
 var oskHeight = Math.ceil(window.jsInterface.getKeyboardHeight() / window.devicePixelRatio);
 var oskWidth = 0;
+var bannerHeight = 0;
+var bannerImagePath = '';
+var bannerHTMLContents = '';
 var fragmentToggle = 0;
 
 var sentryManager = new KeymanSentryManager({
@@ -31,17 +34,23 @@ function init() {
   keyman.getOskHeight = getOskHeight;
   keyman.getOskWidth = getOskWidth;
   keyman.beepKeyboard = beepKeyboard;
+
+  // Readies the keyboard stub for instant loading during the init process.
+  KeymanWeb.registerStub(JSON.parse(jsInterface.initialKeyboard()));
+
   keyman.init({
     'embeddingApp':device,
     'fonts':'packages/',
     oninserttext: insertText,
     root:'./'
   }).then(function () {  // Note:  For non-upgraded API 21, arrow functions will break the keyboard!
-    const bannerHeight = Math.ceil(window.jsInterface.getDefaultBannerHeight() / window.devicePixelRatio);
+    bannerHeight = Math.ceil(window.jsInterface.getDefaultBannerHeight() / window.devicePixelRatio);
+    if (bannerHeight > 0) {
 
-    // The OSK is not available until initialization is complete.
-    keyman.osk.bannerView.activeBannerHeight = bannerHeight;
-    keyman.refreshOskLayout();
+      // The OSK is not available until initialization is complete.
+      keyman.osk.bannerView.activeBannerHeight = bannerHeight;
+      keyman.refreshOskLayout();
+    }
   });
 
   keyman.addEventListener('keyboardloaded', setIsChiral);
@@ -51,6 +60,29 @@ function init() {
   document.body.addEventListener('touchend', loadDefaultKeyboard);
 
   notifyHost('pageLoaded');
+}
+
+function showBanner(flag) {
+  console_debug("Setting banner display for dictionaryless keyboards to " + flag);
+  console_debug("bannerHTMLContents: " + bannerHTMLContents);
+  var bc = keyman.osk.bannerController;
+  if (bc) {
+    if (bannerHTMLContents != '') {
+      bc.inactiveBanner = flag ? new bc.HTMLBanner(bannerHTMLContents) : null;
+    } else {
+      bc.inactiveBanner = flag ? new bc.ImageBanner(bannerImagePath) : null;
+    }
+  }
+}
+
+function setBannerImage(path) {
+  bannerImagePath = path;
+}
+
+// Set the HTML banner to use when predictive-text is not available
+// contents - HTML content to use for the banner
+function setBannerHTML(contents) {
+  bannerHTMLContents = contents;
 }
 
 function notifyHost(event, params) {
@@ -65,12 +97,19 @@ function notifyHost(event, params) {
 }
 
 // Update the KMW banner height
+// h is in dpi (different from iOS)
 function setBannerHeight(h) {
   if (h > 0) {
-    var osk = keyman.osk;
-    osk.banner.height = Math.ceil(h / window.devicePixelRatio);
+    // The banner itself may not be loaded yet.  This will preemptively help set
+    // its eventual display height.
+    bannerHeight = Math.ceil(h / window.devicePixelRatio);
+
+    if (keyman.osk) {
+      keyman.osk.bannerView.activeBannerHeight = bannerHeight;
+    }
   }
-  // Refresh KMW OSK
+
+  // Refresh KMW's OSK
   keyman.refreshOskLayout();
 }
 
@@ -114,8 +153,8 @@ function onStateChange(change) {
   keyman.refreshOskLayout();
 
   fragmentToggle = (fragmentToggle + 1) % 100;
-  if(change != 'configured') { // doesn't change the display; only initiates suggestions.
-    window.location.hash = 'refreshBannerHeight-'+fragmentToggle+'+change='+change;
+  if(change != 'configured') {
+    window.location.hash = 'refreshBannerHeight-'+fragmentToggle;
   }
 }
 
@@ -229,56 +268,10 @@ function updateKMSelectionRange(start, end) {
 }
 
 var lastKeyTip = null;
-function oskCreateKeyPreview(x,y,w,h,t) {
-  if(lastKeyTip &&
-      lastKeyTip.t == t &&
-      lastKeyTip.x == x &&
-      lastKeyTip.y == y &&
-      lastKeyTip.w == w &&
-      lastKeyTip.h == h) {
-    return;
-    }
-  lastKeyTip = {x:x,y:y,w:w,h:h,t:t};
-
-  fragmentToggle = (fragmentToggle + 1) % 100;
-  var div = document.createElement('div');
-  div.innerHTML = t;
-  var dt = div.firstChild.nodeValue;
-  window.location.hash = 'showKeyPreview-'+fragmentToggle+'+x='+x+'+y='+y+'+w='+w+'+h='+h+'+t='+toHex(dt);
-}
-
-function oskClearKeyPreview() {
-  lastKeyTip = null;
-  fragmentToggle = (fragmentToggle + 1) % 100;
-  window.location.hash = 'dismissKeyPreview-'+fragmentToggle;
-}
 
 function signalHelpBubbleDismissal() {
   fragmentToggle = (fragmentToggle + 1) % 100;
   window.location.hash = 'helpBubbleDismissed-'+fragmentToggle;
-}
-
-function oskCreatePopup(obj,x,y) {
-  if(obj != null) {
-    var i;
-    var s = '';
-    var shift = false;
-    var keyPos = x.toString() + ',' + y.toString();
-    for(i=0; i<obj.length; i++)
-    {
-      // elementID contains the layer and coreID
-      s=s+obj[i].elementID;
-      if(obj[i].sp == 1 || obj[i].sp == 2) shift = true;
-      if(typeof(obj[i].text) != 'undefined' && obj[i].text != null && obj[i].text != '') s=s+':'+toHex(obj[i].text);
-      if(i < (obj.length -1)) s=s+';'
-    }
-    fragmentToggle=(fragmentToggle+1) % 100;
-    var hash = 'showMore-' + fragmentToggle + '+keyPos=' + keyPos + '+keys=' + s;
-    if(shift) {
-      hash = hash + '+font=' + 'SpecialOSK';
-    }
-    window.location.hash = hash;
-  }
 }
 
 function suggestionPopup(obj,custom,x,y,w,h) {
@@ -318,12 +311,6 @@ function hideKeyboard() {
 function showKeyboard() {
   // Refresh KMW OSK
   keyman.refreshOskLayout();
-}
-
-function executePopupKey(keyID, keyText) {
-  // KMW only needs keyID to process the popup key. keyText merely logged to console
-  //window.console.log('executePopupKey('+keyID+'); keyText: ' + keyText);
-  keyman.executePopupKey(keyID);
 }
 
 // Cannot make it explicitly async / await on API 21.

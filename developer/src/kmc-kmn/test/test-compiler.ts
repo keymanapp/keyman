@@ -38,12 +38,12 @@ describe('Compiler class', function() {
 
     const fixtureName = baselineDir + 'k_000___null_keyboard.kmx';
     const infile = baselineDir + 'k_000___null_keyboard.kmn';
-    const outfile = __dirname + '/k_000___null_keyboard.kmx';
+    const outFile = __dirname + '/k_000___null_keyboard.kmx';
 
-    assert(compiler.run(infile, outfile, {saveDebug: true, shouldAddCompilerVersion: false}));
+    assert(compiler.run(infile, {saveDebug: true, outFile, shouldAddCompilerVersion: false}));
 
-    assert(fs.existsSync(outfile));
-    const outfileData = fs.readFileSync(outfile);
+    assert(fs.existsSync(outFile));
+    const outfileData = fs.readFileSync(outFile);
     const fixtureData = fs.readFileSync(fixtureName);
     assert.equal(outfileData.byteLength, fixtureData.byteLength);
     assert.deepEqual(outfileData, fixtureData);
@@ -62,15 +62,15 @@ describe('Compiler class', function() {
       if(file.match(/\.kmx$/)) {
         const fixtureName = baselineDir + file;
         const infile = baselineDir + file.replace(/x$/, 'n');
-        const outfile = __dirname + '/' + file;
+        const outFile = __dirname + '/' + file;
 
-        assert(compiler.run(infile, outfile, {saveDebug: true, shouldAddCompilerVersion: false}));
+        assert(compiler.run(infile, {saveDebug: true, outFile, shouldAddCompilerVersion: false}));
 
-        assert(fs.existsSync(outfile));
-        const outfileData = fs.readFileSync(outfile);
+        assert(fs.existsSync(outFile));
+        const outfileData = fs.readFileSync(outFile);
         const fixtureData = fs.readFileSync(fixtureName);
-        assert.equal(outfileData.byteLength, fixtureData.byteLength);
-        assert.deepEqual(outfileData, fixtureData);
+        assert.equal(outfileData.byteLength, fixtureData.byteLength, `file ${file} has the wrong byte length`);
+        assert.deepEqual(outfileData, fixtureData, `file ${file} does not match fixture`);
       }
     }
   });
@@ -78,8 +78,8 @@ describe('Compiler class', function() {
   it('should compile a keyboard with visual keyboard', async function() {
     const compiler = new KmnCompiler();
     const callbacks = new TestCompilerCallbacks();
-    assert(await compiler.init(callbacks));
-    assert(compiler.verifyInitialized());
+    assert.isTrue(await compiler.init(callbacks));
+    assert.isTrue(compiler.verifyInitialized());
 
     const fixtureDir = keyboardsDir + 'caps_lock_layer_3620/'
     const infile = fixtureDir + 'source/caps_lock_layer_3620.kmn';
@@ -89,10 +89,14 @@ describe('Compiler class', function() {
     const resultingKmxfile = __dirname + '/caps_lock_layer_3620.kmx';
     const resultingKvkfile = __dirname + '/caps_lock_layer_3620.kvk';
 
-    assert(compiler.run(infile, resultingKmxfile, {saveDebug: true, shouldAddCompilerVersion: false}));
+    assert.isTrue(compiler.run(infile, {
+      saveDebug: true,
+      shouldAddCompilerVersion: false,
+      outFile: resultingKmxfile,
+    }));
 
-    assert(fs.existsSync(resultingKmxfile));
-    assert(fs.existsSync(resultingKvkfile));
+    assert.isTrue(fs.existsSync(resultingKmxfile));
+    assert.isTrue(fs.existsSync(resultingKvkfile));
 
     const kmxData = fs.readFileSync(resultingKmxfile);
     const kmxFixtureData = fs.readFileSync(kmxFixture);

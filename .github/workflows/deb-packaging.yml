@@ -1,7 +1,18 @@
 name: "Ubuntu packaging"
+run-name: "Ubuntu packaging - ${{ github.event.client_payload.branch }} (branch ${{ github.event.client_payload.baseBranch }}), by @${{ github.event.client_payload.user }}"
 on:
   repository_dispatch:
     types: ['deb-release-packaging:*', 'deb-pr-packaging:*']
+
+# Input:
+# buildSha:    The SHA of the commit to build, e.g. of the branch or
+#              refs/pull/1234/head for PR
+# branch:      The branch to build, for a PR in the form `PR-1234`
+# baseBranch:  For a PR the base branch, otherwise the same as `branch`
+# baseRef:     The ref of the previous commit. For a PR the same as `baseBranch`.
+# user:        The user that triggered the build or created the PR
+# isTestBuild: false for Releases, otherwise true
+
 env:
   COLOR_GREEN: "\e[32m"
   GH_TOKEN: ${{ github.token }}
@@ -12,28 +23,26 @@ env:
 jobs:
   sourcepackage:
     name: Build source package
+    if: github.repository == 'keymanapp/keyman'
     runs-on: ubuntu-22.04
     outputs:
       VERSION: ${{ steps.version_step.outputs.VERSION }}
       PRERELEASE_TAG: ${{ steps.prerelease_tag.outputs.PRERELEASE_TAG }}
-      GIT_SHA: ${{ steps.set_status.outputs.GIT_SHA }}
     steps:
     - name: Checkout
       uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c #v3.3.0
       with:
-        ref: '${{ github.event.client_payload.ref }}'
+        ref: '${{ github.event.client_payload.buildSha }}'
 
     - name: Set pending status on PR builds
       id: set_status
       if: github.event.client_payload.isTestBuild == 'true'
       shell: bash
       run: |
-        GIT_SHA="${{ github.event.client_payload.sha }}"
-        echo "GIT_SHA=$GIT_SHA" >> $GITHUB_OUTPUT
         gh api \
           --method POST \
           -H "Accept: application/vnd.github+json" \
-          /repos/$GITHUB_REPOSITORY/statuses/$GIT_SHA \
+          /repos/$GITHUB_REPOSITORY/statuses/${{ github.event.client_payload.buildSha }} \
           -f state='pending' \
           -f target_url="$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID" \
           -f description='Debian packaging started' \
@@ -50,10 +59,14 @@ jobs:
         ./scripts/deb-packaging.sh --gha dependencies
 
     - name: Build source package
+      id: build_source_package
       run: |
-        TIER=$(cat TIER.md)
-        export TIER
+        export TIER=$(cat TIER.md)
+        export GHA_TEST_BUILD="${{ github.event.client_payload.isTestBuild }}"
+        export GHA_BRANCH="${{ github.event.client_payload.branch }}"
         echo "TIER=$TIER" >> $GITHUB_ENV
+        echo "GHA_TEST_BUILD=${GHA_TEST_BUILD}" >> $GITHUB_ENV
+        echo "GHA_BRANCH=${GHA_BRANCH}" >> $GITHUB_ENV
         cd linux
         ./scripts/deb-packaging.sh --gha source
 
@@ -81,7 +94,7 @@ jobs:
         if [ "${{ github.event.client_payload.isTestBuild }}" == "true" ]; then
           echo ":checkered_flag: **Test build of version ${{ steps.version_step.outputs.VERSION }} for ${{ github.event.client_payload.branch }}**" >> $GITHUB_STEP_SUMMARY
         else
-          echo ":ship: **Release build of ${{ github.event.client_payload.branch }} branch (${{ github.event.client_payload.ref}}), version ${{ steps.version_step.outputs.VERSION }}**" >> $GITHUB_STEP_SUMMARY
+          echo ":ship: **Release build of ${{ github.event.client_payload.branch }} branch (${{ github.event.client_payload.branch}}), version ${{ steps.version_step.outputs.VERSION }}**" >> $GITHUB_STEP_SUMMARY
         fi
         echo "" >> $GITHUB_STEP_SUMMARY
         echo ":gift: Generated source package:" >> $GITHUB_STEP_SUMMARY
@@ -102,7 +115,7 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        dist: [focal, jammy, kinetic, lunar]
+        dist: [focal, jammy, lunar, mantic]
         arch: [amd64]
 
     runs-on: ubuntu-latest
@@ -113,7 +126,7 @@ jobs:
         path: artifacts
 
     - name: Build
-      uses: sillsdev/gha-ubuntu-packaging@4f3a013ec28f4defc2b3d6ecb04c98815cd9de25 # v0.9
+      uses: sillsdev/gha-ubuntu-packaging@1f4b7e7eacb8c82a4d874ee2c371b9bfef7e16ea # v1.0
       with:
         dist: "${{ matrix.dist }}"
         platform: "${{ matrix.arch }}"
@@ -216,7 +229,7 @@ jobs:
         echo "::endgroup::"
 
   api_verification:
-    name: Verify API for libkmnkbp0.so
+    name: Verify API for libkeymancore.so
     needs: [sourcepackage, binary_packages]
     runs-on: ubuntu-latest
 
@@ -224,7 +237,8 @@ jobs:
     - name: Checkout
       uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c #v3.3.0
       with:
-        ref: '${{ github.event.client_payload.ref }}'
+        ref: '${{ github.event.client_payload.buildSha }}'
+        fetch-depth: 0
 
     - name: Download Artifacts
       uses: actions/download-artifact@9bc31d5ccc31df68ecc42ccf4149144866c47d8a # v3.0.2
@@ -239,16 +253,19 @@ jobs:
     - name: Verify API
       run: |
         cd linux
-        SRC_PKG="${GITHUB_WORKSPACE}/artifacts/keyman-srcpkg/keyman_${{ needs.sourcepackage.outputs.VERSION }}-1.debian.tar.xz" \
-        BIN_PKG="${GITHUB_WORKSPACE}/artifacts/keyman-binarypkgs/libkmnkbp0-0_${{ needs.sourcepackage.outputs.VERSION }}-1${{ needs.sourcepackage.outputs.PRERELEASE_TAG }}+jammy1_amd64.deb" \
-        PKG_VERSION="${{ needs.sourcepackage.outputs.VERSION }}" \
-        ./scripts/deb-packaging.sh --gha verify 2>> $GITHUB_STEP_SUMMARY
+        PKG_NAME=libkeymancore
+        ./scripts/deb-packaging.sh \
+          --gha \
+          --bin-pkg "${GITHUB_WORKSPACE}/artifacts/keyman-binarypkgs/${PKG_NAME}_${{ needs.sourcepackage.outputs.VERSION }}-1${{ needs.sourcepackage.outputs.PRERELEASE_TAG }}+jammy1_amd64.deb" \
+          --git-sha "${{ github.event.client_payload.buildSha }}" \
+          --git-base "${{ github.event.client_payload.baseRef }}" \
+          verify 2>> $GITHUB_STEP_SUMMARY
 
     - name: Archive .symbols file
       uses: actions/upload-artifact@0b7f8abb1508181956e8e162db84b466c27e18ce # v3.1.2
       with:
-        name: libkmnkbp0-0.symbols
-        path: linux/debian/libkmnkbp0-0.symbols
+        name: libkeymancore.symbols
+        path: linux/debian/libkeymancore.symbols
       if: always()
 
   set_status:
@@ -280,7 +297,7 @@ jobs:
         gh api \
           --method POST \
           -H "Accept: application/vnd.github+json" \
-          /repos/$GITHUB_REPOSITORY/statuses/${{ needs.sourcepackage.outputs.GIT_SHA }} \
+          /repos/$GITHUB_REPOSITORY/statuses/${{ github.event.client_payload.buildSha }} \
           -f state="$RESULT" \
           -f target_url="$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID" \
           -f description="$MSG" \

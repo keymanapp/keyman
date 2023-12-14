@@ -20,7 +20,7 @@ describe('ModelCompositor', function() {
       );
 
       it('generates suggestions with expected properties', function() {
-        let compositor = new ModelCompositor(plainModel);
+        let compositor = new ModelCompositor(plainModel, true);
         let context = {
           left: 'th', startOfBuffer: true, endOfBuffer: true,
         };
@@ -56,7 +56,7 @@ describe('ModelCompositor', function() {
       });
 
       it('strongly avoids corrections for single-character roots', function() {
-        let compositor = new ModelCompositor(plainModel);
+        let compositor = new ModelCompositor(plainModel, true);
         let context = {
           left: '', startOfBuffer: true, endOfBuffer: true,
         };
@@ -95,7 +95,7 @@ describe('ModelCompositor', function() {
       });
 
       it('properly handles suggestions after a backspace', function() {
-        let compositor = new ModelCompositor(plainModel);
+        let compositor = new ModelCompositor(plainModel, true);
         let context = {
           left: 'the ', startOfBuffer: true, endOfBuffer: true,
         };
@@ -118,7 +118,7 @@ describe('ModelCompositor', function() {
       });
 
       it('properly handles suggestions for the first letter after a ` `', function() {
-        let compositor = new ModelCompositor(plainModel);
+        let compositor = new ModelCompositor(plainModel, true);
         let context = {
           left: 'the', startOfBuffer: true, endOfBuffer: true,
         };
@@ -137,7 +137,7 @@ describe('ModelCompositor', function() {
       });
 
       it('properly handles suggestions for the first letter after a `\'`', function() {
-        let compositor = new ModelCompositor(plainModel);
+        let compositor = new ModelCompositor(plainModel, true);
         let context = {
           left: "the '", startOfBuffer: true, endOfBuffer: true,
         };
@@ -186,7 +186,7 @@ describe('ModelCompositor', function() {
       );
 
       it('properly cases suggestions with no suggestion root', function() {
-        var compositor = new ModelCompositor(plainCasedModel);
+        var compositor = new ModelCompositor(plainCasedModel, true);
 
         let suggestion = {
           transform: {
@@ -226,7 +226,7 @@ describe('ModelCompositor', function() {
       });
 
       it('properly cases suggestions that fully replace the suggestion root', function() {
-        var compositor = new ModelCompositor(plainCasedModel);
+        var compositor = new ModelCompositor(plainCasedModel, true);
 
         let suggestion = {
           transform: {
@@ -266,7 +266,7 @@ describe('ModelCompositor', function() {
       });
 
       it('properly cases suggestions that do not fully replace the suggestion root', function() {
-        var compositor = new ModelCompositor(plainCasedModel);
+        var compositor = new ModelCompositor(plainCasedModel, true);
 
         let suggestion = {
           transform: {
@@ -322,7 +322,7 @@ describe('ModelCompositor', function() {
 
       it('should produce suggestions from uncased input', function() {
         let model = uncasedModel;
-        var composite = new ModelCompositor(model);
+        var composite = new ModelCompositor(model, true);
 
         // Initialize context
         let context = {
@@ -350,7 +350,7 @@ describe('ModelCompositor', function() {
 
       it('should not produce suggestions from cased input', function() {
         let model = uncasedModel;
-        var composite = new ModelCompositor(model);
+        var composite = new ModelCompositor(model, true);
 
         // Initialize context
         let context = {
@@ -397,7 +397,7 @@ describe('ModelCompositor', function() {
 
       it('should produce suggestions from uncased input', function() {
         let model = casedModel;
-        var composite = new ModelCompositor(model);
+        var composite = new ModelCompositor(model, true);
 
         // Initialize context
         let context = {
@@ -425,7 +425,7 @@ describe('ModelCompositor', function() {
 
       it('should produce capitalized suggestions from fully-uppercased input', function() {
         let model = casedModel;
-        var composite = new ModelCompositor(model);
+        var composite = new ModelCompositor(model, true);
 
         // Initialize context
         let context = {
@@ -453,7 +453,7 @@ describe('ModelCompositor', function() {
 
       it('should produce "initial-case" suggestions from input with an initial capital', function() {
         let model = casedModel;
-        var composite = new ModelCompositor(model);
+        var composite = new ModelCompositor(model, true);
 
         // Initialize context
         let context = {
@@ -481,7 +481,7 @@ describe('ModelCompositor', function() {
 
       it('also from input with partial capitalization when including an initial capital', function() {
         let model = casedModel;
-        var composite = new ModelCompositor(model);
+        var composite = new ModelCompositor(model, true);
 
         // Initialize context
         let context = {
@@ -512,7 +512,7 @@ describe('ModelCompositor', function() {
       var model = new TrieModel(
         jsonFixture('models/tries/english-1000')
       );
-      var composite = new ModelCompositor(model);
+      var composite = new ModelCompositor(model, true);
 
       // Initialize context
       let context = {
@@ -542,7 +542,7 @@ describe('ModelCompositor', function() {
       var model = new TrieModel(
         jsonFixture('models/tries/english-1000')
       );
-      var composite = new ModelCompositor(model);
+      var composite = new ModelCompositor(model, true);
 
       // Initialize context
       let context = {
@@ -602,7 +602,7 @@ describe('ModelCompositor', function() {
         };
 
         let model = new models.DummyModel(options);
-        let compositor = new ModelCompositor(model);
+        let compositor = new ModelCompositor(model, true);
 
         var keep;
         if(quoteStyle) {
@@ -646,7 +646,7 @@ describe('ModelCompositor', function() {
       };
 
       let model = new models.DummyModel(options);
-      let compositor = new ModelCompositor(model);
+      let compositor = new ModelCompositor(model, true);
 
       return compositor.acceptSuggestion(suggestion, context, postTransform);
     }
@@ -829,7 +829,7 @@ describe('ModelCompositor', function() {
 
   describe('acceptReversion', function() {
     let executeAcceptance = function(model, suggestion, context, postTransform) {
-      let compositor = new ModelCompositor(model);
+      let compositor = new ModelCompositor(model, true);
 
       return {compositor: compositor, reversion: compositor.acceptSuggestion(suggestion, context, postTransform)};
     }
@@ -869,7 +869,7 @@ describe('ModelCompositor', function() {
       }
 
       let model = new models.DummyModel({punctuation: englishPunctuation});
-      let compositor = new ModelCompositor(model);
+      let compositor = new ModelCompositor(model, true);
 
       let reversion = compositor.acceptSuggestion(baseSuggestion, baseContext, postTransform);
       assert.equal(reversion.transformId, baseSuggestion.transformId);
@@ -909,7 +909,7 @@ describe('ModelCompositor', function() {
       }
 
       let model = new models.TrieModel(jsonFixture('models/tries/english-1000'), {punctuation: englishPunctuation});
-      let compositor = new ModelCompositor(model);
+      let compositor = new ModelCompositor(model, true);
 
       let initialSuggestions = compositor.predict(postTransform, baseContext);
       let keepSuggestion = initialSuggestions[0];
@@ -944,14 +944,17 @@ describe('ModelCompositor', function() {
       }
 
       let model = new models.TrieModel(jsonFixture('models/tries/english-1000'), {punctuation: englishPunctuation});
-      let compositor = new ModelCompositor(model);
+      let compositor = new ModelCompositor(model, true);
 
       let initialSuggestions = compositor.predict(postTransform, baseContext);
+      const suggestionContextState = compositor.contextTracker.newest;
+
       let keepSuggestion = initialSuggestions[0];
       assert.equal(keepSuggestion.tag, 'keep'); // corresponds to `postTransform`, but the transform isn't equal.
 
-      let baseContextState = compositor.contextTracker.analyzeState(model, baseContext);
-      assert.equal(compositor.contextTracker.count, 1);
+      // One for base state, before the transform...
+      // one for after, since it makes an edit.
+      assert.equal(compositor.contextTracker.count, 2);
 
       let baseSuggestion = initialSuggestions[1];
       let reversion = compositor.acceptSuggestion(baseSuggestion, baseContext, postTransform);
@@ -959,20 +962,20 @@ describe('ModelCompositor', function() {
       assert.equal(reversion.id, -baseSuggestion.id);
 
       // Accepting the suggestion adds an extra context state.
-      assert.equal(compositor.contextTracker.count, 2);
+      assert.equal(compositor.contextTracker.count, 3);
 
       // The replacement should be marked on the context-tracking token.
-      assert.isOk(baseContextState.tail.replacement);
+      assert.isOk(suggestionContextState.tail.replacement);
 
       let appliedContext = models.applyTransform(baseSuggestion.transform, baseContext);
       compositor.applyReversion(reversion, appliedContext);
 
       // Reverting the suggestion should remove that extra state.
-      assert.equal(compositor.contextTracker.count, 1);
-      assert.equal(compositor.contextTracker.item(0), baseContextState);
+      assert.equal(compositor.contextTracker.count, 2);
+      assert.equal(compositor.contextTracker.item(1), suggestionContextState);
 
       // The replacement should no longer be marked for the context-tracking token.
-      assert.isNotOk(baseContextState.tail.replacement);
+      assert.isNotOk(suggestionContextState.tail.replacement);
     });
   });
 });

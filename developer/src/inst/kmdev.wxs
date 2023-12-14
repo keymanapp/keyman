@@ -160,35 +160,19 @@
       </Component>
 
       <Component>
-        <File Name="kmcomp.exe" KeyPath="yes" />
-      </Component>
-
-      <Component>
         <File Name="kmconvert.exe" KeyPath="yes" />
       </Component>
 
       <Component>
-        <File Name="kmcmpdll.dll" KeyPath="yes" />
+        <File Name="keymancore-1.dll" KeyPath="yes" />
       </Component>
 
       <Component>
-        <File Name="kmcmpdll.x64.dll" KeyPath="yes" />
+        <File Name="keyboard_info.schema.json" Source="..\..\..\common\schemas\keyboard_info\" KeyPath="yes" />
       </Component>
 
       <Component>
-        <File Name="kmcomp.x64.exe" KeyPath="yes" />
-      </Component>
-
-      <Component>
-        <File Name="kmnkbp0-0.dll" KeyPath="yes" />
-      </Component>
-
-      <Component>
-        <File Name="keyboard_info.distribution.json" Source="..\..\..\common\schemas\keyboard_info\" KeyPath="yes" />
-      </Component>
-
-      <Component>
-        <File Name="keyboard_info.source.json" Source="..\..\..\common\schemas\keyboard_info\" KeyPath="yes" />
+        <File Name="kmp.schema.json" Source="..\..\..\common\schemas\kmp\" KeyPath="yes" />
       </Component>
 
       <!-- Data Files -->
@@ -258,10 +242,6 @@
       </Component>
 
       <Component Directory="INSTALLDIR">
-        <File Name='kmlmi.cmd' KeyPath="yes" Source="node\kmlmi.cmd" />
-      </Component>
-
-      <Component Directory="INSTALLDIR">
         <File Name='kmlmp.cmd' KeyPath="yes" Source="node\kmlmp.cmd" />
       </Component>
 
@@ -297,7 +277,7 @@
       <ComponentGroupRef Id="Server" />
     </Feature>
 
-    <Media Id="1" EmbedCab="yes" CompressionLevel="high" Cabinet="Data1.cab" VolumeLabel="DISK1" />
+    <Media Id="1" EmbedCab="yes" Cabinet="Data1.cab" VolumeLabel="DISK1" />
 
     <UIRef Id="WixUI_FeatureTree"/>
 

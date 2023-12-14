@@ -4,6 +4,9 @@
     <KeymanDeveloperVersion>15.0.266.0</KeymanDeveloperVersion>
     <FileVersion>7.0</FileVersion>
   </System>
+  <Options>
+    <FollowKeyboardVersion/>
+  </Options>
   <Info>
     <Name URL="">SENĆOŦEN (Saanich Dialect) Lexical Model</Name>
     <Copyright URL="">© 2019 National Research Council Canada</Copyright>

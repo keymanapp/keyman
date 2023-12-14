@@ -2,14 +2,13 @@ import { CompilerErrorNamespace, CompilerErrorSeverity, CompilerMessageSpec as m
 
 const Namespace = CompilerErrorNamespace.PackageCompiler;
 const SevInfo = CompilerErrorSeverity.Info | Namespace;
-// const SevHint = CompilerErrorSeverity.Hint | Namespace;
+const SevHint = CompilerErrorSeverity.Hint | Namespace;
 const SevWarn = CompilerErrorSeverity.Warn | Namespace;
 const SevError = CompilerErrorSeverity.Error | Namespace;
 const SevFatal = CompilerErrorSeverity.Fatal | Namespace;
 
 export class CompilerMessages {
-  static Fatal_UnexpectedException = (o:{e: any}) => m(this.FATAL_UnexpectedException,
-    `Unexpected exception: ${(o.e ?? 'unknown error').toString()}\n\nCall stack:\n${(o.e instanceof Error ? o.e.stack : (new Error()).stack)}`);
+  static Fatal_UnexpectedException = (o:{e: any}) => m(this.FATAL_UnexpectedException, null, o.e ?? 'unknown error');
   static FATAL_UnexpectedException = SevFatal | 0x0001;
 
   static Warn_AbsolutePath = (o:{filename: string}) => m(this.WARN_AbsolutePath, `File ${o.filename} has an absolute path, which is not portable.`);
@@ -39,8 +38,8 @@ export class CompilerMessages {
     `Keyboard ${o.id} was listed in <Keyboards> but a corresponding .kmx file was not found in <Files>`);
   static ERROR_KeyboardContentFileNotFound = SevError | 0x0008;
 
-  static Error_KeyboardFileNotValid = (o:{filename:string}) => m(this.ERROR_KeyboardFileNotValid,
-    `Keyboard file ${o.filename} is not a valid .kmx file`);
+  static Error_KeyboardFileNotValid = (o:{filename:string, e:any}) => m(this.ERROR_KeyboardFileNotValid,
+    `Keyboard file ${o.filename} is not a valid .kmx file: ${(o.e ?? 'unknown error').toString()}`);
   static ERROR_KeyboardFileNotValid = SevError | 0x0009;
 
   static Info_KeyboardFileHasNoKeyboardVersion = (o:{filename:string}) => m(this.INFO_KeyboardFileHasNoKeyboardVersion,
@@ -51,9 +50,9 @@ export class CompilerMessages {
     `The package contains both lexical models and keyboards, which is not permitted.`);
   static ERROR_PackageCannotContainBothModelsAndKeyboards = SevError | 0x000B;
 
-  static Warn_PackageShouldNotRepeatLanguages = (o:{resourceType: string, id: string, minimalTag: string, firstTag: string, secondTag: string}) => m(this.WARN_PackageShouldNotRepeatLanguages,
+  static Hint_PackageShouldNotRepeatLanguages = (o:{resourceType: string, id: string, minimalTag: string, firstTag: string, secondTag: string}) => m(this.HINT_PackageShouldNotRepeatLanguages,
     `Two language tags in ${o.resourceType} ${o.id}, '${o.firstTag}' and '${o.secondTag}', reduce to the same minimal tag '${o.minimalTag}'.`);
-  static WARN_PackageShouldNotRepeatLanguages = SevWarn | 0x000C;
+  static HINT_PackageShouldNotRepeatLanguages = SevHint | 0x000C;
 
   static Warn_PackageNameDoesNotFollowLexicalModelConventions = (o:{filename: string}) => m(this.WARN_PackageNameDoesNotFollowLexicalModelConventions,
     `The package file ${o.filename} does not follow the recommended model filename conventions. The name should be all lower case, `+
@@ -83,21 +82,19 @@ export class CompilerMessages {
     `Keyboard ${o.keyboard} version ${o.version} does not match keyboard ${o.firstKeyboard} version ${o.firstVersion}.`);
   static WARN_KeyboardVersionsDoNotMatch = SevWarn | 0x0012;
 
-  static Warn_KeyboardVersionsDoNotMatchPackageVersion = (o: {keyboard:string, keyboardVersion: string, packageVersion: string}) => m(this.WARN_KeyboardVersionsDoNotMatchPackageVersion,
-    `Keyboard ${o.keyboard} version ${o.keyboardVersion} does not match package version ${o.packageVersion}.`);
-  static WARN_KeyboardVersionsDoNotMatchPackageVersion = SevWarn | 0x0013;
+  // 0x0013 was WARN_KeyboardVersionsDoNotMatchPackageVersion
 
   static Error_LanguageTagIsNotValid = (o: {resourceType: string, id:string, lang:string, e:any}) => m(this.ERROR_LanguageTagIsNotValid,
     `Language tag '${o.lang}' in ${o.resourceType} ${o.id} is invalid.`);
   static ERROR_LanguageTagIsNotValid = SevError | 0x0014;
 
-  static Warn_LanguageTagIsNotMinimal = (o: {resourceType: string, id:string, actual:string, expected:string}) => m(this.WARN_LanguageTagIsNotMinimal,
+  static Hint_LanguageTagIsNotMinimal = (o: {resourceType: string, id:string, actual:string, expected:string}) => m(this.HINT_LanguageTagIsNotMinimal,
     `Language tag '${o.actual}' in ${o.resourceType} ${o.id} is not minimal, and should be '${o.expected}'.`);
-  static WARN_LanguageTagIsNotMinimal = SevWarn | 0x0015;
+  static HINT_LanguageTagIsNotMinimal = SevHint | 0x0015;
 
-  static Error_MustHaveAtLeastOneLanguage = (o:{resourceType:string, id:string}) => m(this.ERROR_MustHaveAtLeastOneLanguage,
-    `The ${o.resourceType} ${o.id} must have at least one language specified.`);
-  static ERROR_MustHaveAtLeastOneLanguage = SevError | 0x0016;
+  static Error_ModelMustHaveAtLeastOneLanguage = (o:{id:string}) => m(this.ERROR_ModelMustHaveAtLeastOneLanguage,
+    `The lexical model ${o.id} must have at least one language specified.`);
+  static ERROR_ModelMustHaveAtLeastOneLanguage = SevError | 0x0016;
 
   static Warn_RedistFileShouldNotBeInPackage = (o:{filename:string}) => m(this.WARN_RedistFileShouldNotBeInPackage,
     `The Keyman system file '${o.filename}' should not be compiled into the package.`);
@@ -114,5 +111,21 @@ export class CompilerMessages {
   static Warn_JsKeyboardFileIsMissing = (o:{id: string}) => m(this.WARN_JsKeyboardFileIsMissing,
     `Keyboard ${o.id} targets touch devices but corresponding ${o.id}.js file is not in the package.`);
   static WARN_JsKeyboardFileIsMissing = SevWarn | 0x001A;
+
+  static Warn_KeyboardShouldHaveAtLeastOneLanguage = (o:{id:string}) => m(this.WARN_KeyboardShouldHaveAtLeastOneLanguage,
+    `The keyboard ${o.id} should have at least one language specified.`);
+  static WARN_KeyboardShouldHaveAtLeastOneLanguage = SevWarn | 0x001B;
+
+  static Hint_JsKeyboardFileHasNoTouchTargets = (o:{id:string}) => m(this.HINT_JsKeyboardFileHasNoTouchTargets,
+    `The keyboard ${o.id} has been included for touch platforms, but does not include a touch layout.`);
+  static HINT_JsKeyboardFileHasNoTouchTargets = SevHint | 0x001C;
+
+  static Hint_PackageContainsSourceFile = (o:{filename:string}) => m(this.HINT_PackageContainsSourceFile,
+    `The source file ${o.filename} should not be included in the package; instead include the compiled result.`);
+  static HINT_PackageContainsSourceFile = SevHint | 0x001D;
+
+  static Error_InvalidPackageFile = (o:{e:any}) => m(this.ERROR_InvalidPackageFile,
+    `Package source file is invalid: ${(o.e ?? 'unknown error').toString()}`);
+  static ERROR_InvalidPackageFile = SevError | 0x001E;
 }
 

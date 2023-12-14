@@ -266,11 +266,6 @@ LRESULT _kmnGetMessageProc(int nCode, WPARAM wParam, LPARAM lParam)
 		SendDebugMessageFormat(0, sdmInternat, 0, "GetMessage: wm_keymanshift %x %x", mp->wParam, mp->lParam);
     SelectApplicationIntegration();
 		if(!_td->app->IsWindowHandled(mp->hwnd)) _td->app->HandleWindow(mp->hwnd);
-		if(_td->app->DebugControlled())
-		{
-			if(mp->wParam == 1) *Globals::ShiftState() = (DWORD) mp->lParam;
-			else *Globals::ShiftState() = 0;
-		}
 		return CallNextHookEx(Globals::get_hhookGetMessage(), nCode, wParam, lParam);
 	}
 
@@ -287,7 +282,7 @@ LRESULT _kmnGetMessageProc(int nCode, WPARAM wParam, LPARAM lParam)
           if (!_td->lpActiveKeyboard) {
             return CallNextHookEx(Globals::get_hhookGetMessage(), nCode, wParam, lParam);
           }
-          if (KM_KBP_STATUS_OK != km_kbp_process_queued_actions(_td->lpActiveKeyboard->lpCoreKeyboardState)) {
+          if (KM_CORE_STATUS_OK != km_core_process_queued_actions(_td->lpActiveKeyboard->lpCoreKeyboardState)) {
             SendDebugMessageFormat(0, sdmGlobal, 0, "_kmnGetMessageProc wm_keymanim_close process event fail");
             return CallNextHookEx(Globals::get_hhookGetMessage(), nCode, wParam, lParam);
           }

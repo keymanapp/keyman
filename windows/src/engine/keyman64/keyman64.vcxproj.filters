@@ -38,6 +38,7 @@
     <ClCompile Include="..\keyman32\kmprocessactions.cpp" />
     <ClCompile Include="..\..\global\cpp\kmtip_guids.cpp" />
     <ClCompile Include="..\keyman32\CoreEnvironment.cpp" />
+    <ClCompile Include="..\keyman32\appcontext.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\keyman32\appint\aiTIP.h" />
@@ -72,6 +73,7 @@
     <ClInclude Include="..\keyman32\keymanengine.h" />
     <ClInclude Include="..\keyman32\kmprocessactions.h" />
     <ClInclude Include="..\..\..\include\kmtip_guids.h" />
+    <ClInclude Include="..\keyman32\appcontext.h" />
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="..\keyman32\keyman-debug-etw.man" />

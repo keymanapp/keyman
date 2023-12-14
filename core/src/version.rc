@@ -1,12 +1,12 @@
 #include <windows.h>
-#include "include/keyman/keyboardprocessor_version.h"
+#include "include/keyman/keyman_core_api_version.h"
 
 // Encoding: UTF8 (compile with rc /c65001)
 // Use rc /n to append null to all strings
 
 1 VERSIONINFO
-  FILEVERSION		KM_KBP_VERSION_MAJOR, KM_KBP_VERSION_MINOR, KM_KBP_VERSION_PATCH, 0
-  PRODUCTVERSION	KM_KBP_VERSION_MAJOR, KM_KBP_VERSION_MINOR, KM_KBP_VERSION_PATCH, 0
+  FILEVERSION		KM_CORE_VERSION_MAJOR, KM_CORE_VERSION_MINOR, KM_CORE_VERSION_PATCH, 0
+  PRODUCTVERSION	KM_CORE_VERSION_MAJOR, KM_CORE_VERSION_MINOR, KM_CORE_VERSION_PATCH, 0
   FILEFLAGSMASK		0x3fL
   FILEFLAGS		0x0L
   FILEOS		VOS_NT_WINDOWS32
@@ -19,13 +19,13 @@
       BEGIN
         VALUE "CompanyName", "SIL International"
         VALUE "FileDescription", "Keyman Core"
-        VALUE "FileVersion", KM_KBP_VERSION_STRING
+        VALUE "FileVersion", KM_CORE_VERSION_STRING
         VALUE "InternalName", "Keyman Core"
         VALUE "LegalCopyright", "© SIL International"
         VALUE "LegalTrademarks", ""
-        VALUE "OriginalFilename", "KMNKBP0-0.DLL"
+        VALUE "OriginalFilename", "KEYMANCORE1.DLL"
         VALUE "ProductName", "Keyman Core"
-        VALUE "ProductVersion", KM_KBP_VERSION_STRING
+        VALUE "ProductVersion", KM_CORE_VERSION_STRING
         VALUE "Comments", ""
       END
     END

@@ -1,6 +1,8 @@
 import 'mocha';
 import { assert } from 'chai';
-import { ElementParser, ElementType, MarkerParser, VariableParser } from '../../src/ldml-keyboard/pattern-parser.js';
+import { ElementParser, ElementSegment, ElementType, MarkerParser, OrderedStringList, VariableParser } from '../../src/ldml-keyboard/pattern-parser.js';
+import { constants } from '@keymanapp/ldml-keyboard-constants';
+import { KMXFile } from '../../src/kmx/kmx.js';
 
 describe('Test of Pattern Parsers', () => {
   describe('should test MarkerParser', () => {
@@ -50,6 +52,77 @@ describe('Test of Pattern Parsers', () => {
       ]) {
         assert.deepEqual(MarkerParser.allReferences(str), [], `expected no markers: ${str}`);
       }
+    });
+    it('should be able to emit sentinel values', () => {
+      assert.equal(MarkerParser.markerOutput(295), '\uFFFF\u0008\u0127', 'Wrong sentinel value emitted');
+      assert.equal(MarkerParser.markerOutput(MarkerParser.ANY_MARKER_INDEX), '\uFFFF\u0008\uD7FF', 'Wrong sentinel value emitted for ANY_MARKER_INDEX');
+      assert.throws(() => MarkerParser.markerOutput(0)); // below MIN
+      assert.throws(() => MarkerParser.markerOutput(0x10000)); // above MAX
+    });
+    it('should be able to output sentinel strings', () => {
+      // with nothing (no markers)
+      assert.equal(
+        MarkerParser.toSentinelString(`No markers here!`),
+        `No markers here!`
+      );
+      assert.throws(() =>
+        MarkerParser.toSentinelString(`Marker \\m{sorryNoMarkers}`)
+      );
+      // with a custom class
+      class MyMarkers implements OrderedStringList {
+        getItemOrder(item: string): number {
+          const m : any = {
+            'a': 0,
+            'b': 1,
+            'c': 2,
+            'zz': MarkerParser.MAX_MARKER_INDEX - 1, // this is an ordering, so needs to be -1
+            'zzz': 0x2FFFFF,
+          };
+          const o = m[item];
+          if (o === undefined) return -1;
+          return o;
+        }
+      };
+      const markers = new MyMarkers();
+      assert.equal(MarkerParser.toSentinelString(
+        `No markers here!`, markers),
+        `No markers here!`
+      );
+      assert.equal(MarkerParser.toSentinelString(
+        `Give me \\m{a} and \\m{c}, or \\m{.}.`, markers),
+        `Give me \uFFFF\u0008\u0001 and \uFFFF\u0008\u0003, or \uFFFF\u0008\uD7FF.`
+      );
+      assert.throws(() =>
+        MarkerParser.toSentinelString(
+          `Want to see something funny? \\m{zzz}`, // out of range
+          markers
+        )
+      );
+      assert.throws(() =>
+        MarkerParser.toSentinelString(
+          `Want to see something sad? \\m{nothing}`, // non existent
+          markers
+        )
+      );
+      // verify the matching behavior of these
+      assert.isTrue(new RegExp(MarkerParser.toSentinelString(`^Q\\m{a}$`, markers, true), 'u')
+        .test(MarkerParser.toSentinelString(`Q\\m{a}`, markers, false)), `Q\\m{a} did not match`);
+      assert.isFalse(new RegExp(MarkerParser.toSentinelString(`^Q\\m{a}$`, markers, true), 'u')
+        .test(MarkerParser.toSentinelString(`Q\\m{b}`, markers, false)), `Q\\m{a} should not match Q\\m{b}`);
+      assert.isTrue(new RegExp(MarkerParser.toSentinelString(`^Q\\m{.}$`, markers, true), 'u')
+        .test(MarkerParser.toSentinelString(`Q\\m{a}`, markers, false)), `Q\\m{.} did not match Q\\m{a}`);
+      assert.isTrue(new RegExp(MarkerParser.toSentinelString(`^Q\\m{.}$`, markers, true), 'u')
+        .test(MarkerParser.toSentinelString(`Q\\m{zz}`, markers, false)), `Q\\m{.} did not match Q\\m{zz} (max marker)`);
+      assert.isFalse(new RegExp(MarkerParser.toSentinelString(`^Q\\m{.}$`, markers, true), 'u')
+        .test(MarkerParser.toSentinelString(`\\m{a}`, markers, false)), `Q\\m{.} did not match \\m{a}`);
+      assert.isTrue(new RegExp(MarkerParser.toSentinelString(`^\\m{.}$`, markers, true), 'u')
+        .test(MarkerParser.toSentinelString(`\\m{a}`, markers, false)), `\\m{.} did not match \\m{a}`);
+      assert.isFalse(new RegExp(MarkerParser.toSentinelString(`^\\m{.}$`, markers, true), 'u')
+        .test(MarkerParser.toSentinelString(`\\m{a}\\m{b}`, markers, false)), `\\m{.} did not match \\m{a}\\m{b}`);
+    });
+    it('should match some marker constants', () => {
+      assert.equal(constants.uc_sentinel, KMXFile.UC_SENTINEL);
+      assert.equal(constants.marker_code, KMXFile.CODE_DEADKEY);
     });
   });
   describe('should test VariableParser', () => {
@@ -124,8 +197,45 @@ describe('Test of Pattern Parsers', () => {
           ...samplePatterns,
         ].forEach(s => assert.notOk(ElementParser.MATCH_NESTED_SQUARE_BRACKETS.test(s), `expected false: ${s}`));
       });
+      it('should be able to run some splitters', () => {
+        assert.sameDeepMembers(VariableParser.allStringReferences(
+          ``
+        ), [
+        ], `running allStringReferences('')`);
+
+        assert.sameDeepMembers(VariableParser.allStringReferences(
+          '${str1} ${str2}'
+        ), [
+          'str1', 'str2',
+        ], `running allStringReferences('\${str1} \${str2}')`);
+
+        assert.sameDeepMembers(VariableParser.allSetReferences(
+          '',
+        ), [
+        ], `running allSetReferences('')`);
+        assert.sameDeepMembers(VariableParser.allSetReferences(
+          ' $[set1] $[set2] ',
+        ), [
+          'set1', 'set2',
+        ], `running allSetReferences(' \$[set1] \$[set2]')`);
+        assert.sameDeepMembers(VariableParser.setSplitter(
+          ``
+        ), [
+        ], `running setSplitter('')`);
+        assert.sameDeepMembers(VariableParser.setSplitter(
+          ` A B  C`
+        ), [
+          'A', 'B', 'C',
+        ], `running setSplitter(' A B  C')`);
+      });
     });
     describe('segment some strings', () => {
+      it('should have a functioning ElementSegment() c’tor', () => {
+        assert.equal(new ElementSegment('String', ElementType.string).type, ElementType.string);
+        assert.equal(new ElementSegment('String', ElementType.string).unescaped, 'String');
+        assert.equal(new ElementSegment('\\u0041').unescaped, 'A');
+        assert.equal(new ElementSegment('\\u{0041}').unescaped, 'A');
+      });
       it('should be able to segment strings from the spec and samples', () => {
         samplePatterns.forEach(str => assert.ok(ElementParser.segment(str)));
       });
@@ -149,16 +259,38 @@ describe('Test of Pattern Parsers', () => {
           str: `\\u1A60[\\u1A75-\\u1A79]\\u1A45ħ`,
           expect: [{
             segment: '\\u1A60',
-            type: ElementType.escaped
+            type: ElementType.escaped,
           },{
             segment: '[\\u1A75-\\u1A79]',
-            type: ElementType.uset
+            type: ElementType.uset,
           },{
             segment: '\\u1A45',
-            type: ElementType.escaped
+            type: ElementType.escaped,
           },{
             segment: 'ħ',
-            type: ElementType.codepoint
+            type: ElementType.codepoint,
+          }],
+        },
+        {
+          str: `\\u{22}\\u{0127}`,
+          expect: [{
+            segment: `\\u{22}`,
+            type: ElementType.escaped,
+          },
+          {
+            segment: `\\u{0127}`,
+            type: ElementType.escaped,
+          }],
+        },
+        {
+          str: `\\u{22 0127}`,
+          expect: [{
+            segment: `\\u{22}`,
+            type: ElementType.escaped,
+          },
+          {
+            segment: `\\u{127}`, // resegmented with minimal hex
+            type: ElementType.escaped,
           }],
         },
       ].forEach(({str, expect}) => it(`Segment: ${str}`, () => {

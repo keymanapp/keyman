@@ -51,6 +51,8 @@ type
     editProjectFilename: TEdit;
     Label1: TLabel;
     editFullCopyright: TEdit;
+    Label2: TLabel;
+    memoDescription: TMemo;
     procedure cmdOKClick(Sender: TObject);
     procedure editKeyboardNameChange(Sender: TObject);
     procedure FormCreate(Sender: TObject);
@@ -68,6 +70,7 @@ type
     procedure editKeyboardIDChange(Sender: TObject);
     procedure cmdBrowseClick(Sender: TObject);
     procedure editFullCopyrightChange(Sender: TObject);
+    procedure memoDescriptionChange(Sender: TObject);
   private
     dlgBrowse: TBrowse4Folder;
     pack: TKPSFile; // Used temporarily for storing language list
@@ -90,6 +93,7 @@ type
     procedure SetKeyboardName(const Value: string);
     procedure UpdateProjectFilename;
     function GetFullCopyright: string;
+    function GetDescription: string;
   protected
     function GetHelpTopic: string; override;
   public
@@ -100,6 +104,8 @@ type
     property Targets: TKeymanTargets read GetTargets;
     property BCP47Tags: string read GetBCP47Tags write SetBCP47Tags;
     property BasePath: string read GetBasePath;
+
+    property Description: string read GetDescription;
 
     property KeyboardName: string read GetKeyboardName write SetKeyboardName;
     property KeyboardID: string read GetKeyboardID write SetKeyboardID;
@@ -114,7 +120,6 @@ uses
   Keyman.System.LanguageCodeUtils,
   BCP47Tag,
   utilstr,
-  dmActionsMain,
   KeymanDeveloperOptions,
   Keyman.Developer.System.HelpTopics,
   Keyman.Developer.System.Project.Project,
@@ -122,7 +127,8 @@ uses
   Keyman.Developer.System.KeyboardProjectTemplate,
   Keyman.Developer.System.ProjectTemplate,
   Keyman.Developer.UI.UfrmSelectBCP47Language,
-  Keyman.System.KeyboardUtils;
+  Keyman.System.KeyboardUtils,
+  UfrmMain;
 
 // 1. project filename
 // 2. location
@@ -132,6 +138,7 @@ uses
 // 6. author
 // 7. version
 // 8. bcp47 tags
+// 9. description
 
 {$R *.dfm}
 
@@ -153,6 +160,7 @@ begin
       pt.FullCopyright := f.FullCopyright;
       pt.Author := f.Author;
       pt.Version := f.Version;
+      pt.Description := f.Description;
       pt.BCP47Tags := f.BCP47Tags;
       pt.IncludeIcon := True;
 
@@ -166,7 +174,7 @@ begin
         end;
       end;
 
-      modActionsMain.OpenProject(pt.ProjectFilename);
+      frmKeymanDeveloper.OpenProject(pt.ProjectFilename);
       Result := True;
 
     finally
@@ -185,7 +193,7 @@ var
 begin
   inherited;
   editPath.Text := FKeymanDeveloperOptions.DefaultProjectPath;
-  editFullCopyright.Text := Char($00A9 {copyright})+' '+FormatDateTime('yyyy', Now)+' ';
+  editFullCopyright.Text := 'Copyright '+Char($00A9 {copyright})+' '+FormatDateTime('yyyy', Now)+' ';
 
   dlgBrowse := TBrowse4Folder.Create(Self);
   dlgBrowse.InitialDir := editPath.Text;
@@ -307,9 +315,9 @@ procedure TfrmNewProjectParameters.editAuthorChange(Sender: TObject);
 begin
   EnableControls;
   if not editCopyright.Modified then
-    editCopyright.Text := Char($00A9 {copyright})+' '+Author;
+    editCopyright.Text := 'Copyright '+Char($00A9 {copyright})+' '+Author;
   if not editFullCopyright.Modified then
-    editFullCopyright.Text := Char($00A9 {copyright})+' '+FormatDateTime('yyyy', Now)+' '+Author;
+    editFullCopyright.Text := 'Copyright '+Char($00A9 {copyright})+' '+FormatDateTime('yyyy', Now)+' '+Author;
 end;
 
 procedure TfrmNewProjectParameters.editCopyrightChange(Sender: TObject);
@@ -353,7 +361,8 @@ begin
   e := (Trim(editKeyboardName.Text) <> '') and
     (Trim(editPath.Text) <> '') and
     TKeyboardUtils.IsValidKeyboardID(Trim(editKeyboardID.Text), True) and
-    (GetTargets <> []);
+    (GetTargets <> []) and
+    (Trim(memoDescription.Text) <> '');
 
   cmdOK.Enabled := e;
 
@@ -378,6 +387,11 @@ end;
 function TfrmNewProjectParameters.GetCopyright: string;
 begin
   Result := Trim(editCopyright.Text);
+end;
+
+function TfrmNewProjectParameters.GetDescription: string;
+begin
+  Result := Trim(memoDescription.Text);
 end;
 
 function TfrmNewProjectParameters.GetFullCopyright: string;
@@ -561,6 +575,11 @@ begin
   finally
     Dec(FSetup);
   end;
+end;
+
+procedure TfrmNewProjectParameters.memoDescriptionChange(Sender: TObject);
+begin
+  EnableControls;
 end;
 
 procedure TfrmNewProjectParameters.UpdateProjectFilename;

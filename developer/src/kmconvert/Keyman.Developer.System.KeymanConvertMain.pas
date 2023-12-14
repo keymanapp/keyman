@@ -50,6 +50,7 @@ begin
     iwk.DestinationPath := FParameters.Destination;
     iwk.KeyboardIDTemplate := FParameters.KeyboardID;
     iwk.NameTemplate := FParameters.Name;
+    iwk.Description := FParameters.Description;
     iwk.Copyright := FParameters.Copyright;
     iwk.FullCopyright := FParameters.FullCopyright;
     iwk.Version := FParameters.Version;

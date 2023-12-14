@@ -125,7 +125,7 @@ procedure TModelProjectTemplate.WriteKPJ;
 var
   kpj: TProject;
 begin
-  kpj := TProject.Create(ptLexicalModel, GetProjectFilename);
+  kpj := TProject.Create(ptLexicalModel, GetProjectFilename, False);
   try
     kpj.Options.BuildPath := '$PROJECTPATH\' + SFolder_Build;
     kpj.Options.WarnDeprecatedCode := True;
@@ -161,6 +161,7 @@ begin
     kps.Info.Desc[PackageInfo_Copyright] := Copyright;
     kps.Info.Desc[PackageInfo_Author] := Author;
     kps.Info.Desc[PackageInfo_Version] := Version;
+    kps.Info.Desc[PackageInfo_Description] := Description;
     kps.FileName := GetPackageFilename;
 
     // Add model.js
@@ -178,6 +179,12 @@ begin
     f.FileName := BasePath + ID + '\' + SFolder_Source + '\' + SFile_ReadmeHTM;
     kps.Files.Add(f);
     kps.Options.ReadmeFile := f;
+
+    // Add license
+    f := TPackageContentFile.Create(kps);
+    f.FileName := BasePath + ID + '\' + SFile_LicenseMD;
+    kps.Files.Add(f);
+    kps.Options.LicenseFile := f;
 
     // Add metadata about the lexical model
     plm := TPackageLexicalModel.Create(kps);

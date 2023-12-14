@@ -10,6 +10,4 @@ title: Troubleshooting
 * [How To - Resolve Security Software Conflicts with keyman32.dll](securitysoftware)
 * [How To - Use the Keyman Setup Bootstrapper](bootstrapper)
 
-* [How To - Fix A Problem with an Active Keyman Keyboard Not Typing](hidden)
-
-* [How To - Allow Windows 10 to Install Apps From Anywhere](install-app-from-anywhere)
+* [How To - Allow Windows to Install Apps From Anywhere](install-app-from-anywhere)

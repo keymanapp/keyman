@@ -1,8 +1,6 @@
-import { KmpJsonFile, CompilerCallbacks } from '@keymanapp/common-types';
+import { KmpJsonFile, CompilerCallbacks, CompilerOptions, KeymanFileTypes } from '@keymanapp/common-types';
 import { CompilerMessages } from './messages.js';
 import { keymanEngineForWindowsFiles, keymanForWindowsInstallerFiles, keymanForWindowsRedistFiles } from './redist-files.js';
-
-// const SLexicalModelExtension = '.model.js';
 
 // The keyboard ID SHOULD adhere to this pattern:
 const KEYBOARD_ID_PATTERN_PACKAGE = /^[a-z_][a-z0-9_]*\.(kps|kmp)$/;
@@ -15,12 +13,12 @@ const MODEL_ID_PATTERN_PACKAGE = /^[a-z_][a-z0-9_]*\.[a-z_][a-z0-9_-]*\.[a-z_][a
 // const MODEL_ID_PATTERN_PROJECT = /^[a-z_][a-z0-9_]*\.[a-z_][a-z0-9_-]*\.[a-z_][a-z0-9_]*\.model\.kpj$/;
 
 // "Content files" within the package should adhere to these pattern:
-const CONTENT_FILE_BASENAME_PATTERN = /^[a-z0-9_+.-]+$/;
-const CONTENT_FILE_EXTENSION_PATTERN = /^\.[a-z0-9_]+$/;
+const CONTENT_FILE_BASENAME_PATTERN = /^[a-z0-9_+.-]+$/i; // base names can be case insensitive
+const CONTENT_FILE_EXTENSION_PATTERN = /^(\.[a-z0-9_-]+)?$/;  // extensions should be lower-case or empty
 
 export class PackageValidation {
 
-  constructor(private callbacks: CompilerCallbacks) {
+  constructor(private callbacks: CompilerCallbacks, private options: CompilerOptions) {
   }
 
   public validate(filename: string, kmpJson: KmpJsonFile.KmpJsonFile) {
@@ -46,8 +44,12 @@ export class PackageValidation {
     let minimalTags: {[tag: string]: string} = {};
 
     if(languages.length == 0) {
-      this.callbacks.reportMessage(CompilerMessages.Error_MustHaveAtLeastOneLanguage({resourceType, id}));
-      return false;
+      if(resourceType == 'keyboard') {
+        this.callbacks.reportMessage(CompilerMessages.Warn_KeyboardShouldHaveAtLeastOneLanguage({id}));
+      } else {
+        this.callbacks.reportMessage(CompilerMessages.Error_ModelMustHaveAtLeastOneLanguage({id}));
+        return false;
+      }
     }
 
     for(let lang of languages) {
@@ -62,11 +64,11 @@ export class PackageValidation {
       const minimalTag = locale.minimize().toString();
 
       if(minimalTag.toLowerCase() !== lang.id.toLowerCase()) {
-        this.callbacks.reportMessage(CompilerMessages.Warn_LanguageTagIsNotMinimal({resourceType, id, actual: lang.id, expected: minimalTag}));
+        this.callbacks.reportMessage(CompilerMessages.Hint_LanguageTagIsNotMinimal({resourceType, id, actual: lang.id, expected: minimalTag}));
       }
 
       if(minimalTags[minimalTag]) {
-        this.callbacks.reportMessage(CompilerMessages.Warn_PackageShouldNotRepeatLanguages({resourceType, id, minimalTag, firstTag: lang.id, secondTag: minimalTags[minimalTag]}));
+        this.callbacks.reportMessage(CompilerMessages.Hint_PackageShouldNotRepeatLanguages({resourceType, id, minimalTag, firstTag: lang.id, secondTag: minimalTags[minimalTag]}));
       }
       else {
         minimalTags[minimalTag] = lang.id;
@@ -151,8 +153,10 @@ export class PackageValidation {
     const filename = this.callbacks.path.basename(file.name);
     const ext = this.callbacks.path.extname(filename);
     const base = filename.substring(0, filename.length-ext.length);
-    if(!CONTENT_FILE_BASENAME_PATTERN.test(base) || !CONTENT_FILE_EXTENSION_PATTERN.test(ext)) {
-      this.callbacks.reportMessage(CompilerMessages.Warn_FileInPackageDoesNotFollowFilenameConventions({filename}));
+    if(this.options.checkFilenameConventions) {
+      if(!CONTENT_FILE_BASENAME_PATTERN.test(base) || !CONTENT_FILE_EXTENSION_PATTERN.test(ext)) {
+        this.callbacks.reportMessage(CompilerMessages.Warn_FileInPackageDoesNotFollowFilenameConventions({filename}));
+      }
     }
 
     if(!this.checkIfContentFileIsDangerous(file)) {
@@ -163,15 +167,35 @@ export class PackageValidation {
   }
 
   private checkIfContentFileIsDangerous(file: KmpJsonFile.KmpJsonFileContentFile): boolean {
-    let filename = this.callbacks.path.basename(file.name).toLowerCase();
+    const filename = this.callbacks.path.basename(file.name).toLowerCase();
+
+    // # Test for inclusion of redistributable files
+
     if(keymanForWindowsInstallerFiles.includes(filename) ||
         keymanForWindowsRedistFiles.includes(filename) ||
         keymanEngineForWindowsFiles.includes(filename)) {
       this.callbacks.reportMessage(CompilerMessages.Warn_RedistFileShouldNotBeInPackage({filename}));
     }
+
+    // # Test for inclusion of .doc or .docx files
+
     if(filename.match(/\.doc(x?)$/)) {
       this.callbacks.reportMessage(CompilerMessages.Warn_DocFileDangerous({filename}));
     }
+
+    // # Test for inclusion of keyboard source files
+    //
+    // We treat this as a hint, because it's not a dangerous problem, just
+    // something that suggests that perhaps they are trying to distribute the
+    // wrong files.
+    //
+    // Note: we allow .xml in the package because there are other files
+    // which may be valid, not just LDML keyboards
+    const fileType = KeymanFileTypes.sourceTypeFromFilename(file.name);
+    if(fileType !== null && fileType !== KeymanFileTypes.Source.LdmlKeyboard) {
+      this.callbacks.reportMessage(CompilerMessages.Hint_PackageContainsSourceFile({filename: file.name}));
+    }
+
     return true;
   }
 

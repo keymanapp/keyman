@@ -11,14 +11,16 @@ from shutil import rmtree
 from keyman_config import _, __version__, secure_lookup
 from keyman_config.canonical_language_code_utils import CanonicalLanguageCodeUtils
 from keyman_config.convertico import checkandsaveico, extractico
+from keyman_config.custom_keyboards import CustomKeyboards
 from keyman_config.dbus_util import get_keyman_config_service
-from keyman_config.fcitx_util import is_fcitx_running, restart_fcitx
+from keyman_config.fcitx_util import is_fcitx_running
 from keyman_config.get_kmp import (InstallLocation, get_keyboard_data,
                                    get_keyboard_dir, get_keyman_doc_dir,
                                    get_keyman_font_dir)
 from keyman_config.gnome_keyboards_util import (GnomeKeyboardsUtil,
                                                 get_ibus_keyboard_id,
                                                 is_gnome_shell)
+from keyman_config.gsettings import GSettings
 from keyman_config.ibus_util import get_ibus_bus, install_to_ibus, restart_ibus
 from keyman_config.kmpmetadata import KMFileTypes, get_metadata
 from keyman_config.kvk2ldml import convert_kvk_to_ldml, output_ldml
@@ -114,38 +116,31 @@ class InstallKmp():
 
         extract_kmp(inputfile, self.packageDir)
 
-        if is_fcitx_running():
-            restart_fcitx()
-        else:
-            restart_ibus()
-
         info, system, options, keyboards, files = get_metadata(self.packageDir)
 
         self._check_version(inputfile, system)
 
-        if keyboards:
-            # sourcery skip: extract-method
-            logging.info("Installing %s", secure_lookup(info, 'name', 'description'))
-            process_keyboard_data(self.packageID, self.packageDir)
-            for kb in keyboards:
-                if kb['id'] != self.packageID:
-                    process_keyboard_data(kb['id'], self.packageDir)
-
-            if files is None:
-                return self.install_keyboards(keyboards, self.packageDir, language)
-
-            self._install_files(keyboards, files)
-
-            return self.install_keyboards(keyboards, self.packageDir, language)
-        else:
+        if not keyboards:
             logging.error("install_kmp.py: error: No kmp.json or kmp.inf found in %s", inputfile)
             logging.info("Contents of %s:", inputfile)
             for o in os.listdir(self.packageDir):
                 logging.info(o)
             rmtree(self.packageDir)
             message = _("No kmp.json or kmp.inf found in {packageFile}").format(
-              packageFile=inputfile)
+                packageFile=inputfile)
             raise InstallError(InstallStatus.Abort, message)
+
+        # sourcery skip: extract-method
+        logging.info("Installing %s", secure_lookup(info, 'name', 'description'))
+        process_keyboard_data(self.packageID, self.packageDir)
+        for kb in keyboards:
+            if kb['id'] != self.packageID:
+                process_keyboard_data(kb['id'], self.packageDir)
+
+        if files is not None:
+            self._install_files(keyboards, files)
+
+        return self._install_keyboards(keyboards, self.packageDir, language)
 
     def _check_version(self, inputfile, system):
         if not system:
@@ -238,21 +233,36 @@ class InstallKmp():
         if not language:
             return language
 
-        language = CanonicalLanguageCodeUtils.findBestTag(language, False, True)
+        language = CanonicalLanguageCodeUtils.findBestTag(language, False, False)
         for supportedLanguage in supportedLanguages:
-            tag = CanonicalLanguageCodeUtils.findBestTag(supportedLanguage['id'], False, True)
+            tag = CanonicalLanguageCodeUtils.findBestTag(supportedLanguage['id'], False, False)
             if tag == language:
                 return tag
         return None
 
-    def install_keyboards(self, keyboards, packageDir, language=None):
+    def _add_custom_keyboard(self, keyboard, package_dir, requested_language):
+        if not requested_language:
+            return None
+        language = CanonicalLanguageCodeUtils.findBestTag(requested_language, False, False)
+        new_keyboard = get_ibus_keyboard_id(keyboard, package_dir, language)
+        CustomKeyboards().add(new_keyboard)
+        return language
+
+    def _install_keyboards(self, keyboards, packageDir, requested_language=None):
+        language = requested_language
+        # TODO: add other keyboards as well (#9757)
         firstKeyboard = keyboards[0]
-        if secure_lookup(firstKeyboard, 'languages') and len(firstKeyboard['languages']) > 0:
+        if secure_lookup(firstKeyboard, 'languages') and firstKeyboard['languages']:
             language = self._normalize_language(firstKeyboard['languages'], language)
+
+        if not language:
+            language = self._add_custom_keyboard(firstKeyboard, packageDir, requested_language)
 
         if is_fcitx_running():
             return self._install_keyboards_to_fcitx()
-        elif is_gnome_shell():
+
+        restart_ibus()
+        if is_gnome_shell():
             return self._install_keyboards_to_gnome(keyboards, packageDir, language)
         else:
             return self._install_keyboards_to_ibus(keyboards, packageDir, language)

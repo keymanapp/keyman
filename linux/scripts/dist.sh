@@ -48,14 +48,17 @@ dpkg-source --tar-ignore=*~ --tar-ignore=.git --tar-ignore=.gitattributes \
     \
     --tar-ignore=core/build \
     --tar-ignore=developer --tar-ignore=docs --tar-ignore=ios \
+    --tar-ignore=linux/keyman-config/keyman_config/version.py \
     --tar-ignore=linux/keyman-config/buildtools/build-langtags.py --tar-ignore=__pycache__ \
-    --tar-ignore=linux/help --tar-ignore=linux/Jenkinsfile \
+    --tar-ignore=linux/help \
     --tar-ignore=mac --tar-ignore=node_modules --tar-ignore=oem \
     --tar-ignore=linux/build \
     --tar-ignore=linux/builddebs \
     --tar-ignore=linux/ibus-keyman/build \
     --tar-ignore=linux/keyman-system-service/build \
-    --tar-ignore=resources/devbox --tar-ignore=resources/git-hooks \
+    --tar-ignore=resources/devbox \
+    --tar-ignore=resources/environment.sh \
+    --tar-ignore=resources/git-hooks \
     --tar-ignore=resources/scopes \
     --tar-ignore=resources/build/*.lua --tar-ignore=resources/build/jq* \
     --tar-ignore=results \

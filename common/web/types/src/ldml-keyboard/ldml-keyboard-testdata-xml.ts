@@ -11,7 +11,7 @@ export interface LDMLKeyboardTestDataXMLSourceFile {
   /**
    * <keyboardTest> -- the root element.
    */
-  keyboardTest: LKTKeyboardTest;
+  keyboardTest3: LKTKeyboardTest;
 }
 
 export interface LKTKeyboardTest {
@@ -41,26 +41,11 @@ export interface LKTTests {
 export interface LKTTest {
   name?: string;
   startContext?: LKTStartContext;
-  actions?: LKTAction[];  // differs from XML, to represent order of actions
+  actions?: LKTAnyAction[];  // differs from XML, to represent order of actions
 };
 
 export interface LKTStartContext {
   to?: string;
-};
-
-export interface LKTCheck {
-  result?: string;
-};
-
-export interface LKTEmit {
-  to?: string;
-};
-
-export interface LKTKeystroke {
-  key?: string;
-  flick?: string;
-  longPress?: string;
-  tapCount?: string;
 };
 
 /**
@@ -68,7 +53,29 @@ export interface LKTKeystroke {
  * The expectation is that each LKTAction object will have exactly one non-falsy field.
  */
 export interface LKTAction {
-  check?: LKTCheck;
-  emit?: LKTEmit;
-  keystroke?: LKTKeystroke;
+  type?: "check" | "emit" | "keystroke" | "backspace";
 };
+
+export interface LKTCheck extends LKTAction {
+  type: "check";
+  result?: string;
+};
+
+export interface LKTEmit extends LKTAction {
+  type: "emit";
+  to?: string;
+};
+
+export interface LKTKeystroke extends LKTAction {
+  type: "keystroke";
+  key?: string;
+  flick?: string;
+  longPress?: string;
+  tapCount?: string;
+};
+
+export interface LKTBackspace extends LKTAction {
+  type: "backspace";
+}
+
+export type LKTAnyAction = LKTCheck | LKTEmit | LKTKeystroke | LKTBackspace;

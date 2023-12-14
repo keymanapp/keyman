@@ -28,10 +28,17 @@
 /** NSUserDefaults keys */
 NSString *const kKMSelectedKeyboardKey = @"KMSelectedKeyboardKey";
 NSString *const kKMActiveKeyboardsKey = @"KMActiveKeyboardsKey";
-NSString *const kKMSavedStoresKey = @"KMSavedStoresKey";
+/**
+  The following constant "KMSavedStoresKey" is left here for documentation
+  though we have abandoned stores written to UserDefaults with this key because
+  they used a less-reliable numeric key prior to integration with Keyman Core.
+  It is replaced by the renamed "KMPersistedOptionsKey" which directly
+  represents what it is saving.
+ */
+NSString *const kKMDeprecatedPersistedOptionsKey = @"KMSavedStoresKey";
+NSString *const kKMPersistedOptionsKey = @"KMPersistedOptionsKey";
 NSString *const kKMAlwaysShowOSKKey = @"KMAlwaysShowOSKKey";
 NSString *const kKMUseVerboseLogging = @"KMUseVerboseLogging";
-NSString *const kKMLegacyApps = @"KMLegacyApps";
 
 NSString *const kKeymanKeyboardDownloadCompletedNotification = @"kKeymanKeyboardDownloadCompletedNotification";
 
@@ -117,9 +124,10 @@ NSString* _keymanDataPath = nil;
                                            nil);
 
   if (!self.lowLevelEventTap) {
-      NSLog(@"Can't tap into low level events!");
+      NSLog(@"Unable to create lowLevelEventTap!");
   }
   else {
+      NSLog(@"Successfully created lowLevelEventTap with CGEventTapCreate.");
       CFRelease(self.lowLevelEventTap);
   }
 
@@ -129,6 +137,15 @@ NSString* _keymanDataPath = nil;
 
   if (self.runLoopEventSrc && runLoop) {
       CFRunLoopAddSource(runLoop,  self.runLoopEventSrc, kCFRunLoopDefaultMode);
+  }
+}
+
+-(void)logDebugMessage:(NSString *)format, ... {
+  if (self.debugMode) {
+    va_list args;
+    va_start(args, format);
+    NSLogv(format, args);
+    va_end(args);
   }
 }
 
@@ -266,7 +283,7 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
     if (appDelegate != nil) {
         if (type == kCGEventTapDisabledByTimeout || type == kCGEventTapDisabledByUserInput) {
             // kCGEventTapDisabledByUserInput most likely means we're "sleeping", in which case we want it to stay
-            // diabled until we get the wake-up call.
+            // disabled until we get the wake-up call.
             if (!appDelegate.sleeping) {
                 // REVIEW: We might need to consider putting in some kind of counter/flag to ensure that the very next
                 // event is not another disable so we don't end up in an endless cycle.
@@ -295,10 +312,10 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
         switch (type) {
             case kCGEventFlagsChanged:
                 if (appDelegate.debugMode)
-                    NSLog(@"System Event: flags changed: %x", (int) sysEvent.modifierFlags);
+                    NSLog(@"eventTapFunction: system event kCGEventFlagsChanged to: %x", (int) sysEvent.modifierFlags);
                 appDelegate.currentModifierFlags = sysEvent.modifierFlags;
                 if (appDelegate.currentModifierFlags & NSEventModifierFlagCommand) {
-                    appDelegate.contextChangingEventDetected = YES;
+                    appDelegate.contextChangedByLowLevelEvent = YES;
                 }
                 break;
 
@@ -306,16 +323,21 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
             case kCGEventLeftMouseDown:
             case kCGEventOtherMouseUp:
             case kCGEventOtherMouseDown:
-                appDelegate.contextChangingEventDetected = YES;
+                NSLog(@"Event tap context invalidation flagged due to event: %@", event);
+                appDelegate.contextChangedByLowLevelEvent = YES;
                 break;
 
             case kCGEventKeyDown:
-                // Pass back delete events through to the input method event handler
-                // because some 'legacy' apps don't allow us to see back delete events
-                // that we have synthesized (and we need to see them, for serialization
+                NSLog(@"Event tap keydown event, keyCode: %hu, event: %@", sysEvent.keyCode, event);
+                // Pass back low-level backspace events to the input method event handler
+                // because some non-compliant apps do not allow us to see backspace events
+                // that we have generated (and we need to see them, for serialization
                 // of events)
                 if(sysEvent.keyCode == kVK_Delete && appDelegate.inputController != nil) {
-                    [appDelegate.inputController handleDeleteBackLowLevel:sysEvent];
+                    NSLog(@"Event tap handling kVK_Delete.");
+                    [appDelegate.inputController handleBackspace:sysEvent];
+                } else {
+                  NSLog(@"Event tap not handling kVK_Delete, appDelegate.inputController = %@", appDelegate.inputController);
                 }
 
                 switch(sysEvent.keyCode) {
@@ -359,7 +381,7 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
                     case kVK_ForwardDelete:
                         // Text modification by the forward delete key should reset context, but
                         // note that normal Delete (aka Bksp) is already managed by Keyman correctly.
-                        appDelegate.contextChangingEventDetected = YES;
+                        appDelegate.contextChangedByLowLevelEvent = YES;
                         break;
                 }
                 break;
@@ -377,8 +399,7 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
 
 - (KMEngine *)kme {
     if (_kme == nil) {
-        _kme = [[KMEngine alloc] initWithKMX:nil contextBuffer:self.contextBuffer];
-        [_kme setDebugMode:self.debugMode];
+        _kme = [[KMEngine alloc] initWithKMX:nil context:self.contextBuffer verboseLogging:self.debugMode];
     }
 
     return _kme;
@@ -410,50 +431,52 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
         [_oskWindow.window setTitle:self.oskWindowTitle];
 }
 
-- (void)loadSavedStores {
+- (void)readPersistedOptions {
     NSUserDefaults *userData = [NSUserDefaults standardUserDefaults];
-    NSDictionary *allSavedStores = [userData dictionaryForKey:kKMSavedStoresKey];
-    if (!allSavedStores) return;
-    NSDictionary *savedStores = [allSavedStores objectForKey:_selectedKeyboard];
-    if (!savedStores) return;
+    NSDictionary *allPersistedOptions = [userData dictionaryForKey:kKMPersistedOptionsKey];
+    if (!allPersistedOptions) {
+      return;
+    }
+    NSDictionary *persistedOptionsForSelectedKeyboard = [allPersistedOptions objectForKey:_selectedKeyboard];
+    if (!persistedOptionsForSelectedKeyboard) {
+        NSLog(@"no persisted options found in UserDefaults for keyboard %@ ", _selectedKeyboard);
+        return;
+    }
 
-    NSNumberFormatter *fmt = [[NSNumberFormatter alloc] init];
-    fmt.numberStyle = NSNumberFormatterDecimalStyle;
-
-    for (NSString *key in savedStores) {
-        NSString *value = [savedStores objectForKey:key];
-        NSUInteger storeID = [[fmt numberFromString:key] unsignedIntegerValue];
-        [self.kme setStore:(DWORD)storeID withValue:value];
+  // TODO pass array instead of making repeated calls
+    for (NSString *key in persistedOptionsForSelectedKeyboard) {
+        NSString *value = [persistedOptionsForSelectedKeyboard objectForKey:key];
+        NSLog(@"persisted options found in UserDefaults for keyboard %@, key: %@, value: %@", _selectedKeyboard, key, value);
+        [self.kme setCoreOptions:key withValue:value];
     }
 }
 
-- (void)saveStore:(NSNumber *)storeKey withValue:(NSString* )value {
-    NSString *storeKeyStr = [storeKey stringValue];
+- (void)writePersistedOptions:(NSString *)storeKey withValue:(NSString* )value {
     NSUserDefaults *userData = [NSUserDefaults standardUserDefaults];
-    NSDictionary *allSavedStores = [userData dictionaryForKey:kKMSavedStoresKey];
-    NSDictionary *savedStores;
+    NSDictionary *allPersistedOptions = [userData dictionaryForKey:kKMPersistedOptionsKey];
+    NSDictionary *persistedOptionsForSelectedKeyboard;
 
-    if (allSavedStores) {
-        savedStores = [allSavedStores objectForKey:_selectedKeyboard];
+    if (allPersistedOptions) {
+      persistedOptionsForSelectedKeyboard = [allPersistedOptions objectForKey:_selectedKeyboard];
     }
 
-    if (savedStores) {
-        NSMutableDictionary *newSavedStores = [savedStores mutableCopy];
-        [newSavedStores setObject:value forKey:storeKeyStr];
-        savedStores = newSavedStores;
+    if (persistedOptionsForSelectedKeyboard) {
+        NSMutableDictionary *newSavedStores = [persistedOptionsForSelectedKeyboard mutableCopy];
+       [newSavedStores setObject:value forKey:storeKey];
+       persistedOptionsForSelectedKeyboard = newSavedStores;
     } else {
-        savedStores = [[NSDictionary alloc] initWithObjectsAndKeys:value, storeKeyStr, nil];
+        persistedOptionsForSelectedKeyboard = [[NSDictionary alloc] initWithObjectsAndKeys:value, storeKey, nil];
     }
 
-    if (allSavedStores) {
-        NSMutableDictionary *newAllSavedStores = [allSavedStores mutableCopy];
-        [newAllSavedStores setObject:savedStores forKey:_selectedKeyboard];
-        allSavedStores = newAllSavedStores;
+    if (allPersistedOptions) {
+        NSMutableDictionary *newAllSavedStores = [allPersistedOptions mutableCopy];
+        [newAllSavedStores setObject:persistedOptionsForSelectedKeyboard forKey:_selectedKeyboard];
+        allPersistedOptions = newAllSavedStores;
     } else {
-        allSavedStores = [[NSDictionary alloc] initWithObjectsAndKeys:savedStores, _selectedKeyboard, nil];
+        allPersistedOptions = [[NSDictionary alloc] initWithObjectsAndKeys:persistedOptionsForSelectedKeyboard, _selectedKeyboard, nil];
     }
 
-    [userData setObject:allSavedStores forKey:kKMSavedStoresKey];
+    [userData setObject:allPersistedOptions forKey:kKMPersistedOptionsKey];
     [userData synchronize];
 }
 
@@ -511,14 +534,6 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
         }
     }
     return _keymanDataPath;
-}
-
-/**
- * Returns the list of user-default legacy apps
- */
-- (NSArray *)legacyAppsUserDefaults {
-    NSUserDefaults *userData = [NSUserDefaults standardUserDefaults];
-    return [userData arrayForKey:kKMLegacyApps];
 }
 
 /**
@@ -700,14 +715,14 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
     [userData setObject:_activeKeyboards forKey:kKMActiveKeyboardsKey];
     [userData synchronize];
     [self resetActiveKeyboards];
-    [self setKeyboardsSubMenu];
+    [self updateKeyboardMenuItems];
 }
 
 - (void)clearActiveKeyboards {
     NSUserDefaults *userData = [NSUserDefaults standardUserDefaults];
     [userData setObject:nil forKey:kKMActiveKeyboardsKey];
     [userData synchronize];
-    [self setKeyboardsSubMenu];
+    [self updateKeyboardMenuItems];
 }
 
 - (void)resetActiveKeyboards {
@@ -756,94 +771,178 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
     _contextBuffer = [contextBuffer mutableCopy];
     if (_contextBuffer.length)
         [_contextBuffer replaceOccurrencesOfString:@"\0" withString:[NSString nullChar] options:0 range:NSMakeRange(0, 1)];
-    [self.kme setContextBuffer:self.contextBuffer];
+    [self.kme setCoreContextIfNeeded:self.contextBuffer];
 }
 
 - (void)awakeFromNib {
-    [self setKeyboardsSubMenu];
-
-    NSMenuItem *config = [self.menu itemWithTag:2];
-    if (config)
-        [config setAction:@selector(menuAction:)];
-
-    NSMenuItem *osk = [self.menu itemWithTag:3];
-    if (osk)
-        [osk setAction:@selector(menuAction:)];
-
-    NSMenuItem *about = [self.menu itemWithTag:4];
-    if (about)
-        [about setAction:@selector(menuAction:)];
+    [self setDefaultKeymanMenuItems];
+    [self updateKeyboardMenuItems];
 }
 
-- (void)setKeyboardsSubMenu {
-    NSMenuItem *keyboards = [self.menu itemWithTag:1];
-    if (keyboards) {
-        KVKFile *kvk = nil;
-        BOOL didSetKeyboard = NO;
-        NSInteger itag = 1000;
-        [keyboards.submenu removeAllItems];
-        for (NSString *path in self.activeKeyboards) {
-            NSDictionary *infoDict = [KMXFile keyboardInfoFromKmxFile:path];
-            if (!infoDict)
-                continue;
-            //NSString *str = [NSString stringWithFormat:@"%@ (%@)", [infoDict objectForKey:kKMKeyboardNameKey], [infoDict objectForKey:kKMKeyboardVersionKey]];
-            NSString *str = [infoDict objectForKey:kKMKeyboardNameKey];
-            NSMenuItem *item = [[NSMenuItem alloc] initWithTitle:str action:@selector(menuAction:) keyEquivalent:@""];
-            [item setTag:itag++];
-            if ([path isEqualToString:self.selectedKeyboard]) {
-                [item setState:NSOnState];
-                KMXFile *kmx = [[KMXFile alloc] initWithFilePath:path];
-                [self setKmx:kmx];
-                NSDictionary *kmxInfo = [KMXFile keyboardInfoFromKmxFile:path];
-                NSString *kvkFilename = [kmxInfo objectForKey:kKMVisualKeyboardKey];
-                if (kvkFilename != nil) {
-                    NSString *kvkFilePath = [self kvkFilePathFromFilename:kvkFilename];
-                    if (kvkFilePath != nil)
-                        kvk = [[KVKFile alloc] initWithFilePath:kvkFilePath];
-                }
-                [self setKvk:kvk];
-                [self setKeyboardName:[kmxInfo objectForKey:kKMKeyboardNameKey]];
-                [self setKeyboardIcon:[kmxInfo objectForKey:kKMKeyboardIconKey]];
-                [self loadSavedStores];
+- (void)setDefaultKeymanMenuItems {
+  NSMenuItem *config = [self.menu itemWithTag:CONFIG_MENUITEM_TAG];
+  if (config) {
+    [config setAction:@selector(menuAction:)];
+  }
+  
+  NSMenuItem *osk = [self.menu itemWithTag:OSK_MENUITEM_TAG];
+  if (osk) {
+    [osk setAction:@selector(menuAction:)];
+  }
+  
+  NSMenuItem *about = [self.menu itemWithTag:ABOUT_MENUITEM_TAG];
+  if (about) {
+    [about setAction:@selector(menuAction:)];
+  }
+}
 
-                didSetKeyboard = YES;
-            }
-            else
-                [item setState:NSOffState];
+- (void)updateKeyboardMenuItems {
+  self.numberOfKeyboardMenuItems = [self calculateNumberOfKeyboardMenuItems];
+  [self removeDynamicKeyboardMenuItems];
+  [self addDynamicKeyboardMenuItems];
+}
 
-            [keyboards.submenu addItem:item];
+- (int)calculateNumberOfKeyboardMenuItems {
+  if (self.activeKeyboards.count == 0) {
+    // if there are no active keyboards, then we will insert one placeholder menu item 'No Active Keyboards'
+    return 1;
+  } else {
+    return (int) self.activeKeyboards.count;
+  }
+}
+
+- (void)removeDynamicKeyboardMenuItems {
+  int numberToRemove = (int) self.menu.numberOfItems - DEFAULT_KEYMAN_MENU_ITEM_COUNT;
+  
+  if (self.debugMode) {
+    NSLog(@"*** removeDynamicKeyboardMenuItems, self.menu.numberOfItems = %ld, number of items to remove = %d", (long)self.menu.numberOfItems, numberToRemove);
+  }
+  
+  if (numberToRemove > 0) {
+    for (int i = 0; i < numberToRemove; i++) {
+      [self.menu removeItemAtIndex:KEYMAN_FIRST_KEYBOARD_MENUITEM_INDEX];
+    }
+  }
+}
+
+- (void)addDynamicKeyboardMenuItems {
+    BOOL didSetSelectedKeyboard = NO;
+    NSInteger itag = KEYMAN_FIRST_KEYBOARD_MENUITEM_TAG;
+    NSString *keyboardMenuName = @"";
+    int menuItemIndex = KEYMAN_FIRST_KEYBOARD_MENUITEM_INDEX;
+  
+    if (self.debugMode) {
+      NSLog(@"*** populateKeyboardMenuItems, number of active keyboards=%lu", self.activeKeyboards.count);
+    }
+  
+    // loop through the active keyboards list and add them to the menu
+    for (NSString *path in self.activeKeyboards) {
+        NSDictionary *infoDict = [KMXFile keyboardInfoFromKmxFile:path];
+        if (!infoDict) {
+          continue;
         }
-
-        if (keyboards.submenu.numberOfItems == 0) {
-            NSMenuItem *item = [[NSMenuItem alloc] initWithTitle:@"(None)" action:NULL keyEquivalent:@""];
-            [keyboards.submenu addItem:item];
-            [self setKmx:nil];
-            [self setKvk:nil];
-            [self setKeyboardName:nil];
-            [self setKeyboardIcon:nil];
-            [self setContextBuffer:nil];
-            [self setSelectedKeyboard:nil];
+        keyboardMenuName = [infoDict objectForKey:kKMKeyboardNameKey];
+        NSMenuItem *item = [[NSMenuItem alloc] initWithTitle:keyboardMenuName action:@selector(menuAction:) keyEquivalent:@""];
+        [item setTag:itag++];
+        
+        // if this is the selected keyboard, then configure it as selected
+        if ([path isEqualToString:self.selectedKeyboard]) {
+            [self setSelectedKeyboard:path inMenuItem:item];
+            didSetSelectedKeyboard = YES;
         }
-        else if (!didSetKeyboard) {
-            [keyboards.submenu itemAtIndex:0].state = NSOnState;
-            NSString *path = [self.activeKeyboards objectAtIndex:0];
-            KMXFile *kmx = [[KMXFile alloc] initWithFilePath:path];
-            [self setKmx:kmx];
-            NSDictionary *kmxInfo = [KMXFile keyboardInfoFromKmxFile:path];
-            NSString *kvkFilename = [kmxInfo objectForKey:kKMVisualKeyboardKey];
-            if (kvkFilename != nil) {
-                NSString *kvkFilePath = [self kvkFilePathFromFilename:kvkFilename];
-                if (kvkFilePath != nil)
-                    kvk = [[KVKFile alloc] initWithFilePath:kvkFilePath];
-            }
-            [self setKvk:kvk];
-            [self setKeyboardName:[kmxInfo objectForKey:kKMKeyboardNameKey]];
-            [self setKeyboardIcon:[kmxInfo objectForKey:kKMKeyboardIconKey]];
-            [self setContextBuffer:nil];
-            [self loadSavedStores];
-            [self setSelectedKeyboard:path];
+        else {
+            [item setState:NSOffState];
+        }
+      
+        [self.menu insertItem:item atIndex:menuItemIndex++];
+    }
+  
+    if (self.activeKeyboards.count == 0) {
+        [self addKeyboardPlaceholderMenuItem];
+    } else if (!didSetSelectedKeyboard) {
+        [self setDefaultSelectedKeyboard];
+    }
+}
+
+- (void) setSelectedKeyboard:(NSString*)keyboardName inMenuItem:(NSMenuItem*) menuItem {
+    KVKFile *kvk = nil;
+
+    [menuItem setState:NSOnState];
+    KMXFile *kmx = [[KMXFile alloc] initWithFilePath:keyboardName];
+    [self setKmx:kmx];
+    NSDictionary *kmxInfo = [KMXFile keyboardInfoFromKmxFile:keyboardName];
+    NSString *kvkFilename = [kmxInfo objectForKey:kKMVisualKeyboardKey];
+    if (kvkFilename != nil) {
+        NSString *kvkFilePath = [self kvkFilePathFromFilename:kvkFilename];
+        if (kvkFilePath != nil) {
+          kvk = [[KVKFile alloc] initWithFilePath:kvkFilePath];
         }
     }
+    [self setKvk:kvk];
+    [self setKeyboardName:[kmxInfo objectForKey:kKMKeyboardNameKey]];
+    [self setKeyboardIcon:[kmxInfo objectForKey:kKMKeyboardIconKey]];
+    [self readPersistedOptions];
+}
+
+// defaults to the whatever keyboard happens to be first in the list
+- (void) setDefaultSelectedKeyboard {
+    NSMenuItem* menuItem = [self.menu itemAtIndex:KEYMAN_FIRST_KEYBOARD_MENUITEM_INDEX];
+    NSString *keyboardName = [self.activeKeyboards objectAtIndex:0];
+    [self setSelectedKeyboard:keyboardName inMenuItem:menuItem];
+    [self setSelectedKeyboard:keyboardName];
+    [self setContextBuffer:nil];
+}
+
+- (void) addKeyboardPlaceholderMenuItem {
+    NSString* placeholder = NSLocalizedString(@"no-keyboard-configured-menu-placeholder", nil);
+    NSMenuItem *item = [[NSMenuItem alloc] initWithTitle:placeholder action:NULL keyEquivalent:@""];
+    [self.menu insertItem:item atIndex:KEYMAN_FIRST_KEYBOARD_MENUITEM_INDEX];
+    [self setKmx:nil];
+    [self setKvk:nil];
+    [self setKeyboardName:nil];
+    [self setKeyboardIcon:nil];
+    [self setContextBuffer:nil];
+    [self setSelectedKeyboard:nil];
+}
+
+- (void)selectKeyboardFromMenu:(NSInteger)tag {
+    NSMenuItem *menuItem = [self.menu itemWithTag:tag];
+    NSString *title = menuItem.title;
+    NSLog(@"Input Menu, selected Keyboards menu, itag: %lu, title: %@", tag, title);
+    for (NSMenuItem *item in self.menu.itemArray) {
+        // set the state of the keyboard items in the Keyman menu based on the new selection
+        if (item.tag >= KEYMAN_FIRST_KEYBOARD_MENUITEM_TAG) {
+            if (item.tag == tag) {
+                [item setState:NSOnState];
+            }
+            else {
+                [item setState:NSOffState];
+            }
+        }
+    }
+    
+    NSString *path = [self.activeKeyboards objectAtIndex:tag-KEYMAN_FIRST_KEYBOARD_MENUITEM_TAG];
+    KMXFile *kmx = [[KMXFile alloc] initWithFilePath:path];
+    [self setKmx:kmx];
+    KVKFile *kvk = nil;
+    NSDictionary *kmxInfo = [KMXFile keyboardInfoFromKmxFile:path];
+    NSString *kvkFilename = [kmxInfo objectForKey:kKMVisualKeyboardKey];
+    if (kvkFilename != nil) {
+        NSString *kvkFilePath = [self kvkFilePathFromFilename:kvkFilename];
+        if (kvkFilePath != nil)
+            kvk = [[KVKFile alloc] initWithFilePath:kvkFilePath];
+    }
+    [self setKvk:kvk];
+    NSString *keyboardName = [kmxInfo objectForKey:kKMKeyboardNameKey];
+    if ([self debugMode])
+        NSLog(@"Selected keyboard from menu: %@", keyboardName);
+    [self setKeyboardName:keyboardName];
+    [self setKeyboardIcon:[kmxInfo objectForKey:kKMKeyboardIconKey]];
+    [self setContextBuffer:nil];
+    [self setSelectedKeyboard:path];
+    [self readPersistedOptions];
+    if (kvk != nil && self.alwaysShowOSK)
+        [self showOSK];
 }
 
 - (NSArray *)KMXFiles {
@@ -1189,8 +1288,10 @@ extern const CGKeyCode kProcessPendingBuffer;
 - (void)postKeyboardEventWithSource: (CGEventSourceRef)source code:(CGKeyCode) virtualKey postCallback:(PostEventCallback)postEvent{
 
     CGEventRef ev = CGEventCreateKeyboardEvent (source, virtualKey, true); //down
-    if (postEvent)
-        postEvent(ev);
+    if (postEvent) {
+      NSLog(@"postKeyboardEventWithSource, keycode: %d", virtualKey);
+      postEvent(ev);
+    }
     CFRelease(ev);
     if (virtualKey != kProcessPendingBuffer) { // special 0xFF code is not a real key-press, so no "up" is needed
         ev = CGEventCreateKeyboardEvent (source, virtualKey, false); //up

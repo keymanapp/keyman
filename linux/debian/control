@@ -26,6 +26,7 @@ Build-Depends:
  python3-requests,
  python3-requests-cache,
  python3-setuptools,
+ quilt,
  meson (>= 0.53),
  ninja-build,
  libevdev-dev,
@@ -107,12 +108,14 @@ Description: Keyman for Linux configuration
  This package contains the Python module to install, uninstall and view
  information about Keyman keyboard packages.
 
-Package: libkmnkbp-dev
-Architecture: amd64 arm64 armel armhf i386 mipsel mips64el ppc64el riscv64
+Package: libkeymancore-dev
+Architecture: amd64 arm64 armel armhf i386 loong64 mipsel mips64el ppc64el riscv64
 Section: libdevel
 Depends:
- libkmnkbp0-0 (= ${binary:Version}),
+ libkeymancore (= ${binary:Version}),
  ${misc:Depends},
+Conflicts: libkmnkbp-dev
+Replaces: libkmnkbp-dev
 Multi-Arch: same
 Description: Development files for Keyman keyboard processing library
  Originally created in 1993 to type Lao on Windows, Keyman is now a free and
@@ -126,13 +129,13 @@ Description: Development files for Keyman keyboard processing library
  Keyboard layouts are distributed through an open catalog to all major desktop
  and mobile platforms.
  .
- The Keyman keyboardprocessor library processes input from input method engines
+ The Keyman core library processes input from input method engines
  and applies rules from compiled Keyman keyboard files.
  .
  This package contains development headers and libraries.
 
-Package: libkmnkbp0-0
-Architecture: amd64 arm64 armel armhf i386 mipsel mips64el ppc64el riscv64
+Package: libkeymancore
+Architecture: amd64 arm64 armel armhf i386 loong64 mipsel mips64el ppc64el riscv64
 Section: libs
 Pre-Depends:
  ${misc:Pre-Depends},
@@ -141,6 +144,8 @@ Depends:
  ${shlibs:Depends},
 Suggests:
  keyman,
+Conflicts: libkmnkbp0-0
+Replaces: libkmnkbp0-0
 Multi-Arch: same
 Description: Keyman keyboard processing library
  Originally created in 1993 to type Lao on Windows, Keyman is now a free and
@@ -154,14 +159,14 @@ Description: Keyman keyboard processing library
  Keyboard layouts are distributed through an open catalog to all major desktop
  and mobile platforms.
  .
- The Keyman keyboardprocessor library processes input from input method engines
+ The Keyman core library processes input from input method engines
  and applies rules from compiled Keyman keyboard files.
 
 Package: ibus-keyman
-Architecture: amd64 arm64 armel armhf i386 mipsel mips64el ppc64el riscv64
+Architecture: amd64 arm64 armel armhf i386 loong64 mipsel mips64el ppc64el riscv64
 Depends:
  ibus (>= 1.3.7),
- libkmnkbp0-0 (= ${binary:Version}),
+ libkeymancore (= ${binary:Version}),
  keyman-system-service (= ${binary:Version}),
  ${misc:Depends},
  ${shlibs:Depends},

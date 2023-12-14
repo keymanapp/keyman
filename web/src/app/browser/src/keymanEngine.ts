@@ -122,7 +122,7 @@ export default class KeymanEngine extends KeymanEngineBase<BrowserConfiguration,
     }
 
     this._ui = module;
-    if(this.config.deferForInitialization.hasResolved) {
+    if(this.config.deferForInitialization.isFulfilled) {
       module.initialize();
     }
   }
@@ -165,7 +165,7 @@ export default class KeymanEngine extends KeymanEngineBase<BrowserConfiguration,
 
     // Deferred keyboard loading + shortcutting if a different init call on the engine has
     // already fully resolved.
-    if(this.config.deferForInitialization.hasFinalized) {
+    if(this.config.deferForInitialization.isResolved) {
       // abort!  Maybe throw an error, too.
       return Promise.resolve();
     }
@@ -174,6 +174,19 @@ export default class KeymanEngine extends KeymanEngineBase<BrowserConfiguration,
     // The original seems to allow it.
 
     await super.init(totalOptions);
+
+    // Used by keymanweb.com; if no keyboard-cookie exists, we need this to trigger
+    // default-stub selection on mobile devices so that a keyboard - and thus, the
+    // globe key - are accessible.
+    //
+    // The `super` call above initializes `keyboardRequisitioner`, as needed here.
+    this.keyboardRequisitioner.cloudQueryEngine.once('unboundregister', () => {
+      if(!this.contextManager.activeKeyboard?.keyboard) {
+        // Autoselects this.keyboardRequisitioner.cache.defaultStub, which will be
+        // set to an actual keyboard on mobile devices.
+        this.setActiveKeyboard('', '');
+      }
+    });
 
     this.contextManager.initialize();  // will seek to attach to the page, which requires document.body
 
@@ -213,6 +226,8 @@ export default class KeymanEngine extends KeymanEngineBase<BrowserConfiguration,
     // If we tracked cloud requests and awaited a Promise.all on pending queries,
     // we could handle that too.
     this.contextManager.restoreSavedKeyboard(savedKeyboardStr);
+
+    await Promise.resolve();
   }
 
   get register(): (x: CloudQueryResult) => void {
@@ -427,7 +442,7 @@ export default class KeymanEngine extends KeymanEngineBase<BrowserConfiguration,
     const stub = this.keyboardRequisitioner.cache.getStub(PInternalName, PlgCode);
     const keyboard = this.keyboardRequisitioner.cache.getKeyboardForStub(stub);
 
-    return this._GetKeyboardDetail(stub, keyboard);
+    return stub && this._GetKeyboardDetail(stub, keyboard);
   }
 
   /**

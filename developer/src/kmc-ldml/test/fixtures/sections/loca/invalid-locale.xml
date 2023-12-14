@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<!DOCTYPE keyboard SYSTEM "../../../../../../../resources/standards-data/ldml-keyboards/techpreview/dtd/ldmlKeyboard.dtd">
-<keyboard locale="en-*" conformsTo="techpreview">
-  <names>
-    <name value="invalid-loca" />
-  </names>
+<!DOCTYPE keyboard3 SYSTEM "../../../../../../../resources/standards-data/ldml-keyboards/techpreview/dtd/ldmlKeyboard3.dtd">
+<keyboard3 locale="en-*" conformsTo="techpreview">
+  <info name="invalid-loca"/>
   <keys />
-</keyboard>
+</keyboard3>

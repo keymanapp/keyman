@@ -1,6 +1,9 @@
 import 'mocha';
 import {assert} from 'chai';
-import { isValidEnumValue, calculateUniqueKeys, allUsedKeyIdsInLayers, translateLayerAttrToModifier, validModifier, verifyValidAndUnique } from '../src/util/util.js';
+import {
+  allUsedKeyIdsInFlick, allUsedKeyIdsInKey,
+  isValidEnumValue, calculateUniqueKeys, allUsedKeyIdsInLayers,
+  translateLayerAttrToModifier, validModifier, verifyValidAndUnique } from '../src/util/util.js';
 import { constants } from "@keymanapp/ldml-keyboard-constants";
 import { LDMLKeyboard } from '@keymanapp/common-types';
 
@@ -50,13 +53,13 @@ describe('test of util/util.ts', () => {
     });
     it('should handle some real cases', () => {
       assert.sameDeepMembers(calculateUniqueKeys([
-        { id: 'a', to: 'a' },
-        { id: 'a', to: 'a' }, // dup
-        { id: 'b', to: 'b' },
-        { id: 'a', to: 'å' }, // override
+        { id: 'a', output: 'a' },
+        { id: 'a', output: 'a' }, // dup
+        { id: 'b', output: 'b' },
+        { id: 'a', output: 'å' }, // override
       ]),[
-        { id: 'b', to: 'b' },
-        { id: 'a', to: 'å' },
+        { id: 'b', output: 'b' },
+        { id: 'a', output: 'å' },
       ]);
     });
   });
@@ -98,6 +101,77 @@ describe('test of util/util.ts', () => {
         'q w e r t y Q W E R T Y a s d f A S D F 0 1 2 3'.split(' '));
     });
   });
+  describe('allUsedKeyIdsInFlick', () => {
+    it('should handle a null case', () => {
+      assert.sameDeepMembers(Array.from(allUsedKeyIdsInFlick(
+        undefined
+      )),
+        []);
+    });
+    it('should handle a simple case', () => {
+      assert.sameDeepMembers(Array.from(allUsedKeyIdsInFlick(
+        {
+          id: 'something',
+          flickSegment: [
+            { keyId: 'aaa', directions: 'nnw se w up' },
+          ]
+        }
+      )),
+        'aaa'.split(' '));
+    });
+    it('should handle a redundant case', () => {
+      assert.sameDeepMembers(Array.from(allUsedKeyIdsInFlick(
+        {
+          id: 'something',
+          flickSegment: [
+            { keyId: 'aaa', directions: 'nnw se w up' },
+            { keyId: 'bbb', directions: 'e ne e' },
+            { keyId: 'ccc', directions: 'turn left here, go about half a mile past where old man henry’s place used to be, hang a right, can’t miss it' },
+            { keyId: 'aaa', directions: 'w e n s' },
+          ]
+        }
+      )),
+        ['aaa','bbb','ccc']); // aaa is in there twice
+    });
+  });
+  describe('allUsedKeyIdsInKey', () => {
+    it('should handle a simple case', () => {
+      assert.sameDeepMembers(Array.from(allUsedKeyIdsInKey(
+        {}
+      ).keys()),
+      []);
+    });
+    it('should handle a straightforward case', () => {
+      assert.sameDeepMembers(Array.from(allUsedKeyIdsInKey(
+        {
+          flickId: 'ignore me',
+          multiTapKeyIds: 'tap1 tap2 tap3',
+          longPressDefaultKeyId: 'longPress0',
+          longPressKeyIds: 'longPress1 longPress2 longPress0'
+        }
+      ).keys()),
+      ['tap1','tap2','tap3','longPress0', 'longPress1','longPress2']);
+    });
+    it('should handle a duplicate case', () => {
+      const auk = allUsedKeyIdsInKey(
+        {
+          flickId: 'ignore me',
+          multiTapKeyIds: 'a b c',
+          longPressDefaultKeyId: 'd',
+          longPressKeyIds: 'c d e'
+        }
+      );
+      assert.sameDeepMembers(Array.from(auk.keys()),
+      ['a','b','c','d','e']);
+      assert.sameDeepMembers(Array.from(auk.entries()), [
+        ['a',['multiTapKeyIds']],
+        ['b',['multiTapKeyIds']],
+        ['c',['longPressKeyIds','multiTapKeyIds']],
+        ['d',['longPressDefaultKeyId','longPressKeyIds']],
+        ['e',['longPressKeyIds']],
+      ]);
+    });
+  });
   describe('translateLayerAttrToModifier', () => {
     it('should map from layer info to modifier number', () => {
       assert.equal(translateLayerAttrToModifier({
@@ -105,30 +179,30 @@ describe('test of util/util.ts', () => {
       }), constants.keys_mod_none);
       assert.equal(translateLayerAttrToModifier({
         id: 'base',
-        modifier: '',
+        modifiers: '',
       }), constants.keys_mod_none);
       assert.equal(translateLayerAttrToModifier({
         id: 'base',
-        modifier: 'none',
+        modifiers: 'none',
       }), constants.keys_mod_none);
       assert.equal(translateLayerAttrToModifier({
         id: 'shift',
-        modifier: 'shift',
+        modifiers: 'shift',
       }), constants.keys_mod_shift);
       assert.equal(translateLayerAttrToModifier({
         id: 'shift',
-        modifier: 'shift',
+        modifiers: 'shift',
       }), constants.keys_mod_shift);
       assert.equal(translateLayerAttrToModifier({
         id: 'altshift',
-        modifier: 'alt shift',
+        modifiers: 'alt shift',
       }), constants.keys_mod_alt | constants.keys_mod_shift);
     });
     it('should round trip each possible modifier', () => {
       for(let str of constants.keys_mod_map.keys()) {
         const layer : LDMLKeyboard.LKLayer = {
           id: str,
-          modifier: `${str}`,
+          modifiers: `${str}`,
         };
         assert.equal(translateLayerAttrToModifier(layer),
           constants.keys_mod_map.get(str), str);
@@ -138,7 +212,7 @@ describe('test of util/util.ts', () => {
       for(let str of constants.keys_mod_map.keys()) {
         const layer : LDMLKeyboard.LKLayer = {
           id: str,
-          modifier: `${str} altL`,
+          modifiers: `${str} altL`,
         };
         assert.equal(translateLayerAttrToModifier(layer),
           constants.keys_mod_map.get(str) | constants.keys_mod_altL, str);

@@ -42,10 +42,6 @@ const
   WM_USER_CheckFonts = WM_USER + 115;
 
 const
-  // KeymanDeveloperUtils
-  WM_USER_LOADREGFILES = WM_USER+120;
-  //WM_USER_FORMSHOWN = WM_USER+100;
-
   WC_COMMAND = 0;
   WC_HELP = 1;
   WC_OPENURL = 2;
@@ -54,6 +50,7 @@ const
 
   WM_USER_Modified = WM_USER + 124;
   WM_USER_UpdateCaption = WM_USER + 125;   // I4918
+  WM_USER_OpenFiles = WM_USER + 126;
 
 const
   // SyntaxHighlight

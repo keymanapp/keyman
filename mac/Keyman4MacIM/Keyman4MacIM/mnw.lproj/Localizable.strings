@@ -1,0 +1,74 @@
+/* Message displayed to confirm delete of the Keyman keyboard selected by the user from the keyboard list  */
+"message-confirm-delete-keyboard" = "မၞးပလီု ကဳဗုဒ် '%@' ဏံရောၚ် ဂှ်ချိုတ်ပၠိုတ်ရဟာ?";
+
+/* Delete keyboard confirmation info indicating that the delete action cannot be undone  */
+"info-cannot-undo-delete-keyboard" = "မၞးကၠောန်ဏာတုဲ ကလေၚ်ကေတ်ဟွံဂွံရောၚ်။";
+
+/* Button text to cancel delete of the specified installed Keyman keyboard  */
+"button-cancel-delete-keyboard" = "တးပါဲ";
+
+/* Button text to confirm delete of the specified installed Keyman keyboard  */
+"button-delete-keyboard" = "ပလီု";
+
+/* Message displayed to confirm installation of a keyboard from the specifed .kmp file double-clicked by the user  */
+"message-confirm-install-keyboard" = "စုတ် ကဳမာန် ကဳဗုဒ်ဟာ?";
+
+/* Message displayed to confirm installation of a keyboard from the specifed .kmp file double-clicked by the user  */
+"info-install-keyboard-filename" = "မၞးမိက်ဂွံကဵု ကဳမာန် စုတ် ကဳဗုဒ်နူ ဝှါၚ် '%@' ဟာ?";
+
+/* Button text to cancel installation of the double-clicked Keyman file  */
+"button-cancel-install-keyboard" = "တးပါဲ";
+
+/* Button text to confirm installation of the double-clicked Keyman file  */
+"button-install-keyboard" = "စုတ်";
+
+/* Message displayed to inform user that .kmp file could not be read/unzipped  */
+"message-keyboard-file-unreadable" = "ဗှ် ဝှါၚ်ကဳမာန် '%@' ဟွံဂွံ။";
+
+/* Message displayed in Configuration window when keyboard cannot be loaded */
+"message-error-loading-keyboard" = "(ပ္တိုန်စုတ်ကဳဗုဒ်ဆောတ်ယောၚ်)";
+
+/* Message displayed in Configuration window when keyboard metadata cannot be loaded */
+"message-error-unknown-metadata" = "ဟွံတီ";
+
+/* Button text to acknowledge that .kmp file could not be read  */
+"button-keyboard-file-unreadable" = "အဵုခေ";
+
+/* label text to identify Keyman version */
+"version-label-text" = "ပါယှေန်: %@";
+
+/* Status text for keyboard downloading  */
+"message-keyboard-downloading" = "ဂြဲဖျေံဒၟံၚ်...";
+
+/* Status text for keyboard download complete  */
+"message-keyboard-download-complete" = "ဂြဲဖျေံအံၚ်ဇၞး။";
+
+/* Button text to cancel downloading keyboard  */
+"button-cancel-downloading" = "တးပါဲ";
+
+/* Button text keyboard download complete  */
+"button-download-complete" = "တုဲ";
+
+/* keyboards label in the Package Information window */
+"keyboards-label" = "ကဳဗုဒ်ဂမၠိုၚ်:";
+
+/* fonts label in the Package Information window */
+"fonts-label" = "ဖွန်ဂမၠိုၚ်:";
+
+/* package version label in the Package Information window */
+"package-version-label" = "ပါယှေန်ဓုပ်:";
+
+/* author label in the Package Information window */
+"author-label" = "ညးချူဗဒှ်:";
+
+/* website label in the Package Information window */
+"website-label" = "ဝေက်သာ်:";
+
+/* copyright label in the Package Information window */
+"copyright-label" = "တၠမူ:";
+
+/* message displayed to alert user to need grant accessibility permission */
+"privacy-alert-text" = "ဂွံကၠောန်ကမၠောန်ခိုဟ်ဟ်မာန်ှဂှ် ကဳမာန်ဒးသုၚ်စောဲ နဲကဲဆက်စၠောံအကြာစက်ဂမၠိုၚ်ရ။\n\nအာပ္ဍဲ တၚ်ပလေဝ်သၞောတ်စက်၊ ပရေၚ်ဂီုဂၠီု ကေုာံ ပရေၚ်ဂီုဂၠီုပူဂဵု တုဲ ကဵုအခေါၚ်ညိ။\nကလေၚ်ပံက်ကၟာတ်စက်ညိ။";
+
+/* Text of menu item in Input Menu when no Keyboards are configured -- include parentheses  */
+"no-keyboard-configured-menu-placeholder" = "(ကဳဗုဒ် လဵုမွဲဟွံမွဲ)";

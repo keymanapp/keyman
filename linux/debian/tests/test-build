@@ -1,5 +1,5 @@
 #!/bin/bash
-# autopkgtest check: Build a program against libkmnkbp-dev to verify that the
+# autopkgtest check: Build a program against libkeymancore-dev to verify that the
 # headers and pkg-config file are included and installed correctly.
 # cf https://github.com/keymanapp/keyman/issues/7490
 
@@ -11,20 +11,20 @@ cd "$WORKDIR"
 
 # Test all include files are available
 cat <<EOF > keymantest.c
-#include <keyman/keyboardprocessor.h>
-km_kbp_context* c;
+#include <keyman/keyman_core_api.h>
+km_core_context* c;
 EOF
 
 # shellcheck disable=SC2046
-gcc -c keymantest.c $(pkg-config --cflags --libs keyman_kmn_processor)
+gcc -c keymantest.c $(pkg-config --cflags --libs keyman_core)
 echo "build 1: OK"
 
 # Test pkg-config file - include without path
 cat <<EOF > keymantest.c
-#include <keyboardprocessor.h>
-km_kbp_context* c;
+#include <keyman_core_api.h>
+km_core_context* c;
 EOF
 
 # shellcheck disable=SC2046
-gcc -c keymantest.c $(pkg-config --cflags --libs keyman_kmn_processor)
+gcc -c keymantest.c $(pkg-config --cflags --libs keyman_core)
 echo "build 2: OK"

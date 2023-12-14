@@ -1,7 +1,8 @@
 import { SectionIdent, constants } from '@keymanapp/ldml-keyboard-constants';
 import { SectionCompiler } from "./section-compiler.js";
-import { LDMLKeyboard, KMXPlus, CompilerCallbacks } from "@keymanapp/common-types";
-
+import { LDMLKeyboard, KMXPlus, CompilerCallbacks, util, MarkerParser } from "@keymanapp/common-types";
+import { VarsCompiler } from './vars.js';
+import { CompilerMessages } from './messages.js';
 
 /**
  * Compiler for typrs that don't actually consume input XML
@@ -28,6 +29,45 @@ export class StrsCompiler extends EmptyCompiler {
   public compile(sections: KMXPlus.DependencySections): KMXPlus.Section {
     return new KMXPlus.Strs();
   }
+  public postValidate(section?: KMXPlus.Section): boolean {
+    const strs = <KMXPlus.Strs>section;
+
+    if (strs) {
+      const badStringAnalyzer = new util.BadStringAnalyzer();
+      const CONTAINS_MARKER_REGEX = new RegExp(MarkerParser.ANY_MARKER_MATCH);
+      for (let s of strs.allProcessedStrings.values()) {
+        // skip marker strings
+        if (CONTAINS_MARKER_REGEX.test(s)) {
+          // it had a marker, take out all marker strings, as the sentinel is illegal
+          // need a new regex to match
+          const REPLACE_MARKER_REGEX = new RegExp(MarkerParser.ANY_MARKER_MATCH, 'g');
+          s = s.replaceAll(REPLACE_MARKER_REGEX, ''); // remove markers.
+        }
+        badStringAnalyzer.add(s);
+      }
+      const m = badStringAnalyzer.analyze();
+      if (m?.size > 0) {
+        const puas = m.get(util.BadStringType.pua);
+        const unassigneds = m.get(util.BadStringType.unassigned);
+        const illegals = m.get(util.BadStringType.illegal);
+        if (puas) {
+          const [count, lowestCh] = [puas.size, Array.from(puas.values()).sort((a, b) => a - b)[0]];
+          this.callbacks.reportMessage(CompilerMessages.Hint_PUACharacters({ count, lowestCh }))
+        }
+        if (unassigneds) {
+          const [count, lowestCh] = [unassigneds.size, Array.from(unassigneds.values()).sort((a, b) => a - b)[0]];
+          this.callbacks.reportMessage(CompilerMessages.Warn_UnassignedCharacters({ count, lowestCh }))
+        }
+        if (illegals) {
+          // do this last, because we will return false.
+          const [count, lowestCh] = [illegals.size, Array.from(illegals.values()).sort((a, b) => a - b)[0]];
+          this.callbacks.reportMessage(CompilerMessages.Error_IllegalCharacters({ count, lowestCh }))
+          return false;
+        }
+      }
+    }
+    return true;
+  }
 }
 
 export class ElemCompiler extends EmptyCompiler {
@@ -35,7 +75,7 @@ export class ElemCompiler extends EmptyCompiler {
     super(constants.section.elem, source, callbacks);
   }
   public compile(sections: KMXPlus.DependencySections): KMXPlus.Section {
-    return new KMXPlus.Elem(sections.strs);
+    return new KMXPlus.Elem(sections);
   }
   public get dependencies(): Set<SectionIdent> {
     const strsOnly = new Set(<SectionIdent[]>[constants.section.strs]);
@@ -61,7 +101,7 @@ export class UsetCompiler extends EmptyCompiler {
     super(constants.section.uset, source, callbacks);
   }
   public compile(sections: KMXPlus.DependencySections): KMXPlus.Section {
-    return new KMXPlus.List(sections.strs);
+    return new KMXPlus.Uset();
   }
   public get dependencies(): Set<SectionIdent> {
     const strsOnly = new Set(<SectionIdent[]>[constants.section.strs]);
@@ -70,6 +110,6 @@ export class UsetCompiler extends EmptyCompiler {
 }
 
 /**
- * For test use. The top three compilers.
+ * For test use. The top compilers.
  */
-export const BASIC_DEPENDENCIES = [ StrsCompiler, ListCompiler, ElemCompiler ];
+export const BASIC_DEPENDENCIES = [ StrsCompiler, ListCompiler, ElemCompiler, VarsCompiler ];

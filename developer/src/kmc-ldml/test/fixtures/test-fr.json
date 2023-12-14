@@ -1,5 +1,5 @@
 {
-  "keyboardTest": {
+  "keyboardTest3": {
     "conformsTo": "techpreview",
     "info": {
       "keyboard": "fr-t-k0-azerty.xml",
@@ -29,44 +29,43 @@
             },
             "actions": [
               {
-                "keystroke": {
-                  "key": "s"
-                }
+                "type": "keystroke",
+                "key": "s"
               },
               {
-                "check": {
-                  "result": "abc\\u0022...s"
-                }
+                "type": "check",
+                "result": "abc\\u0022...s"
               },
               {
-                "keystroke": {
-                  "key": "t"
-                }
+                "type": "keystroke",
+                "key": "t"
               },
               {
-                "check": {
-                  "result": "abc\\u0022...st"
-                }
+                "type": "check",
+                "result": "abc\\u0022...st"
               },
               {
-                "keystroke": {
-                  "key": "u"
-                }
+                "type": "keystroke",
+                "key": "u"
               },
               {
-                "check": {
-                  "result": "abc\\u0022...stu"
-                }
+                "type": "check",
+                "result": "abc\\u0022...stu"
               },
               {
-                "emit": {
-                  "to": "v"
-                }
+                "type": "emit",
+                "to": "v"
               },
               {
-                "check": {
-                  "result": "abc\\u0022...stuv"
-                }
+                "type": "check",
+                "result": "abc\\u0022...stuv"
+              },
+              {
+                "type": "backspace"
+              },
+              {
+                "type": "check",
+                "result": "abc\\u0022...stu"
               }
             ]
           }

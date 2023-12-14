@@ -102,7 +102,6 @@ type
     actViewStatusBar: TAction;
     actProjectNew: TAction;
     actProjectOpen: TFileOpen;
-    actProjectSaveAs: TFileSaveAs;
     actProjectAddCurrentEditorFile: TAction;
     actProjectAddFiles: TFileOpen;
     actProjectSettings: TAction;
@@ -139,6 +138,7 @@ type
     actToolsWebConfigure: TAction;
     actToolsWebStartServer: TAction;
     actToolsWebStopServer: TAction;
+    actWindowNew: TAction;
     procedure actFileNewExecute(Sender: TObject);
     procedure DataModuleCreate(Sender: TObject);
     procedure actFileOpenAccept(Sender: TObject);
@@ -169,11 +169,9 @@ type
     procedure actToolsOptionsExecute(Sender: TObject);
     procedure actToolsVirtualKeyIdentifierExecute(Sender: TObject);
     procedure actProjectNewExecute(Sender: TObject);
-    procedure actProjectSaveAsBeforeExecute(Sender: TObject);
     procedure actProjectAddCurrentEditorFileExecute(Sender: TObject);
     procedure actProjectSettingsExecute(Sender: TObject);
     procedure actProjectOpenAccept(Sender: TObject);
-    procedure actProjectSaveAsAccept(Sender: TObject);
     procedure actProjectAddFilesAccept(Sender: TObject);
     procedure actProjectAddCurrentEditorFileUpdate(Sender: TObject);
     procedure actHelpContentsExecute(Sender: TObject);
@@ -224,12 +222,9 @@ type
     procedure actViewCharacterIdentifierExecute(Sender: TObject);   // I4807
     procedure actViewCharacterIdentifierUpdate(Sender: TObject);
     procedure actFileSaveAsSaveDialogCanClose(Sender: TObject;
-      var CanClose: Boolean);
-    procedure actProjectSaveAsSaveDialogCanClose(Sender: TObject;
       var CanClose: Boolean);   // I4807
     procedure actProjectCloseExecute(Sender: TObject);
     procedure actProjectCloseUpdate(Sender: TObject);
-    procedure actProjectSaveAsUpdate(Sender: TObject);
     procedure actProjectAddFilesUpdate(Sender: TObject);
     procedure actProjectSettingsUpdate(Sender: TObject);
     procedure actFileNewUpdate(Sender: TObject);
@@ -243,13 +238,10 @@ type
     procedure actToolsWebStartServerUpdate(Sender: TObject);
     procedure actToolsWebStopServerExecute(Sender: TObject);
     procedure actToolsWebStopServerUpdate(Sender: TObject);
+    procedure actWindowNewExecute(Sender: TObject);
   private
     function CheckFilenameConventions(FileName: string): Boolean;
-    function SaveAndCloseAllFiles: Boolean;
     procedure CloseProject;
-  public
-    procedure NewProject(pt: TProjectType);
-    procedure OpenProject(FileName: WideString);
   end;
 
 var
@@ -270,10 +262,14 @@ uses
   Keyman.System.KeyboardUtils,
   Keyman.Developer.System.Project.Project,
   Keyman.Developer.System.Project.ProjectFileType,
+  Keyman.Developer.System.Project.ProjectLoader,
   Keyman.Developer.System.ServerAPI,
   Keyman.Developer.UI.Project.ProjectFileUI,
   Keyman.Developer.UI.Project.ProjectUI,
   Keyman.Developer.UI.Project.UfrmNewProject,
+  Keyman.Developer.UI.Project.UfrmProject,
+  Keyman.Developer.UI.Project.UfrmProjectSettings,
+  Keyman.Developer.UI.Project.UfrmProjectSettings20,
   GlobalProxySettings,
   RegistryKeys,
   TextFileFormat,
@@ -296,8 +292,6 @@ uses
   UfrmOSKEditor,
   UfrmPackageEditor,
   UmodWebHttpServer,
-  Keyman.Developer.UI.Project.UfrmProject,
-  Keyman.Developer.UI.Project.UfrmProjectSettings,
   Upload_Settings,
   utilexecute,
   UfrmMDIChild;
@@ -339,11 +333,8 @@ begin
 end;
 
 procedure TmodActionsMain.actFileOpenAccept(Sender: TObject);
-var
-  i: Integer;
 begin
-  for i := 0 to actFileOpen.Dialog.Files.Count - 1 do
-    frmKeymanDeveloper.OpenFile(actFileOpen.Dialog.Files[i], True);
+  frmKeymanDeveloper.OpenFilesInProject(actFileOpen.Dialog.Files.ToStringArray);
 end;
 
 procedure TmodActionsMain.actFileOpenUpdate(Sender: TObject);
@@ -540,8 +531,12 @@ end;
 
 procedure TmodActionsMain.actProjectAddCurrentEditorFileUpdate(Sender: TObject);
 begin
+  actProjectAddCurrentEditorFile.Visible :=
+    not IsGlobalProjectUIReady or
+    (FGlobalProject.Options.Version = pv10);
   actProjectAddCurrentEditorFile.Enabled :=
     IsGlobalProjectUIReady and
+    (FGlobalProject.Options.Version = pv10) and
     Assigned(frmKeymanDeveloper.ActiveEditor) and
     not frmKeymanDeveloper.ActiveEditor.Untitled and
     (not Assigned(frmKeymanDeveloper.ActiveEditor.ProjectFile) or
@@ -561,7 +556,11 @@ end;
 
 procedure TmodActionsMain.actProjectAddFilesUpdate(Sender: TObject);
 begin
-  actProjectAddFiles.Enabled := IsGlobalProjectUIReady;
+  actProjectAddFiles.Visible :=
+    not IsGlobalProjectUIReady or
+    (FGlobalProject.Options.Version = pv10);
+  actProjectAddFiles.Enabled := IsGlobalProjectUIReady and
+    (FGlobalProject.Options.Version = pv10);
 end;
 
 procedure TmodActionsMain.actProjectCloseExecute(Sender: TObject);
@@ -576,6 +575,7 @@ end;
 
 procedure TmodActionsMain.actProjectNewExecute(Sender: TObject);
 begin
+  // TODO: new process
   if not frmKeymanDeveloper.BeforeOpenProject then
     Exit;
   ShowNewProjectForm(frmKeymanDeveloper);
@@ -583,84 +583,37 @@ end;
 
 procedure TmodActionsMain.actProjectOpenAccept(Sender: TObject);
 begin
-  if not frmKeymanDeveloper.BeforeOpenProject then
-    Exit;
-  OpenProject(actProjectOpen.Dialog.FileName);
+  frmKeymanDeveloper.OpenProject(actProjectOpen.Dialog.FileName);
 end;
 
-procedure TmodActionsMain.OpenProject(FileName: WideString);
-begin
-  FileName := ExpandUNCFileName(FileName);
-  if (FileName <> '') and not FileExists(FileName) then
-  begin
-    ShowMessage('The project '+FileName+' does not exist.');
-    Exit;
-  end;
 
-  if IsGlobalProjectUIReady then
-  begin
-    if not SaveAndCloseAllFiles then Exit;
-    FreeGlobalProjectUI;
-  end;
-  LoadGlobalProjectUI(ptUnknown, FileName);   // I4687
-  frmKeymanDeveloper.ProjectMRU.Add(FGlobalProject.FileName);
-  frmKeymanDeveloper.ShowProject;
-  frmKeymanDeveloper.UpdateCaption;
-end;
-
-procedure TmodActionsMain.NewProject(pt: TProjectType);
-begin
-  if IsGlobalProjectUIReady then
-  begin
-    if not SaveAndCloseAllFiles then Exit;
-    FreeGlobalProjectUI;
-  end;
-  NewGlobalProjectUI(pt);
-  frmKeymanDeveloper.ShowProject;
-  frmKeymanDeveloper.UpdateCaption;
-end;
 
 procedure TmodActionsMain.CloseProject;
 begin
   if IsGlobalProjectUIReady then
   begin
-    if not SaveAndCloseAllFiles then Exit;
+    if not frmKeymanDeveloper.SaveAndCloseAllFiles then Exit;
     FreeGlobalProjectUI;
   end;
   frmKeymanDeveloper.ShowProject;
   frmKeymanDeveloper.UpdateCaption;
 end;
 
-procedure TmodActionsMain.actProjectSaveAsAccept(Sender: TObject);
-begin
-  FGlobalProject.FileName := actProjectSaveAs.Dialog.FileName;
-  FGlobalProject.Save;
-  frmKeymanDeveloper.ProjectMRU.Add(FGlobalProject.FileName);
-end;
-
-procedure TmodActionsMain.actProjectSaveAsBeforeExecute(Sender: TObject);
-begin
-  actProjectSaveAs.Dialog.FileName := FGlobalProject.FileName;
-end;
-
-procedure TmodActionsMain.actProjectSaveAsSaveDialogCanClose(Sender: TObject;
-  var CanClose: Boolean);
-begin
-  CanClose := CheckFilenameConventions((Sender as TSaveDialog).FileName);
-end;
-
-procedure TmodActionsMain.actProjectSaveAsUpdate(Sender: TObject);
-begin
-  actProjectSaveAs.Enabled := IsGlobalProjectUIReady;
-end;
-
 procedure TmodActionsMain.actProjectSettingsExecute(Sender: TObject);
+var
+  frm: TForm;
 begin
-  with TfrmProjectSettings.Create(Screen.ActiveForm) do   // I4688
+  if FGlobalProject.Options.Version = pv10
+    then frm := TfrmProjectSettings.Create(Screen.ActiveForm)   // I4688
+    else frm := TfrmProjectSettings20.Create(Screen.ActiveForm);
   try
-    ShowModal;
+    if frm.ShowModal = mrOk then
+    begin
+      if IsGlobalProjectUIReady then
+        FGlobalProject.Refresh;
+    end;
   finally
-    Free;
+    frm.Free;
   end;
 end;
 
@@ -1027,6 +980,11 @@ begin
   actWindowClose.Enabled := Assigned(frmKeymanDeveloper.ActiveChild);
 end;
 
+procedure TmodActionsMain.actWindowNewExecute(Sender: TObject);
+begin
+  frmKeymanDeveloper.OpenNewWindow;
+end;
+
 procedure TmodActionsMain.actWindowNextExecute(Sender: TObject);
 begin
   with frmKeymanDeveloper do
@@ -1064,9 +1022,9 @@ end;
 procedure TmodActionsMain.DataModuleCreate(Sender: TObject);
 begin
   actFileOpen.Dialog.Filter :=
-    'Keyman source files|*.kmn;*.kps;*.txt;*.bmp;*.ico;*.kpj;*.kvk;*.kvks;*.model.ts;*.tsv|'+
+    'Keyman source files|*.kmn;*.kps;*.txt;*.bmp;*.ico;*.kpj;*.kvk;*.kvks;*.model.ts;*.tsv;*.xml|'+
     'Projects files (*.kpj)|*.kpj|'+
-    'Keyboard files (*.kmn)|*.kmn|'+
+    'Keyboard files (*.kmn, *.xml)|*.kmn;*.xml|'+
     'Package files (*.kps)|*.kps|'+
     'Model files (*.model.ts)|*.model.ts|'+
     'Wordlist files (*.tsv)|*.tsv|'+
@@ -1079,33 +1037,6 @@ begin
     'HTML files (*.htm, *.html)|*.htm?|'+
     'XML files (*.xml)|*.xml|'+
     'All files (*.*)|*.*';
-end;
-
-function TmodActionsMain.SaveAndCloseAllFiles: Boolean;
-var
-  i: Integer;
-begin
-  FGlobalProject.Save;
-  for i := 0 to frmKeymanDeveloper.ChildWindows.Count - 1 do
-  begin
-    if frmKeymanDeveloper.ChildWindows[i] is TfrmProject then
-      Continue;
-
-    if not frmKeymanDeveloper.ChildWindows[i].CloseQuery then
-      Exit(False);
-  end;
-
-  for i := 0 to frmKeymanDeveloper.ChildWindows.Count - 1 do
-  begin
-    if frmKeymanDeveloper.ChildWindows[i] is TfrmProject then
-      Continue;
-
-    frmKeymanDeveloper.ChildWindows[i].Visible := False;
-    frmKeymanDeveloper.ChildWindows[i].Parent := nil;
-    frmKeymanDeveloper.ChildWindows[i].Release;
-  end;
-
-  Result := True;
 end;
 
 end.

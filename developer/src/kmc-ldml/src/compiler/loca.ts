@@ -24,7 +24,7 @@ export class LocaCompiler extends SectionCompiler {
 
   public validate(): boolean {
     let valid = true;
-    const locales = this.getLocales(this.keyboard);
+    const locales = this.getLocales(this.keyboard3);
     for(let tag of locales) {
       try {
         new Intl.Locale(tag);
@@ -33,6 +33,7 @@ export class LocaCompiler extends SectionCompiler {
           this.callbacks.reportMessage(CompilerMessages.Error_InvalidLocale({tag}));
           valid = false;
         } else {
+          /* c8 ignore next 2 */
           throw e;
         }
       }
@@ -45,7 +46,7 @@ export class LocaCompiler extends SectionCompiler {
 
     // This also minimizes locales according to Remove Likely Subtags algorithm:
     // https://www.unicode.org/reports/tr35/#Likely_Subtags
-    const sourceLocales = this.getLocales(this.keyboard);
+    const sourceLocales = this.getLocales(this.keyboard3);
     const locales = sourceLocales.map((sourceLocale: string) => {
       const locale = new Intl.Locale(sourceLocale).minimize().toString();
       if(locale != sourceLocale) {

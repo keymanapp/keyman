@@ -1,0 +1,40 @@
+{
+  "name": "@keymanapp/developer-utils",
+  "description": "Keyman Developer utilities",
+  "type": "module",
+  "exports": {
+    ".": "./build/index.js"
+  },
+  "files": [
+    "/build/"
+  ],
+  "devDependencies": {
+    "@types/node": "^20.4.1",
+    "ts-node": "^9.1.1",
+    "typescript": "^4.9.5",
+    "c8": "^7.12.0",
+    "chai": "^4.3.4",
+    "mocha": "^8.4.0"
+  },
+  "scripts": {
+    "build": "tsc -b"
+  },
+  "dependencies": {
+    "@keymanapp/common-types": "*"
+  },
+  "mocha": {
+    "spec": "build/test/**/test-*.js",
+    "require": [
+      "source-map-support/register"
+    ]
+  },
+  "author": "Marc Durdin <marc@keyman.com> (https://github.com/mcdurdin)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/keymanapp/keyman/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/keymanapp/keyman.git"
+  }
+}

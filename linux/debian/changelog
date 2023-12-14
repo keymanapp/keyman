@@ -1,3 +1,37 @@
+keyman (16.0.144-1) unstable; urgency=medium
+
+  [Dandan Zhang]
+  * Add support for loong64 (closes: #1057134)
+
+  [Eberhard Beilharz]
+  * New upstream release.
+  * Re-release to Debian
+
+ -- Eberhard Beilharz <eb1@sil.org>  Fri, 01 Dec 2023 14:59:28 +0100
+
+keyman (16.0.143-1) unstable; urgency=medium
+
+  * Fix failure to build source after successful build (Closes #1046776)
+  * New upstream release.
+  * Re-release to Debian
+
+ -- Eberhard Beilharz <eb1@sil.org>  Wed, 22 Nov 2023 15:24:59 +0100
+
+keyman (16.0.141-1) unstable; urgency=medium
+
+  * Work around mips64el build failure (#1041499)
+  * New upstream release.
+  * Re-release to Debian
+
+ -- Eberhard Beilharz <eb1@sil.org>  Thu, 27 Jul 2023 16:30:04 +0200
+
+keyman (16.0.140-1) unstable; urgency=medium
+
+  * New upstream release (closes: #1037707).
+  * Re-release to Debian
+
+ -- Eberhard Beilharz <eb1@sil.org>  Mon, 24 Jul 2023 11:41:07 +0200
+
 keyman (16.0.139-4) unstable; urgency=medium
 
   * debian/tests: Revert previous change and ignore s390x from autopkgtests

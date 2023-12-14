@@ -1,6 +1,4 @@
 import { CompilerCallbacks } from '@keymanapp/common-types';
-import * as fs from 'fs';
-import * as path from 'path';
 import ts from 'typescript';
 import { setCompilerCallbacks } from './compiler-callbacks.js';
 
@@ -21,9 +19,9 @@ export function compileModel(filename: string, callbacks: CompilerCallbacks): st
 
   try {
     let modelSource = loadFromFilename(filename, callbacks);
-    let containingDirectory = path.dirname(filename);
+    let containingDirectory = callbacks.path.dirname(filename);
 
-    return (new LexicalModelCompiler)
+    return (new LexicalModelCompiler(callbacks))
       .generateLexicalModelCode('<unknown>', modelSource, containingDirectory);
   } catch(e) {
     callbacks.reportMessage(
@@ -52,7 +50,7 @@ interface ES2015Module {
 export function loadFromFilename(filename: string, callbacks: CompilerCallbacks): LexicalModelSource {
   setCompilerCallbacks(callbacks);
 
-  let sourceCode = fs.readFileSync(filename, 'utf8');
+  let sourceCode = new TextDecoder().decode(callbacks.loadFile(filename));
   // Compile the module to JavaScript code.
   // NOTE: transpile module does a very simple TS to JS compilation.
   // It DOES NOT check for types!

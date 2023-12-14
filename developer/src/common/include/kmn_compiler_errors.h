@@ -171,8 +171,8 @@
 
 #define CERR_DuplicateGroup                                0x00004071
 #define CERR_DuplicateStore                                0x00004072
-
 #define CERR_RepeatedBegin                                 0x00004073
+#define CERR_VirtualKeyInContext                           0x00004074
 
 #define CWARN_TooManyWarnings                              0x00002080
 #define CWARN_OldVersion                                   0x00002081
@@ -184,7 +184,10 @@
 #define CWARN_ANSIInUnicodeGroup                           0x00002087
 #define CWARN_UnicodeSurrogateUsed                         0x00002088
 #define CWARN_ReservedCharacter                            0x00002089
-#define CWARN_Info                                         0x0000208A
+// Note: CWARN_Info has an "info" severity; this changed in 17.0. Earlier versions
+// had a special case for CWARN_Info in message output.
+#define CWARN_Info                                         0x0000008A
+#define CINFO_Info                                         CWARN_Info
 #define CWARN_VirtualKeyWithMnemonicLayout                 0x0000208B
 #define CWARN_VirtualCharKeyWithPositionalLayout           0x0000208C
 #define CWARN_StoreAlreadyUsedAsOptionOrCall               0x0000208D
@@ -236,8 +239,8 @@
 #define CWARN_KeyShouldIncludeNCaps                        0x000020AD
 
 #define CHINT_UnreachableRule                              0x000010AE
-#define CHINT_FilenameHasDifferingCase                     0x000010AF // only used in kmcmpdll
-#define CWARN_MissingFile                                  0x000020B0 // only used in kmcmpdll
+
+#define CWARN_VirtualKeyInOutput                           0x000020AF
 
 #define CERR_BufferOverflow                                0x000080C0
 #define CERR_Break                                         0x000080C1

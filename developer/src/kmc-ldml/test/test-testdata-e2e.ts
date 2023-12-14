@@ -9,16 +9,17 @@ describe('testdata-tests', function() {
   it('should-build-testdata-fixtures', async function() {
     // Let's build test-fr.json
     // It should match test-fr.json (built from test-fr.xml)
+    // Note! There's another test case against similar data, in common/web/types/test/ldml-keyboard/test-ldml-keyboard-testdata-reader.ts
 
     const inputFilename = makePathToFixture('test-fr.xml');
     const jsonFilename = makePathToFixture('test-fr.json');
 
     // Compile the keyboard
-    const testData = loadTestdata(inputFilename, {...compilerTestOptions, debug: true, addCompilerVersion: false});
+    const testData = loadTestdata(inputFilename, {...compilerTestOptions, saveDebug: true, shouldAddCompilerVersion: false});
     assert.isNotNull(testData);
 
     const jsonData = JSON.parse(readFileSync(jsonFilename, 'utf-8'));
 
-    assert.deepEqual(testData, jsonData);
+    assert.deepEqual(testData, jsonData, 'parsed +test-fr.xml should match -test-fr.json');
   });
 });

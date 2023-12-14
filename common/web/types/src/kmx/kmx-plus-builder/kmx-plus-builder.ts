@@ -10,12 +10,10 @@ import { BUILDER_LAYR, build_layr } from './build-layr.js';
 import { BUILDER_LIST, build_list } from './build-list.js';
 import { BUILDER_LOCA, build_loca } from './build-loca.js';
 import { BUILDER_META, build_meta } from './build-meta.js';
-import { BUILDER_NAME, build_name } from './build-name.js';
 import { BUILDER_STRS, build_strs } from './build-strs.js';
 import { BUILDER_TRAN, build_tran } from './build-tran.js';
 import { BUILDER_USET, build_uset } from './build-uset.js';
 import { BUILDER_VARS, build_vars } from './build-vars.js';
-import { BUILDER_VKEY, build_vkey } from './build-vkey.js';
 
 type BUILDER_BKSP = BUILDER_TRAN;
 // type BUILDER_FINL = BUILDER_TRAN;
@@ -31,12 +29,10 @@ type SectionBuilders = {
   list?: BUILDER_LIST;
   loca?: BUILDER_LOCA;
   meta?: BUILDER_META;
-  name?: BUILDER_NAME;
   strs?: BUILDER_STRS;
   tran?: BUILDER_TRAN;
   uset?: BUILDER_USET;
   vars?: BUILDER_VARS;
-  vkey?: BUILDER_VKEY;
 };
 
 export default class KMXPlusBuilder {
@@ -67,12 +63,11 @@ export default class KMXPlusBuilder {
     this.emitSection(file, this.file.COMP_PLUS_LIST, this.sect.list);
     this.emitSection(file, this.file.COMP_PLUS_LOCA, this.sect.loca);
     this.emitSection(file, this.file.COMP_PLUS_META, this.sect.meta);
-    this.emitSection(file, this.file.COMP_PLUS_NAME, this.sect.name);
     this.emitSection(file, this.file.COMP_PLUS_STRS, this.sect.strs);
     this.emitStrings(file);
     this.emitSection(file, this.file.COMP_PLUS_TRAN, this.sect.tran);
+    this.emitSection(file, this.file.COMP_PLUS_USET, this.sect.uset);
     this.emitSection(file, this.file.COMP_PLUS_VARS, this.sect.vars);
-    this.emitSection(file, this.file.COMP_PLUS_VKEY, this.sect.vkey);
 
     return file;
   }
@@ -84,8 +79,8 @@ export default class KMXPlusBuilder {
     // reference them. However, they will be emitted in alpha order.
     this.sect.strs = build_strs(this.file.kmxplus.strs);
     this.sect.list = build_list(this.file.kmxplus.list, this.sect.strs);
-    this.sect.elem = build_elem(this.file.kmxplus.elem, this.sect.strs);
     this.sect.uset = build_uset(this.file.kmxplus, this.sect.strs);
+    this.sect.elem = build_elem(this.file.kmxplus.elem, this.sect.strs, this.sect.uset);
 
     const build_bksp = build_tran;
 
@@ -95,10 +90,9 @@ export default class KMXPlusBuilder {
     this.sect.layr = build_layr(this.file.kmxplus, this.sect.strs, this.sect.list);
     this.sect.loca = build_loca(this.file.kmxplus, this.sect.strs);
     this.sect.meta = build_meta(this.file.kmxplus, this.sect.strs);
-    this.sect.name = build_name(this.file.kmxplus, this.sect.strs);
     this.sect.tran = build_tran(this.file.kmxplus.tran, this.sect.strs, this.sect.elem);
-    this.sect.vars = build_vars(this.file.kmxplus, this.sect.strs);
-    this.sect.vkey = build_vkey(this.file.kmxplus);
+    this.sect.uset = build_uset(this.file.kmxplus, this.sect.strs);
+    this.sect.vars = build_vars(this.file.kmxplus, this.sect.strs, this.sect.elem, this.sect.list);
 
     // Finalize the sect (index) section
 
@@ -131,12 +125,10 @@ export default class KMXPlusBuilder {
     offset = this.finalize_sect_item(this.sect.list, offset);
     offset = this.finalize_sect_item(this.sect.loca, offset);
     offset = this.finalize_sect_item(this.sect.meta, offset);
-    offset = this.finalize_sect_item(this.sect.name, offset);
     offset = this.finalize_sect_item(this.sect.strs, offset);
     offset = this.finalize_sect_item(this.sect.tran, offset);
     offset = this.finalize_sect_item(this.sect.uset, offset);
     offset = this.finalize_sect_item(this.sect.vars, offset);
-    offset = this.finalize_sect_item(this.sect.vkey, offset);
 
     this.sect.sect.total = offset;
   }
@@ -185,5 +177,4 @@ export default class KMXPlusBuilder {
       }
     }
   }
-
 }

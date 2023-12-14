@@ -1,0 +1,19 @@
+{
+  "extends": "../../../../../tsconfig.base.json",
+
+  "compilerOptions": {
+      "rootDir": ".",
+      "outDir": "./build/",
+      "baseUrl": ".",
+      "paths": {
+        "@keymanapp/common-types": ["../../../../../common/web/types/src/main"],
+      },
+    },
+  "include": [
+    "index.ts",
+    "src/**/*.ts",
+  ],
+  "references": [
+    { "path": "../../../../../common/web/types/" },
+  ]
+}

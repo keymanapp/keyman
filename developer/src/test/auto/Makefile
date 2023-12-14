@@ -15,30 +15,26 @@ test:
 
 developer-tests: \
   compile-supplementary-support \
-  keyboard-info \
   keyboard-js-info \
-  keyboard-package-versions \
   kmcomp \
-  kmcomp-empty-store-names \
-  kmcomp-x64-structures \
   kmconvert \
   kmx-file-languages \
   model-ts-parser \
   package-info \
   kmc \
+  kmc-analyze \
+  kmc-keyboard-info \
+  kmc-kmn \
   kmc-ldml \
   kmc-model \
   kmc-model-info \
-  kmc-package
+  kmc-package \
+  kmcmplib
 
 # ----------------------------------------------------------------------
 
 compile-supplementary-support: .virtual
   cd $(DEVELOPER_ROOT)\src\test\auto\compile-supplementary-support
-  $(MAKE) $(TARGET)
-
-keyboard-info: .virtual
-  cd $(DEVELOPER_ROOT)\src\test\auto\keyboard-info
   $(MAKE) $(TARGET)
 
 keyboard-js-info: .virtual
@@ -49,21 +45,8 @@ kmx-file-languages: .virtual
     cd $(DEVELOPER_ROOT)\src\test\auto\kmx-file-languages
     $(MAKE) $(TARGET)
 
-keyboard-package-versions: .virtual
-  cd $(DEVELOPER_ROOT)\src\test\auto\keyboard-package-versions
-  $(MAKE) $(TARGET)
-
 kmcomp: .virtual
   cd $(DEVELOPER_ROOT)\src\test\auto\kmcomp
-  $(MAKE) $(TARGET)
-
-kmcomp-empty-store-names: .virtual
-  rem TODO
-#  cd $(DEVELOPER_ROOT)\src\test\auto\kmcomp-empty-store-names
-#  $(MAKE) $(TARGET)
-
-kmcomp-x64-structures: .virtual
-  cd $(DEVELOPER_ROOT)\src\test\auto\kmcomp-x64-structures
   $(MAKE) $(TARGET)
 
 kmconvert: .virtual
@@ -87,6 +70,18 @@ kmc: .virtual
   cd $(DEVELOPER_ROOT)\src\kmc
   $(MAKE) $(TARGET)
 
+kmc-analyze: .virtual
+  cd $(DEVELOPER_ROOT)\src\kmc-analyze
+  $(MAKE) $(TARGET)
+
+kmc-keyboard-info: .virtual
+  cd $(DEVELOPER_ROOT)\src\kmc-keyboard-info
+  $(MAKE) $(TARGET)
+
+kmc-kmn: .virtual
+  cd $(DEVELOPER_ROOT)\src\kmc-kmn
+  $(MAKE) $(TARGET)
+
 kmc-ldml: .virtual
   cd $(DEVELOPER_ROOT)\src\kmc-ldml
   $(MAKE) $(TARGET)
@@ -101,6 +96,10 @@ kmc-model-info: .virtual
 
 kmc-package: .virtual
   cd $(DEVELOPER_ROOT)\src\kmc-package
+  $(MAKE) $(TARGET)
+
+kmcmplib: .virtual
+  cd $(DEVELOPER_ROOT)\src\kmcmplib
   $(MAKE) $(TARGET)
 
 # ----------------------------------------------------------------------

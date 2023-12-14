@@ -29,9 +29,8 @@ uses
   System.Variants,
   Winapi.Windows,
 
-  CompileKeymanWeb,
-  compile,
   Keyman.System.LexicalModelUtils,
+  Keyman.Developer.System.KmcWrapper,
   Keyman.Developer.System.LexicalModelCompile,
   VisualKeyboard;
 
@@ -55,26 +54,21 @@ end;
 
 function TmodelTsProjectFileAction.CompileModel: Boolean;
 begin
-  TProject.CompilerMessageFile := Self;
   HasCompileWarning := False;   // I4706
 
-  try
-    CheckFilenameConventions;
+  CheckFilenameConventions;
 
-    Log(plsInfo, Format('Compiling ''%s''%s...', [Filename, IfThen(IsDebug, ' with debug symbols ', '')]), 0, 0);
+  Log(plsInfo, Format('Compiling ''%s''%s...', [Filename, IfThen(IsDebug, ' with debug symbols ', '')]), 0, 0);
 
-    //compile the model
-    ForceDirectories(ExtractFileDir(TargetFileName));
-    Result := CompileModelFile(Self, FileName, TargetFileName, IsDebug);
+  //compile the model
+  ForceDirectories(ExtractFileDir(TargetFileName));
+  Result := CompileModelFile(Self, FileName, TargetFileName, IsDebug);
 
-    if HasCompileWarning and (WarnAsError or OwnerProject.Options.CompilerWarningsAsErrors) then Result := False;   // I4706
+  if HasCompileWarning and OwnerProject.Options.CompilerWarningsAsErrors then Result := False;   // I4706
 
-    if Result
-      then Log(plsSuccess, Format('''%s'' was compiled successfully  to ''%s''.', [FileName, TargetFileName]), 0, 0)   // I4504
-      else Log(plsFailure, Format('''%s'' was not compiled successfully.', [FileName]), 0, 0);   // I4504
-  finally
-    TProject.CompilerMessageFile := nil;
-  end;
+  if Result
+    then Log(plsSuccess, Format('''%s'' was compiled successfully  to ''%s''.', [FileName, TargetFileName]), 0, 0)   // I4504
+    else Log(plsFailure, Format('''%s'' was not compiled successfully.', [FileName]), 0, 0);   // I4504
 end;
 
 initialization

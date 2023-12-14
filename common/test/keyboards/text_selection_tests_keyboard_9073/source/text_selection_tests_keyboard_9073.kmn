@@ -1,0 +1,26 @@
+﻿c text_selection_tests_keyboard_9073 generated from template at 2023-11-14 15:23:49
+c with name "Text Selection Tests Keyboard"
+store(&VERSION) '10.0'
+store(&NAME) 'Text Selection Tests Keyboard'
+store(&COPYRIGHT) '© Keyman Team'
+store(&KEYBOARDVERSION) '1.0'
+store(&TARGETS) 'any'
+store(&BITMAP) 'text_selection_tests_keyboard_9073.ico'
+store(&VISUALKEYBOARD) 'text_selection_tests_keyboard_9073.kvks'
+store(&LAYOUTFILE) 'text_selection_tests_keyboard_9073.keyman-touch-layout'
+
+begin Unicode > use(main)
+
+group(main) using keys
+'^' + [K_A] > 'â'
+'^' + [SHIFT K_A] > 'Â'
+'^' + [K_BKSP] > 'foo'
+
++ '`' > dk(1)
+
++ [K_T] > U+0009 c TAB
+
+'a' dk(1) 'b' + [K_BKSP] > 'ok1'
+'a' 'b' + [K_BKSP] > 'fail1'
+'a' dk(1) + [K_BKSP] > 'fail2'
+dk(1) + 'o' > 'ok3'

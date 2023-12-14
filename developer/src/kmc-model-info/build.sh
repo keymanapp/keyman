@@ -50,8 +50,10 @@ fi
 #-------------------------------------------------------------------------------------------------------------------
 
 if builder_start_action test; then
-  npm test
-  # TODO: no unit tests yet, later add: `&& cd test && tsc -b && cd .. && c8 --reporter=lcov --reporter=text mocha`
+  eslint .
+  tsc --build test
+  c8 --reporter=lcov --reporter=text --exclude-after-remap --lines 80 mocha
+  # TODO: remove --lines 80 and improve coverage
   builder_finish_action success test
 fi
 

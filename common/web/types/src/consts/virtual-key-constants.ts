@@ -122,8 +122,12 @@ export const USVirtualKeyCodes = {
    */
   K_oE2:226,
   K_OE2:226,
-  k_oC1:193,  // ISO B11, ABNT-2 key to left of right shift, not on US keyboard
-  k_OC1:193,
+  K_oC1:193,  // ISO B11, ABNT-2 key to left of right shift, not on US keyboard
+  K_OC1:193,
+  'K_?C1':193,
+  'k_?C1':193,
+  K_oDF:0xDF,
+  K_ODF:0xDF,
   /*K_LOPT:50001,
   K_ROPT:50002,
   K_NUMERALS:50003,
@@ -140,125 +144,90 @@ export const USVirtualKeyCodes = {
 
 const k = USVirtualKeyCodes;
 
+/** Map a CLDR scancode to a US VKey ala USVirtualKeyCodes */
+export const CLDRScanToUSVirtualKeyCodes = {
+  0x02: k.K_1,
+  0x03: k.K_2,
+  0x04: k.K_3,
+  0x05: k.K_4,
+  0x06: k.K_5,
+  0x07: k.K_6,
+  0x08: k.K_7,
+  0x09: k.K_8,
+  0x0A: k.K_9,
+  0x0B: k.K_0,
+  0x0C: k.K_HYPHEN,
+  0x0D: k.K_EQUAL,
+
+  0x10: k.K_Q,
+  0x11: k.K_W,
+  0x12: k.K_E,
+  0x13: k.K_R,
+  0x14: k.K_T,
+  0x15: k.K_Y,
+  0x16: k.K_U,
+  0x17: k.K_I,
+  0x18: k.K_O,
+  0x19: k.K_P,
+  0x1A: k.K_LBRKT,
+  0x1B: k.K_RBRKT,
+
+  0x1E: k.K_A,
+  0x1F: k.K_S,
+  0x20: k.K_D,
+  0x21: k.K_F,
+  0x22: k.K_G,
+  0x23: k.K_H,
+  0x24: k.K_J,
+  0x25: k.K_K,
+  0x26: k.K_L,
+  0x27: k.K_COLON,
+  0x28: k.K_QUOTE,
+  0x29: k.K_BKQUOTE,
+
+  0x2B: k.K_BKSLASH,
+  0x2C: k.K_Z,
+  0x2D: k.K_X,
+  0x2E: k.K_C,
+  0x2F: k.K_V,
+  0x30: k.K_B,
+  0x31: k.K_N,
+  0x32: k.K_M,
+  0x33: k.K_COMMA,
+  0x34: k.K_PERIOD,
+  0x35: k.K_SLASH,
+
+  0x39: k.K_SPACE,
+
+  0x56: k.K_oE2, // << Same as 0x7D; found on iso, abnt2
+  0x73: k.K_oC1,
+  0x7D: k.K_oE2, // << Same as 0x56; found on jis
+
+};
+
 export type KeyMap = number[][];
 
-export const USVirtualKeyMap: KeyMap = [
-  // ` 1 2 3 4 5 6 7 8 9 0 - = [bksp]
-  [ k.K_BKQUOTE, k.K_1, k.K_2, k.K_3, k.K_4, k.K_5, k.K_6, k.K_7, k.K_8, k.K_9, k.K_0, k.K_HYPHEN, k.K_EQUAL ],
-  // [tab] Q W E R T Y U I O P [ ] \
-  [ k.K_Q, k.K_W, k.K_E, k.K_R, k.K_T, k.K_Y, k.K_U, k.K_I, k.K_O, k.K_P, k.K_LBRKT, k.K_RBRKT, k.K_BKSLASH ],
-  // [caps] A S D F G H J K L ; ' [enter]
-  [ k.K_A, k.K_S, k.K_D, k.K_F, k.K_G, k.K_H, k.K_J, k.K_K, k.K_L, k.K_COLON, k.K_QUOTE ],
-  // [shift] Z X C V B N M , . / [shift] *=oE2
-  [ k.K_Z, k.K_X, k.K_C, k.K_V, k.K_B, k.K_N, k.K_M, k.K_COMMA, k.K_PERIOD, k.K_SLASH ],
-  // space
-  [ k.K_SPACE ],
-];
-
-export const ISOVirtualKeyMap: KeyMap = [
-  // ` 1 2 3 4 5 6 7 8 9 0 - = [bksp]
-  [ k.K_BKQUOTE, k.K_1, k.K_2, k.K_3, k.K_4, k.K_5, k.K_6, k.K_7, k.K_8, k.K_9, k.K_0, k.K_HYPHEN, k.K_EQUAL ],
-  // [tab] Q W E R T Y U I O P [ ]
-  [ k.K_Q, k.K_W, k.K_E, k.K_R, k.K_T, k.K_Y, k.K_U, k.K_I, k.K_O, k.K_P, k.K_LBRKT, k.K_RBRKT  ],
-  // [caps] A S D F G H J K L ; ' \ [enter]
-  [ k.K_A, k.K_S, k.K_D, k.K_F, k.K_G, k.K_H, k.K_J, k.K_K, k.K_L, k.K_COLON, k.K_QUOTE, k.K_BKSLASH ],
-  // [shift] * Z X C V B N M , . / [shift] *=oE2
-  [ k.K_oE2, k.K_Z, k.K_X, k.K_C, k.K_V, k.K_B, k.K_N, k.K_M, k.K_COMMA, k.K_PERIOD, k.K_SLASH ],
-  // space
-  [ k.K_SPACE ],
-];
-
-export const JISVirtualKeyMap: KeyMap = [
-  // [Hankaku/Zenkaku] 1 2 3 4 5 6 7 8 9 0 - ^ ¥ [bksp]
-  [ k.K_1, k.K_2, k.K_3, k.K_4, k.K_5, k.K_6, k.K_7, k.K_8, k.K_9, k.K_0, k.K_HYPHEN, k.K_EQUAL, k.K_BKSLASH /* YEN */ ],
-  // [tab] Q W E R T Y U I O P @«`» [ [enter]
-  [ k.K_Q, k.K_W, k.K_E, k.K_R, k.K_T, k.K_Y, k.K_U, k.K_I, k.K_O, k.K_P, k.K_BKQUOTE, k.K_LBRKT  ],
-  // [caps] A S D F G H J K L ; : ] [enter]
-  [ k.K_A, k.K_S, k.K_D, k.K_F, k.K_G, k.K_H, k.K_J, k.K_K, k.K_L, k.K_COLON, k.K_QUOTE, k.K_RBRKT ],
-  // [shift] Z X C V B N M , . / _ [shift]
-  [ k.K_Z, k.K_X, k.K_C, k.K_V, k.K_B, k.K_N, k.K_M, k.K_COMMA, k.K_PERIOD, k.K_SLASH, k.K_oE2 /* ろ */ ],
-  // space
-  [ k.K_SPACE ],
-];
-
-export const ABNT2VirtualKeyMap: KeyMap = [
-  // ' 1 2 3 4 5 6 7 8 9 0 - = [bksp]
-  [ k.K_BKQUOTE, k.K_1, k.K_2, k.K_3, k.K_4, k.K_5, k.K_6, k.K_7, k.K_8, k.K_9, k.K_0, k.K_HYPHEN, k.K_EQUAL ],
-  // [tab] Q W E R T Y U I O P ´ [
-  [ k.K_Q, k.K_W, k.K_E, k.K_R, k.K_T, k.K_Y, k.K_U, k.K_I, k.K_O, k.K_P, k.K_LBRKT, k.K_RBRKT  ],
-  // [caps] A S D F G H J K L ç ~ ] [enter]
-  [ k.K_A, k.K_S, k.K_D, k.K_F, k.K_G, k.K_H, k.K_J, k.K_K, k.K_L, k.K_COLON, k.K_QUOTE, k.K_BKSLASH ],
-  // [shift] \ Z X C V B N M , . ; / [shift]
-  [ k.K_oE2, k.K_Z, k.K_X, k.K_C, k.K_V, k.K_B, k.K_N, k.K_M, k.K_COMMA, k.K_PERIOD, k.K_SLASH, k.k_oC1 /* ABNT2 */ ],
-  // space
-  [ k.K_SPACE ],
-];
-
 /**
- * Map from a hardware constant to a keymap
- * For the 'key' see constants.layr_list_hardware_map
+ * Convert a scan code numerical KeyMap to VKeys
+ * @param scans keymap to convert
+ * @param badScans output: set of not-found scancodes
+ * @returns
  */
-export const HardwareToKeymap: Map<string, KeyMap> = new Map(
-  [
-    ["us",    USVirtualKeyMap],
-    ["iso",   ISOVirtualKeyMap],
-    ["jis",   JISVirtualKeyMap],
-    ["abnt2", ABNT2VirtualKeyMap],
-  ]
-);
+export function CLDRScanToKeyMap(scans: KeyMap, badScans?: Set<number>): KeyMap {
+  return scans.map((row) => row.map((scan) => CLDRScanToVkey(scan, badScans)));
+}
 
-/**
- * Maps LDML VKey Names from CLDR VKey Enum in TR35 to Keyman virtual key codes
- */
-export const LdmlVkeyNames: Record<string, number> = {
-  'SPACE':     k.K_SPACE,      // 0x20,  // A03
-  '0':         k.K_0,          // 0x30,  // E10
-  '1':         k.K_1,          // 0x31,  // E01
-  '2':         k.K_2,          // 0x32,  // E02
-  '3':         k.K_3,          // 0x33,  // E03
-  '4':         k.K_4,          // 0x34,  // E04
-  '5':         k.K_5,          // 0x35,  // E05
-  '6':         k.K_6,          // 0x36,  // E06
-  '7':         k.K_7,          // 0x37,  // E07
-  '8':         k.K_8,          // 0x38,  // E08
-  '9':         k.K_9,          // 0x39,  // E09
-  'A':         k.K_A,          // 0x41,  // C01
-  'B':         k.K_B,          // 0x42,  // B05
-  'C':         k.K_C,          // 0x43,  // B03
-  'D':         k.K_D,          // 0x44,  // C03
-  'E':         k.K_E,          // 0x45,  // D03
-  'F':         k.K_F,          // 0x46,  // C04
-  'G':         k.K_G,          // 0x47,  // C05
-  'H':         k.K_H,          // 0x48,  // C06
-  'I':         k.K_I,          // 0x49,  // D08
-  'J':         k.K_J,          // 0x4A,  // C07
-  'K':         k.K_K,          // 0x4B,  // C08
-  'L':         k.K_L,          // 0x4C,  // C09
-  'M':         k.K_M,          // 0x4D,  // B07
-  'N':         k.K_N,          // 0x4E,  // B06
-  'O':         k.K_O,          // 0x4F,  // D09
-  'P':         k.K_P,          // 0x50,  // D10
-  'Q':         k.K_Q,          // 0x51,  // D01
-  'R':         k.K_R,          // 0x52,  // D04
-  'S':         k.K_S,          // 0x53,  // C02
-  'T':         k.K_T,          // 0x54,  // D05
-  'U':         k.K_U,          // 0x55,  // D07
-  'V':         k.K_V,          // 0x56,  // B05
-  'W':         k.K_W,          // 0x57,  // D02
-  'X':         k.K_X,          // 0x58,  // B02
-  'Y':         k.K_Y,          // 0x59,  // D06
-  'Z':         k.K_Z,          // 0x5A,  // B01
-  'SEMICOLON': k.K_COLON,      // 0xBA,  // C10
-  'EQUAL':     k.K_EQUAL,      // 0xBB,  // E12
-  'COMMA':     k.K_COMMA,      // 0xBC,  // B08
-  'HYPHEN':    k.K_HYPHEN,     // 0xBD,  // E11
-  'PERIOD':    k.K_PERIOD,     // 0xBE,  // B09
-  'SLASH':     k.K_SLASH,      // 0xBF,  // B10
-  'GRAVE':     k.K_BKQUOTE,    // 0xC0,  // E00
-  'LBRACKET':  k.K_LBRKT,      // 0xDB,  // D11
-  'BACKSLASH': k.K_BKSLASH,    // 0xDC,  // D13
-  'RBRACKET':  k.K_RBRKT,      // 0xDD,  // D12
-  'QUOTE':     k.K_QUOTE,      // 0xDE,  // C11
-  'LESS-THAN': k.K_oE2,        // 0xE2,  // B00  102nd key on European layouts, right of left shift.
-  'ABNT2':     k.k_oC1,        // 0xC1,  // B11  Extra key, left of right-shift, ABNT2
-};
+/** Convert one scan code to vkey, or undefined */
+export function CLDRScanToVkey(scan: number, badScans?: Set<number>): number {
+  /** typescript fun to index the scan table */
+  function hasScanCode(key: PropertyKey): key is keyof typeof CLDRScanToUSVirtualKeyCodes {
+    return key in CLDRScanToUSVirtualKeyCodes;
+  }
+  if (hasScanCode(scan)) {
+    return CLDRScanToUSVirtualKeyCodes[scan];
+  } else {
+    badScans?.add(scan);
+    return undefined;
+  }
+}
+

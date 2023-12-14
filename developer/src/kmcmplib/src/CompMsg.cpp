@@ -110,6 +110,7 @@ const struct CompilerError CompilerErrors[] = {
     { CERR_DuplicateGroup                                , "A group with this name has already been defined."},
     { CERR_DuplicateStore                                , "A store with this name has already been defined."},
     { CERR_RepeatedBegin                                 , "Begin has already been set"},
+    { CERR_VirtualKeyInContext                           , "Virtual keys are not permitted in context"},
 
     { CHINT_UnreachableRule                              , "This rule will never be matched as another rule takes precedence"},
     { CHINT_NonUnicodeFile                               , "Keyman Developer has detected that the file has ANSI encoding. Consider converting this file to UTF-8"},
@@ -142,6 +143,7 @@ const struct CompilerError CompilerErrors[] = {
     { CWARN_NulNotFirstStatementInContext                , "nul must be the first statement in the context"},
     { CWARN_IfShouldBeAtStartOfContext                   , "if, platform and baselayout should be at start of context (after nul, if present)"},
     { CWARN_KeyShouldIncludeNCaps                        , "Other rules which reference this key include CAPS or NCAPS modifiers, so this rule must include NCAPS modifier to avoid inconsistent matches"},
+    { CWARN_VirtualKeyInOutput                           , "Virtual keys are not supported in output"},
 
     { 0, nullptr }
   };

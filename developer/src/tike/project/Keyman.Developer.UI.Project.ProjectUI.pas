@@ -25,17 +25,20 @@ uses
   Keyman.Developer.UI.Project.ProjectFileUI;
 
 function GetGlobalProjectUI: TProjectUI;
-function LoadGlobalProjectUI(pt: TProjectType; AFilename: string; ALoadPersistedUntitledProject: Boolean = False): TProjectUI;
-function NewGlobalProjectUI(pt: TProjectType): TProjectUI;
+function LoadGlobalProjectUI(pt: TProjectType; AFilename: string): TProjectUI;
 procedure FreeGlobalProjectUI;
 function IsGlobalProjectUIReady: Boolean;
+function CreateTempGlobalProjectUI(pt: TProjectType): TProjectUI;
 
 implementation
 
 uses
   System.SysUtils,
+  Winapi.Windows,
 
-  Keyman.Developer.System.Project.Project;
+  Keyman.Developer.System.TikeMultiProcess,
+  Keyman.Developer.System.Project.Project,
+  utildir;
 
 function GetGlobalProjectUI: TProjectUI;
 begin
@@ -50,25 +53,53 @@ end;
 procedure FreeGlobalProjectUI;
 begin
   FreeAndNil(FGlobalProject);
+  TikeMultiProcess.CloseProject;
 end;
 
-function LoadGlobalProjectUI(pt: TProjectType; AFilename: string; ALoadPersistedUntitledProject: Boolean = False): TProjectUI;
-begin
-  Assert(not Assigned(FGlobalProject));
-  Result := TProjectUI.Create(pt, AFilename, ALoadPersistedUntitledProject);   // I4687
-  FGlobalProject := Result;
-end;
-
-function NewGlobalProjectUI(pt: TProjectType): TProjectUI;
+function CreateTempGlobalProjectUI(pt: TProjectType): TProjectUI;
 var
-  FSessionUntitledProjectFilename: string;
+  kpj: TProject;
+  AFilename: string;
 begin
   Assert(not Assigned(FGlobalProject));
-  FSessionUntitledProjectFilename := TProject.GetUntitledProjectFilename(True);
-  if FileExists(FSessionUntitledProjectFilename) then
-    DeleteFile(FSessionUntitledProjectFilename);
-  Result := TProjectUI.Create(pt, '', False);   // I4687
+
+  AFileName := KGetTempFileName('.kpj');
+  System.SysUtils.DeleteFile(AFileName);
+
+  kpj := TProject.Create(pt, AFilename, False);
+  try
+    kpj.Options.Version := pv10;
+    kpj.Options.BuildPath := ''; //'$SOURCEPATH';
+    kpj.Options.WarnDeprecatedCode := True;
+    kpj.Options.CompilerWarningsAsErrors := True;
+    kpj.Options.CheckFilenameConventions := False;
+    kpj.Options.SkipMetadataFiles := True;
+    kpj.Save;
+  finally
+    kpj.Free;
+  end;
+
+  Result := TProjectUI.Create(pt, AFilename, True);
+  Result.IsTemporary := True;
+
   FGlobalProject := Result;
+  TikeMultiProcess.OpenProject(
+    '', // We use the empty string to designate a temp project (* is no project)
+    FGlobalProject.GetTargetFilename(FGlobalProject.Options.SourcePath,
+      '', '')
+  );
+end;
+
+function LoadGlobalProjectUI(pt: TProjectType; AFilename: string): TProjectUI;
+begin
+  Assert(not Assigned(FGlobalProject));
+  Result := TProjectUI.Create(pt, AFilename, True);   // I4687
+  FGlobalProject := Result;
+  TikeMultiProcess.OpenProject(
+    FGlobalProject.FileName,
+    FGlobalProject.GetTargetFilename(FGlobalProject.Options.SourcePath,
+      '', '')
+  );
 end;
 
 end.

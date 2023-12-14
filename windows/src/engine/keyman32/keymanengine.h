@@ -18,11 +18,11 @@
 #define _CRT_SECURE_CPP_OVERLOAD_STANDARD_NAMES_COUNT 1
 #endif
 
-// For keyboardprocessor_bits.h
-#ifndef KMN_KBP_STATIC
-#define KMN_KBP_STATIC
+// For keyman_core_api_bits.h
+#ifndef KM_CORE_LIBRARY_STATIC
+#define KM_CORE_LIBRARY_STATIC
 #endif
-// For keyboardprocessor_bits.h
+// For keyman_core_api_bits.h
 #ifndef _WIN32
 #define _WIN32 1
 #endif
@@ -39,8 +39,8 @@
 #include <assert.h>
 #include <msctf.h>
 #include "../../../../common/windows/cpp/include/legacy_kmx_file.h"
-#include <keyman/keyboardprocessor.h>
-#include <keyman/keyboardprocessor_consts.h>
+#include <keyman/keyman_core_api.h>
+#include <keyman/keyman_core_api_consts.h>
 
 /***************************************************************************/
 
@@ -86,18 +86,11 @@ typedef struct tagINTKEYBOARDINFO
   int        __filler2; // makes same as KEYBOARDINFO
   int        nProfiles;
   LPINTKEYBOARDPROFILE Profiles;
-  km_kbp_keyboard* lpCoreKeyboard;
-  km_kbp_option_item* lpCoreKeyboardOptions;
-  km_kbp_state* lpCoreKeyboardState;
-  km_kbp_keyboard_imx* lpIMXList;
+  km_core_keyboard* lpCoreKeyboard;
+  km_core_option_item* lpCoreKeyboardOptions;
+  km_core_state* lpCoreKeyboardState;
+  km_core_keyboard_imx* lpIMXList;
 } INTKEYBOARDINFO, * LPINTKEYBOARDINFO;
-
-typedef struct tagINI
-{
-  int MsgStackSize;
-  int MaxKeyboards;
-  int ContextStackSize;
-} INI;
 
 typedef struct tagKMSTATE
 {
@@ -107,7 +100,7 @@ typedef struct tagKMSTATE
   WCHAR charCode;      // I4582
   BOOL windowunicode;  // I4287
   BOOL isDown;
-  km_kbp_keyboard* lpCoreKb;  //  future use with IMDLL
+  km_core_keyboard* lpCoreKb;  //  future use with IMDLL
 } KMSTATE;
 
 // I3616
@@ -121,17 +114,10 @@ LRESULT CALLBACK kmnLowLevelKeyboardProc(   // I4124
   _In_  LPARAM lParam
 );
 
-BOOL ReleaseStateMemoryCore(km_kbp_state** state);
-BOOL ReleaseKeyboardMemoryCore(km_kbp_keyboard** kbd);
+BOOL ReleaseStateMemoryCore(km_core_state** state);
+BOOL ReleaseKeyboardMemoryCore(km_core_keyboard** kbd);
 
-void PostGETNEXT(HWND hwnd);
-BOOL CompareMsg(LPMSG MsgA, LPMSG MsgB);
 BOOL ProcessHook();	// returns FALSE on error or key not matched [only for AITip]
-BOOL ProcessMessage( LPMSG mp );
-BOOL ProcessGroup(LPGROUP gp);
-BOOL ContextMatch(LPKEY kkp);
-int PostString(PWSTR str, LPMSG mp, LPKEYBOARD lpkb, PWSTR endstr);
-BOOL LoadAllKeymanKeyboards(DWORD layout);
 
 BOOL IsSysTrayWindow(HWND hwnd);
 
@@ -140,7 +126,6 @@ BOOL IsSysTrayWindow(HWND hwnd);
 
 BOOL InitialiseProcess(HWND hwnd);
 BOOL UninitialiseProcess(BOOL Lock);
-BOOL IsKeyboardUnicode();
 
 BOOL IsFocusedThread();
 
@@ -149,7 +134,6 @@ BOOL SelectKeyboard(DWORD KeymanID);
 extern "C" DWORD  _declspec(dllexport) WINAPI GetActiveKeymanID();
 
 BOOL GetKeyboardFileName(LPSTR kbname, LPSTR buf, int nbuf);
-BOOL LoadKeyboard(LPSTR fileName, LPKEYBOARD *lpKeyboard);
 BOOL LoadlpKeyboard(int i);
 
 PSTR wstrtostr(PCWSTR in);
@@ -246,6 +230,7 @@ void keybd_shift(LPINPUT pInputs, int* n, BOOL isReset, LPBYTE const kbd);
 #include "keymancontrol.h"
 #include "keyboardoptions.h"
 #include "kmprocessactions.h"
+#include "appcontext.h"
 
 #include "syskbd.h"
 #include "vkscancodes.h"
@@ -264,7 +249,7 @@ BOOL SelectKeyboardTSF(DWORD KeymanID, BOOL foreground);   // I3933   // I3949  
 BOOL ReportKeyboardChanged(WORD wCommand, DWORD dwProfileType, UINT langid, HKL hkl, GUID clsid, GUID guidProfile);
 void ProcessModifierChange(UINT key, BOOL isUp, BOOL isExtended);   // I4793
 
-BOOL SetupCoreEnvironment(km_kbp_option_item **test_env_opts);
-void DeleteCoreEnvironment(km_kbp_option_item *test_env_opts);
+BOOL SetupCoreEnvironment(km_core_option_item **test_env_opts);
+void DeleteCoreEnvironment(km_core_option_item *test_env_opts);
 
 #endif  // _KEYMANENGINE_H

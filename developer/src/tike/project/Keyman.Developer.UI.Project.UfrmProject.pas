@@ -94,6 +94,7 @@ type
     procedure SetGlobalProject;
     procedure StartClose; override;
     procedure CompileAll;
+    procedure RefreshOptions; override;
   end;
 
 implementation
@@ -109,9 +110,11 @@ uses
   Keyman.Developer.System.Project.kmnProjectFile,
   Keyman.Developer.System.Project.kpsProjectFile,
   Keyman.Developer.System.Project.modelTsProjectFile,
+  Keyman.Developer.System.Project.xmlLdmlProjectFile,
   Keyman.Developer.System.Project.Project,
   Keyman.Developer.UI.Project.ProjectUI,
   Keyman.Developer.UI.Project.ProjectFileUI,
+  keyman.Developer.UI.Project.UpgradeProject,
   Keyman.Developer.System.Project.ProjectFileType,
   typinfo,
   ErrorControlledRegistry,
@@ -200,6 +203,12 @@ begin
   RefreshCaption;
 end;
 
+procedure TfrmProject.RefreshOptions;
+begin
+  inherited;
+  ProjectRefresh(nil);
+end;
+
 procedure TfrmProject.ProjectRefresh(Sender: TObject);
 begin
   if frmKeymanDeveloper.ActiveChild <> Self
@@ -286,14 +295,18 @@ begin
   ClearMessages;
   for i := 0 to FGlobalProject.Files.Count - 1 do
   begin
-    if (FGlobalProject.Files[i] is TkmnProjectFile) or
-      (FGlobalProject.Files[i] is TmodelTsProjectFile) then
+    if not FGlobalProject.Files[i].IsSourceFile then
+      Continue;
+    if FGlobalProject.Files[i].IsCompilable and
+      not (FGlobalProject.Files[i] is TkpsProjectFile) then
     begin
       if not (FGlobalProject.Files[i].UI as TProjectFileUI).DoAction(pfaCompile, False) then Exit;   // I4687
     end;
   end;
   for i := 0 to FGlobalProject.Files.Count - 1 do
   begin
+    if not FGlobalProject.Files[i].IsSourceFile then
+      Continue;
     if FGlobalProject.Files[i] is TkpsProjectFile then
       if not (FGlobalProject.Files[i].UI as TProjectFileUI).DoAction(pfaCompile, False) then Exit;   // I4687
   end;
@@ -346,7 +359,7 @@ begin
   else if Command = 'editfile' then // MRU
   begin
     if SelectedMRUFileName <> '' then
-      modActionsMain.OpenProject(SelectedMRUFileName);
+      frmKeymanDeveloper.OpenProject(SelectedMRUFileName);
   end
   else if Command = 'removefrommru' then
   begin
@@ -401,6 +414,7 @@ begin
   if Command = 'fileaddnew' then
   begin
     { create a new file, add it to the project }
+    Assert(FGlobalProject.Options.Version = pv10);
     with TfrmNewFileDetails.Create(Self) do
     try
       BaseFileName := FGlobalProject.FileName;
@@ -418,6 +432,7 @@ begin
   else if Command = 'fileaddexisting' then
   begin
     { locate an existing file, add it to the project }
+    Assert(FGlobalProject.Options.Version = pv10);
     FFileType := FileTypeFromParamType;
 
     dlgOpenFile.Filter := GetFileTypeFilter(FFileType, FDefaultExtension);
@@ -432,9 +447,9 @@ begin
     pf := SelectedProjectFile;
     if Assigned(pf) then (pf.UI as TProjectFileUI).DefaultEvent(Self)   // I4687
     else if SelectedMRUFileName <> '' then
-      frmKeymanDeveloper.OpenFile(SelectedMRUFileName, True)
+      frmKeymanDeveloper.OpenFilesInProject([SelectedMRUFileName])
     else if Params.Values['name'] <> '' then
-      frmKeymanDeveloper.OpenFile(Params.Values['name'], True);
+      frmKeymanDeveloper.OpenFilesInProject([Params.Values['name']]);
   end
   else if Command = 'viewfilesource' then
   begin
@@ -465,6 +480,8 @@ begin
     pf := SelectedProjectFile;
     if Assigned(pf) and (pf is TkmnProjectFile) then
       OpenContainingFolder((pf as TkmnProjectFile).TargetFileName)
+    else if Assigned(pf) and (pf is TxmlLdmlProjectFile) then
+      OpenContainingFolder((pf as TxmlLdmlProjectFile).TargetFileName)
     else if Assigned(pf) and (pf is TkpsProjectFile) then
       OpenContainingFolder((pf as TkpsProjectFile).TargetFileName)
     else if Assigned(pf) and (pf is TmodelTsProjectFile) then
@@ -476,6 +493,7 @@ begin
   end
   else if Command = 'removefile' then
   begin
+    Assert(FGlobalProject.Options.Version = pv10);
     pf := SelectedProjectFile;
     if Assigned(pf) then
     begin
@@ -500,6 +518,8 @@ begin
     ClearMessages;
     for i := 0 to FGlobalProject.Files.Count - 1 do
     begin
+      if not FGlobalProject.Files[i].IsSourceFile then
+        Continue;
       (FGlobalProject.Files[i].UI as TProjectFileUI).DoAction(pfaClean, False);   // I4687
     end;
   end
@@ -508,7 +528,11 @@ begin
     ClearMessages;
     for i := 0 to FGlobalProject.Files.Count - 1 do
     begin
-      if FGlobalProject.Files[i] is TkmnProjectFile then
+      if not FGlobalProject.Files[i].IsSourceFile then
+        Continue;
+
+      if (FGlobalProject.Files[i] is TkmnProjectFile) or
+          (FGlobalProject.Files[i] is TxmlLdmlProjectFile) then
         (FGlobalProject.Files[i].UI as TProjectFileUI).DoAction(pfaCompile, False);   // I4687
     end;
   end
@@ -517,7 +541,10 @@ begin
     ClearMessages;
     for i := 0 to FGlobalProject.Files.Count - 1 do
     begin
-      if FGlobalProject.Files[i] is TkmnProjectFile then
+      if not FGlobalProject.Files[i].IsSourceFile then
+        Continue;
+      if (FGlobalProject.Files[i] is TkmnProjectFile) or
+          (FGlobalProject.Files[i] is TxmlLdmlProjectFile) then
         (FGlobalProject.Files[i].UI as TProjectFileUI).DoAction(pfaClean, False);
     end;
   end
@@ -526,6 +553,8 @@ begin
     ClearMessages;
     for i := 0 to FGlobalProject.Files.Count - 1 do
     begin
+      if not FGlobalProject.Files[i].IsSourceFile then
+        Continue;
       if FGlobalProject.Files[i] is TmodelTsProjectFile then
         (FGlobalProject.Files[i].UI as TProjectFileUI).DoAction(pfaCompile, False);   // I4687
     end;
@@ -535,6 +564,8 @@ begin
     ClearMessages;
     for i := 0 to FGlobalProject.Files.Count - 1 do
     begin
+      if not FGlobalProject.Files[i].IsSourceFile then
+        Continue;
       if FGlobalProject.Files[i] is TmodelTsProjectFile then
         (FGlobalProject.Files[i].UI as TProjectFileUI).DoAction(pfaClean, False);
     end;
@@ -545,30 +576,19 @@ begin
     ClearMessages;
     for i := 0 to FGlobalProject.Files.Count - 1 do
     begin
+      if not FGlobalProject.Files[i].IsSourceFile then
+        Continue;
       if FGlobalProject.Files[i] is TkpsProjectFile then
         (FGlobalProject.Files[i].UI as TProjectFileUI).DoAction(pfaCompile, False);
     end;
-  end
-  else if Command = 'package_compileallinstallers' then   // I4734
-  begin
-    ClearMessages;
-    for i := 0 to FGlobalProject.Files.Count - 1 do
-    begin
-      if FGlobalProject.Files[i] is TkpsProjectFile then
-        (FGlobalProject.Files[i].UI as TProjectFileUI).DoAction(pfaCompileInstaller, False);
-    end;
-  end
-  else if Command = 'package_compileinstaller' then
-  begin
-    ClearMessages;
-    pf := SelectedProjectFile;
-    if Assigned(pf) then (pf.UI as TProjectFileUI).DoAction(pfaCompileInstaller, False);
   end
   else if Command = 'package_cleanall' then   // I4692
   begin
     ClearMessages;
     for i := 0 to FGlobalProject.Files.Count - 1 do
     begin
+      if not FGlobalProject.Files[i].IsSourceFile then
+        Continue;
       if FGlobalProject.Files[i] is TkpsProjectFile then
         (FGlobalProject.Files[i].UI as TProjectFileUI).DoAction(pfaClean, False);
     end;
@@ -584,6 +604,11 @@ begin
     ClearMessages;
     pf := SelectedProjectFile;
     if Assigned(pf) then (pf.UI as TProjectFileUI).DoAction(pfaCompile, False);
+  end
+  else if Command = 'upgradeproject' then
+  begin
+    TryUpgradeProject(FGlobalProject);
+    ProjectRefresh(nil);
   end
   else if Command = 'checkforupdates' then
   begin

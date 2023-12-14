@@ -22,7 +22,7 @@ function compile() {
   local COMPILE_TARGET="$1"
   local BUNDLE_FLAG="${2:-}"
 
-  tsc -b "${KEYMAN_ROOT}/web/src/$COMPILE_TARGET" -v
+  tsc -b "${KEYMAN_ROOT}/web/src/$COMPILE_TARGET"
 
   if [ -f "./build-bundler.js" ]; then
     node "./build-bundler.js" "$BUNDLE_FLAG"
@@ -42,7 +42,7 @@ function _copy_dir_if_exists() {
 }
 
 # Copies top-level build artifacts into common 'debug' and 'release' config folders
-# for use in publishing.
+# for use in publishing and does a normalization pass on the sourcemaps.
 function prepare() {
   local CHILD_BUILD_ROOT="$KEYMAN_ROOT/web/build/app"
   local PUBLISH_BUILD_ROOT="$KEYMAN_ROOT/web/build/publish"
@@ -58,6 +58,15 @@ function prepare() {
 
   _copy_dir_if_exists "$CHILD_BUILD_ROOT/ui/debug"    "$PUBLISH_BUILD_ROOT/debug"
   _copy_dir_if_exists "$CHILD_BUILD_ROOT/ui/release"  "$PUBLISH_BUILD_ROOT/release"
+
+  # Normalize paths in the sourcemaps
+  for sourcemap in "$PUBLISH_BUILD_ROOT/debug/"*.map; do
+    node "$KEYMAN_ROOT/web/build/tools/building/sourcemap-root/index.js" null "$sourcemap" --clean
+  done
+
+  for sourcemap in "$PUBLISH_BUILD_ROOT/release/"*.map; do
+    node "$KEYMAN_ROOT/web/build/tools/building/sourcemap-root/index.js" null "$sourcemap" --clean
+  done
 }
 
 # Runs all headless tests corresponding to the specified target.

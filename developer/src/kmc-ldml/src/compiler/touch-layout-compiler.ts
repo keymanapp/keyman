@@ -10,7 +10,7 @@ export class TouchLayoutCompiler {
       layer: []
     };
 
-    for(let layers of source.keyboard.layers) {
+    for(let layers of source.keyboard3.layers) {
       for(let layer of layers.layer) {
         const resultLayer = this.compileHardwareLayer(source, result, layer);
         result.desktop.layer.push(resultLayer);
@@ -27,7 +27,7 @@ export class TouchLayoutCompiler {
     // TODO-LDML: consider consolidation with keys.ts?
 
     let fileLayer: TouchLayout.TouchLayoutLayer = {
-      id: this.translateLayerIdToTouchLayoutLayerId(layer.id, layer.modifier),
+      id: this.translateLayerIdToTouchLayoutLayerId(layer.id, layer.modifiers),
       row: []
     };
 
@@ -41,11 +41,11 @@ export class TouchLayoutCompiler {
 
       const keys = row.keys.split(' ');
       for(let key of keys) {
-        const keydef = source.keyboard.keys?.key?.find(x => x.id == key);
+        const keydef = source.keyboard3.keys?.key?.find(x => x.id == key);
         if(keydef) {
           const fileKey: TouchLayout.TouchLayoutKey = {
             id: this.translateKeyIdentifierToTouch(keydef.id) as TouchLayout.TouchLayoutKeyId,
-            text: keydef.to || '',
+            text: keydef.output || '',
             // TODO-LDML: additional properties
           };
           fileRow.key.push(fileKey);
@@ -73,7 +73,6 @@ export class TouchLayoutCompiler {
     // rightalt       | altR
     // rightalt-shift | altR shift
     //
-
     const map = {
       none:         'default',
       shift:        'shift',
@@ -83,6 +82,10 @@ export class TouchLayoutCompiler {
     };
 
     // canonicalize modifier string, alphabetical
+    // TODO-LDML: need to support multiple here
+    if (modifier && modifier.indexOf(',') !== -1) {
+      throw Error(`Internal error: TODO-LDML: multiple modifiers ${modifier} not yet supported.`);
+    }
     modifier = (modifier||'').split(/\b/).sort().join(' ').trim();
 
     if(Object.hasOwn(map, modifier)) {

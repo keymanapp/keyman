@@ -8,7 +8,7 @@
 #include "kmx_base.h"
 
 namespace km {
-namespace kbp {
+namespace core {
 namespace kmx {
 
 #define MAXACTIONQUEUE  1024
@@ -20,10 +20,10 @@ typedef struct
 } KMX_Action;
 
 // QueueAction ItemTypes
-#define QIT_VKEYDOWN  0
-#define QIT_VKEYUP    1
-#define QIT_VSHIFTDOWN  2
-#define QIT_VSHIFTUP  3
+// QIT_VKEYDOWN    0  Not supported by Core, legacy Windows-only, see #10049
+// QIT_VKEYUP      1  Not supported by Core, legacy Windows-only, see #10049
+// QIT_VSHIFTDOWN  2  Not supported by Core, legacy Windows-only, see #10049
+// QIT_VSHIFTUP    3  Not supported by Core, legacy Windows-only, see #10049
 #define QIT_CHAR    4
 #define QIT_DEADKEY   5
 #define QIT_BELL    6
@@ -34,10 +34,6 @@ typedef struct
 #define QIT_EMIT_KEYSTROKE 11
 
 #define QIT_MAX     11
-
-#define QVK_EXTENDED 0x00010000 // Flag for QIT_VKEYDOWN to indicate an extended key
-#define QVK_KEYMASK  0x0000FFFF
-#define QVK_FLAGMASK 0xFFFF0000
 
 class KMX_Actions
 {
@@ -59,6 +55,6 @@ public:
 };
 
 } // namespace kmx
-} // namespace kbp
+} // namespace core
 } // namespace km
 

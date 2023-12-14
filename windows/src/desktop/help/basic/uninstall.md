@@ -16,17 +16,17 @@ title: Software Task - Uninstall Keyman
 
 6.  Follow the prompts to complete the uninstall.
 
-## Uninstall Keyman from Windows 7 or 8
+## Uninstall Keyman from Windows 11
 
 1.  Exit Keyman.
 
-2.  Open Windows Control Panel.
+2.  Open Windows Start Menu and type "Add or Remove Programs", and open that app.
 
-3.  Select \'Add or Remove Programs\' or \'Programs and Features\' or
-    \'Uninstall a program\'.
+3.  In the Apps > Installed apps search box, type "Keyman".
 
-4.  Click Keyman in the list.
+4.  Click the three horizontal dots to the right of Keyman in the list.
+![](../desktop_images/win11-uninstall.png)
 
-5.  Click Remove or Uninstall or right-click \'Uninstall\'.
+5.  Click Uninstall.
 
 6.  Follow the prompts to complete the uninstall.

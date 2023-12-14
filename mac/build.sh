@@ -334,26 +334,17 @@ updatePlist() {
     fi
 }
 
-execCodeSign() {
-    # Allow the signing to fail once (network transient error on timestamping)
-    typeset ret_code
-    set +e
-    eval codesign "$@"
-    ret_code=$?
-    if [ $ret_code != 0 ]; then
-        eval codesign "$@"
-        ret_code=$?
-        if [ $ret_code != 0 ]; then
-            builder_die "Unable to sign component (exit code $ret_code)"
-        fi
-    fi
-    set -e
-}
-
 ### Build Keyman Engine (kmx processor) ###
 
 if $DO_KEYMANENGINE ; then
     builder_heading "Building Keyman Engine"
+    if [ "$CONFIG" == "Debug" ]; then
+        $KEYMAN_ROOT/core/build.sh configure:mac --debug --no-tests
+        $KEYMAN_ROOT/core/build.sh build:mac --debug --no-tests
+    else
+        $KEYMAN_ROOT/core/build.sh configure:mac --no-tests
+        $KEYMAN_ROOT/core/build.sh build:mac --no-tests
+    fi
     execBuildCommand $ENGINE_NAME "xcodebuild -project \"$KME4M_PROJECT_PATH\" $BUILD_OPTIONS $BUILD_ACTIONS $TEST_ACTION -scheme $ENGINE_NAME"
     execBuildCommand "$ENGINE_NAME dSYM file" "dsymutil \"$KME4M_BASE_PATH/build/$CONFIG/$ENGINE_NAME.framework/Versions/A/$ENGINE_NAME\" -o \"$KME4M_BASE_PATH/build/$CONFIG/$ENGINE_NAME.framework.dSYM\""
     updatePlist "$KME4M_BASE_PATH/build/$CONFIG/$ENGINE_NAME.framework/Resources/Info.plist" "Keyman Engine"
@@ -391,11 +382,11 @@ if $DO_KEYMANIM ; then
 
     # We need to re-sign the app after updating the plist file
     if $DO_CODESIGN ; then
-        execCodeSign --force --sign $CERTIFICATE_ID --timestamp --verbose --preserve-metadata=identifier,entitlements "$KM4MIM_BASE_PATH/build/$CONFIG/Keyman.app/Contents/Frameworks/Sentry.framework"
+        execCodeSign eval --force --sign $CERTIFICATE_ID --timestamp --verbose --preserve-metadata=identifier,entitlements "$KM4MIM_BASE_PATH/build/$CONFIG/Keyman.app/Contents/Frameworks/Sentry.framework"
 
-        execCodeSign --force --sign $CERTIFICATE_ID --timestamp --verbose --preserve-metadata=identifier,entitlements "$KM4MIM_BASE_PATH/build/$CONFIG/Keyman.app/Contents/Frameworks/KeymanEngine4Mac.framework"
+        execCodeSign eval --force --sign $CERTIFICATE_ID --timestamp --verbose --preserve-metadata=identifier,entitlements "$KM4MIM_BASE_PATH/build/$CONFIG/Keyman.app/Contents/Frameworks/KeymanEngine4Mac.framework"
 
-        execCodeSign --force --sign $CERTIFICATE_ID --timestamp --verbose -o runtime \
+        execCodeSign eval --force --sign $CERTIFICATE_ID --timestamp --verbose -o runtime \
             --entitlements "$KM4MIM_BASE_PATH/$ENTITLEMENTS_FILE" \
             --requirements "'=designated => anchor apple generic and identifier \"\$self.identifier\" and ((cert leaf[field.1.2.840.113635.100.6.1.9] exists) or ( certificate 1[field.1.2.840.113635.100.6.2.6] exists and certificate leaf[field.1.2.840.113635.100.6.1.13] exists and certificate leaf[subject.OU] = \"$DEVELOPMENT_TEAM\" ))'" \
             "$KM4MIM_BASE_PATH/build/$CONFIG/Keyman.app"
@@ -441,7 +432,7 @@ if $PREPRELEASE || $NOTARIZE; then
     # We may need to re-run the code signing if a custom certificate has been passed in
     if [ ! -z "${CERTIFICATE_ID+x}" ]; then
       builder_heading "Signing with custom certificate (CERTIFICATE_ID environment variable)."
-      codesign --force --options runtime --entitlements Keyman4MacIM/Keyman.entitlements --deep --sign "${CERTIFICATE_ID}" "$TARGET_APP_PATH"
+      execCodeSign direct --force --options runtime --entitlements Keyman4MacIM/Keyman.entitlements --deep --sign "${CERTIFICATE_ID}" "$TARGET_APP_PATH"
     fi
 
     builder_heading "Zipping Keyman.app for notarization to $TARGET_ZIP_PATH"

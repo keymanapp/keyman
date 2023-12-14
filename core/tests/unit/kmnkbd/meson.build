@@ -1,5 +1,5 @@
 # Copyright:    © 2018 SIL International.
-# Description:  Cross platform build script to compile libkmnkbp API unit tests.
+# Description:  Cross platform build script to compile libkeymancore API unit tests.
 # Create Date:  19 Oct 2018
 # Authors:      Tim Eves (TSE)
 #
@@ -14,8 +14,10 @@ else
   warns = []
 endif
 
-local_defns = ['-DKMN_KBP_STATIC']
+local_defns = ['-DKM_CORE_LIBRARY_STATIC']
 tests = [
+  ['action-api', 'action_api.cpp'],
+  ['action-set-api', 'action_set_api.cpp'],
   ['context-api', 'context_api.cpp'],
   ['keyboard-api', 'keyboard_api.cpp'],
   ['options-api', 'options_api.cpp'],
@@ -37,6 +39,7 @@ foreach t : tests
     cpp_args: local_defns + defns + warns,
     include_directories: [inc, libsrc],
     link_args: links + tests_flags,
+    dependencies: [icu_uc, icu_i18n],
     objects: lib.extract_all_objects(recursive: false))
 
   test(t[0], bin, args: ['--color', test_path])

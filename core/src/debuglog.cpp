@@ -9,7 +9,7 @@
 #include "debuglog.h"
 
 namespace km {
-namespace kbp {
+namespace core {
 namespace kmx {
 
 #define TAB "\t"
@@ -358,7 +358,7 @@ int DebugLog_1(const char *file, int line, const char *function, const char *fmt
           "%ld" TAB   //"TickCount" TAB
           "%s:%d" TAB //"SourceFile" TAB
           "%s" TAB    //"Function"
-          "%s" NL,    //"Message"
+          "%s",    //"Message"
 
           GetTickCount(), //"TickCount" TAB
           file, line,     //"SourceFile" TAB
@@ -446,6 +446,25 @@ const char *Debug_UnicodeString(::std::u16string s, int x) {
   for (q = bufout[x]; (intptr_t)(q-bufout[x]) < (128*7) && p != s.end(); p++)
   {
     snprintf(q, MEDIUM_BUF_SIZ - (q - bufout[x]), "U+%4.4X ", *p);
+    q = strchr(q, 0);
+  }
+  return bufout[x];
+}
+
+const char *Debug_UnicodeString(::std::u32string s, int x) {
+  if (!ShouldDebug()) {
+    return "";
+  }
+#ifdef _MSC_VER
+  __declspec(thread)
+#endif
+  static char bufout[2][MEDIUM_BUF_SIZ];
+  auto p = s.begin();
+  char *q;
+  bufout[x][0] = 0;
+  for (q = bufout[x]; (intptr_t)(q-bufout[x]) < (128*7) && p != s.end(); p++)
+  {
+    snprintf(q, MEDIUM_BUF_SIZ - (q - bufout[x]), "U+%4.6X ", (unsigned int)*p);
     q = strchr(q, 0);
   }
   return bufout[x];

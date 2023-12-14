@@ -29,6 +29,11 @@
 # Note: keep changes to version, tier and tag determination in sync with mkver (windows/src/buildutils/mkver)
 #
 
+# Note: set -eu and SHLVL are deliberately set both here and in builder.inc.sh,
+#       because we want them set as early as possible, and because
+#       builder.inc.sh is shared to other repos, this keeps the usage consistent
+#       there as well.
+
 # Exit on command failure and when using unset variables:
 set -eu
 
@@ -74,24 +79,31 @@ function findVersion() {
         VERSION_TAG=
     fi
 
-    if [ -z "${TEAMCITY_VERSION-}" -a -z "${JENKINS_HOME-}" ]; then
-        # Local dev machine, not TeamCity
+    if [ -z "${TEAMCITY_VERSION-}" ] && [ -z "${GITHUB_ACTIONS-}" ]; then
+        # Local dev machine, not TeamCity or GitHub Action
         VERSION_TAG="$VERSION_TAG-local"
         VERSION_ENVIRONMENT=local
-    else
+    elif [ -n "${TEAMCITY_PR_NUMBER-}" ]; then
         # On TeamCity: are we running a pull request build or a master/beta/stable build?
-        if [ ! -z "${TEAMCITY_PR_NUMBER-}" ]; then
-            VERSION_ENVIRONMENT=test
-            # Note TEAMCITY_PR_NUMBER can also be 'master', 'beta', or 'stable-x.y'
-            # This indicates we are running a Test build.
-            if [[ $TEAMCITY_PR_NUMBER =~ ^(master|beta|stable(-[0-9]+\.[0-9]+)?)$ ]]; then
-                VERSION_TAG="$VERSION_TAG-test"
-            else
-                VERSION_TAG="$VERSION_TAG-test-$TEAMCITY_PR_NUMBER"
-            fi
+        VERSION_ENVIRONMENT="test"
+        # Note TEAMCITY_PR_NUMBER can also be 'master', 'beta', or 'stable-x.y'
+        # This indicates we are running a Test build.
+        if [[ $TEAMCITY_PR_NUMBER =~ ^(master|beta|stable(-[0-9]+\.[0-9]+)?)$ ]]; then
+            VERSION_TAG="$VERSION_TAG-test"
         else
-            VERSION_ENVIRONMENT="$TIER"
+            VERSION_TAG="$VERSION_TAG-test-$TEAMCITY_PR_NUMBER"
         fi
+    elif [ -n "${GITHUB_ACTIONS-}" ] && ${GHA_TEST_BUILD-}; then
+        VERSION_ENVIRONMENT="test"
+        # Note GHA_BRANCH can be 'master', 'beta', or 'stable-x.y'
+        # This indicates we are running a Test build.
+        if [[ ${GHA_BRANCH-} =~ ^(master|beta|stable(-[0-9]+\.[0-9]+)?)$ ]]; then
+            VERSION_TAG="${VERSION_TAG}-test"
+        else
+            VERSION_TAG="${VERSION_TAG}-test-${GHA_BRANCH-unset}"
+        fi
+    else
+        VERSION_ENVIRONMENT="$TIER"
     fi
 
     VERSION_WITH_TAG="$VERSION$VERSION_TAG"
@@ -186,6 +198,26 @@ printBuildNumberForTeamCity
 
 findShouldSentryRelease
 
+# Sets the BUILDER_OS environment variable to linux|mac|win
+#
+_builder_get_operating_system() {
+  declare -g BUILDER_OS
+  # Default value, since it's the most general case/configuration to detect.
+  BUILDER_OS=linux
+
+  # Subject to change with future improvements.
+  if [[ $OSTYPE == darwin* ]]; then
+    BUILDER_OS=mac
+  elif [[ $OSTYPE == msys ]]; then
+    BUILDER_OS=win
+  elif [[ $OSTYPE == cygwin ]]; then
+    BUILDER_OS=win
+  fi
+  readonly BUILDER_OS
+}
+
+_builder_get_operating_system
+
 # Intended for use with macOS-based builds, as Xcode build phase "run script"s do not have access to important
 # environment variables.  Doesn't hurt to run it at other times as well.  The output file is .gitignore'd.
 function exportEnvironmentDefinitionScript() {
@@ -220,7 +252,7 @@ function exportEnvironmentDefinitionScript() {
 # someone else to intentionally use, so this check seems reasonable.
 #
 # https://gist.github.com/gdavis/6670468 has a representative copy of a standard Xcode environment variable setup.
-if [[ -z "${XCODE_VERSION_ACTUAL:-}" ]] && [[ -z "${XCODE_PRODUCT_BUILD_VERSION:-}" ]]; then
+if [ "$BUILDER_OS" == "mac" ] && [[ -z "${XCODE_VERSION_ACTUAL:-}" ]] && [[ -z "${XCODE_PRODUCT_BUILD_VERSION:-}" ]]; then
     exportEnvironmentDefinitionScript
 fi
 
@@ -349,26 +381,6 @@ run_xcodebuild() {
   fi
 }
 
-
-# Sets the BUILDER_OS environment variable to linux|mac|win
-#
-_builder_get_operating_system() {
-  declare -g BUILDER_OS
-  # Default value, since it's the most general case/configuration to detect.
-  BUILDER_OS=linux
-
-  # Subject to change with future improvements.
-  if [[ $OSTYPE == darwin* ]]; then
-    BUILDER_OS=mac
-  elif [[ $OSTYPE == msys ]]; then
-    BUILDER_OS=win
-  elif [[ $OSTYPE == cygwin ]]; then
-    BUILDER_OS=win
-  fi
-  readonly BUILDER_OS
-}
-
-_builder_get_operating_system
 
 #
 # We always want to use tools out of node_modules/.bin to guarantee that we get the

@@ -1,7 +1,6 @@
 import { SectionIdent, constants } from "@keymanapp/ldml-keyboard-constants";
-import { KMXPlus, LDMLKeyboard, CompilerCallbacks } from '@keymanapp/common-types';
-import { UnicodeSetParser, VariableParser } from '@keymanapp/common-types';
-import { KmnCompiler } from  '@keymanapp/kmc-kmn';
+import { KMXPlus, LDMLKeyboard, CompilerCallbacks, MarkerParser } from '@keymanapp/common-types';
+import { VariableParser } from '@keymanapp/common-types';
 import { SectionCompiler } from "./section-compiler.js";
 import Vars = KMXPlus.Vars;
 import StringVarItem = KMXPlus.StringVarItem;
@@ -10,6 +9,10 @@ import UnicodeSetItem = KMXPlus.UnicodeSetItem;
 import DependencySections = KMXPlus.DependencySections;
 import LDMLKeyboardXMLSourceFile = LDMLKeyboard.LDMLKeyboardXMLSourceFile;
 import { CompilerMessages } from "./messages.js";
+import { KeysCompiler } from "./keys.js";
+import { TransformCompiler } from "./tran.js";
+import { DispCompiler } from "./disp.js";
+import { MarkerTracker, MarkerUse } from "./marker-tracker.js";
 export class VarsCompiler extends SectionCompiler {
   public get id() {
     return constants.section.vars;
@@ -18,21 +21,11 @@ export class VarsCompiler extends SectionCompiler {
   public get dependencies(): Set<SectionIdent> {
     const defaults = new Set(<SectionIdent[]>[
       constants.section.strs,
-      constants.section.elem
+      constants.section.elem,
+      constants.section.list,
     ]);
     defaults.delete(this.id);
     return defaults;
-  }
-
-  usetparser : UnicodeSetParser = null;
-
-  public async init() : Promise<boolean> {
-    const compiler = new KmnCompiler();
-    const ok = await compiler.init(this.callbacks);
-    if (ok) {
-      this.usetparser = compiler;
-    }
-    return ok;
   }
 
   constructor(source: LDMLKeyboardXMLSourceFile, callbacks: CompilerCallbacks) {
@@ -41,14 +34,24 @@ export class VarsCompiler extends SectionCompiler {
 
   public validate(): boolean {
     let valid = true;
-    // TODO-LDML scan for markers?
+
+    valid = this.validateVars() && valid; // accumulate validity
+    valid = this.validateMarkers() && valid; // accumulate validity
+
+    return valid;
+  }
+
+  private validateVars(): boolean {
+    let valid = true;
+    const variables = this.keyboard3?.variables;
+
+    if (!variables) {
+      return true; // nothing to check
+    }
 
     // Check for duplicate ids
     const allIds = new Set();
     const dups = new Set();
-    const variables = this.keyboard?.variables;
-
-    if (!variables) return valid;
 
     const allStrings = new Set();
     const allSets = new Set();
@@ -58,7 +61,7 @@ export class VarsCompiler extends SectionCompiler {
      * add an ID to check for duplicates
      * @param id id
      */
-    function addId(id : string) : void {
+    function addId(id: string): void {
       if (allIds.has(id)) {
         dups.add(id);
       } else {
@@ -67,19 +70,19 @@ export class VarsCompiler extends SectionCompiler {
     }
 
     // Strings
-    for (const {id, value} of variables?.string) {
+    for (const { id, value } of variables?.string) {
       addId(id);
       allStrings.add(id);
       const stringrefs = VariableParser.allStringReferences(value);
       for (const id2 of stringrefs) {
         if (!allStrings.has(id2)) {
           valid = false;
-          this.callbacks.reportMessage(CompilerMessages.Error_MissingStringVariable({id: id2}));
+          this.callbacks.reportMessage(CompilerMessages.Error_MissingStringVariable({ id: id2 }));
         }
       }
     }
     // Sets
-    for (const {id, value} of variables.set) {
+    for (const { id, value } of variables.set) {
       addId(id);
       allSets.add(id);
       // check for illegal references, here.
@@ -87,23 +90,23 @@ export class VarsCompiler extends SectionCompiler {
       for (const id2 of stringrefs) {
         if (!allStrings.has(id2)) {
           valid = false;
-          this.callbacks.reportMessage(CompilerMessages.Error_MissingStringVariable({id: id2}));
+          this.callbacks.reportMessage(CompilerMessages.Error_MissingStringVariable({ id: id2 }));
         }
       }
 
       // Now split into spaces.
-      const items : string[] = VariableParser.setSplitter(value);
+      const items: string[] = VariableParser.setSplitter(value);
       for (const item of items) {
         const setrefs = VariableParser.allSetReferences(item);
         if (setrefs.length > 1) {
           // this is the form $[seta]$[setb]
           valid = false;
-          this.callbacks.reportMessage(CompilerMessages.Error_NeedSpacesBetweenSetVariables({item}));
+          this.callbacks.reportMessage(CompilerMessages.Error_NeedSpacesBetweenSetVariables({ item }));
         } else {
           for (const id2 of setrefs) {
             if (!allSets.has(id2)) {
               valid = false;
-              this.callbacks.reportMessage(CompilerMessages.Error_MissingSetVariable({id: id2}));
+              this.callbacks.reportMessage(CompilerMessages.Error_MissingSetVariable({ id: id2 }));
             }
           }
         }
@@ -111,14 +114,14 @@ export class VarsCompiler extends SectionCompiler {
       }
     }
     // UnicodeSets
-    for (const {id, value} of variables.unicodeSet) {
+    for (const { id, value } of variables.unicodeSet) {
       addId(id);
       allUnicodeSets.add(id);
       const stringrefs = VariableParser.allStringReferences(value);
       for (const id2 of stringrefs) {
         if (!allStrings.has(id2)) {
           valid = false;
-          this.callbacks.reportMessage(CompilerMessages.Error_MissingStringVariable({id: id2}));
+          this.callbacks.reportMessage(CompilerMessages.Error_MissingStringVariable({ id: id2 }));
         }
       }
       const setrefs = VariableParser.allSetReferences(value);
@@ -127,9 +130,9 @@ export class VarsCompiler extends SectionCompiler {
           valid = false;
           if (allSets.has(id2)) {
             // $[set] in a UnicodeSet must be another UnicodeSet.
-            this.callbacks.reportMessage(CompilerMessages.Error_CantReferenceSetFromUnicodeSet({id: id2}));
+            this.callbacks.reportMessage(CompilerMessages.Error_CantReferenceSetFromUnicodeSet({ id: id2 }));
           } else {
-            this.callbacks.reportMessage(CompilerMessages.Error_MissingUnicodeSetVariable({id: id2}));
+            this.callbacks.reportMessage(CompilerMessages.Error_MissingUnicodeSetVariable({ id: id2 }));
           }
         }
       }
@@ -145,13 +148,55 @@ export class VarsCompiler extends SectionCompiler {
     return valid;
   }
 
+  private collectMarkers(mt : MarkerTracker) : boolean {
+    let valid = true;
+
+    // call our friends to validate
+    valid = this.validateVarsMarkers(this.keyboard3, mt) && valid; // accumulate validity
+    valid = KeysCompiler.validateMarkers(this.keyboard3, mt) && valid; // accumulate validity
+    valid = TransformCompiler.validateMarkers(this.keyboard3, mt) && valid; // accumulate validity
+    valid = DispCompiler.validateMarkers(this.keyboard3, mt) && valid; // accumulate validity
+
+    return valid;
+  }
+
+  private validateMarkers(): boolean {
+    const mt = new MarkerTracker();
+    let valid = this.collectMarkers(mt);
+    // see if there are any matched-but-not-emitted
+    const matchedNotEmitted : Set<string> = new Set<string>();
+    for (const m of mt.matched.values()) {
+      if (m === MarkerParser.ANY_MARKER_ID) continue; // match-all marker
+      if (!mt.emitted.has(m)) {
+        matchedNotEmitted.add(m);
+      }
+    }
+    for (const m of mt.consumed.values()) {
+      if (m === MarkerParser.ANY_MARKER_ID) continue; // match-all marker
+      if (!mt.emitted.has(m)) {
+        matchedNotEmitted.add(m);
+      }
+    }
+
+    // report once
+    if (matchedNotEmitted.size > 0) {
+      this.callbacks.reportMessage(CompilerMessages.Error_MissingMarkers({ ids: Array.from(matchedNotEmitted.values()).sort() }));
+      valid = false;
+    }
+    return valid;
+  }
+
+  validateVarsMarkers(keyboard: LDMLKeyboard.LKKeyboard, mt : MarkerTracker) : boolean {
+    keyboard?.variables?.string?.forEach(({value}) =>
+          mt.add(MarkerUse.variable, MarkerParser.allReferences(value)));
+    return true;
+  }
+
   public compile(sections: DependencySections): Vars {
     const result =  new Vars();
 
-    const variables = this.keyboard?.variables;
-
-    if (!variables) return result; // Empty vars, to simplify other sections
-
+    const variables = this.keyboard3?.variables;
+    // we always have vars, it's depended on by other sections
     // we already know the variables do not conflict with each other
     // need to add these one by one, because they depend on each other.
     // we don't add these in completely 'natural' order because xml2js has already lost that.
@@ -164,6 +209,14 @@ export class VarsCompiler extends SectionCompiler {
       this.addSet(result, e, sections));
     variables?.unicodeSet?.forEach((e) =>
       this.addUnicodeSet(result, e, sections));
+
+    // reload markers - TODO-LDML: double work!
+    const mt = new MarkerTracker();
+    this.collectMarkers(mt);
+
+    // collect all markers, excluding the match-all
+    const allMarkers : string[] = Array.from(mt.all).filter(m => m !== MarkerParser.ANY_MARKER_ID).sort();
+    result.markers = sections.list.allocList(allMarkers, {}, sections);
 
     return result.valid() ? result : null;
   }
@@ -191,7 +244,7 @@ export class VarsCompiler extends SectionCompiler {
     let { value } = e;
     value = result.substituteStrings(value, sections);
     value = result.substituteUnicodeSets(value, sections);
-    result.unicodeSets.push(new UnicodeSetItem(id, value, sections, this.usetparser));
+    result.unicodeSets.push(new UnicodeSetItem(id, value, sections, sections.usetparser));
   }
   // routines for using/substituting variables have been moved to the Vars class and its
   // properties

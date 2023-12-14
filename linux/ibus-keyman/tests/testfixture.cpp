@@ -2,7 +2,7 @@
 #include <glib.h>
 #include <ibus.h>
 #include <iostream>
-#include <keyman/keyboardprocessor.h>
+#include <keyman/keyman_core_api.h>
 #include <kmx/kmx_processevent.h>
 #include <linux/input-event-codes.h>
 #include <list>
@@ -193,28 +193,28 @@ get_involved_keys(IBusKeymanTestsFixture *fixture, km::tests::key_event test_eve
 
   // process all modifiers
   std::list<gdk_key_event> result;
-  if (test_event.modifier_state & KM_KBP_MODIFIER_SHIFT) {
+  if (test_event.modifier_state & KM_CORE_MODIFIER_SHIFT) {
     // we don't distinguish between R and L Shift
     result.push_back(get_key_event_for_modifier(IBUS_SHIFT_MASK, modifiers, GDK_KEY_Shift_L, KEY_LEFTSHIFT));
   }
-  if (test_event.modifier_state & KM_KBP_MODIFIER_ALT || test_event.modifier_state & KM_KBP_MODIFIER_LALT) {
+  if (test_event.modifier_state & KM_CORE_MODIFIER_ALT || test_event.modifier_state & KM_CORE_MODIFIER_LALT) {
     result.push_back(get_key_event_for_modifier(IBUS_MOD1_MASK, modifiers, GDK_KEY_Alt_L, KEY_LEFTALT));
   }
-  if (test_event.modifier_state & KM_KBP_MODIFIER_RALT) {
+  if (test_event.modifier_state & KM_CORE_MODIFIER_RALT) {
     if (test_event.vk == KEYMAN_RALT)
       result.push_back(get_key_event_for_modifier(IBUS_MOD1_MASK, modifiers, GDK_KEY_Alt_R, KEY_RIGHTALT));
     else
       result.push_back(get_key_event_for_modifier(IBUS_MOD5_MASK, modifiers, GDK_KEY_Alt_R, KEY_RIGHTALT));
   }
-  if (test_event.modifier_state & KM_KBP_MODIFIER_CTRL || test_event.modifier_state & KM_KBP_MODIFIER_LCTRL) {
+  if (test_event.modifier_state & KM_CORE_MODIFIER_CTRL || test_event.modifier_state & KM_CORE_MODIFIER_LCTRL) {
     result.push_back(get_key_event_for_modifier(IBUS_CONTROL_MASK, modifiers, GDK_KEY_Control_L, KEY_LEFTCTRL));
   }
-  if (test_event.modifier_state & KM_KBP_MODIFIER_RCTRL) {
+  if (test_event.modifier_state & KM_CORE_MODIFIER_RCTRL) {
     result.push_back(get_key_event_for_modifier(IBUS_CONTROL_MASK, modifiers, GDK_KEY_Control_R, KEY_RIGHTCTRL));
   }
 
   // process key
-  guint keyval = (test_event.modifier_state & KM_KBP_MODIFIER_SHIFT) ? gdk_keyval_to_upper(test_event.vk)
+  guint keyval = (test_event.modifier_state & KM_CORE_MODIFIER_SHIFT) ? gdk_keyval_to_upper(test_event.vk)
                                                                      : gdk_keyval_to_lower(test_event.vk);
 
   // REVIEW: the keyval we use here are not correct for < 0x20 and >= 0x7f
@@ -243,8 +243,8 @@ get_context_keys(std::u16string context) {
           G_LOG_DOMAIN, __FILE__, __LINE__, G_STRFUNC, "We can only deal with ASCII characters in the context", utf8, "", "");
     }
     result.push_back(
-        {km::kbp::kmx::s_char_to_vkey[(int)utf8[0] - 32].vk,
-         (uint16_t)(km::kbp::kmx::s_char_to_vkey[(int)utf8[0] - 32].shifted ? KM_KBP_MODIFIER_SHIFT : 0)});
+        {km::core::kmx::s_char_to_vkey[(int)utf8[0] - 32].vk,
+         (uint16_t)(km::core::kmx::s_char_to_vkey[(int)utf8[0] - 32].shifted ? KM_CORE_MODIFIER_SHIFT : 0)});
   }
   return result;
 }

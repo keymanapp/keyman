@@ -3,12 +3,12 @@
   Description:  Internal keyboard class and adaptor class for the API.
   Create Date:  2 Oct 2018
   Authors:      Tim Eves (TSE)
-  History:      7 Oct 2018 - TSE - Refactored out of km_kbp_keyboard_api.cpp
+  History:      7 Oct 2018 - TSE - Refactored out of km_core_keyboard_api.cpp
 */
 #include "keyboard.hpp"
 #include "jsonpp.hpp"
 
-using namespace km::kbp;
+using namespace km::core;
 
 
 inline
@@ -54,7 +54,7 @@ keyboard_attributes & keyboard_attributes::operator = (keyboard_attributes &&rhs
 }
 
 
-json & km::kbp::operator << (json & j, km::kbp::keyboard_attributes const & kb)
+json & km::core::operator << (json & j, km::core::keyboard_attributes const & kb)
 {
   j << json::object
       << "id" << kb.id

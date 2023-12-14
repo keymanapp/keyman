@@ -21,7 +21,7 @@ export default class NodeProctor extends Proctor {
     this.keyboardWithHarness = kbdHarness;
   }
 
-  beforeAll() {
+  async beforeAll() {
     //
   }
 
@@ -47,7 +47,7 @@ export default class NodeProctor extends Proctor {
     return true;
   }
 
-  simulateSequence(sequence: TestSequence<any>, target?: OutputTarget): string {
+  async simulateSequence(sequence: TestSequence<any>, target?: OutputTarget): Promise<string> {
     // Start with an empty OutputTarget and a fresh KeyboardProcessor.
     if(!target) {
       target = new Mock();
@@ -88,9 +88,10 @@ export default class NodeProctor extends Proctor {
         // it's a matter of actually adding the feature.
         let ruleBehavior = processor.processKeystroke(new KeyEvent(keyEvent), target);
 
-        if(this.debugMode) {
-          console.log(JSON.stringify(target, null, '  '));
-          console.log(JSON.stringify(ruleBehavior, null, '  '));
+        if (this.debugMode) {
+          console.log("Processing %d:", keyEvent.Lcode);
+          console.log("target=%s", JSON.stringify(target, null, '  '));
+          console.log("ruleBehavior=%s", JSON.stringify(ruleBehavior, null, '  '));
         }
       }
     } else {

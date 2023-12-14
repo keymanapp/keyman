@@ -26,9 +26,8 @@ endif
 
 # per icudefs.mk.in:
 # "U_ATTRIBUTE_DEPRECATED is defined to hide warnings about deprecated API warnings."
-add_project_arguments('-DU_ATTRIBUTE_DEPRECATED=', '-DUCONFIG_USE_LOCAL=1', language: 'c')
-
-add_project_arguments('-DU_NOEXCEPT=', language: 'c')
+add_project_arguments('-DU_NOEXCEPT=', '-DU_ATTRIBUTE_DEPRECATED=', '-DUCONFIG_USE_LOCAL=1', language: 'c')
+add_project_arguments('-DU_NOEXCEPT=', '-DU_ATTRIBUTE_DEPRECATED=', '-DUCONFIG_USE_LOCAL=1', language: 'cpp')
 
 uconfig = configuration_data()
 
@@ -36,14 +35,18 @@ uconfig.set('U_ENABLE_DYLOAD', 0) # no DLL
 uconfig.set('U_CHECK_DYLOAD', 0) # no DLL
 uconfig.set('UCONFIG_NO_FILE_IO', 1)
 uconfig.set('UCONFIG_NO_LEGACY_CONVERSION', 1) # turn off file based codepage conversion
-uconfig.set('UCONFIG_NO_NORMALIZATION', 1) # TODO-LDML: may want this
+uconfig.set('UCONFIG_NO_NORMALIZATION', 0)
 uconfig.set('UCONFIG_NO_BREAK_ITERATION', 1) # TODO-LDML: may want this
 uconfig.set('UCONFIG_NO_IDNA', 1)
 uconfig.set('UCONFIG_NO_COLLATION', 1)
 uconfig.set('UCONFIG_NO_FORMATTING', 1)
 uconfig.set('UCONFIG_NO_TRANSLITERATION', 1)
-uconfig.set('UCONFIG_NO_REGULAR_EXPRESSIONS', 1) # TODO-LDML: Will probably want this for transforms #7375
+uconfig.set('UCONFIG_NO_REGULAR_EXPRESSIONS', 0) # want these for transforms #7375
 uconfig.set('UCONFIG_NO_SERVICE', 1)
+uconfig.set('U_OVERRIDE_CXX_ALLOCATION', 1)
+uconfig.set('UCONFIG_NO_CONVERSION', 1)
+uconfig.set('UCONFIG_USE_WINDOWS_LCID_MAPPING_API', 0)
+
 
 
 uconfig_local = configure_file(
@@ -81,6 +84,11 @@ if get_option('default_library') == 'static'
   usage_args = ['-DU_STATIC_IMPLEMENTATION']
   if cpp.get_argument_syntax() == 'msvc'
     library_prefix = ''
+    library_suffix = ''
+  elif host_machine.system() == 'darwin'
+    # TODO-LDML: should be switchable via meson parameters.
+    # TODO-LDML: xcode has a flexibility problem here, so droppinh the suffixes
+    library_prefix = 's'
     library_suffix = ''
   else
     library_prefix = 's'

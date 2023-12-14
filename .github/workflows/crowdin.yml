@@ -2,11 +2,12 @@ name: Upload translation sources to Crowdin translate.keyman.com
 
 on:
   schedule:
-    # At 06:00 every two weeks
-    - cron: '0 6 1,15 * *'
+    # At 06:00 every day. https://crontab.cronhub.io/
+    - cron: '0 6 * * *'
 
 jobs:
   upload-sources-to-crowdin:
+    if: github.repository == 'keymanapp/keyman'
     runs-on: ubuntu-latest
 
     steps:

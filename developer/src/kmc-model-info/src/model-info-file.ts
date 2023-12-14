@@ -4,10 +4,9 @@ export interface ModelInfoFile {
   authorName?: string;
   authorEmail?: string;
   description?: string;
-  license: "mit";
+  license?: "mit";
   languages: Array<string>;
   lastModifiedDate?: string;
-  links: ModelInfoFileLink[];
   packageFilename?: string;
   packageFileSize?: number;
   jsFilename?: string;
@@ -18,16 +17,10 @@ export interface ModelInfoFile {
   minKeymanVersion?: string;
   helpLink?: string;
   sourcePath?: string;
-  related?: ModelInfoFileRelated[];
-}
-
-export interface ModelInfoFileLink {
-  name: string;
-  url: string;
+  related?: {[id:string]:ModelInfoFileRelated};
 }
 
 export interface ModelInfoFileRelated {
   deprecates?: string;
   deprecatedBy?: string;
-  note?: string;
 }

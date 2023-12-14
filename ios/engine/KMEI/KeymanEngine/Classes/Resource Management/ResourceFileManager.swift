@@ -183,6 +183,9 @@ public class ResourceFileManager {
     var extractionFolder = cacheDirectory
     extractionFolder.appendPathComponent("temp/\(archiveUrl.lastPathComponent)")
 
+    // first clear extraction folder to avoid creating duplicates
+    try KeymanPackage.clearDirectory(destination: extractionFolder)
+    
     do {
       if let package = try KeymanPackage.extract(fileUrl: archiveUrl, destination: extractionFolder) {
         return package

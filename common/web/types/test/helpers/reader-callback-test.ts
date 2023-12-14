@@ -1,6 +1,6 @@
 import 'mocha';
 import {assert} from 'chai';
-import { loadFile, makePathToFixture, loadSchema } from '../helpers/index.js';
+import { loadFile, makePathToFixture } from '../helpers/index.js';
 import { LDMLKeyboardXMLSourceFileReader, LDMLKeyboardXMLSourceFileReaderOptions } from '../../src/ldml-keyboard/ldml-keyboard-xml-reader.js';
 import { CompilerEvent } from '../../src/util/compiler-interfaces.js';
 import { LDMLKeyboardXMLSourceFile } from '../../src/ldml-keyboard/ldml-keyboard-xml.js';
@@ -9,7 +9,7 @@ import { TestCompilerCallbacks } from './TestCompilerCallbacks.js';
 import { fileURLToPath } from 'url';
 
 const readerOptions: LDMLKeyboardXMLSourceFileReaderOptions = {
-  importsPath: fileURLToPath(LDMLKeyboardXMLSourceFileReader.defaultImportsURL)
+  importsPath: fileURLToPath(new URL(...LDMLKeyboardXMLSourceFileReader.defaultImportsURL))
 };
 
 export interface CompilationCase {
@@ -94,9 +94,9 @@ export function testReaderCases(cases : CompilationCase[]) {
       }
       // special case for an expected exception
       if (testcase.throws) {
-        assert.throws(() => reader.validate(source, loadSchema('ldml-keyboard')), testcase.throws);
+        assert.throws(() => reader.validate(source), testcase.throws);
       } else {
-        assert.doesNotThrow(() => reader.validate(source, loadSchema('ldml-keyboard')), `validating ${testcase.subpath}`);
+        assert.doesNotThrow(() => reader.validate(source), `validating ${testcase.subpath}`);
         // if we expected errors or warnings, show them
         if (testcase.errors) {
           assert.includeDeepMembers(callbacks.messages, testcase.errors, 'expected errors to be included');
@@ -105,7 +105,7 @@ export function testReaderCases(cases : CompilationCase[]) {
           assert.includeDeepMembers(callbacks.messages, testcase.warnings, 'expected warnings to be included');
         } else if (!expectFailure) {
           // no warnings, so expect zero messages
-          assert.strictEqual(callbacks.messages.length, 0, 'expected zero messages');
+          assert.deepEqual(callbacks.messages, [], 'expected zero messages');
         }
 
         // run the user-supplied callback if any

@@ -58,13 +58,12 @@ NSMutableArray *servers;
 }
 
 // Passthrough from the app delegate low level event hook
-// to the input method event handler for Delete Back. 
-- (BOOL)handleDeleteBackLowLevel:(NSEvent *)event {
+// to the input method event handler for handleBackspace.
+- (void)handleBackspace:(NSEvent *)event {
+    [self.AppDelegate logDebugMessage:@"KMInputController handleBackspace, event = %@", event];
     if(_eventHandler != nil) {
-        return [_eventHandler handleDeleteBackLowLevel:event];
+        [_eventHandler handleBackspace:event];
     }
-
-    return NO;
 }
 
 - (void)activateServer:(id)sender {
@@ -81,10 +80,11 @@ NSMutableArray *servers;
         NSRunningApplication *currApp = [[NSWorkspace sharedWorkspace] frontmostApplication];
         NSString *clientAppId = [currApp bundleIdentifier];
         if ([self.AppDelegate debugMode]) {
-            NSLog(@"New active app %@", clientAppId);
-            NSLog(@"sender %@", sender);
+            NSLog(@"activateServer, new active app: '%@', sender %@", clientAppId, sender);
         }
-        
+ 
+      // TODO: uncomment? commented the browser cases to see how they work with core code
+      /*
         // Most things in Safari work well using the normal way, but Google Docs doesn't.
         if ([clientAppId isEqual: @"com.apple.Safari"]) {
             _eventHandler = [[KMInputMethodSafariClientEventHandler alloc] init];
@@ -98,6 +98,9 @@ NSMutableArray *servers;
             // where we don't necessarily have any access to the current client.
             _eventHandler = [[KMInputMethodEventHandler alloc] initWithClient:clientAppId client:sender];
         }
+*/
+      _eventHandler = [[KMInputMethodEventHandler alloc] initWithClient:clientAppId client:sender];
+
     }
 }
 
@@ -183,65 +186,40 @@ NSMutableArray *servers;
     return self.AppDelegate.kmx;
 }
 
-
 - (void)menuAction:(id)sender {
     NSMenuItem *mItem = [sender objectForKey:kIMKCommandMenuItemName];
     NSInteger itag = mItem.tag;
     if ([self.AppDelegate debugMode])
         NSLog(@"Keyman menu clicked - tag: %lu", itag);
-    if (itag == 2) {
-        // Using `showConfigurationWindow` instead of `showPreferences:` because `showPreferences:` is missing in
-        // High Sierra (10.13.1 - 10.13.3). See: https://bugreport.apple.com/web/?problemID=35422518
-        // rrb: where Apple's API is broken (10.13.1-10.13.3) call our workaround, otherwise, call showPreferences
-        u_int16_t systemVersion = [KMOSVersion SystemVersion];
-        if ([KMOSVersion Version_10_13_1] <= systemVersion && systemVersion <= [KMOSVersion Version_10_13_3]) // between 10.13.1 and 10.13.3 inclusive
-        {
-            NSLog(@"Input Menu: calling workaround instead of showPreferences (sys ver %x)", systemVersion);
-            [self.AppDelegate showConfigurationWindow]; // call our workaround
-        }
-        else
-        {
-            NSLog(@"Input Menu: calling Apple's showPreferences (sys ver %x)", systemVersion);
-            [self showPreferences:sender]; // call Apple API
-        }
+    if (itag == CONFIG_MENUITEM_TAG) {
+        [self showConfigurationWindow:sender];
     }
-    else if (itag == 3) {
+    else if (itag == OSK_MENUITEM_TAG) {
         [self.AppDelegate showOSK];
     }
-    else if (itag == 4) {
+    else if (itag == ABOUT_MENUITEM_TAG) {
         [self.AppDelegate showAboutWindow];
     }
-    else if (itag >= 1000) {
-        NSMenuItem *keyboards = [self.AppDelegate.menu itemWithTag:1];
-        for (NSMenuItem *item in keyboards.submenu.itemArray) {
-            if (item.tag == itag)
-                [item setState:NSOnState];
-            else
-                [item setState:NSOffState];
-        }
-        
-        NSString *path = [self.AppDelegate.activeKeyboards objectAtIndex:itag%1000];
-        KMXFile *kmx = [[KMXFile alloc] initWithFilePath:path];
-        [self.AppDelegate setKmx:kmx];
-        KVKFile *kvk = nil;
-        NSDictionary *kmxInfo = [KMXFile keyboardInfoFromKmxFile:path];
-        NSString *kvkFilename = [kmxInfo objectForKey:kKMVisualKeyboardKey];
-        if (kvkFilename != nil) {
-            NSString *kvkFilePath = [self.AppDelegate kvkFilePathFromFilename:kvkFilename];
-            if (kvkFilePath != nil)
-                kvk = [[KVKFile alloc] initWithFilePath:kvkFilePath];
-        }
-        [self.AppDelegate setKvk:kvk];
-        NSString *keyboardName = [kmxInfo objectForKey:kKMKeyboardNameKey];
-        if ([self.AppDelegate debugMode])
-            NSLog(@"Selected keyboard from menu: %@", keyboardName);
-        [self.AppDelegate setKeyboardName:keyboardName];
-        [self.AppDelegate setKeyboardIcon:[kmxInfo objectForKey:kKMKeyboardIconKey]];
-        [self.AppDelegate setContextBuffer:nil];
-        [self.AppDelegate setSelectedKeyboard:path];
-        [self.AppDelegate loadSavedStores];
-        if (kvk != nil && self.AppDelegate.alwaysShowOSK)
-            [self.AppDelegate showOSK];
+    else if (itag >= KEYMAN_FIRST_KEYBOARD_MENUITEM_TAG) {
+      [self.AppDelegate selectKeyboardFromMenu:itag];
     }
 }
+
+- (void)showConfigurationWindow:(id)sender {
+  // Using `showConfigurationWindow` instead of `showPreferences:` because `showPreferences:` is missing in
+  // High Sierra (10.13.1 - 10.13.3). See: https://bugreport.apple.com/web/?problemID=35422518
+  // rrb: where Apple's API is broken (10.13.1-10.13.3) call our workaround, otherwise, call showPreferences
+  u_int16_t systemVersion = [KMOSVersion SystemVersion];
+  if ([KMOSVersion Version_10_13_1] <= systemVersion && systemVersion <= [KMOSVersion Version_10_13_3]) // between 10.13.1 and 10.13.3 inclusive
+  {
+      NSLog(@"Input Menu: calling workaround instead of showPreferences (sys ver %x)", systemVersion);
+      [self.AppDelegate showConfigurationWindow]; // call our workaround
+  }
+  else
+  {
+      NSLog(@"Input Menu: calling Apple's showPreferences (sys ver %x)", systemVersion);
+      [self showPreferences:sender]; // call Apple API
+  }
+}
+
 @end

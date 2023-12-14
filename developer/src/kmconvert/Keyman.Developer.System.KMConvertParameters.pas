@@ -26,6 +26,7 @@ type
     FModelIdLanguage: string;
     FModelIdUniq: string;
     FEmitUsage: Boolean;
+    FDescription: string;
 
     function CheckParam(name, value: string): Boolean;
     function SetKLID(const value: string): Boolean;
@@ -44,6 +45,7 @@ type
     function IsValidModelComponent(const component, value: string): Boolean;
     function ValidateBCP47Tag(const component, tag: string): Boolean;
     procedure OutputText(const msg: string = '');
+    function SetDescription(const value: string): Boolean;
   public
     type TOutputTextProc = reference to procedure(msg: string);
     var OnOutputText: TOutputTextProc;
@@ -62,6 +64,7 @@ type
     property Version: string read FVersion;
     property BCP47Tags: string read FBCP47Tags;
     property Author: string read FAuthor;
+    property Description: string read FDescription;
     property Targets: TKeymanTargets read FTargets;
     property Mode: TKMConvertMode read FMode;
     property NoLogo: Boolean read FNoLogo;
@@ -90,8 +93,8 @@ begin
   FEmitUsage := False;
 
   FDestination := '.';
-  FCopyright := 'Copyright (C)';
-  FFullCopyright := 'Copyright (C) '+FormatDateTime('yyyy', Now);
+  FCopyright := 'Copyright '+Char($00A9 {copyright});
+  FFullCopyright := 'Copyright '+Char($00A9 {copyright})+' '+FormatDateTime('yyyy', Now);
   FVersion := '1.0';
   FTargets := [ktAny];
 
@@ -161,6 +164,7 @@ begin
   OutputText('                         (in `import-windows` mode, can be a format string)');
   OutputText('  -o <destination>       The target folder to write the project into, defaults to "."');
   OutputText('  -author <data>         Name of author of the keyboard/model, no default');
+  OutputText('  -description <data>    Short plain-text description of the keyboard/model, no default');
   OutputText('  -name <data>           Name of the keyboard/model, e.g. "My First Keyboard", "%s Basic" ');
   OutputText('                         (format strings are only valid in `import-windows` mode)');
   OutputText('  -copyright <data>      Copyright string for the keyboard/model, defaults to "Copyright (C)"');
@@ -189,6 +193,7 @@ begin
   else if name = '-version' then Result := SetVersion(value)
   else if name = '-languages' then Result := SetBCP47Tags(value)
   else if name = '-author' then Result := SetAuthor(value)
+  else if name = '-description' then Result := SetDescription(value)
   else if name = '-targets' then Result := SetTargets(value)
   else if name = '-id-author' then Result := SetModelIdAuthor(value)
   else if name = '-id-language' then Result := SetModelIdLanguage(value)
@@ -279,7 +284,7 @@ begin
   if not TCanonicalLanguageCodeUtils.IsCanonical(tag, msg, False, False) then
   begin
     // Just a warning, because it's not illegal, just generates a warning
-    // kmcomp-side
+    // kmc-side
     OutputText('Warning: '+component+': '+msg);
   end;
 
@@ -311,6 +316,12 @@ end;
 function TKMConvertParameters.SetAuthor(const value: string): Boolean;
 begin
   FAuthor := Value;
+  Result := True;
+end;
+
+function TKMConvertParameters.SetDescription(const value: string): Boolean;
+begin
+  FDescription := Value;
   Result := True;
 end;
 

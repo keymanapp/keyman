@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE keyboard3 SYSTEM "../../../../../../../resources/standards-data/ldml-keyboards/techpreview/dtd/ldmlKeyboard3.dtd">
+<keyboard3 locale="nod-Lana" conformsTo="techpreview">
+  <info name="nod-Lana Test2"/>
+
+  <keys />
+
+  <transforms type="simple">
+    <transformGroup>
+      <reorder from="\u{1A60 1A45}" order="10" />
+    </transformGroup>
+  </transforms>
+</keyboard3>

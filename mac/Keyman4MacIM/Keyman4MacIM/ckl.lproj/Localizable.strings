@@ -68,4 +68,7 @@
 "copyright-label" = "Kopirait:";
 
 /* message displayed to alert user to need grant accessibility permission */
-"privacy-alert-text" = "To function properly, Keyman requires accessibility features:\n\nGrant access in System Preferences, Security & Privacy.\nRestart your system.";
+"privacy-alert-text" = "Akuya ka dzǝ ʻya kǝthlǝr daku, Keyman ada bara ɓui whalǝr lukwa suyerere:\n\nNgyar whalǝr ʻyati su akwa Sǝr Nwɛyere nam Tsar Tsaryere, Su tubwar Lapiyakur & Sǝr Kǝrngɛ.\nƁǝla hyanti ka dzǝ badicini ʻya kǝthlǝr sǝr nuwɛyere nǝngɛ ani system.";
+
+/* Text of menu item in Input Menu when no Keyboards are configured -- include parentheses  */
+"no-keyboard-configured-menu-placeholder" = "(Ndadi vu kibod wɛ)";

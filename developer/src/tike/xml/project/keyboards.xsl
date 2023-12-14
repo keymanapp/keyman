@@ -68,30 +68,34 @@
         </div>
       </div>
 
+      <xsl:call-template name="upgrade-warning" />
+
       <div class='filelist' id="keyboardlist">
         <xsl:call-template name="button">
           <xsl:with-param name="caption">New keyboard...</xsl:with-param>
           <xsl:with-param name="command">keyman:fileaddnew?type=keyboard</xsl:with-param>
           <xsl:with-param name="width">auto</xsl:with-param>
         </xsl:call-template>
-        <xsl:call-template name="button">
-          <xsl:with-param name="caption">Add existing keyboard...</xsl:with-param>
-          <xsl:with-param name="command">keyman:fileaddexisting?type=keyboard</xsl:with-param>
-          <xsl:with-param name="width">auto</xsl:with-param>
-        </xsl:call-template>
+        <xsl:if test="KeymanDeveloperProject/Options/Version != '2.0' or not(KeymanDeveloperProject/Options/Version)">
+          <xsl:call-template name="button">
+            <xsl:with-param name="caption">Add existing keyboard...</xsl:with-param>
+            <xsl:with-param name="command">keyman:fileaddexisting?type=keyboard</xsl:with-param>
+            <xsl:with-param name="width">auto</xsl:with-param>
+          </xsl:call-template>
+        </xsl:if>
         |
         <xsl:call-template name="button">
           <xsl:with-param name="caption">Build all</xsl:with-param>
           <xsl:with-param name="command">keyman:compileall</xsl:with-param>
           <xsl:with-param name="enabled">
-            <xsl:if test="not(KeymanDeveloperProject/Files/File[(FileType='.kps' or FileType='.kmn') and not (ParentFileID)])">false</xsl:if>
+            <xsl:if test="not(KeymanDeveloperProject/Files/File[(FileType='.kps' or FileType='.kmn' or FileType='.xml-ldml-keyboard') and not (ParentFileID)])">false</xsl:if>
           </xsl:with-param>
         </xsl:call-template>
         <xsl:call-template name="button">
           <xsl:with-param name="caption">Clean all</xsl:with-param>
           <xsl:with-param name="command">keyman:cleanall</xsl:with-param>
           <xsl:with-param name="enabled">
-            <xsl:if test="not(KeymanDeveloperProject/Files/File[(FileType='.kps' or FileType='.kmn') and not (ParentFileID)])">false</xsl:if>
+            <xsl:if test="not(KeymanDeveloperProject/Files/File[(FileType='.kps' or FileType='.kmn' or FileType='.xml-ldml-keyboard') and not (ParentFileID)])">false</xsl:if>
           </xsl:with-param>
           <xsl:with-param name="width">auto</xsl:with-param>
         </xsl:call-template>
@@ -100,7 +104,7 @@
           <xsl:with-param name="caption">Build keyboards</xsl:with-param>
           <xsl:with-param name="command">keyman:keyboard_compileall</xsl:with-param>
           <xsl:with-param name="enabled">
-            <xsl:if test="not(KeymanDeveloperProject/Files/File[FileType='.kmn' and not (ParentFileID)])">false</xsl:if>
+            <xsl:if test="not(KeymanDeveloperProject/Files/File[(FileType='.kmn' or FileType='.xml-ldml-keyboard') and not (ParentFileID)])">false</xsl:if>
           </xsl:with-param>
           <xsl:with-param name="width">auto</xsl:with-param>
         </xsl:call-template>
@@ -108,7 +112,7 @@
           <xsl:with-param name="caption">Clean keyboards</xsl:with-param>
           <xsl:with-param name="command">keyman:keyboard_cleanall</xsl:with-param>
           <xsl:with-param name="enabled">
-            <xsl:if test="not(KeymanDeveloperProject/Files/File[FileType='.kmn' and not (ParentFileID)])">false</xsl:if>
+            <xsl:if test="not(KeymanDeveloperProject/Files/File[(FileType='.kmn' or FileType='.xml-ldml-keyboard') and not (ParentFileID)])">false</xsl:if>
           </xsl:with-param>
           <xsl:with-param name="width">auto</xsl:with-param>
         </xsl:call-template>
@@ -116,7 +120,7 @@
         <br />
 
         <div>
-          <xsl:for-each select="KeymanDeveloperProject/Files/File[FileType='.kmn' and not(ParentFileID)]">
+          <xsl:for-each select="$SourceKeyboardFiles">
             <xsl:variable name="FileState" select="/KeymanDeveloperProject/FileStates/FileState[ID=current()/ID]" />
             <xsl:call-template name="file">
               <xsl:with-param name="file_description">
@@ -134,7 +138,7 @@
     </div>
   </xsl:template>
 
-  <xsl:template mode="options_menu" match="/KeymanDeveloperProject/Files/File[FileType='.kmn']" >
+  <xsl:template mode="options_menu" match="/KeymanDeveloperProject/Files/File[FileType='.kmn' or FileType='.xml-ldml-keyboard']" >
     <div class="menu">
       <xsl:attribute name="id">menu_options_<xsl:value-of select="ID"/></xsl:attribute>
       <xsl:call-template name="menuitem">
@@ -172,15 +176,17 @@
         <xsl:with-param name="command">keyman:openbuildfolder?id=<xsl:value-of select="ID" />
         </xsl:with-param>
       </xsl:call-template>
-      <xsl:call-template name="menuitem">
-        <xsl:with-param name="caption">Remove from Project</xsl:with-param>
-        <xsl:with-param name="command">keyman:removefile?id=<xsl:value-of select="ID" />
-        </xsl:with-param>
-      </xsl:call-template>
+      <xsl:if test="/KeymanDeveloperProject/Options/Version != '2.0' or not(/KeymanDeveloperProject/Options/Version)">
+        <xsl:call-template name="menuitem">
+          <xsl:with-param name="caption">Remove from Project</xsl:with-param>
+          <xsl:with-param name="command">keyman:removefile?id=<xsl:value-of select="ID" />
+          </xsl:with-param>
+        </xsl:call-template>
+      </xsl:if>
     </div>
   </xsl:template>
 
-  <xsl:template mode="filedetails" match="/KeymanDeveloperProject/Files/File[FileType='.kmn']">
+  <xsl:template mode="filedetails" match="/KeymanDeveloperProject/Files/File[FileType='.kmn' or FileType='.xml-ldml-keyboard']">
     <xsl:variable name="FileState" select="/KeymanDeveloperProject/FileStates/FileState[ID=current()/ID]" />
     <table class="filedetailtext">
       <xsl:if test="$FileState/FullPath">

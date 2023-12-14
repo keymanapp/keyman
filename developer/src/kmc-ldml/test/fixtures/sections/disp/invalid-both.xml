@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE keyboard3 SYSTEM "../../../../../../../resources/standards-data/ldml-keyboards/techpreview/dtd/ldmlKeyboard3.dtd">
+<keyboard3 locale="mt" conformsTo="techpreview">
+  <info name="disp-invalid"/>
+
+  <displays>
+    <display output="e" keyId="e" display="(e)"/> <!-- both to and id -->
+    <displayOptions baseCharacter="x" />
+  </displays>
+</keyboard3>

@@ -1,5 +1,618 @@
 # Keyman Version History
 
+## 17.0.229 alpha 2023-12-13
+
+* chore(ios): FV certificate key (#10228)
+* feat(core): action struct to action items conversion (#10115)
+* fix(developer): various project fixes (#10151)
+* feat(developer): Add Window menu (#10154)
+* feat(developer): New Project opens in new process (#10155)
+* fix(developer): two errors in touch layout editor (#10211)
+* feat(developer): Move options to ~/.keymandeveloper/options.json (#10216)
+* feat(core): ldml improve key-not-found (#10090)
+* fix(core): remove a TODO-LDML (#10198)
+* fix(core): improve memory allocation issues in calling into icu (#10222)
+
+## 17.0.228 alpha 2023-12-11
+
+* chore(mac): force detach of disk image during build after 5 failures (#10201)
+* chore(linux): Small refactoring to make it easier to read (#10196)
+* chore(common): Specify Keyman repo on GitHub actions (#10203)
+* chore(android,mac): Update Kibaku crowdin strings (#10174)
+* chore(android,mac): Update Mon crowdin strings (#10175)
+* fix(developer): crash loading a project when referenced .xml is missing (#10209)
+* feat(developer): kmc emit hint if project file is old version (#10158)
+* fix(common): kpj loader needs to handle empty Files element (#10157)
+
+## 17.0.227 alpha 2023-12-08
+
+* fix(windows): debug includes libcmtd vs libcmt.dll (#10176)
+* fix(linux): Do not restart Fcitx (#10180)
+
+## 17.0.226 alpha 2023-12-07
+
+* fix(web): accidental suggestion-banner retoggle when disabling predictions (#10014)
+* fix(web): Fix null error with legacy keyboards (#10141)
+
+## 17.0.225 alpha 2023-12-06
+
+* feat(developer): Multi-process model for projects (#10114)
+* fix(developer): prevent opening .kpj in multiple processes (#10137)
+* fix(android/app): InfoActivity pass external links to browser (#10153)
+
+## 17.0.224 alpha 2023-12-05
+
+* chore(linux): Update debian changelog (#10121)
+
+## 17.0.223 alpha 2023-12-04
+
+* chore(web): Add option to create test coverage report file (#10124)
+
+## 17.0.222 alpha 2023-12-02
+
+* fix(common): publish @keymanapp/developer-utils as npm module (#10118)
+
+## 17.0.221 alpha 2023-12-01
+
+* chore(windows): removed cached context windows engine (#10065)
+* change(android): flishy flashy mitigation, round 1 (#10017)
+* change(android): smoother keyboard initialization (#10022)
+* fix(android): no suggestions available when swapping pred-text target language (#10061)
+* chore(developer): require project file to exist (#10092)
+* chore(linux): Add support for loong64 architecture (#10109)
+* fix(web): Don't throw errors after detach (#10086)
+
+## 17.0.220 alpha 2023-11-30
+
+* fix(core): set_if_needed updates an empty cached context (#10098)
+* fix(core): check for null termination (#10101)
+
+## 17.0.219 alpha 2023-11-29
+
+* fix(developer): path separator for kmc-package (#10064)
+* fix(developer): projects 2.0 internal path enumeration (#10016)
+* fix(web): Fix attachment-api tests (#10085)
+* fix(web): Also move source map (#10089)
+
+## 17.0.218 alpha 2023-11-27
+
+* feat(developer): ldml: err/hint on illegal/pua chars (#10029)
+
+## 17.0.217 alpha 2023-11-24
+
+* feat(developer): warn on usage of virtual keys in rule output (#10062)
+* fix(core): memory management of options in action struct (#10073)
+* chore(linux): Update debian changelog (#10047)
+* chore(core): Add test keyboard for text selection tests (#10026)
+
+## 17.0.216 alpha 2023-11-23
+
+* fix(common): kmx struct alignment (#9977)
+* fix(developer): vis kbd callbacks instead of throw (#9979)
+* fix(core): dx: ldml: startContext should be optional in ldml test data (#10021)
+* chore(windows): remove `wm_keymandebug` messages and functions (#10055)
+* chore(windows): remove legacy LoadKeyboard (#10057)
+* chore(windows): remove unused globals relating to old keyboard debugging (#10058)
+* chore(core): remove vkey output from kmx processor (#10060)
+* fix(web): app/webview did not clear deadkeys on context-reset (#10039)
+
+## 17.0.215 alpha 2023-11-22
+
+* feat(core): ldml marker normalization (#9761)
+* feat(core): ldml backspace transform (#9960)
+* feat(core): ldml tertiary reordering (#9962)
+* fix(web): fixes OSK viewport scaling on iOS devices (#10035)
+
+## 17.0.214 alpha 2023-11-20
+
+* fix(ios): fv: replace Zip framework to prevent crash on startup (#10018)
+
+## 17.0.213 alpha 2023-11-17
+
+* fix(linux): Fix packaging GHA (#10020)
+* fix(android): Always display HTML banner when suggestions aren't available (#9696)
+
+## 17.0.212 alpha 2023-11-16
+
+* chore(web): splits banner.ts into separate files per banner type (#9987)
+* refactor(web): inactive banner management (#9988)
+
+## 17.0.211 alpha 2023-11-15
+
+* fix(windows): setup.inf generation had whitespace (#10000)
+* feat(developer): Support v2.0 projects in TIKE (#9949)
+* feat(developer): New Project - Description field and tweaks (#9950)
+* chore(developer): hide 'Remove From Project' for v2.0 projects (#9956)
+* feat(developer): Support loading XML LDML keyboards in TIKE (#9963)
+* feat(developer): show .xml LDML keyboards in project (#9964)
+* fix(developer): kmc build ldml keyboard should create output folder (#9966)
+* fix(developer): Project upgrade messages now show in Messages panel (#9969)
+* feat(developer): Project Settings Form for 17.0+ projects (#9984)
+* chore(developer): only build source files (#9985)
+* chore(developer): manage SourcePath in project upgrade (#9986)
+* feat(developer): handle errors loading projects (#9989)
+* chore(developer): show only source path files in project views (#9995)
+* chore(developer): handle project version checks cleanly in kmc (#9996)
+* fix(common): dx: don't call exit(0) on failure (#10005)
+* fix(linux): Improve triggering of packaging GHA (#10009)
+* chore(web,developer): Move keymanweb-osk.ttf to common/resources (#9993)
+
+## 17.0.210 alpha 2023-11-14
+
+* docs(common): Update CODEOWNERS for web (#9997)
+* chore(core): Add additional API checks (#9867)
+
+## 17.0.209 alpha 2023-11-13
+
+* docs(windows): update meson and emscripten details (#9933)
+* fix(web): Increase size of spacebar text (#9954)
+
+## 17.0.208 alpha 2023-11-08
+
+* fix(web): Fix clearing of deadkeys (#9944)
+* fix(web): Ignore `osk-always-visible` on non-desktop devices (#9951)
+* fix(linux): Fix baseline tests (#9967)
+* chore(linux): Fix GHA triggering (#9965)
+* fix(linux): Fix trigger for baseline tests (#9968)
+
+## 17.0.207 alpha 2023-11-07
+
+* refactor(web): Link to `index.html` in test pages (#9953)
+* feat(developer): Add more non-printing characters (#9846)
+
+## 17.0.206 alpha 2023-11-06
+
+* chore(developer): remove compile.pas and CompileErrorCodes.pas (#9924)
+* chore(common): remove prepublish step from package.json (#9937)
+* feat(developer): provide line number for some kmw compiler messages (#9938)
+* fix(developer): Sentry in Server should honour reporting settings (#9940)
+* fix(developer): resilience in loading Server config and cache files (#9941)
+
+## 17.0.205 alpha 2023-11-03
+
+* fix(developer): use KeymanWeb.Codes for 17.0+ (#9913)
+* fix(developer): don't use osk-always-visible on touch devices (#9917)
+* chore(linux): Improve repository_dispatch (#9865)
+* chore(linux): Refactor deb-packaging.sh script (#9866)
+* chore(linux): Add Core API version number (#9877)
+* fix(developer): kmc code generation for context(n) in context (#9932)
+* chore(developer): remove obsolete 'Allow Multiple Instances' and 'Use Legacy Compiler' options (#9934)
+* chore(developer): common/include dep for kmcmplib (#9935)
+* feat(common): ldml update to WIP cldr data (#9919)
+
+## 17.0.204 alpha 2023-11-02
+
+* fix(web): fixes doc-kbd display of default layer when it's not defined first (#9891)
+* fix(developer): compiler crash when no project loaded (#9898)
+* fix(developer): debug flag for compiling keyboards (#9901)
+* chore(developer): verify kmp.json output from kmc-package (#9844)
+* fix(developer): Project MRU now saves correctly (#9902)
+* chore(common): fixup SchemaValidators error handling (#9903)
+* chore(developer): change field label to 'Related Package ID' in Related Packages dialog (#9904)
+* fix(developer): open editor links in new window (#9905)
+* fix(developer): enable and update unit tests (#9907)
+* fix(developer): layout builder - maintain presentation during undo (#9914)
+* feat(developer): extract font family from .ttf in kmc-keyboard-info (#9859)
+* fix(developer): raise error if virtual key in context string (#9908)
+* feat(developer): Compile button in TIKE toolbar (#9910)
+* chore(developer): rename messages.ts for clarity (#9920)
+* fix(developer): warn if layer switch key is missing ID (#9921)
+* fix(developer): restore selection in layout builder even with duplicate ids (#9922)
+* fix(developer): enable line breaks in debugger (#9906)
+
+## 17.0.203 alpha 2023-10-30
+
+* fix(linux): Fix uninstallation of shared keyboard (#9880)
+* chore: include ci/pull-requests.inc.sh for help uploads (#9897)
+
+## 17.0.202 alpha 2023-10-30
+
+* chore(common): unify pull-request creation scripts (#9888)
+* epic: Keyman Core for Mac (#7857)
+
+## 17.0.201 alpha 2023-10-28
+
+* fix(core): build: support -t parameter correctly (#9820)
+* fix(developer): handle displayMap correctly with 'fill from layout' (#9861)
+
+## 17.0.200 alpha 2023-10-27
+
+* chore(developer,common,core): update to latest CLDR v44 (#9842)
+
+## 17.0.199 alpha 2023-10-26
+
+* fix(developer): handle xml errors in package compiler (#9821)
+* fix(developer): server download Keyman link (#9822)
+* chore(common): handle invalid XML in kpj-file-reader (#9824)
+* fix(developer): reduce confusion in Unicode fields in touch layout editor (#9839)
+
+## 17.0.198 alpha 2023-10-25
+
+* chore(common): Add entries from 16.0 HISTORY.md (#9826)
+* feat(core): new actions APIs (#9828)
+
+## 17.0.197 alpha 2023-10-24
+
+* chore(linux): Rename (lib)kmnkbp to (lib)keymancore  ️ (#9793)
+* chore(linux): Rename `namespace kbp` to `core`  ️ (#9792)
+* chore(linux): rename keyboardprocessor_ldml.* to keyman_core_ldml  ️ (#9791)
+* chore(linux): Rename libkmnkbp0-0 package  ️ (#9795)
+* fix(web): proper disabling of prediction timeout for prediction unit tests (#9835)
+
+## 17.0.196 alpha 2023-10-20
+
+* fix(mac): move keyboard menu items to main Input Menu from submenu (#9777)
+*  (#9728)
+*  (#9759)
+* docs(common): macos build update (#9809)
+* fix(web): enhances integrated test stability (#9718)
+* chore(linux): Update packaging GHA  ️ (#9812)
+* chore(linux): Rename KBP to CORE  ️ (#9794)
+* chore(linux): Fix build by adding one character (#9817)
+
+## 17.0.195 alpha 2023-10-19
+
+* chore(linux): Allow to collect coverage on TC (#9790)
+* fix(common): don't use URL in common/web/types (#9798)
+* chore: update kmp.schema.json and docs for kps schema (#9800)
+* docs(windows): update text and images for windows 11 (#9689)
+
+## 17.0.194 alpha 2023-10-18
+
+* chore(linux): Re-enable building for Ubuntu 23.10 Mantic (#9780)
+* chore(linux): Add missing tests (#9783)
+* fix(web): fixes touch form-factor default kbd on cookieless keymanweb.com page load (#9786)
+* fix(developer): three kmc .keyboard_info generation bugs (#9784)
+* fix(developer): handle invalid project folders cleanly (#9785)
+* chore(linux): Fix build scripts (#9781)
+
+## 17.0.193 alpha 2023-10-17
+
+* fix(developer): kmc crash on start (#9771)
+* fix(core): don't use double newlines in debuglog (#9258)
+* chore(linux): Add code coverage index page (#9758)
+* feat(linux): Allow installing keyboards with arbitrary language  ️ (#9756)
+* fix(linux): Fix crash initializing Sentry with Python < 3.10 (#9774)
+* chore(linux): Rename `kbp_state_get_intermediate_context` to `km_core…`  ️ (#9775)
+
+## 17.0.192 alpha 2023-10-16
+
+* fix(ios): missing backslash in build script (#9765)
+* chore(linux): Speed up ibus-util tests (#9754)
+* feat(linux): Allow loading of keyboards with arbitrary language  ️ (#9735)
+
+## 17.0.191 alpha 2023-10-15
+
+* chore: update readme for keyboard_info schema (#9746)
+
+## 17.0.190 alpha 2023-10-12
+
+* chore(web): web build streamlining (#9743)
+* chore(linux): Add code coverage reports for keyman-config and keyman-system-service (#9753)
+
+## 17.0.189 alpha 2023-10-11
+
+* refactor(linux): Use auto cleanup (and fix some memory leaks) (#9648)
+* refactor(linux): Simplify adding keyboard (#9734)
+
+## 17.0.188 alpha 2023-10-11
+
+* chore(android,windows): Update crowdin strings for Kannada (#9737)
+
+## 17.0.187 alpha 2023-10-11
+
+* chore(developer): convert Server to ES Modules (#9673)
+* chore(common): convert hextobin to ES Modules (#9676)
+* chore(common): convert resources/build/version to ES Modules (#9678)
+* chore(common): keyman-version now generates only es module (#9680)
+* chore(common): cleanup final Typescript non-ESM metadata (#9681)
+* chore(ios): renew certificate (#9697)
+*  (#9687)
+* feat(developer): ldml fix all remaining TODOs around markers and variables (#9688)
+* fix(windows): re-enable signature check (#9695)
+* fix(common): fix schema fixer (#9727)
+* chore(core): rename keyboardprocessor.h to keyman_core_api.h (#9723)
+* chore: rename km_kbp_ to km_core_ (#9724)
+* chore(developer): fixup signcode paths for server (#9730)
+* fix(linux): Explicitly initialize GTK (#9706)
+* chore(linux): Improve Sentry reports (#9725)
+* epic(developer): refactor package-metadata for 17.0 (#9485)
+* chore: clean up a few minor discrepancies in builder.inc.sh (#9731)
+* fix: path for ESM increment-version, and exit code (#9738)
+
+## 17.0.186 alpha 2023-10-04
+
+* feat(developer): show an INFO message when warnings have failed a build (#9652)
+* chore(developer): reduce duplicate words warning to hint (#9653)
+* feat(developer): issue hint if package includes keyboard source files (#9658)
+* chore(developer): switch on code coverage reporting for kmc (#9662)
+* fix(core): clean cached ICU in core (#9668)
+* feat(developer): warn if .kps includes a .js which is not touch-capable (#9667)
+
+## 17.0.185 alpha 2023-10-03
+
+* chore(web): Add non-printing characters to the OSK (#9547)
+* feat(developer): support `store(&version) '17.0'` (#9656)
+* chore(developer): add test for `checkFilenameConventions == false` or unset (#9661)
+* feat(developer): ldml scan codes support (#9615)
+
+## 17.0.184 alpha 2023-10-02
+
+* fix(web): fixes toolbar refocus timing after a keyboard change (#9618)
+
+## 17.0.183 alpha 2023-09-29
+
+* feat(web): browser-KMW support for default subkeys (#9496)
+* refactor(linux): Add more tests for `keymanutil.c`  ️ (#9595)
+
+## 17.0.182 alpha 2023-09-28
+
+* chore(web): builds that output to web/build/publish should also clean it (#9613)
+* chore(linux): Dynamically choose display number (#9629)
+* docs(linux): Update sample tasks.json for Linux (#9634)
+* chore(common): Add Crowdin strings for Mon (#9550)
+* fix(developer): only include mobile touch platform in basic project (#9549)
+* fix(windows): fix the ellipsis for longer text on buttons (#9638)
+
+## 17.0.181 alpha 2023-09-26
+
+* chore: workaround npm/cli#3466 when bundling internal deps (#9536)
+* chore(linux): Check and restart background processes (#9608)
+
+## 17.0.180 alpha 2023-09-25
+
+* fix(linux): Fix detection of unit tests (#9606)
+
+## 17.0.179 alpha 2023-09-22
+
+* chore(resources): ldml: update to keyboard3 (#9588)
+* change(android,web) Use web-based popup key longpresses (#9591)
+
+## 17.0.178 alpha 2023-09-21
+
+* fix(linux): Correctly open files linked from help page (#9601)
+* chore(linux): Fix bugs, add dependency and update documentation (#9602)
+
+## 17.0.177 alpha 2023-09-20
+
+* chore(linux): Add coverage action to `ibus-keyman/build.sh` (#9583)
+* docs(common): Fix documentation for `builder_describe_internal_dependency` (#9582)
+
+## 17.0.176 alpha 2023-09-19
+
+* chore(oem/fv/android): Update Gradle to 7.4 (#9590)
+* refactor(linux): Rename defines to clarify purpose  ️ (#9584)
+*  (#9560)
+
+## 17.0.175 alpha 2023-09-18
+
+* chore(linux): Split startup process (#9570)
+
+## 17.0.174 alpha 2023-09-16
+
+* refactor(linux): Reformat file (#9569)
+
+## 17.0.173 alpha 2023-09-13
+
+* chore(common): Update to Unicode 15.1 (#9555)
+
+## 17.0.172 alpha 2023-09-12
+
+* fix(linux): Prevent exception if neither USER, LOGNAME nor SUDO_USER set (#9543)
+* chore(linux): Exclude environment.sh from build (#9553)
+
+## 17.0.171 alpha 2023-09-01
+
+* chore(linux): Add `clean` target to `rules` (#9531)
+
+## 17.0.170 alpha 2023-08-31
+
+* fix(common): builder_parse broke on option parameters (#9489)
+* docs(linux): Explicitly specify emscripten version (#9527)
+
+## 17.0.169 alpha 2023-08-30
+
+* fix(linux): Fix exception in km-kvk2ldml (#9523)
+
+## 17.0.168 alpha 2023-08-29
+
+* refactor(linux): Fix warning (#9513)
+
+## 17.0.167 alpha 2023-08-25
+
+* feat(core): implement mapped set mapping (#9504)
+* feat(resources): add pcm keyboard (#9508)
+
+## 17.0.166 alpha 2023-08-24
+
+* chore(common): Update crowdin strings for French (#9505)
+
+## 17.0.165 alpha 2023-08-23
+
+* feat(core): add display=id (#9484)
+
+## 17.0.164 alpha 2023-08-22
+
+* fix(common): don't crash on illegal unicodesets (#9492)
+
+## 17.0.163 alpha 2023-08-21
+
+* chore(web): Update keymanweb-osk.ttf to v. 3.0 (#9469)
+
+## 17.0.162 alpha 2023-08-18
+
+*  (#9483)
+* fix(windows): allow QR share box to grow to edge of default configuration parent window (#9472)
+* chore(resources):  update CLDR to post-PRI (#9482)
+
+## 17.0.161 alpha 2023-08-16
+
+*  (#9440)
+
+## 17.0.160 alpha 2023-08-14
+
+* feat(core): limit max marker to 0xD7FF (#9448)
+
+## 17.0.159 alpha 2023-08-11
+
+*  (#9405)
+
+## 17.0.158 alpha 2023-08-09
+
+* chore(linux): Disable Mantic builds on Launchpad (#9435)
+* feat(windows): Use Keyboard Activated event API call to turn off caps lock (if required) (#9353)
+* chore: stats script parameters (#9431)
+* feat(developer): add 'default' property for longpress keys (#9432)
+* chore(developer): improve kmc sentry reporting on fatal build errors (#9441)
+
+## 17.0.157 alpha 2023-08-08
+
+* fix(linux): fix memory leaks and method name (#9413)
+
+## 17.0.156 alpha 2023-08-07
+
+* epic: kmc-kmw KeymanWeb compiler in Typescript (#8954)
+
+## 17.0.155 alpha 2023-08-05
+
+* chore(developer): update markers per review (#9374)
+
+## 17.0.154 alpha 2023-08-04
+
+* chore(common): Update crowdin GHA to trigger daily (#9410)
+* fix(web): forgot to target es5 when minifying polyfilled worker (#9409)
+* chore(common): Update history.md with 16.0 stable entries (#9419)
+
+## 17.0.153 alpha 2023-08-03
+
+* docs(windows): Update OS requirement to Windows 10 (#9381)
+* fix(web): maintenance of focus when changing keyboard via Toolbar UI (#9397)
+* chore(linux): Remove Kinetic from GHA (#9399)
+* chore(linux): Properly treat test builds with packaging GHA (#9400)
+
+## 17.0.152 alpha 2023-08-02
+
+* fix(developer): more wasm uset fixes (#9382)
+* docs(windows): corrected nmake cmd for certificates (#9376)
+* chore: add run-name to deb-packaging (#9386)
+* chore: try another variable for reporting (#9388)
+* chore(linux): Remove package build on Jenkins for Keyman 17 (#9380)
+* docs(linux): Add build doc for Keyman Web and Android (#9383)
+
+## 17.0.151 alpha 2023-08-01
+
+* feat(developer) marker steps (#9364)
+* feat(common): marker processing (#9365)
+* chore(linux): Don't fail on parallel builds (#9368)
+* fix(developer): fix breakage from emscripten 3.1.44 (#9375)
+* docs(core): Document how to build Core on Linux (#9328)
+
+## 17.0.150 alpha 2023-07-31
+
+* chore(linux): Update debian changelog (#9358)
+* chore(linux): Fix creation of PRs after uploading to Debian (#9360)
+
+## 17.0.149 alpha 2023-07-30
+
+* fix(core): Better range check for Uni_IsValid() (#9346)
+* chore(core): update documentation in transform logic and processor (#9352)
+
+## 17.0.148 alpha 2023-07-27
+
+* feat(core): merge transform/reorder processing w/ u32 (#9293)
+* chore(developer): make unknown vkey a hint, not error (#9344)
+* chore(linux): Update supported Ubuntu versions (#9341)
+
+## 17.0.147 alpha 2023-07-25
+
+* chore(linux): Update debian changelog (#9327)
+
+## 17.0.146 alpha 2023-07-24
+
+* chore(deps-dev): bump word-wrap from 1.2.3 to 1.2.4 (#9314)
+
+## 17.0.145 alpha 2023-07-21
+
+* fix(linux): Fix logging (#9310)
+* fix(windows): open pdf in an external browser (#9295)
+* fix(linux): Fix installation of keyboards with lang tag `mul` (#9027)
+* fix(web): allows registering precached keyboards (#9304)
+
+## 17.0.144 alpha 2023-07-20
+
+* refactor(linux): Use better way to get username (#9313)
+
+## 17.0.143 alpha 2023-07-19
+
+*  (#9292)
+* docs(linux): Update man page and remove do-nothing option (#9291)
+* docs(linux): Update documentation (#9277)
+
+## 17.0.142 alpha 2023-07-17
+
+* chore(windows): disable wix compression for debug builds (#9074)
+
+## 17.0.141 alpha 2023-07-15
+
+* feat(core): implement reorder (#9223)
+* chore(common): add BUILDER_STR_REF (#9248)
+* feat(core): load reorder from kmx+, test case (#9260)
+
+## 17.0.140 alpha 2023-07-14
+
+*  (#9008)
+
+## 17.0.139 alpha 2023-07-13
+
+*  (#9259)
+* chore(linux): Add unit tests for dconf_util.py (#9215)
+* refactor(linux): Refactor image loading (#9245)
+
+## 17.0.138 alpha 2023-07-11
+
+* chore: Update standards data (#9193)
+* chore(linux): Trigger Linux integration tests (#9221)
+
+## 17.0.137 alpha 2023-07-10
+
+* chore: authenticate github request when triggering test builds (#9225)
+* feat(web): logs enhanced debug info for error reports (#9217)
+* fix(web): silences low-priority warning that shows up in iOS kbd init (#9206)
+
+## 17.0.136 alpha 2023-07-07
+
+* chore(common): Update crowdin strings for Kibaku (#9214)
+* feat(core): kmxplus uset implementation in core (#9197)
+* chore(linux): Add support for `--no-integration` flag to build files (#9212)
+*  (#9196)
+
+## 17.0.135 alpha 2023-07-06
+
+*  (#9195)
+* chore(ios): minor build-script cleanup (#9201)
+* chore(linux): Allow to run tests without integration tests (#9192)
+* fix(web): sentry sourcemapping round 2 - yesterday's 'fix' unfortunately doesn't upload the maps (#9199)
+* chore(web): normalizes sourcemap paths for cleaner Sentry reports (#9200)
+* feat(linux): Allow to install keyboard for multiple languages (#9017)
+
+## 17.0.134 alpha 2023-07-05
+
+* fix(linux): Fix packaging GHA (#9172)
+* chore(ios): standardizes iOS build scripts (#9092)
+* fix(web): fixes up Web's InlinedOSK manual test page (#9175)
+* fix(web): re-establishes web srcmap uploading (#9179)
+* refactor(linux): Code refactoring (#9129)
+* refactor(linux): Extract methods (#9168)
+* fix(linux): Fix vertical alignment of labels in About dialog (#9167)
+* fix(linux): Add scrollbar to About dialog (#9166)
+* fix(linux): Remove tags from package description (#9165)
+* docs(linux): Update readme (#9190)
+* feat(developer): uset in element string (#9144)
+* fix(developer): improve coverage, add todos (#9170)
+* chore(developer): refactor so KmnCompiler only created once within kmc (#9171)
+* fix(common): support multichar escapes in element sets (#9173)
+* chore(linux): Update docker builds (#9188)
+
 ## 17.0.133 alpha 2023-07-04
 
 * feat(common): add segmenter for element strings (#9141)
@@ -776,6 +1389,67 @@
 * chore: move to 17.0-alpha (#7577)
 * chore: Move to 17.0 alpha
 
+## 16.0.142 stable 2023-10-20
+
+* chore(linux): Update debian changelog (#9326)
+* chore(linux): Remove obsolete dist from uploading to launchpad (#9340)
+* chore(linux): Stop building Kinetic on Jenkins (#9354)
+* chore(linux): Work around build failure on Debian mips64el (#9342)
+* chore(linux): Update debian changelog (#9359)
+* chore(android): Update targetSDKVersion to 33 (#9494)
+* chore(linux): Remove workaround for mips64el (#9519)
+* chore(linux): Workaround: Don't run Wayland tests (#9530)
+* chore(linux): Add `clean` target to `rules` (#9532)
+* fix(linux): Prevent exception if neither USER, LOGNAME nor SUDO_USER set (#9544)
+* chore(linux): Ignore tests that fail on ba-jammy-64-ta (#9556)
+* chore(ios): renew certificate (#9811)
+* fix(mac): move keyboard menu items to main Input Menu from submenu (#9810)
+
+## 16.0.141 stable 2023-07-25
+
+* chore(mac): fix corrupt installer (#9332)
+
+## 16.0.140 stable 2023-07-21
+
+* chore(linux): Update debian changelog (#8451)
+* chore(linux): Prevent building on s390x (#8476)
+* fix(linux): Display error message for corrupt .kmp file (#8480)
+* chore(linux): Run and ignore autopkgtests on s390x (#8491)
+* chore(linux): Revert "Run and ignore autopkgtests on s390x" (#8505)
+* chore(ios): Xcode 14 upgrade (#8487)
+* fix(developer): package editor no longer loses RTL flag for LMs (#8607)
+* chore(common): use mac /usr/bin/stat rather than homebrew version (#8925)
+* chore(ios): replace fv cert (#8923)
+* fix(core): Fix compilation if hotdoc is installed :cherries: (#8929)
+* chore(linux): Move some files to keyman-config :cherries: (#8930)
+* fix(core): Fix compiling with GCC 13 (#8932)
+
+## 16.0.139 stable 2023-03-16
+
+* chore: Fail TC build if triggering Jenkins build fails (#8141)
+* chore(linux): Fix lintian warnings (#8153)
+* chore(linux): Update debian changelog (#8155)
+* chore(ios): update certificate (#8177)
+* cherrypick(windows): Fix Portuguese UI language name (#8190)
+* fix(linux): Fix autopkgtests (#8180)
+* chore(linux): Update changelog from Debian (#8191)
+* cherrypick(common): Cleanup Kannada locale (#8189)
+* fix(windows): add remove lang id uses correct kbd (#8195)
+* fix(linux): Fix autopkgtests (#8200)
+* chore(linux): Exclude autopkg tests on s390x (#8217)
+* chore(common): Update Fula strings for Sprint A17S6 (#8246)
+* chore(windows): Remove old Kannada setup strings (#8258)
+* fix(linux): Fix debian postinst script (#8295)
+* fix(developer): lm compiler handle missing line no in errors (#8445)
+
+## 16.0.138 stable 2023-02-01
+
+* chore: add new developer build trigger (#8139)
+
+## 16.0.137 stable 2023-02-01
+
+* chore(common): Release 16.0
+
 ## 16.0.136 beta 2023-01-31
 
 * chore(common): Update crowdin strings for Shuwa (Latin) (#8097)
@@ -1118,6 +1792,7 @@
 * fix(linux): Fix upload script (#7494)
 * docs(linux): Update sample vscode settings (#7491)
 * fix(android/engine): Dismiss key preview and subkeys on globe action (#7472)
+* refactor(linux): Cleanup whitespace (#7500)
 * chore(linux): Improve debug output (#7499)
 
 ## 16.0.84 alpha 2022-10-19
@@ -1405,7 +2080,7 @@
 ## 16.0.34 alpha 2022-07-15
 
 * fix(developer): set contextDevice in web debugger  ️ (#6906)
-* fix(web): postkeystroke processing should ignore key-event source ️ (#6901)
+* fix(web): postkeystroke processing should ignore key-event source (#6901)
 * fix(web): layer-setting ops should not trigger for hardware keystroke processing  ️ (#6902)
 * fix(developer): kmdecomp virtual character key output (#6940)
 * fix(developer): crash on exit when checking for updates (#6941)

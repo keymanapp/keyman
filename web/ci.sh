@@ -5,7 +5,6 @@
 #
 
 # set -x
-set -eu
 
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
@@ -14,8 +13,7 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 . "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
-
-WORKING_DIRECTORY=`pwd`
+. "$KEYMAN_ROOT/resources/build/ci/pull-requests.inc.sh"
 
 # This script runs from its own folder
 cd "$THIS_SCRIPT_PATH"
@@ -24,15 +22,15 @@ cd "$THIS_SCRIPT_PATH"
 
 S_KEYMAN_COM=
 
-builder_describe "Defines and implements the CI build steps for Keyman Engine for Web (KMW)." \
+builder_describe "CI processes for Keyman Engine for Web releases (KMW)." \
   "@/web/src/tools/building/sourcemap-root prepare:s.keyman.com" \
   "build" \
-  "test                         Runs all unit tests."  \
-  "post-test                    Runs post-test cleanup.  Should be run even if a prior step fails." \
+  "test                         Runs all unit tests" \
+  "post-test                    Runs post-test cleanup. Should be run even if a prior step fails" \
   "validate-size                Runs the build-size comparison check" \
   "prepare                      Prepare upload artifacts for specified target(s)" \
-  ":s.keyman.com                Target:  builds artifacts for s.keyman.com " \
-  ":downloads.keyman.com        Target:  builds artifacts for downloads.keyman.com" \
+  ":s.keyman.com                Builds artifacts for s.keyman.com" \
+  ":downloads.keyman.com        Builds artifacts for downloads.keyman.com" \
   "--s.keyman.com=S_KEYMAN_COM  Sets the root location of a checked-out s.keyman.com repo"
 
 builder_parse "$@"
@@ -43,18 +41,13 @@ TIER=`cat ../TIER.md`
 BUILD_NUMBER=`cat ../VERSION.md`
 
 function web_sentry_upload () {
-  if [ $1 = "webview" ]; then
-    # There is no "publish" version for app/webview; it's "published" inside our mobile apps.
-    ARTIFACT_FOLDER="$KEYMAN_ROOT/web/build/app/webview/release/"
-  elif [ $1 = "browser" ]; then
-    ARTIFACT_FOLDER="$KEYMAN_ROOT/web/build/publish/release/"
-  fi
+  echo "Uploading $1 to Sentry..."
 
-  pushd "$ARTIFACT_FOLDER"
-  echo "Uploading to Sentry..."
-  sentry-cli releases files "$VERSION_GIT_TAG" upload-sourcemaps --strip-common-prefix "@keymanapp/keyman/" --rewrite --ext js --ext map --ext ts || fail "Sentry upload failed."
+  # --strip-common-prefix does not take an argument, unlike --strip-prefix.  It auto-detects
+  # the most common prefix instead.
+  sentry-cli releases files "$VERSION_GIT_TAG" upload-sourcemaps --strip-common-prefix "$1" \
+    --rewrite --ext js --ext map --ext ts
   echo "Upload successful."
-  popd
 }
 
 if builder_start_action build; then
@@ -68,8 +61,16 @@ if builder_start_action build; then
   # - --ci:       For app/browser, outputs 'release' config filesize profiling logs
   ./build.sh configure clean build --ci
 
-  web_sentry_upload webview
-  web_sentry_upload browser
+  # Upload the sentry-configuration engine used by the mobile apps to sentry
+  # Also, clean 'em first.
+  for sourcemap in "$KEYMAN_ROOT/common/web/sentry-manager/build/lib/"*.map; do
+    node "$KEYMAN_ROOT/web/build/tools/building/sourcemap-root/index.js" null "$sourcemap" --clean
+  done
+  web_sentry_upload "$KEYMAN_ROOT/common/web/sentry-manager/build/lib/"
+
+  # And, of course, the main build-products too
+  web_sentry_upload "$KEYMAN_ROOT/web/build/app/webview/release/"
+  web_sentry_upload "$KEYMAN_ROOT/web/build/publish/release/"
 
   builder_finish_action success build
 fi
@@ -84,8 +85,9 @@ if builder_start_action test; then
 
   # No --reporter option exists yet for the headless modules.
 
-  $KEYMAN_ROOT/common/web/keyboard-processor/build.sh test $OPTIONS
-  $KEYMAN_ROOT/common/web/input-processor/build.sh test $OPTIONS
+  "$KEYMAN_ROOT/common/web/keyboard-processor/build.sh" test $OPTIONS
+  "$KEYMAN_ROOT/common/web/input-processor/build.sh" test $OPTIONS
+  "$KEYMAN_ROOT/common/web/gesture-recognizer/test.sh" $OPTIONS
 
   ./build.sh test $OPTIONS
 
@@ -148,7 +150,15 @@ if builder_start_action prepare:s.keyman.com; then
     node "$KEYMAN_ROOT/web/build/tools/building/sourcemap-root/index.js" null "$sourcemap" --sourceRoot "https://s.keyman.com/kmw/engine/$VERSION/src"
   done
 
-  # Actual construction of the PR will be left to CI-config scripting for now.
+  # Construct the PR
+  echo "Committing and pushing KeymanWeb release $VERSION to s.keyman.com"
+
+  ci_add_files "$S_KEYMAN_COM" "kmw/engine/$VERSION"
+  if ! ci_repo_has_cached_changes "$S_KEYMAN_COM"; then
+    builder_die "No release was added to s.keyman.com, something went wrong"
+  fi
+
+  ci_open_pull_request "$S_KEYMAN_COM" auto/keymanweb/release "auto: KeymanWeb release $VERSION"
 
   builder_finish_action success prepare:s.keyman.com
 fi

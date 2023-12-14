@@ -1,9 +1,9 @@
 
 import { constants } from "@keymanapp/ldml-keyboard-constants";
 import { KeysFlick, KMXPlusData, StrsItem } from "../kmx-plus.js";
-import { build_strs_index, BUILDER_STRS } from "./build-strs.js";
-import { build_list_index, BUILDER_LIST } from "./build-list.js";
-import { BUILDER_SECTION } from "./builder-section.js";
+import { build_strs_index, BUILDER_STR_REF, BUILDER_STRS } from "./build-strs.js";
+import { build_list_index, BUILDER_LIST, BUILDER_LIST_REF } from "./build-list.js";
+import { BUILDER_SECTION, BUILDER_U32CHAR } from "./builder-section.js";
 
 /* ------------------------------------------------------------------
  * keys section
@@ -13,15 +13,15 @@ import { BUILDER_SECTION } from "./builder-section.js";
  * This struct is a single <key> in the keys keybag
  */
 interface BUILDER_KEYS_KEY {
-  to: number; // str or single codepoint
+  to: BUILDER_STR_REF | BUILDER_U32CHAR; // str or single codepoint
   flags: number;
-  id: number; // str with original key id
+  id: BUILDER_STR_REF; // str with original key id
   _id: string; // original key id, for sorting
-  switch: number; // str with layer of new l
+  switch: BUILDER_STR_REF; // str with layer of new l
   width: number; // ceil((width||1)*10), so 12 for width 1.2
-  longPress: number; // list of longPress sequences
-  longPressDefault: number; // str with the default longPress target
-  multiTap: number; // list of multiTap sequences
+  longPress: BUILDER_LIST_REF; // list of longPress sequences
+  longPressDefault: BUILDER_STR_REF; // str with the default longPress target
+  multiTap: BUILDER_LIST_REF; // list of multiTap sequences
   flicks: number; // index into the flicks[] subtable for this flick list
 };
 
@@ -31,7 +31,7 @@ interface BUILDER_KEYS_KEY {
 interface BUILDER_KEYS_FLICKS {
   count: number; // number of BUILDER_KEYS_FLICK entries in this flick list
   flick: number; // index into the flick[] subtable of the first flick in the list
-  id: number; // str with the original id of this flicks
+  id: BUILDER_STR_REF; // str with the original id of this flicks
   _id: string; // copy of the flicks id, used for sorting during build
   _flicks: KeysFlick[]; // temporary copy of KeysFlick object
 };
@@ -40,9 +40,8 @@ interface BUILDER_KEYS_FLICKS {
  * This is a single <flick> element.
  */
 interface BUILDER_KEYS_FLICK {
-  directions: number; // list of cardinal/intercardinal directions
-  flags: number; //
-  to: number; // str or single codepoint
+  directions: BUILDER_LIST_REF; // list of cardinal/intercardinal directions
+  to: BUILDER_STR_REF; // str
 };
 
 
@@ -56,8 +55,6 @@ interface BUILDER_KEYS_KMAP {
  * Builder for the 'keys' section
  */
 export interface BUILDER_KEYS extends BUILDER_SECTION {
-  ident: number;
-  size: number;
   keyCount: number;
   flicksCount: number;
   flickCount: number;
@@ -108,8 +105,7 @@ export function build_keys(kmxplus: KMXPlusData, sect_strs: BUILDER_STRS, sect_l
     flicks._flicks.forEach((flick) => {
       keys.flick.push({
         directions: build_list_index(sect_list, flick.directions),
-        flags: flick.flags,
-        to: build_strs_index(sect_strs, flick.to),
+        to: build_strs_index(sect_strs, flick.keyId),
       });
       keys.flickCount++;
     });
