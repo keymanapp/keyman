@@ -1,37 +1,18 @@
-import { pluginForDowncompiledClassTreeshaking, prepareTslibTreeshaking } from '../es-bundling/build/index.mjs';
+import { iifeConfiguration, forES6, prepareTslibTreeshaking } from '../es-bundling/build/index.mjs';
 import esbuild from 'esbuild';
 import fs from 'fs';
 
-const esmConfiguration = {
-  alias: {
-    'tslib': '@keymanapp/tslib'
-  },
-  bundle: true,
-  minify: true,
-  format: "iife",
-  // minifyWhitespace: true,
-  // minifySyntax: true,
-  // // minifyIdentifiers: true,
-  plugins: [ pluginForDowncompiledClassTreeshaking ],
-  sourcemap: true,
-  sourcesContent: true,
-  target: "es6",
-  outExtension: { '.js': '.js'},
-  treeShaking: true,
-  conditions: ['es6-bundling']
-};
-
 const localConfig = {
-  ...esmConfiguration,
+  ...forES6(iifeConfiguration),
   entryPoints: {
     'index': './src/main/worker-main.ts',
   },
+  minify: true,
   outfile: './build/lib/temp/worker-main.js',
   // `esbuild`'s sourcemap output puts relative paths to the original sources from the
   // directory of the build output.  The following keeps repo structure intact and
   // puts our code under a common 'namespace' of sorts.
   sourceRoot: '@keymanapp/keyman/common/web/lm-worker/src/main',
-  tsconfig: 'tsconfig.json',
   // temp
   metafile: true
 }

@@ -21,6 +21,17 @@ export const iifeConfiguration: esbuild.BuildOptions = {
   treeShaking: true
 };
 
+export function forES6(config: esbuild.BuildOptions): esbuild.BuildOptions {
+  return {
+    ...config,
+    target: "es6",
+    conditions: ['es6-bundling'],
+    // Even if they'd be tree-shaken out, esbuild will fall over from their presence
+    // within an imported `@keymanapp/common-types`.
+    external: ['timers', 'buffer', 'events']
+  };
+}
+
 export function objRoot(entryPath: string) {
   const OBJ_REGEX = /^(.+)\/obj\//;
   const match = entryPath.match(OBJ_REGEX);
