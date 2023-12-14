@@ -16,7 +16,8 @@ cd "$THIS_SCRIPT_PATH"
 # ################################ Main script ################################
 
 builder_describe "Builds specialized event-related modules utilized by Keyman Engine for Web." \
-  "@/common/web/utils" \
+  "@/common/web/utils build" \
+  "@/common/web/keyboard-processor build" \
   "clean" \
   "configure" \
   "build" \

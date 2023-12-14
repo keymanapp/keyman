@@ -4,7 +4,6 @@ import { DeviceSpec } from "@keymanapp/keyboard-processor";
 import { type EmbeddedGestureConfig } from "keyman/engine/osk";
 
 import { GlobeHint } from './osk/globeHint.js';
-import { KeyTip } from './osk/keytip.js';
 import type KeymanEngine from "./keymanEngine.js";
 
 export function setupEmbeddedListeners(engine: KeymanEngine, osk: OSKView) {

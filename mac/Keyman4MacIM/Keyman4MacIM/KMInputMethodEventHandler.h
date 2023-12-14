@@ -16,7 +16,7 @@
 
 - (instancetype)initWithClient:(NSString *)clientAppId client:(id)sender;
 - (BOOL)handleEvent:(NSEvent *)event client:(id)sender;
-- (BOOL)handleDeleteBackLowLevel:(NSEvent *)event;
+- (void)handleBackspace:(NSEvent *)event;
 - (void)deactivate;
 
 @end

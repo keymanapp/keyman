@@ -21,7 +21,7 @@ describe("ManagedPromise", () => {
     assert.equal(text, "foobar");
   });
 
-  it('rejection', async () => {
+  it('reject:  await -> try-catch', async () => {
     let promise = new ManagedPromise();
 
     promise.reject(new Error("foobar"));
@@ -45,5 +45,61 @@ describe("ManagedPromise", () => {
     let val = await thenPromise;
 
     assert.deepEqual(val, {text: "foobar"});
+  });
+
+  it('reject:  then() -> catch() => finally()', async () => {
+    let promise = new ManagedPromise();
+
+    promise.reject(new Error("foobar"));
+
+    let caught = false;
+    let final = false;
+
+    await promise.then(
+      () => assert.fail()
+    ).catch((err) => {
+      assert.equal(err.message, "foobar");
+      caught = true;
+    }).finally(() => {
+      final = true;
+    });
+
+    assert.isTrue(final);
+  });
+
+  it('reject:  direct catch()', async () => {
+    let promise = new ManagedPromise();
+
+    promise.reject(new Error("foobar"));
+
+    let caught = false;
+
+    await promise.catch((err) => {
+      assert.equal(err.message, "foobar");
+      caught = true;
+    });
+
+    assert.isTrue(caught);
+  });
+
+  it('reject:  direct finally()', async () => {
+    let promise = new ManagedPromise();
+
+    promise.reject(new Error("foobar"));
+
+    let final = false;
+
+    let settledPromise = promise.finally(() => {
+      final = true;
+    });
+
+    try {
+      await settledPromise;
+      assert.fail();
+    } catch (err) {
+      // because otherwise the test fails on the pending error!
+    }
+
+    assert.isTrue(final);
   });
 });

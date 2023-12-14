@@ -10,7 +10,7 @@ import { KeyboardHarness, MinimalKeymanGlobal } from '/@keymanapp/keyboard-proce
 import { DOMKeyboardLoader } from '/@keymanapp/keyboard-processor/build/lib/dom-keyboard-loader.mjs';
 import { loadKeyboardsFromStubs } from '../../kbdLoader.mjs';
 
-import timedPromise from '../../timedPromise.mjs';
+import { timedPromise } from '/@keymanapp/web-utils/build/lib/index.mjs';
 import sinon from '/node_modules/sinon/pkg/sinon-esm.js';
 
 const assert = chai.assert;
@@ -531,9 +531,9 @@ describe('app/browser:  ContextManager', function () {
         // Even though it's to effectively the same keyboard, we reload it (in case its stub
         // has been replaced)
         assert.isTrue(beforekeyboardchange.calledOnce);
-        assert.isTrue(keyboardchange.calledOnce);
+        // Changing from null-to-null should be a non change; see keyman/keymanweb#96.
+        assert.isFalse(keyboardchange.calledOnce);
         assert.isTrue(keyboardasyncload.notCalled);
-        assert.equal(keyboardchange.firstCall.args[0], null);
       });
 
       it('activate: without .activeTarget, null -> null (touch)', async () => {

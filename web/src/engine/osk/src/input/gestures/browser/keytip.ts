@@ -2,15 +2,23 @@ import OSKBaseKey from '../../../keyboard-layout/oskBaseKey.js';
 import { KeyElement } from '../../../keyElement.js';
 import KeyTipInterface from '../../../keytip.interface.js';
 import VisualKeyboard from '../../../visualKeyboard.js';
+import { GesturePreviewHost } from '../../../keyboard-layout/gesturePreviewHost.js';
+
+const CSS_PREFIX = 'kmw-';
+const DEFAULT_TIP_ORIENTATION: PhoneKeyTipOrientation = 'top';
+
+export type PhoneKeyTipOrientation = 'top' | 'bottom';
 
 export default class KeyTip implements KeyTipInterface {
   public readonly element: HTMLDivElement;
   public key: KeyElement;
   public state: boolean = false;
 
+  private orientation: PhoneKeyTipOrientation = DEFAULT_TIP_ORIENTATION;
+
   //  -----
   // |     | <-- tip
-  // |  x  | <-- label
+  // |  x  | <-- preview
   // |_   _|
   //  |   |
   //  |   |  <-- cap
@@ -18,16 +26,20 @@ export default class KeyTip implements KeyTipInterface {
 
   private readonly cap: HTMLDivElement;
   private readonly tip: HTMLDivElement;
-  private readonly label: HTMLSpanElement;
+  private previewHost: GesturePreviewHost;
+  private preview: HTMLDivElement;
+  private readonly vkbd: VisualKeyboard;
 
   private readonly constrain: boolean;
+  private readonly reorient: (orientation: PhoneKeyTipOrientation) => void;
 
   /**
    *
    * @param constrain keep the keytip within the bounds of the overall OSK.
    *                  Will probably be handled via function in a later pass.
    */
-  constructor(constrain: boolean) {
+  constructor(vkbd: VisualKeyboard, constrain: boolean) {
+    this.vkbd = vkbd;
     let tipElement = this.element=document.createElement('div');
     tipElement.className='kmw-keytip';
     tipElement.id = 'kmw-keytip';
@@ -38,16 +50,32 @@ export default class KeyTip implements KeyTipInterface {
 
     tipElement.appendChild(this.tip = document.createElement('div'));
     tipElement.appendChild(this.cap = document.createElement('div'));
-    this.tip.appendChild(this.label = document.createElement('span'));
+    this.tip.appendChild(this.preview = document.createElement('div'));
 
     this.tip.className = 'kmw-keytip-tip';
     this.cap.className = 'kmw-keytip-cap';
-    this.label.className = 'kmw-keytip-label';
 
     this.constrain = constrain;
+
+    this.reorient = (orientation: PhoneKeyTipOrientation) => {
+      this.orientation = orientation;
+      this.show(this.key, this.state, this.previewHost);
+    }
   }
 
-  show(key: KeyElement, on: boolean, vkbd: VisualKeyboard) {
+  show(key: KeyElement, on: boolean, previewHost: GesturePreviewHost) {
+    const vkbd = this.vkbd;
+
+    // During quick input sequences - especially during a multitap-modipress - it's possible
+    // for a user to request a preview for a key from a layer that is currently active, but
+    // currently not visible due to need previously-requested layout calcs for a different layer.
+    if(on) {
+      // Necessary for `key.offsetParent` and client-rect methods referenced below.
+      // Will not unnecessarily force reflow if the layer is already in proper document flow,
+      // but otherwise restores it.
+      vkbd.layerGroup.blinkLayer(key.key.spec.displayLayer);
+    }
+
     // Create and display the preview
     // If !key.offsetParent, the OSK is probably hidden.  Either way, it's a half-
     // decent null-guard check.
@@ -71,7 +99,11 @@ export default class KeyTip implements KeyTipInterface {
       const _Box = vkbd.topContainer as HTMLDivElement;
       const _BoxRect = _Box.getBoundingClientRect();
       const keyRect = key.getBoundingClientRect();
-      let y = (keyRect.bottom - _BoxRect.top + 1);
+
+      let y: number;
+      const orientation = this.orientation;
+      const distFromTop = keyRect.bottom - _BoxRect.top;
+      y = (distFromTop + (orientation == 'top' ? 1 : -1));
       let ySubPixelPadding = y - Math.floor(y);
 
       // Canvas dimensions must be set explicitly to prevent clipping
@@ -80,14 +112,28 @@ export default class KeyTip implements KeyTipInterface {
       let canvasHeight = Math.ceil(2.3 * xHeight) + (ySubPixelPadding); //
 
       kts.top = 'auto';
+
+      const unselectedOrientation = orientation == 'top' ? 'bottom' : 'top';
+      this.tip.classList.remove(`${CSS_PREFIX}${unselectedOrientation}`);
+      this.tip.classList.add(`${CSS_PREFIX}${orientation}`);
+
+      if(orientation == 'bottom') {
+        y += canvasHeight - xHeight;
+      }
+
       kts.bottom = Math.floor(_BoxRect.height - y) + 'px';
       kts.textAlign = 'center';
       kts.overflow = 'visible';
       kts.width = canvasWidth+'px';
       kts.height = canvasHeight+'px';
 
+      // Some keyboards (such as `balochi_scientific`) do not _package_ a font but
+      // specify an extremely common one, such as Arial.  In such cases, .kmw-key-text
+      // custom styling doesn't exist, relying on the layer object to simply specify
+      // the font-family.
+      const layerFontFamily = this.vkbd.currentLayer.element.style.fontFamily;
       const ckts = getComputedStyle(vkbd.element);
-      kts.fontFamily = ckts.fontFamily;
+      kts.fontFamily = key.key.spec.font || layerFontFamily || ckts.fontFamily;
 
       var px=parseInt(ckts.fontSize,10);
       if(px == Number.NaN) {
@@ -104,8 +150,6 @@ export default class KeyTip implements KeyTipInterface {
 
         kts.fontSize = key.key.getIdealFontSize(vkbd, key.key.keyText, scaleStyle, true);
       }
-
-      this.label.textContent = kc.textContent;
 
       // Adjust shape if at edges
       var xOverflow = (canvasWidth - xWidth) / 2;
@@ -130,19 +174,63 @@ export default class KeyTip implements KeyTipInterface {
       this.cap.style.width = xWidth + 'px';
       this.tip.style.height = halfHeight + 'px';
 
-      this.cap.style.top = (halfHeight - 3) + 'px';
-      this.cap.style.height = (keyRect.bottom - _BoxRect.top - Math.floor(y - canvasHeight) - (halfHeight)) + 'px'; //(halfHeight + 3 + ySubPixelPadding) + 'px';
+      const capOffset = 3;
+      const capStart = (halfHeight - capOffset) + 'px';
+      if(orientation == 'top') {
+        this.cap.style.top = capStart;
+        this.cap.style.bottom = '';
+      } else {
+        this.cap.style.top = '';
+        this.cap.style.bottom = capStart;
+      }
+      const defaultCapHeight = (distFromTop - Math.floor(y) + canvasHeight - (orientation == 'top' ? halfHeight : -capOffset * 2));
+      this.cap.style.height = defaultCapHeight + 'px';
 
       if(this.constrain && tipHeight + bottomY > oskHeight) {
         const delta = tipHeight + bottomY - oskHeight;
         kts.height = (canvasHeight-delta) + 'px';
         const hx = Math.max(0, (canvasHeight-delta)-(canvasHeight/2) + 2);
         this.cap.style.height = hx + 'px';
+      } else if(bottomY < 0) { // we'll assume that we always constrain at the OSK's bottom.
+        kts.bottom = '0px';
+        this.cap.style.height = Math.max(0, defaultCapHeight + bottomY) + 'px';
       }
 
       kts.display = 'block';
+
+      if(this.previewHost == previewHost) {
+        return;
+      }
+
+      const oldHost = this.preview;
+
+      if(this.previewHost) {
+        this.previewHost.off('preferredOrientation', this.reorient);
+      }
+      this.previewHost = previewHost;
+
+      if(previewHost) {
+        this.previewHost.on('preferredOrientation', this.reorient);
+        this.preview = this.previewHost.element;
+        this.tip.replaceChild(this.preview, oldHost);
+        previewHost.setCancellationHandler(() => this.show(null, false, null));
+        previewHost.on('startFade', () => {
+          this.element.classList.remove('kmw-preview-fade');
+          // Note:  a reflow is needed to reset the transition animation.
+          this.element.offsetWidth;
+          this.element.classList.add('kmw-preview-fade');
+        });
+      }
     } else { // Hide the key preview
       this.element.style.display = 'none';
+      this.previewHost?.off('preferredOrientation', this.reorient);
+      this.previewHost = null;
+      const oldPreview = this.preview;
+      this.preview = document.createElement('div');
+      this.tip.replaceChild(this.preview, oldPreview);
+      this.element.classList.remove('kmw-preview-fade');
+
+      this.orientation = DEFAULT_TIP_ORIENTATION;
     }
 
     // Save the key preview state

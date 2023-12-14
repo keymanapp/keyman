@@ -1,0 +1,163 @@
+{
+  "inputs": [
+    {
+      "isFromTouch": true,
+      "path": {
+        "coords": [
+          {
+            "targetX": 118,
+            "targetY": 79,
+            "t": 110727
+          },
+          {
+            "targetX": 118,
+            "targetY": 71,
+            "t": 110877
+          },
+          {
+            "targetX": 118,
+            "targetY": 68,
+            "t": 110909
+          },
+          {
+            "targetX": 118,
+            "targetY": 65,
+            "t": 110926
+          },
+          {
+            "targetX": 118,
+            "targetY": 62,
+            "t": 110943
+          },
+          {
+            "targetX": 118,
+            "targetY": 58,
+            "t": 110959
+          },
+          {
+            "targetX": 118,
+            "targetY": 55,
+            "t": 110976
+          },
+          {
+            "targetX": 118,
+            "targetY": 54,
+            "t": 110993
+          },
+          {
+            "targetX": 118,
+            "targetY": 52,
+            "t": 111009
+          },
+          {
+            "targetX": 118,
+            "targetY": 50,
+            "t": 111026
+          },
+          {
+            "targetX": 118,
+            "targetY": 45,
+            "t": 111043
+          },
+          {
+            "targetX": 118,
+            "targetY": 44,
+            "t": 111060
+          },
+          {
+            "targetX": 118,
+            "targetY": 42,
+            "t": 111076
+          },
+          {
+            "targetX": 118,
+            "targetY": 38,
+            "t": 111093
+          },
+          {
+            "targetX": 118,
+            "targetY": 34,
+            "t": 111109
+          },
+          {
+            "targetX": 118,
+            "targetY": 31,
+            "t": 111126
+          },
+          {
+            "targetX": 118,
+            "targetY": 28,
+            "t": 111143
+          },
+          {
+            "targetX": 118,
+            "targetY": 25,
+            "t": 111160
+          },
+          {
+            "targetX": 118,
+            "targetY": 22,
+            "t": 111176
+          },
+          {
+            "targetX": 118,
+            "targetY": 19,
+            "t": 111193
+          },
+          {
+            "targetX": 118,
+            "targetY": 17,
+            "t": 111209
+          },
+          {
+            "targetX": 118,
+            "targetY": 16,
+            "t": 111226
+          },
+          {
+            "targetX": 118,
+            "targetY": 15,
+            "t": 111243
+          },
+          {
+            "targetX": 118,
+            "targetY": 13,
+            "t": 111259
+          },
+          {
+            "targetX": 118,
+            "targetY": 10,
+            "t": 111276
+          },
+          {
+            "targetX": 118,
+            "targetY": 8,
+            "t": 111293
+          },
+          {
+            "targetX": 118,
+            "targetY": 6,
+            "t": 111309
+          },
+          {
+            "targetX": 118,
+            "targetY": 5,
+            "t": 111325
+          },
+          {
+            "targetX": 118,
+            "targetY": 3,
+            "t": 111343
+          }
+        ],
+        "wasCancelled": true
+      }
+    }
+  ],
+  "config": {
+    "deviceStyle": "screen4",
+    "roamingStyle": "bounds1",
+    "receiverStyle": "full",
+    "safeZoneStyle": "safe-loose"
+  }
+}

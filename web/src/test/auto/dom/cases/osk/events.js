@@ -2,7 +2,7 @@ import * as KeymanOSK from '/@keymanapp/keyman/build/engine/osk/lib/index.mjs';
 import Device from '/@keymanapp/keyman/build/engine/device-detect/lib/index.mjs';
 
 import { loadKeyboardsFromStubs } from '../../kbdLoader.mjs';
-import timedPromise from '../../timedPromise.mjs';
+import { timedPromise } from '/@keymanapp/web-utils/build/lib/index.mjs';
 
 import sinon from '/node_modules/sinon/pkg/sinon-esm.js';
 

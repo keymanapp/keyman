@@ -7,7 +7,7 @@ import { KeyboardRequisitioner, ModelCache, ModelSpec, toUnprefixedKeyboardId as
 import { EngineConfiguration, InitOptionSpec } from "./engineConfiguration.js";
 import KeyboardInterface from "./keyboardInterface.js";
 import { ContextManagerBase } from "./contextManagerBase.js";
-import { KeyEventHandler } from './keyEventSource.interface.js';
+import { KeyEventHandler } from 'keyman/engine/events';
 import HardKeyboardBase from "./hardKeyboard.js";
 import { LegacyAPIEvents } from "./legacyAPIEvents.js";
 import { EventNames, EventListener, LegacyEventEmitter } from "keyman/engine/events";
@@ -54,12 +54,7 @@ export default class KeymanEngine<
       }
     }
 
-    //... probably only applies for physical keystrokes.
-    if(!event.isSynthetic) {
-      if(this.osk?.vkbd?.keyPending) {
-        this.osk.vkbd.keyPending = null;
-      }
-    } else if(this.keyEventRefocus) { // && event.isSynthetic // as in, is from the OSK.
+    if(this.keyEventRefocus) {
       // Do anything needed to guarantee that the outputTarget stays active (`app/browser`: maintains focus).
       // (Interaction with the OSK may have de-focused the element providing active context;
       // we want to restore it in case the user swaps back to the hardware keyboard afterward.)
@@ -72,6 +67,14 @@ export default class KeymanEngine<
     // Deleting matched deadkeys here seems to correct some of the issues.   (JD 6/6/14)
     outputTarget.deadkeys().deleteMatched();      // Delete any matched deadkeys before continuing
 
+    if(event.isSynthetic) {
+      const oskLayer = this.osk.vkbd.layerId;
+
+      // In case of modipresses.
+      if(oskLayer && oskLayer != this.core.keyboardProcessor.layerId) {
+        this.core.keyboardProcessor.layerId = oskLayer;
+      }
+    }
     const result = this.core.processKeyEvent(event, outputTarget);
 
     if(result && result.transcription?.transform) {
@@ -186,7 +189,7 @@ export default class KeymanEngine<
     // The original seems to allow it.
 
     const config = this.config;
-    if(config.deferForInitialization.hasFinalized) {
+    if(config.deferForInitialization.isResolved) {
       // abort!  Maybe throw an error, too.
       return Promise.resolve();
     }
@@ -235,7 +238,7 @@ export default class KeymanEngine<
         }
       }
 
-      if(this.config.deferForInitialization.hasFinalized) {
+      if(this.config.deferForInitialization.isResolved) {
         eventRaiser();
       } else {
         this.config.deferForInitialization.then(eventRaiser);
@@ -250,7 +253,7 @@ export default class KeymanEngine<
         });
       }
 
-      if(this.config.deferForInitialization.hasFinalized) {
+      if(this.config.deferForInitialization.isResolved) {
         eventRaiser();
       } else {
         this.config.deferForInitialization.then(eventRaiser);
@@ -305,7 +308,10 @@ export default class KeymanEngine<
     }
     this._osk = value;
     if(value) {
-      value.activeKeyboard = this.contextManager.activeKeyboard;
+      // Don't build an OSK if no keyboard is available yet; avoid the extra flash.
+      if(this.contextManager.activeKeyboard) {
+        value.activeKeyboard = this.contextManager.activeKeyboard;
+      }
       value.on('keyevent', this.keyEventListener);
       this.core.keyboardProcessor.layerStore.handler = value.layerChangeHandler;
     }

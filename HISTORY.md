@@ -1389,6 +1389,19 @@
 * chore: move to 17.0-alpha (#7577)
 * chore: Move to 17.0 alpha
 
+## 16.0.144 stable 2023-11-30
+
+* chore(linux): Update debian changelog (#10046)
+* fix(android/app) Disable in-app Browser (#10077)
+
+## 16.0.143 stable 2023-11-22
+
+* chore(android): Update targetSdkVersion from 31 to 33 (#9823)
+* chore(linux): Exclude environment.sh from build (#9814)
+* chore(mac): move from altool to notarytool (#9896)
+* fix(web): fixes doc-kbd display of default layer when it's not defined first (#9892)
+* fix(ios): fv: replace Zip framework to prevent crash on startup (#9958)
+
 ## 16.0.142 stable 2023-10-20
 
 * chore(linux): Update debian changelog (#9326)
