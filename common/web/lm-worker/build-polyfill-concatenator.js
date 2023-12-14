@@ -4,6 +4,8 @@ import SourceMapCombiner from 'combine-source-map';
 import convertSourceMap from 'convert-source-map'; // Transforms sourcemaps among various common formats.
                                                    // Base64, stringified-JSON, end-of-file comment...
 
+import esbuild from 'esbuild';
+
 let loadPolyfill = function(scriptFile, sourceMapFile) {
   // May want to retool the pathing somewhat!
   return {
@@ -115,3 +117,15 @@ fs.writeFileSync(`build/lib/${fullWorkerConcatenation.scriptFilename}`, fullWork
 if(fullWorkerConcatenation.sourcemapJSON) {
   fs.writeFileSync(`build/lib/${fullWorkerConcatenation.scriptFilename}.map`, convertSourceMap.fromObject(fullWorkerConcatenation.sourcemapJSON).toJSON());
 }
+
+await esbuild.build({
+  entryPoints: [`build/lib/worker-main.polyfilled.js`],
+  sourcemap: 'external',
+  sourcesContent: true,
+  minify: true,
+  // Do NOT enable - will break under Android 5.0 / Chrome 35 environments, likely through Chrome 42.
+  // https://caniuse.com/mdn-javascript_builtins_function_name_configurable_true
+  keepNames: false,
+  target: 'es5',
+  outfile: `build/lib/worker-main.polyfilled.min.js`
+});

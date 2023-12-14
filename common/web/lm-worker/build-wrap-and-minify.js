@@ -1,5 +1,4 @@
 import fs from 'fs';
-import esbuild from 'esbuild';
 
 import convertSourcemap from 'convert-source-map'; // Transforms sourcemaps among various common formats.
                                                    // Base64, stringified-JSON, end-of-file comment...
@@ -26,23 +25,11 @@ if(process.argv.length > 2) {
   }
 }
 
-let sourcemapJSON = '';
+let sourcemapJSON = convertSourcemap.fromJSON(fs.readFileSync(`build/lib/worker-main.polyfilled${MINIFY ? '.min' : ''}.js.map`)).toObject();
 
-if(MINIFY) {
-  await esbuild.build({
-    entryPoints: [`build/lib/worker-main.polyfilled.js`],
-    sourcemap: 'external',
-    sourcesContent: DEBUG,
-    minify: true,
-    // Do NOT enable - will break under Android 5.0 / Chrome 35 environments, likely through Chrome 42.
-    // https://caniuse.com/mdn-javascript_builtins_function_name_configurable_true
-    keepNames: false,
-    target: 'es5',
-    outfile: `build/lib/worker-main.polyfilled.min.js`
-  });
+if(!DEBUG) {
+  sourcemapJSON.sourcesContent = [];
 }
-
-sourcemapJSON = convertSourcemap.fromJSON(fs.readFileSync(`build/lib/worker-main.polyfilled${MINIFY ? '.min' : ''}.js.map`)).toObject();
 
 const script = fs.readFileSync(`build/lib/worker-main.polyfilled${MINIFY ? '.min' : ''}.js`);
 
@@ -76,7 +63,7 @@ let wrapper = `
 
 export var LMLayerWorkerCode = ${jsonEncoded};
 
-${MINIFY && "// Sourcemaps have been omitted for this release build."}
+${MINIFY && "// Sourcemaps have been omitted for this release build." || ''}
 export var LMLayerWorkerSourcemapComment = "${DEBUG ? srcMapString : ''}";
 
 // --END:LMLayerWorkerCode
