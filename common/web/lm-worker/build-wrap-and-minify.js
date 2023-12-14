@@ -44,10 +44,7 @@ if(MINIFY) {
 
 sourcemapJSON = convertSourcemap.fromJSON(fs.readFileSync(`build/lib/worker-main.polyfilled${MINIFY ? '.min' : ''}.js.map`)).toObject();
 
-const workerConcatenation = {
-  script: fs.readFileSync(`build/lib/worker-main.polyfilled${MINIFY ? '.min' : ''}.js`),
-  sourcemapJSON: sourcemapJSON
-}
+const script = fs.readFileSync(`build/lib/worker-main.polyfilled${MINIFY ? '.min' : ''}.js`);
 
 // While it IS possible to do partial sourcemaps (without the sources, but with everything else) within the worker...
 // the resulting sourcemaps are -surprisingly- large - larger than the code itself!
@@ -60,7 +57,7 @@ console.log(`Wrapping + generating final output: ${MINIFY ? 'minified' : 'unmini
 // Now, to build the wrapper...
 
 // First, let's build the encoded sourcemap.
-const encodedSrcMap = convertSourcemap.fromObject(workerConcatenation.sourcemapJSON).toBase64();
+const encodedSrcMap = convertSourcemap.fromObject(sourcemapJSON).toBase64();
 const srcMapString = `//# sourceMappingURL=data:application/json;charset=utf-8;base64,${encodedSrcMap}`;
 
 /*
@@ -68,7 +65,7 @@ const srcMapString = `//# sourceMappingURL=data:application/json;charset=utf-8;b
  * but my attempts to do so end up triggering errors when loading.
  */
 
-let rawScript = workerConcatenation.script.toString();
+let rawScript = script.toString();
 // Two layers of encoding:  one for the raw source (parsed by the JS engine),
 // one to 'unwrap' it from a string _within_ that source.
 let jsonEncoded = JSON.stringify(rawScript);
