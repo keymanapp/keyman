@@ -38,7 +38,32 @@ describe('PageContextAttachment', () => {
     });
 
     it('supported input types', () => {
-      const doc = createDocument('<!doctype html><html><body> <input type="button"> <input type="checkbox"> <input type="color"> <input type="date"> <input type="datetime-local"> <input type="email"> <input type="file"> <input type="hidden"> <input type="image"> <input type="month"> <input type="number"> <input type="password"> <input type="radio"> <input type="range"> <input type="reset"> <input type="search"> <input type="submit"> <input type="tel"> <input type="text"> <input type="time"> <input type="url"> <input type="week"> <textarea></textarea></body></html>');
+      const doc = createDocument(
+        `<!doctype html><html><body>
+          <input type="button">
+          <input type="checkbox">
+          <input type="color">
+          <input type="date">
+          <input type="datetime-local">
+          <input type="email">
+          <input type="file">
+          <input type="hidden">
+          <input type="image">
+          <input type="month">
+          <input type="number">
+          <input type="password">
+          <input type="radio">
+          <input type="range">
+          <input type="reset">
+          <input type="search">
+          <input type="submit">
+          <input type="tel">
+          <input type="text">
+          <input type="time">
+          <input type="url">
+          <input type="week">
+          <textarea></textarea>
+        </body></html>`);
       const sut = new PageContextAttachment(doc, null);
       sut.listInputs();
 
@@ -49,7 +74,13 @@ describe('PageContextAttachment', () => {
     });
 
     it('ignores disabled', () => {
-      const doc = createDocument('<!doctype html><html><body> <input type="text" id="1"> <input type="text" id="2" class="foo kmw-disabled"> <textarea id="3"></textarea> <textarea id="4" class="kmw-disabled"></textarea></body></html>');
+      const doc = createDocument(
+        `<!doctype html><html><body>
+          <input type="text" id="1">
+          <input type="text" id="2" class="foo kmw-disabled">
+          <textarea id="3"></textarea>
+          <textarea id="4" class="kmw-disabled"></textarea>
+        </body></html>`);
       const sut = new PageContextAttachment(doc, null);
       sut.listInputs();
 
@@ -61,10 +92,12 @@ describe('PageContextAttachment', () => {
   });
 
   describe('isKMWInput', () => {
-
     it('supported input types', () => {
       ['email', 'search', 'text', 'url'].forEach(function (elementType) {
-          const doc = createDocument(`<!doctype html><html><body><input type="${elementType}" id="1"></body></html>`);
+          const doc = createDocument(
+            `<!doctype html><html><body>
+              <input type="${elementType}" id="1">
+            </body></html>`);
           const sut = new PageContextAttachment(doc, null);
           const elem = doc.getElementById('1');
 
@@ -77,7 +110,10 @@ describe('PageContextAttachment', () => {
       [ 'button', 'date', 'file', 'hidden', 'image', 'month', 'number',
         'password', 'radio', 'range', 'reset', 'submit', 'tel', 'time',
         'week'].forEach(function (elementType) {
-          const doc = createDocument(`<!doctype html><html><body><input type="${elementType}" id="1"></body></html>`);
+          const doc = createDocument(
+            `<!doctype html><html><body>
+              <input type="${elementType}" id="1">
+            </body></html>`);
           const sut = new PageContextAttachment(doc, null);
           const elem = doc.getElementById('1');
 
@@ -87,7 +123,10 @@ describe('PageContextAttachment', () => {
     });
 
     it('text area is input', () => {
-      const doc = createDocument('<!doctype html><html><body><textarea id="1"></textarea></body></html>');
+      const doc = createDocument(
+        `<!doctype html><html><body>
+          <textarea id="1"></textarea>
+        </body></html>`);
       const sut = new PageContextAttachment(doc, null);
       const elem = doc.getElementById('1');
 
