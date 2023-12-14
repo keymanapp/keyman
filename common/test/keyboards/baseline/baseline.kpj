@@ -324,9 +324,9 @@
       <FileType>.kmn</FileType>
     </File>
     <File>
-      <ID>id_k_049___context_and_invalidate</ID>
-      <Filename>k_049___context_and_invalidate.kmn</Filename>
-      <Filepath>k_049___context_and_invalidate.kmn</Filepath>
+      <ID>id_k_049___enter_invalidates_context</ID>
+      <Filename>k_049___enter_invalidates_context.kmn</Filename>
+      <Filepath>k_049___enter_invalidates_context.kmn</Filepath>
       <FileVersion>1.0</FileVersion>
       <FileType>.kmn</FileType>
     </File>
