@@ -55,8 +55,8 @@ function do_build() {
   echo "Preparing the polyfills + worker for script-embedding"
   node build-polyfill-concatenator.js
 
-  node build-wrap-and-minify.js --debug
-  node build-wrap-and-minify.js --minify
+  node build-wrapper.js --debug
+  node build-wrapper.js --minify
 }
 
 function do_test() {

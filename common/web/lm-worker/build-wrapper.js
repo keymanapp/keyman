@@ -25,13 +25,10 @@ if(process.argv.length > 2) {
   }
 }
 
-let sourcemapJSON = convertSourcemap.fromJSON(fs.readFileSync(`build/lib/worker-main.polyfilled${MINIFY ? '.min' : ''}.js.map`)).toObject();
+const sourceFile = `build/lib/worker-main.polyfilled${MINIFY ? '.min' : ''}.js`;
+const destFile = `build/lib/worker-main.wrapped${MINIFY ? '.min' : ''}.js`;
 
-if(!DEBUG) {
-  sourcemapJSON.sourcesContent = [];
-}
-
-const script = fs.readFileSync(`build/lib/worker-main.polyfilled${MINIFY ? '.min' : ''}.js`);
+const script = fs.readFileSync(sourceFile);
 
 // While it IS possible to do partial sourcemaps (without the sources, but with everything else) within the worker...
 // the resulting sourcemaps are -surprisingly- large - larger than the code itself!
@@ -44,8 +41,15 @@ console.log(`Wrapping + generating final output: ${MINIFY ? 'minified' : 'unmini
 // Now, to build the wrapper...
 
 // First, let's build the encoded sourcemap.
-const encodedSrcMap = convertSourcemap.fromObject(sourcemapJSON).toBase64();
-const srcMapString = `//# sourceMappingURL=data:application/json;charset=utf-8;base64,${encodedSrcMap}`;
+
+// Wrapped in a function so we can leverage `const` with the result.
+function buildSrcMapString() {
+  const sourcemapJSON = convertSourcemap.fromJSON(fs.readFileSync(`${sourceFile}.map`)).toObject();
+  const encodedSrcMap = convertSourcemap.fromObject(sourcemapJSON).toBase64();
+  return `//# sourceMappingURL=data:application/json;charset=utf-8;base64,${encodedSrcMap}`;
+}
+
+const srcMapString = DEBUG ? buildSrcMapString() : "";
 
 /*
  * It'd be nice to do a 'partial' encodeURIComponent that only gets the important bits...
@@ -64,9 +68,9 @@ let wrapper = `
 export var LMLayerWorkerCode = ${jsonEncoded};
 
 ${MINIFY && "// Sourcemaps have been omitted for this release build." || ''}
-export var LMLayerWorkerSourcemapComment = "${DEBUG ? srcMapString : ''}";
+export var LMLayerWorkerSourcemapComment = "${srcMapString}";
 
 // --END:LMLayerWorkerCode
 `;
 
-fs.writeFileSync(`build/lib/worker-main.wrapped${MINIFY ? '.min' : ''}.js`, wrapper);
+fs.writeFileSync(destFile, wrapper);
