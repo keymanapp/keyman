@@ -1,5 +1,5 @@
 import { PageContextAttachment } from '/@keymanapp/keyman/build/engine/attachment/lib/index.mjs';
-import timedPromise from '../../timedPromise.mjs';
+import { timedPromise } from '/@keymanapp/web-utils/build/lib/index.mjs';
 
 let assert = chai.assert;
 

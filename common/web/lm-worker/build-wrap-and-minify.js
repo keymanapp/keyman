@@ -34,7 +34,9 @@ if(MINIFY) {
     sourcemap: 'external',
     sourcesContent: DEBUG,
     minify: true,
-    keepNames: true,
+    // Do NOT enable - will break under Android 5.0 / Chrome 35 environments, likely through Chrome 42.
+    // https://caniuse.com/mdn-javascript_builtins_function_name_configurable_true
+    keepNames: false,
     target: 'es5',
     outfile: `build/lib/worker-main.polyfilled.min.js`
   });

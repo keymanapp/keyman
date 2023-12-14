@@ -1,6 +1,6 @@
 import Codes from "../text/codes.js";
 import { Layouts, type LayoutFormFactor } from "./defaultLayouts.js";
-import { ActiveKey, ActiveLayout } from "./activeLayout.js";
+import { ActiveKey, ActiveLayout, ActiveSubKey } from "./activeLayout.js";
 import KeyEvent from "../text/keyEvent.js";
 import type OutputTarget from "../text/outputTarget.js";
 
@@ -401,7 +401,7 @@ export default class Keyboard {
     // Final check - do we construct a layout, or is this a case where helpText / insertHelpHTML should take over?
     if(rawSpecifications) {
       // Now to generate a layout from our raw specifications.
-      let layout = this._layouts[formFactor] = Layouts.buildDefaultLayout(rawSpecifications, this, formFactor);
+      let layout = this._layouts[formFactor] = Layouts.buildDefaultLayout(rawSpecifications, this, formFactor) as ActiveLayout;
       layout.isDefault = true;
       return layout;
     } else {
@@ -468,7 +468,7 @@ export default class Keyboard {
     return keyEvent;
   }
 
-  constructKeyEvent(key: ActiveKey, device: DeviceSpec, stateKeys: StateKeyMap): KeyEvent {
+  constructKeyEvent(key: ActiveKey | ActiveSubKey, device: DeviceSpec, stateKeys: StateKeyMap): KeyEvent {
     // Make a deep copy of our preconstructed key event, filling it out from there.
     const Lkc = key.baseKeyEvent;
     Lkc.device = device;
