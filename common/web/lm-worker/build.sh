@@ -23,6 +23,9 @@ cd "$THIS_SCRIPT_PATH"
 WORKER_OUTPUT=build/obj
 WORKER_OUTPUT_FILENAME=build/lib/worker-main.js
 
+INTERMEDIATE=./build/intermediate
+LIB=./build/lib
+
 ################################ Main script ################################
 
 builder_describe \
@@ -50,13 +53,17 @@ function do_build() {
   fi
 
   # Declaration bundling.
-  tsc --emitDeclarationOnly --outFile ./build/lib/worker-main.d.ts
+  tsc --emitDeclarationOnly --outFile $INTERMEDIATE/worker-main.d.ts
 
   echo "Preparing the polyfills + worker for script-embedding"
-  node build-polyfiller.js build/lib/worker-main.js --out build/lib/worker-main.polyfilled.js
+  node build-polyfiller.js $INTERMEDIATE/worker-main.js \
+    --out $INTERMEDIATE/worker-main.polyfilled.js
 
-  node build-wrapper.js build/lib/worker-main.polyfilled.js     --out build/lib/worker-main.wrapped.js     --sourceMap
-  node build-wrapper.js build/lib/worker-main.polyfilled.min.js --out build/lib/worker-main.wrapped.min.js
+  mkdir -p $LIB
+  node build-wrapper.js $INTERMEDIATE/worker-main.polyfilled.js \
+    --out $LIB/worker-main.wrapped.js     --sourceMap
+  node build-wrapper.js $INTERMEDIATE/worker-main.polyfilled.min.js \
+    --out $LIB/worker-main.wrapped.min.js
 }
 
 function do_test() {

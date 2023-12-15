@@ -32,7 +32,7 @@ if(process.argv.length > 2) {
 
 const embeddedWorkerBuildOptions = await prepareTslibTreeshaking({
   ...iifeConfiguration,
-  ...bundleObjEntryPoints('lib', 'build/obj/worker-main.js'),
+  ...bundleObjEntryPoints('intermediate', 'build/obj/worker-main.js'),
   // To be explicit, in comparison to the other build below.  Even if our other
   // configs change their default, we should not minify for THIS build; we'll
   // have a separate minify pass later, after concatenating our polyfills.
