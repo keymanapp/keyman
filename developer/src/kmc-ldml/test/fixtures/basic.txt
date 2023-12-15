@@ -246,14 +246,14 @@ block(endelem)
 block(keys)                         # struct COMP_KMXPLUS_KEYS {
   6b 65 79 73                       #   KMX_DWORD header.ident;   // 0000 Section name - keys
   sizeof(keys)                      #   KMX_DWORD header.size;    // 0004 Section length
-  04 00 00 00                       #   KMX_DWORD keyCount
+  05 00 00 00                       #   KMX_DWORD keyCount
   01 00 00 00                       #   KMX_DWORD flicksCount
   00 00 00 00                       #   KMX_DWORD flickCount
-  02 00 00 00                       #   KMX_DWORD kmapCount;          // 0008 number of kmap
+  30 00 00 00                       #   KMX_DWORD kmapCount;          // 0008 number of kmap - #48, one per key
   # keys
   # (#0000) a
   61 00 00 00                       #   'a'
-  00 00 00 00                       #   KMX_DWORD flags = extend
+  00 00 00 00                       #   KMX_DWORD flags = 0
   index(strNull,strA,2)             #   KMXPLUS_STR 'a' (key id)
   00 00 00 00                       #   KMXPLUS_STR switch
   0A 00 00 00                       #   KMX_DWORD width*10
@@ -263,7 +263,7 @@ block(keys)                         # struct COMP_KMXPLUS_KEYS {
   00 00 00 00                       #  flicks
   # (#0001) e
   65 00 00 00                       #   'e'
-  00 00 00 00                       #   KMX_DWORD flags = extend
+  00 00 00 00                       #   KMX_DWORD flags = 0
   index(strNull,strElemBkspFrom2,2)  #   KMXPLUS_STR 'e' (key id)
   00 00 00 00                       #   KMXPLUS_STR switch
   0A 00 00 00                       #   KMX_DWORD width*10
@@ -271,7 +271,17 @@ block(keys)                         # struct COMP_KMXPLUS_KEYS {
   00 00 00 00                       #   STR longPressDefault
   00 00 00 00                       # TODO: index(listNull,listNull,4)        #   LIST multiTap
   00 00 00 00                       #  flicks
-  # (#0002) hmaqtugha
+  # (#0002) gap (reserved)
+  00 00 00 00                       #   nothing
+  01 00 00 00                       #   KMX_DWORD flags = extend
+  index(strNull,strGapReserved,2)  #   KMXPLUS_STR 'gap (reserved)' (key id)
+  00 00 00 00                       #   KMXPLUS_STR switch
+  0A 00 00 00                       #   KMX_DWORD width*10
+  00 00 00 00                       # TODO: index(listNull,listNull,4)        #   LIST longPress
+  00 00 00 00                       #   STR longPressDefault
+  00 00 00 00                       # TODO: index(listNull,listNull,4)        #   LIST multiTap
+  00 00 00 00                       #  flicks
+  # (#0003) hmaqtugha
   27 01 00 00                       #   UTF-32    'U+0127'
   00 00 00 00                       #   KMX_DWORD (flags: none)
   index(strNull,strHmaqtugha,2)     #   KMXPLUS_STR 'hmaqtugha'
@@ -281,7 +291,7 @@ block(keys)                         # struct COMP_KMXPLUS_KEYS {
   00 00 00 00                       #   STR longPressDefault
   00 00 00 00 # TODO: index(listNull,listNull,4)        #   LIST multiTap
   00 00 00 00                       #   flicks 0
-  # (#0003) that
+  # (#0004) that
   index(strNull,strKeys,2)          #   KMXPLUS_STR 'U+0127'
   01 00 00 00                       #   KMX_DWORD flags = extend
   index(strNull,strThat,2)          #   KMXPLUS_STR 'hmaqtugha'
@@ -305,15 +315,27 @@ block(keys)                         # struct COMP_KMXPLUS_KEYS {
   # kmapdata:
   # note that 'a' and 'e' are omitted, as they aren't on the layers (just from gestures)
 
-  # #0
-  31 00 00 00                        #  KMX_DWORD vkey
-  00 00 00 00                        #  KMX_DWORD modifiers (none)
-  03 00 00 00                        #  KMX_DWORD key index (that)
+  # moving these to 1-liners so they can be sorted! the structure is as follows:
+  ## 31 00 00 00                        #  KMX_DWORD vkey
+  ## 00 00 00 00                        #  KMX_DWORD modifiers (none)
+  ## 04 00 00 00                        #  KMX_DWORD key index (that)
 
-  # #1
-  c0 00 00 00                        #  KMX_DWORD vkey
-  00 00 00 00                        #  KMX_DWORD modifiers (none)
-  02 00 00 00                        #  KMX_DWORD key index (hmaqtugha)
+#   - vkey -   - modifier -   - key id  -
+  02 00 00 00   00 00 00 00   02 00 00 00 # gap (reserved)
+  03 00 00 00   00 00 00 00   02 00 00 00 # gap (reserved)
+  04 00 00 00   00 00 00 00   02 00 00 00 # gap (reserved)
+  05 00 00 00   00 00 00 00   02 00 00 00 # gap (reserved)
+  06 00 00 00   00 00 00 00   02 00 00 00 # gap (reserved)
+  07 00 00 00   00 00 00 00   02 00 00 00 # gap (reserved)
+  08 00 00 00   00 00 00 00   02 00 00 00 # gap (reserved)
+  09 00 00 00   00 00 00 00   02 00 00 00 # gap (reserved)
+  0a 00 00 00   00 00 00 00   02 00 00 00 # gap (reserved)
+  0b 00 00 00   00 00 00 00   02 00 00 00 # gap (reserved)
+  0c 00 00 00   00 00 00 00   02 00 00 00 # gap (reserved)
+  0d 00 00 00   00 00 00 00   02 00 00 00 # gap (reserved)
+  29 00 00 00   00 00 00 00   02 00 00 00 # gap (reserved)
+  31 00 00 00   00 00 00 00   04 00 00 00 # "that"
+  c0 00 00 00   00 00 00 00   03 00 00 00 # "hmaqtugha"
 
 
 # ----------------------------------------------------------------------------------------------------
@@ -432,6 +454,7 @@ block(strs)                         #  struct COMP_KMXPLUS_STRS {
   diff(strs,strSet2)   sizeof(strSet2,2)
   diff(strs,strBase)   sizeof(strBase,2)
   diff(strs,strElemBkspFrom2) sizeof(strElemBkspFrom2,2)
+  diff(strs,strGapReserved) sizeof(strGapReserved,2)
   diff(strs,strHmaqtugha) sizeof(strHmaqtugha,2)
   diff(strs,strLocale)     sizeof(strLocale,2)
   diff(strs,strLayout)     sizeof(strLayout,2)
@@ -467,6 +490,7 @@ block(strs)                         #  struct COMP_KMXPLUS_STRS {
   block(strSet2)             61 00 62 00 63 00 block(x) 00 00                           # 'abc'
   block(strBase)             62 00 61 00 73 00 65 00 block(x) 00 00                     # 'base'
   block(strElemBkspFrom2)    65 00 block(x) 00 00                                       # 'e'
+  block(strGapReserved)         67 00 61 00 70 00 20 00 28 00 72 00 65 00 73 00 65 00 72 00 76 00 65 00 65 00 29 00 block(x) 00 00 # 'gap (reserved)'
   block(strHmaqtugha)        68 00 6d 00 61 00 71 00 74 00 75 00 67 00 68 00 61 00 block(x) 00 00   # 'hmaqtugha'
 #str #10
   block(strLocale)           6d 00 74 00   block(x) 00 00                               # 'mt'
