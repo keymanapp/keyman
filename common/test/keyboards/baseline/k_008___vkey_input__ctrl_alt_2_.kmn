@@ -1,7 +1,8 @@
 store(&NAME) '008 - vkey input (ctrl alt 2)'
 c Description: Tests basic vkey input with control and alt (Unicode)
 c keys: [LCTRL LALT K_A][LCTRL LALT K_B][LCTRL LALT K_C]
-c expected: \u0E03
+c expected: \u0E01\u0E03
+c expected context: \u0E03
 c context:
 
 store(&version) '6.0'

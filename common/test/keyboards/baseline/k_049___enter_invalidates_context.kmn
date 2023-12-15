@@ -2,7 +2,8 @@ store(&NAME) '049 - enter_invalidates_context'
 c Description: Tests that core context is cleared when kb processor
 c              determines its invalid. eg Enter key See #10182.
 c keys: [K_A][K_B][K_ENTER][K_C]
-c expected: c
+c expected: abc
+c expected context: c
 c context:
 
 store(&version) '10.0'

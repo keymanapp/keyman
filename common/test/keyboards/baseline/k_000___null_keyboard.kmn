@@ -1,7 +1,8 @@
 store(&NAME) '000 - null keyboard'
 c Description: Tests null keyboard
 c keys: [K_A][RALT K_B][SHIFT K_C]
-c expected: C
+c expected: aC
+c expected context: C
 c context:
 
 store(&version) '6.0'
