@@ -9,6 +9,7 @@ let MINIFY = false;
 let sourceFromArgs;
 let destFromArgs;
 let profilePath;
+let sourceRoot;
 
 function doHelp(errCode?: number) {
   console.log(`
@@ -16,7 +17,7 @@ Summary:
   Uses esbuild to generate bundled-JS according to common, repo-wide KeymanWeb-oriented settings.
 
 Usage:
-  common-bundle.mjs <input-file> --outDir <out-file> [options...]
+  common-bundle.mjs <input-file> --out <out-file> [options...]
 
 Parameters:
   <input-file>:         Fully-bundled and compiled JS file to be wrapped.
@@ -30,6 +31,7 @@ Options:
                         If not specified, 'iife' will be used.
   --minify              Enables minification.
   --profile=<out-file>  Generates an associated filesize profile at the specified path.
+  --sourceRoot=<path>   Sets the sourceRoot for generated source maps
 ` );
   process.exit(errCode || 0);
 }
@@ -63,6 +65,9 @@ if(process.argv.length > 2) {
         break;
       case '--profile':
         profilePath = process.argv[++i];
+        break;
+      case '--sourceRoot':
+        sourceRoot = process.argv[++i];
         break;
       default:
         if(!sourceFromArgs) {
@@ -111,7 +116,8 @@ const config: esbuild.BuildOptions = {
   entryPoints: [sourceFile],
   outfile: destFile,
   minify: MINIFY,
-  metafile: !!profilePath
+  metafile: !!profilePath,
+  sourceRoot: sourceRoot, // may be undefined - is fine if so.
 };
 
 await prepareTslibTreeshaking(config);
