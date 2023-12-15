@@ -3,36 +3,71 @@ import fs from 'fs';
 import convertSourcemap from 'convert-source-map'; // Transforms sourcemaps among various common formats.
                                                    // Base64, stringified-JSON, end-of-file comment...
 
-let DEBUG = false;
-let MINIFY = false;
+let INCLUDE_SRCMAPS = false;
+
+let sourceFromArgs;
+let destFromArgs;
+
+function doHelp(errCode) {
+  console.log(`
+Summary:
+  Creates a "wrapped" version of the lm-worker for compilation into and inclusion as part
+  of a different JS bundle for later use as the core of a predictive-text WebWorker.
+
+Usage:
+  node build-wrapper.js <input-file> [options...]
+
+Parameters:
+  <input-file>:  Fully-bundled and compiled JS file to be wrapped.
+
+Options:
+  --help            Shows this script's documentation
+  --out=<out-file>  Specifies the destination path for the wrapped output.
+
+                    If missing, the output will be placed next to the source and given
+                    the same path, but with '.wrapped.js' replacing the original '.js'
+                    extension.
+  --sourceMap       Includes the script's original sourcemaps within the wrapped output
+` );
+  process.exit(errCode || 0);
+}
 
 if(process.argv.length > 2) {
   for(let i = 2; i < process.argv.length; i++) {
     const arg = process.argv[i];
 
     switch(arg) {
-      case '--debug':
-        DEBUG = true;
+      case '--help':
+        doHelp();
         break;
-      case '--minify':
-        MINIFY = true;
+      case '--sourceMap':  // bc TS uses this exact flag.  esbuild... uses sourcemap (in the JS config)
+        INCLUDE_SRCMAPS = true;
         break;
-      // May add other options if desired in the future.
+      case '--out':
+        destFromArgs = process.argv[++i];
+        break;
       default:
-        console.error("Invalid command-line option set for script; only --debug and --minify are permitted.");
-        process.exit(1);
+        if(!sourceFromArgs) {
+          sourceFromArgs = arg;
+        } else {
+          doHelp(1);
+        }
     }
   }
 }
 
-const sourceFile = `build/lib/worker-main.polyfilled${MINIFY ? '.min' : ''}.js`;
-const destFile = `build/lib/worker-main.wrapped${MINIFY ? '.min' : ''}.js`;
+if(!sourceFromArgs || sourceFromArgs.substring(sourceFromArgs.length - 3) != '.js') {
+  console.error("No input file has been specified; aborting.");
+  console.log();
+  doHelp(1);
+}
 
-const script = fs.readFileSync(sourceFile);
+const sourceFile = sourceFromArgs;
+const destFile = destFromArgs || sourceFromArgs.substring(0, sourceFromArgs.length - 3) + '.wrapped.js';
 
 // Now, to build the wrapper...
 
-// First, let's build the encoded sourcemap.
+const script = fs.readFileSync(sourceFile);
 
 // Wrapped in a function so we can leverage `const` with the result.
 function buildSrcMapString() {
@@ -43,7 +78,7 @@ function buildSrcMapString() {
 
 // While it IS possible to do partial sourcemaps (without the sources, but with everything else) within the worker...
 // the resulting sourcemaps are -surprisingly- large - larger than the code itself!
-const srcMapString = DEBUG ? buildSrcMapString() : "";
+const srcMapString = INCLUDE_SRCMAPS ? buildSrcMapString() : "";
 
 /*
  * It'd be nice to do a 'partial' encodeURIComponent that only gets the important bits...
@@ -61,7 +96,7 @@ let wrapper = `
 
 export var LMLayerWorkerCode = ${jsonEncoded};
 
-${!DEBUG && "// Sourcemaps have been omitted for this release build." || ''}
+${!INCLUDE_SRCMAPS && "// Sourcemaps have been omitted for this release build." || ''}
 export var LMLayerWorkerSourcemapComment = "${srcMapString}";
 
 // --END:LMLayerWorkerCode
