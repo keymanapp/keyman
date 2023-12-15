@@ -53,7 +53,7 @@ function do_build() {
   tsc --emitDeclarationOnly --outFile ./build/lib/worker-main.d.ts
 
   echo "Preparing the polyfills + worker for script-embedding"
-  node build-polyfill-concatenator.js
+  node build-polyfiller.js build/lib/worker-main.js --out build/lib/worker-main.polyfilled.js
 
   node build-wrapper.js build/lib/worker-main.polyfilled.js     --out build/lib/worker-main.wrapped.js     --sourceMap
   node build-wrapper.js build/lib/worker-main.polyfilled.min.js --out build/lib/worker-main.wrapped.min.js
