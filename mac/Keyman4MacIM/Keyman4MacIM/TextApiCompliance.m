@@ -1,33 +1,35 @@
 /**
  * Keyman is copyright (C) SIL International. MIT License.
- * 
+ *
  * TextApiCompliance.m
  * Keyman
- * 
+ *
  * Created by Shawn Schantz on 2023-05-05.
- * 
+ *
  * Check whether the current text input client is compliant with APIs.
- * Compliance is determined by getting the current selection (location and length) with
- * the selectionRange API and evaluating the results.
- * But this is not a surefire indicator. For several apps,  a valid but incorrect selection of
- * {0, 0}, or possibly something else, is returned regardless of the real selection.
+ * Compliance is determined by getting the current selection (location and
+ * length) with the selectionRange API and evaluating the results. But this is
+ * not a surefire indicator. For several apps,  a valid but incorrect selection
+ * of {0, 0}, or possibly something else, is returned regardless of the real
+ * selection.
  *
- * When {0, 0} is returned, then we can check to see if a later call to the insertText API
- * results in a change in the location. It always should, because there is no text to
- * replace if the client truly is at location 0.
- * If the location does change, then we assume the selection API is compliant.
+ * When a value other than NSNotFound is returned, we can check the selection
+ * after a call to the insertText API to see whether it results in a change in
+ * the selection. If the selection does change, then we assume the selection API
+ * is compliant.
  *
- * Even worse for some apps, the selection API returns a non-zero location, but attempts
- * to replace text during a call to insertText do not function properly. There is no way to
- * detect this behavior, so these apps must be hard-coded as non-compliant.  A couple
- * of known apps that behave this way are Brackets (Adobe OS project) and MacVIM
+ * For some apps, the selection API returns a resonable value, but any attempt to
+ * replace text with a call to insertText do not function properly. There is
+ * no way to detect this behavior, so these apps must be hard-coded as
+ * non-compliant.  A couple of known apps that behave this way are Brackets
+ * (Adobe OS project) and MacVIM
  *
- * We really only have the ability to test the selection API, and if it does not work, then
- * Keyman functionality is limited. Lacking the current location
+ * We really only have the ability to test the selection API, and if it does not
+ * work, then Keyman functionality is limited. Lacking the current location
  * - we cannot pass a range for reading the context
- * - we cannot pass a replacement range when calling insertText
- * The result is that we are limited in key processing, using only locally cached context, and
- * we can only delete by sending backspace events.
+ * - we cannot pass a replacement range when calling insertText The result is
+ *   that we are limited in key processing, using only the cached context, and
+ *   we can only delete by sending backspace events.
  */
 
 #import "TextApiCompliance.h"
@@ -42,6 +44,7 @@ NSString *const kKMLegacyApps = @"KMLegacyApps";
 @property (readonly) id client;
 @property BOOL complianceUncertain;
 @property BOOL hasCompliantSelectionApi;
+@property NSRange initialSelection;
 
 @end
 
@@ -57,6 +60,7 @@ NSString *const kKMLegacyApps = @"KMLegacyApps";
     _client = client;
     _clientApplicationId = appId;
     _complianceUncertain = YES;
+    _initialSelection = NSMakeRange(NSNotFound, NSNotFound);
     
     // if we do not have hard-coded noncompliance, then test the app
     if (![self applyNoncompliantAppLists:appId]) {
@@ -85,25 +89,22 @@ return [NSString stringWithFormat:@"complianceUncertain: %d, hasCompliantSelecti
   else {
     // if API exists, call it and see if it works as expected
     NSRange selectionRange = [client selectedRange];
+    self.initialSelection = selectionRange;
     [self.appDelegate logDebugMessage:@"TextApiCompliance testCompliance, location = %lu, length = %lu", selectionRange.location, selectionRange.length];
     
     if (selectionRange.location == NSNotFound) {
-      // NSNotFound may just mean that we don't have the focus yet
-      // say NO for now, but this may toggle back to YES after the first insertText
+      // NSNotFound may just mean that we don't have the focus yet; say NO for
+      // now, but this may toggle back to YES after the first insertText
       selectionApiVerified = NO;
       self.complianceUncertain = YES;
       [self.appDelegate logDebugMessage:@"TextApiCompliance testCompliance not compliant but uncertain, range is NSNotFound"];
-    } else if (selectionRange.location == 0) {
-      // location zero may just mean that we are at the beginning of the doc
-      // say YES for now, but this may toggle back to NO after the first insertText
+    } else if (selectionRange.location >= 0) {
+      // location greater than or equal to zero may just mean that the client
+      // returns an inaccurate value; say YES for now, but set back to NO if the
+      // first insertText does not cause a change in the selection
       selectionApiVerified = YES;
       self.complianceUncertain = YES;
-      [self.appDelegate logDebugMessage:@"TextApiCompliance testCompliance compliant but uncertain, location = 0"];
-    } else if (selectionRange.location > 0) {
-      // we are confident, based on testing, that selectedRange API does  work
-      selectionApiVerified = YES;
-      self.complianceUncertain = NO;
-      [self.appDelegate logDebugMessage:@"TextApiCompliance testCompliance compliant and certain, location > 0"];
+      [self.appDelegate logDebugMessage:@"TextApiCompliance testCompliance compliant but uncertain, location >= 0"];
     }
   }
   [self.appDelegate logDebugMessage:@"TextApiCompliance testCompliance workingSelectionApi for app %@: set to %@", self.clientApplicationId, selectionApiVerified?@"yes":@"no"];
@@ -128,10 +129,17 @@ return [NSString stringWithFormat:@"complianceUncertain: %d, hasCompliantSelecti
       self.complianceUncertain = NO;
       [self.appDelegate logDebugMessage:@"TextApiCompliance testComplianceAfterInsert certain, non-compliant, location = 0"];
     } else if (selectionRange.location > 0) {
-      // we are confident, based on testing, the selectedRange API does work
-      self.hasCompliantSelectionApi = YES;
-      self.complianceUncertain = NO;
-      [self.appDelegate logDebugMessage:@"TextApiCompliance testComplianceAfterInsert compliant and certain, location > 0"];
+      if (NSEqualRanges(selectionRange, self.initialSelection)) {
+        // NO for certain, when the selection is unchanged after an insert
+        self.hasCompliantSelectionApi = NO;
+        self.complianceUncertain = NO;
+        [self.appDelegate logDebugMessage:@"TextApiCompliance testComplianceAfterInsert certain, non-compliant, selection the same: initial location = %@, new location = %@", NSStringFromRange(self.initialSelection), NSStringFromRange(selectionRange)];
+      } else {
+        // YES for certain, when the selection is changed after an insert
+        self.hasCompliantSelectionApi = YES;
+        self.complianceUncertain = NO;
+        [self.appDelegate logDebugMessage:@"TextApiCompliance testComplianceAfterInsert certain, compliant, selection changed from initial location = %@ to new location = %@", NSStringFromRange(self.initialSelection), NSStringFromRange(selectionRange)];
+      }
     }
     
     [self.appDelegate logDebugMessage:@"TextApiCompliance testComplianceAfterInsert, self.hasWorkingSelectionApi = %@ for app %@", self.hasCompliantSelectionApi?@"yes":@"no", self.clientApplicationId];
@@ -177,13 +185,14 @@ return [NSString stringWithFormat:@"complianceUncertain: %d, hasCompliantSelecti
                      [clientAppId isEqual: @"org.sil.app.builder.dictionary.DictionaryAppBuilder"] ||
                      //[clientAppId isEqual: @"com.microsoft.Word"] || // 2020-11-24[mcd]: Appears to work well in Word 16.43, disable legacy by default
                      [clientAppId isEqual: @"org.openoffice.script"] ||
-                     // 2023-12-13[sgs]: Adobe apps automatically detected as non-compliant 
+                     // 2023-12-13[sgs]: Adobe apps automatically detected as non-compliant
                      //[clientAppId isEqual: @"com.adobe.illustrator"] ||
                      //[clientAppId isEqual: @"com.adobe.InDesign"] ||
                      //[clientAppId isEqual: @"com.adobe.Photoshop"] ||
                      //[clientAppId isEqual: @"com.adobe.AfterEffects"] ||
                      //[clientAppId isEqual: @"com.microsoft.VSCode"] || // 2023-05-29[sgs]: Works with 1.78.2, disable legacy by default
                      [clientAppId isEqual: @"com.google.Chrome"] ||
+                              // 2023-12-13[sgs]: must hard-code for Chrome because Google Docs returns relative but incorrect location so no way to auto-detect
                      [clientAppId hasPrefix: @"net.java"] ||
                      [clientAppId isEqual: @"com.Keyman.test.legacyInput"]
                      /*||[clientAppId isEqual: @"ro.sync.exml.Oxygen"] - Oxygen has worse problems */

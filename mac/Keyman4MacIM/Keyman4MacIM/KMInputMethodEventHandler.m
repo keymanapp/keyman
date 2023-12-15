@@ -319,10 +319,13 @@ NSRange _previousSelRange;
 //MARK: Core-related key processing
 
 - (void)checkTextApiCompliance:(id)client {
-  // if TextApiCompliance object is null or stale,
-  // then create a new one for the current application
+  // if TextApiCompliance object is nil or the app or the context has changed,
+  // then create a new one for the current application and context
+  // the text api compliance may be different from one text field to another
   
-  if ((self.apiCompliance == nil) || (![self.apiCompliance.clientApplicationId isEqualTo:self.clientApplicationId])) {
+  if ((self.apiCompliance == nil) ||
+      (![self.apiCompliance.clientApplicationId isEqualTo:self.clientApplicationId]) ||
+      self.contextChanged) {
     self.apiCompliance = [[TextApiCompliance alloc]initWithClient:client applicationId:self.clientApplicationId];
     [self.appDelegate logDebugMessage:@"KMInputMethodHandler initWithClient checkTextApiCompliance: %@", _apiCompliance];
   } else if (self.apiCompliance.isComplianceUncertain) {
