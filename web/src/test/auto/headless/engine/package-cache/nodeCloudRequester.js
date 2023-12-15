@@ -38,7 +38,7 @@ describe("Mocked cloud query results in headless mode ('canary' testing)", () =>
   }
 
   it('sil_euro_latin@no,sv', async () => {
-    const query = performMockedRequest(`${__dirname}/../../resources/query-mock-results/sil_euro_latin@no_sv.js.fixture`);
+    const query = performMockedRequest(`${__dirname}/../../../resources/query-mock-results/sil_euro_latin@no_sv.js.fixture`);
     await query.promise;
 
     assert.isTrue(query.mockedRegister.called);
@@ -58,7 +58,7 @@ describe("Mocked cloud query results in headless mode ('canary' testing)", () =>
   });
 
   it('sil_cameroon_azerty', async () => {
-    const query = performMockedRequest(`${__dirname}/../../resources/query-mock-results/sil_cameroon_azerty.js.fixture`);
+    const query = performMockedRequest(`${__dirname}/../../../resources/query-mock-results/sil_cameroon_azerty.js.fixture`);
     await query.promise;
 
     assert.isTrue(query.mockedRegister.called);
@@ -75,7 +75,7 @@ describe("Mocked cloud query results in headless mode ('canary' testing)", () =>
   });
 
   it('@dz', async () => {
-    const query = performMockedRequest(`${__dirname}/../../resources/query-mock-results/@dz.js.fixture`);
+    const query = performMockedRequest(`${__dirname}/../../../resources/query-mock-results/@dz.js.fixture`);
     await query.promise;
 
     assert.isTrue(query.mockedRegister.called);
