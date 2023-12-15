@@ -66,7 +66,7 @@ compile_and_copy() {
     --minify
 
   $BUNDLE_CMD    "${BUILD_ROOT}/obj/test-index.js" \
-    --out        "${BUILD_ROOT}/lib/index.js" \
+    --out        "${BUILD_ROOT}/lib/index.mjs" \
     --sourceRoot "@keymanapp/keyman/web/build/app/browser/lib" \
     --format esm
 
