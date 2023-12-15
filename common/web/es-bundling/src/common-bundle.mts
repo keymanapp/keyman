@@ -10,6 +10,7 @@ let sourceFromArgs;
 let destFromArgs;
 let profilePath;
 let sourceRoot;
+let platform;
 
 function doHelp(errCode?: number) {
   console.log(`
@@ -30,6 +31,7 @@ Options:
 
                         If not specified, 'iife' will be used.
   --minify              Enables minification.
+  --platform=<platform> Sets the 'platform' property of the esbuild config accordingly.
   --profile=<out-file>  Generates an associated filesize profile at the specified path.
   --sourceRoot=<path>   Sets the sourceRoot for generated source maps
 ` );
@@ -62,6 +64,9 @@ if(process.argv.length > 2) {
         break;
       case '--out':
         destFromArgs = process.argv[++i];
+        break;
+      case '--platform':
+        platform = process.argv[++i];
         break;
       case '--profile':
         profilePath = process.argv[++i];
@@ -118,6 +123,7 @@ const config: esbuild.BuildOptions = {
   minify: MINIFY,
   metafile: !!profilePath,
   sourceRoot: sourceRoot, // may be undefined - is fine if so.
+  platform: platform as esbuild.Platform || "browser"
 };
 
 await prepareTslibTreeshaking(config);
