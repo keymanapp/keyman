@@ -230,7 +230,7 @@ export class KeysCompiler extends SectionCompiler {
       multiTap: no_list,
       switch: no_string,
       to: no_string,
-      width: 1.0,
+      width: 10.0, // 10 * .1
     });
 
     if (r.size !== KeysCompiler.reserved_count) {

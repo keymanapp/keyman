@@ -273,10 +273,10 @@ block(keys)                         # struct COMP_KMXPLUS_KEYS {
   00 00 00 00                       #  flicks
   # (#0002) gap (reserved)
   00 00 00 00                       #   nothing
-  01 00 00 00                       #   KMX_DWORD flags = extend
+  03 00 00 00                       #   KMX_DWORD flags = extend|gap
   index(strNull,strGapReserved,2)  #   KMXPLUS_STR 'gap (reserved)' (key id)
   00 00 00 00                       #   KMXPLUS_STR switch
-  0A 00 00 00                       #   KMX_DWORD width*10
+  0A 00 00 00                       #   KMX_DWORD width*10  (full width)
   00 00 00 00                       # TODO: index(listNull,listNull,4)        #   LIST longPress
   00 00 00 00                       #   STR longPressDefault
   00 00 00 00                       # TODO: index(listNull,listNull,4)        #   LIST multiTap
@@ -292,9 +292,9 @@ block(keys)                         # struct COMP_KMXPLUS_KEYS {
   00 00 00 00 # TODO: index(listNull,listNull,4)        #   LIST multiTap
   00 00 00 00                       #   flicks 0
   # (#0004) that
-  index(strNull,strKeys,2)          #   KMXPLUS_STR 'U+0127'
+  index(strNull,strKeys,2)          #   KMXPLUS_STR '...'
   01 00 00 00                       #   KMX_DWORD flags = extend
-  index(strNull,strThat,2)          #   KMXPLUS_STR 'hmaqtugha'
+  index(strNull,strThat,2)          #   KMXPLUS_STR 'that'
   00 00 00 00                       #   KMXPLUS_STR switch
   0A 00 00 00                       #   KMX_DWORD width*10
   00 00 00 00 # TODO: index(listNull,listNull,4)        #   LIST longPress
@@ -320,23 +320,70 @@ block(keys)                         # struct COMP_KMXPLUS_KEYS {
   ## 00 00 00 00                        #  KMX_DWORD modifiers (none)
   ## 04 00 00 00                        #  KMX_DWORD key index (that)
 
-#   - vkey -   - modifier -   - key id  -
-  02 00 00 00   00 00 00 00   02 00 00 00 # gap (reserved)
-  03 00 00 00   00 00 00 00   02 00 00 00 # gap (reserved)
-  04 00 00 00   00 00 00 00   02 00 00 00 # gap (reserved)
-  05 00 00 00   00 00 00 00   02 00 00 00 # gap (reserved)
-  06 00 00 00   00 00 00 00   02 00 00 00 # gap (reserved)
-  07 00 00 00   00 00 00 00   02 00 00 00 # gap (reserved)
-  08 00 00 00   00 00 00 00   02 00 00 00 # gap (reserved)
-  09 00 00 00   00 00 00 00   02 00 00 00 # gap (reserved)
-  0a 00 00 00   00 00 00 00   02 00 00 00 # gap (reserved)
-  0b 00 00 00   00 00 00 00   02 00 00 00 # gap (reserved)
-  0c 00 00 00   00 00 00 00   02 00 00 00 # gap (reserved)
-  0d 00 00 00   00 00 00 00   02 00 00 00 # gap (reserved)
-  29 00 00 00   00 00 00 00   02 00 00 00 # gap (reserved)
-  31 00 00 00   00 00 00 00   04 00 00 00 # "that"
-  c0 00 00 00   00 00 00 00   03 00 00 00 # "hmaqtugha"
+# following lines generated with this snippet:
+#
+#      /** from scanCodes-implied.xml */
+#      const scans = ("29 02 03 04 05 06 07 08 09 0A 0B 0C 0D" + " 10 11 12 13 14 15 16 17 18 19 1A 1B 2B" + " 1E 1F 20 21 22 23 24 25 26 27 28" + " 2C 2D 2E 2F 30 31 32 33 34 35").split(/ /);
+#
+#      for (let s of scans) {
+#        const n = Number.parseInt(s, 16);
+#        const v = CLDRScanToUSVirtualKeyCodes[n]; // virtual-key-constants.ts
+#        if (!v) {
+#          console.error(`! ${s}`);
+#        } else {
+#          console.log(`  ${Number(v).toString(16)} 00 00 00   00 00 00 00   02 00 00 00 # gap (reserved)`);
+#        }
+#      }
 
+#   - vkey -   - modifier -   - key id  -
+  20 00 00 00   00 00 00 00   02 00 00 00 # gap (reserved)
+  30 00 00 00   00 00 00 00   02 00 00 00 # gap (reserved)
+  31 00 00 00   00 00 00 00   04 00 00 00 # "that"
+  32 00 00 00   00 00 00 00   02 00 00 00 # gap (reserved)
+  33 00 00 00   00 00 00 00   02 00 00 00 # gap (reserved)
+  34 00 00 00   00 00 00 00   02 00 00 00 # gap (reserved)
+  35 00 00 00   00 00 00 00   02 00 00 00 # gap (reserved)
+  36 00 00 00   00 00 00 00   02 00 00 00 # gap (reserved)
+  37 00 00 00   00 00 00 00   02 00 00 00 # gap (reserved)
+  38 00 00 00   00 00 00 00   02 00 00 00 # gap (reserved)
+  39 00 00 00   00 00 00 00   02 00 00 00 # gap (reserved)
+  41 00 00 00   00 00 00 00   02 00 00 00 # gap (reserved)
+  42 00 00 00   00 00 00 00   02 00 00 00 # gap (reserved)
+  43 00 00 00   00 00 00 00   02 00 00 00 # gap (reserved)
+  44 00 00 00   00 00 00 00   02 00 00 00 # gap (reserved)
+  45 00 00 00   00 00 00 00   02 00 00 00 # gap (reserved)
+  46 00 00 00   00 00 00 00   02 00 00 00 # gap (reserved)
+  47 00 00 00   00 00 00 00   02 00 00 00 # gap (reserved)
+  48 00 00 00   00 00 00 00   02 00 00 00 # gap (reserved)
+  49 00 00 00   00 00 00 00   02 00 00 00 # gap (reserved)
+  4a 00 00 00   00 00 00 00   02 00 00 00 # gap (reserved)
+  4b 00 00 00   00 00 00 00   02 00 00 00 # gap (reserved)
+  4c 00 00 00   00 00 00 00   02 00 00 00 # gap (reserved)
+  4d 00 00 00   00 00 00 00   02 00 00 00 # gap (reserved)
+  4e 00 00 00   00 00 00 00   02 00 00 00 # gap (reserved)
+  4f 00 00 00   00 00 00 00   02 00 00 00 # gap (reserved)
+  50 00 00 00   00 00 00 00   02 00 00 00 # gap (reserved)
+  51 00 00 00   00 00 00 00   02 00 00 00 # gap (reserved)
+  52 00 00 00   00 00 00 00   02 00 00 00 # gap (reserved)
+  53 00 00 00   00 00 00 00   02 00 00 00 # gap (reserved)
+  54 00 00 00   00 00 00 00   02 00 00 00 # gap (reserved)
+  55 00 00 00   00 00 00 00   02 00 00 00 # gap (reserved)
+  56 00 00 00   00 00 00 00   02 00 00 00 # gap (reserved)
+  57 00 00 00   00 00 00 00   02 00 00 00 # gap (reserved)
+  58 00 00 00   00 00 00 00   02 00 00 00 # gap (reserved)
+  59 00 00 00   00 00 00 00   02 00 00 00 # gap (reserved)
+  5a 00 00 00   00 00 00 00   02 00 00 00 # gap (reserved)
+  ba 00 00 00   00 00 00 00   02 00 00 00 # gap (reserved)
+  bb 00 00 00   00 00 00 00   02 00 00 00 # gap (reserved)
+  bc 00 00 00   00 00 00 00   02 00 00 00 # gap (reserved)
+  bd 00 00 00   00 00 00 00   02 00 00 00 # gap (reserved)
+  be 00 00 00   00 00 00 00   02 00 00 00 # gap (reserved)
+  bf 00 00 00   00 00 00 00   02 00 00 00 # gap (reserved)
+  c0 00 00 00   00 00 00 00   03 00 00 00 # "hmaqtugha"
+  db 00 00 00   00 00 00 00   02 00 00 00 # gap (reserved)
+  dc 00 00 00   00 00 00 00   02 00 00 00 # gap (reserved)
+  dd 00 00 00   00 00 00 00   02 00 00 00 # gap (reserved)
+  de 00 00 00   00 00 00 00   02 00 00 00 # gap (reserved)
 
 # ----------------------------------------------------------------------------------------------------
 # layr
@@ -490,7 +537,7 @@ block(strs)                         #  struct COMP_KMXPLUS_STRS {
   block(strSet2)             61 00 62 00 63 00 block(x) 00 00                           # 'abc'
   block(strBase)             62 00 61 00 73 00 65 00 block(x) 00 00                     # 'base'
   block(strElemBkspFrom2)    65 00 block(x) 00 00                                       # 'e'
-  block(strGapReserved)         67 00 61 00 70 00 20 00 28 00 72 00 65 00 73 00 65 00 72 00 76 00 65 00 65 00 29 00 block(x) 00 00 # 'gap (reserved)'
+  block(strGapReserved)         67 00 61 00 70 00 20 00 28 00 72 00 65 00 73 00 65 00 72 00 76 00 65 00 64 00 29 00 block(x) 00 00 # 'gap (reserved)'
   block(strHmaqtugha)        68 00 6d 00 61 00 71 00 74 00 75 00 67 00 68 00 61 00 block(x) 00 00   # 'hmaqtugha'
 #str #10
   block(strLocale)           6d 00 74 00   block(x) 00 00                               # 'mt'
