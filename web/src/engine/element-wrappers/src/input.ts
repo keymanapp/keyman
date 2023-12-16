@@ -58,6 +58,10 @@ export default class Input extends OutputTarget<EventMap> {
     return false;
   }
 
+  static isSupportedType(type: string): boolean {
+    return type == 'email' || type == 'search' || type == 'text' || type == 'url';
+  }
+
   getElement(): HTMLInputElement {
     return this.root;
   }
