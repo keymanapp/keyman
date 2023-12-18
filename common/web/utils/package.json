@@ -36,5 +36,8 @@
   "type": "module",
   "paths": {
     "@keymanapp/keyman-version": "*"
-  }
+  },
+  "sideEffects": [
+    "./src/kmwstring.ts", "./build/obj/kmwstring.js"
+  ]
 }
