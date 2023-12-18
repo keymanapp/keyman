@@ -1,0 +1,13 @@
+﻿c ye_old_ten_key generated from template at 2023-10-23 12:48:10
+c with name "ye_old_ten_key"
+store(&VERSION) '10.0'
+store(&NAME) 'ye_old_ten_key'
+store(&COPYRIGHT) '© SIL Intl'
+store(&KEYBOARDVERSION) '1.0'
+store(&TARGETS) 'web iphone ipad androidphone androidtablet mobile tablet'
+store(&VISUALKEYBOARD) 'ye_old_ten_key.kvks'
+store(&LAYOUTFILE) 'ye_old_ten_key.keyman-touch-layout'
+
+begin Unicode > use(main)
+
+group(main) using keys

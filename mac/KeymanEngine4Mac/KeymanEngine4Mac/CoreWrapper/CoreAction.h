@@ -5,8 +5,6 @@
  * Keyman
  * 
  * Created by Shawn Schantz on 2023-02-21.
- * 
- * Description...
  */
 
 #import <Foundation/Foundation.h>

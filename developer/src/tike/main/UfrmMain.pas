@@ -88,6 +88,7 @@ interface
 
 uses
   System.UITypes,
+  System.Generics.Collections,
   Windows,
   Messages,
   SysUtils,
@@ -107,6 +108,7 @@ uses
   UfrmMDIEditor,
   MenuImgList,
   Keyman.Developer.System.Project.Project,
+  Keyman.Developer.System.TikeMultiProcess,
   Keyman.Developer.UI.Project.UfrmProject,
   CharacterMapSettings,
   mrulist,
@@ -314,6 +316,9 @@ type
     Stopserver1: TMenuItem;
     ToolButton13: TToolButton;
     ToolButton16: TToolButton;
+    mnuWindow: TMenuItem;
+    Newwindow1: TMenuItem;
+    N12: TMenuItem;
     procedure FormCreate(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure mnuFileClick(Sender: TObject);
@@ -334,6 +339,7 @@ type
     procedure mnuToolsClick(Sender: TObject);
     procedure mnuToolsDebugTestsShowDebuggerEventsPanelClick(Sender: TObject);
     procedure ApplicationEvents1Message(var Msg: tagMSG; var Handled: Boolean);
+    procedure mnuWindowClick(Sender: TObject);
 
   private
     AppStorage: TJvAppRegistryStorage;
@@ -355,6 +361,8 @@ type
     FHasDoneCloseCleanup: Boolean;
 
     FFilesToOpen: TStringList;
+
+    FWindowProcesses: TObjectList<TTikeProcess>;
 
     //procedure ChildWindowsChange(Sender: TObject);
     procedure WMUserFormShown(var Message: TMessage); message WM_USER_FORMSHOWN;
@@ -398,6 +406,7 @@ type
     procedure DoCloseCleanup;
 
     procedure RefreshProjectMRU;
+    procedure mnuWindowSelectClick(Sender: TObject);
 
   protected
     procedure WndProc(var Message: TMessage); override;
@@ -432,6 +441,8 @@ type
 
     procedure ShowDebug(AShow: Boolean);
 
+    function SaveAndCloseAllFiles: Boolean;
+
     property ActiveChild: TfrmTikeChild read GetActiveChild write SetActiveChild;
     property ActiveEditor: TfrmTikeEditor read GetActiveEditor;
     procedure FocusActiveChild;
@@ -443,10 +454,12 @@ type
 
     procedure RefreshOptions;
 
+    procedure OpenProjectInCurrentProcess(FileName: WideString);
     function OpenEditor(FFileName: string; frmClass: TfrmTikeEditorClass): TfrmTikeEditor;
     procedure OpenProject(const filename: string);
     function OpenFile(FFileName: string; FCloseNewFile: Boolean): TfrmTikeChild;
     procedure OpenFilesInProject(FFileNames: TArray<string>);
+    procedure OpenNewWindow;
 
     procedure HelpTopic(s: string); overload;
     procedure HelpTopic(Sender: TTIKEForm); overload;
@@ -490,7 +503,6 @@ uses
   Keyman.Developer.System.Project.ProjectLog,
   Keyman.Developer.System.Project.XmlLdmlProjectFile,
   Keyman.Developer.System.TikeCommandLine,
-  Keyman.Developer.System.TikeMultiProcess,
   Keyman.Developer.UI.Project.ProjectFileUI,
   Keyman.Developer.UI.Project.ProjectUI,
   Keyman.Developer.UI.UfrmLdmlKeyboardEditor,
@@ -574,17 +586,8 @@ begin
   Application.HelpFile := GetHelpURL;   // I4677   // I4841
   mHHelp := TWebHookHelpSystem.Create(Application.HelpFile);   // I4677   // I4841
 
-  with TRegistryErrorControlled.Create do  // I2890
-  try
-    RootKey := HKEY_CURRENT_USER;
-    if OpenKeyReadOnly(SRegKey_IDEOptions_CU) then
-    begin
-      if ValueExists(SRegValue_IDEOptToolbarVisible) and (ReadString(SRegValue_IDEOptToolbarVisible) = '0') then
-        barTools.Visible := False;
-    end;
-  finally
-    Free;
-  end;
+  if not FKeymanDeveloperOptions.ToolbarVisible then
+    barTools.Visible := False;
 
   RemoveOldestTikeEditFonts(False);
   RemoveOldestTikeTestFonts(False);
@@ -671,25 +674,16 @@ begin
     FChildWindows[i].Release;   // I2595, probably not necessary
   end;
 
-  with TRegistryErrorControlled.Create do  // I2890
-  try
-    RootKey := HKEY_CURRENT_USER;
-    if OpenKey(SRegKey_IDEOptions_CU, True) then
-    begin
-      if IsGlobalProjectUIReady then
-      begin
-        FGlobalProject.Save;   // I4691
-        WriteString(SRegValue_ActiveProject, FGlobalProject.FileName);
-      end
-      else
-      begin
-        if ValueExists(SRegValue_ActiveProject) then
-          DeleteValue(SRegValue_ActiveProject);
-      end;
-    end;
-  finally
-    Free;
+  if IsGlobalProjectUIReady then
+  begin
+    FGlobalProject.Save;   // I4691
+    FKeymanDeveloperOptions.StartupProjectPath := FGlobalProject.FileName;
+  end
+  else
+  begin
+    FKeymanDeveloperOptions.StartupProjectPath := '';
   end;
+  FKeymanDeveloperOptions.Write;
 
   FreeAndNil(frmCharacterMapDock);
   FreeAndNil(frmCharacterIdentifier);   // I4807
@@ -757,6 +751,7 @@ begin
   FreeAndNil(AppStorage);
 
   FreeAndNil(FFilesToOpen);
+  FreeAndNil(FWindowProcesses);
 end;
 
 procedure TfrmKeymanDeveloper.FormShow(Sender: TObject);
@@ -1306,7 +1301,7 @@ begin
         end;
 
         if BeforeOpenProject then
-          modActionsMain.OpenProject(FFileName);
+          OpenProjectInCurrentProcess(FFileName);
       end
       else
       begin
@@ -1343,6 +1338,38 @@ begin
   end;
 end;
 
+procedure TfrmKeymanDeveloper.OpenProjectInCurrentProcess(FileName: WideString);
+begin
+  FileName := ExpandUNCFileName(FileName);
+  if (FileName <> '') and not FileExists(FileName) then
+  begin
+    ShowMessage('The project '+FileName+' does not exist.');
+    Exit;
+  end;
+
+  if IsGlobalProjectUIReady then
+  begin
+    if not SaveAndCloseAllFiles then Exit;
+    FreeGlobalProjectUI;
+  end;
+
+  try
+    LoadGlobalProjectUI(ptUnknown, FileName);   // I4687
+  except
+    on E:EProjectLoader do
+    begin
+      // Message will be displayed by LoadGlobalProjectUI
+      FreeGlobalProjectUI;
+      ShowProject;
+      UpdateCaption;
+      Exit;
+    end;
+  end;
+  ProjectMRU.Add(FGlobalProject.FileName);
+  ShowProject;
+  UpdateCaption;
+end;
+
 function TfrmKeymanDeveloper.OpenKMNEditor(FFileName: string): TfrmTikeEditor;
 begin
   Result := OpenEditor(FFileName, TfrmKeymanWizard);
@@ -1358,6 +1385,12 @@ begin
   Result := OpenEditor(FFileName, TfrmModelEditor);
 end;
 
+procedure TfrmKeymanDeveloper.OpenNewWindow;
+begin
+  if not TLaunchProjects.LaunchNewEmptyInstance then
+    ShowMessage('Unable to launch new instance: '+SysErrorMessage(GetLastError));
+end;
+
 function TfrmKeymanDeveloper.OpenKPSEditor(FFileName: string): TfrmTikeEditor;
 begin
   Result := OpenEditor(FFileName, TfrmPackageEditor);
@@ -1366,6 +1399,33 @@ end;
 function TfrmKeymanDeveloper.OpenKVKEditor(FFileName: string): TfrmTikeEditor;
 begin
   Result := OpenEditor(FFileName, TfrmOSKEditor);
+end;
+
+function TfrmKeymanDeveloper.SaveAndCloseAllFiles: Boolean;
+var
+  i: Integer;
+begin
+  FGlobalProject.Save;
+  for i := 0 to FChildWindows.Count - 1 do
+  begin
+    if FChildWindows[i] is TfrmProject then
+      Continue;
+
+    if not FChildWindows[i].CloseQuery then
+      Exit(False);
+  end;
+
+  for i := 0 to FChildWindows.Count - 1 do
+  begin
+    if FChildWindows[i] is TfrmProject then
+      Continue;
+
+    FChildWindows[i].Visible := False;
+    FChildWindows[i].Parent := nil;
+    FChildWindows[i].Release;
+  end;
+
+  Result := True;
 end;
 
 function TfrmKeymanDeveloper.BeforeOpenProject: Boolean;
@@ -1462,7 +1522,7 @@ begin
     begin
       m := TMenuItem.Create(Self);
       m.Caption := '&'+IntToStr(i+1)+' '+FGlobalProject.MRU.EllipsisFile(i);
-      m.Hint := FGlobalProject.MRU.Files[i];
+      m.Tag := i;
       m.OnClick := mnuFileRecentFileClick;
       mnuFileRecent.Add(m);
     end;
@@ -1470,9 +1530,11 @@ begin
 end;
 
 procedure TfrmKeymanDeveloper.mnuFileRecentFileClick(Sender: TObject);
+var
+  filename: string;
 begin
-  with Sender as TMenuItem do
-    OpenFilesInProject([Hint]);
+  filename := FGlobalProject.MRU.Files[(Sender as TMenuItem).Tag];
+  OpenFilesInProject([filename]);
 end;
 
 {-------------------------------------------------------------------------------
@@ -1552,7 +1614,7 @@ begin
   begin
     m := TMenuItem.Create(Self);
     m.Caption := '&'+IntToStr(i+1)+' '+FProjectMRU.EllipsisFile(i);
-    m.Hint := FProjectMRU.Files[i];
+    m.Tag := i;
     m.OnClick := mnuProjectRecentFileClick;
     mnuProjectsRecent.Add(m);
   end;
@@ -1567,7 +1629,7 @@ procedure TfrmKeymanDeveloper.mnuProjectRecentFileClick(Sender: TObject);
 var
   filename: string;
 begin
-  filename := (Sender as TMenuItem).Hint;
+  filename := FProjectMRU.Files[(Sender as TMenuItem).Tag];
   OpenProject(filename);
 end;
 
@@ -1575,11 +1637,13 @@ procedure TfrmKeymanDeveloper.OpenProject(const filename: string);
 begin
   if IsGlobalProjectUIReady then
   begin
+    // If we already have a project open, then we'll start a new instance
     OpenFilesInProject([filename]);
   end
   else if BeforeOpenProject then
   begin
-    modActionsMain.OpenProject(filename);
+    // No project is open, so we'll reuse the current instance
+    OpenProjectInCurrentProcess(filename);
   end;
 end;
 
@@ -1597,6 +1661,37 @@ procedure TfrmKeymanDeveloper.mnuToolsDebugTestsShowDebuggerEventsPanelClick(
   Sender: TObject);
 begin
   TfrmDebugStatus.ShowDebuggerEventsPanel := not TfrmDebugStatus.ShowDebuggerEventsPanel;
+end;
+
+procedure TfrmKeymanDeveloper.mnuWindowClick(Sender: TObject);
+var
+  m: TMenuItem;
+  i: Integer;
+  p: TTikeProcess;
+begin
+  // Remove existing items from the menu
+  for i := mnuWindow.Count - 1 downto 2 do
+    mnuWindow.Items[i].Free;
+
+  FreeAndNil(FWindowProcesses);
+
+  FWindowProcesses := TikeMultiProcess.Enumerate;
+  i := 0;
+  for p in FWindowProcesses do
+  begin
+    m := TMenuItem.Create(Self);
+    m.Caption := '&'+IntToStr(i+1)+' '+EllipsisFile(p.Title);
+    m.Tag := i;
+    m.OnClick := mnuWindowSelectClick;
+    m.Checked := p.ThreadId = GetCurrentThreadId;
+    mnuWindow.Add(m);
+    Inc(i);
+  end;
+end;
+
+procedure TfrmKeymanDeveloper.mnuWindowSelectClick(Sender: TObject);
+begin
+  FWindowProcesses[(Sender as TMenuItem).Tag].FocusProcess;
 end;
 
 procedure TfrmKeymanDeveloper.SetActiveChild(const Value: TfrmTikeChild);

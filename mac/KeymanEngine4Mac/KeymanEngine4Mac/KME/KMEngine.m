@@ -111,19 +111,13 @@ const NSString* kEasterEggKmxName = @"EnglishSpanish.kmx";
 }
 
 /*
- * Returns an NSArray of CoreAction objects. Returns nil if no actions result.
+ * Returns a CoreKeyOutput object detailing the results of the keystroke
  */
-- (NSArray *)processEvent:(NSEvent *)event {
+- (CoreKeyOutput *)processEvent:(NSEvent *)event {
   if (!self.kmx)
       return nil;
 
-  // CoreWrapper returns an array of CoreAction objects
-  NSArray *coreActions = [self.coreWrapper processEvent:event];
-  if ([coreActions count] == 0) {
-    return nil;
-  } else {
-    return coreActions;
-  }
+  return [self.coreWrapper processEvent:event];
 }
 
 - (void) processPossibleEasterEggCharacterFrom:(NSString *)characters {

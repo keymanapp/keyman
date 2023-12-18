@@ -22,6 +22,7 @@ import {
   SystemStoreIDs,
   type TextTransform
 } from "@keymanapp/keyboard-processor";
+import { TranscriptionCache } from "../transcriptionCache.js";
 
 export default class InputProcessor {
   public static readonly DEFAULT_OPTIONS: ProcessorInitOptions = {
@@ -37,6 +38,8 @@ export default class InputProcessor {
   private kbdProcessor: KeyboardProcessor;
   private lngProcessor: LanguageProcessor;
 
+  private readonly contextCache = new TranscriptionCache();
+
   constructor(device: DeviceSpec, predictiveTextWorker: Worker, options?: ProcessorInitOptions) {
     if(!device) {
       throw new Error('device must be defined');
@@ -48,7 +51,7 @@ export default class InputProcessor {
 
     this.contextDevice = device;
     this.kbdProcessor = new KeyboardProcessor(device, options);
-    this.lngProcessor = new LanguageProcessor(predictiveTextWorker);
+    this.lngProcessor = new LanguageProcessor(predictiveTextWorker, this.contextCache);
   }
 
   public get languageProcessor(): LanguageProcessor {
@@ -97,6 +100,18 @@ export default class InputProcessor {
       if(kbdMismatch) {
         // Avoid force-reset of context per our setter above.
         this.keyboardInterface.activeKeyboard = keyEvent.srcKeyboard;
+      }
+
+      // Support for multitap context reversion; multitap keys should act as if they were
+      // the first thing typed since `preInput`, the state before the original base key.
+      if(keyEvent.baseTranscriptionToken) {
+        const transcription = this.contextCache.get(keyEvent.baseTranscriptionToken);
+        if(transcription) {
+          // Restores full context, including deadkeys in their exact pre-keystroke state.
+          outputTarget.restoreTo(transcription.preInput);
+        } else {
+          console.warn('The base context for the multitap could not be found');
+        }
       }
 
       return this._processKeyEvent(keyEvent, outputTarget);
@@ -215,6 +230,10 @@ export default class InputProcessor {
       ruleBehavior.triggersDefaultCommand = true;
     }
 
+    // Multitaps operate in part by referencing 'committed' Transcriptions to rewind
+    // the context as necessary.
+    this.contextCache.save(ruleBehavior.transcription);
+
     // The keyboard may want to take an action after all other keystroke processing is
     // finished, for example to switch layers. This action may not have any output
     // but may change system store or variable store values. Given this, we don't need to
@@ -295,7 +314,6 @@ export default class InputProcessor {
         // Sort the distribution into probability-descending order.
         keyDistribution.sort((a, b) => b.p - a.p);
 
-        let activeLayout = this.activeKeyboard.layout(keyEvent.device.formFactor);
         alternates = [];
 
         let totalMass = 0; // Tracks sum of non-error probabilities.
@@ -314,9 +332,9 @@ export default class InputProcessor {
 
           let mock = Mock.from(windowedMock, false);
 
-          let altKey = activeLayout.getLayer(keyEvent.kbdLayer).getKey(pair.keyId);
+          const altKey = pair.keySpec;
           if(!altKey) {
-            console.warn("Potential fat-finger key could not be found in layer!");
+            console.warn("Internal error:  failed to properly filter set of keys for corrections");
             continue;
           }
 

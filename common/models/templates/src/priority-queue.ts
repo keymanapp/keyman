@@ -19,11 +19,26 @@ export default class PriorityQueue<Type> {
   private heap: Type[];
 
   /**
+   * Shallow-copy / clone constructor.
+   * @param instance
+   */
+  constructor(instance: PriorityQueue<Type>);
+  /**
    * Constructs an empty priority queue.
    * @param comparator A `Comparator` returning negative values when and only when
    * the first parameter should precede the second parameter.
+   * @param initialEntries
    */
-  constructor(comparator: Comparator<Type>, initialEntries: Type[] = []) {
+  constructor(comparator: Comparator<Type>, initialEntries?: Type[]);
+  constructor(arg1: Comparator<Type> | PriorityQueue<Type>, initialEntries?: Type[]) {
+    if(typeof arg1 != 'function') {
+      this.comparator = arg1.comparator;
+      // Shallow-copies are fine.
+      this.heap = ([] as Type[]).concat(arg1.heap);
+      return;
+    }
+
+    const comparator = arg1;
     // TODO: We may wish to allow options specifying a limit or threshold for adding
     // items to the priority queue.  Possibly both.
     //
@@ -31,7 +46,7 @@ export default class PriorityQueue<Type> {
     // https://en.wikipedia.org/wiki/Min-max_heap
     this.comparator = comparator;
 
-    this.heap = Array.from(initialEntries);
+    this.heap = Array.from(initialEntries ?? []);
     this.heapify();
   }
 

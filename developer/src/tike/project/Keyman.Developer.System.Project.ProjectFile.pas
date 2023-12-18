@@ -922,6 +922,7 @@ begin
       //
 
       TProjectUrlRenderer.AddUrls(doc.documentElement);
+      TProjectUrlRenderer.AddProcessState(doc.documentElement);
 
       xsl := MSXMLDOMDocumentFactory.CreateDOMDocument;
       try

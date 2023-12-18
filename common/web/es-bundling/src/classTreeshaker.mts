@@ -15,7 +15,7 @@ export const pluginForDowncompiledClassTreeshaking: esbuild.Plugin = {
       return {
         // Marks any classes compiled by TS (as per the /** @class */ annotation)
         // as __PURE__ in order to facilitate tree-shaking.
-        contents: source.replace('/** @class */', '/* @__PURE__ */ /** @class */'),
+        contents: source.replaceAll('/** @class */', '/** @__PURE__ */'),
         loader: 'js'
       }
     });

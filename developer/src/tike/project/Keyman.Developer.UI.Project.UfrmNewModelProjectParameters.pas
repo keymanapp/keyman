@@ -131,14 +131,14 @@ uses
   Keyman.System.LexicalModelUtils,
   BCP47Tag,
   utilstr,
-  dmActionsMain,
   KeymanDeveloperOptions,
   Keyman.Developer.System.HelpTopics,
   Keyman.Developer.System.Project.Project,
   Keyman.Developer.System.Project.ProjectFile,
   Keyman.Developer.System.ModelProjectTemplate,
   Keyman.Developer.System.ProjectTemplate,
-  Keyman.Developer.UI.UfrmSelectBCP47Language;
+  Keyman.Developer.UI.UfrmSelectBCP47Language,
+  UfrmMain;
 
 {$R *.dfm}
 
@@ -173,7 +173,7 @@ begin
         end;
       end;
 
-      modActionsMain.OpenProject(pt.ProjectFilename);
+      frmKeymanDeveloper.OpenProject(pt.ProjectFilename);
       Result := True;
 
     finally
