@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 17.0.232 alpha 2023-12-18
+
+*  (#10270)
+
 ## 17.0.231 alpha 2023-12-15
 
 * chore(web): Better match directory structure for headless engine tests (#10232)
