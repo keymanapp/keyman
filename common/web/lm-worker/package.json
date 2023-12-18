@@ -9,7 +9,7 @@
     },
     "./worker-main.wrapped.min.js": {
       "es6-bundling": "./build/lib/worker-main.wrapped.min.js",
-      "default": "./build/lib/worker-main.wrapped.min.js"
+      "default": "./build/lib/worker-main.wrapped.es5.min.js"
     }
   },
   "imports": {
