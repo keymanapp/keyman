@@ -94,6 +94,7 @@ compile_and_copy() {
   cp "${BUILD_ROOT}/filesize-profile.log"                               "$PROFILE_DEST/web-engine-filesize.log"
   cp "${BUILD_ROOT}/filesize-profile.es5.log"                           "$PROFILE_DEST/web-engine-filesize.es5.log"
   cp "$KEYMAN_ROOT/common/web/lm-worker/build/filesize-profile.log"     "$PROFILE_DEST/lm-worker-filesize.log"
+  cp "$KEYMAN_ROOT/common/web/lm-worker/build/filesize-profile.es5.log" "$PROFILE_DEST/lm-worker-filesize.es5.log"
 }
 
 builder_run_action configure verify_npm_setup
