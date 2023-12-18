@@ -14,6 +14,8 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 # This script runs from its own folder
 cd "$THIS_SCRIPT_PATH"
 
+BUNDLE_CMD="node $KEYMAN_ROOT/common/web/es-bundling/build/common-bundle.mjs"
+
 ################################ Main script ################################
 
 builder_describe "Builds a 'bulk renderer' that loads all the cloud keyboards from api.keyman.com and renders each of them to a document." \
@@ -31,7 +33,10 @@ builder_parse "$@"
 
 function do_build ( ) {
   tsc --build "$THIS_SCRIPT_PATH/tsconfig.json" $builder_verbose
-  node build-bundler.js
+
+  $BUNDLE_CMD    "${KEYMAN_ROOT}/web/build/tools/testing/bulk_rendering/obj/renderer_core.js" \
+    --out        "${KEYMAN_ROOT}/web/build/tools/testing/bulk_rendering/lib/bulk_render.js" \
+    --sourceRoot "@keymanapp/keyman/web/build/tools/testing/bulk_rendering/lib/"
 }
 
 builder_run_action configure  verify_npm_setup
