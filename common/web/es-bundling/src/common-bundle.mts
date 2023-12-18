@@ -1,6 +1,6 @@
 import fs from 'fs';
 import esbuild from 'esbuild';
-import { esmConfiguration, iifeConfiguration } from './configuration.mjs';
+import { esmConfiguration, forES6, iifeConfiguration } from './configuration.mjs';
 import { prepareTslibTreeshaking } from './tslibTreeshaking.mjs';
 
 let FORMAT = 'iife';
@@ -11,6 +11,8 @@ let destFromArgs;
 let profilePath;
 let sourceRoot;
 let platform;
+
+let jsVersionTarget='es5';
 
 function doHelp(errCode?: number) {
   console.log(`
@@ -34,6 +36,7 @@ Options:
   --platform=<platform> Sets the 'platform' property of the esbuild config accordingly.
   --profile=<out-file>  Generates an associated filesize profile at the specified path.
   --sourceRoot=<path>   Sets the sourceRoot for generated source maps
+  --target=<target>     Sets the JavaScript / ECMAScript version to target for the bundle.
 ` );
   process.exit(errCode || 0);
 }
@@ -73,6 +76,9 @@ if(process.argv.length > 2) {
         break;
       case '--sourceRoot':
         sourceRoot = process.argv[++i];
+        break;
+      case '--target':
+        jsVersionTarget = process.argv[++i];
         break;
       default:
         if(!sourceFromArgs) {
@@ -117,7 +123,7 @@ const destFile = destFromArgs;
 const baseConfig = FORMAT == 'iife' ? iifeConfiguration : esmConfiguration;
 
 const config: esbuild.BuildOptions = {
-  ...baseConfig,
+  ...jsVersionTarget == 'es6' ? forES6(baseConfig) : baseConfig,
   entryPoints: [sourceFile],
   outfile: destFile,
   minify: MINIFY,
