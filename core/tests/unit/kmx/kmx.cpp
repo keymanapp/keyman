@@ -257,8 +257,8 @@ run_test(const km::core::path &source, const km::core::path &compiled) {
     km_core_context_items_dispose(citems);
     if ((!context_invalidated) && (text_store != core_context_str)) {
       std::cerr << "text store has unexpectedly diverged from core_context" << std::endl;
-      std::cerr << "text store: " << string_to_hex(text_store) << " [" << text_store << "]" << std::endl;
-      std::cerr << "core context   : " << string_to_hex(core_context_str) << " [" << core_context_str << "]" << std::endl;
+      std::cerr << "text store  : " << string_to_hex(text_store) << " [" << text_store << "]" << std::endl;
+      std::cerr << "core context: " << string_to_hex(core_context_str) << " [" << core_context_str << "]" << std::endl;
      assert(false);
     }
   }
@@ -284,10 +284,10 @@ run_test(const km::core::path &source, const km::core::path &compiled) {
 
   km_core_context_items_dispose(citems);
 
-  std::cout << "expected  : " << string_to_hex(expected) << " [" << expected << "]" << std::endl;
-  std::cout << "text store: " << string_to_hex(text_store) << " [" << text_store << "]" << std::endl;
-  std::cout << "expected context  : " << string_to_hex(expected_context) << " [" << expected_context << "]" << std::endl;
-  std::cout << "context   : " << string_to_hex(core_context_str) << " [" << core_context_str << "]" << std::endl;
+  std::cout << "expected        : " << string_to_hex(expected) << " [" << expected << "]" << std::endl;
+  std::cout << "text store      : " << string_to_hex(text_store) << " [" << text_store << "]" << std::endl;
+  std::cout << "expected context: " << string_to_hex(expected_context) << " [" << expected_context << "]" << std::endl;
+  std::cout << "context         : " << string_to_hex(core_context_str) << " [" << core_context_str << "]" << std::endl;
 
   // Compare internal context with expected context result
   if (core_context_str != expected_context) return __LINE__;
