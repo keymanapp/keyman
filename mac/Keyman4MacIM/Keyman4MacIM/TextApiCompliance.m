@@ -174,7 +174,8 @@ return [NSString stringWithFormat:@"complianceUncertain: %d, hasCompliantSelecti
 *  This was formerly called the legacy app list, renamed to improve clarity.
 */
 - (BOOL)containedInHardCodedNoncompliantAppList:(NSString *)clientAppId {
-    BOOL isAppNonCompliant = ([clientAppId isEqual: @"com.github.atom"] ||
+    BOOL isAppNonCompliant = (//[clientAppId isEqual: @"com.github.atom"] ||
+                              // 2023-12-19[sgs] Atom is now automatically detected as non-compliant
                      [clientAppId isEqual: @"com.collabora.libreoffice-free"] ||
                      [clientAppId isEqual: @"org.libreoffice.script"] ||
                      [clientAppId isEqual: @"org.vim.MacVim"] ||
