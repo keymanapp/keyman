@@ -32,6 +32,7 @@ uses
 
   httpuploader,
   Keyman.System.UpdateCheckResponse,
+  Keyman.System.ExecuteHistory,
   UfrmDownloadProgress;
 
 type
@@ -132,47 +133,8 @@ type
 
   DownloadingState = class(TState)
   private
-  { These function could become members of the state objects
-       or at the very least controlled by the state objects }
-
-    { TODO: make a comment clear when we are in a elevate process}
-
-    {
-      Performs updates download in the background, without displaying a GUI
-      progress bar. This function is similar to DownloadUpdates, but it runs in
-      the background.
-
-      @returns  True  if all updates were successfully downloaded, False if any
-      download failed.
-    }
 
     function DownloadUpdatesBackground: Boolean;
-    {
-      Performs updates download in the background, without displaying a GUI
-      progress bar. This procedure is similar to DownloadUpdates, but it runs in
-      the background.
-
-      @params  SavePath  The path where the downloaded files will be saved.
-               Result    A Boolean value indicating the overall result of the
-               download process.
-    }
-    procedure DoDownloadUpdatesBackground(SavePath: string; var Result: Boolean);
-    {
-      Performs an online update check, including package retrieval and version
-      query.
-
-      This function checks if a week has passed since the last update check. It
-      utilizes the kmcom API to retrieve the current packages. The function then
-      performs an HTTP request to query the remote versions of these packages.
-      The resulting information is stored in the FParams variable. Additionally,
-      the function handles the main Keyman install package.
-
-      @returns  A TBackgroundUpdateResult indicating the result of the update
-      check.
-    }
-    // This is just for testing only.
-    procedure DoDownloadUpdatesBackgroundTest(SavePath: string; var Result: Boolean);
-  public
     procedure Enter; override;
     procedure Exit; override;
     procedure HandleCheck; override;
@@ -289,7 +251,7 @@ type
       tempPath.
     }
     procedure SavePackageUpgradesToDownloadTempPath;
-    function IsKeymanRunning: Boolean;
+    //function IsKeymanRunning: Boolean;
     function checkUpdateSchedule : Boolean;
 
     function SetRegistryState (Update : TUpdateState): Boolean;
@@ -353,6 +315,7 @@ uses
   utilsystem,
   utiluac,
   versioninfo,
+  Keyman.System.RemoteUpdateCheck,
   Keyman.System.DownloadUpdate;
 
 const
@@ -501,18 +464,18 @@ end;
 
 
 
-function TBackgroundUpdate.IsKeymanRunning: Boolean;  // I2329
-begin
-  try
-      Result :=  kmcom.Control.IsKeymanRunning;
-  except
-    on E:Exception do
-    begin
-      KL.Log(E.Message);
-      Exit(False);
-    end;
-  end;
-end;
+//function TBackgroundUpdate.IsKeymanRunning: Boolean;  // I2329
+//begin
+//  try
+//      Result :=  kmcom.Control.IsKeymanRunning;
+//  except
+//    on E:Exception do
+//    begin
+//      KL.Log(E.Message);
+//      Exit(False);
+//    end;
+//  end;
+//end;
 
 function TBackgroundUpdate.CheckUpdateSchedule: Boolean;
 begin
@@ -682,18 +645,28 @@ begin
 end;
 
 procedure IdleState.HandleCheck;
+var
+  CheckForUpdates: TRemoteUpdateCheck;
+  Result : TRemoteUpdateCheckResult;
 begin
-  { TODO: Verify that it has been at least 7 days since last update check -
-    only if FSilent = TRUE }
 
   { Make a HTTP request out and see if updates are available for now do
     this all in the Idle HandleCheck message. But could be broken into an
     seperate state of WaitngCheck RESP }
   { if Response not OK stay in the idle state and return }
+  CheckForUpdates := TRemoteUpdateCheck.Create(False);
+  try
+     Result:= CheckForUpdates.Run;
+  finally
+    CheckForUpdates.Free;
+  end;
 
   { Response OK and Update is available }
-  ChangeState(UpdateAvailableState);
-
+  if Result = wucSuccess then
+  begin
+    ChangeState(UpdateAvailableState);
+  end;
+  // else staty in idle state
 end;
 
 procedure IdleState.HandleDownload;
@@ -795,7 +768,7 @@ begin
   DownloadResult := DownloadUpdatesBackground;
   if DownloadResult then
   begin
-    if bucStateContext.IsKeymanRunning then
+    if HasKeymanRun then
       ChangeState(WaitingRestartState)
     else
       ChangeState(InstallingState);
@@ -860,70 +833,31 @@ begin
   Result := 'DownloadingState';
 end;
 
-procedure DownloadingState.DoDownloadUpdatesBackground(SavePath: string; var Result: Boolean);
-begin
-end;
-
-// Test installing only
-procedure DownloadingState.DoDownloadUpdatesBackgroundTest(SavePath: string; var Result: Boolean);
-var
-  i, downloadCount: Integer;
-  UpdateDir : string;
-
-begin
-   try
-    Result := False;
-
-    UpdateDir := 'C:\Projects\rcswag\testCache';
-    KL.Log('DoDownloadUpdatesBackgroundTest SavePath:'+ SavePath);
-    // Check if the update source directory exists
-    if DirectoryExists(UpdateDir) then
-    begin
-      // Create the update cached directory if it doesn't exist
-      if not DirectoryExists(SavePath) then
-        ForceDirectories(SavePath);
-
-      // Copy all files from the updatedir to savepath
-      TDirectory.Copy(UpdateDir, SavePath);
-      Result:= True;
-      KL.Log('All files copied successfully.');
-    end
-    else
-      KL.Log('Source directory does not exist.');
-  except
-    on E: Exception do
-      KL.Log('Error: ' + E.Message);
-  end;
-
-end;
-
 
 function DownloadingState.DownloadUpdatesBackground: Boolean;
 var
   i: Integer;
   DownloadBackGroundSavePath : String;
   DownloadResult : Boolean;
+  DownloadUpdate: TDownloadUpdate;
 begin
-  //DownloadTempPath := IncludeTrailingPathDelimiter(CreateTempPath);
-  DownloadBackGroundSavePath := IncludeTrailingPathDelimiter(GetFolderPath(CSIDL_COMMON_APPDATA) + SFolder_CachedUpdateFiles);
-  //DownloadBackGroundSavePath :=  DownloadBackGroundSavePath + 'RCTest.txt';
-  { For now lets download all the updates. We need to take these from the user via check box form }
+  DownloadUpdate := TDownloadUpdate.Create;
+  try
+    DownloadResult := DownloadUpdate.DownloadUpdates;
+    KL.Log('TBackgroundUpdate.DownloadUpdatesBackground: DownloadResult = '+IntToStr(Ord(DownloadResult)));
+    Result := DownloadResult;
+// TODO: workout when we need to refresh kmcom keyboards
 
-  if bucStateContext.FParams.Keyman.DownloadURL <> '' then
-    bucStateContext.FParams.Keyman.Install := True;
+//      if Result in [ wucSuccess] then
+//  begin
+//    kmcom.Keyboards.Refresh;
+//    kmcom.Keyboards.Apply;
+//    kmcom.Packages.Refresh;
+//  end;
 
-  for i := 0 to High(bucStateContext.FParams.Packages) do
-    bucStateContext.FParams.Packages[i].Install := True;
-
-  // Download files
-  // DoDownloadUpdatesBackground(DownloadBackGroundSavePath, DownloadResult);
-  // For development by passing the DoDownloadUpdatesBackground and just add
-  // the cached file on my local disk as a simulation
-   DoDownloadUpdatesBackgroundTest(DownloadBackGroundSavePath, DownloadResult);
-
-  KL.Log('TBackgroundUpdate.DownloadUpdatesBackground: DownloadResult = '+IntToStr(Ord(DownloadResult)));
-  //ShowMessage('TBackgroundUpdate.DownloadUpdatesBackground: DownloadResult = '+IntToStr(Ord(DownloadResult)));
-  Result := DownloadResult;
+  finally
+    DownloadUpdate.Free;
+  end;
 end;
 
 { WaitingRestartState }
@@ -1216,7 +1150,7 @@ var SavePath: string;
 begin
       KL.Log('WaitingPostInstallState.HandleMSIInstallComplete');
       // TODO Remove cached files. Do any loging updating of files etc and then set back to idle
-      SavePath := IncludeTrailingPathDelimiter(GetFolderPath(CSIDL_COMMON_APPDATA) + SFolder_CachedUpdateFiles);
+      //SavePath := IncludeTrailingPathDelimiter(GetFolderPath(CSIDL_COMMON_APPDATA) + SFolder_CachedUpdateFiles);
       /// For testing using local user area cache
       SavePath := 'C:\Projects\rcswag\testCache';
       KL.Log('WaitingPostInstallState.HandleMSIInstallComplete remove SavePath:'+ SavePath);

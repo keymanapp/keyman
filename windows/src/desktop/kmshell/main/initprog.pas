@@ -433,7 +433,7 @@ begin
   end;
   // TODO: #10038  Will add this as part of the background update state machine
   // for now just verifing the download happens via -buc switch.
-  RemoteUpdateCheck := TRemoteUpdateCheck.Create(False, False);
+  RemoteUpdateCheck := TRemoteUpdateCheck.Create(False);
     try
       if (FMode = fmBackgroundUpdateCheck) then
       begin

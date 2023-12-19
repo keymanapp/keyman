@@ -181,7 +181,8 @@ uses
   Keyman.System.UpdateCheckStorage in 'main\Keyman.System.UpdateCheckStorage.pas',
   Keyman.System.RemoteUpdateCheck in 'main\Keyman.System.RemoteUpdateCheck.pas',
   BackgroundUpdate in 'main\BackgroundUpdate.pas',
-  Keyman.System.DownloadUpdate in 'main\Keyman.System.DownloadUpdate.pas';
+  Keyman.System.DownloadUpdate in 'main\Keyman.System.DownloadUpdate.pas',
+  Keyman.System.ExecuteHistory in '..\..\..\..\common\windows\delphi\general\Keyman.System.ExecuteHistory.pas';
 
 {$R VERSION.RES}
 {$R manifest.res}

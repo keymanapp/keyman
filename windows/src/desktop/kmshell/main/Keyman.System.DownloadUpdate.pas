@@ -39,19 +39,34 @@ type
 
   TDownloadUpdate = class
   private
-
     FShowErrors: Boolean;
     FDownload: TDownloadUpdateParams;
-    FCheckOnly: Boolean;
-
-    function DownloadUpdates(Params: TUpdateCheckResponse) : Boolean;
+    FErrorMessage: string;
+    {
+      Performs updates download in the background, without displaying a GUI
+      progress bar.
+      @params  SavePath  The path where the downloaded files will be saved.
+               Result    A Boolean value indicating the overall result of the
+               download process.
+    }
     procedure DoDownloadUpdates(SavePath: string; Params: TUpdateCheckResponse;  var Result: Boolean);
 
   public
 
-    constructor Create(AForce : Boolean; ACheckOnly: Boolean = False);
+    constructor Create;
     destructor Destroy; override;
+    {
+      Performs updates download in the background, without displaying a GUI
+      progress bar. This function is similar to DownloadUpdates, but it runs in
+      the background.
+
+      @returns  True  if all updates were successfully downloaded, False if any
+      download failed.
+    }
+
+    function DownloadUpdates : Boolean;
     property ShowErrors: Boolean read FShowErrors write FShowErrors;
+
   end;
 
 implementation
@@ -75,6 +90,23 @@ uses
  begin
    KL.Log(LogMessage);
  end;
+
+constructor TDownloadUpdate.Create;
+begin
+  inherited Create;
+
+  FShowErrors := True;
+  KL.Log('TDownloadUpdate.Create');
+end;
+
+destructor TDownloadUpdate.Destroy;
+begin
+  if (FErrorMessage <> '') and FShowErrors then
+    LogMessage(FErrorMessage);
+
+  KL.Log('TDownloadUpdate.Destroy: FErrorMessage = '+FErrorMessage);
+  inherited Destroy;
+end;
 
 procedure TDownloadUpdate.DoDownloadUpdates(SavePath: string; Params: TUpdateCheckResponse; var Result: Boolean);
 var
@@ -171,19 +203,22 @@ begin
     Result := True;
 end;
 
-function TDownloadUpdate.DownloadUpdates(Params: TUpdateCheckResponse): Boolean;
+function TDownloadUpdate.DownloadUpdates: Boolean;
 var
   DownloadBackGroundSavePath : String;
   DownloadResult : Boolean;
+  ucr: TUpdateCheckResponse;
 begin
   // DownloadBackGroundSavePath := IncludeTrailingPathDelimiter(GetFolderPath(CSIDL_COMMON_APPDATA) + SFolder_CachedUpdateFiles);
   DownloadBackGroundSavePath := IncludeTrailingPathDelimiter(TKeymanPaths.KeymanUpdateCachePath);
-
-  DoDownloadUpdates(DownloadBackGroundSavePath, Params, DownloadResult);
-  KL.Log('TRemoteUpdateCheck.DownloadUpdatesBackground: DownloadResult = '+IntToStr(Ord(DownloadResult)));
-  Result := DownloadResult;
+  if TUpdateCheckStorage.LoadUpdateCacheData(ucr) then
+  begin
+    DoDownloadUpdates(DownloadBackGroundSavePath, ucr, DownloadResult);
+    KL.Log('DownloadUpdates.DownloadUpdatesBackground: DownloadResult = '+IntToStr(Ord(DownloadResult)));
+    Result := DownloadResult;
+  end;
+  Result := False;
 
 end;
-
 
 end.

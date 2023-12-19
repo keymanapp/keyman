@@ -45,7 +45,8 @@ uses
   KeymanVersion,
   RegistryKeys,
   UfrmKeyman7Main,
-  UserMessages;
+  UserMessages,
+  Keyman.System.ExecuteHistory;
 
 function ValidateParameters(var FCommand: Integer): Boolean; forward;
 function PassParametersToRunningInstance(FCommand: Integer): Boolean; forward;
@@ -78,6 +79,9 @@ begin
 
 
   if not ValidateParameters(FCommand) then Exit;
+
+  // TODO set atom application running
+  RecordKeymanStarted;
 
   hProgramMutex := CreateMutex(nil, False, 'KeymanEXE70');
   if hProgramMutex = 0 then
