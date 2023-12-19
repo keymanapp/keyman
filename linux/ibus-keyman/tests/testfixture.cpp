@@ -309,12 +309,12 @@ static void test_source(IBusKeymanTestsFixture *fixture, gconstpointer user_data
 
   km::tests::KmxTestSource test_source;
   std::string keys        = "";
-  std::u16string expected = u"", context = u"";
+  std::u16string expected = u"", expected_context = u"", context = u"";
   km::tests::kmx_options options;
   bool expected_beep = false;
   // NOTE: we don't verify expected beeps since engine.c directly calls a gdk method so we
   // don't know when it gets called.
-  g_assert_cmpint(test_source.load_source(sourcefile.c_str(), keys, expected, context, options, expected_beep), ==, 0);
+  g_assert_cmpint(test_source.load_source(sourcefile.c_str(), keys, expected, expected_context, context, options, expected_beep), ==, 0);
 
   for (auto & option : options) {
     if (option.type == km::tests::KOT_INPUT) {
