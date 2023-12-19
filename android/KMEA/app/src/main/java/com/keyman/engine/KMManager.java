@@ -288,8 +288,11 @@ public final class KMManager {
 
   // Keyman files
   protected static final String KMFilename_KeyboardHtml = "keyboard.html";
+  protected static final String KMFilename_KeyboardHtml_Legacy = "keyboard.es5.html";
   protected static final String KMFilename_JSEngine = "keymanweb-webview.js";
   protected static final String KMFilename_JSEngine_Sourcemap = "keymanweb-webview.js.map";
+  protected static final String KMFilename_JSLegacyEngine = "keymanweb-webview.es5.js";
+  protected static final String KMFilename_JSLegacyEngine_Sourcemap = "keymanweb-webview.es5.js.map";
   protected static final String KMFilename_JSSentry = "sentry.min.js";
   protected static final String KMFilename_JSSentryInit = "keyman-sentry.js";
   protected static final String KMFilename_AndroidHost = "android-host.js";
@@ -848,24 +851,45 @@ public final class KMManager {
 
   private static void copyAssets(Context context) {
     AssetManager assetManager = context.getAssets();
+
+    // Will build a temp WebView in order to check Chrome version internally.
+    boolean legacyMode = WebViewUtils.getEngineWebViewVersionStatus(context, null, null) != WebViewUtils.EngineWebViewVersionStatus.FULL;
+
     try {
       // Copy KMW files
-      copyAsset(context, KMFilename_KeyboardHtml, "", true);
-      copyAsset(context, KMFilename_JSEngine, "", true);
+      if(legacyMode) {
+        // Replaces the standard ES6-friendly version of the host page with a legacy one that
+        // includes polyfill requests and that links the legacy, ES5-compatible version of KMW.
+        copyAssetWithRename(context, KMFilename_KeyboardHtml_Legacy, KMFilename_KeyboardHtml, "", true);
+
+        copyAsset(context, KMFilename_JSLegacyEngine, "", true);
+        if (KMManager.isDebugMode()) {
+          copyAsset(context, KMFilename_JSLegacyEngine_Sourcemap, "", true);
+        }
+      } else {
+        copyAsset(context, KMFilename_KeyboardHtml, "", true);
+
+        // For versions of Chrome with full ES6 support, we use the ES6 artifact.
+        copyAsset(context, KMFilename_JSEngine, "", true);
+        if (KMManager.isDebugMode()) {
+          copyAsset(context, KMFilename_JSEngine_Sourcemap, "", true);
+        }
+      }
+      // Is still built targeting ES5.
       copyAsset(context, KMFilename_JSSentry, "", true);
       copyAsset(context, KMFilename_JSSentryInit, "", true);
       copyAsset(context, KMFilename_AndroidHost, "", true);
-      if(KMManager.isDebugMode()) {
-        copyAsset(context, KMFilename_JSEngine_Sourcemap, "", true);
-      }
       copyAsset(context, KMFilename_KmwCss, "", true);
       copyAsset(context, KMFilename_KmwGlobeHintCss, "", true);
       copyAsset(context, KMFilename_Osk_Ttf_Font, "", true);
 
       // Copy default keyboard font
       copyAsset(context, KMDefault_KeyboardFont, "", true);
-      copyAsset(context, KMFilename_JSPolyfill, "", true);
-      copyAsset(context, KMFilename_JSPolyfill2, "", true);
+
+      if(legacyMode) {
+        copyAsset(context, KMFilename_JSPolyfill, "", true);
+        copyAsset(context, KMFilename_JSPolyfill2, "", true);
+      }
 
       // Keyboard packages directory
       File packagesDir = new File(getPackagesDir());
@@ -961,6 +985,10 @@ public final class KMManager {
   }
 
   private static int copyAsset(Context context, String filename, String directory, boolean overwrite) {
+    return copyAssetWithRename(context, filename, filename, directory, overwrite);
+  }
+
+  private static int copyAssetWithRename(Context context, String srcName, String destName, String directory, boolean overwrite) {
     int result;
     AssetManager assetManager = context.getAssets();
     try {
@@ -977,9 +1005,9 @@ public final class KMManager {
         dirPath = getResourceRoot();
       }
 
-      File file = new File(dirPath, filename);
+      File file = new File(dirPath, destName);
       if (!file.exists() || overwrite) {
-        InputStream inputStream = assetManager.open(directory + filename);
+        InputStream inputStream = assetManager.open(directory + srcName);
         FileOutputStream outputStream = new FileOutputStream(file);
         FileUtils.copy(inputStream, outputStream);
 
