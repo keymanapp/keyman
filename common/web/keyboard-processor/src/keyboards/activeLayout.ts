@@ -315,27 +315,6 @@ export class ActiveKeyBase {
       hasMultitaps: false
     }
 
-    // The default-layer shift key on mobile platforms should have a default multitap under
-    // select conditions.
-    //
-    // Note:  whether or not any other key has multitaps doesn't matter here.  Just THIS one.
-    if(key.id == 'K_SHIFT' && displayLayer == 'default' && layout.formFactor != 'desktop') {
-      /* Extra requirements:
-       *
-       * 1. The SHIFT key must not specify longpress keys or have already-specified multitaps.
-       *
-       *    Note:  touch layouts specified on desktop layouts often do specify longpress keys;
-       *    utilized modifiers aside from 'shift' become longpress keys under K_SHIFT)
-       *
-       * 2. There exists a specified 'caps' layer.  Otherwise, there's no destination for
-       *    the default multitap.
-       *
-       */
-      if(!key.sk && !key.multitap && !!layout.layer.find((entry) => entry.id == 'caps')) {
-        key.multitap = [Layouts.dfltShiftMultitap, Layouts.dfltShiftRotaDefault];
-      }
-    }
-
     // Add class functions to the existing layout object, allowing it to act as an ActiveLayout.
     let dummy = new ActiveKeyBase();
     let proto = Object.getPrototypeOf(dummy);
@@ -864,6 +843,35 @@ export class ActiveLayout implements LayoutFormFactor{
     for(n=0; n<layers.length; n++) {
       ActiveLayer.polyfill(layers[n], keyboard, aLayout, analysisMetadata);
       layerMap[layers[n].id] = layers[n] as ActiveLayer;
+    }
+
+    // After all layers are preprocessed...
+
+    // The default-layer shift key & shift-layer shift key on mobile platforms should have a
+    //  default multitap re: a 'caps' layer under select conditions.
+    //
+    // Note:  whether or not any other keys have multitaps doesn't matter here.  Just THESE.
+    if(formFactor != 'desktop' && !!layout.layer.find((entry) => entry.id == 'caps')) {
+      const defaultLayer = layout.layer.find((entry) => entry.id == 'default') as ActiveLayer;
+      const shiftLayer   = layout.layer.find((entry) => entry.id == 'shift') as ActiveLayer;
+
+      const defaultShift = defaultLayer.getKey('K_SHIFT');
+      const shiftShift   = shiftLayer ?.getKey('K_SHIFT');
+
+      // If BOTH default & shift layer SHIFT keys lack multitaps & longpresses, proceed.
+      if(shiftShift && // doesn't make much sense if there's no shift layer or SHIFT on it
+        !defaultShift.multitap && !shiftShift.multitap &&
+        !defaultShift.sk       && !shiftShift.sk
+      ) {
+        // May cause the layout to gain its first multitaps, which does matter for the next lines after the block.
+        analysisMetadata.hasMultitaps = true;
+
+        defaultShift.multitap = [{...Layouts.dfltShiftToCaps}, {...Layouts.dfltShiftToDefault}] as ActiveSubKey[];
+        shiftShift.multitap   = [{...Layouts.dfltShiftToCaps}, {...Layouts.dfltShiftToShift}] as ActiveSubKey[];
+
+        defaultShift.multitap.forEach((sk) => ActiveSubKey.polyfill(sk, keyboard, aLayout, 'default'));
+        shiftShift  .multitap.forEach((sk) => ActiveSubKey.polyfill(sk, keyboard, aLayout, 'shift'));
+      } // else no default shift -> caps multitaps.
     }
 
     aLayout.hasFlicks = analysisMetadata.hasFlicks;
