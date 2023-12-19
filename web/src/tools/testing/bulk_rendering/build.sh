@@ -16,8 +16,6 @@ SUBPROJECT_NAME=tools/testing/bulk_rendering
 # This script runs from its own folder
 cd "$THIS_SCRIPT_PATH"
 
-BUNDLE_CMD="node $KEYMAN_ROOT/common/web/es-bundling/build/common-bundle.mjs"
-
 ################################ Main script ################################
 
 builder_describe "Builds a 'bulk renderer' that loads all the cloud keyboards from api.keyman.com and renders each of them to a document." \
