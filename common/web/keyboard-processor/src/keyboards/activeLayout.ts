@@ -859,7 +859,7 @@ export class ActiveLayout implements LayoutFormFactor{
       const shiftShift   = shiftLayer ?.getKey('K_SHIFT');
 
       // If BOTH default & shift layer SHIFT keys lack multitaps & longpresses, proceed.
-      if(shiftShift && // doesn't make much sense if there's no shift layer or SHIFT on it
+      if(defaultShift && shiftShift && // doesn't make much sense if there's no shift layer or SHIFT on either
         !defaultShift.multitap && !shiftShift.multitap &&
         !defaultShift.sk       && !shiftShift.sk
       ) {
