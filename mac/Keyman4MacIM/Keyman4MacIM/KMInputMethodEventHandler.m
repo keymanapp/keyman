@@ -329,7 +329,7 @@ NSRange _previousSelRange;
     self.apiCompliance = [[TextApiCompliance alloc]initWithClient:client applicationId:self.clientApplicationId];
     [self.appDelegate logDebugMessage:@"KMInputMethodHandler initWithClient checkTextApiCompliance: %@", _apiCompliance];
   } else if (self.apiCompliance.isComplianceUncertain) {
-    // We have a TextApiCompliance object is valid, but compliance is uncertain, so test it
+    // We have a valid TextApiCompliance object, but compliance is uncertain, so test it
     [self.apiCompliance testCompliance:client];
   }
 }
