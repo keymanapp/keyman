@@ -1,5 +1,11 @@
 # Keyman Version History
 
+## 17.0.234 alpha 2023-12-20
+
+* fix(mac): Improve detection of non-compliant apps (#10282)
+* fix(web): default multitap logic for shift-layer shift multitaps (#10281)
+*  (#10284)
+
 ## 17.0.233 alpha 2023-12-19
 
 * fix(web): unbreak some ts paths (#10279)
