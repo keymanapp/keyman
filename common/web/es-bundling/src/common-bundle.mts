@@ -72,6 +72,9 @@ if(process.argv.length > 2) {
         }
     }
   }
+} else {
+  // Not enough args; display help + abort.
+  doHelp(1);
 }
 
 function fileSpecError(type: 'input' | 'output', file?: string) {
