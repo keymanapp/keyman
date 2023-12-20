@@ -1,8 +1,6 @@
 {
   "extends": "../../../tsconfig.base.json",
   "compilerOptions": {
-    // Primary settings - the version of ES6 we can target in TS, our downcompile target,
-    // and our module-related settings.
     "allowSyntheticDefaultImports": true,
     "baseUrl": "./",
     "outDir": "build/",
