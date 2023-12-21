@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 17.0.235 alpha 2023-12-21
+
+* feat(developer): ldml: more improvement for key-not-found (#10236)
+
 ## 17.0.234 alpha 2023-12-20
 
 * fix(mac): Improve detection of non-compliant apps (#10282)
