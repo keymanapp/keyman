@@ -212,4 +212,36 @@
     </test>
     <!-- TODO: all the variations -->
   </tests>
+  <tests name="regex-tests-8">
+    <test name="regex-test-8a-0">
+      <!-- simple test, exactly as written-->
+      <keystroke key="8" />
+      <keystroke key="e" />
+      <keystroke key="stampy"/>
+      <keystroke key="u-0300"/>
+      <keystroke key="lgtm"/>
+      <keystroke key="u-0320"/>
+      <check result="YES8a"/>
+    </test>
+    <test name="regex-test-8b-0">
+      <!-- simple test, exactly as written-->
+      <keystroke key="8" />
+      <keystroke key="e" />
+      <keystroke key="u-0300"/>
+      <keystroke key="stampy"/>
+      <keystroke key="lgtm"/>
+      <keystroke key="u-0320"/>
+      <check result="YES8b"/>
+    </test>
+    <test name="regex-test-8c-0">
+      <!-- simple test, exactly as written-->
+      <keystroke key="8" />
+      <keystroke key="e" />
+      <keystroke key="u-0300"/>
+      <keystroke key="u-0320"/>
+      <keystroke key="stampy"/>
+      <keystroke key="lgtm"/>
+      <check result="YES8d"/> <!-- TODO-LDML: not FAIL?-->
+    </test>
+  </tests>
 </keyboardTest3>

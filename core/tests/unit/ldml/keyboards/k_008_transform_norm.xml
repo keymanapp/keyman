@@ -16,6 +16,7 @@ from https://github.com/unicode-org/cldr/blob/keyboard-preview/docs/ldml/tr35-ke
     <key id="nfc" output="\u{00E8}\u{0320}" />
     <key id="not-nfd" output="e\u{0300}\u{0320}" />
     <key id="stampy" output="\m{stampy}" />
+    <key id="lgtm" output="\m{lgtm}" />
   </keys>
 
   <layers formId="us">
@@ -27,7 +28,7 @@ from https://github.com/unicode-org/cldr/blob/keyboard-preview/docs/ldml/tr35-ke
       <row keys="space" />
     </layer>
     <layer modifiers="shift" id="shift">
-      <row keys="u-0300 u-00e8 nfd nfc not-nfd stampy" />
+      <row keys="u-0300 u-00e8 nfd nfc not-nfd stampy lgtm" />
     </layer>
   </layers>
 
@@ -67,6 +68,11 @@ from https://github.com/unicode-org/cldr/blob/keyboard-preview/docs/ldml/tr35-ke
       <transform from="7\m{stampy}e\u{0300}" to="YES7a" />
       <transform from="7e\m{stampy}\u{0300}" to="YES7b" />
       <transform from="7e\u{0300}\m{stampy}" to="YES7c" />
+
+      <transform from="8e\m{stampy}\u{0300}\m{lgtm}\u{0320}" to="YES8a" />
+      <transform from="8e\u{0300}\m{stampy}\m{lgtm}\u{0320}" to="YES8b" />
+      <transform from="8e\u{0300}\u{0320}\m{stampy}\m{lgtm}" to="FAIL" /> <!-- denormalized, does not match -->
+      <transform from="8e\u{0320}\u{0300}\m{stampy}\m{lgtm}" to="YES8d" /> <!-- NFD -->
     </transformGroup>
   </transforms>
 </keyboard3>
