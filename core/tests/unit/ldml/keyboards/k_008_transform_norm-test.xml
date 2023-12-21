@@ -159,10 +159,8 @@
       <keystroke key="u-0300" />
       <keystroke key="stampy" />
       <check result="YES4d" />
-
-      <!-- TODO-LDML: backspace is fixed 'in the future', #9450  - reinstate this-->
-      <!-- <backspace />
-      <check result="YES4" /> -->
+      <backspace />
+      <check result="YES4" />
     </test>
   </tests>
   <tests name="regex-tests-5">
@@ -199,9 +197,8 @@
       <keystroke key="u-0320" />
       <keystroke key="stampy" />
       <check result="YES6c" />
-      <!-- TODO-LDML: backspace is fixed 'in the future', #9450  - reinstate this-->
-      <!-- <backspace />
-      <check result="YES6" /> -->
+      <backspace />
+      <check result="YES6" />
     </test>
   </tests>
   <tests name="regex-tests-7">
