@@ -369,8 +369,9 @@ export class GestureSourceSubview<
     const baseClientRect = this.recognizerConfigStack[0].targetRoot.getBoundingClientRect();
 
     return {
-      x: currentClientRect.x - baseClientRect.x,
-      y: currentClientRect.y - baseClientRect.y
+      // x, y not available in Chrome 35... but left and top are.
+      x: currentClientRect.left - baseClientRect.left,
+      y: currentClientRect.top - baseClientRect.top
     }
   }
 

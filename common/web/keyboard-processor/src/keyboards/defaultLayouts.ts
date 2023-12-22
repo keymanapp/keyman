@@ -526,7 +526,7 @@ export class Layouts {
     return KLS;
   }
 
-  static dfltShiftMultitap: LayoutSubKey = {
+  static dfltShiftToCaps: LayoutSubKey = {
     // Needs to be something special and unique.  Typing restricts us from
     // using a reserved key-id prefix, though.
     id: "T_*_MT_SHIFT_TO_CAPS",
@@ -535,13 +535,20 @@ export class Layouts {
     nextlayer: 'caps'
   }
 
-  static dfltShiftRotaDefault: LayoutSubKey = {
+  static dfltShiftToDefault: LayoutSubKey = {
     // Needs to be something special and unique.  Typing restricts us from
     // using a reserved key-id prefix, though.
-    id: "T_*_MT_SHIFT_ROTA_TO_DEFAULT",
+    id: "T_*_MT_SHIFT_TO_DEFAULT",
     text: '*Shift*',
     sp: 1,
     nextlayer: 'default'
+  }
+
+  static dfltShiftToShift: LayoutSubKey = {
+    id: "T_*_MT_SHIFT_TO_SHIFT",
+    text: '*Shift*',
+    sp: 1,
+    nextlayer: 'shift'
   }
 
   // Defines the default visual layout for a keyboard.

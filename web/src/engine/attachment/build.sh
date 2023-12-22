@@ -36,7 +36,7 @@ builder_parse "$@"
 
 #### Build action definitions ####
 
-builder_run_action configure verify_npm_setup
-builder_run_action clean rm -rf "$KEYMAN_ROOT/web/build/$SUBPROJECT_NAME"
-builder_run_action build compile $SUBPROJECT_NAME
-builder_run_action test # No headless tests
+builder_run_action configure  verify_npm_setup
+builder_run_action clean      rm -rf "${KEYMAN_ROOT}/web/build/${SUBPROJECT_NAME}"
+builder_run_action build      compile "${SUBPROJECT_NAME}"
+builder_run_action test       test-headless-typescript "${SUBPROJECT_NAME}"
