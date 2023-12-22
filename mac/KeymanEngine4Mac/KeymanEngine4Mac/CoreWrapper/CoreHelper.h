@@ -25,9 +25,9 @@ extern UInt32 VirtualKeyMap[0x80];
 -(instancetype)initWithDebugMode:(BOOL)debugMode;
 -(void)logDebugMessage:(NSString *)format, ...;
 -(unsigned short) macVirtualKeyToWindowsVirtualKey:(unsigned short) keyCode;
--(UInt32)macToKeymanModifier:(NSEventModifierFlags)modifiers;
--(NSArray*)optimizeActionArray:(NSArray*)actionArray;
--(NSString*)utf32ValueToString:(UInt32)scalarValue;
+-(UTF32Char)macToKeymanModifier:(NSEventModifierFlags)modifiers;
+-(NSString*)utf32ValueToString:(UTF32Char)scalarValue;
+-(NSString*)utf32CStringToString:(UTF32Char*)utf32CString;
 @end
 
 NS_ASSUME_NONNULL_END

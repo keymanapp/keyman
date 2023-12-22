@@ -47,4 +47,4 @@ do_build () {
 builder_run_action configure verify_npm_setup
 builder_run_action clean rm -rf "$KEYMAN_ROOT/web/build/$SUBPROJECT_NAME"
 builder_run_action build do_build
-builder_run_action test # No headless tests
+builder_run_action test test-headless-typescript "${SUBPROJECT_NAME}"

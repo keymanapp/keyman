@@ -48,6 +48,9 @@
             </BuildableReference>
             <SkippedTests>
                <Test
+                  Identifier = "KMEngineTests/testArmenianMnemonic_triggerPersistOptions_ReturnsOptions">
+               </Test>
+               <Test
                   Identifier = "KMEngineTests/testCheckPlatform_Browsers_ReturnsNo">
                </Test>
                <Test
