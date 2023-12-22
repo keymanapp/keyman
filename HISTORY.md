@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 17.0.236 alpha 2023-12-22
+
+* fix(oem/fv): Add fv_kwadacha_tsekene (#10292)
+* fix(common): give warning if emcc.py is present but not executable (#10289)
+
 ## 17.0.235 alpha 2023-12-21
 
 * feat(developer): ldml: more improvement for key-not-found (#10236)
