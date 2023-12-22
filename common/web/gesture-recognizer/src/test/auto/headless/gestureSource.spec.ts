@@ -46,8 +46,8 @@ const mockedInitialConfig = {
   targetRoot: {
     getBoundingClientRect: () => {
       return {
-        x: -2,
-        y: -2
+        left: -2,
+        top: -2
       };
     }
   }
@@ -60,8 +60,8 @@ const mockedShiftedConfig = {
   targetRoot: {
     getBoundingClientRect: () => {
       return {
-        x: 2,
-        y: 2
+        left: 2,
+        top: 2
       };
     }
   }

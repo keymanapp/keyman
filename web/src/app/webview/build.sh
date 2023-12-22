@@ -80,6 +80,8 @@ compile_and_copy() {
     node "$KEYMAN_ROOT/web/build/tools/building/sourcemap-root/index.js" null "$sourcemap" --clean
   done
 
+  node map-polyfill-bundler.js
+
   # For dependent test pages.
   "$KEYMAN_ROOT/web/src/test/manual/embed/android-harness/build.sh"
 }

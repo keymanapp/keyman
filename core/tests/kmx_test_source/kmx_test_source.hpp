@@ -28,6 +28,7 @@ public:
       const km::core::path &path,
       std::string &keys,
       std::u16string &expected,
+      std::u16string &expected_context,
       std::u16string &context,
       kmx_options &options,
       bool &expected_beep);

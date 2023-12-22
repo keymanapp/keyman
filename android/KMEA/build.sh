@@ -86,6 +86,7 @@ if builder_start_action build:engine; then
   cp "$KEYMAN_WEB_ROOT/build/app/webview/$CONFIG/keymanweb-webview.js.map" "$ENGINE_ASSETS/keymanweb-webview.js.map"
   cp "$KEYMAN_WEB_ROOT/build/app/webview/$CONFIG/keymanweb-webview.es5.js" "$ENGINE_ASSETS/keymanweb-webview.es5.js"
   cp "$KEYMAN_WEB_ROOT/build/app/webview/$CONFIG/keymanweb-webview.es5.js.map" "$ENGINE_ASSETS/keymanweb-webview.es5.js.map"
+  cp "$KEYMAN_WEB_ROOT/build/app/webview/$CONFIG/map-polyfill.js" "$ENGINE_ASSETS/map-polyfill.js"
   cp "$KEYMAN_WEB_ROOT/build/app/resources/osk/ajax-loader.gif" "$ENGINE_ASSETS/ajax-loader.gif"
   cp "$KEYMAN_WEB_ROOT/build/app/resources/osk/kmwosk.css" "$ENGINE_ASSETS/kmwosk.css"
   cp "$KEYMAN_WEB_ROOT/build/app/resources/osk/globe-hint.css" "$ENGINE_ASSETS/globe-hint.css"

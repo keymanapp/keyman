@@ -11,6 +11,7 @@
 #import <Foundation/Foundation.h>
 #import "CoreHelper.h"
 #import "CoreAction.h"
+#import "CoreKeyOutput.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -22,8 +23,8 @@ NS_ASSUME_NONNULL_BEGIN
 -(instancetype)initWithHelper:(CoreHelper*)helper kmxFilePath:(nullable NSString*)path;
 -(BOOL)setOptionsForCore: (NSString *) key value:(NSString *) value;
 -(void)changeKeyboardWithKmxFilePath:(NSString*)path;
--(NSArray*)processEvent:(nonnull NSEvent *)event;
--(NSArray*)processMacVirtualKey:(unsigned short)macKeyCode
+-(CoreKeyOutput*)processEvent:(nonnull NSEvent *)event;
+-(CoreKeyOutput*)processMacVirtualKey:(unsigned short)macKeyCode
               withModifiers:(NSEventModifierFlags)modifierState
                 withKeyDown:(BOOL)isKeyDown;
 -(void)setContextIfNeeded:(NSString*)context;

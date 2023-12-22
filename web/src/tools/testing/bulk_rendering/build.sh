@@ -9,12 +9,12 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 . "${THIS_SCRIPT%/*}/../../../../../resources/build/build-utils.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
+SUBPROJECT_NAME=tools/testing/bulk_rendering
+. "$KEYMAN_ROOT/web/common.inc.sh"
 . "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
 
 # This script runs from its own folder
 cd "$THIS_SCRIPT_PATH"
-
-BUNDLE_CMD="node $KEYMAN_ROOT/common/web/es-bundling/build/common-bundle.mjs"
 
 ################################ Main script ################################
 
@@ -23,22 +23,22 @@ builder_describe "Builds a 'bulk renderer' that loads all the cloud keyboards fr
   "@/web/src/app/ui build" \
   "clean" \
   "configure     runs 'npm ci' on root folder" \
-  "build         (default) builds bulk_renderer to web/build/tools/testing/bulk_rendering/"
+  "build         (default) builds bulk_renderer to web/build/$SUBPROJECT_NAME/"
 
 builder_describe_outputs \
   configure  /node_modules \
-  build      /web/build/tools/testing/bulk_rendering/lib/bulk_render.js
+  build      /web/build/$SUBPROJECT_NAME/lib/bulk_render.js
 
 builder_parse "$@"
 
 function do_build ( ) {
   tsc --build "$THIS_SCRIPT_PATH/tsconfig.json" $builder_verbose
 
-  $BUNDLE_CMD    "${KEYMAN_ROOT}/web/build/tools/testing/bulk_rendering/obj/renderer_core.js" \
-    --out        "${KEYMAN_ROOT}/web/build/tools/testing/bulk_rendering/lib/bulk_render.js" \
-    --sourceRoot "@keymanapp/keyman/web/build/tools/testing/bulk_rendering/lib/"
+  $BUNDLE_CMD    "${KEYMAN_ROOT}/web/build/$SUBPROJECT_NAME/obj/renderer_core.js" \
+    --out        "${KEYMAN_ROOT}/web/build/$SUBPROJECT_NAME/lib/bulk_render.js" \
+    --sourceRoot "@keymanapp/keyman/web/build/$SUBPROJECT_NAME/lib/"
 }
 
 builder_run_action configure  verify_npm_setup
-builder_run_action clean      rm -rf ../../../../build/tools/testing/bulk_rendering
+builder_run_action clean      rm -rf ../../../../build/$SUBPROJECT_NAME
 builder_run_action build      do_build

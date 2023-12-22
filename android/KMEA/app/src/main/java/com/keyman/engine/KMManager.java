@@ -301,6 +301,7 @@ public final class KMManager {
   protected static final String KMFilename_Osk_Ttf_Font = "keymanweb-osk.ttf";
   protected static final String KMFilename_JSPolyfill = "es6-shim.min.js";
   protected static final String KMFilename_JSPolyfill2 = "other-polyfills.js";
+  protected static final String KMFilename_JSPolyfill3 = "map-polyfill.js";
 
   // Deprecated by KeyboardController.KMFilename_Installed_KeyboardsList
   public static final String KMFilename_KeyboardsList = "keyboards_list.dat";
@@ -875,6 +876,7 @@ public final class KMManager {
           copyAsset(context, KMFilename_JSEngine_Sourcemap, "", true);
         }
       }
+
       // Is still built targeting ES5.
       copyAsset(context, KMFilename_JSSentry, "", true);
       copyAsset(context, KMFilename_JSSentryInit, "", true);
@@ -889,6 +891,7 @@ public final class KMManager {
       if(legacyMode) {
         copyAsset(context, KMFilename_JSPolyfill, "", true);
         copyAsset(context, KMFilename_JSPolyfill2, "", true);
+        copyAsset(context, KMFilename_JSPolyfill3, "", true);
       }
 
       // Keyboard packages directory

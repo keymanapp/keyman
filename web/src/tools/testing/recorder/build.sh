@@ -15,8 +15,6 @@ SUBPROJECT_NAME=tools/testing/recorder
 # This script runs from its own folder
 cd "$THIS_SCRIPT_PATH"
 
-BUNDLE_CMD="node $KEYMAN_ROOT/common/web/es-bundling/build/common-bundle.mjs"
-
 ################################ Main script ################################
 
 builder_describe "Builds the Keyman Engine for Web's test-sequence recording tool" \

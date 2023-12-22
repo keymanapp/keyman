@@ -264,9 +264,8 @@ ldml_processor::process_key_down(km_core_state *state, km_core_virtual_key vk, u
     // no key was found, so pass the keystroke on to the Engine
     emit_invalidate_passthrough_keystroke(state, vk, modifier_state);
   } else if (!key_str.empty()) {
-    // TODO-LDML: Right now we take no action on empty (i.e. gap) keys. Should we take other action?
     process_key_string(state, key_str);
-  }
+  } // else no action: It's a gap or gap-like key.
 }
 
 void
