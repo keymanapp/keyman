@@ -42,8 +42,8 @@ do_configure() {
   cp "$KEYMAN_ROOT/common/resources/fonts/keymanweb-osk.ttf" "$KEYMAN_ROOT/web/src/resources/osk/"
 }
 
-do_build () {
-  compile $SUBPROJECT_NAME
+do_build() {
+  compile "${SUBPROJECT_NAME}"
 
   $BUNDLE_CMD    "${KEYMAN_ROOT}/web/build/${SUBPROJECT_NAME}/obj/index.js" \
     --out        "${KEYMAN_ROOT}/web/build/${SUBPROJECT_NAME}/lib/index.mjs" \
@@ -54,6 +54,6 @@ do_build () {
 }
 
 builder_run_action configure do_configure
-builder_run_action clean rm -rf "$KEYMAN_ROOT/web/build/$SUBPROJECT_NAME"
+builder_run_action clean rm -rf "${KEYMAN_ROOT}/web/build/${SUBPROJECT_NAME}"
 builder_run_action build do_build
-builder_run_action test test-headless osk
+builder_run_action test test-headless "${SUBPROJECT_NAME}"

@@ -1,5 +1,43 @@
 # Keyman Version History
 
+## 17.0.235 alpha 2023-12-21
+
+* feat(developer): ldml: more improvement for key-not-found (#10236)
+
+## 17.0.234 alpha 2023-12-20
+
+* fix(mac): Improve detection of non-compliant apps (#10282)
+* fix(web): default multitap logic for shift-layer shift multitaps (#10281)
+*  (#10284)
+
+## 17.0.233 alpha 2023-12-19
+
+* fix(web): unbreak some ts paths (#10279)
+* fix(core): clear core context on invalidate cache (#10230)
+* fix(oem/fv): Add fv_hulquminum_combine (#10269)
+
+## 17.0.232 alpha 2023-12-18
+
+*  (#10270)
+
+## 17.0.231 alpha 2023-12-15
+
+* chore(web): Better match directory structure for headless engine tests (#10232)
+* fix(web): Fix types that listInputs and isKMWInput accept (#10233)
+* chore(web): Add unit tests for `pageContextAttachment` (#10250)
+
+## 17.0.230 alpha 2023-12-14
+
+* fix(core): ldml: fix bad usage of unique_ptr (#10252)
+* chore(linux): docker: fix Node.js install, make customizable (#10251)
+* fix(web): unit test for null-null keyboard switch event from #10245 (#10253)
+* fix(web): fixes android-webview emulation Web test page (#10238)
+* epic: new gesture engine (#7324)
+* fix(mac): improve code signing robustness (#10243)
+* chore(mac): use core actions struct (#10066)
+* chore(common): Add entries from 16.0.144 HISTORY.md (#10260)
+* chore(web): Remove dead code (#10231)
+
 ## 17.0.229 alpha 2023-12-13
 
 * chore(ios): FV certificate key (#10228)
@@ -1388,6 +1426,19 @@
 * feat(windows): configuration UI polish (#7206)
 * chore: move to 17.0-alpha (#7577)
 * chore: Move to 17.0 alpha
+
+## 16.0.144 stable 2023-11-30
+
+* chore(linux): Update debian changelog (#10046)
+* fix(android/app) Disable in-app Browser (#10077)
+
+## 16.0.143 stable 2023-11-22
+
+* chore(android): Update targetSdkVersion from 31 to 33 (#9823)
+* chore(linux): Exclude environment.sh from build (#9814)
+* chore(mac): move from altool to notarytool (#9896)
+* fix(web): fixes doc-kbd display of default layer when it's not defined first (#9892)
+* fix(ios): fv: replace Zip framework to prevent crash on startup (#9958)
 
 ## 16.0.142 stable 2023-10-20
 

@@ -81,7 +81,7 @@ describe("KeyboardStub", () => {
   });
 
   it('merge(): barebones stub + fetched sil_euro_latin@no', async () => {
-    const query = performMockedRequest(`${__dirname}/../../resources/query-mock-results/sil_euro_latin@no_sv.js.fixture`);
+    const query = performMockedRequest(`${__dirname}/../../../resources/query-mock-results/sil_euro_latin@no_sv.js.fixture`);
     await query.promise;
 
     assert.isTrue(query.mockedRegister.called);

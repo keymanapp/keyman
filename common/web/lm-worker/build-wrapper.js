@@ -54,6 +54,9 @@ if(process.argv.length > 2) {
         }
     }
   }
+} else {
+  // Display help + abort.
+  doHelp(1);
 }
 
 if(!sourceFromArgs || sourceFromArgs.substring(sourceFromArgs.length - 3) != '.js') {
