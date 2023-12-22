@@ -11,6 +11,7 @@
 
 #import <Foundation/Foundation.h>
 #import "KMXFile.h"
+#import "CoreKeyOutput.h"
 
 //#define USE_ALERT_SHOW_HELP_TO_FORCE_EASTER_EGG_CRASH_FROM_ENGINE
 
@@ -26,7 +27,7 @@
 - (void)setCoreContext:(NSString *)context;
 
 - (void)setCoreOptions:(NSString *)key withValue:(NSString *)value;
-- (NSArray *)processEvent:(NSEvent *)event;
+- (CoreKeyOutput *)processEvent:(NSEvent *)event;
 - (void)setUseVerboseLogging:(BOOL)useVerboseLogging;
 
 @end

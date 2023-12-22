@@ -298,6 +298,7 @@ public final class KMManager {
   protected static final String KMFilename_Osk_Ttf_Font = "keymanweb-osk.ttf";
   protected static final String KMFilename_JSPolyfill = "es6-shim.min.js";
   protected static final String KMFilename_JSPolyfill2 = "other-polyfills.js";
+  protected static final String KMFilename_JSPolyfill3 = "map-polyfill.js";
 
   // Deprecated by KeyboardController.KMFilename_Installed_KeyboardsList
   public static final String KMFilename_KeyboardsList = "keyboards_list.dat";
@@ -866,6 +867,7 @@ public final class KMManager {
       copyAsset(context, KMDefault_KeyboardFont, "", true);
       copyAsset(context, KMFilename_JSPolyfill, "", true);
       copyAsset(context, KMFilename_JSPolyfill2, "", true);
+      copyAsset(context, KMFilename_JSPolyfill3, "", true);
 
       // Keyboard packages directory
       File packagesDir = new File(getPackagesDir());

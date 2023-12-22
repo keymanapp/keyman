@@ -139,7 +139,7 @@ apply_action(
         assert(context.back().character == ch);
         context.pop_back();
       } else {
-        // assume it's otherwise KM-coRE_BT_UNKNOWN
+        // assume it's otherwise KM_CORE_BT_UNKNOWN
         assert(act.backspace.expected_type == KM_CORE_BT_UNKNOWN);
         assert(context.empty()); // if KM_CORE_BT_UNKNOWN, context should be empty.
       }
