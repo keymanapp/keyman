@@ -1126,13 +1126,12 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
     // even if for a different contact point.
     on = modalVizActive ? false : on;
 
+    key.key.highlight(on);
     if(!on) {
-      key.key.highlight(on);
       return null;
     }
 
     if (usePreview) {
-      key.key.highlight(on);
       if(this.gesturePreviewHost) {
         return null; // do not override lingering previews for still-active gestures.
       } else {
