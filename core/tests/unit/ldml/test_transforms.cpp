@@ -760,6 +760,25 @@ int test_normalize() {
     assert_equal(map[0x0320], 0x1L);
   }
 
+  {
+    // from tests
+    marker_map map;
+    std::cout << __FILE__ << ":" << __LINE__ << "   - complex test 9c" << std::endl;
+    const std::u32string src    = U"9ce\u0300\uFFFF\b\u0002\u0320\uFFFF\b\u0001";
+    const std::u32string expect = U"9ce\uFFFF\b\u0002\u0320\u0300\uFFFF\b\u0001";
+    std::u32string dst = src;
+    assert(normalize_nfd_markers(dst, map));
+    if (dst != expect) {
+      std::cout << "dst: " << Debug_UnicodeString(dst) << std::endl;
+      std::cout << "exp: " << Debug_UnicodeString(expect) << std::endl;
+    }
+    zassert_string_equal(dst, expect);
+    assert_equal(map.size(), 2);
+    assert_equal(map[0x0320], 0x2L);
+    assert_equal(map[MARKER_BEFORE_EOT], 0x1L);
+  }
+
+
   return EXIT_SUCCESS;
 }
 

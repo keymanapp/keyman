@@ -253,7 +253,7 @@
       <keystroke key="u-0320"/>
       <keystroke key="stampy"/>
       <keystroke key="lgtm"/>
-      <check result="YES8d"/> <!-- TODO-LDML: not FAIL?-->
+      <check result="YES8d"/>
     </test>
   </tests>
   <tests name="regex-tests-9">
@@ -267,12 +267,11 @@
       <keystroke key="a" />
       <check result="9e\u{0320}\u{0300}"/>
     </test>
-    <!-- TODO-LDML: not working -->
-    <!-- <test name="regex-test-9c">
+    <test name="regex-test-9c">
       <keystroke key="9" />
       <keystroke key="c" />
       <check result="YES9c"/>
-    </test> -->
+    </test>
     <test name="regex-test-9d">
       <keystroke key="9" />
       <keystroke key="d" />
