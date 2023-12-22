@@ -18,14 +18,18 @@ var
   atom: WORD;
 begin
  Result := False;
+ KL.Log('RecordKeymanStarted: Enter');
   try
     atom := GlobalFindAtom(AtomName);
+    KL.Log('Keyman Session Flag atom is: '+IntToStr(atom));
     if atom = 0 then
     begin
+      KL.Log('RecordKeymanStarted: if atom = 0');
       if GetLastError <> ERROR_SUCCESS then
         RaiseLastOSError;
       //writeln('The Sample Keyman Session Flag has not been set, so the process have never been started in this session.');
       atom := GlobalAddAtom(AtomName);
+      KL.Log('RecordKeymanStarted: True');
       Result := True;
       if atom = 0 then
         RaiseLastOSError;
@@ -54,6 +58,7 @@ begin
       if GetLastError <> ERROR_SUCCESS then
         RaiseLastOSError;
 
+       KL.Log('HasKeymanRun: Keyman Has Run');
       Result := True;
     end
     else

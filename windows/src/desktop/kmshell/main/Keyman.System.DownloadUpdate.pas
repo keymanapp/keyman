@@ -65,6 +65,7 @@ type
     }
 
     function DownloadUpdates : Boolean;
+    function CheckAllFilesDownloaded : Boolean;
     property ShowErrors: Boolean read FShowErrors write FShowErrors;
 
   end;
@@ -82,7 +83,10 @@ uses
   ErrorControlledRegistry,
   RegistryKeys,
   Upload_Settings,
-  OnlineUpdateCheckMessages;
+  OnlineUpdateCheckMessages,
+  utilkmshell,
+  System.Types,
+  System.StrUtils;
 
  // temp wrapper for converting showmessage to logs don't know where
  // if nt using klog
@@ -216,8 +220,59 @@ begin
     DoDownloadUpdates(DownloadBackGroundSavePath, ucr, DownloadResult);
     KL.Log('DownloadUpdates.DownloadUpdatesBackground: DownloadResult = '+IntToStr(Ord(DownloadResult)));
     Result := DownloadResult;
+  end
+  else
+    Result := False;
+end;
+
+function TDownloadUpdate.CheckAllFilesDownloaded: Boolean;
+var
+  i : Integer;
+  SavedPath : String;
+  DownloadResult : Boolean;
+  Params: TUpdateCheckResponse;
+  VerifyDownloads : TDownloadUpdateParams;
+  FileNames : TStringDynArray;
+
+begin
+    // DownloadBackGroundSavePath := IncludeTrailingPathDelimiter(GetFolderPath(CSIDL_COMMON_APPDATA) + SFolder_CachedUpdateFiles);
+  SavedPath := IncludeTrailingPathDelimiter(TKeymanPaths.KeymanUpdateCachePath);
+  GetFileNamesInDirectory(SavedPath, FileNames);
+  if Length(FileNames) = 0 then
+  begin
+    Result := False;
+    Exit;
   end;
-  Result := False;
+
+  if TUpdateCheckStorage.LoadUpdateCacheData(Params) then
+  begin
+    for i := 0 to High(Params.Packages) do
+    begin
+      Inc(VerifyDownloads.TotalDownloads);
+      Inc(VerifyDownloads.TotalSize, Params.Packages[i].DownloadSize);
+      if Not MatchStr(Params.Packages[i].FileName, FileNames) then
+        begin
+          Result := False;
+          Exit;
+        end;
+      Params.Packages[i].SavePath := SavedPath + Params.Packages[i].FileName;
+    end;
+    // Add the Keyman installer
+    Inc(FDownload.TotalDownloads);
+    Inc(FDownload.TotalSize, Params.InstallSize);
+    // Check if  the Keyman installer downloaded
+    if Not MatchStr(Params.FileName, FileNames) then
+      begin
+        Result := False;
+        Exit;
+      end;
+    // TODO verify filesizes match so we know we don't have partical downloades.
+    Result := True;
+  end
+  else
+  begin
+    Result := False;
+  end;
 
 end;
 

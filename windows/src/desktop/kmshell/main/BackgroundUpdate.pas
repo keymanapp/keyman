@@ -213,8 +213,6 @@ type
   { This class also controls the state flow see  }
   TBackgroundUpdate = class
   private
-    FOwner: TCustomForm;
-    FSilent: Boolean;
     FForce: Boolean;
     FAuto: Boolean;
     FParams: TBackgroundUpdateParams;
@@ -240,6 +238,7 @@ type
     FWaitingPostInstall: WaitingPostInstallState;
     function GetState: TStateClass;
     procedure SetState(const Value: TStateClass);
+    procedure SetStateOnly(const Value: TStateClass);
     function ConvertEnumState(const TEnumState: TUpdateState): TStateClass;
 
     procedure ShutDown;
@@ -260,7 +259,7 @@ type
   property State: TStateClass read GetState write SetState;
 
   public
-    constructor Create(AOwner: TCustomForm; AForce, ASilent: Boolean);
+    constructor Create(AForce: Boolean);
     destructor Destroy; override;
 
     procedure   HandleCheck;
@@ -325,17 +324,15 @@ const
 
 { TBackgroundUpdate }
 
-constructor TBackgroundUpdate.Create(AOwner: TCustomForm; AForce, ASilent: Boolean);
+constructor TBackgroundUpdate.Create(AForce : Boolean);
 var TSerailsedState : TUpdateState;
 begin
   inherited Create;
 
-  FOwner := AOwner;
 
   FShowErrors := True;
   FParams.Result := oucUnknown;
 
-  FSilent := ASilent;
   FForce := AForce;
   FAuto := True; // Default to automatically check, download, and install
   FIdle := IdleState.Create(Self);
@@ -346,14 +343,14 @@ begin
   FRetry := RetryState.Create(Self);
   FWaitingPostInstall := WaitingPostInstallState.Create(Self);
   // Check the Registry setting.
-  state := ConvertEnumState(CheckRegistryState);
+  SetStateOnly(ConvertEnumState(CheckRegistryState));
   KL.Log('TBackgroundUpdate.Create');
 end;
 
 destructor TBackgroundUpdate.Destroy;
 begin
-  if (FErrorMessage <> '') and not FSilent and FShowErrors then
-    ShowMessage(FErrorMessage);
+  if (FErrorMessage <> '') and FShowErrors then
+    KL.Log(FErrorMessage);
 
   if FParams.Result = oucShutDown then
     ShutDown;
@@ -524,6 +521,21 @@ begin
     CurrentState.Exit;
   end;
 
+  SetStateOnly(Value);
+
+  if Assigned(CurrentState) then
+  begin
+    CurrentState.Enter;
+  end
+  else
+  begin
+   // TODO: Unable to set state for Value []
+  end;
+
+end;
+
+procedure TBackgroundUpdate.SetStateOnly(const Value: TStateClass);
+begin
   if Value = IdleState then
   begin
     CurrentState := FIdle;
@@ -552,16 +564,6 @@ begin
   begin
     CurrentState := FWaitingPostInstall;
   end;
-
-  if Assigned(CurrentState) then
-  begin
-    CurrentState.Enter;
-  end
-  else
-  begin
-   // TODO: Unable to set state for Value []
-  end;
-
 end;
 
 function TBackgroundUpdate.ConvertEnumState(const TEnumState: TUpdateState) : TStateClass;
@@ -654,7 +656,9 @@ begin
     this all in the Idle HandleCheck message. But could be broken into an
     seperate state of WaitngCheck RESP }
   { if Response not OK stay in the idle state and return }
-  CheckForUpdates := TRemoteUpdateCheck.Create(False);
+  //CheckForUpdates := TRemoteUpdateCheck.Create(False);
+  // should be false but forcing check for testing
+  CheckForUpdates := TRemoteUpdateCheck.Create(True);
   try
      Result:= CheckForUpdates.Run;
   finally
@@ -884,19 +888,40 @@ begin
 end;
 
 function WaitingRestartState.HandleKmShell;
+var
+  SavedPath : String;
+  Filenames : TStringDynArray;
 begin
-  // Check downloaded cache if available then
-  // change state intalling
-  // else then change to idle and handle checkupdates state
- // if bucStateContext.IsKeymanRunning then
-      // stay as waiting
-      // log this is unexpected
-      //ChangeState(WaitingRestartState)
-   // else
-  //
-
-  ChangeState(UpdateAvailableState);
-  Result := kmShellExit;
+  KL.Log('WaitingRestartState.HandleKmShell Enter');
+  // Still can't go if keyman has run
+  if HasKeymanRun then
+  begin
+    KL.Log('WaitingRestartState.HandleKmShell Keyman Has Run');
+    Result := kmShellExit;
+    // Exit; // Exit is not wokring for some reason.
+    // this else is only here because the exit is not working.
+  end
+  else
+  begin
+    // Check downloaded cache if available then
+    SavedPath := IncludeTrailingPathDelimiter(TKeymanPaths.KeymanUpdateCachePath);
+    GetFileNamesInDirectory(SavedPath, FileNames);
+    if Length(FileNames) = 0 then
+    begin
+        KL.Log('WaitingRestartState.HandleKmShell No Files in Download Cache');
+        // Return to Idle state and check for Updates state
+        ChangeState(IdleState);
+        bucStateContext.CurrentState.HandleCheck;
+        Result := kmShellExit;
+        // Exit; // again exit was not working
+    end
+    else
+    begin
+      KL.Log('WaitingRestartState.HandleKmShell is good to install');
+      ChangeState(InstallingState);
+      Result := kmShellExit;
+    end;
+  end;
 end;
 
 procedure WaitingRestartState.HandleInstall;
@@ -962,10 +987,12 @@ begin
   if s = '.msi' then
     FResult := TUtilExecute.Shell(0, 'msiexec.exe', '', '/qb /i "'+SavePath+'" AUTOLAUNCHPRODUCT=1')  // I3349
   else if s = '.exe' then
+  begin
+    KL.Log('TBackgroundUpdate.InstallingState.DoInstallKeyman SavePath:"'+ SavePath+'"');
     FResult := TUtilExecute.Shell(0, SavePath, '', '-au')  // I3349
+  end
   else
-    Exit;
-    //Exit(False);
+    FResult := False;
 
   if not FResult then
   begin
@@ -1033,7 +1060,9 @@ end;
 function InstallingState.HandleKmShell;
 begin
   // Result = exit straight away as we are installing (MSI installer)
-  Result := kmShellExit;
+  // need to just do a no-op keyman will it maybe using kmshell to install
+  // packages.
+  Result := kmShellContinue;
 end;
 
 procedure InstallingState.HandleInstall;
@@ -1152,7 +1181,8 @@ begin
       // TODO Remove cached files. Do any loging updating of files etc and then set back to idle
       //SavePath := IncludeTrailingPathDelimiter(GetFolderPath(CSIDL_COMMON_APPDATA) + SFolder_CachedUpdateFiles);
       /// For testing using local user area cache
-      SavePath := 'C:\Projects\rcswag\testCache';
+      //SavePath := 'C:\Projects\rcswag\testCache';
+      SavePath := IncludeTrailingPathDelimiter(TKeymanPaths.KeymanUpdateCachePath);
       KL.Log('WaitingPostInstallState.HandleMSIInstallComplete remove SavePath:'+ SavePath);
 
       GetFileNamesInDirectory(SavePath, FileNames);

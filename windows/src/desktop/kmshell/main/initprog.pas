@@ -143,6 +143,7 @@ uses
   UpgradeMnemonicLayout,
   utilfocusappwnd,
   utilkmshell,
+  BackgroundUpdate,
 
   KeyboardTIPCheck,
 
@@ -384,7 +385,7 @@ var
   kdl: IKeymanDefaultLanguage;
   FIcon: string;
   FMutex: TKeymanMutex;  // I2720
-  RemoteUpdateCheck: TRemoteUpdateCheck;
+  BUpdateSM : TBackgroundUpdate;
     function FirstKeyboardFileName: WideString;
     begin
       if KeyboardFileNames.Count = 0
@@ -433,15 +434,20 @@ begin
   end;
   // TODO: #10038  Will add this as part of the background update state machine
   // for now just verifing the download happens via -buc switch.
-  RemoteUpdateCheck := TRemoteUpdateCheck.Create(False);
+  BUpdateSM := TBackgroundUpdate.Create(False);
     try
       if (FMode = fmBackgroundUpdateCheck) then
       begin
-        RemoteUpdateCheck.Run;
+        BUpdateSM.HandleCheck;
         Exit;
       end
+      else
+      begin
+        if BUpdateSM.HandleKmShell = 1 then
+          Exit;
+      end;
     finally
-      RemoteUpdateCheck.Free;
+      BUpdateSM.Free;
     end;
 
 

@@ -46,6 +46,7 @@ uses
   RegistryKeys,
   UfrmKeyman7Main,
   UserMessages,
+  Klog,
   Keyman.System.ExecuteHistory;
 
 function ValidateParameters(var FCommand: Integer): Boolean; forward;
@@ -77,10 +78,11 @@ var
   hMutex: Cardinal;
 begin
 
-
+      KL.Log('Keyman RunProgram');
   if not ValidateParameters(FCommand) then Exit;
 
   // TODO set atom application running
+  KL.Log('Calling RecordKeymanStarted');
   RecordKeymanStarted;
 
   hProgramMutex := CreateMutex(nil, False, 'KeymanEXE70');
