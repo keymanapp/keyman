@@ -261,7 +261,7 @@ run_test(const km::core::path &source, const km::core::path &compiled, km::tests
   verify_context(text_store, test_state, test_context);
 
   // Run through actions, applying output for each event
-  for (test_source.next_action(action); action.type != km::tests::LDML_ACTION_DONE; test_source.next_action(action)) {
+  for (test_source.next_action(action); !action.done(); test_source.next_action(action)) {
     // handle backspace here
     if (action.type == km::tests::LDML_ACTION_KEY_EVENT) {
       auto &p = action.k;
@@ -308,14 +308,19 @@ run_test(const km::core::path &source, const km::core::path &compiled, km::tests
       if (text_store != action.string) return __LINE__;
     } else if (action.type == km::tests::LDML_ACTION_FAIL) {
       // test requested failure
-      std::cout << "- FAIL: " << action.string << std::endl;
+      std::wcout << console_color::fg(console_color::BRIGHT_RED) << "- FAIL: " << action.string << console_color::reset()
+                 << std::endl;
       return __LINE__;
+    } else if (action.type == km::tests::LDML_ACTION_SKIP) {
+      // test requested skip
+      std::wcout << console_color::fg(console_color::YELLOW) << "- SKIP: " << action.string << console_color::reset()
+                 << std::endl;
     } else {
       std::cerr << " Err: unhandled action type " << action.type << std::endl;
       return __LINE__;
     }
   }
-  std::cout << "- DONE" << std::endl;
+  std::wcout << console_color::fg(console_color::BLUE) << "- DONE" << console_color::reset() << std::endl;
 
   // Test if the beep action was as expected
   if (g_beep_found != test_source.get_expected_beep())
