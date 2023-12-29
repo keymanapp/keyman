@@ -41,6 +41,7 @@ tests_with_testdata = [
   'k_200_reorder_nod_Lana',
   'k_201_reorder_esk',
   'k_210_marker',
+  'k_211_marker_escape',
 ]
 
 tests =  tests_without_testdata
