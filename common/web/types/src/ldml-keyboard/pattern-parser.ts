@@ -65,10 +65,18 @@ export class MarkerParser {
   /** Max count of markers */
   public static readonly MAX_MARKER_COUNT = constants.marker_max_count;
 
+  /** 0000 … FFFF */
+  private static hexQuad(n: number): string {
+    if (n < 0x000 || n > 0xFFFF) {
+      throw RangeError(`${n} not in [0x0000,0xFFFF]`);
+    }
+    return (`0000` + (n).toString(16)).slice(-4);
+  }
+
   private static anyMarkerMatch() : string {
-    const start = (`0000` + (this.MIN_MARKER_INDEX).toString(16)).slice(-4);
-    const end   = (`0000` + (this.MAX_MARKER_INDEX).toString(16)).slice(-4);
-    return `${this.SENTINEL}${this.MARKER_CODE}[\\u${start}-\\u${end}]`;
+    const start = MarkerParser.hexQuad(this.MIN_MARKER_INDEX);
+    const end   = MarkerParser.hexQuad(this.MAX_MARKER_INDEX);
+    return `${this.SENTINEL}${this.MARKER_CODE}[\\u${start}-\\u${end}]`; // TODO-LDML: #9121 wrong escape format
   }
 
   /** Expression that matches any marker */
@@ -91,12 +99,20 @@ export class MarkerParser {
     return matchArray(str, this.REFERENCE);
   }
 
+  private static markerCodeToString(n: number, forMatch?: boolean): string {
+    if (!forMatch) {
+      return String.fromCharCode(n);
+    } else {
+      return `\\u${MarkerParser.hexQuad(n)}`; // TODO-LDML: #9121 wrong escape format
+    }
+  }
+
   /** @returns string for marker #n */
-  public static markerOutput(n: number): string {
+  public static markerOutput(n: number, forMatch?: boolean): string {
     if (n < MarkerParser.MIN_MARKER_INDEX || n > MarkerParser.ANY_MARKER_INDEX) {
       throw RangeError(`Internal Error: marker index out of range ${n}`);
     }
-    return this.SENTINEL + this.MARKER_CODE + String.fromCharCode(n);
+    return this.SENTINEL + this.MARKER_CODE + this.markerCodeToString(n, forMatch);
   }
 
   /** @returns all marker strings as sentinel values */
@@ -118,7 +134,7 @@ export class MarkerParser {
       } else if(order > MarkerParser.MAX_MARKER_INDEX) {
         throw RangeError(`Internal Error: marker \\m{${arg}} has out of range index ${order}`);
       } else {
-        return MarkerParser.markerOutput(order + 1);
+        return MarkerParser.markerOutput(order + 1, forMatch);
       }
     });
   }

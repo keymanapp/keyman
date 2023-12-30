@@ -516,7 +516,7 @@ block(strs)                         #  struct COMP_KMXPLUS_STRS {
   diff(strs,strKeys)       sizeof(strKeys,2)
   diff(strs,strIndicator)  sizeof(strIndicator,2)
   diff(strs,strSentinel0001)  sizeof(strSentinel0001,2)
-
+  diff(strs,strSentinel0001r)  sizeof(strSentinel0001r,2)
 
   # String table -- block(x) is used to store the null u16char at end of each string
   #                 without interfering with sizeof() calculation above
@@ -555,8 +555,8 @@ block(strs)                         #  struct COMP_KMXPLUS_STRS {
   block(strKeys)             90 17 b6 17 block(x) 00 00                               # 'ថា'
   # <reorder before="ᩫ" from="᩠᩵ᩅ" order="10 55 10" />
   block(strIndicator)        3d d8 40 de block(x) 00 00                               # '🙀'
-  block(strSentinel0001)     FF FF 08 00 01 00 block(x) 00 00                   # UC_SENTINEL CODE_DEADKEY U+0001
-
+  block(strSentinel0001)    FF FF 08 00 01 00 block(x) 00 00                         # UC_SENTINEL CODE_DEADKEY U+0001
+  block(strSentinel0001r)   FF FF 08 00 5C 00 75 00 30 00 30 00 30 00 31 00 block(x) 00 00     # UC_SENTINEL CODE_DEADKEY \u0001 (regex form)
 
 
 block(endstrs)                      # end of strs block
@@ -598,12 +598,12 @@ block(tran)                         # struct COMP_KMXPLUS_TRAN {
 
   block(tranTransform1)
     index(strNull,strA,2)  #    KMXPLUS_STR from; 'a'
-    index(strNull,strSentinel0001,2)        #    KMXPLUS_STR to; \m{a}
+    index(strNull,strSentinel0001,2)        #    KMXPLUS_STR to; \m{a} (plain form)
     index(strNull,strNull,2)          # mapFrom
     index(strNull,strNull,2)          # mapTo
 
   block(tranTransform2)  # Next group
-    index(strNull,strSentinel0001,2)  #    KMXPLUS_STR from; (\m{a})
+    index(strNull,strSentinel0001r,2)  #    KMXPLUS_STR from; (\m{a}) (regex form)
     index(strNull,strNull,2)        #    KMXPLUS_STR to; (none)
     index(strNull,strNull,2)          # mapFrom
     index(strNull,strNull,2)          # mapTo

@@ -950,9 +950,9 @@ bool normalize_nfd(std::u16string &str) {
   return normalize(nfd, str, status);
 }
 
-bool normalize_nfd_markers(std::u16string &str, marker_map &map) {
+bool normalize_nfd_markers(std::u16string &str, marker_map &map, bool for_regex) {
   std::u32string rstr = km::core::kmx::u16string_to_u32string(str);
-  if(!normalize_nfd_markers(rstr, map)) {
+  if(!normalize_nfd_markers(rstr, map, for_regex)) {
     return false;
   } else {
     str = km::core::kmx::u32string_to_u16string(rstr);
@@ -960,7 +960,7 @@ bool normalize_nfd_markers(std::u16string &str, marker_map &map) {
   }
 }
 
-void add_back_markers(std::u32string &str, const std::u32string &src, const marker_map &map) {
+static void add_back_markers(std::u32string &str, const std::u32string &src, const marker_map &map, bool for_regex) {
   // need to reconstitute.
   marker_map map2(map);  // make a copy of the map
   // clear the string
@@ -970,7 +970,7 @@ void add_back_markers(std::u32string &str, const std::u32string &src, const mark
     const auto ch = MARKER_BEFORE_EOT;
     const auto m  = map2.find(ch);
     if (m != map2.end()) {
-      prepend_marker(str, m->second);
+      prepend_marker(str, m->second, for_regex);
       map2.erase(ch);  // remove it
     }
   }
@@ -981,7 +981,7 @@ void add_back_markers(std::u32string &str, const std::u32string &src, const mark
 
     const auto m = map2.find(ch);
     if (m != map2.end()) {
-      prepend_marker(str, m->second);
+      prepend_marker(str, m->second, for_regex);
       map2.erase(ch);  // remove it
     }
   }
@@ -992,9 +992,9 @@ void add_back_markers(std::u32string &str, const std::u32string &src, const mark
  *  - doesn't support >1 marker per char - may need a set instead of a map!
  *  - ideally this should be used on a normalization safe subsequence
  */
-bool normalize_nfd_markers(std::u32string &str, marker_map &map) {
+bool normalize_nfd_markers(std::u32string &str, marker_map &map, bool for_regex) {
   /** original string, but no markers */
-  std::u32string str_unmarked = remove_markers(str, map);
+  std::u32string str_unmarked = remove_markers(str, map, for_regex);
   /** original string, no markers, NFD */
   std::u32string str_unmarked_nfd = str_unmarked;
   if(!normalize_nfd(str_unmarked_nfd)) {
@@ -1006,14 +1006,14 @@ bool normalize_nfd_markers(std::u32string &str, marker_map &map) {
     // Normalization produced no change when markers were removed.
     // So, we'll call this a no-op.
   } else {
-    add_back_markers(str, str_unmarked_nfd, map);
+    add_back_markers(str, str_unmarked_nfd, map, for_regex);
   }
   return true; // all OK
 }
 
-bool normalize_nfc_markers(std::u32string &str, marker_map &map) {
+bool normalize_nfc_markers(std::u32string &str, marker_map &map, bool for_regex) {
   /** original string, but no markers */
-  std::u32string str_unmarked = remove_markers(str, map);
+  std::u32string str_unmarked = remove_markers(str, map, for_regex);
   /** original string, no markers, NFC */
   std::u32string str_unmarked_nfc = str_unmarked;
   if(!normalize_nfc(str_unmarked_nfc)) {
@@ -1025,7 +1025,7 @@ bool normalize_nfc_markers(std::u32string &str, marker_map &map) {
     // Normalization produced no change when markers were removed.
     // So, we'll call this a no-op.
   } else {
-    add_back_markers(str, str_unmarked_nfc, map);
+    add_back_markers(str, str_unmarked_nfc, map, for_regex);
   }
   return true; // all OK
 }
@@ -1048,7 +1048,7 @@ bool normalize_nfc(std::u16string &str) {
   return normalize(nfc, str, status);
 }
 
-std::u32string remove_markers(const std::u32string &str, marker_map *markers) {
+std::u32string remove_markers(const std::u32string &str, marker_map *markers, bool _kmn_unused(for_regex)) {
   std::u32string out;
   auto i = str.begin();
   auto last = i;
