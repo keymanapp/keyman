@@ -340,12 +340,41 @@ inline std::u32string remove_markers(const std::u32string &str, marker_map &mark
 }
 
 /** prepend the marker string in UC_SENTINEL format to the str */
-inline static void prepend_marker(std::u32string &str, KMX_DWORD marker, bool for_regex = false);
+inline void prepend_marker(std::u32string &str, KMX_DWORD marker, bool for_regex = false);
+
+/** format 'marker' as 0001...FFFF and put it at the beginning of the string */
+void prepend_hex_quad(std::u32string &str, KMX_DWORD marker);
+
+/** parse 0001...FFFF into a KMX_DWORD. Returns 0 on failure */
+KMX_DWORD parse_hex_quad(const km_core_usv hex_str[]);
 
 void
-prepend_marker(std::u32string &str, KMX_DWORD marker, bool _kmn_unused(for_regex)) {
-  km_core_usv triple[] = {LDML_UC_SENTINEL, LDML_MARKER_CODE, marker};
-  str.insert(0, triple, 3);
+prepend_marker(std::u32string &str, KMX_DWORD marker, bool for_regex) {
+  if (!for_regex) {
+    km_core_usv markstr[] = {LDML_UC_SENTINEL, LDML_MARKER_CODE, marker};
+    str.insert(0, markstr, 3);
+  } else {
+    if (marker == LDML_MARKER_ANY_INDEX) {
+      // recreate the regex from back to front
+      str.insert(0, 1, U']');
+      prepend_hex_quad(str, LDML_MARKER_MAX_INDEX);
+      str.insert(0, 1, U'u');
+      str.insert(0, 1, U'\\');
+      str.insert(0, 1, U'-');
+      prepend_hex_quad(str, LDML_MARKER_MIN_INDEX);
+      str.insert(0, 1, U'u');
+      str.insert(0, 1, U'\\');
+      str.insert(0, 1, U'[');
+      str.insert(0, 1, LDML_MARKER_CODE);
+      str.insert(0, 1, LDML_UC_SENTINEL);
+    } else {
+      // add hex part
+      prepend_hex_quad(str, marker);
+      // add static part
+      km_core_usv markstr[] = {LDML_UC_SENTINEL, LDML_MARKER_CODE, u'\\', u'u'};
+      str.insert(0, markstr, 4);
+    }
+  }
 }
 
 bool normalize_nfd_markers(std::u16string &str, bool for_regex) {

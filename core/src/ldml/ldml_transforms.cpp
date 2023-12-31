@@ -518,8 +518,8 @@ transform_entry::init() {
   }
   // TODO-LDML: if we have mapFrom, may need to do other processing.
   std::u16string patstr = km::core::kmx::u32string_to_u16string(fFrom);
-  // normalize, including markers
-  normalize_nfd_markers(patstr);
+  // normalize, including markers, for regex
+  normalize_nfd_markers(patstr, true);
   UErrorCode status           = U_ZERO_ERROR;
   /* const */ icu::UnicodeString patustr = icu::UnicodeString(patstr.data(), (int32_t)patstr.length());
   // add '$' to match to end
@@ -1048,7 +1048,48 @@ bool normalize_nfc(std::u16string &str) {
   return normalize(nfc, str, status);
 }
 
-std::u32string remove_markers(const std::u32string &str, marker_map *markers, bool _kmn_unused(for_regex)) {
+void
+prepend_hex_quad(std::u32string &str, KMX_DWORD marker) {
+  for (auto i = 0; i < 4; i++) {
+    KMX_DWORD remainder = marker & 0xF; // get the last nibble
+    char32_t ch;
+    if (remainder < 0xA) {
+      ch = U'0' + remainder;
+    } else {
+      ch = U'A' + (remainder - 0xA);
+    }
+    str.insert(0, 1, ch); // prepend
+    marker >>= 4;
+  }
+}
+
+inline int xdigitval(km_core_usv ch) {
+  if (ch >= U'0' && ch <= U'9') {
+    return (ch - U'0');
+  } else if (ch >= U'a' && ch <= U'f') {
+    return (0xA + ch - U'a');
+  } else if (ch >= U'A' && ch <= U'F') {
+    return (0xA + ch - U'A');
+  } else {
+    return -1;
+  }
+}
+
+KMX_DWORD parse_hex_quad(const km_core_usv hex_str[]) {
+  KMX_DWORD mark_no = 0;
+  for(auto i = 0; i < 4; i++) {
+    mark_no <<= 4;
+    auto c = hex_str[i];
+    auto n = xdigitval(c);
+    if (n == -1) {
+      return 0;
+    }
+    mark_no |= n;
+  }
+  return mark_no;
+}
+
+std::u32string remove_markers(const std::u32string &str, marker_map *markers, bool for_regex) {
   std::u32string out;
   auto i = str.begin();
   auto last = i;
@@ -1074,14 +1115,107 @@ std::u32string remove_markers(const std::u32string &str, marker_map *markers, bo
       break; // hit end
     }
 
-    // #3 marker number
-    const KMX_DWORD marker_no = *i;
-    assert(marker_no >= LDML_MARKER_MIN_INDEX && marker_no <= LDML_MARKER_MAX_INDEX);
-    i++; // if end, we'll break out of the loop
+    KMX_DWORD marker_no;
+    if (!for_regex) {
+      // #3 marker number
+      marker_no = *i;
+      i++; // if end, we'll break out of the loop
+    } else {
+      // is it an escape or a range?
+      if (*i == U'\\') {
+        if (++i == str.end()) {
+          break;
+        }
+        assert(*i == U'u');
+        if (++i == str.end()) {
+          break;
+        }
+        km_core_usv markno[4];
+
+        markno[0] = *(i++);
+        if (i == str.end()) {
+          break;
+        }
+        markno[1] = *(i++);
+        if (i == str.end()) {
+          break;
+        }
+        markno[2] = *(i++);
+        if (i == str.end()) {
+          break;
+        }
+        markno[3] = *(i++);
+        marker_no = parse_hex_quad(markno);
+        assert (marker_no != 0); // illegal marker number
+      } else if (*i == U'[') {
+        if (++i == str.end()) {
+          break;
+        }
+        assert(*i == U'\\');
+        if (++i == str.end()) {
+          break;
+        }
+        assert(*i == U'u');
+        if (++i == str.end()) {
+          break;
+        }
+        assert(xdigitval(*i) != -1);
+        if (++i == str.end()) {
+          break;
+        }
+        assert(xdigitval(*i) != -1);
+        if (++i == str.end()) {
+          break;
+        }
+        assert(xdigitval(*i) != -1);
+        if (++i == str.end()) {
+          break;
+        }
+        assert(xdigitval(*i) != -1);
+        if (++i == str.end()) {
+          break;
+        }
+        assert(*i == U'-');
+        if (++i == str.end()) {
+          break;
+        }
+        assert(*i == U'\\');
+        if (++i == str.end()) {
+          break;
+        }
+        assert(*i == U'u');
+        if (++i == str.end()) {
+          break;
+        }
+        assert(xdigitval(*i) != -1);
+        if (++i == str.end()) {
+          break;
+        }
+        assert(xdigitval(*i) != -1);
+        if (++i == str.end()) {
+          break;
+        }
+        assert(xdigitval(*i) != -1);
+        if (++i == str.end()) {
+          break;
+        }
+        assert(xdigitval(*i) != -1);
+        if (++i == str.end()) {
+          break;
+        }
+        assert(*i == U']');
+        i++;
+        marker_no = LDML_MARKER_ANY_INDEX;
+      } else {
+        assert(*i == U'\\' || *i == U'[');  // error.
+        marker_no = 0; // error, don't record
+      }
+    }
+    assert(marker_no >= LDML_MARKER_MIN_INDEX && marker_no <= LDML_MARKER_ANY_INDEX);
     last = i;
 
     // record the marker
-    if (markers != nullptr) {
+    if (marker_no >= LDML_MARKER_MIN_INDEX && markers != nullptr) {
       if (i == str.end()) {
         markers->emplace(MARKER_BEFORE_EOT, marker_no);
       } else {
