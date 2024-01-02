@@ -253,6 +253,40 @@ export interface CompilerCallbackOptions {
   compilerWarningsAsErrors?: boolean;
 };
 
+export interface KeymanCompilerArtifact {
+  data: Uint8Array;
+  filename: string;
+};
+
+export type KeymanCompilerArtifactOptional = KeymanCompilerArtifact | undefined;
+
+export interface KeymanCompilerArtifacts {
+  readonly [type:string]: KeymanCompilerArtifactOptional;
+};
+
+export interface KeymanCompilerResult {
+  artifacts: KeymanCompilerArtifacts;
+};
+
+export interface KeymanCompiler {
+  init(callbacks: CompilerCallbacks, options: CompilerOptions): Promise<boolean>;
+  /**
+   * Run the compiler, and save the result in memory arrays. Note that while
+   * `outputFilename` is provided here, the output file is not written to in
+   * this function.
+   * @param inputFilename
+   * @param outputFilename The intended output filename, optional, if missing,
+   *                       calculated from inputFilename
+   * @param data
+   */
+  run(inputFilename:string, outputFilename?:string /*, data?: any*/): Promise<KeymanCompilerResult>;
+  /**
+   * Writes the compiled output files to disk
+   * @param artifacts
+   */
+  write(artifacts: KeymanCompilerArtifacts): Promise<boolean>;
+};
+
 /**
  * Abstract interface for callbacks, to abstract out file i/o
  */
@@ -369,10 +403,6 @@ export interface CompilerBaseOptions {
    * Format of output for log to console
    */
   logFormat?: CompilerLogFormat;
-  /**
-   * Optional output file for activities that generate output
-   */
-  outFile?: string;
   /**
    * Colorize log output, default is detected from console
    */

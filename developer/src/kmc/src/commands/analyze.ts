@@ -105,7 +105,7 @@ async function analyzeOskCharUse(callbacks: CompilerCallbacks, filenames: string
 
 async function analyzeOskRewritePua(callbacks: CompilerCallbacks, filenames: string[], options: AnalysisActivityOptions) {
   const analyzer = new AnalyzeOskRewritePua(callbacks);
-  const mapping: any = JSON.parse(callbacks.fs.readFileSync(options.mappingFile, 'UTF-8'));
+  const mapping: any = JSON.parse(fs.readFileSync(options.mappingFile, 'utf-8'));
 
   return await runOnFiles(callbacks, filenames, async (filename: string): Promise<boolean> => {
     if(!await analyzer.analyze(filename, mapping)) {

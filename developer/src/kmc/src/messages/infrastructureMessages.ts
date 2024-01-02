@@ -91,5 +91,9 @@ export class InfrastructureMessages {
   static Hint_ProjectIsVersion10 = () => m(this.HINT_ProjectIsVersion10,
     `The project file is an older version and can be upgraded to version 17.0`);
   static HINT_ProjectIsVersion10 = SevHint | 0x0014;
+
+  static Error_OutFileCanOnlyBeSpecifiedWithSingleInfile = () => m(this.ERROR_OutFileCanOnlyBeSpecifiedWithSingleInfile,
+    `Parameter --out-file can only be used with a single input file.`);
+  static ERROR_OutFileCanOnlyBeSpecifiedWithSingleInfile = SevError | 0x0015;
 }
 

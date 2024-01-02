@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 17.0.237 alpha 2024-01-02
+
+* feat(developer): Consolidate public APIs for kmc modules (#10208)
+* chore(developer): honor prompt to upgrade in kmc (#10218)
+
 ## 17.0.236 alpha 2023-12-22
 
 * fix(oem/fv): Add fv_kwadacha_tsekene (#10292)
