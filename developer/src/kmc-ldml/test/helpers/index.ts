@@ -112,14 +112,16 @@ async function loadDepsFor(sections: DependencySections, parentCompiler: Section
   }
 }
 
-export function loadTestdata(inputFilename: string, options: LdmlCompilerOptions) : LDMLKeyboardTestDataXMLSourceFile {
-  const k = new LdmlKeyboardCompiler(compilerTestCallbacks, options);
+export async function loadTestData(inputFilename: string, options: LdmlCompilerOptions) : Promise<LDMLKeyboardTestDataXMLSourceFile> {
+  const k = new LdmlKeyboardCompiler();
+  assert.isTrue(await k.init(compilerTestCallbacks, options));
   const source = k.loadTestData(inputFilename);
   return source;
 }
 
 export async function compileKeyboard(inputFilename: string, options: LdmlCompilerOptions, validateMessages?: CompilerEvent[], expectFailValidate?: boolean, compileMessages?: CompilerEvent[]): Promise<KMXPlusFile> {
-  const k = new LdmlKeyboardCompiler(compilerTestCallbacks, options);
+  const k = new LdmlKeyboardCompiler();
+  assert.isTrue(await k.init(compilerTestCallbacks, options));
   const source = k.load(inputFilename);
   checkMessages();
   assert.isNotNull(source, 'k.load should not have returned null');
@@ -151,7 +153,8 @@ export async function compileKeyboard(inputFilename: string, options: LdmlCompil
 }
 
 export async function compileVisualKeyboard(inputFilename: string, options: LdmlCompilerOptions): Promise<VisualKeyboard.VisualKeyboard> {
-  const k = new LdmlKeyboardCompiler(compilerTestCallbacks, options);
+  const k = new LdmlKeyboardCompiler();
+  assert.isTrue(await k.init(compilerTestCallbacks, options));
   const source = k.load(inputFilename);
   checkMessages();
   assert.isNotNull(source, 'k.load should not have returned null');
@@ -254,7 +257,7 @@ async function getTestUnicodeSetParser(callbacks: CompilerCallbacks): Promise<Un
   // for tests, just create a new one
   // see LdmlKeyboardCompiler.getUsetParser()
   const compiler = new KmnCompiler();
-  const ok = await compiler.init(callbacks);
+  const ok = await compiler.init(callbacks, null);
   assert.ok(ok, `Could not initialize KmnCompiler (UnicodeSetParser), see callback messages`);
   if (ok) {
     return compiler;

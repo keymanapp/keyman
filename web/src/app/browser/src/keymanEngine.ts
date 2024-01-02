@@ -442,7 +442,7 @@ export default class KeymanEngine extends KeymanEngineBase<BrowserConfiguration,
     const stub = this.keyboardRequisitioner.cache.getStub(PInternalName, PlgCode);
     const keyboard = this.keyboardRequisitioner.cache.getKeyboardForStub(stub);
 
-    return this._GetKeyboardDetail(stub, keyboard);
+    return stub && this._GetKeyboardDetail(stub, keyboard);
   }
 
   /**

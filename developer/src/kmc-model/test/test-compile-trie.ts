@@ -1,4 +1,4 @@
-import LexicalModelCompiler from '../src/lexical-model-compiler.js';
+import { LexicalModelCompiler } from '../src/lexical-model-compiler.js';
 import {assert} from 'chai';
 import 'mocha';
 
@@ -14,11 +14,12 @@ describe('LexicalModelCompiler', function () {
   });
 
   describe('#generateLexicalModelCode', function () {
-    it('should compile a trivial word list', function () {
+    it('should compile a trivial word list', async function () {
       const MODEL_ID = 'example.qaa.trivial';
       const PATH = makePathToFixture(MODEL_ID);
 
-      let compiler = new LexicalModelCompiler(callbacks);
+      let compiler = new LexicalModelCompiler();
+      assert.isTrue(await compiler.init(callbacks, null));
       let code = compiler.generateLexicalModelCode(MODEL_ID, {
         format: 'trie-1.0',
         sources: ['wordlist.tsv']
@@ -37,11 +38,12 @@ describe('LexicalModelCompiler', function () {
       assert.match(code, /\bwordBreaker\b["']?:\s*wordBreakers\b/);
     });
 
-    it('should compile a word list exported by Microsoft Excel', function () {
+    it('should compile a word list exported by Microsoft Excel', async function () {
       const MODEL_ID = 'example.qaa.utf16le';
       const PATH = makePathToFixture(MODEL_ID);
 
-      let compiler = new LexicalModelCompiler(callbacks);
+      let compiler = new LexicalModelCompiler();
+      assert.isTrue(await compiler.init(callbacks, null));
       let code = compiler.generateLexicalModelCode(MODEL_ID, {
         format: 'trie-1.0',
         sources: ['wordlist.txt']
@@ -58,11 +60,12 @@ describe('LexicalModelCompiler', function () {
     });
   });
 
-  it('should compile a word list with a custom word breaking function', function () {
+  it('should compile a word list with a custom word breaking function', async function () {
     const MODEL_ID = 'example.qaa.trivial';
     const PATH = makePathToFixture(MODEL_ID);
 
-    let compiler = new LexicalModelCompiler(callbacks);
+    let compiler = new LexicalModelCompiler();
+    assert.isTrue(await compiler.init(callbacks, null));
     let code = compiler.generateLexicalModelCode(MODEL_ID, {
       format: 'trie-1.0',
       sources: ['wordlist.tsv'],
@@ -81,11 +84,12 @@ describe('LexicalModelCompiler', function () {
     assert.match(code, /\bwordBreaker\b["']?:\s+function\b/);
   });
 
-  it('should not generate unpaired surrogate code units', function () {
+  it('should not generate unpaired surrogate code units', async function () {
     const MODEL_ID = 'example.qaa.smp';
     const PATH = makePathToFixture(MODEL_ID);
 
-    let compiler = new LexicalModelCompiler(callbacks);
+    let compiler = new LexicalModelCompiler();
+    assert.isTrue(await compiler.init(callbacks, null));
     let code = compiler.generateLexicalModelCode(MODEL_ID, {
       format: 'trie-1.0',
       sources: ['wordlist.tsv']
@@ -115,10 +119,11 @@ describe('LexicalModelCompiler', function () {
     assert.match(code, /\btotalWeight\b["']?:\s*27596\b/);
   });
 
-  it('should include the source code of its search term to key function', function () {
+  it('should include the source code of its search term to key function', async function () {
     const MODEL_ID = 'example.qaa.trivial';
     const PATH = makePathToFixture(MODEL_ID);
-    let compiler = new LexicalModelCompiler(callbacks);
+    let compiler = new LexicalModelCompiler();
+    assert.isTrue(await compiler.init(callbacks, null));
     let code = compiler.generateLexicalModelCode(MODEL_ID, {
       format: 'trie-1.0',
       sources: ['wordlist.tsv']
