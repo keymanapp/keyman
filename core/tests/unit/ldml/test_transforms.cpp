@@ -770,11 +770,11 @@ int test_normalize() {
   }
 
   {
-    // u"4è\U0000ffff\b\U00000001̠"
+    // u"4è\U0000ffff\u0008\U00000001̠"
     marker_map map;
     std::cout << __FILE__ << ":" << __LINE__ << "   - complex test 4a" << std::endl;
-    const std::u32string src    = U"4e\u0300\uFFFF\b\u0001\u0320";
-    const std::u32string expect = U"4e\uFFFF\b\u0001\u0320\u0300";
+    const std::u32string src    = U"4e\u0300\uFFFF\u0008\u0001\u0320";
+    const std::u32string expect = U"4e\uFFFF\u0008\u0001\u0320\u0300";
     std::u32string dst = src;
     assert(normalize_nfd_markers(dst, map));
     if (dst != expect) {
@@ -808,10 +808,10 @@ int test_normalize() {
     // from tests - regex edition
     marker_map map;
     std::cout << __FILE__ << ":" << __LINE__ << "   - complex test 9c+regex" << std::endl;
-    const std::u32string src    = U"9ce\u0300\uFFFF\b\\u0002\u0320\uFFFF\b\\u0001";
-    const std::u32string expect = U"9ce\uFFFF\b\\u0002\u0320\u0300\uFFFF\b\\u0001";
+    const std::u32string src    = U"9ce\u0300\uFFFF\u0008\\u0002\u0320\uFFFF\u0008\\u0001";
+    const std::u32string expect = U"9ce\uFFFF\u0008\\u0002\u0320\u0300\uFFFF\u0008\\u0001";
     std::u32string dst = src;
-    assert(normalize_nfd_markers(dst, map, true)); // TODO-LDML: need regex flag
+    assert(normalize_nfd_markers(dst, map, regex_sentinel)); // TODO-LDML: need regex flag
     if (dst != expect) {
       std::cout << "dst: " << Debug_UnicodeString(dst) << std::endl;
       std::cout << "exp: " << Debug_UnicodeString(expect) << std::endl;
@@ -825,10 +825,10 @@ int test_normalize() {
     // from tests - regex edition
     marker_map map;
     std::cout << __FILE__ << ":" << __LINE__ << "   - complex test \\m{.}" << std::endl;
-    const std::u32string src    = U"9ce\u0300\uFFFF\b[\\u0001-\\uD7FE]\u0320\uFFFF\b\\u0001";
-    const std::u32string expect = U"9ce\uFFFF\b[\\u0001-\\uD7FE]\u0320\u0300\uFFFF\b\\u0001";
+    const std::u32string src    = U"9ce\u0300\uFFFF\u0008[\\u0001-\\uD7FE]\u0320\uFFFF\u0008\\u0001";
+    const std::u32string expect = U"9ce\uFFFF\u0008[\\u0001-\\uD7FE]\u0320\u0300\uFFFF\u0008\\u0001";
     std::u32string dst = src;
-    assert(normalize_nfd_markers(dst, map, true)); // TODO-LDML: need regex flag
+    assert(normalize_nfd_markers(dst, map, regex_sentinel));
     if (dst != expect) {
       std::cout << "dst: " << Debug_UnicodeString(dst) << std::endl;
       std::cout << "exp: " << Debug_UnicodeString(expect) << std::endl;

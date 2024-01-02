@@ -519,7 +519,7 @@ transform_entry::init() {
   // TODO-LDML: if we have mapFrom, may need to do other processing.
   std::u16string patstr = km::core::kmx::u32string_to_u16string(fFrom);
   // normalize, including markers, for regex
-  normalize_nfd_markers(patstr, true);
+  normalize_nfd_markers(patstr, regex_sentinel);
   UErrorCode status           = U_ZERO_ERROR;
   /* const */ icu::UnicodeString patustr = icu::UnicodeString(patstr.data(), (int32_t)patstr.length());
   // add '$' to match to end
@@ -950,9 +950,9 @@ bool normalize_nfd(std::u16string &str) {
   return normalize(nfd, str, status);
 }
 
-bool normalize_nfd_markers(std::u16string &str, marker_map &map, bool for_regex) {
+bool normalize_nfd_markers(std::u16string &str, marker_map &map, marker_encoding encoding) {
   std::u32string rstr = km::core::kmx::u16string_to_u32string(str);
-  if(!normalize_nfd_markers(rstr, map, for_regex)) {
+  if(!normalize_nfd_markers(rstr, map, encoding)) {
     return false;
   } else {
     str = km::core::kmx::u32string_to_u16string(rstr);
@@ -960,7 +960,7 @@ bool normalize_nfd_markers(std::u16string &str, marker_map &map, bool for_regex)
   }
 }
 
-static void add_back_markers(std::u32string &str, const std::u32string &src, const marker_map &map, bool for_regex) {
+static void add_back_markers(std::u32string &str, const std::u32string &src, const marker_map &map, marker_encoding encoding) {
   // need to reconstitute.
   marker_map map2(map);  // make a copy of the map
   // clear the string
@@ -970,7 +970,7 @@ static void add_back_markers(std::u32string &str, const std::u32string &src, con
     const auto ch = MARKER_BEFORE_EOT;
     const auto m  = map2.find(ch);
     if (m != map2.end()) {
-      prepend_marker(str, m->second, for_regex);
+      prepend_marker(str, m->second, encoding);
       map2.erase(ch);  // remove it
     }
   }
@@ -981,7 +981,7 @@ static void add_back_markers(std::u32string &str, const std::u32string &src, con
 
     const auto m = map2.find(ch);
     if (m != map2.end()) {
-      prepend_marker(str, m->second, for_regex);
+      prepend_marker(str, m->second, encoding);
       map2.erase(ch);  // remove it
     }
   }
@@ -992,9 +992,9 @@ static void add_back_markers(std::u32string &str, const std::u32string &src, con
  *  - doesn't support >1 marker per char - may need a set instead of a map!
  *  - ideally this should be used on a normalization safe subsequence
  */
-bool normalize_nfd_markers(std::u32string &str, marker_map &map, bool for_regex) {
+bool normalize_nfd_markers(std::u32string &str, marker_map &map, marker_encoding encoding) {
   /** original string, but no markers */
-  std::u32string str_unmarked = remove_markers(str, map, for_regex);
+  std::u32string str_unmarked = remove_markers(str, map, encoding);
   /** original string, no markers, NFD */
   std::u32string str_unmarked_nfd = str_unmarked;
   if(!normalize_nfd(str_unmarked_nfd)) {
@@ -1006,14 +1006,14 @@ bool normalize_nfd_markers(std::u32string &str, marker_map &map, bool for_regex)
     // Normalization produced no change when markers were removed.
     // So, we'll call this a no-op.
   } else {
-    add_back_markers(str, str_unmarked_nfd, map, for_regex);
+    add_back_markers(str, str_unmarked_nfd, map, encoding);
   }
   return true; // all OK
 }
 
-bool normalize_nfc_markers(std::u32string &str, marker_map &map, bool for_regex) {
+bool normalize_nfc_markers(std::u32string &str, marker_map &map, marker_encoding encoding) {
   /** original string, but no markers */
-  std::u32string str_unmarked = remove_markers(str, map, for_regex);
+  std::u32string str_unmarked = remove_markers(str, map, encoding);
   /** original string, no markers, NFC */
   std::u32string str_unmarked_nfc = str_unmarked;
   if(!normalize_nfc(str_unmarked_nfc)) {
@@ -1025,7 +1025,7 @@ bool normalize_nfc_markers(std::u32string &str, marker_map &map, bool for_regex)
     // Normalization produced no change when markers were removed.
     // So, we'll call this a no-op.
   } else {
-    add_back_markers(str, str_unmarked_nfc, map, for_regex);
+    add_back_markers(str, str_unmarked_nfc, map, encoding);
   }
   return true; // all OK
 }
@@ -1046,6 +1046,36 @@ bool normalize_nfc(std::u16string &str) {
   const icu::Normalizer2 *nfc = icu::Normalizer2::getNFCInstance(status);
   UASSERT_SUCCESS(status);
   return normalize(nfc, str, status);
+}
+
+void
+prepend_marker(std::u32string &str, KMX_DWORD marker, marker_encoding encoding) {
+  if (encoding == plain_sentinel) {
+    km_core_usv markstr[] = {LDML_UC_SENTINEL, LDML_MARKER_CODE, marker};
+    str.insert(0, markstr, 3);
+  } else {
+    assert(encoding == regex_sentinel);
+    if (marker == LDML_MARKER_ANY_INDEX) {
+      // recreate the regex from back to front
+      str.insert(0, 1, U']');
+      prepend_hex_quad(str, LDML_MARKER_MAX_INDEX);
+      str.insert(0, 1, U'u');
+      str.insert(0, 1, U'\\');
+      str.insert(0, 1, U'-');
+      prepend_hex_quad(str, LDML_MARKER_MIN_INDEX);
+      str.insert(0, 1, U'u');
+      str.insert(0, 1, U'\\');
+      str.insert(0, 1, U'[');
+      str.insert(0, 1, LDML_MARKER_CODE);
+      str.insert(0, 1, LDML_UC_SENTINEL);
+    } else {
+      // add hex part
+      prepend_hex_quad(str, marker);
+      // add static part
+      km_core_usv markstr[] = {LDML_UC_SENTINEL, LDML_MARKER_CODE, u'\\', u'u'};
+      str.insert(0, markstr, 4);
+    }
+  }
 }
 
 void
@@ -1089,7 +1119,7 @@ KMX_DWORD parse_hex_quad(const km_core_usv hex_str[]) {
   return mark_no;
 }
 
-std::u32string remove_markers(const std::u32string &str, marker_map *markers, bool for_regex) {
+std::u32string remove_markers(const std::u32string &str, marker_map *markers, marker_encoding encoding) {
   std::u32string out;
   auto i = str.begin();
   auto last = i;
@@ -1116,11 +1146,12 @@ std::u32string remove_markers(const std::u32string &str, marker_map *markers, bo
     }
 
     KMX_DWORD marker_no;
-    if (!for_regex) {
+    if (encoding == plain_sentinel) {
       // #3 marker number
       marker_no = *i;
       i++; // if end, we'll break out of the loop
     } else {
+      assert(encoding == regex_sentinel);
       // is it an escape or a range?
       if (*i == U'\\') {
         if (++i == str.end()) {

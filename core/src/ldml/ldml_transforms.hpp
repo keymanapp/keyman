@@ -303,6 +303,14 @@ public:
 /** indicates that the marker was before the end of text. */
 const char32_t MARKER_BEFORE_EOT = km::core::kmx::Uni_FFFE_NONCHARACTER;
 
+/** specify the type of encoding for marker text */
+enum marker_encoding {
+  /** encoding as UC_SENTINEL + CODE_DEADKEY + <number> */
+  plain_sentinel,
+  /** encoding as a regex matching the marker */
+  regex_sentinel,
+};
+
 /** map from following-char to marker number. */
 typedef std::map<char32_t, KMX_DWORD> marker_map;
 
@@ -314,33 +322,33 @@ bool normalize_nfd(std::u16string &str);
  * @param markers will be populated with marker chars
  * @return false on failure
  **/
-bool normalize_nfd_markers(std::u32string &str, marker_map &markers, bool for_regex = false);
-bool normalize_nfd_markers(std::u16string &str, marker_map &markers, bool for_regex = false);
-inline bool normalize_nfd_markers(std::u32string &str, bool for_regex = false);
-inline bool normalize_nfd_markers(std::u16string &str, bool for_regex = false);
+bool normalize_nfd_markers(std::u32string &str, marker_map &markers, marker_encoding encoding = plain_sentinel);
+bool normalize_nfd_markers(std::u16string &str, marker_map &markers, marker_encoding encoding = plain_sentinel);
+inline bool normalize_nfd_markers(std::u32string &str, marker_encoding encoding = plain_sentinel);
+inline bool normalize_nfd_markers(std::u16string &str, marker_encoding encoding = plain_sentinel);
 
 /** Normalize a u32string inplace to NFC, retaining markers.
  * @param markers will be populated with marker chars
  * @return false on failure
  **/
-bool normalize_nfc_markers(std::u32string &str, marker_map &markers, bool for_regex = false);
-bool normalize_nfc_markers(std::u16string &str, marker_map &markers, bool for_regex = false);
-inline bool normalize_nfc_markers(std::u32string &str, bool for_regex = false);
-inline bool normalize_nfc_markers(std::u16string &str, bool for_regex = false);
+bool normalize_nfc_markers(std::u32string &str, marker_map &markers, marker_encoding encoding = plain_sentinel);
+bool normalize_nfc_markers(std::u16string &str, marker_map &markers, marker_encoding encoding = plain_sentinel);
+inline bool normalize_nfc_markers(std::u32string &str, marker_encoding encoding = plain_sentinel);
+inline bool normalize_nfc_markers(std::u16string &str, marker_encoding encoding = plain_sentinel);
 
 /** Normalize a u32string inplace to NFC. @return false on failure */
 bool normalize_nfc(std::u32string &str);
 /** Normalize a u16string inplace to NFC. @return false on failure */
 bool normalize_nfc(std::u16string &str);
 /** Remove markers and optionally note their glue characters in the map */
-std::u32string remove_markers(const std::u32string &str, marker_map *markers = nullptr, bool for_regex = false);
+std::u32string remove_markers(const std::u32string &str, marker_map *markers = nullptr, marker_encoding encoding = plain_sentinel);
 /** same but with a reference */
-inline std::u32string remove_markers(const std::u32string &str, marker_map &markers, bool for_regex = false)  {
-  return remove_markers(str, &markers, for_regex);
+inline std::u32string remove_markers(const std::u32string &str, marker_map &markers, marker_encoding encoding = plain_sentinel)  {
+  return remove_markers(str, &markers, encoding);
 }
 
 /** prepend the marker string in UC_SENTINEL format to the str */
-inline void prepend_marker(std::u32string &str, KMX_DWORD marker, bool for_regex = false);
+void prepend_marker(std::u32string &str, KMX_DWORD marker, marker_encoding encoding = plain_sentinel);
 
 /** format 'marker' as 0001...FFFF and put it at the beginning of the string */
 void prepend_hex_quad(std::u32string &str, KMX_DWORD marker);
@@ -348,52 +356,24 @@ void prepend_hex_quad(std::u32string &str, KMX_DWORD marker);
 /** parse 0001...FFFF into a KMX_DWORD. Returns 0 on failure */
 KMX_DWORD parse_hex_quad(const km_core_usv hex_str[]);
 
-void
-prepend_marker(std::u32string &str, KMX_DWORD marker, bool for_regex) {
-  if (!for_regex) {
-    km_core_usv markstr[] = {LDML_UC_SENTINEL, LDML_MARKER_CODE, marker};
-    str.insert(0, markstr, 3);
-  } else {
-    if (marker == LDML_MARKER_ANY_INDEX) {
-      // recreate the regex from back to front
-      str.insert(0, 1, U']');
-      prepend_hex_quad(str, LDML_MARKER_MAX_INDEX);
-      str.insert(0, 1, U'u');
-      str.insert(0, 1, U'\\');
-      str.insert(0, 1, U'-');
-      prepend_hex_quad(str, LDML_MARKER_MIN_INDEX);
-      str.insert(0, 1, U'u');
-      str.insert(0, 1, U'\\');
-      str.insert(0, 1, U'[');
-      str.insert(0, 1, LDML_MARKER_CODE);
-      str.insert(0, 1, LDML_UC_SENTINEL);
-    } else {
-      // add hex part
-      prepend_hex_quad(str, marker);
-      // add static part
-      km_core_usv markstr[] = {LDML_UC_SENTINEL, LDML_MARKER_CODE, u'\\', u'u'};
-      str.insert(0, markstr, 4);
-    }
-  }
+bool normalize_nfd_markers(std::u16string &str, marker_encoding encoding) {
+  marker_map m;
+  return normalize_nfd_markers(str, m, encoding);
 }
 
-bool normalize_nfd_markers(std::u16string &str, bool for_regex) {
+bool normalize_nfc_markers(std::u16string &str, marker_encoding encoding) {
   marker_map m;
-  return normalize_nfd_markers(str, m, for_regex);
+  return normalize_nfc_markers(str, m, encoding);
 }
 
-bool normalize_nfc_markers(std::u16string &str, bool for_regex) {
+bool normalize_nfd_markers(std::u32string &str, marker_encoding encoding) {
   marker_map m;
-  return normalize_nfc_markers(str, m, for_regex);
-}
-bool normalize_nfd_markers(std::u32string &str, bool for_regex) {
-  marker_map m;
-  return normalize_nfd_markers(str, m, for_regex);
+  return normalize_nfd_markers(str, m, encoding);
 }
 
-bool normalize_nfc_markers(std::u32string &str, bool for_regex) {
+bool normalize_nfc_markers(std::u32string &str, marker_encoding encoding) {
   marker_map m;
-  return normalize_nfc_markers(str, m, for_regex);
+  return normalize_nfc_markers(str, m, encoding);
 }
 
 
