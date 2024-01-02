@@ -33,7 +33,9 @@ describe('package versioning', function () {
   for(const [ caseTitle, filename ] of cases) {
     it(caseTitle, async function () {
       const callbacks = new TestCompilerCallbacks();
-      const kmpCompiler = new KmpCompiler(callbacks);
+      const kmpCompiler = new KmpCompiler();
+      assert.isTrue(await kmpCompiler.init(callbacks, null));
+
       const kpsPath = makePathToFixture('versioning', filename);
       const kmpJson: KmpJsonFile.KmpJsonFile = kmpCompiler.transformKpsToKmpObject(kpsPath);
       assert.isTrue(kmpJson !== null);

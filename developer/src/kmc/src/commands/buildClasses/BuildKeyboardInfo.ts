@@ -13,7 +13,7 @@ export class BuildKeyboardInfo extends BuildActivity {
   public get sourceExtension(): KeymanFileTypes.Source { return KeymanFileTypes.Source.Project; }
   public get compiledExtension(): KeymanFileTypes.Binary { return KeymanFileTypes.Binary.KeyboardInfo; }
   public get description(): string { return 'Build a keyboard metadata file'; }
-  public async build(infile: string, callbacks: CompilerCallbacks, options: ExtendedCompilerOptions): Promise<boolean> {
+  public async build(infile: string, _outfile: string, callbacks: CompilerCallbacks, options: ExtendedCompilerOptions): Promise<boolean> {
     if(!KeymanFileTypes.filenameIs(infile, KeymanFileTypes.Source.Project)) {
       // Even if the project file does not exist, we use its name as our reference
       // in order to avoid ambiguity
@@ -35,29 +35,17 @@ export class BuildKeyboardInfo extends BuildActivity {
     const keyboard = project.files.find(file => file.fileType == KeymanFileTypes.Source.KeymanKeyboard);
     const jsFilename = keyboard ? project.resolveOutputFilePath(keyboard, KeymanFileTypes.Source.KeymanKeyboard, KeymanFileTypes.Binary.WebKeyboard) : null;
     const lastCommitDate = getLastGitCommitDate(project.projectPath);
-
-    const compiler = new KeyboardInfoCompiler(callbacks);
-    const data = await compiler.writeKeyboardInfoFile({
+    const sources = {
       kmpFilename:  project.resolveOutputFilePath(kps, KeymanFileTypes.Source.Package, KeymanFileTypes.Binary.Package),
       kpsFilename: project.resolveInputFilePath(kps),
       jsFilename: jsFilename && fs.existsSync(jsFilename) ? jsFilename : undefined,
       sourcePath: calculateSourcePath(infile),
       lastCommitDate,
       forPublishing: !!options.forPublishing,
-    });
-
-    if(data == null) {
-      // Error messages have already been emitted by KeyboardInfoCompiler
-      return false;
-    }
-
+    };
+    // Note: should we always ignore the passed-in output filename for .keyboard_info?
     const outputFilename = project.getOutputFilePath(KeymanFileTypes.Binary.KeyboardInfo);
-
-    fs.writeFileSync(
-      outputFilename,
-      data
-    );
-
-    return true;
+    const compiler = new KeyboardInfoCompiler();
+    return await super.runCompiler(compiler, infile, outputFilename, callbacks, {...options, sources});
   }
 }
