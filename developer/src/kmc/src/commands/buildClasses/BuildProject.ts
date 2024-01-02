@@ -6,6 +6,7 @@ import { buildActivities, buildKeyboardInfoActivity, buildModelInfoActivity } fr
 import { InfrastructureMessages } from '../../messages/infrastructureMessages.js';
 import { loadProject } from '../../util/projectLoader.js';
 import { ExtendedCompilerOptions } from 'src/util/extendedCompilerOptions.js';
+import { getOption } from '@keymanapp/developer-utils';
 
 export class BuildProject extends BuildActivity {
   public get name(): string { return 'Project'; }
@@ -43,7 +44,9 @@ class ProjectBuilder {
 
     // Give a hint if the project is v1.0
     if(this.project.options.version != '2.0') {
-      this.callbacks.reportMessage(InfrastructureMessages.Hint_ProjectIsVersion10());
+      if(getOption("prompt to upgrade projects", true)) {
+        this.callbacks.reportMessage(InfrastructureMessages.Hint_ProjectIsVersion10());
+      }
     }
 
     // Go through the various file types and build them
