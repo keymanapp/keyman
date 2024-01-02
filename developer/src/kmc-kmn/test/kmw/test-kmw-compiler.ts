@@ -5,7 +5,7 @@ import { dirname } from 'path';
 import { fileURLToPath } from 'url';
 import fs from 'fs';
 import { TestCompilerCallbacks } from '@keymanapp/developer-test-helpers';
-import { CompilerResult, KmnCompiler } from '../../src/compiler/compiler.js';
+import { KmnCompilerResult, KmnCompiler } from '../../src/compiler/compiler.js';
 import { ETLResult, extractTouchLayout as parseWebTestResult } from './util.js';
 import { KeymanFileTypes } from '@keymanapp/common-types';
 
@@ -27,7 +27,10 @@ describe('KeymanWeb Compiler', function() {
   const kmnCompiler: KmnCompiler = new KmnCompiler();
 
   this.beforeAll(async function() {
-    assert.isTrue(await kmnCompiler.init(callbacks));
+    assert.isTrue(await kmnCompiler.init(callbacks, {
+      shouldAddCompilerVersion: false,
+      saveDebug: true,
+    }));
   });
 
   this.afterEach(function() {
@@ -79,18 +82,16 @@ describe('KeymanWeb Compiler', function() {
 });
 
 
-function run_test_keyboard(kmnCompiler: KmnCompiler, id: string): { result: CompilerResult, actualCode: string, actual: ETLResult, expectedCode: string, expected: ETLResult } {
+async function run_test_keyboard(kmnCompiler: KmnCompiler, id: string):
+  Promise<{ result: KmnCompilerResult, actualCode: string, actual: ETLResult, expectedCode: string, expected: ETLResult }> {
   const filenames = generateTestFilenames(id);
 
-  let result = kmnCompiler.runCompiler(filenames.source, {
-    shouldAddCompilerVersion: false,
-    saveDebug: true,
-  });
+  let result = await kmnCompiler.run(filenames.source, null);
   assert.isNotNull(result);
 
   let value = {
     result,
-    actualCode: new TextDecoder().decode(result.js.data),
+    actualCode: new TextDecoder().decode(result.artifacts.js.data),
     expectedCode: fs.readFileSync(filenames.fixture, 'utf8'),
     expected: <ETLResult>null,
     actual: <ETLResult>null,

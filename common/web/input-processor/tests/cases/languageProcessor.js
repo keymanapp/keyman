@@ -57,7 +57,13 @@ describe('LanguageProcessor', function() {
   });
 
   describe('.predict', function() {
-    let compiler = new LexicalModelCompiler(callbacks);
+    let compiler = null;
+
+    this.beforeAll(async function() {
+      compiler = new LexicalModelCompiler();
+      assert.isTrue(await compiler.init(callbacks, {}));
+    });
+
     const MODEL_ID = 'example.qaa.trivial';
 
     // ES-module mode leaves out `__dirname`, so we rebuild it using other components.
@@ -67,20 +73,23 @@ describe('LanguageProcessor', function() {
     const PATH = path.join(__dirname, '../../../../../developer/src/kmc-model/test/fixtures', MODEL_ID);
 
     describe('using angle brackets for quotes', function() {
-      let modelCode = compiler.generateLexicalModelCode(MODEL_ID, {
-        format: 'trie-1.0',
-        sources: ['wordlist.tsv'],
-        punctuation: {
-          quotesForKeepSuggestion: { open: `«`, close: `»`},
-          insertAfterWord: " " , // OGHAM SPACE MARK
-        }
-      }, PATH);
+      let modelCode = null, modelSpec = null;
+      this.beforeAll(function() {
+        modelCode = compiler.generateLexicalModelCode(MODEL_ID, {
+          format: 'trie-1.0',
+          sources: ['wordlist.tsv'],
+          punctuation: {
+            quotesForKeepSuggestion: { open: `«`, close: `»`},
+            insertAfterWord: " " , // OGHAM SPACE MARK
+          }
+        }, PATH);
 
-      let modelSpec = {
-        id: MODEL_ID,
-        languages: ['en'],
-        code: modelCode
-      };
+        modelSpec = {
+          id: MODEL_ID,
+          languages: ['en'],
+          code: modelCode
+        };
+      });
 
       it("successfully loads the model", function(done) {
         let languageProcessor = new LanguageProcessor(worker, new TranscriptionCache());
@@ -115,18 +124,21 @@ describe('LanguageProcessor', function() {
       });
 
       describe('properly cases generated suggestions', function() {
-        let modelCode = compiler.generateLexicalModelCode(MODEL_ID, {
-          format: 'trie-1.0',
-          sources: ['wordlist.tsv'],
-          languageUsesCasing: true,
-          //applyCasing // we rely on the compiler's default implementation here.
-        }, PATH);
+        let modelCode = null, modelSpec = null;
+        this.beforeAll(function () {
+          modelCode = compiler.generateLexicalModelCode(MODEL_ID, {
+            format: 'trie-1.0',
+            sources: ['wordlist.tsv'],
+            languageUsesCasing: true,
+            //applyCasing // we rely on the compiler's default implementation here.
+          }, PATH);
 
-        let modelSpec = {
-          id: MODEL_ID,
-          languages: ['en'],
-          code: modelCode
-        };
+          modelSpec = {
+            id: MODEL_ID,
+            languages: ['en'],
+            code: modelCode
+          };
+        });
 
         describe("does not alter casing when input is lowercased", function() {
           it("when input is fully lowercased", function(done) {
