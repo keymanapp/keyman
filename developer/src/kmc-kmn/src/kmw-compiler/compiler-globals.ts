@@ -1,10 +1,10 @@
 import { KMX, CompilerCallbacks, CompilerOptions } from "@keymanapp/common-types";
-import { CompilerResult } from "../compiler/compiler.js";
+import { KmnCompilerResult } from "../compiler/compiler.js";
 
 export let FTabStop: string;
 export let nl: string;
 export let FCompilerWarningsAsErrors = false;
-export let kmxResult: CompilerResult;
+export let kmxResult: KmnCompilerResult;
 export let fk: KMX.KEYBOARD;
 export let FMnemonic: boolean;
 export let options: CompilerOptions;
@@ -19,7 +19,7 @@ export function setupGlobals(
   _options: CompilerOptions,
   _tab: string,
   _nl: string,
-  _kmxResult: CompilerResult,
+  _kmxResult: KmnCompilerResult,
   _keyboard: KMX.KEYBOARD,
   _kmnfile: string
 ) {
