@@ -70,7 +70,7 @@ export class MarkerParser {
     if (n < 0x000 || n > 0xFFFF) {
       throw RangeError(`${n} not in [0x0000,0xFFFF]`);
     }
-    return (`0000` + (n).toString(16)).slice(-4);
+    return n.toString(16).padStart(4, '0');
   }
 
   private static anyMarkerMatch() : string {
