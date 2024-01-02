@@ -254,19 +254,30 @@ export class LdmlKeyboardCompiler implements KeymanCompiler {
       // pre-initialize the usetparser
       globalSections.usetparser = await this.getUsetParser();
       const dependencies = section.dependencies;
+      let dependencyProblem = false;
       Object.keys(constants.section).forEach((sectstr : string) => {
         const sectid : SectionIdent = constants.section[<SectionIdent>sectstr];
         if (dependencies.has(sectid)) {
           /* c8 ignore next 4 */
           if (!kmx.kmxplus[sectid]) {
-            // Internal error useful during section bring-up
-            throw new Error(`Internal error: section ${section.id} depends on uninitialized dependency ${sectid}, check ordering`);
+            if (passed) {
+              // Internal error useful during section bring-up
+              throw new Error(`Internal error: section ${section.id} depends on uninitialized dependency ${sectid}, check ordering`);
+            } else {
+              dependencyProblem = true;
+              return; // Already failed to validate, so no need for the layering message.
+            }
           }
         } else {
           // delete dependencies that aren't referenced
           delete globalSections[sectid];
         }
       });
+      if (dependencyProblem && !passed) {
+        // Some layering problem, but we've already noted an error (!passed).
+        // Just skip this section.
+        continue;
+      }
       const sect = section.compile(globalSections);
 
       /* c8 ignore next 7 */

@@ -79,6 +79,10 @@ export async function loadSectionFixture(compilerClass: SectionCompilerNew, file
   // load dependencies first
   await loadDepsFor(sections, compiler, source, callbacks, dependencies);
 
+  if (callbacks.hasError()) {
+    // break out if there's an error
+    return null;
+  }
   // make sure all dependencies are loaded
   compiler.dependencies.forEach(dep => assert.ok(sections[dep],
       `Required dependency '${dep}' for '${compiler.id}' was not supplied: Check the 'dependencies' argument to loadSectionFixture or testCompilationCases`));
@@ -101,14 +105,18 @@ async function loadDepsFor(sections: DependencySections, parentCompiler: Section
   for (const dep of dependencies) {
     const compiler = new dep(source, callbacks);
     assert.notEqual(compiler.id, parentId, `${parentId} depends on itself`);
-    assert.ok(compiler.validate(), `while setting up ${parentId}: ${compiler.id} failed validate()`);
+    const didValidate = compiler.validate();
+    if (!callbacks.hasError()) {
+      // only go down this path if there isn't already a noted error
+      assert.ok(didValidate, `while setting up ${parentId}: ${compiler.id} failed validate()`);
 
-    const sect = compiler.compile(sections);
+      const sect = compiler.compile(sections);
 
-    assert.ok(sect, `while setting up ${parentId}: ${compiler.id} failed compile()`);
-    assert.notOk(sections[compiler.id], `while setting up ${parentId}: ${compiler.id} was already in the sections[] table, probably a bad dependency`);
+      assert.ok(sect, `while setting up ${parentId}: ${compiler.id} failed compile()`);
+      assert.notOk(sections[compiler.id], `while setting up ${parentId}: ${compiler.id} was already in the sections[] table, probably a bad dependency`);
 
-    sections[compiler.id] = sect as any;
+      sections[compiler.id] = sect as any;
+    }
   }
 }
 
@@ -178,6 +186,8 @@ export function checkMessages() {
 }
 
 export interface CompilationCase {
+  /** if true, expect no further errors than what's in errors.  */
+  strictErrors?: boolean;
   /**
    * path to xml, such as 'sections/layr/invalid-case.xml'
    */
@@ -238,6 +248,9 @@ export function testCompilationCases(compiler: SectionCompilerNew, cases : Compi
       // if we expected errors or warnings, show them
       if (testcase.errors && testcase.errors !== true) {
         assert.includeDeepMembers(callbacks.messages, <CompilerEvent[]> testcase.errors, 'expected errors to be included');
+      }
+      if (testcase.errors && testcase.strictErrors) {
+        assert.sameDeepMembers(callbacks.messages, <CompilerEvent[]> testcase.errors, 'expected same errors to be included');
       }
       if (testcase.warnings) {
         assert.includeDeepMembers(callbacks.messages, testcase.warnings, 'expected warnings to be included');
