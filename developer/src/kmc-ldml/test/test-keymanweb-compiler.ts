@@ -16,7 +16,8 @@ describe('LdmlKeyboardKeymanWebCompiler', function() {
 
     // Load input data; we'll use the LDML keyboard compiler loader to save us
     // effort here
-    const k = new LdmlKeyboardCompiler(compilerTestCallbacks, {...compilerTestOptions, saveDebug: true, shouldAddCompilerVersion: false});
+    const k = new LdmlKeyboardCompiler();
+    await k.init(compilerTestCallbacks, {...compilerTestOptions, saveDebug: true, shouldAddCompilerVersion: false});
     const source = k.load(inputFilename);
     checkMessages();
     assert.isNotNull(source, 'k.load should not have returned null');

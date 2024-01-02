@@ -5,7 +5,7 @@ import { JavaScript_ContextMatch, JavaScript_KeyAsString, JavaScript_Name, JavaS
 import { KmwCompilerMessages } from "./kmw-compiler-messages.js";
 import { ValidateLayoutFile } from "./validate-layout-file.js";
 import { VisualKeyboardFromFile } from "./visual-keyboard-compiler.js";
-import { CompilerResult, STORETYPE_DEBUG, STORETYPE_OPTION, STORETYPE_RESERVED } from "../compiler/compiler.js";
+import { KmnCompilerResult, STORETYPE_DEBUG, STORETYPE_OPTION, STORETYPE_RESERVED } from "../compiler/compiler.js";
 
 function requote(s: string): string {
   return "'" + s.replaceAll(/(['\\])/g, "\\$1") + "'";
@@ -41,7 +41,7 @@ export function WriteCompiledKeyboard(
   kmnfile: string,
   keyboardData: Uint8Array,
   kvkData: Uint8Array,
-  kmxResult: CompilerResult,
+  kmxResult: KmnCompilerResult,
   FDebug: boolean = false
 ): string {
   let opts: CompilerOptions = {

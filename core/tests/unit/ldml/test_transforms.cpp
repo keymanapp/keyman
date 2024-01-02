@@ -790,8 +790,8 @@ int test_normalize() {
     // from tests
     marker_map map;
     std::cout << __FILE__ << ":" << __LINE__ << "   - complex test 9c" << std::endl;
-    const std::u32string src    = U"9ce\u0300\uFFFF\b\u0002\u0320\uFFFF\b\u0001";
-    const std::u32string expect = U"9ce\uFFFF\b\u0002\u0320\u0300\uFFFF\b\u0001";
+    const std::u32string src    = U"9ce\u0300\uFFFF\u0008\u0002\u0320\uFFFF\u0008\u0001";
+    const std::u32string expect = U"9ce\uFFFF\u0008\u0002\u0320\u0300\uFFFF\u0008\u0001";
     std::u32string dst = src;
     assert(normalize_nfd_markers(dst, map));
     if (dst != expect) {

@@ -35,12 +35,16 @@ export interface KeymanDeveloperOptions {
   "automatically report usage"?: boolean;
   "toolbar visible"?: boolean;
   "active project"?: string;
+  "prompt to upgrade projects"?: boolean;
 };
 
 type KeymanDeveloperOption = keyof KeymanDeveloperOptions;
 
+// Default has no options set, and unit tests will use the defaults (won't call
+// `loadOptions()`)
+let options: KeymanDeveloperOptions = {};
+
 // We only load the options from disk once on first use
-let options: KeymanDeveloperOptions = null;
 let optionsLoaded = false;
 
 export async function loadOptions(): Promise<KeymanDeveloperOptions> {
@@ -74,9 +78,18 @@ export async function loadOptions(): Promise<KeymanDeveloperOptions> {
     // low level.
     options = {};
   }
+  optionsLoaded = true;
   return options;
 }
 
 export function getOption<T extends KeymanDeveloperOption>(valueName: T, defaultValue: KeymanDeveloperOptions[T]): KeymanDeveloperOptions[T] {
   return options[valueName] ?? defaultValue;
+}
+
+/**
+ * unit tests will clear options before running, for consistency
+ */
+export function clearOptions() {
+  options = {};
+  optionsLoaded = true;
 }
