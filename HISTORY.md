@@ -1,5 +1,13 @@
 # Keyman Version History
 
+## 17.0.238 alpha 2024-01-03
+
+* fix(developer): quell internal error when  a section fails (#10300)
+* fix(core): ldml fixes for normalization between transform groups (#10290)
+* feat(core): more regex testing (#10304)
+* chore(core): better reporting in ldml tests (#10305)
+* feat(developer): escape bad markers (#10306)
+
 ## 17.0.237 alpha 2024-01-02
 
 * feat(developer): Consolidate public APIs for kmc modules (#10208)
