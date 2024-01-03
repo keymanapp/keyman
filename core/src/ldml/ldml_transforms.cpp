@@ -612,27 +612,14 @@ transform_entry::apply(const std::u32string &input, std::u32string &output) cons
     rustr  = icu::UnicodeString(rstr.data(), (int32_t)rstr.length());
     // and we return to the regular code flow.
   }
-  const icu::Normalizer2 *nfd = icu::Normalizer2::getNFDInstance(status);
-  icu::UnicodeString rustr2;
-  nfd->normalize(rustr, rustr2, status); // TODO-LDML: must be normalize with markers!
-  if (!UASSERT_SUCCESS(status)) {
-    return 0;
-  }
-  // here we replace the match output.
-  icu::UnicodeString entireOutput = matcher->replaceFirst(rustr2, status);
+  // here we replace the match output. No normalization, yet.
+  icu::UnicodeString entireOutput = matcher->replaceFirst(rustr, status);
   if (!UASSERT_SUCCESS(status)) {
     // TODO-LDML: could fail here due to bad input (syntax err)
     return 0;
   }
   // entireOutput includes all of 'input', but modified. Need to substring it.
-  icu::UnicodeString outu_raw = entireOutput.tempSubString(matchStart);
-
-  // normalize the replaced string
-  icu::UnicodeString outu;
-  nfd->normalize(outu_raw, outu, status); // TODO-LDML: must be normalize with markers!
-  if (!UASSERT_SUCCESS(status)) {
-    return 0; // TODO-LDML: probably memory/etc.
-  }
+  icu::UnicodeString outu = entireOutput.tempSubString(matchStart);
 
   // Special case if there's no output, save some allocs
   if (outu.length() == 0) {
@@ -651,9 +638,13 @@ transform_entry::apply(const std::u32string &input, std::u32string &output) cons
     // convert
     outu.toUTF32((UChar32 *)(s.get()), out32len + 1, status);
     if (!UASSERT_SUCCESS(status)) {
-      return 0; // TODO-LDML: memory isue
+      return 0; // TODO-LDML: memory issue
     }
     output.assign(s.get(), out32len);
+    // NOW do a marker-safe normalize
+    if (!normalize_nfd_markers(output)) {
+      return 0; // TODO-LDML: normalization failed.
+    }
   }
   return matchLen;
 }
