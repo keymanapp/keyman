@@ -105,7 +105,6 @@ type
     actProjectAddCurrentEditorFile: TAction;
     actProjectAddFiles: TFileOpen;
     actProjectSettings: TAction;
-    actToolsCustomise: TAction;
     actToolsOptions: TAction;
     actToolsVirtualKeyIdentifier: TAction;
     actHelpAbout: TAction;
