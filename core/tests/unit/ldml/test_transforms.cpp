@@ -770,10 +770,10 @@ int test_normalize() {
     assert(normalize_nfd_markers_segment(dst, map));
     zassert_string_equal(dst, expect);
     assert_equal(map.size(), 4);
-    assert_marker_list_equal(map[U'e'], (marker_list){0x1L});
-    assert_marker_list_equal(map[0x0320], (marker_list){0x2L});
-    assert_marker_list_equal(map[0x0300], (marker_list){0x3L});
-    assert_marker_list_equal(map[MARKER_BEFORE_EOT], (marker_list){0x4L});
+    assert_marker_list_equal(map[U'e'], marker_list({0x1L}));
+    assert_marker_list_equal(map[0x0320], marker_list({0x2L}));
+    assert_marker_list_equal(map[0x0300], marker_list({0x3L}));
+    assert_marker_list_equal(map[MARKER_BEFORE_EOT], marker_list({0x4L}));
   }
   {
     marker_map map;
@@ -790,10 +790,10 @@ int test_normalize() {
     }
     zassert_string_equal(dst, expect);
     assert_equal(map.size(), 4);
-    assert_marker_list_equal(map[U'e'], (marker_list){0x1L});
-    assert_marker_list_equal(map[0x0320], (marker_list){0x3L});
-    assert_marker_list_equal(map[0x0300], (marker_list){0x2L});
-    assert_marker_list_equal(map[MARKER_BEFORE_EOT], (marker_list){0x4L});
+    assert_marker_list_equal(map[U'e'], marker_list({0x1L}));
+    assert_marker_list_equal(map[0x0320], marker_list({0x3L}));
+    assert_marker_list_equal(map[0x0300], marker_list({0x2L}));
+    assert_marker_list_equal(map[MARKER_BEFORE_EOT], marker_list({0x4L}));
   }
 
   {
@@ -810,7 +810,7 @@ int test_normalize() {
     }
     zassert_string_equal(dst, expect);
     assert_equal(map.size(), 1);
-    assert_marker_list_equal(map[0x0320], (marker_list){0x1L});
+    assert_marker_list_equal(map[0x0320], marker_list({0x1L}));
   }
 
   {
@@ -827,8 +827,8 @@ int test_normalize() {
     }
     zassert_string_equal(dst, expect);
     assert_equal(map.size(), 2);
-    assert_marker_list_equal(map[0x0320], (marker_list){0x2L});
-    assert_marker_list_equal(map[MARKER_BEFORE_EOT], (marker_list){0x1L});
+    assert_marker_list_equal(map[0x0320], marker_list({0x2L}));
+    assert_marker_list_equal(map[MARKER_BEFORE_EOT], marker_list({0x1L}));
   }
 
   {
@@ -845,8 +845,8 @@ int test_normalize() {
     }
     zassert_string_equal(dst, expect);
     assert_equal(map.size(), 2);
-    assert_marker_list_equal(map[0x0320], (marker_list){0x2L});
-    assert_marker_list_equal(map[MARKER_BEFORE_EOT], (marker_list){0x1L});
+    assert_marker_list_equal(map[0x0320], marker_list({0x2L}));
+    assert_marker_list_equal(map[MARKER_BEFORE_EOT], marker_list({0x1L}));
   }
   {
     // from tests - regex edition
@@ -862,8 +862,8 @@ int test_normalize() {
     }
     zassert_string_equal(dst, expect);
     assert_equal(map.size(), 2);
-    assert_marker_list_equal(map[0x0320], (marker_list){LDML_MARKER_ANY_INDEX});
-    assert_marker_list_equal(map[MARKER_BEFORE_EOT], (marker_list){0x1L});
+    assert_marker_list_equal(map[0x0320], marker_list({LDML_MARKER_ANY_INDEX}));
+    assert_marker_list_equal(map[MARKER_BEFORE_EOT], marker_list({0x1L}));
   }
 
   {
@@ -879,7 +879,7 @@ int test_normalize() {
       std::cout << "exp: " << Debug_UnicodeString(expect) << std::endl;
     }
     assert_equal(map.size(), 1);
-    assert_marker_list_equal(map[0x0320], ((marker_list){0x2L, 0x2L}));
+    assert_marker_list_equal(map[0x0320], (marker_list({0x2L, 0x2L})));
     zassert_string_equal(dst, expect);
   }
 
@@ -898,7 +898,7 @@ int test_normalize() {
     }
     zassert_string_equal(dst, expect);
     assert_equal(map.size(), 1);
-    assert_marker_list_equal(map[0x0320], ((marker_list){0x2L, 0x1L, 0x3L}));
+    assert_marker_list_equal(map[0x0320], (marker_list({0x2L, 0x1L, 0x3L})));
   }
 
 
