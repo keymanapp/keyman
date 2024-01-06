@@ -970,7 +970,9 @@ static void add_back_markers(std::u32string &str, const std::u32string &src, con
     const auto ch = MARKER_BEFORE_EOT;
     const auto m  = map2.find(ch);
     if (m != map2.end()) {
-      prepend_marker(str, m->second, encoding);
+      for (auto q = (m->second).rbegin(); q < (m->second).rend(); q++) {
+        prepend_marker(str, *q, encoding);
+      }
       map2.erase(ch);  // remove it
     }
   }
@@ -981,7 +983,9 @@ static void add_back_markers(std::u32string &str, const std::u32string &src, con
 
     const auto m = map2.find(ch);
     if (m != map2.end()) {
-      prepend_marker(str, m->second, encoding);
+      for (auto q = (m->second).rbegin(); q < (m->second).rend(); q++) {
+        prepend_marker(str, *q, encoding);
+      }
       map2.erase(ch);  // remove it
     }
   }
@@ -1247,11 +1251,13 @@ std::u32string remove_markers(const std::u32string &str, marker_map *markers, ma
 
     // record the marker
     if (marker_no >= LDML_MARKER_MIN_INDEX && markers != nullptr) {
+      char32_t marker_ch;
       if (i == str.end()) {
-        markers->emplace(MARKER_BEFORE_EOT, marker_no);
+        marker_ch = MARKER_BEFORE_EOT;
       } else {
-        markers->emplace(*i, marker_no);
+        marker_ch = *i;
       }
+      markers->emplace(marker_ch, (marker_list){marker_no}); // TODO-ldml: single! #10320
     }
   }
   // get the suffix between the last marker and the end
