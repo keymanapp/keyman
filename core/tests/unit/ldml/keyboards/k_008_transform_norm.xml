@@ -75,8 +75,8 @@ https://github.com/unicode-org/cldr/blob/keyboard-preview/docs/ldml/tr35-keyboar
 
       <transform from="8e\m{stampy}\u{0300}\m{lgtm}\u{0320}" to="YES8a" />
       <transform from="8e\u{0300}\m{stampy}\m{lgtm}\u{0320}" to="YES8b" />
-      <transform from="8e\u{0300}\u{0320}\m{stampy}\m{lgtm}" to="FAIL" /> <!-- denormalized, nomatch -->
-      <transform from="8e\u{0320}\u{0300}\m{stampy}\m{lgtm}" to="YES8d" /> <!-- NFD -->
+      <transform from="8e\u{0300}\u{0320}\m{stampy}\m{lgtm}" to="YES8c" /> <!-- denormalized, but matches -->
+      <transform from="8f\u{0320}\u{0300}\m{stampy}\m{lgtm}" to="YES8d" /> <!-- NFD -->
 
       <!-- normalization in output -->
       <transform from="9a" to="9e\u{0300}\u{0320}" /> <!-- no marker, denormalized -->

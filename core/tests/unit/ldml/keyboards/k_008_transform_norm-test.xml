@@ -245,12 +245,39 @@
       <keystroke key="u-0320"/>
       <check result="YES8b"/>
     </test>
-    <test name="regex-test-8c-0">
+    <test name="regex-test-8e-0">
       <!-- simple test, exactly as written-->
       <keystroke key="8" />
       <keystroke key="e" />
-      <keystroke key="u-0300"/>
+      <keystroke key="u-0300"/> <!-- denorm-->
       <keystroke key="u-0320"/>
+      <keystroke key="stampy"/>
+      <keystroke key="lgtm"/>
+      <check result="YES8c"/>
+    </test>
+    <test name="regex-test-8e-1">
+      <keystroke key="8" />
+      <keystroke key="e" />
+      <keystroke key="u-0320"/> <!-- NFD-->
+      <keystroke key="u-0300"/>
+      <keystroke key="stampy"/>
+      <keystroke key="lgtm"/>
+      <check result="YES8c"/>
+    </test>
+    <test name="regex-test-8f-0">
+      <keystroke key="8" />
+      <keystroke key="f" />
+      <keystroke key="u-0300"/> <!-- denorm-->
+      <keystroke key="u-0320"/>
+      <keystroke key="stampy"/>
+      <keystroke key="lgtm"/>
+      <check result="YES8d"/>
+    </test>
+    <test name="regex-test-8f-1">
+      <keystroke key="8" />
+      <keystroke key="f" />
+      <keystroke key="u-0320"/> <!-- NFD-->
+      <keystroke key="u-0300"/>
       <keystroke key="stampy"/>
       <keystroke key="lgtm"/>
       <check result="YES8d"/>
