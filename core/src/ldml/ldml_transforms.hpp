@@ -311,8 +311,14 @@ enum marker_encoding {
   regex_sentinel,
 };
 
-/** map from following-char to marker number. */
-typedef std::map<char32_t, KMX_DWORD> marker_map;
+/** a marker ID (1-based) */
+typedef KMX_DWORD marker_num;
+
+/** list of markers */
+typedef std::deque<marker_num> marker_list;
+
+/** map from following-char to marker numbers. */
+typedef std::map<char32_t, marker_num> marker_map;
 
 /** Normalize a u32string inplace to NFD. @return false on failure */
 bool normalize_nfd(std::u32string &str);
@@ -338,17 +344,20 @@ inline bool normalize_nfc_markers(std::u16string &str, marker_encoding encoding 
 
 /** Normalize a u32string inplace to NFC. @return false on failure */
 bool normalize_nfc(std::u32string &str);
+
 /** Normalize a u16string inplace to NFC. @return false on failure */
 bool normalize_nfc(std::u16string &str);
+
 /** Remove markers and optionally note their glue characters in the map */
 std::u32string remove_markers(const std::u32string &str, marker_map *markers = nullptr, marker_encoding encoding = plain_sentinel);
+
 /** same but with a reference */
 inline std::u32string remove_markers(const std::u32string &str, marker_map &markers, marker_encoding encoding = plain_sentinel)  {
   return remove_markers(str, &markers, encoding);
 }
 
 /** prepend the marker string in UC_SENTINEL format to the str */
-void prepend_marker(std::u32string &str, KMX_DWORD marker, marker_encoding encoding = plain_sentinel);
+void prepend_marker(std::u32string &str, marker_num marker, marker_encoding encoding = plain_sentinel);
 
 /** format 'marker' as 0001...FFFF and put it at the beginning of the string */
 void prepend_hex_quad(std::u32string &str, KMX_DWORD marker);

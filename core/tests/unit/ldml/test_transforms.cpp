@@ -839,6 +839,45 @@ int test_normalize() {
     assert_equal(map[MARKER_BEFORE_EOT], 0x1L);
   }
 
+  {
+    // from tests
+    marker_map map;
+    std::cout << __FILE__ << ":" << __LINE__ << "   - complex test 10 stack o' 2x2" << std::endl;
+    const std::u32string src    = U"9ce\u0300\uFFFF\u0008\u0002\uFFFF\u0008\u0002\u0320";
+    const std::u32string expect = U"9ce\uFFFF\u0008\u0002\uFFFF\u0008\u0002\u0320\u0300";
+    std::u32string dst = src;
+    assert(normalize_nfd_markers(dst, map));
+    if (dst != expect) {
+      std::cout << "dst: " << Debug_UnicodeString(dst) << std::endl;
+      std::cout << "exp: " << Debug_UnicodeString(expect) << std::endl;
+    }
+    zassert_string_equal(dst, expect);
+    // TODO-LDML: map is going to be off
+    // assert_equal(map.size(), 2);
+    // assert_equal(map[0x0320], 0x2L);
+    // assert_equal(map[MARKER_BEFORE_EOT], 0x1L);
+  }
+
+
+  {
+    // from tests
+    marker_map map;
+    std::cout << __FILE__ << ":" << __LINE__ << "   - complex test 10 stack o' 2x1x2" << std::endl;
+    const std::u32string src    = U"9ce\u0300\uFFFF\u0008\u0002\uFFFF\u0008\u0001\uFFFF\u0008\u0002\u0320";
+    const std::u32string expect = U"9ce\uFFFF\u0008\u0002\uFFFF\u0008\u0001\uFFFF\u0008\u0002\u0320\u0300";
+    std::u32string dst = src;
+    assert(normalize_nfd_markers(dst, map));
+    if (dst != expect) {
+      std::cout << "dst: " << Debug_UnicodeString(dst) << std::endl;
+      std::cout << "exp: " << Debug_UnicodeString(expect) << std::endl;
+    }
+    zassert_string_equal(dst, expect);
+    // TODO-LDML: map is going to be off
+    // assert_equal(map.size(), 2);
+    // assert_equal(map[0x0320], 0x2L);
+    // assert_equal(map[MARKER_BEFORE_EOT], 0x1L);
+  }
+
 
   return EXIT_SUCCESS;
 }

@@ -1049,7 +1049,7 @@ bool normalize_nfc(std::u16string &str) {
 }
 
 void
-prepend_marker(std::u32string &str, KMX_DWORD marker, marker_encoding encoding) {
+prepend_marker(std::u32string &str, marker_num marker, marker_encoding encoding) {
   if (encoding == plain_sentinel) {
     km_core_usv markstr[] = {LDML_UC_SENTINEL, LDML_MARKER_CODE, marker};
     str.insert(0, markstr, 3);
