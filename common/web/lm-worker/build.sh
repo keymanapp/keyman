@@ -26,6 +26,8 @@ WORKER_OUTPUT_FILENAME=build/lib/worker-main.js
 INTERMEDIATE=./build/intermediate
 LIB=./build/lib
 
+bundle_cmd="node ../es-bundling/build/common-bundle.mjs"
+
 ################################ Main script ################################
 
 builder_describe \
@@ -38,14 +40,16 @@ builder_describe \
 
 builder_describe_outputs \
   configure     /node_modules \
-  build         /common/web/lm-worker/build/lib/worker-main.wrapped.min.js
+  build         /common/web/lm-worker/$LIB/worker-main.wrapped.min.js
 
 builder_parse "$@"
 
 function do_build() {
   # Build worker with tsc first
   tsc -b $builder_verbose || builder_die "Could not build worker."
-  node build-bundler.js
+
+  $bundle_cmd build/obj/worker-main.js --out $INTERMEDIATE/worker-main.js
+  $bundle_cmd build/obj/worker-main.js --out $INTERMEDIATE/worker-main.min.js --minify --profile build/filesize-profile.log
 
   EXT_FLAGS=
   if builder_has_option --ci; then
