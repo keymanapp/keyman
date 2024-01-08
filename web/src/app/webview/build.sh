@@ -43,6 +43,18 @@ builder_describe_outputs \
 compile_and_copy() {
   compile $SUBPROJECT_NAME
 
+  BUILD_ROOT="${KEYMAN_ROOT}/web/build/app/webview"
+
+  $BUNDLE_CMD    "${BUILD_ROOT}/obj/debug-main.js" \
+    --out        "${BUILD_ROOT}/debug/keymanweb-webview.js" \
+    --sourceRoot "@keymanapp/keyman/web/build/app/webview/debug"
+
+  $BUNDLE_CMD    "${BUILD_ROOT}/obj/release-main.js" \
+    --out        "${BUILD_ROOT}/release/keymanweb-webview.js" \
+    --profile    "${BUILD_ROOT}/filesize-profile.log" \
+    --sourceRoot "@keymanapp/keyman/web/build/app/webview/release" \
+    --minify
+
   mkdir -p "$KEYMAN_ROOT/web/build/app/resources/osk"
   cp -R "$KEYMAN_ROOT/web/src/resources/osk/." "$KEYMAN_ROOT/web/build/app/resources/osk/"
 
