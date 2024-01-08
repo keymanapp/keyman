@@ -419,6 +419,7 @@ export class ActiveKeyBase {
     }
   }
 
+  @Enumerable
   private constructBaseKeyEvent(keyboard: Keyboard, layout: ActiveLayout, displayLayer: string) {
     // Get key name and keyboard shift state (needed only for default layouts and physical keyboard handling)
     // Note - virtual keys should be treated case-insensitive, so we force uppercasing here.
@@ -622,6 +623,7 @@ export class ActiveRow implements LayoutRow {
     aRow.proportionalY = proportionalY;
   }
 
+  @Enumerable
   populateKeyMap(map: {[keyId: string]: ActiveKey}) {
     this.key.forEach(function(key: ActiveKey) {
       if(key.coreID) {
@@ -712,6 +714,7 @@ export class ActiveLayer implements LayoutLayer {
     aLayer.keyMap = aLayer.constructKeyMap();
   }
 
+  @Enumerable
   private constructKeyMap(): {[keyId: string]: ActiveKey} {
     let map: {[keyId: string]: ActiveKey} = {};
     this.row.forEach(function(row: ActiveRow) {
@@ -721,6 +724,7 @@ export class ActiveLayer implements LayoutLayer {
     return map;
   }
 
+  @Enumerable
   getKey(keyId: string) {
     // Keys usually are specified in a "long form" prefixed with their layer's ID.
     if(keyId.indexOf(this.id + '-') == 0) {
@@ -759,6 +763,7 @@ export class ActiveLayout implements LayoutFormFactor{
 
   }
 
+  @Enumerable
   getLayer(layerId: string): ActiveLayer {
     return this.layerMap[layerId];
   }

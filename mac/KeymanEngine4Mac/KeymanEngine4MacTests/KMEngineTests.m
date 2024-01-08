@@ -524,13 +524,15 @@ NSString * names[nCombinations];
     XCTAssert(!output.emitKeystroke, @"expected to emit nothing");
 }
 
-// TODO: enable after resolving issue getting options from Keyman Core
 - (void)testArmenianMnemonic_triggerPersistOptions_ReturnsOptions {
     KMXFile *kmxFile = [KeymanEngineTestsStaticHelperMethods getKmxFileForArmenianMnemonicTests];
     KMEngine *engine = [[KMEngine alloc] initWithKMX:kmxFile context:@"√" verboseLogging:YES];
     NSEvent *event = [NSEvent keyEventWithType:NSEventTypeKeyDown location:NSMakePoint(0, 0) modifierFlags:0 timestamp:0 windowNumber:0 context:nil characters:@"w" charactersIgnoringModifiers:@"w" isARepeat:NO keyCode:kVK_ANSI_W];
     CoreKeyOutput *output = [engine processEvent:event];
-    XCTAssert(!output.hasCodePointsToDelete, @"expected to delete nothing");
+    NSString *key = @"option_ligature_ew";
+    NSDictionary *options = output.optionsToPersist;
+    NSString *value = options[key];
+    XCTAssertEqualObjects(value, @"1", @"expected 'option_ligature_ew' with value of '1'");
 }
 
 - (void)testCoreProcessEvent_backspaceElNuerEmptyContext_PassesThrough {

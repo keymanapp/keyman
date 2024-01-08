@@ -11,6 +11,8 @@ THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BA
 # This script runs from its own folder
 cd "$(dirname "$THIS_SCRIPT")"
 
+BUNDLE_CMD="node $KEYMAN_ROOT/common/web/es-bundling/build/common-bundle.mjs"
+
 ################################ Main script ################################
 
 builder_describe "Builds the gesture-recognition model for Web-based on-screen keyboards" \
@@ -47,7 +49,11 @@ fi
 if builder_start_action build:module; then
   # Build
   tsc --build $builder_verbose
-  node build-bundler.js
+
+  $BUNDLE_CMD    "${KEYMAN_ROOT}/common/web/gesture-recognizer/build/obj/index.js" \
+    --out        "${KEYMAN_ROOT}/common/web/gesture-recognizer/build/lib/index.mjs" \
+    --format esm
+
   builder_finish_action success build:module
 fi
 
