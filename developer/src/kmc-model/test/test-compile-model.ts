@@ -1,12 +1,12 @@
 import 'mocha';
 import {assert} from 'chai';
 
-import {compileModel} from '../src/main.js';
+import { LexicalModelCompiler } from '../src/main.js';
 import {makePathToFixture, compileModelSourceCode, CompilationResult} from './helpers/index.js';
 import { TestCompilerCallbacks } from '@keymanapp/developer-test-helpers';
 import { KeymanFileTypes } from '@keymanapp/common-types';
 
-describe('compileModel', function () {
+describe('LexicalModelCompiler', function () {
   let callbacks = new TestCompilerCallbacks();
 
   // Try to compile ALL of the correct models.
@@ -22,9 +22,14 @@ describe('compileModel', function () {
   for (let modelID of MODELS) {
     let modelPath = makePathToFixture(modelID, modelID + KeymanFileTypes.Source.Model);
 
-    it(`should compile ${modelID}`, function () {
-      let code = compileModel(modelPath, callbacks);
+    it(`should compile ${modelID}`, async function () {
+      const compiler = new LexicalModelCompiler();
+      assert.isTrue(await compiler.init(callbacks, null));
+      const result = await compiler.run(modelPath, null);
       callbacks.printMessages();
+      assert.isNotNull(result);
+      const decoder = new TextDecoder();
+      const code = decoder.decode(result.artifacts.js.data);
       let r = compileModelSourceCode(code);
       let compilation = r as CompilationResult;
 

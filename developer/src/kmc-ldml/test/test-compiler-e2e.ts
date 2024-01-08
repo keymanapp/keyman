@@ -12,7 +12,7 @@ describe('compiler-tests', function() {
   before(function() {
     compilerTestCallbacks.clear();
   });
-  
+
   it('should-build-fixtures', async function() {
     // Let's build basic.xml
     // It should match basic.kmx (built from basic.txt)
@@ -36,33 +36,38 @@ describe('compiler-tests', function() {
     assert.deepEqual<Uint8Array>(code, expected);
   });
 
-  it('should handle non existent files', () => {
+  it('should handle non existent files', async () => {
     const filename = 'DOES_NOT_EXIST.xml';
-    const k = new LdmlKeyboardCompiler(compilerTestCallbacks, { ...compilerTestOptions, saveDebug: true, shouldAddCompilerVersion: false });
+    const k = new LdmlKeyboardCompiler();
+    await k.init(compilerTestCallbacks, { ...compilerTestOptions, saveDebug: true, shouldAddCompilerVersion: false });
     const source = k.load(filename);
     assert.notOk(source, `Trying to load(${filename})`);
   });
-  it('should handle unparseable files', () => {
+  it('should handle unparseable files', async () => {
     const filename = makePathToFixture('basic-kvk.txt'); // not an .xml file
-    const k = new LdmlKeyboardCompiler(compilerTestCallbacks, { ...compilerTestOptions, saveDebug: true, shouldAddCompilerVersion: false });
+    const k = new LdmlKeyboardCompiler();
+    await k.init(compilerTestCallbacks, { ...compilerTestOptions, saveDebug: true, shouldAddCompilerVersion: false });
     const source = k.load(filename);
     assert.notOk(source, `Trying to load(${filename})`);
   });
-  it('should handle not-valid files', () => {
+  it('should handle not-valid files', async () => {
     const filename = makePathToFixture('test-fr.xml'); // not a keyboard .xml file
-    const k = new LdmlKeyboardCompiler(compilerTestCallbacks, { ...compilerTestOptions, saveDebug: true, shouldAddCompilerVersion: false });
+    const k = new LdmlKeyboardCompiler();
+    await k.init(compilerTestCallbacks, { ...compilerTestOptions, saveDebug: true, shouldAddCompilerVersion: false });
     const source = k.load(filename);
     assert.notOk(source, `Trying to load(${filename})`);
   });
-  it('should handle non existent test files', () => {
+  it('should handle non existent test files', async () => {
     const filename = 'DOES_NOT_EXIST.xml';
-    const k = new LdmlKeyboardCompiler(compilerTestCallbacks, { ...compilerTestOptions, saveDebug: true, shouldAddCompilerVersion: false });
+    const k = new LdmlKeyboardCompiler();
+    await k.init(compilerTestCallbacks, { ...compilerTestOptions, saveDebug: true, shouldAddCompilerVersion: false });
     const source = k.loadTestData(filename);
     assert.notOk(source, `Trying to loadTestData(${filename})`);
   });
-  it('should handle unparseable test files', () => {
+  it('should handle unparseable test files', async () => {
     const filename = makePathToFixture('basic-kvk.txt'); // not an .xml file
-    const k = new LdmlKeyboardCompiler(compilerTestCallbacks, { ...compilerTestOptions, saveDebug: true, shouldAddCompilerVersion: false });
+    const k = new LdmlKeyboardCompiler();
+    await k.init(compilerTestCallbacks, { ...compilerTestOptions, saveDebug: true, shouldAddCompilerVersion: false });
     const source = k.load(filename);
     assert.notOk(source, `Trying to loadTestData(${filename})`);
   });

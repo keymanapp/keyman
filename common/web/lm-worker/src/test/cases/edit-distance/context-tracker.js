@@ -21,7 +21,7 @@ describe('ContextTracker', function() {
         insert: '',
         deleteLeft: 0
       }
-      let newContext = Array.from(existingContext);
+      let newContext = existingContext.slice(0);
       newContext.splice(0, 1);
       let rawTokens = ["apple", null, "a", null, "day", null, "keeps", null, "the", null, "doctor"];
 
@@ -37,7 +37,7 @@ describe('ContextTracker', function() {
         insert: 'r',
         deleteLeft: 0
       }
-      let newContext = Array.from(existingContext);
+      let newContext = existingContext.slice(0);
       newContext[newContext.length - 1] = 'doctor';
       let rawTokens = ["an", null, "apple", null, "a", null, "day", null, "keeps", null, "the", null, "doctor"];
 
@@ -53,7 +53,7 @@ describe('ContextTracker', function() {
         insert: ' ',
         deleteLeft: 0
       }
-      let newContext = Array.from(existingContext);
+      let newContext = existingContext.slice(0);
       newContext.push('');
       let rawTokens = ["an", null, "apple", null, "a", null, "day", null, "keeps", null, "the", null, "doctor", null, ""];
 
@@ -73,7 +73,7 @@ describe('ContextTracker', function() {
         insert: 'a',
         deleteLeft: 0
       }
-      let newContext = Array.from(existingContext);
+      let newContext = existingContext.slice(0);
       newContext.push('a'); // The incoming transform should produce a new token WITH TEXT.
       let rawTokens = ["'", null, "a"];
 
@@ -93,7 +93,7 @@ describe('ContextTracker', function() {
         insert: ' ',
         deleteLeft: 0
       }
-      let newContext = Array.from(existingContext);
+      let newContext = existingContext.slice(0);
       newContext.splice(0, 1);
       newContext.push('');
       let rawTokens = ["apple", null, "a", null, "day", null, "keeps", null, "the", null, "doctor", null, ""];

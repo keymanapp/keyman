@@ -53,6 +53,19 @@ export class CompilerError {
   static formatSeverity(code: number): string {
     return errorSeverityName[CompilerError.severity(code)] ?? 'UNKNOWN';
   }
+  /** true if events has at least one message of the atLeast severity */
+  static hasSeverity(events: CompilerEvent[], atLeast: CompilerErrorSeverity): boolean {
+    for (const { code } of events) {
+      if (CompilerError.severity(code) >= atLeast) {
+        return true;
+      }
+    }
+    return false;
+  }
+  /** true if events has at least one Error or worse */
+  static hasError(events: CompilerEvent[]): boolean {
+    return CompilerError.hasSeverity(events, CompilerErrorSeverity.Error);
+  }
   /**
    * Format an error code number. The error code number does not include
    * the severity mask, as this is reported in text form separately; see
@@ -253,6 +266,40 @@ export interface CompilerCallbackOptions {
   compilerWarningsAsErrors?: boolean;
 };
 
+export interface KeymanCompilerArtifact {
+  data: Uint8Array;
+  filename: string;
+};
+
+export type KeymanCompilerArtifactOptional = KeymanCompilerArtifact | undefined;
+
+export interface KeymanCompilerArtifacts {
+  readonly [type:string]: KeymanCompilerArtifactOptional;
+};
+
+export interface KeymanCompilerResult {
+  artifacts: KeymanCompilerArtifacts;
+};
+
+export interface KeymanCompiler {
+  init(callbacks: CompilerCallbacks, options: CompilerOptions): Promise<boolean>;
+  /**
+   * Run the compiler, and save the result in memory arrays. Note that while
+   * `outputFilename` is provided here, the output file is not written to in
+   * this function.
+   * @param inputFilename
+   * @param outputFilename The intended output filename, optional, if missing,
+   *                       calculated from inputFilename
+   * @param data
+   */
+  run(inputFilename:string, outputFilename?:string /*, data?: any*/): Promise<KeymanCompilerResult>;
+  /**
+   * Writes the compiled output files to disk
+   * @param artifacts
+   */
+  write(artifacts: KeymanCompilerArtifacts): Promise<boolean>;
+};
+
 /**
  * Abstract interface for callbacks, to abstract out file i/o
  */
@@ -369,10 +416,6 @@ export interface CompilerBaseOptions {
    * Format of output for log to console
    */
   logFormat?: CompilerLogFormat;
-  /**
-   * Optional output file for activities that generate output
-   */
-  outFile?: string;
   /**
    * Colorize log output, default is detected from console
    */

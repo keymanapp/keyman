@@ -19,7 +19,6 @@ function commandOptionsToCompilerOptions(options: any): ExtendedCompilerOptions 
   // CompilerOptions properties...
   return {
     // CompilerBaseOptions
-    outFile: options.outFile,
     logLevel: options.logLevel,
     logFormat: options.logFormat,
     color: options.color,
@@ -66,7 +65,8 @@ File lists can be referenced with @filelist.txt.
 If no input file is supplied, kmc will build the current folder.`)
 
     .action(async (filenames: string[], _options: any, commander: any) => {
-      const options = commandOptionsToCompilerOptions(commander.optsWithGlobals());
+      const commanderOptions/*:{TODO?} CommandLineCompilerOptions*/ = commander.optsWithGlobals();
+      const options = commandOptionsToCompilerOptions(commanderOptions);
       const callbacks = new NodeCompilerCallbacks(options);
 
       if(!filenames.length) {
@@ -75,12 +75,17 @@ If no input file is supplied, kmc will build the current folder.`)
         filenames.push('.');
       }
 
+      if(filenames.length > 1 && commanderOptions.outFile) {
+        // -o can only be specified with a single input file
+        callbacks.reportMessage(InfrastructureMessages.Error_OutFileCanOnlyBeSpecifiedWithSingleInfile());
+      }
+
       if(!expandFileLists(filenames, callbacks)) {
         process.exit(1);
       }
 
       for(let filename of filenames) {
-        if(!await build(filename, callbacks, options)) {
+        if(!await build(filename, commanderOptions.outFile, callbacks, options)) {
           // Once a file fails to build, we bail on subsequent builds
           process.exit(1);
         }
@@ -105,7 +110,7 @@ If no input file is supplied, kmc will build the current folder.`)
     .action(buildWindowsPackageInstaller);
 }
 
-async function build(filename: string, parentCallbacks: NodeCompilerCallbacks, options: CompilerOptions): Promise<boolean> {
+async function build(filename: string, outfile: string, parentCallbacks: NodeCompilerCallbacks, options: CompilerOptions): Promise<boolean> {
   try {
     // TEST: allow command-line simulation of infrastructure fatal errors, and
     // also for unit tests
@@ -151,7 +156,7 @@ async function build(filename: string, parentCallbacks: NodeCompilerCallbacks, o
     const callbacks = new CompilerFileCallbacks(buildFilename, options, parentCallbacks);
     callbacks.reportMessage(InfrastructureMessages.Info_BuildingFile({filename:buildFilename, relativeFilename}));
 
-    let result = await builder.build(filename, callbacks, options);
+    let result = await builder.build(filename, outfile, callbacks, options);
     result = result && !callbacks.hasFailureMessage();
     if(result) {
       callbacks.reportMessage(builder instanceof BuildProject

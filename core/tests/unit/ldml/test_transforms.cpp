@@ -658,6 +658,32 @@ int test_strutils() {
     assert_equal(map[0x0300], 0x3L);
     assert_equal(map[MARKER_BEFORE_EOT], 0x4L);
   }
+  {
+    std::cout << __FILE__ << ":" << __LINE__ << "   - prepend hex quad" << std::endl;
+    {
+      std::u32string dst;
+      prepend_hex_quad(dst, 0x0001);
+      zassert_string_equal(dst, U"0001");
+    }
+    {
+      std::u32string dst;
+      prepend_hex_quad(dst, 0xCAFE);
+      zassert_string_equal(dst, U"CAFE");
+    }
+    {
+      std::u32string dst;
+      prepend_hex_quad(dst, 0xFFFF);
+      zassert_string_equal(dst, U"FFFF");
+    }
+  }
+  {
+    std::cout << __FILE__ << ":" << __LINE__ << "   - parse hex quad" << std::endl;
+    assert_equal(parse_hex_quad(U"0001"), 0x0001);
+    assert_equal(parse_hex_quad(U"CAFE"), 0xCAFE);
+    assert_equal(parse_hex_quad(U"D00d"), 0xD00D);
+    assert_equal(parse_hex_quad(U"FFFF"), 0xFFFF);
+    assert_equal(parse_hex_quad(U"zzzz"), 0); // err
+  }
   return EXIT_SUCCESS;
 }
 
@@ -744,11 +770,11 @@ int test_normalize() {
   }
 
   {
-    // u"4è\U0000ffff\b\U00000001̠"
+    // u"4è\U0000ffff\u0008\U00000001̠"
     marker_map map;
     std::cout << __FILE__ << ":" << __LINE__ << "   - complex test 4a" << std::endl;
-    const std::u32string src    = U"4e\u0300\uFFFF\b\u0001\u0320";
-    const std::u32string expect = U"4e\uFFFF\b\u0001\u0320\u0300";
+    const std::u32string src    = U"4e\u0300\uFFFF\u0008\u0001\u0320";
+    const std::u32string expect = U"4e\uFFFF\u0008\u0001\u0320\u0300";
     std::u32string dst = src;
     assert(normalize_nfd_markers(dst, map));
     if (dst != expect) {
@@ -759,6 +785,60 @@ int test_normalize() {
     assert_equal(map.size(), 1);
     assert_equal(map[0x0320], 0x1L);
   }
+
+  {
+    // from tests
+    marker_map map;
+    std::cout << __FILE__ << ":" << __LINE__ << "   - complex test 9c" << std::endl;
+    const std::u32string src    = U"9ce\u0300\uFFFF\u0008\u0002\u0320\uFFFF\u0008\u0001";
+    const std::u32string expect = U"9ce\uFFFF\u0008\u0002\u0320\u0300\uFFFF\u0008\u0001";
+    std::u32string dst = src;
+    assert(normalize_nfd_markers(dst, map));
+    if (dst != expect) {
+      std::cout << "dst: " << Debug_UnicodeString(dst) << std::endl;
+      std::cout << "exp: " << Debug_UnicodeString(expect) << std::endl;
+    }
+    zassert_string_equal(dst, expect);
+    assert_equal(map.size(), 2);
+    assert_equal(map[0x0320], 0x2L);
+    assert_equal(map[MARKER_BEFORE_EOT], 0x1L);
+  }
+
+  {
+    // from tests - regex edition
+    marker_map map;
+    std::cout << __FILE__ << ":" << __LINE__ << "   - complex test 9c+regex" << std::endl;
+    const std::u32string src    = U"9ce\u0300\uFFFF\u0008\\u0002\u0320\uFFFF\u0008\\u0001";
+    const std::u32string expect = U"9ce\uFFFF\u0008\\u0002\u0320\u0300\uFFFF\u0008\\u0001";
+    std::u32string dst = src;
+    assert(normalize_nfd_markers(dst, map, regex_sentinel)); // TODO-LDML: need regex flag
+    if (dst != expect) {
+      std::cout << "dst: " << Debug_UnicodeString(dst) << std::endl;
+      std::cout << "exp: " << Debug_UnicodeString(expect) << std::endl;
+    }
+    zassert_string_equal(dst, expect);
+    assert_equal(map.size(), 2);
+    assert_equal(map[0x0320], 0x2L);
+    assert_equal(map[MARKER_BEFORE_EOT], 0x1L);
+  }
+  {
+    // from tests - regex edition
+    marker_map map;
+    std::cout << __FILE__ << ":" << __LINE__ << "   - complex test \\m{.}" << std::endl;
+    const std::u32string src    = U"9ce\u0300\uFFFF\u0008[\\u0001-\\uD7FE]\u0320\uFFFF\u0008\\u0001";
+    const std::u32string expect = U"9ce\uFFFF\u0008[\\u0001-\\uD7FE]\u0320\u0300\uFFFF\u0008\\u0001";
+    std::u32string dst = src;
+    assert(normalize_nfd_markers(dst, map, regex_sentinel));
+    if (dst != expect) {
+      std::cout << "dst: " << Debug_UnicodeString(dst) << std::endl;
+      std::cout << "exp: " << Debug_UnicodeString(expect) << std::endl;
+    }
+    zassert_string_equal(dst, expect);
+    assert_equal(map.size(), 2);
+    assert_equal(map[0x0320], LDML_MARKER_ANY_INDEX);
+    assert_equal(map[MARKER_BEFORE_EOT], 0x1L);
+  }
+
 
   return EXIT_SUCCESS;
 }

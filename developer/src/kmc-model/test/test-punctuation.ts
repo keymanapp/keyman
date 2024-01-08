@@ -1,4 +1,4 @@
-import LexicalModelCompiler from '../src/lexical-model-compiler.js';
+import { LexicalModelCompiler } from '../src/lexical-model-compiler.js';
 import {assert} from 'chai';
 import 'mocha';
 
@@ -10,10 +10,11 @@ describe('LexicalModelCompiler', function () {
     const MODEL_ID = 'example.qaa.trivial';
     const PATH = makePathToFixture(MODEL_ID);
 
-    it('should compile punctuation into the generated code', function () {
+    it('should compile punctuation into the generated code', async function () {
       const callbacks = new TestCompilerCallbacks();
 
-      let compiler = new LexicalModelCompiler(callbacks);
+      let compiler = new LexicalModelCompiler();
+      assert.isTrue(await compiler.init(callbacks, null));
       let code = compiler.generateLexicalModelCode(MODEL_ID, {
         format: 'trie-1.0',
         sources: ['wordlist.tsv'],
