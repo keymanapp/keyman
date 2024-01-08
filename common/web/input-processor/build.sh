@@ -15,6 +15,8 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 # This script runs from its own folder
 cd "$THIS_SCRIPT_PATH"
 
+BUNDLE_CMD="node $KEYMAN_ROOT/common/web/es-bundling/build/common-bundle.mjs"
+
 ################################ Main script ################################
 
 builder_describe "Builds the standalone, headless form of Keyman Engine for Web's input-processor module" \
@@ -36,7 +38,10 @@ builder_parse "$@"
 
 function do_build() {
   tsc -b ./tsconfig.json
-  node build-bundler.js
+
+  $BUNDLE_CMD    "${KEYMAN_ROOT}/common/web/input-processor/build/obj/index.js" \
+    --out        "${KEYMAN_ROOT}/common/web/input-processor/build/lib/index.mjs" \
+    --format esm
 
   # Declaration bundling.
   tsc --emitDeclarationOnly --outFile ./build/lib/index.d.ts

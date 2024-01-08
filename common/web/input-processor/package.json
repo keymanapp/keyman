@@ -41,7 +41,10 @@
   "main": "./build/obj/index.js",
   "types": "./build/obj/index.d.ts",
   "exports": {
-    ".": "./build/obj/index.js",
+    ".": {
+      "es6-bundling": "./src/index.ts",
+      "default": "./build/obj/index.js"
+    },
     "./lib": {
       "types": "./build/lib/index.d.ts",
       "import": "./build/lib/index.mjs"

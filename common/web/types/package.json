@@ -9,7 +9,10 @@
   ],
   "type": "module",
   "exports": {
-    ".": "./build/src/main.js"
+    ".": {
+      "es6-bundling": "./src/main.ts",
+      "default": "./build/src/main.js"
+    }
   },
   "files": [
     "/build/src/"
@@ -79,5 +82,6 @@
       "src/schemas/*",
       "test/"
     ]
-  }
+  },
+  "sideEffects": false
 }
