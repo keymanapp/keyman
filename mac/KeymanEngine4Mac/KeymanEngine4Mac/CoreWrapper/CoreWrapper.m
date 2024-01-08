@@ -121,7 +121,7 @@ const int CORE_ENVIRONMENT_ARRAY_LENGTH = 6;
   }
 }
 
--(NSArray*)processEvent:(nonnull NSEvent *)event {
+-(CoreKeyOutput*)processEvent:(nonnull NSEvent *)event {
   NSEventModifierFlags modifiers = event.modifierFlags;
   
   // process key down events only
@@ -133,17 +133,14 @@ const int CORE_ENVIRONMENT_ARRAY_LENGTH = 6;
       return nil;
   }
   
-  NSArray* actions = [self processMacVirtualKey:event.keyCode
-                      withModifiers:modifiers
-                        withKeyDown:YES];
-  
-  return [self.coreHelper optimizeActionArray:actions];
+  return [self processMacVirtualKey:event.keyCode
+                      withModifiers:modifiers withKeyDown:YES];
 }
 
--(NSArray*)processMacVirtualKey:(unsigned short)macKeyCode
+-(CoreKeyOutput*)processMacVirtualKey:(unsigned short)macKeyCode
             withModifiers:(NSEventModifierFlags)modifiers
              withKeyDown:(BOOL) isKeyDown {
-  NSArray *actions = nil;
+  CoreKeyOutput *output = nil;
   uint16_t windowsKeyCode = [self.coreHelper macVirtualKeyToWindowsVirtualKey:macKeyCode];
   uint32_t modifierState = [self.coreHelper macToKeymanModifier:modifiers];
   uint8_t keyDown = (isKeyDown) ? 1 : 0;
@@ -151,9 +148,9 @@ const int CORE_ENVIRONMENT_ARRAY_LENGTH = 6;
   if ([self processVirtualKey:windowsKeyCode
                         withModifier:modifierState
                   withKeyDown:keyDown]) {
-    actions = [self loadActionsUsingCore];
+    output = [self loadOutputForLastKeyProcessed];
   }
-  return actions;
+  return output;
 }
 
 -(BOOL)processVirtualKey:(uint16_t)keyCode
@@ -169,8 +166,63 @@ const int CORE_ENVIRONMENT_ARRAY_LENGTH = 6;
   return (result==KM_CORE_STATUS_OK);
 }
 
--(NSArray*)loadActionsForLastKeyProcessed {
-  return [self loadActionsUsingCore];
+-(CoreKeyOutput*)loadOutputForLastKeyProcessed {
+  return [self loadActionStructUsingCore];
+}
+
+-(CoreKeyOutput*)loadActionStructUsingCore {
+  [self.coreHelper logDebugMessage:@"CoreWrapper loadActionStructUsingCore"];
+  km_core_actions * actions = km_core_state_get_actions(self.coreState);
+  CoreKeyOutput *output = [self createCoreKeyOutputForActionsStruct:actions];
+
+  km_core_status result = km_core_actions_dispose(actions);
+  [self.coreHelper logDebugMessage:@"km_core_actions_dispose() result = %u\n", result];
+  return output;
+}
+
+-(CoreKeyOutput*) createCoreKeyOutputForActionsStruct:(km_core_actions*)actions {
+  NSString* text = [self.coreHelper utf32CStringToString:actions->output];
+  NSDictionary* options = [self convertOptionsArray:actions->persist_options];
+  CapsLockState capsLock = [self convertCapsLockState:actions->new_caps_lock_state];
+
+  CoreKeyOutput* coreKeyOutput = [[CoreKeyOutput alloc] init: actions->code_points_to_delete textToInsert:text optionsToPersist:options alert:actions->do_alert emitKeystroke:actions->emit_keystroke capsLockState:capsLock];
+
+  return coreKeyOutput;
+}
+
+-(NSDictionary*)convertOptionsArray:(km_core_option_item*)options {
+  NSMutableDictionary* optionsDictionary = nil;
+  if (options) {
+    optionsDictionary = [[NSMutableDictionary alloc] init];
+    for (; options->key != 0; ++options) {
+      unichar const * optionsKey = options->key;
+      unichar const * valueKey = options->value;
+
+      NSString *key = [self.coreHelper createNSStringFromUnicharString:optionsKey];
+      NSString *value = [self.coreHelper createNSStringFromUnicharString:valueKey];
+      [optionsDictionary setObject:value forKey:key];
+    }
+  }
+  return optionsDictionary;
+}
+
+-(CapsLockState)convertCapsLockState:(km_core_caps_state)capsState {
+  CapsLockState capsLock = Unchanged;
+  switch(capsState) {
+    case KM_CORE_CAPS_UNCHANGED:
+      capsLock = Unchanged;
+      break;
+    case KM_CORE_CAPS_OFF:
+      capsLock = Off;
+      break;
+    case KM_CORE_CAPS_ON:
+      capsLock = On;
+      break;
+    default:
+      capsLock = Unchanged;
+      break;
+  }
+  return capsLock;
 }
 
 -(NSArray*)loadActionsUsingCore {

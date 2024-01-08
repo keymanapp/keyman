@@ -209,6 +209,22 @@ describe('bksp', function () {
         assert.strictEqual(transforms[0].to.value, "");
       }
     },
+    {
+      // this would fail with a dependency issue if
+      // we tried to initialize the bksp compiler, because
+      // vars isn't initialized.
+      subpath: 'sections/vars/fail-markers-badref-0.xml',
+      strictErrors: true,
+      errors: [
+        CompilerMessages.Error_MissingMarkers({
+          ids: [
+            'doesnt_exist_1',
+            'doesnt_exist_2',
+            'doesnt_exist_3',
+          ]
+        }),
+      ],
+    },
   ], bkspDependencies);
 });
 

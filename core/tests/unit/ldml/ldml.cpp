@@ -139,7 +139,7 @@ apply_action(
         assert(context.back().character == ch);
         context.pop_back();
       } else {
-        // assume it's otherwise KM-coRE_BT_UNKNOWN
+        // assume it's otherwise KM_CORE_BT_UNKNOWN
         assert(act.backspace.expected_type == KM_CORE_BT_UNKNOWN);
         assert(context.empty()); // if KM_CORE_BT_UNKNOWN, context should be empty.
       }
@@ -260,13 +260,19 @@ run_test(const km::core::path &source, const km::core::path &compiled, km::tests
   // verify at beginning
   verify_context(text_store, test_state, test_context);
 
+  int errorLine = 0; // nonzero if err.
+
   // Run through actions, applying output for each event
-  for (test_source.next_action(action); action.type != km::tests::LDML_ACTION_DONE; test_source.next_action(action)) {
-    // handle backspace here
-    if (action.type == km::tests::LDML_ACTION_KEY_EVENT) {
+  do {
+    test_source.next_action(action);
+    switch (action.type) {
+    case km::tests::LDML_ACTION_DONE:
+      // We'll get a printout when this loop exits.
+      break;
+    case km::tests::LDML_ACTION_KEY_EVENT: {
       auto &p = action.k;
-      std::cout << "- key action: " << km::core::kmx::Debug_VirtualKey(p.vk) << "/modifier " << km::core::kmx::Debug_ModifierName(p.modifier_state) << " 0x" << p.modifier_state
-                << std::dec << std::endl;
+      std::cout << "- key action: " << km::core::kmx::Debug_VirtualKey(p.vk) << "/modifier "
+                << km::core::kmx::Debug_ModifierName(p.modifier_state) << " 0x" << p.modifier_state << std::dec << std::endl;
       // Because a normal system tracks caps lock state itself,
       // we mimic that in the tests. We assume caps lock state is
       // updated on key_down before the processor receives the
@@ -277,17 +283,20 @@ run_test(const km::core::path &source, const km::core::path &compiled, km::tests
 
       for (auto key_down = 1; key_down >= 0; key_down--) {
         // expected error only applies to key down
-        try_status(km_core_process_event(test_state, p.vk, p.modifier_state | test_source.caps_lock_state(), key_down, KM_CORE_EVENT_FLAG_DEFAULT)); // TODO-LDML: for now. Should send touch and hardware events.
+        try_status(km_core_process_event(
+            test_state, p.vk, p.modifier_state | test_source.caps_lock_state(), key_down,
+            KM_CORE_EVENT_FLAG_DEFAULT));  // TODO-LDML: for now. Should send touch and hardware events.
 
         for (auto act = km_core_state_action_items(test_state, nullptr); act->type != KM_CORE_IT_END; act++) {
           apply_action(test_state, *act, text_store, test_context, test_source, test_context);
         }
       }
       verify_context(text_store, test_state, test_context);
-    } else if (action.type == km::tests::LDML_ACTION_EMIT_STRING) {
+    } break;
+    case km::tests::LDML_ACTION_EMIT_STRING: {
       std::cout << "- string emit action: " << action.string << std::endl;
       std::cerr << "TODO-LDML: note, LDML_ACTION_EMIT_STRING is NOT going through keyboard, transforms etc." << std::endl;
-      text_store.append(action.string); // TODO-LDML: not going through keyboard
+      text_store.append(action.string);  // TODO-LDML: not going through keyboard
       // Now, update context?
       km_core_context_item *nitems = nullptr;
       try_status(km_core_context_items_from_utf16(action.string.c_str(), &nitems));
@@ -299,37 +308,51 @@ run_test(const km::core::path &source, const km::core::path &compiled, km::tests
       km_core_context_items_dispose(nitems);
 
       verify_context(text_store, test_state, test_context);
-    } else if (action.type == km::tests::LDML_ACTION_CHECK_EXPECTED) {
-      assert(km::core::ldml::normalize_nfd(action.string)); // TODO-LDML: should be NFC
+    } break;
+    case km::tests::LDML_ACTION_CHECK_EXPECTED: {
+      assert(km::core::ldml::normalize_nfd(action.string));  // TODO-LDML: should be NFC
       std::cout << "- check expected" << std::endl;
       std::cout << "expected  : " << string_to_hex(action.string) << " [" << action.string << "]" << std::endl;
       std::cout << "text store: " << string_to_hex(text_store) << " [" << text_store << "]" << std::endl;
       // Compare internal context with expected result
-      if (text_store != action.string) return __LINE__;
-    } else if (action.type == km::tests::LDML_ACTION_FAIL) {
+      if (text_store != action.string) {
+        errorLine = __LINE__;
+      }
+    } break;
+    case km::tests::LDML_ACTION_FAIL: {
       // test requested failure
-      std::cout << "- FAIL: " << action.string << std::endl;
-      return __LINE__;
-    } else {
+      std::wcout << console_color::fg(console_color::BRIGHT_RED) << "- FAIL: " << action.string << console_color::reset()
+                 << std::endl;
+      errorLine = __LINE__;
+    } break;
+    case km::tests::LDML_ACTION_SKIP: {
+      // test requested skip
+      std::wcout << console_color::fg(console_color::YELLOW) << "- SKIP: " << action.string << console_color::reset()
+                 << std::endl;
+    } break;
+    default:
       std::cerr << " Err: unhandled action type " << action.type << std::endl;
-      return __LINE__;
+      errorLine = __LINE__;
     }
+  } while (!action.done() && errorLine == 0);
+
+  if (errorLine != 0) {
+    // re-verify at end (if there wasn't already a failure)
+    verify_context(text_store, test_state, test_context);
   }
-  std::cout << "- DONE" << std::endl;
 
-  // Test if the beep action was as expected
-  if (g_beep_found != test_source.get_expected_beep())
-    return __LINE__;
-
-
-  // re-verify at end.
-  verify_context(text_store, test_state, test_context);
-
-  // Destroy them
+  // cleanup
   km_core_state_dispose(test_state);
   km_core_keyboard_dispose(test_kb);
 
-  return 0;
+  if (g_beep_found != test_source.get_expected_beep()) {
+    // Test if the beep action was as expected.
+    // TODO-LDML: possible in LDML?
+    std::wcout << console_color::fg(console_color::BRIGHT_RED) << "- FAIL - did not get expected beep" << console_color::reset() << std::endl;
+    return __LINE__;
+  }
+
+  return errorLine;
 }
 
 /**

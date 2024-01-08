@@ -52,8 +52,9 @@ export const PRIVATE_USE_IDS = [
    * Private-use identifiers used by KeymanWeb for the default multitap-into-caps-layer key
    * for keyboards with a caps layer while not defining multitaps on shift.
    */
+  'T_*_MT_SHIFT_TO_SHIFT',
   'T_*_MT_SHIFT_TO_CAPS',
-  'T_*_MT_SHIFT_ROTA_TO_DEFAULT'
+  'T_*_MT_SHIFT_TO_DEFAULT'
 ] as const;
 
 /* A map of key field names with values matching the `typeof` the corresponding property

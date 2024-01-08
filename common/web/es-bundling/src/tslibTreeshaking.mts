@@ -275,6 +275,8 @@ class TslibTreeshaker implements esbuild.Plugin {
         } else if(unusedHelper == '__setModuleDefault') {
           matchString = `var ${unusedHelper} = `; // is inlined, not declared at top!
           expectTernary = true;
+        } else if(unusedHelper == '__assign') {
+          matchString = `${unusedHelper} = Object.assign || function`;
         }
         let definitionStart = source.indexOf(matchString);
 

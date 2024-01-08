@@ -518,8 +518,8 @@ transform_entry::init() {
   }
   // TODO-LDML: if we have mapFrom, may need to do other processing.
   std::u16string patstr = km::core::kmx::u32string_to_u16string(fFrom);
-  // normalize, including markers
-  normalize_nfd_markers(patstr);
+  // normalize, including markers, for regex
+  normalize_nfd_markers(patstr, regex_sentinel);
   UErrorCode status           = U_ZERO_ERROR;
   /* const */ icu::UnicodeString patustr = icu::UnicodeString(patstr.data(), (int32_t)patstr.length());
   // add '$' to match to end
@@ -612,27 +612,14 @@ transform_entry::apply(const std::u32string &input, std::u32string &output) cons
     rustr  = icu::UnicodeString(rstr.data(), (int32_t)rstr.length());
     // and we return to the regular code flow.
   }
-  const icu::Normalizer2 *nfd = icu::Normalizer2::getNFDInstance(status);
-  icu::UnicodeString rustr2;
-  nfd->normalize(rustr, rustr2, status); // TODO-LDML: must be normalize with markers!
-  if (!UASSERT_SUCCESS(status)) {
-    return 0;
-  }
-  // here we replace the match output.
-  icu::UnicodeString entireOutput = matcher->replaceFirst(rustr2, status);
+  // here we replace the match output. No normalization, yet.
+  icu::UnicodeString entireOutput = matcher->replaceFirst(rustr, status);
   if (!UASSERT_SUCCESS(status)) {
     // TODO-LDML: could fail here due to bad input (syntax err)
     return 0;
   }
   // entireOutput includes all of 'input', but modified. Need to substring it.
-  icu::UnicodeString outu_raw = entireOutput.tempSubString(matchStart);
-
-  // normalize the replaced string
-  icu::UnicodeString outu;
-  nfd->normalize(outu_raw, outu, status); // TODO-LDML: must be normalize with markers!
-  if (!UASSERT_SUCCESS(status)) {
-    return 0; // TODO-LDML: probably memory/etc.
-  }
+  icu::UnicodeString outu = entireOutput.tempSubString(matchStart);
 
   // Special case if there's no output, save some allocs
   if (outu.length() == 0) {
@@ -651,9 +638,13 @@ transform_entry::apply(const std::u32string &input, std::u32string &output) cons
     // convert
     outu.toUTF32((UChar32 *)(s.get()), out32len + 1, status);
     if (!UASSERT_SUCCESS(status)) {
-      return 0; // TODO-LDML: memory isue
+      return 0; // TODO-LDML: memory issue
     }
     output.assign(s.get(), out32len);
+    // NOW do a marker-safe normalize
+    if (!normalize_nfd_markers(output)) {
+      return 0; // TODO-LDML: normalization failed.
+    }
   }
   return matchLen;
 }
@@ -959,9 +950,9 @@ bool normalize_nfd(std::u16string &str) {
   return normalize(nfd, str, status);
 }
 
-bool normalize_nfd_markers(std::u16string &str, marker_map &map) {
+bool normalize_nfd_markers(std::u16string &str, marker_map &map, marker_encoding encoding) {
   std::u32string rstr = km::core::kmx::u16string_to_u32string(str);
-  if(!normalize_nfd_markers(rstr, map)) {
+  if(!normalize_nfd_markers(rstr, map, encoding)) {
     return false;
   } else {
     str = km::core::kmx::u32string_to_u16string(rstr);
@@ -969,7 +960,7 @@ bool normalize_nfd_markers(std::u16string &str, marker_map &map) {
   }
 }
 
-void add_back_markers(std::u32string &str, const std::u32string &src, const marker_map &map) {
+static void add_back_markers(std::u32string &str, const std::u32string &src, const marker_map &map, marker_encoding encoding) {
   // need to reconstitute.
   marker_map map2(map);  // make a copy of the map
   // clear the string
@@ -979,7 +970,7 @@ void add_back_markers(std::u32string &str, const std::u32string &src, const mark
     const auto ch = MARKER_BEFORE_EOT;
     const auto m  = map2.find(ch);
     if (m != map2.end()) {
-      prepend_marker(str, m->second);
+      prepend_marker(str, m->second, encoding);
       map2.erase(ch);  // remove it
     }
   }
@@ -990,7 +981,7 @@ void add_back_markers(std::u32string &str, const std::u32string &src, const mark
 
     const auto m = map2.find(ch);
     if (m != map2.end()) {
-      prepend_marker(str, m->second);
+      prepend_marker(str, m->second, encoding);
       map2.erase(ch);  // remove it
     }
   }
@@ -1001,9 +992,9 @@ void add_back_markers(std::u32string &str, const std::u32string &src, const mark
  *  - doesn't support >1 marker per char - may need a set instead of a map!
  *  - ideally this should be used on a normalization safe subsequence
  */
-bool normalize_nfd_markers(std::u32string &str, marker_map &map) {
+bool normalize_nfd_markers(std::u32string &str, marker_map &map, marker_encoding encoding) {
   /** original string, but no markers */
-  std::u32string str_unmarked = remove_markers(str, map);
+  std::u32string str_unmarked = remove_markers(str, map, encoding);
   /** original string, no markers, NFD */
   std::u32string str_unmarked_nfd = str_unmarked;
   if(!normalize_nfd(str_unmarked_nfd)) {
@@ -1015,14 +1006,14 @@ bool normalize_nfd_markers(std::u32string &str, marker_map &map) {
     // Normalization produced no change when markers were removed.
     // So, we'll call this a no-op.
   } else {
-    add_back_markers(str, str_unmarked_nfd, map);
+    add_back_markers(str, str_unmarked_nfd, map, encoding);
   }
   return true; // all OK
 }
 
-bool normalize_nfc_markers(std::u32string &str, marker_map &map) {
+bool normalize_nfc_markers(std::u32string &str, marker_map &map, marker_encoding encoding) {
   /** original string, but no markers */
-  std::u32string str_unmarked = remove_markers(str, map);
+  std::u32string str_unmarked = remove_markers(str, map, encoding);
   /** original string, no markers, NFC */
   std::u32string str_unmarked_nfc = str_unmarked;
   if(!normalize_nfc(str_unmarked_nfc)) {
@@ -1034,7 +1025,7 @@ bool normalize_nfc_markers(std::u32string &str, marker_map &map) {
     // Normalization produced no change when markers were removed.
     // So, we'll call this a no-op.
   } else {
-    add_back_markers(str, str_unmarked_nfc, map);
+    add_back_markers(str, str_unmarked_nfc, map, encoding);
   }
   return true; // all OK
 }
@@ -1057,7 +1048,78 @@ bool normalize_nfc(std::u16string &str) {
   return normalize(nfc, str, status);
 }
 
-std::u32string remove_markers(const std::u32string &str, marker_map *markers) {
+void
+prepend_marker(std::u32string &str, KMX_DWORD marker, marker_encoding encoding) {
+  if (encoding == plain_sentinel) {
+    km_core_usv markstr[] = {LDML_UC_SENTINEL, LDML_MARKER_CODE, marker};
+    str.insert(0, markstr, 3);
+  } else {
+    assert(encoding == regex_sentinel);
+    if (marker == LDML_MARKER_ANY_INDEX) {
+      // recreate the regex from back to front
+      str.insert(0, 1, U']');
+      prepend_hex_quad(str, LDML_MARKER_MAX_INDEX);
+      str.insert(0, 1, U'u');
+      str.insert(0, 1, U'\\');
+      str.insert(0, 1, U'-');
+      prepend_hex_quad(str, LDML_MARKER_MIN_INDEX);
+      str.insert(0, 1, U'u');
+      str.insert(0, 1, U'\\');
+      str.insert(0, 1, U'[');
+      str.insert(0, 1, LDML_MARKER_CODE);
+      str.insert(0, 1, LDML_UC_SENTINEL);
+    } else {
+      // add hex part
+      prepend_hex_quad(str, marker);
+      // add static part
+      km_core_usv markstr[] = {LDML_UC_SENTINEL, LDML_MARKER_CODE, u'\\', u'u'};
+      str.insert(0, markstr, 4);
+    }
+  }
+}
+
+void
+prepend_hex_quad(std::u32string &str, KMX_DWORD marker) {
+  for (auto i = 0; i < 4; i++) {
+    KMX_DWORD remainder = marker & 0xF; // get the last nibble
+    char32_t ch;
+    if (remainder < 0xA) {
+      ch = U'0' + remainder;
+    } else {
+      ch = U'A' + (remainder - 0xA);
+    }
+    str.insert(0, 1, ch); // prepend
+    marker >>= 4;
+  }
+}
+
+inline int xdigitval(km_core_usv ch) {
+  if (ch >= U'0' && ch <= U'9') {
+    return (ch - U'0');
+  } else if (ch >= U'a' && ch <= U'f') {
+    return (0xA + ch - U'a');
+  } else if (ch >= U'A' && ch <= U'F') {
+    return (0xA + ch - U'A');
+  } else {
+    return -1;
+  }
+}
+
+KMX_DWORD parse_hex_quad(const km_core_usv hex_str[]) {
+  KMX_DWORD mark_no = 0;
+  for(auto i = 0; i < 4; i++) {
+    mark_no <<= 4;
+    auto c = hex_str[i];
+    auto n = xdigitval(c);
+    if (n == -1) {
+      return 0;
+    }
+    mark_no |= n;
+  }
+  return mark_no;
+}
+
+std::u32string remove_markers(const std::u32string &str, marker_map *markers, marker_encoding encoding) {
   std::u32string out;
   auto i = str.begin();
   auto last = i;
@@ -1083,14 +1145,108 @@ std::u32string remove_markers(const std::u32string &str, marker_map *markers) {
       break; // hit end
     }
 
-    // #3 marker number
-    const KMX_DWORD marker_no = *i;
-    assert(marker_no >= LDML_MARKER_MIN_INDEX && marker_no <= LDML_MARKER_MAX_INDEX);
-    i++; // if end, we'll break out of the loop
+    KMX_DWORD marker_no;
+    if (encoding == plain_sentinel) {
+      // #3 marker number
+      marker_no = *i;
+      i++; // if end, we'll break out of the loop
+    } else {
+      assert(encoding == regex_sentinel);
+      // is it an escape or a range?
+      if (*i == U'\\') {
+        if (++i == str.end()) {
+          break;
+        }
+        assert(*i == U'u');
+        if (++i == str.end()) {
+          break;
+        }
+        km_core_usv markno[4];
+
+        markno[0] = *(i++);
+        if (i == str.end()) {
+          break;
+        }
+        markno[1] = *(i++);
+        if (i == str.end()) {
+          break;
+        }
+        markno[2] = *(i++);
+        if (i == str.end()) {
+          break;
+        }
+        markno[3] = *(i++);
+        marker_no = parse_hex_quad(markno);
+        assert (marker_no != 0); // illegal marker number
+      } else if (*i == U'[') {
+        if (++i == str.end()) {
+          break;
+        }
+        assert(*i == U'\\');
+        if (++i == str.end()) {
+          break;
+        }
+        assert(*i == U'u');
+        if (++i == str.end()) {
+          break;
+        }
+        assert(xdigitval(*i) != -1);
+        if (++i == str.end()) {
+          break;
+        }
+        assert(xdigitval(*i) != -1);
+        if (++i == str.end()) {
+          break;
+        }
+        assert(xdigitval(*i) != -1);
+        if (++i == str.end()) {
+          break;
+        }
+        assert(xdigitval(*i) != -1);
+        if (++i == str.end()) {
+          break;
+        }
+        assert(*i == U'-');
+        if (++i == str.end()) {
+          break;
+        }
+        assert(*i == U'\\');
+        if (++i == str.end()) {
+          break;
+        }
+        assert(*i == U'u');
+        if (++i == str.end()) {
+          break;
+        }
+        assert(xdigitval(*i) != -1);
+        if (++i == str.end()) {
+          break;
+        }
+        assert(xdigitval(*i) != -1);
+        if (++i == str.end()) {
+          break;
+        }
+        assert(xdigitval(*i) != -1);
+        if (++i == str.end()) {
+          break;
+        }
+        assert(xdigitval(*i) != -1);
+        if (++i == str.end()) {
+          break;
+        }
+        assert(*i == U']');
+        i++;
+        marker_no = LDML_MARKER_ANY_INDEX;
+      } else {
+        assert(*i == U'\\' || *i == U'[');  // error.
+        marker_no = 0; // error, don't record
+      }
+    }
+    assert(marker_no >= LDML_MARKER_MIN_INDEX && marker_no <= LDML_MARKER_ANY_INDEX);
     last = i;
 
     // record the marker
-    if (markers != nullptr) {
+    if (marker_no >= LDML_MARKER_MIN_INDEX && markers != nullptr) {
       if (i == str.end()) {
         markers->emplace(MARKER_BEFORE_EOT, marker_no);
       } else {

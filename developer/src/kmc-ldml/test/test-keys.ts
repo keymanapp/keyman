@@ -18,7 +18,7 @@ describe('keys', function () {
         const keys = <Keys> sect;
         assert.ok(keys);
         assert.equal(compilerTestCallbacks.messages.length, 0);
-        assert.equal(keys.keys.length, 2);
+        assert.equal(keys.keys.length, 2 + KeysCompiler.reserved_count); //
         assert.equal(keys.flicks.length, 1); // there's always a 'null' flick
         // ids are in sorted order in memory`
         assert.isTrue(keys.keys[0].to.isOneChar);
@@ -37,7 +37,7 @@ describe('keys', function () {
         const keys = <Keys> sect;
         assert.ok(keys);
         assert.equal(compilerTestCallbacks.messages.length, 0);
-        assert.equal(keys.keys.length, 12); // includes flick and gesture keys
+        assert.equal(keys.keys.length, 12 + KeysCompiler.reserved_count); // includes flick and gesture keys
 
         const [w] = keys.keys.filter(({ id }) => id.value === 'w');
         assert.ok(w);
@@ -71,7 +71,7 @@ describe('keys', function () {
         const keys = <Keys> sect;
         assert.ok(keys);
         assert.equal(compilerTestCallbacks.messages.length, 0);
-        assert.equal(keys.keys.length, 12); // flick and gesture keys
+        assert.equal(keys.keys.length, 12 + KeysCompiler.reserved_count); // flick and gesture keys
 
         const [q] = keys.keys.filter(({ id }) => id.value === 'q');
         assert.ok(q);
@@ -100,7 +100,7 @@ describe('keys', function () {
       callback(sect) {
         const keys = <Keys> sect;
         assert.equal(compilerTestCallbacks.messages.length, 0);
-        assert.equal(keys.keys.length, 4);
+        assert.equal(keys.keys.length, 4 + KeysCompiler.reserved_count);
 
         const [Qgap] = keys.keys.filter(({ id }) => id.value === 'Q');
         assert.ok(Qgap);
@@ -116,7 +116,7 @@ describe('keys', function () {
       subpath: 'sections/keys/escaped2.xml',
       callback: (keys, subpath, callbacks) => {
         assert.isNotNull(keys);
-        assert.equal((<Keys>keys).keys.length, 1);
+        assert.equal((<Keys>keys).keys.length, 1 + KeysCompiler.reserved_count);
         const [q] = (<Keys>keys).keys.filter(({ id }) => id.value === 'grave');
         assert.equal(q.to.value, String.fromCodePoint(0x1faa6));
       },
@@ -127,7 +127,7 @@ describe('keys', function () {
         const keys = <Keys> sect;
         assert.ok(keys);
         assert.equal(compilerTestCallbacks.messages.length, 0);
-        assert.equal(keys.keys.length, 5);
+        assert.equal(keys.keys.length, 5 + KeysCompiler.reserved_count);
 
         const ww = keys.keys.find(({ id }) => id.value === 'ww');
         assert.ok(ww);
@@ -151,7 +151,9 @@ describe('keys.kmap', function () {
     let keys = await loadSectionFixture(KeysCompiler, 'sections/keys/minimal.xml', compilerTestCallbacks) as Keys;
     assert.isNotNull(keys);
     assert.equal(compilerTestCallbacks.messages.length, 0);
-    assert.equal(keys.kmap.length, 2);
+    // skip reserved (gap) keys
+    assert.equal(keys.kmap.filter(({key}) => !/ /.test(key)).length, 2);
+    assert.equal(keys.kmap.length, 48); // # of non-frame keys on US keyboard
   });
 
   testCompilationCases(KeysCompiler, [
@@ -161,8 +163,9 @@ describe('keys.kmap', function () {
         const keys = sect as Keys;
         assert.isNotNull(keys);
         assert.equal(compilerTestCallbacks.messages.length, 0);
-        assert.equal(keys.keys.length, 4);
-        assert.sameDeepMembers(keys.kmap, [
+        assert.equal(keys.keys.length, 4 + KeysCompiler.reserved_count);
+        // skip reserved (gap) keys
+        assert.sameDeepMembers(keys.kmap.filter(({key}) => !/ /.test(key)), [
           {
             vkey: K.K_BKQUOTE,
             key: 'qqq',
@@ -262,7 +265,7 @@ describe('keys.kmap', function () {
         const keys = sect as Keys;
         assert.isNotNull(keys);
         assert.equal(compilerTestCallbacks.messages.length, 0);
-        assert.equal(keys.keys.length, 3);
+        assert.equal(keys.keys.length, 3 + KeysCompiler.reserved_count);
         assert.sameDeepMembers(keys.kmap, [
           {
             vkey: K.K_K,
@@ -292,7 +295,7 @@ describe('keys.kmap', function () {
         const keys = sect as Keys;
         assert.isNotNull(keys);
         assert.equal(compilerTestCallbacks.messages.length, 0);
-        assert.equal(keys.keys.length, 3);
+        assert.equal(keys.keys.length, 3 + KeysCompiler.reserved_count);
         assert.sameDeepMembers(keys.kmap, [
           {
             vkey: K.K_K,
@@ -365,6 +368,6 @@ describe('keys.kmap', function () {
     let keys = await loadSectionFixture(KeysCompiler, 'sections/keys/gap-switch.xml', compilerTestCallbacks) as Keys;
     assert.isNotNull(keys);
     assert.equal(compilerTestCallbacks.messages.length, 0);
-    assert.equal(keys.keys.length, 4);
+    assert.equal(keys.keys.length, 4 + KeysCompiler.reserved_count);
   });
 });

@@ -22,9 +22,10 @@ locate_emscripten() {
       local EMCC=`which emcc.py`
       [[ -z $EMCC ]] && builder_die "locate_emscripten: Could not locate emscripten (emcc.py) on the path or with \$EMCC or \$EMSCRIPTEN_BASE"
     fi
+    [[ -f $EMCC && ! -x $EMCC ]] && builder_die "locate_emscripten: Variable EMCC ($EMCC) points to emcc.py but it is not executable"
     [[ -x $EMCC ]] || builder_die "locate_emscripten: Variable EMCC ($EMCC) does not point to a valid executable emcc.py"
     EMSCRIPTEN_BASE="$(dirname "$EMCC")"
   fi
-
+  [[ -f ${EMSCRIPTEN_BASE}/emcc.py && ! -x ${EMSCRIPTEN_BASE}/emcc.py ]] && builder_die "locate_emscripten: Variable EMSCRIPTEN_BASE ($EMSCRIPTEN_BASE) contains emcc.py but it is not executable"
   [[ -x ${EMSCRIPTEN_BASE}/emcc.py ]] || builder_die "locate_emscripten: Variable EMSCRIPTEN_BASE ($EMSCRIPTEN_BASE) does not point to emcc.py's folder"
 }

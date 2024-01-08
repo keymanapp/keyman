@@ -46,7 +46,7 @@ export default class PriorityQueue<Type> {
     // https://en.wikipedia.org/wiki/Min-max_heap
     this.comparator = comparator;
 
-    this.heap = Array.from(initialEntries ?? []);
+    this.heap = (initialEntries ?? []).slice(0);
     this.heapify();
   }
 
@@ -228,6 +228,6 @@ export default class PriorityQueue<Type> {
    * they will almost certainly be unsorted.
    */
   toArray(): Type[] {
-    return Array.from(this.heap);
+    return this.heap.slice(0);
   }
 }

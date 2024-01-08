@@ -34,6 +34,10 @@ export class StaticActivator extends Activator {
     return true;
   }
 
+  set enabled(value: boolean) {
+    // does nothing; it's static.
+  }
+
   get activate(): boolean {
     return true;
   }

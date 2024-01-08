@@ -6,26 +6,30 @@
  */
 
 import esbuild from 'esbuild';
-import { bundleObjEntryPoints, iifeConfiguration } from '../../../../common/web/es-bundling/build/index.mjs';
+import { iifeConfiguration, prepareTslibTreeshaking  } from '../../../../common/web/es-bundling/build/index.mjs';
 
-const moduleNames = ['kmwuibutton', 'kmwuifloat', 'kmwuitoggle', 'kmwuitoolbar'];
-const modules = moduleNames.map((name) => `../../../build/app/ui/obj/${name}.js`);
-
-await esbuild.build({
+const commonConfig = {
   ...iifeConfiguration,
-  ...bundleObjEntryPoints('debug', ...modules),
+  entryPoints: {
+    'index': '../../../build/app/webview/obj/polyfill/map.js',
+  },
+  outfile: '../../../build/app/webview/debug/map-polyfill.js',
   // `esbuild`'s sourcemap output puts relative paths to the original sources from the
   // directory of the build output.  The following keeps repo structure intact and
   // puts our code under a common 'namespace' of sorts.
-  sourceRoot: '@keymanapp/keyman/web/build/app/ui/debug/',
-});
+  sourceRoot: '@keymanapp/keyman/web/build/app/webview/debug/'
+};
+
+await prepareTslibTreeshaking(commonConfig, /worker-main\.wrapped(?:\.min)?\.js/);
+
+await esbuild.build(commonConfig);
 
 await esbuild.build({
-  ...iifeConfiguration,
-  ...bundleObjEntryPoints('release', ...modules),
+  ...commonConfig,
   minify: true,
+  outfile: '../../../build/app/webview/release/map-polyfill.js',
   // `esbuild`'s sourcemap output puts relative paths to the original sources from the
   // directory of the build output.  The following keeps repo structure intact and
   // puts our code under a common 'namespace' of sorts.
-  sourceRoot: '@keymanapp/keyman/web/build/app/ui/debug/',
+  sourceRoot: '@keymanapp/keyman/web/build/app/webview/release/'
 });

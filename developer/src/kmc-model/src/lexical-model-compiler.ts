@@ -2,20 +2,102 @@
   lexical-model-compiler.ts: base file for lexical model compiler.
 */
 
-import * as ts from "typescript";
+import ts from "typescript";
 import { createTrieDataStructure } from "./build-trie.js";
 import { ModelDefinitions } from "./model-definitions.js";
 import {decorateWithJoin} from "./join-word-breaker-decorator.js";
 import {decorateWithScriptOverrides} from "./script-overrides-decorator.js";
 import { LexicalModelSource, WordBreakerSpec, SimpleWordBreakerSpec } from "./lexical-model.js";
-import { ModelCompilerError, ModelCompilerMessages } from "./model-compiler-errors.js";
+import { ModelCompilerError, ModelCompilerMessageContext, ModelCompilerMessages } from "./model-compiler-errors.js";
 import { callbacks, setCompilerCallbacks } from "./compiler-callbacks.js";
-import { CompilerCallbacks } from "@keymanapp/common-types";
+import { CompilerCallbacks, CompilerOptions, KeymanCompiler, KeymanCompilerArtifact, KeymanCompilerArtifacts, KeymanCompilerResult } from "@keymanapp/common-types";
 
-export default class LexicalModelCompiler {
+/**
+ * An ECMAScript module as emitted by the TypeScript compiler.
+ */
+interface ES2015Module {
+  /** This is always true. */
+  __esModule: boolean;
+  'default'?: unknown;
+};
 
-  constructor(callbacks: CompilerCallbacks) {
+export interface LexicalModelCompilerArtifacts extends KeymanCompilerArtifacts {
+  js: KeymanCompilerArtifact;
+};
+
+export interface LexicalModelCompilerResult extends KeymanCompilerResult {
+  artifacts: LexicalModelCompilerArtifacts;
+};
+
+export class LexicalModelCompiler implements KeymanCompiler {
+
+  async init(callbacks: CompilerCallbacks, _options: CompilerOptions): Promise<boolean> {
     setCompilerCallbacks(callbacks);
+    return true;
+  }
+
+  async run(inputFilename: string, outputFilename?: string): Promise<LexicalModelCompilerResult> {
+    try {
+      let modelSource = this.loadFromFilename(inputFilename);
+      let containingDirectory = callbacks.path.dirname(inputFilename);
+      let code = this.generateLexicalModelCode('<unknown>', modelSource, containingDirectory);
+      const result: LexicalModelCompilerResult = {
+        artifacts: {
+          js: {
+            data: new TextEncoder().encode(code),
+            filename: outputFilename ?? inputFilename.replace(/\.model\.ts$/, '.model.js')
+          }
+        }
+      }
+      return result;
+    } catch(e) {
+      callbacks.reportMessage(
+        e instanceof ModelCompilerError
+        ? e.event
+        : ModelCompilerMessages.Fatal_UnexpectedException({e:e})
+      );
+      return null;
+    }
+  }
+
+  async write(artifacts: LexicalModelCompilerArtifacts): Promise<boolean> {
+    callbacks.fs.writeFileSync(artifacts.js.filename, artifacts.js.data);
+    return true;
+  }
+
+  /**
+   * Loads a lexical model's source module from the given filename.
+   *
+   * @param filename path to the model source file.
+   */
+  public loadFromFilename(filename: string): LexicalModelSource {
+
+    let sourceCode = new TextDecoder().decode(callbacks.loadFile(filename));
+    // Compile the module to JavaScript code.
+    // NOTE: transpile module does a very simple TS to JS compilation.
+    // It DOES NOT check for types!
+    let compilationOutput = ts.transpile(sourceCode, {
+      // Our runtime only supports ES3 with Node/CommonJS modules on Android 5.0.
+      // When we drop Android 5.0 support, we can update this to a `ScriptTarget`
+      // matrix against target version of Keyman, here and in
+      // lexical-model-compiler.ts.
+      target: ts.ScriptTarget.ES3,
+      module: ts.ModuleKind.CommonJS,
+    });
+    // Turn the module into a function in which we can inject a global.
+    let moduleCode = '(function(exports){' + compilationOutput + '})';
+
+    // Run the module; its exports will be assigned to `moduleExports`.
+    let moduleExports: Partial<ES2015Module> = {};
+    let module = eval(moduleCode);
+    module(moduleExports);
+
+    if (!moduleExports['__esModule'] || !moduleExports['default']) {
+      ModelCompilerMessageContext.filename = filename;
+      throw new ModelCompilerError(ModelCompilerMessages.Error_NoDefaultExport());
+    }
+
+    return moduleExports['default'] as LexicalModelSource;
   }
 
   /**

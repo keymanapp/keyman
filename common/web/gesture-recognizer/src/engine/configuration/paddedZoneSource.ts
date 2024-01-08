@@ -125,9 +125,10 @@ export class PaddedZoneSource implements RecognitionZoneSource {
   getBoundingClientRect(): DOMRect {
     const rootZone = this.root.getBoundingClientRect();
 
+    // Chrome 35:  x, y do not exist on the returned rect, but left & top do.
     return new DOMRect(
-      /*x:*/ rootZone.x + this.edgePadding.x,
-      /*y:*/ rootZone.y + this.edgePadding.y,
+      /*x:*/ rootZone.left + this.edgePadding.x,
+      /*y:*/ rootZone.top + this.edgePadding.y,
       /*width:*/  rootZone.width  - this.edgePadding.w,
       /*height:*/ rootZone.height - this.edgePadding.h
     );
