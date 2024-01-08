@@ -61,7 +61,7 @@
 
       function togglePredictions() {
         let newVal = !keyman.core.languageProcessor.mayPredict;
-        keyman.osk.banner.setOptions({'mayPredict': newVal});
+        keyman.core.languageProcessor.mayPredict = newVal;
 
         let btnPredict = document.getElementById("btnPredict");
         btnPredict.value = (newVal ? "Disable" : "Enable") + " predictions";
@@ -69,7 +69,7 @@
 
       function toggleCorrections() {
         let newVal = !keyman.core.languageProcessor.mayCorrect;
-        keyman.osk.banner.setOptions({'mayCorrect': newVal});
+        keyman.core.languageProcessor.mayCorrect = newVal;
 
         let btnCorrect = document.getElementById("btnCorrect");
         btnCorrect.value = (newVal ? "Disable" : "Enable") + " corrections";
