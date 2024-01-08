@@ -1,4 +1,4 @@
-import LexicalModelCompiler from '../src/lexical-model-compiler.js';
+import { LexicalModelCompiler } from '../src/lexical-model-compiler.js';
 import {assert} from 'chai';
 import 'mocha';
 
@@ -26,8 +26,9 @@ describe('LexicalModelCompiler - pseudoclosure compilation + use', function () {
       }
     };
 
-    it('variant 1:  applyCasing prepends symbols, searchTermToKey removes them', function() {
-      let compiler = new LexicalModelCompiler(callbacks);
+    it('variant 1:  applyCasing prepends symbols, searchTermToKey removes them', async function() {
+      let compiler = new LexicalModelCompiler();
+      assert.isTrue(await compiler.init(callbacks, null));
       let code = compiler.generateLexicalModelCode(MODEL_ID, {
         format: 'trie-1.0',
         sources: ['wordlist.tsv'],
@@ -80,8 +81,9 @@ describe('LexicalModelCompiler - pseudoclosure compilation + use', function () {
       assert.isNotNull(compilation.exportedModel);
     });
 
-    it('variant 2:  applyCasing prepends symbols, searchTermToKey keeps them', function() {
-      let compiler = new LexicalModelCompiler(callbacks);
+    it('variant 2:  applyCasing prepends symbols, searchTermToKey keeps them', async function() {
+      let compiler = new LexicalModelCompiler();
+      assert.isTrue(await compiler.init(callbacks, null));
       let code = compiler.generateLexicalModelCode(MODEL_ID, {
         format: 'trie-1.0',
         sources: ['wordlist.tsv'],
@@ -124,8 +126,9 @@ describe('LexicalModelCompiler - pseudoclosure compilation + use', function () {
       assert.isNotNull(compilation.exportedModel);
     });
 
-    it('variant 3:  applyCasing prepends symbols, default searchTermToKey', function() {
-      let compiler = new LexicalModelCompiler(callbacks);
+    it('variant 3:  applyCasing prepends symbols, default searchTermToKey', async function() {
+      let compiler = new LexicalModelCompiler();
+      assert.isTrue(await compiler.init(callbacks, null));
       let code = compiler.generateLexicalModelCode(MODEL_ID, {
         format: 'trie-1.0',
         sources: ['wordlist.tsv'],
@@ -164,8 +167,9 @@ describe('LexicalModelCompiler - pseudoclosure compilation + use', function () {
   });
 
   describe('relying on default applyCasing + searchTermToKey', function() {
-    it('languageUsesCasing: true', function() {
-      let compiler = new LexicalModelCompiler(callbacks);
+    it('languageUsesCasing: true', async function() {
+      let compiler = new LexicalModelCompiler();
+      assert.isTrue(await compiler.init(callbacks, null));
       let code = compiler.generateLexicalModelCode(MODEL_ID, {
         format: 'trie-1.0',
         sources: ['wordlist.tsv'],
@@ -188,8 +192,9 @@ describe('LexicalModelCompiler - pseudoclosure compilation + use', function () {
       assert.isNotNull(compilation.exportedModel);
     });
 
-    it('languageUsesCasing: false', function() {
-      let compiler = new LexicalModelCompiler(callbacks);
+    it('languageUsesCasing: false', async function() {
+      let compiler = new LexicalModelCompiler();
+      assert.isTrue(await compiler.init(callbacks, null));
       let code = compiler.generateLexicalModelCode(MODEL_ID, {
         format: 'trie-1.0',
         sources: ['wordlist.tsv'],
@@ -213,8 +218,9 @@ describe('LexicalModelCompiler - pseudoclosure compilation + use', function () {
       assert.isNotNull(compilation.exportedModel);
     });
 
-    it('languageUsesCasing: undefined', function() {
-      let compiler = new LexicalModelCompiler(callbacks);
+    it('languageUsesCasing: undefined', async function() {
+      let compiler = new LexicalModelCompiler();
+      assert.isTrue(await compiler.init(callbacks, null));
       let code = compiler.generateLexicalModelCode(MODEL_ID, {
         format: 'trie-1.0',
         sources: ['wordlist.tsv']

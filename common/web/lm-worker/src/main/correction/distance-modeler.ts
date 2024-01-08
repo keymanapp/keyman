@@ -143,7 +143,7 @@ export class SearchNode {
 
       // TODO:  transform.deleteRight currently not supported.
 
-      let inputPath = Array.from(this.priorInput);
+      let inputPath = this.priorInput.slice(0);
       inputPath.push(probMass);
       // Tokenize and iterate over input chars, adding them into the calc.
       for(let i=0; i < transform.insert.length; i++) {

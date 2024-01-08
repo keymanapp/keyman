@@ -23,6 +23,11 @@ export class TestCompilerCallbacks implements CompilerCallbacks {
     return this.messages.find((item) => item.code == code) === undefined ? false : true;
   }
 
+  /** true of at least one error */
+  hasError(): boolean {
+    return CompilerError.hasError(this.messages);
+  }
+
   /* CompilerCallbacks */
 
   loadFile(filename: string): Uint8Array {
