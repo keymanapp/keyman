@@ -9,7 +9,10 @@ import esbuild from 'esbuild';
 let sourceFromArgs;
 let destFromArgs;
 
-function doHelp(errCode) {
+function doHelp(errMessage) {
+  if(errMessage) {
+    console.error(errMessage + '\n');
+  }
   console.log(`
 Summary:
   Creates a polyfilled version of the lm-worker to ensure compatibility with the needs of
@@ -23,7 +26,7 @@ Parameters:
 
 Options:
   --help            Shows this script's documentation
-  --out=<out-file>  Specifies the destination path for the polyfilled output.
+  --out <out-file>  Specifies the destination path for the polyfilled output.
 
                     If missing, the output will be placed next to the source and given
                     the same path, but with '.polyfilled.js' replacing the original '.js'
@@ -32,7 +35,7 @@ Options:
                     Either way, a minified version will also be output, using the same
                     path but with the final '.js' replaced by '.min.js'.
 ` );
-  process.exit(errCode || 0);
+  process.exit(errMessage ? 1 : 0);
 }
 
 if(process.argv.length > 2) {
@@ -50,19 +53,17 @@ if(process.argv.length > 2) {
         if(!sourceFromArgs) {
           sourceFromArgs = arg;
         } else {
-          doHelp(1);
+          doHelp("Input file can only be specified once; aborting");
         }
     }
   }
 } else {
   // Display help + abort.
-  doHelp(1);
+  doHelp("Required parameters missing");
 }
 
 if(!sourceFromArgs || sourceFromArgs.substring(sourceFromArgs.length - 3) != '.js') {
-  console.error("No input file has been specified; aborting.");
-  console.log();
-  doHelp(1);
+  doHelp("No input file has been specified; aborting.");
 }
 
 const sourceFile = sourceFromArgs;
@@ -176,7 +177,7 @@ console.log("Pass 2:  Output intermediate state and perform minification");
 fullWorkerConcatenation.script = fullWorkerConcatenation.script.substring(0, fullWorkerConcatenation.script.lastIndexOf('//# sourceMappingURL'));
 fullWorkerConcatenation.script += `//# sourceMappingURL=${fullWorkerConcatenation.scriptFilename}.map`;
 
-fs.writeFileSync(`${fullWorkerConcatenation.scriptFilename}`, fullWorkerConcatenation.script);
+fs.writeFileSync(fullWorkerConcatenation.scriptFilename, fullWorkerConcatenation.script);
 if(fullWorkerConcatenation.sourcemapJSON) {
   fs.writeFileSync(`${fullWorkerConcatenation.scriptFilename}.map`, convertSourceMap.fromObject(fullWorkerConcatenation.sourcemapJSON).toJSON());
 }

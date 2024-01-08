@@ -8,7 +8,11 @@ let INCLUDE_SRCMAPS = false;
 let sourceFromArgs;
 let destFromArgs;
 
-function doHelp(errCode) {
+function doHelp(errMessage) {
+  if(errMessage) {
+    console.error(errMessage + '\n');
+  }
+
   console.log(`
 Summary:
   Creates a "wrapped" version of the lm-worker for compilation into and inclusion as part
@@ -22,14 +26,14 @@ Parameters:
 
 Options:
   --help            Shows this script's documentation
-  --out=<out-file>  Specifies the destination path for the wrapped output.
+  --out <out-file>  Specifies the destination path for the wrapped output.
 
                     If missing, the output will be placed next to the source and given
                     the same path, but with '.wrapped.js' replacing the original '.js'
                     extension.
   --sourceMap       Includes the script's original sourcemaps within the wrapped output
 ` );
-  process.exit(errCode || 0);
+  process.exit(errMessage ? 1 : 0);
 }
 
 if(process.argv.length > 2) {
@@ -41,6 +45,8 @@ if(process.argv.length > 2) {
         doHelp();
         break;
       case '--sourceMap':  // bc TS uses this exact flag.  esbuild... uses sourcemap (in the JS config)
+      case '--sourcemap':
+      case '--source-map':
         INCLUDE_SRCMAPS = true;
         break;
       case '--out':
@@ -50,19 +56,17 @@ if(process.argv.length > 2) {
         if(!sourceFromArgs) {
           sourceFromArgs = arg;
         } else {
-          doHelp(1);
+          doHelp("Input file can only be specified once; aborting");
         }
     }
   }
 } else {
   // Display help + abort.
-  doHelp(1);
+  doHelp("Required parameters missing");
 }
 
 if(!sourceFromArgs || sourceFromArgs.substring(sourceFromArgs.length - 3) != '.js') {
-  console.error("No input file has been specified; aborting.");
-  console.log();
-  doHelp(1);
+  doHelp("No input file has been specified; aborting.");
 }
 
 const sourceFile = sourceFromArgs;
