@@ -191,28 +191,18 @@ const int CORE_ENVIRONMENT_ARRAY_LENGTH = 6;
 }
 
 -(NSDictionary*)convertOptionsArray:(km_core_option_item*)options {
-  NSDictionary* optionsDictionary = nil;
-  unichar const * optionsKey = options->key;
-  unichar const * optionsValue = options->value;
-  if ((optionsKey != nil) && (optionsValue != nil)) {
-    optionsDictionary = [[NSDictionary alloc] init];
-    NSString *key = [self.coreHelper createNSStringFromUnicharString:optionsKey];
-    NSString *value = [self.coreHelper createNSStringFromUnicharString:optionsValue];
-    [optionsDictionary insertValue:value inPropertyWithKey:key];
-  }
-/*
+  NSMutableDictionary* optionsDictionary = nil;
   if (options) {
-    optionsDictionary = [[NSDictionary alloc] init];
+    optionsDictionary = [[NSMutableDictionary alloc] init];
     for (; options->key != 0; ++options) {
       unichar const * optionsKey = options->key;
       unichar const * valueKey = options->value;
 
       NSString *key = [self.coreHelper createNSStringFromUnicharString:optionsKey];
       NSString *value = [self.coreHelper createNSStringFromUnicharString:valueKey];
-      [optionsDictionary insertValue:value inPropertyWithKey:key];
+      [optionsDictionary setObject:value forKey:key];
     }
   }
- */
   return optionsDictionary;
 }
 
