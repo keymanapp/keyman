@@ -6,7 +6,7 @@
  */
 
 import esbuild from 'esbuild';
-import { bundleObjEntryPoints, esmConfiguration, prepareTslibTreeshaking } from '../es-bundling/build/index.mjs';
+import { bundleObjEntryPoints, iifeConfiguration, prepareTslibTreeshaking } from '../es-bundling/build/index.mjs';
 
 import fs from 'fs';
 
@@ -31,8 +31,8 @@ if(process.argv.length > 2) {
 }
 
 const embeddedWorkerBuildOptions = await prepareTslibTreeshaking({
-  ...esmConfiguration,
-  ...bundleObjEntryPoints('lib', 'build/obj/index.js', 'build/obj/worker-main.js'),
+  ...iifeConfiguration,
+  ...bundleObjEntryPoints('intermediate', 'build/obj/worker-main.js'),
   // To be explicit, in comparison to the other build below.  Even if our other
   // configs change their default, we should not minify for THIS build; we'll
   // have a separate minify pass later, after concatenating our polyfills.
