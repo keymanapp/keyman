@@ -1,5 +1,17 @@
 # Keyman Version History
 
+## 17.0.239 alpha 2024-01-08
+
+* fix(mac): write persisted options returned from Core (#10275)
+* chore(web): remove lm-worker `Array.from` polyfill and make `Symbol` polyfill conditional (#10255)
+* change(web): lm-worker bundling + wrapper script rework (#10264)
+* refactor(web): transformation of build-bundler into a common es-bundling command (#10265)
+* change(web): KeymanWeb bundler-script centralization (#10267)
+* feat(web): alternate artifact - es6-bundled Web (#10257)
+* feat(web): es6 artifact for app/webview (#10274)
+* fix(web): adds null-guard for longpress-key validation (#10299)
+*  (#10296)
+
 ## 17.0.238 alpha 2024-01-03
 
 * fix(developer): quell internal error when  a section fails (#10300)
