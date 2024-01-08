@@ -105,6 +105,6 @@ function do_test() {
 }
 
 builder_run_action configure  verify_npm_setup
-builder_run_action clean      rm -rf build/
+builder_run_action clean      rm -rf build/ intermediate/
 builder_run_action build      do_build
 builder_run_action test       do_test
