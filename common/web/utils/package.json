@@ -4,6 +4,7 @@
   "main": "./build/obj/index.js",
   "exports": {
     ".": {
+      "es6-bundling": "./src/index.ts",
       "types": "./build/obj/index.d.ts",
       "import": "./build/obj/index.js"
     }
