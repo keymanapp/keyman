@@ -442,7 +442,7 @@ export function longpressContactModel(params: GestureParams, enabledFlicks: bool
     timer: {
       duration: spec.waitLength,
       expectedResult: true,
-      validateItem: (key: KeyElement) => !!key.key.spec.sk
+      validateItem: (key: KeyElement) => !!key?.key.spec.sk
     },
     pathModel: {
       evaluate: (path) => {

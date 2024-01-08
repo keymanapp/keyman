@@ -33,6 +33,8 @@ import { applyTransform, isHighSurrogate, isSentinel, SENTINEL_CODE_UNIT, transf
 import { getLastPreCaretToken } from "./tokenization.js";
 import PriorityQueue from "./priority-queue.js";
 
+extendString();
+
 /**
  * @file trie-model.ts
  *
@@ -79,6 +81,114 @@ type TextWithProbability = {
   text: string;
   // TODO: use negative-log scaling instead?
   p: number; // real-number weight, from 0 to 1
+}
+
+class Traversal implements LexiconTraversal {
+  /**
+   * The lexical prefix corresponding to the current traversal state.
+   */
+  prefix: String;
+
+  /**
+   * The current traversal node.  Serves as the 'root' of its own sub-Trie,
+   * and we cannot navigate back to its parent.
+   */
+  root: Node;
+
+  constructor(root: Node, prefix: string) {
+    this.root = root;
+    this.prefix = prefix;
+  }
+
+  *children(): Generator<{char: string, traversal: () => LexiconTraversal}> {
+    let root = this.root;
+
+    if(root.type == 'internal') {
+      for(let entry of root.values) {
+        let entryNode = root.children[entry];
+
+        // UTF-16 astral plane check.
+        if(isHighSurrogate(entry)) {
+          // First code unit of a UTF-16 code point.
+          // For now, we'll just assume the second always completes such a char.
+          //
+          // Note:  Things get nasty here if this is only sometimes true; in the future,
+          // we should compile-time enforce that this assumption is always true if possible.
+          if(entryNode.type == 'internal') {
+            let internalNode = entryNode;
+            for(let lowSurrogate of internalNode.values) {
+              let prefix = this.prefix + entry + lowSurrogate;
+              yield {
+                char: entry + lowSurrogate,
+                traversal: function() { return new Traversal(internalNode.children[lowSurrogate], prefix) }
+              }
+            }
+          } else {
+            // Determine how much of the 'leaf' entry has no Trie nodes, emulate them.
+            let fullText = entryNode.entries[0].key;
+            entry = entry + fullText[this.prefix.length + 1]; // The other half of the non-BMP char.
+            let prefix = this.prefix + entry;
+
+            yield {
+              char: entry,
+              traversal: function () {return new Traversal(entryNode, prefix)}
+            }
+          }
+        } else if(isSentinel(entry)) {
+          continue;
+        } else if(!entry) {
+          // Prevent any accidental 'null' or 'undefined' entries from having an effect.
+          continue;
+        } else {
+          let prefix = this.prefix + entry;
+          yield {
+            char: entry,
+            traversal: function() { return new Traversal(entryNode, prefix)}
+          }
+        }
+      }
+
+      return;
+    } else { // type == 'leaf'
+      let prefix = this.prefix;
+
+      let children = root.entries.filter(function(entry) {
+        return entry.key != prefix && prefix.length < entry.key.length;
+      })
+
+      for(let {key} of children) {
+        let nodeKey = key[prefix.length];
+
+        if(isHighSurrogate(nodeKey)) {
+          // Merge the other half of an SMP char in!
+          nodeKey = nodeKey + key[prefix.length+1];
+        }
+        yield {
+          char: nodeKey,
+          traversal: function() { return new Traversal(root, prefix + nodeKey)}
+        }
+      };
+      return;
+    }
+  }
+
+  get entries(): string[] {
+    if(this.root.type == 'leaf') {
+      let prefix = this.prefix;
+      let matches = this.root.entries.filter(function(entry) {
+        return entry.key == prefix;
+      });
+
+      return matches.map(function(value) { return value.content });
+    } else {
+      let matchingLeaf = this.root.children[SENTINEL_CODE_UNIT];
+      if(matchingLeaf && matchingLeaf.type == 'leaf') {
+        return matchingLeaf.entries.map(function(value) { return value.content });
+      } else {
+        return [];
+      }
+    }
+  }
 }
 
 /**
@@ -176,115 +286,7 @@ export default class TrieModel implements LexicalModel {
   }
 
   public traverseFromRoot(): LexiconTraversal {
-    return new TrieModel.Traversal(this._trie['root'], '');
-  }
-
-  private static Traversal = class implements LexiconTraversal {
-    /**
-     * The lexical prefix corresponding to the current traversal state.
-     */
-    prefix: String;
-
-    /**
-     * The current traversal node.  Serves as the 'root' of its own sub-Trie,
-     * and we cannot navigate back to its parent.
-     */
-    root: Node;
-
-    constructor(root: Node, prefix: string) {
-      this.root = root;
-      this.prefix = prefix;
-    }
-
-    *children(): Generator<{char: string, traversal: () => LexiconTraversal}> {
-      let root = this.root;
-
-      if(root.type == 'internal') {
-        for(let entry of root.values) {
-          let entryNode = root.children[entry];
-
-          // UTF-16 astral plane check.
-          if(isHighSurrogate(entry)) {
-            // First code unit of a UTF-16 code point.
-            // For now, we'll just assume the second always completes such a char.
-            //
-            // Note:  Things get nasty here if this is only sometimes true; in the future,
-            // we should compile-time enforce that this assumption is always true if possible.
-            if(entryNode.type == 'internal') {
-              let internalNode = entryNode;
-              for(let lowSurrogate of internalNode.values) {
-                let prefix = this.prefix + entry + lowSurrogate;
-                yield {
-                  char: entry + lowSurrogate,
-                  traversal: function() { return new TrieModel.Traversal(internalNode.children[lowSurrogate], prefix) }
-                }
-              }
-            } else {
-              // Determine how much of the 'leaf' entry has no Trie nodes, emulate them.
-              let fullText = entryNode.entries[0].key;
-              entry = entry + fullText[this.prefix.length + 1]; // The other half of the non-BMP char.
-              let prefix = this.prefix + entry;
-
-              yield {
-                char: entry,
-                traversal: function () {return new TrieModel.Traversal(entryNode, prefix)}
-              }
-            }
-          } else if(isSentinel(entry)) {
-            continue;
-          } else if(!entry) {
-            // Prevent any accidental 'null' or 'undefined' entries from having an effect.
-            continue;
-          } else {
-            let prefix = this.prefix + entry;
-            yield {
-              char: entry,
-              traversal: function() { return new TrieModel.Traversal(entryNode, prefix)}
-            }
-          }
-        }
-
-        return;
-      } else { // type == 'leaf'
-        let prefix = this.prefix;
-
-        let children = root.entries.filter(function(entry) {
-          return entry.key != prefix && prefix.length < entry.key.length;
-        })
-
-        for(let {key} of children) {
-          let nodeKey = key[prefix.length];
-
-          if(isHighSurrogate(nodeKey)) {
-            // Merge the other half of an SMP char in!
-            nodeKey = nodeKey + key[prefix.length+1];
-          }
-          yield {
-            char: nodeKey,
-            traversal: function() { return new TrieModel.Traversal(root, prefix + nodeKey)}
-          }
-        };
-        return;
-      }
-    }
-
-    get entries(): string[] {
-      if(this.root.type == 'leaf') {
-        let prefix = this.prefix;
-        let matches = this.root.entries.filter(function(entry) {
-          return entry.key == prefix;
-        });
-
-        return matches.map(function(value) { return value.content });
-      } else {
-        let matchingLeaf = this.root.children[SENTINEL_CODE_UNIT];
-        if(matchingLeaf && matchingLeaf.type == 'leaf') {
-          return matchingLeaf.entries.map(function(value) { return value.content });
-        } else {
-          return [];
-        }
-      }
-    }
+    return new Traversal(this._trie['root'], '');
   }
 };
 
