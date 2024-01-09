@@ -211,11 +211,13 @@ jobs:
           local upload_log=$1
           local hosttarget=$2
           local max_retries=10
+          local tmpfile=/tmp/dput.output
           shift 2
           while ((i <= max_retries)); do
-            dput ${upload_log} ${hosttarget} "$@" 2>&1 | tee /tmp/dput.output
+            dput ${upload_log} ${hosttarget} "$@" 2>&1 | tee ${tmpfile}
             retval=$?
-            if ! grep -q "ssh: Could not resolve hostname package-drop.psonet: Name or service not known" /tmp/dput.output; then
+            if ! grep -q "ssh: Could not resolve hostname package-drop.psonet: Name or service not known" ${tmpfile}; then
+              rm ${tmpfile}
               if ((retval != 0)); then
                 exit ${retval}
               else
@@ -227,6 +229,7 @@ jobs:
               echo "Retry ${i}/${max_retries}:"
             fi
           done
+          rm ${tmpfile}
           exit ${retval}
         }
 
