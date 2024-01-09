@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 17.0.240 alpha 2024-01-09
+
+* chore(linux): Retry llso upload (#10331)
+
 ## 17.0.239 alpha 2024-01-08
 
 * fix(mac): write persisted options returned from Core (#10275)
