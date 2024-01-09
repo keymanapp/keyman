@@ -6,8 +6,8 @@
 int map_VKShiftState_to_Lin(int VKShiftState) {
   if (VKShiftState == 0 )      return 0;		/* 0000 0000 */
   if (VKShiftState == 16)      return 1;		/* 0001 0000 */
-  //if (VKShiftState == 9 )      return 2;		/* 0000 1001 */
-  //if (VKShiftState == 25)      return 3; 		/* 0001 1001 */
+  if (VKShiftState == 9 )      return 2;		/* 0000 1001 */
+  if (VKShiftState == 25)      return 3; 		/* 0001 1001 */
   return VKShiftState;
 }
 

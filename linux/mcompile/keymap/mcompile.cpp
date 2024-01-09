@@ -165,8 +165,8 @@ int run(int argc, std::vector<std::u16string> str_argv, char* argv_ch[] = NULL){
 // _S2 TODO which version of VKShiftStates do we use ?
 // comment from win-version
 // Map of all shift states that we will work with
-//const UINT VKShiftState[] = {0, K_SHIFTFLAG, LCTRLFLAG|RALTFLAG, K_SHIFTFLAG|LCTRLFLAG|RALTFLAG, 0xFFFF};
-const UINT VKShiftState[] = {0, K_SHIFTFLAG,  0xFFFF};
+const UINT VKShiftState[] = {0, K_SHIFTFLAG, LCTRLFLAG|RALTFLAG, K_SHIFTFLAG|LCTRLFLAG|RALTFLAG, 0xFFFF};
+//const UINT VKShiftState[] = {0, K_SHIFTFLAG,  0xFFFF};
 
 // my comment for Lin version
 // Ubuntu:  Each of the 4 columns specifies a different modifier:  unmodified,  shift,   right alt (altgr),     shift+right alt(altgr)
@@ -555,7 +555,6 @@ KMX_WCHAR KMX_get_KVUS_From_KVUnderlying_VEC(v_dw_3D All_Vector, KMX_DWORD VK_OT
   return VK_OTHER;
 }
 
-
 KMX_WCHAR KMX_SCKUnderlyingLayoutToVKUS_GDK2(GdkKeymap* keymap,KMX_DWORD SC_Other) {
 
     return SC_Other;
@@ -640,18 +639,18 @@ int createOneVectorFromBothKeyboards(v_dw_3D &All_Vector,GdkKeymap *keymap){
 
 int KMX_GetDeadkeys(v_dw_2D & dk_Table, KMX_WORD DeadKey, KMX_WORD *OutputPairs, GdkKeymap* keymap) {
 
-  KMX_WORD *p = OutputPairs, shift;
-  KMX_DWORD shift2;
+  KMX_WORD *p = OutputPairs;
+  KMX_DWORD shift;
 
-  v_dw_2D  dk_CombinationTable;
-  find_all_dk_combinations(&dk_Table, dk_CombinationTable, DeadKey);
-
-  for ( int i=0; i< dk_CombinationTable.size()-1;i++) {
-    KMX_WORD vk = KMX_changeKeynameToCapital(dk_CombinationTable[i][1], shift2, keymap);
+  v_dw_2D  dk_SingleTable;
+  find_dk_combinations_for_single_dk(&dk_Table, dk_SingleTable, DeadKey);
+// _S2 CAPS <-> NCAPS problem from here?
+  for ( int i=0; i< dk_SingleTable.size()-1;i++) {
+    KMX_WORD vk = KMX_changeKeynameToCapital(dk_SingleTable[i][1], shift, keymap);
     if(vk != 0) {
           *p++ = vk;
-          *p++ = shift2;
-          *p++ = dk_CombinationTable[i][2];
+          *p++ = shift;
+          *p++ = dk_SingleTable[i][2];
         }
         // _S2 TODO
         //else {

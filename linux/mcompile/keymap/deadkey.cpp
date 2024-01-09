@@ -10,16 +10,17 @@ v_dw_1D createLine(std::wstring  first, std::wstring second,  KMX_DWORD number, 
 	return line;
 }
 
-KMX_DWORD find_dk_Character(v_dw_2D * p_dk_ComposeTable, KMX_DWORD first, KMX_DWORD second  ) {
+/*KMX_DWORD find_dk_Character(v_dw_2D * p_dk_ComposeTable, KMX_DWORD first, KMX_DWORD second  ) {
   v_dw_2D  dk_ComposeTable = * p_dk_ComposeTable;
   for ( int i =0; i< (dk_ComposeTable).size()-1; i++) {
 	if (( (KMX_DWORD) dk_ComposeTable[i][0] == first) && ( (KMX_DWORD) dk_ComposeTable[i][1] == second) )
 	  return (KMX_DWORD) dk_ComposeTable[i][3];
   }
   return 0;   // _S2 what to return if not found?
-}
+}*/
 
-void find_all_dk_combinations(v_dw_2D * p_dk_ComposeTable, v_dw_2D  &dk_CombinationTable, KMX_DWORD dk) {
+void find_dk_combinations_for_single_dk(v_dw_2D * p_dk_ComposeTable, v_dw_2D  &dk_SingleTable, KMX_DWORD dk) {
+	// _S2 use return value to check if >0 lines in table
 	v_dw_2D  dk_ComposeTable = * p_dk_ComposeTable;
 	v_dw_1D line;
 	for ( int i =0; i< (dk_ComposeTable).size()-1; i++) {
@@ -27,12 +28,13 @@ void find_all_dk_combinations(v_dw_2D * p_dk_ComposeTable, v_dw_2D  &dk_Combinat
 			line.push_back(dk_ComposeTable[i][0]);
 			line.push_back(dk_ComposeTable[i][1]);
 			line.push_back(dk_ComposeTable[i][2]);
-			dk_CombinationTable.push_back(line);
+			dk_SingleTable.push_back(line);
 			line.clear();
 		}
 	}
 }
 
+// _S2 is this correct??
 KMX_DWORD KMX_changeKeynameToCapital(KMX_DWORD KVal, KMX_DWORD &shift, GdkKeymap* keymap) {
 
   guint Keyval = (guint) KVal;

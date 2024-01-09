@@ -614,6 +614,12 @@ bool KMX_ImportRules(KMX_WCHAR *kbid, LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, Gd
             continue;
           }
 
+          //_S2 to compare win-lin kmn-files skip ss6+7; MUST BE restored/removed later!!!!
+          if(ss == MenuCtrl|| ss == ShftMenuCtrl) {
+            // Alt and Shift+Alt don't work, so skip them
+            continue;
+          }
+
           KMX_DWORD SC_US = KMX_get_KeyCodeUnderlying_From_VKUS(iKey);
 
           // _S2 deadkey not finished; Ctrl, Shft +40 not tested
