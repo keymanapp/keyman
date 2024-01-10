@@ -612,8 +612,23 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
             // Merely constructing the instance is enough; it'll link into the sequence's events and
             // handle everything that remains for the backspace from here.
             handlers = [new HeldRepeater(gestureSequence, () => this.modelKeyClick(gestureKey, coord))];
-          } else if(gestureKey.key.spec.baseKeyID == "K_LOPT") {
+          } else if(gestureKey.key.spec.baseKeyID == "K_LOPT") { // globe key
             gestureSequence.on('complete', () => this.emit('globekey', gestureKey, false));
+
+            for(const identifier of Object.keys(sourceTrackingMap)) {
+              if(identifier == coordSource.identifier) {
+                // No need to cancel the current gesture; let the globe-key gesture complete.
+                continue;
+              }
+
+              // Any _other_ gesture, though - yeah, that should cancel out.
+              // Might be a _bit_ funky if there's an active modipress, but only momentarily.
+              const entry = sourceTrackingMap[identifier];
+
+              // Trigger cancellation of all other pending gestures - they're not valid after a keyboard-swap.
+              entry.source.terminate(true);
+            }
+
           }
         } else if(gestureStage.matchedId.indexOf('longpress') > -1) {
           existingPreviewHost?.cancel();
