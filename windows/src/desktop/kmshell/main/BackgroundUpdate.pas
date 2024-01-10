@@ -614,7 +614,6 @@ end;
 
 function TBackgroundUpdate.CurrentStateName: string;
 begin
-  // Implement your logic here
   Result := CurrentState.StateName;
 end;
 
@@ -675,33 +674,33 @@ end;
 
 procedure IdleState.HandleDownload;
 begin
-  // Implement your logic here
+
 end;
 
 function IdleState.HandleKmShell;
 begin
-  // Implement your logic here
+
   Result := kmShellContinue;
 end;
 
 procedure IdleState.HandleInstall;
 begin
-  // Implement your logic here
+
 end;
 
 procedure IdleState.HandleMSIInstallComplete;
 begin
-  // Implement your logic here
+
 end;
 
 procedure IdleState.HandleAbort;
 begin
-  // Implement your logic here
+
 end;
 
 function IdleState.StateName;
 begin
-  // Implement your logic here
+
   Result := 'IdleState';
 end;
 
@@ -724,7 +723,7 @@ end;
 
 procedure UpdateAvailableState.HandleCheck;
 begin
-  // Implement your logic here
+
 end;
 
 procedure UpdateAvailableState.HandleDownload;
@@ -743,22 +742,22 @@ end;
 
 procedure UpdateAvailableState.HandleInstall;
 begin
-  // Implement your logic here
+
 end;
 
 procedure UpdateAvailableState.HandleMSIInstallComplete;
 begin
-  // Implement your logic here
+
 end;
 
 procedure UpdateAvailableState.HandleAbort;
 begin
-  // Implement your logic here
+
 end;
 
 function UpdateAvailableState.StateName;
 begin
-  // Implement your logic here
+
   Result := 'UpdateAvailableState';
 end;
 
@@ -817,23 +816,20 @@ end;
 
 procedure DownloadingState.HandleInstall;
 begin
-  // Implement your logic here
   ChangeState(InstallingState);
 end;
 
 procedure DownloadingState.HandleMSIInstallComplete;
 begin
-  // Implement your logic here
+
 end;
 
 procedure DownloadingState.HandleAbort;
 begin
-  // Implement your logic here
 end;
 
 function DownloadingState.StateName;
 begin
-  // Implement your logic here
   Result := 'DownloadingState';
 end;
 
@@ -879,12 +875,12 @@ end;
 
 procedure WaitingRestartState.HandleCheck;
 begin
-  // Implement your logic here
+
 end;
 
 procedure WaitingRestartState.HandleDownload;
 begin
-  // Implement your logic here
+
 end;
 
 function WaitingRestartState.HandleKmShell;
@@ -926,22 +922,22 @@ end;
 
 procedure WaitingRestartState.HandleInstall;
 begin
-  // Implement your logic here
+
 end;
 
 procedure WaitingRestartState.HandleMSIInstallComplete;
 begin
-  // Implement your logic here
+
 end;
 
 procedure WaitingRestartState.HandleAbort;
 begin
-  // Implement your logic here
+
 end;
 
 function WaitingRestartState.StateName;
 begin
-  // Implement your logic here
+
   Result := 'WaitingRestartState';
 end;
 
@@ -1049,12 +1045,12 @@ end;
 
 procedure InstallingState.HandleCheck;
 begin
-  // Implement your logic here
+
 end;
 
 procedure InstallingState.HandleDownload;
 begin
-  // Implement your logic here
+
 end;
 
 function InstallingState.HandleKmShell;
@@ -1067,12 +1063,12 @@ end;
 
 procedure InstallingState.HandleInstall;
 begin
-  // Implement your logic here
+
 end;
 
 procedure InstallingState.HandleMSIInstallComplete;
 begin
-  // Implement your logic here
+
 end;
 
 procedure InstallingState.HandleAbort;
@@ -1082,7 +1078,7 @@ end;
 
 function InstallingState.StateName;
 begin
-  // Implement your logic here
+
   Result := 'InstallingState';
 end;
 
@@ -1101,12 +1097,12 @@ end;
 
 procedure RetryState.HandleCheck;
 begin
-  // Implement your logic here
+
 end;
 
 procedure RetryState.HandleDownload;
 begin
-  // Implement your logic here
+
 end;
 
 function RetryState.HandleKmShell;
@@ -1117,22 +1113,22 @@ end;
 
 procedure RetryState.HandleInstall;
 begin
-  // Implement your logic here
+
 end;
 
 procedure RetryState.HandleMSIInstallComplete;
 begin
-  // Implement your logic here
+
 end;
 
 procedure RetryState.HandleAbort;
 begin
-  // Implement your logic here
+
 end;
 
 function RetryState.StateName;
 begin
-  // Implement your logic here
+
   Result := 'RetryState';
 end;
 
@@ -1200,7 +1196,7 @@ end;
 
 function WaitingPostInstallState.StateName;
 begin
-  // Implement your logic here
+
   Result := 'WaitingPostInstallState';
 end;
 
