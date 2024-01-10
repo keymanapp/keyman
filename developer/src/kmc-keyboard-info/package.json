@@ -28,9 +28,6 @@
     "@keymanapp/kmc-package": "*",
     "ttfmeta": "^1.1.2"
   },
-  "bundleDependencies": [
-    "@keymanapp/developer-utils"
-  ],
   "devDependencies": {
     "@types/chai": "^4.3.5",
     "@types/mocha": "^5.2.7",

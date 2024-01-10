@@ -48,7 +48,6 @@ type
     FFileName: string;
     FProject: TProject;
     procedure LoadUser;
-    procedure LoadDefaultProjectFromFolder;
     procedure LoadProjectFromFile;   // I4698
   public
     constructor Create(AProject: TProject; AFileName: string);
@@ -66,6 +65,7 @@ uses
   Keyman.Developer.System.Project.ProjectFiles,
   Keyman.Developer.System.Project.ProjectFileType,
 
+  utildir,
   utilfiletypes;
 
 { TProjectLoader }
@@ -79,20 +79,8 @@ end;
 
 procedure TProjectLoader.Execute;   // I4698
 begin
-  if FileExists(FFileName) or (FFileName = '')
-    then LoadProjectFromFile
-    else LoadDefaultProjectFromFolder;
+  LoadProjectFromFile;
 end;
-
-procedure TProjectLoader.LoadDefaultProjectFromFolder;
-begin
-  FProject.Options.Assign(DefaultProjectOptions[pv20]);
-  if not FProject.PopulateFiles then
-    // TODO: This seems somewhat arbitrary and troublesome. Better to load the
-    //       folder and give warnings about file layout
-    raise EProjectLoader.Create('Not a Keyman Developer project folder');
-end;
-
 
 procedure TProjectLoader.LoadProjectFromFile;
 var
@@ -131,10 +119,10 @@ begin
     FProject.Options.Assign(DefaultProjectOptions[FProject.Options.Version]);
 
     if not VarIsNull(node.ChildValues['BuildPath']) then
-      FProject.Options.BuildPath := VarToStr(node.ChildValues['BuildPath']);
+      FProject.Options.BuildPath := DosSlashes(VarToStr(node.ChildValues['BuildPath']));
 
     if not VarIsNull(node.ChildValues['SourcePath']) then
-      FProject.Options.SourcePath := VarToStr(node.ChildValues['SourcePath']);
+      FProject.Options.SourcePath := DosSlashes(VarToStr(node.ChildValues['SourcePath']));
 
     if not VarIsNull(node.ChildValues['CompilerWarningsAsErrors']) then
       FProject.Options.CompilerWarningsAsErrors := node.ChildValues['CompilerWarningsAsErrors'];

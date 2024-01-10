@@ -269,89 +269,27 @@ char *debugstr(PWSTR buf) {
 
 /* Context functions */
 
-void AITIP::MergeContextWithCache(PWSTR buf, AppContext *local_context) {   // I4262
-  WCHAR tmpbuf[MAXCONTEXT], contextExDeadkeys[MAXCONTEXT];
-  local_context->Get(tmpbuf, MAXCONTEXT-1);
-
-  int n = 0;
-  PWSTR p = tmpbuf, q = contextExDeadkeys, r = buf;   // I4266
-  while(*p) {
-    if(*p == UC_SENTINEL) {
-      p += 2; // We know the only UC_SENTINEL CODE in the context is CODE_DEADKEY, which has only 1 parameter: UC_SENTINEL CODE_DEADKEY <deadkey_id>
-      n++;
-    } else {
-      *q++ = *p;
-    }
-    p++;
-  }
-  *q = 0;
-
-  if(n > 0 && wcslen(buf) > wcslen(contextExDeadkeys)) {   // I4266
-    r += wcslen(buf) - wcslen(contextExDeadkeys);
+BOOL AITIP::ReadContext(PWSTR buf) {
+  if (buf == nullptr) {
+    return FALSE;
   }
 
-  // We have to cut off the context comparison from the left by #deadkeys matched to ensure we are comparing like with like,
-  // at least when tmpbuf len=MAXCONTEXT-1 at entry.
-
-#ifdef DEBUG_MERGECONTEXT
-  char *mc1 = debugstr(buf), *mc2 = debugstr(contextExDeadkeys), *mc3 = debugstr(tmpbuf);
-
-  SendDebugMessageFormat(0, sdmAIDefault, 0, "AITIP::MergeContextWithCache TIP:'%s' Context:'%s' DKContext:'%s'",
-      mc1, mc2, mc3);
-
-  delete mc1;
-  delete mc2;
-  delete mc3;
-#endif
-
-  if(wcscmp(r, contextExDeadkeys) != 0) {
-    // context has changed, reset context
-#ifdef DEBUG_MERGECONTEXT
-    SendDebugMessageFormat(0, sdmAIDefault, 0, "AITIP::MergeContextWithCache --> load context from app (losing deadkeys)");
-#endif
-    local_context->Set(buf);
-  } else {
-#ifdef DEBUG_MERGECONTEXT
-    SendDebugMessageFormat(0, sdmAIDefault, 0, "AITIP::MergeContextWithCache --> loading cached context");
-#endif
-    wcscpy_s(buf, MAXCONTEXT, tmpbuf);
-  }
-}
-
-void AITIP::ReadContext() {
-	WCHAR buf[MAXCONTEXT];
   PKEYMAN64THREADDATA _td = ThreadGlobals();
-  if(!_td) return;
+  if(!_td) return FALSE;
 
 	if(_td->TIPGetContext && (*_td->TIPGetContext)(MAXCONTEXT-1, buf) == S_OK) {   // I3575   // I4262
     if(ShouldDebug(sdmKeyboard)) {
       SendDebugMessageFormat(0, sdmAIDefault, 0, "AITIP::ReadContext: full context [Updateable=%d] %s", _td->TIPFUpdateable, Debug_UnicodeString(buf));
     }
     useLegacy = FALSE;   // I3575
-
-    // If the text content of the context is identical, inject the deadkeys
-    // Otherwise, reset the cachedContext to match buf, no deadkeys
-
-    MergeContextWithCache(buf, context);
-
-    if(ShouldDebug(sdmKeyboard)) {
-      SendDebugMessageFormat(0, sdmAIDefault, 0, "AITIP::ReadContext: after merge [Updateable=%d] %s", _td->TIPFUpdateable, Debug_UnicodeString(buf));
-    }
-
-    context->Set(buf);
+    return TRUE;
   }	else {
     SendDebugMessageFormat(0, sdmAIDefault, 0, "AITIP::ReadContext: transitory context, so use buffered context [Updateable=%d]", _td->TIPFUpdateable);
     useLegacy = TRUE;   // I3575
+    return FALSE;
   }
 }
 
-void AITIP::CopyContext(AppContext *savedContext) {
-  savedContext->CopyFrom(context);
-}
-
-void AITIP::RestoreContextOnly(AppContext *savedContext) {
-  context->CopyFrom(savedContext);
-}
 
 /* Output actions */
 

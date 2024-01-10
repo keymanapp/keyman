@@ -288,7 +288,14 @@ uses
   Keyman.Developer.UI.Project.xmlLdmlProjectFileUI in 'project\Keyman.Developer.UI.Project.xmlLdmlProjectFileUI.pas',
   Keyman.Developer.UI.UfrmLdmlKeyboardEditor in 'child\Keyman.Developer.UI.UfrmLdmlKeyboardEditor.pas' {frmLdmlKeyboardEditor},
   dmActionsKeyboardEditor in 'actions\dmActionsKeyboardEditor.pas' {modActionsKeyboardEditor: TDataModule},
-  Keyman.Developer.UI.Project.UfrmProjectSettings in 'project\Keyman.Developer.UI.Project.UfrmProjectSettings.pas' {frmProjectSettings};
+  Keyman.Developer.UI.Project.UfrmProjectSettings in 'project\Keyman.Developer.UI.Project.UfrmProjectSettings.pas' {frmProjectSettings},
+  Keyman.Developer.System.TikeCommandLine in 'main\Keyman.Developer.System.TikeCommandLine.pas',
+  Keyman.Developer.System.MultiProcess in 'main\Keyman.Developer.System.MultiProcess.pas',
+  Keyman.Developer.System.TikeMultiProcess in 'main\Keyman.Developer.System.TikeMultiProcess.pas',
+  Keyman.System.CopyDataHelper in 'main\Keyman.System.CopyDataHelper.pas',
+  Keyman.Developer.System.ProjectOwningFile in 'main\Keyman.Developer.System.ProjectOwningFile.pas',
+  Keyman.Developer.System.Main in 'main\Keyman.Developer.System.Main.pas',
+  Keyman.Developer.System.LaunchProjects in 'main\Keyman.Developer.System.LaunchProjects.pas';
 
 {$R *.RES}
 {$R ICONS.RES}
@@ -299,40 +306,6 @@ uses
 // If you don't add this flag the rederer process will crash when you try to load large images.
 {$SetPEFlags IMAGE_FILE_LARGE_ADDRESS_AWARE}
 
-const
-  LOGGER_DEVELOPER_IDE_TIKE = TKeymanSentryClient.LOGGER_DEVELOPER_IDE + '.tike';
 begin
-  TKeymanSentryClient.Start(TSentryClientVcl, kscpDeveloper, LOGGER_DEVELOPER_IDE_TIKE);
-  try
-    try
-      CoInitFlags := COINIT_APARTMENTTHREADED;
-
-      FInitializeCEF := TCEFManager.Create;
-      try
-        if FInitializeCEF.Start then
-        begin
-          InitThemeLibrary;
-          SetThemeAppProperties(STAP_ALLOW_NONCLIENT or STAP_ALLOW_CONTROLS or STAP_ALLOW_WEBCONTENT);
-          Application.MainFormOnTaskBar := True;
-          Application.Initialize;
-          Application.Title := 'Keyman Developer';
-          Application.CreateForm(TmodWebHttpServer, modWebHttpServer);
-          try
-            Application.CreateForm(TfrmKeymanDeveloper, frmKeymanDeveloper);
-            Application.Run;
-          finally
-            FreeAndNil(frmKeymanDeveloper);
-            FreeAndNil(modWebHttpServer);
-          end;
-        end;
-      finally
-        FInitializeCEF.Free;
-      end;
-    except
-      on E:Exception do
-        SentryHandleException(E);
-    end;
-  finally
-    TKeymanSentryClient.Stop;
-  end;
+  RunKeymanDeveloper;
 end.

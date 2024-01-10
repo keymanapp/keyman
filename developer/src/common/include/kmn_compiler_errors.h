@@ -240,6 +240,8 @@
 
 #define CHINT_UnreachableRule                              0x000010AE
 
+#define CWARN_VirtualKeyInOutput                           0x000020AF
+
 #define CERR_BufferOverflow                                0x000080C0
 #define CERR_Break                                         0x000080C1
 

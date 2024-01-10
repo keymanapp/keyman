@@ -349,8 +349,6 @@ begin
     modActionsMain.actProjectNew.Execute
   else if Command = 'openproject' then
     modActionsMain.actProjectOpen.Execute
-  else if Command = 'openprojectfolder' then
-    modActionsMain.actProjectOpenFolder.Execute
   else if Command = 'editfile' then // MRU
   begin
     if SelectedMRUFileName <> '' then
@@ -442,9 +440,9 @@ begin
     pf := SelectedProjectFile;
     if Assigned(pf) then (pf.UI as TProjectFileUI).DefaultEvent(Self)   // I4687
     else if SelectedMRUFileName <> '' then
-      frmKeymanDeveloper.OpenFile(SelectedMRUFileName, True)
+      frmKeymanDeveloper.OpenFilesInProject([SelectedMRUFileName])
     else if Params.Values['name'] <> '' then
-      frmKeymanDeveloper.OpenFile(Params.Values['name'], True);
+      frmKeymanDeveloper.OpenFilesInProject([Params.Values['name']]);
   end
   else if Command = 'viewfilesource' then
   begin
