@@ -604,6 +604,78 @@ int replace_PosKey_with_Keycode(std::string  in) {
 
   return out;
 }
+
+
+int replace_KeyName_with_Keycode2(std::string  in) {
+  int out = returnIfCharInvalid;
+
+  //  these are the Scancode-Values we use in Keyman ( =  the windows scancodes+8 )
+  //  NAME IN SYMBOLS-FILE      KEYCODE (LIN STYLE)        (WIN STYLE)       VK_US      VK_DE
+                                                           /*on US keyb;*/
+  if      ( in == "key<TLDE>")    out = 49;                /*                VK_  */  // TOASK correct ???
+  else if ( in == "key<AE01>")    out = 10;                /* 0X02           VK_1 */
+  else if ( in == "key<AE02>")    out = 11;                /* 0X03           VK_2  */
+  else if ( in == "key<AE03>")    out = 12;                /* 0X04           VK_3  */
+  else if ( in == "key<AE04>")    out = 13;                /* 0X05           VK_4  */
+  else if ( in == "key<AE05>")    out = 14;                /* 0X06           VK_5  */
+  else if ( in == "key<AE06>")    out = 15;                /* 0X07           VK_6  */
+  else if ( in == "key<AE07>")    out = 16;                /* 0X08           VK_7  */
+  else if ( in == "key<AE08>")    out = 17;                /* 0X09           VK_8  */
+  else if ( in == "key<AE09>")    out = 18;                /* 0X0A           VK_9  */
+  else if ( in == "key<AE10>")    out = 19;                /* 0X0B           VK_0  */
+  else if ( in == "key<AE11>")    out = 20; /*out = 61;*/  /* 0X0C           VK_MINUS   de ẞ*/
+  else if ( in == "key<AE12>")    out = 21;                /* 0X0D           VK_EQUALS  DE ' */
+
+  else if ( in == "key<AD01>")    out = 24;                /* 0X10            VK_Q  */
+  else if ( in == "key<AD02>")    out = 25;                /* 0X11            VK_W  */
+  else if ( in == "key<AD03>")    out = 26;                /* 0X12            VK_E  */
+  else if ( in == "key<AD04>")    out = 27;                /* 0X13            VK_R  */
+  else if ( in == "key<AD05>")    out = 28;                /* 0X14            VK_T  */
+  else if ( in == "key<AD06>")    out = 29; /*out = 52;*/  /* 0X15            VK_Y  */
+  else if ( in == "key<AD07>")    out = 30;                /* 0X16            VK_U  */
+  else if ( in == "key<AD08>")    out = 31;                /* 0X17            VK_I  */
+  else if ( in == "key<AD09>")    out = 32;                /* 0X18            VK_O  */
+  else if ( in == "key<AD10>")    out = 33;                /* 0X19            VK_P  */
+  else if ( in == "key<AD11>")    out = 34; /*out = 17;*/  /* 0X1A            VK_LEFTBRACE   DE Ü */
+  else if ( in == "key<AD12>")    out = 35; /*out = 18;*/  /* 0X1B            VK_RIGHTBRACE  DE + */
+
+  else if ( in == "key<AC01>")    out = 38;                /* 0X1E            VK_A  */
+  else if ( in == "key<AC02>")    out = 39;                /* 0X1F            VK_S  */
+  else if ( in == "key<AC03>")    out = 40;                /* 0X20            VK_D  */
+  else if ( in == "key<AC04>")    out = 41;                /* 0X21            VK_F  */
+  else if ( in == "key<AC05>")    out = 42;                /* 0X22            VK_G  */
+  else if ( in == "key<AC06>")    out = 43;                /* 0X23            VK_H  */
+  else if ( in == "key<AC07>")    out = 44;                /* 0X24            VK_J  */
+  else if ( in == "key<AC08>")    out = 45;                /* 0X25            VK_K  */
+  else if ( in == "key<AC09>")    out = 46;                /* 0X26            VK_L  */
+  else if ( in == "key<AC10>")    out = 47; /*out = 59;*/  /* 0X27            VK_SEMICOLON  DE Ö*/
+  else if ( in == "key<AC11>")    out = 48; /*out = 51;*/  /* 0X28            VK_APOSTROPHE DE Ä */
+
+  else if ( in == "key<AB01>")    out = 52; /*out = 29;*/  /* 0X2C            VK_Z  */
+  else if ( in == "key<AB02>")    out = 53;                /* 0X2D            VK_X  */
+  else if ( in == "key<AB03>")    out = 54;                /* 0X2E            VK_C  */
+  else if ( in == "key<AB04>")    out = 55;                /* 0X2F            VK_V  */
+  else if ( in == "key<AB05>")    out = 56;                /* 0X30            VK_B  */
+  else if ( in == "key<AB06>")    out = 57;                /* 0X31            VK_N  */
+  else if ( in == "key<AB07>")    out = 58;                /* 0X32            VK_M  */
+  else if ( in == "key<AB08>")    out = 59;                /* 0X33            VK_ COMMA */
+  else if ( in == "key<AB09>")    out = 60;                /* 0X34            VK_DOT  */
+  else if ( in == "key<AB10>")    out = 61; /*out = 16;*/  /* 0X35            VK_SLASH  DE - */
+  else if ( in == "key<BKSL>")    out = 51;                /* 0X29            VK_BKSLASH  */
+  else if ( in == "key<LSGT>")    out = 63;                /* 0X37            VK_RIGHTSHIFT  */
+  else if ( in == "key<SPCE>")    out = 65;                /* 0X20 ?? 39?     VK_SPACE  */
+
+  return out;
+}
+
+
+/*
+KMX_DWORD KMX_get_VKUS_From_KeyCodeUnderlying( KMX_DWORD keycode) {
+    if ( keycode >7)
+      return (KMX_DWORD) ScanCodeToUSVirtualKey[keycode-8];
+  return 0;   //_S2 what to return if not found
+}*/
+
 // return RETURN NON SHIFTED CHAR [1]  the VirtualKey of the US Keyboard for given Scancode
 KMX_DWORD get_VirtualKey_Other_Layer1_From_SC(KMX_DWORD SC , v_dw_3D &All_Vector){
   // find correct row of char in US

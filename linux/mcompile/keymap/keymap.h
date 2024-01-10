@@ -505,6 +505,8 @@ const UINT ScanCodeToUSVirtualKey[128] = {
   0x00  // 0x7f => No match
 };
 
+bool IsKeymanUsedKeyVal(std::wstring Keyval);
+
 // take deadkey-value (e.g.65106) and return character (e.g. '^' )
 std::wstring convert_DeadkeyValues_ToChar(int in);
 
@@ -517,14 +519,16 @@ std::wstring KMX_get_CharsUnderlying_according_to_keycode_and_Shiftstate_GDK(Gdk
 // return the VirtualKey of the Other Keyboard for given Scancode using GDK
 KMX_DWORD KMX_get_VKUS_From_KeyCodeUnderlying_GDK( GdkKeymap *keymap, KMX_DWORD scanCode);
 
-KMX_DWORD KMX_get_VKUS_From_KeyCodeUnderlying( KMX_DWORD keycode);
-
+// return the Keycode of the Other Keyboard for given VK_US
 KMX_DWORD KMX_get_KeyCodeUnderlying_From_VKUS( KMX_DWORD VK_US);
 
+// return the Keycode of the Other Keyboard for given VK_US using GDK
 KMX_DWORD KMX_get_KeyCodeUnderlying_From_KeycodeUS_GDK(GdkKeymap *keymap, v_dw_3D &All_Vector,KMX_DWORD KC_US, ShiftState ss, int caps);
 
-bool IsKeymanUsedKeyVal(std::wstring Keyval);
-
+// converts codePoint to wstring
 std::wstring CodePointToWString(unsigned int codepoint);
+
+// converts codePoint to u16string ( _S2 ToDo is this cvorrect?)
+//std::u16string CodePointToU16String(unsigned int codepoint);
 
 # endif /*KEYMAP_H*/

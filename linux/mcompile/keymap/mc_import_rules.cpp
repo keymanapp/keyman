@@ -27,8 +27,9 @@
 #include "mc_kmxfile.h"
 #include "keymap.h"
 
-int KMX_ToUnicodeEx(guint ScanCode, const BYTE *lpKeyState, PKMX_WCHAR pwszBuff,  int shift_state, int caps, GdkKeymap *keymap =NULL);
+
 int KMX_ToUnicodeEx(guint ScanCode, const BYTE *lpKeyState, PWCHAR pwszBuff, int shift_state, int caps,GdkKeymap *keymap);
+
 const int KMX_ShiftStateMap[] = {
   ISVIRTUALKEY,
   ISVIRTUALKEY | K_SHIFTFLAG,
@@ -42,6 +43,7 @@ const int KMX_ShiftStateMap[] = {
   0
 };
 
+// _S2 ToDo open deadkey functions
 class DeadKey {
 private:
   KMX_WCHAR m_deadchar;
@@ -121,7 +123,8 @@ public:
     this->m_vk = KMX_get_VKUS_From_KeyCodeUnderlying_GDK(*keymap, scanCode);
     this->m_hkl = hkl;
     this->m_sc = scanCode;
-    // _S2 ?? memset(this->m_rgfDeadKey,0,sizeof(this->m_rgfDeadKey));
+    // _S2 ToDo deadkey
+    // memset(this->m_rgfDeadKey,0,sizeof(this->m_rgfDeadKey));
   }
 
   UINT VK() {
@@ -136,10 +139,10 @@ public:
     return m_rgss[i][j];
   }
 
-  // _S2 can go later
+  /*// _S2 can go later
   void set_sc(int i) {
     this->m_sc=i;
-  }
+  }*/
 
   std::wstring KMX_GetShiftState(ShiftState shiftState, bool capsLock) {
     return this->m_rgss[(UINT)shiftState][(capsLock ? 1 : 0)];
@@ -156,6 +159,7 @@ public:
     this->m_rgss[(UINT)shiftState][(capsLock ? 1 : 0)] = value;
   }
 
+// _S2 DESIGN NEEDED how to change those?
   bool KMX_IsSGCAPS() {
     std::wstring stBase = this->KMX_GetShiftState(Base, false);     // 0,0  a 4 ß
     std::wstring stShift = this->KMX_GetShiftState(Shft, false);    // 1,0  A $ ?
@@ -218,7 +222,7 @@ public:
     return (this->m_vk >= 0x20 && this->m_vk <= 0x5F) || (this->m_vk >= 0x88);
   }
 
-UINT KMX_GetShiftStateValue(int capslock, int caps, ShiftState ss) {
+  UINT KMX_GetShiftStateValue(int capslock, int caps, ShiftState ss) {
      //wprintf(L"GetShiftStateValue takes capslock: %i, caps: %i, ss: %i and returns: %i\n", capslock, caps, ss, KMX_ShiftStateMap[(int)ss] |
       //(capslock ? (caps ? CAPITALFLAG : NOTCAPITALFLAG) : 0));
     return 
@@ -226,11 +230,12 @@ UINT KMX_GetShiftStateValue(int capslock, int caps, ShiftState ss) {
       (capslock ? (caps ? CAPITALFLAG : NOTCAPITALFLAG) : 0);
   }
 
+  // _S2 should count OK for char AND deadkeys
   int KMX_GetKeyCount(int MaxShiftState) {
     int nkeys = 0;
 
     // Get the CAPSLOCK value
-    //_S2 not used
+    //_S2 not used in original code; can be deleted
     /*int capslock =
         (this->KMX_IsCapsEqualToShift() ? 1 : 0) |
         (this->KMX_IsSGCAPS() ? 2 : 0) |
@@ -296,7 +301,7 @@ int i4 = this->KMX_IsXxxxGrCapsEqualToXxxxShift() ? 8 : 0;
       for (int caps = 0; caps <= 1; caps++) {
         std::wstring st = this->KMX_GetShiftState((ShiftState) ss, (caps == 1));
         PKMX_WCHAR p;  // was PWSTR p;
-        PKMX_WCHAR q;
+        PKMX_WCHAR q;  // _S2 q has to go: it`s just for debugging
 
         if (st.size() == 0) {
           // No character assigned here
@@ -331,12 +336,9 @@ int i4 = this->KMX_IsXxxxGrCapsEqualToXxxxShift() ? 8 : 0;
           if(isvalid) {
             // this is different to mcompile windows !!!!
             // this->m_sc    stores SC-US = SCUnderlying
-            // this->m_vk    stores VK-US
-            // key->Key      stores VK-US
+            // this->m_vk    stores VK-US ( not underlying !!)
+            // key->Key      stores VK-US ( not underlying !!)
             // key->dpOutput stores character Underlying
-
-            // _S2 confusing: since we sort rgkey by VKUS: is SC_Underlying the right SC or SC_Underlying_gdk?? it will be clear when we look at kmx/kmn-file
-            //KMX_DWORD SC_Underlying = KMX_get_SCUnderlying_From_SCUS_VEC(All_Vector,this->SC(), ss);
 
             KMX_DWORD SC_Underlying_gdk = KMX_get_KeyCodeUnderlying_From_KeycodeUS_GDK(keymap, All_Vector,this->SC(), (ShiftState) ss,  caps);
             key->Key = KMX_get_VKUS_From_KeyCodeUnderlying_GDK( keymap, SC_Underlying_gdk);
@@ -528,8 +530,11 @@ int KMX_ToUnicodeEx(guint ScanCode, const BYTE *lpKeyState, PKMX_WCHAR pwszBuff,
     return -1;
 
   std::wstring character = KMX_get_CharsUnderlying_according_to_keycode_and_Shiftstate_GDK(keymap, ScanCode, ShiftState(shift_state), caps);
-  pwszBuff[0]= * (PWCHAR) character.c_str();
-    return  1;
+  std::string ch_str = string_from_wstring(character);
+  std::u16string ch_16 = u16string_from_string(ch_str);
+  pwszBuff[0]= * (PKMX_WCHAR) ch_16.c_str();
+
+  return  1;
 }
 
 bool KMX_ImportRules(KMX_WCHAR *kbid, LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, GdkKeymap **keymap, std::vector<KMX_DeadkeyMapping> *FDeadkeys, KMX_BOOL bDeadkeyConversion) {   // I4353   // I4552
@@ -955,18 +960,4 @@ PKMX_WCHAR KMX_incxstr(PKMX_WCHAR p) {
     p++;
   }
   return p;
-}
-
-bool IsKeymanUsedKeyVal(std::wstring Keyval) {
-
-  int KV = (int) (*Keyval.c_str());
-
-  //         32            127              196          256
-  if  ((KV >= 0x20 && KV <= 0x7F) || (KV >= 0x20 && KV <= 0x7F) || (KV >= 0xC4 && KV < 198) ||
-       (KV >= 199  && KV < 208)   || (KV >= 209  && KV < 216)   || (KV >= 217 && KV < 229)  ||
-       (KV >= 231  && KV < 240)   || (KV >= 241  && KV < 248)   || (KV >= 249 && KV < 0xFF) ||
-       (KV == 128) || (KV == 178) || (KV == 167) || (KV == 179) || (KV == 176)|| (KV == 181) )
-  return true;
-  else
-    return false;
 }

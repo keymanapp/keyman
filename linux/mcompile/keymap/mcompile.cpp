@@ -599,26 +599,6 @@ KMX_WCHAR  KMX_get_CharUnderlying_From_SCUnderlying_GDK(GdkKeymap *keymap, KMX_U
   return (KMX_WCHAR) KeyvalOther;
 }
 
-bool InitializeGDK(GdkKeymap **keymap,int argc, gchar *argv[]){
-// get keymap of keyboard layout in use
-
-  gdk_init(&argc, &argv);
-  GdkDisplay *display = gdk_display_get_default();
-  if (!display) {
-    wprintf(L"ERROR: can't get display\n");
-    return 1;
-  }
-
-  *keymap = gdk_keymap_get_for_display(display);
-  if (!keymap) {
-    wprintf(L"ERROR: Can't get keymap\n");
-    gdk_display_close(display);
-    return 2;
-  }
-
-  return 0;
-}
-
 int createOneVectorFromBothKeyboards(v_dw_3D &All_Vector,GdkKeymap *keymap){
   std::string US_language    = "us";
   const char* text_us        = "xkb_symbols \"basic\"";

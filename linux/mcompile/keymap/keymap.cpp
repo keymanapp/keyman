@@ -4,11 +4,11 @@
 
 
 int map_VKShiftState_to_Lin(int VKShiftState) {
-  if (VKShiftState == 0 )      return 0;		/* 0000 0000 */
-  if (VKShiftState == 16)      return 1;		/* 0001 0000 */
-  if (VKShiftState == 9 )      return 2;		/* 0000 1001 */
-  if (VKShiftState == 25)      return 3; 		/* 0001 1001 */
-  return VKShiftState;
+  if      (VKShiftState == 0 )      return 0;		/* 0000 0000 */
+  else if (VKShiftState == 16)      return 1;		/* 0001 0000 */
+  else if (VKShiftState == 9 )      return 2;		/* 0000 1001 */
+  else if (VKShiftState == 25)      return 3; 	/* 0001 1001 */
+  else return VKShiftState;
 }
 
 KMX_DWORD convertNamesToIntegerValue(std::wstring tok_wstr){
@@ -111,7 +111,7 @@ int write_US_ToVector( v_dw_3D &vec,std::string language, const char* text) {
   return 0;
 }
 
-bool  createCompleteRow_US(v_str_1D &complete_List, FILE* fp, const char* text, std::string language) {
+bool createCompleteRow_US(v_str_1D &complete_List, FILE* fp, const char* text, std::string language) {
   // in the Configuration file we find the appopriate paragraph between "xkb_symbol <text>" and the next xkb_symbol
   // and then copy all rows starting with "key <" to a 1D-Vector
 
@@ -146,7 +146,6 @@ bool  createCompleteRow_US(v_str_1D &complete_List, FILE* fp, const char* text, 
     }
   }
   complete_List.push_back("    key <SPCE>  { [ space,        space] };");
-  //complete_List.push_back("    key <AC12>  { [ backslash,    bar  ] };");
 
   if (complete_List.size() <1) {
     wprintf(L"ERROR: can't create row from US \n");
@@ -158,62 +157,59 @@ bool  createCompleteRow_US(v_str_1D &complete_List, FILE* fp, const char* text, 
 int replace_KeyName_with_Keycode(std::string  in) {
   int out = returnIfCharInvalid;
 
-  //  these are the Scancode-Values we use in Keyman ( =  the windows scancodes+8 )
-  //     NAME IN SYMBOLS-FILE      KEYCODE (LIN STYLE)      (WIN STYLE)       VK_US      VK_DE
-                                                        /*on US keyb;*/
-  if      ( in == "key<TLDE>")    out = 49;               /*                VK_  */  // TOASK correct ???
-  else if ( in == "key<AE01>")    out = 10;              /* 0X02           VK_1 */
-  else if ( in == "key<AE02>")    out = 11;              /* 0X03           VK_2  */
-  else if ( in == "key<AE03>")    out = 12;              /* 0X04           VK_3  */
-  else if ( in == "key<AE04>")    out = 13;              /* 0X05           VK_4  */
-  else if ( in == "key<AE05>")    out = 14;              /* 0X06           VK_5  */
-  else if ( in == "key<AE06>")    out = 15;              /* 0X07           VK_6  */
-  else if ( in == "key<AE07>")    out = 16;              /* 0X08           VK_7  */
-  else if ( in == "key<AE08>")    out = 17;              /* 0X09           VK_8  */
-  else if ( in == "key<AE09>")    out = 18;              /* 0X0A           VK_9  */
-  else if ( in == "key<AE10>")    out = 19;              /* 0X0B           VK_0  */
-  else if ( in == "key<AE11>")    out = 20; /*out = 61;*/  /* 0X0C           VK_MINUS   de ẞ*/
-  else if ( in == "key<AE12>")    out = 21;              /* 0X0D           VK_EQUALS  DE ' */
+  //  these are the Scancode-Values we use in Keyman (= windows scancodes+8 )
+  if      ( in == "key<TLDE>")    out = 49;    /* VK_                 */
+  else if ( in == "key<AE01>")    out = 10;    /* VK_1                */
+  else if ( in == "key<AE02>")    out = 11;    /* VK_2                */
+  else if ( in == "key<AE03>")    out = 12;    /* VK_3                */
+  else if ( in == "key<AE04>")    out = 13;    /* VK_4                */
+  else if ( in == "key<AE05>")    out = 14;    /* VK_5                */
+  else if ( in == "key<AE06>")    out = 15;    /* VK_6                */
+  else if ( in == "key<AE07>")    out = 16;    /* VK_7                */
+  else if ( in == "key<AE08>")    out = 17;    /* VK_8                */
+  else if ( in == "key<AE09>")    out = 18;    /* VK_9                */
+  else if ( in == "key<AE10>")    out = 19;    /* VK_0                */
+  else if ( in == "key<AE11>")    out = 20;    /* VK_MINUS   de ẞ     */
+  else if ( in == "key<AE12>")    out = 21;    /* VK_EQUALS  DE '     */
 
-  else if ( in == "key<AD01>")    out = 24;              /* 0X10            VK_Q  */
-  else if ( in == "key<AD02>")    out = 25;              /* 0X11            VK_W  */
-  else if ( in == "key<AD03>")    out = 26;              /* 0X12            VK_E  */
-  else if ( in == "key<AD04>")    out = 27;              /* 0X13            VK_R  */
-  else if ( in == "key<AD05>")    out = 28;              /* 0X14            VK_T  */
-  else if ( in == "key<AD06>")    out = 29; /*out = 52;*/  /* 0X15            VK_Y  */
-  else if ( in == "key<AD07>")    out = 30;                /* 0X16            VK_U  */
-  else if ( in == "key<AD08>")    out = 31;                /* 0X17            VK_I  */
-  else if ( in == "key<AD09>")    out = 32;                /* 0X18            VK_O  */
-  else if ( in == "key<AD10>")    out = 33;                /* 0X19            VK_P  */
-  else if ( in == "key<AD11>")    out = 34; /*out = 17;*/  /* 0X1A            VK_LEFTBRACE   DE Ü */
-  else if ( in == "key<AD12>")    out = 35; /*out = 18;*/  /* 0X1B            VK_RIGHTBRACE  DE + */
+  else if ( in == "key<AD01>")    out = 24;    /* VK_Q                */
+  else if ( in == "key<AD02>")    out = 25;    /* VK_W                */
+  else if ( in == "key<AD03>")    out = 26;    /* VK_E                */
+  else if ( in == "key<AD04>")    out = 27;    /* VK_R                */
+  else if ( in == "key<AD05>")    out = 28;    /* VK_T                */
+  else if ( in == "key<AD06>")    out = 29;    /* VK_Y                */
+  else if ( in == "key<AD07>")    out = 30;    /* VK_U                */
+  else if ( in == "key<AD08>")    out = 31;    /* VK_I                */
+  else if ( in == "key<AD09>")    out = 32;    /* VK_O                */
+  else if ( in == "key<AD10>")    out = 33;    /* VK_P                */
+  else if ( in == "key<AD11>")    out = 34;    /* VK_LEFTBRACE   DE Ü */
+  else if ( in == "key<AD12>")    out = 35;    /* VK_RIGHTBRACE  DE + */
 
-  else if ( in == "key<AC01>")    out = 38;                /* 0X1E            VK_A  */
-  else if ( in == "key<AC02>")    out = 39;                /* 0X1F            VK_S  */
-  else if ( in == "key<AC03>")    out = 40;                /* 0X20            VK_D  */
-  else if ( in == "key<AC04>")    out = 41;                /* 0X21            VK_F  */
-  else if ( in == "key<AC05>")    out = 42;                /* 0X22            VK_G  */
-  else if ( in == "key<AC06>")    out = 43;                /* 0X23            VK_H  */
-  else if ( in == "key<AC07>")    out = 44;                /* 0X24            VK_J  */
-  else if ( in == "key<AC08>")    out = 45;                /* 0X25            VK_K  */
-  else if ( in == "key<AC09>")    out = 46;                /* 0X26            VK_L  */
-  else if ( in == "key<AC10>")    out = 47; /*out = 59;*/  /* 0X27            VK_SEMICOLON  DE Ö*/
-  else if ( in == "key<AC11>")    out = 48; /*out = 51;*/  /* 0X28            VK_APOSTROPHE DE Ä */
-  //else if ( in == "key<AC12>")    out = 51; /*out = 20;*/  /* 0X29            VK_GRAVE  DE # */
+  else if ( in == "key<AC01>")    out = 38;    /* VK_A                */
+  else if ( in == "key<AC02>")    out = 39;    /* VK_S                */
+  else if ( in == "key<AC03>")    out = 40;    /* VK_D                */
+  else if ( in == "key<AC04>")    out = 41;    /* VK_F                */
+  else if ( in == "key<AC05>")    out = 42;    /* VK_G                */
+  else if ( in == "key<AC06>")    out = 43;    /* VK_H                */
+  else if ( in == "key<AC07>")    out = 44;    /* VK_J                */
+  else if ( in == "key<AC08>")    out = 45;    /* VK_K                */
+  else if ( in == "key<AC09>")    out = 46;    /* VK_L                */
+  else if ( in == "key<AC10>")    out = 47;    /* VK_SEMICOLON  DE Ö  */
+  else if ( in == "key<AC11>")    out = 48;    /* VK_APOSTROPHE DE Ä  */
 
-  else if ( in == "key<AB01>")    out = 52; /*out = 29;*/  /* 0X2C            VK_Z  */
-  else if ( in == "key<AB02>")    out = 53;                /* 0X2D            VK_X  */
-  else if ( in == "key<AB03>")    out = 54;                /* 0X2E            VK_C  */
-  else if ( in == "key<AB04>")    out = 55;                /* 0X2F            VK_V  */
-  else if ( in == "key<AB05>")    out = 56;                /* 0X30            VK_B  */
-  else if ( in == "key<AB06>")    out = 57;                /* 0X31            VK_N  */
-  else if ( in == "key<AB07>")    out = 58;                /* 0X32            VK_M  */
-  else if ( in == "key<AB08>")    out = 59;                /* 0X33            VK_ COMMA */
-  else if ( in == "key<AB09>")    out = 60;                /* 0X34            VK_DOT  */
-  else if ( in == "key<AB10>")    out = 61; /*out = 16;*/  /* 0X35            VK_SLASH  DE - */
-  else if ( in == "key<BKSL>")    out = 51;                /* 0X29            VK_BKSLASH  */
-  else if ( in == "key<LSGT>")    out = 63;                /* 0X37            VK_RIGHTSHIFT  */
-  else if ( in == "key<SPCE>")    out = 65;                /* 0X20 ?? 39?     VK_SPACE  */
+  else if ( in == "key<AB01>")    out = 52;    /* VK_Z                */
+  else if ( in == "key<AB02>")    out = 53;    /* VK_X                */
+  else if ( in == "key<AB03>")    out = 54;    /* VK_C                */
+  else if ( in == "key<AB04>")    out = 55;    /* VK_V                */
+  else if ( in == "key<AB05>")    out = 56;    /* VK_B                */
+  else if ( in == "key<AB06>")    out = 57;    /* VK_N                */
+  else if ( in == "key<AB07>")    out = 58;    /* VK_M                */
+  else if ( in == "key<AB08>")    out = 59;    /* VK_ COMMA           */
+  else if ( in == "key<AB09>")    out = 60;    /* VK_DOT              */
+  else if ( in == "key<AB10>")    out = 61;    /* VK_SLASH  DE -      */
+  else if ( in == "key<BKSL>")    out = 51;    /* VK_BKSLASH          */
+  else if ( in == "key<LSGT>")    out = 63;    /* VK_RIGHTSHIFT       */
+  else if ( in == "key<SPCE>")    out = 65;    /* VK_SPACE            */
 
   return out;
 }
@@ -232,7 +228,6 @@ int split_US_To_3D_Vector(v_dw_3D &all_US,v_str_1D completeList) {
   v_dw_1D tokens_dw;
   v_dw_2D shift_states;
   KMX_DWORD tokens_int;
-  std::wstring tok_wstr;
 
   // loop through the whole vector
   for (int k = 0; k < (int)completeList.size(); k++) {
@@ -286,13 +281,13 @@ int split_US_To_3D_Vector(v_dw_3D &all_US,v_str_1D completeList) {
   return 0;
 }
 
-v_dw_2D create_empty_2D_Vector( int dim_rows,int dim_shifts) {
+v_dw_2D create_empty_2D_Vector( int dim_rows,int dim_ss) {
 
   v_dw_1D shifts;
   v_dw_2D Vector_2D;
 
   for ( int i=0; i< dim_rows;i++) {
-    for ( int j=0; j< dim_shifts;j++) {
+    for ( int j=0; j< dim_ss;j++) {
       shifts.push_back(returnIfCharInvalid);
     }
     Vector_2D.push_back(shifts);
@@ -334,94 +329,43 @@ int append_other_ToVector(v_dw_3D &All_Vector,GdkKeymap * keymap) {
   return 0;
 }
 
-// _S2 use gdk_keymap_translate_keyboard_state instead  return s shifted + unshifted only- no altgr,...
-KMX_DWORD KMX_get_KeyvalsUnderlying_From_KeyCodeUnderlying_GDK(GdkKeymap *keymap, guint keycode, int shift_state_pos) {
-  GdkKeymapKey *maps;
-  guint *keyvals;
-  gint count;
-  KMX_DWORD out;
+bool InitializeGDK(GdkKeymap **keymap,int argc, gchar *argv[]){
+// get keymap of keyboard layout in use
 
-  if (!gdk_keymap_get_entries_for_keycode(keymap, keycode, &maps, &keyvals, &count))
-    return 0;
-  //if(!gdk_wayland_keymap_get_entries_for_keycode(keymap, keycode, &maps, &keyvals, &count))
-  //  return 0;    https://codebrowser.dev/gtk/gtk/gdk/wayland/gdkkeys-wayland.c.html
-
-// _S2 this will return 223 instaed of 7838 for UNICODE cher on DE keycode 20  ß ẞ ? ?
-
-  if (!(shift_state_pos <= count))
-    return 0;
-
-  if (!(keycode <= 94))
-    return 0;
-
-  out =(KMX_DWORD)  keyvals[shift_state_pos];
-
-  if (  (out >=  deadkey_min) && (out <=  deadkey_max) )   {
-    wprintf(L"out of range: found deadkey value out( %i) for keycode = %i /shift_state_pos %i      (49= TLDE 21= VK_EQUALS on US keyboard) \n", out,keycode,shift_state_pos);
+  gdk_init(&argc, &argv);
+  GdkDisplay *display = gdk_display_get_default();
+  if (!display) {
+    wprintf(L"ERROR: can't get display\n");
+    return 1;
   }
-  // _S2 g_free used everywhere?
-  g_free(keyvals);
-  g_free(maps);
 
-  return out;
+  *keymap = gdk_keymap_get_for_display(display);
+  if (!keymap) {
+    wprintf(L"ERROR: Can't get keymap\n");
+    gdk_display_close(display);
+    return 2;
+  }
+
+  return 0;
 }
 
-KMX_DWORD KMX_get_VKUS_From_KeyCodeUnderlying_GDK( GdkKeymap *keymap, KMX_DWORD keycode) {
+//------------------------------
+// _S2 ToDo deadkeys. Do we need this ?
+bool IsKeymanUsedKeyVal(std::wstring Keyval) {
 
-  GdkModifierType consumed;
-  GdkKeymapKey *maps;
-  guint *keyvals;
-  guint lowerCase;
-  guint upperCase;
-  gint count;
+  int KV = (int) (*Keyval.c_str());
 
-  if (!gdk_keymap_get_entries_for_keycode(keymap, keycode, &maps, &keyvals, &count))
-    return 0;
-
-  //Shift
-    //GdkModifierType MOD_Shift = (GdkModifierType) (  ~consumed & GDK_SHIFT_MASK );
-    GdkModifierType MOD_Shift = (GdkModifierType) ( GDK_SHIFT_MASK );
-    gdk_keymap_translate_keyboard_state (keymap, keycode, MOD_Shift , 0, keyvals, NULL, NULL, & consumed);
-
-    for (int i = 0; i < count; i++) {
-      if (maps[i].level > 1 || maps[i].group > 1)
-        continue;
-
-      gchar * kv_name =  gdk_keyval_name (keyvals[i]);
-
-      if ( keyvals[i]>0)
-        gdk_keyval_convert_case (*kv_name, &lowerCase, &upperCase);
-
-      // _S2 is ( lowerCase == upperCase )  true for all number keys for all keyboards?
-      if ( lowerCase == upperCase )
-        return  (KMX_DWORD)  upperCase;
-    }
-
-
-    // _S2 ToDo tidy up
-    if ( keycode >7) {
-      UINT VK_for_rgKey2 = ScanCodeToUSVirtualKey[keycode-8];
-
-    //return  (KMX_DWORD) *keyvals;}  //_S2 what to return if >255
-    return  (KMX_DWORD) VK_for_rgKey2; }
-
-  return 0;   //_S2 what to return if not found
-}
-
-KMX_DWORD KMX_get_VKUS_From_KeyCodeUnderlying( KMX_DWORD keycode) {
-    if ( keycode >7)
-      return (KMX_DWORD) ScanCodeToUSVirtualKey[keycode-8];
-  return 0;   //_S2 what to return if not found
-}
-
-KMX_DWORD KMX_get_KeyCodeUnderlying_From_VKUS( KMX_DWORD VK_US) {
-  if( VK_US > 7) {
-  KMX_DWORD test = (KMX_DWORD)(8+ USVirtualKeyToScanCode[ VK_US ]);
-    return (KMX_DWORD)(8+ USVirtualKeyToScanCode[ VK_US ]);}
+  //         32            127              196          256
+  if  ((KV >= 0x20 && KV <= 0x7F) || (KV >= 0x20 && KV <= 0x7F) || (KV >= 0xC4 && KV < 198) ||
+       (KV >= 199  && KV < 208)   || (KV >= 209  && KV < 216)   || (KV >= 217 && KV < 229)  ||
+       (KV >= 231  && KV < 240)   || (KV >= 241  && KV < 248)   || (KV >= 249 && KV < 0xFF) ||
+       (KV == 128) || (KV == 178) || (KV == 167) || (KV == 179) || (KV == 176)|| (KV == 181) )
+  return true;
   else
-    return 0;
+    return false;
 }
 
+// _S2 ToDo deadkeys.
 std::wstring convert_DeadkeyValues_ToChar(int in) {
 
   KMX_DWORD lname;
@@ -448,24 +392,36 @@ std::wstring convert_DeadkeyValues_ToChar(int in) {
   return L"\0";
 }
 
+// _S2 use gdk_keymap_translate_keyboard_state instead  return s shifted + unshifted only- no altgr,...
+KMX_DWORD KMX_get_KeyvalsUnderlying_From_KeyCodeUnderlying_GDK(GdkKeymap *keymap, guint keycode, int shift_state_pos) {
+  GdkKeymapKey *maps;
+  guint *keyvals;
+  gint count;
+  KMX_DWORD out;
 
-std::wstring CodePointToWString(unsigned int codepoint) {
-  std::wstring str;
+  if (!gdk_keymap_get_entries_for_keycode(keymap, keycode, &maps, &keyvals, &count))
+    return 0;
+  //if(!gdk_wayland_keymap_get_entries_for_keycode(keymap, keycode, &maps, &keyvals, &count))
+  //  return 0;    https://codebrowser.dev/gtk/gtk/gdk/wayland/gdkkeys-wayland.c.html
 
-  if constexpr (sizeof(wchar_t) > 2) {
-      str = static_cast<wchar_t>(codepoint);
-  }
-  else if (codepoint <= 0xFFFF) {
-      str = static_cast<wchar_t>(codepoint);
-  }
-  else {
-      codepoint -= 0x10000;
-      str.resize(2);
-      str[0] = static_cast<wchar_t>(0xD800 + ((codepoint >> 10) & 0x3FF));
-      str[1] = static_cast<wchar_t>(0xDC00 + (codepoint & 0x3FF));
-  }
+// _S2 this will return 223 instaed of 7838 for UNICODE char on DE keycode 20  ß ẞ ? ?
 
-  return str;
+  if (!(shift_state_pos <= count))
+    return 0;
+
+  if (!(keycode <= 94))
+    return 0;
+
+  out =(KMX_DWORD)  keyvals[shift_state_pos];
+
+  if (  (out >=  deadkey_min) && (out <=  deadkey_max) )   {
+    wprintf(L"out of range: found deadkey value out( %i) for keycode = %i /shift_state_pos %i      (49= TLDE 21= VK_EQUALS on US keyboard) \n", out,keycode,shift_state_pos);
+  }
+  // _S2 g_free used everywhere?
+  g_free(keyvals);
+  g_free(maps);
+
+  return out;
 }
 
 std::wstring  KMX_get_CharsUnderlying_according_to_keycode_and_Shiftstate_GDK(GdkKeymap *keymap, guint keycode, ShiftState ss, int caps  ){
@@ -540,7 +496,55 @@ std::wstring  KMX_get_CharsUnderlying_according_to_keycode_and_Shiftstate_GDK(Gd
     return  std::wstring(1, (int) *keyvals);
 }
 
+KMX_DWORD KMX_get_VKUS_From_KeyCodeUnderlying_GDK( GdkKeymap *keymap, KMX_DWORD keycode) {
 
+  GdkModifierType consumed;
+  GdkKeymapKey *maps;
+  guint *keyvals;
+  guint lowerCase;
+  guint upperCase;
+  gint count;
+
+  if (!gdk_keymap_get_entries_for_keycode(keymap, keycode, &maps, &keyvals, &count))
+    return 0;
+
+  //Shift
+    //GdkModifierType MOD_Shift = (GdkModifierType) (  ~consumed & GDK_SHIFT_MASK );
+    GdkModifierType MOD_Shift = (GdkModifierType) ( GDK_SHIFT_MASK );
+    gdk_keymap_translate_keyboard_state (keymap, keycode, MOD_Shift , 0, keyvals, NULL, NULL, & consumed);
+
+    for (int i = 0; i < count; i++) {
+      if (maps[i].level > 1 || maps[i].group > 1)
+        continue;
+
+      gchar * kv_name =  gdk_keyval_name (keyvals[i]);
+
+      if ( keyvals[i]>0)
+        gdk_keyval_convert_case (*kv_name, &lowerCase, &upperCase);
+
+      // _S2 is ( lowerCase == upperCase )  true for all number keys for all keyboards?
+      if ( lowerCase == upperCase )
+        return  (KMX_DWORD)  upperCase;
+    }
+
+
+    // _S2 ToDo tidy up
+    if ( keycode >7) {
+      UINT VK_for_rgKey2 = ScanCodeToUSVirtualKey[keycode-8];
+
+    //return  (KMX_DWORD) *keyvals;}  //_S2 what to return if >255
+    return  (KMX_DWORD) VK_for_rgKey2; }
+
+  return 0;   //_S2 what to return if not found
+}
+
+KMX_DWORD KMX_get_KeyCodeUnderlying_From_VKUS( KMX_DWORD VK_US) {
+
+  if( VK_US > 7) {
+    return (KMX_DWORD)(8+ USVirtualKeyToScanCode[ VK_US ]);}
+  else
+    return 0;
+}
 
 KMX_DWORD KMX_get_KeyCodeUnderlying_From_KeycodeUS_GDK(GdkKeymap *keymap, v_dw_3D &All_Vector,KMX_DWORD KC_US, ShiftState ss, int caps) {
 
@@ -559,3 +563,42 @@ KMX_DWORD KMX_get_KeyCodeUnderlying_From_KeycodeUS_GDK(GdkKeymap *keymap, v_dw_3
   }
   return KC_US;
 }
+
+std::wstring CodePointToWString(unsigned int codepoint) {
+  std::wstring str;
+
+  if constexpr (sizeof(wchar_t) > 2) {
+      str = static_cast<wchar_t>(codepoint);
+  }
+  else if (codepoint <= 0xFFFF) {
+      str = static_cast<wchar_t>(codepoint);
+  }
+  else {
+      codepoint -= 0x10000;
+      str.resize(2);
+      str[0] = static_cast<wchar_t>(0xD800 + ((codepoint >> 10) & 0x3FF));
+      str[1] = static_cast<wchar_t>(0xDC00 + (codepoint & 0x3FF));
+  }
+
+  return str;
+}
+
+// _S2 check if this works
+/*std::u16string CodePointToU16String(unsigned int codepoint) {
+  std::u16string str;
+
+  if constexpr (sizeof(wchar_t) > 2) {
+      str = static_cast<char16_t>(codepoint);
+  }
+  else if (codepoint <= 0xFFFF) {
+      str = static_cast<char16_t>(codepoint);
+  }
+  else {
+      codepoint -= 0x10000;
+      str.resize(2);
+      str[0] = static_cast<wchar_t>(0xD800 + ((codepoint >> 10) & 0x3FF));
+      str[1] = static_cast<wchar_t>(0xDC00 + (codepoint & 0x3FF));
+  }
+
+  return str;
+}*/
