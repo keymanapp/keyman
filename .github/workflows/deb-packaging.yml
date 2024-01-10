@@ -216,6 +216,7 @@ jobs:
           while ((i <= max_retries)); do
             dput ${upload_log} ${hosttarget} "$@" 2>&1 | tee ${tmpfile}
             retval=$?
+            echo "dput exited with ${retval}"
             if ! grep -q "ssh: Could not resolve hostname package-drop.psonet: Name or service not known" ${tmpfile}; then
               rm ${tmpfile}
               if ((retval != 0)); then
