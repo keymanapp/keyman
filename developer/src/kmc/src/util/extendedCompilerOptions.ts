@@ -15,6 +15,18 @@ export interface ExtendedCompilerOptions extends CompilerOptions {
   messageOverrides?: CompilerMessageOverrideMap;
 };
 
+/**
+ * converts an --message command line parameter `<id>[:level]` and verifies that
+ * it is a valid message, returning `null` if it is not a valid id or level. If
+ * level is omitted, the message is disabled. Valid levels are Disable, Info,
+ * Hint, Warn or Error (can shorten or first character of each).
+ *
+ * Will report details of any errors to callbacks.reportMessage
+ * @param message    command line parameter in format '["KM"]<id>[":"level]'
+ * @param callbacks
+ * @returns  CompilerMessageOverride map with the new severity level for the
+ * message; or `null` if parameter is invalid.
+ */
 function commandOptionsMessageToCompilerOptionsMessage(message: string, callbacks: CompilerCallbacks): CompilerMessageOverride {
   const pattern = /^(KM)?([0-9a-f]+)(:(D|Disable|I|Info|H|Hint|W|Warn|E|Error))?$/i;
   const result = message.match(pattern);
@@ -40,7 +52,7 @@ function commandOptionsMessageToCompilerOptionsMessage(message: string, callback
 
 function commandOptionsMessagesToCompilerOptionsMessages(messages: any, callbacks: CompilerCallbacks): CompilerMessageOverrideMap {
   if(!messages || !Array.isArray(messages)) {
-    return [];
+    return {};
   }
 
   const result: CompilerMessageOverrideMap = {};
@@ -54,6 +66,13 @@ function commandOptionsMessagesToCompilerOptionsMessages(messages: any, callback
   return result;
 }
 
+/**
+ * Verifies that a given message is valid and that the severity is allowed to be
+ * modified (Info, Hint and Warn only -- Error and Fatal cannot be modified)
+ * @param override
+ * @param callbacks
+ * @returns true if the message can be overridden
+ */
 function checkMessageOverride(override: CompilerMessageOverride, callbacks: CompilerCallbacks) {
   const namespace = CompilerError.namespace(override.code);
   if(!messageNamespaceKeys.includes(namespace)) {
@@ -85,15 +104,21 @@ function checkMessageOverride(override: CompilerMessageOverride, callbacks: Comp
   return true;
 }
 
+/**
+ * Maps command line compiler options to the compiler API options.
+ * @param options
+ * @param callbacks
+ * @returns
+ */
 export function commandOptionsToCompilerOptions(options: any, callbacks: CompilerCallbacks): ExtendedCompilerOptions {
-  // We don't want to rename command line options to match the precise
-  // properties that we have in CompilerOptions, but nor do we want to rename
-  // CompilerOptions properties...
   const overrides = commandOptionsMessagesToCompilerOptionsMessages(options.message, callbacks);
   if(!overrides) {
     return null;
   }
 
+  // We don't want to rename command line options to match the precise
+  // properties that we have in CompilerOptions, but nor do we want to rename
+  // CompilerOptions properties...
   return {
     // CompilerBaseOptions
     logLevel: options.logLevel,
