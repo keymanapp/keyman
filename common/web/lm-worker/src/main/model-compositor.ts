@@ -65,7 +65,7 @@ export default class ModelCompositor {
     return returnedPredictions;
   }
 
-  predict(transformDistribution: Transform | Distribution<Transform>, context: Context): Suggestion[] {
+  async predict(transformDistribution: Transform | Distribution<Transform>, context: Context): Promise<Suggestion[]> {
     let suggestionDistribution: Distribution<Suggestion> = [];
     let lexicalModel = this.lexicalModel;
     let punctuation = this.punctuation;
@@ -651,19 +651,21 @@ export default class ModelCompositor {
     return reversion;
   }
 
-  applyReversion(reversion: Reversion, context: Context): Suggestion[] {
+  async applyReversion(reversion: Reversion, context: Context): Promise<Suggestion[]> {
     // If we are unable to track context (because the model does not support LexiconTraversal),
     // we need a "fallback" strategy.
     let compositor = this;
     let fallbackSuggestions = function() {
       let revertedContext = models.applyTransform(reversion.transform, context);
-      let suggestions = compositor.predict({insert: '', deleteLeft: 0}, revertedContext);
-      suggestions.forEach(function(suggestion) {
-        // A reversion's transform ID is the additive inverse of its original suggestion;
-        // we revert to the state of said original suggestion.
-        suggestion.transformId = -reversion.transformId;
+      return compositor.predict({insert: '', deleteLeft: 0}, revertedContext).then((suggestions) => {
+        suggestions.forEach(function(suggestion) {
+          // A reversion's transform ID is the additive inverse of its original suggestion;
+          // we revert to the state of said original suggestion.
+          suggestion.transformId = -reversion.transformId;
+        });
+
+        return suggestions;
       });
-      return suggestions;
     }
 
     if(!this.contextTracker) {
