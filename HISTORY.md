@@ -42,7 +42,7 @@
 
 * fix(mac): Improve detection of non-compliant apps (#10282)
 * fix(web): default multitap logic for shift-layer shift multitaps (#10281)
-*  (#10284)
+* fix(web): keyboard functionality on Android 5.0 / Chrome 35 (#10284)
 
 ## 17.0.233 alpha 2023-12-19
 
@@ -52,7 +52,7 @@
 
 ## 17.0.232 alpha 2023-12-18
 
-*  (#10270)
+* feat(web): adds highlighting to BKSP while held (#10270)
 
 ## 17.0.231 alpha 2023-12-15
 
