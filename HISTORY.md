@@ -1,5 +1,15 @@
 # Keyman Version History
 
+## 17.0.241 alpha 2024-01-10
+
+* chore(deps-dev): bump follow-redirects from 1.14.9 to 1.15.4 (#10340)
+* Update character-map.md (#10345)
+* chore(linux): Output dput exit code after upload to llso (#10349)
+* fix(android/engine): Use fallback keyboard if keyboard index undefined (#10342)
+* fix(android): Use alert dialog when package is missing touch keyboards (#10335)
+* chore: cleanup recent history entries without PR title (#10298)
+* chore(web): better logging for gesture-recognizer tools build script (#10329)
+
 ## 17.0.240 alpha 2024-01-09
 
 * chore(linux): Retry llso upload (#10331)
