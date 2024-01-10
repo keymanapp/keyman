@@ -180,6 +180,7 @@ const
 
   SRegValue_Install_Update             = 'install update';
   SRegValue_Update_State               = 'update state';
+  SRegValue_Install_Mode               = 'install mode';
 
   { Privacy }
 

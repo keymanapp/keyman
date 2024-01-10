@@ -98,6 +98,7 @@ type
     procedure HandleInstall; virtual; abstract;
     procedure HandleMSIInstallComplete; virtual; abstract;
     procedure HandleAbort; virtual; abstract;
+    procedure HandleInstallNow; virtual; abstract;
 
     // For convenience
     function StateName: string; virtual; abstract;
@@ -111,10 +112,11 @@ type
     procedure Exit; override;
     procedure HandleCheck; override;
     procedure HandleDownload; override;
-    function HandleKmShell : Integer; override;
+    function  HandleKmShell : Integer; override;
     procedure HandleInstall; override;
     procedure HandleMSIInstallComplete; override;
     procedure HandleAbort; override;
+    procedure HandleInstallNow; override;
     function StateName: string; override;
   end;
 
@@ -124,10 +126,11 @@ type
     procedure Exit; override;
     procedure HandleCheck; override;
     procedure HandleDownload; override;
-    function HandleKmShell : Integer; override;
+    function  HandleKmShell : Integer; override;
     procedure HandleInstall; override;
     procedure HandleMSIInstallComplete; override;
     procedure HandleAbort; override;
+    procedure HandleInstallNow; override;
     function StateName: string; override;
   end;
 
@@ -143,6 +146,7 @@ type
     procedure HandleInstall; override;
     procedure HandleMSIInstallComplete; override;
     procedure HandleAbort; override;
+    procedure HandleInstallNow; override;
     function StateName: string; override;
   end;
 
@@ -156,6 +160,7 @@ type
     procedure HandleInstall; override;
     procedure HandleMSIInstallComplete; override;
     procedure HandleAbort; override;
+    procedure HandleInstallNow; override;
     function StateName: string; override;
   end;
 
@@ -181,6 +186,7 @@ type
     procedure HandleInstall; override;
     procedure HandleMSIInstallComplete; override;
     procedure HandleAbort; override;
+    procedure HandleInstallNow; override;
     function StateName: string; override;
   end;
 
@@ -194,6 +200,7 @@ type
     procedure HandleInstall; override;
     procedure HandleMSIInstallComplete; override;
     procedure HandleAbort; override;
+    procedure HandleInstallNow; override;
     function StateName: string; override;
   end;
 
@@ -207,6 +214,7 @@ type
     procedure HandleInstall; override;
     procedure HandleMSIInstallComplete; override;
     procedure HandleAbort; override;
+    procedure HandleInstallNow; override;
     function StateName: string; override;
   end;
 
@@ -254,6 +262,7 @@ type
     function checkUpdateSchedule : Boolean;
 
     function SetRegistryState (Update : TUpdateState): Boolean;
+    function SetRegistryInstallMode (InstallMode : Boolean): Boolean;
 
   protected
   property State: TStateClass read GetState write SetState;
@@ -268,10 +277,12 @@ type
     procedure   HandleInstall;
     procedure   HandleMSIInstallComplete;
     procedure   HandleAbort;
+    procedure   HandleInstallNow;
     function    CurrentStateName: string;
 
     property ShowErrors: Boolean read FShowErrors write FShowErrors;
     function CheckRegistryState : TUpdateState;
+    function CheckRegistryInstallMode : Boolean;
 
   end;
 
@@ -459,6 +470,57 @@ begin
   Result := UpdateState;
 end;
 
+function TBackgroundUpdate.SetRegistryInstallMode (InstallMode : Boolean): Boolean;
+var
+  InstallModeStr : string;
+begin
+
+  Result := False;
+  with TRegistryErrorControlled.Create do
+  try
+    RootKey := HKEY_LOCAL_MACHINE;
+    KL.Log('SetRegistryState State Entry');
+    if OpenKey(SRegKey_KeymanEngine_LM, True) then
+    begin
+        InstallModeStr := BoolToStr(InstallMode, True);
+        WriteString(SRegValue_Install_Mode, InstallModeStr);
+        KL.Log('SetRegistryInstallMode is:[' + InstallModeStr + ']');
+    end;
+    Result := True;
+  finally
+      Free;
+  end;
+
+end;
+
+function TBackgroundUpdate.CheckRegistryInstallMode : Boolean;
+var
+  InstallMode : Boolean;
+
+begin
+  // We will use a registry flag to maintain the install mode background/foreground
+
+  InstallMode := False;
+  // check the registry value
+  with TRegistryErrorControlled.Create do  // I2890
+  try
+    RootKey := HKEY_LOCAL_MACHINE;
+    if OpenKeyReadOnly(SRegKey_KeymanEngine_LM) and ValueExists(SRegValue_Install_Mode) then
+      begin
+        InstallMode := StrToBool(ReadString(SRegValue_Install_Mode));
+        KL.Log('CheckRegistryState State is:[' + ReadString(SRegValue_Update_State) + ']');
+      end
+    else
+      begin
+          InstallMode := False; // default to background
+          KL.Log('CheckRegistryInstallMode reg value not found default:[ False ]');
+      end
+    finally
+      Free;
+  end;
+  Result := InstallMode;
+end;
+
 
 
 //function TBackgroundUpdate.IsKeymanRunning: Boolean;  // I2329
@@ -612,6 +674,11 @@ begin
   CurrentState.HandleAbort;
 end;
 
+procedure TBackgroundUpdate.HandleInstallNow;
+begin
+  CurrentState.HandleInstallNow;
+end;
+
 function TBackgroundUpdate.CurrentStateName: string;
 begin
   // Implement your logic here
@@ -699,6 +766,12 @@ begin
   // Implement your logic here
 end;
 
+procedure IdleState.HandleInstallNow;
+begin
+  bucStateContext.SetRegistryInstallMode(True);
+  bucStateContext.CurrentState.HandleCheck;
+end;
+
 function IdleState.StateName;
 begin
   // Implement your logic here
@@ -713,7 +786,7 @@ begin
   bucStateContext.SetRegistryState(usUpdateAvailable);
   if bucStateContext.FAuto then
   begin
-    bucStateContext.CurrentState.HandleDownload ;
+    bucStateContext.CurrentState.HandleDownload;
   end;
 end;
 
@@ -754,6 +827,12 @@ end;
 procedure UpdateAvailableState.HandleAbort;
 begin
   // Implement your logic here
+end;
+
+procedure UpdateAvailableState.HandleInstallNow;
+begin
+  bucStateContext.SetRegistryInstallMode(True);
+  ChangeState(DownloadingState);
 end;
 
 function UpdateAvailableState.StateName;
@@ -829,6 +908,12 @@ end;
 procedure DownloadingState.HandleAbort;
 begin
   // Implement your logic here
+end;
+
+procedure DownloadingState.HandleInstallNow;
+begin
+  bucStateContext.SetRegistryInstallMode(True);
+  // Continue downloading
 end;
 
 function DownloadingState.StateName;
@@ -937,6 +1022,14 @@ end;
 procedure WaitingRestartState.HandleAbort;
 begin
   // Implement your logic here
+end;
+
+procedure WaitingRestartState.HandleInstallNow;
+begin
+  bucStateContext.SetRegistryInstallMode(True);
+  // Notify User to install
+  ChangeState(InstallingState);
+
 end;
 
 function WaitingRestartState.StateName;
@@ -1080,6 +1173,11 @@ begin
   ChangeState(IdleState);
 end;
 
+procedure InstallingState.HandleInstallNow;
+begin
+  // Do Nothing. Need the UI to let user know installation in progress OR
+end;
+
 function InstallingState.StateName;
 begin
   // Implement your logic here
@@ -1128,6 +1226,13 @@ end;
 procedure RetryState.HandleAbort;
 begin
   // Implement your logic here
+end;
+
+procedure RetryState.HandleInstallNow;
+begin
+  bucStateContext.SetRegistryInstallMode(True);
+  // TODO: #10038 handle retry counts
+  ChangeState(InstallingState);
 end;
 
 function RetryState.StateName;
@@ -1196,6 +1301,11 @@ end;
 procedure WaitingPostInstallState.HandleAbort;
 begin
   // Handle Abort
+end;
+
+procedure WaitingPostInstallState.HandleInstallNow;
+begin
+  // Do nothing as files will be cleaned via HandleKmShell
 end;
 
 function WaitingPostInstallState.StateName;
