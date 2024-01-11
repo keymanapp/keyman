@@ -23,7 +23,10 @@ export const MATCH_HEX_ESCAPE = /\\u{([0-9a-fA-F ]{1,})}/g;
 // const MATCH_HEX_ESCAPE = /\\u{((?:(?:[0-9a-fA-F]{1,5})|(?:10[0-9a-fA-F]{4})(?: (?!}))?)+)}/g;
 
 /** regex for single quad escape such as \u0127 */
-export const MATCH_QUAD_ESCAPE = /\\u([0-9a-fA-F]{4})/g;
+export const CONTAINS_QUAD_ESCAPE = /\\u([0-9a-fA-F]{4})/;
+
+/** regex for single quad escape such as \u0127 */
+export const MATCH_QUAD_ESCAPE = new RegExp(CONTAINS_QUAD_ESCAPE, 'g');
 
 export class UnescapeError extends Error {
 }
@@ -54,6 +57,13 @@ export function unescapeOneQuadString(s: string): string {
   s = s.replace(MATCH_QUAD_ESCAPE, processMatch);
   return s;
 }
+
+/** unscape multiple occurences of \u0127 style strings */
+export function unescapeQuadString(s: string): string {
+  s = s.replaceAll(MATCH_QUAD_ESCAPE, (quad) => unescapeOneQuadString(quad));
+  return s;
+}
+
 
 /**
  * Unescapes a string according to UTS#18§1.1, see <https://www.unicode.org/reports/tr18/#Hex_notation>
@@ -96,6 +106,10 @@ export function hexQuad(n: number): string {
   return n.toString(16).padStart(4, '0');
 }
 
+/** escape one char for regex in \uXXXX form */
+function escapeRegexChar(ch: string) {
+  return '\\u' + hexQuad(ch.charCodeAt(0));
+}
 
 /**
  * Unescape one codepoint to \u format
@@ -104,8 +118,8 @@ export function hexQuad(n: number): string {
  */
 function regexOne(hex: string): string {
   const unescaped = unescapeOne(hex);
-  // unescape as UTF-16
-  return unescaped.split('').map(ch => '\\u' + hexQuad(ch.charCodeAt(0))).join('');
+  // unescape as UTF-16 code units
+  return unescaped.split('').map(ch => escapeRegexChar(ch)).join('');
 }
 /**
  * Unescapes a string according to UTS#18§1.1, see <https://www.unicode.org/reports/tr18/#Hex_notation>
