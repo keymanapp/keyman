@@ -127,20 +127,35 @@ typedef KMX_UCHAR* KMX_PUCHAR;
 #define VK_CANCEL   0x09
 #define VK_DECIMAL  0x5B*/
 
-// _S2 correct?? Do I need NUMPAD??
-#define VK_NUMPAD0  96
-#define VK_NUMPAD1  97
-#define VK_NUMPAD2  98
-#define VK_NUMPAD3  99
-#define VK_NUMPAD4  100
-#define VK_NUMPAD5  101
-#define VK_NUMPAD6  102
-#define VK_NUMPAD7  103
-#define VK_NUMPAD8  104
-#define VK_NUMPAD9  105
-#define VK_DIVIDE   111
+// _S2 correct?? ??
+
+#define VK_NUMPAD0  0x60
+#define VK_NUMPAD1  0x61
+#define VK_NUMPAD2  0x62
+#define VK_NUMPAD3  0x63
+#define VK_NUMPAD4  0x64
+#define VK_NUMPAD5  0x65
+#define VK_NUMPAD6  0x66
+#define VK_NUMPAD7  0x67
+#define VK_NUMPAD8  0x68
+#define VK_NUMPAD9  0x69
+
+
+// _S2 correct?? ??
+/*#define VK_NUMPAD0  0x2D
+#define VK_NUMPAD1  0x23
+#define VK_NUMPAD2  0x28
+#define VK_NUMPAD3  0x22
+#define VK_NUMPAD4  0x25
+#define VK_NUMPAD5  0x0C
+#define VK_NUMPAD6  0x27
+#define VK_NUMPAD7  0x24
+#define VK_NUMPAD8  0x26
+#define VK_NUMPAD9  0x21*/
+
+#define VK_DIVIDE   0x6F
 #define VK_CANCEL   3
-#define VK_DECIMAL  110
+#define VK_DECIMAL  0x2E
 
 #define VK_OEM_CLEAR      0xFE
 #define VK_LSHIFT         0xA0

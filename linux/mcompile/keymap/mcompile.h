@@ -47,9 +47,7 @@ KMX_WCHAR KMX_get_CharUnderlying_From_SCUnderlying_GDK(GdkKeymap *keymap, KMX_UI
 // _S2 this is used in code for deadkeys and should be removed later
 KMX_WCHAR KMX_get_KVUS_From_KVUnderlying_VEC(v_dw_3D All_Vector,KMX_DWORD SC_US);
 
-
 int KMX_GetDeadkeys(v_dw_2D & dk_Table, KMX_WORD DeadKey, KMX_WORD *OutputPairs, GdkKeymap* keymap);
-
 
 //--------------------old 
 /*

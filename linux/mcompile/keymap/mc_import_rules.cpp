@@ -113,18 +113,18 @@ private:
 
 public:
 
-  KMX_VirtualKey(UINT scanCode, KMX_HKL hkl, v_dw_3D All_Vector, GdkKeymap **keymap) {
-    this->m_vk = KMX_get_VKUS_From_KeyCodeUnderlying_GDK(*keymap, scanCode);
+  KMX_VirtualKey(KMX_HKL hkl,UINT virtualKey, GdkKeymap **keymap) {
+    this->m_sc=KMX_get_SCUnderlying_From_VKUS(virtualKey);
     this->m_hkl = hkl;
-    this->m_sc = scanCode;
-  }
-
-  KMX_VirtualKey(KMX_HKL hkl,UINT scanCode,  v_dw_3D All_Vector, GdkKeymap **keymap) {
-    this->m_vk = KMX_get_VKUS_From_KeyCodeUnderlying_GDK(*keymap, scanCode);
-    this->m_hkl = hkl;
-    this->m_sc = scanCode;
+    this->m_vk = virtualKey;
     // _S2 ToDo deadkey
     // memset(this->m_rgfDeadKey,0,sizeof(this->m_rgfDeadKey));
+  }
+
+  KMX_VirtualKey(UINT scanCode, KMX_HKL hkl, GdkKeymap **keymap) {
+    this->m_vk = KMX_get_VKUS_From_KeyCodeUnderlying_GDK(*keymap, scanCode);
+    this->m_hkl = hkl;
+    this->m_sc = scanCode;
   }
 
   UINT VK() {
@@ -301,7 +301,6 @@ int i4 = this->KMX_IsXxxxGrCapsEqualToXxxxShift() ? 8 : 0;
       for (int caps = 0; caps <= 1; caps++) {
         std::wstring st = this->KMX_GetShiftState((ShiftState) ss, (caps == 1));
         PKMX_WCHAR p;  // was PWSTR p;
-        PKMX_WCHAR q;  // _S2 q has to go: it`s just for debugging
 
         if (st.size() == 0) {
           // No character assigned here
@@ -348,7 +347,6 @@ int i4 = this->KMX_IsXxxxGrCapsEqualToXxxxShift() ? 8 : 0;
             key->dpContext = new KMX_WCHAR; *key->dpContext = 0;
             p = key->dpOutput = new KMX_WCHAR[st.size() + 1];
             for(size_t ich = 0; ich < st.size(); ich++) {
-              q=p;
               *p++ = st[ich];
             }
             *p = 0;
@@ -489,7 +487,6 @@ public:
 
   void KMX_ClearKeyboardBuffer() {
     KMX_WCHAR sb[16];
-    int rc = 0;
     for( int i=0; i<16; i++) {
       sb[i] = L'\0';
     }
@@ -523,7 +520,7 @@ int KMX_ToUnicodeEx(guint ScanCode, const BYTE *lpKeyState, PKMX_WCHAR pwszBuff,
 
 bool KMX_ImportRules(LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, GdkKeymap **keymap, std::vector<KMX_DeadkeyMapping> *FDeadkeys, KMX_BOOL bDeadkeyConversion) {   // I4353   // I4552
   KMX_Loader loader;
-  const size_t BUF_sz= 256;
+
 
   KMX_HKL hkl = NULL;               //_S2 added: but can I do this?? hkl is not needed in Linux??
 
@@ -543,7 +540,7 @@ bool KMX_ImportRules(LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, GdkKeymap **keymap,
     // Linux cant get a VK for the US Keyboard using USVirtualKeyToScanCode/ScanCodeToUSVirtualKey
     // Linux cannot get a VK for the underling Keyboard
     // this "connection" is possible only while using All_Vector
-    KMX_VirtualKey *key = new KMX_VirtualKey(sc, hkl, All_Vector, keymap);
+    KMX_VirtualKey *key = new KMX_VirtualKey(sc, hkl, keymap);
 
    if((key->VK() != 0) ) {
         rgKey[key->VK()] = key;
@@ -553,12 +550,18 @@ bool KMX_ImportRules(LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, GdkKeymap **keymap,
   }
 
   for(UINT ke = VK_NUMPAD0; ke <= VK_NUMPAD9; ke++) {
-      rgKey[ke] = new KMX_VirtualKey(hkl, ke, All_Vector, keymap);
+      rgKey[ke] = new KMX_VirtualKey(hkl, ke, keymap);
   }
 
-  rgKey[VK_DIVIDE] = new KMX_VirtualKey(hkl, VK_DIVIDE, All_Vector, keymap);
-  rgKey[VK_CANCEL] = new KMX_VirtualKey(hkl, VK_CANCEL, All_Vector, keymap);
-  rgKey[VK_DECIMAL] = new KMX_VirtualKey(hkl, VK_DECIMAL, All_Vector, keymap);
+  /*UINT Val_VK_NUMPAD0[] = {45,35,40,34,37,12,39,36,38,33, 0xFFFF};
+  for (int i = 0; Val_VK_NUMPAD0[i] != 0xFFFF; i++) {
+      rgKey[Val_VK_NUMPAD0[i] ] = new KMX_VirtualKey(hkl, Val_VK_NUMPAD0[i] , keymap);
+  }*/
+
+  // _S2 ???? which numbers for VK_DIVIDE, VK_CANCEL, VK_DECIMAL ?
+  rgKey[VK_DIVIDE] = new KMX_VirtualKey(hkl, VK_DIVIDE, keymap);
+  rgKey[VK_CANCEL] = new KMX_VirtualKey(hkl, VK_CANCEL, keymap);
+  rgKey[VK_DECIMAL] = new KMX_VirtualKey(hkl, VK_DECIMAL, keymap);
 
   /*
   // _S2 RALT <-> SHIFT CTRL Problem from here??

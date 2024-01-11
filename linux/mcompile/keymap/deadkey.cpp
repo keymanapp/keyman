@@ -23,7 +23,7 @@ void find_dk_combinations_for_single_dk(v_dw_2D * p_dk_ComposeTable, v_dw_2D  &d
 	// _S2 use return value to check if >0 lines in table
 	v_dw_2D  dk_ComposeTable = * p_dk_ComposeTable;
 	v_dw_1D line;
-	for ( int i =0; i< (dk_ComposeTable).size()-1; i++) {
+	for ( int i =0; i< (int) dk_ComposeTable.size()-1; i++) {
 		if ( dk_ComposeTable[i][0] == dk) {
 			line.push_back(dk_ComposeTable[i][0]);
 			line.push_back(dk_ComposeTable[i][1]);

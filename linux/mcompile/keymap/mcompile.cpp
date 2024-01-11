@@ -491,7 +491,7 @@ void KMX_LogError(const KMX_WCHART* m1,int m2, LPKMX_KEY key) {
 }
 */
 
-// takes SC of US keyboard and returns SC of OTHER keyboard
+// takes VK of US keyboard and returns SC of OTHER keyboard
 UINT  KMX_get_SCUnderlying_From_VKUS(KMX_DWORD VirtualKeyUS) {
   UINT SC_US = 8 + USVirtualKeyToScanCode[VirtualKeyUS];
   UINT SC_OTHER = SC_US;  // not neccessary but to understand what we do
@@ -595,7 +595,6 @@ int KMX_GetDeadkeys(v_dw_2D & dk_Table, KMX_WORD DeadKey, KMX_WORD *OutputPairs,
   *p = 0;
   return (p-OutputPairs);
 }
-
 
 // ---- old copy code from here ----------------------------------------------------------
 
