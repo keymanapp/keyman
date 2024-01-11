@@ -57,6 +57,7 @@ kmx_files = files(
   'jsonpp.cpp',
   'ldml/ldml_processor.cpp',
   'ldml/ldml_transforms.cpp',
+  'ldml/ldml_markers.cpp',
   'ldml/ldml_vkeys.cpp',
   'mock/mock_processor.cpp',
   'kmx/kmx_consts.cpp',

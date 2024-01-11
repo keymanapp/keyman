@@ -8,6 +8,8 @@
 #include <fstream>
 #include <algorithm>
 #include "ldml/ldml_processor.hpp"
+#include "ldml/ldml_transforms.hpp"
+#include "ldml/ldml_markers.hpp"
 #include "state.hpp"
 #include "kmx_file.h"
 #include "kmx/kmx_plus.h"
