@@ -88,6 +88,58 @@ export function unescapeString(s: string): string {
   return s;
 }
 
+/** 0000 … FFFF */
+export function hexQuad(n: number): string {
+  if (n < 0x000 || n > 0xFFFF) {
+    throw RangeError(`${n} not in [0x0000,0xFFFF]`);
+  }
+  return n.toString(16).padStart(4, '0');
+}
+
+
+/**
+ * Unescape one codepoint to \u format
+ * @param hex one codepoint in hex, such as '0127'
+ * @returns the unescaped codepoint
+ */
+function regexOne(hex: string): string {
+  const unescaped = unescapeOne(hex);
+  // unescape as UTF-16
+  return unescaped.split('').map(ch => '\\u' + hexQuad(ch.charCodeAt(0))).join('');
+}
+/**
+ * Unescapes a string according to UTS#18§1.1, see <https://www.unicode.org/reports/tr18/#Hex_notation>
+ * @param s escaped string
+ * @returns
+ */
+export function unescapeStringToRegex(s: string): string {
+  if(!s) {
+    return s;
+  }
+  try {
+    /**
+     * process one regex match
+     * @param str ignored
+     * @param matched the entire match such as '0127' or '22 22'
+     * @returns the unescaped match
+     */
+    function processMatch(str: string, matched: string) : string {
+      const codepoints = matched.split(' ');
+      const unescaped = codepoints.map(regexOne);
+      return unescaped.join('');
+    }
+    s = s.replaceAll(MATCH_HEX_ESCAPE, processMatch);
+  } catch(e) {
+    if (e instanceof RangeError) {
+      throw new UnescapeError(`Out of range while unescaping '${s}': ${e.message}`, { cause: e });
+      /* c8 ignore next 3 */
+    } else {
+      throw e; // pass through some other error
+    }
+  }
+  return s;
+}
+
 /** True if this string *could* be a UTF-32 single char */
 export function
 isOneChar(value: string) : boolean {

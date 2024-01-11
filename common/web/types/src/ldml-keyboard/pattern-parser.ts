@@ -3,7 +3,7 @@
  */
 
 import { constants } from "@keymanapp/ldml-keyboard-constants";
-import { MATCH_QUAD_ESCAPE, isOneChar, unescapeOneQuadString, unescapeString } from "../util/util.js";
+import { MATCH_QUAD_ESCAPE, isOneChar, unescapeOneQuadString, unescapeString, hexQuad } from "../util/util.js";
 
 
 /**
@@ -65,17 +65,9 @@ export class MarkerParser {
   /** Max count of markers */
   public static readonly MAX_MARKER_COUNT = constants.marker_max_count;
 
-  /** 0000 … FFFF */
-  private static hexQuad(n: number): string {
-    if (n < 0x000 || n > 0xFFFF) {
-      throw RangeError(`${n} not in [0x0000,0xFFFF]`);
-    }
-    return n.toString(16).padStart(4, '0');
-  }
-
   private static anyMarkerMatch() : string {
-    const start = MarkerParser.hexQuad(this.MIN_MARKER_INDEX);
-    const end   = MarkerParser.hexQuad(this.MAX_MARKER_INDEX);
+    const start = hexQuad(this.MIN_MARKER_INDEX);
+    const end   = hexQuad(this.MAX_MARKER_INDEX);
     return `${this.SENTINEL}${this.MARKER_CODE}[\\u${start}-\\u${end}]`; // TODO-LDML: #9121 wrong escape format
   }
 
@@ -103,7 +95,7 @@ export class MarkerParser {
     if (!forMatch) {
       return String.fromCharCode(n);
     } else {
-      return `\\u${MarkerParser.hexQuad(n)}`; // TODO-LDML: #9121 wrong escape format
+      return `\\u${hexQuad(n)}`; // TODO-LDML: #9121 wrong escape format
     }
   }
 

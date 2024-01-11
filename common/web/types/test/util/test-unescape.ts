@@ -1,6 +1,6 @@
 import 'mocha';
 import {assert} from 'chai';
-import {unescapeString, UnescapeError, isOneChar, toOneChar, unescapeOneQuadString, BadStringAnalyzer, isValidUnicode, describeCodepoint, isPUA, BadStringType} from '../../src/util/util.js';
+import {unescapeString, UnescapeError, isOneChar, toOneChar, unescapeOneQuadString, BadStringAnalyzer, isValidUnicode, describeCodepoint, isPUA, BadStringType, unescapeStringToRegex} from '../../src/util/util.js';
 
 describe('test UTF32 functions()', function() {
   it('should properly categorize strings', () => {
@@ -54,6 +54,18 @@ describe('test unescapeString()', function() {
 
   it("should throw UnescapeError on invalid escapes", function() {
     assert.throws(() => unescapeString('\\u{110000}'), UnescapeError);
+  });
+});
+
+describe('test unescapeRegex()', () => {
+  it("should correctly handle 1..6 char escapes", function() {
+    assert.equal(unescapeStringToRegex('\\u{9}'),      '\\u0009');   // TAB
+    assert.equal(unescapeStringToRegex('\\u{4a}'),     '\\u004a');   // J
+    assert.equal(unescapeStringToRegex('\\u{3c8}'),    '\\u03c8');   // ψ
+    assert.equal(unescapeStringToRegex('\\u{304B}'),   '\\u304b');   // か
+    // the following go to two UTF-16 escapes for ICU
+    assert.equal(unescapeStringToRegex('\\u{1e109}'),  '\\ud838\\udd09');  // 𞄉
+    assert.equal(unescapeStringToRegex('\\u{10fff0}'), '\\udbff\\udff0'); // Plane 16 Private Use
   });
 });
 
