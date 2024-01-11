@@ -219,15 +219,15 @@ jobs:
             echo "dput exited with ${retval}"
             if ! grep -q "ssh: Could not resolve hostname package-drop.psonet: Name or service not known" ${tmpfile}; then
               rm ${tmpfile}
-              if ((retval != 0)); then
+              if [[ ${retval} != 0 ]]; then
                 exit ${retval}
               else
-                return
+                return 0
               fi
             fi
             if ((++i <= max_retries)); then
               sleep 10
-              echo "Retry ${i}/${max_retries}:"
+              echo "${COLOR_BLUE}Retry ${i}/${max_retries}:"
             fi
           done
           rm ${tmpfile}
