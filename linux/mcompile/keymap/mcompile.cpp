@@ -34,33 +34,17 @@
 
 //------------------------------------------------------------------------------------------------
 //------------------------------------------------------------------------------------------------
-//------------------------------------------------------------------------------------------------
 
-KMX_BOOL KMX_DoConvert(LPKMX_KEYBOARD kbd, PKMX_WCHAR kbid, KMX_BOOL bDeadkeyConversion, gint argc, gchar *argv[]);
+KMX_BOOL KMX_DoConvert(LPKMX_KEYBOARD kbd, KMX_BOOL bDeadkeyConversion, gint argc, gchar *argv[]);
 
-bool KMX_ImportRules(KMX_WCHAR *kbid, LPKMX_KEYBOARD kp,v_dw_3D &All_Vector, GdkKeymap **keymap,std::vector<KMX_DeadkeyMapping> *KMX_FDeadkeys, KMX_BOOL bDeadkeyConversion); // I4353   // I4327
+bool KMX_ImportRules( LPKMX_KEYBOARD kp,v_dw_3D &All_Vector, GdkKeymap **keymap,std::vector<KMX_DeadkeyMapping> *KMX_FDeadkeys, KMX_BOOL bDeadkeyConversion); // I4353   // I4327
 
 std::vector<KMX_DeadkeyMapping> KMX_FDeadkeys; // I4353
 
-void KMX_TranslateKey(LPKMX_KEY key, KMX_WORD vk, KMX_UINT shift, KMX_WCHAR ch);
-void KMX_TranslateGroup(LPKMX_GROUP group, KMX_WORD vk, KMX_UINT shift, KMX_WCHAR ch);
-void KMX_TranslateKeyboard(LPKMX_KEYBOARD kbd, KMX_WORD vk, KMX_UINT shift, KMX_WCHAR ch);
-
-void KMX_ReportUnconvertedKeyRule(LPKMX_KEY key);
-void KMX_ReportUnconvertedGroupRules(LPKMX_GROUP group);
-void KMX_ReportUnconvertedKeyboardRules(LPKMX_KEYBOARD kbd);
-
-void KMX_TranslateDeadkeyKeyboard(LPKMX_KEYBOARD kbd, KMX_WCHAR deadkey, KMX_WORD vk, UINT shift, KMX_WORD ch);
-void KMX_TranslateDeadkeyGroup(LPKMX_GROUP group,KMX_WCHAR deadkey, KMX_WORD vk, UINT shift, KMX_WORD ch);
-void KMX_TranslateDeadkeyKey(LPKMX_KEY key, KMX_WCHAR deadkey, KMX_WORD vk, UINT shift, KMX_WORD ch);
-
-int KMX_GetDeadkeys(v_dw_2D & dk_ComposeTable, KMX_WORD DeadKey, KMX_WORD *OutputPairs, GdkKeymap* keymap);
-//int KMX_GetDeadkeys(v_dw_2D & dk_Table, KMX_WORD DeadKey, KMX_WORD *OutputPairs, KMX_WORD sc);
-void KMX_AddDeadkeyRule(LPKMX_KEYBOARD kbd, KMX_WCHAR deadkey, KMX_WORD vk, UINT shift);
-
-
-KMX_UINT  KMX_get_SCUnderlying_From_VKUS(KMX_DWORD VirtualKeyUS);
-KMX_WCHAR  KMX_get_CharUnderlying_From_SCUnderlying_GDK(GdkKeymap *keymap, KMX_UINT VKShiftState, UINT SC_OTHER, KMX_WCHAR* DeadKey);
+// Note: max is not a standard c api function or macro
+#ifndef max
+#define max(a,b)            (((a) > (b)) ? (a) : (b))
+#endif
 
 #if defined(_WIN32) || defined(_WIN64)
   int wmain(int argc, wchar_t* argv[]) {
@@ -83,8 +67,6 @@ int run(int argc, std::vector<std::u16string> str_argv, char* argv_ch[] = NULL){
     const char16_t* cmdl_par = str_argv[i].c_str();
     argv.push_back(cmdl_par);
   }
-
-
 
   if(argc < 3 || (argc < 5 && u16cmp(argv[1], u"-u") != 0)) {   // I4273// I4273
     wprintf(
@@ -149,8 +131,7 @@ int run(int argc, std::vector<std::u16string> str_argv, char* argv_ch[] = NULL){
   }*/
 
 #else  // LINUX
-// _S2 ToDo :do I need all parameters?-no
-  if(KMX_DoConvert( kmxfile,  kbid,  bDeadkeyConversion, argc, (gchar**) argv_ch)) { // I4552F
+  if(KMX_DoConvert( kmxfile, bDeadkeyConversion, argc, (gchar**) argv_ch)) { // I4552F
     KMX_SaveKeyboard(kmxfile, outfile);
 }
 #endif
@@ -162,11 +143,8 @@ int run(int argc, std::vector<std::u16string> str_argv, char* argv_ch[] = NULL){
   return 0;
 }
 
-// _S2 TODO which version of VKShiftStates do we use ?
-// comment from win-version
 // Map of all shift states that we will work with
 const UINT VKShiftState[] = {0, K_SHIFTFLAG, LCTRLFLAG|RALTFLAG, K_SHIFTFLAG|LCTRLFLAG|RALTFLAG, 0xFFFF};
-//const UINT VKShiftState[] = {0, K_SHIFTFLAG,  0xFFFF};
 
 // my comment for Lin version
 // Ubuntu:  Each of the 4 columns specifies a different modifier:  unmodified,  shift,   right alt (altgr),     shift+right alt(altgr)
@@ -325,11 +303,6 @@ void KMX_AddDeadkeyRule(LPKMX_KEYBOARD kbd, KMX_WCHAR deadkey, KMX_WORD vk, UINT
   }
 }
 
-// Note: max is not a standard c api function or macro
-#ifndef max
-#define max(a,b)            (((a) > (b)) ? (a) : (b))
-#endif
-
 KMX_WCHAR KMX_ScanXStringForMaxDeadkeyID(PKMX_WCHAR str) {
   KMX_WCHAR dkid = 0;
   while(str && *str) {
@@ -447,7 +420,7 @@ KMX_BOOL KMX_SetKeyboardToPositional(LPKMX_KEYBOARD kbd) {
   return FALSE;
 }
 
-KMX_BOOL KMX_DoConvert(LPKMX_KEYBOARD kbd, PKMX_WCHAR kbid, KMX_BOOL bDeadkeyConversion, gint argc, gchar *argv[]) {
+KMX_BOOL KMX_DoConvert(LPKMX_KEYBOARD kbd, KMX_BOOL bDeadkeyConversion, gint argc, gchar *argv[]) {
 
   KMX_WCHAR DeadKey;
 
@@ -481,9 +454,6 @@ KMX_BOOL KMX_DoConvert(LPKMX_KEYBOARD kbd, PKMX_WCHAR kbid, KMX_BOOL bDeadkeyCon
     for (int i = 0;KMX_VKMap[i]; i++) { // I4651
 
       // win goes via VK, Lin goes via SC
-      /*KMX_DWORD vkUnderlying = KMX_get_KVUnderlying_From_KVUS_VEC(All_Vector,(int) KMX_VKMap[i] );
-      KMX_WCHAR ch = KMX_get_CharUnderlying_according_to_keycode_and_Shiftstate_VEC(All_Vector,vkUnderlying, VKShiftState[j], &DeadKey);*/
-
       UINT scUnderlying =  KMX_get_SCUnderlying_From_VKUS(KMX_VKMap[i]);
       KMX_WCHAR ch = KMX_get_CharUnderlying_From_SCUnderlying_GDK(keymap, VKShiftState[j], scUnderlying, &DeadKey);
 
@@ -505,7 +475,7 @@ KMX_BOOL KMX_DoConvert(LPKMX_KEYBOARD kbd, PKMX_WCHAR kbid, KMX_BOOL bDeadkeyCon
 
   KMX_ReportUnconvertedKeyboardRules(kbd);
 
-  if(!KMX_ImportRules(kbid, kbd, All_Vector, &keymap, &KMX_FDeadkeys, bDeadkeyConversion)) {   // I4353   // I4552
+  if(!KMX_ImportRules(kbd, All_Vector, &keymap, &KMX_FDeadkeys, bDeadkeyConversion)) {   // I4353   // I4552
     return FALSE;
   }
   return TRUE;
@@ -526,19 +496,6 @@ UINT  KMX_get_SCUnderlying_From_VKUS(KMX_DWORD VirtualKeyUS) {
   UINT SC_US = 8 + USVirtualKeyToScanCode[VirtualKeyUS];
   UINT SC_OTHER = SC_US;  // not neccessary but to understand what we do
   return  SC_OTHER;
-}
-
-// takes capital letter of US returns cpital character of Other keyboard
-KMX_DWORD  KMX_get_KVUnderlying_From_KVUS_VEC(v_dw_3D &All_Vector,KMX_DWORD inUS) {
-  // loop and find char in US; then return char of Other
-  for( int i=0; i< (int)All_Vector[0].size();i++) {
-    for( int j=1; j< (int)All_Vector[0][0].size();j++) {
-      if((inUS == All_Vector[0][i][j] )) {
-        return  All_Vector[1][i][2];
-      }
-    }
-  }
-  return inUS;
 }
 
 KMX_WCHAR KMX_get_KVUS_From_KVUnderlying_VEC(v_dw_3D All_Vector, KMX_DWORD VK_OTHER) {
@@ -566,7 +523,7 @@ KMX_DWORD KMX_get_SCUnderlying_From_SCUS_VEC(v_dw_3D &All_Vector, KMX_DWORD KC_U
   // find character with that scancode
   for( int i=0; i< (int)All_Vector[0].size()-1 ;i++) {
     if ( ( All_Vector[0][i][0] == KC_US ) ) {
-      if ( Shiftstate+1 < All_Vector[0][i].size()-1)
+      if ( Shiftstate+1 < (int) All_Vector[0][i].size()-1)
         Character = All_Vector[0][i][Shiftstate+1];
       break;
     }
@@ -589,9 +546,7 @@ KMX_WCHAR  KMX_get_CharUnderlying_From_SCUnderlying_GDK(GdkKeymap *keymap, KMX_U
   int VKShiftState_lin = map_VKShiftState_to_Lin(VKShiftState);
   KMX_DWORD KeyvalOther = KMX_get_KeyvalsUnderlying_From_KeyCodeUnderlying_GDK(keymap,SC_OTHER, VKShiftState_lin);
 
-  // _S2  how to detect deadkeys ?  KeyvalOther >deadkeyThreshold   KeyvalOther > 255?  KeyvalOther > 65000 ?  or what else?
-  if (KeyvalOther > deadkeyThreshold) {
-  //if (KeyvalOther > 255) {
+  if (KeyvalOther >= deadkey_min) {
     std::string ws((const char*) gdk_keyval_name (KeyvalOther));
     *DeadKey = convertNamesToIntegerValue( wstring_from_string(ws));
     return 0xFFFF;
@@ -625,7 +580,7 @@ int KMX_GetDeadkeys(v_dw_2D & dk_Table, KMX_WORD DeadKey, KMX_WORD *OutputPairs,
   v_dw_2D  dk_SingleTable;
   find_dk_combinations_for_single_dk(&dk_Table, dk_SingleTable, DeadKey);
 // _S2 CAPS <-> NCAPS problem from here?
-  for ( int i=0; i< dk_SingleTable.size()-1;i++) {
+  for ( int i=0; i< (int) dk_SingleTable.size()-1;i++) {
     KMX_WORD vk = KMX_changeKeynameToCapital(dk_SingleTable[i][1], shift, keymap);
     if(vk != 0) {
           *p++ = vk;

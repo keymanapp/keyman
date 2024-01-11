@@ -24,8 +24,6 @@ typedef std::vector<KMX_DWORD> v_dw_1D;
 typedef std::vector<std::vector<KMX_DWORD> > v_dw_2D;
 typedef std::vector<std::vector<std::vector<KMX_DWORD> > > v_dw_3D;
 
-// _S2 sort declarations/definitions to mcompile or keymaap..
-
 enum ShiftState {
     Base = 0,                           // 0
     Shft = 1,                           // 1
@@ -69,8 +67,6 @@ const KMX_DWORD KMX_VKMap[] = {
 
 static KMX_DWORD returnIfCharInvalid = 0;
 
-//_S2 QUESTION Which threshold ( from what int value onwards is a character considered deadkey? 65000 28000?, > 255? ??
-static KMX_DWORD deadkeyThreshold = 65000;
 static KMX_DWORD deadkey_min = 0xfe50;
 static KMX_DWORD deadkey_max = 0xfe93;
 
@@ -507,14 +503,18 @@ const UINT ScanCodeToUSVirtualKey[128] = {
 
 bool IsKeymanUsedKeyVal(std::wstring Keyval);
 
-// take deadkey-value (e.g.65106) and return character (e.g. '^' )
+// take deadkey-value (e.g.65106) and return wstring (e.g. '^' )
 std::wstring convert_DeadkeyValues_ToChar(int in);
+// take deadkey-value (e.g.65106) and return u16string (e.g. '^' )
+std::u16string convert_DeadkeyValues_ToChar_16(int in);
 
 // find Keyvals to fill into 2D-Vector of Other Language
 KMX_DWORD KMX_get_KeyvalsUnderlying_From_KeyCodeUnderlying_GDK(GdkKeymap *keymap, guint keycode, int shift_state_pos);
 
 // returns KeySyms fo ra given key (for unshifted: finds the Keysym according to Shiftstate e.g. a;A or 1;! )
 std::wstring KMX_get_CharsUnderlying_according_to_keycode_and_Shiftstate_GDK(GdkKeymap *keymap, guint VK, ShiftState ss, int caps);
+// returns KeySyms fo ra given key (for unshifted: finds the Keysym according to Shiftstate e.g. a;A or 1;! )
+std::u16string KMX_get_CharsUnderlying_according_to_keycode_and_Shiftstate_GDK_16(GdkKeymap *keymap, guint keycode, ShiftState ss, int caps);
 
 // return the VirtualKey of the Other Keyboard for given Scancode using GDK
 KMX_DWORD KMX_get_VKUS_From_KeyCodeUnderlying_GDK( GdkKeymap *keymap, KMX_DWORD scanCode);
@@ -527,8 +527,7 @@ KMX_DWORD KMX_get_KeyCodeUnderlying_From_KeycodeUS_GDK(GdkKeymap *keymap, v_dw_3
 
 // converts codePoint to wstring
 std::wstring CodePointToWString(unsigned int codepoint);
-
-// converts codePoint to u16string ( _S2 ToDo is this cvorrect?)
-//std::u16string CodePointToU16String(unsigned int codepoint);
+// converts codePoint to u16string
+std::u16string CodePointToString_16(unsigned int codepoint);
 
 # endif /*KEYMAP_H*/

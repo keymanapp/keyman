@@ -668,6 +668,32 @@ int replace_KeyName_with_Keycode2(std::string  in) {
   return out;
 }
 
+/*int KMX_ToUnicodeEx( guint ScanCode, const BYTE *lpKeyStccate, PWCHAR pwszBuff,  int shift_state, int caps,GdkKeymap *keymap) {
+
+  KMX_DWORD kvl= KMX_get_KeyvalsUnderlying_From_KeyCodeUnderlying_GDK(keymap, ScanCode, shift_state);
+
+  std::wstring character = KMX_get_CharsUnderlying_according_to_keycode_and_Shiftstate_GDK(keymap, ScanCode, ShiftState(shift_state), caps);
+  pwszBuff[0]= * (PWCHAR) character.c_str();
+
+  if((kvl >=  deadkey_min) && (kvl <=  deadkey_max))
+    return -1;
+  else
+    return  1;
+}*/
+
+
+// takes capital letter of US returns cpital character of Other keyboard
+/*KMX_DWORD  KMX_get_KVUnderlying_From_KVUS_VEC(v_dw_3D &All_Vector,KMX_DWORD inUS) {
+  // loop and find char in US; then return char of Other
+  for( int i=0; i< (int)All_Vector[0].size();i++) {
+    for( int j=1; j< (int)All_Vector[0][0].size();j++) {
+      if((inUS == All_Vector[0][i][j] )) {
+        return  All_Vector[1][i][2];
+      }
+    }
+  }
+  return inUS;
+}*/
 
 /*
 KMX_DWORD KMX_get_VKUS_From_KeyCodeUnderlying( KMX_DWORD keycode) {

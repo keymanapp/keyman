@@ -510,19 +510,6 @@ int KMX_GetMaxDeadkeyIndex(KMX_WCHAR *p) {
   return n;
 }
 
-int KMX_ToUnicodeEx( guint ScanCode, const BYTE *lpKeyStccate, PWCHAR pwszBuff,  int shift_state, int caps,GdkKeymap *keymap) {
-
-  KMX_DWORD kvl= KMX_get_KeyvalsUnderlying_From_KeyCodeUnderlying_GDK(keymap, ScanCode, shift_state);
-
-  std::wstring character = KMX_get_CharsUnderlying_according_to_keycode_and_Shiftstate_GDK(keymap, ScanCode, ShiftState(shift_state), caps);
-  pwszBuff[0]= * (PWCHAR) character.c_str();
-
-  if((kvl >=  deadkey_min) && (kvl <=  deadkey_max))
-    return -1;
-  else
-    return  1;
-}
-
 int KMX_ToUnicodeEx(guint ScanCode, const BYTE *lpKeyState, PKMX_WCHAR pwszBuff, int shift_state, int caps,GdkKeymap *keymap) {
 
   KMX_DWORD kvl= KMX_get_KeyvalsUnderlying_From_KeyCodeUnderlying_GDK(keymap, ScanCode, shift_state);
@@ -530,14 +517,11 @@ int KMX_ToUnicodeEx(guint ScanCode, const BYTE *lpKeyState, PKMX_WCHAR pwszBuff,
     return -1;
 
   std::wstring character = KMX_get_CharsUnderlying_according_to_keycode_and_Shiftstate_GDK(keymap, ScanCode, ShiftState(shift_state), caps);
-  std::string ch_str = string_from_wstring(character);
-  std::u16string ch_16 = u16string_from_string(ch_str);
-  pwszBuff[0]= * (PKMX_WCHAR) ch_16.c_str();
-
+  pwszBuff[0]= * (PKMX_WCHAR)  u16string_from_wstring(character).c_str();
   return  1;
 }
 
-bool KMX_ImportRules(KMX_WCHAR *kbid, LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, GdkKeymap **keymap, std::vector<KMX_DeadkeyMapping> *FDeadkeys, KMX_BOOL bDeadkeyConversion) {   // I4353   // I4552
+bool KMX_ImportRules(LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, GdkKeymap **keymap, std::vector<KMX_DeadkeyMapping> *FDeadkeys, KMX_BOOL bDeadkeyConversion) {   // I4353   // I4552
   KMX_Loader loader;
   const size_t BUF_sz= 256;
 
@@ -577,7 +561,8 @@ bool KMX_ImportRules(KMX_WCHAR *kbid, LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, Gd
   rgKey[VK_DECIMAL] = new KMX_VirtualKey(hkl, VK_DECIMAL, All_Vector, keymap);
 
   /*
-  // _S2 do we need special shift state now or later?
+  // _S2 RALT <-> SHIFT CTRL Problem from here??
+  // _S2 DESIGN NEEDED do we need special shift state now or later?
     // See if there is a special shift state added
     for(UINT vk = 0; vk <= VK_OEM_CLEAR; vk++) {
         UINT sc = MapVirtualKeyEx(vk, 0, hkl);
@@ -643,6 +628,7 @@ bool KMX_ImportRules(KMX_WCHAR *kbid, LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, Gd
                 if((rc == 1) &&
                   (ss == Ctrl || ss == ShftCtrl) &&
                   (rgKey[iKey]->VK() == ((UINT)sbBuffer[0] + 0x40))) {
+                    // _S2 RALT<-> SHIFT CTR problem from here??
                       // _S2 TODO is this the same behavior on Linux?
                       // if rc ==1 : it got 1  char && +40 in Buffer CTRl pressed
                       // It's dealing with control characters. If ToUnicodeEx gets
@@ -675,8 +661,8 @@ bool KMX_ImportRules(KMX_WCHAR *kbid, LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, Gd
             DeadKey *dk = NULL;
             for(UINT iDead = 0; iDead < alDead.size(); iDead++) {
                 dk = alDead[iDead];
-                WCHAR dktest1 = dk->KMX_DeadCharacter();
-                WCHAR dktest2 = rgKey[iKey]->KMX_GetShiftState(ss, caps == 0)[0];
+                WCHAR dktest1 = dk->KMX_DeadCharacter();                             // _S2 can go later ; just for testing
+                WCHAR dktest2 = rgKey[iKey]->KMX_GetShiftState(ss, caps == 0)[0];    // _S2 can go later ; just for testing
                 if(dk->KMX_DeadCharacter() == rgKey[iKey]->KMX_GetShiftState(ss, caps == 0)[0]) {
                     break;
                 }
@@ -746,12 +732,10 @@ bool KMX_ImportRules(KMX_WCHAR *kbid, LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, Gd
   kp->cxGroupArray++;
   gp = &kp->dpGroupArray[kp->cxGroupArray-1];
   UINT nKeys = 0;
-  int sab_nr = 0;
   for (UINT iKey = 0; iKey < rgKey.size(); iKey++) {
     if ((rgKey[iKey] != NULL) && rgKey[iKey]->KMX_IsKeymanUsedKey() && (!rgKey[iKey]->KMX_IsEmpty())) {
       nKeys+= rgKey[iKey]->KMX_GetKeyCount(loader.MaxShiftState());
       //wprintf(L" iKey = %i, Delta:  %i -> Sum %i\n", iKey, rgKey[iKey]->KMX_GetKeyCount(loader.MaxShiftState()),  nKeys);
-      sab_nr ++;
    }
   }
 
@@ -770,6 +754,8 @@ bool KMX_ImportRules(KMX_WCHAR *kbid, LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, Gd
   //
   // Fill in the new rules
   //
+
+  // _S2       [CTRL NCAPS K_?00] > use(group3)  c line(0)       from here ?
   for (UINT iKey = 0; iKey < rgKey.size(); iKey++) {
     if ((rgKey[iKey] != NULL) && rgKey[iKey]->KMX_IsKeymanUsedKey() && (!rgKey[iKey]->KMX_IsEmpty())) {
       if(rgKey[iKey]->KMX_LayoutRow(loader.MaxShiftState(), &gp->dpKeyArray[nKeys], &alDead, nDeadkey, bDeadkeyConversion, All_Vector,*keymap)) {   // I4552
@@ -784,6 +770,7 @@ bool KMX_ImportRules(KMX_WCHAR *kbid, LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, Gd
   //
   // Add nomatch control to each terminating 'using keys' group   // I4550
   //
+  // _S2       [CTRL NCAPS K_?00] > use(group3)  c line(0)       from here ?
   LPKMX_GROUP gp2 = kp->dpGroupArray;
   for(UINT i = 0; i < kp->cxGroupArray - 1; i++, gp2++) {
     if(gp2->fUsingKeys && gp2->dpNoMatch == NULL) {
@@ -926,38 +913,3 @@ const int CODE__SIZE[] = {
     3,   // CODE_IFSYSTEMSTORE       0x17
     2    // CODE_SETSYSTEMSTORE      0x18
 };
-
-// _S2 where is nthe best place to put this??
-PKMX_WCHAR KMX_incxstr(PKMX_WCHAR p) {
-
-  if (*p == 0)
-    return p;
-  if (*p != UC_SENTINEL) {
-    if (*p >= 0xD800 && *p <= 0xDBFF && *(p + 1) >= 0xDC00 && *(p + 1) <= 0xDFFF)
-      return p + 2;
-    return p + 1;
-  }
-  // UC_SENTINEL(FFFF) with UC_SENTINEL_EXTENDEDEND(0x10) == variable length
-  if (*(p + 1) == CODE_EXTENDED) {
-    p += 2;
-    while (*p && *p != UC_SENTINEL_EXTENDEDEND)
-      p++;
-
-    if (*p == 0)        return p;
-    return p + 1;
-  }
-
-  if (*(p + 1) > CODE_LASTCODE || CODE__SIZE[*(p + 1)] == -1) {
-    return p + 1;
-  }
-
-  int deltaptr = 2 + CODE__SIZE[*(p + 1)];
-
-  // check for \0 between UC_SENTINEL(FFFF) and next printable character
-  for (int i = 0; i < deltaptr; i++) {
-    if (*p == 0)
-      return p;
-    p++;
-  }
-  return p;
-}

@@ -34,9 +34,8 @@ void find_dk_combinations_for_single_dk(v_dw_2D * p_dk_ComposeTable, v_dw_2D  &d
 	}
 }
 
-// _S2 is this correct??
+// _S2 might be used when deadkeys are implemented . is it correct??
 KMX_DWORD KMX_changeKeynameToCapital(KMX_DWORD KVal, KMX_DWORD &shift, GdkKeymap* keymap) {
-
   guint Keyval = (guint) KVal;
   GdkKeymapKey* keys;
   gint n_keys;

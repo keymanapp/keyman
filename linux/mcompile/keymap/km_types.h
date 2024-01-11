@@ -44,11 +44,8 @@ typedef WCHAR      KMX_WCHART;          // _S2 needs to be removed/ wchart-> cha
 typedef char16_t   KMX_WCHAR;           // _S2
 typedef KMX_WCHAR* PKMX_WCHAR;          // _S2
 typedef wchar_t*   PWSTR;               // _S2 needs to be removed/ wchart-> char16
-//typedef PWSTR      PKMX_WCHART;         // _S2 needs to be removed/ wchart-> char16
-//typedef const wchar_t*  PCKMX_WCHART;   // _S2 needs to be removed/?
 
 typedef char*      LPSTR;               // _S2 needs to be removed?
-//typedef LPSTR      LPKMX_STR;           // _S2 needs to be removed?
 
 typedef uint8_t*   LPBYTE;              // _S2 needs to be removed/?
 typedef uint8_t*   LPKMX_BYTE;          // _S2 needs to be removed?
@@ -57,7 +54,6 @@ typedef uint8_t*   PBYTE;               // _S2 needs to be removed/?
 typedef uint8_t*   PKMX_BYTE;           // _S2 needs to be removed?
 
 typedef char       KMX_CHAR;            // _S2 needs to be removed/?
-//typedef char*      PKMX_STR;            // _S2 needs to be removed/?
 
 typedef unsigned int UINT;              // _S2 needs to be removed/?
 typedef unsigned char   BYTE;           // _S2 needs to be removed?
@@ -103,18 +99,18 @@ typedef  wchar_t KMX_UCHAR;
 typedef KMX_UCHAR* KMX_PUCHAR;
 
 #define VK_SPACE    0x20
-#define VK_COLON	0xBA
-#define VK_EQUAL	0xBB
-#define VK_COMMA	0xBC
-#define VK_HYPHEN	0xBD
-#define VK_PERIOD	0xBE
-#define	VK_SLASH	0xBF
-#define VK_ACCENT	0xC0
-#define VK_LBRKT	0xDB
+#define VK_COLON	  0xBA
+#define VK_EQUAL	  0xBB
+#define VK_COMMA	  0xBC
+#define VK_HYPHEN   0xBD
+#define VK_PERIOD	  0xBE
+#define	VK_SLASH	  0xBF
+#define VK_ACCENT	  0xC0
+#define VK_LBRKT	  0xDB
 #define VK_BKSLASH	0xDC
-#define VK_RBRKT	0xDD
-#define VK_QUOTE	0xDE
-#define VK_xDF		0xDF
+#define VK_RBRKT	  0xDD
+#define VK_QUOTE	  0xDE
+#define VK_xDF		  0xDF
 #define VK_OEM_102  0xE2  //  "<>" or "\|" on RT 102-key kbd.
 
 /*#define VK_NUMPAD0  0x5A

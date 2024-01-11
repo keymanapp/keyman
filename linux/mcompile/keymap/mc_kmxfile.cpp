@@ -484,6 +484,40 @@ KMX_BOOL KMX_VerifyKeyboard(LPKMX_BYTE filebase, KMX_DWORD sz){
   return TRUE;
 }
 
+PKMX_WCHAR KMX_incxstr(PKMX_WCHAR p) {
+
+  if (*p == 0)
+    return p;
+  if (*p != UC_SENTINEL) {
+    if (*p >= 0xD800 && *p <= 0xDBFF && *(p + 1) >= 0xDC00 && *(p + 1) <= 0xDFFF)
+      return p + 2;
+    return p + 1;
+  }
+  // UC_SENTINEL(FFFF) with UC_SENTINEL_EXTENDEDEND(0x10) == variable length
+  if (*(p + 1) == CODE_EXTENDED) {
+    p += 2;
+    while (*p && *p != UC_SENTINEL_EXTENDEDEND)
+      p++;
+
+    if (*p == 0)        return p;
+    return p + 1;
+  }
+
+  if (*(p + 1) > CODE_LASTCODE || CODE__SIZE[*(p + 1)] == -1) {
+    return p + 1;
+  }
+
+  int deltaptr = 2 + CODE__SIZE[*(p + 1)];
+
+  // check for \0 between UC_SENTINEL(FFFF) and next printable character
+  for (int i = 0; i < deltaptr; i++) {
+    if (*p == 0)
+      return p;
+    p++;
+  }
+  return p;
+}
+
 
 
 //---------------------old----------------------------------------

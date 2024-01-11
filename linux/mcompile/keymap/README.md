@@ -9,10 +9,8 @@ Sample program that reads US basic keyboard and compares to key value group
 TODO check if US basic is the right Keyboard to compare with
 TODO deadkeys don't work yet
 TODO path for xkb/symbols as compile time option in meson
-TODO check how many/which shift states we use ( at the moment we read all shiftstate-columns of US but then use only 2 colums (non-shift + shift) then use as many colums for Other )
 TODO define folder to store File_US.txt" in and find better name
 TODO check if I can use files from some other keyman path instead of a copy in keymap ( e.g. filesystem.h exists elsewhere)
-TODO remove kbdid and kbd for Linux
 TODO shiftstate-count
 TODO keymap SplitToV.cpp exchange 4 with genaerated shiftcount
 TODO shift-statevector
@@ -22,17 +20,14 @@ TODO check if passed All_Vectpor as ptr/ref not as value e.g. in KMX_CharFromVK,
 ToDo in get_VirtualKey_Other_From_SC:  what if we use  column 3(altgr) and 4 (shift+altgr) ??
 TODO where to store VK_CANCEL.... in km_types.h or elsewhere?
 ToDo check up to 8 shiftstates ( find symbols-file with 8)
-TODO get_position_From_VirtualKey_US: take care of the other shiftstates
 ToDo use _free(keyvals);   g_free(maps);
+ToDo use u16string OR wstring-functions only and remove the other
 
 TODO next:
-    - mc_import-rules (from ~ l. 790) see if everything gives the same result on win-Lin
     - check if I use char16_t everywhere instead of wchar_t or char
-    - replace GDK
-    - see in which files I can put some functions (e.g. incxstr) that were duplicated or even #include their original location
-    - remove USE_GDK
-    - what is wrong with kp->dpBitmapOffset/BitmapSize ?
     - Check/find use of wchar_t/wstring and replace with char16_t/u16string
+    - replace GDK
+    - what is wrong with kp->dpBitmapOffset/BitmapSize ?
     - check call by reference/value
 TODO ...
 
