@@ -407,6 +407,22 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
       previewHost: GesturePreviewHost
     }> = {};
 
+    const clearActiveGestures = (exception?: string) => {
+      for(const identifier of Object.keys(sourceTrackingMap)) {
+        if(identifier == exception) {
+          // No need to cancel the current gesture; let the globe-key gesture complete.
+          continue;
+        }
+
+        // Any _other_ gesture, though - yeah, that should cancel out.
+        // Might be a _bit_ funky if there's an active modipress, but only momentarily.
+        const entry = sourceTrackingMap[identifier];
+
+        // Trigger cancellation of all other pending gestures - they're not valid after a keyboard-swap.
+        entry.source.terminate(true);
+      }
+    }
+
     const gestureHandlerMap = new Map<GestureSequence<KeyElement>, GestureHandler[]>();
 
     // Now to set up event-handling links.
@@ -614,21 +630,7 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
             handlers = [new HeldRepeater(gestureSequence, () => this.modelKeyClick(gestureKey, coord))];
           } else if(gestureKey.key.spec.baseKeyID == "K_LOPT") { // globe key
             gestureSequence.on('complete', () => this.emit('globekey', gestureKey, false));
-
-            for(const identifier of Object.keys(sourceTrackingMap)) {
-              if(identifier == coordSource.identifier) {
-                // No need to cancel the current gesture; let the globe-key gesture complete.
-                continue;
-              }
-
-              // Any _other_ gesture, though - yeah, that should cancel out.
-              // Might be a _bit_ funky if there's an active modipress, but only momentarily.
-              const entry = sourceTrackingMap[identifier];
-
-              // Trigger cancellation of all other pending gestures - they're not valid after a keyboard-swap.
-              entry.source.terminate(true);
-            }
-
+            clearActiveGestures(coordSource.identifier);
           }
         } else if(gestureStage.matchedId.indexOf('longpress') > -1) {
           existingPreviewHost?.cancel();
