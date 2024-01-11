@@ -65,6 +65,7 @@ type
       Selected: Boolean);
   private
     FRootPath: string;
+    FCanAddToProject: Boolean;
     function GetFileType: TKMFileType;
     procedure GetIcon(s: string; index: Integer);   // I4821
     procedure UpdateFileName;
@@ -74,12 +75,14 @@ type
     function GetDefaultExt: string;
     function CheckFilenameConventions: Boolean;
     function FileIsAppropriateForProject: Boolean;
+    procedure SetCanAddToProject(const Value: Boolean);
   protected
     function GetHelpTopic: string; override;
   public
     property FileType: TKMFileType read GetFileType;
     property AddToProject: Boolean read GetAddToProject;
     property FileName: string read GetFileName;
+    property CanAddToProject: Boolean read FCanAddToProject write SetCanAddToProject;
   end;
 
 implementation
@@ -204,6 +207,7 @@ procedure TfrmNew.EnableControls;
 var
   e: Boolean;
 begin
+  chkAddToProject.Visible := FCanAddToProject;
   e := Assigned(lvItems.Selected);
   editFileName.Enabled := e;
   cmdBrowse.Enabled := e;
@@ -217,7 +221,7 @@ var
   i: Integer;
 begin
   inherited;
-  FRootPath := ExtractFilePath(FGlobalProject.FileName);
+  FRootPath := FGlobalProject.ResolveSourcePath;
 
   lvItems.Selected := lvItems.Items[0];
   lvItems.ItemFocused := lvItems.Items[0];
@@ -319,6 +323,14 @@ end;
 procedure TfrmNew.mnuShowIconsClick(Sender: TObject);
 begin
   lvItems.ViewStyle := vsIcon;
+end;
+
+procedure TfrmNew.SetCanAddToProject(const Value: Boolean);
+begin
+  FCanAddToProject := Value;
+  if not Value then
+    chkAddToProject.Checked := False;
+  EnableControls;
 end;
 
 procedure TfrmNew.UpdateFileName;
