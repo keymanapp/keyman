@@ -1,5 +1,14 @@
 # Keyman Version History
 
+## 17.0.242 alpha 2024-01-11
+
+* fix(windows): serve images for readme files in Keyboard Install (#10312)
+* fix(developer): remove unused tools/customise menu (#10321)
+* fix(developer): cleanly handle filling a new osk file from layout (#10322)
+* fix(developer): new file support for project 2.0 (#10323)
+* chore(common): builder action launch typos (#10361)
+*  (#10326)
+
 ## 17.0.241 alpha 2024-01-10
 
 * chore(deps-dev): bump follow-redirects from 1.14.9 to 1.15.4 (#10340)
