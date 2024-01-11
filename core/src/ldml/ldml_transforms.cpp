@@ -643,6 +643,7 @@ transform_entry::apply(const std::u32string &input, std::u32string &output) cons
     output.assign(s.get(), out32len);
     // NOW do a marker-safe normalize
     if (!normalize_nfd_markers(output)) {
+      DebugLog("normalize_nfd_markers(output) failed");
       return 0; // TODO-LDML: normalization failed.
     }
   }
@@ -950,9 +951,9 @@ bool normalize_nfd(std::u16string &str) {
   return normalize(nfd, str, status);
 }
 
-bool normalize_nfd_markers(std::u16string &str, marker_map &map, marker_encoding encoding) {
+bool normalize_nfd_markers_segment(std::u16string &str, marker_map &map, marker_encoding encoding) {
   std::u32string rstr = km::core::kmx::u16string_to_u32string(str);
-  if(!normalize_nfd_markers(rstr, map, encoding)) {
+  if(!normalize_nfd_markers_segment(rstr, map, encoding)) {
     return false;
   } else {
     str = km::core::kmx::u32string_to_u16string(rstr);
@@ -970,7 +971,9 @@ static void add_back_markers(std::u32string &str, const std::u32string &src, con
     const auto ch = MARKER_BEFORE_EOT;
     const auto m  = map2.find(ch);
     if (m != map2.end()) {
-      prepend_marker(str, m->second, encoding);
+      for (auto q = (m->second).rbegin(); q < (m->second).rend(); q++) {
+        prepend_marker(str, *q, encoding);
+      }
       map2.erase(ch);  // remove it
     }
   }
@@ -981,7 +984,9 @@ static void add_back_markers(std::u32string &str, const std::u32string &src, con
 
     const auto m = map2.find(ch);
     if (m != map2.end()) {
-      prepend_marker(str, m->second, encoding);
+      for (auto q = (m->second).rbegin(); q < (m->second).rend(); q++) {
+        prepend_marker(str, *q, encoding);
+      }
       map2.erase(ch);  // remove it
     }
   }
@@ -992,7 +997,7 @@ static void add_back_markers(std::u32string &str, const std::u32string &src, con
  *  - doesn't support >1 marker per char - may need a set instead of a map!
  *  - ideally this should be used on a normalization safe subsequence
  */
-bool normalize_nfd_markers(std::u32string &str, marker_map &map, marker_encoding encoding) {
+bool normalize_nfd_markers_segment(std::u32string &str, marker_map &map, marker_encoding encoding) {
   /** original string, but no markers */
   std::u32string str_unmarked = remove_markers(str, map, encoding);
   /** original string, no markers, NFD */
@@ -1011,45 +1016,58 @@ bool normalize_nfd_markers(std::u32string &str, marker_map &map, marker_encoding
   return true; // all OK
 }
 
-bool normalize_nfc_markers(std::u32string &str, marker_map &map, marker_encoding encoding) {
-  /** original string, but no markers */
-  std::u32string str_unmarked = remove_markers(str, map, encoding);
-  /** original string, no markers, NFC */
-  std::u32string str_unmarked_nfc = str_unmarked;
-  if(!normalize_nfc(str_unmarked_nfc)) {
-    return false; // normalize failed.
-  } else if (map.size() == 0) {
-    // no markers. Return the normalized unmarked str
-    str = str_unmarked_nfc;
-  } else if (str_unmarked_nfc == str_unmarked) {
-    // Normalization produced no change when markers were removed.
-    // So, we'll call this a no-op.
-  } else {
-    add_back_markers(str, str_unmarked_nfc, map, encoding);
-  }
-  return true; // all OK
+bool normalize_nfd_markers(std::u16string &str, marker_encoding encoding) {
+  marker_map m;
+  // TODO-LDML: split segments
+  return normalize_nfd_markers_segment(str, m, encoding);
 }
 
-
-bool normalize_nfc(std::u32string &str) {
-  std::u16string rstr = km::core::kmx::u32string_to_u16string(str);
-  if(!normalize_nfc(rstr)) {
-    return false;
-  } else {
-    str = km::core::kmx::u16string_to_u32string(rstr);
-    return true;
-  }
+bool normalize_nfd_markers(std::u32string &str, marker_encoding encoding) {
+  marker_map m;
+  // TODO-LDML: split segments
+  return normalize_nfd_markers_segment(str, m, encoding);
 }
 
-bool normalize_nfc(std::u16string &str) {
-  UErrorCode status = U_ZERO_ERROR;
-  const icu::Normalizer2 *nfc = icu::Normalizer2::getNFCInstance(status);
-  UASSERT_SUCCESS(status);
-  return normalize(nfc, str, status);
-}
+// TODO-LDML: cleanup
+// bool normalize_nfc_markers(std::u32string &str, marker_map &map, marker_encoding encoding) {
+//   /** original string, but no markers */
+//   std::u32string str_unmarked = remove_markers(str, map, encoding);
+//   /** original string, no markers, NFC */
+//   std::u32string str_unmarked_nfc = str_unmarked;
+//   if(!normalize_nfc(str_unmarked_nfc)) {
+//     return false; // normalize failed.
+//   } else if (map.size() == 0) {
+//     // no markers. Return the normalized unmarked str
+//     str = str_unmarked_nfc;
+//   } else if (str_unmarked_nfc == str_unmarked) {
+//     // Normalization produced no change when markers were removed.
+//     // So, we'll call this a no-op.
+//   } else {
+//     add_back_markers(str, str_unmarked_nfc, map, encoding);
+//   }
+//   return true; // all OK
+// }
+
+
+// bool normalize_nfc(std::u32string &str) {
+//   std::u16string rstr = km::core::kmx::u32string_to_u16string(str);
+//   if(!normalize_nfc(rstr)) {
+//     return false;
+//   } else {
+//     str = km::core::kmx::u16string_to_u32string(rstr);
+//     return true;
+//   }
+// }
+
+// bool normalize_nfc(std::u16string &str) {
+//   UErrorCode status = U_ZERO_ERROR;
+//   const icu::Normalizer2 *nfc = icu::Normalizer2::getNFCInstance(status);
+//   UASSERT_SUCCESS(status);
+//   return normalize(nfc, str, status);
+// }
 
 void
-prepend_marker(std::u32string &str, KMX_DWORD marker, marker_encoding encoding) {
+prepend_marker(std::u32string &str, marker_num marker, marker_encoding encoding) {
   if (encoding == plain_sentinel) {
     km_core_usv markstr[] = {LDML_UC_SENTINEL, LDML_MARKER_CODE, marker};
     str.insert(0, markstr, 3);
@@ -1119,10 +1137,24 @@ KMX_DWORD parse_hex_quad(const km_core_usv hex_str[]) {
   return mark_no;
 }
 
+/** add the list to the map */
+void add_markers_to_map(marker_map &markers, char32_t marker_ch, const marker_list &list) {
+  auto rep = markers.emplace(marker_ch, list);
+  if (!rep.second) {
+    // already existed.
+    auto existing = rep.first;
+    // append all additional ones
+    for(auto m = list.begin(); m < list.end(); m++) {
+      existing->second.emplace_back(*m);
+    }
+  }
+}
+
 std::u32string remove_markers(const std::u32string &str, marker_map *markers, marker_encoding encoding) {
   std::u32string out;
   auto i = str.begin();
   auto last = i;
+  marker_list last_markers;
   for (i = find(i, str.end(), LDML_UC_SENTINEL); i != str.end(); i = find(i, str.end(), LDML_UC_SENTINEL)) {
     // append any prefix (from prior pos'n to here)
     out.append(last, i);
@@ -1243,19 +1275,34 @@ std::u32string remove_markers(const std::u32string &str, marker_map *markers, ma
       }
     }
     assert(marker_no >= LDML_MARKER_MIN_INDEX && marker_no <= LDML_MARKER_ANY_INDEX);
+    // The marker number is good, add it to the list
     last = i;
-
     // record the marker
     if (marker_no >= LDML_MARKER_MIN_INDEX && markers != nullptr) {
+      // add it to the list
+      last_markers.emplace_back(marker_no);
+      char32_t marker_ch;
       if (i == str.end()) {
-        markers->emplace(MARKER_BEFORE_EOT, marker_no);
+        // Hit end, so mark it as the end
+        marker_ch = MARKER_BEFORE_EOT;
+      } else if (*i == LDML_UC_SENTINEL) {
+        // it's another marker (presumably)
+        continue; // loop around
       } else {
-        markers->emplace(*i, marker_no);
+        marker_ch = *i;
       }
+      add_markers_to_map(*markers, marker_ch, last_markers);
+      last_markers.clear(); // mark as already recorded
     }
   }
   // get the suffix between the last marker and the end
   out.append(last, str.end());
+  if (!last_markers.empty() && markers != nullptr) {
+    // we had markers but couldn't find the base.
+    // it's possible that there was a malformed UC_SENTINEL string in between.
+    // Add it to the end.
+    add_markers_to_map(*markers, MARKER_BEFORE_EOT, last_markers);
+  }
   return out;
 }
 
