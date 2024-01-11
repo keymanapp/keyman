@@ -100,7 +100,6 @@ export async function run() {
     (async function() {
       configuration.ngrokEndpoint = await ngrok.connect({
         proto: 'http',
-        bind_tls: true,
         addr: configuration.port,
         authtoken: configuration.ngrokToken,
         region: configuration.ngrokRegion,
