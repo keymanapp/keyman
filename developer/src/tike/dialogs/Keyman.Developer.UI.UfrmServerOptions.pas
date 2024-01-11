@@ -75,7 +75,7 @@ const
   // to be stable, as they are used in other apps also.
   SUrlNgrokAuthToken = 'https://dashboard.ngrok.com/get-started/your-authtoken';
   SUrlNgrokSignup = 'https://dashboard.ngrok.com/signup';
-  SUrlNgrokDownload = 'https://bin.equinox.io/c/4VmDzA7iaHb/ngrok-stable-windows-386.zip';
+  SUrlNgrokDownload = 'https://bin.equinox.io/c/bNyj1mQVY4c/ngrok-v3-stable-windows-386.zip';
   SNGrokExe = 'ngrok.exe';
 
 procedure TfrmServerOptions.cmdCreateAccountClick(Sender: TObject);
