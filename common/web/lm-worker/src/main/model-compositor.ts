@@ -657,15 +657,14 @@ export default class ModelCompositor {
     let compositor = this;
     let fallbackSuggestions = function() {
       let revertedContext = models.applyTransform(reversion.transform, context);
-      return compositor.predict({insert: '', deleteLeft: 0}, revertedContext).then((suggestions) => {
-        suggestions.forEach(function(suggestion) {
-          // A reversion's transform ID is the additive inverse of its original suggestion;
-          // we revert to the state of said original suggestion.
-          suggestion.transformId = -reversion.transformId;
-        });
-
-        return suggestions;
+      const suggestions = await compositor.predict({insert: '', deleteLeft: 0}, revertedContext);
+      suggestions.forEach(function(suggestion) {
+        // A reversion's transform ID is the additive inverse of its original suggestion;
+        // we revert to the state of said original suggestion.
+        suggestion.transformId = -reversion.transformId;
       });
+
+      return suggestions;
     }
 
     if(!this.contextTracker) {
