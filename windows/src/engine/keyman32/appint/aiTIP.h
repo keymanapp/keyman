@@ -38,9 +38,6 @@
 class AITIP : public AIWin2000Unicode
 {
 private:
-  void MergeContextWithCache(PWSTR buf, AppContext *context);   // I4262
-
-private:
   BOOL useLegacy;
 
 	BOOL PostKeys();
@@ -50,20 +47,6 @@ public:
 	AITIP();
 	~AITIP();
 
-  /**
-   * Copy the member context
-   *
-   * @param[out]  savedContext  the copied context
-   */
-  void CopyContext(AppContext *savedContext);
-
-   /**
-   * Restore the passed context to the member context
-   *
-   * @param  savedContext  the context to restore
-   */
-  void RestoreContextOnly(AppContext *savedContext);
-
 	/* Information functions */
 
 	virtual BOOL CanHandleWindow(HWND ahwnd);
@@ -71,7 +54,12 @@ public:
 
 	/* Context functions */
 
-	virtual void ReadContext();
+ /**
+   * Reads the current application context upto MAXCONTEXT length into the supplied buffer.
+   * @param  buf      The data buffer to copy current application context into, must
+   *                  be MAXCONTEXT WCHARs or larger.
+   */
+	virtual BOOL ReadContext(PWSTR buf);
 
 	/* Queue and sending functions */
 

@@ -690,6 +690,7 @@ export default abstract class OSKView extends EventEmitter<EventMap> implements 
   private loadActiveKeyboard() {
     this.setBoxStyling();
 
+    // Do not erase / 'shutdown' the banner-controller; we simply re-use its elements.
     if(this.vkbd) {
       this.vkbd.shutdown();
     }
@@ -1135,6 +1136,8 @@ export default abstract class OSKView extends EventEmitter<EventMap> implements 
 
     this.kbdStyleSheetManager.unlinkAll();
     this.uiStyleSheetManager.unlinkAll();
+
+    this.bannerController.shutdown();
   }
 
   /**

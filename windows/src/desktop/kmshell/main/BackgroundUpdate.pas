@@ -94,7 +94,7 @@ type
     procedure Exit; virtual; abstract;
     procedure HandleCheck; virtual; abstract;
     procedure HandleDownload; virtual; abstract;
-    function HandleKmShell : Integer; virtual; abstract;
+    function  HandleKmShell : Integer; virtual; abstract;
     procedure HandleInstall; virtual; abstract;
     procedure HandleMSIInstallComplete; virtual; abstract;
     procedure HandleAbort; virtual; abstract;
@@ -258,7 +258,6 @@ type
       tempPath.
     }
     procedure SavePackageUpgradesToDownloadTempPath;
-    //function IsKeymanRunning: Boolean;
     function checkUpdateSchedule : Boolean;
 
     function SetRegistryState (Update : TUpdateState): Boolean;
@@ -522,20 +521,6 @@ begin
 end;
 
 
-
-//function TBackgroundUpdate.IsKeymanRunning: Boolean;  // I2329
-//begin
-//  try
-//      Result :=  kmcom.Control.IsKeymanRunning;
-//  except
-//    on E:Exception do
-//    begin
-//      KL.Log(E.Message);
-//      Exit(False);
-//    end;
-//  end;
-//end;
-
 function TBackgroundUpdate.CheckUpdateSchedule: Boolean;
 begin
   try
@@ -591,7 +576,7 @@ begin
   end
   else
   begin
-   // TODO: Unable to set state for Value []
+   // TODO: #10210 Error log for Unable to set state for Value
   end;
 
 end;
@@ -639,7 +624,7 @@ begin
     usRetry: Result := RetryState;
     usWaitingPostInstall: Result := WaitingPostInstallState;
   else
-    // Log error unknown state setting to idle
+    // TODO: #10210 Log error unknown state setting to idle
     Result := IdleState;
   end;
 end;
@@ -681,7 +666,6 @@ end;
 
 function TBackgroundUpdate.CurrentStateName: string;
 begin
-  // Implement your logic here
   Result := CurrentState.StateName;
 end;
 
@@ -704,13 +688,12 @@ end;
 procedure IdleState.Enter;
 begin
   // Enter UpdateAvailableState
-  // register name
   bucStateContext.SetRegistryState(usIdle);
 end;
 
 procedure IdleState.Exit;
 begin
-  // Exit UpdateAvailableState
+
 end;
 
 procedure IdleState.HandleCheck;
@@ -723,9 +706,11 @@ begin
     this all in the Idle HandleCheck message. But could be broken into an
     seperate state of WaitngCheck RESP }
   { if Response not OK stay in the idle state and return }
-  //CheckForUpdates := TRemoteUpdateCheck.Create(False);
+
+
   // should be false but forcing check for testing
-  CheckForUpdates := TRemoteUpdateCheck.Create(True);
+  //CheckForUpdates := TRemoteUpdateCheck.Create(True);
+  CheckForUpdates := TRemoteUpdateCheck.Create(False);
   try
      Result:= CheckForUpdates.Run;
   finally
@@ -742,28 +727,28 @@ end;
 
 procedure IdleState.HandleDownload;
 begin
-  // Implement your logic here
+
 end;
 
 function IdleState.HandleKmShell;
 begin
-  // Implement your logic here
+
   Result := kmShellContinue;
 end;
 
 procedure IdleState.HandleInstall;
 begin
-  // Implement your logic here
+
 end;
 
 procedure IdleState.HandleMSIInstallComplete;
 begin
-  // Implement your logic here
+
 end;
 
 procedure IdleState.HandleAbort;
 begin
-  // Implement your logic here
+
 end;
 
 procedure IdleState.HandleInstallNow;
@@ -774,7 +759,7 @@ end;
 
 function IdleState.StateName;
 begin
-  // Implement your logic here
+
   Result := 'IdleState';
 end;
 
@@ -797,7 +782,7 @@ end;
 
 procedure UpdateAvailableState.HandleCheck;
 begin
-  // Implement your logic here
+
 end;
 
 procedure UpdateAvailableState.HandleDownload;
@@ -816,17 +801,17 @@ end;
 
 procedure UpdateAvailableState.HandleInstall;
 begin
-  // Implement your logic here
+
 end;
 
 procedure UpdateAvailableState.HandleMSIInstallComplete;
 begin
-  // Implement your logic here
+
 end;
 
 procedure UpdateAvailableState.HandleAbort;
 begin
-  // Implement your logic here
+
 end;
 
 procedure UpdateAvailableState.HandleInstallNow;
@@ -837,7 +822,7 @@ end;
 
 function UpdateAvailableState.StateName;
 begin
-  // Implement your logic here
+
   Result := 'UpdateAvailableState';
 end;
 
@@ -869,7 +854,7 @@ end;
 
 procedure DownloadingState.HandleCheck;
 begin
-  // For now just pretend updated found
+
 end;
 
 procedure DownloadingState.HandleDownload;
@@ -885,29 +870,37 @@ begin
   // TODO check if keyman is running then send to Waiting Restart
   if DownloadResult then
   begin
-    ChangeState(InstallingState);
+    if HasKeymanRun then
+    begin
+      ChangeState(WaitingRestartState);
+      Result := kmShellContinue;
+    end
+    else
+    begin
+      ChangeState(InstallingState);
+      Result := kmShellExit;
+    end;
   end
   else
   begin
     ChangeState(RetryState);
+    Result := kmShellContinue;
   end;
-  Result := kmShellContinue;
+
 end;
 
 procedure DownloadingState.HandleInstall;
 begin
-  // Implement your logic here
   ChangeState(InstallingState);
 end;
 
 procedure DownloadingState.HandleMSIInstallComplete;
 begin
-  // Implement your logic here
+
 end;
 
 procedure DownloadingState.HandleAbort;
 begin
-  // Implement your logic here
 end;
 
 procedure DownloadingState.HandleInstallNow;
@@ -918,7 +911,6 @@ end;
 
 function DownloadingState.StateName;
 begin
-  // Implement your logic here
   Result := 'DownloadingState';
 end;
 
@@ -935,7 +927,7 @@ begin
     DownloadResult := DownloadUpdate.DownloadUpdates;
     KL.Log('TBackgroundUpdate.DownloadUpdatesBackground: DownloadResult = '+IntToStr(Ord(DownloadResult)));
     Result := DownloadResult;
-// TODO: workout when we need to refresh kmcom keyboards
+// #TODO: #10210 workout when we need to refresh kmcom keyboards
 
 //      if Result in [ wucSuccess] then
 //  begin
@@ -964,12 +956,12 @@ end;
 
 procedure WaitingRestartState.HandleCheck;
 begin
-  // Implement your logic here
+
 end;
 
 procedure WaitingRestartState.HandleDownload;
 begin
-  // Implement your logic here
+
 end;
 
 function WaitingRestartState.HandleKmShell;
@@ -1011,17 +1003,17 @@ end;
 
 procedure WaitingRestartState.HandleInstall;
 begin
-  // Implement your logic here
+
 end;
 
 procedure WaitingRestartState.HandleMSIInstallComplete;
 begin
-  // Implement your logic here
+
 end;
 
 procedure WaitingRestartState.HandleAbort;
 begin
-  // Implement your logic here
+
 end;
 
 procedure WaitingRestartState.HandleInstallNow;
@@ -1034,7 +1026,7 @@ end;
 
 function WaitingRestartState.StateName;
 begin
-  // Implement your logic here
+
   Result := 'WaitingRestartState';
 end;
 
@@ -1060,6 +1052,7 @@ var
   s: string;
   FResult: Boolean;
 begin
+  FResult := False;
   s := LowerCase(ExtractFileExt(bucStateContext.FParams.Keyman.SavePath));
   if s = '.msi' then
     FResult := TUtilExecute.Shell(0, 'msiexec.exe', '', '/qb /i "'+bucStateContext.FParams.Keyman.SavePath+'" AUTOLAUNCHPRODUCT=1')  // I3349
@@ -1104,9 +1097,6 @@ var
   fileNames: TStringDynArray;
 begin
     bucStateContext.SetRegistryState(usInstalling);
-     // Needs to be desing discusion about the correct location for the cache
-    //SavePath := IncludeTrailingPathDelimiter(GetFolderPath(CSIDL_COMMON_APPDATA) + SFolder_CachedUpdateFiles);
-    // For testing
     SavePath := IncludeTrailingPathDelimiter(TKeymanPaths.KeymanUpdateCachePath);
 
     GetFileNamesInDirectory(SavePath, fileNames);
@@ -1118,18 +1108,15 @@ begin
       if fileExt = '.exe' then
         break;
     end;
-    // ExecuteInstall(SavePath + ExtractFileName(fileName));
-    // TODO DoInstallPackages ( this may need to be as state in the enum seperate
-    // to installing the main keyman executable.
+
     if DoInstallKeyman(SavePath + ExtractFileName(fileName)) then
     begin
        KL.Log('TBackgroundUpdate.InstallingState.Enter: DoInstall OK');
     end
     else
     begin
-        // TODO: clean failed download
-        // TODO: Do we do a retry on install? probably not
-        // install error log the error.
+        // TODO: #10210 clean failed download
+        // TODO: #10210 Do we do a retry on install? probably not
         KL.Log('TBackgroundUpdate.InstallingState.Enter: DoInstall fail');
         ChangeState(IdleState);
     end
@@ -1142,12 +1129,12 @@ end;
 
 procedure InstallingState.HandleCheck;
 begin
-  // Implement your logic here
+
 end;
 
 procedure InstallingState.HandleDownload;
 begin
-  // Implement your logic here
+
 end;
 
 function InstallingState.HandleKmShell;
@@ -1160,12 +1147,12 @@ end;
 
 procedure InstallingState.HandleInstall;
 begin
-  // Implement your logic here
+
 end;
 
 procedure InstallingState.HandleMSIInstallComplete;
 begin
-  // Implement your logic here
+
 end;
 
 procedure InstallingState.HandleAbort;
@@ -1180,7 +1167,7 @@ end;
 
 function InstallingState.StateName;
 begin
-  // Implement your logic here
+
   Result := 'InstallingState';
 end;
 
@@ -1199,33 +1186,33 @@ end;
 
 procedure RetryState.HandleCheck;
 begin
-  // Implement your logic here
+
 end;
 
 procedure RetryState.HandleDownload;
 begin
-  // Implement your logic here
+
 end;
 
 function RetryState.HandleKmShell;
 begin
-  // TODO Implement retry
+  // #TODO: #10210 Implement retry
   Result := kmShellContinue
 end;
 
 procedure RetryState.HandleInstall;
 begin
-  // Implement your logic here
+
 end;
 
 procedure RetryState.HandleMSIInstallComplete;
 begin
-  // Implement your logic here
+
 end;
 
 procedure RetryState.HandleAbort;
 begin
-  // Implement your logic here
+
 end;
 
 procedure RetryState.HandleInstallNow;
@@ -1237,7 +1224,7 @@ end;
 
 function RetryState.StateName;
 begin
-  // Implement your logic here
+
   Result := 'RetryState';
 end;
 
@@ -1266,8 +1253,8 @@ end;
 
 function WaitingPostInstallState.HandleKmShell;
 begin
-  // TODO maybe have a counter if we get called in this state
-  // to many time we need
+  // TODO: #10210  have a counter if we get called in this state
+  // too many time abort.
   HandleMSIInstallComplete;
   Result := kmShellContinue;
 end;
@@ -1283,10 +1270,6 @@ var SavePath: string;
     FileNames: TStringDynArray;
 begin
       KL.Log('WaitingPostInstallState.HandleMSIInstallComplete');
-      // TODO Remove cached files. Do any loging updating of files etc and then set back to idle
-      //SavePath := IncludeTrailingPathDelimiter(GetFolderPath(CSIDL_COMMON_APPDATA) + SFolder_CachedUpdateFiles);
-      /// For testing using local user area cache
-      //SavePath := 'C:\Projects\rcswag\testCache';
       SavePath := IncludeTrailingPathDelimiter(TKeymanPaths.KeymanUpdateCachePath);
       KL.Log('WaitingPostInstallState.HandleMSIInstallComplete remove SavePath:'+ SavePath);
 
@@ -1310,7 +1293,7 @@ end;
 
 function WaitingPostInstallState.StateName;
 begin
-  // Implement your logic here
+
   Result := 'WaitingPostInstallState';
 end;
 

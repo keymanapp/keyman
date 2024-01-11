@@ -14,6 +14,7 @@ await esbuild.build({
 //
 // Alternatively, we can just build it separately like the node-oriented one.
 fs.renameSync('build/lib/keyboards/loaders/dom-keyboard-loader.mjs', 'build/lib/dom-keyboard-loader.mjs');
+fs.renameSync('build/lib/keyboards/loaders/dom-keyboard-loader.mjs.map', 'build/lib/dom-keyboard-loader.mjs.map');
 fs.rmSync('build/lib/keyboards', { recursive: true, force: true });
 
 // The node-based keyboard loader needs an extra parameter due to Node-built-in imports:

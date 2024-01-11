@@ -138,7 +138,6 @@ type
     actToolsWebConfigure: TAction;
     actToolsWebStartServer: TAction;
     actToolsWebStopServer: TAction;
-    actProjectOpenFolder: TBrowseForFolder;
     procedure actFileNewExecute(Sender: TObject);
     procedure DataModuleCreate(Sender: TObject);
     procedure actFileOpenAccept(Sender: TObject);
@@ -238,7 +237,6 @@ type
     procedure actToolsWebStartServerUpdate(Sender: TObject);
     procedure actToolsWebStopServerExecute(Sender: TObject);
     procedure actToolsWebStopServerUpdate(Sender: TObject);
-    procedure actProjectOpenFolderAccept(Sender: TObject);
   private
     function CheckFilenameConventions(FileName: string): Boolean;
     function SaveAndCloseAllFiles: Boolean;
@@ -336,11 +334,8 @@ begin
 end;
 
 procedure TmodActionsMain.actFileOpenAccept(Sender: TObject);
-var
-  i: Integer;
 begin
-  for i := 0 to actFileOpen.Dialog.Files.Count - 1 do
-    frmKeymanDeveloper.OpenFile(actFileOpen.Dialog.Files[i], True);
+  frmKeymanDeveloper.OpenFilesInProject(actFileOpen.Dialog.Files.ToStringArray);
 end;
 
 procedure TmodActionsMain.actFileOpenUpdate(Sender: TObject);
@@ -581,6 +576,7 @@ end;
 
 procedure TmodActionsMain.actProjectNewExecute(Sender: TObject);
 begin
+  // TODO: new process
   if not frmKeymanDeveloper.BeforeOpenProject then
     Exit;
   ShowNewProjectForm(frmKeymanDeveloper);
@@ -588,22 +584,13 @@ end;
 
 procedure TmodActionsMain.actProjectOpenAccept(Sender: TObject);
 begin
-  if not frmKeymanDeveloper.BeforeOpenProject then
-    Exit;
-  OpenProject(actProjectOpen.Dialog.FileName);
-end;
-
-procedure TmodActionsMain.actProjectOpenFolderAccept(Sender: TObject);
-begin
-  if not frmKeymanDeveloper.BeforeOpenProject then
-    Exit;
-  OpenProject(actProjectOpenFolder.Folder);
+  frmKeymanDeveloper.OpenProject(actProjectOpen.Dialog.FileName);
 end;
 
 procedure TmodActionsMain.OpenProject(FileName: WideString);
 begin
   FileName := ExpandUNCFileName(FileName);
-  if (FileName <> '') and not FileExists(FileName) and not DirectoryExists(FileName) then
+  if (FileName <> '') and not FileExists(FileName) then
   begin
     ShowMessage('The project '+FileName+' does not exist.');
     Exit;
@@ -1056,9 +1043,9 @@ end;
 procedure TmodActionsMain.DataModuleCreate(Sender: TObject);
 begin
   actFileOpen.Dialog.Filter :=
-    'Keyman source files|*.kmn;*.kps;*.txt;*.bmp;*.ico;*.kpj;*.kvk;*.kvks;*.model.ts;*.tsv|'+
+    'Keyman source files|*.kmn;*.kps;*.txt;*.bmp;*.ico;*.kpj;*.kvk;*.kvks;*.model.ts;*.tsv;*.xml|'+
     'Projects files (*.kpj)|*.kpj|'+
-    'Keyboard files (*.kmn)|*.kmn|'+
+    'Keyboard files (*.kmn, *.xml)|*.kmn;*.xml|'+
     'Package files (*.kps)|*.kps|'+
     'Model files (*.model.ts)|*.model.ts|'+
     'Wordlist files (*.tsv)|*.tsv|'+

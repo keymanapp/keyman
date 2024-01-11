@@ -314,6 +314,10 @@ const
   SRegKey_IDEVisualKeyboard_CU   = SRegKey_IDE_CU                 + '\VisualKeyboard';      // CU
   SRegKey_IDEToolbars_CU         = SRegKey_IDE_CU                 + '\Toolbars';            // CU
 
+  SRegKey_IDEActiveProjects_CU   = SRegKey_IDE_CU                 + '\Active Projects';     // CU
+  SRegValue_ActiveProject_Filename = 'project filename';
+  SRegValue_ActiveProject_SourcePath = 'source path';
+
   SRegValue_CheckForUpdates   = 'check for updates'; // CU
   SRegValue_LastUpdateCheckTime = 'last update check time'; // CU
 

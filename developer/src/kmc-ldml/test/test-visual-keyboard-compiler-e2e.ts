@@ -15,7 +15,7 @@ describe('visual-keyboard-compiler', function() {
     const binaryFilename = makePathToFixture('basic-kvk.txt');
 
     // Compile the visual keyboard
-    const vk = compileVisualKeyboard(inputFilename, {...compilerTestOptions, saveDebug: true, shouldAddCompilerVersion: false});
+    const vk = await compileVisualKeyboard(inputFilename, {...compilerTestOptions, saveDebug: true, shouldAddCompilerVersion: false});
     assert.isNotNull(vk);
 
     // Use the builder to generate the binary output file

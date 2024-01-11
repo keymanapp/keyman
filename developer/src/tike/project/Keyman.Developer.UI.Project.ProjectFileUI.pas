@@ -39,6 +39,7 @@ type
   TProjectUI = class(TProject)
   private
     FRenderFileName: TTempFile;
+    FIsTemporary: Boolean;
     function GetRenderFileName: string;
     procedure Refresh;
 
@@ -47,7 +48,7 @@ type
     procedure DoRefreshCaption; override;
 
   public
-    constructor Create(AProjectType: TProjectType; AFileName: string); override;
+    constructor Create(AProjectType: TProjectType; AFileName: string; ALoad: Boolean); override;
     destructor Destroy; override;
 
     procedure Log(AState: TProjectLogState; Filename, Msg: string; MsgCode, line: Integer); override;   // I4706
@@ -61,6 +62,8 @@ type
     function Load: Boolean; override;   // I4694
 
     property RenderFileName: string read GetRenderFileName;   // I4181
+
+    property IsTemporary: Boolean read FIsTemporary write FIsTemporary;
   end;
 
   TProjectFileUI = class
@@ -129,7 +132,7 @@ end;
 
 { TProjectUI }
 
-constructor TProjectUI.Create(AProjectType: TProjectType; AFileName: string);
+constructor TProjectUI.Create(AProjectType: TProjectType; AFileName: string; ALoad: Boolean);
 begin
   inherited;
   FRenderFileName := TTempFileManager.Get('.html');   // I4181
@@ -138,12 +141,21 @@ end;
 destructor TProjectUI.Destroy;
 begin
   FreeAndNil(FRenderFileName);   // I4181
+
+  if FIsTemporary then
+  begin
+    if FileExists(FileName) then System.SysUtils.DeleteFile(FileName);
+    if FileExists(UserFileName) then System.SysUtils.DeleteFile(UserFileName);
+  end;
+
   inherited Destroy;
 end;
 
 function TProjectUI.DisplayFileName: string;
 begin
-  Result := ExtractFileName(FileName);
+  if IsTemporary
+    then Result := 'Temporary Project'
+    else Result := ExtractFileName(FileName);
 end;
 
 function TProjectUI.Load: Boolean;   // I4694

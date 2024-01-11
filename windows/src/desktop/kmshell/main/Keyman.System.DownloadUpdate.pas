@@ -89,7 +89,7 @@ uses
   System.StrUtils;
 
  // temp wrapper for converting showmessage to logs don't know where
- // if nt using klog
+ // if not using klog
  procedure LogMessage(LogMessage: string);
  begin
    KL.Log(LogMessage);
@@ -194,7 +194,8 @@ begin
   // Keyman Installer
   if not DownloadFile(Params.InstallURL, SavePath + Params.FileName) then  // I2742
   begin
-    // TODO: #10210record fail? and log  // Download failed but user wants to install other files
+    // TODO: #10210  convert to error log.
+    LogMessage('DoDownloadUpdates Failed to download' + Params.InstallURL);
   end
   else
   begin
@@ -213,7 +214,6 @@ var
   DownloadResult : Boolean;
   ucr: TUpdateCheckResponse;
 begin
-  // DownloadBackGroundSavePath := IncludeTrailingPathDelimiter(GetFolderPath(CSIDL_COMMON_APPDATA) + SFolder_CachedUpdateFiles);
   DownloadBackGroundSavePath := IncludeTrailingPathDelimiter(TKeymanPaths.KeymanUpdateCachePath);
   if TUpdateCheckStorage.LoadUpdateCacheData(ucr) then
   begin
@@ -235,7 +235,6 @@ var
   FileNames : TStringDynArray;
 
 begin
-    // DownloadBackGroundSavePath := IncludeTrailingPathDelimiter(GetFolderPath(CSIDL_COMMON_APPDATA) + SFolder_CachedUpdateFiles);
   SavedPath := IncludeTrailingPathDelimiter(TKeymanPaths.KeymanUpdateCachePath);
   GetFileNamesInDirectory(SavedPath, FileNames);
   if Length(FileNames) = 0 then
@@ -266,7 +265,7 @@ begin
         Result := False;
         Exit;
       end;
-    // TODO verify filesizes match so we know we don't have partical downloades.
+    // TODO verify filesizes match so we know we don't have partial downloades.
     Result := True;
   end
   else

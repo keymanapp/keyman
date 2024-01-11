@@ -50,9 +50,6 @@
     "commander": "^10.0.0",
     "supports-color": "^9.4.0"
   },
-  "bundleDependencies": [
-    "@keymanapp/developer-utils"
-  ],
   "files": [
     "build/src/"
   ],
