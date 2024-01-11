@@ -284,7 +284,6 @@ type
     UseEditorCharacterFont1: TMenuItem;
     VirtualKeyIdentifier1: TMenuItem;
     N39: TMenuItem;
-    Customise1: TMenuItem;
     Options1: TMenuItem;
     Contents1: TMenuItem;
     N40: TMenuItem;

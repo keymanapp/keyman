@@ -3119,9 +3119,6 @@ inherited frmKeymanDeveloper: TfrmKeymanDeveloper
       object N4: TMenuItem
         Caption = '-'
       end
-      object Customise1: TMenuItem
-        Action = modActionsMain.actToolsCustomise
-      end
       object Options1: TMenuItem
         Action = modActionsMain.actToolsOptions
       end
