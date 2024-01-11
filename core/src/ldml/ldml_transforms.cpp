@@ -1028,6 +1028,7 @@ bool normalize_nfd_markers(std::u32string &str, marker_encoding encoding) {
   return normalize_nfd_markers_segment(str, m, encoding);
 }
 
+// TODO-LDML: cleanup
 // bool normalize_nfc_markers(std::u32string &str, marker_map &map, marker_encoding encoding) {
 //   /** original string, but no markers */
 //   std::u32string str_unmarked = remove_markers(str, map, encoding);

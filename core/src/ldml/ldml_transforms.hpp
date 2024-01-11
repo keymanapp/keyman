@@ -333,6 +333,7 @@ bool normalize_nfd_markers_segment(std::u16string &str, marker_map &markers, mar
 bool normalize_nfd_markers(std::u32string &str, marker_encoding encoding = plain_sentinel);
 bool normalize_nfd_markers(std::u16string &str, marker_encoding encoding = plain_sentinel);
 
+// TODO-LDML: Cleanup
 // /** Normalize a u32string inplace to NFC, retaining markers.
 //  * @param markers will be populated with marker chars
 //  * @return false on failure
@@ -366,6 +367,7 @@ void prepend_hex_quad(std::u32string &str, KMX_DWORD marker);
 KMX_DWORD parse_hex_quad(const km_core_usv hex_str[]);
 
 
+// TODO-LDML: Cleanup
 // bool normalize_nfc_markers(std::u16string &str, marker_encoding encoding) {
 //   marker_map m;
 //   return normalize_nfc_markers_segment(str, m, encoding);
