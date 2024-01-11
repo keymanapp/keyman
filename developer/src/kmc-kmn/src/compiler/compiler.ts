@@ -364,6 +364,12 @@ export class KmnCompiler implements KeymanCompiler, UnicodeSetParser {
   private runKvkCompiler(kvksFilename: string, kmnFilename: string, kmxFilename: string, displayMap?: Osk.PuaMap) {
     // The compiler detected a .kvks file, which needs to be captured
     kvksFilename = this.callbacks.resolveFilename(kmnFilename, kvksFilename);
+    const data = this.callbacks.loadFile(kvksFilename);
+    if(!data) {
+      this.callbacks.reportMessage(CompilerMessages.Error_FileNotFound({filename: kvksFilename}));
+      return null;
+    }
+
     const filename = this.callbacks.path.basename(kvksFilename);
     let basename = null;
     let vk: VisualKeyboard.VisualKeyboard = null;
@@ -373,7 +379,7 @@ export class KmnCompiler implements KeymanCompiler, UnicodeSetParser {
       basename = this.callbacks.path.basename(kvksFilename, KeymanFileTypes.Binary.VisualKeyboard);
       const reader = new KvkFileReader();
       try {
-        vk = reader.read(this.callbacks.loadFile(kvksFilename));
+        vk = reader.read(data);
       } catch(e) {
         this.callbacks.reportMessage(CompilerMessages.Error_InvalidKvkFile({filename, e}));
         return null;
@@ -383,7 +389,7 @@ export class KmnCompiler implements KeymanCompiler, UnicodeSetParser {
       const reader = new KvksFileReader();
       let kvks = null;
       try {
-        kvks = reader.read(this.callbacks.loadFile(kvksFilename));
+        kvks = reader.read(data);
         reader.validate(kvks);
       } catch(e) {
         this.callbacks.reportMessage(CompilerMessages.Error_InvalidKvksFile({filename, e}));

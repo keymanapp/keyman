@@ -1,5 +1,19 @@
 # Keyman Version History
 
+## 17.0.241 alpha 2024-01-10
+
+* chore(deps-dev): bump follow-redirects from 1.14.9 to 1.15.4 (#10340)
+* Update character-map.md (#10345)
+* chore(linux): Output dput exit code after upload to llso (#10349)
+* fix(android/engine): Use fallback keyboard if keyboard index undefined (#10342)
+* fix(android): Use alert dialog when package is missing touch keyboards (#10335)
+* chore: cleanup recent history entries without PR title (#10298)
+* chore(web): better logging for gesture-recognizer tools build script (#10329)
+
+## 17.0.240 alpha 2024-01-09
+
+* chore(linux): Retry llso upload (#10331)
+
 ## 17.0.239 alpha 2024-01-08
 
 * fix(mac): write persisted options returned from Core (#10275)
@@ -38,7 +52,7 @@
 
 * fix(mac): Improve detection of non-compliant apps (#10282)
 * fix(web): default multitap logic for shift-layer shift multitaps (#10281)
-*  (#10284)
+* fix(web): keyboard functionality on Android 5.0 / Chrome 35 (#10284)
 
 ## 17.0.233 alpha 2023-12-19
 
@@ -48,7 +62,7 @@
 
 ## 17.0.232 alpha 2023-12-18
 
-*  (#10270)
+* feat(web): adds highlighting to BKSP while held (#10270)
 
 ## 17.0.231 alpha 2023-12-15
 
