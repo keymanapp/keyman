@@ -128,6 +128,7 @@ bool normalize_nfd_markers(std::u32string &str, marker_encoding encoding) {
   return normalize_nfd_markers_segment(str, m, encoding);
 }
 
+// TODO-LDML: cleanup
 // bool normalize_nfc_markers(std::u32string &str, marker_map &map, marker_encoding encoding) {
 //   /** original string, but no markers */
 //   std::u32string str_unmarked = remove_markers(str, map, encoding);
@@ -147,7 +148,7 @@ bool normalize_nfd_markers(std::u32string &str, marker_encoding encoding) {
 //   return true; // all OK
 // }
 
-
+// TODO-LDML: cleanup
 // bool normalize_nfc(std::u32string &str) {
 //   std::u16string rstr = km::core::kmx::u32string_to_u16string(str);
 //   if(!normalize_nfc(rstr)) {
@@ -158,6 +159,7 @@ bool normalize_nfd_markers(std::u32string &str, marker_encoding encoding) {
 //   }
 // }
 
+// TODO-LDML: cleanup
 // bool normalize_nfc(std::u16string &str) {
 //   UErrorCode status = U_ZERO_ERROR;
 //   const icu::Normalizer2 *nfc = icu::Normalizer2::getNFCInstance(status);
