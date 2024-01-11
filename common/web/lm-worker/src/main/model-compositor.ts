@@ -655,7 +655,7 @@ export default class ModelCompositor {
     // If we are unable to track context (because the model does not support LexiconTraversal),
     // we need a "fallback" strategy.
     let compositor = this;
-    let fallbackSuggestions = function() {
+    let fallbackSuggestions = async function() {
       let revertedContext = models.applyTransform(reversion.transform, context);
       const suggestions = await compositor.predict({insert: '', deleteLeft: 0}, revertedContext);
       suggestions.forEach(function(suggestion) {
