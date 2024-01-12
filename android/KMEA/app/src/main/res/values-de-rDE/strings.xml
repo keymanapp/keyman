@@ -45,7 +45,7 @@
     <!-- Context: Button label -->
     <string name="label_update" comment="Dialog button to update a resource">Aktualisieren</string>
     <!-- Context: No internet for updates -->
-    <string name="no_internet_connection" comment="Internet connection missing">No internet connection</string>
+    <string name="no_internet_connection" comment="Internet connection missing">Keine Internetverbindung</string>
     <!-- Context: Keyboard Updates -->
     <string name="cannot_connect" comment="Error message when network connection fails">Kann keine Verbindung zum Keyman-Server herstellen!</string>
     <!-- Context: Keyboard Updates -->
@@ -128,11 +128,11 @@
     <!-- Context: Model Info -->
     <string name="confirm_delete_model" comment="Confirmation to delete a dictionary">Möchten Sie dieses Wörterbuch löschen?</string>
     <!-- Context: Model Deleted -->
-    <string name="model_deleted" comment="Notification when a dictionary is deleted">Dictionary deleted</string>
+    <string name="model_deleted" comment="Notification when a dictionary is deleted">Wörterbuch gelöscht</string>
     <!-- Context: Language Settings Keyboard install strings -->
     <string name="keyboard_install_toast" comment="Notification when a keyboard is installed">%1$s -Tastatur installiert</string>
     <!-- Context: Language Settings Keyboard uninstall strings -->
-    <string name="keyboard_deleted_toast" comment="Notification when a keyboard is deleted">Keyboard deleted</string>
+    <string name="keyboard_deleted_toast" comment="Notification when a keyboard is deleted">Tastatur gelöscht</string>
     <!-- Context: Language Settings menu strings -->
     <string name="enable_corrections" comment="Enable corrections from the suggestion banner">Korrekturen aktivieren</string>
     <!-- Context: Language Settings menu strings -->
@@ -168,5 +168,5 @@
     <!-- Context: Other strings -->
     <string name="help_bubble_text">Hier tippen, um Tastatur zu ändern</string>
     <!-- Context: anywhere -->
-    <string name="unable_to_open_browser" comment="Notification when a browser activity cannot be launched">Unable to launch web browser</string>
+    <string name="unable_to_open_browser" comment="Notification when a browser activity cannot be launched">Webbrowser kann nicht gestartet werden</string>
 </resources>
