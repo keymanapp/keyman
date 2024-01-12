@@ -996,7 +996,7 @@ ibus_keyman_engine_focus_out (IBusEngine *engine)
     IBusKeymanEngine *keyman = (IBusKeymanEngine *) engine;
 
     g_message("%s", __FUNCTION__);
-    km_core_context_clear(km_core_state_context(keyman->state));
+    km_core_state_context_clear(keyman->state);
     parent_class->focus_out (engine);
 }
 

@@ -282,6 +282,10 @@ function km_core_state_to_json(
   space: pinteger
 ): km_core_status; cdecl; external keymancore delayed;
 
+function km_core_state_context_clear(
+  state: pkm_core_state
+): km_core_status; cdecl; external keymancore delayed;
+
 type
   km_core_attr = record
     max_context: Integer;   // Maximum context size supported by processor.

@@ -106,10 +106,8 @@ procedure TVisualKeyboardImportKMX.ImportKey(vk: TVKKey);
 var
   data: string;
   i: Integer;
-  context: pkm_core_context;
 begin
-  context := km_core_state_context(FCore.State);
-  km_core_context_clear(context);
+  km_core_state_context_clear(FCore.State);
   if km_core_process_event(FCore.State, vk.vkey, vk.kmshift, 1, KM_CORE_EVENT_FLAG_DEFAULT) = KM_CORE_STATUS_OK then
   begin
     FEvents.Clear;
