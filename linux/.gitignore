@@ -39,9 +39,3 @@ help/reference/
 # Debian watch file - we generate it from watch.in
 watch
 
-#sabine
-*.kmn
-*.kmx
-*.kvk
-*.bak
-*.txt
