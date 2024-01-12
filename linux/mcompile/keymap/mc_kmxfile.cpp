@@ -362,8 +362,6 @@ KMX_BOOL KMX_LoadKeyboard(char16_t* fileName, LPKMX_KEYBOARD* lpKeyboard) {
   LPKMX_KEYBOARD kbp;
   PKMX_BYTE filebase;
 
-  wprintf(L"  Loading file '%ls'\n", u16fmt((const char16_t*) fileName).c_str());
-
   if(!fileName || !lpKeyboard) {
     KMX_LogError(L"LogError1: Bad Filename\n" );
     return FALSE;

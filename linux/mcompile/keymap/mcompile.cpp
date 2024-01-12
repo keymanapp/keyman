@@ -68,28 +68,27 @@ int run(int argc, std::vector<std::u16string> str_argv, char* argv_ch[] = NULL){
     argv.push_back(cmdl_par);
   }
 
-  if(argc < 3 || (argc < 5 && u16cmp(argv[1], u"-u") != 0)) {   // I4273// I4273
+  if(argc < 3 || (argc > 4)) {   // I4273// I4273
     wprintf(
-        L"Usage: mcompile -u infile.kmx outfile.kmx\n  (not available for Linux)"
-        L"       mcompile [-d] infile.kmx kbdfile.dll kbid outfile.kmx\n"
-        L"  With -u parameter, converts keyboard from ANSI to Unicode\n"
-        L"  Otherwise, mcompile converts a Keyman mnemonic layout to a\n"
-        L"  positional one based on the Windows keyboard\n"
-        L"  layout file given by kbdfile.dll\n\n"
-        L"  kbid should be a hexadecimal number e.g. 409 for US English\n"
-        L"  -d   convert deadkeys to plain keys\n");   // I4552
+        L"Usage: mcompile [-d] infile.kmx outfile.kmx\n"
+        L"       mmcompile -u ...  (not available for Linux)\n "
+        L"      mcompile converts a Keyman mnemonic layout to a\n"
+        L"       positional one based on the Linux keyboard\n"
+        L"       layout on top position\n"
+        L"       (-d   convert deadkeys to plain keys) not available yet \n\n"
+
+        );   // I4552
 
     return 1;
   }
-
   //  -u option was removed for Linux
 
   int bDeadkeyConversion = u16cmp(argv[1], u"-d") == 0; // I4552
   int n = (bDeadkeyConversion ? 2 : 1);
 
-  char16_t* infile = (char16_t*) argv[n], *indll = (char16_t*) argv[n+1], *kbid = (char16_t*) argv[n+2], *outfile = (char16_t*) argv[n+3];
+  char16_t* infile = (char16_t*) argv[n], *outfile = (char16_t*) argv[n+1];
 
-  wprintf(L"mcompile%ls \"%ls\" \"%ls\" \"%ls\" \"%ls\"\n", bDeadkeyConversion ? L" -d" : L"", u16fmt((const char16_t*) infile).c_str(), u16fmt((const char16_t*) indll).c_str(), u16fmt((const char16_t*) kbid).c_str(), u16fmt((const char16_t*) outfile).c_str() ); // I4174
+  wprintf(L"mcompile%ls \"%ls\" \"%ls\"\n", bDeadkeyConversion ? L" -d" : L"", u16fmt((const char16_t*) infile).c_str(),   u16fmt((const char16_t*) outfile).c_str() ); // I4174
 
   // 1. Load the keyman keyboard file
 
@@ -139,7 +138,8 @@ int run(int argc, std::vector<std::u16string> str_argv, char* argv_ch[] = NULL){
   //DeleteReallocatedPointers(kmxfile); :TODO   // _S2 not my ToDo :-)
   delete kmxfile;
 
-  wprintf(L"\nmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm end\n");
+  //wprintf(L"\nmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm end\n");
+  wprintf(L"\n");
   return 0;
 }
 
@@ -448,7 +448,6 @@ KMX_BOOL KMX_DoConvert(LPKMX_KEYBOARD kbd, KMX_BOOL bDeadkeyConversion, gint arg
   }
 
   for (int j = 0; VKShiftState[j] != 0xFFFF; j++) { // I4651
-  wprintf(L"\n");
 
     // Loop through each possible key on the keyboard
     for (int i = 0;KMX_VKMap[i]; i++) { // I4651
@@ -467,7 +466,7 @@ KMX_BOOL KMX_DoConvert(LPKMX_KEYBOARD kbd, KMX_BOOL bDeadkeyConversion, gint arg
 
       switch(ch) {
         case 0x0000: break;
-        //case 0xFFFF: KMX_ConvertDeadkey(kbd, KMX_VKMap[i], VKShiftState[j], DeadKey, All_Vector, keymap); break;
+        case 0xFFFF: KMX_ConvertDeadkey(kbd, KMX_VKMap[i], VKShiftState[j], DeadKey, All_Vector, keymap); break;
         default:     KMX_TranslateKeyboard(kbd, KMX_VKMap[i], VKShiftState[j], ch);
       }
     }

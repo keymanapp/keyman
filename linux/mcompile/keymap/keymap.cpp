@@ -104,8 +104,8 @@ int write_US_ToVector( v_dw_3D &vec,std::string language, const char* text) {
   if( split_US_To_3D_Vector( vec,Vector_completeUS)) {
     return 1;
   }
-  wprintf(L"\n   ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
-  wprintf(L"   +++++++ dimensions of Vector after split_US_To_3D_Vector (languages..characters..shiftstates)\t %li..%li..%li\n", vec.size(), vec[0].size(),vec[0][0].size());
+  //wprintf(L"\n   ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
+  //wprintf(L"   +++++++ dimensions of Vector after split_US_To_3D_Vector (languages..characters..shiftstates)\t %li..%li..%li\n", vec.size(), vec[0].size(),vec[0][0].size());
 
   fclose(fp);
   return 0;
@@ -121,10 +121,6 @@ bool createCompleteRow_US(v_str_1D &complete_List, FILE* fp, const char* text, s
   const char* key = "key <";
   std::string str_txt(text);
   std::string xbk_mark = "xkb_symbol";
-  // _S2 TODO define folder to store File in
-  std::ofstream KeyboardFile("File_" + language + ".txt");
-
-  KeyboardFile << "Keyboard" << text << "\n";
 
   if (fp) {
     while (fgets(buffer, buffer_size, fp) != NULL) {
@@ -141,7 +137,6 @@ bool createCompleteRow_US(v_str_1D &complete_List, FILE* fp, const char* text, s
       // as long as we are in the same xkb_symbol layout block and find "key <" we push the whole line into a 1D-vector
       if ((print_OK) && (std::string(str_buf).find(key) != std::string::npos)) {
         complete_List.push_back(buffer);
-        KeyboardFile << buffer;
       }
     }
   }
@@ -306,8 +301,8 @@ int append_other_ToVector(v_dw_3D &All_Vector,GdkKeymap * keymap) {
     return 1;
   }
   All_Vector.push_back(Other_Vector2D);
-  wprintf(L"   +++++++ dimensions of Vector after append_other_ToVector\t\t\t\t\t\t %li..%li..%li\n", All_Vector.size(), All_Vector[0].size(),All_Vector[0][0].size());
-  wprintf(L"   ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n\n");
+  //wprintf(L"   +++++++ dimensions of Vector after append_other_ToVector\t\t\t\t\t\t %li..%li..%li\n", All_Vector.size(), All_Vector[0].size(),All_Vector[0][0].size());
+  //wprintf(L"   ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n\n");
 
   if (All_Vector.size() < 2) {
     wprintf(L"ERROR: creation of 3D-Vector failed\n");
@@ -443,7 +438,7 @@ KMX_DWORD KMX_get_KeyvalsUnderlying_From_KeyCodeUnderlying_GDK(GdkKeymap *keymap
   out =(KMX_DWORD)  keyvals[shift_state_pos];
 
   if (  (out >=  deadkey_min) && (out <=  deadkey_max) )   {
-    wprintf(L"out of range: found deadkey value out( %i) for keycode = %i /shift_state_pos %i      (49= TLDE 21= VK_EQUALS on US keyboard) \n", out,keycode,shift_state_pos);
+    //wprintf(L"out of range: found deadkey value out( %i) for keycode = %i /shift_state_pos %i      (49= TLDE 21= VK_EQUALS on US keyboard) \n", out,keycode,shift_state_pos);
   }
   // _S2 g_free used everywhere?
   g_free(keyvals);
