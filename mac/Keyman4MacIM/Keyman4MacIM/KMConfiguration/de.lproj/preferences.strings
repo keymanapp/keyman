@@ -1,0 +1,38 @@
+/* Checkbox text to always show on-screen keyboard */
+"4UX-80-0Vo.title" = "Bildschirmtastatur immer anzeigen";
+
+/* Checkbox text to enable verbose Console logging */
+"7J6-zy-R20.title" = "Ausführliche Konsolen-Protokollierung verwenden";
+
+/* Support button text  */
+"93O-x6-RLF.label" = "Support";
+
+/* Download Keyboard button text */
+"CTw-kf-WNS.title" = "Tastatur herunterladen...";
+
+/* Keyman Configuration window title */
+"F0z-JX-Cv5.title" = "Keyman Konfiguration";
+
+/* button text to go back to previous page */
+"JOK-JV-n8w.title" = "Zurück";
+
+/* Keyboards button text */
+"MPN-9N-wWc.label" = "Tastaturen";
+
+/* text to explain verbose Console logging option */
+"MrI-GM-7d6.title" = "Wenn die ausführliche Protokollierungs-Einstellung aktiviert ist, protokolliert Keyman Aktionen, die dem Keyman Support helfen könnten, ein Problem zu diagnostizieren. Die Konsole kann benutzt werden, um Nachrichten von Keyman zu protokollieren. Filter in der Konsole um alle Nachrichten des \"Keyman\"-Prozesses anzuzeigen. Dieses Protokoll kann exportiert und bei Bedarf an den Keyman-Support gesendet werden.";
+
+/* button text to move forward to the next page */
+"eXr-8V-h1g.title" = "Weiter";
+
+/* button text to return to the home help page */
+"fXS-aC-CMH.title" = "Start";
+
+/* Options button text */
+"frd-No-seV.label" = "Einstellungen";
+
+/* Installed Keyboard column heading */
+"jex-Nd-Qzg.headerCell.title" = "Installierte Tastatur";
+
+/* Verbose logging tooltip text */
+"uWx-3J-U0D.ibShadowedToolTip" = "Schalten Sie dies ein, wenn Sie Probleme mit einer bestimmten Tastatur oder mit Keyman im Allgemeinen haben.";
