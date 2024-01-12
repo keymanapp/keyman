@@ -161,11 +161,18 @@ export default class OSKBaseKey extends OSKKey {
 
     // If the base key itself is the source of the hint text, we use `hint` directly.
     // Otherwise, we present the source subkey's key cap as the hint.
-    const text = renameSpecialKey(hintSpec == this.spec ? this.spec.hint : hintSpec.text, vkbd);
+    const baseText = hintSpec == this.spec ? this.spec.hint : hintSpec.text
+    const text = renameSpecialKey(baseText, vkbd);
     if(text == '\u2022') {
       // The original, pre-17.0 longpress dot-hint used bold-face styling.
       skIcon.style.fontWeight='bold';
     }
+
+    if(baseText != text) {
+      // if the text is from a *Special* shorthand, always use our special-key OSK font.
+      skIcon.style.fontFamily = 'SpecialOSK';
+    }
+
     skIcon.textContent = text;
 
     return skIcon;

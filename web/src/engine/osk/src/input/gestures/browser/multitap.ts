@@ -60,10 +60,7 @@ export default class Multitap implements GestureHandler {
     const tapLookahead = (offset) => (this.tapIndex + offset) % this.multitaps.length;
 
     const updatePreview = () => {
-      previewHost?.setMultitapHint(
-        renameSpecialKey(this.multitaps[tapLookahead(0)].text, vkbd),
-        renameSpecialKey(this.multitaps[tapLookahead(1)].text, vkbd)
-      );
+      previewHost?.setMultitapHint(this.multitaps[tapLookahead(0)], this.multitaps[tapLookahead(1)], vkbd);
     }
 
     source.on('complete', () => {
