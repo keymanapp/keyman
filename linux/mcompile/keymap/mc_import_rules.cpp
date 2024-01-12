@@ -406,7 +406,7 @@ public:
     return (ch < 0x0020) || (ch >= 0x007F && ch <= 0x009F);
   }
 
-// _S2 DEADKEY STUFF - DO NOT REVIEW YET
+ // _S2 DEADKEY STUFF - DO NOT REVIEW YET
  // _S2 ToDo ToUnicodeEx needs to be replaced here
   DeadKey *KMX_ProcessDeadKey(
       UINT iKeyDead,              // The index into the VirtualKey of the dead key
@@ -622,7 +622,6 @@ bool KMX_ImportRules(LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, GdkKeymap **keymap,
 
           //_S2 to compare win-lin kmn-files skip ss6+7; MUST BE restored/removed later!!!!
           if(ss == MenuCtrl|| ss == ShftMenuCtrl) {
-            // Alt and Shift+Alt don't work, so skip them
             continue;
           }
 
