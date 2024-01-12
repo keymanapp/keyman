@@ -43,6 +43,7 @@ const int KMX_ShiftStateMap[] = {
   0
 };
 
+// _S2 DEADKEY STUFF - DO NOT REVIEW YET
 // _S2 ToDo open deadkey functions
 class DeadKey {
 private:
@@ -116,7 +117,7 @@ int KMX_DeadKeyMap(int index, std::vector<DeadKey *> *deadkeys, int deadkeyBase,
 
 class KMX_VirtualKey {
 private:
-  KMX_HKL m_hkl;      // _S2 do I need this and is void* OK to assume?
+  KMX_HKL m_hkl;      // _S2 do I need this and is void* OK to assume? If I remove this, will there be changes in Data-Vectors?
   UINT m_vk;
   UINT m_sc;
   bool m_rgfDeadKey[10][2];
@@ -149,11 +150,6 @@ public:
   std::wstring get_m_rgss(int i,int j) {
     return m_rgss[i][j];
   }
-
-  /*// _S2 can go later
-  void set_sc(int i) {
-    this->m_sc=i;
-  }*/
 
   std::wstring KMX_GetShiftState(ShiftState shiftState, bool capsLock) {
     return this->m_rgss[(UINT)shiftState][(capsLock ? 1 : 0)];
@@ -241,7 +237,6 @@ public:
       (capslock ? (caps ? CAPITALFLAG : NOTCAPITALFLAG) : 0);
   }
 
-  // _S2 should count OK for char AND deadkeys
   int KMX_GetKeyCount(int MaxShiftState) {
     int nkeys = 0;
 
@@ -302,7 +297,7 @@ int i4 = this->KMX_IsXxxxGrCapsEqualToXxxxShift() ? 8 : 0;
 
     // _S2 DESIGN NEEDED on how to replace capslock
     capslock=1;   // _S2
-    // _S2 TODO capslock is not calculated corectly for linux. therefore key->ShiftFlags will be wrong for numbers, special characters
+    // _S2 TODO capslock is not calculated correctly for linux. therefore key->ShiftFlags will be wrong for numbers, special characters
 
     for (int ss = 0; ss <= MaxShiftState; ss++) {
       if (ss == Menu || ss == ShftMenu) {
@@ -411,6 +406,7 @@ public:
     return (ch < 0x0020) || (ch >= 0x007F && ch <= 0x009F);
   }
 
+// _S2 DEADKEY STUFF - DO NOT REVIEW YET
  // _S2 ToDo ToUnicodeEx needs to be replaced here
   DeadKey *KMX_ProcessDeadKey(
       UINT iKeyDead,              // The index into the VirtualKey of the dead key
@@ -546,7 +542,7 @@ bool KMX_ImportRules(LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, GdkKeymap **keymap,
   KMX_Loader loader;
 
 
-  KMX_HKL hkl = NULL;               //_S2 added: but can I do this?? hkl is not needed in Linux??
+  KMX_HKL hkl = NULL;
 
   BYTE lpKeyState[256];// = new KeysEx[256];
   std::vector<KMX_VirtualKey*> rgKey; //= new VirtualKey[256];
@@ -588,7 +584,6 @@ bool KMX_ImportRules(LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, GdkKeymap **keymap,
   rgKey[VK_DECIMAL] = new KMX_VirtualKey(hkl, VK_DECIMAL, keymap);
 
   /*
-  // _S2 RALT <-> SHIFT CTRL Problem from here??
   // _S2 DESIGN NEEDED do we need special shift state now or later?
     // See if there is a special shift state added
     for(UINT vk = 0; vk <= VK_OEM_CLEAR; vk++) {
@@ -613,12 +608,6 @@ bool KMX_ImportRules(LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, GdkKeymap **keymap,
         }
     }
   */
-    // _S2 test rgkey can go later
-    /*for(UINT iKey = 100; iKey < rgKey.size(); iKey++) {
-        if(rgKey[iKey] != NULL) {
-            wprintf(L" Key Nr %i is available\n",iKey);
-        }
-    }*/
 
     // in this part we skip shiftstates 4, 5, 8, 9
     for(UINT iKey = 0; iKey < rgKey.size(); iKey++) {
@@ -655,7 +644,6 @@ bool KMX_ImportRules(LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, GdkKeymap **keymap,
                 if((rc == 1) &&
                   (ss == Ctrl || ss == ShftCtrl) &&
                   (rgKey[iKey]->VK() == ((UINT)sbBuffer[0] + 0x40))) {
-                    // _S2 RALT<-> SHIFT CTR problem from here??
                       // _S2 TODO is this the same behavior on Linux?
                       // if rc ==1 : it got 1  char && +40 in Buffer CTRl pressed
                       // It's dealing with control characters. If ToUnicodeEx gets
@@ -782,11 +770,6 @@ bool KMX_ImportRules(LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, GdkKeymap **keymap,
   //
   // Fill in the new rules
   //
-
-  // _S2       [CTRL NCAPS K_?00] > use(group3)  c line(0)       from here ?
-  //if this is missing: group(group3) using keys
-  // + [NCAPS K_SPACE] > " "  c line(0)
-
   for (UINT iKey = 0; iKey < rgKey.size(); iKey++) {
     if ((rgKey[iKey] != NULL) && rgKey[iKey]->KMX_IsKeymanUsedKey() && (!rgKey[iKey]->KMX_IsEmpty())) {
       if(rgKey[iKey]->KMX_LayoutRow(loader.MaxShiftState(), &gp->dpKeyArray[nKeys], &alDead, nDeadkey, bDeadkeyConversion, All_Vector,*keymap)) {   // I4552
@@ -801,7 +784,6 @@ bool KMX_ImportRules(LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, GdkKeymap **keymap,
   //
   // Add nomatch control to each terminating 'using keys' group   // I4550
   //
-  // _S2       [CTRL NCAPS K_?00] > use(group3)  c line(0)       from here ?
   LPKMX_GROUP gp2 = kp->dpGroupArray;
   for(UINT i = 0; i < kp->cxGroupArray - 1; i++, gp2++) {
     if(gp2->fUsingKeys && gp2->dpNoMatch == NULL) {
@@ -916,7 +898,6 @@ bool KMX_ImportRules(LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, GdkKeymap **keymap,
 return true;
 }
 
-// _S2 where is nthe best place to put this??
 const int CODE__SIZE[] = {
    -1,   // undefined                0x00
     1,   // CODE_ANY                 0x01

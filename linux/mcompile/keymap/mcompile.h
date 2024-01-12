@@ -51,18 +51,10 @@ int KMX_GetDeadkeys(v_dw_2D & dk_Table, KMX_WORD DeadKey, KMX_WORD *OutputPairs,
 
 //--------------------old 
 /*
-#include <vector>
 
 void LogError(PWSTR message, ...);
 
 
-struct DeadkeyMapping {   // I4353
-  WCHAR deadkey, dkid;
-  UINT shift;
-  WORD vk;
-};
-
-extern std::vector<DeadkeyMapping> FDeadkeys;   // I4353
 */
 
 #endif /*MCOMPILE_H*/

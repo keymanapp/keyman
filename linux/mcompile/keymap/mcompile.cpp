@@ -432,7 +432,7 @@ KMX_BOOL KMX_DoConvert(LPKMX_KEYBOARD kbd, KMX_BOOL bDeadkeyConversion, gint arg
   // evident for the 102nd key on UK, for example, where \ can be generated with VK_OEM_102 or AltGr+VK_QUOTE.
   // For now, we get the least shifted version, which is hopefully adequate.
 
-  // _S2 TODO first version with GTK - change later to  XklGetGroupNames  und XklGetCurrentState  as Eberhard suggested
+  // _S2 TODO first version with GTK - maybe change later to  XklGetGroupNames  und XklGetCurrentState  as Eberhard suggested
   //_ init gdk
   GdkKeymap *keymap;
   if(InitializeGDK(&keymap , argc,  argv)) {
@@ -467,7 +467,7 @@ KMX_BOOL KMX_DoConvert(LPKMX_KEYBOARD kbd, KMX_BOOL bDeadkeyConversion, gint arg
 
       switch(ch) {
         case 0x0000: break;
-        case 0xFFFF: KMX_ConvertDeadkey(kbd, KMX_VKMap[i], VKShiftState[j], DeadKey, All_Vector, keymap); break;
+        //case 0xFFFF: KMX_ConvertDeadkey(kbd, KMX_VKMap[i], VKShiftState[j], DeadKey, All_Vector, keymap); break;
         default:     KMX_TranslateKeyboard(kbd, KMX_VKMap[i], VKShiftState[j], ch);
       }
     }
@@ -579,7 +579,6 @@ int KMX_GetDeadkeys(v_dw_2D & dk_Table, KMX_WORD DeadKey, KMX_WORD *OutputPairs,
 
   v_dw_2D  dk_SingleTable;
   find_dk_combinations_for_single_dk(&dk_Table, dk_SingleTable, DeadKey);
-// _S2 CAPS <-> NCAPS problem from here?
   for ( int i=0; i< (int) dk_SingleTable.size()-1;i++) {
     KMX_WORD vk = KMX_changeKeynameToCapital(dk_SingleTable[i][1], shift, keymap);
     if(vk != 0) {

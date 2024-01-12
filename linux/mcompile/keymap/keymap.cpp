@@ -350,6 +350,7 @@ bool InitializeGDK(GdkKeymap **keymap,int argc, gchar *argv[]){
 }
 
 //------------------------------
+// _S2 DEADKEY STUFF - DO NOT REVIEW YET
 // _S2 ToDo deadkeys. Do we need this ?
 bool IsKeymanUsedKeyVal(std::wstring Keyval) {
 
@@ -365,7 +366,7 @@ bool IsKeymanUsedKeyVal(std::wstring Keyval) {
     return false;
 }
 
-// _S2 ToDo deadkeys.
+// _S2 DEADKEY STUFF - DO NOT REVIEW YET
 std::wstring convert_DeadkeyValues_ToChar(int in) {
 
   KMX_DWORD lname;
@@ -392,6 +393,7 @@ std::wstring convert_DeadkeyValues_ToChar(int in) {
   return L"\0";
 }
 
+// _S2 DEADKEY STUFF - DO NOT REVIEW YET
 std::u16string convert_DeadkeyValues_ToChar_16(int in) {
 
   KMX_DWORD lname;
@@ -430,7 +432,7 @@ KMX_DWORD KMX_get_KeyvalsUnderlying_From_KeyCodeUnderlying_GDK(GdkKeymap *keymap
   //if(!gdk_wayland_keymap_get_entries_for_keycode(keymap, keycode, &maps, &keyvals, &count))
   //  return 0;    https://codebrowser.dev/gtk/gtk/gdk/wayland/gdkkeys-wayland.c.html
 
-// _S2 this will return 223 instaed of 7838 for UNICODE char on DE keycode 20  ß ẞ ? ?
+  // this will return 223 instaed of 7838 for UNICODE char on DE keycode 20  ß ẞ ? ?
 
   if (!(shift_state_pos <= count))
     return 0;

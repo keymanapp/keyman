@@ -605,6 +605,14 @@ int replace_PosKey_with_Keycode(std::string  in) {
   return out;
 }
 
+/*KMX_DWORD find_dk_Character(v_dw_2D * p_dk_ComposeTable, KMX_DWORD first, KMX_DWORD second  ) {
+  v_dw_2D  dk_ComposeTable = * p_dk_ComposeTable;
+  for ( int i =0; i< (dk_ComposeTable).size()-1; i++) {
+	if (( (KMX_DWORD) dk_ComposeTable[i][0] == first) && ( (KMX_DWORD) dk_ComposeTable[i][1] == second) )
+	  return (KMX_DWORD) dk_ComposeTable[i][3];
+  }
+  return 0;   // _S2 what to return if not found?
+}*/
 
 int replace_KeyName_with_Keycode2(std::string  in) {
   int out = returnIfCharInvalid;

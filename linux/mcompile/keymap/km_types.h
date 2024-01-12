@@ -36,47 +36,44 @@ typedef uint16_t   km_kbp_cp;          // code point
 typedef uint32_t   km_kbp_usv;         // Unicode Scalar Value
 #endif
 
-typedef km_kbp_cp  KMX_WCHAR;    // wc,   16-bit UNICODE character
+// _S2 which can be removed later?
+typedef unsigned int  UINT;
+typedef unsigned long DWORD;
 
-typedef wchar_t    WCHAR;               // _S2 needs to be removed/ wchart-> char16
-typedef WCHAR      KMX_WCHART;          // _S2 needs to be removed/ wchart-> char16
+typedef unsigned char BYTE;
+typedef char          KMX_CHAR;
 
-typedef char16_t   KMX_WCHAR;           // _S2
-typedef KMX_WCHAR* PKMX_WCHAR;          // _S2
-typedef wchar_t*   PWSTR;               // _S2 needs to be removed/ wchart-> char16
+typedef char16_t      KMX_WCHAR;
+typedef KMX_WCHAR*    PKMX_WCHAR;
 
-typedef char*      LPSTR;               // _S2 needs to be removed?
+typedef wchar_t       WCHAR;
+typedef WCHAR         KMX_WCHART;
+typedef wchar_t*      PWSTR;
+typedef WCHAR*        PWCHAR;
 
-typedef uint8_t*   LPBYTE;              // _S2 needs to be removed/?
-typedef uint8_t*   LPKMX_BYTE;          // _S2 needs to be removed?
+typedef uint8_t*      LPKMX_BYTE;
+typedef uint8_t*      PKMX_BYTE;
 
-typedef uint8_t*   PBYTE;               // _S2 needs to be removed/?
-typedef uint8_t*   PKMX_BYTE;           // _S2 needs to be removed?
+typedef uint32_t      KMX_UINT;
 
-typedef char       KMX_CHAR;            // _S2 needs to be removed/?
+typedef KMX_BYTE*     PKMX_BYTE;
+typedef KMX_DWORD*    PKMX_DWORD;
+typedef int           BOOL;
 
-typedef unsigned int UINT;              // _S2 needs to be removed/?
-typedef unsigned char   BYTE;           // _S2 needs to be removed?
-typedef unsigned long  DWORD;           // _S2 needs to be removed/?
-typedef unsigned short WORD;            // _S2 needs to be removed/?
-typedef wchar_t*     LPWSTR;            // _S2 needs to be removed/?
-typedef WCHAR*       PWCHAR;            // _S2 needs to be removed/?
+//typedef uint8_t*        PBYTE;
+//typedef unsigned short  WORD;
+//typedef wchar_t*        LPWSTR;
+//typedef KMX_CHAR*       PKMX_CHAR;
+//typedef char*           LPSTR;
+//typedef uint8_t*        LPBYTE;
+//typedef KMX_WORD*       PKMX_WORD;
 
-typedef KMX_CHAR*  PKMX_CHAR;           // _S2 needs to be removed/?
-
-typedef int        BOOL;                // _S2 needs to be removed/? or is it int32_t??
-
-                                        // in WIN:
-                                        // PVOID A pointer to any type.
-                                        // typedef PVOID HANDLE;
-                                        // typedef HANDLE HKL;
+// in WIN:
+// PVOID A pointer to any type.
+// typedef PVOID HANDLE;
+// typedef HANDLE HKL;
 typedef void* KMX_HKL;                  // _S2 what is the equivalent to HKL and do I need it?? I assume a void*
 
-typedef uint32_t   KMX_UINT;
-
-typedef KMX_BYTE*  PKMX_BYTE;
-typedef KMX_WORD*  PKMX_WORD;
-typedef KMX_DWORD* PKMX_DWORD;
 
 #ifndef FALSE
 #define FALSE               0
@@ -128,7 +125,6 @@ typedef KMX_UCHAR* KMX_PUCHAR;
 #define VK_DECIMAL  0x5B*/
 
 // _S2 correct?? ??
-
 #define VK_NUMPAD0  0x60
 #define VK_NUMPAD1  0x61
 #define VK_NUMPAD2  0x62
