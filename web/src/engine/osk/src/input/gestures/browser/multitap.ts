@@ -8,6 +8,7 @@ import { distributionFromDistanceMaps } from '@keymanapp/input-processor';
 import Modipress from './modipress.js';
 import { keySupportsModipress } from '../specsForLayout.js';
 import { GesturePreviewHost } from '../../../keyboard-layout/gesturePreviewHost.js';
+import { renameSpecialKey } from '../../../keyboard-layout/oskKey.js';
 
 /**
  * Represents a potential multitap gesture's implementation within KeymanWeb.
@@ -59,7 +60,10 @@ export default class Multitap implements GestureHandler {
     const tapLookahead = (offset) => (this.tapIndex + offset) % this.multitaps.length;
 
     const updatePreview = () => {
-      previewHost?.setMultitapHint(this.multitaps[tapLookahead(0)].text, this.multitaps[tapLookahead(1)].text);
+      previewHost?.setMultitapHint(
+        renameSpecialKey(this.multitaps[tapLookahead(0)].text, vkbd),
+        renameSpecialKey(this.multitaps[tapLookahead(1)].text, vkbd)
+      );
     }
 
     source.on('complete', () => {
