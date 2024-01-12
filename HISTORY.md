@@ -1,5 +1,15 @@
 # Keyman Version History
 
+## 17.0.243 alpha 2024-01-12
+
+* chore(core): split out some files (#10327)
+* chore(common): Update crowdin strings for French, German, Spanish (Latin America) (#10368)
+* fix(web): prediction time-limiter issues, performance (#10330)
+* fix(developer): test-page model loading (#10328)
+* fix(ios): use safe area to position Keyman menu correctly (#10339)
+* chore(linux): fix GHA packaging (#10366)
+* refactor(linux): Use `km_core_state_context_set_if_needed` (#10354)
+
 ## 17.0.242 alpha 2024-01-11
 
 * fix(windows): serve images for readme files in Keyboard Install (#10312)
