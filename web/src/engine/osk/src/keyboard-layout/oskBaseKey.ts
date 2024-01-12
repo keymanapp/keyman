@@ -145,7 +145,7 @@ export default class OSKBaseKey extends OSKKey {
       return skIcon;
     }
 
-    if(hintSpec.font) {
+    if(hintSpec.font && hintSpec.font != 'SpecialOSK') {
       skIcon.style.fontFamily = hintSpec.font;
     } else {
       skIcon.classList.add('kmw-key-text');
