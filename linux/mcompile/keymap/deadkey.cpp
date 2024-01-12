@@ -42,6 +42,7 @@ KMX_DWORD KMX_changeKeynameToCapital(KMX_DWORD KVal, KMX_DWORD &shift, GdkKeymap
 
 	// _S2 QUESTION can I assume that the win keyname is always the uppercase(level1) value??
 	KMX_DWORD Name = (KMX_DWORD) gdk_keyval_to_upper (KVal);
+	//KMX_DWORD Name = (KMX_DWORD) gdk_keyval_to_lower (KVal);
 	if( Keyval !=0) {
 		gdk_keymap_get_entries_for_keyval(keymap, Keyval, &keys, &n_keys);
 		for (int i = 0; i < n_keys; i++) {

@@ -51,19 +51,19 @@ private:
   std::vector<KMX_WCHAR> m_rgcombchar;
 
 public:
-/*  DeadKey(WCHAR deadCharacter) {
+  DeadKey(KMX_WCHAR deadCharacter) {
     this->m_deadchar = deadCharacter;
   }
-*/
+
   KMX_WCHAR KMX_DeadCharacter() {
     return this->m_deadchar;
   }
-/*
-  void AddDeadKeyRow(WCHAR baseCharacter, WCHAR combinedCharacter) {
+
+  void KMX_AddDeadKeyRow(KMX_WCHAR baseCharacter, KMX_WCHAR combinedCharacter) {
     this->m_rgbasechar.push_back(baseCharacter);
     this->m_rgcombchar.push_back(combinedCharacter);
   }
-*/
+
   int KMX_Count() {
     return this->m_rgbasechar.size();
   }
@@ -85,6 +85,17 @@ public:
     }
     return false;
   }*/
+
+
+  bool KMX_ContainsBaseCharacter(KMX_WCHAR baseCharacter) {
+    std::vector<KMX_WCHAR>::iterator it;
+    for(it=this->m_rgbasechar.begin(); it<m_rgbasechar.end(); it++) {
+      if(*it == baseCharacter) {
+        return true;
+      }
+    }
+    return false;
+  }
 };
 
 
@@ -392,20 +403,25 @@ public:
     }
     lpKeyState[VK_CAPITAL] = (fCapsLock ? 0x01 : 0x00);
   }
-/*
-  bool IsControlChar(wchar_t ch) {
+
+  bool KMX_IsControlChar(wchar_t ch) {
     return (ch < 0x0020) || (ch >= 0x007F && ch <= 0x009F);
   }
-  DeadKey *ProcessDeadKey(
+  bool KMX_IsControlChar(char16_t ch) {
+    return (ch < 0x0020) || (ch >= 0x007F && ch <= 0x009F);
+  }
+
+ // _S2 ToDo ToUnicodeEx needs to be replaced here
+  DeadKey *KMX_ProcessDeadKey(
       UINT iKeyDead,              // The index into the VirtualKey of the dead key
       ShiftState shiftStateDead,  // The shiftstate that contains the dead key
       BYTE *lpKeyStateDead,       // The key state for the dead key
-      std::vector<VirtualKey*> rgKey,          // Our array of dead keys
+      std::vector<KMX_VirtualKey*> rgKey,          // Our array of dead keys
       bool fCapsLock,             // Was the caps lock key pressed?
-      HKL hkl) {                  // The keyboard layout
+      KMX_HKL KMX_hkl) {                  // The keyboard layout
 
     BYTE lpKeyState[256];
-    DeadKey *deadKey = new DeadKey(rgKey[iKeyDead]->GetShiftState(shiftStateDead, fCapsLock)[0]);
+    DeadKey *deadKey = new DeadKey(rgKey[iKeyDead]->KMX_GetShiftState(shiftStateDead, fCapsLock)[0]);
 
     for (UINT iKey = 0; iKey < rgKey.size(); iKey++) {
       if (rgKey[iKey] != NULL) {
@@ -427,31 +443,38 @@ public:
               // messed up so we run again and again to clear it up.
               // Risk is technically an infinite loop but per Hiroyama
               // that should be impossible here.
-              rc = ToUnicodeEx(rgKey[iKeyDead]->VK(), rgKey[iKeyDead]->SC(), lpKeyStateDead, sbBuffer, _countof(sbBuffer), 0, hkl);
+
+              // _S2 needs replacement
+              // rc = ToUnicodeEx(rgKey[iKeyDead]->VK(), rgKey[iKeyDead]->SC(), lpKeyStateDead, sbBuffer, _countof(sbBuffer), 0, hkl);
+              rc=-1; //_S2
             }
 
             // Now fill the key state for the potential base character
-            FillKeyState(lpKeyState, ss, (caps != 0));
+            KMX_FillKeyState(lpKeyState, ss, (caps != 0));
 
-            rc = ToUnicodeEx(rgKey[iKey]->VK(), rgKey[iKey]->SC(), lpKeyState, sbBuffer, _countof(sbBuffer), 0, hkl);
+            // _S2 needs replacement
+            //rc = ToUnicodeEx(rgKey[iKey]->VK(), rgKey[iKey]->SC(), lpKeyState, sbBuffer, _countof(sbBuffer), 0, hkl);
             if (rc == 1) {
               // That was indeed a base character for our dead key.
               // And we now have a composite character. Let's run
               // through one more time to get the actual base 
               // character that made it all possible?
               WCHAR combchar = sbBuffer[0];
-              rc = ToUnicodeEx(rgKey[iKey]->VK(), rgKey[iKey]->SC(), lpKeyState, sbBuffer, _countof(sbBuffer), 0, hkl);
+
+              // _S2 needs replacement
+              //rc = ToUnicodeEx(rgKey[iKey]->VK(), rgKey[iKey]->SC(), lpKeyState, sbBuffer, _countof(sbBuffer), 0, hkl);
 
               WCHAR basechar = sbBuffer[0];
 
-              if (deadKey->DeadCharacter() == combchar) {
+              if (deadKey->KMX_DeadCharacter() == combchar) {
                 // Since the combined character is the same as the dead key,
                 // we must clear out the keyboard buffer.
-                ClearKeyboardBuffer(VK_DECIMAL, rgKey[VK_DECIMAL]->SC(), hkl);
+                //KMX_ClearKeyboardBuffer(VK_DECIMAL, rgKey[VK_DECIMAL]->SC(), KMX_hkl);
+                KMX_ClearKeyboardBuffer();
               }
 
               if ((((ss == Ctrl) || (ss == ShftCtrl)) &&
-                  (IsControlChar(basechar))) ||
+                  (KMX_IsControlChar(basechar))) ||
                   (basechar == combchar)) {
                 // ToUnicodeEx has an internal knowledge about those 
                 // VK_A ~ VK_Z keys to produce the control characters, 
@@ -468,14 +491,15 @@ public:
                 continue;
               }
 
-              if (!deadKey->ContainsBaseCharacter(basechar)) {
-                deadKey->AddDeadKeyRow(basechar, combchar);
+              if (!deadKey->KMX_ContainsBaseCharacter(basechar)) {
+                deadKey->KMX_AddDeadKeyRow(basechar, combchar);
               }
             } else if (rc > 1) {
               // Not a valid dead key combination, sorry! We just ignore it.
             } else if (rc < 0) {
               // It's another dead key, so we ignore it (other than to flush it from the state)
-              ClearKeyboardBuffer(VK_DECIMAL, rgKey[VK_DECIMAL]->SC(), hkl);
+              //ClearKeyboardBuffer(VK_DECIMAL, rgKey[VK_DECIMAL]->SC(), KMX_hkl);
+              KMX_ClearKeyboardBuffer();
             }
           }
         }
@@ -483,7 +507,7 @@ public:
     }
     return deadKey;
   }
-*/
+
 
   void KMX_ClearKeyboardBuffer() {
     KMX_WCHAR sb[16];
@@ -662,6 +686,7 @@ bool KMX_ImportRules(LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, GdkKeymap **keymap,
             // It's a dead key; let's flush out whats stored in the keyboard state.
             loader.KMX_ClearKeyboardBuffer();
             DeadKey *dk = NULL;
+            int testI= alDead.size();
             for(UINT iDead = 0; iDead < alDead.size(); iDead++) {
                 dk = alDead[iDead];
                 WCHAR dktest1 = dk->KMX_DeadCharacter();                             // _S2 can go later ; just for testing
@@ -759,6 +784,9 @@ bool KMX_ImportRules(LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, GdkKeymap **keymap,
   //
 
   // _S2       [CTRL NCAPS K_?00] > use(group3)  c line(0)       from here ?
+  //if this is missing: group(group3) using keys
+  // + [NCAPS K_SPACE] > " "  c line(0)
+
   for (UINT iKey = 0; iKey < rgKey.size(); iKey++) {
     if ((rgKey[iKey] != NULL) && rgKey[iKey]->KMX_IsKeymanUsedKey() && (!rgKey[iKey]->KMX_IsEmpty())) {
       if(rgKey[iKey]->KMX_LayoutRow(loader.MaxShiftState(), &gp->dpKeyArray[nKeys], &alDead, nDeadkey, bDeadkeyConversion, All_Vector,*keymap)) {   // I4552
