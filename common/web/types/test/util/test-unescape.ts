@@ -1,6 +1,6 @@
 import 'mocha';
 import {assert} from 'chai';
-import {unescapeString, UnescapeError, isOneChar, toOneChar, unescapeOneQuadString, BadStringAnalyzer, isValidUnicode, describeCodepoint, isPUA, BadStringType, unescapeStringToRegex} from '../../src/util/util.js';
+import {unescapeString, UnescapeError, isOneChar, toOneChar, unescapeOneQuadString, BadStringAnalyzer, isValidUnicode, describeCodepoint, isPUA, BadStringType, unescapeStringToRegex, unescapeQuadString} from '../../src/util/util.js';
 
 describe('test UTF32 functions()', function() {
   it('should properly categorize strings', () => {
@@ -63,9 +63,8 @@ describe('test unescapeRegex()', () => {
     assert.equal(unescapeStringToRegex('\\u{4a}'),     '\\u004a');   // J
     assert.equal(unescapeStringToRegex('\\u{3c8}'),    '\\u03c8');   // ψ
     assert.equal(unescapeStringToRegex('\\u{304B}'),   '\\u304b');   // か
-    // the following go to two UTF-16 escapes for ICU
-    assert.equal(unescapeStringToRegex('\\u{1e109}'),  '\\ud838\\udd09');  // 𞄉
-    assert.equal(unescapeStringToRegex('\\u{10fff0}'), '\\udbff\\udff0'); // Plane 16 Private Use
+    assert.equal(unescapeStringToRegex('\\u{1e109}'),  '\\U0001e109');  // 𞄉
+    assert.equal(unescapeStringToRegex('\\u{10fff0}'), '\\U0010fff0'); // Plane 16 Private Use
   });
 });
 
@@ -73,11 +72,18 @@ describe('test unescapeOneQuadString()', () => {
   it('should be able to convert', () => {
     // testing that `\u0127` is unescaped correctly (to U+0127: 'ħ')
     assert.equal(unescapeOneQuadString('\\u0127'), '\u{0127}');
+    assert.equal(unescapeOneQuadString('\\U0010FFF0'), '\u{10fff0}');
     // test the fail cases
   });
   it('should fail when it needs to fail', () => {
     assert.throws(() => unescapeOneQuadString(null), null);
     assert.throws(() => unescapeOneQuadString('\uFFFFFFFFFFFF'));
+  });
+  const PAIRED=`\\uD838\\uDD09`;
+  it('test of paired surrogates ${UNPAIRED}', () => {
+    const s = unescapeQuadString(PAIRED);
+    assert.equal(s, '\u{1e109}');
+    assert.equal(s, '\u{d838}\u{dd09}');
   });
 });
 

@@ -51,10 +51,12 @@ export class MarkerParser {
    * Marker sentinel as a string - U+FFFF
    */
   public static readonly SENTINEL = String.fromCodePoint(constants.uc_sentinel);
+  static readonly SENTINEL_MATCH = '\\u' + hexQuad(constants.uc_sentinel);
   /**
    * Marker code as a string - U+0008
    */
   public static readonly MARKER_CODE = String.fromCodePoint(constants.marker_code);
+  static readonly MARKER_CODE_MATCH = '\\u' + hexQuad(constants.marker_code);
 
   /** Minimum ID (trailing code unit) */
   public static readonly MIN_MARKER_INDEX = constants.marker_min_index;
@@ -68,7 +70,7 @@ export class MarkerParser {
   private static anyMarkerMatch() : string {
     const start = hexQuad(this.MIN_MARKER_INDEX);
     const end   = hexQuad(this.MAX_MARKER_INDEX);
-    return `${this.SENTINEL}${this.MARKER_CODE}[\\u${start}-\\u${end}]`; // TODO-LDML: #9121 wrong escape format
+    return `${this.SENTINEL_MATCH}${this.MARKER_CODE_MATCH}[\\u${start}-\\u${end}]`; // TODO-LDML: #9121 wrong escape format
   }
 
   /** Expression that matches any marker */
@@ -104,7 +106,11 @@ export class MarkerParser {
     if (n < MarkerParser.MIN_MARKER_INDEX || n > MarkerParser.ANY_MARKER_INDEX) {
       throw RangeError(`Internal Error: marker index out of range ${n}`);
     }
-    return this.SENTINEL + this.MARKER_CODE + this.markerCodeToString(n, forMatch);
+    if (forMatch) {
+      return this.SENTINEL_MATCH + this.MARKER_CODE_MATCH + this.markerCodeToString(n, forMatch);
+    } else {
+      return this.SENTINEL + this.MARKER_CODE + this.markerCodeToString(n, forMatch);
+    }
   }
 
   /** @returns all marker strings as sentinel values */
