@@ -645,18 +645,27 @@ int test_strutils() {
   {
     marker_map map;
     std::cout << __FILE__ << ":" << __LINE__ << "   - bad1" << std::endl;
-    const std::u32string src = U"6\U0000ffffq"; // missing code
+    const std::u32string src = U"6\U0000ffffq"; // missing sentinel subtype
     const std::u32string dst = remove_markers(src, map);
-    const std::u32string expect = U"6q";
+    const std::u32string expect = U"6"; // 'q' removed
     zassert_string_equal(dst, expect);
     assert_equal(map.size(), 0);
   }
   {
     marker_map map;
-    std::cout << __FILE__ << ":" << __LINE__ << "   - bad1" << std::endl;
+    std::cout << __FILE__ << ":" << __LINE__ << "   - bad1b" << std::endl;
     const std::u32string src = U"6\U0000ffff"; // missing code
     const std::u32string dst = remove_markers(src, map);
     const std::u32string expect = U"6";
+    zassert_string_equal(dst, expect);
+    assert_equal(map.size(), 0);
+  }
+  {
+    marker_map map;
+    std::cout << __FILE__ << ":" << __LINE__ << "   - bad1c" << std::endl;
+    const std::u32string src = U"6\U0000ffffzz"; // missing code
+    const std::u32string dst = remove_markers(src, map);
+    const std::u32string expect = U"6z";
     zassert_string_equal(dst, expect);
     assert_equal(map.size(), 0);
   }
@@ -836,13 +845,15 @@ int test_normalize() {
     // from tests - regex edition
     marker_map map;
     std::cout << __FILE__ << ":" << __LINE__ << "   - complex test 9c+regex" << std::endl;
-    const std::u32string src    = U"9ce\u0300\uFFFF\u0008\\u0002\u0320\uFFFF\u0008\\u0001";
-    const std::u32string expect = U"9ce\uFFFF\u0008\\u0002\u0320\u0300\uFFFF\u0008\\u0001";
+    const std::u32string src    = U"9ce\u0300\\uFFFF\\u0008\\u0002\u0320\\uFFFF\\u0008\\u0001";
+    const std::u32string expect = U"9ce\\uFFFF\\u0008\\u0002\u0320\u0300\\uFFFF\\u0008\\u0001";
     std::u32string dst = src;
-    assert(normalize_nfd_markers_segment(dst, map, regex_sentinel)); // TODO-LDML: need regex flag
+    assert(normalize_nfd_markers_segment(dst, map, regex_sentinel));
     if (dst != expect) {
       std::cout << "dst: " << Debug_UnicodeString(dst) << std::endl;
+      std::cout << "     " << dst << std::endl;
       std::cout << "exp: " << Debug_UnicodeString(expect) << std::endl;
+      std::cout << "     " << expect << std::endl;
     }
     zassert_string_equal(dst, expect);
     assert_equal(map.size(), 2);
@@ -853,8 +864,8 @@ int test_normalize() {
     // from tests - regex edition
     marker_map map;
     std::cout << __FILE__ << ":" << __LINE__ << "   - complex test \\m{.}" << std::endl;
-    const std::u32string src    = U"9ce\u0300\uFFFF\u0008[\\u0001-\\uD7FE]\u0320\uFFFF\u0008\\u0001";
-    const std::u32string expect = U"9ce\uFFFF\u0008[\\u0001-\\uD7FE]\u0320\u0300\uFFFF\u0008\\u0001";
+    const std::u32string src    = U"9ce\u0300\\uFFFF\\u0008[\\u0001-\\uD7FE]\u0320\\uFFFF\\u0008\\u0001";
+    const std::u32string expect = U"9ce\\uFFFF\\u0008[\\u0001-\\uD7FE]\u0320\u0300\\uFFFF\\u0008\\u0001";
     std::u32string dst = src;
     assert(normalize_nfd_markers_segment(dst, map, regex_sentinel));
     if (dst != expect) {

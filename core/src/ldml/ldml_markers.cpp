@@ -19,6 +19,10 @@ namespace core {
 namespace ldml {
 
 
+const std::u32string REGEX_PREFIX       = U"\\uFFFF\\u0008";  // does not include '\\' because it might be a range
+const std::u32string RAW_PREFIX         = U"\uFFFF\u0008";
+const std::u32string REGEX_ANY_MATCH    = U"[\\u0001-\\uD7FE]";
+
 // string manipulation
 
 /** internal function to normalize with a specified mode */
@@ -176,23 +180,15 @@ prepend_marker(std::u32string &str, marker_num marker, marker_encoding encoding)
     assert(encoding == regex_sentinel);
     if (marker == LDML_MARKER_ANY_INDEX) {
       // recreate the regex from back to front
-      str.insert(0, 1, U']');
-      prepend_hex_quad(str, LDML_MARKER_MAX_INDEX);
-      str.insert(0, 1, U'u');
-      str.insert(0, 1, U'\\');
-      str.insert(0, 1, U'-');
-      prepend_hex_quad(str, LDML_MARKER_MIN_INDEX);
-      str.insert(0, 1, U'u');
-      str.insert(0, 1, U'\\');
-      str.insert(0, 1, U'[');
-      str.insert(0, 1, LDML_MARKER_CODE);
-      str.insert(0, 1, LDML_UC_SENTINEL);
+      str.insert(0, REGEX_ANY_MATCH);
+      str.insert(0, REGEX_PREFIX);
     } else {
       // add hex part
       prepend_hex_quad(str, marker);
       // add static part
-      km_core_usv markstr[] = {LDML_UC_SENTINEL, LDML_MARKER_CODE, u'\\', u'u'};
-      str.insert(0, markstr, 4);
+      km_core_usv markstr[] = {u'\\', u'u'};
+      str.insert(0, markstr, 2);
+      str.insert(0, REGEX_PREFIX);
     }
   }
 }
@@ -256,27 +252,40 @@ std::u32string remove_markers(const std::u32string &str, marker_map *markers, ma
   auto i = str.begin();
   auto last = i;
   marker_list last_markers;
-  for (i = find(i, str.end(), LDML_UC_SENTINEL); i != str.end(); i = find(i, str.end(), LDML_UC_SENTINEL)) {
-    // append any prefix (from prior pos'n to here)
+  const auto &lookfor_str = (encoding == regex_sentinel) ? REGEX_PREFIX : RAW_PREFIX;
+  auto lookfor = lookfor_str.at(0);
+
+  for (i = find(i, str.end(), lookfor); i != str.end(); i = find(i, str.end(), lookfor)) {
     out.append(last, i);
+    assert(*i == lookfor); // assert that find() worked
+    last = i; // keep track of the last segment appendd.
 
-    // #1: LDML_UC_SENTINEL (what we searched for)
-    assert(*i == LDML_UC_SENTINEL); // assert that find() worked
-    i++;
-    last = i;
-    if (i == str.end()) {
-      break; // hit end
+    std::u32string rest(i, str.end());
+    if (rest.length() <= lookfor_str.length()) {
+      // not enough left so it can't match, so continue
+      i = str.end(); // end of string
+      if (encoding == plain_sentinel) {
+        // in plain mode, delete any irregular sequences
+        last = i;
+      }
+      continue;
     }
 
-    // #2 LDML_MARKER_CODE
-    if (*i != LDML_MARKER_CODE) {
-      continue; // can't process this, get out
+    rest.resize(lookfor_str.length());
+
+    i += lookfor_str.length();
+
+    if (rest != lookfor_str) {
+      // no match - could be backslash something else
+      if (encoding == plain_sentinel) {
+        // in plain mode, delete any irregular sequences
+        last = i;
+      }
+      continue;
     }
-    i++;
+
+    // matches. Skip over the prefix
     last = i;
-    if (i == str.end()) {
-      break; // hit end
-    }
 
     KMX_DWORD marker_no;
     if (encoding == plain_sentinel) {
@@ -311,64 +320,13 @@ std::u32string remove_markers(const std::u32string &str, marker_map *markers, ma
         markno[3] = *(i++);
         marker_no = parse_hex_quad(markno);
         assert (marker_no != 0); // illegal marker number
-      } else if (*i == U'[') {
-        if (++i == str.end()) {
-          break;
+      } else if (*i == REGEX_ANY_MATCH.at(0)) { // '['
+        std::u32string rest2(i, str.end());
+        if (rest2.length() < REGEX_ANY_MATCH.length()) {
+          // not enough left so it can't match, so continue
+          continue;
         }
-        assert(*i == U'\\');
-        if (++i == str.end()) {
-          break;
-        }
-        assert(*i == U'u');
-        if (++i == str.end()) {
-          break;
-        }
-        assert(xdigitval(*i) != -1);
-        if (++i == str.end()) {
-          break;
-        }
-        assert(xdigitval(*i) != -1);
-        if (++i == str.end()) {
-          break;
-        }
-        assert(xdigitval(*i) != -1);
-        if (++i == str.end()) {
-          break;
-        }
-        assert(xdigitval(*i) != -1);
-        if (++i == str.end()) {
-          break;
-        }
-        assert(*i == U'-');
-        if (++i == str.end()) {
-          break;
-        }
-        assert(*i == U'\\');
-        if (++i == str.end()) {
-          break;
-        }
-        assert(*i == U'u');
-        if (++i == str.end()) {
-          break;
-        }
-        assert(xdigitval(*i) != -1);
-        if (++i == str.end()) {
-          break;
-        }
-        assert(xdigitval(*i) != -1);
-        if (++i == str.end()) {
-          break;
-        }
-        assert(xdigitval(*i) != -1);
-        if (++i == str.end()) {
-          break;
-        }
-        assert(xdigitval(*i) != -1);
-        if (++i == str.end()) {
-          break;
-        }
-        assert(*i == U']');
-        i++;
+        i += REGEX_ANY_MATCH.length();
         marker_no = LDML_MARKER_ANY_INDEX;
       } else {
         assert(*i == U'\\' || *i == U'[');  // error.
