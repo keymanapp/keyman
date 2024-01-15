@@ -5,7 +5,7 @@ import { kmnfile } from "./compiler-globals.js";
 const Namespace = CompilerErrorNamespace.KmwCompiler;
 // const SevInfo = CompilerErrorSeverity.Info | Namespace;
 // const SevHint = CompilerErrorSeverity.Hint | Namespace;
-// const SevWarn = CompilerErrorSeverity.Warn | Namespace;
+const SevWarn = CompilerErrorSeverity.Warn | Namespace;
 const SevError = CompilerErrorSeverity.Error | Namespace;
 // const SevFatal = CompilerErrorSeverity.Fatal | Namespace;
 
@@ -106,4 +106,8 @@ export class KmwCompilerMessages extends KmnCompilerMessages {
   static Error_TouchLayoutFileDoesNotExist = (o:{filename:string}) => m(this.ERROR_TouchLayoutFileDoesNotExist,
     `Touch layout file ${o.filename} does not exist`);
   static ERROR_TouchLayoutFileDoesNotExist = SevError | 0x0004;
+
+  static Warn_TouchLayoutUsesUnsupportedGesturesDownlevel = (o:{keyId:string}) => m(this.WARN_TouchLayoutUsesUnsupportedGesturesDownlevel,
+    `The touch layout uses a flick or multi-tap gesture on key ${o.keyId}, which is only available on version 17.0+ of Keyman`);
+  static WARN_TouchLayoutUsesUnsupportedGesturesDownlevel = SevWarn | 0x0005;
 };
