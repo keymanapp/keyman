@@ -122,6 +122,9 @@ namespace core
     virtual km_core_keyboard_imx *
     get_imx_list() const = 0;
 
+    virtual bool
+    supports_normalization() const = 0;
+
     friend json & operator << (json &j, abstract_processor const &opts);
   };
 
