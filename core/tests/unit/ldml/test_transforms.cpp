@@ -845,8 +845,8 @@ int test_normalize() {
     // from tests - regex edition
     marker_map map;
     std::cout << __FILE__ << ":" << __LINE__ << "   - complex test 9c+regex" << std::endl;
-    const std::u32string src    = U"9ce\u0300\\uFFFF\\u0008\\u0002\u0320\\uFFFF\\u0008\\u0001";
-    const std::u32string expect = U"9ce\\uFFFF\\u0008\\u0002\u0320\u0300\\uFFFF\\u0008\\u0001";
+    const std::u32string src    = U"9ce\u0300\\uffff\\u0008\\u0002\u0320\\uffff\\u0008\\u0001";
+    const std::u32string expect = U"9ce\\uffff\\u0008\\u0002\u0320\u0300\\uffff\\u0008\\u0001";
     std::u32string dst = src;
     assert(normalize_nfd_markers_segment(dst, map, regex_sentinel));
     if (dst != expect) {
@@ -864,8 +864,8 @@ int test_normalize() {
     // from tests - regex edition
     marker_map map;
     std::cout << __FILE__ << ":" << __LINE__ << "   - complex test \\m{.}" << std::endl;
-    const std::u32string src    = U"9ce\u0300\\uFFFF\\u0008[\\u0001-\\uD7FE]\u0320\\uFFFF\\u0008\\u0001";
-    const std::u32string expect = U"9ce\\uFFFF\\u0008[\\u0001-\\uD7FE]\u0320\u0300\\uFFFF\\u0008\\u0001";
+    const std::u32string src    = U"9ce\u0300\\uffff\\u0008[\\u0001-\\ud7fe]\u0320\\uffff\\u0008\\u0001";
+    const std::u32string expect = U"9ce\\uffff\\u0008[\\u0001-\\ud7fe]\u0320\u0300\\uffff\\u0008\\u0001";
     std::u32string dst = src;
     assert(normalize_nfd_markers_segment(dst, map, regex_sentinel));
     if (dst != expect) {
