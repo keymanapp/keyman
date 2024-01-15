@@ -72,7 +72,7 @@
   <string name="ssDownloadingTitle">Descargando %0:s</string>
   <!-- Parameters: %0:s: filename -->
   <string name="ssDownloadingText">Descargando %0:s</string>
-  <string name="ssOffline">$APPNAME Setup could not connect to keyman.com to download additional resources.</string>
-  <string name="ssOffline2">Please check that you are online, and give $APPNAME Setup permission to access the Internet in your firewall settings.</string>
-  <string name="ssOffline3">Click Abort to exit Setup, Retry to try and download resources again, or Ignore to continue offline.</string>
+  <string name="ssOffline">El instalador de $APPNAME no pudo conectarse a keyman.com para descargar los recursos adicionales.</string>
+  <string name="ssOffline2">Comprueba que estás en línea y da permiso al instalador de $APPNAME para acceder a Internet en la configuración de tu cortafuegos.</string>
+  <string name="ssOffline3">Haz clic en Abortar para salir del instalador, en Reintentar para reintentar descargar los recursos o en Ignorar para continuar sin conexión.</string>
 </resources>

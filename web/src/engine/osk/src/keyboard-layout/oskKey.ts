@@ -12,6 +12,39 @@ import buttonClassNames from '../buttonClassNames.js';
 import { KeyElement } from '../keyElement.js';
 import VisualKeyboard from '../visualKeyboard.js';
 
+/**
+ * Replace default key names by special font codes for modifier keys
+ *
+ *  @param  {string}  oldText
+ *  @return {string}
+ **/
+export function renameSpecialKey(oldText: string, vkbd: VisualKeyboard): string {
+ // If a 'special key' mapping exists for the text, replace it with its corresponding special OSK character.
+ switch(oldText) {
+   case '*ZWNJ*':
+     // Default ZWNJ symbol comes from iOS.  We'd rather match the system defaults where
+     // possible / available though, and there's a different standard symbol on Android.
+     oldText = vkbd.device.OS == DeviceSpec.OperatingSystem.Android ?
+       '*ZWNJAndroid*' :
+       '*ZWNJiOS*';
+     break;
+   case '*Enter*':
+     oldText = vkbd.isRTL ? '*RTLEnter*' : '*LTREnter*';
+     break;
+   case '*BkSp*':
+     oldText = vkbd.isRTL ? '*RTLBkSp*' : '*LTRBkSp*';
+     break;
+   default:
+     // do nothing.
+ }
+
+ let specialCodePUA = 0XE000 + specialChars[oldText];
+
+ return specialChars[oldText] ?
+   String.fromCharCode(specialCodePUA) :
+   oldText;
+}
+
 export default abstract class OSKKey {
   // Only set here to act as an alias for code built against legacy versions.
   static readonly specialCharacters = specialChars;
@@ -260,39 +293,6 @@ export default abstract class OSKKey {
     return key.proportionalWidth * vkbd.width;
   }
 
-  /**
-   * Replace default key names by special font codes for modifier keys
-   *
-   *  @param  {string}  oldText
-   *  @return {string}
-   **/
-  protected renameSpecialKey(oldText: string, vkbd: VisualKeyboard): string {
-    // If a 'special key' mapping exists for the text, replace it with its corresponding special OSK character.
-    switch(oldText) {
-      case '*ZWNJ*':
-        // Default ZWNJ symbol comes from iOS.  We'd rather match the system defaults where
-        // possible / available though, and there's a different standard symbol on Android.
-        oldText = vkbd.device.OS == DeviceSpec.OperatingSystem.Android ?
-          '*ZWNJAndroid*' :
-          '*ZWNJiOS*';
-        break;
-      case '*Enter*':
-        oldText = vkbd.isRTL ? '*RTLEnter*' : '*LTREnter*';
-        break;
-      case '*BkSp*':
-        oldText = vkbd.isRTL ? '*RTLBkSp*' : '*LTRBkSp*';
-        break;
-      default:
-        // do nothing.
-    }
-
-    let specialCodePUA = 0XE000 + specialChars[oldText];
-
-    return specialChars[oldText] ?
-      String.fromCharCode(specialCodePUA) :
-      oldText;
-  }
-
   public get keyText(): string {
     const spec = this.spec;
     const DEFAULT_BLANK = '\xa0';
@@ -327,7 +327,7 @@ export default abstract class OSKKey {
 
     // Add OSK key labels
     let keyText = this.keyText;
-    let specialText = this.renameSpecialKey(keyText, vkbd);
+    let specialText = renameSpecialKey(keyText, vkbd);
     if(specialText != keyText) {
       // The keyboard wants to use the code for a special glyph defined by the SpecialOSK font.
       keyText = specialText;

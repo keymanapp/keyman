@@ -70,7 +70,7 @@ if builder_start_action test; then
   copy_deps
   tsc --build test/
   npm run lint
-  readonly C8_THRESHOLD=70
+  readonly C8_THRESHOLD=74
   c8 --reporter=lcov --reporter=text --lines $C8_THRESHOLD --statements $C8_THRESHOLD --branches $C8_THRESHOLD --functions $C8_THRESHOLD mocha
   builder_echo warning "Coverage thresholds are currently $C8_THRESHOLD%, which is lower than ideal."
   builder_echo warning "Please increase threshold in build.sh as test coverage improves."
