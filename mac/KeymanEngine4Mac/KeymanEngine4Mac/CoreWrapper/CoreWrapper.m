@@ -310,7 +310,7 @@ const int CORE_ENVIRONMENT_ARRAY_LENGTH = 6;
   return action;
 }
 
--(NSString *)getContextAsStringUsingCore {
+/*-(NSString *)getContextAsStringUsingCore {
   km_core_context * context =  km_core_state_context(self.coreState);
 
   km_core_context_item * contextItemsArray = nil;
@@ -341,7 +341,7 @@ const int CORE_ENVIRONMENT_ARRAY_LENGTH = 6;
 
   [self.coreHelper logDebugMessage:@"CoreWrapper getContextAsStringUsingCore = %@", immutableString];
   return immutableString;
-}
+}*/
 
 -(void)clearContextUsingCore {
   km_core_state_context_clear(self.coreState);
@@ -374,9 +374,9 @@ const int CORE_ENVIRONMENT_ARRAY_LENGTH = 6;
 }
 
 
--(NSString*)context {
+/*-(NSString*)context {
   return [self getContextAsStringUsingCore];
-}
+}*/
 
 //TODO: create and save as static
 +(BOOL)setupCoreEnvironment:(km_core_option_item *) coreOptionArray {
