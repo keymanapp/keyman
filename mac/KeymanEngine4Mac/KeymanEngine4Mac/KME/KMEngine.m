@@ -36,7 +36,7 @@ const NSString* kEasterEggKmxName = @"EnglishSpanish.kmx";
         self.debugMode = enableDebugLogging;
         _kmx = kmx;
         _coreHelper = [[CoreHelper alloc] initWithDebugMode:enableDebugLogging];
-      
+
       if (kmx) {
         [self loadCoreWrapperFromKmxFile:self.kmx.filePath];
         [self.coreWrapper setContext:contextString];
@@ -71,7 +71,7 @@ const NSString* kEasterEggKmxName = @"EnglishSpanish.kmx";
     if (self.coreHelper) {
         self.coreHelper.debugMode = useVerboseLogging;
     }
-  
+
     if (useVerboseLogging) {
         NSLog(@"KMEngine - Turning verbose logging on");
         // In Keyman Engine if "debugMode" is turned on (explicitly) with "English plus Spanish" as the current keyboard and you type "Sentrycrash#KME",
@@ -89,8 +89,8 @@ const NSString* kEasterEggKmxName = @"EnglishSpanish.kmx";
         NSLog(@"KMEngine - Turning verbose logging off");
 }
 
-- (NSString *)getCoreContext {
-  return self.coreWrapper.context;
+- (NSString *)getCoreContextDebug {
+  return self.coreWrapper.contextDebug;
 }
 
 - (void)clearCoreContext {

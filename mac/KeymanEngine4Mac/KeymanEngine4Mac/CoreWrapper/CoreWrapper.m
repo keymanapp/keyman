@@ -310,39 +310,6 @@ const int CORE_ENVIRONMENT_ARRAY_LENGTH = 6;
   return action;
 }
 
-/*-(NSString *)getContextAsStringUsingCore {
-  km_core_context * context =  km_core_state_context(self.coreState);
-
-  km_core_context_item * contextItemsArray = nil;
-  size_t contextLength = km_core_context_length(context);
-
-  NSMutableString *contextString = [[NSMutableString alloc]init];
-
-  if (contextLength==0) {
-    [self.coreHelper logDebugMessage:@"CoreWrapper getContextAsStringUsingCore, context is empty."];
-  } else {
-    km_core_status result = km_core_context_get(context, &contextItemsArray);
-    if (result==KM_CORE_STATUS_OK) {
-      for (int i = 0; i < contextLength; i++) {
-        km_core_context_item contextItem = contextItemsArray[i];
-        if (contextItem.type == KM_CORE_CT_CHAR) {
-          NSString *unicodeString = [self.coreHelper utf32ValueToString:contextItem.character];
-          [contextString appendString:unicodeString];
-        }
-      }
-    }
-  }
-  NSString *immutableString = [NSString stringWithString:contextString];
-
-  // dispose of context items array
-  if (contextItemsArray) {
-    km_core_context_items_dispose(contextItemsArray);
-  }
-
-  [self.coreHelper logDebugMessage:@"CoreWrapper getContextAsStringUsingCore = %@", immutableString];
-  return immutableString;
-}*/
-
 -(void)clearContextUsingCore {
   km_core_state_context_clear(self.coreState);
   [self.coreHelper logDebugMessage:@"km_core_state_context_clear called"];
@@ -373,10 +340,14 @@ const int CORE_ENVIRONMENT_ARRAY_LENGTH = 6;
   }
 }
 
+-(NSString*)contextDebug {
+  km_core_cp * context = km_core_state_context_debug(self.coreState, KM_CORE_DEBUG_CONTEXT_CACHED);
+  NSString *debugString = [self.coreHelper createNSStringFromUnicharString:context];
+  km_core_cp_dispose(context);
 
-/*-(NSString*)context {
-  return [self getContextAsStringUsingCore];
-}*/
+  [self.coreHelper logDebugMessage:@"CoreWrapper contextDebug = %@", debugString];
+  return debugString;
+}
 
 //TODO: create and save as static
 +(BOOL)setupCoreEnvironment:(km_core_option_item *) coreOptionArray {
