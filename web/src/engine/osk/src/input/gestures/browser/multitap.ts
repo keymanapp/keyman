@@ -8,7 +8,6 @@ import { distributionFromDistanceMaps } from '@keymanapp/input-processor';
 import Modipress from './modipress.js';
 import { keySupportsModipress } from '../specsForLayout.js';
 import { GesturePreviewHost } from '../../../keyboard-layout/gesturePreviewHost.js';
-import { renameSpecialKey } from '../../../keyboard-layout/oskKey.js';
 
 /**
  * Represents a potential multitap gesture's implementation within KeymanWeb.
