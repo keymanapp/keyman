@@ -41,7 +41,7 @@ fi
 if builder_start_action clean:fixture; then
   rm -f ../../build/tools/host-fixture.html
   rm -f ../../build/tools/gestureHost.css
-  builder_finish_action success clean :fixture
+  builder_finish_action success clean:fixture
 fi
 
 if builder_start_action clean:test-module; then
