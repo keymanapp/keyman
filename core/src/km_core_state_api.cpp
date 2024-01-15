@@ -408,7 +408,7 @@ km_core_cp * km_core_state_context_debug(
     return _new_error_string(u"<could not retrieve context buffer>");
   }
 
-  // construct the error message
+  // construct the log message
 
   std::stringstream buffer;
 
