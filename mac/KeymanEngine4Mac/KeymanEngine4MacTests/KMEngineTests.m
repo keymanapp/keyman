@@ -43,7 +43,7 @@ NSString * names[nCombinations];
     XCTAssert(engine != nil, @"Expected non-nil engine");
     // Note: relying on km_core_state_context_debug output format is just barely
     // acceptable for a unit test
-    XCTAssert([engine.getCoreContextDebug isEqualToString:@"|| (len: 0) [ ]", @"Expected empty context buffer"]);
+    XCTAssert([engine.getCoreContextDebug isEqualToString:@"|| (len: 0) [ ]"], @"Expected empty context buffer");
 }
 
 - (void)testinitWithKMX_ValidKmxNonEmptyContext_InitializedWithContext {
