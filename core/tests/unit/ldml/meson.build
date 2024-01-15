@@ -83,6 +83,16 @@ t = executable('test_transforms', 'test_transforms.cpp',
     objects: lib.extract_all_objects(recursive: false))
 test('test_transforms', t, suite: 'ldml')
 
+# run test_context_normalization ldml unit test
+
+t = executable('test_context_normalization', 'test_context_normalization.cpp',
+    cpp_args: defns + warns,
+    include_directories: [inc, libsrc, '../../../../developer/src/ext/json'],
+    link_args: links + tests_flags,
+    dependencies: [icu_uc, icu_i18n],
+    objects: lib.extract_all_objects(recursive: false))
+test('test_context_normalization', t, suite: 'ldml')
+
 # Run tests on all keyboards (`tests` defined in keyboards/meson.build)
 
 foreach kbd : tests
