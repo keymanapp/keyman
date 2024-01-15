@@ -4,6 +4,8 @@ import EventEmitter from "eventemitter3";
 import { KeyElement } from "../keyElement.js";
 import { FlickNameCoordMap, OrderedFlickDirections } from "../input/gestures/browser/flick.js";
 import { PhoneKeyTipOrientation } from "../input/gestures/browser/keytip.js";
+import { default as VisualKeyboard } from "../visualKeyboard.js";
+import { renameSpecialKey } from "./oskKey.js";
 
 /**With edge lengths of 1, to keep flick-text invisible at the start, the
  * hypotenuse for an inter-cardinal path is sqrt(2).  To keep a perfect circle
@@ -130,9 +132,15 @@ export class GesturePreviewHost extends EventEmitter<EventMap> {
     this.onCancel = handler;
   }
 
-  public setMultitapHint(current: string, next: string) {
+  public setMultitapHint(currentSrc: ActiveKeyBase, nextSrc: ActiveKeyBase, vkbd?: VisualKeyboard) {
+    const current = renameSpecialKey(currentSrc.text, vkbd);
+    const next    = renameSpecialKey(nextSrc.text, vkbd);
+
     this.label.textContent = current;
     this.hintLabel.textContent = next;
+
+    this.label.style.fontFamily     = (current != currentSrc.text) ? 'SpecialOSK' : currentSrc.font ?? this.label.style.fontFamily;
+    this.hintLabel.style.fontFamily = (next != nextSrc.text) ? 'SpecialOSK' : nextSrc.font ?? this.hintLabel.style.fontFamily;
 
     this.emit('startFade');
 
