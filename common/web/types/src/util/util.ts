@@ -126,6 +126,18 @@ function escapeRegexChar(ch: string) {
   }
 }
 
+/** chars that must be escaped: syntax, C0 + C1 controls */
+const REGEX_SYNTAX_CHAR = /^[\u0000-\u001F\u007F-\u009F{}\[\]\\?.^$*-]$/;
+
+function escapeRegexCharIfSyntax(ch: string) {
+  // escape if syntax or not valid
+  if (REGEX_SYNTAX_CHAR.test(ch) || !isValidUnicode(ch.codePointAt(0))) {
+    return escapeRegexChar(ch);
+  } else {
+    return ch; // leave unescaped
+  }
+}
+
 /**
  * Unescape one codepoint to \u or \U format
  * @param hex one codepoint in hex, such as '0127'
@@ -134,7 +146,7 @@ function escapeRegexChar(ch: string) {
 function regexOne(hex: string): string {
   const unescaped = unescapeOne(hex);
   // re-escape as 16 or 32 bit code units
-  return Array.from(unescaped).map(ch => escapeRegexChar(ch)).join('');
+  return Array.from(unescaped).map(ch => escapeRegexCharIfSyntax(ch)).join('');
 }
 /**
  * Unescapes a string according to UTS#18§1.1, see <https://www.unicode.org/reports/tr18/#Hex_notation>

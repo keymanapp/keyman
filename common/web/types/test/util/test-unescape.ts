@@ -59,12 +59,18 @@ describe('test unescapeString()', function() {
 
 describe('test unescapeRegex()', () => {
   it("should correctly handle 1..6 char escapes", function() {
-    assert.equal(unescapeStringToRegex('\\u{9}'),      '\\u0009');   // TAB
-    assert.equal(unescapeStringToRegex('\\u{4a}'),     '\\u004a');   // J
-    assert.equal(unescapeStringToRegex('\\u{3c8}'),    '\\u03c8');   // ψ
-    assert.equal(unescapeStringToRegex('\\u{304B}'),   '\\u304b');   // か
-    assert.equal(unescapeStringToRegex('\\u{1e109}'),  '\\U0001e109');  // 𞄉
-    assert.equal(unescapeStringToRegex('\\u{10fff0}'), '\\U0010fff0'); // Plane 16 Private Use
+    assert.equal(unescapeStringToRegex('\\u{9}'),       '\\u0009');   // TAB
+    assert.equal(unescapeStringToRegex('\\u{5b}'),      '\\u005b');   // [
+    assert.equal(unescapeStringToRegex('\\u{005b}'),    '\\u005b');   // [
+    assert.equal(unescapeStringToRegex('\\u{4a}'),     'J');   // J
+    assert.equal(unescapeStringToRegex('\\u{8a}'),     '\\u008a');   // J
+    assert.equal(unescapeStringToRegex('\\u{3c8}'),    'ψ');   // ψ
+    assert.equal(unescapeStringToRegex('\\u{304B}'),   'か');   // か
+    assert.equal(unescapeStringToRegex('\\u{ffff}'),   '\\uffff');   // noncharacter
+    assert.equal(unescapeStringToRegex('\\u{1e109}'),  '𞄉');  // 𞄉
+    assert.equal(unescapeStringToRegex('\\u{1ffff}'),  '\\U0001ffff');  // nonchar
+    assert.equal(unescapeStringToRegex('\\u{10fff0}'), '\u{10fff0}'); // Plane 16 Private Use
+    assert.equal(unescapeStringToRegex('\\u{10ffff}'), '\\U0010ffff'); // nonchar
   });
 });
 
