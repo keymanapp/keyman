@@ -420,7 +420,7 @@ km_core_cp * km_core_state_context_debug(
     auto flags = buffer.flags();
     if(cp->type == KM_CORE_CT_CHAR) {
       // A single Unicode codepoint
-      buffer << " U+" << std::hex << std::setfill('0') << std::setw(4) << std::hex << cp->character;
+      buffer << " U+" << std::setfill('0') << std::setw(4) << std::hex << cp->character;
     } else {
       // A marker
       buffer << " M(" << cp->marker << ")";
