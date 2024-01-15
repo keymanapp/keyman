@@ -85,7 +85,8 @@ test('test_transforms', t, suite: 'ldml')
 
 # run test_context_normalization ldml unit test
 
-t = executable('test_context_normalization', 'test_context_normalization.cpp',
+t = executable('test_context_normalization',
+    ['test_context_normalization.cpp', '../emscripten_filesystem.cpp'],
     cpp_args: defns + warns,
     include_directories: [inc, libsrc, '../../../../developer/src/ext/json'],
     link_args: links + tests_flags,
