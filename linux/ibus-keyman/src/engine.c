@@ -205,27 +205,17 @@ ibus_keyman_engine_class_init (IBusKeymanEngineClass *klass)
 }
 
 static gchar *
-get_context_debug(IBusEngine *engine, km_core_context *context) {
+get_context_debug(IBusEngine *engine) {
   IBusKeymanEngine *keyman       = (IBusKeymanEngine *)engine;
-  km_core_context *state_context = context ? context : km_core_state_context(keyman->state);
 
-  size_t buf_size8 = 512, buf_size16 = 512;
-  km_core_context_item *context_items;
-  gchar *current_context_utf8 = g_new0(gchar, buf_size8);
-  km_core_cp *current_context_utf16 = g_new0(km_core_cp, buf_size16);
-  if (km_core_context_get(state_context, &context_items) == KM_CORE_STATUS_OK) {
-    km_core_context_items_to_utf8(context_items, current_context_utf8, &buf_size8);
-    km_core_context_items_to_utf16(context_items, current_context_utf16, &buf_size16);
+  km_core_cp *buf = km_core_state_context_debug(keyman->state, KM_CORE_DEBUG_CONTEXT_CACHED);
+  gchar *result = g_utf16_to_utf8((gunichar2 *)buf, -1, NULL, NULL, NULL);
+  km_core_cp_dispose(buf);
+  if(result) {
+    return result;
   }
-  GString *output = g_string_new("");
-  g_string_append_printf(output, "|%s| (len:%zu) [", current_context_utf8, km_core_context_length(state_context));
-  for (int i = 0; i <  buf_size16 - 1; i++) {
-    g_string_append_printf(output, "U+%04x ", current_context_utf16[i]);
-  }
-  g_string_append(output, "]");
-  km_core_context_items_dispose(context_items);
-  g_free(current_context_utf16);
-  g_free(current_context_utf8);
+
+  GString *output = g_string_new("Error converting debug context");
 #if GLIB_CHECK_VERSION(2, 76, 0)
   return g_string_free_and_steal(output);
 #else
@@ -264,7 +254,7 @@ set_context_if_needed(IBusEngine *engine) {
   guint cursor_pos, anchor_pos, context_start, context_end;
 
   g_autofree gchar *debug_context = NULL;
-  g_message("%s: current core context   : %s", __FUNCTION__, debug_context = get_context_debug(engine, NULL));
+  g_message("%s: current core context   : %s", __FUNCTION__, debug_context = get_context_debug(engine));
 
   ibus_engine_get_surrounding_text(engine, &text, &cursor_pos, &anchor_pos);
 
@@ -934,10 +924,10 @@ ibus_keyman_engine_process_key_event(
     km_mod_state |= KM_CORE_MODIFIER_CAPS;
   }
   g_message("DAR: %s - km_mod_state=0x%x", __FUNCTION__, km_mod_state);
-  g_autofree gchar *debug_context = NULL;
-  g_message("%s: before process key event: %s", __FUNCTION__, debug_context = get_context_debug(engine, NULL));
+  g_autofree gchar *debug_context0 = NULL, *debug_context1 = NULL, *debug_context2 = NULL;
+  g_message("%s: before process key event: %s", __FUNCTION__, debug_context0 = get_context_debug(engine));
   km_core_process_event(keyman->state, keycode_to_vk[keycode], km_mod_state, isKeyDown, KM_CORE_EVENT_FLAG_DEFAULT);
-  g_message("%s: after process key event : %s", __FUNCTION__, debug_context = get_context_debug(engine, NULL));
+  g_message("%s: after process key event : %s", __FUNCTION__, debug_context1 = get_context_debug(engine));
 
   // km_core_state_action_items to get action items
   size_t num_action_items;
@@ -953,7 +943,7 @@ ibus_keyman_engine_process_key_event(
     return FALSE;
   }
 
-  g_message("%s: after processing all actions: %s", __FUNCTION__, debug_context = get_context_debug(engine, NULL));
+  g_message("%s: after processing all actions: %s", __FUNCTION__, debug_context2 = get_context_debug(engine));
   return TRUE;
 }
 
