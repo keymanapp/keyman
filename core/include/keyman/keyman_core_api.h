@@ -1153,10 +1153,10 @@ reading the context for other purposes, and the format may change.
 
 ```c
 */
-enum km_core_debug_context_type {
+typedef enum {
   KM_CORE_DEBUG_CONTEXT_CACHED        = 0,
   KM_CORE_DEBUG_CONTEXT_INTERMEDIATE  = 1
-};
+} km_core_debug_context_type;
 
 /*
 ```
