@@ -278,13 +278,6 @@ object modActionsMain: TmodActionsMain
       OnExecute = actProjectSettingsExecute
       OnUpdate = actProjectSettingsUpdate
     end
-    object actToolsCustomise: TAction
-      Category = 'Tools'
-      Caption = 'C&ustomise...'
-      Hint = 
-        'Customise|Change the layout and appearance of the toolbars and m' +
-        'enus'
-    end
     object actToolsOptions: TAction
       Category = 'Tools'
       Caption = '&Options...'

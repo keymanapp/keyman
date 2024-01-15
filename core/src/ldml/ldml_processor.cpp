@@ -8,6 +8,8 @@
 #include <fstream>
 #include <algorithm>
 #include "ldml/ldml_processor.hpp"
+#include "ldml/ldml_transforms.hpp"
+#include "ldml/ldml_markers.hpp"
 #include "state.hpp"
 #include "kmx_file.h"
 #include "kmx/kmx_plus.h"
@@ -316,13 +318,26 @@ size_t ldml_processor::process_output(km_core_state *state, const std::u32string
   // drop last 'matchedContext':
   ctxtstr.resize(ctxtstr.length() - matchedContext);
   ctxtstr.append(outputString); // TODO-LDML: should be able to do a normalization-safe append here.
-  ldml::marker_map markers;
-  assert(ldml::normalize_nfd_markers(ctxtstr, markers)); // TODO-LDML: Need marker-safe normalize here.
+  {
+    const auto normalize_ok = ldml::normalize_nfd_markers(ctxtstr);
+    assert(normalize_ok);
+    if(!normalize_ok) {
+      DebugLog("ldml_processor::process_output: failed ldml::normalize_nfd_markers(ctxtstr)");
+    }
+  }
 
   // Ok. We've done all the happy manipulations.
 
   /** NFD w/ markers */
   std::u32string ctxtstr_cleanedup = ctxtstr;
+  {
+    const auto normalize_ok = ldml::normalize_nfd_markers(ctxtstr_cleanedup);
+    assert(normalize_ok);
+    if(!normalize_ok) {
+      DebugLog("ldml_processor::process_output: failed ldml::normalize_nfd_markers(ctxtstr_cleanedup)");
+    }
+  }
+
   assert(ldml::normalize_nfd_markers(ctxtstr_cleanedup));
 
   // find common prefix.

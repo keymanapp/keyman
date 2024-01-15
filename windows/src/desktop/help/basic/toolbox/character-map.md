@@ -55,7 +55,7 @@ options:
 |Insert Character | Inserts the selected character at the cursor position in your document.|
 |Filter... | Sends the curser to the \'Filter by\' Character Map search field. See [Filtering](#filtering) below.|
 |Goto...| Displays the Goto dialog box. See [Goto](#goto) below.|
-|Font...| Allows you to choose a different font for use in the Character Map. This will not affect the font being used in your document! See Fonts and Characters](#fonts) below.|
+|Font...| Allows you to choose a different font for use in the Character Map. This will not affect the font being used in your document! See [Fonts and Characters](#fonts) below.|
 |Insert Mode | Allows you to select your desired character insert mode. See [Insert Modes](#insertmodes) below.|
 |Display Quality | Allows you to set the desired display quality for the characters in the Character Map. See [Display Quality](#displayquality) below. |
 

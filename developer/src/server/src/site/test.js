@@ -367,7 +367,7 @@ function selectModel(modelId) {
   }
 
   if(model) {
-    keyman.modelManager.register({
+    keyman.addModel({
       id: model.id,
       languages: ['en'],
       path: location.protocol + '//' + location.host + '/data/model/' + model.src

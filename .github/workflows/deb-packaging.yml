@@ -205,6 +205,35 @@ jobs:
 
     - name: Upload
       run: |
+        function dput_retry() {
+          local i=1
+          local retval
+          local upload_log=$1
+          local hosttarget=$2
+          local max_retries=10
+          local tmpfile=/tmp/dput.output
+          shift 2
+          while ((i <= max_retries)); do
+            dput ${upload_log} ${hosttarget} "$@" 2>&1 | tee ${tmpfile}
+            retval=$?
+            echo "dput exited with ${retval}"
+            if ! grep -q "ssh: Could not resolve hostname package-drop.psonet: Name or service not known" ${tmpfile}; then
+              rm ${tmpfile}
+              if [[ ${retval} != 0 ]]; then
+                exit ${retval}
+              else
+                return 0
+              fi
+            fi
+            if ((++i <= max_retries)); then
+              sleep 10
+              echo "${COLOR_BLUE}Retry ${i}/${max_retries}:"
+            fi
+          done
+          rm ${tmpfile}
+          exit ${retval}
+        }
+
         case ${{ github.event.client_payload.branch }} in
           stable-*)  destination='' ;;
           beta)      destination='-proposed' ;;
@@ -214,7 +243,7 @@ jobs:
         echo -e "::group::${COLOR_GREEN}Upload source package"
         cd keyman-srcpkg
 
-        dput -U llso:ubuntu/jammy${destination} *_source.changes
+        dput_retry -U llso:ubuntu/jammy${destination} *_source.changes
         echo "::endgroup::"
 
         echo -e "::group::${COLOR_GREEN}Uploading binary packages"
@@ -223,7 +252,7 @@ jobs:
         for f in *.changes; do
           if [[ $f =~ $pattern ]]; then
             dist=${BASH_REMATCH[1]}
-            dput -U llso:ubuntu/${dist}${destination} $f
+            dput_retry -U llso:ubuntu/${dist}${destination} $f
           fi
         done
         echo "::endgroup::"

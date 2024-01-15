@@ -1,5 +1,50 @@
 # Keyman Version History
 
+## 17.0.243 alpha 2024-01-12
+
+* chore(core): split out some files (#10327)
+* chore(common): Update crowdin strings for French, German, Spanish (Latin America) (#10368)
+* fix(web): prediction time-limiter issues, performance (#10330)
+* fix(developer): test-page model loading (#10328)
+* fix(ios): use safe area to position Keyman menu correctly (#10339)
+* chore(linux): fix GHA packaging (#10366)
+* refactor(linux): Use `km_core_state_context_set_if_needed` (#10354)
+
+## 17.0.242 alpha 2024-01-11
+
+* fix(windows): serve images for readme files in Keyboard Install (#10312)
+* fix(developer): remove unused tools/customise menu (#10321)
+* fix(developer): cleanly handle filling a new osk file from layout (#10322)
+* fix(developer): new file support for project 2.0 (#10323)
+* chore(common): builder action launch typos (#10361)
+*  (#10326)
+
+## 17.0.241 alpha 2024-01-10
+
+* chore(deps-dev): bump follow-redirects from 1.14.9 to 1.15.4 (#10340)
+* Update character-map.md (#10345)
+* chore(linux): Output dput exit code after upload to llso (#10349)
+* fix(android/engine): Use fallback keyboard if keyboard index undefined (#10342)
+* fix(android): Use alert dialog when package is missing touch keyboards (#10335)
+* chore: cleanup recent history entries without PR title (#10298)
+* chore(web): better logging for gesture-recognizer tools build script (#10329)
+
+## 17.0.240 alpha 2024-01-09
+
+* chore(linux): Retry llso upload (#10331)
+
+## 17.0.239 alpha 2024-01-08
+
+* fix(mac): write persisted options returned from Core (#10275)
+* chore(web): remove lm-worker `Array.from` polyfill and make `Symbol` polyfill conditional (#10255)
+* change(web): lm-worker bundling + wrapper script rework (#10264)
+* refactor(web): transformation of build-bundler into a common es-bundling command (#10265)
+* change(web): KeymanWeb bundler-script centralization (#10267)
+* feat(web): alternate artifact - es6-bundled Web (#10257)
+* feat(web): es6 artifact for app/webview (#10274)
+* fix(web): adds null-guard for longpress-key validation (#10299)
+*  (#10296)
+
 ## 17.0.238 alpha 2024-01-03
 
 * fix(developer): quell internal error when  a section fails (#10300)
@@ -26,7 +71,7 @@
 
 * fix(mac): Improve detection of non-compliant apps (#10282)
 * fix(web): default multitap logic for shift-layer shift multitaps (#10281)
-*  (#10284)
+* fix(web): keyboard functionality on Android 5.0 / Chrome 35 (#10284)
 
 ## 17.0.233 alpha 2023-12-19
 
@@ -36,7 +81,7 @@
 
 ## 17.0.232 alpha 2023-12-18
 
-*  (#10270)
+* feat(web): adds highlighting to BKSP while held (#10270)
 
 ## 17.0.231 alpha 2023-12-15
 

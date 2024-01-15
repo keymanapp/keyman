@@ -22,6 +22,7 @@ tests = [
   ['keyboard-api', 'keyboard_api.cpp'],
   ['options-api', 'options_api.cpp'],
   ['state-api', 'state_api.cpp'],
+  ['state-context-api', 'state_context_api.cpp'],
   ['debug-api', 'debug_api.cpp'],
   ['kmx_xstring', 'test_kmx_xstring.cpp'],
   ['kmx_context', 'test_kmx_context.cpp'],
