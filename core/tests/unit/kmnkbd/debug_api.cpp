@@ -66,6 +66,7 @@ void setup(const char *keyboard) {
   }));
 
   try_status(km_core_context_set(km_core_state_context(test_state), citems));
+  try_status(km_core_context_set(km_core_state_app_context(test_state), citems));
 }
 
 /**
@@ -423,6 +424,7 @@ void test_backspace_markers() {
     {KM_CORE_CT_END}
   };
   try_status(km_core_context_set(km_core_state_context(test_state), marker_context));
+  try_status(km_core_context_set(km_core_state_app_context(test_state), marker_context)); // TODO: this needs to remove markers
 
   DEBUG_GROUP gp = {u"Main"};
 

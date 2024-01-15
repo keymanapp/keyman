@@ -56,9 +56,7 @@ km_core_context_status km_core_state_context_set_if_needed(
 
   // Compare the internal app context with the passed-in application context
 
-  bool is_valid = is_context_valid(new_app_context, app_context_string.get());
-
-  if(is_valid) {
+  if(is_context_valid(new_app_context, app_context_string.get())) {
     // We keep the context as is
     return KM_CORE_CONTEXT_STATUS_UNCHANGED;
   }

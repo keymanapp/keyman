@@ -280,6 +280,7 @@ km_core_status km_core_state_context_clear(
     return KM_CORE_STATUS_INVALID_ARGUMENT;
   }
   km_core_context_clear(km_core_state_context(state));
+  km_core_context_clear(km_core_state_app_context(state));
   return KM_CORE_STATUS_OK;
 }
 
