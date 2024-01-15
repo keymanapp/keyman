@@ -1,5 +1,12 @@
 # Keyman Version History
 
+## 17.0.244 alpha 2024-01-15
+
+* refactor(core): Move `km_core_state_context_*` tests to separate file (#10375)
+* feat(developer): warn on gesture support for downlevel (#10364)
+* fix(web): use KMW OSK font for "**" special-text in key hints (#10371)
+* docs(linux): Update sample settings (#10374)
+
 ## 17.0.243 alpha 2024-01-12
 
 * chore(core): split out some files (#10327)
