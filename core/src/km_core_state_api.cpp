@@ -12,6 +12,8 @@
 #include <algorithm>
 #include <sstream>
 #include <memory>
+#include <iomanip>
+#include <codecvt>
 
 #include <keyman/keyman_core_api.h>
 #include "jsonpp.hpp"
@@ -359,4 +361,81 @@ km_core_status km_core_state_context_clear(
   }
   km_core_context_clear(km_core_state_context(state));
   return KM_CORE_STATUS_OK;
+}
+
+void km_core_cp_dispose(
+  km_core_cp *cp
+) {
+  if(cp != nullptr) {
+    delete [] cp;
+  }
+}
+
+km_core_cp * _new_error_string(std::u16string const str) {
+  km_core_cp* result = new km_core_cp[str.size()+1];
+  str.copy(result, str.size());
+  result[str.size()] = 0;
+  return result;
+}
+
+km_core_cp * km_core_state_context_debug(
+  km_core_state *state,
+  km_core_debug_context_type context_type
+) {
+  km_core_context_item * context_items = nullptr;
+
+  if(context_type == KM_CORE_DEBUG_CONTEXT_INTERMEDIATE) {
+    if(km_core_state_get_intermediate_context(state, &context_items) != KM_CORE_STATUS_OK) {
+      return _new_error_string(u"<error retrieving intermediate context>");
+    }
+  } else if(context_type == KM_CORE_DEBUG_CONTEXT_CACHED) {
+    if(km_core_context_get(km_core_state_context(state), &context_items) != KM_CORE_STATUS_OK) {
+      return _new_error_string(u"<error retrieving cached context>");
+    }
+  } else {
+    return _new_error_string(u"<invalid context type>");
+  }
+
+  size_t buf_size;
+  if(km_core_context_items_to_utf8(context_items, nullptr, &buf_size) != KM_CORE_STATUS_OK) {
+    km_core_context_items_dispose(context_items);
+    return _new_error_string(u"<could not retrieve context buffer size>");
+  }
+
+  std::vector<char> context_buffer(buf_size);
+  if(km_core_context_items_to_utf8(context_items, &context_buffer[0], &buf_size) != KM_CORE_STATUS_OK) {
+    km_core_context_items_dispose(context_items);
+    return _new_error_string(u"<could not retrieve context buffer>");
+  }
+
+  // construct the error message
+
+  std::stringstream buffer;
+
+  int context_item_length = 0;
+  for(auto cp = context_items; cp->type != KM_CORE_CT_END; cp++, context_item_length++);
+
+  buffer << "|" << std::string(&context_buffer[0]) << "| (len: " << context_item_length << ") [";
+  for(auto cp = context_items; cp->type != KM_CORE_CT_END; cp++) {
+    auto flags = buffer.flags();
+    if(cp->type == KM_CORE_CT_CHAR) {
+      // A single Unicode codepoint
+      buffer << " U+" << std::hex << std::setfill('0') << std::setw(4) << std::hex << cp->character;
+    } else {
+      // A marker
+      buffer << " M(" << cp->marker << ")";
+    }
+    buffer.flags(flags);
+  }
+  buffer << " ]";
+
+  km_core_context_items_dispose(context_items);
+
+  std::u16string s = std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t>{}.from_bytes(buffer.str());
+
+  km_core_cp* result = new km_core_cp[s.size() + 1];
+  s.copy(result, s.size());
+  result[s.size()] = 0;
+
+  return result;
 }
