@@ -10,5 +10,6 @@
     "maelvalais.autoconf",
     "webfreak.debug",
     "dawidd6.debian-vscode",
+    "ms-python.autopep8",
   ]
 }
