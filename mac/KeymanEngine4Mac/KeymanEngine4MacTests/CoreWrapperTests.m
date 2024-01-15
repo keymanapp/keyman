@@ -68,7 +68,7 @@ CoreWrapper *mockWrapper;
   CoreWrapper *core = [[CoreWrapper alloc] initWithHelper: [CoreTestStaticHelperMethods helper] kmxFilePath:kmxPath];
   [core setContext:@"🤔?👍🏻✅"];
   NSString *finalContext = core.contextDebug;
-  XCTAssert([finalContext isEqualToString:@"|🤔?👍🏻✅| (len:5) [ U+1f914 U+003f U+1f44d U+1f3fb U+2705 ]"], @"Expected '🤔?👍🏻✅' in context buffer");
+  XCTAssert([finalContext isEqualToString:@"|🤔?👍🏻✅| (len: 5) [ U+1f914 U+003f U+1f44d U+1f3fb U+2705 ]"], @"Expected '🤔?👍🏻✅' in context buffer");
 }
 
 @end
