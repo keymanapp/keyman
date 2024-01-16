@@ -28,7 +28,6 @@ NS_ASSUME_NONNULL_BEGIN
               withModifiers:(NSEventModifierFlags)modifierState
                 withKeyDown:(BOOL)isKeyDown;
 -(void)setContextIfNeeded:(NSString*)context;
--(void)setContext:(NSString*)context;
 -(NSString*)contextDebug;
 -(void)clearCoreContext;
 -(void)dealloc;

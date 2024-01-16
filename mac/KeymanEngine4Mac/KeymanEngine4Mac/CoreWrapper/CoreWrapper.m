@@ -321,25 +321,6 @@ const int CORE_ENVIRONMENT_ARRAY_LENGTH = 6;
   [self.coreHelper logDebugMessage:@"CoreWrapper setContextIfNeeded, context=%@, km_core_state_context_set_if_needed result=%i", context, result];
 }
 
--(void)setContext:(NSString*)context {
-  if (context.length == 0) {
-    [self clearContextUsingCore];
-  } else {
-    char const *coreString = [context cStringUsingEncoding:NSUTF8StringEncoding];
-    km_core_context_item *contextItemArray;
-
-    // create array of context items
-    km_core_status result = km_core_context_items_from_utf8(coreString, &contextItemArray);
-    [self.coreHelper logDebugMessage:@"km_core_context_items_from_utf8, result=%i", result];
-
-    // set the context in core using the array
-    km_core_context * coreContext =  km_core_state_context(self.coreState);
-    km_core_context_set(coreContext, contextItemArray);
-    // dispose
-    km_core_context_items_dispose(contextItemArray);
-  }
-}
-
 -(NSString*)contextDebug {
   km_core_cp * context = km_core_state_context_debug(self.coreState, KM_CORE_DEBUG_CONTEXT_CACHED);
   NSString *debugString = [self.coreHelper createNSStringFromUnicharString:context];
