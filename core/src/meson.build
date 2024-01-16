@@ -42,6 +42,7 @@ endif
 
 
 kmx_files = files(
+  'actions_normalize.cpp',
   'action.cpp',
   'option.cpp',
   'keyboard.cpp',

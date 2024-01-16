@@ -14,8 +14,14 @@
 namespace km {
 namespace core
 {
-  km_core_actions const *action_item_list_to_actions_object(
+  km_core_actions *action_item_list_to_actions_object(
     km_core_action_item const *action_items
+  );
+
+  bool actions_normalize(
+    km_core_context const *cached_context,
+    km_core_context const *app_context,
+    km_core_actions *actions
   );
 } // namespace core
 } // namespace km

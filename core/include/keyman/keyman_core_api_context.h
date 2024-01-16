@@ -116,7 +116,7 @@ km_core_context_items_dispose(km_core_context_item *context_items);
  */
 KMN_API
 km_core_context *
-km_core_state_context(km_core_state *state);
+km_core_state_context(km_core_state const *state);
 
 /**
  * Get access to the state object's application context.
@@ -127,7 +127,7 @@ km_core_state_context(km_core_state *state);
  */
 KMN_API
 km_core_context *
-km_core_state_app_context(km_core_state *state);
+km_core_state_app_context(km_core_state const *state);
 
 /*
 ```

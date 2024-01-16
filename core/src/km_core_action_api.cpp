@@ -33,7 +33,16 @@ km_core_actions const * km_core_state_get_actions(
     return nullptr;
   }
 
-  return action_item_list_to_actions_object(action_items);
+  km_core_actions * result = action_item_list_to_actions_object(action_items);
+
+  if(state->processor().supports_normalization()) {
+    // Normalize to NFC for those keyboard processors that support it
+    if(!actions_normalize(km_core_state_context(state), km_core_state_app_context(state), result)) {
+      km_core_actions_dispose(result);
+      return nullptr;
+    }
+  }
+  return result;
 }
 
 km_core_status km_core_actions_dispose(
