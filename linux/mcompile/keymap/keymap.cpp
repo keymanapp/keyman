@@ -318,6 +318,7 @@ int append_other_ToVector(v_dw_3D &All_Vector,GdkKeymap * keymap) {
     All_Vector[1][i][0+1] = KMX_get_KeyvalsUnderlying_From_KeyCodeUnderlying_GDK(keymap,All_Vector[0][i][0],0);   //shift state: unshifted:0
     All_Vector[1][i][1+1] = KMX_get_KeyvalsUnderlying_From_KeyCodeUnderlying_GDK(keymap,All_Vector[0][i][0],1);   //shift state: shifted:1
 
+
     //wprintf(L" Keycodes US dw        :   %d (US): -- %i (%c)  -- %i (%c) ---- (other): %i (%c)  --  %i(%c)    \n",(All_Vector[1][i][0]),All_Vector[0][i][1],All_Vector[0][i][1],All_Vector[0][i][2],All_Vector[0][i][2],All_Vector[1][i][1] ,All_Vector[1][i][1],All_Vector[1][i][2],All_Vector[1][i][2]);
     //wprintf(L"   Keycodes ->Other dw:-:   %d (US): -- %i (%c)  -- %i (%c)   \n\n",(All_Vector[1][i][0]),All_Vector[1][i][1],All_Vector[1][i][1],All_Vector[1][i][2],All_Vector[1][i][2]);
   }
