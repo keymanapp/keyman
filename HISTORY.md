@@ -1,5 +1,11 @@
 # Keyman Version History
 
+## 17.0.245 alpha 2024-01-16
+
+* chore(core): Ignore C++ symbols (#10386)
+* fix(android): Fix OSK rotation issues (#10373)
+* feat(developer): add `-m` parameter to kmc to control message severity (#10258)
+
 ## 17.0.244 alpha 2024-01-15
 
 * refactor(core): Move `km_core_state_context_*` tests to separate file (#10375)
