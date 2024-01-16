@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include <keyman/keyman_core_api.h>
+#include "keyman_core.h"
 #include <state.hpp>
 
 namespace km {

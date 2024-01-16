@@ -11,7 +11,6 @@
 #include <sstream>
 #include <memory>
 
-#include <keyman/keyman_core_api.h>
 
 #include "action.hpp"
 #include "state.hpp"

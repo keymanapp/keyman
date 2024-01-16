@@ -9,7 +9,7 @@
 #include <iostream>
 #include <string>
 
-#include <keyman/keyman_core_api.h>
+#include "keyman_core.h"
 
 #include "path.hpp"
 #include "state.hpp"

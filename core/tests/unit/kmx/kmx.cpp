@@ -17,6 +17,8 @@
 #include <string>
 #include <type_traits>
 
+#include "keyman_core.h"
+
 #include <kmx/kmx_processevent.h>
 #include <kmx/kmx_xstring.h>
 

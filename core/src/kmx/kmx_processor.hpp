@@ -9,7 +9,7 @@
 #pragma once
 
 #include <string>
-#include <keyman/keyman_core_api.h>
+#include "keyman_core.h"
 #include "kmx/kmx_processevent.h"
 #include "keyboard.hpp"
 #include "processor.hpp"
