@@ -1122,6 +1122,10 @@ km_core_context *
 km_core_state_context(km_core_state *state);
 
 
+KMN_API
+km_core_context *
+km_core_state_app_context(km_core_state *state);
+
 /*
 ```
 ### `km_core_state_get_intermediate_context`
@@ -1151,11 +1155,26 @@ a debug-formatted version of the context is made available with
 `km_core_state_context_debug`. This is not intended to be parsed for
 reading the context for other purposes, and the format may change.
 
+The three context types are:
+* cached: the internal context used by Core, which may be normalized
+       and may contain markers. This is set via
+       km_core_state_context_set_if_needed, and will be modified
+       during keystroke event processing.
+* intermediate: internal context used by IMX, only valid during
+       keystroke event processing.
+* app: an exact copy of the current context passed in to
+       km_core_state_context_set_if_needed, which is used to verify
+       the precise text manipulations required when emitted changes.
+       This input context is in "NFU" -- normalization form unknown,
+       and may be mixed normalization so may require fixups when
+       it is manipulated by keyboard processors that support
+       normalization, such as the LDML keyboard processor.
 ```c
 */
 typedef enum {
   KM_CORE_DEBUG_CONTEXT_CACHED        = 0,
-  KM_CORE_DEBUG_CONTEXT_INTERMEDIATE  = 1
+  KM_CORE_DEBUG_CONTEXT_INTERMEDIATE  = 1,
+  KM_CORE_DEBUG_CONTEXT_APP           = 2
 } km_core_debug_context_type;
 
 /*

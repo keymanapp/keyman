@@ -65,6 +65,10 @@ namespace core
 
     km_core_keyboard_imx  * get_imx_list() const override;
 
+    bool
+    supports_normalization() const override {
+      return false;
+    }
   };
 
   class null_processor : public mock_processor {

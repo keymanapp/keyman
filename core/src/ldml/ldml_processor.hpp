@@ -84,6 +84,11 @@ namespace core {
 
     km_core_keyboard_imx  * get_imx_list() const override;
 
+    bool
+    supports_normalization() const override {
+      return true;
+    }
+
   private:
      /** emit text to context and actions */
      static void emit_text(km_core_state *state, const std::u16string &str);

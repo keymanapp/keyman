@@ -44,6 +44,7 @@ setup(const char *keyboard, const km_core_cp *context) {
   try_status(km_core_state_create(test_kb, test_env_opts, &test_state));
   try_status(km_core_context_items_from_utf16(context, &citems));
   try_status(km_core_context_set(km_core_state_context(test_state), citems));
+  try_status(km_core_context_set(km_core_state_app_context(test_state), citems));
 }
 
 bool
@@ -138,6 +139,7 @@ test_context_set_if_needed_cached_context_has_markers() {
       {KM_CORE_CT_MARKER, {0}, {3}}, {KM_CORE_CT_MARKER, {0}, {4}}, KM_CORE_CONTEXT_ITEM_END};
 
   try_status(km_core_context_set(km_core_state_context(test_state), citems));
+  try_status(km_core_context_set(km_core_state_app_context(test_state), citems));
   assert(km_core_state_context_set_if_needed(test_state, application_context) == KM_CORE_CONTEXT_STATUS_UNCHANGED);
 
   km_core_context_item *citems_new;
@@ -206,6 +208,7 @@ void test_context_debug_various() {
   };
 
   try_status(km_core_context_set(km_core_state_context(test_state), citems));
+  try_status(km_core_context_set(km_core_state_app_context(test_state), citems));
 
   auto str = km_core_state_context_debug(test_state, KM_CORE_DEBUG_CONTEXT_CACHED);
   // std::cout << str << std::endl;

@@ -123,6 +123,7 @@ class state
 {
 protected:
     core::context              _ctxt;
+    core::context              _app_ctxt;
     core::abstract_processor & _processor;
     core::actions              _actions;
     core::debug_items          _debug_items;
@@ -137,6 +138,9 @@ public:
 
     core::context       &  context() noexcept            { return _ctxt; }
     core::context const &  context() const noexcept      { return _ctxt; }
+
+    core::context       &  app_context() noexcept            { return _app_ctxt; }
+    core::context const &  app_context() const noexcept      { return _app_ctxt; }
 
     core::abstract_processor const & processor() const noexcept { return _processor; }
     core::abstract_processor &       processor() noexcept { return _processor; }
