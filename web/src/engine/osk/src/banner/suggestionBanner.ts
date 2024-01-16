@@ -461,7 +461,9 @@ export class SuggestionBanner extends Banner {
         ds.marginRight = `calc(${(SuggestionBanner.MARGIN / 2)}% - 0.5px)`;
 
         this.container.appendChild(separatorDiv);
-        this.separators.push(separatorDiv);
+        // Ensure the separators are maintained in the same order as the
+        // suggestion elements!
+        this.separators[indexToInsert - (rtl ? 1 : 0)] = separatorDiv;
       }
     }
   }
