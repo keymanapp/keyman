@@ -1,7 +1,7 @@
 import 'mocha';
 import { assert } from 'chai';
 import { TestCompilerCallbacks, verifyCompilerMessagesObject } from '@keymanapp/developer-test-helpers';
-import { CompilerMessages } from '../src/compiler/messages.js';
+import { CompilerMessages } from '../src/compiler/package-compiler-messages.js';
 import { makePathToFixture } from './helpers/index.js';
 import { KmpCompiler } from '../src/compiler/kmp-compiler.js';
 import { CompilerErrorNamespace, CompilerOptions } from '@keymanapp/common-types';

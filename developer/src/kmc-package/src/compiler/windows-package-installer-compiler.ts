@@ -14,7 +14,7 @@ import JSZip from 'jszip';
 import { CompilerCallbacks, KeymanCompiler, KeymanCompilerArtifact, KeymanCompilerArtifacts, KeymanCompilerResult, KeymanFileTypes, KmpJsonFile, KpsFile } from "@keymanapp/common-types";
 import KEYMAN_VERSION from "@keymanapp/keyman-version";
 import { KmpCompiler, KmpCompilerOptions } from "./kmp-compiler.js";
-import { CompilerMessages } from "./messages.js";
+import { CompilerMessages } from "./package-compiler-messages.js";
 
 const SETUP_INF_FILENAME = 'setup.inf';
 const PRODUCT_NAME = 'Keyman';
