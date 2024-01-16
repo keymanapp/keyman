@@ -12,7 +12,8 @@
 
 #include <string>
 
-#include <keyman/keyman_core_api.h>
+#include "keyman_core.h"
+
 
 // Forward declarations
 class json;

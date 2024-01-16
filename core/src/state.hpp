@@ -11,7 +11,7 @@
 #include <cassert>
 #include <vector>
 
-#include <keyman/keyman_core_api.h>
+#include "keyman_core.h"
 
 #include "context.hpp"
 #include "option.hpp"
