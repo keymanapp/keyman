@@ -71,30 +71,24 @@ static void add_back_markers(std::u32string &str, const std::u32string &src, con
   marker_map map2(map);  // make a copy of the map
   // clear the string
   str.clear();
-  // add the end-of-text marker
-  {
-    const auto ch = MARKER_BEFORE_EOT;
-    const auto m  = map2.find(ch);
-    if (m != map2.end()) {
-      for (auto q = (m->second).rbegin(); q < (m->second).rend(); q++) {
-        prepend_marker(str, *q, encoding);
-      }
-      map2.erase(ch);  // remove it
-    }
+  // iterator
+  auto marki = map.rbegin();
+
+  // add any end-of-text markers
+  while(marki != map.rend() && marki->first == MARKER_BEFORE_EOT) {
+    prepend_marker(str, (marki++)->second, encoding);
   }
+
   // go from end to beginning of string
   for (auto p = src.rbegin(); p != src.rend(); p++) {
     const auto ch = *p;
     str.insert(0, 1, ch);  // prepend
 
-    const auto m = map2.find(ch);
-    if (m != map2.end()) {
-      for (auto q = (m->second).rbegin(); q < (m->second).rend(); q++) {
-        prepend_marker(str, *q, encoding);
-      }
-      map2.erase(ch);  // remove it
+    while(marki != map.rend() && marki->first == ch) {
+      prepend_marker(str, (marki++)->second, encoding);
     }
   }
+//  assert(marki == map.rend()); // that we consumed everything
 }
 
 /**
@@ -237,14 +231,9 @@ KMX_DWORD parse_hex_quad(const km_core_usv hex_str[]) {
 
 /** add the list to the map */
 static void add_markers_to_map(marker_map &markers, char32_t marker_ch, const marker_list &list) {
-  auto rep = markers.emplace(marker_ch, list);
-  if (!rep.second) {
-    // already existed.
-    auto existing = rep.first;
-    // append all additional ones
-    for(auto m = list.begin(); m < list.end(); m++) {
-      existing->second.emplace_back(*m);
-    }
+  for (auto i = list.begin(); i < list.end(); i++) {
+    // marker_ch is duplicate, but keeps the structure more shallow.
+    markers.emplace_back(marker_ch, *i);
   }
 }
 

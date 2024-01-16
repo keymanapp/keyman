@@ -48,11 +48,14 @@ enum marker_encoding {
 /** a marker ID (1-based) */
 typedef KMX_DWORD marker_num;
 
-/** list of markers */
+/** list of marker numbers */
 typedef std::deque<marker_num> marker_list;
 
-/** map from following-char to marker numbers. */
-typedef std::map<char32_t, marker_list> marker_map;
+/** map from one char to one entry */
+typedef std::pair<char32_t, marker_num> marker_entry;
+
+/** map from following-char to marker numbers, in front to back order */
+typedef std::deque<marker_entry> marker_map;
 
 /** Normalize a u32string inplace to NFD. @return false on failure */
 bool normalize_nfd(std::u32string &str);
