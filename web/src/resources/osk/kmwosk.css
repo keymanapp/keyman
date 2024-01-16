@@ -396,7 +396,7 @@
   /* Set scrollable-suggestion fade width here.  Make sure to also set .kmw-suggestion-text
    * padding-left and padding-right accordingly!
    */
-  width: 4px;
+  width: 32px;
   height: 100%;
   content: '';
   top: 0;
@@ -406,11 +406,23 @@
   touch-action: none; /* Doesn't seem to allow touch-through, though - even with touch-action: none */
                       /* https://stackoverflow.com/q/21474722 - poster never could find a solution, and settled*/
                       /* on the same workaround:  a 'before' and 'after' piece instead of a single overlay.*/
+  transition: opacity 0.25s linear;
+}
+
+.kmw-suggest-option.swallow-fade-transition::before,
+.kmw-suggest-option.swallow-fade-transition::after {
+  transition-duration: 0s;
 }
 
 .kmw-suggest-option::before {
   background: linear-gradient(90deg, darkorange 0%, transparent 100%);
   left: 0;
+}
+
+.kmw-suggest-option.kmw-hide-fade-left::before,
+.kmw-suggest-option.kmw-hide-fade-right::after {
+  opacity: 0;
+  /* visibility: hidden; */
 }
 
 .kmw-suggest-option::after {
@@ -421,6 +433,12 @@
 /* Fallback suggestion-selection highlighting */
 .kmw-suggest-option.kmw-suggest-touched {
   background: #bbb;
+}
+
+.kmw-suggest-option.kmw-suggest-touched::before,
+.kmw-suggest-option.kmw-suggest-touched::after {
+  /* Immediately start hiding the fade styling for touched suggestions. */
+  opacity: 0;
 }
 
 /* Creates a gradient to fade text at the borders, providing visual indication of overflow */
@@ -440,10 +458,11 @@
   line-height: normal;
   position: relative;
   vertical-align: middle;
-  padding-left: 4px;   /* To prevent start & end of suggestion from being affected by gradient effects */
-  padding-right: 4px;  /* Set these to match scrollable-suggestion fade width set above. */
+  /* Contrast with .kmw-suggest-option::before .width styling.  */
+  padding-left: 8px;   /* Keeps a bit of whitespace on the suggestion's side. */
+  padding-right: 8px;  /* Keeps a bit of whitespace on the suggestion's side. */
   width: max-content;  /* Ensure the text span acts like it contains its text */
-  min-width: calc(100% - 8px); /* To ensure the span stays centered; also adjusts for scrollable-suggestion fade width. */
+  min-width: calc(100% - 16px); /* To ensure the span stays centered. */
   white-space: nowrap;
 }
 

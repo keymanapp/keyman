@@ -28,6 +28,12 @@ const BANNER_SCROLLER_CLASS = 'kmw-suggest-banner-scroller';
 const BANNER_VERT_ROAMING_HEIGHT_RATIO = 0.666;
 
 /**
+ * The style to temporarily apply when updating suggestion text in order to prevent
+ * fade transitions at that time.
+ */
+const FADE_SWALLOW_STYLE = 'swallow-fade-transition';
+
+/**
  * Defines various parameters used by `BannerSuggestion` instances for layout and formatting.
  * This object is designed first and foremost for use with `BannerSuggestion.update()`.
  */
@@ -192,6 +198,33 @@ export class BannerSuggestion {
       collapserStyle.marginRight = (this.collapsedWidth - this.expandedWidth) + 'px';
     } else {
       collapserStyle.marginLeft  = (this.collapsedWidth - this.expandedWidth) + 'px';
+    }
+
+    this.updateFade();
+  }
+
+  public updateFade() {
+    // Note:  selected suggestion fade transitions are handled purely by CSS.
+    // We want to prevent them when updating a suggestion, though.
+    this.div.classList.add(FADE_SWALLOW_STYLE);
+    // Be sure that our fade-swallow mechanism is able to trigger once;
+    // we'll remove it after the current animation frame.
+    window.requestAnimationFrame(() => {
+      this.div.classList.remove(FADE_SWALLOW_STYLE);
+    })
+
+    // Never apply fading to the side that doesn't overflow.
+    this.div.classList.add(`kmw-hide-fade-${this.rtl ? 'left' : 'right'}`);
+
+    // Matches the side that overflows, depending on if LTR or RTL.
+    const fadeClass = `kmw-hide-fade-${this.rtl ? 'right' : 'left'}`;
+
+    // Is the suggestion already its ideal width?.
+    if(!(this.expandedWidth - this.collapsedWidth)) {
+      // Yes?  Don't do any fading.
+      this.div.classList.add(fadeClass);
+    } else {
+      this.div.classList.remove(fadeClass);
     }
   }
 
