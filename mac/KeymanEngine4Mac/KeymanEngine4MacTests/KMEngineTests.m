@@ -563,6 +563,8 @@ NSString * names[nCombinations];
     XCTAssert(output.codePointsToDeleteBeforeInsert == 1, @"Expected output to delete one code point");
     XCTAssert(!output.hasTextToInsert, @"expected to insert nothing");
     NSString *context = engine.getCoreContextDebug;
+    // Note: relying on km_core_state_context_debug output format is just barely
+    // acceptable for a unit test
     XCTAssert([context isEqualToString:@"|| (len: 0) [ ]"], @"Context should be empty.");
 }
 
@@ -573,6 +575,8 @@ NSString * names[nCombinations];
     CoreKeyOutput *output = [engine processEvent:event];
     XCTAssert(output.emitKeystroke, @"Expected emitKeystroke==YES");
     NSString *context = engine.getCoreContextDebug;
+    // Note: relying on km_core_state_context_debug output format is just barely
+    // acceptable for a unit test
     XCTAssert([context isEqualToString:@"|| (len: 0) [ ]"], @"Context should be cleared.");
 }
 
@@ -583,6 +587,8 @@ NSString * names[nCombinations];
     CoreKeyOutput *output = [engine processEvent:event];
     XCTAssert(output.emitKeystroke, @"Expected emitKeystroke==YES");
     NSString *context = engine.getCoreContextDebug;
+    // Note: relying on km_core_state_context_debug output format is just barely
+    // acceptable for a unit test
     XCTAssert([context isEqualToString:@"|| (len: 0) [ ]"], @"Context should be cleared.");
 }
 
@@ -594,6 +600,8 @@ NSString * names[nCombinations];
     CoreKeyOutput *output = [engine processEvent:event];
     XCTAssert(output.hasTextToInsert, @"returns text to insert");
     context = engine.getCoreContextDebug;
+    // Note: relying on km_core_state_context_debug output format is just barely
+    // acceptable for a unit test
     XCTAssert([context isEqualToString:@"|\u025B\u0308| (len: 2) [ U+025b U+0308 ]"], @"Context updated with diacritic.");
 }
 
