@@ -1,11 +1,11 @@
-#include "../../../src/ldml/ldml_transforms.hpp"
 #include "../../../src/ldml/ldml_markers.hpp"
+#include "../../../src/ldml/ldml_transforms.hpp"
 #include "kmx/kmx_plus.h"
 #include "kmx/kmx_xstring.h"
+#include "test_color.h"
 #include <iostream>
 #include <string>
 #include <test_assert.h>
-#include "test_color.h"
 
 // TODO-LDML: normal asserts wern't working, so using some hacks.
 // #include "ldml_test_utils.hpp"
@@ -13,18 +13,19 @@
 // #include "debuglog.h"
 
 #ifndef zassert_string_equal
-#define zassert_string_equal(actual, expected)                                                                               \
-  {                                                                                                                          \
-    if (actual != expected) {                                                                                                \
-      std::wcerr << __FILE__ << ":" << __LINE__ << ": " << console_color::fg(console_color::BRIGHT_RED) << "got: " << km::core::kmx::Debug_UnicodeString(actual, 0) \
-                 << " expected " << km::core::kmx::Debug_UnicodeString(expected, 1) << console_color::reset() << std::endl;                                         \
-      return EXIT_FAILURE;                                                                                                   \
-    }                                                                                                                        \
+#define zassert_string_equal(actual, expected)                                                              \
+  {                                                                                                         \
+    if (actual != expected) {                                                                               \
+      std::wcerr << __FILE__ << ":" << __LINE__ << ": " << console_color::fg(console_color::BRIGHT_RED)     \
+                 << "got: " << km::core::kmx::Debug_UnicodeString(actual, 0) << " expected "                \
+                 << km::core::kmx::Debug_UnicodeString(expected, 1) << console_color::reset() << std::endl; \
+      return EXIT_FAILURE;                                                                                  \
+    }                                                                                                       \
   }
 #endif
 
 #ifndef zassert_equal
-#define zassert_equal(actual, expected)                                                                             \
+#define zassert_equal(actual, expected)                                                                                      \
   {                                                                                                                          \
     if (actual != expected) {                                                                                                \
       std::wcerr << __FILE__ << ":" << __LINE__ << ": " << console_color::fg(console_color::BRIGHT_RED) << "got: " << actual \
@@ -33,7 +34,6 @@
     }                                                                                                                        \
   }
 #endif
-
 
 // needed for streaming operators
 #include "utfcodec.hpp"
@@ -44,23 +44,22 @@ using namespace km::core::kmx;
 void
 prepend_hex_oct(std::u32string &str, char32_t x) {
   for (auto i = 0; i < 8; i++) {
-    KMX_DWORD remainder = x & 0xF; // get the last nibble
+    KMX_DWORD remainder = x & 0xF;  // get the last nibble
     char32_t ch;
     if (remainder < 0xA) {
       ch = U'0' + remainder;
     } else {
       ch = U'A' + (remainder - 0xA);
     }
-    str.insert(0, 1, ch); // prepend
+    str.insert(0, 1, ch);  // prepend
     x >>= 4;
   }
 }
 
-
-std::u32string marker_map_to_string(const marker_map &m) {
+std::u32string
+marker_map_to_string(const marker_map &m) {
   std::u32string s;
   for (auto i = m.rbegin(); i < m.rend(); i++) {
-
     prepend_hex_oct(s, i->first);
     s.insert(0, U"=U+");
 
@@ -70,8 +69,10 @@ std::u32string marker_map_to_string(const marker_map &m) {
   return s;
 }
 
-bool _assert_marker_map_equal(const char *f, int l, const marker_map a, const marker_map x) {
-  if (a == x) return true;
+bool
+_assert_marker_map_equal(const char *f, int l, const marker_map a, const marker_map x) {
+  if (a == x)
+    return true;
   std::wcerr << f << ":" << l << ": " << console_color::fg(console_color::BRIGHT_RED);
   std::wcerr << "got: " << marker_map_to_string(a);
   std::wcerr << " expected: " << marker_map_to_string(x);
@@ -242,7 +243,7 @@ test_reorder_standalone() {
     std::cout << __FILE__ << ":" << __LINE__ << " - element API test " << std::endl;
     // element test
     {
-      element es(U'a', (80 << LDML_ELEM_FLAGS_ORDER_BITSHIFT)  | LDML_ELEM_FLAGS_PREBASE);  // tertiary -12, primary 80
+      element es(U'a', (80 << LDML_ELEM_FLAGS_ORDER_BITSHIFT) | LDML_ELEM_FLAGS_PREBASE);  // tertiary -12, primary 80
       std::cout << "es flags" << std::hex << es.get_flags() << std::dec << std::endl;
       // verify element metadata
       assert_equal(es.is_uset(), false);
@@ -406,19 +407,19 @@ test_reorder_standalone() {
       std::cout << __FILE__ << ":" << __LINE__ << " - trying roast #" << r << "=" << roast << std::endl;
       // try apply with string
       {
-          std::cout << "- try apply(text, output)" << std::endl;
-          std::u32string text = roast;
-          std::u32string output;
-          size_t len = tr.apply(text, output);
-          if (len == 0) {
-            std::cout << " (did not apply)" << std::endl;
-          } else {
-            std::cout << " applied, matchLen= " << len << std::endl;
-            text.resize(text.size()-len); // shrink
-            text.append(output);
-            std::cout << " = " << text << std::endl;
-          }
-          zassert_string_equal(text, expect);
+        std::cout << "- try apply(text, output)" << std::endl;
+        std::u32string text = roast;
+        std::u32string output;
+        size_t len = tr.apply(text, output);
+        if (len == 0) {
+          std::cout << " (did not apply)" << std::endl;
+        } else {
+          std::cout << " applied, matchLen= " << len << std::endl;
+          text.resize(text.size() - len);  // shrink
+          text.append(output);
+          std::cout << " = " << text << std::endl;
+        }
+        zassert_string_equal(text, expect);
       }
       // try all-at-once
       {
@@ -455,7 +456,7 @@ test_reorder_standalone() {
     // special test
     {
       std::cout << __FILE__ << ":" << __LINE__ << " - special test " << std::endl;
-      const std::u32string expect = U"\u1A21\u1A60\u1A45"; // this string shouldn't mutate at all.
+      const std::u32string expect = U"\u1A21\u1A60\u1A45";  // this string shouldn't mutate at all.
       {
         std::u32string text = expect;
         tr.apply(text);
@@ -473,7 +474,6 @@ test_reorder_standalone() {
   }
   return EXIT_SUCCESS;
 }
-
 
 // this test case is also in XML form under 'k_201_*'
 int
@@ -536,34 +536,34 @@ test_reorder_esk() {
     // now actually test it
     std::cout << __FILE__ << ":" << __LINE__ << " - cases " << std::endl;
     const std::u32string orig_expect[] = {
-      // 1short
-      U"ax\u0305",          // orig
-      U"a\u0305x",          // expect
+        // 1short
+        U"ax\u0305",  // orig
+        U"a\u0305x",  // expect
 
-      // 2longer
-      U"az\u0305x\u0332",   // orig
-      U"a\u0332\u0305xz",   // expect
+        // 2longer
+        U"az\u0305x\u0332",  // orig
+        U"a\u0332\u0305xz",  // expect
     };
     // TODO-LDML: move this into test code perhaps
-    for (size_t r = 0; r < sizeof(orig_expect) / sizeof(orig_expect[0]); r+= 2) {
+    for (size_t r = 0; r < sizeof(orig_expect) / sizeof(orig_expect[0]); r += 2) {
       const auto &orig   = orig_expect[r + 0];
       const auto &expect = orig_expect[r + 1];
-      std::cout << __FILE__ << ":" << __LINE__ << " - trying str #" << r+1 << "=" << orig << std::endl;
+      std::cout << __FILE__ << ":" << __LINE__ << " - trying str #" << r + 1 << "=" << orig << std::endl;
       // try apply with string
       {
-          std::cout << "- try apply(text, output)" << std::endl;
-          std::u32string text = orig;
-          std::u32string output;
-          size_t len = tr.apply(text, output);
-          if (len == 0) {
-            std::cout << " (did not apply)" << std::endl;
-          } else {
-            std::cout << " applied, matchLen= " << len << std::endl;
-            text.resize(text.size()-len); // shrink
-            text.append(output);
-            std::cout << " = " << text << std::endl;
-          }
-          zassert_string_equal(text, expect);
+        std::cout << "- try apply(text, output)" << std::endl;
+        std::u32string text = orig;
+        std::u32string output;
+        size_t len = tr.apply(text, output);
+        if (len == 0) {
+          std::cout << " (did not apply)" << std::endl;
+        } else {
+          std::cout << " applied, matchLen= " << len << std::endl;
+          text.resize(text.size() - len);  // shrink
+          text.append(output);
+          std::cout << " = " << text << std::endl;
+        }
+        zassert_string_equal(text, expect);
       }
       // try all-at-once
       {
@@ -601,7 +601,8 @@ test_reorder_esk() {
   return EXIT_SUCCESS;
 }
 
-int test_map() {
+int
+test_map() {
   std::cout << "== " << __FUNCTION__ << std::endl;
 
   std::cout << __FILE__ << ":" << __LINE__ << "  transform_entry::findIndex" << std::endl;
@@ -622,42 +623,42 @@ int test_map() {
   return EXIT_SUCCESS;
 }
 
-int test_strutils() {
+int
+test_strutils() {
   std::cout << "== " << __FUNCTION__ << std::endl;
 
   std::cout << __FILE__ << ":" << __LINE__ << " * remove_markers" << std::endl;
-
 
   {
     std::cout << __FILE__ << ":" << __LINE__ << "   - basic test0" << std::endl;
     const std::u32string src = U"abc";
     const std::u32string dst = remove_markers(src);
-    zassert_string_equal(dst, src); // unchanged
+    zassert_string_equal(dst, src);  // unchanged
   }
   {
     marker_map map;
     std::cout << __FILE__ << ":" << __LINE__ << "   - basic test" << std::endl;
     const std::u32string src = U"abc";
     const std::u32string dst = remove_markers(src, map);
-    zassert_string_equal(dst, src); // unchanged
+    zassert_string_equal(dst, src);  // unchanged
     assert_equal(map.size(), 0);
   }
   {
     marker_map map;
     std::cout << __FILE__ << ":" << __LINE__ << "   - marker test" << std::endl;
-    const std::u32string src = U"6\U0000ffff\U00000008\U00000001e";
-    const std::u32string dst = remove_markers(src, map);
+    const std::u32string src    = U"6\U0000ffff\U00000008\U00000001e";
+    const std::u32string dst    = remove_markers(src, map);
     const std::u32string expect = U"6e";
     zassert_string_equal(dst, expect);
-    marker_map expm = { {U'e', 0x1L} };
-    assert_marker_map_equal(map, expm); // marker 1 @ e
+    marker_map expm = {{U'e', 0x1L}};
+    assert_marker_map_equal(map, expm);  // marker 1 @ e
     assert_equal(map.size(), 1);
   }
   {
     marker_map map;
     std::cout << __FILE__ << ":" << __LINE__ << "   - bad0" << std::endl;
-    const std::u32string src = U"6\U0000ffff\U00000008"; // missing trailing marker #
-    const std::u32string dst = remove_markers(src, map);
+    const std::u32string src    = U"6\U0000ffff\U00000008";  // missing trailing marker #
+    const std::u32string dst    = remove_markers(src, map);
     const std::u32string expect = src;
     zassert_string_equal(dst, expect);
     assert_equal(map.size(), 0);
@@ -665,17 +666,17 @@ int test_strutils() {
   {
     marker_map map;
     std::cout << __FILE__ << ":" << __LINE__ << "   - bad1" << std::endl;
-    const std::u32string src = U"6\U0000ffffq"; // missing sentinel subtype
-    const std::u32string dst = remove_markers(src, map);
-    const std::u32string expect = src; // 'q' removed
+    const std::u32string src    = U"6\U0000ffffq";  // missing sentinel subtype
+    const std::u32string dst    = remove_markers(src, map);
+    const std::u32string expect = src;  // 'q' removed
     zassert_string_equal(dst, expect);
     assert_equal(map.size(), 0);
   }
   {
     marker_map map;
     std::cout << __FILE__ << ":" << __LINE__ << "   - bad1b" << std::endl;
-    const std::u32string src = U"6\U0000ffff"; // missing code
-    const std::u32string dst = remove_markers(src, map);
+    const std::u32string src    = U"6\U0000ffff";  // missing code
+    const std::u32string dst    = remove_markers(src, map);
     const std::u32string expect = src;
     zassert_string_equal(dst, expect);
     assert_equal(map.size(), 0);
@@ -683,8 +684,8 @@ int test_strutils() {
   {
     marker_map map;
     std::cout << __FILE__ << ":" << __LINE__ << "   - bad1c" << std::endl;
-    const std::u32string src = U"6\U0000ffffzz"; // missing code
-    const std::u32string dst = remove_markers(src, map);
+    const std::u32string src    = U"6\U0000ffffzz";  // missing code
+    const std::u32string dst    = remove_markers(src, map);
     const std::u32string expect = src;
     zassert_string_equal(dst, expect);
     assert_equal(map.size(), 0);
@@ -692,8 +693,8 @@ int test_strutils() {
   {
     marker_map map;
     std::cout << __FILE__ << ":" << __LINE__ << "   - marker end test" << std::endl;
-    const std::u32string src = U"6\U0000ffff\U00000008\U00000001";
-    const std::u32string dst = remove_markers(src, map);
+    const std::u32string src    = U"6\U0000ffff\U00000008\U00000001";
+    const std::u32string dst    = remove_markers(src, map);
     const std::u32string expect = U"6";
     zassert_string_equal(dst, expect);
     marker_map expm({{MARKER_BEFORE_EOT, 0x1L}});
@@ -703,8 +704,10 @@ int test_strutils() {
   {
     marker_map map;
     std::cout << __FILE__ << ":" << __LINE__ << "   - complex test" << std::endl;
-    const std::u32string src = U"6\U0000ffff\U00000008\U00000001e\U0000ffff\U00000008\U00000002\U00000320\U0000ffff\U00000008\U00000003\U00000300\U0000ffff\U00000008\U00000004";
-    const std::u32string dst = remove_markers(src, map);
+    const std::u32string src =
+        U"6\U0000ffff\U00000008\U00000001e\U0000ffff\U00000008\U00000002\U00000320\U0000ffff\U00000008\U00000003\U00000300"
+        U"\U0000ffff\U00000008\U00000004";
+    const std::u32string dst    = remove_markers(src, map);
     const std::u32string expect = U"6e\U00000320\U00000300";
     zassert_string_equal(dst, expect);
     marker_map expm({{U'e', 0x1L}, {0x0320, 0x2L}, {0x0300, 0x3L}, {MARKER_BEFORE_EOT, 0x4L}});
@@ -735,16 +738,16 @@ int test_strutils() {
     assert_equal(parse_hex_quad(U"CAFE"), 0xCAFE);
     assert_equal(parse_hex_quad(U"D00d"), 0xD00D);
     assert_equal(parse_hex_quad(U"FFFF"), 0xFFFF);
-    assert_equal(parse_hex_quad(U"zzzz"), 0); // err
+    assert_equal(parse_hex_quad(U"zzzz"), 0);  // err
   }
   return EXIT_SUCCESS;
 }
 
-int test_normalize() {
+int
+test_normalize() {
   std::cout << "== " << __FUNCTION__ << std::endl;
 
   std::cout << __FILE__ << ":" << __LINE__ << " * normalize_nfd_markers" << std::endl;
-
 
   {
     marker_map map;
@@ -774,7 +777,7 @@ int test_normalize() {
         U"6\U0000ffff\U00000008\U00000001e\U0000ffff\U00000008\U00000002\U00000320\U0000ffff\U00000008\U00000003\U00000300"
         U"\U0000ffff\U00000008\U00000004";
     const std::u32string expect = src;
-    std::u32string dst = src;
+    std::u32string dst          = src;
     assert(normalize_nfd_markers_segment(dst, map));
     zassert_string_equal(dst, expect);
     marker_map expm({{U'e', 0x1L}, {0x320, 0x2L}, {0x300, 0x3L}, {MARKER_BEFORE_EOT, 0x4L}});
@@ -785,10 +788,11 @@ int test_normalize() {
   {
     marker_map map;
     std::cout << __FILE__ << ":" << __LINE__ << "   - complex test" << std::endl;
-    const std::u32string src = // already in order: 320+300
-        U"6\U0000ffff\U00000008\U00000001e\U0000ffff\U00000008\U00000002\U00000320\U0000ffff\U00000008\U00000003\U00000300\U0000ffff\U00000008\U00000004";
+    const std::u32string src =  // already in order: 320+300
+        U"6\U0000ffff\U00000008\U00000001e\U0000ffff\U00000008\U00000002\U00000320\U0000ffff\U00000008\U00000003\U00000300"
+        U"\U0000ffff\U00000008\U00000004";
     const std::u32string expect = src;
-    std::u32string dst = src;
+    std::u32string dst          = src;
     assert(normalize_nfd_markers_segment(dst, map));
     zassert_string_equal(dst, expect);
     marker_map expm({{U'e', 0x1L}, {0x320, 0x2L}, {0x300, 0x3L}, {MARKER_BEFORE_EOT, 0x4L}});
@@ -798,10 +802,12 @@ int test_normalize() {
   {
     marker_map map;
     std::cout << __FILE__ << ":" << __LINE__ << "   - complex test2" << std::endl;
-    const std::u32string src = // out of order, 300-320
-        U"6\U0000ffff\U00000008\U00000001e\U0000ffff\U00000008\U00000002\U00000300\U0000ffff\U00000008\U00000003\U00000320\U0000ffff\U00000008\U00000004";
+    const std::u32string src =  // out of order, 300-320
+        U"6\U0000ffff\U00000008\U00000001e\U0000ffff\U00000008\U00000002\U00000300\U0000ffff\U00000008\U00000003\U00000320"
+        U"\U0000ffff\U00000008\U00000004";
     const std::u32string expect =
-        U"6\U0000ffff\U00000008\U00000001e\U0000ffff\U00000008\U00000003\U00000320\U0000ffff\U00000008\U00000002\U00000300\U0000ffff\U00000008\U00000004";
+        U"6\U0000ffff\U00000008\U00000001e\U0000ffff\U00000008\U00000003\U00000320\U0000ffff\U00000008\U00000002\U00000300"
+        U"\U0000ffff\U00000008\U00000004";
     std::u32string dst = src;
     assert(normalize_nfd_markers_segment(dst, map));
     if (dst != expect) {
@@ -820,7 +826,7 @@ int test_normalize() {
     std::cout << __FILE__ << ":" << __LINE__ << "   - complex test 4a" << std::endl;
     const std::u32string src    = U"4e\u0300\uFFFF\u0008\u0001\u0320";
     const std::u32string expect = U"4e\uFFFF\u0008\u0001\u0320\u0300";
-    std::u32string dst = src;
+    std::u32string dst          = src;
     assert(normalize_nfd_markers_segment(dst, map));
     if (dst != expect) {
       std::cout << "dst: " << Debug_UnicodeString(dst) << std::endl;
@@ -838,14 +844,14 @@ int test_normalize() {
     std::cout << __FILE__ << ":" << __LINE__ << "   - complex test 9c" << std::endl;
     const std::u32string src    = U"9ce\u0300\uFFFF\u0008\u0002\u0320\uFFFF\u0008\u0001";
     const std::u32string expect = U"9ce\uFFFF\u0008\u0002\u0320\u0300\uFFFF\u0008\u0001";
-    std::u32string dst = src;
+    std::u32string dst          = src;
     assert(normalize_nfd_markers_segment(dst, map));
     if (dst != expect) {
       std::cout << "dst: " << Debug_UnicodeString(dst) << std::endl;
       std::cout << "exp: " << Debug_UnicodeString(expect) << std::endl;
     }
     zassert_string_equal(dst, expect);
-    marker_map expm({{0x320, 0x2L},{MARKER_BEFORE_EOT, 0x1L}});
+    marker_map expm({{0x320, 0x2L}, {MARKER_BEFORE_EOT, 0x1L}});
     assert_marker_map_equal(map, expm);
     assert_equal(map.size(), 2);
   }
@@ -856,7 +862,7 @@ int test_normalize() {
     std::cout << __FILE__ << ":" << __LINE__ << "   - complex test 9c+regex" << std::endl;
     const std::u32string src    = U"9ce\u0300\\uffff\\u0008\\u0002\u0320\\uffff\\u0008\\u0001";
     const std::u32string expect = U"9ce\\uffff\\u0008\\u0002\u0320\u0300\\uffff\\u0008\\u0001";
-    std::u32string dst = src;
+    std::u32string dst          = src;
     assert(normalize_nfd_markers_segment(dst, map, regex_sentinel));
     if (dst != expect) {
       std::cout << "dst: " << Debug_UnicodeString(dst) << std::endl;
@@ -865,7 +871,7 @@ int test_normalize() {
       std::cout << "     " << expect << std::endl;
     }
     zassert_string_equal(dst, expect);
-    marker_map expm({{0x320, 0x2L},{MARKER_BEFORE_EOT, 0x1L}});
+    marker_map expm({{0x320, 0x2L}, {MARKER_BEFORE_EOT, 0x1L}});
     assert_marker_map_equal(map, expm);
     assert_equal(map.size(), 2);
   }
@@ -875,14 +881,14 @@ int test_normalize() {
     std::cout << __FILE__ << ":" << __LINE__ << "   - complex test \\m{.}" << std::endl;
     const std::u32string src    = U"9ce\u0300\\uffff\\u0008[\\u0001-\\ud7fe]\u0320\\uffff\\u0008\\u0001";
     const std::u32string expect = U"9ce\\uffff\\u0008[\\u0001-\\ud7fe]\u0320\u0300\\uffff\\u0008\\u0001";
-    std::u32string dst = src;
+    std::u32string dst          = src;
     assert(normalize_nfd_markers_segment(dst, map, regex_sentinel));
     if (dst != expect) {
       std::cout << "dst: " << Debug_UnicodeString(dst) << std::endl;
       std::cout << "exp: " << Debug_UnicodeString(expect) << std::endl;
     }
     zassert_string_equal(dst, expect);
-    marker_map expm({{0x320, LDML_MARKER_ANY_INDEX},{MARKER_BEFORE_EOT, 0x1L}});
+    marker_map expm({{0x320, LDML_MARKER_ANY_INDEX}, {MARKER_BEFORE_EOT, 0x1L}});
     assert_marker_map_equal(map, expm);
     assert_equal(map.size(), 2);
   }
@@ -893,7 +899,7 @@ int test_normalize() {
     std::cout << __FILE__ << ":" << __LINE__ << "   - complex test 10 stack o' 2x2" << std::endl;
     const std::u32string src    = U"9ce\u0300\uFFFF\u0008\u0002\uFFFF\u0008\u0002\u0320";
     const std::u32string expect = U"9ce\uFFFF\u0008\u0002\uFFFF\u0008\u0002\u0320\u0300";
-    std::u32string dst = src;
+    std::u32string dst          = src;
     assert(normalize_nfd_markers_segment(dst, map));
     if (dst != expect) {
       std::cout << "dst: " << Debug_UnicodeString(dst) << std::endl;
@@ -905,14 +911,13 @@ int test_normalize() {
     assert_equal(map.size(), 2);
   }
 
-
   {
     // from tests
     marker_map map;
     std::cout << __FILE__ << ":" << __LINE__ << "   - complex test 10 stack o' 2x1x2" << std::endl;
     const std::u32string src    = U"9ce\u0300\uFFFF\u0008\u0002\uFFFF\u0008\u0001\uFFFF\u0008\u0003\u0320";
     const std::u32string expect = U"9ce\uFFFF\u0008\u0002\uFFFF\u0008\u0001\uFFFF\u0008\u0003\u0320\u0300";
-    std::u32string dst = src;
+    std::u32string dst          = src;
     assert(normalize_nfd_markers_segment(dst, map));
     if (dst != expect) {
       std::cout << "dst: " << Debug_UnicodeString(dst) << std::endl;
@@ -923,26 +928,26 @@ int test_normalize() {
     assert_marker_map_equal(map, expm);
   }
 
-
   {
     marker_map map;
     std::cout << __FILE__ << ":" << __LINE__ << "   - dup-char test" << std::endl;
-    const std::u32string src = U"a\uFFFF\u0008\u0001\u0300e\uFFFF\u0008\u0002\u0300";
-    const std::u32string dst = remove_markers(src, map);
-    const std::u32string expect = U"a\u0300e\u0300"; // U+0300 twice! This should be removed in 2 segments
+    const std::u32string src    = U"a\uFFFF\u0008\u0001\u0300e\uFFFF\u0008\u0002\u0300";
+    const std::u32string dst    = remove_markers(src, map);
+    const std::u32string expect = U"a\u0300e\u0300";  // U+0300 twice! This should be removed in 2 segments
     zassert_string_equal(dst, expect);
     marker_map expm({{0x300, 0x1L}, {0x300, 0x2L}});
     assert_marker_map_equal(map, expm);
   }
 
-    {
-    // from tests
+  {
     marker_map map;
     std::cout << __FILE__ << ":" << __LINE__ << " - support 2-segment markers " << std::endl;
     // e\m{1}`\m{2}_E\m{3}`\m{4}_
-    const std::u32string src    = U"e\uFFFF\u0008\u0001\u0300\uFFFF\u0008\u0002\u0320E\uFFFF\u0008\u0003\u0300\uFFFF\u0008\u0004\u0320";
+    const std::u32string src =
+        U"e\uFFFF\u0008\u0001\u0300\uFFFF\u0008\u0002\u0320E\uFFFF\u0008\u0003\u0300\uFFFF\u0008\u0004\u0320";
     // e\m{2}_\m{1}`E\m{4}_\m{3}`
-    const std::u32string expect = U"e\uFFFF\u0008\u0002\u0320\uFFFF\u0008\u0001\u0300E\uFFFF\u0008\u0004\u0320\uFFFF\u0008\u0003\u0300";
+    const std::u32string expect =
+        U"e\uFFFF\u0008\u0002\u0320\uFFFF\u0008\u0001\u0300E\uFFFF\u0008\u0004\u0320\uFFFF\u0008\u0003\u0300";
     std::u32string dst = src;
     assert(normalize_nfd_markers_segment(dst, map));
     if (dst != expect) {
@@ -954,10 +959,8 @@ int test_normalize() {
     assert_marker_map_equal(map, expm);
   }
 
-
   return EXIT_SUCCESS;
 }
-
 
 int
 main(int argc, const char *argv[]) {
@@ -969,7 +972,7 @@ main(int argc, const char *argv[]) {
 
   if (first_arg < argc) {
     arg_color = std::string(argv[first_arg]) == "--color";
-    if(arg_color) {
+    if (arg_color) {
       first_arg++;
     }
   }
