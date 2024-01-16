@@ -469,21 +469,6 @@ export class SuggestionBanner extends Banner {
   }
 
   private setupInputHandling(): GestureRecognizer<BannerSuggestion> {
-
-    const findTargetFrom = (e: HTMLElement): HTMLDivElement => {
-    try {
-      if(e) {
-        if(e.classList.contains('kmw-suggest-option')) {
-          return e as HTMLDivElement;
-        }
-        if(e.parentElement && e.parentElement.classList.contains('kmw-suggest-option')) {
-          return e.parentElement as HTMLDivElement;
-        }
-      }
-    } catch(ex) {}
-      return null;
-    }
-
     // Auto-cancels suggestion-selection if the finger moves too far; having very generous
     // safe-zone settings also helps keep scrolls active on demo pages, etc.
     const safeBounds = new PaddedZoneSource(this.getDiv(), [-Number.MAX_SAFE_INTEGER]);
