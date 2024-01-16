@@ -6,6 +6,7 @@ let metricsCanvas: HTMLCanvasElement;
  * Uses canvas.measureText to compute and return the width of the given text of given font in pixels.
  *
  * @param {String} text The text to be rendered.
+ * @param emScale The absolute `px` size expected to match `1em`.
  * @param {String} style The CSSStyleDeclaration for an element to measure against, without modification.
  *
  * @see https://stackoverflow.com/questions/118241/calculate-text-width-with-javascript/21015393#21015393

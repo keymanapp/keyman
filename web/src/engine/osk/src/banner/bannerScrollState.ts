@@ -1,7 +1,7 @@
 import { InputSample } from "@keymanapp/gesture-recognizer";
 
 /**
- * The amount of coordinate 'noise' allowed during a scroll-enabled touch allowed
+ * The amount of coordinate 'noise' allowed during a scroll-enabled touch
  * before interpreting the currently-ongoing touch command as having scrolled.
  */
 const HAS_SCROLLED_FUDGE_FACTOR = 10;
@@ -19,10 +19,6 @@ export class BannerScrollState {
   baseCoord: InputSample<any>;
   curCoord: InputSample<any>;
   baseScrollLeft: number;
-
-  // The amount of coordinate 'noise' allowed during a scroll-enabled touch allowed
-  // before interpreting the currently-ongoing touch command as having scrolled.
-  static readonly HAS_SCROLLED_FUDGE_FACTOR = 10;
 
   constructor(coord: InputSample<any>, baseScrollLeft: number) {
     this.baseCoord = coord;

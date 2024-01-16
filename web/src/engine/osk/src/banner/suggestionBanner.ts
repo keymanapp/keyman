@@ -149,13 +149,10 @@ export class BannerSuggestion {
 
   /**
    * Function update
-   * @param {string}     id           Element ID for the suggestion span
    * @param {Suggestion} suggestion   Suggestion from the lexical model
-   * @param fontStyle                 The CSS styling expected for the suggestion text
-   * @param emSize                    The font size represented by 1em (in px, as from getComputedStyle on document.body)
-   * @param targetWidth
-   * @param collapsedTargetWidth
-   * Description  Update the ID and text of the BannerSuggestionSpec
+   * @param {BannerSuggestionFormatSpec} format Formatting metadata to use for the Suggestion
+   *
+   * Update the ID and text of the BannerSuggestionSpec
    */
   public update(suggestion: Suggestion, format: BannerSuggestionFormatSpec) {
     this._suggestion = suggestion;
