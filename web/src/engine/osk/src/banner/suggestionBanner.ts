@@ -391,6 +391,8 @@ export class SuggestionBanner extends Banner {
   private options : BannerSuggestion[] = [];
   private separators: HTMLElement[] = [];
 
+  private isRTL: boolean = false;
+
   private hostDevice: DeviceSpec;
 
   /**
@@ -422,6 +424,7 @@ export class SuggestionBanner extends Banner {
   }
 
   buildInternals(rtl: boolean) {
+    this.isRTL = rtl;
     if(this.options.length > 0) {
       this.options = [];
       this.separators = [];
@@ -603,7 +606,10 @@ export class SuggestionBanner extends Banner {
       sequence.once('stage', (result) => {
         const suggestion = result.item; // Should also == sourceTracker.suggestion.
         if(suggestion && !this.scrollState.hasScrolled) {
-          this.predictionContext.accept(suggestion.suggestion);
+          this.predictionContext.accept(suggestion.suggestion).then(() => {
+            // Reset the scroll state
+            this.container.scrollLeft = this.isRTL ? this.container.scrollWidth : 0;
+          });
         }
 
         this.scrollState = null;
