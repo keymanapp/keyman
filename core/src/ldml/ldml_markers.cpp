@@ -66,16 +66,16 @@ bool normalize_nfd_markers_segment(std::u16string &str, marker_map &map, marker_
   }
 }
 
-static void add_back_markers(std::u32string &str, const std::u32string &src, const marker_map &map, marker_encoding encoding) {
+static void add_back_markers(std::u32string &str, const std::u32string &src, marker_map &map, marker_encoding encoding) {
   // need to reconstitute.
   marker_map map2(map);  // make a copy of the map
   // clear the string
   str.clear();
-  // iterator
-  auto marki = map.rbegin();
+  // iterator over the marker map
+  auto marki = map2.rbegin();
 
   // add any end-of-text markers
-  while(marki != map.rend() && marki->first == MARKER_BEFORE_EOT) {
+  while(marki != map2.rend() && marki->first == MARKER_BEFORE_EOT) {
     prepend_marker(str, (marki++)->second, encoding);
   }
 
@@ -84,8 +84,21 @@ static void add_back_markers(std::u32string &str, const std::u32string &src, con
     const auto ch = *p;
     str.insert(0, 1, ch);  // prepend
 
-    while(marki != map.rend() && marki->first == ch) {
-      prepend_marker(str, (marki++)->second, encoding);
+    // add the markers at the end of the list first.
+    for (; marki != map2.rend() && marki->first == ch; marki++) {
+      if (marki->second != 0) {
+        // set to '0' if already applied
+        prepend_marker(str, marki->second, encoding);
+        marki->second = 0; // mark as already applied
+      }
+    }
+
+    // now, add any out of order markers.
+    for (auto marki2 = marki; marki2 != map2.rend(); marki2++) {
+      if (marki2->second != 0 && marki2->first == ch) {
+        prepend_marker(str, marki2->second, encoding);
+        marki2->second = 0; // mark as already applied
+      }
     }
   }
 //  assert(marki == map.rend()); // that we consumed everything
@@ -93,7 +106,6 @@ static void add_back_markers(std::u32string &str, const std::u32string &src, con
 
 /**
  * TODO-LDML:
- *  - doesn't support >1 marker per char - may need a set instead of a map!
  *  - ideally this should be used on a normalization safe subsequence
  */
 bool normalize_nfd_markers_segment(std::u32string &str, marker_map &map, marker_encoding encoding) {

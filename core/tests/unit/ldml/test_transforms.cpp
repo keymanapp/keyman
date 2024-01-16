@@ -815,7 +815,7 @@ test_normalize() {
       std::cout << "exp: " << Debug_UnicodeString(expect) << std::endl;
     }
     zassert_string_equal(dst, expect);
-    marker_map expm({{U'e', 0x1L}, {0x320, 0x3L}, {0x300, 0x2L}, {MARKER_BEFORE_EOT, 0x4L}});
+    marker_map expm({{U'e', 0x1L},  {0x300, 0x2L}, {0x320, 0x3L}, {MARKER_BEFORE_EOT, 0x4L}});
     assert_marker_map_equal(map, expm);
     assert_equal(map.size(), 4);
   }
@@ -938,7 +938,6 @@ test_normalize() {
     marker_map expm({{0x300, 0x1L}, {0x300, 0x2L}});
     assert_marker_map_equal(map, expm);
   }
-
   {
     marker_map map;
     std::cout << __FILE__ << ":" << __LINE__ << " - support 2-segment markers " << std::endl;
@@ -946,17 +945,21 @@ test_normalize() {
     const std::u32string src =
         U"e\uFFFF\u0008\u0001\u0300\uFFFF\u0008\u0002\u0320E\uFFFF\u0008\u0003\u0300\uFFFF\u0008\u0004\u0320";
     // e\m{2}_\m{1}`E\m{4}_\m{3}`
-    const std::u32string expect =
+    const std::u32string expect_rem =
+        U"e\u0300\u0320E\u0300\u0320";
+    const std::u32string expect_nfd =
         U"e\uFFFF\u0008\u0002\u0320\uFFFF\u0008\u0001\u0300E\uFFFF\u0008\u0004\u0320\uFFFF\u0008\u0003\u0300";
-    std::u32string dst = src;
-    assert(normalize_nfd_markers_segment(dst, map));
-    if (dst != expect) {
-      std::cout << "dst: " << Debug_UnicodeString(dst) << std::endl;
-      std::cout << "exp: " << Debug_UnicodeString(expect) << std::endl;
-    }
-    zassert_string_equal(dst, expect);
+    auto dst_rem = remove_markers(src, &map); // note: this is bigger than a single segment. so it is a degenerate test case.
     marker_map expm({{0x300, 0x1L}, {0x320, 0x2L}, {0x300, 0x3L}, {0x320, 0x4L}});
     assert_marker_map_equal(map, expm);
+    zassert_string_equal(dst_rem, expect_rem);
+    std::u32string dst_nfd = src;
+    assert(normalize_nfd_markers(dst_nfd));
+    if (dst_nfd != expect_nfd) {
+      std::cout << "dst: " << Debug_UnicodeString(dst_nfd) << std::endl;
+      std::cout << "exp: " << Debug_UnicodeString(expect_nfd) << std::endl;
+    }
+    zassert_string_equal(dst_nfd, expect_nfd);
   }
 
   return EXIT_SUCCESS;
