@@ -102,7 +102,7 @@ void test(
   int actions_code_points_to_delete,
   const std::u32string actions_output,
 
-  const int expected_delete,
+  const unsigned int expected_delete,
   const std::u32string expected_output,
   const km_core_cp *expected_final_app_context
 ) {
@@ -124,7 +124,7 @@ void test(
 
   auto actual_final_app_context = get_context_as_string(km_core_state_app_context(test_state));
   auto actual_final_app_context_string = std::u16string(actual_final_app_context);
-  auto expected_final_app_context_string = std::u16string(final_app_context);
+  auto expected_final_app_context_string = std::u16string(expected_final_app_context);
   std::cout << " final app context: actual: |" << actual_final_app_context_string << "| expected: |" << expected_final_app_context_string << "|" << std::endl;
   assert(actual_final_app_context_string == expected_final_app_context_string);
   delete [] actual_final_app_context;
