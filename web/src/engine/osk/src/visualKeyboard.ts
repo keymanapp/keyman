@@ -1038,7 +1038,9 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
       return;
     }
 
-    this.gestureEngine.stateToken = layerId;
+    if(this.gestureEngine) {
+      this.gestureEngine.stateToken = layerId;
+    }
 
     // So... through KMW 14, we actually never tracked the capsKey, numKey, and scrollKey
     // properly for keyboard-defined layouts - only _default_, desktop-style layouts.
@@ -1250,15 +1252,19 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
       return;
     }
 
-    // Step 3:  perform layout operations.
-    const paddingZone = this.gestureEngine.config.maxRoamingBounds as PaddedZoneSource;
-    paddingZone.updatePadding([-0.333 * this.currentLayer.rowHeight]);
+    // Step 3: recalculate gesture parameter values
+    // Skip for doc-keyboards, since they don't do gestures.
+    if(!this.isStatic) {
+      const paddingZone = this.gestureEngine.config.maxRoamingBounds as PaddedZoneSource;
+      paddingZone.updatePadding([-0.333 * this.currentLayer.rowHeight]);
 
-    this.gestureParams.longpress.flickDist = 0.25 * this.currentLayer.rowHeight;
-    this.gestureParams.flick.startDist     = 0.15 * this.currentLayer.rowHeight;
-    this.gestureParams.flick.dirLockDist   = 0.35 * this.currentLayer.rowHeight;
-    this.gestureParams.flick.triggerDist   = 0.75 * this.currentLayer.rowHeight;
+      this.gestureParams.longpress.flickDist = 0.25 * this.currentLayer.rowHeight;
+      this.gestureParams.flick.startDist     = 0.15 * this.currentLayer.rowHeight;
+      this.gestureParams.flick.dirLockDist   = 0.35 * this.currentLayer.rowHeight;
+      this.gestureParams.flick.triggerDist   = 0.75 * this.currentLayer.rowHeight;
+    }
 
+    // Step 4:  perform layout operations.
     // Needs the refreshed layout info to work correctly.
     if(this.currentLayer) {
       this.currentLayer.refreshLayout(this, this._computedHeight - this.getVerticalLayerGroupPadding());
