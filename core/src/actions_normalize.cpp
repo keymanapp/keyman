@@ -9,7 +9,7 @@
 #include <sstream>
 #include <memory>
 
-#include <test_assert.h>
+#include <cassert>
 #include "context.hpp"
 #include "action.hpp"
 #include "state.hpp"
