@@ -1,5 +1,13 @@
 # Keyman Version History
 
+## 17.0.246 alpha 2024-01-17
+
+* fix(web): Add null check for changing the keyboard during typing (#10346)
+* chore(common): Update crowdin strings for Khmer (#10411)
+* docs(common): Update website README.md (#10399)
+* docs(linux): Add documentation for Core API verification (#10409)
+* fix(web): right-flick gesture-preview positioning (#10406)
+
 ## 17.0.245 alpha 2024-01-16
 
 * chore(core): Ignore C++ symbols (#10386)
