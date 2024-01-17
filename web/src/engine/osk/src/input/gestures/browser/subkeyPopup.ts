@@ -288,7 +288,8 @@ export default class SubkeyPopup implements GestureHandler {
     const _Box = vkbd.topContainer;
     let rowElement = (e.key as OSKBaseKey).row.element;
     let ss=subKeys.style;
-    var x = e.offsetLeft + (<HTMLElement>e.offsetParent).offsetLeft + 0.5*(e.offsetWidth-subKeys.offsetWidth);
+    let parentOffsetLeft = e.offsetParent ? (<HTMLElement>e.offsetParent).offsetLeft : 0;
+    var x = e.offsetLeft + parentOffsetLeft + 0.5*(e.offsetWidth-subKeys.offsetWidth);
     var xMax = vkbd.width - subKeys.offsetWidth;
 
     if(x > xMax) {
