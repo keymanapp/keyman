@@ -920,7 +920,7 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
 
     // Prevent NaN breakages.
     if (!width || !height) {
-      return null;
+      return new Map();
     }
 
     let kbdAspectRatio = width / height;
