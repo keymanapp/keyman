@@ -123,7 +123,7 @@ Note that this `symbols` file can't be directly copied over
 
 ### Running the API verification locally
 
-It's possibel to run the API verification locally. To do that, download
+It's possible to run the API verification locally. To do that, download
 (or build) the binary package for at least one platform .
 
 Then run
