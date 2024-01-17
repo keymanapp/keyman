@@ -102,7 +102,7 @@ int main(int, char * [])
   if(context_length(&mock_ctxt2) != 0) return __LINE__;
 
   // Mutation tests
-  try_status(context_shrink(&mock_ctxt1, 42, nullptr));
+  try_status(context_shrink(&mock_ctxt1, 42));
 
   // Append a character, a marker and & a string.
   try_status(context_items_from_utf16(u" ", &ctxt1));
@@ -126,7 +126,8 @@ int main(int, char * [])
   try_status(context_items_from_utf16(u"Bye, ", &ctxt1));
   // We delete 7 characters (" World!") plus 1 marker hence 8 and not 7 as
   //  expected if you go by the test string above.
-  try_status(context_shrink(&mock_ctxt1, 8, ctxt1));
+  try_status(context_shrink(&mock_ctxt1, 8));
+  try_status(context_prepend(&mock_ctxt1, ctxt1, 8));
   ctxt_size=sizeof ctxt_buffer/sizeof(km_core_cp);
   try_status(context_get(&mock_ctxt1, &tmp_ctxt));
   try_status(context_items_to_utf16(tmp_ctxt, ctxt_buffer, &ctxt_size));

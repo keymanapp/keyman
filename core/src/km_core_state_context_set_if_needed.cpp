@@ -26,43 +26,63 @@
 
 using namespace km::core;
 
+enum context_changed_type {
+  // new and internal contexts are identical
+  CONTEXT_UNCHANGED = 0,
+  // new and internal contexts differ
+  CONTEXT_DIFFERENT = 1,
+  // internal context is shorter, but content is same as far as it goes
+  CONTEXT_SHORTER = 2,
+  // internal context is longer, but content is same as far as it goes
+  CONTEXT_LONGER = 3,
+};
+
+typedef struct {
+  uint8_t type;
+  // the number of characters/context items (from beginning of context)
+  // that are missing from the new/internal context.
+  uint8_t end_difference;
+} context_change_type;
+
 // Forward declarations
 
+bool replace_context(context_change_type context_changed, km_core_context *context, km_core_cp const *new_context);
 bool should_normalize(km_core_state *state);
-bool is_context_valid(km_core_cp const * context, km_core_cp const * cached_context);
+context_change_type is_context_unchanged(km_core_cp const *new_context, km_core_context *context);
 bool do_normalize_nfd(km_core_cp const * src, std::u16string &dst);
 km_core_context_status do_fail(km_core_context *app_context, km_core_context *cached_context, const char* error);
 
 // ---------------------------------------------------------------------------
 
-km_core_context_status km_core_state_context_set_if_needed(
+km_core_context_status
+km_core_state_context_set_if_needed(
   km_core_state *state,
   km_core_cp const *new_app_context
 ) {
   assert(state != nullptr);
   assert(new_app_context != nullptr);
-  if(state == nullptr || new_app_context == nullptr) {
+  if (state == nullptr || new_app_context == nullptr) {
     return KM_CORE_CONTEXT_STATUS_INVALID_ARGUMENT;
   }
 
-  auto app_context = km_core_state_app_context(state);
+  auto app_context    = km_core_state_app_context(state);
   auto cached_context = km_core_state_context(state);
-
-  // Retrieve the existing internally cached app context for comparison
-
-  std::unique_ptr<km_core_cp[]> app_context_string(get_context_as_string(app_context));
 
   // Compare the internal app context with the passed-in application context
 
-  if(is_context_valid(new_app_context, app_context_string.get())) {
-    // We keep the context as is
-    return KM_CORE_CONTEXT_STATUS_UNCHANGED;
-  }
-
-  // We replace the internal app context with the passed-in application context
-
-  if(set_context_from_string(app_context, new_app_context) != KM_CORE_STATUS_OK) {
-    return do_fail(app_context, cached_context, "could not set new app context");
+  auto context_changed = is_context_unchanged(new_app_context, app_context);
+  if (context_changed.type != CONTEXT_UNCHANGED) {
+    // We replace the internal app context with the passed-in application context
+    if (!replace_context(context_changed, app_context, new_app_context)) {
+      switch (context_changed.type) {
+        case CONTEXT_DIFFERENT:
+          return do_fail(app_context, cached_context, "could not set new app context");
+        case CONTEXT_SHORTER:
+          return do_fail(app_context, cached_context, "could not prepend new app context");
+        case CONTEXT_LONGER:
+          return do_fail(app_context, cached_context, "could not shrink app context");
+      }
+    }
   }
 
   // Finally, we normalize and replace the cached context
@@ -70,8 +90,8 @@ km_core_context_status km_core_state_context_set_if_needed(
   std::u16string normalized_buffer;
   km_core_cp const *new_cached_context = nullptr;
 
-  if(should_normalize(state)) {
-    if(!do_normalize_nfd(new_app_context, normalized_buffer)) {
+  if (should_normalize(state)) {
+    if (!do_normalize_nfd(new_app_context, normalized_buffer)) {
       return do_fail(app_context, cached_context, "could not normalize string");
     }
     new_cached_context = normalized_buffer.c_str();
@@ -79,14 +99,50 @@ km_core_context_status km_core_state_context_set_if_needed(
     new_cached_context = new_app_context;
   }
 
-  // TODO: #10100 will alter how we replace the cached context here -- maintaining
-  //       markers as far as possible
+  context_changed = is_context_unchanged(new_cached_context, cached_context);
+  if (context_changed.type == CONTEXT_UNCHANGED) {
+    // We keep the context as is
+    return KM_CORE_CONTEXT_STATUS_UNCHANGED;
+  }
 
-  if(set_context_from_string(cached_context, new_cached_context) != KM_CORE_STATUS_OK) {
-    return do_fail(app_context, cached_context, "could not set new cached context");
+  if (!replace_context(context_changed, cached_context, new_cached_context)) {
+    switch (context_changed.type) {
+    case CONTEXT_DIFFERENT:
+      return do_fail(app_context, cached_context, "could not set new cached context");
+    case CONTEXT_SHORTER:
+      return do_fail(app_context, cached_context, "could not prepend new cached context");
+    case CONTEXT_LONGER:
+      return do_fail(app_context, cached_context, "could not shrink cached context");
+    }
   }
 
   return KM_CORE_CONTEXT_STATUS_UPDATED;
+}
+
+bool
+replace_context(
+  context_change_type context_changed,
+  km_core_context *context,
+  km_core_cp const *new_context
+) {
+  if (context_changed.type == CONTEXT_DIFFERENT) {
+    if (set_context_from_string(context, new_context) != KM_CORE_STATUS_OK) {
+      return false;
+    }
+  } else if (context_changed.type == CONTEXT_SHORTER) {
+    km_core_context_item *new_context_items;
+    if (context_items_from_utf16(new_context, &new_context_items) != KM_CORE_STATUS_OK ||
+        context_prepend(context, new_context_items, context_changed.end_difference) != KM_CORE_STATUS_OK) {
+      km_core_context_items_dispose(new_context_items);
+      return false;
+    }
+  } else {
+    assert(context_changed.type == CONTEXT_LONGER);
+    if (context_shrink(context, context_changed.end_difference, false) != KM_CORE_STATUS_OK) {
+      return false;
+    }
+  }
+  return true;
 }
 
 /**
@@ -97,44 +153,99 @@ bool should_normalize(km_core_state *state) {
 }
 
 /**
+ * Returns the previous context item that is a character skipping any
+ * markers, or NULL if there are no more characters before to
+ * `context_items`.
+ */
+km_core_context_item const *
+context_previous_char(
+  km_core_context_item const *context_items,
+  km_core_context_item const *context_start
+) {
+  if (context_items == context_start) {
+    return NULL;
+  }
+  while (context_items > context_start) {
+    context_items--;
+    if (context_items->type == KM_CORE_CT_CHAR) {
+      return context_items;
+    }
+    // skip over marker
+  }
+  return NULL;
+}
+
+/**
  * Returns true if the internal app context does not need to be updated to the new
  * app context
- *
- * TODO: #10100 will alter some of the assumptions here
  */
-bool is_context_valid(km_core_cp const * new_app_context, km_core_cp const * app_context) {
-  if (new_app_context == nullptr || app_context == nullptr || *app_context == '\0') {
-    // If the app_context is "empty" then it needs updating
-    return false;
-  }
-  km_core_cp const* new_app_context_p = new_app_context;
-  while(*new_app_context_p) {
-    new_app_context_p++;
+context_change_type
+is_context_unchanged(
+  km_core_cp const *new_context_string,
+  km_core_context *context
+) {
+  context_change_type change_type({CONTEXT_DIFFERENT, 0});
+  if (new_context_string == nullptr || context == nullptr) {
+    return change_type;
   }
 
-  km_core_cp const* app_context_p = app_context;
-  while(*app_context_p) {
-    app_context_p++;
+  std::unique_ptr<km_core_cp[]> context_string(get_context_as_string(context));
+  if (context_string[0] == '\0') {
+    // If the app_context is "empty" then it needs updating
+    return change_type;
+  }
+
+  km_core_context_item *context_items;
+  if (context_get(context, &context_items) != KM_CORE_STATUS_OK) {
+    return change_type;
+  }
+
+  // move to the end of the new and internal app context
+  km_core_cp const *new_context_p = new_context_string;
+  while (*new_context_p) {
+    new_context_p++;
+  }
+
+  km_core_context_item const *context_p = context_items;
+  while (context_p->type != KM_CORE_CT_END) {
+    context_p++;
   }
 
   // we need to compare from the end of the cached context
-  for(; new_app_context_p >= new_app_context && app_context_p >= app_context; new_app_context_p--, app_context_p--) {
-    if(*new_app_context_p != *app_context_p) {
-      // The cached context doesn't match the application context, so it is
-      // invalid
-      return false;
+  for (; new_context_p >= new_context_string && context_p != NULL;
+        new_context_p--, context_p = context_previous_char(context_p, context_items)) {
+    if (*new_context_p != context_p->character && context_p->type != KM_CORE_CT_END) {
+      // The cached context doesn't match the application context
+      km_core_context_items_dispose(context_items);
+      return change_type;
     }
   }
 
-  if(app_context_p > app_context) {
-    // if the cached context is longer than the application context, then we also
-    // assume that it is invalid
-    return false;
+  if (context_p == NULL && new_context_p < new_context_string) {
+    // new and internal app contexts are identical
+    change_type.type = CONTEXT_UNCHANGED;
+    km_core_context_items_dispose(context_items);
+    return change_type;
   }
 
-  // It's acceptable for the application context to be longer than the cached
-  // context, so if we match the whole cached context, we can safely return true
-  return true;
+  if (context_p >= context_items) {
+    uint8_t n = 1;
+    for (; context_p > context_items; context_p--) {
+      n++;
+    }
+    change_type.type = CONTEXT_LONGER;
+    change_type.end_difference = n;
+    km_core_context_items_dispose(context_items);
+    return change_type;
+  }
+  uint8_t n = 1;
+  for (; new_context_p > new_context_string; new_context_p--) {
+    n++;
+  }
+  change_type.type = CONTEXT_SHORTER;
+  change_type.end_difference = n;
+  km_core_context_items_dispose(context_items);
+  return change_type;
 }
 
 /**

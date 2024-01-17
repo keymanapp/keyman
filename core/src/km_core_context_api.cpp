@@ -192,7 +192,7 @@ size_t context_length(km_core_context *ctxt)
 
 
 km_core_status context_append(km_core_context *ctxt,
-                                    km_core_context_item const *ci)
+                              km_core_context_item const *ci)
 {
   assert(ctxt); assert(ci);
   if (!ctxt || !ci)   return KM_CORE_STATUS_INVALID_ARGUMENT;
@@ -210,30 +210,61 @@ km_core_status context_append(km_core_context *ctxt,
   return KM_CORE_STATUS_OK;
 }
 
-
-km_core_status context_shrink(km_core_context *ctxt, size_t num,
-                           km_core_context_item const * ci)
-{
+km_core_status
+context_prepend(
+  km_core_context *ctxt,
+  km_core_context_item const *ci,
+  size_t num
+) {
   assert(ctxt);
-  if (!ctxt)   return KM_CORE_STATUS_INVALID_ARGUMENT;
+  assert(ci);
+  if (!ctxt || !ci)
+    return KM_CORE_STATUS_INVALID_ARGUMENT;
 
-  try
-  {
-    ctxt->resize(ctxt->size() - std::min(num, ctxt->size()));
-
-    if (ci)
-    {
-      auto const ip = ctxt->begin();
-      while(num-- && ci->type != KM_CORE_CT_END)
-      {
-        ctxt->emplace(ip, *ci);
-        ci++;
-      }
+  try {
+    std::vector<km_core_context_item> vci;
+    for (; ci->type != KM_CORE_CT_END && num > 0; ++ci) {
+      num--;
+      vci.push_back(*ci);
     }
+
+    ctxt->insert(ctxt->begin(), vci.begin(), vci.end());
   } catch (std::bad_alloc &) {
     return KM_CORE_STATUS_NO_MEM;
   }
 
+  return KM_CORE_STATUS_OK;
+}
+
+km_core_status
+context_shrink(
+  km_core_context *ctxt,
+  size_t num,
+  bool from_end
+) {
+  assert(ctxt);
+  if (!ctxt)
+    return KM_CORE_STATUS_INVALID_ARGUMENT;
+
+  if (from_end) {
+    // remove from the end
+    try {
+      ctxt->resize(ctxt->size() - std::min(num, ctxt->size()));
+    } catch (std::bad_alloc &) {
+      return KM_CORE_STATUS_NO_MEM;
+    }
+
+    return KM_CORE_STATUS_OK;
+  }
+
+  // remove from the beginning
+  auto it = ctxt->begin();
+  while (num > 0 && it != ctxt->end()) {
+    num--;
+    it++;
+  }
+
+  ctxt->erase(ctxt->begin(), it);
   return KM_CORE_STATUS_OK;
 }
 

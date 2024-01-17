@@ -223,8 +223,25 @@ context_append(km_core_context *context,
                       km_core_context_item const *context_items);
 
 /**
- * Remove a specified number of items from the end of the context, optionally
- * add up to the same number of the supplied items to the front of the context.
+ * Insert items at the front of the context.
+ *
+ * @return km_core_status
+ *         * `KM_CORE_STATUS_OK`: On success.
+ *         * `KM_CORE_STATUS_INVALID_ARGUMENT`: If non-optional parameters are
+ *           null.
+ *         * `KM_CORE_STATUS_NO_MEM`: In the event not enough memory can be
+ *           allocated to grow the context buffer internally.
+ *
+ * @param context       A pointer to an opaque context object.
+ * @param context_items A pointer to the start of the `KM_CORE_CT_END`
+ *                      terminated array of `km_core_context_item` to prepend.
+ * @param num           Maximum number of `km_core_context_item` elements to prepend.
+ */
+km_core_status
+context_prepend(km_core_context *context, km_core_context_item const *context_items, size_t num = SIZE_MAX);
+
+/**
+ * Remove a specified number of items from the front or end of the context.
  *
  * @return km_core_status
  *         * `KM_CORE_STATUS_OK`: On success.
@@ -234,13 +251,8 @@ context_append(km_core_context *context,
  *           memory to grow the context internally.
  *
  * @param context       A pointer to an opaque context object.
- * @param num           The number of items to remove from the end of context.
- * @param context_items Pointer to the start of the `KM_CORE_CT_END` terminated
- *                      array of `km_core_context_item` to add to the front. Up
- *                      to `num` items will be prepended. This may be null if
- *                      not required.
+ * @param num           The number of items to remove from the context.
+ * @param from_end      Whether to remove from the end or front of the context.
  */
 km_core_status
-context_shrink(km_core_context *context,
-                      size_t num,
-                      km_core_context_item const *prefix);
+context_shrink(km_core_context *context, size_t num, bool from_end = true);
