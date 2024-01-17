@@ -78,10 +78,12 @@ compile_and_copy() {
       "$script" "$sourcemap" --clean --inline
   done
 
+  # Do NOT inline sourcemaps for release builds - we don't want them to affect
+  # load time.
   for script in "$KEYMAN_ROOT/web/build/$SUBPROJECT_NAME/release/"*.js; do
     sourcemap="$script.map"
     node "$KEYMAN_ROOT/web/build/tools/building/sourcemap-root/index.js" \
-      "$script" "$sourcemap" --clean  --inline
+      "$script" "$sourcemap" --clean
   done
 
   node map-polyfill-bundler.js
