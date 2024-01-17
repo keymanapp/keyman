@@ -5,19 +5,52 @@
   Authors:      Marc Durdin (MCD)
   History:      16 Jan 2024 - MCD - Initial implementation from #9999
 */
-#include <cassert>
 #include <algorithm>
 #include <sstream>
 #include <memory>
 
+#include <test_assert.h>
+#include "context.hpp"
 #include "action.hpp"
 #include "state.hpp"
 #include "option.hpp"
+#include "debuglog.h"
 
+#if !defined(HAVE_ICU4C)
+#error icu4c is required for this code
+#endif
+
+#define U_FALLTHROUGH
+#include "unicode/utypes.h"
+#include "unicode/unistr.h"
+#include "unicode/normalizer2.h"
+
+// ********************************************************************************
+// TODO: if we don't apply normalization, we should still fixup the app_context
+// ********************************************************************************
+
+// forward declarations
+
+icu::UnicodeString context_items_to_unicode_string(km_core_context const *context);
+km_core_usv *unicode_string_to_usv(icu::UnicodeString& src);
+
+/**
+ * Normalize the output from an action to NFC, across the context | output
+ * boundary, fixing up the app_context and the output actions to take into
+ * account the NFU input app_context
+ *
+ * @param cached_context  the cached context, in NFD, after transform has been
+ *                        applied to it by the keyboard processor
+ * @param app_context     the app context, in NFU; transform has not been
+ *                        applied, and will be applied by this function
+ * @param actions         transform to apply, in NFD, which will be converted
+ *                        to NFC by this function
+ * @return true on success, false on failure
+ */
 bool km::core::actions_normalize(
-  km_core_context const *cached_context,
-  km_core_context const *app_context,
-  km_core_actions *actions
+  /* in */      km_core_context const *cached_context,
+  /* in, out */ km_core_context *app_context,
+  /* in, out */ km_core_actions *actions
 ) {
   assert(actions != nullptr);
   assert(cached_context != nullptr);
@@ -26,9 +59,227 @@ bool km::core::actions_normalize(
     return false;
   }
 
-  // Normalize output to NFC
-  //TODO
-  // actions->code_points_to_delete++;
+  /*
+    The code_points_to_delete value at this point is in NFD. The cached_context
+    is in NFD and has already been updated by the keyboard processor to the
+    expected result of the action, so we need to remove the output from a copy
+    of the cached_context to start, in order to get it to the same position as
+    the app_context.
+
+    The app_context is in NFU. We need to figure out how many characters to
+    remove from the end of app_context in order to correctly normalize across
+    the boundary, without normalizing more of the string than necessary.
+
+    We do not need to mutate the cached_context itself, because it is already
+    correct. This is good, because it means we will not lose track of markers
+    within it. The app_context will be mutated, as it will need the new output
+    appended, in order to match the expected result. Remember that the
+    app_context does not contain markers; these are maintained only in the
+    cached_context.
+  */
+
+  // TODO: That description above is not quite right. cached_context is not
+  // guaranteed to be normalized across the transform boundary, because its
+  // output was simply appended to the existing context. MUCH PAIN COMING WITH
+  // THIS, because cached_context includes markers. Hence, blocked by #10369.
+
+  /*
+    Initialization
+  */
+
+  UErrorCode icu_status = U_ZERO_ERROR;
+  const icu::Normalizer2 *nfc = icu::Normalizer2::getNFCInstance(icu_status);
+  assert(U_SUCCESS(icu_status));
+  if(!U_SUCCESS(icu_status)) {
+    DebugLog("getNFCInstance failed with %x", icu_status);
+    return false;
+  }
+
+  const icu::Normalizer2 *nfd = icu::Normalizer2::getNFDInstance(icu_status);
+  assert(U_SUCCESS(icu_status));
+  if(!U_SUCCESS(icu_status)) {
+    DebugLog("getNFDInstance failed with %x", icu_status);
+    return false;
+  }
+
+  icu::UnicodeString output = icu::UnicodeString::fromUTF32(reinterpret_cast<const UChar32*>(actions->output), -1);
+  icu::UnicodeString cached_context_string = context_items_to_unicode_string(cached_context);
+  icu::UnicodeString app_context_string = context_items_to_unicode_string(app_context);
+  assert(!output.isBogus());
+  assert(!cached_context_string.isBogus());
+  assert(!app_context_string.isBogus());
+  if(output.isBogus() || cached_context_string.isBogus() || app_context_string.isBogus()) {
+    return false;
+  }
+  int nfu_to_delete = 0;
+
+  /*
+    The keyboard processor will have updated the cached_context already,
+    applying the transform to it, so we need to rewind this. Remove the output
+    from cached_context_string to start
+  */
+
+  assert(cached_context_string.length() >= output.length());
+  int n = cached_context_string.length() - output.length();
+  assert(cached_context_string.compare(n, output.length(), output) == 0);
+  cached_context_string.remove(n);
+
+  /*
+    Now, look for a normalization boundary at the intersection of the
+    cached_context and the output
+  */
+
+  while(n > 0 && output[0] && !nfd->hasBoundaryBefore(output[0])) {
+    // The output may interact with the context further in normalization. We
+    // need to copy characters back further until we reach a normalization
+    // boundary.
+
+    // Remove last code point from the context ...
+
+    n = cached_context_string.moveIndex32(n, -1);
+    UChar32 chr = cached_context_string.char32At(n);
+    cached_context_string.remove(n);
+
+    // And prepend it to the output ...
+
+    output.insert(0, chr);
+
+    // And finally remember that we now need to delete an additional NFD codepoint
+
+    actions->code_points_to_delete++;
+  }
+
+  /*
+    At this point, our output and cached_context are coherent and normalization
+    will be complete at the edit boundary.
+
+    Now, we need to adjust the delete_back to match the number of characters
+    that must actually be deleted from the applications's NFU context
+
+    To adjust, we remove one character at a time from the app_context until
+    its normalized form matches the cached_context normalized form.
+  */
+
+
+  while(app_context_string.length()) {
+    icu::UnicodeString app_context_nfd;
+    nfd->normalize(app_context_string, app_context_nfd, icu_status);
+    assert(U_SUCCESS(icu_status));
+    if(!U_SUCCESS(icu_status)) {
+      DebugLog("nfd->normalize failed with %x", icu_status);
+      return false;
+    }
+
+    if(app_context_nfd.compare(cached_context_string) == 0) {
+      break;
+    }
+    app_context_string.remove(app_context_string.length()-1);
+    nfu_to_delete++;
+  }
+
+  /*
+    Normalize our output string
+  */
+
+  icu::UnicodeString output_nfc;
+  nfc->normalize(output, output_nfc, icu_status);
+  assert(U_SUCCESS(icu_status));
+  if(!U_SUCCESS(icu_status)) {
+    DebugLog("nfc->normalize failed with %x", icu_status);
+    return false;
+  }
+
+  auto new_output = unicode_string_to_usv(output_nfc);
+  if(!new_output) {
+    // error logging handled in unicode_string_to_usv
+    return false;
+  }
+
+  /*
+    Final steps -- set our outputs
+  */
+
+  // Append the new NFC output to our reduced app_context
+
+  app_context_string.append(output_nfc);
+  km_core_context_item *app_context_items = nullptr;
+  km_core_status status = KM_CORE_STATUS_OK;
+  if((status = km_core_context_items_from_utf16(app_context_string.getTerminatedBuffer(), &app_context_items)) != KM_CORE_STATUS_OK) {
+    DebugLog("km_core_context_items_from_utf16 failed with %x", status);
+    delete [] new_output;
+    return false;
+  }
+
+  if((status = km_core_context_set(app_context, app_context_items)) != KM_CORE_STATUS_OK) {
+    DebugLog("km_core_context_set failed with %x", status);
+    km_core_context_items_dispose(app_context_items);
+    delete [] new_output;
+    return false;
+  }
+
+  km_core_context_items_dispose(app_context_items);
+
+  // Update actions with new NFC output + count of NFU code points to delete
+
+  delete [] actions->output;
+  actions->output = new_output;
+  actions->code_points_to_delete = nfu_to_delete;
 
   return true;
+}
+
+/**
+ * Helper to convert km_core_context list into a icu::UnicodeString
+ */
+icu::UnicodeString context_items_to_unicode_string(km_core_context const *context) {
+  icu::UnicodeString nullString;
+  nullString.setToBogus();
+
+  km_core_context_item *items = nullptr;
+  km_core_status status;
+  if((status = km_core_context_get(context, &items)) != KM_CORE_STATUS_OK) {
+    DebugLog("Failed to retrieve context with %s", status);
+    return nullString;
+  }
+  size_t buf_size = 0;
+  if((status = km_core_context_items_to_utf32(items, nullptr, &buf_size)) != KM_CORE_STATUS_OK) {
+    DebugLog("Failed to retrieve context size with %s", status);
+    km_core_context_items_dispose(items);
+    return nullString;
+  }
+
+  km_core_usv *buf = new km_core_usv[buf_size];
+  if((status = km_core_context_items_to_utf32(items, buf, &buf_size)) != KM_CORE_STATUS_OK) {
+    DebugLog("Failed to retrieve context with %s", status);
+    km_core_context_items_dispose(items);
+    delete [] buf;
+    return nullString;
+  }
+
+  auto result = icu::UnicodeString::fromUTF32(reinterpret_cast<const UChar32*>(buf), -1);
+  km_core_context_items_dispose(items);
+  delete [] buf;
+  return result;
+}
+
+/**
+ * Helper to convert icu::UnicodeString to a UTF-32 km_core_usv buffer,
+ * nul-terminated
+ */
+km_core_usv *unicode_string_to_usv(icu::UnicodeString& src) {
+  UErrorCode icu_status = U_ZERO_ERROR;
+
+  km_core_usv *dst = new km_core_usv[src.length() + 1];
+
+  src.toUTF32(reinterpret_cast<UChar32*>(dst), src.length(), icu_status);
+
+  assert(U_SUCCESS(icu_status));
+  if(!U_SUCCESS(icu_status)) {
+    DebugLog("toUTF32 failed with %x", icu_status);
+    delete[] dst;
+    return nullptr;
+  }
+
+  dst[src.length()] = 0;
+  return dst;
 }

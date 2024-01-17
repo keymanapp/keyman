@@ -19,9 +19,9 @@ namespace core
   );
 
   bool actions_normalize(
-    km_core_context const *cached_context,
-    km_core_context const *app_context,
-    km_core_actions *actions
+    /* in */      km_core_context const *cached_context,
+    /* in, out */ km_core_context *app_context,
+    /* in, out */ km_core_actions *actions
   );
 } // namespace core
 } // namespace km
