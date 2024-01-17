@@ -30,6 +30,7 @@ libkeymancore.so.1 libkeymancore #MINVER#
  km_core_process_event@Base 17.0.195
  km_core_process_queued_actions@Base 17.0.195
  km_core_state_action_items@Base 17.0.195
+ km_core_state_app_context@Base 17.0.245
  km_core_state_clone@Base 17.0.195
  km_core_state_context@Base 17.0.195
  km_core_state_context_clear@Base 17.0.197
