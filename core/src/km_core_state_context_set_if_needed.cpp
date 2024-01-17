@@ -31,7 +31,7 @@ using namespace km::core;
 bool should_normalize(km_core_state *state);
 bool is_context_valid(km_core_cp const * context, km_core_cp const * cached_context);
 km_core_cp* get_context_as_string(km_core_context *context);
-bool set_context_from_string(km_core_context *context, km_core_cp const *new_context);
+km_core_status set_context_from_string(km_core_context *context, km_core_cp const *new_context);
 bool do_normalize_nfd(km_core_cp const * src, std::u16string &dst);
 km_core_context_status do_fail(km_core_context *app_context, km_core_context *cached_context, const char* error);
 
@@ -63,7 +63,7 @@ km_core_context_status km_core_state_context_set_if_needed(
 
   // We replace the internal app context with the passed-in application context
 
-  if(!set_context_from_string(app_context, new_app_context)) {
+  if(set_context_from_string(app_context, new_app_context) != KM_CORE_STATUS_OK) {
     return do_fail(app_context, cached_context, "could not set new app context");
   }
 
@@ -84,7 +84,7 @@ km_core_context_status km_core_state_context_set_if_needed(
   // TODO: #10100 will alter how we replace the cached context here -- maintaining
   //       markers as far as possible
 
-  if(!set_context_from_string(cached_context, new_cached_context)) {
+  if(set_context_from_string(cached_context, new_cached_context) != KM_CORE_STATUS_OK) {
     return do_fail(app_context, cached_context, "could not set new cached context");
   }
 
@@ -170,18 +170,18 @@ km_core_cp* get_context_as_string(km_core_context *context) {
 /**
  * Updates the context from the new_context km_core_cp string
  */
-bool set_context_from_string(km_core_context *context, km_core_cp const *new_context) {
+km_core_status set_context_from_string(km_core_context *context, km_core_cp const *new_context) {
   km_core_context_item* new_context_items = nullptr;
 
   km_core_status status = km_core_context_items_from_utf16(new_context, &new_context_items);
   if (status != KM_CORE_STATUS_OK) {
-    return false;
+    return status;
   }
 
   km_core_context_set(context, new_context_items);
   km_core_context_items_dispose(new_context_items);
 
-  return true;
+  return KM_CORE_STATUS_OK;
 }
 
 /**

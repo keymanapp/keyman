@@ -14,6 +14,8 @@
 #include <test_assert.h>
 #include "../emscripten_filesystem.h"
 
+// TODO: These helpers are in km_core_state_context_set_if_needed.cpp and
+// should be refactored into a helper module
 km_core_status set_context_from_string(km_core_context *context, km_core_cp const *new_context);
 km_core_cp* get_context_as_string(km_core_context *context);
 
@@ -294,25 +296,4 @@ int main(int argc, char *argv []) {
 #endif
 
   run_tests();
-}
-
-
-// TODO: These helpers are copied from km_core_state_context_set_if_needed and
-// should be refactored into a helper module
-
-/**
- * Updates the context from the new_context km_core_cp string
- */
-km_core_status set_context_from_string(km_core_context *context, km_core_cp const *new_context) {
-  km_core_context_item* new_context_items = nullptr;
-
-  km_core_status status = km_core_context_items_from_utf16(new_context, &new_context_items);
-  if (status != KM_CORE_STATUS_OK) {
-    return status;
-  }
-
-  km_core_context_set(context, new_context_items);
-  km_core_context_items_dispose(new_context_items);
-
-  return KM_CORE_STATUS_OK;
 }
