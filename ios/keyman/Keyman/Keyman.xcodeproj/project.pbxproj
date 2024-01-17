@@ -16,6 +16,8 @@
 		165EB39C2097181D00040A69 /* KMView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 165EB39B2097181D00040A69 /* KMView.swift */; };
 		296EF2C42AFA267500E3E384 /* ZIPFoundation.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 296EF2C32AFA267500E3E384 /* ZIPFoundation.xcframework */; };
 		296EF2C52AFA267500E3E384 /* ZIPFoundation.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 296EF2C32AFA267500E3E384 /* ZIPFoundation.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		29B30C212B56325D00C342A4 /* KeymanLogger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 29CA9A612B4F9B0B00EAB099 /* KeymanLogger.swift */; };
+		29CA9A622B4F9B0B00EAB099 /* KeymanLogger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 29CA9A612B4F9B0B00EAB099 /* KeymanLogger.swift */; };
 		981AFA8F19EF44DE006706BF /* 724-info@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 9815725518E4F0930014DF0C /* 724-info@2x.png */; };
 		981AFA9619EF44DE006706BF /* MainViewController_iPhone.xib in Resources */ = {isa = PBXBuildFile; fileRef = 98ABADCE176935E500B62590 /* MainViewController_iPhone.xib */; };
 		981AFA9819EF44DE006706BF /* 724-info.png in Resources */ = {isa = PBXBuildFile; fileRef = 9815725418E4F0930014DF0C /* 724-info.png */; };
@@ -116,7 +118,6 @@
 		C055F0B11F60E8D400140735 /* GetStartedViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C055F0B01F60E8D400140735 /* GetStartedViewController.swift */; };
 		C055F0B31F60F7A400140735 /* DropDownView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C055F0B21F60F7A400140735 /* DropDownView.swift */; };
 		C055F0B51F610FB200140735 /* DropDownListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C055F0B41F610FB200140735 /* DropDownListView.swift */; };
-		C059FCC01FD927EF00BD1A64 /* Log.swift in Sources */ = {isa = PBXBuildFile; fileRef = C059FCBF1FD927EF00BD1A64 /* Log.swift */; };
 		C0A1A6311F5E4F4300EAF822 /* InfoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0A1A6301F5E4F4300EAF822 /* InfoViewController.swift */; };
 		C0A1A6331F5E749000EAF822 /* SetUpViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0A1A6321F5E749000EAF822 /* SetUpViewController.swift */; };
 		C0A1A6351F5E786A00EAF822 /* BookmarksViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0A1A6341F5E786A00EAF822 /* BookmarksViewController.swift */; };
@@ -215,6 +216,7 @@
 		29BFA75D282931F8009FCCC3 /* it */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = it; path = it.lproj/Localizable.strings; sourceTree = "<group>"; };
 		29BFA769282946EC009FCCC3 /* pl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = pl; path = pl.lproj/Localizable.strings; sourceTree = "<group>"; };
 		29C1E17028001EC200759EDE /* pt-PT */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "pt-PT"; path = "pt-PT.lproj/Localizable.strings"; sourceTree = "<group>"; };
+		29CA9A612B4F9B0B00EAB099 /* KeymanLogger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeymanLogger.swift; sourceTree = "<group>"; };
 		37378F4222C9AA610043F22B /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/MainViewController_iPad.xib; sourceTree = "<group>"; };
 		37378F4322C9AA630043F22B /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/MainViewController_iPhone.xib; sourceTree = "<group>"; };
 		9815725018E4F0930014DF0C /* 702-share.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "702-share.png"; path = "Keyman Icons/702-share.png"; sourceTree = "<group>"; };
@@ -319,7 +321,6 @@
 		C055F0B01F60E8D400140735 /* GetStartedViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = GetStartedViewController.swift; sourceTree = "<group>"; tabWidth = 2; };
 		C055F0B21F60F7A400140735 /* DropDownView.swift */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = DropDownView.swift; sourceTree = "<group>"; tabWidth = 2; };
 		C055F0B41F610FB200140735 /* DropDownListView.swift */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = DropDownListView.swift; sourceTree = "<group>"; tabWidth = 2; };
-		C059FCBF1FD927EF00BD1A64 /* Log.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Log.swift; sourceTree = "<group>"; };
 		C0A1A6301F5E4F4300EAF822 /* InfoViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = InfoViewController.swift; sourceTree = "<group>"; tabWidth = 2; };
 		C0A1A6321F5E749000EAF822 /* SetUpViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = SetUpViewController.swift; sourceTree = "<group>"; tabWidth = 2; };
 		C0A1A6341F5E786A00EAF822 /* BookmarksViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = BookmarksViewController.swift; sourceTree = "<group>"; tabWidth = 2; };
@@ -568,8 +569,8 @@
 				16A9229D20325253003CC98E /* Info.plist */,
 				162E2C9420926C8600F40769 /* Classes */,
 				C0E943F91F6124E100E7D98C /* AppDelegate.swift */,
-				C059FCBF1FD927EF00BD1A64 /* Log.swift */,
 				CE7FF1EF239A0293007859D9 /* PackageBrowserViewController.swift */,
+				29CA9A612B4F9B0B00EAB099 /* KeymanLogger.swift */,
 			);
 			path = Keyman;
 			sourceTree = "<group>";
@@ -1042,9 +1043,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				165EB39C2097181D00040A69 /* KMView.swift in Sources */,
+				29CA9A622B4F9B0B00EAB099 /* KeymanLogger.swift in Sources */,
 				C055F0B11F60E8D400140735 /* GetStartedViewController.swift in Sources */,
 				C055F0B51F610FB200140735 /* DropDownListView.swift in Sources */,
-				C059FCC01FD927EF00BD1A64 /* Log.swift in Sources */,
 				CE7FF1F0239A0293007859D9 /* PackageBrowserViewController.swift in Sources */,
 				C0E943F81F61234C00E7D98C /* UIImage+Helpers.swift in Sources */,
 				C0E943FE1F61377900E7D98C /* MainViewController.swift in Sources */,
@@ -1070,6 +1071,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				CEF4E55A23E967140065B9C7 /* ImageBannerViewController.swift in Sources */,
+				29B30C212B56325D00C342A4 /* KeymanLogger.swift in Sources */,
 				C0FF769B1F5D368C00BD23C3 /* KeyboardViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

@@ -26,6 +26,7 @@
 		1645D5972036C9F80076C51B /* KMPKeyboard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1645D5962036C9F80076C51B /* KMPKeyboard.swift */; };
 		165EB3A12098993900040A69 /* KeyboardError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 165EB3A02098993900040A69 /* KeyboardError.swift */; };
 		296EF2C72AFA26C700E3E384 /* ZIPFoundation.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 296EF2C62AFA26C700E3E384 /* ZIPFoundation.xcframework */; };
+		29B30C232B564F9900C342A4 /* KeymanEngineLogger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 29B30C222B564F9900C342A4 /* KeymanEngineLogger.swift */; };
 		377D10DE26846B8900467431 /* SpacebarTextViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 377D10DD26846B8900467431 /* SpacebarTextViewController.swift */; };
 		6CD5DFAA150F6DC8007A5DDE /* icon.png in Resources */ = {isa = PBXBuildFile; fileRef = 6CD5DFA8150F6DC8007A5DDE /* icon.png */; };
 		6CD5DFAB150F6DC8007A5DDE /* icon@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 6CD5DFA9150F6DC8007A5DDE /* icon@2x.png */; };
@@ -327,6 +328,7 @@
 		29B27FEF29062CF50036917E /* nl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = nl; path = nl.lproj/ResourceInfoView.strings; sourceTree = "<group>"; };
 		29B27FF029062D100036917E /* nl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = nl; path = nl.lproj/Localizable.strings; sourceTree = "<group>"; };
 		29B27FF129062D190036917E /* nl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.stringsdict; name = nl; path = nl.lproj/Localizable.stringsdict; sourceTree = "<group>"; };
+		29B30C222B564F9900C342A4 /* KeymanEngineLogger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeymanEngineLogger.swift; sourceTree = "<group>"; };
 		29BFA75E28293287009FCCC3 /* it */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = it; path = it.lproj/ResourceInfoView.strings; sourceTree = "<group>"; };
 		29BFA75F282934B4009FCCC3 /* it */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = it; path = it.lproj/Localizable.strings; sourceTree = "<group>"; };
 		29BFA760282934BB009FCCC3 /* it */ = {isa = PBXFileReference; lastKnownFileType = text.plist.stringsdict; name = it; path = it.lproj/Localizable.stringsdict; sourceTree = "<group>"; };
@@ -925,6 +927,7 @@
 		F243887314BBD43000A3E055 = {
 			isa = PBXGroup;
 			children = (
+				29B30C222B564F9900C342A4 /* KeymanEngineLogger.swift */,
 				C06D372C1F81F4E100F61AE0 /* KeymanEngine */,
 				9A079DD0223194B100581263 /* KeymanEngineTests */,
 				CE1679B8265F315C008D6FCE /* Demos */,
@@ -1525,6 +1528,7 @@
 				C06085B41F9485E40057E5B9 /* UIButton+Helpers.swift in Sources */,
 				C0959CD41F99C44E00B616BC /* Constants.swift in Sources */,
 				C0452BAD1F9F21270064431A /* Keyboard.swift in Sources */,
+				29B30C232B564F9900C342A4 /* KeymanEngineLogger.swift in Sources */,
 				CE79B24923C711FF007E72AE /* KeyboardScaleMap.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

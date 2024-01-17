@@ -9,6 +9,7 @@
 import KeymanEngine
 import WebKit
 import Reachability
+import os
 
 // TODO: Refactor common functionality from InfoViewController
 class SetUpViewController: UIViewController, WKNavigationDelegate {
@@ -74,6 +75,6 @@ class SetUpViewController: UIViewController, WKNavigationDelegate {
     let url = "\(KeymanHosts.HELP_KEYMAN_COM)/products/iphone-and-ipad/\(appVersion.plainString)"
       + "/start/installing-system-keyboard?embed=ios"
     webView.load(URLRequest(url: URL(string: url)!))
-    log.debug("Set up page URL: \(url)")
+    os_log("Set up page URL: %s", log: KeymanLogger.resources, type: .debug, url)
   }
 }

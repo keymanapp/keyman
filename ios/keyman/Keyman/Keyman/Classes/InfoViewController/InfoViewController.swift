@@ -9,6 +9,7 @@
 import KeymanEngine
 import WebKit
 import Reachability
+import os
 
 class InfoViewController: UIViewController, WKNavigationDelegate {
   @IBOutlet var webView: WKWebView!
@@ -67,7 +68,7 @@ class InfoViewController: UIViewController, WKNavigationDelegate {
   func webView(_ webView: WKWebView, didFailNavigation error: Error) {
     UIApplication.shared.isNetworkActivityIndicatorVisible = false
     updateButtons()
-    log.debug(error)
+    os_log("%s", log: KeymanLogger.ui, type: .error, error.localizedDescription)
   }
 
   @IBAction func back(_ sender: Any) {
@@ -100,6 +101,6 @@ class InfoViewController: UIViewController, WKNavigationDelegate {
     let appVersion = Version.current.majorMinor
     let url =  "\(KeymanHosts.HELP_KEYMAN_COM)/products/iphone-and-ipad/\(appVersion.plainString)/"
     webView.load(URLRequest(url: URL(string: url)!))
-    log.debug("Info page URL: \(url)")
+    os_log("Info page URL: %s", log: KeymanLogger.ui, type: .debug, url)
   }
 }

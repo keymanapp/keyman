@@ -60,7 +60,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     SentryManager.start()
     // Forces the logs to initialize, as their definitions result in lazy init.
     // These references have been configured to also log app details.
-    _ = log
     _ = KeymanEngine.log
 
     // In iOS 15, navigation bars become transparent by default when the edge
