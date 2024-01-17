@@ -293,9 +293,7 @@ public final class KMManager {
   protected static final String KMFilename_KeyboardHtml = "keyboard.html";
   protected static final String KMFilename_KeyboardHtml_Legacy = "keyboard.es5.html";
   protected static final String KMFilename_JSEngine = "keymanweb-webview.js";
-  protected static final String KMFilename_JSEngine_Sourcemap = "keymanweb-webview.js.map";
   protected static final String KMFilename_JSLegacyEngine = "keymanweb-webview.es5.js";
-  protected static final String KMFilename_JSLegacyEngine_Sourcemap = "keymanweb-webview.es5.js.map";
   protected static final String KMFilename_JSSentry = "sentry.min.js";
   protected static final String KMFilename_JSSentryInit = "keyman-sentry.js";
   protected static final String KMFilename_AndroidHost = "android-host.js";
@@ -867,17 +865,11 @@ public final class KMManager {
         copyAssetWithRename(context, KMFilename_KeyboardHtml_Legacy, KMFilename_KeyboardHtml, "", true);
 
         copyAsset(context, KMFilename_JSLegacyEngine, "", true);
-        if (KMManager.isDebugMode()) {
-          copyAsset(context, KMFilename_JSLegacyEngine_Sourcemap, "", true);
-        }
       } else {
         copyAsset(context, KMFilename_KeyboardHtml, "", true);
 
         // For versions of Chrome with full ES6 support, we use the ES6 artifact.
         copyAsset(context, KMFilename_JSEngine, "", true);
-        if (KMManager.isDebugMode()) {
-          copyAsset(context, KMFilename_JSEngine_Sourcemap, "", true);
-        }
       }
 
       // Is still built targeting ES5.
