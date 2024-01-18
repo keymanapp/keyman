@@ -19,7 +19,8 @@ namespace core {
 namespace ldml {
 
 
-const std::u32string REGEX_PREFIX       = U"\\uffff\\u0008";  // does not include '\\' because it might be a range
+// the 'prefix part' of a regex marker sequence, followed by RAW_PREFIX or REGEX_ANY_MATCH
+const std::u32string REGEX_PREFIX       = U"\\uffff\\u0008";
 const std::u32string RAW_PREFIX         = U"\uffff\u0008";
 const std::u32string REGEX_ANY_MATCH    = U"[\\u0001-\\ud7fe]";
 
