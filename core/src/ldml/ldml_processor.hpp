@@ -123,6 +123,7 @@ public:
       uint16_t modifier_state,
       uint8_t is_key_down,
       uint16_t event_flags);
+  ~ldml_event_state();
   /** done with this, copy it into core state */
   void commit();
   /** clear this object out */
@@ -172,6 +173,11 @@ public:
    uint8_t is_key_down;
    uint16_t event_flags;
    km_core_state *state;
+
+   // our in-flight action struct.
+   km_core_actions actions;
+   // text to add
+   std::u32string  text;
 };
 
 
