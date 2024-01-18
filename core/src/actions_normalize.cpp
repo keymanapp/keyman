@@ -25,10 +25,6 @@
 #include "unicode/unistr.h"
 #include "unicode/normalizer2.h"
 
-// ********************************************************************************
-// TODO: if we don't apply normalization, we should still fixup the app_context
-// ********************************************************************************
-
 // forward declarations
 
 icu::UnicodeString context_items_to_unicode_string(km_core_context const *context);
