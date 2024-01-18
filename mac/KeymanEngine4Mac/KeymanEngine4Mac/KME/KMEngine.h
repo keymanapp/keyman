@@ -24,7 +24,6 @@
 - (NSString *)getCoreContextDebug;
 - (void)clearCoreContext;
 - (void)setCoreContextIfNeeded:(NSString *)context;
-- (void)setCoreContext:(NSString *)context;
 
 - (void)setCoreOptions:(NSString *)key withValue:(NSString *)value;
 - (CoreKeyOutput *)processEvent:(NSEvent *)event;

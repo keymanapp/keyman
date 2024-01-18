@@ -66,7 +66,7 @@ CoreWrapper *mockWrapper;
 - (void)testgetContextAsString_ContextContainsEmojis_ReturnsSameContext  {
   NSString *kmxPath = [CoreTestStaticHelperMethods getKmxFilePathTestMacEngine];
   CoreWrapper *core = [[CoreWrapper alloc] initWithHelper: [CoreTestStaticHelperMethods helper] kmxFilePath:kmxPath];
-  [core setContext:@"🤔?👍🏻✅"];
+  [core setContextIfNeeded:@"🤔?👍🏻✅"];
   NSString *finalContext = core.contextDebug;
   // Note: relying on km_core_state_context_debug output format is just barely
   // acceptable for a unit test

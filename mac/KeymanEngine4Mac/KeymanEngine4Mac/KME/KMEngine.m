@@ -39,7 +39,7 @@ const NSString* kEasterEggKmxName = @"EnglishSpanish.kmx";
 
       if (kmx) {
         [self loadCoreWrapperFromKmxFile:self.kmx.filePath];
-        [self.coreWrapper setContext:contextString];
+        [self.coreWrapper setContextIfNeeded:contextString];
       }
     }
 
@@ -99,10 +99,6 @@ const NSString* kEasterEggKmxName = @"EnglishSpanish.kmx";
 
 - (void)setCoreContextIfNeeded:(NSString *)context {
   [self.coreWrapper setContextIfNeeded:context];
-}
-
-- (void)setCoreContext:(NSString *)context {
-  [self.coreWrapper setContext:context];
 }
 
 - (void)setCoreOptions:(NSString *)key withValue:(NSString *)value {
