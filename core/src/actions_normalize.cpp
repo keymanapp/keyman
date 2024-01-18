@@ -286,3 +286,37 @@ km_core_usv *unicode_string_to_usv(icu::UnicodeString& src) {
   dst[src.length()] = 0;
   return dst;
 }
+
+
+
+/**
+ * Refresh app_context to match the cached_context
+ *
+ * @param cached_context  the cached context, in NFU, after transform has been
+ *                        applied to it by the keyboard processor
+ * @param app_context     the app context, in NFU; transform has not been
+ *                        applied, and will effectively be applied by this
+ *                        function
+ * @return true on success, false on failure
+ */
+bool km::core::actions_update_app_context(
+  /* in */      km_core_context const *cached_context,
+  /* in, out */ km_core_context *app_context
+) {
+  // We simply copy the cached_context to the app_context
+  km_core_status status = KM_CORE_STATUS_OK;
+  km_core_context_item *items = nullptr;
+
+  if((status = km_core_context_get(cached_context, &items)) != KM_CORE_STATUS_OK) {
+    DebugLog("km_core_context_get failed with %d", status);
+    return false;
+  }
+
+  if((status = km_core_context_set(app_context, items)) != KM_CORE_STATUS_OK) {
+    DebugLog("km_core_context_set failed with %d", status);
+  }
+
+  delete [] items;
+
+  return status == KM_CORE_STATUS_OK;
+}

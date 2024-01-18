@@ -41,6 +41,12 @@ km_core_actions const * km_core_state_get_actions(
       km_core_actions_dispose(result);
       return nullptr;
     }
+  } else {
+    // For all other keyboard processors, we just copy the cached_context to the app_context
+    if(!actions_update_app_context(km_core_state_context(state), km_core_state_app_context(state))) {
+      km_core_actions_dispose(result);
+      return nullptr;
+    }
   }
   return result;
 }

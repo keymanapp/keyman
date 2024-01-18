@@ -23,5 +23,11 @@ namespace core
     /* in, out */ km_core_context *app_context,
     /* in, out */ km_core_actions *actions
   );
+
+  bool actions_update_app_context(
+    /* in */      km_core_context const *cached_context,
+    /* in, out */ km_core_context *app_context
+  );
+
 } // namespace core
 } // namespace km
