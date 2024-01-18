@@ -109,6 +109,13 @@ bool km::core::actions_normalize(
   int nfu_to_delete = 0;
 
   /*
+    Further debug assertion of inputs
+  */
+
+  assert(nfd->isNormalized(output, icu_status) && U_SUCCESS(icu_status));
+  assert(nfd->isNormalized(cached_context_string, icu_status) && U_SUCCESS(icu_status));
+
+  /*
     The keyboard processor will have updated the cached_context already,
     applying the transform to it, so we need to rewind this. Remove the output
     from cached_context_string to start
