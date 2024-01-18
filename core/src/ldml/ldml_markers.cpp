@@ -23,6 +23,7 @@ namespace ldml {
 const std::u32string REGEX_PREFIX       = U"\\uffff\\u0008";
 const std::u32string RAW_PREFIX         = U"\uffff\u0008";
 const std::u32string REGEX_ANY_MATCH    = U"[\\u0001-\\ud7fe]";
+const KMX_DWORD LDML_MARKER_NO_INDEX    = 0; // TODO: move to .ts
 
 // string manipulation
 
@@ -54,16 +55,6 @@ bool normalize_nfd(std::u16string &str) {
   const icu::Normalizer2 *nfd = icu::Normalizer2::getNFDInstance(status);
   UASSERT_SUCCESS(status);
   return normalize(nfd, str, status);
-}
-
-bool normalize_nfd_markers_segment(std::u16string &str, marker_map &map, marker_encoding encoding) {
-  std::u32string rstr = km::core::kmx::u16string_to_u32string(str);
-  if(!normalize_nfd_markers_segment(rstr, map, encoding)) {
-    return false;
-  } else {
-    str = km::core::kmx::u32string_to_u16string(rstr);
-    return true;
-  }
 }
 
 static void add_back_markers(std::u32string &str, const std::u32string &src, marker_map &map, marker_encoding encoding) {
@@ -104,10 +95,6 @@ static void add_back_markers(std::u32string &str, const std::u32string &src, mar
 //  assert(marki == map.rend()); // that we consumed everything
 }
 
-/**
- * TODO-LDML:
- *  - ideally this should be used on a normalization safe subsequence
- */
 bool normalize_nfd_markers_segment(std::u32string &str, marker_map &map, marker_encoding encoding) {
   /** original string, but no markers */
   std::u32string str_unmarked = remove_markers(str, map, encoding);
@@ -127,16 +114,135 @@ bool normalize_nfd_markers_segment(std::u32string &str, marker_map &map, marker_
   return true; // all OK
 }
 
-bool normalize_nfd_markers(std::u16string &str, marker_encoding encoding) {
+static bool append_segment(std::u32string &str, std::u32string &sub, marker_encoding encoding) {
+  if(sub.empty()) {
+    return true;
+  }
   marker_map m;
-  // TODO-LDML: split segments
-  return normalize_nfd_markers_segment(str, m, encoding);
+  if (!normalize_nfd_markers_segment(sub, m, encoding)) {
+    return false;  // failed
+  }
+  // append the fixed-up segment
+  str.append(sub);
+  return true;
+}
+
+/**
+ * @param i iteration point. will always advance unless at end
+ * @param end end of input
+ * @returns marker number, or LDML_MARKER_NO_INDEX if no marker (and i will be unmoved)
+ */
+marker_num parse_next_marker(std::u32string::const_iterator &i, const std::u32string::const_iterator &end, marker_encoding encoding) {
+  if (i == end) {
+    return LDML_MARKER_NO_INDEX;
+  }
+  const auto &lookfor_str = (encoding == regex_sentinel) ? REGEX_PREFIX : RAW_PREFIX;
+  std::u32string rest(i, end);
+  if (rest.length() <= lookfor_str.length()) { // <= because we need at least 1 char for the rest of the marker payload
+    // input too short
+    i++;
+    return LDML_MARKER_NO_INDEX;
+  }
+  if (0 != rest.compare(0, lookfor_str.length(), lookfor_str)) {
+    // advance past initial char
+    i++;
+    return LDML_MARKER_NO_INDEX; // prefix mismatch
+  }
+  i += lookfor_str.length(); // matches, so advance
+
+  // handle the plain_sentinel option here
+  if (encoding == plain_sentinel) {
+    marker_num marker_no = *(i++); // advance past marker no
+    assert(marker_no >= LDML_MARKER_MIN_INDEX && marker_no <= LDML_MARKER_ANY_INDEX);
+    return marker_no;
+  }
+
+  assert(encoding == regex_sentinel);
+
+  // TODO-LDML: could change this from iterator to using 'rest'
+  if (*i == U'\\') {
+    // single marker
+    if (++i == end) {
+      return LDML_MARKER_NO_INDEX;
+    }
+    assert(*i == U'u');
+    if (++i == end) {
+      return LDML_MARKER_NO_INDEX;
+    }
+    km_core_usv markno[4];
+
+    markno[0] = *(i++);
+    if (i == end) {
+      return LDML_MARKER_NO_INDEX;
+    }
+    markno[1] = *(i++);
+    if (i == end) {
+      return LDML_MARKER_NO_INDEX;
+    }
+    markno[2] = *(i++);
+    if (i == end) {
+      return LDML_MARKER_NO_INDEX;
+    }
+    markno[3] = *(i++);
+    auto marker_no = parse_hex_quad(markno);
+    assert(marker_no >= LDML_MARKER_MIN_INDEX && marker_no <= LDML_MARKER_MAX_INDEX);
+    return marker_no;
+  } else if (*i == REGEX_ANY_MATCH.at(0)) {  // '['
+    std::u32string rest2(i, end); // TODO-LDML: could use 'rest' above
+    if (rest2.length() < REGEX_ANY_MATCH.length()) {
+      // not enough left so it can't match, so continue
+      return LDML_MARKER_NO_INDEX;
+    }
+    i += REGEX_ANY_MATCH.length();
+    return LDML_MARKER_ANY_INDEX;
+  }
+  return LDML_MARKER_NO_INDEX;
 }
 
 bool normalize_nfd_markers(std::u32string &str, marker_encoding encoding) {
-  marker_map m;
-  // TODO-LDML: split segments
-  return normalize_nfd_markers_segment(str, m, encoding);
+  // quick check
+  if(str.empty()) return true;
+  // get an NFD normalizer
+  UErrorCode status           = U_ZERO_ERROR;
+  const icu::Normalizer2 *nfd = icu::Normalizer2::getNFDInstance(status);
+  if (!UASSERT_SUCCESS(status)) {
+    return false;
+  }
+
+  std::u32string out;      // output string
+
+  auto last = str.begin();  // points to the beginning of the next segment to work on
+  for (auto i = str.begin(); i != str.end();) {
+    if (nfd->hasBoundaryBefore(*i)) { // marker may appear as a boundary
+      auto i2 = i;
+      if (parse_next_marker(i2, str.end(), encoding) != LDML_MARKER_NO_INDEX) {
+        // found a marker, so skip forward
+        i = i2; // advance over marker
+        continue; // continue
+      }
+      if (last != i) {
+        std::u32string segment(last, i);
+        marker_map m;
+        if (!normalize_nfd_markers_segment(segment, m, encoding)) {
+          return false;
+        }
+        out.append(segment);
+        last = i;
+      }
+    }
+    i++;
+  }
+  // pick up suffix
+  if (last != str.end()) {
+    std::u32string segment(last, str.end());
+    marker_map m;
+    if (!normalize_nfd_markers_segment(segment, m, encoding)) {
+      return false;
+    }
+    out.append(segment);
+  }
+  str = out;
+  return true;
 }
 
 // TODO-LDML: cleanup
@@ -255,7 +361,7 @@ static void add_markers_to_map(marker_map &markers, char32_t marker_ch, const ma
  * @param last the 'last' parameter past the prior parsing
  * @param end end of the input string
  */
-static void
+inline void
 add_pending_markers(
     marker_map *markers,
     marker_list &last_markers,
@@ -274,96 +380,35 @@ add_pending_markers(
   last_markers.clear(); // mark as already recorded
 }
 
-std::u32string remove_markers(const std::u32string &str, marker_map *markers, marker_encoding encoding) {
+std::u32string
+remove_markers(const std::u32string &str, marker_map *markers, marker_encoding encoding) {
   std::u32string out;
-  auto i = str.begin(); // current iterator
-  auto last = i; // points to the part of the string after the last matched marker
   marker_list last_markers;
-  const auto &lookfor_str = (encoding == regex_sentinel) ? REGEX_PREFIX : RAW_PREFIX;
-  auto lookfor = lookfor_str.at(0);
+  // const auto &lookfor_str = (encoding == regex_sentinel) ? REGEX_PREFIX : RAW_PREFIX;
+  // auto lookfor            = lookfor_str.at(0);
 
-  for (i = find(i, str.end(), lookfor); i != str.end(); i = find(i, str.end(), lookfor)) {
-    if (last != i) {
+  auto last = str.begin();  // points to the part of the string after the last matched marker
+  for (auto i = str.begin(); i != str.end();) {
+    auto marker_no = parse_next_marker(i, str.end(), encoding);
+    if (marker_no == LDML_MARKER_NO_INDEX) {
       // add any markers found before this entry, but only if there is intervening
       // text. This prevents the sentinel or the '\u' from becoming the attachment char.
-      add_pending_markers(markers, last_markers, last, str.end());
-    }
-    out.append(last, i);
-    assert(*i == lookfor); // assert that find() worked
-    last = i; // keep track of the last segment appended.
-
-    std::u32string rest(i, str.end());
-    if (rest.length() <= lookfor_str.length()) {
-      // not enough left so it can't match, so continue
-      i = str.end(); // end of string
-      continue;
-    }
-
-    rest.resize(lookfor_str.length());
-
-    i += lookfor_str.length();
-
-    if (rest != lookfor_str) {
-      // no match - could be backslash something else
-      continue;
-    }
-
-    assert(i != str.end()); // caught above
-
-    KMX_DWORD marker_no;
-    if (encoding == plain_sentinel) {
-      // #3 marker number
-      marker_no = *i;
-      i++; // if end, we'll break out of the loop
-    } else {
-      assert(encoding == regex_sentinel);
-      // is it an escape or a range?
-      if (*i == U'\\') {
-        if (++i == str.end()) {
-          break;
-        }
-        assert(*i == U'u');
-        if (++i == str.end()) {
-          break;
-        }
-        km_core_usv markno[4];
-
-        markno[0] = *(i++);
-        if (i == str.end()) {
-          break;
-        }
-        markno[1] = *(i++);
-        if (i == str.end()) {
-          break;
-        }
-        markno[2] = *(i++);
-        if (i == str.end()) {
-          break;
-        }
-        markno[3] = *(i++);
-        marker_no = parse_hex_quad(markno);
-        assert (marker_no != 0); // illegal marker number
-      } else if (*i == REGEX_ANY_MATCH.at(0)) { // '['
-        std::u32string rest2(i, str.end());
-        if (rest2.length() < REGEX_ANY_MATCH.length()) {
-          // not enough left so it can't match, so continue
-          continue;
-        }
-        i += REGEX_ANY_MATCH.length();
-        marker_no = LDML_MARKER_ANY_INDEX;
-      } else {
-        assert(*i == U'\\' || *i == U'[');  // error.
-        marker_no = 0; // error, don't record
+      if (i != last) {
+        add_pending_markers(markers, last_markers, last, str.end());
+        out.append(last, i); // append any non-marker text since the end of the last marker
+        last = i; // advance over text we've already appended
       }
-    }
-    assert(marker_no >= LDML_MARKER_MIN_INDEX && marker_no <= LDML_MARKER_ANY_INDEX);
-    // The marker number is good, add it to the list
-    last = i;
-    if (marker_no >= LDML_MARKER_MIN_INDEX && markers != nullptr) {
-      // add it to the list
-      last_markers.emplace_back(marker_no);
+    } else {
+      assert(marker_no >= LDML_MARKER_MIN_INDEX && marker_no <= LDML_MARKER_ANY_INDEX);
+      // The marker number is good, add it to the list
+      if (marker_no >= LDML_MARKER_MIN_INDEX && markers != nullptr) {
+        // add it to the list
+        last_markers.emplace_back(marker_no);
+      }
+      last = i; // skip over marker
     }
   }
+
   // add any remaining pending markers.
   // if last == str.end() then this wil be MARKER_BEFORE_EOT
   // otherwise it will be the glue character
@@ -374,6 +419,8 @@ std::u32string remove_markers(const std::u32string &str, marker_map *markers, ma
 }
 
 
+
+// --- end namespaces
 }
 }
 }

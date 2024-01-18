@@ -66,9 +66,7 @@ bool normalize_nfd(std::u16string &str);
  * @return false on failure
  **/
 bool normalize_nfd_markers_segment(std::u32string &str, marker_map &markers, marker_encoding encoding = plain_sentinel);
-bool normalize_nfd_markers_segment(std::u16string &str, marker_map &markers, marker_encoding encoding = plain_sentinel);
 bool normalize_nfd_markers(std::u32string &str, marker_encoding encoding = plain_sentinel);
-bool normalize_nfd_markers(std::u16string &str, marker_encoding encoding = plain_sentinel);
 
 // /** Normalize a u32string inplace to NFC, retaining markers.
 //  * @param markers will be populated with marker chars

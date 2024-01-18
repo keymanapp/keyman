@@ -519,9 +519,10 @@ transform_entry::init() {
     return false;
   }
   // TODO-LDML: if we have mapFrom, may need to do other processing.
-  std::u16string patstr = km::core::kmx::u32string_to_u16string(fFrom);
+  std::u32string from2 = fFrom;
+  normalize_nfd_markers(from2, regex_sentinel);
+  std::u16string patstr = km::core::kmx::u32string_to_u16string(from2);
   // normalize, including markers, for regex
-  normalize_nfd_markers(patstr, regex_sentinel);
   UErrorCode status           = U_ZERO_ERROR;
   /* const */ icu::UnicodeString patustr = icu::UnicodeString(patstr.data(), (int32_t)patstr.length());
   // add '$' to match to end
