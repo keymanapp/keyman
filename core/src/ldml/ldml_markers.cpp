@@ -114,19 +114,6 @@ bool normalize_nfd_markers_segment(std::u32string &str, marker_map &map, marker_
   return true; // all OK
 }
 
-static bool append_segment(std::u32string &str, std::u32string &sub, marker_encoding encoding) {
-  if(sub.empty()) {
-    return true;
-  }
-  marker_map m;
-  if (!normalize_nfd_markers_segment(sub, m, encoding)) {
-    return false;  // failed
-  }
-  // append the fixed-up segment
-  str.append(sub);
-  return true;
-}
-
 /**
  * @param i iteration point. will always advance unless at end
  * @param end end of input
@@ -218,11 +205,11 @@ bool normalize_nfd_markers(std::u32string &str, marker_encoding encoding) {
    * this is the beginning of the current segment to process.
    * it will also be the beginning of the string OR the end of the previous segment.
   */
-  auto seg_start = str.begin();
+  std::u32string::const_iterator seg_start = str.begin();
   /** end of the current segment. This will be == seg_start unless a new segment is identified. */
-  auto seg_end   = str.begin();
+  std::u32string::const_iterator seg_end   = str.begin();
   /** iterator through this loop */
-  auto i         = str.begin();
+  std::u32string::const_iterator i         = str.begin();
 
   // now we'll loop through looking for normalization-safe subsegments of [seg_start, seg_end)
   // For example (sentinel mode) the following would be segments:
@@ -242,7 +229,7 @@ bool normalize_nfd_markers(std::u32string &str, marker_encoding encoding) {
     // First, check if there's a marker.
 
     // temporary iterator so we don't move 'i' unnecessarily. points to end of marker sequence.
-    auto marker_end  = i;
+    std::u32string::const_iterator marker_end = i;
     // true if marker detected
     bool have_marker = parse_next_marker(marker_end, str.end(), encoding) != LDML_MARKER_NO_INDEX;
 
