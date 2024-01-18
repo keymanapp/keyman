@@ -16,6 +16,11 @@ using namespace km::core;
  * Retrieves the context as a km_core_cp string, dropping markers
  */
 km_core_cp* km::core::get_context_as_string(km_core_context *context) {
+  assert(context != nullptr);
+  if(context == nullptr) {
+    return nullptr;
+  }
+
   size_t buf_size = 0;
   km_core_context_item* context_items = nullptr;
 
@@ -44,6 +49,12 @@ km_core_cp* km::core::get_context_as_string(km_core_context *context) {
  * Updates the context from the new_context km_core_cp string
  */
 km_core_status km::core::set_context_from_string(km_core_context *context, km_core_cp const *new_context) {
+  assert(context != nullptr);
+  assert(new_context != nullptr);
+  if(context == nullptr || new_context == nullptr) {
+    return KM_CORE_STATUS_INVALID_ARGUMENT;
+  }
+
   km_core_context_item* new_context_items = nullptr;
 
   km_core_status status = km_core_context_items_from_utf16(new_context, &new_context_items);
