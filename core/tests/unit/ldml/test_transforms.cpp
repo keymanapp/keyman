@@ -638,7 +638,7 @@ int test_strutils() {
     std::cout << __FILE__ << ":" << __LINE__ << "   - bad0" << std::endl;
     const std::u32string src = U"6\U0000ffff\U00000008"; // missing trailing marker #
     const std::u32string dst = remove_markers(src, map);
-    const std::u32string expect = U"6";
+    const std::u32string expect = src;
     zassert_string_equal(dst, expect);
     assert_equal(map.size(), 0);
   }

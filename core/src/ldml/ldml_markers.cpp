@@ -289,7 +289,7 @@ std::u32string remove_markers(const std::u32string &str, marker_map *markers, ma
     }
     out.append(last, i);
     assert(*i == lookfor); // assert that find() worked
-    last = i; // keep track of the last segment appendd.
+    last = i; // keep track of the last segment appended.
 
     std::u32string rest(i, str.end());
     if (rest.length() <= lookfor_str.length()) {
@@ -307,8 +307,7 @@ std::u32string remove_markers(const std::u32string &str, marker_map *markers, ma
       continue;
     }
 
-    // matches. Skip over the prefix
-    last = i;
+    assert(i != str.end()); // caught above
 
     KMX_DWORD marker_no;
     if (encoding == plain_sentinel) {
