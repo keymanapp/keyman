@@ -148,21 +148,42 @@ export class MarkerParser {
     return MarkerParser.nfd_markers_segment(s, m, forMatch);
   }
 
-  static nfd_markers_segment(s: string, map: MarkerMap, forMatch?: boolean) : string {
+  public static nfd_markers_segment(s: string, map: MarkerMap, forMatch?: boolean) : string {
     return s.normalize("NFD");
   }
 
-  static remove_markers(s: string, map: MarkerMap, forMatch?: boolean) : string {
+  public static remove_markers(s: string, map: MarkerMap, forMatch?: boolean) : string {
     return s;
   }
-}
 
-interface MarkerEntry {
+  public static parse_next_marker(s: string, forMatch?: boolean) : MarkerResult {
+    if(!forMatch) {
+      const anchored_match = new RegExp(`^${MarkerParser.ANY_MARKER_MATCH}`);
+      const m = s.match(anchored_match);
+      if (m) {
+        const match = m[0];
+        const marker = match.codePointAt(2);
+        return ({ match, marker });
+      }
+      // else TODO
+    }
+    return null;
+  }
+};
+
+export interface MarkerEntry {
   ch? : string;
   marker? : number;
 };
 
-type MarkerMap = Array<MarkerEntry>;
+export type MarkerMap = Array<MarkerEntry>;
+
+export interface MarkerResult {
+  // if matched, the number of the marker. or falsy
+  marker?: number;
+  // if matched, the entire marker sequence
+  match?: string;
+};
 
 /**
  * Class for helping with markers

@@ -1,6 +1,6 @@
 import 'mocha';
 import { assert } from 'chai';
-import { ElementParser, ElementSegment, ElementType, MarkerParser, OrderedStringList, VariableParser } from '../../src/ldml-keyboard/pattern-parser.js';
+import { ElementParser, ElementSegment, ElementType, MarkerParser, MarkerResult, OrderedStringList, VariableParser } from '../../src/ldml-keyboard/pattern-parser.js';
 import { constants } from '@keymanapp/ldml-keyboard-constants';
 import { KMXFile } from '../../src/kmx/kmx.js';
 
@@ -308,6 +308,33 @@ describe('Test of Pattern Parsers', () => {
 
 
 describe('Test of nfd_markers()', () => {
+  it('should be able to parse_next_markers()', () => {
+    [
+      ["6e", null, false],
+      ["6e", null, true],
+      ["\uffff\u0008\u0001e", { match: "\uffff\u0008\u0001", marker: 1 }, false],
+      [MarkerParser.ANY_MARKER_MATCH, {
+        match: MarkerParser.ANY_MARKER_MATCH,
+        marker: constants.marker_any_index,
+      }, true],
+      [
+        "\\uffff\\u0008\\u0002abc", { match: "\\uffff\\u0008\\u0002", marker: 2 }, true
+      ],
+    ].forEach(([src,expect,forMatch]) => {
+      const dst = MarkerParser.parse_next_marker(<string>src, <boolean>forMatch);
+      assert.deepEqual(dst, <MarkerResult>expect, `Parsing ${src} with forMatch=${forMatch}`);
+    });
+  });
+  it('should be able to remove_markers()', () => {
+    [
+      ["6e","6e",false],
+      ["6e","6e",true],
+      ["6\uffff\u0008\u0001e", "6e", false],
+    ].forEach(([src,expect,forMatch]) => {
+      const dst = MarkerParser.remove_markers(<string>src, [], <boolean>forMatch);
+      assert.equal(dst, <string>expect, `mapping ${src} with forMatch=${forMatch}`);
+    });
+  });
   it('should normalize as expected', () => {
     // this is a little bit simpler in structure than what's in test_transforms.cpp,
     // see there for more complicated cases and discussion
@@ -317,7 +344,7 @@ describe('Test of nfd_markers()', () => {
 
       // #1
       ["abc"],
-      // ["6\uffff\u0008\u0001e", "6e"], (removal test)
+      //, (removal test)
       ["6\uffff\u0008"],
       ["6\uffffq"],
       ["6\uffff"],
