@@ -75,10 +75,8 @@ void setup(const km_core_cp *app_context, const km_core_cp *cached_context, int 
  * @param initial_app_context           the app context stored in the state,
  *                                      _before_ transform is applied -- NFU
  * @param final_cached_context          cached context _after_ actions have been
- *                                      applied -- NFD except on the boundary of
- *                                      the transform, where reorder may be
- *                                      required (essentially, this is
- *                                      initial_cached_context -
+ *                                      applied -- guaranteed NFD (essentially,
+ *                                      this is initial_cached_context -
  *                                      actions_code_points_to_delete +
  *                                      actions_output)
  * @param actions_code_points_to_delete number of NFD code points that the
@@ -223,10 +221,10 @@ void run_tests() {
   );
 
   test(
-    "Two backspaces for NFD converts into one char in NFC (ê) and recombine",
+    "One backspace for NFD converts into one char in NFC (ê) and recombine",
     /* app context pre transform: */     u"abcê",
     /* cached context post transform: */ u"abce\u0323\u0302",
-    /* action del, output: */            2, U"e\u0323\u0302", // NFD input;  delete 2: e and \u0302
+    /* action del, output: */            1, U"\u0323\u0302",  // NFD input;  delete 1: \u0302
     // ---- results ----
     /* action del, output: */            1, U"ệ",             // NFC output; delete 1: ê
     /* app_context: */                   u"abcệ"
@@ -238,7 +236,7 @@ void run_tests() {
     "Avoid editing too far back in context when finding normalization boundary",
     /* app context pre transform: */     u"a\u0300bcê",
     /* cached context post transform: */ u"a\u0300bce\u0323\u0302",
-    /* action del, output: */            2, U"e\u0323\u0302", // NFD input;  delete 2: e and \u0302
+    /* action del, output: */            1, U"\u0323\u0302", // NFD input;  delete 1: \u0302
     // ---- results ----
     /* action del, output: */            1, U"ệ",              // NFC output; delete 1: ê
     /* app_context: */                   u"a\u0300bcệ"
@@ -248,12 +246,25 @@ void run_tests() {
   test(
     "Normalizable letters at start of context",
     /* app context pre transform: */     u"\u0300",
-    /* cached context post transform: */ u"\u0300\u0323\u0302",
-    /* action del, output: */            0, U"\u0323\u0302",       // NFD input;
+    /* cached context post transform: */ u"\u0323\u0300\u0302",
+    /* action del, output: */            1, U"\u0323\u0300\u0302",       // NFD input;
     // ---- results ----
     /* action del, output: */            1, U"\u0323\u0300\u0302",  // NFC output is still decomposed because there is no base
     /* app_context: */                   u"\u0323\u0300\u0302"
   );
+
+  // Modifies the base as well as diacritic
+
+  test(
+    "Two backspaces for NFD converts into one char in NFC (ê) and recombine",
+    /* app context pre transform: */     u"abcê",
+    /* cached context post transform: */ u"abca\u0323\u0302",
+    /* action del, output: */            2, U"a\u0323\u0302",  // NFD input;  delete 2: e\u0302
+    // ---- results ----
+    /* action del, output: */            1, U"ậ",             // NFC output; delete 1: ê
+    /* app_context: */                   u"abcậ"
+  );
+
 
   // TODO: surrogate pair tests
   // TODO: add check for updated cached_context once #10369 lands and we apply

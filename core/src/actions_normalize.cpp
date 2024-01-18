@@ -62,9 +62,9 @@ bool km::core::actions_normalize(
   /*
     The code_points_to_delete value at this point is in NFD. The cached_context
     is in NFD and has already been updated by the keyboard processor to the
-    expected result of the action, so we need to remove the output from a copy
-    of the cached_context to start, in order to get it to the same position as
-    the app_context.
+    expected result of the action, so we need to remove the output from a string
+    copy of the cached_context to start, in order to get it to the same position
+    as the app_context.
 
     The app_context is in NFU. We need to figure out how many characters to
     remove from the end of app_context in order to correctly normalize across
@@ -77,11 +77,6 @@ bool km::core::actions_normalize(
     app_context does not contain markers; these are maintained only in the
     cached_context.
   */
-
-  // TODO: That description above is not quite right. cached_context is not
-  // guaranteed to be normalized across the transform boundary, because its
-  // output was simply appended to the existing context. MUCH PAIN COMING WITH
-  // THIS, because cached_context includes markers. Hence, blocked by #10369.
 
   /*
     Initialization
@@ -125,8 +120,10 @@ bool km::core::actions_normalize(
   cached_context_string.remove(n);
 
   /*
-    Now, look for a normalization boundary at the intersection of the
-    cached_context and the output
+    While cached_context is guaranteed to be normalized, actions->output may not
+    start at a normalization boundary. In order to achieve the correct NFC
+    normalization in our output, we now need to look for a normalization
+    boundary prior to the intersection of the cached_context and the output.
   */
 
   while(n > 0 && output[0] && !nfd->hasBoundaryBefore(output[0])) {
@@ -159,7 +156,6 @@ bool km::core::actions_normalize(
     To adjust, we remove one character at a time from the app_context until
     its normalized form matches the cached_context normalized form.
   */
-
 
   while(app_context_string.length()) {
     icu::UnicodeString app_context_nfd;
