@@ -43,7 +43,7 @@
           let file = ev.target.files[0];
 
           if(!file) {
-            // TODO:  Error alert.
+            // The user probably canceled file selection; abort.
             return;
           }
 
@@ -53,10 +53,13 @@
           const packageEntries = await packageReader.getEntries();
 
           if(packageEntries.length == 0) {
-            // TODO:  Error alert.
+            alert('Could not decompress the KMP; package loading failed.');
             return;
           } else {
             const metadataFile = packageEntries.find((entry) => entry.filename == 'kmp.json');
+            if(!metadataFile) {
+              alert('Could not extract kmp.json; aborting');
+            }
             const rawMetadata = await metadataFile.getData(new zip.TextWriter());
 
             // Full kmp.json load!
@@ -74,12 +77,16 @@
                   type = type + '/' + ext;
                 }
                 const rawEntry = packageEntries.find((entry) => entry.filename == filename);
+                if(!rawEntry) {
+                  alert(`Could not extract ${filename} from the keyboard package.`);
+                  return null;
+                }
                 return await rawEntry.getData(new zip.Data64URIWriter(type));
               }
 
               const kbdData = await dataFor(keyboardFile, 'text/javascript');
-              const dFontData = displayFont ? await dataFor(displayFont, 'font') : undefined;
-              const oFontData = oskFont ? await dataFor(oskFont, 'font') : undefined;
+              const dFontData = displayFont ? await dataFor(displayFont, 'font') : null;
+              const oFontData = oskFont ? await dataFor(oskFont, 'font') : null;
 
               keyboard.languages.forEach((language) => {
                 if(dFontData) {
