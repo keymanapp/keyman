@@ -647,7 +647,7 @@ int test_strutils() {
     std::cout << __FILE__ << ":" << __LINE__ << "   - bad1" << std::endl;
     const std::u32string src = U"6\U0000ffffq"; // missing sentinel subtype
     const std::u32string dst = remove_markers(src, map);
-    const std::u32string expect = U"6"; // 'q' removed
+    const std::u32string expect = src; // 'q' removed
     zassert_string_equal(dst, expect);
     assert_equal(map.size(), 0);
   }
@@ -656,7 +656,7 @@ int test_strutils() {
     std::cout << __FILE__ << ":" << __LINE__ << "   - bad1b" << std::endl;
     const std::u32string src = U"6\U0000ffff"; // missing code
     const std::u32string dst = remove_markers(src, map);
-    const std::u32string expect = U"6";
+    const std::u32string expect = src;
     zassert_string_equal(dst, expect);
     assert_equal(map.size(), 0);
   }
@@ -665,7 +665,7 @@ int test_strutils() {
     std::cout << __FILE__ << ":" << __LINE__ << "   - bad1c" << std::endl;
     const std::u32string src = U"6\U0000ffffzz"; // missing code
     const std::u32string dst = remove_markers(src, map);
-    const std::u32string expect = U"6z";
+    const std::u32string expect = src;
     zassert_string_equal(dst, expect);
     assert_equal(map.size(), 0);
   }

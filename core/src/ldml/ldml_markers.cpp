@@ -295,10 +295,6 @@ std::u32string remove_markers(const std::u32string &str, marker_map *markers, ma
     if (rest.length() <= lookfor_str.length()) {
       // not enough left so it can't match, so continue
       i = str.end(); // end of string
-      if (encoding == plain_sentinel) {
-        // in plain mode, delete any irregular sequences
-        last = i;
-      }
       continue;
     }
 
@@ -308,10 +304,6 @@ std::u32string remove_markers(const std::u32string &str, marker_map *markers, ma
 
     if (rest != lookfor_str) {
       // no match - could be backslash something else
-      if (encoding == plain_sentinel) {
-        // in plain mode, delete any irregular sequences
-        last = i;
-      }
       continue;
     }
 
