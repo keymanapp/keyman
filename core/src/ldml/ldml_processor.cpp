@@ -151,24 +151,20 @@ bool ldml_processor::is_kmxplus_file(path const & kb_path, std::vector<uint8_t>&
 
 km_core_status
 ldml_processor::process_queued_actions(
-  km_core_state *state
+  km_core_state *_kmn_unused(state)
 ) {
-  assert(state);
-  if (!state)
-    return KM_CORE_STATUS_INVALID_ARGUMENT;
-  // TODO Implement
-  return KM_CORE_STATUS_OK;
+  /* Not implemented. Only used by IMX. */
+  assert(false);
+  return KM_CORE_STATUS_NOT_IMPLEMENTED;
 }
 
 bool ldml_processor::queue_action(
-  km_core_state * state,
-  km_core_action_item const* action_item
+  km_core_state * _kmn_unused(state),
+  km_core_action_item const* _kmn_unused(action_item)
 )
 {
-  assert(state);
-  assert(action_item);
-  if ((!state) || (!action_item))
-    return false;
+  /* Not implemented. Only used by IMX. */
+  assert(false);
   return false;
 }
 
