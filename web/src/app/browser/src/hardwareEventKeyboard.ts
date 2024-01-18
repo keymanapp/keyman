@@ -208,7 +208,13 @@ export function preprocessKeyboardEvent(e: KeyboardEvent, keyboardState: Keyboar
     }
     /* 13/03/2007 MCD: Swedish: End mapping of keystroke to US keyboard */
 
-    if(!activeKeyboard.definesPositionalOrMnemonic && !(s.Lmodifiers & 0x60)) {
+    // The second conditional component (re 0x60):  if CTRL or ALT is held down...
+    // Do not remap for legacy keyboard compatibility, do not pass Go, do not collect $200.
+    // This effectively only permits `default` and `shift` for legacy keyboards.
+    //
+    // Third:  DO, however, track direct presses of any main modifier key.  The OSK should
+    // reflect the current modifier state even for legacy keyboards.
+    if(!activeKeyboard.definesPositionalOrMnemonic && !(s.Lmodifiers & 0x60) && !s.isModifier) {
       // Support version 1.0 KeymanWeb keyboards that do not define positional vs mnemonic
       s = new KeyEvent({
         Lcode: KeyMapping._USKeyCodeToCharCode(s),
