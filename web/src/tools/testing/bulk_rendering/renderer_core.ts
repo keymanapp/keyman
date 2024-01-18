@@ -120,7 +120,11 @@ export class BatchRenderer {
       } else {
         // They instead specify only the post-KMW-10 touch-layout format.
         const layout = keyboard.layout(formFactor);
-        eleDescription.appendChild(document.createTextNode('Font:  ' + layout.font));
+        if(!layout) {
+          eleDescription.appendChild(document.createTextNode('Keyboard is help-text based'));
+        } else {
+          eleDescription.appendChild(document.createTextNode('Font:  ' + layout.font));
+        }
       }
 
     } else {
@@ -164,15 +168,17 @@ export class BatchRenderer {
 
       // Uses 'private' APIs that may be subject to change in the future.  Keep it updated!
       var layers;
-      if(isMobile) {
-        layers = keyman.osk.vkbd.layerGroup.layers;
-      } else {
+      if(!isMobile) {
         // The desktop OSK will be overpopulated, with a number of blank layers to display in most cases.
         // We instead rely upon the KLS definition to ensure we keep the renders sparse.
         //
         // _legacyLayoutSpec is technically private, but it's what we've been using, so... yeah.
-        layers = keyman.core.activeKeyboard['_legacyLayoutSpec'].KLS;
+        layers = keyman.core.activeKeyboard['_legacyLayoutSpec']?.KLS;
       }
+
+      // If mobile, or if the desktop definition lacks a `_legacyLayoutSpec` entry.
+      // Note:  vkbd will be null for keyboards with desktop help-text, such as sil_euro_latin.
+      layers = layers || keyman.osk.vkbd?.layerGroup.layers;
 
       let renderLayer = function(i: number) {
         return new Promise(function(resolve) {
@@ -180,7 +186,10 @@ export class BatchRenderer {
           if(keyman.osk.vkbd) {
             keyman.core.keyboardProcessor.layerId = Object.keys(layers)[i];
           } else {
-            console.error("Error - keyman.osk.vkbd is undefined!");
+            // Again, occurs for keyboards with desktop help-text.
+            console.error(`Error - keyman.osk.vkbd is undefined for ${kbd.InternalName}!`);
+            // Will otherwise crash the renderer later.
+            return;
           }
           // Make sure the active element's still set!
           renderer.setActiveDummy();
@@ -206,7 +215,7 @@ export class BatchRenderer {
       };
 
       // The resulting Promise will only call it's `.then()` once all of this keyboard's renders have been completed.
-      return renderer.arrayPromiseIteration(renderLayer, Object.keys(layers).length);
+      return renderer.arrayPromiseIteration(renderLayer, layers ? Object.keys(layers).length : 0);
     }).catch(function(err) {
       console.error("Failed to load the \"" + kbd.InternalName + "\" keyboard for rendering:");
       console.error(err);
