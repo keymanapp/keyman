@@ -1,5 +1,11 @@
 # Keyman Version History
 
+## 17.0.247 alpha 2024-01-18
+
+* fix(ios): banner image management (#10337)
+* feat(core): unescape u (#10356)
+* chore(developer,core): change sample and test files to use \u{…} (#10391)
+
 ## 17.0.246 alpha 2024-01-17
 
 * fix(web): Add null check for changing the keyboard during typing (#10346)
