@@ -32,14 +32,14 @@ extern "C"
 typedef struct km_core_context     km_core_context;
 
 // ----------------------------------------------------------------------------------
-// Context APIs are now available only to the keyboard debugger and Core unit
+// Context APIs are now available only to the keyboard debugger, IMX, and Core unit
 // tests (17.0)
 // ----------------------------------------------------------------------------------
 
 /*
 ### Context
-The context is the text prior to the insertion point (caret, cursor).
-The context is constructed by the Platform layer, typically by interrogating the
+The context is the text prior to the insertion point (caret, cursor). The
+context is constructed by the Platform layer, typically by interrogating the
 Client Application.  The context will be updated by the engine for keystroke
 events.  If the Platform layer code caches the context, the context should be
 reset when a context state change is detected. Context state changes can occur
@@ -54,6 +54,14 @@ state change is detected. Markers are always controlled by the Engine.
 
 Contexts are always owned by their state.  They may be set to a list of
 context_items or interrogated for their current list of context items.
+
+Core maintains and caches the context. Engine can update the context with
+`km_core_state_context_set_if_needed` and `km_core_state_context_clear`. These
+two functions are available in keyman_core_api.h.
+
+The Keyboard Debugger in Keyman Developer, and IMX in Keyman for Windows, make
+use of the context functionality in this header, but these functions should not
+be used in other places.
 ```c
 */
 enum km_core_context_type {
