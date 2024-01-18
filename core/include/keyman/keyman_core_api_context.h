@@ -83,7 +83,8 @@ km_core_state_get_intermediate_context(km_core_state *state, km_core_context_ite
 ### `km_core_context_items_dispose`
 ##### Description:
 Free the allocated memory belonging to a `km_core_context_item` array previously
-returned by `km_core_context_items_from_utf16` or `context_get`
+returned by `km_core_state_get_intermediate_context` (internally, also
+`context_items_from_utf16` and `context_get`)
 ##### Parameters:
 - __context_items__: A pointer to the start of the `km_core_context_item` array
     to be disposed of.

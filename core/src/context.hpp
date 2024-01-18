@@ -181,9 +181,7 @@ context_items_to_utf32(km_core_context_item const *item,
  *         * `KM_CORE_STATUS_NO_MEM`: In the event not enough memory can be
  *           allocated for the output buffer.
  *
- * @param context_items A pointer to the start of an array
- *                      `km_core_context_item`.
- *
+ * @param context       A pointer to an opaque context object
  * @param out           A pointer to the result variable: A pointer to the start
  *                      of the `km_core_context_item` array containing a copy of
  *                      the context. Terminated with a type of `KM_CORE_CT_END`.
@@ -191,7 +189,7 @@ context_items_to_utf32(km_core_context_item const *item,
  *                      `km_core_context_items_dispose`.
  */
 km_core_status
-context_get(km_core_context const *context_items,
+context_get(km_core_context const *context,
                    km_core_context_item **out);
 
 /**
@@ -242,7 +240,6 @@ context_append(km_core_context *context,
  *                      to `num` items will be prepended. This may be null if
  *                      not required.
  */
-KMN_API
 km_core_status
 context_shrink(km_core_context *context,
                       size_t num,

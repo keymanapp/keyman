@@ -124,8 +124,8 @@ int main(int, char * [])
 
   // Test shrink and prepend, delete more than we provide to prepend.
   try_status(context_items_from_utf16(u"Bye, ", &ctxt1));
-  // We delete 7 characters plus 1 marker hence 8 and not 7 as expected if you
-  //  go by the test string above.
+  // We delete 7 characters (" World!") plus 1 marker hence 8 and not 7 as
+  //  expected if you go by the test string above.
   try_status(context_shrink(&mock_ctxt1, 8, ctxt1));
   ctxt_size=sizeof ctxt_buffer/sizeof(km_core_cp);
   try_status(context_get(&mock_ctxt1, &tmp_ctxt));
