@@ -6,7 +6,7 @@ uses
   UKeymanTargets;
 
 type
-  TKMConvertMode = (cmImportWindows, cmTemplate, cmLexicalModel);
+  TKMConvertMode = (cmImportWindows, cmTemplate, cmLexicalModel, cmLdmlKeyboard);
 
   TKMConvertParameters = record
   private
@@ -119,6 +119,8 @@ begin
     FMode := cmTemplate
   else if ModeString = 'lexical-model' then
     FMode := cmLexicalModel
+  else if ModeString = 'ldml-keyboard' then
+    FMode := cmLdmlKeyboard
   else
   begin
     FEmitUsage := True;
@@ -153,6 +155,9 @@ begin
   OutputText;
   OutputText('kmconvert template -id <keyboard_id> [additional-options]');
   OutputText('  Creates a basic keyboard project in the repository template format');
+  OutputText;
+  OutputText('kmconvert ldml-keyboard -id <keyboard_id> [additional-options]');
+  OutputText('  Creates an LDML keyboard project in the repository template format');
   OutputText;
   OutputText('kmconvert lexical-model -id-author <id-author> -id-language <id-language> -id-uniq <id-uniq> [additional-options]');
   OutputText('  Creates a wordlist lexical model project in the repository template format');
