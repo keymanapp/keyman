@@ -8,7 +8,7 @@ import { ModelDefinitions } from "./model-definitions.js";
 import {decorateWithJoin} from "./join-word-breaker-decorator.js";
 import {decorateWithScriptOverrides} from "./script-overrides-decorator.js";
 import { LexicalModelSource, WordBreakerSpec, SimpleWordBreakerSpec } from "./lexical-model.js";
-import { ModelCompilerError, ModelCompilerMessageContext, ModelCompilerMessages } from "./model-compiler-errors.js";
+import { ModelCompilerError, ModelCompilerMessageContext, ModelCompilerMessages } from "./model-compiler-messages.js";
 import { callbacks, setCompilerCallbacks } from "./compiler-callbacks.js";
 import { CompilerCallbacks, CompilerOptions, KeymanCompiler, KeymanCompilerArtifact, KeymanCompilerArtifacts, KeymanCompilerResult } from "@keymanapp/common-types";
 

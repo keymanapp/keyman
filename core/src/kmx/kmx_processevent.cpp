@@ -11,7 +11,7 @@ using namespace kmx;
 
 /* Globals */
 
-KMX_BOOL km::core::kmx::g_debug_ToConsole = TRUE;
+KMX_BOOL km::core::kmx::g_debug_ToConsole = FALSE;
 KMX_BOOL km::core::kmx::g_debug_KeymanLog = TRUE;
 KMX_BOOL km::core::kmx::g_silent = FALSE;
 

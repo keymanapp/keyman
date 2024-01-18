@@ -19,7 +19,8 @@ namespace core {
 namespace ldml {
 
 
-const std::u32string REGEX_PREFIX       = U"\\uffff\\u0008";  // does not include '\\' because it might be a range
+// the 'prefix part' of a regex marker sequence, followed by RAW_PREFIX or REGEX_ANY_MATCH
+const std::u32string REGEX_PREFIX       = U"\\uffff\\u0008";
 const std::u32string RAW_PREFIX         = U"\uffff\u0008";
 const std::u32string REGEX_ANY_MATCH    = U"[\\u0001-\\ud7fe]";
 
@@ -288,16 +289,12 @@ std::u32string remove_markers(const std::u32string &str, marker_map *markers, ma
     }
     out.append(last, i);
     assert(*i == lookfor); // assert that find() worked
-    last = i; // keep track of the last segment appendd.
+    last = i; // keep track of the last segment appended.
 
     std::u32string rest(i, str.end());
     if (rest.length() <= lookfor_str.length()) {
       // not enough left so it can't match, so continue
       i = str.end(); // end of string
-      if (encoding == plain_sentinel) {
-        // in plain mode, delete any irregular sequences
-        last = i;
-      }
       continue;
     }
 
@@ -307,15 +304,10 @@ std::u32string remove_markers(const std::u32string &str, marker_map *markers, ma
 
     if (rest != lookfor_str) {
       // no match - could be backslash something else
-      if (encoding == plain_sentinel) {
-        // in plain mode, delete any irregular sequences
-        last = i;
-      }
       continue;
     }
 
-    // matches. Skip over the prefix
-    last = i;
+    assert(i != str.end()); // caught above
 
     KMX_DWORD marker_no;
     if (encoding == plain_sentinel) {

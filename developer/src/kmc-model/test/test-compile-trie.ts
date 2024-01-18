@@ -4,7 +4,7 @@ import 'mocha';
 
 import {makePathToFixture, compileModelSourceCode} from './helpers/index.js';
 import { createTrieDataStructure } from '../src/build-trie.js';
-import { ModelCompilerError } from '../src/model-compiler-errors.js';
+import { ModelCompilerError } from '../src/model-compiler-messages.js';
 import { TestCompilerCallbacks } from '@keymanapp/developer-test-helpers';
 
 describe('LexicalModelCompiler', function () {
