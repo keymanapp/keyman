@@ -619,11 +619,11 @@ bool KMX_ImportRules(LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, GdkKeymap **keymap,
             // Alt and Shift+Alt don't work, so skip them
             continue;
           }
-
+/*
           //_S2 to compare win-lin kmn-files skip ss6+7; MUST BE restored/removed later!!!!
           if(ss == MenuCtrl|| ss == ShftMenuCtrl) {
             continue;
-          }
+          }*/
 
           KMX_DWORD SC_US = KMX_get_KeyCodeUnderlying_From_VKUS(iKey);
 

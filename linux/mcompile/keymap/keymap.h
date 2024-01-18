@@ -502,19 +502,23 @@ const UINT ScanCodeToUSVirtualKey[128] = {
 };
 
 bool IsKeymanUsedKeyVal(std::wstring Keyval);
+bool IsKeymanUsedKeyVal(std::u16string Keyval);
 
 // take deadkey-value (e.g.65106) and return wstring (e.g. '^' )
 std::wstring convert_DeadkeyValues_ToChar(int in);
 // take deadkey-value (e.g.65106) and return u16string (e.g. '^' )
-std::u16string convert_DeadkeyValues_ToChar_16(int in);
+std::u16string convert_DeadkeyValues_To_U16str(int in);
 
 // find Keyvals to fill into 2D-Vector of Other Language
 KMX_DWORD KMX_get_KeyvalsUnderlying_From_KeyCodeUnderlying_GDK(GdkKeymap *keymap, guint keycode, int shift_state_pos);
+KMX_DWORD KMX_get_KeyvalsUnderlying_From_KeyCodeUnderlying_GDK(GdkKeymap *keymap, guint keycode, int shift_state_pos, PKMX_WCHAR &dky);
 
-// returns KeySyms fo ra given key (for unshifted: finds the Keysym according to Shiftstate e.g. a;A or 1;! )
+// returns KeySyms for a given key (for unshifted: finds the Keysym according to Shiftstate e.g. a;A or 1;! )
 std::wstring KMX_get_CharsUnderlying_according_to_keycode_and_Shiftstate_GDK(GdkKeymap *keymap, guint VK, ShiftState ss, int caps);
-// returns KeySyms fo ra given key (for unshifted: finds the Keysym according to Shiftstate e.g. a;A or 1;! )
+// returns KeySyms for a given key (for unshifted: finds the Keysym according to Shiftstate e.g. a;A or 1;! )
 std::u16string KMX_get_CharsUnderlying_according_to_keycode_and_Shiftstate_GDK_16(GdkKeymap *keymap, guint keycode, ShiftState ss, int caps);
+// returns KeySyms for a given key (for unshifted: finds the Keysym according to Shiftstate e.g. a;A or 1;! )
+KMX_DWORD KMX_get_CharsUnderlying_according_to_keycode_and_Shiftstate_GDK_dw(GdkKeymap *keymap, guint keycode, ShiftState ss, int caps);
 
 // return the VirtualKey of the Other Keyboard for given Scancode using GDK
 KMX_DWORD KMX_get_VKUS_From_KeyCodeUnderlying_GDK( GdkKeymap *keymap, KMX_DWORD scanCode);

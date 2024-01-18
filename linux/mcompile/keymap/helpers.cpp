@@ -299,6 +299,23 @@ bool CompareVector_To_VectorOfFile(v_dw_3D All_Vector,v_dw_3D File_Vector){
   return true;
 }
 
+/*// takes SC of Other keyboard and returns character of Other keyboard with shiftstate VKShiftState[j]
+KMX_WCHAR  KMX_get_CharUnderlying_From_SCUnderlying_GDK(GdkKeymap *keymap, KMX_UINT VKShiftState, UINT SC_OTHER, PKMX_WCHAR DeadKey) {
+  
+  PKMX_WCHAR dky;
+  int VKShiftState_lin = map_VKShiftState_to_Lin(VKShiftState);
+  KMX_DWORD KeyvalOther = KMX_get_KeyvalsUnderlying_From_KeyCodeUnderlying_GDK(keymap,SC_OTHER, VKShiftState_lin, dky);
+
+  if (KeyvalOther >= deadkey_min) {
+   /// std::string ws((const char*) gdk_keyval_name (KeyvalOther));
+   // *DeadKey = convertNamesToIntegerValue( wstring_from_string(ws));
+    
+*DeadKey=*dky;
+return 0xFFFF;
+  }
+  return (KMX_WCHAR) KeyvalOther;
+}*/
+
 bool CompareVector_To_VectorOfFile_RGKEY(v_dw_2D Win_Vector,v_dw_2D Lin_Vector, v_dw_2D Map_Vector){
   wprintf(L" #### CompareVector_To_VectorOfFile started: ");
   wprintf(L" #### dimensions:  %i  %i  -- %i  %i  \n", Win_Vector.size() ,Win_Vector[0].size(), Lin_Vector.size() ,Lin_Vector[0].size());
