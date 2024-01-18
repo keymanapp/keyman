@@ -15,7 +15,7 @@
 #include <iomanip>
 #include <codecvt>
 
-#include <keyman/keyman_core_api.h>
+#include "keyman_core.h"
 #include "jsonpp.hpp"
 
 #include "processor.hpp"

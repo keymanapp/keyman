@@ -29,6 +29,9 @@ python = py.find_installation()
 # For now, we use KM_CORE_LIBRARY to inject the km::core::kmx namespace
 defns += ['-DKM_CORE_LIBRARY']
 
+# See keyman_core_api_context.h
+defns += ['-D_KM_CORE_ACCESS_PRIVATE_CONTEXT_API']
+
 # #define DEBUG when we are on a debug build
 if get_option('buildtype') == 'debug'
   add_global_arguments('-DDEBUG', language : 'cpp')

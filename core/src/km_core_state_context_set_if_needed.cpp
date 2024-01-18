@@ -9,7 +9,7 @@
 */
 #include <cassert>
 
-#include <keyman/keyman_core_api.h>
+#include "keyman_core.h"
 
 #include "processor.hpp"
 #include "state.hpp"

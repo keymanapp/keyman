@@ -10,7 +10,8 @@
 #include <algorithm>
 #include <sstream>
 
-#include <keyman/keyman_core_api.h>
+#include "keyman_core.h"
+
 #include "jsonpp.hpp"
 
 #include "processor.hpp"

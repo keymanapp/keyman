@@ -10,7 +10,9 @@
 #include <algorithm>
 #include <iterator>
 #include <string>
-#include <keyman/keyman_core_api.h>
+
+#include "keyman_core.h"
+
 #include "path.hpp"
 #include "state.hpp"
 #include "kmx/kmx_base.h"
