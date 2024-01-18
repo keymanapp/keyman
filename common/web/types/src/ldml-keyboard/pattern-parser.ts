@@ -136,7 +136,33 @@ export class MarkerParser {
       }
     });
   }
+
+  /**
+   * NFD a string, respecting markers.
+   * @param s input string
+   * @param forMatch true if regex, false if individual
+   * @returns the normalized string
+   */
+  public static nfd_markers(s: string, forMatch?: boolean) : string {
+    const m : MarkerMap = [];
+    return MarkerParser.nfd_markers_segment(s, m, forMatch);
+  }
+
+  static nfd_markers_segment(s: string, map: MarkerMap, forMatch?: boolean) : string {
+    return s.normalize("NFD");
+  }
+
+  static remove_markers(s: string, map: MarkerMap, forMatch?: boolean) : string {
+    return s;
+  }
 }
+
+interface MarkerEntry {
+  ch? : string;
+  marker? : number;
+};
+
+type MarkerMap = Array<MarkerEntry>;
 
 /**
  * Class for helping with markers

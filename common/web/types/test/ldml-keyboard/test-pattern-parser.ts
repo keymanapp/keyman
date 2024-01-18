@@ -305,3 +305,60 @@ describe('Test of Pattern Parsers', () => {
     });
   });
 });
+
+
+describe('Test of nfd_markers()', () => {
+  it('should normalize as expected', () => {
+    // this is a little bit simpler in structure than what's in test_transforms.cpp,
+    // see there for more complicated cases and discussion
+    const src_expect = [
+      // ["src", "expect", "regex"]
+      // or ["src"] if it is expected to be unchanged
+
+      // #1
+      ["abc"],
+      // ["6\uffff\u0008\u0001e", "6e"], (removal test)
+      ["6\uffff\u0008"],
+      ["6\uffffq"],
+      ["6\uffff"],
+      ["6\uffffzz"],
+      ["6\uffff\u0008\u0001"],
+      // ["6\uffff\u0008\u0001e\uffff\u0008\u0002\u0320\uffff\u0008\u0003\u0300\uffff\u0008\u0004",
+      //  "6e\u0320\u0300"], (removal)
+      ["6e\u0320\u0300"],
+      ["6e\u0300\u0320","6e\u0320\u0300"],
+      ["6\uffff\u0008\u0001e\uffff\u0008\u0002\u0320\uffff\u0008\u0003\u0300\uffff\u0008\u0004"],
+      ["6\uffff\u0008\u0001e\uffff\u0008\u0002\u0320\uffff\u0008\u0003\u0300\uffff\u0008\u0004"],
+      // out of order
+      ["6\uffff\u0008\u0001e\uffff\u0008\u0002\u0300\uffff\u0008\u0003\u0320\uffff\u0008\u0004",
+       "6\uffff\u0008\u0001e\uffff\u0008\u0003\u0320\uffff\u0008\u0002\u0300\uffff\u0008\u0004"],
+      ["4e\u0300\uFFFF\u0008\u0001\u0320",
+       "4e\uFFFF\u0008\u0001\u0320\u0300"],
+      ["9ce\u0300\uFFFF\u0008\u0002\u0320\uFFFF\u0008\u0001",
+       "9ce\uFFFF\u0008\u0002\u0320\u0300\uFFFF\u0008\u0001"],
+      ["9ce\u0300\\uffff\\u0008\\u0002\u0320\\uffff\\u0008\\u0001",
+       "9ce\\uffff\\u0008\\u0002\u0320\u0300\\uffff\\u0008\\u0001",             "REGEX"],
+      ["9ce\u0300\\uffff\\u0008[\\u0001-\\ud7fe]\u0320\\uffff\\u0008\\u0001",
+       "9ce\\uffff\\u0008[\\u0001-\\ud7fe]\u0320\u0300\\uffff\\u0008\\u0001",   "REGEX"],
+      ["9ce\u0300\uFFFF\u0008\u0002\uFFFF\u0008\u0002\u0320",
+      "9ce\uFFFF\u0008\u0002\uFFFF\u0008\u0002\u0320\u0300"],
+      ["9ce\u0300\uFFFF\u0008\u0002\uFFFF\u0008\u0001\uFFFF\u0008\u0003\u0320",
+      "9ce\uFFFF\u0008\u0002\uFFFF\u0008\u0001\uFFFF\u0008\u0003\u0320\u0300"],
+      ["e\uFFFF\u0008\u0001\u0300\uFFFF\u0008\u0002\u0320E\uFFFF\u0008\u0003\u0300\uFFFF\u0008\u0004\u0320",
+       "e\uFFFF\u0008\u0002\u0320\uFFFF\u0008\u0001\u0300E\uFFFF\u0008\u0004\u0320\uFFFF\u0008\u0003\u0300"],
+    ];
+
+    for (let i = 0; i < src_expect.length; i++) {
+      const r = src_expect[i];
+      const src = r[0];
+      const exp = r[1] || src;
+      let forMatch = false;
+      if (r.length > 2) {
+        // regex
+        forMatch = true;
+      }
+      const dst = MarkerParser.nfd_markers(src, forMatch);
+      assert.equal(dst, exp, `#${i+1} normalizing '${src}' forMatch=${forMatch}`);
+    }
+  });
+});

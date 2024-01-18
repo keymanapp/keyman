@@ -24,6 +24,7 @@ const std::u32string REGEX_PREFIX       = U"\\uffff\\u0008";
 const std::u32string RAW_PREFIX         = U"\uffff\u0008";
 const std::u32string REGEX_ANY_MATCH    = U"[\\u0001-\\ud7fe]";
 const KMX_DWORD LDML_MARKER_NO_INDEX    = 0; // TODO: move to .ts
+static_assert(LDML_MARKER_NO_INDEX < LDML_MARKER_MIN);
 
 // string manipulation
 
