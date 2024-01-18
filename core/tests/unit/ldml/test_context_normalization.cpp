@@ -63,13 +63,13 @@ bool is_identical_context(km_core_cp const *cached_context, km_core_debug_contex
   debug_context(context_type);
 
   if(context_type == KM_CORE_DEBUG_CONTEXT_APP) {
-    try_status(km_core_context_get(km_core_state_app_context(test_state), &citems));
+    try_status(context_get(km_core_state_app_context(test_state), &citems));
   } else {
-    try_status(km_core_context_get(km_core_state_context(test_state), &citems));
+    try_status(context_get(km_core_state_context(test_state), &citems));
   }
-  try_status(km_core_context_items_to_utf16(citems, nullptr, &buf_size));
+  try_status(context_items_to_utf16(citems, nullptr, &buf_size));
   km_core_cp* new_cached_context = new km_core_cp[buf_size];
-  try_status(km_core_context_items_to_utf16(citems, new_cached_context, &buf_size));
+  try_status(context_items_to_utf16(citems, new_cached_context, &buf_size));
 
   km_core_context_items_dispose(citems);
 

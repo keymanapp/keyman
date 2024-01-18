@@ -59,7 +59,7 @@ void setup(const char *keyboard, const km_core_cp* context) {
   km::core::path path = km::core::path::join(arg_path, keyboard);
   try_status(km_core_keyboard_load(path.native().c_str(), &test_kb));
   try_status(km_core_state_create(test_kb, test_env_opts, &test_state));
-  try_status(km_core_context_items_from_utf16(context, &citems));
+  try_status(context_items_from_utf16(context, &citems));
   try_status(km_core_context_set(km_core_state_context(test_state), citems));
   try_status(km_core_context_set(km_core_state_app_context(test_state), citems));
 }

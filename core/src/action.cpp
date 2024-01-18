@@ -115,13 +115,13 @@ km_core_actions * km::core::action_item_list_to_actions_object(
 
   size_t buf_size;
 
-  if((status = km_core_context_items_to_utf32(output.data(), nullptr, &buf_size)) != KM_CORE_STATUS_OK) {
+  if((status = context_items_to_utf32(output.data(), nullptr, &buf_size)) != KM_CORE_STATUS_OK) {
     return nullptr;
   }
 
   std::unique_ptr<km_core_usv[]> output_usv(new km_core_usv[buf_size]);
 
-  if((status = km_core_context_items_to_utf32(output.data(), output_usv.get(), &buf_size)) != KM_CORE_STATUS_OK) {
+  if((status = context_items_to_utf32(output.data(), output_usv.get(), &buf_size)) != KM_CORE_STATUS_OK) {
     return nullptr;
   }
 

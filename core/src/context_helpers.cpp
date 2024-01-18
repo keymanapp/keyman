@@ -24,18 +24,18 @@ km_core_cp* km::core::get_context_as_string(km_core_context *context) {
   size_t buf_size = 0;
   km_core_context_item* context_items = nullptr;
 
-  if(km_core_context_get(context, &context_items) != KM_CORE_STATUS_OK) {
+  if(context_get(context, &context_items) != KM_CORE_STATUS_OK) {
     return nullptr;
   }
 
-  if(km_core_context_items_to_utf16(context_items, nullptr, &buf_size) != KM_CORE_STATUS_OK) {
+  if(context_items_to_utf16(context_items, nullptr, &buf_size) != KM_CORE_STATUS_OK) {
     km_core_context_items_dispose(context_items);
     return nullptr;
   }
 
   km_core_cp *app_context_string = new km_core_cp[buf_size];
 
-  km_core_status status = km_core_context_items_to_utf16(context_items, app_context_string, &buf_size);
+  km_core_status status = context_items_to_utf16(context_items, app_context_string, &buf_size);
   km_core_context_items_dispose(context_items);
 
   if(status != KM_CORE_STATUS_OK) {
@@ -57,7 +57,7 @@ km_core_status km::core::set_context_from_string(km_core_context *context, km_co
 
   km_core_context_item* new_context_items = nullptr;
 
-  km_core_status status = km_core_context_items_from_utf16(new_context, &new_context_items);
+  km_core_status status = context_items_from_utf16(new_context, &new_context_items);
   if (status != KM_CORE_STATUS_OK) {
     return status;
   }

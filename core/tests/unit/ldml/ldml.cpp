@@ -156,7 +156,7 @@ apply_action(
       // the context from the context string.
       km_core_context_item* new_context_items = nullptr;
       // We replace the cached context with the current application context
-      km_core_status status = km_core_context_items_from_utf16(text_store.c_str(), &new_context_items);
+      km_core_status status = context_items_from_utf16(text_store.c_str(), &new_context_items);
       assert(status == KM_CORE_STATUS_OK);
       copy_context_items_to_vector(new_context_items, context);
       // also update the test context
@@ -188,10 +188,10 @@ verify_context(std::u16string& text_store, km_core_state* &test_state, std::vect
       // Compare context and text store at each step - should be identical
     size_t n = 0;
     km_core_context_item* citems = nullptr;
-    try_status(km_core_context_get(km_core_state_context(test_state), &citems));
-    try_status(km_core_context_items_to_utf16(citems, nullptr, &n));
+    try_status(context_get(km_core_state_context(test_state), &citems));
+    try_status(context_items_to_utf16(citems, nullptr, &n));
     km_core_cp *buf = new km_core_cp[n];
-    try_status(km_core_context_items_to_utf16(citems, buf, &n));
+    try_status(context_items_to_utf16(citems, buf, &n));
     std::cout << "context   : " << string_to_hex(buf) << " [" << buf << "]" << std::endl;
     std::cout << "testcontext ";
     std::cout.fill('0');
@@ -247,7 +247,7 @@ run_test(const km::core::path &source, const km::core::path &compiled, km::tests
 
   km_core_context_item *citems = nullptr;
   // setup test_context
-  try_status(km_core_context_items_from_utf16(test_source.get_context().c_str(), &citems));
+  try_status(context_items_from_utf16(test_source.get_context().c_str(), &citems));
   try_status(km_core_context_set(km_core_state_context(test_state), citems));
 
   // Make a copy of the setup context for the test
@@ -301,8 +301,8 @@ run_test(const km::core::path &source, const km::core::path &compiled, km::tests
       text_store.append(action.string);  // TODO-LDML: not going through keyboard
       // Now, update context?
       km_core_context_item *nitems = nullptr;
-      try_status(km_core_context_items_from_utf16(action.string.c_str(), &nitems));
-      try_status(km_core_context_append(km_core_state_context(test_state), nitems));
+      try_status(context_items_from_utf16(action.string.c_str(), &nitems));
+      try_status(context_append(km_core_state_context(test_state), nitems));
       // update the test_context also.
       for (km_core_context_item *ci = nitems; ci->type != KM_CORE_CT_END; ci++) {
         test_context.emplace_back(*ci);

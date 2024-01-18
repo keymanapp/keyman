@@ -203,8 +203,8 @@ bool km::core::actions_normalize(
   app_context_string.append(output_nfc);
   km_core_context_item *app_context_items = nullptr;
   km_core_status status = KM_CORE_STATUS_OK;
-  if((status = km_core_context_items_from_utf16(app_context_string.getTerminatedBuffer(), &app_context_items)) != KM_CORE_STATUS_OK) {
-    DebugLog("km_core_context_items_from_utf16 failed with %x", status);
+  if((status = context_items_from_utf16(app_context_string.getTerminatedBuffer(), &app_context_items)) != KM_CORE_STATUS_OK) {
+    DebugLog("context_items_from_utf16 failed with %x", status);
     delete [] new_output;
     return false;
   }
@@ -236,19 +236,19 @@ icu::UnicodeString context_items_to_unicode_string(km_core_context const *contex
 
   km_core_context_item *items = nullptr;
   km_core_status status;
-  if((status = km_core_context_get(context, &items)) != KM_CORE_STATUS_OK) {
+  if((status = context_get(context, &items)) != KM_CORE_STATUS_OK) {
     DebugLog("Failed to retrieve context with %s", status);
     return nullString;
   }
   size_t buf_size = 0;
-  if((status = km_core_context_items_to_utf32(items, nullptr, &buf_size)) != KM_CORE_STATUS_OK) {
+  if((status = context_items_to_utf32(items, nullptr, &buf_size)) != KM_CORE_STATUS_OK) {
     DebugLog("Failed to retrieve context size with %s", status);
     km_core_context_items_dispose(items);
     return nullString;
   }
 
   km_core_usv *buf = new km_core_usv[buf_size];
-  if((status = km_core_context_items_to_utf32(items, buf, &buf_size)) != KM_CORE_STATUS_OK) {
+  if((status = context_items_to_utf32(items, buf, &buf_size)) != KM_CORE_STATUS_OK) {
     DebugLog("Failed to retrieve context with %s", status);
     km_core_context_items_dispose(items);
     delete [] buf;
@@ -303,8 +303,8 @@ bool km::core::actions_update_app_context(
   km_core_status status = KM_CORE_STATUS_OK;
   km_core_context_item *items = nullptr;
 
-  if((status = km_core_context_get(cached_context, &items)) != KM_CORE_STATUS_OK) {
-    DebugLog("km_core_context_get failed with %d", status);
+  if((status = context_get(cached_context, &items)) != KM_CORE_STATUS_OK) {
+    DebugLog("context_get failed with %d", status);
     return false;
   }
 

@@ -310,11 +310,11 @@ km_core_cp * km_core_state_context_debug(
       return _new_error_string(u"<error retrieving intermediate context>");
     }
   } else if(context_type == KM_CORE_DEBUG_CONTEXT_CACHED) {
-    if(km_core_context_get(km_core_state_context(state), &context_items) != KM_CORE_STATUS_OK) {
+    if(context_get(km_core_state_context(state), &context_items) != KM_CORE_STATUS_OK) {
       return _new_error_string(u"<error retrieving cached context>");
     }
   } else if(context_type == KM_CORE_DEBUG_CONTEXT_APP) {
-    if(km_core_context_get(km_core_state_app_context(state), &context_items) != KM_CORE_STATUS_OK) {
+    if(context_get(km_core_state_app_context(state), &context_items) != KM_CORE_STATUS_OK) {
       return _new_error_string(u"<error retrieving app context>");
     }
   } else {
@@ -322,13 +322,13 @@ km_core_cp * km_core_state_context_debug(
   }
 
   size_t buf_size;
-  if(km_core_context_items_to_utf8(context_items, nullptr, &buf_size) != KM_CORE_STATUS_OK) {
+  if(context_items_to_utf8(context_items, nullptr, &buf_size) != KM_CORE_STATUS_OK) {
     km_core_context_items_dispose(context_items);
     return _new_error_string(u"<could not retrieve context buffer size>");
   }
 
   std::vector<char> context_buffer(buf_size);
-  if(km_core_context_items_to_utf8(context_items, &context_buffer[0], &buf_size) != KM_CORE_STATUS_OK) {
+  if(context_items_to_utf8(context_items, &context_buffer[0], &buf_size) != KM_CORE_STATUS_OK) {
     km_core_context_items_dispose(context_items);
     return _new_error_string(u"<could not retrieve context buffer>");
   }
