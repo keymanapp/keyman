@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import os.log
 
 extension Queries {
   // Kept internal; the query is 'publicly exposed' through KeymanPackage and ResourceFileManager.
@@ -116,7 +117,9 @@ extension Queries {
       }
 
       urlComponents.queryItems = queryItems + [URLQueryItem(name: "platform", value: "ios")]
-      SentryManager.breadcrumbAndLog("Querying package versions through API endpoint: \(urlComponents.url!)")
+      let message = "Querying package versions through API endpoint: \(urlComponents.url!)"
+      os_log("%{public}s", log:KeymanEngineLogger.resources, type: .info, message)
+      SentryManager.breadcrumb(message)
 
       // Step 2:  configure the completion closure.
       let completionClosure = Queries.jsonDataTaskCompletionAdapter(resultType: Result.self, completionBlock: fetchCompletion)

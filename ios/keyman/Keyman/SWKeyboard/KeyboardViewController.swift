@@ -9,6 +9,7 @@
 import KeymanEngine
 import UIKit
 import Sentry
+import os.log
 
 class KeyboardViewController: InputViewController {
   var topBarImageSource: ImageBannerViewController!
@@ -69,7 +70,9 @@ class KeyboardViewController: InputViewController {
 
     let imgPath = getTopBarImage(size: size)
     guard let path = imgPath else {
-      SentryManager.captureAndLog("No image specified for the image banner!")
+      let message = "No image specified for the image banner!"
+      os_log("%{public}s", log: KeymanLogger.ui, type: .info, message)
+      SentryManager.capture(message)
       return
     }
 

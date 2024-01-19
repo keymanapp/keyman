@@ -8,6 +8,7 @@
 //
 import QuartzCore
 import UIKit
+import os.log
 
 private let activityViewTag = -2
 private let toolbarButtonTag = 100
@@ -88,7 +89,7 @@ public class InstalledLanguagesViewController: UITableViewController, UIAlertVie
       navigationItem.rightBarButtonItem = addButton
     }
     
-    log.info("viewDidLoad: InstalledLanguagesViewController (registered for keyboardDownloadStarted)")
+    os_log("viewDidLoad: InstalledLanguagesViewController (registered for keyboardDownloadStarted)", log:KeymanEngineLogger.resources, type: .info)
   }
   
   override public func viewWillAppear(_ animated: Bool) {
@@ -104,8 +105,8 @@ public class InstalledLanguagesViewController: UITableViewController, UIAlertVie
     if numberOfSections(in: tableView) == 0 {
       showActivityView()
     }
-    log.info("didAppear: InstalledLanguagesViewController")
-    
+    os_log("didAppear: InstalledLanguagesViewController", log:KeymanEngineLogger.ui, type: .info)
+
     // Are there updates worth doing?
     if isDidUpdateCheck {
       // Nope; don't make an 'update' button.
@@ -171,11 +172,14 @@ public class InstalledLanguagesViewController: UITableViewController, UIAlertVie
     for lm in userLexicalModels {
       let l = lm.languageID
       if let langName = keyboardLanguages[l]?.name {
-        log.info("keyboard language \(l) \(langName) has lexical model")
+        let message = "keyboard language \(l) \(langName) has lexical model"
+        os_log("%{public}s", log:KeymanEngineLogger.resources, type: .info, message)
       } else {
         // Legacy behavior:  we automatically install all MTNT language codes, even without
         // a matching keyboard for the more specific variant(s).
-        SentryManager.breadcrumbAndLog("lexical model language \(l) has no keyboard installed!")
+        let message = "lexical model language \(l) has no keyboard installed!"
+        os_log("%{public}s", log:KeymanEngineLogger.resources, type: .info, message)
+        SentryManager.breadcrumb(message)
       }
     }
 
@@ -279,7 +283,8 @@ public class InstalledLanguagesViewController: UITableViewController, UIAlertVie
   }
 
   private func packageDownloadStarted(key: KeymanPackage.Key) {
-    log.info("download started for \(key.type.rawValue): InstalledLanguagesViewController")
+    let message = "download started for \(key.type.rawValue): InstalledLanguagesViewController"
+    os_log("%{public}s", log:KeymanEngineLogger.resources, type: .info, message)
     view.isUserInteractionEnabled = false
     navigationItem.setHidesBackButton(true, animated: true)
 
@@ -299,7 +304,7 @@ public class InstalledLanguagesViewController: UITableViewController, UIAlertVie
   }
 
   private func packageDownloadCompleted(package: KeymanPackage) {
-    log.info("lexicalModelDownloadCompleted: InstalledLanguagesViewController")
+    os_log("lexicalModelDownloadCompleted: InstalledLanguagesViewController", log:KeymanEngineLogger.resources, type: .info)
 
     DispatchQueue.main.async {
       var msg: String
@@ -331,7 +336,7 @@ public class InstalledLanguagesViewController: UITableViewController, UIAlertVie
       return
     }
 
-    log.info("keyboardDownloadFailed: InstalledLanguagesViewController")
+    os_log("keyboardDownloadFailed: InstalledLanguagesViewController", log:KeymanEngineLogger.resources, type: .info)
 
     DispatchQueue.main.async {
       var msg: String
@@ -353,7 +358,7 @@ public class InstalledLanguagesViewController: UITableViewController, UIAlertVie
   }
   
   private func batchUpdateStarted(_: [AnyLanguageResource]) {
-    log.info("batchUpdateStarted: InstalledLanguagesViewController")
+    os_log("batchUpdateStarted: InstalledLanguagesViewController", log:KeymanEngineLogger.resources, type: .info)
     view.isUserInteractionEnabled = false
     navigationItem.setHidesBackButton(true, animated: true)
     
@@ -447,7 +452,8 @@ extension InstalledLanguagesViewController {
         case .error(let error):
           // Note: Errors may result from network issues.
           if let error = error {
-            log.error(String(describing: error))
+            let errorMessage = "\(String(describing: error))"
+            os_log("%{public}s", log:KeymanEngineLogger.resources, type: .error, errorMessage)
           }
         case .success(let package, let fullID):
           ResourceFileManager.shared.doInstallPrompt(for: package as! KeyboardKeymanPackage,

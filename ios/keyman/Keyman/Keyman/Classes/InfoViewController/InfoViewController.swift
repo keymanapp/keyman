@@ -42,7 +42,9 @@ class InfoViewController: UIViewController, WKNavigationDelegate {
       try networkReachable = Reachability(hostname: "keyman.com")
       try networkReachable?.startNotifier()
     } catch {
-      SentryManager.captureAndLog(error, message: "error starting Reachability notifier: \(error)")
+      let message = "error starting Reachability notifier: \(error)"
+      os_log("%{public}s", log:KeymanLogger.ui, type: .error, message)
+      SentryManager.capture(error, message: message)
     }
   }
 
@@ -68,7 +70,7 @@ class InfoViewController: UIViewController, WKNavigationDelegate {
   func webView(_ webView: WKWebView, didFailNavigation error: Error) {
     UIApplication.shared.isNetworkActivityIndicatorVisible = false
     updateButtons()
-    os_log("%s", log: KeymanLogger.ui, type: .error, error.localizedDescription)
+    os_log("%{public}s", log: KeymanLogger.ui, type: .error, error.localizedDescription)
   }
 
   @IBAction func back(_ sender: Any) {
@@ -101,6 +103,6 @@ class InfoViewController: UIViewController, WKNavigationDelegate {
     let appVersion = Version.current.majorMinor
     let url =  "\(KeymanHosts.HELP_KEYMAN_COM)/products/iphone-and-ipad/\(appVersion.plainString)/"
     webView.load(URLRequest(url: URL(string: url)!))
-    os_log("Info page URL: %s", log: KeymanLogger.ui, type: .debug, url)
+    os_log("Info page URL: %{public}s", log: KeymanLogger.ui, type: .debug, url)
   }
 }

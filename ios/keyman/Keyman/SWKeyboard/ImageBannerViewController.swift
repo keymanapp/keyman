@@ -50,7 +50,7 @@ class ImageBannerViewController: UIViewController {
 
     let frame = CGRect(origin: self.view.frame.origin, size: size)
 
-    os_log("Rendering banner image of size %s", log: KeymanLogger.ui, type: .info, NSCoder.string(for: size))
+    os_log("Rendering banner image of size %{public}s", log: KeymanLogger.ui, type: .info, NSCoder.string(for: size))
 
     self.view.frame = frame
     widthConstraint?.constant = size.width

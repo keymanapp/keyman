@@ -192,7 +192,7 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
     userData.set(self.textView?.text, forKey: userTextKey)
     userData.set(self.textSize.description, forKey: userTextSizeKey)
     userData.synchronize()
-    os_log("saving text size: %s", log: KeymanLogger.settings, type: .debug, textSize.description)
+    os_log("saving text size: %{public}s", log: KeymanLogger.settings, type: .debug, textSize.description)
   }
 
   private func calculateDefaultTextSize() -> CGFloat {
