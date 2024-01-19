@@ -22,8 +22,6 @@ using namespace km::core;
 
 bool should_normalize(km_core_state *state);
 bool is_context_valid(km_core_cp const * context, km_core_cp const * cached_context);
-km_core_cp* get_context_as_string(km_core_context *context);
-km_core_status set_context_from_string(km_core_context *context, km_core_cp const *new_context);
 bool do_normalize_nfd(km_core_cp const * src, std::u16string &dst);
 km_core_context_status do_fail(km_core_context *app_context, km_core_context *cached_context, const char* error);
 
@@ -129,51 +127,6 @@ bool is_context_valid(km_core_cp const * new_app_context, km_core_cp const * app
   // It's acceptable for the application context to be longer than the cached
   // context, so if we match the whole cached context, we can safely return true
   return true;
-}
-
-/**
- * Retrieves the context as a km_core_cp string, dropping markers
- */
-km_core_cp* get_context_as_string(km_core_context *context) {
-  size_t buf_size = 0;
-  km_core_context_item* context_items = nullptr;
-
-  if(km_core_context_get(context, &context_items) != KM_CORE_STATUS_OK) {
-    return nullptr;
-  }
-
-  if(km_core_context_items_to_utf16(context_items, nullptr, &buf_size) != KM_CORE_STATUS_OK) {
-    km_core_context_items_dispose(context_items);
-    return nullptr;
-  }
-
-  km_core_cp *app_context_string = new km_core_cp[buf_size];
-
-  km_core_status status = km_core_context_items_to_utf16(context_items, app_context_string, &buf_size);
-  km_core_context_items_dispose(context_items);
-
-  if(status != KM_CORE_STATUS_OK) {
-    return nullptr;
-  }
-
-  return app_context_string;
-}
-
-/**
- * Updates the context from the new_context km_core_cp string
- */
-km_core_status set_context_from_string(km_core_context *context, km_core_cp const *new_context) {
-  km_core_context_item* new_context_items = nullptr;
-
-  km_core_status status = km_core_context_items_from_utf16(new_context, &new_context_items);
-  if (status != KM_CORE_STATUS_OK) {
-    return status;
-  }
-
-  km_core_context_set(context, new_context_items);
-  km_core_context_items_dispose(new_context_items);
-
-  return KM_CORE_STATUS_OK;
 }
 
 /**

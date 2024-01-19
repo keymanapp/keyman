@@ -10,14 +10,10 @@
 
 #include "path.hpp"
 #include "action.hpp"
+#include "context.hpp"
 
 #include <test_assert.h>
 #include "../emscripten_filesystem.h"
-
-// TODO: These helpers are in km_core_state_context_set_if_needed.cpp and
-// should be refactored into a helper module
-km_core_status set_context_from_string(km_core_context *context, km_core_cp const *new_context);
-km_core_cp* get_context_as_string(km_core_context *context);
 
 km_core_option_item test_env_opts[] =
 {
