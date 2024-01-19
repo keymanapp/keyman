@@ -10,7 +10,8 @@
                                     mutation functions.
 */
 #include <string>
-#include <keyman/keyman_core_api.h>
+
+#include "keyman_core.h"
 
 #include "context.hpp"
 #include "utfcodec.hpp"

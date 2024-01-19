@@ -6,7 +6,8 @@
   History:      23 Oct 2023 - MCD - Initial implementation.
 */
 #include <string>
-#include <keyman/keyman_core_api.h>
+
+#include "keyman_core.h"
 
 #include "path.hpp"
 #include "action.hpp"
@@ -60,6 +61,7 @@ void setup(const char *keyboard, const km_core_cp* context) {
   try_status(km_core_state_create(test_kb, test_env_opts, &test_state));
   try_status(km_core_context_items_from_utf16(context, &citems));
   try_status(km_core_context_set(km_core_state_context(test_state), citems));
+  try_status(km_core_context_set(km_core_state_app_context(test_state), citems));
 }
 
 void run_test(km_core_action_item const * action_items, const km_core_actions &actions) {

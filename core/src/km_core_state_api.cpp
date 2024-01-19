@@ -12,12 +12,15 @@
 #include <algorithm>
 #include <sstream>
 #include <memory>
+#include <iomanip>
+#include <codecvt>
 
-#include <keyman/keyman_core_api.h>
+#include "keyman_core.h"
 #include "jsonpp.hpp"
 
 #include "processor.hpp"
 #include "state.hpp"
+
 
 using namespace km::core;
 
@@ -62,12 +65,20 @@ void km_core_state_dispose(km_core_state *state)
 }
 
 
-km_core_context *km_core_state_context(km_core_state *state)
+km_core_context *km_core_state_context(km_core_state const *state)
 {
   assert(state);
   if (!state) return nullptr;
 
-  return static_cast<km_core_context *>(&state->context());
+  return static_cast<km_core_context *>(&(const_cast<km_core_state *>(state)->context()));
+}
+
+km_core_context *km_core_state_app_context(km_core_state const *state)
+{
+  assert(state);
+  if (!state) return nullptr;
+
+  return static_cast<km_core_context *>(&(const_cast<km_core_state *>(state)->app_context()));
 }
 
 km_core_status km_core_state_get_intermediate_context(
@@ -261,95 +272,6 @@ void km_core_state_imx_deregister_callback(km_core_state *state)
   state->imx_deregister_callback();
 }
 
-bool is_context_valid(km_core_cp const * context, km_core_cp const * cached_context) {
-  if (context == nullptr || cached_context == nullptr || *cached_context == '\0') {
-    // If the cached_context is "empty" then it needs updating
-    return false;
-  }
-  km_core_cp const* context_p = context;
-  while(*context_p) {
-    context_p++;
-  }
-
-  km_core_cp const* cached_context_p = cached_context;
-  while(*cached_context_p) {
-    cached_context_p++;
-  }
-
-  // we need to compare from the end of the cached context
-  for(; context_p >= context && cached_context_p >= cached_context; context_p--, cached_context_p--) {
-    if(*context_p != *cached_context_p) {
-      // The cached context doesn't match the application context, so it is
-      // invalid
-      return false;
-    }
-  }
-
-  if(cached_context_p > cached_context) {
-    // if the cached context is longer than the application context, then we also
-    // assume that it is invalid
-    return false;
-  }
-
-  // It's acceptable for the application context to be longer than the cached
-  // context, so if we match the whole cached context, we can safely return true
-  return true;
-}
-
-km_core_context_status km_core_state_context_set_if_needed(
-  km_core_state *state,
-  km_core_cp const *application_context
-) {
-  assert(state != nullptr);
-  assert(application_context != nullptr);
-  if(state == nullptr || application_context == nullptr) {
-    return KM_CORE_CONTEXT_STATUS_INVALID_ARGUMENT;
-  }
-
-  size_t buf_size;
-  km_core_context_item* context_items = nullptr;
-
-  auto context = km_core_state_context(state);
-  if(km_core_context_get(context, &context_items) != KM_CORE_STATUS_OK) {
-    return KM_CORE_CONTEXT_STATUS_ERROR;
-  }
-
-  if(km_core_context_items_to_utf16(context_items, nullptr, &buf_size) != KM_CORE_STATUS_OK) {
-    km_core_context_items_dispose(context_items);
-    return KM_CORE_CONTEXT_STATUS_ERROR;
-  }
-
-  std::unique_ptr<km_core_cp[]> cached_context(new km_core_cp[buf_size]);
-
-  km_core_status status = km_core_context_items_to_utf16(context_items, cached_context.get(), &buf_size);
-  km_core_context_items_dispose(context_items);
-
-  if(status != KM_CORE_STATUS_OK) {
-    return KM_CORE_CONTEXT_STATUS_ERROR;
-  }
-
-  bool is_valid = is_context_valid(application_context, cached_context.get());
-
-  if(is_valid) {
-    // We keep the context as is
-    return KM_CORE_CONTEXT_STATUS_UNCHANGED;
-  }
-
-  km_core_context_item* new_context_items = nullptr;
-
-  // We replace the cached context with the current application context
-  status = km_core_context_items_from_utf16(application_context, &new_context_items);
-  if (status != KM_CORE_STATUS_OK) {
-    km_core_context_clear(context);
-    return KM_CORE_CONTEXT_STATUS_CLEARED;
-  }
-
-  km_core_context_set(context, new_context_items);
-  km_core_context_items_dispose(new_context_items);
-  return KM_CORE_CONTEXT_STATUS_UPDATED;
-}
-
-
 km_core_status km_core_state_context_clear(
   km_core_state *state
 ) {
@@ -358,5 +280,87 @@ km_core_status km_core_state_context_clear(
     return KM_CORE_STATUS_INVALID_ARGUMENT;
   }
   km_core_context_clear(km_core_state_context(state));
+  km_core_context_clear(km_core_state_app_context(state));
   return KM_CORE_STATUS_OK;
+}
+
+void km_core_cp_dispose(
+  km_core_cp *cp
+) {
+  if(cp != nullptr) {
+    delete [] cp;
+  }
+}
+
+km_core_cp * _new_error_string(std::u16string const str) {
+  km_core_cp* result = new km_core_cp[str.size()+1];
+  str.copy(result, str.size());
+  result[str.size()] = 0;
+  return result;
+}
+
+km_core_cp * km_core_state_context_debug(
+  km_core_state *state,
+  km_core_debug_context_type context_type
+) {
+  km_core_context_item * context_items = nullptr;
+
+  if(context_type == KM_CORE_DEBUG_CONTEXT_INTERMEDIATE) {
+    if(km_core_state_get_intermediate_context(state, &context_items) != KM_CORE_STATUS_OK) {
+      return _new_error_string(u"<error retrieving intermediate context>");
+    }
+  } else if(context_type == KM_CORE_DEBUG_CONTEXT_CACHED) {
+    if(km_core_context_get(km_core_state_context(state), &context_items) != KM_CORE_STATUS_OK) {
+      return _new_error_string(u"<error retrieving cached context>");
+    }
+  } else if(context_type == KM_CORE_DEBUG_CONTEXT_APP) {
+    if(km_core_context_get(km_core_state_app_context(state), &context_items) != KM_CORE_STATUS_OK) {
+      return _new_error_string(u"<error retrieving app context>");
+    }
+  } else {
+    return _new_error_string(u"<invalid context type>");
+  }
+
+  size_t buf_size;
+  if(km_core_context_items_to_utf8(context_items, nullptr, &buf_size) != KM_CORE_STATUS_OK) {
+    km_core_context_items_dispose(context_items);
+    return _new_error_string(u"<could not retrieve context buffer size>");
+  }
+
+  std::vector<char> context_buffer(buf_size);
+  if(km_core_context_items_to_utf8(context_items, &context_buffer[0], &buf_size) != KM_CORE_STATUS_OK) {
+    km_core_context_items_dispose(context_items);
+    return _new_error_string(u"<could not retrieve context buffer>");
+  }
+
+  // construct the log message
+
+  std::stringstream buffer;
+
+  int context_item_length = 0;
+  for(auto cp = context_items; cp->type != KM_CORE_CT_END; cp++, context_item_length++);
+
+  buffer << "|" << std::string(&context_buffer[0]) << "| (len: " << context_item_length << ") [";
+  for(auto cp = context_items; cp->type != KM_CORE_CT_END; cp++) {
+    auto flags = buffer.flags();
+    if(cp->type == KM_CORE_CT_CHAR) {
+      // A single Unicode codepoint
+      buffer << " U+" << std::setfill('0') << std::setw(4) << std::hex << cp->character;
+    } else {
+      // A marker
+      buffer << " M(" << cp->marker << ")";
+    }
+    buffer.flags(flags);
+  }
+  buffer << " ]";
+
+  km_core_context_items_dispose(context_items);
+
+  std::u16string s = std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t>{}.from_bytes(buffer.str());
+
+  km_core_cp* result = new km_core_cp[s.size() + 1];
+  s.copy(result, s.size());
+  result[s.size()] = 0;
+
+  return result;
 }

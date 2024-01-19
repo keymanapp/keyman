@@ -24,6 +24,8 @@
 #include <test_assert.h>
 #include <test_color.h>
 
+#include "keyman_core.h"
+
 #include <kmx/kmx_xstring.h>  // for surrogate pair macros
 
 #include "ldml_test_source.hpp"

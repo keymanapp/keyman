@@ -9,7 +9,7 @@
 #pragma once
 #include <list>
 #include <vector>
-#include <keyman/keyman_core_api.h>
+#include "keyman_core.h"
 
 // Forward declarations
 class json;
@@ -38,6 +38,11 @@ inline
 void context::push_marker(uint32_t marker) {
   emplace_back(km_core_context_item { KM_CORE_CT_MARKER, {0,}, {marker} });
 }
+
+// Context helper functions
+
+km_core_cp* get_context_as_string(km_core_context *context);
+km_core_status set_context_from_string(km_core_context *context, km_core_cp const *new_context);
 
 } // namespace core
 } // namespace km
