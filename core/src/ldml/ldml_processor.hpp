@@ -128,6 +128,8 @@ public:
   void commit();
   /** clear this object out */
   void clear();
+  /** clear underlying context */
+  void context_clear();
 
   // getters
   inline km_core_virtual_key get_vk() const;

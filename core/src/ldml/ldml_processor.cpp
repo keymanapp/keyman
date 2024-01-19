@@ -481,6 +481,7 @@ ldml_event_state::emit_marker( KMX_DWORD marker_no) {
 void ldml_event_state::emit_invalidate_passthrough_keystroke() {
   if ((vk < 0x100) && km::core::kmx::vkey_to_contextreset[vk]) {
     // TODO-LDML: how to invalidate context?
+    context_clear();
   } else {
     assert(vk < 0x100); // don't expect synthetic vkeys here
   }
@@ -554,6 +555,13 @@ void ldml_event_state::clear() {
   actions.do_alert              = KM_CORE_FALSE;
   actions.emit_keystroke        = KM_CORE_FALSE;
   actions.new_caps_lock_state   = KM_CORE_CAPS_UNCHANGED;
+}
+
+void ldml_event_state::context_clear() {
+  // clear the context
+  state->context().clear();
+  // clear our own state
+  clear();
 }
 
 ldml_event_state::~ldml_event_state() {
