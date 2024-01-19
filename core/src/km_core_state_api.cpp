@@ -65,20 +65,20 @@ void km_core_state_dispose(km_core_state *state)
 }
 
 
-km_core_context *km_core_state_context(km_core_state *state)
+km_core_context *km_core_state_context(km_core_state const *state)
 {
   assert(state);
   if (!state) return nullptr;
 
-  return static_cast<km_core_context *>(&state->context());
+  return static_cast<km_core_context *>(&(const_cast<km_core_state *>(state)->context()));
 }
 
-km_core_context *km_core_state_app_context(km_core_state *state)
+km_core_context *km_core_state_app_context(km_core_state const *state)
 {
   assert(state);
   if (!state) return nullptr;
 
-  return static_cast<km_core_context *>(&state->app_context());
+  return static_cast<km_core_context *>(&(const_cast<km_core_state *>(state)->app_context()));
 }
 
 km_core_status km_core_state_get_intermediate_context(

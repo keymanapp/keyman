@@ -16,7 +16,7 @@
 #include "state.hpp"
 #include "option.hpp"
 
-km_core_actions const * km::core::action_item_list_to_actions_object(
+km_core_actions * km::core::action_item_list_to_actions_object(
   km_core_action_item const *action_items
 ) {
   assert(action_items != nullptr);
