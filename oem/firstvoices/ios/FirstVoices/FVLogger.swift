@@ -22,7 +22,7 @@
 import Foundation
 import os.log
 
-private let subsystem = "keyman.inputmethod.Keyman"
+private let subsystem = "com.firstvoices.keyboards"
 
 public struct FVLogger {
   static let ui = OSLog(subsystem: subsystem, category: "UI")

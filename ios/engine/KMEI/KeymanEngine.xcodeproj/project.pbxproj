@@ -919,7 +919,6 @@
 		F243887314BBD43000A3E055 = {
 			isa = PBXGroup;
 			children = (
-				29B30C222B564F9900C342A4 /* KeymanEngineLogger.swift */,
 				C06D372C1F81F4E100F61AE0 /* KeymanEngine */,
 				9A079DD0223194B100581263 /* KeymanEngineTests */,
 				CE1679B8265F315C008D6FCE /* Demos */,
@@ -993,6 +992,7 @@
 				CE7A26DA23CEEF640005955C /* Colors.swift */,
 				CE7A26D723CEEC630005955C /* Colors+Extension.swift */,
 				C0959CD31F99C44E00B616BC /* Constants.swift */,
+				29B30C222B564F9900C342A4 /* KeymanEngineLogger.swift */,
 				CEE0321224C58C90005BFC73 /* KeymanHosts.swift */,
 				C0324B921F87689B00AF3785 /* KeymanURLProtocol.swift */,
 				C0A93A531F8B21240079948B /* Manager.swift */,

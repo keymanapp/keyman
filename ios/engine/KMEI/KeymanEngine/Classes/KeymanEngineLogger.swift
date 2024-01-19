@@ -22,7 +22,7 @@
 import Foundation
 import os.log
 
-private let subsystem = "org.sil.KeymanEngine4Mac"
+private let subsystem = "org.sil.Keyman.ios.Engine"
 
 public struct KeymanEngineLogger {
   static let engine = OSLog(subsystem: subsystem, category: "Engine")
