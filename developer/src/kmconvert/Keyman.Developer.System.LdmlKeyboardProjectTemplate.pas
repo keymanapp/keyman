@@ -72,20 +72,44 @@ begin
   Result := GetFilename(Ext_LDMLKeyboardSource);
 end;
 
+const
+  TemplateXML: string =
+    '<?xml version="1.0" encoding="UTF-8"?>'#13#10+
+    '<!DOCTYPE keyboard3 SYSTEM "ldmlKeyboard3.dtd">'#13#10+
+    '<keyboard3 />'#13#10;
+
+const
+  keys: array[0..11, 0..1] of string = (
+    ('a', 'Hello World!'),
+    ('grave','`'),
+    ('hyphen','-'),
+    ('equal','='),
+    ('open-bracket','['),
+    ('close-bracket',']'),
+    ('backslash','\'),
+    ('semi-colon',';'),
+    ('quote',''''),
+    ('comma',','),
+    ('period','.'),
+    ('slash','/')
+  );
+
 procedure TLDMLKeyboardProjectTemplate.WriteLDML;
 var
   doc: IXmlDocument;
-  node, root: IXmlNode;
+  key, row, node, root: IXmlNode;
   tag, tags: string;
+  i: Integer;
 begin
   tags := Trim(BCP47Tags);
   tag := StrToken(tags, ' ');
 
-  doc := NewXMLDocument();
+  doc := TXMLDocument.Create(nil);
+  doc.ParseOptions := [];
+  doc.LoadFromXML(TemplateXML);
   doc.Options := doc.Options + [doNodeAutoIndent];   // I4704
-  doc.Encoding := 'utf-8';
 
-  root := doc.CreateElement('keyboard3', '');
+  root := doc.DocumentElement;
   root.Attributes['locale'] := tag;
   root.Attributes['conformsTo'] := 'techpreview';
 
@@ -107,12 +131,35 @@ begin
     end;
   end;
 
-  root.AddChild('displays');
-  root.AddChild('keys');
-  root.AddChild('flicks');
-  root.AddChild('layers');
-  root.AddChild('transforms');
-  root.AddChild('variables');
+  //  root.AddChild('displays');
+
+  node := root.AddChild('keys');
+  for i := Low(keys) to High(keys) do
+  begin
+    key := node.AddChild('key');
+    key.Attributes['id'] := keys[i][0];
+    key.Attributes['output'] := keys[i][1];
+  end;
+
+  //  root.AddChild('flicks');
+
+  node := root.AddChild('layers');
+  node.Attributes['formId'] := 'us';
+  node := node.AddChild('layer');
+  node.Attributes['modifiers'] := 'none';
+  row := node.AddChild('row');
+  row.Attributes['keys'] := 'grave 1 2 3 4 5 6 7 8 9 0 hyphen equal';
+  row := node.AddChild('row');
+  row.Attributes['keys'] := 'q w e r t y u i o p open-bracket close-bracket backslash';
+  row := node.AddChild('row');
+  row.Attributes['keys'] := 'a s d f g h j k l semi-colon quote';
+  row := node.AddChild('row');
+  row.Attributes['keys'] := 'z x c v b n m comma period slash';
+  row := node.AddChild('row');
+  row.Attributes['keys'] := 'space';
+
+  //  root.AddChild('transforms');
+  //  root.AddChild('variables');
 
   doc.SaveToFile(KeyboardFileName);
 end;

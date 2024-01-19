@@ -48,6 +48,7 @@ type
     memoDescription: TMemo;
     memoLanguages: TMemo;
     Label3: TLabel;
+    Label4: TLabel;
     procedure cmdOKClick(Sender: TObject);
     procedure editKeyboardNameChange(Sender: TObject);
     procedure FormCreate(Sender: TObject);
@@ -98,6 +99,8 @@ function ShowNewLDMLKeyboardProjectParameters(Owner: TComponent): Boolean;
 implementation
 
 uses
+  System.RegularExpressions,
+
   Keyman.System.CanonicalLanguageCodeUtils,
   Keyman.System.LanguageCodeUtils,
   BCP47Tag,
@@ -243,6 +246,12 @@ begin
   EnableControls;
 end;
 
+function IsValidSemanticVersion(const s: string): Boolean;
+begin
+  // For now, only supports triplet version due to limits in .kps
+  Result := TRegEx.Create('^\d+\.\d+\.\d+$').IsMatch(s);
+end;
+
 procedure TfrmNewLDMLKeyboardProjectParameters.EnableControls;
 var
   e: Boolean;
@@ -250,6 +259,7 @@ begin
   e := (Trim(editKeyboardName.Text) <> '') and
     (Trim(editPath.Text) <> '') and
     TKeyboardUtils.IsValidKeyboardID(Trim(editKeyboardID.Text), True) and
+    IsValidSemanticVersion(Trim(editVersion.Text)) and
     (Trim(memoDescription.Text) <> '') and
     (Trim(memoLanguages.Text) <> '');
 

@@ -60,8 +60,8 @@ inherited frmNewLDMLKeyboardProjectParameters: TfrmNewLDMLKeyboardProjectParamet
   object lblKeyboardLanguages: TLabel
     Left = 419
     Top = 260
-    Width = 150
-    Height = 45
+    Width = 145
+    Height = 26
     Caption = '(one BCP 47 tag per line, first tag is primary)'
     WordWrap = True
   end
@@ -96,6 +96,13 @@ inherited frmNewLDMLKeyboardProjectParameters: TfrmNewLDMLKeyboardProjectParamet
     Height = 13
     Caption = 'Supported &languages'
     FocusControl = memoLanguages
+  end
+  object Label4: TLabel
+    Left = 331
+    Top = 233
+    Width = 232
+    Height = 13
+    Caption = 'Semantic version: major.minor.patch, e.g. 1.0.1'
   end
   object editKeyboardID: TEdit
     Left = 120
@@ -145,7 +152,7 @@ inherited frmNewLDMLKeyboardProjectParameters: TfrmNewLDMLKeyboardProjectParamet
     Width = 205
     Height = 21
     TabOrder = 5
-    Text = '1.0'
+    Text = '1.0.0'
     OnChange = editVersionChange
   end
   object editAuthor: TEdit
