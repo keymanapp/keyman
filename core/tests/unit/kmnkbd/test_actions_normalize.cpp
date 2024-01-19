@@ -261,10 +261,37 @@ void run_tests() {
     /* app_context: */                   u"abcậ"
   );
 
+  // surrogate pair tests
 
-  // TODO: surrogate pair tests
-  // TODO: add check for updated cached_context once #10369 lands and we apply
-  //       it here
+  test(
+    "Surrogate pair in context",
+    /* app context pre transform: */     u"abc\U0001F607ê",
+    /* cached context post transform: */ u"abc\U0001F607a\u0323\u0302",
+    /* action del, output: */            2, U"a\u0323\u0302",
+    // ---- results ----
+    /* action del, output: */            1, U"ậ",
+    /* app_context: */                   u"abc\U0001F607ậ"
+  );
+
+  test(
+    "Surrogate pair in output",
+    /* app context pre transform: */     u"abc",
+    /* cached context post transform: */ u"abc\U0001F607",
+    /* action del, output: */            0, U"\U0001F607",
+    // ---- results ----
+    /* action del, output: */            0, U"\U0001F607",
+    /* app_context: */                   u"abc\U0001F607"
+  );
+
+  test(
+    "Surrogate pairs in both context and output",
+    /* app context pre transform: */     u"a\U0001F607bcê",
+    /* cached context post transform: */ u"a\U0001F607bca\U0001F60E",
+    /* action del, output: */            2, U"a\U0001F60E",
+    // ---- results ----
+    /* action del, output: */            1, U"a\U0001F60E",
+    /* app_context: */                   u"a\U0001F607bca\U0001F60E"
+  );
 }
 
 //-------------------------------------------------------------------------------------
