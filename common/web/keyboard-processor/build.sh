@@ -15,6 +15,8 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 # This script runs from its own folder
 cd "$THIS_SCRIPT_PATH"
 
+BUNDLE_CMD="node $KEYMAN_ROOT/common/web/es-bundling/build/common-bundle.mjs"
+
 ################################ Main script ################################
 
 builder_describe \
@@ -22,6 +24,7 @@ builder_describe \
   "@/common/web/recorder  test" \
   "@/common/web/keyman-version" \
   "@/common/web/es-bundling" \
+  "@/common/web/types" \
   "@/common/web/utils" \
   configure \
   clean \
@@ -37,7 +40,22 @@ builder_parse "$@"
 
 function do_build() {
   tsc --build "$THIS_SCRIPT_PATH/tsconfig.all.json"
-  node ./build-bundler.js
+
+  # Base product - the main keyboard processor
+  $BUNDLE_CMD    "${KEYMAN_ROOT}/common/web/keyboard-processor/build/obj/index.js" \
+    --out        "${KEYMAN_ROOT}/common/web/keyboard-processor/build/lib/index.mjs" \
+    --format esm
+
+  # The DOM-oriented keyboard loader
+  $BUNDLE_CMD    "${KEYMAN_ROOT}/common/web/keyboard-processor/build/obj/keyboards/loaders/dom-keyboard-loader.js" \
+    --out        "${KEYMAN_ROOT}/common/web/keyboard-processor/build/lib/dom-keyboard-loader.mjs" \
+    --format esm
+
+  # The Node-oriented keyboard loader
+  $BUNDLE_CMD    "${KEYMAN_ROOT}/common/web/keyboard-processor/build/obj/keyboards/loaders/node-keyboard-loader.js" \
+    --out        "${KEYMAN_ROOT}/common/web/keyboard-processor/build/lib/node-keyboard-loader.mjs" \
+    --format   esm \
+    --platform node
 
   # Declaration bundling.
   tsc --emitDeclarationOnly --outFile ./build/lib/index.d.ts

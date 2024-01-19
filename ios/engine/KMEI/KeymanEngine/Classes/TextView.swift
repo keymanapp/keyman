@@ -133,11 +133,6 @@ public class TextView: UITextView, KeymanResponder {
       font = UIFont.systemFont(ofSize: fontSize)
     }
 
-    if isFirstResponder {
-      resignFirstResponder()
-      becomeFirstResponder()
-    }
-
     log.debug("TextView: \(self.hashValue) setFont: \(font?.familyName ?? "nil")")
   }
 

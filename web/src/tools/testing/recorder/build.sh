@@ -31,6 +31,15 @@ builder_describe_outputs \
 
 builder_parse "$@"
 
+do_build ( ) {
+  compile $SUBPROJECT_NAME
+
+  # Base product - the main keyboard processor
+  $BUNDLE_CMD    "${KEYMAN_ROOT}/web/build/$SUBPROJECT_NAME/obj/index.js" \
+    --out        "${KEYMAN_ROOT}/web/build/$SUBPROJECT_NAME/lib/index.mjs" \
+    --format esm
+}
+
 builder_run_action configure verify_npm_setup
 builder_run_action clean rm -rf ../../../../build/$SUBPROJECT_NAME/
-builder_run_action build compile $SUBPROJECT_NAME
+builder_run_action build do_build

@@ -29,7 +29,7 @@
 #include "ldml_test_source.hpp"
 #include "debuglog.h"
 
-#include "ldml/ldml_transforms.hpp"
+#include "ldml/ldml_markers.hpp"
 
 namespace {
 
@@ -57,13 +57,24 @@ string_to_hex(const std::u16string &input) {
   return result.str();
 }
 
+
+void
+copy_context_items_to_vector(km_core_context_item *citems, std::vector<km_core_context_item> &vector) {
+  vector.clear();
+  for(km_core_context_item *ci = citems; ci->type != KM_CORE_CT_END; ci++) {
+    vector.emplace_back(*ci);
+  }
+}
+
+
 void
 apply_action(
-    km_core_state const *,
+    km_core_state *test_state,
     km_core_action_item const &act,
     std::u16string &text_store,
     std::vector<km_core_context_item> &context,
-    km::tests::LdmlTestSource &test_source) {
+    km::tests::LdmlTestSource &test_source,
+    std::vector<km_core_context_item> &test_context) {
   switch (act.type) {
   case KM_CORE_IT_END:
     assert(false);
@@ -128,7 +139,7 @@ apply_action(
         assert(context.back().character == ch);
         context.pop_back();
       } else {
-        // assume it's otherwise KM-coRE_BT_UNKNOWN
+        // assume it's otherwise KM_CORE_BT_UNKNOWN
         assert(act.backspace.expected_type == KM_CORE_BT_UNKNOWN);
         assert(context.empty()); // if KM_CORE_BT_UNKNOWN, context should be empty.
       }
@@ -137,10 +148,25 @@ apply_action(
   case KM_CORE_IT_PERSIST_OPT:
     break;
   case KM_CORE_IT_INVALIDATE_CONTEXT:
-    std::cout << "action: context invalidated (markers cleared)" << std::endl;
+    {
+      std::cout << "action: context invalidated (markers cleared)" << std::endl;
+      // TODO-LDML: We need the context for tests. So we will simulate recreating
+      // the context from the context string.
+      km_core_context_item* new_context_items = nullptr;
+      // We replace the cached context with the current application context
+      km_core_status status = km_core_context_items_from_utf16(text_store.c_str(), &new_context_items);
+      assert(status == KM_CORE_STATUS_OK);
+      copy_context_items_to_vector(new_context_items, context);
+      // also update the test context
+      copy_context_items_to_vector(new_context_items, test_context);
+      // TODO-LDML: now we need to SET the core context!
+      status = km_core_context_set(km_core_state_context(test_state), new_context_items);
+      km_core_context_items_dispose(new_context_items);
+    }
     break;
   case KM_CORE_IT_EMIT_KEYSTROKE:
     std::cout << "action: emit keystroke" << std::endl;
+    // TODO-LDML: For now, this is a no-op. We could handle enter, etc.
     break;
   case KM_CORE_IT_CAPSLOCK:
     std::cout << "action: capsLock " << act.capsLock << std::endl;
@@ -166,10 +192,11 @@ verify_context(std::u16string& text_store, km_core_state* &test_state, std::vect
     try_status(km_core_context_items_to_utf16(citems, buf, &n));
     std::cout << "context   : " << string_to_hex(buf) << " [" << buf << "]" << std::endl;
     std::cout << "testcontext ";
+    std::cout.fill('0');
     for (auto i = test_context.begin(); i < test_context.end(); i++) {
       switch(i->type) {
         case KM_CORE_CT_CHAR:
-          std::cout << "U+" << std::hex << i->character << std::dec << " ";
+          std::cout << "U+" << std::setw(4) << std::hex << i->character << std::dec << " ";
           break;
         case KM_CORE_CT_MARKER:
           std::cout << "\\m{" << i->character << "} ";
@@ -179,7 +206,6 @@ verify_context(std::u16string& text_store, km_core_state* &test_state, std::vect
       }
     }
     std::cout << std::endl;
-    std::cout << "context   : " << string_to_hex(buf) << " [" << buf << "]" << std::endl;
 
     // Verify that both our local test_context and the core's test_state.context have
     // not diverged
@@ -215,16 +241,15 @@ run_test(const km::core::path &source, const km::core::path &compiled, km::tests
   // Setup state, environment
   try_status(km_core_state_create(test_kb, test_env_opts, &test_state));
 
-  // Setup context
+  std::vector<km_core_context_item> test_context;
+
   km_core_context_item *citems = nullptr;
+  // setup test_context
   try_status(km_core_context_items_from_utf16(test_source.get_context().c_str(), &citems));
   try_status(km_core_context_set(km_core_state_context(test_state), citems));
 
   // Make a copy of the setup context for the test
-  std::vector<km_core_context_item> test_context;
-  for(km_core_context_item *ci = citems; ci->type != KM_CORE_CT_END; ci++) {
-    test_context.emplace_back(*ci);
-  }
+  copy_context_items_to_vector(citems, test_context);
   km_core_context_items_dispose(citems);
 
   // Setup baseline text store
@@ -235,13 +260,19 @@ run_test(const km::core::path &source, const km::core::path &compiled, km::tests
   // verify at beginning
   verify_context(text_store, test_state, test_context);
 
+  int errorLine = 0; // nonzero if err.
+
   // Run through actions, applying output for each event
-  for (test_source.next_action(action); action.type != km::tests::LDML_ACTION_DONE; test_source.next_action(action)) {
-    // handle backspace here
-    if (action.type == km::tests::LDML_ACTION_KEY_EVENT) {
+  do {
+    test_source.next_action(action);
+    switch (action.type) {
+    case km::tests::LDML_ACTION_DONE:
+      // We'll get a printout when this loop exits.
+      break;
+    case km::tests::LDML_ACTION_KEY_EVENT: {
       auto &p = action.k;
-      std::cout << "- key action: " << km::core::kmx::Debug_VirtualKey(p.vk) << "/modifier " << km::core::kmx::Debug_ModifierName(p.modifier_state) << " 0x" << p.modifier_state
-                << std::dec << std::endl;
+      std::cout << "- key action: " << km::core::kmx::Debug_VirtualKey(p.vk) << "/modifier "
+                << km::core::kmx::Debug_ModifierName(p.modifier_state) << " 0x" << p.modifier_state << std::dec << std::endl;
       // Because a normal system tracks caps lock state itself,
       // we mimic that in the tests. We assume caps lock state is
       // updated on key_down before the processor receives the
@@ -252,17 +283,20 @@ run_test(const km::core::path &source, const km::core::path &compiled, km::tests
 
       for (auto key_down = 1; key_down >= 0; key_down--) {
         // expected error only applies to key down
-        try_status(km_core_process_event(test_state, p.vk, p.modifier_state | test_source.caps_lock_state(), key_down, KM_CORE_EVENT_FLAG_DEFAULT)); // TODO-LDML: for now. Should send touch and hardware events.
+        try_status(km_core_process_event(
+            test_state, p.vk, p.modifier_state | test_source.caps_lock_state(), key_down,
+            KM_CORE_EVENT_FLAG_DEFAULT));  // TODO-LDML: for now. Should send touch and hardware events.
 
         for (auto act = km_core_state_action_items(test_state, nullptr); act->type != KM_CORE_IT_END; act++) {
-          apply_action(test_state, *act, text_store, test_context, test_source);
+          apply_action(test_state, *act, text_store, test_context, test_source, test_context);
         }
       }
       verify_context(text_store, test_state, test_context);
-    } else if (action.type == km::tests::LDML_ACTION_EMIT_STRING) {
+    } break;
+    case km::tests::LDML_ACTION_EMIT_STRING: {
       std::cout << "- string emit action: " << action.string << std::endl;
       std::cerr << "TODO-LDML: note, LDML_ACTION_EMIT_STRING is NOT going through keyboard, transforms etc." << std::endl;
-      text_store.append(action.string); // TODO-LDML: not going through keyboard
+      text_store.append(action.string);  // TODO-LDML: not going through keyboard
       // Now, update context?
       km_core_context_item *nitems = nullptr;
       try_status(km_core_context_items_from_utf16(action.string.c_str(), &nitems));
@@ -274,48 +308,51 @@ run_test(const km::core::path &source, const km::core::path &compiled, km::tests
       km_core_context_items_dispose(nitems);
 
       verify_context(text_store, test_state, test_context);
-    } else if (action.type == km::tests::LDML_ACTION_CHECK_EXPECTED) {
-      assert(km::core::ldml::normalize_nfd(action.string)); // TODO-LDML: should be NFC
+    } break;
+    case km::tests::LDML_ACTION_CHECK_EXPECTED: {
+      assert(km::core::ldml::normalize_nfd(action.string));  // TODO-LDML: should be NFC
       std::cout << "- check expected" << std::endl;
       std::cout << "expected  : " << string_to_hex(action.string) << " [" << action.string << "]" << std::endl;
       std::cout << "text store: " << string_to_hex(text_store) << " [" << text_store << "]" << std::endl;
       // Compare internal context with expected result
-      if (text_store != action.string) return __LINE__;
-    } else if (action.type == km::tests::LDML_ACTION_FAIL) {
+      if (text_store != action.string) {
+        errorLine = __LINE__;
+      }
+    } break;
+    case km::tests::LDML_ACTION_FAIL: {
       // test requested failure
-      std::cout << "- FAIL: " << action.string << std::endl;
-      return __LINE__;
-    } else {
+      std::wcout << console_color::fg(console_color::BRIGHT_RED) << "- FAIL: " << action.string << console_color::reset()
+                 << std::endl;
+      errorLine = __LINE__;
+    } break;
+    case km::tests::LDML_ACTION_SKIP: {
+      // test requested skip
+      std::wcout << console_color::fg(console_color::YELLOW) << "- SKIP: " << action.string << console_color::reset()
+                 << std::endl;
+    } break;
+    default:
       std::cerr << " Err: unhandled action type " << action.type << std::endl;
-      return __LINE__;
+      errorLine = __LINE__;
     }
-  }
-  std::cout << "- DONE" << std::endl;
+  } while (!action.done() && errorLine == 0);
 
-  // Test if the beep action was as expected
-  if (g_beep_found != test_source.get_expected_beep())
-    return __LINE__;
-
-
-  // re-verify at end.
-  verify_context(text_store, test_state, test_context);
-
-  // Verify that both our local test_context and the core's test_state.context have
-  // not diverged
-  try_status(km_core_context_get(km_core_state_context(test_state), &citems));
-  auto ci = citems;
-  for(auto test_ci = test_context.begin(); ci->type != KM_CORE_CT_END || test_ci != test_context.end(); ci++, test_ci++) {
-    assert(ci->type != KM_CORE_CT_END && test_ci != test_context.end()); // Verify that both lists are same length
-    assert(test_ci->type == ci->type && test_ci->marker == ci->marker);
+  if (errorLine != 0) {
+    // re-verify at end (if there wasn't already a failure)
+    verify_context(text_store, test_state, test_context);
   }
 
-  km_core_context_items_dispose(citems);
-
-  // Destroy them
+  // cleanup
   km_core_state_dispose(test_state);
   km_core_keyboard_dispose(test_kb);
 
-  return 0;
+  if (g_beep_found != test_source.get_expected_beep()) {
+    // Test if the beep action was as expected.
+    // TODO-LDML: possible in LDML?
+    std::wcout << console_color::fg(console_color::BRIGHT_RED) << "- FAIL - did not get expected beep" << console_color::reset() << std::endl;
+    return __LINE__;
+  }
+
+  return errorLine;
 }
 
 /**

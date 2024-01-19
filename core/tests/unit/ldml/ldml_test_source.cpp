@@ -24,7 +24,7 @@
 #include <kmx/kmx_plus.h>
 #include "ldml/keyman_core_ldml.h"
 #include "ldml/ldml_processor.hpp"
-#include "ldml/ldml_transforms.hpp"
+#include "ldml/ldml_markers.hpp"
 
 #include "path.hpp"
 #include "state.hpp"
@@ -58,6 +58,59 @@ namespace tests {
 
 #include <test_color.h>
 
+
+
+/** string munging */
+static void append_to_str(std::u16string &str, const char *buf) {
+  const PKMX_WCHAR p = km::core::kmx::strtowstr((char *)buf); /** cast away const, unused*/
+  const std::u16string p2(p);
+  str.append(p2);
+  delete [] p;
+}
+
+/** string munging */
+static void append_to_str(std::u16string &str, long n) {
+  char buf[64];
+
+  snprintf(buf, 64, "%ld", n);
+  append_to_str(str, buf);
+}
+
+void
+ldml_action::formatType(const char *f, int l, ldml_action_type setType, const std::u16string &msg) {
+  type = setType;
+  string.clear();
+  append_to_str(string, f);
+  string.append(u":");
+  append_to_str(string, l);
+  string.append(u" ");
+  string.append(msg);
+}
+
+void
+ldml_action::formatType(const char *f, int l, ldml_action_type setType, const std::u16string &msg, const std::u16string &msg2) {
+  std::u16string tmp = msg;
+  tmp.append(msg2);
+  formatType(f, l, setType, tmp);
+}
+
+void
+ldml_action::formatType(const char *f, int l, ldml_action_type setType, const std::u16string &msg, long msg2) {
+  std::u16string tmp;
+  append_to_str(tmp, msg2);
+  formatType(f, l, setType, msg, tmp);
+}
+
+void
+ldml_action::formatType(const char *f, int l, ldml_action_type setType, const std::u16string &msg, const std::string &msg2) {
+  std::u16string tmp;
+  append_to_str(tmp, msg2.c_str());
+  formatType(f, l, setType, msg, tmp);
+}
+
+bool ldml_action::done() const {
+  return (type == LDML_ACTION_DONE || type == LDML_ACTION_SKIP || type == LDML_ACTION_FAIL);
+}
 
 LdmlTestSource::LdmlTestSource() {
 }
@@ -396,10 +449,8 @@ private:
   */
   std::size_t action_index = -1;
   const km::core::kmx::kmx_plus *kmxplus;
-  /**
-   * Helpers
-  */
-  void set_key_from_id(key_event& k, const std::u16string& id);
+  /** @return false if not found */
+  bool set_key_from_id(key_event& k, const std::u16string& id);
 };
 
 LdmlJsonTestSource::LdmlJsonTestSource(const std::string &path, km::core::kmx::kmx_plus *k)
@@ -410,7 +461,7 @@ LdmlJsonTestSource::LdmlJsonTestSource(const std::string &path, km::core::kmx::k
 LdmlJsonTestSource::~LdmlJsonTestSource() {
 }
 
-void LdmlJsonTestSource::set_key_from_id(key_event& k, const std::u16string& id) {
+bool LdmlJsonTestSource::set_key_from_id(key_event& k, const std::u16string& id) {
   k = {0, 0};  // set to a null value at first.
 
   assert(kmxplus != nullptr);
@@ -418,24 +469,17 @@ void LdmlJsonTestSource::set_key_from_id(key_event& k, const std::u16string& id)
   assert(kmxplus->key2 != nullptr);
 
   assert(kmxplus->key2Helper.valid());
-
-  // TODO-LDML: optimize. or optimise.
-
   // First, find the string
   KMX_DWORD strId = kmxplus->strs->find(id);
   if (strId == 0) {
-    // will also get here if id is empty.
-    std::cerr << "ERROR: could not find string for " << id << std::endl;
-    assert(false);
-    return;
+    return false;
   }
 
   // OK. Now we can search the keybag
   KMX_DWORD keyIndex = 0; // initialize loop
   auto *key2 = kmxplus->key2Helper.findKeyByStringId(strId, keyIndex);
-  assert(key2 != nullptr);
   if (key2 == nullptr) {
-    return;
+    return false;
   }
 
   // Now, look for the _first_ candidate vkey match in the kmap.
@@ -444,11 +488,11 @@ void LdmlJsonTestSource::set_key_from_id(key_event& k, const std::u16string& id)
     assert(kmap != nullptr);
     if (kmap->key == keyIndex) {
       k = {(km_core_virtual_key)kmap->vkey, (uint16_t)kmap->mod};
-      return;
+      return true;
     }
   }
   // Else, unfound
-  return;
+  return false;
 }
 
 
@@ -478,7 +522,9 @@ LdmlJsonTestSource::next_action(ldml_action &fillin) {
     fillin.type   = LDML_ACTION_KEY_EVENT;
     auto keyId = LdmlTestSource::parse_u8_source_string(key.get<std::string>());
     // now, look up the key
-    set_key_from_id(fillin.k, keyId);
+    if (!set_key_from_id(fillin.k, keyId)) {
+      fillin.formatType(__FILE__, __LINE__, LDML_ACTION_FAIL, u"Could not find key: ", keyId);
+    }
     return;
   } else if (type == "emit") {
     fillin.type   = LDML_ACTION_EMIT_STRING;
@@ -493,9 +539,9 @@ LdmlJsonTestSource::next_action(ldml_action &fillin) {
     return;
   }
 
-  // TODO-LDML: error passthrough
-  std::cerr << "TODO-LDML: Error, unknown/unhandled action: " << type << std::endl;
-  fillin.type = LDML_ACTION_DONE;
+  // unhandled, so fail
+  fillin.formatType(__FILE__, __LINE__, LDML_ACTION_FAIL, u"Error, unknown/unhandled action: ", (long)type);
+  return;
 }
 
 const std::u16string &
@@ -535,10 +581,6 @@ private:
   std::unique_ptr<icu::UnicodeSetIterator> iterator;
   bool need_check = false; // set this after each char
   const km::core::kmx::kmx_plus *kmxplus;
-  /**
-   * Helpers
-  */
-  void set_key_from_id(key_event& k, const std::u16string& id);
 };
 
 LdmlJsonRepertoireTestSource::LdmlJsonRepertoireTestSource(const std::string &path, km::core::kmx::kmx_plus *k)
@@ -552,13 +594,11 @@ LdmlJsonRepertoireTestSource::~LdmlJsonRepertoireTestSource() {
 void
 LdmlJsonRepertoireTestSource::next_action(ldml_action &fillin) {
   if (type != "simple") {
-    std::cerr << "TODO-LDML: Warning: only 'simple' is supported now, not "  << type << std::endl;
-    fillin.type = LDML_ACTION_DONE;
+    fillin.formatType(__FILE__, __LINE__, LDML_ACTION_SKIP, u"TODO-LDML: Only 'simple' is supported, not ", type);
     return;
   }
 
   if (!iterator->next()) {
-    std::cout << "TODO-LDML: end of unicode set iterator" << std::endl;
     fillin.type = LDML_ACTION_DONE;
     return;
   }
@@ -605,9 +645,7 @@ LdmlJsonRepertoireTestSource::next_action(ldml_action &fillin) {
   KMX_DWORD keyIndex = 0;
   auto *key2 = kmxplus->key2Helper.findKeyByStringTo(chstr, strId, keyIndex);
   if (key2 == nullptr) {
-    fillin.string = u"No key for repertoire test: ";
-    fillin.string.append(chstr);
-    fillin.type = LDML_ACTION_FAIL;
+    fillin.formatType(__FILE__, __LINE__, LDML_ACTION_FAIL, u"No key for repertoire test: ", chstr);
     return;
   }
 
@@ -623,9 +661,7 @@ LdmlJsonRepertoireTestSource::next_action(ldml_action &fillin) {
     }
   }
 
-  fillin.type = LDML_ACTION_FAIL;
-  fillin.string = u"Could not find candidate vkey: ";
-  fillin.string.append(chstr);
+  fillin.formatType(__FILE__, __LINE__, LDML_ACTION_FAIL, u"Could not find candidate vkey: ", chstr);
 }
 
 const std::u16string &

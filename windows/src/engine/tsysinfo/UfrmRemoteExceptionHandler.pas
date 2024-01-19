@@ -92,11 +92,9 @@ function RunCrashReportHandler: Boolean;
 implementation
 
 uses
-  System.Win.Registry,
   Vcl.Clipbrd,
 
   Keyman.System.KeymanSentryClient,
-  RegistryKeys,
   Upload_Settings,
   utilexecute;
 
@@ -124,8 +122,6 @@ function RunCrashReportHandler: Boolean;
 var
   frm: TfrmExceptionHandler;
   crashID, applicationName, applicationID, projectName, eventClassName, eventMessage: string;
-  reg: TRegistry;
-  RegKey: string;
   reportExceptions: Boolean;
 begin
   if ParamStr(1) <> '-c' then
@@ -137,6 +133,7 @@ begin
   projectName := ParamStr(5);
   eventClassName := ParamStr(6);
   eventMessage := ParamStr(7);
+  reportExceptions := ParamStr(8) = 'report';
 
   Application.CreateForm(TfrmExceptionHandler, frm);
   Application.Title := applicationName;
@@ -146,22 +143,6 @@ begin
   frm.ProjectName := projectName;
   frm.EventClassName := eventClassName;
   frm.EventMessage := eventMessage;
-
-  // Load the registry settings for privacy settings
-
-  if projectName = SENTRY_PROJECT_NAME_DESKTOP
-    then RegKey := SRegKey_KeymanEngine_CU
-    else RegKey := SRegKey_IDEOptions_CU;
-
-  reg := TRegistry.Create;
-  try
-    reportExceptions :=
-      not reg.OpenKeyReadOnly(RegKey) or
-      not reg.ValueExists(SRegValue_AutomaticallyReportErrors) or
-      reg.ReadBool(SRegValue_AutomaticallyReportErrors);
-  finally
-    reg.Free;
-  end;
 
   frm.lblText2.Visible := reportExceptions;
   frm.lblNoPersonal.Visible := reportExceptions;

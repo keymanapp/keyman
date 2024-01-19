@@ -1,4 +1,4 @@
-import { OrderedStringList } from 'src/ldml-keyboard/pattern-parser.js';
+import { OrderedStringList } from '../ldml-keyboard/pattern-parser.js';
 import { DependencySections, StrsItem, StrsOptions } from './kmx-plus.js';
 
 /**

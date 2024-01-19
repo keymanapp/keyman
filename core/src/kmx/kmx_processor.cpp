@@ -247,6 +247,7 @@ kmx_processor::internal_process_queued_actions(km_core_state *state) {
       }
       break;
     case QIT_INVALIDATECONTEXT:
+      state->context().clear();
       state->actions().push_invalidate_context();
       break;
     default:

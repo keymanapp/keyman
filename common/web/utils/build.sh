@@ -14,6 +14,8 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 
 cd "$THIS_SCRIPT_PATH"
 
+BUNDLE_CMD="node $KEYMAN_ROOT/common/web/es-bundling/build/common-bundle.mjs"
+
 ################################ Main script ################################
 
 builder_describe \
@@ -35,6 +37,12 @@ function do_build() {
   # May be useful one day, for building a mass .d.ts for KMW as a whole.
   # So... tsc does declaration-bundling on its own pretty well, at least for local development.
   tsc --emitDeclarationOnly --outFile ./build/lib/index.d.ts
+
+  # One of the functions (timedPromise) is quite helpful for automated testing, even in the DOM.
+  # So, to make sure it's easily-accessible for the DOM-based tests...
+  $BUNDLE_CMD    "${KEYMAN_ROOT}/common/web/utils/build/obj/index.js" \
+    --out        "${KEYMAN_ROOT}/common/web/utils/build/lib/index.mjs" \
+    --format esm
 }
 
 function do_test() {

@@ -10,7 +10,7 @@
   ],
   "type": "module",
   "exports": {
-    ".": "./build/src/model-info-compiler.js"
+    ".": "./build/src/index.js"
   },
   "files": [
     "/build/src/"

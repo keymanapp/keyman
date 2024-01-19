@@ -178,31 +178,31 @@ describe('Engine - Browser Interactions', function() {
       assert.equal(inputElem.value, "ຫ");
     });
 
-    it('Simple OSK click', function() {
+    it('Simple OSK click', async function() {
       var inputElem = document.getElementById('singleton');
 
       var lao_s_osk_json = {"type": "osk", "keyID": 'shift-K_S'};
       var lao_s_event = new KMWRecorder.OSKInputEventSpec(lao_s_osk_json);
 
       let eventDriver = new KMWRecorder.BrowserDriver(inputElem);
-      eventDriver.simulateEvent(lao_s_event);
+      await eventDriver.simulateEvent(lao_s_event);
 
       if(inputElem['base']) {
         inputElem = inputElem['base'];
       }
       assert.equal(inputElem.value, ";");
     });
-  })
+  });
 
   describe('Sequence Simulation Checks', function() {
     this.timeout(testconfig.timeouts.scriptLoad);
 
-    it('Keyboard simulation', function() {
-      return runKeyboardTestFromJSON('/engine_tests/basic_lao_simulation.json', {usingOSK: false}, assert.equal, testconfig.timeouts.scriptLoad);
+    it('Keyboard simulation', async function() {
+      return await runKeyboardTestFromJSON('/engine_tests/basic_lao_simulation.json', {usingOSK: false}, assert.equal, testconfig.timeouts.scriptLoad);
     });
 
-    it('OSK simulation', function() {
-      return runKeyboardTestFromJSON('/engine_tests/basic_lao_simulation.json', {usingOSK: true}, assert.equal, testconfig.timeouts.scriptLoad);
+    it('OSK simulation', async function() {
+      return await runKeyboardTestFromJSON('/engine_tests/basic_lao_simulation.json', {usingOSK: true}, assert.equal, testconfig.timeouts.scriptLoad);
     })
   });
 });
@@ -231,10 +231,10 @@ describe('Unmatched Final Groups', function() {
     fixture.cleanup();
   });
 
-  it('matches rule from early group AND performs default behavior', function() {
+  it('matches rule from early group AND performs default behavior', async function() {
     // While a TAB-oriented version would be nice, it's much harder to write the test
     // to detect change in last input element.
-    return runKeyboardTestFromJSON('/engine_tests/ghp_enter.json', {usingOSK: true}, assert.equal, testconfig.timeouts.scriptLoad);
+    return await runKeyboardTestFromJSON('/engine_tests/ghp_enter.json', {usingOSK: true}, assert.equal, testconfig.timeouts.scriptLoad);
   });
 });
 

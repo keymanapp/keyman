@@ -3,51 +3,63 @@
   "description": "Facilitates text input in any language.",
   "exports": {
     "./app/browser": {
+      "es6-bundling": "./src/app/browser/src/test-index.ts",
       "types": "./build/app/browser/obj/test-index.d.js",
       "import": "./build/app/browser/obj/test-index.js"
     },
     "./engine/attachment": {
+      "es6-bundling": "./src/engine/attachment/src/index.ts",
       "types": "./build/engine/attachment/obj/index.d.ts",
       "import": "./build/engine/attachment/obj/index.js"
     },
     "./engine/paths": {
+      "es6-bundling": "./src/engine/paths/src/index.ts",
       "types": "./build/engine/paths/obj/index.d.ts",
       "import": "./build/engine/paths/obj/index.js"
     },
     "./engine/device-detect": {
+      "es6-bundling": "./src/engine/device-detect/src/index.ts",
       "types": "./build/engine/device-detect/obj/index.d.ts",
       "import": "./build/engine/device-detect/obj/index.js"
     },
     "./engine/dom-utils": {
+      "es6-bundling": "./src/engine/dom-utils/src/index.ts",
       "types": "./build/engine/dom-utils/obj/index.d.ts",
       "import": "./build/engine/dom-utils/obj/index.js"
     },
     "./engine/element-wrappers": {
+      "es6-bundling": "./src/engine/element-wrappers/src/index.ts",
       "types": "./build/engine/element-wrappers/obj/index.d.ts",
       "import": "./build/engine/element-wrappers/obj/index.js"
     },
     "./engine/events": {
+      "es6-bundling": "./src/engine/events/src/index.ts",
       "types": "./build/engine/events/obj/index.d.ts",
       "import": "./build/engine/events/obj/index.js"
     },
     "./engine/package-cache": {
+      "es6-bundling": "./src/engine/package-cache/src/index.ts",
       "types": "./build/engine/package-cache/obj/index.d.ts",
       "import": "./build/engine/package-cache/obj/index.js",
       "require": "./build/engine/package-cache/obj/index.js"
     },
     "./engine/package-cache/dom-requester": {
+      "es6-bundling": "./src/engine/package-cache/src/domCloudRequester.ts",
       "types": "./build/engine/package-cache/obj/domCloudRequester.d.ts",
       "import": "./build/engine/package-cache/obj/domCloudRequester.js"
     },
     "./engine/package-cache/node-requester": {
+      "es6-bundling": "./src/engine/package-cache/src/nodeCloudRequester.ts",
       "types": "./build/engine/package-cache/obj/nodeCloudRequester.d.ts",
       "import": "./build/engine/package-cache/obj/nodeCloudRequester.js"
     },
     "./engine/main": {
+      "es6-bundling": "./src/engine/main/src/index.ts",
       "types": "./build/engine/main/obj/index.d.ts",
       "import": "./build/engine/main/obj/index.js"
     },
     "./engine/osk": {
+      "es6-bundling": "./src/engine/osk/src/index.ts",
       "types": "./build/engine/osk/obj/index.d.ts",
       "import": "./build/engine/osk/obj/index.js"
     }
@@ -73,6 +85,7 @@
     "@sentry/cli": "2.2.0",
     "c8": "^7.12.0",
     "chai": "^4.3.4",
+    "jsdom": "^23.0.1",
     "karma": "^6.4.1",
     "karma-browserstack-launcher": "^1.6.0",
     "karma-chai": "^0.1.0",
@@ -104,7 +117,8 @@
     "@keymanapp/recorder-core": "*",
     "@keymanapp/tslib": "*",
     "@keymanapp/web-utils": "*",
-    "@types/node": "^11.9.4",
+    "@types/node": "^18.19.3",
+    "core-js": "^3.34.0",
     "eventemitter3": "^4.0.0",
     "tslib": "^2.5.2"
   },

@@ -22,6 +22,10 @@ enum ldml_action_type {
   */
   LDML_ACTION_DONE,
   /**
+   * Skip this test
+  */
+  LDML_ACTION_SKIP,
+  /**
    * key_event - a vkey
   */
   LDML_ACTION_KEY_EVENT,
@@ -45,6 +49,18 @@ struct ldml_action {
   ldml_action_type type;
   key_event k;
   std::u16string string;
+
+  /** mark failure as specified type */
+  void formatType(const char *file, int line, ldml_action_type type, const std::u16string &msg);
+  /** mark failure as specified type. msg2 is concatenated */
+  void formatType(const char *file, int line, ldml_action_type type, const std::u16string &msg, const std::u16string &msg2);
+  /** mark failure as specified type. msg2 is concatenated */
+  void formatType(const char *file, int line, ldml_action_type type, const std::u16string &msg, long msg2);
+  /** mark failure as specified type.  msg2 is concatenated */
+  void formatType(const char *file, int line, ldml_action_type type, const std::u16string &msg, const std::string &msg2);
+
+  /** @returns true if caller should stop processing events */
+  bool done() const;
 };
 
 /**

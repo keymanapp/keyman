@@ -5,8 +5,8 @@
 
 import { minKeymanVersion } from "./min-keyman-version.js";
 import { ModelInfoFile } from "./model-info-file.js";
-import { CompilerCallbacks, KmpJsonFile } from "@keymanapp/common-types";
-import { ModelInfoCompilerMessages } from "./messages.js";
+import { CompilerCallbacks, CompilerOptions, KeymanCompiler, KeymanCompilerArtifact, KeymanCompilerArtifacts, KeymanCompilerResult, KmpJsonFile } from "@keymanapp/common-types";
+import { ModelInfoCompilerMessages } from "./model-info-compiler-messages.js";
 import { validateMITLicense } from "@keymanapp/developer-utils";
 
 const HelpRoot = 'https://help.keyman.com/model/';
@@ -39,8 +39,30 @@ export class ModelInfoSources {
 };
 /* c8 ignore stop */
 
-export class ModelInfoCompiler {
-  constructor(private callbacks: CompilerCallbacks) {
+export interface ModelInfoCompilerOptions extends CompilerOptions {
+  sources: ModelInfoSources;
+};
+
+export interface ModelInfoCompilerArtifacts extends KeymanCompilerArtifacts {
+  model_info: KeymanCompilerArtifact;
+};
+
+export interface ModelInfoCompilerResult extends KeymanCompilerResult {
+  artifacts: ModelInfoCompilerArtifacts;
+};
+
+
+export class ModelInfoCompiler implements KeymanCompiler {
+  private callbacks: CompilerCallbacks;
+  private options: ModelInfoCompilerOptions;
+
+  constructor() {
+  }
+
+  public async init(callbacks: CompilerCallbacks, options: ModelInfoCompilerOptions): Promise<boolean> {
+    this.callbacks = callbacks;
+    this.options = {...options};
+    return true;
   }
 
   /**
@@ -51,9 +73,8 @@ export class ModelInfoCompiler {
    *
    * @param sources                  Details on files from which to extract additional metadata
    */
-  writeModelMetadataFile(
-    sources: ModelInfoSources
-  ): Uint8Array {
+  public async run(inputFilename: string, outputFilename?: string): Promise<ModelInfoCompilerResult> {
+    const sources = this.options.sources;
 
     /*
       * Model info looks like this:
@@ -171,7 +192,22 @@ export class ModelInfoCompiler {
     }
 
     const jsonOutput = JSON.stringify(model_info, null, 2);
-    return new TextEncoder().encode(jsonOutput);
+    const data = new TextEncoder().encode(jsonOutput);
+    const result: ModelInfoCompilerResult = {
+      artifacts: {
+        model_info: {
+          data,
+          filename: outputFilename ?? inputFilename.replace(/\.kpj$/, '.model_info')
+        }
+      }
+    };
+
+    return result;
+  }
+
+  public async write(artifacts: ModelInfoCompilerArtifacts): Promise<boolean> {
+    this.callbacks.fs.writeFileSync(artifacts.model_info.filename, artifacts.model_info.data);
+    return true;
   }
 
   private isLicenseMIT(filename: string) {

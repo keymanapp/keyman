@@ -15,7 +15,6 @@
 #import "CoreTestStaticHelperMethods.h"
 #import "keyman_core_api.h"
 #import "CoreAction.h"
-#import "ActionArrayOptimizer.h"
 
 @interface CoreHelperTests : XCTestCase
 
@@ -23,10 +22,7 @@
 
 @implementation CoreHelperTests
 
-ActionArrayOptimizer *optimizer;
-
 + (void)setUp {
-  optimizer  = [[ActionArrayOptimizer alloc] init];
 }
 
 - (void)tearDown {
@@ -126,54 +122,6 @@ ActionArrayOptimizer *optimizer;
   NSString *convertedString = [[CoreTestStaticHelperMethods helper] createNSStringFromUnicharString:unicharString];
 
   XCTAssertTrue([convertedString isEqual:optionNameString], @"Converted unichar string is not equal to literal string.");
-}
-
-
-/*
-- (void)testOptimize_MultipleCharacterActions_CombinedToSingleAction {
-  CoreAction *characterAAction = [[CoreAction alloc] initWithType:CharacterAction actionContent:@"A" backspaceCount:0];
-  CoreAction *characterBAction = [[CoreAction alloc] initWithType:CharacterAction actionContent:@"B" backspaceCount:0];
-  CoreAction *endAction = [[CoreAction alloc] initWithType:EndAction actionContent:@"" backspaceCount:0];
-  NSArray *coreArray = @[characterAAction, characterBAction, endAction];
-  
-  NSArray *optimizedArray = [optimizer optimize:coreArray];
-  XCTAssert(optimizedArray.count == 1, @"Expected 1 action");
-  CoreAction *action = optimizedArray[0];
-  XCTAssert([action.content isEqualToString:@"AB"], @"Expected combined string.");
-}
-
-- (void)testOptimize_MultipleBackspaceActions_CombinedToSingleAction {
-  CoreAction *backspaceAction = [[CoreAction alloc] initWithType:CharacterBackspaceAction actionContent:@"" backspaceCount:1];
-  CoreAction *anotherBackspaceAction = [[CoreAction alloc] initWithType:CharacterBackspaceAction actionContent:@"" backspaceCount:1];
-  CoreAction *endAction = [[CoreAction alloc] initWithType:EndAction actionContent:@"" backspaceCount:0];
-  NSArray *coreArray = @[backspaceAction, anotherBackspaceAction, endAction];
-  
-  NSArray *optimizedArray = [optimizer optimize:coreArray];
-  XCTAssert(optimizedArray.count == 1, @"Expected 1 action");
-  CoreAction *action = optimizedArray[0];
-  XCTAssert(action.backspaceCount==2, @"Expected a backspace count of 2.");
-}
-*/
-- (void)testOptimize_OneBackspaceAndOneCharacterAction_RetainedWithEndActionStripped {
-  CoreAction *backspaceAction = [[CoreAction alloc] initCharacterBackspaceAction:@""];
-  CoreAction *characterAAction = [[CoreAction alloc] initCharacterAction:@"A"];
-  CoreAction *endAction = [[CoreAction alloc] initWithType:EndAction actionContent:@"" backspaceCount:0 key:@"" value:@"" scope:0];
-  NSArray *coreArray = @[backspaceAction, characterAAction, endAction];
-  
-  NSArray *optimizedArray = [optimizer optimize:coreArray];
-  XCTAssert(optimizedArray.count == 2, @"Expected two actions.");
-  CoreAction *action = optimizedArray[1];
-  XCTAssert([action.content isEqualToString:@"A"], @"Expected CharacterAction.");
-}
-
-- (void)testOptimize_OneCharacterAndOneBackspaceAction_CompactedToEmptyArray {
-  CoreAction *characterAAction = [[CoreAction alloc] initCharacterAction:@"A"];
-  CoreAction *backspaceAction = [[CoreAction alloc] initCharacterBackspaceAction:@""];
-  CoreAction *endAction = [[CoreAction alloc] initWithType:EndAction actionContent:@"" backspaceCount:0 key:@"" value:@"" scope:0];
-  NSArray *coreArray = @[characterAAction, backspaceAction, endAction];
-  
-  NSArray *optimizedArray = [optimizer optimize:coreArray];
-  XCTAssert(optimizedArray.count == 0, @"Expected empty array");
 }
 
 - (void)testHelperCreationPerformance {

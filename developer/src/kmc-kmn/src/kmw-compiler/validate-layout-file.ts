@@ -237,6 +237,14 @@ export function ValidateLayoutFile(fk: KMX.KEYBOARD, FDebug: boolean, sLayoutFil
     return null;
   }
 
+  let hasWarnedOfGestureUseDownlevel = false;
+  const warnGesturesIfNeeded = function(keyId: string) {
+    if(!hasWarnedOfGestureUseDownlevel && !IsKeyboardVersion17OrLater()) {
+      hasWarnedOfGestureUseDownlevel = true;
+      callbacks.reportMessage(KmwCompilerMessages.Warn_TouchLayoutUsesUnsupportedGesturesDownlevel({keyId}));
+    }
+  }
+
   let result: boolean = true;
   let FTouchLayoutFont = '';   // I4872
   let pid: keyof TouchLayout.TouchLayoutFile;
@@ -267,6 +275,7 @@ export function ValidateLayoutFile(fk: KMX.KEYBOARD, FDebug: boolean, sLayoutFil
           let direction: keyof TouchLayout.TouchLayoutFlick;
           if(key.flick) {
             for(direction in key.flick) {
+              warnGesturesIfNeeded(key.id);
               result = CheckKey(pid, platform, layer, key.flick[direction].id, key.flick[direction].text,
                 key.flick[direction].nextlayer, key.flick[direction].sp, FRequiredKeys, FDictionary) && result;
             }
@@ -274,6 +283,7 @@ export function ValidateLayoutFile(fk: KMX.KEYBOARD, FDebug: boolean, sLayoutFil
 
           if(key.multitap) {
             for(let subkey of key.multitap) {
+              warnGesturesIfNeeded(key.id);
               result = CheckKey(pid, platform, layer, subkey.id, subkey.text, subkey.nextlayer, subkey.sp, FRequiredKeys, FDictionary) && result;
             }
           }

@@ -15,7 +15,7 @@ describe('Compiler class', function() {
     const compiler = new KmnCompiler();
     const callbacks : any = null; // ERROR
     try {
-      await compiler.init(callbacks)
+      await compiler.init(callbacks, null)
       assert.fail('Expected exception');
     } catch(e) {
       assert.ok(e);
@@ -26,21 +26,27 @@ describe('Compiler class', function() {
   it('should start', async function() {
     const compiler = new KmnCompiler();
     const callbacks = new TestCompilerCallbacks();
-    assert(await compiler.init(callbacks));
+    assert(await compiler.init(callbacks, null));
     assert(compiler.verifyInitialized());
   });
 
   it('should compile a basic keyboard', async function() {
     const compiler = new KmnCompiler();
     const callbacks = new TestCompilerCallbacks();
-    assert(await compiler.init(callbacks));
+    assert(await compiler.init(callbacks, {saveDebug: true, shouldAddCompilerVersion: false}));
     assert(compiler.verifyInitialized());
 
     const fixtureName = baselineDir + 'k_000___null_keyboard.kmx';
     const infile = baselineDir + 'k_000___null_keyboard.kmn';
     const outFile = __dirname + '/k_000___null_keyboard.kmx';
 
-    assert(compiler.run(infile, {saveDebug: true, outFile, shouldAddCompilerVersion: false}));
+    if(fs.existsSync(outFile)) {
+      fs.rmSync(outFile);
+    }
+
+    const result = await compiler.run(infile, outFile);
+    assert.isNotNull(result);
+    assert.isTrue(await compiler.write(result.artifacts));
 
     assert(fs.existsSync(outFile));
     const outfileData = fs.readFileSync(outFile);
@@ -54,7 +60,7 @@ describe('Compiler class', function() {
   it('should build all baseline fixtures', async function() {
     const compiler = new KmnCompiler();
     const callbacks = new TestCompilerCallbacks();
-    assert(await compiler.init(callbacks));
+    assert(await compiler.init(callbacks, {saveDebug: true, shouldAddCompilerVersion: false}));
     assert(compiler.verifyInitialized());
 
     const files = fs.readdirSync(baselineDir);
@@ -64,7 +70,13 @@ describe('Compiler class', function() {
         const infile = baselineDir + file.replace(/x$/, 'n');
         const outFile = __dirname + '/' + file;
 
-        assert(compiler.run(infile, {saveDebug: true, outFile, shouldAddCompilerVersion: false}));
+        if(fs.existsSync(outFile)) {
+          fs.rmSync(outFile);
+        }
+
+        const result = await compiler.run(infile, outFile);
+        assert.isNotNull(result);
+        assert.isTrue(await compiler.write(result.artifacts));
 
         assert(fs.existsSync(outFile));
         const outfileData = fs.readFileSync(outFile);
@@ -78,7 +90,10 @@ describe('Compiler class', function() {
   it('should compile a keyboard with visual keyboard', async function() {
     const compiler = new KmnCompiler();
     const callbacks = new TestCompilerCallbacks();
-    assert.isTrue(await compiler.init(callbacks));
+    assert.isTrue(await compiler.init(callbacks, {
+      saveDebug: true,
+      shouldAddCompilerVersion: false,
+    }));
     assert.isTrue(compiler.verifyInitialized());
 
     const fixtureDir = keyboardsDir + 'caps_lock_layer_3620/'
@@ -89,11 +104,17 @@ describe('Compiler class', function() {
     const resultingKmxfile = __dirname + '/caps_lock_layer_3620.kmx';
     const resultingKvkfile = __dirname + '/caps_lock_layer_3620.kvk';
 
-    assert.isTrue(compiler.run(infile, {
-      saveDebug: true,
-      shouldAddCompilerVersion: false,
-      outFile: resultingKmxfile,
-    }));
+    if(fs.existsSync(resultingKmxfile)) {
+      fs.rmSync(resultingKmxfile);
+    }
+
+    if(fs.existsSync(resultingKvkfile)) {
+      fs.rmSync(resultingKvkfile);
+    }
+
+    const result = await compiler.run(infile, resultingKmxfile);
+    assert.isNotNull(result);
+    assert.isTrue(await compiler.write(result.artifacts));
 
     assert.isTrue(fs.existsSync(resultingKmxfile));
     assert.isTrue(fs.existsSync(resultingKvkfile));

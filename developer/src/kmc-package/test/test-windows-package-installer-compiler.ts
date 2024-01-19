@@ -12,9 +12,6 @@ describe('WindowsPackageInstallerCompiler', function () {
   it(`should build an SFX archive`, async function () {
     this.timeout(10000); // this test can take a little while to run
 
-    const callbacks = new TestCompilerCallbacks();
-    let compiler = new WindowsPackageInstallerCompiler(callbacks);
-
     const kpsPath = makePathToFixture('khmer_angkor', 'source', 'khmer_angkor.kps');
     const sources: WindowsPackageInstallerSources = {
       licenseFilename: makePathToFixture('windows-installer', 'license.txt'),
@@ -25,11 +22,18 @@ describe('WindowsPackageInstallerCompiler', function () {
       appName: 'Testing',
     };
 
-    const sfxBuffer = await compiler.compile(kpsPath, sources);
+    const callbacks = new TestCompilerCallbacks();
+    let compiler = new WindowsPackageInstallerCompiler();
+    assert.isTrue(await compiler.init(callbacks, {sources}));
+
+    const result = await compiler.run(kpsPath, null);
+    assert.isNotNull(result);
 
     // This returns a buffer with a SFX loader and a zip suffix. For the sake of repository size
     // we actually provide a stub SFX loader and a stub MSI file, which is enough to verify that
     // the compiler is generating what it thinks is a valid file.
+
+    const sfxBuffer = result.artifacts.exe.data;
 
     const zip = JSZip();
 
