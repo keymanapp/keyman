@@ -48,6 +48,22 @@ do_clean() {
 compile_and_copy() {
   compile $SUBPROJECT_NAME
 
+  BUILD_ROOT="${KEYMAN_ROOT}/web/build/app/ui"
+
+  types=(button float toggle toolbar)
+  for type in ${types[@]}
+  do
+    filename="kmwui${type}"
+    $BUNDLE_CMD    "${BUILD_ROOT}/obj/$filename.js" \
+      --out        "${BUILD_ROOT}/debug/$filename.js" \
+      --sourceRoot "@keymanapp/keyman/web/build/app/ui/debug"
+
+    $BUNDLE_CMD    "${BUILD_ROOT}/obj/$filename.js" \
+      --out        "${BUILD_ROOT}/release/$filename.js" \
+      --sourceRoot "@keymanapp/keyman/web/build/app/ui/release" \
+      --minify
+  done
+
   mkdir -p "$KEYMAN_ROOT/web/build/app/resources/ui"
   cp -R "$KEYMAN_ROOT/web/src/resources/ui/." "$KEYMAN_ROOT/web/build/app/resources/ui/"
 

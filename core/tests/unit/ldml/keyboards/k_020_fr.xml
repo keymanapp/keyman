@@ -16,7 +16,7 @@
 		<!-- Note: displays is only used for keycap presentation -->
 		<!-- this example is not required for this keyboard as we use the spacing
 			modifiers -->
-		<display output="\u0300" display="\u02CB" /> <!-- display combining grave as modifier letter
+		<display output="\u{0300}" display="\u{02CB}" /> <!-- display combining grave as modifier letter
 		grave ˋ -->
 		<!-- Note: We discussed why the existing displayMap was used for display.
 			rather than adding something closer to the key layout. 1. This way we can

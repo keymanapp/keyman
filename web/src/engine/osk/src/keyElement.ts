@@ -1,9 +1,10 @@
-import OSKKey, { OSKKeySpec } from "./keyboard-layout/oskKey.js";
+import { ActiveSubKey } from '@keymanapp/keyboard-processor';
+import OSKKey from "./keyboard-layout/oskKey.js";
 
 export class KeyData {
   ['key']: OSKKey;
   ['keyId']: string;
-  ['subKeys']?: OSKKeySpec[];
+  ['subKeys']?: ActiveSubKey[];
 
   constructor(keyData: OSKKey, keyId: string) {
     this['key'] = keyData;

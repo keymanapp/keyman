@@ -69,11 +69,11 @@ export class ClassicalDistanceCalculation<TUnit = string, TInput extends EditTok
       this.resolvedDistances = Array(rowCount);
 
       for(let r = 0; r < rowCount; r++) {
-        this.resolvedDistances[r] = Array.from(other.resolvedDistances[r]);
+        this.resolvedDistances[r] = other.resolvedDistances[r].slice(0);
       }
 
-      this.inputSequence = Array.from(other.inputSequence);
-      this.matchSequence = Array.from(other.matchSequence);
+      this.inputSequence = other.inputSequence.slice(0);
+      this.matchSequence = other.matchSequence.slice(0);
       this.diagonalWidth = other.diagonalWidth;
     } else {
       this.resolvedDistances = [];

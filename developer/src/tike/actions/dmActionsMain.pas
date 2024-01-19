@@ -105,7 +105,6 @@ type
     actProjectAddCurrentEditorFile: TAction;
     actProjectAddFiles: TFileOpen;
     actProjectSettings: TAction;
-    actToolsCustomise: TAction;
     actToolsOptions: TAction;
     actToolsVirtualKeyIdentifier: TAction;
     actHelpAbout: TAction;
@@ -138,6 +137,7 @@ type
     actToolsWebConfigure: TAction;
     actToolsWebStartServer: TAction;
     actToolsWebStopServer: TAction;
+    actWindowNew: TAction;
     procedure actFileNewExecute(Sender: TObject);
     procedure DataModuleCreate(Sender: TObject);
     procedure actFileOpenAccept(Sender: TObject);
@@ -237,12 +237,10 @@ type
     procedure actToolsWebStartServerUpdate(Sender: TObject);
     procedure actToolsWebStopServerExecute(Sender: TObject);
     procedure actToolsWebStopServerUpdate(Sender: TObject);
+    procedure actWindowNewExecute(Sender: TObject);
   private
     function CheckFilenameConventions(FileName: string): Boolean;
-    function SaveAndCloseAllFiles: Boolean;
     procedure CloseProject;
-  public
-    procedure OpenProject(FileName: WideString);
   end;
 
 var
@@ -300,31 +298,38 @@ uses
 procedure TmodActionsMain.actFileNewExecute(Sender: TObject);
 var
   FEditor: TfrmTikeEditor;
+  frmNew: TfrmNew;
 begin
-  with TfrmNew.Create(frmKeymanDeveloper) do
+  frmNew := TfrmNew.Create(frmKeymanDeveloper);
   try
-    if ShowModal = mrOk then
+    frmNew.CanAddToProject := FGlobalProject.Options.Version = pv10;
+    if frmNew.ShowModal = mrOk then
     begin
-      case FileType of
-        ftKeymanSource:    FEditor := TfrmKeymanWizard.Create(frmKeymanDeveloper);
-        ftPackageSource:   FEditor := TfrmPackageEditor.Create(frmKeymanDeveloper);
-        ftBitmap:          FEditor := TfrmBitmapEditor.Create(frmKeymanDeveloper);
-        ftVisualKeyboard:  FEditor := TfrmOSKEditor.Create(frmKeymanDeveloper);
-        ftTextFile:        begin FEditor := TfrmEditor.Create(frmKeymanDeveloper); (FEditor as TfrmEditor).EditorFormat := efText; end;
-        ftXMLFile:         begin FEditor := TfrmEditor.Create(frmKeymanDeveloper); (FEditor as TfrmEditor).EditorFormat := efXML; end;
-        ftHTMLFile:        begin FEditor := TfrmEditor.Create(frmKeymanDeveloper); (FEditor as TfrmEditor).EditorFormat := efHTML; end;
-      else
-        FEditor := TfrmEditor.Create(frmKeymanDeveloper);
-      end;
-      if FileName <> '' then
+      if SameFileName(ExtractFilePath(FGlobalProject.FileName), ExtractFilePath(frmNew.FileName)) or
+        SameFileName(FGlobalProject.ResolveProjectPath(FGlobalProject.Options.SourcePath), ExtractFilePath(frmNew.FileName)) then
       begin
-        if AddToProject then
-          FEditor.ProjectFile := CreateProjectFile(FGlobalProject, FileName, nil);
-        FEditor.OpenFile(FileName);
+        // File belongs to the project
+        case frmNew.FileType of
+          ftKeymanSource:    FEditor := TfrmKeymanWizard.Create(frmKeymanDeveloper);
+          ftPackageSource:   FEditor := TfrmPackageEditor.Create(frmKeymanDeveloper);
+          ftBitmap:          FEditor := TfrmBitmapEditor.Create(frmKeymanDeveloper);
+          ftVisualKeyboard:  FEditor := TfrmOSKEditor.Create(frmKeymanDeveloper);
+          ftTextFile:        begin FEditor := TfrmEditor.Create(frmKeymanDeveloper); (FEditor as TfrmEditor).EditorFormat := efText; end;
+          ftXMLFile:         begin FEditor := TfrmEditor.Create(frmKeymanDeveloper); (FEditor as TfrmEditor).EditorFormat := efXML; end;
+          ftHTMLFile:        begin FEditor := TfrmEditor.Create(frmKeymanDeveloper); (FEditor as TfrmEditor).EditorFormat := efHTML; end;
+        else
+          FEditor := TfrmEditor.Create(frmKeymanDeveloper);
+        end;
+        FEditor.ProjectFile := CreateProjectFile(FGlobalProject, frmNew.FileName, nil);
+        FEditor.OpenFile(frmNew.FileName);
+      end
+      else
+      begin
+        frmKeymanDeveloper.OpenFilesInProject([frmNew.FileName]);
       end;
     end;
   finally
-    Free;
+    frmNew.Free;
   end;
 end;
 
@@ -587,42 +592,13 @@ begin
   frmKeymanDeveloper.OpenProject(actProjectOpen.Dialog.FileName);
 end;
 
-procedure TmodActionsMain.OpenProject(FileName: WideString);
-begin
-  FileName := ExpandUNCFileName(FileName);
-  if (FileName <> '') and not FileExists(FileName) then
-  begin
-    ShowMessage('The project '+FileName+' does not exist.');
-    Exit;
-  end;
 
-  if IsGlobalProjectUIReady then
-  begin
-    if not SaveAndCloseAllFiles then Exit;
-    FreeGlobalProjectUI;
-  end;
-  try
-    LoadGlobalProjectUI(ptUnknown, FileName);   // I4687
-  except
-    on E:EProjectLoader do
-    begin
-      // Message will be displayed by LoadGlobalProjectUI
-      FreeGlobalProjectUI;
-      frmKeymanDeveloper.ShowProject;
-      frmKeymanDeveloper.UpdateCaption;
-      Exit;
-    end;
-  end;
-  frmKeymanDeveloper.ProjectMRU.Add(FGlobalProject.FileName);
-  frmKeymanDeveloper.ShowProject;
-  frmKeymanDeveloper.UpdateCaption;
-end;
 
 procedure TmodActionsMain.CloseProject;
 begin
   if IsGlobalProjectUIReady then
   begin
-    if not SaveAndCloseAllFiles then Exit;
+    if not frmKeymanDeveloper.SaveAndCloseAllFiles then Exit;
     FreeGlobalProjectUI;
   end;
   frmKeymanDeveloper.ShowProject;
@@ -637,7 +613,11 @@ begin
     then frm := TfrmProjectSettings.Create(Screen.ActiveForm)   // I4688
     else frm := TfrmProjectSettings20.Create(Screen.ActiveForm);
   try
-    frm.ShowModal;
+    if frm.ShowModal = mrOk then
+    begin
+      if IsGlobalProjectUIReady then
+        FGlobalProject.Refresh;
+    end;
   finally
     frm.Free;
   end;
@@ -1006,6 +986,11 @@ begin
   actWindowClose.Enabled := Assigned(frmKeymanDeveloper.ActiveChild);
 end;
 
+procedure TmodActionsMain.actWindowNewExecute(Sender: TObject);
+begin
+  frmKeymanDeveloper.OpenNewWindow;
+end;
+
 procedure TmodActionsMain.actWindowNextExecute(Sender: TObject);
 begin
   with frmKeymanDeveloper do
@@ -1058,33 +1043,6 @@ begin
     'HTML files (*.htm, *.html)|*.htm?|'+
     'XML files (*.xml)|*.xml|'+
     'All files (*.*)|*.*';
-end;
-
-function TmodActionsMain.SaveAndCloseAllFiles: Boolean;
-var
-  i: Integer;
-begin
-  FGlobalProject.Save;
-  for i := 0 to frmKeymanDeveloper.ChildWindows.Count - 1 do
-  begin
-    if frmKeymanDeveloper.ChildWindows[i] is TfrmProject then
-      Continue;
-
-    if not frmKeymanDeveloper.ChildWindows[i].CloseQuery then
-      Exit(False);
-  end;
-
-  for i := 0 to frmKeymanDeveloper.ChildWindows.Count - 1 do
-  begin
-    if frmKeymanDeveloper.ChildWindows[i] is TfrmProject then
-      Continue;
-
-    frmKeymanDeveloper.ChildWindows[i].Visible := False;
-    frmKeymanDeveloper.ChildWindows[i].Parent := nil;
-    frmKeymanDeveloper.ChildWindows[i].Release;
-  end;
-
-  Result := True;
 end;
 
 end.

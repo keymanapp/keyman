@@ -194,6 +194,8 @@
         <DCCReference Include="..\..\..\common\windows\delphi\standards\Keyman.System.Standards.LangTagsRegistry.pas"/>
         <DCCReference Include="..\TIKE\project\Keyman.Developer.System.Project.UrlRenderer.pas"/>
         <DCCReference Include="..\common\delphi\lexicalmodels\Keyman.System.LexicalModelUtils.pas"/>
+        <DCCReference Include="..\tike\main\KeymanDeveloperOptions.pas"/>
+        <DCCReference Include="..\tike\main\Keyman.Developer.System.KeymanDeveloperPaths.pas"/>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>

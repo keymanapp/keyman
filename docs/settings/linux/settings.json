@@ -10,10 +10,11 @@
   "python.testing.unittestEnabled": true,
   "python.testing.pytestEnabled": false,
   "python.testing.nosetestsEnabled": false,
-  "python.linting.enabled": true,
-  // We use flake8 for Python linting - install with `pip3 install flake8`
-  "python.linting.flake8Enabled": true,
   "python.pythonPath": "/usr/bin/python3",
+  "[python]": {
+    "editor.defaultFormatter": "ms-python.autopep8",
+    "editor.formatOnType": true
+  },
   "files.associations": {
     "*.tcc": "cpp",
     "keyman_core_api.h": "c",

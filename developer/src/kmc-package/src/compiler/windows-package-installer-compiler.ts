@@ -11,10 +11,10 @@
  */
 
 import JSZip from 'jszip';
-import { CompilerCallbacks, KeymanFileTypes, KmpJsonFile, KpsFile } from "@keymanapp/common-types";
+import { CompilerCallbacks, KeymanCompiler, KeymanCompilerArtifact, KeymanCompilerArtifacts, KeymanCompilerResult, KeymanFileTypes, KmpJsonFile, KpsFile } from "@keymanapp/common-types";
 import KEYMAN_VERSION from "@keymanapp/keyman-version";
-import { KmpCompiler } from "./kmp-compiler.js";
-import { CompilerMessages } from "./messages.js";
+import { KmpCompiler, KmpCompilerOptions } from "./kmp-compiler.js";
+import { CompilerMessages } from "./package-compiler-messages.js";
 
 const SETUP_INF_FILENAME = 'setup.inf';
 const PRODUCT_NAME = 'Keyman';
@@ -30,15 +30,33 @@ export interface WindowsPackageInstallerSources {
   startWithConfiguration: boolean;
 };
 
-export class WindowsPackageInstallerCompiler {
-  private kmpCompiler: KmpCompiler;
+export interface WindowsPackageInstallerCompilerOptions extends KmpCompilerOptions {
+  sources: WindowsPackageInstallerSources;
+}
 
-  constructor(private callbacks: CompilerCallbacks) {
-    this.kmpCompiler = new KmpCompiler(this.callbacks);
+export interface WindowsPackageInstallerCompilerArtifacts extends KeymanCompilerArtifacts {
+  exe: KeymanCompilerArtifact;
+};
+
+export interface WindowsPackageInstallerCompilerResult extends KeymanCompilerResult {
+  artifacts: WindowsPackageInstallerCompilerArtifacts;
+};
+
+export class WindowsPackageInstallerCompiler implements KeymanCompiler {
+  private kmpCompiler: KmpCompiler;
+  private callbacks: CompilerCallbacks;
+  private options: WindowsPackageInstallerCompilerOptions;
+
+  async init(callbacks: CompilerCallbacks, options: WindowsPackageInstallerCompilerOptions): Promise<boolean> {
+    this.callbacks = callbacks;
+    this.options = {...options};
+    this.kmpCompiler = new KmpCompiler();
+    return await this.kmpCompiler.init(callbacks, options);
   }
 
-  public async compile(kpsFilename: string, sources: WindowsPackageInstallerSources): Promise<Uint8Array> {
-    const kps = this.kmpCompiler.loadKpsFile(kpsFilename);
+  public async run(inputFilename: string, outputFilename?: string): Promise<WindowsPackageInstallerCompilerResult> {
+    const sources = this.options.sources;
+    const kps = this.kmpCompiler.loadKpsFile(inputFilename);
     if(!kps) {
       // errors will already have been reported by loadKpsFile
       return null;
@@ -64,7 +82,7 @@ export class WindowsPackageInstallerCompiler {
     // Nor do we use the MSIOptions field.
 
     // Build the zip
-    const zipBuffer = await this.buildZip(kps, kpsFilename, sources);
+    const zipBuffer = await this.buildZip(kps, inputFilename, sources);
     if(!zipBuffer) {
       // Error messages already reported by buildZip
       return null;
@@ -72,7 +90,22 @@ export class WindowsPackageInstallerCompiler {
 
     // Build the sfx
     const sfxBuffer = this.buildSfx(zipBuffer, sources);
-    return sfxBuffer;
+
+    const result: WindowsPackageInstallerCompilerResult = {
+      artifacts: {
+        exe: {
+          data: sfxBuffer,
+          filename: outputFilename ?? inputFilename.replace(/\.kps$/, '.exe')
+        }
+      }
+    };
+
+    return result;
+  }
+
+  public async write(artifacts: WindowsPackageInstallerCompilerArtifacts): Promise<boolean> {
+    this.callbacks.fs.writeFileSync(artifacts.exe.filename, artifacts.exe.data);
+    return true;
   }
 
   private async buildZip(kps: KpsFile.KpsFile, kpsFilename: string, sources: WindowsPackageInstallerSources): Promise<Uint8Array> {

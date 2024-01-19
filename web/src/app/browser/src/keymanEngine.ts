@@ -20,7 +20,7 @@ import { PageIntegrationHandlers } from './context/pageIntegrationHandlers.js';
 import { LanguageMenu } from './languageMenu.js';
 import { setupOskListeners } from './oskConfiguration.js';
 import { whenDocumentReady } from './utils/documentReady.js';
-import { outputTargetForElement } from '../../../../build/engine/attachment/obj/outputTargetForElement.js';
+import { outputTargetForElement } from 'keyman/engine/attachment';
 
 import { UtilApiEndpoint} from './utilApiEndpoint.js';
 import { UIModule } from './uiModuleInterface.js';
@@ -122,7 +122,7 @@ export default class KeymanEngine extends KeymanEngineBase<BrowserConfiguration,
     }
 
     this._ui = module;
-    if(this.config.deferForInitialization.hasResolved) {
+    if(this.config.deferForInitialization.isFulfilled) {
       module.initialize();
     }
   }
@@ -165,7 +165,7 @@ export default class KeymanEngine extends KeymanEngineBase<BrowserConfiguration,
 
     // Deferred keyboard loading + shortcutting if a different init call on the engine has
     // already fully resolved.
-    if(this.config.deferForInitialization.hasFinalized) {
+    if(this.config.deferForInitialization.isResolved) {
       // abort!  Maybe throw an error, too.
       return Promise.resolve();
     }
@@ -442,7 +442,7 @@ export default class KeymanEngine extends KeymanEngineBase<BrowserConfiguration,
     const stub = this.keyboardRequisitioner.cache.getStub(PInternalName, PlgCode);
     const keyboard = this.keyboardRequisitioner.cache.getKeyboardForStub(stub);
 
-    return this._GetKeyboardDetail(stub, keyboard);
+    return stub && this._GetKeyboardDetail(stub, keyboard);
   }
 
   /**

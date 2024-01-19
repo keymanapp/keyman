@@ -10,7 +10,7 @@ ext.rootPath = '../../'
 apply from: "$rootPath/version.gradle"
 
 android {
-    compileSdkVersion 33
+    compileSdk 34
     namespace="com.tavultesoft.kmapro"
 
     // Don't compress kmp files so they can be copied via AssetManager
@@ -21,7 +21,7 @@ android {
     defaultConfig {
         applicationId "com.tavultesoft.kmapro"
         minSdkVersion 21
-        targetSdkVersion 33
+        targetSdkVersion 34
 
         //println "===DUMPING PROPERTIES==="
         //dumpProperties(project) // Use this to dump all external properties for debugging TeamCity integration

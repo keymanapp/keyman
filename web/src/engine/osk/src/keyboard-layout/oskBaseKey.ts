@@ -1,17 +1,22 @@
 import { ActiveKey, Codes, DeviceSpec } from '@keymanapp/keyboard-processor';
 import { landscapeView } from 'keyman/engine/dom-utils';
 
-import OSKKey, { OSKKeySpec } from './oskKey.js';
+import OSKKey, { renameSpecialKey } from './oskKey.js';
 import { KeyData, KeyElement, link } from '../keyElement.js';
 import OSKRow from './oskRow.js';
 import VisualKeyboard from '../visualKeyboard.js';
+import { ParsedLengthStyle } from '../lengthStyle.js';
+import { GesturePreviewHost } from './gesturePreviewHost.js';
 
 
 export default class OSKBaseKey extends OSKKey {
   private capLabel: HTMLDivElement;
+  private previewHost: GesturePreviewHost;
+  private preview: HTMLDivElement;
+
   public readonly row: OSKRow;
 
-  constructor(spec: OSKKeySpec, layer: string, row: OSKRow) {
+  constructor(spec: ActiveKey, layer: string, row: OSKRow) {
     super(spec, layer);
     this.row = row;
   }
@@ -73,7 +78,7 @@ export default class OSKBaseKey extends OSKKey {
     for(bsn=0; bsn<bsk.length; bsn++) {
       if(bsk[bsn]['sp'] == 1 || bsk[bsn]['sp'] == 2) {
         var oldText=bsk[bsn]['text'];
-        bsk[bsn]['text']=this.renameSpecialKey(oldText, vkbd);
+        bsk[bsn]['text']=renameSpecialKey(oldText, vkbd);
       }
 
       // If a subkey doesn't have a defined layer property, copy it from the base key's layer by default.
@@ -81,12 +86,6 @@ export default class OSKBaseKey extends OSKKey {
         bsk[bsn].layer = btn.key.layer
       }
     }
-
-    // If a subkey array is defined, add an icon
-    var skIcon = document.createElement('div');
-    skIcon.className='kmw-key-popup-icon';
-    //kDiv.appendChild(skIcon);
-    btn.appendChild(skIcon);
   }
 
   construct(vkbd: VisualKeyboard): HTMLDivElement {
@@ -120,11 +119,82 @@ export default class OSKBaseKey extends OSKKey {
       btn['subKeys']=null;
     }
 
+    // If a subkey array is defined, add an icon
+    const skIcon = this.generateHint(vkbd);
+    btn.appendChild(skIcon);
+
     // Add text to button and button to placeholder div
     kDiv.appendChild(btn);
 
+    this.preview = document.createElement('div');
+    this.preview.style.display = 'none';
+    btn.appendChild(this.preview);
+
     // The 'return value' of this process.
     return this.square = kDiv;
+  }
+
+  public generateHint(vkbd: VisualKeyboard): HTMLDivElement {
+    // If a hint is defined, add an icon
+    const skIcon = document.createElement('div');
+    // Ensure that we use the keyboard's text font for hints.
+    skIcon.className='kmw-key-popup-icon';
+
+    const hintSpec = this.spec.hintSrc;
+    if(!hintSpec) {
+      return skIcon;
+    }
+
+    if(hintSpec.font && hintSpec.font != 'SpecialOSK') {
+      skIcon.style.fontFamily = hintSpec.font;
+    } else {
+      skIcon.classList.add('kmw-key-text');
+    }
+
+    if(hintSpec.fontsize) {
+      const parsed = new ParsedLengthStyle(hintSpec.fontsize);
+      // From kmwosk.css: .kmw-key-popup-icon { font-size: 0.5em }
+      // The spec says to overwrite that, but we still want half-size compared to the text
+      // as a key-cap.
+      skIcon.style.fontSize = parsed.scaledBy(0.5).styleString;
+    }
+
+    // If the base key itself is the source of the hint text, we use `hint` directly.
+    // Otherwise, we present the source subkey's key cap as the hint.
+    const baseText = hintSpec == this.spec ? this.spec.hint : hintSpec.text
+    const text = renameSpecialKey(baseText, vkbd);
+    if(text == '\u2022') {
+      // The original, pre-17.0 longpress dot-hint used bold-face styling.
+      skIcon.style.fontWeight='bold';
+    }
+
+    if(baseText != text) {
+      // if the text is from a *Special* shorthand, always use our special-key OSK font.
+      skIcon.style.fontFamily = 'SpecialOSK';
+    }
+
+    skIcon.textContent = text;
+
+    return skIcon;
+  }
+
+  public setPreview(previewHost: GesturePreviewHost) {
+    const oldPreview = this.preview;
+
+    if(previewHost) {
+      this.previewHost = previewHost;
+      this.preview = this.previewHost.element;
+    } else {
+      this.previewHost = null;
+      this.preview = document.createElement('div');
+      this.preview.style.display = 'none';
+    }
+
+    previewHost?.setCancellationHandler(() => {
+      this.setPreview(null);
+    });
+
+    this.btn.replaceChild(this.preview, oldPreview);
   }
 
   public refreshLayout(vkbd: VisualKeyboard) {

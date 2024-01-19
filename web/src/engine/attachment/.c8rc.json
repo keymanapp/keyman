@@ -1,0 +1,10 @@
+{
+  "check-coverage": false,
+  "clean": true,
+  "exclude-after-remap": true,
+  "reporter": ["text", "text-summary"],
+  "reports-dir": "build/coverage",
+  "src": [
+    "src/"
+  ]
+}

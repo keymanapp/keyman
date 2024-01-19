@@ -82,8 +82,8 @@ check_api_not_changed() {
   # shellcheck disable=SC2064
   trap "rm -rf \"${tmpDir}\"" ERR
   dpkg -x "${BIN_PKG}" "${tmpDir}"
-  cd debian
-  dpkg-gensymbols -v"${VERSION}" -p"${PKG_NAME}" -e"${tmpDir}"/usr/lib/x86_64-linux-gnu/"${LIB_NAME}".so* -O"${PKG_NAME}.symbols" -c4
+  mkdir -p debian/tmp/DEBIAN
+  dpkg-gensymbols -v"${VERSION}" -p"${PKG_NAME}" -e"${tmpDir}"/usr/lib/x86_64-linux-gnu/"${LIB_NAME}".so* -c4
   output_ok "${LIB_NAME} API didn't change"
   cd "${REPO_ROOT}/linux"
   rm -rf "${tmpDir}"

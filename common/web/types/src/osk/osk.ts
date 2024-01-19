@@ -1,4 +1,4 @@
-import { TouchLayoutFile, TouchLayoutFlick, TouchLayoutKey, TouchLayoutPlatform, TouchLayoutSubKey } from "src/keyman-touch-layout/keyman-touch-layout-file.js";
+import { TouchLayoutFile, TouchLayoutFlick, TouchLayoutKey, TouchLayoutPlatform, TouchLayoutSubKey } from "../keyman-touch-layout/keyman-touch-layout-file.js";
 import { VisualKeyboard } from "../kvk/visual-keyboard.js";
 import SchemaValidators from "../schema-validators.js";
 

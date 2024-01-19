@@ -1,40 +1,48 @@
-import { ActiveKey, ButtonClass, DeviceSpec, LayoutKey } from '@keymanapp/keyboard-processor';
+import { ActiveKey, ActiveSubKey, ButtonClass, DeviceSpec, LayoutKey } from '@keymanapp/keyboard-processor';
+import { TouchLayout } from '@keymanapp/common-types';
+import TouchLayoutFlick = TouchLayout.TouchLayoutFlick;
+
 // At present, we don't use @keymanapp/keyman.  Just `keyman`.  (Refer to <root>/web/package.json.)
 import { getAbsoluteX, getAbsoluteY } from 'keyman/engine/dom-utils';
 
 import { getFontSizeStyle } from '../fontSizeUtils.js';
-import InputEventCoordinate from '../input/inputEventCoordinate.js';
 import specialChars from '../specialCharacters.js';
 import buttonClassNames from '../buttonClassNames.js';
 
 import { KeyElement } from '../keyElement.js';
 import VisualKeyboard from '../visualKeyboard.js';
 
-export class OSKKeySpec implements LayoutKey {
-  id: string;
+/**
+ * Replace default key names by special font codes for modifier keys
+ *
+ *  @param  {string}  oldText
+ *  @return {string}
+ **/
+export function renameSpecialKey(oldText: string, vkbd: VisualKeyboard): string {
+ // If a 'special key' mapping exists for the text, replace it with its corresponding special OSK character.
+ switch(oldText) {
+   case '*ZWNJ*':
+     // Default ZWNJ symbol comes from iOS.  We'd rather match the system defaults where
+     // possible / available though, and there's a different standard symbol on Android.
+     oldText = vkbd.device.OS == DeviceSpec.OperatingSystem.Android ?
+       '*ZWNJAndroid*' :
+       '*ZWNJiOS*';
+     break;
+   case '*Enter*':
+     oldText = vkbd.isRTL ? '*RTLEnter*' : '*LTREnter*';
+     break;
+   case '*BkSp*':
+     oldText = vkbd.isRTL ? '*RTLBkSp*' : '*LTRBkSp*';
+     break;
+   default:
+     // do nothing.
+ }
 
-  // Only set (within @keymanapp/keyboard-processor) for keys actually specified in a loaded layout
-  baseKeyID?: string;
-  coreID?: string;
-  elementID?: string;
+ let specialCodePUA = 0XE000 + specialChars[oldText];
 
-  text?: string;
-  sp?: ButtonClass;
-  width: number;
-  layer?: string; // The key will derive its base modifiers from this property - may not equal the layer on which it is displayed.
-  nextlayer?: string;
-  pad?: number;
-  sk?: OSKKeySpec[];
-  default?: boolean;
-
-  constructor(id: string, text?: string, width?: number, sp?: ButtonClass, nextlayer?: string, pad?: number) {
-    this.id = id;
-    this.text = text;
-    this.width = width ? width : 50;
-    this.sp = sp;
-    this.nextlayer = nextlayer;
-    this.pad = pad;
-  }
+ return specialChars[oldText] ?
+   String.fromCharCode(specialCodePUA) :
+   oldText;
 }
 
 export default abstract class OSKKey {
@@ -44,7 +52,7 @@ export default abstract class OSKKey {
   static readonly BUTTON_CLASSES = buttonClassNames;
 
   static readonly HIGHLIGHT_CLASS = 'kmw-key-touched';
-  readonly spec: OSKKeySpec;
+  readonly spec: ActiveKey | ActiveSubKey;
 
   btn: KeyElement;
   label: HTMLSpanElement;
@@ -55,7 +63,7 @@ export default abstract class OSKKey {
    */
   readonly layer: string;
 
-  constructor(spec: OSKKeySpec, layer: string) {
+  constructor(spec: ActiveKey | ActiveSubKey, layer: string) {
     this.spec = spec;
     this.layer = layer;
   }
@@ -285,39 +293,6 @@ export default abstract class OSKKey {
     return key.proportionalWidth * vkbd.width;
   }
 
-  /**
-   * Replace default key names by special font codes for modifier keys
-   *
-   *  @param  {string}  oldText
-   *  @return {string}
-   **/
-  protected renameSpecialKey(oldText: string, vkbd: VisualKeyboard): string {
-    // If a 'special key' mapping exists for the text, replace it with its corresponding special OSK character.
-    switch(oldText) {
-      case '*ZWNJ*':
-        // Default ZWNJ symbol comes from iOS.  We'd rather match the system defaults where
-        // possible / available though, and there's a different standard symbol on Android.
-        oldText = vkbd.device.OS == DeviceSpec.OperatingSystem.Android ?
-          '*ZWNJAndroid*' :
-          '*ZWNJiOS*';
-        break;
-      case '*Enter*':
-        oldText = vkbd.isRTL ? '*RTLEnter*' : '*LTREnter*';
-        break;
-      case '*BkSp*':
-        oldText = vkbd.isRTL ? '*RTLBkSp*' : '*LTRBkSp*';
-        break;
-      default:
-        // do nothing.
-    }
-
-    let specialCodePUA = 0XE000 + specialChars[oldText];
-
-    return specialChars[oldText] ?
-      String.fromCharCode(specialCodePUA) :
-      oldText;
-  }
-
   public get keyText(): string {
     const spec = this.spec;
     const DEFAULT_BLANK = '\xa0';
@@ -325,12 +300,8 @@ export default abstract class OSKKey {
     // Add OSK key labels
     let keyText = null;
     if(spec['text'] == null || spec['text'] == '') {
-      if(typeof spec['id'] == 'string') {
-        // If the ID's Unicode-based, just use that code.
-        keyText = ActiveKey.unicodeIDToText(spec['id']);
-      }
-
-      keyText = keyText || DEFAULT_BLANK;
+      // U_ codes are handled during keyboard pre-processing.
+      keyText = DEFAULT_BLANK;
     } else {
       keyText=spec['text'];
 
@@ -352,7 +323,7 @@ export default abstract class OSKKey {
 
     // Add OSK key labels
     let keyText = this.keyText;
-    let specialText = this.renameSpecialKey(keyText, vkbd);
+    let specialText = renameSpecialKey(keyText, vkbd);
     if(specialText != keyText) {
       // The keyboard wants to use the code for a special glyph defined by the SpecialOSK font.
       keyText = specialText;
@@ -403,19 +374,6 @@ export default abstract class OSKKey {
     t.innerText = keyText;
 
     return t;
-  }
-
-  public isUnderTouch(input: InputEventCoordinate): boolean {
-    let x = input.x;
-    let y = input.y;
-
-    let btn = this.btn;
-    let x0 = getAbsoluteX(btn);
-    let y0 = getAbsoluteY(btn);
-    let x1 = x0 + btn.offsetWidth;
-    let y1 = y0 + btn.offsetHeight;
-
-    return (x > x0 && x < x1 && y > y0 && y < y1);
   }
 
   public refreshLayout(vkbd: VisualKeyboard) {

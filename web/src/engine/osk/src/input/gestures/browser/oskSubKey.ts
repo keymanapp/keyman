@@ -1,9 +1,13 @@
-import OSKKey, { OSKKeySpec } from '../../../keyboard-layout/oskKey.js';
+import { ActiveSubKey } from '@keymanapp/keyboard-processor';
+import OSKKey from '../../../keyboard-layout/oskKey.js';
 import { KeyData, KeyElement, link } from '../../../keyElement.js';
 import VisualKeyboard from '../../../visualKeyboard.js';
 
+// Typing is to ensure that the keys specified below actually are on the type...
+// and to gain Intellisense if more need to be added.
+
 export default class OSKSubKey extends OSKKey {
-  constructor(spec: OSKKeySpec, layer: string) {
+  constructor(spec: ActiveSubKey, layer: string) {
     if(typeof(layer) != 'string' || layer == '') {
       throw "The 'layer' parameter for subkey construction must be properly defined.";
     }
@@ -22,12 +26,6 @@ export default class OSKSubKey extends OSKKey {
     let kDiv=document.createElement('div');
     let tKey = osk.getDefaultKeyObject();
     let ks=kDiv.style;
-
-    for(var tp in tKey) {
-      if(typeof spec[tp] != 'string') {
-        spec[tp]=tKey[tp];
-      }
-    }
 
     kDiv.className='kmw-key-square-ex';
     if(topMargin) {

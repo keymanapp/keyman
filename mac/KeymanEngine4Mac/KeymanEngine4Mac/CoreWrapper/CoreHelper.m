@@ -17,7 +17,6 @@
 #import "CoreHelper.h"
 #import "CoreAction.h"
 #import "keyman_core_api.h"
-#import "ActionArrayOptimizer.h"
 #import "MacVKCodes.h"
 #import "WindowsVKCodes.h"
 
@@ -25,7 +24,6 @@ const int VIRTUAL_KEY_ARRAY_SIZE = 0x80;
 UInt32 VirtualKeyMap[VIRTUAL_KEY_ARRAY_SIZE];
 
 @interface CoreHelper()
-@property (strong, nonatomic, readonly) ActionArrayOptimizer *optimizer;
 @end
 
 
@@ -56,12 +54,24 @@ UInt32 VirtualKeyMap[VIRTUAL_KEY_ARRAY_SIZE];
     return length;
 }
 
+/**
+ * Return the string length (number of unicode scalar, or UTF32, values) excluding the terminating null.
+ */
+-(unsigned long) scalarValueStringLength:(UTF32Char const *)string {
+  unsigned long length = 0lu;
+  if(NULL == string) {
+    return length;
+  }
+  while('\0' != string[length]) {
+    length++;
+  }
+  return length;
+}
 
 -(instancetype)initWithDebugMode:(BOOL)debugMode {
   self = [super init];
   if (self) {
     _debugMode = debugMode;
-    _optimizer = [[ActionArrayOptimizer alloc] init];
     [self initVirtualKeyMapping];
   }
   return self;
@@ -84,15 +94,8 @@ UInt32 VirtualKeyMap[VIRTUAL_KEY_ARRAY_SIZE];
   }
 }
 
--(NSArray*)optimizeActionArray:(NSArray*)actionArray {
-  [self logDebugMessage:@"unoptimized actions array: %@", actionArray];
-  NSArray* optimizedActionArray = [self.optimizer optimize:actionArray];
-  [self logDebugMessage:@"optimized actions array: %@", optimizedActionArray];
-  return optimizedActionArray;
-}
-
--(UInt32)macToKeymanModifier:(NSEventModifierFlags)modifiers {
-  UInt32 keymanModifiers = 0;
+-(UTF32Char)macToKeymanModifier:(NSEventModifierFlags)modifiers {
+  UTF32Char keymanModifiers = 0;
   if ([self isShiftKey:modifiers]) {
     keymanModifiers |= KM_CORE_MODIFIER_SHIFT;
   }
@@ -158,17 +161,32 @@ UInt32 VirtualKeyMap[VIRTUAL_KEY_ARRAY_SIZE];
   return (modifiers & NSEventModifierFlagOption) == NSEventModifierFlagOption;
 }
 
-/*
- Converts a UTF-32 unicode scalar value to an NSString.
- Use this method to convert values from Keyman Core of type km_core_usv, equivalent to uint32_t
+/**
+ * Converts a UTF-32 unicode scalar value to an NSString.
+ * Use this method to convert values from Keyman Core of type km_core_usv, equivalent to uint32_t
  */
--(NSString*)utf32ValueToString:(UInt32)scalarValue {
+-(NSString*)utf32ValueToString:(UTF32Char)scalarValue {
   NSData * characterData = [[NSData alloc] initWithBytes:&scalarValue length:sizeof(scalarValue)];
 
   NSString *characterString=[[NSString alloc] initWithBytes:[characterData bytes] length:[characterData length] encoding:NSUTF32LittleEndianStringEncoding];
   [self logDebugMessage:@"utf32ValueToString data: '%@', string: %@", characterData, characterString];
   return characterString;
 }
+
+/**
+ * Converts a null-terminated string of UTF-32 unicode scalar values to an NSString.
+ */
+-(NSString*)utf32CStringToString:(UTF32Char*)utf32CString {
+  NSString *characterString = nil;
+  long utf32StringLength = [self scalarValueStringLength:utf32CString];
+  
+  if (utf32StringLength > 0) {
+    characterString=[[NSString alloc] initWithBytes:utf32CString length:utf32StringLength*4 encoding:NSUTF32LittleEndianStringEncoding];
+  }
+
+  return characterString;
+}
+
 
 // TODO: alphabetize instead of using whatever this order is
 

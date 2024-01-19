@@ -582,7 +582,7 @@ typedef struct {
   km_core_usv* output;
 
   // list of options to persist, terminated with KM_CORE_OPTIONS_END
-  km_core_option_item* persist_options;
+  km_core_option_item * persist_options;
 
   // issue a beep, 0 = no, 1 = yes
   km_core_bool do_alert;
@@ -611,7 +611,7 @@ A pointer to a `km_core_actions` object, which must be freed with
 ```c
 */
 KMN_API
-km_core_actions*
+km_core_actions const *
 km_core_state_get_actions(
   km_core_state const *state
 );
@@ -630,7 +630,7 @@ returned by `km_core_state_get_actions`.
 KMN_API
 km_core_status
 km_core_actions_dispose(
-  km_core_actions* actions
+  km_core_actions const * actions
 );
 
 /*
@@ -669,8 +669,9 @@ will replace most uses of the existing Core context APIs.
 
 ##### Parameters:
 - __state__: An opaque pointer to a state object.
-- __application_context__: A pointer to an null-terminated `km_core_cp`
-    string representing the current context from the application.
+- __application_context__: A pointer to an null-terminated array of
+    utf16 encoded data representing the current context from the
+    application.
 ##### Return status:
 - `KM_CORE_CONTEXT_STATUS_UNCHANGED`: Cached context change was not needed
 - `KM_CORE_CONTEXT_STATUS_UPDATED`: Cached context was set to application

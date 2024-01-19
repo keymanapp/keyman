@@ -1,6 +1,6 @@
 import { assert } from 'chai';
 
-import { LanguageProcessor } from '@keymanapp/input-processor';
+import { LanguageProcessor, TranscriptionCache } from '@keymanapp/input-processor';
 import { SourcemappedWorker as LMWorker } from "@keymanapp/lexical-model-layer/node";
 import { Mock } from '@keymanapp/keyboard-processor';
 
@@ -36,12 +36,12 @@ describe('LanguageProcessor', function() {
 
   describe('[[constructor]]', function () {
     it('should initialize without errors', function () {
-      let lp = new LanguageProcessor(worker);
+      let lp = new LanguageProcessor(worker, new TranscriptionCache());
       assert.isNotNull(lp);
     });
 
     it('has expected default values after initialization', function () {
-      let languageProcessor = new LanguageProcessor(worker);
+      let languageProcessor = new LanguageProcessor(worker, new TranscriptionCache());
 
       // These checks are lifted from the keyboard-processor init checks found in
       // common/web/keyboard-processor/tests/cases/basic-init.js.
@@ -57,7 +57,13 @@ describe('LanguageProcessor', function() {
   });
 
   describe('.predict', function() {
-    let compiler = new LexicalModelCompiler(callbacks);
+    let compiler = null;
+
+    this.beforeAll(async function() {
+      compiler = new LexicalModelCompiler();
+      assert.isTrue(await compiler.init(callbacks, {}));
+    });
+
     const MODEL_ID = 'example.qaa.trivial';
 
     // ES-module mode leaves out `__dirname`, so we rebuild it using other components.
@@ -67,23 +73,26 @@ describe('LanguageProcessor', function() {
     const PATH = path.join(__dirname, '../../../../../developer/src/kmc-model/test/fixtures', MODEL_ID);
 
     describe('using angle brackets for quotes', function() {
-      let modelCode = compiler.generateLexicalModelCode(MODEL_ID, {
-        format: 'trie-1.0',
-        sources: ['wordlist.tsv'],
-        punctuation: {
-          quotesForKeepSuggestion: { open: `«`, close: `»`},
-          insertAfterWord: " " , // OGHAM SPACE MARK
-        }
-      }, PATH);
+      let modelCode = null, modelSpec = null;
+      this.beforeAll(function() {
+        modelCode = compiler.generateLexicalModelCode(MODEL_ID, {
+          format: 'trie-1.0',
+          sources: ['wordlist.tsv'],
+          punctuation: {
+            quotesForKeepSuggestion: { open: `«`, close: `»`},
+            insertAfterWord: " " , // OGHAM SPACE MARK
+          }
+        }, PATH);
 
-      let modelSpec = {
-        id: MODEL_ID,
-        languages: ['en'],
-        code: modelCode
-      };
+        modelSpec = {
+          id: MODEL_ID,
+          languages: ['en'],
+          code: modelCode
+        };
+      });
 
       it("successfully loads the model", function(done) {
-        let languageProcessor = new LanguageProcessor(worker);
+        let languageProcessor = new LanguageProcessor(worker, new TranscriptionCache());
 
         languageProcessor.loadModel(modelSpec).then(function() {
           assert.isOk(languageProcessor.activeModel); // is only set after a successful load.
@@ -94,7 +103,7 @@ describe('LanguageProcessor', function() {
       });
 
       it("generates the expected prediction set", function(done) {
-        let languageProcessor = new LanguageProcessor(worker);
+        let languageProcessor = new LanguageProcessor(worker, new TranscriptionCache());
 
         let contextSource = new Mock("li", 2);
         let transcription = contextSource.buildTranscriptionFrom(contextSource, null, null);
@@ -115,22 +124,25 @@ describe('LanguageProcessor', function() {
       });
 
       describe('properly cases generated suggestions', function() {
-        let modelCode = compiler.generateLexicalModelCode(MODEL_ID, {
-          format: 'trie-1.0',
-          sources: ['wordlist.tsv'],
-          languageUsesCasing: true,
-          //applyCasing // we rely on the compiler's default implementation here.
-        }, PATH);
+        let modelCode = null, modelSpec = null;
+        this.beforeAll(function () {
+          modelCode = compiler.generateLexicalModelCode(MODEL_ID, {
+            format: 'trie-1.0',
+            sources: ['wordlist.tsv'],
+            languageUsesCasing: true,
+            //applyCasing // we rely on the compiler's default implementation here.
+          }, PATH);
 
-        let modelSpec = {
-          id: MODEL_ID,
-          languages: ['en'],
-          code: modelCode
-        };
+          modelSpec = {
+            id: MODEL_ID,
+            languages: ['en'],
+            code: modelCode
+          };
+        });
 
         describe("does not alter casing when input is lowercased", function() {
           it("when input is fully lowercased", function(done) {
-            let languageProcessor = new LanguageProcessor(worker);
+            let languageProcessor = new LanguageProcessor(worker, new TranscriptionCache());
 
             let contextSource = new Mock("li", 2);
             let transcription = contextSource.buildTranscriptionFrom(contextSource, null, null);
@@ -149,7 +161,7 @@ describe('LanguageProcessor', function() {
           });
 
           it("when input has non-initial uppercased letters", function(done) {
-            let languageProcessor = new LanguageProcessor(worker);
+            let languageProcessor = new LanguageProcessor(worker, new TranscriptionCache());
 
             let contextSource = new Mock("lI", 2);
             let transcription = contextSource.buildTranscriptionFrom(contextSource, null, null);
@@ -169,7 +181,7 @@ describe('LanguageProcessor', function() {
           });
 
           it("unless the suggestion has uppercased letters", function(done) {
-            let languageProcessor = new LanguageProcessor(worker);
+            let languageProcessor = new LanguageProcessor(worker, new TranscriptionCache());
 
             let contextSource = new Mock("i", 1);
             let transcription = contextSource.buildTranscriptionFrom(contextSource, null, null);
@@ -190,7 +202,7 @@ describe('LanguageProcessor', function() {
 
         describe("uppercases suggestions when input is fully capitalized ", function() {
           it("for suggestions with default casing  (== 'lower')", function(done) {
-            let languageProcessor = new LanguageProcessor(worker);
+            let languageProcessor = new LanguageProcessor(worker, new TranscriptionCache());
 
             let contextSource = new Mock("LI", 2);
             let transcription = contextSource.buildTranscriptionFrom(contextSource, null, null);
@@ -210,7 +222,7 @@ describe('LanguageProcessor', function() {
           });
 
           it("for precapitalized suggestions", function(done) {
-            let languageProcessor = new LanguageProcessor(worker);
+            let languageProcessor = new LanguageProcessor(worker, new TranscriptionCache());
 
             let contextSource = new Mock("I", 1);
             let transcription = contextSource.buildTranscriptionFrom(contextSource, null, null);
@@ -232,7 +244,7 @@ describe('LanguageProcessor', function() {
         describe("initial-cases suggestions when input uses initial casing ", function() {
           describe("when input is a single capitalized letter", function() {
             it("for suggestions with default casing (== 'lower')", function(done) {
-              let languageProcessor = new LanguageProcessor(worker);
+              let languageProcessor = new LanguageProcessor(worker, new TranscriptionCache());
 
               let contextSource = new Mock("L", 1);
               let transcription = contextSource.buildTranscriptionFrom(contextSource, null, null);
@@ -254,7 +266,7 @@ describe('LanguageProcessor', function() {
 
           describe("input length > 1", function() {
             it("for suggestions with default casing (== 'lower')", function(done) {
-              let languageProcessor = new LanguageProcessor(worker);
+              let languageProcessor = new LanguageProcessor(worker, new TranscriptionCache());
 
               let contextSource = new Mock("Li", 2);
               let transcription = contextSource.buildTranscriptionFrom(contextSource, null, null);

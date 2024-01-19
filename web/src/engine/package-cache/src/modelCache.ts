@@ -11,7 +11,7 @@ export default class ModelManager {
     return this.languageModelMap[lgCode];
   }
 
-  // Accessible publicly as keyman.modelManager.register(model: ModelSpec)
+  // Accessible publicly as keyman.modelCache.register(model: ModelSpec)
   register(model: ModelSpec): void {
     // Forcibly lowercase the model ID before proceeding.
     model.id = model.id.toLowerCase();

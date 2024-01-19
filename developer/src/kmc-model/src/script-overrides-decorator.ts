@@ -1,5 +1,5 @@
 import { OverrideScriptDefaults } from "./lexical-model.js";
-import { ModelCompilerError, ModelCompilerMessages } from "./model-compiler-errors.js";
+import { ModelCompilerError, ModelCompilerMessages } from "./model-compiler-messages.js";
 
 export function decorateWithScriptOverrides(breaker: WordBreakingFunction, option: OverrideScriptDefaults) {
   if (option !== 'break-words-at-spaces') {

@@ -1,4 +1,4 @@
-import { ModelCompilerError, ModelCompilerMessageContext, ModelCompilerMessages } from "./model-compiler-errors.js";
+import { ModelCompilerError, ModelCompilerMessageContext, ModelCompilerMessages } from "./model-compiler-messages.js";
 import { callbacks } from "./compiler-callbacks.js";
 
 // Supports LF or CRLF line terminators.
