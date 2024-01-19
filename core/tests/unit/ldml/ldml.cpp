@@ -37,6 +37,8 @@ namespace {
 
 bool g_beep_found = false;
 
+bool g_already_complained = false;
+
 km_core_option_item test_env_opts[] =
 {
   KM_CORE_OPTIONS_END
@@ -136,9 +138,17 @@ apply_action(
         }
       }
       if (act.backspace.expected_type == KM_CORE_BT_CHAR) {
-        std::cerr << "Note: TODO-LDML:  not validating backspace.expected_value nor ch - no information available." << std::endl;
-        // assert(ch == act.backspace.expected_value);
-        // assert(context.back().character == ch);
+        if (act.backspace.expected_value == 0) {
+          // using set_action() doesn't provide for expected backspaces, so can't validate here
+          // only complain once.
+          if (!g_already_complained) {
+            std::cerr << "Note: TODO-LDML:  not validating backspace.expected_value nor ch - no information available." << std::endl;
+            g_already_complained = true;
+          }
+        } else {
+          assert(ch == act.backspace.expected_value);
+          assert(context.back().character == ch);
+        }
         assert(context.back().type == KM_CORE_CT_CHAR);
         context.pop_back();
       } else {
@@ -193,6 +203,20 @@ verify_context(std::u16string& text_store, km_core_state* &test_state, std::vect
     try_status(km_core_context_items_to_utf16(citems, nullptr, &n));
     km_core_cp *buf = new km_core_cp[n];
     try_status(km_core_context_items_to_utf16(citems, buf, &n));
+    std::cout << "context (raw): "; // output including markers (which aren't in 'buf' here)
+    for (auto ci = citems; ci->type != KM_CORE_CT_END; ci++) {
+      switch(ci->type) {
+        case KM_CORE_CT_CHAR:
+          std::cout << "U+" << std::setw(4) << std::hex << ci->character << std::dec << " ";
+          break;
+        case KM_CORE_CT_MARKER:
+          std::cout << "\\m{" << ci->character << "} ";
+          break;
+        default:
+          std::cout << "type#" << ci->type << " ";
+      }
+    }
+    std::cout << std::endl;
     std::cout << "context   : " << string_to_hex(buf) << " [" << buf << "]" << std::endl;
     std::cout << "testcontext ";
     std::cout.fill('0');
@@ -210,31 +234,31 @@ verify_context(std::u16string& text_store, km_core_state* &test_state, std::vect
     }
     std::cout << std::endl;
 
-#if 0
     // Verify that both our local test_context and the core's test_state.context have
     // not diverged
     auto ci = citems;
-    // TODO-LDML: How to validate this with the new struct?
     for (auto test_ci = test_context.begin(); ci->type != KM_CORE_CT_END || test_ci != test_context.end(); ci++, test_ci++) {
-      assert(ci->type != KM_CORE_CT_END && test_ci != test_context.end());  // Verify that both lists are same length
+      // skip over markers, they won't be in test_context
+      while (ci->type == KM_CORE_CT_MARKER) {
+        ci++;
+      }
+      // exit if BOTH are at end.
+      if (ci->type == KM_CORE_CT_END && test_ci == test_context.end()) {
+        break;  // success
+      }
+      // fail if only ONE is at end
+      assert(ci->type != KM_CORE_CT_END && test_ci != test_context.end());
+      // fail if type and marker don't match.
       assert(test_ci->type == ci->type && test_ci->marker == ci->marker);
     }
-#else
-  std::cerr << "Note: TODO-LDML: need to figure out how to validate test_context divergence." << std::endl;
-#endif
 
   km_core_context_items_dispose(citems);
   if (text_store != buf) {
     std::cerr << "text store has diverged from buf" << std::endl;
     std::cerr << "text store: " << string_to_hex(text_store) << " [" << text_store << "]" << std::endl;
-#if 0
-      assert(false);
-#else
-    std::cerr << "TODO-LDML: need to validate text store" << std::endl;
-#endif
-    }
-    delete [] buf;
-
+    assert(false);
+  }
+  delete[] buf;
 }
 
 int
