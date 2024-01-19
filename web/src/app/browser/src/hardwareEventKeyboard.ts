@@ -1,6 +1,6 @@
 import { Codes, DeviceSpec, KeyEvent, KeyMapping, Keyboard, KeyboardProcessor } from '@keymanapp/keyboard-processor';
 
-import { HardKeyboard } from 'keyman/engine/main';
+import { HardKeyboard, processForMnemonicsAndLegacy } from 'keyman/engine/main';
 import { DomEventTracker } from 'keyman/engine/events';
 import { DesignIFrame, nestedInstanceOf } from 'keyman/engine/element-wrappers';
 import { eventOutputTarget, outputTargetForElement } from 'keyman/engine/attachment';
@@ -186,48 +186,11 @@ export function preprocessKeyboardEvent(e: KeyboardEvent, keyboardState: Keyboar
     isSynthetic: false
   });
 
-  // Mnemonic handling.
-  if(activeKeyboard && activeKeyboard.isMnemonic) {
-    // The following will never set a code corresponding to a modifier key, so it's fine to do this,
-    // which may change the value of Lcode, here.
-
-    s.setMnemonicCode(e.getModifierState("Shift"), e.getModifierState("CapsLock"));
-  }
   // The 0x6F used to be 0x60 - this adjustment now includes the chiral alt and ctrl modifiers in that check.
   let LisVirtualKeyCode = (typeof e.charCode != 'undefined' && e.charCode != null  &&  (e.charCode == 0 || (Lmodifiers & 0x6F) != 0));
   s.LisVirtualKey = LisVirtualKeyCode || e.type != 'keypress';
 
-  // Other minor physical-keyboard adjustments
-  if(activeKeyboard && !activeKeyboard.isMnemonic) {
-    // Positional Layout
-
-    /* 13/03/2007 MCD: Swedish: Start mapping of keystroke to US keyboard */
-    var Lbase = KeyMapping.languageMap[keyboardState.baseLayout];
-    if(Lbase && Lbase['k'+s.Lcode]) {
-      s.Lcode=Lbase['k'+s.Lcode];
-    }
-    /* 13/03/2007 MCD: Swedish: End mapping of keystroke to US keyboard */
-
-    // The second conditional component (re 0x60):  if CTRL or ALT is held down...
-    // Do not remap for legacy keyboard compatibility, do not pass Go, do not collect $200.
-    // This effectively only permits `default` and `shift` for legacy keyboards.
-    //
-    // Third:  DO, however, track direct presses of any main modifier key.  The OSK should
-    // reflect the current modifier state even for legacy keyboards.
-    if(!activeKeyboard.definesPositionalOrMnemonic && !(s.Lmodifiers & 0x60) && !s.isModifier) {
-      // Support version 1.0 KeymanWeb keyboards that do not define positional vs mnemonic
-      s = new KeyEvent({
-        Lcode: KeyMapping._USKeyCodeToCharCode(s),
-        Lmodifiers: 0,
-        LisVirtualKey: false,
-        vkCode: s.Lcode, // Helps to merge OSK and physical keystroke control paths.
-        Lstates: s.Lstates,
-        kName: '',
-        device: device,
-        isSynthetic: false
-      });
-    }
-  }
+  s = processForMnemonicsAndLegacy(s, activeKeyboard, keyboardState.baseLayout);
 
   let processedEvent = new KeyEvent(s);
   processedEvent.source = e;
