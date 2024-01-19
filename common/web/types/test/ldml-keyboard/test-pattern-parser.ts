@@ -330,6 +330,8 @@ describe('Test of nfd_markers()', () => {
       ["6e","6e",false],
       ["6e","6e",true],
       ["6\uffff\u0008\u0001e", "6e", false],
+      ["6\\uffff\\u0008\\u0001e", "6e", true],
+      [`6${MarkerParser.ANY_MARKER_MATCH}e`, "6e", true],
     ].forEach(([src,expect,forMatch]) => {
       const dst = MarkerParser.remove_markers(<string>src, [], <boolean>forMatch);
       assert.equal(dst, <string>expect, `mapping ${src} with forMatch=${forMatch}`);

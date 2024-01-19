@@ -152,24 +152,66 @@ export class MarkerParser {
     return s.normalize("NFD");
   }
 
+
   public static remove_markers(s: string, map: MarkerMap, forMatch?: boolean) : string {
-    return s;
+    let out : string = '';
+    let last_markers : number[] = [];
+    let a : string[] = [...s];
+    function add_pending_markers(l : string) {
+      // first char, or, marker-before-eot
+      const ch = (l === '') ? MARKER_BEFORE_EOT : [...l][0];
+      while(last_markers.length) {
+        const marker = last_markers[0];
+        last_markers = last_markers.slice(1); // pop from front
+        map.push({ ch, marker });
+      }
+    }
+    while (a.length > 0) {
+      const p = this.parse_next_marker(a.join(''), forMatch);
+      if (!p?.match) {
+        // no match
+        add_pending_markers(a[0]); // add any pending markers
+        out = out + a[0]; // add the non-marker text
+        a = a.slice(1); // move forward 1 char
+    } else {
+        const { marker, match } = p;
+        if (marker >= constants.marker_min_index) {
+          last_markers.push(marker);
+        }
+        a = a.slice([...match].length); // skip over matched marker
+      }
+    }
+    add_pending_markers('');
+    return out;
   }
 
   public static parse_next_marker(s: string, forMatch?: boolean) : MarkerResult {
     if(!forMatch) {
-      const anchored_match = new RegExp(`^${MarkerParser.ANY_MARKER_MATCH}`);
-      const m = s.match(anchored_match);
+      const m = s.match(PARSE_SENTINEL_MARKER);
       if (m) {
         const match = m[0];
         const marker = match.codePointAt(2);
         return ({ match, marker });
       }
-      // else TODO
+    } else {
+      const m = s.match(PARSE_REGEX_MARKER);
+      if (m) {
+        const match = m[0];
+        const single = m[1];
+        if (single) {
+          return ({ match, marker: Number.parseInt(single.substring(3), 16) });
+        } else {
+          return ({ match, marker: constants.marker_any_index });
+        }
+      }
     }
     return null;
   }
 };
+
+const MARKER_BEFORE_EOT = '\ufffe';
+const PARSE_SENTINEL_MARKER = new RegExp(`^${MarkerParser.ANY_MARKER_MATCH}`);
+const PARSE_REGEX_MARKER    = /^\\uffff\\u0008(?:(\\u[0-9a-fA-F]{4})|(\[\\u[0-9a-fA-F]{4}-\\u[0-9a-fA-F]{4}\]))/;
 
 export interface MarkerEntry {
   ch? : string;
