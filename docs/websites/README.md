@@ -35,20 +35,21 @@ Docker tends to throttle Docker image downloads, so some developer offices may w
 This stops the Docker container for the site.
 
 #### Build the Docker image
-1. Run `./build.sh build`.
+1. Run `./build.sh build`
 
 This downloads and builds the Docker images needed for the site.
 
 #### Configure
 1. Run `./build.sh configure`.
 
-This step is currently not needed
+This step typically downloads _common/ website files from [shared-sites](https://github.com/keymanapp/shared-sites/tree/main/_common).
 
 #### Start the Docker container
 1. Run `./build.sh start`.
 
 This maps the local directory to the the Docker image.
-Then, it creates a link of the PHP dependencies in Docker image from /var/www/vendor/ to /var/www/html/vendor.
+
+For sites that use Composer dependencies, this step also creates a link in the Docker image from /var/www/vendor/ to /var/www/html/vendor.
 The link file also appears locally.
 
 After this, you can access the website at the following ports:
@@ -65,11 +66,19 @@ After this, you can access the website at the following ports:
 Checks for broken links
 1. Run `./build.sh test`
 
+#### Using Website-Local-Proxy
+Rather than remembering localhost port values, you can clone and run [website-local-proxy](https://github.com/keymanapp/website-local-proxy).
+
+Follow https://github.com/keymanapp/website-local-proxy?tab=readme-ov-file#using-website-local-proxy and you can access the local websites at
+http://*keyman.com.localhost
+
+
 ---------
 
 ## Kubernetes Deployment
 For production, the websites are deployed with Kubernetes.
 
+Note: the following section is outdated as it's replaced with Rancher/Fleet.
 
 ### How to run help.keyman.com locally with Docker Desktop's Kubernetes singlenode cluster
 

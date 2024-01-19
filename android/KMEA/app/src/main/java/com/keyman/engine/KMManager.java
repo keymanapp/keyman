@@ -34,8 +34,11 @@ import android.os.IBinder;
 import android.text.InputType;
 import android.util.Log;
 import android.view.View;
+import android.view.Display;
+import android.view.Surface;
 import android.view.ViewGroup;
 import android.view.Window;
+import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputConnection;
 import android.view.inputmethod.InputMethodManager;
@@ -2016,10 +2019,12 @@ public final class KMManager {
   public static int getKeyboardHeight(Context context) {
     int defaultHeight = (int) context.getResources().getDimension(R.dimen.keyboard_height);
     SharedPreferences prefs = context.getSharedPreferences(context.getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
-    int orientation = context.getResources().getConfiguration().orientation;
-    if (orientation == Configuration.ORIENTATION_PORTRAIT) {
+
+    Display display = ((WindowManager) context.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
+    int rotation = display.getRotation();
+    if (rotation == Surface.ROTATION_0 || rotation == Surface.ROTATION_180) {
       return prefs.getInt(KMManager.KMKey_KeyboardHeightPortrait, defaultHeight);
-    } else if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
+    } else if (rotation == Surface.ROTATION_90 || rotation == Surface.ROTATION_270) {
       return prefs.getInt(KMManager.KMKey_KeyboardHeightLandscape, defaultHeight);
     }
 

@@ -1,6 +1,6 @@
 import { KmpJsonFile, CompilerCallbacks, KmxFileReader, KmxFileReaderError, KMX, KeymanFileTypes } from '@keymanapp/common-types';
 import { getCompiledKmxKeyboardMetadata } from './kmx-keyboard-metadata.js';
-import { CompilerMessages } from './messages.js';
+import { CompilerMessages } from './package-compiler-messages.js';
 import { getCompiledWebKeyboardMetadata, WebKeyboardMetadata } from './web-keyboard-metadata.js';
 
 export type KeyboardMetadata = {

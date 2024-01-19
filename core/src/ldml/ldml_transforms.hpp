@@ -16,18 +16,11 @@
 #include <utility>
 #include "debuglog.h"
 
-#if !defined(HAVE_ICU4C)
-#error icu4c is required for this code
-#endif
-
-#define U_FALLTHROUGH
-#include "unicode/utypes.h"
+#include "core_icu.h"
 #include "unicode/uniset.h"
 #include "unicode/usetiter.h"
-#include "unicode/unistr.h"
 #include "unicode/regex.h"
 #include "unicode/utext.h"
-#include "unicode/normalizer2.h"
 
 namespace km {
 namespace core {

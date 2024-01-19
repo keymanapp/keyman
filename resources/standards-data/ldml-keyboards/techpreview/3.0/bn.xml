@@ -129,7 +129,7 @@
     <transforms type="simple">
         <transformGroup>
             <transform from="\u{09C7}\m{A}" to="\u{09CC}" /> <!-- E + lengthener = AU -->
-            <!-- <transform from="\u{09C7}\u{09BE}" to="\u09CB" /> --> <!-- E + O = O This is handled by normalization. -->
+            <!-- <transform from="\u{09C7}\u{09BE}" to="\u{09CB}" /> --> <!-- E + O = O This is handled by normalization. -->
 
             <!-- these suport the 'q' key -->
             <transform from="\m{q}:" to="\u{0983}" />

@@ -14,6 +14,10 @@ import { renameSpecialKey } from "./oskKey.js";
  */
 const FLICK_OVERFLOW_OFFSET = 1.4142;
 
+// If it's a rounding error off of 0, force it to 0.
+// Values such as -1.32e-18 have been seen when 0 was expected.
+const coerceZeroes = (val: number) => Math.abs(val) < 1e-10 ? 0 : val;
+
 interface EventMap {
   preferredOrientation: (orientation: PhoneKeyTipOrientation) => void;
   startFade: () => void;
@@ -74,8 +78,9 @@ export class GesturePreviewHost extends EventEmitter<EventMap> {
 
         // is in polar coords, origin toward north, clockwise.
         const coords = FlickNameCoordMap.get(dir);
-        const x = -Math.sin(coords[0]); // Put 'e' flick at left
-        const y =  Math.cos(coords[0]); // Put 'n' flick at bottom
+
+        const x = coerceZeroes(-Math.sin(coords[0])); // Put 'e' flick at left
+        const y = coerceZeroes(Math.cos(coords[0])); // Put 'n' flick at bottom
 
         ps.width = '100%';
         ps.textAlign = 'center';
@@ -90,6 +95,7 @@ export class GesturePreviewHost extends EventEmitter<EventMap> {
 
         ps.height = '100%';
         ps.lineHeight = '100%';
+
         if(y < 0) {
           ps.bottom = (-y * FLICK_OVERFLOW_OFFSET * edgeLength) + 'px';
         } else if(y > 0) {
@@ -156,7 +162,7 @@ export class GesturePreviewHost extends EventEmitter<EventMap> {
     scrollStyle.marginLeft = `${edge * x}px`;
     scrollStyle.marginTop =  `${edge * y}px`;
 
-    const preferredOrientation = y < 0 ? 'bottom' : 'top';
+    const preferredOrientation = coerceZeroes(y) < 0 ? 'bottom' : 'top';
     if(this.orientation != preferredOrientation) {
       this.orientation = preferredOrientation;
       this.emit('preferredOrientation', preferredOrientation);

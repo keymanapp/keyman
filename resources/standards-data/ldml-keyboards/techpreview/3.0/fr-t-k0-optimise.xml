@@ -8,7 +8,7 @@
 	<info author="Team Keyboard" name="French AZERTY optimisé" layout="AZERTY" indicator="FR" />
 
 	<displays>
-    <display output="\u0300" display="${grave}" />
+    <display output="\u{0300}" display="${grave}" />
     <display output="\m{acute}" display="´" />
     <display output="\m{grave}" display="`" />
     <display output="\m{umlaut}" display="¨" />
@@ -191,9 +191,9 @@
 		<transformGroup>
 			<!-- this is a reorder group -->
 			<!-- nod-Lana partial example -->
-			<reorder from="\u1A60" order="127" />
-			<reorder from="\u1A6B" order="42" />
-			<reorder from="[\u1A75-\u1A79]" order="55" />
+			<reorder from="\u{1A60}" order="127" />
+			<reorder from="\u{1A6B}" order="42" />
+			<reorder from="[\u{1A75}-\u{1A79}]" order="55" />
 			<!-- ... partial example ... -->
 		</transformGroup>
 	</transforms>
