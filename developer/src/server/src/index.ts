@@ -102,7 +102,7 @@ export async function run() {
         proto: 'http',
         addr: configuration.port,
         authtoken: configuration.ngrokToken,
-        region: configuration.ngrokRegion,
+        // region: configuration.ngrokRegion,
         binPath: () => configuration.ngrokBinPath,
         onLogEvent: (msg: string) => {
           if(options.ngrokLog) {
