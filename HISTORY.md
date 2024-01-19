@@ -1,5 +1,16 @@
 # Keyman Version History
 
+## 17.0.248 alpha 2024-01-19
+
+* chore(android): Update targetSdkVersion to 34 (#10393)
+*  (#10352)
+* fix(web): keyboard-documentation rendering mode (#10417)
+* fix(ios): multiple keyboard slide-in animations on app start (#10362)
+* fix(web): U_ key id -> text for all subkeys; is now preprocessed (#10434)
+* chore(android/app): Update whatsnew for 17.0 (#10395)
+* fix(web): bulk renderer interface for recent-version targeting keyboards (#10427)
+* feat(core): cross-segment markers (#10394)
+
 ## 17.0.247 alpha 2024-01-18
 
 * fix(ios): banner image management (#10337)
