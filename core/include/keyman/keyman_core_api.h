@@ -229,7 +229,7 @@ typedef struct {
   unsigned int code_points_to_delete;
 
   // null-term string of characters to insert into document
-  km_core_usv* output;
+  const km_core_usv* output;
 
   // list of options to persist, terminated with KM_CORE_OPTIONS_END
   km_core_option_item * persist_options;

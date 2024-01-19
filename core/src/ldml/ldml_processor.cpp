@@ -533,16 +533,16 @@ ldml_event_state::ldml_event_state(
 }
 
 void ldml_event_state::commit() {
-  // TODO-LDML: is this necessary? what's the lifecycle of actions.output?
-  actions.output = new km_core_usv[text.length()+1];
-  memcpy(actions.output, text.c_str(), text.length()+1);
+  // thi is only set for the duration of the next call.
+  actions.output = text.c_str();
   // current implementation copies actions.output and doesn't retain it
   state->set_actions(actions);
   // clean up
-  delete [] actions.output;
   actions.output = nullptr;
   // clear struct
   clear();
+  // commit. TODO: should this be necessary? #9999
+  state->actions().commit();
 }
 
 void ldml_event_state::clear() {
