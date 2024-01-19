@@ -150,8 +150,6 @@
 		CEBD34322654FE3500EB2EA8 /* KeymanEngine.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CE80AD32257F2B4A008D2150 /* KeymanEngine.framework */; };
 		CEBD343B2654FEB400EB2EA8 /* DeviceKit.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = CEBD34352654FEB400EB2EA8 /* DeviceKit.xcframework */; };
 		CEBD343C2654FEB400EB2EA8 /* DeviceKit.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = CEBD34352654FEB400EB2EA8 /* DeviceKit.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		CEBD343D2654FEB400EB2EA8 /* ObjcExceptionBridging.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = CEBD34362654FEB400EB2EA8 /* ObjcExceptionBridging.xcframework */; };
-		CEBD343E2654FEB400EB2EA8 /* ObjcExceptionBridging.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = CEBD34362654FEB400EB2EA8 /* ObjcExceptionBridging.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		CEBD343F2654FEB400EB2EA8 /* Reachability.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = CEBD34372654FEB400EB2EA8 /* Reachability.xcframework */; };
 		CEBD34402654FEB400EB2EA8 /* Reachability.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = CEBD34372654FEB400EB2EA8 /* Reachability.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		CEBD34412654FEB400EB2EA8 /* Sentry.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = CEBD34382654FEB400EB2EA8 /* Sentry.xcframework */; };
@@ -181,7 +179,6 @@
 			dstSubfolderSpec = 10;
 			files = (
 				CEBD34402654FEB400EB2EA8 /* Reachability.xcframework in Embed Frameworks */,
-				CEBD343E2654FEB400EB2EA8 /* ObjcExceptionBridging.xcframework in Embed Frameworks */,
 				296EF2C52AFA267500E3E384 /* ZIPFoundation.xcframework in Embed Frameworks */,
 				CEBD343C2654FEB400EB2EA8 /* DeviceKit.xcframework in Embed Frameworks */,
 				CEBD34422654FEB400EB2EA8 /* Sentry.xcframework in Embed Frameworks */,
@@ -339,7 +336,6 @@
 		CEACC90F25F07D5A006EAB45 /* km */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = km; path = km.lproj/Localizable.strings; sourceTree = "<group>"; };
 		CEACC91225F07D77006EAB45 /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/Localizable.strings; sourceTree = "<group>"; };
 		CEBD34352654FEB400EB2EA8 /* DeviceKit.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = DeviceKit.xcframework; path = ../../Carthage/Build/DeviceKit.xcframework; sourceTree = "<absolute>"; };
-		CEBD34362654FEB400EB2EA8 /* ObjcExceptionBridging.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = ObjcExceptionBridging.xcframework; path = ../../Carthage/Build/ObjcExceptionBridging.xcframework; sourceTree = "<absolute>"; };
 		CEBD34372654FEB400EB2EA8 /* Reachability.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = Reachability.xcframework; path = ../../Carthage/Build/Reachability.xcframework; sourceTree = "<absolute>"; };
 		CEBD34382654FEB400EB2EA8 /* Sentry.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = Sentry.xcframework; path = ../../Carthage/Build/Sentry.xcframework; sourceTree = "<absolute>"; };
 		CEBD3458265511B700EB2EA8 /* am */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = am; path = am.lproj/Localizable.strings; sourceTree = "<group>"; };
@@ -355,7 +351,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				CEBD343F2654FEB400EB2EA8 /* Reachability.xcframework in Frameworks */,
-				CEBD343D2654FEB400EB2EA8 /* ObjcExceptionBridging.xcframework in Frameworks */,
 				296EF2C42AFA267500E3E384 /* ZIPFoundation.xcframework in Frameworks */,
 				CEBD343B2654FEB400EB2EA8 /* DeviceKit.xcframework in Frameworks */,
 				CEBD34412654FEB400EB2EA8 /* Sentry.xcframework in Frameworks */,
@@ -542,7 +537,6 @@
 			children = (
 				296EF2C32AFA267500E3E384 /* ZIPFoundation.xcframework */,
 				CEBD34352654FEB400EB2EA8 /* DeviceKit.xcframework */,
-				CEBD34362654FEB400EB2EA8 /* ObjcExceptionBridging.xcframework */,
 				CEBD34372654FEB400EB2EA8 /* Reachability.xcframework */,
 				CEBD34382654FEB400EB2EA8 /* Sentry.xcframework */,
 				CE80AD32257F2B4A008D2150 /* KeymanEngine.framework */,
