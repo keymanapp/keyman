@@ -46,9 +46,12 @@
         kmw.addKeyboards({id:'obolo_chwerty_6351',name:'obolo_chwerty_6351',languages:{id:'en',name:'English'},
           filename:('../obolo_chwerty_6351.js')});
 
-        var pageRef = (window.location.protocol == 'file:')
-          ? window.location.href.substr(0, window.location.href.lastIndexOf('/')+1)
-          : window.location.href;
+        // Ensure the URL we prefix to the page's path is the page's directory, not including
+        // the actual HTML page itself.
+        var urlIncludesIndex = window.location.href.lastIndexOf('.html') > 1;
+        var pageRef = (urlIncludesIndex
+          ? window.location.href.substr(0, window.location.href.lastIndexOf('/'))
+          : window.location.href) + '/';
 
         var modelStub = {'id': 'example.en.trie',
           languages: ['en'],
