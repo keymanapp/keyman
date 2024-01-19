@@ -3,7 +3,7 @@ import JSZip from 'jszip';
 import KEYMAN_VERSION from "@keymanapp/keyman-version";
 
 import { KmpJsonFile, KpsFile, SchemaValidators, CompilerCallbacks, KeymanFileTypes, KvkFile, KeymanCompiler, CompilerOptions, KeymanCompilerResult, KeymanCompilerArtifacts, KeymanCompilerArtifact } from '@keymanapp/common-types';
-import { CompilerMessages } from './messages.js';
+import { CompilerMessages } from './package-compiler-messages.js';
 import { PackageMetadataCollector } from './package-metadata-collector.js';
 import { KmpInfWriter } from './kmp-inf-writer.js';
 import { transcodeToCP1252 } from './cp1252.js';

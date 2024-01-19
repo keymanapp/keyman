@@ -289,7 +289,12 @@ ldml_processor::process_key_string(ldml_event_state &ldml_state, const std::u16s
 
 size_t ldml_processor::process_output(ldml_event_state &ldml_state, const std::u32string &str, ldml::transforms *with_transforms) const {
   std::u32string nfd_str = str;
-  assert(ldml::normalize_nfd_markers(nfd_str)); // TODO-LDML: else fail?
+  // Note:
+  //  The normalize functions have assert and Debuglog at the bottom.
+  //  so we do not need to assert the status here unless we're going to do something
+  //  different with control flow.
+  (void)ldml::normalize_nfd_markers(nfd_str);
+
   // extract context string, in NFD
   std::u32string old_ctxtstr_nfd;
   (void)ldml_state.context_to_string(old_ctxtstr_nfd, true);
@@ -300,8 +305,7 @@ size_t ldml_processor::process_output(ldml_event_state &ldml_state, const std::u
   (void)ldml_state.context_to_string(ctxtstr, true); // TODO-LDML: remove this second call
   // add the newly added key output to ctxtstr
   ctxtstr.append(nfd_str);
-  assert(ldml::normalize_nfd_markers(ctxtstr)); // TODO-LDML: else fail?
-
+  (void)ldml::normalize_nfd_markers(ctxtstr);
   /** transform output string */
   std::u32string outputString;
   /** how many chars of the ctxtstr to replace */
@@ -311,9 +315,7 @@ size_t ldml_processor::process_output(ldml_event_state &ldml_state, const std::u
 
   if(with_transforms != nullptr) {
     matchedContext = with_transforms->apply(ctxtstr, outputString);
-  } else {
-    // no transforms, no output
-  }
+  } // else: no transforms, no output
 
   // Short Circuit: if no transforms matched, and no new text is being output,
   // just return.
@@ -324,27 +326,13 @@ size_t ldml_processor::process_output(ldml_event_state &ldml_state, const std::u
   // drop last 'matchedContext':
   ctxtstr.resize(ctxtstr.length() - matchedContext);
   ctxtstr.append(outputString); // TODO-LDML: should be able to do a normalization-safe append here.
-  {
-    const auto normalize_ok = ldml::normalize_nfd_markers(ctxtstr);
-    assert(normalize_ok);
-    if(!normalize_ok) {
-      DebugLog("ldml_processor::process_output: failed ldml::normalize_nfd_markers(ctxtstr)");
-    }
-  }
+  (void)ldml::normalize_nfd_markers(ctxtstr);
 
   // Ok. We've done all the happy manipulations.
 
   /** NFD w/ markers */
   std::u32string ctxtstr_cleanedup = ctxtstr;
-  {
-    const auto normalize_ok = ldml::normalize_nfd_markers(ctxtstr_cleanedup);
-    assert(normalize_ok);
-    if(!normalize_ok) {
-      DebugLog("ldml_processor::process_output: failed ldml::normalize_nfd_markers(ctxtstr_cleanedup)");
-    }
-  }
-
-  assert(ldml::normalize_nfd_markers(ctxtstr_cleanedup));
+  (void)ldml::normalize_nfd_markers(ctxtstr_cleanedup);
 
   // find common prefix.
   // For example, if the context previously had "aaBBBBB" and it is changing to "aaCCC" then we will have:
@@ -352,6 +340,32 @@ size_t ldml_processor::process_output(ldml_event_state &ldml_state, const std::u
   // - new_ctxtstr_changed = "CCC"
   // So the BBBBB needs to be removed and then CCC added.
   auto ctxt_prefix = mismatch(old_ctxtstr_nfd.begin(), old_ctxtstr_nfd.end(), ctxtstr_cleanedup.begin(), ctxtstr_cleanedup.end());
+
+  // handle a special case where we're simply changing from one marker to another.
+  // Example:
+  // 0. old_ctxtstr_changed ends with  … U+FFFF U+0008 | U+0001 …
+  // 1. ctxtstr_cleanedup   ends with  … U+FFFF U+0008 | U+0002 …
+  // Pipe symbol shows where the difference starts.
+  // As you can see, the different starts in the MIDDLE of a marker sequence.
+  // so, old_ctxtstr_changed will start with U+0001
+  // and new_ctxtstr_changed will start with U+0002
+  // remove_text will only be able to delete up to and through the U+0001
+  // and it will need to emit a push_backspace(KM_CORE_BT_MARKER,…) due to the
+  // marker change.
+  // We can detect this because the unchanged_prefix will end with u+FFFF U+0008
+  //
+  // Oh, and yes, test case 'regex-test-8a-0' hits this.
+  std::u32string common_prefix(old_ctxtstr_nfd.begin(), ctxt_prefix.first);
+  if (common_prefix.length() >= 2) {
+    auto iter = common_prefix.rbegin();
+    if (*(iter++) == LDML_MARKER_CODE && *(iter++) == UC_SENTINEL) {
+      // adjust the iterator so that the "U+FFFF U+0008" is not a part of the common prefix.
+      ctxt_prefix.first -= 2;
+      ctxt_prefix.second += 2;
+      // Now, old_ctxtstr_changed and new_ctxtstr_changed will start with U+FFFF U+0008 …
+    }
+  }
+
   /** The part of the old string to be removed */
   std::u32string old_ctxtstr_changed(ctxt_prefix.first,old_ctxtstr_nfd.end());
   /** The new context to be added */
@@ -374,6 +388,8 @@ size_t ldml_processor::process_output(ldml_event_state &ldml_state, const std::u
 
 void
 ldml_event_state::remove_text(std::u32string &str, size_t length) {
+  // str is the string to remove, so it should be at least as long as length
+  assert(length <= str.length());
   /** track how many context items have been removed, via push_backspace() */
   size_t contextRemoved = 0;
   for (auto c = state->context().rbegin(); length > 0 && c != state->context().rend(); c++, contextRemoved++) {
@@ -389,23 +405,23 @@ ldml_event_state::remove_text(std::u32string &str, size_t length) {
       // Cause prior char to be removed
       state->actions().push_backspace(KM_CORE_BT_CHAR, c->character);
     } else if (type == KM_CORE_BT_MARKER) {
-      // It's a marker.
-      // need to be able to drop 3 chars
       assert(length >= 3);
-      length -= 3;
+      state->actions().push_backspace(KM_CORE_BT_MARKER, c->marker);
       // #3 - the marker.
       assert(lastCtx == c->marker);
       str.pop_back();
+      length--;
       // #2 - the code
       assert(str.back() == LDML_MARKER_CODE);
       str.pop_back();
+      length--;
       // #1 - the sentinel
       assert(str.back() == UC_SENTINEL);
       str.pop_back();
-      // cause marker to be removed
-      state->actions().push_backspace(KM_CORE_BT_MARKER, c->marker);
+      length--;
     }
   }
+  assert(length == 0);
   // now, pop the context items
   for (size_t i = 0; i < contextRemoved; i++) {
     // we don't pop during the above loop because the iterator gets confused

@@ -6,7 +6,7 @@
 import { minKeymanVersion } from "./min-keyman-version.js";
 import { ModelInfoFile } from "./model-info-file.js";
 import { CompilerCallbacks, CompilerOptions, KeymanCompiler, KeymanCompilerArtifact, KeymanCompilerArtifacts, KeymanCompilerResult, KmpJsonFile } from "@keymanapp/common-types";
-import { ModelInfoCompilerMessages } from "./messages.js";
+import { ModelInfoCompilerMessages } from "./model-info-compiler-messages.js";
 import { validateMITLicense } from "@keymanapp/developer-utils";
 
 const HelpRoot = 'https://help.keyman.com/model/';

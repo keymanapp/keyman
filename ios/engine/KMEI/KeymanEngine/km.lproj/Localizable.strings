@@ -125,7 +125,7 @@
 "kmp-error-missing-resource" = "កញ្ចប់​នេះ​គ្មាន​ក្ដារចុច ឬ​បញ្ជី​ពាក្យ​ដែល​បាន​ស្នើ​សុំ​ទេ។";
 
 /* Error installing a Keyman package with a version of Keyman that does not support it */
-"kmp-error-unsupported-keyman-version" = "This package requires a newer version of Keyman.";
+"kmp-error-unsupported-keyman-version" = "កញ្ចប់នេះត្រូវការ Keyman ជំនាន់ថ្មីជាងនេះ";
 
 /* Error opening a Keyman package - cannot parse contents */
 "kmp-error-no-metadata" = "កញ្ចប់​នេះ​ត្រូវ​បាន​រៀបចំឡើងដោយ​មិន​សម​ស្រប - មិន​ស្គាល់​មាតិកា។";
