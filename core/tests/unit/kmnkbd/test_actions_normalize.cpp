@@ -6,6 +6,7 @@
   History:      23 Oct 2023 - MCD - Initial implementation.
 */
 #include <string>
+#include <memory>
 #include "keyman_core.h"
 
 #include "path.hpp"
