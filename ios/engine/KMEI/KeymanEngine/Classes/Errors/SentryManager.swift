@@ -29,7 +29,7 @@ public class SentryManager {
       os_log("Sentry error logging disabled for development mode.", log: KeymanEngineLogger.settings, type: .debug)
     #else
       let allowEnabled = true
-      os_log("Sentry error logging enabled.", log: KeymanEngineLogger.sentry, type: .debug)
+      os_log("Sentry error logging enabled.", log: KeymanEngineLogger.settings, type: .debug)
     #endif
 
     let infoDict = Bundle(for: SentryManager.self).infoDictionary
