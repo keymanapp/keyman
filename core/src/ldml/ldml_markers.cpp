@@ -409,8 +409,6 @@ std::u32string
 remove_markers(const std::u32string &str, marker_map *markers, marker_encoding encoding) {
   std::u32string out;
   marker_list last_markers;
-  // const auto &lookfor_str = (encoding == regex_sentinel) ? REGEX_PREFIX : RAW_PREFIX;
-  // auto lookfor            = lookfor_str.at(0);
 
   auto last = str.begin();  // points to the part of the string after the last matched marker
   for (auto i = str.begin(); i != str.end();) {

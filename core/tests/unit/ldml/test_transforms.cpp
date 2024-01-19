@@ -45,12 +45,7 @@ void
 prepend_hex_oct(std::u32string &str, char32_t x) {
   for (auto i = 0; i < 8; i++) {
     KMX_DWORD remainder = x & 0xF;  // get the last nibble
-    char32_t ch;
-    if (remainder < 0xA) {
-      ch = U'0' + remainder;
-    } else {
-      ch = U'A' + (remainder - 0xA);
-    }
+    const char32_t ch = remainder < 0xA ? U'0' + remainder : U'A' + (remainder - 0xA);
     str.insert(0, 1, ch);  // prepend
     x >>= 4;
   }
