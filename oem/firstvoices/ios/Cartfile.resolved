@@ -1,5 +1,4 @@
 github "ashleymills/Reachability.swift" "v5.1.0"
 github "devicekit/DeviceKit" "5.1.0"
 github "getsentry/sentry-cocoa" "8.15.2"
-github "keymanapp/dependency-XCGLogger" "57a7b975dbb6fe4fe90cef3d1bc52b8adbd89113"
 github "weichsel/ZIPFoundation" "0.9.17"
