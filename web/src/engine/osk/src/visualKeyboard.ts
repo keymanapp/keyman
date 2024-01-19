@@ -407,6 +407,20 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
       previewHost: GesturePreviewHost
     }> = {};
 
+    const clearActiveGestures = (excludedTouchpointId?: string) => {
+      for(const identifier of Object.keys(sourceTrackingMap)) {
+        // Filter out the exclusion if one exists.
+        if(identifier == excludedTouchpointId) {
+          continue;
+        }
+
+        // Any _other_ gesture, though - yeah, that should cancel out.
+        // Note:  this can cancel ongoing modipress gestures, which may trigger an unexpected layer shift.
+        const entry = sourceTrackingMap[identifier];
+        entry.source.terminate(true);
+      }
+    }
+
     const gestureHandlerMap = new Map<GestureSequence<KeyElement>, GestureHandler[]>();
 
     // Now to set up event-handling links.
@@ -612,8 +626,11 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
             // Merely constructing the instance is enough; it'll link into the sequence's events and
             // handle everything that remains for the backspace from here.
             handlers = [new HeldRepeater(gestureSequence, () => this.modelKeyClick(gestureKey, coord))];
-          } else if(gestureKey.key.spec.baseKeyID == "K_LOPT") {
+          } else if(gestureKey.key.spec.baseKeyID == "K_LOPT") { // globe key
             gestureSequence.on('complete', () => this.emit('globekey', gestureKey, false));
+            // Cancel all other gesture sources; a language-menu interaction voids all previously-active
+            // gestures that haven't completed.
+            clearActiveGestures(coordSource.identifier);
           }
         } else if(gestureStage.matchedId.indexOf('longpress') > -1) {
           existingPreviewHost?.cancel();
@@ -903,7 +920,7 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
 
     // Prevent NaN breakages.
     if (!width || !height) {
-      return null;
+      return new Map();
     }
 
     let kbdAspectRatio = width / height;
