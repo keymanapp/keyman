@@ -28,8 +28,6 @@
 #include "keymap.h"
 
 
-int KMX_ToUnicodeEx(guint ScanCode, const BYTE *lpKeyState, PWCHAR pwszBuff, int shift_state, int caps,GdkKeymap *keymap);
-
 const int KMX_ShiftStateMap[] = {
   ISVIRTUALKEY,
   ISVIRTUALKEY | K_SHIFTFLAG,
@@ -99,6 +97,20 @@ public:
   }
 };
 
+int KMX_ToUnicodeEx(guint ScanCode, const BYTE *lpKeyState, PKMX_WCHAR pwszBuff, int shift_state, int caps,GdkKeymap *keymap) {
+
+  KMX_DWORD kvl= KMX_get_KeyvalsUnderlying_From_KeyCodeUnderlying_GDK(keymap, ScanCode, shift_state);
+  //if((kvl >=  deadkey_min) && (kvl <=  deadkey_max))
+
+
+  std::wstring character = KMX_get_CharsUnderlying_according_to_keycode_and_Shiftstate_GDK(keymap, ScanCode, ShiftState(shift_state), caps);
+  std::u16string uuu16= u16string_from_wstring(character).c_str();
+  pwszBuff[0]= * (PKMX_WCHAR)  u16string_from_wstring(character).c_str();
+
+   if((kvl ==  0xFFFF))
+    return -1;
+  return  1;
+}
 
 int KMX_DeadKeyMap(int index, std::vector<DeadKey *> *deadkeys, int deadkeyBase, std::vector<KMX_DeadkeyMapping> *deadkeyMappings) {   // I4327   // I4353
   for(size_t i = 0; i < deadkeyMappings->size(); i++) {
@@ -317,7 +329,7 @@ int i4 = this->KMX_IsXxxxGrCapsEqualToXxxxShift() ? 8 : 0;
           key->dpContext = new KMX_WCHAR[1];
           *key->dpContext = 0;
           key->ShiftFlags = this->KMX_GetShiftStateValue(capslock, caps, (ShiftState) ss);
-          //key->Key = KMX_get_KVUS_From_KVUnderlying_VEC(All_Vector,this->VK());
+          //key->Key = KMX_get_VKUS_From_VKUnderlying_VEC(All_Vector,this->VK());
           // key->Key = KMX_get_VKUnderlying_From_VKUS_GDK(keymap,this->VK());
           key->Line = 0;
 
@@ -384,7 +396,7 @@ public:
     m_XxxxVk = value;
   }
 
-  ShiftState MaxShiftState() {
+  ShiftState KMX_MaxShiftState() {
     return (Get_XxxxVk() == 0 ? ShftMenuCtrl : ShftXxxx);
   }
 
@@ -411,19 +423,41 @@ public:
   DeadKey *KMX_ProcessDeadKey(
       UINT iKeyDead,              // The index into the VirtualKey of the dead key
       ShiftState shiftStateDead,  // The shiftstate that contains the dead key
-      BYTE *lpKeyStateDead,       // The key state for the dead key
+      KMX_BYTE *lpKeyStateDead,       // The key state for the dead key
       std::vector<KMX_VirtualKey*> rgKey,          // Our array of dead keys
       bool fCapsLock,             // Was the caps lock key pressed?
-      KMX_HKL KMX_hkl) {                  // The keyboard layout
+      KMX_HKL KMX_hkl,          // The keyboard layout
+      GdkKeymap *keymap) {       // _S2 keymap, The keyboard layout
 
-    BYTE lpKeyState[256];
+
+    KMX_BYTE lpKeyState[256];
     DeadKey *deadKey = new DeadKey(rgKey[iKeyDead]->KMX_GetShiftState(shiftStateDead, fCapsLock)[0]);
+
+KMX_WCHAR sbBuffer1[16];
+  KMX_WCHAR sbBuffer2[16];
+   KMX_WCHAR sbBuffer3[16];
+   KMX_WCHAR sbBuffer4[16];
+   KMX_WCHAR sbBuffer5[16];
+      int rc1 = KMX_ToUnicodeEx(49, lpKeyState, sbBuffer1, 0, 0, keymap) ;
+      int rc4 = KMX_ToUnicodeEx(21, lpKeyState, sbBuffer4, 0, 0, keymap) ;
+      int rc3 = KMX_ToUnicodeEx( 3, lpKeyState, sbBuffer3, 0, 0, keymap) ;
+      /*int rc2 = KMX_ToUnicodeEx( 49, lpKeyState, sbBuffer2, 0, 0, keymap) ;
+      int rc5 = KMX_ToUnicodeEx( 65, lpKeyState, sbBuffer5, 0, 0, keymap) ;*/
+
+      /*int rc1 = KMX_ToUnicodeEx(192, lpKeyState, sbBuffer1, 0, 0, keymap) ;
+      int rc4 = KMX_ToUnicodeEx(220, lpKeyState, sbBuffer4, 0, 0, keymap) ;
+      int rc3 = KMX_ToUnicodeEx( 3, lpKeyState, sbBuffer3, 0, 0, keymap) ;
+      int rc2 = KMX_ToUnicodeEx( 49, lpKeyState, sbBuffer2, 0, 0, keymap) ;
+      int rc5 = KMX_ToUnicodeEx( 65, lpKeyState, sbBuffer5, 0, 0, keymap) ;*/
+
+
+
 
     for (UINT iKey = 0; iKey < rgKey.size(); iKey++) {
       if (rgKey[iKey] != NULL) {
-        WCHAR sbBuffer[16];
+        KMX_WCHAR sbBuffer[16];
 
-        for (ShiftState ss = Base; ss <= MaxShiftState(); ss = (ShiftState)((int)ss+1)) {
+        for (ShiftState ss = Base; ss <= KMX_MaxShiftState(); ss = (ShiftState)((int)ss+1)) {
           int rc = 0;
           if (ss == Menu || ss == ShftMenu) {
             // Alt and Shift+Alt don't work, so skip them
@@ -431,6 +465,10 @@ public:
           }
 
           for (int caps = 0; caps <= 1; caps++) {
+
+            //------_S2 To find a deadkey in a possibly messed up key ------------------------
+            // _S2 My fun does not loop to shorten keys :-((
+
             // First the dead key
             while (rc >= 0) {
               // We know that this is a dead key coming up, otherwise
@@ -442,25 +480,44 @@ public:
 
               // _S2 needs replacement
               // rc = ToUnicodeEx(rgKey[iKeyDead]->VK(), rgKey[iKeyDead]->SC(), lpKeyStateDead, sbBuffer, _countof(sbBuffer), 0, hkl);
-              rc=-1; //_S2
+              //rc = KMX_ToUnicodeEx(rgKey[iKeyDead]->VK(), rgKey[iKeyDead]->SC(), lpKeyStateDead, sbBuffer, _countof(sbBuffer), 0, hkl);
+
+            rc = KMX_ToUnicodeEx(rgKey[iKeyDead]->SC(), lpKeyState, sbBuffer, ss, caps, keymap);
+            //wprintf(L"ikey: %i rc = %i\n",iKey,rc);
+            rc=-1;    //_S2
             }
+
+            //----------------------------------------------------------------------------------
 
             // Now fill the key state for the potential base character
             KMX_FillKeyState(lpKeyState, ss, (caps != 0));
 
+            //----------------------------------------------------------------------------------
+
             // _S2 needs replacement
             //rc = ToUnicodeEx(rgKey[iKey]->VK(), rgKey[iKey]->SC(), lpKeyState, sbBuffer, _countof(sbBuffer), 0, hkl);
+            rc = KMX_ToUnicodeEx( rgKey[iKey]->SC(), lpKeyState, sbBuffer, ss, caps, keymap) ;
+
+
+            //--------- ONE character found = combined char (e.g. â ) --------------------------
+            //   ***** E.G:  ToUnicodeEx  FOUND  Â *****  //
+
             if (rc == 1) {
-              // That was indeed a base character for our dead key.
+   /* Â */    // That was indeed a base character for our dead key.
               // And we now have a composite character. Let's run
               // through one more time to get the actual base 
+
               // character that made it all possible?
-              WCHAR combchar = sbBuffer[0];
 
-              // _S2 needs replacement
-              //rc = ToUnicodeEx(rgKey[iKey]->VK(), rgKey[iKey]->SC(), lpKeyState, sbBuffer, _countof(sbBuffer), 0, hkl);
+              // _s2 store combined char
+              //   ***** E.G:  combchar =   Â *****  //
+              KMX_WCHAR combchar = sbBuffer[0];
 
-              WCHAR basechar = sbBuffer[0];
+              // _S2 again split to get base char ( e.g. a)
+              //   ***** E.G:  ToUnicodeEx  FOUND  A *****  //
+    /* A */   rc = KMX_ToUnicodeEx(rgKey[iKey]->SC(), lpKeyState, sbBuffer, ss, caps, keymap) ;
+
+              KMX_WCHAR basechar = sbBuffer[0];
 
               if (deadKey->KMX_DeadCharacter() == combchar) {
                 // Since the combined character is the same as the dead key,
@@ -490,9 +547,16 @@ public:
               if (!deadKey->KMX_ContainsBaseCharacter(basechar)) {
                 deadKey->KMX_AddDeadKeyRow(basechar, combchar);
               }
-            } else if (rc > 1) {
+            }
+
+            //---------no valid key combi -> IGNORE ---------------------------------------------
+
+            else if (rc > 1) {
               // Not a valid dead key combination, sorry! We just ignore it.
-            } else if (rc < 0) {
+            }
+
+            //---------another dead key-> IGNORE -----------------------------------------------
+            else if (rc < 0) {
               // It's another dead key, so we ignore it (other than to flush it from the state)
               //ClearKeyboardBuffer(VK_DECIMAL, rgKey[VK_DECIMAL]->SC(), KMX_hkl);
               KMX_ClearKeyboardBuffer();
@@ -525,17 +589,6 @@ int KMX_GetMaxDeadkeyIndex(KMX_WCHAR *p) {
     p = KMX_incxstr(p);
   }
   return n;
-}
-
-int KMX_ToUnicodeEx(guint ScanCode, const BYTE *lpKeyState, PKMX_WCHAR pwszBuff, int shift_state, int caps,GdkKeymap *keymap) {
-
-  KMX_DWORD kvl= KMX_get_KeyvalsUnderlying_From_KeyCodeUnderlying_GDK(keymap, ScanCode, shift_state);
-  if((kvl >=  deadkey_min) && (kvl <=  deadkey_max))
-    return -1;
-
-  std::wstring character = KMX_get_CharsUnderlying_according_to_keycode_and_Shiftstate_GDK(keymap, ScanCode, ShiftState(shift_state), caps);
-  pwszBuff[0]= * (PKMX_WCHAR)  u16string_from_wstring(character).c_str();
-  return  1;
 }
 
 bool KMX_ImportRules(LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, GdkKeymap **keymap, std::vector<KMX_DeadkeyMapping> *FDeadkeys, KMX_BOOL bDeadkeyConversion) {   // I4353   // I4552
@@ -614,7 +667,7 @@ bool KMX_ImportRules(LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, GdkKeymap **keymap,
       if(rgKey[iKey] != NULL) {
         KMX_WCHAR sbBuffer[256];     // Scratchpad we use many places
 
-        for(ShiftState ss = Base; ss <= loader.MaxShiftState(); ss = (ShiftState)((int)ss + 1)) {
+        for(ShiftState ss = Base; ss <= loader.KMX_MaxShiftState(); ss = (ShiftState)((int)ss + 1)) {
           if(ss == Menu || ss == ShftMenu) {
             // Alt and Shift+Alt don't work, so skip them
             continue;
@@ -632,7 +685,7 @@ bool KMX_ImportRules(LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, GdkKeymap **keymap,
             // _S2 is THIS correct ???  Do we need  lpKeyState or is it just used in ToUnicodeEx??
             loader.KMX_ClearKeyboardBuffer();
             loader.KMX_FillKeyState(lpKeyState, ss, (caps == 0));
-            int rc = KMX_ToUnicodeEx(SC_US, lpKeyState, sbBuffer, ss, caps, *keymap) ;
+            int rc = KMX_ToUnicodeEx(SC_US, lpKeyState, sbBuffer, ss, caps, *keymap);
 
             if(rc > 0) {
               if(*sbBuffer == 0) {
@@ -669,6 +722,7 @@ bool KMX_ImportRules(LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, GdkKeymap **keymap,
             sbBuffer[2] = 0;
             //rgKey[iKey]->SetShiftState(ss, sbBuffer, true, (caps == 0));
             rgKey[iKey]->KMX_SetShiftState(ss, sbBuffer, true, (caps ));
+            wprintf(L"rc<0 for iKey nr. %i (%c) \n",iKey,iKey );
 
             // It's a dead key; let's flush out whats stored in the keyboard state.
             loader.KMX_ClearKeyboardBuffer();
@@ -685,7 +739,13 @@ bool KMX_ImportRules(LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, GdkKeymap **keymap,
             }
             if(dk == NULL) {
               //_S2 TODO
-              //alDead.push_back(loader.KMX_ProcessDeadKey(iKey, ss, lpKeyState, rgKey, caps == 0, hkl));
+              alDead.push_back(loader.KMX_ProcessDeadKey(iKey, ss, lpKeyState, rgKey, caps == 0, hkl, *keymap));
+              //alDead.push_back(loader.KMX_ProcessDeadKey(192, ss, lpKeyState, rgKey, caps == 0, hkl, *keymap));
+
+              //_S2 for each dk (^ ' `  push_back all combinations ^,â,ê,î,ô,û   ',á,é,í,ó,ú   `,à,è,ì,ò,ù into alDead->m_rgcombchar)
+              //_S2 for each dk (^ ' `  push_back all base char : _,a,e,i,o,u                              into alDead->m_rgbasechar)
+              // S2 do nothing for other keys
+              int wertzui=9;
             }
           }
         }
@@ -749,7 +809,7 @@ bool KMX_ImportRules(LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, GdkKeymap **keymap,
   UINT nKeys = 0;
   for (UINT iKey = 0; iKey < rgKey.size(); iKey++) {
     if ((rgKey[iKey] != NULL) && rgKey[iKey]->KMX_IsKeymanUsedKey() && (!rgKey[iKey]->KMX_IsEmpty())) {
-      nKeys+= rgKey[iKey]->KMX_GetKeyCount(loader.MaxShiftState());
+      nKeys+= rgKey[iKey]->KMX_GetKeyCount(loader.KMX_MaxShiftState());
       //wprintf(L" iKey = %i, Delta:  %i -> Sum %i\n", iKey, rgKey[iKey]->KMX_GetKeyCount(loader.MaxShiftState()),  nKeys);
    }
   }
@@ -771,8 +831,8 @@ bool KMX_ImportRules(LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, GdkKeymap **keymap,
   //
   for (UINT iKey = 0; iKey < rgKey.size(); iKey++) {
     if ((rgKey[iKey] != NULL) && rgKey[iKey]->KMX_IsKeymanUsedKey() && (!rgKey[iKey]->KMX_IsEmpty())) {
-      if(rgKey[iKey]->KMX_LayoutRow(loader.MaxShiftState(), &gp->dpKeyArray[nKeys], &alDead, nDeadkey, bDeadkeyConversion, All_Vector,*keymap)) {   // I4552
-        nKeys+=rgKey[iKey]->KMX_GetKeyCount(loader.MaxShiftState());
+      if(rgKey[iKey]->KMX_LayoutRow(loader.KMX_MaxShiftState(), &gp->dpKeyArray[nKeys], &alDead, nDeadkey, bDeadkeyConversion, All_Vector,*keymap)) {   // I4552
+        nKeys+=rgKey[iKey]->KMX_GetKeyCount(loader.KMX_MaxShiftState());
         // wprintf(L" iKey = %i, Delta:  %i -> Sum %i\n", iKey, rgKey[iKey]->KMX_GetKeyCount(loader.MaxShiftState()),  nKeys);
       }
     }

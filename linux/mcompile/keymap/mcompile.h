@@ -44,9 +44,10 @@ UINT KMX_get_SCUnderlying_From_VKUS(KMX_DWORD VirtualKeyUS);
 
 KMX_WCHAR KMX_get_CharUnderlying_From_SCUnderlying_GDK(GdkKeymap *keymap, KMX_UINT VKShiftState, UINT SC_OTHER, PKMX_WCHAR DeadKey);
 
-KMX_WCHAR KMX_get_KVUS_From_KVUnderlying_VEC(v_dw_3D All_Vector,KMX_DWORD SC_US);
+KMX_WCHAR KMX_get_VKUS_From_VKUnderlying_VEC(v_dw_3D All_Vector,KMX_DWORD SC_US);
 
 int KMX_GetDeadkeys(v_dw_2D & dk_Table, KMX_WORD DeadKey, KMX_WORD *OutputPairs, GdkKeymap* keymap);
+
 
 //--------------------old 
 /*
