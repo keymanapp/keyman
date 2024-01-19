@@ -4,7 +4,7 @@
 
 import { constants } from "@keymanapp/ldml-keyboard-constants";
 import { MATCH_QUAD_ESCAPE, isOneChar, unescapeOneQuadString, unescapeString, hexQuad } from "../util/util.js";
-
+// import { nfdNoBoundaryBefore } from "./nfd-table.js";
 
 /**
  * Helper function for extracting matched items
