@@ -248,8 +248,7 @@ void ldml_event_state::emit_backspace() {
     } else if ((*end).type == KM_CORE_BT_MARKER) {
       // nothing in actions
       state->context().pop_back();
-      // TODO-LDML: fall through here?
-      // no action?
+      // falls through - end wasn't a character
     }
   }
   /*
@@ -260,8 +259,7 @@ void ldml_event_state::emit_backspace() {
     dumped in somewhere unknown, so we will have to depend on the app to
     be sensible about backspacing because we know nothing.
   */
-  // TODO-LDML: What here?
-  // state->actions().push_backspace(KM_CORE_BT_UNKNOWN);
+  actions.emit_keystroke = KM_CORE_TRUE;
 }
 
 void
@@ -272,7 +270,7 @@ ldml_processor::process_key_down(ldml_event_state &ldml_state) const {
 
   if (!found) {
     // no key was found, so pass the keystroke on to the Engine
-    ldml_state.emit_invalidate_passthrough_keystroke();
+    ldml_state.emit_passthrough_keystroke();
   } else if (!key_str.empty()) {
     process_key_string(ldml_state, key_str);
   } // else no action: It's a gap or gap-like key.
@@ -408,7 +406,6 @@ ldml_event_state::remove_text(std::u32string &str, size_t length) {
       actions.code_points_to_delete++;
     } else if (type == KM_CORE_BT_MARKER) {
       assert(length >= 3);
-      state->actions().push_backspace(KM_CORE_BT_MARKER, c->marker);
       // #3 - the marker.
       assert(lastCtx == c->marker);
       str.pop_back();
@@ -496,13 +493,7 @@ ldml_event_state::emit_marker( KMX_DWORD marker_no) {
   state->context().push_marker(marker_no);
 }
 
-void ldml_event_state::emit_invalidate_passthrough_keystroke() {
-  if ((vk < 0x100) && km::core::kmx::vkey_to_contextreset[vk]) {
-    // TODO-LDML: how to invalidate context?
-    context_clear();
-  } else {
-    assert(vk < 0x100); // don't expect synthetic vkeys here
-  }
+void ldml_event_state::emit_passthrough_keystroke() {
   // assert we haven't already requested a keystroke
   assert(actions.emit_keystroke != KM_CORE_TRUE);
   actions.emit_keystroke = KM_CORE_TRUE;

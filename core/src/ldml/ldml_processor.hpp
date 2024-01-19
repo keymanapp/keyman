@@ -145,8 +145,8 @@ public:
   void emit_text(km_core_usv ch);
   /** emit a marker */
   void emit_marker(KMX_DWORD marker);
-  /** emit a pass-through and invalidate */
-  void emit_invalidate_passthrough_keystroke();
+  /** emit a pass-through */
+  void emit_passthrough_keystroke();
   /** emit a backspace (for a user-initiated deletion) */
   void emit_backspace();
 
