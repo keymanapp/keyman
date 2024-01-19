@@ -71,7 +71,6 @@
 		C0452BAD1F9F21270064431A /* Keyboard.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0452BAC1F9F21270064431A /* Keyboard.swift */; };
 		C0452BAF1F9F22A80064431A /* Font.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0452BAE1F9F22A80064431A /* Font.swift */; };
 		C055E6EB1F99ED090035C2DD /* RegisteredFont.swift in Sources */ = {isa = PBXBuildFile; fileRef = C055E6EA1F99ED090035C2DD /* RegisteredFont.swift */; };
-		C05B14331FD914870082A316 /* Log.swift in Sources */ = {isa = PBXBuildFile; fileRef = C05B14321FD914870082A316 /* Log.swift */; };
 		C05F43311FBD62550058CBD4 /* JSONDecoder.DateDecodingStrategy+ISO8601Fallback.swift in Sources */ = {isa = PBXBuildFile; fileRef = C05F43301FBD62550058CBD4 /* JSONDecoder.DateDecodingStrategy+ISO8601Fallback.swift */; };
 		C06085B41F9485E40057E5B9 /* UIButton+Helpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = C06085B31F9485E40057E5B9 /* UIButton+Helpers.swift */; };
 		C06D37341F81F5C300F61AE0 /* HTTPDownloader.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0ED71B41F6BBFAF002A2FD6 /* HTTPDownloader.swift */; };
@@ -122,7 +121,6 @@
 		CE46D65D247B93C9005FD506 /* (null) in Resources */ = {isa = PBXBuildFile; };
 		CE5C8BE324B5B3BA00FAFB7F /* Queries+LexicalModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE5C8BE224B5B3BA00FAFB7F /* Queries+LexicalModel.swift */; };
 		CE5C8BE524B5BD1C00FAFB7F /* QueryModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE5C8BE424B5BD1C00FAFB7F /* QueryModelTests.swift */; };
-		CE5EDDC526522EAA001733AC /* XCGLogger.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = CE5EDDC026522EA9001733AC /* XCGLogger.xcframework */; };
 		CE5EDDC726522EAA001733AC /* Sentry.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = CE5EDDC226522EAA001733AC /* Sentry.xcframework */; };
 		CE5EDDC826522EAA001733AC /* Reachability.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = CE5EDDC326522EAA001733AC /* Reachability.xcframework */; };
 		CE5EDDC926522EAA001733AC /* ObjcExceptionBridging.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = CE5EDDC426522EAA001733AC /* ObjcExceptionBridging.xcframework */; };
@@ -393,7 +391,6 @@
 		C0452BAC1F9F21270064431A /* Keyboard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Keyboard.swift; sourceTree = "<group>"; };
 		C0452BAE1F9F22A80064431A /* Font.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Font.swift; sourceTree = "<group>"; };
 		C055E6EA1F99ED090035C2DD /* RegisteredFont.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegisteredFont.swift; sourceTree = "<group>"; };
-		C05B14321FD914870082A316 /* Log.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Log.swift; sourceTree = "<group>"; };
 		C05F43301FBD62550058CBD4 /* JSONDecoder.DateDecodingStrategy+ISO8601Fallback.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "JSONDecoder.DateDecodingStrategy+ISO8601Fallback.swift"; sourceTree = "<group>"; };
 		C06085B31F9485E40057E5B9 /* UIButton+Helpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIButton+Helpers.swift"; sourceTree = "<group>"; };
 		C06D372B1F81F4E100F61AE0 /* KeymanEngine.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = KeymanEngine.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -438,7 +435,6 @@
 		CE5C8BE224B5B3BA00FAFB7F /* Queries+LexicalModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Queries+LexicalModel.swift"; sourceTree = "<group>"; };
 		CE5C8BE424B5BD1C00FAFB7F /* QueryModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QueryModelTests.swift; sourceTree = "<group>"; };
 		CE5EDDBB26522EA3001733AC /* DeviceKit.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = DeviceKit.xcframework; path = ../../Carthage/Build/DeviceKit.xcframework; sourceTree = "<group>"; };
-		CE5EDDC026522EA9001733AC /* XCGLogger.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = XCGLogger.xcframework; path = ../../Carthage/Build/XCGLogger.xcframework; sourceTree = "<group>"; };
 		CE5EDDC226522EAA001733AC /* Sentry.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = Sentry.xcframework; path = ../../Carthage/Build/Sentry.xcframework; sourceTree = "<group>"; };
 		CE5EDDC326522EAA001733AC /* Reachability.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = Reachability.xcframework; path = ../../Carthage/Build/Reachability.xcframework; sourceTree = "<group>"; };
 		CE5EDDC426522EAA001733AC /* ObjcExceptionBridging.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = ObjcExceptionBridging.xcframework; path = ../../Carthage/Build/ObjcExceptionBridging.xcframework; sourceTree = "<group>"; };
@@ -563,7 +559,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				296EF2C72AFA26C700E3E384 /* ZIPFoundation.xcframework in Frameworks */,
-				CE5EDDC526522EAA001733AC /* XCGLogger.xcframework in Frameworks */,
 				CE5EDDD52652372A001733AC /* DeviceKit.xcframework in Frameworks */,
 				CE5EDDC726522EAA001733AC /* Sentry.xcframework in Frameworks */,
 				CE5EDDC826522EAA001733AC /* Reachability.xcframework in Frameworks */,
@@ -956,7 +951,6 @@
 				CE5EDDC426522EAA001733AC /* ObjcExceptionBridging.xcframework */,
 				CE5EDDC326522EAA001733AC /* Reachability.xcframework */,
 				CE5EDDC226522EAA001733AC /* Sentry.xcframework */,
-				CE5EDDC026522EA9001733AC /* XCGLogger.xcframework */,
 				CE5EDDBB26522EA3001733AC /* DeviceKit.xcframework */,
 				9A079DE52231A69D00581263 /* Foundation.framework */,
 			);
@@ -1006,7 +1000,6 @@
 				CEE0321224C58C90005BFC73 /* KeymanHosts.swift */,
 				C0324B921F87689B00AF3785 /* KeymanURLProtocol.swift */,
 				C0A93A531F8B21240079948B /* Manager.swift */,
-				C05B14321FD914870082A316 /* Log.swift */,
 				CEA70CCE24CAC3AE001C12E6 /* Obsoletions.swift */,
 				CE9E95CC24CE786900F6DD78 /* UniversalLinks.swift */,
 			);
@@ -1442,7 +1435,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				C05B14331FD914870082A316 /* Log.swift in Sources */,
 				9A079E43223B61AE00581263 /* FullLexicalModelID.swift in Sources */,
 				C06D37341F81F5C300F61AE0 /* HTTPDownloader.swift in Sources */,
 				C0452BAF1F9F22A80064431A /* Font.swift in Sources */,

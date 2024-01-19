@@ -8,7 +8,6 @@
 
 import UIKit
 import WebKit
-import XCGLogger
 import DeviceKit
 import Reachability
 import os.log

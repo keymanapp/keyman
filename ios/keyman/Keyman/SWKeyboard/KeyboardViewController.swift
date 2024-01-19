@@ -22,7 +22,6 @@ class KeyboardViewController: InputViewController {
       // is enabled.  They seem to get blocked otherwise, except in the Simulator.
       SentryManager.start(sendingEnabled: true)
     }
-    _ = KeymanEngine.log
 
     Manager.applicationGroupIdentifier = "group.KM4I"
 
