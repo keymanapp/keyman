@@ -3,6 +3,8 @@ import { assert } from 'chai';
 import { ElementParser, ElementSegment, ElementType, MarkerParser, MarkerResult, OrderedStringList, VariableParser } from '../../src/ldml-keyboard/pattern-parser.js';
 import { constants } from '@keymanapp/ldml-keyboard-constants';
 import { KMXFile } from '../../src/kmx/kmx.js';
+import Hexy from 'hexy';
+const { hexy } = Hexy;
 
 describe('Test of Pattern Parsers', () => {
   describe('should test MarkerParser', () => {
@@ -387,7 +389,11 @@ describe('Test of nfd_markers()', () => {
         forMatch = true;
       }
       const dst = MarkerParser.nfd_markers(src, forMatch);
-      assert.equal(dst, exp, `#${i+1} normalizing '${src}' forMatch=${forMatch}`);
+      assert.equal(dst, exp, `#${i+1} normalizing '${src}' forMatch=${forMatch} (got \n${hex_str(dst)} expected \n${hex_str(exp)}) `);
     }
   });
 });
+
+function hex_str(s?: string) : string {
+  return hexy(Buffer.from(s, 'utf16le'), {});
+}

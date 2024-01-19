@@ -145,13 +145,70 @@ export class MarkerParser {
    */
   public static nfd_markers(s: string, forMatch?: boolean) : string {
     const m : MarkerMap = [];
-    return MarkerParser.nfd_markers_segment(s, m, forMatch);
+    return MarkerParser.nfd_markers_segment(s, m, forMatch); // TODO
   }
 
   public static nfd_markers_segment(s: string, map: MarkerMap, forMatch?: boolean) : string {
-    return s.normalize("NFD");
+    const str_unmarked = this.remove_markers(s, map, forMatch);
+    const str_unmarked_nfd = str_unmarked.normalize("NFD");
+    if(map.length == 0) {
+      return str_unmarked_nfd; // no markers, so we can safely return the normalized unmarked one
+    } else if(str_unmarked_nfd === str_unmarked) {
+      return s; // normalization didn't shuffle anything, so it's entirely a no-op.
+    } else {
+      return this.add_back_markers(str_unmarked_nfd, map, forMatch);
+    }
   }
 
+  public static prepend_marker(s: string, marker: number, forMatch?: boolean) : string {
+    if (forMatch && marker === constants.marker_any_index) {
+      return MarkerParser.ANY_MARKER_MATCH + s;
+    } else {
+      return this.markerOutput(marker, forMatch) + s;
+    }
+  }
+
+  public static add_back_markers(s: string, map: MarkerMap, forMatch?: boolean) : string {
+    if (!s || !map.length) {
+      return s;
+    }
+    let out = ''; // output str
+    const max_markers = map.length;
+    let written_markers = 0;
+    const map2 : MarkerMap = [...map]; // make a copy
+    while (map2.length && map2[map2.length - 1].ch === MARKER_BEFORE_EOT) {
+      const { marker } = map2.pop();
+      out = MarkerParser.prepend_marker(out, marker, forMatch);
+      written_markers++;
+    }
+    for (let p of [...s].reverse()) {
+      // reverse order code units
+      out = p + out;
+      // write end-of-list markers first
+      while(map2.length > 0 && map2[map2.length-1].ch === p) {
+        const { marker } = map2.pop();
+        if (marker !== 0) { // if not already written
+          out = MarkerParser.prepend_marker(out, marker, forMatch);
+          written_markers++;
+          // no need to update .marker here, we're about to pop it
+        }
+      }
+      // now, any out of order markers. iterate with an index so we can record.
+      // will skip this if map2.length < 2
+      for (let i = map2.length - 2; i >= 0; i--) {
+        const { ch, marker } = map2[i];
+        if (ch === p && marker !== 0) {
+          out = MarkerParser.prepend_marker(out, marker, forMatch);
+          written_markers++;
+          map2[i].marker = 0; // mark as written
+        }
+      }
+    }
+    if(written_markers !== max_markers) {
+      throw Error(`Internal Error: We should have written ${max_markers} markers but only wrote ${written_markers}`);
+    }
+    return out;
+  }
 
   public static remove_markers(s: string, map: MarkerMap, forMatch?: boolean) : string {
     let out : string = '';
