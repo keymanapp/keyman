@@ -5,7 +5,6 @@
 import { constants } from "@keymanapp/ldml-keyboard-constants";
 import { MATCH_QUAD_ESCAPE, isOneChar, unescapeOneQuadString, unescapeString, hexQuad } from "../util/util.js";
 import { nfdNoBoundaryBefore } from "./nfd-table.js";
-// import { nfdNoBoundaryBefore } from "./nfd-table.js";
 
 /**
  * Helper function for extracting matched items
@@ -218,7 +217,7 @@ export class MarkerParser {
       // write end-of-list markers first
       while(map2.length > 0 && map2[map2.length-1].ch === p) {
         const { marker } = map2.pop();
-        if (marker !== 0) { // if not already written
+        if (marker !== constants.marker_no_index) { // if not already written
           out = MarkerParser.prepend_marker(out, marker, forMatch);
           written_markers++;
           // no need to update .marker here, we're about to pop it
@@ -228,10 +227,10 @@ export class MarkerParser {
       // will skip this if map2.length < 2
       for (let i = map2.length - 2; i >= 0; i--) {
         const { ch, marker } = map2[i];
-        if (ch === p && marker !== 0) {
+        if (ch === p && marker !== constants.marker_no_index) {
           out = MarkerParser.prepend_marker(out, marker, forMatch);
           written_markers++;
-          map2[i].marker = 0; // mark as written
+          map2[i].marker = constants.marker_no_index; // mark as written
         }
       }
     }
