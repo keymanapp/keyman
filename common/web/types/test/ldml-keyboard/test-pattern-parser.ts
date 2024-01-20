@@ -348,15 +348,13 @@ describe('Test of nfd_markers()', () => {
 
       // #1
       ["abc"],
-      //, (removal test)
       ["6\uffff\u0008"],
       ["6\uffffq"],
       ["6\uffff"],
       ["6\uffffzz"],
       ["6\uffff\u0008\u0001"],
-      // ["6\uffff\u0008\u0001e\uffff\u0008\u0002\u0320\uffff\u0008\u0003\u0300\uffff\u0008\u0004",
-      //  "6e\u0320\u0300"], (removal)
       ["6e\u0320\u0300"],
+      // #8
       ["6e\u0300\u0320","6e\u0320\u0300"],
       ["6\uffff\u0008\u0001e\uffff\u0008\u0002\u0320\uffff\u0008\u0003\u0300\uffff\u0008\u0004"],
       ["6\uffff\u0008\u0001e\uffff\u0008\u0002\u0320\uffff\u0008\u0003\u0300\uffff\u0008\u0004"],

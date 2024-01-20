@@ -4,6 +4,7 @@
 
 import { constants } from "@keymanapp/ldml-keyboard-constants";
 import { MATCH_QUAD_ESCAPE, isOneChar, unescapeOneQuadString, unescapeString, hexQuad } from "../util/util.js";
+import { nfdNoBoundaryBefore } from "./nfd-table.js";
 // import { nfdNoBoundaryBefore } from "./nfd-table.js";
 
 /**
@@ -144,8 +145,38 @@ export class MarkerParser {
    * @returns the normalized string
    */
   public static nfd_markers(s: string, forMatch?: boolean) : string {
-    const m : MarkerMap = [];
-    return MarkerParser.nfd_markers_segment(s, m, forMatch); // TODO
+    if(!s) return s;
+    let out = '';
+    let a = [...s]; // code point array
+    let seg_start = 0;
+    let seg_end = 0;
+    let i = 0;
+    let str_end = a.length;
+
+    do {
+      const rest = a.slice(i).join(''); // rest of string
+      const p = this.parse_next_marker(rest, forMatch);
+      const have_marker = !!(p?.match);
+      if (i === str_end) {
+        seg_end = i;
+      } else if(nfd_hasBoundaryBefore(a[i]) && !have_marker) {
+        seg_end = i;
+        i++;
+      } else if(have_marker) {
+        i += [...p.match].length;
+      } else {
+        i++;
+      }
+
+      if(seg_end !== seg_start) {
+        const segment = a.slice(seg_start, seg_end).join('');
+        const m : MarkerMap = [];
+        const segment_nfd = MarkerParser.nfd_markers_segment(segment, m, forMatch);
+        out = out + segment_nfd;
+        seg_start = seg_end;
+      }
+    } while (seg_end != str_end);
+    return out;
   }
 
   public static nfd_markers_segment(s: string, map: MarkerMap, forMatch?: boolean) : string {
@@ -269,6 +300,14 @@ export class MarkerParser {
 const MARKER_BEFORE_EOT = '\ufffe';
 const PARSE_SENTINEL_MARKER = new RegExp(`^${MarkerParser.ANY_MARKER_MATCH}`);
 const PARSE_REGEX_MARKER    = /^\\uffff\\u0008(?:(\\u[0-9a-fA-F]{4})|(\[\\u[0-9a-fA-F]{4}-\\u[0-9a-fA-F]{4}\]))/;
+
+
+function nfd_hasBoundaryBefore(s: string) : boolean {
+  const ch = s.codePointAt(0);
+  // not found = has boundary
+  const hasBoundary = (nfdNoBoundaryBefore.findIndex((n) => n === ch) === -1);
+  return hasBoundary;
+}
 
 export interface MarkerEntry {
   ch? : string;
