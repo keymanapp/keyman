@@ -407,6 +407,20 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
       previewHost: GesturePreviewHost
     }> = {};
 
+    const clearActiveGestures = (excludedTouchpointId?: string) => {
+      for(const identifier of Object.keys(sourceTrackingMap)) {
+        // Filter out the exclusion if one exists.
+        if(identifier == excludedTouchpointId) {
+          continue;
+        }
+
+        // Any _other_ gesture, though - yeah, that should cancel out.
+        // Note:  this can cancel ongoing modipress gestures, which may trigger an unexpected layer shift.
+        const entry = sourceTrackingMap[identifier];
+        entry.source.terminate(true);
+      }
+    }
+
     const gestureHandlerMap = new Map<GestureSequence<KeyElement>, GestureHandler[]>();
 
     // Now to set up event-handling links.
@@ -612,8 +626,11 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
             // Merely constructing the instance is enough; it'll link into the sequence's events and
             // handle everything that remains for the backspace from here.
             handlers = [new HeldRepeater(gestureSequence, () => this.modelKeyClick(gestureKey, coord))];
-          } else if(gestureKey.key.spec.baseKeyID == "K_LOPT") {
+          } else if(gestureKey.key.spec.baseKeyID == "K_LOPT") { // globe key
             gestureSequence.on('complete', () => this.emit('globekey', gestureKey, false));
+            // Cancel all other gesture sources; a language-menu interaction voids all previously-active
+            // gestures that haven't completed.
+            clearActiveGestures(coordSource.identifier);
           }
         } else if(gestureStage.matchedId.indexOf('longpress') > -1) {
           existingPreviewHost?.cancel();
@@ -903,7 +920,7 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
 
     // Prevent NaN breakages.
     if (!width || !height) {
-      return null;
+      return new Map();
     }
 
     let kbdAspectRatio = width / height;
@@ -1038,7 +1055,9 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
       return;
     }
 
-    this.gestureEngine.stateToken = layerId;
+    if(this.gestureEngine) {
+      this.gestureEngine.stateToken = layerId;
+    }
 
     // So... through KMW 14, we actually never tracked the capsKey, numKey, and scrollKey
     // properly for keyboard-defined layouts - only _default_, desktop-style layouts.
@@ -1250,15 +1269,19 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
       return;
     }
 
-    // Step 3:  perform layout operations.
-    const paddingZone = this.gestureEngine.config.maxRoamingBounds as PaddedZoneSource;
-    paddingZone.updatePadding([-0.333 * this.currentLayer.rowHeight]);
+    // Step 3: recalculate gesture parameter values
+    // Skip for doc-keyboards, since they don't do gestures.
+    if(!this.isStatic) {
+      const paddingZone = this.gestureEngine.config.maxRoamingBounds as PaddedZoneSource;
+      paddingZone.updatePadding([-0.333 * this.currentLayer.rowHeight]);
 
-    this.gestureParams.longpress.flickDist = 0.25 * this.currentLayer.rowHeight;
-    this.gestureParams.flick.startDist     = 0.15 * this.currentLayer.rowHeight;
-    this.gestureParams.flick.dirLockDist   = 0.35 * this.currentLayer.rowHeight;
-    this.gestureParams.flick.triggerDist   = 0.75 * this.currentLayer.rowHeight;
+      this.gestureParams.longpress.flickDist = 0.25 * this.currentLayer.rowHeight;
+      this.gestureParams.flick.startDist     = 0.15 * this.currentLayer.rowHeight;
+      this.gestureParams.flick.dirLockDist   = 0.35 * this.currentLayer.rowHeight;
+      this.gestureParams.flick.triggerDist   = 0.75 * this.currentLayer.rowHeight;
+    }
 
+    // Step 4:  perform layout operations.
     // Needs the refreshed layout info to work correctly.
     if(this.currentLayer) {
       this.currentLayer.refreshLayout(this, this._computedHeight - this.getVerticalLayerGroupPadding());

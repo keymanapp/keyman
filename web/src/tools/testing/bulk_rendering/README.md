@@ -12,8 +12,9 @@ This renderer loads all the cloud keyboards from api.keyman.com and renders each
     - Note that it is preferable to run this on an actual device if possible.
       - If no prompt is given re: screensharing when you click the 'run' button, use Chrome's Developer Tools
         on a desktop or laptop to run this via emulation instead.
-      - If emulating a mobile device, when prompted to screenshare, be sure to share _the Chrome tab_.  The screen capture
-        system will fail to capture the OSK properly otherwise.
+      - If emulating a mobile device, when prompted to screenshare...
+          - Be sure to share _the Chrome tab_.  The screen capture system will fail to capture the OSK properly otherwise.
+          - Also verify that emulation zoom is set to 100%; the system will fail to capture the OSK properly otherwise.
 6. Save the result to a .html file, either before.html or after.html.
 7. When swapping versions, don't forget to rebuild.
 

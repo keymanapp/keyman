@@ -66,10 +66,15 @@ static void add_back_markers(std::u32string &str, const std::u32string &src, mar
   str.clear();
   // iterator over the marker map
   auto marki = map2.rbegin();
+  // number of markers left to process
+  size_t processed_count = map2.size();
 
   // add any end-of-text markers
   while(marki != map2.rend() && marki->first == MARKER_BEFORE_EOT) {
-    prepend_marker(str, (marki++)->second, encoding);
+    prepend_marker(str, marki->second, encoding);
+    processed_count--;
+    marki->second = 0;  // mark as done
+    marki++;
   }
 
   // go from end to beginning of string
@@ -83,6 +88,7 @@ static void add_back_markers(std::u32string &str, const std::u32string &src, mar
         // set to '0' if already applied
         prepend_marker(str, marki->second, encoding);
         marki->second = 0; // mark as already applied
+        processed_count--;
       }
     }
 
@@ -91,10 +97,11 @@ static void add_back_markers(std::u32string &str, const std::u32string &src, mar
       if (marki2->second != 0 && marki2->first == ch) {
         prepend_marker(str, marki2->second, encoding);
         marki2->second = 0; // mark as already applied
+        processed_count--;
       }
     }
   }
-//  assert(marki == map.rend()); // that we consumed everything
+  assert(processed_count == 0);  // assert that we consumed all marks
 }
 
 bool normalize_nfd_markers_segment(std::u32string &str, marker_map &map, marker_encoding encoding) {
