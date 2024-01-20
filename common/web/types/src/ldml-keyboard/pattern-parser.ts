@@ -4,7 +4,6 @@
 
 import { constants } from "@keymanapp/ldml-keyboard-constants";
 import { MATCH_QUAD_ESCAPE, isOneChar, unescapeOneQuadString, unescapeString, hexQuad } from "../util/util.js";
-import { nfdNoBoundaryBefore } from "./nfd-table.js";
 
 /**
  * Helper function for extracting matched items
@@ -152,13 +151,25 @@ export class MarkerParser {
     let i = 0;
     let str_end = a.length;
 
+    // without hasBoundaryBefore, we'll need to use an iterator to segment.
+    const mall : MarkerMap = [];
+    const all_no_markers = MarkerParser.remove_markers(s, mall, forMatch);
+    if(mall.length == 0) {
+      // no markers, so just normalize as a group
+      return all_no_markers.normalize("NFD");
+    }
+    const raw_segments = Array.from(graphemeSegmenter.segment(all_no_markers))
+      .map(({segment})=>segment)
+      .map((c)=>c.codePointAt(0));
+    const hasBoundaryBefore = new Set(raw_segments);
+
     do {
       const rest = a.slice(i).join(''); // rest of string
       const p = this.parse_next_marker(rest, forMatch);
       const have_marker = !!(p?.match);
       if (i === str_end) {
         seg_end = i;
-      } else if(nfd_hasBoundaryBefore(a[i]) && !have_marker) {
+      } else if (hasBoundaryBefore.has(rest.codePointAt(0)) && !have_marker) {
         seg_end = i;
         i++;
       } else if(have_marker) {
@@ -300,13 +311,7 @@ const MARKER_BEFORE_EOT = '\ufffe';
 const PARSE_SENTINEL_MARKER = new RegExp(`^${MarkerParser.ANY_MARKER_MATCH}`);
 const PARSE_REGEX_MARKER    = /^\\uffff\\u0008(?:(\\u[0-9a-fA-F]{4})|(\[\\u[0-9a-fA-F]{4}-\\u[0-9a-fA-F]{4}\]))/;
 
-
-function nfd_hasBoundaryBefore(s: string) : boolean {
-  const ch = s.codePointAt(0);
-  // not found = has boundary
-  const hasBoundary = (nfdNoBoundaryBefore.findIndex((n) => n === ch) === -1);
-  return hasBoundary;
-}
+const graphemeSegmenter = new Intl.Segmenter(['und'], { granularity: 'grapheme' });
 
 export interface MarkerEntry {
   ch? : string;

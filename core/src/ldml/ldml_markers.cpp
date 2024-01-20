@@ -24,7 +24,7 @@ namespace ldml {
 const std::u32string REGEX_PREFIX       = U"\\uffff\\u0008";
 const std::u32string RAW_PREFIX         = U"\uffff\u0008";
 const std::u32string REGEX_ANY_MATCH    = U"[\\u0001-\\ud7fe]";
-static_assert(LDML_MARKER_NO_INDEX < LDML_MARKER_MIN_INDEX);
+static_assert(LDML_MARKER_NO_INDEX < LDML_MARKER_MIN_INDEX, "LDML_MARKER_NO_INDEX must be < LDML_MARKER_MIN_INDEX");
 
 // string manipulation
 
