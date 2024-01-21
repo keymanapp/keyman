@@ -117,7 +117,6 @@
         <VerInfo_Locale>1033</VerInfo_Locale>
         <BT_BuildType>Debug</BT_BuildType>
         <DCC_DebugInfoInTds>true</DCC_DebugInfoInTds>
-        <Debugger_RunParams>c:\temp\Bangla.kmn</Debugger_RunParams>
     </PropertyGroup>
     <ItemGroup>
         <DelphiCompile Include="$(MainSource)">
@@ -379,6 +378,9 @@
         <DCCReference Include="child\UfrmDebug.pas">
             <Form>frmDebug</Form>
         </DCCReference>
+        <DCCReference Include="child\Keyman.Developer.UI.Debug.UfrmLdmlKeyboardDebug.pas">
+            <Form>frmLdmlKeyboardDebug</Form>
+        </DCCReference>
         <DCCReference Include="child\UfrmPackageEditor.pas">
             <Form>frmPackageEditor</Form>
         </DCCReference>
@@ -536,12 +538,10 @@
         </DCCReference>
         <DCCReference Include="debug\UfrmDebugStatus_Options.pas">
             <Form>frmDebugStatus_Options</Form>
-            <FormType>dfm</FormType>
         </DCCReference>
         <DCCReference Include="main\Keyman.Developer.System.KeymanDeveloperPaths.pas"/>
         <DCCReference Include="dialogs\Keyman.Developer.UI.UfrmServerOptions.pas">
             <Form>frmServerOptions</Form>
-            <FormType>dfm</FormType>
         </DCCReference>
         <DCCReference Include="http\Keyman.Developer.System.ServerAPI.pas"/>
         <DCCReference Include="main\Keyman.System.FontLoadUtil.pas"/>
@@ -549,15 +549,12 @@
         <DCCReference Include="..\kmconvert\Keyman.Developer.System.GenerateKeyboardIcon.pas"/>
         <DCCReference Include="dialogs\examples\Keyman.Developer.UI.UfrmEditLanguageExample.pas">
             <Form>frmEditLanguageExample</Form>
-            <FormType>dfm</FormType>
         </DCCReference>
         <DCCReference Include="dialogs\relatedPackages\Keyman.Developer.UI.UfrmEditRelatedPackage.pas">
             <Form>frmEditRelatedPackage</Form>
-            <FormType>dfm</FormType>
         </DCCReference>
         <DCCReference Include="dialogs\packageWebFonts\Keyman.Developer.UI.UfrmEditPackageWebFonts.pas">
             <Form>frmEditPackageWebFonts</Form>
-            <FormType>dfm</FormType>
         </DCCReference>
         <DCCReference Include="compile\Keyman.Developer.System.KmcWrapper.pas"/>
         <DCCReference Include="project\Keyman.Developer.UI.Project.UpgradeProject.pas"/>
@@ -566,16 +563,13 @@
         <DCCReference Include="project\Keyman.Developer.UI.Project.xmlLdmlProjectFileUI.pas"/>
         <DCCReference Include="child\Keyman.Developer.UI.UfrmLdmlKeyboardEditor.pas">
             <Form>frmLdmlKeyboardEditor</Form>
-            <FormType>dfm</FormType>
         </DCCReference>
         <DCCReference Include="actions\dmActionsKeyboardEditor.pas">
             <Form>modActionsKeyboardEditor</Form>
-            <FormType>dfm</FormType>
             <DesignClass>TDataModule</DesignClass>
         </DCCReference>
         <DCCReference Include="project\Keyman.Developer.UI.Project.UfrmProjectSettings.pas">
             <Form>frmProjectSettings</Form>
-            <FormType>dfm</FormType>
         </DCCReference>
         <DCCReference Include="main\Keyman.Developer.System.TikeCommandLine.pas"/>
         <DCCReference Include="main\Keyman.Developer.System.MultiProcess.pas"/>

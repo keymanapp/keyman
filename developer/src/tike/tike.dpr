@@ -161,6 +161,7 @@ uses
   UfrmVisualKeyboardKeyBitmap in '..\..\..\common\windows\delphi\visualkeyboard\UfrmVisualKeyboardKeyBitmap.pas' {frmVisualKeyboardKeyBitmap},
   UfrmOptions in 'dialogs\UfrmOptions.pas' {frmOptions},
   UfrmDebug in 'child\UfrmDebug.pas' {frmDebug},
+  Keyman.Developer.UI.Debug.UfrmLdmlKeyboardDebug in 'child\Keyman.Developer.UI.Debug.UfrmLdmlKeyboardDebug.pas' {frmLdmlKeyboardDebug},
   UfrmPackageEditor in 'child\UfrmPackageEditor.pas' {frmPackageEditor},
   utilexecute in '..\..\..\common\windows\delphi\general\utilexecute.pas',
   KeymanVersion in '..\..\..\common\windows\delphi\general\KeymanVersion.pas',
