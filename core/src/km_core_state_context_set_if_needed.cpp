@@ -38,10 +38,10 @@ enum context_changed_type {
 };
 
 typedef struct {
-  uint8_t type;
+  enum context_changed_type type;
   // the number of characters/context items (from beginning of context)
   // that are missing from the new/internal context.
-  uint8_t end_difference;
+  uint32_t end_difference;
 } context_change_type;
 
 // Forward declarations
@@ -81,7 +81,9 @@ km_core_state_context_set_if_needed(
           return do_fail(app_context, cached_context, "could not prepend new app context");
         case CONTEXT_LONGER:
           return do_fail(app_context, cached_context, "could not shrink app context");
-      }
+        case CONTEXT_UNCHANGED:
+          break; // can't happen, but makes compiler happy
+        }
     }
   }
 
@@ -107,12 +109,14 @@ km_core_state_context_set_if_needed(
 
   if (!replace_context(context_changed, cached_context, new_cached_context)) {
     switch (context_changed.type) {
-    case CONTEXT_DIFFERENT:
-      return do_fail(app_context, cached_context, "could not set new cached context");
-    case CONTEXT_SHORTER:
-      return do_fail(app_context, cached_context, "could not prepend new cached context");
-    case CONTEXT_LONGER:
-      return do_fail(app_context, cached_context, "could not shrink cached context");
+      case CONTEXT_DIFFERENT:
+        return do_fail(app_context, cached_context, "could not set new cached context");
+      case CONTEXT_SHORTER:
+        return do_fail(app_context, cached_context, "could not prepend new cached context");
+      case CONTEXT_LONGER:
+        return do_fail(app_context, cached_context, "could not shrink cached context");
+      case CONTEXT_UNCHANGED:
+        break;  // can't happen, but makes compiler happy
     }
   }
 
@@ -130,7 +134,7 @@ replace_context(
       return false;
     }
   } else if (context_changed.type == CONTEXT_SHORTER) {
-    km_core_context_item *new_context_items;
+    km_core_context_item *new_context_items = nullptr;
     if (context_items_from_utf16(new_context, &new_context_items) != KM_CORE_STATUS_OK ||
         context_prepend(context, new_context_items, context_changed.end_difference) != KM_CORE_STATUS_OK) {
       km_core_context_items_dispose(new_context_items);
@@ -185,6 +189,8 @@ is_context_unchanged(
   km_core_context *context
 ) {
   context_change_type change_type({CONTEXT_DIFFERENT, 0});
+  assert(new_context_string != nullptr);
+  assert(context != nullptr);
   if (new_context_string == nullptr || context == nullptr) {
     return change_type;
   }
