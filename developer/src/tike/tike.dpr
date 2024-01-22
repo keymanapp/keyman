@@ -298,7 +298,8 @@ uses
   Keyman.System.CopyDataHelper in 'main\Keyman.System.CopyDataHelper.pas',
   Keyman.Developer.System.ProjectOwningFile in 'main\Keyman.Developer.System.ProjectOwningFile.pas',
   Keyman.Developer.System.Main in 'main\Keyman.Developer.System.Main.pas',
-  Keyman.Developer.System.LaunchProjects in 'main\Keyman.Developer.System.LaunchProjects.pas';
+  Keyman.Developer.System.LaunchProjects in 'main\Keyman.Developer.System.LaunchProjects.pas',
+  Keyman.System.Debug.DebugUtils in 'debug\Keyman.System.Debug.DebugUtils.pas';
 
 {$R *.RES}
 {$R ICONS.RES}

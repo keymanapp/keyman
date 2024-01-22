@@ -34,6 +34,7 @@ uses
   Keyman.System.Debug.DebugCore,
   Keyman.System.Debug.DebugEvent,
   Keyman.System.Debug.DebugUIStatus,
+  Keyman.System.Debug.DebugUtils,
   Keyman.System.KeymanCore,
   Keyman.System.KeymanCoreDebug,
   UframeTextEditor,
@@ -115,8 +116,6 @@ type
     function HandleMemoKeydown(var Message: TMessage): Boolean;
     procedure SetCurrentEvent(Value: Integer);
     procedure Run;
-    function GetContextFromMemo(
-      IncludeMarkers: Boolean): TArray<km_core_context_item>;
 
   protected
     function GetHelpTopic: string; override;
@@ -291,52 +290,6 @@ begin
   end;
 end;
 
-function TfrmLdmlKeyboardDebug.GetContextFromMemo(IncludeMarkers: Boolean): TArray<km_core_context_item>;
-var
-  n, i: Integer;
-  ch: Char;
-  dk: TDeadKeyInfo;
-begin
-  n := 0;
-  SetLength(Result, Length(memo.Text)+1);
-  i := 1;
-  while i <= memo.SelStart + memo.SelLength do
-  begin
-    ch := memo.Text[i];
-    if Uni_IsSurrogate1(ch) and (i < Length(memo.Text)) and
-      Uni_IsSurrogate2(memo.Text[i+1]) then
-    begin
-      Result[n]._type := KM_CORE_CT_CHAR;
-      Result[n].character := Uni_SurrogateToUTF32(ch, memo.Text[i+1]);
-      Inc(i);
-    end
-    else if Ord(ch) = $FFFC then
-    begin
-      if IncludeMarkers then
-      begin
-        Result[n]._type := KM_CORE_CT_MARKER;
-        dk := FDeadkeys.GetFromPosition(i-1);
-        Assert(Assigned(dk));
-        Result[n].marker := dk.Deadkey.Value;
-      end
-      else
-      begin
-        Inc(i);
-        Continue;
-      end;
-    end
-    else
-    begin
-      Result[n]._type := KM_CORE_CT_CHAR;
-      Result[n].character := Ord(ch);
-    end;
-    Inc(i);
-    Inc(n);
-  end;
-
-  Result[n]._type := KM_CORE_CT_END;
-end;
-
 function TfrmLdmlKeyboardDebug.SetKeyEventContext: Boolean;
 var
   context: pkm_core_context;
@@ -360,14 +313,14 @@ begin
   end;
 
   // Set the cached context
-  context_items := GetContextFromMemo(True);
+  context_items := GetContextFromMemo(memo, FDeadkeys, True);
   context := km_core_state_context(FDebugCore.State);
   Result := km_core_context_set(context, @context_items[0]) = KM_CORE_STATUS_OK;
 
   if Result then
   begin
     // Set the app context
-    context_items := GetContextFromMemo(False);
+    context_items := GetContextFromMemo(memo, FDeadkeys, False);
     context := km_core_state_app_context(FDebugCore.State);
     Result := km_core_context_set(context, @context_items[0]) = KM_CORE_STATUS_OK;
   end;
