@@ -58,7 +58,7 @@ void setup(const km_core_cp *app_context, const km_core_cp *cached_context, int 
   test_actions->code_points_to_delete = actions_code_points_to_delete;
   std::unique_ptr<km_core_usv[]> buf(new km_core_usv[actions_output.length() + 1]);
   actions_output.copy(buf.get(), actions_output.length());
-  // terimate the buffer
+  // terminate the buffer
   buf.get()[actions_output.length()] = 0;
   test_actions->output = buf.release();
 }
