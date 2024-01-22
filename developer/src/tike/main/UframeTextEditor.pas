@@ -367,6 +367,7 @@ end;
 procedure TframeTextEditor.cefLoadEnd(Sender: TObject);
 begin
   FHasBeenLoaded := True;
+  UpdateEditorFonts;
   SetupCharMapDrop;
   DelayedFindError;
 end;
