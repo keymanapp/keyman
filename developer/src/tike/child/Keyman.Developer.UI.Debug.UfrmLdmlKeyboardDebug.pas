@@ -115,6 +115,8 @@ type
     function HandleMemoKeydown(var Message: TMessage): Boolean;
     procedure SetCurrentEvent(Value: Integer);
     procedure Run;
+    function GetContextFromMemo(
+      IncludeMarkers: Boolean): TArray<km_core_context_item>;
 
   protected
     function GetHelpTopic: string; override;
@@ -289,16 +291,57 @@ begin
   end;
 end;
 
-function TfrmLdmlKeyboardDebug.SetKeyEventContext: Boolean;
+function TfrmLdmlKeyboardDebug.GetContextFromMemo(IncludeMarkers: Boolean): TArray<km_core_context_item>;
 var
-  context: pkm_core_context;
-  context_items: TArray<km_core_context_item>;
   n, i: Integer;
   ch: Char;
   dk: TDeadKeyInfo;
 begin
-  context := km_core_state_context(FDebugCore.State);
+  n := 0;
+  SetLength(Result, Length(memo.Text)+1);
+  i := 1;
+  while i <= memo.SelStart + memo.SelLength do
+  begin
+    ch := memo.Text[i];
+    if Uni_IsSurrogate1(ch) and (i < Length(memo.Text)) and
+      Uni_IsSurrogate2(memo.Text[i+1]) then
+    begin
+      Result[n]._type := KM_CORE_CT_CHAR;
+      Result[n].character := Uni_SurrogateToUTF32(ch, memo.Text[i+1]);
+      Inc(i);
+    end
+    else if Ord(ch) = $FFFC then
+    begin
+      if IncludeMarkers then
+      begin
+        Result[n]._type := KM_CORE_CT_MARKER;
+        dk := FDeadkeys.GetFromPosition(i-1);
+        Assert(Assigned(dk));
+        Result[n].marker := dk.Deadkey.Value;
+      end
+      else
+      begin
+        Inc(i);
+        Continue;
+      end;
+    end
+    else
+    begin
+      Result[n]._type := KM_CORE_CT_CHAR;
+      Result[n].character := Ord(ch);
+    end;
+    Inc(i);
+    Inc(n);
+  end;
 
+  Result[n]._type := KM_CORE_CT_END;
+end;
+
+function TfrmLdmlKeyboardDebug.SetKeyEventContext: Boolean;
+var
+  context: pkm_core_context;
+  context_items: TArray<km_core_context_item>;
+begin
   if memo.SelLength > 0 then
   begin
     // When there is a selection, we'll treat it as
@@ -312,41 +355,22 @@ begin
     // backspace in the case of backspace key, rather
     // than deleting the last character of the selection
     // (Keyman Core is not aware of selection).
-    km_core_context_clear(context);
+    km_core_state_context_clear(FDebugCore.State);
     Exit(True);
   end;
 
-  n := 0;
-  SetLength(context_items, Length(memo.Text)+1);
-  i := 1;
-  while i <= memo.SelStart + memo.SelLength do
-  begin
-    ch := memo.Text[i];
-    if Uni_IsSurrogate1(ch) and (i < Length(memo.Text)) and
-      Uni_IsSurrogate2(memo.Text[i+1]) then
-    begin
-      context_items[n]._type := KM_CORE_CT_CHAR;
-      context_items[n].character := Uni_SurrogateToUTF32(ch, memo.Text[i+1]);
-      Inc(i);
-    end
-    else if Ord(ch) = $FFFC then
-    begin
-      context_items[n]._type := KM_CORE_CT_MARKER;
-      dk := FDeadkeys.GetFromPosition(i-1);
-      Assert(Assigned(dk));
-      context_items[n].marker := dk.Deadkey.Value;
-    end
-    else
-    begin
-      context_items[n]._type := KM_CORE_CT_CHAR;
-      context_items[n].character := Ord(ch);
-    end;
-    Inc(i);
-    Inc(n);
-  end;
-
-  context_items[n]._type := KM_CORE_CT_END;
+  // Set the cached context
+  context_items := GetContextFromMemo(True);
+  context := km_core_state_context(FDebugCore.State);
   Result := km_core_context_set(context, @context_items[0]) = KM_CORE_STATUS_OK;
+
+  if Result then
+  begin
+    // Set the app context
+    context_items := GetContextFromMemo(False);
+    context := km_core_state_app_context(FDebugCore.State);
+    Result := km_core_context_set(context, @context_items[0]) = KM_CORE_STATUS_OK;
+  end;
 end;
 
 function TfrmLdmlKeyboardDebug.ProcessKeyEvent(var Message: TMessage): Boolean;
