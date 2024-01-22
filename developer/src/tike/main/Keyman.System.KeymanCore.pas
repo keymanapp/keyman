@@ -20,6 +20,7 @@ type
   km_core_virtual_key = uint16_t;
 
   km_core_usv = uint32_t;  // UTF-32
+  pkm_core_usv = ^km_core_usv;
   km_core_cp = WideChar;
   pkm_core_cp = ^km_core_cp;
 
@@ -201,6 +202,35 @@ type
 
   pkm_core_action_item = ^km_core_action_item;
 
+  km_core_bool = uint32;
+
+  km_core_caps_state = (
+    KM_CORE_CAPS_UNCHANGED = -1,
+    KM_CORE_CAPS_OFF = 0,
+    KM_CORE_CAPS_ON = 1
+  );
+
+  km_core_actions = record
+  code_points_to_delete: uint32; // number of codepoints (not codeunits!) to delete from app context.
+
+  // null-term string of characters to insert into document
+  output: pkm_core_usv;
+
+  // list of options to persist, terminated with KM_CORE_OPTIONS_END
+  persist_options: pkm_core_option_item;
+
+  // issue a beep, 0 = no, 1 = yes
+  do_alert: km_core_bool;
+
+  // emit the (unmodified) input keystroke to the application, 0 = no, 1 = yes
+  emit_keystroke: km_core_bool;
+
+  // -1=unchanged, 0=off, 1=on
+  new_caps_lock_state: km_core_caps_state;
+
+  end;
+  pkm_core_actions = ^km_core_actions;
+
 // These types are used only for debugging convenience
 type
   km_core_action_item_array = array[0..100] of km_core_action_item;
@@ -279,6 +309,10 @@ function km_core_state_action_items(
   state: pkm_core_state;
   num_items: pinteger
 ): pkm_core_action_item; cdecl; external keymancore delayed;
+
+function km_core_state_get_actions(
+  state: pkm_core_state
+): pkm_core_actions; cdecl; external keymancore delayed;
 
 function km_core_state_to_json(
   state: pkm_core_state;
@@ -652,4 +686,24 @@ begin
     RaiseLastOSError;
 end;
 
+// Verify size of km_core_actions - from x86 core c++ build, test_actions.cpp
+
+procedure VerifyKmCoreActionsSize;
+var
+  act: km_core_actions;
+begin
+{$IFDEF WIN64}
+  {$ERROR Struct size not yet verified for 64-bit}
+{$ENDIF}
+  assert(sizeof(km_core_actions) = 24);
+  // &km_core_actions.code_points_to_delete: 0
+  assert(Uint32(@act.output) - Uint32(@act) = 4);
+  assert(Uint32(@act.persist_options) - Uint32(@act) = 8);
+  assert(Uint32(@act.do_alert) - Uint32(@act) = 12);
+  assert(Uint32(@act.emit_keystroke) - Uint32(@act) = 16);
+  assert(Uint32(@act.new_caps_lock_state) - Uint32(@act) = 20);
+end;
+
+initialization
+  VerifyKmCoreActionsSize;
 end.

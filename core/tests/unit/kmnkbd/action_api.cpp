@@ -218,6 +218,16 @@ int main(int argc, char *argv []) {
   }
   console_color::enabled = console_color::isaterminal() || arg_color;
 
+  km_core_actions act = {0};
+
+  std::cout << "sizeof(km_core_actions): " << sizeof(km_core_actions) << std::endl;
+  std::cout << "&km_core_actions.code_points_to_delete: " << ((int)(&act.code_points_to_delete)-(int)(&act)) << std::endl;
+  std::cout << "&km_core_actions.output: " << ((int)(&act.output)-(int)(&act)) << std::endl;
+  std::cout << "&km_core_actions.persist_options: " << ((int)(&act.persist_options)-(int)(&act)) << std::endl;
+  std::cout << "&km_core_actions.do_alert: " << ((int)(&act.do_alert)-(int)(&act)) << std::endl;
+  std::cout << "&km_core_actions.emit_keystroke: " << ((int)(&act.emit_keystroke)-(int)(&act)) << std::endl;
+  std::cout << "&km_core_actions.new_caps_lock_state: " << ((int)(&act.new_caps_lock_state)-(int)(&act)) << std::endl;
+
   // actions
   test_two_backspaces();
   test_marker_text_interleaved();
