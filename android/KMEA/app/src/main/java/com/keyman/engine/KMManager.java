@@ -2310,6 +2310,11 @@ public final class KMManager {
    * @param keyboardType KeyboardType KEYBOARD_TYPE_INAPP or KEYBOARD_TYPE_SYSTEM
    */
   public static void handleGlobeKeyAction(Context context, boolean globeKeyDown, KeyboardType keyboardType) {
+    if (globeKeyState == GlobeKeyState.GLOBE_KEY_STATE_UP && !globeKeyDown) {
+      // No globe key action to process
+      return;
+    }
+
     // Update globeKeyState
     if (globeKeyState != GlobeKeyState.GLOBE_KEY_STATE_LONGPRESS) {
       globeKeyState = globeKeyDown ? GlobeKeyState.GLOBE_KEY_STATE_DOWN : GlobeKeyState.GLOBE_KEY_STATE_UP;
