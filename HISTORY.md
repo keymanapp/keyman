@@ -1,5 +1,30 @@
 # Keyman Version History
 
+## 17.0.248 alpha 2024-01-19
+
+* chore(android): Update targetSdkVersion to 34 (#10393)
+*  (#10352)
+* fix(web): keyboard-documentation rendering mode (#10417)
+* fix(ios): multiple keyboard slide-in animations on app start (#10362)
+* fix(web): U_ key id -> text for all subkeys; is now preprocessed (#10434)
+* chore(android/app): Update whatsnew for 17.0 (#10395)
+* fix(web): bulk renderer interface for recent-version targeting keyboards (#10427)
+* feat(core): cross-segment markers (#10394)
+
+## 17.0.247 alpha 2024-01-18
+
+* fix(ios): banner image management (#10337)
+* feat(core): unescape u (#10356)
+* chore(developer,core): change sample and test files to use \u{…} (#10391)
+
+## 17.0.246 alpha 2024-01-17
+
+* fix(web): Add null check for changing the keyboard during typing (#10346)
+* chore(common): Update crowdin strings for Khmer (#10411)
+* docs(common): Update website README.md (#10399)
+* docs(linux): Add documentation for Core API verification (#10409)
+* fix(web): right-flick gesture-preview positioning (#10406)
+
 ## 17.0.245 alpha 2024-01-16
 
 * chore(core): Ignore C++ symbols (#10386)

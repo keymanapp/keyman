@@ -22,8 +22,11 @@ export function boxXmlArray(o: any, x: string): void {
 export const MATCH_HEX_ESCAPE = /\\u{([0-9a-fA-F ]{1,})}/g;
 // const MATCH_HEX_ESCAPE = /\\u{((?:(?:[0-9a-fA-F]{1,5})|(?:10[0-9a-fA-F]{4})(?: (?!}))?)+)}/g;
 
+/** regex for single quad escape such as \u0127 or \U00000000 */
+export const CONTAINS_QUAD_ESCAPE = /(?:\\u([0-9a-fA-F]{4})|\\U([0-9a-fA-F]{8}))/;
+
 /** regex for single quad escape such as \u0127 */
-export const MATCH_QUAD_ESCAPE = /\\u([0-9a-fA-F]{4})/g;
+export const MATCH_QUAD_ESCAPE = new RegExp(CONTAINS_QUAD_ESCAPE, 'g');
 
 export class UnescapeError extends Error {
 }
@@ -39,8 +42,10 @@ function unescapeOne(hex: string): string {
 }
 
 /**
- * Unescape one single quad string such as \u0127.
+ * Unescape one single quad string such as \u0127 / \U00000000
  * Throws exception if the string doesn't match MATCH_QUAD_ESCAPE
+ * Note this does not attempt to handle or reject surrogates.
+ * So, `\\uD838\\uDD09` will work but other combinations may not.
  * @param s input string
  * @returns output
  */
@@ -48,12 +53,19 @@ export function unescapeOneQuadString(s: string): string {
   if (!s || !s.match(MATCH_QUAD_ESCAPE)) {
     throw new UnescapeError(`Not a quad escape: ${s}`);
   }
-  function processMatch(str: string, matched: string): string {
-    return unescapeOne(matched);
+  function processMatch(str: string, m16: string, m32: string): string {
+    return unescapeOne(m16 || m32); // either \u or \U
   }
   s = s.replace(MATCH_QUAD_ESCAPE, processMatch);
   return s;
 }
+
+/** unscape multiple occurences of \u0127 style strings */
+export function unescapeQuadString(s: string): string {
+  s = s.replaceAll(MATCH_QUAD_ESCAPE, (quad) => unescapeOneQuadString(quad));
+  return s;
+}
+
 
 /**
  * Unescapes a string according to UTS#18§1.1, see <https://www.unicode.org/reports/tr18/#Hex_notation>
@@ -74,6 +86,87 @@ export function unescapeString(s: string): string {
     function processMatch(str: string, matched: string) : string {
       const codepoints = matched.split(' ');
       const unescaped = codepoints.map(unescapeOne);
+      return unescaped.join('');
+    }
+    s = s.replaceAll(MATCH_HEX_ESCAPE, processMatch);
+  } catch(e) {
+    if (e instanceof RangeError) {
+      throw new UnescapeError(`Out of range while unescaping '${s}': ${e.message}`, { cause: e });
+      /* c8 ignore next 3 */
+    } else {
+      throw e; // pass through some other error
+    }
+  }
+  return s;
+}
+
+/** 0000 … FFFF */
+export function hexQuad(n: number): string {
+  if (n < 0x0000 || n > 0xFFFF) {
+    throw RangeError(`${n} not in [0x0000,0xFFFF]`);
+  }
+  return n.toString(16).padStart(4, '0');
+}
+
+/** 00000000 … FFFFFFFF */
+export function hexOcts(n: number): string {
+  if (n < 0x0000 || n > 0xFFFFFFFF) {
+    throw RangeError(`${n} not in [0x00000000,0xFFFFFFFF]`);
+  }
+  return n.toString(16).padStart(8, '0');
+}
+
+/** escape one char for regex in \uXXXX form */
+function escapeRegexChar(ch: string) {
+  const code = ch.codePointAt(0);
+  if (code <= 0xFFFF) {
+    return '\\u' + hexQuad(code);
+  } else {
+    return '\\U' + hexOcts(code);
+  }
+}
+
+/** chars that must be escaped: syntax, C0 + C1 controls */
+const REGEX_SYNTAX_CHAR = /^[\u0000-\u001F\u007F-\u009F{}\[\]\\?.^$*()/-]$/;
+
+function escapeRegexCharIfSyntax(ch: string) {
+  // escape if syntax or not valid
+  if (REGEX_SYNTAX_CHAR.test(ch) || !isValidUnicode(ch.codePointAt(0))) {
+    return escapeRegexChar(ch);
+  } else {
+    return ch; // leave unescaped
+  }
+}
+
+/**
+ * Unescape one codepoint to \u or \U format
+ * @param hex one codepoint in hex, such as '0127'
+ * @returns the unescaped codepoint
+ */
+function regexOne(hex: string): string {
+  const unescaped = unescapeOne(hex);
+  // re-escape as 16 or 32 bit code units
+  return Array.from(unescaped).map(ch => escapeRegexCharIfSyntax(ch)).join('');
+}
+/**
+ * Unescapes a string according to UTS#18§1.1, see <https://www.unicode.org/reports/tr18/#Hex_notation>
+ * @param s escaped string
+ * @returns
+ */
+export function unescapeStringToRegex(s: string): string {
+  if(!s) {
+    return s;
+  }
+  try {
+    /**
+     * process one regex match
+     * @param str ignored
+     * @param matched the entire match such as '0127' or '22 22'
+     * @returns the unescaped match
+     */
+    function processMatch(str: string, matched: string) : string {
+      const codepoints = matched.split(' ');
+      const unescaped = codepoints.map(regexOne);
       return unescaped.join('');
     }
     s = s.replaceAll(MATCH_HEX_ESCAPE, processMatch);

@@ -48,11 +48,14 @@ enum marker_encoding {
 /** a marker ID (1-based) */
 typedef KMX_DWORD marker_num;
 
-/** list of markers */
+/** list of marker numbers */
 typedef std::deque<marker_num> marker_list;
 
-/** map from following-char to marker numbers. */
-typedef std::map<char32_t, marker_list> marker_map;
+/** map from one char to one entry */
+typedef std::pair<char32_t, marker_num> marker_entry;
+
+/** map from following-char to marker numbers, in front to back order */
+typedef std::deque<marker_entry> marker_map;
 
 /** Normalize a u32string inplace to NFD. @return false on failure */
 bool normalize_nfd(std::u32string &str);
@@ -63,9 +66,7 @@ bool normalize_nfd(std::u16string &str);
  * @return false on failure
  **/
 bool normalize_nfd_markers_segment(std::u32string &str, marker_map &markers, marker_encoding encoding = plain_sentinel);
-bool normalize_nfd_markers_segment(std::u16string &str, marker_map &markers, marker_encoding encoding = plain_sentinel);
 bool normalize_nfd_markers(std::u32string &str, marker_encoding encoding = plain_sentinel);
-bool normalize_nfd_markers(std::u16string &str, marker_encoding encoding = plain_sentinel);
 
 // /** Normalize a u32string inplace to NFC, retaining markers.
 //  * @param markers will be populated with marker chars
