@@ -123,10 +123,13 @@ public:
       uint16_t modifier_state,
       uint8_t is_key_down,
       uint16_t event_flags);
+  ~ldml_event_state();
   /** done with this, copy it into core state */
   void commit();
   /** clear this object out */
   void clear();
+  /** clear underlying context */
+  void context_clear();
 
   // getters
   inline km_core_virtual_key get_vk() const;
@@ -142,8 +145,8 @@ public:
   void emit_text(km_core_usv ch);
   /** emit a marker */
   void emit_marker(KMX_DWORD marker);
-  /** emit a pass-through and invalidate */
-  void emit_invalidate_passthrough_keystroke();
+  /** emit a pass-through */
+  void emit_passthrough_keystroke();
   /** emit a backspace (for a user-initiated deletion) */
   void emit_backspace();
 
@@ -172,6 +175,11 @@ public:
    uint8_t is_key_down;
    uint16_t event_flags;
    km_core_state *state;
+
+   // our in-flight action struct.
+   km_core_actions actions;
+   // text to add
+   std::u32string  text;
 };
 
 

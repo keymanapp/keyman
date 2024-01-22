@@ -242,13 +242,13 @@ void ldml_event_state::emit_backspace() {
   auto end = state->context().rbegin();
   if (end != state->context().rend()) {
     if ((*end).type == KM_CORE_CT_CHAR) {
-      state->actions().push_backspace(KM_CORE_BT_CHAR, (*end).character);
+      actions.code_points_to_delete++;
       state->context().pop_back();
       return;
     } else if ((*end).type == KM_CORE_BT_MARKER) {
-      state->actions().push_backspace(KM_CORE_BT_MARKER, (*end).marker);
+      // nothing in actions
       state->context().pop_back();
-      // TODO-LDML: fall through here?
+      // falls through - end wasn't a character
     }
   }
   /*
@@ -259,7 +259,7 @@ void ldml_event_state::emit_backspace() {
     dumped in somewhere unknown, so we will have to depend on the app to
     be sensible about backspacing because we know nothing.
   */
-  state->actions().push_backspace(KM_CORE_BT_UNKNOWN);
+  actions.emit_keystroke = KM_CORE_TRUE;
 }
 
 void
@@ -270,7 +270,7 @@ ldml_processor::process_key_down(ldml_event_state &ldml_state) const {
 
   if (!found) {
     // no key was found, so pass the keystroke on to the Engine
-    ldml_state.emit_invalidate_passthrough_keystroke();
+    ldml_state.emit_passthrough_keystroke();
   } else if (!key_str.empty()) {
     process_key_string(ldml_state, key_str);
   } // else no action: It's a gap or gap-like key.
@@ -403,10 +403,9 @@ ldml_event_state::remove_text(std::u32string &str, size_t length) {
       assert(c->character == lastCtx);
       str.pop_back();
       // Cause prior char to be removed
-      state->actions().push_backspace(KM_CORE_BT_CHAR, c->character);
+      actions.code_points_to_delete++;
     } else if (type == KM_CORE_BT_MARKER) {
       assert(length >= 3);
-      state->actions().push_backspace(KM_CORE_BT_MARKER, c->marker);
       // #3 - the marker.
       assert(lastCtx == c->marker);
       str.pop_back();
@@ -418,6 +417,7 @@ ldml_event_state::remove_text(std::u32string &str, size_t length) {
       // #1 - the sentinel
       assert(str.back() == UC_SENTINEL);
       str.pop_back();
+      // Nothing in actions
       length--;
     }
   }
@@ -483,23 +483,20 @@ void
 ldml_event_state::emit_text( km_core_usv ch) {
   assert(ch != LDML_UC_SENTINEL);
   state->context().push_character(ch);
-  state->actions().push_character(ch);
+  text.push_back(ch);
 }
 
 void
 ldml_event_state::emit_marker( KMX_DWORD marker_no) {
   assert(km::core::kmx::is_valid_marker(marker_no));
-  state->actions().push_marker(marker_no);
+  // No markers in the action struct!
   state->context().push_marker(marker_no);
 }
 
-void ldml_event_state::emit_invalidate_passthrough_keystroke() {
-  if ((vk < 0x100) && km::core::kmx::vkey_to_contextreset[vk]) {
-    state->actions().push_invalidate_context();
-  } else {
-    assert(vk < 0x100); // don't expect synthetic vkeys here
-  }
-  state->actions().push_emit_keystroke();
+void ldml_event_state::emit_passthrough_keystroke() {
+  // assert we haven't already requested a keystroke
+  assert(actions.emit_keystroke != KM_CORE_TRUE);
+  actions.emit_keystroke = KM_CORE_TRUE;
 }
 
 size_t
@@ -524,6 +521,8 @@ ldml_event_state::context_to_string(std::u32string &str, bool include_markers) {
     return ctxlen; // consumed the entire context buffer.
 }
 
+static const km_core_option_item NULL_OPTIONS[] = {KM_CORE_OPTIONS_END};
+
 ldml_event_state::ldml_event_state(
     km_core_state *s,
     km_core_virtual_key v,
@@ -535,14 +534,47 @@ ldml_event_state::ldml_event_state(
   this->modifier_state = m;
   this->is_key_down    = i;
   this->event_flags    = e;
+
+  actions.persist_options = new km_core_option_item[1];
+  actions.persist_options[0] = NULL_OPTIONS[0];
+
+  // initialize actions
+  clear();
 }
 
 void ldml_event_state::commit() {
+  // thi is only set for the duration of the next call.
+  actions.output = text.c_str();
+  // current implementation copies actions.output and doesn't retain it
+  state->set_actions(actions);
+  // clean up
+  actions.output = nullptr;
+  // clear struct
+  clear();
+  // commit. TODO: should this be necessary? #9999
   state->actions().commit();
 }
 
 void ldml_event_state::clear() {
-  state->actions().clear();
+  // reset text
+  text.clear();
+  // reset state obj
+  actions.output                = nullptr;
+  actions.code_points_to_delete = 0;
+  actions.do_alert              = KM_CORE_FALSE;
+  actions.emit_keystroke        = KM_CORE_FALSE;
+  actions.new_caps_lock_state   = KM_CORE_CAPS_UNCHANGED;
+}
+
+void ldml_event_state::context_clear() {
+  // clear the context
+  state->context().clear();
+  // clear our own state
+  clear();
+}
+
+ldml_event_state::~ldml_event_state() {
+  delete [] actions.persist_options;
 }
 
 } // namespace core
