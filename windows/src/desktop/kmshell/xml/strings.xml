@@ -788,6 +788,16 @@ keyboard that you use in Windows.  Keyman keyboards will adapt automatically to 
 
 
 
+  <!-- Context: Update Dialog -->
+  <!-- String Type: FormatString -->
+  <!-- Introduced: 17.0233.0 -->
+  <string name="S_Button_Update_ApplyNow" comment="Apply update now button - update dialog">Apply update now</string>
+
+  <!-- Context: Update Dialog -->
+  <!-- String Type: FormatString -->
+  <!-- Introduced: 17.0233.0 -->
+  <string name="S_Button_Update_CheckNow" comment="Check for updates now button - update dialog">Check for new updates</string>
+
 
   <!-- Context: Splash Dialog -->
   <!-- String Type: PlainText -->
