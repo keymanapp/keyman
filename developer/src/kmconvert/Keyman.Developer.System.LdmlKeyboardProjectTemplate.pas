@@ -75,31 +75,51 @@ end;
 const
   TemplateXML: string =
     '<?xml version="1.0" encoding="UTF-8"?>'#13#10+
-    // We won't inject the DOCTYPE because of pathing challenges, CLDR-15505: '<!DOCTYPE keyboard3 SYSTEM "ldmlKeyboard3.dtd">'#13#10+
-    '<keyboard3 />'#13#10;
-
-const
-  keys: array[0..11, 0..1] of string = (
-    ('a', 'Hello World!'),
-    ('grave','`'),
-    ('hyphen','-'),
-    ('equal','='),
-    ('open-bracket','['),
-    ('close-bracket',']'),
-    ('backslash','\'),
-    ('semi-colon',';'),
-    ('quote',''''),
-    ('comma',','),
-    ('period','.'),
-    ('slash','/')
-  );
+    // We won't inject the DOCTYPE because of pathing challenges, CLDR-15505
+    //  '<!DOCTYPE keyboard3 SYSTEM "ldmlKeyboard3.dtd">'#13#10+
+    '<keyboard3>'#13#10+
+    '  <keys>'#13#10+
+    '    <import base="cldr" path="techpreview/keys-Zyyy-punctuation.xml"/>'#13#10+
+    '    <import base="cldr" path="techpreview/keys-Zyyy-currency.xml"/>  '#13#10+
+    '  </keys>'#13#10+
+    '  <layers formId="us">'#13#10+
+    '    <layer modifiers="none">'#13#10+
+    '      <row keys="grave 1 2 3 4 5 6 7 8 9 0 hyphen equal"/>'#13#10+
+    '      <row keys="q w e r t y u i o p open-square close-square backslash"/>'#13#10+
+    '      <row keys="a s d f g h j k l semi-colon apos"/>'#13#10+
+    '      <row keys="z x c v b n m comma period slash"/>'#13#10+
+    '      <row keys="space"/>'#13#10+
+    '    </layer>'#13#10+
+    '    <layer modifiers="shift">'#13#10+
+    '      <row keys="tilde bang at hash dollar percent caret amp asterisk open-paren close-paren underscore plus"/>'#13#10+
+    '      <row keys="Q W E R T Y U I O P open-curly close-curly pipe"/>'#13#10+
+    '      <row keys="A S D F G H J K L colon double-quote"/>'#13#10+
+    '      <row keys="Z X C V B N M open-angle close-angle question"/>'#13#10+
+    '      <row keys="space"/>'#13#10+
+    '    </layer>'#13#10+
+    '    <layer modifiers="caps">'#13#10+
+    '      <row keys="grave 1 2 3 4 5 6 7 8 9 0 hyphen equal"/>'#13#10+
+    '      <row keys="Q W E R T Y U I O P open-square close-square backslash"/>'#13#10+
+    '      <row keys="A S D F G H J K L semi-colon apos"/>'#13#10+
+    '      <row keys="Z X C V B N M comma period slash"/>'#13#10+
+    '      <row keys="space"/>'#13#10+
+    '    </layer>'#13#10+
+    '    <layer modifiers="shift caps">'#13#10+
+    '      <row keys="tilde bang at hash dollar percent caret amp asterisk open-paren close-paren underscore plus"/>'#13#10+
+    '      <row keys="q w e r t y u i o p open-curly close-curly pipe"/>'#13#10+
+    '      <row keys="a s d f g h j k l colon double-quote"/>'#13#10+
+    '      <row keys="z x c v b n m open-angle close-angle question"/>'#13#10+
+    '      <row keys="space"/>'#13#10+
+    '    </layer>'#13#10+
+    '  </layers>'#13#10+
+    '</keyboard3>'#13#10;
 
 procedure TLDMLKeyboardProjectTemplate.WriteLDML;
 var
   doc: IXmlDocument;
-  key, row, node, root: IXmlNode;
-  tag, tags: string;
-  i: Integer;
+  node, root: IXmlNode;
+  xml, tag, tags: string;
+  str: TStringStream;
 begin
   tags := Trim(BCP47Tags);
   tag := StrToken(tags, ' ');
@@ -107,7 +127,6 @@ begin
   doc := TXMLDocument.Create(nil);
   doc.ParseOptions := [];
   doc.LoadFromXML(TemplateXML);
-  doc.Options := doc.Options + [doNodeAutoIndent];   // I4704
 
   root := doc.DocumentElement;
   root.Attributes['locale'] := tag;
@@ -115,53 +134,36 @@ begin
 
   doc.DocumentElement := root;
 
-  node := root.AddChild('info');
+  node := doc.CreateElement('info', '');
   node.Attributes['author'] := Author;
   node.Attributes['name'] := Name;
+  root.ChildNodes.Insert(0, node);
 
-  root.AddChild('version').Attributes['number'] := Version;
+  node := doc.CreateElement('version', '');
+  node.Attributes['number'] := Version;
+  root.ChildNodes.Insert(1, node);
 
   if tags <> '' then
   begin
-    node := root.AddChild('locales');
+    node := doc.CreateElement('locales', '');
     while tags <> '' do
     begin
       tag := StrToken(tags, ' ');
       node.AddChild('locale').Attributes['id'] := tag;
     end;
+    root.ChildNodes.Insert(2, node);
   end;
 
-  //  root.AddChild('displays');
+  // Reformat the document
 
-  node := root.AddChild('keys');
-  for i := Low(keys) to High(keys) do
-  begin
-    key := node.AddChild('key');
-    key.Attributes['id'] := keys[i][0];
-    key.Attributes['output'] := keys[i][1];
+  doc.SaveToXML(xml);
+  xml := FormatXMLData(xml);
+  str := TStringStream.Create(xml, TEncoding.UTF8);
+  try
+    str.SaveToFile(KeyboardFileName);
+  finally
+    str.Free;
   end;
-
-  //  root.AddChild('flicks');
-
-  node := root.AddChild('layers');
-  node.Attributes['formId'] := 'us';
-  node := node.AddChild('layer');
-  node.Attributes['modifiers'] := 'none';
-  row := node.AddChild('row');
-  row.Attributes['keys'] := 'grave 1 2 3 4 5 6 7 8 9 0 hyphen equal';
-  row := node.AddChild('row');
-  row.Attributes['keys'] := 'q w e r t y u i o p open-bracket close-bracket backslash';
-  row := node.AddChild('row');
-  row.Attributes['keys'] := 'a s d f g h j k l semi-colon quote';
-  row := node.AddChild('row');
-  row.Attributes['keys'] := 'z x c v b n m comma period slash';
-  row := node.AddChild('row');
-  row.Attributes['keys'] := 'space';
-
-  //  root.AddChild('transforms');
-  //  root.AddChild('variables');
-
-  doc.SaveToFile(KeyboardFileName);
 end;
 
 procedure TLDMLKeyboardProjectTemplate.WriteKPJ;
