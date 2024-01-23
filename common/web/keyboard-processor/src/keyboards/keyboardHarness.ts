@@ -87,8 +87,8 @@ export class KeyboardHarness {
 
   // Is evaluated on script-load for some keyboards using variable stores.
   // Example:  sil_ipa - store(option_key)
-  public KLOAD() {
-    return '';
+  public KLOAD(kbdName: string, storeName: string, dfltValue: string) {
+    return dfltValue;
   }
 
   /**
