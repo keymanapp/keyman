@@ -4,8 +4,12 @@ import fs from 'fs';
 import { createRequire } from 'module';
 const require = createRequire(import.meta.url);
 
-import { Codes, Keyboard, KeyboardInterface, KeyEvent, MinimalKeymanGlobal, Mock } from '@keymanapp/keyboard-processor';
+import { Codes, KeyboardInterface, KeyEvent, MinimalKeymanGlobal, Mock } from '@keymanapp/keyboard-processor';
 import { NodeKeyboardLoader } from '@keymanapp/keyboard-processor/node-keyboard-loader';
+
+// Compare and contrast the unit tests here with those for app/browser key-event unit testing
+// in the hardware-event-processing set; the output objects there should have the same format
+// as the event object inputs used here.
 
 describe.only('Engine - rule processing', function() {
   const ipaPath = require.resolve('@keymanapp/common-test-resources/keyboards/sil_ipa.js');
