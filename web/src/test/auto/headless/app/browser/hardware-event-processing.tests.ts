@@ -554,8 +554,10 @@ describe("app/browser: hardware event processing", () => {
           'us'
         );
 
-        // Legacy keyboards expect this to be false; this acts as a filter for legacy keyboards
-        // to prevent key processing with held CTRL / ALT.
+        // KMW 1.0 keyboards expect this to be false; setting it to true prevents the keyboard
+        // from matching the event to a rule.  As KMW 1.0 keyboards shouldn't handle modifiers
+        // other than shift, this acts as a filter to prevent rule processing for the unsupported
+        // modifier.
         assert.isTrue(finalKeyEvent.LisVirtualKey);
         assert.equal(finalKeyEvent.Lcode, KeyCodes.K_A);
         assert.equal(finalKeyEvent.Lmodifiers, ModifierCodes.ALT);
@@ -579,8 +581,10 @@ describe("app/browser: hardware event processing", () => {
           'us'
         );
 
-        // Legacy keyboards expect this to be false; this acts as a filter for legacy keyboards
-        // to prevent key processing with held CTRL / ALT.
+        // KMW 1.0 keyboards expect this to be false; setting it to true prevents the keyboard
+        // from matching the event to a rule.  As KMW 1.0 keyboards shouldn't handle modifiers
+        // other than shift, this acts internally as a filter to prevent rule matching for
+        // events with the unsupported modifier.
         assert.isTrue(finalKeyEvent.LisVirtualKey);
         assert.equal(finalKeyEvent.Lcode, KeyCodes.K_A);
         assert.equal(finalKeyEvent.Lmodifiers, ModifierCodes.LALT);

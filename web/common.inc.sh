@@ -103,8 +103,6 @@ function test-headless() {
     # if the command is started within the appropriate subfolder.
     pushd "${TEST_BASE}" > /dev/null
     TEST_BASE=
-  else
-    TEST_BASE="${TEST_BASE}/"
   fi
 
   if [[ -e .c8rc.json ]]; then
