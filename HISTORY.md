@@ -1,5 +1,13 @@
 # Keyman Version History
 
+## 17.0.250 alpha 2024-01-23
+
+* fix(android/engine): Add RECEIVER_EXPORTED flag for broadcast receiver (#10463)
+* fix(web): osk responsiveness to held modifiers on legacy kbds (#10437)
+* fix(android/engine): Skip final globe key action (#10465)
+* feat(developer): marker normalization in .ts (#10443)
+*  (#10445)
+
 ## 17.0.249 alpha 2024-01-22
 
 * feat(web): suggestion banner UI enhancements - suggestion expanding + scrollable banner (#7934)
