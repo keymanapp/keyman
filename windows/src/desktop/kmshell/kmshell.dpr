@@ -182,7 +182,8 @@ uses
   Keyman.System.RemoteUpdateCheck in 'main\Keyman.System.RemoteUpdateCheck.pas',
   BackgroundUpdate in 'main\BackgroundUpdate.pas',
   Keyman.System.DownloadUpdate in 'main\Keyman.System.DownloadUpdate.pas',
-  Keyman.System.ExecuteHistory in '..\..\..\..\common\windows\delphi\general\Keyman.System.ExecuteHistory.pas';
+  Keyman.System.ExecuteHistory in '..\..\..\..\common\windows\delphi\general\Keyman.System.ExecuteHistory.pas',
+  UfrmStartInstall in 'main\UfrmStartInstall.pas' {Form1};
 
 {$R VERSION.RES}
 {$R manifest.res}
@@ -204,6 +205,8 @@ begin
         Application.Initialize;
         Application.Title := 'Keyman Configuration';
         Application.CreateForm(TmodWebHttpServer, modWebHttpServer);
+  Application.CreateForm(TForm1, Form1);
+  Application.CreateForm(TForm1, Form1);
   try
           Run;
         finally
