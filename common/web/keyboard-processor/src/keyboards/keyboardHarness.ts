@@ -85,6 +85,12 @@ export class KeyboardHarness {
     this.loadedKeyboard = new Keyboard(scriptObject);
   }
 
+  // Is evaluated on script-load for some keyboards using variable stores.
+  // Example:  sil_ipa - store(option_key)
+  public KLOAD() {
+    return '';
+  }
+
   /**
    * Installs this harness instance into the object that the keyboard script will perceive
    * as the top-level global with the name `KeymanWeb`.
