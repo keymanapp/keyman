@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 17.0.249 alpha 2024-01-22
+
+* feat(web): suggestion banner UI enhancements - suggestion expanding + scrollable banner (#7934)
+* chore(web): worker sourcemap cleanup, mobile app webview sourcemap compat (#10413)
+
 ## 17.0.248 alpha 2024-01-19
 
 * chore(android): Update targetSdkVersion to 34 (#10393)

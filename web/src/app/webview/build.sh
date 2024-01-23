@@ -72,12 +72,18 @@ compile_and_copy() {
   cp -R "$KEYMAN_ROOT/web/src/resources/osk/." "$KEYMAN_ROOT/web/build/app/resources/osk/"
 
   # Clean the sourcemaps of .. and . components
-  for sourcemap in "$KEYMAN_ROOT/web/build/$SUBPROJECT_NAME/debug/"*.map; do
-    node "$KEYMAN_ROOT/web/build/tools/building/sourcemap-root/index.js" null "$sourcemap" --clean
+  for script in "$KEYMAN_ROOT/web/build/$SUBPROJECT_NAME/debug/"*.js; do
+    sourcemap="$script.map"
+    node "$KEYMAN_ROOT/web/build/tools/building/sourcemap-root/index.js" \
+      "$script" "$sourcemap" --clean --inline
   done
 
-  for sourcemap in "$KEYMAN_ROOT/web/build/$SUBPROJECT_NAME/release/"*.map; do
-    node "$KEYMAN_ROOT/web/build/tools/building/sourcemap-root/index.js" null "$sourcemap" --clean
+  # Do NOT inline sourcemaps for release builds - we don't want them to affect
+  # load time.
+  for script in "$KEYMAN_ROOT/web/build/$SUBPROJECT_NAME/release/"*.js; do
+    sourcemap="$script.map"
+    node "$KEYMAN_ROOT/web/build/tools/building/sourcemap-root/index.js" \
+      "$script" "$sourcemap" --clean
   done
 
   node map-polyfill-bundler.js
