@@ -221,12 +221,12 @@ int main(int argc, char *argv []) {
   km_core_actions act = {0};
 
   std::cout << "sizeof(km_core_actions): " << sizeof(km_core_actions) << std::endl;
-  std::cout << "&km_core_actions.code_points_to_delete: " << ((int)(&act.code_points_to_delete)-(int)(&act)) << std::endl;
-  std::cout << "&km_core_actions.output: " << ((int)(&act.output)-(int)(&act)) << std::endl;
-  std::cout << "&km_core_actions.persist_options: " << ((int)(&act.persist_options)-(int)(&act)) << std::endl;
-  std::cout << "&km_core_actions.do_alert: " << ((int)(&act.do_alert)-(int)(&act)) << std::endl;
-  std::cout << "&km_core_actions.emit_keystroke: " << ((int)(&act.emit_keystroke)-(int)(&act)) << std::endl;
-  std::cout << "&km_core_actions.new_caps_lock_state: " << ((int)(&act.new_caps_lock_state)-(int)(&act)) << std::endl;
+  std::cout << "&km_core_actions.code_points_to_delete: " << ((intptr_t)(&act.code_points_to_delete)-(intptr_t)(&act)) << std::endl;
+  std::cout << "&km_core_actions.output: " << ((intptr_t)(&act.output)-(intptr_t)(&act)) << std::endl;
+  std::cout << "&km_core_actions.persist_options: " << ((intptr_t)(&act.persist_options)-(intptr_t)(&act)) << std::endl;
+  std::cout << "&km_core_actions.do_alert: " << ((intptr_t)(&act.do_alert)-(intptr_t)(&act)) << std::endl;
+  std::cout << "&km_core_actions.emit_keystroke: " << ((intptr_t)(&act.emit_keystroke)-(intptr_t)(&act)) << std::endl;
+  std::cout << "&km_core_actions.new_caps_lock_state: " << ((intptr_t)(&act.new_caps_lock_state)-(intptr_t)(&act)) << std::endl;
 
   // actions
   test_two_backspaces();
