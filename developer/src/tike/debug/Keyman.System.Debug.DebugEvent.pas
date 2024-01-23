@@ -93,9 +93,6 @@ type
       vk: uint16_t;
       modifier_state: uint16_t
     ): Boolean; overload;
-
-    procedure AddLdmlStateItems(state: pkm_core_state; vk,
-      modifier_state: uint16_t; debugkeyboard: TDebugKeyboard);
   end;
 
 implementation
@@ -373,44 +370,6 @@ begin
   // By the time we get to the end of rule processing, all actions should have
   // already been undertaken
   Assert(action._type = KM_CORE_IT_END);
-end;
-
-procedure TDebugEventList.AddLdmlStateItems(
-  state: pkm_core_state;
-  vk: uint16_t;
-  modifier_state: uint16_t;
-  debugkeyboard: TDebugKeyboard
-);
-var
-  actions: pkm_core_actions;
-  p: pkm_core_usv;
-  i: UInt32;
-begin
-  actions := km_core_state_get_actions(state);
-
-  for i := 1 to actions.code_points_to_delete do
-    Action_DeleteBack(Byte(KM_CORE_BT_CHAR), 0);
-
-  p := actions.output;
-  while p^ <> 0 do
-  begin
-    Action_Char(p^);
-    Inc(p);
-  end;
-
-  // TODO: actions.persist_options
-
-  if actions.do_alert <> 0 then
-  begin
-    // TODO
-  end;
-
-  if actions.emit_keystroke <> 0 then
-  begin
-    Action_EmitKeystroke(vk);
-  end;
-
-  // TODO: actions.new_caps_lock_state
 end;
 
 { TDebugEventRuleData }

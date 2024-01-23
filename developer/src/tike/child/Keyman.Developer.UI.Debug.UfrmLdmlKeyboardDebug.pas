@@ -32,8 +32,6 @@ uses
   PaintPanel,
   KeymanDeveloperDebuggerMemo,
   Keyman.System.Debug.DebugCore,
-  Keyman.System.Debug.DebugEvent,
-  Keyman.System.Debug.DebugUIStatus,
   Keyman.System.Debug.DebugUtils,
   Keyman.System.KeymanCore,
   Keyman.System.KeymanCoreDebug,
@@ -41,6 +39,13 @@ uses
   UfrmMDIEditor,
   UfrmTike,
   UserMessages;
+
+type
+  TLdmlDebugUIStatus = (
+    duiStarting,
+    duiTest,
+    duiClosing
+  );
 
 type
   TfrmLdmlKeyboardDebug = class(TTikeForm)
@@ -56,7 +61,6 @@ type
     mnuPaste: TMenuItem;   // I4808
     procedure FormCreate(Sender: TObject);
     procedure memoGotFocus(Sender: TObject);
-    procedure memoLostFocus(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure memoChange(Sender: TObject);
@@ -70,27 +74,15 @@ type
     procedure memoKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure FormResize(Sender: TObject);
   private
-
-    FDebugVisible: Boolean;
-    FRunning: Boolean;
     FFileName: string;
     debugkeyboard: TDebugKeyboard;
-    _FCurrentEvent: Integer;
     FDefaultFont: Boolean;
-    FEvents: TDebugEventList;
-    FUIStatus: TDebugUIStatus;
+    FUIStatus: TLdmlDebugUIStatus;
     FUIDisabled: Boolean;
 
     { Deadkey member variables }
     FSelectedDeadkey: TDeadKeyInfo;
-    FSavedSelection: TMemoSelection;
 
-    procedure ResetEvents;
-    procedure ExecuteEvent(n: Integer);
-    procedure ExecuteEventAction(n: Integer);
-    procedure SetUIStatus(const Value: TDebugUIStatus);
-    procedure DisableUI;
-    procedure EnableUI;
     function GetStatusText: string;
     procedure SetStatusText(Value: string);
 
@@ -102,7 +94,6 @@ type
     FDebugFileName: WideString;
     procedure ClearDeadkeys;
     procedure ClearDeadkeyStyle;
-    function GetCurrentEvent: TDebugEvent;
     procedure UninitDeadkeys;
     procedure UpdateDeadkeyDisplay;
     procedure UpdateDeadkeys;
@@ -114,8 +105,7 @@ type
     procedure CleanupCoreState;
     function SetKeyEventContext: Boolean;
     function HandleMemoKeydown(var Message: TMessage): Boolean;
-    procedure SetCurrentEvent(Value: Integer);
-    procedure Run;
+    procedure Run(vkey: Word);
 
   protected
     function GetHelpTopic: string; override;
@@ -132,7 +122,7 @@ type
 
     function GetDebugKeyboard: TDebugKeyboard;
 
-    property UIStatus: TDebugUIStatus read FUIStatus write SetUIStatus;
+    property UIStatus: TLdmlDebugUIStatus read FUIStatus write FUIStatus;
 
     property DebugFileName: WideString read FDebugFileName write FDebugFileName;
     property CompiledFileName: string read FFileName write FFileName;   // I4695
@@ -141,11 +131,7 @@ type
     procedure ShowDebugForm;
     procedure HideDebugForm;
 
-    property DebugVisible: Boolean read FDebugVisible;
-
     function ShortcutDisabled(Key: Word): Boolean;
-
-    property CurrentEvent: TDebugEvent read GetCurrentEvent;
   end;
 
 implementation
@@ -153,20 +139,18 @@ implementation
 {$R *.DFM}
 
 uses
+  System.Character,
+  System.Math,
+
   Keyman.Developer.System.HelpTopics,
 
-  ActiveX,
   dmActionsDebugger,
   dmActionsMain,
-  Glossary,
   Keyman.Developer.System.Project.ProjectLog,
+  Keyman.Developer.UI.Project.ProjectUI,
   Keyman.Developer.UI.UfrmLdmlKeyboardEditor,
   Keyman.UI.Debug.CharacterGridRenderer,
   KeyNames,
-  kmxfile,
-  kmxfileconsts,
-  ErrorControlledRegistry,
-  RegistryKeys,
   KeymanDeveloperOptions,
   KeymanDeveloperUtils,
   ScanCodeMap,
@@ -174,13 +158,9 @@ uses
   UfrmEditor,
   UfrmMain,
   UfrmMessages,
-  UfrmRegressionTestFailure,
   UfrmSelectSystemKeyboard,
   Unicode,
-  utilstr,
-  UTikeDebugMode,
-  VKeys,
-  XString;
+  utilstr;
 
 const
   // WM_KEYDOWN bits; KEYFLAG_KEYMAN is a reserved value
@@ -197,18 +177,19 @@ begin
 
   FDeadkeys := TDebugDeadkeyInfoList.Create;
 
-  FUIStatus := duiInvalid;
-  FEvents := TDebugEventList.Create;
+  FUIStatus := duiStarting;
   FDefaultFont := True;
   memo.Align := alClient;
+  memo.ReadOnly := False;
+  memo.IsDebugging := True;
+  StatusText := 'Simple Test';
 
-  UIStatus := duiReadyForInput;
+  UIStatus := duiTest;
 end;
 
 procedure TfrmLdmlKeyboardDebug.FormDestroy(Sender: TObject);
 begin
   ResetDebug;
-  FreeAndNil(FEvents);
   UninitDeadkeys;
 end;
 
@@ -224,9 +205,6 @@ end;
 
 procedure TfrmLdmlKeyboardDebug.memoGotFocus(Sender: TObject);
 begin
-  if UIStatus = duiReadyForInput then
-    UIStatus := duiFocusedForInput;
-
   memoSelMove(memo);
 end;
 
@@ -236,30 +214,15 @@ begin
   memoSelMove(memo);
 end;
 
-procedure TfrmLdmlKeyboardDebug.memoLostFocus(Sender: TObject);
-begin
-  if UIStatus = duiFocusedForInput then
-    UIStatus := duiReadyForInput;
-end;
-
 function TfrmLdmlKeyboardDebug.HandleMemoKeydown(var Message: TMessage): Boolean;
 begin
-  if (Message.wParam = VK_ESCAPE) and
-      (GetKeyState(VK_SHIFT) < 0) and
-      (UIStatus <> duiPaused) then   // I4033
-    UIStatus := duiPaused
-  else if (Message.wParam = VK_F6) and
+  if (Message.wParam = VK_F6) and
     (GetKeyState(VK_CONTROL) >= 0) and
-    (GetKeyState(VK_MENU) >= 0) and
-    (UIStatus <> duiFocusedForInput) then
+    (GetKeyState(VK_MENU) >= 0) then
   begin
     EditorMemo.SetFocus;
   end
-  else if (Message.wParam = VK_ESCAPE) and
-      (GetKeyState(VK_SHIFT) < 0) and
-      (UIStatus = duiPaused) then
-    UIStatus := duiFocusedForInput
-  else if UIStatus in [duiTest, duiFocusedForInput] then
+  else if UIStatus = duiTest then
   begin
     Exit(ProcessKeyEvent(Message));
   end
@@ -274,9 +237,9 @@ procedure TfrmLdmlKeyboardDebug.memoMessage(Sender: TObject; var Message: TMessa
 begin
   Handled := False;
 
-  if UIStatus = duiClosing then
+  if UIStatus <> duiTest then
   begin
-    Exit;  // Don't process while destroying...
+    Exit;
   end;
 
   case Message.Msg of
@@ -384,63 +347,35 @@ begin
       Exit(True);
     end;
 
-    FEvents.Clear;
-    FEvents.AddLdmlStateItems(FDebugCore.State, vkey, modifier, debugkeyboard);
+    Run(vkey);
 
-    FRunning := True;
-    SetCurrentEvent(0);
-    Run;
+    UpdateDeadkeys;
   end
   else
   begin
-    FEvents.Clear;
     Result := False;
   end;
 end;
 
-procedure TfrmLdmlKeyboardDebug.SetCurrentEvent(Value: Integer);
+function UsvToString(p: pkm_core_usv): string;
 begin
-  _FCurrentEvent := Value;
+  Result := '';
+  while p^ <> 0 do
+  begin
+    Result := Result + Char.ConvertFromUtf32(p^);
+    Inc(p);
+  end;
 end;
 
-procedure TfrmLdmlKeyboardDebug.Run;
-begin
-  FRunning := True;
-  try
-    while (_FCurrentEvent < FEvents.Count) do
-    begin
-      ExecuteEvent(_FCurrentEvent);
-      SetCurrentEvent(_FCurrentEvent + 1);
-      if UIStatus = duiPaused then   // I4033
-        Exit;
-    end;
-  finally
-    FRunning := False;
-    EnableUI;
-    UpdateCharacterGrid;
-    // We want to refresh the memo and character grid for rapid typing
-    memo.Update;
-    sgChars.Update;
+procedure TfrmLdmlKeyboardDebug.Run(vkey: Word);
+
+  procedure DoAlert;
+  begin
+    MessageBeep(0);
   end;
 
-  if UIStatus <> duiTest then
-    if memo.Focused
-      then UIStatus := duiFocusedForInput
-      else UIStatus := duiReadyForInput;
-end;
 
-{ Stores }
 
-procedure TfrmLdmlKeyboardDebug.ExecuteEvent(n: Integer);
-begin
-  memo.ReadOnly := False;
-  memo.Selection := FSavedSelection;
-  ExecuteEventAction(n);
-  FSavedSelection := memo.Selection;
-  memo.ReadOnly := True;
-end;
-
-procedure TfrmLdmlKeyboardDebug.ExecuteEventAction(n: Integer);
   type
     TMemoSelectionState = record
       Selection: TMemoSelection;
@@ -481,126 +416,6 @@ procedure TfrmLdmlKeyboardDebug.ExecuteEventAction(n: Integer);
     UpdateDeadkeys;
   end;
 
-  procedure DoBackspace(BackspaceType: km_core_backspace_type);
-  var
-    m, n: Integer;
-    dk: TDeadKeyInfo;
-    state: TMemoSelectionState;
-  begin
-    // Offset is zero-based, but string is 1-based. Beware!
-    state := SaveMemoSelectionState;
-    n := memo.SelStart;
-    m := n;
-
-    if memo.SelLength > 0 then
-    begin
-      // If the memo has a selection, we have given Core an empty context,
-      // which forces it to emit a KM_CORE_BT_UNKNOWN backspace, which is
-      // exactly what we want here. We just delete the selection
-      Assert(BackspaceType = KM_CORE_BT_UNKNOWN);
-      memo.SelText := '';
-      RealignMemoSelectionState(state);
-      Exit;
-    end;
-
-    case BackspaceType of
-      KM_CORE_BT_MARKER:
-        begin
-          Assert(m >= 1);
-          Assert(memo.Text[m] = #$FFFC);
-          dk := FDeadkeys.GetFromPosition(m-1);
-          Assert(Assigned(dk));
-          dk.Delete;
-          Dec(m);
-        end;
-      KM_CORE_BT_CHAR:
-        begin
-          Assert(m >= 1);
-          Assert(memo.Text[m] <> #$FFFC);
-          // Delete surrogate pairs
-          if (m > 1) and
-              Uni_IsSurrogate2(memo.Text[m]) and
-              Uni_IsSurrogate1(memo.Text[m-1]) then
-            Dec(m, 2)
-          // Delete \r\n line breaks
-          else if (m > 1) and
-              (memo.Text[m] = #$0A) and
-              (memo.Text[m-1] = #$0D) then
-            Dec(m, 2)
-          else
-            Dec(m);
-        end;
-      KM_CORE_BT_UNKNOWN:
-        begin
-          while (m >= 1) and (memo.Text[m] = #$FFFC) do
-          begin
-            dk := FDeadkeys.GetFromPosition(m-1);
-            Assert(Assigned(dk));
-            dk.Delete;
-            Dec(m);
-          end;
-
-          // Delete character
-          if (m > 1) and
-              Uni_IsSurrogate2(memo.Text[m]) and
-              Uni_IsSurrogate1(memo.Text[m-1]) then
-            Dec(m, 2)
-          else
-            Dec(m);
-
-          // Also delete deadkeys to left of current character
-          while (m >= 1) and (memo.Text[m] = #$FFFC) do
-          begin
-            dk := FDeadkeys.GetFromPosition(m-1);
-            Assert(Assigned(dk));
-            dk.Delete;
-            Dec(m);
-          end;
-        end;
-    else
-      Assert(False, 'Unrecognised backspace type');
-    end;
-
-    memo.Text := Copy(memo.Text, 1, m) + Copy(memo.Text, n+1, MaxInt);
-    memo.SelStart := m;
-
-    RealignMemoSelectionState(state);
-  end;
-
-  procedure DoDeadkey(dkCode: Integer);
-  var
-    dk: TDeadKeyInfo;
-    i: Integer;
-    state: TMemoSelectionState;
-  begin
-    dk := TDeadKeyInfo.Create;
-    dk.Memo := memo;
-    dk.Deadkey := nil;
-    for i := 0 to debugkeyboard.Deadkeys.Count - 1 do
-      if debugkeyboard.Deadkeys[i].Value = dkCode then
-      begin
-        dk.Deadkey := debugkeyboard.Deadkeys[i];
-        Break;
-      end;
-    if not Assigned(dk.Deadkey) then
-      dk.Free //silent failure
-    else
-    begin
-      state := SaveMemoSelectionState;
-
-      memo.SelText := WideChar($FFFC);
-      memo.SelStart := memo.SelStart + memo.SelLength;  // I1603
-      memo.SelLength := 0;
-      dk.Position := memo.SelStart - 1;
-
-      RealignMemoSelectionState(state);
-
-      FDeadkeys.Add(dk);
-      UpdateDeadkeyDisplay;
-
-    end;
-  end;
-
   procedure DoHandleShortcut(vk: UINT);
   begin
     // Because we disable shortcuts in the debug memo, there are a small set of
@@ -610,7 +425,13 @@ procedure TfrmLdmlKeyboardDebug.ExecuteEventAction(n: Integer);
     // apart from Ctrl+A
 
     if GetKeyState(VK_CONTROL) >= 0 then
+    begin
+      if (vk = VK_RETURN) and (GetKeyState(VK_MENU) >= 0) then
+      begin
+        memo.SelText := #13#10;
+      end;
       Exit;
+    end;
 
     case vk of
       Ord('A'): memo.SelectAll;
@@ -653,85 +474,187 @@ procedure TfrmLdmlKeyboardDebug.ExecuteEventAction(n: Integer);
     end;
   end;
 
-  procedure DoChar(const text: string);
+  function ContextToDebugString(context_items: pkm_core_context_item; offset, length: Integer): string;
   var
-    state: TMemoSelectionState;
+    outText: array of UInt32;
+    ox: Integer;
+    pc: pkm_core_context_item;
+    dk: TDeadKeyInfo;
   begin
-    state := SaveMemoSelectionState;
-    // Line breaks: replace \r (0x0D) with \r\n (0x0D 0x0A) so line breaks work
-    memo.SelText := ReplaceStr(Text, #$0D, #$0D#$0A);
-    memo.SelStart := memo.SelStart + memo.SelLength;  // I1603
-    memo.SelLength := 0;
-    RealignMemoSelectionState(state);
-  end;
+    SetLength(outText, length + 1);
 
-  procedure DoBell;
-  begin
-    MessageBeep(0);
-  end;
-
-begin
-  DisableUI;
-  with FEvents[n].Action do
-  begin
-    case ActionType of
-      KM_CORE_IT_EMIT_KEYSTROKE: DoEmitKeystroke(dwData);
-      KM_CORE_IT_CHAR:           DoChar(Text);
-      KM_CORE_IT_MARKER:         DoDeadkey(dwData);
-      KM_CORE_IT_ALERT:          DoBell;
-      KM_CORE_IT_BACK:           DoBackspace(km_core_backspace_type(dwData));
-      KM_CORE_IT_PERSIST_OPT: ; //TODO
-      KM_CORE_IT_CAPSLOCK:    ; //TODO
-      KM_CORE_IT_INVALIDATE_CONTEXT: ; // no-op
+    ox := 0;
+    pc := context_items;
+    while pc._type <> KM_CORE_CT_END do
+    begin
+      if pc._type = KM_CORE_CT_CHAR then
+        outText[ox] := pc.character
+      else
+      begin
+        dk := TDeadKeyInfo.Create;
+        dk.Deadkey := TDebugDeadkey.Create;
+        dk.Deadkey.Name := '\m{'+IntToStr(pc.marker)+'}';
+        dk.Deadkey.Value := pc.marker;
+        dk.Position := ox + offset;
+        dk.SavedPosition := ox + offset;
+        FDeadkeys.Add(dk);
+        outText[ox] := $FFFC;
+      end;
+      Inc(pc);
+      Inc(ox);
     end;
-//    AddDEBUG(Format('%d: %d [%s]', [ActionType, dwData, Text]));
-  end;
-  EnableUI;
-end;
 
-procedure TfrmLdmlKeyboardDebug.DisableUI;
+    outText[ox] := 0;
+
+    Result := USVToString(@outText[0]);
+  end;
+
+var
+  actions: pkm_core_actions;
+  context_items: pkm_core_context_item;
+  selection: TMemoSelection;
+  output: string;
+  lhs, rhs, context: string;
+  status: km_core_status;
+  dk: TDeadKeyInfo;
+  context_items_length: Integer;
+  state: TMemoSelectionState;
+  Adjustment: Integer;
 begin
   FUIDisabled := True;
-//  UpdateControlCaptions;
-end;
 
-procedure TfrmLdmlKeyboardDebug.EnableUI;
-begin
-  if not FRunning then
+  actions := km_core_state_get_actions(FDebugCore.State);
+  if actions = nil then
   begin
+    GetGlobalProjectUI.Log(plsError, FDebugFileName,
+      'Failed to get actions from Keyman Core', 0, 0);
+    Exit;
+  end;
+
+  context_items := nil;
+  status := km_core_context_get(km_core_state_context(FDebugCore.State), @context_items);
+  if status <> KM_CORE_STATUS_OK then
+  begin
+    GetGlobalProjectUI.Log(plsError, FDebugFileName,
+      'Failed to get context from Keyman Core with error '+IntToStr(Ord(Status)), 0, 0);
+    km_core_actions_dispose(actions);
+    Exit;
+  end;
+
+  selection := memo.Selection;
+
+  // TODO: #10471 deleting U+000D U+000A should delete as a unit
+
+  try
+    if (actions.emit_keystroke = 1) and (vkey <> VK_BACK) and
+      (actions.code_points_to_delete = 0) and (actions.output^ = 0) then
+    begin
+      // If the keystroke is being emitted, then it was not matched by LDML, and
+      // must be a frame key. We exclude Bksp as a special case which needs
+      // additional processing. All other frame keys should be passed to the
+      // text control for default processing.
+    end
+    else
+    begin
+      if selection.Finish > selection.Start then
+      begin
+        // We have a selection, so we should remove it first and then continue
+        // as normal. We will have given Core a zero-length context, so we
+        // need to save everything before the start of selection before 
+        // continuing, and cleanup any markers that were in the selection
+        if (actions.emit_keystroke = 0) or (vkey = VK_BACK) then
+        begin
+          state := SaveMemoSelectionState;
+          memo.SelText := '';
+          RealignMemoSelectionState(state);
+          selection := memo.Selection;
+        end;
+        lhs := Copy(memo.Text, 1, selection.Start);
+      end
+      else
+        lhs := '';
+
+      context := Copy(memo.Text, lhs.Length + 1, selection.Start - lhs.Length);
+      rhs := Copy(memo.Text, lhs.Length + context.Length + 1, MaxInt);
+
+      // Reinsert the context
+
+      context_items_length := km_core_context_length(km_core_state_context(FDebugCore.State));
+      Adjustment := context_items_length - selection.Start + lhs.Length;
+
+      // Delete all markers that are in the context, because we will reinsert
+      // them shortly, and adjust marker positions to right of insertion point
+
+      for dk in FDeadkeys do
+      begin
+        if (dk.Position > lhs.Length) and (dk.Position < selection.Start) then
+        begin
+          dk.Delete;
+        end
+        else if dk.Position >= selection.Start then
+        begin
+          dk.Position := dk.Position + Adjustment;
+        end;
+      end;
+
+      // Build the new context string and create new markers
+
+      output := ContextToDebugString(context_items, lhs.Length, context_items_length);
+
+      // Merge left of context, context, and right of context and update memo
+      // insertion point position
+
+      memo.Text := lhs + output + rhs;
+      selection.Start := lhs.Length + output.Length;
+      selection.Finish := selection.Start;
+      selection.Anchor := selection.Start;
+      memo.Selection := selection;
+    end;
+
+    // actions.persist_options are not currently supported by LDML
+
+    if actions.do_alert <> 0 then
+    begin
+      DoAlert;
+    end;
+
+    if actions.emit_keystroke <> 0 then
+    begin
+      DoEmitKeystroke(vkey);
+    end;
+
+  finally
+    km_core_actions_dispose(actions);
+    km_core_context_items_dispose(context_items);
+
     FUIDisabled := False;
+    UpdateCharacterGrid;
+
+    // We want to refresh the memo and character grid for rapid typing
+    memo.Update;
+    sgChars.Update;
   end;
 end;
+
+{ Stores }
 
 procedure TfrmLdmlKeyboardDebug.CleanupCoreState;
 begin
   FreeAndNil(FDebugCore);
 end;
 
-procedure TfrmLdmlKeyboardDebug.ResetEvents;
-begin
-  if _FCurrentEvent > 0 then
-  begin
-    FEvents.Clear;
-    SetCurrentEvent(0);
-  end;
-end;
-
 procedure TfrmLdmlKeyboardDebug.HideDebugForm;
 begin
   frmKeymanDeveloper.ShowDebug(False);   // I4796
-  FDebugVisible := False;
   ResetDebug;
-  UIStatus := duiReadyForInput;
 end;
 
 procedure TfrmLdmlKeyboardDebug.ShowDebugForm;
 begin
+  UIStatus := duiTest;
+
   frmKeymanDeveloper.ShowDebug(True);   // I4796
 
-  FDebugVisible := True;
-
-  //UpdateFont(nil);
   if not SetupDebug then
     Exit;
 
@@ -741,8 +664,6 @@ end;
 procedure TfrmLdmlKeyboardDebug.ResetDebug;
 begin
   FreeAndNil(debugkeyboard);
-  SetCurrentEvent(1);
-  ResetEvents;
   ClearDeadkeys;  // I1699
   CleanupCoreState;
   memo.Text := '';
@@ -781,67 +702,6 @@ begin
   else
     FDefaultFont := False;
   memo.Font := FFont;
-end;
-
-procedure TfrmLdmlKeyboardDebug.SetUIStatus(const Value: TDebugUIStatus);
-var
-  FOldUIStatus: TDebugUIStatus;
-begin
-  if FUIStatus <> Value then
-  begin
-    FOldUIStatus := FUIStatus;
-    FUIStatus := Value;
-
-    case Value of
-      duiTest:
-        begin
-          StatusText := 'Simple Test';
-          memo.ReadOnly := False;
-          memo.IsDebugging := True;
-        end;
-      duiFocusedForInput:
-        begin
-          DisableUI;
-          StatusText := 'Focused for input';
-          memo.ReadOnly := False;
-          memo.IsDebugging := True;
-        end;
-      duiReadyForInput:
-        begin
-          if memo.Focused then UIStatus := duiFocusedForInput
-          else
-          begin
-            EnableUI;
-            StatusText := 'Ready for input';
-            memo.ReadOnly := True;
-            memo.IsDebugging := False;
-          end;
-        end;
-      duiPaused:
-        begin
-          EnableUI;
-          FUIDisabled := False;   // I4033
-          StatusText := 'Paused';
-          memo.ReadOnly := True;
-          memo.IsDebugging := False;
-        end;
-    end;
-    if FOldUIStatus = duiTest then
-    begin
-      if memo.Focused then
-      begin
-        GetParentForm(memo).ActiveControl := nil;
-        memo.SetFocus;
-      end;
-    end
-  end;
-end;
-
-function TfrmLdmlKeyboardDebug.GetCurrentEvent: TDebugEvent;
-begin
-  if (_FCurrentEvent >= 0) and (_FCurrentEvent < FEvents.Count)
-    then Result := FEvents[_FCurrentEvent]
-    else Result := nil;
 end;
 
 function TfrmLdmlKeyboardDebug.GetDebugKeyboard: TDebugKeyboard;
@@ -971,7 +831,6 @@ begin
 
   if not memo.ReadOnly then
   begin
-    FSavedSelection := memo.Selection;
     UpdateCharacterGrid;   // I4808
   end;
 end;
@@ -981,7 +840,8 @@ begin
   if csDestroying in ComponentState then
     Exit;
 
-  TCharacterGridRenderer.Fill(sgChars, memo.Text, FDeadkeys, memo.SelStart, memo.SelLength, memo.Selection.Anchor);
+  TCharacterGridRenderer.Fill(sgChars, memo.Text, FDeadkeys, memo.SelStart,
+    memo.SelLength, memo.Selection.Anchor, True);
   TCharacterGridRenderer.Size(sgChars, memo.Font);
 end;
 

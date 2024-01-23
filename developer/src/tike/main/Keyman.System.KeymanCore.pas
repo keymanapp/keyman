@@ -71,6 +71,7 @@ type
   end;
 
   pkm_core_context_item = ^km_core_context_item;
+  ppkm_core_context_item = ^pkm_core_context_item;
 
 const
   KM_CORE_CONTEXT_ITEM_END: km_core_context_item = (
@@ -105,7 +106,7 @@ function km_core_context_items_to_utf8(
 ): km_core_status; cdecl; external keymancore delayed;
 
 procedure km_core_context_items_dispose(
-  const context_items: km_core_context_item
+  context_items: pkm_core_context_item
 ); cdecl; external keymancore delayed;
 
 function km_core_context_set(
@@ -115,7 +116,7 @@ function km_core_context_set(
 
 function km_core_context_get(
   context: pkm_core_context;
-  var context_items: pkm_core_context_item
+  context_items: ppkm_core_context_item
 ): km_core_status; cdecl; external keymancore delayed;
 
 procedure km_core_context_clear(
@@ -133,7 +134,9 @@ function km_core_context_shrink(
   prefix: pkm_core_context_item
 ): km_core_status; cdecl; external keymancore delayed;
 
-
+function km_core_context_length(
+  context: pkm_core_context
+): uint32; cdecl; external keymancore delayed;
 
 type
   km_core_option_scope = (
@@ -313,6 +316,10 @@ function km_core_state_action_items(
 function km_core_state_get_actions(
   state: pkm_core_state
 ): pkm_core_actions; cdecl; external keymancore delayed;
+
+function km_core_actions_dispose(
+  actions: pkm_core_actions
+): km_core_status; cdecl; external keymancore delayed;
 
 function km_core_state_to_json(
   state: pkm_core_state;

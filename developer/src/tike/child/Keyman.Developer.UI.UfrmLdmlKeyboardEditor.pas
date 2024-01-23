@@ -83,8 +83,6 @@ procedure TfrmLdmlKeyboardEditor.StartDebugging;
 begin
   if not IsDebugVisible then
   begin
-    FDebugForm.UIStatus := duiReadyForInput;
-
     (ProjectFileUI as TxmlLdmlProjectFileUI).Debug := True;   // I4687
 
     frmMessages.Clear;   // I4686
