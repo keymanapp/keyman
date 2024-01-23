@@ -288,7 +288,7 @@ class LexicalModelPickerViewController: UITableViewController, UIAlertViewDelega
     Queries.LexicalModel.fetch(forLanguageCode: language.id) { result, error in
       if let error = error {
         let errorMessage = "Failed to fetch lexical model list for \(self.language.id). Error: \(error.localizedDescription)"
-        os_log("%{public}s", log:KeymanEngineLogger.resources, type: .error, errorMessage)
+        os_log("%{public}s", log:KeymanEngineLogger.resources, type: .info, errorMessage)
         DispatchQueue.main.async {
           self.lexicalModelDownloadFailed(PackageDownloadFailedNotification(packageKey: nil, error: error))
         }

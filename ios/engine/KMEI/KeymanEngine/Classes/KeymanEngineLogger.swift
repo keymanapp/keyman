@@ -22,7 +22,9 @@
 import Foundation
 import os.log
 
-private let subsystem = "org.sil.Keyman.ios.Engine"
+// bundle for engine is "org.sil.Keyman.ios.Engine"
+// but selecting this subsystem name for consistency across apps
+private let subsystem = "com.keyman.ios.engine"
 
 public struct KeymanEngineLogger {
   static let engine = OSLog(subsystem: subsystem, category: "Engine")

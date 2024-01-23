@@ -101,8 +101,7 @@ public enum Migrations {
           let message = "Could not migrate pre-existing resources to KMP-style file organization"
           event.message = SentryMessage(formatted: message)
           event.extra = [ "priorVersion": version ]
-          os_log("%{public}s", log:KeymanEngineLogger.migration, type: .info, message)
-          SentryManager.breadcrumb(message)
+          os_log("%{public}s", log:KeymanEngineLogger.migration, type: .error, message)
           SentryManager.capture(event)
         }
       } else {
@@ -373,7 +372,7 @@ public enum Migrations {
       let message = "Missing required fields in keyboard dictionary for FullKeyboardID"
       event.message = SentryMessage(formatted: message)
       event.extra = ["kbId": kbDict["kbId"] ?? "nil", "langId": kbDict["langId"] ?? "nil"]
-      os_log("%{public}s", log:KeymanEngineLogger.migration, type: .info, message)
+      os_log("%{public}s", log:KeymanEngineLogger.migration, type: .error, message)
       SentryManager.capture(event)
       return nil
     }

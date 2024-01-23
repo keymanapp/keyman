@@ -91,11 +91,7 @@ public class SentryManager {
   }
 
   /**
-   * Captures a Sentry event and copies its message to the engine's logging mechanism.
-   * If the logging level is not specified, the Sentry event's log-level will be used as a default.
-   *
-   * Will safely bypass the Sentry component if not activated by the app, only logging the
-   * message in such scenarios.
+   * Captures a Sentry event  and safely bypass the Sentry component if not activated by the app.
    */
   public static func capture(_ event: Sentry.Event) {
     // Guarded in case a library consumer decides against initializing Sentry.
@@ -105,11 +101,8 @@ public class SentryManager {
   }
 
   /**
-   * Captures a Sentry event and copies its message to the engine's logging mechanism.
-   * If the logging level is not specified, the Sentry event's log-level will be used as a default.
-   *
-   * Will safely bypass the Sentry component if not activated by the app, only logging the
-   * message in such scenarios.
+   * Captures a Sentry event for the specified error. If the logging level is not specified, it will default to .error.
+   * Will safely bypass the Sentry component if not activated by the app.
    */
   public static func capture(_ error: Error, message: String? = nil, sentryLevel: Sentry.SentryLevel = .error) {
     let event = Sentry.Event(error: error)
@@ -122,11 +115,8 @@ public class SentryManager {
   }
 
   /**
-   * Constructs a SentryEvent around a message and also passes it to the engine's logging mechanism.
-   * If the logging level is not specified, it will default to .error.
-   *
-   * Will safely bypass the Sentry component if not activated by the app, only logging the
-   * message in such scenarios.
+   * Constructs a SentryEvent around a message. If the logging level is not specified, it will default to .error.
+   * Will safely bypass the Sentry component if not activated by the app.
    */
   public static func capture(_ message: String, sentryLevel: Sentry.SentryLevel = .error) {
     let event = Sentry.Event(level: sentryLevel)
@@ -136,11 +126,7 @@ public class SentryManager {
   }
 
   /**
-   * Adds a Sentry breadcrumb and copies its message to the engine's logging mechanism.
-   * If the logging level is not specified, the Sentry event's log-level will be used as a default.
-   *
-   * Will safely bypass the Sentry component if not activated by the app, only logging the
-   * message in such scenarios.
+   * Adds a Sentry breadcrumb. Will safely bypass the Sentry component if not activated by the app.
    */
   public static func breadcrumb(crumb: Sentry.Breadcrumb) {
     // Guarded in case a library consumer decides against initializing Sentry.
@@ -150,11 +136,7 @@ public class SentryManager {
   }
 
   /**
-   * Adds a Sentry breadcrumb and copies its message to the engine's logging mechanism.
-   * If the logging level is not specified, the Sentry event's log-level will be used as a default.
-   *
-   * Will safely bypass the Sentry component if not activated by the app, only logging the
-   * message in such scenarios.
+   * Adds a Sentry breadcrumb. Will safely bypass the Sentry component if not activated by the app.
    */
   public static func breadcrumb(_ message: String, category: String? = nil, sentryLevel: Sentry.SentryLevel = .info) {
     let crumb = Sentry.Breadcrumb()

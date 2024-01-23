@@ -172,10 +172,9 @@ class KeyboardScaleMap {
       // Shouldn't happen, but just in case.
       if _screenSize == CGSize.zero {
       // This would notify us whenever new devices are out that we haven't build a mapping for.
-      // We haven't actually updated things here in a while, so we'll just breadcrumb for now.
       let message = "Cannot detect device dimensions; defaulting to smallest device for form factor."
       os_log("%{public}s", log: KeymanEngineLogger.ui, type: .error, message)
-      SentryManager.breadcrumb(message, sentryLevel: .error)
+      SentryManager.capture(message, sentryLevel: .error)
     }
 
     // Convert to CGSize in portrait orientation.

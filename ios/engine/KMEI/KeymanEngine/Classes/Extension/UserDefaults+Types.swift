@@ -19,7 +19,7 @@ public extension UserDefaults {
     do {
       return try array.map { try decoder.decode(InstallableKeyboard.self, from: $0) }
     } catch {
-      let message = "\(String(describing: error))"
+      let message = "Error decoding keyboards: \(error))"
       os_log("%{public}s", log:KeymanEngineLogger.settings, type: .error, message)
       SentryManager.capture(error, message: message)
       return nil

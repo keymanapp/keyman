@@ -22,7 +22,9 @@
 import Foundation
 import os.log
 
-private let subsystem = "Tavultesoft.Keyman"
+// bundle for engine is "Tavultesoft.Keyman"
+// but selecting this subsystem name for consistency across apps
+private let subsystem = "com.keyman.ios.app"
 
 public struct KeymanLogger {
   static let ui = OSLog(subsystem: subsystem, category: "UI")

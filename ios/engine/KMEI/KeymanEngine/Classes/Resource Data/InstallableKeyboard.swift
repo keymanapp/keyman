@@ -109,8 +109,8 @@ public struct InstallableKeyboard: Codable, KMPInitializableLanguageResource {
     let languageMatches = metadata.languages.compactMap { return $0.languageId == lgCode ? $0.name : nil }
     if (languageMatches.isEmpty) {
       let message = "Could not find languageId '\(lgCode)' for package '\(packageID)'"
-      os_log("%{public}s", log:KeymanEngineLogger.resources, type: .error, message)
-      SentryManager.capture(message)
+      os_log("%{public}s", log:KeymanEngineLogger.resources, type: .default, message)
+      SentryManager.capture(message, sentryLevel: .warning)
     }
     guard languageMatches.count >= 1 else {
       return nil

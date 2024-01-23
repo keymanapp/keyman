@@ -372,7 +372,7 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
       let wrappedKbds = Migrations.migrateToKMPFormat([keyboard])
       guard wrappedKbds.count == 1 else {
         let message = "Could not properly import keyboard"
-        os_log("%{public}s", log:KeymanEngineLogger.settings, type: .info, message)
+        os_log("%{public}s", log:KeymanEngineLogger.settings, type: .error, message)
        SentryManager.capture(message)
         return
       }

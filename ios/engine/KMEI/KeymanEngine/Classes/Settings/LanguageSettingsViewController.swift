@@ -350,7 +350,7 @@ class LanguageSettingsViewController: UITableViewController {
     // If user defaults for keyboards list does not exist, do nothing.
     guard let globalUserKeyboards = userData.userKeyboards else {
       let message = "no keyboards in the global keyboards list!"
-      os_log("%{public}s", log:KeymanEngineLogger.resources, type: .info, message)
+      os_log("%{public}s", log:KeymanEngineLogger.resources, type: .error, message)
       SentryManager.capture(message)
     return nil
     }

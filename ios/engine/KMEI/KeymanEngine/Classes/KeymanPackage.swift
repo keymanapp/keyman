@@ -453,7 +453,7 @@ public class KeymanPackage {
     } catch {
       let message = "Keyboard installation error: \(String(describing: error))"
       os_log("%{public}s", log:KeymanEngineLogger.migration, type: .error, message)
-      SentryManager.capture(error, message: message)
+      SentryManager.capture(error, message: message, sentryLevel: .info)
       complete(nil)
     }
   }

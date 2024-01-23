@@ -70,7 +70,7 @@ class KeyboardViewController: InputViewController {
     let imgPath = getTopBarImage(size: size)
     guard let path = imgPath else {
       let message = "No image specified for the image banner!"
-      os_log("%{public}s", log: KeymanLogger.ui, type: .info, message)
+      os_log("%{public}s", log: KeymanLogger.ui, type: .error, message)
       SentryManager.capture(message)
       return
     }
