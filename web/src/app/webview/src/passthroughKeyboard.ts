@@ -1,9 +1,10 @@
-import { DeviceSpec, KeyEvent, ManagedPromise } from '@keymanapp/keyboard-processor';
+import { DeviceSpec, Keyboard, KeyEvent, ManagedPromise } from '@keymanapp/keyboard-processor';
 
-import { HardKeyboard } from 'keyman/engine/main';
+import { HardKeyboard, processForMnemonicsAndLegacy } from 'keyman/engine/main';
 
 export default class PassthroughKeyboard extends HardKeyboard {
   readonly baseDevice: DeviceSpec;
+  public activeKeyboard: Keyboard;
 
   constructor(baseDevice: DeviceSpec) {
     super();
@@ -36,6 +37,10 @@ export default class PassthroughKeyboard extends HardKeyboard {
       device: this.baseDevice,
       isSynthetic: false       // is not an OSK keystroke.
     });
+
+    // 'us' is our default base layout; our distributed engine doesn't support
+    // changing the assumed base keyboard for mnemonics.
+    Lkc = processForMnemonicsAndLegacy(Lkc, this.activeKeyboard, 'us');
 
     const promise = new ManagedPromise<Boolean>();
 
