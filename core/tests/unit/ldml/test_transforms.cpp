@@ -977,6 +977,7 @@ main(int argc, const char *argv[]) {
 
   console_color::enabled = console_color::isaterminal() || arg_color;
 
+
   if (test_transforms() != EXIT_SUCCESS) {
     rc = EXIT_FAILURE;
   }
