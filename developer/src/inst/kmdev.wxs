@@ -201,10 +201,18 @@
     <ComponentGroup Id="LdmlImports" Directory="dir_import_techpreview" Source="..\..\..\resources\standards-data\ldml-keyboards\techpreview\import">
       <Component>
         <File Id="LdmlImportReadme" Name="README.md" KeyPath="yes" />
-        <File Name="keys-Latn-implied.xml" />
-        <File Name="keys-Zyyy-currency.xml" />
-        <File Name="keys-Zyyy-punctuation.xml" />
-        <File Name="scanCodes-implied.xml" />
+      </Component>
+      <Component>
+        <File Name="keys-Latn-implied.xml" KeyPath="yes" />
+      </Component>
+      <Component>
+        <File Name="keys-Zyyy-currency.xml" KeyPath="yes" />
+      </Component>
+      <Component>
+        <File Name="keys-Zyyy-punctuation.xml" KeyPath="yes" />
+      </Component>
+      <Component>
+        <File Name="scanCodes-implied.xml" KeyPath="yes" />
       </Component>
     </ComponentGroup>
 
