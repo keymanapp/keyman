@@ -16,6 +16,7 @@ bool find_dk_combinations_for_single_dk(v_dw_2D * p_dk_ComposeTable, v_dw_2D  &d
 	v_dw_1D line;
 	for ( int i =0; i< (int) (*p_dk_ComposeTable).size()-1; i++) {
 		// _S2 is there a better way to find a-z,A-Z?
+		//if (((*p_dk_ComposeTable)[i][0] == dk) ) {
 		if (((*p_dk_ComposeTable)[i][0] == dk) && (IsKeymanUsedChar((*p_dk_ComposeTable)[i][1]))) {
 			line.push_back((*p_dk_ComposeTable)[i][0]);
 			line.push_back((*p_dk_ComposeTable)[i][1]);
@@ -42,7 +43,8 @@ std::vector<DeadKey*> create_alDead() {
 		DeadKey *dk2= new DeadKey(dk_ComposeTable[i][0]);
 		for ( int j=0; j< dk_ComposeTable.size();j++) {
 			// check for right dk
-			if( dk_ComposeTable[i][0]==dk_ComposeTable[j][0])
+			// _S2 do I need to trim here??
+			if(( dk_ComposeTable[i][0]==dk_ComposeTable[j][0]) && (IsKeymanUsedChar(dk_ComposeTable[j][1])))
 				dk2->KMX_AddDeadKeyRow(dk_ComposeTable[j][1],dk_ComposeTable[j][2]);
 		}
 		alDead.push_back(dk2);
@@ -57,6 +59,7 @@ std::vector<DeadKey*> reduce_alDead(std::vector<DeadKey*> dk_big) {
 	bool foundInSmall=false;
 
 	for ( int i=1; i<dk_big.size()-1;i++) {
+		// _S2 this needs to be good for all kbds
 		if( (dk_big[i]->KMX_DeadCharacter()==94 || dk_big[i]->KMX_DeadCharacter()==96 || dk_big[i]->KMX_DeadCharacter()==180)) {
 			for( int k=0; k< dk_small.size();k++) {
 				if(dk_big[i]->KMX_DeadCharacter()   == dk_small[k]->KMX_DeadCharacter())

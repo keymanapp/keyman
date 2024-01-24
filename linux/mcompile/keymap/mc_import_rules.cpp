@@ -976,6 +976,8 @@ bool KMX_ImportRules(LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, GdkKeymap **keymap,
       *p++ = CODE_ANY;
       *p++ = nStoreBase + i*2 + 1;
       *p = 0;
+      wprintf(L" contents of kkp->dpContext: %i \\ %i \\ %i \\ %i \\ %i \\ %i \\ %i \\ %i ----",
+          *qQQ_S2,*(qQQ_S2+1),*(qQQ_S2+2),*(qQQ_S2+3),*(qQQ_S2+4),*(qQQ_S2+5),*(qQQ_S2+6),*(qQQ_S2+7),*(qQQ_S2+8));
 
       p = kkp->dpOutput = new KMX_WCHAR[5];
       KMX_WCHAR* QT_S2= p;
@@ -985,6 +987,8 @@ bool KMX_ImportRules(LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, GdkKeymap **keymap,
       *p++ = 2;
       *p = 0;
 
+      wprintf(L" contents of kkp->dpOutput:  %i \\ %i \\ %i \\ %i \\ %i \\ %i \\ %i \\ %i\n",
+          *QT_S2,*(QT_S2+1),*(QT_S2+2),*(QT_S2+3),*(QT_S2+4),*(QT_S2+5),*(QT_S2+6),*(QT_S2+7),*(QT_S2+8));
       kkp++;
     }
   }

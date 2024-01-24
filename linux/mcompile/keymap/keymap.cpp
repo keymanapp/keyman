@@ -2,13 +2,13 @@
 
 #include <xkbcommon/xkbcommon.h>
 
-// _S2 is return 2 + 3 correct??? prob not
+// _S2 is return 2 + 3 correct??? YES, it talking about the column-nr in symbols-file
 int map_VKShiftState_to_Lin(int VKShiftState) {
   if      (VKShiftState == 0 )      return 0;		/* 0000 0000 */
   else if (VKShiftState == 16)      return 1;		/* 0001 0000 */
   // _S2 if commented out only 3 DK will be processed ^ ' `
-  //else if (VKShiftState == 9 )      return 2;		/* 0000 1001 */
-  //else if (VKShiftState == 25)      return 3; 	/* 0001 1001 */
+  else if (VKShiftState == 9 )      return 2;		/* 0000 1001 */
+  else if (VKShiftState == 25)      return 3; 	/* 0001 1001 */
   else return VKShiftState;
 }
 
