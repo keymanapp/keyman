@@ -154,7 +154,7 @@ block(bksp)
   00 00 00 00                       #   KMX_DWORD index = 0
 
   # transforms 0
-  index(strNull,strElemTranFrom1b,2) #   KMX_DWORD str from  ^e
+  index(strNull,strElemTranFrom1b,2) #   KMX_DWORD str from  ^e ## << ??
   index(strNull,strNull,2)          #   KMX_DWORD str to 0
   index(strNull,strNull,2)          #   KMX_DWORD str mapFrom 0
   index(strNull,strNull,2)          #   KMX_DWORD str mapTo 0
@@ -493,6 +493,7 @@ block(strs)                         #  struct COMP_KMXPLUS_STRS {
   diff(strs,strFromSet)     sizeof(strFromSet,2)
   diff(strs,strUSet)       sizeof(strUSet,2)
   diff(strs,strAmarker)     sizeof(strAmarker,2)
+  diff(strs,strSentinel0001r)  sizeof(strSentinel0001r,2)
   diff(strs,strElemTranFrom1) sizeof(strElemTranFrom1,2)
   diff(strs,strElemTranFrom1a) sizeof(strElemTranFrom1a,2)
   diff(strs,strElemTranFrom1b) sizeof(strElemTranFrom1b,2)
@@ -516,7 +517,6 @@ block(strs)                         #  struct COMP_KMXPLUS_STRS {
   diff(strs,strKeys)       sizeof(strKeys,2)
   diff(strs,strIndicator)  sizeof(strIndicator,2)
   diff(strs,strSentinel0001)  sizeof(strSentinel0001,2)
-  diff(strs,strSentinel0001r)  sizeof(strSentinel0001r,2)
 
   # String table -- block(x) is used to store the null u16char at end of each string
   #                 without interfering with sizeof() calculation above
@@ -528,6 +528,7 @@ block(strs)                         #  struct COMP_KMXPLUS_STRS {
   block(strFromSet)          5B 00 5C 00 75 00 31 00 41 00 37 00 35 00 2D 00 5C 00 75 00 31 00 41 00 37 00 39 00 5D 00 block(x) 00 00 # [\u1a75-\u1a79]
   block(strUSet)             5b 00 61 00 62 00 63 00 5d 00 block(x) 00 00               # '[abc]'
   block(strAmarker)          5C 00 6D 00 7B 00 61 00 7D 00 block(x) 00 00               # '\m{a}'
+  block(strSentinel0001r)    5c 00 75 00 66 00 66 00 66 00 66 00 5c 00 75 00 30 00 30 00 30 00 38 00 5C 00 75 00 30 00 30 00 30 00 31 00 block(x) 00 00     # UC_SENTINEL CODE_DEADKEY \u0001 (regex form)
   block(strElemTranFrom1)    5E 00 block(x) 00 00                                       # '^'
   block(strElemTranFrom1a)   5E 00 61 00 block(x) 00 00                                       # '^a'
   block(strElemTranFrom1b)   5E 00 65 00 block(x) 00 00                                       # '^e'
@@ -556,7 +557,6 @@ block(strs)                         #  struct COMP_KMXPLUS_STRS {
   # <reorder before="ᩫ" from="᩠᩵ᩅ" order="10 55 10" />
   block(strIndicator)        3d d8 40 de block(x) 00 00                               # '🙀'
   block(strSentinel0001)    FF FF 08 00 01 00 block(x) 00 00                         # UC_SENTINEL CODE_DEADKEY U+0001
-  block(strSentinel0001r)   FF FF 08 00 5C 00 75 00 30 00 30 00 30 00 31 00 block(x) 00 00     # UC_SENTINEL CODE_DEADKEY \u0001 (regex form)
 
 
 block(endstrs)                      # end of strs block
