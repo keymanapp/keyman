@@ -93,7 +93,6 @@ if(configuration.useNgrok && os.platform() == 'win32' && fs.existsSync(configura
       proto: 'http',
       addr: configuration.port,
       authtoken: configuration.ngrokToken,
-      region: configuration.ngrokRegion,
       binPath: () => configuration.ngrokBinPath,
       onLogEvent: (msg: string) => {
         if(options.ngrokLog) {
