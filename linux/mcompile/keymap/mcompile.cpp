@@ -239,13 +239,7 @@ void KMX_ReportUnconvertedKeyboardRules(LPKMX_KEYBOARD kbd) {
 }
 
 void KMX_TranslateDeadkeyKey(LPKMX_KEY key, KMX_WCHAR deadkey, KMX_WORD vk, UINT shift, KMX_WORD ch) {
-  //if(ch==94)
-  //wprintf(L" input with: key->Key: %i (%c) -- key->ShiftFlags %i -- key->Line %i -- shift %i  --ch %i(%c) \n", key->Key,key->Key, key->ShiftFlags,key->Line, shift,ch,ch );
-  if((key->ShiftFlags == 0 || key->ShiftFlags & VIRTUALCHARKEY) && key->Key == ch) {
-//vk==192 && ch==94  && key->Key==94 && Line == 1572
-//vk==192 && ch==94  && key->Key==94 && Line == 1567
-//vk==192 && ch==94  && key->Key==94 && Line == 1568
-
+   if((key->ShiftFlags == 0 || key->ShiftFlags & VIRTUALCHARKEY) && key->Key == ch) {
     // The weird LCTRL+RALT is Windows' way of mapping the AltGr key.
     // We store that as just RALT, and use the option "Simulate RAlt with Ctrl+Alt"
     // to provide an alternate..
@@ -262,10 +256,8 @@ void KMX_TranslateDeadkeyKey(LPKMX_KEY key, KMX_WCHAR deadkey, KMX_WORD vk, UINT
       key->ShiftFlags &= ~VIRTUALCHARKEY;
     }
 
-  int len = u16len(key->dpContext);
+    int len = u16len(key->dpContext);
 
-    //PWSTR
-    // _S2 breakpoint key->Key==94
     PKMX_WCHAR context = new KMX_WCHAR[len + 4];
     memcpy(context, key->dpContext, len * sizeof(KMX_WCHAR));
     context[len] = UC_SENTINEL;
@@ -273,18 +265,16 @@ void KMX_TranslateDeadkeyKey(LPKMX_KEY key, KMX_WCHAR deadkey, KMX_WORD vk, UINT
     context[len+2] = deadkey;
     context[len+3] = 0;
     key->dpContext = context;
-    key->Key = vk;          // _S2 fill with vk_US?
+    key->Key = vk;
   }
 }
 
 void KMX_TranslateDeadkeyGroup(LPKMX_GROUP group,KMX_WCHAR deadkey, KMX_WORD vk, UINT shift, KMX_WORD ch) {
   for(unsigned int i = 0; i < group->cxKeyArray; i++) {
-    //wprintf(L" i= %i \n",i);
     KMX_TranslateDeadkeyKey(&group->dpKeyArray[i], deadkey, vk, shift, ch);
   }
 }
-// is     223 0  175
-// should 45  0  175      --> need other VK !!
+
 void KMX_TranslateDeadkeyKeyboard(LPKMX_KEYBOARD kbd, KMX_WCHAR deadkey, KMX_WORD vk, UINT shift, KMX_WORD ch) {
   for(unsigned int i = 0; i < kbd->cxGroupArray; i++) {
     if(kbd->dpGroupArray[i].fUsingKeys) {
@@ -618,7 +608,7 @@ int KMX_GetDeadkeys(v_dw_2D & dk_Table, KMX_WORD DeadKey, KMX_WORD *OutputPairs,
 
   v_dw_2D  dk_SingleTable;
   find_dk_combinations_for_single_dk(&dk_Table, dk_SingleTable, DeadKey);
-  for ( int i=0; i< (int) dk_SingleTable.size()-1;i++) {
+  for ( int i=0; i< (int) dk_SingleTable.size();i++) {
     KMX_WORD vk = KMX_changeKeynameToCapital(dk_SingleTable[i][1], shift, keymap);
     if(vk != 0) {
           *p++ = vk;
