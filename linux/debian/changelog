@@ -1,5 +1,8 @@
 keyman (16.0.144-1) unstable; urgency=medium
 
+  [Jeremy Bicha]
+  * Build with webkitgtk 4.1 instead of 4.0  (closes: #1061396)
+
   [Dandan Zhang]
   * Add support for loong64 (closes: #1057134)
 
