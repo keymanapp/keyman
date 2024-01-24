@@ -619,18 +619,15 @@ process_backspace_action(IBusEngine *engine, unsigned int code_points_to_delete)
 
 static void
 process_persist_action(IBusEngine *engine, km_core_option_item *persist_options) {
-  if (persist_options == NULL) {
-    return;
-  }
+  g_assert(persist_options != NULL);
 
   IBusKeymanEngine *keyman = (IBusKeymanEngine *)engine;
   for (km_core_option_item *option = persist_options; !is_core_options_end(option); option++) {
     // Put the keyboard option into DConf
-    if (option->key != NULL && option->value != NULL) {
-      g_message("%s: Saving keyboard option to DConf", __FUNCTION__);
-      // Load the current keyboard options from DConf
-      keyman_put_options_todconf(keyman->kb_name, keyman->kb_name, (gchar *)option->key, (gchar *)option->value);
-    }
+    g_assert(option->key != NULL && option->value != NULL);
+    g_message("%s: Saving keyboard option to DConf", __FUNCTION__);
+    // Load the current keyboard options from DConf
+    keyman_put_options_todconf(keyman->kb_name, keyman->kb_name, (gchar *)option->key, (gchar *)option->value);
   }
 }
 
@@ -683,48 +680,37 @@ commit_current_queue_item(IBusKeymanEngine *keyman) {
   initialize_queue(keyman, MAX_QUEUE_SIZE - 1, 1);
 }
 
-static gboolean
+static void
 finish_process_actions(IBusEngine *engine) {
   g_assert(engine != NULL);
   IBusKeymanEngine *keyman = (IBusKeymanEngine *)engine;
-  if (client_supports_prefilter(engine) && !client_supports_surrounding_text(engine)) {
-    // non-compliant app with patched ibus
-    guint state = keyman->commit_item->state;
-    keyman->commit_item++;
-    if (keyman->commit_item > &keyman->commit_queue[MAX_QUEUE_SIZE-1]) {
-      g_error("Overflow of keyman commit_queue!");
-      // TODO: log to Sentry
-      keyman->commit_item--;
-    }
-
-    // Forward a fake key event to get the correct order of events so that any backspace key we
-    // generated will be processed before the character we're adding. We need to send a
-    // valid keyval/keycode combination so that it doesn't get swallowed by GTK but which
-    // isn't very likely used in real keyboards. F24 seems to work for that.
-    ibus_engine_forward_key_event(engine,
-      KEYMAN_NOCHAR_KEYSYM,
-      KEYMAN_F24_KEYCODE_OUTPUT_SENTINEL,
-      (state & IBUS_RELEASE_MASK)
-        ? IBUS_PREFILTER_MASK | IBUS_RELEASE_MASK
-        : IBUS_PREFILTER_MASK);
-  } else {
-    // compliant app, or unpatched ibus
-    // If we have an old ibus version without prefilter support, or a client that does support
-    // surrounding text we already did everything that needs to be done including forwarding
-    // a keystroke. So we can return TRUE to stop processing of this event.
-      return TRUE;
+  if (!client_supports_prefilter(engine) || client_supports_surrounding_text(engine)) {
+    // compliant app or unpatched ibus
+    return;
   }
 
-  // If we have a new ibus version that supports prefilter and a client that doesn't support
-  // surrounding text (e.g. Chromium as of v104) we forwarded the key event with
-  // IBUS_PREFILTER_MASK set and now return TRUE here to stop further processing.
-  // With an old ibus version without prefilter support, or with a client that does support
-  // surrounding text, we return TRUE if we completely processed the event and no further
-  // processing should happen.
-  return TRUE;
+  // non-compliant app with patched ibus
+  guint state = keyman->commit_item->state;
+  keyman->commit_item++;
+  if (keyman->commit_item > &keyman->commit_queue[MAX_QUEUE_SIZE-1]) {
+    g_error("Overflow of keyman commit_queue!");
+    // TODO: log to Sentry
+    keyman->commit_item--;
+  }
+
+  // Forward a fake key event to get the correct order of events so that any backspace key we
+  // generated will be processed before the character we're adding. We need to send a
+  // valid keyval/keycode combination so that it doesn't get swallowed by GTK but which
+  // isn't very likely used in real keyboards. F24 seems to work for that.
+  ibus_engine_forward_key_event(engine,
+    KEYMAN_NOCHAR_KEYSYM,
+    KEYMAN_F24_KEYCODE_OUTPUT_SENTINEL,
+    (state & IBUS_RELEASE_MASK)
+      ? IBUS_PREFILTER_MASK | IBUS_RELEASE_MASK
+      : IBUS_PREFILTER_MASK);
 }
 
-static gboolean
+static void
 process_actions(
   IBusEngine *engine,
   km_core_actions const *actions
@@ -735,8 +721,7 @@ process_actions(
   process_alert_action(actions->do_alert);
   process_emit_keystroke_action(engine, actions->emit_keystroke);
   process_capslock_action(actions->new_caps_lock_state);
-
-  return finish_process_actions(engine);
+  finish_process_actions(engine);
 }
 
 static gboolean
@@ -833,15 +818,18 @@ ibus_keyman_engine_process_key_event(
   keyman->commit_item->char_buffer = NULL;
   const km_core_actions *core_actions = km_core_state_get_actions(keyman->state);
 
-  if (!process_actions(engine, core_actions) &&
-      (!client_supports_prefilter(engine) || client_supports_surrounding_text(engine))) {
-    // If we have an old ibus version without prefilter support, or a client that supports
-    // surrounding text, and we forwarded a key event we want to return FALSE so that the
-    // processing of the event continues.
-    km_core_actions_dispose(core_actions);
-    return FALSE;
-  }
+  process_actions(engine, core_actions);
 
+  km_core_actions_dispose(core_actions);
+
+  // If we have a new ibus version that supports prefilter and a non-compliant
+  // client, i.e. a client that doesn't support surrounding text (e.g.
+  // Chromium as of v104) we forwarded the key event with IBUS_PREFILTER_MASK
+  // set and now stop further processing by returning TRUE.
+  // With an old ibus version without prefilter support as well as with
+  // a compliant client (i.e. it does support surrounding text), we return
+  // TRUE because we completely processed the event and no further
+  // processing should happen.
   g_message("%s: after processing all actions: %s", __FUNCTION__, debug_context2 = get_context_debug(engine));
   return TRUE;
 }
