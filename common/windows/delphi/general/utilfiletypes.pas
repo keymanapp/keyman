@@ -55,6 +55,7 @@ const
   Ext_Javascript = '.js';
   Ext_LexicalModelSource = '.ts'; // can't use .model.ts unless we change all extension comparisons to support multiple dots...
   Ext_LexicalModelWordlist = '.tsv';
+  Ext_LdmlKeyboardSource = '.xml'; // note generic XML extension
 
   Ext_Model_Component = '.model';
 
@@ -62,7 +63,7 @@ const
   Ext_LexicalModelPackageSource = '.model.kps';
   Ext_LexicalModelProject = '.model.kpj';
 
-const ExtFileTypes: array[0..14] of TKMFileTypeInfo = (
+const ExtFileTypes: array[0..15] of TKMFileTypeInfo = (
   (Ext: Ext_KeymanSource; FileType: ftKeymanSource),
   (Ext: Ext_PackageSource; FileType: ftPackageSource),
   (Ext: Ext_KeymanFile; FileType: ftKeymanFile),
@@ -77,7 +78,9 @@ const ExtFileTypes: array[0..14] of TKMFileTypeInfo = (
   (Ext: Ext_Javascript; FileType: ftJavascript),
   (Ext: Ext_KeymanTouchLayout; FileType: ftTouchLayout),
   (Ext: Ext_LexicalModelSource; FileType: ftModelSource),
-  (Ext: ''; FileType: ftOther));
+  (Ext: ''; FileType: ftOther),
+  (Ext: Ext_LdmlKeyboardSource; FileType: ftXMLFile)
+);
 
 function GetFileTypeFromFileName(const FileName: string): TKMFileType;
 function GetFileTypeFilter(ft: TKMFileType; var DefaultExt: string): string;
@@ -97,7 +100,7 @@ type
   end;
 
 type
-  TKeymanProjectType = (kptUnknown, kptBasic, kptImportWindowsKeyboard, kptWordlistLexicalModel);
+  TKeymanProjectType = (kptUnknown, kptBasic, kptLDMLKeyboard, kptImportWindowsKeyboard, kptWordlistLexicalModel);
 
 implementation
 
