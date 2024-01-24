@@ -300,12 +300,8 @@ export default abstract class OSKKey {
     // Add OSK key labels
     let keyText = null;
     if(spec['text'] == null || spec['text'] == '') {
-      if(typeof spec['id'] == 'string') {
-        // If the ID's Unicode-based, just use that code.
-        keyText = ActiveKey.unicodeIDToText(spec['id']);
-      }
-
-      keyText = keyText || DEFAULT_BLANK;
+      // U_ codes are handled during keyboard pre-processing.
+      keyText = DEFAULT_BLANK;
     } else {
       keyText=spec['text'];
 

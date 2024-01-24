@@ -81,28 +81,6 @@ const
 const
   keymancore = 'keymancore-1.dll';
 
-function km_core_context_items_from_utf16(
-  const text: pkm_core_cp;
-  var out_ptr: pkm_core_context_item
-): km_core_status; cdecl; external keymancore delayed;
-
-function km_core_context_items_from_utf8(
-  const text: PAnsiChar;
-  var out_ptr: pkm_core_context_item
-): km_core_status; cdecl; external keymancore delayed;
-
-function km_core_context_items_to_utf16(
-  const item: pkm_core_context_item;
-  buf: pkm_core_cp;
-  var buf_size: integer
-): km_core_status; cdecl; external keymancore delayed;
-
-function km_core_context_items_to_utf8(
-  const item: pkm_core_context_item;
-  buf: pansichar;
-  var buf_size: integer
-): km_core_status; cdecl; external keymancore delayed;
-
 procedure km_core_context_items_dispose(
   const context_items: km_core_context_item
 ); cdecl; external keymancore delayed;
@@ -112,26 +90,9 @@ function km_core_context_set(
   context_items: pkm_core_context_item
 ): km_core_status; cdecl; external keymancore delayed;
 
-function km_core_context_get(
-  context: pkm_core_context;
-  var context_items: pkm_core_context_item
-): km_core_status; cdecl; external keymancore delayed;
-
 procedure km_core_context_clear(
   context: pkm_core_context
 ); cdecl; external keymancore delayed;
-
-function km_core_context_append(
-  context: pkm_core_context;
-  context_items: pkm_core_context_item
-): km_core_status; cdecl; external keymancore delayed;
-
-function km_core_context_shrink(
-  context: pkm_core_context;
-  num: Integer;
-  prefix: pkm_core_context_item
-): km_core_status; cdecl; external keymancore delayed;
-
 
 
 type
