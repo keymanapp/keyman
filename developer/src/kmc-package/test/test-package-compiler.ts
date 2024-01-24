@@ -11,7 +11,7 @@ import { TestCompilerCallbacks } from '@keymanapp/developer-test-helpers';
 import { makePathToFixture } from './helpers/index.js';
 
 import { KmpCompiler } from '../src/compiler/kmp-compiler.js';
-import { CompilerMessages } from '../src/compiler/messages.js';
+import { CompilerMessages } from '../src/compiler/package-compiler-messages.js';
 
 const debug = false;
 

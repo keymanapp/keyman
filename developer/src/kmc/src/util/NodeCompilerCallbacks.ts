@@ -130,6 +130,8 @@ export class NodeCompilerCallbacks implements CompilerCallbacks {
       this.messageCount = 0;
     }
 
+    const disable = CompilerFileCallbacks.applyMessageOverridesToEvent(event, this.options.messageOverrides);
+
     this.messages.push({...event});
 
     // report fatal errors to Sentry, but don't abort; note, it won't be
@@ -140,7 +142,7 @@ export class NodeCompilerCallbacks implements CompilerCallbacks {
       KeymanSentry.reportException(event.exceptionVar, false);
     }
 
-    if(CompilerError.severity(event.code) < compilerLogLevelToSeverity[this.options.logLevel]) {
+    if(disable || CompilerError.severity(event.code) < compilerLogLevelToSeverity[this.options.logLevel]) {
       // collect messages but don't print to console
       return;
     }

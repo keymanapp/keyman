@@ -27,6 +27,8 @@ export { defaultCompilerOptions, CompilerBaseOptions, CompilerCallbacks, Compile
          compilerExceptionToString, compilerErrorFormatCode,
          compilerLogLevelToSeverity, CompilerLogLevel, compilerEventFormat, ALL_COMPILER_LOG_LEVELS,
          ALL_COMPILER_LOG_FORMATS, CompilerLogFormat,
+         CompilerMessageOverride,
+         CompilerMessageOverrideMap,
 
          KeymanCompilerArtifact,
          KeymanCompilerArtifactOptional,

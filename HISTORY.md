@@ -1,5 +1,25 @@
 # Keyman Version History
 
+## 17.0.247 alpha 2024-01-18
+
+* fix(ios): banner image management (#10337)
+* feat(core): unescape u (#10356)
+* chore(developer,core): change sample and test files to use \u{…} (#10391)
+
+## 17.0.246 alpha 2024-01-17
+
+* fix(web): Add null check for changing the keyboard during typing (#10346)
+* chore(common): Update crowdin strings for Khmer (#10411)
+* docs(common): Update website README.md (#10399)
+* docs(linux): Add documentation for Core API verification (#10409)
+* fix(web): right-flick gesture-preview positioning (#10406)
+
+## 17.0.245 alpha 2024-01-16
+
+* chore(core): Ignore C++ symbols (#10386)
+* fix(android): Fix OSK rotation issues (#10373)
+* feat(developer): add `-m` parameter to kmc to control message severity (#10258)
+
 ## 17.0.244 alpha 2024-01-15
 
 * refactor(core): Move `km_core_state_context_*` tests to separate file (#10375)
