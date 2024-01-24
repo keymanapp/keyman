@@ -57,7 +57,7 @@ void setup(const char *keyboard) {
 
   try_status(km_core_keyboard_load(path.native().c_str(), &test_kb));
   try_status(km_core_state_create(test_kb, test_env_opts, &test_state));
-  try_status(km_core_context_items_from_utf16(u"Hello 😁", &citems));
+  try_status(context_items_from_utf16(u"Hello 😁", &citems));
 
   // Pre-test sanity: ensure debugging is disabled
   assert(km_core_state_debug_get(test_state) == 0);
