@@ -1,6 +1,6 @@
 import 'mocha';
 import {assert} from 'chai';
-import {unescapeString, UnescapeError, isOneChar, toOneChar, unescapeOneQuadString, BadStringAnalyzer, isValidUnicode, describeCodepoint, isPUA, BadStringType} from '../../src/util/util.js';
+import {unescapeString, UnescapeError, isOneChar, toOneChar, unescapeOneQuadString, BadStringAnalyzer, isValidUnicode, describeCodepoint, isPUA, BadStringType, unescapeStringToRegex, unescapeQuadString} from '../../src/util/util.js';
 
 describe('test UTF32 functions()', function() {
   it('should properly categorize strings', () => {
@@ -57,15 +57,39 @@ describe('test unescapeString()', function() {
   });
 });
 
+describe('test unescapeRegex()', () => {
+  it("should correctly handle 1..6 char escapes", function() {
+    assert.equal(unescapeStringToRegex('\\u{9}'),       '\\u0009');   // TAB
+    assert.equal(unescapeStringToRegex('\\u{5b}'),      '\\u005b');   // [
+    assert.equal(unescapeStringToRegex('\\u{005b}'),    '\\u005b');   // [
+    assert.equal(unescapeStringToRegex('\\u{4a}'),     'J');   // J
+    assert.equal(unescapeStringToRegex('\\u{8a}'),     '\\u008a');   // J
+    assert.equal(unescapeStringToRegex('\\u{3c8}'),    'ψ');   // ψ
+    assert.equal(unescapeStringToRegex('\\u{304B}'),   'か');   // か
+    assert.equal(unescapeStringToRegex('\\u{ffff}'),   '\\uffff');   // noncharacter
+    assert.equal(unescapeStringToRegex('\\u{1e109}'),  '𞄉');  // 𞄉
+    assert.equal(unescapeStringToRegex('\\u{1ffff}'),  '\\U0001ffff');  // nonchar
+    assert.equal(unescapeStringToRegex('\\u{10fff0}'), '\u{10fff0}'); // Plane 16 Private Use
+    assert.equal(unescapeStringToRegex('\\u{10ffff}'), '\\U0010ffff'); // nonchar
+  });
+});
+
 describe('test unescapeOneQuadString()', () => {
   it('should be able to convert', () => {
     // testing that `\u0127` is unescaped correctly (to U+0127: 'ħ')
     assert.equal(unescapeOneQuadString('\\u0127'), '\u{0127}');
+    assert.equal(unescapeOneQuadString('\\U0010FFF0'), '\u{10fff0}');
     // test the fail cases
   });
   it('should fail when it needs to fail', () => {
     assert.throws(() => unescapeOneQuadString(null), null);
     assert.throws(() => unescapeOneQuadString('\uFFFFFFFFFFFF'));
+  });
+  const PAIRED=`\\uD838\\uDD09`;
+  it('test of paired surrogates ${UNPAIRED}', () => {
+    const s = unescapeQuadString(PAIRED);
+    assert.equal(s, '\u{1e109}');
+    assert.equal(s, '\u{d838}\u{dd09}');
   });
 });
 

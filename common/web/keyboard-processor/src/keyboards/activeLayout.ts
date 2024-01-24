@@ -331,6 +331,10 @@ export class ActiveKeyBase {
       }
     }
 
+    if(!key.text && typeof key.id == 'string') {
+      key.text = ActiveKey.unicodeIDToText(key.id);
+    }
+
     // Ensure subkeys are also properly extended.
     if(key.sk) {
       analysisFlagObj.hasLongpresses = true;

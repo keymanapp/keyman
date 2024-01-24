@@ -92,6 +92,10 @@ describe('Test of Pattern Parsers', () => {
         `Give me \\m{a} and \\m{c}, or \\m{.}.`, markers),
         `Give me \uFFFF\u0008\u0001 and \uFFFF\u0008\u0003, or \uFFFF\u0008\uD7FF.`
       );
+      assert.equal(MarkerParser.toSentinelString(
+        `Give me \\m{a} and \\m{c}, or \\m{.}.`, markers, true),
+        `Give me \\uffff\\u0008\\u0001 and \\uffff\\u0008\\u0003, or ${MarkerParser.ANY_MARKER_MATCH}.`
+      );
       assert.throws(() =>
         MarkerParser.toSentinelString(
           `Want to see something funny? \\m{zzz}`, // out of range
