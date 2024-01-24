@@ -36,6 +36,12 @@ export class StrsCompiler extends EmptyCompiler {
       const badStringAnalyzer = new util.BadStringAnalyzer();
       const CONTAINS_MARKER_REGEX = new RegExp(MarkerParser.ANY_MARKER_MATCH);
       for (let s of strs.allProcessedStrings.values()) {
+        // replace all \\uXXXX with the actual code point.
+        // this lets us analyze whether there are PUA, unassigned, etc.
+        // the results might not be valid regex of course.
+        if (util.CONTAINS_QUAD_ESCAPE.test(s)) {
+          s = util.unescapeQuadString(s);
+        }
         // skip marker strings
         if (CONTAINS_MARKER_REGEX.test(s)) {
           // it had a marker, take out all marker strings, as the sentinel is illegal

@@ -225,124 +225,6 @@ const int CORE_ENVIRONMENT_ARRAY_LENGTH = 6;
   return capsLock;
 }
 
--(NSArray*)loadActionsUsingCore {
-  size_t actionCount = 0;
-  km_core_action_item const * actionList =
-      km_core_state_action_items(self.coreState, &actionCount);
-
-  NSMutableArray *eventArray = [NSMutableArray arrayWithCapacity:actionCount];
-
-  for (int i = 0; i < actionCount; i++) {
-    km_core_action_item action = actionList[i];
-    CoreAction *coreAction = [self createCoreActionForActionStruct:&action];
-    [eventArray insertObject:coreAction atIndex:i];
-  }
-
-  return eventArray;
-}
-
--(CoreAction*)createCoreActionForActionStruct:(km_core_action_item*)actionStruct {
-  CoreAction* action = nil;
-    switch (actionStruct->type)
-    {
-      case KM_CORE_IT_END: {
-        action = [[CoreAction alloc] initWithType: EndAction actionContent:@"" backspaceCount:0 key:@"" value:@"" scope:0];
-        break;
-      }
-      case KM_CORE_IT_CHAR: {
-        NSString *characterString = [self.coreHelper utf32ValueToString:actionStruct->character];
-        action = [[CoreAction alloc] initWithType: CharacterAction actionContent:characterString backspaceCount:0 key:@"" value:@"" scope:0];
-        [self.coreHelper logDebugMessage:@"createCoreActionForActionStruct actionStruct->character decimal: %u, hex: %X", actionStruct->character, actionStruct->character];
-        [self.coreHelper logDebugMessage:@"createCoreActionForActionStruct converted unicode string: '%@' length=%lu", characterString, characterString.length];
-        break;
-      }
-      case KM_CORE_IT_MARKER: {
-        action = [[CoreAction alloc] initWithType: MarkerAction actionContent:@"" backspaceCount:0 key:@"" value:@"" scope:0];
-        break;
-      }
-      case KM_CORE_IT_ALERT: {
-        action = [[CoreAction alloc] initWithType: AlertAction actionContent:@"" backspaceCount:0 key:@"" value:@"" scope:0];
-        break;
-      }
-      case KM_CORE_IT_BACK: {
-        km_core_backspace_item backspace = actionStruct->backspace;
-
-        if (backspace.expected_type == KM_CORE_BT_CHAR) {
-          NSString *charString = [self.coreHelper utf32ValueToString:backspace.expected_value];
-          [self.coreHelper logDebugMessage:@"createCoreActionForActionStruct charString = %@", charString];
-          action = [[CoreAction alloc] initCharacterBackspaceAction:charString];
-          [self.coreHelper logDebugMessage:@"createCoreActionForActionStruct converted character backspace, expected value =%lu, expected type =%u", backspace.expected_value, backspace.expected_type];
-        } else if(backspace.expected_type == KM_CORE_BT_MARKER) {
-          action = [[CoreAction alloc] initMarkerBackspaceAction:actionStruct->backspace.expected_value];
-          [self.coreHelper logDebugMessage:@"createCoreActionForActionStruct converted marker backspace, expected value =%lu, expected type =%u", backspace.expected_value, backspace.expected_type];
-        } else {
-          [self.coreHelper logDebugMessage:@"createCoreActionForActionStruct did not convert unknown backspace, expected value =%lu, expected type =%u", backspace.expected_value, backspace.expected_type];
-        }
-        break;
-      }
-      case KM_CORE_IT_PERSIST_OPT: {
-        [self.coreHelper logDebugMessage:@"***createCoreActionForActionStruct Persist Options encountered."];
-        km_core_option_item const * option = actionStruct->option;
-        NSString *keyString = [self.coreHelper createNSStringFromUnicharString:option->key];
-        NSString *valueString = [self.coreHelper createNSStringFromUnicharString:option->value];
-
-        [self.coreHelper logDebugMessage:@"***createCoreActionForActionStruct converted Persist Options, key = %@, value = %@, scope = %d", keyString, valueString, option->scope];
-
-        action = [[CoreAction alloc] initPersistOptionAction:keyString value:valueString scope:option->scope];
-        break;
-      }
-      case KM_CORE_IT_EMIT_KEYSTROKE: {
-        action = [[CoreAction alloc] initWithType: EmitKeystrokeAction actionContent:@"" backspaceCount:0 key:@"" value:@"" scope:0];
-        break;
-      }
-      case KM_CORE_IT_INVALIDATE_CONTEXT: {
-        action = [[CoreAction alloc] initWithType: InvalidateContextAction actionContent:@"" backspaceCount:0 key:@"" value:@"" scope:0];
-        break;
-      }
-      case KM_CORE_IT_CAPSLOCK: {
-        action = [[CoreAction alloc] initWithType: CapsLockAction actionContent:@"" backspaceCount:0 key:@"" value:@"" scope:0];
-        break;
-      }
-      default: {
-        NSLog(@"createCoreActionForActionStruct unrecognized type of km_core_action_item = %u\n", actionStruct->type);
-      }
-  }
-  return action;
-}
-
--(NSString *)getContextAsStringUsingCore {
-  km_core_context * context =  km_core_state_context(self.coreState);
-
-  km_core_context_item * contextItemsArray = nil;
-  size_t contextLength = km_core_context_length(context);
-
-  NSMutableString *contextString = [[NSMutableString alloc]init];
-
-  if (contextLength==0) {
-    [self.coreHelper logDebugMessage:@"CoreWrapper getContextAsStringUsingCore, context is empty."];
-  } else {
-    km_core_status result = km_core_context_get(context, &contextItemsArray);
-    if (result==KM_CORE_STATUS_OK) {
-      for (int i = 0; i < contextLength; i++) {
-        km_core_context_item contextItem = contextItemsArray[i];
-        if (contextItem.type == KM_CORE_CT_CHAR) {
-          NSString *unicodeString = [self.coreHelper utf32ValueToString:contextItem.character];
-          [contextString appendString:unicodeString];
-        }
-      }
-    }
-  }
-  NSString *immutableString = [NSString stringWithString:contextString];
-
-  // dispose of context items array
-  if (contextItemsArray) {
-    km_core_context_items_dispose(contextItemsArray);
-  }
-
-  [self.coreHelper logDebugMessage:@"CoreWrapper getContextAsStringUsingCore = %@", immutableString];
-  return immutableString;
-}
-
 -(void)clearContextUsingCore {
   km_core_state_context_clear(self.coreState);
   [self.coreHelper logDebugMessage:@"km_core_state_context_clear called"];
@@ -354,28 +236,13 @@ const int CORE_ENVIRONMENT_ARRAY_LENGTH = 6;
   [self.coreHelper logDebugMessage:@"CoreWrapper setContextIfNeeded, context=%@, km_core_state_context_set_if_needed result=%i", context, result];
 }
 
--(void)setContext:(NSString*)context {
-  if (context.length == 0) {
-    [self clearContextUsingCore];
-  } else {
-    char const *coreString = [context cStringUsingEncoding:NSUTF8StringEncoding];
-    km_core_context_item *contextItemArray;
+-(NSString*)contextDebug {
+  km_core_cp * context = km_core_state_context_debug(self.coreState, KM_CORE_DEBUG_CONTEXT_CACHED);
+  NSString *debugString = [self.coreHelper createNSStringFromUnicharString:context];
+  km_core_cp_dispose(context);
 
-    // create array of context items
-    km_core_status result = km_core_context_items_from_utf8(coreString, &contextItemArray);
-    [self.coreHelper logDebugMessage:@"km_core_context_items_from_utf8, result=%i", result];
-
-    // set the context in core using the array
-    km_core_context * coreContext =  km_core_state_context(self.coreState);
-    km_core_context_set(coreContext, contextItemArray);
-    // dispose
-    km_core_context_items_dispose(contextItemArray);
-  }
-}
-
-
--(NSString*)context {
-  return [self getContextAsStringUsingCore];
+  [self.coreHelper logDebugMessage:@"CoreWrapper contextDebug = %@", debugString];
+  return debugString;
 }
 
 //TODO: create and save as static

@@ -1,8 +1,9 @@
 // Tests for the state_context_* API methods
 
-#include <keyman/keyman_core_api.h>
+#include "keyman_core.h"
 #include <string>
 
+#include "context.hpp"
 #include "path.hpp"
 
 #include "../emscripten_filesystem.h"
@@ -42,17 +43,18 @@ setup(const char *keyboard, const km_core_cp *context) {
   km::core::path path = km::core::path::join(arg_path, keyboard);
   try_status(km_core_keyboard_load(path.native().c_str(), &test_kb));
   try_status(km_core_state_create(test_kb, test_env_opts, &test_state));
-  try_status(km_core_context_items_from_utf16(context, &citems));
+  try_status(context_items_from_utf16(context, &citems));
   try_status(km_core_context_set(km_core_state_context(test_state), citems));
+  try_status(km_core_context_set(km_core_state_app_context(test_state), citems));
 }
 
 bool
 is_identical_context(km_core_cp const *cached_context) {
   size_t buf_size;
-  try_status(km_core_context_get(km_core_state_context(test_state), &citems));
-  try_status(km_core_context_items_to_utf16(citems, nullptr, &buf_size));
+  try_status(context_get(km_core_state_context(test_state), &citems));
+  try_status(context_items_to_utf16(citems, nullptr, &buf_size));
   km_core_cp *new_cached_context = new km_core_cp[buf_size];
-  try_status(km_core_context_items_to_utf16(citems, new_cached_context, &buf_size));
+  try_status(context_items_to_utf16(citems, new_cached_context, &buf_size));
   bool result = std::u16string(cached_context) == new_cached_context;
   delete[] new_cached_context;
   return result;
@@ -138,11 +140,12 @@ test_context_set_if_needed_cached_context_has_markers() {
       {KM_CORE_CT_MARKER, {0}, {3}}, {KM_CORE_CT_MARKER, {0}, {4}}, KM_CORE_CONTEXT_ITEM_END};
 
   try_status(km_core_context_set(km_core_state_context(test_state), citems));
+  try_status(km_core_context_set(km_core_state_app_context(test_state), citems));
   assert(km_core_state_context_set_if_needed(test_state, application_context) == KM_CORE_CONTEXT_STATUS_UNCHANGED);
 
   km_core_context_item *citems_new;
 
-  try_status(km_core_context_get(km_core_state_context(test_state), &citems_new));
+  try_status(context_get(km_core_state_context(test_state), &citems_new));
 
   for (int i = 0; citems[i].type || citems_new[i].type; i++) {
     assert(citems_new[i].type == citems[i].type);
@@ -175,6 +178,48 @@ test_context_clear() {
   assert(!is_identical_context(cached_context));
   assert(is_identical_context(u""));
   teardown();
+}
+
+//-------------------------------------------------------------------------------------
+
+void test_context_debug_empty() {
+  km_core_cp const *cached_context =      u"";
+  setup("k_000___null_keyboard.kmx", cached_context);
+  auto str = km_core_state_context_debug(test_state, KM_CORE_DEBUG_CONTEXT_CACHED);
+  // std::cout << str << std::endl;
+  assert(std::u16string(str) == u"|| (len: 0) [ ]");
+  km_core_cp_dispose(str);
+}
+
+void test_context_debug_various() {
+  km_core_cp const *cached_context =      u"";
+  setup("k_000___null_keyboard.kmx", cached_context);
+
+  km_core_context_item const citems[] = {
+    { KM_CORE_CT_MARKER, {0}, { 5 } },
+    { KM_CORE_CT_CHAR, {0}, { '1' } },
+    { KM_CORE_CT_MARKER, {0}, { 1 } },
+    { KM_CORE_CT_CHAR, {0}, { '2' } },
+    { KM_CORE_CT_MARKER, {0}, { 2 } },
+    { KM_CORE_CT_CHAR, {0}, { '3' } },
+    { KM_CORE_CT_MARKER, {0}, { 3 } },
+    { KM_CORE_CT_MARKER, {0}, { 4 } },
+    { KM_CORE_CT_CHAR, {0}, { 0x1F923 /* 🤣 */ } },
+    KM_CORE_CONTEXT_ITEM_END
+  };
+
+  try_status(km_core_context_set(km_core_state_context(test_state), citems));
+  try_status(km_core_context_set(km_core_state_app_context(test_state), citems));
+
+  auto str = km_core_state_context_debug(test_state, KM_CORE_DEBUG_CONTEXT_CACHED);
+  // std::cout << str << std::endl;
+  assert(std::u16string(str) == u"|123🤣| (len: 9) [ M(5) U+0031 M(1) U+0032 M(2) U+0033 M(3) M(4) U+1f923 ]");
+  km_core_cp_dispose(str);
+}
+
+void test_context_debug() {
+  test_context_debug_empty();
+  test_context_debug_various();
 }
 
 //-------------------------------------------------------------------------------------
@@ -216,4 +261,5 @@ main(int argc, char *argv[]) {
 
   test_context_set_if_needed();
   test_context_clear();
+  test_context_debug();
 }
