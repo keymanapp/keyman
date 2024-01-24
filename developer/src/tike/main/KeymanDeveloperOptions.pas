@@ -68,7 +68,6 @@ type
     FServerUseNgrok: Boolean;
     FServerServerShowConsoleWindow: Boolean;
     FServerNgrokToken: string;
-    FServerNgrokRegion: string;
     FServerKeepAlive: Boolean;
     procedure CloseRegistry;
     procedure OpenRegistry;
@@ -112,7 +111,6 @@ type
     property ServerUseLocalAddresses: Boolean read FServerUseLocalAddresses write FServerUseLocalAddresses;
 
     property ServerNgrokToken: string read FServerNgrokToken write FServerNgrokToken;
-    property ServerNgrokRegion: string read FServerNgrokRegion write FServerNgrokRegion;
     property ServerUseNgrok: Boolean read FServerUseNgrok write FServerUseNgrok;
     property ServerServerShowConsoleWindow: Boolean read FServerServerShowConsoleWindow write FServerServerShowConsoleWindow;
 
@@ -220,7 +218,6 @@ begin
     FServerUseLocalAddresses := regReadBool(SRegValue_IDEOptServerUseLocalAddresses, True);
 
     FServerNgrokToken := regReadString(SRegValue_IDEOptServerNgrokToken, '');
-    FServerNgrokRegion := regReadString(SRegValue_IDEOptServerNgrokRegion, 'us');
     FServerUseNgrok := regReadBool(SRegValue_IDEOptServerUseNgrok, False);
     FServerServerShowConsoleWindow := regReadBool(SRegValue_IDEOptServerShowConsoleWindow, False);
 
@@ -282,7 +279,6 @@ begin
     regWriteBool(SRegValue_IDEOptServerUseLocalAddresses, FServerUseLocalAddresses);
 
     regWriteString(SRegValue_IDEOptServerNgrokToken, FServerNgrokToken);
-    regWriteString(SRegValue_IDEOptServerNgrokRegion, FServerNgrokRegion);
     regWriteBool(SRegValue_IDEOptServerUseNgrok, FServerUseNgrok);
     regWriteBool(SRegValue_IDEOptServerShowConsoleWindow, FServerServerShowConsoleWindow);
 
@@ -326,7 +322,6 @@ begin
   try
     o.AddPair('port', TJSONNumber.Create(FServerDefaultPort));
     o.AddPair('ngrokToken', FServerNgrokToken);
-    o.AddPair('ngrokRegion', FServerNgrokRegion);
     o.AddPair('useNgrok', TJSONBool.Create(FServerUseNgrok));
     o.AddPair('ngrokVisible', TJSONBool.Create(FServerServerShowConsoleWindow));
     s := TStringList.Create;

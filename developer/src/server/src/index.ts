@@ -91,10 +91,8 @@ if(configuration.useNgrok && os.platform() == 'win32' && fs.existsSync(configura
   (async function() {
     configuration.ngrokEndpoint = await ngrok.connect({
       proto: 'http',
-      bind_tls: true,
       addr: configuration.port,
       authtoken: configuration.ngrokToken,
-      region: configuration.ngrokRegion,
       binPath: () => configuration.ngrokBinPath,
       onLogEvent: (msg: string) => {
         if(options.ngrokLog) {
