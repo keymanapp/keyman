@@ -13,7 +13,6 @@
     "strictFunctionTypes": true,
     "noUnusedLocals": true,
     "allowJs": true,
-    "preserveConstEnums": true,
 
     "rootDir": ".",
 
