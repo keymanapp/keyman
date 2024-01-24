@@ -399,7 +399,6 @@ const
   SRegValue_IDEOptServerPort = 'web host port';   // I4021
   SRegValue_IDEOptServerKeepAlive = 'server keep alive';
   SRegValue_IDEOptServerNgrokToken = 'server ngrok token';
-  SRegValue_IDEOptServerNgrokRegion = 'server ngrok region';
   SRegValue_IDEOptServerUseLocalAddresses = 'server use local addresses';
   SRegValue_IDEOptServerUseNgrok = 'server use ngrok';
   SRegValue_IDEOptServerShowConsoleWindow = 'server show console window';
