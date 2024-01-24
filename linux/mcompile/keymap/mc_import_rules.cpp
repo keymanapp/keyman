@@ -43,39 +43,22 @@ const int KMX_ShiftStateMap[] = {
 
 // _S2 DEADKEY STUFF - DO NOT REVIEW YET
 // _S2 ToDo open deadkey functions
-class DeadKey {
-private:
-  KMX_WCHAR m_deadchar;
-  std::vector<KMX_WCHAR> m_rgbasechar;
-  std::vector<KMX_WCHAR> m_rgcombchar;
 
-public:
-  DeadKey(KMX_WCHAR deadCharacter) {
+  DeadKey::DeadKey(KMX_WCHAR deadCharacter) {
     this->m_deadchar = deadCharacter;
   }
 
-  KMX_WCHAR KMX_DeadCharacter() {
+  KMX_WCHAR DeadKey::KMX_DeadCharacter() {
     return this->m_deadchar;
   }
 
-  void KMX_AddDeadKeyRow(KMX_WCHAR baseCharacter, KMX_WCHAR combinedCharacter) {
+  void DeadKey::KMX_AddDeadKeyRow(KMX_WCHAR baseCharacter, KMX_WCHAR combinedCharacter) {
     this->m_rgbasechar.push_back(baseCharacter);
     this->m_rgcombchar.push_back(combinedCharacter);
   }
 
-  int KMX_Count() {
-    return this->m_rgbasechar.size();
-  }
-
-  KMX_WCHAR KMX_GetBaseCharacter(int index) {
-    return this->m_rgbasechar[index];
-  }
-
-  KMX_WCHAR KMX_GetCombinedCharacter(int index) {
-    return this->m_rgcombchar[index];
-  }
 /*
-  bool ContainsBaseCharacter(WCHAR baseCharacter) {
+  bool DeadKey::ContainsBaseCharacter(WCHAR baseCharacter) {
     std::vector<WCHAR>::iterator it;
     for(it=this->m_rgbasechar.begin(); it<m_rgbasechar.end(); it++) {
       if(*it == baseCharacter) {
@@ -86,7 +69,7 @@ public:
   }*/
 
 
-  bool KMX_ContainsBaseCharacter(KMX_WCHAR baseCharacter) {
+  bool DeadKey::KMX_ContainsBaseCharacter(KMX_WCHAR baseCharacter) {
     std::vector<KMX_WCHAR>::iterator it;
     for(it=this->m_rgbasechar.begin(); it<m_rgbasechar.end(); it++) {
       if(*it == baseCharacter) {
@@ -95,7 +78,6 @@ public:
     }
     return false;
   }
-};
 
 int KMX_ToUnicodeEx(guint ScanCode, const BYTE *lpKeyState, PKMX_WCHAR pwszBuff, int shift_state, int caps,GdkKeymap *keymap) {
 
@@ -319,6 +301,7 @@ int i4 = this->KMX_IsXxxxGrCapsEqualToXxxxShift() ? 8 : 0;
       for (int caps = 0; caps <= 1; caps++) {
         std::wstring st = this->KMX_GetShiftState((ShiftState) ss, (caps == 1));
         PKMX_WCHAR p;  // was PWSTR p;
+        PKMX_WCHAR p_S2;  // was PWSTR p;
 
         if (st.size() == 0) {
           // No character assigned here
@@ -338,11 +321,14 @@ int i4 = this->KMX_IsXxxxGrCapsEqualToXxxxShift() ? 8 : 0;
             *p++ = st[0];
             *p = 0;
           } else {
+
             p = key->dpOutput = new KMX_WCHAR[4];
+            p_S2 =p;
             *p++ = UC_SENTINEL;
             *p++ = CODE_DEADKEY;
             *p++ = KMX_DeadKeyMap(st[0], deadkeys, deadkeyBase, &KMX_FDeadkeys);   // I4353
             *p = 0;
+            int wertzu=57;
           }
           key++;
         } else {
@@ -364,6 +350,8 @@ int i4 = this->KMX_IsXxxxGrCapsEqualToXxxxShift() ? 8 : 0;
             key->ShiftFlags = this->KMX_GetShiftStateValue(capslock, caps, (ShiftState) ss);
             key->dpContext = new KMX_WCHAR; *key->dpContext = 0;
             p = key->dpOutput = new KMX_WCHAR[st.size() + 1];
+
+            p_S2 = p;
             for(size_t ich = 0; ich < st.size(); ich++) {
               *p++ = st[ich];
             }
@@ -577,19 +565,52 @@ KMX_WCHAR sbBuffer1[16];
   }
 };
 
-int KMX_GetMaxDeadkeyIndex(KMX_WCHAR *p) {
+//_S2 REVIEW
+
+/*
+int GetMaxDeadkeyIndex(WCHAR *p) {
   int n = 0;
   while(p && *p) {
     if(*p == UC_SENTINEL && *(p+1) == CODE_DEADKEY)
+      n = max(n, *(p+2));
+    p = incxstr(p);
+  }
+  return n;
+}
+*/
 
-     // n = max(n, *(p+2));
+
+int KMX_GetMaxDeadkeyIndex(KMX_WCHAR *p) {
+  int n = 0;  int pp = 0;
+  while(p && *p) {
+    if(*p == UC_SENTINEL && *(p+1) == CODE_DEADKEY) {
+      //pp = (int) *(p+2);
+      n = std::max(n, (int) *(p+2));
+    }
+    p = KMX_incxstr(p);
+  }
+  return n;
+}
+
+
+
+/*int KMX_GetMaxDeadkeyIndex(KMX_WCHAR *p) {
+  int n = 0;
+  int nn = 0;
+  int pp = 0;
+  while(p && *p) {
+    if(*p == UC_SENTINEL && *(p+1) == CODE_DEADKEY)
+    pp = (int) *(p+2);
+      //nn = std::max(n, *(p+2));
+      nn = std::max(n, pp);
+
     if( !(n > (*p+2)))       // _S2 p+4 ??
       n= (*p+2);
 
     p = KMX_incxstr(p);
   }
   return n;
-}
+}*/
 
 bool KMX_ImportRules(LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, GdkKeymap **keymap, std::vector<KMX_DeadkeyMapping> *FDeadkeys, KMX_BOOL bDeadkeyConversion) {   // I4353   // I4552
   KMX_Loader loader;
@@ -600,6 +621,10 @@ bool KMX_ImportRules(LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, GdkKeymap **keymap,
   BYTE lpKeyState[256];// = new KeysEx[256];
   std::vector<KMX_VirtualKey*> rgKey; //= new VirtualKey[256];
   std::vector<DeadKey*> alDead;
+
+//_S2 REVIEW
+ std::vector<DeadKey*> alDead2 ;
+  //std::vector<DeadKey*> alDead_small;
 
   rgKey.resize(256);
 
@@ -722,7 +747,7 @@ bool KMX_ImportRules(LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, GdkKeymap **keymap,
             sbBuffer[2] = 0;
             //rgKey[iKey]->SetShiftState(ss, sbBuffer, true, (caps == 0));
             rgKey[iKey]->KMX_SetShiftState(ss, sbBuffer, true, (caps ));
-            wprintf(L"rc<0 for iKey nr. %i (%c) \n",iKey,iKey );
+            //wprintf(L"rc<0 for iKey nr. %i (%c) \n",iKey,iKey );
 
             // It's a dead key; let's flush out whats stored in the keyboard state.
             loader.KMX_ClearKeyboardBuffer();
@@ -739,7 +764,13 @@ bool KMX_ImportRules(LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, GdkKeymap **keymap,
             }
             if(dk == NULL) {
               //_S2 TODO
-              alDead.push_back(loader.KMX_ProcessDeadKey(iKey, ss, lpKeyState, rgKey, caps == 0, hkl, *keymap));
+              //alDead.push_back(loader.KMX_ProcessDeadKey(iKey, ss, lpKeyState, rgKey, caps == 0, hkl, *keymap));
+
+              //_S2 REVIEW
+              alDead2 = create_alDead();
+              //_S2 REVIEW
+              alDead = reduce_alDead(alDead2);
+
               //alDead.push_back(loader.KMX_ProcessDeadKey(192, ss, lpKeyState, rgKey, caps == 0, hkl, *keymap));
 
               //_S2 for each dk (^ ' `  push_back all combinations ^,â,ê,î,ô,û   ',á,é,í,ó,ú   `,à,è,ì,ò,ù into alDead->m_rgcombchar)
@@ -783,7 +814,6 @@ bool KMX_ImportRules(LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, GdkKeymap **keymap,
   memcpy(gp, kp->dpGroupArray, sizeof(KMX_GROUP) * kp->cxGroupArray);
 
   //
-
   // Find the current highest deadkey index
   //
 
@@ -803,7 +833,7 @@ bool KMX_ImportRules(LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, GdkKeymap **keymap,
       nDeadkey = std::max(nDeadkey, KMX_GetMaxDeadkeyIndex(kkp->dpOutput));
     }
   }
-
+//nDeadkey=3;    //_S2
   kp->cxGroupArray++;
   gp = &kp->dpGroupArray[kp->cxGroupArray-1];
   UINT nKeys = 0;
@@ -889,6 +919,7 @@ bool KMX_ImportRules(LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, GdkKeymap **keymap,
     kp->cxGroupArray++;
 
     KMX_WCHAR *p = gp->dpMatch = new KMX_WCHAR[4];
+    KMX_WCHAR *qq_S2 = p;
     *p++ = UC_SENTINEL;
     *p++ = CODE_USE;
     *p++ = (KMX_WCHAR) kp->cxGroupArray;
@@ -912,6 +943,7 @@ bool KMX_ImportRules(LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, GdkKeymap **keymap,
     int nStoreBase = kp->cxStoreArray;
     kp->cxStoreArray += alDead.size() * 2;
 
+//_S2 here get ÂâÊêÎî...
     for(UINT i = 0; i < alDead.size(); i++) {
       DeadKey *dk = alDead[i];
 
@@ -935,6 +967,7 @@ bool KMX_ImportRules(LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, GdkKeymap **keymap,
       kkp->ShiftFlags = 0;
       kkp->Key = 0;
       KMX_WCHAR *p = kkp->dpContext = new KMX_WCHAR[8];
+      KMX_WCHAR* qQQ_S2= p;
       *p++ = UC_SENTINEL;
       *p++ = CODE_DEADKEY;
       *p++ = KMX_DeadKeyMap(dk->KMX_DeadCharacter(), &alDead, nDeadkey, FDeadkeys);   // I4353
@@ -945,6 +978,7 @@ bool KMX_ImportRules(LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, GdkKeymap **keymap,
       *p = 0;
 
       p = kkp->dpOutput = new KMX_WCHAR[5];
+      KMX_WCHAR* QT_S2= p;
       *p++ = UC_SENTINEL;
       *p++ = CODE_INDEX;
       *p++ = nStoreBase + i*2 + 2;

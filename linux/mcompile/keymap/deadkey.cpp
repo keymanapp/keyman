@@ -26,6 +26,48 @@ void find_dk_combinations_for_single_dk(v_dw_2D * p_dk_ComposeTable, v_dw_2D  &d
 	}
 }
 
+//_S2 REVIEW
+std::vector<DeadKey*> create_alDead() {
+
+	std::vector<DeadKey*> alDead;
+
+	v_dw_2D dk_ComposeTable;
+	KMX_DWORD dw= create_DKTable(dk_ComposeTable);
+
+	for( int i=0; i< dk_ComposeTable.size()-1; i++) {
+		DeadKey *dk2= new DeadKey(dk_ComposeTable[i][0]);
+		for ( int j=0; j< dk_ComposeTable.size();j++) {
+			// check for right dk
+			if( dk_ComposeTable[i][0]==dk_ComposeTable[j][0])
+				dk2->KMX_AddDeadKeyRow(dk_ComposeTable[j][1],dk_ComposeTable[j][2]);
+		}
+		alDead.push_back(dk2);
+	}
+
+	return alDead;
+}
+
+//_S2 REVIEW
+std::vector<DeadKey*> reduce_alDead(std::vector<DeadKey*> dk_big) {
+	std::vector<DeadKey*> dk_small;
+	bool foundInSmall=false;
+
+	for ( int i=1; i<dk_big.size()-1;i++) {
+		if( (dk_big[i]->KMX_DeadCharacter()==94 || dk_big[i]->KMX_DeadCharacter()==96 || dk_big[i]->KMX_DeadCharacter()==180)) {
+			for( int k=0; k< dk_small.size();k++) {
+				if(dk_big[i]->KMX_DeadCharacter()   == dk_small[k]->KMX_DeadCharacter())
+					foundInSmall=true;
+			}
+
+		if(!foundInSmall)
+			dk_small.push_back(dk_big[i]);
+
+		foundInSmall=false;
+		}
+	}
+	return dk_small;
+}
+
 // _S2 DEADKEY STUFF - DO NOT REVIEW YET
 // _S2 might be used when deadkeys are implemented . is it correct??
 KMX_DWORD KMX_changeKeynameToCapital(KMX_DWORD KVal, KMX_DWORD &shift, GdkKeymap* keymap) {
@@ -50,7 +92,7 @@ KMX_DWORD KMX_changeKeynameToCapital(KMX_DWORD KVal, KMX_DWORD &shift, GdkKeymap
 
 // _S2 DEADKEY STUFF - DO NOT REVIEW YET
 // _S2 DESIGN NEEDED is this the right place to get dk from? if not wher are they stored?
-KMX_DWORD create_DKTable(v_dw_2D & dk_ComposeTable){
+KMX_DWORD create_DKTable(v_dw_2D & dk_ComposeTable) {
 
   // values taken from: https://help.ubuntu.com/community/GtkDeadKeyTable#Latin
   //dk_ComposeTable[i][0] : First
