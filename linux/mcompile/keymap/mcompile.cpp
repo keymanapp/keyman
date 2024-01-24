@@ -239,6 +239,8 @@ void KMX_ReportUnconvertedKeyboardRules(LPKMX_KEYBOARD kbd) {
 }
 
 void KMX_TranslateDeadkeyKey(LPKMX_KEY key, KMX_WCHAR deadkey, KMX_WORD vk, UINT shift, KMX_WORD ch) {
+  //if(ch==94)
+  //wprintf(L" input with: key->Key: %i (%c) -- key->ShiftFlags %i -- key->Line %i -- shift %i  --ch %i(%c) \n", key->Key,key->Key, key->ShiftFlags,key->Line, shift,ch,ch );
   if((key->ShiftFlags == 0 || key->ShiftFlags & VIRTUALCHARKEY) && key->Key == ch) {
 //vk==192 && ch==94  && key->Key==94 && Line == 1572
 //vk==192 && ch==94  && key->Key==94 && Line == 1567
@@ -252,11 +254,11 @@ void KMX_TranslateDeadkeyKey(LPKMX_KEY key, KMX_WCHAR deadkey, KMX_WORD vk, UINT
 
     if(key->ShiftFlags == 0) {
       //LogError("Converted mnemonic rule on line %d, + '%c' TO dk(%d) + [%x K_%d]", key->Line, key->Key, deadkey, shift, vk);
-      //wprintf(L"Converted mnemonic rule on line %d, + '%c' TO dk(%d) + [%x K_%d]\n", key->Line, key->Key, deadkey, shift, vk);
+      wprintf(L"DK Converted mnemonic rule on line %d, + '%c' TO dk(%d) + [%x K_%d], %i(%c)\n", key->Line, key->Key, deadkey, shift, vk, ch, ch);
       key->ShiftFlags = ISVIRTUALKEY | shift;
     } else {
       //LogError("Converted mnemonic virtual char key rule on line %d, + [%x '%c'] TO dk(%d) + [%x K_%d]", key->Line, key->ShiftFlags, key->Key, deadkey, key->ShiftFlags & ~VIRTUALCHARKEY, vk);
-      //wprintf(L"Converted mnemonic virtual char key rule on line %d, + [%x '%c'] TO dk(%d) + [%x K_%d]\n", key->Line, key->ShiftFlags, key->Key, deadkey, key->ShiftFlags & ~VIRTUALCHARKEY, vk);
+      wprintf(L"DK Converted mnemonic virtual char key rule on line %d, + [%x '%c'] TO dk(%d) + [%x K_%d], %i(%c)\n", key->Line, key->ShiftFlags, key->Key, deadkey, key->ShiftFlags & ~VIRTUALCHARKEY, vk, ch, ch);
       key->ShiftFlags &= ~VIRTUALCHARKEY;
     }
 
@@ -321,7 +323,7 @@ void KMX_AddDeadkeyRule(LPKMX_KEYBOARD kbd, KMX_WCHAR deadkey, KMX_WORD vk, UINT
       kbd->dpGroupArray[i].cxKeyArray++;
       //LogError("Add deadkey rule:  + [%d K_%d] > dk(%d)", shift, vk, deadkey);
       zaehler++;
-      //wprintf(L"Add deadkey rule:  + [%d K_%d] > dk(%d)  %i\n", shift, vk, deadkey,zaehler);
+      wprintf(L"Add deadkey rule:  + [%d K_%d] > dk(%d)  %i\n", shift, vk, deadkey,zaehler);
     //test_keyboard_S2(kbd);
       if(i == kbd->StartGroup[1]) break;  // If this is the initial group, that's all we need to do.
     }
@@ -415,23 +417,18 @@ void KMX_ConvertDeadkey(LPKMX_KEYBOARD kbd, KMX_WORD vk, UINT shift, KMX_WCHAR d
   KMX_GetDeadkeys(dk_Table, deadkey, pdk = deadkeys, keymap);  // returns array of [usvk, ch_out] pairs
 
   while(*pdk) {
+
     // Look up the ch
+    UINT vkUnderlying = KMX_get_VKUS_From_VKUnderlying_VEC(All_Vector, *pdk);
 
-    // go via SC
-// hier ist das problem: ich muss über sc hehen; nicht über VK_underlying, dens nicht gibt!!
-    //-S2 this is wrong!!
-    //UINT vkUnderlying = KMX_get_VKUS_From_VKUnderlying_VEC(All_Vector, *pdk);
-    UINT vkUnderlying = vk;
+    wprintf(L" vkUnderlying   %i    *pdk %i ", vkUnderlying, *pdk);
 
-    //if(vkUnderlying != *pdk)
-        //wprintf(L" vkUnderlying_X   %i    *pdk %i \n", vkUnderlying, *pdk);
-
-    //UINT vkUnderlying = VKUnderlyingLayoutToVKUS(*pdk);
-    // UINT scUnderlyingtest =  KMX_get_SCUnderlying_From_VKUS(KMX_VKMap[i]);
-   
-   // _s  (pdk+1) = UINT shift,   *(pdk+2)=WORD ch
-   //wprintf(L" *(pdk+1): %i (%c)   *(pdk+2) :  \n",  *(pdk+1), *(pdk+1) );
-    KMX_TranslateDeadkeyKeyboard(kbd, dkid, vkUnderlying, *(pdk+1), *(pdk+2));
+    if(vkUnderlying != (UINT) *pdk) {
+      wprintf(L" TRANSLATED \n");
+      KMX_TranslateDeadkeyKeyboard(kbd, dkid, vkUnderlying, *(pdk+1), *(pdk+2));
+    }
+    else
+      wprintf(L" \n");
     pdk+=3;
   }
 }

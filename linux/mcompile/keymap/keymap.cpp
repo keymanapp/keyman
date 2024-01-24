@@ -2,12 +2,13 @@
 
 #include <xkbcommon/xkbcommon.h>
 
-
+// _S2 is return 2 + 3 correct??? prob not
 int map_VKShiftState_to_Lin(int VKShiftState) {
   if      (VKShiftState == 0 )      return 0;		/* 0000 0000 */
   else if (VKShiftState == 16)      return 1;		/* 0001 0000 */
-  else if (VKShiftState == 9 )      return 2;		/* 0000 1001 */
-  else if (VKShiftState == 25)      return 3; 	/* 0001 1001 */
+  // _S2 if commented out only 3 DK will be processed ^ ' `
+  //else if (VKShiftState == 9 )      return 2;		/* 0000 1001 */
+  //else if (VKShiftState == 25)      return 3; 	/* 0001 1001 */
   else return VKShiftState;
 }
 
@@ -371,6 +372,15 @@ bool IsKeymanUsedKeyVal(std::u16string Keyval) {
        (KV >= 231  && KV < 240)   || (KV >= 241  && KV < 248)   || (KV >= 249 && KV < 0xFF) ||
        (KV == 128) || (KV == 178) || (KV == 167) || (KV == 179) || (KV == 176)|| (KV == 181)||
        (KV >= deadkey_min && KV < deadkey_max+1) )
+    return true;
+  else
+    return false;
+}
+
+
+bool IsKeymanUsedChar(int KV) {
+  //         32            A-Z                      a-z
+  if  ((KV == 0x20 ) || (KV >= 65 && KV <= 90) || (KV >= 97 && KV <= 122) )
     return true;
   else
     return false;
