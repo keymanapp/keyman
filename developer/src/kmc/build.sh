@@ -119,7 +119,6 @@ if builder_start_action bundle; then
     --org keyman \
     --project keyman-developer \
     --release "$VERSION_GIT_TAG"  \
-    --ext js --ext mjs --ext ts --ext map \
     build/ "${SOURCEMAP_PATHS[@]}"
 
   # Manually copy over kmcmplib module
