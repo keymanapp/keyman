@@ -88,7 +88,7 @@ export class StylesheetManager {
     const fontKey = fd.family;
     let source: string;
 
-    let i, ttf='', woff='', eot='', svg='', fList=[];
+    let i, ttf='', woff='', fList=[];
 
     // TODO: 22 Aug 2014: check that font path passed from cloud is actually used!
 
@@ -118,8 +118,6 @@ export class StylesheetManager {
       if(fList[i].toLowerCase().indexOf('.otf') > 0) ttf=fList[i];
       if(fList[i].toLowerCase().indexOf('.ttf') > 0) ttf=fList[i];
       if(fList[i].toLowerCase().indexOf('.woff') > 0) woff=fList[i];
-      if(fList[i].toLowerCase().indexOf('.eot') > 0) eot=fList[i];
-      if(fList[i].toLowerCase().indexOf('.svg') > 0) svg=fList[i];
     }
 
     // Font path qualified to support page-relative fonts (build 347)
@@ -129,14 +127,6 @@ export class StylesheetManager {
 
     if(woff != '' && (woff.indexOf('/') < 0)) {
       woff = fontPathRoot+woff;
-    }
-
-    if(eot != '' && (eot.indexOf('/') < 0)) {
-      eot = fontPathRoot+eot;
-    }
-
-    if(svg != '' && (svg.indexOf('/') < 0)) {
-      svg = fontPathRoot+svg;
     }
 
     // Build the font-face definition according to the browser being used
@@ -155,16 +145,10 @@ export class StylesheetManager {
         source = "url('"+ttf+"') format('truetype')";
       }
     } else {
-      var s0 = [];
-
       if(os == DeviceSpec.OperatingSystem.Android) {
         // Android 4.2 and 4.3 have bugs in their rendering for some scripts
         // with embedded ttf or woff.  svg mostly works so is a better initial
         // choice on the Android browser.
-        if(svg != '') {
-          source = "url('"+svg+"') format('svg')";
-        }
-
         if(woff != '') {
           source = "url('"+woff+"') format('woff')";
         }
@@ -179,10 +163,6 @@ export class StylesheetManager {
 
         if(ttf != '') {
           source = "url('"+ttf+"') format('truetype')";
-        }
-
-        if(svg != '') {
-          source = "url('"+svg+"') format('svg')";
         }
       }
     }
