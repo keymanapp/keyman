@@ -399,7 +399,8 @@ add_pending_markers(
     marker_map *markers,
     marker_list &last_markers,
     const std::u32string::const_iterator &last,
-    const std::u32string::const_iterator &end) {
+    const std::u32string::const_iterator &end,
+    const icu::Normalizer2 *nfd) {
   if(markers == nullptr || last_markers.empty()) {
     return;
   }
@@ -407,8 +408,15 @@ add_pending_markers(
   if (last == end) {
     marker_ch = MARKER_BEFORE_EOT;
   } else {
-    marker_ch = *last;
+    icu::UnicodeString decomposition;
+    auto ch = *last;
+    if(!nfd->getDecomposition(ch, decomposition)) {
+      marker_ch = ch;
+    } else {
+      marker_ch = decomposition.char32At(0); // first UChar32
+    }
   }
+
   add_markers_to_map(*markers, marker_ch, last_markers);
   last_markers.clear(); // mark as already recorded
 }
@@ -417,6 +425,9 @@ std::u32string
 remove_markers(const std::u32string &str, marker_map *markers, marker_encoding encoding) {
   std::u32string out;
   marker_list last_markers;
+  UErrorCode status = U_ZERO_ERROR;
+  const icu::Normalizer2 *nfd = icu::Normalizer2::getNFDInstance(status);
+  UASSERT_SUCCESS(status);
 
   auto last = str.begin();  // points to the part of the string after the last matched marker
   for (auto i = str.begin(); i != str.end();) {
@@ -425,7 +436,7 @@ remove_markers(const std::u32string &str, marker_map *markers, marker_encoding e
       // add any markers found before this entry, but only if there is intervening
       // text. This prevents the sentinel or the '\u' from becoming the attachment char.
       if (i != last) {
-        add_pending_markers(markers, last_markers, last, str.end());
+        add_pending_markers(markers, last_markers, last, str.end(), nfd);
         out.append(last, i); // append any non-marker text since the end of the last marker
         last = i; // advance over text we've already appended
       }
@@ -443,7 +454,7 @@ remove_markers(const std::u32string &str, marker_map *markers, marker_encoding e
   // add any remaining pending markers.
   // if last == str.end() then this wil be MARKER_BEFORE_EOT
   // otherwise it will be the glue character
-  add_pending_markers(markers, last_markers, last, str.end());
+  add_pending_markers(markers, last_markers, last, str.end(), nfd);
   // get the suffix between the last marker and the end (could be nothing)
   out.append(last, str.end());
   return out;
