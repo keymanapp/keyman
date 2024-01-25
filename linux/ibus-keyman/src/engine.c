@@ -226,6 +226,23 @@ get_context_debug(IBusEngine *engine) {
 #endif
 }
 
+static gchar *
+debug_utf8_with_codepoints(const gchar *utf8) {
+  GString *output = g_string_new("");
+  g_string_append_printf(output, "|%s| len:%zu) [", utf8, g_utf8_strlen(utf8, -1));
+  gunichar2 *utf16 = g_utf8_to_utf16(utf8, -1, NULL, NULL, NULL);
+  for (int i = 0; utf16[i] != '\0'; i++) {
+    g_string_append_printf(output, "U+%04x ", utf16[i]);
+  }
+  g_string_append(output, "]");
+  g_free(utf16);
+#if GLIB_CHECK_VERSION(2, 76, 0)
+  return g_string_free_and_steal(output);
+#else
+  return g_string_free(output, FALSE);
+#endif
+}
+
 static gboolean
 client_supports_prefilter(IBusEngine *engine)
 {
@@ -553,7 +570,8 @@ void ibus_keyman_set_text(IBusEngine *engine, const gchar *text)
 static void commit_string(IBusKeymanEngine *keyman, const gchar *string)
 {
     IBusText *text;
-    g_message("DAR: %s - %s", __FUNCTION__, string);
+    g_autofree gchar *debug = NULL;
+    g_message("DAR: %s - %s", __FUNCTION__, debug = debug_utf8_with_codepoints(string));
     text = ibus_text_new_from_static_string (string);
     g_object_ref_sink(text);
     ibus_engine_commit_text ((IBusEngine *)keyman, text);
@@ -575,14 +593,16 @@ process_output_action(IBusEngine *engine, km_core_usv* output_utf32) {
 
   IBusKeymanEngine *keyman = (IBusKeymanEngine *)engine;
   gchar *output_utf8 = g_ucs4_to_utf8(output_utf32, -1, NULL, NULL, NULL);
+  g_autofree gchar *debug  = NULL;
   if (client_supports_prefilter(engine) && !client_supports_surrounding_text(engine)) {
     // non-compliant app with patched ibus
-    g_message("%s: Adding to commit queue: %s", __FUNCTION__, output_utf8);
+    g_message("%s: Adding to commit queue: %s", __FUNCTION__, debug = debug_utf8_with_codepoints(output_utf8));
     g_assert(keyman->commit_item->char_buffer == NULL);
     keyman->commit_item->char_buffer = output_utf8;
+    // don't free output_utf8 - assigned to char_buffer!
   } else {
     // compliant app or unpatched ibus
-    g_message("%s: Outputing %s", __FUNCTION__, output_utf8);
+    g_message("%s: Outputing %s", __FUNCTION__, debug = debug_utf8_with_codepoints(output_utf8));
     commit_string(keyman, output_utf8);
     g_free(output_utf8);
   }
@@ -740,8 +760,8 @@ ibus_keyman_engine_process_key_event(
 
   g_message("-----------------------------------------------------------------------------------------------------------------");
   g_message(
-      "DAR: %s - keyval=0x%02x keycode=0x%02x, state=0x%02x, isKeyDown=%d, supports_prefilter=%d", __FUNCTION__, keyval, keycode,
-      state, isKeyDown, client_supports_prefilter(engine));
+      "DAR: %s - keyval=0x%02x keycode=0x%02x, state=0x%02x, isKeyDown=%d, supports_prefilter=%d, compliant=%d", __FUNCTION__, keyval, keycode,
+      state, isKeyDown, client_supports_prefilter(engine), client_supports_surrounding_text(engine));
 
   // This keycode is a fake keycode that we send when it's time to commit the text, ensuring the
   // correct output order of backspace and text.
