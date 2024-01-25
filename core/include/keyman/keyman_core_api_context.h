@@ -92,7 +92,7 @@ km_core_state_get_intermediate_context(km_core_state *state, km_core_context_ite
 ##### Description:
 Free the allocated memory belonging to a `km_core_context_item` array previously
 returned by `km_core_state_get_intermediate_context` (internally, also
-`context_items_from_utf16` and `context_get`)
+`context_items_from_utf16` and `km_core_context_get`)
 ##### Parameters:
 - __context_items__: A pointer to the start of the `km_core_context_item` array
     to be disposed of.
@@ -181,6 +181,41 @@ or 0 if `context_items` is null.
 KMN_API
 size_t
 km_core_context_item_list_size(km_core_context_item const *context_items);
+
+/**
+ *
+ * Copies all items in the context into a new array and returns the new array.
+ * This must be disposed of by caller using `km_core_context_items_dispose`.
+ *
+ * @return km_core_status
+ *         * `KM_CORE_STATUS_OK`: On success.
+ *         * `KM_CORE_STATUS_INVALID_ARGUMENT`: If non-optional parameters are
+ *           null.
+ *         * `KM_CORE_STATUS_NO_MEM`: In the event not enough memory can be
+ *           allocated for the output buffer.
+ *
+ * @param context       A pointer to an opaque context object
+ * @param out           A pointer to the result variable: A pointer to the start
+ *                      of the `km_core_context_item` array containing a copy of
+ *                      the context. Terminated with a type of `KM_CORE_CT_END`.
+ *                      Must be disposed of with
+ *                      `km_core_context_items_dispose`.
+ */
+KMN_API
+km_core_status
+km_core_context_get(km_core_context const *context,
+                   km_core_context_item **out);
+
+/**
+ * Return the number of items in the context.
+ *
+ * @return size_t The number of items in the context, and will return 0 if
+ *                passed a null `context` pointer.
+ * @param context A pointer to an opaque context object
+*/
+KMN_API
+size_t
+km_core_context_length(km_core_context *);
 
 #if defined(__cplusplus)
 } // extern "C"

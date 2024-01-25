@@ -244,7 +244,7 @@ run_test(const km::core::path &source, const km::core::path &compiled) {
     // Compare context and text store at each step
     // should be identical unless an action has caused the context to be invalidated
     size_t n = 0;
-    try_status(context_get(km_core_state_context(test_state), &citems));
+    try_status(km_core_context_get(km_core_state_context(test_state), &citems));
     try_status(context_items_to_utf16(citems, nullptr, &n));
     km_core_cp *core_context_str = new km_core_cp[n];
     try_status(context_items_to_utf16(citems, core_context_str, &n));
@@ -271,7 +271,7 @@ run_test(const km::core::path &source, const km::core::path &compiled) {
 
   // Compare final output - retrieve internal context
   size_t n = 0;
-  try_status(context_get(km_core_state_context(test_state), &citems));
+  try_status(km_core_context_get(km_core_state_context(test_state), &citems));
   try_status(context_items_to_utf16(citems, nullptr, &n));
   km_core_cp *core_context_str = new km_core_cp[n];
   try_status(context_items_to_utf16(citems, core_context_str, &n));

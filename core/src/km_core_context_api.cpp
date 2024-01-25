@@ -153,7 +153,7 @@ km_core_status km_core_context_set(km_core_context *ctxt, km_core_context_item c
 }
 
 
-km_core_status context_get(km_core_context const *ctxt,
+km_core_status km_core_context_get(km_core_context const *ctxt,
                                  km_core_context_item **out_ptr)
 {
   assert(ctxt); assert(out_ptr);
@@ -184,7 +184,7 @@ void km_core_context_clear(km_core_context *ctxt)
 }
 
 
-size_t context_length(km_core_context *ctxt)
+size_t km_core_context_length(km_core_context *ctxt)
 {
   assert(ctxt);
   return ctxt ? ctxt->size() : 0;

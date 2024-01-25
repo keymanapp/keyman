@@ -199,7 +199,7 @@ verify_context(std::u16string& text_store, km_core_state* &test_state, std::vect
       // Compare context and text store at each step - should be identical
     size_t n = 0;
     km_core_context_item* citems = nullptr;
-    try_status(context_get(km_core_state_context(test_state), &citems));
+    try_status(km_core_context_get(km_core_state_context(test_state), &citems));
     try_status(context_items_to_utf16(citems, nullptr, &n));
     km_core_cp *buf = new km_core_cp[n];
     try_status(context_items_to_utf16(citems, buf, &n));
