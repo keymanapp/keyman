@@ -1,5 +1,12 @@
 # Keyman Version History
 
+## 17.0.252 alpha 2024-01-25
+
+* fix(common): ldml: fix typo in kmc error message (#10484)
+* chore(developer): `--enable-source-maps` parameter for kmc wrapper (#10496)
+* fix(android/engine): Fix OSK widths (#10442)
+*  (#10508)
+
 ## 17.0.251 alpha 2024-01-24
 
 * chore(developer): upgrade ngrok to v3 (#10359)
