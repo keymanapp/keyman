@@ -232,6 +232,10 @@ function km_core_state_context(
   state: pkm_core_state
 ): pkm_core_context; cdecl; external keymancore delayed;
 
+function km_core_state_app_context(
+  state: pkm_core_state
+): pkm_core_context; cdecl; external keymancore delayed;
+
 function km_core_state_action_items(
   state: pkm_core_state;
   num_items: pinteger
