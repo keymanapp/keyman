@@ -704,25 +704,32 @@ export class SuggestionBanner extends Banner {
       minWidth: 0,
     }
 
-    let totalWidth = 0;
-    let displayCount = 0;
-
-    let collapsedOptions: BannerSuggestion[] = [];
-
     for (let i=0; i<SuggestionBanner.SUGGESTION_LIMIT; i++) {
       const d = this.options[i];
 
       if(suggestions.length > i) {
         const suggestion = suggestions[i];
         d.update(suggestion, optionFormat);
-        if(d.collapsedWidth < d.expandedWidth) {
-          collapsedOptions.push(d);
-        }
-
-        totalWidth += d.collapsedWidth;
-        displayCount++;
       } else {
         d.update(null, optionFormat);
+      }
+    }
+
+    this.refreshLayout();
+  }
+
+  readonly refreshLayout = () => {
+    let collapsedOptions: BannerSuggestion[] = [];
+    let totalWidth = 0;
+
+    let displayCount = Math.min(this.currentSuggestions.length, 8);
+    for(let i=0; i < displayCount; i++) {
+      const opt = this.options[i];
+      opt.minWidth = 0; // remove any previously-applied padding
+      totalWidth += opt.collapsedWidth;
+
+      if(opt.collapsedWidth < opt.expandedWidth) {
+        collapsedOptions.push(opt);
       }
     }
 

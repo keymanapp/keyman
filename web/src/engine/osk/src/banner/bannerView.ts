@@ -142,5 +142,6 @@ export class BannerView implements OSKViewComponent {
   }
 
   public refreshLayout() {
+    this.currentBanner.refreshLayout?.();
   }
 }
