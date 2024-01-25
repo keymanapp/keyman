@@ -112,5 +112,7 @@ export abstract class Banner {
    */
   public configureForKeyboard(keyboard: Keyboard, keyboardProperties: KeyboardProperties) { }
 
+  public readonly refreshLayout?: () => void;
+
   abstract get type();
 }
