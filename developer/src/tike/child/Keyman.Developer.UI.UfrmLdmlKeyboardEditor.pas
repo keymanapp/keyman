@@ -46,6 +46,7 @@ uses
   Keyman.Developer.System.Project.xmlLdmlProjectFile,
   Keyman.Developer.UI.Project.ProjectFileUI,
   Keyman.Developer.UI.Project.xmlLdmlProjectFileUI,
+  TextFileFormat,
   UfrmMessages;
 
 {$R *.dfm}
@@ -55,6 +56,7 @@ uses
 procedure TfrmLdmlKeyboardEditor.FormCreate(Sender: TObject);
 begin
   inherited;
+  EditorFormat := efXML;
   SetupDebugForm;
 end;
 
