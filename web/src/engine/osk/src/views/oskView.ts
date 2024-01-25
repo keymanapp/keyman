@@ -627,6 +627,7 @@ export default abstract class OSKView
     if(!pending) {
       this.headerView?.refreshLayout();
       this.bannerView.width = this.computedWidth;
+      this.bannerView.refreshLayout();
       this.footerView?.refreshLayout();
     }
 
@@ -652,10 +653,6 @@ export default abstract class OSKView
       bs.width  = 'auto';
       bs.height = 'auto';
       bs.maxWidth = bs.maxHeight = '';
-    }
-
-    if(!pending) {
-      this.bannerView.refreshLayout();
     }
   }
 
