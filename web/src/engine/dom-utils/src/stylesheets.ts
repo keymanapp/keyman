@@ -145,25 +145,12 @@ export class StylesheetManager {
         source = "url('"+ttf+"') format('truetype')";
       }
     } else {
-      if(os == DeviceSpec.OperatingSystem.Android) {
-        // Android 4.2 and 4.3 have bugs in their rendering for some scripts
-        // with embedded ttf or woff.  svg mostly works so is a better initial
-        // choice on the Android browser.
-        if(woff != '') {
-          source = "url('"+woff+"') format('woff')";
-        }
+      if(woff != '') {
+        source = "url('"+woff+"') format('woff')";
+      }
 
-        if(ttf != '') {
-          source = "url('"+ttf+"') format('truetype')";
-        }
-      } else {
-        if(woff != '') {
-          source = "url('"+woff+"') format('woff')";
-        }
-
-        if(ttf != '') {
-          source = "url('"+ttf+"') format('truetype')";
-        }
+      if(ttf != '') {
+        source = "url('"+ttf+"') format('truetype')";
       }
     }
 
