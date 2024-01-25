@@ -42,6 +42,7 @@ import KeyTip from './keytip.interface.js';
 import OSKKey from './keyboard-layout/oskKey.js';
 import OSKLayer from './keyboard-layout/oskLayer.js';
 import OSKLayerGroup from './keyboard-layout/oskLayerGroup.js';
+import OSKView from './views/oskView.js';
 import { LengthStyle, ParsedLengthStyle } from './lengthStyle.js';
 import { defaultFontSize, getFontSizeStyle } from './fontSizeUtils.js';
 import PhoneKeyTip from './input/gestures/browser/keytip.js';
@@ -59,6 +60,7 @@ import Modipress from './input/gestures/browser/modipress.js';
 import Flick, { buildFlickScroller } from './input/gestures/browser/flick.js';
 import { GesturePreviewHost } from './keyboard-layout/gesturePreviewHost.js';
 import OSKBaseKey from './keyboard-layout/oskBaseKey.js';
+import { OSKResourcePathConfiguration } from './index.js';
 
 interface KeyRuleEffects {
   contextToken?: number,
@@ -1406,7 +1408,14 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
    *                                              (currently required for legacy reasons)
    *  @return {Object}                            DIV object with filled keyboard layer content
    */
-  static buildDocumentationKeyboard(PKbd: Keyboard, kbdProperties: KeyboardProperties, fontRootPath: string, argFormFactor: DeviceSpec.FormFactor, argLayerId, height: number): HTMLElement { // I777
+  static buildDocumentationKeyboard(
+    PKbd: Keyboard,
+    kbdProperties: KeyboardProperties,
+    pathConfig: OSKResourcePathConfiguration,
+    argFormFactor: DeviceSpec.FormFactor,
+    argLayerId,
+    height: number
+  ): HTMLElement { // I777
     if (!PKbd) {
       return null;
     }
@@ -1438,12 +1447,9 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
       hostDevice: deviceSpec,
       isStatic: true,
       topContainer: null,
-      pathConfig: {
-        fonts: fontRootPath,
-        resources: '' // ignored
-      },
+      pathConfig: pathConfig,
       styleSheetManager: null
-    }); //
+    });
 
     kbdObj.layerGroup.element.className = kbdObj.kbdDiv.className; // may contain multiple classes
     kbdObj.layerGroup.element.classList.add(device.formFactor + '-static');
@@ -1468,11 +1474,10 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
       // the Web OSK-Core design.
       kbdObj.setSize(800, height); // Probably need something for width, too, rather than
       kbdObj.fontSize = defaultFontSize(deviceSpec, height, false);
+      classWrapper.style.fontSize = kbdObj.element.style.fontSize;
 
       // assuming 100%.
       kbdObj.refreshLayout(); // Necessary for the row heights to be properly set!
-      // Relocates the font size definition from the main VisualKeyboard wrapper, since we don't return the whole thing.
-      kbd.style.fontSize = kbdObj.kbdDiv.style.fontSize;
       kbd.style.height = kbdObj.kbdDiv.style.height;
       kbd.style.maxHeight = kbdObj.kbdDiv.style.maxHeight;
     } else {
@@ -1484,39 +1489,58 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
     kbdObj.updateState(); // double-ensure that the 'default' layer is properly displayed.
 
     // Once the element is inserted into the DOM, refresh the layout so that proper text scaling may apply.
-    const detectAndHandleInsertion = () => {
+    const detectAndHandleInsertion = async () => {
       if(document.contains(kbd)) {
         // Yay, insertion!
 
         try {
-          // Are there font-size attributes we may safely adjust?  If so, do that!
-          if(getComputedStyle(kbd) && kbd.style.fontSize) {
-            kbdObj.fontSize = new ParsedLengthStyle(kbd.style.fontSize);
+          // Wait for full loading/connection before manipulating stylesheet locations.
+          await kbdObj.styleSheetManager.allLoadedPromise();
+
+          const mainSheet = kbdObj.styleSheet;
+          if(mainSheet) {
+            kbd.appendChild(mainSheet);
           }
 
-          // Make sure that the stylesheet is attached, now that the keyboard-doc's been inserted.
-          // The stylesheet is currently built + constructed in the same code that attaches it to
-          // the page.
-          kbdObj.appendStyleSheet();
+          // Unlinking sheets will mutate the original array; make a backup
+          // copy of the array to iterate over.
+          const sheets = [].concat(kbdObj.styleSheetManager.sheets);
 
-          // Grab a reference to the stylesheet.
-          const stylesheet = kbdObj.styleSheet;
-          const stylesheetParentElement = stylesheet.parentElement;
+          /*
+           * Re-attach the font stylesheets... to the <head> element.
+           * They need re-attachment for the fonts to work properly for inactive keyboards.
+           *
+           * For future reference:  as of early 2024, Chrome does not support
+           * @font-face style declaration within Shadow DOM elements. The
+           * declaration needs to be part of the main HTML doc.
+           *
+           * References:
+           * - https://stackoverflow.com/q/63710162
+           * - https://github.com/mdn/interactive-examples/issues/887#issuecomment-432418008
+           */
+          for(let sheet of sheets) {
+            if(sheet == mainSheet) {
+              // Don't need to relocate the custom stylesheet.
+              continue;
+            } else if(sheet.href) {
+              // Don't relocate kmwosk.css or similar.
+              continue;
+            }
+            kbdObj.styleSheetManager.unlink(sheet);
+            document.head.appendChild(sheet);
+          }
 
-          // Don't reset top-level stuff; just the visible layer.
-          // kbdObj.currentLayer.refreshLayout(kbdObj, kbdObj.height);
+          // // Should we ever remove ALL related stylesheets during .shutdown()...
+          // kbdObj.config.styleSheetManager = new StylesheetManager(kbdObj.element);
 
           // We refresh the full layout so that font-size is properly detected & stored
           // on the documentation keyboard.
           kbdObj.refreshLayout();
-          kbd.style.fontSize = kbdObj.kbdDiv.style.fontSize;
 
           // We no longer need a reference to the constructing VisualKeyboard, so we should let
           // it clean up its <head> stylesheet links.  This detaches the stylesheet, though.
+          kbdObj.styleSheet = null; // is directly checked in shutdown; prevent removal.
           kbdObj.shutdown();
-
-          // Now that shutdown is done, re-attach the stylesheet - but to the layer group.
-          kbd.appendChild(stylesheet);
         } finally {
           insertionObserver.disconnect();
         }
@@ -1529,7 +1553,22 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
       subtree: true
     });
 
+    // Ensure the main keyboard root is the first child element of the top-level div.
     classWrapper.append(kbd);
+
+    // Ensure that the OSK's style-sheet is included by the top-level div standing in for the OSKView.
+    for(let sheetFile of OSKView.STYLESHEET_FILES) {
+      const sheetHref = `${pathConfig.resources}/osk/${sheetFile}`;
+      const sheet = kbdObj.styleSheetManager.linkExternalSheet(sheetHref, true);
+      sheet.parentNode.removeChild(sheet);
+      classWrapper.appendChild(sheet);
+    }
+
+    // Make sure that the stylesheet is attached, now that the keyboard-doc's been inserted.
+    // The stylesheet is currently built + constructed in the same code that attaches it to
+    // the page.
+    kbdObj.appendStyleSheet();
+
     return classWrapper;
   }
 

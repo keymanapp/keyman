@@ -679,7 +679,7 @@ export default class KeymanEngine extends KeymanEngineBase<BrowserConfiguration,
     return VisualKeyboard.buildDocumentationKeyboard(
       PKbd,
       Pstub,
-      this.config.paths.fonts,
+      this.config.paths,
       argFormFactor,
       argLayerId,
       targetHeight

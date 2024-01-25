@@ -198,7 +198,7 @@ export default abstract class OSKView
   private mouseEnterPromise?: ManagedPromise<void>;
   private touchEventPromiseManager = new TouchEventPromiseMap();
 
-  private static readonly STYLESHEET_FILES = ['kmwosk.css', 'globe-hint.css'];
+  static readonly STYLESHEET_FILES = ['kmwosk.css', 'globe-hint.css'];
 
   constructor(configuration: Configuration) {
     super();
