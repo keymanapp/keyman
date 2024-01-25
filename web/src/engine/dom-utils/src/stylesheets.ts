@@ -6,9 +6,14 @@ type FontFamilyStyleMap = {[family: string]: HTMLStyleElement};
 export class StylesheetManager {
   private fontStyleDefinitions: { [os: string]: FontFamilyStyleMap} = {};
   private linkedSheets: HTMLStyleElement[] = [];
+  private fontPromises: Promise<FontFace>[] = [];
   private doCacheBusting: boolean;
 
   public readonly linkNode: Node;
+
+  public get sheets(): readonly HTMLStyleElement[] {
+    return this.linkedSheets;
+  }
 
   public constructor(linkNode?: Node, doCacheBusting?: boolean) {
     if(!linkNode) {
@@ -32,12 +37,16 @@ export class StylesheetManager {
    * Provides a `Promise` that resolves when all currently-linked stylesheets have loaded.
    * Any change to the set of linked sheets after the initial call will be ignored.
    */
-  async allLoadedPromise() {
+  async allLoadedPromise(): Promise<void> {
     const promises: Promise<void>[] = [];
 
     for(const sheetElem of this.linkedSheets) {
       // Based on https://stackoverflow.com/a/21147238
       if(sheetElem.sheet?.cssRules) {
+        promises.push(Promise.resolve());
+      } else if(sheetElem.innerHTML) {
+        // NOT at the StackOverflow link, but something I found experimentally.
+        // Needed for live-constructed sheets with no corresponding file.
         promises.push(Promise.resolve());
       } else {
         const promise = new ManagedPromise<void>();
@@ -46,7 +55,17 @@ export class StylesheetManager {
       }
     }
 
-    await Promise.all(promises);
+    const allPromises = promises.concat(this.fontPromises as Promise<any>[]);
+    if(Promise.allSettled) {
+      // allSettled - Chrome 76 / Safari 13
+      // Delays for settling (either then OR catch) for ALL promises.
+      await Promise.allSettled(allPromises)
+    } else {
+      // all - Chrome 32
+      // If an error happens, .all instantly resolves regardless of state of
+      // other Promises.
+      await Promise.all(allPromises);
+    }
   }
 
   /**
@@ -67,6 +86,7 @@ export class StylesheetManager {
     }
 
     const fontKey = fd.family;
+    let source: string;
 
     let i, ttf='', woff='', eot='', svg='', fList=[];
 
@@ -132,9 +152,7 @@ export class StylesheetManager {
         if(this.doCacheBusting) {
           ttf = this.cacheBust(ttf);
         }
-        s=s+'src:url(\''+ttf+'\') format(\'truetype\');';
-      } else {
-        return null;
+        source = "url('"+ttf+"') format('truetype')";
       }
     } else {
       var s0 = [];
@@ -144,41 +162,54 @@ export class StylesheetManager {
         // with embedded ttf or woff.  svg mostly works so is a better initial
         // choice on the Android browser.
         if(svg != '') {
-          s0.push("url('"+svg+"') format('svg')");
+          source = "url('"+svg+"') format('svg')";
         }
 
         if(woff != '') {
-          s0.push("url('"+woff+"') format('woff')");
+          source = "url('"+woff+"') format('woff')";
         }
 
         if(ttf != '') {
-          s0.push("url('"+ttf+"') format('truetype')");
+          source = "url('"+ttf+"') format('truetype')";
         }
       } else {
         if(woff != '') {
-          s0.push("url('"+woff+"') format('woff')");
+          source = "url('"+woff+"') format('woff')";
         }
 
         if(ttf != '') {
-          s0.push("url('"+ttf+"') format('truetype')");
+          source = "url('"+ttf+"') format('truetype')";
         }
 
         if(svg != '') {
-          s0.push("url('"+svg+"') format('svg')");
+          source = "url('"+svg+"') format('svg')";
         }
       }
-
-      if(s0.length == 0) {
-        return null;
-      }
-
-      s += 'src:'+s0.join(',')+';';
     }
+
+    if(!source) {
+      return null;
+    }
+
+    s += 'src:'+source+';';
 
     s=s+'\n}\n';
 
     const sheet = createStyleSheet(s);
     fontStyleMap[fontKey] = sheet;
+
+    /* https://developer.mozilla.org/en-US/docs/Web/API/CSS_Font_Loading_API
+     * Compat:  Chrome 35... _just_ on the unupdated-Android 5.0 threshold.
+     *
+     * Note:  this could probably wholesale-replace the stylesheet!
+     * Would need: `document.fonts.add(fontFace)` - does not have to wait for the load() Promise.
+     *
+     * For now, we're using this solely to detect when the font has been succesfully loaded.
+     */
+    const fontFace = new FontFace(fd.family, source);
+    const loadPromise = fontFace.load();
+    this.fontPromises.push(loadPromise);
+    loadPromise.then(() => this.fontPromises = this.fontPromises.filter((entry) => entry != loadPromise));
 
     this.linkStylesheet(sheet);
 
@@ -197,15 +228,15 @@ export class StylesheetManager {
    *
    * @param   {string}  href   path to stylesheet file
    */
-  linkExternalSheet(href: string): void {
+  linkExternalSheet(href: string, force?: boolean): HTMLStyleElement {
     try {
-      if(document.querySelector("link[href="+JSON.stringify(href)+"]") != null) {
+      if(!force && document.querySelector("link[href="+JSON.stringify(href)+"]") != null) {
         // We've already linked this stylesheet, don't do it again
-        return;
+        return null;
       }
     } catch(e) {
       // We've built an invalid href, somehow?
-      return;
+      return null;
     }
 
     const linkElement=document.createElement('link');
@@ -214,6 +245,7 @@ export class StylesheetManager {
     linkElement.href=href;
 
     this.linkStylesheet(linkElement);
+    return linkElement;
   }
 
   public unlink(stylesheet: HTMLStyleElement) {
