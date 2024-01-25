@@ -724,6 +724,10 @@ export class SuggestionBanner extends Banner {
 
     let displayCount = Math.min(this.currentSuggestions.length, 8);
     for(let i=0; i < displayCount; i++) {
+      // Note:  options is an array of pre-built suggestion-hosting elements, with
+      // fixed SUGGESTIONS_LIMIT length - not a length that dynamically changes to
+      // match the number of suggestions available.  Those without a suggestion
+      // are hidden, but preserved.
       const opt = this.options[i];
       opt.minWidth = 0; // remove any previously-applied padding
       totalWidth += opt.collapsedWidth;
