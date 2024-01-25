@@ -1359,11 +1359,10 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
       customStyle = customStyle + activeKeyboard.oskStyling;
 
     this.styleSheet = createStyleSheet(customStyle); //Build 360
-    this.styleSheet.addEventListener('load', () => {
-      // Once any related fonts are loaded, we can re-adjust key-cap scaling.
-      this.refreshLayout();
-    })
     this.styleSheetManager.linkStylesheet(this.styleSheet);
+
+    // Once any related fonts are loaded, we can re-adjust key-cap scaling.
+    this.styleSheetManager.allLoadedPromise().then(() => this.refreshLayout());
   }
 
   /**
