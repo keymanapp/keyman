@@ -13,7 +13,7 @@
 #include <utility>
 #include <vector>
 
-#include <keyman/keyman_core_api.h>
+#include "keyman_core.h"
 
 namespace km {
 namespace core {

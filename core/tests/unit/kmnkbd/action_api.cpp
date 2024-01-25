@@ -6,7 +6,7 @@
   History:      23 Oct 2023 - MCD - Initial implementation.
 */
 #include <string>
-#include <keyman/keyman_core_api.h>
+#include "keyman_core.h"
 
 #include "path.hpp"
 #include "action.hpp"

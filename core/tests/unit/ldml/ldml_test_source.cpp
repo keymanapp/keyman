@@ -33,15 +33,9 @@
 #include "ldml_test_source.hpp"
 #include "ldml_test_utils.hpp"
 
-#if defined(HAVE_ICU4C)
-// TODO-LDML: Needed this for some compiler warnings
-#define U_FALLTHROUGH
-#include "unicode/utypes.h"
+#include "core_icu.h"
 #include "unicode/uniset.h"
 #include "unicode/usetiter.h"
-#else
-#error icu4c is required for this test
-#endif
 
 #define assert_or_return(expr) if(!(expr)) { \
   std::wcerr << __FILE__ << ":" << __LINE__ << ": " << \
