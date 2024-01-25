@@ -1033,6 +1033,8 @@ test_normalize() {
   return EXIT_SUCCESS;
 }
 
+#include <unicode/uchar.h>
+
 #define NFD_FILE "common/web/types/src/ldml-keyboard/nfd-table.ts"
 int
 write_nfd_table() {
@@ -1051,9 +1053,17 @@ write_nfd_table() {
 
   fprintf(f, "export const nfdNoBoundaryBefore = [\n");
   for (km_core_usv ch = 0; ch < 0x10FFFF; ch++) {
-    auto bb = nfd->hasBoundaryBefore(ch);
+    bool bb = nfd->hasBoundaryBefore(ch);
+    icu::UnicodeString s;
+    s.append((UChar32)ch);
+    bool lccc = nfd->isNormalized(s, status) && u_getCombiningClass(ch) == 0;
+    assert(U_SUCCESS(status));
+    if (bb != lccc) {
+      printf("0x%04x - bb=%s but lccc=%s\n", (unsigned int)ch, bb ? "y" : "n", lccc ? "y" : "n");
+    }
+    assert(bb == lccc);
     if (bb) continue;
-    fprintf(f, "  0x%04x,\n", ch);
+    fprintf(f, "  0x%04x,\n", (unsigned int)ch);
   }
   fprintf(f, "];\n\n");
   fclose(f);
