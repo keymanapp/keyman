@@ -1401,10 +1401,12 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
    * Create copy of the OSK that can be used for embedding in documentation or help
    * The currently active keyboard will be returned if PInternalName is null
    *
-   *  @param  {Object}            PKbd            the keyboard object to be displayed
-   *  @param  {string=}           argFormFactor   layout form factor, defaulting to 'desktop'
-   *  @param  {(string|number)=}  argLayerId      name or index of layer to show, defaulting to 'default'
-   *  @param  {number}            height          Target height for the rendered keyboard
+   *  @param  {Keyboard}           PKbd            the keyboard object to be displayed
+   *  @param  {KeyboardProperties} kbdProperties   the metadata stub for the keyboard
+   *  @param  {Object}             pathConfig      an OSK path-configuration instance
+   *  @param  {string=}            argFormFactor   layout form factor, defaulting to 'desktop'
+   *  @param  {(string|number)=}   argLayerId      name or index of layer to show, defaulting to 'default'
+   *  @param  {number}             height          Target height for the rendered keyboard
    *                                              (currently required for legacy reasons)
    *  @return {Object}                            DIV object with filled keyboard layer content
    */
@@ -1413,7 +1415,7 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
     kbdProperties: KeyboardProperties,
     pathConfig: OSKResourcePathConfiguration,
     argFormFactor: DeviceSpec.FormFactor,
-    argLayerId,
+    argLayerId: string,
     height: number
   ): HTMLElement { // I777
     if (!PKbd) {
