@@ -1998,6 +1998,17 @@ public final class KMManager {
     KMKeyboard.removeOnKeyboardEventListener(listener);
   }
 
+  public static int getOrientation(Context context) {
+    Display display = ((WindowManager) context.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
+    int rotation = display.getRotation();
+    if (rotation == Surface.ROTATION_0 || rotation == Surface.ROTATION_180) {
+      return Configuration.ORIENTATION_PORTRAIT;
+    } else if (rotation == Surface.ROTATION_90 || rotation == Surface.ROTATION_270) {
+      return Configuration.ORIENTATION_LANDSCAPE;
+    }
+    return Configuration.ORIENTATION_UNDEFINED;
+  }
+
   public static int getBannerHeight(Context context) {
     int bannerHeight = 0;
     if (InAppKeyboard != null && InAppKeyboard.getBanner() != BannerType.BLANK) {
@@ -2012,11 +2023,10 @@ public final class KMManager {
     int defaultHeight = (int) context.getResources().getDimension(R.dimen.keyboard_height);
     SharedPreferences prefs = context.getSharedPreferences(context.getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
 
-    Display display = ((WindowManager) context.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
-    int rotation = display.getRotation();
-    if (rotation == Surface.ROTATION_0 || rotation == Surface.ROTATION_180) {
+    int orientation = getOrientation(context);
+    if (orientation == Configuration.ORIENTATION_PORTRAIT) {
       return prefs.getInt(KMManager.KMKey_KeyboardHeightPortrait, defaultHeight);
-    } else if (rotation == Surface.ROTATION_90 || rotation == Surface.ROTATION_270) {
+    } else if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
       return prefs.getInt(KMManager.KMKey_KeyboardHeightLandscape, defaultHeight);
     }
 
