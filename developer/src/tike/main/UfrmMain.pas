@@ -992,6 +992,13 @@ begin
     if AShow then
       // Move the form below the splitter
       (ActiveEditor as TfrmKeymanWizard).panDebugHost.Top := ActiveEditor.ClientHeight;
+  end
+  else if ActiveEditor is TfrmLdmlKeyboardEditor then
+  begin
+    (ActiveEditor as TfrmLdmlKeyboardEditor).panDebugHost.Visible := AShow;
+    if AShow then
+      // Move the form below the splitter
+      (ActiveEditor as TfrmLdmlKeyboardEditor).panDebugHost.Top := ActiveEditor.ClientHeight;
   end;
 //  if Assigned(frmDebugStatus) then frmDebugStatus.Visible := AShow;
   panDebugToolbar.Visible := AShow;

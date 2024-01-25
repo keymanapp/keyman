@@ -135,6 +135,7 @@ uses
   Keyman.System.Debug.DebugUIStatus,
   Keyman.Developer.System.Project.kmnProjectFile,
   Keyman.Developer.UI.Project.kmnProjectFileUI,
+  Keyman.Developer.UI.UfrmLdmlKeyboardEditor,
   UfrmKeymanWizard,
   UfrmDebug,
   UfrmDebugStatus,
@@ -146,6 +147,13 @@ function ActiveKmnKeyboardEditor: TfrmKeymanWizard;
 begin
   if Assigned(frmKeymanDeveloper.ActiveChild) and (frmKeymanDeveloper.ActiveChild is TfrmKeymanWizard)
     then Result := frmKeymanDeveloper.ActiveChild as TfrmKeymanWizard
+    else Result := nil;
+end;
+
+function ActiveLdmlKeyboardEditor: TfrmLdmlKeyboardEditor;
+begin
+  if Assigned(frmKeymanDeveloper.ActiveChild) and (frmKeymanDeveloper.ActiveChild is TfrmLdmlKeyboardEditor)
+    then Result := frmKeymanDeveloper.ActiveChild as TfrmLdmlKeyboardEditor
     else Result := nil;
 end;
 
@@ -181,6 +189,7 @@ end;
 
 procedure TmodActionsDebugger.actDebugDebuggerModeUpdate(Sender: TObject);
 begin
+  actDebugDebuggerMode.Enabled := (ActiveKmnKeyboardEditor <> nil);
   actDebugDebuggerMode.Checked := (ActiveKmnKeyboardEditor <> nil) and (ActiveKmnKeyboardEditor.DebugForm.UIStatus <> duiTest);
 end;
 
@@ -271,12 +280,19 @@ end;
 
 procedure TmodActionsDebugger.actDebugStartDebuggerExecute(Sender: TObject);
 begin
-  ActiveKmnKeyboardEditor.StartDebugging;
+  if ActiveKmnKeyboardEditor <> nil then
+    ActiveKmnKeyboardEditor.StartDebugging
+  else
+    ActiveLdmlKeyboardEditor.StartDebugging;
 end;
 
 procedure TmodActionsDebugger.actDebugStartDebuggerUpdate(Sender: TObject);
 begin
-  actDebugStartDebugger.Enabled := (ActiveKmnKeyboardEditor <> nil) and not ActiveKmnKeyboardEditor.IsDebugVisible;
+  actDebugStartDebugger.Enabled := (
+    (ActiveKmnKeyboardEditor <> nil) and not ActiveKmnKeyboardEditor.IsDebugVisible
+   ) or (
+    (ActiveLdmlKeyboardEditor <> nil) and not ActiveLdmlKeyboardEditor.IsDebugVisible
+   );
 end;
 
 procedure TmodActionsDebugger.actDebugStepForwardExecute(Sender: TObject);
@@ -293,25 +309,38 @@ end;
 procedure TmodActionsDebugger.actDebugStopDebuggerExecute(
   Sender: TObject);
 begin
-  ActiveKmnKeyboardEditor.StopDebugging;
+  if ActiveKmnKeyboardEditor <> nil then
+    ActiveKmnKeyboardEditor.StopDebugging
+  else
+    ActiveLdmlKeyboardEditor.StopDebugging;
 end;
 
 procedure TmodActionsDebugger.actDebugStopDebuggerUpdate(Sender: TObject);
 begin
-  actDebugStopDebugger.Enabled := (ActiveKmnKeyboardEditor <> nil) and ActiveKmnKeyboardEditor.IsDebugVisible;
+  actDebugStopDebugger.Enabled :=
+    ((ActiveKmnKeyboardEditor <> nil) and ActiveKmnKeyboardEditor.IsDebugVisible) or
+    ((ActiveLdmlKeyboardEditor <> nil) and ActiveLdmlKeyboardEditor.IsDebugVisible);
 end;
 
 procedure TmodActionsDebugger.actDebugSwitchToDebuggerWindowExecute(
   Sender: TObject);
 begin
-  ActiveKmnKeyboardEditor.DebugForm.SetFocus;
+  if ActiveKmnKeyboardEditor <> nil then
+    ActiveKmnKeyboardEditor.DebugForm.SetFocus
+  else
+    ActiveLdmlKeyboardEditor.DebugForm.SetFocus;
 end;
 
 procedure TmodActionsDebugger.actDebugSwitchToDebuggerWindowUpdate(
   Sender: TObject);
 begin
-  actDebugSwitchToDebuggerWindow.Enabled := (ActiveKmnKeyboardEditor <> nil) and ActiveKmnKeyboardEditor.IsDebugVisible and
-    ((Screen.ActiveControl = nil) or (Screen.ActiveControl.Owner <> ActiveKmnKeyboardEditor.DebugForm));
+  actDebugSwitchToDebuggerWindow.Enabled := (
+    (ActiveKmnKeyboardEditor <> nil) and ActiveKmnKeyboardEditor.IsDebugVisible and
+    ((Screen.ActiveControl = nil) or (Screen.ActiveControl.Owner <> ActiveKmnKeyboardEditor.DebugForm))
+   ) or (
+    (ActiveLdmlKeyboardEditor <> nil) and ActiveLdmlKeyboardEditor.IsDebugVisible and
+    ((Screen.ActiveControl = nil) or (Screen.ActiveControl.Owner <> ActiveLdmlKeyboardEditor.DebugForm))
+   );
 end;
 
 procedure TmodActionsDebugger.actDebugTestModeExecute(Sender: TObject);

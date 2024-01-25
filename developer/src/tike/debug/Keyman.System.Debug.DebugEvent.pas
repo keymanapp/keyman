@@ -93,6 +93,9 @@ type
       vk: uint16_t;
       modifier_state: uint16_t
     ): Boolean; overload;
+
+    function AddLdmlStateItems(state: pkm_core_state; vk,
+      modifier_state: uint16_t; debugkeyboard: TDebugKeyboard): Boolean;
   end;
 
 implementation
@@ -359,6 +362,36 @@ begin
   end;
 
   AddDebugItem(debug, debugkeyboard, vk, modifier_state);
+
+  if action._type = KM_CORE_IT_EMIT_KEYSTROKE then
+  begin
+    // The EMIT_KEYSTROKE action comes after all rules have completed processing
+    Result := Result and AddActionItem(vk, action);
+    Inc(action);
+  end;
+
+  // By the time we get to the end of rule processing, all actions should have
+  // already been undertaken
+  Assert(action._type = KM_CORE_IT_END);
+end;
+
+function TDebugEventList.AddLdmlStateItems(
+  state: pkm_core_state;
+  vk: uint16_t;
+  modifier_state: uint16_t;
+  debugkeyboard: TDebugKeyboard
+): Boolean;
+var
+  action: pkm_core_action_item;
+begin
+  // TODO: use action struct
+  Result := True;
+  action := km_core_state_action_items(state, nil);
+  while (action._type <> KM_CORE_IT_END) do
+  begin
+    Result := Result and AddActionItem(vk, action);
+    Inc(action);
+  end;
 
   if action._type = KM_CORE_IT_EMIT_KEYSTROKE then
   begin
