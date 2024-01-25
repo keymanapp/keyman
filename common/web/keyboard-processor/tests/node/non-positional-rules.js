@@ -11,7 +11,7 @@ import { NodeKeyboardLoader } from '@keymanapp/keyboard-processor/node-keyboard-
 // in the hardware-event-processing set; the output objects there should have the same format
 // as the event object inputs used here.
 
-describe.only('Engine - rule processing', function() {
+describe('Engine - rule processing', function() {
   const ipaPath = require.resolve('@keymanapp/common-test-resources/keyboards/sil_ipa.js');
   const armenianPath = require.resolve('@keymanapp/common-test-resources/keyboards/armenian.js');
 
@@ -118,10 +118,9 @@ describe.only('Engine - rule processing', function() {
     });
 
     it('matches rules with legacy-specced KeyEvents', () => {
-      // Note:  plain 'n' is produced from default key outputs for sil_ipa, not a keyboard rule.
       let mockLegacy = new Mock('');
       let legacyEvent = new KeyEvent({
-        // sil_ipa is a mnenomic keyboard:  it expects codes based on the key's standard character output.
+        // armenian is a KMW 1.0 keyboard:  it expects codes based on the key's standard character output.
         Lcode: 'a'.charCodeAt(0),
         Lmodifiers: 0,
         Lstates: Codes.modifierCodes.NO_CAPS | Codes.modifierCodes.NO_NUM_LOCK | Codes.modifierCodes.NO_SCROLL_LOCK,
@@ -139,10 +138,9 @@ describe.only('Engine - rule processing', function() {
     });
 
     it('ignores current modifiers and states', () => {
-      // Note:  plain 'n' is produced from default key outputs for sil_ipa, not a keyboard rule.
       let mockLegacy = new Mock('');
       let legacyEvent = new KeyEvent({
-        // sil_ipa is a mnenomic keyboard:  it expects codes based on the key's standard character output.
+        // armenian is a KMW 1.0 keyboard:  it expects codes based on the key's standard character output.
         Lcode: 'a'.charCodeAt(0),
         Lmodifiers: 27,
         Lstates: Codes.modifierCodes.CAPS | Codes.modifierCodes.NO_NUM_LOCK | Codes.modifierCodes.SCROLL_LOCK | 0x5C00,
@@ -160,10 +158,9 @@ describe.only('Engine - rule processing', function() {
     });
 
     it('does not match rules with mnemonic-specced KeyEvents', () => {
-      // Note:  plain 'n' is produced from default key outputs for sil_ipa, not a keyboard rule.
       let mockMnemonic = new Mock('');
       let mnemonicEvent = new KeyEvent({
-        // sil_ipa is a mnenomic keyboard:  it expects codes based on the key's standard character output.
+        // armenian is a KMW 1.0 keyboard:  it expects codes based on the key's standard character output.
         Lcode: 'a'.charCodeAt(0),
         Lmodifiers: 0,
         Lstates: Codes.modifierCodes.NO_CAPS | Codes.modifierCodes.NO_NUM_LOCK | Codes.modifierCodes.NO_SCROLL_LOCK,
