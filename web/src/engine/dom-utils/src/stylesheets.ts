@@ -142,15 +142,15 @@ export class StylesheetManager {
         if(this.doCacheBusting) {
           ttf = this.cacheBust(ttf);
         }
-        source = "url('"+ttf+"') format('truetype')";
+        source = "url('"+encodeURI(ttf)+"') format('truetype')";
       }
     } else {
       if(woff != '') {
-        source = "url('"+woff+"') format('woff')";
+        source = "url('"+encodeURI(woff)+"') format('woff')";
       }
 
       if(ttf != '') {
-        source = "url('"+ttf+"') format('truetype')";
+        source = "url('"+encodeURI(ttf)+"') format('truetype')";
       }
     }
 
@@ -176,7 +176,10 @@ export class StylesheetManager {
     const fontFace = new FontFace(fd.family, source);
     const loadPromise = fontFace.load();
     this.fontPromises.push(loadPromise);
-    loadPromise.then(() => this.fontPromises = this.fontPromises.filter((entry) => entry != loadPromise));
+
+    const clearPromise = () => this.fontPromises = this.fontPromises.filter((entry) => entry != loadPromise);
+    loadPromise.then(clearPromise);
+    loadPromise.catch(clearPromise);
 
     this.linkStylesheet(sheet);
 
