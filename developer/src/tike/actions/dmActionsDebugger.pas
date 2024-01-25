@@ -379,27 +379,45 @@ end;
 
 procedure TmodActionsDebugger.actDebugViewDefaultFontExecute(Sender: TObject);
 begin
-  ActiveKmnKeyboardEditor.DebugForm.UpdateFont(nil);
+  if ActiveKmnKeyboardEditor <> nil
+    then ActiveKmnKeyboardEditor.DebugForm.UpdateFont(nil)
+    else ActiveLdmlKeyboardEditor.DebugForm.UpdateFont(nil)
 end;
 
 procedure TmodActionsDebugger.actDebugViewDefaultFontUpdate(Sender: TObject);
 begin
   actDebugViewDefaultFont.Enabled := IsDebuggerVisible;
-  actDebugViewDefaultFont.Checked := actDebugViewDefaultFont.Enabled and
-    ActiveKmnKeyboardEditor.DebugForm.DefaultFont;
+  actDebugViewDefaultFont.Checked := actDebugViewDefaultFont.Enabled and (
+    ((ActiveKmnKeyboardEditor <> nil) and ActiveKmnKeyboardEditor.DebugForm.DefaultFont)
+  ) or (
+    ((ActiveLdmlKeyboardEditor <> nil) and ActiveLdmlKeyboardEditor.DebugForm.DefaultFont)
+  );
 end;
 
 procedure TmodActionsDebugger.actDebugViewFontExecute(Sender: TObject);
 begin
-  dlgFont.Font := ActiveKmnKeyboardEditor.DebugForm.memo.Font;
-  if dlgFont.Execute then
-    ActiveKmnKeyboardEditor.DebugForm.UpdateFont(dlgFont.Font);
+  if ActiveKmnKeyboardEditor <> nil then
+  begin
+    dlgFont.Font := ActiveKmnKeyboardEditor.DebugForm.memo.Font;
+    if dlgFont.Execute then
+      ActiveKmnKeyboardEditor.DebugForm.UpdateFont(dlgFont.Font);
+  end
+  else
+  begin
+    dlgFont.Font := ActiveLdmlKeyboardEditor.DebugForm.memo.Font;
+    if dlgFont.Execute then
+      ActiveLdmlKeyboardEditor.DebugForm.UpdateFont(dlgFont.Font);
+  end;
 end;
 
 procedure TmodActionsDebugger.actDebugViewFontUpdate(Sender: TObject);
 begin
   actDebugViewFont.Enabled := IsDebuggerVisible;
-  actDebugViewFont.Checked := actDebugViewFont.Enabled and not ActiveKmnKeyboardEditor.DebugForm.DefaultFont;
+  actDebugViewFont.Checked := actDebugViewFont.Enabled and (
+    ((ActiveKmnKeyboardEditor <> nil) and not ActiveKmnKeyboardEditor.DebugForm.DefaultFont)
+  ) or (
+    ((ActiveLdmlKeyboardEditor <> nil) and not ActiveLdmlKeyboardEditor.DebugForm.DefaultFont)
+  );
 end;
 
 procedure TmodActionsDebugger.actDebugViewRegressionTestingExecute(Sender: TObject);
@@ -439,12 +457,14 @@ end;
 
 function TmodActionsDebugger.IsDebuggerInTestMode: Boolean;
 begin
-  Result := (ActiveKmnKeyboardEditor <> nil) and (ActiveKmnKeyboardEditor.DebugForm.UIStatus = duiTest);
+  Result := ((ActiveKmnKeyboardEditor <> nil) and (ActiveKmnKeyboardEditor.DebugForm.UIStatus = duiTest)) or
+    (ActiveLdmlKeyboardEditor <> nil);
 end;
 
 function TmodActionsDebugger.IsDebuggerVisible: Boolean;
 begin
-  Result := (ActiveKmnKeyboardEditor <> nil) and ActiveKmnKeyboardEditor.IsDebugVisible;
+  Result := ((ActiveKmnKeyboardEditor <> nil) and ActiveKmnKeyboardEditor.IsDebugVisible) or
+    ((ActiveLdmlKeyboardEditor <> nil) and ActiveLdmlKeyboardEditor.IsDebugVisible);
 end;
 
 procedure TmodActionsDebugger.SelectDebugSystemKeyboard(k: TSystemKeyboardItem);

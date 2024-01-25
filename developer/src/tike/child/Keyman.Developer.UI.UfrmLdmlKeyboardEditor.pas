@@ -29,9 +29,10 @@ type
     FDebugForm: TfrmLdmlKeyboardDebug;
     function GetIsDebugVisible: Boolean;
     procedure SetupDebugForm;
-    { Private declarations }
+  protected
+    procedure LoadSettings; override;
+    procedure SaveSettings(SaveProject: Boolean); override;
   public
-    { Public declarations }
     procedure StartDebugging;
     procedure StopDebugging;
     property DebugForm: TfrmLdmlKeyboardDebug read FDebugForm;
@@ -46,6 +47,7 @@ uses
   Keyman.Developer.System.Project.xmlLdmlProjectFile,
   Keyman.Developer.UI.Project.ProjectFileUI,
   Keyman.Developer.UI.Project.xmlLdmlProjectFileUI,
+  KeymanDeveloperUtils,
   TextFileFormat,
   UfrmMessages;
 
@@ -112,6 +114,37 @@ begin
   FDebugForm.HideDebugForm;
   panDebugHost.Visible := False;
   EditorFrame.SetFocus;
+end;
+
+procedure TfrmLdmlKeyboardEditor.LoadSettings;
+var
+  FFont: TFont;
+begin
+  inherited;
+
+  if ProjectFile.IDEState['DebugDefaultFont'] <> '0' then   // I4702
+    FDebugForm.UpdateFont(nil)
+  else
+  begin
+    FFont := TFont.Create;
+    try
+      SetFontFromString(FFont, ProjectFile.IDEState['DebugFont']);   // I4702
+      FDebugForm.UpdateFont(FFont);
+    finally
+      FFont.Free;
+    end;
+  end;
+end;
+
+procedure TfrmLdmlKeyboardEditor.SaveSettings(SaveProject: Boolean);
+begin
+  if FDebugForm.DefaultFont
+    then ProjectFile.IDEState['DebugDefaultFont'] := '1'   // I4702
+    else ProjectFile.IDEState['DebugDefaultFont'] := '0';   // I4702
+
+  ProjectFile.IDEState['DebugFont'] := FontAsString(FDebugForm.memo.Font);   // I4702
+
+  inherited;
 end;
 
 end.
