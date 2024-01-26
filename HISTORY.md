@@ -1,5 +1,11 @@
 # Keyman Version History
 
+## 17.0.253 alpha 2024-01-26
+
+* feat(web): keystroke pre-processing unit tests (#10464)
+* feat(web): key-event rule processing unit tests for mnemonic, KMW 1.0 keyboards (#10475)
+* fix(web): touch-layout fontsize property use (#10504)
+
 ## 17.0.252 alpha 2024-01-25
 
 * fix(common): ldml: fix typo in kmc error message (#10484)
