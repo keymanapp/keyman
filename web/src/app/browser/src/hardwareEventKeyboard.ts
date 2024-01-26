@@ -121,6 +121,10 @@ export function preprocessKeyboardEvent(e: KeyboardEvent, keyboardState: Keyboar
 
   // Stage 3 - Set our modifier state tracking variable and perform basic AltGr-related management.
   const LmodifierChange = keyboardState.modStateFlags != curModState;
+
+  // KeyboardState update:  save our known modifier/state analysis bits.
+  // Note:  `keyboardState` is typically the full-fledged KeyboardProcessor instance.  As a result,
+  // changes here persist across calls (as we only ever make the one instance).
   keyboardState.modStateFlags = curModState;
 
   // For European keyboards, not all browsers properly send both key-up events for the AltGr combo.
