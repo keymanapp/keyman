@@ -349,8 +349,8 @@ export class MarkerParser {
      * @param l string the marker is 'glued' to, or '' for end
      */
     function add_pending_markers(l: string): void {
-      // first char, or, marker-before-eot
-      const ch = (l === '') ? MARKER_BEFORE_EOT : [...l][0];
+      // first char, or, marker-before-eot. Must be first char of NFD sequence
+      const ch = (l === '') ? MARKER_BEFORE_EOT : [...(l.normalize("NFD"))][0];
       while(last_markers.length) {
         const marker = last_markers[0];
         last_markers = last_markers.slice(1); // pop from front
