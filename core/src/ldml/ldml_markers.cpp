@@ -381,7 +381,7 @@ KMX_DWORD parse_hex_quad(const km_core_usv hex_str[]) {
 }
 
 /** add the list to the map */
-static void add_markers_to_map(marker_map &markers, char32_t marker_ch, const marker_list &list) {
+inline void add_markers_to_map(marker_map &markers, char32_t marker_ch, const marker_list &list) {
   for (auto i = list.begin(); i < list.end(); i++) {
     // marker_ch is duplicate, but keeps the structure more shallow.
     markers.emplace_back(marker_ch, *i);
@@ -389,7 +389,7 @@ static void add_markers_to_map(marker_map &markers, char32_t marker_ch, const ma
 }
 
 /**
- * Add any markers, if needed
+ * Add any markers, if needed. Inlined because we need to run it twice.
  * @param markers marker map or nullptr
  * @param last the 'last' parameter past the prior parsing
  * @param end end of the input string
@@ -401,24 +401,34 @@ add_pending_markers(
     const std::u32string::const_iterator &last,
     const std::u32string::const_iterator &end,
     const icu::Normalizer2 *nfd) {
+  // quick check to see if there's no work to do.
   if(markers == nullptr || last_markers.empty()) {
     return;
   }
+  /** which character this marker is 'glued' to. */
   char32_t marker_ch;
   if (last == end) {
+    // at end of text, so use a special value to indicate 'EOT'.
     marker_ch = MARKER_BEFORE_EOT;
   } else {
     icu::UnicodeString decomposition;
-    auto ch = *last;
+    auto ch = *last; // non-normalized character
+
+    // if the character is composed, we need to use the first decomposed char
+    // as the 'glue'.
     if(!nfd->getDecomposition(ch, decomposition)) {
+      // char does not have a decomposition - so it may be used for the glue
       marker_ch = ch;
     } else {
-      marker_ch = decomposition.char32At(0); // first UChar32
+      // 'glue' is the first codepoint of the decomposition.
+      marker_ch = decomposition.char32At(0);
     }
   }
 
+  // now, update the map with these markers (in order) on this character.
   add_markers_to_map(*markers, marker_ch, last_markers);
-  last_markers.clear(); // mark as already recorded
+  // clear the list
+  last_markers.clear();
 }
 
 std::u32string
