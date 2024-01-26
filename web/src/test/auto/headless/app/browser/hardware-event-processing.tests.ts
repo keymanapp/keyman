@@ -12,7 +12,9 @@ const KeyCodes = Codes.keyCodes;
 
 const DUMMY_DEVICE = new DeviceSpec('chrome', 'desktop', 'windows', false);
 
-// console.log(JSON.stringify(processedEvent));
+// Compare and contrast the unit tests here with those for keyboard-processor unit testing
+// in the non-positional-rules set; the output objects here should have the same format
+// as the inputs for rules as used there.
 
 describe("app/browser: hardware event processing", () => {
   describe('preprocessKeyboardEvent', () => {
