@@ -1232,17 +1232,15 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
       paddedHeight = this.computedAdjustedOskHeight(this.height);
     }
 
-    let b = this.layerGroup.element as HTMLElement;
     let gs = this.kbdDiv.style;
-    let bs = b.style;
     if (this.usesFixedHeightScaling && this.height) {
       // Sets the layer group to the correct height.
       gs.height = gs.maxHeight = this.height + 'px';
     }
 
-    // The font-scaling applied on the layer group.
-    gs.fontSize = this.fontSize.styleString;
-    bs.fontSize = ParsedLengthStyle.forScalar(fs).styleString;
+    // The font-scaling applied by default for this instance on its root element.
+    // Layer-group font-scaling is applied separately.
+    gs.fontSize = this.fontSize.scaledBy(fs).styleString;
 
     // Step 1:  have the necessary conditions been met?
     const fixedSize = this.width && this.height;
