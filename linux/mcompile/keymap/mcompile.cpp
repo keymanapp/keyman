@@ -239,6 +239,9 @@ void KMX_ReportUnconvertedKeyboardRules(LPKMX_KEYBOARD kbd) {
 }
 
 void KMX_TranslateDeadkeyKey(LPKMX_KEY key, KMX_WCHAR deadkey, KMX_WORD vk, UINT shift, KMX_WORD ch) {
+
+  //if (key->Key == 94)
+  //  wprintf(L"key->ShiftFlags: %i  isEqual: %i  %i(%c)   %i(%c) --->  %i \n", key->ShiftFlags, key->ShiftFlags & VIRTUALCHARKEY , key->Key , key->Key, ch,ch , ((key->ShiftFlags == 0 || key->ShiftFlags & VIRTUALCHARKEY) && key->Key == ch));
    if((key->ShiftFlags == 0 || key->ShiftFlags & VIRTUALCHARKEY) && key->Key == ch) {
     // The weird LCTRL+RALT is Windows' way of mapping the AltGr key.
     // We store that as just RALT, and use the option "Simulate RAlt with Ctrl+Alt"
@@ -391,6 +394,7 @@ KMX_WCHAR KMX_GetUniqueDeadkeyID(LPKMX_KEYBOARD kbd, KMX_WCHAR deadkey) {
 void KMX_ConvertDeadkey(LPKMX_KEYBOARD kbd, KMX_WORD vk, UINT shift, KMX_WCHAR deadkey, v_dw_3D &All_Vector, GdkKeymap* keymap) {
   KMX_WORD deadkeys[512], *pdk;
 
+  // _S2 create dkTable once only and use as static/ define before func
   // create dk_createDK_ComposeTable
   v_dw_2D  dk_Table;
   create_DKTable(dk_Table);
@@ -401,9 +405,21 @@ void KMX_ConvertDeadkey(LPKMX_KEYBOARD kbd, KMX_WORD vk, UINT shift, KMX_WCHAR d
 
   // Add the deadkey to the mapping table for use in the import rules phase
   KMX_DeadkeyMapping KMX_deadkeyMapping = { deadkey, dkid, shift, vk};    // I4353
-  KMX_FDeadkeys.push_back(KMX_deadkeyMapping); //dkid, vk, shift);   // I4353
 
-  KMX_AddDeadkeyRule(kbd, dkid, vk, shift);
+  //__S2 NEEDS to be here later
+  /*KMX_FDeadkeys.push_back(KMX_deadkeyMapping); //dkid, vk, shift);   // I4353
+  KMX_AddDeadkeyRule(kbd, dkid, vk, shift);*/
+
+  // _S2 NEEDS to go! --------
+  // _S2 is only for testing &to compare 3 dk of windows
+  if(KMX_FDeadkeys.size()<3 )
+  KMX_FDeadkeys.push_back(KMX_deadkeyMapping); //dkid, vk, shift);   // I4353
+  if(shift== 0 || shift== 16  )
+    KMX_AddDeadkeyRule(kbd, dkid, vk, shift);
+  else
+    return;;
+  // _S2 -----------------------------
+
   KMX_GetDeadkeys(dk_Table, deadkey, pdk = deadkeys, keymap);  // returns array of [usvk, ch_out] pairs
 
   while(*pdk) {
@@ -411,7 +427,7 @@ void KMX_ConvertDeadkey(LPKMX_KEYBOARD kbd, KMX_WORD vk, UINT shift, KMX_WCHAR d
     // Look up the ch
     UINT vkUnderlying = KMX_get_VKUS_From_VKUnderlying_VEC(All_Vector, *pdk);
 
-    wprintf(L" vkUnderlying   %i    *pdk %i ", vkUnderlying, *pdk);
+    wprintf(L" vkUnderlying   %i    *pdk %i  %i %ixxx", vkUnderlying, *pdk, *(pdk+1), *(pdk+2));
 
     if(vkUnderlying != (UINT) *pdk) {
       wprintf(L" TRANSLATED \n");
