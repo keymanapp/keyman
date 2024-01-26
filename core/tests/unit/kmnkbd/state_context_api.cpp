@@ -51,7 +51,7 @@ setup(const char *keyboard, const km_core_cp *context) {
 bool
 is_identical_context(km_core_cp const *cached_context) {
   size_t buf_size;
-  try_status(context_get(km_core_state_context(test_state), &citems));
+  try_status(km_core_context_get(km_core_state_context(test_state), &citems));
   try_status(context_items_to_utf16(citems, nullptr, &buf_size));
   km_core_cp *new_cached_context = new km_core_cp[buf_size];
   try_status(context_items_to_utf16(citems, new_cached_context, &buf_size));
@@ -145,7 +145,7 @@ test_context_set_if_needed_cached_context_has_markers() {
 
   km_core_context_item *citems_new;
 
-  try_status(context_get(km_core_state_context(test_state), &citems_new));
+  try_status(km_core_context_get(km_core_state_context(test_state), &citems_new));
 
   for (int i = 0; citems[i].type || citems_new[i].type; i++) {
     assert(citems_new[i].type == citems[i].type);

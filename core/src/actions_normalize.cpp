@@ -228,7 +228,7 @@ icu::UnicodeString context_items_to_unicode_string(km_core_context const *contex
 
   km_core_context_item *items = nullptr;
   km_core_status status;
-  if((status = context_get(context, &items)) != KM_CORE_STATUS_OK) {
+  if((status = km_core_context_get(context, &items)) != KM_CORE_STATUS_OK) {
     DebugLog("Failed to retrieve context with %s", status);
     return nullString;
   }
@@ -297,8 +297,8 @@ bool km::core::actions_update_app_context_nfu(
   km_core_status status = KM_CORE_STATUS_OK;
   km_core_context_item *items = nullptr;
 
-  if((status = context_get(cached_context, &items)) != KM_CORE_STATUS_OK) {
-    DebugLog("context_get failed with %d", status);
+  if((status = km_core_context_get(cached_context, &items)) != KM_CORE_STATUS_OK) {
+    DebugLog("km_core_context_get failed with %d", status);
     return false;
   }
 

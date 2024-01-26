@@ -310,11 +310,11 @@ km_core_cp * km_core_state_context_debug(
       return _new_error_string(u"<error retrieving intermediate context>");
     }
   } else if(context_type == KM_CORE_DEBUG_CONTEXT_CACHED) {
-    if(context_get(km_core_state_context(state), &context_items) != KM_CORE_STATUS_OK) {
+    if(km_core_context_get(km_core_state_context(state), &context_items) != KM_CORE_STATUS_OK) {
       return _new_error_string(u"<error retrieving cached context>");
     }
   } else if(context_type == KM_CORE_DEBUG_CONTEXT_APP) {
-    if(context_get(km_core_state_app_context(state), &context_items) != KM_CORE_STATUS_OK) {
+    if(km_core_context_get(km_core_state_app_context(state), &context_items) != KM_CORE_STATUS_OK) {
       return _new_error_string(u"<error retrieving app context>");
     }
   } else {

@@ -79,19 +79,19 @@ int main(int, char * [])
   km_core_context_items_dispose(ctxt2);
 
   // Test lengths, these are Unicode Scalar Values, not utf16 codeunits.
-  if(context_length(&mock_ctxt1) != bmp_ctxt_size) return __LINE__;
-  if(context_length(&mock_ctxt2) != smp_ctxt_size) return __LINE__;
+  if(km_core_context_length(&mock_ctxt1) != bmp_ctxt_size) return __LINE__;
+  if(km_core_context_length(&mock_ctxt2) != smp_ctxt_size) return __LINE__;
 
   // retrieve bmp context and check it's okay.
   km_core_context_item *tmp_ctxt;
-  try_status(context_get(&mock_ctxt1, &tmp_ctxt));
+  try_status(km_core_context_get(&mock_ctxt1, &tmp_ctxt));
   ctxt_size=sizeof ctxt_buffer/sizeof(km_core_cp);
   try_status(context_items_to_utf16(tmp_ctxt, ctxt_buffer, &ctxt_size));
   km_core_context_items_dispose(tmp_ctxt);
   if (initial_bmp_context != ctxt_buffer) return __LINE__;
 
   // retrieve smp context and check it's okay.
-  try_status(context_get(&mock_ctxt2, &tmp_ctxt));
+  try_status(km_core_context_get(&mock_ctxt2, &tmp_ctxt));
   ctxt_size=sizeof ctxt_buffer/sizeof(km_core_cp);
   try_status(context_items_to_utf16(tmp_ctxt, ctxt_buffer, &ctxt_size));
   km_core_context_items_dispose(tmp_ctxt);
@@ -99,7 +99,7 @@ int main(int, char * [])
 
   // Call km_core_context_clear
   km_core_context_clear(&mock_ctxt2);
-  if(context_length(&mock_ctxt2) != 0) return __LINE__;
+  if(km_core_context_length(&mock_ctxt2) != 0) return __LINE__;
 
   // Mutation tests
   try_status(context_shrink(&mock_ctxt1, 42, nullptr));
@@ -117,7 +117,7 @@ int main(int, char * [])
 
   // Check it matches. The marker will be elided during the conversion.
   ctxt_size=sizeof ctxt_buffer/sizeof(km_core_cp);
-  try_status(context_get(&mock_ctxt1, &tmp_ctxt));
+  try_status(km_core_context_get(&mock_ctxt1, &tmp_ctxt));
   try_status(context_items_to_utf16(tmp_ctxt, ctxt_buffer, &ctxt_size));
   if (std::u16string(u"Hello World!") != ctxt_buffer) return __LINE__;
   km_core_context_items_dispose(tmp_ctxt);
@@ -128,7 +128,7 @@ int main(int, char * [])
   //  expected if you go by the test string above.
   try_status(context_shrink(&mock_ctxt1, 8, ctxt1));
   ctxt_size=sizeof ctxt_buffer/sizeof(km_core_cp);
-  try_status(context_get(&mock_ctxt1, &tmp_ctxt));
+  try_status(km_core_context_get(&mock_ctxt1, &tmp_ctxt));
   try_status(context_items_to_utf16(tmp_ctxt, ctxt_buffer, &ctxt_size));
   if (std::u16string(u"Bye, Hello") != ctxt_buffer) return __LINE__;
 

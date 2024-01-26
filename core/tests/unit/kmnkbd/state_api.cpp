@@ -133,9 +133,9 @@ int main(int argc, char * argv[])
   try_status(context_items_from_utf16(u"Hello 😁", &citems));
   try_status(km_core_context_set(km_core_state_context(test_state), citems));
   km_core_context_items_dispose(citems);
-  if(context_length(km_core_state_context(test_state)) != 7)
+  if(km_core_context_length(km_core_state_context(test_state)) != 7)
     return __LINE__;
-  if(context_length(km_core_state_context(test_clone)) != 0)
+  if(km_core_context_length(km_core_state_context(test_clone)) != 0)
     return __LINE__;
 
   // Overwrite some data.

@@ -37,7 +37,6 @@ inherited frmLdmlKeyboardDebug: TfrmLdmlKeyboardDebug
     OnChange = memoChange
     OnClick = memoClick
     OnEnter = memoGotFocus
-    OnExit = memoLostFocus
     OnKeyUp = memoKeyUp
     OnMessage = memoMessage
     IsDebugging = False
