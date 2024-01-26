@@ -75,7 +75,7 @@ end;
 const
   TemplateXML: string =
     '<?xml version="1.0" encoding="UTF-8"?>'#13#10+
-    '<!DOCTYPE keyboard3 SYSTEM "ldmlKeyboard3.dtd">'#13#10+
+    // We won't inject the DOCTYPE because of pathing challenges, CLDR-15505: '<!DOCTYPE keyboard3 SYSTEM "ldmlKeyboard3.dtd">'#13#10+
     '<keyboard3 />'#13#10;
 
 const
