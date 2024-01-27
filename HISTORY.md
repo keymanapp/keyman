@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 17.0.254 alpha 2024-01-27
+
+* feat(core): ldml marker normalization fix (#10517)
+
 ## 17.0.253 alpha 2024-01-26
 
 * feat(web): keystroke pre-processing unit tests (#10464)
