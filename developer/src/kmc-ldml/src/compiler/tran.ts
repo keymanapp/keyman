@@ -141,6 +141,9 @@ export abstract class TransformCompiler<T extends TransformCompilerType, TranBas
     // don't unescape literals here, because we are going to pass them through into the regex
     cookedFrom = util.unescapeStringToRegex(cookedFrom);
 
+    // nfd here.
+    cookedFrom = MarkerParser.nfd_markers(cookedFrom, true);
+
     // cookedFrom is cooked above, since there's some special treatment
     result.from = sections.strs.allocString(cookedFrom, {
       unescape: false,
@@ -150,6 +153,7 @@ export abstract class TransformCompiler<T extends TransformCompilerType, TranBas
       stringVariables: true,
       markers: true,
       unescape: true,
+      nfd: true,
     }, sections);
     return result;
   }

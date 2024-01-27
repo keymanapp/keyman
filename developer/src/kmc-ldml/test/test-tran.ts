@@ -3,7 +3,7 @@ import { assert } from 'chai';
 import { TranCompiler, BkspCompiler } from '../src/compiler/tran.js';
 import { BASIC_DEPENDENCIES, UsetCompiler } from '../src/compiler/empty-compiler.js';
 import { CompilerMessages } from '../src/compiler/messages.js';
-import { compilerTestCallbacks, testCompilationCases } from './helpers/index.js';
+import { assertCodePoints, compilerTestCallbacks, testCompilationCases } from './helpers/index.js';
 import { KMXPlus, MarkerParser } from '@keymanapp/common-types';
 
 import Tran = KMXPlus.Tran;// for tests…
@@ -67,16 +67,15 @@ describe('tran', function () {
         assert.equal(g0t3.mapFrom?.value, "upper");
         assert.equal(g0t3.mapTo?.value, "lower");
 
-        assert.strictEqual(g0t4.from.value,
-          `\u{03b9}${m(1,true)}\u{0309}\u{0301}`, '(warning: normalization)');
-        assert.strictEqual(g0t4.to.value,
-          `\u{03b9}\u{0313}\u{301}`, '(warning: normalization)');
+        assertCodePoints(g0t4.from.value,
+          `\u{03b9}${m(1, true)}\u{0308}\u{0301}`);
+        assertCodePoints(g0t4.to.value,
+          `\u{03b9}\u{0313}\u{301}`);
 
-        assert.strictEqual(g0t5.from.value,
-          `\u{03b9}\u{033c}${m(MarkerParser.ANY_MARKER_INDEX, true)}\u{0301}`, '(warning: normalization)'
-          );
-        assert.strictEqual(g0t5.to.value,
-          `\u{03b9}\u{033c}${m(1,false)}\u{0300}`);
+        assertCodePoints(g0t5.from.value,
+          `\u{03b9}${MarkerParser.ANY_MARKER_MATCH}\u{033c}\u{0301}`);
+        assertCodePoints(g0t5.to.value,
+          `\u{03b9}${m(1,false)}\u{033c}\u{0300}`);
       }
     },
     {

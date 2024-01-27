@@ -551,7 +551,7 @@ block(strs)                         #  struct COMP_KMXPLUS_STRS {
   block(strVse)              76 00 73 00 65 00 block(x) 00 00                     # 'vse'
   block(strVst)              76 00 73 00 74 00 block(x) 00 00                     # 'vst'
   block(strVus)              76 00 75 00 73 00 block(x) 00 00                     # 'vus'
-  block(strTranTo)           E2 00 block(x) 00 00                                       # 'â'
+  block(strTranTo)           61 00 02 03 block(x) 00 00                          # 'â' (U+0061 U+0302)
 #str #1a
   block(strKeys)             90 17 b6 17 block(x) 00 00                               # 'ថា'
   # <reorder before="ᩫ" from="᩠᩵ᩅ" order="10 55 10" />

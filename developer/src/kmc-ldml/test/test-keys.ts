@@ -1,7 +1,7 @@
 import 'mocha';
 import { assert } from 'chai';
 import { KeysCompiler } from '../src/compiler/keys.js';
-import { compilerTestCallbacks, loadSectionFixture, testCompilationCases } from './helpers/index.js';
+import { assertCodePoints, compilerTestCallbacks, loadSectionFixture, testCompilationCases } from './helpers/index.js';
 import { KMXPlus, Constants, MarkerParser } from '@keymanapp/common-types';
 import { CompilerMessages } from '../src/compiler/messages.js';
 import { constants } from '@keymanapp/ldml-keyboard-constants';
@@ -66,13 +66,11 @@ describe('keys', function () {
 
         // normalization w markers
         const [amarker] = keys.keys.filter(({ id }) => id.value === 'amarker');
-        assert.equal(amarker.to.value, `a\u{0320}${MarkerParser.markerOutput(1, false)}\u{0301}`,
-          'did not match (may be a normalization issue)'); // normalized
+        assertCodePoints(amarker.to.value, `a${MarkerParser.markerOutput(1, false)}\u{0320}\u{0301}`);
 
         // normalization
         const [aacute] = keys.keys.filter(({ id }) => id.value === 'a-acute');
-        assert.equal(aacute.to.value, 'a\u{0301}', 'did not match (may be a normalization issue)'); // normalized
-
+        assertCodePoints(aacute.to.value, 'a\u{0301}');
       },
     },
     {
