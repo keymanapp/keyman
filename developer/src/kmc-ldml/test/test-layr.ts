@@ -70,8 +70,8 @@ describe('layr', function () {
         assert.equal(hardware1.mod, constants.keys_mod_shift);
         const hardware1row0 = hardware1.rows[0];
         assert.ok(hardware1row0);
-        assert.equal(hardware1row0.keys.length, 2);
-        allKeysOk(hardware1row0,'q w', 'hardware1row0');
+        assert.equal(hardware1row0.keys.length, 3);
+        allKeysOk(hardware1row0,'q w amarker', 'hardware1row0');
 
         const listTouch = layr.lists.find(v => v.hardware.value === constants.layr_list_hardware_touch);
         assert.ok(listTouch);
