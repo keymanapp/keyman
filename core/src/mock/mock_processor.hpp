@@ -67,7 +67,7 @@ namespace core
 
     bool
     supports_normalization() const override {
-      return false;
+      return true;
     }
   };
 
