@@ -29,6 +29,10 @@ export class StylesheetManager {
   }
 
   linkStylesheet(sheet: HTMLStyleElement) {
+    if(!(sheet instanceof HTMLLinkElement) && !sheet.innerHTML) {
+      return;
+    }
+
     this.linkedSheets.push(sheet);
     this.linkNode.appendChild(sheet);
   }
@@ -51,6 +55,7 @@ export class StylesheetManager {
       } else {
         const promise = new ManagedPromise<void>();
         sheetElem.addEventListener('load', () => promise.resolve());
+        sheetElem.addEventListener('error', () => promise.reject());
         promises.push(promise.corePromise);
       }
     }
@@ -174,12 +179,10 @@ export class StylesheetManager {
      * For now, we're using this solely to detect when the font has been succesfully loaded.
      */
     const fontFace = new FontFace(fd.family, source);
-    const loadPromise = fontFace.load();
-    this.fontPromises.push(loadPromise);
 
     const clearPromise = () => this.fontPromises = this.fontPromises.filter((entry) => entry != loadPromise);
-    loadPromise.then(clearPromise);
-    loadPromise.catch(clearPromise);
+    const loadPromise = fontFace.load().then(clearPromise).catch(clearPromise);
+    this.fontPromises.push(loadPromise);
 
     this.linkStylesheet(sheet);
 
