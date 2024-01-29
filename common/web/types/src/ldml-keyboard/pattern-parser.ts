@@ -4,7 +4,8 @@
 
 import { constants } from "@keymanapp/ldml-keyboard-constants";
 import { MATCH_QUAD_ESCAPE, isOneChar, unescapeOneQuadString, unescapeString, hexQuad } from "../util/util.js";
-
+// see comment in file - generated file
+import { nfdNoBoundaryBefore } from "./nfd-table.js";
 /**
  * Helper function for extracting matched items
  * @param str input string
@@ -169,16 +170,6 @@ export class MarkerParser {
       return all_no_markers.normalize("NFD");
     }
 
-    // split segments on grapheme cluster boundaries for processing
-    const raw_segments = Array.from(graphemeSegmenter.segment(all_no_markers))
-      .map(({ segment }) => segment)
-      .map((c) => c.codePointAt(0));
-    /**
-     * Set of all code points which have a boundary before.
-     * This parallels nfd->hasBoundaryBefore().
-     */
-    const hasBoundaryBefore = new Set(raw_segments);
-
     // now we'll loop through looking for normalization-safe subsegments of [seg_start, seg_end)
     // For example (sentinel mode) the following would be segments:
     //     - A
@@ -197,13 +188,14 @@ export class MarkerParser {
       const rest = a.slice(i).join('');
       const p = MarkerParser.parse_next_marker(rest, forMatch);
       const have_marker = !!(p?.match);
+      const has_nfd_boundary_before = (nfdNoBoundaryBefore.indexOf(a[i]?.codePointAt(0)) === -1);
 
       // First, categorize the current character.
 
       if (i === str_end) {
         // at end of string, so this is also the end of the segment.
         seg_end = i;
-      } else if (hasBoundaryBefore.has(rest.codePointAt(0)) && !have_marker) {
+      } else if (has_nfd_boundary_before && !have_marker) {
         // it's an NFD safe boundary, but NOT a marker
         // (if it were a marker, we would fall through to consume the marker)
         // segment ends before this code point
@@ -427,8 +419,6 @@ const MARKER_BEFORE_EOT = '\ufffe';
 const PARSE_SENTINEL_MARKER = new RegExp(`^${MarkerParser.ANY_MARKER_MATCH}`);
 /** matcher for a regex marker, either single or any */
 const PARSE_REGEX_MARKER    = /^\\uffff\\u0008(?:(\\u[0-9a-fA-F]{4})|(\[\\u[0-9a-fA-F]{4}-\\u[0-9a-fA-F]{4}\]))/;
-/** a grapheme cluster segmenter for finding NFD boundaries */
-const graphemeSegmenter = new Intl.Segmenter(['und'], { granularity: 'grapheme' });
 
 export interface MarkerEntry {
   /** code point 'glued' to, or MARKER_BEFORE_EOT  */
