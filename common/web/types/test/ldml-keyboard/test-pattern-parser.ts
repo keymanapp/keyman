@@ -346,11 +346,6 @@ describe('Test of nfd_markers()', () => {
       // ["src", "expect", "regex"]
       // or ["src"] if it is expected to be unchanged
 
-      // double marker -
-      ["e\uffff\u0008\u0001\u0300\u0320\u0300", "e\u0320\uffff\u0008\u0001\u0300\u0300"],
-      // double marker - no change
-      ["e\u0320\uffff\u0008\u0001\u0300\u0300", "e\u0320\uffff\u0008\u0001\u0300\u0300"],
-
       // #1
       ["abc"],
       ["6\uffff\u0008"],
@@ -384,6 +379,12 @@ describe('Test of nfd_markers()', () => {
       ["\u0995\uFFFF\u0008\u0001\u09CB", "\u0995\uFFFF\u0008\u0001\u09C7\u09BE"],
       ["\u0995\u09BE\uFFFF\u0008\u0001\u09C7"],
       ["\u03B5\uFFFF\u0008\u0001\u0344", "\u03B5\uFFFF\u0008\u0001\u0308\u0301"],
+
+      // double marker -
+      ["e\uffff\u0008\u0001\u0300\u0320\u0300", "e\u0320\uffff\u0008\u0001\u0300\u0300"],
+      // double marker - no change
+      ["e\u0320\uffff\u0008\u0001\u0300\u0300", "e\u0320\uffff\u0008\u0001\u0300\u0300"],
+
     ];
 
     for (let i = 0; i < src_expect.length; i++) {

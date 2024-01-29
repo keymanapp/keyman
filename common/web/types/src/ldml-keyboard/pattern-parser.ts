@@ -439,7 +439,7 @@ const PARSE_REGEX_MARKER    = /^\\uffff\\u0008(?:(\\u[0-9a-fA-F]{4})|(\[\\u[0-9a
 const graphemeSegmenter = new Intl.Segmenter(['und'], { granularity: 'grapheme' });
 
 export interface MarkerEntry {
-  /** code point 'glued' to  */
+  /** code point 'glued' to, or MARKER_BEFORE_EOT */
   ch? : string;
   /** marker number, 1-based */
   marker? : number;
