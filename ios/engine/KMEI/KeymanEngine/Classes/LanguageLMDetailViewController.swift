@@ -8,6 +8,7 @@
 
 
 import UIKit
+import os.log
 
 private let toolbarButtonTag = 100
 private let toolbarLabelTag = 101
@@ -53,19 +54,19 @@ class LanguageLMDetailViewController: UITableViewController, UIAlertViewDelegate
       forName: Notifications.packageDownloadFailed,
       observer: self,
       function: LanguageLMDetailViewController.lexicalModelDownloadFailed)
-    log.info("viewDidLoad: LanguageLMDetailViewController (registered for lexicalModelDownloadStarted)")
+    os_log("viewDidLoad: LanguageLMDetailViewController (registered for lexicalModelDownloadStarted)", log:KeymanEngineLogger.ui, type: .info)
   }
   
   override open func viewWillAppear(_ animated: Bool) {
     super.viewWillAppear(animated)
     
-    log.info("willAppear: LanguageLMDetailViewController")
+    os_log("viewWillAppear: LanguageLMDetailViewController", log:KeymanEngineLogger.ui, type: .info)
   }
   
   override func viewDidAppear(_ animated: Bool) {
     super.viewDidAppear(animated)
-    log.info("didAppear: LanguageLMDetailViewController")
-    
+    os_log("viewDidAppear: LanguageLMDetailViewController", log:KeymanEngineLogger.ui, type: .info)
+
     navigationController?.setToolbarHidden(true, animated: true)
   }
   
@@ -156,7 +157,7 @@ class LanguageLMDetailViewController: UITableViewController, UIAlertViewDelegate
   }
   
   private func lexicalModelDownloadStarted() {
-    log.info("lexicalModelDownloadStarted: LanguageLMDetailViewController")
+    os_log("lexicalModelDownloadStarted: LanguageLMDetailViewController", log:KeymanEngineLogger.resources, type: .info)
     view.isUserInteractionEnabled = false
     
     navigationItem.setHidesBackButton(true, animated: true)
@@ -164,8 +165,8 @@ class LanguageLMDetailViewController: UITableViewController, UIAlertViewDelegate
   }
   
   private func lexicalModelDownloadFailed() {
-    log.info("lexicalModelDownloadFailed: LanguageLMDetailViewController")
-    view.isUserInteractionEnabled = true
+    os_log("lexicalModelDownloadFailed: LanguageLMDetailViewController", log:KeymanEngineLogger.resources, type: .info)
+   view.isUserInteractionEnabled = true
     navigationItem.setHidesBackButton(false, animated: true)
   }
   

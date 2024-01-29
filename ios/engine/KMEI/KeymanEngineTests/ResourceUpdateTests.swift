@@ -7,6 +7,7 @@
 //
 
 import XCTest
+import os.log
 @testable import KeymanEngine
 
 class ResourceUpdateTests: XCTestCase {
@@ -60,7 +61,7 @@ class ResourceUpdateTests: XCTestCase {
     // Uses the XCTest 'attachment' system to retrieve the desired file.
     self.add(try TestUtils.EngineStateBundler.createBundle(withName: "khmer_angkor update base"))
 
-    log.info("Bundle archived and attached to test's report.")
+    os_log("Bundle archived and attached to test's report.", log:KeymanEngineLogger.resources, type: .info)
   }
 
   func testCacheCurrent() {
