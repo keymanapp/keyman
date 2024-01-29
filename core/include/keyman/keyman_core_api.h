@@ -242,6 +242,12 @@ typedef struct {
 
   // -1=unchanged, 0=off, 1=on
   km_core_caps_state new_caps_lock_state;
+
+  // reference copy of actual UTF32 codepoints deleted from rhs of context
+  // exactly code_points_to_delete in length (plus null terminator). Used to
+  // determine encoding conversion differences when deleting; only set when
+  // using km_core_state_get_actions, otherwise nullptr.
+  const km_core_usv* deleted_context;
 } km_core_actions;
 
 /*
