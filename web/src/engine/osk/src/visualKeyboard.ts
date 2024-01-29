@@ -100,6 +100,11 @@ export interface VisualKeyboardConfiguration extends CommonConfiguration {
    * want to remove that one when swapping keyboards.
    */
   styleSheetManager: StylesheetManager;
+
+  /**
+   * A promise for loading of the font used by special keys.
+   */
+  specialFont?: InternalKeyboardFont;
 }
 
 interface BoundingRect {
@@ -1351,6 +1356,10 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
     // Add and define style sheets for embedded fonts if necessary (each font-face style will only be added once)
     this.styleSheetManager.addStyleSheetForFont(kfd, this.fontRootPath, this.device.OS);
     this.styleSheetManager.addStyleSheetForFont(ofd, this.fontRootPath, this.device.OS);
+
+    if(this.config.specialFont) {
+      this.styleSheetManager.addStyleSheetForFont(this.config.specialFont, '', this.device.OS);
+    }
 
     // Build the style string to USE the fonts and append (or replace) the font style sheet
     // Note: Some browsers do not download the font-face font until it is applied,

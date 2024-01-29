@@ -176,9 +176,20 @@ export default abstract class OSKKey {
    * @returns         font size as a style string
    */
   getIdealFontSize(vkbd: VisualKeyboard, text: string, style: {height?: string, fontFamily?: string, fontSize: string}, override?: boolean): string {
-    let buttonStyle = getComputedStyle(this.btn);
+    let buttonStyle: typeof style & {width?: string} = getComputedStyle(this.btn);
     let keyWidth = parseFloat(buttonStyle.width);
     let emScale = 1;
+
+    // Among other things, ensures we use SpecialOSK styling for special key text.
+    // It's set on the key-span, not on the button.
+    const localFont = this.label?.style.fontFamily;
+    if(localFont) {
+      buttonStyle = {
+        fontFamily: localFont,
+        fontSize: buttonStyle.fontSize,
+        height: buttonStyle.height
+      }
+    }
 
     const originalSize = getFontSizeStyle(style.fontSize || '1em');
 
@@ -334,7 +345,9 @@ export default abstract class OSKKey {
     // space bar may not define the text span!
     if(this.label) {
       if(!this.label.classList.contains('kmw-spacebar-caption')) {
-        this.label.style.fontSize = this.getIdealFontSize(vkbd, this.keyText, this.btn.style);
+        // Do not use `this.keyText` - it holds *___* codes for special keys, not the actual glyph!
+        const keyCapText = this.label.textContent;
+        this.label.style.fontSize = this.getIdealFontSize(vkbd, keyCapText, this.btn.style);
       } else {
         // Remove any custom setting placed on it before recomputing its inherited style info.
         this.label.style.fontSize = '';
