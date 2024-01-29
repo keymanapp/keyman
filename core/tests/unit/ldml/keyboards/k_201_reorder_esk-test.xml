@@ -21,4 +21,46 @@
       <check result="a\u0332\u0305xz" />
     </test>
   </tests>
+  <tests name="onekey" >
+    <!-- same as above, but a single key-->
+    <test name="1short">
+      <startContext to="" />
+      <keystroke key="test0" />
+      <check result="a\u0305x" />
+      <keystroke key="o"/>
+      <backspace />
+      <!-- no change -->
+      <check result="a\u0305x" />
+    </test>
+    <test name="2longer">
+      <startContext to="" />
+      <keystroke key="test1" />
+      <check result="a\u0332\u0305xz" />
+      <keystroke key="o"/>
+      <backspace />
+      <!-- no change -->
+      <check result="a\u0332\u0305xz" />
+    </test>
+  </tests>
+  <tests name="marker" >
+    <!-- same as above, but a single key with markers -->
+    <test name="1short">
+      <startContext to="" />
+      <keystroke key="markertest0" />
+      <check result="a\u0305x" />
+      <keystroke key="o"/>
+      <backspace />
+      <!-- no change -->
+      <check result="a\u0305x" />
+    </test>
+    <test name="2longer">
+      <startContext to="" />
+      <keystroke key="markertest1" />
+      <check result="a\u0332\u0305xz" />
+      <keystroke key="o"/>
+      <backspace />
+      <!-- no change -->
+      <check result="a\u0332\u0305xz" />
+    </test>
+  </tests>
 </keyboardTest3>

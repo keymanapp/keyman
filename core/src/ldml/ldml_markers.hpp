@@ -93,6 +93,8 @@ void prepend_hex_quad(std::u32string &str, KMX_DWORD marker);
 /** parse 0001...FFFF into a KMX_DWORD. Returns 0 on failure */
 KMX_DWORD parse_hex_quad(const km_core_usv hex_str[]);
 
+/** re-add markers */
+void add_back_markers(std::u32string &str, const std::u32string &src, marker_map &map, marker_encoding encoding);
 
 // bool normalize_nfc_markers(std::u16string &str, marker_encoding encoding) {
 //   marker_map m;

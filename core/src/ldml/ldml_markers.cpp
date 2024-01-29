@@ -58,7 +58,7 @@ bool normalize_nfd(std::u16string &str) {
   return normalize(nfd, str, status);
 }
 
-static void add_back_markers(std::u32string &str, const std::u32string &src, marker_map &map, marker_encoding encoding) {
+void add_back_markers(std::u32string &str, const std::u32string &src, marker_map &map, marker_encoding encoding) {
   // need to reconstitute.
   marker_map map2(map);  // make a copy of the map
   // clear the string
