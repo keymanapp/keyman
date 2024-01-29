@@ -346,6 +346,11 @@ describe('Test of nfd_markers()', () => {
       // ["src", "expect", "regex"]
       // or ["src"] if it is expected to be unchanged
 
+      // double marker -
+      ["e\uffff\u0008\u0001\u0300\u0320\u0300", "e\u0320\uffff\u0008\u0001\u0300\u0300"],
+      // double marker - no change
+      ["e\u0320\uffff\u0008\u0001\u0300\u0300", "e\u0320\uffff\u0008\u0001\u0300\u0300"],
+
       // #1
       ["abc"],
       ["6\uffff\u0008"],
@@ -391,6 +396,7 @@ describe('Test of nfd_markers()', () => {
         forMatch = true;
       }
       const dst = MarkerParser.nfd_markers(src, forMatch);
+      assert.ok(dst, `#${i+1} normalizing '${src}'`);
       assert.equal(dst, exp, `#${i+1} normalizing '${src}' forMatch=${forMatch} (got \n${hex_str(dst)} expected \n${hex_str(exp)}) `);
     }
   });
