@@ -169,38 +169,6 @@ km_core_status
 context_items_to_utf32(km_core_context_item const *item,
                               km_core_usv *buf,
                               size_t *buf_size);
-/**
- *
- * Copies all items in the context into a new array and returns the new array.
- * This must be disposed of by caller using `km_core_context_items_dispose`.
- *
- * @return km_core_status
- *         * `KM_CORE_STATUS_OK`: On success.
- *         * `KM_CORE_STATUS_INVALID_ARGUMENT`: If non-optional parameters are
- *           null.
- *         * `KM_CORE_STATUS_NO_MEM`: In the event not enough memory can be
- *           allocated for the output buffer.
- *
- * @param context       A pointer to an opaque context object
- * @param out           A pointer to the result variable: A pointer to the start
- *                      of the `km_core_context_item` array containing a copy of
- *                      the context. Terminated with a type of `KM_CORE_CT_END`.
- *                      Must be disposed of with
- *                      `km_core_context_items_dispose`.
- */
-km_core_status
-context_get(km_core_context const *context,
-                   km_core_context_item **out);
-
-/**
- * Return the number of items in the context.
- *
- * @return size_t The number of items in the context, and will return 0 if
- *                passed a null `context` pointer.
- * @param context A pointer to an opaque context object
-*/
-size_t
-context_length(km_core_context *);
 
 /**
  * Add more items to the end (insertion point) of the context. If these exceed

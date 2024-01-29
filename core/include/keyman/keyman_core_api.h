@@ -145,6 +145,7 @@ enum km_core_status_codes {
   KM_CORE_STATUS_INSUFFICENT_BUFFER = 5,
   KM_CORE_STATUS_INVALID_UTF = 6,
   KM_CORE_STATUS_INVALID_KEYBOARD = 7,
+  KM_CORE_STATUS_NOT_IMPLEMENTED = 8,
   KM_CORE_STATUS_OS_ERROR = 0x80000000
 };
 
@@ -228,7 +229,7 @@ typedef struct {
   unsigned int code_points_to_delete;
 
   // null-term string of characters to insert into document
-  km_core_usv* output;
+  const km_core_usv* output;
 
   // list of options to persist, terminated with KM_CORE_OPTIONS_END
   km_core_option_item * persist_options;

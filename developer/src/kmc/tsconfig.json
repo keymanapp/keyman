@@ -12,7 +12,7 @@
       "@keymanapp/kmc-kmn": [ "../kmc-kmn/src/main" ],
       "@keymanapp/kmc-ldml": [ "../kmc-ldml/src/main" ],
       "@keymanapp/kmc-model": [ "../kmc-model/src/main" ],
-      "@keymanapp/kmc-model-info": [ "../kmc-model-info/src/model-info-compiler" ],
+      "@keymanapp/kmc-model-info": [ "../kmc-model-info/src/index" ],
       "@keymanapp/kmc-package": [ "../kmc-package/src/kmp-compiler" ],
     }
   },

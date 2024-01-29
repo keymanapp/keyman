@@ -6,6 +6,7 @@
   History:      23 Oct 2023 - MCD - Initial implementation.
 */
 #include <string>
+#include <memory>
 #include "keyman_core.h"
 
 #include "path.hpp"
@@ -55,9 +56,11 @@ void setup(const km_core_cp *app_context, const km_core_cp *cached_context, int 
 
   test_actions = new km_core_actions;
   test_actions->code_points_to_delete = actions_code_points_to_delete;
-  test_actions->output = new km_core_usv[actions_output.length() + 1];
-  actions_output.copy(test_actions->output, actions_output.length());
-  test_actions->output[actions_output.length()] = 0;
+  std::unique_ptr<km_core_usv[]> buf(new km_core_usv[actions_output.length() + 1]);
+  actions_output.copy(buf.get(), actions_output.length());
+  // terminate the buffer
+  buf.get()[actions_output.length()] = 0;
+  test_actions->output = buf.release();
 }
 
 //-------------------------------------------------------------------------------------

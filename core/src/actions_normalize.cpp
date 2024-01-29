@@ -15,15 +15,7 @@
 #include "state.hpp"
 #include "option.hpp"
 #include "debuglog.h"
-
-#if !defined(HAVE_ICU4C)
-#error icu4c is required for this code
-#endif
-
-#define U_FALLTHROUGH
-#include "unicode/utypes.h"
-#include "unicode/unistr.h"
-#include "unicode/normalizer2.h"
+#include "core_icu.h"
 
 // forward declarations
 
@@ -236,7 +228,7 @@ icu::UnicodeString context_items_to_unicode_string(km_core_context const *contex
 
   km_core_context_item *items = nullptr;
   km_core_status status;
-  if((status = context_get(context, &items)) != KM_CORE_STATUS_OK) {
+  if((status = km_core_context_get(context, &items)) != KM_CORE_STATUS_OK) {
     DebugLog("Failed to retrieve context with %s", status);
     return nullString;
   }
@@ -286,7 +278,9 @@ km_core_usv *unicode_string_to_usv(icu::UnicodeString& src) {
 
 
 /**
- * Refresh app_context to match the cached_context
+ * Refresh app_context to match the cached_context. Does not do normalization,
+ * unlike `actions_normalize`. Used in conjunction with keyboard processors that
+ * do not support normalization.
  *
  * @param cached_context  the cached context, in NFU, after transform has been
  *                        applied to it by the keyboard processor
@@ -295,7 +289,7 @@ km_core_usv *unicode_string_to_usv(icu::UnicodeString& src) {
  *                        function
  * @return true on success, false on failure
  */
-bool km::core::actions_update_app_context(
+bool km::core::actions_update_app_context_nfu(
   /* in */      km_core_context const *cached_context,
   /* in, out */ km_core_context *app_context
 ) {
@@ -303,8 +297,8 @@ bool km::core::actions_update_app_context(
   km_core_status status = KM_CORE_STATUS_OK;
   km_core_context_item *items = nullptr;
 
-  if((status = context_get(cached_context, &items)) != KM_CORE_STATUS_OK) {
-    DebugLog("context_get failed with %d", status);
+  if((status = km_core_context_get(cached_context, &items)) != KM_CORE_STATUS_OK) {
+    DebugLog("km_core_context_get failed with %d", status);
     return false;
   }
 

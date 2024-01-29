@@ -53,7 +53,7 @@ setup(const char *keyboard, const km_core_cp *context, bool setup_app_context = 
 bool
 is_identical_context(km_core_cp const *cached_context) {
   size_t buf_size;
-  try_status(context_get(km_core_state_context(test_state), &citems));
+  try_status(km_core_context_get(km_core_state_context(test_state), &citems));
   try_status(context_items_to_utf16(citems, nullptr, &buf_size));
   km_core_cp *new_cached_context = new km_core_cp[buf_size];
   try_status(context_items_to_utf16(citems, new_cached_context, &buf_size));

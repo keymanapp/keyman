@@ -24,7 +24,7 @@ km_core_cp* km::core::get_context_as_string(km_core_context *context) {
   size_t buf_size = 0;
   km_core_context_item* context_items = nullptr;
 
-  if(context_get(context, &context_items) != KM_CORE_STATUS_OK) {
+  if(km_core_context_get(context, &context_items) != KM_CORE_STATUS_OK) {
     return nullptr;
   }
 
