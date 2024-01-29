@@ -131,6 +131,17 @@ describe('InfrastructureMessages', function () {
       `ERROR_FileTypeNotFound not generated, instead got: `+JSON.stringify(ncb.messages,null,2));
   });
 
+  // ERROR_FileTypeNotFound (BuildModelInfo; .kps)
+
+  it('should generate ERROR_FileTypeNotFound if a project file does not contain a .kps file entry (BuildModelInfo)', async function() {
+    const buildModelInfo = new BuildModelInfo();
+    const projectPath = makePathToFixture('invalid-projects', 'error_file_type_not_found_mdl_kps.kpj')
+    const ncb = new NodeCompilerCallbacks({logLevel: 'silent'});
+    await buildModelInfo.build(projectPath, ncb, {});
+    assert.isTrue(ncb.hasMessage(InfrastructureMessages.ERROR_FileTypeNotFound),
+      `ERROR_FileTypeNotFound not generated, instead got: `+JSON.stringify(ncb.messages,null,2));
+  });
+
   // HINT_FilenameHasDifferingCase
 
   it('should generate HINT_FilenameHasDifferingCase if a referenced file has differing case', async function() {
