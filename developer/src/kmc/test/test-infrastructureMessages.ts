@@ -11,6 +11,7 @@ import { defaultCompilerOptions, CompilerOptions} from '@keymanapp/common-types'
 import { loadProject } from '../src/util/projectLoader.js';
 import { analyzeUnitTestEndpoints } from '../src/commands/analyze.js';
 import { BuildKeyboardInfo } from '../src/commands/buildClasses/BuildKeyboardInfo.js';
+import { BuildModelInfo } from '../src/commands/buildClasses/BuildModelInfo.js';
 
 describe('InfrastructureMessages', function () {
   it('should have a valid InfrastructureMessages object', function() {
@@ -101,6 +102,17 @@ describe('InfrastructureMessages', function () {
     const projectPath = makePathToFixture('invalid-projects', 'error_file_type_not_found_kbd.kpj')
     const ncb = new NodeCompilerCallbacks({logLevel: 'silent'});
     await buildKeyboardInfo.build(projectPath, ncb, {});
+    assert.isTrue(ncb.hasMessage(InfrastructureMessages.ERROR_FileTypeNotFound),
+      `ERROR_FileTypeNotFound not generated, instead got: `+JSON.stringify(ncb.messages,null,2));
+  });
+
+  // ERROR_FileTypeNotFound (BuildModelInfo; .model.ts)
+
+  it('should generate ERROR_FileTypeNotFound if a project file does not contain a .model.ts file entry (BuildModelInfo)', async function() {
+    const buildModelInfo = new BuildModelInfo();
+    const projectPath = makePathToFixture('invalid-projects', 'error_file_type_not_found_mdl_mdl.kpj')
+    const ncb = new NodeCompilerCallbacks({logLevel: 'silent'});
+    await buildModelInfo.build(projectPath, ncb, {});
     assert.isTrue(ncb.hasMessage(InfrastructureMessages.ERROR_FileTypeNotFound),
       `ERROR_FileTypeNotFound not generated, instead got: `+JSON.stringify(ncb.messages,null,2));
   });
