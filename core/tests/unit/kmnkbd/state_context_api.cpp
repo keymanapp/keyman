@@ -75,19 +75,20 @@ is_identical_context(km_core_cp const *cached_context) {
   } \
 }
 
-#define assert_identical_context_with_markers(context, citems) { \
-  km_core_context_item *citems_new; \
-  try_status(context_get((context), &citems_new)); \
-  for (int i = 0; (citems)[i].type || citems_new[i].type; i++) { \
-    assert_equal_msg(citems_new[i].type, (citems)[i].type, "Unexpected type:"); \
-    if ((citems)[i].type == KM_CORE_CT_CHAR) { \
-      assert_equal_msg(citems_new[i].character, (citems)[i].character, "Unexpected character:"); \
-    } else { \
-      assert_equal_msg(citems_new[i].marker, (citems)[i].marker, "Unexpected marker:"); \
-    } \
-  } \
-  km_core_context_items_dispose(citems_new); \
-}
+#define assert_identical_context_with_markers(context, citems)                                     \
+  {                                                                                                \
+    km_core_context_item *citems_new;                                                              \
+    try_status(km_core_context_get((context), &citems_new));                                       \
+    for (int i = 0; (citems)[i].type || citems_new[i].type; i++) {                                 \
+      assert_equal_msg(citems_new[i].type, (citems)[i].type, "Unexpected type:");                  \
+      if ((citems)[i].type == KM_CORE_CT_CHAR) {                                                   \
+        assert_equal_msg(citems_new[i].character, (citems)[i].character, "Unexpected character:"); \
+      } else {                                                                                     \
+        assert_equal_msg(citems_new[i].marker, (citems)[i].marker, "Unexpected marker:");          \
+      }                                                                                            \
+    }                                                                                              \
+    km_core_context_items_dispose(citems_new);                                                     \
+  }
 
 #define assert_equal_status(actual, expected) { \
   if ((actual) != (expected)) { \

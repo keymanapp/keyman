@@ -194,7 +194,7 @@ is_context_unchanged(
   }
 
   km_core_context_item *context_items;
-  if (context_get(context, &context_items) != KM_CORE_STATUS_OK) {
+  if (km_core_context_get(context, &context_items) != KM_CORE_STATUS_OK) {
     return change_type;
   }
 
