@@ -1,5 +1,96 @@
 # Keyman Version History
 
+## 17.0.254 alpha 2024-01-27
+
+* feat(core): ldml marker normalization fix (#10517)
+
+## 17.0.253 alpha 2024-01-26
+
+* feat(web): keystroke pre-processing unit tests (#10464)
+* feat(web): key-event rule processing unit tests for mnemonic, KMW 1.0 keyboards (#10475)
+* fix(web): touch-layout fontsize property use (#10504)
+
+## 17.0.252 alpha 2024-01-25
+
+* fix(common): ldml: fix typo in kmc error message (#10484)
+* chore(developer): `--enable-source-maps` parameter for kmc wrapper (#10496)
+* fix(android/engine): Fix OSK widths (#10442)
+*  (#10508)
+
+## 17.0.251 alpha 2024-01-24
+
+* chore(developer): upgrade ngrok to v3 (#10359)
+
+## 17.0.250 alpha 2024-01-23
+
+* fix(android/engine): Add RECEIVER_EXPORTED flag for broadcast receiver (#10463)
+* fix(web): osk responsiveness to held modifiers on legacy kbds (#10437)
+* fix(android/engine): Skip final globe key action (#10465)
+* feat(developer): marker normalization in .ts (#10443)
+*  (#10445)
+
+## 17.0.249 alpha 2024-01-22
+
+* feat(web): suggestion banner UI enhancements - suggestion expanding + scrollable banner (#7934)
+* chore(web): worker sourcemap cleanup, mobile app webview sourcemap compat (#10413)
+
+## 17.0.248 alpha 2024-01-19
+
+* chore(android): Update targetSdkVersion to 34 (#10393)
+*  (#10352)
+* fix(web): keyboard-documentation rendering mode (#10417)
+* fix(ios): multiple keyboard slide-in animations on app start (#10362)
+* fix(web): U_ key id -> text for all subkeys; is now preprocessed (#10434)
+* chore(android/app): Update whatsnew for 17.0 (#10395)
+* fix(web): bulk renderer interface for recent-version targeting keyboards (#10427)
+* feat(core): cross-segment markers (#10394)
+
+## 17.0.247 alpha 2024-01-18
+
+* fix(ios): banner image management (#10337)
+* feat(core): unescape u (#10356)
+* chore(developer,core): change sample and test files to use \u{…} (#10391)
+
+## 17.0.246 alpha 2024-01-17
+
+* fix(web): Add null check for changing the keyboard during typing (#10346)
+* chore(common): Update crowdin strings for Khmer (#10411)
+* docs(common): Update website README.md (#10399)
+* docs(linux): Add documentation for Core API verification (#10409)
+* fix(web): right-flick gesture-preview positioning (#10406)
+
+## 17.0.245 alpha 2024-01-16
+
+* chore(core): Ignore C++ symbols (#10386)
+* fix(android): Fix OSK rotation issues (#10373)
+* feat(developer): add `-m` parameter to kmc to control message severity (#10258)
+
+## 17.0.244 alpha 2024-01-15
+
+* refactor(core): Move `km_core_state_context_*` tests to separate file (#10375)
+* feat(developer): warn on gesture support for downlevel (#10364)
+* fix(web): use KMW OSK font for "**" special-text in key hints (#10371)
+* docs(linux): Update sample settings (#10374)
+
+## 17.0.243 alpha 2024-01-12
+
+* chore(core): split out some files (#10327)
+* chore(common): Update crowdin strings for French, German, Spanish (Latin America) (#10368)
+* fix(web): prediction time-limiter issues, performance (#10330)
+* fix(developer): test-page model loading (#10328)
+* fix(ios): use safe area to position Keyman menu correctly (#10339)
+* chore(linux): fix GHA packaging (#10366)
+* refactor(linux): Use `km_core_state_context_set_if_needed` (#10354)
+
+## 17.0.242 alpha 2024-01-11
+
+* fix(windows): serve images for readme files in Keyboard Install (#10312)
+* fix(developer): remove unused tools/customise menu (#10321)
+* fix(developer): cleanly handle filling a new osk file from layout (#10322)
+* fix(developer): new file support for project 2.0 (#10323)
+* chore(common): builder action launch typos (#10361)
+*  (#10326)
+
 ## 17.0.241 alpha 2024-01-10
 
 * chore(deps-dev): bump follow-redirects from 1.14.9 to 1.15.4 (#10340)

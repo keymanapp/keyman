@@ -19,7 +19,6 @@ export class Configuration {
   public readonly useNgrok: boolean;
   public readonly ngrokControlPort: number;
   public readonly ngrokToken: string;
-  public readonly ngrokRegion: string;
   public readonly ngrokVisible: boolean;
 
   public ngrokEndpoint: string = '';
@@ -46,7 +45,6 @@ export class Configuration {
     this.ngrokBinPath = this.appDataPath + 'bin/';
     this.ngrokControlPort = cfg?.ngrokControlPort ?? 8009;
     this.ngrokToken = cfg?.ngrokToken ?? '';
-    this.ngrokRegion = cfg?.ngrokRegion ?? '';
     this.ngrokVisible = cfg?.ngrokVisible ?? false;
   }
 };

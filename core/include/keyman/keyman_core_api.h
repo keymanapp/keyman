@@ -669,8 +669,9 @@ will replace most uses of the existing Core context APIs.
 
 ##### Parameters:
 - __state__: An opaque pointer to a state object.
-- __application_context__: A pointer to an null-terminated `km_core_cp`
-    string representing the current context from the application.
+- __application_context__: A pointer to an null-terminated array of
+    utf16 encoded data representing the current context from the
+    application.
 ##### Return status:
 - `KM_CORE_CONTEXT_STATUS_UNCHANGED`: Cached context change was not needed
 - `KM_CORE_CONTEXT_STATUS_UPDATED`: Cached context was set to application

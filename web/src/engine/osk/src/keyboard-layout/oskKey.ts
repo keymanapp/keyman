@@ -11,6 +11,40 @@ import buttonClassNames from '../buttonClassNames.js';
 
 import { KeyElement } from '../keyElement.js';
 import VisualKeyboard from '../visualKeyboard.js';
+import { getTextMetrics } from './getTextMetrics.js';
+
+/**
+ * Replace default key names by special font codes for modifier keys
+ *
+ *  @param  {string}  oldText
+ *  @return {string}
+ **/
+export function renameSpecialKey(oldText: string, vkbd: VisualKeyboard): string {
+ // If a 'special key' mapping exists for the text, replace it with its corresponding special OSK character.
+ switch(oldText) {
+   case '*ZWNJ*':
+     // Default ZWNJ symbol comes from iOS.  We'd rather match the system defaults where
+     // possible / available though, and there's a different standard symbol on Android.
+     oldText = vkbd.device.OS == DeviceSpec.OperatingSystem.Android ?
+       '*ZWNJAndroid*' :
+       '*ZWNJiOS*';
+     break;
+   case '*Enter*':
+     oldText = vkbd.isRTL ? '*RTLEnter*' : '*LTREnter*';
+     break;
+   case '*BkSp*':
+     oldText = vkbd.isRTL ? '*RTLBkSp*' : '*LTRBkSp*';
+     break;
+   default:
+     // do nothing.
+ }
+
+ let specialCodePUA = 0XE000 + specialChars[oldText];
+
+ return specialChars[oldText] ?
+   String.fromCharCode(specialCodePUA) :
+   oldText;
+}
 
 export default abstract class OSKKey {
   // Only set here to act as an alias for code built against legacy versions.
@@ -134,53 +168,6 @@ export default abstract class OSKKey {
   }
 
   /**
-   * Uses canvas.measureText to compute and return the width of the given text of given font in pixels.
-   *
-   * @param {String} text The text to be rendered.
-   * @param {String} style The CSSStyleDeclaration for an element to measure against, without modification.
-   *
-   * @see https://stackoverflow.com/questions/118241/calculate-text-width-with-javascript/21015393#21015393
-   * This version has been substantially modified to work for this particular application.
-   */
-  static getTextMetrics(text: string, emScale: number, style: {fontFamily?: string, fontSize: string}): TextMetrics {
-    // Since we may mutate the incoming style, let's make sure to copy it first.
-    // Only the relevant properties, though.
-    style = {
-      fontFamily: style.fontFamily,
-      fontSize: style.fontSize
-    };
-
-    // A final fallback - having the right font selected makes a world of difference.
-    if(!style.fontFamily) {
-      style.fontFamily = getComputedStyle(document.body).fontFamily;
-    }
-
-    if(!style.fontSize || style.fontSize == "") {
-      style.fontSize = '1em';
-    }
-
-    let fontFamily = style.fontFamily;
-    let fontSpec = getFontSizeStyle(style.fontSize);
-
-    var fontSize: string;
-    if(fontSpec.absolute) {
-      // We've already got an exact size - use it!
-      fontSize = fontSpec.val + 'px';
-    } else {
-      fontSize = fontSpec.val * emScale + 'px';
-    }
-
-    // re-use canvas object for better performance
-    var canvas: HTMLCanvasElement = OSKKey.getTextMetrics['canvas'] ||
-                                    (OSKKey.getTextMetrics['canvas'] = document.createElement("canvas"));
-    var context = canvas.getContext("2d");
-    context.font = fontSize + " " + fontFamily;
-    var metrics = context.measureText(text);
-
-    return metrics;
-  }
-
-  /**
    * Calculate the font size required for a key cap, scaling to fit longer text
    * @param vkbd
    * @param text
@@ -210,7 +197,7 @@ export default abstract class OSKKey {
     }
 
     let fontSpec = getFontSizeStyle(style.fontSize || '1em');
-    let metrics = OSKKey.getTextMetrics(text, emScale, style);
+    let metrics = getTextMetrics(text, emScale, style);
 
     const MAX_X_PROPORTION = 0.90;
     const MAX_Y_PROPORTION = 0.90;
@@ -260,39 +247,6 @@ export default abstract class OSKKey {
     return key.proportionalWidth * vkbd.width;
   }
 
-  /**
-   * Replace default key names by special font codes for modifier keys
-   *
-   *  @param  {string}  oldText
-   *  @return {string}
-   **/
-  protected renameSpecialKey(oldText: string, vkbd: VisualKeyboard): string {
-    // If a 'special key' mapping exists for the text, replace it with its corresponding special OSK character.
-    switch(oldText) {
-      case '*ZWNJ*':
-        // Default ZWNJ symbol comes from iOS.  We'd rather match the system defaults where
-        // possible / available though, and there's a different standard symbol on Android.
-        oldText = vkbd.device.OS == DeviceSpec.OperatingSystem.Android ?
-          '*ZWNJAndroid*' :
-          '*ZWNJiOS*';
-        break;
-      case '*Enter*':
-        oldText = vkbd.isRTL ? '*RTLEnter*' : '*LTREnter*';
-        break;
-      case '*BkSp*':
-        oldText = vkbd.isRTL ? '*RTLBkSp*' : '*LTRBkSp*';
-        break;
-      default:
-        // do nothing.
-    }
-
-    let specialCodePUA = 0XE000 + specialChars[oldText];
-
-    return specialChars[oldText] ?
-      String.fromCharCode(specialCodePUA) :
-      oldText;
-  }
-
   public get keyText(): string {
     const spec = this.spec;
     const DEFAULT_BLANK = '\xa0';
@@ -300,12 +254,8 @@ export default abstract class OSKKey {
     // Add OSK key labels
     let keyText = null;
     if(spec['text'] == null || spec['text'] == '') {
-      if(typeof spec['id'] == 'string') {
-        // If the ID's Unicode-based, just use that code.
-        keyText = ActiveKey.unicodeIDToText(spec['id']);
-      }
-
-      keyText = keyText || DEFAULT_BLANK;
+      // U_ codes are handled during keyboard pre-processing.
+      keyText = DEFAULT_BLANK;
     } else {
       keyText=spec['text'];
 
@@ -327,7 +277,7 @@ export default abstract class OSKKey {
 
     // Add OSK key labels
     let keyText = this.keyText;
-    let specialText = this.renameSpecialKey(keyText, vkbd);
+    let specialText = renameSpecialKey(keyText, vkbd);
     if(specialText != keyText) {
       // The keyboard wants to use the code for a special glyph defined by the SpecialOSK font.
       keyText = specialText;
@@ -355,7 +305,7 @@ export default abstract class OSKKey {
 
     // Check the key's display width - does the key visualize well?
     let emScale = vkbd.getKeyEmFontSize();
-    var width: number = OSKKey.getTextMetrics(keyText, emScale, styleSpec).width;
+    var width: number = getTextMetrics(keyText, emScale, styleSpec).width;
     if(width == 0 && keyText != '' && keyText != '\xa0') {
       // Add the Unicode 'empty circle' as a base support for needy diacritics.
 

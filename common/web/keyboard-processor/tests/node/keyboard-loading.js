@@ -11,6 +11,7 @@ describe('Headless keyboard loading', function() {
   const laoPath = require.resolve('@keymanapp/common-test-resources/keyboards/lao_2008_basic.js');
   const khmerPath = require.resolve('@keymanapp/common-test-resources/keyboards/khmer_angkor.js');
   const nonKeyboardPath = require.resolve('@keymanapp/common-test-resources/index.mjs');
+  const ipaPath = require.resolve('@keymanapp/common-test-resources/keyboards/sil_ipa.js');
   // Common test suite setup.
 
   let device = {
@@ -35,6 +36,17 @@ describe('Headless keyboard loading', function() {
 
       // This part provides assurance that the keyboard properly loaded.
       assert.equal(keyboard.id, "Keyboard_lao_2008_basic");
+    });
+
+    it('successfully loads (has variable stores)', async () => {
+      // -- START: Standard Recorder-based unit test loading boilerplate --
+      let harness = new KeyboardInterface({}, MinimalKeymanGlobal);
+      let keyboardLoader = new NodeKeyboardLoader(harness);
+      let keyboard = await keyboardLoader.loadKeyboardFromPath(ipaPath);
+      // --  END:  Standard Recorder-based unit test loading boilerplate --
+
+      // This part provides extra assurance that the keyboard properly loaded.
+      assert.equal(keyboard.id, "Keyboard_sil_ipa");
     });
 
     it('cannot evaluate rules', async function() {

@@ -34,8 +34,11 @@ import android.os.IBinder;
 import android.text.InputType;
 import android.util.Log;
 import android.view.View;
+import android.view.Display;
+import android.view.Surface;
 import android.view.ViewGroup;
 import android.view.Window;
+import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputConnection;
 import android.view.inputmethod.InputMethodManager;
@@ -290,9 +293,7 @@ public final class KMManager {
   protected static final String KMFilename_KeyboardHtml = "keyboard.html";
   protected static final String KMFilename_KeyboardHtml_Legacy = "keyboard.es5.html";
   protected static final String KMFilename_JSEngine = "keymanweb-webview.js";
-  protected static final String KMFilename_JSEngine_Sourcemap = "keymanweb-webview.js.map";
   protected static final String KMFilename_JSLegacyEngine = "keymanweb-webview.es5.js";
-  protected static final String KMFilename_JSLegacyEngine_Sourcemap = "keymanweb-webview.es5.js.map";
   protected static final String KMFilename_JSSentry = "sentry.min.js";
   protected static final String KMFilename_JSSentryInit = "keyman-sentry.js";
   protected static final String KMFilename_AndroidHost = "android-host.js";
@@ -864,17 +865,11 @@ public final class KMManager {
         copyAssetWithRename(context, KMFilename_KeyboardHtml_Legacy, KMFilename_KeyboardHtml, "", true);
 
         copyAsset(context, KMFilename_JSLegacyEngine, "", true);
-        if (KMManager.isDebugMode()) {
-          copyAsset(context, KMFilename_JSLegacyEngine_Sourcemap, "", true);
-        }
       } else {
         copyAsset(context, KMFilename_KeyboardHtml, "", true);
 
         // For versions of Chrome with full ES6 support, we use the ES6 artifact.
         copyAsset(context, KMFilename_JSEngine, "", true);
-        if (KMManager.isDebugMode()) {
-          copyAsset(context, KMFilename_JSEngine_Sourcemap, "", true);
-        }
       }
 
       // Is still built targeting ES5.
@@ -2003,6 +1998,17 @@ public final class KMManager {
     KMKeyboard.removeOnKeyboardEventListener(listener);
   }
 
+  public static int getOrientation(Context context) {
+    Display display = ((WindowManager) context.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
+    int rotation = display.getRotation();
+    if (rotation == Surface.ROTATION_0 || rotation == Surface.ROTATION_180) {
+      return Configuration.ORIENTATION_PORTRAIT;
+    } else if (rotation == Surface.ROTATION_90 || rotation == Surface.ROTATION_270) {
+      return Configuration.ORIENTATION_LANDSCAPE;
+    }
+    return Configuration.ORIENTATION_UNDEFINED;
+  }
+
   public static int getBannerHeight(Context context) {
     int bannerHeight = 0;
     if (InAppKeyboard != null && InAppKeyboard.getBanner() != BannerType.BLANK) {
@@ -2016,7 +2022,8 @@ public final class KMManager {
   public static int getKeyboardHeight(Context context) {
     int defaultHeight = (int) context.getResources().getDimension(R.dimen.keyboard_height);
     SharedPreferences prefs = context.getSharedPreferences(context.getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
-    int orientation = context.getResources().getConfiguration().orientation;
+
+    int orientation = getOrientation(context);
     if (orientation == Configuration.ORIENTATION_PORTRAIT) {
       return prefs.getInt(KMManager.KMKey_KeyboardHeightPortrait, defaultHeight);
     } else if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
@@ -2313,6 +2320,11 @@ public final class KMManager {
    * @param keyboardType KeyboardType KEYBOARD_TYPE_INAPP or KEYBOARD_TYPE_SYSTEM
    */
   public static void handleGlobeKeyAction(Context context, boolean globeKeyDown, KeyboardType keyboardType) {
+    if (globeKeyState == GlobeKeyState.GLOBE_KEY_STATE_UP && !globeKeyDown) {
+      // No globe key action to process
+      return;
+    }
+
     // Update globeKeyState
     if (globeKeyState != GlobeKeyState.GLOBE_KEY_STATE_LONGPRESS) {
       globeKeyState = globeKeyDown ? GlobeKeyState.GLOBE_KEY_STATE_DOWN : GlobeKeyState.GLOBE_KEY_STATE_UP;

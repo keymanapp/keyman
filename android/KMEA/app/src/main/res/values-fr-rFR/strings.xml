@@ -140,8 +140,8 @@
     <!-- Context: Language Settings menu strings -->
     <string name="model_label">Dictionnaire</string>
     <plurals name="model_count">
-        <item quantity="one">Dictionary</item>
-        <item quantity="other">Dictionaries</item>
+        <item quantity="one">Dictionnaire</item>
+        <item quantity="other">Dictionnaires</item>
     </plurals>
     <!-- Context: Language Settings menu substring - Check for available dictionary -->
     <string name="check_available_model" comment="Check for available dictionary">Vérifier les dictionnaires disponibles</string>

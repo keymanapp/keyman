@@ -148,10 +148,6 @@ public class TextField: UITextField, KeymanResponder {
       font = UIFont.systemFont(ofSize: fontSize)
     }
 
-    if isFirstResponder {
-      resignFirstResponder()
-      becomeFirstResponder()
-    }
     let message = "TextField \(self.hashValue) setFont: \(font?.familyName ?? "nil")"
     os_log("%{public}s", log:KeymanEngineLogger.settings, type: .debug, message)
   }
@@ -183,7 +179,7 @@ extension KeymanResponder where Self: TextField {
     resignFirstResponder()
     Manager.shared.inputViewController.endEditing(true)
   }
-  
+
   public func summonKeyboard() {
     becomeFirstResponder()
   }

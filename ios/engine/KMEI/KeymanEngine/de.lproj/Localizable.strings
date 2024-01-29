@@ -125,7 +125,7 @@
 "kmp-error-missing-resource" = "Dieses Paket enthält nicht die angeforderte Tastatur oder Wörterbuch.";
 
 /* Error installing a Keyman package with a version of Keyman that does not support it */
-"kmp-error-unsupported-keyman-version" = "This package requires a newer version of Keyman.";
+"kmp-error-unsupported-keyman-version" = "Dieses Paket benötigt eine neuere Version von Keyman.";
 
 /* Error opening a Keyman package - cannot parse contents */
 "kmp-error-no-metadata" = "Dieses Paket wurde nicht richtig erstellt - Inhalt unbekannt.";

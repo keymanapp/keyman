@@ -28,10 +28,13 @@ LIB=./build/lib
 
 bundle_cmd="node ../es-bundling/build/common-bundle.mjs"
 
+SRCMAP_CLEANER="node $KEYMAN_ROOT/web/build/tools/building/sourcemap-root/index.js"
+
 ################################ Main script ################################
 
 builder_describe \
   "Compiles the Language Modeling Layer for common use in predictive text and autocorrective applications." \
+  "@/web/src/tools/building/sourcemap-root" \
   "@/common/web/keyman-version" \
   "@/common/web/es-bundling" \
   "@/common/models/wordbreakers" \
@@ -49,12 +52,24 @@ function do_build() {
   tsc -b $builder_verbose || builder_die "Could not build worker."
 
   $bundle_cmd build/obj/worker-main.js \
-    --out $INTERMEDIATE/worker-main.es5.js
+    --out $INTERMEDIATE/worker-main.es5.js \
+    --sourceRoot '@keymanapp/keyman/common/web/lm-worker/src/main'
+
+  $SRCMAP_CLEANER \
+    $INTERMEDIATE/worker-main.es5.js.map \
+    $INTERMEDIATE/worker-main.es5.js.map \
+    --clean
 
   $bundle_cmd build/obj/worker-main.js \
     --out $INTERMEDIATE/worker-main.min.es5.js \
     --minify \
-    --profile build/filesize-profile.es5.log
+    --profile build/filesize-profile.es5.log \
+    --sourceRoot '@keymanapp/keyman/common/web/lm-worker/src/main'
+
+  $SRCMAP_CLEANER \
+    $INTERMEDIATE/worker-main.min.es5.js.map \
+    $INTERMEDIATE/worker-main.min.es5.js.map \
+    --clean
 
   EXT_FLAGS=
   if builder_has_option --ci; then
@@ -79,13 +94,25 @@ function do_build() {
   # The ES6 target needs no polyfills - we go straight to the wrapped version.
   $bundle_cmd src/main/worker-main.ts \
     --out $INTERMEDIATE/worker-main.js \
-    --target "es6"
+    --target "es6" \
+    --sourceRoot '@keymanapp/keyman/common/web/lm-worker/src/main'
+
+  $SRCMAP_CLEANER \
+    $INTERMEDIATE/worker-main.js.map \
+    $INTERMEDIATE/worker-main.js.map \
+    --clean
 
   $bundle_cmd src/main/worker-main.ts \
     --out $INTERMEDIATE/worker-main.min.js \
     --minify \
     --profile build/filesize-profile.log \
-    --target "es6"
+    --target "es6" \
+    --sourceRoot '@keymanapp/keyman/common/web/lm-worker/src/main'
+
+  $SRCMAP_CLEANER \
+    $INTERMEDIATE/worker-main.min.js.map \
+    $INTERMEDIATE/worker-main.min.js.map \
+    --clean
 
   node build-wrapper.js $INTERMEDIATE/worker-main.js \
     --out $LIB/worker-main.wrapped.js \
