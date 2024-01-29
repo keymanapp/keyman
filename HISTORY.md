@@ -1,5 +1,11 @@
 # Keyman Version History
 
+## 17.0.255 alpha 2024-01-29
+
+* chore(ios): eliminate xcglogger dependency (#10446)
+* feat(developer): ldml marker normalization fix (#10527)
+* chore(linux): Build with webkitgtk 4.1 instead of 4.0 (#10483)
+
 ## 17.0.254 alpha 2024-01-27
 
 * feat(core): ldml marker normalization fix (#10517)
