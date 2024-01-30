@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+
+    <!-- Set the viewport width to match phone and tablet device widths -->
+    <meta name="viewport" content="width=device-width,user-scalable=no" />
+
+    <!-- Allow KeymanWeb to be saved to the iPhone home screen -->
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+
+    <!-- Enable IE9 Standards mode -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+
+    <title>KeymanWeb - On-Screen Keyboard Rendering</title>
+
+    <!-- Your page CSS -->
+    <style type='text/css'>
+      body {font-family: Tahoma,helvetica; margin-left: 0px}
+      h3 {font-size: 1em;font-weight:normal;color: darkred; margin-bottom: 4px}
+      h1 { font-size: 12px; font-weight: bold; color: darkred; }
+      h2 { font-size: 10px; background: blue; color: white; margin:  0; }
+      p { font-size: 12px;}
+
+    </style>
+
+    <!-- Insert unminified KeymanWeb source scripts -->
+    <!--<script src="https://s.keyman.com/kmw/engine/14.0.227/keymanweb.js" type="application/javascript"></script>-->
+    <script src="../../../../build/publish/debug/keymanweb.js" type="application/javascript"></script>
+    <script src="../../../../build/tools/testing/bulk_rendering/lib/bulk_render.js" type="application/javascript"></script>
+    <script src="../../../../build/tools/testing/bulk_rendering/lib/zip.min.js" type="application/javascript"></script>
+
+    <!-- Initialization: set paths to keyboards, resources and fonts as required -->
+    <script>
+      var kmw=window.keyman;
+      kmw.init({
+        attachType:'auto'
+      });
+
+      window.onload = () => {
+        const packageSelector = document.getElementById('package-file-select');
+        packageSelector.addEventListener('change', async (ev) => {
+          let file = ev.target.files[0];
+
+          if(!file) {
+            // The user probably canceled file selection; abort.
+            return;
+          }
+
+          // Load the package.
+          // https://gildas-lormeau.github.io/zip.js/api/classes/ZipReader.html
+          const packageReader = new zip.ZipReader(new zip.BlobReader(file));
+          const packageEntries = await packageReader.getEntries();
+
+          if(packageEntries.length == 0) {
+            alert('Could not decompress the KMP; package loading failed.');
+            return;
+          } else {
+            const metadataFile = packageEntries.find((entry) => entry.filename == 'kmp.json');
+            if(!metadataFile) {
+              alert('Could not extract kmp.json; aborting');
+            }
+            const rawMetadata = await metadataFile.getData(new zip.TextWriter());
+
+            // Full kmp.json load!
+            const packageMetadata = JSON.parse(rawMetadata);
+            const keyboards = packageMetadata.keyboards
+
+            for(let keyboard of keyboards) {
+              const keyboardFile = `${keyboard.id}.js`;
+              const displayFont = keyboard.displayFont;
+              const oskFont = keyboard.oskFont;
+
+              async function dataFor(filename, type) {
+                if(type == 'font') {
+                  const ext = filename.substring(filename.lastIndexOf('.')+1);
+                  type = type + '/' + ext;
+                }
+                const rawEntry = packageEntries.find((entry) => entry.filename == filename);
+                if(!rawEntry) {
+                  alert(`Could not extract ${filename} from the keyboard package.`);
+                  return null;
+                }
+                return await rawEntry.getData(new zip.Data64URIWriter(type));
+              }
+
+              const kbdData = await dataFor(keyboardFile, 'text/javascript');
+              const dFontData = displayFont ? await dataFor(displayFont, 'font') : null;
+              const oFontData = oskFont ? await dataFor(oskFont, 'font') : null;
+
+              keyboard.languages.forEach((language) => {
+                if(dFontData) {
+                  language.font = {
+                    family: keyboard.id,
+                    source: [dFontData]
+                  };
+                }
+
+                if(oFontData) {
+                  language.oskFont = {
+                    family: keyboard.id,
+                    source: [oFontData]
+                  };
+                }
+              })
+
+              const stub = {
+                id: keyboard.id,
+                name: keyboard.name,
+                languages: keyboard.languages,
+                filename: kbdData
+              };
+
+              // Load 'er up!
+              keyman.addKeyboards(stub).then(() => document.getElementById('ta1').focus());
+            }
+          }
+        });
+      };
+
+      async function runRenderer() {
+        kmw_renderer.run(document.getElementById('allLayers').checked, document.getElementById('filter').value);
+      }
+    </script>
+  </head>
+
+  <body>
+    <h1>KeymanWeb - On-Screen Keyboard Rendering</h1>
+    <p>See this tool's README.md for details.</p>
+    <p><a href="compare.html">Saved render comparison tool here.</a></p>
+    <p>This page is designed for use in testing the local version of a keyboard.  Please select compiled
+      keyboard package to render:
+    </p>
+    <p>
+      <input type="file" id="package-file-select" accept=".kmp"/>
+    </p>
+    <p>
+    </p>
+    <textarea id="ta1"></textarea>
+    <p>
+    </p>
+    <p>
+      <a href="../">Return to tools index page.</a>
+    </p>
+    <hr>
+    <input type='checkbox' id='allLayers' checked> <label for='allLayers'>All Layers</label>
+    <input type='text' id='filter' class='kmw-disabled' placeholder='Filter by ID'>
+    <input type='button' value='Start Render' onclick='runRenderer()'>
+    <div id='deviceNotes'></div>
+    <div id='renderList'></div>
+
+  </body>
+</html>

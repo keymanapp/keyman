@@ -21,3 +21,8 @@ This renderer loads all the cloud keyboards from api.keyman.com and renders each
 ## compare.html
 
 Compare allows you to load two runs of the renderer side-by-side (simply save the run to either before.html or after.html in this folder). It defaults to a width of 20% which you might need to tweak depending on the size of your display and the width of the OSK images.
+
+## local-renderer.html
+
+This variant of the bulk-renderer engine allows loading and rendering keyboards from local file-system KMPs,
+rather than those from our Keyman Cloud repository.
