@@ -396,7 +396,13 @@ describe('Test of nfd_markers()', () => {
         // regex
         forMatch = true;
       }
-      const dst = MarkerParser.nfd_markers(src, forMatch);
+      let dst;
+      try {
+        dst = MarkerParser.nfd_markers(src, forMatch);
+      } catch(e) {
+        console.error(e);
+        assert.fail(`#${i+1} normalizing '${src}'`);
+      }
       assert.ok(dst, `#${i+1} normalizing '${src}'`);
       assert.equal(dst, exp, `#${i+1} normalizing '${src}' forMatch=${forMatch} (got \n${hex_str(dst)} expected \n${hex_str(exp)}) `);
     }

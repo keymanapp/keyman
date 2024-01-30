@@ -361,7 +361,7 @@ export class MarkerParser {
       //  { ch: 0308, end: true}
       //  { ch: 0308, marker: 1}
       //  { ch: 0301, end: true}  // added because of decomp
-      for(const ch of glueChars.slice(0)) {
+      for(const ch of glueChars.slice(1)) {
         map.push({ ch, end: true });
       }
     }
