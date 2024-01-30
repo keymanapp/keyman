@@ -58,6 +58,24 @@ bool normalize_nfd(std::u16string &str) {
   return normalize(nfd, str, status);
 }
 
+marker_entry::marker_entry(char32_t c) : ch(c), marker(LDML_MARKER_NO_INDEX), processed(false), end(true) {
+}
+
+marker_entry::marker_entry(char32_t c, marker_num n) : ch(c), marker(n), processed(false), end(false) {
+
+}
+
+static size_t count_markers(const marker_map &map) {
+  size_t m = 0;
+  for (auto i = map.begin(); i < map.end(); i++) {
+    // add all actual markers
+    if (i->marker != LDML_MARKER_NO_INDEX) {
+      m++;
+    }
+  }
+  return m;
+}
+
 void add_back_markers(std::u32string &str, const std::u32string &src, marker_map &map, marker_encoding encoding) {
   if (map.empty()) {
     // quick check, nothing to do if no markers
@@ -70,13 +88,16 @@ void add_back_markers(std::u32string &str, const std::u32string &src, marker_map
   // iterator over the marker map
   auto marki = map2.rbegin();
   // number of markers left to process
-  size_t processed_count = map2.size();
+  size_t max_markers = count_markers(map);
+  size_t processed_markers = 0;
 
   // add any end-of-text markers
-  while(marki != map2.rend() && marki->first == MARKER_BEFORE_EOT) {
-    prepend_marker(str, marki->second, encoding);
-    processed_count--;
-    marki->second = 0;  // mark as done
+  while(marki != map2.rend() && marki->ch == MARKER_BEFORE_EOT) {
+    if (!marki->end) {
+      prepend_marker(str, marki->marker, encoding);
+      processed_markers++;
+    }
+    marki->processed = true;  // mark as done
     marki++;
   }
 
@@ -85,26 +106,25 @@ void add_back_markers(std::u32string &str, const std::u32string &src, marker_map
     const auto ch = *p;
     str.insert(0, 1, ch);  // prepend
 
-    // add the markers at the end of the list first.
-    for (; marki != map2.rend() && marki->first == ch; marki++) {
-      if (marki->second != 0) {
-        // set to '0' if already applied
-        prepend_marker(str, marki->second, encoding);
-        marki->second = 0; // mark as already applied
-        processed_count--;
-      }
+    // remove all processed entries, outside of an iterator
+    while (!map2.empty() && map2.back().processed) {
+      map2.pop_back();
     }
 
     // now, add any out of order markers.
-    for (auto marki2 = marki; marki2 != map2.rend(); marki2++) {
-      if (marki2->second != 0 && marki2->first == ch) {
-        prepend_marker(str, marki2->second, encoding);
-        marki2->second = 0; // mark as already applied
-        processed_count--;
+    for (auto i = map2.rbegin(); i != map2.rend(); i++) {
+      if ((i->ch == ch) && !(i->processed)) {
+        i->processed = true;
+        if (i->end) {
+          break;
+        } else {
+          prepend_marker(str, i->marker, encoding);
+          processed_markers++;
+        }
       }
     }
   }
-  assert(processed_count == 0);  // assert that we consumed all marks
+  assert(max_markers == processed_markers);  // assert that we consumed all marks
 }
 
 bool normalize_nfd_markers_segment(std::u32string &str, marker_map &map, marker_encoding encoding) {
@@ -381,14 +401,6 @@ KMX_DWORD parse_hex_quad(const km_core_usv hex_str[]) {
   return mark_no;
 }
 
-/** add the list to the map */
-inline void add_markers_to_map(marker_map &markers, char32_t marker_ch, const marker_list &list) {
-  for (auto i = list.begin(); i < list.end(); i++) {
-    // marker_ch is duplicate, but keeps the structure more shallow.
-    markers.emplace_back(marker_ch, *i);
-  }
-}
-
 /**
  * Add any markers, if needed. Inlined because we need to run it twice.
  * @param markers marker map or nullptr
@@ -403,16 +415,16 @@ add_pending_markers(
     const std::u32string::const_iterator &end,
     const icu::Normalizer2 *nfd) {
   // quick check to see if there's no work to do.
-  if(markers == nullptr || last_markers.empty()) {
+  if(markers == nullptr) {
     return;
   }
   /** which character this marker is 'glued' to. */
   char32_t marker_ch;
+  icu::UnicodeString decomposition;
   if (last == end) {
     // at end of text, so use a special value to indicate 'EOT'.
     marker_ch = MARKER_BEFORE_EOT;
   } else {
-    icu::UnicodeString decomposition;
     auto ch = *last; // non-normalized character
 
     // if the character is composed, we need to use the first decomposed char
@@ -420,14 +432,25 @@ add_pending_markers(
     if(!nfd->getDecomposition(ch, decomposition)) {
       // char does not have a decomposition - so it may be used for the glue
       marker_ch = ch;
+      decomposition.remove(); // no other entries needed
     } else {
       // 'glue' is the first codepoint of the decomposition.
       marker_ch = decomposition.char32At(0);
+      if(decomposition.countChar32() == 1) {
+        decomposition.remove(); // no other entries needed
+      }
     }
   }
-
+  markers->emplace_back(marker_ch);
   // now, update the map with these markers (in order) on this character.
-  add_markers_to_map(*markers, marker_ch, last_markers);
+  for (auto i = last_markers.begin(); i < last_markers.end(); i++) {
+    // marker_ch is duplicate, but keeps the structure more shallow.
+    markers->emplace_back(marker_ch, *i);
+  }
+  // add any further entries due to decomposition
+  if (!decomposition.isEmpty()) {
+    assert(false); // TODO
+  }
   // clear the list
   last_markers.clear();
 }

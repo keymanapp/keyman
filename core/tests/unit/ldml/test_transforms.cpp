@@ -55,10 +55,16 @@ std::u32string
 marker_map_to_string(const marker_map &m) {
   std::u32string s;
   for (auto i = m.rbegin(); i < m.rend(); i++) {
-    prepend_hex_oct(s, i->first);
+    if (i->end) {
+      s.insert(0, U"<END>");
+    }
+    if (i->processed) {
+      s.insert(0, U"<PROCESSED?>");
+    }
+    prepend_hex_oct(s, i->ch);
     s.insert(0, U"=U+");
 
-    prepend_hex_quad(s, i->second);
+    prepend_hex_quad(s, i->marker);
     s.insert(0, U" \\m0x");
   }
   return s;
@@ -66,8 +72,6 @@ marker_map_to_string(const marker_map &m) {
 
 bool
 _assert_marker_map_equal(const char *f, int l, const marker_map a, const marker_map x) {
-  if (a == x)
-    return true;
   std::wcerr << f << ":" << l << ": " << console_color::fg(console_color::BRIGHT_RED);
   std::wcerr << "got: " << marker_map_to_string(a);
   std::wcerr << " expected: " << marker_map_to_string(x);
@@ -1028,6 +1032,44 @@ test_normalize() {
     }
     zassert_string_equal(dst_nfd, expect_nfd);
     assert_marker_map_equal(map, expm);
+  }
+
+  // doubled markers tests
+  {
+    marker_map map;
+    std::cout << __FILE__ << ":" << __LINE__ << " - doubled marker1 " << std::endl;
+    const std::u32string src        = U"e\uffff\u0008\u0001\u0300\u0320\u0300";
+    const std::u32string expect_rem = U"e\u0300\u0320\u0300";
+    const std::u32string expect_nfd = U"e\u0320\uffff\u0008\u0001\u0300\u0300";
+    auto dst_rem                    = remove_markers(src, &map);
+//    marker_map expm({{0x0308, 0x1L}});
+    zassert_string_equal(dst_rem, expect_rem);
+    std::u32string dst_nfd = src;
+    assert(normalize_nfd_markers(dst_nfd));
+    if (dst_nfd != expect_nfd) {
+      std::cout << "dst: " << Debug_UnicodeString(dst_nfd) << std::endl;
+      std::cout << "exp: " << Debug_UnicodeString(expect_nfd) << std::endl;
+    }
+    zassert_string_equal(dst_nfd, expect_nfd);
+  //  assert_marker_map_equal(map, expm);
+  }
+  {
+    marker_map map;
+    std::cout << __FILE__ << ":" << __LINE__ << " - doubled unchanged marker " << std::endl;
+    const std::u32string src        = U"e\u0320\uffff\u0008\u0001\u0300\u0300";
+    const std::u32string expect_rem = U"e\u0300\u0320\u0300";
+    const std::u32string expect_nfd = src;
+    auto dst_rem                    = remove_markers(src, &map);
+    // marker_map expm({{0x0308, 0x1L}});
+    zassert_string_equal(dst_rem, expect_rem);
+    std::u32string dst_nfd = src;
+    assert(normalize_nfd_markers(dst_nfd));
+    if (dst_nfd != expect_nfd) {
+      std::cout << "dst: " << Debug_UnicodeString(dst_nfd) << std::endl;
+      std::cout << "exp: " << Debug_UnicodeString(expect_nfd) << std::endl;
+    }
+    zassert_string_equal(dst_nfd, expect_nfd);
+    // assert_marker_map_equal(map, expm);
   }
 
   return EXIT_SUCCESS;

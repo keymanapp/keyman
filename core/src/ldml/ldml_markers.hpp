@@ -44,8 +44,21 @@ typedef KMX_DWORD marker_num;
 /** list of marker numbers */
 typedef std::deque<marker_num> marker_list;
 
-/** map from one char to one entry */
-typedef std::pair<char32_t, marker_num> marker_entry;
+struct marker_entry {
+  /** code point glued to or MARKER_BEFORE_EOT */
+  char32_t ch;
+  /** marker number */
+  marker_num marker;
+  /** true if processed */
+  bool processed;
+  /** true if an end of this codepoint */
+  bool end;
+
+  /** add an 'end' entry */
+  marker_entry(char32_t ch);
+  /** add a 'marker' entry */
+  marker_entry(char32_t ch, marker_num marker);
+};
 
 /** map from following-char to marker numbers, in front to back order */
 typedef std::deque<marker_entry> marker_map;
