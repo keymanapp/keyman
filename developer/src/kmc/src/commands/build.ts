@@ -12,6 +12,7 @@ import { isProject } from '../util/projectLoader.js';
 import { buildTestData } from './buildTestData/index.js';
 import { buildWindowsPackageInstaller } from './buildWindowsPackageInstaller/index.js';
 import { commandOptionsToCompilerOptions } from '../util/extendedCompilerOptions.js';
+import { exitProcess } from '../util/sysexits.js';
 
 export function declareBuild(program: Command) {
   // TODO: localization?
@@ -79,7 +80,7 @@ async function buildFile(filenames: string[], _options: any, commander: any)  {
   const commanderOptions/*:{TODO?} CommandLineCompilerOptions*/ = commander.optsWithGlobals();
   const options = initialize(commanderOptions);
   if(!options) {
-    process.exit(1);
+    await exitProcess(1);
   }
 
   const callbacks = new NodeCompilerCallbacks(options);
@@ -93,17 +94,17 @@ async function buildFile(filenames: string[], _options: any, commander: any)  {
   if(filenames.length > 1 && commanderOptions.outFile) {
     // -o can only be specified with a single input file
     callbacks.reportMessage(InfrastructureMessages.Error_OutFileCanOnlyBeSpecifiedWithSingleInfile());
-    process.exit(1);
+    await exitProcess(1);
   }
 
   if(!expandFileLists(filenames, callbacks)) {
-    process.exit(1);
+    await exitProcess(1);
   }
 
   for(let filename of filenames) {
     if(!await build(filename, commanderOptions.outFile, callbacks, options)) {
       // Once a file fails to build, we bail on subsequent builds
-      process.exit(1);
+      await exitProcess(1);
     }
   }
 }
