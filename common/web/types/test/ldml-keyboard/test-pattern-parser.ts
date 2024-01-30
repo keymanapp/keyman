@@ -385,6 +385,10 @@ describe('Test of nfd_markers()', () => {
       // double marker - no change
       ["e\u0320\uffff\u0008\u0001\u0300\u0300", "e\u0320\uffff\u0008\u0001\u0300\u0300"],
 
+      // Double marker with greek!
+      ["\u03B5\uFFFF\u0008\u0001\u0344\uFFFF\u0008\u0002\u0344\uFFFF\u0008\u0003",
+       "\u03B5\uFFFF\u0008\u0001\u0308\u0301\uFFFF\u0008\u0002\u0308\u0301\uFFFF\u0008\u0003"]
+
     ];
 
     for (let i = 0; i < src_expect.length; i++) {
