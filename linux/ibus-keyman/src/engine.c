@@ -40,7 +40,15 @@
 
 // Fallback for older ibus versions that don't define IBUS_PREFILTER_MASK
 #ifndef IBUS_HAS_PREFILTER
+#ifdef KEYMAN_PKG_BUILD
+// When building packages on Ubuntu and Debian servers we probably don't have
+// a patched ibus available and additionally treat warnings as errors, but
+// still want to build packages.
+#pragma message "Compiling against ibus version that does not include prefilter mask patch\n(https://github.com/ibus/ibus/pull/2440). Output ordering guarantees will be disabled."
+#else
 #warning Compiling against ibus version that does not include prefilter mask patch (https://github.com/ibus/ibus/pull/2440). Output ordering guarantees will be disabled.
+#endif
+
 #define IBUS_PREFILTER_MASK (1 << 23)
 #endif
 
