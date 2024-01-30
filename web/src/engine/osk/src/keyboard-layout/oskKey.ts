@@ -182,6 +182,9 @@ export default abstract class OSKKey {
 
     // Among other things, ensures we use SpecialOSK styling for special key text.
     // It's set on the key-span, not on the button.
+    //
+    // Also helps ensure that the stub's font-family name is used for keys, should
+    // that mismatch the font-family name specified within the keyboard's touch layout.
     const capFont = !this.label ? undefined: getComputedStyle(this.label).fontFamily;
     if(capFont) {
       buttonStyle = {
