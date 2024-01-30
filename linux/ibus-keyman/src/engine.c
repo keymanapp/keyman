@@ -586,7 +586,7 @@ is_core_options_end(km_core_option_item *option) {
 }
 
 static void
-process_output_action(IBusEngine *engine, km_core_usv* output_utf32) {
+process_output_action(IBusEngine *engine, const km_core_usv* output_utf32) {
   if (output_utf32 == NULL || output_utf32[0] == '\0') {
     return;
   }
