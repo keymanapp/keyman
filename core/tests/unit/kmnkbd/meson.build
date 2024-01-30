@@ -27,6 +27,7 @@ tests = [
   ['kmx_xstring', 'test_kmx_xstring.cpp'],
   ['kmx_context', 'test_kmx_context.cpp'],
   ['test_actions_normalize', 'test_actions_normalize.cpp'],
+  ['test_actions_get_api', 'test_actions_get_api.cpp'],
 ]
 
 test_path = join_paths(meson.current_build_dir(), '..', 'kmx')

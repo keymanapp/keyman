@@ -46,6 +46,7 @@ void test_two_backspaces() {
   assert(actions->do_alert == false);
   assert(actions->emit_keystroke == false);
   assert(actions->new_caps_lock_state == -1);
+  assert(actions->deleted_context == nullptr);
 
   try_status(km_core_actions_dispose(actions));
 }
@@ -76,6 +77,7 @@ void test_marker_text_interleaved() {
   assert(actions->do_alert == false);
   assert(actions->emit_keystroke == false);
   assert(actions->new_caps_lock_state == -1);
+  assert(actions->deleted_context == nullptr);
 
   try_status(km_core_actions_dispose(actions));
 }
@@ -99,6 +101,7 @@ void test_alert() {
   assert(actions->do_alert == KM_CORE_TRUE);
   assert(actions->emit_keystroke == KM_CORE_FALSE);
   assert(actions->new_caps_lock_state == KM_CORE_CAPS_UNCHANGED);
+  assert(actions->deleted_context == nullptr);
 
   try_status(km_core_actions_dispose(actions));
 }
@@ -122,6 +125,7 @@ void test_emit_keystroke() {
   assert(actions->do_alert == KM_CORE_FALSE);
   assert(actions->emit_keystroke == KM_CORE_TRUE);
   assert(actions->new_caps_lock_state == KM_CORE_CAPS_UNCHANGED);
+  assert(actions->deleted_context == nullptr);
 
   try_status(km_core_actions_dispose(actions));
 }
@@ -146,6 +150,7 @@ void test_invalidate_context() {
   assert(actions->do_alert == KM_CORE_FALSE);
   assert(actions->emit_keystroke == KM_CORE_FALSE);
   assert(actions->new_caps_lock_state == KM_CORE_CAPS_UNCHANGED);
+  assert(actions->deleted_context == nullptr);
 
   try_status(km_core_actions_dispose(actions));
 }
@@ -185,6 +190,7 @@ void test_persist_opt() {
   assert(actions->do_alert == KM_CORE_FALSE);
   assert(actions->emit_keystroke == KM_CORE_FALSE);
   assert(actions->new_caps_lock_state == KM_CORE_CAPS_UNCHANGED);
+  assert(actions->deleted_context == nullptr);
 
   try_status(km_core_actions_dispose(actions));
 }
@@ -227,6 +233,7 @@ int main(int argc, char *argv []) {
   std::cout << "&km_core_actions.do_alert: " << ((intptr_t)(&act.do_alert)-(intptr_t)(&act)) << std::endl;
   std::cout << "&km_core_actions.emit_keystroke: " << ((intptr_t)(&act.emit_keystroke)-(intptr_t)(&act)) << std::endl;
   std::cout << "&km_core_actions.new_caps_lock_state: " << ((intptr_t)(&act.new_caps_lock_state)-(intptr_t)(&act)) << std::endl;
+  std::cout << "&km_core_actions.deleted_context: " << ((intptr_t)(&act.deleted_context)-(intptr_t)(&act)) << std::endl;
 
   // actions
   test_two_backspaces();

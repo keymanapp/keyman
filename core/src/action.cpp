@@ -36,6 +36,10 @@ km_core_actions * km::core::action_item_list_to_actions_object(
   actions->emit_keystroke = KM_CORE_FALSE;
   actions->new_caps_lock_state = KM_CORE_CAPS_UNCHANGED;
 
+  // deleted_context data will be set in km_core_state_get_actions
+  // because it needs access to the state's app context
+  actions->deleted_context = nullptr;
+
   // Clear output pointers, will be set later once we have sizes
   actions->output = nullptr;
   actions->persist_options = nullptr;

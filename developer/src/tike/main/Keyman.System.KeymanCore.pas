@@ -181,23 +181,30 @@ type
   );
 
   km_core_actions = record
-  code_points_to_delete: uint32; // number of codepoints (not codeunits!) to delete from app context.
+    // number of codepoints (not codeunits!) to delete from app context.
+    code_points_to_delete: uint32;
 
-  // null-term string of characters to insert into document
-  output: pkm_core_usv;
+    // null-term string of characters to insert into document
+    output: pkm_core_usv;
 
-  // list of options to persist, terminated with KM_CORE_OPTIONS_END
-  persist_options: pkm_core_option_item;
+    // list of options to persist, terminated with KM_CORE_OPTIONS_END
+    persist_options: pkm_core_option_item;
 
-  // issue a beep, 0 = no, 1 = yes
-  do_alert: km_core_bool;
+    // issue a beep, 0 = no, 1 = yes
+    do_alert: km_core_bool;
 
-  // emit the (unmodified) input keystroke to the application, 0 = no, 1 = yes
-  emit_keystroke: km_core_bool;
+    // emit the (unmodified) input keystroke to the application, 0 = no, 1 = yes
+    emit_keystroke: km_core_bool;
 
-  // -1=unchanged, 0=off, 1=on
-  new_caps_lock_state: km_core_caps_state;
+    // -1=unchanged, 0=off, 1=on
+    new_caps_lock_state: km_core_caps_state;
 
+    // reference copy of actual UTF32 codepoints deleted from end of context
+    // (closest to caret) exactly code_points_to_delete in length (plus null
+    // terminator). Used to determine encoding conversion differences when
+    // deleting; only set when using km_core_state_actions_get, otherwise
+    // nullptr.
+    deleted_context: pkm_core_usv;
   end;
   pkm_core_actions = ^km_core_actions;
 
@@ -669,13 +676,14 @@ begin
 {$IFDEF WIN64}
   {$ERROR Struct size not yet verified for 64-bit}
 {$ENDIF}
-  assert(sizeof(km_core_actions) = 24);
+  assert(sizeof(km_core_actions) = 28);
   // &km_core_actions.code_points_to_delete: 0
   assert(Uint32(@act.output) - Uint32(@act) = 4);
   assert(Uint32(@act.persist_options) - Uint32(@act) = 8);
   assert(Uint32(@act.do_alert) - Uint32(@act) = 12);
   assert(Uint32(@act.emit_keystroke) - Uint32(@act) = 16);
   assert(Uint32(@act.new_caps_lock_state) - Uint32(@act) = 20);
+  assert(Uint32(@act.deleted_context) - Uint32(@act) = 24);
 end;
 
 initialization

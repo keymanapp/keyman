@@ -125,7 +125,8 @@ void test_two_backspaces() {
     test_env_opts, // km_core_option_item* persist_options;
     KM_CORE_FALSE, // km_core_bool do_alert;
     KM_CORE_FALSE, // km_core_bool emit_keystroke;
-    KM_CORE_CAPS_UNCHANGED // new_caps_lock_state;
+    KM_CORE_CAPS_UNCHANGED, // new_caps_lock_state;
+    nullptr // km_core_usv* deleted_context;
   };
 
   run_test(action_items, actions);
@@ -144,7 +145,8 @@ void test_character() {
     test_env_opts, // km_core_option_item* persist_options;
     KM_CORE_FALSE, // km_core_bool do_alert;
     KM_CORE_FALSE, // km_core_bool emit_keystroke;
-    KM_CORE_CAPS_UNCHANGED // new_caps_lock_state;
+    KM_CORE_CAPS_UNCHANGED, // new_caps_lock_state;
+    nullptr // km_core_usv* deleted_context;
   };
 
   run_test(action_items, actions);
@@ -165,7 +167,8 @@ void test_alert() {
     test_env_opts, // km_core_option_item* persist_options;
     KM_CORE_TRUE, // km_core_bool do_alert;
     KM_CORE_FALSE, // km_core_bool emit_keystroke;
-    KM_CORE_CAPS_UNCHANGED // new_caps_lock_state;
+    KM_CORE_CAPS_UNCHANGED, // new_caps_lock_state;
+    nullptr // km_core_usv* deleted_context;
   };
 
   run_test(action_items, actions);
@@ -186,7 +189,8 @@ void test_emit_keystroke() {
     test_env_opts, // km_core_option_item* persist_options;
     KM_CORE_FALSE, // km_core_bool do_alert;
     KM_CORE_TRUE, // km_core_bool emit_keystroke;
-    KM_CORE_CAPS_UNCHANGED // new_caps_lock_state;
+    KM_CORE_CAPS_UNCHANGED, // new_caps_lock_state;
+    nullptr // km_core_usv* deleted_context;
   };
 
   run_test(action_items, actions);
@@ -208,7 +212,8 @@ void test_invalidate_context() {
     test_env_opts, // km_core_option_item* persist_options;
     KM_CORE_FALSE, // km_core_bool do_alert;
     KM_CORE_FALSE, // km_core_bool emit_keystroke;
-    KM_CORE_CAPS_UNCHANGED // new_caps_lock_state;
+    KM_CORE_CAPS_UNCHANGED, // new_caps_lock_state;
+    nullptr // km_core_usv* deleted_context;
   };
 
   run_test(action_items, actions);
@@ -243,7 +248,8 @@ void test_persist_opt() {
     options, // km_core_option_item* persist_options;
     KM_CORE_FALSE, // km_core_bool do_alert;
     KM_CORE_FALSE, // km_core_bool emit_keystroke;
-    KM_CORE_CAPS_UNCHANGED // new_caps_lock_state;
+    KM_CORE_CAPS_UNCHANGED, // new_caps_lock_state;
+    nullptr // km_core_usv* deleted_context;
   };
 
   run_test(action_items, actions);
@@ -266,7 +272,8 @@ void test_caps_lock() {
     test_env_opts, // km_core_option_item* persist_options;
     KM_CORE_FALSE, // km_core_bool do_alert;
     KM_CORE_FALSE, // km_core_bool emit_keystroke;
-    KM_CORE_CAPS_ON // new_caps_lock_state;
+    KM_CORE_CAPS_ON, // new_caps_lock_state;
+    nullptr // km_core_usv* deleted_context;
   };
 
   run_test(action_items, actions);
