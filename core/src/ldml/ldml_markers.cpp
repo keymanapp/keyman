@@ -65,7 +65,7 @@ marker_entry::marker_entry(char32_t c, marker_num n) : ch(c), marker(n), process
 
 }
 
-static size_t count_markers(const marker_map &map) {
+size_t count_markers(const marker_map &map) {
   size_t m = 0;
   for (auto i = map.begin(); i < map.end(); i++) {
     // add all actual markers
@@ -436,9 +436,9 @@ add_pending_markers(
     } else {
       // 'glue' is the first codepoint of the decomposition.
       marker_ch = decomposition.char32At(0);
-      if(decomposition.countChar32() == 1) {
+      if (decomposition.countChar32() == 1) {
         decomposition.remove(); // no other entries needed
-      }
+      } // else: will add the remainder below
     }
   }
   markers->emplace_back(marker_ch);
@@ -449,7 +449,10 @@ add_pending_markers(
   }
   // add any further entries due to decomposition
   if (!decomposition.isEmpty()) {
-    assert(false); // TODO
+    // We already added the base char above, add teh rest
+    for (auto i=1; i<decomposition.countChar32(); i++) {
+      markers->emplace_back(decomposition.char32At(i));
+    }
   }
   // clear the list
   last_markers.clear();
