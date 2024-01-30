@@ -1,6 +1,5 @@
 #include <iostream>
-#include <keyman/keyman_core_api.h>
-#include <keyman/keyman_core_api_debug.h>
+#include "keyman_core.h"
 #include "kmx/kmx_base.h"
 #include "kmx/kmx_xstring.h"
 
