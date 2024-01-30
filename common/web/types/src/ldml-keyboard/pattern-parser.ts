@@ -69,9 +69,9 @@ export class MarkerParser {
   public static readonly MAX_MARKER_COUNT = constants.marker_max_count;
 
   private static anyMarkerMatch() : string {
-    const start = hexQuad(this.MIN_MARKER_INDEX);
-    const end   = hexQuad(this.MAX_MARKER_INDEX);
-    return `${this.SENTINEL_MATCH}${this.MARKER_CODE_MATCH}[\\u${start}-\\u${end}]`; // TODO-LDML: #9121 wrong escape format
+    const start = hexQuad(MarkerParser.MIN_MARKER_INDEX);
+    const end   = hexQuad(MarkerParser.MAX_MARKER_INDEX);
+    return `${MarkerParser.SENTINEL_MATCH}${MarkerParser.MARKER_CODE_MATCH}[\\u${start}-\\u${end}]`; // TODO-LDML: #9121 wrong escape format
   }
 
   /** Expression that matches any marker */
@@ -91,7 +91,7 @@ export class MarkerParser {
     if (!str) {
       return [];
     }
-    return matchArray(str, this.REFERENCE);
+    return matchArray(str, MarkerParser.REFERENCE);
   }
 
   private static markerCodeToString(n: number, forMatch?: boolean): string {
@@ -108,19 +108,19 @@ export class MarkerParser {
       throw RangeError(`Internal Error: marker index out of range ${n}`);
     }
     if (forMatch) {
-      return this.SENTINEL_MATCH + this.MARKER_CODE_MATCH + this.markerCodeToString(n, forMatch);
+      return MarkerParser.SENTINEL_MATCH + MarkerParser.MARKER_CODE_MATCH + MarkerParser.markerCodeToString(n, forMatch);
     } else {
-      return this.SENTINEL + this.MARKER_CODE + this.markerCodeToString(n, forMatch);
+      return MarkerParser.SENTINEL + MarkerParser.MARKER_CODE + MarkerParser.markerCodeToString(n, forMatch);
     }
   }
 
   /** @returns all marker strings as sentinel values */
   public static toSentinelString(s: string, markers?: OrderedStringList, forMatch?: boolean) : string {
     if (!s) return s;
-    return s.replaceAll(this.REFERENCE, (sub, arg) => {
+    return s.replaceAll(MarkerParser.REFERENCE, (sub, arg) => {
       if (arg === MarkerParser.ANY_MARKER_ID) {
         if (forMatch) {
-          return this.ANY_MARKER_MATCH;
+          return MarkerParser.ANY_MARKER_MATCH;
         }
         return MarkerParser.markerOutput(MarkerParser.ANY_MARKER_INDEX);
       }
@@ -195,7 +195,7 @@ export class MarkerParser {
     do {
       /** remainder of string i..end, for match */
       const rest = a.slice(i).join('');
-      const p = this.parse_next_marker(rest, forMatch);
+      const p = MarkerParser.parse_next_marker(rest, forMatch);
       const have_marker = !!(p?.match);
 
       // First, categorize the current character.
@@ -245,7 +245,7 @@ export class MarkerParser {
    */
   public static nfd_markers_segment(s: string, map: MarkerMap, forMatch?: boolean) : string {
     // remove (and parse) the markers first
-    const str_unmarked = this.remove_markers(s, map, forMatch);
+    const str_unmarked = MarkerParser.remove_markers(s, map, forMatch);
     // then, NFD the normalized string
     const str_unmarked_nfd = str_unmarked.normalize("NFD");
     if(map.length == 0) {
@@ -257,7 +257,7 @@ export class MarkerParser {
     } else {
       // we had markers AND the normalization made a difference.
       // add the markers back per the map, and return
-      return this.add_back_markers(str_unmarked_nfd, map, forMatch);
+      return MarkerParser.add_back_markers(str_unmarked_nfd, map, forMatch);
     }
   }
 
@@ -266,7 +266,7 @@ export class MarkerParser {
     if (forMatch && marker === constants.marker_any_index) {
       return MarkerParser.ANY_MARKER_MATCH + s;
     } else {
-      return this.markerOutput(marker, forMatch) + s;
+      return MarkerParser.markerOutput(marker, forMatch) + s;
     }
   }
 
@@ -349,8 +349,8 @@ export class MarkerParser {
      * @param l string the marker is 'glued' to, or '' for end
      */
     function add_pending_markers(l: string): void {
-      // first char, or, marker-before-eot
-      const ch = (l === '') ? MARKER_BEFORE_EOT : [...l][0];
+      // first char, or, marker-before-eot. Must be first char of NFD sequence
+      const ch = (l === '') ? MARKER_BEFORE_EOT : [...(l.normalize("NFD"))][0];
       while(last_markers.length) {
         const marker = last_markers[0];
         last_markers = last_markers.slice(1); // pop from front
@@ -361,7 +361,7 @@ export class MarkerParser {
     // iterate until the codepoint list is empty
     while (a.length > 0) {
       // does 'a' begin with a marker?
-      const p = this.parse_next_marker(a.join(''), forMatch);
+      const p = MarkerParser.parse_next_marker(a.join(''), forMatch);
       if (!p?.match) {
         // no match
         add_pending_markers(a[0]); // add any pending markers
@@ -484,7 +484,7 @@ export class VariableParser {
    * @returns `[]` or an array of all string references referenced
    */
   public static allStringReferences(str: string): string[] {
-    return matchArray(str, this.STRING_REFERENCE);
+    return matchArray(str, VariableParser.STRING_REFERENCE);
   }
 
   /**
@@ -493,7 +493,7 @@ export class VariableParser {
    * @returns `[]` or an array of all string references referenced
    */
   public static allSetReferences(str: string): string[] {
-    return matchArray(str, this.SET_REFERENCE);
+    return matchArray(str, VariableParser.SET_REFERENCE);
   }
 
   /**
@@ -570,7 +570,7 @@ export class ElementParser {
 
   /** Split a string into ElementSegments */
   public static segment(str: string): ElementSegment[] {
-    if (this.MATCH_NESTED_SQUARE_BRACKETS.test(str)) {
+    if (ElementParser.MATCH_NESTED_SQUARE_BRACKETS.test(str)) {
       throw Error(`Unsupported: nested square brackets in element segment: ${str}`);
     }
     const list: ElementSegment[] = [];

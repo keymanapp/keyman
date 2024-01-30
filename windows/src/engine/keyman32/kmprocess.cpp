@@ -70,31 +70,6 @@
 
 BOOL fOutputKeystroke;
 
-char *getcontext_debug() {
-
-  PKEYMAN64THREADDATA _td = ThreadGlobals();
-  if (!_td || !_td->lpActiveKeyboard || !_td->lpActiveKeyboard->lpCoreKeyboardState){
-        return "";
-  }
-
-  WCHAR buf[(MAXCONTEXT * 3) + 1];  // *3 if every context item was a deadkey
-  km_core_context_item *citems = nullptr;
-
-  if (KM_CORE_STATUS_OK != km_core_context_get(
-    km_core_state_context(_td->lpActiveKeyboard->lpCoreKeyboardState), &citems)) {
-    return "";
-  }
-
-  DWORD context_length = (DWORD)km_core_context_item_list_size(citems);
-  if (!ContextItemToAppContext(citems, buf, context_length)) {
-    km_core_context_items_dispose(citems);
-    return "";
-  }
-  km_core_context_items_dispose(citems);
-  return Debug_UnicodeString(buf);
-
-}
-
 /**
  *  Process the key stroke using the core processor
  *
@@ -148,8 +123,18 @@ BOOL ProcessHook()
 
 	if(_td->state.msg.message == wm_keymankeydown) {   // I4827
     if (ShouldDebug(sdmKeyboard)) {
-      SendDebugMessageFormat(_td->state.msg.hwnd, sdmKeyboard, 0, "Key pressed: %s Context '%s'",
-        Debug_VirtualKey(_td->state.vkey), getcontext_debug());
+      if(!_td->lpActiveKeyboard || !_td->lpActiveKeyboard->lpCoreKeyboardState) {
+        SendDebugMessageFormat(_td->state.msg.hwnd, sdmKeyboard, 0, "Key pressed: %s Context <unavailable>",
+          Debug_VirtualKey(_td->state.vkey));
+      } else {
+        km_core_cp* debug_context = km_core_state_context_debug(
+          _td->lpActiveKeyboard->lpCoreKeyboardState,
+          KM_CORE_DEBUG_CONTEXT_CACHED
+        );
+        SendDebugMessageFormat(_td->state.msg.hwnd, sdmKeyboard, 0, "Key pressed: %s Context '%ls'",
+          Debug_VirtualKey(_td->state.vkey), debug_context);
+        km_core_cp_dispose(debug_context);
+      }
     }
 
 	}

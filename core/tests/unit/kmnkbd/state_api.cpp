@@ -9,7 +9,7 @@
 #include <iostream>
 #include <string>
 
-#include <keyman/keyman_core_api.h>
+#include "keyman_core.h"
 
 #include "path.hpp"
 #include "state.hpp"
@@ -130,7 +130,7 @@ int main(int argc, char * argv[])
 
   // Lets add data and do some basic checks of options and km_core_context
   km_core_context_item *citems = nullptr;
-  try_status(km_core_context_items_from_utf16(u"Hello 😁", &citems));
+  try_status(context_items_from_utf16(u"Hello 😁", &citems));
   try_status(km_core_context_set(km_core_state_context(test_state), citems));
   km_core_context_items_dispose(citems);
   if(km_core_context_length(km_core_state_context(test_state)) != 7)

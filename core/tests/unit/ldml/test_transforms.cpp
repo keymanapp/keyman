@@ -954,7 +954,80 @@ test_normalize() {
       std::cout << "dst: " << Debug_UnicodeString(dst_nfd) << std::endl;
       std::cout << "exp: " << Debug_UnicodeString(expect_nfd) << std::endl;
     }
+      zassert_string_equal(dst_nfd, expect_nfd);
+  }
+  {
+    marker_map map;
+    std::cout << __FILE__ << ":" << __LINE__ << " - marker-before-NFC " << std::endl;
+    // KA \m O -> KA \m E AA
+    const std::u32string src        = U"\u0995\uFFFF\u0008\u0001\u09CB";
+    const std::u32string expect_rem = U"\u0995\u09CB";
+    const std::u32string expect_nfd = U"\u0995\uFFFF\u0008\u0001\u09C7\u09BE";
+    auto dst_rem                    = remove_markers(src, &map);
+    marker_map expm({{0x09C7, 0x1L}});
+    zassert_string_equal(dst_rem, expect_rem);
+    std::u32string dst_nfd = src;
+    assert(normalize_nfd_markers(dst_nfd));
+    if (dst_nfd != expect_nfd) {
+      std::cout << "dst: " << Debug_UnicodeString(dst_nfd) << std::endl;
+      std::cout << "exp: " << Debug_UnicodeString(expect_nfd) << std::endl;
+    }
     zassert_string_equal(dst_nfd, expect_nfd);
+    assert_marker_map_equal(map, expm);
+  }
+  {
+    marker_map map;
+    std::cout << __FILE__ << ":" << __LINE__ << " - marker-before-NFC " << std::endl;
+    const std::u32string src        = U"\u0995\u09BE\uFFFF\u0008\u0001\u09C7";
+    const std::u32string expect_rem = U"\u0995\u09BE\u09C7";
+    const std::u32string expect_nfd = src; // does not get reordered
+    auto dst_rem                    = remove_markers(src, &map);
+    marker_map expm({{0x09C7, 0x1L}});
+    zassert_string_equal(dst_rem, expect_rem);
+    std::u32string dst_nfd = src;
+    assert(normalize_nfd_markers(dst_nfd));
+    if (dst_nfd != expect_nfd) {
+      std::cout << "dst: " << Debug_UnicodeString(dst_nfd) << std::endl;
+      std::cout << "exp: " << Debug_UnicodeString(expect_nfd) << std::endl;
+    }
+    zassert_string_equal(dst_nfd, expect_nfd);
+    assert_marker_map_equal(map, expm);
+  }
+  {
+    marker_map map;
+    std::cout << __FILE__ << ":" << __LINE__ << " - marker-before-NFC " << std::endl;
+    const std::u32string src        = U"\u0995\u09BE\uFFFF\u0008\u0001\u09C7";
+    const std::u32string expect_rem = U"\u0995\u09BE\u09C7";
+    const std::u32string expect_nfd = src; // does not get reordered
+    auto dst_rem                    = remove_markers(src, &map);
+    marker_map expm({{0x09C7, 0x1L}});
+    zassert_string_equal(dst_rem, expect_rem);
+    std::u32string dst_nfd = src;
+    assert(normalize_nfd_markers(dst_nfd));
+    if (dst_nfd != expect_nfd) {
+      std::cout << "dst: " << Debug_UnicodeString(dst_nfd) << std::endl;
+      std::cout << "exp: " << Debug_UnicodeString(expect_nfd) << std::endl;
+    }
+    zassert_string_equal(dst_nfd, expect_nfd);
+    assert_marker_map_equal(map, expm);
+  }
+  {
+    marker_map map;
+    std::cout << __FILE__ << ":" << __LINE__ << " - marker-before-greek " << std::endl;
+    const std::u32string src        = U"\u03B5\uFFFF\u0008\u0001\u0344";
+    const std::u32string expect_rem = U"\u03B5\u0344";
+    const std::u32string expect_nfd = U"\u03B5\uFFFF\u0008\u0001\u0308\u0301";
+    auto dst_rem                    = remove_markers(src, &map);
+    marker_map expm({{0x0308, 0x1L}});
+    zassert_string_equal(dst_rem, expect_rem);
+    std::u32string dst_nfd = src;
+    assert(normalize_nfd_markers(dst_nfd));
+    if (dst_nfd != expect_nfd) {
+      std::cout << "dst: " << Debug_UnicodeString(dst_nfd) << std::endl;
+      std::cout << "exp: " << Debug_UnicodeString(expect_nfd) << std::endl;
+    }
+    zassert_string_equal(dst_nfd, expect_nfd);
+    assert_marker_map_equal(map, expm);
   }
 
   return EXIT_SUCCESS;

@@ -500,6 +500,7 @@ block(strs)                         #  struct COMP_KMXPLUS_STRS {
   diff(strs,strA)   sizeof(strA,2)
   diff(strs,strSet)   sizeof(strSet,2)
   diff(strs,strSet2)   sizeof(strSet2,2)
+  diff(strs,strTranTo)          sizeof(strTranTo,2)
   diff(strs,strBase)   sizeof(strBase,2)
   diff(strs,strElemBkspFrom2) sizeof(strElemBkspFrom2,2)
   diff(strs,strGapReserved) sizeof(strGapReserved,2)
@@ -513,7 +514,6 @@ block(strs)                         #  struct COMP_KMXPLUS_STRS {
   diff(strs,strVse)   sizeof(strVse,2)
   diff(strs,strVst)   sizeof(strVst,2)
   diff(strs,strVus)   sizeof(strVus,2)
-  diff(strs,strTranTo)          sizeof(strTranTo,2)
   diff(strs,strKeys)       sizeof(strKeys,2)
   diff(strs,strIndicator)  sizeof(strIndicator,2)
   diff(strs,strSentinel0001)  sizeof(strSentinel0001,2)
@@ -536,6 +536,7 @@ block(strs)                         #  struct COMP_KMXPLUS_STRS {
   block(strSet)              61 00 20 00 62 00 20 00 63 00 block(x) 00 00               # 'a b c'
 #str #0A
   block(strSet2)             61 00 62 00 63 00 block(x) 00 00                           # 'abc'
+  block(strTranTo)           61 00 02 03 block(x) 00 00                          # 'â' (U+0061 U+0302)
   block(strBase)             62 00 61 00 73 00 65 00 block(x) 00 00                     # 'base'
   block(strElemBkspFrom2)    65 00 block(x) 00 00                                       # 'e'
   block(strGapReserved)         67 00 61 00 70 00 20 00 28 00 72 00 65 00 73 00 65 00 72 00 76 00 65 00 64 00 29 00 block(x) 00 00 # 'gap (reserved)'
@@ -551,7 +552,6 @@ block(strs)                         #  struct COMP_KMXPLUS_STRS {
   block(strVse)              76 00 73 00 65 00 block(x) 00 00                     # 'vse'
   block(strVst)              76 00 73 00 74 00 block(x) 00 00                     # 'vst'
   block(strVus)              76 00 75 00 73 00 block(x) 00 00                     # 'vus'
-  block(strTranTo)           E2 00 block(x) 00 00                                       # 'â'
 #str #1a
   block(strKeys)             90 17 b6 17 block(x) 00 00                               # 'ថា'
   # <reorder before="ᩫ" from="᩠᩵ᩅ" order="10 55 10" />

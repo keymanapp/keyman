@@ -33,15 +33,9 @@
 #include "ldml_test_source.hpp"
 #include "ldml_test_utils.hpp"
 
-#if defined(HAVE_ICU4C)
-// TODO-LDML: Needed this for some compiler warnings
-#define U_FALLTHROUGH
-#include "unicode/utypes.h"
+#include "core_icu.h"
 #include "unicode/uniset.h"
 #include "unicode/usetiter.h"
-#else
-#error icu4c is required for this test
-#endif
 
 #define assert_or_return(expr) if(!(expr)) { \
   std::wcerr << __FILE__ << ":" << __LINE__ << ": " << \
@@ -516,7 +510,7 @@ LdmlJsonTestSource::next_action(ldml_action &fillin) {
   if (type == "check") {
     fillin.type   = LDML_ACTION_CHECK_EXPECTED;
     fillin.string = LdmlTestSource::parse_u8_source_string(result.get<std::string>());
-    assert(km::core::ldml::normalize_nfd(fillin.string)); // TODO-LDML: should be NFC
+    assert(km::core::ldml::normalize_nfd(fillin.string)); // TODO-LDML: will be NFC when core is normalizing to NFC
     return;
   } else if (type == "keystroke") {
     fillin.type   = LDML_ACTION_KEY_EVENT;
@@ -529,7 +523,7 @@ LdmlJsonTestSource::next_action(ldml_action &fillin) {
   } else if (type == "emit") {
     fillin.type   = LDML_ACTION_EMIT_STRING;
     fillin.string = LdmlTestSource::parse_u8_source_string(to.get<std::string>());
-    assert(km::core::ldml::normalize_nfd(fillin.string)); // TODO-LDML: should be NFC
+    assert(km::core::ldml::normalize_nfd(fillin.string)); // TODO-LDML: will be NFC when core is normalizing to NFC
     return;
   } else if (type == "backspace") {
     // backspace is handled as a key event
@@ -619,6 +613,7 @@ LdmlJsonRepertoireTestSource::next_action(ldml_action &fillin) {
   km::core::kmx::char16_single ch16;
   std::size_t len = km::core::kmx::Utf32CharToUtf16(ch, ch16);
   std::u16string chstr = std::u16string(ch16.ch, len);
+  assert(km::core::ldml::normalize_nfd(chstr)); // TODO-LDML: will be NFC when core is normalizing to NFC
   // append to expected
   expected.append(chstr);
   need_check = true;

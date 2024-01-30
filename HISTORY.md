@@ -1,5 +1,37 @@
 # Keyman Version History
 
+## 17.0.256 alpha 2024-01-30
+
+* fix(linux): packaging on Ubuntu and Debian servers should give message instead of warning because we don't have patched ibus there (#10537)
+* feat(developer): turn on developer side normalization (#10528)
+
+## 17.0.255 alpha 2024-01-29
+
+* chore(ios): eliminate xcglogger dependency (#10446)
+* feat(developer): ldml marker normalization fix (#10527)
+* chore(linux): Build with webkitgtk 4.1 instead of 4.0 (#10483)
+
+## 17.0.254 alpha 2024-01-27
+
+* feat(core): ldml marker normalization fix (#10517)
+
+## 17.0.253 alpha 2024-01-26
+
+* feat(web): keystroke pre-processing unit tests (#10464)
+* feat(web): key-event rule processing unit tests for mnemonic, KMW 1.0 keyboards (#10475)
+* fix(web): touch-layout fontsize property use (#10504)
+
+## 17.0.252 alpha 2024-01-25
+
+* fix(common): ldml: fix typo in kmc error message (#10484)
+* chore(developer): `--enable-source-maps` parameter for kmc wrapper (#10496)
+* fix(android/engine): Fix OSK widths (#10442)
+*  (#10508)
+
+## 17.0.251 alpha 2024-01-24
+
+* chore(developer): upgrade ngrok to v3 (#10359)
+
 ## 17.0.250 alpha 2024-01-23
 
 * fix(android/engine): Add RECEIVER_EXPORTED flag for broadcast receiver (#10463)

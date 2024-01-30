@@ -127,13 +127,11 @@ class KeymanPackageTests: XCTestCase {
 
     do {
       if let kmp = try KeymanPackage.extract(fileUrl: khmerPackageZip, destination: destinationFolderURL) {
-        log.info("*** first unzip of \(kmp.id)")
         do {
           // clear directory before second extract
           try KeymanPackage.clearDirectory(destination: destinationFolderURL)
           
           if let secondKmp = try KeymanPackage.extract(fileUrl: khmerPackageZip, destination: destinationFolderURL) {
-            log.info("*** second unzip of \(secondKmp.id)")
           } else {
             XCTAssert(false, "*** second unzip failed")
           }

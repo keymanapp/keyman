@@ -1,0 +1,1 @@
+From the legacy section of the keyboards repo - is a KMW 1.0 keyboard, thus is neither positional nor mnemonic.

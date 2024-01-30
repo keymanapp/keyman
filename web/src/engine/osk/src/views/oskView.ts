@@ -626,8 +626,8 @@ export default abstract class OSKView
 
     if(!pending) {
       this.headerView?.refreshLayout();
-      this.bannerView.refreshLayout();
       this.bannerView.width = this.computedWidth;
+      this.bannerView.refreshLayout();
       this.footerView?.refreshLayout();
     }
 

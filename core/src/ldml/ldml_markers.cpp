@@ -381,7 +381,7 @@ KMX_DWORD parse_hex_quad(const km_core_usv hex_str[]) {
 }
 
 /** add the list to the map */
-static void add_markers_to_map(marker_map &markers, char32_t marker_ch, const marker_list &list) {
+inline void add_markers_to_map(marker_map &markers, char32_t marker_ch, const marker_list &list) {
   for (auto i = list.begin(); i < list.end(); i++) {
     // marker_ch is duplicate, but keeps the structure more shallow.
     markers.emplace_back(marker_ch, *i);
@@ -389,7 +389,7 @@ static void add_markers_to_map(marker_map &markers, char32_t marker_ch, const ma
 }
 
 /**
- * Add any markers, if needed
+ * Add any markers, if needed. Inlined because we need to run it twice.
  * @param markers marker map or nullptr
  * @param last the 'last' parameter past the prior parsing
  * @param end end of the input string
@@ -399,24 +399,45 @@ add_pending_markers(
     marker_map *markers,
     marker_list &last_markers,
     const std::u32string::const_iterator &last,
-    const std::u32string::const_iterator &end) {
+    const std::u32string::const_iterator &end,
+    const icu::Normalizer2 *nfd) {
+  // quick check to see if there's no work to do.
   if(markers == nullptr || last_markers.empty()) {
     return;
   }
+  /** which character this marker is 'glued' to. */
   char32_t marker_ch;
   if (last == end) {
+    // at end of text, so use a special value to indicate 'EOT'.
     marker_ch = MARKER_BEFORE_EOT;
   } else {
-    marker_ch = *last;
+    icu::UnicodeString decomposition;
+    auto ch = *last; // non-normalized character
+
+    // if the character is composed, we need to use the first decomposed char
+    // as the 'glue'.
+    if(!nfd->getDecomposition(ch, decomposition)) {
+      // char does not have a decomposition - so it may be used for the glue
+      marker_ch = ch;
+    } else {
+      // 'glue' is the first codepoint of the decomposition.
+      marker_ch = decomposition.char32At(0);
+    }
   }
+
+  // now, update the map with these markers (in order) on this character.
   add_markers_to_map(*markers, marker_ch, last_markers);
-  last_markers.clear(); // mark as already recorded
+  // clear the list
+  last_markers.clear();
 }
 
 std::u32string
 remove_markers(const std::u32string &str, marker_map *markers, marker_encoding encoding) {
   std::u32string out;
   marker_list last_markers;
+  UErrorCode status = U_ZERO_ERROR;
+  const icu::Normalizer2 *nfd = icu::Normalizer2::getNFDInstance(status);
+  UASSERT_SUCCESS(status);
 
   auto last = str.begin();  // points to the part of the string after the last matched marker
   for (auto i = str.begin(); i != str.end();) {
@@ -425,7 +446,7 @@ remove_markers(const std::u32string &str, marker_map *markers, marker_encoding e
       // add any markers found before this entry, but only if there is intervening
       // text. This prevents the sentinel or the '\u' from becoming the attachment char.
       if (i != last) {
-        add_pending_markers(markers, last_markers, last, str.end());
+        add_pending_markers(markers, last_markers, last, str.end(), nfd);
         out.append(last, i); // append any non-marker text since the end of the last marker
         last = i; // advance over text we've already appended
       }
@@ -443,7 +464,7 @@ remove_markers(const std::u32string &str, marker_map *markers, marker_encoding e
   // add any remaining pending markers.
   // if last == str.end() then this wil be MARKER_BEFORE_EOT
   // otherwise it will be the glue character
-  add_pending_markers(markers, last_markers, last, str.end());
+  add_pending_markers(markers, last_markers, last, str.end(), nfd);
   // get the suffix between the last marker and the end (could be nothing)
   out.append(last, str.end());
   return out;

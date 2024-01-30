@@ -100,6 +100,7 @@ compile_and_copy() {
 builder_run_action configure verify_npm_setup
 builder_run_action clean do_clean
 builder_run_action build compile_and_copy
+builder_run_action test test-headless-typescript $SUBPROJECT_NAME
 
 # No headless tests for this child project.  Currently, DOM-based unit &
 # integrated tests are run solely by the top-level $KEYMAN_ROOT/web project.

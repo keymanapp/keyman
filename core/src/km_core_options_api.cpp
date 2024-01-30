@@ -11,7 +11,8 @@
 #include <cassert>
 #include <sstream>
 
-#include <keyman/keyman_core_api.h>
+#include "keyman_core.h"
+
 #include "processor.hpp"
 
 #include "jsonpp.hpp"

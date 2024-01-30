@@ -117,7 +117,7 @@ export function hexOcts(n: number): string {
 }
 
 /** escape one char for regex in \uXXXX form */
-function escapeRegexChar(ch: string) {
+export function escapeRegexChar(ch: string) {
   const code = ch.codePointAt(0);
   if (code <= 0xFFFF) {
     return '\\u' + hexQuad(code);
