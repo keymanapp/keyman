@@ -65,25 +65,9 @@ processBack(AITIP* app, const unsigned int code_points_to_delete) {
 }
 
 static void
-processPersistOpt(km_core_actions const* actions,
-  km_core_state* keyboardState,
-  LPINTKEYBOARDINFO activeKeyboard
+processPersistOpt(km_core_actions const* actions, LPINTKEYBOARDINFO activeKeyboard
 ) {
-
-
   for (auto option = actions->persist_options; option->key; option++) {
-    // TODO: Do we need really to write the option back to the core?
-    // Allocate for 1 option plus 1 pad struct of 0's for KM_CORE_IT_END
-    km_core_option_item keyboardOpts[2] = { 0 };
-    keyboardOpts[0].key                 = option->key;
-    keyboardOpts[0].value               = option->value;
-    km_core_status eventStatus = (km_core_status_codes)km_core_state_options_update(keyboardState, keyboardOpts);
-    if (eventStatus != KM_CORE_STATUS_OK)
-    {
-      // log warning "problem saving option for km_core_keyboard");
-      SendDebugMessageFormat(0, sdmGlobal, 0, "ProcessHook: Error %d saving option for keyboard [%s].", eventStatus, activeKeyboard->Name);
-    }
-
     // Put the keyboard option into Windows Registry
     // log"Saving keyboard option to registry");
     SendDebugMessageFormat(0, sdmGlobal, 0, "ProcessHook: Saving option to registry for keyboard [%s].", activeKeyboard->Name);
@@ -92,7 +76,6 @@ processPersistOpt(km_core_actions const* actions,
     wcscpy_s(value, value_length + 1, reinterpret_cast<LPCWSTR>(option->value));
     SaveKeyboardOptionCoretoRegistry(activeKeyboard, reinterpret_cast<LPCWSTR>(option->key), value);
     delete[] value;
-
   }
 }
 
@@ -144,7 +127,7 @@ BOOL ProcessActions(BOOL* emitKeyStroke)
   processBack(_td->app, actions->code_points_to_delete);
   processUnicodeChar(_td->app, actions->output);
   if (actions->persist_options != NULL) {
-    processPersistOpt(actions, _td->lpActiveKeyboard->lpCoreKeyboardState, _td->lpActiveKeyboard);
+    processPersistOpt(actions, _td->lpActiveKeyboard);
   }
   if (actions->do_alert) {
     processAlert(_td->app);
