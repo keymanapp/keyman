@@ -199,10 +199,11 @@ type
     // -1=unchanged, 0=off, 1=on
     new_caps_lock_state: km_core_caps_state;
 
-    // reference copy of actual UTF32 codepoints deleted from rhs of context
-    // exactly code_points_to_delete in length (plus null terminator). Used to
-    // determine encoding conversion differences when deleting; only set when
-    // using km_core_state_actions_get, otherwise nullptr.
+    // reference copy of actual UTF32 codepoints deleted from end of context
+    // (closest to caret) exactly code_points_to_delete in length (plus null
+    // terminator). Used to determine encoding conversion differences when
+    // deleting; only set when using km_core_state_actions_get, otherwise
+    // nullptr.
     deleted_context: pkm_core_usv;
   end;
   pkm_core_actions = ^km_core_actions;
