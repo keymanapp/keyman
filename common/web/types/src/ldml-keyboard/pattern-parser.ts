@@ -145,6 +145,10 @@ export class MarkerParser {
    * @returns the normalized string
    */
   public static nfd_markers(s: string, forMatch?: boolean) : string {
+    if(true) {
+      const m : MarkerMap = [];
+      return this.nfd_markers_segment(s, m, forMatch);
+    }
     // Note: parallel to ldml::normalize_nfd_markers()
     if(!s) return s;
     /** Accumulate output normalized string */

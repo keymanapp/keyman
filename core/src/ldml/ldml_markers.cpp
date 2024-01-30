@@ -219,6 +219,11 @@ bool normalize_nfd_markers(std::u32string &str, marker_encoding encoding) {
   // quick check - don't bother if the string is empty
   if(str.empty()) return true;
 
+#if 1
+  marker_map m;
+  return normalize_nfd_markers_segment(str, m, encoding);
+#else
+
   // we're going to need an NFD normalizer
   UErrorCode status           = U_ZERO_ERROR;
   const icu::Normalizer2 *nfd = icu::Normalizer2::getNFDInstance(status);
@@ -297,6 +302,7 @@ bool normalize_nfd_markers(std::u32string &str, marker_encoding encoding) {
   // update output string
   str = out;
   return true;
+#endif
 }
 
 // TODO-LDML: cleanup
