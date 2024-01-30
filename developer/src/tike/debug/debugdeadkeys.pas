@@ -30,7 +30,7 @@ type
   TDeadKeyInfo = class // Kept as a list of active deadkeys
   private
     FDeleted: Boolean;
-    FPosition: Integer;
+    FPosition: Integer; // in UTF-16 code units
     FSavedPosition: Integer;
   public
     //Position: Integer;

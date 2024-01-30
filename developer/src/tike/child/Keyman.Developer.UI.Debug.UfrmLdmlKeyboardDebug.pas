@@ -474,39 +474,50 @@ procedure TfrmLdmlKeyboardDebug.Run(vkey: Word);
     end;
   end;
 
+
+  // Returns the length of the context items in UTF16, treating markers as a
+  // single UTF16 code unit (U+FFFC)
+  function ContextItemsLengthUTF16(pc: pkm_core_context_item): Integer;
+  begin
+    Result := 0;
+    while pc._type <> KM_CORE_CT_END do
+    begin
+      if pc._type = KM_CORE_CT_CHAR then
+      begin
+        if Uni_IsSurrogate(pc.character) then
+          Inc(Result);
+      end;
+      Inc(Result);
+      Inc(pc);
+    end;
+  end;
+
   function ContextToDebugString(context_items: pkm_core_context_item; offset, length: Integer): string;
   var
-    outText: array of UInt32;
-    ox: Integer;
     pc: pkm_core_context_item;
     dk: TDeadKeyInfo;
   begin
-    SetLength(outText, length + 1);
-
-    ox := 0;
+    Result := '';
     pc := context_items;
     while pc._type <> KM_CORE_CT_END do
     begin
       if pc._type = KM_CORE_CT_CHAR then
-        outText[ox] := pc.character
+      begin
+        Result := Result + Uni_UTF32CharToUTF16(pc.character);
+      end
       else
       begin
         dk := TDeadKeyInfo.Create;
         dk.Deadkey := TDebugDeadkey.Create;
         dk.Deadkey.Name := '\m{'+IntToStr(pc.marker)+'}';
         dk.Deadkey.Value := pc.marker;
-        dk.Position := ox + offset;
-        dk.SavedPosition := ox + offset;
+        dk.Position := Result.Length + offset;
+        dk.SavedPosition := Result.Length + offset;
         FDeadkeys.Add(dk);
-        outText[ox] := $FFFC;
+        Result := Result + #$FFFC;
       end;
       Inc(pc);
-      Inc(ox);
     end;
-
-    outText[ox] := 0;
-
-    Result := USVToString(@outText[0]);
   end;
 
 var
@@ -560,7 +571,7 @@ begin
       begin
         // We have a selection, so we should remove it first and then continue
         // as normal. We will have given Core a zero-length context, so we
-        // need to save everything before the start of selection before 
+        // need to save everything before the start of selection before
         // continuing, and cleanup any markers that were in the selection
         if (actions.emit_keystroke = 0) or (vkey = VK_BACK) then
         begin
@@ -579,7 +590,7 @@ begin
 
       // Reinsert the context
 
-      context_items_length := km_core_context_length(km_core_state_context(FDebugCore.State));
+      context_items_length := ContextItemsLengthUTF16(context_items);
       Adjustment := context_items_length - selection.Start + lhs.Length;
 
       // Delete all markers that are in the context, because we will reinsert
