@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 17.0.256 alpha 2024-01-30
+
+* fix(linux): packaging on Ubuntu and Debian servers should give message instead of warning because we don't have patched ibus there (#10537)
+* feat(developer): turn on developer side normalization (#10528)
+
 ## 17.0.255 alpha 2024-01-29
 
 * chore(ios): eliminate xcglogger dependency (#10446)
