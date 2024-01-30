@@ -516,7 +516,7 @@ LdmlJsonTestSource::next_action(ldml_action &fillin) {
   if (type == "check") {
     fillin.type   = LDML_ACTION_CHECK_EXPECTED;
     fillin.string = LdmlTestSource::parse_u8_source_string(result.get<std::string>());
-    assert(km::core::ldml::normalize_nfd(fillin.string)); // TODO-LDML: should be NFC
+    assert(km::core::ldml::normalize_nfd(fillin.string)); // TODO-LDML: will be NFC when core is normalizing to NFC
     return;
   } else if (type == "keystroke") {
     fillin.type   = LDML_ACTION_KEY_EVENT;
@@ -529,7 +529,7 @@ LdmlJsonTestSource::next_action(ldml_action &fillin) {
   } else if (type == "emit") {
     fillin.type   = LDML_ACTION_EMIT_STRING;
     fillin.string = LdmlTestSource::parse_u8_source_string(to.get<std::string>());
-    assert(km::core::ldml::normalize_nfd(fillin.string)); // TODO-LDML: should be NFC
+    assert(km::core::ldml::normalize_nfd(fillin.string)); // TODO-LDML: will be NFC when core is normalizing to NFC
     return;
   } else if (type == "backspace") {
     // backspace is handled as a key event
@@ -619,6 +619,7 @@ LdmlJsonRepertoireTestSource::next_action(ldml_action &fillin) {
   km::core::kmx::char16_single ch16;
   std::size_t len = km::core::kmx::Utf32CharToUtf16(ch, ch16);
   std::u16string chstr = std::u16string(ch16.ch, len);
+  assert(km::core::ldml::normalize_nfd(chstr)); // TODO-LDML: will be NFC when core is normalizing to NFC
   // append to expected
   expected.append(chstr);
   need_check = true;

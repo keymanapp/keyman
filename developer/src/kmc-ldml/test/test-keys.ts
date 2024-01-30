@@ -1,7 +1,7 @@
 import 'mocha';
 import { assert } from 'chai';
 import { KeysCompiler } from '../src/compiler/keys.js';
-import { compilerTestCallbacks, loadSectionFixture, testCompilationCases } from './helpers/index.js';
+import { assertCodePoints, compilerTestCallbacks, loadSectionFixture, testCompilationCases } from './helpers/index.js';
 import { KMXPlus, Constants, MarkerParser } from '@keymanapp/common-types';
 import { CompilerMessages } from '../src/compiler/messages.js';
 import { constants } from '@keymanapp/ldml-keyboard-constants';
@@ -37,7 +37,7 @@ describe('keys', function () {
         const keys = <Keys> sect;
         assert.ok(keys);
         assert.equal(compilerTestCallbacks.messages.length, 0);
-        assert.equal(keys.keys.length, 12 + KeysCompiler.reserved_count); // includes flick and gesture keys
+        assert.equal(keys.keys.length, 13 + KeysCompiler.reserved_count); // includes flick and gesture keys
 
         const [w] = keys.keys.filter(({ id }) => id.value === 'w');
         assert.ok(w);
@@ -63,6 +63,14 @@ describe('keys', function () {
         const [flick0_ne_sw] = flick0.flicks.filter(({ directions }) => directions && directions.isEqual('ne sw'.split(' ')));
         assert.ok(flick0_ne_sw);
         assert.equal(flick0_ne_sw.keyId?.value, 'e-caret'); // via variable
+
+        // normalization w markers
+        const [amarker] = keys.keys.filter(({ id }) => id.value === 'amarker');
+        assertCodePoints(amarker.to.value, `a${MarkerParser.markerOutput(1, false)}\u{0320}\u{0301}`);
+
+        // normalization
+        const [aacute] = keys.keys.filter(({ id }) => id.value === 'a-acute');
+        assertCodePoints(aacute.to.value, 'a\u{0301}');
       },
     },
     {
