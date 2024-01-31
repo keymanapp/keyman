@@ -1033,6 +1033,41 @@ test_keyman_add_keyboards_from_dir__one_language_plus_two_different_custom() {
   g_assert_cmpstr(ibus_engine_desc_get_name(desc), ==, expected_name);
 }
 
+void
+test_keyman_compare_version_equal() {
+  g_assert_cmpint(keyman_compare_version("1.0", "1.0"), ==, 0);
+}
+
+void
+test_keyman_compare_version_equal_with_patch() {
+  g_assert_cmpint(keyman_compare_version("1.0", "1.0.0"), ==, 0);
+}
+
+void
+test_keyman_compare_version_less() {
+  g_assert_cmpint(keyman_compare_version("1.0", "1.1"), <, 0);
+}
+
+void
+test_keyman_compare_version_minor_less_with_patch() {
+  g_assert_cmpint(keyman_compare_version("1.0.1", "1.1"), <, 0);
+}
+
+void
+test_keyman_compare_version_patch_less() {
+  g_assert_cmpint(keyman_compare_version("1.0", "1.0.1"), <, 0);
+}
+
+void
+test_keyman_compare_version_less_twodigit() {
+  g_assert_cmpint(keyman_compare_version("99.9", "100"), <, 0);
+}
+
+void
+test_keyman_compare_version_greater() {
+  g_assert_cmpint(keyman_compare_version("1.10", "1.9"), >, 0);
+}
+
 //----------------------------------------------------------------------------------------------
 void
 print_usage() {
@@ -1110,10 +1145,9 @@ int main(int argc, char* argv[]) {
   g_test_add_func(
       "/keymanutil/keyman_add_keyboard/prev_engine_adding_newer_version",
       test_keyman_add_keyboard__prev_engine_adding_newer_version);
-  // #9593
-  // g_test_add_func(
-  //     "/keymanutil/keyman_add_keyboard/prev_engine_adding_newer_version_versioncompare",
-  //     test_keyman_add_keyboard__prev_engine_adding_newer_version_9593);
+  g_test_add_func(
+      "/keymanutil/keyman_add_keyboard/prev_engine_adding_newer_version_versioncompare",
+      test_keyman_add_keyboard__prev_engine_adding_newer_version_9593);
   g_test_add_func(
       "/keymanutil/keyman_add_keyboard/prev_engine_adding_older_version",
       test_keyman_add_keyboard__prev_engine_adding_older_version);
@@ -1125,6 +1159,14 @@ int main(int argc, char* argv[]) {
   g_test_add_func(
       "/keymanutil/keyman_add_keyboards_from_dir/one_language_plus_two_different_custom",
       test_keyman_add_keyboards_from_dir__one_language_plus_two_different_custom);
+
+  g_test_add_func("/keymanutil/keyman_compare_version/1.0==1.0", test_keyman_compare_version_equal);
+  g_test_add_func("/keymanutil/keyman_compare_version/1.0==1.0.0", test_keyman_compare_version_equal_with_patch);
+  g_test_add_func("/keymanutil/keyman_compare_version/1.0<1.1", test_keyman_compare_version_less);
+  g_test_add_func("/keymanutil/keyman_compare_version/1.0.1<1.1", test_keyman_compare_version_minor_less_with_patch);
+  g_test_add_func("/keymanutil/keyman_compare_version/1.0<1.0.1", test_keyman_compare_version_patch_less);
+  g_test_add_func("/keymanutil/keyman_compare_version/99.9<100",test_keyman_compare_version_less_twodigit);
+  g_test_add_func("/keymanutil/keyman_compare_version/1.10>1.9", test_keyman_compare_version_greater);
 
   // Run tests
   int retVal = g_test_run();

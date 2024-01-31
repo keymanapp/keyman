@@ -212,6 +212,30 @@ get_engine_for_language(
   return engine_desc;
 }
 
+int
+keyman_compare_version(const gchar *version1str, const gchar *version2str) {
+  size_t len1 = strlen(version1str);
+  size_t len2 = strlen(version2str);
+  for (size_t i = 0, j = 0; i < len1 || j < len2; i++, j++) {
+      int version1 = 0, version2 = 0;
+
+      while (i < len1 && version1str[i] != '.') {
+        version1 = version1 * 10 + (version1str[i] - '0');
+        i++;
+      }
+      while (j < len2 && version2str[j] != '.') {
+        version2 = version2 * 10 + (version2str[j] - '0');
+        j++;
+      }
+
+      if (version1 < version2)
+        return -1;
+      if (version1 > version2)
+        return +1;
+    }
+  return 0;
+}
+
 gboolean
 keyman_list_contains_keyboard(
   GList *engines_list,
@@ -225,8 +249,7 @@ keyman_list_contains_keyboard(
     // If we already have an engine for this keyboard (in a different area), we
     // don't want to add it again since we wouldn't add anything new
     // if it's the same version
-    // TODO: fix version comparison (#9593)
-    if (g_strcmp0(kmx_file, keyboard->kmx_file) == 0 && g_strcmp0(version, keyboard->version) >= 0) {
+    if (g_strcmp0(kmx_file, keyboard->kmx_file) == 0 && keyman_compare_version(version, keyboard->version) >= 0) {
       g_debug("keyboard %s already exists at version %s which is newer or same as %s", kmx_file, version, keyboard->version);
       return TRUE;
     }
