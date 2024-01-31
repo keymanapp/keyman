@@ -1,5 +1,20 @@
 # Keyman Version History
 
+## 17.0.257 alpha 2024-01-31
+
+* epic: Keyman Core normalization (#10390)
+* fix(web): OSK resource-loading promise's font-wait (#10506)
+* fix(web): documentation-keyboard font size, font scaling (#10507)
+* feat(web): testing page for font-load / key-scale interactions (#10534)
+* fix(web): proper await for special-osk font, use of it in key scaling (#10535)
+* fix(web): ensure use of actual key-cap / label font in key-scale ops (#10555)
+* docs: Update websites README.md (#10566)
+* fix(developer): kmc exit needs to wait for Sentry (#10558)
+* fix(developer): make sourcePath calculation for kmc-keyboard-info more lenient (#10559)
+* chore(developer): disable .js output for LDML keyboard compiler for 17.0 (#10560)
+* chore(linux): Replace Lunar with Noble (#10561)
+* chore(linux): Adjust test expectations for ICU >= 73 (#10573)
+
 ## 17.0.256 alpha 2024-01-30
 
 * fix(linux): packaging on Ubuntu and Debian servers should give message instead of warning because we don't have patched ibus there (#10537)
