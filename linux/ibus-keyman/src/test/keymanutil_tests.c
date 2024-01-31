@@ -2,6 +2,7 @@
 #include <glib.h>
 #include <gtk/gtk.h>
 #include <ibus.h>
+#include <unicode/uvernum.h>
 #include "kmpdetails.h"
 #include "keymanutil.h"
 #include "keymanutil_internal.h"
@@ -935,6 +936,16 @@ test_keyman_add_keyboards_from_dir__one_dir() {
   g_assert_cmpstr(ibus_engine_desc_get_name(desc), ==, expected_name);
 }
 
+#if U_ICU_VERSION_MAJOR_NUM >= 73
+// ICU 73 uses CLDR 43 which contains various corrections so that ICU
+// now returns the correct bmf instead of bmf-Latn.
+#define BCP47_BMF "bmf"
+#define BCP47_BUN "bun"
+#else
+#define BCP47_BMF "bmf-Latn"
+#define BCP47_BUN "bun-Latn"
+#endif
+
 void
 test_keyman_add_keyboards_from_dir__two_langs() {
   // Initialize
@@ -949,10 +960,10 @@ test_keyman_add_keyboards_from_dir__two_langs() {
   g_assert_cmpint(g_list_length(keyboards), ==, 2);
 
   IBusEngineDesc* desc = IBUS_ENGINE_DESC(keyboards->data);
-  g_autofree gchar* expected_name1 = g_strdup_printf("bmf-Latn:%s/test2.kmx", kmp_dir);
+  g_autofree gchar* expected_name1 = g_strdup_printf("%s:%s/test2.kmx", BCP47_BMF, kmp_dir);
   g_assert_cmpstr(ibus_engine_desc_get_name(desc), ==, expected_name1);
   desc = IBUS_ENGINE_DESC(keyboards->next->data);
-  g_autofree gchar* expected_name2 = g_strdup_printf("bun-Latn:%s/test2.kmx", kmp_dir);
+  g_autofree gchar* expected_name2 = g_strdup_printf("%s:%s/test2.kmx", BCP47_BUN, kmp_dir);
   g_assert_cmpstr(ibus_engine_desc_get_name(desc), ==, expected_name2);
 }
 
@@ -972,10 +983,10 @@ test_keyman_add_keyboards_from_dir__prev_keyboards() {
   g_assert_cmpint(g_list_length(keyboards), ==, 3);
 
   IBusEngineDesc* desc = IBUS_ENGINE_DESC(keyboards->data);
-  g_autofree gchar* expected_name1 = g_strdup_printf("bmf-Latn:%s/test2.kmx", kmp_dir);
+  g_autofree gchar* expected_name1 = g_strdup_printf("%s:%s/test2.kmx", BCP47_BMF, kmp_dir);
   g_assert_cmpstr(ibus_engine_desc_get_name(desc), ==, expected_name1);
   desc = IBUS_ENGINE_DESC(keyboards->next->data);
-  g_autofree gchar* expected_name2 = g_strdup_printf("bun-Latn:%s/test2.kmx", kmp_dir);
+  g_autofree gchar* expected_name2 = g_strdup_printf("%s:%s/test2.kmx", BCP47_BUN, kmp_dir);
   g_assert_cmpstr(ibus_engine_desc_get_name(desc), ==, expected_name2);
   desc = IBUS_ENGINE_DESC(keyboards->next->next->data);
   g_autofree gchar* expected_name = g_strdup_printf("bza:%s/test1.kmx", kmp_dir);
