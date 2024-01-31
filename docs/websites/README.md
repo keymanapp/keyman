@@ -66,6 +66,7 @@ After this, you can access the website at the following ports:
 | s.keyman.com   | http://localhost:8054 | http://s.keyman.com.localhost     |
 | help.keyman    | http://localhost:8055 | http://help.keyman.com.localhost  |
 | keymanweb.com  | http://localhost:8057 | http://keymanweb.com.localhost    |
+|                                  |                                       | http://web.keyman.com.localhost   |
 | api.keyman.com | http://localhost:8058 | http://api.keyman.com.localhost   |
 
 #### Remove the Docker container and image
