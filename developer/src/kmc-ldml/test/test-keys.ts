@@ -74,6 +74,50 @@ describe('keys', function () {
       },
     },
     {
+      // same thing, but without normalization
+      subpath: 'sections/keys/maximal-nfc.xml',
+      callback(sect) {
+        const keys = <Keys> sect;
+        assert.ok(keys);
+        assert.equal(compilerTestCallbacks.messages.length, 0);
+        assert.equal(keys.keys.length, 13 + KeysCompiler.reserved_count); // includes flick and gesture keys
+
+        const [w] = keys.keys.filter(({ id }) => id.value === 'w');
+        assert.ok(w);
+        assert.equal(w.to.value, 'w', 'substituted key value');
+
+        const [q] = keys.keys.filter(({ id }) => id.value === 'q');
+        assert.ok(q);
+        assert.isFalse(!!(q.flags & constants.keys_key_flags_gap));
+        assert.equal(q.width, 32, 'q\'s width'); // ceil(3.14159 * 10.0)
+        assert.equal(q.flicks, 'flick0'); // note this is a string, not a StrsItem
+        assert.equal(q.longPress.toString(), 'a-acute e-acute i-acute');
+        assert.equal(q.longPressDefault.value, 'e-acute');
+        assert.equal(q.multiTap.toString(), 'a-umlaut e-umlaut i-umlaut');
+
+        const [flick0] = keys.flicks.filter(({ id }) => id.value === 'flick0');
+        assert.ok(flick0);
+        assert.equal(flick0.flicks.length, 2);
+
+        const [flick0_nw_se] = flick0.flicks.filter(({ directions }) => directions && directions.isEqual('nw se'.split(' ')));
+        assert.ok(flick0_nw_se);
+        assert.equal(flick0_nw_se.keyId?.value, 'c-cedilla');
+
+        const [flick0_ne_sw] = flick0.flicks.filter(({ directions }) => directions && directions.isEqual('ne sw'.split(' ')));
+        assert.ok(flick0_ne_sw);
+        assert.equal(flick0_ne_sw.keyId?.value, 'e-caret'); // via variable
+
+        // normalization w markers
+        const [amarker] = keys.keys.filter(({ id }) => id.value === 'amarker');
+        assertCodePoints(amarker.to.value, `á${MarkerParser.markerOutput(1, false)}\u{0320}`);
+
+        // normalization
+        const [aacute] = keys.keys.filter(({ id }) => id.value === 'a-acute');
+        assertCodePoints(aacute.to.value, 'á');
+
+      },
+    },
+    {
       subpath: 'sections/keys/escaped.xml',
       callback(sect) {
         const keys = <Keys> sect;
