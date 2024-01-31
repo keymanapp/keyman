@@ -24,7 +24,7 @@ See [license information](./LICENSE.md) about licensing.
     libjson-glib-dev libgtk-3-dev libxml2-utils help2man python3-lxml \
     python3-magic python3-numpy python3-pil python3-pip python3-qrcode \
     python3-requests python3-requests-cache python3 python3-gi dconf-cli \
-    dconf-editor cargo python3-dbus gir1.2-webkit2-4.0 ibus libglib2.0-bin \
+    dconf-editor cargo python3-dbus gir1.2-webkit2-4.1 ibus libglib2.0-bin \
     liblocale-gettext-perl xvfb xserver-xephyr metacity mutter
   ```
 
