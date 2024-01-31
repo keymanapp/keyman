@@ -40,6 +40,7 @@
 #include <msctf.h>
 #include "../../../../common/windows/cpp/include/legacy_kmx_file.h"
 #include <keyman/keyman_core_api.h>
+#include <keyman/keyman_core_api_actions.h> // for imx integration
 #include <keyman/keyman_core_api_context.h> // for intermediate context
 #include <keyman/keyman_core_api_consts.h>
 
