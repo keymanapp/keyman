@@ -647,7 +647,7 @@ export default class KeymanEngine extends KeymanEngineBase<BrowserConfiguration,
    *  @param  {string}          PInternalName   internal name of keyboard, with or without Keyboard_ prefix
    *  @param  {number}          Pstatic         static keyboard flag  (unselectable elements)
    *  @param  {string=}         argFormFactor   layout form factor, defaulting to 'desktop'
-   *  @param  {(string|number)=}  argLayerId    name or index of layer to show, defaulting to 'default'
+   *  @param  {(string)=}  argLayerId    name or index of layer to show, defaulting to 'default'
    *  @return {Object}                          DIV object with filled keyboard layer content
    *
    * See https://help.keyman.com/developer/engine/web/current-version/reference/osk/BuildVisualKeyboard
@@ -656,7 +656,7 @@ export default class KeymanEngine extends KeymanEngineBase<BrowserConfiguration,
     PInternalName: string,
     Pstatic: number,
     argFormFactor?: DeviceSpec.FormFactor,
-    argLayerId?: string|number
+    argLayerId?: string
   ): HTMLElement {
     let PKbd: Keyboard = null;
 
@@ -679,7 +679,7 @@ export default class KeymanEngine extends KeymanEngineBase<BrowserConfiguration,
     return VisualKeyboard.buildDocumentationKeyboard(
       PKbd,
       Pstub,
-      this.config.paths.fonts,
+      this.config.paths,
       argFormFactor,
       argLayerId,
       targetHeight
