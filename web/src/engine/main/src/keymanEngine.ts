@@ -151,11 +151,17 @@ export default class KeymanEngine<
         this.osk.startHide(false);
       }
 
+      console.log(`this.osk == ${this.osk}`);
       if(this.osk) {
         this.osk.setNeedsLayout();
         this.osk.activeKeyboard = kbd;
         this.osk.present();
       }
+
+      // Needed to ensure the correct layer is displayed.
+      // Needs to be after the OSK has loaded for the keyboard in case the default
+      // layer should be something other than "default" for the current context.
+      this.core.resetContext(this.contextManager.activeTarget);
     });
 
     this.contextManager.on('keyboardasyncload', (metadata) => {
