@@ -151,7 +151,6 @@ export default class KeymanEngine<
         this.osk.startHide(false);
       }
 
-      console.log(`this.osk == ${this.osk}`);
       if(this.osk) {
         this.osk.setNeedsLayout();
         this.osk.activeKeyboard = kbd;
