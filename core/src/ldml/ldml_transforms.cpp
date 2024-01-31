@@ -331,7 +331,7 @@ reorder_group::apply(std::u32string &str) const {
   /** did we match anything */
   bool some_match = false;
 
-  // markers need to 'pass thorugh' reorders. remove and re-add if needed
+  // markers need to 'pass through' reorders. remove and re-add if needed
   marker_map markers;
   std::u32string out = remove_markers(str, markers, plain_sentinel);
 
@@ -433,13 +433,7 @@ reorder_group::apply(std::u32string &str) const {
     r.dump();
   }
 #endif
-  if (markers.empty()) {
-    // no markers, just copy over to str
-    str = out;
-  } else {
-    // copy and re-add markers
-    add_back_markers(str, out, markers, plain_sentinel);
-  }
+  add_back_markers(str, out, markers, plain_sentinel);
   return true; // updated
 }
 
