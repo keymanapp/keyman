@@ -23,41 +23,24 @@ static void processAlert(AITIP* app) {
   app->QueueAction(QIT_BELL, 0);
 }
 
-static BOOL
-processBack(AITIP* app, const unsigned int code_points_to_delete) {
 
+static BOOL
+processBack(AITIP* app, const unsigned int code_points_to_delete, const km_core_usv* delete_context) {
   if (app->IsLegacy()) {
     for (unsigned int i = 0; i < code_points_to_delete; i++) {
-        app->QueueAction(QIT_BACK, BK_DEFAULT);
+      app->QueueAction(QIT_BACK, BK_DEFAULT);
     }
     return TRUE;
   }
-
   if (!app->IsLegacy()) {
-    WCHAR application_context[MAXCONTEXT];
-    DWORD cp_to_delete = code_points_to_delete;
-    if (!app->ReadContext(application_context)) {
-      SendDebugMessageFormat(0, sdmGlobal, 0, "processBack: Error reading context from application.");
-    } else {
-      // Find the length of the string
-      int length = 0;
-      while (application_context[length] != L'\0') {
-        length++;
+    while (*delete_context) {
+      if (Uni_IsSMP(*delete_context)) {
+        app->QueueAction(QIT_BACK, BK_DEFAULT | BK_SURROGATE);
       }
-      // Read each character starting from caret
-      for (int i = length - 1; i >= 0 && cp_to_delete > 0; i--) {
-        // Need to consider malformed context where only one surrogate is present, at either the start or end of the context.
-        // In both these scenarios just perform one backspace one the same as if it was a non surrogate pair.
-        if ((i > 0) && (Uni_IsSurrogate1(application_context[i - 1]) && Uni_IsSurrogate2(application_context[i]))) {
-          app->QueueAction(QIT_BACK, BK_DEFAULT | BK_SURROGATE);
-          i--;
-          cp_to_delete--;
-          }
-        else {
-          app->QueueAction(QIT_BACK, BK_DEFAULT);
-          cp_to_delete--;
-        }
+      else {
+        app->QueueAction(QIT_BACK, BK_DEFAULT);
       }
+      delete_context++;
     }
     return TRUE;
   }
@@ -124,7 +107,7 @@ BOOL ProcessActions(BOOL* emitKeyStroke)
   // Therefore it is not required to copy the context from the core to the windows context.
   km_core_actions const* actions = km_core_state_get_actions(_td->lpActiveKeyboard->lpCoreKeyboardState);
 
-  processBack(_td->app, actions->code_points_to_delete);
+  processBack(_td->app, actions->code_points_to_delete, actions->deleted_context);
   processUnicodeChar(_td->app, actions->output);
   if (actions->persist_options != NULL) {
     processPersistOpt(actions, _td->lpActiveKeyboard);
