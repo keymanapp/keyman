@@ -153,7 +153,7 @@ int replace_KeyName_with_Keycode(std::string  in) {
   int out = returnIfCharInvalid;
 
   //  these are the Scancode-Values we use in Keyman (= windows scancodes+8 )
-  if      ( in == "key<TLDE>")    out = 49;    /* VK_                 */
+  if      ( in == "key<TLDE>")    out = 49;    /* VK_ BKQUOTE         */
   else if ( in == "key<AE01>")    out = 10;    /* VK_1                */
   else if ( in == "key<AE02>")    out = 11;    /* VK_2                */
   else if ( in == "key<AE03>")    out = 12;    /* VK_3                */
@@ -164,8 +164,8 @@ int replace_KeyName_with_Keycode(std::string  in) {
   else if ( in == "key<AE08>")    out = 17;    /* VK_8                */
   else if ( in == "key<AE09>")    out = 18;    /* VK_9                */
   else if ( in == "key<AE10>")    out = 19;    /* VK_0                */
-  else if ( in == "key<AE11>")    out = 20;    /* VK_MINUS   de ẞ     */
-  else if ( in == "key<AE12>")    out = 21;    /* VK_EQUALS  DE '     */
+  else if ( in == "key<AE11>")    out = 20;    /* VK_MINUS K_HYPHEN  de ẞ     */
+  else if ( in == "key<AE12>")    out = 21;    /* VK_EQUAL   DE '     */
 
   else if ( in == "key<AD01>")    out = 24;    /* VK_Q                */
   else if ( in == "key<AD02>")    out = 25;    /* VK_W                */
@@ -391,7 +391,7 @@ std::wstring convert_DeadkeyValues_ToChar(int in) {
 
   KMX_DWORD lname;
 
-  if (in <= (int) deadkey_min) {                                                // no deadkey; no Unicode
+  if (in < (int) deadkey_min) {                                                // no deadkey; no Unicode
     if (!IsKeymanUsedKeyVal(std::wstring(1, in)))
       return L"\0";
     return  std::wstring(1, in);
@@ -586,9 +586,11 @@ KMX_DWORD KMX_get_CharsUnderlying_according_to_keycode_and_Shiftstate_GDK_dw(Gdk
   }
   else
     return 0;
-
+//hier wird fffe returned ist das OK?
   if((*keyvals >=  deadkey_min) && (*keyvals <=  deadkey_max))
     return 0xFFFF;
+  if((*keyvals >  deadkey_max) || ((*keyvals <  deadkey_min)  &&  ( *keyvals > 0xFF)))
+    return 0xFFFE;
   else
     return (KMX_DWORD) *keyvals;
 }
@@ -788,6 +790,7 @@ KMX_DWORD KMX_get_VKUS_From_KeyCodeUnderlying_GDK( GdkKeymap *keymap, KMX_DWORD 
       return (KMX_DWORD) upperCase;
   }
 
+ KMX_DWORD testvar_S2 =  ScanCodeToUSVirtualKey[keycode-8];
   if ( keycode >7)
     return  (KMX_DWORD) ScanCodeToUSVirtualKey[keycode-8];
 
@@ -795,7 +798,7 @@ KMX_DWORD KMX_get_VKUS_From_KeyCodeUnderlying_GDK( GdkKeymap *keymap, KMX_DWORD 
 }
 
 KMX_DWORD KMX_get_KeyCodeUnderlying_From_VKUS( KMX_DWORD VK_US) {
-
+KMX_DWORD test_S2 = (8+ USVirtualKeyToScanCode[ VK_US ]);
   if( VK_US > 7) {
     return (KMX_DWORD)(8+ USVirtualKeyToScanCode[ VK_US ]);}
   else

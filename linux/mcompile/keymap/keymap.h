@@ -44,7 +44,7 @@ const KMX_DWORD KMX_VKMap[] = {
 
   VK_SPACE,     /*   32 */
 
-  VK_ACCENT,    /*   192 VK_OEM_3 */
+  VK_ACCENT,    /*   192 VK_OEM_3   K_BKQUOTE  */ 
   VK_HYPHEN,    /* - 189 VK_OEM_MINUS */
   VK_EQUAL,     /* = 187 VK_OEM_PLUS */
 
@@ -61,7 +61,6 @@ const KMX_DWORD KMX_VKMap[] = {
 
   VK_xDF,       /* ß (?) 223*/
   VK_OEM_102,   /* < > | 226 */
-
   0
 };
 

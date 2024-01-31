@@ -28,6 +28,43 @@
 #include "keymap.h"
 
 
+
+void TestKey_S21(LPKMX_KEY key, int iii, int gr) {
+
+  KMX_WCHAR* PP= key->dpOutput;
+  int z=0;
+
+  if( *(key->dpOutput+1) != 0) {
+    wprintf(L"\n     group[%i]      dpKeyArray[%i] (key->key: %i) ",gr, iii, key->Key);
+    int tzuiop=0;
+    do {
+      wprintf(L"%i\t",  *(PP+z ));
+      z++;
+    } while (*(PP+z) !=0);
+  }
+  //if ((*(PP+z) !=0)) wprintf(L" _\n");
+}
+
+void TestGroup_S21(LPKMX_GROUP group ,int gr) {
+  for(unsigned int i = 0; i < group->cxKeyArray; i++) {
+    TestKey_S21(&group->dpKeyArray[i],i,gr);
+  }
+}
+
+void TestKeyboard_S21(LPKMX_KEYBOARD kbd) {
+ for(unsigned int i = 0; i < kbd->cxGroupArray; i++) {
+    if(kbd->dpGroupArray[i].fUsingKeys) {
+      wprintf(L"\nkbd->dpGroupArray[%i]  \n",i);
+      TestGroup_S21(&kbd->dpGroupArray[i], i);
+    }
+  }
+}
+
+// _S2 can go later
+void test_keyboard_S21(LPKMX_KEYBOARD kmxfile){
+  //TestKeyboard_S21(kmxfile);
+}
+
 const int KMX_ShiftStateMap[] = {
   ISVIRTUALKEY,
   ISVIRTUALKEY | K_SHIFTFLAG,
@@ -89,7 +126,9 @@ int KMX_ToUnicodeEx(guint ScanCode, const BYTE *lpKeyState, PKMX_WCHAR pwszBuff,
   std::u16string uuu16= u16string_from_wstring(character).c_str();
   pwszBuff[0]= * (PKMX_WCHAR)  u16string_from_wstring(character).c_str();
 
-   if((kvl ==  0xFFFF))
+  if((kvl ==  0xFFFE))
+    return 0;
+  if((kvl ==  0xFFFF))
     return -1;
   return  1;
 }
@@ -224,8 +263,8 @@ public:
   }
 
   UINT KMX_GetShiftStateValue(int capslock, int caps, ShiftState ss) {
-     //wprintf(L"GetShiftStateValue takes capslock: %i, caps: %i, ss: %i and returns: %i\n", capslock, caps, ss, KMX_ShiftStateMap[(int)ss] |
-      //(capslock ? (caps ? CAPITALFLAG : NOTCAPITALFLAG) : 0));
+     //wprintf(L"GetShiftStateValue takes capslock: %i, caps: %i, ss: %i and returns: %i \n",
+     //capslock, caps, ss, (KMX_ShiftStateMap[(int)ss] |    (capslock ? (caps ? CAPITALFLAG : NOTCAPITALFLAG) : 0)));
     return 
       KMX_ShiftStateMap[(int)ss] |
       (capslock ? (caps ? CAPITALFLAG : NOTCAPITALFLAG) : 0);
@@ -288,7 +327,7 @@ int i4 = this->KMX_IsXxxxGrCapsEqualToXxxxShift() ? 8 : 0;
         (this->KMX_IsSGCAPS() ? 2 : 0) |
         (this->KMX_IsAltGrCapsEqualToAltGrShift() ? 4 : 0) |
         (this->KMX_IsXxxxGrCapsEqualToXxxxShift() ? 8 : 0);
-
+//wprintf(L"capslock is: %i\n",capslock);
     // _S2 DESIGN NEEDED on how to replace capslock
     capslock=1;   // _S2
     // _S2 TODO capslock is not calculated correctly for linux. therefore key->ShiftFlags will be wrong for numbers, special characters
@@ -306,12 +345,16 @@ int i4 = this->KMX_IsXxxxGrCapsEqualToXxxxShift() ? 8 : 0;
         if (st.size() == 0) {
           // No character assigned here
         }
+        // _S2 kommt er hier immer hin????
         // _S2 TODO deadkeys don't work yet/ if true is in m_rgfDeadKey
         else if (this->m_rgfDeadKey[(int)ss][caps]) {
           // It's a dead key, append an @ sign.
           key->dpContext = new KMX_WCHAR[1];
           *key->dpContext = 0;
+
+          wprintf(L"st %i  ", st[0]);
           key->ShiftFlags = this->KMX_GetShiftStateValue(capslock, caps, (ShiftState) ss);
+          //key->ShiftFlags = this->KMX_GetShiftStateValue(1, caps, (ShiftState) ss);
           //key->Key = KMX_get_VKUS_From_VKUnderlying_VEC(All_Vector,this->VK());
           // key->Key = KMX_get_VKUnderlying_From_VKUS_GDK(keymap,this->VK());
           key->Line = 0;
@@ -697,11 +740,11 @@ bool KMX_ImportRules(LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, GdkKeymap **keymap,
             // Alt and Shift+Alt don't work, so skip them
             continue;
           }
-/*
+
           //_S2 to compare win-lin kmn-files skip ss6+7; MUST BE restored/removed later!!!!
           if(ss == MenuCtrl|| ss == ShftMenuCtrl) {
             continue;
-          }*/
+          }
 
           KMX_DWORD SC_US = KMX_get_KeyCodeUnderlying_From_VKUS(iKey);
 
@@ -840,7 +883,7 @@ bool KMX_ImportRules(LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, GdkKeymap **keymap,
   for (UINT iKey = 0; iKey < rgKey.size(); iKey++) {
     if ((rgKey[iKey] != NULL) && rgKey[iKey]->KMX_IsKeymanUsedKey() && (!rgKey[iKey]->KMX_IsEmpty())) {
       nKeys+= rgKey[iKey]->KMX_GetKeyCount(loader.KMX_MaxShiftState());
-      //wprintf(L" iKey = %i, Delta:  %i -> Sum %i\n", iKey, rgKey[iKey]->KMX_GetKeyCount(loader.MaxShiftState()),  nKeys);
+      //wprintf(L" iKey = %i, Delta:  %i -> Sum %i\n", iKey, rgKey[iKey]->KMX_GetKeyCount(loader.KMX_MaxShiftState()),  nKeys);
    }
   }
 
@@ -890,6 +933,12 @@ bool KMX_ImportRules(LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, GdkKeymap **keymap,
       UINT j;
       LPKMX_KEY kkp;
       for(j = 0, kkp = gp->dpKeyArray; j < gp->cxKeyArray; j++, kkp++) {
+          // _S2 missing 26 lines from here: since capalock is not correct this loop  will never be done
+          //wprintf(L"will add Rule  for group %i and key  %i  - shiftflag %i \n", i, kkp->Key, kkp->ShiftFlags);
+          KMX_DWORD S_S2 = kkp->ShiftFlags;
+          bool eins= (K_CTRLFLAG|K_ALTFLAG|LCTRLFLAG|LALTFLAG|RCTRLFLAG|RALTFLAG);
+          bool test_S_S2 = ((kkp->ShiftFlags & (K_CTRLFLAG|K_ALTFLAG|LCTRLFLAG|LALTFLAG|RCTRLFLAG|RALTFLAG)) != 0);
+
         if((kkp->ShiftFlags & (K_CTRLFLAG|K_ALTFLAG|LCTRLFLAG|LALTFLAG|RCTRLFLAG|RALTFLAG)) != 0) {
           gp2->cxKeyArray++;
           LPKMX_KEY kkp2 = new KMX_KEY[gp2->cxKeyArray];
@@ -899,15 +948,19 @@ bool KMX_ImportRules(LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, GdkKeymap **keymap,
           kkp2->dpContext = new KMX_WCHAR; *kkp2->dpContext = 0;
           kkp2->Key = kkp->Key;
           kkp2->ShiftFlags = kkp->ShiftFlags;
+          //kkp2->ShiftFlags = 16384;
           kkp2->Line = 0;
           KMX_WCHAR *p = kkp2->dpOutput = new KMX_WCHAR[4];
           KMX_WCHAR *q=p;
           *p++ = UC_SENTINEL;
           *p++ = CODE_USE;
           *p++ = (KMX_WCHAR)(kp->cxGroupArray);
+          //wprintf(L"    --------------------------------did  Rule  for group %i and key  %i  - shiftflag %i \n", i, kkp->Key, kkp->ShiftFlags);
           *p = 0;
         }
       }
+      //test_keyboard_S21(kp);
+      int sdfghjk=0;
     }
   }
 
