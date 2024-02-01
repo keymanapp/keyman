@@ -1044,6 +1044,16 @@ test_keyman_compare_version_equal_with_patch() {
 }
 
 void
+test_keyman_compare_version_equal_nondigit() {
+  g_assert_cmpint(keyman_compare_version("1.1", "1.1-beta2"), ==, 0);
+}
+
+void
+test_keyman_compare_version_equal_doubledot() {
+  g_assert_cmpint(keyman_compare_version("1..2", "1.0.2"), ==, 0);
+}
+
+void
 test_keyman_compare_version_less() {
   g_assert_cmpint(keyman_compare_version("1.0", "1.1"), <, 0);
 }
@@ -1162,6 +1172,8 @@ int main(int argc, char* argv[]) {
 
   g_test_add_func("/keymanutil/keyman_compare_version/1.0==1.0", test_keyman_compare_version_equal);
   g_test_add_func("/keymanutil/keyman_compare_version/1.0==1.0.0", test_keyman_compare_version_equal_with_patch);
+  g_test_add_func("/keymanutil/keyman_compare_version/1.1==1.1-beta", test_keyman_compare_version_equal_nondigit);
+  g_test_add_func("/keymanutil/keyman_compare_version/1..2==1.0.2", test_keyman_compare_version_equal_doubledot);
   g_test_add_func("/keymanutil/keyman_compare_version/1.0<1.1", test_keyman_compare_version_less);
   g_test_add_func("/keymanutil/keyman_compare_version/1.0.1<1.1", test_keyman_compare_version_minor_less_with_patch);
   g_test_add_func("/keymanutil/keyman_compare_version/1.0<1.0.1", test_keyman_compare_version_patch_less);

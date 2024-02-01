@@ -212,27 +212,41 @@ get_engine_for_language(
   return engine_desc;
 }
 
-int
-keyman_compare_version(const gchar *version1str, const gchar *version2str) {
-  size_t len1 = strlen(version1str);
-  size_t len2 = strlen(version2str);
-  for (size_t i = 0, j = 0; i < len1 || j < len2; i++, j++) {
-      int version1 = 0, version2 = 0;
+int _get_version(const gchar **pver) {
+  g_assert(pver);
+  const gchar *ver = *pver;
+  int version      = 0;
 
-      while (i < len1 && version1str[i] != '.') {
-        version1 = version1 * 10 + (version1str[i] - '0');
-        i++;
-      }
-      while (j < len2 && version2str[j] != '.') {
-        version2 = version2 * 10 + (version2str[j] - '0');
-        j++;
-      }
-
-      if (version1 < version2)
-        return -1;
-      if (version1 > version2)
-        return +1;
+  while (*ver && *ver != '.') {
+    if (*ver >= '0' && *ver <= '9') {
+      version = version * 10 + (*ver - '0');
+      ver++;
+    } else {
+      // stop comparison on first non-digit
+      while (*ver)
+        ver++;
     }
+  }
+  *pver = ver;
+  return version;
+}
+
+int
+keyman_compare_version(const gchar *ver1, const gchar *ver2) {
+  for (; *ver1 || *ver2; ) {
+    int version1 = _get_version(&ver1);
+    int version2 = _get_version(&ver2);
+
+    if (version1 < version2)
+      return -1;
+    if (version1 > version2)
+      return +1;
+
+    if (*ver1)
+      ver1++;
+    if (*ver2)
+      ver2++;
+  }
   return 0;
 }
 
