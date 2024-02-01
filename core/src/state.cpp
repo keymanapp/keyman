@@ -9,6 +9,7 @@
 #include "action.hpp"
 #include "processor.hpp"
 #include <keyman/keyman_core_api_consts.h>
+#include <cstring>
 
 using namespace km::core;
 
