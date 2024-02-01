@@ -79,6 +79,7 @@ size_t count_markers(const marker_map &map) {
 void add_back_markers(std::u32string &str, const std::u32string &src, marker_map &map, marker_encoding encoding) {
   if (map.empty()) {
     // quick check, nothing to do if no markers
+    str = src;
     return;
   }
   // need to reconstitute.
