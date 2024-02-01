@@ -83,7 +83,7 @@ class ldml_processor : public abstract_processor {
 
     bool
     supports_normalization() const override {
-      return true;
+      return !normalization_disabled;
     }
 
   private:
@@ -111,6 +111,7 @@ class ldml_processor : public abstract_processor {
     bool _valid;
     std::unique_ptr<ldml::transforms> transforms, bksp_transforms;
     ldml::vkeys keys;
+    bool normalization_disabled;
 };
 
 
