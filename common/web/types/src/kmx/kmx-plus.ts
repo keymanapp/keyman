@@ -75,6 +75,11 @@ export class Meta extends Section {
   indicator: StrsItem;
   version: StrsItem; // semver version string, defaults to "0"
   settings: KeyboardSettings;
+
+  /** convenience for checking settings */
+  get normalizionDisabled() {
+    return this.settings & KeyboardSettings.normalizationDisabled;
+  }
 };
 
 // 'strs'
@@ -205,11 +210,15 @@ export class Strs extends Section {
     }
     // nfd
     if (opts?.nfd) {
-      if (opts?.markers) {
-        s = MarkerParser.nfd_markers(s, false);
-      } else {
-        s = s.normalize("NFD");
-      }
+      if (!sections.meta) {
+        throw Error(`Internal Error: need 'meta' section to check normalization mode.`);
+      } else if (!sections.meta.normalizionDisabled) {
+        if (opts?.markers) {
+          s = MarkerParser.nfd_markers(s, false);
+        } else {
+          s = s.normalize("NFD");
+        }
+      } // else: disabled, do nothing
     }
     return s;
   }

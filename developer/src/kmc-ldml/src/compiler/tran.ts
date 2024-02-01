@@ -185,11 +185,12 @@ export abstract class TransformCompiler<T extends TransformCompilerType, TranBas
   }
   public get dependencies(): Set<SectionIdent> {
     const defaults = new Set(<SectionIdent[]>[
-      constants.section.strs,
-      constants.section.list,
       constants.section.elem,
-      constants.section.vars,
+      constants.section.list,
+      constants.section.meta,
+      constants.section.strs,
       constants.section.uset,
+      constants.section.vars,
     ]);
     defaults.delete(this.id);
     return defaults;

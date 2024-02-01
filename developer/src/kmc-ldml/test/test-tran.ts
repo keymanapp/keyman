@@ -9,7 +9,8 @@ import { KMXPlus, MarkerParser } from '@keymanapp/common-types';
 import Tran = KMXPlus.Tran;// for tests…
 import Bksp = KMXPlus.Bksp;// for tests…
 import { constants } from '@keymanapp/ldml-keyboard-constants';
-const tranDependencies = [ ...BASIC_DEPENDENCIES, UsetCompiler ];
+import { MetaCompiler } from './compiler/meta.js';
+const tranDependencies = [ ...BASIC_DEPENDENCIES, UsetCompiler, MetaCompiler ];
 const bkspDependencies = tranDependencies;
 
 describe('tran', function () {
