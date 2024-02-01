@@ -283,8 +283,8 @@ export class MarkerParser {
     }
     /** output string */
     let out = '';
-    /** for checking: the total number of markers expected */
-    const max_markers = map.length;
+    /** for checking: the total number of markers expected, skipping end markers */
+    const max_markers = map.filter(({ end }) => !end).length;
     /** for checking: the number of markers we've written */
     let written_markers = 0;
     /** we are going to mutate the map, so copy it */
@@ -292,39 +292,36 @@ export class MarkerParser {
     // First, add back all 'MARKER_BEFORE_EOT' markers
     while (map2.length && map2[map2.length - 1].ch === MARKER_BEFORE_EOT) {
       // remove from list
-      const { marker } = map2.pop();
-      out = MarkerParser.prepend_marker(out, marker, forMatch);
-      written_markers++;
+      const { marker, end } = map2.pop();
+      if (!end) {
+        out = MarkerParser.prepend_marker(out, marker, forMatch);
+        written_markers++;
+      }
     }
     // Then, take each codepoint (from back to front)
     for (let p of [...s].reverse()) {
       // reverse order code units, prepend to out
       out = p + out;
 
-      // 1. we write any markers which match the output string in order,
-      // and pop them off the list as dones
-      while(map2.length > 0 && map2[map2.length-1].ch === p) {
-        const { marker } = map2.pop();
-        if (marker !== constants.marker_no_index) { // if not already written
-          out = MarkerParser.prepend_marker(out, marker, forMatch);
-          written_markers++;
-          // no need to update .marker here, we're about to pop it
-        }
-      }
-      // 2. now, any out of order markers. iterate with an index so we can record.
-      // will skip this if map2.length < 2
-      for (let i = map2.length - 2; i >= 0; i--) {
-        const { ch, marker } = map2[i]; // don't pop here, as it might not be the right char
-        if (ch === p && marker !== constants.marker_no_index) {
-          out = MarkerParser.prepend_marker(out, marker, forMatch);
-          written_markers++;
-          map2[i].marker = constants.marker_no_index; // mark as written
+      for (let i = map2.length - 1; i >= 0; i--) {
+        const { ch, marker, processed, end } = map2[i];
+        if (ch === p && !processed) {
+          map2[i].processed = true; // mark as processed
+          if (end) {
+            break; // exit loop
+          } else {
+            out = MarkerParser.prepend_marker(out, marker, forMatch);
+            written_markers++;
+          }
+        } else if (map2[map2.length-1]?.processed) {
+          // keep the list as short as possible
+          map2.pop();
         }
       }
     }
     // validate that we consumed all markers
     if(written_markers !== max_markers) {
-      throw Error(`Internal Error: We should have written ${max_markers} markers but only wrote ${written_markers}`);
+      throw Error(`Internal Error: should have written ${max_markers} markers but only wrote ${written_markers}`);
     }
     return out;
   }
@@ -343,18 +340,31 @@ export class MarkerParser {
     let last_markers: number[] = [];
     /** input string, split into codepoint runs */
     let a: string[] = [...s];
+    /** were any markers found? */
+    let had_markers = false;
 
     /**
      * subfunc: add all markers in the pending (last_markers) queue
      * @param l string the marker is 'glued' to, or '' for end
      */
-    function add_pending_markers(l: string): void {
-      // first char, or, marker-before-eot. Must be first char of NFD sequence
-      const ch = (l === '') ? MARKER_BEFORE_EOT : [...(l.normalize("NFD"))][0];
+    function add_pending_markers(l: string){
+      // first char, or, marker-before-eot
+      const glueChars = (l === '') ? [MARKER_BEFORE_EOT] : [...(l.normalize("NFD"))];
+      const glue = glueChars[0];
+      // push the 'end' value
+      map.push({ ch: glue, end: true });
       while(last_markers.length) {
         const marker = last_markers[0];
         last_markers = last_markers.slice(1); // pop from front
-        map.push({ ch, marker });
+        map.push({ ch: glue, marker });
+      }
+      // now, push the rest of the glue chars as an NFD sequence.
+      // For example, `\m{m}\u0344` will create the following stream:
+      //  { ch: 0308, end: true}
+      //  { ch: 0308, marker: 1}
+      //  { ch: 0301, end: true}  // added because of decomp
+      for(const ch of glueChars.slice(1)) {
+        map.push({ ch, end: true });
       }
     }
 
@@ -369,6 +379,7 @@ export class MarkerParser {
         a = a.slice(1); // move forward 1 codepoint
       } else {
         // found a marker
+        had_markers = true;
         const { marker, match } = p;
         if ((marker == constants.marker_any_index) ||
           (marker >= constants.marker_min_index && marker <= constants.marker_max_index)) {
@@ -379,8 +390,12 @@ export class MarkerParser {
         a = a.slice([...match].length); // move forward over matched marker
       }
     }
-    // finally, add any remaining markers at the end of the string
+    // add any remaining markers at the end of the string
     add_pending_markers('');
+    if (!had_markers) {
+      // no markers were found. clear out the map.
+      map = [];
+    }
     return out;
   }
 
@@ -422,7 +437,7 @@ export class MarkerParser {
 };
 
 /** special noncharacter value denoting end of string */
-const MARKER_BEFORE_EOT = '\ufffe';
+export const MARKER_BEFORE_EOT = '\ufffe';
 /** matcher for a sentinel */
 const PARSE_SENTINEL_MARKER = new RegExp(`^${MarkerParser.ANY_MARKER_MATCH}`);
 /** matcher for a regex marker, either single or any */
@@ -431,10 +446,14 @@ const PARSE_REGEX_MARKER    = /^\\uffff\\u0008(?:(\\u[0-9a-fA-F]{4})|(\[\\u[0-9a
 const graphemeSegmenter = new Intl.Segmenter(['und'], { granularity: 'grapheme' });
 
 export interface MarkerEntry {
-  /** code point 'glued' to, or MARKER_BEFORE_EOT  */
+  /** code point 'glued' to, or MARKER_BEFORE_EOT */
   ch? : string;
   /** marker number, 1-based */
   marker? : number;
+  /** true if processed */
+  processed? : boolean;
+  /** true if the end of the entries */
+  end? : boolean;
 };
 
 /** list of marker entries, from remove_markers */
