@@ -145,99 +145,8 @@ export class MarkerParser {
    * @returns the normalized string
    */
   public static nfd_markers(s: string, forMatch?: boolean) : string {
-    if(true) {
-      const m : MarkerMap = [];
-      return this.nfd_markers_segment(s, m, forMatch);
-    }
-    // Note: parallel to ldml::normalize_nfd_markers()
-    if(!s) return s;
-    /** Accumulate output normalized string */
-    let out = '';
-    /** 's' split into code point units */
-    let a = [...s];
-    /** index into `a` where the current segment starts */
-    let seg_start = 0;
-    /** index into 'a' following end of current segment */
-    let seg_end = 0;
-    /** iterator over 'a' */
-    let i = 0;
-    /** for parallelism with C++, end of string */
-    let str_end = a.length;
-
-    /** map of all markers in the string */
-    const mall : MarkerMap = [];
-    // preprocess string, also check for markers
-    const all_no_markers = MarkerParser.remove_markers(s, mall, forMatch);
-    if(mall.length == 0) {
-      // no markers, so just normalize as a single segment
-      return all_no_markers.normalize("NFD");
-    }
-
-    // split segments on grapheme cluster boundaries for processing
-    const raw_segments = Array.from(graphemeSegmenter.segment(all_no_markers))
-      .map(({ segment }) => segment)
-      .map((c) => c.codePointAt(0));
-    /**
-     * Set of all code points which have a boundary before.
-     * This parallels nfd->hasBoundaryBefore().
-     */
-    const hasBoundaryBefore = new Set(raw_segments);
-
-    // now we'll loop through looking for normalization-safe subsegments of [seg_start, seg_end)
-    // For example (sentinel mode) the following would be segments:
-    //     - A
-    //     - E\u0320\u0302
-    //     - U\u0320\m{marker}\u0300
-    //
-    // The marker will typically 'look' like an NFD-safe boundary, but it's not! It's part of the
-    // subsegment, we want to skip over it. This is why we use parse_next_marker to look-ahead to see
-    // if there is actually a marker under the iterator.
-    //
-    // We don't assume that the marker sentinel or regex appears as an NFD boundary, that is why
-    // the parse function and the nfd function are called in parallel.
-
-    do {
-      /** remainder of string i..end, for match */
-      const rest = a.slice(i).join('');
-      const p = MarkerParser.parse_next_marker(rest, forMatch);
-      const have_marker = !!(p?.match);
-
-      // First, categorize the current character.
-
-      if (i === str_end) {
-        // at end of string, so this is also the end of the segment.
-        seg_end = i;
-      } else if (hasBoundaryBefore.has(rest.codePointAt(0)) && !have_marker) {
-        // it's an NFD safe boundary, but NOT a marker
-        // (if it were a marker, we would fall through to consume the marker)
-        // segment ends before this code point
-        seg_end = i;
-        // move the index past the NFD boundary
-        i++;
-      } else if(have_marker) {
-        // we have a marker. move the index past the marker.
-        i += [...p.match].length;
-      } else {
-        // non boundary. just move the index forward
-        i++;
-      }
-
-      // Next, if we found a segment boundary (which includes
-      // end of string) process it
-
-      if(seg_end !== seg_start) {
-        // re-join the segment from the iterated code points
-        const segment = a.slice(seg_start, seg_end).join('');
-        const m : MarkerMap = [];
-        // process the subsegment
-        const segment_nfd = MarkerParser.nfd_markers_segment(segment, m, forMatch);
-        // append the processed segment to the output buffer
-        out = out + segment_nfd;
-        // the end of this segment is the start of the next one.
-        seg_start = seg_end;
-      }
-    } while (seg_end != str_end); // until the last codepoint processed
-    return out;
+    const m : MarkerMap = [];
+    return this.nfd_markers_segment(s, m, forMatch);
   }
 
   /**
@@ -446,8 +355,6 @@ export const MARKER_BEFORE_EOT = '\ufffe';
 const PARSE_SENTINEL_MARKER = new RegExp(`^${MarkerParser.ANY_MARKER_MATCH}`);
 /** matcher for a regex marker, either single or any */
 const PARSE_REGEX_MARKER    = /^\\uffff\\u0008(?:(\\u[0-9a-fA-F]{4})|(\[\\u[0-9a-fA-F]{4}-\\u[0-9a-fA-F]{4}\]))/;
-/** a grapheme cluster segmenter for finding NFD boundaries */
-const graphemeSegmenter = new Intl.Segmenter(['und'], { granularity: 'grapheme' });
 
 export interface MarkerEntry {
   /** code point 'glued' to, or MARKER_BEFORE_EOT */
