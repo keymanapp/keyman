@@ -23,7 +23,7 @@ km_core_option_item test_env_opts[] =
 
 km_core_keyboard * test_kb = nullptr;
 km_core_state * test_state = nullptr;
-km_core_actions * test_actions = nullptr;
+km_core_actions test_actions = {0};
 std::string arg_path;
 
 void teardown() {
@@ -35,11 +35,7 @@ void teardown() {
     km_core_keyboard_dispose(test_kb);
     test_kb = nullptr;
   }
-  if(test_actions) {
-    delete [] test_actions->output;
-    delete test_actions;
-    test_actions = nullptr;
-  }
+  km::core::actions_dispose(test_actions);
 }
 
 
@@ -54,14 +50,14 @@ void setup(const km_core_cp *app_context, const km_core_cp *cached_context, int 
   try_status(set_context_from_string(km_core_state_context(test_state), cached_context));
   try_status(set_context_from_string(km_core_state_app_context(test_state), app_context));
 
-  test_actions = new km_core_actions;
-  test_actions->code_points_to_delete = actions_code_points_to_delete;
+  memset(&test_actions, 0, sizeof(km_core_actions));
+  test_actions.code_points_to_delete = actions_code_points_to_delete;
   std::unique_ptr<km_core_usv[]> buf(new km_core_usv[actions_output.length() + 1]);
   actions_output.copy(buf.get(), actions_output.length());
   // terminate the buffer
   buf.get()[actions_output.length()] = 0;
-  test_actions->output = buf.release();
-  test_actions->deleted_context = nullptr;
+  test_actions.output = buf.release();
+  test_actions.deleted_context = nullptr;
 }
 
 //-------------------------------------------------------------------------------------
@@ -112,15 +108,15 @@ void test(
 
   assert(km::core::actions_normalize(km_core_state_context(test_state), km_core_state_app_context(test_state), test_actions));
 
-  std::cout << " (" << name << "): delete: " << expected_delete << " output: |" << std::u32string(test_actions->output) << "|" << std::endl;
-  std::u32string o(test_actions->output);
+  std::cout << " (" << name << "): delete: " << expected_delete << " output: |" << std::u32string(test_actions.output) << "|" << std::endl;
+  std::u32string o(test_actions.output);
   for(auto i = o.begin(); i < o.end(); i++) {
     std::cout << "U+" << std::hex << (int)(*i) << " ";
   }
   std::cout << std::endl;
 
-  assert(expected_delete == test_actions->code_points_to_delete);
-  assert(expected_output == test_actions->output);
+  assert(expected_delete == test_actions.code_points_to_delete);
+  assert(expected_output == test_actions.output);
 
   auto actual_final_app_context = get_context_as_string(km_core_state_app_context(test_state));
   auto actual_final_app_context_string = std::u16string(actual_final_app_context);

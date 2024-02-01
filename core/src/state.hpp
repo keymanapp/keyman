@@ -126,6 +126,7 @@ protected:
     core::context              _app_ctxt;
     core::abstract_processor & _processor;
     core::actions              _actions;
+    km_core_actions            _action_struct;
     core::debug_items          _debug_items;
     km_core_keyboard_imx_platform _imx_callback;
     void *_imx_object;
@@ -135,6 +136,8 @@ public:
 
     state(state const &) = default;
     state(state const &&) = delete;
+
+    ~state();
 
     core::context       &  context() noexcept            { return _ctxt; }
     core::context const &  context() const noexcept      { return _ctxt; }
@@ -147,6 +150,9 @@ public:
 
     core::actions        & actions() noexcept        { return _actions; }
     core::actions const  & actions() const noexcept  { return _actions; }
+
+    km_core_actions       & action_struct() noexcept       { return _action_struct; }
+    km_core_actions const & action_struct() const noexcept { return _action_struct; }
 
     core::debug_items        & debug_items() noexcept        { return _debug_items; }
     core::debug_items const  & debug_items() const noexcept  { return _debug_items; }
@@ -167,6 +173,7 @@ public:
     bool set_actions(
       km_core_actions const &actions
     );
+    void prepare_actions();
   };
 } // namespace core
 } // namespace km
