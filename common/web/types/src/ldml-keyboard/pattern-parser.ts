@@ -340,6 +340,8 @@ export class MarkerParser {
     let last_markers: number[] = [];
     /** input string, split into codepoint runs */
     let a: string[] = [...s];
+    /** were any markers found? */
+    let had_markers = false;
 
     /**
      * subfunc: add all markers in the pending (last_markers) queue
@@ -377,6 +379,7 @@ export class MarkerParser {
         a = a.slice(1); // move forward 1 codepoint
       } else {
         // found a marker
+        had_markers = true;
         const { marker, match } = p;
         if ((marker == constants.marker_any_index) ||
           (marker >= constants.marker_min_index && marker <= constants.marker_max_index)) {
@@ -387,8 +390,12 @@ export class MarkerParser {
         a = a.slice([...match].length); // move forward over matched marker
       }
     }
-    // finally, add any remaining markers at the end of the string
+    // add any remaining markers at the end of the string
     add_pending_markers('');
+    if (!had_markers) {
+      // no markers were found. clear out the map.
+      map = [];
+    }
     return out;
   }
 
@@ -430,7 +437,7 @@ export class MarkerParser {
 };
 
 /** special noncharacter value denoting end of string */
-const MARKER_BEFORE_EOT = '\ufffe';
+export const MARKER_BEFORE_EOT = '\ufffe';
 /** matcher for a sentinel */
 const PARSE_SENTINEL_MARKER = new RegExp(`^${MarkerParser.ANY_MARKER_MATCH}`);
 /** matcher for a regex marker, either single or any */

@@ -1,6 +1,6 @@
 import 'mocha';
 import { assert } from 'chai';
-import { ElementParser, ElementSegment, ElementType, MarkerParser, MarkerResult, OrderedStringList, VariableParser } from '../../src/ldml-keyboard/pattern-parser.js';
+import { ElementParser, ElementSegment, ElementType, MARKER_BEFORE_EOT, MarkerMap, MarkerParser, MarkerResult, OrderedStringList, VariableParser } from '../../src/ldml-keyboard/pattern-parser.js';
 import { constants } from '@keymanapp/ldml-keyboard-constants';
 import { KMXFile } from '../../src/kmx/kmx.js';
 import Hexy from 'hexy';
@@ -339,6 +339,18 @@ describe('Test of nfd_markers()', () => {
       assert.equal(dst, <string>expect, `mapping ${src} with forMatch=${forMatch}`);
     });
   });
+  it('should be able to remove_markers() with composed chars', () => {
+    const src = '\uffff\u0008\u0001\u0344';
+    const m : MarkerMap = [];
+    const dst = MarkerParser.remove_markers(src, m, false);
+    assert.equal(dst, '\u0344'); // nfc
+    assert.sameDeepOrderedMembers(m, [
+      { ch: '\u0308', end: true },
+      { ch: '\u0308', marker: 1},
+      { ch: '\u0301', end: true},
+      { ch: MARKER_BEFORE_EOT, end: true },
+    ]);
+  });
   it('should normalize as expected', () => {
     // this is a little bit simpler in structure than what's in test_transforms.cpp,
     // see there for more complicated cases and discussion
@@ -387,7 +399,21 @@ describe('Test of nfd_markers()', () => {
 
       // Double marker with greek!
       ["\u03B5\uFFFF\u0008\u0001\u0344\uFFFF\u0008\u0002\u0344\uFFFF\u0008\u0003",
-       "\u03B5\uFFFF\u0008\u0001\u0308\u0301\uFFFF\u0008\u0002\u0308\u0301\uFFFF\u0008\u0003"]
+       "\u03B5\uFFFF\u0008\u0001\u0308\u0301\uFFFF\u0008\u0002\u0308\u0301\uFFFF\u0008\u0003"],
+
+      // double marker -
+      ["e\uffff\u0008\u0001\u0300\u0320\u0300", "e\u0320\uffff\u0008\u0001\u0300\u0300"],
+      // double marker - no change
+      ["e\u0320\uffff\u0008\u0001\u0300\u0300", "e\u0320\uffff\u0008\u0001\u0300\u0300"],
+      // double marker - in front of second, no change
+      ["e\u0320\u0300\uffff\u0008\u0001\u0300", "e\u0320\u0300\uffff\u0008\u0001\u0300"],
+      // double marker - in front of second, with segment reordering
+      ["e\u0300\u0320\uffff\u0008\u0001\u0300", "e\u0320\u0300\uffff\u0008\u0001\u0300"],
+      // double marker - alternate pattern with reordering needed
+      ["e\u0300\uffff\u0008\u0001\u0300\u0320", "e\u0320\u0300\uffff\u0008\u0001\u0300"],
+      // triple diacritic + marker - reordering needed
+      ["e\u0300\uffff\u0008\u0001\u0300\u0320\u0300", "e\u0320\u0300\uffff\u0008\u0001\u0300\u0300"],
+
 
     ];
 
