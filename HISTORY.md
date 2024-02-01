@@ -1,5 +1,76 @@
 # Keyman Version History
 
+## 17.0.257 alpha 2024-01-31
+
+* epic: Keyman Core normalization (#10390)
+* fix(web): OSK resource-loading promise's font-wait (#10506)
+* fix(web): documentation-keyboard font size, font scaling (#10507)
+* feat(web): testing page for font-load / key-scale interactions (#10534)
+* fix(web): proper await for special-osk font, use of it in key scaling (#10535)
+* fix(web): ensure use of actual key-cap / label font in key-scale ops (#10555)
+* docs: Update websites README.md (#10566)
+* fix(developer): kmc exit needs to wait for Sentry (#10558)
+* fix(developer): make sourcePath calculation for kmc-keyboard-info more lenient (#10559)
+* chore(developer): disable .js output for LDML keyboard compiler for 17.0 (#10560)
+* chore(linux): Replace Lunar with Noble (#10561)
+* chore(linux): Adjust test expectations for ICU >= 73 (#10573)
+
+## 17.0.256 alpha 2024-01-30
+
+* fix(linux): packaging on Ubuntu and Debian servers should give message instead of warning because we don't have patched ibus there (#10537)
+* feat(developer): turn on developer side normalization (#10528)
+
+## 17.0.255 alpha 2024-01-29
+
+* chore(ios): eliminate xcglogger dependency (#10446)
+* feat(developer): ldml marker normalization fix (#10527)
+* chore(linux): Build with webkitgtk 4.1 instead of 4.0 (#10483)
+
+## 17.0.254 alpha 2024-01-27
+
+* feat(core): ldml marker normalization fix (#10517)
+
+## 17.0.253 alpha 2024-01-26
+
+* feat(web): keystroke pre-processing unit tests (#10464)
+* feat(web): key-event rule processing unit tests for mnemonic, KMW 1.0 keyboards (#10475)
+* fix(web): touch-layout fontsize property use (#10504)
+
+## 17.0.252 alpha 2024-01-25
+
+* fix(common): ldml: fix typo in kmc error message (#10484)
+* chore(developer): `--enable-source-maps` parameter for kmc wrapper (#10496)
+* fix(android/engine): Fix OSK widths (#10442)
+*  (#10508)
+
+## 17.0.251 alpha 2024-01-24
+
+* chore(developer): upgrade ngrok to v3 (#10359)
+
+## 17.0.250 alpha 2024-01-23
+
+* fix(android/engine): Add RECEIVER_EXPORTED flag for broadcast receiver (#10463)
+* fix(web): osk responsiveness to held modifiers on legacy kbds (#10437)
+* fix(android/engine): Skip final globe key action (#10465)
+* feat(developer): marker normalization in .ts (#10443)
+*  (#10445)
+
+## 17.0.249 alpha 2024-01-22
+
+* feat(web): suggestion banner UI enhancements - suggestion expanding + scrollable banner (#7934)
+* chore(web): worker sourcemap cleanup, mobile app webview sourcemap compat (#10413)
+
+## 17.0.248 alpha 2024-01-19
+
+* chore(android): Update targetSdkVersion to 34 (#10393)
+*  (#10352)
+* fix(web): keyboard-documentation rendering mode (#10417)
+* fix(ios): multiple keyboard slide-in animations on app start (#10362)
+* fix(web): U_ key id -> text for all subkeys; is now preprocessed (#10434)
+* chore(android/app): Update whatsnew for 17.0 (#10395)
+* fix(web): bulk renderer interface for recent-version targeting keyboards (#10427)
+* feat(core): cross-segment markers (#10394)
+
 ## 17.0.247 alpha 2024-01-18
 
 * fix(ios): banner image management (#10337)

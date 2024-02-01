@@ -115,7 +115,7 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        dist: [focal, jammy, lunar, mantic]
+        dist: [focal, jammy, mantic, noble]
         arch: [amd64]
 
     runs-on: ubuntu-latest

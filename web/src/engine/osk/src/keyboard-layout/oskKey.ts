@@ -11,6 +11,7 @@ import buttonClassNames from '../buttonClassNames.js';
 
 import { KeyElement } from '../keyElement.js';
 import VisualKeyboard from '../visualKeyboard.js';
+import { getTextMetrics } from './getTextMetrics.js';
 
 /**
  * Replace default key names by special font codes for modifier keys
@@ -167,53 +168,6 @@ export default abstract class OSKKey {
   }
 
   /**
-   * Uses canvas.measureText to compute and return the width of the given text of given font in pixels.
-   *
-   * @param {String} text The text to be rendered.
-   * @param {String} style The CSSStyleDeclaration for an element to measure against, without modification.
-   *
-   * @see https://stackoverflow.com/questions/118241/calculate-text-width-with-javascript/21015393#21015393
-   * This version has been substantially modified to work for this particular application.
-   */
-  static getTextMetrics(text: string, emScale: number, style: {fontFamily?: string, fontSize: string}): TextMetrics {
-    // Since we may mutate the incoming style, let's make sure to copy it first.
-    // Only the relevant properties, though.
-    style = {
-      fontFamily: style.fontFamily,
-      fontSize: style.fontSize
-    };
-
-    // A final fallback - having the right font selected makes a world of difference.
-    if(!style.fontFamily) {
-      style.fontFamily = getComputedStyle(document.body).fontFamily;
-    }
-
-    if(!style.fontSize || style.fontSize == "") {
-      style.fontSize = '1em';
-    }
-
-    let fontFamily = style.fontFamily;
-    let fontSpec = getFontSizeStyle(style.fontSize);
-
-    var fontSize: string;
-    if(fontSpec.absolute) {
-      // We've already got an exact size - use it!
-      fontSize = fontSpec.val + 'px';
-    } else {
-      fontSize = fontSpec.val * emScale + 'px';
-    }
-
-    // re-use canvas object for better performance
-    var canvas: HTMLCanvasElement = OSKKey.getTextMetrics['canvas'] ||
-                                    (OSKKey.getTextMetrics['canvas'] = document.createElement("canvas"));
-    var context = canvas.getContext("2d");
-    context.font = fontSize + " " + fontFamily;
-    var metrics = context.measureText(text);
-
-    return metrics;
-  }
-
-  /**
    * Calculate the font size required for a key cap, scaling to fit longer text
    * @param vkbd
    * @param text
@@ -222,28 +176,34 @@ export default abstract class OSKKey {
    * @returns         font size as a style string
    */
   getIdealFontSize(vkbd: VisualKeyboard, text: string, style: {height?: string, fontFamily?: string, fontSize: string}, override?: boolean): string {
-    let buttonStyle = getComputedStyle(this.btn);
+    let buttonStyle: typeof style & {width?: string} = getComputedStyle(this.btn);
     let keyWidth = parseFloat(buttonStyle.width);
-    let emScale = 1;
+    let emScale = vkbd.getKeyEmFontSize();
+
+    // Among other things, ensures we use SpecialOSK styling for special key text.
+    // It's set on the key-span, not on the button.
+    //
+    // Also helps ensure that the stub's font-family name is used for keys, should
+    // that mismatch the font-family name specified within the keyboard's touch layout.
+    const capFont = !this.label ? undefined: getComputedStyle(this.label).fontFamily;
+    if(capFont) {
+      buttonStyle = {
+        fontFamily: capFont,
+        fontSize: buttonStyle.fontSize,
+        height: buttonStyle.height
+      }
+    }
 
     const originalSize = getFontSizeStyle(style.fontSize || '1em');
 
     // Not yet available; it'll be handled in a later layout pass.
-    if(!buttonStyle.fontSize) {
-      // NOTE:  preserves old behavior for use in documentation keyboards, for now.
-      // Once we no longer need to maintain this code block, we can drop all current
-      // method parameters safely.
-      //
-      // Recompute the new width for use in autoscaling calculations below, just in case.
-      emScale = vkbd.getKeyEmFontSize();
-      keyWidth = this.getKeyWidth(vkbd);
-    } else if(!override) {
+    if(!override) {
       // When available, just use computedStyle instead.
       style = buttonStyle;
     }
 
     let fontSpec = getFontSizeStyle(style.fontSize || '1em');
-    let metrics = OSKKey.getTextMetrics(text, emScale, style);
+    let metrics = getTextMetrics(text, emScale, style);
 
     const MAX_X_PROPORTION = 0.90;
     const MAX_Y_PROPORTION = 0.90;
@@ -351,7 +311,7 @@ export default abstract class OSKKey {
 
     // Check the key's display width - does the key visualize well?
     let emScale = vkbd.getKeyEmFontSize();
-    var width: number = OSKKey.getTextMetrics(keyText, emScale, styleSpec).width;
+    var width: number = getTextMetrics(keyText, emScale, styleSpec).width;
     if(width == 0 && keyText != '' && keyText != '\xa0') {
       // Add the Unicode 'empty circle' as a base support for needy diacritics.
 
@@ -380,11 +340,13 @@ export default abstract class OSKKey {
     // space bar may not define the text span!
     if(this.label) {
       if(!this.label.classList.contains('kmw-spacebar-caption')) {
-        this.label.style.fontSize = this.getIdealFontSize(vkbd, this.keyText, this.btn.style);
+        // Do not use `this.keyText` - it holds *___* codes for special keys, not the actual glyph!
+        const keyCapText = this.label.textContent;
+        this.label.style.fontSize = this.getIdealFontSize(vkbd, keyCapText, this.btn.style);
       } else {
         // Remove any custom setting placed on it before recomputing its inherited style info.
         this.label.style.fontSize = '';
-        const fontSize = this.getIdealFontSize(vkbd, this.label.textContent, getComputedStyle(this.label), true);
+        const fontSize = this.getIdealFontSize(vkbd, this.label.textContent, this.btn.style);
 
         // Since the kmw-spacebar-caption version uses !important, we must specify
         // it directly on the element too; otherwise, scaling gets ignored.

@@ -6,6 +6,7 @@
     "rootDir": "src/",
     "baseUrl": ".",
     "allowSyntheticDefaultImports": true,
+    "preserveConstEnums": true,
   },
   "include": [
     "src/**/*.ts",

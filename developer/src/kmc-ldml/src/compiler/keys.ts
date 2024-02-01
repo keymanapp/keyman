@@ -339,7 +339,8 @@ export class KeysCompiler extends SectionCompiler {
           stringVariables: true,
           markers: true,
           unescape: true,
-          singleOk: true
+          singleOk: true,
+          nfd: true,
         },
         sections);
       if (!to.isOneChar) {

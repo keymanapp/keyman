@@ -27,6 +27,12 @@ Docker tends to throttle Docker image downloads, so some developer offices may w
   ]
 ```
 
+### Using Website-Local-Proxy
+Rather than remembering localhost port values below, you can clone and run [website-local-proxy](https://github.com/keymanapp/website-local-proxy).
+
+Follow https://github.com/keymanapp/website-local-proxy?tab=readme-ov-file#using-website-local-proxy and you can access the local websites at
+http://*keyman.com.localhost
+
 ## Builder BASH Script Actions
 
 #### Stop the Docker container
@@ -40,12 +46,12 @@ This stops the Docker container for the site.
 This downloads and builds the Docker images needed for the site.
 
 #### Configure
-1. Run `./build.sh configure`.
+1. Run `./build.sh configure`
 
 This step typically downloads _common/ website files from [shared-sites](https://github.com/keymanapp/shared-sites/tree/main/_common).
 
 #### Start the Docker container
-1. Run `./build.sh start`.
+1. Run `./build.sh start`
 
 This maps the local directory to the the Docker image.
 
@@ -54,10 +60,14 @@ The link file also appears locally.
 
 After this, you can access the website at the following ports:
 
-| Website      |          URL          |
-|--------------|-----------------------|
-|help.keyman   | http://localhost:8055 |
-|keymanweb.com | http://localhost:8057 |
+| Website        |          URL          |  with website-local-proxy running |
+|----------------|-----------------------|-----------------------------------|
+| keyman.com     | http://localhost:8053 | http://keyman.com.localhost       |
+| s.keyman.com   | http://localhost:8054 | http://s.keyman.com.localhost     |
+| help.keyman    | http://localhost:8055 | http://help.keyman.com.localhost  |
+| keymanweb.com  | http://localhost:8057 | http://keymanweb.com.localhost    |
+|                                  |                                       | http://web.keyman.com.localhost   |
+| api.keyman.com | http://localhost:8058 | http://api.keyman.com.localhost   |
 
 #### Remove the Docker container and image
 1. Run `./build.sh clean`.
@@ -65,13 +75,6 @@ After this, you can access the website at the following ports:
 #### Running tests
 Checks for broken links
 1. Run `./build.sh test`
-
-#### Using Website-Local-Proxy
-Rather than remembering localhost port values, you can clone and run [website-local-proxy](https://github.com/keymanapp/website-local-proxy).
-
-Follow https://github.com/keymanapp/website-local-proxy?tab=readme-ov-file#using-website-local-proxy and you can access the local websites at
-http://*keyman.com.localhost
-
 
 ---------
 

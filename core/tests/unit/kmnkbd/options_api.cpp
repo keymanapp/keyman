@@ -7,7 +7,7 @@
 #include <cstdlib>
 #include <string>
 
-#include <keyman/keyman_core_api.h>
+#include "keyman_core.h"
 
 #include "option.hpp"
 #include "state.hpp"

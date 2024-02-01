@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<visualkeyboard>
+  <header>
+    <version>10.0</version>
+    <kbdname>dotty_keys</kbdname>
+    <flags/>
+  </header>
+  <encoding name="unicode" fontname="Arial" fontsize="48">
+    <layer shift="">
+      <key vkey="K_Q">q</key>
+      <key vkey="K_W">w</key>
+      <key vkey="K_E">e</key>
+      <key vkey="K_R">r</key>
+      <key vkey="K_T">t</key>
+      <key vkey="K_Y">y</key>
+      <key vkey="K_U">u</key>
+      <key vkey="K_I">i</key>
+      <key vkey="K_O">o</key>
+      <key vkey="K_P">p</key>
+      <key vkey="K_A">a</key>
+      <key vkey="K_S">s</key>
+      <key vkey="K_D">d</key>
+      <key vkey="K_F">f</key>
+      <key vkey="K_G">g</key>
+      <key vkey="K_H">h</key>
+      <key vkey="K_K">k</key>
+      <key vkey="K_J">j</key>
+      <key vkey="K_L">l</key>
+      <key vkey="K_COLON">;</key>
+      <key vkey="K_QUOTE">'</key>
+      <key vkey="K_LBRKT">[</key>
+      <key vkey="K_RBRKT">]</key>
+      <key vkey="K_1">1</key>
+      <key vkey="K_2">2</key>
+      <key vkey="K_3">3</key>
+      <key vkey="K_4">4</key>
+      <key vkey="K_5">5</key>
+      <key vkey="K_6">6</key>
+      <key vkey="K_7">7</key>
+      <key vkey="K_8">8</key>
+      <key vkey="K_9">9</key>
+      <key vkey="K_0">0</key>
+      <key vkey="K_HYPHEN">-</key>
+      <key vkey="K_EQUAL">=</key>
+      <key vkey="K_Z">z</key>
+      <key vkey="K_X">x</key>
+      <key vkey="K_C">c</key>
+      <key vkey="K_V">v</key>
+      <key vkey="K_B">b</key>
+      <key vkey="K_N">n</key>
+      <key vkey="K_M">m</key>
+      <key vkey="K_COMMA">,</key>
+      <key vkey="K_PERIOD">.</key>
+      <key vkey="K_SLASH">/</key>
+    </layer>
+  </encoding>
+</visualkeyboard>

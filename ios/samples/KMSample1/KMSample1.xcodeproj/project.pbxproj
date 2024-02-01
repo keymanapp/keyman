@@ -18,14 +18,10 @@
 		CEBD337E26549EC100EB2EA8 /* KeymanEngine.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = CEBD337C26549EC100EB2EA8 /* KeymanEngine.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		CEBD33C62654CB0E00EB2EA8 /* DeviceKit.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = CEBD33B92654CA4B00EB2EA8 /* DeviceKit.xcframework */; };
 		CEBD33C72654CB0F00EB2EA8 /* DeviceKit.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = CEBD33B92654CA4B00EB2EA8 /* DeviceKit.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		CEBD33C82654CB1000EB2EA8 /* ObjcExceptionBridging.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = CEBD33BC2654CA5900EB2EA8 /* ObjcExceptionBridging.xcframework */; };
-		CEBD33C92654CB1100EB2EA8 /* ObjcExceptionBridging.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = CEBD33BC2654CA5900EB2EA8 /* ObjcExceptionBridging.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		CEBD33CA2654CB1300EB2EA8 /* Reachability.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = CEBD33BF2654CA5900EB2EA8 /* Reachability.xcframework */; };
 		CEBD33CB2654CB1300EB2EA8 /* Reachability.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = CEBD33BF2654CA5900EB2EA8 /* Reachability.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		CEBD33CC2654CB1400EB2EA8 /* Sentry.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = CEBD33BE2654CA5900EB2EA8 /* Sentry.xcframework */; };
 		CEBD33CD2654CB1500EB2EA8 /* Sentry.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = CEBD33BE2654CA5900EB2EA8 /* Sentry.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		CEBD33CE2654CB1600EB2EA8 /* XCGLogger.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = CEBD33BD2654CA5900EB2EA8 /* XCGLogger.xcframework */; };
-		CEBD33CF2654CB1700EB2EA8 /* XCGLogger.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = CEBD33BD2654CA5900EB2EA8 /* XCGLogger.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		CED2AC85260AFADC00A408D2 /* ekwtamil99uni.kmp in Resources */ = {isa = PBXBuildFile; fileRef = CED2AC84260AFADC00A408D2 /* ekwtamil99uni.kmp */; };
 /* End PBXBuildFile section */
 
@@ -37,11 +33,9 @@
 			dstSubfolderSpec = 10;
 			files = (
 				CEBD33CB2654CB1300EB2EA8 /* Reachability.xcframework in Embed Frameworks */,
-				CEBD33C92654CB1100EB2EA8 /* ObjcExceptionBridging.xcframework in Embed Frameworks */,
 				290FB45C2AFB234900249D58 /* ZIPFoundation.xcframework in Embed Frameworks */,
 				CEBD33C72654CB0F00EB2EA8 /* DeviceKit.xcframework in Embed Frameworks */,
 				CEBD33CD2654CB1500EB2EA8 /* Sentry.xcframework in Embed Frameworks */,
-				CEBD33CF2654CB1700EB2EA8 /* XCGLogger.xcframework in Embed Frameworks */,
 				CEBD337E26549EC100EB2EA8 /* KeymanEngine.xcframework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
@@ -60,8 +54,6 @@
 		C0324B831F87172900AF3785 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
 		CEBD337C26549EC100EB2EA8 /* KeymanEngine.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; path = KeymanEngine.xcframework; sourceTree = "<group>"; };
 		CEBD33B92654CA4B00EB2EA8 /* DeviceKit.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = DeviceKit.xcframework; path = ../../Carthage/Build/DeviceKit.xcframework; sourceTree = "<group>"; };
-		CEBD33BC2654CA5900EB2EA8 /* ObjcExceptionBridging.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = ObjcExceptionBridging.xcframework; path = ../../Carthage/Build/ObjcExceptionBridging.xcframework; sourceTree = "<group>"; };
-		CEBD33BD2654CA5900EB2EA8 /* XCGLogger.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = XCGLogger.xcframework; path = ../../Carthage/Build/XCGLogger.xcframework; sourceTree = "<group>"; };
 		CEBD33BE2654CA5900EB2EA8 /* Sentry.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = Sentry.xcframework; path = ../../Carthage/Build/Sentry.xcframework; sourceTree = "<group>"; };
 		CEBD33BF2654CA5900EB2EA8 /* Reachability.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = Reachability.xcframework; path = ../../Carthage/Build/Reachability.xcframework; sourceTree = "<group>"; };
 		CED2AC84260AFADC00A408D2 /* ekwtamil99uni.kmp */ = {isa = PBXFileReference; lastKnownFileType = file; path = ekwtamil99uni.kmp; sourceTree = "<group>"; };
@@ -72,13 +64,11 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				CEBD33C82654CB1000EB2EA8 /* ObjcExceptionBridging.xcframework in Frameworks */,
 				CEBD33CA2654CB1300EB2EA8 /* Reachability.xcframework in Frameworks */,
 				290FB45B2AFB234900249D58 /* ZIPFoundation.xcframework in Frameworks */,
 				CEBD33CC2654CB1400EB2EA8 /* Sentry.xcframework in Frameworks */,
 				CEBD33C62654CB0E00EB2EA8 /* DeviceKit.xcframework in Frameworks */,
 				CEBD337D26549EC100EB2EA8 /* KeymanEngine.xcframework in Frameworks */,
-				CEBD33CE2654CB1600EB2EA8 /* XCGLogger.xcframework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -128,10 +118,8 @@
 			isa = PBXGroup;
 			children = (
 				290FB45A2AFB234800249D58 /* ZIPFoundation.xcframework */,
-				CEBD33BC2654CA5900EB2EA8 /* ObjcExceptionBridging.xcframework */,
 				CEBD33BF2654CA5900EB2EA8 /* Reachability.xcframework */,
 				CEBD33BE2654CA5900EB2EA8 /* Sentry.xcframework */,
-				CEBD33BD2654CA5900EB2EA8 /* XCGLogger.xcframework */,
 				CEBD33B92654CA4B00EB2EA8 /* DeviceKit.xcframework */,
 				CEBD337C26549EC100EB2EA8 /* KeymanEngine.xcframework */,
 			);

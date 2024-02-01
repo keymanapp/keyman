@@ -51,7 +51,8 @@
     "supports-color": "^9.4.0"
   },
   "files": [
-    "build/src/"
+    "build/src/",
+    "build/unicode-license.txt"
   ],
   "devDependencies": {
     "@sentry/cli": "^2.19.4",

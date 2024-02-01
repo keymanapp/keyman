@@ -32,7 +32,9 @@ const Codes = {
     "ALT_GR_SIM": (0x0001 | 0x0004),
     "CHIRAL":0x001F,    // The base bitmask for chiral keyboards.  Includes SHIFT, which is non-chiral.
     "IS_CHIRAL":0x000F, // Used to test if a bitmask uses a chiral modifier.
-    "NON_CHIRAL":0x0070 // The default bitmask, for non-chiral keyboards
+    "NON_CHIRAL":0x0070, // The default bitmask, for non-chiral keyboards,
+    // Represents all modifier codes not supported by KMW 1.0 legacy keyboards.
+    "NON_LEGACY": 0x006F // ALL, but without the SHIFT bit
   },
 
   stateBitmasks: {

@@ -8,6 +8,7 @@
 
 import Foundation
 import UIKit
+import os.log
 
 /**
  * This class stores common methods used for installing language resources, regardless of source.
@@ -40,7 +41,9 @@ public class ResourceFileManager {
         do {
           try Storage.active.installDefaultKeyboard(from: Resources.bundle)
         } catch {
-          SentryManager.captureAndLog(error, message: "Failed to copy default keyboard from bundle: \(error)")
+          let message = "Failed to copy default keyboard from bundle: \(error)"
+          os_log("%{public}s", log:KeymanEngineLogger.resources, type: .error, message)
+          SentryManager.capture(error, message:message)
         }
       }
       Migrations.engineVersion = Version.latestFeature
@@ -154,7 +157,9 @@ public class ResourceFileManager {
       try copyWithOverwrite(from: url, to: destinationUrl)
       return destinationUrl
     } catch {
-      SentryManager.captureAndLog(error)
+      let message = "\(String(describing: error))"
+      os_log("%{public}s", log:KeymanEngineLogger.resources, type: .error, message)
+      SentryManager.capture(error, message:message)
       return nil
     }
   }
@@ -166,7 +171,9 @@ public class ResourceFileManager {
    */
   public func prepareKMPInstall(from url: URL) throws -> KeymanPackage {
     // Once selected, start the standard install process.
-    SentryManager.breadcrumbAndLog("Opening KMP from \(url)")
+    let message = "Opening KMP from \(url)"
+    os_log("%{public}s", log:KeymanEngineLogger.resources, type: .info, message)
+    SentryManager.breadcrumb(message)
 
     // Step 1: Copy it to a temporary location, making it a .zip in the process
     let cacheDirectory = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask)[0]
@@ -176,7 +183,8 @@ public class ResourceFileManager {
     do {
       try copyWithOverwrite(from: url, to: archiveUrl)
     } catch {
-      log.error(error)
+      let errorMessage = "\(String(describing: error))"
+      os_log("%{public}s", log:KeymanEngineLogger.resources, type: .error, errorMessage)
       throw KMPError.copyFiles
     }
 
@@ -208,7 +216,8 @@ public class ResourceFileManager {
       let kmp = try prepareKMPInstall(from: url)
       completionHandler(kmp, nil)
     } catch {
-      log.error(error)
+      let errorMessage = "\(String(describing: error))"
+      os_log("%{public}s", log:KeymanEngineLogger.resources, type: .error, errorMessage)
       completionHandler(nil, error)
     }
   }
@@ -333,7 +342,8 @@ public class ResourceFileManager {
       try finalizePackageInstall(package, isCustom: isCustom)
       completionHandler(nil)
     } catch {
-      log.error(error)
+      let errorMessage = "\(String(describing: error))"
+      os_log("%{public}s", log:KeymanEngineLogger.resources, type: .error, errorMessage)
       completionHandler(error)
     }
   }
@@ -360,7 +370,8 @@ public class ResourceFileManager {
                         where FullID.Resource.Package: TypedKeymanPackage<FullID.Resource> {
     if fullIDs.contains(where: { package.findResource(withID: $0) == nil }) {
       let missingResource = fullIDs.first(where: { package.findResource(withID: $0) == nil })!
-      log.error("Resource with full ID \(missingResource.description) not in package")
+      let errorMessage = "Resource with full ID \(missingResource.description) not in package"
+      os_log("%{public}s", log:KeymanEngineLogger.resources, type: .error, errorMessage)
       throw KMPError.resourceNotInPackage
     }
 
@@ -376,7 +387,8 @@ public class ResourceFileManager {
       try copyWithOverwrite(from: package.sourceFolder,
                             to: Storage.active.packageDir(for: package)!)
     } catch {
-      log.error("Could not create installation directory and/or copy resources: \(error)")
+      let errorMessage = "Could not create installation directory and/or copy resources: \(error)"
+      os_log("%{public}s", log:KeymanEngineLogger.resources, type: .error, errorMessage)
       throw KMPError.fileSystem
     }
 
@@ -413,7 +425,9 @@ public class ResourceFileManager {
     if !FileManager.default.fileExists(atPath: path) {
       // Is 'internal' and only called after packages have been installed,
       // thus when the files should already be in-place.
-      SentryManager.captureAndLog("Could not add resource of type: \(resource.fullID.type) with ID: \(resource.id) because the resource file does not exist")
+      let message = "Could not add resource of type: \(resource.fullID.type) with ID: \(resource.id) because the resource file does not exist"
+      os_log("%{public}s", log:KeymanEngineLogger.resources, type: .error, message)
+      SentryManager.capture(message)
       return
     }
 
@@ -445,6 +459,8 @@ public class ResourceFileManager {
 
     userDefaults.set([Date()], forKey: Key.synchronizeSWKeyboard)
     userDefaults.synchronize()
-    SentryManager.breadcrumbAndLog("Added \(resource.fullID.type) with ID: \(resource.id) and language code: \(resource.languageID)")
+    let message = "Added \(resource.fullID.type) with ID: \(resource.id) and language code: \(resource.languageID)"
+    os_log("%{public}s", log:KeymanEngineLogger.resources, type: .info, message)
+    SentryManager.breadcrumb(message)
   }
 }

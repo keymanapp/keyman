@@ -8,7 +8,8 @@
   History:      17 Oct 2018 - TSE - Initial implementation.
 */
 
-#include <keyman/keyman_core_api.h>
+#include "keyman_core.h"
+
 #include "processor.hpp"
 #include "state.hpp"
 

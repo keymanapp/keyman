@@ -151,24 +151,20 @@ bool ldml_processor::is_kmxplus_file(path const & kb_path, std::vector<uint8_t>&
 
 km_core_status
 ldml_processor::process_queued_actions(
-  km_core_state *state
+  km_core_state *_kmn_unused(state)
 ) {
-  assert(state);
-  if (!state)
-    return KM_CORE_STATUS_INVALID_ARGUMENT;
-  // TODO Implement
-  return KM_CORE_STATUS_OK;
+  /* Not implemented. Only used by IMX. */
+  assert(false);
+  return KM_CORE_STATUS_NOT_IMPLEMENTED;
 }
 
 bool ldml_processor::queue_action(
-  km_core_state * state,
-  km_core_action_item const* action_item
+  km_core_state * _kmn_unused(state),
+  km_core_action_item const* _kmn_unused(action_item)
 )
 {
-  assert(state);
-  assert(action_item);
-  if ((!state) || (!action_item))
-    return false;
+  /* Not implemented. Only used by IMX. */
+  assert(false);
   return false;
 }
 
@@ -178,58 +174,67 @@ ldml_processor::process_event(
     km_core_virtual_key vk,
     uint16_t modifier_state,
     uint8_t is_key_down,
-    uint16_t _kmn_unused(event_flags)
+    uint16_t event_flags
 ) {
   assert(state);
   if (!state)
     return KM_CORE_STATUS_INVALID_ARGUMENT;
 
-  try {
-    // At the start of every process_event always clear the action_items
-    state->actions().clear();
+  // this will hold the parameters, and our response
+  ldml_event_state ldml_state(state, vk, modifier_state, is_key_down, event_flags);
+  ldml_state.clear();
 
+  try {
     if (!is_key_down) {
-      process_key_up(state, vk, modifier_state);
+      process_key_up(ldml_state);
     } else {
       switch (vk) {
       // Currently, only one VK gets spoecial treatment.
       // Special handling for backspace VK
       case KM_CORE_VKEY_BKSP:
-        process_backspace(state);
+        process_backspace(ldml_state);
         break;
       default:
         // all other VKs
-        process_key_down(state, vk, modifier_state);
+        process_key_down(ldml_state);
       } // end of switch
     } // end of normal processing
 
     // all key-up and key-down events end up here.
-    state->actions().commit();  // always commit
+    // commit the ldml state into the core state
+    ldml_state.commit();
     return KM_CORE_STATUS_OK;
   } catch (std::bad_alloc &) {
     // out of memory, clean up and get out
-    state->actions().clear();
+    ldml_state.clear();
+    // no actions will be set
     return KM_CORE_STATUS_NO_MEM;
   }
 }
 
 void
-ldml_processor::process_key_up(km_core_state *state, km_core_virtual_key _kmn_unused(vk), uint16_t _kmn_unused(modifier_state))
+ldml_processor::process_key_up(ldml_event_state &ldml_state)
     const {
   // TODO-LDML: Implement caps lock handling
-  state->actions().clear();  // TODO-LDML: Why is clear here?
+  ldml_state.clear();
 }
 
 void
-ldml_processor::process_backspace(km_core_state *state) const {
+ldml_processor::process_backspace(ldml_event_state &ldml_state) const {
   if (!!bksp_transforms) {
-    // process with an empty string
-    auto matchedContext = process_output(state, std::u32string(), bksp_transforms.get());
+    // process with an empty string voa the bksp transforms
+    auto matchedContext = process_output(ldml_state, std::u32string(), bksp_transforms.get());
 
     if (matchedContext > 0) {
       return; // The transform took care of the backspacing.
     }  // else, fall through to default processing below.
   }
+
+  ldml_state.emit_backspace();
+}
+
+void ldml_event_state::emit_backspace() {
+  // this is called from user-initiated backspace, not internal backspacing.
 
   // Find out what the last actual character was and remove it.
   // attempt to get the last char
@@ -237,12 +242,13 @@ ldml_processor::process_backspace(km_core_state *state) const {
   auto end = state->context().rbegin();
   if (end != state->context().rend()) {
     if ((*end).type == KM_CORE_CT_CHAR) {
-      state->actions().push_backspace(KM_CORE_BT_CHAR, (*end).character);
+      actions.code_points_to_delete++;
       state->context().pop_back();
       return;
     } else if ((*end).type == KM_CORE_BT_MARKER) {
-      state->actions().push_backspace(KM_CORE_BT_MARKER, (*end).marker);
+      // nothing in actions
       state->context().pop_back();
+      // falls through - end wasn't a character
     }
   }
   /*
@@ -253,35 +259,35 @@ ldml_processor::process_backspace(km_core_state *state) const {
     dumped in somewhere unknown, so we will have to depend on the app to
     be sensible about backspacing because we know nothing.
   */
-  state->actions().push_backspace(KM_CORE_BT_UNKNOWN);
+  actions.emit_keystroke = KM_CORE_TRUE;
 }
 
 void
-ldml_processor::process_key_down(km_core_state *state, km_core_virtual_key vk, uint16_t modifier_state) const {
+ldml_processor::process_key_down(ldml_event_state &ldml_state) const {
   // Look up the key
   bool found = false;
-  const std::u16string key_str = keys.lookup(vk, modifier_state, found);
+  const std::u16string key_str = keys.lookup(ldml_state.get_vk(), ldml_state.get_modifier_state(), found);
 
   if (!found) {
     // no key was found, so pass the keystroke on to the Engine
-    emit_invalidate_passthrough_keystroke(state, vk, modifier_state);
+    ldml_state.emit_passthrough_keystroke();
   } else if (!key_str.empty()) {
-    process_key_string(state, key_str);
+    process_key_string(ldml_state, key_str);
   } // else no action: It's a gap or gap-like key.
 }
 
 void
-ldml_processor::process_key_string(km_core_state *state, const std::u16string &key_str) const {
+ldml_processor::process_key_string(ldml_event_state &ldml_state, const std::u16string &key_str) const {
   // We know that key_str is not empty per the caller.
   assert(!key_str.empty());
 
   // we convert the keys str to UTF-32 here instead of using the emit_text() overload
   // so that we don't have to reconvert it inside the transform code.
   std::u32string key_str32 = kmx::u16string_to_u32string(key_str);
-  (void)process_output(state, key_str32, transforms.get());
+  (void)process_output(ldml_state, key_str32, transforms.get());
 }
 
-size_t ldml_processor::process_output(km_core_state *state, const std::u32string &str, ldml::transforms *with_transforms) const {
+size_t ldml_processor::process_output(ldml_event_state &ldml_state, const std::u32string &str, ldml::transforms *with_transforms) const {
   std::u32string nfd_str = str;
   // Note:
   //  The normalize functions have assert and Debuglog at the bottom.
@@ -291,12 +297,12 @@ size_t ldml_processor::process_output(km_core_state *state, const std::u32string
 
   // extract context string, in NFD
   std::u32string old_ctxtstr_nfd;
-  (void)context_to_string(state, old_ctxtstr_nfd, true);
-  (void)ldml::normalize_nfd_markers(old_ctxtstr_nfd);
+  (void)ldml_state.context_to_string(old_ctxtstr_nfd, true);
+  assert(ldml::normalize_nfd_markers(old_ctxtstr_nfd)); // TODO-LDML: else fail?
 
   // context string in NFD
   std::u32string ctxtstr;
-  (void)context_to_string(state, ctxtstr, true); // with markers
+  (void)ldml_state.context_to_string(ctxtstr, true); // TODO-LDML: remove this second call
   // add the newly added key output to ctxtstr
   ctxtstr.append(nfd_str);
   (void)ldml::normalize_nfd_markers(ctxtstr);
@@ -367,20 +373,21 @@ size_t ldml_processor::process_output(km_core_state *state, const std::u32string
 
   // FIRST drop the old suffix. Note: this mutates old_ctxtstr_changed.
   // see remove_text() docs, this PUSHes actions, POPs context items, and TRIMS the string.
-  remove_text(state, old_ctxtstr_changed, old_ctxtstr_changed.length());
+  ldml_state.remove_text(old_ctxtstr_changed, old_ctxtstr_changed.length());
   assert(old_ctxtstr_changed.length() == 0);
   // old_ctxtstr_changed is now empty because it's been removed.
   // context is "aa" in the above example.
 
   // THEN add the new suffix, "CCC" in the above example
-  emit_text(state, new_ctxtstr_changed);
+  ldml_state.emit_text(new_ctxtstr_changed);
   // context is now "aaCCC"
 
   return matchedContext;
 }
 
+
 void
-ldml_processor::remove_text(km_core_state *state, std::u32string &str, size_t length) {
+ldml_event_state::remove_text(std::u32string &str, size_t length) {
   // str is the string to remove, so it should be at least as long as length
   assert(length <= str.length());
   /** track how many context items have been removed, via push_backspace() */
@@ -396,10 +403,9 @@ ldml_processor::remove_text(km_core_state *state, std::u32string &str, size_t le
       assert(c->character == lastCtx);
       str.pop_back();
       // Cause prior char to be removed
-      state->actions().push_backspace(KM_CORE_BT_CHAR, c->character);
+      actions.code_points_to_delete++;
     } else if (type == KM_CORE_BT_MARKER) {
       assert(length >= 3);
-      state->actions().push_backspace(KM_CORE_BT_MARKER, c->marker);
       // #3 - the marker.
       assert(lastCtx == c->marker);
       str.pop_back();
@@ -411,6 +417,7 @@ ldml_processor::remove_text(km_core_state *state, std::u32string &str, size_t le
       // #1 - the sentinel
       assert(str.back() == UC_SENTINEL);
       str.pop_back();
+      // Nothing in actions
       length--;
     }
   }
@@ -446,13 +453,13 @@ km_core_status ldml_processor::validate() const {
 }
 
 void
-ldml_processor::emit_text(km_core_state *state, const std::u16string &str) {
+ldml_event_state::emit_text(const std::u16string &str) {
   const std::u32string str32 = kmx::u16string_to_u32string(str);
-  emit_text(state, str32);
+  emit_text(str32);
 }
 
 void
-ldml_processor::emit_text(km_core_state *state, const std::u32string &str) {
+ldml_event_state::emit_text(const std::u32string &str) {
   for (auto it = str.begin(); it < str.end(); it++) {
     const auto ch = *it;
     // If we are at the start of a sequence:
@@ -465,41 +472,38 @@ ldml_processor::emit_text(km_core_state *state, const std::u32string &str) {
       it++; // consume LDML_MARKER_CODE
       assert(it < str.end());
       const auto marker_no = *it;
-      emit_marker(state, marker_no);
+      emit_marker(marker_no);
     } else {
-      emit_text(state, ch);
+      emit_text(ch);
     }
   }
 }
 
 void
-ldml_processor::emit_text(km_core_state *state, km_core_usv ch) {
+ldml_event_state::emit_text( km_core_usv ch) {
   assert(ch != LDML_UC_SENTINEL);
   state->context().push_character(ch);
-  state->actions().push_character(ch);
+  text.push_back(ch);
 }
 
 void
-ldml_processor::emit_marker(km_core_state *state, KMX_DWORD marker_no) {
+ldml_event_state::emit_marker( KMX_DWORD marker_no) {
   assert(km::core::kmx::is_valid_marker(marker_no));
-  state->actions().push_marker(marker_no);
+  // No markers in the action struct!
   state->context().push_marker(marker_no);
 }
 
-void ldml_processor::emit_invalidate_passthrough_keystroke(km_core_state *state, km_core_virtual_key vk, uint16_t _kmn_unused(modifier_state)) {
-  if ((vk < 0x100) && km::core::kmx::vkey_to_contextreset[vk]) {
-    state->actions().push_invalidate_context();
-  } else {
-    assert(vk < 0x100); // don't expect synthetic vkeys here
-  }
-  state->actions().push_emit_keystroke();
+void ldml_event_state::emit_passthrough_keystroke() {
+  // assert we haven't already requested a keystroke
+  assert(actions.emit_keystroke != KM_CORE_TRUE);
+  actions.emit_keystroke = KM_CORE_TRUE;
 }
 
 size_t
-ldml_processor::context_to_string(km_core_state *state, std::u32string &str, bool include_markers) {
+ldml_event_state::context_to_string(std::u32string &str, bool include_markers) {
     str.clear();
-    auto &cp      = state->context();
-    size_t ctxlen = 0; // TODO-LDML: not used by callers?
+    auto &cp          = state->context();
+    size_t ctxlen     = 0;  // TODO-LDML: not used by callers?
     uint8_t last_type = KM_CORE_BT_UNKNOWN;
     for (auto c = cp.rbegin(); c != cp.rend(); c++, ctxlen++) {
       last_type = c->type;
@@ -515,6 +519,62 @@ ldml_processor::context_to_string(km_core_state *state, std::u32string &str, boo
       }
     }
     return ctxlen; // consumed the entire context buffer.
+}
+
+static const km_core_option_item NULL_OPTIONS[] = {KM_CORE_OPTIONS_END};
+
+ldml_event_state::ldml_event_state(
+    km_core_state *s,
+    km_core_virtual_key v,
+    uint16_t m,
+    uint8_t i,
+    uint16_t e) {
+  this->state          = s;
+  this->vk             = v;
+  this->modifier_state = m;
+  this->is_key_down    = i;
+  this->event_flags    = e;
+
+  actions.persist_options = new km_core_option_item[1];
+  actions.persist_options[0] = NULL_OPTIONS[0];
+
+  // initialize actions
+  clear();
+}
+
+void ldml_event_state::commit() {
+  // thi is only set for the duration of the next call.
+  actions.output = text.c_str();
+  // current implementation copies actions.output and doesn't retain it
+  state->set_actions(actions);
+  // clean up
+  actions.output = nullptr;
+  // clear struct
+  clear();
+  // commit. TODO: should this be necessary? #9999
+  state->actions().commit();
+}
+
+void ldml_event_state::clear() {
+  // reset text
+  text.clear();
+  // reset state obj
+  actions.output                = nullptr;
+  actions.code_points_to_delete = 0;
+  actions.do_alert              = KM_CORE_FALSE;
+  actions.emit_keystroke        = KM_CORE_FALSE;
+  actions.new_caps_lock_state   = KM_CORE_CAPS_UNCHANGED;
+}
+
+void ldml_event_state::context_clear() {
+  // clear the context
+  state->context().clear();
+  // clear our own state
+  clear();
+}
+
+ldml_event_state::~ldml_event_state() {
+  delete [] actions.persist_options;
 }
 
 } // namespace core
