@@ -556,10 +556,6 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
     var offsetPrefix = false;
 
     let str = trimDirectionalMarkPrefix(text)
-    let context = str
-
-    let sCount = str.count
-    let tCount = text?.count ?? 0
     if str.count != (text?.count ?? 0) {
       offsetPrefix = true
     }
@@ -569,7 +565,7 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
       selRange = NSRange(location: selRange.location - 1, length: selRange.length)
     }
 
-    keymanWeb.setText(context)
+    keymanWeb.setText(str)
     if range.location != NSNotFound {
       keymanWeb.setCursorRange(selRange)
     }

@@ -54,12 +54,13 @@ func trimDirectionalMarkPrefix(_ str: String?) -> String {
   // standard string-handling will treat it and a preceding directional character
   // as a single unit.  This code block exists to avoid the issue.
   if text.utf16.count > 0 {
-    let head = UnicodeScalar(text.utf16[text.utf16.startIndex])!;
-    // "%02X" - to hex-format the integer for the string conversion.
+    let head = UnicodeScalar(text.utf16[text.utf16.startIndex])!
     let tail = text.utf16.count > 1 ? String(text.utf16[text.utf16.index(text.utf16.startIndex, offsetBy: 1)..<text.utf16.endIndex])! : ""
 
-//      let headEncoding = String(format:"%02X", text.utf16[text.utf16.startIndex])
-//      os_log("head: '%@', tail: '%@'", log: KeymanEngineLogger.engine, type: .debug, headEncoding, tail)
+
+//    // "%02X" - to hex-format the integer for the string conversion.
+//    let headEncoding = String(format:"%02X", text.utf16[text.utf16.startIndex])
+//    os_log("head: '%@', tail: '%@'", log: KeymanEngineLogger.engine, type: .debug, headEncoding, tail)
 
     // Remove any system-added LTR/RTL marks.
     if DIRECTIONAL_MARKS.contains(where: { head.value == $0.value }) {
