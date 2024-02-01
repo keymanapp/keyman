@@ -58,7 +58,12 @@ bool normalize_nfd(std::u16string &str) {
   return normalize(nfd, str, status);
 }
 
-static void add_back_markers(std::u32string &str, const std::u32string &src, marker_map &map, marker_encoding encoding) {
+void add_back_markers(std::u32string &str, const std::u32string &src, marker_map &map, marker_encoding encoding) {
+  if (map.empty()) {
+    // quick check, nothing to do if no markers
+    str = src;
+    return;
+  }
   // need to reconstitute.
   marker_map map2(map);  // make a copy of the map
   // clear the string
@@ -110,9 +115,6 @@ bool normalize_nfd_markers_segment(std::u32string &str, marker_map &map, marker_
   std::u32string str_unmarked_nfd = str_unmarked;
   if(!normalize_nfd(str_unmarked_nfd)) {
     return false; // normalize failed.
-  } else if (map.size() == 0) {
-    // no markers. Return the normalized unmarked str
-    str = str_unmarked_nfd;
   } else if (str_unmarked_nfd == str_unmarked) {
     // Normalization produced no change when markers were removed.
     // So, we'll call this a no-op.
