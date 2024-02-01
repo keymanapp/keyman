@@ -1,5 +1,14 @@
 # Keyman Version History
 
+## 17.0.258 alpha 2024-02-01
+
+* chore(developer): add unicode-license.txt for ldml keyboards data (#10568)
+* feat(core): ldml reorder marker processing (#10539)
+* chore(developer): kmc ldml build - call c8 directly for tests (#10522)
+* fix(web): app/webview control flow for initial layer (#10571)
+* chore(linux): Upgrade artifacts to v4 (#10577)
+* chore(linux): Fix the path of downloaded artifacts (#10594)
+
 ## 17.0.257 alpha 2024-01-31
 
 * epic: Keyman Core normalization (#10390)
