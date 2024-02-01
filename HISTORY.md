@@ -1,5 +1,15 @@
 # Keyman Version History
 
+## 16.0.145 stable 2024-02-01
+
+* chore(linux): Add support for loong64 architecture (#10108)
+* chore(linux): Update debian changelog (#10122)
+* fix(web): Fix null error with legacy keyboards (#10177)
+* chore(ios): FV certificate key (#10229)
+* fix(oem/fv): Add fv_hulquminum_combine and fv_kwadacha_tsekene :cherries: (#10285)
+* chore(developer): upgrade ngrok to v3 (#10360)
+* chore(linux): Build with webkitgtk 4.1 instead of 4.0 (#10574)
+
 ## 16.0.144 stable 2023-11-30
 
 * chore(linux): Update debian changelog (#10046)
