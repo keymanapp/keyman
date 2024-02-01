@@ -87,7 +87,8 @@ uses
   Keyman.Developer.System.Project.UrlRenderer in '..\TIKE\project\Keyman.Developer.System.Project.UrlRenderer.pas',
   Keyman.System.LexicalModelUtils in '..\common\delphi\lexicalmodels\Keyman.System.LexicalModelUtils.pas',
   KeymanDeveloperOptions in '..\tike\main\KeymanDeveloperOptions.pas',
-  Keyman.Developer.System.KeymanDeveloperPaths in '..\tike\main\Keyman.Developer.System.KeymanDeveloperPaths.pas';
+  Keyman.Developer.System.KeymanDeveloperPaths in '..\tike\main\Keyman.Developer.System.KeymanDeveloperPaths.pas',
+  Keyman.Developer.System.LdmlKeyboardProjectTemplate in 'Keyman.Developer.System.LdmlKeyboardProjectTemplate.pas';
 
 {$R icons.RES}
 {$R version.res}

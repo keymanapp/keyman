@@ -9,6 +9,7 @@
 import Foundation
 import UIKit
 import KeymanEngine // for log commands
+import os
 
 /**
  * Takes in a XIB spec for an image banner and makes it renderable, applying size constraints when rendered
@@ -49,7 +50,8 @@ class ImageBannerViewController: UIViewController {
 
     let frame = CGRect(origin: self.view.frame.origin, size: size)
 
-    log.debug("Rendering banner image of size \(size)")
+    os_log("Rendering banner image of size %{public}s", log: KeymanLogger.ui, type: .debug, NSCoder.string(for: size))
+
     self.view.frame = frame
     widthConstraint?.constant = size.width
     heightConstraint?.constant = size.height

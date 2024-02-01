@@ -1,0 +1,10 @@
+{
+  "id": "sil_ipa",
+  "name":"IPA (SIL)",
+  "languages":{
+    "id":"und-fonipa",
+    "name": "Undetermined",
+    "region": "World"
+  },
+  "filename":"resources/keyboards/sil_ipa.js"
+}

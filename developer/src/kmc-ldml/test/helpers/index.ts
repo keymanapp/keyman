@@ -5,7 +5,7 @@ import 'mocha';
 import * as path from 'path';
 import { fileURLToPath } from 'url';
 import { SectionCompiler, SectionCompilerNew } from '../../src/compiler/section-compiler.js';
-import { KMXPlus, LDMLKeyboardXMLSourceFileReader, VisualKeyboard, CompilerEvent, LDMLKeyboardTestDataXMLSourceFile, compilerEventFormat, LDMLKeyboard, UnicodeSetParser, CompilerCallbacks } from '@keymanapp/common-types';
+import { util, KMXPlus, LDMLKeyboardXMLSourceFileReader, VisualKeyboard, CompilerEvent, LDMLKeyboardTestDataXMLSourceFile, compilerEventFormat, LDMLKeyboard, UnicodeSetParser, CompilerCallbacks } from '@keymanapp/common-types';
 import { LdmlKeyboardCompiler } from '../../src/main.js'; // make sure main.js compiles
 import { assert } from 'chai';
 import { KMXPlusMetadataCompiler } from '../../src/compiler/metadata-compiler.js';
@@ -279,3 +279,13 @@ async function getTestUnicodeSetParser(callbacks: CompilerCallbacks): Promise<Un
   }
 }
 
+/** compare actual and expected strings */
+export function assertCodePoints(actual?: string, expected?: string, msg?: string) {
+  assert.strictEqual(actual, expected, `Actual ${msg||':'}\n${hex_str(actual)}\nExpected:\n${hex_str(expected)}\n`);
+}
+
+const dontEscape = /[a-zA-Z0-9\.${}\[\]-]/;
+
+export function hex_str(s?: string) : string {
+  return [...s].map(ch => dontEscape.test(ch) ? ch : util.escapeRegexChar(ch)).join('');
+}

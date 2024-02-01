@@ -8,6 +8,7 @@
 
 import AudioToolbox
 import UIKit
+import os.log
 
 public class TextField: UITextField, KeymanResponder {
   // viewController should be set to main view controller to enable keyboard picker.
@@ -83,7 +84,7 @@ public class TextField: UITextField, KeymanResponder {
       }
 
       if delegate !== delegateProxy {
-        log.error("Trying to set TextField's delegate directly. Use setKeymanDelegate() instead.")
+        os_log("Trying to set TextField's delegate directly. Use setKeymanDelegate() instead.", log:KeymanEngineLogger.ui, type: .error)
       }
       super.delegate = delegateProxy
     }
@@ -95,7 +96,8 @@ public class TextField: UITextField, KeymanResponder {
   // All of the normal UITextFieldDelegate methods are supported.
   public func setKeymanDelegate(_ keymanDelegate: TextFieldDelegate?) {
     delegateProxy.keymanDelegate = keymanDelegate
-    log.debug("TextField: \(self.hashValue) keymanDelegate set to: \(keymanDelegate.debugDescription)")
+    let message = "TextField: \(self.hashValue) keymanDelegate set to: \(keymanDelegate.debugDescription)"
+    os_log("%{public}s", log:KeymanEngineLogger.ui, type: .debug, message)
   }
 
   public override var text: String! {
@@ -146,7 +148,8 @@ public class TextField: UITextField, KeymanResponder {
       font = UIFont.systemFont(ofSize: fontSize)
     }
 
-    log.debug("TextField \(self.hashValue) setFont: \(font?.familyName ?? "nil")")
+    let message = "TextField \(self.hashValue) setFont: \(font?.familyName ?? "nil")"
+    os_log("%{public}s", log:KeymanEngineLogger.settings, type: .debug, message)
   }
 
   @objc func enableInputClickSound() {
@@ -171,7 +174,8 @@ extension KeymanResponder where Self: TextField {
   // Dismisses the keyboard if this textview is the first responder.
   //   - Use this instead of [resignFirstResponder] as it also resigns the Keyman keyboard's responders.
   public func dismissKeyboard() {
-    log.debug("TextField: \(self.hashValue) dismissing keyboard. Was first responder: \(isFirstResponder)")
+    let message = "TextField: \(self.hashValue) dismissing keyboard. Was first responder: \(isFirstResponder)"
+    os_log("%{public}s", log:KeymanEngineLogger.ui, type: .debug, message)
     resignFirstResponder()
     Manager.shared.inputViewController.endEditing(true)
   }
@@ -258,10 +262,12 @@ extension TextField: UITextFieldDelegate {
       font = UIFont.systemFont(ofSize: fontSize)
     }
 
-    log.debug("TextField: \(self.hashValue) setFont: \(font?.familyName ?? "nil")")
+    let messageOne = "TextField: \(self.hashValue) setFont: \(font?.familyName ?? "nil")"
+    os_log("%{public}s", log:KeymanEngineLogger.ui, type: .debug, messageOne)
 
-    log.debug("TextField: \(self.hashValue) Became first responder. Value: \(String(describing: text))")
-  }
+    let messageTwo = "TextField: \(self.hashValue) Became first responder. Value: \(String(describing: text))"
+    os_log("%{public}s", log:KeymanEngineLogger.ui, type: .debug, messageTwo)
+}
 
   public func textFieldShouldEndEditing(_ textField: UITextField) -> Bool {
     if textField == self {

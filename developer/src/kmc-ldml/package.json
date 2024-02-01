@@ -17,7 +17,7 @@
   "scripts": {
     "build": "tsc -b",
     "lint": "eslint .",
-    "test": "npm run lint && cd test && tsc -b && cd .. && c8 --reporter=lcov --reporter=text mocha"
+    "test": "gosh ./build.sh test"
   },
   "author": "Marc Durdin <marc@keyman.com> (https://github.com/mcdurdin)",
   "license": "MIT",
@@ -33,6 +33,7 @@
   },
   "devDependencies": {
     "@keymanapp/developer-test-helpers": "*",
+    "@keymanapp/resources-gosh": "*",
     "@types/chai": "^4.1.7",
     "@types/mocha": "^5.2.7",
     "@types/node": "^20.4.1",

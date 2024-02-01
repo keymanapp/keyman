@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import os.log
 
 extension Queries {
   public class LexicalModel {
@@ -56,7 +57,9 @@ extension Queries {
       var urlComponents = MODEL_ENDPOINT
 
       urlComponents.queryItems = [URLQueryItem(name: "q", value: "bcp47:\(bcp47)")]
-      SentryManager.breadcrumbAndLog("Querying package versions through API endpoint: \(urlComponents.url!)")
+      let message = "Querying package versions through API endpoint: \(urlComponents.url!)"
+      os_log("%{public}s", log:KeymanEngineLogger.resources, type: .info, message)
+      SentryManager.breadcrumb(message)
 
       // Step 2:  configure the completion closure.
       let completionClosure = Queries.jsonDataTaskCompletionAdapter(resultType: [Result].self, completionBlock: fetchCompletion)

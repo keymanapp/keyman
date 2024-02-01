@@ -8,9 +8,9 @@
 
 import UIKit
 import WebKit
-import XCGLogger
 import DeviceKit
 import Reachability
+import os.log
 
 typealias FetchKeyboardsBlock = ([String: Any]?) -> Void
 
@@ -211,7 +211,9 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
     do {
       try Storage.active.copyKMWFiles(from: Resources.bundle)
     } catch {
-      SentryManager.captureAndLog(error, message: "Failed to copy KMW files from bundle: \(error)")
+      let message = ("Failed to copy KMW files from bundle: \(error)")
+      os_log("%{public}s", log:KeymanEngineLogger.settings, type: .error, message)
+      SentryManager.capture(error, message:message)
     }
 
     updateUserKeyboards(with: Defaults.keyboard)
@@ -219,7 +221,9 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
     do {
       try reachability = Reachability(hostname: KeymanHosts.API_KEYMAN_COM.host!)
     } catch {
-      SentryManager.captureAndLog(error, message: "Could not start Reachability object: \(error)")
+      let message = ("Could not start Reachability object: \(error)")
+      os_log("%{public}s", log:KeymanEngineLogger.settings, type: .error, message)
+      SentryManager.capture(error, message:message)
     }
 
     if(!Util.isSystemKeyboard) {
@@ -228,7 +232,9 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
       do {
         try reachability.startNotifier()
       } catch {
-        SentryManager.captureAndLog(error, message: "failed to start Reachability notifier: \(error)")
+        let message = ("failed to start Reachability notifier: \(error)")
+        os_log("%{public}s", log:KeymanEngineLogger.settings, type: .error, message)
+        SentryManager.capture(error, message:message)
       }
     }
 
@@ -294,11 +300,15 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
     // We MUST NOT shortcut this method as a result; doing so may (rarely) result in the infamous
     // blank keyboard bug!
     if kb.fullID == currentKeyboardID && !self.isSystemKeyboard && !inputViewController.shouldReload {
-      SentryManager.breadcrumbAndLog("Keyboard unchanged: \(kb.fullID)")
+      let message = "Keyboard unchanged: \(kb.fullID)"
+      os_log("%{public}s", log:KeymanEngineLogger.settings, type: .info, message)
+      SentryManager.breadcrumb(message)
       return false
     }
 
-    SentryManager.breadcrumbAndLog("Setting language: \(kb.fullID)")
+    let message = "Setting language: \(kb.fullID)"
+    os_log("%{public}s", log:KeymanEngineLogger.settings, type: .info, message)
+    SentryManager.breadcrumb("Setting language: \(kb.fullID)")
 
     currentKeyboardID = kb.fullID
 
@@ -361,7 +371,9 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
     if !Migrations.resourceHasPackageMetadata(keyboard) {
       let wrappedKbds = Migrations.migrateToKMPFormat([keyboard])
       guard wrappedKbds.count == 1 else {
-        SentryManager.captureAndLog("Could not properly import keyboard")
+        let message = "Could not properly import keyboard"
+        os_log("%{public}s", log:KeymanEngineLogger.settings, type: .error, message)
+       SentryManager.capture(message)
         return
       }
       kbdToInstall = wrappedKbds[0]
@@ -398,7 +410,8 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
       try ResourceFileManager.shared.install(resourceWithID: fullId, from: package)
     }
     catch {
-      log.error("Could not add lexical model for id '\(lexicalModelId)' and languageId '\(languageId)' due to error: \(error)")
+      let message = "Could not add lexical model for id '\(lexicalModelId)' and languageId '\(languageId)' due to error: \(error)"
+      os_log("%{public}s", log:KeymanEngineLogger.resources, type: .error, message)
     }
     
     if let lexicalModel = Storage.active.userDefaults.userLexicalModel(withFullID: fullId) {
@@ -421,7 +434,9 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
 
   /// Registers a lexical model with KMW.
   public func registerLexicalModel(_ lm: InstallableLexicalModel) -> Bool {
-    SentryManager.breadcrumbAndLog("Setting lexical model: \(lm.fullID)")
+    let message = "Setting lexical model: \(lm.fullID)"
+    os_log("%{public}s", log:KeymanEngineLogger.settings, type: .info, message)
+    SentryManager.breadcrumb(message)
     
     currentLexicalModelID = lm.fullID
     
@@ -462,7 +477,9 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
     if !Migrations.resourceHasPackageMetadata(lexicalModel) {
       let wrappedModels = Migrations.migrateToKMPFormat([lexicalModel])
       guard wrappedModels.count == 1 else {
-        SentryManager.captureAndLog("Could not properly import lexical model")
+        let message = "Could not properly import lexical model"
+        os_log("%{public}s", log:KeymanEngineLogger.resources, type: .info, message)
+        SentryManager.capture(message)
         return
       }
       modelToInstall = wrappedModels[0]
@@ -502,7 +519,9 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
     userData.set([Date()], forKey: Key.synchronizeSWKeyboard)
     userData.synchronize()
 
-    SentryManager.breadcrumbAndLog("Removing keyboard with ID \(kb.id) and languageID \(kb.languageID)")
+    let message = ("Removing keyboard with ID \(kb.id) and languageID \(kb.languageID)")
+    os_log("%{public}s", log:KeymanEngineLogger.resources, type: .info, message)
+    SentryManager.breadcrumb(message)
 
     // Set a new keyboard if deleting the current one
     if kb.fullID == currentKeyboardID {
@@ -516,12 +535,18 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
       //        rather than just 'no matching keyboards'.
       let keyboardDir = Storage.active.resourceDir(for: kb)!
       FontManager.shared.unregisterFonts(in: keyboardDir, fromSystemOnly: false)
-      SentryManager.breadcrumbAndLog("Deleting directory \(keyboardDir)")
+      let message = "Deleting directory \(keyboardDir)"
+      os_log("%{public}s", log:KeymanEngineLogger.resources, type: .info, message)
+      SentryManager.breadcrumb(message)
       if (try? FileManager.default.removeItem(at: keyboardDir)) == nil {
-        SentryManager.captureAndLog("Failed to delete \(keyboardDir) when removing keyboard")
+        let message = "Failed to delete \(keyboardDir) when removing keyboard"
+        os_log("%{public}s", log:KeymanEngineLogger.settings, type: .info, message)
+        SentryManager.capture(message)
       }
     } else {
-      SentryManager.breadcrumbAndLog("User has another language installed. Skipping delete of keyboard files.")
+      let message = "User has another language installed. Skipping delete of keyboard files."
+      os_log("%{public}s", log:KeymanEngineLogger.settings, type: .info, message)
+      SentryManager.breadcrumb(message)
     }
 
     NotificationCenter.default.post(name: Notifications.keyboardRemoved, object: self, value: kb)
@@ -570,7 +595,9 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
     }
     
     let lm = userLexicalModels[index]
-    SentryManager.breadcrumbAndLog("Removing lexical model with ID \(lm.id) and languageID \(lm.languageID) from user list of all models")
+    let message = "Removing lexical model with ID \(lm.id) and languageID \(lm.languageID) from user list of all models"
+    os_log("%{public}s", log:KeymanEngineLogger.settings, type: .info, message)
+    SentryManager.breadcrumb(message)
     userLexicalModels.remove(at: index)
     ud.userLexicalModels = userLexicalModels
     ud.set([Date()], forKey: Key.synchronizeSWLexicalModel)
@@ -580,7 +607,9 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
   
   /// Removes the lexical model at index from the lexical models list if it exists.
   public func removeLexicalModelFromLanguagePreference(userDefs ud: UserDefaults, _ lm: InstallableLexicalModel) {
-    SentryManager.breadcrumbAndLog("Removing lexical model with ID \(lm.id) and languageID \(lm.languageID) from per-language prefs")
+    let message = "Removing lexical model with ID \(lm.id) and languageID \(lm.languageID) from per-language prefs"
+    os_log("%{public}s", log:KeymanEngineLogger.settings, type: .info, message)
+    SentryManager.breadcrumb(message)
     ud.set(preferredLexicalModelID: nil, forKey: lm.languageID)
   }
 
@@ -601,7 +630,9 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
       if let first_lm = userLexicalModels.first(where: {$0.languageID == lm.languageID}) {
         _ = registerLexicalModel(first_lm)
       } else {
-        SentryManager.breadcrumbAndLog("no more lexical models available for language \(lm.fullID)")
+        let message = "no more lexical models available for language \(lm.fullID)"
+        os_log("%{public}s", log:KeymanEngineLogger.settings, type: .info, message)
+        SentryManager.breadcrumb(message)
         currentLexicalModelID = nil
       }
     }
@@ -609,12 +640,18 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
     if !userLexicalModels.contains(where: { $0.id == lm.id }) {
       let lexicalModelDir = Storage.active.resourceDir(for: lm)!
       FontManager.shared.unregisterFonts(in: lexicalModelDir, fromSystemOnly: false)
-      SentryManager.breadcrumbAndLog("Deleting directory \(lexicalModelDir)")
+      let message = "Deleting directory \(lexicalModelDir)"
+      os_log("%{public}s", log:KeymanEngineLogger.settings, type: .info, message)
+      SentryManager.breadcrumb(message)
       if (try? FileManager.default.removeItem(at: lexicalModelDir)) == nil {
-        SentryManager.captureAndLog("Failed to delete \(lexicalModelDir) when removing lexical model")
+        let message = "Failed to delete \(lexicalModelDir) when removing lexical model"
+        os_log("%{public}s", log:KeymanEngineLogger.settings, type: .info, message)
+        SentryManager.capture(message)
       }
     } else {
-      SentryManager.breadcrumbAndLog("User has another language installed. Skipping delete of lexical model files.")
+        let message = "User has another language installed. Skipping delete of lexical model files."
+        os_log("%{public}s", log:KeymanEngineLogger.settings, type: .info, message)
+        SentryManager.breadcrumb(message)
     }
     
     NotificationCenter.default.post(name: Notifications.lexicalModelRemoved, object: self, value: lm)
@@ -706,7 +743,7 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
   }
   
   @objc func reachabilityChanged(_ notification: Notification) {
-    log.debug {
+    let message = { [self] in
       let reachStr: String
       switch reachability.connection {
       case Reachability.Connection.wifi:
@@ -718,6 +755,7 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
       }
       return "Reachability changed to '\(reachStr)'"
     }
+    os_log("%{public}s", log:KeymanEngineLogger.ui, type: .debug, message())
   }
 
   // MARK: - Loading custom keyboards
@@ -793,7 +831,9 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
         try shared.copyFiles(to: nonShared)
         FontManager.shared.registerCustomFonts()
       } catch {
-        SentryManager.captureAndLog(error, message: "Failed to copy from shared container: \(error)")
+        let message = ("Failed to copy from shared container: \(error)")
+        os_log("%{public}s", log:KeymanEngineLogger.settings, type: .error, message)
+        SentryManager.capture(error, message:message)
       }
     }
   }

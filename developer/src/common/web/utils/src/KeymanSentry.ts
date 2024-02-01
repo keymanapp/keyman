@@ -12,7 +12,7 @@ let isInit = false;
 
 export class KeymanSentry {
 
-  static async isEnabled() {
+  static isEnabled() {
     if(process.argv.includes('--no-error-reporting')) {
       return false;
     }

@@ -22,6 +22,8 @@
       <transform from="q$[upper]x"/> <!-- g0t1 -->
       <transform from="$[consonants]"/> <!-- g0t2 -->
       <transform from="($[upper])" to="$[1:lower]"/> <!-- g0t3 -->
+      <transform from="ι\m{a}\u{0344}" to="ἴ"/>  <!-- g0t4:  \u{03b9}\m{1}\u{0309}\u{0301} => \u{03b9}\u{0313}\u{0301} (\u1f34) -->
+      <transform from="ι\u{0301}\m{.}\u{033c}" to="ι\u{0300}\m{a}\u{033c}"/> <!-- g0t5 \u{03b9}\u{033c}\m{.}\u{0301} -->
     </transformGroup>
   </transforms>
 </keyboard3>

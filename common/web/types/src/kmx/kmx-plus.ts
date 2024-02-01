@@ -141,6 +141,8 @@ export interface StrsOptions {
   markers?: boolean;
   /** unescape with unescapeString */
   unescape?: boolean;
+  /** apply (possibly marker safe) nfd. Not for regex use. */
+  nfd?: boolean;
   /** string can be stored as a single CharStrsItem, not in strs table. */
   singleOk?: boolean;
 };
@@ -200,6 +202,14 @@ export class Strs extends Section {
     // unescape \u{…}
     if (opts?.unescape) {
       s = unescapeString(s);
+    }
+    // nfd
+    if (opts?.nfd) {
+      if (opts?.markers) {
+        s = MarkerParser.nfd_markers(s, false);
+      } else {
+        s = s.normalize("NFD");
+      }
     }
     return s;
   }

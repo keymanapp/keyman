@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import os.log
 
 class KeymanURLProtocol: URLProtocol, NSURLConnectionDataDelegate {
   private static let protocolHandledKey = "KMURLProtocolHandledKey"
@@ -32,7 +33,7 @@ class KeymanURLProtocol: URLProtocol, NSURLConnectionDataDelegate {
 
   override func startLoading() {
     guard let mutableRequest = request as? NSMutableURLRequest else {
-      log.error("Bridge to NSMutableURLRequest failed")
+      os_log("Bridge to NSMutableURLRequest failed", log:KeymanEngineLogger.resources, type: .error)
       return
     }
     URLProtocol.setProperty(true, forKey: KeymanURLProtocol.protocolHandledKey, in: mutableRequest)

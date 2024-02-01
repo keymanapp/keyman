@@ -66,7 +66,8 @@ fi
 #-------------------------------------------------------------------------------------------------------------------
 
 if builder_start_action build; then
-  npm run build
+  tsc -b
+  cp "$KEYMAN_ROOT/resources/standards-data/ldml-keyboards/unicode-license.txt" ./build/unicode-license.txt
   builder_finish_action success build
 fi
 
@@ -119,7 +120,6 @@ if builder_start_action bundle; then
     --org keyman \
     --project keyman-developer \
     --release "$VERSION_GIT_TAG"  \
-    --ext js --ext mjs --ext ts --ext map \
     build/ "${SOURCEMAP_PATHS[@]}"
 
   # Manually copy over kmcmplib module

@@ -61,6 +61,10 @@ export default class KeymanEngine extends KeymanEngineBase<WebviewConfiguration,
       this.core.keyboardProcessor.beepHandler = this.beepKeyboard;
     }
 
+    this.contextManager.on('keyboardchange', (kbd) => {
+      this.hardKeyboard.activeKeyboard = kbd?.keyboard;
+    });
+
     this.contextManager.initialize();
 
     const oskConfig: ViewConfiguration = {

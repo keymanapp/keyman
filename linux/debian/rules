@@ -33,7 +33,8 @@ override_dh_auto_configure:
 	linux/keyman-system-service/build.sh configure -- \
 		--wrap-mode=nodownload --prefix=/usr --sysconfdir=/etc --localstatedir=/var
 	linux/ibus-keyman/build.sh configure -- \
-		--wrap-mode=nodownload --prefix=/usr --sysconfdir=/etc --localstatedir=/var
+		--wrap-mode=nodownload --prefix=/usr --sysconfdir=/etc --localstatedir=/var \
+		 -Dkeyman_deb_pkg_build=true
 	linux/keyman-config/build.sh configure
 
 override_dh_auto_build:

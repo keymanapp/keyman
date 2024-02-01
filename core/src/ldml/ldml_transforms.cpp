@@ -331,15 +331,19 @@ reorder_group::apply(std::u32string &str) const {
   /** did we match anything */
   bool some_match = false;
 
+  // markers need to 'pass through' reorders. remove and re-add if needed
+  marker_map markers;
+  std::u32string out = remove_markers(str, markers, plain_sentinel);
+
   // get a baseline sort key
-  auto sort_keys = reorder_sort_key::from(str);
+  auto sort_keys = reorder_sort_key::from(out);
 
   // apply ALL reorders in the group.
   for (const auto &r : list) {
     // work backward from end of string forward
     // That is, see if "abc" matches "abc" or "ab" or "a"
-    for (size_t s = str.size(); s > 0; s--) {
-      size_t submatch = r.match_end(str, 0, s);
+    for (size_t s = out.size(); s > 0; s--) {
+      size_t submatch = r.match_end(out, 0, s);
       if (submatch != 0) {
 #if KMXPLUS_DEBUG_TRANSFORM
         DebugTran("Matched: %S (off=%d, len=%d)", str.c_str(), 0, s);
@@ -366,18 +370,6 @@ reorder_group::apply(std::u32string &str) const {
     r.dump();
   }
 #endif
-
-  // TODO-LDML: for now, assume matches entire string.
-  // A needed optimization here would be to detect a common substring
-  // at the end of the old and new strings, and keep the match_len
-  // minimal. This could reduce thrash in core's context.
-  // However, the calling code does check for a common substring with mismatch()
-  size_t match_len = str.size();
-
-  // 'prefix' is the unmatched string before the match
-  // TODO-LDML: right now, this is empty, because match_len is the entire size.
-  std::u32string prefix = str;
-  prefix.resize(str.size() - match_len);  // just the part before the matched part.
 
   // Now, we need to actually do the sorting, but we must only sort
   // 'runs' beginning with 0-weight keys.
@@ -420,7 +412,7 @@ reorder_group::apply(std::u32string &str) const {
   }
   // recombine into a string by pulling out the 'ch' value
   // that's in each sortkey element.
-  std::u32string newSuffix;
+  out.clear(); // will re-add all text
   signed char q = sort_keys.begin()->quaternary; // start with the first quaternary
   for (auto e = sort_keys.begin(); e < sort_keys.end(); e++, q++) {
     if (q != e->quaternary) {
@@ -428,13 +420,12 @@ reorder_group::apply(std::u32string &str) const {
       applied = true;
     }
     // collect the characters
-    newSuffix.append(1, e->ch);
+    out.append(1, e->ch);
   }
-  if (applied) {
-    str.resize(prefix.size());
-    str.append(newSuffix);
-  } else {
+  if (!applied) {
     DebugTran("Skip: sorting caused no reordering");
+    // exit early to avoid string copying and possibly marker re-adding.
+    return false; // no change
   }
 #if KMXPLUS_DEBUG_TRANSFORM
   DebugTran("Sorted sortkey");
@@ -442,7 +433,8 @@ reorder_group::apply(std::u32string &str) const {
     r.dump();
   }
 #endif
-  return applied;
+  add_back_markers(str, out, markers, plain_sentinel);
+  return true; // updated
 }
 
 transform_entry::transform_entry(const transform_entry &other)
@@ -519,9 +511,10 @@ transform_entry::init() {
     return false;
   }
   // TODO-LDML: if we have mapFrom, may need to do other processing.
-  std::u16string patstr = km::core::kmx::u32string_to_u16string(fFrom);
+  std::u32string from2 = fFrom;
+  normalize_nfd_markers(from2, regex_sentinel);
+  std::u16string patstr = km::core::kmx::u32string_to_u16string(from2);
   // normalize, including markers, for regex
-  normalize_nfd_markers(patstr, regex_sentinel);
   UErrorCode status           = U_ZERO_ERROR;
   /* const */ icu::UnicodeString patustr = icu::UnicodeString(patstr.data(), (int32_t)patstr.length());
   // add '$' to match to end

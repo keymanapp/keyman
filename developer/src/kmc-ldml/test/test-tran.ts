@@ -3,8 +3,8 @@ import { assert } from 'chai';
 import { TranCompiler, BkspCompiler } from '../src/compiler/tran.js';
 import { BASIC_DEPENDENCIES, UsetCompiler } from '../src/compiler/empty-compiler.js';
 import { CompilerMessages } from '../src/compiler/messages.js';
-import { compilerTestCallbacks, testCompilationCases } from './helpers/index.js';
-import { KMXPlus } from '@keymanapp/common-types';
+import { assertCodePoints, compilerTestCallbacks, testCompilationCases } from './helpers/index.js';
+import { KMXPlus, MarkerParser } from '@keymanapp/common-types';
 
 import Tran = KMXPlus.Tran;// for tests…
 import Bksp = KMXPlus.Bksp;// for tests…
@@ -41,14 +41,15 @@ describe('tran', function () {
     {
       subpath: 'sections/tran/tran-vars.xml',
       callback(sect) {
+        const m = MarkerParser.markerOutput;
         const tran = <Tran> sect;
         assert.ok(tran);
         assert.lengthOf(compilerTestCallbacks.messages, 0);
         // cautiously destructure
         assert.lengthOf(tran.groups, 1);
         const [ g0 ]  = tran.groups;
-        assert.lengthOf(g0.transforms, 4);
-        const [ g0t0, g0t1, g0t2, g0t3 ] = g0.transforms;
+        assert.lengthOf(g0.transforms, 6);
+        const [ g0t0, g0t1, g0t2, g0t3, g0t4, g0t5 ] = g0.transforms;
         assert.strictEqual(g0t0.from.value, "yes");
         assert.strictEqual(g0t0.to.value, "no");
 
@@ -65,6 +66,16 @@ describe('tran', function () {
         assert.strictEqual(g0t3.from.value, "((?:A|B|C|D|FF|E))");
         assert.equal(g0t3.mapFrom?.value, "upper");
         assert.equal(g0t3.mapTo?.value, "lower");
+
+        assertCodePoints(g0t4.from.value,
+          `\u{03b9}${m(1, true)}\u{0308}\u{0301}`);
+        assertCodePoints(g0t4.to.value,
+          `\u{03b9}\u{0313}\u{301}`);
+
+        assertCodePoints(g0t5.from.value,
+          `\u{03b9}${MarkerParser.ANY_MARKER_MATCH}\u{033c}\u{0301}`);
+        assertCodePoints(g0t5.to.value,
+          `\u{03b9}${m(1,false)}\u{033c}\u{0300}`);
       }
     },
     {

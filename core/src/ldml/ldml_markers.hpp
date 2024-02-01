@@ -16,18 +16,11 @@
 #include <utility>
 #include "debuglog.h"
 
-#if !defined(HAVE_ICU4C)
-#error icu4c is required for this code
-#endif
-
-#define U_FALLTHROUGH
-#include "unicode/utypes.h"
+#include "core_icu.h"
 #include "unicode/uniset.h"
 #include "unicode/usetiter.h"
-#include "unicode/unistr.h"
 #include "unicode/regex.h"
 #include "unicode/utext.h"
-#include "unicode/normalizer2.h"
 
 namespace km {
 namespace core {
@@ -48,11 +41,14 @@ enum marker_encoding {
 /** a marker ID (1-based) */
 typedef KMX_DWORD marker_num;
 
-/** list of markers */
+/** list of marker numbers */
 typedef std::deque<marker_num> marker_list;
 
-/** map from following-char to marker numbers. */
-typedef std::map<char32_t, marker_list> marker_map;
+/** map from one char to one entry */
+typedef std::pair<char32_t, marker_num> marker_entry;
+
+/** map from following-char to marker numbers, in front to back order */
+typedef std::deque<marker_entry> marker_map;
 
 /** Normalize a u32string inplace to NFD. @return false on failure */
 bool normalize_nfd(std::u32string &str);
@@ -63,9 +59,7 @@ bool normalize_nfd(std::u16string &str);
  * @return false on failure
  **/
 bool normalize_nfd_markers_segment(std::u32string &str, marker_map &markers, marker_encoding encoding = plain_sentinel);
-bool normalize_nfd_markers_segment(std::u16string &str, marker_map &markers, marker_encoding encoding = plain_sentinel);
 bool normalize_nfd_markers(std::u32string &str, marker_encoding encoding = plain_sentinel);
-bool normalize_nfd_markers(std::u16string &str, marker_encoding encoding = plain_sentinel);
 
 // /** Normalize a u32string inplace to NFC, retaining markers.
 //  * @param markers will be populated with marker chars
@@ -99,6 +93,8 @@ void prepend_hex_quad(std::u32string &str, KMX_DWORD marker);
 /** parse 0001...FFFF into a KMX_DWORD. Returns 0 on failure */
 KMX_DWORD parse_hex_quad(const km_core_usv hex_str[]);
 
+/** re-add markers */
+void add_back_markers(std::u32string &str, const std::u32string &src, marker_map &map, marker_encoding encoding);
 
 // bool normalize_nfc_markers(std::u16string &str, marker_encoding encoding) {
 //   marker_map m;

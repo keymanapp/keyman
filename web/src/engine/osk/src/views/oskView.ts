@@ -116,6 +116,14 @@ export interface EventMap {
   pointerinteraction: (promise: Promise<void>) => void;
 }
 
+export function getResourcePath(config: Configuration) {
+  let resourcePathExt = 'osk/';
+  if(config.isEmbedded) {
+    resourcePathExt = '';
+  }
+  return `${config.pathConfig.resources}/${resourcePathExt}`
+}
+
 export default abstract class OSKView
   extends EventEmitter<EventMap>
   implements MinimalCodesInterface, KeyEventSourceInterface<EventMap> {
@@ -198,7 +206,7 @@ export default abstract class OSKView
   private mouseEnterPromise?: ManagedPromise<void>;
   private touchEventPromiseManager = new TouchEventPromiseMap();
 
-  private static readonly STYLESHEET_FILES = ['kmwosk.css', 'globe-hint.css'];
+  static readonly STYLESHEET_FILES = ['kmwosk.css', 'globe-hint.css'];
 
   constructor(configuration: Configuration) {
     super();
@@ -626,6 +634,7 @@ export default abstract class OSKView
 
     if(!pending) {
       this.headerView?.refreshLayout();
+      this.bannerView.width = this.computedWidth;
       this.bannerView.refreshLayout();
       this.footerView?.refreshLayout();
     }
@@ -709,12 +718,10 @@ export default abstract class OSKView
     // Install the default OSK stylesheets - but don't have it managed by the keyboard-specific stylesheet manager.
     // We wish to maintain kmwosk.css whenever keyboard-specific styles are reset/removed.
     // Temp-hack:  embedded products prefer their stylesheet, etc linkages without the /osk path component.
-    let subpath = 'osk/';
-    if(this.config.isEmbedded) {
-      subpath = '';
-    }
+    const resourcePath = getResourcePath(this.config);
+
     for(let sheetFile of OSKView.STYLESHEET_FILES) {
-      const sheetHref = `${this.config.pathConfig.resources}/${subpath}${sheetFile}`;
+      const sheetHref = `${resourcePath}${sheetFile}`;
       this.uiStyleSheetManager.linkExternalSheet(sheetHref);
     }
 
@@ -728,9 +735,7 @@ export default abstract class OSKView
     // Add suggestion banner bar to OSK
     this._Box.appendChild(this.banner.element);
 
-    if(this.bannerView.banner) {
-      this.banner.banner.configureForKeyboard(this.keyboardData?.keyboard, this.keyboardData?.metadata);
-    }
+    this.bannerController?.configureForKeyboard(this.keyboardData?.keyboard, this.keyboardData?.metadata);
 
     let kbdView: KeyboardView = this.keyboardView = this._GenerateKeyboardView(this.keyboardData?.keyboard, this.keyboardData?.metadata);
     this._Box.appendChild(kbdView.element);
@@ -802,6 +807,8 @@ export default abstract class OSKView
   private _GenerateVisualKeyboard(keyboard: Keyboard, keyboardMetadata: KeyboardProperties): VisualKeyboard {
     let device = this.targetDevice;
 
+    const resourcePath = getResourcePath(this.config);
+
     // Root element sets its own classes, one of which is 'kmw-osk-inner-frame'.
     let vkbd = new VisualKeyboard({
       keyboard: keyboard,
@@ -812,7 +819,12 @@ export default abstract class OSKView
       styleSheetManager: this.kbdStyleSheetManager,
       pathConfig: this.config.pathConfig,
       embeddedGestureConfig: this.config.embeddedGestureConfig,
-      isEmbedded: this.config.isEmbedded
+      isEmbedded: this.config.isEmbedded,
+      specialFont: {
+        family: 'SpecialOSK',
+        files: [`${resourcePath}/keymanweb-osk.ttf`],
+        path: '' // Not actually used.
+      }
     });
 
     vkbd.on('keyevent', (keyEvent, callback) => this.emit('keyevent', keyEvent, callback));
