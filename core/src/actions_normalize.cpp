@@ -40,10 +40,9 @@ bool km::core::actions_normalize(
   /* in, out */ km::core::context *app_context,
   /* in, out */ km_core_actions &actions
 ) {
-  assert(actions != nullptr);
   assert(cached_context != nullptr);
   assert(app_context != nullptr);
-  if(actions == nullptr || cached_context == nullptr || app_context == nullptr) {
+  if(cached_context == nullptr || app_context == nullptr) {
     return false;
   }
 

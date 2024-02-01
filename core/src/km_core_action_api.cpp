@@ -9,6 +9,7 @@
 #include <cassert>
 #include <algorithm>
 #include <sstream>
+#include <string>
 
 #include "keyman_core.h"
 
