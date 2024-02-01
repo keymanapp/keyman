@@ -2,6 +2,7 @@
 
 #include <xkbcommon/xkbcommon.h>
 
+
 // _S2 is return 2 + 3 correct??? YES, it talking about the column-nr in symbols-file
 int map_VKShiftState_to_Lin(int VKShiftState) {
   if      (VKShiftState == 0 )      return 0;		/* 0000 0000 */
@@ -13,6 +14,7 @@ int map_VKShiftState_to_Lin(int VKShiftState) {
 }
 
 KMX_DWORD convertNamesToIntegerValue(std::wstring tok_wstr){
+  // more on https://manpages.ubuntu.com/manpages/jammy/man3/keysyms.3tk.html
   std::map<std::wstring, KMX_DWORD > first;
 
   first[L"ampersand"]         =  38;
@@ -22,6 +24,7 @@ KMX_DWORD convertNamesToIntegerValue(std::wstring tok_wstr){
   first[L"asterisk"]          =  42;
   first[L"at"]                =  64;
   first[L"backslash"]         =  92;
+  first[L"BackSpace"]         = 65288;
   first[L"bar"]               = 124;
   first[L"braceleft"]         = 123;
   first[L"braceright"]        = 125;
@@ -630,8 +633,8 @@ std::wstring KMX_get_CharsUnderlying_according_to_keycode_and_Shiftstate_GDK(Gdk
     gdk_keymap_translate_keyboard_state (keymap, keycode, MOD_ShiftCaps , 0, keyvals, NULL, NULL, & consumed);
   }
 
-  /*
-  // Ctrl (shiftstate: 2)
+  // _S2 if I include this we get deadkey(65535) instead of deadkey(3)
+  /*// Ctrl (shiftstate: 2)
   else if (( ss == Ctrl ) && ( caps == 0 )){
     GdkModifierType MOD_Ctrl = (GdkModifierType) ( GDK_MOD2_MASK  );
     gdk_keymap_translate_keyboard_state (keymap, keycode, MOD_Ctrl , 0, keyvals, NULL, NULL, & consumed);
@@ -641,9 +644,19 @@ std::wstring KMX_get_CharsUnderlying_according_to_keycode_and_Shiftstate_GDK(Gdk
   else if (( ss == Ctrl ) && ( caps == 1 )){
     GdkModifierType MOD_CtrlCaps = (GdkModifierType) ( (GDK_MOD2_MASK | GDK_LOCK_MASK) );
     gdk_keymap_translate_keyboard_state (keymap, keycode, MOD_CtrlCaps , 0, keyvals, NULL, NULL, & consumed);
+  }*/
+
+  /*// SHIFT+Ctrl (shiftstate: 3)
+  else if (( ss == ShftCtrl ) && ( caps == 0 )){
+    GdkModifierType MOD_Ctrl = (GdkModifierType) (GDK_SHIFT_MASK | GDK_MOD2_MASK  );
+    gdk_keymap_translate_keyboard_state (keymap, keycode, MOD_Ctrl , 0, keyvals, NULL, NULL, & consumed);
   }
-    // SHIFT+Ctrl (shiftstate: 3)
-  */
+
+  // SHIFT+Ctrl (shiftstate: 3)
+  else if (( ss == ShftCtrl ) && ( caps == 1 )){
+    GdkModifierType MOD_CtrlCaps = (GdkModifierType) (GDK_SHIFT_MASK | GDK_MOD2_MASK | GDK_LOCK_MASK);
+    gdk_keymap_translate_keyboard_state (keymap, keycode, MOD_CtrlCaps , 0, keyvals, NULL, NULL, & consumed);
+  }*/
 
   //ALT-GR (shiftstate: 6)
   else if (( ss == MenuCtrl ) && ( caps == 0 )){

@@ -242,7 +242,7 @@ void KMX_TranslateDeadkeyKey(LPKMX_KEY key, KMX_WCHAR deadkey, KMX_WORD vk, UINT
 PKMX_WCHAR PP = key->dpOutput;
   //if (key->Key == 94)
   //  wprintf(L"key->ShiftFlags: %i  isEqual: %i  %i(%c)   %i(%c) --->  %i \n", key->ShiftFlags, key->ShiftFlags & VIRTUALCHARKEY , key->Key , key->Key, ch,ch , ((key->ShiftFlags == 0 || key->ShiftFlags & VIRTUALCHARKEY) && key->Key == ch));
-
+//wprintf(L"key->Key %i\n",key->Key);
 /*if(abcd >1 && abcd < 815 ) {
 
 wprintf(L"key->Key %i\tkey->dpContext: %i  %i %i %i %i %i %i %i %i    \tkey->dpoutput: %i  %i %i %i %i %i\n", key->Key,
@@ -291,7 +291,7 @@ void KMX_TranslateDeadkeyKeyboard(LPKMX_KEYBOARD kbd, KMX_WCHAR deadkey, KMX_WOR
   for(unsigned int i = 0; i < kbd->cxGroupArray; i++) {
     if(kbd->dpGroupArray[i].fUsingKeys) {
 
-    wprintf(L" group: %i\n",i );
+    //wprintf(L" group: %i\n",i );
       KMX_TranslateDeadkeyGroup(&kbd->dpGroupArray[i], deadkey, vk, shift, ch);
     }
   }
@@ -327,7 +327,7 @@ void KMX_AddDeadkeyRule(LPKMX_KEYBOARD kbd, KMX_WCHAR deadkey, KMX_WORD vk, UINT
       kbd->dpGroupArray[i].cxKeyArray++;
       //LogError("Add deadkey rule:  + [%d K_%d] > dk(%d)", shift, vk, deadkey);
       zaehler++;
-      wprintf(L"Add deadkey rule:  + [%d K_%d] > dk(%d)  %i\n", shift, vk, deadkey,zaehler);
+      //wprintf(L"Add deadkey rule:  + [%d K_%d] > dk(%d)  %i\n", shift, vk, deadkey,zaehler);
     //test_keyboard_S2(kbd);
       if(i == kbd->StartGroup[1]) break;  // If this is the initial group, that's all we need to do.
     }

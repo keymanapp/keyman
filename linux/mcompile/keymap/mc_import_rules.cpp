@@ -27,8 +27,6 @@
 #include "mc_kmxfile.h"
 #include "keymap.h"
 
-
-
 void TestKey_S21(LPKMX_KEY key, int iii, int gr) {
 
   KMX_WCHAR* PP= key->dpOutput;
@@ -170,6 +168,7 @@ public:
     this->m_vk = KMX_get_VKUS_From_KeyCodeUnderlying_GDK(*keymap, scanCode);
     this->m_hkl = hkl;
     this->m_sc = scanCode;
+    //KMX_InitializeDeadkeys();       // _S2 to get all 0 in rgfDeadkey[ ][ ]- why were there numbers???
   }
 
   UINT VK() {
@@ -183,6 +182,19 @@ public:
   std::wstring get_m_rgss(int i,int j) {
     return m_rgss[i][j];
   }
+  // _S2 can go later
+  bool get_m_rgfDeadkey(int i,int j) {
+    return m_rgfDeadKey[i][j];
+  }
+
+  // _S2 do we need this??
+  void KMX_InitializeDeadkeys() {
+    for ( int i=0; i<10;i++) {
+      for ( int j=0; j<2;j++) {
+        this->m_rgfDeadKey[i][j] = 0;
+      }
+    }
+  }
 
   std::wstring KMX_GetShiftState(ShiftState shiftState, bool capsLock) {
     return this->m_rgss[(UINT)shiftState][(capsLock ? 1 : 0)];
@@ -193,6 +205,7 @@ public:
     this->m_rgss[(UINT)shiftState][(capsLock ? 1 : 0)] = value;
   }
 
+// _S2 why are there sometimes numbers in m_rgfDeadKey???
   void KMX_SetShiftState(ShiftState shiftState, std::u16string value16, bool isDeadKey, bool capsLock) {
     std::wstring value = wstring_from_u16string(value16);
     this->m_rgfDeadKey[(UINT)shiftState][(capsLock ? 1 : 0)] = isDeadKey;
@@ -352,7 +365,7 @@ int i4 = this->KMX_IsXxxxGrCapsEqualToXxxxShift() ? 8 : 0;
           key->dpContext = new KMX_WCHAR[1];
           *key->dpContext = 0;
 
-          wprintf(L"st %i  ", st[0]);
+          wprintf(L"st %i  \n", st[0]);
           key->ShiftFlags = this->KMX_GetShiftStateValue(capslock, caps, (ShiftState) ss);
           //key->ShiftFlags = this->KMX_GetShiftStateValue(1, caps, (ShiftState) ss);
           //key->Key = KMX_get_VKUS_From_VKUnderlying_VEC(All_Vector,this->VK());
@@ -391,10 +404,16 @@ int i4 = this->KMX_IsXxxxGrCapsEqualToXxxxShift() ? 8 : 0;
 
             key->Line = 0;
             key->ShiftFlags = this->KMX_GetShiftStateValue(capslock, caps, (ShiftState) ss);
-            key->dpContext = new KMX_WCHAR; *key->dpContext = 0;
+
+            //_S2 needs to go later
+            /*if(this->m_vk==192)
+              key->ShiftFlags=16400;*/
+
+            key->dpContext = new KMX_WCHAR; 
+            *key->dpContext = 0;
             p = key->dpOutput = new KMX_WCHAR[st.size() + 1];
 
-            p_S2 = p;
+            p_S2 = key->dpContext;
             for(size_t ich = 0; ich < st.size(); ich++) {
               *p++ = st[ich];
             }
@@ -404,6 +423,8 @@ int i4 = this->KMX_IsXxxxGrCapsEqualToXxxxShift() ? 8 : 0;
         }
       }
     }
+            //wprintf(L"key->Key: %i %c\n",(key--)->Key,(key--)->Key);
+            int keyvalis= (key--)->Key;
     return true;
   }
 };
@@ -655,6 +676,21 @@ int KMX_GetMaxDeadkeyIndex(KMX_WCHAR *p) {
   return n;
 }*/
 
+void check_rgkey_S2( std::vector<KMX_VirtualKey*> rgKey, int i) {
+
+  wprintf(L" rgfDeadkey[%i]:  \t%i %i %i %i %i %i %i %i %i %i\n", i,
+  rgKey[i]->get_m_rgfDeadkey(0,0), rgKey[i]->get_m_rgfDeadkey(0,1), 
+  rgKey[i]->get_m_rgfDeadkey(1,0), rgKey[i]->get_m_rgfDeadkey(1,1),
+  rgKey[i]->get_m_rgfDeadkey(2,0), rgKey[i]->get_m_rgfDeadkey(2,1),
+  rgKey[i]->get_m_rgfDeadkey(3,0), rgKey[i]->get_m_rgfDeadkey(3,1),
+  rgKey[i]->get_m_rgfDeadkey(4,0), rgKey[i]->get_m_rgfDeadkey(4,1),
+  rgKey[i]->get_m_rgfDeadkey(5,0), rgKey[i]->get_m_rgfDeadkey(5,1),
+  rgKey[i]->get_m_rgfDeadkey(6,0), rgKey[i]->get_m_rgfDeadkey(6,1),
+  rgKey[i]->get_m_rgfDeadkey(7,0), rgKey[i]->get_m_rgfDeadkey(7,1),
+  rgKey[i]->get_m_rgfDeadkey(8,0), rgKey[i]->get_m_rgfDeadkey(8,1),
+  rgKey[i]->get_m_rgfDeadkey(9,0), rgKey[i]->get_m_rgfDeadkey(9,1));
+}
+
 bool KMX_ImportRules(LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, GdkKeymap **keymap, std::vector<KMX_DeadkeyMapping> *FDeadkeys, KMX_BOOL bDeadkeyConversion) {   // I4353   // I4552
   KMX_Loader loader;
 
@@ -683,12 +719,16 @@ bool KMX_ImportRules(LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, GdkKeymap **keymap,
     // this "connection" is possible only while using All_Vector
     KMX_VirtualKey *key = new KMX_VirtualKey(sc, hkl, keymap);
 
+ //     if(rgKey[sc] != NULL) 
+ //      check_rgkey_S2(rgKey, sc);
+
    if((key->VK() != 0) ) {
         rgKey[key->VK()] = key;
     } else {
         delete key;
     }
   }
+
 
   for(UINT ke = VK_NUMPAD0; ke <= VK_NUMPAD9; ke++) {
       rgKey[ke] = new KMX_VirtualKey(hkl, ke, keymap);
@@ -730,9 +770,12 @@ bool KMX_ImportRules(LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, GdkKeymap **keymap,
     }
   */
 
+
     // in this part we skip shiftstates 4, 5, 8, 9
     for(UINT iKey = 0; iKey < rgKey.size(); iKey++) {
+
       if(rgKey[iKey] != NULL) {
+//check_rgkey_S2(rgKey, iKey);
         KMX_WCHAR sbBuffer[256];     // Scratchpad we use many places
 
         for(ShiftState ss = Base; ss <= loader.KMX_MaxShiftState(); ss = (ShiftState)((int)ss + 1)) {
@@ -745,7 +788,7 @@ bool KMX_ImportRules(LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, GdkKeymap **keymap,
           if(ss == MenuCtrl|| ss == ShftMenuCtrl) {
             continue;
           }
-
+//check_rgkey_S2(rgKey, iKey);
           KMX_DWORD SC_US = KMX_get_KeyCodeUnderlying_From_VKUS(iKey);
 
           // _S2 deadkey not finished; Ctrl, Shft +40 not tested
@@ -834,7 +877,7 @@ bool KMX_ImportRules(LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, GdkKeymap **keymap,
 
   for ( int i=0; i < (int) TestValues.size();i++) {
     std::wstring wws = rgKey[TestValues[i]]->get_m_rgss(0,0);
-    wprintf(L"Results for %i / SC %i\t : %ls (%i)  \t%ls (%i)   \t%ls (%i)   \t%ls (%i)   \t%ls (%i)   \t%ls (%i)   \n",    TestValues[i], rgKey[TestValues[i]]->SC(),
+    wprintf(L"Results for %i / SC %i\t : %ls (%i)  \t%ls (%i)   \t%ls (%i)   \t%ls (%i)   \t%ls (%i)   \t%ls (%i)   \n",    TestValues[i), rgKey[TestValues[i]]->SC(),
       rgKey[TestValues[i]]->get_m_rgss(0,0).c_str(), rgKey[TestValues[i]]->get_m_rgss(0,0)[0],
       rgKey[TestValues[i]]->get_m_rgss(0,1).c_str(), rgKey[TestValues[i]]->get_m_rgss(0,1)[0],
       rgKey[TestValues[i]]->get_m_rgss(1,0).c_str(), rgKey[TestValues[i]]->get_m_rgss(1,0)[0],
@@ -945,7 +988,8 @@ bool KMX_ImportRules(LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, GdkKeymap **keymap,
           memcpy(kkp2, gp2->dpKeyArray, sizeof(KMX_KEY)*(gp2->cxKeyArray-1));
           gp2->dpKeyArray = kkp2;
           kkp2 = &kkp2[gp2->cxKeyArray-1];
-          kkp2->dpContext = new KMX_WCHAR; *kkp2->dpContext = 0;
+          kkp2->dpContext = new KMX_WCHAR; 
+          *kkp2->dpContext = 0;
           kkp2->Key = kkp->Key;
           kkp2->ShiftFlags = kkp->ShiftFlags;
           //kkp2->ShiftFlags = 16384;
