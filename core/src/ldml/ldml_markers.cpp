@@ -220,84 +220,8 @@ bool normalize_nfd_markers(std::u32string &str, marker_encoding encoding) {
   // quick check - don't bother if the string is empty
   if(str.empty()) return true;
 
-  // we're going to need an NFD normalizer
-  UErrorCode status           = U_ZERO_ERROR;
-  const icu::Normalizer2 *nfd = icu::Normalizer2::getNFDInstance(status);
-  if (!UASSERT_SUCCESS(status)) {
-    return false;
-  }
-
-  /**
-   * output string, we'll accumulate the normalized string here
-  */
-  std::u32string out;
-  /**
-   * this is the beginning of the current segment to process.
-   * it will also be the beginning of the string OR the end of the previous segment.
-  */
-  std::u32string::const_iterator seg_start = str.begin();
-  /** end of the current segment. This will be == seg_start unless a new segment is identified. */
-  std::u32string::const_iterator seg_end   = str.begin();
-  /** iterator through this loop */
-  std::u32string::const_iterator i         = str.begin();
-
-  // now we'll loop through looking for normalization-safe subsegments of [seg_start, seg_end)
-  // For example (sentinel mode) the following would be segments:
-  //     - A
-  //     - E\u0320\u0302
-  //     - U\u0320\m{marker}\u0300
-  //
-  // The marker will typically 'look' like an NFD-safe boundary, but it's not! It's part of the
-  // subsegment, we want to skip over it. This is why we use parse_next_marker to look-ahead to see
-  // if there is actually a marker under the iterator.
-  //
-  // We don't assume that the marker sentinel or regex appears as an NFD boundary, that is why
-  // the parse function and the nfd function are called in parallel.
-
-  do {
-
-    // First, check if there's a marker.
-
-    // temporary iterator so we don't move 'i' unnecessarily. points to end of marker sequence.
-    std::u32string::const_iterator marker_end = i;
-    // true if marker detected
-    bool have_marker = parse_next_marker(marker_end, str.end(), encoding) != LDML_MARKER_NO_INDEX;
-
-
-    // Now, categorize the string. Is there a segment boundary BEFORE 'i'?
-    if (i == str.end()) {
-      // end of string, mark as the end of a segment
-      // this will cause the final segment to be processed and the loop exitted.
-      seg_end = i;
-    } else if (nfd->hasBoundaryBefore(*i) && !have_marker) {
-      // 'i' is the beginning of an NFD safe boundary (such as a base character).
-      // but it's also not on a marker (which would be included in the segment)
-      seg_end = i;
-      // we also need to advance so we can pick up the next char.
-      i++;
-    } else if (have_marker) {
-      // it's actually a marker. so, advance over it.
-      i = marker_end;
-    } else {
-      // some other non boundary char.
-      // advance without further drama
-      i++;
-    }
-
-    // Finally, process any identified segment.
-    if (seg_end != seg_start) { // is the segment non-empty?
-      std::u32string segment(seg_start, seg_end);
-      marker_map m;
-      if (!normalize_nfd_markers_segment(segment, m, encoding)) {
-        return false;
-      }
-      out.append(segment);
-      seg_start = seg_end;
-    }
-  } while(seg_end != str.end()); // repeat until the last codepoint has been processed in a segment
-  // update output string
-  str = out;
-  return true;
+  marker_map m;
+  return normalize_nfd_markers_segment(str, m, encoding);
 }
 
 // TODO-LDML: cleanup
