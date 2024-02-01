@@ -63,7 +63,7 @@ const DOUBLED_BKSP_KEYBOARD_SCRIPT = function keyboard_core () {
   }
 }
 
-describe.only('Engine - specialized backspace handling', function() {
+describe('Engine - specialized backspace handling', function() {
   const ipaPath = require.resolve('@keymanapp/common-test-resources/keyboards/sil_ipa.js');
   const angkorPath = require.resolve('@keymanapp/common-test-resources/keyboards/khmer_angkor.js');
 
@@ -185,6 +185,43 @@ describe.only('Engine - specialized backspace handling', function() {
     // Does not trigger backspace-like behavior.
     assert.equal(transform.deleteLeft, 0);
     assert.isNotOk(transform.deleteRight);
+  });
+
+  it('empty context, positional keyboard, but text is selected', () => {
+    let contextSource = new Mock('selected text', 0);
+    contextSource.setSelection(0, contextSource.getText().kmwLength());
+
+    let event = new KeyEvent({
+      Lcode: Codes.keyCodes.K_BKSP,
+      Lmodifiers: 0,
+      Lstates: Codes.modifierCodes.NO_CAPS | Codes.modifierCodes.NO_NUM_LOCK | Codes.modifierCodes.NO_SCROLL_LOCK,
+      LisVirtualKey: true,
+      kName: '',
+      vkCode: Codes.keyCodes.K_BKSP,
+      device: device
+    });
+
+    const processor = new KeyboardProcessor(TEST_DEVICE, {
+      keyboardInterface: angkorWithHarness
+    });
+    const result = processor.processKeystroke(event, contextSource);
+
+    assert.isFalse(result.triggerKeyDefault);
+    assert.equal(contextSource.getTextBeforeCaret(), '');
+    assert.equal(contextSource.getTextAfterCaret(), '');
+    assert.isOk(result?.transcription?.transform);
+
+    const transform = result.transcription.transform;
+    assert.equal(transform.insert, '');
+    // This BKSP was to delete selected text, NOT to delete text before the caret.
+    assert.equal(transform.deleteLeft, 0);
+
+    // Is currently not what I'd expect - it reports the length of the selected string instead!
+    // Fixing that may have knock-on effects, though... and it seems to pass through
+    // the apps just fine as-is.
+    //
+    // I do have concerns for certain scripts on iOS, though... see #4538.
+    // assert.isNotOk(transform.deleteRight);
   });
 
   it('empty left-context, positional keyboard', () => {
