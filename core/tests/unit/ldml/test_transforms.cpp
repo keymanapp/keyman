@@ -1107,6 +1107,31 @@ test_normalize() {
     assert_marker_map_equal(map, expm);
   }
 
+// macro for moving tests from test-pattern-parser.ts
+#define TEST_NFD_PLAIN(x, y)                                                \
+  {                                                                         \
+    marker_map map;                                                         \
+    std::cout << __FILE__ << ":" << __LINE__ << ": nfd test " << std::endl; \
+    const std::u32string src        = x;                                    \
+    const std::u32string expect_nfd = y;                                    \
+    std::u32string dst_nfd          = src;                                  \
+    assert(normalize_nfd_markers(dst_nfd));                                 \
+    if (dst_nfd != expect_nfd) {                                            \
+      std::cout << "dst: " << Debug_UnicodeString(dst_nfd) << std::endl;    \
+      std::cout << "exp: " << Debug_UnicodeString(expect_nfd) << std::endl; \
+    }                                                                       \
+    zassert_string_equal(dst_nfd, expect_nfd);                              \
+  }
+
+  // double marker - in front of second, no change
+  TEST_NFD_PLAIN(U"e\u0320\u0300\uffff\u0008\u0001\u0300", U"e\u0320\u0300\uffff\u0008\u0001\u0300")
+  // double marker - in front of second, with segment reordering
+  TEST_NFD_PLAIN(U"e\u0300\u0320\uffff\u0008\u0001\u0300", U"e\u0320\u0300\uffff\u0008\u0001\u0300")
+  // double marker - alternate pattern with reordering needed
+  TEST_NFD_PLAIN(U"e\u0300\uffff\u0008\u0001\u0300\u0320", U"e\u0320\u0300\uffff\u0008\u0001\u0300")
+  // triple diacritic + marker - reordering needed
+  TEST_NFD_PLAIN(U"e\u0300\uffff\u0008\u0001\u0300\u0320\u0300", U"e\u0320\u0300\uffff\u0008\u0001\u0300\u0300")
+
   return EXIT_SUCCESS;
 }
 
