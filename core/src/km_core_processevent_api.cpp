@@ -52,7 +52,7 @@ km_core_process_event(km_core_state *state,
   }
   km_core_status status = state->processor().process_event(state, vk, modifier_state, is_key_down, event_flags);
 
-  state->prepare_actions();
+  state->apply_actions_and_merge_app_context();
 
   return status;
 }

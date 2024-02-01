@@ -173,7 +173,7 @@ public:
     bool set_actions(
       km_core_actions const &actions
     );
-    void prepare_actions();
+    void apply_actions_and_merge_app_context();
   };
 } // namespace core
 } // namespace km

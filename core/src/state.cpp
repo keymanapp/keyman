@@ -81,7 +81,7 @@ state::~state() {
   km::core::actions_dispose(this->_action_struct);
 }
 
-void state::prepare_actions() {
+void state::apply_actions_and_merge_app_context() {
   auto action_items = this->_actions.data();
 
   km::core::actions_dispose(this->_action_struct);
