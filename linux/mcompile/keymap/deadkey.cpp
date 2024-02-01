@@ -55,7 +55,7 @@ std::vector<DeadKey*> create_alDead() {
 	return alDead;
 }
 
-//_S2 REVIEW
+//_S2 REVIEW this is for testing only and needs to go later
 std::vector<DeadKey*> reduce_alDead(std::vector<DeadKey*> dk_big) {
 	std::vector<DeadKey*> dk_small;
 	bool foundInSmall=false;

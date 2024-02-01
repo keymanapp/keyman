@@ -37,7 +37,6 @@
 
 // _S2 can go later
 void  test_keyboard_S2(LPKMX_KEYBOARD kmxfile);
-
 void TestKey_S2(LPKMX_KEY key) ;
 void TestGroup_S2(LPKMX_GROUP group) ;
 void TestKeyboard_S2(LPKMX_KEYBOARD kbd) ;
@@ -132,8 +131,6 @@ int run(int argc, std::vector<std::u16string> str_argv, char* argv_ch[] = NULL){
   }
 
 
-
-//test_keyboard_S2(kmxfile);    -> THE SAME
 #if defined(_WIN32) || defined(_WIN64)
   // _S2 DoConvert for windows needs to be done later ( can it be copied from engine/mcompile ?)
   /*if(DoConvert(kmxfile, kbid, bDeadkeyConversion)) {   // I4552F
@@ -142,9 +139,9 @@ int run(int argc, std::vector<std::u16string> str_argv, char* argv_ch[] = NULL){
 
 #else  // LINUX
   if(KMX_DoConvert( kmxfile, bDeadkeyConversion, argc, (gchar**) argv_ch)) { // I4552F
-    KMX_SaveKeyboard(kmxfile, outfile);  //test_keyboard_S2(kmxfile);    -> THE SAME without DoConvert
+    KMX_SaveKeyboard(kmxfile, outfile);
 }
-//test_keyboard_S2(kmxfile);   // -> DIFFERENT
+
 #endif
 
   //DeleteReallocatedPointers(kmxfile); :TODO   // _S2 not my ToDo :-)
@@ -328,7 +325,7 @@ void KMX_AddDeadkeyRule(LPKMX_KEYBOARD kbd, KMX_WCHAR deadkey, KMX_WORD vk, UINT
       //LogError("Add deadkey rule:  + [%d K_%d] > dk(%d)", shift, vk, deadkey);
       zaehler++;
       //wprintf(L"Add deadkey rule:  + [%d K_%d] > dk(%d)  %i\n", shift, vk, deadkey,zaehler);
-    //test_keyboard_S2(kbd);
+
       if(i == kbd->StartGroup[1]) break;  // If this is the initial group, that's all we need to do.
     }
   }
@@ -432,7 +429,7 @@ void KMX_ConvertDeadkey(LPKMX_KEYBOARD kbd, KMX_WORD vk, UINT shift, KMX_WCHAR d
   // _S2 -----------------------------
 
   KMX_GetDeadkeys(dk_Table, deadkey, pdk = deadkeys, keymap);  // returns array of [usvk, ch_out] pairs
-//test_keyboard_S2(kbd);
+
   while(*pdk) {
 
     // Look up the ch
@@ -516,7 +513,7 @@ KMX_BOOL KMX_DoConvert(LPKMX_KEYBOARD kbd, KMX_BOOL bDeadkeyConversion, gint arg
           ch = DeadKey;
         }
       }
-// _S2 GOOD TIL HERE 
+
 //wprintf(L" scunderlying:  SS: %i Nr: %i VKMap[i] %i ch:%i (%c)\n", VKShiftState[j],i, KMX_VKMap[i],ch,ch );
       switch(ch) {
         case 0x0000: break;
@@ -526,7 +523,7 @@ KMX_BOOL KMX_DoConvert(LPKMX_KEYBOARD kbd, KMX_BOOL bDeadkeyConversion, gint arg
     }
   }
 
-  //test_keyboard_S2(kbd);
+
   KMX_ReportUnconvertedKeyboardRules(kbd);
   if(!KMX_ImportRules(kbd, All_Vector, &keymap, &KMX_FDeadkeys, bDeadkeyConversion)) {   // I4353   // I4552
     return FALSE;
@@ -563,35 +560,6 @@ KMX_WCHAR KMX_get_VKUS_From_VKUnderlying_VEC(v_dw_3D All_Vector, KMX_DWORD VK_OT
     }
   }
   return VK_OTHER;
-}
-
-KMX_WCHAR KMX_SCKUnderlyingLayoutToVKUS_GDK2(GdkKeymap* keymap,KMX_DWORD SC_Other) {
-
-    return SC_Other;
-}
-
-KMX_DWORD KMX_get_SCUnderlying_From_SCUS_VEC(v_dw_3D &All_Vector, KMX_DWORD KC_US, int Shiftstate) {
-
-  KMX_DWORD Character = 0;
-  // find character with that scancode
-  for( int i=0; i< (int)All_Vector[0].size()-1 ;i++) {
-    if ( ( All_Vector[0][i][0] == KC_US ) ) {
-      if ( Shiftstate+1 < (int) All_Vector[0][i].size()-1)
-        Character = All_Vector[0][i][Shiftstate+1];
-      break;
-    }
-  }
-
-  //Find underlying SC of character
-  for( int i=0; i< (int)All_Vector[1].size()-1 ;i++) {
-    for( int j=1; j< (int)All_Vector[01][0].size();j++) {
-      if ( ( All_Vector[1][i][j] == Character ) ) {
-        KC_US = All_Vector[1][i][j];
-        return All_Vector[1][i][0];
-      }
-    }
-  }
-  return KC_US;
 }
 
 // takes SC of underlying keyboard and returns character of underlying keyboard with shiftstate VKShiftState[j] or deadkey

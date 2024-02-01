@@ -5,6 +5,39 @@
 //_S2 do not review - all this will be deleted later
 // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
+/*
+
+KMX_DWORD KMX_get_SCUnderlying_From_SCUS_VEC(v_dw_3D &All_Vector, KMX_DWORD KC_US, int Shiftstate) {
+
+  KMX_DWORD Character = 0;
+  // find character with that scancode
+  for( int i=0; i< (int)All_Vector[0].size()-1 ;i++) {
+    if ( ( All_Vector[0][i][0] == KC_US ) ) {
+      if ( Shiftstate+1 < (int) All_Vector[0][i].size()-1)
+        Character = All_Vector[0][i][Shiftstate+1];
+      break;
+    }
+  }
+
+  //Find underlying SC of character
+  for( int i=0; i< (int)All_Vector[1].size()-1 ;i++) {
+    for( int j=1; j< (int)All_Vector[01][0].size();j++) {
+      if ( ( All_Vector[1][i][j] == Character ) ) {
+        KC_US = All_Vector[1][i][j];
+        return All_Vector[1][i][0];
+      }
+    }
+  }
+  return KC_US;
+}
+
+
+
+
+KMX_WCHAR KMX_SCKUnderlyingLayoutToVKUS_GDK2(GdkKeymap* keymap,KMX_DWORD SC_Other) {
+
+    return SC_Other;
+}*/
 // _S2 can go later
 void Inspect_kp(LPKMX_KEYBOARD kp) {
   wprintf(L"-------\n");

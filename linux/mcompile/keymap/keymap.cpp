@@ -7,7 +7,7 @@
 int map_VKShiftState_to_Lin(int VKShiftState) {
   if      (VKShiftState == 0 )      return 0;		/* 0000 0000 */
   else if (VKShiftState == 16)      return 1;		/* 0001 0000 */
-  // _S2 if commented out only 3 DK will be processed ^ ' `
+  // _S2 if commented out only DK on base+shift will be processed ^ ' `
   else if (VKShiftState == 9 )      return 2;		/* 0000 1001 */
   else if (VKShiftState == 25)      return 3; 	/* 0001 1001 */
   else return VKShiftState;
@@ -352,7 +352,6 @@ bool InitializeGDK(GdkKeymap **keymap,int argc, gchar *argv[]){
 // _S2 DEADKEY STUFF - DO NOT REVIEW YET
 // _S2 ToDo deadkeys. Do we need this ?
 bool IsKeymanUsedKeyVal(std::wstring Keyval) {
-
   int KV = (int) (*Keyval.c_str());
 
   //         32            127              196          256
@@ -379,7 +378,6 @@ bool IsKeymanUsedKeyVal(std::u16string Keyval) {
   else
     return false;
 }
-
 
 bool IsKeymanUsedChar(int KV) {
   //         32            A-Z                      a-z
@@ -445,7 +443,7 @@ std::u16string convert_DeadkeyValues_To_U16str(int in) {
   return u"\0";
 }
 
-// _S2 use gdk_keymap_translate_keyboard_state instead  return s shifted + unshifted only- no altgr,...
+// _S2 use gdk_keymap_translate_keyboard_state instead  returns shifted + unshifted only- no altgr,...
 KMX_DWORD KMX_get_KeyvalsUnderlying_From_KeyCodeUnderlying_GDK(GdkKeymap *keymap, guint keycode, int shift_state_pos) {
   GdkKeymapKey *maps;
   guint *keyvals;
@@ -463,7 +461,7 @@ KMX_DWORD KMX_get_KeyvalsUnderlying_From_KeyCodeUnderlying_GDK(GdkKeymap *keymap
    if (!(keycode <= 94))
     return 0;
 
- KMX_DWORD deadkey =(KMX_DWORD)  keyvals[shift_state_pos];  //_S2 do I need this? no
+ //KMX_DWORD deadkey =(KMX_DWORD)  keyvals[shift_state_pos];  //_S2 do I need this? no
   out = KMX_get_CharsUnderlying_according_to_keycode_and_Shiftstate_GDK_dw(keymap,  keycode,  (ShiftState)  shift_state_pos,  0);
 
   // _S2 g_free used everywhere?
