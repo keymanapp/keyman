@@ -124,7 +124,7 @@ jobs:
       uses: actions/download-artifact@6b208ae046db98c579e8a3aa621ab581ff575935 # v4.1.1
       with:
         name: keyman-srcpkg
-        path: artifacts
+        path: artifacts/keyman-srcpkg
 
     - name: Build
       uses: sillsdev/gha-ubuntu-packaging@1f4b7e7eacb8c82a4d874ee2c371b9bfef7e16ea # v1.0
@@ -146,7 +146,7 @@ jobs:
     - name: Store binary packages
       uses: actions/upload-artifact@26f96dfa697d77e81fd5907df203aa23a56210a8 # v4.3.0
       with:
-        name: keyman-binarypkgs-${{ matrix.dist }}${{ matrix.arch }}
+        name: keyman-binarypkgs-${{ matrix.dist }}_${{ matrix.arch }}
         path: |
           artifacts/*
           !artifacts/keyman-srcpkg/
