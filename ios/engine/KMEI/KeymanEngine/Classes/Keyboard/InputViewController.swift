@@ -144,7 +144,7 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
   var isSystemKeyboard: Bool {
     return _isSystemKeyboard;
   }
-  
+
   // Constraints dependent upon the device's current rotation state.
   // For now, should be mostly upon keymanWeb.view.heightAnchor.
   var portraitConstraint: NSLayoutConstraint?
@@ -170,14 +170,14 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
   var expandedHeight: CGFloat {
     return keymanWeb.keyboardHeight + activeTopBarHeight
   }
-  
+
   public convenience init() {
     // iOS will call this constructor to initialize the system keyboard app extension.
     // It's safe and there will only ever be one active instance of this class within process scope.
     // See https://developer.apple.com/library/archive/documentation/General/Conceptual/ExtensibilityPG/ExtensionOverview.html
     self.init(forSystem: true)
   }
-  
+
   public convenience init(forSystem: Bool) {
     // In-app uses of the keyboard should call this constructor for simplicity, setting `forSystem`=`false`.
     self.init(nibName: nil, bundle: nil)
@@ -189,7 +189,7 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
     _isSystemKeyboard = true
     keymanWeb = KeymanWebViewController(storage: Storage.active)
     super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
-    
+
     addChild(keymanWeb)
   }
 
@@ -202,7 +202,7 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
 
     super.updateViewConstraints()
   }
-  
+
   open override func loadView() {
     let baseView = CustomInputView(frame: CGRect.zero, innerVC: keymanWeb, inputViewStyle: .keyboard)
     baseView.backgroundColor = Colors.keyboardBackground
@@ -294,7 +294,7 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
       self.swallowBackspaceTextChange = false
       return
     }
-    
+
     let contextBeforeInput = textDocumentProxy.documentContextBeforeInput ?? ""
     let selection = textDocumentProxy.selectedText ?? ""
     let contextAfterInput = textDocumentProxy.documentContextAfterInput ?? ""
@@ -305,7 +305,7 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
     // Within the app, this is triggered after every keyboard input.
     // We should NOT call .resetContext() here for this reason.
   }
-  
+
   func insertText(_ keymanWeb: KeymanWebViewController, numCharsToDelete: Int, newText: String) {
     if keymanWeb.isSubKeysMenuVisible {
       return
@@ -318,9 +318,9 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
       isInputClickSoundEnabled = false
       perform(#selector(self.enableInputClickSound), with: nil, afterDelay: 0.1)
     }
-    
+
     var hasDeletedSelection = false
-    
+
     if let selected = textDocumentProxy.selectedText {
       if selected.count > 0 {
         textDocumentProxy.deleteBackward()
@@ -338,7 +338,7 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
       textDocumentProxy.deleteBackward()
       return
     }
-    
+
     for _ in 0..<numCharsToDelete {
       let oldContext = textDocumentProxy.documentContextBeforeInput ?? ""
       textDocumentProxy.deleteBackward()
@@ -411,7 +411,7 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
   func updateShowBannerSetting() {
     keymanWeb.updateShowBannerSetting()
   }
-  
+
   func updateSpacebarText() {
     keymanWeb.updateSpacebarText()
   }
@@ -452,7 +452,7 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
     // If 'isSystemKeyboard' is true, always show the top bar.
     return isTopBarActive ? CGFloat(InputViewController.topBarHeight) : 0
   }
-  
+
   public var kmwHeight: CGFloat {
     return keymanWeb.keyboardHeight
   }
@@ -468,12 +468,12 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
     self.updateViewConstraints()
     fixLayout()
   }
-  
+
   func fixLayout() {
     view.setNeedsLayout()
     view.layoutIfNeeded()
   }
-  
+
   open override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
     super.viewWillTransition(to: size, with: coordinator)
 
@@ -507,7 +507,7 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
       keymanWeb.shouldReload = false
     }
   }
-  
+
   func setKeyboard(_ kb: InstallableKeyboard) throws {
     try keymanWeb.setKeyboard(kb)
   }
@@ -519,19 +519,19 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
   internal var shouldReload: Bool {
     return keymanWeb.shouldReload
   }
-    
+
   func registerLexicalModel(_ lm: InstallableLexicalModel) throws {
     try keymanWeb.registerLexicalModel(lm)
   }
-  
+
   func deregisterLexicalModel(_ lm: InstallableLexicalModel) {
     keymanWeb.deregisterLexicalModel(lm)
   }
-  
+
   func showHelpBubble() {
     keymanWeb.showHelpBubble()
   }
-  
+
   func showHelpBubble(afterDelay delay: TimeInterval) {
     keymanWeb.showHelpBubble(afterDelay: delay)
   }
@@ -543,7 +543,7 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
     os_log("%{public}s", log: KeymanEngineLogger.ui, type: .info, message)
     SentryManager.breadcrumb(message)
   }
-  
+
   func resetContext() {
     keymanWeb.resetContext()
   }
@@ -551,33 +551,30 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
   internal func setSentryState(enabled: Bool) {
     keymanWeb.setSentryState(enabled: enabled)
   }
- 
+
   func setContextState(text: String?, range: NSRange) {
-    // Check for any LTR or RTL marks at the context's start; if they exist, we should
-    // offset the selection range.
-    let characterOrderingChecks = [ "\u{200e}" /*LTR*/, "\u{202e}" /*RTL 1*/, "\u{200f}" /*RTL 2*/ ]
     var offsetPrefix = false;
-    
-    let context = text ?? ""
-    
-    for codepoint in characterOrderingChecks {
-      if(context.hasPrefix(codepoint)) {
-        offsetPrefix = true;
-        break;
-      }
+
+    let str = trimDirectionalMarkPrefix(text)
+    let context = str
+
+    let sCount = str.count
+    let tCount = text?.count ?? 0
+    if str.count != (text?.count ?? 0) {
+      offsetPrefix = true
     }
-    
+
     var selRange = range;
     if(offsetPrefix) { // If we have a character ordering mark, offset range location to hide it.
       selRange = NSRange(location: selRange.location - 1, length: selRange.length)
     }
-    
+
     keymanWeb.setText(context)
     if range.location != NSNotFound {
       keymanWeb.setCursorRange(selRange)
     }
   }
-  
+
   func resetKeyboardState() {
     keymanWeb.resetKeyboardState()
   }
@@ -585,11 +582,11 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
   func endEditing(_ force: Bool) {
     keymanWeb.view.endEditing(force)
   }
-  
+
   func dismissKeyboardMenu() {
     keymanWeb.dismissKeyboardMenu()
   }
-  
+
   open func setBannerImage(to path: String) {
     keymanWeb.setBannerImage(to: path)
   }

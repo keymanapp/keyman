@@ -230,22 +230,19 @@ extension KeymanWebViewController {
     }
   }
 
-  func setText(_ text: String?) {
-    var text = text ?? ""
-
-    // Remove any system-added LTR/RTL marks.
-    text = text.replacingOccurrences(of: "\u{200e}", with: "") // Unicode's LTR codepoint
-    text = text.replacingOccurrences(of: "\u{200f}", with: "") // Unicode's RTL codepoint (v1)
-    text = text.replacingOccurrences(of: "\u{202e}", with: "") // Unicode's RTL codepoint (v2)
+  func setText(_ str: String?) {
+    let text = trimDirectionalMarkPrefix(str)
 
     do {
       let encodingArray = [ text ];
       let jsonString = try String(data: JSONSerialization.data(withJSONObject: encodingArray), encoding: .utf8)!
-      let start = jsonString.index(jsonString.startIndex, offsetBy: 2)
-      let end = jsonString.index(jsonString.endIndex, offsetBy: -2)
-      let jsonText = jsonString[start..<end]
+      // Must use utf16-mode - default Swift string handling will include a leading U+0300 with the opening double-quote
+      // being removed by the substring op below.
+      let start = jsonString.utf16.index(jsonString.utf16.startIndex, offsetBy: 2)
+      let end = jsonString.utf16.index(jsonString.utf16.endIndex, offsetBy: -2)
+      let jsonText = String(jsonString.utf16[start..<end])!
 
-      self.currentText = String(jsonText)
+      self.currentText = jsonText
       webView!.evaluateJavaScript("setKeymanVal(\"\(jsonText)\");", completionHandler: nil)
     } catch {
       os_log("%{public}s", log: KeymanEngineLogger.engine, type: .error, error.localizedDescription)
@@ -363,7 +360,7 @@ extension KeymanWebViewController {
       if let packageID = lexicalModel.packageID {
         event.extra?["package"] = packageID
       }
-      
+
       os_log("%{public}s: %{public}s", log: KeymanEngineLogger.resources, type: .error, errorMessage, lexicalModel.id)
       SentryManager.capture(event)
       throw KeyboardError.fileMissing
@@ -572,7 +569,7 @@ extension KeymanWebViewController: WKScriptMessageHandler {
       // This may need filtering for proper use with Sentry?
       // Then again, if KMW is logging it... we already have to worry
       // about it showing up in Web-oriented Sentry logs.
-      
+
       let logMessage = "KMW Log: \(message)"
       os_log("%{public}s", log: KeymanEngineLogger.engine, type: .info, logMessage)
       SentryManager.breadcrumb(logMessage)
