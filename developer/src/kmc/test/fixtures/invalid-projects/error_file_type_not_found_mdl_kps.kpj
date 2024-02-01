@@ -5,22 +5,11 @@
     <CompilerWarningsAsErrors>False</CompilerWarningsAsErrors>
     <WarnDeprecatedCode>False</WarnDeprecatedCode>
     <CheckFilenameConventions>False</CheckFilenameConventions>
-    <ProjectType>keyboard</ProjectType>
+    <ProjectType>lexicalmodel</ProjectType>
   </Options>
   <Files>
-      <File>
-      <ID>error_file_type_not_found_mdl_kps_1</ID>
-      <Filename>error_file_type_not_found_mdl_kps.kmn</Filename>
-      <Filepath>error_file_type_not_found_mdl_kps.kmn</Filepath>
-      <FileVersion>1.0</FileVersion>
-      <FileType>.kmn</FileType>
-      <Details>
-        <Name>error_file_type_not_found_mdl_kps</Name>
-        <Copyright>Copyright (C) Keyman Team</Copyright>
-      </Details>
-    </File>
     <File>
-      <ID>error_file_type_not_found_mdl_kps_2</ID>
+      <ID>error_file_type_not_found_mdl_kps_1</ID>
       <Filename>error_file_type_not_found_mdl_kps.model.ts</Filename>
       <Filepath>error_file_type_not_found_mdl_kps.model.ts</Filepath>
       <FileVersion></FileVersion>

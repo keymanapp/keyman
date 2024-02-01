@@ -5,23 +5,12 @@
     <CompilerWarningsAsErrors>False</CompilerWarningsAsErrors>
     <WarnDeprecatedCode>False</WarnDeprecatedCode>
     <CheckFilenameConventions>False</CheckFilenameConventions>
-    <ProjectType>keyboard</ProjectType>
+    <ProjectType>lexicalmodel</ProjectType>
   </Options>
   <Files>
-      <File>
-      <ID>error_file_type_not_found_mdl_mdl_1</ID>
-      <Filename>error_file_type_not_found_mdl_mdl.kmn</Filename>
-      <Filepath>error_file_type_not_found_mdl_mdl.kmn</Filepath>
-      <FileVersion>1.0</FileVersion>
-      <FileType>.kmn</FileType>
-      <Details>
-        <Name>error_file_type_not_found_mdl_mdl</Name>
-        <Copyright>Copyright (C) Keyman Team</Copyright>
-      </Details>
-    </File>
     <!-- ERROR_FileTypeNotFound (BuildModelInfo; .model.ts) -->
     <File>
-      <ID>error_file_type_not_found_mdl_mdl_3</ID>
+      <ID>error_file_type_not_found_mdl_mdl_2</ID>
       <Filename>error_file_type_not_found_mdl_mdl.kps</Filename>
       <Filepath>error_file_type_not_found_mdl_mdl.kps</Filepath>
       <FileVersion></FileVersion>
