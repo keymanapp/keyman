@@ -65,16 +65,26 @@ async function cancelRunningBuild(id, buildTypeId) {
   }
 }
 
-const data = await getQueuedBuilds();
-for(const build of data.build) {
-  if(allTestBuildConfigurations.includes(build.buildTypeId) && build.branchName == branchName) {
-    await cancelQueuedBuild(build.id, build.buildTypeId);
+try {
+  const queuedBuilds = await getQueuedBuilds();
+  if(queuedBuilds) {
+    for(const build of queuedBuilds.build) {
+      if(allTestBuildConfigurations.includes(build.buildTypeId) && build.branchName == branchName) {
+        await cancelQueuedBuild(build.id, build.buildTypeId);
+      }
+    }
   }
-}
 
-const runningBuilds = await getRunningBuilds();
-for(const build of runningBuilds.build) {
-  if(allTestBuildConfigurations.includes(build.buildTypeId) && build.branchName == branchName) {
-    await cancelRunningBuild(build.id, build.buildTypeId);
+  const runningBuilds = await getRunningBuilds();
+  if(runningBuilds) {
+    for(const build of runningBuilds.build) {
+      if(allTestBuildConfigurations.includes(build.buildTypeId) && build.branchName == branchName) {
+        await cancelRunningBuild(build.id, build.buildTypeId);
+      }
+    }
   }
+} catch(e) {
+  // we don't want to fail a trigger because of a hiccup in this script
+  console.trace(e);
+  process.exit(0);
 }
