@@ -298,19 +298,26 @@ size_t ldml_processor::process_output(ldml_event_state &ldml_state, const std::u
   //  The normalize functions have assert and Debuglog at the bottom.
   //  so we do not need to assert the status here unless we're going to do something
   //  different with control flow.
-  (void)ldml::normalize_nfd_markers(nfd_str);
-
+  if (!normalization_disabled) {
+    auto norm_ok = ldml::normalize_nfd_markers(nfd_str);
+    assert(norm_ok);
+  }
   // extract context string, in NFD
   std::u32string old_ctxtstr_nfd;
   (void)ldml_state.context_to_string(old_ctxtstr_nfd, true);
-  assert(ldml::normalize_nfd_markers(old_ctxtstr_nfd)); // TODO-LDML: else fail?
-
+  if (!normalization_disabled) {
+    auto norm_ok = ldml::normalize_nfd_markers(old_ctxtstr_nfd);
+    assert(norm_ok); // TODO-LDML: else fail?
+  }
   // context string in NFD
   std::u32string ctxtstr;
   (void)ldml_state.context_to_string(ctxtstr, true); // TODO-LDML: remove this second call
   // add the newly added key output to ctxtstr
   ctxtstr.append(nfd_str);
-  (void)ldml::normalize_nfd_markers(ctxtstr);
+  if (!normalization_disabled) {
+    auto norm_ok = ldml::normalize_nfd_markers(ctxtstr);
+    assert(norm_ok);
+  }
   /** transform output string */
   std::u32string outputString;
   /** how many chars of the ctxtstr to replace */
@@ -330,14 +337,18 @@ size_t ldml_processor::process_output(ldml_event_state &ldml_state, const std::u
 
   // drop last 'matchedContext':
   ctxtstr.resize(ctxtstr.length() - matchedContext);
-  ctxtstr.append(outputString); // TODO-LDML: should be able to do a normalization-safe append here.
-  (void)ldml::normalize_nfd_markers(ctxtstr);
-
+  ctxtstr.append(outputString); // TODO-LDML: should be able to do a normalization-safe append here.'
+  if (!normalization_disabled) {
+    (void)ldml::normalize_nfd_markers(ctxtstr);
+  }
   // Ok. We've done all the happy manipulations.
 
   /** NFD w/ markers */
   std::u32string ctxtstr_cleanedup = ctxtstr;
-  (void)ldml::normalize_nfd_markers(ctxtstr_cleanedup);
+  if (!normalization_disabled) {
+    bool norm_ok = ldml::normalize_nfd_markers(ctxtstr_cleanedup);
+    assert(norm_ok);
+  }
 
   // find common prefix.
   // For example, if the context previously had "aaBBBBB" and it is changing to "aaCCC" then we will have:

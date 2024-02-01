@@ -1,11 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <!--
-like k_008 but in NFC!
+like k_008 but in NFC (and other normalizations)
 -->
 <!DOCTYPE keyboard3 SYSTEM "../../../../../resources/standards-data/ldml-keyboards/techpreview/dtd/ldmlKeyboard3.dtd">
 <keyboard3 locale="en" conformsTo="techpreview">
   <info author="srl295" indicator="🙀" layout="qwerty" name="k_009_transform_nfc" />
+
+  <settings normalization="disabled" />
 
   <keys>
     <key id="u-0320" output="\u{0320}" /> <!-- ◌̠ -->
