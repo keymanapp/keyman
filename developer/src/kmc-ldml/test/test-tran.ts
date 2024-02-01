@@ -9,7 +9,7 @@ import { KMXPlus, MarkerParser } from '@keymanapp/common-types';
 import Tran = KMXPlus.Tran;// for tests…
 import Bksp = KMXPlus.Bksp;// for tests…
 import { constants } from '@keymanapp/ldml-keyboard-constants';
-import { MetaCompiler } from './compiler/meta.js';
+import { MetaCompiler } from '../src/compiler/meta.js';
 const tranDependencies = [ ...BASIC_DEPENDENCIES, UsetCompiler, MetaCompiler ];
 const bkspDependencies = tranDependencies;
 
@@ -80,6 +80,48 @@ describe('tran', function () {
       }
     },
     {
+      subpath: 'sections/tran/tran-vars-nfc.xml',
+      callback(sect) {
+        const m = MarkerParser.markerOutput;
+        const tran = <Tran> sect;
+        assert.ok(tran);
+        assert.lengthOf(compilerTestCallbacks.messages, 0);
+        // cautiously destructure
+        assert.lengthOf(tran.groups, 1);
+        const [ g0 ]  = tran.groups;
+        assert.lengthOf(g0.transforms, 6);
+        const [ g0t0, g0t1, g0t2, g0t3, g0t4, g0t5 ] = g0.transforms;
+        assert.strictEqual(g0t0.from.value, "yes");
+        assert.strictEqual(g0t0.to.value, "no");
+
+        assert.strictEqual(g0t1.from.value, "q(?:A|B|C|D|FF|E)x");
+        const g0t1r = new RegExp(g0t1.from.value);
+        assert.ok(g0t1r.test('qFFx'));
+        assert.notOk(g0t1r.test('qZZx'));
+
+        assert.strictEqual(g0t2.from.value, "[b-df-hj-np-tv-z]");
+        const g0t2r = new RegExp(g0t2.from.value);
+        assert.ok(g0t2r.test('k'));
+        assert.notOk(g0t2r.test('e'));
+
+        assert.strictEqual(g0t3.from.value, "((?:A|B|C|D|FF|E))");
+        assert.equal(g0t3.mapFrom?.value, "upper");
+        assert.equal(g0t3.mapTo?.value, "lower");
+
+        assertCodePoints(g0t4.from.value,
+          `\u{03b9}${m(1, true)}\u{0344}`);
+        assertCodePoints(g0t4.to.value,
+          `\u{1f34}`);
+
+        assertCodePoints(g0t5.from.value,
+          `\u{03af}${MarkerParser.ANY_MARKER_MATCH}\u{033c}`);
+        assertCodePoints(g0t5.to.value,
+          `\u{1f76}${m(1,false)}\u{033c}`);
+      },
+      warnings: [
+        CompilerMessages.Hint_NormalizationDisabled()
+      ],
+    },    {
       subpath: 'sections/tran/fail-invalid-type.xml',
       errors: true, // XML error
     },
