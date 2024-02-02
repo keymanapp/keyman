@@ -880,7 +880,7 @@ transforms::load(
         if (fromStr.empty()) {
           valid = false;
         }
-        newGroup.emplace_back(fromStr, toStr, mapFrom, mapTo, kplus, valid, normalization_disabled);  // creating a transform_entry
+        newGroup.emplace_back(fromStr, toStr, mapFrom, mapTo, kplus, valid, transforms->normalization_disabled);  // creating a transform_entry
         assert(valid);
         if(!valid) {
           return nullptr;
