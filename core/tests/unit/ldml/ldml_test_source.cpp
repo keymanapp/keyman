@@ -511,7 +511,7 @@ LdmlJsonTestSource::next_action(ldml_action &fillin) {
   if (type == "check") {
     fillin.type   = LDML_ACTION_CHECK_EXPECTED;
     fillin.string = LdmlTestSource::parse_u8_source_string(result.get<std::string>());
-    if (get_normalization_disabled()) {
+    if (!get_normalization_disabled()) {
       assert(km::core::ldml::normalize_nfd(fillin.string)); // TODO-LDML: will be NFC when core is normalizing to NFC
     }
     return;
@@ -526,7 +526,7 @@ LdmlJsonTestSource::next_action(ldml_action &fillin) {
   } else if (type == "emit") {
     fillin.type   = LDML_ACTION_EMIT_STRING;
     fillin.string = LdmlTestSource::parse_u8_source_string(to.get<std::string>());
-    if (get_normalization_disabled()) {
+    if (!get_normalization_disabled()) {
       assert(km::core::ldml::normalize_nfd(fillin.string)); // TODO-LDML: will be NFC when core is normalizing to NFC
     }
     return;
@@ -553,7 +553,7 @@ LdmlJsonTestSource::get_context() {
     // only set startContext if present - it's optional.
     auto startContext = data["/startContext/to"_json_pointer];
     context = LdmlTestSource::parse_u8_source_string(startContext);
-    if (get_normalization_disabled()) {
+    if (!get_normalization_disabled()) {
       assert(km::core::ldml::normalize_nfd(context)); // TODO-LDML: should be NFC
     }
   }

@@ -39,12 +39,12 @@
       <keystroke key="e" />
       <keystroke key="u-0300" />
       <keystroke key="u-0320" />
-      <check result="YES1" />
+      <check result="1NO0" />
     </test>
     <test name="regex-test-1-nfd2">
       <keystroke key="1" />
       <keystroke key="nfd" />
-      <check result="YES1" />
+      <check result="1e\u{0320}\u{0300}" />
     </test>
     <test name="regex-test-1-nfc">
       <keystroke key="1" />
@@ -61,7 +61,7 @@
     <test name="regex-test-1-nfd-ooo2">
       <keystroke key="1" />
       <keystroke key="not-nfd" />
-      <check result="YES1" />
+      <check result="1NO0" />
     </test>
   </tests>
   <tests name="regex-tests-2">
@@ -70,12 +70,12 @@
       <keystroke key="e" />
       <keystroke key="u-0300" />
       <keystroke key="u-0320" />
-      <check result="2e\u{0300}\u{0320}" />
+      <check result="2NO0" />
     </test>
     <test name="regex-test-2-nfd2">
       <keystroke key="2" />
       <keystroke key="nfd" />
-      <check result="2e\u{0320}\u{0300}" />
+      <check result="YES2" />
     </test>
     <test name="regex-test-2-nfc">
       <keystroke key="2" />
@@ -92,7 +92,7 @@
     <test name="regex-test-2-nfd-ooo2">
       <keystroke key="2" />
       <keystroke key="not-nfd" />
-      <check result="YES2" />
+      <check result="2NO0" />
     </test>
   </tests>
   <tests name="regex-tests-3">
@@ -101,7 +101,7 @@
       <keystroke key="e" />
       <keystroke key="u-0300" />
       <keystroke key="u-0320" />
-      <check result="3e\u{0300}\u{0320}" />
+      <check result="3NO0" />
     </test>
     <test name="regex-test-3-nfd2">
       <keystroke key="3" />
@@ -123,7 +123,7 @@
     <test name="regex-test-3-nfd-ooo2">
       <keystroke key="3" />
       <keystroke key="not-nfd" />
-      <check result="3\u{00e8}\u{0320}" />
+      <check result="3NO0" />
     </test>
   </tests>
   <tests name="regex-tests-4">
@@ -175,7 +175,7 @@
       <keystroke key="e" />
       <keystroke key="u-0300" />
       <keystroke key="u-0320" />
-      <check result="YES4x" />
+      <check result="4NO0" />
     </test>
     <test name="regex-test-4a-1x">
       <keystroke key="4" />
@@ -183,7 +183,7 @@
       <keystroke key="e" />
       <keystroke key="u-0300" />
       <keystroke key="u-0320" />
-      <check result="YES4a" />
+      <check result="4NO0" />
     </test>
     <test name="regex-test-4a-2x">
       <keystroke key="4" />
@@ -207,7 +207,7 @@
       <keystroke key="u-0300" />
       <keystroke key="u-0320" />
       <keystroke key="stampy" />
-      <check result="YES4d" />
+      <check result="4NOYES0" />
     </test>
   </tests>
   <tests name="regex-tests-5">
@@ -293,7 +293,7 @@
       <keystroke key="u-0320"/>
       <keystroke key="stampy"/>
       <keystroke key="lgtm"/>
-      <check result="YES8c"/>
+      <check result="8NOYESYES0"/>
     </test>
     <test name="regex-test-8e-1">
       <keystroke key="8" />
@@ -302,7 +302,7 @@
       <keystroke key="u-0300"/>
       <keystroke key="stampy"/>
       <keystroke key="lgtm"/>
-      <check result="YES8c"/>
+      <check result="8e\u{0320}\u{0300}"/>
     </test>
     <test name="regex-test-8f-0">
       <keystroke key="8" />
@@ -311,7 +311,7 @@
       <keystroke key="u-0320"/>
       <keystroke key="stampy"/>
       <keystroke key="lgtm"/>
-      <check result="YES8d"/>
+      <check result="8f\u{0300}\u{0320}"/>
     </test>
     <test name="regex-test-8f-1">
       <keystroke key="8" />
@@ -332,12 +332,12 @@
     <test name="regex-test-9b">
       <keystroke key="9" />
       <keystroke key="a" />
-      <check result="9e\u{0320}\u{0300}"/>
+      <check result="9e\u{0300}\u{0320}"/>
     </test>
     <test name="regex-test-9c">
       <keystroke key="9" />
       <keystroke key="c" />
-      <check result="YES9c"/>
+      <check result="9ce\u{0300}\u{0320}"/>
     </test>
     <test name="regex-test-9d">
       <keystroke key="9" />
@@ -357,7 +357,7 @@
       <keystroke key="u-0300" /> <!-- out of order -->
       <keystroke key="u-0320" />
       <keystroke key="lgtm" />
-      <check result="YES9e" />
+      <check result="9ee\u{0300}e\u{0300}\u{0320}" />
     </test>
     <test name="regex-test-9e-0">
       <keystroke key="9" />
@@ -369,7 +369,7 @@
       <keystroke key="u-0320" />
       <keystroke key="u-0300" /> <!-- in order -->
       <keystroke key="lgtm" />
-      <check result="YES9e" />
+      <check result="9ee\u{0300}e\u{0320}\u{0300}" />
     </test>
   </tests>
   <tests name="regex-tests-9f">
