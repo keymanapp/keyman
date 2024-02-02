@@ -176,7 +176,7 @@ ProcessActionsExternalEvent() {
   if (!_td->core_actions) {   // when ideponent we will not need this
     return FALSE;
   }
-  // TODO: #10583 remove dispose
+  // TODO: #10583 remove and call get actions here directly
   //km_core_actions const* acts = km_core_state_get_actions(_td->lpActiveKeyboard->lpCoreKeyboardState);
   processCapsLock(_td->core_actions->new_caps_lock_state, !_td->state.isDown, FALSE, TRUE);
   return TRUE;
