@@ -1,5 +1,14 @@
 # Keyman Version History
 
+## 17.0.258 alpha 2024-02-01
+
+* chore(developer): add unicode-license.txt for ldml keyboards data (#10568)
+* feat(core): ldml reorder marker processing (#10539)
+* chore(developer): kmc ldml build - call c8 directly for tests (#10522)
+* fix(web): app/webview control flow for initial layer (#10571)
+* chore(linux): Upgrade artifacts to v4 (#10577)
+* chore(linux): Fix the path of downloaded artifacts (#10594)
+
 ## 17.0.257 alpha 2024-01-31
 
 * epic: Keyman Core normalization (#10390)
@@ -41,7 +50,7 @@
 * fix(common): ldml: fix typo in kmc error message (#10484)
 * chore(developer): `--enable-source-maps` parameter for kmc wrapper (#10496)
 * fix(android/engine): Fix OSK widths (#10442)
-*  (#10508)
+* fix(web): banner suggestion resizing after device rotation (#10508)
 
 ## 17.0.251 alpha 2024-01-24
 
@@ -53,7 +62,7 @@
 * fix(web): osk responsiveness to held modifiers on legacy kbds (#10437)
 * fix(android/engine): Skip final globe key action (#10465)
 * feat(developer): marker normalization in .ts (#10443)
-*  (#10445)
+* fix(android): hardware keystrokes now include mnemonic processing (#10445)
 
 ## 17.0.249 alpha 2024-01-22
 
@@ -1211,7 +1220,7 @@
 
 ## 17.0.67 alpha 2023-03-14
 
-* (developer):Update copyright period in License.rtf (#8425)
+* chore(developer): Update copyright period in License.rtf (#8425)
 * chore(common): support shorthand for build.sh (#8415)
 * chore(common): build script performance improvements (#8416)
 * chore(common): TS updates to non-sync'd packages, feature-esmodule merge conflict prevention (#8429)
@@ -1587,6 +1596,16 @@
 * feat(windows): configuration UI polish (#7206)
 * chore: move to 17.0-alpha (#7577)
 * chore: Move to 17.0 alpha
+
+## 16.0.145 stable 2024-02-01
+
+* chore(linux): Add support for loong64 architecture (#10108)
+* chore(linux): Update debian changelog (#10122)
+* fix(web): Fix null error with legacy keyboards (#10177)
+* chore(ios): FV certificate key (#10229)
+* fix(oem/fv): Add fv_hulquminum_combine and fv_kwadacha_tsekene (#10285)
+* chore(developer): upgrade ngrok to v3 (#10360)
+* chore(linux): Build with webkitgtk 4.1 instead of 4.0 (#10574)
 
 ## 16.0.144 stable 2023-11-30
 

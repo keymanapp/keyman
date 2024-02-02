@@ -2,6 +2,9 @@
 #
 # This file maps specific paths to build triggers
 #
+# Maps to ci/cancel-builds/trigger-definitions.mjs and must be kept in sync
+#
+
 
 available_platforms=(android common_web common_windows common_mac common_linux ios linux mac web windows developer)
 
