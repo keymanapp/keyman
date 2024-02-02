@@ -1,5 +1,17 @@
 # Keyman Version History
 
+## 17.0.259 alpha 2024-02-02
+
+* feat(developer):  double markers once again (#10541)
+* feat(core): ldml double marker, C++ side (#10563)
+* feat(core,developer): simplify markers (#10565)
+* chore(common): cancel earlier builds when new test builds triggered (#10593)
+* chore(linux): Use correct format specifier for `g_utf8_strlen` (#10599)
+* fix(linux): Fix version comparison (#10576)
+* chore(common): Add entries from 16.0.145 HISTORY.md (#10603)
+* chore(common): history missing message fixup (#10601)
+* chore(linux): Update debian changelog (#10596)
+
 ## 17.0.258 alpha 2024-02-01
 
 * chore(developer): add unicode-license.txt for ldml keyboards data (#10568)
