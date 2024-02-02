@@ -160,11 +160,11 @@ export class CompilerMessages {
 
   static Hint_CharClassImplicitDenorm = (o: { lowestCh: number }) =>
   m(this.HINT_CharClassImplicitDenorm, `File has character classes which span non-NFD character(s), including ${util.describeCodepoint(o.lowestCh)}. These will not match any text.`);
-  static HINT_CharClassImplicitDenorm = SevHint | 0x0023;
+  static HINT_CharClassImplicitDenorm = SevHint | 0x0026;
 
   static Warn_CharClassExplicitDenorm = (o: { lowestCh: number }) =>
   m(this.WARN_CharClassExplicitDenorm, `File has character classes which include non-NFD characters(s), including ${util.describeCodepoint(o.lowestCh)}. These will not match any text.`);
-  static WARN_CharClassExplicitDenorm = SevWarn | 0x0024;
+  static WARN_CharClassExplicitDenorm = SevWarn | 0x0027;
 
 }
 

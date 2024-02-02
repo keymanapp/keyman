@@ -8,7 +8,7 @@
     <transforms type="simple">
         <transformGroup>
             <!-- all NFD but crosses non-NFD-->
-            <transform from="[\u{0020}-\u{01ff}]" to="x" />
+            <transform from="[\u{0020}-\u{0250}]" to="x" />
         </transformGroup>
     </transforms>
 </keyboard3>

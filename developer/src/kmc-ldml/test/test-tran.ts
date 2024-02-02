@@ -248,19 +248,19 @@ describe('tran', function () {
     {
       subpath: 'sections/tran/tran-warn-range.xml',
       warnings: [
-        CompilerMessages.Warn_CharClassExplicitDenorm({lowestCh: 0}),
+        CompilerMessages.Warn_CharClassExplicitDenorm({lowestCh: 0xE1}),
       ],
     },
     {
       subpath: 'sections/tran/tran-hint-range.xml',
       warnings: [
-        CompilerMessages.Hint_CharClassImplicitDenorm({lowestCh: 0}),
+        CompilerMessages.Hint_CharClassImplicitDenorm({lowestCh: 0xc0}),
       ],
     },
     {
       subpath: 'sections/tran/tran-hint-range2.xml',
       warnings: [
-        CompilerMessages.Hint_CharClassImplicitDenorm({lowestCh: 0}),
+        CompilerMessages.Hint_CharClassImplicitDenorm({lowestCh: 0xC0}),
       ],
     },
   ], tranDependencies);

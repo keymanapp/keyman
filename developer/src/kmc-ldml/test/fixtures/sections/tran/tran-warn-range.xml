@@ -7,7 +7,7 @@
 
     <transforms type="simple">
         <transformGroup>
-            <!-- warning, includes NFD start/end-->
+            <!-- warning, includes NFC start/end-->
             <transform from="[á-é]" to="x" />
         </transformGroup>
     </transforms>
