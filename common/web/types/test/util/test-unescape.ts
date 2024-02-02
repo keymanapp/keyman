@@ -271,7 +271,7 @@ describe('test NFDAnalyzer', () => {
     assert.sameDeepMembers(Array.from(m.get(BadStringType.denormalized).values()), [
       0x00E8,
       0x0344,
-      0x1FA1D,
+      0x2FA1D,
   ], `denorm analysis`);
   });
 });
