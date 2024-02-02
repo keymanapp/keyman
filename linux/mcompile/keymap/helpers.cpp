@@ -5,7 +5,107 @@
 //_S2 do not review - all this will be deleted later
 // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
+
 /*
+
+KMX_DWORD KMX_get_CharsUnderlying_according_to_keycode_and_Shiftstate_GDK_dw_OLD(GdkKeymap *keymap, guint keycode, ShiftState ss, int caps){
+
+  GdkModifierType consumed;
+  GdkKeymapKey *maps;
+  guint *keyvals;
+  gint count;
+
+  if (!gdk_keymap_get_entries_for_keycode(keymap, keycode, &maps, &keyvals, &count))
+    return 0;
+
+  //BASE (shiftstate: 0)
+  if (( ss == Base ) && ( caps == 0 )) {
+    GdkModifierType MOD_base = (GdkModifierType) ( ~GDK_MODIFIER_MASK );
+    gdk_keymap_translate_keyboard_state (keymap, keycode, MOD_base , 0, keyvals, NULL, NULL, & consumed);
+  }
+
+  //BASE + CAPS (shiftstate: 0)
+  else if (( ss == Base ) && ( caps == 1 )) {
+    GdkModifierType MOD_Caps = (GdkModifierType) ( GDK_LOCK_MASK );
+    gdk_keymap_translate_keyboard_state (keymap, keycode, MOD_Caps, 0, keyvals, NULL, NULL, & consumed);
+  }
+
+  //SHIFT (shiftstate: 1)
+  else if (( ss == Shft ) && ( caps == 0 )) {
+    GdkModifierType MOD_Shift = (GdkModifierType) ( GDK_SHIFT_MASK );
+    gdk_keymap_translate_keyboard_state (keymap, keycode, MOD_Shift , 0, keyvals, NULL, NULL, & consumed);
+  }
+
+  //SHIFT+CAPS (shiftstate: 1)
+  else if ( ( ss == Shft ) && ( caps ==1 )) {
+    GdkModifierType MOD_ShiftCaps= (GdkModifierType) ((GDK_SHIFT_MASK | GDK_LOCK_MASK));
+    gdk_keymap_translate_keyboard_state (keymap, keycode, MOD_ShiftCaps , 0, keyvals, NULL, NULL, & consumed);
+  }
+
+  // Ctrl (shiftstate: 2)
+  else if (( ss == Ctrl ) && ( caps == 0 )){
+    GdkModifierType MOD_Ctrl = (GdkModifierType) ( GDK_MOD5_MASK  );
+    gdk_keymap_translate_keyboard_state (keymap, keycode, MOD_Ctrl , 0, keyvals, NULL, NULL, & consumed);
+  }
+
+  // Ctrl (shiftstate: 2)
+  else if (( ss == Ctrl ) && ( caps == 1 )){
+    GdkModifierType MOD_CtrlCaps = (GdkModifierType) (GDK_MOD5_MASK | GDK_LOCK_MASK);
+    gdk_keymap_translate_keyboard_state (keymap, keycode, MOD_CtrlCaps , 0, keyvals, NULL, NULL, & consumed);
+  }
+
+
+  // SHIFT+Ctrl (shiftstate: 3)
+  else if (( ss == ShftCtrl ) && ( caps == 0 )){
+    GdkModifierType MOD_Ctrl = (GdkModifierType) (GDK_SHIFT_MASK |  GDK_MOD5_MASK  );
+    gdk_keymap_translate_keyboard_state (keymap, keycode, MOD_Ctrl , 0, keyvals, NULL, NULL, & consumed);
+  }
+
+  // SHIFT+Ctrl (shiftstate: 3)
+  else if (( ss == ShftCtrl ) && ( caps == 1 )){
+    GdkModifierType MOD_CtrlCaps = (GdkModifierType) ( GDK_SHIFT_MASK | GDK_MOD5_MASK | GDK_LOCK_MASK);
+    gdk_keymap_translate_keyboard_state (keymap, keycode, MOD_CtrlCaps , 0, keyvals, NULL, NULL, & consumed);
+  }
+
+  //ALT-GR (shiftstate: 6)
+  else if (( ss == MenuCtrl ) && ( caps == 0 )){
+    GdkModifierType MOD_AltGr = (GdkModifierType) (GDK_MOD2_MASK | GDK_MOD5_MASK);
+    gdk_keymap_translate_keyboard_state (keymap, keycode, MOD_AltGr , 0, keyvals, NULL, NULL, & consumed);
+  }
+
+  //ALT-GR +CAPS (shiftstate: 6)
+  else if (( ss == MenuCtrl ) && ( caps == 1 )){
+    GdkModifierType MOD_AltGr = (GdkModifierType) (GDK_MOD2_MASK | GDK_MOD5_MASK | GDK_LOCK_MASK);
+    gdk_keymap_translate_keyboard_state (keymap, keycode, MOD_AltGr , 0, keyvals, NULL, NULL, & consumed);
+  }
+
+  //ALT-GR (shiftstate: 7)
+  else if (( ss == ShftMenuCtrl ) && ( caps == 0 )){
+    GdkModifierType MOD_AltGr = (GdkModifierType) ( (GDK_SHIFT_MASK | GDK_MOD2_MASK | GDK_MOD5_MASK) );
+    gdk_keymap_translate_keyboard_state (keymap, keycode, MOD_AltGr , 0, keyvals, NULL, NULL, & consumed);
+  }
+
+  //ALT-GR +CAPS (shiftstate: 7)
+  else if (( ss == ShftMenuCtrl ) && ( caps == 1 )){
+    GdkModifierType MOD_AltGr = (GdkModifierType) ( (GDK_SHIFT_MASK | GDK_MOD2_MASK | GDK_MOD5_MASK | GDK_LOCK_MASK) );
+    gdk_keymap_translate_keyboard_state (keymap, keycode, MOD_AltGr , 0, keyvals, NULL, NULL, & consumed);
+  }
+  else
+    return 0;
+//_S2 hier wird fffe returned ist das OK?
+  if((*keyvals >=  deadkey_min) && (*keyvals <=  deadkey_max))
+    return 0xFFFF;
+  if((*keyvals >  deadkey_max) || ((*keyvals <  deadkey_min)  &&  ( *keyvals > 0xFF)))
+    return 0xFFFE;
+  else
+    return (KMX_DWORD) *keyvals;
+}
+
+
+
+
+
+
 
 KMX_DWORD KMX_get_SCUnderlying_From_SCUS_VEC(v_dw_3D &All_Vector, KMX_DWORD KC_US, int Shiftstate) {
 

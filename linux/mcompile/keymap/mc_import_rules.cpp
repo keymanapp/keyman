@@ -108,7 +108,7 @@ int KMX_ToUnicodeEx(guint ScanCode, const BYTE *lpKeyState, PKMX_WCHAR pwszBuff,
   //if((kvl >=  deadkey_min) && (kvl <=  deadkey_max))
 
 
-  std::wstring character = KMX_get_CharsUnderlying_according_to_keycode_and_Shiftstate_GDK(keymap, ScanCode, ShiftState(shift_state), caps);
+  std::wstring character = KMX_get_CharsUnderlying_according_to_keycode_and_Shiftstate_GDK_OLD(keymap, ScanCode, ShiftState(shift_state), caps);
   std::u16string uuu16= u16string_from_wstring(character).c_str();
   pwszBuff[0]= * (PKMX_WCHAR)  u16string_from_wstring(character).c_str();
 

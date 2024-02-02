@@ -462,7 +462,7 @@ KMX_DWORD KMX_get_KeyvalsUnderlying_From_KeyCodeUnderlying_GDK(GdkKeymap *keymap
     return 0;
 
  //KMX_DWORD deadkey =(KMX_DWORD)  keyvals[shift_state_pos];  //_S2 do I need this? no
-  out = KMX_get_CharsUnderlying_according_to_keycode_and_Shiftstate_GDK_dw(keymap,  keycode,  (ShiftState)  shift_state_pos,  0);
+  out = KMX_get_CharsUnderlying_according_to_keycode_and_Shiftstate_GDK_dw_OLD(keymap,  keycode,  (ShiftState)  shift_state_pos,  0);
 
   // _S2 g_free used everywhere?
   g_free(keyvals);
@@ -493,7 +493,7 @@ KMX_DWORD KMX_get_KeyvalsUnderlying_From_KeyCodeUnderlying_GDK(GdkKeymap *keymap
   //wprintf(L" keyvals[shift_state_pos]: %i %i %i %i----", keyvals[0],keyvals[1],keyvals[2],keyvals[3]);
 
   dky = (PKMX_WCHAR) (convert_DeadkeyValues_To_U16str((int) deadkey)).c_str();
-  out = KMX_get_CharsUnderlying_according_to_keycode_and_Shiftstate_GDK_dw(keymap,  keycode,  (ShiftState)  shift_state_pos,  0);
+  out = KMX_get_CharsUnderlying_according_to_keycode_and_Shiftstate_GDK_dw_OLD(keymap,  keycode,  (ShiftState)  shift_state_pos,  0);
 
   // _S2 g_free used everywhere?
   g_free(keyvals);
@@ -503,7 +503,7 @@ KMX_DWORD KMX_get_KeyvalsUnderlying_From_KeyCodeUnderlying_GDK(GdkKeymap *keymap
 }
 
 // _S2 ToDo use only one of those
-KMX_DWORD KMX_get_CharsUnderlying_according_to_keycode_and_Shiftstate_GDK_dw(GdkKeymap *keymap, guint keycode, ShiftState ss, int caps){
+KMX_DWORD KMX_get_CharsUnderlying_according_to_keycode_and_Shiftstate_GDK_dw_OLD(GdkKeymap *keymap, guint keycode, ShiftState ss, int caps){
 
   GdkModifierType consumed;
   GdkKeymapKey *maps;
@@ -587,7 +587,7 @@ KMX_DWORD KMX_get_CharsUnderlying_according_to_keycode_and_Shiftstate_GDK_dw(Gdk
   }
   else
     return 0;
-//hier wird fffe returned ist das OK?
+//_S2 hier wird fffe returned ist das OK?
   if((*keyvals >=  deadkey_min) && (*keyvals <=  deadkey_max))
     return 0xFFFF;
   if((*keyvals >  deadkey_max) || ((*keyvals <  deadkey_min)  &&  ( *keyvals > 0xFF)))
@@ -596,7 +596,7 @@ KMX_DWORD KMX_get_CharsUnderlying_according_to_keycode_and_Shiftstate_GDK_dw(Gdk
     return (KMX_DWORD) *keyvals;
 }
 
-std::wstring KMX_get_CharsUnderlying_according_to_keycode_and_Shiftstate_GDK(GdkKeymap *keymap, guint keycode, ShiftState ss, int caps){
+std::wstring KMX_get_CharsUnderlying_according_to_keycode_and_Shiftstate_GDK_OLD(GdkKeymap *keymap, guint keycode, ShiftState ss, int caps){
 
   GdkModifierType consumed;
   GdkKeymapKey *maps;
@@ -690,7 +690,7 @@ std::wstring KMX_get_CharsUnderlying_according_to_keycode_and_Shiftstate_GDK(Gdk
     return  std::wstring(1, (int) *keyvals);
 }
 
-std::u16string KMX_get_CharsUnderlying_according_to_keycode_and_Shiftstate_GDK_16(GdkKeymap *keymap, guint keycode, ShiftState ss, int caps){
+std::u16string KMX_get_CharsUnderlying_according_to_keycode_and_Shiftstate_GDK_16_OLD(GdkKeymap *keymap, guint keycode, ShiftState ss, int caps){
 
   GdkModifierType consumed;
   GdkKeymapKey *maps;
@@ -819,7 +819,9 @@ KMX_DWORD test_S2 = (8+ USVirtualKeyToScanCode[ VK_US ]);
 KMX_DWORD KMX_get_KeyCodeUnderlying_From_KeycodeUS_GDK(GdkKeymap *keymap, v_dw_3D &All_Vector,KMX_DWORD KC_US, ShiftState ss, int caps) {
 
   KMX_DWORD Character;
-  std::wstring ws = KMX_get_CharsUnderlying_according_to_keycode_and_Shiftstate_GDK(keymap,  KC_US,  ss,  caps);
+  std::wstring ws = KMX_get_CharsUnderlying_according_to_keycode_and_Shiftstate_GDK_OLD(keymap,  KC_US,  ss,  caps);
+  //std::wstring ws = KMX_get_CharsUnderlying_according_to_keycode_and_Shiftstate_GDK(keymap,  KC_US,  ss,  caps);
+
   Character = *ws.c_str();
 
   //Find underlying SC of character
