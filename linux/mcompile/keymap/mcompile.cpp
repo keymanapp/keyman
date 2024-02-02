@@ -587,6 +587,7 @@ int createOneVectorFromBothKeyboards(v_dw_3D &All_Vector,GdkKeymap *keymap){
     return 1;
   }
 
+  // _S2 is it OK to have 65535 instead of 94, 96 and 180 as a value for deadkeys in Vector
   // add contents of other keyboard to All_Vector
   if( append_other_ToVector(All_Vector,keymap)) {
     wprintf(L"ERROR: can't append Other ToVector \n");
