@@ -50,7 +50,7 @@
 * fix(common): ldml: fix typo in kmc error message (#10484)
 * chore(developer): `--enable-source-maps` parameter for kmc wrapper (#10496)
 * fix(android/engine): Fix OSK widths (#10442)
-*  (#10508)
+* fix(web): banner suggestion resizing after device rotation (#10508)
 
 ## 17.0.251 alpha 2024-01-24
 
@@ -62,7 +62,7 @@
 * fix(web): osk responsiveness to held modifiers on legacy kbds (#10437)
 * fix(android/engine): Skip final globe key action (#10465)
 * feat(developer): marker normalization in .ts (#10443)
-*  (#10445)
+* fix(android): hardware keystrokes now include mnemonic processing (#10445)
 
 ## 17.0.249 alpha 2024-01-22
 
@@ -1220,7 +1220,7 @@
 
 ## 17.0.67 alpha 2023-03-14
 
-* (developer):Update copyright period in License.rtf (#8425)
+* chore(developer): Update copyright period in License.rtf (#8425)
 * chore(common): support shorthand for build.sh (#8415)
 * chore(common): build script performance improvements (#8416)
 * chore(common): TS updates to non-sync'd packages, feature-esmodule merge conflict prevention (#8429)
