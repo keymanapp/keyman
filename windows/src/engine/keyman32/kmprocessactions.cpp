@@ -23,29 +23,36 @@ static void processAlert(AITIP* app) {
   app->QueueAction(QIT_BELL, 0);
 }
 
-
 static BOOL
 processBack(AITIP* app, const unsigned int code_points_to_delete, const km_core_usv* delete_context) {
   if (app->IsLegacy()) {
+    SendDebugMessageFormat(0, sdmGlobal, 0, "processBack: Legacy app cptd [%d].", code_points_to_delete);
     for (unsigned int i = 0; i < code_points_to_delete; i++) {
       app->QueueAction(QIT_BACK, BK_DEFAULT);
     }
     return TRUE;
   }
   if (!app->IsLegacy()) {
-    while (*delete_context) {
-      if (Uni_IsSMP(*delete_context)) {
+    SendDebugMessageFormat(0, sdmGlobal, 0, "processBack: TSF app cptd [%d].", code_points_to_delete);
+    km_core_usv const* delete_context_ptr = delete_context;
+    while (*delete_context_ptr) {
+      delete_context_ptr++;
+    }
+    delete_context_ptr--;
+    for (; delete_context_ptr >= delete_context; delete_context_ptr--) {
+      if (Uni_IsSMP(*delete_context_ptr)) {
         app->QueueAction(QIT_BACK, BK_DEFAULT | BK_SURROGATE);
       }
       else {
         app->QueueAction(QIT_BACK, BK_DEFAULT);
       }
-      delete_context++;
     }
     return TRUE;
   }
   return FALSE;
 }
+
+
 
 static void
 processPersistOpt(km_core_actions const* actions, LPINTKEYBOARDINFO activeKeyboard
@@ -53,7 +60,7 @@ processPersistOpt(km_core_actions const* actions, LPINTKEYBOARDINFO activeKeyboa
   for (auto option = actions->persist_options; option->key; option++) {
     // Put the keyboard option into Windows Registry
     // log"Saving keyboard option to registry");
-    SendDebugMessageFormat(0, sdmGlobal, 0, "ProcessHook: Saving option to registry for keyboard [%s].", activeKeyboard->Name);
+    SendDebugMessageFormat(0, sdmGlobal, 0, "ProcessPersistOpt: Saving option to registry for keyboard [%s].", activeKeyboard->Name);
     size_t value_length = wcslen(reinterpret_cast<LPCWSTR>(option->value));
     LPWSTR value = new WCHAR[value_length + 1];
     wcscpy_s(value, value_length + 1, reinterpret_cast<LPCWSTR>(option->value));
@@ -101,24 +108,34 @@ BOOL ProcessActions(BOOL* emitKeyStroke)
 {
   PKEYMAN64THREADDATA _td = ThreadGlobals();
   if (!_td) return FALSE;
+  SendDebugMessageFormat(0, sdmGlobal, 0, "ProcessActions: Enter");
+
+  // TODO: #10583  Remove caching action_struct
+  if (!_td->core_actions) {
+    SendDebugMessageFormat(0, sdmGlobal, 0, "ProcessActions: core_actions not set");
+    _td->core_actions = km_core_state_get_actions(_td->lpActiveKeyboard->lpCoreKeyboardState);
+  }
 
   _td->CoreProcessEventRun = FALSE;
-  // Process the action items from the core. This actions will modify the windows context (AppContext).
-  // Therefore it is not required to copy the context from the core to the windows context.
-  km_core_actions const* actions = km_core_state_get_actions(_td->lpActiveKeyboard->lpCoreKeyboardState);
 
-  processBack(_td->app, actions->code_points_to_delete, actions->deleted_context);
-  processUnicodeChar(_td->app, actions->output);
-  if (actions->persist_options != NULL) {
-    processPersistOpt(actions, _td->lpActiveKeyboard);
+
+
+  processBack(_td->app, _td->core_actions->code_points_to_delete, _td->core_actions->deleted_context);
+  processUnicodeChar(_td->app, _td->core_actions->output);
+  if (_td->core_actions->persist_options != NULL) {
+    processPersistOpt(_td->core_actions, _td->lpActiveKeyboard);
   }
-  if (actions->do_alert) {
+  if (_td->core_actions->do_alert) {
     processAlert(_td->app);
   }
-  if (actions->emit_keystroke) {
+  if (_td->core_actions->emit_keystroke) {
     *emitKeyStroke = TRUE;
   }
-  processCapsLock(actions->new_caps_lock_state, !_td->state.isDown, _td->TIPFUpdateable, FALSE);
+  processCapsLock(_td->core_actions->new_caps_lock_state, !_td->state.isDown, _td->TIPFUpdateable, FALSE);
+  // TODO: #10583 remove dispose
+  km_core_actions_dispose(_td->core_actions);
+  _td->core_actions = nullptr;
+
   return TRUE;
 }
 
@@ -128,15 +145,21 @@ ProcessActionsNonUpdatableParse(BOOL* emitKeyStroke) {
   if (!_td) {
     return FALSE;
   }
-
+  SendDebugMessageFormat(0, sdmGlobal, 0, "ProcessActionsNonUpdatableParse: Enter");
   if (_td->TIPFUpdateable) {  // ensure only run when not updateable
     return FALSE;
   }
   _td->CoreProcessEventRun = TRUE;
+  // TODO: #10583 remove dispose
+  if (_td->core_actions) {
+    km_core_actions_dispose(_td->core_actions);
+    _td->core_actions = nullptr;
+  }
 
-  km_core_actions const* acts    = km_core_state_get_actions(_td->lpActiveKeyboard->lpCoreKeyboardState);
-  processCapsLock(acts->new_caps_lock_state, !_td->state.isDown, _td->TIPFUpdateable, FALSE);
-  if (acts->emit_keystroke) {
+  _td->core_actions   = km_core_state_get_actions(_td->lpActiveKeyboard->lpCoreKeyboardState);
+  SendDebugMessageFormat(0, sdmGlobal, 0, "ProcessActionsNonUpdatableParse: km_core_state_get_actions");
+  processCapsLock(_td->core_actions->new_caps_lock_state, !_td->state.isDown, _td->TIPFUpdateable, FALSE);
+  if (_td->core_actions->emit_keystroke) {
     *emitKeyStroke = TRUE;
     SendDebugMessageFormat(0, sdmGlobal, 0, "ProcessActionsNonUpdatableParse EMIT_KEYSTROKE");
     _td->CoreProcessEventRun  = FALSE;  // If we emit the key stroke on this parse we don't need the second parse
@@ -150,7 +173,11 @@ ProcessActionsExternalEvent() {
   if (!_td) {
     return FALSE;
   }
-  km_core_actions const* acts = km_core_state_get_actions(_td->lpActiveKeyboard->lpCoreKeyboardState);
-  processCapsLock(acts->new_caps_lock_state, !_td->state.isDown, FALSE, TRUE);
+  if (!_td->core_actions) {   // when ideponent we will not need this
+    return FALSE;
+  }
+  // TODO: #10583 remove and call get actions here directly
+  //km_core_actions const* acts = km_core_state_get_actions(_td->lpActiveKeyboard->lpCoreKeyboardState);
+  processCapsLock(_td->core_actions->new_caps_lock_state, !_td->state.isDown, FALSE, TRUE);
   return TRUE;
 }
