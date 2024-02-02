@@ -23,26 +23,6 @@ static void processAlert(AITIP* app) {
   app->QueueAction(QIT_BELL, 0);
 }
 
-// TODO: #10583
-// Remove extra debuging code
-static void
-processDebugDeleteContext(const km_core_usv* delete_context) {
-  km_core_usv const* delete_context_ptr = delete_context;
-  while (*delete_context_ptr) {
-    delete_context_ptr++;
-  }
-  delete_context_ptr--;
-  for (; delete_context_ptr >= delete_context; delete_context_ptr--) {
-    if (Uni_IsSMP(*delete_context_ptr)) {
-
-      SendDebugMessageFormat(0, sdmGlobal, 0, "processDebugContext: s1 U+%04x", Uni_UTF32ToSurrogate1(*delete_context_ptr));
-      SendDebugMessageFormat(0, sdmGlobal, 0, "processDebugContext: s2 U+%04x", Uni_UTF32ToSurrogate2(*delete_context_ptr));
-    } else {
-      SendDebugMessageFormat(0, sdmGlobal, 0, "processDebugContext: U+%04x", *delete_context_ptr);
-    }
-  }
-
-}
 static BOOL
 processBack(AITIP* app, const unsigned int code_points_to_delete, const km_core_usv* delete_context) {
   if (app->IsLegacy()) {
@@ -72,48 +52,7 @@ processBack(AITIP* app, const unsigned int code_points_to_delete, const km_core_
   return FALSE;
 }
 
-// TODO remove reading the applications context
-static BOOL
-processBack2(AITIP* app, const unsigned int code_points_to_delete) {
-  if (app->IsLegacy()) {
-    SendDebugMessageFormat(0, sdmGlobal, 0, "processBack2: Legacy app cptd [%d].", code_points_to_delete);
-    for (unsigned int i = 0; i < code_points_to_delete; i++) {
-      //app->QueueAction(QIT_BACK, BK_DEFAULT);
-    }
-    return TRUE;
-  }
 
-  if (!app->IsLegacy()) {
-    SendDebugMessageFormat(0, sdmGlobal, 0, "processBack2: TSF app cptd [%d].", code_points_to_delete);
-    WCHAR application_context[MAXCONTEXT];
-    DWORD cp_to_delete = code_points_to_delete;
-    if (!app->ReadContext(application_context)) {
-      SendDebugMessageFormat(0, sdmGlobal, 0, "processBack2: Error reading context from application.");
-    } else {
-      // Find the length of the string
-      int length = 0;
-      while (application_context[length] != L'\0') {
-        length++;
-      }
-      // Read each character starting from caret
-      for (int i = length - 1; i >= 0 && cp_to_delete > 0; i--) {
-        // Need to consider malformed context where only one surrogate is present, at either the start or end of the context.
-        // In both these scenarios just perform one backspace one the same as if it was a non surrogate pair.
-        if ((i > 0) && (Uni_IsSurrogate1(application_context[i - 1]) && Uni_IsSurrogate2(application_context[i]))) {
-          //app->QueueAction(QIT_BACK, BK_DEFAULT | BK_SURROGATE);
-          i--;
-          cp_to_delete--;
-        } else {
-          //app->QueueAction(QIT_BACK, BK_DEFAULT);
-          cp_to_delete--;
-        }
-      }
-    }
-    return TRUE;
-  }
-
-  return FALSE;
-}
 
 static void
 processPersistOpt(km_core_actions const* actions, LPINTKEYBOARDINFO activeKeyboard
@@ -181,11 +120,7 @@ BOOL ProcessActions(BOOL* emitKeyStroke)
 
 
 
-  // Process the action items from the core. This actions will modify the windows context (AppContext).
-  // Therefore it is not required to copy the context from the core to the windows context.
-  processDebugDeleteContext(_td->core_actions->deleted_context);
   processBack(_td->app, _td->core_actions->code_points_to_delete, _td->core_actions->deleted_context);
-  processBack2(_td->app, _td->core_actions->code_points_to_delete);
   processUnicodeChar(_td->app, _td->core_actions->output);
   if (_td->core_actions->persist_options != NULL) {
     processPersistOpt(_td->core_actions, _td->lpActiveKeyboard);
