@@ -1,6 +1,6 @@
 import 'mocha';
 import {assert} from 'chai';
-import {unescapeString, UnescapeError, isOneChar, toOneChar, unescapeOneQuadString, BadStringAnalyzer, isValidUnicode, describeCodepoint, isPUA, BadStringType, unescapeStringToRegex, unescapeQuadString} from '../../src/util/util.js';
+import {unescapeString, UnescapeError, isOneChar, toOneChar, unescapeOneQuadString, BadStringAnalyzer, isValidUnicode, describeCodepoint, isPUA, BadStringType, unescapeStringToRegex, unescapeQuadString, NFDAnalyzer} from '../../src/util/util.js';
 
 describe('test UTF32 functions()', function() {
   it('should properly categorize strings', () => {
@@ -207,9 +207,8 @@ describe('test BadStringAnalyzer', () => {
       });
     }
   });
-  describe('should return nothing for all valid strings', () => {
-    it('should handle a case with some odd strs in it', () => {
-      const strs = "But you can call me “\uE010\uFDD0\uFFFE\uD800”, for short." +
+  it('should handle a case with some odd strs in it', () => {
+    const strs = "But you can call me “\uE010\uFDD0\uFFFE\uD800”, for short." +
       ([
         0xF800,
         0x05FFFF,
@@ -217,21 +216,62 @@ describe('test BadStringAnalyzer', () => {
         0x04FFFE,
       ].map(ch => String.fromCodePoint(ch)).join(''));
 
-      const bsa = new BadStringAnalyzer();
-      for (const s of strs) {
-        bsa.add(s);
-      }
-      const m = bsa.analyze();
-      assert.isNotNull(m);
-      assert.containsAllKeys(m, [BadStringType.pua, BadStringType.illegal]);
-      assert.sameDeepMembers(Array.from(m.get(BadStringType.pua).values()), [
-        0xE010,0xF800, 0x102222,
-      ], `pua analysis`);
-      assert.sameDeepMembers(Array.from(m.get(BadStringType.illegal).values()), [
-        0xFDD0,0xD800,0xFFFE,
-        0x05FFFF,
-        0x04FFFE,
-      ], `illegal analysis`);
-    });
+    const bsa = new BadStringAnalyzer();
+    for (const s of strs) {
+      bsa.add(s);
+    }
+    const m = bsa.analyze();
+    assert.isNotNull(m);
+    assert.containsAllKeys(m, [BadStringType.pua, BadStringType.illegal]);
+    assert.sameDeepMembers(Array.from(m.get(BadStringType.pua).values()), [
+      0xE010, 0xF800, 0x102222,
+    ], `pua analysis`);
+    assert.sameDeepMembers(Array.from(m.get(BadStringType.illegal).values()), [
+      0xFDD0, 0xD800, 0xFFFE,
+      0x05FFFF,
+      0x04FFFE,
+    ], `illegal analysis`);
+  });
+});
+
+describe('test NFDAnalyzer', () => {
+  describe('should return nothing for NFD strings', () => {
+    const cases = [
+      [],
+      ['a',],
+      ['a', 'b',]
+    ];
+    for (const strs of cases) {
+      const title = titleize(strs);
+      it(`should analyze ${title}`, () => {
+        const bsa = new NFDAnalyzer();
+        for (const s of strs) {
+          bsa.add(s);
+        }
+        const m = bsa.analyze();
+        assert.isNull(m, `${title}`);
+      });
+    }
+  });
+  it('should handle a case with some odd strs in it', () => {
+    const strs = "This text is in NFD, but not all of it is." +
+      ([
+        0x00E8,
+        0x0344,
+        0x2FA1D,
+      ].map(ch => String.fromCodePoint(ch)).join(''));
+
+    const bsa = new NFDAnalyzer();
+    for (const s of strs) {
+      bsa.add(s);
+    }
+    const m = bsa.analyze();
+    assert.isNotNull(m);
+    assert.containsAllKeys(m, [BadStringType.denormalized]);
+    assert.sameDeepMembers(Array.from(m.get(BadStringType.denormalized).values()), [
+      0x00E8,
+      0x0344,
+      0x1FA1D,
+  ], `denorm analysis`);
   });
 });
