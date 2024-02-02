@@ -245,6 +245,24 @@ describe('tran', function () {
         assert.strictEqual(transforms[0].to.value, "x");
       }
     },
+    {
+      subpath: 'sections/tran/tran-warn-range.xml',
+      warnings: [
+        CompilerMessages.Warn_CharClassExplicitDenorm({lowestCh: 0}),
+      ],
+    },
+    {
+      subpath: 'sections/tran/tran-hint-range.xml',
+      warnings: [
+        CompilerMessages.Hint_CharClassImplicitDenorm({lowestCh: 0}),
+      ],
+    },
+    {
+      subpath: 'sections/tran/tran-hint-range2.xml',
+      warnings: [
+        CompilerMessages.Hint_CharClassImplicitDenorm({lowestCh: 0}),
+      ],
+    },
   ], tranDependencies);
 });
 
