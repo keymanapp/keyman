@@ -1,5 +1,12 @@
 # Keyman Version History
 
+## 17.0.260 alpha 2024-02-03
+
+* chore(oem/fv): Update versions in keyboards.csv (#10606)
+* fix(linux): Fix path to artifacts when uploading to llso (#10609)
+* docs(linux): Update sample settings (#10610)
+* chore(linux): Fix API check if lines got removed in .symbols file (#10612)
+
 ## 17.0.259 alpha 2024-02-02
 
 * feat(developer):  double markers once again (#10541)
