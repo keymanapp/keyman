@@ -40,6 +40,7 @@ void actions::push_capslock(bool turnOn) {
 state::state(km::core::abstract_processor & ap, km_core_option_item const *env)
   : _processor(ap)
 {
+  _app_ctxt.has_markers = false;
   for (; env && env->key != nullptr; env++) {
     //assert(env->scope == KM_CORE_OPT_ENVIRONMENT); // todo do we need scope? or can we find a way to eliminate it?
     ap.update_option(env->scope
