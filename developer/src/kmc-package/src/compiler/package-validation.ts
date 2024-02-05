@@ -1,5 +1,5 @@
 import { KmpJsonFile, CompilerCallbacks, CompilerOptions, KeymanFileTypes } from '@keymanapp/common-types';
-import { CompilerMessages } from './messages.js';
+import { CompilerMessages } from './package-compiler-messages.js';
 import { keymanEngineForWindowsFiles, keymanForWindowsInstallerFiles, keymanForWindowsRedistFiles } from './redist-files.js';
 
 // The keyboard ID SHOULD adhere to this pattern:

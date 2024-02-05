@@ -16,11 +16,18 @@ export class TestCompilerCallbacks implements CompilerCallbacks {
   }
 
   printMessages() {
-    process.stdout.write(CompilerError.formatEvent(this.messages));
+    if(this.messages.length) {
+      process.stdout.write(CompilerError.formatEvent(this.messages));
+    }
   }
 
   hasMessage(code: number): boolean {
     return this.messages.find((item) => item.code == code) === undefined ? false : true;
+  }
+
+  /** true of at least one error */
+  hasError(): boolean {
+    return CompilerError.hasError(this.messages);
   }
 
   /* CompilerCallbacks */

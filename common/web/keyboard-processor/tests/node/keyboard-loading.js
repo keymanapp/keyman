@@ -11,6 +11,7 @@ describe('Headless keyboard loading', function() {
   const laoPath = require.resolve('@keymanapp/common-test-resources/keyboards/lao_2008_basic.js');
   const khmerPath = require.resolve('@keymanapp/common-test-resources/keyboards/khmer_angkor.js');
   const nonKeyboardPath = require.resolve('@keymanapp/common-test-resources/index.mjs');
+  const ipaPath = require.resolve('@keymanapp/common-test-resources/keyboards/sil_ipa.js');
   // Common test suite setup.
 
   let device = {
@@ -37,6 +38,17 @@ describe('Headless keyboard loading', function() {
       assert.equal(keyboard.id, "Keyboard_lao_2008_basic");
     });
 
+    it('successfully loads (has variable stores)', async () => {
+      // -- START: Standard Recorder-based unit test loading boilerplate --
+      let harness = new KeyboardInterface({}, MinimalKeymanGlobal);
+      let keyboardLoader = new NodeKeyboardLoader(harness);
+      let keyboard = await keyboardLoader.loadKeyboardFromPath(ipaPath);
+      // --  END:  Standard Recorder-based unit test loading boilerplate --
+
+      // This part provides extra assurance that the keyboard properly loaded.
+      assert.equal(keyboard.id, "Keyboard_sil_ipa");
+    });
+
     it('cannot evaluate rules', async function() {
       // -- START: Standard Recorder-based unit test loading boilerplate --
       let harness = new KeyboardHarness({}, MinimalKeymanGlobal);
@@ -57,6 +69,26 @@ describe('Headless keyboard loading', function() {
         // 'sandboxed' keyboard loading in the DOM!)
         assert.equal(err.message, 'k.KKM is not a function');
       }
+    });
+
+    it('accurately determines supported gesture types', async () => {
+      // -- START: Standard Recorder-based unit test loading boilerplate --
+      let harness = new KeyboardHarness({}, MinimalKeymanGlobal);
+      let keyboardLoader = new NodeKeyboardLoader(harness);
+      let km_keyboard = await keyboardLoader.loadKeyboardFromPath(khmerPath);
+      // --  END:  Standard Recorder-based unit test loading boilerplate --
+
+      // `khmer_angkor` - supports longpresses, but not flicks or multitaps.
+
+      const desktopLayout = km_keyboard.layout('desktop');
+      assert.isFalse(desktopLayout.hasFlicks);
+      assert.isFalse(desktopLayout.hasLongpresses);
+      assert.isFalse(desktopLayout.hasMultitaps);
+
+      const mobileLayout = km_keyboard.layout('phone');
+      assert.isFalse(mobileLayout.hasFlicks);
+      assert.isTrue(mobileLayout.hasLongpresses);
+      assert.isFalse(mobileLayout.hasMultitaps);
     });
   });
 

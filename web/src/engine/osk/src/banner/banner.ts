@@ -1,10 +1,23 @@
 import { Keyboard, KeyboardProperties } from '@keymanapp/keyboard-processor';
+import { type PredictionContext } from '@keymanapp/input-processor';
+
+import {
+  GestureRecognizer,
+  GestureRecognizerConfiguration,
+  GestureSource,
+  InputSample,
+  PaddedZoneSource
+} from '@keymanapp/gesture-recognizer';
+
+import { BANNER_GESTURE_SET } from './bannerGestureSet.js';
+
 import { createUnselectableElement } from 'keyman/engine/dom-utils';
 
 // Base class for a banner above the keyboard in the OSK
 
 export abstract class Banner {
   private _height: number; // pixels
+  private _width: number; // pixels
   private div: HTMLDivElement;
 
   public static DEFAULT_HEIGHT: number = 37; // pixels; embedded apps can modify
@@ -35,12 +48,21 @@ export abstract class Banner {
     this.update();
   }
 
+  public get width(): number {
+    return this._width;
+  }
+
+  public set width(width: number) {
+    this._width = width;
+    this.update();
+  }
+
   /**
    * Function      update
    * @return       {boolean}   true if the banner styling changed
    * Description   Update the height and display styling of the banner
    */
-  private update() : boolean {
+  protected update() : boolean {
     let ds = this.div.style;
     let currentHeightStyle = ds.height;
     let currentDisplayStyle = ds.display;
@@ -76,7 +98,7 @@ export abstract class Banner {
    * Function     getDiv
    * Scope        Public
    * @returns     {HTMLElement} Base element of the banner
-   * Description  Returns the HTMLElelemnt of the banner
+   * Description  Returns the HTMLElement of the banner
    */
   public getDiv(): HTMLElement {
     return this.div;
@@ -89,6 +111,8 @@ export abstract class Banner {
    * @param keyboardProperties
    */
   public configureForKeyboard(keyboard: Keyboard, keyboardProperties: KeyboardProperties) { }
+
+  public readonly refreshLayout?: () => void;
 
   abstract get type();
 }

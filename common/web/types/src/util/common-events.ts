@@ -21,12 +21,12 @@ export class CommonTypesMessages {
 
   static Error_ImportInvalidPath = (o: { base: string, path: string, subtag: string }) =>
     m(this.ERROR_ImportInvalidPath,
-      `Import element with invalid path ${o.path}: expected the form '${constants.cldr_version_latest}./*.xml`);
+      `Import element with invalid path ${o.path}: expected the form '${constants.cldr_version_latest}/*.xml`);
   static ERROR_ImportInvalidPath = SevError | 0x0003;
 
   static Error_ImportReadFail = (o: { base: string, path: string, subtag: string }) =>
     m(this.ERROR_ImportReadFail,
-      `Import could not read data with path ${o.path}: expected the form '${constants.cldr_version_latest}./*.xml'`);
+      `Import could not read data with path ${o.path}: expected the form '${constants.cldr_version_latest}/*.xml'`);
   static ERROR_ImportReadFail = SevError | 0x0004;
 
   static Error_ImportWrongRoot = (o: { base: string, path: string, subtag: string }) =>

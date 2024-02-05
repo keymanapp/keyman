@@ -8,6 +8,7 @@
 
 import AudioToolbox
 import UIKit
+import os.log
 
 public enum GlobeKeyTapBehaviour {
   case switchToNextKeyboard
@@ -367,7 +368,7 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
           // This should allow us to debug any failures of this assumption.
           // So far, only occurs when debugging a breakpoint during a touch event on BKSP,
           // so all seems good.
-          log.verbose("Failed to swallow a recent textDidChange call!")
+          os_log("Failed to swallow a recent textDidChange call!", log: KeymanEngineLogger.ui, type: .default)
         }
         self.swallowBackspaceTextChange = true
         break
@@ -538,7 +539,9 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
   func clearText() {
     setContextState(text: nil, range: NSRange(location: 0, length: 0))
     keymanWeb.resetContext()
-    SentryManager.breadcrumbAndLog("Cleared text.")
+    let message = "Cleared text."
+    os_log("%{public}s", log: KeymanEngineLogger.ui, type: .info, message)
+    SentryManager.breadcrumb(message)
   }
   
   func resetContext() {

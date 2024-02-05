@@ -2963,6 +2963,7 @@ begin
     kbdparser.AddRequiredLines;
     kbdparser.SetSystemStoreValue(ssTargets, 'windows native');
     kbdparser.SetSystemStoreValue(ssVersion, SKeymanVersion90);
+    kbdparser.DeleteSystemStore(ssVisualKeyboard);
     kbdparser.DeleteSystemStore(ssBitmap);
 
     FIncludeCodes := kbdparser.GetSystemStoreValue(ssIncludeCodes);   // I4979

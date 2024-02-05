@@ -36,10 +36,10 @@ const NSString* kEasterEggKmxName = @"EnglishSpanish.kmx";
         self.debugMode = enableDebugLogging;
         _kmx = kmx;
         _coreHelper = [[CoreHelper alloc] initWithDebugMode:enableDebugLogging];
-      
+
       if (kmx) {
         [self loadCoreWrapperFromKmxFile:self.kmx.filePath];
-        [self.coreWrapper setContext:contextString];
+        [self.coreWrapper setContextIfNeeded:contextString];
       }
     }
 
@@ -71,7 +71,7 @@ const NSString* kEasterEggKmxName = @"EnglishSpanish.kmx";
     if (self.coreHelper) {
         self.coreHelper.debugMode = useVerboseLogging;
     }
-  
+
     if (useVerboseLogging) {
         NSLog(@"KMEngine - Turning verbose logging on");
         // In Keyman Engine if "debugMode" is turned on (explicitly) with "English plus Spanish" as the current keyboard and you type "Sentrycrash#KME",
@@ -89,8 +89,8 @@ const NSString* kEasterEggKmxName = @"EnglishSpanish.kmx";
         NSLog(@"KMEngine - Turning verbose logging off");
 }
 
-- (NSString *)getCoreContext {
-  return self.coreWrapper.context;
+- (NSString *)getCoreContextDebug {
+  return self.coreWrapper.contextDebug;
 }
 
 - (void)clearCoreContext {
@@ -101,29 +101,19 @@ const NSString* kEasterEggKmxName = @"EnglishSpanish.kmx";
   [self.coreWrapper setContextIfNeeded:context];
 }
 
-- (void)setCoreContext:(NSString *)context {
-  [self.coreWrapper setContext:context];
-}
-
 - (void)setCoreOptions:(NSString *)key withValue:(NSString *)value {
   BOOL success = [self.coreWrapper setOptionsForCore:key value:value];
   [self.coreHelper logDebugMessage:@"setCoreOptions for key: %@, value: %@ succeeded = %@", key, value, success ? @"YES" : @"NO"];
 }
 
 /*
- * Returns an NSArray of CoreAction objects. Returns nil if no actions result.
+ * Returns a CoreKeyOutput object detailing the results of the keystroke
  */
-- (NSArray *)processEvent:(NSEvent *)event {
+- (CoreKeyOutput *)processEvent:(NSEvent *)event {
   if (!self.kmx)
       return nil;
 
-  // CoreWrapper returns an array of CoreAction objects
-  NSArray *coreActions = [self.coreWrapper processEvent:event];
-  if ([coreActions count] == 0) {
-    return nil;
-  } else {
-    return coreActions;
-  }
+  return [self.coreWrapper processEvent:event];
 }
 
 - (void) processPossibleEasterEggCharacterFrom:(NSString *)characters {

@@ -9,6 +9,7 @@
 import Foundation
 import XCTest
 import ZIPFoundation
+import os.log
 
 @testable import KeymanEngine
 
@@ -41,13 +42,16 @@ extension TestUtils {
 
         try FileManager.default.createDirectory(at: bundleConstructionURL.appendingPathComponent("Library"), withIntermediateDirectories: true, attributes: nil)
 
-        log.info("Documents directory source: \(documentsDirectory)")
+        let messageOne = "Documents directory source: \(documentsDirectory)"
+        os_log("%{public}s", log:KeymanEngineLogger.resources, type: .info, messageOne)
         try FileManager.default.copyItem(at: documentsDirectory, to: bundleConstructionURL.appendingPathComponent("Documents"))
 
-        log.info("Library source: \(storageDirectory)")
+        let messageTwo = "Library source: \(storageDirectory)"
+        os_log("%{public}s", log:KeymanEngineLogger.resources, type: .info, messageTwo)
         try FileManager.default.copyItem(at: storageDirectory, to: bundleConstructionURL.appendingPathComponent("Library").appendingPathComponent("keyman"))
 
-        log.info("Preferences directory source: \(preferencesDirectory)")
+        let messageThree = "Preferences directory source: \(preferencesDirectory)"
+        os_log("%{public}s", log:KeymanEngineLogger.resources, type: .info, messageThree)
         let pListPath = bundleConstructionURL.appendingPathComponent("Library").appendingPathComponent("Preferences")
 
         let testEngineFilename = "com.keyman.testing.KeymanEngineTestHost.plist"
@@ -68,7 +72,8 @@ extension TestUtils {
       let archiveURL = bundleConstructionURL.appendingPathComponent("bundleArchive.zip")
       do {
         _ = try Archive(url: archiveURL, accessMode: .create)
-        log.info("archiveURL: \(archiveURL)")
+        let message = "archiveURL: \(archiveURL)"
+        os_log("%{public}s", log:KeymanEngineLogger.resources, type: .info, message)
         let attachment = XCTAttachment(contentsOfFile: archiveURL)
         attachment.lifetime = .keepAlways
         return attachment

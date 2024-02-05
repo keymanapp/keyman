@@ -6,12 +6,15 @@
 import { Command, Option } from 'commander';
 import { declareBuild } from './commands/build.js';
 import { declareAnalyze } from './commands/analyze.js';
-import { KeymanSentry } from '@keymanapp/developer-utils';
+import { KeymanSentry, loadOptions } from '@keymanapp/developer-utils';
 import KEYMAN_VERSION from "@keymanapp/keyman-version";
 import { TestKeymanSentry } from './util/TestKeymanSentry.js';
+import { exitProcess } from './util/sysexits.js';
 
 await TestKeymanSentry.runTestIfCLRequested();
-KeymanSentry.init();
+if(KeymanSentry.isEnabled()) {
+  KeymanSentry.init();
+}
 try {
   await run();
 } catch(e) {
@@ -20,9 +23,11 @@ try {
 
 // Ensure any messages reported to Sentry have had time to be uploaded before we
 // exit. In most cases, this will be a no-op so should not affect performance.
-await KeymanSentry.close();
+await exitProcess(0);
 
 async function run() {
+  await loadOptions();
+
   /* Arguments */
 
   const program = new Command();
@@ -39,10 +44,6 @@ async function run() {
     // in launch
     .addOption(new Option('--no-error-reporting', 'Disable error reporting to keyman.com (overriding user settings)'))
     .addOption(new Option('--error-reporting', 'Enable error reporting to keyman.com (overriding user settings)'));
-
-  if(await KeymanSentry.isEnabled()) {
-    KeymanSentry.init();
-  }
 
   declareBuild(program);
   declareAnalyze(program);

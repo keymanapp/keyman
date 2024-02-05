@@ -25,7 +25,7 @@ uses
 const
   LOGGER_DESKTOP_KMCONFIG = TKeymanSentryClient.LOGGER_DESKTOP + '.kmconfig';
 begin
-  TKeymanSentryClient.Start(TSentryClientConsole, kscpDesktop, LOGGER_DESKTOP_KMCONFIG);
+  TKeymanSentryClient.Start(TSentryClientConsole, kscpDesktop, LOGGER_DESKTOP_KMCONFIG, LoadKeymanDesktopSentryFlags);
   try
     try
       TKeymanSentryClient.Validate;

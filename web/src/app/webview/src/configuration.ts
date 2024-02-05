@@ -1,16 +1,46 @@
 import { isEmptyTransform, RuleBehavior } from "@keymanapp/keyboard-processor";
 import { EngineConfiguration, InitOptionSpec, InitOptionDefaults } from "keyman/engine/main";
 
+import { buildMergedTransform } from '@keymanapp/models-templates';
+
 import { type OnInsertTextFunc } from "./contextManager.js";
 
 export class WebviewConfiguration extends EngineConfiguration {
   private _embeddingApp: string;
   private _oninserttext: OnInsertTextFunc;
+  private _hostInsert: OnInsertTextFunc;
+
+  private pendingInserts: Transform[] = [];
 
   initialize(options: Required<WebviewInitOptionSpec>) {
     super.initialize(options);
     this._embeddingApp = options.embeddingApp;
-    this._oninserttext = options.oninserttext;
+    this._oninserttext = (dl, text, dr) => {
+      this.pendingInserts.push({
+        deleteLeft: dl,
+        insert: text,
+        deleteRight: dr
+      });
+
+      Promise.resolve().then((this.pushInserts));
+    }
+
+    this._hostInsert = options.oninserttext;
+  }
+
+  private readonly pushInserts = () => {
+    const finalTransform = this.pendingInserts.reduce((concatenated, current) => {
+      return buildMergedTransform(concatenated, current);
+    }, {
+      insert: '',
+      deleteLeft: 0
+    });
+
+    this.pendingInserts.splice(0);
+
+    if(this._hostInsert) {
+      this._hostInsert(finalTransform.deleteLeft, finalTransform.insert, finalTransform.deleteRight);
+    }
   }
 
   get embeddingApp() {

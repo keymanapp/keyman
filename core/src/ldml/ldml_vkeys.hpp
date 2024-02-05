@@ -13,7 +13,7 @@
 #include <utility>
 #include <vector>
 
-#include <keyman/keyman_core_api.h>
+#include "keyman_core.h"
 
 namespace km {
 namespace core {
@@ -29,7 +29,6 @@ typedef std::pair<km_core_virtual_key, uint16_t> vkey_id;
  */
 class vkeys {
 private:
-  // TODO-LDML: store transform=no state
   std::map<vkey_id, std::u16string> vkey_to_string;
 
 public:
@@ -42,16 +41,18 @@ public:
 
   /**
    * Lookup a vkey, returns an empty string if not found
+   * @param found on exit: true if found
    */
   std::u16string
-  lookup(km_core_virtual_key vk, uint16_t modifier_state) const;
+  lookup(km_core_virtual_key vk, uint16_t modifier_state, bool &found) const;
 
 private:
   /**
    * Non-recursive internal lookup of a specific ID
-  */
+   * @param found on exit: true if found
+   */
   std::u16string
-  lookup(const vkey_id &id) const;
+  lookup(const vkey_id &id, bool &found) const;
 };
 
 }  // namespace ldml

@@ -50,6 +50,8 @@ export class SearchNode {
       this.currentTraversal = priorNode.currentTraversal;
       this.priorInput = priorNode.priorInput;
       this.toKey = priorNode.toKey;
+      // Do NOT copy over _inputCost; this is a helper-constructor for methods
+      // building new nodes... which will have a different cost.
     } else {
       this.calculation = new ClassicalDistanceCalculation();
       this.currentTraversal = rootTraversal;
@@ -141,7 +143,7 @@ export class SearchNode {
 
       // TODO:  transform.deleteRight currently not supported.
 
-      let inputPath = Array.from(this.priorInput);
+      let inputPath = this.priorInput.slice(0);
       inputPath.push(probMass);
       // Tokenize and iterate over input chars, adding them into the calc.
       for(let i=0; i < transform.insert.length; i++) {
@@ -221,9 +223,18 @@ class SearchSpaceTier {
   processed: SearchNode[] = [];
   index: number;
 
-  constructor(index: number, initialEdges?: SearchNode[]) {
-    this.index = index;
-    this.correctionQueue = new PriorityQueue<SearchNode>(QUEUE_NODE_COMPARATOR, initialEdges);
+  constructor(instance: SearchSpaceTier);
+  constructor(index: number, initialEdges?: SearchNode[]);
+  constructor(arg1: number | SearchSpaceTier, initialEdges?: SearchNode[]) {
+    if(typeof arg1 == 'number') {
+      this.index = arg1;
+      this.correctionQueue = new PriorityQueue<SearchNode>(QUEUE_NODE_COMPARATOR, initialEdges);
+      return;
+    } else {
+      this.index = arg1.index;
+      this.processed = [].concat(arg1.processed);
+      this.correctionQueue = new PriorityQueue(arg1.correctionQueue);
+    }
   }
 
   increaseMaxEditDistance() {
@@ -319,15 +330,42 @@ export class SearchSpace {
   // Signals that the edge has already been processed.
   private processedEdgeSet: {[mapKey: string]: boolean} = {};
 
-  constructor(model: LexicalModel) {
+  /**
+   * Clone constructor.  Deep-copies its internal queues, but not search nodes.
+   * @param instance
+   */
+  constructor(instance: SearchSpace);
+  /**
+   * Constructs a fresh SearchSpace instance for used in predictive-text correction
+   * and suggestion searches.
+   * @param model
+   */
+  constructor(model: LexicalModel);
+  constructor(arg1: SearchSpace|LexicalModel) {
+    // Constructs the priority-queue comparator-closure needed for determining which
+    // tier should be searched next.
+    this.buildQueueSpaceComparator();
+
+    if(arg1 instanceof SearchSpace) {
+      this.inputSequence = [].concat(arg1.inputSequence);
+      this.minInputCost = [].concat(arg1.minInputCost);
+      this.rootNode = arg1.rootNode;
+      this.completedPaths = [].concat(arg1.completedPaths);
+      this.returnedValues = {...arg1.returnedValues};
+      this.processedEdgeSet = {...arg1.processedEdgeSet};
+
+      this.tierOrdering   = arg1.tierOrdering.map((tier) => new SearchSpaceTier(tier));
+      this.selectionQueue = new PriorityQueue(this.QUEUE_SPACE_COMPARATOR, this.tierOrdering);
+      return;
+    }
+
+    const model = arg1;
     if(!model) {
       throw "The LexicalModel parameter must not be null / undefined.";
     } else if(!model.traverseFromRoot) {
       throw "The provided model does not implement the `traverseFromRoot` function, which is needed to support robust correction searching.";
     }
 
-    // Constructs the comparator needed for the following line.
-    this.buildQueueSpaceComparator();
     this.selectionQueue = new PriorityQueue<SearchSpaceTier>(this.QUEUE_SPACE_COMPARATOR);
     this.rootNode = new SearchNode(model.traverseFromRoot(), model.toKey ? model.toKey.bind(model) : null);
 
@@ -603,14 +641,15 @@ export class SearchSpace {
          * Ignore any zero-ms length intervals; they'd make the logic much
          * messier than necessary otherwise.
          */
-        if(delta) {
+        if(delta && delta > this.largestIntervals[0]) {
           // If the currently-observed interval is longer than the shortest of the 3
           // previously-observed longest intervals, replace it.
-          if(this.largestIntervals.length > 2 && delta > this.largestIntervals[0]) {
+          if(this.largestIntervals.length > 2) {
             this.largestIntervals[0] = delta;
           } else {
             this.largestIntervals.push(delta);
           }
+
           // Puts the list in ascending order.  Shortest of the list becomes the head,
           // longest one the tail.
           this.largestIntervals.sort();

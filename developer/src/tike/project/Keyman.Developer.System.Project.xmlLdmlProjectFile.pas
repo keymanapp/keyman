@@ -78,13 +78,21 @@ class function TxmlLdmlProjectFile.IsFileTypeSupported(const Filename: string): 
 var
   ss: TStringStream;
 begin
-  // Look for DTD in plain text as an adequate heuristic
-  ss := TStringStream.Create('', TEncoding.UTF8);
   try
-    ss.LoadFromFile(Filename);
-    Result := ss.DataString.IndexOf('ldmlKeyboard3.dtd') > 0;
-  finally
-    ss.Free;
+    // Look for DTD in plain text as an adequate heuristic
+    ss := TStringStream.Create('', TEncoding.UTF8);
+    try
+      ss.LoadFromFile(Filename);
+      Result := ss.DataString.IndexOf('<keyboard3') > 0;
+    finally
+      ss.Free;
+    end;
+  except
+    // If we can't read the file, e.g. it is missing, or is not in UTF-8, or
+    // is locked, etc., then we'll just say it's not an XML LDML keyboard
+    // file. Yes, this is a catch-all exception handler, but that should be
+    // permissible for this scenario
+    Exit(False);
   end;
 end;
 

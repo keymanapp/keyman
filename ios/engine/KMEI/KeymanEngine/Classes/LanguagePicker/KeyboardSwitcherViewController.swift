@@ -9,6 +9,7 @@
 // It replaces the original in every case but one.
 
 import UIKit
+import os.log
 
 private let toolbarButtonTag = 100
 
@@ -27,7 +28,7 @@ class KeyboardSwitcherViewController: UITableViewController, UIAlertViewDelegate
     //NEEDED?
     navigationItem.rightBarButtonItem = nil
     
-    log.info("didLoad: KeyboardSwitcherViewController")
+    os_log("didLoad: KeyboardSwitcherViewController", log: KeymanEngineLogger.ui, type: .info)
   }
 
   override func viewWillAppear(_ animated: Bool) {

@@ -27,6 +27,15 @@ export { defaultCompilerOptions, CompilerBaseOptions, CompilerCallbacks, Compile
          compilerExceptionToString, compilerErrorFormatCode,
          compilerLogLevelToSeverity, CompilerLogLevel, compilerEventFormat, ALL_COMPILER_LOG_LEVELS,
          ALL_COMPILER_LOG_FORMATS, CompilerLogFormat,
+         CompilerMessageOverride,
+         CompilerMessageOverrideMap,
+
+         KeymanCompilerArtifact,
+         KeymanCompilerArtifactOptional,
+         KeymanCompilerArtifacts,
+         KeymanCompilerResult,
+         KeymanCompiler
+
          } from './util/compiler-interfaces.js';
 export { CommonTypesMessages } from './util/common-events.js';
 

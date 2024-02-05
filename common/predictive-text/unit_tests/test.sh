@@ -93,7 +93,7 @@ fi
 #
 # We do not run BrowserStack tests on master, beta, or stable-x.y test
 # builds.
-if [[ $VERSION_ENVIRONMENT == test ]] && builder_has_action test :browser; then
+if [[ $VERSION_ENVIRONMENT == test ]] && builder_has_action test:browser; then
   if builder_pull_get_details; then
     if ! ([[ $builder_pull_title =~ \(web\) ]] || builder_pull_has_label test-browserstack); then
 

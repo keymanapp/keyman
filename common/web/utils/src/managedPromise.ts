@@ -2,42 +2,68 @@ type ResolveSignature<Type> = (value: Type | PromiseLike<Type>) => void;
 type RejectSignature = (reason?: any) => void;
 
 export default class ManagedPromise<Type> {
-  public resolve: ResolveSignature<Type>;
-  public reject: RejectSignature;
-
-  private _hasResolved: boolean = false;
-  private _hasRejected: boolean = false;
-
-  public get hasResolved(): boolean {
-    return this._hasResolved;
+  /**
+   * Calling this function will fulfill the Promise represented by this class.
+   */
+  public get resolve(): ResolveSignature<Type> {
+    return this._resolve;
   }
 
-  public get hasRejected(): boolean {
-    return this._hasRejected;
+  /**
+   * Calling this function will reject the Promise represented by this class.
+   */
+  public get reject(): RejectSignature {
+    return this._reject;
   }
 
-  public get hasFinalized(): boolean {
-    return this.hasResolved || this.hasRejected;
+  protected _resolve: ResolveSignature<Type>;
+  protected _reject: RejectSignature;
+
+  private _isFulfilled: boolean = false;
+  private _isRejected: boolean = false;
+
+  /**
+   * Indicates that the promise has been fulfilled; the underlying `resolve` function has
+   * already been called and "locked in".
+   */
+  public get isFulfilled(): boolean {
+    return this._isFulfilled;
+  }
+
+  /**
+   * Indicates that the promise has been rejected; the underlying `reject` function has
+   * already been called and "locked in".
+   */
+  public get isRejected(): boolean {
+    return this._isRejected;
+  }
+
+  /**
+   * Indicates that the promise itself has either been resolved or rejected.  It may not be fully
+   * settled if resolved or rejected with a "thenable" that has not yet fully resolved itself.
+   */
+  public get isResolved(): boolean {
+    return this.isFulfilled || this.isRejected;
   }
 
   private _promise: Promise<Type>;
 
   constructor();
-  constructor(executor: (resolve: ResolveSignature<Type>, reject: RejectSignature) => Type);
-  constructor(executor?: (resolve: ResolveSignature<Type>, reject: RejectSignature) => Type) {
+  constructor(executor: (resolve: ResolveSignature<Type>, reject: RejectSignature) => void);
+  constructor(executor?: (resolve: ResolveSignature<Type>, reject: RejectSignature) => void) {
     this._promise = new Promise<Type>((resolve, reject) => {
-      this.resolve = (value) => {
-        this._hasResolved = true;
+      this._resolve = (value) => {
+        this._isFulfilled = true;
         resolve(value);
       };
 
-      this.reject = (reason) => {
-        this._hasRejected = true;
+      this._reject = (reason) => {
+        this._isRejected = true;
         reject(reason);
       };
 
       if(executor) {
-        executor(this.resolve, this.reject);
+        executor(this._resolve, this._reject);
       }
     });
   }
@@ -49,7 +75,7 @@ export default class ManagedPromise<Type> {
     return this._promise.then(onfulfilled, onrejected);
   }
 
-  catch(onrejected?: (reason: any) => PromiseLike<never>): Promise<Type> {
+  catch<TResult1>(onrejected?: (reason: any) => TResult1 | PromiseLike<TResult1>): Promise<Type | TResult1> {
     return this._promise.catch(onrejected);
   }
 

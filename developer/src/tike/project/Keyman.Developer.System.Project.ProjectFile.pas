@@ -185,7 +185,6 @@ type
     procedure MRUChange(Sender: TObject);
     procedure UpdateFileParameters;
     function GetUserFileName: string;
-    function ResolveProjectPath(APath: string): string;
     procedure PopulateFolder(const path: string);
     function GetTargetFilename10(ATargetFile, ASourceFile,
       AVersion: string): string;
@@ -208,6 +207,9 @@ type
     function Render: WideString;
 
     function IsDefaultProject(Version: TProjectVersion): Boolean;
+
+    function ResolveProjectPath(APath: string): string;
+    function ResolveSourcePath: string;
 
     function Load: Boolean; virtual;   // I4694
     function Save: Boolean; virtual;   // I4694
@@ -922,6 +924,7 @@ begin
       //
 
       TProjectUrlRenderer.AddUrls(doc.documentElement);
+      TProjectUrlRenderer.AddProcessState(doc.documentElement);
 
       xsl := MSXMLDOMDocumentFactory.CreateDOMDocument;
       try
@@ -1230,6 +1233,13 @@ end;
 function TProject.ResolveProjectPath(APath: string): string;
 begin
   Result := IncludeTrailingPathDelimiter(ReplaceText(APath, '$PROJECTPATH', ExtractFileDir(ExpandFileName(FFileName))));
+end;
+
+function TProject.ResolveSourcePath: string;
+begin
+  if FOptions.Version = pv10
+    then Result := ExtractFilePath(FFileName)
+    else Result := ResolveProjectPath(FOptions.SourcePath);
 end;
 
 function TProject.GetTargetFilename10(ATargetFile, ASourceFile, AVersion: string): string;   // I4688

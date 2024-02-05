@@ -11,7 +11,7 @@
 #include <cassert>
 #include <vector>
 
-#include <keyman/keyman_core_api.h>
+#include "keyman_core.h"
 
 #include "context.hpp"
 #include "option.hpp"
@@ -123,6 +123,7 @@ class state
 {
 protected:
     core::context              _ctxt;
+    core::context              _app_ctxt;
     core::abstract_processor & _processor;
     core::actions              _actions;
     core::debug_items          _debug_items;
@@ -138,6 +139,9 @@ public:
     core::context       &  context() noexcept            { return _ctxt; }
     core::context const &  context() const noexcept      { return _ctxt; }
 
+    core::context       &  app_context() noexcept            { return _app_ctxt; }
+    core::context const &  app_context() const noexcept      { return _app_ctxt; }
+
     core::abstract_processor const & processor() const noexcept { return _processor; }
     core::abstract_processor &       processor() noexcept { return _processor; }
 
@@ -152,8 +156,18 @@ public:
     void imx_deregister_callback();
 
     void imx_callback(uint32_t imx_id);
-};
 
+    // This is intended to be used to take the actions given in the actions
+    // parameter, and load them into the _actions member of this class. Used by
+    // keyboard processors to set the output actions, and is a long-term
+    // replacement for the actions()::push_*() functions. Note that the
+    // km_core_actions struct does not include information about markers, which
+    // are maintained separately in the _ctxt member of this class, and the
+    // corresponding marker-backspace action items are never used here.
+    bool set_actions(
+      km_core_actions const &actions
+    );
+  };
 } // namespace core
 } // namespace km
 

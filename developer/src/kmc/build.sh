@@ -66,7 +66,8 @@ fi
 #-------------------------------------------------------------------------------------------------------------------
 
 if builder_start_action build; then
-  npm run build
+  tsc -b
+  cp "$KEYMAN_ROOT/resources/standards-data/ldml-keyboards/unicode-license.txt" ./build/unicode-license.txt
   builder_finish_action success build
 fi
 
@@ -75,7 +76,7 @@ fi
 if builder_start_action test; then
   eslint .
   tsc --build test/
-  readonly C8_THRESHOLD=35
+  readonly C8_THRESHOLD=48
   c8 --reporter=lcov --reporter=text --lines $C8_THRESHOLD --statements $C8_THRESHOLD --branches $C8_THRESHOLD --functions $C8_THRESHOLD mocha
   builder_echo warning "Coverage thresholds are currently $C8_THRESHOLD%, which is lower than ideal."
   builder_echo warning "Please increase threshold in build.sh as test coverage improves."
@@ -119,7 +120,6 @@ if builder_start_action bundle; then
     --org keyman \
     --project keyman-developer \
     --release "$VERSION_GIT_TAG"  \
-    --ext js --ext mjs --ext ts --ext map \
     build/ "${SOURCEMAP_PATHS[@]}"
 
   # Manually copy over kmcmplib module

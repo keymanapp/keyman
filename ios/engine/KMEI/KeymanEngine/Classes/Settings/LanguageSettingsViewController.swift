@@ -8,6 +8,7 @@
 
 import UIKit
 import Sentry
+import os.log
 
 private let toolbarButtonTag = 100
 
@@ -38,7 +39,8 @@ class LanguageSettingsViewController: UITableViewController {
     super.viewDidLoad()
     let titleFormat = NSLocalizedString("menu-langsettings-title", bundle: engineBundle, comment: "")
     title = String.localizedStringWithFormat(titleFormat, language.name)
-    log.info("viewDidLoad: LanguageSettingsViewController title: \(title ?? "<empty>")")
+    let message = "viewDidLoad: LanguageSettingsViewController title: \(title ?? "<empty>")"
+    os_log("%{public}s", log:KeymanEngineLogger.ui, type: .info, message)
 
     if Manager.shared.canAddNewKeyboards {
       let addButton = UIBarButtonItem(barButtonSystemItem: .add, target: self,
@@ -50,7 +52,7 @@ class LanguageSettingsViewController: UITableViewController {
   override func viewDidAppear(_ animated: Bool) {
     super.viewDidAppear(animated)
 
-    log.info("didAppear: LanguageSettingsViewController")
+    os_log("viewDidAppear: LanguageSettingsViewController", log:KeymanEngineLogger.ui, type: .info)
   }
   
   
@@ -309,7 +311,8 @@ class LanguageSettingsViewController: UITableViewController {
         case .error(let error):
           if let error = error {
             // Note: Errors may result from network issues.
-            log.error(String(describing: error))
+            let errorMessage = "\(String(describing: error))"
+            os_log("%{public}s", log:KeymanEngineLogger.ui, type: .error, errorMessage)
           }
         case .success(let package, let fullID):
           ResourceFileManager.shared.doInstallPrompt(for: package as! KeyboardKeymanPackage,
@@ -346,8 +349,10 @@ class LanguageSettingsViewController: UITableViewController {
 
     // If user defaults for keyboards list does not exist, do nothing.
     guard let globalUserKeyboards = userData.userKeyboards else {
-      SentryManager.captureAndLog("no keyboards in the global keyboards list!")
-      return nil
+      let message = "no keyboards in the global keyboards list!"
+      os_log("%{public}s", log:KeymanEngineLogger.resources, type: .error, message)
+      SentryManager.capture(message)
+    return nil
     }
 
     if let index = globalUserKeyboards.firstIndex(where: { $0.fullID == matchingFullID }) {
@@ -361,7 +366,8 @@ class LanguageSettingsViewController: UITableViewController {
       event.extra = ["id": matchingFullID]
       SentrySDK.capture(event: event)
 
-      log.error("this keyboard \(matchingFullID) not found among user's installed keyboards!")
+      let errorMessage = "this keyboard \(matchingFullID) not found among user's installed keyboards!"
+      os_log("%{public}s", log:KeymanEngineLogger.resources, type: .error, errorMessage)
       return nil
     }
   }
@@ -373,7 +379,9 @@ class LanguageSettingsViewController: UITableViewController {
 
     // If user defaults for keyboards list does not exist, do nothing.
     guard let globalUserKeyboards = userData.userKeyboards else {
-      SentryManager.captureAndLog("no keyboards in the global keyboards list!")
+      let message = "No keyboards in the global keyboards list!"
+      os_log("%{public}s", log: KeymanEngineLogger.settings, type: .error, message)
+      SentryManager.capture("no keyboards in the global keyboards list!")
       return
     }
 
@@ -392,7 +400,8 @@ class LanguageSettingsViewController: UITableViewController {
       event.extra = ["id": matchingFullID]
       SentrySDK.capture(event: event)
 
-      log.error("this keyboard \(matchingFullID) not found among user's installed keyboards!")
+      let errorMessage = "this keyboard \(matchingFullID) not found among user's installed keyboards!"
+      os_log("%{public}s", log:KeymanEngineLogger.resources, type: .error, errorMessage)
       return
     }
   }

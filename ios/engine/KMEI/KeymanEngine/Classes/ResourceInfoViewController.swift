@@ -9,6 +9,7 @@
 import Foundation
 import UIKit
 import WebKit
+import os.log
 
 class ResourceInfoViewController<Resource: LanguageResource>: UIViewController, UIAlertViewDelegate, UITableViewDelegate, UITableViewDataSource {
   // The data backing our UI text in the UITableView.
@@ -84,7 +85,8 @@ class ResourceInfoViewController<Resource: LanguageResource>: UIViewController, 
         if let qrImg = generateQRCode(from: resourceURL) {
           qrImageView.image = qrImg
         } else {
-          log.info("Unable to generate QR code for URL: \(resourceURL)")
+          let message = "Unable to generate QR code for URL: \(resourceURL)"
+          os_log("%{public}s", log:KeymanEngineLogger.resources, type: .info, message)
         }
       } else {
         // No resource-sharing link available.  Hide the text label!
@@ -117,7 +119,7 @@ class ResourceInfoViewController<Resource: LanguageResource>: UIViewController, 
   override func viewDidAppear(_ animated: Bool) {
     super.viewDidAppear(animated)
     navigationController?.setToolbarHidden(true, animated: true)
-    log.info("didAppear: ResourceInfoViewController")
+    os_log("didAppear: ResourceInfoViewController", log:KeymanEngineLogger.resources, type: .info)
 }
 
   func numberOfSections(in tableView: UITableView) -> Int {

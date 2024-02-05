@@ -42,10 +42,10 @@ describe('Engine - Chirality', function() {
     if(!proctor.compatibleWithSuite(testSuite)) {
       it.skip(set.toTestName() + " - Cannot run this test suite on Node.");
     } else if(set.constraint.target == 'hardware') {
-      it(set.toTestName(), function() {
+      it(set.toTestName(), async function() {
         // Refresh the proctor instance at runtime.
         let proctor = new NodeProctor(keyboardWithHarness, device, assert.equal);
-        set.test(proctor);
+        await set.test(proctor);
       });
     } else {
       it.skip(set.toTestName() + " - modifier state simulation for OSK not yet supported in headless KeyboardProcessor");

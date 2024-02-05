@@ -23,13 +23,13 @@ describe('CompilerMessages', function () {
     callbacks.clear();
 
     const compiler = new KmnCompiler();
-    assert(await compiler.init(callbacks));
+    assert(await compiler.init(callbacks, {saveDebug: true, shouldAddCompilerVersion: false}));
     assert(compiler.verifyInitialized());
 
     const kmnPath = makePathToFixture(...fixture);
 
     // Note: throwing away compile results (just to memory)
-    compiler.runCompiler(kmnPath, {saveDebug: true, shouldAddCompilerVersion: false});
+    await compiler.run(kmnPath, null);
 
     if(messageId) {
       assert.isTrue(callbacks.hasMessage(messageId), `messageId ${messageId.toString(16)} not generated, instead got: `+JSON.stringify(callbacks.messages,null,2));

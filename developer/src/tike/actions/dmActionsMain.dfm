@@ -278,13 +278,6 @@ object modActionsMain: TmodActionsMain
       OnExecute = actProjectSettingsExecute
       OnUpdate = actProjectSettingsUpdate
     end
-    object actToolsCustomise: TAction
-      Category = 'Tools'
-      Caption = 'C&ustomise...'
-      Hint = 
-        'Customise|Change the layout and appearance of the toolbars and m' +
-        'enus'
-    end
     object actToolsOptions: TAction
       Category = 'Tools'
       Caption = '&Options...'
@@ -492,6 +485,11 @@ object modActionsMain: TmodActionsMain
       Caption = '&Stop server'
       OnExecute = actToolsWebStopServerExecute
       OnUpdate = actToolsWebStopServerUpdate
+    end
+    object actWindowNew: TAction
+      Category = 'Window'
+      Caption = '&New window'
+      OnExecute = actWindowNewExecute
     end
   end
   object ActionManager1: TActionManager

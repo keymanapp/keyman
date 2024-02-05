@@ -3119,9 +3119,6 @@ inherited frmKeymanDeveloper: TfrmKeymanDeveloper
       object N4: TMenuItem
         Caption = '-'
       end
-      object Customise1: TMenuItem
-        Action = modActionsMain.actToolsCustomise
-      end
       object Options1: TMenuItem
         Action = modActionsMain.actToolsOptions
       end
@@ -3138,6 +3135,16 @@ inherited frmKeymanDeveloper: TfrmKeymanDeveloper
           Caption = '&Exception Test'
           OnClick = mnuToolsDebugTestsExceptionTestClick
         end
+      end
+    end
+    object mnuWindow: TMenuItem
+      Caption = '&Window'
+      OnClick = mnuWindowClick
+      object Newwindow1: TMenuItem
+        Action = modActionsMain.actWindowNew
+      end
+      object N12: TMenuItem
+        Caption = '-'
       end
     end
     object Help1: TMenuItem

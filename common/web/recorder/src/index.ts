@@ -49,7 +49,7 @@ export class PhysicalInputEventSpec extends InputEventSpec {
   modifierSet: number;
   location: number;
 
-  constructor(e?: PhysicalInputEventSpec) { // parameter is used to reconstruct from JSON.
+  constructor(e?: PhysicalInputEventSpec | Partial<Pick<PhysicalInputEventSpec, 'key' | 'code' | 'keyCode' | 'modifierSet' | 'location'>>) { // parameter is used to reconstruct from JSON.
     super();
 
     if(e) {
@@ -212,7 +212,7 @@ export abstract class TestSequence<KeyRecord extends RecordedKeystroke | InputEv
 
   abstract hasOSKInteraction(): boolean;
 
-  test(proctor: Proctor, target?: OutputTarget): {success: boolean, result: string} {
+  async test(proctor: Proctor, target?: OutputTarget): Promise<{success: boolean, result: string}> {
     // Start with an empty OutputTarget and a fresh KeyboardProcessor.
     if(!target) {
       target = new Mock();
@@ -220,7 +220,7 @@ export abstract class TestSequence<KeyRecord extends RecordedKeystroke | InputEv
 
     proctor.before();
 
-    let result = proctor.simulateSequence(this, target);
+    let result = await proctor.simulateSequence(this, target);
     proctor.assertEquals(result, this.output, this.msg);
 
     return {success: (result == this.output), result: result};
@@ -527,7 +527,7 @@ export interface TestSet<Sequence extends TestSequence<any>> {
 
   addTest(seq: Sequence): void;
   isValidForDevice(device: utils.DeviceSpec, usingOSK?: boolean): boolean;
-  test(proctor: Proctor): TestFailure[];
+  test(proctor: Proctor): Promise<TestFailure[]>;
 }
 
 /**
@@ -563,13 +563,13 @@ export class EventSpecTestSet implements TestSet<InputEventSpecSequence> {
   }
 
   // Validity should be checked before calling this method.
-  test(proctor: Proctor): TestFailure[] {
+  async test(proctor: Proctor): Promise<TestFailure[]> {
     var failures: TestFailure[] = [];
     let testSet = this.testSet;
 
     for(var i=0; i < testSet.length; i++) {
       var testSeq = this[i];
-      var simResult = testSet[i].test(proctor);
+      var simResult = await testSet[i].test(proctor);
       if(!simResult.success) {
         // Failed test!
         failures.push(new TestFailure(this.constraint, testSeq, simResult.result));
@@ -613,13 +613,13 @@ export class RecordedSequenceTestSet implements TestSet<RecordedKeystrokeSequenc
   }
 
   // Validity should be checked before calling this method.
-  test(proctor: Proctor): TestFailure[] {
+  async test(proctor: Proctor): Promise<TestFailure[]> {
     var failures: TestFailure[] = [];
     let testSet = this.testSet;
 
     for(var i=0; i < testSet.length; i++) {
       var testSeq = this[i];
-      var simResult = testSet[i].test(proctor);
+      var simResult = await testSet[i].test(proctor);
       if(!simResult.success) {
         // Failed test!
         failures.push(new TestFailure(this.constraint, testSeq, simResult.result));
@@ -729,11 +729,11 @@ export class KeyboardTest {
     newSet.addTest(seq);
   }
 
-  test(proctor: Proctor) {
+  async test(proctor: Proctor) {
     var setHasRun = false;
     var failures: TestFailure[] = [];
 
-    proctor.beforeAll();
+    await proctor.beforeAll();
 
     // The original test spec requires a browser environment and thus requires its own `.run` implementation.
     if(!(proctor.compatibleWithSuite(this))) {
@@ -745,7 +745,7 @@ export class KeyboardTest {
       var testSet = this.inputTestSets[i];
 
       if(proctor.matchesTestSet(testSet)) {
-        var testFailures = testSet.test(proctor);
+        var testFailures = await testSet.test(proctor);
         if(testFailures) {
           failures = failures.concat(testFailures);
         }

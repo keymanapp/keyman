@@ -58,7 +58,23 @@ uses
   utildir;
 
 procedure TfrmProjectSettings20.cmdOKClick(Sender: TObject);
+var
+  path: string;
 begin
+  path := Trim(DosSlashes(editOutputPath.Text));
+  if (path <> '') and (not path.StartsWith('$PROJECTPATH') or (path.CountChar('\') > 1)) then
+  begin
+    ShowMessage('Output path "'+path+'" should start with "$PROJECTPATH" and be no more than one level deep.');
+    Exit;
+  end;
+
+  path := Trim(DosSlashes(editSourcePath.Text));
+  if (path <> '') and (not path.StartsWith('$PROJECTPATH') or (path.CountChar('\') > 1)) then
+  begin
+    ShowMessage('Source path "'+path+'" should start with "$PROJECTPATH" and be no more than one level deep.');
+    Exit;
+  end;
+
   FGlobalProject.Options.BuildPath := Trim(DosSlashes(editOutputPath.Text));
   FGlobalProject.Options.SourcePath := Trim(DosSlashes(editSourcePath.Text));
   FGlobalProject.Options.SkipMetadataFiles := not chkBuildMetadataFiles.Checked;

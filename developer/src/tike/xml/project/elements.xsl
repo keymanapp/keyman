@@ -278,7 +278,8 @@
   <!-- Upgrades -->
 
   <xsl:template name="upgrade-warning">
-    <xsl:if test="KeymanDeveloperProject/Options/Version != '2.0' or not(KeymanDeveloperProject/Options/Version)">
+    <xsl:if test="KeymanDeveloperProject/DeveloperState/@promptToUpgradeProjects != '0' and
+       (KeymanDeveloperProject/Options/Version != '2.0' or not(KeymanDeveloperProject/Options/Version))">
     <div class="upgrade-warning">
       <p>⚠️ This project file is in an old format. You should upgrade it to the Keyman Developer 17.0 project format.
         <xsl:call-template name="button">

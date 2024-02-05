@@ -7,7 +7,6 @@
 //
 
 import Foundation
-import XCGLogger
 import XCTest
 
 extension TestUtils.Downloading {

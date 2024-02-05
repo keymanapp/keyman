@@ -1,0 +1,10 @@
+{
+  "id": "armenian",
+  "name":"Armenian Unicode",
+  "languages":{
+    "id":"hy",
+    "name": "Armenian",
+    "region": "Asia"
+  },
+  "filename":"resources/keyboards/armenian.js"
+}

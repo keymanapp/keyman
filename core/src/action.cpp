@@ -11,7 +11,6 @@
 #include <sstream>
 #include <memory>
 
-#include <keyman/keyman_core_api.h>
 
 #include "action.hpp"
 #include "state.hpp"
@@ -36,6 +35,10 @@ km_core_actions * km::core::action_item_list_to_actions_object(
   actions->do_alert = KM_CORE_FALSE;
   actions->emit_keystroke = KM_CORE_FALSE;
   actions->new_caps_lock_state = KM_CORE_CAPS_UNCHANGED;
+
+  // deleted_context data will be set in km_core_state_get_actions
+  // because it needs access to the state's app context
+  actions->deleted_context = nullptr;
 
   // Clear output pointers, will be set later once we have sizes
   actions->output = nullptr;
@@ -116,13 +119,13 @@ km_core_actions * km::core::action_item_list_to_actions_object(
 
   size_t buf_size;
 
-  if((status = km_core_context_items_to_utf32(output.data(), nullptr, &buf_size)) != KM_CORE_STATUS_OK) {
+  if((status = context_items_to_utf32(output.data(), nullptr, &buf_size)) != KM_CORE_STATUS_OK) {
     return nullptr;
   }
 
   std::unique_ptr<km_core_usv[]> output_usv(new km_core_usv[buf_size]);
 
-  if((status = km_core_context_items_to_utf32(output.data(), output_usv.get(), &buf_size)) != KM_CORE_STATUS_OK) {
+  if((status = context_items_to_utf32(output.data(), output_usv.get(), &buf_size)) != KM_CORE_STATUS_OK) {
     return nullptr;
   }
 
@@ -137,4 +140,43 @@ km_core_actions * km::core::action_item_list_to_actions_object(
   // We now have a complete set of actions
 
   return actions.release();
+}
+
+
+// TODO: this is effectively the inverse of action_item_list_to_actions_object,
+//       and perhaps we should consider changing that function to be a member
+//       of state also, so that we can move memory management into state?
+bool km::core::state::set_actions(
+  km_core_actions const &actions
+) {
+  _actions.clear();
+
+  // number of codepoints (not codeunits!) to delete from app context.
+
+  for(unsigned int i = 0; i < actions.code_points_to_delete; i++) {
+    _actions.push_backspace(KM_CORE_BT_CHAR, 0); // expected value is not known
+  }
+
+  for(auto output = actions.output; *output; output++) {
+    _actions.push_character(*output);
+  }
+
+  for(auto opt = actions.persist_options; opt->scope; opt++) {
+    km::core::option opt0(static_cast<km_core_option_scope>(opt->scope), opt->key, opt->value);
+    _actions.push_persist(opt0);
+  }
+
+  if(actions.do_alert) {
+    _actions.push_alert();
+  }
+
+  if(actions.emit_keystroke) {
+    _actions.push_emit_keystroke();
+  }
+
+  if(actions.new_caps_lock_state != KM_CORE_CAPS_UNCHANGED) {
+    _actions.push_capslock(actions.new_caps_lock_state == KM_CORE_CAPS_ON);
+  }
+
+  return true;
 }
