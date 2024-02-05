@@ -4,7 +4,7 @@ import { InfrastructureMessages } from '../src/messages/infrastructureMessages.j
 import { verifyCompilerMessagesObject } from '@keymanapp/developer-test-helpers';
 import { makePathToFixture } from './helpers/index.js';
 import { NodeCompilerCallbacks } from '../src/util/NodeCompilerCallbacks.js';
-import { CompilerErrorNamespace, CompilerEvent } from '@keymanapp/common-types';
+import { CompilerErrorNamespace, CompilerEvent, KeymanFileTypes } from '@keymanapp/common-types';
 import { unitTestEndpoints } from '../src/commands/build.js';
 import { KmnCompilerMessages } from '@keymanapp/kmc-kmn';
 import { clearOptions } from '@keymanapp/developer-utils';
@@ -129,6 +129,8 @@ describe('InfrastructureMessages', function () {
     await buildModelInfo.build(projectPath, ncb, {});
     assert.isTrue(ncb.hasMessage(InfrastructureMessages.ERROR_FileTypeNotFound),
       `ERROR_FileTypeNotFound not generated, instead got: `+JSON.stringify(ncb.messages,null,2));
+    assert.isTrue(nodeCompilerMessage(ncb, InfrastructureMessages.ERROR_FileTypeNotFound).includes(KeymanFileTypes.Source.Model),
+      KeymanFileTypes.Source.Model+` not found in the message`);
   });
 
   // ERROR_FileTypeNotFound (BuildModelInfo; .kps)
@@ -140,6 +142,8 @@ describe('InfrastructureMessages', function () {
     await buildModelInfo.build(projectPath, ncb, {});
     assert.isTrue(ncb.hasMessage(InfrastructureMessages.ERROR_FileTypeNotFound),
       `ERROR_FileTypeNotFound not generated, instead got: `+JSON.stringify(ncb.messages,null,2));
+    assert.isTrue(nodeCompilerMessage(ncb, InfrastructureMessages.ERROR_FileTypeNotFound).includes(KeymanFileTypes.Source.Package),
+      KeymanFileTypes.Source.Package+` not found in the message`);
   });
 
   // HINT_FilenameHasDifferingCase
@@ -187,4 +191,8 @@ function assertMessagesEqual(actualMessages: CompilerEvent[], expectedMessages: 
   assert.deepEqual(actualMessages.map(m => m.code), expectedMessages,
     `actual callbacks.messages:\n${JSON.stringify(actualMessages,null,2)}\n\n`+
     `did not match expected:\n${JSON.stringify(expectedMessages,null,2)}\n\n`);
+}
+
+function nodeCompilerMessage(ncb: NodeCompilerCallbacks, code: number): string {
+  return ncb.messages.find((item) => item.code == code).message ?? '';
 }
