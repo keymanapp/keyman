@@ -327,19 +327,23 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
     updater(preCaretContext, postCaretContext)
 
     if preCaretContext == "" {
-      // 33ms seemed sufficient.  Can we go lower? (~30 Hz rate)
-      // Success with 20ms. (50 Hz rate)
-      // 1ms is not sufficient, nor is 10ms.   :(
-      // Note:  these notes were taken via Simulator, not on a physical device;
-      // there's no guarantee (yet) that the times will be the same.
-      // But something refresh-rate related is a fairly reasonable assumption.
+      /* The `textDocumentProxy` abstraction is documented (in passing) as involving
+       * inter-process communication.  It is thus asynchronous.  Despite all attempts to prod
+       * it, the context window is only ever updated if an attempt to make an actual *edit*
+       * outside of the context window occurs.  The first such edit will NOT have
+       * available synchronous data... but a bit of an async wait will usually succeed in
+       * getting the update.
+       *
+       * 33ms seemed sufficient.  Can we go lower? (~30 Hz rate)
+       * Success with 20ms. (50 Hz rate)
+       * 1ms is not sufficient, nor is 10ms.   :(
+       *
+       * Note:  these notes were taken via Simulator, not on a physical device;
+       * there's no guarantee (yet) that the times will be the same.
+       * But something refresh-rate related is a fairly reasonable assumption.
+       */
       DispatchQueue.main.asyncAfter(deadline: .now() + 0.33) { //0.033) {  // contrast:  held backspace - every 0.1.
 
-        // if currentPostContext != postCaretContext {
-        //   // We probably reached the TRUE beginning of context, meaning the initial
-        //   // relocate by -1 failed.  So, we need to undo the +1 that DID succeed.
-        //   self.textDocumentProxy.adjustTextPosition(byCharacterOffset: -1)
-        // }
         // Does NOT update after half a second if there's no context manipulation.
         let preCaretAsyncContext = self.textDocumentProxy.documentContextBeforeInput ?? ""
         let postCaretAsyncContext = self.textDocumentProxy.documentContextAfterInput ?? ""
