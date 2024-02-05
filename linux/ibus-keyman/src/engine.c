@@ -237,7 +237,7 @@ get_context_debug(IBusEngine *engine) {
 static gchar *
 debug_utf8_with_codepoints(const gchar *utf8) {
   GString *output = g_string_new("");
-  g_string_append_printf(output, "|%s| len:%zu) [", utf8, g_utf8_strlen(utf8, -1));
+  g_string_append_printf(output, "|%s| len:%ld) [", utf8, g_utf8_strlen(utf8, -1));
   gunichar2 *utf16 = g_utf8_to_utf16(utf8, -1, NULL, NULL, NULL);
   for (int i = 0; utf16[i] != '\0'; i++) {
     g_string_append_printf(output, "U+%04x ", utf16[i]);

@@ -9,9 +9,9 @@
  */
 export function calculateSourcePath(projectFilename: string): string {
   projectFilename = projectFilename.replace(/\\/g, '/');
-  const result = /([^\/]+)\/([^\/]+)\/([^\/]+)\/([^\/]+)\.kpj$/.exec(projectFilename);
+  const result = /(release|legacy|experimental)\/([^\/]+)\/([^\/]+)\/([^\/]+)\.kpj$/.exec(projectFilename);
   if (!result) {
-    throw new Error(`Invalid path ${projectFilename}`);
+    return undefined;
   }
   return `${result[1]}/${result[2]}/${result[3]}`;
 }
