@@ -18,7 +18,7 @@
 
 using namespace km::core;
 
-enum context_changed_type {
+enum context_change_type {
   // new and internal contexts are identical
   CONTEXT_UNCHANGED = 0,
   // new and internal contexts differ
@@ -30,18 +30,18 @@ enum context_changed_type {
 };
 
 typedef struct {
-  enum context_changed_type type;
+  enum context_change_type type;
   // the number of context items (from beginning of context)
   // that are missing from the new/internal context (i.e. USV not UTF-16)
   uint32_t end_difference;
-} context_change;
+} context_change_result;
 
 // Forward declarations
 
-bool replace_context(context_change context_change, km_core_context *context, km_core_cp const *new_context);
+bool replace_context(context_change_result context_change, km_core_context *context, km_core_cp const *new_context);
 bool should_normalize(km_core_state *state);
-context_change get_context_change(km_core_cp const *new_context, km_core_context *context);
-context_change get_context_items_change(km_core_context_item *new_context_items, km_core_context_item *context_items);
+context_change_result get_context_change(km_core_cp const *new_context, km_core_context *context);
+context_change_result get_context_items_change(km_core_context_item *new_context_items, km_core_context_item *context_items);
 
 bool do_normalize_nfd(km_core_cp const * src, std::u16string &dst);
 km_core_context_status do_fail(km_core_context *app_context, km_core_context *cached_context, const char* error);
@@ -119,7 +119,7 @@ km_core_state_context_set_if_needed(
 
 bool
 replace_context(
-  context_change context_change,
+  context_change_result context_change,
   km_core_context *context,
   km_core_cp const *new_context
 ) {
@@ -180,12 +180,12 @@ context_previous_char(
  * number of context items affected by the change (including markers if they
  * are in the original context).
  */
-context_change
+context_change_result
 get_context_change(
   km_core_cp const *new_context_string,
   km_core_context *context
 ) {
-  context_change change_type({CONTEXT_DIFFERENT, 0});
+  context_change_result change_type({CONTEXT_DIFFERENT, 0});
   assert(new_context_string != nullptr);
   assert(context != nullptr);
   if (new_context_string == nullptr || context == nullptr) {
@@ -213,7 +213,7 @@ get_context_change(
  * change and the number of context items affected by the change (including
  * markers if they are in the original context).
  */
-context_change
+context_change_result
 get_context_items_change(
   km_core_context_item *new_context_items,
   km_core_context_item *context_items
@@ -221,7 +221,7 @@ get_context_items_change(
   int n = 0;
   km_core_context_item const *context_p = nullptr, *new_context_p = nullptr;
 
-  context_change change_type({CONTEXT_DIFFERENT, 0});
+  context_change_result change_type({CONTEXT_DIFFERENT, 0});
 
   if(context_items->type == KM_CORE_CT_END) {
     // If the app_context is "empty" then it needs updating
