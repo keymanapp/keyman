@@ -212,8 +212,6 @@ typedef struct tagKEYMAN64THREADDATA
   BOOL TIPFUpdateable, TIPFPreserved;   // I4290
 
   BOOL CoreProcessEventRun;  // True if core process event has been run
-  // TODO: #10583 remove core_actions cache
-  km_core_actions const *core_actions;
 
   BOOL FInRefreshKeyboards;
   BOOL RefreshRequired;
