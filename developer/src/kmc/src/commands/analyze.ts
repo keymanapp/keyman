@@ -7,6 +7,7 @@ import { CompilerCallbacks, CompilerLogLevel } from '@keymanapp/common-types';
 import { AnalyzeOskCharacterUse, AnalyzeOskRewritePua } from '@keymanapp/kmc-analyze';
 import { BaseOptions } from '../util/baseOptions.js';
 import { runOnFiles } from '../util/projectRunner.js';
+import { exitProcess } from '../util/sysexits.js';
 
 interface AnalysisActivityOptions /* not inheriting from CompilerBaseOptions */ {
   /**
@@ -45,7 +46,7 @@ function declareOskCharUse(command: Command) {
 
       if(!await analyze(analyzeOskCharUse, filenames, options)) {
         // Once a file fails to build, we bail on subsequent builds
-        process.exit(1);
+        await exitProcess(1);
       }
     });
 
@@ -65,7 +66,7 @@ function declareOskRewrite(command: Command) {
 
       if(!await analyze(analyzeOskRewritePua, filenames, options)) {
         // Once a file fails to build, we bail on subsequent builds
-        process.exit(1);
+        await exitProcess(1);
       }
     });
 }

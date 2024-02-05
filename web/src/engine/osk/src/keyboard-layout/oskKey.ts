@@ -176,22 +176,28 @@ export default abstract class OSKKey {
    * @returns         font size as a style string
    */
   getIdealFontSize(vkbd: VisualKeyboard, text: string, style: {height?: string, fontFamily?: string, fontSize: string}, override?: boolean): string {
-    let buttonStyle = getComputedStyle(this.btn);
+    let buttonStyle: typeof style & {width?: string} = getComputedStyle(this.btn);
     let keyWidth = parseFloat(buttonStyle.width);
-    let emScale = 1;
+    let emScale = vkbd.getKeyEmFontSize();
+
+    // Among other things, ensures we use SpecialOSK styling for special key text.
+    // It's set on the key-span, not on the button.
+    //
+    // Also helps ensure that the stub's font-family name is used for keys, should
+    // that mismatch the font-family name specified within the keyboard's touch layout.
+    const capFont = !this.label ? undefined: getComputedStyle(this.label).fontFamily;
+    if(capFont) {
+      buttonStyle = {
+        fontFamily: capFont,
+        fontSize: buttonStyle.fontSize,
+        height: buttonStyle.height
+      }
+    }
 
     const originalSize = getFontSizeStyle(style.fontSize || '1em');
 
     // Not yet available; it'll be handled in a later layout pass.
-    if(!buttonStyle.fontSize) {
-      // NOTE:  preserves old behavior for use in documentation keyboards, for now.
-      // Once we no longer need to maintain this code block, we can drop all current
-      // method parameters safely.
-      //
-      // Recompute the new width for use in autoscaling calculations below, just in case.
-      emScale = vkbd.getKeyEmFontSize();
-      keyWidth = this.getKeyWidth(vkbd);
-    } else if(!override) {
+    if(!override) {
       // When available, just use computedStyle instead.
       style = buttonStyle;
     }
@@ -334,11 +340,13 @@ export default abstract class OSKKey {
     // space bar may not define the text span!
     if(this.label) {
       if(!this.label.classList.contains('kmw-spacebar-caption')) {
-        this.label.style.fontSize = this.getIdealFontSize(vkbd, this.keyText, this.btn.style);
+        // Do not use `this.keyText` - it holds *___* codes for special keys, not the actual glyph!
+        const keyCapText = this.label.textContent;
+        this.label.style.fontSize = this.getIdealFontSize(vkbd, keyCapText, this.btn.style);
       } else {
         // Remove any custom setting placed on it before recomputing its inherited style info.
         this.label.style.fontSize = '';
-        const fontSize = this.getIdealFontSize(vkbd, this.label.textContent, getComputedStyle(this.label), true);
+        const fontSize = this.getIdealFontSize(vkbd, this.label.textContent, this.btn.style);
 
         // Since the kmw-spacebar-caption version uses !important, we must specify
         // it directly on the element too; otherwise, scaling gets ignored.

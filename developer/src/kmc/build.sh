@@ -66,7 +66,8 @@ fi
 #-------------------------------------------------------------------------------------------------------------------
 
 if builder_start_action build; then
-  npm run build
+  tsc -b
+  cp "$KEYMAN_ROOT/resources/standards-data/ldml-keyboards/unicode-license.txt" ./build/unicode-license.txt
   builder_finish_action success build
 fi
 

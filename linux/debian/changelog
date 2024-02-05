@@ -1,9 +1,11 @@
-keyman (16.0.144-2) UNRELEASED; urgency=medium
+keyman (16.0.145-1) unstable; urgency=medium
 
   [Jeremy Bicha]
   * Build with webkitgtk 4.1 instead of 4.0  (closes: #1061396)
+  * New upstream release.
+  * Re-release to Debian
 
- -- Eberhard Beilharz <eb1@sil.org>  Wed, 24 Jan 2024 17:38:11 +0100
+ -- Eberhard Beilharz <eb1@sil.org>  Thu, 01 Feb 2024 12:58:00 +0100
 
 keyman (16.0.144-1) unstable; urgency=medium
 
