@@ -20,3 +20,7 @@ Each directory contains:
     - change /keyboard/keys/key type to "array"
 
 - `imports/` - the importable data files (TODO-LDML)
+
+## License
+
+- [unicode-license.txt](unicode-license.txt) - Unicode license

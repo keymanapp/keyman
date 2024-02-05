@@ -7,13 +7,6 @@
   kmwosk.css: main CSS for keymanweb on-screen keyboard and other objects.
 */
 
-@font-face {
-  font-family: SpecialOSK;
-  font-style:  normal;
-  font-weight: normal;
-  src: url('keymanweb-osk.ttf')  format('truetype');
-}
-
 /* kmw-key-square applies only to OSK key elements, kmw-key-square-ex applies only to popup key elements */
 
 /* Common key-layout properties (all form factor + OS combinations) */
@@ -340,7 +333,16 @@
 /* Vertical centering of text labels on keys */
 .kmw-key {text-align:center; white-space:nowrap;}
 .kmw-key::before {content:'.'; display:inline-block; height:100%; vertical-align:middle; max-width:0px; visibility:hidden;}
-.kmw-key span {display:inline-block}
+.kmw-key span {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 
 
 .desktop .kmw-osk-frame{position:absolute;width:auto;height:auto;left:0;top:0;display:none;margin:0;padding:0;
@@ -494,8 +496,8 @@
 .phone .kmw-key-shift, .phone .kmw-key-shift-on{font-size:0.7em !important;}
 
 /* Set special font and style for modifier and special key images */
-body div.kmw-key-shift span.kmw-key-text {font-family:SpecialOSK !important;font-size:1em !important;}
-body div.kmw-key-shift-on span.kmw-key-text {font-family:SpecialOSK !important;font-size:1em !important;}
+body div.kmw-key-shift span.kmw-key-text {font-family:SpecialOSK !important;font-size:1em;}
+body div.kmw-key-shift-on span.kmw-key-text {font-family:SpecialOSK !important;font-size:1em;}
 #kmw-popup-keys div.kmw-key-shift span.kmw-key-text {font-family:SpecialOSK !important;}
 
 #kmw-keytip {
@@ -779,7 +781,7 @@ div.android div.kmw-keytip-cap {
 .kmw-alert-text{margin:10px;white-space:default;font-family:Arial,sans-serif;}
 
 /* Note: font size gets overwritten in source code! */
-.kmw-spacebar-caption{font:1em Arial !important;color:rgba(0,0,0,0.25);}
+.kmw-spacebar-caption{font-family: Arial !important;color:rgba(0,0,0,0.25);}
 
 /* Probably best to make this its own CSS that can be optionally included? */
 @media (prefers-color-scheme: dark) {

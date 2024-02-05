@@ -3,7 +3,7 @@
 # If needed set cowbuilder up for building Keyman Debian packages
 # Then cowbuilder update
 
-distributions='focal jammy lunar mantic'
+distributions='focal jammy mantic noble'
 
 if ! dpkg-query -l cowbuilder; then
     echo "installing pbuilder and cowbuilder"

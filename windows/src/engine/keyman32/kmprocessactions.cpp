@@ -23,17 +23,15 @@ static void processAlert(AITIP* app) {
   app->QueueAction(QIT_BELL, 0);
 }
 
-static BOOL
+static void
 processBack(AITIP* app, const unsigned int code_points_to_delete, const km_core_usv* delete_context) {
   if (app->IsLegacy()) {
-    SendDebugMessageFormat(0, sdmGlobal, 0, "processBack: Legacy app cptd [%d].", code_points_to_delete);
     for (unsigned int i = 0; i < code_points_to_delete; i++) {
       app->QueueAction(QIT_BACK, BK_DEFAULT);
     }
-    return TRUE;
+    return;
   }
   if (!app->IsLegacy()) {
-    SendDebugMessageFormat(0, sdmGlobal, 0, "processBack: TSF app cptd [%d].", code_points_to_delete);
     km_core_usv const* delete_context_ptr = delete_context;
     while (*delete_context_ptr) {
       delete_context_ptr++;
@@ -47,9 +45,8 @@ processBack(AITIP* app, const unsigned int code_points_to_delete, const km_core_
         app->QueueAction(QIT_BACK, BK_DEFAULT);
       }
     }
-    return TRUE;
+    return;
   }
-  return FALSE;
 }
 
 
@@ -58,8 +55,6 @@ static void
 processPersistOpt(km_core_actions const* actions, LPINTKEYBOARDINFO activeKeyboard
 ) {
   for (auto option = actions->persist_options; option->key; option++) {
-    // Put the keyboard option into Windows Registry
-    // log"Saving keyboard option to registry");
     SendDebugMessageFormat(0, sdmGlobal, 0, "ProcessPersistOpt: Saving option to registry for keyboard [%s].", activeKeyboard->Name);
     size_t value_length = wcslen(reinterpret_cast<LPCWSTR>(option->value));
     LPWSTR value = new WCHAR[value_length + 1];
@@ -108,8 +103,6 @@ BOOL ProcessActions(BOOL* emitKeyStroke)
 {
   PKEYMAN64THREADDATA _td = ThreadGlobals();
   if (!_td) return FALSE;
-  SendDebugMessageFormat(0, sdmGlobal, 0, "ProcessActions: Enter");
-
   // TODO: #10583  Remove caching action_struct
   if (!_td->core_actions) {
     SendDebugMessageFormat(0, sdmGlobal, 0, "ProcessActions: core_actions not set");
@@ -145,7 +138,7 @@ ProcessActionsNonUpdatableParse(BOOL* emitKeyStroke) {
   if (!_td) {
     return FALSE;
   }
-  SendDebugMessageFormat(0, sdmGlobal, 0, "ProcessActionsNonUpdatableParse: Enter");
+
   if (_td->TIPFUpdateable) {  // ensure only run when not updateable
     return FALSE;
   }

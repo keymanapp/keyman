@@ -40,7 +40,7 @@ namespace core {
 ldml_processor::ldml_processor(path const & kb_path, const std::vector<uint8_t> &data)
 : abstract_processor(
     keyboard_attributes(kb_path.stem(), KM_CORE_LMDL_PROCESSOR_VERSION, kb_path.parent(), {})
-  ), _valid(false), transforms(), bksp_transforms(), keys()
+  ), _valid(false), transforms(), bksp_transforms(), keys(), normalization_disabled(false)
 {
 
   if(data.size() <= sizeof(kmx::COMP_KEYBOARD_EX)) {
@@ -104,6 +104,11 @@ ldml_processor::ldml_processor(path const & kb_path, const std::vector<uint8_t> 
     if (!bksp_transforms) {
       DebugLog("Failed to load bksp transforms");
       return; // failed to load
+    }
+  }
+  if (kplus.meta != nullptr) {
+    if (kplus.meta->settings & LDML_META_SETTINGS_NORMALIZATION_DISABLED) {
+      normalization_disabled = true;
     }
   }
   // Only valid if we reach here

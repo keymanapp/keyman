@@ -203,6 +203,9 @@
         <File Id="LdmlImportReadme" Name="README.md" KeyPath="yes" />
       </Component>
       <Component>
+        <File Id="LdmlImportLicense" Name="unicode-license.txt" Source="..\..\..\resources\standards-data\ldml-keyboards\unicode-license.txt" />
+      </Component>
+      <Component>
         <File Name="keys-Latn-implied.xml" KeyPath="yes" />
       </Component>
       <Component>

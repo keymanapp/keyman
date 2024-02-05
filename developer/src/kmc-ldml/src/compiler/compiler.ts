@@ -18,7 +18,7 @@ import { SectionIdent, constants } from '@keymanapp/ldml-keyboard-constants';
 import { KmnCompiler } from '@keymanapp/kmc-kmn';
 import { KMXPlusMetadataCompiler } from './metadata-compiler.js';
 import { LdmlKeyboardVisualKeyboardCompiler } from './visual-keyboard-compiler.js';
-import { LdmlKeyboardKeymanWebCompiler } from './keymanweb-compiler.js';
+//KMW17.0: import { LdmlKeyboardKeymanWebCompiler } from './keymanweb-compiler.js';
 
 export const SECTION_COMPILERS = [
   // These are in dependency order.
@@ -97,10 +97,11 @@ export class LdmlKeyboardCompiler implements KeymanCompiler {
     // const tlcompiler = new kmc.TouchLayoutCompiler();
     // const tl = tlcompiler.compile(source);
     // const tlwriter = new TouchLayoutFileWriter();
-    const kmwcompiler = new LdmlKeyboardKeymanWebCompiler(this.callbacks, compilerOptions);
-    const kmw_string = kmwcompiler.compile(inputFilename, source);
-    const encoder = new TextEncoder();
-    const kmw_binary = encoder.encode(kmw_string);
+
+    //KMW17.0: const kmwcompiler = new LdmlKeyboardKeymanWebCompiler(this.callbacks, compilerOptions);
+    //KMW17.0: const kmw_string = kmwcompiler.compile(inputFilename, source);
+    //KMW17.0: const encoder = new TextEncoder();
+    //KMW17.0: const kmw_binary = encoder.encode(kmw_string);
 
     outputFilename = outputFilename ?? inputFilename.replace(/\.xml$/, '.kmx');
 
@@ -108,7 +109,7 @@ export class LdmlKeyboardCompiler implements KeymanCompiler {
       artifacts: {
         kmx: { data: kmx_binary, filename: outputFilename },
         kvk: { data: kvk_binary, filename: outputFilename.replace(/\.kmx$/, '.kvk') },
-        js: { data: kmw_binary, filename: outputFilename.replace(/\.kmx$/, '.js') },
+        //KMW17.0: js: { data: kmw_binary, filename: outputFilename.replace(/\.kmx$/, '.js') },
       }
     };
   }
