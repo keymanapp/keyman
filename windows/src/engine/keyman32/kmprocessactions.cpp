@@ -97,7 +97,7 @@ static void processCapsLock(const km_core_caps_state caps_lock_state, BOOL isUp,
   }
 }
 
-BOOL ProcessActions(BOOL* emitKeyStroke)
+BOOL ProcessActions(BOOL* emitKeystroke)
 {
   PKEYMAN64THREADDATA _td = ThreadGlobals();
   if (!_td) return FALSE;
@@ -131,7 +131,7 @@ BOOL ProcessActions(BOOL* emitKeyStroke)
 }
 
 BOOL
-ProcessActionsNonUpdatableParse(BOOL* emitKeyStroke) {
+ProcessActionsNonUpdatableParse(BOOL* emitKeystroke) {
   PKEYMAN64THREADDATA _td = ThreadGlobals();
   if (!_td) {
     return FALSE;
@@ -151,7 +151,7 @@ ProcessActionsNonUpdatableParse(BOOL* emitKeyStroke) {
   SendDebugMessageFormat(0, sdmGlobal, 0, "ProcessActionsNonUpdatableParse: km_core_state_get_actions");
   processCapsLock(_td->core_actions->new_caps_lock_state, !_td->state.isDown, _td->TIPFUpdateable, FALSE);
   if (_td->core_actions->emit_keystroke) {
-    *emitKeyStroke = TRUE;
+    *emitKeystroke = TRUE;
     SendDebugMessageFormat(0, sdmGlobal, 0, "ProcessActionsNonUpdatableParse EMIT_KEYSTROKE");
     _td->CoreProcessEventRun  = FALSE;  // If we emit the key stroke on this parse we don't need the second parse
   }
