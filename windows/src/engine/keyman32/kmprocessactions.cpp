@@ -29,9 +29,8 @@ processBack(AITIP* app, const unsigned int code_points_to_delete, const km_core_
     for (unsigned int i = 0; i < code_points_to_delete; i++) {
       app->QueueAction(QIT_BACK, BK_DEFAULT);
     }
-    return;
   }
-  if (!app->IsLegacy()) {
+  else {
     km_core_usv const* delete_context_ptr = delete_context;
     while (*delete_context_ptr) {
       delete_context_ptr++;
@@ -45,7 +44,6 @@ processBack(AITIP* app, const unsigned int code_points_to_delete, const km_core_
         app->QueueAction(QIT_BACK, BK_DEFAULT);
       }
     }
-    return;
   }
 }
 
@@ -122,7 +120,7 @@ BOOL ProcessActions(BOOL* emitKeyStroke)
     processAlert(_td->app);
   }
   if (_td->core_actions->emit_keystroke) {
-    *emitKeyStroke = TRUE;
+    *emitKeystroke = TRUE;
   }
   processCapsLock(_td->core_actions->new_caps_lock_state, !_td->state.isDown, _td->TIPFUpdateable, FALSE);
   // TODO: #10583 remove dispose
