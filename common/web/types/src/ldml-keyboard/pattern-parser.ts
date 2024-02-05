@@ -145,95 +145,8 @@ export class MarkerParser {
    * @returns the normalized string
    */
   public static nfd_markers(s: string, forMatch?: boolean) : string {
-    // Note: parallel to ldml::normalize_nfd_markers()
-    if(!s) return s;
-    /** Accumulate output normalized string */
-    let out = '';
-    /** 's' split into code point units */
-    let a = [...s];
-    /** index into `a` where the current segment starts */
-    let seg_start = 0;
-    /** index into 'a' following end of current segment */
-    let seg_end = 0;
-    /** iterator over 'a' */
-    let i = 0;
-    /** for parallelism with C++, end of string */
-    let str_end = a.length;
-
-    /** map of all markers in the string */
-    const mall : MarkerMap = [];
-    // preprocess string, also check for markers
-    const all_no_markers = MarkerParser.remove_markers(s, mall, forMatch);
-    if(mall.length == 0) {
-      // no markers, so just normalize as a single segment
-      return all_no_markers.normalize("NFD");
-    }
-
-    // split segments on grapheme cluster boundaries for processing
-    const raw_segments = Array.from(graphemeSegmenter.segment(all_no_markers))
-      .map(({ segment }) => segment)
-      .map((c) => c.codePointAt(0));
-    /**
-     * Set of all code points which have a boundary before.
-     * This parallels nfd->hasBoundaryBefore().
-     */
-    const hasBoundaryBefore = new Set(raw_segments);
-
-    // now we'll loop through looking for normalization-safe subsegments of [seg_start, seg_end)
-    // For example (sentinel mode) the following would be segments:
-    //     - A
-    //     - E\u0320\u0302
-    //     - U\u0320\m{marker}\u0300
-    //
-    // The marker will typically 'look' like an NFD-safe boundary, but it's not! It's part of the
-    // subsegment, we want to skip over it. This is why we use parse_next_marker to look-ahead to see
-    // if there is actually a marker under the iterator.
-    //
-    // We don't assume that the marker sentinel or regex appears as an NFD boundary, that is why
-    // the parse function and the nfd function are called in parallel.
-
-    do {
-      /** remainder of string i..end, for match */
-      const rest = a.slice(i).join('');
-      const p = MarkerParser.parse_next_marker(rest, forMatch);
-      const have_marker = !!(p?.match);
-
-      // First, categorize the current character.
-
-      if (i === str_end) {
-        // at end of string, so this is also the end of the segment.
-        seg_end = i;
-      } else if (hasBoundaryBefore.has(rest.codePointAt(0)) && !have_marker) {
-        // it's an NFD safe boundary, but NOT a marker
-        // (if it were a marker, we would fall through to consume the marker)
-        // segment ends before this code point
-        seg_end = i;
-        // move the index past the NFD boundary
-        i++;
-      } else if(have_marker) {
-        // we have a marker. move the index past the marker.
-        i += [...p.match].length;
-      } else {
-        // non boundary. just move the index forward
-        i++;
-      }
-
-      // Next, if we found a segment boundary (which includes
-      // end of string) process it
-
-      if(seg_end !== seg_start) {
-        // re-join the segment from the iterated code points
-        const segment = a.slice(seg_start, seg_end).join('');
-        const m : MarkerMap = [];
-        // process the subsegment
-        const segment_nfd = MarkerParser.nfd_markers_segment(segment, m, forMatch);
-        // append the processed segment to the output buffer
-        out = out + segment_nfd;
-        // the end of this segment is the start of the next one.
-        seg_start = seg_end;
-      }
-    } while (seg_end != str_end); // until the last codepoint processed
-    return out;
+    const m : MarkerMap = [];
+    return this.nfd_markers_segment(s, m, forMatch);
   }
 
   /**
@@ -283,8 +196,8 @@ export class MarkerParser {
     }
     /** output string */
     let out = '';
-    /** for checking: the total number of markers expected */
-    const max_markers = map.length;
+    /** for checking: the total number of markers expected, skipping end markers */
+    const max_markers = map.filter(({ end }) => !end).length;
     /** for checking: the number of markers we've written */
     let written_markers = 0;
     /** we are going to mutate the map, so copy it */
@@ -292,39 +205,36 @@ export class MarkerParser {
     // First, add back all 'MARKER_BEFORE_EOT' markers
     while (map2.length && map2[map2.length - 1].ch === MARKER_BEFORE_EOT) {
       // remove from list
-      const { marker } = map2.pop();
-      out = MarkerParser.prepend_marker(out, marker, forMatch);
-      written_markers++;
+      const { marker, end } = map2.pop();
+      if (!end) {
+        out = MarkerParser.prepend_marker(out, marker, forMatch);
+        written_markers++;
+      }
     }
     // Then, take each codepoint (from back to front)
     for (let p of [...s].reverse()) {
       // reverse order code units, prepend to out
       out = p + out;
 
-      // 1. we write any markers which match the output string in order,
-      // and pop them off the list as dones
-      while(map2.length > 0 && map2[map2.length-1].ch === p) {
-        const { marker } = map2.pop();
-        if (marker !== constants.marker_no_index) { // if not already written
-          out = MarkerParser.prepend_marker(out, marker, forMatch);
-          written_markers++;
-          // no need to update .marker here, we're about to pop it
-        }
-      }
-      // 2. now, any out of order markers. iterate with an index so we can record.
-      // will skip this if map2.length < 2
-      for (let i = map2.length - 2; i >= 0; i--) {
-        const { ch, marker } = map2[i]; // don't pop here, as it might not be the right char
-        if (ch === p && marker !== constants.marker_no_index) {
-          out = MarkerParser.prepend_marker(out, marker, forMatch);
-          written_markers++;
-          map2[i].marker = constants.marker_no_index; // mark as written
+      for (let i = map2.length - 1; i >= 0; i--) {
+        const { ch, marker, processed, end } = map2[i];
+        if (ch === p && !processed) {
+          map2[i].processed = true; // mark as processed
+          if (end) {
+            break; // exit loop
+          } else {
+            out = MarkerParser.prepend_marker(out, marker, forMatch);
+            written_markers++;
+          }
+        } else if (map2[map2.length-1]?.processed) {
+          // keep the list as short as possible
+          map2.pop();
         }
       }
     }
     // validate that we consumed all markers
     if(written_markers !== max_markers) {
-      throw Error(`Internal Error: We should have written ${max_markers} markers but only wrote ${written_markers}`);
+      throw Error(`Internal Error: should have written ${max_markers} markers but only wrote ${written_markers}`);
     }
     return out;
   }
@@ -343,18 +253,31 @@ export class MarkerParser {
     let last_markers: number[] = [];
     /** input string, split into codepoint runs */
     let a: string[] = [...s];
+    /** were any markers found? */
+    let had_markers = false;
 
     /**
      * subfunc: add all markers in the pending (last_markers) queue
      * @param l string the marker is 'glued' to, or '' for end
      */
-    function add_pending_markers(l: string): void {
-      // first char, or, marker-before-eot. Must be first char of NFD sequence
-      const ch = (l === '') ? MARKER_BEFORE_EOT : [...(l.normalize("NFD"))][0];
+    function add_pending_markers(l: string){
+      // first char, or, marker-before-eot
+      const glueChars = (l === '') ? [MARKER_BEFORE_EOT] : [...(l.normalize("NFD"))];
+      const glue = glueChars[0];
+      // push the 'end' value
+      map.push({ ch: glue, end: true });
       while(last_markers.length) {
         const marker = last_markers[0];
         last_markers = last_markers.slice(1); // pop from front
-        map.push({ ch, marker });
+        map.push({ ch: glue, marker });
+      }
+      // now, push the rest of the glue chars as an NFD sequence.
+      // For example, `\m{m}\u0344` will create the following stream:
+      //  { ch: 0308, end: true}
+      //  { ch: 0308, marker: 1}
+      //  { ch: 0301, end: true}  // added because of decomp
+      for(const ch of glueChars.slice(1)) {
+        map.push({ ch, end: true });
       }
     }
 
@@ -369,6 +292,7 @@ export class MarkerParser {
         a = a.slice(1); // move forward 1 codepoint
       } else {
         // found a marker
+        had_markers = true;
         const { marker, match } = p;
         if ((marker == constants.marker_any_index) ||
           (marker >= constants.marker_min_index && marker <= constants.marker_max_index)) {
@@ -379,8 +303,12 @@ export class MarkerParser {
         a = a.slice([...match].length); // move forward over matched marker
       }
     }
-    // finally, add any remaining markers at the end of the string
+    // add any remaining markers at the end of the string
     add_pending_markers('');
+    if (!had_markers) {
+      // no markers were found. clear out the map.
+      map = [];
+    }
     return out;
   }
 
@@ -422,19 +350,21 @@ export class MarkerParser {
 };
 
 /** special noncharacter value denoting end of string */
-const MARKER_BEFORE_EOT = '\ufffe';
+export const MARKER_BEFORE_EOT = '\ufffe';
 /** matcher for a sentinel */
 const PARSE_SENTINEL_MARKER = new RegExp(`^${MarkerParser.ANY_MARKER_MATCH}`);
 /** matcher for a regex marker, either single or any */
 const PARSE_REGEX_MARKER    = /^\\uffff\\u0008(?:(\\u[0-9a-fA-F]{4})|(\[\\u[0-9a-fA-F]{4}-\\u[0-9a-fA-F]{4}\]))/;
-/** a grapheme cluster segmenter for finding NFD boundaries */
-const graphemeSegmenter = new Intl.Segmenter(['und'], { granularity: 'grapheme' });
 
 export interface MarkerEntry {
-  /** code point 'glued' to, or MARKER_BEFORE_EOT  */
+  /** code point 'glued' to, or MARKER_BEFORE_EOT */
   ch? : string;
   /** marker number, 1-based */
   marker? : number;
+  /** true if processed */
+  processed? : boolean;
+  /** true if the end of the entries */
+  end? : boolean;
 };
 
 /** list of marker entries, from remove_markers */

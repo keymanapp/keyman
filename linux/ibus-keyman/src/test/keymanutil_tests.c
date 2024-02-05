@@ -2,6 +2,7 @@
 #include <glib.h>
 #include <gtk/gtk.h>
 #include <ibus.h>
+#include <unicode/uvernum.h>
 #include "kmpdetails.h"
 #include "keymanutil.h"
 #include "keymanutil_internal.h"
@@ -935,6 +936,16 @@ test_keyman_add_keyboards_from_dir__one_dir() {
   g_assert_cmpstr(ibus_engine_desc_get_name(desc), ==, expected_name);
 }
 
+#if U_ICU_VERSION_MAJOR_NUM >= 73
+// ICU 73 uses CLDR 43 which contains various corrections so that ICU
+// now returns the correct bmf instead of bmf-Latn.
+#define BCP47_BMF "bmf"
+#define BCP47_BUN "bun"
+#else
+#define BCP47_BMF "bmf-Latn"
+#define BCP47_BUN "bun-Latn"
+#endif
+
 void
 test_keyman_add_keyboards_from_dir__two_langs() {
   // Initialize
@@ -949,10 +960,10 @@ test_keyman_add_keyboards_from_dir__two_langs() {
   g_assert_cmpint(g_list_length(keyboards), ==, 2);
 
   IBusEngineDesc* desc = IBUS_ENGINE_DESC(keyboards->data);
-  g_autofree gchar* expected_name1 = g_strdup_printf("bmf-Latn:%s/test2.kmx", kmp_dir);
+  g_autofree gchar* expected_name1 = g_strdup_printf("%s:%s/test2.kmx", BCP47_BMF, kmp_dir);
   g_assert_cmpstr(ibus_engine_desc_get_name(desc), ==, expected_name1);
   desc = IBUS_ENGINE_DESC(keyboards->next->data);
-  g_autofree gchar* expected_name2 = g_strdup_printf("bun-Latn:%s/test2.kmx", kmp_dir);
+  g_autofree gchar* expected_name2 = g_strdup_printf("%s:%s/test2.kmx", BCP47_BUN, kmp_dir);
   g_assert_cmpstr(ibus_engine_desc_get_name(desc), ==, expected_name2);
 }
 
@@ -972,10 +983,10 @@ test_keyman_add_keyboards_from_dir__prev_keyboards() {
   g_assert_cmpint(g_list_length(keyboards), ==, 3);
 
   IBusEngineDesc* desc = IBUS_ENGINE_DESC(keyboards->data);
-  g_autofree gchar* expected_name1 = g_strdup_printf("bmf-Latn:%s/test2.kmx", kmp_dir);
+  g_autofree gchar* expected_name1 = g_strdup_printf("%s:%s/test2.kmx", BCP47_BMF, kmp_dir);
   g_assert_cmpstr(ibus_engine_desc_get_name(desc), ==, expected_name1);
   desc = IBUS_ENGINE_DESC(keyboards->next->data);
-  g_autofree gchar* expected_name2 = g_strdup_printf("bun-Latn:%s/test2.kmx", kmp_dir);
+  g_autofree gchar* expected_name2 = g_strdup_printf("%s:%s/test2.kmx", BCP47_BUN, kmp_dir);
   g_assert_cmpstr(ibus_engine_desc_get_name(desc), ==, expected_name2);
   desc = IBUS_ENGINE_DESC(keyboards->next->next->data);
   g_autofree gchar* expected_name = g_strdup_printf("bza:%s/test1.kmx", kmp_dir);
@@ -1020,6 +1031,51 @@ test_keyman_add_keyboards_from_dir__one_language_plus_two_different_custom() {
   desc                            = IBUS_ENGINE_DESC(keyboards->next->data);
   expected_name                   = g_strdup_printf("ldb:%s/test1.kmx", kmp_dir);
   g_assert_cmpstr(ibus_engine_desc_get_name(desc), ==, expected_name);
+}
+
+void
+test_keyman_compare_version_equal() {
+  g_assert_cmpint(keyman_compare_version("1.0", "1.0"), ==, 0);
+}
+
+void
+test_keyman_compare_version_equal_with_patch() {
+  g_assert_cmpint(keyman_compare_version("1.0", "1.0.0"), ==, 0);
+}
+
+void
+test_keyman_compare_version_equal_nondigit() {
+  g_assert_cmpint(keyman_compare_version("1.1", "1.1-beta2"), ==, 0);
+}
+
+void
+test_keyman_compare_version_equal_doubledot() {
+  g_assert_cmpint(keyman_compare_version("1..2", "1.0.2"), ==, 0);
+}
+
+void
+test_keyman_compare_version_less() {
+  g_assert_cmpint(keyman_compare_version("1.0", "1.1"), <, 0);
+}
+
+void
+test_keyman_compare_version_minor_less_with_patch() {
+  g_assert_cmpint(keyman_compare_version("1.0.1", "1.1"), <, 0);
+}
+
+void
+test_keyman_compare_version_patch_less() {
+  g_assert_cmpint(keyman_compare_version("1.0", "1.0.1"), <, 0);
+}
+
+void
+test_keyman_compare_version_less_twodigit() {
+  g_assert_cmpint(keyman_compare_version("99.9", "100"), <, 0);
+}
+
+void
+test_keyman_compare_version_greater() {
+  g_assert_cmpint(keyman_compare_version("1.10", "1.9"), >, 0);
 }
 
 //----------------------------------------------------------------------------------------------
@@ -1099,10 +1155,9 @@ int main(int argc, char* argv[]) {
   g_test_add_func(
       "/keymanutil/keyman_add_keyboard/prev_engine_adding_newer_version",
       test_keyman_add_keyboard__prev_engine_adding_newer_version);
-  // #9593
-  // g_test_add_func(
-  //     "/keymanutil/keyman_add_keyboard/prev_engine_adding_newer_version_versioncompare",
-  //     test_keyman_add_keyboard__prev_engine_adding_newer_version_9593);
+  g_test_add_func(
+      "/keymanutil/keyman_add_keyboard/prev_engine_adding_newer_version_versioncompare",
+      test_keyman_add_keyboard__prev_engine_adding_newer_version_9593);
   g_test_add_func(
       "/keymanutil/keyman_add_keyboard/prev_engine_adding_older_version",
       test_keyman_add_keyboard__prev_engine_adding_older_version);
@@ -1114,6 +1169,16 @@ int main(int argc, char* argv[]) {
   g_test_add_func(
       "/keymanutil/keyman_add_keyboards_from_dir/one_language_plus_two_different_custom",
       test_keyman_add_keyboards_from_dir__one_language_plus_two_different_custom);
+
+  g_test_add_func("/keymanutil/keyman_compare_version/1.0==1.0", test_keyman_compare_version_equal);
+  g_test_add_func("/keymanutil/keyman_compare_version/1.0==1.0.0", test_keyman_compare_version_equal_with_patch);
+  g_test_add_func("/keymanutil/keyman_compare_version/1.1==1.1-beta", test_keyman_compare_version_equal_nondigit);
+  g_test_add_func("/keymanutil/keyman_compare_version/1..2==1.0.2", test_keyman_compare_version_equal_doubledot);
+  g_test_add_func("/keymanutil/keyman_compare_version/1.0<1.1", test_keyman_compare_version_less);
+  g_test_add_func("/keymanutil/keyman_compare_version/1.0.1<1.1", test_keyman_compare_version_minor_less_with_patch);
+  g_test_add_func("/keymanutil/keyman_compare_version/1.0<1.0.1", test_keyman_compare_version_patch_less);
+  g_test_add_func("/keymanutil/keyman_compare_version/99.9<100",test_keyman_compare_version_less_twodigit);
+  g_test_add_func("/keymanutil/keyman_compare_version/1.10>1.9", test_keyman_compare_version_greater);
 
   // Run tests
   int retVal = g_test_run();
