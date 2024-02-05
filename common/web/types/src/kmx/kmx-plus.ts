@@ -77,7 +77,7 @@ export class Meta extends Section {
   settings: KeyboardSettings;
 
   /** convenience for checking settings */
-  get normalizionDisabled() {
+  get normalizationDisabled() {
     return this.settings & KeyboardSettings.normalizationDisabled;
   }
 };
@@ -212,7 +212,7 @@ export class Strs extends Section {
     if (opts?.nfd) {
       if (!sections.meta) {
         throw Error(`Internal Error: need 'meta' section to check normalization mode.`);
-      } else if (!sections.meta.normalizionDisabled) {
+      } else if (!sections.meta.normalatizionDisabled) {
         if (opts?.markers) {
           s = MarkerParser.nfd_markers(s, false);
         } else {
