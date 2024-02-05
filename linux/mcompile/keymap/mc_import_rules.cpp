@@ -104,19 +104,17 @@ const int KMX_ShiftStateMap[] = {
 // _S2 naming??
 int KMX_ToUnicodeEx(guint ScanCode, const BYTE *lpKeyState, PKMX_WCHAR pwszBuff, int shift_state, int caps,GdkKeymap *keymap) {
 
-  KMX_DWORD kvl= KMX_get_KeyvalsUnderlying_From_KeyCodeUnderlying_GDK(keymap, ScanCode, shift_state);
-  //if((kvl >=  deadkey_min) && (kvl <=  deadkey_max))
+  KMX_DWORD rc = KMX_get_rc_From_KeyCodeUnderlying_GDK(keymap,ScanCode, shift_state);
 
-
-  std::wstring character = KMX_get_CharsUnderlying_according_to_keycode_and_Shiftstate_GDK_OLD(keymap, ScanCode, ShiftState(shift_state), caps);
-  std::u16string uuu16= u16string_from_wstring(character).c_str();
+  std::wstring character= KMX_get_CharsUnderlying_according_to_keycode_and_Shiftstate_GDK(keymap, ScanCode, ShiftState(shift_state), caps);
   pwszBuff[0]= * (PKMX_WCHAR)  u16string_from_wstring(character).c_str();
 
-  if((kvl ==  0xFFFE))
+  if(rc ==  0xFFFE)
     return 0;
-  if((kvl ==  0xFFFF))
+  else if(rc ==  0xFFFF)
     return -1;
-  return  1;
+  else
+    return  1;
 }
 
 int KMX_DeadKeyMap(int index, std::vector<DeadKey *> *deadkeys, int deadkeyBase, std::vector<KMX_DeadkeyMapping> *deadkeyMappings) {   // I4327   // I4353

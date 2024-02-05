@@ -320,11 +320,8 @@ int append_other_ToVector(v_dw_3D &All_Vector,GdkKeymap * keymap) {
     // get Keyvals of this key and copy to unshifted/shifted in "other"-block[1][i][1] / block[1][i][2]
     All_Vector[1][i][0+1] = KMX_get_KeyvalsUnderlying_From_KeyCodeUnderlying_GDK(keymap,All_Vector[0][i][0],0);   //shift state: unshifted:0
     All_Vector[1][i][1+1] = KMX_get_KeyvalsUnderlying_From_KeyCodeUnderlying_GDK(keymap,All_Vector[0][i][0],1);   //shift state: shifted:1
-
-
-    //wprintf(L" Keycodes US dw        :   %d (US): -- %i (%c)  -- %i (%c) ---- (other): %i (%c)  --  %i(%c)    \n",(All_Vector[1][i][0]),All_Vector[0][i][1],All_Vector[0][i][1],All_Vector[0][i][2],All_Vector[0][i][2],All_Vector[1][i][1] ,All_Vector[1][i][1],All_Vector[1][i][2],All_Vector[1][i][2]);
-    //wprintf(L"   Keycodes ->Other dw:-:   %d (US): -- %i (%c)  -- %i (%c)   \n\n",(All_Vector[1][i][0]),All_Vector[1][i][1],All_Vector[1][i][1],All_Vector[1][i][2],All_Vector[1][i][2]);
   }
+
   return 0;
 }
 
@@ -443,67 +440,8 @@ std::u16string convert_DeadkeyValues_To_U16str(int in) {
   return u"\0";
 }
 
-// _S2 use gdk_keymap_translate_keyboard_state instead  returns shifted + unshifted only- no altgr,...
-KMX_DWORD KMX_get_KeyvalsUnderlying_From_KeyCodeUnderlying_GDK(GdkKeymap *keymap, guint keycode, int shift_state_pos) {
-  GdkKeymapKey *maps;
-  guint *keyvals;
-  gint count;
-  KMX_DWORD out;
-
-  if (!gdk_keymap_get_entries_for_keycode(keymap, keycode, &maps, &keyvals, &count))
-    return 0;
-  //if(!gdk_wayland_keymap_get_entries_for_keycode(keymap, keycode, &maps, &keyvals, &count))
-  //  return 0;    https://codebrowser.dev/gtk/gtk/gdk/wayland/gdkkeys-wayland.c.html
-
-  if (!(shift_state_pos <= count))
-   return 0;
-
-   if (!(keycode <= 94))
-    return 0;
-
- //KMX_DWORD deadkey =(KMX_DWORD)  keyvals[shift_state_pos];  //_S2 do I need this? no
-  out = KMX_get_CharsUnderlying_according_to_keycode_and_Shiftstate_GDK_dw_OLD(keymap,  keycode,  (ShiftState)  shift_state_pos,  0);
-
-  // _S2 g_free used everywhere?
-  g_free(keyvals);
-  g_free(maps);
-
-  return out;
-}
-
-// _S2 use gdk_keymap_translate_keyboard_state instead  return s shifted + unshifted only- no altgr,...
-KMX_DWORD KMX_get_KeyvalsUnderlying_From_KeyCodeUnderlying_GDK(GdkKeymap *keymap, guint keycode, int shift_state_pos, PKMX_WCHAR &dky) {
-  GdkKeymapKey *maps;
-  guint *keyvals;
-  gint count;
-  KMX_DWORD out;
-
-  if (!gdk_keymap_get_entries_for_keycode(keymap, keycode, &maps, &keyvals, &count))
-    return 0;
-  //if(!gdk_wayland_keymap_get_entries_for_keycode(keymap, keycode, &maps, &keyvals, &count))
-  //  return 0;    https://codebrowser.dev/gtk/gtk/gdk/wayland/gdkkeys-wayland.c.html
-
-  if (!(shift_state_pos <= count))
-   return 0;
-
-   if (!(keycode <= 94))
-    return 0;
-
-  KMX_DWORD deadkey = (KMX_DWORD)  keyvals[shift_state_pos];
-  //wprintf(L" keyvals[shift_state_pos]: %i %i %i %i----", keyvals[0],keyvals[1],keyvals[2],keyvals[3]);
-
-  dky = (PKMX_WCHAR) (convert_DeadkeyValues_To_U16str((int) deadkey)).c_str();
-  out = KMX_get_CharsUnderlying_according_to_keycode_and_Shiftstate_GDK_dw_OLD(keymap,  keycode,  (ShiftState)  shift_state_pos,  0);
-
-  // _S2 g_free used everywhere?
-  g_free(keyvals);
-  g_free(maps);
-
-  return out;
-}
-
-// _S2 ToDo use only one of those
-KMX_DWORD KMX_get_CharsUnderlying_according_to_keycode_and_Shiftstate_GDK_dw_OLD(GdkKeymap *keymap, guint keycode, ShiftState ss, int caps){
+//_S2 change Name
+int NEW_KMX_get_Keyval_all_7(GdkKeymap *keymap, guint keycode, ShiftState ss, int caps) {
 
   GdkModifierType consumed;
   GdkKeymapKey *maps;
@@ -586,160 +524,453 @@ KMX_DWORD KMX_get_CharsUnderlying_according_to_keycode_and_Shiftstate_GDK_dw_OLD
   }
   else
     return 0;
-
-  if((*keyvals >=  deadkey_min) && (*keyvals <=  deadkey_max))                             // deadkeys
-    return 0xFFFF;
-  if((*keyvals >  deadkey_max) || ((*keyvals <  deadkey_min)  &&  ( *keyvals > 0xFF)))     // out of range
-    return 0xFFFE;
-  else                                                                                     // usable char
-    return (KMX_DWORD) *keyvals;
+  return (int) *keyvals;
 }
 
-std::wstring KMX_get_CharsUnderlying_according_to_keycode_and_Shiftstate_GDK_OLD(GdkKeymap *keymap, guint keycode, ShiftState ss, int caps){
 
-  GdkModifierType consumed;
+
+
+      // _S2 use gdk_keymap_translate_keyboard_state instead  return s shifted + unshifted only- no altgr,...
+      KMX_DWORD KMX_get_KeyvalsUnderlying_From_KeyCodeUnderlying_GDK(GdkKeymap *keymap, guint keycode, int shift_state_pos, PKMX_WCHAR &dky) {
+        GdkKeymapKey *maps;
+        guint *keyvals;
+        gint count;
+        KMX_DWORD out;
+
+        if (!gdk_keymap_get_entries_for_keycode(keymap, keycode, &maps, &keyvals, &count))
+          return 0;
+        //if(!gdk_wayland_keymap_get_entries_for_keycode(keymap, keycode, &maps, &keyvals, &count))
+        //  return 0;    https://codebrowser.dev/gtk/gtk/gdk/wayland/gdkkeys-wayland.c.html
+
+        if (!(shift_state_pos <= count))
+        return 0;
+
+        if (!(keycode <= 94))
+          return 0;
+
+        KMX_DWORD deadkey = (KMX_DWORD)  keyvals[shift_state_pos];
+        //wprintf(L" keyvals[shift_state_pos]: %i %i %i %i----", keyvals[0],keyvals[1],keyvals[2],keyvals[3]);
+
+        dky = (PKMX_WCHAR) (convert_DeadkeyValues_To_U16str((int) deadkey)).c_str();
+        out = KMX_get_FFFF_Underlying_according_to_keycode_and_Shiftstate_GDK_dw(keymap,  keycode,  (ShiftState)  shift_state_pos,  0);
+ 
+        // _S2 g_free used everywhere?
+        g_free(keyvals);
+        g_free(maps);
+
+        return out;
+      }
+
+
+// _S2 use gdk_keymap_translate_keyboard_state instead  return s shifted + unshifted only- no altgr,...
+KMX_DWORD KMX_get_KeyvalsUnderlying_From_KeyCodeUnderlying_GDK(GdkKeymap *keymap, guint keycode, int shift_state_pos) {
   GdkKeymapKey *maps;
   guint *keyvals;
   gint count;
+  KMX_DWORD out;
 
   if (!gdk_keymap_get_entries_for_keycode(keymap, keycode, &maps, &keyvals, &count))
-    return L"\0";
+    return 0;
+  //if(!gdk_wayland_keymap_get_entries_for_keycode(keymap, keycode, &maps, &keyvals, &count))
+  //  return 0;    https://codebrowser.dev/gtk/gtk/gdk/wayland/gdkkeys-wayland.c.html
 
-  //unshifted (shiftstate: 0)
-  if (( ss == Base ) && ( caps == 0 )) {
-    GdkModifierType MOD_base = (GdkModifierType) ( ~GDK_MODIFIER_MASK );
-    gdk_keymap_translate_keyboard_state (keymap, keycode, MOD_base , 0, keyvals, NULL, NULL, & consumed);
-  }
+  if (!(shift_state_pos <= count))
+   return 0;
 
-  //caps (shiftstate: 0)
-  else if (( ss == Base ) && ( caps == 1 )) {
-    GdkModifierType MOD_Caps = (GdkModifierType) ( GDK_LOCK_MASK );
-    gdk_keymap_translate_keyboard_state (keymap, keycode, MOD_Caps, 0, keyvals, NULL, NULL, & consumed);
-  }
+   if (!(keycode <= 94))
+    return 0;
 
-  //Shift (shiftstate: 1)
-  else if (( ss == Shft ) && ( caps == 0 )) {
-    GdkModifierType MOD_Shift = (GdkModifierType) ( GDK_SHIFT_MASK );
-    gdk_keymap_translate_keyboard_state (keymap, keycode, MOD_Shift , 0, keyvals, NULL, NULL, & consumed);
-    std::wstring rV1= std::wstring(1, (int) *keyvals);
-  }
+    // _S2  can I opt this out whne i do nou use dky??
+   // KMX_DWORD deadkey = (KMX_DWORD)  keyvals[shift_state_pos];
+   // //wprintf(L" keyvals[shift_state_pos]: %i %i %i %i----", keyvals[0],keyvals[1],keyvals[2],keyvals[3]);
+   // dky = (PKMX_WCHAR) (convert_DeadkeyValues_To_U16str((int) deadkey)).c_str();
 
-  //SHIFT+CAPS (shiftstate: 1)
-  else if ( ( ss == Shft ) && ( caps ==1 )) {
-    GdkModifierType MOD_ShiftCaps= (GdkModifierType) ((GDK_SHIFT_MASK | GDK_LOCK_MASK));
-    gdk_keymap_translate_keyboard_state (keymap, keycode, MOD_ShiftCaps , 0, keyvals, NULL, NULL, & consumed);
-  }
+  //out = KMX_get_CharsUnderlying_according_to_keycode_and_Shiftstate_GDK_dw_OLD(keymap,  keycode,  (ShiftState)  shift_state_pos,  0);
+  //out = KMX_get_FFFF_Underlying_according_to_keycode_and_Shiftstate_GDK_dw(keymap,  keycode,  (ShiftState)  shift_state_pos,0);
+  out = KMX_get_CharsUnderlying_according_to_keycode_and_Shiftstate_GDK_dw(keymap,  keycode,  (ShiftState)  shift_state_pos,0);
 
-  // _S2 if I include this we get deadkey(65535) instead of deadkey(3)
-  /*// Ctrl (shiftstate: 2)
-  else if (( ss == Ctrl ) && ( caps == 0 )){
-    GdkModifierType MOD_Ctrl = (GdkModifierType) ( GDK_MOD2_MASK  );
-    gdk_keymap_translate_keyboard_state (keymap, keycode, MOD_Ctrl , 0, keyvals, NULL, NULL, & consumed);
-  }
+  // _S2 g_free used everywhere?
+  g_free(keyvals);
+  g_free(maps);
 
-  // Ctrl (shiftstate: 2)
-  else if (( ss == Ctrl ) && ( caps == 1 )){
-    GdkModifierType MOD_CtrlCaps = (GdkModifierType) ( (GDK_MOD2_MASK | GDK_LOCK_MASK) );
-    gdk_keymap_translate_keyboard_state (keymap, keycode, MOD_CtrlCaps , 0, keyvals, NULL, NULL, & consumed);
-  }*/
-
-  /*// SHIFT+Ctrl (shiftstate: 3)
-  else if (( ss == ShftCtrl ) && ( caps == 0 )){
-    GdkModifierType MOD_Ctrl = (GdkModifierType) (GDK_SHIFT_MASK | GDK_MOD2_MASK  );
-    gdk_keymap_translate_keyboard_state (keymap, keycode, MOD_Ctrl , 0, keyvals, NULL, NULL, & consumed);
-  }
-
-  // SHIFT+Ctrl (shiftstate: 3)
-  else if (( ss == ShftCtrl ) && ( caps == 1 )){
-    GdkModifierType MOD_CtrlCaps = (GdkModifierType) (GDK_SHIFT_MASK | GDK_MOD2_MASK | GDK_LOCK_MASK);
-    gdk_keymap_translate_keyboard_state (keymap, keycode, MOD_CtrlCaps , 0, keyvals, NULL, NULL, & consumed);
-  }*/
-
-  //ALT-GR (shiftstate: 6)
-  else if (( ss == MenuCtrl ) && ( caps == 0 )){
-    GdkModifierType MOD_AltGr = (GdkModifierType) (GDK_MOD2_MASK | GDK_MOD5_MASK);
-    gdk_keymap_translate_keyboard_state (keymap, keycode, MOD_AltGr , 0, keyvals, NULL, NULL, & consumed);
-  }
-
-  //ALT-GR +CAPS (shiftstate: 6)
-  else if (( ss == MenuCtrl ) && ( caps == 1 )){
-    GdkModifierType MOD_AltGr = (GdkModifierType) (GDK_MOD2_MASK | GDK_MOD5_MASK | GDK_LOCK_MASK);
-    gdk_keymap_translate_keyboard_state (keymap, keycode, MOD_AltGr , 0, keyvals, NULL, NULL, & consumed);
-  }
-
-  //ALT-GR (shiftstate: 7)
-  else if (( ss == ShftMenuCtrl ) && ( caps == 0 )){
-    GdkModifierType MOD_AltGr = (GdkModifierType) ( (GDK_SHIFT_MASK | GDK_MOD2_MASK | GDK_MOD5_MASK) );
-    gdk_keymap_translate_keyboard_state (keymap, keycode, MOD_AltGr , 0, keyvals, NULL, NULL, & consumed);
-  }
-
-  //ALT-GR +CAPS (shiftstate: 7)
-  else if (( ss == ShftMenuCtrl ) && ( caps == 1 )){
-    GdkModifierType MOD_AltGr = (GdkModifierType) ( (GDK_SHIFT_MASK | GDK_MOD2_MASK | GDK_MOD5_MASK | GDK_LOCK_MASK) );
-    gdk_keymap_translate_keyboard_state (keymap, keycode, MOD_AltGr , 0, keyvals, NULL, NULL, & consumed);
-  }
-
-  else
-    return L"\0";
-
-  //if((*keyvals >=  deadkey_min) && (*keyvals <=  deadkey_max) )
-  if((*keyvals >=  deadkey_min)  )
-    return  convert_DeadkeyValues_ToChar((int) *keyvals);
-  else
-    return  std::wstring(1, (int) *keyvals);
+  return out;
 }
 
-KMX_DWORD KMX_get_VKUS_From_KeyCodeUnderlying_GDK( GdkKeymap *keymap, KMX_DWORD keycode) {
-
-  GdkModifierType consumed;
+// _S2 use gdk_keymap_translate_keyboard_state instead  return s shifted + unshifted only- no altgr,...
+KMX_DWORD KMX_get_rc_From_KeyCodeUnderlying_GDK(GdkKeymap *keymap, guint keycode, int shift_state_pos) {
   GdkKeymapKey *maps;
   guint *keyvals;
-  guint lowerCase;
-  guint upperCase;
   gint count;
+  KMX_DWORD out;
 
   if (!gdk_keymap_get_entries_for_keycode(keymap, keycode, &maps, &keyvals, &count))
     return 0;
+  //if(!gdk_wayland_keymap_get_entries_for_keycode(keymap, keycode, &maps, &keyvals, &count))
+  //  return 0;    https://codebrowser.dev/gtk/gtk/gdk/wayland/gdkkeys-wayland.c.html
 
-  //Shift
-  GdkModifierType MOD_Shift = (GdkModifierType) ( GDK_SHIFT_MASK );
-  gdk_keymap_translate_keyboard_state (keymap, keycode, MOD_Shift , 0, keyvals, NULL, NULL, & consumed);
+  if (!(shift_state_pos <= count))
+   return 0;
 
-  for (int i = 0; i < count; i++) {
-    if (maps[i].level > 1 || maps[i].group > 1)
-      continue;
+   if (!(keycode <= 94))
+    return 0;
 
-    gchar * kv_name =  gdk_keyval_name (keyvals[i]);
+    // _S2  can I opt this out whne i do nou use dky??
+   // KMX_DWORD deadkey = (KMX_DWORD)  keyvals[shift_state_pos];
+   // //wprintf(L" keyvals[shift_state_pos]: %i %i %i %i----", keyvals[0],keyvals[1],keyvals[2],keyvals[3]);
+   // dky = (PKMX_WCHAR) (convert_DeadkeyValues_To_U16str((int) deadkey)).c_str();
 
-    if ( keyvals[i]>0)
-      gdk_keyval_convert_case (*kv_name, &lowerCase, &upperCase);
+  //out = KMX_get_CharsUnderlying_according_to_keycode_and_Shiftstate_GDK_dw_OLD(keymap,  keycode,  (ShiftState)  shift_state_pos,  0);
+  out = KMX_get_FFFF_Underlying_according_to_keycode_and_Shiftstate_GDK_dw(keymap,  keycode,  (ShiftState)  shift_state_pos,0);
+  //out = KMX_get_CharsUnderlying_according_to_keycode_and_Shiftstate_GDK_dw(keymap,  keycode,  (ShiftState)  shift_state_pos,0);
 
-    // _S2 is ( lowerCase == upperCase )  true for all number keys for all keyboards?
-    if ( lowerCase == upperCase )
-      return (KMX_DWORD) upperCase;
+  // _S2 g_free used everywhere?
+  g_free(keyvals);
+  g_free(maps);
+
+  return out;
+}
+
+  // _S2 ToDo use only one of those
+  KMX_DWORD KMX_get_FFFF_Underlying_according_to_keycode_and_Shiftstate_GDK_dw(GdkKeymap *keymap, guint keycode, ShiftState ss, int caps){
+
+    GdkModifierType consumed;
+    GdkKeymapKey *maps;
+    guint *keyvals;
+    gint count;
+
+    if (!gdk_keymap_get_entries_for_keycode(keymap, keycode, &maps, &keyvals, &count))
+      return 0;
+
+    KMX_DWORD keyvals_dw= (KMX_DWORD) NEW_KMX_get_Keyval_all_7(keymap,  keycode, ss,  caps) ;
+
+    if((keyvals_dw >=  deadkey_min) && (keyvals_dw <=  deadkey_max))                             // deadkeys
+      return 0xFFFF;
+    if((keyvals_dw >  deadkey_max) || ((keyvals_dw <  deadkey_min)  &&  ( keyvals_dw > 0xFF)))     // out of range
+      return 0xFFFE;
+    else                                                                                     // usable char
+      return keyvals_dw;
   }
 
- KMX_DWORD testvar_S2 =  ScanCodeToUSVirtualKey[keycode-8];
-  if ( keycode >7)
-    return  (KMX_DWORD) ScanCodeToUSVirtualKey[keycode-8];
 
-  return 0;   //_S2 what to return if not found
-}
 
-KMX_DWORD KMX_get_KeyCodeUnderlying_From_VKUS( KMX_DWORD VK_US) {
-KMX_DWORD test_S2 = (8+ USVirtualKeyToScanCode[ VK_US ]);
-  if( VK_US > 7) {
-    return (KMX_DWORD)(8+ USVirtualKeyToScanCode[ VK_US ]);}
-  else
-    return 0;
-}
 
-KMX_DWORD KMX_get_KeyCodeUnderlying_From_KeycodeUS_GDK(GdkKeymap *keymap, v_dw_3D &All_Vector,KMX_DWORD KC_US, ShiftState ss, int caps) {
+  // _S2 ToDo use only one of those
+  KMX_DWORD KMX_get_CharsUnderlying_according_to_keycode_and_Shiftstate_GDK_dw(GdkKeymap *keymap, guint keycode, ShiftState ss, int caps){
+
+    GdkModifierType consumed;
+    GdkKeymapKey *maps;
+    guint *keyvals;
+    gint count;
+
+    if (!gdk_keymap_get_entries_for_keycode(keymap, keycode, &maps, &keyvals, &count))
+      return 0;
+
+    KMX_DWORD keyvals_dw= (KMX_DWORD) NEW_KMX_get_Keyval_all_7(keymap,  keycode, ss,  caps) ;
+    return keyvals_dw;
+  }
+      // _S2 ToDo use only one of those
+      KMX_DWORD KMX_get_CharsUnderlying_according_to_keycode_and_Shiftstate_GDK_dw_OLD(GdkKeymap *keymap, guint keycode, ShiftState ss, int caps){
+
+        GdkModifierType consumed;
+        GdkKeymapKey *maps;
+        guint *keyvals;
+        gint count;
+
+        if (!gdk_keymap_get_entries_for_keycode(keymap, keycode, &maps, &keyvals, &count))
+          return 0;
+
+        //BASE (shiftstate: 0)
+        if (( ss == Base ) && ( caps == 0 )) {
+          GdkModifierType MOD_base = (GdkModifierType) ( ~GDK_MODIFIER_MASK );
+          gdk_keymap_translate_keyboard_state (keymap, keycode, MOD_base , 0, keyvals, NULL, NULL, & consumed);
+        }
+
+        //BASE + CAPS (shiftstate: 0)
+        else if (( ss == Base ) && ( caps == 1 )) {
+          GdkModifierType MOD_Caps = (GdkModifierType) ( GDK_LOCK_MASK );
+          gdk_keymap_translate_keyboard_state (keymap, keycode, MOD_Caps, 0, keyvals, NULL, NULL, & consumed);
+        }
+
+        //SHIFT (shiftstate: 1)
+        else if (( ss == Shft ) && ( caps == 0 )) {
+          GdkModifierType MOD_Shift = (GdkModifierType) ( GDK_SHIFT_MASK );
+          gdk_keymap_translate_keyboard_state (keymap, keycode, MOD_Shift , 0, keyvals, NULL, NULL, & consumed);
+        }
+
+        //SHIFT+CAPS (shiftstate: 1)
+        else if ( ( ss == Shft ) && ( caps ==1 )) {
+          GdkModifierType MOD_ShiftCaps= (GdkModifierType) ((GDK_SHIFT_MASK | GDK_LOCK_MASK));
+          gdk_keymap_translate_keyboard_state (keymap, keycode, MOD_ShiftCaps , 0, keyvals, NULL, NULL, & consumed);
+        }
+
+        // Ctrl (shiftstate: 2)
+        else if (( ss == Ctrl ) && ( caps == 0 )){
+          GdkModifierType MOD_Ctrl = (GdkModifierType) ( GDK_MOD5_MASK  );
+          gdk_keymap_translate_keyboard_state (keymap, keycode, MOD_Ctrl , 0, keyvals, NULL, NULL, & consumed);
+        }
+
+        // Ctrl (shiftstate: 2)
+        else if (( ss == Ctrl ) && ( caps == 1 )){
+          GdkModifierType MOD_CtrlCaps = (GdkModifierType) (GDK_MOD5_MASK | GDK_LOCK_MASK);
+          gdk_keymap_translate_keyboard_state (keymap, keycode, MOD_CtrlCaps , 0, keyvals, NULL, NULL, & consumed);
+        }
+
+        // SHIFT+Ctrl (shiftstate: 3)
+        else if (( ss == ShftCtrl ) && ( caps == 0 )){
+          GdkModifierType MOD_Ctrl = (GdkModifierType) (GDK_SHIFT_MASK |  GDK_MOD5_MASK  );
+          gdk_keymap_translate_keyboard_state (keymap, keycode, MOD_Ctrl , 0, keyvals, NULL, NULL, & consumed);
+        }
+
+        // SHIFT+Ctrl (shiftstate: 3)
+        else if (( ss == ShftCtrl ) && ( caps == 1 )){
+          GdkModifierType MOD_CtrlCaps = (GdkModifierType) ( GDK_SHIFT_MASK | GDK_MOD5_MASK | GDK_LOCK_MASK);
+          gdk_keymap_translate_keyboard_state (keymap, keycode, MOD_CtrlCaps , 0, keyvals, NULL, NULL, & consumed);
+        }
+
+        //ALT-GR (shiftstate: 6)
+        else if (( ss == MenuCtrl ) && ( caps == 0 )){
+          GdkModifierType MOD_AltGr = (GdkModifierType) (GDK_MOD2_MASK | GDK_MOD5_MASK);
+          gdk_keymap_translate_keyboard_state (keymap, keycode, MOD_AltGr , 0, keyvals, NULL, NULL, & consumed);
+        }
+
+        //ALT-GR +CAPS (shiftstate: 6)
+        else if (( ss == MenuCtrl ) && ( caps == 1 )){
+          GdkModifierType MOD_AltGr = (GdkModifierType) (GDK_MOD2_MASK | GDK_MOD5_MASK | GDK_LOCK_MASK);
+          gdk_keymap_translate_keyboard_state (keymap, keycode, MOD_AltGr , 0, keyvals, NULL, NULL, & consumed);
+        }
+
+        //ALT-GR (shiftstate: 7)
+        else if (( ss == ShftMenuCtrl ) && ( caps == 0 )){
+          GdkModifierType MOD_AltGr = (GdkModifierType) ( (GDK_SHIFT_MASK | GDK_MOD2_MASK | GDK_MOD5_MASK) );
+          gdk_keymap_translate_keyboard_state (keymap, keycode, MOD_AltGr , 0, keyvals, NULL, NULL, & consumed);
+        }
+
+        //ALT-GR +CAPS (shiftstate: 7)
+        else if (( ss == ShftMenuCtrl ) && ( caps == 1 )){
+          GdkModifierType MOD_AltGr = (GdkModifierType) ( (GDK_SHIFT_MASK | GDK_MOD2_MASK | GDK_MOD5_MASK | GDK_LOCK_MASK) );
+          gdk_keymap_translate_keyboard_state (keymap, keycode, MOD_AltGr , 0, keyvals, NULL, NULL, & consumed);
+        }
+        else
+          return 0;
+
+        if((*keyvals >=  deadkey_min) && (*keyvals <=  deadkey_max))                             // deadkeys
+          return 0xFFFF;
+        if((*keyvals >  deadkey_max) || ((*keyvals <  deadkey_min)  &&  ( *keyvals > 0xFF)))     // out of range
+          return 0xFFFE;
+        else                                                                                     // usable char
+          return (KMX_DWORD) *keyvals;
+      }
+
+
+/*
+      std::wstring KMX_get_CharsUnderlying_according_to_keycode_and_Shiftstate_GDK_OLD(GdkKeymap *keymap, guint keycode, ShiftState ss, int caps){
+
+        GdkModifierType consumed;
+        GdkKeymapKey *maps;
+        guint *keyvals;
+        gint count;
+
+        if (!gdk_keymap_get_entries_for_keycode(keymap, keycode, &maps, &keyvals, &count))
+          return L"\0";
+
+        //unshifted (shiftstate: 0)
+        if (( ss == Base ) && ( caps == 0 )) {
+          GdkModifierType MOD_base = (GdkModifierType) ( ~GDK_MODIFIER_MASK );
+          gdk_keymap_translate_keyboard_state (keymap, keycode, MOD_base , 0, keyvals, NULL, NULL, & consumed);
+        }
+
+        //caps (shiftstate: 0)
+        else if (( ss == Base ) && ( caps == 1 )) {
+          GdkModifierType MOD_Caps = (GdkModifierType) ( GDK_LOCK_MASK );
+          gdk_keymap_translate_keyboard_state (keymap, keycode, MOD_Caps, 0, keyvals, NULL, NULL, & consumed);
+        }
+
+        //Shift (shiftstate: 1)
+        else if (( ss == Shft ) && ( caps == 0 )) {
+          GdkModifierType MOD_Shift = (GdkModifierType) ( GDK_SHIFT_MASK );
+          gdk_keymap_translate_keyboard_state (keymap, keycode, MOD_Shift , 0, keyvals, NULL, NULL, & consumed);
+          std::wstring rV1= std::wstring(1, (int) *keyvals);
+        }
+
+        //SHIFT+CAPS (shiftstate: 1)
+        else if ( ( ss == Shft ) && ( caps ==1 )) {
+          GdkModifierType MOD_ShiftCaps= (GdkModifierType) ((GDK_SHIFT_MASK | GDK_LOCK_MASK));
+          gdk_keymap_translate_keyboard_state (keymap, keycode, MOD_ShiftCaps , 0, keyvals, NULL, NULL, & consumed);
+        }
+
+        //ALT-GR (shiftstate: 6)
+        else if (( ss == MenuCtrl ) && ( caps == 0 )){
+          GdkModifierType MOD_AltGr = (GdkModifierType) (GDK_MOD2_MASK | GDK_MOD5_MASK);
+          gdk_keymap_translate_keyboard_state (keymap, keycode, MOD_AltGr , 0, keyvals, NULL, NULL, & consumed);
+        }
+
+        //ALT-GR +CAPS (shiftstate: 6)
+        else if (( ss == MenuCtrl ) && ( caps == 1 )){
+          GdkModifierType MOD_AltGr = (GdkModifierType) (GDK_MOD2_MASK | GDK_MOD5_MASK | GDK_LOCK_MASK);
+          gdk_keymap_translate_keyboard_state (keymap, keycode, MOD_AltGr , 0, keyvals, NULL, NULL, & consumed);
+        }
+
+        //ALT-GR (shiftstate: 7)
+        else if (( ss == ShftMenuCtrl ) && ( caps == 0 )){
+          GdkModifierType MOD_AltGr = (GdkModifierType) ( (GDK_SHIFT_MASK | GDK_MOD2_MASK | GDK_MOD5_MASK) );
+          gdk_keymap_translate_keyboard_state (keymap, keycode, MOD_AltGr , 0, keyvals, NULL, NULL, & consumed);
+        }
+
+        //ALT-GR +CAPS (shiftstate: 7)
+        else if (( ss == ShftMenuCtrl ) && ( caps == 1 )){
+          GdkModifierType MOD_AltGr = (GdkModifierType) ( (GDK_SHIFT_MASK | GDK_MOD2_MASK | GDK_MOD5_MASK | GDK_LOCK_MASK) );
+          gdk_keymap_translate_keyboard_state (keymap, keycode, MOD_AltGr , 0, keyvals, NULL, NULL, & consumed);
+        }
+
+        else
+          return L"\0";
+
+        //if((*keyvals >=  deadkey_min) && (*keyvals <=  deadkey_max) )
+        if((*keyvals >=  deadkey_min)  )
+          return  convert_DeadkeyValues_ToChar((int) *keyvals);
+        else
+          return  std::wstring(1, (int) *keyvals);
+      }
+
+*/
+
+
+  std::wstring KMX_get_CharsUnderlying_according_to_keycode_and_Shiftstate_GDK(GdkKeymap *keymap, guint keycode, ShiftState ss, int caps){
+
+    GdkModifierType consumed;
+    GdkKeymapKey *maps;
+    guint *keyvals;
+    gint count;
+
+    if (!gdk_keymap_get_entries_for_keycode(keymap, keycode, &maps, &keyvals, &count))
+      return L"\0";
+
+    /* //unshifted (shiftstate: 0)
+    if (( ss == Base ) && ( caps == 0 )) {
+      GdkModifierType MOD_base = (GdkModifierType) ( ~GDK_MODIFIER_MASK );
+      gdk_keymap_translate_keyboard_state (keymap, keycode, MOD_base , 0, keyvals, NULL, NULL, & consumed);
+    }
+
+    //caps (shiftstate: 0)
+    else if (( ss == Base ) && ( caps == 1 )) {
+      GdkModifierType MOD_Caps = (GdkModifierType) ( GDK_LOCK_MASK );
+      gdk_keymap_translate_keyboard_state (keymap, keycode, MOD_Caps, 0, keyvals, NULL, NULL, & consumed);
+    }
+
+    //Shift (shiftstate: 1)
+    else if (( ss == Shft ) && ( caps == 0 )) {
+      GdkModifierType MOD_Shift = (GdkModifierType) ( GDK_SHIFT_MASK );
+      gdk_keymap_translate_keyboard_state (keymap, keycode, MOD_Shift , 0, keyvals, NULL, NULL, & consumed);
+      std::wstring rV1= std::wstring(1, (int) *keyvals);
+    }
+
+    //SHIFT+CAPS (shiftstate: 1)
+    else if ( ( ss == Shft ) && ( caps ==1 )) {
+      GdkModifierType MOD_ShiftCaps= (GdkModifierType) ((GDK_SHIFT_MASK | GDK_LOCK_MASK));
+      gdk_keymap_translate_keyboard_state (keymap, keycode, MOD_ShiftCaps , 0, keyvals, NULL, NULL, & consumed);
+    }
+
+
+    //ALT-GR (shiftstate: 6)
+    else if (( ss == MenuCtrl ) && ( caps == 0 )){
+      GdkModifierType MOD_AltGr = (GdkModifierType) (GDK_MOD2_MASK | GDK_MOD5_MASK);
+      gdk_keymap_translate_keyboard_state (keymap, keycode, MOD_AltGr , 0, keyvals, NULL, NULL, & consumed);
+    }
+
+    //ALT-GR +CAPS (shiftstate: 6)
+    else if (( ss == MenuCtrl ) && ( caps == 1 )){
+      GdkModifierType MOD_AltGr = (GdkModifierType) (GDK_MOD2_MASK | GDK_MOD5_MASK | GDK_LOCK_MASK);
+      gdk_keymap_translate_keyboard_state (keymap, keycode, MOD_AltGr , 0, keyvals, NULL, NULL, & consumed);
+    }
+
+    //ALT-GR (shiftstate: 7)
+    else if (( ss == ShftMenuCtrl ) && ( caps == 0 )){
+      GdkModifierType MOD_AltGr = (GdkModifierType) ( (GDK_SHIFT_MASK | GDK_MOD2_MASK | GDK_MOD5_MASK) );
+      gdk_keymap_translate_keyboard_state (keymap, keycode, MOD_AltGr , 0, keyvals, NULL, NULL, & consumed);
+    }
+
+    //ALT-GR +CAPS (shiftstate: 7)
+    else if (( ss == ShftMenuCtrl ) && ( caps == 1 )){
+      GdkModifierType MOD_AltGr = (GdkModifierType) ( (GDK_SHIFT_MASK | GDK_MOD2_MASK | GDK_MOD5_MASK | GDK_LOCK_MASK) );
+      gdk_keymap_translate_keyboard_state (keymap, keycode, MOD_AltGr , 0, keyvals, NULL, NULL, & consumed);
+    }
+    else
+      return L"\0";*/
+
+
+
+  if( (ss ==2 ) ||(ss ==3 ))
+      return L"\0";
+
+
+  int keyvals_int= NEW_KMX_get_Keyval_all_7(keymap,  keycode,  ss,  caps);
+
+
+
+    //if((*keyvals >=  deadkey_min) && (*keyvals <=  deadkey_max) )
+    if((keyvals_int >=  deadkey_min)  )
+      return  convert_DeadkeyValues_ToChar(keyvals_int);
+    else
+      return  std::wstring(1, keyvals_int);
+  }
+
+
+
+
+
+
+
+
+      KMX_DWORD KMX_get_VKUS_From_KeyCodeUnderlying_GDK( GdkKeymap *keymap, KMX_DWORD keycode) {
+
+        GdkModifierType consumed;
+        GdkKeymapKey *maps;
+        guint *keyvals;
+        guint lowerCase;
+        guint upperCase;
+        gint count;
+
+        if (!gdk_keymap_get_entries_for_keycode(keymap, keycode, &maps, &keyvals, &count))
+          return 0;
+
+        //Shift
+        GdkModifierType MOD_Shift = (GdkModifierType) ( GDK_SHIFT_MASK );
+        gdk_keymap_translate_keyboard_state (keymap, keycode, MOD_Shift , 0, keyvals, NULL, NULL, & consumed);
+
+        for (int i = 0; i < count; i++) {
+          if (maps[i].level > 1 || maps[i].group > 1)
+            continue;
+
+          gchar * kv_name =  gdk_keyval_name (keyvals[i]);
+
+          if ( keyvals[i]>0)
+            gdk_keyval_convert_case (*kv_name, &lowerCase, &upperCase);
+
+          // _S2 is ( lowerCase == upperCase )  true for all number keys for all keyboards?
+          if ( lowerCase == upperCase )
+            return (KMX_DWORD) upperCase;
+        }
+
+      KMX_DWORD testvar_S2 =  ScanCodeToUSVirtualKey[keycode-8];
+        if ( keycode >7)
+          return  (KMX_DWORD) ScanCodeToUSVirtualKey[keycode-8];
+
+        return 0;   //_S2 what to return if not found
+      }
+
+      KMX_DWORD KMX_get_KeyCodeUnderlying_From_VKUS( KMX_DWORD VK_US) {
+      KMX_DWORD test_S2 = (8+ USVirtualKeyToScanCode[ VK_US ]);
+        if( VK_US > 7) {
+          return (KMX_DWORD)(8+ USVirtualKeyToScanCode[ VK_US ]);}
+        else
+          return 0;
+      }
+
+      KMX_DWORD KMX_get_KeyCodeUnderlying_From_KeycodeUS_GDK(GdkKeymap *keymap, v_dw_3D &All_Vector,KMX_DWORD KC_US, ShiftState ss, int caps) {
 
   KMX_DWORD Character;
-  std::wstring ws = KMX_get_CharsUnderlying_according_to_keycode_and_Shiftstate_GDK_OLD(keymap,  KC_US,  ss,  caps);
-  //std::wstring ws = KMX_get_CharsUnderlying_according_to_keycode_and_Shiftstate_GDK(keymap,  KC_US,  ss,  caps);
-
+  ///std::wstring ws =  KMX_get_CharsUnderlying_according_to_keycode_and_Shiftstate_GDK_OLD(keymap,  KC_US,  ss,  caps);
+  std::wstring ws = KMX_get_CharsUnderlying_according_to_keycode_and_Shiftstate_GDK(keymap,  KC_US,  ss,  caps);
   Character = *ws.c_str();
 
   //Find underlying SC of character

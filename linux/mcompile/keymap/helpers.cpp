@@ -519,7 +519,7 @@ KMX_WCHAR  KMX_get_CharUnderlying_From_SCUnderlying_GDK(GdkKeymap *keymap, KMX_U
   
   PKMX_WCHAR dky;
   int VKShiftState_lin = map_VKShiftState_to_Lin(VKShiftState);
-  KMX_DWORD KeyvalOther = KMX_get_KeyvalsUnderlying_From_KeyCodeUnderlying_GDK(keymap,SC_OTHER, VKShiftState_lin, dky);
+  KMX_DWORD KeyvalOther = KMX_get_KeyvalsUnderlying_From_KeyCodeUnderlying_GDK_OLD(keymap,SC_OTHER, VKShiftState_lin, dky);
 
   if (KeyvalOther >= deadkey_min) {
    /// std::string ws((const char*) gdk_keyval_name (KeyvalOther));
@@ -910,7 +910,7 @@ int replace_KeyName_with_Keycode2(std::string  in) {
 
 /*int KMX_ToUnicodeEx( guint ScanCode, const BYTE *lpKeyStccate, PWCHAR pwszBuff,  int shift_state, int caps,GdkKeymap *keymap) {
 
-  KMX_DWORD kvl= KMX_get_KeyvalsUnderlying_From_KeyCodeUnderlying_GDK(keymap, ScanCode, shift_state);
+  KMX_DWORD kvl= KMX_get_KeyvalsUnderlying_From_KeyCodeUnderlying_GDK_OLD(keymap, ScanCode, shift_state);
 
   std::wstring character = KMX_get_CharsUnderlying_according_to_keycode_and_Shiftstate_GDK(keymap, ScanCode, ShiftState(shift_state), caps);
   pwszBuff[0]= * (PWCHAR) character.c_str();
@@ -998,7 +998,7 @@ gdk_keyval_convert_case (GDK_KEY_4,    lower,upper);
 gdk_keyval_convert_case (GDK_KEY_dollar,    lower,upper);*/
 }
 
-static void PrintKeymapForCode(GdkKeymap *keymap, guint keycode) {
+/*static void PrintKeymapForCode(GdkKeymap *keymap, guint keycode) {
   GdkModifierType consumed;
   GdkKeymapKey *maps;
   GdkEventKey* event;
@@ -1066,9 +1066,9 @@ static void PrintKeymapForCode(GdkKeymap *keymap, guint keycode) {
 
   g_free(keyvals);
   g_free(maps);
-}
+}*/
 
-bool InsertKeyvalsFromKeymap(v_dw_3D &All_Vector,GdkKeymap * keymap){
+/*bool InsertKeyvalsFromKeymap(v_dw_3D &All_Vector,GdkKeymap * keymap){
 
   // get the keyvals using GDK and copy into All_Vector
   for(int i =0; i< (int) All_Vector[1].size();i++) {
@@ -1076,27 +1076,27 @@ bool InsertKeyvalsFromKeymap(v_dw_3D &All_Vector,GdkKeymap * keymap){
     All_Vector[1][i][0] = All_Vector[0][i][0];
 
     // get Keyvals of this key and copy to unshifted/shifted in "other"-block[1][i][1] / block[1][i][2]
-    All_Vector[1][i][0+1] = KMX_get_KeyvalsUnderlying_From_KeyCodeUnderlying_GDK(keymap,(All_Vector[1][i][0]),0);   //shift state: unshifted:0
-    All_Vector[1][i][1+1] = KMX_get_KeyvalsUnderlying_From_KeyCodeUnderlying_GDK(keymap,(All_Vector[1][i][0]),1);   //shift state: shifted:1
+    All_Vector[1][i][0+1] = KMX_get_KeyvalsUnderlying_From_KeyCodeUnderlying_GDK_OLD(keymap,(All_Vector[1][i][0]),0);   //shift state: unshifted:0
+    All_Vector[1][i][1+1] = KMX_get_KeyvalsUnderlying_From_KeyCodeUnderlying_GDK_OLD(keymap,(All_Vector[1][i][0]),1);   //shift state: shifted:1
 
     //wprintf(L" Keycodes US dw        :   %d (US): -- %i (%c)  -- %i (%c) ---- (other): %i (%c)  --  %i(%c)    \n",(All_Vector[1][i][0]),All_Vector[0][i][1],All_Vector[0][i][1],All_Vector[0][i][2],All_Vector[0][i][2],All_Vector[1][i][1] ,All_Vector[1][i][1],All_Vector[1][i][2],All_Vector[1][i][2]);
     //wprintf(L"   Keycodes ->Other dw:-:   %d (US): -- %i (%c)  -- %i (%c)   \n\n",(All_Vector[1][i][0]),All_Vector[1][i][1],All_Vector[1][i][1],All_Vector[1][i][2],All_Vector[1][i][2]);
   }
-}
+}*/
 
 // _S2 can go later
-KMX_DWORD writeKeyvalsFromKeymap(GdkKeymap *keymap, guint keycode, int shift_state_pos) {
+/*KMX_DWORD writeKeyvalsFromKeymap(GdkKeymap *keymap, guint keycode, int shift_state_pos) {
   GdkKeymapKey *maps;
   guint *keyvals;
   gint count;
   KMX_DWORD out;
   for ( int ii =1; ii< 255;ii++) {
 
-  KMX_DWORD out = KMX_get_KeyvalsUnderlying_From_KeyCodeUnderlying_GDK(keymap,ii,0);
-  KMX_DWORD out2= KMX_get_KeyvalsUnderlying_From_KeyCodeUnderlying_GDK(keymap,ii,1);
+  KMX_DWORD out = KMX_get_KeyvalsUnderlying_From_KeyCodeUnderlying_GDK_OLD(keymap,ii,0);
+  KMX_DWORD out2= KMX_get_KeyvalsUnderlying_From_KeyCodeUnderlying_GDK_OLD(keymap,ii,1);
   wprintf(L" ii = %i  --> keymap = %i (%c)..%i(%c) \n",ii, out,out, out2,out2);
   }
-}
+}*/
 
 // _S2 not needed later
 bool test(v_dw_3D &V) {
