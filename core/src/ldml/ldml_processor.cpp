@@ -292,70 +292,90 @@ ldml_processor::process_key_string(ldml_event_state &ldml_state, const std::u16s
   (void)process_output(ldml_state, key_str32, transforms.get());
 }
 
-size_t ldml_processor::process_output(ldml_event_state &ldml_state, const std::u32string &str, ldml::transforms *with_transforms) const {
-  std::u32string nfd_str = str;
+size_t ldml_processor::process_output(ldml_event_state &ldml_state, const std::u32string &key_str, ldml::transforms *with_transforms) const {
+  // previous context string
+  std::u32string old_ctxt;
+  (void)ldml_state.context_to_string(old_ctxt, true);
+  // new context string (NFD)
+  std::u32string new_ctxt = old_ctxt;
+  // add the newly added key output to new_ctxt
+  new_ctxt.append(key_str);
+
   // Note:
-  //  The normalize functions have assert and Debuglog at the bottom.
-  //  so we do not need to assert the status here unless we're going to do something
+  //  The normalize functions will assert() and DebugLog() if there is a problem,
+  //  so we do not need to assert their status here unless we're going to do something
   //  different with control flow.
   if (!normalization_disabled) {
-    auto norm_ok = ldml::normalize_nfd_markers(nfd_str);
-    assert(norm_ok);
+    (void)ldml::normalize_nfd_markers(old_ctxt);
+    (void)ldml::normalize_nfd_markers(new_ctxt);
   }
-  // extract context string, in NFD
-  std::u32string old_ctxtstr_nfd;
-  (void)ldml_state.context_to_string(old_ctxtstr_nfd, true);
-  if (!normalization_disabled) {
-    auto norm_ok = ldml::normalize_nfd_markers(old_ctxtstr_nfd);
-    assert(norm_ok); // TODO-LDML: else fail?
-  }
-  // context string in NFD
-  std::u32string ctxtstr;
-  (void)ldml_state.context_to_string(ctxtstr, true); // TODO-LDML: remove this second call
-  // add the newly added key output to ctxtstr
-  ctxtstr.append(nfd_str);
-  if (!normalization_disabled) {
-    auto norm_ok = ldml::normalize_nfd_markers(ctxtstr);
-    assert(norm_ok);
-  }
-  /** transform output string */
-  std::u32string outputString;
-  /** how many chars of the ctxtstr to replace */
-  size_t matchedContext = 0; // zero if no transforms
 
-  // begin modifications to the string
+  /** how many chars of the new_ctxt to replace? This is our return value. */
+  const size_t new_ctxt_matched = apply_transforms(new_ctxt, with_transforms);
 
-  if(with_transforms != nullptr) {
-    matchedContext = with_transforms->apply(ctxtstr, outputString);
-  } // else: no transforms, no output
-
-  // Short Circuit: if no transforms matched, and no new text is being output,
-  // just return.
-  if (matchedContext == 0 && str.empty()) {
-    return matchedContext;
+  if (new_ctxt_matched == 0 && key_str.empty()) {
+    // no transforms matched, and no key string came in
+    // just return.
+    assert(old_ctxt == new_ctxt);
+  } else {
+    // apply difference
+    ldml_state.emit_difference(old_ctxt, new_ctxt);
   }
+
+  return new_ctxt_matched;
+}
+
+size_t ldml_processor::apply_transforms(std::u32string &new_ctxt, ldml::transforms *with_transforms) const {
+  if (with_transforms == nullptr) {
+    return 0; // nothing to do
+  }
+  /** transformed output string */
+  std::u32string transform_output;
+  size_t new_ctxt_matched = with_transforms->apply(new_ctxt, transform_output);
 
   // drop last 'matchedContext':
-  ctxtstr.resize(ctxtstr.length() - matchedContext);
-  ctxtstr.append(outputString); // TODO-LDML: should be able to do a normalization-safe append here.'
+  new_ctxt.resize(new_ctxt.length() - new_ctxt_matched);
+  // TODO-LDML: should be able to do a normalization-safe append here. Instead, we append and re-normalize.
+  new_ctxt.append(transform_output);
   if (!normalization_disabled) {
-    (void)ldml::normalize_nfd_markers(ctxtstr);
+    (void)ldml::normalize_nfd_markers(new_ctxt);
   }
-  // Ok. We've done all the happy manipulations.
+  // new_ctxt is now up-to-date and ready to apply.
+  return new_ctxt_matched;
+}
 
-  /** NFD w/ markers */
-  std::u32string ctxtstr_cleanedup = ctxtstr;
-  if (!normalization_disabled) {
-    bool norm_ok = ldml::normalize_nfd_markers(ctxtstr_cleanedup);
-    assert(norm_ok);
-  }
+km_core_attr const & ldml_processor::attributes() const {
+  return engine_attrs;
+}
 
+km_core_keyboard_key  * ldml_processor::get_key_list() const {
+  km_core_keyboard_key* key_list = new km_core_keyboard_key(KM_CORE_KEYBOARD_KEY_LIST_END);
+  return key_list;
+}
+
+km_core_keyboard_imx  * ldml_processor::get_imx_list() const {
+  km_core_keyboard_imx* imx_list = new km_core_keyboard_imx(KM_CORE_KEYBOARD_IMX_END);
+  return imx_list;
+}
+
+km_core_context_item * ldml_processor::get_intermediate_context() {
+  km_core_context_item *citems = new km_core_context_item(KM_CORE_CONTEXT_ITEM_END);
+  return citems;
+}
+
+km_core_status ldml_processor::validate() const {
+  return _valid ? KM_CORE_STATUS_OK : KM_CORE_STATUS_INVALID_KEYBOARD;
+}
+
+void
+ldml_event_state::emit_difference(const std::u32string &old_ctxt, const std::u32string &new_ctxt) {
   // find common prefix.
+
   // For example, if the context previously had "aaBBBBB" and it is changing to "aaCCC" then we will have:
   // - old_ctxtstr_changed = "BBBBB"
   // - new_ctxtstr_changed = "CCC"
   // So the BBBBB needs to be removed and then CCC added.
-  auto ctxt_prefix = mismatch(old_ctxtstr_nfd.begin(), old_ctxtstr_nfd.end(), ctxtstr_cleanedup.begin(), ctxtstr_cleanedup.end());
+  auto ctxt_prefix = mismatch(old_ctxt.begin(), old_ctxt.end(), new_ctxt.begin(), new_ctxt.end());
 
   // handle a special case where we're simply changing from one marker to another.
   // Example:
@@ -371,7 +391,7 @@ size_t ldml_processor::process_output(ldml_event_state &ldml_state, const std::u
   // We can detect this because the unchanged_prefix will end with u+FFFF U+0008
   //
   // Oh, and yes, test case 'regex-test-8a-0' hits this.
-  std::u32string common_prefix(old_ctxtstr_nfd.begin(), ctxt_prefix.first);
+  std::u32string common_prefix(old_ctxt.begin(), ctxt_prefix.first);
   if (common_prefix.length() >= 2) {
     auto iter = common_prefix.rbegin();
     if (*(iter++) == LDML_MARKER_CODE && *(iter++) == UC_SENTINEL) {
@@ -383,24 +403,21 @@ size_t ldml_processor::process_output(ldml_event_state &ldml_state, const std::u
   }
 
   /** The part of the old string to be removed */
-  std::u32string old_ctxtstr_changed(ctxt_prefix.first,old_ctxtstr_nfd.end());
+  std::u32string old_ctxtstr_changed(ctxt_prefix.first, old_ctxt.end());
   /** The new context to be added */
-  std::u32string new_ctxtstr_changed(ctxt_prefix.second,ctxtstr_cleanedup.end());
+  std::u32string new_ctxtstr_changed(ctxt_prefix.second, new_ctxt.end());
 
   // FIRST drop the old suffix. Note: this mutates old_ctxtstr_changed.
   // see remove_text() docs, this PUSHes actions, POPs context items, and TRIMS the string.
-  ldml_state.remove_text(old_ctxtstr_changed, old_ctxtstr_changed.length());
+  remove_text(old_ctxtstr_changed, old_ctxtstr_changed.length());
   assert(old_ctxtstr_changed.length() == 0);
   // old_ctxtstr_changed is now empty because it's been removed.
   // context is "aa" in the above example.
 
   // THEN add the new suffix, "CCC" in the above example
-  ldml_state.emit_text(new_ctxtstr_changed);
+  emit_text(new_ctxtstr_changed);
   // context is now "aaCCC"
-
-  return matchedContext;
 }
-
 
 void
 ldml_event_state::remove_text(std::u32string &str, size_t length) {
@@ -443,29 +460,6 @@ ldml_event_state::remove_text(std::u32string &str, size_t length) {
     // we don't pop during the above loop because the iterator gets confused
     state->context().pop_back();
   }
-}
-
-km_core_attr const & ldml_processor::attributes() const {
-  return engine_attrs;
-}
-
-km_core_keyboard_key  * ldml_processor::get_key_list() const {
-  km_core_keyboard_key* key_list = new km_core_keyboard_key(KM_CORE_KEYBOARD_KEY_LIST_END);
-  return key_list;
-}
-
-km_core_keyboard_imx  * ldml_processor::get_imx_list() const {
-  km_core_keyboard_imx* imx_list = new km_core_keyboard_imx(KM_CORE_KEYBOARD_IMX_END);
-  return imx_list;
-}
-
-km_core_context_item * ldml_processor::get_intermediate_context() {
-  km_core_context_item *citems = new km_core_context_item(KM_CORE_CONTEXT_ITEM_END);
-  return citems;
-}
-
-km_core_status ldml_processor::validate() const {
-  return _valid ? KM_CORE_STATUS_OK : KM_CORE_STATUS_INVALID_KEYBOARD;
 }
 
 void
