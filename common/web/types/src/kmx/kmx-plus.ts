@@ -210,15 +210,13 @@ export class Strs extends Section {
     }
     // nfd
     if (opts?.nfd) {
-      if (!sections.meta) {
-        throw Error(`Internal Error: need 'meta' section to check normalization mode.`);
-      } else if (!sections.meta.normalizationDisabled) {
+      if (!sections?.meta?.normalizationDisabled) {
         if (opts?.markers) {
           s = MarkerParser.nfd_markers(s, false);
         } else {
           s = s.normalize("NFD");
         }
-      } // else: disabled, do nothing
+      }
     }
     return s;
   }
