@@ -101,21 +101,43 @@ const int KMX_ShiftStateMap[] = {
     return false;
   }
 
-// _S2 naming??
-int KMX_ToUnicodeEx(guint ScanCode, const BYTE *lpKeyState, PKMX_WCHAR pwszBuff, int shift_state, int caps,GdkKeymap *keymap) {
+int KMX_ToUnicodeEx(guint keycode, const BYTE *lpKeyState, PKMX_WCHAR pwszBuff, int shift_state_pos, int caps,GdkKeymap *keymap) {
 
-  KMX_DWORD rc = KMX_get_rc_From_KeyCodeUnderlying_GDK(keymap,ScanCode, shift_state);
+GdkKeymapKey *maps;
+  guint *keyvals;
+  gint count;
+  KMX_DWORD out;
 
-  std::wstring character= KMX_get_CharsUnderlying_according_to_keycode_and_Shiftstate_GDK(keymap, ScanCode, ShiftState(shift_state), caps);
+  if (!gdk_keymap_get_entries_for_keycode(keymap, keycode, &maps, &keyvals, &count))
+    return 0;
+
+  //if(!gdk_wayland_keymap_get_entries_for_keycode(keymap, keycode, &maps, &keyvals, &count))
+  //  return 0;    https://codebrowser.dev/gtk/gtk/gdk/wayland/gdkkeys-wayland.c.html
+
+  if (!(shift_state_pos <= count))
+   return 0;
+
+   if (!(keycode <= 94))
+    return 0;
+
+
+  std::wstring character= KMX_get_CharsUnderlying_according_to_keycode_and_Shiftstate_GDK(keymap, keycode, ShiftState(shift_state_pos), caps);
   pwszBuff[0]= * (PKMX_WCHAR)  u16string_from_wstring(character).c_str();
 
-  if(rc ==  0xFFFE)
-    return 0;
-  else if(rc ==  0xFFFF)
+  KMX_DWORD keyvals_dw= (KMX_DWORD) KMX_get_keyvals_From_Keycode(keymap,  keycode, ShiftState(shift_state_pos),  caps) ;
+
+  // _S2 g_free used everywhere?
+  g_free(keyvals);
+  g_free(maps);
+
+  if((keyvals_dw >=  deadkey_min) && (keyvals_dw <=  deadkey_max))          // deadkeys
     return -1;
-  else
-    return  1;
+  else if(gdk_keyval_to_unicode(keyvals_dw)  == 0)                          // NO UNICODE
+    return 0;
+  else                                                                      // usable char
+    return 1;
 }
+
 
 int KMX_DeadKeyMap(int index, std::vector<DeadKey *> *deadkeys, int deadkeyBase, std::vector<KMX_DeadkeyMapping> *deadkeyMappings) {   // I4327   // I4353
   for(size_t i = 0; i < deadkeyMappings->size(); i++) {
@@ -726,7 +748,6 @@ bool KMX_ImportRules(LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, GdkKeymap **keymap,
 
           // _S2 deadkey not finished; Ctrl, Shft +40 not tested
           for(int caps = 0; caps <= 1; caps++) {
-            // _S2 is THIS correct ???  Do we need  lpKeyState or is it just used in ToUnicodeEx??
             loader.KMX_ClearKeyboardBuffer();
             loader.KMX_FillKeyState(lpKeyState, ss, (caps == 0));
             int rc = KMX_ToUnicodeEx(SC_US, lpKeyState, sbBuffer, ss, caps, *keymap);

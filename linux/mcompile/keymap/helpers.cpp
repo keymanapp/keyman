@@ -1084,6 +1084,27 @@ gdk_keyval_convert_case (GDK_KEY_dollar,    lower,upper);*/
   }
 }*/
 
+
+
+// _S2 naming?? the original
+/*int KMX_ToUnicodeEx_OLD(guint ScanCode, const BYTE *lpKeyState, PKMX_WCHAR pwszBuff, int shift_state, int caps,GdkKeymap *keymap) {
+
+  KMX_DWORD rc = KMX_get_rc_From_KeyCodeUnderlying_GDK(keymap,ScanCode, shift_state);
+
+  std::wstring character= KMX_get_CharsUnderlying_according_to_keycode_and_Shiftstate_GDK(keymap, ScanCode, ShiftState(shift_state), caps);
+  pwszBuff[0]= * (PKMX_WCHAR)  u16string_from_wstring(character).c_str();
+
+  if((rc ==  0))
+    return -0;
+  else if((rc ==  0xFFFE))
+    return 0;
+  else if((rc ==  0xFFFF))
+    return -1;
+  else
+    return  1;
+}*/
+
+
 // _S2 can go later
 /*KMX_DWORD writeKeyvalsFromKeymap(GdkKeymap *keymap, guint keycode, int shift_state_pos) {
   GdkKeymapKey *maps;

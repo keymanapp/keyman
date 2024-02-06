@@ -506,19 +506,12 @@ bool IsKeymanUsedChar(int KV);
 
 // take deadkey-value (e.g.65106) and return wstring (e.g. '^' )
 std::wstring convert_DeadkeyValues_ToChar(int in);
-// take deadkey-value (e.g.65106) and return u16string (e.g. '^' )
 std::u16string convert_DeadkeyValues_To_U16str(int in);
 
+int KMX_get_keyvals_From_Keycode(GdkKeymap *keymap, guint keycode, ShiftState ss, int caps);
 
-
-int NEW_KMX_get_Keyval_all_7(GdkKeymap *keymap, guint keycode, ShiftState ss, int caps);
-int KMX_get_KeyvalsUnderlying_according_to_keycode_and_Shiftstate_GDK_dw(GdkKeymap *keymap, guint keycode, ShiftState ss, int caps);
-
-
-// find Keyvals to fill into 2D-Vector of Other Language
-KMX_DWORD KMX_get_KeyvalsUnderlying_From_KeyCodeUnderlying_GDK(GdkKeymap *keymap, guint keycode, int shift_state_pos);
-KMX_DWORD KMX_get_rc_From_KeyCodeUnderlying_GDK(GdkKeymap *keymap, guint keycode, int shift_state_pos);
 KMX_DWORD KMX_get_KeyvalsUnderlying_From_KeyCodeUnderlying_GDK(GdkKeymap *keymap, guint keycode, int shift_state_pos, PKMX_WCHAR &dky);
+KMX_DWORD KMX_get_KeyvalsUnderlying_From_KeyCodeUnderlying_GDK(GdkKeymap *keymap, guint keycode, int shift_state_pos);
 
 // returns KeySyms for a given key (for unshifted: finds the Keysym according to Shiftstate e.g. a;A or 1;! )
 std::wstring KMX_get_CharsUnderlying_according_to_keycode_and_Shiftstate_GDK(GdkKeymap *keymap, guint VK, ShiftState ss, int caps);
@@ -540,7 +533,6 @@ KMX_DWORD KMX_get_KeyCodeUnderlying_From_KeycodeUS_GDK(GdkKeymap *keymap, v_dw_3
 
 // converts codePoint to wstring
 std::wstring CodePointToWString(unsigned int codepoint);
-// converts codePoint to u16string
 std::u16string CodePointToString_16(unsigned int codepoint);
 
 # endif /*KEYMAP_H*/
