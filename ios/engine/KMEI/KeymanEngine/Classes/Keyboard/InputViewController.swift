@@ -342,7 +342,7 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
        * there's no guarantee (yet) that the times will be the same.
        * But something refresh-rate related is a fairly reasonable assumption.
        */
-      DispatchQueue.main.asyncAfter(deadline: .now() + 0.33) { //0.033) {  // contrast:  held backspace - every 0.1.
+      DispatchQueue.main.asyncAfter(deadline: .now() + 0.033) { //0.033) {  // contrast:  held backspace - every 0.1.
 
         // Does NOT update after half a second if there's no context manipulation.
         let preCaretAsyncContext = self.textDocumentProxy.documentContextBeforeInput ?? ""
