@@ -315,9 +315,6 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
     let updater = { (_ before: String, _ after: String) -> Void in
       let contextWindowText = "\(before)\(after)"
 
-      // On the KMW app/webview side, `location` is SMP-aware.
-      // .utf16:  treats SMPs as two char.  (Tested with U+1D5BA)
-      // Without .utf16 - treats SMPs as one char.
       let range = NSRange(location: before.unicodeScalars.count, length: 0)
 
       self.setContextState(text: contextWindowText, range: range)
@@ -602,6 +599,13 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
     keymanWeb.setSentryState(enabled: enabled)
   }
 
+  /**
+   * Facilitates context synchronization with the KMW-app/webview side.
+   *
+   * The range's components should be SMP-aware, as the embedded engine
+   * will be expecting SMP-aware measurements.  Swift's `.unicodeScalars`
+   * property on `String`s lines up best with this.
+   */
   func setContextState(text: String?, range: NSRange) {
     // Check for any LTR or RTL marks at the context's start; if they exist, we should
     // offset the selection range.
