@@ -95,7 +95,7 @@ int run(int argc, std::vector<std::u16string> str_argv, char* argv_ch[] = NULL){
 
   char16_t* infile = (char16_t*) argv[n], *outfile = (char16_t*) argv[n+1];
 
-  wprintf(L"mcompile%ls \"%ls\" \"%ls\"\n", bDeadkeyConversion ? L" -d" : L"", u16fmt((const char16_t*) infile).c_str(),   u16fmt((const char16_t*) outfile).c_str() ); // I4174
+  wprintf(L"mcompile%ls \"%ls\" \"%ls\"\n", bDeadkeyConversion ? L" -d" : L"", u16fmt((const char16_t*) infile).c_str(), u16fmt((const char16_t*) outfile).c_str() ); // I4174
 
   // 1. Load the keyman keyboard file
 
@@ -155,7 +155,7 @@ int run(int argc, std::vector<std::u16string> str_argv, char* argv_ch[] = NULL){
 // Map of all shift states that we will work with
 const UINT VKShiftState[] = {0, K_SHIFTFLAG, LCTRLFLAG|RALTFLAG, K_SHIFTFLAG|LCTRLFLAG|RALTFLAG, 0xFFFF};
 
-// my comment for Lin version
+// _S2 my comment for Lin version
 // Ubuntu:  Each of the 4 columns specifies a different modifier:  unmodified,  shift,   right alt (altgr),     shift+right alt(altgr)
 // some hold up to 8 what are those ???
 // we have assigned these to columns 1-4  ( column o holds the keycode)
@@ -464,7 +464,6 @@ KMX_BOOL KMX_SetKeyboardToPositional(LPKMX_KEYBOARD kbd) {
       return TRUE;
     }
   }
-
   KMX_LogError(L"Keyboard is not a mnemonic layout keyboard");
   return FALSE;
 }
@@ -484,7 +483,7 @@ KMX_BOOL KMX_DoConvert(LPKMX_KEYBOARD kbd, KMX_BOOL bDeadkeyConversion, gint arg
   // _S2 TODO first version with GTK - maybe change later to  XklGetGroupNames  und XklGetCurrentState  as Eberhard suggested
   //_ init gdk
   GdkKeymap *keymap;
-  if(InitializeGDK(&keymap , argc,  argv)) {
+  if(InitializeGDK(&keymap , argc, argv)) {
       wprintf(L"ERROR: can't Initialize GDK\n");
       return FALSE;
   }
@@ -523,7 +522,6 @@ KMX_BOOL KMX_DoConvert(LPKMX_KEYBOARD kbd, KMX_BOOL bDeadkeyConversion, gint arg
     }
   }
 
-
   KMX_ReportUnconvertedKeyboardRules(kbd);
   if(!KMX_ImportRules(kbd, All_Vector, &keymap, &KMX_FDeadkeys, bDeadkeyConversion)) {   // I4353   // I4552
     return FALSE;
@@ -549,7 +547,6 @@ UINT  KMX_get_SCUnderlying_From_VKUS(KMX_DWORD VirtualKeyUS) {
 }
 
 KMX_WCHAR KMX_get_VKUS_From_VKUnderlying_VEC(v_dw_3D All_Vector, KMX_DWORD VK_OTHER) {
-
   KMX_DWORD VK_US;
   for( int i=0; i< (int)All_Vector[0].size()-1 ;i++) {
     for( int j=1; j< (int)All_Vector[0][0].size();j++) {
@@ -573,27 +570,7 @@ KMX_WCHAR  KMX_get_CharUnderlying_From_SCUnderlying_GDK(GdkKeymap *keymap, KMX_U
     *DeadKey = *dky;
     return 0xFFFF;
   }
-
   return (KMX_WCHAR) KeyvalOther;
-}
-
-int createOneVectorFromBothKeyboards(v_dw_3D &All_Vector,GdkKeymap *keymap){
-  std::string US_language    = "us";
-  const char* text_us        = "xkb_symbols \"basic\"";
-  //const char* text_us        = "xkb_symbols \"intl\"";
-
-  if(write_US_ToVector(All_Vector,US_language, text_us)) {
-    wprintf(L"ERROR: can't write US to Vector \n");
-    return 1;
-  }
-
-  // _S2 is it OK to have 65535 instead of 94, 96 and 180 as a value for deadkeys in Vector
-  // add contents of other keyboard to All_Vector
-  if( append_other_ToVector(All_Vector,keymap)) {
-    wprintf(L"ERROR: can't append Other ToVector \n");
-    return 2;
-  }
-  return 0;
 }
 
 int KMX_GetDeadkeys(v_dw_2D & dk_Table, KMX_WORD DeadKey, KMX_WORD *OutputPairs, GdkKeymap* keymap) {
@@ -634,7 +611,7 @@ void TestKey_S2(LPKMX_KEY key, int iii, int gr) {
     wprintf(L"\n     group[%i]      dpKeyArray[%i]  ",gr, iii);
     int tzuiop=0;
     do {
-      wprintf(L"%i\t",  *(PP+z ));
+      wprintf(L"%i\t", *(PP+z ));
       z++;
     } while (*(PP+z) !=0);
   }

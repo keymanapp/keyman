@@ -1084,7 +1084,33 @@ gdk_keyval_convert_case (GDK_KEY_dollar,    lower,upper);*/
   }
 }*/
 
+/*
+KMX_DWORD KMX_get_rc_From_KeyCodeUnderlying_GDK(GdkKeymap *keymap, guint keycode, int shift_state_pos) {
+  GdkKeymapKey *maps;
+  guint *keyvals;
+  gint count;
+  KMX_DWORD out;
 
+  if (!gdk_keymap_get_entries_for_keycode(keymap, keycode, &maps, &keyvals, &count))
+    return 0;
+  //if(!gdk_wayland_keymap_get_entries_for_keycode(keymap, keycode, &maps, &keyvals, &count))
+  //  return 0;    https://codebrowser.dev/gtk/gtk/gdk/wayland/gdkkeys-wayland.c.html
+
+  if (!(shift_state_pos <= count))
+   return 0;
+
+   if (!(keycode <= 94))
+    return 0;
+
+  out = KMX_get_FFFF_Underlying_according_to_keycode_and_Shiftstate_GDK_dw(keymap,  keycode,  (ShiftState)  shift_state_pos,0);
+
+  // _S2 g_free used everywhere?
+  g_free(keyvals);
+  g_free(maps);
+
+  return out;
+}
+*/
 
 // _S2 naming?? the original
 /*int KMX_ToUnicodeEx_OLD(guint ScanCode, const BYTE *lpKeyState, PKMX_WCHAR pwszBuff, int shift_state, int caps,GdkKeymap *keymap) {

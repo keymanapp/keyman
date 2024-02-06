@@ -7,12 +7,10 @@
 #include "mc_import_rules.h"
 
 // creates a vector for a dk combination ( ` + a  ->  à )
-v_dw_1D createLine(std::wstring  first, std::wstring second,  KMX_DWORD number, std::wstring nameresult);
+v_dw_1D createLine(std::wstring  first, std::wstring second, KMX_DWORD number, std::wstring nameresult);
 
 // creates a 2D-vector of all dk combinations ( ` + a -> à ;  ^ + a -> â ; `+ e -> è; ...)
 KMX_DWORD create_DKTable(v_dw_2D & dk_ComposeTable);
-
-//KMX_DWORD find_dkCharacter(v_dw_2D * dk_ComposeTable, KMX_DWORD first, KMX_DWORD second );
 
 //_S2 REVIEW
 std::vector<DeadKey*> create_alDead();

@@ -508,6 +508,9 @@ bool IsKeymanUsedChar(int KV);
 std::wstring convert_DeadkeyValues_ToChar(int in);
 std::u16string convert_DeadkeyValues_To_U16str(int in);
 
+
+
+// uses gdk_keymap_translate_keyboard_state to get keyval
 int KMX_get_keyvals_From_Keycode(GdkKeymap *keymap, guint keycode, ShiftState ss, int caps);
 
 KMX_DWORD KMX_get_KeyvalsUnderlying_From_KeyCodeUnderlying_GDK(GdkKeymap *keymap, guint keycode, int shift_state_pos, PKMX_WCHAR &dky);
@@ -517,6 +520,7 @@ KMX_DWORD KMX_get_KeyvalsUnderlying_From_KeyCodeUnderlying_GDK(GdkKeymap *keymap
 std::wstring KMX_get_CharsUnderlying_according_to_keycode_and_Shiftstate_GDK(GdkKeymap *keymap, guint VK, ShiftState ss, int caps);
 KMX_DWORD KMX_get_CharsUnderlying_according_to_keycode_and_Shiftstate_GDK_dw(GdkKeymap *keymap, guint keycode, ShiftState ss, int caps);
 
+// _S2 returns char or FFFF / FFFE ????
 KMX_DWORD KMX_get_FFFF_Underlying_according_to_keycode_and_Shiftstate_GDK_dw(GdkKeymap *keymap, guint keycode, ShiftState ss, int caps);
 
 

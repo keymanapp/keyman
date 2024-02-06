@@ -1,7 +1,7 @@
 #include "keymap.h"
 #include "deadkey.h"
 
-v_dw_1D createLine(std::wstring  first, std::wstring second,  KMX_DWORD number,  std::wstring nameresult) {
+v_dw_1D createLine(std::wstring  first, std::wstring second, KMX_DWORD number, std::wstring nameresult) {
 	v_dw_1D line;
 	line.push_back(convertNamesToIntegerValue(first));
 	line.push_back(convertNamesToIntegerValue(second));
@@ -12,9 +12,7 @@ v_dw_1D createLine(std::wstring  first, std::wstring second,  KMX_DWORD number, 
 
 // _S2 DEADKEY STUFF - DO NOT REVIEW YET
 bool find_dk_combinations_for_single_dk(v_dw_2D * p_dk_ComposeTable, v_dw_2D  &dk_SingleTable, KMX_DWORD dk) {
-
 	v_dw_1D line;
-	//for ( int i =0; i< (int) (*p_dk_ComposeTable).size()-1; i++) {
 	for ( int i =0; i< (int) (*p_dk_ComposeTable).size(); i++) {
 		// _S2 is there a better way to find a-z,A-Z?
 		//if (((*p_dk_ComposeTable)[i][0] == dk) ) {
@@ -34,11 +32,9 @@ bool find_dk_combinations_for_single_dk(v_dw_2D * p_dk_ComposeTable, v_dw_2D  &d
 
 //_S2 REVIEW
 std::vector<DeadKey*> create_alDead() {
-
 	std::vector<DeadKey*> alDead;
-
 	v_dw_2D dk_ComposeTable;
-	KMX_DWORD dw= create_DKTable(dk_ComposeTable);
+  KMX_DWORD dw = create_DKTable(dk_ComposeTable);
 
 	for( int i=0; i< dk_ComposeTable.size()-1; i++) {
 		DeadKey *dk2= new DeadKey(dk_ComposeTable[i][0]);
@@ -51,7 +47,6 @@ std::vector<DeadKey*> create_alDead() {
 		}
 		alDead.push_back(dk2);
 	}
-
 	return alDead;
 }
 
@@ -67,10 +62,8 @@ std::vector<DeadKey*> reduce_alDead(std::vector<DeadKey*> dk_big) {
 				if(dk_big[i]->KMX_DeadCharacter()   == dk_small[k]->KMX_DeadCharacter())
 					foundInSmall=true;
 			}
-
 		if(!foundInSmall)
 			dk_small.push_back(dk_big[i]);
-
 		foundInSmall=false;
 		}
 	}

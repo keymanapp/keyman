@@ -36,7 +36,7 @@ void TestKey_S21(LPKMX_KEY key, int iii, int gr) {
     wprintf(L"\n     group[%i]      dpKeyArray[%i] (key->key: %i) ",gr, iii, key->Key);
     int tzuiop=0;
     do {
-      wprintf(L"%i\t",  *(PP+z ));
+      wprintf(L"%i\t", *(PP+z ));
       z++;
     } while (*(PP+z) !=0);
   }
@@ -102,8 +102,7 @@ const int KMX_ShiftStateMap[] = {
   }
 
 int KMX_ToUnicodeEx(guint keycode, const BYTE *lpKeyState, PKMX_WCHAR pwszBuff, int shift_state_pos, int caps,GdkKeymap *keymap) {
-
-GdkKeymapKey *maps;
+  GdkKeymapKey *maps;
   guint *keyvals;
   gint count;
   KMX_DWORD out;
@@ -111,20 +110,16 @@ GdkKeymapKey *maps;
   if (!gdk_keymap_get_entries_for_keycode(keymap, keycode, &maps, &keyvals, &count))
     return 0;
 
-  //if(!gdk_wayland_keymap_get_entries_for_keycode(keymap, keycode, &maps, &keyvals, &count))
-  //  return 0;    https://codebrowser.dev/gtk/gtk/gdk/wayland/gdkkeys-wayland.c.html
-
   if (!(shift_state_pos <= count))
    return 0;
 
    if (!(keycode <= 94))
     return 0;
 
-
   std::wstring character= KMX_get_CharsUnderlying_according_to_keycode_and_Shiftstate_GDK(keymap, keycode, ShiftState(shift_state_pos), caps);
   pwszBuff[0]= * (PKMX_WCHAR)  u16string_from_wstring(character).c_str();
 
-  KMX_DWORD keyvals_dw= (KMX_DWORD) KMX_get_keyvals_From_Keycode(keymap,  keycode, ShiftState(shift_state_pos),  caps) ;
+  KMX_DWORD keyvals_dw= (KMX_DWORD) KMX_get_keyvals_From_Keycode(keymap, keycode, ShiftState(shift_state_pos), caps) ;
 
   // _S2 g_free used everywhere?
   g_free(keyvals);
@@ -137,7 +132,6 @@ GdkKeymapKey *maps;
   else                                                                      // usable char
     return 1;
 }
-
 
 int KMX_DeadKeyMap(int index, std::vector<DeadKey *> *deadkeys, int deadkeyBase, std::vector<KMX_DeadkeyMapping> *deadkeyMappings) {   // I4327   // I4353
   for(size_t i = 0; i < deadkeyMappings->size(); i++) {
@@ -407,7 +401,7 @@ int i4 = this->KMX_IsXxxxGrCapsEqualToXxxxShift() ? 8 : 0;
             // key->Key      stores VK-US ( not underlying !!)
             // key->dpOutput stores character Underlying
 
-            KMX_DWORD SC_Underlying_gdk = KMX_get_KeyCodeUnderlying_From_KeycodeUS_GDK(keymap, All_Vector,this->SC(), (ShiftState) ss,  caps);
+            KMX_DWORD SC_Underlying_gdk = KMX_get_KeyCodeUnderlying_From_KeycodeUS_GDK(keymap, All_Vector,this->SC(), (ShiftState) ss, caps);
             key->Key = KMX_get_VKUS_From_KeyCodeUnderlying_GDK( keymap, SC_Underlying_gdk);
 
             key->Line = 0;
@@ -626,7 +620,6 @@ KMX_WCHAR sbBuffer1[16];
   }
 };
 
-
 int KMX_GetMaxDeadkeyIndex(KMX_WCHAR *p) {
   int n = 0;
   while(p && *p) {
@@ -636,7 +629,6 @@ int KMX_GetMaxDeadkeyIndex(KMX_WCHAR *p) {
   }
   return n;
 }
-
 
 void check_rgkey_S2( std::vector<KMX_VirtualKey*> rgKey, int i) {
 
@@ -686,15 +678,9 @@ bool KMX_ImportRules(LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, GdkKeymap **keymap,
     }
   }
 
-
   for(UINT ke = VK_NUMPAD0; ke <= VK_NUMPAD9; ke++) {
       rgKey[ke] = new KMX_VirtualKey(hkl, ke, keymap);
   }
-
-  /*UINT Val_VK_NUMPAD0[] = {45,35,40,34,37,12,39,36,38,33, 0xFFFF};
-  for (int i = 0; Val_VK_NUMPAD0[i] != 0xFFFF; i++) {
-      rgKey[Val_VK_NUMPAD0[i] ] = new KMX_VirtualKey(hkl, Val_VK_NUMPAD0[i] , keymap);
-  }*/
 
   // _S2 ???? which numbers for VK_DIVIDE, VK_CANCEL, VK_DECIMAL ?
   rgKey[VK_DIVIDE] = new KMX_VirtualKey(hkl, VK_DIVIDE, keymap);

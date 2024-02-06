@@ -338,14 +338,7 @@ LPKMX_KEYBOARD KMX_FixupKeyboard(PKMX_BYTE bufp, PKMX_BYTE base, KMX_DWORD dwFil
 		if(cgp->dpMatch != NULL) gp->dpMatch = (PKMX_WCHAR) (base + cgp->dpMatch);
 		if(cgp->dpNoMatch != NULL) gp->dpNoMatch = (PKMX_WCHAR) (base + cgp->dpNoMatch);
 
-    // _S2  Version of kmx_file v
-    /*gp->dpName = StringOffset(base, cgp->dpName);
-    gp->dpKeyArray = cgp->cxKeyArray > 0 ? (LPKEY) (base + cgp->dpKeyArray) : NULL;
-    gp->dpMatch = StringOffset(base, cgp->dpMatch);
-    gp->dpNoMatch = StringOffset(base, cgp->dpNoMatch);*/
-    // _S2  Version of kmx_file ^
-
-		for(kp = gp->dpKeyArray, ckp = (PKMX_COMP_KEY) kp, j = 0; j < gp->cxKeyArray; j++, kp++, ckp++) {
+    for(kp = gp->dpKeyArray, ckp = (PKMX_COMP_KEY) kp, j = 0; j < gp->cxKeyArray; j++, kp++, ckp++) {
 			kp->dpOutput = (PKMX_WCHAR) (base + ckp->dpOutput);
 			kp->dpContext = (PKMX_WCHAR) (base + ckp->dpContext);
 		}
