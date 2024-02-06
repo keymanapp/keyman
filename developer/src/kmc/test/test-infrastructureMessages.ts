@@ -44,7 +44,7 @@ describe('InfrastructureMessages', function () {
 
   it('should generate ERROR_FileDoesNotExist if a file does not exist', async function() {
     const ncb = new NodeCompilerCallbacks({logLevel: 'silent'});
-    await unitTestEndpoints.build(makePathToFixture('invalid-keyboards', 'Error_File_Does_Not_Exist.kmn'), ncb, {});
+    await unitTestEndpoints.build(makePathToFixture('invalid-keyboards', 'Error_File_Does_Not_Exist.kmn'), '', ncb, {});
     assert.isTrue(ncb.hasMessage(InfrastructureMessages.ERROR_FileDoesNotExist),
       `ERROR_FileDoesNotExist not generated, instead got: `+JSON.stringify(ncb.messages,null,2));
   });
@@ -53,7 +53,7 @@ describe('InfrastructureMessages', function () {
 
   it('should generate ERROR_FileTypeNotRecognized if a file is not a recognized type', async function() {
     const ncb = new NodeCompilerCallbacks({logLevel: 'silent'});
-    await unitTestEndpoints.build(makePathToFixture('invalid-keyboards', 'error_file_type_not_recognized.xxx'), ncb, {});
+    await unitTestEndpoints.build(makePathToFixture('invalid-keyboards', 'error_file_type_not_recognized.xxx'), '', ncb, {});
     assert.isTrue(ncb.hasMessage(InfrastructureMessages.ERROR_FileTypeNotRecognized),
       `ERROR_FileTypeNotRecognized not generated, instead got: `+JSON.stringify(ncb.messages,null,2));
   });
@@ -64,8 +64,8 @@ describe('InfrastructureMessages', function () {
     const ncb = new NodeCompilerCallbacks({logLevel: 'silent'});
     const projectPath = makePathToFixture('kpj-2.0/khmer_angkor', 'khmer_angkor.kpj');
     const outFilePath = makePathToFixture('kpj-2.0/khmer_angkor', 'khmer_angkor.kmx');
-    const options: CompilerOptions = {...defaultCompilerOptions, outFile: outFilePath};
-    await unitTestEndpoints.build(projectPath, ncb, options);
+    const options: CompilerOptions = {...defaultCompilerOptions};
+    await unitTestEndpoints.build(projectPath, outFilePath, ncb, options);
     assert.isTrue(ncb.hasMessage(InfrastructureMessages.ERROR_OutFileNotValidForProjects),
       `ERROR_OutFileNotValidForProjects not generated, instead got: `+JSON.stringify(ncb.messages,null,2));
   });
@@ -74,7 +74,7 @@ describe('InfrastructureMessages', function () {
 
   it('should generate ERROR_InvalidProjectFile if a project file is invalid', async function() {
     const ncb = new NodeCompilerCallbacks({logLevel: 'silent'});
-    await unitTestEndpoints.build(makePathToFixture('invalid-projects', 'error_invalid_project_file.kpj'), ncb, {});
+    await unitTestEndpoints.build(makePathToFixture('invalid-projects', 'error_invalid_project_file.kpj'), '', ncb, {});
     assert.isTrue(ncb.hasMessage(InfrastructureMessages.ERROR_InvalidProjectFile),
       `ERROR_InvalidProjectFile not generated, instead got: `+JSON.stringify(ncb.messages,null,2));
   });
@@ -105,7 +105,7 @@ describe('InfrastructureMessages', function () {
     const buildKeyboardInfo = new BuildKeyboardInfo();
     const projectPath = makePathToFixture('invalid-projects', 'error_file_type_not_found_kbd.kpj')
     const ncb = new NodeCompilerCallbacks({logLevel: 'silent'});
-    await buildKeyboardInfo.build(projectPath, ncb, {});
+    await buildKeyboardInfo.build(projectPath, '', ncb, {});
     assert.isTrue(ncb.hasMessage(InfrastructureMessages.ERROR_FileTypeNotFound),
       `ERROR_FileTypeNotFound not generated, instead got: `+JSON.stringify(ncb.messages,null,2));
   });
@@ -116,7 +116,7 @@ describe('InfrastructureMessages', function () {
     const buildModelInfo = new BuildModelInfo();
     const projectPath = makePathToFixture('invalid-projects', 'error_file_type_not_found_mdl_mdl.kpj')
     const ncb = new NodeCompilerCallbacks({logLevel: 'silent'});
-    await buildModelInfo.build(projectPath, ncb, {});
+    await buildModelInfo.build(projectPath, '', ncb, {});
     assert.isTrue(ncb.hasMessage(InfrastructureMessages.ERROR_FileTypeNotFound),
       `ERROR_FileTypeNotFound not generated, instead got: `+JSON.stringify(ncb.messages,null,2));
     assert.isTrue(nodeCompilerMessage(ncb, InfrastructureMessages.ERROR_FileTypeNotFound).includes(KeymanFileTypes.Source.Model),
@@ -129,7 +129,7 @@ describe('InfrastructureMessages', function () {
     const buildModelInfo = new BuildModelInfo();
     const projectPath = makePathToFixture('invalid-projects', 'error_file_type_not_found_mdl_kps.kpj')
     const ncb = new NodeCompilerCallbacks({logLevel: 'silent'});
-    await buildModelInfo.build(projectPath, ncb, {});
+    await buildModelInfo.build(projectPath, '', ncb, {});
     assert.isTrue(ncb.hasMessage(InfrastructureMessages.ERROR_FileTypeNotFound),
       `ERROR_FileTypeNotFound not generated, instead got: `+JSON.stringify(ncb.messages,null,2));
     assert.isTrue(nodeCompilerMessage(ncb, InfrastructureMessages.ERROR_FileTypeNotFound).includes(KeymanFileTypes.Source.Package),
