@@ -99,7 +99,7 @@ if(sourceRoot) {
 srcMap.toFile(mapFile);
 
 if(shouldInline) {
-  const mapToInline = SourcemapRemapper.fromFile(mapFile).sourceRoot;
+  const mapToInline = SourcemapRemapper.fromFile(mapFile).sourceMap;
   const inlineableComment = convertSourceMap.fromObject(mapToInline).toComment();
 
   fs.appendFileSync(scriptFile, `\n${inlineableComment}`);

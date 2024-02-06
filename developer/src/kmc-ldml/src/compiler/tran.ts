@@ -143,7 +143,7 @@ export abstract class TransformCompiler<T extends TransformCompilerType, TranBas
 
     this.checkRanges(cookedFrom); // check before normalizing
 
-    if (!sections.meta.normalizionDisabled) {
+    if (!sections?.meta?.normalizationDisabled) {
       // nfd here.
       cookedFrom = MarkerParser.nfd_markers(cookedFrom, true);
     }

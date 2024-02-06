@@ -77,8 +77,8 @@ export class Meta extends Section {
   settings: KeyboardSettings;
 
   /** convenience for checking settings */
-  get normalizionDisabled() {
-    return this.settings & KeyboardSettings.normalizationDisabled;
+  get normalizationDisabled() {
+    return this?.settings & KeyboardSettings.normalizationDisabled;
   }
 };
 
@@ -210,15 +210,13 @@ export class Strs extends Section {
     }
     // nfd
     if (opts?.nfd) {
-      if (!sections.meta) {
-        throw Error(`Internal Error: need 'meta' section to check normalization mode.`);
-      } else if (!sections.meta.normalizionDisabled) {
+      if (!sections?.meta?.normalizationDisabled) {
         if (opts?.markers) {
           s = MarkerParser.nfd_markers(s, false);
         } else {
           s = s.normalize("NFD");
         }
-      } // else: disabled, do nothing
+      }
     }
     return s;
   }
