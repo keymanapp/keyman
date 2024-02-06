@@ -141,7 +141,7 @@ export abstract class TransformCompiler<T extends TransformCompilerType, TranBas
     // don't unescape literals here, because we are going to pass them through into the regex
     cookedFrom = util.unescapeStringToRegex(cookedFrom);
 
-    if (!sections.meta.normalizionDisabled) {
+    if (!sections?.meta?.normalizationDisabled) {
       // nfd here.
       cookedFrom = MarkerParser.nfd_markers(cookedFrom, true);
     }
