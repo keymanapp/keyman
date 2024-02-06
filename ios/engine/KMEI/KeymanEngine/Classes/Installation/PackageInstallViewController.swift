@@ -9,6 +9,7 @@
 import Foundation
 import WebKit
 import DeviceKit
+import os.log
 
 public class PackageInstallViewController<Resource: LanguageResource>: UIViewController, UITableViewDelegate, UITableViewDataSource, UITabBarControllerDelegate, UIAdaptivePresentationControllerDelegate {
   private enum NavigationMode: Int {  // b/c hashable
@@ -97,7 +98,7 @@ public class PackageInstallViewController<Resource: LanguageResource>: UIViewCon
     var preinstalleds: Set<String> = Set()
 
     guard let typedPackage = package as? TypedKeymanPackage<Resource> else {
-      log.warning("Cannot check for previously-installed resources of unexpected type")
+      os_log("Cannot check for previously-installed resources of unexpected type", log:KeymanEngineLogger.resources, type: .error)
       return preinstalleds
     }
 

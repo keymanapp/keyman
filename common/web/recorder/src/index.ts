@@ -49,7 +49,7 @@ export class PhysicalInputEventSpec extends InputEventSpec {
   modifierSet: number;
   location: number;
 
-  constructor(e?: PhysicalInputEventSpec) { // parameter is used to reconstruct from JSON.
+  constructor(e?: PhysicalInputEventSpec | Partial<Pick<PhysicalInputEventSpec, 'key' | 'code' | 'keyCode' | 'modifierSet' | 'location'>>) { // parameter is used to reconstruct from JSON.
     super();
 
     if(e) {

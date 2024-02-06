@@ -2,8 +2,8 @@ import * as xml2js from 'xml2js';
 import JSZip from 'jszip';
 import KEYMAN_VERSION from "@keymanapp/keyman-version";
 
-import { KmpJsonFile, KpsFile, SchemaValidators, CompilerCallbacks, KeymanFileTypes, KvkFile } from '@keymanapp/common-types';
-import { CompilerMessages } from './messages.js';
+import { KmpJsonFile, KpsFile, SchemaValidators, CompilerCallbacks, KeymanFileTypes, KvkFile, KeymanCompiler, CompilerOptions, KeymanCompilerResult, KeymanCompilerArtifacts, KeymanCompilerArtifact } from '@keymanapp/common-types';
+import { CompilerMessages } from './package-compiler-messages.js';
 import { PackageMetadataCollector } from './package-metadata-collector.js';
 import { KmpInfWriter } from './kmp-inf-writer.js';
 import { transcodeToCP1252 } from './cp1252.js';
@@ -11,6 +11,7 @@ import { MIN_LM_FILEVERSION_KMP_JSON, PackageVersionValidator } from './package-
 import { PackageKeyboardTargetValidator } from './package-keyboard-target-validator.js';
 import { PackageMetadataUpdater } from './package-metadata-updater.js';
 import { markdownToHTML } from './markdown.js';
+import { PackageValidation } from './package-validation.js';
 
 const KMP_JSON_FILENAME = 'kmp.json';
 const KMP_INF_FILENAME = 'kmp.inf';
@@ -20,9 +21,68 @@ const KMP_INF_FILENAME = 'kmp.inf';
 // this filename for existing keyboard packages.
 const WELCOME_HTM_FILENAME = 'welcome.htm';
 
-export class KmpCompiler {
+export interface KmpCompilerOptions extends CompilerOptions {
+  // Note: WindowsPackageInstallerCompilerOptions extends KmpCompilerOptions, so
+  // be careful when modifying this interface
+};
 
-  constructor(private callbacks: CompilerCallbacks) {
+export interface KmpCompilerArtifacts extends KeymanCompilerArtifacts {
+  kmp: KeymanCompilerArtifact;
+};
+
+export interface KmpCompilerResult extends KeymanCompilerResult {
+  artifacts: KmpCompilerArtifacts;
+};
+
+export class KmpCompiler implements KeymanCompiler {
+  private callbacks: CompilerCallbacks;
+  private options: KmpCompilerOptions;
+
+  public async init(callbacks: CompilerCallbacks, options: KmpCompilerOptions): Promise<boolean> {
+    this.callbacks = callbacks;
+    this.options = options ? {...options} : {};
+    return true;
+  }
+
+  public async run(inputFilename: string, outputFilename?: string): Promise<KmpCompilerResult> {
+    const kmpJsonData = this.transformKpsToKmpObject(inputFilename);
+    if(!kmpJsonData) {
+      return null;
+    }
+
+    //
+    // Validate the package file
+    //
+
+    const validation = new PackageValidation(this.callbacks, this.options);
+    if(!validation.validate(inputFilename, kmpJsonData)) {
+      return null;
+    }
+
+    //
+    // Build the .kmp package file
+    //
+
+    const data = await this.buildKmpFile(inputFilename, kmpJsonData);
+    if(!data) {
+      return null;
+    }
+
+    const result: KmpCompilerResult = {
+      artifacts: {
+        kmp: {
+          data,
+          filename: outputFilename ?? inputFilename.replace(/\.kps$/, '.kmp')
+        }
+      }
+    }
+
+    return result;
+  }
+
+  public async write(artifacts: KmpCompilerArtifacts): Promise<boolean> {
+    this.callbacks.fs.writeFileSync(artifacts.kmp.filename, artifacts.kmp.data);
+    return true;
   }
 
   public transformKpsToKmpObject(kpsFilename: string): KmpJsonFile.KmpJsonFile {
@@ -346,7 +406,7 @@ export class KmpCompiler {
    * @param kpsFilename - Filename of the kps, not read, used only for calculating relative paths
    * @param kmpJsonData - The kmp.json Object
    */
-  public buildKmpFile(kpsFilename: string, kmpJsonData: KmpJsonFile.KmpJsonFile): Promise<string> {
+  public buildKmpFile(kpsFilename: string, kmpJsonData: KmpJsonFile.KmpJsonFile): Promise<Uint8Array> {
     const zip = JSZip();
 
 
@@ -438,7 +498,7 @@ export class KmpCompiler {
     }
 
     // Generate kmp file
-    return zip.generateAsync({type: 'binarystring', compression:'DEFLATE'});
+    return zip.generateAsync({type:'uint8array', compression:'DEFLATE'});
   }
 
   private buildKmpInf(data: KmpJsonFile.KmpJsonFile): Uint8Array {

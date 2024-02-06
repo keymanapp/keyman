@@ -26,7 +26,7 @@ export class TestKeymanSentry {
     if(cli.includes('kmcmplib')) {
       const compiler = new KmnCompiler();
       const callbacks = new NodeCompilerCallbacks({});
-      if(!await compiler.init(callbacks)) {
+      if(!await compiler.init(callbacks, null)) {
         throw new Error('Failed to instantiate WASM compiler');
       }
       try {

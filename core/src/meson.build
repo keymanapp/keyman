@@ -42,7 +42,9 @@ endif
 
 
 kmx_files = files(
+  'actions_normalize.cpp',
   'action.cpp',
+  'context_helpers.cpp',
   'option.cpp',
   'keyboard.cpp',
   'state.cpp',
@@ -52,11 +54,13 @@ kmx_files = files(
   'km_core_keyboard_api.cpp',
   'km_core_options_api.cpp',
   'km_core_state_api.cpp',
+  'km_core_state_context_set_if_needed.cpp',
   'km_core_debug_api.cpp',
   'km_core_processevent_api.cpp',
   'jsonpp.cpp',
   'ldml/ldml_processor.cpp',
   'ldml/ldml_transforms.cpp',
+  'ldml/ldml_markers.cpp',
   'ldml/ldml_vkeys.cpp',
   'mock/mock_processor.cpp',
   'kmx/kmx_consts.cpp',

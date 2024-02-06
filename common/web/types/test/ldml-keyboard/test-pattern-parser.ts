@@ -1,8 +1,10 @@
 import 'mocha';
 import { assert } from 'chai';
-import { ElementParser, ElementSegment, ElementType, MarkerParser, OrderedStringList, VariableParser } from '../../src/ldml-keyboard/pattern-parser.js';
+import { ElementParser, ElementSegment, ElementType, MARKER_BEFORE_EOT, MarkerMap, MarkerParser, MarkerResult, OrderedStringList, VariableParser } from '../../src/ldml-keyboard/pattern-parser.js';
 import { constants } from '@keymanapp/ldml-keyboard-constants';
 import { KMXFile } from '../../src/kmx/kmx.js';
+import Hexy from 'hexy';
+const { hexy } = Hexy;
 
 describe('Test of Pattern Parsers', () => {
   describe('should test MarkerParser', () => {
@@ -91,6 +93,10 @@ describe('Test of Pattern Parsers', () => {
       assert.equal(MarkerParser.toSentinelString(
         `Give me \\m{a} and \\m{c}, or \\m{.}.`, markers),
         `Give me \uFFFF\u0008\u0001 and \uFFFF\u0008\u0003, or \uFFFF\u0008\uD7FF.`
+      );
+      assert.equal(MarkerParser.toSentinelString(
+        `Give me \\m{a} and \\m{c}, or \\m{.}.`, markers, true),
+        `Give me \\uffff\\u0008\\u0001 and \\uffff\\u0008\\u0003, or ${MarkerParser.ANY_MARKER_MATCH}.`
       );
       assert.throws(() =>
         MarkerParser.toSentinelString(
@@ -301,3 +307,138 @@ describe('Test of Pattern Parsers', () => {
     });
   });
 });
+
+
+describe('Test of nfd_markers()', () => {
+  it('should be able to parse_next_markers()', () => {
+    [
+      ["6e", null, false],
+      ["6e", null, true],
+      ["\uffff\u0008\u0001e", { match: "\uffff\u0008\u0001", marker: 1 }, false],
+      [MarkerParser.ANY_MARKER_MATCH, {
+        match: MarkerParser.ANY_MARKER_MATCH,
+        marker: constants.marker_any_index,
+      }, true],
+      [
+        "\\uffff\\u0008\\u0002abc", { match: "\\uffff\\u0008\\u0002", marker: 2 }, true
+      ],
+    ].forEach(([src,expect,forMatch]) => {
+      const dst = MarkerParser.parse_next_marker(<string>src, <boolean>forMatch);
+      assert.deepEqual(dst, <MarkerResult>expect, `Parsing ${src} with forMatch=${forMatch}`);
+    });
+  });
+  it('should be able to remove_markers()', () => {
+    [
+      ["6e","6e",false],
+      ["6e","6e",true],
+      ["6\uffff\u0008\u0001e", "6e", false],
+      ["6\\uffff\\u0008\\u0001e", "6e", true],
+      [`6${MarkerParser.ANY_MARKER_MATCH}e`, "6e", true],
+    ].forEach(([src,expect,forMatch]) => {
+      const dst = MarkerParser.remove_markers(<string>src, [], <boolean>forMatch);
+      assert.equal(dst, <string>expect, `mapping ${src} with forMatch=${forMatch}`);
+    });
+  });
+  it('should be able to remove_markers() with composed chars', () => {
+    const src = '\uffff\u0008\u0001\u0344';
+    const m : MarkerMap = [];
+    const dst = MarkerParser.remove_markers(src, m, false);
+    assert.equal(dst, '\u0344'); // nfc
+    assert.sameDeepOrderedMembers(m, [
+      { ch: '\u0308', end: true },
+      { ch: '\u0308', marker: 1},
+      { ch: '\u0301', end: true},
+      { ch: MARKER_BEFORE_EOT, end: true },
+    ]);
+  });
+  it('should normalize as expected', () => {
+    // this is a little bit simpler in structure than what's in test_transforms.cpp,
+    // see there for more complicated cases and discussion
+    const src_expect = [
+      // ["src", "expect", "regex"]
+      // or ["src"] if it is expected to be unchanged
+
+      // #1
+      ["abc"],
+      ["6\uffff\u0008"],
+      ["6\uffffq"],
+      ["6\uffff"],
+      ["6\uffffzz"],
+      ["6\uffff\u0008\u0001"],
+      ["6e\u0320\u0300"],
+      // #8
+      ["6e\u0300\u0320","6e\u0320\u0300"],
+      ["6\uffff\u0008\u0001e\uffff\u0008\u0002\u0320\uffff\u0008\u0003\u0300\uffff\u0008\u0004"],
+      ["6\uffff\u0008\u0001e\uffff\u0008\u0002\u0320\uffff\u0008\u0003\u0300\uffff\u0008\u0004"],
+      // out of order
+      ["6\uffff\u0008\u0001e\uffff\u0008\u0002\u0300\uffff\u0008\u0003\u0320\uffff\u0008\u0004",
+       "6\uffff\u0008\u0001e\uffff\u0008\u0003\u0320\uffff\u0008\u0002\u0300\uffff\u0008\u0004"],
+      ["4e\u0300\uFFFF\u0008\u0001\u0320",
+       "4e\uFFFF\u0008\u0001\u0320\u0300"],
+      ["9ce\u0300\uFFFF\u0008\u0002\u0320\uFFFF\u0008\u0001",
+       "9ce\uFFFF\u0008\u0002\u0320\u0300\uFFFF\u0008\u0001"],
+      ["9ce\u0300\\uffff\\u0008\\u0002\u0320\\uffff\\u0008\\u0001",
+       "9ce\\uffff\\u0008\\u0002\u0320\u0300\\uffff\\u0008\\u0001",             "REGEX"],
+      ["9ce\u0300\\uffff\\u0008[\\u0001-\\ud7fe]\u0320\\uffff\\u0008\\u0001",
+       "9ce\\uffff\\u0008[\\u0001-\\ud7fe]\u0320\u0300\\uffff\\u0008\\u0001",   "REGEX"],
+      ["9ce\u0300\uFFFF\u0008\u0002\uFFFF\u0008\u0002\u0320",
+      "9ce\uFFFF\u0008\u0002\uFFFF\u0008\u0002\u0320\u0300"],
+      ["9ce\u0300\uFFFF\u0008\u0002\uFFFF\u0008\u0001\uFFFF\u0008\u0003\u0320",
+      "9ce\uFFFF\u0008\u0002\uFFFF\u0008\u0001\uFFFF\u0008\u0003\u0320\u0300"],
+      ["e\uFFFF\u0008\u0001\u0300\uFFFF\u0008\u0002\u0320E\uFFFF\u0008\u0003\u0300\uFFFF\u0008\u0004\u0320",
+       "e\uFFFF\u0008\u0002\u0320\uFFFF\u0008\u0001\u0300E\uFFFF\u0008\u0004\u0320\uFFFF\u0008\u0003\u0300"],
+      // additional tests with denormalized glue chars
+      ["\u0995\uFFFF\u0008\u0001\u09CB", "\u0995\uFFFF\u0008\u0001\u09C7\u09BE"],
+      ["\u0995\u09BE\uFFFF\u0008\u0001\u09C7"],
+      ["\u03B5\uFFFF\u0008\u0001\u0344", "\u03B5\uFFFF\u0008\u0001\u0308\u0301"],
+
+      // double marker -
+      ["e\uffff\u0008\u0001\u0300\u0320\u0300", "e\u0320\uffff\u0008\u0001\u0300\u0300"],
+      // double marker - no change
+      ["e\u0320\uffff\u0008\u0001\u0300\u0300", "e\u0320\uffff\u0008\u0001\u0300\u0300"],
+
+      // Double marker with greek!
+      ["\u03B5\uFFFF\u0008\u0001\u0344\uFFFF\u0008\u0002\u0344\uFFFF\u0008\u0003",
+       "\u03B5\uFFFF\u0008\u0001\u0308\u0301\uFFFF\u0008\u0002\u0308\u0301\uFFFF\u0008\u0003"],
+
+      // double marker -
+      ["e\uffff\u0008\u0001\u0300\u0320\u0300", "e\u0320\uffff\u0008\u0001\u0300\u0300"],
+      // double marker - no change
+      ["e\u0320\uffff\u0008\u0001\u0300\u0300", "e\u0320\uffff\u0008\u0001\u0300\u0300"],
+      // double marker - in front of second, no change
+      ["e\u0320\u0300\uffff\u0008\u0001\u0300", "e\u0320\u0300\uffff\u0008\u0001\u0300"],
+      // double marker - in front of second, with segment reordering
+      ["e\u0300\u0320\uffff\u0008\u0001\u0300", "e\u0320\u0300\uffff\u0008\u0001\u0300"],
+      // double marker - alternate pattern with reordering needed
+      ["e\u0300\uffff\u0008\u0001\u0300\u0320", "e\u0320\u0300\uffff\u0008\u0001\u0300"],
+      // triple diacritic + marker - reordering needed
+      ["e\u0300\uffff\u0008\u0001\u0300\u0320\u0300", "e\u0320\u0300\uffff\u0008\u0001\u0300\u0300"],
+
+
+    ];
+
+    for (let i = 0; i < src_expect.length; i++) {
+      const r = src_expect[i];
+      const src = r[0];
+      const exp = r[1] || src;
+      let forMatch = false;
+      if (r.length > 2) {
+        // regex
+        forMatch = true;
+      }
+      let dst;
+      try {
+        dst = MarkerParser.nfd_markers(src, forMatch);
+      } catch(e) {
+        console.error(e);
+        assert.fail(`#${i+1} normalizing '${src}'`);
+      }
+      assert.ok(dst, `#${i+1} normalizing '${src}'`);
+      assert.equal(dst, exp, `#${i+1} normalizing '${src}' forMatch=${forMatch} (got \n${hex_str(dst)} expected \n${hex_str(exp)}) `);
+    }
+  });
+});
+
+function hex_str(s?: string) : string {
+  return hexy(Buffer.from(s, 'utf16le'), {});
+}

@@ -9,6 +9,7 @@
 import KeymanEngine
 import WebKit
 import Reachability
+import os
 
 // TODO: Refactor common functionality from InfoViewController
 class SetUpViewController: UIViewController, WKNavigationDelegate {
@@ -35,7 +36,9 @@ class SetUpViewController: UIViewController, WKNavigationDelegate {
       try networkReachable = Reachability(hostname: "keyman.com")
       try networkReachable?.startNotifier()
     } catch {
-      SentryManager.captureAndLog(error, message: "error thrown starting Reachability notifier:  \(error)")
+      let message = "error thrown starting Reachability notifier:  \(error)"
+      os_log("%{public}s", log:KeymanLogger.ui, type: .error, message)
+      SentryManager.capture(error, message: message)
     }
   }
 
@@ -74,6 +77,6 @@ class SetUpViewController: UIViewController, WKNavigationDelegate {
     let url = "\(KeymanHosts.HELP_KEYMAN_COM)/products/iphone-and-ipad/\(appVersion.plainString)"
       + "/start/installing-system-keyboard?embed=ios"
     webView.load(URLRequest(url: URL(string: url)!))
-    log.debug("Set up page URL: \(url)")
+    os_log("Set up page URL: %{public}s", log: KeymanLogger.resources, type: .debug, url)
   }
 }

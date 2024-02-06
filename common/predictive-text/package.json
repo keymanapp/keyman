@@ -4,6 +4,7 @@
   "main": "build/obj/node/index.js",
   "exports": {
     ".": {
+      "es6-bundling": "./src/web/index.ts",
       "node": {
         "types": "./build/obj/node/index.d.ts",
         "import": "./build/obj/index.js"
@@ -14,7 +15,10 @@
       }
     },
     "./node": "./build/obj/node/index.js",
-    "./web": "./build/obj/web/index.js",
+    "./web": {
+      "es6-bundling": "./src/web/index.ts",
+      "default": "./build/obj/web/index.js"
+    },
     "./build/obj/node/index.js": "./build/obj/node/index.js",
     "./build/obj/web/index.js": "./build/obj/web/index.js"
   },

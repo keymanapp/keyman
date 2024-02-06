@@ -1,5 +1,5 @@
 import { constants, SectionIdent } from "@keymanapp/ldml-keyboard-constants";
-import { KMXPlus, LDMLKeyboard, CompilerCallbacks, VariableParser, MarkerParser } from '@keymanapp/common-types';
+import { KMXPlus, LDMLKeyboard, CompilerCallbacks, VariableParser, MarkerParser, util } from '@keymanapp/common-types';
 import { SectionCompiler } from "./section-compiler.js";
 
 import Bksp = KMXPlus.Bksp;
@@ -138,15 +138,22 @@ export abstract class TransformCompiler<T extends TransformCompilerType, TranBas
     // add in markers. idempotent if no markers.
     cookedFrom = sections.vars.substituteMarkerString(cookedFrom, true);
 
+    // don't unescape literals here, because we are going to pass them through into the regex
+    cookedFrom = util.unescapeStringToRegex(cookedFrom);
+
+    // nfd here.
+    cookedFrom = MarkerParser.nfd_markers(cookedFrom, true);
+
     // cookedFrom is cooked above, since there's some special treatment
     result.from = sections.strs.allocString(cookedFrom, {
-      unescape: true
+      unescape: false,
     }, sections);
     // 'to' is handled via allocString
     result.to = sections.strs.allocString(transform.to, {
       stringVariables: true,
       markers: true,
       unescape: true,
+      nfd: true,
     }, sections);
     return result;
   }

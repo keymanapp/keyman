@@ -1,7 +1,7 @@
 import { ActiveKey, Codes, DeviceSpec } from '@keymanapp/keyboard-processor';
 import { landscapeView } from 'keyman/engine/dom-utils';
 
-import OSKKey from './oskKey.js';
+import OSKKey, { renameSpecialKey } from './oskKey.js';
 import { KeyData, KeyElement, link } from '../keyElement.js';
 import OSKRow from './oskRow.js';
 import VisualKeyboard from '../visualKeyboard.js';
@@ -78,7 +78,7 @@ export default class OSKBaseKey extends OSKKey {
     for(bsn=0; bsn<bsk.length; bsn++) {
       if(bsk[bsn]['sp'] == 1 || bsk[bsn]['sp'] == 2) {
         var oldText=bsk[bsn]['text'];
-        bsk[bsn]['text']=this.renameSpecialKey(oldText, vkbd);
+        bsk[bsn]['text']=renameSpecialKey(oldText, vkbd);
       }
 
       // If a subkey doesn't have a defined layer property, copy it from the base key's layer by default.
@@ -120,7 +120,7 @@ export default class OSKBaseKey extends OSKKey {
     }
 
     // If a subkey array is defined, add an icon
-    const skIcon = this.generateHint();
+    const skIcon = this.generateHint(vkbd);
     btn.appendChild(skIcon);
 
     // Add text to button and button to placeholder div
@@ -134,7 +134,7 @@ export default class OSKBaseKey extends OSKKey {
     return this.square = kDiv;
   }
 
-  public generateHint(): HTMLDivElement {
+  public generateHint(vkbd: VisualKeyboard): HTMLDivElement {
     // If a hint is defined, add an icon
     const skIcon = document.createElement('div');
     // Ensure that we use the keyboard's text font for hints.
@@ -145,7 +145,7 @@ export default class OSKBaseKey extends OSKKey {
       return skIcon;
     }
 
-    if(hintSpec.font) {
+    if(hintSpec.font && hintSpec.font != 'SpecialOSK') {
       skIcon.style.fontFamily = hintSpec.font;
     } else {
       skIcon.classList.add('kmw-key-text');
@@ -161,11 +161,18 @@ export default class OSKBaseKey extends OSKKey {
 
     // If the base key itself is the source of the hint text, we use `hint` directly.
     // Otherwise, we present the source subkey's key cap as the hint.
-    const text = hintSpec == this.spec ? this.spec.hint : hintSpec.text;
+    const baseText = hintSpec == this.spec ? this.spec.hint : hintSpec.text
+    const text = renameSpecialKey(baseText, vkbd);
     if(text == '\u2022') {
       // The original, pre-17.0 longpress dot-hint used bold-face styling.
       skIcon.style.fontWeight='bold';
     }
+
+    if(baseText != text) {
+      // if the text is from a *Special* shorthand, always use our special-key OSK font.
+      skIcon.style.fontFamily = 'SpecialOSK';
+    }
+
     skIcon.textContent = text;
 
     return skIcon;

@@ -35,9 +35,18 @@ builder_parse "$@"
 
 #### Build action definitions ####
 
+do_build () {
+  compile $SUBPROJECT_NAME
+
+  $BUNDLE_CMD    "${KEYMAN_ROOT}/web/build/${SUBPROJECT_NAME}/obj/index.js" \
+    --out        "${KEYMAN_ROOT}/web/build/${SUBPROJECT_NAME}/lib/index.mjs" \
+    --format esm
+}
+
 builder_run_action configure verify_npm_setup
 builder_run_action clean rm -rf "$KEYMAN_ROOT/web/build/$SUBPROJECT_NAME"
-builder_run_action build compile $SUBPROJECT_NAME
+builder_run_action build do_build
+builder_run_action test
 
 # No headless tests for this child project.  Currently, DOM-based unit &
 # integrated tests are run solely by the top-level $KEYMAN_ROOT/web project.

@@ -6,11 +6,13 @@
 */
 
 #include "ldml_transforms.hpp"
+#include "ldml_markers.hpp"
 #include "debuglog.h"
 #include <algorithm>
 #include <string>
 #include "kmx/kmx_xstring.h"
 #include <assert.h>
+#include "ldml_utils.hpp"
 
 namespace km {
 namespace core {
@@ -329,15 +331,19 @@ reorder_group::apply(std::u32string &str) const {
   /** did we match anything */
   bool some_match = false;
 
+  // markers need to 'pass through' reorders. remove and re-add if needed
+  marker_map markers;
+  std::u32string out = remove_markers(str, markers, plain_sentinel);
+
   // get a baseline sort key
-  auto sort_keys = reorder_sort_key::from(str);
+  auto sort_keys = reorder_sort_key::from(out);
 
   // apply ALL reorders in the group.
   for (const auto &r : list) {
     // work backward from end of string forward
     // That is, see if "abc" matches "abc" or "ab" or "a"
-    for (size_t s = str.size(); s > 0; s--) {
-      size_t submatch = r.match_end(str, 0, s);
+    for (size_t s = out.size(); s > 0; s--) {
+      size_t submatch = r.match_end(out, 0, s);
       if (submatch != 0) {
 #if KMXPLUS_DEBUG_TRANSFORM
         DebugTran("Matched: %S (off=%d, len=%d)", str.c_str(), 0, s);
@@ -364,18 +370,6 @@ reorder_group::apply(std::u32string &str) const {
     r.dump();
   }
 #endif
-
-  // TODO-LDML: for now, assume matches entire string.
-  // A needed optimization here would be to detect a common substring
-  // at the end of the old and new strings, and keep the match_len
-  // minimal. This could reduce thrash in core's context.
-  // However, the calling code does check for a common substring with mismatch()
-  size_t match_len = str.size();
-
-  // 'prefix' is the unmatched string before the match
-  // TODO-LDML: right now, this is empty, because match_len is the entire size.
-  std::u32string prefix = str;
-  prefix.resize(str.size() - match_len);  // just the part before the matched part.
 
   // Now, we need to actually do the sorting, but we must only sort
   // 'runs' beginning with 0-weight keys.
@@ -418,7 +412,7 @@ reorder_group::apply(std::u32string &str) const {
   }
   // recombine into a string by pulling out the 'ch' value
   // that's in each sortkey element.
-  std::u32string newSuffix;
+  out.clear(); // will re-add all text
   signed char q = sort_keys.begin()->quaternary; // start with the first quaternary
   for (auto e = sort_keys.begin(); e < sort_keys.end(); e++, q++) {
     if (q != e->quaternary) {
@@ -426,13 +420,12 @@ reorder_group::apply(std::u32string &str) const {
       applied = true;
     }
     // collect the characters
-    newSuffix.append(1, e->ch);
+    out.append(1, e->ch);
   }
-  if (applied) {
-    str.resize(prefix.size());
-    str.append(newSuffix);
-  } else {
+  if (!applied) {
     DebugTran("Skip: sorting caused no reordering");
+    // exit early to avoid string copying and possibly marker re-adding.
+    return false; // no change
   }
 #if KMXPLUS_DEBUG_TRANSFORM
   DebugTran("Sorted sortkey");
@@ -440,7 +433,8 @@ reorder_group::apply(std::u32string &str) const {
     r.dump();
   }
 #endif
-  return applied;
+  add_back_markers(str, out, markers, plain_sentinel);
+  return true; // updated
 }
 
 transform_entry::transform_entry(const transform_entry &other)
@@ -517,9 +511,10 @@ transform_entry::init() {
     return false;
   }
   // TODO-LDML: if we have mapFrom, may need to do other processing.
-  std::u16string patstr = km::core::kmx::u32string_to_u16string(fFrom);
-  // normalize, including markers
-  normalize_nfd_markers(patstr);
+  std::u32string from2 = fFrom;
+  normalize_nfd_markers(from2, regex_sentinel);
+  std::u16string patstr = km::core::kmx::u32string_to_u16string(from2);
+  // normalize, including markers, for regex
   UErrorCode status           = U_ZERO_ERROR;
   /* const */ icu::UnicodeString patustr = icu::UnicodeString(patstr.data(), (int32_t)patstr.length());
   // add '$' to match to end
@@ -612,27 +607,14 @@ transform_entry::apply(const std::u32string &input, std::u32string &output) cons
     rustr  = icu::UnicodeString(rstr.data(), (int32_t)rstr.length());
     // and we return to the regular code flow.
   }
-  const icu::Normalizer2 *nfd = icu::Normalizer2::getNFDInstance(status);
-  icu::UnicodeString rustr2;
-  nfd->normalize(rustr, rustr2, status); // TODO-LDML: must be normalize with markers!
-  if (!UASSERT_SUCCESS(status)) {
-    return 0;
-  }
-  // here we replace the match output.
-  icu::UnicodeString entireOutput = matcher->replaceFirst(rustr2, status);
+  // here we replace the match output. No normalization, yet.
+  icu::UnicodeString entireOutput = matcher->replaceFirst(rustr, status);
   if (!UASSERT_SUCCESS(status)) {
     // TODO-LDML: could fail here due to bad input (syntax err)
     return 0;
   }
   // entireOutput includes all of 'input', but modified. Need to substring it.
-  icu::UnicodeString outu_raw = entireOutput.tempSubString(matchStart);
-
-  // normalize the replaced string
-  icu::UnicodeString outu;
-  nfd->normalize(outu_raw, outu, status); // TODO-LDML: must be normalize with markers!
-  if (!UASSERT_SUCCESS(status)) {
-    return 0; // TODO-LDML: probably memory/etc.
-  }
+  icu::UnicodeString outu = entireOutput.tempSubString(matchStart);
 
   // Special case if there's no output, save some allocs
   if (outu.length() == 0) {
@@ -651,9 +633,14 @@ transform_entry::apply(const std::u32string &input, std::u32string &output) cons
     // convert
     outu.toUTF32((UChar32 *)(s.get()), out32len + 1, status);
     if (!UASSERT_SUCCESS(status)) {
-      return 0; // TODO-LDML: memory isue
+      return 0; // TODO-LDML: memory issue
     }
     output.assign(s.get(), out32len);
+    // NOW do a marker-safe normalize
+    if (!normalize_nfd_markers(output)) {
+      DebugLog("normalize_nfd_markers(output) failed");
+      return 0; // TODO-LDML: normalization failed.
+    }
   }
   return matchLen;
 }
@@ -925,182 +912,6 @@ transforms::load(
   } else {
     return transforms.release();
   }
-}
-
-// string manipulation
-
-/** internal function to normalize with a specified mode */
-static bool normalize(const icu::Normalizer2 *n, std::u16string &str, UErrorCode &status) {
-  UASSERT_SUCCESS(status);
-  assert(n != nullptr);
-  icu::UnicodeString dest;
-  icu::UnicodeString src = icu::UnicodeString(str.data(), (int32_t)str.length());
-  n->normalize(src, dest, status);
-  if (UASSERT_SUCCESS(status)) {
-    str.assign(dest.getBuffer(), dest.length());
-  }
-  return U_SUCCESS(status);
-}
-
-bool normalize_nfd(std::u32string &str) {
-  std::u16string rstr = km::core::kmx::u32string_to_u16string(str);
-  if(!normalize_nfd(rstr)) {
-    return false;
-  } else {
-    str = km::core::kmx::u16string_to_u32string(rstr);
-    return true;
-  }
-}
-
-bool normalize_nfd(std::u16string &str) {
-  UErrorCode status = U_ZERO_ERROR;
-  const icu::Normalizer2 *nfd = icu::Normalizer2::getNFDInstance(status);
-  UASSERT_SUCCESS(status);
-  return normalize(nfd, str, status);
-}
-
-bool normalize_nfd_markers(std::u16string &str, marker_map &map) {
-  std::u32string rstr = km::core::kmx::u16string_to_u32string(str);
-  if(!normalize_nfd_markers(rstr, map)) {
-    return false;
-  } else {
-    str = km::core::kmx::u32string_to_u16string(rstr);
-    return true;
-  }
-}
-
-void add_back_markers(std::u32string &str, const std::u32string &src, const marker_map &map) {
-  // need to reconstitute.
-  marker_map map2(map);  // make a copy of the map
-  // clear the string
-  str.clear();
-  // add the end-of-text marker
-  {
-    const auto ch = MARKER_BEFORE_EOT;
-    const auto m  = map2.find(ch);
-    if (m != map2.end()) {
-      prepend_marker(str, m->second);
-      map2.erase(ch);  // remove it
-    }
-  }
-  // go from end to beginning of string
-  for (auto p = src.rbegin(); p != src.rend(); p++) {
-    const auto ch = *p;
-    str.insert(0, 1, ch);  // prepend
-
-    const auto m = map2.find(ch);
-    if (m != map2.end()) {
-      prepend_marker(str, m->second);
-      map2.erase(ch);  // remove it
-    }
-  }
-}
-
-/**
- * TODO-LDML:
- *  - doesn't support >1 marker per char - may need a set instead of a map!
- *  - ideally this should be used on a normalization safe subsequence
- */
-bool normalize_nfd_markers(std::u32string &str, marker_map &map) {
-  /** original string, but no markers */
-  std::u32string str_unmarked = remove_markers(str, map);
-  /** original string, no markers, NFD */
-  std::u32string str_unmarked_nfd = str_unmarked;
-  if(!normalize_nfd(str_unmarked_nfd)) {
-    return false; // normalize failed.
-  } else if (map.size() == 0) {
-    // no markers. Return the normalized unmarked str
-    str = str_unmarked_nfd;
-  } else if (str_unmarked_nfd == str_unmarked) {
-    // Normalization produced no change when markers were removed.
-    // So, we'll call this a no-op.
-  } else {
-    add_back_markers(str, str_unmarked_nfd, map);
-  }
-  return true; // all OK
-}
-
-bool normalize_nfc_markers(std::u32string &str, marker_map &map) {
-  /** original string, but no markers */
-  std::u32string str_unmarked = remove_markers(str, map);
-  /** original string, no markers, NFC */
-  std::u32string str_unmarked_nfc = str_unmarked;
-  if(!normalize_nfc(str_unmarked_nfc)) {
-    return false; // normalize failed.
-  } else if (map.size() == 0) {
-    // no markers. Return the normalized unmarked str
-    str = str_unmarked_nfc;
-  } else if (str_unmarked_nfc == str_unmarked) {
-    // Normalization produced no change when markers were removed.
-    // So, we'll call this a no-op.
-  } else {
-    add_back_markers(str, str_unmarked_nfc, map);
-  }
-  return true; // all OK
-}
-
-
-bool normalize_nfc(std::u32string &str) {
-  std::u16string rstr = km::core::kmx::u32string_to_u16string(str);
-  if(!normalize_nfc(rstr)) {
-    return false;
-  } else {
-    str = km::core::kmx::u16string_to_u32string(rstr);
-    return true;
-  }
-}
-
-bool normalize_nfc(std::u16string &str) {
-  UErrorCode status = U_ZERO_ERROR;
-  const icu::Normalizer2 *nfc = icu::Normalizer2::getNFCInstance(status);
-  UASSERT_SUCCESS(status);
-  return normalize(nfc, str, status);
-}
-
-std::u32string remove_markers(const std::u32string &str, marker_map *markers) {
-  std::u32string out;
-  auto i = str.begin();
-  auto last = i;
-  for (i = find(i, str.end(), LDML_UC_SENTINEL); i != str.end(); i = find(i, str.end(), LDML_UC_SENTINEL)) {
-    // append any prefix (from prior pos'n to here)
-    out.append(last, i);
-
-    // #1: LDML_UC_SENTINEL (what we searched for)
-    assert(*i == LDML_UC_SENTINEL); // assert that find() worked
-    i++;
-    last = i;
-    if (i == str.end()) {
-      break; // hit end
-    }
-
-    // #2 LDML_MARKER_CODE
-    if (*i != LDML_MARKER_CODE) {
-      continue; // can't process this, get out
-    }
-    i++;
-    last = i;
-    if (i == str.end()) {
-      break; // hit end
-    }
-
-    // #3 marker number
-    const KMX_DWORD marker_no = *i;
-    assert(marker_no >= LDML_MARKER_MIN_INDEX && marker_no <= LDML_MARKER_MAX_INDEX);
-    i++; // if end, we'll break out of the loop
-    last = i;
-
-    // record the marker
-    if (markers != nullptr) {
-      if (i == str.end()) {
-        markers->emplace(MARKER_BEFORE_EOT, marker_no);
-      } else {
-        markers->emplace(*i, marker_no);
-      }
-    }
-  }
-  // get the suffix between the last marker and the end
-  out.append(last, str.end());
-  return out;
 }
 
 }  // namespace ldml

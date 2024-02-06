@@ -279,14 +279,21 @@ end;
 
 procedure TmodActionsKeyboardEditor.actKeyboardTestUpdate(Sender: TObject);
 begin
-  actKeyboardTest.Enabled := (ActiveKmnKeyboardEditor <> nil);
+  actKeyboardTest.Enabled := (ActiveKmnKeyboardEditor <> nil) or (ActiveLdmlKeyboardEditor <> nil);
   // TODO: test xml keyboards in editor
 end;
 
 procedure TmodActionsKeyboardEditor.actKeyboardTestExecute(Sender: TObject);
 begin
-  ActiveKmnKeyboardEditor.DebugForm.UIStatus := duiTest;
-  ActiveKmnKeyboardEditor.StartDebugging(True);
+  if ActiveKmnKeyboardEditor <> nil then
+  begin
+    ActiveKmnKeyboardEditor.DebugForm.UIStatus := duiTest;
+    ActiveKmnKeyboardEditor.StartDebugging(True);
+  end
+  else
+  begin
+    ActiveLdmlKeyboardEditor.StartDebugging;
+  end;
 end;
 
 //------------------------------------------------------------------------------

@@ -91,5 +91,25 @@ export class InfrastructureMessages {
   static Hint_ProjectIsVersion10 = () => m(this.HINT_ProjectIsVersion10,
     `The project file is an older version and can be upgraded to version 17.0`);
   static HINT_ProjectIsVersion10 = SevHint | 0x0014;
+
+  static Error_OutFileCanOnlyBeSpecifiedWithSingleInfile = () => m(this.ERROR_OutFileCanOnlyBeSpecifiedWithSingleInfile,
+    `Parameter --out-file can only be used with a single input file.`);
+  static ERROR_OutFileCanOnlyBeSpecifiedWithSingleInfile = SevError | 0x0015;
+
+  static Error_InvalidMessageFormat = (o:{message:string}) => m(this.ERROR_InvalidMessageFormat,
+    `Invalid parameter: --message ${o.message} must match format '[KM]#####[:Disable|Info|Hint|Warn|Error]'`);
+  static ERROR_InvalidMessageFormat = SevError | 0x0016;
+
+  static Error_MessageNamespaceNotFound = (o:{code: number}) => m(this.ERROR_MessageNamespaceNotFound,
+    `Invalid parameter: --message KM${o.code?.toString(16)} does not have a recognized namespace`);
+  static ERROR_MessageNamespaceNotFound = SevError | 0x0017;
+
+  static Error_MessageCodeNotFound = (o:{code: number}) => m(this.ERROR_MessageCodeNotFound,
+    `Invalid parameter: --message KM${o.code?.toString(16)} is not a recognized code`);
+  static ERROR_MessageCodeNotFound = SevError | 0x0018;
+
+  static Error_MessageCannotBeCoerced = (o:{code: number}) => m(this.ERROR_MessageCannotBeCoerced,
+    `Invalid parameter: --message KM${o.code?.toString(16)} is not a info, hint or warn message type and cannot be coerced`);
+  static ERROR_MessageCannotBeCoerced = SevError | 0x0019;
 }
 

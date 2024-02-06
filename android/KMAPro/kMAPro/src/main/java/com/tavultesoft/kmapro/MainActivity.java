@@ -267,9 +267,11 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
 
     // onConfigurationChanged() only triggers when device is rotated while app is in foreground
     // This handles when device is rotated while app is in background
-    Configuration newConfig = this.getResources().getConfiguration();
-    if (newConfig != null && newConfig.orientation != lastOrientation) {
-      lastOrientation = newConfig.orientation;
+    // using KMManager.getOrientation() since getConfiguration().orientation is unreliable #10241
+    int newOrientation = KMManager.getOrientation(context);
+    if (newOrientation != lastOrientation) {
+      lastOrientation = newOrientation;
+      Configuration newConfig = this.getResources().getConfiguration();
       KMManager.onConfigurationChanged(newConfig);
     }
     resizeTextView(textView.isKeyboardVisible());

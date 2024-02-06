@@ -143,7 +143,7 @@ export class SearchNode {
 
       // TODO:  transform.deleteRight currently not supported.
 
-      let inputPath = Array.from(this.priorInput);
+      let inputPath = this.priorInput.slice(0);
       inputPath.push(probMass);
       // Tokenize and iterate over input chars, adding them into the calc.
       for(let i=0; i < transform.insert.length; i++) {
@@ -641,14 +641,15 @@ export class SearchSpace {
          * Ignore any zero-ms length intervals; they'd make the logic much
          * messier than necessary otherwise.
          */
-        if(delta) {
+        if(delta && delta > this.largestIntervals[0]) {
           // If the currently-observed interval is longer than the shortest of the 3
           // previously-observed longest intervals, replace it.
-          if(this.largestIntervals.length > 2 && delta > this.largestIntervals[0]) {
+          if(this.largestIntervals.length > 2) {
             this.largestIntervals[0] = delta;
           } else {
             this.largestIntervals.push(delta);
           }
+
           // Puts the list in ascending order.  Shortest of the list becomes the head,
           // longest one the tail.
           this.largestIntervals.sort();
