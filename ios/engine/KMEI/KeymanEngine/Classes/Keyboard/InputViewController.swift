@@ -299,8 +299,8 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
     let selection = textDocumentProxy.selectedText ?? ""
     let contextAfterInput = textDocumentProxy.documentContextAfterInput ?? ""
     let context = "\(contextBeforeInput)\(selection)\(contextAfterInput)"
-    let bLength = contextBeforeInput.count
-    let sLength = selection.count
+    let bLength = contextBeforeInput.unicodeScalars.count
+    let sLength = selection.unicodeScalars.count
     setContextState(text: context, range: NSMakeRange(bLength, sLength))
     // Within the app, this is triggered after every keyboard input.
     // We should NOT call .resetContext() here for this reason.
@@ -318,9 +318,8 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
       // On the KMW app/webview side, `location` is SMP-aware.
       // .utf16:  treats SMPs as two char.  (Tested with U+1D5BA)
       // Without .utf16 - treats SMPs as one char.
-      let range = NSRange(location: before.count, length: 0)
+      let range = NSRange(location: before.unicodeScalars.count, length: 0)
 
-      os_log("setContextState(text: `%@`, range initializer location: %d, range.location: %d", log: KeymanEngineLogger.engine, type: .debug, contextWindowText, before.count, range.location)
       self.setContextState(text: contextWindowText, range: range)
     }
 
