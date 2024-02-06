@@ -103,6 +103,9 @@
         <data
           android:mimeType="application/octet-stream"
           android:scheme="content" />
+        <data
+          android:mimeType="application/x-keyman-package"
+          android:scheme="content" />
       </intent-filter>
 
       <!--
@@ -121,19 +124,7 @@
 
         <data android:scheme="file" />
         <data android:host="*" />
-
-        <!--
-                     Work around Android's ugly primitive PatternMatcher
-                     implementation that can't cope with finding a . early in
-                     the path unless it's explicitly matched.
-                -->
-        <data android:pathPattern=".*\\.kmp" />
-        <data android:pathPattern=".*\\..*\\.kmp" />
-        <data android:pathPattern=".*\\..*\\..*\\.kmp" />
-        <data android:pathPattern=".*\\..*\\..*\\..*\\.kmp" />
-        <data android:pathPattern=".*\\..*\\..*\\..*\\..*\\.kmp" />
-        <data android:pathPattern=".*\\..*\\..*\\..*\\..*\\..*\\.kmp" />
-        <data android:pathPattern=".*\\..*\\..*\\..*\\..*\\..*\\..*\\.kmp" />
+        <data android:pathPattern="/.*\\.kmp" />
       </intent-filter>
 
       <!--
@@ -154,19 +145,7 @@
         <data android:scheme="file" />
         <data android:host="*" />
         <data android:mimeType="*/*" />
-
-        <!--
-                     Work around Android's ugly primitive PatternMatcher
-                     implementation that can't cope with finding a . early in
-                     the path unless it's explicitly matched.
-                -->
-        <data android:pathPattern=".*\\.kmp" />
-        <data android:pathPattern=".*\\..*\\.kmp" />
-        <data android:pathPattern=".*\\..*\\..*\\.kmp" />
-        <data android:pathPattern=".*\\..*\\..*\\..*\\.kmp" />
-        <data android:pathPattern=".*\\..*\\..*\\..*\\..*\\.kmp" />
-        <data android:pathPattern=".*\\..*\\..*\\..*\\..*\\..*\\.kmp" />
-        <data android:pathPattern=".*\\..*\\..*\\..*\\..*\\..*\\..*\\.kmp" />
+        <data android:pathPattern="/.*\\.kmp" />
       </intent-filter>
       <intent-filter>
         <action android:name="android.intent.action.VIEW" />
@@ -177,11 +156,11 @@
         <!-- http:// and  https:// protocols -->
         <data
           android:host="*"
-          android:pathPattern=".*\\.kmp"
+          android:pathPattern="/.*\\.kmp"
           android:scheme="http" />
         <data
           android:host="*"
-          android:pathPattern=".*\\.kmp"
+          android:pathPattern="/.*\\.kmp"
           android:scheme="https" />
       </intent-filter>
 
