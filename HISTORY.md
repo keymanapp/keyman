@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 17.0.261 alpha 2024-02-06
+
+* fix(web): app/webview sourcemap inlining (#10631)
+* fix(android/app): Cleanup AndroidManifest handling of *.kmp (#10624)
+
 ## 17.0.260 alpha 2024-02-03
 
 * chore(oem/fv): Update versions in keyboards.csv (#10606)
