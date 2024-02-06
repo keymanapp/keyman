@@ -285,7 +285,7 @@ describe("PredictionContext", () => {
     let returnValue = predictiveContext.accept(reversion);
 
     // 'accepting' a reversion performs a rewind; there's no need for async ops here.
-    assert.isNull(returnValue); // as per the method's spec.
+    assert.isNull(await returnValue); // as per the method's spec.
 
     // Verify that the rewind + application of reversion worked!
     let rewoundTextStateWithInput = Mock.from(revertBaseTextState); // appl
