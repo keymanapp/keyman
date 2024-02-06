@@ -30,6 +30,16 @@ int GetActualShiftState() {   // I4843
 }
 
 extern "C" void _declspec(dllexport) WINAPI Keyman_WriteDebugEvent(char *file, int line, PWCHAR msg) {
+  // This function exists solely to provide a stable transition between versions
+  // of Keyman, so that things don't crash if an older version of kmtip.dll
+  // happens to call this function in a newer installation. It is not used in
+  // current versions of Keyman. This change came in around 17.0.260-alpha
+  PWCHAR fileW = strtowstr(file);
+  Keyman_WriteDebugEventW(fileW, line, msg);
+  delete[] fileW;
+}
+
+extern "C" void _declspec(dllexport) WINAPI Keyman_WriteDebugEventW(PWCHAR file, int line, PWCHAR msg) {
   if (file == NULL || msg == NULL) {
     return;
   }
@@ -102,8 +112,6 @@ extern "C" void _declspec(dllexport) WINAPI Keyman_WriteDebugEvent(char *file, i
     DWORD platform = 1;
 #endif
 
-    // TODO Convert to Unicode
-    PWCHAR fileW = strtowstr(file);
 
     // These must match the manifest template in keyman-debug-etw.man
     EventDataDescCreate(&Descriptors[0], &platform, sizeof(DWORD)); // <data name = "Platform" inType = "Platform" / >
@@ -115,7 +123,7 @@ extern "C" void _declspec(dllexport) WINAPI Keyman_WriteDebugEvent(char *file, i
     EventDataDescCreate(&Descriptors[6], &tickCount, sizeof(DWORD)); //  <data name = "TickCount" inType = "win:UInt32" / >
     EventDataDescCreate(&Descriptors[7], (PDWORD)&gti.hwndFocus, sizeof(DWORD)); //  <data name = "FocusHWND" inType = "win:UInt32" / >
     EventDataDescCreate(&Descriptors[8], (PDWORD)&activeHKL, sizeof(DWORD)); //  <data name = "ActiveHKL" inType = "win:UInt32" / >
-    EventDataDescCreate(&Descriptors[9], fileW, (ULONG)(wcslen(fileW) + 1) * sizeof(WCHAR)); //  <data name = "SourceFile" inType = "win:UnicodeString" / >
+    EventDataDescCreate(&Descriptors[9], file, (ULONG)(wcslen(file) + 1) * sizeof(WCHAR)); //  <data name = "SourceFile" inType = "win:UnicodeString" / >
     EventDataDescCreate(&Descriptors[10], (PDWORD)&line, sizeof(DWORD)); //  <data name = "SourceLine" inType = "win:UInt32" / >
     EventDataDescCreate(&Descriptors[11], msg, (ULONG)(wcslen(msg) + 1) * sizeof(WCHAR)); //  <data name = "Message" inType = "win:UnicodeString" / >
 
@@ -124,6 +132,5 @@ extern "C" void _declspec(dllexport) WINAPI Keyman_WriteDebugEvent(char *file, i
       OutputDebugString("Keyman k32_dbg: Failed to call EventWrite");
     }
 
-    delete fileW;
   }
 }
