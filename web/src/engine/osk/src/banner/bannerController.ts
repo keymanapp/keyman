@@ -81,7 +81,6 @@ export class BannerController {
     } else {
       let suggestBanner = banner = new SuggestionBanner(this.hostDevice, this.container.activeBannerHeight);
       suggestBanner.predictionContext = this.predictionContext;
-      suggestBanner.events.on('apply', (selection) => this.predictionContext.accept(selection.suggestion));
 
       // Registers for prediction-engine events & handles its needed connections.
       this.container.banner = suggestBanner;
