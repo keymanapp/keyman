@@ -1,6 +1,7 @@
 ///<reference types="@keymanapp/models-types" />
 
 import { extendString } from "@keymanapp/web-utils";
+import { searchStringDivergence } from "./stringDivergence.js";
 
 extendString();
 
@@ -120,85 +121,24 @@ export default abstract class OutputTarget {
    * @param from An output target (preferably a Mock) representing the prior state of the input/output system.
    */
   buildTransformFrom(original: OutputTarget): Transform {
-    let to = this.getText();
-    let from = original.getText();
+    const toLeft = this.getTextBeforeCaret();
+    const fromLeft = original.getTextBeforeCaret();
 
-    let fromCaret = original.getDeadkeyCaret();
-    let toCaret = this.getDeadkeyCaret();
+    const leftDivergenceIndex = searchStringDivergence(fromLeft, toLeft, false)[0];
+    const deletedLeft = fromLeft.substring(leftDivergenceIndex)._kmwLength();
+    // No need for our specialized variant here.
+    const insertedText = toLeft.substring(leftDivergenceIndex);
 
-    // Step 1:  Determine the number of left-deletions.
-    let maxSMPLeftMatch = fromCaret < toCaret ? fromCaret : toCaret;
+    const toRight = this.getTextAfterCaret();
+    const fromRight = original.getTextAfterCaret();
+    const rightDivergence1 = searchStringDivergence(fromRight, toRight, true)[0];
 
-    // We need the corresponding non-SMP caret location in order to binary-search efficiently.
-    // (Examining code units is much more computationally efficient.)
-    let maxLeftMatch = to._kmwCodePointToCodeUnit(maxSMPLeftMatch);
+    // Right insertions aren't supported, but right deletions will matter in some scenarios.
+    // In particular, once we allow right-deletion for pred-text suggestions applied with the
+    // caret mid-word..
+    const deletedRight = fromRight.substring(0, rightDivergence1 + 1)._kmwLength();
 
-    // 1.1:  use a non-SMP-aware binary search to determine the divergence point.
-    let start = 0;
-    let end = maxLeftMatch;  // the index AFTER the last possible matching char.
-
-    // This search is O(maxLeftMatch).  1/2 + 1/4 + 1/8 + ... converges to = 1.
-    while(start < end) {
-      let mid = Math.floor((end+start+1) / 2); // round up (compare more)
-      let fromLeft = from.substr(start, mid-start);
-      let toLeft   = to.substr(start, mid-start);
-
-      if(fromLeft == toLeft) {
-        start = mid;
-      } else {
-        end = mid - 1;
-      }
-    }
-
-    // At the loop's end:  `end` now holds the non-SMP-aware divergence point.
-    // The 'caret' is after the last matching code unit.
-
-    // 1.2:  detect a possible surrogate-pair split scenario, correcting for it
-    //       (by moving the split before the high-surrogate) if detected.
-
-    // If the split location is precisely on either end of the context, we can't
-    // have split a surrogate pair.
-    if(end > 0 && end < maxLeftMatch) {
-      let potentialHigh    = from.charCodeAt(end-1);
-      let potentialFromLow = from.charCodeAt(end);
-      let potentialToLow   = to.charCodeAt(end);
-
-      // if potentialHigh is a possible high surrogate...
-      if(potentialHigh >= 0xD800 && potentialHigh <= 0xDBFF) {
-        // and at least one potential 'low' is a possible low surrogate...
-        let flag = potentialFromLow >= 0xDC00 && potentialFromLow <= 0xDFFF;
-        flag = flag || (potentialToLow >= 0XDC00 && potentialToLow <= 0xDFFF);
-
-        // Correct the split location, moving it 'before' the high surrogate.
-        if(flag) {
-          end = end - 1;
-        }
-      }
-    }
-
-    // 1.3:  take substring from start to the split point; determine SMP-aware length.
-    //       This yields the SMP-aware divergence index, which gives the number of left-deletes.
-    let newCaret = from._kmwCodeUnitToCodePoint(end);
-    let deletedLeft = fromCaret - newCaret;
-
-    // Step 2:  Determine the other properties.
-    // Since the 'after' OutputTarget's caret indicates the end of any inserted text, we
-    // can easily calculate the rest.
-    let insertedLength = toCaret - newCaret;
-    let delta = to._kmwSubstr(newCaret, insertedLength);
-
-    let undeletedRight = to._kmwLength() - toCaret;
-    let originalRight = from._kmwLength() - fromCaret;
-    let deletedRight = originalRight - undeletedRight;
-
-    // May occur when reverting a suggestion that had been applied mid-word.
-    if(deletedRight < 0) {
-      // Restores deleteRight characters.
-      delta = delta + to._kmwSubstr(toCaret, -deletedRight);
-      deletedRight = 0;
-    }
-
-    return new TextTransform(delta, deletedLeft, deletedRight);
+    return new TextTransform(insertedText, deletedLeft, deletedRight);
   }
 
   buildTranscriptionFrom(original: OutputTarget, keyEvent: KeyEvent, readonly: boolean, alternates?: Alternate[]): Transcription {

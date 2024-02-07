@@ -205,9 +205,6 @@ export default class KeymanEngine extends KeymanEngineBase<BrowserConfiguration,
     // Automatically performs related handler setup & maintains references
     // needed for related cleanup / shutdown.
     this.pageIntegration = new PageIntegrationHandlers(window, this);
-
-    // Initialize supplementary plane string extensions
-    String.kmwEnableSupplementaryPlane(true);
     this.config.finalizeInit();
 
     if(this.ui) {

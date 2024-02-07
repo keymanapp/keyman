@@ -1,20 +1,129 @@
 import { assert } from 'chai';
 
-import { Mock } from '@keymanapp/keyboard-processor';
+import { Mock, searchStringDivergence } from '@keymanapp/keyboard-processor';
 import { extendString } from '@keymanapp/web-utils';
 
 extendString();  // Ensure KMW's string-extension functionality is available.
 
 String.kmwEnableSupplementaryPlane(false);
 
+const toSupplementaryPairString = function(code){
+  var H = Math.floor((code - 0x10000) / 0x400) + 0xD800;
+  var L = (code - 0x10000) % 0x400 + 0xDC00;
+
+  return String.fromCharCode(H, L);
+}
+// A unicode-coding like alias for use in constructing SMP strings.
+const u = toSupplementaryPairString;
+
+/**
+ * Returns the "Mathematical Sans-Serif Small" SMP encoding for
+ * a passed-in lowercase char between 'a' and 'z', inclusive.
+ * @param {*} char
+ * @returns
+ */
+const ss = (char) => {
+  const charCodeOffset = char.charCodeAt(0) - 'a'.charCodeAt(0);
+  return u(0x1d5ba + charCodeOffset);
+}
+
+describe("String divergence calculations", function() {
+  describe("Common prefix", () => {
+    it("BMP text", () => {
+      const result1 = searchStringDivergence("apple", "applause", false);
+      assert.deepEqual(result1, [4, 4]);
+
+      const result2 = searchStringDivergence("applesauce", "applause", false);
+      assert.deepEqual(result2, [4, 4]);
+
+      const result3 = searchStringDivergence("applesauce", "applesauce", false);
+      assert.deepEqual(result3, [10, 10]);
+    });
+
+    it("SMP text", () => {
+      const smp_ify = (str) => str.split('').map(ss).join('');
+
+      const result1 = searchStringDivergence(
+        smp_ify('apple'),
+        smp_ify('applause'),
+        false
+      );
+
+      // 2 per SMP char; is in code-unit... units.
+      // Will avoid splitting code points, though.
+      assert.deepEqual(result1, [8, 8]);
+
+      const result2 = searchStringDivergence(
+        smp_ify('applesauce'),
+        smp_ify('applause'),
+        false
+      );
+
+      assert.deepEqual(result2, [8, 8]);
+
+      const result3 = searchStringDivergence(
+        smp_ify('applesauce'),
+        smp_ify('applesauce'),
+        false
+      );
+
+      assert.deepEqual(result3, [20, 20]);
+    });
+  });
+
+  describe("Common suffix", () => {
+    it("BMP text", () => {
+      //    att|endance
+      // transc|endance
+      const result1 = searchStringDivergence("attendance", "transcendance", true);
+      assert.deepEqual(result1, [2, 5]);
+
+      // transcend|ance
+      //  happenst|ance
+      const result2 = searchStringDivergence("transcendance", "happenstance", true);
+      assert.deepEqual(result2, [8, 7]);
+
+      // And if the two are equal...
+      const result3 = searchStringDivergence("post-caret text", "post-caret text", true);
+      assert.deepEqual(result3, [-1, -1]);
+    });
+
+    it("SMP text", () => {
+      const smp_ify = (str) => str.split('').map(ss).join('');
+
+      //   att|endance
+      // trans|endance
+      const result1 = searchStringDivergence(
+        smp_ify("attendance"),
+        smp_ify("transcendance"),
+        true
+      );
+
+      // 2 per SMP char; is in code-unit... units.
+      // Will avoid splitting code points; is odd b/c we get the index of the LAST char of the pair.
+      assert.deepEqual(result1, [5, 11]);
+
+      // transcend|ance
+      //  happenst|ance
+      const result2 = searchStringDivergence(
+        smp_ify("transcendance"),
+        smp_ify("happenstance"),
+        true
+      );
+      assert.deepEqual(result2, [17, 15]);
+
+      // And if the two are equal...
+      const result3 = searchStringDivergence(
+        smp_ify("post-caret text"),
+        smp_ify("post-caret text"),
+        true
+      );
+      assert.deepEqual(result3, [-1, -1]);
+    });
+  })
+});
+
 describe("Transcriptions and Transforms", function() {
-  var toSupplementaryPairString = function(code){
-    var H = Math.floor((code - 0x10000) / 0x400) + 0xD800;
-    var L = (code - 0x10000) % 0x400 + 0xDC00;
-
-    return String.fromCharCode(H, L);
-  }
-
   // Built in-line via function.  Looks functionally equivalent to "apple", but with SMP characters.
   let u = toSupplementaryPairString;
   let smpApple = u(0x1d5ba)+u(0x1d5c9)+u(0x1d5c9)+u(0x1d5c5)+u(0x1d5be);
@@ -298,7 +407,7 @@ but not himself.`;  // Sheev Palpatine, in the Star Wars prequels.
       }
     });
 
-    it.only('from targets with existing selection', () => {
+    it('from targets with existing selection', () => {
       //                              |            |
       const target = new Mock("testing testing one two three");
       target.setSelection(8, 20)
@@ -313,7 +422,7 @@ but not himself.`;  // Sheev Palpatine, in the Star Wars prequels.
       });
     });
 
-    it.only('to targets with existing selection', () => {
+    it('to targets with existing selection', () => {
       //                              |            |
       const target = new Mock("testing testing one two three");
       target.setSelection(8, 20)
