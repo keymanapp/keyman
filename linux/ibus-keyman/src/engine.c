@@ -848,8 +848,6 @@ ibus_keyman_engine_process_key_event(
 
   process_actions(engine, core_actions);
 
-  km_core_actions_dispose(core_actions);
-
   // If we have a new ibus version that supports prefilter and a non-compliant
   // client, i.e. a client that doesn't support surrounding text (e.g.
   // Chromium as of v104) we forwarded the key event with IBUS_PREFILTER_MASK

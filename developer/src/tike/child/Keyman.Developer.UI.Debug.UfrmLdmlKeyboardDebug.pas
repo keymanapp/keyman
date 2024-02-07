@@ -548,7 +548,6 @@ begin
   begin
     GetGlobalProjectUI.Log(plsError, FDebugFileName,
       'Failed to get context from Keyman Core with error '+IntToStr(Ord(Status)), 0, 0);
-    km_core_actions_dispose(actions);
     Exit;
   end;
 
@@ -635,7 +634,6 @@ begin
     end;
 
   finally
-    km_core_actions_dispose(actions);
     km_core_context_items_dispose(context_items);
 
     FUIDisabled := False;

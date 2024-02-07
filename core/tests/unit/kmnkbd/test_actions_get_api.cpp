@@ -71,6 +71,7 @@ void setup(const km_core_cp *app_context, const km_core_cp *cached_context, int 
   test_actions->deleted_context = nullptr;
   test_state->set_actions(*test_actions);
   test_state->actions().commit();
+  test_state->apply_actions_and_merge_app_context();
 }
 
 //-------------------------------------------------------------------------------------

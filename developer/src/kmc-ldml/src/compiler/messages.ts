@@ -157,6 +157,15 @@ export class CompilerMessages {
   static Error_IllegalCharacters = (o: { count: number, lowestCh: number }) =>
   m(this.ERROR_IllegalCharacters, `File contains ${o.count} illegal character(s), including ${util.describeCodepoint(o.lowestCh)}`);
   static ERROR_IllegalCharacters = SevError | 0x0025;
+
+  static Hint_CharClassImplicitDenorm = (o: { lowestCh: number }) =>
+  m(this.HINT_CharClassImplicitDenorm, `File has character classes which span non-NFD character(s), including ${util.describeCodepoint(o.lowestCh)}. These will not match any text.`);
+  static HINT_CharClassImplicitDenorm = SevHint | 0x0026;
+
+  static Warn_CharClassExplicitDenorm = (o: { lowestCh: number }) =>
+  m(this.WARN_CharClassExplicitDenorm, `File has character classes which include non-NFD characters(s), including ${util.describeCodepoint(o.lowestCh)}. These will not match any text.`);
+  static WARN_CharClassExplicitDenorm = SevWarn | 0x0027;
+
 }
 
 

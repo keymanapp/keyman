@@ -111,7 +111,7 @@ test_transforms() {
     // start with one
     transform_entry te(std::u32string(U"e\\^"), std::u32string(U"E"));  // keep it simple
     // OK now make a group do it
-    transforms tr;
+    transforms tr(false);
     transform_group st;
 
     st.push_back(te);
@@ -137,7 +137,7 @@ test_transforms() {
   std::cout << __FILE__ << ":" << __LINE__ << " - more complex " << std::endl;
 
   {
-    transforms tr;
+    transforms tr(false);
 
     // setup
     {
@@ -198,7 +198,7 @@ test_transforms() {
   std::cout << __FILE__ << ":" << __LINE__ << " - hindi example " << std::endl;
 
   {
-    transforms tr;
+    transforms tr(false);
     {
       transform_group st;
       st.emplace_back(std::u32string(U"िह"), std::u32string(U"हि"));
@@ -367,7 +367,7 @@ test_reorder_standalone() {
       zassert_string_equal(sorted, expect);
     }
     std::cout << "now prepare the reorder elements" << std::endl;
-    transforms tr;
+    transforms tr(false);
     {
       reorder_group rg;
 
@@ -502,7 +502,7 @@ test_reorder_esk() {
     // rules are a little bit simplified, having only the vowel 'a'
 
     std::cout << "now prepare the reorder elements" << std::endl;
-    transforms tr;
+    transforms tr(false);
     {
       reorder_group rg;
 
