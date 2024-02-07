@@ -119,7 +119,6 @@ describe("String divergence calculations", function() {
 
 describe("Transcriptions and Transforms", function() {
   // Built in-line via function.  Looks functionally equivalent to "apple", but with SMP characters.
-  let u = toSupplementaryPairString;
   let smpApple = u(0x1d5ba)+u(0x1d5c9)+u(0x1d5c9)+u(0x1d5c5)+u(0x1d5be);
 
   it("does not store an alias for related OutputTargets", function() {
