@@ -6,7 +6,10 @@
  * @returns The code unit indices within each string for the start of the code point not common to both.
  */
 export function searchStringDivergence(str1: string, str2: string, commonSuffix: boolean): [number, number] {
-  const maxInterval = Math.min(str1.length, str2.length) - 1;
+  /**
+   * The maximum number of iterations to consider; exceeding this would go past a string boundary.
+   */
+  const maxInterval = Math.min(str1.length, str2.length);
 
   /**
    * The first valid index within the string.
@@ -35,12 +38,12 @@ export function searchStringDivergence(str1: string, str2: string, commonSuffix:
 
   if(commonSuffix) {
     start = index = str1.length - 1;
-    end = index - maxInterval;
+    end = index - maxInterval + 1; // index - (maxInterval-1)
     inc = -1;
     offset = str2.length - str1.length;
   } else {
     start = index = 0;
-    end = maxInterval;
+    end = maxInterval - 1;
     inc = 1;
     offset = 0;
   }
