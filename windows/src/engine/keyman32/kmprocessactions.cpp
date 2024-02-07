@@ -29,9 +29,8 @@ processBack(AITIP* app, const unsigned int code_points_to_delete, const km_core_
     for (unsigned int i = 0; i < code_points_to_delete; i++) {
       app->QueueAction(QIT_BACK, BK_DEFAULT);
     }
-    return;
   }
-  if (!app->IsLegacy()) {
+  else {
     km_core_usv const* delete_context_ptr = delete_context;
     while (*delete_context_ptr) {
       delete_context_ptr++;
@@ -45,7 +44,6 @@ processBack(AITIP* app, const unsigned int code_points_to_delete, const km_core_
         app->QueueAction(QIT_BACK, BK_DEFAULT);
       }
     }
-    return;
   }
 }
 
@@ -99,7 +97,7 @@ static void processCapsLock(const km_core_caps_state caps_lock_state, BOOL isUp,
   }
 }
 
-BOOL ProcessActions(BOOL* emitKeyStroke)
+BOOL ProcessActions(BOOL* emitKeystroke)
 {
   PKEYMAN64THREADDATA _td = ThreadGlobals();
   if (!_td) return FALSE;
@@ -117,7 +115,7 @@ BOOL ProcessActions(BOOL* emitKeyStroke)
     processAlert(_td->app);
   }
   if (core_actions->emit_keystroke) {
-    *emitKeyStroke = TRUE;
+    *emitKeystroke = TRUE;
   }
   processCapsLock(core_actions->new_caps_lock_state, !_td->state.isDown, _td->TIPFUpdateable, FALSE);
 
@@ -125,7 +123,7 @@ BOOL ProcessActions(BOOL* emitKeyStroke)
 }
 
 BOOL
-ProcessActionsNonUpdatableParse(BOOL* emitKeyStroke) {
+ProcessActionsNonUpdatableParse(BOOL* emitKeystroke) {
   PKEYMAN64THREADDATA _td = ThreadGlobals();
   if (!_td) {
     return FALSE;
@@ -140,7 +138,7 @@ ProcessActionsNonUpdatableParse(BOOL* emitKeyStroke) {
 
   processCapsLock(core_actions->new_caps_lock_state, !_td->state.isDown, _td->TIPFUpdateable, FALSE);
   if (core_actions->emit_keystroke) {
-    *emitKeyStroke = TRUE;
+    *emitKeystroke = TRUE;
     SendDebugMessageFormat(0, sdmGlobal, 0, "ProcessActionsNonUpdatableParse EMIT_KEYSTROKE");
     _td->CoreProcessEventRun  = FALSE;  // If we emit the key stroke on this parse we don't need the second parse
   }

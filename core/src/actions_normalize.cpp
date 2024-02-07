@@ -305,7 +305,7 @@ bool km::core::actions_update_app_context_nfu(
 
   int i, j;
   for(i = 0, j = 0; items[i].type != KM_CORE_CT_END; i++) {
-    if(items[i].type == KM_CORE_CT_CHAR) {
+    if(items[i].type != KM_CORE_CT_MARKER) {
       items[j] = items[i];
       j++;
     }

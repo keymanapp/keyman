@@ -151,12 +151,16 @@ void test_actions_normalize(
  *                                      applied -- NFU (essentially,
  *                                      this is initial_cached_context -
  *                                      actions_code_points_to_delete +
- *                                      actions_output) - no markers supported
+ *                                      actions_output) - no markers supported.
+ *                                      If specified, final_cached_context_items 
+ *                                      must be nullptr.
  * @param final_cached_context_items    cached context _after_ actions have been
  *                                      applied -- NFU (essentially,
  *                                      this is initial_cached_context -
  *                                      actions_code_points_to_delete +
- *                                      actions_output) - markers supported
+ *                                      actions_output) - markers supported.
+ *                                      If specified, final_cached_context_string
+ *                                      must be nullptr.
  * @param actions_code_points_to_delete number of NFU code points that the
  *                                      keyboard processor has asked to remove
  *                                      in its actions
