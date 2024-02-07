@@ -40,6 +40,10 @@ void actions::push_capslock(bool turnOn) {
 state::state(km::core::abstract_processor & ap, km_core_option_item const *env)
   : _processor(ap)
 {
+  // The app context will never have markers, because it is an exact
+  // copy of the context passed in from the application, in whatever
+  // normalization form that the app is using.
+  _app_ctxt.has_markers = false;
   for (; env && env->key != nullptr; env++) {
     //assert(env->scope == KM_CORE_OPT_ENVIRONMENT); // todo do we need scope? or can we find a way to eliminate it?
     ap.update_option(env->scope
