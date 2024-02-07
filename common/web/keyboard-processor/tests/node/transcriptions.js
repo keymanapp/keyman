@@ -297,6 +297,35 @@ but not himself.`;  // Sheev Palpatine, in the Star Wars prequels.
         String.kmwEnableSupplementaryPlane(false);
       }
     });
+
+    it.only('from targets with existing selection', () => {
+      //                              |            |
+      const target = new Mock("testing testing one two three");
+      target.setSelection(8, 20)
+      const original = Mock.from(target);
+      target.clearSelection();
+
+      const transform = target.buildTransformFrom(original);
+      assert.deepEqual(transform, {
+        insert: '',
+        deleteLeft: 0,
+        deleteRight: 0
+      });
+    });
+
+    it.only('to targets with existing selection', () => {
+      //                              |            |
+      const target = new Mock("testing testing one two three");
+      target.setSelection(8, 20)
+      const transform = {
+        insert: '',
+        deleteLeft: 0,
+        deleteRight: 0
+      };
+
+      target.apply(transform);
+      assert.equal(target.getText(), 'testing two three');
+    });
   });
 
   /*describe("Operations with deadkeys", function() {

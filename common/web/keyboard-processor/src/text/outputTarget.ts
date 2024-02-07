@@ -223,6 +223,10 @@ export default abstract class OutputTarget {
   }
 
   apply(transform: Transform) {
+    // Selected text should disappear on any text edit; application of a transform
+    // certainly qualifies.
+    this.clearSelection();
+
     if(transform.deleteRight) {
       this.setTextAfterCaret(this.getTextAfterCaret()._kmwSubstr(transform.deleteRight));
     }
