@@ -6,11 +6,21 @@
  * @returns The code unit indices within each string for the start of the code point not common to both.
  */
 export function searchStringDivergence(str1: string, str2: string, commonSuffix: boolean): [number, number] {
-  let maxInterval = Math.min(str1.length, str2.length) - 1;
-  const commonPrefix = !commonSuffix;
+  const maxInterval = Math.min(str1.length, str2.length) - 1;
 
+  /**
+   * The first valid index within the string.
+   */
   let start: number;
+
+  /**
+   * The current index within the string under consideration as the divergence point.
+   */
   let index: number;
+
+  /**
+   * The last valid index within the string to consider as the divergence point.
+   */
   let end: number;
 
   /**
@@ -23,20 +33,20 @@ export function searchStringDivergence(str1: string, str2: string, commonSuffix:
    */
   let offset: number;
 
-  if(commonPrefix) {
-    start = index = 0;
-    end = maxInterval;
-    inc = 1;
-    offset = 0;
-  } else {
+  if(commonSuffix) {
     start = index = str1.length - 1;
     end = index - maxInterval;
     inc = -1;
     offset = str2.length - str1.length;
+  } else {
+    start = index = 0;
+    end = maxInterval;
+    inc = 1;
+    offset = 0;
   }
 
   // Step 1: Find the index for the first code unit different between the strings.
-  for(; commonPrefix ? index <= end: index >= end; index += inc) {
+  for(; commonSuffix ? index >= end: index <= end; index += inc) {
     if(str1.charAt(index) != str2.charAt(index + offset)) {
       break;
     }
@@ -55,8 +65,8 @@ export function searchStringDivergence(str1: string, str2: string, commonSuffix:
 
     const isHigh = (charCode: number) => charCode >= 0xD800 && charCode <= 0xDBFF;
     const isLow =  (charCode: number) => charCode >= 0xDC00 && charCode <= 0xDFFF;
-    const commonChecker = commonPrefix ? isHigh : isLow;
-    const divergentChecker = commonPrefix ? isLow : isHigh;
+    const commonChecker = commonSuffix ? isLow : isHigh;
+    const divergentChecker = commonSuffix ? isHigh : isLow;
 
     // If the last common char qualifies as a direction-appropriate SMP surrogate...
     if(commonChecker(commonPotentialSurrogate)) {
