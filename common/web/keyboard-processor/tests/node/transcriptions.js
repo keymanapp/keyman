@@ -25,13 +25,13 @@ describe("String divergence calculations", function() {
   describe("Common prefix", () => {
     it("BMP text", () => {
       const result1 = searchStringDivergence("apple", "applause", false);
-      assert.deepEqual(result1, [4, 4]);
+      assert.equal(result1, 4);
 
       const result2 = searchStringDivergence("applesauce", "applause", false);
-      assert.deepEqual(result2, [4, 4]);
+      assert.equal(result2, 4);
 
       const result3 = searchStringDivergence("applesauce", "applesauce", false);
-      assert.deepEqual(result3, [10, 10]);
+      assert.equal(result3, 10);
     });
 
     it("SMP text", () => {
@@ -45,7 +45,7 @@ describe("String divergence calculations", function() {
 
       // 2 per SMP char; is in code-unit... units.
       // Will avoid splitting code points, though.
-      assert.deepEqual(result1, [8, 8]);
+      assert.equal(result1, 8);
 
       const result2 = searchStringDivergence(
         smp_ify('applesauce'),
@@ -53,7 +53,7 @@ describe("String divergence calculations", function() {
         false
       );
 
-      assert.deepEqual(result2, [8, 8]);
+      assert.equal(result2, 8);
 
       const result3 = searchStringDivergence(
         smp_ify('applesauce'),
@@ -61,7 +61,7 @@ describe("String divergence calculations", function() {
         false
       );
 
-      assert.deepEqual(result3, [20, 20]);
+      assert.equal(result3, 20);
     });
   });
 
@@ -70,16 +70,16 @@ describe("String divergence calculations", function() {
       //    att|endance
       // transc|endance
       const result1 = searchStringDivergence("attendance", "transcendance", true);
-      assert.deepEqual(result1, [2, 5]);
+      assert.equal(result1, 2);
 
       // transcend|ance
       //  happenst|ance
       const result2 = searchStringDivergence("transcendance", "happenstance", true);
-      assert.deepEqual(result2, [8, 7]);
+      assert.equal(result2, 8);
 
       // And if the two are equal...
       const result3 = searchStringDivergence("post-caret text", "post-caret text", true);
-      assert.deepEqual(result3, [-1, -1]);
+      assert.equal(result3, -1);
     });
 
     it("SMP text", () => {
@@ -95,7 +95,7 @@ describe("String divergence calculations", function() {
 
       // 2 per SMP char; is in code-unit... units.
       // Will avoid splitting code points; is odd b/c we get the index of the LAST char of the pair.
-      assert.deepEqual(result1, [5, 11]);
+      assert.equal(result1, 5);
 
       // transcend|ance
       //  happenst|ance
@@ -104,7 +104,7 @@ describe("String divergence calculations", function() {
         smp_ify("happenstance"),
         true
       );
-      assert.deepEqual(result2, [17, 15]);
+      assert.equal(result2, 17);
 
       // And if the two are equal...
       const result3 = searchStringDivergence(
@@ -112,7 +112,7 @@ describe("String divergence calculations", function() {
         smp_ify("post-caret text"),
         true
       );
-      assert.deepEqual(result3, [-1, -1]);
+      assert.equal(result3, -1);
     });
   })
 });

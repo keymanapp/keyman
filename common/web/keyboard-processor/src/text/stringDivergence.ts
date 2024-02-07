@@ -3,9 +3,9 @@
  * @param str1
  * @param str2
  * @param commonSuffix If false, asserts a common prefix to the strings.  If true, asserts a common suffix.
- * @returns The code unit indices within each string for the start of the code point not common to both.
+ * @returns The code unit index within `str1` for the start of the code point not common to both.
  */
-export function searchStringDivergence(str1: string, str2: string, commonSuffix: boolean): [number, number] {
+export function searchStringDivergence(str1: string, str2: string, commonSuffix: boolean): number {
   /**
    * The maximum number of iterations to consider; exceeding this would go past a string boundary.
    */
@@ -79,10 +79,10 @@ export function searchStringDivergence(str1: string, str2: string, commonSuffix:
       if(divergentChecker(divergentChar1) || divergentChecker(divergentChar2)) {
         // Our current index would split a surrogate pair; decrement the index to
         // preserve the pair.
-        return [index - inc, index - inc + offset];
+        return index - inc;
       }
     }
   }
 
-  return [index, index + offset];
+  return index;
 }

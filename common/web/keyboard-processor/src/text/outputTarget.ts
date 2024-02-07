@@ -124,14 +124,14 @@ export default abstract class OutputTarget {
     const toLeft = this.getTextBeforeCaret();
     const fromLeft = original.getTextBeforeCaret();
 
-    const leftDivergenceIndex = searchStringDivergence(fromLeft, toLeft, false)[0];
+    const leftDivergenceIndex = searchStringDivergence(fromLeft, toLeft, false);
     const deletedLeft = fromLeft.substring(leftDivergenceIndex)._kmwLength();
     // No need for our specialized variant here.
     const insertedText = toLeft.substring(leftDivergenceIndex);
 
     const toRight = this.getTextAfterCaret();
     const fromRight = original.getTextAfterCaret();
-    const rightDivergenceIndex = searchStringDivergence(fromRight, toRight, true)[0];
+    const rightDivergenceIndex = searchStringDivergence(fromRight, toRight, true);
 
     // Right insertions aren't supported, but right deletions will matter in some scenarios.
     // In particular, once we allow right-deletion for pred-text suggestions applied with the
