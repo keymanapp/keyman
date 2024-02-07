@@ -397,7 +397,7 @@ bool IsKeymanUsedChar(int KV) {
 }
 
 // _S2 DEADKEY STUFF - DO NOT REVIEW YET
-std::wstring convert_DeadkeyValues_ToChar(int in) {
+std::wstring convert_DeadkeyValues_ToChar_old(int in) {
 
   KMX_DWORD lname;
 
@@ -421,6 +421,35 @@ std::wstring convert_DeadkeyValues_ToChar(int in) {
       return L"\0";
   }
   return L"\0";
+}
+
+
+// _S2 DEADKEY STUFF - DO NOT REVIEW YET
+std::wstring convert_DeadkeyValues_ToChar(int in) {
+
+  KMX_DWORD lname;
+
+  if (in == 0 )
+    return L"\0";
+
+  std::string long_name((const char*) gdk_keyval_name (in));
+
+  if ( long_name.substr (0,2) == "U+" )                                       // U+... Unicode value
+    return  CodePointToWString(in-0x1000000);
+
+  if (in < (int) deadkey_min) {                                                // no deadkey; no Unicode
+    /*if (!IsKeymanUsedKeyVal(std::wstring(1, in)))
+      return L"\0";*/
+    return  std::wstring(1, in);
+  }
+
+    lname = convertNamesToIntegerValue( wstring_from_string(long_name));      // 65106 => "dead_circumflex " => 94 => "^"
+
+    if (lname != returnIfCharInvalid) {
+      return std::wstring(1, lname );
+    }
+    else
+      return L"\0";
 }
 
 std::u16string convert_DeadkeyValues_To_U16str(int in) {
@@ -615,17 +644,12 @@ KMX_DWORD KMX_get_CharsUnderlying_according_to_keycode_and_Shiftstate_GDK_dw(Gdk
 
 std::wstring KMX_get_CharsUnderlying_according_to_keycode_and_Shiftstate_GDK(GdkKeymap *keymap, guint keycode, ShiftState ss, int caps){
 
-  // _S2 skip ss 2+3
+  // _S2 skip ss 2+3  remove??
   if( (ss ==2 ) ||(ss ==3 ))
     return L"\0";
 
   int keyvals_int= KMX_get_keyvals_From_Keycode(keymap, keycode, ss, caps);
-
-  //if((*keyvals >=  deadkey_min) && (*keyvals <=  deadkey_max) )
-  if((keyvals_int >=  deadkey_min))
     return  convert_DeadkeyValues_ToChar(keyvals_int);
-  else
-    return  std::wstring(1, keyvals_int);
 }
 
 // _S2 ToDo // _use gdk_keymap_translate_keyboard_state of other function

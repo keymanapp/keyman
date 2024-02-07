@@ -369,9 +369,8 @@ int i4 = this->KMX_IsXxxxGrCapsEqualToXxxxShift() ? 8 : 0;
 
           wprintf(L"st %i  \n", st[0]);
           key->ShiftFlags = this->KMX_GetShiftStateValue(capslock, caps, (ShiftState) ss);
-          //key->ShiftFlags = this->KMX_GetShiftStateValue(1, caps, (ShiftState) ss);
-          //key->Key = KMX_get_VKUS_From_VKUnderlying_VEC(All_Vector,this->VK());
-          // key->Key = KMX_get_VKUnderlying_From_VKUS_GDK(keymap,this->VK());
+          // _S2 we already use VK_US so no need to convert it
+          key->Key = this->VK();
           key->Line = 0;
 
           if(bDeadkeyConversion) {   // I4552
@@ -730,6 +729,7 @@ bool KMX_ImportRules(LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, GdkKeymap **keymap,
           if(ss == MenuCtrl|| ss == ShftMenuCtrl) {
             continue;
           }
+
           KMX_DWORD SC_US = KMX_get_KeyCodeUnderlying_From_VKUS(iKey);
 
           // _S2 deadkey not finished; Ctrl, Shft +40 not tested
