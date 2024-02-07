@@ -131,12 +131,12 @@ export default abstract class OutputTarget {
 
     const toRight = this.getTextAfterCaret();
     const fromRight = original.getTextAfterCaret();
-    const rightDivergence1 = searchStringDivergence(fromRight, toRight, true)[0];
+    const rightDivergenceIndex = searchStringDivergence(fromRight, toRight, true)[0];
 
     // Right insertions aren't supported, but right deletions will matter in some scenarios.
     // In particular, once we allow right-deletion for pred-text suggestions applied with the
     // caret mid-word..
-    const deletedRight = fromRight.substring(0, rightDivergence1 + 1)._kmwLength();
+    const deletedRight = fromRight.substring(0, rightDivergenceIndex + 1)._kmwLength();
 
     return new TextTransform(insertedText, deletedLeft, deletedRight);
   }

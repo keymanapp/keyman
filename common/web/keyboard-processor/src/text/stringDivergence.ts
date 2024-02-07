@@ -2,12 +2,12 @@
  * Returns the index for the code point divergence point in code unit coordinates.
  * @param str1
  * @param str2
- * @param commonRight If false or undefined, asserts a common prefix to the strings.  If true, asserts a common suffix.
+ * @param commonSuffix If false, asserts a common prefix to the strings.  If true, asserts a common suffix.
  * @returns The code unit indices within each string for the start of the code point not common to both.
  */
-export function searchStringDivergence(str1: string, str2: string, commonRight?: boolean): [number, number] {
+export function searchStringDivergence(str1: string, str2: string, commonSuffix: boolean): [number, number] {
   let maxInterval = Math.min(str1.length, str2.length) - 1;
-  const commonLeft = !commonRight;
+  const commonPrefix = !commonSuffix;
 
   let start: number;
   let index: number;
@@ -23,7 +23,7 @@ export function searchStringDivergence(str1: string, str2: string, commonRight?:
    */
   let offset: number;
 
-  if(commonLeft) {
+  if(commonPrefix) {
     start = index = 0;
     end = maxInterval;
     inc = 1;
@@ -35,7 +35,7 @@ export function searchStringDivergence(str1: string, str2: string, commonRight?:
     offset = str2.length - str1.length;
   }
 
-  for(; commonLeft ? index <= end: index >= end; index += inc) {
+  for(; commonPrefix ? index <= end: index >= end; index += inc) {
     if(str1.charAt(index) != str2.charAt(index + offset)) {
       break;
     }
@@ -52,8 +52,8 @@ export function searchStringDivergence(str1: string, str2: string, commonRight?:
 
     const isHigh = (charCode: number) => charCode >= 0xD800 && charCode <= 0xDBFF;
     const isLow =  (charCode: number) => charCode >= 0xDC00 && charCode <= 0xDFFF;
-    const commonChecker = commonLeft ? isHigh : isLow;
-    const divergentChecker = commonLeft ? isLow : isHigh;
+    const commonChecker = commonPrefix ? isHigh : isLow;
+    const divergentChecker = commonPrefix ? isLow : isHigh;
 
     // If the last common char qualifies as a direction-appropriate SMP surrogate...
     if(commonChecker(commonPotentialSurrogate)) {
