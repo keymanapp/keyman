@@ -1,5 +1,24 @@
 # Keyman Version History
 
+## 17.0.262 alpha 2024-02-07
+
+* refactor(windows): Use km_core_actions struct instead of queue (#10557)
+* chore(core): move action apis into keyman_core_api_actions.h (#10569)
+*  (#10586)
+*  (#10614)
+* fix(core): make `km_core_state_get_actions()` idempotent (#10585)
+* fix(core): strip markers in `actions_update_app_context_nfu()` (#10607)
+* fix(core): surrogate handling, markers in app context, and memory leak (#10618)
+* fix(windows): support unicode strings properly in logs (#10650)
+* fix(developer): ensure project populate files actually adds files (#10651)
+* fix(linux): Use raw string for regex (#10652)
+* fix(windows): `wstrtostr` should use `WideCharToMultiByte` (#10660)
+* chore(windows): rename actionItem to outputString for clarity (#10661)
+* fix(web): handling of backspaces when left-context is empty (#10584)
+* fix(ios): long-held backspace handling (#10633)
+* fix(web): banner scroll positioning after reversions (#10643)
+* chore(web): removes unused banner events (#10644)
+
 ## 17.0.261 alpha 2024-02-06
 
 * fix(web): app/webview sourcemap inlining (#10631)
