@@ -101,31 +101,23 @@ BOOL ProcessActions(BOOL* emitKeystroke)
 {
   PKEYMAN64THREADDATA _td = ThreadGlobals();
   if (!_td) return FALSE;
-  // TODO: #10583  Remove caching action_struct
-  if (!_td->core_actions) {
-    SendDebugMessageFormat(0, sdmGlobal, 0, "ProcessActions: core_actions not set");
-    _td->core_actions = km_core_state_get_actions(_td->lpActiveKeyboard->lpCoreKeyboardState);
-  }
+
+  km_core_actions const* core_actions = km_core_state_get_actions(_td->lpActiveKeyboard->lpCoreKeyboardState);
 
   _td->CoreProcessEventRun = FALSE;
 
-
-
-  processBack(_td->app, _td->core_actions->code_points_to_delete, _td->core_actions->deleted_context);
-  processUnicodeChar(_td->app, _td->core_actions->output);
-  if (_td->core_actions->persist_options != NULL) {
-    processPersistOpt(_td->core_actions, _td->lpActiveKeyboard);
+  processBack(_td->app, core_actions->code_points_to_delete, core_actions->deleted_context);
+  processUnicodeChar(_td->app, core_actions->output);
+  if (core_actions->persist_options != NULL) {
+    processPersistOpt(core_actions, _td->lpActiveKeyboard);
   }
-  if (_td->core_actions->do_alert) {
+  if (core_actions->do_alert) {
     processAlert(_td->app);
   }
-  if (_td->core_actions->emit_keystroke) {
+  if (core_actions->emit_keystroke) {
     *emitKeystroke = TRUE;
   }
-  processCapsLock(_td->core_actions->new_caps_lock_state, !_td->state.isDown, _td->TIPFUpdateable, FALSE);
-  // TODO: #10583 remove dispose
-  km_core_actions_dispose(_td->core_actions);
-  _td->core_actions = nullptr;
+  processCapsLock(core_actions->new_caps_lock_state, !_td->state.isDown, _td->TIPFUpdateable, FALSE);
 
   return TRUE;
 }
@@ -141,16 +133,11 @@ ProcessActionsNonUpdatableParse(BOOL* emitKeystroke) {
     return FALSE;
   }
   _td->CoreProcessEventRun = TRUE;
-  // TODO: #10583 remove dispose
-  if (_td->core_actions) {
-    km_core_actions_dispose(_td->core_actions);
-    _td->core_actions = nullptr;
-  }
 
-  _td->core_actions   = km_core_state_get_actions(_td->lpActiveKeyboard->lpCoreKeyboardState);
-  SendDebugMessageFormat(0, sdmGlobal, 0, "ProcessActionsNonUpdatableParse: km_core_state_get_actions");
-  processCapsLock(_td->core_actions->new_caps_lock_state, !_td->state.isDown, _td->TIPFUpdateable, FALSE);
-  if (_td->core_actions->emit_keystroke) {
+  km_core_actions const* core_actions = km_core_state_get_actions(_td->lpActiveKeyboard->lpCoreKeyboardState);
+
+  processCapsLock(core_actions->new_caps_lock_state, !_td->state.isDown, _td->TIPFUpdateable, FALSE);
+  if (core_actions->emit_keystroke) {
     *emitKeystroke = TRUE;
     SendDebugMessageFormat(0, sdmGlobal, 0, "ProcessActionsNonUpdatableParse EMIT_KEYSTROKE");
     _td->CoreProcessEventRun  = FALSE;  // If we emit the key stroke on this parse we don't need the second parse
@@ -164,11 +151,7 @@ ProcessActionsExternalEvent() {
   if (!_td) {
     return FALSE;
   }
-  if (!_td->core_actions) {   // when ideponent we will not need this
-    return FALSE;
-  }
-  // TODO: #10583 remove and call get actions here directly
-  //km_core_actions const* acts = km_core_state_get_actions(_td->lpActiveKeyboard->lpCoreKeyboardState);
-  processCapsLock(_td->core_actions->new_caps_lock_state, !_td->state.isDown, FALSE, TRUE);
+  km_core_actions const* core_actions = km_core_state_get_actions(_td->lpActiveKeyboard->lpCoreKeyboardState);
+  processCapsLock(core_actions->new_caps_lock_state, !_td->state.isDown, FALSE, TRUE);
   return TRUE;
 }

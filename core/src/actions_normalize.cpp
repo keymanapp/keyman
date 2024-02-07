@@ -19,7 +19,7 @@
 
 // forward declarations
 
-icu::UnicodeString context_items_to_unicode_string(km_core_context const *context);
+icu::UnicodeString context_items_to_unicode_string(km::core::context const *context);
 km_core_usv *unicode_string_to_usv(icu::UnicodeString& src);
 
 /**
@@ -36,14 +36,13 @@ km_core_usv *unicode_string_to_usv(icu::UnicodeString& src);
  * @return true on success, false on failure
  */
 bool km::core::actions_normalize(
-  /* in */      km_core_context const *cached_context,
-  /* in, out */ km_core_context *app_context,
-  /* in, out */ km_core_actions *actions
+  /* in */      km::core::context const *cached_context,
+  /* in, out */ km::core::context *app_context,
+  /* in, out */ km_core_actions &actions
 ) {
-  assert(actions != nullptr);
   assert(cached_context != nullptr);
   assert(app_context != nullptr);
-  if(actions == nullptr || cached_context == nullptr || app_context == nullptr) {
+  if(cached_context == nullptr || app_context == nullptr) {
     return false;
   }
 
@@ -85,7 +84,7 @@ bool km::core::actions_normalize(
     return false;
   }
 
-  icu::UnicodeString output = icu::UnicodeString::fromUTF32(reinterpret_cast<const UChar32*>(actions->output), -1);
+  icu::UnicodeString output = icu::UnicodeString::fromUTF32(reinterpret_cast<const UChar32*>(actions.output), -1);
   icu::UnicodeString cached_context_string = context_items_to_unicode_string(cached_context);
   icu::UnicodeString app_context_string = context_items_to_unicode_string(app_context);
   assert(!output.isBogus());
@@ -138,7 +137,7 @@ bool km::core::actions_normalize(
 
     // And finally remember that we now need to delete an additional NFD codepoint
 
-    actions->code_points_to_delete++;
+    actions.code_points_to_delete++;
   }
 
   /*
@@ -201,7 +200,7 @@ bool km::core::actions_normalize(
     return false;
   }
 
-  if((status = km_core_context_set(app_context, app_context_items)) != KM_CORE_STATUS_OK) {
+  if((status = km_core_context_set(static_cast<km_core_context*>(app_context), app_context_items)) != KM_CORE_STATUS_OK) {
     DebugLog("km_core_context_set failed with %x", status);
     km_core_context_items_dispose(app_context_items);
     delete [] new_output;
@@ -212,9 +211,9 @@ bool km::core::actions_normalize(
 
   // Update actions with new NFC output + count of NFU code points to delete
 
-  delete [] actions->output;
-  actions->output = new_output;
-  actions->code_points_to_delete = nfu_to_delete;
+  delete [] actions.output;
+  actions.output = new_output;
+  actions.code_points_to_delete = nfu_to_delete;
 
   return true;
 }
@@ -222,13 +221,13 @@ bool km::core::actions_normalize(
 /**
  * Helper to convert km_core_context list into a icu::UnicodeString
  */
-icu::UnicodeString context_items_to_unicode_string(km_core_context const *context) {
+icu::UnicodeString context_items_to_unicode_string(km::core::context const *context) {
   icu::UnicodeString nullString;
   nullString.setToBogus();
 
   km_core_context_item *items = nullptr;
   km_core_status status;
-  if((status = km_core_context_get(context, &items)) != KM_CORE_STATUS_OK) {
+  if((status = km_core_context_get(static_cast<km_core_context const *>(context), &items)) != KM_CORE_STATUS_OK) {
     DebugLog("Failed to retrieve context with %s", status);
     return nullString;
   }
@@ -290,19 +289,19 @@ km_core_usv *unicode_string_to_usv(icu::UnicodeString& src) {
  * @return true on success, false on failure
  */
 bool km::core::actions_update_app_context_nfu(
-  /* in */      km_core_context const *cached_context,
-  /* in, out */ km_core_context *app_context
+  /* in */      km::core::context const *cached_context,
+  /* in, out */ km::core::context *app_context
 ) {
   // We simply copy the cached_context to the app_context
   km_core_status status = KM_CORE_STATUS_OK;
   km_core_context_item *items = nullptr;
 
-  if((status = km_core_context_get(cached_context, &items)) != KM_CORE_STATUS_OK) {
+  if((status = km_core_context_get(static_cast<km_core_context const *>(cached_context), &items)) != KM_CORE_STATUS_OK) {
     DebugLog("km_core_context_get failed with %d", status);
     return false;
   }
 
-  if((status = km_core_context_set(app_context, items)) != KM_CORE_STATUS_OK) {
+  if((status = km_core_context_set(static_cast<km_core_context*>(app_context), items)) != KM_CORE_STATUS_OK) {
     DebugLog("km_core_context_set failed with %d", status);
   }
 

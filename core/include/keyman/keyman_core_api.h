@@ -208,8 +208,9 @@ that the Platform layer must take after a keystroke. The `code_points_to_delete`
 action must be performed before the `output` action, but the other
 actions may be performed in any order.
 ##### Return:
-A pointer to a `km_core_actions` object, which must be freed with
-`km_core_actions_dispose`.
+A pointer to a `km_core_actions` object. This data becomes invalid
+when the state object is destroyed, or after a call to
+`km_core_process_event`. Do not modify the contents of this data.
 ##### Parameters:
 - __state__: An opaque pointer to a state object.
 
@@ -219,23 +220,6 @@ KMN_API
 km_core_actions const *
 km_core_state_get_actions(
   km_core_state const *state
-);
-
-/*
-```
-### `km_core_actions_dispose`
-##### Description:
-Free the allocated memory belonging to an actions object previously
-returned by `km_core_state_get_actions`.
-##### Parameters:
-- __actions__: A pointer to the actions object to be disposed of.
-
-```c
-*/
-KMN_API
-km_core_status
-km_core_actions_dispose(
-  km_core_actions const * actions
 );
 
 /*

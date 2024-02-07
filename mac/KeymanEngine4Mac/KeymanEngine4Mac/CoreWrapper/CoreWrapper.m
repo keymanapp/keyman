@@ -174,9 +174,6 @@ const int CORE_ENVIRONMENT_ARRAY_LENGTH = 6;
   [self.coreHelper logDebugMessage:@"CoreWrapper loadActionStructUsingCore"];
   km_core_actions * actions = km_core_state_get_actions(self.coreState);
   CoreKeyOutput *output = [self createCoreKeyOutputForActionsStruct:actions];
-
-  km_core_status result = km_core_actions_dispose(actions);
-  [self.coreHelper logDebugMessage:@"km_core_actions_dispose() result = %u\n", result];
   return output;
 }
 
