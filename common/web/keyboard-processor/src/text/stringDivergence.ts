@@ -35,11 +35,14 @@ export function searchStringDivergence(str1: string, str2: string, commonSuffix:
     offset = str2.length - str1.length;
   }
 
+  // Step 1: Find the index for the first code unit different between the strings.
   for(; commonPrefix ? index <= end: index >= end; index += inc) {
     if(str1.charAt(index) != str2.charAt(index + offset)) {
       break;
     }
   }
+
+  // Step 2:  Ensure that we're not splitting a surrogate pair.
 
   // `index` corresponds to the first char that is different _in the direction indicated by inc_.
   // If it's the start position, it can't split a (completed) surrogate pair.
