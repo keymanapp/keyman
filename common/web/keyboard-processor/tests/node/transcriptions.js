@@ -7,14 +7,8 @@ extendString();  // Ensure KMW's string-extension functionality is available.
 
 String.kmwEnableSupplementaryPlane(false);
 
-const toSupplementaryPairString = function(code){
-  var H = Math.floor((code - 0x10000) / 0x400) + 0xD800;
-  var L = (code - 0x10000) % 0x400 + 0xDC00;
-
-  return String.fromCharCode(H, L);
-}
 // A unicode-coding like alias for use in constructing SMP strings.
-const u = toSupplementaryPairString;
+const u = String.fromCodePoint;
 
 /**
  * Returns the "Mathematical Sans-Serif Small" SMP encoding for
