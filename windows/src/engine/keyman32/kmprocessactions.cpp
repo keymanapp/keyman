@@ -6,16 +6,22 @@
  */
 #include "pch.h"
 
+/**
+* Adds characters to the queue to be inserted into the application
+* @param app           A pointer to the AITIP instance.
+* @param outputString  A null-terminated string of characters to insert into the application
+*/
+
 static void
-processUnicodeChar(AITIP* app, const km_core_usv* actionItem) {
-  while (*actionItem) {
-    if (Uni_IsSMP(*actionItem)) {
-      app->QueueAction(QIT_CHAR, (Uni_UTF32ToSurrogate1(*actionItem)));
-      app->QueueAction(QIT_CHAR, (Uni_UTF32ToSurrogate2(*actionItem)));
+processUnicodeChar(AITIP* app, const km_core_usv* outputString) {
+  while (*outputString) {
+    if (Uni_IsSMP(*outputString)) {
+      app->QueueAction(QIT_CHAR, (Uni_UTF32ToSurrogate1(*outputString)));
+      app->QueueAction(QIT_CHAR, (Uni_UTF32ToSurrogate2(*outputString)));
     } else {
-      app->QueueAction(QIT_CHAR, *actionItem);
+      app->QueueAction(QIT_CHAR, *outputString);
     }
-    actionItem++;
+    outputString++;
   }
 }
 
