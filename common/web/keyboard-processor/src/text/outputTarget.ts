@@ -154,6 +154,13 @@ export default abstract class OutputTarget {
    * @param original An `OutputTarget` (usually a `Mock`).
    */
   restoreTo(original: OutputTarget) {
+    this.clearSelection();
+    // We currently do not restore selected text; the mechanism isn't supported at present for
+    // all output target types - especially in regard to re-selecting the text if restored.
+    //
+    // I believe this would mostly matter if/when reverting predictions based upon selected text.
+    // That pattern isn't well-supported yet, though.
+
     //
     this.setTextBeforeCaret(original.getTextBeforeCaret());
     this.setTextAfterCaret(original.getTextAfterCaret());
