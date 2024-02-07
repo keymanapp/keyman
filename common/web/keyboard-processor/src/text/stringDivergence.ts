@@ -9,6 +9,7 @@ export function searchStringDivergence(str1: string, str2: string, commonRight?:
   let maxInterval = Math.min(str1.length, str2.length) - 1;
   const commonLeft = !commonRight;
 
+  let start: number;
   let index: number;
   let end: number;
 
@@ -23,12 +24,12 @@ export function searchStringDivergence(str1: string, str2: string, commonRight?:
   let offset: number;
 
   if(commonLeft) {
-    index = 0;
+    start = index = 0;
     end = maxInterval;
     inc = 1;
     offset = 0;
   } else {
-    index = str1.length - 1;
+    start = index = str1.length - 1;
     end = index - maxInterval;
     inc = -1;
     offset = str2.length - str1.length;
@@ -41,26 +42,28 @@ export function searchStringDivergence(str1: string, str2: string, commonRight?:
   }
 
   // `index` corresponds to the first char that is different _in the direction indicated by inc_.
+  // If it's the start position, it can't split a (completed) surrogate pair.
+  if(index != start) {
+    // if commonLeft, high surrogate; if commonRight, low surrogate.
+    const commonPotentialSurrogate = str1.charCodeAt(index - inc);
+    // Opposite surrogate type from the previous variable.
+    const divergentChar1 = str1.charCodeAt(index);
+    const divergentChar2 = str2.charCodeAt(index + offset);
 
-  // if commonLeft, high surrogate; if commonRight, low surrogate.
-  const commonPotentialSurrogate = str1.charCodeAt(index - inc);
-  // Opposite surrogate type from the previous variable.
-  const divergentChar1 = str1.charCodeAt(index);
-  const divergentChar2 = str2.charCodeAt(index + offset);
+    const isHigh = (charCode: number) => charCode >= 0xD800 && charCode <= 0xDBFF;
+    const isLow =  (charCode: number) => charCode >= 0xDC00 && charCode <= 0xDFFF;
+    const commonChecker = commonLeft ? isHigh : isLow;
+    const divergentChecker = commonLeft ? isLow : isHigh;
 
-  const isHigh = (charCode: number) => charCode >= 0xD800 && charCode <= 0xDBFF;
-  const isLow =  (charCode: number) => charCode >= 0xDC00 && charCode <= 0xDFFF;
-  const commonChecker = commonLeft ? isHigh : isLow;
-  const divergentChecker = commonLeft ? isLow : isHigh;
-
-  // If the last common char qualifies as a direction-appropriate SMP surrogate...
-  if(commonChecker(commonPotentialSurrogate)) {
-    // And one of the two divergent chars is a qualifying match - a surrogate
-    // of the opposite type...
-    if(divergentChecker(divergentChar1) || divergentChecker(divergentChar2)) {
-      // Our current index would split a surrogate pair; decrement the index to
-      // preserve the pair.
-      return [index - inc, index - inc + offset];
+    // If the last common char qualifies as a direction-appropriate SMP surrogate...
+    if(commonChecker(commonPotentialSurrogate)) {
+      // And one of the two divergent chars is a qualifying match - a surrogate
+      // of the opposite type...
+      if(divergentChecker(divergentChar1) || divergentChecker(divergentChar2)) {
+        // Our current index would split a surrogate pair; decrement the index to
+        // preserve the pair.
+        return [index - inc, index - inc + offset];
+      }
     }
   }
 
