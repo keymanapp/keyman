@@ -384,8 +384,6 @@ export class SuggestionBanner extends Banner {
 
   public readonly type = "suggestion";
 
-  public readonly events: EventEmitter<SuggestionInputEventMap>;
-
   private currentSuggestions: Suggestion[] = [];
 
   private options : BannerSuggestion[] = [];
@@ -417,8 +415,6 @@ export class SuggestionBanner extends Banner {
     this.container.className = BANNER_SCROLLER_CLASS;
     this.getDiv().appendChild(this.container);
     this.buildInternals(false);
-
-    this.events = new EventEmitter<SuggestionInputEventMap>(); //this.manager.events;
 
     this.gestureEngine = this.setupInputHandling();
   }
@@ -780,14 +776,6 @@ export class SuggestionBanner extends Banner {
     }
   }
 }
-
-interface SuggestionInputEventMap {
-  highlight: (bannerSuggestion: BannerSuggestion, state: boolean) => void,
-  apply: (bannerSuggestion: BannerSuggestion) => void;
-  hold: (bannerSuggestion: BannerSuggestion) => void;
-  scrollLeft: (val: number) => void;
-}
-
 
 class SuggestionExpandContractAnimation {
   private scrollContainer: HTMLElement | null;
