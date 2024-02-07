@@ -96,7 +96,7 @@ describe('InfrastructureMessages', function () {
     const options = {mappingFile: makePathToFixture('analyze', 'error_not_a_project_file.xxx')};
     await analyzeUnitTestEndpoints.analyzeOskCharUse(ncb, [], options);
     assert.isTrue(ncb.hasMessage(InfrastructureMessages.ERROR_UnknownFileFormat),
-      `ERROR_NotAProjectFile not generated, instead got: `+JSON.stringify(ncb.messages,null,2));
+      `ERROR_UnknownFileFormat not generated, instead got: `+JSON.stringify(ncb.messages,null,2));
   });
 
   // ERROR_FileTypeNotFound (BuildKeyboardInfo)
