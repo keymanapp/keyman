@@ -22,7 +22,7 @@ export function searchStringDivergence(str1: string, str2: string, commonSuffix:
   let index: number;
 
   /**
-   * The last valid index within the string to consider as the divergence point.
+   * The index at which to terminate the search for a divergence point.
    */
   let end: number;
 
@@ -30,6 +30,7 @@ export function searchStringDivergence(str1: string, str2: string, commonSuffix:
    * Index shift per loop iteration.
    */
   let inc: number;
+
   /**
    * Difference in index for comparison between strings.
    * Mostly matters when assuming a common right-hand side.
@@ -37,19 +38,19 @@ export function searchStringDivergence(str1: string, str2: string, commonSuffix:
   let offset: number;
 
   if(commonSuffix) {
-    start = index = str1.length - 1;
-    end = index - maxInterval + 1; // index - (maxInterval-1)
+    start = index = str1.length - 1; // e.g. str.length == 10 => start = 9.
+    end = index - maxInterval;       // e.g. maxInterval 8, start 9 => iterate from 9 to 2, end at 1.
     inc = -1;
     offset = str2.length - str1.length;
   } else {
     start = index = 0;
-    end = maxInterval - 1;
+    end = maxInterval; // last valid index: - 1.  e.g. maxInterval 8 => iterate from 0 to 7, end at 8.
     inc = 1;
     offset = 0;
   }
 
   // Step 1: Find the index for the first code unit different between the strings.
-  for(; commonSuffix ? index >= end: index <= end; index += inc) {
+  for(; index != end; index += inc) {
     if(str1.charAt(index) != str2.charAt(index + offset)) {
       break;
     }
