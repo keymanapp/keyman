@@ -141,8 +141,10 @@ export abstract class TransformCompiler<T extends TransformCompilerType, TranBas
     // don't unescape literals here, because we are going to pass them through into the regex
     cookedFrom = util.unescapeStringToRegex(cookedFrom);
 
-    // nfd here.
-    cookedFrom = MarkerParser.nfd_markers(cookedFrom, true);
+    if (!sections?.meta?.normalizationDisabled) {
+      // nfd here.
+      cookedFrom = MarkerParser.nfd_markers(cookedFrom, true);
+    }
 
     // cookedFrom is cooked above, since there's some special treatment
     result.from = sections.strs.allocString(cookedFrom, {
@@ -185,11 +187,12 @@ export abstract class TransformCompiler<T extends TransformCompilerType, TranBas
   }
   public get dependencies(): Set<SectionIdent> {
     const defaults = new Set(<SectionIdent[]>[
-      constants.section.strs,
-      constants.section.list,
       constants.section.elem,
-      constants.section.vars,
+      constants.section.list,
+      constants.section.meta,
+      constants.section.strs,
       constants.section.uset,
+      constants.section.vars,
     ]);
     defaults.delete(this.id);
     return defaults;
