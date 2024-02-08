@@ -1,6 +1,6 @@
 import { assert } from 'chai';
 
-import { Mock, searchStringDivergence } from '@keymanapp/keyboard-processor';
+import { Mock, findCommonSubstringEndIndex } from '@keymanapp/keyboard-processor';
 import { extendString } from '@keymanapp/web-utils';
 
 extendString();  // Ensure KMW's string-extension functionality is available.
@@ -24,25 +24,25 @@ const ss = (char) => {
 describe("String divergence calculations", function() {
   describe("Common prefix", () => {
     it("BMP text", () => {
-      const result1 = searchStringDivergence("apple", "applause", false);
+      const result1 = findCommonSubstringEndIndex("apple", "applause", false);
       assert.equal(result1, 4);
 
-      const result2 = searchStringDivergence("applesauce", "applause", false);
+      const result2 = findCommonSubstringEndIndex("applesauce", "applause", false);
       assert.equal(result2, 4);
     });
 
     it("BMP edge cases", () => {
-      const result1 = searchStringDivergence("applesauce", "applesauce", false);
+      const result1 = findCommonSubstringEndIndex("applesauce", "applesauce", false);
       assert.equal(result1, 10);
 
-      const result2 = searchStringDivergence("applesauce", "banana bread", false);
+      const result2 = findCommonSubstringEndIndex("applesauce", "banana bread", false);
       assert.equal(result2, 0);
     });
 
     it("non-BMP text", () => {
       const smp_ify = (str) => str.split('').map(ss).join('');
 
-      const result1 = searchStringDivergence(
+      const result1 = findCommonSubstringEndIndex(
         smp_ify('apple'),
         smp_ify('applause'),
         false
@@ -52,7 +52,7 @@ describe("String divergence calculations", function() {
       // Will avoid splitting code points, though.
       assert.equal(result1, 8);
 
-      const result2 = searchStringDivergence(
+      const result2 = findCommonSubstringEndIndex(
         smp_ify('applesauce'),
         smp_ify('applause'),
         false
@@ -64,7 +64,7 @@ describe("String divergence calculations", function() {
     it("non-BMP edge cases", () => {
       const smp_ify = (str) => str.split('').map(ss).join('');
 
-      const result1 = searchStringDivergence(
+      const result1 = findCommonSubstringEndIndex(
         smp_ify('applesauce'),
         smp_ify('applesauce'),
         false
@@ -72,7 +72,7 @@ describe("String divergence calculations", function() {
 
       assert.equal(result1, 20);
 
-      const result2 = searchStringDivergence(
+      const result2 = findCommonSubstringEndIndex(
         smp_ify('applesauce'),
         smp_ify('banana bread'),
         false
@@ -86,23 +86,23 @@ describe("String divergence calculations", function() {
     it("BMP text", () => {
       //    att|endance
       // transc|endance
-      const result1 = searchStringDivergence("attendance", "transcendance", true);
+      const result1 = findCommonSubstringEndIndex("attendance", "transcendance", true);
       assert.equal(result1, 2);
 
       // transcend|ance
       //  happenst|ance
-      const result2 = searchStringDivergence("transcendance", "happenstance", true);
+      const result2 = findCommonSubstringEndIndex("transcendance", "happenstance", true);
       assert.equal(result2, 8);
 
     });
 
     it("BMP edge cases", () => {
       // If the two are equal...
-      const result1 = searchStringDivergence("post-caret text", "post-caret text", true);
+      const result1 = findCommonSubstringEndIndex("post-caret text", "post-caret text", true);
       assert.equal(result1, -1);
 
       // If the two are completely different...
-      const result2 = searchStringDivergence("post-caret text", "supercalifragilistic", true);
+      const result2 = findCommonSubstringEndIndex("post-caret text", "supercalifragilistic", true);
       assert.equal(result2, "post-caret text".length-1);
     })
 
@@ -111,7 +111,7 @@ describe("String divergence calculations", function() {
 
       //   att|endance
       // trans|endance
-      const result1 = searchStringDivergence(
+      const result1 = findCommonSubstringEndIndex(
         smp_ify("attendance"),
         smp_ify("transcendance"),
         true
@@ -123,7 +123,7 @@ describe("String divergence calculations", function() {
 
       // transcend|ance
       //  happenst|ance
-      const result2 = searchStringDivergence(
+      const result2 = findCommonSubstringEndIndex(
         smp_ify("transcendance"),
         smp_ify("happenstance"),
         true
@@ -136,7 +136,7 @@ describe("String divergence calculations", function() {
       const smp_ify = (str) => str.split('').map(ss).join('');
 
       // If the two are equal...
-      const result3 = searchStringDivergence(
+      const result3 = findCommonSubstringEndIndex(
         smp_ify("post-caret text"),
         smp_ify("post-caret text"),
         true
@@ -144,7 +144,7 @@ describe("String divergence calculations", function() {
       assert.equal(result3, -1);
 
       // If the two are completely different...
-      const result2 = searchStringDivergence(
+      const result2 = findCommonSubstringEndIndex(
         smp_ify("post-caret text"),
         smp_ify("supercalifragilistic"),
         true
