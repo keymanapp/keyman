@@ -9,7 +9,7 @@ title: Keyman for Android (Tablet Layout)
 | ![](../android_images/backspace-at.png) | Backspace |
 | ![](../android_images/return-at.png) | Return |
 | ![](../android_images/shift-at.png) | Shift key. Long press this key to access the <kbd>CTRL</kbd>, <kbd>ALT</kbd> and <kbd>CTRL</kbd><kbd>ALT</kbd> keys (which can access additional key layers) |
-| ![](../android_images/touch-hold-at.png) | Keys with a small dot in the top right corner indicate a long press key. Access further functionality by long pressing the key |
+| ![](../android_images/touch-hold-at.png) | Keys with a character (default of small dot) in the top right corner indicate further functionality by one of the following ways:<br> * long pressing the key<br> * multi-tapping the key<br> * a flick gesture in one of 8 directions (up, down, left, right, and the 4 intermediate corners) |
 
 ----
 
