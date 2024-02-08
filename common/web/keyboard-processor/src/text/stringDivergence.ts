@@ -60,7 +60,7 @@ export function searchStringDivergence(str1: string, str2: string, commonSuffix:
 
   // `index` corresponds to the first char that is different _in the direction indicated by inc_.
   // If it's the start position, it can't split a (completed) surrogate pair.
-  if(index != start) {
+  if(index != start && index != end) {
     // if commonLeft, high surrogate; if commonRight, low surrogate.
     const commonPotentialSurrogate = str1.charCodeAt(index - inc);
     // Opposite surrogate type from the previous variable.
