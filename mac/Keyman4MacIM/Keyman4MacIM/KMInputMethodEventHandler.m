@@ -11,14 +11,13 @@
 #import <Carbon/Carbon.h> /* For kVK_ constants. */
 #import "KeySender.h"
 #import "TextApiCompliance.h"
-
 @import Sentry;
 
 @interface KMInputMethodEventHandler ()
 @property (nonatomic, retain) KeySender* keySender;
 @property (nonatomic, retain) TextApiCompliance* apiCompliance;
 @property NSUInteger generatedBackspaceCount;
-@property BOOL backspaceHandledLowLevel;
+@property NSUInteger lowLevelBackspaceCount;
 @property (nonatomic, retain) NSString* clientApplicationId;
 @property NSString *queuedText;
 @property BOOL contextChanged;
@@ -63,7 +62,9 @@ NSRange _previousSelRange;
     _keySender = [[KeySender alloc] init];
     _clientApplicationId = clientAppId;
     _generatedBackspaceCount = 0;
-    
+    _lowLevelBackspaceCount = 0;
+    _queuedText = nil;
+
     //BOOL legacy = [self isClientAppLegacy:clientAppId];
 
     // In Xcode, if Keyman is the active IM and is in "debugMode" and "English plus Spanish" is 
@@ -76,10 +77,13 @@ NSRange _previousSelRange;
     else
         _easterEggForSentry = nil;
 
+  /*
     // For the Atom editor, this isn't really true (the context CAN change unexpectedly), but we can't get
     // the context, so we pretend/hope it won't.
     BOOL selectionCanChangeUnexpectedly = (![clientAppId isEqual: @"com.github.atom"]);
     return [self initWithLegacyMode:self.apiCompliance.mustBackspaceUsingEvents clientSelectionCanChangeUnexpectedly:selectionCanChangeUnexpectedly];
+   */
+  return [self initWithLegacyMode:NO clientSelectionCanChangeUnexpectedly:NO];
 }
 
 - (void)switchToLegacyMode {
@@ -265,7 +269,7 @@ NSRange _previousSelRange;
 }
 
 /**
- handleBackspace: handles generated for a subset of non-compliant apps (such as Adobe apps) that do
+ handleBackspace: handles generated backspaces for a subset of non-compliant apps (such as Adobe apps) that do
  not support replacing text with the insertText API but also intercept events so that we do not see them in handleEvent.
  Other apps, such as Word, show the event both in the low
  level EventTap and in the normal IM handleEvent. Thus, we set a flag after
@@ -275,16 +279,14 @@ NSRange _previousSelRange;
 */
 - (void)handleBackspace:(NSEvent *)event {
   [self.appDelegate logDebugMessage:@"KMInputMethodEventHandler handleBackspace, event = %@", event];
-  NSLog(@"  backspaceHandledLowLevel: %d, generatedBackspaceCount: %lu", _backspaceHandledLowLevel, (unsigned long)_generatedBackspaceCount);
-  self.backspaceHandledLowLevel = NO;
-
+  
   if (self.generatedBackspaceCount > 0) {
     self.generatedBackspaceCount--;
-    self.backspaceHandledLowLevel = YES;
+    self.lowLevelBackspaceCount++;
     
     // if we just encountered the last backspace, then send event to insert queued text
-    if (self.generatedBackspaceCount == 0) {
-      [self performSelector:@selector(triggerInsertQueuedText:) withObject:event afterDelay:kQueuedTextEventDelayInSeconds];
+    if ((self.generatedBackspaceCount == 0) && (self.queuedText.length > 0)) {
+     [self performSelector:@selector(triggerInsertQueuedText:) withObject:event afterDelay:kQueuedTextEventDelayInSeconds];
     }
   }
 }
@@ -358,16 +360,17 @@ NSRange _previousSelRange;
     // indicates that our generated backspace event(s) are consumed
     // and we can insert text that followed the backspace(s)
     if (event.keyCode == kKeymanEventKeyCode) {
-      [self.appDelegate logDebugMessage:@"handleEvent, handling kKeymanEventKeyCode"];
+     [self.appDelegate logDebugMessage:@"handleEvent, handling kKeymanEventKeyCode"];
       [self insertQueuedText: event client:sender];
       return YES;
     }
-
+    
     // for some apps, handleEvent will not be called for the generated backspace
     // but if it is, we need to let it pass through rather than process again in core
-    if((event.keyCode == kVK_Delete) && (self.backspaceHandledLowLevel)) {
+    if((event.keyCode == kVK_Delete) && (self.lowLevelBackspaceCount > 0)) {
       [self.appDelegate logDebugMessage:@"handleEvent, allowing generated backspace to pass through"];
-      self.backspaceHandledLowLevel = NO;
+      self.lowLevelBackspaceCount--;
+      
       // return NO to pass through to client app
       return NO;
     }
@@ -482,18 +485,34 @@ NSRange _previousSelRange;
   } else if (output.isDeleteOnlyScenario) {
     if ((event.keyCode == kVK_Delete) && output.codePointsToDeleteBeforeInsert == 1) {
       // let the delete pass through in the original event rather than sending a new delete
-      [self.appDelegate logDebugMessage:@"KXMInputMethodHandler applyOutputToTextInputClient, delete only scenario"];
+      [self.appDelegate logDebugMessage:@"KXMInputMethodHandler applyOutputToTextInputClient, delete only scenario with passthrough"];
       handledEvent = NO;
     } else {
       [self.appDelegate logDebugMessage:@"KXMInputMethodHandler applyOutputToTextInputClient, delete only scenario"];
       [self sendEvents:event forOutput:output];
     }
   } else if (output.isDeleteAndInsertScenario) {
+    /*
+    // needs further testing to fix backspace bug in google docs (without breaking other apps)
+    // assume that all non-compliant apps which require backspaces apply an extra backspace if the original event is a backspace
+    if ((self.apiCompliance.mustBackspaceUsingEvents) && (event.keyCode == kVK_Delete)) {
+      output.codePointsToDeleteBeforeInsert--;
+      os_log_with_type(keymanLog, OS_LOG_TYPE_INFO, "isDeleteAndInsertScenario, after delete pressed subtracting one backspace to reach %d and insert text '%{public}@'", output.codePointsToDeleteBeforeInsert, output.textToInsert);
+      if (output.codePointsToDeleteBeforeInsert == 0) {
+        // no backspace events needed
+        [self insertAndReplaceTextForOutput:output client:client];
+      } else {
+        // still need at least one backspace event
+      [self sendEvents:event forOutput:output];
+      }
+    }
+     */
+
     if (self.apiCompliance.mustBackspaceUsingEvents) {
       [self.appDelegate logDebugMessage:@"KXMInputMethodHandler applyOutputToTextInputClient, delete and insert scenario with events"];
       [self sendEvents:event forOutput:output];
     } else {
-      [self.appDelegate logDebugMessage:@"KXMInputMethodHandler applyOutputToTextInputClient, delete and insert scenario with insert API"];
+     [self.appDelegate logDebugMessage:@"KXMInputMethodHandler applyOutputToTextInputClient, delete and insert scenario with insert API"];
       // directly insert text and handle backspaces by using replace
       [self insertAndReplaceTextForOutput:output client:client];
     }
@@ -585,15 +604,16 @@ NSRange _previousSelRange;
 }
 
 -(void)sendEvents:(NSEvent *)event forOutput:(CoreKeyOutput*)output {
-  [self.appDelegate logDebugMessage:@"sendEvents called"];
-  
+  [self.appDelegate logDebugMessage:@"sendEvents called, output = %@", output];
+
   _sourceForGeneratedEvent = CGEventCreateSourceFromEvent([event CGEvent]);
 
   self.generatedBackspaceCount = output.codePointsToDeleteBeforeInsert;
   
+
   if (output.hasCodePointsToDelete) {
     for (int i = 0; i < output.codePointsToDeleteBeforeInsert; i++) {
-      [self.appDelegate logDebugMessage:@"sendEvents queueing backspace"];
+      [self.appDelegate logDebugMessage:@"sendEvents sending backspace key event"];
       [self.keySender sendBackspaceforEventSource:_sourceForGeneratedEvent];
     }
   }
