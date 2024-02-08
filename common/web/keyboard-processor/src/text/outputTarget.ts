@@ -1,7 +1,7 @@
 ///<reference types="@keymanapp/models-types" />
 
 import { extendString } from "@keymanapp/web-utils";
-import { searchStringDivergence } from "./stringDivergence.js";
+import { findCommonSubstringEndIndex } from "./stringDivergence.js";
 
 extendString();
 
@@ -124,14 +124,14 @@ export default abstract class OutputTarget {
     const toLeft = this.getTextBeforeCaret();
     const fromLeft = original.getTextBeforeCaret();
 
-    const leftDivergenceIndex = searchStringDivergence(fromLeft, toLeft, false);
+    const leftDivergenceIndex = findCommonSubstringEndIndex(fromLeft, toLeft, false);
     const deletedLeft = fromLeft.substring(leftDivergenceIndex)._kmwLength();
     // No need for our specialized variant here.
     const insertedText = toLeft.substring(leftDivergenceIndex);
 
     const toRight = this.getTextAfterCaret();
     const fromRight = original.getTextAfterCaret();
-    const rightDivergenceIndex = searchStringDivergence(fromRight, toRight, true);
+    const rightDivergenceIndex = findCommonSubstringEndIndex(fromRight, toRight, true);
 
     // Right insertions aren't supported, but right deletions will matter in some scenarios.
     // In particular, once we allow right-deletion for pred-text suggestions applied with the

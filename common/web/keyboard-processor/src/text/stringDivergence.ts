@@ -1,11 +1,15 @@
+// Future TODO:  import from @keymanapp/common-types... once we no longer need to support ES5.
+import { Uni_IsSurrogate1, Uni_IsSurrogate2 } from '@keymanapp/web-utils';
+
 /**
- * Returns the index for the code point divergence point in code unit coordinates.
+ * Returns the index for the code point divergence point between two strings, as measured in code
+ * unit coordinates.
  * @param str1
  * @param str2
  * @param commonSuffix If false, asserts a common prefix to the strings.  If true, asserts a common suffix.
  * @returns The code unit index within `str1` for the start of the code point not common to both.
  */
-export function searchStringDivergence(str1: string, str2: string, commonSuffix: boolean): number {
+export function findCommonSubstringEndIndex(str1: string, str2: string, commonSuffix: boolean): number {
   /**
    * The maximum number of iterations to consider; exceeding this would go past a string boundary.
    */
@@ -67,16 +71,15 @@ export function searchStringDivergence(str1: string, str2: string, commonSuffix:
     const divergentChar1 = str1.charCodeAt(index);
     const divergentChar2 = str2.charCodeAt(index + offset);
 
-    const isHigh = (charCode: number) => charCode >= 0xD800 && charCode <= 0xDBFF;
-    const isLow =  (charCode: number) => charCode >= 0xDC00 && charCode <= 0xDFFF;
-    const commonChecker = commonSuffix ? isLow : isHigh;
-    const divergentChecker = commonSuffix ? isHigh : isLow;
+    const commonSurrogateChecker = commonSuffix ? Uni_IsSurrogate2 : Uni_IsSurrogate1;
+    const divergentSurrogateChecker = commonSuffix ? Uni_IsSurrogate1 : Uni_IsSurrogate2;
 
-    // If the last common char qualifies as a direction-appropriate SMP surrogate...
-    if(commonChecker(commonPotentialSurrogate)) {
+    // If the last common character if of the direction-appropriate surrogate type (for
+    // comprising a potential split surrogate pair representing a non-BMP char)...
+    if(commonSurrogateChecker(commonPotentialSurrogate)) {
       // And one of the two divergent chars is a qualifying match - a surrogate
       // of the opposite type...
-      if(divergentChecker(divergentChar1) || divergentChecker(divergentChar2)) {
+      if(divergentSurrogateChecker(divergentChar1) || divergentSurrogateChecker(divergentChar2)) {
         // Our current index would split a surrogate pair; decrement the index to
         // preserve the pair.
         return index - inc;

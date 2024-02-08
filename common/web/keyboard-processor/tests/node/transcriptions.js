@@ -7,11 +7,11 @@ extendString();  // Ensure KMW's string-extension functionality is available.
 
 String.kmwEnableSupplementaryPlane(false);
 
-// A unicode-coding like alias for use in constructing SMP strings.
+// A unicode-coding like alias for use in constructing non-BMP strings.
 const u = String.fromCodePoint;
 
 /**
- * Returns the "Mathematical Sans-Serif Small" SMP encoding for
+ * Returns the "Mathematical Sans-Serif Small" non-BMP encoding for
  * a passed-in lowercase char between 'a' and 'z', inclusive.
  * @param {*} char
  * @returns
@@ -39,7 +39,7 @@ describe("String divergence calculations", function() {
       assert.equal(result2, 0);
     });
 
-    it("SMP text", () => {
+    it("non-BMP text", () => {
       const smp_ify = (str) => str.split('').map(ss).join('');
 
       const result1 = searchStringDivergence(
@@ -48,7 +48,7 @@ describe("String divergence calculations", function() {
         false
       );
 
-      // 2 per SMP char; is in code-unit... units.
+      // 2 per non-BMP char; is in code-unit... units.
       // Will avoid splitting code points, though.
       assert.equal(result1, 8);
 
@@ -61,7 +61,7 @@ describe("String divergence calculations", function() {
       assert.equal(result2, 8);
     });
 
-    it("SMP edge cases", () => {
+    it("non-BMP edge cases", () => {
       const smp_ify = (str) => str.split('').map(ss).join('');
 
       const result1 = searchStringDivergence(
@@ -106,7 +106,7 @@ describe("String divergence calculations", function() {
       assert.equal(result2, "post-caret text".length-1);
     })
 
-    it("SMP text", () => {
+    it("non-BMP text", () => {
       const smp_ify = (str) => str.split('').map(ss).join('');
 
       //   att|endance
@@ -117,7 +117,7 @@ describe("String divergence calculations", function() {
         true
       );
 
-      // 2 per SMP char; is in code-unit... units.
+      // 2 per non-BMP char; is in code-unit... units.
       // Will avoid splitting code points; is odd b/c we get the index of the LAST char of the pair.
       assert.equal(result1, 5);
 
@@ -132,7 +132,7 @@ describe("String divergence calculations", function() {
 
     });
 
-    it("SMP edge cases", () => {
+    it("non-BMP edge cases", () => {
       const smp_ify = (str) => str.split('').map(ss).join('');
 
       // If the two are equal...
@@ -155,7 +155,7 @@ describe("String divergence calculations", function() {
 });
 
 describe("Transcriptions and Transforms", function() {
-  // Built in-line via function.  Looks functionally equivalent to "apple", but with SMP characters.
+  // Built in-line via function.  Looks functionally equivalent to "apple", but with non-BMP characters.
   let smpApple = u(0x1d5ba)+u(0x1d5c9)+u(0x1d5c9)+u(0x1d5c5)+u(0x1d5be);
 
   it("does not store an alias for related OutputTargets", function() {
@@ -263,7 +263,7 @@ but not himself.`;  // Sheev Palpatine, in the Star Wars prequels.
       assert.equal(transcription.transform.deleteRight, 1, "Incorrect count for right-of-caret deletions");
     });
 
-    it("handles deletions around the caret without text insertion (SMP text)", function() {
+    it("handles deletions around the caret without text insertion (non-BMP text)", function() {
       try {
         String.kmwEnableSupplementaryPlane(true);
         var target = new Mock(smpApple, 2);
@@ -355,7 +355,7 @@ but not himself.`;  // Sheev Palpatine, in the Star Wars prequels.
       assert.equal(transcription.transform.deleteRight, 3, "Incorrect count for right-of-caret deletions");
     });
 
-    it("handles deletions around the caret with text insertion (SMP text)", function() {
+    it("handles deletions around the caret with text insertion (non-BMP text)", function() {
       try {
         String.kmwEnableSupplementaryPlane(true);
 
