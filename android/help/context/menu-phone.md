@@ -16,7 +16,6 @@ title: Keyman for Android (Phone Layout)
 
 |   | Toolbar Icons |
 |---|---|
-| ![](../android_images/browser-a.png) | Open the Keyman Browser to use the web in your language |
 | ![](../android_images/menu-icon-a.png) | Open the menu for additional options |
 | ![](../android_images/font-size-a.png) | Adjust the font size |
 | ![](../android_images/delete-a.png) | Delete all current text |

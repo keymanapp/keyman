@@ -30,7 +30,6 @@ title: Keyman for Android 17.0 Help
 * [Installing Custom Keyboards/Dictionaries](basic/installing-custom-packages)
 * [Adding Dictionaries](basic/installing-dictionaries)
 * [Using the Settings Screen](basic/config/)
-* [Using the Keyman Browser](basic/using-keyman-browser)
 * [Removing Keyboards](basic/uninstalling-keyboards)
 * [Removing Dictionaries](basic/uninstalling-dictionaries)
 
