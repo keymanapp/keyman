@@ -29,9 +29,14 @@ describe("String divergence calculations", function() {
 
       const result2 = searchStringDivergence("applesauce", "applause", false);
       assert.equal(result2, 4);
+    });
 
-      const result3 = searchStringDivergence("applesauce", "applesauce", false);
-      assert.equal(result3, 10);
+    it("BMP edge cases", () => {
+      const result1 = searchStringDivergence("applesauce", "applesauce", false);
+      assert.equal(result1, 10);
+
+      const result2 = searchStringDivergence("applesauce", "banana bread", false);
+      assert.equal(result2, 0);
     });
 
     it("SMP text", () => {
@@ -54,15 +59,27 @@ describe("String divergence calculations", function() {
       );
 
       assert.equal(result2, 8);
+    });
 
-      const result3 = searchStringDivergence(
+    it("SMP edge cases", () => {
+      const smp_ify = (str) => str.split('').map(ss).join('');
+
+      const result1 = searchStringDivergence(
         smp_ify('applesauce'),
         smp_ify('applesauce'),
         false
       );
 
-      assert.equal(result3, 20);
-    });
+      assert.equal(result1, 20);
+
+      const result2 = searchStringDivergence(
+        smp_ify('applesauce'),
+        smp_ify('banana bread'),
+        false
+      );
+
+      assert.equal(result2, 0);
+    })
   });
 
   describe("Common suffix", () => {
@@ -77,10 +94,17 @@ describe("String divergence calculations", function() {
       const result2 = searchStringDivergence("transcendance", "happenstance", true);
       assert.equal(result2, 8);
 
-      // And if the two are equal...
-      const result3 = searchStringDivergence("post-caret text", "post-caret text", true);
-      assert.equal(result3, -1);
     });
+
+    it("BMP edge cases", () => {
+      // If the two are equal...
+      const result1 = searchStringDivergence("post-caret text", "post-caret text", true);
+      assert.equal(result1, -1);
+
+      // If the two are completely different...
+      const result2 = searchStringDivergence("post-caret text", "supercalifragilistic", true);
+      assert.equal(result2, "post-caret text".length-1);
+    })
 
     it("SMP text", () => {
       const smp_ify = (str) => str.split('').map(ss).join('');
@@ -106,14 +130,27 @@ describe("String divergence calculations", function() {
       );
       assert.equal(result2, 17);
 
-      // And if the two are equal...
+    });
+
+    it("SMP edge cases", () => {
+      const smp_ify = (str) => str.split('').map(ss).join('');
+
+      // If the two are equal...
       const result3 = searchStringDivergence(
         smp_ify("post-caret text"),
         smp_ify("post-caret text"),
         true
       );
       assert.equal(result3, -1);
-    });
+
+      // If the two are completely different...
+      const result2 = searchStringDivergence(
+        smp_ify("post-caret text"),
+        smp_ify("supercalifragilistic"),
+        true
+      );
+      assert.equal(result2, smp_ify("post-caret text").length-1);
+    })
   })
 });
 
