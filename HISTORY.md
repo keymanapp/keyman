@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 17.0.263 alpha 2024-02-08
+
+* fix(linux): Ignore keys with IBUS_MOD4_MASK set (#10668)
+
 ## 17.0.262 alpha 2024-02-07
 
 * refactor(windows): Use km_core_actions struct instead of queue (#10557)
