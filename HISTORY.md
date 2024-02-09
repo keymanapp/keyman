@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 17.0.264 alpha 2024-02-09
+
+* chore(linux): Don't set VERSION_TAG to …-local in .deb packages (#10675)
+*  (#10672)
+
 ## 17.0.263 alpha 2024-02-08
 
 * fix(linux): Ignore keys with IBUS_MOD4_MASK set (#10668)
