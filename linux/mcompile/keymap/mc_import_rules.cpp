@@ -360,7 +360,6 @@ int i4 = this->KMX_IsXxxxGrCapsEqualToXxxxShift() ? 8 : 0;
         if (st.size() == 0) {
           // No character assigned here
         }
-        // _S2 kommt er hier immer hin????
         // _S2 TODO deadkeys don't work yet/ if true is in m_rgfDeadKey
         else if (this->m_rgfDeadKey[(int)ss][caps]) {
           // It's a dead key, append an @ sign.
@@ -655,6 +654,7 @@ bool KMX_ImportRules(LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, GdkKeymap **keymap,
 
   //_S2 REVIEW
    std::vector<DeadKey*> alDead2 ;
+   std::vector<DeadKey*> alDead_cpl = create_alDead();    // _S2 finds all possible dk combinations that exist - will be refined to those used in the underlying keyboard
 
   rgKey.resize(256);
 
@@ -769,6 +769,7 @@ bool KMX_ImportRules(LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, GdkKeymap **keymap,
             }
           }
           else if(rc < 0) {
+            wprintf(L"iKey: %i- ss: %i, caps: %i - bsBuffer[0] = %i\n", iKey, ss, caps,sbBuffer[0]);
             //_S2 TODO
             sbBuffer[2] = 0;
             //rgKey[iKey]->SetShiftState(ss, sbBuffer, true, (caps == 0));
@@ -778,11 +779,13 @@ bool KMX_ImportRules(LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, GdkKeymap **keymap,
             // It's a dead key; let's flush out whats stored in the keyboard state.
             loader.KMX_ClearKeyboardBuffer();
             DeadKey *dk = NULL;
+            Create_alDead(sbBuffer[0], alDead, &alDead_cpl);
             int testI= alDead.size();
-            for(UINT iDead = 0; iDead < alDead.size(); iDead++) {
+
+           /* for(UINT iDead = 0; iDead < alDead.size(); iDead++) {
                 dk = alDead[iDead];
-                WCHAR dktest1 = dk->KMX_DeadCharacter();                             // _S2 can go later ; just for testing
-                WCHAR dktest2 = rgKey[iKey]->KMX_GetShiftState(ss, caps == 0)[0];    // _S2 can go later ; just for testing
+                KMX_WCHAR dktest1 = dk->KMX_DeadCharacter();                             // _S2 can go later ; just for testing
+                KMX_WCHAR dktest2 = rgKey[iKey]->KMX_GetShiftState(ss, caps == 0)[0];    // _S2 can go later ; just for testing
                 if(dk->KMX_DeadCharacter() == rgKey[iKey]->KMX_GetShiftState(ss, caps == 0)[0]) {
                     break;
                 }
@@ -797,13 +800,14 @@ bool KMX_ImportRules(LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, GdkKeymap **keymap,
               //_S2 for each dk (^ ' `  push_back all combinations ^,â,ê,î,ô,û   ',á,é,í,ó,ú   `,à,è,ì,ò,ù into alDead->m_rgcombchar)
               //_S2 for each dk (^ ' `  push_back all base char : _,a,e,i,o,u                              into alDead->m_rgbasechar)
               // S2 do nothing for other keys
-              int wertzui=9;
-            }
+            }*/
           }
         }
       }
     }
   }
+  // _S2 do we need to sort ??
+  sort_alDead(alDead, &alDead_cpl) ;
 
   //_S2 this gan co later
   /*std::vector< int > TestValues = {40,44,48,49,50,51,52,53,54,55,56,57,65,66,67,88,89,90, 186,187,188,189,191,191,192,219,220,221,222,226};

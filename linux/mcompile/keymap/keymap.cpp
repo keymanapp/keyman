@@ -54,7 +54,7 @@ KMX_DWORD convertNamesToIntegerValue(std::wstring tok_wstr) {
 
   first[L"dead_abovedot"]     = 729;
   first[L"dead_abovering"]    = 730;
-  first[L"dead_acute"]        = 180;   //39 180 ??
+  first[L"dead_acute"]        = 180;
   first[L"dead_breve"]        = 728;
   first[L"dead_caron"]        = 711;
   first[L"dead_cedilla"]      = 184;
@@ -573,6 +573,7 @@ KMX_DWORD KMX_get_KeyvalsUnderlying_From_KeyCodeUnderlying_GDK(GdkKeymap *keymap
   guint *keyvals;
   gint count;
   KMX_DWORD out;
+  KMX_DWORD deadkey;
 
   if (!gdk_keymap_get_entries_for_keycode(keymap, keycode, &maps, &keyvals, &count))
     return 0;
@@ -585,8 +586,14 @@ KMX_DWORD KMX_get_KeyvalsUnderlying_From_KeyCodeUnderlying_GDK(GdkKeymap *keymap
   if (!(keycode <= 94))
     return 0;
 
-  // _S2 can I use that?????
-  KMX_DWORD deadkey = (KMX_DWORD)  keyvals[shift_state_pos];
+  // _S2 take caps to this function
+  // here I get all kvals: normal char , my Deadkeys, allothr DK
+  KMX_DWORD All_Keyvals = KMX_get_keyvals_From_Keycode(keymap, keycode, ShiftState(shift_state_pos), 0)  ;
+  //wprintf(L"All_Keyvals: %i----\n", All_Keyvals);
+
+  if(( (All_Keyvals >= deadkey_min) && (All_Keyvals <= deadkey_max)))
+    deadkey = All_Keyvals;
+
   //wprintf(L" keyvals[shift_state_pos]: %i %i %i %i----", keyvals[0],keyvals[1],keyvals[2],keyvals[3]);
 
   dky = (PKMX_WCHAR) (convert_DeadkeyValues_To_U16str((int) deadkey)).c_str();

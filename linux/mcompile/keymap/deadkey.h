@@ -14,7 +14,11 @@ KMX_DWORD create_DKTable(v_dw_2D & dk_ComposeTable);
 
 //_S2 REVIEW
 std::vector<DeadKey*> create_alDead();
-std::vector<DeadKey*> reduce_alDead(std::vector<DeadKey*> dk_big) ;
+std::vector<DeadKey*> reduce_alDead(std::vector<DeadKey*> dk_big);
+
+void Create_alDead(KMX_WCHAR dk, std::vector<DeadKey*> &myVec, std::vector<DeadKey*> *p_All_Vec);
+void sort_alDead(std::vector<DeadKey*> &myVec, std::vector<DeadKey*> *p_All_Vec);
+bool found_dk_inVector(KMX_WCHAR dk, std::vector<DeadKey*> &myVec);
 
 // finds all combination for a specific deadkey(dk)
 bool find_dk_combinations_for_single_dk(v_dw_2D * dk_ComposeTable, v_dw_2D & dk_SingleTable, KMX_DWORD dk);

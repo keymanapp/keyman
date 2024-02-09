@@ -1084,6 +1084,76 @@ gdk_keyval_convert_case (GDK_KEY_dollar,    lower,upper);*/
   }
 }*/
 
+//_S2 REVIEW this is for testing only and needs to go later
+/*std::vector<DeadKey*> reduce_alDead(GdkKeymap*keymap,std::vector<DeadKey*> dk_big) {/
+	
+	
+	std::vector<DeadKey*> dk_underlying;
+	
+	
+	
+	std::vector<DeadKey*> dk_small;
+	bool foundInSmall=false;
+
+	for ( int i=1; i<dk_big.size()-1;i++) {
+		// _S2 this needs to be good for all kbds
+		if( (dk_big[i]->KMX_DeadCharacter()==94 || dk_big[i]->KMX_DeadCharacter()==96 || dk_big[i]->KMX_DeadCharacter()==180|| dk_big[i]->KMX_DeadCharacter()==126|| dk_big[i]->KMX_DeadCharacter()==168)) {
+			for( int k=0; k< dk_small.size();k++) {
+				if(dk_big[i]->KMX_DeadCharacter()   == dk_small[k]->KMX_DeadCharacter())
+					foundInSmall=true;
+			}
+		if(!foundInSmall)
+			dk_small.push_back(dk_big[i]);
+		foundInSmall=false;
+		}
+	}
+	return dk_small;
+}*/
+
+
+
+/*// _S2 TODO
+KMX_DWORD KMX_get_KeyvalsUnderlying_From_KeyCodeUnderlying_GDK_old(GdkKeymap *keymap, guint keycode, int shift_state_pos, PKMX_WCHAR &dky) {
+  GdkKeymapKey *maps;
+  guint *keyvals;
+  gint count;
+  KMX_DWORD out;
+
+
+//in: keycode, shift_state_pos,keymap
+//(out): dky-code if it is a deadkey; if not keep last
+//out: keyval for char; FFFF for dk
+
+
+  if (!gdk_keymap_get_entries_for_keycode(keymap, keycode, &maps, &keyvals, &count))
+    return 0;
+  //if(!gdk_wayland_keymap_get_entries_for_keycode(keymap, keycode, &maps, &keyvals, &count))
+  //  return 0;    https://codebrowser.dev/gtk/gtk/gdk/wayland/gdkkeys-wayland.c.html
+
+  if (!(shift_state_pos <= count))
+  return 0;
+
+  if (!(keycode <= 94))
+    return 0;
+
+  // _S2 can I use that?????
+  KMX_DWORD deadkey = (KMX_DWORD)  keyvals[shift_state_pos];
+  //wprintf(L" keyvals[shift_state_pos]: %i %i %i %i----", keyvals[0],keyvals[1],keyvals[2],keyvals[3]);
+
+  dky = (PKMX_WCHAR) (convert_DeadkeyValues_To_U16str((int) deadkey)).c_str();
+  out = KMX_get_FFFF_Underlying_according_to_keycode_and_Shiftstate_GDK_dw(keymap, keycode, (ShiftState)  shift_state_pos, 0);
+  //wprintf(L" out is :.....................................%i\n", out);
+
+  // _S2 g_free used everywhere?
+  g_free(keyvals);
+  g_free(maps);
+
+  return out;
+}
+*/
+
+
+
 /*
 KMX_DWORD KMX_get_rc_From_KeyCodeUnderlying_GDK(GdkKeymap *keymap, guint keycode, int shift_state_pos) {
   GdkKeymapKey *maps;

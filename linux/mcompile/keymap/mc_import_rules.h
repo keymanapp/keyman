@@ -19,6 +19,10 @@ public:
     return this->m_rgbasechar.size();
   }
 
+  KMX_WCHAR KMX_GetDeadCharacter() {
+    return this->m_deadchar;
+  }
+
   KMX_WCHAR KMX_GetBaseCharacter(int index) {
     return this->m_rgbasechar[index];
   }

@@ -39,10 +39,8 @@ std::vector<DeadKey*> create_alDead() {
 	for( int i=0; i< dk_ComposeTable.size()-1; i++) {
 		DeadKey *dk2= new DeadKey(dk_ComposeTable[i][0]);
 		for ( int j=0; j< dk_ComposeTable.size();j++) {
-			// check for right dk
-			// _S2 do I need to trim here??  Yes, to prevent "aAeEiIoOuU -_^"
+			// _S2 check for right basechar, to prevent "aAeEiIoOuU -_^"
 			if(( dk_ComposeTable[i][0]==dk_ComposeTable[j][0]) && (IsKeymanUsedChar(dk_ComposeTable[j][1])))
-			//if(( dk_ComposeTable[i][0]==dk_ComposeTable[j][0]) )
 				dk2->KMX_AddDeadKeyRow(dk_ComposeTable[j][1],dk_ComposeTable[j][2]);
 		}
 		alDead.push_back(dk2);
@@ -50,14 +48,80 @@ std::vector<DeadKey*> create_alDead() {
 	return alDead;
 }
 
-//_S2 REVIEW this is for testing only and needs to go later
+bool found_dk_inVector(KMX_WCHAR dk, std::vector<DeadKey*> &dkVec) {
+
+	int i=0;
+	if( dkVec.size()>0) {
+		do {
+			if( dk == dkVec[i]->KMX_GetDeadCharacter())
+				return true;
+			i++;
+		} while (i < dkVec.size());
+	}
+	return false;
+}
+
+void Create_alDead(KMX_WCHAR dk, std::vector<DeadKey*> &dkVec, std::vector<DeadKey*> *p_All_Vec) {
+	std::vector<DeadKey*> dkVec_unsorted;
+
+	if( dk == 0)
+		return;
+
+	for (int j=0; j< (*p_All_Vec).size()-1;j++) {
+		if( dk == (*p_All_Vec)[j]->KMX_GetDeadCharacter()) {
+			if(! found_dk_inVector(dk, dkVec)) {
+				dkVec.push_back((*p_All_Vec)[j]);
+				return;
+			}
+			else return;
+		}
+	}
+
+	for (int j=0; j< (*p_All_Vec).size()-1;j++) {
+		if( dk == (*p_All_Vec)[j]->KMX_GetDeadCharacter()) {
+			if(! found_dk_inVector(dk, dkVec_unsorted)) {
+				dkVec_unsorted.push_back((*p_All_Vec)[j]);
+				return;
+			}
+			else return;
+		}
+	}
+}
+
+void sort_alDead(std::vector<DeadKey*> &small_Vec, std::vector<DeadKey*> *p_All_Vec) {
+
+	std::vector<DeadKey*> small_sorted;
+	int Vsmall_size;
+
+	int i=0;
+
+	do {
+		int j=0;
+		Vsmall_size= small_Vec.size();
+
+		do {
+			if( (*p_All_Vec)[i]->KMX_DeadCharacter() == small_Vec[j]->KMX_DeadCharacter()) {
+				small_sorted.push_back(small_Vec[j]);
+				small_Vec.erase(std::next(small_Vec.begin()+j-1));
+				Vsmall_size--;
+			}
+			j++;
+		} while (j< Vsmall_size);
+
+		i++;
+	} while ((i< (*p_All_Vec).size()) && (Vsmall_size>0));
+
+	small_Vec = small_sorted;
+}
+
+/* _S2 probably not needed  //_S2 REVIEW this is for testing only and needs to go later
 std::vector<DeadKey*> reduce_alDead(std::vector<DeadKey*> dk_big) {
 	std::vector<DeadKey*> dk_small;
 	bool foundInSmall=false;
 
 	for ( int i=1; i<dk_big.size()-1;i++) {
 		// _S2 this needs to be good for all kbds
-		if( (dk_big[i]->KMX_DeadCharacter()==94 || dk_big[i]->KMX_DeadCharacter()==96 || dk_big[i]->KMX_DeadCharacter()==180)) {
+		if( (dk_big[i]->KMX_DeadCharacter()==94 || dk_big[i]->KMX_DeadCharacter()==96 || dk_big[i]->KMX_DeadCharacter()==180|| dk_big[i]->KMX_DeadCharacter()==126|| dk_big[i]->KMX_DeadCharacter()==168)) {
 			for( int k=0; k< dk_small.size();k++) {
 				if(dk_big[i]->KMX_DeadCharacter()   == dk_small[k]->KMX_DeadCharacter())
 					foundInSmall=true;
@@ -69,7 +133,7 @@ std::vector<DeadKey*> reduce_alDead(std::vector<DeadKey*> dk_big) {
 	}
 	return dk_small;
 }
-
+*/
 // _S2 DEADKEY STUFF - DO NOT REVIEW YET
 // _S2 might be used when deadkeys are implemented . is it correct??
 KMX_DWORD KMX_changeKeynameToCapital(KMX_DWORD KVal, KMX_DWORD &shift, GdkKeymap* keymap) {
