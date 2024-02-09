@@ -383,11 +383,13 @@ int i4 = this->KMX_IsXxxxGrCapsEqualToXxxxShift() ? 8 : 0;
             *p++ = UC_SENTINEL;
             *p++ = CODE_DEADKEY;
             *p++ = KMX_DeadKeyMap(st[0], deadkeys, deadkeyBase, &KMX_FDeadkeys);   // I4353
+            wprintf(L"KMX_DeadKeyMap(st[0], deadkeys, deadkeyBase, &KMX_FDeadkeys): %i\n",KMX_DeadKeyMap(st[0], deadkeys, deadkeyBase, &KMX_FDeadkeys));
             *p = 0;
             int wertzu=57;
           }
           key++;
-        } else {
+        } 
+        else {
           bool isvalid = true;
           for (size_t ich = 0; ich < st.size(); ich++) {
             if(st[ich] < 0x20 || st[ich] == 0x7F) { isvalid=false; break; }
@@ -769,7 +771,7 @@ bool KMX_ImportRules(LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, GdkKeymap **keymap,
             }
           }
           else if(rc < 0) {
-            wprintf(L"iKey: %i- ss: %i, caps: %i - bsBuffer[0] = %i\n", iKey, ss, caps,sbBuffer[0]);
+            //wprintf(L"iKey: %i- ss: %i, caps: %i - bsBuffer[0] = %i\n", iKey, ss, caps,sbBuffer[0]);
             //_S2 TODO
             sbBuffer[2] = 0;
             //rgKey[iKey]->SetShiftState(ss, sbBuffer, true, (caps == 0));
@@ -806,7 +808,7 @@ bool KMX_ImportRules(LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, GdkKeymap **keymap,
       }
     }
   }
-  // _S2 do we need to sort ??
+  // _S2 do we need to sort alDead??
   sort_alDead(alDead, &alDead_cpl) ;
 
   //_S2 this gan co later
@@ -949,7 +951,7 @@ bool KMX_ImportRules(LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, GdkKeymap **keymap,
   // If we have deadkeys, then add a new group to translate the deadkeys per the deadkey tables
   // We only do this if not in deadkey conversion mode
   //
-
+  // DK_PART
   if (alDead.size() > 0 && !bDeadkeyConversion) {   // I4552
     kp->cxGroupArray++;
 

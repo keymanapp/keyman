@@ -237,6 +237,9 @@ void KMX_ReportUnconvertedKeyboardRules(LPKMX_KEYBOARD kbd) {
 
 void KMX_TranslateDeadkeyKey(LPKMX_KEY key, KMX_WCHAR deadkey, KMX_WORD vk, UINT shift, KMX_WORD ch, int abcd) {
 
+// deadkey2 should not run this routine !!! but it does  _S2 FEHLER HIER !!!!!
+
+
   //if (key->Key == 94)
   //  wprintf(L"key->ShiftFlags: %i  isEqual: %i  %i(%c)   %i(%c) --->  %i \n", key->ShiftFlags, key->ShiftFlags & VIRTUALCHARKEY , key->Key , key->Key, ch,ch , ((key->ShiftFlags == 0 || key->ShiftFlags & VIRTUALCHARKEY) && key->Key == ch));
 //wprintf(L"key->Key %i\n",key->Key);
@@ -246,7 +249,16 @@ wprintf(L"key->Key %i\tkey->dpContext: %i  %i %i %i %i %i %i %i %i    \tkey->dpo
 *key->dpContext, *(key->dpContext+1),*(key->dpContext+2),*(key->dpContext+3),*(key->dpContext+4),*(key->dpContext+5),*(key->dpContext+6),*(key->dpContext+7),*(key->dpContext+8),
 *key->dpOutput, *(key->dpOutput+1),*(key->dpOutput+2),*(key->dpOutput+3),*(key->dpOutput+4),*(key->dpOutput+5) );
 }*/
+
+
+  if (deadkey == 2) {
+    wprintf(L"\ndeadkey %i,  key->ShiftFlags:%i    key->ShiftFlags & VIRTUALCHARKEY %i key->Key == ch %i",deadkey, key->ShiftFlags, key->ShiftFlags & VIRTUALCHARKEY, key->Key == ch);
+  }
+Hier ist das Problem : für dk==2 springt er hier rein, was er nicht darf...
    if((key->ShiftFlags == 0 || key->ShiftFlags & VIRTUALCHARKEY) && key->Key == ch) {
+   //if(((key->ShiftFlags == 0 || key->ShiftFlags & VIRTUALCHARKEY) && key->Key == ch) && (!(deadkey==2 && shift==0))) {
+
+     wprintf(L"TRUE!!!!!!!!!");
     // The weird LCTRL+RALT is Windows' way of mapping the AltGr key.
     // We store that as just RALT, and use the option "Simulate RAlt with Ctrl+Alt"
     // to provide an alternate..
@@ -325,7 +337,7 @@ void KMX_AddDeadkeyRule(LPKMX_KEYBOARD kbd, KMX_WCHAR deadkey, KMX_WORD vk, UINT
       kbd->dpGroupArray[i].cxKeyArray++;
       //LogError("Add deadkey rule:  + [%d K_%d] > dk(%d)", shift, vk, deadkey);
       zaehler++;
-      //wprintf(L"Add deadkey rule:  + [%d K_%d] > dk(%d)  %i\n", shift, vk, deadkey,zaehler);
+      wprintf(L"Add deadkey rule:  + [%d K_%d] > dk(%d)  %i\n", shift, vk, deadkey,zaehler);
 
       if(i == kbd->StartGroup[1]) break;  // If this is the initial group, that's all we need to do.
     }
@@ -402,7 +414,7 @@ KMX_WCHAR KMX_GetUniqueDeadkeyID(LPKMX_KEYBOARD kbd, KMX_WCHAR deadkey) {
 
 void KMX_ConvertDeadkey(LPKMX_KEYBOARD kbd, KMX_WORD vk, UINT shift, KMX_WCHAR deadkey, v_dw_3D &All_Vector, GdkKeymap* keymap) {
   KMX_WORD deadkeys[512], *pdk;
-
+//wprintf(L" ***************************************** key: %i  %i  %i \n",vk,shift, deadkey);
   // _S2 create dkTable once only and use as static/ define before func
   // create dk_createDK_ComposeTable
   v_dw_2D  dk_Table;
@@ -506,10 +518,11 @@ KMX_BOOL KMX_DoConvert(LPKMX_KEYBOARD kbd, KMX_BOOL bDeadkeyConversion, gint arg
       KMX_WCHAR ch = KMX_get_CharUnderlying_From_SCUnderlying_GDK(keymap, VKShiftState[j], scUnderlying, &DeadKey);
 
       //LogError("--- VK_%d -> VK_%d [%c] dk=%d", VKMap[i], vkUnderlying, ch == 0 ? 32 : ch, DeadKey);
-      wprintf(L"--- VK_%d -> SC_%d [%c] dk=%d  ( ss %i) \n", KMX_VKMap[i], KMX_get_KeyCodeUnderlying_From_VKUS(KMX_VKMap[i]), ch == 0 ? 32 : ch, DeadKey,VKShiftState[j]);
+      //wprintf(L"--- VK_%d -> SC_%d [%c] dk=%d  ( ss %i) \n", KMX_VKMap[i], KMX_get_KeyCodeUnderlying_From_VKUS(KMX_VKMap[i]), ch == 0 ? 32 : ch, DeadKey,VKShiftState[j]);
+//wprintf(L"^^^^^^^^^^^^^^^^^^^^^^^, VKShiftState[j] ----> ch %i (%c)\n",  (int)VKShiftState[j],ch,ch);
 
       //wprintf(L"--- VK_%d -> SC_ [%c] dk=%d  ( ss %i) \n", VKMap[i], ch == 0 ? 32 : ch, DeadKey, VKShiftState[j]);
-
+int sdfghjkl=0;
       if(bDeadkeyConversion) {   // I4552
         if(ch == 0xFFFF) {
           ch = DeadKey;
@@ -519,7 +532,8 @@ KMX_BOOL KMX_DoConvert(LPKMX_KEYBOARD kbd, KMX_BOOL bDeadkeyConversion, gint arg
 //wprintf(L" scunderlying:  SS: %i Nr: %i VKMap[i] %i ch:%i (%c)\n", VKShiftState[j],i, KMX_VKMap[i],ch,ch );`
       switch(ch) {
         case 0x0000: break;
-        case 0xFFFF: KMX_ConvertDeadkey(kbd, KMX_VKMap[i], VKShiftState[j], DeadKey, All_Vector, keymap); break;   //test_keyboard_S2(kbd);    //-> mit Convert DK FALSCH; Ohne ConvertDK the same 
+        case 0xFFFF: 
+        KMX_ConvertDeadkey(kbd, KMX_VKMap[i], VKShiftState[j], DeadKey, All_Vector, keymap); break;   //test_keyboard_S2(kbd);    //-> mit Convert DK FALSCH; Ohne ConvertDK the same 
         default:     KMX_TranslateKeyboard(kbd, KMX_VKMap[i], VKShiftState[j], ch);
       }
     }
@@ -563,6 +577,7 @@ KMX_WCHAR KMX_get_VKUS_From_VKUnderlying_VEC(v_dw_3D All_Vector, KMX_DWORD VK_OT
 }
 
 // takes SC of underlying keyboard and returns character of underlying keyboard with shiftstate VKShiftState[j] or deadkey
+// _S2 KMX_UINT ???
 KMX_WCHAR  KMX_get_CharUnderlying_From_SCUnderlying_GDK(GdkKeymap *keymap, KMX_UINT VKShiftState, UINT SC_OTHER, PKMX_WCHAR DeadKey) {
 
   PKMX_WCHAR dky;

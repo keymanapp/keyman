@@ -575,6 +575,7 @@ KMX_DWORD KMX_get_KeyvalsUnderlying_From_KeyCodeUnderlying_GDK(GdkKeymap *keymap
   KMX_DWORD out;
   KMX_DWORD deadkey;
 
+
   if (!gdk_keymap_get_entries_for_keycode(keymap, keycode, &maps, &keyvals, &count))
     return 0;
   //if(!gdk_wayland_keymap_get_entries_for_keycode(keymap, keycode, &maps, &keyvals, &count))
@@ -635,8 +636,11 @@ KMX_DWORD KMX_get_KeyvalsUnderlying_From_KeyCodeUnderlying_GDK(GdkKeymap *keymap
 KMX_DWORD KMX_get_FFFF_Underlying_according_to_keycode_and_Shiftstate_GDK_dw(GdkKeymap *keymap, guint keycode, ShiftState ss, int caps){
 
   KMX_DWORD keyvals_dw= (KMX_DWORD) KMX_get_keyvals_From_Keycode(keymap, keycode, ss, caps) ;
-
-  if((keyvals_dw >=  deadkey_min) && (keyvals_dw <=  deadkey_max))                                    // deadkeys
+  
+  // _S2 AHA output for dk4-12 at the top after dk... from here
+  // _S2 only for testing
+  if((keyvals_dw >=  deadkey_min) && (keyvals_dw <=  deadkey_max))
+  //if((keyvals_dw >=  65104) && (keyvals_dw <=  65106))                                    // deadkeys
     return 0xFFFF;
   else if((keyvals_dw >  deadkey_max) || ((keyvals_dw <  deadkey_min)  &&  ( keyvals_dw > 0xFF)))     // out of range
     return 0xFFFE;
