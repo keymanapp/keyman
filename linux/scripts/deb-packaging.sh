@@ -144,10 +144,20 @@ check_updated_version_number() {
 get_api_version_in_symbols_file() {
   # Extract 1 from "libkeymancore.so.1 libkeymancore #MINVER#"
   local firstline
-  firstline="$(head -1 "debian/${PKG_NAME}.symbols")"
+  local file="$1"
+  firstline="$(head -1 "${file}")"
   firstline="${firstline#"${PKG_NAME}".so.}"
   firstline="${firstline%% *}"
   echo "${firstline}"
+}
+
+get_api_version_from_core() {
+  local api_version file
+  file="$1"
+  api_version=$(cat "${file}")
+  # Extract major version number from "1.0.0"
+  api_version=${api_version%%.*}
+  echo "${api_version}"
 }
 
 # Check if the API version got updated
@@ -159,12 +169,14 @@ get_api_version_in_symbols_file() {
 # NOTE: it is up to the caller to check if this is a major version
 # change that requires an API version update.
 is_api_version_updated() {
-  local NEW_VERSION OLD_VERSION TIER
-  git checkout "${GIT_BASE}" -- "debian/${PKG_NAME}.symbols"
-  OLD_VERSION=$(get_api_version_in_symbols_file)
-  git checkout "${GIT_SHA}" -- "debian/${PKG_NAME}.symbols"
-  NEW_VERSION=$(get_api_version_in_symbols_file)
-  if (( NEW_VERSION > OLD_VERSION )); then
+  local OLD_API_VERSION NEW_API_VERSION  TIER TMPFILE
+  TMPFILE=$(mktemp)
+  git cat-file blob "${GIT_BASE}:linux/debian/${PKG_NAME}.symbols" > "${TMPFILE}"
+  OLD_API_VERSION=$(get_api_version_in_symbols_file "${TMPFILE}")
+  git cat-file blob "${GIT_SHA}:linux/debian/${PKG_NAME}.symbols" > "${TMPFILE}"
+  NEW_API_VERSION=$(get_api_version_in_symbols_file "${TMPFILE}")
+  if (( NEW_API_VERSION > OLD_API_VERSION )); then
+    rm "${TMPFILE}"
     echo "0"
     return
   fi
@@ -174,17 +186,30 @@ is_api_version_updated() {
   TIER=$(cat "${REPO_ROOT}/TIER.md")
   case ${TIER} in
     alpha)
-      local STABLE_VERSION
+      local STABLE_VERSION STABLE_API_VERSION
+      STABLE_API_VERSION=0
       STABLE_VERSION=$((${VERSION%%.*} - 1))
-      if ! git cat-file -e "origin/stable-${STABLE_VERSION}.0" "debian/${PKG_NAME}.symbols" 2>/dev/null; then
-        # .symbols file doesn't exist in stable branch; that's ok
-        echo "2"
-        return
+      if ! git cat-file blob "origin/stable-${STABLE_VERSION}.0:linux/debian/${PKG_NAME}.symbols" > "${TMPFILE}" 2>/dev/null; then
+        # .symbols file doesn't exist in stable branch, so let's check CORE_API_VERSION.md. That
+        # doesn't exist in 16.0 but appeared in 17.0.
+        if ! git cat-file blob "origin/stable-${STABLE_VERSION}.0:core/CORE_API_VERSION.md" > "${TMPFILE}" 2>/dev/null; then
+          # CORE_API_VERSION.md doesn't exist either
+          if (( NEW_API_VERSION > 0 )); then
+            # .symbols and CORE_API_VERSION.md file don't exist in stable branch; however, we
+            # incremented the version number compared to 16.0, so that's ok
+            rm "${TMPFILE}"
+            echo "2"
+            return
+          fi
+        else
+          # Get API version from CORE_API_VERSION.md
+          STABLE_API_VERSION=$(get_api_version_from_core "${TMPFILE}")
+        fi
+      else
+        STABLE_API_VERSION=$(get_api_version_in_symbols_file "${TMPFILE}")
       fi
-      git checkout "origin/stable-${STABLE_VERSION}.0" -- "debian/${PKG_NAME}.symbols"
-      STABLE_API_VERSION=$(get_api_version_in_symbols_file)
-      git checkout "${GIT_SHA}" -- "debian/${PKG_NAME}.symbols"
-      if (( NEW_VERSION > STABLE_API_VERSION )); then
+      if (( NEW_API_VERSION > STABLE_API_VERSION )); then
+        rm "${TMPFILE}"
         echo "2"
         return
       fi ;;
@@ -192,6 +217,7 @@ is_api_version_updated() {
       ;;
   esac
 
+  rm "${TMPFILE}"
   echo "1"
 }
 
@@ -233,10 +259,8 @@ check_for_api_version_consistency() {
   # Checks that the (major) API version number in the .symbols file and
   # in CORE_API_VERSION.md are the same
   local symbols_version api_version
-  symbols_version=$(get_api_version_in_symbols_file)
-  api_version=$(cat ../core/CORE_API_VERSION.md)
-  # Extract major version number from "1.0.0"
-  api_version=${api_version%%.*}
+  symbols_version=$(get_api_version_in_symbols_file "debian/${PKG_NAME}.symbols")
+  api_version=$(get_api_version_from_core ../core/CORE_API_VERSION.md)
 
   if (( symbols_version == api_version )); then
     output_ok "API version in .symbols file and in CORE_API_VERSION.md is the same"
