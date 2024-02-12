@@ -60,11 +60,8 @@ processPersistOpt(km_core_actions const* actions, LPINTKEYBOARDINFO activeKeyboa
 ) {
   for (auto option = actions->persist_options; option->key; option++) {
     SendDebugMessageFormat(0, sdmGlobal, 0, "ProcessPersistOpt: Saving option to registry for keyboard [%s].", activeKeyboard->Name);
-    size_t value_length = wcslen(reinterpret_cast<LPCWSTR>(option->value));
-    LPWSTR value = new WCHAR[value_length + 1];
-    wcscpy_s(value, value_length + 1, reinterpret_cast<LPCWSTR>(option->value));
-    SaveKeyboardOptionCoretoRegistry(activeKeyboard, reinterpret_cast<LPCWSTR>(option->key), value);
-    delete[] value;
+    SaveKeyboardOptionCoretoRegistry(
+        activeKeyboard, reinterpret_cast<LPCWSTR>(option->key), reinterpret_cast<LPCWSTR>(option->value));
   }
 }
 

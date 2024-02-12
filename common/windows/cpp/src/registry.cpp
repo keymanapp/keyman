@@ -211,18 +211,16 @@ BOOL RegistryReadOnly::WrapError(DWORD res)
 	return res == ERROR_SUCCESS;
 }
 
-BOOL RegistryFullAccess::WriteInteger(LPCSTR AName, int AValue)
+BOOL RegistryFullAccess::WriteInteger(LPCSTR AName, const int AValue)
 {
 	return WrapError(RegSetValueEx(FhKey, AName, 0, REG_DWORD, (LPBYTE) &AValue, sizeof(int)));
 }
 
-BOOL RegistryFullAccess::WriteString(LPCSTR AName, LPSTR AValue)
-{
+BOOL RegistryFullAccess::WriteString(LPCSTR AName, LPCSTR AValue) {
 	return WrapError(RegSetValueEx(FhKey, AName, 0, REG_SZ, (LPBYTE) AValue, (DWORD) strlen(AValue)+1));
 }
 
-BOOL RegistryFullAccess::WriteString(LPCWSTR AName, LPWSTR AValue)
-{
+BOOL RegistryFullAccess::WriteString(LPCWSTR AName, LPCWSTR AValue) {
 	return WrapError(RegSetValueExW(FhKey, AName, 0, REG_SZ, (LPBYTE) AValue, (DWORD) wcslen(AValue)*2+2));
 }
 
