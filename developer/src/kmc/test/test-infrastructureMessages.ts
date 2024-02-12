@@ -146,6 +146,25 @@ describe('InfrastructureMessages', function () {
       KeymanFileTypes.Source.Package+` not found in the message`);
   });
 
+  // ERROR_InvalidProjectFolder (no source folder)
+  it('should generate ERROR_InvalidProjectFolder if there is no source folder when generating a default project file', async function() {
+    const projectPath = makePathToFixture('empty-folder', 'error_invalid_project_folder.kpj')
+    const ncb = new NodeCompilerCallbacks({logLevel: 'silent'});
+    loadProject(projectPath, ncb);
+    assert.isTrue(ncb.hasMessage(InfrastructureMessages.ERROR_InvalidProjectFolder),
+      `ERROR_FileTypeNotFound not generated, instead got: `+JSON.stringify(ncb.messages,null,2));
+  });
+
+  // ERROR_InvalidProjectFolder (invalid source folder)
+
+  it('should generate ERROR_InvalidProjectFolder if there are no valid file types in the source folder when generating a default project file', async function() {
+    const projectPath = makePathToFixture('invalid-source-folder', 'error_invalid_project_folder.kpj')
+    const ncb = new NodeCompilerCallbacks({logLevel: 'silent'});
+    loadProject(projectPath, ncb);
+    assert.isTrue(ncb.hasMessage(InfrastructureMessages.ERROR_InvalidProjectFolder),
+      `ERROR_FileTypeNotFound not generated, instead got: `+JSON.stringify(ncb.messages,null,2));
+  });
+
   // HINT_FilenameHasDifferingCase
 
   it('should generate HINT_FilenameHasDifferingCase if a referenced file has differing case', async function() {
