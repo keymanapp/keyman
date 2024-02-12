@@ -24,7 +24,10 @@
     "./lib": {
       "types": "./build/lib/index.d.ts"
     },
-    "./obj/*.js": "./build/obj/*.js"
+    "./obj/*.js": "./build/obj/*.js",
+    "./test-index": {
+      "default": "./build/obj/test-index.js"
+    }
   },
   "directories": {
     "lib": "lib",
