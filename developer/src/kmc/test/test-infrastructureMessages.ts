@@ -155,6 +155,17 @@ describe('InfrastructureMessages', function () {
       `ERROR_FileTypeNotFound not generated, instead got: `+JSON.stringify(ncb.messages,null,2));
   });
 
+  // ERROR_CannotCreateFolder
+
+  it('should generate ERROR_CannotCreateFolder if the output folder cannot be created', async function() {
+    const buildKeyboardInfo = new BuildKeyboardInfo();
+    const targetFilename = makePathToFixture('invalid-projects', 'build', 'error_cannot create_folder.xxx')
+    const ncb = new NodeCompilerCallbacks({logLevel: 'silent'});
+    buildKeyboardInfo['createOutputFolder'](targetFilename, ncb); // call private method
+    assert.isTrue(ncb.hasMessage(InfrastructureMessages.ERROR_CannotCreateFolder),
+      `ERROR_CannotCreateFolder not generated, instead got: `+JSON.stringify(ncb.messages,null,2));
+  });
+
   // HINT_FilenameHasDifferingCase
 
   it('should generate HINT_FilenameHasDifferingCase if a referenced file has differing case', async function() {
