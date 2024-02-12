@@ -9,6 +9,7 @@
 #pragma once
 #include <list>
 #include <vector>
+#include <cassert>
 #include "keyman_core.h"
 
 // Forward declarations
@@ -23,6 +24,7 @@ namespace core
 class context: public std::list<km_core_context_item>
 {
 public:
+  bool has_markers = true;
   void push_character(km_core_usv);
   void push_marker(uint32_t);
 };
@@ -36,6 +38,8 @@ void context::push_character(km_core_usv usv) {
 
 inline
 void context::push_marker(uint32_t marker) {
+  assert(has_markers);
+  if(!has_markers) return;
   emplace_back(km_core_context_item { KM_CORE_CT_MARKER, {0,}, {marker} });
 }
 

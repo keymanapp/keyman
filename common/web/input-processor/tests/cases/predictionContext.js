@@ -282,7 +282,7 @@ describe("PredictionContext", () => {
     });
 
     // And now, apply the reversion itself.
-    let returnValue = predictiveContext.accept(reversion);
+    let returnValue = await predictiveContext.accept(reversion);
 
     // 'accepting' a reversion performs a rewind; there's no need for async ops here.
     assert.isNull(returnValue); // as per the method's spec.

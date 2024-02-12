@@ -779,7 +779,11 @@ ibus_keyman_engine_process_key_event(
     return TRUE;
   }
 
-  // REVIEW: why don't we handle these keys?
+  // Depending on the OS/base keyboard layout we might get the same modifier
+  // key whether the user pressed right or left Alt or Ctrl key. We work
+  // around that by setting the `l/r*_pressed` flag when the actual modifier
+  // key is pressed so that when we get the actual key with the modifier
+  // flag set we know which Ctrl/Alt key is still pressed.
   switch (keycode) {
   case KEYMAN_LCTRL:
     keyman->lctrl_pressed = isKeyDown;
@@ -804,16 +808,35 @@ ibus_keyman_engine_process_key_event(
     return FALSE;
   }
 
+  // #10476: Core currently doesn't handle IBUS_MOD{2-4}_MASK modifiers.
+  // On Ubuntu 23.10/24.04 we get IBUS_MOD4_MASK set on keycode 0x39 (space) when
+  // the user tries to switch keyboards. Since this is not a regular keypress
+  // and Core doesn't handle it, we need to just return and let the Gnome deal
+  // with it. We could consider to add it to Core and let Core ignore it.
+  // As for IBUS_MOD3_MASK it's unclear when/how that gets set, so we
+  // just not deal with that for now until we notice problems.
+  if (state & IBUS_MOD4_MASK) {  // Super/Meta/Windows key depressed
+    g_message("%s: Not handling keys with IBUS_MOD4_MASK (Super) modifier", __FUNCTION__);
+    return FALSE;
+  }
+
+  // REVIEW: Do we need to do something about IBUS_MOD2_MASK (NumLock)? I guess
+  // if a keyboard would have rules for the numeric keypad we might need
+  // it. At the moment however we let Core process the keypress and since
+  // it doesn't have rules for the numeric keypad keys we eventually
+  // forward the key to ibus (in process_emit_keystroke_action) and let
+  // Gnome deal with it.
+
   // keyman modifiers are different from X11/ibus
   uint16_t km_mod_state = 0;
-  if (state & IBUS_SHIFT_MASK) {
+  if (state & IBUS_SHIFT_MASK) {  // Shift key depressed
     km_mod_state |= KM_CORE_MODIFIER_SHIFT;
   }
-  if (state & IBUS_MOD5_MASK) {
+  if (state & IBUS_MOD5_MASK) {  // Right Alt key depressed
     km_mod_state |= KM_CORE_MODIFIER_RALT;
     g_message("%s: modstate KM_CORE_MODIFIER_RALT from IBUS_MOD5_MASK", __FUNCTION__);
   }
-  if (state & IBUS_MOD1_MASK) {
+  if (state & IBUS_MOD1_MASK) {  // Alt key depressed
     if (keyman->ralt_pressed) {
       km_mod_state |= KM_CORE_MODIFIER_RALT;
       g_message("%s: modstate KM_CORE_MODIFIER_RALT from ralt_pressed", __FUNCTION__);
@@ -823,7 +846,7 @@ ibus_keyman_engine_process_key_event(
       g_message("%s: modstate KM_CORE_MODIFIER_LALT from lalt_pressed", __FUNCTION__);
     }
   }
-  if (state & IBUS_CONTROL_MASK) {
+  if (state & IBUS_CONTROL_MASK) {  // Ctrl key depressed
     if (keyman->rctrl_pressed) {
       km_mod_state |= KM_CORE_MODIFIER_RCTRL;
       g_message("%s: modstate KM_CORE_MODIFIER_RCTRL from rctrl_pressed", __FUNCTION__);
@@ -833,7 +856,7 @@ ibus_keyman_engine_process_key_event(
       g_message("%s: modstate KM_CORE_MODIFIER_LCTRL from lctrl_pressed", __FUNCTION__);
     }
   }
-  if (state & IBUS_LOCK_MASK) {
+  if (state & IBUS_LOCK_MASK) {  // Caps lock active
     km_mod_state |= KM_CORE_MODIFIER_CAPS;
   }
   g_message("DAR: %s - km_mod_state=0x%x", __FUNCTION__, km_mod_state);
@@ -847,8 +870,6 @@ ibus_keyman_engine_process_key_event(
   const km_core_actions *core_actions = km_core_state_get_actions(keyman->state);
 
   process_actions(engine, core_actions);
-
-  km_core_actions_dispose(core_actions);
 
   // If we have a new ibus version that supports prefilter and a non-compliant
   // client, i.e. a client that doesn't support surrounding text (e.g.

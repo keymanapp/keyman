@@ -13,6 +13,7 @@ import { analyzeUnitTestEndpoints } from '../src/commands/analyze.js';
 import { BuildKeyboardInfo } from '../src/commands/buildClasses/BuildKeyboardInfo.js';
 import { BuildModelInfo } from '../src/commands/buildClasses/BuildModelInfo.js';
 import { clearOptions } from '@keymanapp/developer-utils';
+import { loadProject } from '../src/util/projectLoader.js';
 
 describe('InfrastructureMessages', function () {
 
@@ -134,6 +135,16 @@ describe('InfrastructureMessages', function () {
       `ERROR_FileTypeNotFound not generated, instead got: `+JSON.stringify(ncb.messages,null,2));
     assert.isTrue(nodeCompilerMessage(ncb, InfrastructureMessages.ERROR_FileTypeNotFound).includes(KeymanFileTypes.Source.Package),
       KeymanFileTypes.Source.Package+` not found in the message`);
+  });
+
+  // ERROR_InvalidProjectFolder (invalid source folder)
+  
+  it('should generate ERROR_InvalidProjectFolder if there are no valid file types in the source folder when generating a default project file', async function() {
+    const projectPath = makePathToFixture('invalid-source-folder', 'error_invalid_project_folder.kpj')
+    const ncb = new NodeCompilerCallbacks({logLevel: 'silent'});
+    loadProject(projectPath, ncb);
+    assert.isTrue(ncb.hasMessage(InfrastructureMessages.ERROR_InvalidProjectFolder),
+      `ERROR_FileTypeNotFound not generated, instead got: `+JSON.stringify(ncb.messages,null,2));
   });
 
   // HINT_FilenameHasDifferingCase

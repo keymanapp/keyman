@@ -28,13 +28,26 @@ static_assert(LDML_MARKER_NO_INDEX < LDML_MARKER_MIN_INDEX, "LDML_MARKER_NO_INDE
 
 // string manipulation
 
-/** internal function to normalize with a specified mode */
+/**
+ * Internal function to normalize with a specified mode.
+ * Note: that this function _does_ assert failure, so it is not
+ * required to assert its return code. The return is provided so
+ * that callers can exit (such as making no change) if there was failure.
+ *
+ * Also note that "failure" here is something catastrophic: ICU not initialized,
+ * or, more likely, some low memory situation. Does not fail on "bad" data.
+ * @param n the ICU Normalizer to use
+ * @param str input/output string
+ * @param status error code, must be initialized on input
+ * @return false if failure
+ */
 static bool normalize(const icu::Normalizer2 *n, std::u16string &str, UErrorCode &status) {
   UASSERT_SUCCESS(status);
   assert(n != nullptr);
   icu::UnicodeString dest;
   icu::UnicodeString src = icu::UnicodeString(str.data(), (int32_t)str.length());
   n->normalize(src, dest, status);
+  // the next line here will assert
   if (UASSERT_SUCCESS(status)) {
     str.assign(dest.getBuffer(), dest.length());
   }
@@ -88,7 +101,7 @@ void add_back_markers(std::u32string &str, const std::u32string &src, marker_map
   str.clear();
   // iterator over the marker map
   auto marki = map2.rbegin();
-  // number of markers left to process
+  // number of markers left to processnfd
   size_t max_markers = count_markers(map);
   size_t processed_markers = 0;
 
@@ -224,45 +237,6 @@ bool normalize_nfd_markers(std::u32string &str, marker_encoding encoding) {
   return normalize_nfd_markers_segment(str, m, encoding);
 }
 
-// TODO-LDML: cleanup
-// bool normalize_nfc_markers(std::u32string &str, marker_map &map, marker_encoding encoding) {
-//   /** original string, but no markers */
-//   std::u32string str_unmarked = remove_markers(str, map, encoding);
-//   /** original string, no markers, NFC */
-//   std::u32string str_unmarked_nfc = str_unmarked;
-//   if(!normalize_nfc(str_unmarked_nfc)) {
-//     return false; // normalize failed.
-//   } else if (map.size() == 0) {
-//     // no markers. Return the normalized unmarked str
-//     str = str_unmarked_nfc;
-//   } else if (str_unmarked_nfc == str_unmarked) {
-//     // Normalization produced no change when markers were removed.
-//     // So, we'll call this a no-op.
-//   } else {
-//     add_back_markers(str, str_unmarked_nfc, map, encoding);
-//   }
-//   return true; // all OK
-// }
-
-// TODO-LDML: cleanup
-// bool normalize_nfc(std::u32string &str) {
-//   std::u16string rstr = km::core::kmx::u32string_to_u16string(str);
-//   if(!normalize_nfc(rstr)) {
-//     return false;
-//   } else {
-//     str = km::core::kmx::u16string_to_u32string(rstr);
-//     return true;
-//   }
-// }
-
-// TODO-LDML: cleanup
-// bool normalize_nfc(std::u16string &str) {
-//   UErrorCode status = U_ZERO_ERROR;
-//   const icu::Normalizer2 *nfc = icu::Normalizer2::getNFCInstance(status);
-//   UASSERT_SUCCESS(status);
-//   return normalize(nfc, str, status);
-// }
-
 void
 prepend_marker(std::u32string &str, marker_num marker, marker_encoding encoding) {
   if (encoding == plain_sentinel) {
@@ -300,6 +274,7 @@ prepend_hex_quad(std::u32string &str, KMX_DWORD marker) {
   }
 }
 
+/** @returns hex digit value for a UTF-32 codepoint */
 inline int xdigitval(km_core_usv ch) {
   if (ch >= U'0' && ch <= U'9') {
     return (ch - U'0');
@@ -312,6 +287,7 @@ inline int xdigitval(km_core_usv ch) {
   }
 }
 
+/** @returns 32-bit value for a 4-character buffer */
 KMX_DWORD parse_hex_quad(const km_core_usv hex_str[]) {
   KMX_DWORD mark_no = 0;
   for(auto i = 0; i < 4; i++) {

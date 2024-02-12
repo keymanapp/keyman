@@ -22,7 +22,7 @@ have to begin with a space character.
 Example:
 
 ```
- km_core_actions_dispose@Base 17.0.197
+ km_core_state_actions_get@Base 17.0.197
 ```
 
 ## What to do when the API verification check fails

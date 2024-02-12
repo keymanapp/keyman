@@ -197,7 +197,7 @@ toOneChar(value: string) : number {
 
 export function describeCodepoint(ch : number) : string {
   let s;
-  const p = getProblem(ch);
+  const p = BadStringAnalyzer.getProblem(ch);
   if (p != null) {
     // for example: 'PUA (U+E010)'
     s = p;
@@ -208,10 +208,12 @@ export function describeCodepoint(ch : number) : string {
   return `${s} (U+${Number(ch).toString(16).toUpperCase()})`;
 }
 
+
 export enum BadStringType {
   pua = 'PUA',
   unassigned = 'Unassigned',
   illegal = 'Illegal',
+  denormalized = "Denormalized"
 };
 
 // Following from kmx_xstring.h / .cpp
@@ -314,34 +316,35 @@ class BadStringMap extends Map<BadStringType, Set<number>> {
   }
 }
 
-function getProblem(ch : number) : BadStringType {
-  if (!isValidUnicode(ch)) {
-    return BadStringType.illegal;
-  } else if(isPUA(ch)) {
-    return BadStringType.pua;
-  } else { // TODO-LDML: unassigned
-    return null;
-  }
-}
-export class BadStringAnalyzer {
+/** abstract class for analyzing and categorizing strings */
+export abstract class StringAnalyzer {
   /** add a string for analysis */
   public add(s : string) {
-    for (const c of s) {
+    for (const c of [...s]) {
       const ch = c.codePointAt(0);
-      const problem = getProblem(ch);
+      const problem = this.analyzeCodePoint(c, ch);
       if (problem) {
         this.addProblem(ch, problem);
       }
     }
   }
 
-  private addProblem(ch : number, type : BadStringType) {
+  /**
+   * subclass interface
+   * @param c single codepoint to analyze (string)
+   * @param ch single codepoint to analyze (scalar)
+   */
+  protected abstract analyzeCodePoint(c: string, ch: number) : BadStringType;
+
+  /** internal interface for the result of an analysis */
+  protected addProblem(ch : number, type : BadStringType) {
     if (!this.m.has(type)) {
       this.m.set(type, new Set<number>());
     }
     this.m.get(type).add(ch);
   }
 
+  /** get the results of the analysis */
   public analyze() : BadStringMap {
     if (this.m.size == 0) {
       return null;
@@ -350,5 +353,36 @@ export class BadStringAnalyzer {
     }
   }
 
+  /** internal map */
   private m = new BadStringMap();
+}
+
+/** analyze a string looking for bad unicode */
+export class BadStringAnalyzer extends StringAnalyzer {
+  /** analyze one codepoint */
+  protected analyzeCodePoint(c: string, ch: number): BadStringType {
+    return BadStringAnalyzer.getProblem(ch);
+  }
+  /** export analyzer function  */
+  public static getProblem(ch: number) {
+    if (!isValidUnicode(ch)) {
+      return BadStringType.illegal;
+    } else if(isPUA(ch)) {
+      return BadStringType.pua;
+    } else { // TODO-LDML: unassigned
+      return null;
+    }
+  }
+}
+
+/** Analyzer that checks if something isn't NFD */
+export class NFDAnalyzer extends StringAnalyzer {
+  protected analyzeCodePoint(c: string, ch: number): BadStringType {
+    const nfd = c.normalize("NFD");
+    if (c !== nfd) {
+      return BadStringType.denormalized;
+    } else {
+      return null;
+    }
+  }
 }

@@ -221,11 +221,11 @@ PWSTR strtowstr(PSTR in)
 PSTR wstrtostr(PCWSTR in)
 {
     PSTR result;
-    size_t len;
+    int len;
 
-    wcstombs_s(&len, NULL, 0, in, wcslen(in));
+    len = WideCharToMultiByte(CP_ACP, 0, in, -1, NULL, 0, NULL, NULL);
     result = new CHAR[len+1];
-    wcstombs_s(&len, result, len, in, wcslen(in));
+    WideCharToMultiByte(CP_ACP, 0, in, -1, result, len, NULL, NULL);
     result[len] = 0;
     return result;
 }

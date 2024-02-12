@@ -201,7 +201,13 @@ km_core_status context_append(km_core_context *ctxt,
   {
     for (;ci->type != KM_CORE_CT_END; ++ci)
     {
-      ctxt->emplace_back(*ci);
+      assert(ci->type == KM_CORE_CT_CHAR || ci->type == KM_CORE_CT_MARKER);
+      if(ci->type == KM_CORE_CT_CHAR || ci->type == KM_CORE_CT_MARKER) {
+        assert(ctxt->has_markers || ci->type != KM_CORE_CT_MARKER);
+        if(ctxt->has_markers || ci->type != KM_CORE_CT_MARKER) {
+          ctxt->emplace_back(*ci);
+        }
+      }
     }
   } catch (std::bad_alloc &) {
     return KM_CORE_STATUS_NO_MEM;
@@ -225,7 +231,13 @@ context_prepend(
     std::vector<km_core_context_item> vci;
     for (; ci->type != KM_CORE_CT_END && num > 0; ++ci) {
       num--;
-      vci.push_back(*ci);
+      assert(ci->type == KM_CORE_CT_CHAR || ci->type == KM_CORE_CT_MARKER);
+      if(ci->type == KM_CORE_CT_CHAR || ci->type == KM_CORE_CT_MARKER) {
+        assert(ctxt->has_markers || ci->type != KM_CORE_CT_MARKER);
+        if(ctxt->has_markers || ci->type != KM_CORE_CT_MARKER) {
+          vci.push_back(*ci);
+        }
+      }
     }
 
     ctxt->insert(ctxt->begin(), vci.begin(), vci.end());

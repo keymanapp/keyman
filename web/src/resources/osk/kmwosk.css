@@ -466,6 +466,9 @@
   width: max-content;  /* Ensure the text span acts like it contains its text */
   min-width: calc(100% - 16px); /* To ensure the span stays centered. */
   white-space: nowrap;
+  /* We need click-through and touch-through - we replace spans when updating suggestions, and that can break gestures. */
+  pointer-events: none;
+  touch-action: none;
 }
 
 .kmw-footer-resize{cursor:se-resize;position:absolute;right:2px;bottom:2px;width:16px;height:16px;overflow:hidden;

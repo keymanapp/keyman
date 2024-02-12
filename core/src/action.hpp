@@ -14,19 +14,29 @@
 namespace km {
 namespace core
 {
-  km_core_actions *action_item_list_to_actions_object(
-    km_core_action_item const *action_items
+  bool action_item_list_to_actions_object(
+    km_core_action_item const *action_items,
+    km_core_actions *actions
   );
 
   bool actions_normalize(
-    /* in */      km_core_context const *cached_context,
-    /* in, out */ km_core_context *app_context,
-    /* in, out */ km_core_actions *actions
+    /* in */      context const *cached_context,
+    /* in, out */ context *app_context,
+    /* in, out */ km_core_actions &actions
   );
 
   bool actions_update_app_context_nfu(
-    /* in */      km_core_context const *cached_context,
-    /* in, out */ km_core_context *app_context
+    /* in */      context const *cached_context,
+    /* in, out */ context *app_context
+  );
+
+  void actions_dispose(
+    km_core_actions const & actions
+  );
+
+  km_core_usv const *get_deleted_context(
+    context const &app_context,
+    unsigned int code_points_to_delete
   );
 
 } // namespace core
