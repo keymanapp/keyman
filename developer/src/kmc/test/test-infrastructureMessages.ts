@@ -13,7 +13,6 @@ import { analyzeUnitTestEndpoints } from '../src/commands/analyze.js';
 import { BuildKeyboardInfo } from '../src/commands/buildClasses/BuildKeyboardInfo.js';
 import { BuildModelInfo } from '../src/commands/buildClasses/BuildModelInfo.js';
 import { clearOptions } from '@keymanapp/developer-utils';
-import { loadProject } from '../src/util/projectLoader.js';
 
 describe('InfrastructureMessages', function () {
 
