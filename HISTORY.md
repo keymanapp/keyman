@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 17.0.265 alpha 2024-02-12
+
+* fix(developer): keyboard that targets only web can cause crashes and other problems (#10664)
+* fix(android/engine): Download multiple dictionaries (#10680)
+
 ## 17.0.264 alpha 2024-02-09
 
 * chore(linux): Don't set VERSION_TAG to …-local in .deb packages (#10675)
