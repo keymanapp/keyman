@@ -158,7 +158,7 @@ public class CloudLexicalModelMetaDataDownloadCallback implements ICloudDownload
         JSONObject modelInfo = lmData.getJSONObject(i);
         if (!modelInfo.has("packageFilename") || !modelInfo.has("id")) {
           KMLog.LogError(TAG, "Error in lexical model metadata from api.keyman.com - missing metadata");
-          return;
+          continue;
         }
 
         String _modelID = modelInfo.getString("id");
@@ -167,7 +167,7 @@ public class CloudLexicalModelMetaDataDownloadCallback implements ICloudDownload
           modelInfo.getString("packageFilename")));
         _r.additionalDownloadid = CloudLexicalPackageDownloadCallback.createDownloadId(_modelID);
         _r.additionalDownloads = urls;
-      };
+      }
     } catch (JSONException e) {
       KMLog.LogException(TAG, "Error in lexical model metadata from api.keyman.com. ", e);
     }
