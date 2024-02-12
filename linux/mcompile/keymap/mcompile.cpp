@@ -132,7 +132,6 @@ int run(int argc, std::vector<std::u16string> str_argv, char* argv_ch[] = NULL){
 
 
 #if defined(_WIN32) || defined(_WIN64)
-  // _S2 DoConvert for windows needs to be done later ( can it be copied from engine/mcompile ?)
   /*if(DoConvert(kmxfile, kbid, bDeadkeyConversion)) {   // I4552F
       KMX_SaveKeyboard(kmxfile, outfile);
   }*/
@@ -144,7 +143,7 @@ int run(int argc, std::vector<std::u16string> str_argv, char* argv_ch[] = NULL){
 
 #endif
 
-  //DeleteReallocatedPointers(kmxfile); :TODO   // _S2 not my ToDo :-)
+  //DeleteReallocatedPointers(kmxfile); :TODO   //  not my ToDo :-)
   delete kmxfile;
 
   wprintf(L"\nmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm end\n");
@@ -157,15 +156,15 @@ const UINT VKShiftState[] = {0, K_SHIFTFLAG, LCTRLFLAG|RALTFLAG, K_SHIFTFLAG|LCT
 
 // _S2 my comment for Lin version
 // Ubuntu:  Each of the 4 columns specifies a different modifier:  unmodified,  shift,   right alt (altgr),     shift+right alt(altgr)
-// some hold up to 8 what are those ???
 // we have assigned these to columns 1-4  ( column o holds the keycode)
-//const UINT VKShiftState[] = {0, 1,  2,  3, 0xFFFF};
+// const UINT VKShiftState[] = {0, 1,  2,  3, 0xFFFF};
 
 //
 // TranslateKey
 //
 // For each key rule on the keyboard, remap its key to the
 // correct shift state and key.  Adjust the LCTRL+RALT -> RALT if necessary
+// _S2 exchange key->Key with the new value ( use vk instead of ch)
 //
 void KMX_TranslateKey(LPKMX_KEY key, KMX_WORD vk, KMX_UINT shift, KMX_WCHAR ch) {
   // The weird LCTRL+RALT is Windows' way of mapping the AltGr key.
@@ -237,28 +236,28 @@ void KMX_ReportUnconvertedKeyboardRules(LPKMX_KEYBOARD kbd) {
 
 void KMX_TranslateDeadkeyKey(LPKMX_KEY key, KMX_WCHAR deadkey, KMX_WORD vk, UINT shift, KMX_WORD ch, int abcd) {
 
-// deadkey2 should not run this routine !!! but it does  _S2 FEHLER HIER !!!!!
+ //_S2 AHA Hier ist das Problem : für dk==2 springt er hier rein, was er nicht darf...
+ // this is because SHIFTFLAG has the wrong value
+ // which is because KMX_GetShiftStateValue gets the wrong value
+ // which is because capslock is not set correctlyS
+ // which is because WIN<->Lin shiftstares are different 4 $ $ 4 <-> 4 4 $ $ etc.
 
-
-  //if (key->Key == 94)
-  //  wprintf(L"key->ShiftFlags: %i  isEqual: %i  %i(%c)   %i(%c) --->  %i \n", key->ShiftFlags, key->ShiftFlags & VIRTUALCHARKEY , key->Key , key->Key, ch,ch , ((key->ShiftFlags == 0 || key->ShiftFlags & VIRTUALCHARKEY) && key->Key == ch));
-//wprintf(L"key->Key %i\n",key->Key);
-/*if(abcd >1 && abcd < 815 ) {
-
-wprintf(L"key->Key %i\tkey->dpContext: %i  %i %i %i %i %i %i %i %i    \tkey->dpoutput: %i  %i %i %i %i %i\n", key->Key,
-*key->dpContext, *(key->dpContext+1),*(key->dpContext+2),*(key->dpContext+3),*(key->dpContext+4),*(key->dpContext+5),*(key->dpContext+6),*(key->dpContext+7),*(key->dpContext+8),
-*key->dpOutput, *(key->dpOutput+1),*(key->dpOutput+2),*(key->dpOutput+3),*(key->dpOutput+4),*(key->dpOutput+5) );
-}*/
-
-
-  if (deadkey == 2) {
-    wprintf(L"\ndeadkey %i,  key->ShiftFlags:%i    key->ShiftFlags & VIRTUALCHARKEY %i key->Key == ch %i",deadkey, key->ShiftFlags, key->ShiftFlags & VIRTUALCHARKEY, key->Key == ch);
-  }
-Hier ist das Problem : für dk==2 springt er hier rein, was er nicht darf...
+int wertzu=688;
+// _S2 why is key->Key == ch -> false ????
    if((key->ShiftFlags == 0 || key->ShiftFlags & VIRTUALCHARKEY) && key->Key == ch) {
    //if(((key->ShiftFlags == 0 || key->ShiftFlags & VIRTUALCHARKEY) && key->Key == ch) && (!(deadkey==2 && shift==0))) {
+        if(((deadkey==2  ))) {
+             //wprintf(L"\nXXdeadkey %i,  vk: %i\tkey->ShiftFlags:%i \tkey->ShiftFlags & VIRTUALCHARKEY %i\tkey->Key == ch %i key->Key: %i ch: %i",deadkey, vk, key->ShiftFlags, key->ShiftFlags & VIRTUALCHARKEY, key->Key == ch, key->Key, ch);
 
-     wprintf(L"TRUE!!!!!!!!!");
+             wprintf(L"\nXXdeadkey %i,  vk: %i\tkey->Key: %i ch: %i",deadkey, vk, key->Key, ch);
+
+
+          wprintf(L" TRUE!!!!!!!!!");
+        }
+       //wprintf(L"\ndeadkey %i,  key->ShiftFlags:%i    key->ShiftFlags & VIRTUALCHARKEY %i key->Key == ch %i",deadkey, key->ShiftFlags, key->ShiftFlags & VIRTUALCHARKEY, key->Key == ch);
+
+
+     //wprintf(L" TRUE!!!!!!!!!");
     // The weird LCTRL+RALT is Windows' way of mapping the AltGr key.
     // We store that as just RALT, and use the option "Simulate RAlt with Ctrl+Alt"
     // to provide an alternate..
@@ -414,6 +413,8 @@ KMX_WCHAR KMX_GetUniqueDeadkeyID(LPKMX_KEYBOARD kbd, KMX_WCHAR deadkey) {
 
 void KMX_ConvertDeadkey(LPKMX_KEYBOARD kbd, KMX_WORD vk, UINT shift, KMX_WCHAR deadkey, v_dw_3D &All_Vector, GdkKeymap* keymap) {
   KMX_WORD deadkeys[512], *pdk;
+  KMX_WORD* pd_S2;
+  KMX_DWORD* pdd_S2;
 //wprintf(L" ***************************************** key: %i  %i  %i \n",vk,shift, deadkey);
   // _S2 create dkTable once only and use as static/ define before func
   // create dk_createDK_ComposeTable
@@ -427,28 +428,17 @@ void KMX_ConvertDeadkey(LPKMX_KEYBOARD kbd, KMX_WORD vk, UINT shift, KMX_WCHAR d
   // Add the deadkey to the mapping table for use in the import rules phase
   KMX_DeadkeyMapping KMX_deadkeyMapping = { deadkey, dkid, shift, vk};    // I4353
 
-  //__S2 NEEDS to be here later
   KMX_FDeadkeys.push_back(KMX_deadkeyMapping); //dkid, vk, shift);   // I4353
   KMX_AddDeadkeyRule(kbd, dkid, vk, shift);
 
-  // _S2 NEEDS to go! --------
-  /*// _S2 is only for testing &to compare 3 dk of windows
-  if(KMX_FDeadkeys.size()<3 )
-  KMX_FDeadkeys.push_back(KMX_deadkeyMapping); //dkid, vk, shift);   // I4353
-  if(shift== 0 || shift== 16  )
-    KMX_AddDeadkeyRule(kbd, dkid, vk, shift);
-  else
-    return;;*/
-  // _S2 -----------------------------
-
   KMX_GetDeadkeys(dk_Table, deadkey, pdk = deadkeys, keymap);  // returns array of [usvk, ch_out] pairs
-
   while(*pdk) {
-
+pd_S2=pdk;
+//pdd_S2=pdk;
     // Look up the ch
     UINT vkUnderlying = KMX_get_VKUS_From_VKUnderlying_VEC(All_Vector, *pdk);
 
-    //wprintf(L" vkUnderlying   %i    *pdk %i  %i %ixxx", vkUnderlying, *pdk, *(pdk+1), *(pdk+2));
+    wprintf(L" vkUnderlying   %i    *pdk %i  %i %ixxx   \n", vkUnderlying, *pd_S2, *(pd_S2+1), *(pd_S2+2));
      KMX_TranslateDeadkeyKeyboard(kbd, dkid, vkUnderlying, *(pdk+1), *(pdk+2));
 
     if(vkUnderlying != (UINT) *pdk) {
@@ -457,6 +447,7 @@ void KMX_ConvertDeadkey(LPKMX_KEYBOARD kbd, KMX_WORD vk, UINT shift, KMX_WCHAR d
     //else
       //wprintf(L" \n");
     pdk+=3;
+    pd_S2+=3;
   }
 }
 
@@ -532,14 +523,17 @@ int sdfghjkl=0;
 //wprintf(L" scunderlying:  SS: %i Nr: %i VKMap[i] %i ch:%i (%c)\n", VKShiftState[j],i, KMX_VKMap[i],ch,ch );`
       switch(ch) {
         case 0x0000: break;
-        case 0xFFFF: 
-        KMX_ConvertDeadkey(kbd, KMX_VKMap[i], VKShiftState[j], DeadKey, All_Vector, keymap); break;   //test_keyboard_S2(kbd);    //-> mit Convert DK FALSCH; Ohne ConvertDK the same 
-        default:     KMX_TranslateKeyboard(kbd, KMX_VKMap[i], VKShiftState[j], ch);
+        case 0xFFFF:          // _S2 in kbd (=loaded from kmx-file): replace  LCTRL+RALT -> Ctrl+Alt + write  deadkey-> FFFF + CODE_DEADKEY + deadkey into context
+              KMX_ConvertDeadkey(kbd, KMX_VKMap[i], VKShiftState[j], DeadKey, All_Vector, keymap); break;
+        default:     // _S2 in kbd (=loaded from kmx-file):  replace  LCTRL+RALT -> Ctrl+Alt + switch keyvalues e.g. y<->z
+              KMX_TranslateKeyboard(kbd, KMX_VKMap[i], VKShiftState[j], ch);
       }
     }
   }
 
   KMX_ReportUnconvertedKeyboardRules(kbd);
+
+  // _S2 use translated kbd and write data to rgkey[] then add things to rgkey[] to enable to write to kmx-format
   if(!KMX_ImportRules(kbd, All_Vector, &keymap, &KMX_FDeadkeys, bDeadkeyConversion)) {   // I4353   // I4552
     return FALSE;
   }
@@ -577,7 +571,7 @@ KMX_WCHAR KMX_get_VKUS_From_VKUnderlying_VEC(v_dw_3D All_Vector, KMX_DWORD VK_OT
 }
 
 // takes SC of underlying keyboard and returns character of underlying keyboard with shiftstate VKShiftState[j] or deadkey
-// _S2 KMX_UINT ???
+// _S2 QUESTION KMX_UINT ???
 KMX_WCHAR  KMX_get_CharUnderlying_From_SCUnderlying_GDK(GdkKeymap *keymap, KMX_UINT VKShiftState, UINT SC_OTHER, PKMX_WCHAR DeadKey) {
 
   PKMX_WCHAR dky;

@@ -10,11 +10,10 @@ v_dw_1D createLine(std::wstring  first, std::wstring second, KMX_DWORD number, s
 	return line;
 }
 
-// _S2 DEADKEY STUFF - DO NOT REVIEW YET
 bool find_dk_combinations_for_single_dk(v_dw_2D * p_dk_ComposeTable, v_dw_2D  &dk_SingleTable, KMX_DWORD dk) {
 	v_dw_1D line;
 	for ( int i =0; i< (int) (*p_dk_ComposeTable).size(); i++) {
-		// _S2 is there a better way to find a-z,A-Z?
+		// _S2 QUESTION is there a better way to find a-z,A-Z?
 		//if (((*p_dk_ComposeTable)[i][0] == dk) ) {
 		if (((*p_dk_ComposeTable)[i][0] == dk) && (IsKeymanUsedChar((*p_dk_ComposeTable)[i][1]))) {
 			line.push_back((*p_dk_ComposeTable)[i][0]);
@@ -61,7 +60,7 @@ bool found_dk_inVector(KMX_WCHAR dk, std::vector<DeadKey*> &dkVec) {
 	return false;
 }
 
-void Create_alDead(KMX_WCHAR dk, std::vector<DeadKey*> &dkVec, std::vector<DeadKey*> *p_All_Vec) {
+void refine_alDead(KMX_WCHAR dk, std::vector<DeadKey*> &dkVec, std::vector<DeadKey*> *p_All_Vec) {
 	std::vector<DeadKey*> dkVec_unsorted;
 
 	if( dk == 0)
@@ -114,28 +113,7 @@ void sort_alDead(std::vector<DeadKey*> &small_Vec, std::vector<DeadKey*> *p_All_
 	small_Vec = small_sorted;
 }
 
-/* _S2 probably not needed  //_S2 REVIEW this is for testing only and needs to go later
-std::vector<DeadKey*> reduce_alDead(std::vector<DeadKey*> dk_big) {
-	std::vector<DeadKey*> dk_small;
-	bool foundInSmall=false;
-
-	for ( int i=1; i<dk_big.size()-1;i++) {
-		// _S2 this needs to be good for all kbds
-		if( (dk_big[i]->KMX_DeadCharacter()==94 || dk_big[i]->KMX_DeadCharacter()==96 || dk_big[i]->KMX_DeadCharacter()==180|| dk_big[i]->KMX_DeadCharacter()==126|| dk_big[i]->KMX_DeadCharacter()==168)) {
-			for( int k=0; k< dk_small.size();k++) {
-				if(dk_big[i]->KMX_DeadCharacter()   == dk_small[k]->KMX_DeadCharacter())
-					foundInSmall=true;
-			}
-		if(!foundInSmall)
-			dk_small.push_back(dk_big[i]);
-		foundInSmall=false;
-		}
-	}
-	return dk_small;
-}
-*/
-// _S2 DEADKEY STUFF - DO NOT REVIEW YET
-// _S2 might be used when deadkeys are implemented . is it correct??
+// _S2 TODO might be used when deadkeys are implemented . is it correct??
 KMX_DWORD KMX_changeKeynameToCapital(KMX_DWORD KVal, KMX_DWORD &shift, GdkKeymap* keymap) {
   guint Keyval = (guint) KVal;
   GdkKeymapKey* keys;
@@ -156,16 +134,14 @@ KMX_DWORD KMX_changeKeynameToCapital(KMX_DWORD KVal, KMX_DWORD &shift, GdkKeymap
 	return Name;
 }	
 
-// _S2 DEADKEY STUFF - DO NOT REVIEW YET
 // _S2 DESIGN NEEDED is this the right place to get dk from? if not wher are they stored?
 KMX_DWORD create_DKTable(v_dw_2D & dk_ComposeTable) {
 
   // values taken from: https://help.ubuntu.com/community/GtkDeadKeyTable#Latin
-  //dk_ComposeTable[i][0] : First
-  //dk_ComposeTable[i][1] : Second
-  //dk_ComposeTable[i][3] : Unicode-Value
-  //dk_ComposeTable[i][4] : Character
-
+  //dk_ComposeTable[i][0] : First    (e.g. dead_circumflex)
+  //dk_ComposeTable[i][1] : Second   (e.g. a)
+  //dk_ComposeTable[i][3] : Unicode-Value   (e.g. 0x00E2)
+  //dk_ComposeTable[i][4] : Character   (e.g. small A with circumflex)
   v_dw_1D line;
 
 	line = createLine(L"dead_circumflex",  L"a",  0x00E2, L"small A with circumflex");

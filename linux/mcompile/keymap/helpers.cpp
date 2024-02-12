@@ -1152,6 +1152,200 @@ KMX_DWORD KMX_get_KeyvalsUnderlying_From_KeyCodeUnderlying_GDK_old(GdkKeymap *ke
 }
 */
 
+/* _S2 probably not needed  //_S2 REVIEW this is for testing only and needs to go later
+std::vector<DeadKey*> reduce_alDead(std::vector<DeadKey*> dk_big) {
+	std::vector<DeadKey*> dk_small;
+	bool foundInSmall=false;
+
+	for ( int i=1; i<dk_big.size()-1;i++) {
+		// _S2 this needs to be good for all kbds
+		if( (dk_big[i]->KMX_DeadCharacter()==94 || dk_big[i]->KMX_DeadCharacter()==96 || dk_big[i]->KMX_DeadCharacter()==180|| dk_big[i]->KMX_DeadCharacter()==126|| dk_big[i]->KMX_DeadCharacter()==168)) {
+			for( int k=0; k< dk_small.size();k++) {
+				if(dk_big[i]->KMX_DeadCharacter()   == dk_small[k]->KMX_DeadCharacter())
+					foundInSmall=true;
+			}
+		if(!foundInSmall)
+			dk_small.push_back(dk_big[i]);
+		foundInSmall=false;
+		}
+	}
+	return dk_small;
+}
+*/
+
+
+// _S2 DEADKEY STUFF - DO NOT REVIEW YET
+/*std::wstring convert_DeadkeyValues_ToChar_old(int in) {
+
+  KMX_DWORD lname;
+
+  if (in < (int) deadkey_min) {                                                // no deadkey; no Unicode
+    if (!IsKeymanUsedKeyVal(std::wstring(1, in)))
+      return L"\0";
+    return  std::wstring(1, in);
+  }
+  else {
+    std::string long_name((const char*) gdk_keyval_name (in));
+
+    if ( long_name.substr (0,2) == "U+" )                                     // U+... Unicode value
+      return  CodePointToWString(in-0x1000000);
+
+    lname = convertNamesToIntegerValue( wstring_from_string(long_name));      // 65106 => "dead_circumflex " => 94 => "^"
+
+    if (lname != returnIfCharInvalid) {
+      return std::wstring(1, lname );
+    }
+    else
+      return L"\0";
+  }
+  return L"\0";
+}*/
+
+
+ // _S2 DEADKEY STUFF - DO NOT REVIEW YET --- Do we need this at all?
+ // _S2 ToDo ToUnicodeEx needs to be replaced here
+ /* DeadKey *KMX_ProcessDeadKey(
+      UINT iKeyDead,              // The index into the VirtualKey of the dead key
+      ShiftState shiftStateDead,  // The shiftstate that contains the dead key
+      KMX_BYTE *lpKeyStateDead,       // The key state for the dead key
+      std::vector<KMX_VirtualKey*> rgKey,          // Our array of dead keys
+      bool fCapsLock,             // Was the caps lock key pressed?
+      KMX_HKL KMX_hkl,          // The keyboard layout
+      GdkKeymap *keymap) {       // _S2 keymap, The keyboard layout
+
+
+    KMX_BYTE lpKeyState[256];
+    DeadKey *deadKey = new DeadKey(rgKey[iKeyDead]->KMX_GetShiftState(shiftStateDead, fCapsLock)[0]);
+
+KMX_WCHAR sbBuffer1[16];
+  KMX_WCHAR sbBuffer2[16];
+   KMX_WCHAR sbBuffer3[16];
+   KMX_WCHAR sbBuffer4[16];
+   KMX_WCHAR sbBuffer5[16];
+      int rc1 = KMX_ToUnicodeEx(49, lpKeyState, sbBuffer1, 0, 0, keymap) ;
+      int rc4 = KMX_ToUnicodeEx(21, lpKeyState, sbBuffer4, 0, 0, keymap) ;
+      int rc3 = KMX_ToUnicodeEx( 3, lpKeyState, sbBuffer3, 0, 0, keymap) ;
+      /*int rc2 = KMX_ToUnicodeEx( 49, lpKeyState, sbBuffer2, 0, 0, keymap) ;
+      int rc5 = KMX_ToUnicodeEx( 65, lpKeyState, sbBuffer5, 0, 0, keymap) ;*/
+
+      /*int rc1 = KMX_ToUnicodeEx(192, lpKeyState, sbBuffer1, 0, 0, keymap) ;
+      int rc4 = KMX_ToUnicodeEx(220, lpKeyState, sbBuffer4, 0, 0, keymap) ;
+      int rc3 = KMX_ToUnicodeEx( 3, lpKeyState, sbBuffer3, 0, 0, keymap) ;
+      int rc2 = KMX_ToUnicodeEx( 49, lpKeyState, sbBuffer2, 0, 0, keymap) ;
+      int rc5 = KMX_ToUnicodeEx( 65, lpKeyState, sbBuffer5, 0, 0, keymap) ;*/
+
+
+
+/*
+    for (UINT iKey = 0; iKey < rgKey.size(); iKey++) {
+      if (rgKey[iKey] != NULL) {
+        KMX_WCHAR sbBuffer[16];
+
+        for (ShiftState ss = Base; ss <= KMX_MaxShiftState(); ss = (ShiftState)((int)ss+1)) {
+          int rc = 0;
+          if (ss == Menu || ss == ShftMenu) {
+            // Alt and Shift+Alt don't work, so skip them
+            continue;
+          }
+
+          for (int caps = 0; caps <= 1; caps++) {
+
+            //------_S2 To find a deadkey in a possibly messed up key ------------------------
+            // _S2 My fun does not loop to shorten keys :-((
+
+            // First the dead key
+            while (rc >= 0) {
+              // We know that this is a dead key coming up, otherwise
+              // this function would never have been called. If we do
+              // *not* get a dead key then that means the state is 
+              // messed up so we run again and again to clear it up.
+              // Risk is technically an infinite loop but per Hiroyama
+              // that should be impossible here.
+
+            rc = KMX_ToUnicodeEx(rgKey[iKeyDead]->SC(), lpKeyState, sbBuffer, ss, caps, keymap);
+            //wprintf(L"ikey: %i rc = %i\n",iKey,rc);
+            rc=-1;    //_S2
+            }
+
+            //----------------------------------------------------------------------------------
+
+            // Now fill the key state for the potential base character
+            KMX_FillKeyState(lpKeyState, ss, (caps != 0));
+
+            //----------------------------------------------------------------------------------
+
+            rc = KMX_ToUnicodeEx( rgKey[iKey]->SC(), lpKeyState, sbBuffer, ss, caps, keymap) ;
+
+            //--------- ONE character found = combined char (e.g. â ) --------------------------
+            //   ***** E.G:  ToUnicodeEx  FOUND  Â *****  //
+
+            if (rc == 1) {
+    Â */    // That was indeed a base character for our dead key.
+              // And we now have a composite character. Let's run
+              // through one more time to get the actual base 
+
+              // character that made it all possible?
+
+              // _s2 store combined char
+              //   ***** E.G:  combchar =   Â *****  //
+              /*KMX_WCHAR combchar = sbBuffer[0];
+
+              // _S2 again split to get base char ( e.g. a)
+              //   ***** E.G:  ToUnicodeEx  FOUND  A *****  //
+       rc = KMX_ToUnicodeEx(rgKey[iKey]->SC(), lpKeyState, sbBuffer, ss, caps, keymap) ;
+
+              KMX_WCHAR basechar = sbBuffer[0];
+
+              if (deadKey->KMX_DeadCharacter() == combchar) {
+                // Since the combined character is the same as the dead key,
+                // we must clear out the keyboard buffer.
+                //KMX_ClearKeyboardBuffer(VK_DECIMAL, rgKey[VK_DECIMAL]->SC(), KMX_hkl);
+                KMX_ClearKeyboardBuffer();
+              }
+
+              if ((((ss == Ctrl) || (ss == ShftCtrl)) &&
+                  (KMX_IsControlChar(basechar))) ||
+                  (basechar == combchar)) {
+                // ToUnicodeEx has an internal knowledge about those 
+                // VK_A ~ VK_Z keys to produce the control characters, 
+                // when the conversion rule is not provided in keyboard 
+                // layout files
+
+                // Additionally, dead key state is lost for some of these
+                // character combinations, for unknown reasons.
+
+                // Therefore, if the base character and combining are equal,
+                // and its a CTRL or CTRL+SHIFT state, and a control character
+                // is returned, then we do not add this "dead key" (which
+                // is not really a dead key).
+                continue;
+              }
+
+              if (!deadKey->KMX_ContainsBaseCharacter(basechar)) {
+                deadKey->KMX_AddDeadKeyRow(basechar, combchar);
+              }
+            }
+
+            //---------no valid key combi -> IGNORE ---------------------------------------------
+
+            else if (rc > 1) {
+              // Not a valid dead key combination, sorry! We just ignore it.
+            }
+
+            //---------another dead key-> IGNORE -----------------------------------------------
+            else if (rc < 0) {
+              // It's another dead key, so we ignore it (other than to flush it from the state)
+              //ClearKeyboardBuffer(VK_DECIMAL, rgKey[VK_DECIMAL]->SC(), KMX_hkl);
+              KMX_ClearKeyboardBuffer();
+            }
+          }
+        }
+      }
+    }
+    return deadKey;
+  }*/
+
+
 
 
 /*

@@ -76,8 +76,6 @@ const int KMX_ShiftStateMap[] = {
   0
 };
 
-// _S2 DEADKEY STUFF - DO NOT REVIEW YET
-
   DeadKey::DeadKey(KMX_WCHAR deadCharacter) {
     this->m_deadchar = deadCharacter;
   }
@@ -121,7 +119,7 @@ int KMX_ToUnicodeEx(guint keycode, const BYTE *lpKeyState, PKMX_WCHAR pwszBuff, 
 
   KMX_DWORD keyvals_dw= (KMX_DWORD) KMX_get_keyvals_From_Keycode(keymap, keycode, ShiftState(shift_state_pos), caps) ;
 
-  // _S2 g_free used everywhere?
+  // _S2 TODO g_free used everywhere?
   g_free(keyvals);
   g_free(maps);
 
@@ -150,7 +148,7 @@ int KMX_DeadKeyMap(int index, std::vector<DeadKey *> *deadkeys, int deadkeyBase,
 
 class KMX_VirtualKey {
 private:
-  KMX_HKL m_hkl;      // _S2 do I need this and is void* OK to assume? If I remove this, will there be changes in Data-Vectors?
+  KMX_HKL m_hkl;      // _S2 QUESTION do I need this and is void* OK to assume? If I remove this, will there be changes in Data-Vectors?
   UINT m_vk;
   UINT m_sc;
   bool m_rgfDeadKey[10][2];
@@ -162,7 +160,7 @@ public:
     this->m_sc=KMX_get_SCUnderlying_From_VKUS(virtualKey);
     this->m_hkl = hkl;
     this->m_vk = virtualKey;
-    // _S2 ToDo deadkey
+    // _S2 TODO  deadkey
     // memset(this->m_rgfDeadKey,0,sizeof(this->m_rgfDeadKey));
   }
 
@@ -207,7 +205,7 @@ public:
     this->m_rgss[(UINT)shiftState][(capsLock ? 1 : 0)] = value;
   }
 
-// _S2 why are there sometimes numbers in m_rgfDeadKey???
+// _S2 QUESTION why are there sometimes numbers in m_rgfDeadKey???
   void KMX_SetShiftState(ShiftState shiftState, std::u16string value16, bool isDeadKey, bool capsLock) {
     std::wstring value = wstring_from_u16string(value16);
     this->m_rgfDeadKey[(UINT)shiftState][(capsLock ? 1 : 0)] = isDeadKey;
@@ -276,7 +274,7 @@ public:
   bool KMX_IsKeymanUsedKey() {
     return (this->m_vk >= 0x20 && this->m_vk <= 0x5F) || (this->m_vk >= 0x88);
   }
-
+  
   UINT KMX_GetShiftStateValue(int capslock, int caps, ShiftState ss) {
      //wprintf(L"GetShiftStateValue takes capslock: %i, caps: %i, ss: %i and returns: %i \n",
      //capslock, caps, ss, (KMX_ShiftStateMap[(int)ss] |    (capslock ? (caps ? CAPITALFLAG : NOTCAPITALFLAG) : 0)));
@@ -468,150 +466,6 @@ public:
     return (ch < 0x0020) || (ch >= 0x007F && ch <= 0x009F);
   }
 
- // _S2 DEADKEY STUFF - DO NOT REVIEW YET --- Do we need this at all?
- // _S2 ToDo ToUnicodeEx needs to be replaced here
-  DeadKey *KMX_ProcessDeadKey(
-      UINT iKeyDead,              // The index into the VirtualKey of the dead key
-      ShiftState shiftStateDead,  // The shiftstate that contains the dead key
-      KMX_BYTE *lpKeyStateDead,       // The key state for the dead key
-      std::vector<KMX_VirtualKey*> rgKey,          // Our array of dead keys
-      bool fCapsLock,             // Was the caps lock key pressed?
-      KMX_HKL KMX_hkl,          // The keyboard layout
-      GdkKeymap *keymap) {       // _S2 keymap, The keyboard layout
-
-
-    KMX_BYTE lpKeyState[256];
-    DeadKey *deadKey = new DeadKey(rgKey[iKeyDead]->KMX_GetShiftState(shiftStateDead, fCapsLock)[0]);
-
-KMX_WCHAR sbBuffer1[16];
-  KMX_WCHAR sbBuffer2[16];
-   KMX_WCHAR sbBuffer3[16];
-   KMX_WCHAR sbBuffer4[16];
-   KMX_WCHAR sbBuffer5[16];
-      int rc1 = KMX_ToUnicodeEx(49, lpKeyState, sbBuffer1, 0, 0, keymap) ;
-      int rc4 = KMX_ToUnicodeEx(21, lpKeyState, sbBuffer4, 0, 0, keymap) ;
-      int rc3 = KMX_ToUnicodeEx( 3, lpKeyState, sbBuffer3, 0, 0, keymap) ;
-      /*int rc2 = KMX_ToUnicodeEx( 49, lpKeyState, sbBuffer2, 0, 0, keymap) ;
-      int rc5 = KMX_ToUnicodeEx( 65, lpKeyState, sbBuffer5, 0, 0, keymap) ;*/
-
-      /*int rc1 = KMX_ToUnicodeEx(192, lpKeyState, sbBuffer1, 0, 0, keymap) ;
-      int rc4 = KMX_ToUnicodeEx(220, lpKeyState, sbBuffer4, 0, 0, keymap) ;
-      int rc3 = KMX_ToUnicodeEx( 3, lpKeyState, sbBuffer3, 0, 0, keymap) ;
-      int rc2 = KMX_ToUnicodeEx( 49, lpKeyState, sbBuffer2, 0, 0, keymap) ;
-      int rc5 = KMX_ToUnicodeEx( 65, lpKeyState, sbBuffer5, 0, 0, keymap) ;*/
-
-
-
-
-    for (UINT iKey = 0; iKey < rgKey.size(); iKey++) {
-      if (rgKey[iKey] != NULL) {
-        KMX_WCHAR sbBuffer[16];
-
-        for (ShiftState ss = Base; ss <= KMX_MaxShiftState(); ss = (ShiftState)((int)ss+1)) {
-          int rc = 0;
-          if (ss == Menu || ss == ShftMenu) {
-            // Alt and Shift+Alt don't work, so skip them
-            continue;
-          }
-
-          for (int caps = 0; caps <= 1; caps++) {
-
-            //------_S2 To find a deadkey in a possibly messed up key ------------------------
-            // _S2 My fun does not loop to shorten keys :-((
-
-            // First the dead key
-            while (rc >= 0) {
-              // We know that this is a dead key coming up, otherwise
-              // this function would never have been called. If we do
-              // *not* get a dead key then that means the state is 
-              // messed up so we run again and again to clear it up.
-              // Risk is technically an infinite loop but per Hiroyama
-              // that should be impossible here.
-
-            rc = KMX_ToUnicodeEx(rgKey[iKeyDead]->SC(), lpKeyState, sbBuffer, ss, caps, keymap);
-            //wprintf(L"ikey: %i rc = %i\n",iKey,rc);
-            rc=-1;    //_S2
-            }
-
-            //----------------------------------------------------------------------------------
-
-            // Now fill the key state for the potential base character
-            KMX_FillKeyState(lpKeyState, ss, (caps != 0));
-
-            //----------------------------------------------------------------------------------
-
-            rc = KMX_ToUnicodeEx( rgKey[iKey]->SC(), lpKeyState, sbBuffer, ss, caps, keymap) ;
-
-            //--------- ONE character found = combined char (e.g. â ) --------------------------
-            //   ***** E.G:  ToUnicodeEx  FOUND  Â *****  //
-
-            if (rc == 1) {
-   /* Â */    // That was indeed a base character for our dead key.
-              // And we now have a composite character. Let's run
-              // through one more time to get the actual base 
-
-              // character that made it all possible?
-
-              // _s2 store combined char
-              //   ***** E.G:  combchar =   Â *****  //
-              KMX_WCHAR combchar = sbBuffer[0];
-
-              // _S2 again split to get base char ( e.g. a)
-              //   ***** E.G:  ToUnicodeEx  FOUND  A *****  //
-    /* A */   rc = KMX_ToUnicodeEx(rgKey[iKey]->SC(), lpKeyState, sbBuffer, ss, caps, keymap) ;
-
-              KMX_WCHAR basechar = sbBuffer[0];
-
-              if (deadKey->KMX_DeadCharacter() == combchar) {
-                // Since the combined character is the same as the dead key,
-                // we must clear out the keyboard buffer.
-                //KMX_ClearKeyboardBuffer(VK_DECIMAL, rgKey[VK_DECIMAL]->SC(), KMX_hkl);
-                KMX_ClearKeyboardBuffer();
-              }
-
-              if ((((ss == Ctrl) || (ss == ShftCtrl)) &&
-                  (KMX_IsControlChar(basechar))) ||
-                  (basechar == combchar)) {
-                // ToUnicodeEx has an internal knowledge about those 
-                // VK_A ~ VK_Z keys to produce the control characters, 
-                // when the conversion rule is not provided in keyboard 
-                // layout files
-
-                // Additionally, dead key state is lost for some of these
-                // character combinations, for unknown reasons.
-
-                // Therefore, if the base character and combining are equal,
-                // and its a CTRL or CTRL+SHIFT state, and a control character
-                // is returned, then we do not add this "dead key" (which
-                // is not really a dead key).
-                continue;
-              }
-
-              if (!deadKey->KMX_ContainsBaseCharacter(basechar)) {
-                deadKey->KMX_AddDeadKeyRow(basechar, combchar);
-              }
-            }
-
-            //---------no valid key combi -> IGNORE ---------------------------------------------
-
-            else if (rc > 1) {
-              // Not a valid dead key combination, sorry! We just ignore it.
-            }
-
-            //---------another dead key-> IGNORE -----------------------------------------------
-            else if (rc < 0) {
-              // It's another dead key, so we ignore it (other than to flush it from the state)
-              //ClearKeyboardBuffer(VK_DECIMAL, rgKey[VK_DECIMAL]->SC(), KMX_hkl);
-              KMX_ClearKeyboardBuffer();
-            }
-          }
-        }
-      }
-    }
-    return deadKey;
-  }
-
-
   void KMX_ClearKeyboardBuffer() {
     KMX_WCHAR sb[16];
     for( int i=0; i<16; i++) {
@@ -656,7 +510,7 @@ bool KMX_ImportRules(LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, GdkKeymap **keymap,
 
   //_S2 REVIEW
    std::vector<DeadKey*> alDead2 ;
-   std::vector<DeadKey*> alDead_cpl = create_alDead();    // _S2 finds all possible dk combinations that exist - will be refined to those used in the underlying keyboard
+   std::vector<DeadKey*> alDead_cpl = create_alDead();
 
   rgKey.resize(256);
 
@@ -734,7 +588,7 @@ bool KMX_ImportRules(LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, GdkKeymap **keymap,
 
           KMX_DWORD SC_US = KMX_get_KeyCodeUnderlying_From_VKUS(iKey);
 
-          // _S2 deadkey not finished; Ctrl, Shft +40 not tested
+          // _S2 TODO deadkey not finished; Ctrl, Shft +40 not tested
           for(int caps = 0; caps <= 1; caps++) {
             loader.KMX_ClearKeyboardBuffer();
             loader.KMX_FillKeyState(lpKeyState, ss, (caps == 0));
@@ -771,30 +625,24 @@ bool KMX_ImportRules(LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, GdkKeymap **keymap,
             }
           }
           else if(rc < 0) {
-            //wprintf(L"iKey: %i- ss: %i, caps: %i - bsBuffer[0] = %i\n", iKey, ss, caps,sbBuffer[0]);
-            //_S2 TODO
             sbBuffer[2] = 0;
             //rgKey[iKey]->SetShiftState(ss, sbBuffer, true, (caps == 0));
-            rgKey[iKey]->KMX_SetShiftState(ss, sbBuffer, true, (caps ));
-            //wprintf(L"rc<0 for iKey nr. %i (%c) \n",iKey,iKey );
+            rgKey[iKey]->KMX_SetShiftState(ss, sbBuffer, true, (caps ));   //_S2
 
             // It's a dead key; let's flush out whats stored in the keyboard state.
             loader.KMX_ClearKeyboardBuffer();
             DeadKey *dk = NULL;
-            Create_alDead(sbBuffer[0], alDead, &alDead_cpl);
+            refine_alDead(sbBuffer[0], alDead, &alDead_cpl);
             int testI= alDead.size();
 
            /* for(UINT iDead = 0; iDead < alDead.size(); iDead++) {
                 dk = alDead[iDead];
-                KMX_WCHAR dktest1 = dk->KMX_DeadCharacter();                             // _S2 can go later ; just for testing
-                KMX_WCHAR dktest2 = rgKey[iKey]->KMX_GetShiftState(ss, caps == 0)[0];    // _S2 can go later ; just for testing
                 if(dk->KMX_DeadCharacter() == rgKey[iKey]->KMX_GetShiftState(ss, caps == 0)[0]) {
                     break;
                 }
                 dk = NULL;
             }
             if(dk == NULL) {
-              //_S2 TODO
               //alDead.push_back(loader.KMX_ProcessDeadKey(iKey, ss, lpKeyState, rgKey, caps == 0, hkl, *keymap));
               alDead2 = create_alDead();
               alDead = reduce_alDead(alDead2);
@@ -808,7 +656,7 @@ bool KMX_ImportRules(LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, GdkKeymap **keymap,
       }
     }
   }
-  // _S2 do we need to sort alDead??
+  //  do we need to sort alDead??
   sort_alDead(alDead, &alDead_cpl) ;
 
   //_S2 this gan co later

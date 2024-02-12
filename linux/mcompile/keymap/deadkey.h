@@ -12,11 +12,16 @@ v_dw_1D createLine(std::wstring  first, std::wstring second, KMX_DWORD number, s
 // creates a 2D-vector of all dk combinations ( ` + a -> à ;  ^ + a -> â ; `+ e -> è; ...)
 KMX_DWORD create_DKTable(v_dw_2D & dk_ComposeTable);
 
-//_S2 REVIEW
+//_S2 TODO REVIEW
+//_S2 finds all possible dk combinations that exist
 std::vector<DeadKey*> create_alDead();
+//_S2 refines dk to those used in the underlying keyboard
+void refine_alDead(KMX_WCHAR dk, std::vector<DeadKey*> &myVec, std::vector<DeadKey*> *p_All_Vec);
+
+// _S2 TODO maybe not used
 std::vector<DeadKey*> reduce_alDead(std::vector<DeadKey*> dk_big);
 
-void Create_alDead(KMX_WCHAR dk, std::vector<DeadKey*> &myVec, std::vector<DeadKey*> *p_All_Vec);
+
 void sort_alDead(std::vector<DeadKey*> &myVec, std::vector<DeadKey*> *p_All_Vec);
 bool found_dk_inVector(KMX_WCHAR dk, std::vector<DeadKey*> &myVec);
 

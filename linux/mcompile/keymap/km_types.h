@@ -72,7 +72,7 @@ typedef int           BOOL;
 // PVOID A pointer to any type.
 // typedef PVOID HANDLE;
 // typedef HANDLE HKL;
-typedef void* KMX_HKL;                  // _S2 what is the equivalent to HKL and do I need it?? I assume a void*
+typedef void* KMX_HKL;                  // _S2 QUESTION what is the equivalent to HKL and do I need it?? I assume a void*
 
 
 #ifndef FALSE

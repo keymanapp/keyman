@@ -358,8 +358,7 @@ bool InitializeGDK(GdkKeymap **keymap,int argc, gchar *argv[]) {
 }
 
 //------------------------------
-// _S2 DEADKEY STUFF - DO NOT REVIEW YET
-// _S2 ToDo deadkeys. Do we need this ?
+// _S2 TODO  deadkeys. Do we need this ?
 bool IsKeymanUsedKeyVal(std::wstring Keyval) {
   int KV = (int) (*Keyval.c_str());
 
@@ -396,35 +395,7 @@ bool IsKeymanUsedChar(int KV) {
     return false;
 }
 
-// _S2 DEADKEY STUFF - DO NOT REVIEW YET
-std::wstring convert_DeadkeyValues_ToChar_old(int in) {
 
-  KMX_DWORD lname;
-
-  if (in < (int) deadkey_min) {                                                // no deadkey; no Unicode
-    if (!IsKeymanUsedKeyVal(std::wstring(1, in)))
-      return L"\0";
-    return  std::wstring(1, in);
-  }
-  else {
-    std::string long_name((const char*) gdk_keyval_name (in));
-
-    if ( long_name.substr (0,2) == "U+" )                                     // U+... Unicode value
-      return  CodePointToWString(in-0x1000000);
-
-    lname = convertNamesToIntegerValue( wstring_from_string(long_name));      // 65106 => "dead_circumflex " => 94 => "^"
-
-    if (lname != returnIfCharInvalid) {
-      return std::wstring(1, lname );
-    }
-    else
-      return L"\0";
-  }
-  return L"\0";
-}
-
-
-// _S2 DEADKEY STUFF - DO NOT REVIEW YET
 std::wstring convert_DeadkeyValues_ToChar(int in) {
 
   KMX_DWORD lname;
@@ -451,7 +422,7 @@ std::wstring convert_DeadkeyValues_ToChar(int in) {
     else
       return L"\0";
 }
-
+//_S2 REview and change??
 std::u16string convert_DeadkeyValues_To_U16str(int in) {
 
   KMX_DWORD lname;
@@ -587,7 +558,7 @@ KMX_DWORD KMX_get_KeyvalsUnderlying_From_KeyCodeUnderlying_GDK(GdkKeymap *keymap
   if (!(keycode <= 94))
     return 0;
 
-  // _S2 take caps to this function
+  // _S2 TODO take caps to this function
   // here I get all kvals: normal char , my Deadkeys, allothr DK
   KMX_DWORD All_Keyvals = KMX_get_keyvals_From_Keycode(keymap, keycode, ShiftState(shift_state_pos), 0)  ;
   //wprintf(L"All_Keyvals: %i----\n", All_Keyvals);
@@ -601,7 +572,7 @@ KMX_DWORD KMX_get_KeyvalsUnderlying_From_KeyCodeUnderlying_GDK(GdkKeymap *keymap
   out = KMX_get_FFFF_Underlying_according_to_keycode_and_Shiftstate_GDK_dw(keymap, keycode, (ShiftState)  shift_state_pos, 0);
   //wprintf(L" out is :.....................................%i\n", out);
 
-  // _S2 g_free used everywhere?
+  // _S2 TODO g_free used everywhere?
   g_free(keyvals);
   g_free(maps);
 
@@ -625,7 +596,7 @@ KMX_DWORD KMX_get_KeyvalsUnderlying_From_KeyCodeUnderlying_GDK(GdkKeymap *keymap
 
   out = KMX_get_CharsUnderlying_according_to_keycode_and_Shiftstate_GDK_dw(keymap, keycode, (ShiftState) shift_state_pos, 0);
 
-  // _S2 g_free used everywhere?
+  // _S2 TODO g_free used everywhere?
   g_free(keyvals);
   g_free(maps);
 
@@ -638,9 +609,7 @@ KMX_DWORD KMX_get_FFFF_Underlying_according_to_keycode_and_Shiftstate_GDK_dw(Gdk
   KMX_DWORD keyvals_dw= (KMX_DWORD) KMX_get_keyvals_From_Keycode(keymap, keycode, ss, caps) ;
   
   // _S2 AHA output for dk4-12 at the top after dk... from here
-  // _S2 only for testing
-  if((keyvals_dw >=  deadkey_min) && (keyvals_dw <=  deadkey_max))
-  //if((keyvals_dw >=  65104) && (keyvals_dw <=  65106))                                    // deadkeys
+  if((keyvals_dw >=  deadkey_min) && (keyvals_dw <=  deadkey_max))                                    // deadkeys
     return 0xFFFF;
   else if((keyvals_dw >  deadkey_max) || ((keyvals_dw <  deadkey_min)  &&  ( keyvals_dw > 0xFF)))     // out of range
     return 0xFFFE;
@@ -655,7 +624,7 @@ KMX_DWORD KMX_get_CharsUnderlying_according_to_keycode_and_Shiftstate_GDK_dw(Gdk
 
 std::wstring KMX_get_CharsUnderlying_according_to_keycode_and_Shiftstate_GDK(GdkKeymap *keymap, guint keycode, ShiftState ss, int caps){
 
-  // _S2 skip ss 2+3  remove??
+  // _S2 QUESTION skip ss 2+3  remove??
   if( (ss ==2 ) ||(ss ==3 ))
     return L"\0";
 
@@ -689,7 +658,7 @@ KMX_DWORD KMX_get_VKUS_From_KeyCodeUnderlying_GDK( GdkKeymap *keymap, KMX_DWORD 
     if ( keyvals[i]>0)
       gdk_keyval_convert_case (*kv_name, &lowerCase, &upperCase);
 
-    // _S2 is ( lowerCase == upperCase )  true for all number keys for all keyboards?
+    // _S2 QUESTION is ( lowerCase == upperCase )  true for all number keys for all keyboards?
     if ( lowerCase == upperCase )
       return (KMX_DWORD) upperCase;
   }
@@ -698,7 +667,7 @@ KMX_DWORD testvar_S2 =  ScanCodeToUSVirtualKey[keycode-8];
   if ( keycode >7)
     return  (KMX_DWORD) ScanCodeToUSVirtualKey[keycode-8];
 
-  return 0;   //_S2 what to return if not found
+  return 0;
 }
 
 KMX_DWORD KMX_get_KeyCodeUnderlying_From_VKUS( KMX_DWORD VK_US) {

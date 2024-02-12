@@ -31,7 +31,7 @@ public:
     return this->m_rgcombchar[index];
   }
 
-  // _S2 only use one
+  // _S2 TODO  only use one
   bool ContainsBaseCharacter(WCHAR baseCharacter);
 
   bool KMX_ContainsBaseCharacter(KMX_WCHAR baseCharacter) ;
