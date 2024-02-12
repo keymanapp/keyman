@@ -34,7 +34,7 @@ function do_build() {
   tsc -b
 
   # Declaration bundling.
-  tsc --emitDeclarationOnly --outFile ./build/lib/index.d.ts
+  tsc -p src/main/tsconfig.json --emitDeclarationOnly --outFile ./build/lib/index.d.ts
 }
 
 function do_test() {
