@@ -135,6 +135,9 @@
     <ClCompile Include="CoreEnvironment.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="appcontext.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="KEYMAN32.DEF">
@@ -241,6 +244,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="kmprocessactions.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="appcontext.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
