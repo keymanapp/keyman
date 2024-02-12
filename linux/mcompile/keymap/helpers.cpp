@@ -1346,6 +1346,102 @@ KMX_WCHAR sbBuffer1[16];
   }*/
 
 
+// _S2 can go later
+/*void  test_keyboard_S2(LPKMX_KEYBOARD kmxfile);
+void TestKey_S2(LPKMX_KEY key) ;
+void TestGroup_S2(LPKMX_GROUP group) ;
+void TestKeyboard_S2(LPKMX_KEYBOARD kbd) ;*/
+
+
+// _S2 can go later
+/*void test_keyboard_S2(LPKMX_KEYBOARD kmxfile){
+  TestKeyboard_S2(kmxfile);
+}
+
+void TestKey_S2(LPKMX_KEY key, int iii, int gr) {
+
+  KMX_WCHAR* PP= key->dpOutput;
+  int z=0;
+
+  if( *(key->dpOutput+1) != 0) {
+    wprintf(L"\n     group[%i]      dpKeyArray[%i]  ",gr, iii);
+    int tzuiop=0;
+    do {
+      wprintf(L"%i\t", *(PP+z ));
+      z++;
+    } while (*(PP+z) !=0);
+  }
+  //if ((*(PP+z) !=0)) wprintf(L" _\n");
+}
+
+void TestGroup_S2(LPKMX_GROUP group ,int gr) {
+  for(unsigned int i = 0; i < group->cxKeyArray; i++) {
+    TestKey_S2(&group->dpKeyArray[i],i,gr);
+  }
+}
+
+void TestKeyboard_S2(LPKMX_KEYBOARD kbd) {
+ for(unsigned int i = 0; i < kbd->cxGroupArray; i++) {
+    if(kbd->dpGroupArray[i].fUsingKeys) {
+      wprintf(L"\nkbd->dpGroupArray[%i]  \n",i);
+      TestGroup_S2(&kbd->dpGroupArray[i], i);
+    }
+  }
+}*/
+
+/*void check_rgkey_S2( std::vector<KMX_VirtualKey*> rgKey, int i) {
+
+  wprintf(L" rgfDeadkey[%i]:  \t%i %i %i %i %i %i %i %i %i %i\n", i,
+  rgKey[i]->get_m_rgfDeadkey(0,0), rgKey[i]->get_m_rgfDeadkey(0,1), 
+  rgKey[i]->get_m_rgfDeadkey(1,0), rgKey[i]->get_m_rgfDeadkey(1,1),
+  rgKey[i]->get_m_rgfDeadkey(2,0), rgKey[i]->get_m_rgfDeadkey(2,1),
+  rgKey[i]->get_m_rgfDeadkey(3,0), rgKey[i]->get_m_rgfDeadkey(3,1),
+  rgKey[i]->get_m_rgfDeadkey(4,0), rgKey[i]->get_m_rgfDeadkey(4,1),
+  rgKey[i]->get_m_rgfDeadkey(5,0), rgKey[i]->get_m_rgfDeadkey(5,1),
+  rgKey[i]->get_m_rgfDeadkey(6,0), rgKey[i]->get_m_rgfDeadkey(6,1),
+  rgKey[i]->get_m_rgfDeadkey(7,0), rgKey[i]->get_m_rgfDeadkey(7,1),
+  rgKey[i]->get_m_rgfDeadkey(8,0), rgKey[i]->get_m_rgfDeadkey(8,1),
+  rgKey[i]->get_m_rgfDeadkey(9,0), rgKey[i]->get_m_rgfDeadkey(9,1));
+}
+
+*/
+
+/*void TestKey_S21(LPKMX_KEY key, int iii, int gr) {
+
+  KMX_WCHAR* PP= key->dpOutput;
+  int z=0;
+
+  if( *(key->dpOutput+1) != 0) {
+    wprintf(L"\n     group[%i]      dpKeyArray[%i] (key->key: %i) ",gr, iii, key->Key);
+    int tzuiop=0;
+    do {
+      wprintf(L"%i\t", *(PP+z ));
+      z++;
+    } while (*(PP+z) !=0);
+  }
+  //if ((*(PP+z) !=0)) wprintf(L" _\n");
+}
+
+void TestGroup_S21(LPKMX_GROUP group ,int gr) {
+  for(unsigned int i = 0; i < group->cxKeyArray; i++) {
+    TestKey_S21(&group->dpKeyArray[i],i,gr);
+  }
+}
+
+void TestKeyboard_S21(LPKMX_KEYBOARD kbd) {
+ for(unsigned int i = 0; i < kbd->cxGroupArray; i++) {
+    if(kbd->dpGroupArray[i].fUsingKeys) {
+      wprintf(L"\nkbd->dpGroupArray[%i]  \n",i);
+      TestGroup_S21(&kbd->dpGroupArray[i], i);
+    }
+  }
+}
+// _S2 can go later
+void test_keyboard_S21(LPKMX_KEYBOARD kmxfile){
+  //TestKeyboard_S21(kmxfile);
+}*/
+
+
 
 
 /*

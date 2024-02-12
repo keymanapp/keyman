@@ -10,9 +10,10 @@ v_dw_1D createLine(std::wstring  first, std::wstring second, KMX_DWORD number, s
 	return line;
 }
 
-bool find_dk_combinations_for_single_dk(v_dw_2D * p_dk_ComposeTable, v_dw_2D  &dk_SingleTable, KMX_DWORD dk) {
+bool find_dk_combinations_for_specific_dk(v_dw_2D * p_dk_ComposeTable, v_dw_2D  &dk_SingleTable, KMX_DWORD dk) {
 	v_dw_1D line;
 	for ( int i =0; i< (int) (*p_dk_ComposeTable).size(); i++) {
+		// _S2 QUESTION is there a better way to find a-z,A-Z?
 		// _S2 QUESTION is there a better way to find a-z,A-Z?
 		//if (((*p_dk_ComposeTable)[i][0] == dk) ) {
 		if (((*p_dk_ComposeTable)[i][0] == dk) && (IsKeymanUsedChar((*p_dk_ComposeTable)[i][1]))) {
@@ -29,11 +30,10 @@ bool find_dk_combinations_for_single_dk(v_dw_2D * p_dk_ComposeTable, v_dw_2D  &d
 		return false;
 }
 
-//_S2 REVIEW
 std::vector<DeadKey*> create_alDead() {
 	std::vector<DeadKey*> alDead;
 	v_dw_2D dk_ComposeTable;
-  KMX_DWORD dw = create_DKTable(dk_ComposeTable);
+  create_DKTable(dk_ComposeTable);
 
 	for( int i=0; i< dk_ComposeTable.size()-1; i++) {
 		DeadKey *dk2= new DeadKey(dk_ComposeTable[i][0]);
@@ -61,8 +61,6 @@ bool found_dk_inVector(KMX_WCHAR dk, std::vector<DeadKey*> &dkVec) {
 }
 
 void refine_alDead(KMX_WCHAR dk, std::vector<DeadKey*> &dkVec, std::vector<DeadKey*> *p_All_Vec) {
-	std::vector<DeadKey*> dkVec_unsorted;
-
 	if( dk == 0)
 		return;
 
@@ -75,23 +73,12 @@ void refine_alDead(KMX_WCHAR dk, std::vector<DeadKey*> &dkVec, std::vector<DeadK
 			else return;
 		}
 	}
-
-	for (int j=0; j< (*p_All_Vec).size()-1;j++) {
-		if( dk == (*p_All_Vec)[j]->KMX_GetDeadCharacter()) {
-			if(! found_dk_inVector(dk, dkVec_unsorted)) {
-				dkVec_unsorted.push_back((*p_All_Vec)[j]);
-				return;
-			}
-			else return;
-		}
-	}
 }
 
 void sort_alDead(std::vector<DeadKey*> &small_Vec, std::vector<DeadKey*> *p_All_Vec) {
 
 	std::vector<DeadKey*> small_sorted;
 	int Vsmall_size;
-
 	int i=0;
 
 	do {
@@ -99,20 +86,19 @@ void sort_alDead(std::vector<DeadKey*> &small_Vec, std::vector<DeadKey*> *p_All_
 		Vsmall_size= small_Vec.size();
 
 		do {
-			if( (*p_All_Vec)[i]->KMX_DeadCharacter() == small_Vec[j]->KMX_DeadCharacter()) {
+			if((*p_All_Vec)[i]->KMX_DeadCharacter() == small_Vec[j]->KMX_DeadCharacter()) {
 				small_sorted.push_back(small_Vec[j]);
 				small_Vec.erase(std::next(small_Vec.begin()+j-1));
 				Vsmall_size--;
 			}
 			j++;
 		} while (j< Vsmall_size);
-
 		i++;
 	} while ((i< (*p_All_Vec).size()) && (Vsmall_size>0));
-
 	small_Vec = small_sorted;
 }
 
+// _S2 TODO might be used when deadkeys are implemented . is it correct??
 // _S2 TODO might be used when deadkeys are implemented . is it correct??
 KMX_DWORD KMX_changeKeynameToCapital(KMX_DWORD KVal, KMX_DWORD &shift, GdkKeymap* keymap) {
   guint Keyval = (guint) KVal;
@@ -135,13 +121,14 @@ KMX_DWORD KMX_changeKeynameToCapital(KMX_DWORD KVal, KMX_DWORD &shift, GdkKeymap
 }	
 
 // _S2 DESIGN NEEDED is this the right place to get dk from? if not wher are they stored?
-KMX_DWORD create_DKTable(v_dw_2D & dk_ComposeTable) {
+void create_DKTable(v_dw_2D & dk_ComposeTable) {
 
-  // values taken from: https://help.ubuntu.com/community/GtkDeadKeyTable#Latin
+  //values taken from: https://help.ubuntu.com/community/GtkDeadKeyTable#Latin
   //dk_ComposeTable[i][0] : First    (e.g. dead_circumflex)
   //dk_ComposeTable[i][1] : Second   (e.g. a)
   //dk_ComposeTable[i][3] : Unicode-Value   (e.g. 0x00E2)
   //dk_ComposeTable[i][4] : Character   (e.g. small A with circumflex)
+
   v_dw_1D line;
 
 	line = createLine(L"dead_circumflex",  L"a",  0x00E2, L"small A with circumflex");
@@ -504,7 +491,5 @@ KMX_DWORD create_DKTable(v_dw_2D & dk_ComposeTable) {
 	  dk_ComposeTable.push_back(line);	line.clear();
 	line = createLine(L"dead_tilde",  L"dead_tilde",  0x007E, L"TILDE");
 	  dk_ComposeTable.push_back(line);	line.clear();
-
-  return 0;
 }
 

@@ -27,42 +27,6 @@
 #include "mc_kmxfile.h"
 #include "keymap.h"
 
-void TestKey_S21(LPKMX_KEY key, int iii, int gr) {
-
-  KMX_WCHAR* PP= key->dpOutput;
-  int z=0;
-
-  if( *(key->dpOutput+1) != 0) {
-    wprintf(L"\n     group[%i]      dpKeyArray[%i] (key->key: %i) ",gr, iii, key->Key);
-    int tzuiop=0;
-    do {
-      wprintf(L"%i\t", *(PP+z ));
-      z++;
-    } while (*(PP+z) !=0);
-  }
-  //if ((*(PP+z) !=0)) wprintf(L" _\n");
-}
-
-void TestGroup_S21(LPKMX_GROUP group ,int gr) {
-  for(unsigned int i = 0; i < group->cxKeyArray; i++) {
-    TestKey_S21(&group->dpKeyArray[i],i,gr);
-  }
-}
-
-void TestKeyboard_S21(LPKMX_KEYBOARD kbd) {
- for(unsigned int i = 0; i < kbd->cxGroupArray; i++) {
-    if(kbd->dpGroupArray[i].fUsingKeys) {
-      wprintf(L"\nkbd->dpGroupArray[%i]  \n",i);
-      TestGroup_S21(&kbd->dpGroupArray[i], i);
-    }
-  }
-}
-// _S2 can go later
-void test_keyboard_S21(LPKMX_KEYBOARD kmxfile){
-  //TestKeyboard_S21(kmxfile);
-}
-
-
 const int KMX_ShiftStateMap[] = {
   ISVIRTUALKEY,
   ISVIRTUALKEY | K_SHIFTFLAG,
@@ -117,9 +81,8 @@ int KMX_ToUnicodeEx(guint keycode, const BYTE *lpKeyState, PKMX_WCHAR pwszBuff, 
   std::wstring character= KMX_get_CharsUnderlying_according_to_keycode_and_Shiftstate_GDK(keymap, keycode, ShiftState(shift_state_pos), caps);
   pwszBuff[0]= * (PKMX_WCHAR)  u16string_from_wstring(character).c_str();
 
-  KMX_DWORD keyvals_dw= (KMX_DWORD) KMX_get_keyvals_From_Keycode(keymap, keycode, ShiftState(shift_state_pos), caps) ;
+  KMX_DWORD keyvals_dw= (KMX_DWORD) KMX_get_keyvals_From_Keycode(keymap, keycode, ShiftState(shift_state_pos), caps);
 
-  // _S2 TODO g_free used everywhere?
   g_free(keyvals);
   g_free(maps);
 
@@ -149,6 +112,7 @@ int KMX_DeadKeyMap(int index, std::vector<DeadKey *> *deadkeys, int deadkeyBase,
 class KMX_VirtualKey {
 private:
   KMX_HKL m_hkl;      // _S2 QUESTION do I need this and is void* OK to assume? If I remove this, will there be changes in Data-Vectors?
+  KMX_HKL m_hkl;      // _S2 QUESTION do I need this and is void* OK to assume? If I remove this, will there be changes in Data-Vectors?
   UINT m_vk;
   UINT m_sc;
   bool m_rgfDeadKey[10][2];
@@ -160,6 +124,7 @@ public:
     this->m_sc=KMX_get_SCUnderlying_From_VKUS(virtualKey);
     this->m_hkl = hkl;
     this->m_vk = virtualKey;
+    // _S2 TODO  deadkey
     // _S2 TODO  deadkey
     // memset(this->m_rgfDeadKey,0,sizeof(this->m_rgfDeadKey));
   }
@@ -205,6 +170,7 @@ public:
     this->m_rgss[(UINT)shiftState][(capsLock ? 1 : 0)] = value;
   }
 
+// _S2 QUESTION why are there sometimes numbers in m_rgfDeadKey???
 // _S2 QUESTION why are there sometimes numbers in m_rgfDeadKey???
   void KMX_SetShiftState(ShiftState shiftState, std::u16string value16, bool isDeadKey, bool capsLock) {
     std::wstring value = wstring_from_u16string(value16);
@@ -276,11 +242,7 @@ public:
   }
   
   UINT KMX_GetShiftStateValue(int capslock, int caps, ShiftState ss) {
-     //wprintf(L"GetShiftStateValue takes capslock: %i, caps: %i, ss: %i and returns: %i \n",
-     //capslock, caps, ss, (KMX_ShiftStateMap[(int)ss] |    (capslock ? (caps ? CAPITALFLAG : NOTCAPITALFLAG) : 0)));
-    return 
-      KMX_ShiftStateMap[(int)ss] |
-      (capslock ? (caps ? CAPITALFLAG : NOTCAPITALFLAG) : 0);
+    return KMX_ShiftStateMap[(int)ss] | (capslock ? (caps ? CAPITALFLAG : NOTCAPITALFLAG) : 0);
   }
 
   int KMX_GetKeyCount(int MaxShiftState) {
@@ -340,7 +302,7 @@ int i4 = this->KMX_IsXxxxGrCapsEqualToXxxxShift() ? 8 : 0;
         (this->KMX_IsSGCAPS() ? 2 : 0) |
         (this->KMX_IsAltGrCapsEqualToAltGrShift() ? 4 : 0) |
         (this->KMX_IsXxxxGrCapsEqualToXxxxShift() ? 8 : 0);
-//wprintf(L"capslock is: %i\n",capslock);
+
     // _S2 DESIGN NEEDED on how to replace capslock
     capslock=1;   // _S2
     // _S2 TODO capslock is not calculated correctly for linux. therefore key->ShiftFlags will be wrong for numbers, special characters
@@ -352,8 +314,7 @@ int i4 = this->KMX_IsXxxxGrCapsEqualToXxxxShift() ? 8 : 0;
       }
       for (int caps = 0; caps <= 1; caps++) {
         std::wstring st = this->KMX_GetShiftState((ShiftState) ss, (caps == 1));
-        PKMX_WCHAR p;  // was PWSTR p;
-        PKMX_WCHAR p_S2;  // was PWSTR p;
+        PKMX_WCHAR p;
 
         if (st.size() == 0) {
           // No character assigned here
@@ -364,7 +325,6 @@ int i4 = this->KMX_IsXxxxGrCapsEqualToXxxxShift() ? 8 : 0;
           key->dpContext = new KMX_WCHAR[1];
           *key->dpContext = 0;
 
-          wprintf(L"st %i  \n", st[0]);
           key->ShiftFlags = this->KMX_GetShiftStateValue(capslock, caps, (ShiftState) ss);
           // _S2 we already use VK_US so no need to convert it
           key->Key = this->VK();
@@ -377,13 +337,10 @@ int i4 = this->KMX_IsXxxxGrCapsEqualToXxxxShift() ? 8 : 0;
           } else {
 
             p = key->dpOutput = new KMX_WCHAR[4];
-            p_S2 =p;
             *p++ = UC_SENTINEL;
             *p++ = CODE_DEADKEY;
             *p++ = KMX_DeadKeyMap(st[0], deadkeys, deadkeyBase, &KMX_FDeadkeys);   // I4353
-            wprintf(L"KMX_DeadKeyMap(st[0], deadkeys, deadkeyBase, &KMX_FDeadkeys): %i\n",KMX_DeadKeyMap(st[0], deadkeys, deadkeyBase, &KMX_FDeadkeys));
             *p = 0;
-            int wertzu=57;
           }
           key++;
         } 
@@ -409,7 +366,6 @@ int i4 = this->KMX_IsXxxxGrCapsEqualToXxxxShift() ? 8 : 0;
             *key->dpContext = 0;
             p = key->dpOutput = new KMX_WCHAR[st.size() + 1];
 
-            p_S2 = key->dpContext;
             for(size_t ich = 0; ich < st.size(); ich++) {
               *p++ = st[ich];
             }
@@ -419,8 +375,6 @@ int i4 = this->KMX_IsXxxxGrCapsEqualToXxxxShift() ? 8 : 0;
         }
       }
     }
-            //wprintf(L"key->Key: %i %c\n",(key--)->Key,(key--)->Key);
-            int keyvalis= (key--)->Key;
     return true;
   }
 };
@@ -484,21 +438,6 @@ int KMX_GetMaxDeadkeyIndex(KMX_WCHAR *p) {
   return n;
 }
 
-void check_rgkey_S2( std::vector<KMX_VirtualKey*> rgKey, int i) {
-
-  wprintf(L" rgfDeadkey[%i]:  \t%i %i %i %i %i %i %i %i %i %i\n", i,
-  rgKey[i]->get_m_rgfDeadkey(0,0), rgKey[i]->get_m_rgfDeadkey(0,1), 
-  rgKey[i]->get_m_rgfDeadkey(1,0), rgKey[i]->get_m_rgfDeadkey(1,1),
-  rgKey[i]->get_m_rgfDeadkey(2,0), rgKey[i]->get_m_rgfDeadkey(2,1),
-  rgKey[i]->get_m_rgfDeadkey(3,0), rgKey[i]->get_m_rgfDeadkey(3,1),
-  rgKey[i]->get_m_rgfDeadkey(4,0), rgKey[i]->get_m_rgfDeadkey(4,1),
-  rgKey[i]->get_m_rgfDeadkey(5,0), rgKey[i]->get_m_rgfDeadkey(5,1),
-  rgKey[i]->get_m_rgfDeadkey(6,0), rgKey[i]->get_m_rgfDeadkey(6,1),
-  rgKey[i]->get_m_rgfDeadkey(7,0), rgKey[i]->get_m_rgfDeadkey(7,1),
-  rgKey[i]->get_m_rgfDeadkey(8,0), rgKey[i]->get_m_rgfDeadkey(8,1),
-  rgKey[i]->get_m_rgfDeadkey(9,0), rgKey[i]->get_m_rgfDeadkey(9,1));
-}
-
 bool KMX_ImportRules(LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, GdkKeymap **keymap, std::vector<KMX_DeadkeyMapping> *FDeadkeys, KMX_BOOL bDeadkeyConversion) {   // I4353   // I4552
   KMX_Loader loader;
 
@@ -510,6 +449,7 @@ bool KMX_ImportRules(LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, GdkKeymap **keymap,
 
   //_S2 REVIEW
    std::vector<DeadKey*> alDead2 ;
+   std::vector<DeadKey*> alDead_cpl = create_alDead();
    std::vector<DeadKey*> alDead_cpl = create_alDead();
 
   rgKey.resize(256);
@@ -589,6 +529,7 @@ bool KMX_ImportRules(LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, GdkKeymap **keymap,
           KMX_DWORD SC_US = KMX_get_KeyCodeUnderlying_From_VKUS(iKey);
 
           // _S2 TODO deadkey not finished; Ctrl, Shft +40 not tested
+          // _S2 TODO deadkey not finished; Ctrl, Shft +40 not tested
           for(int caps = 0; caps <= 1; caps++) {
             loader.KMX_ClearKeyboardBuffer();
             loader.KMX_FillKeyState(lpKeyState, ss, (caps == 0));
@@ -628,12 +569,12 @@ bool KMX_ImportRules(LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, GdkKeymap **keymap,
             sbBuffer[2] = 0;
             //rgKey[iKey]->SetShiftState(ss, sbBuffer, true, (caps == 0));
             rgKey[iKey]->KMX_SetShiftState(ss, sbBuffer, true, (caps ));   //_S2
+            rgKey[iKey]->KMX_SetShiftState(ss, sbBuffer, true, (caps ));   //_S2
 
             // It's a dead key; let's flush out whats stored in the keyboard state.
             loader.KMX_ClearKeyboardBuffer();
             DeadKey *dk = NULL;
             refine_alDead(sbBuffer[0], alDead, &alDead_cpl);
-            int testI= alDead.size();
 
            /* for(UINT iDead = 0; iDead < alDead.size(); iDead++) {
                 dk = alDead[iDead];
@@ -646,10 +587,6 @@ bool KMX_ImportRules(LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, GdkKeymap **keymap,
               //alDead.push_back(loader.KMX_ProcessDeadKey(iKey, ss, lpKeyState, rgKey, caps == 0, hkl, *keymap));
               alDead2 = create_alDead();
               alDead = reduce_alDead(alDead2);
-
-              //_S2 for each dk (^ ' `  push_back all combinations ^,â,ê,î,ô,û   ',á,é,í,ó,ú   `,à,è,ì,ò,ù into alDead->m_rgcombchar)
-              //_S2 for each dk (^ ' `  push_back all base char : _,a,e,i,o,u                              into alDead->m_rgbasechar)
-              // S2 do nothing for other keys
             }*/
           }
         }
@@ -657,27 +594,7 @@ bool KMX_ImportRules(LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, GdkKeymap **keymap,
     }
   }
   //  do we need to sort alDead??
-  sort_alDead(alDead, &alDead_cpl) ;
-
-  //_S2 this gan co later
-  /*std::vector< int > TestValues = {40,44,48,49,50,51,52,53,54,55,56,57,65,66,67,88,89,90, 186,187,188,189,191,191,192,219,220,221,222,226};
-  wprintf(L"-----------------\nNow some tests:\n");
-  wprintf(L"                  Base          Caps            Shift           Shfit+Caps     MenuCtrl         MenuCtrl+Caps \n");
-
-  for ( int i=0; i < (int) TestValues.size();i++) {
-    std::wstring wws = rgKey[TestValues[i]]->get_m_rgss(0,0);
-    wprintf(L"Results for %i / SC %i\t : %ls (%i)  \t%ls (%i)   \t%ls (%i)   \t%ls (%i)   \t%ls (%i)   \t%ls (%i)   \n",    TestValues[i), rgKey[TestValues[i]]->SC(),
-      rgKey[TestValues[i]]->get_m_rgss(0,0).c_str(), rgKey[TestValues[i]]->get_m_rgss(0,0)[0],
-      rgKey[TestValues[i]]->get_m_rgss(0,1).c_str(), rgKey[TestValues[i]]->get_m_rgss(0,1)[0],
-      rgKey[TestValues[i]]->get_m_rgss(1,0).c_str(), rgKey[TestValues[i]]->get_m_rgss(1,0)[0],
-      rgKey[TestValues[i]]->get_m_rgss(1,1).c_str(), rgKey[TestValues[i]]->get_m_rgss(1,1)[0],
-      rgKey[TestValues[i]]->get_m_rgss(6,0).c_str(), rgKey[TestValues[i]]->get_m_rgss(6,0)[0],
-      rgKey[TestValues[i]]->get_m_rgss(6,1).c_str(), rgKey[TestValues[i]]->get_m_rgss(6,1)[0],
-      rgKey[TestValues[i]]->get_m_rgss(7,0).c_str(), rgKey[TestValues[i]]->get_m_rgss(7,0)[0],
-      rgKey[TestValues[i]]->get_m_rgss(7,1).c_str(), rgKey[TestValues[i]]->get_m_rgss(7,1)[0]
-    );
-  }
-  wprintf(L"-----------------\n");*/
+  sort_alDead(alDead, &alDead_cpl);
 
   //-------------------------------------------------------------
   // Now that we've collected the key data, we need to
@@ -715,8 +632,7 @@ bool KMX_ImportRules(LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, GdkKeymap **keymap,
   for (UINT iKey = 0; iKey < rgKey.size(); iKey++) {
     if ((rgKey[iKey] != NULL) && rgKey[iKey]->KMX_IsKeymanUsedKey() && (!rgKey[iKey]->KMX_IsEmpty())) {
       nKeys+= rgKey[iKey]->KMX_GetKeyCount(loader.KMX_MaxShiftState());
-      //wprintf(L" iKey = %i, Delta:  %i -> Sum %i\n", iKey, rgKey[iKey]->KMX_GetKeyCount(loader.KMX_MaxShiftState()),  nKeys);
-   }
+    }
   }
 
 
@@ -738,7 +654,6 @@ bool KMX_ImportRules(LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, GdkKeymap **keymap,
     if ((rgKey[iKey] != NULL) && rgKey[iKey]->KMX_IsKeymanUsedKey() && (!rgKey[iKey]->KMX_IsEmpty())) {
       if(rgKey[iKey]->KMX_LayoutRow(loader.KMX_MaxShiftState(), &gp->dpKeyArray[nKeys], &alDead, nDeadkey, bDeadkeyConversion, All_Vector,*keymap)) {   // I4552
         nKeys+=rgKey[iKey]->KMX_GetKeyCount(loader.KMX_MaxShiftState());
-        // wprintf(L" iKey = %i, Delta:  %i -> Sum %i\n", iKey, rgKey[iKey]->KMX_GetKeyCount(loader.MaxShiftState()),  nKeys);
       }
     }
   }
@@ -766,11 +681,6 @@ bool KMX_ImportRules(LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, GdkKeymap **keymap,
       LPKMX_KEY kkp;
       for(j = 0, kkp = gp->dpKeyArray; j < gp->cxKeyArray; j++, kkp++) {
           // _S2 AHA! missing 26 lines from here: since capalock is not correct this loop  will never be done
-          //wprintf(L"will add Rule  for group %i and key  %i  - shiftflag %i \n", i, kkp->Key, kkp->ShiftFlags);
-          KMX_DWORD S_S2 = kkp->ShiftFlags;
-          bool eins= (K_CTRLFLAG|K_ALTFLAG|LCTRLFLAG|LALTFLAG|RCTRLFLAG|RALTFLAG);
-          bool test_S_S2 = ((kkp->ShiftFlags & (K_CTRLFLAG|K_ALTFLAG|LCTRLFLAG|LALTFLAG|RCTRLFLAG|RALTFLAG)) != 0);
-
         if((kkp->ShiftFlags & (K_CTRLFLAG|K_ALTFLAG|LCTRLFLAG|LALTFLAG|RCTRLFLAG|RALTFLAG)) != 0) {
           gp2->cxKeyArray++;
           LPKMX_KEY kkp2 = new KMX_KEY[gp2->cxKeyArray];
@@ -781,18 +691,15 @@ bool KMX_ImportRules(LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, GdkKeymap **keymap,
           *kkp2->dpContext = 0;
           kkp2->Key = kkp->Key;
           kkp2->ShiftFlags = kkp->ShiftFlags;
-          //kkp2->ShiftFlags = 16384;
           kkp2->Line = 0;
           KMX_WCHAR *p = kkp2->dpOutput = new KMX_WCHAR[4];
           KMX_WCHAR *q=p;
           *p++ = UC_SENTINEL;
           *p++ = CODE_USE;
           *p++ = (KMX_WCHAR)(kp->cxGroupArray);
-          //wprintf(L"    --------------------------------did  Rule  for group %i and key  %i  - shiftflag %i \n", i, kkp->Key, kkp->ShiftFlags);
           *p = 0;
         }
       }
-      int sdfghjk=0;
     }
   }
 
@@ -804,7 +711,6 @@ bool KMX_ImportRules(LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, GdkKeymap **keymap,
     kp->cxGroupArray++;
 
     KMX_WCHAR *p = gp->dpMatch = new KMX_WCHAR[4];
-    KMX_WCHAR *qq_S2 = p;
     *p++ = UC_SENTINEL;
     *p++ = CODE_USE;
     *p++ = (KMX_WCHAR) kp->cxGroupArray;
@@ -828,7 +734,6 @@ bool KMX_ImportRules(LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, GdkKeymap **keymap,
     int nStoreBase = kp->cxStoreArray;
     kp->cxStoreArray += alDead.size() * 2;
 
-//_S2 here get ÂâÊêÎî...
     for(UINT i = 0; i < alDead.size(); i++) {
       DeadKey *dk = alDead[i];
 
@@ -852,7 +757,6 @@ bool KMX_ImportRules(LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, GdkKeymap **keymap,
       kkp->ShiftFlags = 0;
       kkp->Key = 0;
       KMX_WCHAR *p = kkp->dpContext = new KMX_WCHAR[8];
-      KMX_WCHAR* qQQ_S2= p;
       *p++ = UC_SENTINEL;
       *p++ = CODE_DEADKEY;
       *p++ = KMX_DeadKeyMap(dk->KMX_DeadCharacter(), &alDead, nDeadkey, FDeadkeys);   // I4353
@@ -861,19 +765,13 @@ bool KMX_ImportRules(LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, GdkKeymap **keymap,
       *p++ = CODE_ANY;
       *p++ = nStoreBase + i*2 + 1;
       *p = 0;
-      wprintf(L" contents of kkp->dpContext: %i \\ %i \\ %i \\ %i \\ %i \\ %i \\ %i \\ %i ----",
-          *qQQ_S2,*(qQQ_S2+1),*(qQQ_S2+2),*(qQQ_S2+3),*(qQQ_S2+4),*(qQQ_S2+5),*(qQQ_S2+6),*(qQQ_S2+7),*(qQQ_S2+8));
 
       p = kkp->dpOutput = new KMX_WCHAR[5];
-      KMX_WCHAR* QT_S2= p;
       *p++ = UC_SENTINEL;
       *p++ = CODE_INDEX;
       *p++ = nStoreBase + i*2 + 2;
       *p++ = 2;
       *p = 0;
-
-      wprintf(L" contents of kkp->dpOutput:  %i \\ %i \\ %i \\ %i \\ %i \\ %i \\ %i \\ %i\n",
-          *QT_S2,*(QT_S2+1),*(QT_S2+2),*(QT_S2+3),*(QT_S2+4),*(QT_S2+5),*(QT_S2+6),*(QT_S2+7),*(QT_S2+8));
       kkp++;
     }
   }

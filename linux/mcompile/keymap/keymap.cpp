@@ -5,7 +5,6 @@
 int map_VKShiftState_to_Lin(int VKShiftState) {
   if      (VKShiftState == 0 )      return 0;		/* 0000 0000 */
   else if (VKShiftState == 16)      return 1;		/* 0001 0000 */
-  // _S2 if commented out only DK on base+shift will be processed ^ ' `
   else if (VKShiftState == 9 )      return 2;		/* 0000 1001 */
   else if (VKShiftState == 25)      return 3; 	/* 0001 1001 */
   else                              return VKShiftState;
@@ -123,8 +122,6 @@ int write_US_ToVector( v_dw_3D &vec,std::string language, const char* text) {
   if( split_US_To_3D_Vector( vec,Vector_completeUS)) {
     return 1;
   }
-  //wprintf(L"\n   ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
-  //wprintf(L"   +++++++ dimensions of Vector after split_US_To_3D_Vector (languages..characters..shiftstates)\t %li..%li..%li\n", vec.size(), vec[0].size(),vec[0][0].size());
 
   fclose(fp);
   return 0;
@@ -317,8 +314,6 @@ int append_other_ToVector(v_dw_3D &All_Vector,GdkKeymap * keymap) {
     return 1;
   }
   All_Vector.push_back(Other_Vector2D);
-  //wprintf(L"   +++++++ dimensions of Vector after append_other_ToVector\t\t\t\t\t\t %li..%li..%li\n", All_Vector.size(), All_Vector[0].size(),All_Vector[0][0].size());
-  //wprintf(L"   ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n\n");
 
   if (All_Vector.size() < 2) {
     wprintf(L"ERROR: creation of 3D-Vector failed\n");
@@ -359,6 +354,7 @@ bool InitializeGDK(GdkKeymap **keymap,int argc, gchar *argv[]) {
 
 //------------------------------
 // _S2 TODO  deadkeys. Do we need this ?
+// _S2 TODO  deadkeys. Do we need this ?
 bool IsKeymanUsedKeyVal(std::wstring Keyval) {
   int KV = (int) (*Keyval.c_str());
 
@@ -396,6 +392,7 @@ bool IsKeymanUsedChar(int KV) {
 }
 
 
+
 std::wstring convert_DeadkeyValues_ToChar(int in) {
 
   KMX_DWORD lname;
@@ -422,6 +419,7 @@ std::wstring convert_DeadkeyValues_ToChar(int in) {
     else
       return L"\0";
 }
+//_S2 REview and change??
 //_S2 REview and change??
 std::u16string convert_DeadkeyValues_To_U16str(int in) {
 
@@ -535,6 +533,7 @@ int KMX_get_keyvals_From_Keycode(GdkKeymap *keymap, guint keycode, ShiftState ss
   }
   else
     return 0;
+
   return (int) *keyvals;
 }
 
@@ -559,20 +558,15 @@ KMX_DWORD KMX_get_KeyvalsUnderlying_From_KeyCodeUnderlying_GDK(GdkKeymap *keymap
     return 0;
 
   // _S2 TODO take caps to this function
+  // _S2 TODO take caps to this function
   // here I get all kvals: normal char , my Deadkeys, allothr DK
-  KMX_DWORD All_Keyvals = KMX_get_keyvals_From_Keycode(keymap, keycode, ShiftState(shift_state_pos), 0)  ;
-  //wprintf(L"All_Keyvals: %i----\n", All_Keyvals);
-
+  KMX_DWORD All_Keyvals = KMX_get_keyvals_From_Keycode(keymap, keycode, ShiftState(shift_state_pos), 0);
   if(( (All_Keyvals >= deadkey_min) && (All_Keyvals <= deadkey_max)))
     deadkey = All_Keyvals;
 
-  //wprintf(L" keyvals[shift_state_pos]: %i %i %i %i----", keyvals[0],keyvals[1],keyvals[2],keyvals[3]);
-
   dky = (PKMX_WCHAR) (convert_DeadkeyValues_To_U16str((int) deadkey)).c_str();
   out = KMX_get_FFFF_Underlying_according_to_keycode_and_Shiftstate_GDK_dw(keymap, keycode, (ShiftState)  shift_state_pos, 0);
-  //wprintf(L" out is :.....................................%i\n", out);
 
-  // _S2 TODO g_free used everywhere?
   g_free(keyvals);
   g_free(maps);
 
@@ -596,7 +590,6 @@ KMX_DWORD KMX_get_KeyvalsUnderlying_From_KeyCodeUnderlying_GDK(GdkKeymap *keymap
 
   out = KMX_get_CharsUnderlying_according_to_keycode_and_Shiftstate_GDK_dw(keymap, keycode, (ShiftState) shift_state_pos, 0);
 
-  // _S2 TODO g_free used everywhere?
   g_free(keyvals);
   g_free(maps);
 
@@ -606,9 +599,10 @@ KMX_DWORD KMX_get_KeyvalsUnderlying_From_KeyCodeUnderlying_GDK(GdkKeymap *keymap
 // _S2 ToDo
 KMX_DWORD KMX_get_FFFF_Underlying_according_to_keycode_and_Shiftstate_GDK_dw(GdkKeymap *keymap, guint keycode, ShiftState ss, int caps){
 
-  KMX_DWORD keyvals_dw= (KMX_DWORD) KMX_get_keyvals_From_Keycode(keymap, keycode, ss, caps) ;
+  KMX_DWORD keyvals_dw= (KMX_DWORD) KMX_get_keyvals_From_Keycode(keymap, keycode, ss, caps);
   
   // _S2 AHA output for dk4-12 at the top after dk... from here
+  if((keyvals_dw >=  deadkey_min) && (keyvals_dw <=  deadkey_max))                                    // deadkeys
   if((keyvals_dw >=  deadkey_min) && (keyvals_dw <=  deadkey_max))                                    // deadkeys
     return 0xFFFF;
   else if((keyvals_dw >  deadkey_max) || ((keyvals_dw <  deadkey_min)  &&  ( keyvals_dw > 0xFF)))     // out of range
@@ -624,6 +618,7 @@ KMX_DWORD KMX_get_CharsUnderlying_according_to_keycode_and_Shiftstate_GDK_dw(Gdk
 
 std::wstring KMX_get_CharsUnderlying_according_to_keycode_and_Shiftstate_GDK(GdkKeymap *keymap, guint keycode, ShiftState ss, int caps){
 
+  // _S2 QUESTION skip ss 2+3  remove??
   // _S2 QUESTION skip ss 2+3  remove??
   if( (ss ==2 ) ||(ss ==3 ))
     return L"\0";
@@ -659,11 +654,11 @@ KMX_DWORD KMX_get_VKUS_From_KeyCodeUnderlying_GDK( GdkKeymap *keymap, KMX_DWORD 
       gdk_keyval_convert_case (*kv_name, &lowerCase, &upperCase);
 
     // _S2 QUESTION is ( lowerCase == upperCase )  true for all number keys for all keyboards?
+    // _S2 QUESTION is ( lowerCase == upperCase )  true for all number keys for all keyboards?
     if ( lowerCase == upperCase )
       return (KMX_DWORD) upperCase;
-  }
+}
 
-KMX_DWORD testvar_S2 =  ScanCodeToUSVirtualKey[keycode-8];
   if ( keycode >7)
     return  (KMX_DWORD) ScanCodeToUSVirtualKey[keycode-8];
 
@@ -671,7 +666,6 @@ KMX_DWORD testvar_S2 =  ScanCodeToUSVirtualKey[keycode-8];
 }
 
 KMX_DWORD KMX_get_KeyCodeUnderlying_From_VKUS( KMX_DWORD VK_US) {
-  KMX_DWORD test_S2 = (8+ USVirtualKeyToScanCode[ VK_US ]);
   if( VK_US > 7) {
     return (KMX_DWORD)(8+ USVirtualKeyToScanCode[ VK_US ]);}
   else
