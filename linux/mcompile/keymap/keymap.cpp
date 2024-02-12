@@ -352,36 +352,6 @@ bool InitializeGDK(GdkKeymap **keymap,int argc, gchar *argv[]) {
   return 0;
 }
 
-//------------------------------
-// _S2 TODO  deadkeys. Do we need this ?
-// _S2 TODO  deadkeys. Do we need this ?
-bool IsKeymanUsedKeyVal(std::wstring Keyval) {
-  int KV = (int) (*Keyval.c_str());
-
-  //         32            127              196          256
-  if  ((KV >= 0x20 && KV <= 0x7F) || (KV >= 0x20 && KV <= 0x7F) || (KV >= 0xC4 && KV < 198) ||
-       (KV >= 199  && KV < 208)   || (KV >= 209  && KV < 216)   || (KV >= 217 && KV < 229)  ||
-       (KV >= 231  && KV < 240)   || (KV >= 241  && KV < 248)   || (KV >= 249 && KV < 0xFF) ||
-       (KV == 128) || (KV == 178) || (KV == 167) || (KV == 179) || (KV == 176)|| (KV == 181) )
-    return true;
-  else
-    return false;
-}
-
-bool IsKeymanUsedKeyVal(std::u16string Keyval) {
-
-  int KV = (int) (*Keyval.c_str());
-
-  //         32            127              196          256
-  if  ((KV >= 0x20 && KV <= 0x7F) || (KV >= 0x20 && KV <= 0x7F) || (KV >= 0xC4 && KV < 198) ||
-       (KV >= 199  && KV < 208)   || (KV >= 209  && KV < 216)   || (KV >= 217 && KV < 229)  ||
-       (KV >= 231  && KV < 240)   || (KV >= 241  && KV < 248)   || (KV >= 249 && KV < 0xFF) ||
-       (KV == 128) || (KV == 178) || (KV == 167) || (KV == 179) || (KV == 176)|| (KV == 181)||
-       (KV >= deadkey_min && KV < deadkey_max+1) )
-    return true;
-  else
-    return false;
-}
 
 bool IsKeymanUsedChar(int KV) {
   //         32            A-Z                      a-z
@@ -619,10 +589,7 @@ KMX_DWORD KMX_get_CharsUnderlying_according_to_keycode_and_Shiftstate_GDK_dw(Gdk
 std::wstring KMX_get_CharsUnderlying_according_to_keycode_and_Shiftstate_GDK(GdkKeymap *keymap, guint keycode, ShiftState ss, int caps){
 
   // _S2 QUESTION skip ss 2+3  remove??
-  // _S2 QUESTION skip ss 2+3  remove??
-  if( (ss ==2 ) ||(ss ==3 ))
-    return L"\0";
-
+  
   int keyvals_int= KMX_get_keyvals_From_Keycode(keymap, keycode, ss, caps);
     return  convert_DeadkeyValues_ToChar(keyvals_int);
 }

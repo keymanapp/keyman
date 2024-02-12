@@ -500,8 +500,6 @@ const UINT ScanCodeToUSVirtualKey[128] = {
   0x00  // 0x7f => No match
 };
 
-bool IsKeymanUsedKeyVal(std::wstring Keyval);
-bool IsKeymanUsedKeyVal(std::u16string Keyval);
 bool IsKeymanUsedChar(int KV);
 
 // take deadkey-value (e.g.65106) and return wstring (e.g. '^' )

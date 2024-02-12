@@ -54,8 +54,6 @@ typedef WCHAR*        PWCHAR;
 typedef uint8_t*      LPKMX_BYTE;
 typedef uint8_t*      PKMX_BYTE;
 
-typedef uint32_t      KMX_UINT;
-
 typedef KMX_BYTE*     PKMX_BYTE;
 typedef KMX_DWORD*    PKMX_DWORD;
 typedef int           BOOL;

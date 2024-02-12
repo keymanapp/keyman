@@ -128,12 +128,14 @@ public:
     // _S2 TODO  deadkey
     // memset(this->m_rgfDeadKey,0,sizeof(this->m_rgfDeadKey));
   }
+//_S2 keymap* or keymap**
 
   KMX_VirtualKey(UINT scanCode, KMX_HKL hkl, GdkKeymap **keymap) {
     this->m_vk = KMX_get_VKUS_From_KeyCodeUnderlying_GDK(*keymap, scanCode);
     this->m_hkl = hkl;
     this->m_sc = scanCode;
     //KMX_InitializeDeadkeys();       // _S2 to get all 0 in rgfDeadkey[ ][ ]- why were there numbers???
+    // _S2 originally initioalized with memse ( see above=)
   }
 
   UINT VK() {
@@ -178,7 +180,7 @@ public:
     this->m_rgss[(UINT)shiftState][(capsLock ? 1 : 0)] = value;
   }
 
-// _S2 DESIGN NEEDED how to change those?
+// _S2 DESIGN NEEDED how to change those? Do we need to change?
   bool KMX_IsSGCAPS() {
     std::wstring stBase = this->KMX_GetShiftState(Base, false);     // 0,0  a 4 ß
     std::wstring stShift = this->KMX_GetShiftState(Shft, false);    // 1,0  A $ ?
@@ -319,14 +321,13 @@ int i4 = this->KMX_IsXxxxGrCapsEqualToXxxxShift() ? 8 : 0;
         if (st.size() == 0) {
           // No character assigned here
         }
-        // _S2 TODO deadkeys don't work yet/ if true is in m_rgfDeadKey
         else if (this->m_rgfDeadKey[(int)ss][caps]) {
           // It's a dead key, append an @ sign.
           key->dpContext = new KMX_WCHAR[1];
           *key->dpContext = 0;
 
           key->ShiftFlags = this->KMX_GetShiftStateValue(capslock, caps, (ShiftState) ss);
-          // _S2 we already use VK_US so no need to convert it
+          // we already use VK_US so no need to convert it
           key->Key = this->VK();
           key->Line = 0;
 
@@ -382,7 +383,7 @@ int i4 = this->KMX_IsXxxxGrCapsEqualToXxxxShift() ? 8 : 0;
 class KMX_Loader {
 private:
   KMX_BYTE lpKeyStateNull[256];
-  KMX_UINT m_XxxxVk;
+  UINT m_XxxxVk;
 
 public:
   KMX_Loader() {
@@ -447,7 +448,7 @@ bool KMX_ImportRules(LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, GdkKeymap **keymap,
   std::vector<KMX_VirtualKey*> rgKey; //= new VirtualKey[256];
   std::vector<DeadKey*> alDead;
 
-  //_S2 REVIEW
+  //_S2 remove alDead2
    std::vector<DeadKey*> alDead2 ;
    std::vector<DeadKey*> alDead_cpl = create_alDead();
    std::vector<DeadKey*> alDead_cpl = create_alDead();
@@ -477,7 +478,6 @@ bool KMX_ImportRules(LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, GdkKeymap **keymap,
       rgKey[ke] = new KMX_VirtualKey(hkl, ke, keymap);
   }
 
-  // _S2 ???? which numbers for VK_DIVIDE, VK_CANCEL, VK_DECIMAL ?
   rgKey[VK_DIVIDE] = new KMX_VirtualKey(hkl, VK_DIVIDE, keymap);
   rgKey[VK_CANCEL] = new KMX_VirtualKey(hkl, VK_CANCEL, keymap);
   rgKey[VK_DECIMAL] = new KMX_VirtualKey(hkl, VK_DECIMAL, keymap);
