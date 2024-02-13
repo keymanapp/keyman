@@ -95,6 +95,37 @@ const categoryMap = new Map<string, number>();
 
 for(let cat of categories) {
   categoryMap.set(cat, catIndexSeed++);
+  if(catIndexSeed == '`'.charCodeAt(0)) {
+    catIndexSeed++; // Skip the back-tick as an encoding symbol.
+                    // Reduces complications, as it's the encoding string start/end char.
+  }
+}
+
+const bmpRanges: typeof ranges = [];
+const nonBmpRanges: typeof ranges = [];
+
+// { start: number, property: number}[]
+for(let range of ranges) { // already sorted
+  if(range.start <= 0xFFFF) {
+    bmpRanges.push(range);
+  } else {
+    if(nonBmpRanges.length == 0) {
+      const finalBmpRange = bmpRanges[bmpRanges.length - 1];
+      bmpRanges.push({
+        start: 0xFFFF,
+        property: range.property,
+        end: undefined
+      });
+
+      nonBmpRanges.push({
+        start: 0x10000,
+        property: finalBmpRange.property,
+        end: undefined
+      });
+    }
+
+    nonBmpRanges.push(range);
+  }
 }
 
 //////////////////////// Creating the generated file /////////////////////////
@@ -107,28 +138,40 @@ let stream = fs.createWriteStream(generatedFilename);
 
 // Generate the file!
 stream.write(`// Automatically generated file. DO NOT MODIFY.
-
 /**
  * Valid values for a word break property.
  */
 export const enum WordBreakProperty {
 ${ /* Create enum values for each word break property */
   Array.from(categories)
-    .map(x => `  ${x}`)
+    .map(x => `  ${x} = ${categoryMap.get(x)}`)
     .join(',\n')
 }
 };
 
-export const WORD_BREAK_PROPERTY: [number, WordBreakProperty][] = [
-${
-  // TODO:  Two versions:  one that's BMP-encoded, one that's non-BMP encoded.
-    ranges.map(({start, property}) => (`  [` +
-      `/*start*/ 0x${start.toString(16).toUpperCase()}, ` +
-      `WordBreakProperty.${property}],`
-    )).join('\n')
+export const WORD_BREAK_PROPERTY_BMP: string = \`${
+  // To consider:  emit `\uxxxx` codes instead of the raw char?
+  bmpRanges.map(({start, property}) => {
+    let codedStart = String.fromCodePoint(start);
+    if(codedStart == '`') {
+      // Prevents accidental unescaped use of the string start/end char.
+      // The backslash gets removed on file-load.
+      codedStart = '\\`';
+    }
+    const codedProp = String.fromCharCode(categoryMap.get(property));
+    return `${codedStart}${codedProp}`;
+  }).join('')
+}\`
+
+export const WORD_BREAK_PROPERTY_NON_BMP: string = \`${
+  // To consider:  emit `\uxxxx` codes instead of the raw char?
+  nonBmpRanges.map(({start, property}) => {
+    const codedStart = String.fromCodePoint(start);
+    const codedProp = String.fromCharCode(categoryMap.get(property));
+    return `${codedStart}${codedProp}`;
+  }).join('')
 }
-];
-`);
+\``);
 
 /**
  * Reads a Unicode character property file.
