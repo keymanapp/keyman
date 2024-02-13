@@ -513,7 +513,7 @@ KMX_DWORD KMX_get_KeyvalsUnderlying_From_KeyCodeUnderlying_GDK(GdkKeymap *keymap
   guint *keyvals;
   gint count;
   KMX_DWORD out;
-  KMX_DWORD deadkey;
+  KMX_DWORD deadkey=0;
 
 
   if (!gdk_keymap_get_entries_for_keycode(keymap, keycode, &maps, &keyvals, &count))
@@ -523,7 +523,7 @@ KMX_DWORD KMX_get_KeyvalsUnderlying_From_KeyCodeUnderlying_GDK(GdkKeymap *keymap
 
   if (!(shift_state_pos <= count))
   return 0;
-
+// _S2 94 as variable/const
   if (!(keycode <= 94))
     return 0;
 
@@ -541,6 +541,70 @@ KMX_DWORD KMX_get_KeyvalsUnderlying_From_KeyCodeUnderlying_GDK(GdkKeymap *keymap
   g_free(maps);
 
   return out;
+}
+
+// _S2 TODO
+KMX_DWORD KMX_get_KeyvalsUnderlying_From_KeyCodeUnderlying_GDK_New(GdkKeymap *keymap, guint keycode, int shift_state_pos, PKMX_WCHAR &dky) {
+  GdkKeymapKey *maps;
+  guint *keyvals;
+  gint count;
+  KMX_DWORD out;
+  KMX_DWORD deadkey=0;
+
+
+  if (!gdk_keymap_get_entries_for_keycode(keymap, keycode, &maps, &keyvals, &count))
+    return 0;
+  //if(!gdk_wayland_keymap_get_entries_for_keycode(keymap, keycode, &maps, &keyvals, &count))
+  //  return 0;    https://codebrowser.dev/gtk/gtk/gdk/wayland/gdkkeys-wayland.c.html
+
+  if (!(shift_state_pos <= count))
+  return 0;
+// _S2 94 as variable/const
+  if (!(keycode <= 94))
+    return 0;
+
+  // _S2 TODO take caps to this function
+  // here I get all kvals: normal char , my Deadkeys, allothr DK
+  KMX_DWORD All_Keyvals =  KMX_get_keyvals_From_Keycode(keymap, keycode, ShiftState(shift_state_pos), 0);
+  if(( (All_Keyvals >= deadkey_min) && (All_Keyvals <= deadkey_max)))
+    deadkey = All_Keyvals;
+    // _S2 check if naming is correct: does get_char... return a char or a string or a DWORD;...?
+  dky = (PKMX_WCHAR) (convert_DeadkeyValues_To_U16str((int) deadkey)).c_str();
+/*
+// _S2 ToDo
+KMX_DWORD KMX_get_FFFF_Underlying_according_to_keycode_and_Shiftstate_GDK_dw(GdkKeymap *keymap, guint keycode, ShiftState ss, int caps){
+
+  KMX_DWORD keyvals_dw= (KMX_DWORD) KMX_get_keyvals_From_Keycode(keymap, keycode, ss, caps);
+  
+  // _S2 AHA output for dk4-12 at the top after dk... from here
+  if((keyvals_dw >=  deadkey_min) && (keyvals_dw <=  deadkey_max))                                    // deadkeys
+    return 0xFFFF;
+  else if((keyvals_dw >  deadkey_max) || ((keyvals_dw <  deadkey_min)  &&  ( keyvals_dw > 0xFF)))     // out of range
+    return 0xFFFE;
+  else                                                                                                // usable char
+    return keyvals_dw;
+}
+*/
+
+  g_free(keyvals);
+  g_free(maps);
+
+  // _S2 AHA output for dk4-12 at the top after dk... from here
+ if((All_Keyvals >=  deadkey_min) && (All_Keyvals <=  deadkey_max))                                    // deadkeys
+    return 0xFFFF;
+  else if((All_Keyvals >  deadkey_max) || ((All_Keyvals <  deadkey_min)  &&  ( All_Keyvals > 0xFF)))     // out of range
+    return 0xFFFE;
+  else                                                                                                // usable char
+    return All_Keyvals;
+
+
+
+
+
+
+  //out = KMX_get_FFFF_Underlying_according_to_keycode_and_Shiftstate_GDK_dw(keymap, keycode, (ShiftState)  shift_state_pos, 0);
+
+
 }
 
 KMX_DWORD KMX_get_KeyvalsUnderlying_From_KeyCodeUnderlying_GDK(GdkKeymap *keymap, guint keycode, int shift_state_pos) {
@@ -579,6 +643,28 @@ KMX_DWORD KMX_get_FFFF_Underlying_according_to_keycode_and_Shiftstate_GDK_dw(Gdk
     return 0xFFFE;
   else                                                                                                // usable char
     return keyvals_dw;
+}
+// _S2 remove term _other and use underlying instead
+KMX_DWORD KMX_get_CharUnderlying_From_SCUnderlying_GDK_NEW(GdkKeymap *keymap, UINT VKShiftState, UINT SC_OTHER, PKMX_WCHAR DeadKey) {
+  //takes keymap, shift, scanCode
+  //fills ref deadkey
+  //returns character(KMX_DWORD)
+PKMX_WCHAR dd;
+  KMX_DWORD keyvals_dw = KMX_get_KeyvalsUnderlying_From_KeyCodeUnderlying_GDK_New(keymap, SC_OTHER, map_VKShiftState_to_Lin(VKShiftState), dd);
+
+
+
+
+// _S2 rename dd
+  if((keyvals_dw >=  deadkey_min) && (keyvals_dw >=  deadkey_max))  {
+    *DeadKey = *dd;
+    return 0xFFFF;
+  }
+  else if((keyvals_dw >  deadkey_max) || ((keyvals_dw <  deadkey_min)  &&  ( keyvals_dw > 0xFF)))     // out of range
+    return 0xFFFE;
+  else                                                                                                // usable char
+    return keyvals_dw;
+
 }
 
 KMX_DWORD KMX_get_CharsUnderlying_according_to_keycode_and_Shiftstate_GDK_dw(GdkKeymap *keymap, guint keycode, ShiftState ss, int caps){

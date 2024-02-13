@@ -42,6 +42,7 @@ PKMX_WCHAR KMX_incxstr(PKMX_WCHAR p);
 
 UINT KMX_get_SCUnderlying_From_VKUS(KMX_DWORD VirtualKeyUS);
 
+// _S2 why is this function not in keymap.cpp/h
 KMX_WCHAR KMX_get_CharUnderlying_From_SCUnderlying_GDK(GdkKeymap *keymap, UINT VKShiftState, UINT SC_OTHER, PKMX_WCHAR DeadKey);
 
 KMX_WCHAR KMX_get_VKUS_From_VKUnderlying_VEC(v_dw_3D All_Vector,KMX_DWORD SC_US);

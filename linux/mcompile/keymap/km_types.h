@@ -36,7 +36,7 @@ typedef uint16_t   km_kbp_cp;          // code point
 typedef uint32_t   km_kbp_usv;         // Unicode Scalar Value
 #endif
 
-// _S2 which can be removed later?
+// _S2 TODO which can be removed later?
 typedef unsigned int  UINT;
 typedef unsigned long DWORD;
 

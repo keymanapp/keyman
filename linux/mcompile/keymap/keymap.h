@@ -520,7 +520,7 @@ KMX_DWORD KMX_get_CharsUnderlying_according_to_keycode_and_Shiftstate_GDK_dw(Gdk
 
 // _S2 TODO  returns char or FFFF / FFFE ????
 KMX_DWORD KMX_get_FFFF_Underlying_according_to_keycode_and_Shiftstate_GDK_dw(GdkKeymap *keymap, guint keycode, ShiftState ss, int caps);
-
+KMX_DWORD KMX_get_CharUnderlying_From_SCUnderlying_GDK_NEW(GdkKeymap *keymap, UINT VKShiftState, UINT SC_OTHER, PKMX_WCHAR DeadKey);
 
 
 

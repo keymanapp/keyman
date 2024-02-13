@@ -128,7 +128,7 @@ public:
     // _S2 TODO  deadkey
     // memset(this->m_rgfDeadKey,0,sizeof(this->m_rgfDeadKey));
   }
-//_S2 keymap* or keymap**
+//_S2 ToDo keymap* or keymap**
 
   KMX_VirtualKey(UINT scanCode, KMX_HKL hkl, GdkKeymap **keymap) {
     this->m_vk = KMX_get_VKUS_From_KeyCodeUnderlying_GDK(*keymap, scanCode);
@@ -251,7 +251,7 @@ public:
     int nkeys = 0;
 
     // Get the CAPSLOCK value
-    //_S2 not used in original code; can be deleted
+    //_S2 INFO not used in original code; can be deleted
     /*int capslock =
         (this->KMX_IsCapsEqualToShift() ? 1 : 0) |
         (this->KMX_IsSGCAPS() ? 2 : 0) |
@@ -448,7 +448,7 @@ bool KMX_ImportRules(LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, GdkKeymap **keymap,
   std::vector<KMX_VirtualKey*> rgKey; //= new VirtualKey[256];
   std::vector<DeadKey*> alDead;
 
-  //_S2 remove alDead2
+  //_S2 TODO remove alDead2
    std::vector<DeadKey*> alDead2 ;
    std::vector<DeadKey*> alDead_cpl = create_alDead();
    std::vector<DeadKey*> alDead_cpl = create_alDead();
@@ -522,9 +522,9 @@ bool KMX_ImportRules(LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, GdkKeymap **keymap,
           }
 
           //_S2 to compare win-lin kmn-files skip ss6+7; MUST BE restored/removed later!!!!
-          if(ss == MenuCtrl|| ss == ShftMenuCtrl) {
+         /*if(ss == MenuCtrl|| ss == ShftMenuCtrl) {
             continue;
-          }
+          }*/
 
           KMX_DWORD SC_US = KMX_get_KeyCodeUnderlying_From_VKUS(iKey);
 
@@ -562,14 +562,13 @@ bool KMX_ImportRules(LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, GdkKeymap **keymap,
               }
               sbBuffer[rc] = 0;
               //rgKey[iKey]->KMX_SetShiftState(ss, KeyVal_Other, false, (caps==0));
-              rgKey[iKey]->KMX_SetShiftState(ss, sbBuffer, false, (caps));    //_S2
+              rgKey[iKey]->KMX_SetShiftState(ss, sbBuffer, false, (caps));    //_S2 INFO
             }
           }
           else if(rc < 0) {
             sbBuffer[2] = 0;
             //rgKey[iKey]->SetShiftState(ss, sbBuffer, true, (caps == 0));
-            rgKey[iKey]->KMX_SetShiftState(ss, sbBuffer, true, (caps ));   //_S2
-            rgKey[iKey]->KMX_SetShiftState(ss, sbBuffer, true, (caps ));   //_S2
+            rgKey[iKey]->KMX_SetShiftState(ss, sbBuffer, true, (caps ));   //_S2 INFO
 
             // It's a dead key; let's flush out whats stored in the keyboard state.
             loader.KMX_ClearKeyboardBuffer();
