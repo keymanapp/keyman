@@ -8,6 +8,8 @@ import { Uni_IsSurrogate1, Uni_IsSurrogate2 } from '@keymanapp/web-utils';
  * @param str2
  * @param commonSuffix If false, asserts a common prefix to the strings.  If true, asserts a common suffix.
  * @returns The code unit index within `str1` for the start of the code point not common to both.
+ *
+ * Follows the convention of (start, end) substring parameterizations having 'end' be exclusive.
  */
 export function findCommonSubstringEndIndex(str1: string, str2: string, commonSuffix: boolean): number {
   /**
