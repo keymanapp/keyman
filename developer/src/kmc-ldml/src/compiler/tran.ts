@@ -88,7 +88,9 @@ export abstract class TransformCompiler<T extends TransformCompilerType, TranBas
 
     if (transforms?.transformGroup) {
       for (let transformGroup of transforms.transformGroup) {
-        result.groups.push(this.compileTransformGroup(sections, transformGroup));
+        const tg = this.compileTransformGroup(sections, transformGroup);
+        if (!tg) return null; //error
+        result.groups.push(tg);
       }
     }
     return result;
@@ -115,6 +117,7 @@ export abstract class TransformCompiler<T extends TransformCompilerType, TranBas
       transforms: transforms.map(transform => this.compileTransform(sections, transform)),
       reorders: [],
     }
+    if (result.transforms.includes(null)) return null;
     return result;
   }
 
@@ -141,11 +144,19 @@ export abstract class TransformCompiler<T extends TransformCompilerType, TranBas
     // don't unescape literals here, because we are going to pass them through into the regex
     cookedFrom = util.unescapeStringToRegex(cookedFrom);
 
-    this.checkRanges(cookedFrom); // check before normalizing
+    // cook the ranges also
+    cookedFrom = this.checkRanges(cookedFrom); // check before normalizing
 
     if (!sections?.meta?.normalizationDisabled) {
       // nfd here.
       cookedFrom = MarkerParser.nfd_markers(cookedFrom, true);
+    }
+
+    try {
+      new RegExp(cookedFrom, 'ug');
+    } catch (e) {
+      this.callbacks.reportMessage(CompilerMessages.Error_UnparseableTransformFrom({ from: transform.from }));
+      return null;
     }
 
     // cookedFrom is cooked above, since there's some special treatment
@@ -168,6 +179,7 @@ export abstract class TransformCompiler<T extends TransformCompilerType, TranBas
       transforms: [],
       reorders: reorders.map(reorder => this.compileReorder(sections, reorder)),
     }
+    if (result.reorders.includes(null)) return null;
     return result;
   }
 
@@ -175,7 +187,11 @@ export abstract class TransformCompiler<T extends TransformCompilerType, TranBas
     let result = new TranReorder();
     result.elements = sections.elem.allocElementString(sections, reorder.from, reorder.order, reorder.tertiary, reorder.tertiaryBase, reorder.preBase);
     result.before = sections.elem.allocElementString(sections, reorder.before);
-    return result;
+    if (!result.elements || !result.before) {
+      return null; // already error'ed
+    } else {
+      return result;
+    }
   }
 
   public compile(sections: DependencySections): TranBase {
@@ -200,12 +216,14 @@ export abstract class TransformCompiler<T extends TransformCompilerType, TranBas
     return defaults;
   }
 
-  private checkRanges(cookedFrom: string) {
+  /** true if ok */
+  private checkRanges(cookedFrom: string): string {
+    if (!cookedFrom) return cookedFrom;
     // extract all of the potential ranges - but don't match any-markers!
     const anyRange = /(?<!\\uffff\\u0008)\[([^\]]+)\]/g;
     const ranges = cookedFrom.matchAll(anyRange);
 
-    if (!ranges) return;
+    if (!ranges) return cookedFrom;
 
     // extract inner members of a range (inside the [])
     const rangeRegex = /(\\u[0-9a-fA-F]{4}|.)-(\\u[0-9a-fA-F]{4}|.)|./g;
@@ -246,16 +264,46 @@ export abstract class TransformCompiler<T extends TransformCompilerType, TranBas
     }
 
     // analyze ranges
+    let needCooking = false;
     const explicitSet = rangeExplicit.analyze()?.get(util.BadStringType.denormalized);
     if (explicitSet) {
       this.callbacks.reportMessage(CompilerMessages.Warn_CharClassExplicitDenorm({ lowestCh: explicitSet.values().next().value }));
+      needCooking = true;
     } else {
       // don't analyze the implicit set of THIS range, if explicit is already problematic
       const implicitSet = rangeImplicit.analyze()?.get(util.BadStringType.denormalized);
       if (implicitSet) {
         this.callbacks.reportMessage(CompilerMessages.Hint_CharClassImplicitDenorm({ lowestCh: implicitSet.values().next().value }));
+        needCooking = true;
       }
     }
+
+    // do we need to fixup the ranges?
+    // don't do this unless we flagged issues above
+    if (needCooking) {
+      // if we get here, there are some ranges with troublesome chars.
+      // we work around this by escaping all chars
+      function cookOne(s: string) {
+        if (s === '^') {
+          return s; // syntax
+        } else if (s.startsWith('\\u{') || s.startsWith('\\u')) {
+          return s; // already escaped
+        } else {
+          return util.escapeRegexChar(s);
+        }
+      }
+      return cookedFrom.replaceAll(anyRange, (ignored1: any, sub: string) => {
+        return '[' + sub.replaceAll(rangeRegex, (all: any, start: string, end: string) => {
+          if (!start && !end) {
+            // explicit single char
+            return cookOne(all); // matched one char
+          } else {
+            return cookOne(start) + '-' + cookOne(end);
+          }
+        }) + ']';
+      });
+    }
+    return cookedFrom; // no change
   }
 }
 
