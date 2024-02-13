@@ -3,9 +3,9 @@
 
 v_dw_1D createLine(std::wstring  first, std::wstring second, KMX_DWORD number, std::wstring nameresult) {
 	v_dw_1D line;
-	line.push_back(convertNamesToIntegerValue(first));
-	line.push_back(convertNamesToIntegerValue(second));
-	//line.push_back(convertNamesToIntegerValue(nameresult));
+	line.push_back(convertNamesToDWORDValue(first));
+	line.push_back(convertNamesToDWORDValue(second));
+	//line.push_back(convertNamesToDWORDValue(nameresult));
 	line.push_back(number);
 	return line;
 }
@@ -414,8 +414,12 @@ void create_DKTable(v_dw_2D & dk_ComposeTable) {
 
 	line = createLine(L"dead_circumflex",  L"space",  0x005E, L"CIRCUMFLEX_ACCENT");
 	  dk_ComposeTable.push_back(line);	line.clear();
+
 	line = createLine(L"dead_acute",  L"space",  0x0027, L"APOSTROPHE");
 	  dk_ComposeTable.push_back(line);	line.clear();
+	/*line = createLine(L"dead_acute",  L"space",  0x00B4, L"ACUTE_ACCENT");
+	  dk_ComposeTable.push_back(line);	line.clear();*/
+
 	line = createLine(L"dead_grave",  L"space",  0x0060, L"GRAVE_ACCENT");
 	  dk_ComposeTable.push_back(line);	line.clear();
 	line = createLine(L"dead_breve",  L"space",  0x02D8, L"BREVE");

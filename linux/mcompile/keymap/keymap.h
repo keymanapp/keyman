@@ -65,14 +65,15 @@ const KMX_DWORD KMX_VKMap[] = {
 };
 
 static KMX_DWORD returnIfCharInvalid = 0;
+static KMX_DWORD keycode_max =94;
 
 static KMX_DWORD deadkey_min = 0xfe50;
 static KMX_DWORD deadkey_max = 0xfe93;
 
-int map_VKShiftState_to_Lin(int VKShiftState);
+int map_VKShiftState_to_LinModifier(int VKShiftState);
 
 // takes a std::wstring (=contents of line symbols-file ) and returns the (int) value of the character
-KMX_DWORD convertNamesToIntegerValue(std::wstring tok_wstr);
+KMX_DWORD convertNamesToDWORDValue(std::wstring tok_wstr);
 
 // create a Vector with all entries of both keymaps+ keymap
 int createOneVectorFromBothKeyboards(v_dw_3D &All_Vector,GdkKeymap *keymap);
@@ -93,8 +94,8 @@ int split_US_To_3D_Vector(v_dw_3D &all_US, v_str_1D completeList);
 // create an empty 2D vector containing "--" in all fields
 v_dw_2D create_empty_2D_Vector(int dim_rows, int dim_shifts);
 
-// append characters using GDK to 3D-Vector (Data for Other Language on [1][ ][ ]  )
-int append_other_ToVector(v_dw_3D &All_Vector, GdkKeymap *keymap);
+// append characters using GDK to 3D-Vector (Data for underlying Language on [1][ ][ ]  )
+int append_underlying_ToVector(v_dw_3D &All_Vector, GdkKeymap *keymap);
 
 // initialize GDK
 bool InitializeGDK(GdkKeymap **keymap,int argc, gchar *argv[]);
@@ -503,34 +504,27 @@ const UINT ScanCodeToUSVirtualKey[128] = {
 bool IsKeymanUsedChar(int KV);
 
 // take deadkey-value (e.g.65106) and return wstring (e.g. '^' )
-std::wstring convert_DeadkeyValues_ToChar(int in);
+std::wstring convert_DeadkeyValues_ToWstr(int in);
 std::u16string convert_DeadkeyValues_To_U16str(int in);
-
-
 
 // uses gdk_keymap_translate_keyboard_state to get keyval
 int KMX_get_keyvals_From_Keycode(GdkKeymap *keymap, guint keycode, ShiftState ss, int caps);
 
-KMX_DWORD KMX_get_KeyvalsUnderlying_From_KeyCodeUnderlying_GDK(GdkKeymap *keymap, guint keycode, int shift_state_pos, PKMX_WCHAR &dky);
 KMX_DWORD KMX_get_KeyvalsUnderlying_From_KeyCodeUnderlying_GDK(GdkKeymap *keymap, guint keycode, int shift_state_pos);
 
 // returns KeySyms for a given key (for unshifted: finds the Keysym according to Shiftstate e.g. a;A or 1;! )
-std::wstring KMX_get_CharsUnderlying_according_to_keycode_and_Shiftstate_GDK(GdkKeymap *keymap, guint VK, ShiftState ss, int caps);
-KMX_DWORD KMX_get_CharsUnderlying_according_to_keycode_and_Shiftstate_GDK_dw(GdkKeymap *keymap, guint keycode, ShiftState ss, int caps);
+std::wstring KMX_get_CharUnderlying_according_to_keycode_and_Shiftstate_GDK(GdkKeymap *keymap, guint VK, ShiftState ss, int caps);
+KMX_DWORD KMX_get_CharUnderlying_according_to_keycode_and_Shiftstate_GDK_dw(GdkKeymap *keymap, guint keycode, ShiftState ss, int caps);
 
-// _S2 TODO  returns char or FFFF / FFFE ????
-KMX_DWORD KMX_get_FFFF_Underlying_according_to_keycode_and_Shiftstate_GDK_dw(GdkKeymap *keymap, guint keycode, ShiftState ss, int caps);
-KMX_DWORD KMX_get_CharUnderlying_From_SCUnderlying_GDK_NEW(GdkKeymap *keymap, UINT VKShiftState, UINT SC_OTHER, PKMX_WCHAR DeadKey);
+KMX_DWORD KMX_get_CharUnderlying_From_SCUnderlying_GDK(GdkKeymap *keymap, UINT VKShiftState, UINT SC_underlying, PKMX_WCHAR DeadKey);
 
-
-
-// return the VirtualKey of the Other Keyboard for given Scancode using GDK
+// return the VirtualKey of the underlying Keyboard for given Scancode using GDK
 KMX_DWORD KMX_get_VKUS_From_KeyCodeUnderlying_GDK( GdkKeymap *keymap, KMX_DWORD scanCode);
 
-// return the Keycode of the Other Keyboard for given VK_US
+// return the Keycode of the underlying Keyboard for given VK_US
 KMX_DWORD KMX_get_KeyCodeUnderlying_From_VKUS( KMX_DWORD VK_US);
 
-// return the Keycode of the Other Keyboard for given VK_US using GDK
+// return the Keycode of the underlying Keyboard for given VK_US using GDK
 KMX_DWORD KMX_get_KeyCodeUnderlying_From_KeycodeUS_GDK(GdkKeymap *keymap, v_dw_3D &All_Vector,KMX_DWORD KC_US, ShiftState ss, int caps);
 
 // converts codePoint to wstring

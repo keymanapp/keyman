@@ -1,16 +1,17 @@
 #include "keymap.h"
 
 #include <xkbcommon/xkbcommon.h>
+// unmodified, shift, RALT, shift+RALT
 
-int map_VKShiftState_to_Lin(int VKShiftState) {
+int map_VKShiftState_to_LinModifier(int VKShiftState) {
   if      (VKShiftState == 0 )      return 0;		/* 0000 0000 */
   else if (VKShiftState == 16)      return 1;		/* 0001 0000 */
   else if (VKShiftState == 9 )      return 2;		/* 0000 1001 */
   else if (VKShiftState == 25)      return 3; 	/* 0001 1001 */
-  else                              return VKShiftState;
+  else return VKShiftState;
 }
 
-KMX_DWORD convertNamesToIntegerValue(std::wstring tok_wstr) {
+KMX_DWORD convertNamesToDWORDValue(std::wstring tok_wstr) {
   // more on https://manpages.ubuntu.com/manpages/jammy/man3/keysyms.3tk.html
   std::map<std::wstring, KMX_DWORD > first;
 
@@ -93,8 +94,8 @@ int createOneVectorFromBothKeyboards(v_dw_3D &All_Vector,GdkKeymap *keymap) {
   }
 
   // add contents of other keyboard to All_Vector
-  if( append_other_ToVector(All_Vector,keymap)) {
-    wprintf(L"ERROR: can't append Other ToVector \n");
+  if( append_underlying_ToVector(All_Vector,keymap)) {
+    wprintf(L"ERROR: can't append underlying ToVector \n");
     return 2;
   }
   return 0;
@@ -271,7 +272,7 @@ int split_US_To_3D_Vector(v_dw_3D &all_US,v_str_1D completeList) {
       for ( int i = 1; i< (int) tokens.size();i++) {
 
         // replace a name with a single character ( a -> a  ; equal -> = )
-        tokens_int = convertNamesToIntegerValue( wstring_from_string(tokens[i]));
+        tokens_int = convertNamesToDWORDValue( wstring_from_string(tokens[i]));
         tokens_dw.push_back(tokens_int);
       }
 
@@ -304,16 +305,16 @@ v_dw_2D create_empty_2D_Vector( int dim_rows,int dim_ss) {
   return Vector_2D;
 }
 
-int append_other_ToVector(v_dw_3D &All_Vector,GdkKeymap * keymap) {
+int append_underlying_ToVector(v_dw_3D &All_Vector,GdkKeymap * keymap) {
 
   // create a 2D vector all filled with " " and push to 3D-Vector
-  v_dw_2D Other_Vector2D = create_empty_2D_Vector(All_Vector[0].size(),All_Vector[0][0].size());
+  v_dw_2D underlying_Vector2D = create_empty_2D_Vector(All_Vector[0].size(),All_Vector[0][0].size());
 
-  if (Other_Vector2D.size() == 0) {
+  if (underlying_Vector2D.size() == 0) {
     wprintf(L"ERROR: can't create empty 2D-Vector\n");
     return 1;
   }
-  All_Vector.push_back(Other_Vector2D);
+  All_Vector.push_back(underlying_Vector2D);
 
   if (All_Vector.size() < 2) {
     wprintf(L"ERROR: creation of 3D-Vector failed\n");
@@ -322,10 +323,10 @@ int append_other_ToVector(v_dw_3D &All_Vector,GdkKeymap * keymap) {
 
   for(int i =0; i< (int) All_Vector[1].size();i++) {
 
-    // get key name US stored in [0][i][0] and copy to name in "other"-block[1][i][0]
+    // get key name US stored in [0][i][0] and copy to name in "underlying"-block[1][i][0]
     All_Vector[1][i][0] = All_Vector[0][i][0];
 
-    // get Keyvals of this key and copy to unshifted/shifted in "other"-block[1][i][1] / block[1][i][2]
+    // get Keyvals of this key and copy to unshifted/shifted in "underlying"-block[1][i][1] / block[1][i][2]
     All_Vector[1][i][0+1] = KMX_get_KeyvalsUnderlying_From_KeyCodeUnderlying_GDK(keymap,All_Vector[0][i][0],0);   //shift state: unshifted:0
     All_Vector[1][i][1+1] = KMX_get_KeyvalsUnderlying_From_KeyCodeUnderlying_GDK(keymap,All_Vector[0][i][0],1);   //shift state: shifted:1
   }
@@ -362,8 +363,7 @@ bool IsKeymanUsedChar(int KV) {
 }
 
 
-
-std::wstring convert_DeadkeyValues_ToChar(int in) {
+std::wstring convert_DeadkeyValues_ToWstr(int in) {
 
   KMX_DWORD lname;
 
@@ -381,7 +381,7 @@ std::wstring convert_DeadkeyValues_ToChar(int in) {
     return  std::wstring(1, in);
   }
 
-    lname = convertNamesToIntegerValue( wstring_from_string(long_name));      // 65106 => "dead_circumflex " => 94 => "^"
+    lname = convertNamesToDWORDValue( wstring_from_string(long_name));      // 65106 => "dead_circumflex " => 94 => "^"
 
     if (lname != returnIfCharInvalid) {
       return std::wstring(1, lname );
@@ -389,8 +389,7 @@ std::wstring convert_DeadkeyValues_ToChar(int in) {
     else
       return L"\0";
 }
-//_S2 REview and change??
-//_S2 REview and change??
+//_S2 ToDo REview and change??
 std::u16string convert_DeadkeyValues_To_U16str(int in) {
 
   KMX_DWORD lname;
@@ -409,7 +408,7 @@ std::u16string convert_DeadkeyValues_To_U16str(int in) {
       return  CodePointToString_16(in-0x1000000);
 
     // it's a descriptive name like "dead_circumflex"
-    lname = convertNamesToIntegerValue( wstring_from_string(long_name));      // "dead_circumflex" => 94 => "^"
+    lname = convertNamesToDWORDValue( wstring_from_string(long_name));      // "dead_circumflex" => 94 => "^"
 
     if (lname != returnIfCharInvalid) {
       return std::u16string(1, lname );
@@ -420,6 +419,7 @@ std::u16string convert_DeadkeyValues_To_U16str(int in) {
   return u"\0";
 }
 
+// base function to get keyvals
 int KMX_get_keyvals_From_Keycode(GdkKeymap *keymap, guint keycode, ShiftState ss, int caps) {
 
   GdkModifierType consumed;
@@ -507,7 +507,6 @@ int KMX_get_keyvals_From_Keycode(GdkKeymap *keymap, guint keycode, ShiftState ss
   return (int) *keyvals;
 }
 
-// _S2 TODO
 KMX_DWORD KMX_get_KeyvalsUnderlying_From_KeyCodeUnderlying_GDK(GdkKeymap *keymap, guint keycode, int shift_state_pos, PKMX_WCHAR &dky) {
   GdkKeymapKey *maps;
   guint *keyvals;
@@ -523,44 +522,8 @@ KMX_DWORD KMX_get_KeyvalsUnderlying_From_KeyCodeUnderlying_GDK(GdkKeymap *keymap
 
   if (!(shift_state_pos <= count))
   return 0;
-// _S2 94 as variable/const
-  if (!(keycode <= 94))
-    return 0;
 
-  // _S2 TODO take caps to this function
-  // _S2 TODO take caps to this function
-  // here I get all kvals: normal char , my Deadkeys, allothr DK
-  KMX_DWORD All_Keyvals = KMX_get_keyvals_From_Keycode(keymap, keycode, ShiftState(shift_state_pos), 0);
-  if(( (All_Keyvals >= deadkey_min) && (All_Keyvals <= deadkey_max)))
-    deadkey = All_Keyvals;
-
-  dky = (PKMX_WCHAR) (convert_DeadkeyValues_To_U16str((int) deadkey)).c_str();
-  out = KMX_get_FFFF_Underlying_according_to_keycode_and_Shiftstate_GDK_dw(keymap, keycode, (ShiftState)  shift_state_pos, 0);
-
-  g_free(keyvals);
-  g_free(maps);
-
-  return out;
-}
-
-// _S2 TODO
-KMX_DWORD KMX_get_KeyvalsUnderlying_From_KeyCodeUnderlying_GDK_New(GdkKeymap *keymap, guint keycode, int shift_state_pos, PKMX_WCHAR &dky) {
-  GdkKeymapKey *maps;
-  guint *keyvals;
-  gint count;
-  KMX_DWORD out;
-  KMX_DWORD deadkey=0;
-
-
-  if (!gdk_keymap_get_entries_for_keycode(keymap, keycode, &maps, &keyvals, &count))
-    return 0;
-  //if(!gdk_wayland_keymap_get_entries_for_keycode(keymap, keycode, &maps, &keyvals, &count))
-  //  return 0;    https://codebrowser.dev/gtk/gtk/gdk/wayland/gdkkeys-wayland.c.html
-
-  if (!(shift_state_pos <= count))
-  return 0;
-// _S2 94 as variable/const
-  if (!(keycode <= 94))
+  if (!(keycode <= keycode_max))
     return 0;
 
   // _S2 TODO take caps to this function
@@ -568,23 +531,8 @@ KMX_DWORD KMX_get_KeyvalsUnderlying_From_KeyCodeUnderlying_GDK_New(GdkKeymap *ke
   KMX_DWORD All_Keyvals =  KMX_get_keyvals_From_Keycode(keymap, keycode, ShiftState(shift_state_pos), 0);
   if(( (All_Keyvals >= deadkey_min) && (All_Keyvals <= deadkey_max)))
     deadkey = All_Keyvals;
-    // _S2 check if naming is correct: does get_char... return a char or a string or a DWORD;...?
+    // _S2 TODO check if naming is correct: does get_char... return a char or a string or a DWORD;...?
   dky = (PKMX_WCHAR) (convert_DeadkeyValues_To_U16str((int) deadkey)).c_str();
-/*
-// _S2 ToDo
-KMX_DWORD KMX_get_FFFF_Underlying_according_to_keycode_and_Shiftstate_GDK_dw(GdkKeymap *keymap, guint keycode, ShiftState ss, int caps){
-
-  KMX_DWORD keyvals_dw= (KMX_DWORD) KMX_get_keyvals_From_Keycode(keymap, keycode, ss, caps);
-  
-  // _S2 AHA output for dk4-12 at the top after dk... from here
-  if((keyvals_dw >=  deadkey_min) && (keyvals_dw <=  deadkey_max))                                    // deadkeys
-    return 0xFFFF;
-  else if((keyvals_dw >  deadkey_max) || ((keyvals_dw <  deadkey_min)  &&  ( keyvals_dw > 0xFF)))     // out of range
-    return 0xFFFE;
-  else                                                                                                // usable char
-    return keyvals_dw;
-}
-*/
 
   g_free(keyvals);
   g_free(maps);
@@ -596,15 +544,6 @@ KMX_DWORD KMX_get_FFFF_Underlying_according_to_keycode_and_Shiftstate_GDK_dw(Gdk
     return 0xFFFE;
   else                                                                                                // usable char
     return All_Keyvals;
-
-
-
-
-
-
-  //out = KMX_get_FFFF_Underlying_according_to_keycode_and_Shiftstate_GDK_dw(keymap, keycode, (ShiftState)  shift_state_pos, 0);
-
-
 }
 
 KMX_DWORD KMX_get_KeyvalsUnderlying_From_KeyCodeUnderlying_GDK(GdkKeymap *keymap, guint keycode, int shift_state_pos) {
@@ -619,10 +558,10 @@ KMX_DWORD KMX_get_KeyvalsUnderlying_From_KeyCodeUnderlying_GDK(GdkKeymap *keymap
   if (!(shift_state_pos <= count))
    return 0;
 
-   if (!(keycode <= 94))
+   if (!(keycode <= keycode_max))
     return 0;
 
-  out = KMX_get_CharsUnderlying_according_to_keycode_and_Shiftstate_GDK_dw(keymap, keycode, (ShiftState) shift_state_pos, 0);
+  out = KMX_get_CharUnderlying_according_to_keycode_and_Shiftstate_GDK_dw(keymap, keycode, (ShiftState) shift_state_pos, 0);
 
   g_free(keyvals);
   g_free(maps);
@@ -630,54 +569,34 @@ KMX_DWORD KMX_get_KeyvalsUnderlying_From_KeyCodeUnderlying_GDK(GdkKeymap *keymap
   return out;
 }
 
-// _S2 ToDo
-KMX_DWORD KMX_get_FFFF_Underlying_according_to_keycode_and_Shiftstate_GDK_dw(GdkKeymap *keymap, guint keycode, ShiftState ss, int caps){
-
-  KMX_DWORD keyvals_dw= (KMX_DWORD) KMX_get_keyvals_From_Keycode(keymap, keycode, ss, caps);
+// _S2 same as KMX_get_KeyvalsUnderlying_From_KeyCodeUnderlying_GDK ??
+KMX_DWORD KMX_get_CharUnderlying_From_SCUnderlying_GDK(GdkKeymap *keymap, UINT VKShiftState, UINT SC_underlying, PKMX_WCHAR DeadKey) {
   
-  // _S2 AHA output for dk4-12 at the top after dk... from here
-  if((keyvals_dw >=  deadkey_min) && (keyvals_dw <=  deadkey_max))                                    // deadkeys
-  if((keyvals_dw >=  deadkey_min) && (keyvals_dw <=  deadkey_max))                                    // deadkeys
-    return 0xFFFF;
-  else if((keyvals_dw >  deadkey_max) || ((keyvals_dw <  deadkey_min)  &&  ( keyvals_dw > 0xFF)))     // out of range
-    return 0xFFFE;
-  else                                                                                                // usable char
-    return keyvals_dw;
-}
-// _S2 remove term _other and use underlying instead
-KMX_DWORD KMX_get_CharUnderlying_From_SCUnderlying_GDK_NEW(GdkKeymap *keymap, UINT VKShiftState, UINT SC_OTHER, PKMX_WCHAR DeadKey) {
-  //takes keymap, shift, scanCode
-  //fills ref deadkey
-  //returns character(KMX_DWORD)
-PKMX_WCHAR dd;
-  KMX_DWORD keyvals_dw = KMX_get_KeyvalsUnderlying_From_KeyCodeUnderlying_GDK_New(keymap, SC_OTHER, map_VKShiftState_to_Lin(VKShiftState), dd);
+  PKMX_WCHAR dky;
+  KMX_DWORD keyvals_dw = KMX_get_KeyvalsUnderlying_From_KeyCodeUnderlying_GDK(keymap, SC_underlying, map_VKShiftState_to_LinModifier(VKShiftState), dky);
 
-
-
-
-// _S2 rename dd
-  if((keyvals_dw >=  deadkey_min) && (keyvals_dw >=  deadkey_max))  {
-    *DeadKey = *dd;
+  if(keyvals_dw >=  deadkey_min) {
+    *DeadKey = *dky;
     return 0xFFFF;
   }
   else if((keyvals_dw >  deadkey_max) || ((keyvals_dw <  deadkey_min)  &&  ( keyvals_dw > 0xFF)))     // out of range
     return 0xFFFE;
   else                                                                                                // usable char
     return keyvals_dw;
-
 }
 
-KMX_DWORD KMX_get_CharsUnderlying_according_to_keycode_and_Shiftstate_GDK_dw(GdkKeymap *keymap, guint keycode, ShiftState ss, int caps){
+// _S2 why dio I need this function after all??
+KMX_DWORD KMX_get_CharUnderlying_according_to_keycode_and_Shiftstate_GDK_dw(GdkKeymap *keymap, guint keycode, ShiftState ss, int caps){
 
   return (KMX_DWORD) KMX_get_keyvals_From_Keycode(keymap, keycode, ss, caps);
 }
 
-std::wstring KMX_get_CharsUnderlying_according_to_keycode_and_Shiftstate_GDK(GdkKeymap *keymap, guint keycode, ShiftState ss, int caps){
+std::wstring KMX_get_CharUnderlying_according_to_keycode_and_Shiftstate_GDK(GdkKeymap *keymap, guint keycode, ShiftState ss, int caps){
 
   // _S2 QUESTION skip ss 2+3  remove??
   
   int keyvals_int= KMX_get_keyvals_From_Keycode(keymap, keycode, ss, caps);
-    return  convert_DeadkeyValues_ToChar(keyvals_int);
+    return  convert_DeadkeyValues_ToWstr(keyvals_int);
 }
 
 // _S2 ToDo // _use gdk_keymap_translate_keyboard_state of other function
@@ -728,7 +647,7 @@ KMX_DWORD KMX_get_KeyCodeUnderlying_From_VKUS( KMX_DWORD VK_US) {
 KMX_DWORD KMX_get_KeyCodeUnderlying_From_KeycodeUS_GDK(GdkKeymap *keymap, v_dw_3D &All_Vector,KMX_DWORD KC_US, ShiftState ss, int caps) {
 
   KMX_DWORD Character;
-  std::wstring ws = KMX_get_CharsUnderlying_according_to_keycode_and_Shiftstate_GDK(keymap, KC_US, ss, caps);
+  std::wstring ws = KMX_get_CharUnderlying_according_to_keycode_and_Shiftstate_GDK(keymap, KC_US, ss, caps);
   Character = *ws.c_str();
 
   //Find underlying SC of character

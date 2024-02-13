@@ -226,7 +226,7 @@ void KMX_ReportUnconvertedKeyboardRules(LPKMX_KEYBOARD kbd) {
 }
 
 void KMX_TranslateDeadkeyKey(LPKMX_KEY key, KMX_WCHAR deadkey, KMX_WORD vk, UINT shift, KMX_WORD ch) {
-// _S2 INFO this produces  a different output due to different layouts for Lin<-> win ( foe the same language!!)
+// _S2 INFO this produces  a different output due to different layouts for Lin<-> win ( for the same language!!)
 
    if((key->ShiftFlags == 0 || key->ShiftFlags & VIRTUALCHARKEY) && key->Key == ch) {
 
@@ -394,7 +394,7 @@ void KMX_ConvertDeadkey(LPKMX_KEYBOARD kbd, KMX_WORD vk, UINT shift, KMX_WCHAR d
 pd_S2=pdk;
 //pdd_S2=pdk;
     // Look up the ch
-    UINT vkUnderlying = KMX_get_VKUS_From_VKUnderlying_VEC(All_Vector, *pdk);
+    UINT vkUnderlying = KMX_get_CharUS_From_VKUnderlying_VEC(All_Vector, *pdk);
 
     KMX_TranslateDeadkeyKeyboard(kbd, dkid, vkUnderlying, *(pdk+1), *(pdk+2));
     pdk+=3;
@@ -425,7 +425,7 @@ KMX_BOOL KMX_SetKeyboardToPositional(LPKMX_KEYBOARD kbd) {
 
 KMX_BOOL KMX_DoConvert(LPKMX_KEYBOARD kbd, KMX_BOOL bDeadkeyConversion, gint argc, gchar *argv[]) {
 
-  KMX_WCHAR DeadKey;
+  KMX_WCHAR DeadKey=0;
 
   if(!KMX_SetKeyboardToPositional(kbd)) return FALSE;
 
@@ -460,16 +460,8 @@ KMX_BOOL KMX_DoConvert(LPKMX_KEYBOARD kbd, KMX_BOOL bDeadkeyConversion, gint arg
 
       // win goes via VK, Lin goes via SC
 
-  KMX_WCHAR DeadKey1=0;
-  DeadKey=0;
       UINT scUnderlying =  KMX_get_SCUnderlying_From_VKUS(KMX_VKMap[i]);
       KMX_WCHAR ch = KMX_get_CharUnderlying_From_SCUnderlying_GDK(keymap, VKShiftState[j], scUnderlying, &DeadKey);
-      KMX_WCHAR ch1 = KMX_get_CharUnderlying_From_SCUnderlying_GDK_NEW(keymap, VKShiftState[j], scUnderlying, &DeadKey1);
-
-      if( ch!=ch1)
-      wprintf(L"IS DIFFERENT!!!! %i <--> %i\n", ch,ch1);
-      if( DeadKey!=DeadKey1)
-      wprintf(L"DDDDKKKK IS DIFFERENT!!!! %i <--> %i\n", DeadKey,DeadKey1);
 
       //wprintf(L"--- VK_%d -> SC_ [%c] dk=%d  ( ss %i) \n", VKMap[i], ch == 0 ? 32 : ch, DeadKey, VKShiftState[j]);
 
@@ -509,38 +501,25 @@ void KMX_LogError(const KMX_WCHART* m1,int m2, LPKMX_KEY key) {
 }
 */
 
-// takes VK of US keyboard and returns SC of OTHER keyboard
+// _S2 why are those not in keymap.cpp/h
+// takes VK of US keyboard and returns SC of underlying keyboard
 UINT  KMX_get_SCUnderlying_From_VKUS(KMX_DWORD VirtualKeyUS) {
   UINT SC_US = 8 + USVirtualKeyToScanCode[VirtualKeyUS];
-  UINT SC_OTHER = SC_US;  // not neccessary but to understand what we do
-  return  SC_OTHER;
+  UINT SC_underlying = SC_US;  // not neccessary but to understand what we do
+  return  SC_underlying;
 }
 
-KMX_WCHAR KMX_get_VKUS_From_VKUnderlying_VEC(v_dw_3D All_Vector, KMX_DWORD VK_OTHER) {
+KMX_WCHAR KMX_get_CharUS_From_VKUnderlying_VEC(v_dw_3D All_Vector, KMX_DWORD VK_underlying) {
   KMX_DWORD VK_US;
   for( int i=0; i< (int)All_Vector[0].size()-1 ;i++) {
     for( int j=1; j< (int)All_Vector[0][0].size();j++) {
-      if ( ( All_Vector[0][i][j] == VK_OTHER ) ) {
+      if ( ( All_Vector[0][i][j] == VK_underlying ) ) {
         VK_US = All_Vector[1][i][j];;
         return VK_US;
       }
     }
   }
-  return VK_OTHER;
-}
-
-// takes SC of underlying keyboard and returns character of underlying keyboard with shiftstate VKShiftState[j] or deadkey
-KMX_WCHAR  KMX_get_CharUnderlying_From_SCUnderlying_GDK(GdkKeymap *keymap, UINT VKShiftState, UINT SC_OTHER, PKMX_WCHAR DeadKey) {
-
-  PKMX_WCHAR dky;
-  int VKShiftState_lin = map_VKShiftState_to_Lin(VKShiftState);
-  KMX_DWORD KeyvalOther = KMX_get_KeyvalsUnderlying_From_KeyCodeUnderlying_GDK(keymap,SC_OTHER, VKShiftState_lin, dky);
-// _S2 < or > 
-  if ((KeyvalOther >= deadkey_min) && (KeyvalOther >=  deadkey_max)){
-    *DeadKey = *dky;
-    return 0xFFFF;
-  }
-  return (KMX_WCHAR) KeyvalOther;
+  return VK_underlying;
 }
 
 int KMX_GetDeadkeys(v_dw_2D & dk_Table, KMX_WORD DeadKey, KMX_WORD *OutputPairs, GdkKeymap* keymap) {

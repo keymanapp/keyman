@@ -75,11 +75,11 @@ int KMX_ToUnicodeEx(guint keycode, const BYTE *lpKeyState, PKMX_WCHAR pwszBuff, 
   if (!(shift_state_pos <= count))
    return 0;
 
-   if (!(keycode <= 94))
+   if (!(keycode <= keycode_max))
     return 0;
 
-  std::wstring character= KMX_get_CharsUnderlying_according_to_keycode_and_Shiftstate_GDK(keymap, keycode, ShiftState(shift_state_pos), caps);
-  pwszBuff[0]= * (PKMX_WCHAR)  u16string_from_wstring(character).c_str();
+  std::wstring str= KMX_get_CharUnderlying_according_to_keycode_and_Shiftstate_GDK(keymap, keycode, ShiftState(shift_state_pos), caps);
+  pwszBuff[0]= * (PKMX_WCHAR)  u16string_from_wstring(str).c_str();
 
   KMX_DWORD keyvals_dw= (KMX_DWORD) KMX_get_keyvals_From_Keycode(keymap, keycode, ShiftState(shift_state_pos), caps);
 
@@ -561,7 +561,7 @@ bool KMX_ImportRules(LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, GdkKeymap **keymap,
                 continue;
               }
               sbBuffer[rc] = 0;
-              //rgKey[iKey]->KMX_SetShiftState(ss, KeyVal_Other, false, (caps==0));
+              //rgKey[iKey]->KMX_SetShiftState(ss, sbBuffer, false, (caps==0));
               rgKey[iKey]->KMX_SetShiftState(ss, sbBuffer, false, (caps));    //_S2 INFO
             }
           }
