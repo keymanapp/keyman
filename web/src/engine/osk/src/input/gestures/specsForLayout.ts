@@ -441,9 +441,9 @@ export function longpressContactModel(params: GestureParams, enabledFlicks: bool
     pathResolutionAction: 'resolve',
     timer: {
       duration: spec.waitLength,
-      expectedResult: true,
-      validateItem: (key: KeyElement) => !!key?.key.spec.sk
+      expectedResult: true
     },
+    validateItem: (key: KeyElement) => !!key?.key.spec.sk,
     pathModel: {
       evaluate: (path) => {
         const stats = path.stats;
