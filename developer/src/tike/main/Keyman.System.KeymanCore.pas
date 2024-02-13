@@ -291,10 +291,6 @@ function km_core_state_get_actions(
   state: pkm_core_state
 ): pkm_core_actions; cdecl; external keymancore delayed;
 
-function km_core_actions_dispose(
-  actions: pkm_core_actions
-): km_core_status; cdecl; external keymancore delayed;
-
 function km_core_state_to_json(
   state: pkm_core_state;
   buf: PAnsiChar;

@@ -1,5 +1,71 @@
 # Keyman Version History
 
+## 17.0.265 alpha 2024-02-12
+
+* fix(developer): keyboard that targets only web can cause crashes and other problems (#10664)
+* fix(android/engine): Download multiple dictionaries (#10680)
+
+## 17.0.264 alpha 2024-02-09
+
+* chore(linux): Don't set VERSION_TAG to …-local in .deb packages (#10675)
+*  (#10672)
+
+## 17.0.263 alpha 2024-02-08
+
+* fix(linux): Ignore keys with IBUS_MOD4_MASK set (#10668)
+
+## 17.0.262 alpha 2024-02-07
+
+* refactor(windows): Use km_core_actions struct instead of queue (#10557)
+* chore(core): move action apis into keyman_core_api_actions.h (#10569)
+*  (#10586)
+*  (#10614)
+* fix(core): make `km_core_state_get_actions()` idempotent (#10585)
+* fix(core): strip markers in `actions_update_app_context_nfu()` (#10607)
+* fix(core): surrogate handling, markers in app context, and memory leak (#10618)
+* fix(windows): support unicode strings properly in logs (#10650)
+* fix(developer): ensure project populate files actually adds files (#10651)
+* fix(linux): Use raw string for regex (#10652)
+* fix(windows): `wstrtostr` should use `WideCharToMultiByte` (#10660)
+* chore(windows): rename actionItem to outputString for clarity (#10661)
+* fix(web): handling of backspaces when left-context is empty (#10584)
+* fix(ios): long-held backspace handling (#10633)
+* fix(web): banner scroll positioning after reversions (#10643)
+* chore(web): removes unused banner events (#10644)
+
+## 17.0.261 alpha 2024-02-06
+
+* fix(web): app/webview sourcemap inlining (#10631)
+* fix(android/app): Cleanup AndroidManifest handling of *.kmp (#10624)
+
+## 17.0.260 alpha 2024-02-03
+
+* chore(oem/fv): Update versions in keyboards.csv (#10606)
+* fix(linux): Fix path to artifacts when uploading to llso (#10609)
+* docs(linux): Update sample settings (#10610)
+* chore(linux): Fix API check if lines got removed in .symbols file (#10612)
+
+## 17.0.259 alpha 2024-02-02
+
+* feat(developer):  double markers once again (#10541)
+* feat(core): ldml double marker, C++ side (#10563)
+* feat(core,developer): simplify markers (#10565)
+* chore(common): cancel earlier builds when new test builds triggered (#10593)
+* chore(linux): Use correct format specifier for `g_utf8_strlen` (#10599)
+* fix(linux): Fix version comparison (#10576)
+* chore(common): Add entries from 16.0.145 HISTORY.md (#10603)
+* chore(common): history missing message fixup (#10601)
+* chore(linux): Update debian changelog (#10596)
+
+## 17.0.258 alpha 2024-02-01
+
+* chore(developer): add unicode-license.txt for ldml keyboards data (#10568)
+* feat(core): ldml reorder marker processing (#10539)
+* chore(developer): kmc ldml build - call c8 directly for tests (#10522)
+* fix(web): app/webview control flow for initial layer (#10571)
+* chore(linux): Upgrade artifacts to v4 (#10577)
+* chore(linux): Fix the path of downloaded artifacts (#10594)
+
 ## 17.0.257 alpha 2024-01-31
 
 * epic: Keyman Core normalization (#10390)
@@ -41,7 +107,7 @@
 * fix(common): ldml: fix typo in kmc error message (#10484)
 * chore(developer): `--enable-source-maps` parameter for kmc wrapper (#10496)
 * fix(android/engine): Fix OSK widths (#10442)
-*  (#10508)
+* fix(web): banner suggestion resizing after device rotation (#10508)
 
 ## 17.0.251 alpha 2024-01-24
 
@@ -53,7 +119,7 @@
 * fix(web): osk responsiveness to held modifiers on legacy kbds (#10437)
 * fix(android/engine): Skip final globe key action (#10465)
 * feat(developer): marker normalization in .ts (#10443)
-*  (#10445)
+* fix(android): hardware keystrokes now include mnemonic processing (#10445)
 
 ## 17.0.249 alpha 2024-01-22
 
@@ -1211,7 +1277,7 @@
 
 ## 17.0.67 alpha 2023-03-14
 
-* (developer):Update copyright period in License.rtf (#8425)
+* chore(developer): Update copyright period in License.rtf (#8425)
 * chore(common): support shorthand for build.sh (#8415)
 * chore(common): build script performance improvements (#8416)
 * chore(common): TS updates to non-sync'd packages, feature-esmodule merge conflict prevention (#8429)
@@ -1587,6 +1653,16 @@
 * feat(windows): configuration UI polish (#7206)
 * chore: move to 17.0-alpha (#7577)
 * chore: Move to 17.0 alpha
+
+## 16.0.145 stable 2024-02-01
+
+* chore(linux): Add support for loong64 architecture (#10108)
+* chore(linux): Update debian changelog (#10122)
+* fix(web): Fix null error with legacy keyboards (#10177)
+* chore(ios): FV certificate key (#10229)
+* fix(oem/fv): Add fv_hulquminum_combine and fv_kwadacha_tsekene (#10285)
+* chore(developer): upgrade ngrok to v3 (#10360)
+* chore(linux): Build with webkitgtk 4.1 instead of 4.0 (#10574)
 
 ## 16.0.144 stable 2023-11-30
 

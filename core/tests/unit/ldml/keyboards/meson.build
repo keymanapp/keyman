@@ -37,6 +37,7 @@ tests_with_testdata = [
   'k_006_backspace',
   'k_007_transform_rgx',
   'k_008_transform_norm',
+  'k_009_transform_nfc',
   'k_020_fr', # TODO-LDML: move to cldr above (fix vkey)
   'k_200_reorder_nod_Lana',
   'k_201_reorder_esk',

@@ -141,8 +141,12 @@ export abstract class TransformCompiler<T extends TransformCompilerType, TranBas
     // don't unescape literals here, because we are going to pass them through into the regex
     cookedFrom = util.unescapeStringToRegex(cookedFrom);
 
-    // nfd here.
-    cookedFrom = MarkerParser.nfd_markers(cookedFrom, true);
+    this.checkRanges(cookedFrom); // check before normalizing
+
+    if (!sections?.meta?.normalizationDisabled) {
+      // nfd here.
+      cookedFrom = MarkerParser.nfd_markers(cookedFrom, true);
+    }
 
     // cookedFrom is cooked above, since there's some special treatment
     result.from = sections.strs.allocString(cookedFrom, {
@@ -185,14 +189,73 @@ export abstract class TransformCompiler<T extends TransformCompilerType, TranBas
   }
   public get dependencies(): Set<SectionIdent> {
     const defaults = new Set(<SectionIdent[]>[
-      constants.section.strs,
-      constants.section.list,
       constants.section.elem,
-      constants.section.vars,
+      constants.section.list,
+      constants.section.meta,
+      constants.section.strs,
       constants.section.uset,
+      constants.section.vars,
     ]);
     defaults.delete(this.id);
     return defaults;
+  }
+
+  private checkRanges(cookedFrom: string) {
+    // extract all of the potential ranges - but don't match any-markers!
+    const anyRange = /(?<!\\uffff\\u0008)\[([^\]]+)\]/g;
+    const ranges = cookedFrom.matchAll(anyRange);
+
+    if (!ranges) return;
+
+    // extract inner members of a range (inside the [])
+    const rangeRegex = /(\\u[0-9a-fA-F]{4}|.)-(\\u[0-9a-fA-F]{4}|.)|./g;
+
+    const rangeExplicit = new util.NFDAnalyzer();
+    const rangeImplicit = new util.NFDAnalyzer();
+
+    /** process an explicit entry */
+    function processExplicit(s: string) {
+      if (s.startsWith('\\u{')) {
+        s = util.unescapeString(s);
+      } else if(s.startsWith('\\u')) {
+        s = util.unescapeOneQuadString(s);
+      }
+      rangeExplicit.add(s);
+      return s;
+    }
+
+    for (const [, sub] of ranges) {
+      const subRanges = sub.matchAll(rangeRegex);
+      for (const [all, start, end] of subRanges) {
+        if (!start && !end) {
+          // explicit single char
+          processExplicit(all); // matched one char
+        } else {
+          // start-end range - get explicit start and end chars
+          const s = processExplicit(start);
+          const sch = s.codePointAt(0);
+          const e = processExplicit(end);
+          const ech = e.codePointAt(0);
+          // now, process the inner chars, not including explicit
+          for (let n = sch; n < ech; n++) {
+            // add inner text
+            rangeImplicit.add(String.fromCodePoint(n));
+          }
+        }
+      }
+    }
+
+    // analyze ranges
+    const explicitSet = rangeExplicit.analyze()?.get(util.BadStringType.denormalized);
+    if (explicitSet) {
+      this.callbacks.reportMessage(CompilerMessages.Warn_CharClassExplicitDenorm({ lowestCh: explicitSet.values().next().value }));
+    } else {
+      // don't analyze the implicit set of THIS range, if explicit is already problematic
+      const implicitSet = rangeImplicit.analyze()?.get(util.BadStringType.denormalized);
+      if (implicitSet) {
+        this.callbacks.reportMessage(CompilerMessages.Hint_CharClassImplicitDenorm({ lowestCh: implicitSet.values().next().value }));
+      }
+    }
   }
 }
 

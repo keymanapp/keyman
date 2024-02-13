@@ -299,11 +299,54 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
     let selection = textDocumentProxy.selectedText ?? ""
     let contextAfterInput = textDocumentProxy.documentContextAfterInput ?? ""
     let context = "\(contextBeforeInput)\(selection)\(contextAfterInput)"
-    let bLength = contextBeforeInput.utf16.count
-    let sLength = selection.utf16.count
+    let bLength = contextBeforeInput.unicodeScalars.count
+    let sLength = selection.unicodeScalars.count
     setContextState(text: context, range: NSMakeRange(bLength, sLength))
     // Within the app, this is triggered after every keyboard input.
     // We should NOT call .resetContext() here for this reason.
+  }
+
+  // Pre-condition:  no text is selected.  As this is currently only called by `insertText`
+  // below, this condition is met.
+  func sendContextUpdate() {
+    let preCaretContext = textDocumentProxy.documentContextBeforeInput ?? ""
+    let postCaretContext = textDocumentProxy.documentContextAfterInput ?? ""
+
+    let updater = { (_ before: String, _ after: String) -> Void in
+      let contextWindowText = "\(before)\(after)"
+
+      let range = NSRange(location: before.unicodeScalars.count, length: 0)
+
+      self.setContextState(text: contextWindowText, range: range)
+    }
+
+    updater(preCaretContext, postCaretContext)
+
+    if preCaretContext == "" {
+      /* The `textDocumentProxy` abstraction is documented (in passing) as involving
+       * inter-process communication.  It is thus asynchronous.  Despite all attempts to prod
+       * it, the context window is only ever updated if an attempt to make an actual *edit*
+       * outside of the context window occurs.  The first such edit will NOT have
+       * available synchronous data... but a bit of an async wait will usually succeed in
+       * getting the update.
+       *
+       * 33ms seemed sufficient.  Can we go lower? (~30 Hz rate)
+       * Success with 20ms. (50 Hz rate)
+       * 1ms is not sufficient, nor is 10ms.   :(
+       *
+       * Note:  these notes were taken via Simulator, not on a physical device;
+       * there's no guarantee (yet) that the times will be the same.
+       * But something refresh-rate related is a fairly reasonable assumption.
+       */
+      DispatchQueue.main.asyncAfter(deadline: .now() + 0.033) { // 33 msec; contrast: held backspace - every 100 msec.
+
+        // Does NOT update after half a second if there's no context manipulation.
+        let preCaretAsyncContext = self.textDocumentProxy.documentContextBeforeInput ?? ""
+        let postCaretAsyncContext = self.textDocumentProxy.documentContextAfterInput ?? ""
+
+        updater(preCaretAsyncContext, postCaretAsyncContext)
+      }
+    }
   }
 
   func insertText(_ keymanWeb: KeymanWebViewController, numCharsToDelete: Int, newText: String) {
@@ -331,11 +374,13 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
     if numCharsToDelete <= 0 || hasDeletedSelection {
       textDocumentProxy.insertText(newText)
 
+      sendContextUpdate()
       return
     }
 
     if numCharsToDelete > 0 && textDocumentProxy.documentContextBeforeInput == nil {
       textDocumentProxy.deleteBackward()
+      sendContextUpdate()
       return
     }
 
@@ -378,6 +423,8 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
     if !newText.isEmpty {
       textDocumentProxy.insertText(newText)
     }
+
+    sendContextUpdate()
   }
 
   func menuKeyUp(_ keymanWeb: KeymanWebViewController) {
@@ -552,6 +599,13 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
     keymanWeb.setSentryState(enabled: enabled)
   }
 
+  /**
+   * Facilitates context synchronization with the KMW-app/webview side.
+   *
+   * The range's components should be SMP-aware, as the embedded engine
+   * will be expecting SMP-aware measurements.  Swift's `.unicodeScalars`
+   * property on `String`s lines up best with this.
+   */
   func setContextState(text: String?, range: NSRange) {
     var offsetPrefix = false;
 
