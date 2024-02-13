@@ -5,9 +5,12 @@
     "baseUrl": "./",
     "outDir": "build/obj",
     "tsBuildInfoFile": "build/tsconfig.tsbuildinfo",
-    "rootDir": "./"
+    "rootDir": "./",
+    "module": "Node16",
+    "moduleResolution": "Node16"
   },
   "references": [
-    { "path": "./src/main" }
+    { "path": "./src/main" },
+    { "path": "./src/data-compiler" }
   ]
 }
