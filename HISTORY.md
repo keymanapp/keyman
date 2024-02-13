@@ -1,5 +1,11 @@
 # Keyman Version History
 
+## 17.0.266 alpha 2024-02-13
+
+* chore(windows): add const to argument definition (#10677)
+* feat(windows): update windows engine unit tests to match removal of engine cached context (#10184)
+* fix(web): prevent invalid longpress shortcut triggers (#10641)
+
 ## 17.0.265 alpha 2024-02-12
 
 * fix(developer): keyboard that targets only web can cause crashes and other problems (#10664)
