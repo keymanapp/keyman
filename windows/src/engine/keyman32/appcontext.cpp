@@ -164,3 +164,62 @@ ContextItemToAppContext(km_core_context_item *contextItems, PWSTR outBuf, DWORD 
   delete[] buf;
   return TRUE;
 }
+
+BOOL
+pre_process_context(LPWSTR context) {
+
+  if (context == nullptr) {
+    return FALSE;
+  }
+  BOOL result = FALSE;
+  LPWSTR ptr = context;
+  while (*ptr != L'\0') {
+    if (*ptr == L'\r' && *(ptr + 1) == L'\n') {
+      *ptr = L'\n';
+      size_t len = wcslen(ptr + 2) + 1;
+      memmove_s(ptr + 1, len * sizeof(wchar_t), ptr + 2, len * sizeof(wchar_t));  // Shift characters
+      result = TRUE;
+    } else {
+      ++ptr;
+    }
+  }
+  return result;
+}
+
+BOOL
+post_process_context(LPCWSTR context, LPWSTR windows_context, uint32_t output_size) {
+
+  if (context == nullptr) {
+     return FALSE;
+  }
+
+  // return early if doesn't contain any '\n';
+  if (wcsstr(context, L"\n") == nullptr) {
+    return FALSE;
+  }
+
+  size_t temp_length = wcslen(context) *2;
+  LPWSTR temp_string  = new WCHAR[temp_length];
+
+  LPCWSTR orig_ptr = context;
+  LPWSTR temp_ptr  = temp_string;
+  while (*orig_ptr != L'\0') {
+    if (*orig_ptr == L'\n') {
+      *temp_ptr++ = L'\r';
+    }
+    *temp_ptr++ = *orig_ptr++;
+  }
+  *temp_ptr++ = L'\0';
+
+  // may now need to truncate the string preserving the end closest the caret.
+  auto final_length = wcsnlen_s(temp_string, temp_length);
+  if (final_length < output_size) {
+    wcscpy_s(windows_context, output_size, temp_string);
+  }
+  else {
+    auto diff = final_length + 1 - output_size;  // +1 for null termination
+    wcscpy_s(windows_context, output_size, temp_string + diff);
+  }
+  delete[] temp_string;
+  return TRUE;
+}

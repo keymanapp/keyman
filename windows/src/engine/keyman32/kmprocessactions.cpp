@@ -14,14 +14,21 @@
 
 static void
 processUnicodeChar(AITIP* app, const km_core_usv* outputString) {
-  while (*outputString) {
-    if (Uni_IsSMP(*outputString)) {
-      app->QueueAction(QIT_CHAR, (Uni_UTF32ToSurrogate1(*outputString)));
-      app->QueueAction(QIT_CHAR, (Uni_UTF32ToSurrogate2(*outputString)));
+  // modify output string for windows platform
+  LPCWSTR output_ptr = reinterpret_cast<LPCWSTR>(outputString);
+  WCHAR windows_context[MAXCONTEXT];
+  if (post_process_context(output_ptr, windows_context, MAXCONTEXT)) {
+    output_ptr = windows_context;
+  } 
+
+  while (*output_ptr) {
+    if (Uni_IsSMP(*output_ptr)) {
+      app->QueueAction(QIT_CHAR, (Uni_UTF32ToSurrogate1(*output_ptr)));
+      app->QueueAction(QIT_CHAR, (Uni_UTF32ToSurrogate2(*output_ptr)));
     } else {
-      app->QueueAction(QIT_CHAR, *outputString);
+      app->QueueAction(QIT_CHAR, *output_ptr);
     }
-    outputString++;
+    output_ptr++;
   }
 }
 

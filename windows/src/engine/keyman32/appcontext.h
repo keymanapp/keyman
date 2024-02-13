@@ -102,6 +102,35 @@ public:
  */
 BOOL ContextItemToAppContext(km_core_context_item *contextItems, PWSTR outBuf, DWORD len);
 
+/**
+ * Pre-processes the given wide-character string context, before passing to the
+ * Keyman core. Currently this consists of replacing "\r\n" sequences with "\n".
+ *
+ * @param  context  The wide-character string to be pre-processed. It must be
+ *                  null-terminated.
+ * @return  BOOL    True if context has been modified
+ */
+BOOL pre_process_context(LPWSTR context);
+
+/**
+  * Post-processes the given wide-character string, inserting "\r\n" sequences
+  * after each "\n" character to ensure the string conforms to the CRLF line
+  * ending convention of Windows. If the processed string exceeds the specified
+  * output size, it is truncated, preserving the end closest to the caret.
+  *
+  * @param  context  The wide-character string to be post-processed. It must be
+  * null-terminated.
+  *
+  * @param  windows_context  The buffer to store the post-processed string. It
+  *                          shall be allocated with to the size specified in
+  *                          output_size. If now modification necessary it will
+  *                          be unchanged.
+  * @param  output_size  The maximum length of the post-processed string to be
+  *                      stored in 'windows_context'. If the processed string
+  *                      exceeds this length, it will be truncated to fit.
+  * @return  BOOL  True if output_context has been set
+  */
+  BOOL post_process_context(LPCWSTR context, LPWSTR output_context, uint32_t output_size);
 
 
 #endif

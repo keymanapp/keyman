@@ -81,6 +81,8 @@ static BOOL
 Process_Event_Core(PKEYMAN64THREADDATA _td) {
   WCHAR application_context[MAXCONTEXT];
   if (_td->app->ReadContext(application_context)) {
+    // pre-process any windows specific text 
+    pre_process_context(application_context);
     km_core_context_status result;
     result = km_core_state_context_set_if_needed(_td->lpActiveKeyboard->lpCoreKeyboardState, reinterpret_cast<const km_core_cp *>(application_context));
     if (result == KM_CORE_CONTEXT_STATUS_ERROR || result == KM_CORE_CONTEXT_STATUS_INVALID_ARGUMENT) {
