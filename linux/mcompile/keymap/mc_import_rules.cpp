@@ -78,10 +78,10 @@ int KMX_ToUnicodeEx(guint keycode, const BYTE *lpKeyState, PKMX_WCHAR pwszBuff, 
    if (!(keycode <= keycode_max))
     return 0;
 
-  std::wstring str= KMX_get_CharUnderlying_according_to_keycode_and_Shiftstate_GDK(keymap, keycode, ShiftState(shift_state_pos), caps);
+  std::wstring str= KMX_get_WStrUnderlying_according_to_keycode_and_Shiftstate_GDK(keymap, keycode, ShiftState(shift_state_pos), caps);
   pwszBuff[0]= * (PKMX_WCHAR)  u16string_from_wstring(str).c_str();
 
-  KMX_DWORD keyvals_dw= (KMX_DWORD) KMX_get_keyvals_From_Keycode(keymap, keycode, ShiftState(shift_state_pos), caps);
+  KMX_DWORD keyvals_dw= (KMX_DWORD) KMX_get_keyval_From_Keycode(keymap, keycode, ShiftState(shift_state_pos), caps);
 
   g_free(keyvals);
   g_free(maps);

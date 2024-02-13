@@ -507,25 +507,28 @@ bool IsKeymanUsedChar(int KV);
 std::wstring convert_DeadkeyValues_ToWstr(int in);
 std::u16string convert_DeadkeyValues_To_U16str(int in);
 
-// uses gdk_keymap_translate_keyboard_state to get keyval
-int KMX_get_keyvals_From_Keycode(GdkKeymap *keymap, guint keycode, ShiftState ss, int caps);
+// use gdk_keymap_translate_keyboard_state to get keyval - base function to get keyvals
+int KMX_get_keyval_From_Keycode(GdkKeymap *keymap, guint keycode, ShiftState ss, int caps);
 
-KMX_DWORD KMX_get_KeyvalsUnderlying_From_KeyCodeUnderlying_GDK(GdkKeymap *keymap, guint keycode, int shift_state_pos);
+KMX_DWORD KMX_get_KeyvalUnderlying_From_KeyCodeUnderlying_GDK(GdkKeymap *keymap, guint keycode, int shift_state_pos);
 
-// returns KeySyms for a given key (for unshifted: finds the Keysym according to Shiftstate e.g. a;A or 1;! )
-std::wstring KMX_get_CharUnderlying_according_to_keycode_and_Shiftstate_GDK(GdkKeymap *keymap, guint VK, ShiftState ss, int caps);
-KMX_DWORD KMX_get_CharUnderlying_according_to_keycode_and_Shiftstate_GDK_dw(GdkKeymap *keymap, guint keycode, ShiftState ss, int caps);
+// return KeySyms for a given key (for unshifted: finds the Keysym according to Shiftstate e.g. a;A or 1;! )
+std::wstring KMX_get_WStrUnderlying_according_to_keycode_and_Shiftstate_GDK(GdkKeymap *keymap, guint VK, ShiftState ss, int caps);
 
 KMX_DWORD KMX_get_CharUnderlying_From_SCUnderlying_GDK(GdkKeymap *keymap, UINT VKShiftState, UINT SC_underlying, PKMX_WCHAR DeadKey);
 
-// return the VirtualKey of the underlying Keyboard for given Scancode using GDK
-KMX_DWORD KMX_get_VKUS_From_KeyCodeUnderlying_GDK( GdkKeymap *keymap, KMX_DWORD scanCode);
+// return the VirtualKey of the underlying Keyboard for given Keyode using GDK
+KMX_DWORD KMX_get_VKUS_From_KeyCodeUnderlying_GDK( GdkKeymap *keymap, KMX_DWORD keycode);
 
 // return the Keycode of the underlying Keyboard for given VK_US
 KMX_DWORD KMX_get_KeyCodeUnderlying_From_VKUS( KMX_DWORD VK_US);
 
 // return the Keycode of the underlying Keyboard for given VK_US using GDK
 KMX_DWORD KMX_get_KeyCodeUnderlying_From_KeycodeUS_GDK(GdkKeymap *keymap, v_dw_3D &All_Vector,KMX_DWORD KC_US, ShiftState ss, int caps);
+
+UINT KMX_get_SCUnderlying_From_VKUS(KMX_DWORD VirtualKeyUS);
+
+KMX_WCHAR KMX_get_CharUS_From_VKUnderlying_VEC(v_dw_3D All_Vector,KMX_DWORD SC_US);
 
 // converts codePoint to wstring
 std::wstring CodePointToWString(unsigned int codepoint);

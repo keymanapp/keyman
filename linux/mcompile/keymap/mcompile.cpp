@@ -458,7 +458,7 @@ KMX_BOOL KMX_DoConvert(LPKMX_KEYBOARD kbd, KMX_BOOL bDeadkeyConversion, gint arg
     // Loop through each possible key on the keyboard
     for (int i = 0;KMX_VKMap[i]; i++) { // I4651
 
-      // win goes via VK, Lin goes via SC
+      // win goes via VK, Lin goes via SC/Keycode
 
       UINT scUnderlying =  KMX_get_SCUnderlying_From_VKUS(KMX_VKMap[i]);
       KMX_WCHAR ch = KMX_get_CharUnderlying_From_SCUnderlying_GDK(keymap, VKShiftState[j], scUnderlying, &DeadKey);
@@ -500,28 +500,6 @@ void KMX_LogError(const KMX_WCHART* m1,int m2, LPKMX_KEY key) {
   wprintf((PWSTR)m1, m2);
 }
 */
-
-// _S2 why are those not in keymap.cpp/h
-// takes VK of US keyboard and returns SC of underlying keyboard
-UINT  KMX_get_SCUnderlying_From_VKUS(KMX_DWORD VirtualKeyUS) {
-  UINT SC_US = 8 + USVirtualKeyToScanCode[VirtualKeyUS];
-  UINT SC_underlying = SC_US;  // not neccessary but to understand what we do
-  return  SC_underlying;
-}
-
-KMX_WCHAR KMX_get_CharUS_From_VKUnderlying_VEC(v_dw_3D All_Vector, KMX_DWORD VK_underlying) {
-  KMX_DWORD VK_US;
-  for( int i=0; i< (int)All_Vector[0].size()-1 ;i++) {
-    for( int j=1; j< (int)All_Vector[0][0].size();j++) {
-      if ( ( All_Vector[0][i][j] == VK_underlying ) ) {
-        VK_US = All_Vector[1][i][j];;
-        return VK_US;
-      }
-    }
-  }
-  return VK_underlying;
-}
-
 int KMX_GetDeadkeys(v_dw_2D & dk_Table, KMX_WORD DeadKey, KMX_WORD *OutputPairs, GdkKeymap* keymap) {
 
   KMX_WORD *p = OutputPairs;
