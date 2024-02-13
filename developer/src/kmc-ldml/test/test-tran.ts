@@ -265,9 +265,21 @@ describe('tran', function () {
       ],
     },
     {
-      subpath: 'sections/tran/fail-bad-reorder.xml',
+      subpath: 'sections/tran/fail-bad-reorder-1.xml',
       errors: [
         KmnOtherCompilerMessages.Error_UnicodeSetSyntaxError()
+      ],
+    },
+    {
+      subpath: 'sections/tran/fail-bad-reorder-2.xml',
+      errors: [
+        CompilerMessages.Error_InvalidQuadEscape({ cp: 0x1a6b }),
+      ],
+    },
+    {
+      subpath: 'sections/tran/fail-bad-reorder-3.xml',
+      errors: [
+        CompilerMessages.Error_InvalidQuadEscape({ cp: 0x1a60 }),
       ],
     },
     // error due to bad regex
@@ -275,6 +287,12 @@ describe('tran', function () {
       subpath: `sections/tran/fail-bad-tran-1.xml`,
       errors: [
         CompilerMessages.Error_UnparseableTransformFrom({ from: 'AB(now if only I would terminate this group..' }),
+      ],
+    },
+    {
+      subpath: `sections/tran/fail-bad-tran-2.xml`,
+      errors: [
+        CompilerMessages.Error_InvalidQuadEscape({ cp: 295 }),
       ],
     },
   ], tranDependencies);
