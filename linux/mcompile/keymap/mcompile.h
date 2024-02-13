@@ -40,8 +40,6 @@ int run(int argc, std::vector<std::u16string>  str_argv, char* argv[]);
 
 PKMX_WCHAR KMX_incxstr(PKMX_WCHAR p);
 
-UINT KMX_get_SCUnderlying_From_VKUS(KMX_DWORD VirtualKeyUS);
-
 int KMX_GetDeadkeys(v_dw_2D & dk_Table, KMX_WORD DeadKey, KMX_WORD *OutputPairs, GdkKeymap* keymap);
 
 

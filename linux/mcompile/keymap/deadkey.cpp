@@ -3,19 +3,17 @@
 
 v_dw_1D createLine(std::wstring  first, std::wstring second, KMX_DWORD number, std::wstring nameresult) {
 	v_dw_1D line;
-	line.push_back(convertNamesToDWORDValue(first));
-	line.push_back(convertNamesToDWORDValue(second));
-	//line.push_back(convertNamesToDWORDValue(nameresult));
+	line.push_back(convertNamesTo_DWORD_Value(first));
+	line.push_back(convertNamesTo_DWORD_Value(second));
+	//line.push_back(convertNamesTo_DWORD_Value(nameresult));
 	line.push_back(number);
 	return line;
 }
 
 bool find_dk_combinations_for_specific_dk(v_dw_2D * p_dk_ComposeTable, v_dw_2D  &dk_SingleTable, KMX_DWORD dk) {
 	v_dw_1D line;
+
 	for ( int i =0; i< (int) (*p_dk_ComposeTable).size(); i++) {
-		// _S2 QUESTION is there a better way to find a-z,A-Z?
-		// _S2 QUESTION is there a better way to find a-z,A-Z?
-		//if (((*p_dk_ComposeTable)[i][0] == dk) ) {
 		if (((*p_dk_ComposeTable)[i][0] == dk) && (IsKeymanUsedChar((*p_dk_ComposeTable)[i][1]))) {
 			line.push_back((*p_dk_ComposeTable)[i][0]);
 			line.push_back((*p_dk_ComposeTable)[i][1]);
@@ -24,6 +22,7 @@ bool find_dk_combinations_for_specific_dk(v_dw_2D * p_dk_ComposeTable, v_dw_2D  
 			line.clear();
 		}
 	}
+
 	if( dk_SingleTable.size()>0)
 		return true;
 	else
@@ -38,7 +37,6 @@ std::vector<DeadKey*> create_alDead() {
 	for( int i=0; i< dk_ComposeTable.size()-1; i++) {
 		DeadKey *dk2= new DeadKey(dk_ComposeTable[i][0]);
 		for ( int j=0; j< dk_ComposeTable.size();j++) {
-			// _S2 check for right basechar, to prevent "aAeEiIoOuU -_^"
 			if(( dk_ComposeTable[i][0]==dk_ComposeTable[j][0]) && (IsKeymanUsedChar(dk_ComposeTable[j][1])))
 				dk2->KMX_AddDeadKeyRow(dk_ComposeTable[j][1],dk_ComposeTable[j][2]);
 		}
@@ -98,26 +96,22 @@ void sort_alDead(std::vector<DeadKey*> &small_Vec, std::vector<DeadKey*> *p_All_
 	small_Vec = small_sorted;
 }
 
-// _S2 TODO might be used when deadkeys are implemented . is it correct??
-// _S2 TODO might be used when deadkeys are implemented . is it correct??
 KMX_DWORD KMX_changeKeynameToCapital(KMX_DWORD KVal, KMX_DWORD &shift, GdkKeymap* keymap) {
   guint Keyval = (guint) KVal;
   GdkKeymapKey* keys;
   gint n_keys;
 
-	// _S2 QUESTION can I assume that the win keyname is always the uppercase(level1) value??
-	KMX_DWORD Name = (KMX_DWORD) gdk_keyval_to_upper (KVal);
-	//KMX_DWORD Name = (KMX_DWORD) gdk_keyval_to_lower (KVal);
+	KMX_DWORD Cap = (KMX_DWORD) gdk_keyval_to_upper (KVal);
 	if( Keyval !=0) {
 		gdk_keymap_get_entries_for_keyval(keymap, Keyval, &keys, &n_keys);
 		for (int i = 0; i < n_keys; i++) {
 			if (keys[i].group == 0) {
 				shift = keys[i].level;
-				return Name;
+				return Cap;
 			}
 		}
 	}
-	return Name;
+	return Cap;
 }	
 
 // _S2 DESIGN NEEDED is this the right place to get dk from? if not wher are they stored?

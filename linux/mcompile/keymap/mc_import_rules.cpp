@@ -78,7 +78,7 @@ int KMX_ToUnicodeEx(guint keycode, const BYTE *lpKeyState, PKMX_WCHAR pwszBuff, 
    if (!(keycode <= keycode_max))
     return 0;
 
-  std::wstring str= KMX_get_WStrUnderlying_according_to_keycode_and_Shiftstate_GDK(keymap, keycode, ShiftState(shift_state_pos), caps);
+  std::wstring str= KMX_get_WStrUnderlying_From_KeyCodeUnderlying_GDK(keymap, keycode, ShiftState(shift_state_pos), caps);
   pwszBuff[0]= * (PKMX_WCHAR)  u16string_from_wstring(str).c_str();
 
   KMX_DWORD keyvals_dw= (KMX_DWORD) KMX_get_keyval_From_Keycode(keymap, keycode, ShiftState(shift_state_pos), caps);
@@ -121,12 +121,10 @@ private:
 public:
 
   KMX_VirtualKey(KMX_HKL hkl,UINT virtualKey, GdkKeymap **keymap) {
-    this->m_sc=KMX_get_SCUnderlying_From_VKUS(virtualKey);
+    this->m_sc = KMX_get_KeyCodeUnderlying_From_VKUS(virtualKey);
     this->m_hkl = hkl;
     this->m_vk = virtualKey;
-    // _S2 TODO  deadkey
-    // _S2 TODO  deadkey
-    // memset(this->m_rgfDeadKey,0,sizeof(this->m_rgfDeadKey));
+    memset(this->m_rgfDeadKey,0,sizeof(this->m_rgfDeadKey));
   }
 //_S2 ToDo keymap* or keymap**
 
@@ -134,8 +132,7 @@ public:
     this->m_vk = KMX_get_VKUS_From_KeyCodeUnderlying_GDK(*keymap, scanCode);
     this->m_hkl = hkl;
     this->m_sc = scanCode;
-    //KMX_InitializeDeadkeys();       // _S2 to get all 0 in rgfDeadkey[ ][ ]- why were there numbers???
-    // _S2 originally initioalized with memse ( see above=)
+    memset(this->m_rgfDeadKey,0,sizeof(this->m_rgfDeadKey));
   }
 
   UINT VK() {
@@ -145,6 +142,7 @@ public:
   UINT SC() {
     return this->m_sc;
   }
+
   // _S2 can go later
   std::wstring get_m_rgss(int i,int j) {
     return m_rgss[i][j];
@@ -152,15 +150,6 @@ public:
   // _S2 can go later
   bool get_m_rgfDeadkey(int i,int j) {
     return m_rgfDeadKey[i][j];
-  }
-
-  // _S2 do we need this??
-  void KMX_InitializeDeadkeys() {
-    for ( int i=0; i<10;i++) {
-      for ( int j=0; j<2;j++) {
-        this->m_rgfDeadKey[i][j] = 0;
-      }
-    }
   }
 
   std::wstring KMX_GetShiftState(ShiftState shiftState, bool capsLock) {
@@ -172,8 +161,6 @@ public:
     this->m_rgss[(UINT)shiftState][(capsLock ? 1 : 0)] = value;
   }
 
-// _S2 QUESTION why are there sometimes numbers in m_rgfDeadKey???
-// _S2 QUESTION why are there sometimes numbers in m_rgfDeadKey???
   void KMX_SetShiftState(ShiftState shiftState, std::u16string value16, bool isDeadKey, bool capsLock) {
     std::wstring value = wstring_from_u16string(value16);
     this->m_rgfDeadKey[(UINT)shiftState][(capsLock ? 1 : 0)] = isDeadKey;
@@ -285,11 +272,11 @@ public:
     return nkeys;
   }
 
-  bool KMX_LayoutRow(int MaxShiftState, LPKMX_KEY key, std::vector<DeadKey*> *deadkeys, int deadkeyBase, BOOL bDeadkeyConversion,v_dw_3D &All_Vector, GdkKeymap * keymap) {   // I4552
+  bool KMX_LayoutRow(int MaxShiftState, LPKMX_KEY key, std::vector<DeadKey*> *deadkeys, int deadkeyBase, BOOL bDeadkeyConversion,v_dw_3D &All_Vector, GdkKeymap *keymap) {   // I4552
     // Get the CAPSLOCK value
 
 // _S2 needs to go later                                    // this should be true for char, number, special
-bool   b1= this->KMX_IsCapsEqualToShift();                  // but is false for numbers  and    special
+/*bool   b1= this->KMX_IsCapsEqualToShift();                  // but is false for numbers  and    special
 bool   b2= this->KMX_IsSGCAPS();
 bool   b3= this->KMX_IsAltGrCapsEqualToAltGrShift();
 bool   b4= this->KMX_IsXxxxGrCapsEqualToXxxxShift();
@@ -297,7 +284,7 @@ bool   b4= this->KMX_IsXxxxGrCapsEqualToXxxxShift();
 int i1 = this->KMX_IsCapsEqualToShift() ? 1 : 0;
 int i2 = this->KMX_IsSGCAPS() ? 2 : 0;
 int i3 = this->KMX_IsAltGrCapsEqualToAltGrShift() ? 4 : 0;
-int i4 = this->KMX_IsXxxxGrCapsEqualToXxxxShift() ? 8 : 0;
+int i4 = this->KMX_IsXxxxGrCapsEqualToXxxxShift() ? 8 : 0;*/
 
     int capslock =
         (this->KMX_IsCapsEqualToShift() ? 1 : 0) |
@@ -306,8 +293,9 @@ int i4 = this->KMX_IsXxxxGrCapsEqualToXxxxShift() ? 8 : 0;
         (this->KMX_IsXxxxGrCapsEqualToXxxxShift() ? 8 : 0);
 
     // _S2 DESIGN NEEDED on how to replace capslock
-    capslock=1;   // _S2
-    // _S2 TODO capslock is not calculated correctly for linux. therefore key->ShiftFlags will be wrong for numbers, special characters
+    //     capslock has different values for linux. Therefore key->ShiftFlags will be different for numbers, special characters
+    //     for now set capslock=1
+    capslock=1;
 
     for (int ss = 0; ss <= MaxShiftState; ss++) {
       if (ss == Menu || ss == ShftMenu) {
@@ -357,8 +345,8 @@ int i4 = this->KMX_IsXxxxGrCapsEqualToXxxxShift() ? 8 : 0;
             // key->Key      stores VK-US ( not underlying !!)
             // key->dpOutput stores character Underlying
 
-            KMX_DWORD SC_Underlying_gdk = KMX_get_KeyCodeUnderlying_From_KeycodeUS_GDK(keymap, All_Vector,this->SC(), (ShiftState) ss, caps);
-            key->Key = KMX_get_VKUS_From_KeyCodeUnderlying_GDK( keymap, SC_Underlying_gdk);
+            KMX_DWORD SC_Underlying = KMX_get_KeyCodeUnderlying_From_KeycodeUS_GDK(keymap, All_Vector, this->SC(), (ShiftState) ss, caps);
+            key->Key = KMX_get_VKUS_From_KeyCodeUnderlying_GDK( keymap, SC_Underlying);
 
             key->Line = 0;
             key->ShiftFlags = this->KMX_GetShiftStateValue(capslock, caps, (ShiftState) ss);
@@ -448,9 +436,7 @@ bool KMX_ImportRules(LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, GdkKeymap **keymap,
   std::vector<KMX_VirtualKey*> rgKey; //= new VirtualKey[256];
   std::vector<DeadKey*> alDead;
 
-  //_S2 TODO remove alDead2
-   std::vector<DeadKey*> alDead2 ;
-   std::vector<DeadKey*> alDead_cpl = create_alDead();
+   
    std::vector<DeadKey*> alDead_cpl = create_alDead();
 
   rgKey.resize(256);
@@ -521,19 +507,20 @@ bool KMX_ImportRules(LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, GdkKeymap **keymap,
             continue;
           }
 
-          //_S2 to compare win-lin kmn-files skip ss6+7; MUST BE restored/removed later!!!!
+          //_S2 to compare win-lin kmn-files skip ss6+7; MUST BE removed later!!!!
          /*if(ss == MenuCtrl|| ss == ShftMenuCtrl) {
             continue;
           }*/
 
-          KMX_DWORD SC_US = KMX_get_KeyCodeUnderlying_From_VKUS(iKey);
+          KMX_DWORD KC_US = (KMX_DWORD) KMX_get_KeyCodeUnderlying_From_VKUS(iKey);
+
 
           // _S2 TODO deadkey not finished; Ctrl, Shft +40 not tested
           // _S2 TODO deadkey not finished; Ctrl, Shft +40 not tested
           for(int caps = 0; caps <= 1; caps++) {
             loader.KMX_ClearKeyboardBuffer();
             loader.KMX_FillKeyState(lpKeyState, ss, (caps == 0));
-            int rc = KMX_ToUnicodeEx(SC_US, lpKeyState, sbBuffer, ss, caps, *keymap);
+            int rc = KMX_ToUnicodeEx(KC_US, lpKeyState, sbBuffer, ss, caps, *keymap);
 
             if(rc > 0) {
               if(*sbBuffer == 0) {
@@ -573,26 +560,14 @@ bool KMX_ImportRules(LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, GdkKeymap **keymap,
             // It's a dead key; let's flush out whats stored in the keyboard state.
             loader.KMX_ClearKeyboardBuffer();
             DeadKey *dk = NULL;
-            refine_alDead(sbBuffer[0], alDead, &alDead_cpl);
 
-           /* for(UINT iDead = 0; iDead < alDead.size(); iDead++) {
-                dk = alDead[iDead];
-                if(dk->KMX_DeadCharacter() == rgKey[iKey]->KMX_GetShiftState(ss, caps == 0)[0]) {
-                    break;
-                }
-                dk = NULL;
-            }
-            if(dk == NULL) {
-              //alDead.push_back(loader.KMX_ProcessDeadKey(iKey, ss, lpKeyState, rgKey, caps == 0, hkl, *keymap));
-              alDead2 = create_alDead();
-              alDead = reduce_alDead(alDead2);
-            }*/
+            refine_alDead(sbBuffer[0], alDead, &alDead_cpl);
           }
         }
       }
     }
   }
-  //  do we need to sort alDead??
+  // _S2 DESIGN NEEDED do we need to sort alDead? And if so how?
   sort_alDead(alDead, &alDead_cpl);
 
   //-------------------------------------------------------------

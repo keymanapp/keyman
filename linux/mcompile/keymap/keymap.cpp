@@ -11,7 +11,7 @@ int map_VKShiftState_to_LinModifier(int VKShiftState) {
   else return VKShiftState;
 }
 
-KMX_DWORD convertNamesToDWORDValue(std::wstring tok_wstr) {
+KMX_DWORD convertNamesTo_DWORD_Value(std::wstring tok_wstr) {
   // more on https://manpages.ubuntu.com/manpages/jammy/man3/keysyms.3tk.html
   std::map<std::wstring, KMX_DWORD > first;
 
@@ -272,7 +272,7 @@ int split_US_To_3D_Vector(v_dw_3D &all_US,v_str_1D completeList) {
       for ( int i = 1; i< (int) tokens.size();i++) {
 
         // replace a name with a single character ( a -> a  ; equal -> = )
-        tokens_int = convertNamesToDWORDValue( wstring_from_string(tokens[i]));
+        tokens_int = convertNamesTo_DWORD_Value( wstring_from_string(tokens[i]));
         tokens_dw.push_back(tokens_int);
       }
 
@@ -305,7 +305,7 @@ v_dw_2D create_empty_2D_Vector( int dim_rows,int dim_ss) {
   return Vector_2D;
 }
 
-int append_underlying_ToVector(v_dw_3D &All_Vector,GdkKeymap * keymap) {
+int append_underlying_ToVector(v_dw_3D &All_Vector,GdkKeymap *keymap) {
 
   // create a 2D vector all filled with " " and push to 3D-Vector
   v_dw_2D underlying_Vector2D = create_empty_2D_Vector(All_Vector[0].size(),All_Vector[0][0].size());
@@ -353,7 +353,6 @@ bool InitializeGDK(GdkKeymap **keymap,int argc, gchar *argv[]) {
   return 0;
 }
 
-
 bool IsKeymanUsedChar(int KV) {
   //         32            A-Z                      a-z
   if  ((KV == 0x20 ) || (KV >= 65 && KV <= 90) || (KV >= 97 && KV <= 122) )
@@ -362,61 +361,50 @@ bool IsKeymanUsedChar(int KV) {
     return false;
 }
 
-
 std::wstring convert_DeadkeyValues_ToWstr(int in) {
-
-  KMX_DWORD lname;
 
   if (in == 0 )
     return L"\0";
 
-  std::string long_name((const char*) gdk_keyval_name (in));
+  std::string long_name((const char*) gdk_keyval_name (in));                      // e.g. "dead_circumflex" , "U+017F" , "t"
 
-  if ( long_name.substr (0,2) == "U+" )                                       // U+... Unicode value
+  if ( long_name.substr (0,2) == "U+" )                                           // U+... Unicode value
     return  CodePointToWString(in-0x1000000);
 
-  if (in < (int) deadkey_min) {                                                // no deadkey; no Unicode
-    /*if (!IsKeymanUsedKeyVal(std::wstring(1, in)))
-      return L"\0";*/
+  if (in < (int) deadkey_min) {                                                   // no deadkey; no Unicode
     return  std::wstring(1, in);
   }
 
-    lname = convertNamesToDWORDValue( wstring_from_string(long_name));      // 65106 => "dead_circumflex " => 94 => "^"
+  KMX_DWORD lname = convertNamesTo_DWORD_Value( wstring_from_string(long_name));  // 65106 => "dead_circumflex" => 94 => "^"
 
-    if (lname != returnIfCharInvalid) {
-      return std::wstring(1, lname );
-    }
-    else
-      return L"\0";
+  if (lname != returnIfCharInvalid) {
+    return std::wstring(1, lname );
+  }
+  else
+    return L"\0";
 }
-//_S2 ToDo REview and change??
+
 std::u16string convert_DeadkeyValues_To_U16str(int in) {
 
-  KMX_DWORD lname;
+  if (in == 0 )
+    return u"\0";
 
-  // it`s not a deadkey
-  if (in < (int) deadkey_min) {                                               // no deadkey; no Unicode  97 => a
-    /*if (!IsKeymanUsedKeyVal(std::u16string(1, in)))
-      return u"\0";*/
+  std::string long_name((const char*) gdk_keyval_name (in));                      // e.g. "dead_circumflex" , "U+017F" , "t"
+
+  if ( long_name.substr (0,2) == "U+" )                                           // U+... Unicode value
+    return  CodePointToString_16(in-0x1000000);
+
+  if (in < (int) deadkey_min) {                                                   // no deadkey; no Unicode
     return  std::u16string(1, in);
   }
-  else {
-    std::string long_name((const char*) gdk_keyval_name (in));
 
-    // it's Unicode
-    if ( long_name.substr (0,2) == "U+" )                                     // U+... Unicode value      U+1E9E => ẞ
-      return  CodePointToString_16(in-0x1000000);
+  KMX_DWORD lname = convertNamesTo_DWORD_Value( wstring_from_string(long_name));  // 65106 => "dead_circumflex" => 94 => "^"
 
-    // it's a descriptive name like "dead_circumflex"
-    lname = convertNamesToDWORDValue( wstring_from_string(long_name));      // "dead_circumflex" => 94 => "^"
-
-    if (lname != returnIfCharInvalid) {
-      return std::u16string(1, lname );
-    }
-    else
-      return u"\0";
+  if (lname != returnIfCharInvalid) {
+    return std::u16string(1, lname );
   }
-  return u"\0";
+  else
+    return u"\0";
 }
 
 int KMX_get_keyval_From_Keycode(GdkKeymap *keymap, guint keycode, ShiftState ss, int caps) {
@@ -516,6 +504,7 @@ KMX_DWORD KMX_get_KeyvalUnderlying_From_KeyCodeUnderlying_GDK(GdkKeymap *keymap,
 
   if (!gdk_keymap_get_entries_for_keycode(keymap, keycode, &maps, &keyvals, &count))
     return 0;
+  // _S2 INFO maybe later use something like
   //if(!gdk_wayland_keymap_get_entries_for_keycode(keymap, keycode, &maps, &keyvals, &count))
   //  return 0;    https://codebrowser.dev/gtk/gtk/gdk/wayland/gdkkeys-wayland.c.html
 
@@ -525,8 +514,6 @@ KMX_DWORD KMX_get_KeyvalUnderlying_From_KeyCodeUnderlying_GDK(GdkKeymap *keymap,
   if (!(keycode <= keycode_max))
     return 0;
 
-  // _S2 TODO take caps to this function
-  // here I get all kvals: normal char , my Deadkeys, allothr DK
   KMX_DWORD All_Keyvals =  KMX_get_keyval_From_Keycode(keymap, keycode, ShiftState(shift_state_pos), 0);
   if(( (All_Keyvals >= deadkey_min) && (All_Keyvals <= deadkey_max)))
     deadkey = All_Keyvals;
@@ -567,13 +554,12 @@ KMX_DWORD KMX_get_KeyvalUnderlying_From_KeyCodeUnderlying_GDK(GdkKeymap *keymap,
   return out;
 }
 
-// _S2 same as KMX_get_KeyvalUnderlying_From_KeyCodeUnderlying_GDK ??
-KMX_DWORD KMX_get_CharUnderlying_From_SCUnderlying_GDK(GdkKeymap *keymap, UINT VKShiftState, UINT SC_underlying, PKMX_WCHAR DeadKey) {
+KMX_DWORD KMX_get_CharUnderlying_From_KeyCodeUnderlying_GDK(GdkKeymap *keymap, UINT VKShiftState, UINT KC_underlying, PKMX_WCHAR DeadKey) {
   
   PKMX_WCHAR dky;
-  KMX_DWORD keyvals_dw = KMX_get_KeyvalUnderlying_From_KeyCodeUnderlying_GDK(keymap, SC_underlying, map_VKShiftState_to_LinModifier(VKShiftState), dky);
+  KMX_DWORD keyvals_dw = KMX_get_KeyvalUnderlying_From_KeyCodeUnderlying_GDK(keymap, KC_underlying, map_VKShiftState_to_LinModifier(VKShiftState), dky);
 
-  if(keyvals_dw >=  deadkey_min) {
+  if(keyvals_dw >=  deadkey_min) {                                                                    // deadkey
     *DeadKey = *dky;
     return 0xFFFF;
   }
@@ -583,47 +569,18 @@ KMX_DWORD KMX_get_CharUnderlying_From_SCUnderlying_GDK(GdkKeymap *keymap, UINT V
     return keyvals_dw;
 }
 
-std::wstring KMX_get_WStrUnderlying_according_to_keycode_and_Shiftstate_GDK(GdkKeymap *keymap, guint keycode, ShiftState ss, int caps){
-
-  // _S2 QUESTION skip ss 2+3  remove??
-  /*if( (ss ==2 ) ||(ss ==3 ))
-    return L"\0";*/
-
+std::wstring KMX_get_WStrUnderlying_From_KeyCodeUnderlying_GDK(GdkKeymap *keymap, guint keycode, ShiftState ss, int caps){
   int keyvals_int= KMX_get_keyval_From_Keycode(keymap, keycode, ss, caps);
-    return  convert_DeadkeyValues_ToWstr(keyvals_int);
+  return  convert_DeadkeyValues_ToWstr(keyvals_int);
 }
 
-// _S2 ToDo // _use gdk_keymap_translate_keyboard_state of other function
 KMX_DWORD KMX_get_VKUS_From_KeyCodeUnderlying_GDK( GdkKeymap *keymap, KMX_DWORD keycode) {
-
-  GdkModifierType consumed;
   GdkKeymapKey *maps;
   guint *keyvals;
-  guint lowerCase;
-  guint upperCase;
   gint count;
 
   if (!gdk_keymap_get_entries_for_keycode(keymap, keycode, &maps, &keyvals, &count))
     return 0;
-
-  //Shift
-  GdkModifierType MOD_Shift = (GdkModifierType) ( GDK_SHIFT_MASK );
-  gdk_keymap_translate_keyboard_state (keymap, keycode, MOD_Shift , 0, keyvals, NULL, NULL, & consumed);
-
-  for (int i = 0; i < count; i++) {
-    if (maps[i].level > 1 || maps[i].group > 1)
-      continue;
-
-    gchar * kv_name =  gdk_keyval_name (keyvals[i]);
-
-    if ( keyvals[i]>0)
-      gdk_keyval_convert_case (*kv_name, &lowerCase, &upperCase);
-
-    // _S2 QUESTION is ( lowerCase == upperCase )  true for all number keys for all keyboards?
-    // _S2 QUESTION is ( lowerCase == upperCase )  true for all number keys for all keyboards?
-    if ( lowerCase == upperCase )
-      return (KMX_DWORD) upperCase;
-}
 
   if ( keycode >7)
     return  (KMX_DWORD) ScanCodeToUSVirtualKey[keycode-8];
@@ -631,17 +588,10 @@ KMX_DWORD KMX_get_VKUS_From_KeyCodeUnderlying_GDK( GdkKeymap *keymap, KMX_DWORD 
   return 0;
 }
 
-KMX_DWORD KMX_get_KeyCodeUnderlying_From_VKUS( KMX_DWORD VK_US) {
-  if( VK_US > 7) {
-    return (KMX_DWORD)(8+ USVirtualKeyToScanCode[ VK_US ]);}
-  else
-    return 0;
-}
-
-KMX_DWORD KMX_get_KeyCodeUnderlying_From_KeycodeUS_GDK(GdkKeymap *keymap, v_dw_3D &All_Vector,KMX_DWORD KC_US, ShiftState ss, int caps) {
+KMX_DWORD KMX_get_KeyCodeUnderlying_From_KeycodeUS_GDK(GdkKeymap *keymap, v_dw_3D &All_Vector, KMX_DWORD KC_US, ShiftState ss, int caps) {
 
   KMX_DWORD Character;
-  std::wstring ws = KMX_get_WStrUnderlying_according_to_keycode_and_Shiftstate_GDK(keymap, KC_US, ss, caps);
+  std::wstring ws = KMX_get_WStrUnderlying_From_KeyCodeUnderlying_GDK(keymap, KC_US, ss, caps);
   Character = *ws.c_str();
 
   //Find underlying KC of character
@@ -656,10 +606,8 @@ KMX_DWORD KMX_get_KeyCodeUnderlying_From_KeycodeUS_GDK(GdkKeymap *keymap, v_dw_3
   return KC_US;
 }
 
-UINT  KMX_get_SCUnderlying_From_VKUS(KMX_DWORD VirtualKeyUS) {
-  UINT SC_US = 8 + USVirtualKeyToScanCode[VirtualKeyUS];
-  UINT SC_underlying = SC_US;  // not neccessary but to understand what we do
-  return  SC_underlying;
+UINT  KMX_get_KeyCodeUnderlying_From_VKUS(KMX_DWORD VirtualKeyUS) {
+  return (8 + USVirtualKeyToScanCode[VirtualKeyUS]);
 }
 
 KMX_WCHAR KMX_get_CharUS_From_VKUnderlying_VEC(v_dw_3D All_Vector, KMX_DWORD VK_underlying) {
@@ -674,7 +622,6 @@ KMX_WCHAR KMX_get_CharUS_From_VKUnderlying_VEC(v_dw_3D All_Vector, KMX_DWORD VK_
   }
   return VK_underlying;
 }
-
 
 std::wstring CodePointToWString(unsigned int codepoint) {
   std::wstring str;

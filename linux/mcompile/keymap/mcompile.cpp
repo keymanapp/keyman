@@ -149,12 +149,6 @@ int run(int argc, std::vector<std::u16string> str_argv, char* argv_ch[] = NULL){
 // Map of all shift states that we will work with
 const UINT VKShiftState[] = {0, K_SHIFTFLAG, LCTRLFLAG|RALTFLAG, K_SHIFTFLAG|LCTRLFLAG|RALTFLAG, 0xFFFF};
 
-// _S2 INFO my comment for Lin version
-// Ubuntu:  Each of the 4 columns specifies a different modifier:  unmodified,  shift,   right alt (altgr),     shift+right alt(altgr)
-// we have assigned these to columns 1-4  ( column o holds the keycode)
-// const UINT VKShiftState[] = {0, 1,  2,  3, 0xFFFF};
-// const UINT VKShiftState[] = {0, 1,  2,  3, 0xFFFF};
-
 //
 // TranslateKey
 //
@@ -435,7 +429,7 @@ KMX_BOOL KMX_DoConvert(LPKMX_KEYBOARD kbd, KMX_BOOL bDeadkeyConversion, gint arg
   // evident for the 102nd key on UK, for example, where \ can be generated with VK_OEM_102 or AltGr+VK_QUOTE.
   // For now, we get the least shifted version, which is hopefully adequate.
 
-  // _S2 TODO first version with GTK - maybe change later to  XklGetGroupNames  und XklGetCurrentState  as Eberhard suggested
+  // _S2 INFO first version with GTK - maybe change later to  XklGetGroupNames  und XklGetCurrentState  as Eberhard suggested
   //_ init gdk
   GdkKeymap *keymap;
   if(InitializeGDK(&keymap , argc, argv)) {
@@ -460,8 +454,8 @@ KMX_BOOL KMX_DoConvert(LPKMX_KEYBOARD kbd, KMX_BOOL bDeadkeyConversion, gint arg
 
       // win goes via VK, Lin goes via SC/Keycode
 
-      UINT scUnderlying =  KMX_get_SCUnderlying_From_VKUS(KMX_VKMap[i]);
-      KMX_WCHAR ch = KMX_get_CharUnderlying_From_SCUnderlying_GDK(keymap, VKShiftState[j], scUnderlying, &DeadKey);
+      UINT scUnderlying =  KMX_get_KeyCodeUnderlying_From_VKUS(KMX_VKMap[i]);
+      KMX_WCHAR ch = KMX_get_CharUnderlying_From_KeyCodeUnderlying_GDK(keymap, VKShiftState[j], scUnderlying, &DeadKey);
 
       //wprintf(L"--- VK_%d -> SC_ [%c] dk=%d  ( ss %i) \n", VKMap[i], ch == 0 ? 32 : ch, DeadKey, VKShiftState[j]);
 
