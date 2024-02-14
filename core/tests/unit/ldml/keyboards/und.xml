@@ -35,8 +35,8 @@
       -->
       <reorder from="U" order="0" />
       <reorder from="N" order="1" />
-      <reorder from="I" order="3" /> <!-- the 'T' and 'I' will swap places-->
-      <reorder from="T" order="2" />
+      <reorder from="I" order="2" /> <!-- the 'T' and 'I' will swap places-->
+      <reorder from="T" order="3" />
       <reorder from="E" order="4" />
       <reorder from="D" order="5" />
     </transformGroup>
