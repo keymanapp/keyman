@@ -356,20 +356,20 @@ KMX_BOOL KMX_LoadKeyboard(char16_t* fileName, LPKMX_KEYBOARD* lpKeyboard) {
   PKMX_BYTE filebase;
 
   if(!fileName || !lpKeyboard) {
-    KMX_LogError(L"LogError1: Bad Filename\n" );
+    KMX_LogError(L"Bad Filename\n" );
     return FALSE;
   }
 
   fp = Open_File((const KMX_WCHAR*)fileName, u"rb");
 
   if(fp == NULL) {
-    KMX_LogError(L"LogError1: Could not open file\n" );
+    KMX_LogError(L"Could not open file\n" );
     return FALSE;
   }
 
   if (fseek(fp, 0, SEEK_END) != 0) {
     fclose(fp);
-    KMX_LogError(L"LogError1: Could not fseek file\n" );
+    KMX_LogError(L"Could not fseek file\n" );
     return FALSE;
   }
 
@@ -381,7 +381,7 @@ KMX_BOOL KMX_LoadKeyboard(char16_t* fileName, LPKMX_KEYBOARD* lpKeyboard) {
 
   if (fseek(fp, 0, SEEK_SET) != 0) {
     fclose(fp);
-    KMX_LogError(L"LogErr1: Could not fseek(set) file\n" );
+    KMX_LogError(L"Could not fseek(set) file\n" );
     return FALSE;
   }
 
@@ -399,7 +399,7 @@ KMX_BOOL KMX_LoadKeyboard(char16_t* fileName, LPKMX_KEYBOARD* lpKeyboard) {
 
   if (!buf) {
     fclose(fp);
-    KMX_LogError(L"LogErr1: Not allocmem\n" );
+    KMX_LogError(L"Not allocmem\n" );
     return FALSE;
   }
 
@@ -410,7 +410,7 @@ KMX_BOOL KMX_LoadKeyboard(char16_t* fileName, LPKMX_KEYBOARD* lpKeyboard) {
   #endif
 
   if (fread(filebase, 1, sz, fp) < (size_t)sz) {
-    KMX_LogError(L"LogError1: Could not read file\n" );
+    KMX_LogError(L"Could not read file\n" );
     fclose(fp);
     return FALSE;
   }
@@ -425,7 +425,7 @@ KMX_BOOL KMX_LoadKeyboard(char16_t* fileName, LPKMX_KEYBOARD* lpKeyboard) {
   }
 
   if (!KMX_VerifyKeyboard(filebase, sz)) {
-    KMX_LogError(L"LogError1: errVerifyKeyboard\n" );
+    KMX_LogError(L"errVerifyKeyboard\n" );
     return FALSE;
   }
 
@@ -437,13 +437,13 @@ KMX_BOOL KMX_LoadKeyboard(char16_t* fileName, LPKMX_KEYBOARD* lpKeyboard) {
 
 
   if (!kbp) {
-    KMX_LogError(L"LogError1: errFixupKeyboard\n" );
+    KMX_LogError(L"errFixupKeyboard\n" );
     return FALSE;
   }
 
   if (kbp->dwIdentifier != FILEID_COMPILED) {
     delete[] buf;
-    KMX_LogError(L"LogError1: errNotFileID\n" );
+    KMX_LogError(L"errNotFileID\n" );
     return FALSE;
   }
   *lpKeyboard = kbp;
@@ -462,14 +462,14 @@ KMX_BOOL KMX_VerifyKeyboard(LPKMX_BYTE filebase, KMX_DWORD sz){
     for (csp = (PKMX_COMP_STORE)(filebase + ckbp->dpStoreArray), i = 0; i < ckbp->cxStoreArray; i++, csp++) {
       if (csp->dwSystemID == TSS_COMPILEDVERSION) {
         if (csp->dpString == 0) {
-          KMX_LogError(L"LogErr1: errWrongFileVersion:NULL");
+          KMX_LogError(L"errWrongFileVersion:NULL");
         } else {
-          wprintf(L"LogErr1: errWrongFileVersion:%10.10ls",(const PKMX_WCHAR) KMX_StringOffset((PKMX_BYTE)filebase, csp->dpString));
+          KMX_LogError(L"errWrongFileVersion:%10.10ls",(const PKMX_WCHAR) KMX_StringOffset((PKMX_BYTE)filebase, csp->dpString));
         }
         return FALSE;
       }
     }
-    KMX_LogError(L"LogErr1: errWrongFileVersion");
+    KMX_LogError(L"errWrongFileVersion");
     return FALSE;
   }
   return TRUE;

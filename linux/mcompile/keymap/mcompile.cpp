@@ -40,6 +40,8 @@ std::vector<KMX_DeadkeyMapping> KMX_FDeadkeys; // I4353
 #define max(a,b)            (((a) > (b)) ? (a) : (b))
 #endif
 
+#define _countof(a) (sizeof(a)/sizeof(*(a)))
+
 #if defined(_WIN32) || defined(_WIN64)
   int wmain(int argc, wchar_t* argv[]) {
     std::vector<std::u16string> str_argv_16 = convert_argvW_to_Vector_u16str( argc, argv);
@@ -129,9 +131,8 @@ int run(int argc, std::vector<std::u16string> str_argv, char* argv_ch[] = NULL){
 }
 
 #endif
+  //DeleteReallocatedPointers(kmxfile); :TODO   //  not my ToDo :-)
 
-  //DeleteReallocatedPointers(kmxfile); :TODO   //  not my ToDo :-)
-  //DeleteReallocatedPointers(kmxfile); :TODO   //  not my ToDo :-)
   delete kmxfile;
 
   wprintf(L"\nmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm end\n");
@@ -190,11 +191,9 @@ void KMX_TranslateKeyboard(LPKMX_KEYBOARD kbd, KMX_WORD vk, UINT shift, KMX_WCHA
 
 void KMX_ReportUnconvertedKeyRule(LPKMX_KEY key) {
   if(key->ShiftFlags == 0) {
-    //KMX_LogError(L"Did not find a match for mnemonic rule on line %d, + '%c' > ...", key->Line, key->Key);
-    //wprintf(L" _S2 Did not find a match for mnemonic rule on line %d, + '%c' > ...\n", key->Line, key->Key);
+    KMX_LogError(L"Did not find a match for mnemonic rule on line %d, + '%c' > ...", key->Line, key->Key);
   } else if(key->ShiftFlags & VIRTUALCHARKEY) {
-    //KMX_LogError(L"Did not find a match for mnemonic virtual character key rule on line %d, + [%x '%c'] > ...", key->Line, key->ShiftFlags, key->Key);
-    //wprintf(L"_S2 Did not find a match for mnemonic virtual character key rule on line %d, + [%x '%c'] > ...\n", key->Line, key->ShiftFlags, key->Key);
+    KMX_LogError(L"Did not find a match for mnemonic virtual character key rule on line %d, + [%x '%c'] > ...", key->Line, key->ShiftFlags, key->Key);
   }
 }
 
@@ -477,15 +476,7 @@ KMX_BOOL KMX_DoConvert(LPKMX_KEYBOARD kbd, KMX_BOOL bDeadkeyConversion, gint arg
   return TRUE;
 }
 
-// _S2 TODO
-void KMX_LogError(const KMX_WCHART* m1,int m2) {
-  wprintf((PWSTR)m1, m2);
-}
-/*
-void KMX_LogError(const KMX_WCHART* m1,int m2, LPKMX_KEY key) {
-  wprintf((PWSTR)m1, m2);
-}
-*/
+
 int KMX_GetDeadkeys(v_dw_2D & dk_Table, KMX_WORD DeadKey, KMX_WORD *OutputPairs, GdkKeymap* keymap) {
 
   KMX_WORD *p = OutputPairs;
@@ -507,6 +498,26 @@ int KMX_GetDeadkeys(v_dw_2D & dk_Table, KMX_WORD DeadKey, KMX_WORD *OutputPairs,
   }
   *p = 0;
   return (p-OutputPairs);
+}
+
+
+void KMX_LogError(PWCHAR fmt, ...) {
+	WCHAR fmtbuf[256];
+  wchar_t *end = L"\0";
+  wchar_t *nl  = L"\n";
+	va_list vars;
+  int j=0;
+
+	va_start(vars, fmt);
+  vswprintf (fmtbuf,_countof(fmtbuf), fmt,  vars );
+	fmtbuf[255] = 0;
+
+  do {
+    putwchar(fmtbuf[j]);
+    j++;
+  }
+  while(fmtbuf[j] != *end);
+  putwchar(*nl);
 }
 
 // ---- old copy code from here ----------------------------------------------------------

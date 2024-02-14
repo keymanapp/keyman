@@ -25,8 +25,7 @@
 #include "deadkey.h"
 #include "mc_kmxfile.h"
 
-void KMX_LogError(const KMX_WCHART* m1, int m2 = 0);
-//void KMX_LogError(const KMX_WCHART* m1, int m2 = 0, LPKMX_KEY key =NULL);
+void KMX_LogError(PWCHAR fmt, ...) ;
 
 struct KMX_DeadkeyMapping {   // I4353
   KMX_WCHAR deadkey, dkid;
