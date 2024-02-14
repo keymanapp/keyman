@@ -3,6 +3,7 @@ import { assert } from 'chai';
 import { TranCompiler, BkspCompiler } from '../src/compiler/tran.js';
 import { BASIC_DEPENDENCIES, UsetCompiler } from '../src/compiler/empty-compiler.js';
 import { CompilerMessages } from '../src/compiler/messages.js';
+import { CompilerMessages as KmnOtherCompilerMessages } from '@keymanapp/kmc-kmn';
 import { assertCodePoints, compilerTestCallbacks, testCompilationCases } from './helpers/index.js';
 import { KMXPlus, MarkerParser } from '@keymanapp/common-types';
 
@@ -261,6 +262,21 @@ describe('tran', function () {
       subpath: 'sections/tran/tran-hint-range2.xml',
       warnings: [
         CompilerMessages.Hint_CharClassImplicitDenorm({lowestCh: 0xC0}),
+      ],
+    },
+    {
+      subpath: 'sections/tran/fail-bad-reorder.xml',
+      errors: [
+        KmnOtherCompilerMessages.Error_UnicodeSetSyntaxError()
+      ],
+    },
+    // error due to bad regex
+    {
+      subpath: `sections/tran/fail-bad-tran-1.xml`,
+      errors: [
+        CompilerMessages.Error_UnparseableTransformFrom({ from: 'AB(now if only I would terminate this group..',
+        // this message is dependent on v8, so this test could be a little brittle.
+        message: 'Invalid regular expression: /AB(now if only I would terminate this group../: Unterminated group' }),
       ],
     },
   ], tranDependencies);
