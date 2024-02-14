@@ -152,10 +152,11 @@ export abstract class TransformCompiler<T extends TransformCompilerType, TranBas
       cookedFrom = MarkerParser.nfd_markers(cookedFrom, true);
     }
 
+    // Verify that the regex is syntactically valid
     try {
       new RegExp(cookedFrom, 'ug');
     } catch (e) {
-      this.callbacks.reportMessage(CompilerMessages.Error_UnparseableTransformFrom({ from: transform.from }));
+      this.callbacks.reportMessage(CompilerMessages.Error_UnparseableTransformFrom({ from: transform.from, message: e.message }));
       return null;
     }
 
@@ -179,7 +180,7 @@ export abstract class TransformCompiler<T extends TransformCompilerType, TranBas
       transforms: [],
       reorders: reorders.map(reorder => this.compileReorder(sections, reorder)),
     }
-    if (result.reorders.includes(null)) return null;
+    if (result.reorders.includes(null)) return null; // if any of the reorders returned null, fail the entire group.
     return result;
   }
 
@@ -216,7 +217,12 @@ export abstract class TransformCompiler<T extends TransformCompilerType, TranBas
     return defaults;
   }
 
-  /** true if ok */
+  /**
+   * Analyze character classes such as '[a-z]' for denormalized characters.
+   * Escapes non-NFD characters as hex escapes.
+   * @param cookedFrom input regex string
+   * @returns updated 'from' string
+   */
   private checkRanges(cookedFrom: string): string {
     if (!cookedFrom) return cookedFrom;
     // extract all of the potential ranges - but don't match any-markers!

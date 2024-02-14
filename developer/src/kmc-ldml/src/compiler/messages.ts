@@ -170,8 +170,8 @@ export class CompilerMessages {
   m(this.ERROR_UnparseableReorderSet, `Illegal UnicodeSet "${o.set}" in reorder "${o.from}`);
   static ERROR_UnparseableReorderSet = SevError | 0x0028;
 
-  static Error_UnparseableTransformFrom = (o: { from: string }) =>
-  m(this.ERROR_UnparseableTransformFrom, `Invalid transfom from "${o.from}"`);
+  static Error_UnparseableTransformFrom = (o: { from: string, message: string }) =>
+  m(this.ERROR_UnparseableTransformFrom, `Invalid transfom from "${o.from}": "${o.message}`);
   static ERROR_UnparseableTransformFrom = SevError | 0x0029;
 }
 
