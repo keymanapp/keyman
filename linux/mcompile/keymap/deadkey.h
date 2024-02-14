@@ -25,7 +25,7 @@ bool find_dk_combinations_for_specific_dk(v_dw_2D * dk_ComposeTable, v_dw_2D & d
 // gets the shifted character of a key
 KMX_DWORD KMX_changeKeynameToCapital(KMX_DWORD KVal, KMX_DWORD &shift, GdkKeymap* keymap);
 
-// _S2 probably not used
+// _S2 TODO probably not used
 void sort_alDead(std::vector<DeadKey*> &myVec, std::vector<DeadKey*> *p_All_Vec);
 
 # endif /*DEADKEY_H*/

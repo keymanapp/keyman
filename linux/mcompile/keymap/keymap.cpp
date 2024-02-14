@@ -567,7 +567,7 @@ KMX_DWORD KMX_get_CharUnderlying_From_KeyCodeUnderlying_GDK(GdkKeymap *keymap, U
   else                                                                                                // usable char
     return keyvals_dw;
 }
-
+// _S2 do we need this func
 std::wstring KMX_get_WStrUnderlying_From_KeyCodeUnderlying_GDK(GdkKeymap *keymap, guint keycode, ShiftState ss, int caps){
   int keyvals_int= KMX_get_keyval_From_Keycode(keymap, keycode, ss, caps);
   return  convert_DeadkeyValues_ToWstr(keyvals_int);
@@ -609,7 +609,7 @@ UINT  KMX_get_KeyCodeUnderlying_From_VKUS(KMX_DWORD VirtualKeyUS) {
   return (8 + USVirtualKeyToScanCode[VirtualKeyUS]);
 }
 
-KMX_WCHAR KMX_get_CharUS_From_VKUnderlying_VEC(v_dw_3D All_Vector, KMX_DWORD VK_underlying) {
+KMX_WCHAR KMX_get_CharUS_From_VKUnderlying_VEC(v_dw_3D & All_Vector, KMX_DWORD VK_underlying) {
   KMX_DWORD VK_US;
   for( int i=0; i< (int)All_Vector[0].size()-1 ;i++) {
     for( int j=1; j< (int)All_Vector[0][0].size();j++) {

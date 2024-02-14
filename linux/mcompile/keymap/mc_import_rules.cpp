@@ -123,7 +123,6 @@ public:
     this->m_vk = virtualKey;
     memset(this->m_rgfDeadKey,0,sizeof(this->m_rgfDeadKey));
   }
-//_S2 ToDo keymap* or keymap**
 
   KMX_VirtualKey(UINT scanCode, KMX_HKL hkl, GdkKeymap **keymap) {
     this->m_vk = KMX_get_VKUS_From_KeyCodeUnderlying_GDK(*keymap, scanCode);
@@ -140,11 +139,11 @@ public:
     return this->m_sc;
   }
 
-  // _S2 can go later
+  // _S2 TODO can go later
   std::wstring get_m_rgss(int i,int j) {
     return m_rgss[i][j];
   }
-  // _S2 can go later
+  // _S2 TODO can go later
   bool get_m_rgfDeadkey(int i,int j) {
     return m_rgfDeadKey[i][j];
   }
@@ -272,7 +271,7 @@ public:
   bool KMX_LayoutRow(int MaxShiftState, LPKMX_KEY key, std::vector<DeadKey*> *deadkeys, int deadkeyBase, BOOL bDeadkeyConversion,v_dw_3D &All_Vector, GdkKeymap *keymap) {   // I4552
     // Get the CAPSLOCK value
 
-// _S2 needs to go later                                    // this should be true for char, number, special
+// _S2 TODO needs to go later                                    // this should be true for char, number, special
 /*bool   b1= this->KMX_IsCapsEqualToShift();                  // but is false for numbers  and    special
 bool   b2= this->KMX_IsSGCAPS();
 bool   b3= this->KMX_IsAltGrCapsEqualToAltGrShift();
@@ -289,6 +288,8 @@ int i4 = this->KMX_IsXxxxGrCapsEqualToXxxxShift() ? 8 : 0;*/
         (this->KMX_IsAltGrCapsEqualToAltGrShift() ? 4 : 0) |
         (this->KMX_IsXxxxGrCapsEqualToXxxxShift() ? 8 : 0);
 
+
+    // _S2 DIFFERENCE TO MCOMPILE WINDOWS
     // _S2 DESIGN NEEDED on how to replace capslock
     //     capslock has different values for linux. Therefore key->ShiftFlags will be different for numbers, special characters
     //     for now set capslock=1
@@ -406,6 +407,7 @@ public:
     return (ch < 0x0020) || (ch >= 0x007F && ch <= 0x009F);
   }
 
+  // _S2 TODO Do we need this?
   void KMX_ClearKeyboardBuffer() {
     KMX_WCHAR sb[16];
     for( int i=0; i<16; i++) {
@@ -434,7 +436,8 @@ bool KMX_ImportRules(LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, GdkKeymap **keymap,
   std::vector<DeadKey*> alDead;
 
    
-   std::vector<DeadKey*> alDead_cpl = create_alDead();
+  // _S2 DIFFERENCE TO MCOMPILE WINDOWS
+  std::vector<DeadKey*> alDead_cpl = create_alDead();
 
   rgKey.resize(256);
 
@@ -504,7 +507,7 @@ bool KMX_ImportRules(LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, GdkKeymap **keymap,
             continue;
           }
 
-          //_S2 to compare win-lin kmn-files skip ss6+7; MUST BE removed later!!!!
+          //_S2 TODO to compare win-lin kmn-files skip ss6+7; MUST BE removed later!!!!
          /*if(ss == MenuCtrl|| ss == ShftMenuCtrl) {
             continue;
           }*/
@@ -512,28 +515,30 @@ bool KMX_ImportRules(LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, GdkKeymap **keymap,
           KMX_DWORD KC_US = (KMX_DWORD) KMX_get_KeyCodeUnderlying_From_VKUS(iKey);
 
 
-          // _S2 TODO deadkey not finished; Ctrl, Shft +40 not tested
-          // _S2 TODO deadkey not finished; Ctrl, Shft +40 not tested
+          // _S2 TODO not finished; Ctrl, Shft +40 not tested
           for(int caps = 0; caps <= 1; caps++) {
-            loader.KMX_ClearKeyboardBuffer();
+
+            // _S2 TODO Do we need this?
+            //loader.KMX_ClearKeyboardBuffer();
             loader.KMX_FillKeyState(lpKeyState, ss, (caps == 0));
             int rc = KMX_ToUnicodeEx(KC_US, lpKeyState, sbBuffer, ss, caps, *keymap);
 
             if(rc > 0) {
               if(*sbBuffer == 0) {
-                //rgKey[iKey]->KMX_SetShiftState(ss, L"", false, (caps == 0));
+                //rgKey[iKey]->KMX_SetShiftState(ss, L"", false, (caps == 0)); // _S2
                 rgKey[iKey]->KMX_SetShiftState(ss, L"", false, (caps));
               }
               else {
                 if((rc == 1) &&
                   (ss == Ctrl || ss == ShftCtrl) &&
                   (rgKey[iKey]->VK() == ((UINT)sbBuffer[0] + 0x40))) {
-                      // _S2 TODO is this the same behavior on Linux?
+                      //  is this the same behavior on Linux?
                       // if rc ==1 : it got 1  char && +40 in Buffer CTRl pressed
+                      // && CTRl +0x40 in the buffer ( which indicates a ctrl press)
+
                       // It's dealing with control characters. If ToUnicodeEx gets
                       // VK_A with the Ctrl key pressed, it will write 0x01 to sBuffer[0],
                       // without Ctrl it's 0x41. The if detects this case.
-                      // && CTRl +0x40 in the buffer ( which indicates a ctrl press)
 
                       // ToUnicodeEx has an internal knowledge about those
                       // VK_A ~ VK_Z keys to produce the control characters,
@@ -555,7 +560,10 @@ bool KMX_ImportRules(LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, GdkKeymap **keymap,
             rgKey[iKey]->KMX_SetShiftState(ss, sbBuffer, true, (caps ));   //_S2 INFO
 
             // It's a dead key; let's flush out whats stored in the keyboard state.
-            loader.KMX_ClearKeyboardBuffer();
+            // _S2 TODO Do we need this?
+            //loader.KMX_ClearKeyboardBuffer();
+
+            // _S2 DIFFERENCE TO MCOMPILE WINDOWS
             refine_alDead(sbBuffer[0], alDead, &alDead_cpl);
           }
         }

@@ -475,7 +475,7 @@ KMX_BOOL KMX_VerifyKeyboard(LPKMX_BYTE filebase, KMX_DWORD sz){
   return TRUE;
 }
 
-// __S2 TODO use incxstr from elsewhere
+// _S2 TODO use incxstr from elsewhere
 PKMX_WCHAR KMX_incxstr(PKMX_WCHAR p) {
 
   if (*p == 0)

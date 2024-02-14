@@ -36,7 +36,6 @@ typedef uint16_t   km_kbp_cp;          // code point
 typedef uint32_t   km_kbp_usv;         // Unicode Scalar Value
 #endif
 
-// _S2 TODO which can be removed later?
 typedef unsigned int  UINT;
 typedef unsigned long DWORD;
 
@@ -122,7 +121,7 @@ typedef KMX_UCHAR* KMX_PUCHAR;
 #define VK_CANCEL   0x09
 #define VK_DECIMAL  0x5B*/
 
-// _S2 correct?? ??
+// _S2 TODO correct?? ??
 #define VK_NUMPAD0  0x60
 #define VK_NUMPAD1  0x61
 #define VK_NUMPAD2  0x62
@@ -135,7 +134,7 @@ typedef KMX_UCHAR* KMX_PUCHAR;
 #define VK_NUMPAD9  0x69
 
 
-// _S2 correct?? ??
+// _S2 TODO correct?? ??
 /*#define VK_NUMPAD0  0x2D
 #define VK_NUMPAD1  0x23
 #define VK_NUMPAD2  0x28
