@@ -33,6 +33,7 @@ tests_without_testdata = [
 
 # These tests have a k_001_tiny-test.xml file as well.
 tests_with_testdata = [
+  'und',
   'k_001_tiny',
   'k_006_backspace',
   'k_007_transform_rgx',
