@@ -426,7 +426,7 @@ KMX_BOOL KMX_DoConvert(LPKMX_KEYBOARD kbd, KMX_BOOL bDeadkeyConversion, gint arg
       return FALSE;
   }
 
-  // _S2 DIFFERENCE TO MCOMPILE WINDOWS
+  // _S2 DIFFERENT TO MCOMPILE WINDOWS
   // create vector
   v_dw_3D All_Vector;
   if(createOneVectorFromBothKeyboards(All_Vector, keymap)){
@@ -443,7 +443,7 @@ KMX_BOOL KMX_DoConvert(LPKMX_KEYBOARD kbd, KMX_BOOL bDeadkeyConversion, gint arg
     for (int i = 0;KMX_VKMap[i]; i++) { // I4651
 
 
-      // _S2 DIFFERENCE TO MCOMPILE WINDOWS
+      // _S2 DIFFERENT TO MCOMPILE WINDOWS
       // win goes via VK, Lin goes via SC/Keycode
 
       UINT scUnderlying =  KMX_get_KeyCodeUnderlying_From_VKUS(KMX_VKMap[i]);
