@@ -494,42 +494,6 @@ int KMX_get_keyval_From_Keycode(GdkKeymap *keymap, guint keycode, ShiftState ss,
   return (int) *keyvals;
 }
 
-KMX_DWORD KMX_get_KeyvalUnderlying_From_KeyCodeUnderlying_GDK(GdkKeymap *keymap, guint keycode, int shift_state_pos, PKMX_WCHAR &dky) {
-  GdkKeymapKey *maps;
-  guint *keyvals;
-  gint count;
-  KMX_DWORD deadkey=0;
-
-
-  if (!gdk_keymap_get_entries_for_keycode(keymap, keycode, &maps, &keyvals, &count))
-    return 0;
-  // _S2 INFO maybe later use something like
-  //if(!gdk_wayland_keymap_get_entries_for_keycode(keymap, keycode, &maps, &keyvals, &count))
-  //  return 0;    https://codebrowser.dev/gtk/gtk/gdk/wayland/gdkkeys-wayland.c.html
-
-  if (!(shift_state_pos <= count))
-  return 0;
-
-  if (!(keycode <= keycode_max))
-    return 0;
-
-  KMX_DWORD All_Keyvals =  KMX_get_keyval_From_Keycode(keymap, keycode, ShiftState(shift_state_pos), 0);
-  if(( (All_Keyvals >= deadkey_min) && (All_Keyvals <= deadkey_max)))
-    deadkey = All_Keyvals;
-  dky = (PKMX_WCHAR) (convert_DeadkeyValues_To_U16str((int) deadkey)).c_str();
-
-  g_free(keyvals);
-  g_free(maps);
-
-  // _S2 AHA output for dk4-12 at the top after dk... from here
- if((All_Keyvals >=  deadkey_min) && (All_Keyvals <=  deadkey_max))                                    // deadkeys
-    return 0xFFFF;
-  else if((All_Keyvals >  deadkey_max) || ((All_Keyvals <  deadkey_min)  &&  ( All_Keyvals > 0xFF)))     // out of range
-    return 0xFFFE;
-  else                                                                                                // usable char
-    return All_Keyvals;
-}
-
 KMX_DWORD KMX_get_KeyvalUnderlying_From_KeyCodeUnderlying_GDK(GdkKeymap *keymap, guint keycode, int shift_state_pos) {
   GdkKeymapKey *maps;
   guint *keyvals;
@@ -553,10 +517,48 @@ KMX_DWORD KMX_get_KeyvalUnderlying_From_KeyCodeUnderlying_GDK(GdkKeymap *keymap,
   return out;
 }
 
+KMX_DWORD KMX_get_KeyvalUnderlying_DK_From_KeyCodeUnderlying_GDK(GdkKeymap *keymap, guint keycode, int shift_state_pos, PKMX_WCHAR &dky) {
+  GdkKeymapKey *maps;
+  guint *keyvals;
+  gint count;
+  KMX_DWORD deadkey=0;
+
+
+  if (!gdk_keymap_get_entries_for_keycode(keymap, keycode, &maps, &keyvals, &count))
+    return 0;
+  // _S2 INFO maybe later use something like
+  //if(!gdk_wayland_keymap_get_entries_for_keycode(keymap, keycode, &maps, &keyvals, &count))
+  //  return 0;    https://codebrowser.dev/gtk/gtk/gdk/wayland/gdkkeys-wayland.c.html
+
+  if (!(shift_state_pos <= count))
+  return 0;
+
+  if (!(keycode <= keycode_max))
+    return 0;
+
+  KMX_DWORD All_Keyvals =  KMX_get_keyval_From_Keycode(keymap, keycode, ShiftState(shift_state_pos), 0);
+
+  if(( (All_Keyvals >= deadkey_min) && (All_Keyvals <= deadkey_max)))
+    deadkey = All_Keyvals;
+
+  dky = (PKMX_WCHAR) (convert_DeadkeyValues_To_U16str((int) deadkey)).c_str();
+
+  g_free(keyvals);
+  g_free(maps);
+
+  // _S2 AHA output for dk4-12 at the top after dk... from here
+  if((All_Keyvals >=  deadkey_min) && (All_Keyvals <=  deadkey_max))                                    // deadkeys
+    return 0xFFFF;
+  else if((All_Keyvals >  deadkey_max) || ((All_Keyvals <  deadkey_min)  &&  ( All_Keyvals > 0xFF)))    // out of range
+    return 0xFFFE;
+  else                                                                                                  // usable char
+    return All_Keyvals;
+}
+
 KMX_DWORD KMX_get_CharUnderlying_From_KeyCodeUnderlying_GDK(GdkKeymap *keymap, UINT VKShiftState, UINT KC_underlying, PKMX_WCHAR DeadKey) {
   
   PKMX_WCHAR dky;
-  KMX_DWORD keyvals_dw = KMX_get_KeyvalUnderlying_From_KeyCodeUnderlying_GDK(keymap, KC_underlying, map_VKShiftState_to_LinModifier(VKShiftState), dky);
+  KMX_DWORD keyvals_dw = KMX_get_KeyvalUnderlying_DK_From_KeyCodeUnderlying_GDK(keymap, KC_underlying, map_VKShiftState_to_LinModifier(VKShiftState), dky);
 
   if(keyvals_dw >=  deadkey_min) {                                                                    // deadkey
     *DeadKey = *dky;
@@ -600,10 +602,6 @@ KMX_DWORD KMX_get_KeyCodeUnderlying_From_KeycodeUS_GDK(GdkKeymap *keymap, v_dw_3
   return KC_US;
 }
 
-UINT  KMX_get_KeyCodeUnderlying_From_VKUS(KMX_DWORD VirtualKeyUS) {
-  return (8 + USVirtualKeyToScanCode[VirtualKeyUS]);
-}
-
 KMX_WCHAR KMX_get_CharUS_From_VKUnderlying_VEC(v_dw_3D & All_Vector, KMX_DWORD VK_underlying) {
   KMX_DWORD VK_US;
   for( int i=0; i< (int)All_Vector[0].size()-1 ;i++) {
@@ -615,6 +613,10 @@ KMX_WCHAR KMX_get_CharUS_From_VKUnderlying_VEC(v_dw_3D & All_Vector, KMX_DWORD V
     }
   }
   return VK_underlying;
+}
+
+UINT  KMX_get_KeyCodeUnderlying_From_VKUS(KMX_DWORD VirtualKeyUS) {
+  return (8 + USVirtualKeyToScanCode[VirtualKeyUS]);
 }
 
 std::wstring CodePointToWString(unsigned int codepoint) {

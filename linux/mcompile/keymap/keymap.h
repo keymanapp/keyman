@@ -509,9 +509,9 @@ std::u16string convert_DeadkeyValues_To_U16str(int in);
 // use gdk_keymap_translate_keyboard_state to get keyval - base function to get keyvals
 int KMX_get_keyval_From_Keycode(GdkKeymap *keymap, guint keycode, ShiftState ss, int caps);
 
-KMX_DWORD KMX_get_KeyvalUnderlying_From_KeyCodeUnderlying_GDK(GdkKeymap *keymap, guint keycode, int shift_state_pos, PKMX_WCHAR &dky);
-
 KMX_DWORD KMX_get_KeyvalUnderlying_From_KeyCodeUnderlying_GDK(GdkKeymap *keymap, guint keycode, int shift_state_pos);
+
+KMX_DWORD KMX_get_KeyvalUnderlying_DK_From_KeyCodeUnderlying_GDK(GdkKeymap *keymap, guint keycode, int shift_state_pos, PKMX_WCHAR &dky);
 
 KMX_DWORD KMX_get_CharUnderlying_From_KeyCodeUnderlying_GDK(GdkKeymap *keymap, UINT VKShiftState, UINT KC_underlying, PKMX_WCHAR DeadKey);
 
@@ -521,12 +521,12 @@ KMX_DWORD KMX_get_VKUS_From_KeyCodeUnderlying_GDK( GdkKeymap *keymap, KMX_DWORD 
 // return the Keycode of the underlying Keyboard for given VK_US using GDK
 KMX_DWORD KMX_get_KeyCodeUnderlying_From_KeycodeUS_GDK(GdkKeymap *keymap, v_dw_3D &All_Vector,KMX_DWORD KC_US, ShiftState ss, int caps);
 
+KMX_WCHAR KMX_get_CharUS_From_VKUnderlying_VEC(v_dw_3D &All_Vector,KMX_DWORD VK_underlying);
+
 // return the Keycode of the underlying Keyboard for given VK_US
 UINT KMX_get_KeyCodeUnderlying_From_VKUS(KMX_DWORD VirtualKeyUS);
 
-KMX_WCHAR KMX_get_CharUS_From_VKUnderlying_VEC(v_dw_3D &All_Vector,KMX_DWORD VK_underlying);
-
-// converts codePoint to wstring
+// convert codePoint to wstring
 std::wstring CodePointToWString(unsigned int codepoint);
 std::u16string CodePointToString_16(unsigned int codepoint);
 
