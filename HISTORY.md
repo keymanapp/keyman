@@ -1,5 +1,12 @@
 # Keyman Version History
 
+## 17.0.267 alpha 2024-02-14
+
+* fix(linux): Use temp dir if we can't create cache dir (#10681)
+* feat(developer): errs on unparseable regex (#10689)
+* feat(developer): errs on \uXXXX escapes (#10701)
+* docs(common): Fill in missing HISTORY.md entries (#10704)
+
 ## 17.0.266 alpha 2024-02-13
 
 * chore(windows): add const to argument definition (#10677)
