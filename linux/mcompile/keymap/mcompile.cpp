@@ -385,14 +385,11 @@ void KMX_ConvertDeadkey(LPKMX_KEYBOARD kbd, KMX_WORD vk, UINT shift, KMX_WCHAR d
 
   KMX_GetDeadkeys(dk_Table, deadkey, pdk = deadkeys, keymap);  // returns array of [usvk, ch_out] pairs
   while(*pdk) {
-pd_S2=pdk;
-//pdd_S2=pdk;
     // Look up the ch
     UINT vkUnderlying = KMX_get_CharUS_From_VKUnderlying_VEC(All_Vector, *pdk);
 
     KMX_TranslateDeadkeyKeyboard(kbd, dkid, vkUnderlying, *(pdk+1), *(pdk+2));
     pdk+=3;
-    pd_S2+=3;
   }
 }
 
