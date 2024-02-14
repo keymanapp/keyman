@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  Test Keyboard
+-->
+
+<!DOCTYPE keyboard3 SYSTEM "../../../../../resources/standards-data/ldml-keyboards/techpreview/dtd/ldmlKeyboard3.dtd">
+<keyboard3 locale="und" conformsTo="techpreview">
+  <info layout="qwerty" name="Test Keyboards"/>
+
+  <keys>
+    <key id="1" output="1:basic:OK"/>
+  </keys>
+
+  <layers formId="us">
+    <layer modifiers="none" id="base">
+      <row keys="gap 1 2 3 4 5 6 7 8 9 0" />
+    </layer>
+  </layers>
+</keyboard3>

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE keyboardTest3 SYSTEM "../../../../../resources/standards-data/ldml-keyboards/techpreview/dtd/ldmlKeyboardTest3.dtd">
+<keyboardTest3 conformsTo="techpreview">
+  <info keyboard="und.xml" author="srl295" name="test" />
+
+  <tests name="separate">
+    <test name="key-1">
+      <keystroke key="1" />
+      <check result="1:basic:OK" />
+    </test>
+  </tests>
+</keyboardTest3>
