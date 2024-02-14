@@ -516,7 +516,7 @@ KMX_DWORD KMX_get_KeyvalUnderlying_From_KeyCodeUnderlying_GDK(GdkKeymap *keymap,
 KMX_DWORD KMX_get_CharUnderlying_From_KeyCodeUnderlying_GDK(GdkKeymap *keymap, UINT VKShiftState, UINT KC_underlying, PKMX_WCHAR DeadKey);
 
 // return KeySyms for a given key (for unshifted: finds the Keysym according to Shiftstate e.g. a;A or 1;! )
-std::wstring KMX_get_WStrUnderlying_From_KeyCodeUnderlying_GDK(GdkKeymap *keymap, guint VK, ShiftState ss, int caps);
+//std::wstring KMX_get_WStrUnderlying_From_KeyCodeUnderlying_GDK(GdkKeymap *keymap, guint VK, ShiftState ss, int caps);
 
 // return the VirtualKey of the underlying Keyboard for a given Keyode using GDK
 KMX_DWORD KMX_get_VKUS_From_KeyCodeUnderlying_GDK( GdkKeymap *keymap, KMX_DWORD keycode);
