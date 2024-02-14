@@ -144,21 +144,23 @@ export abstract class TransformCompiler<T extends TransformCompilerType, TranBas
     // don't unescape literals here, because we are going to pass them through into the regex
     cookedFrom = util.unescapeStringToRegex(cookedFrom);
 
+    // check for incorrect \uXXXX escapes
     cookedFrom = this.checkEscapes(cookedFrom); // check for \uXXXX escapes before normalizing
     if (cookedFrom === null) return null; // error
 
+    // check for denormalized ranges
     cookedFrom = this.checkRanges(cookedFrom); // check before normalizing
-    if (cookedFrom === null) return null; // error
 
     if (!sections?.meta?.normalizationDisabled) {
       // nfd here.
       cookedFrom = MarkerParser.nfd_markers(cookedFrom, true);
     }
 
+    // Verify that the regex is syntactically valid
     try {
       new RegExp(cookedFrom, 'ug');
     } catch (e) {
-      this.callbacks.reportMessage(CompilerMessages.Error_UnparseableTransformFrom({ from: transform.from }));
+      this.callbacks.reportMessage(CompilerMessages.Error_UnparseableTransformFrom({ from: transform.from, message: e.message }));
       return null; // error
     }
 
@@ -182,7 +184,7 @@ export abstract class TransformCompiler<T extends TransformCompilerType, TranBas
       transforms: [],
       reorders: reorders.map(reorder => this.compileReorder(sections, reorder)),
     }
-    if (result.reorders.includes(null)) return null;
+    if (result.reorders.includes(null)) return null; // if any of the reorders returned null, fail the entire group.
     return result;
   }
 
@@ -225,7 +227,12 @@ export abstract class TransformCompiler<T extends TransformCompilerType, TranBas
     return defaults;
   }
 
-  /** returns ===null on error */
+  /**
+   * Analyze reorders and regexes for \uXXXX escapes.
+   * The LDML spec requires \u{XXXX} format.
+   * @param cookedFrom the original string
+   * @returns the original string, or null if an error was reported
+   */
   private checkEscapes(cookedFrom: string): string | null {
     if (!cookedFrom) return cookedFrom;
 
@@ -242,8 +249,13 @@ export abstract class TransformCompiler<T extends TransformCompilerType, TranBas
     return cookedFrom;
   }
 
-  /** returns ===null on error */
-  private checkRanges(cookedFrom: string): string | null {
+  /**
+   * Analyze character classes such as '[a-z]' for denormalized characters.
+   * Escapes non-NFD characters as hex escapes.
+   * @param cookedFrom input regex string
+   * @returns updated 'from' string
+   */
+  private checkRanges(cookedFrom: string): string {
     if (!cookedFrom) return cookedFrom;
 
     // extract all of the potential ranges - but don't match any-markers!

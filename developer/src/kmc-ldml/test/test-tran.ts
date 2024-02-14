@@ -286,7 +286,9 @@ describe('tran', function () {
     {
       subpath: `sections/tran/fail-bad-tran-1.xml`,
       errors: [
-        CompilerMessages.Error_UnparseableTransformFrom({ from: 'AB(now if only I would terminate this group..' }),
+        CompilerMessages.Error_UnparseableTransformFrom({ from: 'AB(now if only I would terminate this group..',
+        // this message is dependent on v8, so this test could be a little brittle.
+        message: 'Invalid regular expression: /AB(now if only I would terminate this group../: Unterminated group' }),
       ],
     },
     {
