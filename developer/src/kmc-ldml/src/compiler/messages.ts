@@ -173,6 +173,10 @@ export class CompilerMessages {
   static Error_UnparseableTransformFrom = (o: { from: string, message: string }) =>
   m(this.ERROR_UnparseableTransformFrom, `Invalid transfom from "${o.from}": "${o.message}`);
   static ERROR_UnparseableTransformFrom = SevError | 0x0029;
+
+  static Error_InvalidQuadEscape = (o: { cp: number }) =>
+  m(this.ERROR_InvalidQuadEscape, `Invalid escape "\\u${util.hexQuad(o?.cp || 0)}", use "\\u{${o?.cp?.toString(16)}}" instead.`);
+  static ERROR_InvalidQuadEscape = SevError | 0x0030;
 }
 
 

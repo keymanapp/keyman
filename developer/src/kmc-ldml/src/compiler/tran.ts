@@ -144,7 +144,11 @@ export abstract class TransformCompiler<T extends TransformCompilerType, TranBas
     // don't unescape literals here, because we are going to pass them through into the regex
     cookedFrom = util.unescapeStringToRegex(cookedFrom);
 
-    // cook the ranges also
+    // check for incorrect \uXXXX escapes
+    cookedFrom = this.checkEscapes(cookedFrom); // check for \uXXXX escapes before normalizing
+    if (cookedFrom === null) return null; // error
+
+    // check for denormalized ranges
     cookedFrom = this.checkRanges(cookedFrom); // check before normalizing
 
     if (!sections?.meta?.normalizationDisabled) {
@@ -157,7 +161,7 @@ export abstract class TransformCompiler<T extends TransformCompilerType, TranBas
       new RegExp(cookedFrom, 'ug');
     } catch (e) {
       this.callbacks.reportMessage(CompilerMessages.Error_UnparseableTransformFrom({ from: transform.from, message: e.message }));
-      return null;
+      return null; // error
     }
 
     // cookedFrom is cooked above, since there's some special treatment
@@ -186,6 +190,12 @@ export abstract class TransformCompiler<T extends TransformCompilerType, TranBas
 
   private compileReorder(sections: DependencySections, reorder: LKReorder): TranReorder {
     let result = new TranReorder();
+    if (reorder.from && this.checkEscapes(reorder.from) === null) {
+      return null; // error'ed
+    }
+    if (reorder.before && this.checkEscapes(reorder.before) === null) {
+      return null; // error'ed
+    }
     result.elements = sections.elem.allocElementString(sections, reorder.from, reorder.order, reorder.tertiary, reorder.tertiaryBase, reorder.preBase);
     result.before = sections.elem.allocElementString(sections, reorder.before);
     if (!result.elements || !result.before) {
@@ -218,6 +228,28 @@ export abstract class TransformCompiler<T extends TransformCompilerType, TranBas
   }
 
   /**
+   * Analyze reorders and regexes for \uXXXX escapes.
+   * The LDML spec requires \u{XXXX} format.
+   * @param cookedFrom the original string
+   * @returns the original string, or null if an error was reported
+   */
+  private checkEscapes(cookedFrom: string): string | null {
+    if (!cookedFrom) return cookedFrom;
+
+    // should not follow marker prefix, nor marker prefix with range
+    const anyQuad = /(?<!\\uffff\\u0008(?:\[[0-9a-fA-F\\u-]*)?)\\u([0-9a-fA-F]{4})/g;
+
+    for (const [, sub] of cookedFrom.matchAll(anyQuad)) {
+      const s = util.unescapeOne(sub);
+      if (s !== '\uffff' && s !== '\u0008') { // markers
+        this.callbacks.reportMessage(CompilerMessages.Error_InvalidQuadEscape({ cp: s.codePointAt(0) }));
+        return null; // exit on the first error
+      }
+    }
+    return cookedFrom;
+  }
+
+  /**
    * Analyze character classes such as '[a-z]' for denormalized characters.
    * Escapes non-NFD characters as hex escapes.
    * @param cookedFrom input regex string
@@ -225,6 +257,7 @@ export abstract class TransformCompiler<T extends TransformCompilerType, TranBas
    */
   private checkRanges(cookedFrom: string): string {
     if (!cookedFrom) return cookedFrom;
+
     // extract all of the potential ranges - but don't match any-markers!
     const anyRange = /(?<!\\uffff\\u0008)\[([^\]]+)\]/g;
     const ranges = cookedFrom.matchAll(anyRange);
@@ -232,7 +265,7 @@ export abstract class TransformCompiler<T extends TransformCompilerType, TranBas
     if (!ranges) return cookedFrom;
 
     // extract inner members of a range (inside the [])
-    const rangeRegex = /(\\u[0-9a-fA-F]{4}|.)-(\\u[0-9a-fA-F]{4}|.)|./g;
+    const rangeRegex = /(\\u\{[0-9a-fA-F]\}{1,6}|.)-(\\u\{[0-9a-fA-F]\}{1,6}|.)|./g;
 
     const rangeExplicit = new util.NFDAnalyzer();
     const rangeImplicit = new util.NFDAnalyzer();
@@ -241,8 +274,6 @@ export abstract class TransformCompiler<T extends TransformCompilerType, TranBas
     function processExplicit(s: string) {
       if (s.startsWith('\\u{')) {
         s = util.unescapeString(s);
-      } else if(s.startsWith('\\u')) {
-        s = util.unescapeOneQuadString(s);
       }
       rangeExplicit.add(s);
       return s;
