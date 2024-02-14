@@ -8,5 +8,17 @@
       <keystroke key="1" />
       <check result="1:basic:OK" />
     </test>
+    <test name="key-2">
+      <keystroke key="2" />
+      <check result="2:simple_transform:OK" />
+    </test>
+    <test name="key-3">
+      <keystroke key="3" />
+      <check result="3:simple_marker:OK" />
+    </test>
+    <test name="key-4">
+      <keystroke key="4" />
+      <check result="4:simple_reorder:OK" />
+    </test>
   </tests>
 </keyboardTest3>
