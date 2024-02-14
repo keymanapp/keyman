@@ -19,7 +19,6 @@
                     06 Feb 2015 - mcdurdin - I4552 - V9.0 - Add mnemonic recompile option to ignore deadkeys
 */
 
-
 #include <vector>
 #include <string>
 #include <stdio.h>
@@ -67,7 +66,6 @@ int KMX_ToUnicodeEx(guint keycode, const BYTE *lpKeyState, PKMX_WCHAR pwszBuff, 
   GdkKeymapKey *maps;
   guint *keyvals;
   gint count;
-  KMX_DWORD out;
 
   if (!gdk_keymap_get_entries_for_keycode(keymap, keycode, &maps, &keyvals, &count))
     return 0;
@@ -75,7 +73,7 @@ int KMX_ToUnicodeEx(guint keycode, const BYTE *lpKeyState, PKMX_WCHAR pwszBuff, 
   if (!(shift_state_pos <= count))
    return 0;
 
-   if (!(keycode <= keycode_max))
+  if (!(keycode <= keycode_max))
     return 0;
 
   std::wstring str= KMX_get_WStrUnderlying_From_KeyCodeUnderlying_GDK(keymap, keycode, ShiftState(shift_state_pos), caps);
@@ -558,8 +556,6 @@ bool KMX_ImportRules(LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, GdkKeymap **keymap,
 
             // It's a dead key; let's flush out whats stored in the keyboard state.
             loader.KMX_ClearKeyboardBuffer();
-            DeadKey *dk = NULL;
-
             refine_alDead(sbBuffer[0], alDead, &alDead_cpl);
           }
         }
@@ -640,7 +636,6 @@ bool KMX_ImportRules(LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, GdkKeymap **keymap,
   for(UINT i = 0; i < kp->cxGroupArray - 1; i++, gp2++) {
     if(gp2->fUsingKeys && gp2->dpNoMatch == NULL) {
       KMX_WCHAR *p = gp2->dpNoMatch = new KMX_WCHAR[4];
-      KMX_WCHAR *q = p;
       *p++ = UC_SENTINEL;
       *p++ = CODE_USE;
       *p++ = (KMX_WCHAR)(kp->cxGroupArray);
@@ -666,7 +661,6 @@ bool KMX_ImportRules(LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, GdkKeymap **keymap,
           kkp2->ShiftFlags = kkp->ShiftFlags;
           kkp2->Line = 0;
           KMX_WCHAR *p = kkp2->dpOutput = new KMX_WCHAR[4];
-          KMX_WCHAR *q=p;
           *p++ = UC_SENTINEL;
           *p++ = CODE_USE;
           *p++ = (KMX_WCHAR)(kp->cxGroupArray);

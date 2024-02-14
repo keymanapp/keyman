@@ -1,8 +1,8 @@
 #include "keymap.h"
 
 #include <xkbcommon/xkbcommon.h>
-// unmodified, shift, RALT, shift+RALT
 
+// unmodified, shift, RALT, shift+RALT
 int map_VKShiftState_to_LinModifier(int VKShiftState) {
   if      (VKShiftState == 0 )      return 0;		/* 0000 0000 */
   else if (VKShiftState == 16)      return 1;		/* 0001 0000 */
@@ -498,7 +498,6 @@ KMX_DWORD KMX_get_KeyvalUnderlying_From_KeyCodeUnderlying_GDK(GdkKeymap *keymap,
   GdkKeymapKey *maps;
   guint *keyvals;
   gint count;
-  KMX_DWORD out;
   KMX_DWORD deadkey=0;
 
 
@@ -541,7 +540,7 @@ KMX_DWORD KMX_get_KeyvalUnderlying_From_KeyCodeUnderlying_GDK(GdkKeymap *keymap,
     return 0;
 
   if (!(shift_state_pos <= count))
-   return 0;
+    return 0;
 
    if (!(keycode <= keycode_max))
     return 0;

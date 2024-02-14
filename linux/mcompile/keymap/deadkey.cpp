@@ -34,9 +34,9 @@ std::vector<DeadKey*> create_alDead() {
 	v_dw_2D dk_ComposeTable;
   create_DKTable(dk_ComposeTable);
 
-	for( int i=0; i< dk_ComposeTable.size()-1; i++) {
+	for( int i=0; i< (int) dk_ComposeTable.size()-1; i++) {
 		DeadKey *dk2= new DeadKey(dk_ComposeTable[i][0]);
-		for ( int j=0; j< dk_ComposeTable.size();j++) {
+		for ( int j=0; j< (int) dk_ComposeTable.size();j++) {
 			if(( dk_ComposeTable[i][0]==dk_ComposeTable[j][0]) && (IsKeymanUsedChar(dk_ComposeTable[j][1])))
 				dk2->KMX_AddDeadKeyRow(dk_ComposeTable[j][1],dk_ComposeTable[j][2]);
 		}
@@ -53,7 +53,7 @@ bool found_dk_inVector(KMX_WCHAR dk, std::vector<DeadKey*> &dkVec) {
 			if( dk == dkVec[i]->KMX_GetDeadCharacter())
 				return true;
 			i++;
-		} while (i < dkVec.size());
+		} while (i < (int) dkVec.size());
 	}
 	return false;
 }
@@ -62,7 +62,7 @@ void refine_alDead(KMX_WCHAR dk, std::vector<DeadKey*> &dkVec, std::vector<DeadK
 	if( dk == 0)
 		return;
 
-	for (int j=0; j< (*p_All_Vec).size()-1;j++) {
+	for (int j=0; j < (int) (*p_All_Vec).size()-1;j++) {
 		if( dk == (*p_All_Vec)[j]->KMX_GetDeadCharacter()) {
 			if(! found_dk_inVector(dk, dkVec)) {
 				dkVec.push_back((*p_All_Vec)[j]);
@@ -77,10 +77,10 @@ void sort_alDead(std::vector<DeadKey*> &small_Vec, std::vector<DeadKey*> *p_All_
 
 	std::vector<DeadKey*> small_sorted;
 	int Vsmall_size;
-	int i=0;
+	int i = 0;
 
 	do {
-		int j=0;
+		int j = 0;
 		Vsmall_size= small_Vec.size();
 
 		do {
@@ -90,9 +90,9 @@ void sort_alDead(std::vector<DeadKey*> &small_Vec, std::vector<DeadKey*> *p_All_
 				Vsmall_size--;
 			}
 			j++;
-		} while (j< Vsmall_size);
+		} while (j < Vsmall_size);
 		i++;
-	} while ((i< (*p_All_Vec).size()) && (Vsmall_size>0));
+	} while ((i < (int) (*p_All_Vec).size()) && (Vsmall_size>0));
 	small_Vec = small_sorted;
 }
 

@@ -22,13 +22,6 @@
                     06 Feb 2015 - mcdurdin - I4552 - V9.0 - Add mnemonic recompile option to ignore deadkeys
                     08 Apr 2015 - mcdurdin - I4651 - V9.0 - Mnemonic layout recompiler maps AltGr+VK_BKSLASH rather than VK_OEM_102
 */
-//_S2 INFO
-// in /Projects/keyman/keyman/linux/mcompile/keymap/build_mcompile
-// run with:
-//./mcompile -d in.kmx bla.dll 0407 out.kmx
-//./mcompile -d /Projects/keyman/keyman/linux/mcompile/keymap/anii.kmx bla.dll 0407 /Projects/keyman/keyman/linux/mcompile/keymap/anii_out.kmx
-//./mcompile -d /Projects/keyman/keyman/linux/mcompile/keymap/sil_ipa_o.kmx bla.dll 0407 /Projects/keyman/keyman/linux/mcompile/keymap/sil_ipa_o_out2.kmx
-//./mcompile -d /Projects/keyman/keyman/linux/mcompile/keymap/mcompile_test.kmx bla.dll 0407 /Projects/keyman/keyman/linux/mcompile/keymap/mcompile_test_out.kmx
 
 #include "mcompile.h"
 
@@ -244,7 +237,6 @@ void KMX_TranslateDeadkeyKey(LPKMX_KEY key, KMX_WCHAR deadkey, KMX_WORD vk, UINT
 
     PKMX_WCHAR context = new KMX_WCHAR[len + 4];
     memcpy(context, key->dpContext, len * sizeof(KMX_WCHAR));
-    PKMX_WCHAR PP = context;
     context[len] = UC_SENTINEL;
     context[len+1] = CODE_DEADKEY;
     context[len+2] = deadkey;
