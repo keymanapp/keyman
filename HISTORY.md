@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 18.0.1 alpha 2024-02-15
+
+* chore: move to 18.0 alpha
+
 ## 17.0.267 alpha 2024-02-14
 
 * fix(linux): Use temp dir if we can't create cache dir (#10681)
