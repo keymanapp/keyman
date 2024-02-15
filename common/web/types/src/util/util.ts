@@ -36,7 +36,7 @@ export class UnescapeError extends Error {
  * @param hex one codepoint in hex, such as '0127'
  * @returns the unescaped codepoint
  */
-function unescapeOne(hex: string): string {
+export function unescapeOne(hex: string): string {
   const codepoint = Number.parseInt(hex, 16);
   return String.fromCodePoint(codepoint);
 }

@@ -71,7 +71,7 @@ describe('compiler-tests', function() {
     const source = k.load(filename);
     assert.notOk(source, `Trying to loadTestData(${filename})`);
   });
-  it('should fail on illegal chars', async function() {
+  it('should fail on illegal chars - sections/strs/invalid-illegal.xml', async function() {
     const inputFilename = makePathToFixture('sections/strs/invalid-illegal.xml');
     const kmx = await compileKeyboard(inputFilename, { ...compilerTestOptions, saveDebug: true, shouldAddCompilerVersion: false },
       [
