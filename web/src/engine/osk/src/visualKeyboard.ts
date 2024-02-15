@@ -489,8 +489,8 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
           if(previewHost) {
             this.gesturePreviewHost = previewHost;
             trackingEntry.previewHost = previewHost;
-            sourceTrackingMap[source.identifier].key = key;
           }
+          sourceTrackingMap[source.identifier].key = key;
         }
       }
 
