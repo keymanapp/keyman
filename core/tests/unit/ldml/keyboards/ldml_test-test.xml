@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE keyboardTest3 SYSTEM "../../../../../resources/standards-data/ldml-keyboards/techpreview/dtd/ldmlKeyboardTest3.dtd">
 <keyboardTest3 conformsTo="techpreview">
-  <info keyboard="und.xml" author="srl295" name="test" />
+  <info keyboard="ldml_tgest.xml" author="srl295" name="test" />
 
   <tests name="separate">
     <test name="key-1">
@@ -19,6 +19,14 @@
     <test name="key-4">
       <keystroke key="4" />
       <check result="4:simple_reorder:OK" />
+    </test>
+    <test name="key-5">
+      <keystroke key="5" />
+      <check result="5:simple_reorder:OK" />
+    </test>
+    <test name="key-6">
+      <keystroke key="6" />
+      <check result="6:simple_reorder:OK" />
     </test>
   </tests>
 </keyboardTest3>
