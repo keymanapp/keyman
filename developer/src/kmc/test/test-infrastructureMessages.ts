@@ -113,7 +113,7 @@ describe('InfrastructureMessages', function () {
 
   it('should generate ERROR_FileTypeNotFound if a project file does not contain a .kps file entry (BuildKeyboardInfo)', async function() {
     const buildKeyboardInfo = new BuildKeyboardInfo();
-    const projectPath = makePathToFixture('invalid-projects', 'error_file_type_not_found_kbd.kpj')
+    const projectPath = makePathToFixture('invalid-projects', 'error_file_type_not_found__keyboard.kpj')
     const ncb = new NodeCompilerCallbacks({logLevel: 'silent'});
     await buildKeyboardInfo.build(projectPath, '', ncb, {});
     assert.isTrue(ncb.hasMessage(InfrastructureMessages.ERROR_FileTypeNotFound),
@@ -148,7 +148,7 @@ describe('InfrastructureMessages', function () {
 
   // ERROR_InvalidProjectFolder (no source folder)
   it('should generate ERROR_InvalidProjectFolder if there is no source folder when generating a default project file', async function() {
-    const projectPath = makePathToFixture('empty-folder', 'error_invalid_project_folder.kpj')
+    const projectPath = makePathToFixture('no-source-folder', 'error_invalid_project_folder.kpj')
     const ncb = new NodeCompilerCallbacks({logLevel: 'silent'});
     loadProject(projectPath, ncb);
     assert.isTrue(ncb.hasMessage(InfrastructureMessages.ERROR_InvalidProjectFolder),
