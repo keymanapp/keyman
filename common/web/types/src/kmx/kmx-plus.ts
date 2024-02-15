@@ -43,6 +43,7 @@ export class Elem extends Section {
    */
   allocElementString(sections: DependencySections, source: string | string[], order?: string, tertiary?: string, tertiary_base?: string, prebase?: string): ElementString {
     let s = ElementString.fromStrings(sections, source, order, tertiary, tertiary_base, prebase);
+    if (!s) return s;
     let result = this.strings.find(item => item.isEqual(s));
     if(result === undefined) {
       result = s;
