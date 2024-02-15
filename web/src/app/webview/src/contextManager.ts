@@ -1,4 +1,4 @@
-import { type Keyboard, Mock, OutputTarget, Transcription } from '@keymanapp/keyboard-processor';
+import { type Keyboard, Mock, OutputTarget, Transcription, findCommonSubstringEndIndex } from '@keymanapp/keyboard-processor';
 import { KeyboardStub } from 'keyman/engine/package-cache';
 import { ContextManagerBase, ContextManagerConfiguration } from 'keyman/engine/main';
 import { WebviewConfiguration } from './configuration.js';
@@ -49,6 +49,35 @@ export class ContextHost extends Mock {
   restoreTo(original: OutputTarget): void {
     this.savedState = Mock.from(this);
     super.restoreTo(original);
+  }
+
+  updateContext(text: string, selStart: number, selEnd: number): boolean {
+    let shouldResetContext = false;
+    if(text != this.text) {
+      let tempMock = new Mock(text, selStart ?? text._kmwLength(), selEnd ?? text._kmwLength());
+
+      let newLeft = tempMock.getTextBeforeCaret();
+      let oldLeft = this.getTextBeforeCaret();
+
+      let unexpectedBeforeCharCount = findCommonSubstringEndIndex(newLeft, oldLeft, true) + 1;
+      shouldResetContext = !!unexpectedBeforeCharCount;
+    }
+
+    if(shouldResetContext) {
+      this.text = text;
+    }
+
+    if(selStart === undefined || selEnd === undefined) {
+      // Regardless of keyboard, we should check the SMP-aware length of the string.
+      // Our host app will not know whether or not the keyboard uses SMP chars,
+      // and we want a consistent interface for context synchronization between
+      // host app + app/webview KMW.
+      this.setSelection(this.text._kmwLength());
+    }
+
+    this.savedState = Mock.from(this);
+
+    return shouldResetContext;
   }
 
   // In app/webview, apps are expected to immediately update the selection range AFTER

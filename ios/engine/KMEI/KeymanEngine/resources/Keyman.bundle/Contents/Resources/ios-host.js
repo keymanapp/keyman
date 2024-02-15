@@ -276,33 +276,21 @@ function doResetContext() {
     keyman.resetContext();
 }
 
-function setCursorRange(pos, length) {
-    var context = keyman.context;
-
-    //console.log('setCursorRange('+pos+', '+length+')');
-
-    var start = pos;
-    var end = pos + length;
-
-    if(context.selStart != start || context.selEnd != end) {
-      keyman.context.setSelection(start, end);
-      keyman.resetContext();
-    }
-}
-
-function setKeymanVal(text) {
-    //console.log('setKeymanVal('+JSON.stringify(text)+')');
-
+function setKeymanContext(text, doSync, pos, length) {
+    // console.log(`setKeymanContext(${JSON.stringify(text)}, ${doSync}, ${pos}, ${length})`);
     if(text == undefined) {
         text = '';
     }
 
-    if(keyman.context.getText() != text) {
-        keyman.context.setText(text);
+    var start = pos;
+    var end = pos + length;
+    // undefined + <number> => NaN.
+    end = isNaN(end) ? undefined : end;
+
+    const shouldReset = keyman.context.updateContext(text, start, end);
+    if(!doSync || shouldReset) {
         keyman.resetContext();
     }
-
-    return keyman.context.getText();
 }
 
 function executePopupKey(keyID, keyText) {
