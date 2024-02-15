@@ -27,6 +27,7 @@ title: Keyman for Android 17.0 Help
 * [How To - Integrating Keyman for Android](troubleshooting/integrating)
 
 ### [Using Keyman for Android](basic/)
+* [Using the Banner on the Keyboard](basic/using-the-banner)
 * [Switching Between Keyboards](basic/switching-between-keyboards)
 * [Installing Custom Keyboards/Dictionaries](basic/installing-custom-packages)
 * [Adding Dictionaries](basic/installing-dictionaries)
