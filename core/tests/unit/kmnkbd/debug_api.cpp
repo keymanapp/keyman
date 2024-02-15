@@ -425,8 +425,11 @@ void test_backspace_markers() {
     {KM_CORE_CT_MARKER, {0,}, {1}},
     {KM_CORE_CT_END}
   };
+  km_core_context_item app_context[] = {
+    {KM_CORE_CT_END}
+  };
   try_status(km_core_context_set(km_core_state_context(test_state), marker_context));
-  try_status(km_core_context_set(km_core_state_app_context(test_state), marker_context)); // TODO: this needs to remove markers
+  try_status(km_core_context_set(km_core_state_app_context(test_state), app_context));
 
   DEBUG_GROUP gp = {u"Main"};
 

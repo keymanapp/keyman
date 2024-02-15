@@ -81,9 +81,9 @@ class ldml_processor : public abstract_processor {
 
     km_core_keyboard_imx  * get_imx_list() const override;
 
-    bool
+    inline bool
     supports_normalization() const override {
-      return true;
+      return !normalization_disabled;
     }
 
   private:
@@ -107,10 +107,19 @@ class ldml_processor : public abstract_processor {
      */
     size_t process_output(ldml_event_state &ldml_state, const std::u32string &str, ldml::transforms *with_transforms) const;
 
+    /**
+     * Apply transforms.
+     * @param new_ctxt input/output context to apply
+     * @param with_transforms transforms to use
+     * @returns length of matched input context, or 0 if no match
+     */
+    size_t apply_transforms(std::u32string &new_ctxt, ldml::transforms *with_transforms) const;
+
   private:
     bool _valid;
     std::unique_ptr<ldml::transforms> transforms, bksp_transforms;
     ldml::vkeys keys;
+    bool normalization_disabled;
 };
 
 
@@ -149,6 +158,8 @@ public:
   void emit_passthrough_keystroke();
   /** emit a backspace (for a user-initiated deletion) */
   void emit_backspace();
+  /** emit the difference between two strings */
+  void emit_difference(const std::u32string &old_ctxt, const std::u32string &new_ctxt);
 
   /**
    * Delete text from the state, by:

@@ -43,12 +43,10 @@ TEST(AppContext, Get_split_surrogate) {
 
 // Test Calling BufMax
 TEST(AppContext, BufMax_LastChar) {
-  WCHAR callbuff[MAXCONTEXT];
   const uint32_t ExpectedMarker = 0x0002;
   AppContext testContext;
   WCHAR testString[]            = {0x0042, 0xD800, 0xDC00, UC_SENTINEL, CODE_DEADKEY, ExpectedMarker, 0x0000};
   WCHAR expectedString[] = {UC_SENTINEL, CODE_DEADKEY, 0x0002, 0x0000};
-
   testContext.Set(testString);
   WCHAR *contextBuf = testContext.BufMax(3);
   EXPECT_STREQ((expectedString), contextBuf);
@@ -60,7 +58,6 @@ TEST(AppContext, BufMax_LastChar) {
 
 // Test AppContext::Delete()
 TEST(AppContext, AppContext_Delete) {
-  WCHAR callbuff[MAXCONTEXT];
   const uint32_t ExpectedMarker = 0x0002;
   AppContext testContext;
   WCHAR testString[]     = {0x0042, 0xD800, 0xDC00, UC_SENTINEL, CODE_DEADKEY, ExpectedMarker, 0x0000};
