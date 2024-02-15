@@ -12,9 +12,10 @@ title: Keyman for Android 17.0 Help
 * [How To - Download and Install a Keyman Keyboard](start/installing-keyboards)
 * [Enabling Keyman as a System-Wide Keyboard](start/enabling-system-keyboard)
 
-## [Using the Menu](context/)
-* [Using the menu buttons (phone layout)](context/menu-phone)
-* [Using the menu buttons (tablet layout)](context/menu-tablet)
+## [Using the Keyboard Keys and Menu](context/)
+* [Using the keyboard keys and menu buttons (phone layout)](context/menu-phone)
+* [Using the keyboard keys and menu buttons (tablet layout)](context/menu-tablet)
+* [Gesture Hints and Tips](context/gestures)
 
 ## Ask for Help
 * [Ask other users in the SIL Keyman Community](https://community.software.sil.org/c/keyman)
@@ -30,7 +31,6 @@ title: Keyman for Android 17.0 Help
 * [Installing Custom Keyboards/Dictionaries](basic/installing-custom-packages)
 * [Adding Dictionaries](basic/installing-dictionaries)
 * [Using the Settings Screen](basic/config/)
-* [Using the Keyman Browser](basic/using-keyman-browser)
 * [Removing Keyboards](basic/uninstalling-keyboards)
 * [Removing Dictionaries](basic/uninstalling-dictionaries)
 

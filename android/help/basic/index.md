@@ -9,7 +9,5 @@ title: Basic Help
 
 * [Using the Settings Screen](config/)
 
-* [Using the Keyman Browser](using-keyman-browser)
-
 * [Removing Keyboards](uninstalling-keyboards)
 * [Removing Dictionaries](uninstalling-dictionaries)
