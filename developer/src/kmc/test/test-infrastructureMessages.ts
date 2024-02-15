@@ -142,7 +142,7 @@ describe('InfrastructureMessages', function () {
     const ncb = new NodeCompilerCallbacks({logLevel: 'silent'});
     loadProject(projectPath, ncb);
     assert.isTrue(ncb.hasMessage(InfrastructureMessages.ERROR_InvalidProjectFolder),
-      'ERROR_FileTypeNotFound not generated, instead got: '+JSON.stringify(ncb.messages,null,2));
+      'ERROR_InvalidProjectFolder not generated, instead got: '+JSON.stringify(ncb.messages,null,2));
   });
 
   // ERROR_InvalidProjectFolder (invalid source folder)
@@ -152,7 +152,7 @@ describe('InfrastructureMessages', function () {
     const ncb = new NodeCompilerCallbacks({logLevel: 'silent'});
     loadProject(projectPath, ncb);
     assert.isTrue(ncb.hasMessage(InfrastructureMessages.ERROR_InvalidProjectFolder),
-      'ERROR_FileTypeNotFound not generated, instead got: '+JSON.stringify(ncb.messages,null,2));
+      'ERROR_InvalidProjectFolder not generated, instead got: '+JSON.stringify(ncb.messages,null,2));
   });
 
   // ERROR_CannotCreateFolder
