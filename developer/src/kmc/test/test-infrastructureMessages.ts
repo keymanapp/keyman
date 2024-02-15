@@ -103,7 +103,7 @@ describe('InfrastructureMessages', function () {
 
   it('should generate ERROR_UnknownFileFormat if an analyze osk-char-use mapping file is not the correct type', async function() {
     const ncb = new NodeCompilerCallbacks({logLevel: 'silent'});
-    const options = {mappingFile: makePathToFixture('analyze', 'error_not_a_project_file.xxx')};
+    const options = {mappingFile: makePathToFixture('analyze', 'error_unknown_file_format.xxx')};
     await analyzeUnitTestEndpoints.analyzeOskCharUse(ncb, [], options);
     assert.isTrue(ncb.hasMessage(InfrastructureMessages.ERROR_UnknownFileFormat),
       'ERROR_UnknownFileFormat not generated, instead got: '+JSON.stringify(ncb.messages,null,2));
