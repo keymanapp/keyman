@@ -159,7 +159,7 @@ describe('InfrastructureMessages', function () {
 
   it('should generate ERROR_CannotCreateFolder if the output folder cannot be created', async function() {
     const buildKeyboardInfo = new BuildKeyboardInfo();
-    const targetFilename = makePathToFixture('invalid-projects', 'build', 'error_cannot create_folder.xxx')
+    const targetFilename = makePathToFixture('invalid-projects', 'build', 'error_cannot_create_folder.xxx')
     const ncb = new NodeCompilerCallbacks({logLevel: 'silent'});
     buildKeyboardInfo['createOutputFolder'](targetFilename, ncb); // call private method
     assert.isTrue(ncb.hasMessage(InfrastructureMessages.ERROR_CannotCreateFolder),
