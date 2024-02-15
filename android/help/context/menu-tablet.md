@@ -9,7 +9,7 @@ title: Keyman for Android (Tablet Layout)
 | ![](../android_images/backspace-at.png) | Backspace |
 | ![](../android_images/return-at.png) | Return |
 | ![](../android_images/shift-at.png) | Shift key. Long press this key to access the <kbd>CTRL</kbd>, <kbd>ALT</kbd> and <kbd>CTRL</kbd><kbd>ALT</kbd> keys (which can access additional key layers) |
-| ![](../android_images/touch-hold-at.png) | There are several [gestures](gestures) to interact with some keys on the keyboard. Keys which have gestures available will normally show them as a hint in the top right of the key.<br>Gestures include: long press, flick, and multitap. |
+| ![](../android_images/touch-hold-at.png) | There are several [gestures](gestures) to interact with some keys on the keyboard. Keys which have gestures available will normally show a hint in the top right of the key.<br>Gestures include: long press, flick, and multitap. |
 
 ----
 
