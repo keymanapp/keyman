@@ -11,12 +11,12 @@
     <!-- ERROR_FileTypeNotFound (BuildModelInfo; .model.ts) -->
     <File>
       <ID>error_file_type_not_found_mdl_mdl_2</ID>
-      <Filename>error_file_type_not_found_mdl_mdl.kps</Filename>
-      <Filepath>error_file_type_not_found_mdl_mdl.kps</Filepath>
+      <Filename>error_file_type_not_found__model_ts.kps</Filename>
+      <Filepath>error_file_type_not_found__model_ts.kps</Filepath>
       <FileVersion></FileVersion>
       <FileType>.kps</FileType>
       <Details>
-        <Name>error_file_type_not_found_mdl_mdl</Name>
+        <Name>error_file_type_not_found__model_ts</Name>
         <Copyright>Copyright (C) Keyman Team</Copyright>
       </Details>
     </File>
