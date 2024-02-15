@@ -22,7 +22,7 @@
     </test>
     <test name="key-5">
       <keystroke key="5" />
-      <check result="5:simple_reorder:OK" />
+      <check result="5:simple_vars:OK" />
     </test>
     <test name="key-6">
       <keystroke key="6" />
