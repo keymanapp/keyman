@@ -40,13 +40,4 @@ PKMX_WCHAR KMX_incxstr(PKMX_WCHAR p);
 
 int KMX_GetDeadkeys(v_dw_2D & dk_Table, KMX_WORD DeadKey, KMX_WORD *OutputPairs, GdkKeymap* keymap);
 
-
-//--------------------old 
-/*
-
-void LogError(PWSTR message, ...);
-
-
-*/
-
 #endif /*MCOMPILE_H*/

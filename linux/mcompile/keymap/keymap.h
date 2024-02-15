@@ -16,7 +16,6 @@
 #include <vector>
 #include "kmx_file.h"
 #include "u16.h"
-#include "mc_savekeyboard.h"
 
 
 enum ShiftState {

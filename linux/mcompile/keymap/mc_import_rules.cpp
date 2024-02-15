@@ -39,28 +39,28 @@ const int KMX_ShiftStateMap[] = {
   0
 };
 
-  DeadKey::DeadKey(KMX_WCHAR deadCharacter) {
-    this->m_deadchar = deadCharacter;
-  }
+DeadKey::DeadKey(KMX_WCHAR deadCharacter) {
+  this->m_deadchar = deadCharacter;
+}
 
-  KMX_WCHAR DeadKey::KMX_DeadCharacter() {
-    return this->m_deadchar;
-  }
+KMX_WCHAR DeadKey::KMX_DeadCharacter() {
+  return this->m_deadchar;
+}
 
-  void DeadKey::KMX_AddDeadKeyRow(KMX_WCHAR baseCharacter, KMX_WCHAR combinedCharacter) {
-    this->m_rgbasechar.push_back(baseCharacter);
-    this->m_rgcombchar.push_back(combinedCharacter);
-  }
+void DeadKey::KMX_AddDeadKeyRow(KMX_WCHAR baseCharacter, KMX_WCHAR combinedCharacter) {
+  this->m_rgbasechar.push_back(baseCharacter);
+  this->m_rgcombchar.push_back(combinedCharacter);
+}
 
-  bool DeadKey::KMX_ContainsBaseCharacter(KMX_WCHAR baseCharacter) {
-    std::vector<KMX_WCHAR>::iterator it;
-    for(it=this->m_rgbasechar.begin(); it<m_rgbasechar.end(); it++) {
-      if(*it == baseCharacter) {
-        return true;
-      }
+bool DeadKey::KMX_ContainsBaseCharacter(KMX_WCHAR baseCharacter) {
+  std::vector<KMX_WCHAR>::iterator it;
+  for(it=this->m_rgbasechar.begin(); it<m_rgbasechar.end(); it++) {
+    if(*it == baseCharacter) {
+      return true;
     }
-    return false;
   }
+  return false;
+}
 
 int KMX_ToUnicodeEx(guint keycode, const BYTE *lpKeyState, PKMX_WCHAR pwszBuff, int shift_state_pos, int caps,GdkKeymap *keymap) {
   GdkKeymapKey *maps;
