@@ -16,9 +16,9 @@ If a [dictionary is installed](installing-dictionaries) and enabled for the acti
 
 ![](../android_images/settings-suggestions-ap.png)
 
-* You can slide the banner to see more suggestions by dragging it horizontally with your finger
-* Overly-long suggestions are partially hidden, but expand when you hold your finger on them
-* A suggestion will not be applied while you slide the banner
+* Drag the banner horizontally to see more suggestions
+* Overly-long suggestions are partially hidden, but expand when a finger is held on them
+* Banner displays up to 8 suggestions
 
 ## The Keyman Themed Banner
 
