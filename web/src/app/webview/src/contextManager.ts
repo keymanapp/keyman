@@ -29,6 +29,8 @@ export class ContextHost extends Mock {
         const preInput = transcription.preInput;
         // If our saved state matches the `preInput` from the incoming transcription, just reuse its transform.
         // Will generally not match during multitap operations, though.
+        //
+        // Helps ensure backspaces pass through even if we don't currently have text available in context for them.
         if(preInput.text == savedState.text && preInput.selStart == savedState.selStart && preInput.selEnd == savedState.selEnd) {
           transform = transcription.transform;
         }
