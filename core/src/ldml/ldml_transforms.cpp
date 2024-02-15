@@ -588,7 +588,7 @@ transform_entry::apply(const std::u32string &input, std::u32string &output) cons
     char32_t *s                = new char32_t[group1Len + 1];
     assert(s != nullptr); // TODO-LDML: OOM
     // convert
-    substr.toUTF32((UChar32 *)s, group1Len + 1, status);
+    group1.toUTF32((UChar32 *)s, group1Len + 1, status);
     if (!UASSERT_SUCCESS(status)) {
       return 0; // TODO-LDML: memory issue
     }
