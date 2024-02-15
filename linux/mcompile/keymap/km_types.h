@@ -57,18 +57,6 @@ typedef KMX_BYTE*     PKMX_BYTE;
 typedef KMX_DWORD*    PKMX_DWORD;
 typedef int           BOOL;
 
-//typedef uint8_t*        PBYTE;
-//typedef unsigned short  WORD;
-//typedef wchar_t*        LPWSTR;
-//typedef KMX_CHAR*       PKMX_CHAR;
-//typedef char*           LPSTR;
-//typedef uint8_t*        LPBYTE;
-//typedef KMX_WORD*       PKMX_WORD;
-
-// in WIN:
-// PVOID A pointer to any type.
-// typedef PVOID HANDLE;
-// typedef HANDLE HKL;
 typedef void* KMX_HKL;                  // _S2 QUESTION what is the equivalent to HKL and do I need it?? I assume a void*
 
 

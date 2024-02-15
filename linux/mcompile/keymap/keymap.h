@@ -14,15 +14,10 @@
 #include <iostream>
 #include <string>
 #include <vector>
-#include "mc_kmxfile.h"
 #include "kmx_file.h"
-#include "mc_savekeyboard.h"
 #include "u16.h"
+#include "mc_savekeyboard.h"
 
-typedef std::vector<std::string> v_str_1D;
-typedef std::vector<KMX_DWORD> v_dw_1D;
-typedef std::vector<std::vector<KMX_DWORD> > v_dw_2D;
-typedef std::vector<std::vector<std::vector<KMX_DWORD> > > v_dw_3D;
 
 enum ShiftState {
     Base = 0,                           // 0
@@ -64,8 +59,14 @@ const KMX_DWORD KMX_VKMap[] = {
   0
 };
 
+typedef std::vector<std::string> v_str_1D;
+
+typedef std::vector<KMX_DWORD> v_dw_1D;
+typedef std::vector<std::vector<KMX_DWORD> > v_dw_2D;
+typedef std::vector<std::vector<std::vector<KMX_DWORD> > > v_dw_3D;
+
 static KMX_DWORD returnIfCharInvalid = 0;
-static KMX_DWORD keycode_max =94;
+static KMX_DWORD keycode_max = 94;
 static KMX_DWORD deadkey_min = 0xfe50;
 static KMX_DWORD deadkey_max = 0xfe93;
 

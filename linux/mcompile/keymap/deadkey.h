@@ -15,6 +15,7 @@ void create_DKTable(v_dw_2D & dk_ComposeTable);
 
 // find all possible dk combinations that exist
 std::vector<DeadKey*> create_alDead();
+
 // refine dk to those used in the underlying keyboard
 void refine_alDead(KMX_WCHAR dk, std::vector<DeadKey*> &myVec, std::vector<DeadKey*> *p_All_Vec);
 bool found_dk_inVector(KMX_WCHAR dk, std::vector<DeadKey*> &myVec);
