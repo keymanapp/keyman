@@ -153,8 +153,16 @@ function buildDistFromKeyCentroidFunctor(key: KeyElement) {
 
 export function keySupportsModipress(key: KeyElement) {
   const keySpec = key.key.spec;
+
+  // A key cannot reasonably support both longpresses and modipresses.
+  // It'd be quite ugly to overlay the subkey menu over the new layer during a modipress.
+  if(keySpec.sk) {
+    return false;
+  }
+
   const modifierKeyIds = ['K_SHIFT', 'K_ALT', 'K_CTRL', 'K_NUMERALS', 'K_SYMBOLS', 'K_CURRENCIES'];
   for(const modKeyId of modifierKeyIds) {
+
     if(keySpec.id == modKeyId) {
       return true;
     }
