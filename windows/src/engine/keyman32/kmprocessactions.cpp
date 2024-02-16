@@ -7,28 +7,33 @@
 #include "pch.h"
 
 /**
-* Adds characters to the queue to be inserted into the application
+* Adds converts the characters to UTF-16 and inserts CR as it places them
+* in the queue. 
 * @param app           A pointer to the AITIP instance.
-* @param outputString  A null-terminated string of characters to insert into the application
+* @param core_output   A null-terminated string of characters in UTF-32 format to insert into the application
 */
 
-static void
-processUnicodeChar(AITIP* app, const km_core_usv* outputString) {
-  // modify output string for windows platform
-  LPCWSTR output_ptr = reinterpret_cast<LPCWSTR>(outputString);
-  WCHAR windows_context[MAXCONTEXT];
-  if (post_process_context(output_ptr, windows_context, MAXCONTEXT)) {
-    output_ptr = windows_context;
-  } 
+// When the windows platform code is updated to not use QueueAction
+// This function would be better to take as input the km_core_usv*
+// string form the core and generate a new buffer that is
+// windows formated (CRLF) and encoded as UTF-16. Currently it just
+// does both in one parse while adding it to the queue to reduce the double
+// processing.
 
-  while (*output_ptr) {
-    if (Uni_IsSMP(*output_ptr)) {
-      app->QueueAction(QIT_CHAR, (Uni_UTF32ToSurrogate1(*output_ptr)));
-      app->QueueAction(QIT_CHAR, (Uni_UTF32ToSurrogate2(*output_ptr)));
-    } else {
-      app->QueueAction(QIT_CHAR, *output_ptr);
+static void
+processOutputString(AITIP* app, const km_core_usv* core_output) {
+  while (*core_output) {
+    if (*core_output == L'\n') {
+      // Insert '\r' for Windows platform applications
+      app->QueueAction(QIT_CHAR, L'\r');
     }
-    output_ptr++;
+    if (Uni_IsSMP(*core_output)) {
+      app->QueueAction(QIT_CHAR, (Uni_UTF32ToSurrogate1(*core_output)));
+      app->QueueAction(QIT_CHAR, (Uni_UTF32ToSurrogate2(*core_output)));
+    } else {
+      app->QueueAction(QIT_CHAR, *core_output);
+    }
+    core_output++;
   }
 }
 
@@ -117,7 +122,7 @@ BOOL ProcessActions(BOOL* emitKeystroke)
   _td->CoreProcessEventRun = FALSE;
 
   processBack(_td->app, core_actions->code_points_to_delete, core_actions->deleted_context);
-  processUnicodeChar(_td->app, core_actions->output);
+  processOutputString(_td->app, core_actions->output);
   if (core_actions->persist_options != NULL) {
     processPersistOpt(core_actions, _td->lpActiveKeyboard);
   }

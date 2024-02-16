@@ -79,62 +79,33 @@ TEST(AppContext, AppContext_Delete) {
 
 }
 
-// Test pre/post context functions
+// Test pre context function
 
-TEST(AppContext, pre_process_context) {
-  wchar_t context[]         = L"Hello\r\nWorld\r\nYou Rock";
+TEST(AppContext, format_context_for_core) {
+  wchar_t windows_context[]         = L"Hello\r\nWorld\r\nYou Rock";
+  wchar_t core_context[MAXCONTEXT];
   wchar_t expected_string[] = L"Hello\nWorld\nYou Rock";
-  EXPECT_TRUE(pre_process_context(context));
-  EXPECT_STREQ(expected_string, context);
+  EXPECT_TRUE(format_context_for_core(windows_context, core_context, MAXCONTEXT) == frUpdated);
+  EXPECT_STREQ(expected_string, core_context);
 }
 
 // No CRLF `\r\n` found
-TEST(AppContext, pre_process_context_unchanged) {
-  wchar_t context[]         = L"Hello World You Rock";
-  wchar_t expected_string[] = L"Hello World You Rock";
-  EXPECT_FALSE(pre_process_context(context));
-  EXPECT_STREQ(expected_string, context);
+TEST(AppContext, format_context_for_core_unchanged) {
+  wchar_t windows_context[] = L"Hello World You Rock";
+  wchar_t core_context[MAXCONTEXT];
+  core_context[0]           = L'\0'; // for test just to verify it wasn't changed
+  wchar_t expected_string[] = L"";
+  EXPECT_EQ(format_context_for_core(windows_context, core_context, MAXCONTEXT), frNoChange);
+  EXPECT_STREQ(expected_string, core_context);
 }
 
-// post process
-// Test where there is no LF `\n' most common case
-TEST(AppContext, post_process_context_no_change) {
-  const size_t max_context = 17;
-  wchar_t windows_context[max_context];
-  const wchar_t context[] = L"Hello World You Rock";
-  EXPECT_FALSE(post_process_context(context, windows_context, max_context));
+//// Core Context too short 
+TEST(AppContext, format_context_for_core_too_short) {
+  wchar_t windows_context[] = L"Hello\r\nWorld\r\nYou Rock";
+  wchar_t core_context[2];
+  core_context[0]           = L'\0';  // for test just to verify it wasn't changed
+  wchar_t expected_string[] = L"";
+  EXPECT_EQ(format_context_for_core(windows_context, core_context, 2), frError);
+  //EXPECT_STREQ(expected_string, core_context);
 }
 
-// Test where inserting '\r' with sufficient room for the
-// extended string in the output context.
-TEST(AppContext, post_process_context_full) {
-  const size_t max_context = 64;
-
-  wchar_t windows_context[max_context];
-  const wchar_t context[]   = L"Hello\nWorld\nYou Rock";
-  wchar_t expected_string[] = L"Hello\r\nWorld\r\nYou Rock";
-  EXPECT_TRUE(post_process_context(context, windows_context, max_context));
-  EXPECT_STREQ((expected_string), windows_context);
-}
-
-// Test inserting '\r' makes the string to long for context
-// and needs to be truncated furtherest from the caret
-TEST(AppContext, post_process_context_truncated) {
-  const size_t max_context = 22;
-  wchar_t windows_context[max_context];
-  const wchar_t context[] = L"Hello\nWorld\nYou Rock";
-  wchar_t expected_string[] = L"ello\r\nWorld\r\nYou Rock";
-  EXPECT_TRUE(post_process_context(context, windows_context, max_context));
-  EXPECT_STREQ((expected_string), windows_context);
-}
-
-// Test where inserting a '\r' at the end furtherest from the caret
-// would make it to long for the context buffer so you still end up with the \n
-TEST(AppContext, post_process_context_split_rn) {
-  const size_t max_context = 17;
-  wchar_t windows_context[max_context];
-  const wchar_t context[]   = L"Hello\nWorld\nYou Rock";
-  wchar_t expected_string[] = L"\nWorld\r\nYou Rock";
-  EXPECT_TRUE(post_process_context(context, windows_context, max_context));
-  EXPECT_STREQ((expected_string), windows_context);
-}

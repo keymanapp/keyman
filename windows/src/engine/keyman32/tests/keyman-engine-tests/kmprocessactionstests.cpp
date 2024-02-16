@@ -27,14 +27,46 @@ public:
 // Now that the AITIP no longer contains a context
 // this test is just reduced to checking the size of the
 // action queue
-TEST_F(KMPROCESSACTIONS, processUnicodeChartest) {
+TEST_F(KMPROCESSACTIONS, processOutputStringtest) {
  // just check something has been added to the que
   WCHAR callbuf[MAXCONTEXT];
   AITIP testApp;
   int expectedQueueSize           = 3; // 1 + surrogate pair
   km_core_usv output_string[] = {0x0041, 0x010000, 0};
-  processUnicodeChar(&testApp, &output_string[0]);
+  processOutputString(&testApp, &output_string[0]);
   int queueSize = testApp.GetQueueSize();
   EXPECT_EQ(queueSize, expectedQueueSize);
 }
+
+// Test where there is no LF `\n' most common case
+TEST_F(KMPROCESSACTIONS, processOutputStringNoChange) {
+  WCHAR callbuf[MAXCONTEXT];
+  AITIP testApp;
+  int expectedQueueSize = 20;  
+  // L"Hello World You Rock";
+ km_core_usv output_string[] = {0x0048, 0x0065, 0x006C, 0x006C, 0x006F, 0x0020, 0x0057, 0x006F, 0x0072, 0x006C, 0x0064,
+                                 0x0020, 0x0059, 0x006F, 0x0075, 0x0020, 0x0052, 0x006F, 0x0063, 0x006B, 0};
+ //km_core_usv output_string[] = {0x0041, 0x010000, 0};
+ processOutputString(&testApp, &output_string[0]);
+  int queueSize = testApp.GetQueueSize();
+  EXPECT_EQ(queueSize, expectedQueueSize);
+  
+}
+
+// Test inserting '\r' 
+TEST_F(KMPROCESSACTIONS, processOutputStringInsertCR) {
+  WCHAR callbuf[MAXCONTEXT];
+  AITIP testApp;
+  int expectedQueueSize = 22;
+  // L"Hello\nWorld\nYou Rock";
+  km_core_usv output_string[] = {0x0048, 0x0065, 0x006C, 0x006C, 0x006F, 0x000A, 0x0057, 0x006F, 0x0072, 0x006C, 0x0064,
+                                 0x000A, 0x0059, 0x006F, 0x0075, 0x0020, 0x0052, 0x006F, 0x0063, 0x006B, 0x0000};
+  // km_core_usv output_string[] = {0x0041, 0x010000, 0};
+  processOutputString(&testApp, &output_string[0]);
+  int queueSize = testApp.GetQueueSize();
+  EXPECT_EQ(queueSize, expectedQueueSize);
+}
+
+
+
 
