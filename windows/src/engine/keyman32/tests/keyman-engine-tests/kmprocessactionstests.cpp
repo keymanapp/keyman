@@ -33,7 +33,7 @@ TEST_F(KMPROCESSACTIONS, processOutputStringtest) {
   AITIP testApp;
   int expectedQueueSize           = 3; // 1 + surrogate pair
   km_core_usv output_string[] = {0x0041, 0x010000, 0};
-  processOutputString(&testApp, &output_string[0]);
+  process_output_string(&testApp, &output_string[0]);
   int queueSize = testApp.GetQueueSize();
   EXPECT_EQ(queueSize, expectedQueueSize);
 }
@@ -47,7 +47,7 @@ TEST_F(KMPROCESSACTIONS, processOutputStringNoChange) {
  km_core_usv output_string[] = {0x0048, 0x0065, 0x006C, 0x006C, 0x006F, 0x0020, 0x0057, 0x006F, 0x0072, 0x006C, 0x0064,
                                  0x0020, 0x0059, 0x006F, 0x0075, 0x0020, 0x0052, 0x006F, 0x0063, 0x006B, 0};
  //km_core_usv output_string[] = {0x0041, 0x010000, 0};
- processOutputString(&testApp, &output_string[0]);
+ process_output_string(&testApp, &output_string[0]);
   int queueSize = testApp.GetQueueSize();
   EXPECT_EQ(queueSize, expectedQueueSize);
   
@@ -62,7 +62,7 @@ TEST_F(KMPROCESSACTIONS, processOutputStringInsertCR) {
   km_core_usv output_string[] = {0x0048, 0x0065, 0x006C, 0x006C, 0x006F, 0x000A, 0x0057, 0x006F, 0x0072, 0x006C, 0x0064,
                                  0x000A, 0x0059, 0x006F, 0x0075, 0x0020, 0x0052, 0x006F, 0x0063, 0x006B, 0x0000};
   // km_core_usv output_string[] = {0x0041, 0x010000, 0};
-  processOutputString(&testApp, &output_string[0]);
+  process_output_string(&testApp, &output_string[0]);
   int queueSize = testApp.GetQueueSize();
   EXPECT_EQ(queueSize, expectedQueueSize);
 }

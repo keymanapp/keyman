@@ -21,7 +21,7 @@
 // processing.
 
 static void
-processOutputString(AITIP* app, const km_core_usv* core_output) {
+process_output_string(AITIP* app, const km_core_usv* core_output) {
   while (*core_output) {
     if (*core_output == L'\n') {
       // Insert '\r' for Windows platform applications
@@ -122,7 +122,7 @@ BOOL ProcessActions(BOOL* emitKeystroke)
   _td->CoreProcessEventRun = FALSE;
 
   processBack(_td->app, core_actions->code_points_to_delete, core_actions->deleted_context);
-  processOutputString(_td->app, core_actions->output);
+  process_output_string(_td->app, core_actions->output);
   if (core_actions->persist_options != NULL) {
     processPersistOpt(core_actions, _td->lpActiveKeyboard);
   }

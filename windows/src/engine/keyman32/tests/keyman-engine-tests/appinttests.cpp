@@ -85,7 +85,7 @@ TEST(AppContext, format_context_for_core) {
   wchar_t windows_context[]         = L"Hello\r\nWorld\r\nYou Rock";
   wchar_t core_context[MAXCONTEXT];
   wchar_t expected_string[] = L"Hello\nWorld\nYou Rock";
-  EXPECT_TRUE(format_context_for_core(windows_context, core_context, MAXCONTEXT) == frUpdated);
+  EXPECT_TRUE(format_context_for_core(windows_context, core_context, MAXCONTEXT) == frUPDATED);
   EXPECT_STREQ(expected_string, core_context);
 }
 
@@ -95,7 +95,7 @@ TEST(AppContext, format_context_for_core_unchanged) {
   wchar_t core_context[MAXCONTEXT];
   core_context[0]           = L'\0'; // for test just to verify it wasn't changed
   wchar_t expected_string[] = L"";
-  EXPECT_EQ(format_context_for_core(windows_context, core_context, MAXCONTEXT), frNoChange);
+  EXPECT_EQ(format_context_for_core(windows_context, core_context, MAXCONTEXT), frNO_CHANGE);
   EXPECT_STREQ(expected_string, core_context);
 }
 
@@ -105,7 +105,7 @@ TEST(AppContext, format_context_for_core_too_short) {
   wchar_t core_context[2];
   core_context[0]           = L'\0';  // for test just to verify it wasn't changed
   wchar_t expected_string[] = L"";
-  EXPECT_EQ(format_context_for_core(windows_context, core_context, 2), frError);
+  EXPECT_EQ(format_context_for_core(windows_context, core_context, 2), frERROR);
   //EXPECT_STREQ(expected_string, core_context);
 }
 

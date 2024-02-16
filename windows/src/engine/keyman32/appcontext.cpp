@@ -168,17 +168,17 @@ ContextItemToAppContext(km_core_context_item *contextItems, PWSTR outBuf, DWORD 
 FormatContextResult
 format_context_for_core(LPCWSTR windows_context, LPWSTR core_context, uint32_t output_size) {
   if (windows_context == nullptr || core_context == nullptr) {
-    return frError;
+    return frERROR;
   }
   // Return early if windowsContext does not contain '\r\n'
   if (wcsstr(windows_context, L"\r\n") == nullptr) {
-    return frNoChange;
+    return frNO_CHANGE;
   }
 
   auto windows_context_length = wcsnlen_s(windows_context, MAXCONTEXT);
 
   if (output_size < windows_context_length) {
-    return frError;
+    return frERROR;
   }
 
   LPCWSTR win_ptr  = windows_context;
@@ -192,7 +192,7 @@ format_context_for_core(LPCWSTR windows_context, LPWSTR core_context, uint32_t o
     }
   }
   *core_ptr++ = L'\0';
-  return frUpdated;
+  return frUPDATED;
 }
 
 

@@ -103,11 +103,11 @@ public:
 BOOL ContextItemToAppContext(km_core_context_item *contextItems, PWSTR outBuf, DWORD len);
 
 /**
-*  frError:    If an error occurs, such as null pointers or buffer to small.
-*  frUpdated:  If the context has been modified.
-*  frNoChange: If no modifications were made.
+*  frERROR:    If an error occurs, such as null pointers or buffer to small.
+*  frUPDATED:  If the context has been modified.
+*  frNO_CHANGE: If no modifications were made.
 */
-enum FormatContextResult { frError, frUpdated, frNoChange };
+enum FormatContextResult { frERROR, frUPDATED, frNO_CHANGE };
 
 /**
  * Pre-processes the given wide-character string context for passing to the

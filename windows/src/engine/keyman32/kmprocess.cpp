@@ -84,7 +84,7 @@ Process_Event_Core(PKEYMAN64THREADDATA _td) {
   LPWSTR context_ptr = application_context; 
   if (_td->app->ReadContext(application_context)) {
     // pre-process any windows specific text 
-    if (format_context_for_core(application_context, core_context, MAXCONTEXT) == frUpdated) {
+    if (format_context_for_core(application_context, core_context, MAXCONTEXT) == frUPDATED) {
       context_ptr = core_context;
     }
     km_core_context_status result;
