@@ -257,7 +257,7 @@ export default class HardwareEventKeyboard extends HardKeyboard {
   }
 
   get activeKeyboard(): Keyboard {
-    return this.contextManager.activeKeyboard.keyboard;
+    return this.contextManager.activeKeyboard?.keyboard ?? null;
   }
 
   /**
