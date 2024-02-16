@@ -108,7 +108,7 @@ const main = async (): Promise<void> => {
 
   if(argv._.includes('history')) {
     logInfo(`# Validating history for ${version}`);
-    changeCount = await fixupHistory(octokit, argv.base, argv.force, argv['write-github-comment']);
+    changeCount = await fixupHistory(octokit, argv.base, argv.force, argv['write-github-comment'], argv.from, argv.to);
     logInfo(`# ${changeCount} change(s) found for ${version}\n`);
   }
 

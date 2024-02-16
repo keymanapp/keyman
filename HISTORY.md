@@ -1,9 +1,16 @@
 # Keyman Version History
 
-## 18.0.1 alpha 2024-02-15
+## 17.0.269 beta 2024-02-15
 
-* chore(common): move to 18.0 alpha (#10713)
-* chore: move to 18.0 alpha
+* docs(android): Document using gestures on touch, and remove references to Browser (#10686)
+* docs(android/app): Add help page on using the banner (#10691)
+* fix(web): corrects Android over-deletion of selected text, other context diffs involving selected text (#10662)
+* fix(web): disables banner interaction when suggestions are absent (#10695)
+* fix(web): longpress validation by base key, not current location (#10707)
+
+## 17.0.268 beta 2024-02-15
+
+* chore: move to beta
 
 ## 17.0.267 alpha 2024-02-14
 
