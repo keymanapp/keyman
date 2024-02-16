@@ -2,8 +2,6 @@
 
 Currently, most of the Keyman websites (*.keyman.com, *.keyman-staging.com) are running PHP 7.4 via Apache.
 
-For legacy configuration of IIS on Windows 10, refer to the deprecated Keyman [wiki](https://github.com/keymanapp/keyman/wiki/%5BDeprecated%5D-How-to-set-up-a-local-IIS-web-server-for-the-Keyman-web-pages).
-
 ## Pre-requisite Installs
 * [Docker Desktop](https://www.docker.com/products/docker-desktop/)
 
