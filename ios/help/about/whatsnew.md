@@ -1,7 +1,7 @@
 ---
 title: What's New
 ---
-Here are some of the new features we have added to Keyman 17.0 for Android:
+Here are some of the new features we have added to Keyman 17.0 for iPhone and iPad:
 
 * New gesture support (#5029)
 * Better use of space for predictions, better handling for long predictions (#7934)
