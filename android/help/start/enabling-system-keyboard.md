@@ -5,7 +5,7 @@ title: How To - Enabling Keyman as a System-Wide Keyboard
 ## Enabling System Wide Keyboards
 Step 1)
 Open the Keyman app and select the menu for additional options.
-The screenshots below are of a device running Android 9.0 Pie.
+The screenshots below are of a device running Android 12 Snow Cone.
 
 ![](../android_images/settings1-ap.png)
 
