@@ -33,6 +33,8 @@
 
 #include "ldml/ldml_markers.hpp"
 
+#include "processor.hpp"
+
 namespace {
 
 bool g_beep_found = false;
@@ -274,6 +276,10 @@ run_test(const km::core::path &source, const km::core::path &compiled, km::tests
     return 0;
   }
 
+  // setup normalization status
+  const bool normalization_disabled = !test_kb->supports_normalization();
+  test_source.set_normalization_disabled(normalization_disabled);
+
   // Setup state, environment
   try_status(km_core_state_create(test_kb, test_env_opts, &test_state));
 
@@ -346,7 +352,9 @@ run_test(const km::core::path &source, const km::core::path &compiled, km::tests
       verify_context(text_store, test_state, test_context);
     } break;
     case km::tests::LDML_ACTION_CHECK_EXPECTED: {
-      assert(km::core::ldml::normalize_nfd(action.string));  // TODO-LDML: should be NFC
+      if (!normalization_disabled) {
+        assert(km::core::ldml::normalize_nfd(action.string));  // TODO-LDML: should be NFC
+      }
       std::cout << "- check expected" << std::endl;
       std::cout << "expected  : " << string_to_hex(action.string) << " [" << action.string << "]" << std::endl;
       std::cout << "text store: " << string_to_hex(text_store) << " [" << text_store << "]" << std::endl;

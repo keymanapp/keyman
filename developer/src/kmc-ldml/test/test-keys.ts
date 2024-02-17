@@ -5,7 +5,10 @@ import { assertCodePoints, compilerTestCallbacks, loadSectionFixture, testCompil
 import { KMXPlus, Constants, MarkerParser } from '@keymanapp/common-types';
 import { CompilerMessages } from '../src/compiler/messages.js';
 import { constants } from '@keymanapp/ldml-keyboard-constants';
+import { MetaCompiler } from '../src/compiler/meta.js';
+const keysDependencies = [ ...BASIC_DEPENDENCIES, MetaCompiler ];
 import Keys = KMXPlus.Keys;
+import { BASIC_DEPENDENCIES } from '../src/compiler/empty-compiler.js';
 const K = Constants.USVirtualKeyCodes;
 
 describe('keys', function () {
@@ -72,6 +75,53 @@ describe('keys', function () {
         const [aacute] = keys.keys.filter(({ id }) => id.value === 'a-acute');
         assertCodePoints(aacute.to.value, 'a\u{0301}');
       },
+    },
+    {
+      // same thing, but without normalization
+      subpath: 'sections/keys/maximal-nfc.xml',
+      callback(sect) {
+        const keys = <Keys> sect;
+        assert.ok(keys);
+
+        assert.equal(keys.keys.length, 13 + KeysCompiler.reserved_count); // includes flick and gesture keys
+
+        const [w] = keys.keys.filter(({ id }) => id.value === 'w');
+        assert.ok(w);
+        assert.equal(w.to.value, 'w', 'substituted key value');
+
+        const [q] = keys.keys.filter(({ id }) => id.value === 'q');
+        assert.ok(q);
+        assert.isFalse(!!(q.flags & constants.keys_key_flags_gap));
+        assert.equal(q.width, 32, 'q\'s width'); // ceil(3.14159 * 10.0)
+        assert.equal(q.flicks, 'flick0'); // note this is a string, not a StrsItem
+        assert.equal(q.longPress.toString(), 'a-acute e-acute i-acute');
+        assert.equal(q.longPressDefault.value, 'e-acute');
+        assert.equal(q.multiTap.toString(), 'a-umlaut e-umlaut i-umlaut');
+
+        const [flick0] = keys.flicks.filter(({ id }) => id.value === 'flick0');
+        assert.ok(flick0);
+        assert.equal(flick0.flicks.length, 2);
+
+        const [flick0_nw_se] = flick0.flicks.filter(({ directions }) => directions && directions.isEqual('nw se'.split(' ')));
+        assert.ok(flick0_nw_se);
+        assert.equal(flick0_nw_se.keyId?.value, 'c-cedilla');
+
+        const [flick0_ne_sw] = flick0.flicks.filter(({ directions }) => directions && directions.isEqual('ne sw'.split(' ')));
+        assert.ok(flick0_ne_sw);
+        assert.equal(flick0_ne_sw.keyId?.value, 'e-caret'); // via variable
+
+        // normalization w markers
+        const [amarker] = keys.keys.filter(({ id }) => id.value === 'amarker');
+        assertCodePoints(amarker.to.value, `á${MarkerParser.markerOutput(1, false)}\u{0320}`);
+
+        // normalization
+        const [aacute] = keys.keys.filter(({ id }) => id.value === 'a-acute');
+        assertCodePoints(aacute.to.value, 'á');
+
+      },
+      warnings: [
+        CompilerMessages.Hint_NormalizationDisabled()
+      ],
     },
     {
       subpath: 'sections/keys/escaped.xml',
@@ -149,14 +199,14 @@ describe('keys', function () {
         assert.equal(flickw.flicks[0].keyId.value, 'dd');
       },
     },
-  ]);
+  ], keysDependencies);
 });
 
 describe('keys.kmap', function () {
   this.slow(500); // 0.5 sec -- json schema validation takes a while
 
   it('should compile minimal kmap data', async function() {
-    let keys = await loadSectionFixture(KeysCompiler, 'sections/keys/minimal.xml', compilerTestCallbacks) as Keys;
+    let keys = await loadSectionFixture(KeysCompiler, 'sections/keys/minimal.xml', compilerTestCallbacks, keysDependencies) as Keys;
     assert.isNotNull(keys);
     assert.equal(compilerTestCallbacks.messages.length, 0);
     // skip reserved (gap) keys
@@ -341,10 +391,10 @@ describe('keys.kmap', function () {
         CompilerMessages.Error_InvalidScanCode({ form: "zzz", codes: ['ff'] }),
       ],
     },
-  ]);
+  ], keysDependencies);
 
   it('should reject layouts with too many hardware rows', async function() {
-    let keys = await loadSectionFixture(KeysCompiler, 'sections/keys/invalid-hardware-too-many-rows.xml', compilerTestCallbacks) as Keys;
+    let keys = await loadSectionFixture(KeysCompiler, 'sections/keys/invalid-hardware-too-many-rows.xml', compilerTestCallbacks, keysDependencies) as Keys;
     assert.isNull(keys);
     assert.equal(compilerTestCallbacks.messages.length, 1);
 
@@ -352,7 +402,7 @@ describe('keys.kmap', function () {
   });
 
   it('should reject layouts with too many hardware keys', async function() {
-    let keys = await loadSectionFixture(KeysCompiler, 'sections/keys/invalid-hardware-too-many-keys.xml', compilerTestCallbacks) as Keys;
+    let keys = await loadSectionFixture(KeysCompiler, 'sections/keys/invalid-hardware-too-many-keys.xml', compilerTestCallbacks, keysDependencies) as Keys;
     assert.isNull(keys);
     assert.equal(compilerTestCallbacks.messages.length, 1);
 
@@ -360,20 +410,20 @@ describe('keys.kmap', function () {
   });
 
   it('should reject layouts with undefined keys', async function() {
-    let keys = await loadSectionFixture(KeysCompiler, 'sections/keys/invalid-undefined-key.xml', compilerTestCallbacks) as Keys;
+    let keys = await loadSectionFixture(KeysCompiler, 'sections/keys/invalid-undefined-key.xml', compilerTestCallbacks, keysDependencies) as Keys;
     assert.isNull(keys);
     assert.equal(compilerTestCallbacks.messages.length, 1);
 
     assert.deepEqual(compilerTestCallbacks.messages[0], CompilerMessages.Error_KeyNotFoundInKeyBag({col: 1, form: 'hardware', keyId: 'foo', layer: 'base', row: 1}));
   });
   it('should reject layouts with invalid keys', async function() {
-    let keys = await loadSectionFixture(KeysCompiler, 'sections/keys/invalid-key-missing-attrs.xml', compilerTestCallbacks) as Keys;
+    let keys = await loadSectionFixture(KeysCompiler, 'sections/keys/invalid-key-missing-attrs.xml', compilerTestCallbacks, keysDependencies) as Keys;
     assert.isNull(keys);
     assert.equal(compilerTestCallbacks.messages.length, 1);
     assert.deepEqual(compilerTestCallbacks.messages[0], CompilerMessages.Error_KeyMissingToGapOrSwitch({keyId: 'Q'}));
   });
   it('should accept layouts with gap/switch keys', async function() {
-    let keys = await loadSectionFixture(KeysCompiler, 'sections/keys/gap-switch.xml', compilerTestCallbacks) as Keys;
+    let keys = await loadSectionFixture(KeysCompiler, 'sections/keys/gap-switch.xml', compilerTestCallbacks, keysDependencies) as Keys;
     assert.isNotNull(keys);
     assert.equal(compilerTestCallbacks.messages.length, 0);
     assert.equal(keys.keys.length, 4 + KeysCompiler.reserved_count);

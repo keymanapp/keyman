@@ -465,6 +465,7 @@ export class KmnCompiler implements KeymanCompiler, UnicodeSetParser {
   public parseUnicodeSet(pattern: string, rangeCount: number) : UnicodeSet | null {
     if(!this.verifyInitialized()) {
       /* c8 ignore next 2 */
+      // verifyInitialized will set a callback if needed
       return null;
     }
 

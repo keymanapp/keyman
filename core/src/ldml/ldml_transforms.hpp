@@ -97,7 +97,8 @@ public:
       KMX_DWORD mapFrom,
       KMX_DWORD mapTo,
       const kmx::kmx_plus &kplus,
-      bool &valid);
+      bool &valid,
+      bool normalization_disabled);
 
   /**
    * If matching, apply the match to the output string
@@ -118,6 +119,7 @@ private:
   std::deque<std::u32string> fMapToList;
   /** Internal function to setup pattern string @returns true on success */
   bool init();
+  bool normalization_disabled;
   /** @returns the index of the item in the fMapFromList list, or -1 */
   int32_t findIndexFrom(const std::u32string &match) const;
 public:
@@ -243,9 +245,9 @@ typedef std::deque<any_group> group_list;
 class transforms {
 private:
   group_list transform_groups;
-
+  bool normalization_disabled;
 public:
-  transforms();
+  transforms(bool normalization_disabled);
 
   /**
    * Add a transform group

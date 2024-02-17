@@ -2,7 +2,7 @@
 #include "kmtip.h"
 
 extern "C" {
-  BOOL WINAPI Keyman_WriteDebugEvent(char *file, int line, PWCHAR msg);
+  BOOL WINAPI Keyman_WriteDebugEventW(PWCHAR file, int line, PWCHAR msg);
 
   BOOL WINAPI TIPActivateEx(BOOL fActivate);
   BOOL WINAPI TIPActivateKeyboard(GUID *profile);
@@ -15,8 +15,8 @@ extern "C" {
   BOOL WINAPI TIPIsKeymanRunning();
 };
 
-void Keyman32Interface::WriteDebugEvent(char *file, int line, PWCHAR msg) {
-  ::Keyman_WriteDebugEvent(file, line, msg);
+void Keyman32Interface::WriteDebugEvent(PWCHAR file, int line, PWCHAR msg) {
+  ::Keyman_WriteDebugEventW(file, line, msg);
   // Don't DebugLastError here because it depends on WriteDebugEvent...
 }
 

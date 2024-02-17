@@ -157,6 +157,26 @@ export class CompilerMessages {
   static Error_IllegalCharacters = (o: { count: number, lowestCh: number }) =>
   m(this.ERROR_IllegalCharacters, `File contains ${o.count} illegal character(s), including ${util.describeCodepoint(o.lowestCh)}`);
   static ERROR_IllegalCharacters = SevError | 0x0025;
+
+  static Hint_CharClassImplicitDenorm = (o: { lowestCh: number }) =>
+  m(this.HINT_CharClassImplicitDenorm, `File has character classes which span non-NFD character(s), including ${util.describeCodepoint(o.lowestCh)}. These will not match any text.`);
+  static HINT_CharClassImplicitDenorm = SevHint | 0x0026;
+
+  static Warn_CharClassExplicitDenorm = (o: { lowestCh: number }) =>
+  m(this.WARN_CharClassExplicitDenorm, `File has character classes which include non-NFD characters(s), including ${util.describeCodepoint(o.lowestCh)}. These will not match any text.`);
+  static WARN_CharClassExplicitDenorm = SevWarn | 0x0027;
+
+  static Error_UnparseableReorderSet = (o: { from: string, set: string }) =>
+  m(this.ERROR_UnparseableReorderSet, `Illegal UnicodeSet "${o.set}" in reorder "${o.from}`);
+  static ERROR_UnparseableReorderSet = SevError | 0x0028;
+
+  static Error_UnparseableTransformFrom = (o: { from: string, message: string }) =>
+  m(this.ERROR_UnparseableTransformFrom, `Invalid transfom from "${o.from}": "${o.message}`);
+  static ERROR_UnparseableTransformFrom = SevError | 0x0029;
+
+  static Error_InvalidQuadEscape = (o: { cp: number }) =>
+  m(this.ERROR_InvalidQuadEscape, `Invalid escape "\\u${util.hexQuad(o?.cp || 0)}", use "\\u{${o?.cp?.toString(16)}}" instead.`);
+  static ERROR_InvalidQuadEscape = SevError | 0x0030;
 }
 
 

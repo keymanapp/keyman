@@ -30,21 +30,20 @@ uses
 
   Keyman.Developer.System.Project.ProjectLog,
   Keyman.System.KeyboardUtils,
-  Keyman.Developer.System.KmcWrapper;
+  Keyman.Developer.System.KmcWrapper,
+  utilfiletypes;
 
 function TkmnProjectFileAction.Clean: Boolean;
-var
-  FJS: string;
 begin
-  CleanFile(OutputFileName);
-
   if Targets * KMXKeymanTargets <> [] then
-    CleanFile(ExtractFilePath(FileName) + ExtractFileName(ChangeFileExt(KVKFileName, '.kvk')), True);
+  begin
+    CleanFile(KmxTargetFileName);
+    CleanFile(ExtractFilePath(KmxTargetFileName) + ExtractFileName(ChangeFileExt(KVKFileName, Ext_VisualKeyboard)), True);
+  end;
 
   if Targets * KMWKeymanTargets <> [] then
   begin
-    FJS := TKeyboardUtils.GetKeymanWebCompiledFileName(FileName);
-    CleanFile(FJS); // keyboard-x.y.js
+    CleanFile(JsTargetFileName);
   end;
 
   Result := True;

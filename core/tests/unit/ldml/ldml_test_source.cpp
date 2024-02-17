@@ -311,7 +311,7 @@ LdmlEmbeddedTestSource::get_expected_load_status() {
 }
 
 const std::u16string&
-LdmlEmbeddedTestSource::get_context() const {
+LdmlEmbeddedTestSource::get_context() {
   return context;
 }
 
@@ -430,7 +430,7 @@ class LdmlJsonTestSource : public LdmlTestSource {
 public:
   LdmlJsonTestSource(const std::string &path, km::core::kmx::kmx_plus *kmxplus);
   virtual ~LdmlJsonTestSource();
-  virtual const std::u16string &get_context() const;
+  virtual const std::u16string &get_context();
   int load(const nlohmann::json &test);
   virtual void next_action(ldml_action &fillin);
 private:
@@ -445,6 +445,7 @@ private:
   const km::core::kmx::kmx_plus *kmxplus;
   /** @return false if not found */
   bool set_key_from_id(key_event& k, const std::u16string& id);
+  bool loaded_context = false;
 };
 
 LdmlJsonTestSource::LdmlJsonTestSource(const std::string &path, km::core::kmx::kmx_plus *k)
@@ -510,7 +511,9 @@ LdmlJsonTestSource::next_action(ldml_action &fillin) {
   if (type == "check") {
     fillin.type   = LDML_ACTION_CHECK_EXPECTED;
     fillin.string = LdmlTestSource::parse_u8_source_string(result.get<std::string>());
-    assert(km::core::ldml::normalize_nfd(fillin.string)); // TODO-LDML: will be NFC when core is normalizing to NFC
+    if (!get_normalization_disabled()) {
+      assert(km::core::ldml::normalize_nfd(fillin.string)); // TODO-LDML: will be NFC when core is normalizing to NFC
+    }
     return;
   } else if (type == "keystroke") {
     fillin.type   = LDML_ACTION_KEY_EVENT;
@@ -523,7 +526,9 @@ LdmlJsonTestSource::next_action(ldml_action &fillin) {
   } else if (type == "emit") {
     fillin.type   = LDML_ACTION_EMIT_STRING;
     fillin.string = LdmlTestSource::parse_u8_source_string(to.get<std::string>());
-    assert(km::core::ldml::normalize_nfd(fillin.string)); // TODO-LDML: will be NFC when core is normalizing to NFC
+    if (!get_normalization_disabled()) {
+      assert(km::core::ldml::normalize_nfd(fillin.string)); // TODO-LDML: will be NFC when core is normalizing to NFC
+    }
     return;
   } else if (type == "backspace") {
     // backspace is handled as a key event
@@ -539,20 +544,26 @@ LdmlJsonTestSource::next_action(ldml_action &fillin) {
 }
 
 const std::u16string &
-LdmlJsonTestSource::get_context() const {
+LdmlJsonTestSource::get_context() {
+  // load this on demand so that we can normalize (or not) properly.
+
+  // TODO-LDML: Need an update to json.hpp to use contains()
+  // if (data.contains("/startContext"_json_pointer)) {
+  if (!loaded_context && data.find("startContext") != data.end()) {
+    // only set startContext if present - it's optional.
+    auto startContext = data["/startContext/to"_json_pointer];
+    context = LdmlTestSource::parse_u8_source_string(startContext);
+    if (!get_normalization_disabled()) {
+      assert(km::core::ldml::normalize_nfd(context)); // TODO-LDML: should be NFC
+    }
+  }
+  loaded_context = true;
   return context;
 }
 
 int LdmlJsonTestSource::load(const nlohmann::json &data) {
-  this->data        = data; // TODO-LDML: restructure to not need this pointer?
-  // TODO-LDML: Need an update to json.hpp to use contains()
-  // if (data.contains("/startContext"_json_pointer)) {
-  if (data.find("startContext") != data.end()) {
-    // only set startContext if present - it's optional.
-    auto startContext = data["/startContext/to"_json_pointer];
-    context = LdmlTestSource::parse_u8_source_string(startContext);
-    assert(km::core::ldml::normalize_nfd(context)); // TODO-LDML: should be NFC
-  }
+  this->data        = data;
+  // TODO-LDML: validate here?
   return 0;
 }
 
@@ -561,7 +572,7 @@ class LdmlJsonRepertoireTestSource : public LdmlTestSource {
 public:
   LdmlJsonRepertoireTestSource(const std::string &path, km::core::kmx::kmx_plus *kmxplus);
   virtual ~LdmlJsonRepertoireTestSource();
-  virtual const std::u16string &get_context() const;
+  virtual const std::u16string &get_context();
   int load(const nlohmann::json &test);
   virtual void next_action(ldml_action &fillin);
 private:
@@ -613,7 +624,9 @@ LdmlJsonRepertoireTestSource::next_action(ldml_action &fillin) {
   km::core::kmx::char16_single ch16;
   std::size_t len = km::core::kmx::Utf32CharToUtf16(ch, ch16);
   std::u16string chstr = std::u16string(ch16.ch, len);
-  assert(km::core::ldml::normalize_nfd(chstr)); // TODO-LDML: will be NFC when core is normalizing to NFC
+  if (!get_normalization_disabled()) {
+    assert(km::core::ldml::normalize_nfd(chstr)); // TODO-LDML: will be NFC when core is normalizing to NFC
+  }
   // append to expected
   expected.append(chstr);
   need_check = true;
@@ -660,7 +673,7 @@ LdmlJsonRepertoireTestSource::next_action(ldml_action &fillin) {
 }
 
 const std::u16string &
-LdmlJsonRepertoireTestSource::get_context() const {
+LdmlJsonRepertoireTestSource::get_context() {
   return context; // no context needed
 }
 
