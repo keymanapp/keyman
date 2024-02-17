@@ -1012,11 +1012,11 @@ procedure TfrmKeymanWizard.StartDebugging(FStartTest: Boolean);
     ki: TKeyboardInfo;
     buf: WideString;
   begin
-    if not FileExists((ProjectFile as TkmnProjectFile).TargetFilename) then
+    if not FileExists((ProjectFile as TkmnProjectFile).KmxTargetFilename) then
       Exit(False);
 
     try
-      GetKeyboardInfo((ProjectFile as TkmnProjectFile).TargetFilename, True, ki);   // I4695
+      GetKeyboardInfo((ProjectFile as TkmnProjectFile).KmxTargetFilename, True, ki);   // I4695
       try
         Result := GetSystemStore(ki.MemoryDump.Memory, TSS_DEBUG_LINE, buf);
       finally
@@ -1069,7 +1069,7 @@ begin
       Exit;
     end;
 
-    if not FileExists((ProjectFile as TkmnProjectFile).TargetFilename) then
+    if not FileExists((ProjectFile as TkmnProjectFile).KmxTargetFilename) then
     begin
       ShowMessage(SKKeyboardKMXDoesNotExist);
       Exit;
@@ -1085,7 +1085,7 @@ begin
       FDebugForm.UpdateFont(nil);
 //    FDebugForm.Visible := True;
     FDebugForm.DebugFileName := FileName;
-    FDebugForm.CompiledFileName := (ProjectFile as TkmnProjectFile).TargetFilename;   // I4695
+    FDebugForm.CompiledFileName := (ProjectFile as TkmnProjectFile).KmxTargetFilename;   // I4695
     FDebugForm.ShowDebugForm;
   end;
 end;
@@ -2390,7 +2390,7 @@ begin
 
   if FKeyboardParser.Features.ContainsKey(kfOSK) then
   begin
-    frameOSK.KMXFileName := (ProjectFile as TkmnProjectFile).TargetFilename;   // I4695
+    frameOSK.KMXFileName := (ProjectFile as TkmnProjectFile).KmxTargetFilename;   // I4695
     frameOSK.UpdateControls;
   end;
 
@@ -3128,7 +3128,7 @@ end;
 
 procedure TfrmKeymanWizard.SaveOSK;
 begin
-  frameOSK.KMXFileName := (ProjectFile as TkmnProjectFile).TargetFilename;   // I4695
+  frameOSK.KMXFileName := (ProjectFile as TkmnProjectFile).KmxTargetFilename;   // I4695
   if FFeature[kfOSK].FileName = '' then
     FFeature[kfOSK].FileName := ChangeFileExt(FileName, '.kvks');
   frameOSK.FileName := FFeature[kfOSK].Filename;

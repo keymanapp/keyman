@@ -25,6 +25,8 @@ export const SECTION_COMPILERS = [
 
   // First the former 'global' sections
   StrsCompiler,
+  // meta depends on strs, but potentially needed by anything else using strs
+  MetaCompiler,
   ListCompiler,
   ElemCompiler,
   UsetCompiler,
@@ -36,7 +38,6 @@ export const SECTION_COMPILERS = [
   KeysCompiler,
   LayrCompiler,
   LocaCompiler,
-  MetaCompiler,
   TranCompiler,
 ];
 

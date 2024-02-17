@@ -90,6 +90,23 @@ is_identical_context(km_core_cp const *cached_context) {
     km_core_context_items_dispose(citems_new);                                                     \
   }
 
+// citems contains markers, but we will skip over them
+#define assert_identical_context_without_markers(context, citems)                                  \
+  {                                                                                                \
+    km_core_context_item *citems_new;                                                              \
+    try_status(km_core_context_get((context), &citems_new));                                       \
+    for (int i = 0, i_new = 0; (citems)[i].type || citems_new[i_new].type; i++) {                  \
+      if ((citems)[i].type == KM_CORE_CT_CHAR) {                                                   \
+        assert_equal_msg(citems_new[i_new].type, (citems)[i].type, "Unexpected type:");            \
+        assert_equal_msg(citems_new[i_new].character, (citems)[i].character, "Unexpected character:"); \
+        i_new++;                                                                                   \
+      } else if((citems)[i].type == KM_CORE_CT_END ) {                                             \
+        assert_equal_msg(citems_new[i_new].type, (citems)[i].type, "Unexpected type:");            \
+      }                                                                                            \
+    }                                                                                              \
+    km_core_context_items_dispose(citems_new);                                                     \
+  }
+
 #define assert_equal_status(actual, expected) { \
   if ((actual) != (expected)) { \
     std::wcerr << console_color::fg(console_color::BRIGHT_RED) \
@@ -181,12 +198,11 @@ test_context_set_if_needed__identical_context_and_markers() {
       {KM_CORE_CT_MARKER, {0}, {3}}, {KM_CORE_CT_MARKER, {0}, {4}}, KM_CORE_CONTEXT_ITEM_END};
 
   try_status(km_core_context_set(km_core_state_context(test_state), citems));
-  try_status(km_core_context_set(km_core_state_app_context(test_state), citems));
 
   assert_equal_status(km_core_state_context_set_if_needed(test_state, new_app_context), KM_CORE_CONTEXT_STATUS_UNCHANGED);
 
   assert_identical_context_with_markers(km_core_state_context(test_state), citems);
-  assert_identical_context_with_markers(km_core_state_app_context(test_state), citems);
+  assert_identical_context_without_markers(km_core_state_app_context(test_state), citems);
 
   teardown();
 }
@@ -202,7 +218,6 @@ test_context_set_if_needed__cached_context_shorter_and_markers() {
       {KM_CORE_CT_CHAR, {0}, {'2'}}, {KM_CORE_CT_MARKER, {0}, {2}}, {KM_CORE_CT_CHAR, {0}, {'3'}},
       {KM_CORE_CT_MARKER, {0}, {3}}, {KM_CORE_CT_MARKER, {0}, {4}}, KM_CORE_CONTEXT_ITEM_END};
   try_status(km_core_context_set(km_core_state_context(test_state), citems));
-  try_status(km_core_context_set(km_core_state_app_context(test_state), citems));
 
   assert_equal_status(km_core_state_context_set_if_needed(test_state, new_app_context), KM_CORE_CONTEXT_STATUS_UPDATED);
 
@@ -212,7 +227,8 @@ test_context_set_if_needed__cached_context_shorter_and_markers() {
       {KM_CORE_CT_CHAR, {0}, {'2'}}, {KM_CORE_CT_MARKER, {0}, {2}}, {KM_CORE_CT_CHAR, {0}, {'3'}},
       {KM_CORE_CT_MARKER, {0}, {3}}, {KM_CORE_CT_MARKER, {0}, {4}}, KM_CORE_CONTEXT_ITEM_END};
   assert_identical_context_with_markers(km_core_state_context(test_state), expected_citems);
-  assert_identical_context_with_markers(km_core_state_app_context(test_state), expected_citems);
+  assert_identical_context_without_markers(km_core_state_app_context(test_state), expected_citems);
+  assert(is_identical_context(new_app_context));
 
   teardown();
 }
@@ -229,7 +245,6 @@ test_context_set_if_needed__cached_context_shorter_and_markers_nfu() {
       {KM_CORE_CT_CHAR, {0}, {'e'}}, {KM_CORE_CT_CHAR, {0}, {u'\u0323'}},
       {KM_CORE_CT_CHAR, {0}, {u'\u0302'}}, KM_CORE_CONTEXT_ITEM_END};
   try_status(km_core_context_set(km_core_state_context(test_state), citems));
-  try_status(km_core_context_set(km_core_state_app_context(test_state), citems));
 
   assert_equal_status(km_core_state_context_set_if_needed(test_state, new_app_context), KM_CORE_CONTEXT_STATUS_UPDATED);
 
@@ -240,7 +255,13 @@ test_context_set_if_needed__cached_context_shorter_and_markers_nfu() {
       {KM_CORE_CT_CHAR, {0}, {'e'}}, {KM_CORE_CT_CHAR, {0}, {u'\u0323'}},
       {KM_CORE_CT_CHAR, {0}, {u'\u0302'}}, KM_CORE_CONTEXT_ITEM_END};
   assert_identical_context_with_markers(km_core_state_context(test_state), expected_citems);
-  // we don't test app_context here - it will be different because of the NFU/NFD difference
+  km_core_context_item const expected_app_citems[] = {
+      {KM_CORE_CT_CHAR, {0}, {'a'}},
+      {KM_CORE_CT_CHAR, {0}, {'b'}},
+      {KM_CORE_CT_CHAR, {0}, {'c'}},
+      {KM_CORE_CT_CHAR, {0}, {u'ệ'}},
+      KM_CORE_CONTEXT_ITEM_END};
+  assert_identical_context_without_markers(km_core_state_app_context(test_state), expected_app_citems);
 
   teardown();
 }
@@ -257,7 +278,6 @@ test_context_set_if_needed__cached_context_longer_and_markers() {
       {KM_CORE_CT_CHAR, {0}, {'2'}}, {KM_CORE_CT_MARKER, {0}, {2}}, {KM_CORE_CT_CHAR, {0}, {'3'}},
       {KM_CORE_CT_MARKER, {0}, {3}}, {KM_CORE_CT_MARKER, {0}, {4}}, KM_CORE_CONTEXT_ITEM_END};
   try_status(km_core_context_set(km_core_state_context(test_state), citems));
-  try_status(km_core_context_set(km_core_state_app_context(test_state), citems));
 
   assert_equal_status(km_core_state_context_set_if_needed(test_state, new_app_context), KM_CORE_CONTEXT_STATUS_UPDATED);
 
@@ -266,7 +286,7 @@ test_context_set_if_needed__cached_context_longer_and_markers() {
       {KM_CORE_CT_CHAR, {0}, {'2'}}, {KM_CORE_CT_MARKER, {0}, {2}}, {KM_CORE_CT_CHAR, {0}, {'3'}},
       {KM_CORE_CT_MARKER, {0}, {3}}, {KM_CORE_CT_MARKER, {0}, {4}}, KM_CORE_CONTEXT_ITEM_END};
   assert_identical_context_with_markers(km_core_state_context(test_state), expected_citems);
-  assert_identical_context_with_markers(km_core_state_app_context(test_state), expected_citems);
+  assert_identical_context_without_markers(km_core_state_app_context(test_state), expected_citems);
 
   teardown();
 }
@@ -284,7 +304,6 @@ test_context_set_if_needed__cached_context_longer_and_markers_nfu() {
       {KM_CORE_CT_CHAR, {0}, {'e'}}, {KM_CORE_CT_CHAR, {0}, {u'\u0323'}},
       {KM_CORE_CT_CHAR, {0}, {u'\u0302'}}, KM_CORE_CONTEXT_ITEM_END};
   try_status(km_core_context_set(km_core_state_context(test_state), citems));
-  try_status(km_core_context_set(km_core_state_app_context(test_state), citems));
 
   assert_equal_status(km_core_state_context_set_if_needed(test_state, new_app_context), KM_CORE_CONTEXT_STATUS_UPDATED);
 
@@ -294,7 +313,117 @@ test_context_set_if_needed__cached_context_longer_and_markers_nfu() {
       {KM_CORE_CT_CHAR, {0}, {'e'}}, {KM_CORE_CT_CHAR, {0}, {u'\u0323'}},
       {KM_CORE_CT_CHAR, {0}, {u'\u0302'}}, KM_CORE_CONTEXT_ITEM_END};
   assert_identical_context_with_markers(km_core_state_context(test_state), expected_citems);
-  // we don't test app_context here - it will be different because of the NFU/NFD difference
+
+  km_core_context_item const expected_app_citems[] = {
+      {KM_CORE_CT_CHAR, {0}, {'b'}},
+      {KM_CORE_CT_CHAR, {0}, {'c'}},
+      {KM_CORE_CT_CHAR, {0}, {u'ệ'}},
+      KM_CORE_CONTEXT_ITEM_END};
+  assert_identical_context_without_markers(km_core_state_app_context(test_state), expected_app_citems);
+
+  teardown();
+}
+
+void
+test_context_set_if_needed__surrogate_pairs_unchanged() {
+  km_core_cp const *cached_context  = u"a\U00010100";
+  km_core_cp const *new_app_context = u"a\U00010100";
+  setup("k_000___null_keyboard.kmx", cached_context);
+  assert_equal_status(km_core_state_context_set_if_needed(test_state, new_app_context), KM_CORE_CONTEXT_STATUS_UNCHANGED);
+  assert(is_identical_context(new_app_context));
+  teardown();
+}
+
+void
+test_context_set_if_needed__surrogate_pairs_app_context_longer() {
+  km_core_cp const *cached_context  = u"a\U00010100";
+  km_core_cp const *new_app_context = u"xa\U00010100";
+  setup("k_000___null_keyboard.kmx", cached_context);
+  assert_equal_status(km_core_state_context_set_if_needed(test_state, new_app_context), KM_CORE_CONTEXT_STATUS_UPDATED);
+  assert(is_identical_context(new_app_context));
+  teardown();
+}
+
+void
+test_context_set_if_needed__surrogate_pairs_cached_context_longer() {
+  km_core_cp const *cached_context  = u"xa\U00010100";
+  km_core_cp const *new_app_context = u"a\U00010100";
+  setup("k_000___null_keyboard.kmx", cached_context);
+  assert_equal_status(km_core_state_context_set_if_needed(test_state, new_app_context), KM_CORE_CONTEXT_STATUS_UPDATED);
+  assert(is_identical_context(new_app_context));
+  teardown();
+}
+
+void
+test_context_set_if_needed__surrogate_pairs_unchanged_and_markers() {
+  km_core_cp const *cached_context  = u"a\U00010100";
+  km_core_cp const *new_app_context = u"a\U00010100";
+  setup("k_000___null_keyboard.kmx", cached_context);
+
+  km_core_context_item const citems[] = {
+      {KM_CORE_CT_CHAR, {0}, {'a'}},
+      {KM_CORE_CT_MARKER, {0}, {5}},
+      {KM_CORE_CT_CHAR, {0}, {0x10100}},
+      KM_CORE_CONTEXT_ITEM_END};
+  try_status(km_core_context_set(km_core_state_context(test_state), citems));
+
+  assert_equal_status(km_core_state_context_set_if_needed(test_state, new_app_context), KM_CORE_CONTEXT_STATUS_UNCHANGED);
+  assert_identical_context_with_markers(km_core_state_context(test_state), citems);
+  assert_identical_context_without_markers(km_core_state_app_context(test_state), citems);
+
+  teardown();
+}
+
+void
+test_context_set_if_needed__surrogate_pairs_app_context_longer_and_markers() {
+  km_core_cp const *cached_context  = u"a\U00010100";
+  km_core_cp const *new_app_context = u"\U00010200a\U00010100";
+  setup("k_000___null_keyboard.kmx", cached_context);
+
+  km_core_context_item const citems[] = {
+      {KM_CORE_CT_CHAR, {0}, {'a'}},
+      {KM_CORE_CT_MARKER, {0}, {5}},
+      {KM_CORE_CT_CHAR, {0}, {0x10100}},
+      KM_CORE_CONTEXT_ITEM_END};
+  try_status(km_core_context_set(km_core_state_context(test_state), citems));
+
+  assert_equal_status(km_core_state_context_set_if_needed(test_state, new_app_context), KM_CORE_CONTEXT_STATUS_UPDATED);
+  km_core_context_item const expected_citems[] = {
+      {KM_CORE_CT_CHAR, {0}, {0x10200}},
+      {KM_CORE_CT_CHAR, {0}, {'a'}},
+      {KM_CORE_CT_MARKER, {0}, {5}},
+      {KM_CORE_CT_CHAR, {0}, {0x10100}},
+      KM_CORE_CONTEXT_ITEM_END};
+
+  assert_identical_context_with_markers(km_core_state_context(test_state), expected_citems);
+  assert_identical_context_without_markers(km_core_state_app_context(test_state), expected_citems);
+
+  teardown();
+}
+
+void
+test_context_set_if_needed__surrogate_pairs_cached_context_longer_and_markers() {
+  km_core_cp const *cached_context  = u"\U00010200a\U00010100";
+  km_core_cp const *new_app_context = u"a\U00010100";
+  setup("k_000___null_keyboard.kmx", cached_context);
+
+  km_core_context_item const citems[] = {
+      {KM_CORE_CT_CHAR, {0}, {0x10200}},
+      {KM_CORE_CT_CHAR, {0}, {'a'}},
+      {KM_CORE_CT_MARKER, {0}, {5}},
+      {KM_CORE_CT_CHAR, {0}, {0x10100}},
+      KM_CORE_CONTEXT_ITEM_END};
+  try_status(km_core_context_set(km_core_state_context(test_state), citems));
+
+  assert_equal_status(km_core_state_context_set_if_needed(test_state, new_app_context), KM_CORE_CONTEXT_STATUS_UPDATED);
+  km_core_context_item const expected_citems[] = {
+      {KM_CORE_CT_CHAR, {0}, {'a'}},
+      {KM_CORE_CT_MARKER, {0}, {5}},
+      {KM_CORE_CT_CHAR, {0}, {0x10100}},
+      KM_CORE_CONTEXT_ITEM_END};
+
+  assert_identical_context_with_markers(km_core_state_context(test_state), expected_citems);
+  assert_identical_context_without_markers(km_core_state_app_context(test_state), expected_citems);
 
   teardown();
 }
@@ -324,6 +453,13 @@ test_context_set_if_needed() {
   test_context_set_if_needed__cached_context_longer_and_markers_nfu();
   // 6. cached context is longer than app context, but content is different.
   test_context_set_if_needed__application_context_empty();
+  // 7. surrogate pairs in context
+  test_context_set_if_needed__surrogate_pairs_unchanged();
+  test_context_set_if_needed__surrogate_pairs_unchanged_and_markers();
+  test_context_set_if_needed__surrogate_pairs_app_context_longer();
+  test_context_set_if_needed__surrogate_pairs_cached_context_longer();
+  test_context_set_if_needed__surrogate_pairs_app_context_longer_and_markers();
+  test_context_set_if_needed__surrogate_pairs_cached_context_longer_and_markers();
 }
 
 void
@@ -348,7 +484,7 @@ void test_context_debug_empty() {
 }
 
 void test_context_debug_various() {
-  km_core_cp const *cached_context =      u"";
+  km_core_cp const *cached_context =      u"123\U0001F923";
   setup("k_000___null_keyboard.kmx", cached_context);
 
   km_core_context_item const citems[] = {
@@ -365,7 +501,6 @@ void test_context_debug_various() {
   };
 
   try_status(km_core_context_set(km_core_state_context(test_state), citems));
-  try_status(km_core_context_set(km_core_state_app_context(test_state), citems));
 
   auto str = km_core_state_context_debug(test_state, KM_CORE_DEBUG_CONTEXT_CACHED);
   // std::cout << str << std::endl;

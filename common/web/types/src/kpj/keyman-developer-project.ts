@@ -55,7 +55,7 @@ export class KeymanDeveloperProject {
         this.files.push(file);
       }
     }
-    return true;
+    return this.files.length > 0;
   }
 
   public isKeyboardProject() {

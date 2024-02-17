@@ -76,8 +76,7 @@ export class ElementString extends Array<ElemElement> {
         const needRanges = sections.usetparser.sizeUnicodeSet(item.segment);
         const uset = sections.usetparser.parseUnicodeSet(item.segment, needRanges);
         if (!uset) {
-          // TODO-LDML - error callback
-          throw Error(`Could not parse uset ${item.segment}`);
+          return null; // UnicodeSet error already thrown
         }
         elem.uset = sections.uset.allocUset(uset, sections);
         elem.value = sections.strs.allocString('', {singleOk: true}); // no string
