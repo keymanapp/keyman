@@ -686,40 +686,41 @@ any_group::apply_transform(std::u32string &input, std::u32string &output, size_t
   std::u32string subOutput;
   size_t subMatched = transform.apply(input, subOutput);
 
-  if (subMatched != 0) {
-    // remove the matched part of the updatedInput
-    input.resize(input.length() - subMatched);  // chop of the subMatched part at end
-    input.append(subOutput);                           // subOutput could be empty such as in backspace transform
+  if (subMatched == 0) {
+    return matched; // no match, break out
+  }
 
-    if (subMatched > output.size()) {
-      // including first time through
-      // expand match by amount subMatched prior to output
-      matched += (subMatched - output.size());
-    }  // else: didn't match prior to the existing output, so don't expand 'match'
+  // remove the matched part of the updatedInput
+  input.resize(input.length() - subMatched);  // chop of the subMatched part at end
+  input.append(subOutput);                    // subOutput could be empty such as in backspace transform
 
-    // now update 'output'
-    if (subOutput.length() >= output.length() || subMatched > output.length()) {
-      output = subOutput;  // replace all output
-    } else {
-      // replace output with new output
-      output.resize(output.length() - subMatched);
-      output.append(subOutput);
-    }
+  if (subMatched > output.size()) {
+    // including first time through
+    // expand match by amount subMatched prior to output
+    matched += (subMatched - output.size());
+  }  // else: didn't match prior to the existing output, so don't expand 'match'
+
+  // now update 'output'
+  if (subOutput.length() >= output.length() || subMatched > output.length()) {
+    output = subOutput;  // replace all output
+  } else {
+    // replace output with new output
+    output.resize(output.length() - subMatched);
+    output.append(subOutput);
   }
   return matched;
 }
 
 size_t
 any_group::apply_reorder(std::u32string &input, std::u32string &output, size_t matched) const {
-  // TODO-LDML: cheesy solution. We should be finding a smaller
-  // common match here.
   std::u32string str2 = input;
   if (reorder.apply(str2)) {
-    // pretend the whole thing matched
     output.resize(0);
     output.append(str2);
     input.resize(0);
     input.append(str2);
+    // Consider the entire string as 'matched'.
+    // The calling chain will determine which characters actually changed.
     matched = output.length();
   }
   return matched;
@@ -801,14 +802,16 @@ transforms::apply(const std::u32string &input, std::u32string &output) {
    */
   size_t matched = 0;
   output.clear();
-  /** modified copy of input, to pass to the next stage */
+  /** modified copy of input, to pass to each next step */
   std::u32string updatedInput = input;
 
+  // loop over each group of transforms
   for (auto group = transform_groups.begin(); group < transform_groups.end(); group++) {
     matched = group->apply(updatedInput, output, matched);
   }
+
   /**
-   * TODO-LDML: optimization to contract 'matched' if possible.
+   * Could optimize to contract 'matched' if possible.
    * We could decrement 'matched' for every char of output
    * which is already in input. Example (regex example):
    * - str = "xxyyzz";
@@ -819,6 +822,9 @@ transforms::apply(const std::u32string &input, std::u32string &output) {
    *      (but could contract to match=1, output='w')
    *
    * could also handle from="x" to="x" as match=0
+   *
+   * However, the calling code already checks for common prefixes,
+   * so this does not need to be optimized.
    */
   return matched;
 }
