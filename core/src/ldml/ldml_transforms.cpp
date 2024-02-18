@@ -155,7 +155,7 @@ reorder_sort_key::dump() const {
 
 size_t
 element_list::match_end(const std::u32string &str) const {
-  if (str.size() < size()) {
+  if (str.length() < size()) {
     // input string too short, can't possibly match.
     // This assumes each element is a single char, no string elements.
     return 0;
@@ -292,7 +292,7 @@ reorder_entry::match_end(std::u32string &str, size_t offset, size_t len) const {
   // is also a precondition.
   if (!before.empty()) {
     // does not match before offset
-    std::u32string prefix = substr.substr(0, substr.size() - match_len);
+    std::u32string prefix = substr.substr(0, substr.length() - match_len);
     // make sure the 'before' is present
     if (before.match_end(prefix) == 0) {
       return 0;  // break out.
@@ -342,7 +342,7 @@ reorder_group::apply(std::u32string &str) const {
   for (const auto &r : list) {
     // work backward from end of string forward
     // That is, see if "abc" matches "abc" or "ab" or "a"
-    for (size_t s = out.size(); s > 0; s--) {
+    for (size_t s = out.length(); s > 0; s--) {
       size_t submatch = r.match_end(out, 0, s);
       if (submatch != 0) {
 #if KMXPLUS_DEBUG_TRANSFORM
@@ -690,24 +690,21 @@ any_group::apply_transform(std::u32string &input, std::u32string &output, size_t
     return matched; // no match, break out
   }
 
-  // remove the matched part of the updatedInput
+  // remove the matched part of the input
+  assert(subMatched <= input.length());
   input.resize(input.length() - subMatched);  // chop of the subMatched part at end
   input.append(subOutput);                    // subOutput could be empty such as in backspace transform
 
-  if (subMatched > output.size()) {
-    // including first time through
-    // expand match by amount subMatched prior to output
-    matched += (subMatched - output.size());
-  }  // else: didn't match prior to the existing output, so don't expand 'match'
-
-  // now update 'output'
-  if (subOutput.length() >= output.length() || subMatched > output.length()) {
-    output = subOutput;  // replace all output
-  } else {
-    // replace output with new output
+  if (subMatched <= output.length()) {
+    // remove matched part of output
     output.resize(output.length() - subMatched);
-    output.append(subOutput);
+  } else {
+    // matched past beginning of 'output', expand match
+    matched += (subMatched - output.length());
+    output.resize(0);
   }
+  output.append(subOutput);
+
   return matched;
 }
 
