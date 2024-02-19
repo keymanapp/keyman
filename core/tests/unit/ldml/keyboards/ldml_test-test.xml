@@ -26,8 +26,7 @@
     </test>
     <test name="key-6">
       <keystroke key="6" />
-      <check result="6:map_varOK" /> <!-- TODO: 10734 There's a bug in the matching still. Come back and fix this, but the crasher is fixed -->
-      <!-- <check result="6:map_var:OK" /> -->
+      <check result="6:map_var:OK" />
     </test>
   </tests>
 </keyboardTest3>
