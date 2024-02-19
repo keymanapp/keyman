@@ -1,5 +1,5 @@
 import { constants } from "@keymanapp/ldml-keyboard-constants";
-import { KMXPlus, LDMLKeyboard, MarkerParser } from '@keymanapp/common-types';
+import { KMXPlus, LDMLKeyboard } from '@keymanapp/common-types';
 
 import { CompilerMessages } from "./messages.js";
 import { SectionCompiler } from "./section-compiler.js";
@@ -11,8 +11,10 @@ import { SubstitutionUse, Substitutions } from "./substitution-tracker.js";
 
 export class DispCompiler extends SectionCompiler {
   static validateSubstitutions(keyboard: LDMLKeyboard.LKKeyboard, st : Substitutions): boolean {
-    keyboard.displays?.display?.forEach(({ output }) =>
-      st.markers.add(SubstitutionUse.match, MarkerParser.allReferences(output)));
+    keyboard.displays?.display?.forEach(({ display, output }) => {
+      st.addStringAndMarkerSubstitution(SubstitutionUse.match, output);
+      st.addStringSubstitution(SubstitutionUse.emit, display);
+    });
     // no marker references in 'id'
     return true;
   }

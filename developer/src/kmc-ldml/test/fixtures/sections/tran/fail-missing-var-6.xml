@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE keyboard3 SYSTEM "../../../../../../../resources/standards-data/ldml-keyboards/techpreview/dtd/ldmlKeyboard3.dtd">
+<keyboard3 locale="mt" conformsTo="techpreview">
+  <info name="fail-missing-var-1"/>
+
+  <keys />
+
+  <transforms type="simple">
+    <transformGroup>
+      <reorder from="A" before="${missingstr}" /> <!-- missing -->
+    </transformGroup>
+  </transforms>
+</keyboard3>

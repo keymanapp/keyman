@@ -21,13 +21,27 @@ type TransformCompilerType = 'simple' | 'backspace';
 
 export abstract class TransformCompiler<T extends TransformCompilerType, TranBase extends Tran> extends SectionCompiler {
 
-  static validateSubstitutions(keyboard: LDMLKeyboard.LKKeyboard, st : Substitutions): boolean {
+  static validateSubstitutions(keyboard: LDMLKeyboard.LKKeyboard, st: Substitutions): boolean {
     keyboard?.transforms?.forEach(transforms =>
       transforms.transformGroup.forEach(transformGroup => {
         transformGroup.transform?.forEach(({ to, from }) => {
-          st.markers.add(SubstitutionUse.emit, MarkerParser.allReferences(to));
-          st.markers.add(SubstitutionUse.consume, MarkerParser.allReferences(from));
-        })}));
+          st.addSetAndStringSubtitution(SubstitutionUse.consume, from);
+          st.addSetAndStringSubtitution(SubstitutionUse.emit, to);
+          const mapFrom = VariableParser.CAPTURE_SET_REFERENCE.exec(from);
+          const mapTo = VariableParser.MAPPED_SET_REFERENCE.exec(to || '');
+          if (mapFrom) {
+            // add the 'from' as a match
+            st.set.add(SubstitutionUse.consume, [mapFrom[1]]);
+          }
+          if (mapTo) {
+            // add the 'from' as a match
+            st.set.add(SubstitutionUse.emit, [mapTo[1]]);
+          }
+        });
+        transformGroup.reorder?.forEach(({ before }) => {
+          st.addStringSubstitution(SubstitutionUse.consume, before);
+        });
+      }));
     return true;
   }
 
