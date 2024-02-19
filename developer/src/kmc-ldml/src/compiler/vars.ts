@@ -12,7 +12,7 @@ import { CompilerMessages } from "./messages.js";
 import { KeysCompiler } from "./keys.js";
 import { TransformCompiler } from "./tran.js";
 import { DispCompiler } from "./disp.js";
-import { MarkerTracker, MarkerUse } from "./marker-tracker.js";
+import { SubstitutionUse, Substitutions } from "./substitution-tracker.js";
 export class VarsCompiler extends SectionCompiler {
   public get id() {
     return constants.section.vars;
@@ -36,7 +36,7 @@ export class VarsCompiler extends SectionCompiler {
     let valid = true;
 
     valid = this.validateVars() && valid; // accumulate validity
-    valid = this.validateMarkers() && valid; // accumulate validity
+    valid = this.validateAllSubstitutions() && valid; // accumulate validity
 
     return valid;
   }
@@ -148,23 +148,24 @@ export class VarsCompiler extends SectionCompiler {
     return valid;
   }
 
-  private collectMarkers(mt : MarkerTracker) : boolean {
+  private collectSubstitutions(st: Substitutions): boolean {
     let valid = true;
 
     // call our friends to validate
-    valid = this.validateVarsMarkers(this.keyboard3, mt) && valid; // accumulate validity
-    valid = KeysCompiler.validateMarkers(this.keyboard3, mt) && valid; // accumulate validity
-    valid = TransformCompiler.validateMarkers(this.keyboard3, mt) && valid; // accumulate validity
-    valid = DispCompiler.validateMarkers(this.keyboard3, mt) && valid; // accumulate validity
+    valid = this.validateSubstitutions(this.keyboard3, st) && valid; // accumulate validity
+    valid = KeysCompiler.validateSubstitutions(this.keyboard3, st) && valid; // accumulate validity
+    valid = TransformCompiler.validateSubstitutions(this.keyboard3, st) && valid; // accumulate validity
+    valid = DispCompiler.validateSubstitutions(this.keyboard3, st) && valid; // accumulate validity
 
     return valid;
   }
 
-  private validateMarkers(): boolean {
-    const mt = new MarkerTracker();
-    let valid = this.collectMarkers(mt);
-    // see if there are any matched-but-not-emitted
+  private validateAllSubstitutions(): boolean {
+    const st = new Substitutions();
+    let valid = this.collectSubstitutions(st);
+    // see if there are any matched-but-not-emitted markers
     const matchedNotEmitted : Set<string> = new Set<string>();
+    const mt = st.markers;
     for (const m of mt.matched.values()) {
       if (m === MarkerParser.ANY_MARKER_ID) continue; // match-all marker
       if (!mt.emitted.has(m)) {
@@ -186,9 +187,9 @@ export class VarsCompiler extends SectionCompiler {
     return valid;
   }
 
-  validateVarsMarkers(keyboard: LDMLKeyboard.LKKeyboard, mt : MarkerTracker) : boolean {
+  validateSubstitutions(keyboard: LDMLKeyboard.LKKeyboard, st : Substitutions) : boolean {
     keyboard?.variables?.string?.forEach(({value}) =>
-          mt.add(MarkerUse.variable, MarkerParser.allReferences(value)));
+          st.markers.add(SubstitutionUse.variable, MarkerParser.allReferences(value)));
     return true;
   }
 
@@ -211,8 +212,9 @@ export class VarsCompiler extends SectionCompiler {
       this.addUnicodeSet(result, e, sections));
 
     // reload markers - TODO-LDML: double work!
-    const mt = new MarkerTracker();
-    this.collectMarkers(mt);
+    const st = new Substitutions();
+    this.collectSubstitutions(st);
+    const mt = st.markers;
 
     // collect all markers, excluding the match-all
     const allMarkers : string[] = Array.from(mt.all).filter(m => m !== MarkerParser.ANY_MARKER_ID).sort();

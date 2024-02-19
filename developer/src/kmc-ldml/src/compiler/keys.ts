@@ -9,19 +9,19 @@ import KeysKeys = KMXPlus.KeysKeys;
 import ListItem = KMXPlus.ListItem;
 import KeysFlicks = KMXPlus.KeysFlicks;
 import { allUsedKeyIdsInFlick, allUsedKeyIdsInKey, allUsedKeyIdsInLayers, calculateUniqueKeys, hashFlicks, hashKeys, translateLayerAttrToModifier, validModifier } from '../util/util.js';
-import { MarkerTracker, MarkerUse } from './marker-tracker.js';
+import { SubstitutionUse, Substitutions } from './substitution-tracker.js';
 
 /** reserved name for the special gap key. space is not allowed in key ids. */
 const reserved_gap = "gap (reserved)";
 
 
 export class KeysCompiler extends SectionCompiler {
-  static validateMarkers(
+  static validateSubstitutions(
     keyboard: LDMLKeyboard.LKKeyboard,
-    mt: MarkerTracker
+    st: Substitutions
   ): boolean {
     // TODO-LDML: repetition
-
+    const mt = st.markers;
     const uniqueKeys = calculateUniqueKeys([...keyboard.keys?.key]);
     const keyBag = hashKeys(uniqueKeys); // for easier lookup
     // will be the set of ALL keys used in this keyboard
@@ -37,7 +37,7 @@ export class KeysCompiler extends SectionCompiler {
     for (let keyId of usedKeys.values()) {
       const key = keyBag.get(keyId);
       if (!key) continue;
-      mt.add(MarkerUse.emit, MarkerParser.allReferences(key.output));
+      mt.add(SubstitutionUse.emit, MarkerParser.allReferences(key.output));
     }
     return true;
   }

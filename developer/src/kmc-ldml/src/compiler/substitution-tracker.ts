@@ -1,7 +1,7 @@
 /**
- * Verb for MarkerTracker.add()
+ * Verb for SubstitutionTracker.add()
  */
-export enum MarkerUse {
+export enum SubstitutionUse {
   /** outputs this marker into context (e.g. transform to= or key to=) */
   emit,
   /** consumes this marker out of the context (e.g. transform from=) */
@@ -12,18 +12,18 @@ export enum MarkerUse {
   variable,
 }
 
-type MarkerSet = Set<string>;
+type SubstitutionSet = Set<string>;
 
 /** Tracks usage of markers */
-export class MarkerTracker {
+export class SubstitutionTracker {
   /** markers that were emitted */
-  emitted: MarkerSet;
+  emitted: SubstitutionSet;
   /** markers that were consumed and removed from the context */
-  consumed: MarkerSet;
+  consumed: SubstitutionSet;
   /** markers that were matched, but not necessarily consumed */
-  matched: MarkerSet;
+  matched: SubstitutionSet;
   /** all markers */
-  all: MarkerSet;
+  all: SubstitutionSet;
 
   constructor() {
     this.emitted = new Set<string>();
@@ -35,28 +35,28 @@ export class MarkerTracker {
   /**
    *
    * @param verb what kind of use we are adding
-   * @param markers list of markers to add
+   * @param markers list of substitutions to add
    */
-  add(verb: MarkerUse, markers: string[]) {
+  add(verb: SubstitutionUse, markers: string[]) {
     if (!markers.length) {
       return; // skip if empty
     }
-    if (verb == MarkerUse.emit) {
+    if (verb == SubstitutionUse.emit) {
       markers.forEach((m) => {
         this.emitted.add(m);
         this.all.add(m);
       });
-    } else if (verb == MarkerUse.consume) {
+    } else if (verb == SubstitutionUse.consume) {
       markers.forEach((m) => {
         this.consumed.add(m);
         this.all.add(m);
       });
-    } else if (verb == MarkerUse.match) {
+    } else if (verb == SubstitutionUse.match) {
       markers.forEach((m) => {
         this.matched.add(m);
         this.all.add(m);
       });
-    } else if (verb == MarkerUse.variable) {
+    } else if (verb == SubstitutionUse.variable) {
       markers.forEach((m) => {
         // we don't know, so add it to all three
         this.matched.add(m);
@@ -68,5 +68,20 @@ export class MarkerTracker {
     } else {
       throw Error(`Internal error: unsupported verb ${verb} for match`);
     }
+  }
+}
+
+/** rollup of several substitution types */
+export class Substitutions {
+  markers: SubstitutionTracker;
+  set: SubstitutionTracker;
+  string: SubstitutionTracker;
+  uset: SubstitutionTracker;
+
+  constructor() {
+    this.markers = new SubstitutionTracker();
+    this.set = new SubstitutionTracker();
+    this.string = new SubstitutionTracker();
+    this.uset = new SubstitutionTracker();
   }
 }
