@@ -223,18 +223,12 @@ extension KeymanWebViewController {
     setSpacebarText(userData.optSpacebarText)
   }
 
-  func setCursorRange(_ range: NSRange) {
-    if range.location != NSNotFound {
-      webView!.evaluateJavaScript("setCursorRange(\(range.location),\(range.length));", completionHandler: nil)
-      self.currentCursorRange = range
-    }
-  }
-
-  func setText(_ str: String?) {
-    let text = trimDirectionalMarkPrefix(str)
+  func setContext(text: String?, range: NSRange?, doSync: Bool = false) {
+    // Remove any LTR / RTL marks we added within TextView and TextField.
+    let context = trimDirectionalMarkPrefix(text ?? "")
 
     do {
-      let encodingArray = [ text ];
+      let encodingArray = [ context ];
       let jsonString = try String(data: JSONSerialization.data(withJSONObject: encodingArray), encoding: .utf8)!
       // Must use utf16-mode - default Swift string handling will include a leading U+0300 with the opening double-quote
       // being removed by the substring op below.
@@ -242,8 +236,17 @@ extension KeymanWebViewController {
       let end = jsonString.utf16.index(jsonString.utf16.endIndex, offsetBy: -2)
       let jsonText = String(jsonString.utf16[start..<end])!
 
-      self.currentText = jsonText
-      webView!.evaluateJavaScript("setKeymanVal(\"\(jsonText)\");", completionHandler: nil)
+      self.currentText = String(jsonText)
+
+      var finalRange = range ?? self.currentCursorRange ?? nil
+      self.currentCursorRange = finalRange
+
+      //
+      if (finalRange?.location ?? NSNotFound) != NSNotFound {
+        webView!.evaluateJavaScript("setKeymanContext(\"\(jsonText)\", \(doSync ? "true" : "false"), \(finalRange!.location), \(finalRange!.length));", completionHandler: nil)
+      } else {
+        webView!.evaluateJavaScript("setKeymanContext(\"\(jsonText)\", \(doSync ? "true" : "false"));", completionHandler: nil)
+      }
     } catch {
       os_log("%{public}s", log: KeymanEngineLogger.engine, type: .error, error.localizedDescription)
       SentryManager.capture(error.localizedDescription)
@@ -669,10 +672,7 @@ extension KeymanWebViewController: KeymanWebDelegate {
     resizeKeyboard()
 
     // There may have been attempts to set these values before the keyboard loaded!
-    self.setText(self.currentText)
-    if let cursorRange = self.currentCursorRange {
-      self.setCursorRange(cursorRange)
-    }
+    self.setContext(text: self.currentText, range: self.currentCursorRange)
 
     var newKb = Manager.shared.currentKeyboard
 

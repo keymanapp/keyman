@@ -121,3 +121,10 @@ async function analyzeOskRewritePua(callbacks: CompilerCallbacks, filenames: str
     return true;
   });
 }
+
+/**
+ * these are exported only for unit tests, do not use
+ */
+export const analyzeUnitTestEndpoints = {
+  analyzeOskCharUse
+};
