@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<KeymanDeveloperProject>
+  <Options>
+    <BuildPath>$PROJECTPATH</BuildPath>
+    <CompilerWarningsAsErrors>False</CompilerWarningsAsErrors>
+    <WarnDeprecatedCode>False</WarnDeprecatedCode>
+    <CheckFilenameConventions>False</CheckFilenameConventions>
+    <ProjectType>keyboard</ProjectType>
+  </Options>
+  <Files>
+      <File>
+      <ID>error_file_type_not_found_kbd_1</ID>
+      <Filename>error_file_type_not_found__keyboard.kmn</Filename>
+      <Filepath>error_file_type_not_found__keyboard.kmn</Filepath>
+      <FileVersion>1.0</FileVersion>
+      <FileType>.kmn</FileType>
+      <Details>
+        <Name>error_file_type_not_found__keyboard</Name>
+        <Copyright>Copyright (C) Keyman Team</Copyright>
+      </Details>
+    </File>
+    <!-- ERROR_FileTypeNotFound (BuildKeyboardInfo) -->
+  </Files>
+ </KeymanDeveloperProject>

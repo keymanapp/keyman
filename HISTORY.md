@@ -1,5 +1,17 @@
 # Keyman Version History
 
+## 17.0.270 beta 2024-02-17
+
+*  (#10735)
+
+## 17.0.269 beta 2024-02-15
+
+* docs(android): Document using gestures on touch, and remove references to Browser (#10686)
+* docs(android/app): Add help page on using the banner (#10691)
+* fix(web): corrects Android over-deletion of selected text, other context diffs involving selected text (#10662)
+* fix(web): disables banner interaction when suggestions are absent (#10695)
+* fix(web): longpress validation by base key, not current location (#10707)
+
 ## 17.0.268 beta 2024-02-15
 
 * chore: move to beta
