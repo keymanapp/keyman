@@ -2,6 +2,9 @@
 rem This script avoids path dependencies for node for distribution
 rem with Keyman Developer. When used on platforms other than Windows,
 rem node can be used directly with the compiler (`npm link` will setup).
+
+set root=%~dp0
+
 if "%1" == "--enable-source-maps" (
   set ESM=--enable-source-maps
   shift
@@ -18,5 +21,5 @@ shift
 goto :build_params
 :finished_building_params
 
-"%~dp0\node.js\node.exe" %ESM% "%~dp0\kmc\kmc.mjs" %params%
+"%root%\node.js\node.exe" %ESM% "%root%\kmc\kmc.mjs" %params%
 exit /b %errorlevel%
