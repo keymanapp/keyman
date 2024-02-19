@@ -276,18 +276,18 @@ function doResetContext() {
     keyman.resetContext();
 }
 
-function setKeymanContext(text, doSync, pos, length) {
+function setKeymanContext(text, doSync, selStart, selLength) {
     // console.log(`setKeymanContext(${JSON.stringify(text)}, ${doSync}, ${pos}, ${length})`);
     if(text == undefined) {
         text = '';
     }
 
-    var start = pos;
-    var end = pos + length;
-    // undefined + <number> => NaN.
-    end = isNaN(end) ? undefined : end;
+    // Both pos + length are optional parameters.
+    // undefined + <number> => NaN; undefined + undefined => NaN.
+    let selEnd = selStart + selLength;
+    selEnd = isNaN(selEnd) ? undefined : selEnd;
 
-    const shouldReset = keyman.context.updateContext(text, start, end);
+    const shouldReset = keyman.context.updateContext(text, selStart, selEnd);
     if(!doSync || shouldReset) {
         keyman.resetContext();
     }
