@@ -107,7 +107,7 @@ namespace com.keyman.dom.targets {
 
     getTextBeforeCaret(): string {
       if(!this.hasSelection()) {
-        return;
+        return this.getText();
       }
 
       let caret = this.getCarets().start;
