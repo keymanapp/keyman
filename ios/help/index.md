@@ -13,7 +13,17 @@ title: Keyman for iPhone and iPad 17.0 Help
 * [How To - Keyboard and Dictionary Installation](start/installing-packages)
 * [How To - Installing Keyman as a System Keyboard](start/installing-system-keyboard)
 
-## [Using the Menu](context/)
+
+## [Using Keyman for iPhone and iPad](basic/)
+* [Switching Between Keyboards](basic/switching-between-keyboards)
+* [Using a Keyboard](basic/keyboard-usage)
+* [Using the Menu](context/)
+* [Using the Settings Screen](basic/config/)
+* [Language Settings](basic/language-settings)
+* [Installing Custom Keyboards/Dictionaries](basic/installing-custom-keyboards-dictionaries)
+* [Sharing Keyboards and Dictionaries](basic/sharing-keyboards)
+* [Using the Keyman Browser](basic/using-keyman-browser)
+* [Removing Keyboards](basic/uninstalling-keyboards)
 
 ## Ask for Help
 * [Ask other users in the SIL Keyman Community](https://community.software.sil.org/c/keyman)
@@ -23,16 +33,7 @@ title: Keyman for iPhone and iPad 17.0 Help
 * [How To - Installing fonts](troubleshooting/installing-fonts)
 * [How To - Integrating Keyman for iPhone and iPad](troubleshooting/integrating)
 
-### [Using Keyman for iPhone and iPad](basic/)
-* [Switching Between Keyboards](basic/switching-between-keyboards)
-* [Using the Settings Screen](basic/config/)
-* [Language Settings](basic/language-settings)
-* [Installing Custom Keyboards/Dictionaries](basic/installing-custom-keyboards-dictionaries)
-* [Sharing Keyboards and Dictionaries](basic/sharing-keyboards)
-* [Using the Keyman Browser](basic/using-keyman-browser)
-* [Removing Keyboards](basic/uninstalling-keyboards)
-
 ## Further Help
-For more information on Keyman, [keyman.com](https://keyman.com).
+For more information on Keyman, see [keyman.com](https://keyman.com)
 
-For more information on Keyman for iPhone and iPad, visit [keyman.com/iphone-and-ipad](https://keyman.com/iphone-and-ipad/)
+For more information on Keyman for iPhone and iPad, see [keyman.com/iphone-and-ipad](https://keyman.com/iphone-and-ipad/)
