@@ -52,6 +52,7 @@ export default class KeymanEngine<
       if(callback) {
         callback(null, null);
       }
+      return;
     }
 
     if(this.keyEventRefocus) {
