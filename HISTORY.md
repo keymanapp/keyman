@@ -1,5 +1,18 @@
 # Keyman Version History
 
+## 17.0.271 beta 2024-02-19
+
+* chore(developer): add infrastructure messages tests (#10756)
+* chore(windows): Update more PT strings (#10718)
+* docs(android/app): Update tablet screenshots (#10726)
+* fix(web): sticky special-key highlighting (#10729)
+* fix(web): disables modipress for layer-switch keys with subkeys (#10745)
+* fix(web): missing null-guard for hardware keystrokes without active Keyman keyboard (#10740)
+* docs(ios): what's new in 17.0 (#10748)
+* fix(web): handling of page-elements focused before engine initialization (#10744)
+* fix(ios): multitap consistency after new-lines (#10728)
+* docs(common): Update website README (#10738)
+
 ## 17.0.270 beta 2024-02-17
 
 *  (#10735)
