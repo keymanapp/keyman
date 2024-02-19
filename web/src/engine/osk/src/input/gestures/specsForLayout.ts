@@ -443,7 +443,7 @@ export function longpressContactModel(params: GestureParams, enabledFlicks: bool
       duration: spec.waitLength,
       expectedResult: true
     },
-    validateItem: (key: KeyElement) => !!key?.key.spec.sk,
+    validateItem: (_: KeyElement, baseKey: KeyElement) => !!baseKey?.key.spec.sk,
     pathModel: {
       evaluate: (path) => {
         const stats = path.stats;
