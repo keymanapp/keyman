@@ -222,6 +222,7 @@ void KMX_TranslateDeadkeyKey(LPKMX_KEY key, KMX_WCHAR deadkey, KMX_WORD vk, UINT
       shift &= ~LCTRLFLAG;
 
     if(key->ShiftFlags == 0) {
+      // _S2 TODO enable logError
       //LogError("Converted mnemonic rule on line %d, + '%c' TO dk(%d) + [%x K_%d]", key->Line, key->Key, deadkey, shift, vk);
       //wprintf(L"DK Converted mnemonic rule on line %d, + '%c' TO dk(%d) + [%x K_%d], %i(%c)\n", key->Line, key->Key, deadkey, shift, vk, ch, ch);
       key->ShiftFlags = ISVIRTUALKEY | shift;
@@ -360,7 +361,7 @@ KMX_WCHAR KMX_GetUniqueDeadkeyID(LPKMX_KEYBOARD kbd, KMX_WCHAR deadkey) {
   return s_dkids[s_ndkids++].dst_deadkey = s_next_dkid = ++dkid;
 }
 
-void KMX_ConvertDeadkey(LPKMX_KEYBOARD kbd, KMX_WORD vk, UINT shift, KMX_WCHAR deadkey, v_dw_3D &All_Vector, GdkKeymap* keymap,v_dw_2D dk_Table) {
+void KMX_ConvertDeadkey(LPKMX_KEYBOARD kbd, KMX_WORD vk_US, UINT shift, KMX_WCHAR deadkey, v_dw_3D &All_Vector, GdkKeymap* keymap,v_dw_2D dk_Table) {
   KMX_WORD deadkeys[512], *pdk;
 
   // Lookup the deadkey table for the deadkey in the physical keyboard
@@ -368,16 +369,15 @@ void KMX_ConvertDeadkey(LPKMX_KEYBOARD kbd, KMX_WORD vk, UINT shift, KMX_WCHAR d
   KMX_WCHAR dkid = KMX_GetUniqueDeadkeyID(kbd, deadkey);
 
   // Add the deadkey to the mapping table for use in the import rules phase
-  KMX_DeadkeyMapping KMX_deadkeyMapping = { deadkey, dkid, shift, vk};    // I4353
+  KMX_DeadkeyMapping KMX_deadkeyMapping = { deadkey, dkid, shift, vk_US};    // I4353
 
   KMX_FDeadkeys.push_back(KMX_deadkeyMapping); //dkid, vk, shift);   // I4353
-  KMX_AddDeadkeyRule(kbd, dkid, vk, shift);
+  KMX_AddDeadkeyRule(kbd, dkid, vk_US, shift);
 
   KMX_GetDeadkeys(dk_Table, deadkey, pdk = deadkeys, keymap);  // returns array of [usvk, ch_out] pairs
   while(*pdk) {
     // Look up the ch
-    UINT vkUnderlying = KMX_get_CharUS_From_VKUnderlying_VEC(All_Vector, *pdk);
-
+    UINT vkUnderlying = KMX_get_KValUnderlying_From_KValUS_VEC(All_Vector, *pdk);
     KMX_TranslateDeadkeyKeyboard(kbd, dkid, vkUnderlying, *(pdk+1), *(pdk+2));
     pdk+=3;
   }
@@ -439,11 +439,8 @@ KMX_BOOL KMX_DoConvert(LPKMX_KEYBOARD kbd, KMX_BOOL bDeadkeyConversion, gint arg
 
     // Loop through each possible key on the keyboard
     for (int i = 0;KMX_VKMap[i]; i++) { // I4651
-
-
       // _S2 DIFFERENT TO MCOMPILE WINDOWS
       // win goes via VK, Lin goes via SC/Keycode
-
       UINT scUnderlying =  KMX_get_KeyCodeUnderlying_From_VKUS(KMX_VKMap[i]);
       KMX_WCHAR ch = KMX_get_CharUnderlying_From_KeyCodeUnderlying_GDK(keymap, VKShiftState[j], scUnderlying, &DeadKey);
 
@@ -484,14 +481,13 @@ int KMX_GetDeadkeys(v_dw_2D & dk_Table, KMX_WORD DeadKey, KMX_WORD *OutputPairs,
   for ( int i=0; i< (int) dk_SingleTable.size();i++) {
     KMX_WORD vk = KMX_changeKeynameToCapital(dk_SingleTable[i][1], shift, keymap);
     if(vk != 0) {
-          *p++ = vk;
-          *p++ = shift;
-          *p++ = dk_SingleTable[i][2];
-        }
-        // _S2 TODO
-        //else {
-        //  LogError(L"Warning: complex deadkey not supported.");
-      // }
+      *p++ = vk;
+      *p++ = shift;
+      *p++ = dk_SingleTable[i][2];
+    }
+    else {
+      KMX_LogError(L"Warning: complex deadkey not supported.");
+    }
   }
   *p = 0;
   return (p-OutputPairs);

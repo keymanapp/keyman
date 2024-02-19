@@ -14,6 +14,7 @@ _S2 TODO TODO keymap* or keymap** everywhere?
 _S2 TODO check call by reference/value
 _S2 TODO replace GDK
 _S2 TODO what is wrong with kp->dpBitmapOffset/BitmapSize ?
+_S2 TODO all wprintf gone ?
 _S2 ...
 
 

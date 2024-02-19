@@ -112,7 +112,7 @@ KMX_DWORD KMX_changeKeynameToCapital(KMX_DWORD KVal, KMX_DWORD &shift, GdkKeymap
 	return Cap;
 }	
 
-// _S2 DESIGN NEEDED is this the right place to get dk from? if not wher are they stored?
+// _S2 DESIGN NEEDED is this the right place to get dk from? if not where are they stored?
 void create_DKTable(v_dw_2D & dk_ComposeTable) {
 
   //values taken from: https://help.ubuntu.com/community/GtkDeadKeyTable#Latin

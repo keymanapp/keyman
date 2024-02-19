@@ -68,6 +68,7 @@ static KMX_DWORD returnIfCharInvalid = 0;
 static KMX_DWORD keycode_max = 94;
 static KMX_DWORD deadkey_min = 0xfe50;
 static KMX_DWORD deadkey_max = 0xfe93;
+//static KMX_DWORD deadkey_max = 0xfe52;  // _S2 TODO This has to go! my test: to only return 3 dk
 
 int map_VKShiftState_to_LinModifier(int VKShiftState);
 
@@ -509,19 +510,24 @@ std::u16string convert_DeadkeyValues_To_U16str(int in);
 // use gdk_keymap_translate_keyboard_state to get keyval - base function to get keyvals
 int KMX_get_keyval_From_Keycode(GdkKeymap *keymap, guint keycode, ShiftState ss, int caps);
 
+// uses KMX_get_keyval_From_Keycode and forbids use of certain keycodes
 KMX_DWORD KMX_get_KeyvalUnderlying_From_KeyCodeUnderlying_GDK(GdkKeymap *keymap, guint keycode, int shift_state_pos);
 
+
+// _S2 uses KMX_get_keyval_From_Keycode and returns CATEGORY off keyval and forbids use of certain keycodes
 KMX_DWORD KMX_get_KeyvalUnderlying_DK_From_KeyCodeUnderlying_GDK(GdkKeymap *keymap, guint keycode, int shift_state_pos, PKMX_WCHAR &dky);
 
+// _S2 fills Deadkey with dk and returns CATEGORY
 KMX_DWORD KMX_get_CharUnderlying_From_KeyCodeUnderlying_GDK(GdkKeymap *keymap, UINT VKShiftState, UINT KC_underlying, PKMX_WCHAR DeadKey);
 
 // return the VirtualKey of the underlying Keyboard for a given Keyode using GDK
 KMX_DWORD KMX_get_VKUS_From_KeyCodeUnderlying_GDK( GdkKeymap *keymap, KMX_DWORD keycode);
 
-// return the Keycode of the underlying Keyboard for given VK_US using GDK
+// uses Vector to return the Keycode of the underlying Keyboard for given VK_US using GDK
 KMX_DWORD KMX_get_KeyCodeUnderlying_From_KeycodeUS_GDK(GdkKeymap *keymap, v_dw_3D &All_Vector,KMX_DWORD KC_US, ShiftState ss, int caps);
 
-KMX_WCHAR KMX_get_CharUS_From_VKUnderlying_VEC(v_dw_3D &All_Vector,KMX_DWORD VK_underlying);
+		// _S2 HÄÄ
+		KMX_WCHAR KMX_get_KValUnderlying_From_KValUS_VEC(v_dw_3D &All_Vector,KMX_DWORD VK_underlying);
 
 // return the Keycode of the underlying Keyboard for given VK_US
 UINT KMX_get_KeyCodeUnderlying_From_VKUS(KMX_DWORD VirtualKeyUS);

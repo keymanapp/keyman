@@ -546,7 +546,6 @@ KMX_DWORD KMX_get_KeyvalUnderlying_DK_From_KeyCodeUnderlying_GDK(GdkKeymap *keym
   g_free(keyvals);
   g_free(maps);
 
-  // _S2 AHA output for dk4-12 at the top after dk... from here
   if((All_Keyvals >=  deadkey_min) && (All_Keyvals <=  deadkey_max))                                    // deadkeys
     return 0xFFFF;
   else if((All_Keyvals >  deadkey_max) || ((All_Keyvals <  deadkey_min)  &&  ( All_Keyvals > 0xFF)))    // out of range
@@ -568,6 +567,12 @@ KMX_DWORD KMX_get_CharUnderlying_From_KeyCodeUnderlying_GDK(GdkKeymap *keymap, U
     return 0xFFFE;
   else                                                                                                // usable char
     return keyvals_dw;
+
+/*if( keyvals_dw == 0xFFFF)
+ *DeadKey = *dky;
+
+ return keyvals_dw;*/
+
 }
 
 KMX_DWORD KMX_get_VKUS_From_KeyCodeUnderlying_GDK( GdkKeymap *keymap, KMX_DWORD keycode) {
@@ -583,7 +588,7 @@ KMX_DWORD KMX_get_VKUS_From_KeyCodeUnderlying_GDK( GdkKeymap *keymap, KMX_DWORD 
 
   return 0;
 }
-
+//_S2 TODO condense these 2 fun to one
 KMX_DWORD KMX_get_KeyCodeUnderlying_From_KeycodeUS_GDK(GdkKeymap *keymap, v_dw_3D &All_Vector, KMX_DWORD KC_US, ShiftState ss, int caps) {
 
   KMX_DWORD Character;
@@ -592,7 +597,7 @@ KMX_DWORD KMX_get_KeyCodeUnderlying_From_KeycodeUS_GDK(GdkKeymap *keymap, v_dw_3
 
   //Find underlying KC of character
   for( int i=0; i< (int)All_Vector[1].size()-1 ;i++) {
-    for( int j=1; j< (int)All_Vector[01][0].size();j++) {
+    for( int j=1; j< (int)All_Vector[1][0].size();j++) {
       if ( ( All_Vector[1][i][j] == Character ) ) {
         KC_US = All_Vector[1][i][j];
         return All_Vector[1][i][0];
@@ -602,12 +607,12 @@ KMX_DWORD KMX_get_KeyCodeUnderlying_From_KeycodeUS_GDK(GdkKeymap *keymap, v_dw_3
   return KC_US;
 }
 
-KMX_WCHAR KMX_get_CharUS_From_VKUnderlying_VEC(v_dw_3D & All_Vector, KMX_DWORD VK_underlying) {
+KMX_WCHAR KMX_get_KValUnderlying_From_KValUS_VEC(v_dw_3D & All_Vector, KMX_DWORD VK_underlying) {
   KMX_DWORD VK_US;
   for( int i=0; i< (int)All_Vector[0].size()-1 ;i++) {
     for( int j=1; j< (int)All_Vector[0][0].size();j++) {
       if ( ( All_Vector[0][i][j] == VK_underlying ) ) {
-        VK_US = All_Vector[1][i][j];;
+        VK_US = All_Vector[1][i][j];
         return VK_US;
       }
     }

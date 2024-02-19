@@ -77,7 +77,6 @@ int KMX_ToUnicodeEx(guint keycode, const BYTE *lpKeyState, PKMX_WCHAR pwszBuff, 
     return 0;
 
   std::wstring str = convert_DeadkeyValues_ToWstr(KMX_get_keyval_From_Keycode(keymap, keycode, ShiftState(shift_state_pos), caps));
-
   pwszBuff[0]= * (PKMX_WCHAR)  u16string_from_wstring(str).c_str();
 
   KMX_DWORD keyvals_dw= (KMX_DWORD) KMX_get_keyval_From_Keycode(keymap, keycode, ShiftState(shift_state_pos), caps);
@@ -290,10 +289,13 @@ int i4 = this->KMX_IsXxxxGrCapsEqualToXxxxShift() ? 8 : 0;*/
         (this->KMX_IsXxxxGrCapsEqualToXxxxShift() ? 8 : 0);
 
 
-    // _S2 DIFFERENCE TO MCOMPILE WINDOWS
+    // DIFFERENCE TO MCOMPILE WINDOWS
     // _S2 DESIGN NEEDED on how to replace capslock
     //     capslock has different values for linux. Therefore key->ShiftFlags will be different for numbers, special characters
+    //     Therefore CAPS/NCAPS will be added differently for Lin<->Win
     //     for now set capslock=1
+    //        capslock=1  <->   capslock=0;
+    // [ CTRL NCAPS K_I]  <->   [CTRL K_I]
     capslock=1;
 
     for (int ss = 0; ss <= MaxShiftState; ss++) {
@@ -344,7 +346,9 @@ int i4 = this->KMX_IsXxxxGrCapsEqualToXxxxShift() ? 8 : 0;*/
             // key->Key      stores VK-US ( not underlying !!)
             // key->dpOutput stores character Underlying
 
-            KMX_DWORD SC_Underlying = KMX_get_KeyCodeUnderlying_From_KeycodeUS_GDK(keymap, All_Vector, this->SC(), (ShiftState) ss, caps);
+            // _S2 ToDo which one ??? is different if a char is on different keys- then it may find the wrong key.
+            //KMX_DWORD SC_Underlying = KMX_get_KeyCodeUnderlying_From_KeycodeUS_GDK(keymap, All_Vector, this->SC(), (ShiftState) ss, caps);
+            KMX_DWORD SC_Underlying = this->SC();
             key->Key = KMX_get_VKUS_From_KeyCodeUnderlying_GDK( keymap, SC_Underlying);
 
             key->Line = 0;
@@ -518,7 +522,6 @@ bool KMX_ImportRules(LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, GdkKeymap **keymap,
 
           // _S2 TODO not finished; Ctrl, Shft +40 not tested
           for(int caps = 0; caps <= 1; caps++) {
-
             // _S2 TODO Do we need this?
             //loader.KMX_ClearKeyboardBuffer();
             loader.KMX_FillKeyState(lpKeyState, ss, (caps == 0));
@@ -545,6 +548,7 @@ bool KMX_ImportRules(LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, GdkKeymap **keymap,
                       // VK_A ~ VK_Z keys to produce the control characters,
                       // when the conversion rule is not provided in keyboard
                       // layout files
+
                       continue;
                   }
                 if( (ss == Ctrl || ss == ShftCtrl) ) {
@@ -657,7 +661,6 @@ bool KMX_ImportRules(LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, GdkKeymap **keymap,
       UINT j;
       LPKMX_KEY kkp;
       for(j = 0, kkp = gp->dpKeyArray; j < gp->cxKeyArray; j++, kkp++) {
-          // _S2 AHA! missing 26 lines from here: since capalock is not correct this loop  will never be done
         if((kkp->ShiftFlags & (K_CTRLFLAG|K_ALTFLAG|LCTRLFLAG|LALTFLAG|RCTRLFLAG|RALTFLAG)) != 0) {
           gp2->cxKeyArray++;
           LPKMX_KEY kkp2 = new KMX_KEY[gp2->cxKeyArray];
@@ -682,7 +685,7 @@ bool KMX_ImportRules(LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, GdkKeymap **keymap,
   // If we have deadkeys, then add a new group to translate the deadkeys per the deadkey tables
   // We only do this if not in deadkey conversion mode
   //
-  // DK_PART
+
   if (alDead.size() > 0 && !bDeadkeyConversion) {   // I4552
     kp->cxGroupArray++;
 
