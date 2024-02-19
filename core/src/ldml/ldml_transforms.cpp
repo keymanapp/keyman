@@ -692,7 +692,7 @@ any_group::apply_transform(std::u32string &input, std::u32string &output, size_t
 
   // remove the matched part of the input
   assert(subMatched <= input.length());
-  input.resize(input.length() - subMatched);  // chop of the subMatched part at end
+  input.resize(input.length() - subMatched);  // chop off the subMatched part at end
   input.append(subOutput);                    // subOutput could be empty such as in backspace transform
 
   if (subMatched <= output.length()) {
