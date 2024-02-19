@@ -223,14 +223,7 @@ extension KeymanWebViewController {
     setSpacebarText(userData.optSpacebarText)
   }
 
-  func setCursorRange(_ range: NSRange) {
-    if range.location != NSNotFound {
-      webView!.evaluateJavaScript("setCursorRange(\(range.location),\(range.length));", completionHandler: nil)
-      self.currentCursorRange = range
-    }
-  }
-
-  func setText(_ text: String?) {
+  func setContext(text: String?, range: NSRange?, doSync: Bool = false) {
     var text = text ?? ""
 
     // Remove any system-added LTR/RTL marks.
@@ -246,7 +239,16 @@ extension KeymanWebViewController {
       let jsonText = jsonString[start..<end]
 
       self.currentText = String(jsonText)
-      webView!.evaluateJavaScript("setKeymanVal(\"\(jsonText)\");", completionHandler: nil)
+
+      var finalRange = range ?? self.currentCursorRange ?? nil
+      self.currentCursorRange = finalRange
+
+      //
+      if (finalRange?.location ?? NSNotFound) != NSNotFound {
+        webView!.evaluateJavaScript("setKeymanContext(\"\(jsonText)\", \(doSync ? "true" : "false"), \(finalRange!.location), \(finalRange!.length));", completionHandler: nil)
+      } else {
+        webView!.evaluateJavaScript("setKeymanContext(\"\(jsonText)\", \(doSync ? "true" : "false"));", completionHandler: nil)
+      }
     } catch {
       os_log("%{public}s", log: KeymanEngineLogger.engine, type: .error, error.localizedDescription)
       SentryManager.capture(error.localizedDescription)
@@ -363,7 +365,7 @@ extension KeymanWebViewController {
       if let packageID = lexicalModel.packageID {
         event.extra?["package"] = packageID
       }
-      
+
       os_log("%{public}s: %{public}s", log: KeymanEngineLogger.resources, type: .error, errorMessage, lexicalModel.id)
       SentryManager.capture(event)
       throw KeyboardError.fileMissing
@@ -572,7 +574,7 @@ extension KeymanWebViewController: WKScriptMessageHandler {
       // This may need filtering for proper use with Sentry?
       // Then again, if KMW is logging it... we already have to worry
       // about it showing up in Web-oriented Sentry logs.
-      
+
       let logMessage = "KMW Log: \(message)"
       os_log("%{public}s", log: KeymanEngineLogger.engine, type: .info, logMessage)
       SentryManager.breadcrumb(logMessage)
@@ -672,10 +674,7 @@ extension KeymanWebViewController: KeymanWebDelegate {
     resizeKeyboard()
 
     // There may have been attempts to set these values before the keyboard loaded!
-    self.setText(self.currentText)
-    if let cursorRange = self.currentCursorRange {
-      self.setCursorRange(cursorRange)
-    }
+    self.setContext(text: self.currentText, range: self.currentCursorRange)
 
     var newKb = Manager.shared.currentKeyboard
 

@@ -317,7 +317,7 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
 
       let range = NSRange(location: before.unicodeScalars.count, length: 0)
 
-      self.setContextState(text: contextWindowText, range: range)
+      self.setContextState(text: contextWindowText, range: range, doSync: true)
     }
 
     updater(preCaretContext, postCaretContext)
@@ -606,7 +606,7 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
    * will be expecting SMP-aware measurements.  Swift's `.unicodeScalars`
    * property on `String`s lines up best with this.
    */
-  func setContextState(text: String?, range: NSRange) {
+  func setContextState(text: String?, range: NSRange, doSync: Bool = false) {
     // Check for any LTR or RTL marks at the context's start; if they exist, we should
     // offset the selection range.
     let characterOrderingChecks = [ "\u{200e}" /*LTR*/, "\u{202e}" /*RTL 1*/, "\u{200f}" /*RTL 2*/ ]
@@ -626,10 +626,7 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
       selRange = NSRange(location: selRange.location - 1, length: selRange.length)
     }
 
-    keymanWeb.setText(context)
-    if range.location != NSNotFound {
-      keymanWeb.setCursorRange(selRange)
-    }
+    keymanWeb.setContext(text: context, range: selRange, doSync: doSync)
   }
 
   func resetKeyboardState() {
