@@ -410,7 +410,7 @@ void create_DKTable(v_dw_2D & dk_ComposeTable) {
 
 	line = createLine(L"dead_acute",  L"space",  0x0027, L"APOSTROPHE");
 	  dk_ComposeTable.push_back(line);	line.clear();
-	/*line = createLine(L"dead_acute",  L"space",  0x00B4, L"ACUTE_ACCENT");
+	/*line = createLine(L"dead_acute",  L"space",  0x00B4, L"ACUTE_ACCENT");		// _S2 ToDo remove - just for testing
 	  dk_ComposeTable.push_back(line);	line.clear();*/
 
 	line = createLine(L"dead_grave",  L"space",  0x0060, L"GRAVE_ACCENT");

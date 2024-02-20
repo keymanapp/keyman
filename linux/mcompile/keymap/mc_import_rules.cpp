@@ -392,18 +392,6 @@ public:
     return (Get_XxxxVk() == 0 ? ShftMenuCtrl : ShftXxxx);
   }
 
-// _S2 ToDo needed??? - no?
-  void KMX_FillKeyState(KMX_BYTE *lpKeyState, ShiftState ss, bool fCapsLock) {
-    lpKeyState[VK_SHIFT] = (((ss & Shft) != 0) ? 0x80 : 0x00);
-    lpKeyState[VK_CONTROL] = (((ss & Ctrl) != 0) ? 0x80 : 0x00);
-    lpKeyState[VK_MENU] = (((ss & Menu) != 0) ? 0x80 : 0x00);
-    if (Get_XxxxVk() != 0) {
-      // The Xxxx key has been assigned, so let's include it
-      lpKeyState[Get_XxxxVk()] = (((ss & Xxxx) != 0) ? 0x80 : 0x00);
-    }
-    lpKeyState[VK_CAPITAL] = (fCapsLock ? 0x01 : 0x00);
-  }
-
   bool KMX_IsControlChar(wchar_t ch) {
     return (ch < 0x0020) || (ch >= 0x007F && ch <= 0x009F);
   }
@@ -512,7 +500,6 @@ bool KMX_ImportRules(LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, GdkKeymap **keymap,
           KMX_DWORD KC_US = (KMX_DWORD) KMX_get_KeyCodeUnderlying_From_VKUS(iKey);
 
           for(int caps = 0; caps <= 1; caps++) {
-            loader.KMX_FillKeyState(lpKeyState, ss, (caps == 0));
             int rc = KMX_ToUnicodeEx(KC_US, sbBuffer, ss, caps, *keymap);
 
             if(rc > 0) {
