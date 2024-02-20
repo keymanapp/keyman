@@ -76,19 +76,19 @@ int KMX_ToUnicodeEx(guint keycode, const BYTE *lpKeyState, PKMX_WCHAR pwszBuff, 
   if (!(keycode <= keycode_max))
     return 0;
 
-  std::wstring str = convert_DeadkeyValues_ToWstr(KMX_get_keyval_From_Keycode(keymap, keycode, ShiftState(shift_state_pos), caps));
+  std::wstring str = convert_DeadkeyValues_ToWstr(KMX_get_KeyVal_From_KeyCode(keymap, keycode, ShiftState(shift_state_pos), caps));
   pwszBuff[0]= * (PKMX_WCHAR)  u16string_from_wstring(str).c_str();
 
-  KMX_DWORD keyvals_dw= (KMX_DWORD) KMX_get_keyval_From_Keycode(keymap, keycode, ShiftState(shift_state_pos), caps);
+  KMX_DWORD KeyVal= (KMX_DWORD) KMX_get_KeyVal_From_KeyCode(keymap, keycode, ShiftState(shift_state_pos), caps);
 
   g_free(keyvals);
   g_free(maps);
 
-  if((keyvals_dw >=  deadkey_min) && (keyvals_dw <=  deadkey_max))          // deadkeys
+  if((KeyVal >=  deadkey_min) && (KeyVal <=  deadkey_max))          // deadkeys
     return -1;
-  else if(gdk_keyval_to_unicode(keyvals_dw)  == 0)                          // NO UNICODE
+  else if(gdk_keyval_to_unicode(KeyVal)  == 0)                      // NO UNICODE
     return 0;
-  else                                                                      // usable char
+  else                                                              /// usable char
     return 1;
 }
 
@@ -125,7 +125,7 @@ public:
   }
 
   KMX_VirtualKey(UINT scanCode, KMX_HKL hkl, GdkKeymap **keymap) {
-    this->m_vk = KMX_get_VKUS_From_KeyCodeUnderlying_GDK(*keymap, scanCode);
+    this->m_vk = KMX_get_VKUS_From_KeyCodeUnderlying(*keymap, scanCode);
     this->m_hkl = hkl;
     this->m_sc = scanCode;
     memset(this->m_rgfDeadKey,0,sizeof(this->m_rgfDeadKey));
@@ -346,8 +346,8 @@ int i4 = this->KMX_IsXxxxGrCapsEqualToXxxxShift() ? 8 : 0;*/
             // key->Key      stores VK-US ( not underlying !!)
             // key->dpOutput stores character Underlying
 
-            KMX_DWORD SC_Underlying = KMX_get_KeyCodeUnderlying_From_KeycodeUS_GDK(keymap, All_Vector, this->SC(), (ShiftState) ss, caps);
-            key->Key = KMX_get_VKUS_From_KeyCodeUnderlying_GDK( keymap, SC_Underlying);
+            KMX_DWORD SC_Underlying = KMX_get_KeyCodeUnderlying_From_KeyCodeUS(keymap, All_Vector, this->SC(), (ShiftState) ss, caps);
+            key->Key = KMX_get_VKUS_From_KeyCodeUnderlying( keymap, SC_Underlying);
 
             key->Line = 0;
             key->ShiftFlags = this->KMX_GetShiftStateValue(capslock, caps, (ShiftState) ss);

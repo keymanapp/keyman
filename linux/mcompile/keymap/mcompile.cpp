@@ -370,8 +370,8 @@ void KMX_ConvertDeadkey(LPKMX_KEYBOARD kbd, KMX_WORD vk_US, UINT shift, KMX_WCHA
   KMX_GetDeadkeys(dk_Table, deadkey, pdk = deadkeys, keymap);  // returns array of [usvk, ch_out] pairs
   while(*pdk) {
     // Look up the ch
-    UINT vkUnderlying = KMX_get_KValUnderlying_From_KValUS_VEC(All_Vector, *pdk);
-    KMX_TranslateDeadkeyKeyboard(kbd, dkid, vkUnderlying, *(pdk+1), *(pdk+2));
+    UINT KeyValUnderlying = KMX_get_KeyValUnderlying_From_KeyValUS(All_Vector, *pdk);
+    KMX_TranslateDeadkeyKeyboard(kbd, dkid, KeyValUnderlying, *(pdk+1), *(pdk+2));
     pdk+=3;
   }
 }
@@ -435,7 +435,7 @@ KMX_BOOL KMX_DoConvert(LPKMX_KEYBOARD kbd, KMX_BOOL bDeadkeyConversion, gint arg
       // _S2 DIFFERENT TO MCOMPILE WINDOWS
       // win goes via VK, Lin goes via SC/Keycode
       UINT scUnderlying =  KMX_get_KeyCodeUnderlying_From_VKUS(KMX_VKMap[i]);
-      KMX_WCHAR ch = KMX_get_CharUnderlying_From_KeyCodeUnderlying_GDK(keymap, VKShiftState[j], scUnderlying, &DeadKey);
+      KMX_WCHAR ch = KMX_get_KeyValUnderlying_From_KeyCodeUnderlying(keymap, VKShiftState[j], scUnderlying, &DeadKey);
 
       //wprintf(L"--- VK_%d -> SC_ [%c] dk=%d  ( ss %i) \n", VKMap[i], ch == 0 ? 32 : ch, DeadKey, VKShiftState[j]);
 

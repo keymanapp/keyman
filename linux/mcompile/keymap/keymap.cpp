@@ -327,8 +327,8 @@ int append_underlying_ToVector(v_dw_3D &All_Vector,GdkKeymap *keymap) {
     All_Vector[1][i][0] = All_Vector[0][i][0];
 
     // get Keyvals of this key and copy to unshifted/shifted in "underlying"-block[1][i][1] / block[1][i][2]
-    All_Vector[1][i][0+1] = KMX_get_KeyvalUnderlying_From_KeyCodeUnderlying_GDK(keymap,All_Vector[0][i][0],0);   //shift state: unshifted:0
-    All_Vector[1][i][1+1] = KMX_get_KeyvalUnderlying_From_KeyCodeUnderlying_GDK(keymap,All_Vector[0][i][0],1);   //shift state: shifted:1
+    All_Vector[1][i][0+1] = KMX_get_KeyValUnderlying_From_KeyCodeUnderlying(keymap,All_Vector[0][i][0],0);   //shift state: unshifted:0
+    All_Vector[1][i][1+1] = KMX_get_KeyValUnderlying_From_KeyCodeUnderlying(keymap,All_Vector[0][i][0],1);   //shift state: shifted:1
   }
 
   return 0;
@@ -407,7 +407,7 @@ std::u16string convert_DeadkeyValues_To_U16str(int in) {
     return u"\0";
 }
 
-int KMX_get_keyval_From_Keycode(GdkKeymap *keymap, guint keycode, ShiftState ss, int caps) {
+int KMX_get_KeyVal_From_KeyCode(GdkKeymap *keymap, guint keycode, ShiftState ss, int caps) {
 
   GdkModifierType consumed;
   GdkKeymapKey *maps;
@@ -494,11 +494,11 @@ int KMX_get_keyval_From_Keycode(GdkKeymap *keymap, guint keycode, ShiftState ss,
   return (int) *keyvals;
 }
 
-KMX_DWORD KMX_get_KeyvalUnderlying_From_KeyCodeUnderlying_GDK(GdkKeymap *keymap, guint keycode, int shift_state_pos) {
+KMX_DWORD KMX_get_KeyValUnderlying_From_KeyCodeUnderlying(GdkKeymap *keymap, guint keycode, int shift_state_pos) {
   GdkKeymapKey *maps;
   guint *keyvals;
   gint count;
-  KMX_DWORD out;
+  KMX_DWORD KVal;
 
   if (!gdk_keymap_get_entries_for_keycode(keymap, keycode, &maps, &keyvals, &count))
     return 0;
@@ -509,15 +509,29 @@ KMX_DWORD KMX_get_KeyvalUnderlying_From_KeyCodeUnderlying_GDK(GdkKeymap *keymap,
    if (!(keycode <= keycode_max))
     return 0;
 
-  out = (KMX_DWORD) KMX_get_keyval_From_Keycode(keymap, keycode, (ShiftState) shift_state_pos, 0);
+  KVal = (KMX_DWORD) KMX_get_KeyVal_From_KeyCode(keymap, keycode, (ShiftState) shift_state_pos, 0);
 
   g_free(keyvals);
   g_free(maps);
 
-  return out;
+  return KVal;
 }
 
-KMX_DWORD KMX_get_KeyvalUnderlying_DK_From_KeyCodeUnderlying_GDK(GdkKeymap *keymap, guint keycode, int shift_state_pos, PKMX_WCHAR &dky) {
+KMX_DWORD KMX_get_KeyValUnderlying_From_KeyCodeUnderlying(GdkKeymap *keymap, UINT VKShiftState, UINT KC_underlying, PKMX_WCHAR DeadKey) {
+  PKMX_WCHAR dky;
+  KMX_DWORD KeyVal = KMX_get_KeyValUnderlying_DK_From_KeyCodeUnderlying(keymap, KC_underlying, map_VKShiftState_to_LinModifier(VKShiftState), dky);
+
+  if(KeyVal >=  deadkey_min) {                                                                    // deadkey
+    *DeadKey = *dky;
+    return 0xFFFF;
+  }
+  else if((KeyVal >  deadkey_max) || ((KeyVal <  deadkey_min)  &&  ( KeyVal > 0xFF)))     // out of range
+    return 0xFFFE;
+  else                                                                                                // usable char
+    return KeyVal;
+}
+
+KMX_DWORD KMX_get_KeyValUnderlying_DK_From_KeyCodeUnderlying(GdkKeymap *keymap, guint keycode, int shift_state_pos, PKMX_WCHAR &dky) {
   GdkKeymapKey *maps;
   guint *keyvals;
   gint count;
@@ -536,79 +550,25 @@ KMX_DWORD KMX_get_KeyvalUnderlying_DK_From_KeyCodeUnderlying_GDK(GdkKeymap *keym
   if (!(keycode <= keycode_max))
     return 0;
 
-  KMX_DWORD All_Keyvals =  KMX_get_keyval_From_Keycode(keymap, keycode, ShiftState(shift_state_pos), 0);
+  KMX_DWORD KeyV =  KMX_get_KeyVal_From_KeyCode(keymap, keycode, ShiftState(shift_state_pos), 0);
 
-  if(( (All_Keyvals >= deadkey_min) && (All_Keyvals <= deadkey_max)))
-    deadkey = All_Keyvals;
+  if(( (KeyV >= deadkey_min) && (KeyV <= deadkey_max)))
+    deadkey = KeyV;
 
   dky = (PKMX_WCHAR) (convert_DeadkeyValues_To_U16str((int) deadkey)).c_str();
 
   g_free(keyvals);
   g_free(maps);
 
-  if((All_Keyvals >=  deadkey_min) && (All_Keyvals <=  deadkey_max))                                    // deadkeys
+  if((KeyV >=  deadkey_min) && (KeyV <=  deadkey_max))                                    // deadkeys
     return 0xFFFF;
-  else if((All_Keyvals >  deadkey_max) || ((All_Keyvals <  deadkey_min)  &&  ( All_Keyvals > 0xFF)))    // out of range
+  else if((KeyV >  deadkey_max) || ((KeyV <  deadkey_min)  &&  ( KeyV > 0xFF)))    // out of range
     return 0xFFFE;
   else                                                                                                  // usable char
-    return All_Keyvals;
+    return KeyV;
 }
 
-KMX_DWORD KMX_get_CharUnderlying_From_KeyCodeUnderlying_GDK(GdkKeymap *keymap, UINT VKShiftState, UINT KC_underlying, PKMX_WCHAR DeadKey) {
-  
-  PKMX_WCHAR dky;
-  KMX_DWORD keyvals_dw = KMX_get_KeyvalUnderlying_DK_From_KeyCodeUnderlying_GDK(keymap, KC_underlying, map_VKShiftState_to_LinModifier(VKShiftState), dky);
-
-  if(keyvals_dw >=  deadkey_min) {                                                                    // deadkey
-    *DeadKey = *dky;
-    return 0xFFFF;
-  }
-  else if((keyvals_dw >  deadkey_max) || ((keyvals_dw <  deadkey_min)  &&  ( keyvals_dw > 0xFF)))     // out of range
-    return 0xFFFE;
-  else                                                                                                // usable char
-    return keyvals_dw;
-
-/*if( keyvals_dw == 0xFFFF)
- *DeadKey = *dky;
-
- return keyvals_dw;*/
-
-}
-
-KMX_DWORD KMX_get_VKUS_From_KeyCodeUnderlying_GDK( GdkKeymap *keymap, KMX_DWORD keycode) {
-  GdkKeymapKey *maps;
-  guint *keyvals;
-  gint count;
-
-  if (!gdk_keymap_get_entries_for_keycode(keymap, keycode, &maps, &keyvals, &count))
-    return 0;
-
-  if ( keycode >7)
-    return  (KMX_DWORD) ScanCodeToUSVirtualKey[keycode-8];
-
-  return 0;
-}
-
-KMX_DWORD KMX_get_KeyCodeUnderlying_From_KeycodeUS_GDK(GdkKeymap *keymap, v_dw_3D &All_Vector, KMX_DWORD KC_US, ShiftState ss, int caps) {
-
-  KMX_DWORD Character;
-  std::wstring ws = convert_DeadkeyValues_ToWstr(KMX_get_keyval_From_Keycode(keymap, KC_US, ss, caps));
-  Character = *ws.c_str();
-
-  //Find underlying KC of character
-  for( int i=0; i< (int)All_Vector[1].size()-1 ;i++) {
-    for( int j=1; j< (int)All_Vector[1][0].size();j++) {
-      if ( ( All_Vector[1][i][j] == Character ) ) {
-        KC_US = All_Vector[1][i][j];
-        return All_Vector[1][i][0];
-      }
-    }
-  }
-  return KC_US;
-}
-
-
-KMX_WCHAR KMX_get_KValUnderlying_From_KValUS_VEC(v_dw_3D & All_Vector, KMX_DWORD VK_US) {
+KMX_WCHAR KMX_get_KeyValUnderlying_From_KeyValUS(v_dw_3D & All_Vector, KMX_DWORD VK_US) {
   KMX_DWORD VK_underlying;
   for( int i=0; i< (int)All_Vector[0].size()-1 ;i++) {
     for( int j=1; j< (int)All_Vector[0][0].size();j++) {
@@ -621,9 +581,40 @@ KMX_WCHAR KMX_get_KValUnderlying_From_KValUS_VEC(v_dw_3D & All_Vector, KMX_DWORD
   return VK_US;
 }
 
+KMX_DWORD KMX_get_KeyCodeUnderlying_From_KeyCodeUS(GdkKeymap *keymap, v_dw_3D &All_Vector, KMX_DWORD KC_US, ShiftState ss, int caps) {
+  KMX_DWORD KC_underlying;
+  KMX_DWORD Character;
+  std::wstring ws = convert_DeadkeyValues_ToWstr(KMX_get_KeyVal_From_KeyCode(keymap, KC_US, ss, caps));
+  Character = *ws.c_str();
+
+  //Find underlying KC of character
+  for( int i=0; i< (int)All_Vector[1].size()-1 ;i++) {
+    for( int j=1; j< (int)All_Vector[1][0].size();j++) {
+      if ( ( All_Vector[1][i][j] == Character ) ) {
+        KC_underlying = All_Vector[1][i][0];
+        return KC_underlying;
+      }
+    }
+  }
+  return KC_US;
+}
 
 UINT  KMX_get_KeyCodeUnderlying_From_VKUS(KMX_DWORD VirtualKeyUS) {
   return (8 + USVirtualKeyToScanCode[VirtualKeyUS]);
+}
+
+KMX_DWORD KMX_get_VKUS_From_KeyCodeUnderlying( GdkKeymap *keymap, KMX_DWORD keycode) {
+  GdkKeymapKey *maps;
+  guint *keyvals;
+  gint count;
+
+  if (!gdk_keymap_get_entries_for_keycode(keymap, keycode, &maps, &keyvals, &count))
+    return 0;
+
+  if ( keycode >7)
+    return  (KMX_DWORD) ScanCodeToUSVirtualKey[keycode-8];
+
+  return 0;
 }
 
 std::wstring CodePointToWString(unsigned int codepoint) {
