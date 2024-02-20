@@ -7,7 +7,7 @@ Uploaders:
  Eberhard Beilharz <eb1@sil.org>,
 Build-Depends:
  bash-completion,
- debhelper (>= 12),
+ debhelper-compat (= 12),
  dh-python,
  gir1.2-webkit2-4.1 | gir1.2-webkit2-4.0,
  ibus,
