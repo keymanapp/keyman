@@ -677,6 +677,7 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
         } else if(gestureStage.matchedId.includes('modipress') && gestureStage.matchedId.includes('-start')) {
           // There shouldn't be a preview host for modipress keys... but it doesn't hurt to add the check.
           existingPreviewHost?.cancel();
+          this.gesturePreviewHost = null;
 
           if(this.layerLocked) {
             console.warn("Unexpected state:  modipress start attempt during an active modipress");
@@ -697,6 +698,7 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
         } else {
           // Probably an initial-tap or a simple-tap.
           existingPreviewHost?.cancel();
+          this.gesturePreviewHost = null;
         }
 
         if(handlers) {
