@@ -28,8 +28,7 @@ title: Keyman for iPhone and iPad 17.0 Help
 ## Ask for Help
 * [Ask other users in the SIL Keyman Community](https://community.software.sil.org/c/keyman)
 
-## Help Topics
-### [Troubleshooting](troubleshooting/)
+## [Troubleshooting](troubleshooting/)
 * [How To - Installing fonts](troubleshooting/installing-fonts)
 * [How To - Integrating Keyman for iPhone and iPad](troubleshooting/integrating)
 
