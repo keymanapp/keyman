@@ -297,6 +297,42 @@ describe('tran', function () {
         CompilerMessages.Error_InvalidQuadEscape({ cp: 295 }),
       ],
     },
+    {
+      subpath: `sections/tran/fail-missing-var-1.xml`,
+      errors: [
+        CompilerMessages.Error_MissingStringVariable({ id: "missingfrom" }),
+      ],
+    },
+    {
+      subpath: `sections/tran/fail-missing-var-2.xml`,
+      errors: [
+        CompilerMessages.Error_MissingStringVariable({ id: "missingto" }),
+      ],
+    },
+    {
+      subpath: `sections/tran/fail-missing-var-3.xml`,
+      errors: [
+        CompilerMessages.Error_MissingSetVariable({ id: "missingset" }),
+      ],
+    },
+    {
+      subpath: `sections/tran/fail-missing-var-4.xml`,
+      errors: [
+        CompilerMessages.Error_MissingSetVariable({ id: "missingset" }),
+      ],
+    },
+    {
+      subpath: `sections/tran/fail-missing-var-5.xml`,
+      errors: [
+        CompilerMessages.Error_MissingSetVariable({ id: "missingset" }),
+      ],
+    },
+    {
+      subpath: `sections/tran/fail-missing-var-6.xml`,
+      errors: [
+        CompilerMessages.Error_MissingStringVariable({ id: "missingstr" }),
+      ],
+    },
   ], tranDependencies);
 });
 

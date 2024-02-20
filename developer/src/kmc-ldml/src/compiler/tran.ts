@@ -15,19 +15,33 @@ import LKTransform = LDMLKeyboard.LKTransform;
 import LKTransforms = LDMLKeyboard.LKTransforms;
 import { verifyValidAndUnique } from "../util/util.js";
 import { CompilerMessages } from "./messages.js";
-import { MarkerTracker, MarkerUse } from "./marker-tracker.js";
+import { Substitutions, SubstitutionUse } from "./substitution-tracker.js";
 
 type TransformCompilerType = 'simple' | 'backspace';
 
 export abstract class TransformCompiler<T extends TransformCompilerType, TranBase extends Tran> extends SectionCompiler {
 
-  static validateMarkers(keyboard: LDMLKeyboard.LKKeyboard, mt : MarkerTracker): boolean {
+  static validateSubstitutions(keyboard: LDMLKeyboard.LKKeyboard, st: Substitutions): boolean {
     keyboard?.transforms?.forEach(transforms =>
       transforms.transformGroup.forEach(transformGroup => {
         transformGroup.transform?.forEach(({ to, from }) => {
-          mt.add(MarkerUse.emit, MarkerParser.allReferences(to));
-          mt.add(MarkerUse.consume, MarkerParser.allReferences(from));
-        })}));
+          st.addSetAndStringSubtitution(SubstitutionUse.consume, from);
+          st.addSetAndStringSubtitution(SubstitutionUse.emit, to);
+          const mapFrom = VariableParser.CAPTURE_SET_REFERENCE.exec(from);
+          const mapTo = VariableParser.MAPPED_SET_REFERENCE.exec(to || '');
+          if (mapFrom) {
+            // add the 'from' as a match
+            st.set.add(SubstitutionUse.consume, [mapFrom[1]]);
+          }
+          if (mapTo) {
+            // add the 'from' as a match
+            st.set.add(SubstitutionUse.emit, [mapTo[1]]);
+          }
+        });
+        transformGroup.reorder?.forEach(({ before }) => {
+          st.addStringSubstitution(SubstitutionUse.consume, before);
+        });
+      }));
     return true;
   }
 
