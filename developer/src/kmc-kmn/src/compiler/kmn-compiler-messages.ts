@@ -112,10 +112,10 @@ export class KmnCompilerMessages {
 
   static FATAL_BadCallParams                                  = SevFatal | 0x002;
   static FATAL_CannotAllocateMemory                           = SevFatal | 0x004;
-  static FATAL_InfileNotExist                                 = SevFatal | 0x005;
-  static FATAL_CannotCreateOutfile                            = SevFatal | 0x006;
+  static ERROR_InfileNotExist                                 = SevError | 0x005; // #10678: reduced from fatal to error in 17.0
+  // static ERROR_CannotCreateOutfile                            = SevError | 0x006; // #10678: reduced from fatal to error in 17.0, but unused
   static FATAL_UnableToWriteFully                             = SevFatal | 0x007;
-  static FATAL_CannotReadInfile                               = SevFatal | 0x008;
+  static ERROR_CannotReadInfile                               = SevError | 0x008; // #10678: reduced from fatal to error in 17.0
   static FATAL_SomewhereIGotItWrong                           = SevFatal | 0x009;
 
   static ERROR_InvalidToken                                   = SevError | 0x00A;
