@@ -73,6 +73,12 @@ if ! git diff --quiet; then
     builder_die "You have changed files in your git working directory. Exiting."
 fi
 
+if [[ "$(cat TIER.md)" == "beta" ]]; then
+    ISBETA=true
+else
+    ISBETA=false
+fi
+
 builder_heading "Fetching latest changes"
 git fetch -p origin
 stable_branch=$(git branch -r | grep origin/stable- | sort | tail -1)
@@ -81,10 +87,9 @@ stable_branch=${stable_branch##* }
 git checkout "${stable_branch#origin/}"
 git pull origin "${stable_branch#origin/}"
 
-if git branch -r | grep origin/beta; then
-    ISBETA=true
-else
-    ISBETA=false
+if ${ISBETA}; then
+  git checkout beta
+  git pull origin beta
 fi
 
 cd "$KEYMAN_ROOT/linux"
@@ -98,27 +103,27 @@ $NOOP dput mentors ./*.changes
 cd ..
 
 builder_heading "Updating changelog"
-# base changelog branch on remote stable branch
-git checkout -B chore/linux/changelog "$stable_branch"
+if $ISBETA; then
+    CLBRANCH=origin/beta
+else
+    CLBRANCH="${stable_branch}"
+fi
+
+# base changelog branch on remote stable/beta branch
+git checkout -B chore/linux/changelog "${CLBRANCH}"
 cp debianpackage/keyman-*/debian/changelog debian/
 git add debian/changelog
 git commit -m "chore(linux): Update debian changelog"
 if [ -n "$PUSH" ]; then
     $NOOP git push --force-with-lease origin chore/linux/changelog
-    $NOOP gh pr create --draft --base "${stable_branch#origin/}" --title "chore(linux): Update debian changelog" --body "@keymanapp-test-bot skip"
+    $NOOP gh pr create --draft --base "${CLBRANCH#origin/}" --title "chore(linux): Update debian changelog" --body "@keymanapp-test-bot skip"
 fi
 
-if $ISBETA; then
-    CLBRANCH=origin/beta
-else
-    CLBRANCH=origin/master
-fi
-
-git checkout -B chore/linux/cherry-pick/changelog ${CLBRANCH}
+git checkout -B chore/linux/cherry-pick/changelog origin/master
 git cherry-pick -x chore/linux/changelog
 if [ -n "$PUSH" ]; then
     $NOOP git push --force-with-lease origin chore/linux/cherry-pick/changelog
-    $NOOP gh pr create --draft --base ${CLBRANCH#origin/} --title "chore(linux): Update debian changelog 🍒" --body "@keymanapp-test-bot skip"
+    $NOOP gh pr create --draft --base master --title "chore(linux): Update debian changelog 🍒" --body "@keymanapp-test-bot skip"
 fi
 
 builder_heading "Finishing"
