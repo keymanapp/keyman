@@ -139,15 +139,6 @@ public:
     return this->m_sc;
   }
 
-  // _S2 TODO can go later
-  std::wstring get_m_rgss(int i,int j) {
-    return m_rgss[i][j];
-  }
-  // _S2 TODO can go later
-  bool get_m_rgfDeadkey(int i,int j) {
-    return m_rgfDeadKey[i][j];
-  }
-
   std::wstring KMX_GetShiftState(ShiftState shiftState, bool capsLock) {
     return this->m_rgss[(UINT)shiftState][(capsLock ? 1 : 0)];
   }
@@ -340,6 +331,7 @@ int i4 = this->KMX_IsXxxxGrCapsEqualToXxxxShift() ? 8 : 0;*/
             if(st[ich] < 0x20 || st[ich] == 0x7F) { isvalid=false; break; }
           }
           if(isvalid) {
+            // _S2 DIFFERENCE TO MCOMPILE WINDOWS
             // this is different to mcompile windows !!!!
             // this->m_sc    stores SC-US = SCUnderlying
             // this->m_vk    stores VK-US ( not underlying !!)
@@ -392,6 +384,7 @@ public:
     return (Get_XxxxVk() == 0 ? ShftMenuCtrl : ShftXxxx);
   }
 
+  // _S2 ToDo Do we need one/none?
   bool KMX_IsControlChar(wchar_t ch) {
     return (ch < 0x0020) || (ch >= 0x007F && ch <= 0x009F);
   }
@@ -431,11 +424,13 @@ bool KMX_ImportRules(LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, GdkKeymap **keymap,
   // flag that the VK is valid, and it can store the SC value.
 
   for(UINT sc = 0x01; sc <= 0x7f; sc++) {
+    // _S2 DIFFERENCE TO MCOMPILE WINDOWS
     // fills m_vk with the VK of the US keyboard
     // ( mcompile win uses MapVirtualKeyEx() to fill m_vk with the VK of the Underlying keyboard)
-    // Linux cant get a VK for the US Keyboard using USVirtualKeyToScanCode/ScanCodeToUSVirtualKey
+    // Linux can get a VK for the US Keyboard using USVirtualKeyToScanCode/ScanCodeToUSVirtualKey
     // Linux cannot get a VK for the underling Keyboard
-    // this "connection" is possible only while using All_Vector
+    // this "connection" is possible only when using All_Vector
+
     KMX_VirtualKey *key = new KMX_VirtualKey(sc, hkl);
 
    if((key->VK() != 0) ) {
@@ -488,14 +483,14 @@ bool KMX_ImportRules(LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, GdkKeymap **keymap,
 
         for(ShiftState ss = Base; ss <= loader.KMX_MaxShiftState(); ss = (ShiftState)((int)ss + 1)) {
           if(ss == Menu || ss == ShftMenu) {
-            // Alt and Shift+Alt don't work, so skip them 4+5
+            // Alt and Shift+Alt don't work, so skip them (ss 4+5)
             continue;
           }
 
           //_S2 TODO to compare win-lin kmn-files skip ss6+7; MUST BE removed later!!!!
-         /*if(ss == MenuCtrl|| ss == ShftMenuCtrl) {
+         if(ss == MenuCtrl|| ss == ShftMenuCtrl) {
             continue;
-          }*/
+          }
 
           KMX_DWORD KC_US = (KMX_DWORD) KMX_get_KeyCodeUnderlying_From_VKUS(iKey);
 

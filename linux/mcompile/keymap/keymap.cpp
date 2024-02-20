@@ -82,6 +82,16 @@ KMX_DWORD convertNamesTo_DWORD_Value(std::wstring tok_wstr) {
 }
 
 int createOneVectorFromBothKeyboards(v_dw_3D &All_Vector,GdkKeymap *keymap) {
+  // create a 3D-Vector which contains data of the US keyboard and the underlying Keyboard:
+  //    All_Vector[  US_Keyboard ]
+  //                     [KeyCode_US        ]
+  //                     [Keyval unshifted  ]
+  //                     [Keyval shifted    ]
+  //               [Underlying Kbd]
+  //                     [KeyCode_underlying]
+  //                     [Keyval unshifted  ]
+  //                     [Keyval shifted    ]
+
   std::string US_language    = "us";
   const char* text_us        = "xkb_symbols \"basic\"";
   //const char* text_us        = "xkb_symbols \"intl\"";

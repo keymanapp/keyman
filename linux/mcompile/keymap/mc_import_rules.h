@@ -11,6 +11,7 @@ private:
 
 public:
   DeadKey(KMX_WCHAR deadCharacter) ;
+
   KMX_WCHAR KMX_DeadCharacter() ;
 
   void KMX_AddDeadKeyRow(KMX_WCHAR baseCharacter, KMX_WCHAR combinedCharacter) ;

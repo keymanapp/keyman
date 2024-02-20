@@ -24,8 +24,6 @@
 #include "deadkey.h"
 #include "mc_kmxfile.h"
 
-void KMX_LogError(PWCHAR fmt, ...) ;
-
 struct KMX_DeadkeyMapping {   // I4353
   KMX_WCHAR deadkey, dkid;
   UINT shift;
@@ -39,5 +37,7 @@ int run(int argc, std::vector<std::u16string>  str_argv, char* argv[]);
 PKMX_WCHAR KMX_incxstr(PKMX_WCHAR p);
 
 int KMX_GetDeadkeys(v_dw_2D & dk_Table, KMX_WORD DeadKey, KMX_WORD *OutputPairs, GdkKeymap* keymap);
+
+void KMX_LogError(PWCHAR fmt, ...) ;
 
 #endif /*MCOMPILE_H*/

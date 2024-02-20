@@ -71,7 +71,6 @@ int run(int argc, std::vector<std::u16string> str_argv, char* argv_ch[] = NULL){
         L"       positional one based on the Linux keyboard\n"
         L"       layout on top position\n"
         L"       (-d   convert deadkeys to plain keys) not available yet \n\n"
-
         );   // I4552
 
     return 1;
@@ -133,9 +132,6 @@ int run(int argc, std::vector<std::u16string> str_argv, char* argv_ch[] = NULL){
   //DeleteReallocatedPointers(kmxfile); :TODO   // _S2 not my ToDo :-)
 
   delete kmxfile;
-
-  wprintf(L"\nmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm end\n");
-  wprintf(L"\n");
   return 0;
 }
 
@@ -147,7 +143,6 @@ const UINT VKShiftState[] = {0, K_SHIFTFLAG, LCTRLFLAG|RALTFLAG, K_SHIFTFLAG|LCT
 //
 // For each key rule on the keyboard, remap its key to the
 // correct shift state and key.  Adjust the LCTRL+RALT -> RALT if necessary
-// _S2 INFO exchange key->Key with the new value ( use vk instead of ch)
 //
 void KMX_TranslateKey(LPKMX_KEY key, KMX_WORD vk, UINT shift, KMX_WCHAR ch) {
   // The weird LCTRL+RALT is Windows' way of mapping the AltGr key.
@@ -214,7 +209,6 @@ void KMX_TranslateDeadkeyKey(LPKMX_KEY key, KMX_WCHAR deadkey, KMX_WORD vk, UINT
 // _S2 INFO this produces  a different output due to different layouts for Lin<-> win ( for the same language!!)
 
    if((key->ShiftFlags == 0 || key->ShiftFlags & VIRTUALCHARKEY) && key->Key == ch) {
-
     // The weird LCTRL+RALT is Windows' way of mapping the AltGr key.
     // We store that as just RALT, and use the option "Simulate RAlt with Ctrl+Alt"
     // to provide an alternate..
@@ -433,6 +427,7 @@ KMX_BOOL KMX_DoConvert(LPKMX_KEYBOARD kbd, KMX_BOOL bDeadkeyConversion, gint arg
 
     // Loop through each possible key on the keyboard
     for (int i = 0;KMX_VKMap[i]; i++) { // I4651
+
       // _S2 DIFFERENT TO MCOMPILE WINDOWS
       // win goes via VK, Lin goes via SC/Keycode
       UINT scUnderlying =  KMX_get_KeyCodeUnderlying_From_VKUS(KMX_VKMap[i]);
@@ -448,17 +443,14 @@ KMX_BOOL KMX_DoConvert(LPKMX_KEYBOARD kbd, KMX_BOOL bDeadkeyConversion, gint arg
 
       switch(ch) {
         case 0x0000: break;
-        case 0xFFFF:          // _S2 INFO in kbd (=loaded from kmx-file): replace  LCTRL+RALT -> Ctrl+Alt + write  deadkey-> FFFF + CODE_DEADKEY + deadkey into context
-              KMX_ConvertDeadkey(kbd, KMX_VKMap[i], VKShiftState[j], DeadKey, All_Vector, keymap , dk_Table); break;
-        default:     // _S2 INFO in kbd (=loaded from kmx-file):  replace  LCTRL+RALT -> Ctrl+Alt + switch keyvalues e.g. y<->z
-              KMX_TranslateKeyboard(kbd, KMX_VKMap[i], VKShiftState[j], ch);
+        case 0xFFFF: KMX_ConvertDeadkey(kbd, KMX_VKMap[i], VKShiftState[j], DeadKey, All_Vector, keymap , dk_Table); break;
+        default: KMX_TranslateKeyboard(kbd, KMX_VKMap[i], VKShiftState[j], ch);
       }
     }
   }
 
   KMX_ReportUnconvertedKeyboardRules(kbd);
 
-  // _S2 INFO use translated kbd and write data to rgkey[] then add things to rgkey[] to enable to write to kmx-format
   if(!KMX_ImportRules(kbd, All_Vector, &keymap, &KMX_FDeadkeys, bDeadkeyConversion)) {   // I4353   // I4552
     return FALSE;
   }

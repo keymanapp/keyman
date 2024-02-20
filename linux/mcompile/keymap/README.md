@@ -10,12 +10,9 @@ _S2 TODO QUESTION check if US basic is the right Keyboard to compare with
 _S2 TODO check if I can use files from some other keyman path instead of a copy here ( e.g. filesystem.h exists elsewhere); where can I use incxstr from
 _S2 TODO Do I need HKL for Linux / can I just use a void* or remove HKL ??,  typeddef of KMX_HKL - can I delete all m_hkl from classes?
 _S2 TODO Check/find use of wchar_t/wstring and replace with char16_t/u16string
-_S2 TODO TODO keymap* or keymap** everywhere?
 _S2 TODO check call by reference/value
 _S2 TODO replace GDK
 _S2 TODO what is wrong with kp->dpBitmapOffset/BitmapSize ?
-_S2 TODO do I use all var in a function or are there unsused var?
-_S2 TODO explain fields of aldead and All_Vector somewher
 _s2 INFO idee spanish keyboard has dk on altgr !!
 
 _S2 ...
