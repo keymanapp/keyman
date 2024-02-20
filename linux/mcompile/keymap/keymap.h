@@ -529,7 +529,7 @@ KMX_DWORD KMX_get_KeyCodeUnderlying_From_KeyCodeUS(GdkKeymap *keymap, v_dw_3D &A
 UINT KMX_get_KeyCodeUnderlying_From_VKUS(KMX_DWORD VirtualKeyUS);
 
 // return the VirtualKey of the US Keyboard for a given Keyode using GDK
-KMX_DWORD KMX_get_VKUS_From_KeyCodeUnderlying( GdkKeymap *keymap, KMX_DWORD keycode);
+KMX_DWORD KMX_get_VKUS_From_KeyCodeUnderlying(KMX_DWORD keycode);
 
 // convert codePoint to wstring
 std::wstring CodePointToWString(unsigned int codepoint);

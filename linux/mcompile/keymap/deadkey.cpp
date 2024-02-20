@@ -32,6 +32,7 @@ bool find_dk_combinations_for_specific_dk(v_dw_2D * p_dk_ComposeTable, v_dw_2D  
 std::vector<DeadKey*> create_alDead() {
 	std::vector<DeadKey*> alDead;
 	v_dw_2D dk_ComposeTable;
+
   create_DKTable(dk_ComposeTable);
 
 	for( int i=0; i < (int) dk_ComposeTable.size()-1; i++) {

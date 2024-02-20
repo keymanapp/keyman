@@ -270,7 +270,7 @@ void KMX_AddDeadkeyRule(LPKMX_KEYBOARD kbd, KMX_WCHAR deadkey, KMX_WORD vk, UINT
       memcpy(keys+1, kbd->dpGroupArray[i].dpKeyArray, kbd->dpGroupArray[i].cxKeyArray * sizeof(KMX_KEY));
       keys[0].dpContext = new KMX_WCHAR[1];
       keys[0].dpContext[0] = 0;
-      keys[0].dpOutput = new KMX_WCHAR[4]; // UC_SENTINEL, CODE_DEADKEY, deadkey_value, 0
+      keys[0].dpOutput = new KMX_WCHAR[4];
       keys[0].dpOutput[0] = UC_SENTINEL;
       keys[0].dpOutput[1] = CODE_DEADKEY;
       keys[0].dpOutput[2] = deadkey; // TODO: translate to unique index
@@ -368,6 +368,7 @@ void KMX_ConvertDeadkey(LPKMX_KEYBOARD kbd, KMX_WORD vk_US, UINT shift, KMX_WCHA
   KMX_AddDeadkeyRule(kbd, dkid, vk_US, shift);
 
   KMX_GetDeadkeys(dk_Table, deadkey, pdk = deadkeys, keymap);  // returns array of [usvk, ch_out] pairs
+
   while(*pdk) {
     // Look up the ch
     UINT KeyValUnderlying = KMX_get_KeyValUnderlying_From_KeyValUS(All_Vector, *pdk);

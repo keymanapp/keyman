@@ -14,7 +14,8 @@ _S2 TODO TODO keymap* or keymap** everywhere?
 _S2 TODO check call by reference/value
 _S2 TODO replace GDK
 _S2 TODO what is wrong with kp->dpBitmapOffset/BitmapSize ?
-
+_S2 TODO do I use all var in a function or are there unsused var?
+_S2 TODO explain fields of aldead and All_Vector somewher
 _s2 INFO idee spanish keyboard has dk on altgr !!
 
 _S2 ...

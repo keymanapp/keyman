@@ -62,7 +62,7 @@ bool DeadKey::KMX_ContainsBaseCharacter(KMX_WCHAR baseCharacter) {
   return false;
 }
 
-int KMX_ToUnicodeEx(guint keycode, const BYTE *lpKeyState, PKMX_WCHAR pwszBuff, int shift_state_pos, int caps,GdkKeymap *keymap) {
+int KMX_ToUnicodeEx(guint keycode, PKMX_WCHAR pwszBuff, int shift_state_pos, int caps,GdkKeymap *keymap) {
   GdkKeymapKey *maps;
   guint *keyvals;
   gint count;
@@ -76,10 +76,10 @@ int KMX_ToUnicodeEx(guint keycode, const BYTE *lpKeyState, PKMX_WCHAR pwszBuff, 
   if (!(keycode <= keycode_max))
     return 0;
 
-  std::wstring str = convert_DeadkeyValues_ToWstr(KMX_get_KeyVal_From_KeyCode(keymap, keycode, ShiftState(shift_state_pos), caps));
+  KMX_DWORD KeyVal= (KMX_DWORD) KMX_get_KeyVal_From_KeyCode(keymap, keycode, ShiftState(shift_state_pos), caps);
+  std::wstring str = convert_DeadkeyValues_ToWstr(KeyVal);
   pwszBuff[0]= * (PKMX_WCHAR)  u16string_from_wstring(str).c_str();
 
-  KMX_DWORD KeyVal= (KMX_DWORD) KMX_get_KeyVal_From_KeyCode(keymap, keycode, ShiftState(shift_state_pos), caps);
 
   g_free(keyvals);
   g_free(maps);
@@ -117,15 +117,15 @@ private:
 
 public:
 
-  KMX_VirtualKey(KMX_HKL hkl,UINT virtualKey, GdkKeymap **keymap) {
+  KMX_VirtualKey(KMX_HKL hkl,UINT virtualKey) {
     this->m_sc = KMX_get_KeyCodeUnderlying_From_VKUS(virtualKey);
     this->m_hkl = hkl;
     this->m_vk = virtualKey;
     memset(this->m_rgfDeadKey,0,sizeof(this->m_rgfDeadKey));
   }
 
-  KMX_VirtualKey(UINT scanCode, KMX_HKL hkl, GdkKeymap **keymap) {
-    this->m_vk = KMX_get_VKUS_From_KeyCodeUnderlying(*keymap, scanCode);
+  KMX_VirtualKey(UINT scanCode, KMX_HKL hkl) {
+    this->m_vk = KMX_get_VKUS_From_KeyCodeUnderlying(scanCode);
     this->m_hkl = hkl;
     this->m_sc = scanCode;
     memset(this->m_rgfDeadKey,0,sizeof(this->m_rgfDeadKey));
@@ -347,7 +347,7 @@ int i4 = this->KMX_IsXxxxGrCapsEqualToXxxxShift() ? 8 : 0;*/
             // key->dpOutput stores character Underlying
 
             KMX_DWORD SC_Underlying = KMX_get_KeyCodeUnderlying_From_KeyCodeUS(keymap, All_Vector, this->SC(), (ShiftState) ss, caps);
-            key->Key = KMX_get_VKUS_From_KeyCodeUnderlying( keymap, SC_Underlying);
+            key->Key = KMX_get_VKUS_From_KeyCodeUnderlying( SC_Underlying);
 
             key->Line = 0;
             key->ShiftFlags = this->KMX_GetShiftStateValue(capslock, caps, (ShiftState) ss);
@@ -392,6 +392,7 @@ public:
     return (Get_XxxxVk() == 0 ? ShftMenuCtrl : ShftXxxx);
   }
 
+// _S2 ToDo needed??? - no?
   void KMX_FillKeyState(KMX_BYTE *lpKeyState, ShiftState ss, bool fCapsLock) {
     lpKeyState[VK_SHIFT] = (((ss & Shft) != 0) ? 0x80 : 0x00);
     lpKeyState[VK_CONTROL] = (((ss & Ctrl) != 0) ? 0x80 : 0x00);
@@ -447,7 +448,7 @@ bool KMX_ImportRules(LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, GdkKeymap **keymap,
     // Linux cant get a VK for the US Keyboard using USVirtualKeyToScanCode/ScanCodeToUSVirtualKey
     // Linux cannot get a VK for the underling Keyboard
     // this "connection" is possible only while using All_Vector
-    KMX_VirtualKey *key = new KMX_VirtualKey(sc, hkl, keymap);
+    KMX_VirtualKey *key = new KMX_VirtualKey(sc, hkl);
 
    if((key->VK() != 0) ) {
         rgKey[key->VK()] = key;
@@ -457,12 +458,12 @@ bool KMX_ImportRules(LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, GdkKeymap **keymap,
   }
 
   for(UINT ke = VK_NUMPAD0; ke <= VK_NUMPAD9; ke++) {
-      rgKey[ke] = new KMX_VirtualKey(hkl, ke, keymap);
+      rgKey[ke] = new KMX_VirtualKey(hkl, ke);
   }
 
-  rgKey[VK_DIVIDE] = new KMX_VirtualKey(hkl, VK_DIVIDE, keymap);
-  rgKey[VK_CANCEL] = new KMX_VirtualKey(hkl, VK_CANCEL, keymap);
-  rgKey[VK_DECIMAL] = new KMX_VirtualKey(hkl, VK_DECIMAL, keymap);
+  rgKey[VK_DIVIDE] = new KMX_VirtualKey(hkl, VK_DIVIDE);
+  rgKey[VK_CANCEL] = new KMX_VirtualKey(hkl, VK_CANCEL);
+  rgKey[VK_DECIMAL] = new KMX_VirtualKey(hkl, VK_DECIMAL);
 
   /*
   // _S2 DESIGN NEEDED do we need special shift state now or later?
@@ -499,7 +500,7 @@ bool KMX_ImportRules(LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, GdkKeymap **keymap,
 
         for(ShiftState ss = Base; ss <= loader.KMX_MaxShiftState(); ss = (ShiftState)((int)ss + 1)) {
           if(ss == Menu || ss == ShftMenu) {
-            // Alt and Shift+Alt don't work, so skip them
+            // Alt and Shift+Alt don't work, so skip them 4+5
             continue;
           }
 
@@ -510,11 +511,9 @@ bool KMX_ImportRules(LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, GdkKeymap **keymap,
 
           KMX_DWORD KC_US = (KMX_DWORD) KMX_get_KeyCodeUnderlying_From_VKUS(iKey);
 
-
-          // _S2 TODO not finished; Ctrl, Shft +40 not tested
           for(int caps = 0; caps <= 1; caps++) {
             loader.KMX_FillKeyState(lpKeyState, ss, (caps == 0));
-            int rc = KMX_ToUnicodeEx(KC_US, lpKeyState, sbBuffer, ss, caps, *keymap);
+            int rc = KMX_ToUnicodeEx(KC_US, sbBuffer, ss, caps, *keymap);
 
             if(rc > 0) {
               if(*sbBuffer == 0) {
@@ -522,24 +521,6 @@ bool KMX_ImportRules(LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, GdkKeymap **keymap,
                 rgKey[iKey]->KMX_SetShiftState(ss, L"", false, (caps));
               }
               else {
-                if((rc == 1) &&
-                  (ss == Ctrl || ss == ShftCtrl) &&
-                  (rgKey[iKey]->VK() == ((UINT)sbBuffer[0] + 0x40))) {
-                      //  is this the same behavior on Linux?
-                      // if rc ==1 : it got 1  char && +40 in Buffer CTRl pressed
-                      // && CTRl +0x40 in the buffer ( which indicates a ctrl press)
-
-                      // It's dealing with control characters. If ToUnicodeEx gets
-                      // VK_A with the Ctrl key pressed, it will write 0x01 to sBuffer[0],
-                      // without Ctrl it's 0x41. The if detects this case.
-
-                      // ToUnicodeEx has an internal knowledge about those
-                      // VK_A ~ VK_Z keys to produce the control characters,
-                      // when the conversion rule is not provided in keyboard
-                      // layout files
-
-                      continue;
-                  }
                 if( (ss == Ctrl || ss == ShftCtrl) ) {
                 continue;
               }
