@@ -1,5 +1,20 @@
 # Keyman Version History
 
+## 17.0.272 beta 2024-02-20
+
+* fix(core): fix output append logic in any_group::apply_transform (#10758)
+* fix(android): Match phone suggestion banner styling on tablet (#10760)
+* docs(mac): Document What's New for version 17.0 (#10764)
+*  (#10773)
+* chore(developer): reduce WARN_TouchLayoutUsesUnsupportedGesturesDownlevel to HINT (#10766)
+* fix(developer): prevent renaming of new project types in New Project dialog (#10767)
+* fix(developer): return an error code if build-test-data fails (#10765)
+* fix(developer): allow more parameters in kmc.cmd (#10759)
+* chore(linux): Ignore missing .symbols file in stable branch (#10674)
+* chore(linux): Update symbols file with current version (#10575)
+* docs(linux): Update screenshots and FAQ (#10768)
+* chore(linux): Fix `debian.sh` by removing quotes (#10772)
+
 ## 17.0.271 beta 2024-02-19
 
 * chore(developer): add infrastructure messages tests (#10756)
