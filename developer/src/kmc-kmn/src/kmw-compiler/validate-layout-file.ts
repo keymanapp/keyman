@@ -241,7 +241,7 @@ export function ValidateLayoutFile(fk: KMX.KEYBOARD, FDebug: boolean, sLayoutFil
   const warnGesturesIfNeeded = function(keyId: string) {
     if(!hasWarnedOfGestureUseDownlevel && !IsKeyboardVersion17OrLater()) {
       hasWarnedOfGestureUseDownlevel = true;
-      callbacks.reportMessage(KmwCompilerMessages.Warn_TouchLayoutUsesUnsupportedGesturesDownlevel({keyId}));
+      callbacks.reportMessage(KmwCompilerMessages.Hint_TouchLayoutUsesUnsupportedGesturesDownlevel({keyId}));
     }
   }
 
