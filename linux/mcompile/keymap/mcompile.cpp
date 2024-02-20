@@ -222,13 +222,10 @@ void KMX_TranslateDeadkeyKey(LPKMX_KEY key, KMX_WCHAR deadkey, KMX_WORD vk, UINT
       shift &= ~LCTRLFLAG;
 
     if(key->ShiftFlags == 0) {
-      // _S2 TODO enable logError
-      //LogError("Converted mnemonic rule on line %d, + '%c' TO dk(%d) + [%x K_%d]", key->Line, key->Key, deadkey, shift, vk);
-      //wprintf(L"DK Converted mnemonic rule on line %d, + '%c' TO dk(%d) + [%x K_%d], %i(%c)\n", key->Line, key->Key, deadkey, shift, vk, ch, ch);
+      //KMX_LogError(L"Converted mnemonic rule on line %d, + '%c' TO dk(%d) + [%x K_%d]", key->Line, key->Key, deadkey, shift, vk);
       key->ShiftFlags = ISVIRTUALKEY | shift;
     } else {
-      //LogError("Converted mnemonic virtual char key rule on line %d, + [%x '%c'] TO dk(%d) + [%x K_%d]", key->Line, key->ShiftFlags, key->Key, deadkey, key->ShiftFlags & ~VIRTUALCHARKEY, vk);
-      //wprintf(L"DK Converted mnemonic virtual char key rule on line %d, + [%x '%c'] TO dk(%d) + [%x K_%d], %i(%c)\n", key->Line, key->ShiftFlags, key->Key, deadkey, key->ShiftFlags & ~VIRTUALCHARKEY, vk, ch, ch);
+      //KMX_LogError(L"Converted mnemonic virtual char key rule on line %d, + [%x '%c'] TO dk(%d) + [%x K_%d]", key->Line, key->ShiftFlags, key->Key, deadkey, key->ShiftFlags & ~VIRTUALCHARKEY, vk);
       key->ShiftFlags &= ~VIRTUALCHARKEY;
     }
 
@@ -265,8 +262,6 @@ void KMX_AddDeadkeyRule(LPKMX_KEYBOARD kbd, KMX_WCHAR deadkey, KMX_WORD vk, UINT
   // to provide an alternate..
   if((shift & (LCTRLFLAG|RALTFLAG)) == (LCTRLFLAG|RALTFLAG)) // I4549
     shift &= ~LCTRLFLAG;
-    // _s2 INFO idee spanish keyboard has dk on altgr !!
-
   // If the first group is not a matching-keys group, then we need to add into
   // each subgroup, otherwise just the match group
   for(unsigned int i = 0; i < kbd->cxGroupArray; i++) {
@@ -285,9 +280,7 @@ void KMX_AddDeadkeyRule(LPKMX_KEYBOARD kbd, KMX_WCHAR deadkey, KMX_WORD vk, UINT
       keys[0].ShiftFlags = shift | ISVIRTUALKEY;
       kbd->dpGroupArray[i].dpKeyArray = keys;
       kbd->dpGroupArray[i].cxKeyArray++;
-      //LogError("Add deadkey rule:  + [%d K_%d] > dk(%d)", shift, vk, deadkey);
-      wprintf(L"Add deadkey rule:  + [%d K_%d] > dk(%d)  \n", shift, vk, deadkey);
-
+      KMX_LogError(L"Add deadkey rule:  + [%d K_%d] > dk(%d)", shift, vk, deadkey);
       if(i == kbd->StartGroup[1]) break;  // If this is the initial group, that's all we need to do.
     }
   }

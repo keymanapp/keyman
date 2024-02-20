@@ -20,10 +20,10 @@ std::vector<DeadKey*> create_alDead();
 void refine_alDead(KMX_WCHAR dk, std::vector<DeadKey*> &myVec, std::vector<DeadKey*> *p_All_Vec);
 bool found_dk_inVector(KMX_WCHAR dk, std::vector<DeadKey*> &myVec);
 
-// finds all combination for a specific deadkey(dk) ^-> â,ê,î,ô,û,...
+// find all combination for a specific deadkey(dk) ^-> â,ê,î,ô,û,...
 bool find_dk_combinations_for_specific_dk(v_dw_2D * dk_ComposeTable, v_dw_2D & dk_SingleTable, KMX_DWORD dk);
 
-// gets the shifted character of a key and writes shiftstate of KValto shift
+// get the shifted character of a key and write shiftstate of KVal to shift
 KMX_DWORD KMX_changeKeynameToCapital(KMX_DWORD KVal, KMX_DWORD &shift, GdkKeymap* keymap);
 
 // _S2 TODO probably not used

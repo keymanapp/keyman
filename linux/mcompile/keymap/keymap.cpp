@@ -588,7 +588,7 @@ KMX_DWORD KMX_get_VKUS_From_KeyCodeUnderlying_GDK( GdkKeymap *keymap, KMX_DWORD 
 
   return 0;
 }
-//_S2 TODO condense these 2 fun to one
+
 KMX_DWORD KMX_get_KeyCodeUnderlying_From_KeycodeUS_GDK(GdkKeymap *keymap, v_dw_3D &All_Vector, KMX_DWORD KC_US, ShiftState ss, int caps) {
 
   KMX_DWORD Character;
@@ -607,18 +607,20 @@ KMX_DWORD KMX_get_KeyCodeUnderlying_From_KeycodeUS_GDK(GdkKeymap *keymap, v_dw_3
   return KC_US;
 }
 
-KMX_WCHAR KMX_get_KValUnderlying_From_KValUS_VEC(v_dw_3D & All_Vector, KMX_DWORD VK_underlying) {
-  KMX_DWORD VK_US;
+
+KMX_WCHAR KMX_get_KValUnderlying_From_KValUS_VEC(v_dw_3D & All_Vector, KMX_DWORD VK_US) {
+  KMX_DWORD VK_underlying;
   for( int i=0; i< (int)All_Vector[0].size()-1 ;i++) {
     for( int j=1; j< (int)All_Vector[0][0].size();j++) {
-      if ( ( All_Vector[0][i][j] == VK_underlying ) ) {
-        VK_US = All_Vector[1][i][j];
-        return VK_US;
+      if ( ( All_Vector[0][i][j] == VK_US ) ) {
+        VK_underlying = All_Vector[1][i][j];
+        return VK_underlying;
       }
     }
   }
-  return VK_underlying;
+  return VK_US;
 }
+
 
 UINT  KMX_get_KeyCodeUnderlying_From_VKUS(KMX_DWORD VirtualKeyUS) {
   return (8 + USVirtualKeyToScanCode[VirtualKeyUS]);

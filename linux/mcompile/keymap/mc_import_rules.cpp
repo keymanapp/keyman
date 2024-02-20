@@ -346,9 +346,7 @@ int i4 = this->KMX_IsXxxxGrCapsEqualToXxxxShift() ? 8 : 0;*/
             // key->Key      stores VK-US ( not underlying !!)
             // key->dpOutput stores character Underlying
 
-            // _S2 ToDo which one ??? is different if a char is on different keys- then it may find the wrong key.
-            //KMX_DWORD SC_Underlying = KMX_get_KeyCodeUnderlying_From_KeycodeUS_GDK(keymap, All_Vector, this->SC(), (ShiftState) ss, caps);
-            KMX_DWORD SC_Underlying = this->SC();
+            KMX_DWORD SC_Underlying = KMX_get_KeyCodeUnderlying_From_KeycodeUS_GDK(keymap, All_Vector, this->SC(), (ShiftState) ss, caps);
             key->Key = KMX_get_VKUS_From_KeyCodeUnderlying_GDK( keymap, SC_Underlying);
 
             key->Line = 0;
@@ -412,13 +410,6 @@ public:
     return (ch < 0x0020) || (ch >= 0x007F && ch <= 0x009F);
   }
 
-  // _S2 TODO Do we need this?
-  void KMX_ClearKeyboardBuffer() {
-    KMX_WCHAR sb[16];
-    for( int i=0; i<16; i++) {
-      sb[i] = L'\0';
-    }
-  }
 };
 
 int KMX_GetMaxDeadkeyIndex(KMX_WCHAR *p) {
@@ -522,14 +513,12 @@ bool KMX_ImportRules(LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, GdkKeymap **keymap,
 
           // _S2 TODO not finished; Ctrl, Shft +40 not tested
           for(int caps = 0; caps <= 1; caps++) {
-            // _S2 TODO Do we need this?
-            //loader.KMX_ClearKeyboardBuffer();
             loader.KMX_FillKeyState(lpKeyState, ss, (caps == 0));
             int rc = KMX_ToUnicodeEx(KC_US, lpKeyState, sbBuffer, ss, caps, *keymap);
 
             if(rc > 0) {
               if(*sbBuffer == 0) {
-                //rgKey[iKey]->KMX_SetShiftState(ss, L"", false, (caps == 0)); // _S2
+                //rgKey[iKey]->KMX_SetShiftState(ss, L"", false, (caps == 0)); // _S2 INFO
                 rgKey[iKey]->KMX_SetShiftState(ss, L"", false, (caps));
               }
               else {
@@ -563,10 +552,6 @@ bool KMX_ImportRules(LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, GdkKeymap **keymap,
             sbBuffer[2] = 0;
             //rgKey[iKey]->SetShiftState(ss, sbBuffer, true, (caps == 0));
             rgKey[iKey]->KMX_SetShiftState(ss, sbBuffer, true, (caps ));   //_S2 INFO
-
-            // It's a dead key; let's flush out whats stored in the keyboard state.
-            // _S2 TODO Do we need this?
-            //loader.KMX_ClearKeyboardBuffer();
 
             // _S2 DIFFERENCE TO MCOMPILE WINDOWS
             refine_alDead(sbBuffer[0], alDead, &alDead_cpl);
