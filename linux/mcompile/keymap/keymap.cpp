@@ -514,56 +514,38 @@ KMX_DWORD KMX_get_KeyValUnderlying_From_KeyCodeUnderlying(GdkKeymap *keymap, gui
 
   return KVal;
 }
-// _S2 ToDo combine those??
+
 KMX_DWORD KMX_get_KeyValUnderlying_From_KeyCodeUnderlying(GdkKeymap *keymap, UINT VKShiftState, UINT KC_underlying, PKMX_WCHAR DeadKey) {
 
-  PKMX_WCHAR dky;
-  KMX_DWORD KeyVal = KMX_get_KeyValUnderlying_DK_From_KeyCodeUnderlying(keymap, KC_underlying, map_VKShiftState_to_LinModifier(VKShiftState), dky);
-
-  if(KeyVal >=  deadkey_min) {                                                                    // deadkey
-    *DeadKey = *dky;
-    return 0xFFFF;
-  }
-  else if((KeyVal >  deadkey_max) || ((KeyVal <  deadkey_min)  &&  ( KeyVal > 0xFF)))             // out of range
-    return 0xFFFE;
-  else                                                                                            // usable char
-    return KeyVal;
-}
-
-KMX_DWORD KMX_get_KeyValUnderlying_DK_From_KeyCodeUnderlying(GdkKeymap *keymap, guint keycode, int shift_state_pos, PKMX_WCHAR &dky) {
   GdkKeymapKey *maps;
   guint *keyvals;
   gint count;
   KMX_DWORD deadkey=0;
+  PKMX_WCHAR dky=NULL;
 
 
-  if (!gdk_keymap_get_entries_for_keycode(keymap, keycode, &maps, &keyvals, &count))
+  if (!gdk_keymap_get_entries_for_keycode(keymap, KC_underlying, &maps, &keyvals, &count))
     return 0;
-  // _S2 INFO maybe later use something like
-  //if(!gdk_wayland_keymap_get_entries_for_keycode(keymap, keycode, &maps, &keyvals, &count))
-  //  return 0;    https://codebrowser.dev/gtk/gtk/gdk/wayland/gdkkeys-wayland.c.html
 
-  if (!(shift_state_pos <= count))
+  if (!(map_VKShiftState_to_LinModifier(VKShiftState) <= count))
   return 0;
 
-  if (!(keycode <= keycode_max))
+  if (!(KC_underlying <= keycode_max))
     return 0;
 
-  KMX_DWORD KeyV =  KMX_get_KeyVal_From_KeyCode(keymap, keycode, ShiftState(shift_state_pos), 0);
-
-  if(( (KeyV >= deadkey_min) && (KeyV <= deadkey_max)))
-    deadkey = KeyV;
-
-  dky = (PKMX_WCHAR) (convert_DeadkeyValues_To_U16str((int) deadkey)).c_str();
+  KMX_DWORD KeyV = KMX_get_KeyVal_From_KeyCode(keymap, KC_underlying, ShiftState(map_VKShiftState_to_LinModifier(VKShiftState)), 0);
 
   g_free(keyvals);
   g_free(maps);
 
-  if((KeyV >=  deadkey_min) && (KeyV <=  deadkey_max))                                    // deadkeys
+  if ((KeyV >= deadkey_min) && (KeyV <= deadkey_max) ){                                     // deadkey
+    dky = (PKMX_WCHAR) (convert_DeadkeyValues_To_U16str((int) KeyV)).c_str();
+    *DeadKey = *dky;
     return 0xFFFF;
-  else if((KeyV >  deadkey_max) || ((KeyV <  deadkey_min)  &&  ( KeyV > 0xFF)))           // out of range
+  }
+  else if((KeyV >  deadkey_max) || ((KeyV <  deadkey_min)  &&  ( KeyV > 0xFF)))             // out of range
     return 0xFFFE;
-  else                                                                                    // usable char
+  else                                                                                      // usable char
     return KeyV;
 }
 

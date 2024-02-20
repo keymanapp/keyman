@@ -67,8 +67,8 @@ typedef std::vector<std::vector<std::vector<KMX_DWORD> > > v_dw_3D;
 static KMX_DWORD returnIfCharInvalid = 0;
 static KMX_DWORD keycode_max = 94;
 static KMX_DWORD deadkey_min = 0xfe50;
-static KMX_DWORD deadkey_max = 0xfe93;
-//static KMX_DWORD deadkey_max = 0xfe52;  // _S2 TODO This has to go! my test: to only return 3 dk
+//static KMX_DWORD deadkey_max = 0xfe93;
+static KMX_DWORD deadkey_max = 0xfe52;  // _S2 TODO This has to go! my test: to only return 3 dk
 
 int map_VKShiftState_to_LinModifier(int VKShiftState);
 
@@ -515,9 +515,6 @@ KMX_DWORD KMX_get_KeyValUnderlying_From_KeyCodeUnderlying(GdkKeymap *keymap, gui
 
 // fill Deadkey with dk and return CATEGORY
 KMX_DWORD KMX_get_KeyValUnderlying_From_KeyCodeUnderlying(GdkKeymap *keymap, UINT VKShiftState, UINT KC_underlying, PKMX_WCHAR DeadKey);
-
-// use KMX_get_KeyVal_From_KeyCode and return CATEGORY off keyval and prevent use of certain keycodes
-KMX_DWORD KMX_get_KeyValUnderlying_DK_From_KeyCodeUnderlying(GdkKeymap *keymap, guint keycode, int shift_state_pos, PKMX_WCHAR &dky);
 
 // use Vector to return the Keyval of underlying Keyboard
 KMX_WCHAR KMX_get_KeyValUnderlying_From_KeyValUS(v_dw_3D &All_Vector,KMX_DWORD VK_underlying);
