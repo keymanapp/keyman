@@ -2,7 +2,7 @@
 title: Using a Keyboard - Keyman for iPhone and iPad Help
 ---
 
-Keyman keyboards are accessed by pressing the globe key whenever an iOS app presents the system keyboard. The follow screenshot shows the Keyman EuroLatin keyboard displayed with Apple's Calendar app.
+Keyman keyboards are accessed by pressing the globe key whenever an iOS app presents the system keyboard. The following screenshot shows the Keyman EuroLatin keyboard displayed with Apple's Calendar app.
 
 ![](../ios_images/system-keyboard-cal.png)
 
@@ -20,7 +20,7 @@ The Gestures:
 
 ![](../ios_images/key-submenu.png)
 
-* **Flick:** hold and slide in various directions on a key to reach alternate outputs. The key will animate to show you the expected output. A common flick is to slide down to reach numerals on the top row of the keyboard.
+* **Flick:** hold and slide in various directions on a key to reach alternate outputs. The key will animate to show you the expected output. For example, a keyboard could support sliding down on keys in the top row to output numerals.
 
 * **Multitap:** some keys produce alternate outputs with rapid, repeated taps. For example, tapping rapidly twice on <kbd>shift</kbd> will activate <kbd>caps lock</kbd> on many keyboards.
 
