@@ -28,5 +28,40 @@
       <keystroke key="6" />
       <check result="6:map_var:OK" />
     </test>
+    <test name="key-7">
+      <keystroke key="7" />
+      <check result="7:simple_uset:OK" />
+    </test>
+    <test name="key-shift-7">
+      <keystroke key="shift-7" />
+      <check result="7:simple_uset:FAIL" />
+    </test>
+    <test name="key-8">
+      <startContext to="ABC" />
+      <keystroke key="8" />
+      <check result="8:ctxt:OK" />
+    </test>
+    <test name="key-8-fail">
+      <startContext to="" /> <!-- w/o context -->
+      <keystroke key="8" />
+      <check result="8:ctxt:FAIL"/>
+    </test>
+    <test name="key-8-osage">
+      <startContext to="𐓏" />
+      <keystroke key="8" />
+      <check result="8:ctxt:OK" />
+    </test>
+    <test name="key-8-osage2">
+      <startContext to="𐒻" />
+      <keystroke key="shift-8" />
+      <keystroke key="8" />
+      <check result="8:ctxt:OK" />
+    </test>
+    <test name="key-9">
+      <startContext to="" />
+      <keystroke key="9" />
+      <keystroke key="shift-9" />
+      <check result="9:split_marker:OK" />
+    </test>
   </tests>
 </keyboardTest3>
