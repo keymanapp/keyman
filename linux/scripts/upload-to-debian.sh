@@ -81,15 +81,15 @@ fi
 
 builder_heading "Fetching latest changes"
 git fetch -p origin
-stable_branch=$(git branch -r | grep origin/stable- | sort | tail -1)
-stable_branch=${stable_branch##* }
-# Checkout stable branch so that `scripts/debian.sh` picks up correct version
-git checkout "${stable_branch#origin/}"
-git pull origin "${stable_branch#origin/}"
-
 if ${ISBETA}; then
   git checkout beta
   git pull origin beta
+else
+  stable_branch=$(git branch -r | grep origin/stable- | sort | tail -1)
+  stable_branch=${stable_branch##* }
+  # Checkout stable branch so that `scripts/debian.sh` picks up correct version
+  git checkout "${stable_branch#origin/}"
+  git pull origin "${stable_branch#origin/}"
 fi
 
 cd "$KEYMAN_ROOT/linux"
@@ -103,7 +103,7 @@ $NOOP dput mentors ./*.changes
 cd ..
 
 builder_heading "Updating changelog"
-if $ISBETA; then
+if ${ISBETA}; then
     CLBRANCH=origin/beta
 else
     CLBRANCH="${stable_branch}"
