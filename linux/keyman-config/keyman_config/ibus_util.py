@@ -1,5 +1,6 @@
 #!/usr/bin/python3
 
+from enum import Enum
 import getpass
 import logging
 import os
@@ -14,6 +15,16 @@ from gi.repository import IBus
 
 from keyman_config.gnome_keyboards_util import is_gnome_shell
 from keyman_config.gsettings import GSettings
+
+
+class IbusDaemon(Enum):
+    """
+    States of the ibus-daemon
+    """
+    RUNNING = 0,        'ibus-daemon is running'
+    NOT_RUNNING = 1,    'ibus-daemon is not running'
+    MORE_THAN_ONE = 2,  'Error: more than one instance of ibus-daemon is running'
+    ERROR = 3,          'Error: invalid/unknown user or exception'
 
 
 class IbusUtil():
@@ -82,12 +93,22 @@ def restart_ibus_subp():
 
 
 def verify_ibus_daemon(start):
+    """
+    Verify if ibus-daemon is running and optionally start it.
+
+    Args:
+        start (bool): True to start ibus-daemon if it is not running, otherwise False
+
+    Returns:
+        One of the IbusDaemon values
+    """
     realuser = os.environ.get('SUDO_USER')
     user = realuser or getpass.getuser()
+    retval = IbusDaemon.RUNNING
 
     if not user:
         logging.debug('SUDO_USER not set and getpass.getuser() returned None. Skipping ibus-daemon check.')
-        return
+        return IbusDaemon.ERROR
 
     try:
         ps = subprocess.run(('ps', '--user', user, '-o', 's=', '-o', 'cmd'), stdout=subprocess.PIPE).stdout
@@ -95,9 +116,15 @@ def verify_ibus_daemon(start):
         if len(ibus_daemons) <= 0:
             if start:
                 _start_ibus_daemon(realuser)
+                # give ibus a chance to start
+                time.sleep(1)  # 1s
+                retval = verify_ibus_daemon(False)
+            else:
+                retval = IbusDaemon.NOT_RUNNING
         elif len(ibus_daemons) > 1:
             logging.error('More than one ibus-daemon instance running! Keyman keyboards might not work as expected. '
                           'Please reboot your machine.')
+            retval = IbusDaemon.MORE_THAN_ONE
         else:
             logging.debug('ibus already running')
     except subprocess.CalledProcessError as e:
@@ -105,6 +132,10 @@ def verify_ibus_daemon(start):
         logging.critical('getting ibus-daemon failed (%s: %s)', type(e), e.args)
         if start:
             _start_ibus_daemon(realuser)
+            return verify_ibus_daemon(False)
+        retval = IbusDaemon.ERROR
+
+    return retval
 
 
 def _start_ibus_daemon(realuser):
