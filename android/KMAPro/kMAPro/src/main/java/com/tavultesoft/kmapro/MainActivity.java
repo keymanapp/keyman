@@ -111,8 +111,6 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
   private final int maxTextSize = 72;
   private int textSize = minTextSize;
   private int lastOrientation = Configuration.ORIENTATION_UNDEFINED;
-  private static final String defaultKeyboardInstalled = "DefaultKeyboardInstalled";
-  private static final String defaultDictionaryInstalled = "DefaultDictionaryInstalled";
   private static final String userTextKey = "UserText";
   private static final String userTextSizeKey = "UserTextSize";
   private Toolbar toolbar;
@@ -147,43 +145,9 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
     KMManager.initialize(getApplicationContext(), KeyboardType.KEYBOARD_TYPE_INAPP);
     KMManager.executeResourceUpdate(this);
 
+    DefaultLanguageResource.install(context);
+
     SharedPreferences prefs = getSharedPreferences(getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
-    // Add default keyboard
-    boolean installDefaultKeyboard = prefs.getBoolean(defaultKeyboardInstalled, false);
-    if (!installDefaultKeyboard) {
-      if (!KMManager.keyboardExists(context, KMManager.KMDefault_PackageID, KMManager.KMDefault_KeyboardID,
-          KMManager.KMDefault_LanguageID)) {
-        KMManager.addKeyboard(this, KMManager.getDefaultKeyboard(getApplicationContext()));
-      }
-      SharedPreferences.Editor editor = prefs.edit();
-      editor.putBoolean(defaultKeyboardInstalled, true);
-      editor.commit();
-    }
-
-    // Add default dictionary
-    boolean installDefaultDictionary = prefs.getBoolean(defaultDictionaryInstalled, false);
-    if (!installDefaultDictionary) {
-      LexicalModel defaultLexicalModel = LexicalModel.getDefaultLexicalModel(context);
-      HashMap<String, String> lexicalModelInfo = new HashMap<String, String>();
-      lexicalModelInfo.put(KMManager.KMKey_PackageID, defaultLexicalModel.getPackageID());
-      lexicalModelInfo.put(KMManager.KMKey_LanguageID, defaultLexicalModel.getLanguageID());
-      lexicalModelInfo.put(KMManager.KMKey_LanguageName, defaultLexicalModel.getLanguageName());
-      lexicalModelInfo.put(KMManager.KMKey_LexicalModelID, defaultLexicalModel.getLexicalModelID());
-      lexicalModelInfo.put(KMManager.KMKey_LexicalModelName, defaultLexicalModel.getLexicalModelName());
-      lexicalModelInfo.put(KMManager.KMKey_LexicalModelVersion, defaultLexicalModel.getVersion());
-      /*
-      // If welcome.htm exists, add custom help link
-      welcomeFile = new File(KMManager.getLexicalModelsDir(), KMManager.KMDefault_DictionaryPackageID + File.separator + FileUtils.WELCOME_HTM);
-      lexicalModelInfo.put(KMManager.KMKey_CustomHelpLink, welcomeFile.getPath());
-       */
-      KMManager.addLexicalModel(context, lexicalModelInfo);
-      KMManager.registerAssociatedLexicalModel(KMManager.KMDefault_LanguageID);
-
-      SharedPreferences.Editor editor = prefs.edit();
-      editor.putBoolean(defaultDictionaryInstalled, true);
-      editor.commit();
-    }
-
     KMManager.SpacebarText spacebarText = KMManager.SpacebarText.fromString(prefs.getString(KeymanSettingsActivity.spacebarTextKey, KMManager.SpacebarText.LANGUAGE_KEYBOARD.toString()));
     KMManager.setSpacebarText(spacebarText);
 
