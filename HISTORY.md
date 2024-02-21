@@ -1,5 +1,14 @@
 # Keyman Version History
 
+## 17.0.273 beta 2024-02-21
+
+* fix(developer): match kmc console formatting for messages in IDE (#10775)
+* fix(developer): ensure fatal errors report message or made non-fatal (#10777)
+* chore(developer): add LDML specific text to Project view (#10779)
+* fix(developer): reset debugger after ldml keyboard compile (#10780)
+* fix(developer): crash opening invalid project (#10781)
+* docs(ios): document gestures (#10763)
+
 ## 17.0.272 beta 2024-02-20
 
 * fix(core): fix output append logic in any_group::apply_transform (#10758)
