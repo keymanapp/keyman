@@ -139,7 +139,7 @@ export class NodeCompilerCallbacks implements CompilerCallbacks {
     if(CompilerError.severity(event.code) == CompilerErrorSeverity.Fatal) {
       // this is async so returns a Promise, we'll let it resolve in its own
       // time, and it will emit a message to stderr with details at that time
-      KeymanSentry.reportException(event.exceptionVar, false);
+      KeymanSentry.reportException(event.exceptionVar ?? event.message, false);
     }
 
     if(disable || CompilerError.severity(event.code) < compilerLogLevelToSeverity[this.options.logLevel]) {
