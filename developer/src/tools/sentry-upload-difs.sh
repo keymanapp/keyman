@@ -73,6 +73,7 @@ echo "Uploading symbols for developer/"
 
 for sourcemap_path in "${sourcemap_paths[@]}"; do
   ./src/kmc/node_modules/.bin/sentry-cli sourcemaps upload \
+    --no-dedupe \
     --org keyman \
     --project keyman-developer \
     --release "$VERSION_GIT_TAG"  \
