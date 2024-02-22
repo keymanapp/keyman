@@ -7,7 +7,7 @@ Uploaders:
  Eberhard Beilharz <eb1@sil.org>,
 Build-Depends:
  bash-completion,
- debhelper (>= 11),
+ debhelper-compat (= 12),
  dh-python,
  gir1.2-webkit2-4.1 | gir1.2-webkit2-4.0,
  ibus,
@@ -40,9 +40,9 @@ Build-Depends:
  xvfb,
  metacity,
  gawk,
-Standards-Version: 4.6.1
-Vcs-Git: https://github.com/keymanapp/keyman.git -b stable-16.0 [linux/debian]
-Vcs-Browser: https://github.com/keymanapp/keyman/tree/stable-16.0/linux/debian
+Standards-Version: 4.6.2
+Vcs-Git: https://github.com/keymanapp/keyman.git -b beta [linux/debian]
+Vcs-Browser: https://github.com/keymanapp/keyman/tree/beta/linux/debian
 Homepage: https://www.keyman.com
 Rules-Requires-Root: binary-targets
 
