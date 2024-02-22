@@ -78,7 +78,6 @@ upload_sourcemap() {
     --org keyman \
     --project keyman-developer \
     --release "$VERSION_GIT_TAG"  \
-    --dist "$VERSION_ENVIRONMENT" \
     --ext js --ext mjs --ext ts --ext map \
     "$smpath"
 }
