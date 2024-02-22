@@ -1632,6 +1632,12 @@ public final class KMManager {
     return KeyboardPickerActivity.removeKeyboard(context, position);
   }
 
+  public static boolean isDefaultKey(String key) {
+    return (
+      key != null && 
+      key.equals(KMString.format("%s_%s", KMDefault_LanguageID, KMDefault_KeyboardID)));
+  }
+
   /**
    * Some apps have the user select which keyboard to add. To ensure there's always a fallback
    * system keyboard when the keyboard list is empty, use this method.
@@ -2171,13 +2177,13 @@ public final class KMManager {
   public static Keyboard getCurrentKeyboardInfo(Context context) {
     int index = getCurrentKeyboardIndex(context);
     if(index < 0) {
-      // As of 15.0-beta and 15.0-stable, this only appears to occur when
-      // #6703 would trigger.  This logging may help us better identify the
-      // root cause.
+      // index can be undefined if user installs Keyman (without launching it)
+      // and then enables Keyaman as a system keyboard from the Android settings menus.
+      // We'll only log if key isn't for fallback keyboard
       String key = KMKeyboard.currentKeyboard();
-      // Even if it's null, it's still a notable error.  This function shouldn't
-      // be reachable in execution (15.0) at a time this variable would be set to `null`.
-      KMLog.LogError(TAG, "Failed getCurrentKeyboardIndex check for keyboard: " + key);
+      if (!isDefaultKey(key)) {
+        KMLog.LogError(TAG, "Failed getCurrentKeyboardIndex check for keyboard: " + key);
+      }
       return null;
     }
     return KeyboardController.getInstance().getKeyboardInfo(index);
