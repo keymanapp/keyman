@@ -71,13 +71,24 @@ echo "Uploading symbols for developer/"
   --no-zips \
   src/
 
-for sourcemap_path in "${sourcemap_paths[@]}"; do
-  ./src/kmc/node_modules/.bin/sentry-cli sourcemaps upload \
+upload_sourcemap() {
+  local smpath="$1"
+  "$KEYMAN_ROOT/developer/src/kmc/node_modules/.bin/sentry-cli" sourcemaps upload \
     --no-dedupe \
     --org keyman \
     --project keyman-developer \
     --release "$VERSION_GIT_TAG"  \
     --dist "$VERSION_ENVIRONMENT" \
     --ext js --ext mjs --ext ts --ext map \
-    "$sourcemap_path"
+    "$smpath"
+}
+
+# Separate sourcemap upload for KeymanWeb to avoid pathing
+cd "$KEYMAN_ROOT/developer/bin/server/build/src/site/resource"
+upload_sourcemap .
+cd "$KEYMAN_ROOT/developer"
+
+# Upload all other sourcemaps
+for sourcemap_path in "${sourcemap_paths[@]}"; do
+  upload_sourcemap "$sourcemap_path"
 done
