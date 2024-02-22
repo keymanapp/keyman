@@ -36,6 +36,10 @@ fi
 
 dependencies_action() {
   sudo mk-build-deps --install --tool='apt-get -o Debug::pkgProblemResolver=yes --no-install-recommends --yes' debian/control
+  # Additionally we need quilt to be able to create the source package.
+  # Since this is not needed to build the binary package, it is not
+  # (and should not be) included in `build-depends` in `debian/control`.
+  sudo DEBIAN_FRONTEND=noninteractive apt-get -q -y install quilt
 }
 
 source_action() {
