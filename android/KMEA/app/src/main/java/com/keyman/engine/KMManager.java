@@ -1635,8 +1635,7 @@ public final class KMManager {
   public static boolean isDefaultKey(String key) {
     return (
       key != null && 
-      key.equals(KMString.format("%s_%s", KMDefault_LanguageID, KMDefault_KeyboardID)
-    );
+      key.equals(KMString.format("%s_%s", KMDefault_LanguageID, KMDefault_KeyboardID)));
   }
 
   /**
