@@ -1,5 +1,16 @@
 # Keyman Version History
 
+## 17.0.274 beta 2024-02-22
+
+* fix(android/engine): Remove logs for uninitialized default keyboard (#10782)
+* refactor(android/app): Allow SystemKeyboard to install default keyboard and dictionary (#10794)
+* chore(android/app): Remove logging for install referrer details (#10795)
+* docs(android/app): Update tablet screenshots (again) (#10796)
+* docs(android): Update screenshots for help (#10808)
+* chore(web): proper reporting of errors from es5 KMW (#10807)
+* fix(android): first keystroke when context is empty (#10809)
+* chore(linux): Update Debian `control` file (#10787)
+
 ## 17.0.273 beta 2024-02-21
 
 * fix(developer): match kmc console formatting for messages in IDE (#10775)
