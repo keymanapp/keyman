@@ -1633,10 +1633,10 @@ public final class KMManager {
   }
 
   public static boolean isDefaultKey(String key) {
-    if (key != null && key.equals(KMString.format("%s_%s", KMDefault_LanguageID, KMDefault_KeyboardID))) {
-      return true;
-    }
-    return false;
+    return (
+      key != null && 
+      key.equals(KMString.format("%s_%s", KMDefault_LanguageID, KMDefault_KeyboardID)
+    );
   }
 
   /**
