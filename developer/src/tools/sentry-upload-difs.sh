@@ -84,7 +84,7 @@ upload_sourcemap() {
 }
 
 # Separate sourcemap upload for KeymanWeb to avoid pathing
-cd "$KEYMAN_ROOT/developer/bin/server/build/src/site/resource"
+cd "$KEYMAN_ROOT/developer/bin/server/build/src/site"
 upload_sourcemap .
 cd "$KEYMAN_ROOT/developer"
 
