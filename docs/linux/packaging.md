@@ -112,8 +112,9 @@ You'll have to create the docker image.
   cd $KEYMAN_ROOT
   DIST=jammy
   docker run -v $(pwd):/source -i -t -w /source --platform=amd64 \
-    --env INPUT_DIST=$DIST --env INPUT_SOURCEPACKAGE=$(ls keyman_*.dsc) \
-    --env INPUT_SOURCE_DIR=. sillsdev/$DIST
+    --env INPUT_DIST=$DIST --env INPUT_SOURCE_DIR=. \
+    --env INPUT_SOURCEPACKAGE=$(ls keyman_*.dsc | sort | tail -1) \
+    sillsdev/$DIST
   ```
 
   This will create the binary packages in `$KEYMAN_ROOT/artifacts`.
