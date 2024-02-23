@@ -205,6 +205,24 @@ describe('InfrastructureMessages', function () {
     await unitTestEndpoints.build(filename, null, ncb, {compilerWarningsAsErrors: true});
     assertMessagesEqual(ncb.messages, expectedMessages);
   });
+
+  // HINT_ProjectIsVersion10
+
+  it('should generate HINT_ProjectIsVersion10 if a project file is not version 2.0', async function() {
+    const ncb = new NodeCompilerCallbacks({logLevel: 'silent'});
+    const filename = makePathToFixture('kpj-1.0', 'hint_project_is_version_10.kpj');
+    const expectedMessages = [
+      InfrastructureMessages.INFO_BuildingFile,
+      InfrastructureMessages.HINT_ProjectIsVersion10,
+      InfrastructureMessages.INFO_BuildingFile, //kmn
+      InfrastructureMessages.INFO_FileBuiltSuccessfully,
+      InfrastructureMessages.INFO_BuildingFile, //kps
+      InfrastructureMessages.INFO_FileBuiltSuccessfully,
+      InfrastructureMessages.INFO_ProjectBuiltSuccessfully
+    ];
+    await unitTestEndpoints.build(filename, null, ncb, {});
+    assertMessagesEqual(ncb.messages, expectedMessages);
+  });
 });
 
 function assertMessagesEqual(actualMessages: CompilerEvent[], expectedMessages: number[]) {
