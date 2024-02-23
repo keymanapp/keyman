@@ -1,5 +1,17 @@
 # Keyman Version History
 
+## 17.0.275 beta 2024-02-23
+
+*  (#10791)
+* fix(developer): publish keymancore-1.dll symbols (#10797)
+* fix(developer): improve uploading of sourcemaps to sentry (#10798)
+* fix(android/engine): Fix how keyboard picker menu exits (#10806)
+* chore(linux): Fix `upload-to-debian.sh` script for beta releases (#10784)
+* chore(linux): Fix API verification after adding SONAME (#10813)
+* chore(linux): Address comments from Debian mailing list (#10800)
+* docs(linux): Update how to build binary package with docker (#10814)
+* chore(linux): Update debian changelog (#10785)
+
 ## 17.0.274 beta 2024-02-22
 
 * fix(android/engine): Remove logs for uninitialized default keyboard (#10782)
