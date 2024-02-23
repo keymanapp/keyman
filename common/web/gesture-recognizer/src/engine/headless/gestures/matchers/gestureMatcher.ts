@@ -454,9 +454,14 @@ export class GestureMatcher<Type, StateToken = any> implements PredecessorMatch<
       }
     }
 
-    contactModel.update();
-    // Now that we've done the initial-state check, we can check for instantly-matching path models.
+    // Now that we've done the initial-state check, we can check for instantly-matching and
+    // instantly-rejecting path models.
+    let result = contactModel.update();
+    if(result?.type == 'reject') {
+      this.finalize(false, 'cancelled');
+    }
 
+    // If there's nothing instant, then we set up listeners to help trigger future resolution.
     contactModel.promise.then((resolution) => {
       this.finalize(resolution.type == 'resolve', resolution.cause);
     });

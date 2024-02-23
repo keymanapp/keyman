@@ -1,4 +1,4 @@
-var _debug = 0;
+var _debug = true;
 
 // Android harness attachment
 if(window.parent && window.parent.jsInterface && !window.jsInterface) {
@@ -237,7 +237,7 @@ function updateKMText(text) {
 
   console_debug('updateKMText(text='+text+') context.value='+keyman.context.getText());
 
-  if(text != keyman.context.getText()) {
+  if(!text || text != keyman.context.getText()) {
     keyman.context.setText(text);
     keyman.resetContext();
   }

@@ -6,6 +6,7 @@ import { GestureSource, GestureSourceSubview } from "../../gestureSource.js";
 import { GestureMatcher, MatchResult, PredecessorMatch } from "./gestureMatcher.js";
 import { GestureModel } from "../specs/gestureModel.js";
 import { GestureSequence } from "./index.js";
+import { GesturePath } from "../../gesturePath.js";
 
 interface GestureSourceTracker<Type, StateToken> {
   /**
@@ -15,6 +16,11 @@ interface GestureSourceTracker<Type, StateToken> {
    */
   source: GestureSource<Type>;
   matchPromise: ManagedPromise<MatcherSelection<Type, StateToken>>;
+  /**
+   * Set to true during the timeout period needed to complete existing trackers & initialize new ones.
+   * Once that process is complete, set to false.
+   */
+  preserve: boolean;
 }
 
 export interface MatcherSelection<Type, StateToken = any> {
@@ -120,6 +126,7 @@ export class MatcherSelector<Type, StateToken = any> extends EventEmitter<EventM
     // Now we can actually trigger proper cancellation - both for the model-match attempts
     // and for the `matchGesture` call that referenced the cancelled model-match attempts.
     sourcesToCancel.forEach((sourceTracker) => {
+      console.debug('cascade termination');
       sourceTracker.matchPromise.resolve({
         matcher: null,
         result: {
@@ -203,7 +210,10 @@ export class MatcherSelector<Type, StateToken = any> extends EventEmitter<EventM
      */
     const sourceNotYetStaged = source instanceof GestureSource;
 
-    const determinePredecessorSources = (source: PredecessorMatch<Type, StateToken>) => {
+    // Sadly, TS type inference failed on the return type.
+    const determinePredecessorSources: (
+      source: PredecessorMatch<Type, StateToken>
+    ) => GestureSource<Type, any, GesturePath<Type, any>>[] = (source: PredecessorMatch<Type, StateToken>) => {
       const directSources = (source.sources as GestureSourceSubview<Type>[]).map((source => source.baseSource));
 
       if(directSources && directSources.length > 0) {
@@ -219,16 +229,28 @@ export class MatcherSelector<Type, StateToken = any> extends EventEmitter<EventM
       ? [source instanceof GestureSourceSubview ? source.baseSource : source]
       : determinePredecessorSources(source);
 
+    console.debug(`matchGesture for sources ${sources.map((src) => src.identifier)}, keys ${sources.map((src) => src.baseItem?.['keyId'])} against models ${gestureModelSet.map((entry) => entry.id)}`);
+
     // Defining these as locals helps the TS type-checker better infer types within
     // this method; a later assignment to `source` will remove its ability to infer
     // `source`'s type at this point.
     const unmatchedSource = sourceNotYetStaged ? source : null;
     const priorMatcher = sourceNotYetStaged ? null: source;
 
-    if(this.pendingMatchSetup) {
+    if(this.pendingMatchSetup && sourceNotYetStaged) {
+      const lockPromise = this.pendingMatchSetup;
+      const nextLock = new ManagedPromise<void>();
+      const nextLockPromise = nextLock.corePromise;
+      this.pendingMatchSetup = nextLockPromise;
       // If a prior call is still waiting on the `await` below, wait for it to clear
       // entirely before proceeding; there could be effects for how the next part below is processed.
-      await this.pendingMatchSetup;
+      console.debug(`awaiting pendingMatchSetup for sources ${sources.map((src) => src.identifier)}, keys ${sources.map((src) => src.baseItem?.['keyId'])} against models ${gestureModelSet.map((entry) => entry.id)}`);
+      await lockPromise;
+      nextLock.resolve();
+      console.debug(`awaited pendingMatchSetup for sources ${sources.map((src) => src.identifier)}, keys ${sources.map((src) => src.baseItem?.['keyId'])} against models ${gestureModelSet.map((entry) => entry.id)}`);
+      if(this.pendingMatchSetup == nextLockPromise) {
+        this.pendingMatchSetup = null;
+      }
     }
 
     if(sourceNotYetStaged) {
@@ -257,7 +279,8 @@ export class MatcherSelector<Type, StateToken = any> extends EventEmitter<EventM
       // Promises only resolve once, after all - once called, a "selection" has been made.
       const sourceSelectors: GestureSourceTracker<Type, StateToken> = {
         source: src,
-        matchPromise: matchPromise
+        matchPromise: matchPromise,
+        preserve: true
       };
       this._sourceSelector.push(sourceSelectors);
 
@@ -304,12 +327,22 @@ export class MatcherSelector<Type, StateToken = any> extends EventEmitter<EventM
          */
 
         const pendingMatchGesture = new ManagedPromise<void>();
-        this.pendingMatchSetup = pendingMatchGesture.corePromise;
+        const lockPromise = pendingMatchGesture.corePromise;
+        this.pendingMatchSetup = lockPromise;
         await timedPromise(0);
+        console.log(`selector timedPromise(0) #1 complete: incoming source ${source.rawIdentifier}/${source.baseItem?.['keyId']}`);
+
+        // -------------------
+        // Waaaaaait.  Are we sure this isn't getting triggered earlier than intended?
+
         // A second one, in case of a deferred modipress completion (via awaitNested)
         // (which itself needs a macroqueue wait)
         await timedPromise(0);
-        this.pendingMatchSetup = null;
+        console.log(`selector timedPromise(0) #2 complete: incoming source ${source.rawIdentifier}/${source.baseItem?.['keyId']}`);
+
+        if(this.pendingMatchSetup == lockPromise) {
+          this.pendingMatchSetup = null;
+        }
         pendingMatchGesture.resolve();
 
         // stateToken may have shifted by the time we regain control here.
@@ -341,6 +374,7 @@ export class MatcherSelector<Type, StateToken = any> extends EventEmitter<EventM
         // If the incoming Source triggered a match AND is included in the model,
         // do not build new independent models for it.
         if(newlyMatched && newlyMatched.allSourceIds.includes(source.identifier)) {
+          console.debug('selection blocked due to merger with pre-existing gesture');
           matchPromise.resolve({
             matcher: null,
             result: {
@@ -359,9 +393,14 @@ export class MatcherSelector<Type, StateToken = any> extends EventEmitter<EventM
       }
     }
 
+    sourceTrackers.forEach((tracker) => {
+      tracker.preserve = false;
+    });
+
     // If in a sustain mode, no models for new sources may launch;
     // only existing sequences are allowed to continue.
     if(this.sustainMode && unmatchedSource) {
+      console.debug('sustain mode - matching blocked');
       matchPromise.resolve({
         matcher: null,
         result: {
@@ -394,6 +433,7 @@ export class MatcherSelector<Type, StateToken = any> extends EventEmitter<EventM
     if(newMatchers.length > 0) {
       this.potentialMatchers = this.potentialMatchers.concat(newMatchers);
     } else {
+      console.debug('no more matchers');
       matchPromise.resolve({
         matcher: null,
         result: {
@@ -461,6 +501,7 @@ export class MatcherSelector<Type, StateToken = any> extends EventEmitter<EventM
   }
 
   public dropSourcesWithIds(idsToClean: string[]) {
+    console.log(`dropSourcesWithIds - dropping ids: ${idsToClean}`);
     for(const id of idsToClean) {
       const index = this._sourceSelector.findIndex((entry) => entry.source.identifier == id);
       if(index > -1) {
@@ -491,6 +532,13 @@ export class MatcherSelector<Type, StateToken = any> extends EventEmitter<EventM
     // Returns a closure-captured Promise-resolution handler used by individual GestureMatchers managed
     // by this class instance.
     return async (result: MatchResult<Type>) => {
+      console.debug(`matcherSelection - ${matcher.model.id} with result ${result.matched}, action ${JSON.stringify(result.action, (key, value) => {
+        if(key == 'item') {
+          return value?.['keyId'];
+        } else {
+          return value;
+        }
+      })}`);
       // Note:  is only called by GestureMatcher Promises that are resolving.
 
       // Do not bypass match handling just because a synchronization promise is fulfilled.
@@ -498,6 +546,7 @@ export class MatcherSelector<Type, StateToken = any> extends EventEmitter<EventM
       // need to perform internal state cleanup.
 
       if(matcher.isCancelled) {
+        console.debug('marking as cancelled');
         result = {
           matched: false,
           action: {
@@ -614,6 +663,14 @@ export class MatcherSelector<Type, StateToken = any> extends EventEmitter<EventM
 
           // And now for one line with some "heavy lifting":
 
+          console.debug(`selected - ${matcher.model.id} with result ${result.matched}, action ${JSON.stringify(result.action, (key, value) => {
+            if(key == 'item') {
+              return value?.['keyId'];
+            } else {
+              return value;
+            }
+          })}`);
+
           /*
            * Fulfills the contract set by `matchGesture`.
            */
@@ -653,7 +710,8 @@ export class MatcherSelector<Type, StateToken = any> extends EventEmitter<EventM
     // If we just rejected the last possible matcher for a tracked gesture-source...
     // then, for each such affected source...
     for(const stat of remainingMatcherStats) {
-      if(stat.pendingCount == 0) {
+      console.debug(`finalizeMatcherlessTrackers - no more left for source ${stat.tracker.source.identifier}, base item ${stat.tracker.source.baseItem?.['keyId']}`);
+      if(stat.pendingCount == 0 && !stat.tracker.preserve) {
         // ... report the failure and signal to close-out that source / stop tracking it.
         stat.tracker.matchPromise.resolve({
           matcher: null,

@@ -47,11 +47,13 @@ export default class KeymanEngine<
 
   private keyEventListener: KeyEventHandler = (event, callback) => {
     const outputTarget = this.contextManager.activeTarget;
+    console.debug(`keyEventListener: Lcode = ${event.Lcode}, keyID: ${event.kName}, layer: ${event.kLayer}`);
 
     if(!this.contextManager.activeKeyboard || !outputTarget) {
       if(callback) {
         callback(null, null);
       }
+      console.debug(`keyEventListener: early return 1`);
       return;
     }
 
@@ -76,10 +78,17 @@ export default class KeymanEngine<
         this.core.keyboardProcessor.layerId = oskLayer;
       }
     }
+
+    console.debug(`keyEventListener: processKeyEvent`);
     const result = this.core.processKeyEvent(event, outputTarget);
+    console.debug(`keyEventListener: back from key event`);
+
 
     if(result && result.transcription?.transform) {
+      console.debug('rule finalization');
       this.config.onRuleFinalization(result, this.contextManager.activeTarget);
+    } else {
+      console.debug('no rule finalization');
     }
 
     if(callback) {

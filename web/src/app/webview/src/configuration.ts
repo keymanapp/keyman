@@ -22,6 +22,7 @@ export class WebviewConfiguration extends EngineConfiguration {
         deleteRight: dr
       });
 
+      console.debug('pending insert');
       Promise.resolve().then((this.pushInserts));
     }
 
@@ -29,6 +30,7 @@ export class WebviewConfiguration extends EngineConfiguration {
   }
 
   private readonly pushInserts = () => {
+    console.debug(`concatenating inserts: length ${this.pendingInserts.length}`);
     const finalTransform = this.pendingInserts.reduce((concatenated, current) => {
       return buildMergedTransform(concatenated, current);
     }, {

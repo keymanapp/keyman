@@ -106,7 +106,9 @@ export class GesturePath<Type, StateToken = any> extends EventEmitter<EventMap<T
   extend(sample: InputSample<Type, StateToken>) {
     /* c8 ignore next 3 */
     if(this._isComplete) {
-      throw new Error("Invalid state:  this GesturePath has already terminated.");
+      return;
+      console.log("Update event swallowed:  this GesturePath has already terminated.");
+      // throw new Error("Invalid state:  this GesturePath has already terminated.");
     }
 
     // The tracked path should emit InputSample events before Segment events and

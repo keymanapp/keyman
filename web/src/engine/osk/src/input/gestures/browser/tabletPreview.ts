@@ -97,6 +97,8 @@ export class TabletKeyTip implements KeyTipInterface {
       if(previewHost) {
         this.preview = this.previewHost.element;
         this.element.replaceChild(this.preview, oldHost);
+        console.log("showing key tip");
+        // console.log(`installing gesture preview ${previewHost.tempId} in phone keytip`);
         previewHost.setCancellationHandler(() => this.show(null, false, null));
         previewHost.on('startFade', () => {
           this.element.classList.remove('kmw-preview-fade');
@@ -114,6 +116,8 @@ export class TabletKeyTip implements KeyTipInterface {
       this.preview = document.createElement('div');
       this.element.replaceChild(this.preview, oldPreview);
       this.element.classList.remove('kmw-preview-fade');
+
+      console.log(`Keytip hide called`);
     }
 
     // Save the key preview state

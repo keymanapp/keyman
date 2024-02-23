@@ -8,6 +8,7 @@ import { GestureModel } from "./gestures/specs/gestureModel.js";
 import { timedPromise } from "@keymanapp/web-utils";
 import { InputSample } from "./inputSample.js";
 import { GestureDebugPath } from "./gestureDebugPath.js";
+import { InputEventEngine } from "../inputEventEngine.js";
 
 interface EventMap<HoveredItemType, StateToken> {
   /**
@@ -166,6 +167,7 @@ export class TouchpointCoordinator<HoveredItemType, StateToken=any> extends Even
   }
 
   private readonly onNewTrackedPath = async (touchpoint: GestureSource<HoveredItemType>) => {
+    console.log('onNewTrackedPath');
     this.addSimpleSourceHooks(touchpoint);
     const modelDefs = this.gestureModelDefinitions;
 
@@ -223,13 +225,35 @@ export class TouchpointCoordinator<HoveredItemType, StateToken=any> extends Even
     const selector = this.currentSelector;
 
     touchpoint.setGestureMatchInspector(this.buildGestureMatchInspector(selector));
-    this.emit('inputstart', touchpoint);
+
+    // If there's an error in code receiving this event, we must not let that break the flow of
+    // event input processing here!
+    try {
+      this.emit('inputstart', touchpoint);
+    } catch (err) {
+      console.error(err);
+    }
+
+    // In particular, things will break HORRIBLY if this code block does not get to run.
+    this.inputEngines.forEach((engine) => {
+      // It is now safe to signal further updates for this touchpoint, as we can be sure
+      // that each will be received.
+      if(engine instanceof InputEventEngine) {
+        engine.unlockTouchpoint(touchpoint);
+      }
+    });
+
+    // Touchpoint now fully started; await model-matching results.
 
     const selection = await selectionPromise;
 
     // Any related 'push' mechanics that may still be lingering are currently handled by GestureSequence
     // during its 'completion' processing.  (See `GestureSequence.selectionHandler`.)
     if(!selection || selection.result.matched == false) {
+      // the highlighted key issue is here; for whatever reason, it's not being able to match anything.
+      console.debug(`could not match a gesture model: base item ${touchpoint.baseItem?.['keyId']}`);
+      console.debug(selection);
+      console.debug(touchpoint);
       return;
     }
 
@@ -238,6 +262,7 @@ export class TouchpointCoordinator<HoveredItemType, StateToken=any> extends Even
     for(let sequence of this._activeGestures) {
       if(!!sequence.allSourceIds.find((id1) => !!sourceIDs.find((id2) => id1 == id2))) {
         // We've already established (and thus, already reported) a GestureSequence for this selection.
+        console.debug(`linked with existing gesture model`);
         return;
       }
     }

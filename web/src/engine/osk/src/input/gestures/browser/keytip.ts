@@ -213,6 +213,8 @@ export default class KeyTip implements KeyTipInterface {
         this.previewHost.on('preferredOrientation', this.reorient);
         this.preview = this.previewHost.element;
         this.tip.replaceChild(this.preview, oldHost);
+        console.log("showing keytip");
+        // console.log(`installing gesture preview ${previewHost.tempId} in phone keytip`);
         previewHost.setCancellationHandler(() => this.show(null, false, null));
         previewHost.on('startFade', () => {
           this.element.classList.remove('kmw-preview-fade');
@@ -229,6 +231,8 @@ export default class KeyTip implements KeyTipInterface {
       this.preview = document.createElement('div');
       this.tip.replaceChild(this.preview, oldPreview);
       this.element.classList.remove('kmw-preview-fade');
+
+      console.log(`Keytip hide called`);
 
       this.orientation = DEFAULT_TIP_ORIENTATION;
     }

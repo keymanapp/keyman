@@ -2,6 +2,8 @@ import { InputEngineBase } from "./headless/inputEngineBase.js";
 import { InputSample } from "./headless/inputSample.js";
 import { GestureSource } from "./headless/gestureSource.js";
 import { GestureRecognizerConfiguration } from "./index.js";
+import { ManagedPromise } from "@keymanapp/web-utils";
+import { EventSequentializationQueue } from "./eventSequentializationQueue.js";
 
 export function processSampleClientCoords<Type, StateToken>(config: GestureRecognizerConfiguration<Type>, clientX: number, clientY: number) {
   const targetRect = config.targetRoot.getBoundingClientRect();
@@ -16,6 +18,8 @@ export function processSampleClientCoords<Type, StateToken>(config: GestureRecog
 export abstract class InputEventEngine<HoveredItemType, StateToken> extends InputEngineBase<HoveredItemType, StateToken> {
   abstract registerEventHandlers(): void;
   abstract unregisterEventHandlers(): void;
+
+  protected sequentializer = new EventSequentializationQueue();
 
   protected buildSampleFor(clientX: number, clientY: number, target: EventTarget, timestamp: number, source: GestureSource<HoveredItemType, StateToken>): InputSample<HoveredItemType, StateToken> {
     const sample: InputSample<HoveredItemType, StateToken> = {
@@ -35,7 +39,11 @@ export abstract class InputEventEngine<HoveredItemType, StateToken> extends Inpu
     const touchpoint = this.createTouchpoint(identifier, isFromTouch);
     touchpoint.update(sample);
 
-    this.addTouchpoint(touchpoint);
+    console.log(`onInputStart: ${touchpoint.identifier}, original id ${identifier}, base item ${sample.item?.['keyId'] ?? 'null'}`);
+
+    // Waaaaait.  The touchpoint id map - not the ancestor touchpoint list - is enough for our needs, I think!
+    // this._pendingTouchpoints
+    // this.addTouchpoint(touchpoint); // NOT now.
 
     // External objects may desire to directly terminate handling of
     // input sequences under specific conditions.
@@ -47,30 +55,45 @@ export abstract class InputEventEngine<HoveredItemType, StateToken> extends Inpu
       this.dropTouchpoint(touchpoint);
     });
 
+    this.addTouchpoint(touchpoint);
+
     this.emit('pointstart', touchpoint);
+    console.log('pointstart: ' + touchpoint.baseItem?.['keyId']);
+
+    // Just... do this.
+    return touchpoint;
+  }
+
+  public unlockTouchpoint(touchpoint: GestureSource<HoveredItemType, StateToken>) {
   }
 
   protected onInputMove(identifier: number, sample: InputSample<HoveredItemType, StateToken>, target: EventTarget) {
     const activePoint = this.getTouchpointWithId(identifier);
+
+    console.log(`onInputMove: ${activePoint?.identifier}, original id: ${identifier}`);
     if(!activePoint) {
       return;
     }
 
-    activePoint.update(sample);
+    console.log('update: ' + activePoint.baseItem?.['keyId'])
+    activePoint.update(sample)
   }
 
   protected onInputMoveCancel(identifier: number, sample: InputSample<HoveredItemType, StateToken>, target: EventTarget) {
     const touchpoint = this.getTouchpointWithId(identifier);
+    console.log(`onInputMoveCancel: ${touchpoint?.identifier}, original id: ${identifier}`);
     if(!touchpoint) {
       return;
     }
 
     touchpoint.update(sample);
+    console.log('cancel update/terminate: ' + touchpoint.baseItem?.['keyId'])
     touchpoint.path.terminate(true);
   }
 
   protected onInputEnd(identifier: number, target: EventTarget) {
     const touchpoint = this.getTouchpointWithId(identifier);
+    console.log(`onInputEnd: ${touchpoint?.identifier}, original id: ${identifier}`);
     if(!touchpoint) {
       return;
     }
@@ -86,10 +109,12 @@ export abstract class InputEventEngine<HoveredItemType, StateToken> extends Inpu
      * need to worry about `currentHoveredItem` changing.  We're only concerned with
      * recording the _timing_ of the touchpoint's release.
      */
-    if(sample.t != lastEntry.t) {
-      touchpoint.update(sample);
-    }
 
+    if(sample.t != lastEntry.t) { // Temp trial
+      touchpoint.update(sample);
+    } // Temp trial
+
+    console.log('end update/terminate: ' + touchpoint.baseItem?.['keyId'])
     this.getTouchpointWithId(identifier)?.path.terminate(false);
   }
 }

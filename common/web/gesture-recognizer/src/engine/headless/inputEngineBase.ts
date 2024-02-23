@@ -56,6 +56,10 @@ export abstract class InputEngineBase<HoveredItemType, StateToken = any> extends
     return source;
   }
 
+  getTouchpointEventId(touchpoint: GestureSource<HoveredItemType, StateToken>) {
+    return Number.parseInt(Object.keys(this.identifierMap).find((key) => this.identifierMap[key] == touchpoint.rawIdentifier), 10);
+  }
+
   /**
    * Calls to this method will cancel any touchpoints whose internal IDs are _not_ included in the parameter.
    * Designed to facilitate recovery from error cases and peculiar states that sometimes arise when debugging.
@@ -63,6 +67,13 @@ export abstract class InputEngineBase<HoveredItemType, StateToken = any> extends
    */
   maintainTouchpointsWithIds(identifiers: number[]) {
     const identifiersToMaintain = identifiers.map((internal_id) => this.identifierMap[internal_id]);
+
+    const dropped = this._activeTouchpoints.filter((source) => !identifiersToMaintain.includes(source.rawIdentifier));
+
+    dropped.forEach((point) =>
+      console.log(`maintainTouchpointsWithIds: dropping ${point.identifier}, original id ${point.rawIdentifier}`)
+    );
+
     this._activeTouchpoints
       .filter((source) => !identifiersToMaintain.includes(source.rawIdentifier))
       // Will trigger `.dropTouchpoint` later in the event chain.
@@ -72,7 +83,7 @@ export abstract class InputEngineBase<HoveredItemType, StateToken = any> extends
   /**
    * @param identifier The identifier number corresponding to the input sequence.
    */
-  hasActiveTouchpoint(identifier: number) {
+  hasRegisteredTouchpoint(identifier: number) {
     return this.identifierMap[identifier] !== undefined;
   }
 
@@ -110,6 +121,8 @@ export abstract class InputEngineBase<HoveredItemType, StateToken = any> extends
 
   protected dropTouchpoint(point: GestureSource<HoveredItemType>) {
     const id = point.rawIdentifier;
+
+    console.log(`dropTouchpoint: ${point.identifier}, original id ${point.rawIdentifier}`);
 
     this._activeTouchpoints = this._activeTouchpoints.filter((pt) => point != pt);
     for(const key of Object.keys(this.identifierMap)) {

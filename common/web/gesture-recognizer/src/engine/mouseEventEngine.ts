@@ -94,7 +94,7 @@ export class MouseEventEngine<HoveredItemType, StateToken = any> extends InputEv
   }
 
   onMouseMove(event: MouseEvent) {
-    if(!this.hasActiveTouchpoint(this.activeIdentifier)) {
+    if(!this.hasRegisteredTouchpoint(this.activeIdentifier)) {
       return;
     }
 
@@ -119,7 +119,7 @@ export class MouseEventEngine<HoveredItemType, StateToken = any> extends InputEv
   }
 
   onMouseEnd(event: MouseEvent) {
-    if(!this.hasActiveTouchpoint(this.activeIdentifier)) {
+    if(!this.hasRegisteredTouchpoint(this.activeIdentifier)) {
       return;
     }
 

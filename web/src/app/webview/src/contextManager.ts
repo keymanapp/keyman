@@ -21,6 +21,7 @@ export class ContextHost extends Mock {
 
   updateHost(transcription?: Transcription): void {
     const savedState = this.savedState;
+    console.debug('has saved state: ' + !!savedState);
 
     if(this.savedState) {
       let transform = null;
@@ -45,10 +46,12 @@ export class ContextHost extends Mock {
     }
 
     // Save the current context state for use in future diffs.
+    console.debug('updateHost');
     this.savedState = Mock.from(this);
   }
 
   restoreTo(original: OutputTarget): void {
+    console.debug('restoreTo');
     this.savedState = Mock.from(this);
     super.restoreTo(original);
   }
@@ -77,6 +80,7 @@ export class ContextHost extends Mock {
       this.setSelection(this.text._kmwLength());
     }
 
+    console.debug('restoreTo');
     this.savedState = Mock.from(this);
 
     return shouldResetContext;
@@ -91,6 +95,7 @@ export class ContextHost extends Mock {
     // and we want a consistent interface for context synchronization between
     // host app + app/webview KMW.
     this.setSelection(this.text._kmwLength());
+    console.debug('setText');
     this.savedState = Mock.from(this);
   }
 }

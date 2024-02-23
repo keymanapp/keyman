@@ -36,6 +36,9 @@ export class GesturePreviewHost extends EventEmitter<EventMap> {
 
   private onCancel: () => void;
 
+  // private static seed = 0;
+  // public tempId: number;
+
   get element(): HTMLDivElement {
     return this.div;
   }
@@ -43,6 +46,7 @@ export class GesturePreviewHost extends EventEmitter<EventMap> {
   constructor(key: KeyElement, isPhone: boolean, width: number, height: number) {
     super();
 
+    // this.tempId = GesturePreviewHost.seed++;
     const keySpec = key.key.spec;
     const edgeLength = this.flickEdgeLength = Math.max(width, height);
 
@@ -130,6 +134,11 @@ export class GesturePreviewHost extends EventEmitter<EventMap> {
   }
 
   public cancel() {
+    // if(this.onCancel) {
+    //   // Can get a bit noisy otherwise.
+    //   console.log(`clearing gesture preview ${this.tempId}`);
+    //   console.log((new Error()).stack);
+    // }
     this.onCancel?.();
     this.onCancel = null;
   }
