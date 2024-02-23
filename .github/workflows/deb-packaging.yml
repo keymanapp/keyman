@@ -280,7 +280,9 @@ jobs:
     - name: Verify API
       run: |
         cd linux
-        PKG_NAME=libkeymancore
+        # Extract line containing "Package: libkeymancore1" and then strip "Package: "
+        PKG_NAME=$(grep -E 'Package: libkeymancore([0-9]+|$)' debian/control)
+        PKG_NAME="${PKG_NAME#Package: }"
         ./scripts/deb-packaging.sh \
           --gha \
           --bin-pkg "${GITHUB_WORKSPACE}/artifacts/${PKG_NAME}_${{ needs.sourcepackage.outputs.VERSION }}-1${{ needs.sourcepackage.outputs.PRERELEASE_TAG }}+jammy1_amd64.deb" \
