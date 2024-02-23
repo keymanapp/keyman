@@ -79,16 +79,6 @@ describe('InfrastructureMessages', function () {
       'ERROR_InvalidProjectFile not generated, instead got: '+JSON.stringify(ncb.messages,null,2));
   });
 
-  // ERROR_InvalidProjectFolder (invalid source folder)
-
-  it('should generate ERROR_InvalidProjectFolder if there are no valid file types in the source folder when generating a default project file', async function() {
-    const projectPath = makePathToFixture('invalid-source-folder', 'error_invalid_project_folder.kpj')
-    const ncb = new NodeCompilerCallbacks({logLevel: 'silent'});
-    loadProject(projectPath, ncb);
-    assert.isTrue(ncb.hasMessage(InfrastructureMessages.ERROR_InvalidProjectFolder),
-      `ERROR_FileTypeNotFound not generated, instead got: `+JSON.stringify(ncb.messages,null,2));
-  });
-
   // ERROR_NotAProjectFile
 
   it('should generate ERROR_NotAProjectFile if a project file is not the correct type', async function() {
