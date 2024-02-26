@@ -326,17 +326,17 @@ export class MatcherSelector<Type, StateToken = any> extends EventEmitter<EventM
          * Reference: https://javascript.info/event-loop
          */
 
-        const pendingMatchGesture = new ManagedPromise<void>();
-        this.pendingMatchSetup = pendingMatchGesture.corePromise;
+        const matchingLock = new ManagedPromise<void>();
+        this.pendingMatchSetup = matchingLock.corePromise;
 
         await timedPromise(0);
         // A second one, in case of a deferred modipress completion (via awaitNested)
         // (which itself needs a macroqueue wait)
         await timedPromise(0);
 
-        pendingMatchGesture.resolve();
+        matchingLock.resolve();
         // Only clear the promise if no extra entries were added to the implied `matchGesture` queue.
-        if(this.pendingMatchSetup == pendingMatchGesture.corePromise) {
+        if(this.pendingMatchSetup == matchingLock.corePromise) {
           this.pendingMatchSetup = null;
         }
 
