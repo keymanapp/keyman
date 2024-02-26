@@ -437,6 +437,7 @@ export class GestureMatcher<Type, StateToken = any> implements PredecessorMatch<
       }
     }
 
+    // Check that initial "item" and "state" properties are legal for this type of gesture.
     if(contactSpec.model.allowsInitialState) {
       const initialStateCheck = contactSpec.model.allowsInitialState(
         simpleSource.currentSample,
@@ -450,13 +451,40 @@ export class GestureMatcher<Type, StateToken = any> implements PredecessorMatch<
         // pathMatcher for a source that failed to meet initial conditions.
         this.pathMatchers.pop();
 
-        this.finalize(false, 'path');
+      /*
+       * To prevent any further retries for the model (via rejectionActions), we list the
+       * cause as 'cancelled'.  The rejection-action mechanism already blocks paths that
+       * are rejected synchronously by this method; this adds an extra layer of protection
+       * and is likely also more clear.
+       *
+       * Alternatively, 'item' _should_ be fine - and corresponds best with a
+       * rejection based on the initial item.
+       */
+        this.finalize(false, 'cancelled');
       }
     }
 
-    contactModel.update();
-    // Now that we've done the initial-state check, we can check for instantly-matching path models.
+    // Now that we've done the initial-state check, we can check for instantly-matching and
+    // instantly-rejecting path models... particularly from from causes other than initial-item
+    // and state, such as rejection due to an extra touch.
+    //
+    // KMW example:  longpresses cancel when a new touch comes in during the longpress timer;
+    // they should never become valid again for that base touch.
+    const result = contactModel.update();
+    if(result?.type == 'reject') {
+      /*
+       * To prevent any further retries for the model (via rejectionActions), we list the
+       * cause as 'cancelled'.  The rejection-action mechanism already blocks paths that
+       * are rejected synchronously by this method; this adds an extra layer of protection
+       * and is likely also more clear.
+       *
+       * Alternatively, 'path' _should_ be fine - and corresponds best with a
+       * rejected contact-path-model.
+       */
+      this.finalize(false, 'cancelled');
+    }
 
+    // Standard path:  trigger either resolution or rejection when the contact model signals either.
     contactModel.promise.then((resolution) => {
       this.finalize(resolution.type == 'resolve', resolution.cause);
     });
