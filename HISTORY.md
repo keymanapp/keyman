@@ -1,5 +1,11 @@
 # Keyman Version History
 
+## 18.0.5 alpha 2024-02-26
+
+* fix(linux): Dynamically get package name (#10826)
+* chore(linux): Add running autopkgtests on GHA (#10823)
+* fix(linux): Fix autopkgtest gha (#10849)
+
 ## 18.0.4 alpha 2024-02-23
 
 * chore(linux): Update debian changelog (#10786)
