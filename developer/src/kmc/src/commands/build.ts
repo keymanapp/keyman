@@ -91,6 +91,8 @@ async function buildFile(filenames: string[], _options: any, commander: any)  {
     filenames.push('.');
   }
 
+  /* c8 ignore next 6 */
+  // full test on console log of error message not justified; check with user test recommended
   if(filenames.length > 1 && commanderOptions.outFile) {
     // -o can only be specified with a single input file
     callbacks.reportMessage(InfrastructureMessages.Error_OutFileCanOnlyBeSpecifiedWithSingleInfile());
