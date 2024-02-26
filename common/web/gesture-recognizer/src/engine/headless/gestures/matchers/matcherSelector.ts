@@ -235,7 +235,7 @@ export class MatcherSelector<Type, StateToken = any> extends EventEmitter<EventM
     const priorMatcher = sourceNotYetStaged ? null: source;
 
     // matchGesture calls should be queued and act atomically, in sequence.
-    if(this.pendingMatchSetup /*&& sourceNotYetStaged*/) {
+    if(this.pendingMatchSetup) {
       const parentLockPromise = this.pendingMatchSetup;
       const childLock = new ManagedPromise<void>();
 
