@@ -98,7 +98,7 @@ kmc-package: .virtual
 
 api: .virtual
     cd $(DEVELOPER_ROOT)
-    $(GIT_BASH_FOR_KEYMAN) build.sh api --no-deps
+    if $(TARGET) == build $(GIT_BASH_FOR_KEYMAN) build.sh api --no-deps
 
 # ----------------------------------------------------------------------
 
