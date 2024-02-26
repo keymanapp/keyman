@@ -152,6 +152,32 @@ jobs:
           !artifacts/keyman-srcpkg/
       if: always()
 
+  autopkg_test:
+    name: Run autopkgtests
+    needs: [binary_packages]
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Download Artifacts
+      uses: actions/download-artifact@6b208ae046db98c579e8a3aa621ab581ff575935 # v4.1.1
+      with:
+        path: artifacts
+        merge-multiple: true
+
+    - name: Install dependencies
+      run: |
+        sudo DEBIAN_FRONTEND=noninteractive apt-get -q -y install autopkgtest qemu-system qemu-utils autodep8
+
+    - name: Build test image
+      run: |
+        cd "${GITHUB_WORKSPACE}/artifacts"
+        autopkgtest-buildvm-ubuntu-cloud -v --release=jammy
+
+    - name: Run tests
+      run: |
+        cd "${GITHUB_WORKSPACE}/artifacts"
+        autopkgtest -B *.deb keyman_*.dsc -- qemu autopkgtest-jammy-amd64.img
+
   deb_signing:
     name: Sign source and binary packages
     needs: [sourcepackage, binary_packages]
