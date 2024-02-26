@@ -115,7 +115,7 @@ def verify_ibus_daemon(start):
     try:
         ps_output = subprocess.run(('ps', '--user', user, '-o', 's=', '-o', 'cmd'),
                                    check=False, stdout=subprocess.PIPE).stdout
-        ibus_daemons = re.findall('^[^ZT] (.*/|)ibus-daemon( .*|$)',
+        ibus_daemons = re.findall(r'^[^ZT] (/[^ ]+/|)ibus-daemon( .*|$)',
                                   ps_output.decode('utf-8'), re.MULTILINE)
         if len(ibus_daemons) <= 0:
             if start:
