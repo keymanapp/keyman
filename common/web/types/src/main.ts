@@ -54,7 +54,5 @@ export * as util from './util/util.js';
 
 export * as KeymanFileTypes from './util/file-types.js';
 
-export * as Osk from './osk/osk.js';
-
 export * as Schemas from './schemas.js';
 export * as SchemaValidators from './schema-validators.js';
