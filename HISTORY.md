@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 17.0.276 beta 2024-02-26
+
+* chore(linux): Fix autopkg tests (#10824)
+
 ## 17.0.275 beta 2024-02-23
 
 *  (#10791)
