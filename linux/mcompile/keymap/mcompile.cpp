@@ -412,8 +412,7 @@ KMX_BOOL KMX_DoConvert(LPKMX_KEYBOARD kbd, KMX_BOOL bDeadkeyConversion, gint arg
       return FALSE;
   }
 
-  // _S2 DIFFERENT TO MCOMPILE WINDOWS
-  // create vector
+  // create vector that contains Keycode, base, shift for US-KEyboard and underlying keyboard
   v_dw_3D All_Vector;
   if(createOneVectorFromBothKeyboards(All_Vector, keymap)){
     wprintf(L"ERROR: can't create one vector from both keyboards\n");
@@ -428,8 +427,7 @@ KMX_BOOL KMX_DoConvert(LPKMX_KEYBOARD kbd, KMX_BOOL bDeadkeyConversion, gint arg
     // Loop through each possible key on the keyboard
     for (int i = 0;KMX_VKMap[i]; i++) { // I4651
 
-      // _S2 DIFFERENT TO MCOMPILE WINDOWS
-      // win goes via VK, Lin goes via SC/Keycode
+      // windows uses  VK, Linux uses SC/Keycode
       UINT scUnderlying =  KMX_get_KeyCodeUnderlying_From_VKUS(KMX_VKMap[i]);
       KMX_WCHAR ch = KMX_get_KeyValUnderlying_From_KeyCodeUnderlying(keymap, VKShiftState[j], scUnderlying, &DeadKey);
 

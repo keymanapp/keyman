@@ -154,8 +154,8 @@ public:
     this->m_rgss[(UINT)shiftState][(capsLock ? 1 : 0)] = value;
   }
 
-// _S2 DESIGN NEEDED how to change those? Do we need to change?
-  bool KMX_IsSGCAPS() {
+// _S2 ToDo delete later
+ /* bool KMX_IsSGCAPS() {
     std::wstring stBase = this->KMX_GetShiftState(Base, false);     // 0,0  a 4 ß
     std::wstring stShift = this->KMX_GetShiftState(Shft, false);    // 1,0  A $ ?
     std::wstring stCaps = this->KMX_GetShiftState(Base, true);      // 0,1  A 4 ẞ
@@ -201,7 +201,7 @@ public:
         (stBase.compare(stShift) != 0) &&
         (stShift.compare(stCaps) == 0));
   }
-
+*/
   bool KMX_IsEmpty() {
     for (int i = 0; i < 10; i++) {
       for (int j = 0; j <= 1; j++) {
@@ -262,32 +262,14 @@ public:
   bool KMX_LayoutRow(int MaxShiftState, LPKMX_KEY key, std::vector<DeadKey*> *deadkeys, int deadkeyBase, BOOL bDeadkeyConversion,v_dw_3D &All_Vector, GdkKeymap *keymap) {   // I4552
     // Get the CAPSLOCK value
 
-// _S2 TODO needs to go later                                    // this should be true for char, number, special
-/*bool   b1= this->KMX_IsCapsEqualToShift();                  // but is false for numbers  and    special
-bool   b2= this->KMX_IsSGCAPS();
-bool   b3= this->KMX_IsAltGrCapsEqualToAltGrShift();
-bool   b4= this->KMX_IsXxxxGrCapsEqualToXxxxShift();
-
-int i1 = this->KMX_IsCapsEqualToShift() ? 1 : 0;
-int i2 = this->KMX_IsSGCAPS() ? 2 : 0;
-int i3 = this->KMX_IsAltGrCapsEqualToAltGrShift() ? 4 : 0;
-int i4 = this->KMX_IsXxxxGrCapsEqualToXxxxShift() ? 8 : 0;*/
-
-    int capslock =
+    // _S2 TODO delete later
+    /* int capslock =
         (this->KMX_IsCapsEqualToShift() ? 1 : 0) |
         (this->KMX_IsSGCAPS() ? 2 : 0) |
         (this->KMX_IsAltGrCapsEqualToAltGrShift() ? 4 : 0) |
-        (this->KMX_IsXxxxGrCapsEqualToXxxxShift() ? 8 : 0);
-
-
-    // DIFFERENCE TO MCOMPILE WINDOWS
-    // _S2 DESIGN NEEDED on how to replace capslock
-    //     capslock has different values for linux. Therefore key->ShiftFlags will be different for numbers, special characters
-    //     Therefore CAPS/NCAPS will be added differently for Lin<->Win
-    //     for now set capslock=1
-    //        capslock=1  <->   capslock=0;
-    // [ CTRL NCAPS K_I]  <->   [CTRL K_I]
-    capslock=1;
+        (this->KMX_IsXxxxGrCapsEqualToXxxxShift() ? 8 : 0);*/
+    // _S2 replaced 
+    int capslock=1;
 
     for (int ss = 0; ss <= MaxShiftState; ss++) {
       if (ss == Menu || ss == ShftMenu) {
@@ -331,7 +313,6 @@ int i4 = this->KMX_IsXxxxGrCapsEqualToXxxxShift() ? 8 : 0;*/
             if(st[ich] < 0x20 || st[ich] == 0x7F) { isvalid=false; break; }
           }
           if(isvalid) {
-            // _S2 DIFFERENCE TO MCOMPILE WINDOWS
             // this is different to mcompile windows !!!!
             // this->m_sc    stores SC-US = SCUnderlying
             // this->m_vk    stores VK-US ( not underlying !!)
@@ -424,7 +405,6 @@ bool KMX_ImportRules(LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, GdkKeymap **keymap,
   // flag that the VK is valid, and it can store the SC value.
 
   for(UINT sc = 0x01; sc <= 0x7f; sc++) {
-    // _S2 DIFFERENCE TO MCOMPILE WINDOWS
     // fills m_vk with the VK of the US keyboard
     // ( mcompile win uses MapVirtualKeyEx() to fill m_vk with the VK of the Underlying keyboard)
     // Linux can get a VK for the US Keyboard using USVirtualKeyToScanCode/ScanCodeToUSVirtualKey
@@ -485,7 +465,6 @@ bool KMX_ImportRules(LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, GdkKeymap **keymap,
             //rgKey[iKey]->SetShiftState(ss, sbBuffer, true, (caps == 0));
             rgKey[iKey]->KMX_SetShiftState(ss, sbBuffer, true, (caps ));   //_S2 INFO
 
-            // _S2 DIFFERENCE TO MCOMPILE WINDOWS
             refine_alDead(sbBuffer[0], alDead, &alDead_cpl);
           }
         }
