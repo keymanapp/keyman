@@ -95,45 +95,6 @@ typedef KMX_UCHAR* KMX_PUCHAR;
 #define VK_xDF		  0xDF
 #define VK_OEM_102  0xE2  //  "<>" or "\|" on RT 102-key kbd.
 
-/*#define VK_NUMPAD0  0x5A
-#define VK_NUMPAD1  0x57
-#define VK_NUMPAD2  0x58
-#define VK_NUMPAD3  0x59
-#define VK_NUMPAD4  0x53
-#define VK_NUMPAD5  0x54
-#define VK_NUMPAD6  0x55
-#define VK_NUMPAD7  0x4F
-#define VK_NUMPAD8  0x50
-#define VK_NUMPAD9  0x51
-#define VK_DIVIDE   0x6A
-#define VK_CANCEL   0x09
-#define VK_DECIMAL  0x5B*/
-
-// _S2 TODO correct?? ??
-#define VK_NUMPAD0  0x60
-#define VK_NUMPAD1  0x61
-#define VK_NUMPAD2  0x62
-#define VK_NUMPAD3  0x63
-#define VK_NUMPAD4  0x64
-#define VK_NUMPAD5  0x65
-#define VK_NUMPAD6  0x66
-#define VK_NUMPAD7  0x67
-#define VK_NUMPAD8  0x68
-#define VK_NUMPAD9  0x69
-
-
-// _S2 TODO correct?? ??
-/*#define VK_NUMPAD0  0x2D
-#define VK_NUMPAD1  0x23
-#define VK_NUMPAD2  0x28
-#define VK_NUMPAD3  0x22
-#define VK_NUMPAD4  0x25
-#define VK_NUMPAD5  0x0C
-#define VK_NUMPAD6  0x27
-#define VK_NUMPAD7  0x24
-#define VK_NUMPAD8  0x26
-#define VK_NUMPAD9  0x21*/
-
 #define VK_DIVIDE   0x6F
 #define VK_CANCEL   3
 #define VK_DECIMAL  0x2E

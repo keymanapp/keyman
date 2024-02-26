@@ -6,8 +6,7 @@ Sample program that reads US basic keyboard and compares to key value group
 
 # Keymap
 
-_S2 TODO QUESTION check if US basic is the right Keyboard to compare with
-_S2 TODO check if I can use files from some other keyman path instead of a copy here ( e.g. filesystem.h exists elsewhere); where can I use incxstr from
+__S2 TODO check if I can use files from some other keyman path instead of a copy here ( e.g. filesystem.h exists elsewhere); where can I use incxstr from
 _S2 TODO Do I need HKL for Linux / can I just use a void* or remove HKL ??,  typeddef of KMX_HKL - can I delete all m_hkl from classes?
 _S2 TODO Check/find use of wchar_t/wstring and replace with char16_t/u16string
 _S2 TODO check call by reference/value

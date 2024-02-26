@@ -67,8 +67,8 @@ typedef std::vector<std::vector<std::vector<KMX_DWORD> > > v_dw_3D;
 static KMX_DWORD returnIfCharInvalid = 0;
 static KMX_DWORD keycode_max = 94;
 static KMX_DWORD deadkey_min = 0xfe50;
-static KMX_DWORD deadkey_max = 0xfe93;
-//static KMX_DWORD deadkey_max = 0xfe52;  // _S2 TODO This has to go! my test: to only return 3 dk
+//static KMX_DWORD deadkey_max = 0xfe93;
+static KMX_DWORD deadkey_max = 0xfe52;  // _S2 TODO This has to go! my test: to only return 3 dk
 
 int map_VKShiftState_to_LinModifier(int VKShiftState);
 

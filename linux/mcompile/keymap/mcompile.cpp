@@ -130,7 +130,7 @@ int run(int argc, std::vector<std::u16string> str_argv, char* argv_ch[] = NULL){
 
 #endif
   //DeleteReallocatedPointers(kmxfile); :TODO   // _S2 not my ToDo :-)
-
+wprintf(L"mmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm end\n");
   delete kmxfile;
   return 0;
 }

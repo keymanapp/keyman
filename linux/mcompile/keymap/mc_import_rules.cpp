@@ -440,40 +440,9 @@ bool KMX_ImportRules(LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, GdkKeymap **keymap,
     }
   }
 
-  for(UINT ke = VK_NUMPAD0; ke <= VK_NUMPAD9; ke++) {
-      rgKey[ke] = new KMX_VirtualKey(hkl, ke);
-  }
-
   rgKey[VK_DIVIDE] = new KMX_VirtualKey(hkl, VK_DIVIDE);
   rgKey[VK_CANCEL] = new KMX_VirtualKey(hkl, VK_CANCEL);
   rgKey[VK_DECIMAL] = new KMX_VirtualKey(hkl, VK_DECIMAL);
-
-  /*
-  // _S2 DESIGN NEEDED do we need special shift state now or later?
-    // See if there is a special shift state added
-    for(UINT vk = 0; vk <= VK_OEM_CLEAR; vk++) {
-        UINT sc = MapVirtualKeyEx(vk, 0, hkl);
-        UINT vkL = MapVirtualKeyEx(sc, 1, hkl);
-        UINT vkR = MapVirtualKeyEx(sc, 3, hkl);
-        if((vkL != vkR) &&
-            (vk != vkL)) {
-            switch(vk) {
-                case VK_LCONTROL:
-                case VK_RCONTROL:
-                case VK_LSHIFT:
-                case VK_RSHIFT:
-                case VK_LMENU:
-                case VK_RMENU:
-                    break;
-
-                default:
-                    loader.Set_XxxxVk(vk);
-                    break;
-            }
-        }
-    }
-  */
-
 
     // in this part we skip shiftstates 4, 5, 8, 9
     for(UINT iKey = 0; iKey < rgKey.size(); iKey++) {
@@ -523,8 +492,6 @@ bool KMX_ImportRules(LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, GdkKeymap **keymap,
       }
     }
   }
-  // _S2 DESIGN NEEDED do we need to sort alDead? And if so how?
-  sort_alDead(alDead, &alDead_cpl);
 
   //-------------------------------------------------------------
   // Now that we've collected the key data, we need to
