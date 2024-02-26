@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# TODO: rewrite this script to builder reqs
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
@@ -41,7 +42,7 @@ function display_usage {
   echo "Usage: $0 [platform]"
   echo "       $0 --help"
   echo
-  echo "  platform should be one of: android, ios, linux, mac, windows."
+  echo "  platform should be one of: android, ios, linux, mac, windows, developer."
   echo "  --help               displays this screen and exits"
 }
 
@@ -67,6 +68,10 @@ fi
 function help_product_path {
   if [ $platform == 'ios' ]; then
     echo "products/iphone-and-ipad/$VERSION_RELEASE"
+  elif [ $platform == 'developer' ]; then
+    # developer/17.0/reference/api -- we only publish Typescript APIs here at present
+    # and this would need to change for future deployment if we do more on this repo
+    echo "developer/$VERSION_RELEASE/reference/api"
   else
     echo "products/$platform/$VERSION_RELEASE"
   fi
@@ -107,6 +112,10 @@ function upload_keyman_help {
       # Note: `/windows/src/desktop/help/build.sh web` must be run first
       helppath=$KEYMAN_ROOT/windows/bin/help/md/desktop
       ;;
+    developer)
+      # Note: `/developer/build.sh api` must be run first
+      helppath="$KEYMAN_ROOT/developer/build/docs"
+      ;;
     *)
       display_usage
     esac
@@ -142,7 +151,7 @@ while [[ $# -gt 0 ]] ; do
       display_usage
       exit 0
       ;;
-    android | ios | linux | mac | windows)
+    android | ios | linux | mac | windows | developer)
       platform=$key
       ;;
     *)
