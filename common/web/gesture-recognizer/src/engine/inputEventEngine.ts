@@ -48,6 +48,7 @@ export abstract class InputEventEngine<HoveredItemType, StateToken> extends Inpu
     });
 
     this.emit('pointstart', touchpoint);
+    return touchpoint;
   }
 
   protected onInputMove(identifier: number, sample: InputSample<HoveredItemType, StateToken>, target: EventTarget) {

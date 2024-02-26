@@ -223,7 +223,21 @@ export class TouchpointCoordinator<HoveredItemType, StateToken=any> extends Even
     const selector = this.currentSelector;
 
     touchpoint.setGestureMatchInspector(this.buildGestureMatchInspector(selector));
-    this.emit('inputstart', touchpoint);
+
+    // If there's an error in code receiving this event, we must not let that break the flow of
+    // event input processing here!
+    try {
+      this.emit('inputstart', touchpoint);
+    } catch (err) {
+      console.error(err);
+    }
+
+    // In particular, things will break HORRIBLY if this code block does not get to run.
+    this.inputEngines.forEach((engine) => {
+      // It is now safe to signal further updates for this touchpoint, as we can be sure
+      // that each will be received.
+      engine.unlockTouchpoint?.(touchpoint);
+    });
 
     const selection = await selectionPromise;
 
