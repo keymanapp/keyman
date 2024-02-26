@@ -166,7 +166,7 @@ jobs:
 
     - name: Install dependencies
       run: |
-        sudo DEBIAN_FRONTEND=noninteractive apt-get -q -y install autopkgtest qemu-system qemu-utils autodep8
+        sudo DEBIAN_FRONTEND=noninteractive apt-get -q -y install autopkgtest qemu-system qemu-utils autodep8 genisoimage python3-distro-info
 
     - name: Build test image
       run: |
@@ -325,24 +325,24 @@ jobs:
 
   set_status:
     name: Set result status on PR builds
-    needs: [sourcepackage, binary_packages, api_verification]
+    needs: [sourcepackage, binary_packages, api_verification, autopkg_test]
     runs-on: ubuntu-latest
     if: ${{ always() && github.event.client_payload.isTestBuild == 'true' }}
     steps:
     - name: Set success
-      if: needs.sourcepackage.result == 'success' && needs.binary_packages.result == 'success' && needs.api_verification.result == 'success'
+      if: needs.sourcepackage.result == 'success' && needs.binary_packages.result == 'success' && needs.api_verification.result == 'success' && needs.autopkg_test.result == 'success'
       run: |
         echo "RESULT=success" >> $GITHUB_ENV
         echo "MSG=Package build succeeded" >> $GITHUB_ENV
 
     - name: Set cancelled
-      if: needs.sourcepackage.result == 'cancelled' || needs.binary_packages.result == 'cancelled' || needs.api_verification.result == 'cancelled'
+      if: needs.sourcepackage.result == 'cancelled' || needs.binary_packages.result == 'cancelled' || needs.api_verification.result == 'cancelled' || needs.autopkg_test.result == 'cancelled'
       run: |
         echo "RESULT=error" >> $GITHUB_ENV
         echo "MSG=Package build cancelled" >> $GITHUB_ENV
 
     - name: Set failure
-      if: needs.sourcepackage.result == 'failure' || needs.binary_packages.result == 'failure' || needs.api_verification.result == 'failure'
+      if: needs.sourcepackage.result == 'failure' || needs.binary_packages.result == 'failure' || needs.api_verification.result == 'failure' || needs.autopkg_test.result == 'failure'
       run: |
         echo "RESULT=failure" >> $GITHUB_ENV
         echo "MSG=Package build failed" >> $GITHUB_ENV
