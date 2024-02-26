@@ -4,6 +4,7 @@ import 'mocha';
 import { TestCompilerCallbacks } from '@keymanapp/developer-test-helpers';
 import { makePathToFixture } from './helpers/index.js';
 import { KeyboardInfoCompiler, KeyboardInfoCompilerResult } from '../src/keyboard-info-compiler.js';
+import { KeyboardInfoCompilerMessages } from '../src/keyboard-info-compiler-messages.js';
 
 const callbacks = new TestCompilerCallbacks();
 
@@ -49,5 +50,35 @@ describe('keyboard-info-compiler', function () {
     delete expected['lastModifiedDate'];
 
     assert.deepEqual(actual, expected);
+  });
+
+// ERROR_FileDoesNotExist (loadJsFile)
+
+  it('handle FileDoesNotExist error correctly', async function() {
+    const jsFilename = makePathToFixture('khmer_angkor', 'build', 'xxx.js');
+    const kpsFilename = makePathToFixture('khmer_angkor', 'source', 'khmer_angkor.kps');
+    const kmpFilename = makePathToFixture('khmer_angkor', 'build', 'khmer_angkor.kmp');
+
+    const sources = {
+      kmpFilename,
+      sourcePath: 'release/k/khmer_angkor',
+      kpsFilename,
+      jsFilename: jsFilename,
+      forPublishing: true,
+    };
+
+    const compiler = new KeyboardInfoCompiler();
+    assert.isTrue(await compiler.init(callbacks, {sources}));
+    let result: KeyboardInfoCompilerResult = null;
+    try {
+      result = await compiler.run(kmpFilename, null);
+    } catch(e) {
+      callbacks.printMessages();
+      throw e;
+    }
+    assert.isNull(result);
+
+    assert.isTrue(callbacks.hasMessage(KeyboardInfoCompilerMessages.ERROR_FileDoesNotExist),
+    `ERROR_FileDoesNotExist not generated, instead got: `+JSON.stringify(callbacks.messages,null,2));
   });
 });
