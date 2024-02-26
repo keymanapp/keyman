@@ -72,16 +72,18 @@ describe("'Canary' checks", function() {
       let fireEvent = () => {
         playbackEngine.replayTouchSamples(/*relative coord:*/ [ { sample: {targetX: 10, targetY: 10}, identifier: 1}],
                                           /*state:*/         "start",
-                                          /*recentTouches:*/  [],
+                                          /*recentTouches:*/  [/* TODO */],
                                         );
       }
 
       // Ensure that the expected handler is called.
       let fakeHandler = sinon.fake();
-      this.controller.recognizer.on('inputstart', fakeHandler)
+      this.controller.recognizer.on('inputstart', fakeHandler);
       fireEvent();
 
-      await Promise.resolve();
+      await new Promise((resolve) => {
+        window.setTimeout(resolve, 0);
+      });
 
       assert.isTrue(fakeHandler.called, "Unit test attempt failed:  handler was not called successfully.");
     });
@@ -99,10 +101,12 @@ describe("'Canary' checks", function() {
 
       // Ensure that the expected handler is called.
       let fakeHandler = sinon.fake();
-      this.controller.recognizer.on('inputstart', fakeHandler)
+      this.controller.recognizer.on('inputstart', fakeHandler);
       fireEvent();
 
-      await Promise.resolve();
+      await new Promise((resolve) => {
+        window.setTimeout(resolve, 0);
+      });
 
       assert.isTrue(fakeHandler.called, "Unit test attempt failed:  handler was not called successfully.");
     });
