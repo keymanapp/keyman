@@ -32,6 +32,7 @@ builder_describe "Build Keyman Keyboard Compiler kmc" \
   "build                     (default) builds kmc to build/" \
   "clean                     cleans build/ folder" \
   "bundle                    creates a bundled version of kmc" \
+  "api                       analyze API and prepare API documentation (no-op for kmc)" \
   "test                      run automated tests for kmc" \
   "pack                      build a local .tgz pack for testing (note: all npm modules in the repo will be packed by this script)" \
   "publish                   publish to npm (note: all npm modules in the repo will be published by this script)" \
