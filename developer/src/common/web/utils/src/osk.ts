@@ -1,6 +1,6 @@
-import { TouchLayoutFile, TouchLayoutFlick, TouchLayoutKey, TouchLayoutPlatform, TouchLayoutSubKey } from "../keyman-touch-layout/keyman-touch-layout-file.js";
-import { VisualKeyboard } from "../kvk/visual-keyboard.js";
-import SchemaValidators from "../schema-validators.js";
+import { TouchLayout } from "@keymanapp/common-types";
+import { VisualKeyboard } from "@keymanapp/common-types";
+import { SchemaValidators } from "@keymanapp/common-types";
 
 export interface StringRefUsage {
   filename: string;
@@ -12,20 +12,29 @@ export interface StringRef {
   usages: StringRefUsage[];
 };
 
+/**
+ * Represents a single key cap found by `AnalyzeOskCharacterUse`
+ */
 export interface StringResult {
-  str: string;                         // the key cap string
-  unicode: string;                     // unicode code points in <str> for reference
-  pua: string;                         // hexadecimal single character in PUA range
-  usages: StringRefUsage[] | string[]; // files in which the string is referenced
+  /** the key cap string */
+  str: string;
+  /** unicode code points in <str> for reference, without 'U+' prefix, e.g. '0061 0301' */
+  unicode: string;
+  /** hexadecimal single character in PUA range, without 'U+' prefix, e.g. 'F100' */
+  pua: string;
+  /** files in which the string is referenced; will be an array of
+   * {@link StringRefUsage} if includeCounts is true, otherwise will be an array
+   * of strings listing files in which the key cap may be found */
+  usages: StringRefUsage[] | string[];
 };
 
 export type PuaMap = {[index:string]: string};
 
 export function parseMapping(mapping: any) {
-  if(!SchemaValidators.displayMap(<any>mapping))
+  if(!SchemaValidators.default.displayMap(<any>mapping))
   /* c8 ignore next 3 */
   {
-    throw new Error(JSON.stringify((<any>SchemaValidators.displayMap).errors));
+    throw new Error(JSON.stringify((<any>SchemaValidators.default.displayMap).errors));
   }
 
   let map: PuaMap = {};
@@ -51,7 +60,7 @@ function remap(text: string, map: PuaMap) {
   return text;
 }
 
-export function remapVisualKeyboard(vk: VisualKeyboard, map: PuaMap): boolean {
+export function remapVisualKeyboard(vk: VisualKeyboard.VisualKeyboard, map: PuaMap): boolean {
   let dirty = false;
   for(let key of vk.keys) {
     if(!key.text) {
@@ -64,9 +73,9 @@ export function remapVisualKeyboard(vk: VisualKeyboard, map: PuaMap): boolean {
   return dirty;
 }
 
-export function remapTouchLayout(source: TouchLayoutFile, map: PuaMap) {
+export function remapTouchLayout(source: TouchLayout.TouchLayoutFile, map: PuaMap) {
   let dirty = false;
-  const scanKey = (key: TouchLayoutKey | TouchLayoutSubKey) => {
+  const scanKey = (key: TouchLayout.TouchLayoutKey | TouchLayout.TouchLayoutSubKey) => {
     if(!key.text) {
       return;
     }
@@ -79,7 +88,7 @@ export function remapTouchLayout(source: TouchLayoutFile, map: PuaMap) {
     key.text = text;
   }
 
-  const scanPlatform = (platform: TouchLayoutPlatform) => {
+  const scanPlatform = (platform: TouchLayout.TouchLayoutPlatform) => {
     if(!platform) {
       return;
     }
@@ -87,7 +96,7 @@ export function remapTouchLayout(source: TouchLayoutFile, map: PuaMap) {
       for(let row of layer.row) {
         for(let key of row.key) {
           scanKey(key);
-          let f: keyof TouchLayoutFlick;
+          let f: keyof TouchLayout.TouchLayoutFlick;
           for(f in key.flick ?? {}) {
             scanKey(key.flick[f]);
           }
