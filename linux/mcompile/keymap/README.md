@@ -15,6 +15,13 @@ _s2 INFO idee spanish keyboard has dk on altgr !!
 
 _S2 ...
 
+_S2 TOP_1 NCAPS/capslock
+_S2 TOP_2 Shiftflags
+_S2 TOP_3 dk-table from file->from functions
+_S2 TOP_4 HKL
+_S2 TOP_5 use files/functions from other places
+_S2 TOP_6 remaining
+
 
 ./mcompile -d /Projects/keyman/keyman/linux/mcompile/keymap/mcompile_test.kmx bla.dll 0407 /Projects/keyman/keyman/linux/mcompile/keymap/mcompile_test_out.kmx
 

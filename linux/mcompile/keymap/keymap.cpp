@@ -599,7 +599,7 @@ KMX_DWORD KMX_get_VKUS_From_KeyCodeUnderlying(KMX_DWORD keycode) {
   return 0;
 }
 
-// _S2 ToDo only use one
+// _S2 TOP_6 ToDo only use one
 std::wstring CodePointToWString(unsigned int codepoint) {
   std::wstring str;
 

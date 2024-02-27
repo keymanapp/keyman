@@ -109,7 +109,7 @@ int KMX_DeadKeyMap(int index, std::vector<DeadKey *> *deadkeys, int deadkeyBase,
 
 class KMX_VirtualKey {
 private:
-  KMX_HKL m_hkl;      // _S2 QUESTION do I need this and is void* OK to assume? If I remove this, will there be changes in Data-Vectors?
+  KMX_HKL m_hkl;      // _S2 TOP_4 QUESTION do I need this and is void* OK to assume? If I remove this, will there be changes in Data-Vectors?
   UINT m_vk;
   UINT m_sc;
   bool m_rgfDeadKey[10][2];
@@ -154,8 +154,8 @@ public:
     this->m_rgss[(UINT)shiftState][(capsLock ? 1 : 0)] = value;
   }
 
-// _S2 ToDo delete later
- /* bool KMX_IsSGCAPS() {
+// _S2 TOP_1 ToDo delete later
+  bool KMX_IsSGCAPS() {
     std::wstring stBase = this->KMX_GetShiftState(Base, false);     // 0,0  a 4 ß
     std::wstring stShift = this->KMX_GetShiftState(Shft, false);    // 1,0  A $ ?
     std::wstring stCaps = this->KMX_GetShiftState(Base, true);      // 0,1  A 4 ẞ
@@ -201,7 +201,7 @@ public:
         (stBase.compare(stShift) != 0) &&
         (stShift.compare(stCaps) == 0));
   }
-*/
+
 
   bool KMX_IsEmpty() {
     for (int i = 0; i < 10; i++) {
@@ -226,7 +226,7 @@ public:
     int nkeys = 0;
 
     // Get the CAPSLOCK value
-    //_S2 INFO not used in original code; can be deleted
+    //_S2 TOP_6 INFO not used in original code; can be deleted
     /*int capslock =
         (this->KMX_IsCapsEqualToShift() ? 1 : 0) |
         (this->KMX_IsSGCAPS() ? 2 : 0) |
@@ -263,14 +263,14 @@ public:
   bool KMX_LayoutRow(int MaxShiftState, LPKMX_KEY key, std::vector<DeadKey*> *deadkeys, int deadkeyBase, BOOL bDeadkeyConversion,v_dw_3D &All_Vector, GdkKeymap *keymap) {   // I4552
     // Get the CAPSLOCK value
 
-    // _S2 TODO delete later
-    /* int capslock =
+    // _S2 TOP_1 TODO delete later
+   int capslock =
         (this->KMX_IsCapsEqualToShift() ? 1 : 0) |
         (this->KMX_IsSGCAPS() ? 2 : 0) |
         (this->KMX_IsAltGrCapsEqualToAltGrShift() ? 4 : 0) |
-        (this->KMX_IsXxxxGrCapsEqualToXxxxShift() ? 8 : 0);*/
-    // _S2 replaced 
-    int capslock=1;
+        (this->KMX_IsXxxxGrCapsEqualToXxxxShift() ? 8 : 0);
+    // _S2 TOP_1 -> we need capslock calculation
+    //capslock=1;
 
     for (int ss = 0; ss <= MaxShiftState; ss++) {
       if (ss == Menu || ss == ShftMenu) {
@@ -289,8 +289,9 @@ public:
           key->dpContext = new KMX_WCHAR[1];
           *key->dpContext = 0;
 
+          //key->ShiftFlags = this->KMX_GetShiftStateValue(capslock, caps, (ShiftState) ss);
           key->ShiftFlags = this->KMX_GetShiftStateValue(capslock, caps, (ShiftState) ss);
-          // we already use VK_US so no need to convert it
+          // we already use VK_US so no need to convert it as we do on windows
           key->Key = this->VK();
           key->Line = 0;
 
@@ -325,6 +326,8 @@ public:
 
             key->Line = 0;
             key->ShiftFlags = this->KMX_GetShiftStateValue(capslock, caps, (ShiftState) ss);
+
+          //wprintf(L"capslock = %i, shiftflgs= %i \n", capslock, key->ShiftFlags  );
 
             key->dpContext = new KMX_WCHAR; 
             *key->dpContext = 0;
@@ -366,7 +369,7 @@ public:
     return (Get_XxxxVk() == 0 ? ShftMenuCtrl : ShftXxxx);
   }
 
-  // _S2 ToDo Do we need one/none?
+  // _S2 TOP_6 ToDo Do we need one/none?
   bool KMX_IsControlChar(wchar_t ch) {
     return (ch < 0x0020) || (ch >= 0x007F && ch <= 0x009F);
   }
@@ -434,7 +437,7 @@ bool KMX_ImportRules(LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, GdkKeymap **keymap,
             continue;
           }
 
-          //_S2 TODO to compare win-lin kmn-files skip ss6+7; MUST BE removed later!!!!
+          //_S2 TOP_6 TODO to compare win-lin kmn-files skip ss6+7; MUST BE removed later!!!!
          if(ss == MenuCtrl|| ss == ShftMenuCtrl) {
             continue;
           }
@@ -446,7 +449,7 @@ bool KMX_ImportRules(LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, GdkKeymap **keymap,
 
             if(rc > 0) {
               if(*sbBuffer == 0) {
-                //rgKey[iKey]->KMX_SetShiftState(ss, L"", false, (caps == 0)); // _S2 INFO
+                //rgKey[iKey]->KMX_SetShiftState(ss, L"", false, (caps == 0)); // _S2 TOP_6 INFO
                 rgKey[iKey]->KMX_SetShiftState(ss, L"", false, (caps));
               }
               else {
@@ -455,13 +458,13 @@ bool KMX_ImportRules(LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, GdkKeymap **keymap,
               }
               sbBuffer[rc] = 0;
               //rgKey[iKey]->KMX_SetShiftState(ss, sbBuffer, false, (caps==0));
-              rgKey[iKey]->KMX_SetShiftState(ss, sbBuffer, false, (caps));    //_S2 INFO
+              rgKey[iKey]->KMX_SetShiftState(ss, sbBuffer, false, (caps));    //_S2 TOP_6 INFO
             }
           }
           else if(rc < 0) {
             sbBuffer[2] = 0;
             //rgKey[iKey]->SetShiftState(ss, sbBuffer, true, (caps == 0));
-            rgKey[iKey]->KMX_SetShiftState(ss, sbBuffer, true, (caps ));   //_S2 INFO
+            rgKey[iKey]->KMX_SetShiftState(ss, sbBuffer, true, (caps ));   //_S2 TOP_6 INFO
 
             refine_alDead(sbBuffer[0], alDead, &alDead_cpl);
           }
@@ -524,6 +527,7 @@ bool KMX_ImportRules(LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, GdkKeymap **keymap,
   //
   // Fill in the new rules
   //
+  // _S2 group 2 using keys
   for (UINT iKey = 0; iKey < rgKey.size(); iKey++) {
     if ((rgKey[iKey] != NULL) && rgKey[iKey]->KMX_IsKeymanUsedKey() && (!rgKey[iKey]->KMX_IsEmpty())) {
       if(rgKey[iKey]->KMX_LayoutRow(loader.KMX_MaxShiftState(), &gp->dpKeyArray[nKeys], &alDead, nDeadkey, bDeadkeyConversion, All_Vector,*keymap)) {   // I4552
@@ -537,6 +541,10 @@ bool KMX_ImportRules(LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, GdkKeymap **keymap,
   //
   // Add nomatch control to each terminating 'using keys' group   // I4550
   //
+  // _adds    + [CTRL NCAPS K_QUOTE] > use(group2)  c line(0)
+ //  + [CTRL CAPS K_QUOTE] > use(group2)  c line(0)
+  //nomatch > use(group2)
+  // after dk-section
   LPKMX_GROUP gp2 = kp->dpGroupArray;
   for(UINT i = 0; i < kp->cxGroupArray - 1; i++, gp2++) {
     if(gp2->fUsingKeys && gp2->dpNoMatch == NULL) {
@@ -553,7 +561,7 @@ bool KMX_ImportRules(LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, GdkKeymap **keymap,
       UINT j;
       LPKMX_KEY kkp;
       for(j = 0, kkp = gp->dpKeyArray; j < gp->cxKeyArray; j++, kkp++) {
-        // _S2                 0110 1111
+        // _S2   TOP_2                0110 1111
         if((kkp->ShiftFlags & (K_CTRLFLAG|K_ALTFLAG|LCTRLFLAG|LALTFLAG|RCTRLFLAG|RALTFLAG)) != 0) {
           gp2->cxKeyArray++;
           LPKMX_KEY kkp2 = new KMX_KEY[gp2->cxKeyArray];
@@ -578,6 +586,9 @@ bool KMX_ImportRules(LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, GdkKeymap **keymap,
   // If we have deadkeys, then add a new group to translate the deadkeys per the deadkey tables
   // We only do this if not in deadkey conversion mode
   //
+  // _S2 writes âêîôû^for dk at the beginning
+  // _S2 writes deadkey(1) at the end
+
 
   if (alDead.size() > 0 && !bDeadkeyConversion) {   // I4552
     kp->cxGroupArray++;
@@ -647,6 +658,7 @@ bool KMX_ImportRules(LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, GdkKeymap **keymap,
       kkp++;
     }
   }
+
 return true;
 }
 

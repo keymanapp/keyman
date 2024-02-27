@@ -129,7 +129,7 @@ int run(int argc, std::vector<std::u16string> str_argv, char* argv_ch[] = NULL){
 }
 
 #endif
-  //DeleteReallocatedPointers(kmxfile); :TODO   // _S2 not my ToDo :-)
+  //DeleteReallocatedPointers(kmxfile); :TODO   // _S2 TOP_6 not my ToDo :-)
 wprintf(L"mmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm end\n");
   delete kmxfile;
   return 0;
@@ -206,7 +206,7 @@ void KMX_ReportUnconvertedKeyboardRules(LPKMX_KEYBOARD kbd) {
 }
 
 void KMX_TranslateDeadkeyKey(LPKMX_KEY key, KMX_WCHAR deadkey, KMX_WORD vk, UINT shift, KMX_WORD ch) {
-// _S2 INFO this produces  a different output due to different layouts for Lin<-> win ( for the same language!!)
+// _S2 TOP_2 INFO this produces  a different output due to different layouts for Lin<-> win ( for the same language!!)
 
    if((key->ShiftFlags == 0 || key->ShiftFlags & VIRTUALCHARKEY) && key->Key == ch) {
     // The weird LCTRL+RALT is Windows' way of mapping the AltGr key.
@@ -436,7 +436,7 @@ KMX_BOOL KMX_DoConvert(LPKMX_KEYBOARD kbd, KMX_BOOL bDeadkeyConversion, gint arg
           ch = DeadKey;
         }
       }
-
+// _S2 group1 using keys here
       switch(ch) {
         case 0x0000: break;
         case 0xFFFF: KMX_ConvertDeadkey(kbd, KMX_VKMap[i], VKShiftState[j], DeadKey, All_Vector, keymap , dk_Table); break;
@@ -447,6 +447,7 @@ KMX_BOOL KMX_DoConvert(LPKMX_KEYBOARD kbd, KMX_BOOL bDeadkeyConversion, gint arg
 
   KMX_ReportUnconvertedKeyboardRules(kbd);
 
+// _S2 add everything after dk-section group1
   if(!KMX_ImportRules(kbd, All_Vector, &keymap, &KMX_FDeadkeys, bDeadkeyConversion)) {   // I4353   // I4552
     return FALSE;
   }
