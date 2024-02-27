@@ -675,6 +675,9 @@
         },
         "version": {
           "$ref": "#/definitions/version"
+        },
+        "xmlns": {
+          "type": "string"
         }
       },
       "required": [
