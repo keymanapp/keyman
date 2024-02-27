@@ -21,10 +21,10 @@ export async function buildTestData(infile: string, _options: any, commander: an
     }
   };
 
-  const callbacks: CompilerCallbacks = new NodeCompilerCallbacks(options);
+  const callbacks = new NodeCompilerCallbacks(options);
 
   let testData = await loadTestData(infile, callbacks, compilerOptions);
-  if (!testData) {
+  if (!testData || callbacks.hasFailureMessage()) {
     await exitProcess(1);
   }
 

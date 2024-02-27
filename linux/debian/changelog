@@ -1,8 +1,16 @@
-keyman (17.0.272-2) UNRELEASED; urgency=medium
+keyman (17.0.274-2) UNRELEASED; urgency=medium
 
   * Remove ibus-keyman.post{inst,rm} (closes: #1034040)
 
  -- Eberhard Beilharz <eb1@sil.org>  Fri, 23 Feb 2024 16:01:56 +0100
+
+keyman (17.0.274-1) unstable; urgency=medium
+
+  * Fix autopkg tests
+  * New upstream release.
+  * Re-release to Debian
+
+ -- Eberhard Beilharz <eb1@sil.org>  Fri, 23 Feb 2024 15:45:13 +0100
 
 keyman (17.0.272-1) unstable; urgency=medium
 
