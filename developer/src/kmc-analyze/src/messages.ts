@@ -7,11 +7,25 @@ const SevInfo = CompilerErrorSeverity.Info | Namespace;
 // const SevError = CompilerErrorSeverity.Error | Namespace;
 const SevFatal = CompilerErrorSeverity.Fatal | Namespace;
 
+/**
+ * @public
+ * Compiler messages for `kmc analyze`
+ */
 export class AnalyzerMessages {
+  /** @internal */
   static Fatal_UnexpectedException = (o:{e: any}) => m(this.FATAL_UnexpectedException, null, o.e ?? 'unknown error');
-  static FATAL_UnexpectedException = SevFatal | 0x0001;
+  /**
+   * Raised when the compiler experiences an internal error. These should be
+   * reported to the Keyman team for resolution via
+   * https://github.com/keymanapp/keyman/issues/new
+   */
+  static readonly FATAL_UnexpectedException = SevFatal | 0x0001;
 
+  /** @internal */
   static Info_ScanningFile = (o:{type: string, name: string}) => m(this.INFO_ScanningFile,
     `Scanning ${o.type} file ${o.name}`);
-  static INFO_ScanningFile = SevInfo | 0x0002;
+  /**
+   * Informative message reporting on the current file being scanned
+   */
+  static readonly INFO_ScanningFile = SevInfo | 0x0002;
 };
