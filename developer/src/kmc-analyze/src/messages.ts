@@ -15,9 +15,9 @@ export class AnalyzerMessages {
   /** @internal */
   static Fatal_UnexpectedException = (o:{e: any}) => m(this.FATAL_UnexpectedException, null, o.e ?? 'unknown error');
   /**
-   * Raised when the compiler experiences an internal error. These should be
-   * reported to the Keyman team for resolution via
-   * https://github.com/keymanapp/keyman/issues/new
+   * Raised when an analysis components experiences an internal error. If you
+   * experience this error, it should be reported to the Keyman team for
+   * resolution via https://github.com/keymanapp/keyman/issues/new
    */
   static readonly FATAL_UnexpectedException = SevFatal | 0x0001;
 
