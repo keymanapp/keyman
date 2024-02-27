@@ -48,9 +48,9 @@ builder_run_action configure cp "$KEYMAN_ROOT/common/resources/fonts/keymanweb-o
 
 builder_run_child_actions clean configure build test api
 
-function build_docs() {
+function build_api() {
   api-documenter markdown -i ./build/api -o ./build/docs
   # TODO: Copy to help.keyman.com and open PR
 }
 
-builder_run_action api build_docs
+builder_run_action api build_api
