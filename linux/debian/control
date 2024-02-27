@@ -30,6 +30,7 @@ Build-Depends:
  python3-lxml,
  python3-magic,
  python3-numpy,
+ python3-packaging,
  python3-pil,
  python3-pip,
  python3-qrcode,
