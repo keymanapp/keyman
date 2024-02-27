@@ -63,6 +63,44 @@ describe('AsyncClosureDispatchQueue', () => {
     assert.isTrue(fake.called);
   });
 
+  it('non-empty queue, default configuration, simple closure', async () => {
+    const queue = new AsyncClosureDispatchQueue();
+
+    const fakeTimers = sinon.useFakeTimers();
+
+    const lock = new ManagedPromise<void>();
+    queue.runAsync(() => lock.corePromise);
+
+    const fake = sinon.fake();
+    queue.runAsync(() => {
+      fake(queue.ready);
+    });
+
+    try {
+      assert.isFalse(queue.ready);
+      assert.isFalse(fake.called);
+
+      // Doesn't matter how long we wait; there's still a pending entry in front of `fake`.
+      await fakeTimers.tickAsync(50);
+
+      assert.isFalse(queue.ready);
+      assert.isFalse(fake.called);
+
+      // Allow that pending entry to resolve; `fake` should be able to resolve afterward with little issue.
+      lock.resolve();
+      await fakeTimers.tickAsync(50);
+
+      assert.isTrue(queue.ready);
+      assert.isTrue(fake.called);
+
+      // During the actual closure call, the queue is still awaiting async completion of the closure.
+      // Default wait:  a macroqueue task
+      assert.isFalse(fake.firstCall.args[0]);
+    } finally {
+      fakeTimers.restore();
+    }
+  });
+
   it('complex case 1 - all queued at the same time', async () => {
     // Uses the default timeout between events; just making it extra-explicit here.
     const queue = new AsyncClosureDispatchQueue(() => { return timedPromise(0) });
