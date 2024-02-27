@@ -436,7 +436,7 @@ KMX_BOOL KMX_DoConvert(LPKMX_KEYBOARD kbd, KMX_BOOL bDeadkeyConversion, gint arg
           ch = DeadKey;
         }
       }
-// _S2 group1 using keys here
+// _S2 group1 writes using keys here
       switch(ch) {
         case 0x0000: break;
         case 0xFFFF: KMX_ConvertDeadkey(kbd, KMX_VKMap[i], VKShiftState[j], DeadKey, All_Vector, keymap , dk_Table); break;

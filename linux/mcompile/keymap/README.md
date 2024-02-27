@@ -12,10 +12,9 @@ _S2 TODO Check/find use of wchar_t/wstring and replace with char16_t/u16string
 _S2 TODO check call by reference/value
 _S2 TODO what is wrong with kp->dpBitmapOffset/BitmapSize ?
 _s2 INFO idee spanish keyboard has dk on altgr !!
+_S2 TODO new Problem: RALT-dk(4): Why do we havea RALT in dk 4? It makes sense but how do we handle this??
 
-_S2 ...
-
-_S2 TOP_1 NCAPS/capslock
+_S2 TOP_1 NCAPS/capslock-> we need capslock-equation. ---> new Problem: RALT-dk(4)  RALT+Ä
 _S2 TOP_2 Shiftflags
 _S2 TOP_3 dk-table from file->from functions
 _S2 TOP_4 HKL
