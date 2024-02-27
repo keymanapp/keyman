@@ -17,7 +17,7 @@ export class EventSequentializationQueue {
   }
 
   private async triggerEvent() {
-    while(this.queue.length > 0) {
+    if(this.queue.length > 0) {
       const functor = this.queue.shift();
 
       // Things break _badly_ if we don't keep the queue running if errors are triggered by the functor.
