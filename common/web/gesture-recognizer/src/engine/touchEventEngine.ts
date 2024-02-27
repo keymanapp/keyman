@@ -82,11 +82,11 @@ export class TouchEventEngine<HoveredItemType, StateToken = any> extends InputEv
     }
   }
 
-  public unlockTouchpoint? = (touchpoint: GestureSource<HoveredItemType, StateToken, GesturePath<HoveredItemType, StateToken>>) => {
+  public fulfillInputStart(touchpoint: GestureSource<HoveredItemType, StateToken, GesturePath<HoveredItemType, StateToken>>) {
     const lock = this.inputStartSignalMap.get(touchpoint);
     if(lock) {
-      lock.resolve();
       this.inputStartSignalMap.delete(touchpoint);
+      lock.resolve();
     }
   };
 
