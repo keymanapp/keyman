@@ -471,7 +471,7 @@ export class GestureMatcher<Type, StateToken = any> implements PredecessorMatch<
           'cancelled' is thus not necessary for avoiding the loop-scenario, but it does
           add an extra layer of protection.  Also, it's more explicit about the fact that
           we _are_ permanently cancelling any and all future attempts to match against
-          it in the future for this `GestureSource`.
+          it in the future for the affected `GestureSource`(s).
 
           If we weren't using 'cancelled', 'item' would correspond best with a rejection
           here, as the decision is made due to a validation check against the initial item.
