@@ -5,9 +5,9 @@ import { MatcherSelection, MatcherSelector } from "./gestures/matchers/matcherSe
 import { GestureSequence } from "./gestures/matchers/gestureSequence.js";
 import { GestureModelDefs, getGestureModel, getGestureModelSet } from "./gestures/specs/gestureModelDefs.js";
 import { GestureModel } from "./gestures/specs/gestureModel.js";
-import { timedPromise } from "@keymanapp/web-utils";
 import { InputSample } from "./inputSample.js";
 import { GestureDebugPath } from "./gestureDebugPath.js";
+import { reportError } from "../reportError.js";
 
 interface EventMap<HoveredItemType, StateToken> {
   /**
@@ -229,10 +229,9 @@ export class TouchpointCoordinator<HoveredItemType, StateToken=any> extends Even
     try {
       this.emit('inputstart', touchpoint);
     } catch (err) {
-      console.error(err);
+      reportError("Error from 'inputstart' event listener", err);
     }
 
-    // In particular, things will break HORRIBLY if this code block does not get to run.
     this.inputEngines.forEach((engine) => {
       // It is now safe to signal further updates for this touchpoint, as we can be sure
       // that each will be received.

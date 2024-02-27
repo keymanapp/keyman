@@ -5,7 +5,7 @@ import { Nonoptional } from "./nonoptional.js";
 import { ZoneBoundaryChecker } from "./configuration/zoneBoundaryChecker.js";
 import { GestureSource } from "./headless/gestureSource.js";
 import { ManagedPromise } from "@keymanapp/web-utils";
-import { EventSequentializationQueue } from "./eventSequentializationQueue.js";
+import { AsyncClosureDispatchQueue } from "./asyncClosureDispatchQueue.js";
 import { GesturePath } from "./index.js";
 
 function touchListToArray(list: TouchList) {
@@ -22,7 +22,7 @@ export class TouchEventEngine<HoveredItemType, StateToken = any> extends InputEv
   private readonly _touchMove:  typeof TouchEventEngine.prototype.onTouchMove;
   private readonly _touchEnd:   typeof TouchEventEngine.prototype.onTouchEnd;
 
-  protected readonly sequentializer = new EventSequentializationQueue();
+  protected readonly eventDispatcher = new AsyncClosureDispatchQueue();
 
   private safeBoundMaskMap: {[id: number]: number} = {};
   private pendingSourceIdentifiers: Map<number, Object> = new Map();
@@ -116,7 +116,7 @@ export class TouchEventEngine<HoveredItemType, StateToken = any> extends InputEv
     const allTouches = touchListToArray(event.touches);
     const newTouches = touchListToArray(event.changedTouches);
 
-    this.sequentializer.queueEventFunctor(() => {
+    this.eventDispatcher.runAsync(() => {
       // Maintain all touches in the `.touches` array that are NOT marked as `.changedTouches` (and therefore, new)
       this.maintainTouchpointsWithIds(allTouches
         .filter((touch1) => newTouches.findIndex(touch2 => touch1.identifier == touch2.identifier) == -1)
@@ -124,7 +124,7 @@ export class TouchEventEngine<HoveredItemType, StateToken = any> extends InputEv
       );
     });
 
-    this.sequentializer.queueEventFunctor(() => {
+    this.eventDispatcher.runAsync(() => {
       // Ensure the same timestamp is used for all touches being updated.
       const timestamp = performance.now();
       let lastValidTouchpoint: GestureSource<HoveredItemType, StateToken> = null;
@@ -184,13 +184,13 @@ export class TouchEventEngine<HoveredItemType, StateToken = any> extends InputEv
       }
     }
 
-    this.sequentializer.queueEventFunctor(() => {
+    this.eventDispatcher.runAsync(() => {
       this.maintainTouchpointsWithIds(touchListToArray(event.touches)
         .map((touch) => touch.identifier)
       );
     });
 
-    this.sequentializer.queueEventFunctor(() => {
+    this.eventDispatcher.runAsync(() => {
       // Ensure the same timestamp is used for all touches being updated.
       const timestamp = performance.now();
 
@@ -227,7 +227,7 @@ export class TouchEventEngine<HoveredItemType, StateToken = any> extends InputEv
       }
     }
 
-    this.sequentializer.queueEventFunctor(() => {
+    this.eventDispatcher.runAsync(() => {
       // Only lists touch contact points that have been lifted; touchmove is raised separately if any movement occurred.
       for(let i=0; i < event.changedTouches.length; i++) {
         const touch = event.changedTouches.item(i);
