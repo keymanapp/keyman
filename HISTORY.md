@@ -1,5 +1,17 @@
 # Keyman Version History
 
+## 17.0.277 beta 2024-02-27
+
+* fix(developer): exit kmc test data if any failure messages occurred (#10805)
+* docs(windows): add whats new Keyman for Windows  17.0 (#10783)
+* feat(developer): add api-extractor and api-documenter, config, and build integration (#10839)
+* feat(developer): publish api documentation to help.keyman.com (#10841)
+* docs(developer): npm package readme files (#10842)
+* refactor(developer): move osk module from common-types to developer-utils (#10845)
+* chore(linux): Update debian changelog (#10828)
+* fix(developer): repeated options in kmc must now be fully specified (#10821)
+* docs(developer): add documentation for kmc-analyze (#10854)
+
 ## 17.0.276 beta 2024-02-26
 
 * chore(linux): Fix autopkg tests (#10824)
