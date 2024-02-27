@@ -7,7 +7,7 @@ toolchain, `kmc`.
 ## Install kmc
 
 `kmc` is available as:
-* a part of Keyman Developer (Windows)
+* a part of Keyman Developer (Windows only)
 * an npm package, and
 * a zip download
 
