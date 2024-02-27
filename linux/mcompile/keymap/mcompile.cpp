@@ -75,7 +75,7 @@ int run(int argc, std::vector<std::u16string> str_argv, char* argv_ch[] = NULL){
 
     return 1;
   }
-  // _S2 INFO  -u option was removed for Linux
+  // -u option not available for Linux
 
   int bDeadkeyConversion = u16cmp(argv[1], u"-d") == 0; // I4552
   int n = (bDeadkeyConversion ? 2 : 1);
@@ -404,8 +404,6 @@ KMX_BOOL KMX_DoConvert(LPKMX_KEYBOARD kbd, KMX_BOOL bDeadkeyConversion, gint arg
   // evident for the 102nd key on UK, for example, where \ can be generated with VK_OEM_102 or AltGr+VK_QUOTE.
   // For now, we get the least shifted version, which is hopefully adequate.
 
-  // _S2 INFO first version with GTK - maybe change later to  XklGetGroupNames  und XklGetCurrentState  as Eberhard suggested
-  //_ init gdk
   GdkKeymap *keymap;
   if(InitializeGDK(&keymap , argc, argv)) {
       wprintf(L"ERROR: can't Initialize GDK\n");

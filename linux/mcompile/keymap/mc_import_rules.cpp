@@ -202,6 +202,7 @@ public:
         (stShift.compare(stCaps) == 0));
   }
 */
+
   bool KMX_IsEmpty() {
     for (int i = 0; i < 10; i++) {
       for (int j = 0; j <= 1; j++) {
@@ -393,9 +394,6 @@ bool KMX_ImportRules(LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, GdkKeymap **keymap,
   BYTE lpKeyState[256];// = new KeysEx[256];
   std::vector<KMX_VirtualKey*> rgKey; //= new VirtualKey[256];
   std::vector<DeadKey*> alDead;
-
-   
-  // _S2 DIFFERENCE TO MCOMPILE WINDOWS
   std::vector<DeadKey*> alDead_cpl = create_alDead();
 
   rgKey.resize(256);
@@ -555,6 +553,7 @@ bool KMX_ImportRules(LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, GdkKeymap **keymap,
       UINT j;
       LPKMX_KEY kkp;
       for(j = 0, kkp = gp->dpKeyArray; j < gp->cxKeyArray; j++, kkp++) {
+        // _S2                 0110 1111
         if((kkp->ShiftFlags & (K_CTRLFLAG|K_ALTFLAG|LCTRLFLAG|LALTFLAG|RCTRLFLAG|RALTFLAG)) != 0) {
           gp2->cxKeyArray++;
           LPKMX_KEY kkp2 = new KMX_KEY[gp2->cxKeyArray];

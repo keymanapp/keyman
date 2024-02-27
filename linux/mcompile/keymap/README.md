@@ -10,7 +10,6 @@ __S2 TODO check if I can use files from some other keyman path instead of a copy
 _S2 TODO Do I need HKL for Linux / can I just use a void* or remove HKL ??,  typeddef of KMX_HKL - can I delete all m_hkl from classes?
 _S2 TODO Check/find use of wchar_t/wstring and replace with char16_t/u16string
 _S2 TODO check call by reference/value
-_S2 TODO replace GDK
 _S2 TODO what is wrong with kp->dpBitmapOffset/BitmapSize ?
 _s2 INFO idee spanish keyboard has dk on altgr !!
 
