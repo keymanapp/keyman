@@ -100,7 +100,7 @@ km-package-install -f build/khmer_angkor.kmp
 **macOS**: open Keyman Configuration and drop the package khmer_angkor.kmp file
 onto the Keyman Configuration window.
 
-**Android**: send khmer_angkor.kmp to your Android device, and install it from the
+**Android**: send khmer_angkor.kmp to your Android device, and [install it](https://help.keyman.com/products/android/current-version/basic/installing-custom-packages) from the
 hamburger menu in the Keyman app.
 
 **iOS**: send khmer_angkor.kmp to your iOS device, and install it from the
