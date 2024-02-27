@@ -11,7 +11,7 @@ import { KeymanCompiler } from '@keymanapp/common-types';
 import { KeymanCompilerArtifactOptional } from '@keymanapp/common-types';
 import { KeymanCompilerArtifacts } from '@keymanapp/common-types';
 import { KeymanCompilerResult } from '@keymanapp/common-types';
-import { Osk } from '@keymanapp/common-types';
+import { Osk } from '@keymanapp/developer-utils';
 import { UnicodeSet } from '@keymanapp/common-types';
 import { UnicodeSetParser } from '@keymanapp/common-types';
 

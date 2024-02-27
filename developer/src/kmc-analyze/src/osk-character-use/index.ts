@@ -7,9 +7,24 @@ import { AnalyzerMessages } from "../messages.js";
 
 type StringRefUsageMap = {[index:string]: Osk.StringRefUsage[]};
 
+/**
+ * @public
+ * Options for character analysis
+ */
 export interface AnalyzeOskCharacterUseOptions {
+  /**
+   * First character to use in PUA for remapping with &displayMap, defaults to
+   * U+F100
+   */
   puaBase?: number;
+  /**
+   * If true, strips U+25CC from the key cap before further analysis
+   */
   stripDottedCircle?: boolean;
+  /**
+   * If true, reports number of references to each character found in each
+   * source file
+   */
   includeCounts?: boolean;
 }
 
@@ -19,6 +34,11 @@ const defaultOptions: AnalyzeOskCharacterUseOptions = {
   includeCounts: false,
 }
 
+/**
+ * @public
+ * Analyze the characters used in On Screen Keyboard files (.kvks,
+ * .keyman-touch-layout) for use with `&displayMap`.
+ */
 export class AnalyzeOskCharacterUse {
   private _strings: StringRefUsageMap = {};
   private options: AnalyzeOskCharacterUseOptions;
@@ -27,6 +47,10 @@ export class AnalyzeOskCharacterUse {
     this.options = {...defaultOptions, ...options};
   }
 
+  /**
+   * Clears analysis data collected from previous calls to
+   * {@link AnalyzeOskCharacterUse.analyze}
+   */
   public clear() {
     this._strings = {};
   }
@@ -35,6 +59,19 @@ export class AnalyzeOskCharacterUse {
   // Analyze a single file
   //
 
+  /**
+   * Analyzes a single source file for Unicode character usage. Can parse .kmn,
+   * .kvks, .keyman-touch-layout file formats. Can be called multiple times to
+   * collect results from more than one file. Use
+   * {@link AnalyzeOskCharacterUse.getStrings} to retrieve results.
+   *
+   * Note: `analyze()` collects key cap data, so calling this for a .kmn file
+   * will retrieve the key caps from the .kvks and .keyman-touch-layout files
+   * that it references, rather than key cap data from the .kmn file itself.
+   *
+   * @param   file - relative or absolute path to a Keyman source file
+   * @returns        true if the file is successfully loaded and parsed
+   */
   public async analyze(file: string): Promise<boolean> {
     switch(KeymanFileTypes.sourceTypeFromFilename(file)) {
       case KeymanFileTypes.Source.VisualKeyboard: {
@@ -211,6 +248,30 @@ export class AnalyzeOskCharacterUse {
     return result;
   }
 
+  /**
+   * Returns the collected results from earlier calls to
+   * {@link AnalyzeOskCharacterUse.analyze}. This generates a mapping from a key
+   * cap (one or more characters) to a PUA code, for use with `&displayMap`.
+   *
+   * Three output formats are supported:
+   *
+   * - .txt: tab-separated string format, with three columns: PUA, Key Cap, and
+   *   plain string. The PUA and Key Cap columns are formatted as Unicode Scalar
+   *   Values, e.g. U+0061, and the plain string is the original key cap string.
+   *
+   * - .md: formatted for documentation purposes. Generates a Markdown table
+   *   (GFM) with PUA, Key Cap, and plain string. The PUA and Key Cap columns
+   *   are formatted as Unicode Scalar Values, e.g. U+0061, and the plain string
+   *   is the original key cap string.
+   *
+   * - .json: returns the final aggregated data as an array of strings, which
+   *   can be joined to form a JSON blob of an object with a single member,
+   *   `map`, which is an array of {@link Osk.StringResult} objects.
+   *
+   * @param    format - file format to return - can be '.txt', '.md', or '.json'
+   * @returns  an array of strings, formatted according to the `format`
+   *           parameter.
+   */
   public getStrings(format?: '.txt'|'.md'|'.json'): string[] {
     const final = this.prepareResults(this._strings);
     switch(format) {
