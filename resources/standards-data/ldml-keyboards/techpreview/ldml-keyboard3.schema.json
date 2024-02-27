@@ -544,7 +544,7 @@
       ],
       "type": "object"
     },
-    "unicodeSet": {
+    "uset": {
       "additionalProperties": false,
       "properties": {
         "id": {
@@ -587,9 +587,9 @@
           },
           "type": "array"
         },
-        "unicodeSet": {
+        "uset": {
           "items": {
-            "$ref": "#/definitions/unicodeSet"
+            "$ref": "#/definitions/uset"
           },
           "type": "array"
         }
