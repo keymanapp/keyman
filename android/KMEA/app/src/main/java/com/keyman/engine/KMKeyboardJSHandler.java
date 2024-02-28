@@ -294,7 +294,7 @@ public class KMKeyboardJSHandler {
       KMLog.LogException(TAG,
         KMString.format("Bad subSequence of start %d, end is %d, length %d, dn %d, numPairs %d",
         start, end, charsBackup.length(), dn, numPairs), e);
-      expectedChars = charsBackup;
+      expectedChars = "";
     }
     ic.deleteSurroundingText(dn + numPairs, 0);
     CharSequence newContext = getCharacterSequence(ic, originalBufferLength - 2*dn);
