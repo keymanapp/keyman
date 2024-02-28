@@ -1,4 +1,4 @@
-var _debug = 0;
+var _debug = false;
 
 // Android harness attachment
 if(window.parent && window.parent.jsInterface && !window.jsInterface) {
@@ -235,7 +235,7 @@ function updateKMText(text) {
       text = '';
   }
 
-  console_debug('updateKMText(text='+text+') context.value='+keyman.context.getText());
+  console_debug('updateKMText(text=' + text + ') with: ' + build_context_string(keyman.context));
 
   if(text != keyman.context.getText()) {
     keyman.context.setText(text);
@@ -249,11 +249,17 @@ function console_debug(s) {
   }
 }
 
+function build_context_string(context) {
+  // Sadly, ES6-style "template strings" - strings with backticks - require Chrome 41+.
+  return 'preCaret: `' + context.getTextBeforeCaret() + '`\n' +
+    'selected: `' + context.getSelectedText() + '`\n' +
+    'postCaret: `' + context.getTextAfterCaret() + '`';
+}
+
 function updateKMSelectionRange(start, end) {
   var context = keyman.context;
 
-  // console_debug('updateKMSelectionRange('+start+','+end+'): context.selStart='+ta.selectionStart+' '+
-  //   '['+ta._KeymanWebSelectionStart+'] context.selEnd='+ta.selectionEnd+' '+ta._KeymanWebSelectionEnd);
+  console_debug('updateKMSelectionRange(' + start + ', ' + end + ') with: ' + build_context_string(context));
 
   if(start > end) {
     var e0 = end;

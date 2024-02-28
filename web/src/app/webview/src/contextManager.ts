@@ -12,6 +12,7 @@ export class ContextHost extends Mock {
   constructor(oninserttext: OnInsertTextFunc) {
     super();
     this.oninserttext = oninserttext;
+    this.saveState();
   }
 
   apply(transform: Transform): void {
@@ -45,6 +46,10 @@ export class ContextHost extends Mock {
     }
 
     // Save the current context state for use in future diffs.
+    this.saveState();
+  }
+
+  saveState() {
     this.savedState = Mock.from(this);
   }
 
@@ -77,7 +82,7 @@ export class ContextHost extends Mock {
       this.setSelection(this.text._kmwLength());
     }
 
-    this.savedState = Mock.from(this);
+    this.saveState();
 
     return shouldResetContext;
   }
@@ -182,5 +187,10 @@ export default class ContextManager extends ContextManagerBase<WebviewConfigurat
     }
 
     return activatingKeyboard;
+  }
+
+  public resetContext(): void {
+    super.resetContext();
+    this._rawContext.saveState();
   }
 }
