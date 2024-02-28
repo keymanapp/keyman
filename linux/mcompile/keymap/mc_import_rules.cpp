@@ -22,7 +22,7 @@
 #include <vector>
 #include <string>
 #include <stdio.h>
-#include "km_types.h"
+//#include "km_types.h"
 #include "mc_kmxfile.h"
 #include "keymap.h"
 
@@ -154,7 +154,7 @@ public:
     this->m_rgss[(UINT)shiftState][(capsLock ? 1 : 0)] = value;
   }
 
-// _S2 TOP_1 ToDo delete comments later
+// _S2 TOP_6 ToDo delete comments later
   bool KMX_IsSGCAPS() {
     std::wstring stBase = this->KMX_GetShiftState(Base, false);     // 0,0  a 4 ß
     std::wstring stShift = this->KMX_GetShiftState(Shft, false);    // 1,0  A $ ?

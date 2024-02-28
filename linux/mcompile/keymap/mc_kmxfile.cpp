@@ -1,5 +1,5 @@
 #include "mc_kmxfile.h"
-#include "u16.h"
+//#include "u16.h"
 #include <typeinfo>
 
 #define CERR_None                                          0x00000000
@@ -478,7 +478,6 @@ KMX_BOOL KMX_VerifyKeyboard(LPKMX_BYTE filebase, KMX_DWORD sz){
   return TRUE;
 }
 
-// _S2 TOP_6 TODO use incxstr from elsewhere
 PKMX_WCHAR KMX_incxstr(PKMX_WCHAR p) {
 
   if (*p == 0)

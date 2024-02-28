@@ -54,7 +54,7 @@ bool found_dk_inVector(KMX_WCHAR dk, std::vector<DeadKey*> &dkVec) {
 	return false;
 }
 
-void sort_alDead(std::vector<DeadKey*> &small_Vec, std::vector<DeadKey*> *p_All_Vec) {
+/*void sort_alDead(std::vector<DeadKey*> &small_Vec, std::vector<DeadKey*> *p_All_Vec) {
 	std::vector<DeadKey*> small_sorted;
 	int Vsmall_size;
 	int i = 0;
@@ -75,7 +75,7 @@ void sort_alDead(std::vector<DeadKey*> &small_Vec, std::vector<DeadKey*> *p_All_
 	} while ((i < (int) (*p_All_Vec).size()) && (Vsmall_size>0));
 	small_Vec = small_sorted;
 }
-
+*/
 bool find_dk_combinations_for_specific_dk(v_dw_2D * p_dk_ComposeTable, v_dw_2D  &dk_SingleTable, KMX_DWORD dk) {
 	v_dw_1D line;
 

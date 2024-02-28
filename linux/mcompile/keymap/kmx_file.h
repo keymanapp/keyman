@@ -7,7 +7,7 @@
 #ifndef KMX_FILE_H
 #define KMX_FILE_H
 
-#include <km_types.h>
+//#include <km_types.h>
 
 #define UNREFERENCED_PARAMETER(P)   (P)
 #define TRUNCATE ((size_t)-1)
