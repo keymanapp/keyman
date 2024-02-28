@@ -1,4 +1,4 @@
-import { CompilerErrorNamespace, CompilerErrorSeverity, CompilerMessageSpec as m } from "@keymanapp/common-types";
+import { CompilerErrorNamespace, CompilerErrorSeverity, CompilerMessageSpec as m, CompilerMessageSpecWithException } from "@keymanapp/common-types";
 
 const Namespace = CompilerErrorNamespace.Analyzer;
 const SevInfo = CompilerErrorSeverity.Info | Namespace;
@@ -13,7 +13,7 @@ const SevFatal = CompilerErrorSeverity.Fatal | Namespace;
  */
 export class AnalyzerMessages {
   /** @internal */
-  static Fatal_UnexpectedException = (o:{e: any}) => m(this.FATAL_UnexpectedException, null, o.e ?? 'unknown error');
+  static Fatal_UnexpectedException = (o:{e: any}) => CompilerMessageSpecWithException(this.FATAL_UnexpectedException, null, o.e ?? 'unknown error');
   /**
    * Raised when an analysis components experiences an internal error. If you
    * experience this error, it should be reported to the Keyman team for

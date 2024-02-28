@@ -1,4 +1,4 @@
-import { util, CompilerErrorNamespace, CompilerErrorSeverity, CompilerMessageSpec as m } from "@keymanapp/common-types";
+import { util, CompilerErrorNamespace, CompilerErrorSeverity, CompilerMessageSpec as m, CompilerMessageSpecWithException } from "@keymanapp/common-types";
 // const SevInfo = CompilerErrorSeverity.Info | CompilerErrorNamespace.LdmlKeyboardCompiler;
 const SevHint = CompilerErrorSeverity.Hint | CompilerErrorNamespace.LdmlKeyboardCompiler;
 const SevWarn = CompilerErrorSeverity.Warn | CompilerErrorNamespace.LdmlKeyboardCompiler;
@@ -57,7 +57,7 @@ export class CompilerMessages {
   static ERROR_MustBeAtLeastOneLayerElement = SevError | 0x000E;
 
   static Fatal_SectionCompilerFailed = (o:{sect: string}) =>
-    m(this.FATAL_SectionCompilerFailed, null, `The compiler for '${o.sect}' failed unexpectedly.`);
+  CompilerMessageSpecWithException(this.FATAL_SectionCompilerFailed, null, `The compiler for '${o.sect}' failed unexpectedly.`);
   static FATAL_SectionCompilerFailed = SevFatal | 0x000F;
 
   /** annotate the to= or id= entry */

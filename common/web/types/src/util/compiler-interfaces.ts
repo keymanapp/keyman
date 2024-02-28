@@ -528,14 +528,18 @@ export const defaultCompilerOptions: CompilerOptions = {
  * @param message
  * @returns
  */
-export const CompilerMessageSpec = (code: number, message: string, exceptionVar?: any) : CompilerEvent => ({
+export const CompilerMessageSpec = (code: number, message: string) : CompilerEvent => ({
+  code,
+  message,
+});
+
+export const CompilerMessageSpecWithException = (code: number, message: string, exceptionVar: any) : CompilerEvent => ({
   code,
   message: exceptionVar
     ? (message ?? `Unexpected exception`) + `: ${exceptionVar.toString()}\n\nCall stack:\n${(exceptionVar instanceof Error ? exceptionVar.stack : (new Error()).stack)}` :
     message,
   exceptionVar
 });
-
 /**
  * @deprecated use `CompilerError.exceptionToString` instead
  */

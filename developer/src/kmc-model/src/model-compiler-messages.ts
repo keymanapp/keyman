@@ -1,4 +1,4 @@
-import { CompilerErrorNamespace, CompilerErrorSeverity, CompilerEvent, CompilerMessageSpec } from "@keymanapp/common-types";
+import { CompilerErrorNamespace, CompilerErrorSeverity, CompilerEvent, CompilerMessageSpec, CompilerMessageSpecWithException } from "@keymanapp/common-types";
 
 const Namespace = CompilerErrorNamespace.ModelCompiler;
 // const SevInfo = CompilerErrorSeverity.Info | Namespace;
@@ -7,8 +7,14 @@ const SevHint = CompilerErrorSeverity.Hint | Namespace;
 const SevError = CompilerErrorSeverity.Error | Namespace;
 const SevFatal = CompilerErrorSeverity.Fatal | Namespace;
 
-const m = (code: number, message: string, exceptionVar?: any) : CompilerEvent => ({
-  ...CompilerMessageSpec(code, message, exceptionVar),
+const m = (code: number, message: string) : CompilerEvent => ({
+  ...CompilerMessageSpec(code, message),
+  line: ModelCompilerMessageContext.line,
+  filename: ModelCompilerMessageContext.filename,
+});
+
+const m_e = (code: number, message: string, exceptionVar: any) : CompilerEvent => ({
+  ...CompilerMessageSpecWithException(code, message, exceptionVar),
   line: ModelCompilerMessageContext.line,
   filename: ModelCompilerMessageContext.filename,
 });
@@ -21,7 +27,7 @@ export class ModelCompilerMessageContext {
 
 export class ModelCompilerMessages {
 
-  static Fatal_UnexpectedException = (o:{e: any}) => m(this.FATAL_UnexpectedException, null, o.e ?? 'unknown error');
+  static Fatal_UnexpectedException = (o:{e: any}) => m_e(this.FATAL_UnexpectedException, null, o.e ?? 'unknown error');
   static FATAL_UnexpectedException = SevFatal | 0x0001;
 
   static Hint_MixedNormalizationForms = (o:{wordform: string}) => m(this.HINT_MixedNormalizationForms,

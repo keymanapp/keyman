@@ -1,4 +1,4 @@
-import { CompilerErrorNamespace, CompilerErrorSeverity, CompilerMessageSpec as m } from "@keymanapp/common-types";
+import { CompilerErrorNamespace, CompilerErrorSeverity, CompilerMessageSpec as m, CompilerMessageSpecWithException } from "@keymanapp/common-types";
 
 const Namespace = CompilerErrorNamespace.Infrastructure;
 const SevInfo = CompilerErrorSeverity.Info | Namespace;
@@ -8,7 +8,7 @@ const SevError = CompilerErrorSeverity.Error | Namespace;
 const SevFatal = CompilerErrorSeverity.Fatal | Namespace;
 
 export class InfrastructureMessages {
-  static Fatal_UnexpectedException = (o:{e: any}) => m(this.FATAL_UnexpectedException, null, o.e ?? 'unknown error');
+  static Fatal_UnexpectedException = (o:{e: any}) => CompilerMessageSpecWithException(this.FATAL_UnexpectedException, null, o.e ?? 'unknown error');
   static FATAL_UnexpectedException = SevFatal | 0x0001;
 
   // For this message, we override the filename with the passed-in file. A bit of a hack but does the job
@@ -76,7 +76,7 @@ export class InfrastructureMessages {
     `The build failed because option "treat warnings as errors" is enabled and there are one or more warnings.`);
   static INFO_WarningsHaveFailedBuild = SevInfo | 0x0010;
 
-  static Error_CannotCreateFolder = (o:{folderName:string, e: any}) => m(this.ERROR_CannotCreateFolder, null,
+  static Error_CannotCreateFolder = (o:{folderName:string, e: any}) => CompilerMessageSpecWithException(this.ERROR_CannotCreateFolder, null,
     `Unable to create folder ${o.folderName}: ${o.e ?? 'unknown error'}`);
   static ERROR_CannotCreateFolder = SevError | 0x0011;
 

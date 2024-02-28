@@ -37,8 +37,8 @@ export function parseMapping(mapping: any) {
     throw new Error(JSON.stringify((<any>SchemaValidators.default.displayMap).errors));
   }
 
-  let map: PuaMap = {};
-  for (let item of mapping.map) {
+  const map: PuaMap = {};
+  for (const item of mapping.map) {
     map[item.str] = String.fromCharCode(parseInt(item.pua, 16));
   }
   return map;
@@ -62,7 +62,7 @@ function remap(text: string, map: PuaMap) {
 
 export function remapVisualKeyboard(vk: VisualKeyboard.VisualKeyboard, map: PuaMap): boolean {
   let dirty = false;
-  for(let key of vk.keys) {
+  for(const key of vk.keys) {
     if(!key.text) {
       continue;
     }
@@ -92,18 +92,18 @@ export function remapTouchLayout(source: TouchLayout.TouchLayoutFile, map: PuaMa
     if(!platform) {
       return;
     }
-    for(let layer of platform.layer) {
-      for(let row of layer.row) {
-        for(let key of row.key) {
+    for(const layer of platform.layer) {
+      for(const row of layer.row) {
+        for(const key of row.key) {
           scanKey(key);
           let f: keyof TouchLayout.TouchLayoutFlick;
           for(f in key.flick ?? {}) {
             scanKey(key.flick[f]);
           }
-          for(let sk of key.sk ?? []) {
+          for(const sk of key.sk ?? []) {
             scanKey(sk);
           }
-          for(let mt of key.multitap ?? []) {
+          for(const mt of key.multitap ?? []) {
             scanKey(mt);
           }
         }

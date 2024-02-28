@@ -9,8 +9,8 @@ const SevHint = CompilerErrorSeverity.Hint | Namespace;
 const SevError = CompilerErrorSeverity.Error | Namespace;
 // const SevFatal = CompilerErrorSeverity.Fatal | Namespace;
 
-const m = (code: number, message: string, o?: {e?: any, filename?: string, line?: number}) : CompilerEvent => ({
-  ...CompilerMessageSpec(code, message, o?.e),
+const m = (code: number, message: string, o?: {filename?: string, line?: number}) : CompilerEvent => ({
+  ...CompilerMessageSpec(code, message),
   filename: o?.filename ?? kmnfile,
   line: o?.line,
 });

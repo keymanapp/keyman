@@ -1,4 +1,4 @@
-import { CompilerErrorNamespace, CompilerErrorSeverity, CompilerEvent, CompilerMessageSpec as m } from "@keymanapp/common-types";
+import { CompilerErrorNamespace, CompilerErrorSeverity, CompilerEvent, CompilerMessageSpec as m, CompilerMessageSpecWithException } from "@keymanapp/common-types";
 import { kmnfile } from "../kmw-compiler/compiler-globals.js";
 
 const Namespace = CompilerErrorNamespace.KmnCompiler;
@@ -11,8 +11,8 @@ const SevFatal = CompilerErrorSeverity.Fatal | Namespace;
 // For messages from the KeymanWeb compiler, we need to construct our messages
 // slightly differently. This could be refactored in the future, as it is not
 // obvious which messages should use which function.
-const mw = (code: number, message: string, o?: {e?: any, filename?: string, line?: number}) : CompilerEvent => ({
-  ...m(code, message, o?.e),
+const mw = (code: number, message: string, o?: {filename?: string, line?: number}) : CompilerEvent => ({
+  ...m(code, message),
   filename: o?.filename ?? kmnfile,
   line: o?.line,
 });
@@ -80,7 +80,7 @@ export class KmnCompilerMessages {
   // parameterisation.
 
   /** @internal */
-  static Fatal_UnexpectedException = (o:{e: any}) => m(this.FATAL_UnexpectedException, null, o.e ?? 'unknown error');
+  static Fatal_UnexpectedException = (o:{e: any}) => CompilerMessageSpecWithException(this.FATAL_UnexpectedException, null, o.e ?? 'unknown error');
   /**
    * Raised when KmnCompiler or one of its components experiences an internal
    * error. If you experience this error, it should be reported to the Keyman
@@ -89,7 +89,7 @@ export class KmnCompilerMessages {
   static FATAL_UnexpectedException = SevFatal | 0x900;
 
   /** @internal */
-  static Fatal_MissingWasmModule = (o:{e?: any}) => m(this.FATAL_MissingWasmModule,
+  static Fatal_MissingWasmModule = (o:{e?: any}) => CompilerMessageSpecWithException(this.FATAL_MissingWasmModule,
     `Could not instantiate WASM compiler module or initialization failed`, o.e ?? 'unknown error');
   /**
    * Raised when the kmcmplib component could be instantiated. This may indicate
@@ -103,7 +103,7 @@ export class KmnCompilerMessages {
   // static FATAL_UnableToSetCompilerOptions = SevFatal | 0x902;
 
   /** @internal */
-  static Fatal_CallbacksNotSet = () => m(this.FATAL_CallbacksNotSet, null, `Callbacks were not set with init`);
+  static Fatal_CallbacksNotSet = () => CompilerMessageSpecWithException(this.FATAL_CallbacksNotSet, null, `Callbacks were not set with init`);
   /**
    * Raised when KmnCompiler or one of its components experiences an internal
    * error. If you experience this error, it should be reported to the Keyman
@@ -112,7 +112,7 @@ export class KmnCompilerMessages {
   static FATAL_CallbacksNotSet = SevFatal | 0x903;
 
   /** @internal */
-  static Fatal_UnicodeSetOutOfRange = () => m(this.FATAL_UnicodeSetOutOfRange, null, `UnicodeSet buffer was too small`);
+  static Fatal_UnicodeSetOutOfRange = () => CompilerMessageSpecWithException(this.FATAL_UnicodeSetOutOfRange, null, `UnicodeSet buffer was too small`);
   /**
    * Raised when caller to UnicodeSet functions provides an invalid buffer. If
    * you experience this error, it should be reported to the Keyman team for
