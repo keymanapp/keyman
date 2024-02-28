@@ -1,5 +1,12 @@
 # Keyman Version History
 
+## 17.0.278 beta 2024-02-28
+
+* docs(linux): Updated whatsnew for Keyman for Linux 17 (#10858)
+*  (#10869)
+* chore(android/engine): Reduce toast notifications after installations (#10868)
+* fix(android/engine): Check selection indexes (#10857)
+
 ## 17.0.277 beta 2024-02-27
 
 * fix(developer): exit kmc test data if any failure messages occurred (#10805)
