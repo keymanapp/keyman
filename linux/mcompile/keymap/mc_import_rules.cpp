@@ -109,7 +109,7 @@ int KMX_DeadKeyMap(int index, std::vector<DeadKey *> *deadkeys, int deadkeyBase,
 
 class KMX_VirtualKey {
 private:
-  KMX_HKL m_hkl;      // _S2 TOP_4 QUESTION do I need this and is void* OK to assume? If I remove this, will there be changes in Data-Vectors?
+  //KMX_HKL m_hkl;      // _S2 QUESTION do I need this and is void* OK to assume? If I remove this, will there be changes in Data-Vectors?
   UINT m_vk;
   UINT m_sc;
   bool m_rgfDeadKey[10][2];
@@ -125,9 +125,10 @@ public:
     memset(this->m_rgfDeadKey,0,sizeof(this->m_rgfDeadKey));
   }*/
 
-  KMX_VirtualKey(UINT scanCode, KMX_HKL hkl) {
+  //KMX_VirtualKey(UINT scanCode, KMX_HKL hkl) {
+  KMX_VirtualKey(UINT scanCode) {
     this->m_vk = KMX_get_VKUS_From_KeyCodeUnderlying(scanCode);
-    this->m_hkl = hkl;
+    //this->m_hkl = hkl;
     this->m_sc = scanCode;
     memset(this->m_rgfDeadKey,0,sizeof(this->m_rgfDeadKey));
   }
@@ -269,7 +270,7 @@ public:
         (this->KMX_IsSGCAPS() ? 2 : 0) |
         (this->KMX_IsAltGrCapsEqualToAltGrShift() ? 4 : 0) |
         (this->KMX_IsXxxxGrCapsEqualToXxxxShift() ? 8 : 0);
-    // _S2 TOP_1 -> we need this capslock calculation
+    // _S2 we need this capslock calculation
     //capslock=1;
 
     for (int ss = 0; ss <= MaxShiftState; ss++) {
@@ -392,7 +393,7 @@ int KMX_GetMaxDeadkeyIndex(KMX_WCHAR *p) {
 bool KMX_ImportRules(LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, GdkKeymap **keymap, std::vector<KMX_DeadkeyMapping> *FDeadkeys, KMX_BOOL bDeadkeyConversion) {   // I4353   // I4552
   KMX_Loader loader;
 
-  KMX_HKL hkl = NULL;
+  //KMX_HKL hkl = NULL;
 
   BYTE lpKeyState[256];// = new KeysEx[256];
   std::vector<KMX_VirtualKey*> rgKey; //= new VirtualKey[256];
@@ -412,7 +413,8 @@ bool KMX_ImportRules(LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, GdkKeymap **keymap,
     // Linux cannot get a VK for the underling Keyboard
     // this "connection" is possible only when using All_Vector
 
-    KMX_VirtualKey *key = new KMX_VirtualKey(sc, hkl);
+    //KMX_VirtualKey *key = new KMX_VirtualKey(sc, hkl);
+    KMX_VirtualKey *key = new KMX_VirtualKey(sc);
 
    if((key->VK() != 0) ) {
         rgKey[key->VK()] = key;

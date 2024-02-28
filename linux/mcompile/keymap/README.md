@@ -17,7 +17,7 @@ _S2 TODO new Problem: RALT-dk(4): Why do we havea RALT in dk 4? It makes sense b
 _   S2 TOP_1 NCAPS/capslock-> we need capslock-equation. ---> new Problem: RALT-dk(4)  RALT+Ä
 _S2 TOP_2 Shiftflags
    _S2 TOP_3 dk-table from file->from functions -> ask EB, MD in TX to setup gtk
-_S2 TOP_4 HKL
+   _S2 TOP_4 HKL
    _S2 TOP_5 use files/functions from other places
 _S2 TOP_6 remaining
 
