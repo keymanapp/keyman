@@ -9,7 +9,7 @@ Here are some of the new features we have added to Keyman for Linux 17.0:
   Previously the full functionality only worked with the X11 display server.
 - Slightly modified the UI of `km-config`. The new _Options_ tab allows
   to disable automatic error reporting to keyman.com.
-- Added Mon localization.
+- Added Mon localization ([#9550](https://github.com/keymanapp/keyman/pull/9550)).
 - It is now possible to specify an arbitrary language tag when installing
   a keyboard package from the command line ([#8598](https://github.com/keymanapp/keyman/issues/8598)).
   Previously this only worked for the language tags listed in the
