@@ -240,6 +240,11 @@ function updateKMText(text) {
   if(text != keyman.context.getText()) {
     keyman.context.setText(text);
     keyman.resetContext();
+
+
+    console_debug('result: \n' + build_context_string(keyman.context));
+  } else {
+    console_debug('context unchanged');
   }
 }
 
@@ -270,6 +275,10 @@ function updateKMSelectionRange(start, end) {
   if(context.selStart != start || context.selEnd != end) {
     keyman.context.setSelection(start, end);
     keyman.resetContext();
+
+    console_debug('result:\n' + build_context_string(context));
+  } else {
+    console.debug('range unchanged');
   }
 }
 
