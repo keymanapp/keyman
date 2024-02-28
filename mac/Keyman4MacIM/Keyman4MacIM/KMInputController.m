@@ -8,8 +8,6 @@
 
 #import "KMInputController.h"
 #import "KMInputMethodEventHandler.h"
-#import "KMInputMethodBrowserClientEventHandler.h"
-#import "KMInputMethodSafariClientEventHandler.h"
 #import "KMOSVersion.h"
 #include <Carbon/Carbon.h> /* For kVK_ constants. */
 
@@ -83,22 +81,6 @@ NSMutableArray *servers;
             NSLog(@"activateServer, new active app: '%@', sender %@", clientAppId, sender);
         }
  
-      // TODO: uncomment? commented the browser cases to see how they work with core code
-      /*
-        // Most things in Safari work well using the normal way, but Google Docs doesn't.
-        if ([clientAppId isEqual: @"com.apple.Safari"]) {
-            _eventHandler = [[KMInputMethodSafariClientEventHandler alloc] init];
-        }
-        else if ([clientAppId isEqual: @"org.mozilla.firefox"] ||
-            [clientAppId isEqual: @"com.google.Chrome"]) {
-            _eventHandler = [[KMInputMethodBrowserClientEventHandler alloc] init];
-        }
-        else {
-            // We cache the client for use with events sourced from the low level tap
-            // where we don't necessarily have any access to the current client.
-            _eventHandler = [[KMInputMethodEventHandler alloc] initWithClient:clientAppId client:sender];
-        }
-*/
       _eventHandler = [[KMInputMethodEventHandler alloc] initWithClient:clientAppId client:sender];
 
     }
