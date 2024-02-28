@@ -117,12 +117,13 @@ private:
 
 public:
 
-  KMX_VirtualKey(KMX_HKL hkl,UINT virtualKey) {
+  // _S2 TODO I assume we do not need those...
+  /*KMX_VirtualKey(KMX_HKL hkl,UINT virtualKey) {
     this->m_sc = KMX_get_KeyCodeUnderlying_From_VKUS(virtualKey);
     this->m_hkl = hkl;
     this->m_vk = virtualKey;
     memset(this->m_rgfDeadKey,0,sizeof(this->m_rgfDeadKey));
-  }
+  }*/
 
   KMX_VirtualKey(UINT scanCode, KMX_HKL hkl) {
     this->m_vk = KMX_get_VKUS_From_KeyCodeUnderlying(scanCode);
@@ -420,9 +421,10 @@ bool KMX_ImportRules(LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, GdkKeymap **keymap,
     }
   }
 
-  rgKey[VK_DIVIDE] = new KMX_VirtualKey(hkl, VK_DIVIDE);
+  // _S2 TODO I assume we do not need those...
+  /*rgKey[VK_DIVIDE] = new KMX_VirtualKey(hkl, VK_DIVIDE);
   rgKey[VK_CANCEL] = new KMX_VirtualKey(hkl, VK_CANCEL);
-  rgKey[VK_DECIMAL] = new KMX_VirtualKey(hkl, VK_DECIMAL);
+  rgKey[VK_DECIMAL] = new KMX_VirtualKey(hkl, VK_DECIMAL);*/
 
     // in this part we skip shiftstates 4, 5, 8, 9
     for(UINT iKey = 0; iKey < rgKey.size(); iKey++) {
