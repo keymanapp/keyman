@@ -235,7 +235,7 @@ function updateKMText(text) {
       text = '';
   }
 
-  console_debug('updateKMText(text=' + text + ') with: ' + build_context_string(keyman.context));
+  console_debug('updateKMText(text=' + text + ') with: \n' + build_context_string(keyman.context));
 
   if(text != keyman.context.getText()) {
     keyman.context.setText(text);
@@ -259,7 +259,7 @@ function build_context_string(context) {
 function updateKMSelectionRange(start, end) {
   var context = keyman.context;
 
-  console_debug('updateKMSelectionRange(' + start + ', ' + end + ') with: ' + build_context_string(context));
+  console_debug('updateKMSelectionRange(' + start + ', ' + end + ') with: \n' + build_context_string(context));
 
   if(start > end) {
     var e0 = end;
