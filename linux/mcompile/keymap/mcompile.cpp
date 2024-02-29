@@ -476,10 +476,10 @@ int KMX_GetDeadkeys(v_dw_2D & dk_Table, KMX_WORD DeadKey, KMX_WORD *OutputPairs,
   return (p-OutputPairs);
 }
 
-void KMX_LogError(PWCHAR fmt, ...) {
+void KMX_LogError(const wchar_t* fmt, ...) {
 	WCHAR fmtbuf[256];
-  wchar_t *end = L"\0";
-  wchar_t *nl  = L"\n";
+  const wchar_t* end = L"\0";
+  const wchar_t* nl  = L"\n";
 	va_list vars;
   int j=0;
 

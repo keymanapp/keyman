@@ -6,8 +6,6 @@ Sample program that reads US basic keyboard and compares to key value group
 
 # Keymap
 
-__S2 TODO check if I can use files from some other keyman path instead of a copy here ( e.g. filesystem.h exists elsewhere); where can I use incxstr from
-_S2 TODO Do I need HKL for Linux / can I just use a void* or remove HKL ??,  typeddef of KMX_HKL - can I delete all m_hkl from classes?
 _S2 TODO Check/find use of wchar_t/wstring and replace with char16_t/u16string
 _S2 TODO check call by reference/value
 _S2 TODO what is wrong with kp->dpBitmapOffset/BitmapSize ?

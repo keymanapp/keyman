@@ -290,7 +290,6 @@ public:
           key->dpContext = new KMX_WCHAR[1];
           *key->dpContext = 0;
 
-          //key->ShiftFlags = this->KMX_GetShiftStateValue(capslock, caps, (ShiftState) ss);
           key->ShiftFlags = this->KMX_GetShiftStateValue(capslock, caps, (ShiftState) ss);
           // we already use VK_US so no need to convert it as we do on windows
           key->Key = this->VK();
@@ -327,8 +326,6 @@ public:
 
             key->Line = 0;
             key->ShiftFlags = this->KMX_GetShiftStateValue(capslock, caps, (ShiftState) ss);
-
-          //wprintf(L"capslock = %i, shiftflgs= %i \n", capslock, key->ShiftFlags  );
 
             key->dpContext = new KMX_WCHAR; 
             *key->dpContext = 0;
@@ -395,7 +392,6 @@ bool KMX_ImportRules(LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, GdkKeymap **keymap,
 
   //KMX_HKL hkl = NULL;
 
-  BYTE lpKeyState[256];// = new KeysEx[256];
   std::vector<KMX_VirtualKey*> rgKey; //= new VirtualKey[256];
   std::vector<DeadKey*> alDead;
   std::vector<DeadKey*> alDead_cpl = create_alDead();
@@ -452,7 +448,7 @@ bool KMX_ImportRules(LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, GdkKeymap **keymap,
 
             if(rc > 0) {
               if(*sbBuffer == 0) {
-                //rgKey[iKey]->KMX_SetShiftState(ss, L"", false, (caps == 0)); // _S2 TOP_6 INFO
+                //rgKey[iKey]->KMX_SetShiftState(ss, L"", false, (caps == 0));  // different to windows since behavior on Linux is different
                 rgKey[iKey]->KMX_SetShiftState(ss, L"", false, (caps));
               }
               else {
@@ -461,13 +457,13 @@ bool KMX_ImportRules(LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, GdkKeymap **keymap,
               }
               sbBuffer[rc] = 0;
               //rgKey[iKey]->KMX_SetShiftState(ss, sbBuffer, false, (caps==0));
-              rgKey[iKey]->KMX_SetShiftState(ss, sbBuffer, false, (caps));    //_S2 TOP_6 INFO
+              rgKey[iKey]->KMX_SetShiftState(ss, sbBuffer, false, (caps));      // different to windows since behavior on Linux is different
             }
           }
           else if(rc < 0) {
             sbBuffer[2] = 0;
             //rgKey[iKey]->SetShiftState(ss, sbBuffer, true, (caps == 0));
-            rgKey[iKey]->KMX_SetShiftState(ss, sbBuffer, true, (caps ));   //_S2 TOP_6 INFO
+            rgKey[iKey]->KMX_SetShiftState(ss, sbBuffer, true, (caps ));      // different to windows since behavior on Linux is different
 
             refine_alDead(sbBuffer[0], alDead, &alDead_cpl);
           }
@@ -564,7 +560,6 @@ bool KMX_ImportRules(LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, GdkKeymap **keymap,
       UINT j;
       LPKMX_KEY kkp;
       for(j = 0, kkp = gp->dpKeyArray; j < gp->cxKeyArray; j++, kkp++) {
-        // _S2   TOP_2                0110 1111
         if((kkp->ShiftFlags & (K_CTRLFLAG|K_ALTFLAG|LCTRLFLAG|LALTFLAG|RCTRLFLAG|RALTFLAG)) != 0) {
           gp2->cxKeyArray++;
           LPKMX_KEY kkp2 = new KMX_KEY[gp2->cxKeyArray];

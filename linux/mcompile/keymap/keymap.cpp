@@ -1,5 +1,4 @@
 #include "keymap.h"
-
 #include <xkbcommon/xkbcommon.h>
 
 // unmodified, shift, RALT, shift+RALT
@@ -530,7 +529,6 @@ KMX_DWORD KMX_get_KeyValUnderlying_From_KeyCodeUnderlying(GdkKeymap *keymap, UIN
   GdkKeymapKey *maps;
   guint *keyvals;
   gint count;
-  KMX_DWORD deadkey=0;
   PKMX_WCHAR dky=NULL;
 
 
@@ -579,7 +577,7 @@ KMX_DWORD KMX_get_KeyCodeUnderlying_From_KeyCodeUS(GdkKeymap *keymap, v_dw_3D &A
   //Find KC_underlying character
   for( int i=0; i< (int)All_Vector[1].size()-1 ;i++) {
     for( int j=1; j< (int)All_Vector[1][0].size();j++) {
-      if ( ( All_Vector[1][i][j] == *ws.c_str() ) ) {
+      if ( ( All_Vector[1][i][j] == (KMX_DWORD)  *ws.c_str() ) ) {
         KC_underlying = All_Vector[1][i][0];
         return KC_underlying;
       }
