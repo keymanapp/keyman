@@ -5,6 +5,7 @@ import { TestCompilerCallbacks } from '@keymanapp/developer-test-helpers';
 import { makePathToFixture } from './helpers/index.js';
 import { KeyboardInfoCompiler, KeyboardInfoCompilerResult } from '../src/keyboard-info-compiler.js';
 import { KeyboardInfoCompilerMessages } from '../src/keyboard-info-compiler-messages.js';
+import { KeymanFileTypes } from '@keymanapp/common-types';
 
 const callbacks = new TestCompilerCallbacks();
 
@@ -52,9 +53,9 @@ describe('keyboard-info-compiler', function () {
     assert.deepEqual(actual, expected);
   });
 
-// ERROR_FileDoesNotExist (loadJsFile)
+  // ERROR_FileDoesNotExist (loadJsFile)
 
-  it('handle FileDoesNotExist error correctly', async function() {
+  it('should generate FileDoesNotExist error if .js file does not exist', async function() {
     const jsFilename = makePathToFixture('khmer_angkor', 'build', 'xxx.js');
     const kpsFilename = makePathToFixture('khmer_angkor', 'source', 'khmer_angkor.kps');
     const kmpFilename = makePathToFixture('khmer_angkor', 'build', 'khmer_angkor.kmp');
@@ -79,6 +80,12 @@ describe('keyboard-info-compiler', function () {
     assert.isNull(result);
 
     assert.isTrue(callbacks.hasMessage(KeyboardInfoCompilerMessages.ERROR_FileDoesNotExist),
-    `ERROR_FileDoesNotExist not generated, instead got: `+JSON.stringify(callbacks.messages,null,2));
+      `ERROR_FileDoesNotExist not generated, instead got: `+JSON.stringify(callbacks.messages,null,2));
+    assert.isTrue(nodeCompilerMessage(callbacks, KeyboardInfoCompilerMessages.ERROR_FileDoesNotExist).includes(KeymanFileTypes.Binary.WebKeyboard),
+      KeymanFileTypes.Binary.WebKeyboard+' not found in the message');
   });
 });
+
+function nodeCompilerMessage(ncb: TestCompilerCallbacks, code: number): string {
+  return ncb.messages.find((item) => item.code == code).message ?? '';
+}
