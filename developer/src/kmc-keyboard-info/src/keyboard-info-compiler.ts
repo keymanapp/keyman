@@ -213,11 +213,11 @@ export class KeyboardInfoCompiler implements KeymanCompiler {
     keyboard_info.packageFilename = this.callbacks.path.basename(sources.kmpFilename);
 
     // Always overwrite with actual file size
-    keyboard_info.packageFileSize = this.callbacks.fileSize(sources.kmpFilename);
-    if(keyboard_info.packageFileSize === undefined) {
+    if(!this.callbacks.fs.existsSync(sources.kmpFilename)) {
       this.callbacks.reportMessage(KeyboardInfoCompilerMessages.Error_FileDoesNotExist({filename:sources.kmpFilename}));
       return null;
     }
+    keyboard_info.packageFileSize = this.callbacks.fileSize(sources.kmpFilename);
 
     if(sources.jsFilename) {
       keyboard_info.jsFilename = this.callbacks.path.basename(sources.jsFilename);
