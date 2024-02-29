@@ -72,7 +72,7 @@ describe("'Canary' checks", function() {
       let fireEvent = () => {
         playbackEngine.replayTouchSamples(/*relative coord:*/ [ { sample: {targetX: 10, targetY: 10}, identifier: 1}],
                                           /*state:*/         "start",
-                                          /*recentTouches:*/  [/* TODO */],
+                                          /*recentTouches:*/  [],
                                         );
       }
 

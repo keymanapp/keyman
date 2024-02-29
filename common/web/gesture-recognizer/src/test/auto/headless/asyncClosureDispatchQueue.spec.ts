@@ -6,12 +6,12 @@ import { ManagedPromise, timedPromise } from '@keymanapp/web-utils';
 type ClosureSpy = SinonSpy<[], ReturnType<QueueClosure>>;
 
 describe('AsyncClosureDispatchQueue', () => {
-  it('initial, state', () => {
+  it('has expected initial state', () => {
     const queue = new AsyncClosureDispatchQueue();
     assert.isTrue(queue.ready);
   });
 
-  it('empty queue, default configuration, simple closure', async () => {
+  it('proper handling of simple closure when queue is empty (default config)', async () => {
     const queue = new AsyncClosureDispatchQueue();
 
     const fake = sinon.fake();
@@ -34,7 +34,7 @@ describe('AsyncClosureDispatchQueue', () => {
     assert.isFalse(fake.firstCall.args[0]);
   });
 
-  it('empty queue, default configuration, Promise-returning closure', async () => {
+  it('proper handling of Promise-returning closure when queue is empty (default config)', async () => {
     const queue = new AsyncClosureDispatchQueue();
 
     const lock = new ManagedPromise<void>();
@@ -63,7 +63,7 @@ describe('AsyncClosureDispatchQueue', () => {
     assert.isTrue(fake.called);
   });
 
-  it('non-empty queue, default configuration, simple closure', async () => {
+  it('proper handling of simple closure when queue is not empty (default config)', async () => {
     const queue = new AsyncClosureDispatchQueue();
 
     const fakeTimers = sinon.useFakeTimers();
@@ -101,7 +101,7 @@ describe('AsyncClosureDispatchQueue', () => {
     }
   });
 
-  it('complex case 1 - all queued at the same time', async () => {
+  it('complex case 1 - many tasks, all queued at the same time', async () => {
     // Uses the default timeout between events; just making it extra-explicit here.
     const queue = new AsyncClosureDispatchQueue(() => { return timedPromise(0) });
 
@@ -167,7 +167,7 @@ describe('AsyncClosureDispatchQueue', () => {
     }
   });
 
-  it('complex case 2 - inverted unlock order', async () => {
+  it('complex case 2 - queued closure promises "unlocking" out of order', async () => {
     // Uses the default timeout between events; just making it extra-explicit here.
     const queue = new AsyncClosureDispatchQueue(() => { return timedPromise(0) });
 
