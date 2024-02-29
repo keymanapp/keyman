@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 18.0.7 alpha 2024-02-29
+
+* chore: Merge 17.0.270 beta back to master (#10886)
+
 ## 18.0.6 alpha 2024-02-27
 
 * chore(linux): Temporarily disable autopkgtests gha (#10853)
