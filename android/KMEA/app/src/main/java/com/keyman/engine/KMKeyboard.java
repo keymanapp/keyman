@@ -168,10 +168,12 @@ final class KMKeyboard extends WebView {
     InputConnection ic = KMManager.getInputConnection(this.keyboardType);
     if (ic != null) {
       ExtractedText icText = ic.getExtractedText(new ExtractedTextRequest(), 0);
-      String rawText = icText.text.toString();
-      if (icText != null) {
-        updateText(rawText.toString());
+      if (icText == null) {
+        return false;
       }
+
+      String rawText = icText.text.toString();
+      updateText(rawText.toString());
 
       /*
         The values of selStart & selEnd provided by the system are in code units,
