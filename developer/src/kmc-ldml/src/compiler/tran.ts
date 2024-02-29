@@ -126,7 +126,6 @@ export abstract class TransformCompiler<T extends TransformCompilerType, TranBas
     let cookedFrom = transform.from;
 
     cookedFrom = sections.vars.substituteStrings(cookedFrom, sections);
-    // TODO: handle 'map' case
     const mapFrom = VariableParser.CAPTURE_SET_REFERENCE.exec(cookedFrom);
     const mapTo = VariableParser.MAPPED_SET_REFERENCE.exec(transform.to || '');
     if (mapFrom && mapTo) { // TODO-LDML: error cases
