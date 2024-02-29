@@ -25,7 +25,8 @@ class IbusDaemon(Enum):
     RUNNING = 0,        'ibus-daemon is running'
     NOT_RUNNING = 1,    'ibus-daemon is not running'
     MORE_THAN_ONE = 2,  'Error: more than one instance of ibus-daemon is running'
-    ERROR = 3,          'Error: invalid/unknown user or exception'
+    ERROR_USER = 3,     'Error: invalid/unknown user'
+    ERROR = 4,          'Error: got exception finding ibus-daemon'
 
 
 class IbusUtil():
@@ -110,7 +111,7 @@ def verify_ibus_daemon(start):
     if not user:
         logging.debug('SUDO_USER not set and getpass.getuser() returned None. '
                       'Skipping ibus-daemon check.')
-        return IbusDaemon.ERROR
+        return IbusDaemon.ERROR_USER
 
     try:
         ps_output = subprocess.run(('ps', '--user', user, '-o', 's=', '-o', 'cmd'),
