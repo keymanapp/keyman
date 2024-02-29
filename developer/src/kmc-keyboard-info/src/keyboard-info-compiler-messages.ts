@@ -27,7 +27,7 @@ export class KeyboardInfoCompilerMessages {
     `Invalid author email: ${def(o.email)}`);
 
   static ERROR_LicenseFileIsMissing = SevError | 0x0006;
-  static Error_LicenseFileDoesNotExist = (o:{filename:string}) => m(this.ERROR_LicenseFileIsMissing,
+  static Error_LicenseFileIsMissing = (o:{filename:string}) => m(this.ERROR_LicenseFileIsMissing,
     `License file ${def(o.filename)} does not exist.`);
 
   static ERROR_LicenseFileIsDamaged = SevError | 0x0007;

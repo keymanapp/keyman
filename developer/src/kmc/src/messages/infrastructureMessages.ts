@@ -111,5 +111,30 @@ export class InfrastructureMessages {
   static ERROR_MessageCannotBeCoerced = SevError | 0x0019;
   static Error_MessageCannotBeCoerced = (o:{code: number}) => m(this.ERROR_MessageCannotBeCoerced,
     `Invalid parameter: --message KM${def(o.code?.toString(16))} is not a info, hint or warn message type and cannot be coerced`);
+
+  static ERROR_UnrecognizedMessageCode = SevError | 0x001a;
+  static Error_UnrecognizedMessageCode = (o:{message:string}) => m(
+    this.ERROR_UnrecognizedMessageCode,
+    `Invalid parameter: message identifier '${def(o.message)}' must match format '[KM]#####'`);
+
+  static ERROR_MustSpecifyMessageCode = SevError | 0x001b;
+  static Error_MustSpecifyMessageCode = () => m(
+    this.ERROR_MustSpecifyMessageCode,
+    `Must specify at least one message code or -a for all messages`);
+
+  static ERROR_MessagesCannotBeFilteredForMarkdownFormat = SevError | 0x001c;
+  static Error_MessagesCannotBeFilteredForMarkdownFormat = () => m(
+    this.ERROR_MessagesCannotBeFilteredForMarkdownFormat,
+    `Messages cannot be filtered for markdown format`);
+
+  static ERROR_OutputPathMustBeSpecifiedForMarkdownFormat = SevError | 0x001d;
+  static Error_OutputPathMustBeSpecifiedForMarkdownFormat = () => m(
+    this.ERROR_OutputPathMustBeSpecifiedForMarkdownFormat,
+    `Output path must be specified with -o for markdown output format`);
+
+  static ERROR_OutputPathMustExistAndBeADirectory = SevError | 0x001e;
+  static Error_OutputPathMustExistAndBeADirectory = (o:{outPath:string}) => m(
+    this.ERROR_OutputPathMustExistAndBeADirectory,
+    `Output path ${def(o.outPath)} must exist and must be a folder`);
 }
 

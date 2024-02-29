@@ -374,7 +374,7 @@ export class KeyboardInfoCompiler implements KeymanCompiler {
   private isLicenseMIT(filename: string) {
     const data = this.callbacks.loadFile(filename);
     if(!data) {
-      this.callbacks.reportMessage(KeyboardInfoCompilerMessages.Error_LicenseFileDoesNotExist({filename}));
+      this.callbacks.reportMessage(KeyboardInfoCompilerMessages.Error_LicenseFileIsMissing({filename}));
       return false;
     }
 
