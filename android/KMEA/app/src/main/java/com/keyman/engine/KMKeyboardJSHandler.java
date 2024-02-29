@@ -24,6 +24,7 @@ import com.keyman.engine.KMManager.KeyboardType;
 import com.keyman.engine.data.Keyboard;
 import com.keyman.engine.util.CharSequenceUtil;
 import com.keyman.engine.util.KMLog;
+import com.keyman.engine.util.KMString;
 
 public class KMKeyboardJSHandler {
   private Context context;
@@ -284,7 +285,17 @@ public class KMKeyboardJSHandler {
 
     // Chop dn+numPairs code points from the end of charsBackup
     // subSequence indices are start(inclusive) to end(exclusive)
-    CharSequence expectedChars = charsBackup.subSequence(0, charsBackup.length() - (dn + numPairs));
+    int start = 0;
+    int end = charsBackup.length() - (dn + numPairs);
+    CharSequence expectedChars;
+    try {
+      expectedChars = charsBackup.subSequence(start, end);
+    } catch (IndexOutOfBoundsException e) {
+      KMLog.LogException(TAG,
+        KMString.format("Bad subSequence of start %d, end is %d, length %d, dn %d, numPairs %d",
+        start, end, charsBackup.length(), dn, numPairs), e);
+      expectedChars = "";
+    }
     ic.deleteSurroundingText(dn + numPairs, 0);
     CharSequence newContext = getCharacterSequence(ic, originalBufferLength - 2*dn);
 
@@ -327,7 +338,15 @@ public class KMKeyboardJSHandler {
     if (Character.isLowSurrogate(sequence.charAt(0))) {
       // Adjust if the first char is also a split surrogate pair
       // subSequence indices are start(inclusive) to end(exclusive)
-      sequence = sequence.subSequence(1, sequence.length());
+      int start = 1;
+      int end = sequence.length();
+      try {
+        sequence = sequence.subSequence(start, end);
+      } catch (IndexOutOfBoundsException e) {
+        KMLog.LogException(TAG,
+          KMString.format("Bad subSequence of start %d, end is %d",
+          start, end), e);
+      }      
     }
 
     return sequence;
