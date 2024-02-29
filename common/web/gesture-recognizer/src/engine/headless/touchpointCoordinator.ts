@@ -238,7 +238,7 @@ export class TouchpointCoordinator<HoveredItemType, StateToken=any> extends Even
     /*
       If an `InputEventEngine` internally utilizes the `AsyncClosureDispatchQueue`, this is the point
       at which we are now safe to process further events.  The correct 'stateToken' has been identified
-      and all GestureMatcher possibilities for the source have been launched; path updates to resume _and_
+      and all GestureMatcher possibilities for the source have been launched; path updates may resume _and_
       new incoming paths may now be safely handled.  As such, we can now fulfill any Promise returned by
       a closure defined within its `inputStart` method for the `GestureSource` under consideration.
 
