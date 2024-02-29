@@ -5,7 +5,7 @@ import { TestCompilerCallbacks } from '@keymanapp/developer-test-helpers';
 import { makePathToFixture } from './helpers/index.js';
 import { KeyboardInfoCompiler, KeyboardInfoCompilerResult } from '../src/keyboard-info-compiler.js';
 import { KeyboardInfoCompilerMessages } from '../src/keyboard-info-compiler-messages.js';
-import { KeymanFileTypes } from '@keymanapp/common-types';
+import { KeymanFileTypes, KmpJsonFile } from '@keymanapp/common-types';
 
 const callbacks = new TestCompilerCallbacks();
 
@@ -83,6 +83,34 @@ describe('keyboard-info-compiler', function () {
       `ERROR_FileDoesNotExist not generated, instead got: `+JSON.stringify(callbacks.messages,null,2));
     assert.isTrue(nodeCompilerMessage(callbacks, KeyboardInfoCompilerMessages.ERROR_FileDoesNotExist).includes(KeymanFileTypes.Binary.WebKeyboard),
       KeymanFileTypes.Binary.WebKeyboard+' not found in the message');
+  });
+
+  // ERROR_FileDoesNotExist (font file in package)
+
+  it('should generate FileDoesNotExist error if font file is missing from package', async function() {
+    const jsFilename = makePathToFixture('khmer_angkor', 'build', 'khmer_angkor.js');
+    const kpsFilename = makePathToFixture('khmer_angkor', 'source', 'khmer_angkor.kps');
+    const kmpFilename = makePathToFixture('khmer_angkor', 'build', 'khmer_angkor.kmp');
+
+    const sources = {
+      kmpFilename,
+      sourcePath: 'release/k/khmer_angkor',
+      kpsFilename,
+      jsFilename: jsFilename,
+      forPublishing: true,
+    };
+
+    const compiler = new KeyboardInfoCompiler();
+    assert.isTrue(await compiler.init(callbacks, {sources}));
+    const kmpJsonData: KmpJsonFile.KmpJsonFile = {system: {fileVersion: "7.0", keymanDeveloperVersion: "17.0.204"},
+      options: {},
+      files: []}
+    const source = ["Mondulkiri-R.ttf"]
+    const result = await compiler['fontSourceToKeyboardInfoFont'](kpsFilename, kmpJsonData, source)
+    assert.isNull(result);
+
+    assert.isTrue(callbacks.hasMessage(KeyboardInfoCompilerMessages.ERROR_FileDoesNotExist),
+      `ERROR_FileDoesNotExist not generated, instead got: `+JSON.stringify(callbacks.messages,null,2));
   });
 });
 
