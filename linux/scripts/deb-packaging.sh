@@ -36,6 +36,10 @@ fi
 
 dependencies_action() {
   sudo mk-build-deps --install --tool='apt-get -o Debug::pkgProblemResolver=yes --no-install-recommends --yes' debian/control
+  # Additionally we need quilt to be able to create the source package.
+  # Since this is not needed to build the binary package, it is not
+  # (and should not be) included in `build-depends` in `debian/control`.
+  sudo DEBIAN_FRONTEND=noninteractive apt-get -q -y install quilt
 }
 
 source_action() {
@@ -105,7 +109,7 @@ is_symbols_file_changed() {
 
 get_changes() {
   local WHAT_CHANGED
-  WHAT_CHANGED=$(git diff -I "^${PKG_NAME}.so" "$1".."$2" -- "debian/${PKG_NAME}.symbols" | diffstat -m -t | tail -n +2)
+  WHAT_CHANGED=$(git diff -I "^${LIB_NAME}.so" "$1".."$2" | diffstat -m -t | grep "${PKG_NAME}.symbols" )
 
   IFS=',' read -r -a CHANGES <<< "${WHAT_CHANGED:-0,0,0}"
 }
@@ -143,7 +147,7 @@ check_updated_version_number() {
 
 get_api_version_in_symbols_file() {
   # Retrieve symbols file at commit $1 and extract "1" from
-  # "libkeymancore.so.1 libkeymancore #MINVER#"
+  # "libkeymancore.so.1 libkeymancore1 #MINVER#"
   local firstline tmpfile
   local sha="$1"
 
@@ -155,7 +159,7 @@ get_api_version_in_symbols_file() {
   fi
 
   firstline="$(head -1 "${tmpfile}")"
-  firstline="${firstline#"${PKG_NAME}".so.}"
+  firstline="${firstline#"${LIB_NAME}".so.}"
   firstline="${firstline%% *}"
 
   rm "${tmpfile}"
@@ -164,7 +168,7 @@ get_api_version_in_symbols_file() {
 
 get_api_version_from_core() {
   # Retrieve CORE_API_VERSION.md from commit $1 and extract major version
-  # number from "1.0.0"
+  # number ("1") from "1.0.0"
   local api_version tmpfile
   local sha="$1"
   tmpfile=$(mktemp)
@@ -284,10 +288,12 @@ check_for_api_version_consistency() {
 }
 
 verify_action() {
-  PKG_NAME=libkeymancore
+  local SONAME
+  SONAME=$(get_api_version_from_core "HEAD")
   LIB_NAME=libkeymancore
+  PKG_NAME="${LIB_NAME}${SONAME}"
   if [[ ! -f debian/${PKG_NAME}.symbols ]]; then
-    output_warning "Missing ${PKG_NAME}.symbols file"
+    output_error "Missing ${PKG_NAME}.symbols file"
     exit 0
   fi
 
