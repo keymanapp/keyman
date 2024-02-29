@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 17.0.279 beta 2024-02-29
+
+* fix(linux): Fix libkeymancore-dev dependencies (#10880)
+* chore(resources): update to latest ldml: xmlns, uset (#10865)
+
 ## 17.0.278 beta 2024-02-28
 
 * docs(linux): Updated whatsnew for Keyman for Linux 17 (#10858)
