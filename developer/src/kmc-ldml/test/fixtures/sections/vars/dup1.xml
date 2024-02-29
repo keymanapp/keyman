@@ -12,8 +12,8 @@
     <string id="upper" value="UPPERCASE" /> <!-- ERROR: duplicate -->
     <set id="upper" value="A B C D E FF" /> <!-- ERROR: duplicate -->
     <set id="y" value="Y E S" /> <!-- ERROR: duplicate -->
-    <unicodeSet id="consonants" value="[कसतनमह]" /> <!-- a UnicodeSet -->
-    <unicodeSet id="y" value="[y e s]" />  <!-- ERROR: duplicate -->
+    <uset id="consonants" value="[कसतनमह]" /> <!-- a UnicodeSet -->
+    <uset id="y" value="[y e s]" />  <!-- ERROR: duplicate -->
   </variables>
 
 </keyboard3>

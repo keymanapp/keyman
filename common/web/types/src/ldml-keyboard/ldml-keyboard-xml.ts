@@ -124,7 +124,7 @@ export interface LKRow {
 export interface LKVariables {
   string?: LKString[];
   set?: LKSet[];
-  unicodeSet?: LKUnicodeSet[];
+  uset?: LKUSet[];
 };
 
 /**
@@ -137,7 +137,7 @@ export interface Variable {
 
 export interface LKString extends Variable {};
 export interface LKSet extends Variable {};
-export interface LKUnicodeSet extends Variable {};
+export interface LKUSet extends Variable {};
 
 export interface LKTransforms {
   type?: "simple" | "backspace";
