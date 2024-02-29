@@ -4,6 +4,8 @@ import 'mocha';
 import { TestCompilerCallbacks } from '@keymanapp/developer-test-helpers';
 import { makePathToFixture } from './helpers/index.js';
 import { KeyboardInfoCompiler, KeyboardInfoCompilerResult } from '../src/keyboard-info-compiler.js';
+import { KeyboardInfoCompilerMessages } from '../src/keyboard-info-compiler-messages.js';
+import { KeymanFileTypes } from '@keymanapp/common-types';
 
 const callbacks = new TestCompilerCallbacks();
 
@@ -50,4 +52,40 @@ describe('keyboard-info-compiler', function () {
 
     assert.deepEqual(actual, expected);
   });
+
+  // ERROR_FileDoesNotExist (.kmp fileSize)
+
+  it('should generate FileDoesNotExist error if .kmp file does not exist', async function() {
+    const jsFilename = makePathToFixture('no-kmp', 'build', 'khmer_angkor.js');
+    const kpsFilename = makePathToFixture('no-kmp', 'source', 'khmer_angkor.kps');
+    const kmpFilename = makePathToFixture('no-kmp', 'build', 'khmer_angkor.kmp');
+
+    const sources = {
+      kmpFilename,
+      sourcePath: 'release/k/no-kmp',
+      kpsFilename,
+      jsFilename: jsFilename,
+      forPublishing: true,
+    };
+
+    const compiler = new KeyboardInfoCompiler();
+    assert.isTrue(await compiler.init(callbacks, {sources}));
+    let result: KeyboardInfoCompilerResult = null;
+    try {
+      result = await compiler.run(kmpFilename, null);
+    } catch(e) {
+      callbacks.printMessages();
+      throw e;
+    }
+    assert.isNull(result);
+
+    assert.isTrue(callbacks.hasMessage(KeyboardInfoCompilerMessages.ERROR_FileDoesNotExist),
+      `ERROR_FileDoesNotExist not generated, instead got: `+JSON.stringify(callbacks.messages,null,2));
+    assert.isTrue(nodeCompilerMessage(callbacks, KeyboardInfoCompilerMessages.ERROR_FileDoesNotExist).includes(KeymanFileTypes.Binary.Package),
+      KeymanFileTypes.Binary.Package+' not found in the message');
+  });
 });
+
+function nodeCompilerMessage(ncb: TestCompilerCallbacks, code: number): string {
+  return ncb.messages.find((item) => item.code == code).message ?? '';
+}
