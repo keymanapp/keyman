@@ -49,6 +49,9 @@ public final class CharSequenceUtil {
         String expectedCharsString = expectedChars.toString();
         String currentContextString = currentContext.toString();
         int index = expectedCharsString.lastIndexOf(currentContextString);
+        if (currentContextString.length() == 0) {
+          index = 0;
+        }
         if (index > -1) {
           // subSequence indices are start(inclusive) to end(exclusive)
           charsToRestore = expectedChars.subSequence(index + currentContextString.length(), expectedChars.length());
