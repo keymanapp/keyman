@@ -17,6 +17,7 @@ import com.keyman.engine.data.KeyboardController;
 import com.keyman.engine.KMManager.KeyboardType;
 import com.keyman.engine.KeyboardEventHandler.EventType;
 import com.keyman.engine.KeyboardEventHandler.OnKeyboardEventListener;
+import com.keyman.engine.util.CharSequenceUtil;
 import com.keyman.engine.util.DependencyUtil;
 import com.keyman.engine.util.DependencyUtil.LibraryType;
 import com.keyman.engine.util.FileUtils;
@@ -167,9 +168,29 @@ final class KMKeyboard extends WebView {
     InputConnection ic = KMManager.getInputConnection(this.keyboardType);
     if (ic != null) {
       ExtractedText icText = ic.getExtractedText(new ExtractedTextRequest(), 0);
+      String rawText = icText.text.toString();
       if (icText != null) {
-        updateText(icText.text.toString());
+        updateText(rawText.toString());
       }
+
+      /*
+        The values of selStart & selEnd provided by the system are in code units,
+        not code-points.  We need to account for surrogate pairs here.
+
+        Fortunately, it uses UCS-2 encoding... just like JS.
+
+        References:
+        - https://stackoverflow.com/a/23980211
+        - https://android.googlesource.com/platform/frameworks/base/+/152944f/core/java/android/view/inputmethod/InputConnection.java#326
+       */
+
+      // Count the number of characters which are surrogate pairs.
+      int pairsAtStart = CharSequenceUtil.countSurrogatePairs(rawText.substring(0, selStart), rawText.length());
+      String selectedText = rawText.substring(selStart, selEnd);
+      int pairsSelected = CharSequenceUtil.countSurrogatePairs(selectedText, selectedText.length());
+
+      selStart -= pairsAtStart;
+      selEnd -= (pairsAtStart + pairsSelected);
     }
     this.loadJavascript(KMString.format("updateKMSelectionRange(%d,%d)", selStart, selEnd));
     result = true;
