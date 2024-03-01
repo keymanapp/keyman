@@ -609,16 +609,11 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
   func setContextState(text: String?, range: NSRange, doSync: Bool = false) {
     // Check for any LTR or RTL marks at the context's start; if they exist, we should
     // offset the selection range.
-    let characterOrderingChecks = [ "\u{200e}" /*LTR*/, "\u{202e}" /*RTL 1*/, "\u{200f}" /*RTL 2*/ ]
     var offsetPrefix = false;
 
-    let context = text ?? ""
-
-    for codepoint in characterOrderingChecks {
-      if(context.hasPrefix(codepoint)) {
-        offsetPrefix = true;
-        break;
-      }
+    let context = trimDirectionalMarkPrefix(text)
+    if context.count != (text?.count ?? 0) {
+      offsetPrefix = true
     }
 
     var selRange = range;

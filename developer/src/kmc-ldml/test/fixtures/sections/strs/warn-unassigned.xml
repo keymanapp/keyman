@@ -31,7 +31,7 @@
     <string id="a" value="\m{a}"/>
     <string id="vst" value="pua:\u{E010}"/>
     <set id="vse" value="a b"/>
-    <unicodeSet id="vus" value="[abc]"/>
+    <uset id="vus" value="[abc]"/>
   </variables>
 
   <transforms type="simple">

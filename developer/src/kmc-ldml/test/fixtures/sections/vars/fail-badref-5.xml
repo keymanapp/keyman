@@ -9,7 +9,7 @@
   <!-- from spec -->
   <variables>
     <set id="nonUnicodeSet" value="A B C"/>
-    <unicodeSet id="consonants" value="[$[nonUnicodeSet]]" /> <!-- fail: bad back reference to a set instead of a uset-->
+    <uset id="consonants" value="[$[nonUnicodeSet]]" /> <!-- fail: bad back reference to a set instead of a uset-->
   </variables>
 
 </keyboard3>
