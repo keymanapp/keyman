@@ -44,7 +44,7 @@
 
     "layer-id": {
       "type": "string",
-      "pattern": "^[a-zA-Z0-9_-]+$"
+      "pattern": "^[\\S]+$"
     },
 
     "rows": {
