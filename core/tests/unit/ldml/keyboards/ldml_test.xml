@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<keyboard3 locale="en" conformsTo="techpreview">
+<keyboard3 locale="en" conformsTo="45">
   <info author="Steven R. Loomis" name="LDML Test"/>
   <version number="1.0.0"/>
   <keys>

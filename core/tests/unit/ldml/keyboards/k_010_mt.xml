@@ -12,7 +12,7 @@ Gets part of the way,
 -->
 <!DOCTYPE keyboard3 SYSTEM "../../../../../resources/standards-data/ldml-keyboards/techpreview/dtd/ldmlKeyboard3.dtd">
 <!-- remainder entirely from resources/standards-data/ldml-keyboards/techpreview/3.0/mt-t-k0-47key.xml -->
-<keyboard3 locale="mt-t-k0-47key" conformsTo="techpreview">
+<keyboard3 locale="mt-t-k0-47key" conformsTo="45">
     <locales>
         <!-- English is also an official language in Malta.-->
         <locale id="en" />

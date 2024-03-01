@@ -5,7 +5,7 @@ This will fail because the two markers given don't exist anywhere.
 
 -->
 <!DOCTYPE keyboard3 SYSTEM "../../../../../../../resources/standards-data/ldml-keyboards/techpreview/dtd/ldmlKeyboard3.dtd">
-<keyboard3 locale="mt" conformsTo="techpreview">
+<keyboard3 locale="mt" conformsTo="45">
   <info name="vars-markers-badref-0"/>
 
   <displays>

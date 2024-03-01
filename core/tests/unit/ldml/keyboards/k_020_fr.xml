@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Note: similar to, but slightly ahead of, fr-t-k0-azerty -->
 <!DOCTYPE keyboard3 SYSTEM "../../../../../resources/standards-data/ldml-keyboards/techpreview/dtd/ldmlKeyboard3.dtd">
-<keyboard3 locale="fr-t-k0-azerty" conformsTo="techpreview">
+<keyboard3 locale="fr-t-k0-azerty" conformsTo="45">
 	<locales>
 		<locale id="br" /> <!-- example of including Breton -->
 	</locales>

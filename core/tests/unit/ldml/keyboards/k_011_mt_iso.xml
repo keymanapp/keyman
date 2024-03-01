@@ -12,7 +12,7 @@ Exact copy of mt.xml from CLDR, but with:
   - test case
 -->
 <!DOCTYPE keyboard3 SYSTEM "../../../../../resources/standards-data/ldml-keyboards/techpreview/dtd/ldmlKeyboard3.dtd">
-<keyboard3 locale="mt" conformsTo="techpreview">
+<keyboard3 locale="mt" conformsTo="45">
     <locales>
         <!-- English is also an official language in Malta.-->
         <locale id="en" />

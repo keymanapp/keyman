@@ -5,7 +5,7 @@ from https://github.com/unicode-org/cldr/blob/keyboard-preview/docs/ldml/tr35-ke
 
 -->
 <!DOCTYPE keyboard3 SYSTEM "../../../../../resources/standards-data/ldml-keyboards/techpreview/dtd/ldmlKeyboard3.dtd">
-<keyboard3 locale="en" conformsTo="techpreview">
+<keyboard3 locale="en" conformsTo="45">
   <info author="srl295" indicator="🙀" layout="qwerty" name="k_007_transform_rgx" />
 
   <keys>

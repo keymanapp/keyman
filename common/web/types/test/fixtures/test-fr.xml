@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE keyboardTest3 SYSTEM "../../../../../resources/standards-data/ldml-keyboards/techpreview/dtd/ldmlKeyboardTest3.dtd">
-<keyboardTest3 conformsTo="techpreview">
+<keyboardTest3 conformsTo="45">
     <!--
       Read by:
       - common/web/types/test/ldml-keyboard/test-ldml-keyboard-testdata-reader.ts
