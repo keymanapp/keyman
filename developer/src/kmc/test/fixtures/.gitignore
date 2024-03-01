@@ -2,3 +2,5 @@
 relative_paths/*.kmp
 relative_paths/*.kmx
 compiler-warnings-as-errors/*.kmx
+kpj-1.0/*.kmp
+kpj-1.0/*.kmx
