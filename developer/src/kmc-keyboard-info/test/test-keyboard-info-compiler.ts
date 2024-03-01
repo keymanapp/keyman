@@ -5,7 +5,8 @@ import { TestCompilerCallbacks } from '@keymanapp/developer-test-helpers';
 import { makePathToFixture } from './helpers/index.js';
 import { KeyboardInfoCompiler, KeyboardInfoCompilerResult } from '../src/keyboard-info-compiler.js';
 import { KeyboardInfoCompilerMessages } from '../src/keyboard-info-compiler-messages.js';
-import { KeymanFileTypes } from '@keymanapp/common-types';
+import { KeymanFileTypes, KmpJsonFile } from '@keymanapp/common-types';
+import { KeyboardInfoFile } from './keyboard-info-file.js';
 
 const callbacks = new TestCompilerCallbacks();
 
@@ -70,6 +71,7 @@ describe('keyboard-info-compiler', function () {
 
     const compiler = new KeyboardInfoCompiler();
     assert.isTrue(await compiler.init(callbacks, {sources}));
+    compiler['fillLanguages'] = stubFillLanguages;
     let result: KeyboardInfoCompilerResult = null;
     try {
       result = await compiler.run(kmpFilename, null);
@@ -88,4 +90,8 @@ describe('keyboard-info-compiler', function () {
 
 function nodeCompilerMessage(ncb: TestCompilerCallbacks, code: number): string {
   return ncb.messages.find((item) => item.code == code).message ?? '';
+}
+
+async function stubFillLanguages(kpsFilename: string, keyboard_info: KeyboardInfoFile, kmpJsonData:  KmpJsonFile.KmpJsonFile): Promise<boolean> {
+  return true;
 }
