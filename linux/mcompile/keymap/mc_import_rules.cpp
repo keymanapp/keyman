@@ -75,7 +75,7 @@ int KMX_ToUnicodeEx(guint keycode, PKMX_WCHAR pwszBuff, int shift_state_pos, int
 
   if (!(keycode <= keycode_max))
     return 0;
-// _S2 TOP_7
+// _S2 TOP_7 ok
   KMX_DWORD KeyVal= (KMX_DWORD) KMX_get_KeyVal_From_KeyCode(keymap, keycode, ShiftState(shift_state_pos), caps);
   //std::wstring str = convert_DeadkeyValues_ToWstr(KeyVal);
  // pwszBuff[0]= * (PKMX_WCHAR)  u16string_from_wstring(str).c_str();
@@ -144,7 +144,7 @@ public:
   UINT SC() {
     return this->m_sc;
   }
-// _S2 TOP_7
+// _S2 TOP_7 ok
   std::wstring KMX_GetShiftState(ShiftState shiftState, bool capsLock) {
     return this->m_rgss[(UINT)shiftState][(capsLock ? 1 : 0)];
   }
@@ -168,7 +168,7 @@ public:
     this->m_rgss_16[(UINT)shiftState][(capsLock ? 1 : 0)] = value;
   }
 
-// _S2 TOP_7
+// _S2 TOP_7 ok
   bool KMX_IsSGCAPS() {
     std::wstring stBase = this->KMX_GetShiftState(Base, false);     // 0,0  a 4 ß
     std::wstring stShift = this->KMX_GetShiftState(Shft, false);    // 1,0  A $ ?
@@ -195,7 +195,7 @@ public:
           (stBase.compare(stShiftCaps) != 0) &&                       // stBase != stShiftCaps
           (stShift.compare(stShiftCaps) != 0)));                      // stShift!= stShiftCaps
     }
-// _S2 TOP_7
+// _S2 TOP_7 ok
   bool KMX_IsCapsEqualToShift() {
     std::wstring stBase = this->KMX_GetShiftState(Base, false);     // 0,0  a 4 ß
     std::wstring stShift = this->KMX_GetShiftState(Shft, false);    // 1,0  A $ ?
@@ -216,7 +216,7 @@ public:
           (stBase.compare(stShift) != 0) &&                           // stBase != stShft
           (stShift.compare(stCaps) == 0));                            // stShft == stCaps
     }
-// _S2 TOP_7
+// _S2 TOP_7 ok
   bool KMX_IsAltGrCapsEqualToAltGrShift() {
     std::wstring stBase = this->KMX_GetShiftState(MenuCtrl, false);       // 0,0
     std::wstring stShift = this->KMX_GetShiftState(ShftMenuCtrl, false);  // 1,0
@@ -237,7 +237,7 @@ public:
         (stBase.compare(stShift) != 0) &&                          // stBase != stShft
         (stShift.compare(stCaps) == 0));                           // stShft == stCaps
   }
-// _S2 TOP_7
+// _S2 TOP_7 ok
   bool KMX_IsXxxxGrCapsEqualToXxxxShift() {
     std::wstring stBase = this->KMX_GetShiftState(Xxxx, false);
     std::wstring stShift = this->KMX_GetShiftState(ShftXxxx, false);
@@ -308,7 +308,7 @@ return (
       for (int caps = 0; caps <= 1; caps++) {
         // _S2 TOP_7
         std::wstring st = this->KMX_GetShiftState((ShiftState) ss, (caps == 1));
-        //std::u16string st16 = this->KMX_GetShiftState_16((ShiftState) ss, (caps == 1));
+        //std::u16string st = this->KMX_GetShiftState_16((ShiftState) ss, (caps == 1));
 
         if (st.size() == 0) {
           // No character assigned here
@@ -356,7 +356,7 @@ return (
       for (int caps = 0; caps <= 1; caps++) {
         // _S2 TOP_7
         std::wstring st = this->KMX_GetShiftState((ShiftState) ss, (caps == 1));
-        //std::u16string st_16 = this->KMX_GetShiftState_16((ShiftState) ss, (caps == 1));
+        //std::u16string st = this->KMX_GetShiftState_16((ShiftState) ss, (caps == 1));
         PKMX_WCHAR p;
 
         if (st.size() == 0) {
@@ -527,6 +527,7 @@ bool KMX_ImportRules(LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, GdkKeymap **keymap,
               if(*sbBuffer == 0) {
                 //rgKey[iKey]->KMX_SetShiftState(ss, L"", false, (caps == 0));  // different to windows since behavior on Linux is different
                 rgKey[iKey]->KMX_SetShiftState(ss, u"", false, (caps));
+                //rgKey[iKey]->KMX_SetShiftState_16(ss, u"", false, (caps));
               }
               else {
                 if( (ss == Ctrl || ss == ShftCtrl) ) {
@@ -535,12 +536,14 @@ bool KMX_ImportRules(LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, GdkKeymap **keymap,
               sbBuffer[rc] = 0;
               //rgKey[iKey]->KMX_SetShiftState(ss, sbBuffer, false, (caps==0));
               rgKey[iKey]->KMX_SetShiftState(ss, sbBuffer, false, (caps));      // different to windows since behavior on Linux is different
+              //rgKey[iKey]->KMX_SetShiftState_16(ss, sbBuffer, false, (caps));      // different to windows since behavior on Linux is different
             }
           }
           else if(rc < 0) {
             sbBuffer[2] = 0;
             //rgKey[iKey]->SetShiftState(ss, sbBuffer, true, (caps == 0));
             rgKey[iKey]->KMX_SetShiftState(ss, sbBuffer, true, (caps ));      // different to windows since behavior on Linux is different
+            //rgKey[iKey]->KMX_SetShiftState_16(ss, sbBuffer, true, (caps ));      // different to windows since behavior on Linux is different
 
             refine_alDead(sbBuffer[0], alDead, &alDead_cpl);
           }

@@ -10,7 +10,7 @@ int map_VKShiftState_to_LinModifier(int VKShiftState) {
   else return VKShiftState;
 }
 
-// _S2 TOP_7
+// _S2 TOP_7 ok
 /*KMX_DWORD convertNamesTo_DWORD_Value(std::wstring tok_wstr) {
   // more on https://manpages.ubuntu.com/manpages/jammy/man3/keysyms.3tk.html
   std::map<std::wstring, KMX_DWORD > first;
@@ -561,7 +561,7 @@ int split_US_To_3D_Vector(v_dw_3D &all_US,v_str_1D completeList) {
       for ( int i = 1; i< (int) tokens.size();i++) {
 
         // replace a name with a single character ( a -> a  ; equal -> = )
-        // _S2 TOP_7
+        // _S2 TOP_7 ok
         tokens_int = convertNamesTo_DWORD_Value(tokens[i]);
         //tokens_int = convertNamesTo_DWORD_Value( wstring_from_string(tokens[i]));
 
@@ -652,7 +652,7 @@ bool IsKeymanUsedChar(int KV) {
   else
     return false;
 }
-// _S2 TOP_7
+// _S2 TOP_7 ok
 std::wstring convert_DeadkeyValues_ToWstr(int in) {
 
   if (in == 0 )
@@ -884,7 +884,7 @@ KMX_DWORD KMX_get_VKUS_From_KeyCodeUnderlying(KMX_DWORD keycode) {
   return 0;
 }
 
-// _S2 TOP_7
+// _S2 TOP_7 ok
 std::wstring CodePointToWString(unsigned int codepoint) {
   std::wstring str;
 

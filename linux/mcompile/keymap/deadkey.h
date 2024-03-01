@@ -6,7 +6,7 @@
 #include <map>
 #include "mc_import_rules.h"
 
-// _S2 TOP_7
+// _S2 TOP_7 ok
 // create a vector for a dk combination ( ` + a  ->  à )
 //v_dw_1D createLine(std::wstring  first, std::wstring second, KMX_DWORD number, std::wstring nameresult);
 v_dw_1D createLine(std::string  first, std::string second, KMX_DWORD number, std::string nameresult);

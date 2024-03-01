@@ -71,7 +71,7 @@ static KMX_DWORD deadkey_min = 0xfe50;
 static KMX_DWORD deadkey_max = 0xfe52;  // _S2 TOP_6 TODO This has to go! my test: to only return 3 dk
 
 int map_VKShiftState_to_LinModifier(int VKShiftState);
-// _S2 TOP_7
+// _S2 TOP_7 ok
 // take a std::wstring (=contents of line symbols-file ) and returns the (int) value of the character
 //KMX_DWORD convertNamesTo_DWORD_Value(std::wstring tok_wstr);
 KMX_DWORD convertNamesTo_DWORD_Value(std::string tok_str);
@@ -503,7 +503,7 @@ const UINT ScanCodeToUSVirtualKey[128] = {
 
 bool IsKeymanUsedChar(int KV);
 //------------------------------
-// _S2 TOP_7
+// _S2 TOP_7 ok
 // take deadkey-value (e.g.65106) and return wstring (e.g. '^' )
 std::wstring convert_DeadkeyValues_ToWstr(int in);
 std::u16string convert_DeadkeyValues_To_U16str(int in);
@@ -530,7 +530,7 @@ UINT KMX_get_KeyCodeUnderlying_From_VKUS(KMX_DWORD VirtualKeyUS);
 KMX_DWORD KMX_get_VKUS_From_KeyCodeUnderlying(KMX_DWORD keycode);
 
 // convert codePoint to wstring
-// _S2 TOP_7
+// _S2 TOP_7 ok
 std::wstring CodePointToWString(unsigned int codepoint);
 std::u16string CodePointToString_16(unsigned int codepoint);
 
