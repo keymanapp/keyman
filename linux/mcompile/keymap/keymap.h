@@ -73,7 +73,7 @@ static KMX_DWORD deadkey_max = 0xfe52;  // _S2 TOP_6 TODO This has to go! my tes
 int map_VKShiftState_to_LinModifier(int VKShiftState);
 
 // take a std::wstring (=contents of line symbols-file ) and returns the (int) value of the character
-KMX_DWORD convertNamesTo_DWORD_Value(std::wstring tok_wstr);
+KMX_DWORD convertNamesTo_DWORD_Value(std::string tok_str);
 
 // create a Vector with all entries of both keymaps+ keymap
 int createOneVectorFromBothKeyboards(v_dw_3D &All_Vector,GdkKeymap *keymap);
@@ -502,9 +502,7 @@ const UINT ScanCodeToUSVirtualKey[128] = {
 
 bool IsKeymanUsedChar(int KV);
 //------------------------------
-
 // take deadkey-value (e.g.65106) and return wstring (e.g. '^' )
-std::wstring convert_DeadkeyValues_ToWstr(int in);
 std::u16string convert_DeadkeyValues_To_U16str(int in);
 
 // use gdk_keymap_translate_keyboard_state to get keyval - base function to get keyvals
@@ -529,7 +527,6 @@ UINT KMX_get_KeyCodeUnderlying_From_VKUS(KMX_DWORD VirtualKeyUS);
 KMX_DWORD KMX_get_VKUS_From_KeyCodeUnderlying(KMX_DWORD keycode);
 
 // convert codePoint to wstring
-std::wstring CodePointToWString(unsigned int codepoint);
-std::u16string CodePointToString_16(unsigned int codepoint);
+std::u16string CodePointToU16String(unsigned int codepoint);
 
 # endif /*KEYMAP_H*/

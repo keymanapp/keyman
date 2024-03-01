@@ -18,6 +18,7 @@ _S2 TOP_2 Shiftflags
    _S2 TOP_4 HKL
    _S2 TOP_5 use files/functions from other places
 _S2 TOP_6 remaining
+_S2 TOP_7 wchar_t->char16_t
 
 
 ./mcompile -d /Projects/keyman/keyman/linux/mcompile/keymap/mcompile_test.kmx bla.dll 0407 /Projects/keyman/keyman/linux/mcompile/keymap/mcompile_test_out.kmx
