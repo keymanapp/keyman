@@ -1,5 +1,37 @@
 # Keyman Version History
 
+## 18.0.7 alpha 2024-02-29
+
+* chore: Merge 17.0.270 beta back to master (#10886)
+
+## 18.0.6 alpha 2024-02-27
+
+* chore(linux): Temporarily disable autopkgtests gha (#10853)
+* chore(linux): Update debian changelog (#10827)
+
+## 18.0.5 alpha 2024-02-26
+
+* fix(linux): Dynamically get package name (#10826)
+* chore(linux): Add running autopkgtests on GHA (#10823)
+* fix(linux): Fix autopkgtest gha (#10849)
+
+## 18.0.4 alpha 2024-02-23
+
+* chore(linux): Update debian changelog (#10786)
+
+## 18.0.3 alpha 2024-02-21
+
+* chore(deps): bump ip from 2.0.0 to 2.0.1 (#10792)
+
+## 18.0.2 alpha 2024-02-20
+
+* chore(linux): Add testbuild info to workflow title (#10771)
+
+## 18.0.1 alpha 2024-02-15
+
+* chore(common): move to 18.0 alpha (#10713)
+* chore: move to 18.0 alpha
+
 ## 17.0.279 beta 2024-02-29
 
 * fix(linux): Fix libkeymancore-dev dependencies (#10880)
