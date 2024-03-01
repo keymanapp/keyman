@@ -74,6 +74,7 @@ int map_VKShiftState_to_LinModifier(int VKShiftState);
 
 // take a std::wstring (=contents of line symbols-file ) and returns the (int) value of the character
 KMX_DWORD convertNamesTo_DWORD_Value(std::wstring tok_wstr);
+KMX_DWORD convertNamesTo_DWORD_Value(std::string tok_str);
 
 // create a Vector with all entries of both keymaps+ keymap
 int createOneVectorFromBothKeyboards(v_dw_3D &All_Vector,GdkKeymap *keymap);
