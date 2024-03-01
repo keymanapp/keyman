@@ -1,4 +1,4 @@
-import { CompilerErrorNamespace, CompilerErrorSeverity, CompilerMessageSpec as m, CompilerMessageDef as def, CompilerMessageSpecWithException } from "@keymanapp/common-types";
+import { CompilerError, CompilerErrorNamespace, CompilerErrorSeverity, CompilerMessageSpec as m, CompilerMessageDef as def, CompilerMessageSpecWithException } from "@keymanapp/common-types";
 
 const Namespace = CompilerErrorNamespace.Infrastructure;
 const SevInfo = CompilerErrorSeverity.Info | Namespace;
@@ -102,14 +102,14 @@ export class InfrastructureMessages {
 
   static ERROR_MessageNamespaceNotFound = SevError | 0x0017;
   static Error_MessageNamespaceNotFound = (o:{code: number}) => m(this.ERROR_MessageNamespaceNotFound,
-    `Invalid parameter: --message KM${def(o.code?.toString(16))} does not have a recognized namespace`);
+    `Invalid parameter: --message ${def(o.code?CompilerError.formatCode(o.code):undefined)} does not have a recognized namespace`);
 
   static ERROR_MessageCodeNotFound = SevError | 0x0018;
   static Error_MessageCodeNotFound = (o:{code: number}) => m(this.ERROR_MessageCodeNotFound,
-    `Invalid parameter: --message KM${def(o.code?.toString(16))} is not a recognized code`);
+    `Invalid parameter: --message ${o.code?CompilerError.formatCode(o.code):undefined} is not a recognized code`);
 
   static ERROR_MessageCannotBeCoerced = SevError | 0x0019;
   static Error_MessageCannotBeCoerced = (o:{code: number}) => m(this.ERROR_MessageCannotBeCoerced,
-    `Invalid parameter: --message KM${def(o.code?.toString(16))} is not a info, hint or warn message type and cannot be coerced`);
+    `Invalid parameter: --message ${o.code?CompilerError.formatCode(o.code):undefined} is not of type 'info', 'hint' or 'warn', and cannot be coerced`);
 }
 

@@ -94,7 +94,7 @@ export class CompilerError {
    * ```
    */
   static formatCode(code: number): string {
-    return 'KM' + CompilerError.error(code).toString(16).toUpperCase().padStart(5, '0');
+    return Number.isInteger(code) ? 'KM' + CompilerError.error(code).toString(16).toUpperCase().padStart(5, '0') : 'KM?????';
   }
 
   /**

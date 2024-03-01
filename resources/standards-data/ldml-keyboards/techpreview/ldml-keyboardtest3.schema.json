@@ -205,6 +205,9 @@
             "$ref": "#/definitions/tests"
           },
           "type": "array"
+        },
+        "xmlns": {
+          "type": "string"
         }
       },
       "required": [
