@@ -94,7 +94,7 @@ export class KmnCompilerMessages {
     this.FATAL_MissingWasmModule,
     `Could not instantiate WASM compiler module or initialization failed`,
     o.e ?? 'unknown error',
-    `Raised when the kmcmplib component could be instantiated. This may indicate
+    `Raised when the kmcmplib component could not be instantiated. This may indicate
     a configuration or dependency issue. Make sure you are running a Javascript
     engine that supports WASM, and that use of WASM is enabled.`
   );
@@ -203,7 +203,8 @@ export class KmnCompilerMessages {
   );
 
   static ERROR_FileNotFound = SevError | 0x90C;
-  static Error_FileNotFound = (o:{filename: string}) => m(this.ERROR_FileNotFound,
+  static Error_FileNotFound = (o:{filename: string}) => m(
+    this.ERROR_FileNotFound,
     `File ${def(o.filename)} was not found`,
     `The file was not found on the disk. Verify that you have the correct path
     to the file.`

@@ -1,6 +1,6 @@
 import { CompilerCallbacks, KeymanFileTypes, KvksFile, KvksFileReader, TouchLayout, TouchLayoutFileReader } from "@keymanapp/common-types";
 import { CompilerMessages } from '@keymanapp/kmc-kmn';
-import { Osk } from '@keymanapp/developer-utils';
+import { escapeMarkdownChar, Osk } from '@keymanapp/developer-utils';
 import { getOskFromKmnFile } from "../util/get-osk-from-kmn-file.js";
 import { AnalyzerMessages } from "../messages.js";
 
@@ -303,7 +303,7 @@ export class AnalyzeOskCharacterUse {
     lines.push('-------|-------------|---------');
     for(let s of strings) {
       const ux = this.stringToUnicodeSequence(s.str);
-      lines.push('U+'+s.pua + ' | ' + ux + ' | ' + this.escapeMarkdownChar(s.str));
+      lines.push('U+'+s.pua + ' | ' + ux + ' | ' + escapeMarkdownChar(s.str, true));
     }
     return lines;
   }
@@ -312,20 +312,6 @@ export class AnalyzeOskCharacterUse {
     // For future expansion, we wrap the array in a 'map' property
     let map = { "map": strings };
     return JSON.stringify(map, null, 2).split('\n');
-  }
-
-  private static escapeMarkdownChar(s: string) {
-    // note: could replace with a common lib but too much baggage to be worth it for now
-    // commonmark 2.4: all punct can be escaped
-    // const punct = '!"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~';
-    s = s.replace(/[!"#$%&'()*+,-./:;<=>?@\[\\\]^_`{|}~]/g, '\\$0');
-    // replace whitepsace
-    s = s.replace(/[\n]/g, '\\n');
-    s = s.replace(/[\r]/g, '\\r');
-    s = s.replace(/[\t]/g, '\\t');
-    s = s.replace(/ /g, '&#x20;');
-    s = s.replace(/\u00a0/g, '&#xa0;');
-    return s;
   }
 
   private static stringToUnicodeSequence(s: string, addUPlusPrefix: boolean = true): string {

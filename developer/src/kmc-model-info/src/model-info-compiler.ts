@@ -213,7 +213,7 @@ export class ModelInfoCompiler implements KeymanCompiler {
   private isLicenseMIT(filename: string) {
     const data = this.callbacks.loadFile(filename);
     if(!data) {
-      this.callbacks.reportMessage(ModelInfoCompilerMessages.Error_LicenseFileDoesNotExist({filename}));
+      this.callbacks.reportMessage(ModelInfoCompilerMessages.Error_LicenseFileIsMissing({filename}));
       return false;
     }
 
