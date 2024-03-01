@@ -1,5 +1,5 @@
 import { KmnCompilerMessages } from "../compiler/kmn-compiler-messages.js";
-import { CompilerErrorNamespace, CompilerErrorSeverity, CompilerEvent, CompilerMessageSpec } from "@keymanapp/common-types";
+import { CompilerErrorNamespace, CompilerErrorSeverity, CompilerEvent, CompilerMessageDef as def, CompilerMessageSpec } from "@keymanapp/common-types";
 import { kmnfile } from "./compiler-globals.js";
 
 const Namespace = CompilerErrorNamespace.KmwCompiler;
@@ -9,8 +9,8 @@ const SevHint = CompilerErrorSeverity.Hint | Namespace;
 const SevError = CompilerErrorSeverity.Error | Namespace;
 // const SevFatal = CompilerErrorSeverity.Fatal | Namespace;
 
-const m = (code: number, message: string, o?: {e?: any, filename?: string, line?: number}) : CompilerEvent => ({
-  ...CompilerMessageSpec(code, message, o?.e),
+const m = (code: number, message: string, o?: {filename?: string, line?: number}) : CompilerEvent => ({
+  ...CompilerMessageSpec(code, message),
   filename: o?.filename ?? kmnfile,
   line: o?.line,
 });
@@ -30,28 +30,23 @@ export class KmwCompilerMessages extends KmnCompilerMessages {
 
   // Following messages are kmw-compiler only, so use KmwCompiler error namespace
 
-  /** @internal */
+  static ERROR_NotAnyRequiresVersion14 = SevError | 0x0001;
   static Error_NotAnyRequiresVersion14 = (o:{line: number}) => m(this.ERROR_NotAnyRequiresVersion14,
     `Statement notany in context() match requires version 14.0+ of KeymanWeb`, o);
-  static ERROR_NotAnyRequiresVersion14 = SevError | 0x0001;
 
-  /** @internal */
-  static Error_TouchLayoutIdentifierRequires15 = (o:{keyId:string, platformName:string, layerId:string}) => m(this.ERROR_TouchLayoutIdentifierRequires15,
-    `Key "${o.keyId}" on "${o.platformName}", layer "${o.layerId}" has a multi-part identifier which requires version 15.0 or newer.`);
   static ERROR_TouchLayoutIdentifierRequires15 = SevError | 0x0002;
+  static Error_TouchLayoutIdentifierRequires15 = (o:{keyId:string, platformName:string, layerId:string}) => m(this.ERROR_TouchLayoutIdentifierRequires15,
+    `Key "${def(o.keyId)}" on "${def(o.platformName)}", layer "${def(o.layerId)}" has a multi-part identifier which requires version 15.0 or newer.`);
 
-  /** @internal */
-  static Error_InvalidTouchLayoutFileFormat = (o:{msg: string}) => m(this.ERROR_InvalidTouchLayoutFileFormat,
-    `Invalid touch layout file: ${o.msg}`);
   static ERROR_InvalidTouchLayoutFileFormat = SevError | 0x0003;
+  static Error_InvalidTouchLayoutFileFormat = (o:{msg: string}) => m(this.ERROR_InvalidTouchLayoutFileFormat,
+    `Invalid touch layout file: ${def(o.msg)}`);
 
-  /** @internal */
-  static Error_TouchLayoutFileDoesNotExist = (o:{filename:string}) => m(this.ERROR_TouchLayoutFileDoesNotExist,
-    `Touch layout file ${o.filename} does not exist`);
   static ERROR_TouchLayoutFileDoesNotExist = SevError | 0x0004;
+  static Error_TouchLayoutFileDoesNotExist = (o:{filename:string}) => m(this.ERROR_TouchLayoutFileDoesNotExist,
+    `Touch layout file ${def(o.filename)} does not exist`);
 
-  /** @internal */
-  static Hint_TouchLayoutUsesUnsupportedGesturesDownlevel = (o:{keyId:string}) => m(this.HINT_TouchLayoutUsesUnsupportedGesturesDownlevel,
-    `The touch layout uses a flick or multi-tap gesture on key ${o.keyId}, which is only available on version 17.0+ of Keyman`);
   static HINT_TouchLayoutUsesUnsupportedGesturesDownlevel = SevHint | 0x0005;
+  static Hint_TouchLayoutUsesUnsupportedGesturesDownlevel = (o:{keyId:string}) => m(this.HINT_TouchLayoutUsesUnsupportedGesturesDownlevel,
+    `The touch layout uses a flick or multi-tap gesture on key ${def(o.keyId)}, which is only available on version 17.0+ of Keyman`);
 };
