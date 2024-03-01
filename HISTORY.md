@@ -1,5 +1,18 @@
 # Keyman Version History
 
+## 17.0.280 beta 2024-03-01
+
+* fix(developer): make sure scroll bar appears when needed in global welcome (#10818)
+* chore(common): loosen .keyman-touch-layout schema layer id requirements (#10819)
+* docs(developer): kmc-kmn api documentation and some message documentation (#10856)
+* refactor(developer): cleanup kmn compiler message namespaces (#10867)
+* refactor(developer): reorganize messages for adding details (#10878)
+* fix(ios): context-initial diacritic handling (#10589)
+* feat(developer): adds kmc message command (#10888)
+* test(developer): kmc unit test infrastructure messages (#10825)
+* fix(android): handle surrogate pairs in selection range indexing (#10885)
+* feat(windows): move the code kmshell.dpr to unit so that only the includes are in dpr (#10871)
+
 ## 17.0.279 beta 2024-02-29
 
 * fix(linux): Fix libkeymancore-dev dependencies (#10880)
