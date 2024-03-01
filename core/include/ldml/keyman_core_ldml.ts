@@ -61,6 +61,10 @@ class Constants {
    */
   readonly cldr_version_latest = '45';
   /**
+   * The version for testdata files
+   */
+  readonly cldr_test_version_latest = 'techpreview';
+  /**
    * import base
    */
   readonly cldr_import_base = 'cldr';
