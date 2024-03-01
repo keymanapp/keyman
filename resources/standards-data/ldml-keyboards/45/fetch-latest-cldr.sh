@@ -73,7 +73,7 @@ do
     base=$(basename "${xsd}" .xsd | tr A-Z a-z | sed -e 's%^ldml%ldml-%g' )
     json=${base}.schema.json
     echo "${xsd} -> ${json}"
-    (cd .. ; npx -p  jgexml xsd2json techpreview/"${xsd}" techpreview/"${json}") || exit
+    (cd .. ; npx -p  jgexml xsd2json 45/"${xsd}" 45/"${json}") || exit
     echo 'fixup-schema.js' "${json}"
     node fixup-schema.js "${json}" || builder_die "failed to fixup schema ${json}"
     mv "${json}" tmp.json
