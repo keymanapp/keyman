@@ -41,13 +41,33 @@ export const SECTION_COMPILERS = [
   TranCompiler,
 ];
 
+/**
+ * @public
+ * Internal in-memory build artifacts from a successful compilation
+ */
 export interface LdmlKeyboardCompilerArtifacts extends KeymanCompilerArtifacts {
+  /**
+   * Binary keyboard filedata and filename - installable into Keyman desktop
+   * projects
+   */
   kmx?: KeymanCompilerArtifactOptional;
+  /**
+   * Binary on screen keyboard filedata and filename - installable into Keyman
+   * desktop projects alongside .kmx
+   */
   kvk?: KeymanCompilerArtifactOptional;
+  /**
+   * Javascript keyboard filedata and filename - installable into KeymanWeb,
+   * Keyman mobile products
+   */
   js?: KeymanCompilerArtifactOptional;
 };
 
 export interface LdmlKeyboardCompilerResult extends KeymanCompilerResult {
+  /**
+   * Internal in-memory build artifacts from a successful compilation. Caller
+   * can write these to disk with {@link LdmlKeyboardCompiler.write}
+   */
   artifacts: LdmlKeyboardCompilerArtifacts;
 };
 
