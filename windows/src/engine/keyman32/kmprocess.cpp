@@ -81,10 +81,11 @@ static BOOL
 Process_Event_Core(PKEYMAN64THREADDATA _td) {
   WCHAR application_context[MAXCONTEXT];
   WCHAR core_context[MAXCONTEXT];
-  LPWSTR context_ptr = application_context; 
+  LPWSTR context_ptr = application_context;
   if (_td->app->ReadContext(application_context)) {
-    // pre-process any windows specific text 
-    if (format_context_for_core(application_context, core_context, MAXCONTEXT) == frUPDATED) {
+    // pre-process any windows specific text
+    _td->line_break = normalize_line_breaks(application_context, core_context, MAXCONTEXT);
+    if (_td->line_break != lbNONE) {
       context_ptr = core_context;
     }
     km_core_context_status result;
@@ -93,8 +94,12 @@ Process_Event_Core(PKEYMAN64THREADDATA _td) {
     if (result == KM_CORE_CONTEXT_STATUS_ERROR || result == KM_CORE_CONTEXT_STATUS_INVALID_ARGUMENT) {
       SendDebugMessageFormat(0, sdmGlobal, 0, "Process_Event_Core: km_core_state_context_set_if_needed returned [%d]", result);
     }
+    SendDebugMessageFormatW(0, sdmGlobal, 0, L"Process_Event_Core: set_if_needed result: %d", result);
   }
 
+  auto debug_ctx_app = km_core_state_context_debug(_td->lpActiveKeyboard->lpCoreKeyboardState, KM_CORE_DEBUG_CONTEXT_APP);
+  auto debug_ctx_cached =
+      km_core_state_context_debug(_td->lpActiveKeyboard->lpCoreKeyboardState, KM_CORE_DEBUG_CONTEXT_CACHED);
   SendDebugMessageFormat(
       0, sdmGlobal, 0, "ProcessEvent: vkey[%d] ShiftState[%d] isDown[%d]", _td->state.vkey,
       static_cast<uint16_t>(Globals::get_ShiftState() & (KM_CORE_MODIFIER_MASK_ALL | KM_CORE_MODIFIER_MASK_CAPS)), (uint8_t)_td->state.isDown);
@@ -105,6 +110,20 @@ Process_Event_Core(PKEYMAN64THREADDATA _td) {
     SendDebugMessageFormat(0, sdmGlobal, 0, "ProcessEvent CoreProcessEvent Result:False %d ", FALSE);
     return FALSE;
   }
+  auto debug_ctx_app_after = km_core_state_context_debug(_td->lpActiveKeyboard->lpCoreKeyboardState, KM_CORE_DEBUG_CONTEXT_APP);
+  auto debug_ctx_cached_after =
+      km_core_state_context_debug(_td->lpActiveKeyboard->lpCoreKeyboardState, KM_CORE_DEBUG_CONTEXT_CACHED);
+
+
+  SendDebugMessageFormatW(0, sdmGlobal, 0, L"Process_Event_Core: context app before:   %s", debug_ctx_app);
+  SendDebugMessageFormatW(0, sdmGlobal, 0, L"Process_Event_Core: context app after:    %s", debug_ctx_app_after);
+  SendDebugMessageFormatW(0, sdmGlobal, 0, L"Process_Event_Core: context cache before: %s", debug_ctx_cached);
+  SendDebugMessageFormatW(0, sdmGlobal, 0, L"Process_Event_Core: context cache after:  %s", debug_ctx_cached_after);
+
+  km_core_cp_dispose(debug_ctx_app);
+  km_core_cp_dispose(debug_ctx_cached);
+  km_core_cp_dispose(debug_ctx_app_after);
+  km_core_cp_dispose(debug_ctx_cached_after);
   return TRUE;
 }
 

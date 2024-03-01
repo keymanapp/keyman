@@ -195,5 +195,123 @@ format_context_for_core(LPCWSTR windows_context, LPWSTR core_context, uint32_t o
   return frUPDATED;
 }
 
+LBType normalize_line_breaks(LPCWSTR windows_context, LPWSTR core_context, uint32_t core_context_size_in_chars){
+  
+  // Error Checking
+  if (windows_context == nullptr || core_context == nullptr || core_context_size_in_chars == 0) {
+    return lbNONE;
+  }
+   auto windows_context_length = wcsnlen_s(windows_context, MAXCONTEXT);
+
+ if (core_context_size_in_chars <= windows_context_length) {
+     return lbNONE; // TODO: add error handling 
+ }
+
+  // Replace all line breaks with LF and determine line break type
+  LBType match    = lbNONE;
+  LPCWSTR win_ptr = windows_context;
+  LPWSTR core_ptr = core_context;
+  while (*win_ptr != L'\0') {
+    if (*win_ptr == L'\r' && *(win_ptr + 1) == L'\n') {
+      win_ptr++;  // skip '\r'
+      *core_ptr++ = *win_ptr++;
+      match = lbCRLF;
+    } else if (*win_ptr == L'\r') {
+      *core_ptr++ = L'\n';
+      win_ptr++;
+      match = lbCR;
+    } else if (*win_ptr == L'\n') {
+      *core_ptr++ = *win_ptr++;
+      match       = lbLF;
+    }
+    else {
+      *core_ptr++ = *win_ptr++;
+    }
+  }
+  *core_ptr = L'\0';
+
+  return match;
+}
+
+BOOL
+restore_line_breaks(LPWSTR win_out_str, uint32_t output_size, LBType line_break, LBType default_lb ){
+  if (win_out_str == nullptr) {
+    return FALSE;
+  }
+
+  if (line_break == lbNONE){
+    line_break = default_lb;
+  }
+
+  // return early if doesn't contain any '\n';
+  if (wcsstr(win_out_str, L"\n") == nullptr) {
+    return FALSE;
+  }
+
+  size_t temp_length = wcslen(win_out_str) * 2;
+  LPWSTR temp_string = new WCHAR[temp_length];
+
+  LPCWSTR in_ptr = win_out_str;
+  LPWSTR temp_ptr   = temp_string;
+
+  while (*in_ptr != L'\0') {
+    if (*in_ptr == '\n') {
+      switch (line_break) {
+        case lbLF:
+          *temp_ptr++ = *in_ptr++;
+          break;
+        case lbCRLF:
+          *temp_ptr++ = '\r';
+          *temp_ptr++ = *in_ptr++;
+          break;
+        case lbCR:
+          *temp_ptr++ = '\r';
+          *in_ptr++;
+          break;
+      }
+    } else {
+      *temp_ptr++ = *in_ptr++;
+    }
+  }
+  *temp_ptr = '\0';  // Null terminate the modified string
+
+  // may now need to truncate the string preserving the end closest the caret.
+  auto final_length = wcsnlen_s(temp_string, temp_length);
+  if (final_length < output_size) {
+    wcscpy_s(win_out_str, output_size, temp_string);
+  } else {
+    auto diff = final_length + 1 - output_size;  // +1 for null termination
+    wcscpy_s(win_out_str, output_size, temp_string + diff);
+  }
+  delete[] temp_string;
+  return TRUE;
+}
 
 
+BOOL
+context_char32_char16(const km_core_usv *core_output, LPWSTR win_out_str, uint32_t win_output_size_in_char) {
+  uint8_t idx = 0;
+  size_t  buf_length    = (MAXCONTEXT * 2) + 1;
+  WCHAR *buf = new WCHAR[(MAXCONTEXT * 2) + 1]; // if every charcter is a surragote
+  while (*core_output) {
+    if (Uni_IsSMP(*core_output)) {
+      buf[idx++] = static_cast<WCHAR> Uni_UTF32ToSurrogate1(*core_output);
+      buf[idx++] = static_cast<WCHAR> Uni_UTF32ToSurrogate2(*core_output);
+    } else {
+      buf[idx++] = static_cast<WCHAR>(*core_output);
+    }
+    core_output++;
+  }
+  buf[idx] = 0;  // Null terminate character array
+
+  auto final_length = wcsnlen_s(buf, buf_length);
+  if (final_length < win_output_size_in_char) {
+    wcscpy_s(win_out_str, win_output_size_in_char, buf);
+  } else {
+    auto diff = final_length + 1 - win_output_size_in_char;  // +1 for null termination
+    wcscpy_s(win_out_str, win_output_size_in_char, buf + diff);
+  }
+  delete[] buf;
+  return TRUE;
+
+}

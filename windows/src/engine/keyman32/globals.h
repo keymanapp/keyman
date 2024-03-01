@@ -56,6 +56,7 @@
 
 #include "serialkeyeventclient.h"
 #include "SharedBuffers.h"
+#include "appcontext.h"
 
 #include "..\..\..\include\kmtip_guids.h"
 
@@ -212,6 +213,8 @@ typedef struct tagKEYMAN64THREADDATA
   BOOL TIPFUpdateable, TIPFPreserved;   // I4290
 
   BOOL CoreProcessEventRun;  // True if core process event has been run
+
+  LBType line_break;
 
   BOOL FInRefreshKeyboards;
   BOOL RefreshRequired;

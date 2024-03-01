@@ -103,12 +103,12 @@ public:
 BOOL ContextItemToAppContext(km_core_context_item *contextItems, PWSTR outBuf, DWORD len);
 
 /**
-*  frERROR:    If an error occurs, such as null pointers or buffer to small.
+*  frERROR:    If an error occurs, such as null pointers or buffer too small.
 *  frUPDATED:  If the context has been modified.
 *  frNO_CHANGE: If no modifications were made.
 */
 enum FormatContextResult { frERROR, frUPDATED, frNO_CHANGE };
-
+enum LBType { lbNONE, lbLF, lbCRLF, lbCR };
 /**
  * Pre-processes the given wide-character string context for passing to the
  * Keyman core. Currently, this consists of replacing "\r\n" sequences with
@@ -125,7 +125,9 @@ enum FormatContextResult { frERROR, frUPDATED, frNO_CHANGE };
  */
 FormatContextResult format_context_for_core(LPCWSTR windows_context, LPWSTR core_context, uint32_t output_size);
 
-
+LBType normalize_line_breaks(LPCWSTR windows_context, LPWSTR core_context, uint32_t core_context_size_in_chars);
+BOOL restore_line_breaks(LPWSTR win_out_str, uint32_t output_size, LBType line_break, LBType default_lb);
+BOOL context_char32_char16(const km_core_usv *core_output, LPWSTR win_out_str, uint32_t win_output_size_in_char);
 
 
 #endif

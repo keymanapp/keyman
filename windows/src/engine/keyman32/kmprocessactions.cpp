@@ -20,20 +20,28 @@
 // does both in one parse while adding it to the queue to reduce the double
 // processing.
 
+//static void
+//process_output_string(AITIP* app, const km_core_usv* core_output) {
+//  while (*core_output) {
+//    if (*core_output == L'\n') {
+//      // Insert '\r' for Windows platform applications
+//      app->QueueAction(QIT_CHAR, L'\r');
+//    }
+//    if (Uni_IsSMP(*core_output)) {
+//      app->QueueAction(QIT_CHAR, (Uni_UTF32ToSurrogate1(*core_output)));
+//      app->QueueAction(QIT_CHAR, (Uni_UTF32ToSurrogate2(*core_output)));
+//    } else {
+//      app->QueueAction(QIT_CHAR, *core_output);
+//    }
+//    core_output++;
+//  }
+//}
+
 static void
-process_output_string(AITIP* app, const km_core_usv* core_output) {
-  while (*core_output) {
-    if (*core_output == L'\n') {
-      // Insert '\r' for Windows platform applications
-      app->QueueAction(QIT_CHAR, L'\r');
-    }
-    if (Uni_IsSMP(*core_output)) {
-      app->QueueAction(QIT_CHAR, (Uni_UTF32ToSurrogate1(*core_output)));
-      app->QueueAction(QIT_CHAR, (Uni_UTF32ToSurrogate2(*core_output)));
-    } else {
-      app->QueueAction(QIT_CHAR, *core_output);
-    }
-    core_output++;
+process_output_string_2(AITIP* app, LPWSTR win_output) {
+  while (*win_output) {
+    app->QueueAction(QIT_CHAR, *win_output);
+    win_output++;
   }
 }
 
@@ -122,7 +130,11 @@ BOOL ProcessActions(BOOL* emitKeystroke)
   _td->CoreProcessEventRun = FALSE;
 
   processBack(_td->app, core_actions->code_points_to_delete, core_actions->deleted_context);
-  process_output_string(_td->app, core_actions->output);
+  WCHAR win_out_str[MAXCONTEXT];
+  context_char32_char16(core_actions->output, win_out_str, MAXCONTEXT);
+  restore_line_breaks(win_out_str, MAXCONTEXT, _td->line_break, lbCRLF);
+  //process_output_string(_td->app, core_actions->output);
+  process_output_string_2(_td->app, win_out_str);
   if (core_actions->persist_options != NULL) {
     processPersistOpt(core_actions, _td->lpActiveKeyboard);
   }
