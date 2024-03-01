@@ -8,7 +8,7 @@
 
 // _S2 TOP_7
 // create a vector for a dk combination ( ` + a  ->  à )
-v_dw_1D createLine(std::wstring  first, std::wstring second, KMX_DWORD number, std::wstring nameresult);
+//v_dw_1D createLine(std::wstring  first, std::wstring second, KMX_DWORD number, std::wstring nameresult);
 v_dw_1D createLine(std::string  first, std::string second, KMX_DWORD number, std::string nameresult);
 
 // create a 2D-vector of all dk combinations ( ` + a -> à ;  ^ + a -> â ; `+ e -> è; ...)

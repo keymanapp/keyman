@@ -2,15 +2,14 @@
 #include "deadkey.h"
 
 // _S2 TOP_7
-v_dw_1D createLine(std::wstring  first, std::wstring second, KMX_DWORD number, std::wstring nameresult) {
+/*v_dw_1D createLine(std::wstring  first, std::wstring second, KMX_DWORD number, std::wstring nameresult) {
 	v_dw_1D line;
 	line.push_back(convertNamesTo_DWORD_Value(first));
 	line.push_back(convertNamesTo_DWORD_Value(second));
 	//line.push_back(convertNamesTo_DWORD_Value(nameresult));
 	line.push_back(number);
 	return line;
-}
-
+}*/
 v_dw_1D createLine(std::string  first, std::string second, KMX_DWORD number, std::string nameresult) {
 	v_dw_1D line;
 	line.push_back(convertNamesTo_DWORD_Value(first));
@@ -500,7 +499,7 @@ void create_DKTable(v_dw_2D & dk_ComposeTable) {
 	  dk_ComposeTable.push_back(line);	line.clear();
 }
 
-// _S2 TOP_3 is this the right place to get dk from? if not where are they stored?
+/*// _S2 TOP_3 is this the right place to get dk from? if not where are they stored?
 void create_DKTable_old(v_dw_2D & dk_ComposeTable) {
   //create a 2D-Vector which contains data for ALL existing deadkey combinations on a Linux Keyboard:
   //dk_ComposeTable[i][0] : First    (e.g. dead_circumflex)
@@ -797,8 +796,8 @@ void create_DKTable_old(v_dw_2D & dk_ComposeTable) {
 
 	line = createLine(L"dead_acute",  L"space",  0x0027, L"APOSTROPHE");
 	  dk_ComposeTable.push_back(line);	line.clear();
-	/*line = createLine(L"dead_acute",  L"space",  0x00B4, L"ACUTE_ACCENT");		// _S2 TOP_3 ToDo remove - just for testing
-	  dk_ComposeTable.push_back(line);	line.clear();*/
+	//line = createLine(L"dead_acute",  L"space",  0x00B4, L"ACUTE_ACCENT");		// _S2 TOP_3 ToDo remove - just for testing
+	//  dk_ComposeTable.push_back(line);	line.clear();
 
 	line = createLine(L"dead_grave",  L"space",  0x0060, L"GRAVE_ACCENT");
 	  dk_ComposeTable.push_back(line);	line.clear();
@@ -876,4 +875,4 @@ void create_DKTable_old(v_dw_2D & dk_ComposeTable) {
 	line = createLine(L"dead_tilde",  L"dead_tilde",  0x007E, L"TILDE");
 	  dk_ComposeTable.push_back(line);	line.clear();
 }
-
+*/

@@ -77,8 +77,10 @@ int KMX_ToUnicodeEx(guint keycode, PKMX_WCHAR pwszBuff, int shift_state_pos, int
     return 0;
 // _S2 TOP_7
   KMX_DWORD KeyVal= (KMX_DWORD) KMX_get_KeyVal_From_KeyCode(keymap, keycode, ShiftState(shift_state_pos), caps);
-  std::wstring str = convert_DeadkeyValues_ToWstr(KeyVal);
-  pwszBuff[0]= * (PKMX_WCHAR)  u16string_from_wstring(str).c_str();
+  //std::wstring str = convert_DeadkeyValues_ToWstr(KeyVal);
+ // pwszBuff[0]= * (PKMX_WCHAR)  u16string_from_wstring(str).c_str();
+  std::u16string str_16 = convert_DeadkeyValues_To_U16str(KeyVal);
+  pwszBuff[0]= * (PKMX_WCHAR)  str_16.c_str();
 
 
   g_free(keyvals);

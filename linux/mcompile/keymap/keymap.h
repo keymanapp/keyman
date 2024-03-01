@@ -73,7 +73,7 @@ static KMX_DWORD deadkey_max = 0xfe52;  // _S2 TOP_6 TODO This has to go! my tes
 int map_VKShiftState_to_LinModifier(int VKShiftState);
 // _S2 TOP_7
 // take a std::wstring (=contents of line symbols-file ) and returns the (int) value of the character
-KMX_DWORD convertNamesTo_DWORD_Value(std::wstring tok_wstr);
+//KMX_DWORD convertNamesTo_DWORD_Value(std::wstring tok_wstr);
 KMX_DWORD convertNamesTo_DWORD_Value(std::string tok_str);
 
 // create a Vector with all entries of both keymaps+ keymap

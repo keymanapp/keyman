@@ -11,7 +11,7 @@ int map_VKShiftState_to_LinModifier(int VKShiftState) {
 }
 
 // _S2 TOP_7
-KMX_DWORD convertNamesTo_DWORD_Value(std::wstring tok_wstr) {
+/*KMX_DWORD convertNamesTo_DWORD_Value(std::wstring tok_wstr) {
   // more on https://manpages.ubuntu.com/manpages/jammy/man3/keysyms.3tk.html
   std::map<std::wstring, KMX_DWORD > first;
 
@@ -80,6 +80,7 @@ KMX_DWORD convertNamesTo_DWORD_Value(std::wstring tok_wstr) {
   }
   return returnIfCharInvalid;
 }
+*/
 KMX_DWORD convertNamesTo_DWORD_Value(std::string tok_str) {
   // more on https://manpages.ubuntu.com/manpages/jammy/man3/keysyms.3tk.html
   std::map<std::string, KMX_DWORD > first;
@@ -561,8 +562,8 @@ int split_US_To_3D_Vector(v_dw_3D &all_US,v_str_1D completeList) {
 
         // replace a name with a single character ( a -> a  ; equal -> = )
         // _S2 TOP_7
-        //tokens_int = convertNamesTo_DWORD_Value(tokens[i]);
-        tokens_int = convertNamesTo_DWORD_Value( wstring_from_string(tokens[i]));
+        tokens_int = convertNamesTo_DWORD_Value(tokens[i]);
+        //tokens_int = convertNamesTo_DWORD_Value( wstring_from_string(tokens[i]));
 
         tokens_dw.push_back(tokens_int);
       }
@@ -665,7 +666,6 @@ std::wstring convert_DeadkeyValues_ToWstr(int in) {
   if (in < (int) deadkey_min) {                                                   // no deadkey; no Unicode
     return  std::wstring(1, in);
   }
-// _S2 TOP_7
   KMX_DWORD lname = convertNamesTo_DWORD_Value( long_name);                       // 65106 => "dead_circumflex" => 94 => "^"
   //KMX_DWORD lname = convertNamesTo_DWORD_Value( wstring_from_string(long_name));  // 65106 => "dead_circumflex" => 94 => "^"
 
@@ -675,7 +675,6 @@ std::wstring convert_DeadkeyValues_ToWstr(int in) {
   else
     return L"\0";
 }
-
 std::u16string convert_DeadkeyValues_To_U16str(int in) {
 
   if (in == 0 )
@@ -690,7 +689,8 @@ std::u16string convert_DeadkeyValues_To_U16str(int in) {
     return  std::u16string(1, in);
   }
 
-  KMX_DWORD lname = convertNamesTo_DWORD_Value( wstring_from_string(long_name));  // 65106 => "dead_circumflex" => 94 => "^"
+  //KMX_DWORD lname_old = convertNamesTo_DWORD_Value( wstring_from_string(long_name));  // 65106 => "dead_circumflex" => 94 => "^"
+  KMX_DWORD lname = convertNamesTo_DWORD_Value(long_name);  // 65106 => "dead_circumflex" => 94 => "^"
 
   if (lname != returnIfCharInvalid) {
     return std::u16string(1, lname );
@@ -854,7 +854,7 @@ KMX_WCHAR KMX_get_KeyValUnderlying_From_KeyValUS(v_dw_3D & All_Vector, KMX_DWORD
   }
   return VK_US;
 }
-// _S2 TOP_7
+
 KMX_DWORD KMX_get_KeyCodeUnderlying_From_KeyCodeUS(GdkKeymap *keymap, v_dw_3D &All_Vector, KMX_DWORD KC_US, ShiftState ss, int caps) {
   KMX_DWORD KC_underlying;
   std::u16string u16str = convert_DeadkeyValues_To_U16str(KMX_get_KeyVal_From_KeyCode(keymap, KC_US, ss, caps));
@@ -903,7 +903,6 @@ std::wstring CodePointToWString(unsigned int codepoint) {
 
   return str;
 }
-
 std::u16string CodePointToString_16(unsigned int codepoint) {
   std::u16string str;
 
