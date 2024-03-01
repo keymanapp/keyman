@@ -484,6 +484,7 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
           this.highlightKey(oldKey, false);
           this.gesturePreviewHost?.cancel();
           this.gesturePreviewHost = null;
+          trackingEntry.previewHost = null;
 
           const previewHost = this.highlightKey(key, true);
           if(previewHost) {
@@ -530,6 +531,13 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
         const existingPreviewHost = gestureSequence.allSourceIds.map((id) => {
           return sourceTrackingMap[id]?.previewHost;
         }).find((obj) => !!obj);
+
+        const clearPreviewHost = () => {
+          if(existingPreviewHost) {
+            existingPreviewHost.cancel();
+            this.gesturePreviewHost = null;
+          }
+        }
 
         let handlers: GestureHandler[] = gestureHandlerMap.get(gestureSequence);
         if(!handlers && existingPreviewHost && !gestureStage.matchedId.includes('flick')) {
@@ -625,7 +633,7 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
         if(gestureStage.matchedId == 'special-key-start') {
           if(gestureKey.key.spec.baseKeyID == 'K_BKSP') {
             // There shouldn't be a preview host for special keys... but it doesn't hurt to add the check.
-            existingPreviewHost?.cancel();
+            clearPreviewHost();
 
             // Possible enhancement:  maybe update the held location for the backspace if there's movement?
             // But... that seems pretty low-priority.
@@ -640,7 +648,7 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
             clearActiveGestures(coordSource.identifier);
           }
         } else if(gestureStage.matchedId.indexOf('longpress') > -1) {
-          existingPreviewHost?.cancel();
+          clearPreviewHost();
 
           // Matches:  'longpress', 'longpress-reset'.
           // Likewise.
@@ -659,8 +667,7 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
           trackingEntry.previewHost = null;
 
           gestureSequence.on('complete', () => {
-            existingPreviewHost?.cancel();
-            this.gesturePreviewHost = null;
+            clearPreviewHost();
           })
 
           // Past that, mere construction of the class for delegation is enough.
@@ -676,8 +683,7 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
           )];
         } else if(gestureStage.matchedId.includes('modipress') && gestureStage.matchedId.includes('-start')) {
           // There shouldn't be a preview host for modipress keys... but it doesn't hurt to add the check.
-          existingPreviewHost?.cancel();
-          this.gesturePreviewHost = null;
+          clearPreviewHost();
 
           if(this.layerLocked) {
             console.warn("Unexpected state:  modipress start attempt during an active modipress");
@@ -697,8 +703,7 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
           }
         } else {
           // Probably an initial-tap or a simple-tap.
-          existingPreviewHost?.cancel();
-          this.gesturePreviewHost = null;
+          clearPreviewHost();
         }
 
         if(handlers) {
