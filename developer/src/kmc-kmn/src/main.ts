@@ -6,4 +6,6 @@
 export { KmnCompiler, KmnCompilerOptions, KmnCompilerResult, KmnCompilerArtifacts, KmnCompilerResultExtra, CompilerResultExtraStore, CompilerResultExtraGroup } from './compiler/compiler.js';
 export { KmnCompilerMessages, CompilerMessages } from './compiler/kmn-compiler-messages.js';
 export { KmwCompilerMessages } from './kmw-compiler/kmw-compiler-messages.js';
-export * as Osk from './compiler/osk.js';
+
+import * as Osk from './compiler/osk.js';
+export { Osk };
