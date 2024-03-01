@@ -79,8 +79,8 @@ const
     //  '<!DOCTYPE keyboard3 SYSTEM "ldmlKeyboard3.dtd">'#13#10+
     '<keyboard3>'#13#10+
     '  <keys>'#13#10+
-    '    <import base="cldr" path="techpreview/keys-Zyyy-punctuation.xml"/>'#13#10+
-    '    <import base="cldr" path="techpreview/keys-Zyyy-currency.xml"/>  '#13#10+
+    '    <import base="cldr" path="45/keys-Zyyy-punctuation.xml"/>'#13#10+
+    '    <import base="cldr" path="45/keys-Zyyy-currency.xml"/>  '#13#10+
     '  </keys>'#13#10+
     '  <layers formId="us">'#13#10+
     '    <layer modifiers="none">'#13#10+
