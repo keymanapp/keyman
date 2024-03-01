@@ -5,6 +5,9 @@ const SevWarn = CompilerErrorSeverity.Warn | CompilerErrorNamespace.LdmlKeyboard
 const SevError = CompilerErrorSeverity.Error | CompilerErrorNamespace.LdmlKeyboardCompiler;
 const SevFatal = CompilerErrorSeverity.Fatal | CompilerErrorNamespace.LdmlKeyboardCompiler;
 
+/**
+ * @internal
+ */
 export class CompilerMessages {
   static HINT_NormalizationDisabled = SevHint | 0x0001;
   static Hint_NormalizationDisabled = () => m(this.HINT_NormalizationDisabled, `normalization=disabled is not recommended.`);

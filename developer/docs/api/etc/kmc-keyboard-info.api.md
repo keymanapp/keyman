@@ -65,10 +65,6 @@ export class KeyboardInfoCompilerMessages {
         email: string;
     }) => CompilerEvent;
     // (undocumented)
-    static Error_LicenseFileDoesNotExist: (o: {
-        filename: string;
-    }) => CompilerEvent;
-    // (undocumented)
     static ERROR_LicenseFileIsDamaged: number;
     // (undocumented)
     static Error_LicenseFileIsDamaged: (o: {
@@ -76,6 +72,10 @@ export class KeyboardInfoCompilerMessages {
     }) => CompilerEvent;
     // (undocumented)
     static ERROR_LicenseFileIsMissing: number;
+    // (undocumented)
+    static Error_LicenseFileIsMissing: (o: {
+        filename: string;
+    }) => CompilerEvent;
     // (undocumented)
     static ERROR_LicenseIsNotValid: number;
     // (undocumented)
