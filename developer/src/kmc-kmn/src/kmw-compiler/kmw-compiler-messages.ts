@@ -15,6 +15,10 @@ const m = (code: number, message: string, o?: {e?: any, filename?: string, line?
   line: o?.line,
 });
 
+/**
+ * @public
+ * Error messages reported by the KeymanWeb .kmn compiler.
+ */
 export class KmwCompilerMessages extends KmnCompilerMessages {
   // Note: for legacy reasons, KMWCompilerMessages extends from
   // KMNCompilerMessages as they share the same error codes. This can be a
@@ -24,89 +28,115 @@ export class KmwCompilerMessages extends KmnCompilerMessages {
   // the splitting of all KMW-specific error messages out of the
   // KmnCompilerMessages space.
 
+  /** @internal */
   static Error_InvalidBegin = () => m(this.ERROR_InvalidBegin,
     `A "begin unicode" statement is required to compile a KeymanWeb keyboard`);
 
+  /** @internal */
   static Error_InvalidTouchLayoutFile = (o:{filename:string}) => m(this.ERROR_InvalidTouchLayoutFile,
     `Touch layout file ${o.filename} is not valid`);
 
+  /** @internal */
   static Warn_DontMixChiralAndNonChiralModifiers = () => m(this.WARN_DontMixChiralAndNonChiralModifiers,
     `This keyboard contains Ctrl,Alt and LCtrl,LAlt,RCtrl,RAlt sets of modifiers. Use only one or the other set for web target.`);
 
+  /** @internal */
   static Warn_OptionStoreNameInvalid = (o:{name:string}) => m(this.WARN_OptionStoreNameInvalid,
     `The option store ${o.name} should be named with characters in the range A-Z, a-z, 0-9 and _ only.`);
 
+  /** @internal */
   static Error_VirtualCharacterKeysNotSupportedInKeymanWeb = (o:{line:number}) => m(this.ERROR_VirtualCharacterKeysNotSupportedInKeymanWeb,
     `Virtual character keys not currently supported in KeymanWeb`, o);
 
+  /** @internal */
   static Error_VirtualKeysNotValidForMnemonicLayouts = (o:{line:number}) => m(this.ERROR_VirtualKeysNotValidForMnemonicLayouts,
     `Virtual keys are not valid for mnemonic layouts`, o);
 
+  /** @internal */
   static Warn_ExtendedShiftFlagsNotSupportedInKeymanWeb = (o:{line:number,flags:string}) => m(this.WARN_ExtendedShiftFlagsNotSupportedInKeymanWeb,
     `Extended shift flags ${o.flags} are not supported in KeymanWeb`, o);
 
+  /** @internal */
   static Hint_UnreachableKeyCode = (o:{line:number,key:string}) => m(this.HINT_UnreachableKeyCode,
     `The rule will never be matched for key ${o.key} because its key code is never fired.`, o);
 
+  /** @internal */
   static Error_NotSupportedInKeymanWebStore = (o:{code:string,store:string}) => m(this.ERROR_NotSupportedInKeymanWebStore,
     `'${o.code}' is not currently supported in store '${o.store}' when used by any or index for web and touch targets`);
 
+  /** @internal */
   static Error_NotSupportedInKeymanWebContext = (o:{line:number, code:String}) => m(this.ERROR_NotSupportedInKeymanWebContext,
     `Statement '${o.code}' is not currently supported in context for web and touch targets`, o);
 
+  /** @internal */
   static Error_NotSupportedInKeymanWebOutput = (o:{line:number, code:string}) => m(this.ERROR_NotSupportedInKeymanWebOutput,
     `Statement '${o.code}' is not currently supported in output for web and touch targets`, o);
 
+  /** @internal */
   static Warn_HelpFileMissing = (o:{line:number, helpFilename:string, e:any}) => m(this.WARN_HelpFileMissing,
     `File ${o.helpFilename} could not be loaded: ${(o.e??'').toString()}`,o);
 
+  /** @internal */
   static Warn_EmbedJsFileMissing = (o:{line:number, jsFilename: string, e:any}) => m(this.WARN_EmbedJsFileMissing,
     `File ${o.jsFilename} could not be loaded: ${(o.e??'').toString()}`, o);
 
+  /** @internal */
   static Warn_TouchLayoutMissingLayer = (o:{keyId:string, platformName:string, layerId:string, nextLayer:string}) => m(this.WARN_TouchLayoutMissingLayer,
     `Key "${o.keyId}" on platform "${o.platformName}", layer "${o.layerId}", references a missing layer "${o.nextLayer}"`);
 
+  /** @internal */
   static Warn_TouchLayoutUnidentifiedKey = (o:{layerId:string}) => m(this.WARN_TouchLayoutUnidentifiedKey,
     `A key on layer "${o.layerId}" has no identifier.`);
 
+  /** @internal */
   static Error_TouchLayoutInvalidIdentifier = (o:{keyId:string, platformName: string, layerId:string}) => m(this.ERROR_TouchLayoutInvalidIdentifier,
     `Key "${o.keyId}" on "${o.platformName}", layer "${o.layerId}" has an invalid identifier.`);
 
+  /** @internal */
   static Warn_TouchLayoutCustomKeyNotDefined = (o:{keyId:string, platformName:string, layerId:string}) => m(this.WARN_TouchLayoutCustomKeyNotDefined,
     `Key "${o.keyId}" on platform "${o.platformName}", layer "${o.layerId}", is a custom key but has no corresponding rule in the source.`);
 
+  /** @internal */
   static Warn_TouchLayoutSpecialLabelOnNormalKey = (o:{keyId:string, platformName:string, layerId:string, label:string}) =>
     m(this.WARN_TouchLayoutSpecialLabelOnNormalKey,
     `Key "${o.keyId}" on platform "${o.platformName}", layer "${o.layerId}" does not have `+
     `the key type "Special" or "Special (active)" but has the label "${o.label}". This feature is only supported in Keyman 14 or later`);
 
+  /** @internal */
   static Error_InvalidKeyCode = (o:{keyId: string}) => m(this.ERROR_InvalidKeyCode,
     `Invalid key identifier "${o.keyId}"`);
 
+  /** @internal */
   static Warn_TouchLayoutFontShouldBeSameForAllPlatforms = () => m(this.WARN_TouchLayoutFontShouldBeSameForAllPlatforms,
     `The touch layout font should be the same for all platforms.`);
 
+  /** @internal */
   static Warn_TouchLayoutMissingRequiredKeys = (o:{layerId:string, platformName:string, missingKeys:string}) => m(this.WARN_TouchLayoutMissingRequiredKeys,
     `Layer "${o.layerId}" on platform "${o.platformName}" is missing the required key(s) '${o.missingKeys}'.`);
 
   // Following messages are kmw-compiler only, so use KmwCompiler error namespace
 
+  /** @internal */
   static Error_NotAnyRequiresVersion14 = (o:{line: number}) => m(this.ERROR_NotAnyRequiresVersion14,
     `Statement notany in context() match requires version 14.0+ of KeymanWeb`, o);
   static ERROR_NotAnyRequiresVersion14 = SevError | 0x0001;
 
+  /** @internal */
   static Error_TouchLayoutIdentifierRequires15 = (o:{keyId:string, platformName:string, layerId:string}) => m(this.ERROR_TouchLayoutIdentifierRequires15,
     `Key "${o.keyId}" on "${o.platformName}", layer "${o.layerId}" has a multi-part identifier which requires version 15.0 or newer.`);
   static ERROR_TouchLayoutIdentifierRequires15 = SevError | 0x0002;
 
+  /** @internal */
   static Error_InvalidTouchLayoutFileFormat = (o:{msg: string}) => m(this.ERROR_InvalidTouchLayoutFileFormat,
     `Invalid touch layout file: ${o.msg}`);
   static ERROR_InvalidTouchLayoutFileFormat = SevError | 0x0003;
 
+  /** @internal */
   static Error_TouchLayoutFileDoesNotExist = (o:{filename:string}) => m(this.ERROR_TouchLayoutFileDoesNotExist,
     `Touch layout file ${o.filename} does not exist`);
   static ERROR_TouchLayoutFileDoesNotExist = SevError | 0x0004;
 
+  /** @internal */
   static Hint_TouchLayoutUsesUnsupportedGesturesDownlevel = (o:{keyId:string}) => m(this.HINT_TouchLayoutUsesUnsupportedGesturesDownlevel,
     `The touch layout uses a flick or multi-tap gesture on key ${o.keyId}, which is only available on version 17.0+ of Keyman`);
   static HINT_TouchLayoutUsesUnsupportedGesturesDownlevel = SevHint | 0x0005;

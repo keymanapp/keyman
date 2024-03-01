@@ -15,103 +15,111 @@ import { Osk } from '@keymanapp/developer-utils';
 import { UnicodeSet } from '@keymanapp/common-types';
 import { UnicodeSetParser } from '@keymanapp/common-types';
 
-// @public (undocumented)
+// @public
 export class CompilerMessages {
-    // (undocumented)
     static ERROR_FileNotFound: number;
-    // (undocumented)
+    // @internal (undocumented)
     static Error_FileNotFound: (o: {
         filename: string;
     }) => CompilerEvent;
-    // (undocumented)
     static ERROR_InvalidDisplayMapFile: number;
-    // (undocumented)
+    // @internal (undocumented)
     static Error_InvalidDisplayMapFile: (o: {
         filename: string;
         e: any;
     }) => CompilerEvent;
-    // (undocumented)
     static ERROR_InvalidKvkFile: number;
-    // (undocumented)
+    // @internal (undocumented)
     static Error_InvalidKvkFile: (o: {
         filename: string;
         e: any;
     }) => CompilerEvent;
-    // (undocumented)
     static ERROR_InvalidKvksFile: number;
-    // (undocumented)
+    // @internal (undocumented)
     static Error_InvalidKvksFile: (o: {
         filename: string;
         e: any;
     }) => CompilerEvent;
-    // (undocumented)
     static ERROR_UnicodeSetHasProperties: number;
-    // (undocumented)
+    // @internal (undocumented)
     static Error_UnicodeSetHasProperties: () => CompilerEvent;
-    // (undocumented)
     static ERROR_UnicodeSetHasStrings: number;
-    // (undocumented)
+    // @internal (undocumented)
     static Error_UnicodeSetHasStrings: () => CompilerEvent;
-    // (undocumented)
     static ERROR_UnicodeSetSyntaxError: number;
-    // (undocumented)
+    // @internal (undocumented)
     static Error_UnicodeSetSyntaxError: () => CompilerEvent;
-    // (undocumented)
     static FATAL_CallbacksNotSet: number;
-    // (undocumented)
+    // @internal (undocumented)
     static Fatal_CallbacksNotSet: () => CompilerEvent;
-    // (undocumented)
     static FATAL_MissingWasmModule: number;
-    // (undocumented)
+    // @internal (undocumented)
     static Fatal_MissingWasmModule: (o: {
         e?: any;
     }) => CompilerEvent;
-    // (undocumented)
-    static FATAL_UnableToSetCompilerOptions: number;
-    // (undocumented)
-    static Fatal_UnableToSetCompilerOptions: () => CompilerEvent;
-    // (undocumented)
     static FATAL_UnexpectedException: number;
-    // (undocumented)
+    // @internal (undocumented)
     static Fatal_UnexpectedException: (o: {
         e: any;
     }) => CompilerEvent;
-    // (undocumented)
     static FATAL_UnicodeSetOutOfRange: number;
-    // (undocumented)
+    // @internal (undocumented)
     static Fatal_UnicodeSetOutOfRange: () => CompilerEvent;
-    // (undocumented)
     static WARN_InvalidVkeyInKvksFile: number;
-    // (undocumented)
+    // @internal (undocumented)
     static Warn_InvalidVkeyInKvksFile: (o: {
         filename: string;
         invalidVkey: string;
     }) => CompilerEvent;
 }
 
-// @public (undocumented)
+// Warning: (ae-internal-missing-underscore) The name "CompilerResultExtraGroup" should be prefixed with an underscore because the declaration is marked as @internal
+//
+// @internal (undocumented)
+export interface CompilerResultExtraGroup {
+    // (undocumented)
+    isReadOnly: boolean;
+    // (undocumented)
+    name: string;
+}
+
+// Warning: (ae-internal-missing-underscore) The name "CompilerResultExtraStore" should be prefixed with an underscore because the declaration is marked as @internal
+//
+// @internal (undocumented)
+export interface CompilerResultExtraStore {
+    // (undocumented)
+    line: number;
+    // (undocumented)
+    name: string;
+    // (undocumented)
+    storeType: number;
+}
+
+// @public
 export class KmnCompiler implements KeymanCompiler, UnicodeSetParser {
     constructor();
+    // @internal
     static fixNewPattern(pattern: string): string;
-    // Warning: (ae-forgotten-export) The symbol "KmnCompilerOptions" needs to be exported by the entry point main.d.ts
-    //
-    // (undocumented)
     init(callbacks: CompilerCallbacks, options: KmnCompilerOptions): Promise<boolean>;
-    // (undocumented)
+    // @internal (undocumented)
     parseUnicodeSet(pattern: string, rangeCount: number): UnicodeSet | null;
-    // Warning: (ae-forgotten-export) The symbol "KmnCompilerResult" needs to be exported by the entry point main.d.ts
-    //
-    // (undocumented)
     run(infile: string, outfile: string): Promise<KmnCompilerResult>;
-    // (undocumented)
+    // @internal (undocumented)
     sizeUnicodeSet(pattern: string): number;
-    // (undocumented)
+    // @internal
     testSentry(): any;
     verifyInitialized(): boolean;
-    // Warning: (ae-forgotten-export) The symbol "KmnCompilerArtifacts" needs to be exported by the entry point main.d.ts
-    //
-    // (undocumented)
     write(artifacts: KmnCompilerArtifacts): Promise<boolean>;
+}
+
+// @public
+export interface KmnCompilerArtifacts extends KeymanCompilerArtifacts {
+    // (undocumented)
+    js?: KeymanCompilerArtifactOptional;
+    // (undocumented)
+    kmx?: KeymanCompilerArtifactOptional;
+    // (undocumented)
+    kvk?: KeymanCompilerArtifactOptional;
 }
 
 // @public
@@ -440,141 +448,170 @@ export class KmnCompilerMessages {
     static WARN_VisualKeyboardFileMissing: number;
 }
 
-// @public (undocumented)
+// @public
+export interface KmnCompilerOptions extends CompilerOptions {
+}
+
+// @public
+export interface KmnCompilerResult extends KeymanCompilerResult {
+    // (undocumented)
+    artifacts: KmnCompilerArtifacts;
+    // (undocumented)
+    displayMap?: Osk.PuaMap;
+    // Warning: (ae-incompatible-release-tags) The symbol "extra" is marked as @public, but its signature references "KmnCompilerResultExtra" which is marked as @internal
+    //
+    // (undocumented)
+    extra: KmnCompilerResultExtra;
+}
+
+// Warning: (ae-internal-missing-underscore) The name "KmnCompilerResultExtra" should be prefixed with an underscore because the declaration is marked as @internal
+//
+// @internal
+export interface KmnCompilerResultExtra {
+    // (undocumented)
+    displayMapFilename?: string;
+    // (undocumented)
+    groups: CompilerResultExtraGroup[];
+    // (undocumented)
+    kvksFilename?: string;
+    // (undocumented)
+    stores: CompilerResultExtraStore[];
+    targets: number;
+}
+
+// @public
 export class KmwCompilerMessages extends KmnCompilerMessages {
-    // (undocumented)
+    // @internal (undocumented)
     static Error_InvalidBegin: () => CompilerEvent;
-    // (undocumented)
+    // @internal (undocumented)
     static Error_InvalidKeyCode: (o: {
         keyId: string;
     }) => CompilerEvent;
-    // (undocumented)
+    // @internal (undocumented)
     static Error_InvalidTouchLayoutFile: (o: {
         filename: string;
     }) => CompilerEvent;
     // (undocumented)
     static ERROR_InvalidTouchLayoutFileFormat: number;
-    // (undocumented)
+    // @internal (undocumented)
     static Error_InvalidTouchLayoutFileFormat: (o: {
         msg: string;
     }) => CompilerEvent;
     // (undocumented)
     static ERROR_NotAnyRequiresVersion14: number;
-    // (undocumented)
+    // @internal (undocumented)
     static Error_NotAnyRequiresVersion14: (o: {
         line: number;
     }) => CompilerEvent;
-    // (undocumented)
+    // @internal (undocumented)
     static Error_NotSupportedInKeymanWebContext: (o: {
         line: number;
         code: String;
     }) => CompilerEvent;
-    // (undocumented)
+    // @internal (undocumented)
     static Error_NotSupportedInKeymanWebOutput: (o: {
         line: number;
         code: string;
     }) => CompilerEvent;
-    // (undocumented)
+    // @internal (undocumented)
     static Error_NotSupportedInKeymanWebStore: (o: {
         code: string;
         store: string;
     }) => CompilerEvent;
     // (undocumented)
     static ERROR_TouchLayoutFileDoesNotExist: number;
-    // (undocumented)
+    // @internal (undocumented)
     static Error_TouchLayoutFileDoesNotExist: (o: {
         filename: string;
     }) => CompilerEvent;
     // (undocumented)
     static ERROR_TouchLayoutIdentifierRequires15: number;
-    // (undocumented)
+    // @internal (undocumented)
     static Error_TouchLayoutIdentifierRequires15: (o: {
         keyId: string;
         platformName: string;
         layerId: string;
     }) => CompilerEvent;
-    // (undocumented)
+    // @internal (undocumented)
     static Error_TouchLayoutInvalidIdentifier: (o: {
         keyId: string;
         platformName: string;
         layerId: string;
     }) => CompilerEvent;
-    // (undocumented)
+    // @internal (undocumented)
     static Error_VirtualCharacterKeysNotSupportedInKeymanWeb: (o: {
         line: number;
     }) => CompilerEvent;
-    // (undocumented)
+    // @internal (undocumented)
     static Error_VirtualKeysNotValidForMnemonicLayouts: (o: {
         line: number;
     }) => CompilerEvent;
     // (undocumented)
     static HINT_TouchLayoutUsesUnsupportedGesturesDownlevel: number;
-    // (undocumented)
+    // @internal (undocumented)
     static Hint_TouchLayoutUsesUnsupportedGesturesDownlevel: (o: {
         keyId: string;
     }) => CompilerEvent;
-    // (undocumented)
+    // @internal (undocumented)
     static Hint_UnreachableKeyCode: (o: {
         line: number;
         key: string;
     }) => CompilerEvent;
-    // (undocumented)
+    // @internal (undocumented)
     static Warn_DontMixChiralAndNonChiralModifiers: () => CompilerEvent;
-    // (undocumented)
+    // @internal (undocumented)
     static Warn_EmbedJsFileMissing: (o: {
         line: number;
         jsFilename: string;
         e: any;
     }) => CompilerEvent;
-    // (undocumented)
+    // @internal (undocumented)
     static Warn_ExtendedShiftFlagsNotSupportedInKeymanWeb: (o: {
         line: number;
         flags: string;
     }) => CompilerEvent;
-    // (undocumented)
+    // @internal (undocumented)
     static Warn_HelpFileMissing: (o: {
         line: number;
         helpFilename: string;
         e: any;
     }) => CompilerEvent;
-    // (undocumented)
+    // @internal (undocumented)
     static Warn_OptionStoreNameInvalid: (o: {
         name: string;
     }) => CompilerEvent;
-    // (undocumented)
+    // @internal (undocumented)
     static Warn_TouchLayoutCustomKeyNotDefined: (o: {
         keyId: string;
         platformName: string;
         layerId: string;
     }) => CompilerEvent;
-    // (undocumented)
+    // @internal (undocumented)
     static Warn_TouchLayoutFontShouldBeSameForAllPlatforms: () => CompilerEvent;
-    // (undocumented)
+    // @internal (undocumented)
     static Warn_TouchLayoutMissingLayer: (o: {
         keyId: string;
         platformName: string;
         layerId: string;
         nextLayer: string;
     }) => CompilerEvent;
-    // (undocumented)
+    // @internal (undocumented)
     static Warn_TouchLayoutMissingRequiredKeys: (o: {
         layerId: string;
         platformName: string;
         missingKeys: string;
     }) => CompilerEvent;
-    // (undocumented)
+    // @internal (undocumented)
     static Warn_TouchLayoutSpecialLabelOnNormalKey: (o: {
         keyId: string;
         platformName: string;
         layerId: string;
         label: string;
     }) => CompilerEvent;
-    // (undocumented)
+    // @internal (undocumented)
     static Warn_TouchLayoutUnidentifiedKey: (o: {
         layerId: string;
     }) => CompilerEvent;
 }
-
-// (No @packageDocumentation comment for this package)
 
 ```

@@ -1,4 +1,8 @@
+/**
+ * @packageDocumentation
+ * kmc-kmn - Keyman keyboard compiler
+ */
 
-export { KmnCompiler } from './compiler/compiler.js';
+export { KmnCompiler, KmnCompilerOptions, KmnCompilerResult, KmnCompilerArtifacts, KmnCompilerResultExtra, CompilerResultExtraStore, CompilerResultExtraGroup } from './compiler/compiler.js';
 export { KmnCompilerMessages, CompilerMessages } from './compiler/kmn-compiler-messages.js';
 export { KmwCompilerMessages } from './kmw-compiler/kmw-compiler-messages.js';
