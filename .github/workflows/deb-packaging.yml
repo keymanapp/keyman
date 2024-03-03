@@ -1,5 +1,5 @@
 name: "Ubuntu packaging"
-run-name: "Ubuntu packaging - ${{ github.event.client_payload.branch }} (branch ${{ github.event.client_payload.baseBranch }}), by @${{ github.event.client_payload.user }}"
+run-name: "Ubuntu packaging - ${{ github.event.client_payload.branch }} (branch ${{ github.event.client_payload.baseBranch }}), by @${{ github.event.client_payload.user }}, testbuild: ${{ github.event.client_payload.isTestBuild }}"
 on:
   repository_dispatch:
     types: ['deb-release-packaging:*', 'deb-pr-packaging:*']
@@ -152,6 +152,35 @@ jobs:
           !artifacts/keyman-srcpkg/
       if: always()
 
+  autopkg_test:
+    name: Run autopkgtests
+    needs: [binary_packages]
+    runs-on: ubuntu-latest
+
+    steps:
+    # - name: Download Artifacts
+    #   uses: actions/download-artifact@6b208ae046db98c579e8a3aa621ab581ff575935 # v4.1.1
+    #   with:
+    #     path: artifacts
+    #     merge-multiple: true
+
+    # - name: Install dependencies
+    #   run: |
+    #     sudo DEBIAN_FRONTEND=noninteractive apt-get -q -y install autopkgtest qemu-system qemu-utils autodep8 genisoimage python3-distro-info
+
+    # - name: Build test image
+    #   run: |
+    #     cd "${GITHUB_WORKSPACE}/artifacts"
+    #     autopkgtest-buildvm-ubuntu-cloud -v --release=jammy
+
+    # - name: Run tests
+    #   run: |
+    #     cd "${GITHUB_WORKSPACE}/artifacts"
+    #     autopkgtest -B *.deb keyman_*.dsc -- qemu autopkgtest-jammy-amd64.img
+    - name: Ignore
+      run: |
+        echo "Ignored for now - until working solution is in place"
+
   deb_signing:
     name: Sign source and binary packages
     needs: [sourcepackage, binary_packages]
@@ -280,7 +309,9 @@ jobs:
     - name: Verify API
       run: |
         cd linux
-        PKG_NAME=libkeymancore
+        # Extract line containing "Package: libkeymancore1" and then strip "Package: "
+        PKG_NAME=$(grep -E 'Package: libkeymancore([0-9]+|$)' debian/control)
+        PKG_NAME="${PKG_NAME#Package: }"
         ./scripts/deb-packaging.sh \
           --gha \
           --bin-pkg "${GITHUB_WORKSPACE}/artifacts/${PKG_NAME}_${{ needs.sourcepackage.outputs.VERSION }}-1${{ needs.sourcepackage.outputs.PRERELEASE_TAG }}+jammy1_amd64.deb" \
@@ -297,24 +328,24 @@ jobs:
 
   set_status:
     name: Set result status on PR builds
-    needs: [sourcepackage, binary_packages, api_verification]
+    needs: [sourcepackage, binary_packages, api_verification, autopkg_test]
     runs-on: ubuntu-latest
     if: ${{ always() && github.event.client_payload.isTestBuild == 'true' }}
     steps:
     - name: Set success
-      if: needs.sourcepackage.result == 'success' && needs.binary_packages.result == 'success' && needs.api_verification.result == 'success'
+      if: needs.sourcepackage.result == 'success' && needs.binary_packages.result == 'success' && needs.api_verification.result == 'success' && needs.autopkg_test.result == 'success'
       run: |
         echo "RESULT=success" >> $GITHUB_ENV
         echo "MSG=Package build succeeded" >> $GITHUB_ENV
 
     - name: Set cancelled
-      if: needs.sourcepackage.result == 'cancelled' || needs.binary_packages.result == 'cancelled' || needs.api_verification.result == 'cancelled'
+      if: needs.sourcepackage.result == 'cancelled' || needs.binary_packages.result == 'cancelled' || needs.api_verification.result == 'cancelled' || needs.autopkg_test.result == 'cancelled'
       run: |
         echo "RESULT=error" >> $GITHUB_ENV
         echo "MSG=Package build cancelled" >> $GITHUB_ENV
 
     - name: Set failure
-      if: needs.sourcepackage.result == 'failure' || needs.binary_packages.result == 'failure' || needs.api_verification.result == 'failure'
+      if: needs.sourcepackage.result == 'failure' || needs.binary_packages.result == 'failure' || needs.api_verification.result == 'failure' || needs.autopkg_test.result == 'failure'
       run: |
         echo "RESULT=failure" >> $GITHUB_ENV
         echo "MSG=Package build failed" >> $GITHUB_ENV

@@ -588,7 +588,7 @@ transform_entry::apply(const std::u32string &input, std::u32string &output) cons
     char32_t *s                = new char32_t[group1Len + 1];
     assert(s != nullptr); // TODO-LDML: OOM
     // convert
-    substr.toUTF32((UChar32 *)s, group1Len + 1, status);
+    group1.toUTF32((UChar32 *)s, group1Len + 1, status);
     if (!UASSERT_SUCCESS(status)) {
       return 0; // TODO-LDML: memory issue
     }
@@ -749,12 +749,9 @@ transforms::apply(const std::u32string &input, std::u32string &output) {
   for (auto group = transform_groups.begin(); group < transform_groups.end(); group++) {
     // for each transform group
     // break out once there's a match
-    // TODO-LDML: reorders
-    // Assume it's a non reorder group
     /** Length of match within this group*/
 
     // find the first match in this group (if present)
-    // TODO-LDML: check if reorder
     if (group->type == any_group_type::transform) {
       std::u32string subOutput;
       size_t subMatched = group->transform.apply(updatedInput, subOutput);
