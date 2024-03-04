@@ -301,9 +301,9 @@ export class KmnCompiler implements KeymanCompiler, UnicodeSetParser {
 
   /**
    * Compiles a .kmn file to .kmx, .kvk, and/or .js files. Returns an object
-   * containing binary artifacts on succes. The files are passed in by name, and
-   * the compiler will use callbacks as passed to the {@link KmnCompiler.init}
-   * function to read any input files by disk.
+   * containing binary artifacts on success. The files are passed in by name,
+   * and the compiler will use callbacks as passed to the
+   * {@link KmnCompiler.init} function to read any input files by disk.
    * @param infile  - Path to source file. Path will be parsed to find relative
    *                  references in the .kmn file, such as icon or On Screen
    *                  Keyboard file
