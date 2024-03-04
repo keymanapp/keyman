@@ -127,8 +127,7 @@ export class TouchEventEngine<HoveredItemType, StateToken = any> extends InputEv
     this.eventDispatcher.runAsync(() => {
       // Ensure the same timestamp is used for all touches being updated.
       const timestamp = performance.now();
-      let lastValidTouchpoint: GestureSource<HoveredItemType, StateToken> = null;
-      let lastValidTouchId: number;
+      let touchpoint: GestureSource<HoveredItemType, StateToken> = null;
       const uniqueObject = {};
 
       // During a touch-start, only _new_ touch contact points are listed here;
@@ -150,25 +149,27 @@ export class TouchEventEngine<HoveredItemType, StateToken = any> extends InputEv
           continue;
         }
 
-        lastValidTouchpoint = this.onInputStart(touchId, sample, event.target, true);
-        lastValidTouchId = touchId;
-      }
+        touchpoint = this.onInputStart(touchId, sample, event.target, true);
 
-      if(lastValidTouchpoint) {
         // Ensure we only do the cleanup if and when it hasn't already been replaced by new events later.
+        //
+        // Must be done for EACH source - we can't risk leaving a lingering entry once we've dismissed
+        // processing for the source.
         const cleanup = () => {
-          if(this.pendingSourceIdentifiers.get(lastValidTouchId) == uniqueObject) {
-            this.pendingSourceIdentifiers.delete(lastValidTouchId);
+          if(this.pendingSourceIdentifiers.get(touchId) == uniqueObject) {
+            this.pendingSourceIdentifiers.delete(touchId);
           }
         }
 
-        lastValidTouchpoint.path.on('complete', cleanup);
-        lastValidTouchpoint.path.on('invalidated', cleanup);
+        touchpoint.path.on('complete', cleanup);
+        touchpoint.path.on('invalidated', cleanup);
+      }
 
+      if(touchpoint) {
         // This 'lock' should only be released when the last simultaneously-registered touch is published via
         // gesture-recognizer event.
         let eventSignalPromise = new ManagedPromise<void>();
-        this.inputStartSignalMap.set(lastValidTouchpoint, eventSignalPromise);
+        this.inputStartSignalMap.set(touchpoint, eventSignalPromise);
 
         return eventSignalPromise.corePromise;
       }
@@ -201,10 +202,15 @@ export class TouchEventEngine<HoveredItemType, StateToken = any> extends InputEv
       for(let i=0; i < event.touches.length; i++) {
         const touch = event.touches.item(i);
 
+        // Requires that the `pendingSourceIdentifiers` map is properly maintained;
+        // any lingering entries from a completed source could prevent this guard
+        // from blocking further processing.
         if(!this.hasActiveTouchpoint(touch.identifier)) {
           continue;
         }
 
+        // This method expects that processing for the corresponding source is
+        // NOT completed.
         const config = this.getConfigForId(touch.identifier);
         const sample = this.buildSampleFromTouch(touch, timestamp);
 
