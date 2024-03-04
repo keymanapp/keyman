@@ -170,6 +170,34 @@ describe('keyboard-info-compiler', function () {
       `ERROR_LicenseFileIsMissing not generated, instead got: `+JSON.stringify(callbacks.messages,null,2));
     assert.isTrue(nodeCompilerMessage(callbacks, KeyboardInfoCompilerMessages.ERROR_LicenseFileIsMissing).includes(licenseFilename),
       licenseFilename+' not found in the message');
+  });
+  
+  // ERROR_LicenseFileIsDamaged (error on decode)
+
+  it('should generate ERROR_LicenseFileIsDamaged error if license file throws error on decode', async function() {
+    const jsFilename = makePathToFixture('khmer_angkor', 'build', 'khmer_angkor.js');
+    const kpsFilename = makePathToFixture('khmer_angkor', 'source', 'khmer_angkor.kps');
+    const kmpFilename = makePathToFixture('khmer_angkor', 'build', 'khmer_angkor.kmp');
+
+    const sources = {
+      kmpFilename,
+      sourcePath: 'release/k/khmer_angkor',
+      kpsFilename,
+      jsFilename: jsFilename,
+      forPublishing: true,
+    };
+
+    const compiler = new KeyboardInfoCompiler();
+    assert.isTrue(await compiler.init(callbacks, {sources}));
+    const licenseFilename = makePathToFixture('khmer_angkor', 'LICENSE.md');
+    TextDecoder.prototype.decode = () => { throw new Error() }
+    const result = compiler['isLicenseMIT'](licenseFilename)
+    assert.isFalse(result);
+
+    assert.isTrue(callbacks.hasMessage(KeyboardInfoCompilerMessages.ERROR_LicenseFileIsDamaged),
+      `ERROR_ERROR_LicenseFileIsDamaged not generated, instead got: `+JSON.stringify(callbacks.messages,null,2));
+    assert.isTrue(nodeCompilerMessage(callbacks, KeyboardInfoCompilerMessages.ERROR_LicenseFileIsDamaged).includes(licenseFilename),
+      licenseFilename+' not found in the message');
   });  
 });
 
