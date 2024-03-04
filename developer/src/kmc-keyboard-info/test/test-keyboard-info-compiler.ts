@@ -55,7 +55,7 @@ describe('keyboard-info-compiler', function () {
 
   // ERROR_FileDoesNotExist (loadJsFile)
 
-  it('should generate FileDoesNotExist error if .js file does not exist', async function() {
+  it('should generate ERROR_FileDoesNotExist error if .js file does not exist', async function() {
     const jsFilename = makePathToFixture('khmer_angkor', 'build', 'xxx.js');
     const kpsFilename = makePathToFixture('khmer_angkor', 'source', 'khmer_angkor.kps');
     const kmpFilename = makePathToFixture('khmer_angkor', 'build', 'khmer_angkor.kmp');
@@ -87,7 +87,7 @@ describe('keyboard-info-compiler', function () {
 
   // ERROR_FileDoesNotExist (font file not in package)
 
-  it('should generate FileDoesNotExist error if font file is missing from package', async function() {
+  it('should generate ERROR_FileDoesNotExist error if font file is missing from package', async function() {
     const jsFilename = makePathToFixture('khmer_angkor', 'build', 'khmer_angkor.js');
     const kpsFilename = makePathToFixture('khmer_angkor', 'source', 'khmer_angkor.kps');
     const kmpFilename = makePathToFixture('khmer_angkor', 'build', 'khmer_angkor.kmp');
@@ -117,7 +117,7 @@ describe('keyboard-info-compiler', function () {
 
   // ERROR_FileDoesNotExist (font file not on disk)
 
-  it('should generate FileDoesNotExist error if font file is missing from disk', async function() {
+  it('should generate ERROR_FileDoesNotExist error if font file is missing from disk', async function() {
     const jsFilename = makePathToFixture('khmer_angkor', 'build', 'khmer_angkor.js');
     const kpsFilename = makePathToFixture('khmer_angkor', 'source', 'khmer_angkor.kps');
     const kmpFilename = makePathToFixture('khmer_angkor', 'build', 'khmer_angkor.kmp');
