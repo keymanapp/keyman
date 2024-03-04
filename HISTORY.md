@@ -1,5 +1,11 @@
 # Keyman Version History
 
+## 17.0.281 beta 2024-03-04
+
+* chore(linux): Update debian changelog (#10897)
+* fix(ios): cross-paragraph keyboard rules (#10905)
+* chore(developer): deploy compiler messages to help site (#10906)
+
 ## 17.0.280 beta 2024-03-01
 
 * fix(developer): make sure scroll bar appears when needed in global welcome (#10818)
