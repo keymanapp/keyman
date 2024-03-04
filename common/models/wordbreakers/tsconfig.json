@@ -4,17 +4,13 @@
   "compilerOptions": {
     "baseUrl": "./",
     "outDir": "build/obj",
-    "tsBuildInfoFile": "build/obj/tsconfig.tsbuildinfo",
-    "rootDir": "./src"
+    "tsBuildInfoFile": "build/tsconfig.tsbuildinfo",
+    "rootDir": "./",
+    "module": "Node16",
+    "moduleResolution": "Node16"
   },
   "references": [
-    { "path": "../types" }
-  ],
-  "include": [
-	"src/**/*"
-  ],
-  "exclude": [
-	"node_modules",
-	"test/**/*.ts"
+    { "path": "./src/main" },
+    { "path": "./src/data-compiler" }
   ]
 }
