@@ -94,7 +94,7 @@ KMX_BOOL KMX_ProcessEvent::ProcessEvent(
     CreateInternalDebugItems();
   } else {
     // We want to have a clean debug state even if it is not in use
-    state->debug_items().push_end(m_actions.Length(), 0);
+    FinishInternalDebugItems();
   }
 
   ResetCapsLock(modifiers, isKeyDown);
@@ -106,24 +106,30 @@ KMX_BOOL KMX_ProcessEvent::ProcessEvent(
 
   if (kbd->StartGroup[BEGIN_UNICODE] == (KMX_DWORD) -1) {
     DebugLog("Non-Unicode keyboards are not supported.");
+    FinishInternalDebugItems();
     m_core_state = nullptr;
     return FALSE;
   }
 
   switch (vkey) {
   case KM_CORE_VKEY_CAPS:
-    if (KeyCapsLockPress(modifiers, isKeyDown))
+    if (KeyCapsLockPress(modifiers, isKeyDown)) {
+      FinishInternalDebugItems();
       return TRUE;
+    }
     break;
   case KM_CORE_VKEY_SHIFT:
     KeyShiftPress(modifiers, isKeyDown);
+    FinishInternalDebugItems();
     return TRUE;
   case KM_CORE_VKEY_CONTROL:
   case KM_CORE_VKEY_ALT:
+    FinishInternalDebugItems();
     return TRUE;
   }
 
   if (!isKeyDown) {
+    FinishInternalDebugItems();
     m_core_state = nullptr;
     return FALSE;
   }
@@ -792,4 +798,12 @@ void KMX_ProcessEvent::DeleteInternalDebugItems() {
     m_debug_items = nullptr;
   }
   m_options.SetInternalDebugItems(m_debug_items);
+}
+
+void KMX_ProcessEvent::FinishInternalDebugItems() {
+  assert(m_debug_items != nullptr);
+  m_debug_items->push_end(m_actions.Length(), 0);
+  // m_debug_items is just a helper class that pushes to state->debug_items(),
+  // so we can throw it away after we are done with it
+  DeleteInternalDebugItems();
 }
