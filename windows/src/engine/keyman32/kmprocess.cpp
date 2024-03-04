@@ -83,10 +83,13 @@ Process_Event_Core(PKEYMAN64THREADDATA _td) {
   WCHAR core_context[MAXCONTEXT];
   LPWSTR context_ptr = application_context;
   if (_td->app->ReadContext(application_context)) {
-    // pre-process any windows specific text
     _td->line_break = normalize_line_breaks(application_context, core_context, MAXCONTEXT);
-    if (_td->line_break != lbNONE) {
+    if (_td->line_break == lbERROR) {
+      SendDebugMessageFormat(0, sdmGlobal, 0, "Process_Event_Core: normalize_line_break failed.");
+    } else if (_td->line_break != lbNONE) { // line break found
       context_ptr = core_context;
+    } else {
+      context_ptr = application_context;
     }
     km_core_context_status result;
     result = km_core_state_context_set_if_needed(

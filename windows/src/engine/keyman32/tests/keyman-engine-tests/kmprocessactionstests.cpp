@@ -27,158 +27,46 @@ public:
 // Now that the AITIP no longer contains a context
 // this test is just reduced to checking the size of the
 // action queue
-//TEST_F(KMPROCESSACTIONS, processOutputStringtest) {
-// // just check something has been added to the que
-//  WCHAR callbuf[MAXCONTEXT];
-//  AITIP testApp;
-//  int expectedQueueSize           = 3; // 1 + surrogate pair
-//  km_core_usv output_string[] = {0x0041, 0x010000, 0};
-//  process_output_string(&testApp, &output_string[0]);
-//  int queueSize = testApp.GetQueueSize();
-//  EXPECT_EQ(queueSize, expectedQueueSize);
-//}
-//
-//// Test where there is no LF `\n' most common case
-//TEST_F(KMPROCESSACTIONS, processOutputStringNoChange) {
-//  WCHAR callbuf[MAXCONTEXT];
-//  AITIP testApp;
-//  int expectedQueueSize = 20;  
-//  // L"Hello World You Rock";
-// km_core_usv output_string[] = {0x0048, 0x0065, 0x006C, 0x006C, 0x006F, 0x0020, 0x0057, 0x006F, 0x0072, 0x006C, 0x0064,
-//                                 0x0020, 0x0059, 0x006F, 0x0075, 0x0020, 0x0052, 0x006F, 0x0063, 0x006B, 0};
-// //km_core_usv output_string[] = {0x0041, 0x010000, 0};
-// process_output_string(&testApp, &output_string[0]);
-//  int queueSize = testApp.GetQueueSize();
-//  EXPECT_EQ(queueSize, expectedQueueSize);
-//  
-//}
-//
-//// Test inserting '\r' 
-//TEST_F(KMPROCESSACTIONS, processOutputStringInsertCR) {
-//  WCHAR callbuf[MAXCONTEXT];
-//  AITIP testApp;
-//  int expectedQueueSize = 22;
-//  // L"Hello\nWorld\nYou Rock";
-//  km_core_usv output_string[] = {0x0048, 0x0065, 0x006C, 0x006C, 0x006F, 0x000A, 0x0057, 0x006F, 0x0072, 0x006C, 0x0064,
-//                                 0x000A, 0x0059, 0x006F, 0x0075, 0x0020, 0x0052, 0x006F, 0x0063, 0x006B, 0x0000};
-//  // km_core_usv output_string[] = {0x0041, 0x010000, 0};
-//  process_output_string(&testApp, &output_string[0]);
-//  int queueSize = testApp.GetQueueSize();
-//  EXPECT_EQ(queueSize, expectedQueueSize);
-//}
-
-
-
-
-//// Test where there is no LF `\n' most common case
-//TEST_F(KMPROCESSACTIONS, processOutputStringNoChange) {
-//  WCHAR callbuf[MAXCONTEXT];
-//  AITIP testApp;
-//  int expectedQueueSize = 20;
-//  // L"Hello World You Rock";
-//  km_core_usv output_string[] = {0x0048, 0x0065, 0x006C, 0x006C, 0x006F, 0x0020, 0x0057, 0x006F, 0x0072, 0x006C, 0x0064,
-//                                 0x0020, 0x0059, 0x006F, 0x0075, 0x0020, 0x0052, 0x006F, 0x0063, 0x006B, 0};
-//  // km_core_usv output_string[] = {0x0041, 0x010000, 0};
-//  process_output_string_2(&testApp, &output_string[0]);
-//  int queueSize = testApp.GetQueueSize();
-//  EXPECT_EQ(queueSize, expectedQueueSize);
-//}
-
-// Test inserting '\r'
-//TEST_F(KMPROCESSACTIONS, processOutputStringInsertCR) {
-//  WCHAR callbuf[MAXCONTEXT];
-//  AITIP testApp;
-//  int expectedQueueSize = 22;
-//  // L"Hello\nWorld\nYou Rock";
-//  km_core_usv output_string[] = {0x0048, 0x0065, 0x006C, 0x006C, 0x006F, 0x000A, 0x0057, 0x006F, 0x0072, 0x006C, 0x0064,
-//                                 0x000A, 0x0059, 0x006F, 0x0075, 0x0020, 0x0052, 0x006F, 0x0063, 0x006B, 0x0000};
-//  // km_core_usv output_string[] = {0x0041, 0x010000, 0};
-//  process_output_string_2(&testApp, &output_string[0]);
-//  int queueSize = testApp.GetQueueSize();
-//  EXPECT_EQ(queueSize, expectedQueueSize);
-//}
-
-// Test where there is LF `\n' most common case
-TEST_F(KMPROCESSACTIONS, processNormalisLB_LF) {
+TEST_F(KMPROCESSACTIONS, processOutputStringtest) {
+ // just check something has been added to the que
   WCHAR callbuf[MAXCONTEXT];
   AITIP testApp;
-  LBType received_lb;
-  int expectedQueueSize = 20;
-  // L"Hello World You Rock";
-  WCHAR app_string[] = {
-    0x0048, 0x0065, 0x006C, 0x006C, 0x006F, 0x000A, 0x0057, 0x006F, 0x0072, 0x006C, 0x0064,
-                                     0x000A, 0x0059, 0x006F, 0x0075, 0x0020, 0x0052, 0x006F, 0x0063, 0x006B, 0x0000};
-  received_lb = normalize_line_breaks(app_string, callbuf, MAXCONTEXT);
-  //process_output_string_2(&testApp, &output_string[0]);
-  //int queueSize = testApp.GetQueueSize();
-  //EXPECT_EQ(queueSize, expectedQueueSize);
-  EXPECT_EQ(lbLF, received_lb);
-}
-
-// Test where there is a CR LF `\n' most common case
-TEST_F(KMPROCESSACTIONS, processNormaliseLB_CRLF) {
-  WCHAR callbuf[MAXCONTEXT];
-  AITIP testApp;
-  LBType received_lb;
-  int expectedQueueSize = 20;
-  // L"Hello World You Rock";
-  WCHAR app_string[] = {0x0048, 0x0065, 0x006C, 0x006C, 0x006F, 0x000D, 0x000A, 0x0057, 0x006F, 0x0072, 0x006C, 0x0064,
-                        0x000D, 0x000A, 0x0059, 0x006F, 0x0075, 0x0020, 0x0052, 0x006F, 0x0063, 0x006B, 0x0000};
-  received_lb        = normalize_line_breaks(app_string, callbuf, MAXCONTEXT);
-  //process_output_string_2(&testApp, &output_string[0]);
-  // int queueSize = testApp.GetQueueSize();
-  // EXPECT_EQ(queueSize, expectedQueueSize);
-  EXPECT_EQ(lbCRLF, received_lb);
-}
-
-// Test where there is a CR `\n' most common case
-TEST_F(KMPROCESSACTIONS, processNormalisLB_CR) {
-  WCHAR callbuf[MAXCONTEXT];
-  AITIP testApp;
-  LBType received_lb;
-  int expectedQueueSize = 20;
-  // L"Hello World You Rock";
-  WCHAR app_string[] = {0x0048, 0x0065, 0x006C, 0x006C, 0x006F, 0x000D, 0x0057, 0x006F, 0x0072, 0x006C,
-                        0x0064, 0x000D, 0x0059, 0x006F, 0x0075, 0x0020, 0x0052, 0x006F, 0x0063, 0x006B, 0x0000};
-  received_lb        = normalize_line_breaks(app_string, callbuf, MAXCONTEXT);
-  // process_output_string_2(&testApp, &output_string[0]);
-  // int queueSize = testApp.GetQueueSize();
-  // EXPECT_EQ(queueSize, expectedQueueSize);
-  EXPECT_EQ(lbCR, received_lb);
-}
-
-
-// Test where there is a CR `\n' most common case
-TEST_F(KMPROCESSACTIONS, processrestore_LB_CR) {
-  WCHAR callbuf[MAXCONTEXT];
-  AITIP testApp;
-  LBType received_lb;
-  int expectedQueueSize = 20;
-  // L"Hello World You Rock";
-  WCHAR app_string[] = {0x0048, 0x0065, 0x006C, 0x006C, 0x006F, 0x000D, 0x0057, 0x006F, 0x0072, 0x006C, 0x0064,
-                        0x000D, 0x0059, 0x006F, 0x0075, 0x0020, 0x0052, 0x006F, 0x0063, 0x006B, 0x0000};
-  received_lb        = normalize_line_breaks(app_string, callbuf, MAXCONTEXT);
-  EXPECT_EQ(lbCR, received_lb);
-  restore_line_breaks(callbuf, MAXCONTEXT, received_lb, lbCRLF);
-  process_output_string_2(&testApp, callbuf);
+  int expectedQueueSize           = 3; // 1 + surrogate pair
+  km_core_usv output_string[] = {0x0041, 0x010000, 0};
+  context_char32_char16(output_string, callbuf, MAXCONTEXT);
+  process_output_string(&testApp, callbuf);
   int queueSize = testApp.GetQueueSize();
   EXPECT_EQ(queueSize, expectedQueueSize);
-  
 }
 
-// Test where there is a CRLF `\n' most common case
-TEST_F(KMPROCESSACTIONS, processrestore_LB_CRLF) {
-  WCHAR callbuf[MAXCONTEXT];
+
+// Test char32_char16_test
+TEST_F(KMPROCESSACTIONS, context_char32_char16_test) {
+  WCHAR wchar16_string[MAXCONTEXT];
   AITIP testApp;
-  LBType received_lb;
-  int expectedQueueSize = 22;
-  // L"Hello World You Rock";
-  WCHAR app_string[] = {0x0048, 0x0065, 0x006C, 0x006C, 0x006F, 0x000D, 0x000A, 0x0057, 0x006F, 0x0072, 0x006C, 0x0064,
-                        0x000D, 0x000A, 0x0059, 0x006F, 0x0075, 0x0020, 0x0052, 0x006F, 0x0063, 0x006B, 0x0000};
-  received_lb        = normalize_line_breaks(app_string, callbuf, MAXCONTEXT);
-  EXPECT_EQ(lbCRLF, received_lb);
-  restore_line_breaks(callbuf, MAXCONTEXT, received_lb, lbCRLF);
-  process_output_string_2(&testApp, callbuf);
-  int queueSize = testApp.GetQueueSize();
-  EXPECT_EQ(queueSize, expectedQueueSize);
+  // L"Hello\nWorld\nYou 𝄞Rock";
+  km_core_usv core_string[] = {0x0048, 0x0065, 0x006C, 0x006C, 0x006F, 0x000A, 0x0057, 0x006F, 0x0072, 0x006C, 0x0064,
+                                 0x000A, 0x0059, 0x006F, 0x0075, 0x0020, 0x1D11E, 0x0052, 0x006F, 0x0063, 0x006B, 0x0000};
+
+  wchar_t expected_string[] = {0x0048, 0x0065, 0x006C, 0x006C, 0x006F, 0x000A, 0x0057, 0x006F, 0x0072, 0x006C, 0x0064, 0x000A,
+                               0x0059, 0x006F, 0x0075, 0x0020, 0xD834, 0xDD1E, 0x0052, 0x006F, 0x0063, 0x006B, 0x0000};
+
+  context_char32_char16(&core_string[0], wchar16_string, MAXCONTEXT);
+  EXPECT_STREQ(expected_string, wchar16_string);
+}
+
+// Test char32_char16_test
+TEST_F(KMPROCESSACTIONS, context_char32_char16_small_context) {
+  const int small_context = 15;
+  WCHAR wchar16_string[small_context];
+  AITIP testApp;
+  // L"Hello\nWorld\nYou 𝄞Rock"
+  km_core_usv core_string[] = {0x0048, 0x0065, 0x006C, 0x006C, 0x006F, 0x000A,  0x0057, 0x006F, 0x0072, 0x006C, 0x0064,
+                               0x000A, 0x0059, 0x006F, 0x0075, 0x0020, 0x1D11E, 0x0052, 0x006F, 0x0063, 0x006B, 0x0000};
+  // L"rld\nYou 𝄞Rock"
+  wchar_t expected_string[] = {0x0072, 0x006C, 0x0064, 0x000A, 0x0059, 0x006F, 0x0075, 0x0020,
+                               0xD834, 0xDD1E, 0x0052, 0x006F, 0x0063, 0x006B, 0x0000};
+
+  context_char32_char16(&core_string[0], wchar16_string, small_context);
+  EXPECT_STREQ(expected_string, wchar16_string);
 }

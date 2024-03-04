@@ -103,30 +103,61 @@ public:
 BOOL ContextItemToAppContext(km_core_context_item *contextItems, PWSTR outBuf, DWORD len);
 
 /**
-*  frERROR:    If an error occurs, such as null pointers or buffer too small.
-*  frUPDATED:  If the context has been modified.
-*  frNO_CHANGE: If no modifications were made.
-*/
-enum FormatContextResult { frERROR, frUPDATED, frNO_CHANGE };
-enum LBType { lbNONE, lbLF, lbCRLF, lbCR };
-/**
- * Pre-processes the given wide-character string context for passing to the
- * Keyman core. Currently, this consists of replacing "\r\n" sequences with
- * "\n".
- *
- * @param  windows_context  The wide-character string to be pre-processed. It
- *                          must be null-terminated.
- * @param[in,out]  core_context  The buffer to store the pre-processed string
- *                               for the Keyman core.
- * @param  output_size  The size of the buffer core_context, in number of wide
- *                      characters.
- * @return FormatContextResult  Indicates the result of the pre-processing
- *                              operation:
+ * lbNONE: No line break.
+ * lbLF: Line feed only .
+ * lbCRLF: Carriage return and line feed.
+ * lbCR: lbCR Carriage return only.
+ * lbERROR: lbERROR Error encountered during line break processing.
  */
-FormatContextResult format_context_for_core(LPCWSTR windows_context, LPWSTR core_context, uint32_t output_size);
+enum LBType { lbNONE, lbLF, lbCRLF, lbCR, lbERROR };
 
+enum RestoreLBResult { rsSUCCESS, rsNO_LB, rsERROR};
+
+/**
+ * Normalizes line breaks in a wide-character string to LF (line feed) and
+ * identifies the original line break type.
+ *
+ * @param  windows_context       The wide-character string to be normalized.
+ * @param[in,out]  core_context  The buffer to store the normalized string.
+ * @param  core_context_size_in_chars  The size of the `core_context` buffer in
+ * wide characters.
+ * @return                      The type of line break originally found in
+ * `windows_context`.
+ */
 LBType normalize_line_breaks(LPCWSTR windows_context, LPWSTR core_context, uint32_t core_context_size_in_chars);
-BOOL restore_line_breaks(LPWSTR win_out_str, uint32_t output_size, LBType line_break, LBType default_lb);
+
+/**
+ * Restores line breaks in a wide-character string based on the provided line
+ * break type. It handles potential truncation of the string to fit within
+ * `win_out_size_in_chars` by preserving the end closest to the caret.
+ *
+ * @param[in,out] win_out_str    The wide-character string to have its line
+ *                                breaks restored.
+ * @param win_out_size_in_chars  The maximum length of the `win_out_str` buffer
+ * in wide characters.
+ * @param line_break             The desired line break type to use for
+ * restoration.
+ * @param default_lb           The default line break type to use if
+ * `line_break` is lbNONE.
+ * @return                     TRUE if successful, FALSE if errors occur
+ */
+BOOL restore_line_breaks(LPWSTR win_out_str, uint32_t win_out_size_in_chars, LBType line_break, LBType default_lb);
+
+/**
+ * Converts a UTF-32 string from the Keyman core output to a UTF-16
+ * wide-character string. The function handles surrogate pairs for characters
+ * exceeding the Basic Multilingual Plane (BMP) in UTF-32. If the converted
+ * string does not fit within the provided `win_out_str` buffer size, the string
+ * is truncated preserving the end closest to the caret.
+ *
+ * @param  core_output  Pointer to the `km_core_usv` structure containing
+ *                      the UTF-32 string.
+ * @param[in,out]  win_out_str  The wide-character string buffer to store
+ *                              the converted UTF-16 string.
+ * @param  win_output_size_in_char  The size of the `win_out_str` buffer in wide
+ *                                  characters.
+ * @return  TRUE if successful, FALSE is not supported
+ */
 BOOL context_char32_char16(const km_core_usv *core_output, LPWSTR win_out_str, uint32_t win_output_size_in_char);
 
 

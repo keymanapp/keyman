@@ -165,46 +165,16 @@ ContextItemToAppContext(km_core_context_item *contextItems, PWSTR outBuf, DWORD 
   return TRUE;
 }
 
-FormatContextResult
-format_context_for_core(LPCWSTR windows_context, LPWSTR core_context, uint32_t output_size) {
-  if (windows_context == nullptr || core_context == nullptr) {
-    return frERROR;
-  }
-  // Return early if windowsContext does not contain '\r\n'
-  if (wcsstr(windows_context, L"\r\n") == nullptr) {
-    return frNO_CHANGE;
-  }
+LBType normalize_line_breaks(LPCWSTR windows_context, LPWSTR core_context, uint32_t core_context_size_in_chars) {
 
-  auto windows_context_length = wcsnlen_s(windows_context, MAXCONTEXT);
-
-  if (output_size < windows_context_length) {
-    return frERROR;
-  }
-
-  LPCWSTR win_ptr  = windows_context;
-  LPWSTR core_ptr = core_context;
-  while (*win_ptr != L'\0') {
-    if (*win_ptr == L'\r' && *(win_ptr + 1) == L'\n') {
-      win_ptr++; // skip '\r'
-
-    } else {
-      *core_ptr++ = *win_ptr++;
-    }
-  }
-  *core_ptr++ = L'\0';
-  return frUPDATED;
-}
-
-LBType normalize_line_breaks(LPCWSTR windows_context, LPWSTR core_context, uint32_t core_context_size_in_chars){
-  
   // Error Checking
   if (windows_context == nullptr || core_context == nullptr || core_context_size_in_chars == 0) {
-    return lbNONE;
+    return lbERROR;
   }
    auto windows_context_length = wcsnlen_s(windows_context, MAXCONTEXT);
 
  if (core_context_size_in_chars <= windows_context_length) {
-     return lbNONE; // TODO: add error handling 
+     return lbERROR;
  }
 
   // Replace all line breaks with LF and determine line break type
@@ -234,9 +204,9 @@ LBType normalize_line_breaks(LPCWSTR windows_context, LPWSTR core_context, uint3
 }
 
 BOOL
-restore_line_breaks(LPWSTR win_out_str, uint32_t output_size, LBType line_break, LBType default_lb ){
+restore_line_breaks(LPWSTR win_out_str, uint32_t win_out_size_in_chars, LBType line_break, LBType default_lb ){
   if (win_out_str == nullptr) {
-    return FALSE;
+    return rsERROR;
   }
 
   if (line_break == lbNONE){
@@ -245,54 +215,56 @@ restore_line_breaks(LPWSTR win_out_str, uint32_t output_size, LBType line_break,
 
   // return early if doesn't contain any '\n';
   if (wcsstr(win_out_str, L"\n") == nullptr) {
-    return FALSE;
+    return rsNO_LB;
   }
 
-  size_t temp_length = wcslen(win_out_str) * 2;
-  LPWSTR temp_string = new WCHAR[temp_length];
+  size_t buf_length = wcslen(win_out_str) * 2;
+  LPWSTR buf_string = new WCHAR[buf_length];
 
   LPCWSTR in_ptr = win_out_str;
-  LPWSTR temp_ptr   = temp_string;
+  LPWSTR buf_ptr   = buf_string;
 
   while (*in_ptr != L'\0') {
     if (*in_ptr == '\n') {
       switch (line_break) {
         case lbLF:
-          *temp_ptr++ = *in_ptr++;
+          *buf_ptr++ = *in_ptr++;
           break;
         case lbCRLF:
-          *temp_ptr++ = '\r';
-          *temp_ptr++ = *in_ptr++;
+          *buf_ptr++ = '\r';
+          *buf_ptr++ = *in_ptr++;
           break;
         case lbCR:
-          *temp_ptr++ = '\r';
+          *buf_ptr++ = '\r';
           *in_ptr++;
           break;
       }
     } else {
-      *temp_ptr++ = *in_ptr++;
+      *buf_ptr++ = *in_ptr++;
     }
   }
-  *temp_ptr = '\0';  // Null terminate the modified string
+  *buf_ptr = '\0';  // Null terminate the modified string
 
   // may now need to truncate the string preserving the end closest the caret.
-  auto final_length = wcsnlen_s(temp_string, temp_length);
-  if (final_length < output_size) {
-    wcscpy_s(win_out_str, output_size, temp_string);
+  auto final_length = wcsnlen_s(buf_string, buf_length);
+  if (final_length < win_out_size_in_chars) {
+    wcscpy_s(win_out_str, win_out_size_in_chars, buf_string);
   } else {
-    auto diff = final_length + 1 - output_size;  // +1 for null termination
-    wcscpy_s(win_out_str, output_size, temp_string + diff);
+    auto diff = final_length + 1 - win_out_size_in_chars;  // +1 for null termination
+    wcscpy_s(win_out_str, win_out_size_in_chars, buf_string + diff);
   }
-  delete[] temp_string;
-  return TRUE;
+  delete[] buf_string;
+  return rsSUCCESS;
 }
-
 
 BOOL
 context_char32_char16(const km_core_usv *core_output, LPWSTR win_out_str, uint32_t win_output_size_in_char) {
+  if (core_output == nullptr || win_out_str == nullptr || win_output_size_in_char <= 0) {
+    return FALSE;
+  }
   uint8_t idx = 0;
   size_t  buf_length    = (MAXCONTEXT * 2) + 1;
-  WCHAR *buf = new WCHAR[(MAXCONTEXT * 2) + 1]; // if every charcter is a surragote
+  WCHAR *buf = new WCHAR[(MAXCONTEXT * 2) + 1]; // if every character is a surrogate
   while (*core_output) {
     if (Uni_IsSMP(*core_output)) {
       buf[idx++] = static_cast<WCHAR> Uni_UTF32ToSurrogate1(*core_output);
@@ -313,5 +285,4 @@ context_char32_char16(const km_core_usv *core_output, LPWSTR win_out_str, uint32
   }
   delete[] buf;
   return TRUE;
-
 }

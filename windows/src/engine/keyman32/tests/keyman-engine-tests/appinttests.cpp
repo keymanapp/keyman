@@ -79,33 +79,57 @@ TEST(AppContext, AppContext_Delete) {
 
 }
 
-// Test pre context function
+// Test normalize and restore line break functions
 
-TEST(AppContext, format_context_for_core) {
+TEST(AppContext, normalize_restore_CRLF) {
   wchar_t windows_context[]         = L"Hello\r\nWorld\r\nYou Rock";
   wchar_t core_context[MAXCONTEXT];
   wchar_t expected_string[] = L"Hello\nWorld\nYou Rock";
-  EXPECT_TRUE(format_context_for_core(windows_context, core_context, MAXCONTEXT) == frUPDATED);
+  LBType lb_type;
+  lb_type = normalize_line_breaks(windows_context, core_context, MAXCONTEXT);
+  EXPECT_TRUE(lb_type == lbCRLF);
   EXPECT_STREQ(expected_string, core_context);
+  EXPECT_TRUE(restore_line_breaks(core_context, MAXCONTEXT, lb_type, lbCRLF) == rsSUCCESS);
+  // should be the same as the original windows_context.
+  EXPECT_STREQ(windows_context, core_context);
 }
 
 // No CRLF `\r\n` found
-TEST(AppContext, format_context_for_core_unchanged) {
+TEST(AppContext, normalize_restore_NONE) {
   wchar_t windows_context[] = L"Hello World You Rock";
   wchar_t core_context[MAXCONTEXT];
-  core_context[0]           = L'\0'; // for test just to verify it wasn't changed
-  wchar_t expected_string[] = L"";
-  EXPECT_EQ(format_context_for_core(windows_context, core_context, MAXCONTEXT), frNO_CHANGE);
+  wchar_t expected_string[] = L"Hello World You Rock";
+  LBType lb_type;
+  lb_type = normalize_line_breaks(windows_context, core_context, MAXCONTEXT);
+  EXPECT_TRUE(lb_type == lbNONE);
   EXPECT_STREQ(expected_string, core_context);
+  EXPECT_TRUE(restore_line_breaks(core_context, MAXCONTEXT, lb_type, lbCRLF) == rsNO_LB);
+  // should be the same as the original windows_context.
+  EXPECT_STREQ(windows_context, core_context);
 }
 
-//// Core Context too short 
-TEST(AppContext, format_context_for_core_too_short) {
-  wchar_t windows_context[] = L"Hello\r\nWorld\r\nYou Rock";
-  wchar_t core_context[2];
-  core_context[0]           = L'\0';  // for test just to verify it wasn't changed
-  wchar_t expected_string[] = L"";
-  EXPECT_EQ(format_context_for_core(windows_context, core_context, 2), frERROR);
-  //EXPECT_STREQ(expected_string, core_context);
+TEST(AppContext, normalize_restore_CR) {
+  wchar_t windows_context[] = L"Hello\rWorld\rYou Rock";
+  wchar_t core_context[MAXCONTEXT];
+  wchar_t expected_string[] = L"Hello\nWorld\nYou Rock";
+  LBType lb_type;
+  lb_type = normalize_line_breaks(windows_context, core_context, MAXCONTEXT);
+  EXPECT_TRUE(lb_type == lbCR);
+  EXPECT_STREQ(expected_string, core_context);
+  EXPECT_TRUE(restore_line_breaks(core_context, MAXCONTEXT, lb_type, lbCRLF) == rsSUCCESS);
+  // should be the same as the original windows_context.
+  EXPECT_STREQ(windows_context, core_context);
 }
 
+TEST(AppContext, normalize_restore_LF) {
+  wchar_t windows_context[] = L"Hello\nWorld\nYou Rock";
+  wchar_t core_context[MAXCONTEXT];
+  wchar_t expected_string[] = L"Hello\nWorld\nYou Rock";
+  LBType lb_type;
+  lb_type = normalize_line_breaks(windows_context, core_context, MAXCONTEXT);
+  EXPECT_TRUE(lb_type == lbLF);
+  EXPECT_STREQ(expected_string, core_context);
+  EXPECT_TRUE(restore_line_breaks(core_context, MAXCONTEXT, lb_type, lbCRLF) == rsSUCCESS);
+  // should be the same as the original windows_context.
+  EXPECT_STREQ(windows_context, core_context);
+}
