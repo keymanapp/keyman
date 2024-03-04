@@ -44,8 +44,7 @@ public class DefaultLanguageResource {
     SharedPreferences prefs = context.getSharedPreferences(context.getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
 
     // Add default keyboard
-    boolean installDefaultKeyboard = prefs.getBoolean(defaultKeyboardInstalled, false);
-    if (!installDefaultKeyboard) {
+    if (!prefs.getBoolean(defaultKeyboardInstalled, false)) {
       if (!KMManager.keyboardExists(context, FVShared.FVDefault_PackageID, KMManager.KMDefault_KeyboardID,
         KMManager.KMDefault_LanguageID)) {
 
