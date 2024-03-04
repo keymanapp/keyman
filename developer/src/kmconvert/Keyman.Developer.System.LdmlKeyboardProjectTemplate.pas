@@ -130,7 +130,7 @@ begin
 
   root := doc.DocumentElement;
   root.Attributes['locale'] := tag;
-  root.Attributes['conformsTo'] := 'techpreview';
+  root.Attributes['conformsTo'] := '45';
 
   doc.DocumentElement := root;
 
