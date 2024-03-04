@@ -144,6 +144,33 @@ describe('keyboard-info-compiler', function () {
     assert.isTrue(nodeCompilerMessage(callbacks, KeyboardInfoCompilerMessages.ERROR_FileDoesNotExist).includes(kmpJsonData.files[0].name),
     kmpJsonData.files[0].name+' not found in the message');
   });
+
+  // ERROR_LicenseFileIsMissing
+
+  it('should generate ERROR_LicenseFileIsMissing error if license file is missing from disk', async function() {
+    const jsFilename = makePathToFixture('khmer_angkor', 'build', 'khmer_angkor.js');
+    const kpsFilename = makePathToFixture('khmer_angkor', 'source', 'khmer_angkor.kps');
+    const kmpFilename = makePathToFixture('khmer_angkor', 'build', 'khmer_angkor.kmp');
+
+    const sources = {
+      kmpFilename,
+      sourcePath: 'release/k/khmer_angkor',
+      kpsFilename,
+      jsFilename: jsFilename,
+      forPublishing: true,
+    };
+
+    const compiler = new KeyboardInfoCompiler();
+    assert.isTrue(await compiler.init(callbacks, {sources}));
+    const licenseFilename = makePathToFixture('khmer_angkor', 'xxx.md');
+    const result = compiler['isLicenseMIT'](licenseFilename)
+    assert.isFalse(result);
+
+    assert.isTrue(callbacks.hasMessage(KeyboardInfoCompilerMessages.ERROR_LicenseFileIsMissing),
+      `ERROR_LicenseFileIsMissing not generated, instead got: `+JSON.stringify(callbacks.messages,null,2));
+    assert.isTrue(nodeCompilerMessage(callbacks, KeyboardInfoCompilerMessages.ERROR_LicenseFileIsMissing).includes(licenseFilename),
+      licenseFilename+' not found in the message');
+  });  
 });
 
 function nodeCompilerMessage(ncb: TestCompilerCallbacks, code: number): string {
