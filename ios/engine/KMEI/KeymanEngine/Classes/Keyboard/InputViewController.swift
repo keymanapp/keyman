@@ -389,7 +389,7 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
       textDocumentProxy.deleteBackward()
       let newContext = textDocumentProxy.documentContextBeforeInput ?? ""
       let unitsDeleted = oldContext.utf16.count - newContext.utf16.count
-      let unitsInPoint = InputViewController.isSurrogate(oldContext.utf16.last!) ? 2 : 1
+      let unitsInPoint = InputViewController.isSurrogate(oldContext.utf16.last ?? 0) ? 2 : 1
 
       // This CAN happen when a surrogate pair is deleted.
       // For example, the emoji 👍🏻 is made of TWO surrogate pairs.
@@ -416,7 +416,6 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
           os_log("Failed to swallow a recent textDidChange call!", log: KeymanEngineLogger.ui, type: .default)
         }
         self.swallowBackspaceTextChange = true
-        break
       }
     }
 
