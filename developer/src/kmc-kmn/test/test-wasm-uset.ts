@@ -25,14 +25,14 @@ describe('Compiler UnicodeSet function', function() {
   it('should start', async function() {
     const compiler = new KmnCompiler();
     const callbacks = new TestCompilerCallbacks();
-    assert(await compiler.init(callbacks));
+    assert(await compiler.init(callbacks, null));
     assert(compiler.verifyInitialized());
   });
 
   it('should compile a basic uset', async function() {
     const compiler = new KmnCompiler();
     const callbacks = new TestCompilerCallbacks();
-    assert(await compiler.init(callbacks));
+    assert(await compiler.init(callbacks, null));
     assert(compiler.verifyInitialized());
 
     const pat = "[abc]";
@@ -50,7 +50,7 @@ describe('Compiler UnicodeSet function', function() {
   it('should compile a more complex uset', async function() {
     const compiler = new KmnCompiler();
     const callbacks = new TestCompilerCallbacks();
-    assert(await compiler.init(callbacks));
+    assert(await compiler.init(callbacks, null));
     assert(compiler.verifyInitialized());
 
     const pat = "[[🙀A-C]-[CB]]";
@@ -70,7 +70,7 @@ describe('Compiler UnicodeSet function', function() {
   it('should compile an even more complex uset', async function() {
     const compiler = new KmnCompiler();
     const callbacks = new TestCompilerCallbacks();
-    assert(await compiler.init(callbacks));
+    assert(await compiler.init(callbacks, null));
     assert(compiler.verifyInitialized());
 
     const pat = "[\\u{10FFFD}\\u{2019}\\u{22}\\u{a}\\u{ead}\\u{1F640}]";
@@ -97,7 +97,7 @@ describe('Compiler UnicodeSet function', function() {
   it('should fail in various ways', async function() {
     const compiler = new KmnCompiler();
     const callbacks = new TestCompilerCallbacks();
-    assert(await compiler.init(callbacks));
+    assert(await compiler.init(callbacks, null));
     assert(compiler.verifyInitialized());
     // map from string to failing error
     const failures = {

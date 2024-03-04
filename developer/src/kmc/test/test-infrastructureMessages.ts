@@ -7,8 +7,13 @@ import { NodeCompilerCallbacks } from '../src/util/NodeCompilerCallbacks.js';
 import { CompilerErrorNamespace, CompilerEvent } from '@keymanapp/common-types';
 import { unitTestEndpoints } from '../src/commands/build.js';
 import { KmnCompilerMessages } from '@keymanapp/kmc-kmn';
+import { clearOptions } from '@keymanapp/developer-utils';
+import { loadProject } from '../src/util/projectLoader.js';
 
 describe('InfrastructureMessages', function () {
+
+  beforeEach(clearOptions);
+
   it('should have a valid InfrastructureMessages object', function() {
     return verifyCompilerMessagesObject(InfrastructureMessages, CompilerErrorNamespace.Infrastructure);
   });
@@ -24,7 +29,7 @@ describe('InfrastructureMessages', function () {
     const expectedMessages = [InfrastructureMessages.FATAL_UnexpectedException];
 
     process.env.SENTRY_CLIENT_TEST_BUILD_EXCEPTION = '1';
-    await unitTestEndpoints.build(null, ncb, {});
+    await unitTestEndpoints.build(null, null, ncb, {});
     delete process.env.SENTRY_CLIENT_TEST_BUILD_EXCEPTION;
 
     assertMessagesEqual(ncb.messages, expectedMessages);
@@ -57,6 +62,16 @@ describe('InfrastructureMessages', function () {
   });
   */
 
+  // ERROR_InvalidProjectFolder (invalid source folder)
+  
+  it('should generate ERROR_InvalidProjectFolder if there are no valid file types in the source folder when generating a default project file', async function() {
+    const projectPath = makePathToFixture('invalid-source-folder', 'error_invalid_project_folder.kpj')
+    const ncb = new NodeCompilerCallbacks({logLevel: 'silent'});
+    loadProject(projectPath, ncb);
+    assert.isTrue(ncb.hasMessage(InfrastructureMessages.ERROR_InvalidProjectFolder),
+      `ERROR_FileTypeNotFound not generated, instead got: `+JSON.stringify(ncb.messages,null,2));
+  });
+
   // HINT_FilenameHasDifferingCase
 
   it('should generate HINT_FilenameHasDifferingCase if a referenced file has differing case', async function() {
@@ -79,7 +94,7 @@ describe('InfrastructureMessages', function () {
       InfrastructureMessages.INFO_WarningsHaveFailedBuild,
       InfrastructureMessages.INFO_FileNotBuiltSuccessfully
     ];
-    await unitTestEndpoints.build(filename, ncb, {compilerWarningsAsErrors: true});
+    await unitTestEndpoints.build(filename, null, ncb, {compilerWarningsAsErrors: true});
     assertMessagesEqual(ncb.messages, expectedMessages);
   });
 
@@ -93,7 +108,7 @@ describe('InfrastructureMessages', function () {
       InfrastructureMessages.ERROR_UnsupportedProjectVersion,
       InfrastructureMessages.INFO_ProjectNotBuiltSuccessfully
     ];
-    await unitTestEndpoints.build(filename, ncb, {compilerWarningsAsErrors: true});
+    await unitTestEndpoints.build(filename, null, ncb, {compilerWarningsAsErrors: true});
     assertMessagesEqual(ncb.messages, expectedMessages);
   });
 });

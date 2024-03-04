@@ -5,14 +5,14 @@ import { TestCompilerCallbacks } from '@keymanapp/developer-test-helpers';
 import { makePathToFixture } from './helpers/index.js';
 import { KMX, KmxFileReader } from '@keymanapp/common-types';
 
-describe('Keyboard compiler features', async function() {
+describe('Keyboard compiler features', function() {
   let compiler: KmnCompiler = null;
   let callbacks: TestCompilerCallbacks = null;
 
   this.beforeAll(async function() {
     compiler = new KmnCompiler();
     callbacks = new TestCompilerCallbacks();
-    assert(await compiler.init(callbacks));
+    assert(await compiler.init(callbacks, {saveDebug: true}));
     assert(compiler.verifyInitialized());
   });
 
@@ -29,15 +29,15 @@ describe('Keyboard compiler features', async function() {
   ];
 
   for(const v of versions) {
-    it(`should build a version ${v[0]} keyboard`, function() {
+    it(`should build a version ${v[0]} keyboard`, async function() {
       const fixtureName = makePathToFixture('features', `version_${v[1]}.kmn`);
 
-      const result = compiler.runCompiler(fixtureName, {outFile: `version_${v[1]}.kmx`, saveDebug: true});
+      const result = await compiler.run(fixtureName, `version_${v[1]}.kmx`);
       if(result === null) callbacks.printMessages();
       assert.isNotNull(result);
 
       const reader = new KmxFileReader();
-      const keyboard = reader.read(result.kmx.data);
+      const keyboard = reader.read(result.artifacts.kmx.data);
       assert.equal(keyboard.fileVersion, v[2]);
     });
   }

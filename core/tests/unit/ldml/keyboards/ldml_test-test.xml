@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE keyboardTest3 SYSTEM "../../../../../resources/standards-data/ldml-keyboards/techpreview/dtd/ldmlKeyboardTest3.dtd">
+<keyboardTest3 conformsTo="techpreview">
+  <info keyboard="ldml_test.xml" author="srl295" name="test" />
+
+  <tests name="separate">
+    <test name="key-1">
+      <keystroke key="1" />
+      <check result="1:basic:OK" />
+    </test>
+    <test name="key-2">
+      <keystroke key="2" />
+      <check result="2:simple_transform:OK" />
+    </test>
+    <test name="key-3">
+      <keystroke key="3" />
+      <check result="3:simple_marker:OK" />
+    </test>
+    <test name="key-4">
+      <keystroke key="4" />
+      <check result="4:simple_reorder:OK" />
+    </test>
+    <test name="key-5">
+      <keystroke key="5" />
+      <check result="5:simple_vars:OK" />
+    </test>
+    <test name="key-6">
+      <keystroke key="6" />
+      <check result="6:map_varOK" /> <!-- TODO: 10734 There's a bug in the matching still. Come back and fix this, but the crasher is fixed -->
+      <!-- <check result="6:map_var:OK" /> -->
+    </test>
+  </tests>
+</keyboardTest3>

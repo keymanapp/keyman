@@ -24,8 +24,6 @@ type
     gbSetup: TGroupBox;
     editAuthToken: TEdit;
     lblAuthToken: TLabel;
-    cbRegion: TComboBox;
-    lblRegion: TLabel;
     cmdDownload: TButton;
     gbAdvanced: TGroupBox;
     chkServerShowConsoleWindow: TCheckBox;
@@ -75,7 +73,7 @@ const
   // to be stable, as they are used in other apps also.
   SUrlNgrokAuthToken = 'https://dashboard.ngrok.com/get-started/your-authtoken';
   SUrlNgrokSignup = 'https://dashboard.ngrok.com/signup';
-  SUrlNgrokDownload = 'https://bin.equinox.io/c/4VmDzA7iaHb/ngrok-stable-windows-386.zip';
+  SUrlNgrokDownload = 'https://bin.equinox.io/c/bNyj1mQVY4c/ngrok-v3-stable-windows-386.zip';
   SNGrokExe = 'ngrok.exe';
 
 procedure TfrmServerOptions.cmdCreateAccountClick(Sender: TObject);
@@ -193,14 +191,13 @@ procedure TfrmServerOptions.cmdOKClick(Sender: TObject);
 var
   DefaultPort: Integer;
   KeepAlive, UseNgrok, ngrokKeepVisible: Boolean;
-  ngrokToken, ngrokRegion: string;
+  ngrokToken: string;
   Changed: Boolean;
 begin
   DefaultPort := StrToIntDef(editDefaultPort.Text, 8008);   // I4021
   KeepAlive := chkLeaveServerRunning.Checked;
   UseNgrok := chkUseNgrok.Checked;
   ngrokToken := editAuthToken.Text;
-  ngrokRegion := Copy(cbRegion.Text, 1, 2);
   ngrokKeepVisible := chkServerShowConsoleWindow.Checked;
 
   Changed :=
@@ -208,7 +205,6 @@ begin
     (FKeymanDeveloperOptions.ServerKeepAlive <> KeepAlive) or
     (FKeymanDeveloperOptions.ServerUseNgrok <> UseNgrok) or
     (FKeymanDeveloperOptions.ServerNgrokToken <> ngrokToken) or
-    (FKeymanDeveloperOptions.ServerNgrokRegion <> ngrokRegion) or
     (FKeymanDeveloperOptions.ServerServerShowConsoleWindow <> ngrokKeepVisible);
 
   if Changed then
@@ -217,7 +213,6 @@ begin
     FKeymanDeveloperOptions.ServerKeepAlive := KeepAlive;
     FKeymanDeveloperOptions.ServerUseNgrok := UseNgrok;
     FKeymanDeveloperOptions.ServerNgrokToken := ngrokToken;
-    FKeymanDeveloperOptions.ServerNgrokRegion := ngrokRegion;
     FKeymanDeveloperOptions.ServerServerShowConsoleWindow := ngrokKeepVisible;
     FKeymanDeveloperOptions.Write; // TODO: Cancel button in parent dialog is a problem
     modWebHttpServer.RestartServer;
@@ -226,8 +221,6 @@ begin
 end;
 
 procedure TfrmServerOptions.FormCreate(Sender: TObject);
-var
-  i: Integer;
 begin
   editDefaultPort.Text := IntToStr(FKeymanDeveloperOptions.ServerDefaultPort);   // I4021
   chkUseNgrok.Checked := FKeymanDeveloperOptions.ServerUseNgrok;
@@ -235,14 +228,6 @@ begin
 
   lblVersion.Caption := '';
   editAuthToken.Text := FKeymanDeveloperOptions.ServerNgrokToken;
-
-  cbRegion.ItemIndex := 0;
-  for i := 0 to cbRegion.Items.Count - 1 do
-    if cbRegion.Items[i].StartsWith(FKeymanDeveloperOptions.ServerNgrokRegion) then
-    begin
-      cbRegion.ItemIndex := i;
-      Break;
-    end;
 
   chkServerShowConsoleWindow.Checked := FKeymanDeveloperOptions.ServerServerShowConsoleWindow;
 

@@ -20,6 +20,7 @@ import {
   TestSet
 } from "@keymanapp/recorder-core";
 import { BrowserDriver } from "./browserDriver.js";
+import { type StylesheetManager } from "keyman/engine/dom-utils";
 
 
 type AssertCallback = (s1: any, s2: any, msg?: string) => void;
@@ -51,9 +52,15 @@ export class BrowserProctor extends Proctor {
   }
 
   // Performs browser-specific global test prep.
-  beforeAll() {
+  async beforeAll() {
     let ele = this.target;
-    (window['keyman'] as any).setActiveElement(ele['base'] ? ele['base'] : ele);
+    keyman.setActiveElement(ele, true);
+
+    // If the CSS isn't fully loaded, the element positions will not match their expected
+    // locations in the keyboard layout and OSK keys won't be triggered properly by the
+    // gesture engine.
+    const styleManager = keyman.osk['uiStyleSheetManager'] as StylesheetManager;
+    await styleManager.allLoadedPromise();
   }
 
   before() {
@@ -74,12 +81,12 @@ export class BrowserProctor extends Proctor {
 
   // Execution of a test sequence depends on the testing environment; this handles
   // the browser-specific aspects.
-  simulateSequence(sequence: TestSequence<any>, outputTarget?: OutputTarget): string {
+  async simulateSequence(sequence: TestSequence<any>, outputTarget?: OutputTarget): Promise<string> {
     let driver = new BrowserDriver(this.target);
 
     // For the version 10.0 spec
     if(sequence instanceof InputEventSpecSequence) {
-      return driver.simulateSequence(sequence);
+      return await driver.simulateSequence(sequence);
 
       // For the version 14.0+ spec
     } else if(sequence instanceof RecordedKeystrokeSequence) {

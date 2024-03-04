@@ -77,9 +77,9 @@ uint8_t test_imx_callback(km_core_state *state, uint32_t imx_id, void *callback_
   km_core_state_get_intermediate_context(state, &entry_context);
 
   size_t n = 0;
-  try_status(km_core_context_items_to_utf16(entry_context, nullptr, &n))
+  try_status(context_items_to_utf16(entry_context, nullptr, &n))
   km_core_cp *buf = new km_core_cp[n];
-  try_status(km_core_context_items_to_utf16(entry_context, buf, &n));
+  try_status(context_items_to_utf16(entry_context, buf, &n));
 
   std::cout << "imx entry context   : "  << " [" << buf << "]" << std::endl;
   km_core_context_items_dispose(entry_context);
@@ -145,9 +145,9 @@ uint8_t test_imx_callback(km_core_state *state, uint32_t imx_id, void *callback_
   km_core_state_get_intermediate_context(state, &exit_context);
 
   n = 0;
-  try_status(km_core_context_items_to_utf16(exit_context, nullptr, &n))
+  try_status(context_items_to_utf16(exit_context, nullptr, &n))
   km_core_cp *tmp_buf = new km_core_cp[n];
-  try_status(km_core_context_items_to_utf16(exit_context, tmp_buf, &n));
+  try_status(context_items_to_utf16(exit_context, tmp_buf, &n));
 
   std::cout << "imx exit context   : "  << " [" << tmp_buf << "]" << std::endl;
   km_core_context_items_dispose(exit_context);

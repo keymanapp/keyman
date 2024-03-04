@@ -18,16 +18,13 @@
 		297A501928DF4D360074EB1B /* PrivacyConsent.m in Sources */ = {isa = PBXBuildFile; fileRef = 297A501628DF4D360074EB1B /* PrivacyConsent.m */; };
 		298D09F72A1F4533006B9DFE /* TextApiCompliance.m in Sources */ = {isa = PBXBuildFile; fileRef = 298D09F52A1F4533006B9DFE /* TextApiCompliance.m */; };
 		2992F41C2A28479400E08929 /* KeySender.m in Sources */ = {isa = PBXBuildFile; fileRef = 299ABD6F29ECE75B00AA5948 /* KeySender.m */; };
-		2992F41D2A2847A900E08929 /* KMCoreActionHandler.m in Sources */ = {isa = PBXBuildFile; fileRef = 2996D63929F2719F00DF4D56 /* KMCoreActionHandler.m */; };
 		2992F41E2A2847AF00E08929 /* PrivacyConsent.m in Sources */ = {isa = PBXBuildFile; fileRef = 297A501628DF4D360074EB1B /* PrivacyConsent.m */; };
 		2992F41F2A2847C900E08929 /* TextApiCompliance.m in Sources */ = {isa = PBXBuildFile; fileRef = 298D09F52A1F4533006B9DFE /* TextApiCompliance.m */; };
 		2992F4202A28482800E08929 /* PrivacyWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 297A501228DF4D360074EB1B /* PrivacyWindowController.m */; };
-		2996D63A29F2719F00DF4D56 /* KMCoreActionHandler.m in Sources */ = {isa = PBXBuildFile; fileRef = 2996D63929F2719F00DF4D56 /* KMCoreActionHandler.m */; };
 		2999C69929D3E4CE006366F5 /* InputMethodTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 2999C69829D3E4CE006366F5 /* InputMethodTests.m */; };
 		299ABD7129ECE75B00AA5948 /* KeySender.m in Sources */ = {isa = PBXBuildFile; fileRef = 299ABD6F29ECE75B00AA5948 /* KeySender.m */; };
 		299B5E2029126CA20070841D /* keyman-icon@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 299B5E1E29126CA20070841D /* keyman-icon@2x.png */; };
 		299B5E2129126CA20070841D /* keyman-icon.png in Resources */ = {isa = PBXBuildFile; fileRef = 299B5E1F29126CA20070841D /* keyman-icon.png */; };
-		29A2D94E2A44FC4500FABFDB /* CoreActionHandlerTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 29A2D94D2A44FC4500FABFDB /* CoreActionHandlerTests.m */; };
 		29B42A572728339900EDD5D3 /* KMInfoWindowController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 29B42A592728339900EDD5D3 /* KMInfoWindowController.xib */; };
 		29B42A602728343B00EDD5D3 /* KMKeyboardHelpWindowController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 29B42A622728343B00EDD5D3 /* KMKeyboardHelpWindowController.xib */; };
 		37A245C12565DFA6000BBF92 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 37A245C02565DFA6000BBF92 /* Assets.xcassets */; };
@@ -195,14 +192,11 @@
 		298566E52980E584004ACA95 /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/Localizable.strings; sourceTree = "<group>"; };
 		298D09F52A1F4533006B9DFE /* TextApiCompliance.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TextApiCompliance.m; sourceTree = "<group>"; };
 		298D09F62A1F4533006B9DFE /* TextApiCompliance.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TextApiCompliance.h; sourceTree = "<group>"; };
-		2996D63829F2719F00DF4D56 /* KMCoreActionHandler.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = KMCoreActionHandler.h; sourceTree = "<group>"; };
-		2996D63929F2719F00DF4D56 /* KMCoreActionHandler.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = KMCoreActionHandler.m; sourceTree = "<group>"; };
 		2999C69829D3E4CE006366F5 /* InputMethodTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = InputMethodTests.m; sourceTree = "<group>"; };
 		299ABD6F29ECE75B00AA5948 /* KeySender.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = KeySender.m; sourceTree = "<group>"; };
 		299ABD7029ECE75B00AA5948 /* KeySender.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KeySender.h; sourceTree = "<group>"; };
 		299B5E1E29126CA20070841D /* keyman-icon@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "keyman-icon@2x.png"; sourceTree = "<group>"; };
 		299B5E1F29126CA20070841D /* keyman-icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "keyman-icon.png"; sourceTree = "<group>"; };
-		29A2D94D2A44FC4500FABFDB /* CoreActionHandlerTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CoreActionHandlerTests.m; sourceTree = "<group>"; };
 		29A4730527E9D6D500DE07C7 /* ha */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ha; path = ha.lproj/KMAboutWindowController.strings; sourceTree = "<group>"; };
 		29A4730627E9D6D500DE07C7 /* ha */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ha; path = ha.lproj/preferences.strings; sourceTree = "<group>"; };
 		29A4730727E9D6D600DE07C7 /* ha */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ha; path = ha.lproj/KMInfoWindowController.strings; sourceTree = "<group>"; };
@@ -572,8 +566,6 @@
 				98A778C31A8C53BF00CF809D /* KMInputMethodAppDelegate.m */,
 				E21799031FC5B74D00F2D66A /* KMInputMethodEventHandler.h */,
 				E21799041FC5B7BC00F2D66A /* KMInputMethodEventHandler.m */,
-				2996D63829F2719F00DF4D56 /* KMCoreActionHandler.h */,
-				2996D63929F2719F00DF4D56 /* KMCoreActionHandler.m */,
 				298D09F62A1F4533006B9DFE /* TextApiCompliance.h */,
 				298D09F52A1F4533006B9DFE /* TextApiCompliance.m */,
 				E24C79EC1FFFEA6B00D8E46F /* KMInputMethodEventHandlerProtected.h */,
@@ -708,7 +700,6 @@
 				E211769E20E18C0B00F8065D /* AppleCompliantTestClient.h */,
 				E211769F20E18C5200F8065D /* AppleCompliantTestClient.m */,
 				2999C69829D3E4CE006366F5 /* InputMethodTests.m */,
-				29A2D94D2A44FC4500FABFDB /* CoreActionHandlerTests.m */,
 			);
 			path = KeymanTests;
 			sourceTree = "<group>";
@@ -1011,7 +1002,6 @@
 				297A501928DF4D360074EB1B /* PrivacyConsent.m in Sources */,
 				98FE105E1B4DE8F400525F54 /* NSWindow+SuppMethods.m in Sources */,
 				9836B3741AE5F11D00780482 /* ZipArchive.mm in Sources */,
-				2996D63A29F2719F00DF4D56 /* KMCoreActionHandler.m in Sources */,
 				983247B21A9EB9690010B90C /* KMConfigColumn3CellView.m in Sources */,
 				290BC75E274F3FD7005CD1C3 /* KMKeyboardInfo.m in Sources */,
 				297A501728DF4D360074EB1B /* PrivacyWindowController.m in Sources */,
@@ -1028,9 +1018,7 @@
 				2992F4202A28482800E08929 /* PrivacyWindowController.m in Sources */,
 				2992F41F2A2847C900E08929 /* TextApiCompliance.m in Sources */,
 				2992F41E2A2847AF00E08929 /* PrivacyConsent.m in Sources */,
-				2992F41D2A2847A900E08929 /* KMCoreActionHandler.m in Sources */,
 				2992F41C2A28479400E08929 /* KeySender.m in Sources */,
-				29A2D94E2A44FC4500FABFDB /* CoreActionHandlerTests.m in Sources */,
 				2999C69929D3E4CE006366F5 /* InputMethodTests.m in Sources */,
 				E211769D20E182DD00F8065D /* NoContextTestClient.m in Sources */,
 				E2D5529D20DD8E0200D77CFB /* LegacyTestClient.m in Sources */,

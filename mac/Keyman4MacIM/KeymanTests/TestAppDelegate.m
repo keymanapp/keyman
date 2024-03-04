@@ -18,7 +18,7 @@
     if (_kme == nil) {
       _kme = [[KMEngine alloc] initWithKMX:nil context:self.contextBuffer verboseLogging:self.debugMode];
     }
-    
+
     return _kme;
 }
 
@@ -31,7 +31,7 @@
     if (_contextBuffer == nil) {
         _contextBuffer = [[NSMutableString alloc] initWithString:@""];
     }
-    
+
     return _contextBuffer;
 }
 
@@ -39,7 +39,7 @@
     _contextBuffer = [contextBuffer mutableCopy];
     if (_contextBuffer.length)
         [_contextBuffer replaceOccurrencesOfString:@"\0" withString:[NSString nullChar] options:0 range:NSMakeRange(0, 1)];
-    [self.kme setCoreContext:self.contextBuffer];
+    [self.kme setCoreContextIfNeeded:self.contextBuffer];
 }
 
 - (BOOL)debugMode {

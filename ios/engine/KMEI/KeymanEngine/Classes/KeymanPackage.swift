@@ -8,6 +8,7 @@
 
 import Foundation
 import ZIPFoundation
+import os.log
 
 // KMPErrors may be passed to UIAlertControllers, so they need localization.
 public enum KMPError : String, Error {
@@ -245,7 +246,7 @@ public class KeymanPackage {
           try FileManager.default.removeItem(at: self.sourceFolder)
         }
       } catch {
-        log.debug("Could not remove temporary extraction site on package deinit")
+        os_log("Could not remove temporary extraction site on package deinit", log:KeymanEngineLogger.resources, type: .error)
       }
     }
   }
@@ -436,7 +437,8 @@ public class KeymanPackage {
     let minVersion = Version(minSupportedVersion)
     
     if (currentVersion.major < minVersion!.major) {
-      log.error("package '\(packageName)' could not be installed because it requires version \(minSupportedVersion) of Keyman")
+      let message = "package '\(packageName)' could not be installed because it requires version \(minSupportedVersion) of Keyman"
+      os_log("%{public}s", log:KeymanEngineLogger.resources, type: .error, message)
       throw KMPError.unsupportedKeymanVersion
     }
   }
@@ -449,7 +451,9 @@ public class KeymanPackage {
       let package = try KeymanPackage.parse(destination)
       complete(package)
     } catch {
-      SentryManager.captureAndLog(error, sentryLevel: .info)
+      let message = "Keyboard installation error: \(String(describing: error))"
+      os_log("%{public}s", log:KeymanEngineLogger.migration, type: .error, message)
+      SentryManager.capture(error, message: message, sentryLevel: .info)
       complete(nil)
     }
   }

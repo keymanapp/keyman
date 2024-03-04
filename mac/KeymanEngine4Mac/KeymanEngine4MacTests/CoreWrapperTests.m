@@ -1,11 +1,11 @@
 /**
  * Keyman is copyright (C) SIL International. MIT License.
- * 
+ *
  * CoreWrapperTest.m
  * CoreWrapperTests
- * 
+ *
  * Created by Shawn Schantz on 2023-02-17.
- * 
+ *
  * Description...
  */
 
@@ -29,7 +29,7 @@ CoreWrapper *mockWrapper;
   NSString *khmerKeyboardPath = [[[NSBundle mainBundle] resourcePath] stringByAppendingPathComponent:@"khmer_angkor.kmx"];
 
   NSLog(@"mockKmxFilePath  = %@\n", mockKmxFilePath);
-  
+
   mockWrapper = [[CoreWrapper alloc] initWithHelper: [CoreTestStaticHelperMethods helper] kmxFilePath:mockKmxFilePath];
 }
 
@@ -57,24 +57,20 @@ CoreWrapper *mockWrapper;
 - (void)testprocessEvent_lowercaseA_returnsExpectedCharacterForKmx {
   NSString *kmxPath = [CoreTestStaticHelperMethods getKmxFilePathTestMacEngine];
   CoreWrapper *core = [[CoreWrapper alloc] initWithHelper: [CoreTestStaticHelperMethods helper] kmxFilePath:kmxPath];
-  
-  // expecting two actions: character action with 'Ç' and end action
-  NSArray *actions = [core processMacVirtualKey:MVK_A withModifiers:0 withKeyDown:YES];
-  XCTAssert(actions.count == 2, @"Expected 2 actions");
-  CoreAction *charAction = actions[0];
-  XCTAssert(charAction.actionType==CharacterAction, @"Expected CharacterAction");
-  NSString *content = charAction.content;
-  XCTAssert([content isEqualToString:@"\u00C7"], @"Expected capital C cedille (U+00C7)");
-  CoreAction *endAction = actions[1];
-  XCTAssert(endAction.actionType==EndAction, @"Expected EndAction");
+
+  // expecting character with 'Ç'
+  CoreKeyOutput *coreOutput = [core processMacVirtualKey:MVK_A withModifiers:0 withKeyDown:YES];
+  XCTAssert([coreOutput.textToInsert isEqualToString:@"\u00C7"], @"Expected capital C cedille (U+00C7)");
 }
 
 - (void)testgetContextAsString_ContextContainsEmojis_ReturnsSameContext  {
   NSString *kmxPath = [CoreTestStaticHelperMethods getKmxFilePathTestMacEngine];
   CoreWrapper *core = [[CoreWrapper alloc] initWithHelper: [CoreTestStaticHelperMethods helper] kmxFilePath:kmxPath];
-  [core setContext:@"🤔?👍🏻✅"];
-  NSString *finalContext = core.context;
-  XCTAssert([finalContext isEqualToString:@"🤔?👍🏻✅"], @"Expected '🤔?👍🏻✅' in context buffer");
+  [core setContextIfNeeded:@"🤔?👍🏻✅"];
+  NSString *finalContext = core.contextDebug;
+  // Note: relying on km_core_state_context_debug output format is just barely
+  // acceptable for a unit test
+  XCTAssert([finalContext isEqualToString:@"|🤔?👍🏻✅| (len: 5) [ U+1f914 U+003f U+1f44d U+1f3fb U+2705 ]"], @"Expected '🤔?👍🏻✅' in context buffer");
 }
 
 @end

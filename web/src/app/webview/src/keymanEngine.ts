@@ -52,7 +52,7 @@ export default class KeymanEngine extends KeymanEngineBase<WebviewConfiguration,
     // There may be some valid mutations possible even on repeated calls?
     // The original seems to allow it.
 
-    if(this.config.deferForInitialization.hasFinalized) {
+    if(this.config.deferForInitialization.isResolved) {
       // abort!  Maybe throw an error, too.
       return Promise.resolve();
     }
@@ -60,6 +60,10 @@ export default class KeymanEngine extends KeymanEngineBase<WebviewConfiguration,
     if(this.beepKeyboard) {
       this.core.keyboardProcessor.beepHandler = this.beepKeyboard;
     }
+
+    this.contextManager.on('keyboardchange', (kbd) => {
+      this.hardKeyboard.activeKeyboard = kbd?.keyboard;
+    });
 
     this.contextManager.initialize();
 

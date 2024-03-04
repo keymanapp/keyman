@@ -9,7 +9,7 @@ Build-Depends:
  bash-completion,
  debhelper (>= 11),
  dh-python,
- gir1.2-webkit2-4.0,
+ gir1.2-webkit2-4.1 | gir1.2-webkit2-4.0,
  ibus,
  liblocale-gettext-perl,
  perl,
@@ -85,7 +85,7 @@ Section: python
 Architecture: all
 Depends:
  dconf-cli,
- gir1.2-webkit2-4.0,
+ gir1.2-webkit2-4.1 | gir1.2-webkit2-4.0,
  keyman-engine,
  python3-bs4,
  python3-gi,

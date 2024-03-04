@@ -70,12 +70,11 @@ public class KMKeyboardJSHandler {
     // loaded and has set a keyboard.  To allow the host-page to have earlier access, we instead get the stored
     // keyboard index directly.
     SharedPreferences prefs = context.getSharedPreferences(context.getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
-    int index = prefs.getInt(KMManager.KMKey_UserKeyboardIndex, 0);
-    if (index < 0) {
-      index = 0;
+    Keyboard kbd = Keyboard.getDefaultKeyboard(context);
+    int index = prefs.getInt(KMManager.KMKey_UserKeyboardIndex, -1);
+    if (index >= 0) {
+      kbd = KMManager.getKeyboardInfo(this.context, index);
     }
-
-    Keyboard kbd = KMManager.getKeyboardInfo(this.context, index);
     return kbd.toStub(context);
   }
 

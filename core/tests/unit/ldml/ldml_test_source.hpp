@@ -22,6 +22,10 @@ enum ldml_action_type {
   */
   LDML_ACTION_DONE,
   /**
+   * Skip this test
+  */
+  LDML_ACTION_SKIP,
+  /**
    * key_event - a vkey
   */
   LDML_ACTION_KEY_EVENT,
@@ -45,6 +49,18 @@ struct ldml_action {
   ldml_action_type type;
   key_event k;
   std::u16string string;
+
+  /** mark failure as specified type */
+  void formatType(const char *file, int line, ldml_action_type type, const std::u16string &msg);
+  /** mark failure as specified type. msg2 is concatenated */
+  void formatType(const char *file, int line, ldml_action_type type, const std::u16string &msg, const std::u16string &msg2);
+  /** mark failure as specified type. msg2 is concatenated */
+  void formatType(const char *file, int line, ldml_action_type type, const std::u16string &msg, long msg2);
+  /** mark failure as specified type.  msg2 is concatenated */
+  void formatType(const char *file, int line, ldml_action_type type, const std::u16string &msg, const std::string &msg2);
+
+  /** @returns true if caller should stop processing events */
+  bool done() const;
 };
 
 /**
@@ -59,7 +75,7 @@ public:
   virtual void toggle_caps_lock_state();
   virtual void set_caps_lock_on(bool caps_lock_on);
   virtual km_core_status get_expected_load_status();
-  virtual const std::u16string &get_context() const  = 0;
+  virtual const std::u16string &get_context() = 0;
   virtual bool get_expected_beep() const;
 
   // helper functions
@@ -67,6 +83,22 @@ public:
   static uint16_t get_modifier(std::string const m);
   static std::u16string parse_source_string(std::string const &s);
   static std::u16string parse_u8_source_string(std::string const &s);
+
+  // sets the normalization switch.
+  // why is this here? to prevent an additional pass of parsing the KMX+ file.
+  void set_normalization_disabled(bool is_disabled) {
+    normalization_disabled = is_disabled;
+    setup = true;
+  }
+
+  bool get_normalization_disabled() const {
+    assert(setup); // make sure set_ was called first
+    return normalization_disabled;
+  }
+
+private:
+  bool normalization_disabled = false;
+  bool setup = false;
 
 private:
   bool _caps_lock_on = false;
@@ -105,7 +137,7 @@ public:
   int load_source(const km::core::path &path);
 
   virtual km_core_status get_expected_load_status();
-  virtual const std::u16string &get_context() const;
+  virtual const std::u16string &get_context();
   virtual bool get_expected_beep() const;
 
   virtual void next_action(ldml_action &fillin);

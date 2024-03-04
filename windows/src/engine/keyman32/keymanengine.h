@@ -40,6 +40,8 @@
 #include <msctf.h>
 #include "../../../../common/windows/cpp/include/legacy_kmx_file.h"
 #include <keyman/keyman_core_api.h>
+#include <keyman/keyman_core_api_actions.h> // for imx integration
+#include <keyman/keyman_core_api_context.h> // for intermediate context
 #include <keyman/keyman_core_api_consts.h>
 
 /***************************************************************************/
@@ -157,24 +159,35 @@ void InitDebugging();
 void UninitDebugging();
 
 extern "C" void _declspec(dllexport) WINAPI Keyman_WriteDebugEvent(char* file, int line, PWCHAR msg);
+extern "C" void _declspec(dllexport) WINAPI Keyman_WriteDebugEventW(PWCHAR file, int line, PWCHAR msg);
 
-#define SendDebugMessage(hwnd,state,kmn_lineno,msg) (ShouldDebug((state)) ? SendDebugMessage_1((hwnd),(state),(kmn_lineno), __FILE__, __LINE__, (msg)) : 0)
-#define SendDebugMessageFormat(hwnd,state,kmn_lineno,msg,...) (ShouldDebug((state)) ? SendDebugMessageFormat_1((hwnd),(state),(kmn_lineno), __FILE__, __LINE__, (msg),__VA_ARGS__) : 0)
+// Following macros widen a constant string, ugly it is true
+#define __WFILE2__(m) L ## m
+#define __WFILE1__(m) __WFILE2__(m)
+#define __WFILE__ __WFILE1__(__FILE__)
+
+#define SendDebugMessageW(hwnd,state,kmn_lineno,msg) (ShouldDebug((state)) ? SendDebugMessageW_1((hwnd),(state),(kmn_lineno), __WFILE__, __LINE__, (msg)) : 0)
+#define SendDebugMessageFormatW(hwnd,state,kmn_lineno,msg,...) (ShouldDebug((state)) ? SendDebugMessageFormatW_1((hwnd),(state),(kmn_lineno), __WFILE__, __LINE__, (msg),__VA_ARGS__) : 0)
+
+#define SendDebugMessage(hwnd,state,kmn_lineno,msg) (ShouldDebug((state)) ? SendDebugMessage_1((hwnd),(state),(kmn_lineno), __WFILE__, __LINE__, (msg)) : 0)
+#define SendDebugMessageFormat(hwnd,state,kmn_lineno,msg,...) (ShouldDebug((state)) ? SendDebugMessageFormat_1((hwnd),(state),(kmn_lineno), __WFILE__, __LINE__, (msg),__VA_ARGS__) : 0)
 #define ShouldDebug(state) ShouldDebug_1()
-#define DebugLastError(context) (DebugLastError_1(GetLastError(), (context), __FILE__,__LINE__,__FUNCTION__))
-#define DebugLastError0(error, context) (DebugLastError_1((error), (context), __FILE__,__LINE__,__FUNCTION__))
+#define DebugLastError(context) (DebugLastError_1(GetLastError(), (context), __WFILE__, __LINE__,__FUNCTION__))
+#define DebugLastError0(error, context) (DebugLastError_1((error), (context), __WFILE__, __LINE__,__FUNCTION__))
 // On failed condition log "message", return FALSE
 // and assert if a debugger is attached for a debug build.
-#define DebugAssert(condition, message) (DebugAssert_1((condition),(message), __FILE__, __LINE__))
-int SendDebugMessage_1(HWND hwnd, TSDMState state, int kmn_lineno, char* file, int line, char* msg);
-int SendDebugMessageFormat_1(HWND hwnd, TSDMState state, int kmn_lineno, char* file, int line, char* fmt, ...);
-void DebugLastError_1(DWORD err, char* context, char* file, int line, char* func);
+#define DebugAssert(condition, message) (DebugAssert_1((condition),(message), __WFILE__, __LINE__))
+int SendDebugMessage_1(HWND hwnd, TSDMState state, int kmn_lineno, wchar_t* file, int line, char* msg);
+int SendDebugMessageFormat_1(HWND hwnd, TSDMState state, int kmn_lineno, wchar_t* file, int line, char* fmt, ...);
+int SendDebugMessageW_1(HWND hwnd, TSDMState state, int kmn_lineno, wchar_t* file, int line, wchar_t* msg);
+int SendDebugMessageFormatW_1(HWND hwnd, TSDMState state, int kmn_lineno, wchar_t* file, int line, wchar_t* fmt, ...);
+void DebugLastError_1(DWORD err, char* context, wchar_t* file, int line, char* func);
 void DebugMessage(LPMSG msg, WPARAM wParam);
 void DebugShift(char* function, char* point);
 BOOL DebugSignalPause(BOOL fIsUp);
 char* Debug_VirtualKey(WORD vk);
 char* Debug_UnicodeString(PWSTR s, int x = 0);
-BOOL DebugAssert_1(BOOL condition, char* msg, char* file, int line);
+BOOL DebugAssert_1(BOOL condition, char* msg, wchar_t* file, int line);
 BOOL ShouldDebug_1(); // TSDMState state);
 
 #endif

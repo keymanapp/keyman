@@ -20,7 +20,7 @@ import { PageIntegrationHandlers } from './context/pageIntegrationHandlers.js';
 import { LanguageMenu } from './languageMenu.js';
 import { setupOskListeners } from './oskConfiguration.js';
 import { whenDocumentReady } from './utils/documentReady.js';
-import { outputTargetForElement } from '../../../../build/engine/attachment/obj/outputTargetForElement.js';
+import { outputTargetForElement } from 'keyman/engine/attachment';
 
 import { UtilApiEndpoint} from './utilApiEndpoint.js';
 import { UIModule } from './uiModuleInterface.js';
@@ -122,7 +122,7 @@ export default class KeymanEngine extends KeymanEngineBase<BrowserConfiguration,
     }
 
     this._ui = module;
-    if(this.config.deferForInitialization.hasResolved) {
+    if(this.config.deferForInitialization.isFulfilled) {
       module.initialize();
     }
   }
@@ -165,7 +165,7 @@ export default class KeymanEngine extends KeymanEngineBase<BrowserConfiguration,
 
     // Deferred keyboard loading + shortcutting if a different init call on the engine has
     // already fully resolved.
-    if(this.config.deferForInitialization.hasFinalized) {
+    if(this.config.deferForInitialization.isResolved) {
       // abort!  Maybe throw an error, too.
       return Promise.resolve();
     }
@@ -205,9 +205,6 @@ export default class KeymanEngine extends KeymanEngineBase<BrowserConfiguration,
     // Automatically performs related handler setup & maintains references
     // needed for related cleanup / shutdown.
     this.pageIntegration = new PageIntegrationHandlers(window, this);
-
-    // Initialize supplementary plane string extensions
-    String.kmwEnableSupplementaryPlane(true);
     this.config.finalizeInit();
 
     if(this.ui) {
@@ -442,7 +439,7 @@ export default class KeymanEngine extends KeymanEngineBase<BrowserConfiguration,
     const stub = this.keyboardRequisitioner.cache.getStub(PInternalName, PlgCode);
     const keyboard = this.keyboardRequisitioner.cache.getKeyboardForStub(stub);
 
-    return this._GetKeyboardDetail(stub, keyboard);
+    return stub && this._GetKeyboardDetail(stub, keyboard);
   }
 
   /**
@@ -647,7 +644,7 @@ export default class KeymanEngine extends KeymanEngineBase<BrowserConfiguration,
    *  @param  {string}          PInternalName   internal name of keyboard, with or without Keyboard_ prefix
    *  @param  {number}          Pstatic         static keyboard flag  (unselectable elements)
    *  @param  {string=}         argFormFactor   layout form factor, defaulting to 'desktop'
-   *  @param  {(string|number)=}  argLayerId    name or index of layer to show, defaulting to 'default'
+   *  @param  {(string)=}  argLayerId    name or index of layer to show, defaulting to 'default'
    *  @return {Object}                          DIV object with filled keyboard layer content
    *
    * See https://help.keyman.com/developer/engine/web/current-version/reference/osk/BuildVisualKeyboard
@@ -656,7 +653,7 @@ export default class KeymanEngine extends KeymanEngineBase<BrowserConfiguration,
     PInternalName: string,
     Pstatic: number,
     argFormFactor?: DeviceSpec.FormFactor,
-    argLayerId?: string|number
+    argLayerId?: string
   ): HTMLElement {
     let PKbd: Keyboard = null;
 
@@ -679,7 +676,7 @@ export default class KeymanEngine extends KeymanEngineBase<BrowserConfiguration,
     return VisualKeyboard.buildDocumentationKeyboard(
       PKbd,
       Pstub,
-      this.config.paths.fonts,
+      this.config.paths,
       argFormFactor,
       argLayerId,
       targetHeight

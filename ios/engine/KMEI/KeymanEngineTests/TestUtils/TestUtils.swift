@@ -7,8 +7,9 @@
 //
 
 import XCTest
-
 import Foundation
+import os.log
+
 @testable import KeymanEngine
 
 /**
@@ -40,8 +41,9 @@ enum TestUtils {
         try FileManager.default.removeItem(at: item)
       }
     } catch {
-      log.error(error)
-      XCTFail("Could not clear a directory because of error: \(error)")
+      let message = "Could not clear a directory because of error: \(String(describing: error))"
+      os_log("%{public}s", log:KeymanEngineLogger.resources, type: .debug, message)
+     XCTFail("Could not clear a directory because of error: \(error)")
     }
   }
 
@@ -57,7 +59,8 @@ enum TestUtils {
                                               withIntermediateDirectories: true,
                                               attributes: nil)
     } catch {
-      log.error(error)
+      let message = "Could not properly erase & reinit KeymanEngine Storage because of error: \(String(describing: error))"
+      os_log("%{public}s", log:KeymanEngineLogger.resources, type: .debug, message)
       XCTFail("Could not properly erase & reinit KeymanEngine Storage because of error: \(error)")
     }
   }

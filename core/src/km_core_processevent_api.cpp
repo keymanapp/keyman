@@ -8,7 +8,8 @@
   History:      17 Oct 2018 - TSE - Initial implementation.
 */
 
-#include <keyman/keyman_core_api.h>
+#include "keyman_core.h"
+
 #include "processor.hpp"
 #include "state.hpp"
 
@@ -49,7 +50,11 @@ km_core_process_event(km_core_state *state,
   if(state == nullptr) {
     return KM_CORE_STATUS_INVALID_ARGUMENT;
   }
-  return state->processor().process_event(state, vk, modifier_state, is_key_down, event_flags);
+  km_core_status status = state->processor().process_event(state, vk, modifier_state, is_key_down, event_flags);
+
+  state->apply_actions_and_merge_app_context();
+
+  return status;
 }
 
 km_core_status

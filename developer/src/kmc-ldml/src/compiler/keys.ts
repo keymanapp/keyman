@@ -1,14 +1,19 @@
-import { constants } from '@keymanapp/ldml-keyboard-constants';
+import { SectionIdent, constants } from '@keymanapp/ldml-keyboard-constants';
 import { LDMLKeyboard, KMXPlus, Constants, MarkerParser } from '@keymanapp/common-types';
 import { CompilerMessages } from './messages.js';
 import { SectionCompiler } from "./section-compiler.js";
 
 import DependencySections = KMXPlus.DependencySections;
 import Keys = KMXPlus.Keys;
+import KeysKeys = KMXPlus.KeysKeys;
 import ListItem = KMXPlus.ListItem;
 import KeysFlicks = KMXPlus.KeysFlicks;
 import { allUsedKeyIdsInFlick, allUsedKeyIdsInKey, allUsedKeyIdsInLayers, calculateUniqueKeys, hashFlicks, hashKeys, translateLayerAttrToModifier, validModifier } from '../util/util.js';
 import { MarkerTracker, MarkerUse } from './marker-tracker.js';
+
+/** reserved name for the special gap key. space is not allowed in key ids. */
+const reserved_gap = "gap (reserved)";
+
 
 export class KeysCompiler extends SectionCompiler {
   static validateMarkers(
@@ -39,6 +44,17 @@ export class KeysCompiler extends SectionCompiler {
 
   public get id() {
     return constants.section.keys;
+  }
+
+  public get dependencies(): Set<SectionIdent> {
+    const defaults = new Set(<SectionIdent[]>[
+      constants.section.elem,
+      constants.section.list,
+      constants.section.meta,
+      constants.section.strs,
+      constants.section.vars,
+    ]);
+    return defaults;
   }
 
   /**
@@ -193,7 +209,46 @@ export class KeysCompiler extends SectionCompiler {
       }
     } // else: TODO-LDML do nothing if only touch layers
 
+    // Now load the reserved keys and slip them in here
+    const reservedKeys = this.getReservedKeys(sections);
+    for (const key of reservedKeys.values()) {
+      sect.keys.push(key);
+    }
+
     return sect;
+  }
+
+  /** list of reserved keys, for tests */
+  public static readonly reserved_keys = [ reserved_gap ];
+  /** count of reserved keys, for tests */
+  public static readonly reserved_count = KeysCompiler.reserved_keys.length;
+
+  /** load up all reserved keys */
+  getReservedKeys(sections: KMXPlus.DependencySections) : Map<String, KeysKeys> {
+    const r = new Map<String, KeysKeys>();
+
+    // set up some constants..
+    const no_string = sections.strs.allocString('');
+    const no_list = sections.list.allocList([], {}, sections);
+
+    // now add the reserved key(s).
+    r.set(reserved_gap, {
+      flags: constants.keys_key_flags_gap | constants.keys_key_flags_extend,
+      id: sections.strs.allocString(reserved_gap),
+      flicks: '',
+      longPress: no_list,
+      longPressDefault: no_string,
+      multiTap: no_list,
+      switch: no_string,
+      to: no_string,
+      width: 10.0, // 10 * .1
+    });
+
+    if (r.size !== KeysCompiler.reserved_count) {
+      throw Error(`Internal Error: KeysCompiler.reserved_count=${KeysCompiler.reserved_count} != ${r.size} actual reserved keys.`);
+    }
+
+    return r;
   }
 
   static addUsedGestureKeys(layerKeyIds: string[], keyBag: Map<string, LDMLKeyboard.LKKey>, usedKeys: Set<string>) {
@@ -295,7 +350,8 @@ export class KeysCompiler extends SectionCompiler {
           stringVariables: true,
           markers: true,
           unescape: true,
-          singleOk: true
+          singleOk: true,
+          nfd: true,
         },
         sections);
       if (!to.isOneChar) {
@@ -436,22 +492,32 @@ export class KeysCompiler extends SectionCompiler {
     const mod = translateLayerAttrToModifier(layer);
     const keymap = this.getKeymapFromForm(hardware);
 
-    let y = -1;
-    for (let row of layer.row) {
-      y++;
+    // Iterate over rows (y) and cols (x) of the scancodes table.
+    // Any assigned keys will be used until we run out of keys in each row,
+    // and run out of rows. The rest will be reserved_gap.
 
-      const keys = row.keys.split(" ");
-      let x = -1;
-      for (let key of keys) {
-        x++;
+    for (let y = 0; y < keymap.length; y++) {
+      let keys : string[];
 
-        // TODO-LDML: we already validated that the key exists, above.
-        // So here we only need the ID?
-        // let keydef = this.keyboard3.keys?.key?.find(x => x.id == key);
+      // if there are keys, use them.
+      if (y < layer.row.length ) {
+        const row = layer.row[y];
+        keys = row.keys.split(" ");
+      } else {
+        keys = [];
+      }
 
+      // all columns in this row
+      for (let x = 0; x < keymap[y].length; x++) {
+        const vkey = keymap[y][x]; // from the scan table
+
+        let key = reserved_gap; // unless there's a key in this row
+        if (x < keys.length) {
+          key = keys[x];
+        }
         sect.kmap.push({
-          vkey: keymap[y][x],
-          mod: mod,
+          vkey,
+          mod,
           key, // key id, to be changed into key index at finalization
         });
       }

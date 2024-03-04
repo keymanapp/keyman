@@ -5,7 +5,7 @@ import 'mocha';
 import * as path from 'path';
 import { fileURLToPath } from 'url';
 import { SectionCompiler, SectionCompilerNew } from '../../src/compiler/section-compiler.js';
-import { KMXPlus, LDMLKeyboardXMLSourceFileReader, VisualKeyboard, CompilerEvent, LDMLKeyboardTestDataXMLSourceFile, compilerEventFormat, LDMLKeyboard, UnicodeSetParser, CompilerCallbacks } from '@keymanapp/common-types';
+import { util, KMXPlus, LDMLKeyboardXMLSourceFileReader, VisualKeyboard, CompilerEvent, LDMLKeyboardTestDataXMLSourceFile, compilerEventFormat, LDMLKeyboard, UnicodeSetParser, CompilerCallbacks } from '@keymanapp/common-types';
 import { LdmlKeyboardCompiler } from '../../src/main.js'; // make sure main.js compiles
 import { assert } from 'chai';
 import { KMXPlusMetadataCompiler } from '../../src/compiler/metadata-compiler.js';
@@ -79,6 +79,10 @@ export async function loadSectionFixture(compilerClass: SectionCompilerNew, file
   // load dependencies first
   await loadDepsFor(sections, compiler, source, callbacks, dependencies);
 
+  if (callbacks.hasError()) {
+    // break out if there's an error
+    return null;
+  }
   // make sure all dependencies are loaded
   compiler.dependencies.forEach(dep => assert.ok(sections[dep],
       `Required dependency '${dep}' for '${compiler.id}' was not supplied: Check the 'dependencies' argument to loadSectionFixture or testCompilationCases`));
@@ -101,25 +105,31 @@ async function loadDepsFor(sections: DependencySections, parentCompiler: Section
   for (const dep of dependencies) {
     const compiler = new dep(source, callbacks);
     assert.notEqual(compiler.id, parentId, `${parentId} depends on itself`);
-    assert.ok(compiler.validate(), `while setting up ${parentId}: ${compiler.id} failed validate()`);
+    const didValidate = compiler.validate();
+    if (!callbacks.hasError()) {
+      // only go down this path if there isn't already a noted error
+      assert.ok(didValidate, `while setting up ${parentId}: ${compiler.id} failed validate()`);
 
-    const sect = compiler.compile(sections);
+      const sect = compiler.compile(sections);
 
-    assert.ok(sect, `while setting up ${parentId}: ${compiler.id} failed compile()`);
-    assert.notOk(sections[compiler.id], `while setting up ${parentId}: ${compiler.id} was already in the sections[] table, probably a bad dependency`);
+      assert.ok(sect, `while setting up ${parentId}: ${compiler.id} failed compile()`);
+      assert.notOk(sections[compiler.id], `while setting up ${parentId}: ${compiler.id} was already in the sections[] table, probably a bad dependency`);
 
-    sections[compiler.id] = sect as any;
+      sections[compiler.id] = sect as any;
+    }
   }
 }
 
-export function loadTestdata(inputFilename: string, options: LdmlCompilerOptions) : LDMLKeyboardTestDataXMLSourceFile {
-  const k = new LdmlKeyboardCompiler(compilerTestCallbacks, options);
+export async function loadTestData(inputFilename: string, options: LdmlCompilerOptions) : Promise<LDMLKeyboardTestDataXMLSourceFile> {
+  const k = new LdmlKeyboardCompiler();
+  assert.isTrue(await k.init(compilerTestCallbacks, options));
   const source = k.loadTestData(inputFilename);
   return source;
 }
 
 export async function compileKeyboard(inputFilename: string, options: LdmlCompilerOptions, validateMessages?: CompilerEvent[], expectFailValidate?: boolean, compileMessages?: CompilerEvent[]): Promise<KMXPlusFile> {
-  const k = new LdmlKeyboardCompiler(compilerTestCallbacks, options);
+  const k = new LdmlKeyboardCompiler();
+  assert.isTrue(await k.init(compilerTestCallbacks, options));
   const source = k.load(inputFilename);
   checkMessages();
   assert.isNotNull(source, 'k.load should not have returned null');
@@ -151,7 +161,8 @@ export async function compileKeyboard(inputFilename: string, options: LdmlCompil
 }
 
 export async function compileVisualKeyboard(inputFilename: string, options: LdmlCompilerOptions): Promise<VisualKeyboard.VisualKeyboard> {
-  const k = new LdmlKeyboardCompiler(compilerTestCallbacks, options);
+  const k = new LdmlKeyboardCompiler();
+  assert.isTrue(await k.init(compilerTestCallbacks, options));
   const source = k.load(inputFilename);
   checkMessages();
   assert.isNotNull(source, 'k.load should not have returned null');
@@ -175,6 +186,8 @@ export function checkMessages() {
 }
 
 export interface CompilationCase {
+  /** if true, expect no further errors than what's in errors.  */
+  strictErrors?: boolean;
   /**
    * path to xml, such as 'sections/layr/invalid-case.xml'
    */
@@ -236,11 +249,14 @@ export function testCompilationCases(compiler: SectionCompilerNew, cases : Compi
       if (testcase.errors && testcase.errors !== true) {
         assert.includeDeepMembers(callbacks.messages, <CompilerEvent[]> testcase.errors, 'expected errors to be included');
       }
+      if (testcase.errors && testcase.strictErrors) {
+        assert.sameDeepMembers(callbacks.messages, <CompilerEvent[]> testcase.errors, 'expected same errors to be included');
+      }
       if (testcase.warnings) {
         assert.includeDeepMembers(callbacks.messages, testcase.warnings, 'expected warnings to be included');
       } else if (!expectFailure) {
         // no warnings, so expect zero messages
-        assert.strictEqual(callbacks.messages.length, 0, 'expected zero messages');
+        assert.sameDeepMembers(callbacks.messages, [], 'expected zero messages but got ' + callbacks.messages);
       }
 
       // run the user-supplied callback if any
@@ -254,7 +270,7 @@ async function getTestUnicodeSetParser(callbacks: CompilerCallbacks): Promise<Un
   // for tests, just create a new one
   // see LdmlKeyboardCompiler.getUsetParser()
   const compiler = new KmnCompiler();
-  const ok = await compiler.init(callbacks);
+  const ok = await compiler.init(callbacks, null);
   assert.ok(ok, `Could not initialize KmnCompiler (UnicodeSetParser), see callback messages`);
   if (ok) {
     return compiler;
@@ -263,3 +279,13 @@ async function getTestUnicodeSetParser(callbacks: CompilerCallbacks): Promise<Un
   }
 }
 
+/** compare actual and expected strings */
+export function assertCodePoints(actual?: string, expected?: string, msg?: string) {
+  assert.strictEqual(actual, expected, `Actual ${msg||':'}\n${hex_str(actual)}\nExpected:\n${hex_str(expected)}\n`);
+}
+
+const dontEscape = /[a-zA-Z0-9\.${}\[\]-]/;
+
+export function hex_str(s?: string) : string {
+  return [...s].map(ch => dontEscape.test(ch) ? ch : util.escapeRegexChar(ch)).join('');
+}

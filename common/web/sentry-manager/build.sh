@@ -15,6 +15,8 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 # This script runs from its own folder
 cd "$THIS_SCRIPT_PATH"
 
+BUNDLE_CMD="node $KEYMAN_ROOT/common/web/es-bundling/build/common-bundle.mjs"
+
 builder_describe "Builds the Sentry-reporting module used with Keyman Engine for Web" \
   "@/common/web/keyman-version" \
   clean configure build
@@ -41,6 +43,10 @@ fi
 
 if builder_start_action build; then
   tsc --build "$THIS_SCRIPT_PATH/src/tsconfig.json"
-  node build-bundler.js
+
+  $BUNDLE_CMD    "${KEYMAN_ROOT}/common/web/sentry-manager/build/obj/index.js" \
+    --out        "${KEYMAN_ROOT}/common/web/sentry-manager/build/lib/index.js" \
+    --sourceRoot "@keymanapp/keyman/common/web/sentry-manager/build/lib/"
+
   builder_finish_action success build
 fi

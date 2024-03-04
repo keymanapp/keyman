@@ -37,8 +37,16 @@ export class KeymanDeveloperProject {
     for(let filename of files) {
       let fullPath = this.callbacks.path.join(sourcePath, filename);
       if(KeymanFileTypes.filenameIs(filename, KeymanFileTypes.Source.LdmlKeyboard)) {
-        if(!this.callbacks.fs.readFileSync(fullPath, 'utf-8').match(/ldmlKeyboard3\.dtd/)) {
-          // Skip this .xml because we assume it isn't really a keyboard .xml
+        try {
+          const data = this.callbacks.loadFile(fullPath);
+          const text = new TextDecoder().decode(data);
+          if(!text?.match(/ldmlKeyboard3\.dtd/)) {
+            // Skip this .xml because we assume it isn't really a keyboard .xml
+            continue;
+          }
+        } catch(e) {
+          // We'll just silently skip this file because we were not able to load it,
+          // so let's hope it wasn't a real LDML keyboard XML :-)
           continue;
         }
       }
@@ -47,7 +55,7 @@ export class KeymanDeveloperProject {
         this.files.push(file);
       }
     }
-    return true;
+    return this.files.length > 0;
   }
 
   public isKeyboardProject() {

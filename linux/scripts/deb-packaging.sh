@@ -82,8 +82,8 @@ check_api_not_changed() {
   # shellcheck disable=SC2064
   trap "rm -rf \"${tmpDir}\"" ERR
   dpkg -x "${BIN_PKG}" "${tmpDir}"
-  cd debian
-  dpkg-gensymbols -v"${VERSION}" -p"${PKG_NAME}" -e"${tmpDir}"/usr/lib/x86_64-linux-gnu/"${LIB_NAME}".so* -O"${PKG_NAME}.symbols" -c4
+  mkdir -p debian/tmp/DEBIAN
+  dpkg-gensymbols -v"${VERSION}" -p"${PKG_NAME}" -e"${tmpDir}"/usr/lib/x86_64-linux-gnu/"${LIB_NAME}".so* -c4
   output_ok "${LIB_NAME} API didn't change"
   cd "${REPO_ROOT}/linux"
   rm -rf "${tmpDir}"
@@ -103,6 +103,13 @@ is_symbols_file_changed() {
   return 0
 }
 
+get_changes() {
+  local WHAT_CHANGED
+  WHAT_CHANGED=$(git diff -I "^${PKG_NAME}.so" "$1".."$2" -- "debian/${PKG_NAME}.symbols" | diffstat -m -t | tail -n +2)
+
+  IFS=',' read -r -a CHANGES <<< "${WHAT_CHANGED:-0,0,0}"
+}
+
 check_updated_version_number() {
   # Checks that the package version number got updated in the .symbols file if it got changed
   # shellcheck disable=SC2310
@@ -114,7 +121,16 @@ check_updated_version_number() {
     # is out of date when it is merged to the release branch (master/beta/stable-x.y). If this
     # is considered important, then make sure the branch is up to date, and wait for test
     # builds to complete, before merging.
-    if ! git log -p -1 -- "debian/${PKG_NAME}.symbols" | grep -q "${VERSION}"; then
+    get_changes "${GIT_BASE}" "${GIT_SHA}"
+    INSERTED="${CHANGES[0]}"
+    DELETED="${CHANGES[1]}"
+    MODIFIED="${CHANGES[2]}"
+
+    if (( DELETED > 0 )) && (( MODIFIED == 0 )) && (( INSERTED == 0)); then
+        # If only lines got removed we basically skip this test. A later check will
+        # test that the API version got updated.
+        output_ok "${PKG_NAME}.symbols file did change but only removed lines"
+    elif ! git log -p -1 -- "debian/${PKG_NAME}.symbols" | grep -q "${VERSION}"; then
       output_error "${PKG_NAME}.symbols file got changed without changing the package version number of the symbol"
       EXIT_CODE=1
     else
@@ -135,20 +151,40 @@ get_api_version_in_symbols_file() {
 }
 
 is_api_version_updated() {
-  local NEW_VERSION OLD_VERSION
+  local NEW_VERSION OLD_VERSION TIER
   git checkout "${GIT_BASE}" -- "debian/${PKG_NAME}.symbols"
   OLD_VERSION=$(get_api_version_in_symbols_file)
   git checkout "${GIT_SHA}" -- "debian/${PKG_NAME}.symbols"
   NEW_VERSION=$(get_api_version_in_symbols_file)
   if (( NEW_VERSION > OLD_VERSION )); then
-    return 0
+    echo "0"
+    return
   fi
-  return 1
+
+  # API version didn't change. However, that might be ok if we're in alpha
+  # and a major change happened previously.
+  TIER=$(cat "${REPO_ROOT}/TIER.md")
+  case ${TIER} in
+    alpha)
+      local STABLE_VERSION
+      STABLE_VERSION=$((${VERSION%%.*} - 1))
+      git checkout "stable-${STABLE_VERSION}.0" -- "debian/${PKG_NAME}.symbols"
+      STABLE_API_VERSION=$(get_api_version_in_symbols_file)
+      git checkout "${GIT_SHA}" -- "debian/${PKG_NAME}.symbols"
+      if (( NEW_VERSION > STABLE_API_VERSION )); then
+        echo "2"
+        return
+      fi ;;
+    *)
+      ;;
+  esac
+
+  echo "1"
 }
 
 check_for_major_api_changes() {
   # Checks that API version number gets updated if API changes
-  local WHAT_CHANGED CHANGES INSERTED DELETED MODIFIED
+  local WHAT_CHANGED CHANGES INSERTED DELETED MODIFIED UPDATED
 
   # shellcheck disable=2310
   if ! is_symbols_file_changed; then
@@ -156,19 +192,19 @@ check_for_major_api_changes() {
     return
   fi
 
-  WHAT_CHANGED=$(git diff "${GIT_BASE}".."${GIT_SHA}" -- "debian/${PKG_NAME}.symbols" | diffstat -m -t | tail -1)
-
-  IFS=',' read -r -a CHANGES <<< "${WHAT_CHANGED}"
+  get_changes "${GIT_BASE}" "${GIT_SHA}"
   INSERTED="${CHANGES[0]}"
   DELETED="${CHANGES[1]}"
   MODIFIED="${CHANGES[2]}"
 
   if (( DELETED > 0 )) || (( MODIFIED > 0 )); then
     builder_echo "Major API change: ${DELETED} lines deleted and ${MODIFIED} lines modified"
-    # shellcheck disable=2310
-    if ! is_api_version_updated; then
+    UPDATED=$(is_api_version_updated)
+    if [[ ${UPDATED} == 1 ]]; then
       output_error "Major API change without updating API version number in ${PKG_NAME}.symbols file"
       EXIT_CODE=2
+    elif [[ ${UPDATED} == 2 ]]; then
+      output_ok "API version number got previously updated in ${PKG_NAME}.symbols file after major API change; no change within alpha necessary"
     else
       output_ok "API version number got updated in ${PKG_NAME}.symbols file after major API change"
     fi

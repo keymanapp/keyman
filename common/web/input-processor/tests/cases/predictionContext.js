@@ -1,7 +1,7 @@
 import { assert } from 'chai';
 import sinon from 'sinon';
 
-import { LanguageProcessor, PredictionContext } from '@keymanapp/input-processor';
+import { LanguageProcessor, PredictionContext, TranscriptionCache } from '@keymanapp/input-processor';
 import { Worker as LMWorker } from "@keymanapp/lexical-model-layer/node";
 import { DeviceSpec, KeyboardProcessor, Mock } from '@keymanapp/keyboard-processor';
 
@@ -77,7 +77,7 @@ describe("PredictionContext", () => {
   });
 
   it('receives predictions as they are generated', async function () {
-    const langProcessor = new LanguageProcessor(worker);
+    const langProcessor = new LanguageProcessor(worker, new TranscriptionCache());
     await langProcessor.loadModel(appleDummyModel);  // await:  must fully 'configure', load script into worker.
 
     const kbdProcessor = new KeyboardProcessor(deviceSpec);
@@ -118,7 +118,7 @@ describe("PredictionContext", () => {
   });
 
   it('sendUpdateState retrieves the most recent suggestion set', async function() {
-    const langProcessor = new LanguageProcessor(worker);
+    const langProcessor = new LanguageProcessor(worker, new TranscriptionCache());
     await langProcessor.loadModel(appleDummyModel);  // await:  must fully 'configure', load script into worker.
 
     const kbdProcessor = new KeyboardProcessor(deviceSpec);
@@ -144,7 +144,7 @@ describe("PredictionContext", () => {
   });
 
   it('suggestion application logic & triggered effects', async function () {
-    const langProcessor = new LanguageProcessor(worker);
+    const langProcessor = new LanguageProcessor(worker, new TranscriptionCache());
     await langProcessor.loadModel(appleDummyModel);  // await:  must fully 'configure', load script into worker.
 
     const kbdProcessor = new KeyboardProcessor(deviceSpec);
@@ -212,7 +212,7 @@ describe("PredictionContext", () => {
   });
 
   it('reversion application logic & triggered effects', async function () {
-    const langProcessor = new LanguageProcessor(worker);
+    const langProcessor = new LanguageProcessor(worker, new TranscriptionCache());
     await langProcessor.loadModel(appleDummyModel);  // await:  must fully 'configure', load script into worker.
 
     const kbdProcessor = new KeyboardProcessor(deviceSpec);
@@ -282,7 +282,7 @@ describe("PredictionContext", () => {
     });
 
     // And now, apply the reversion itself.
-    let returnValue = predictiveContext.accept(reversion);
+    let returnValue = await predictiveContext.accept(reversion);
 
     // 'accepting' a reversion performs a rewind; there's no need for async ops here.
     assert.isNull(returnValue); // as per the method's spec.

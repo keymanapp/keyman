@@ -20,7 +20,7 @@
 #include "pch.h"
 
 BOOL IntLoadKeyboardOptionsRegistrytoCore(LPCSTR key, LPINTKEYBOARDINFO kp, km_core_state* const state);
-void IntSaveKeyboardOptionCoretoRegistry(LPCSTR REGKey, LPINTKEYBOARDINFO kp, LPCWSTR key, LPWSTR value);
+void IntSaveKeyboardOptionCoretoRegistry(LPCSTR REGKey, LPINTKEYBOARDINFO kp, LPCWSTR key, LPCWSTR value);
 
 static km_core_cp* CloneKeymanCoreCP(const km_core_cp* cp) {
   LPCWSTR buf      = reinterpret_cast<LPCWSTR>(cp);
@@ -35,13 +35,11 @@ static km_core_cp* CloneKeymanCoreCPFromWSTR(LPWSTR buf) {
   return clone;
 }
 
-void SaveKeyboardOptionCoretoRegistry(LPINTKEYBOARDINFO kp, LPCWSTR key, LPWSTR value)
-{
+void SaveKeyboardOptionCoretoRegistry(LPINTKEYBOARDINFO kp, LPCWSTR key, LPCWSTR value) {
   IntSaveKeyboardOptionCoretoRegistry(REGSZ_KeyboardOptions, kp, key, value);
 }
 
-void IntSaveKeyboardOptionCoretoRegistry(LPCSTR REGKey, LPINTKEYBOARDINFO kp, LPCWSTR key, LPWSTR value)
-{
+void IntSaveKeyboardOptionCoretoRegistry(LPCSTR REGKey, LPINTKEYBOARDINFO kp, LPCWSTR key, LPCWSTR value) {
   assert(REGKey != NULL);
   assert(kp != NULL);
   assert(key);

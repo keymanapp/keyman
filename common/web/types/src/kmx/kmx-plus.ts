@@ -43,6 +43,7 @@ export class Elem extends Section {
    */
   allocElementString(sections: DependencySections, source: string | string[], order?: string, tertiary?: string, tertiary_base?: string, prebase?: string): ElementString {
     let s = ElementString.fromStrings(sections, source, order, tertiary, tertiary_base, prebase);
+    if (!s) return s;
     let result = this.strings.find(item => item.isEqual(s));
     if(result === undefined) {
       result = s;
@@ -75,6 +76,11 @@ export class Meta extends Section {
   indicator: StrsItem;
   version: StrsItem; // semver version string, defaults to "0"
   settings: KeyboardSettings;
+
+  /** convenience for checking settings */
+  get normalizationDisabled() {
+    return this?.settings & KeyboardSettings.normalizationDisabled;
+  }
 };
 
 // 'strs'
@@ -141,6 +147,8 @@ export interface StrsOptions {
   markers?: boolean;
   /** unescape with unescapeString */
   unescape?: boolean;
+  /** apply (possibly marker safe) nfd. Not for regex use. */
+  nfd?: boolean;
   /** string can be stored as a single CharStrsItem, not in strs table. */
   singleOk?: boolean;
 };
@@ -200,6 +208,16 @@ export class Strs extends Section {
     // unescape \u{…}
     if (opts?.unescape) {
       s = unescapeString(s);
+    }
+    // nfd
+    if (opts?.nfd) {
+      if (!sections?.meta?.normalizationDisabled) {
+        if (opts?.markers) {
+          s = MarkerParser.nfd_markers(s, false);
+        } else {
+          s = s.normalize("NFD");
+        }
+      }
     }
     return s;
   }

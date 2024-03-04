@@ -53,7 +53,7 @@ export default class StubAndKeyboardCache extends EventEmitter<EventMap> {
   }
 
   getKeyboardForStub(stub: KeyboardStub): Keyboard {
-    return this.getKeyboard(stub.KI);
+    return stub ? this.getKeyboard(stub.KI) : null;
   }
 
   getKeyboard(keyboardID: string): Keyboard {

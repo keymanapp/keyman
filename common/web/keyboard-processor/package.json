@@ -37,6 +37,7 @@
     "test": "gosh build.sh test"
   },
   "dependencies": {
+    "@keymanapp/common-types": "*",
     "@keymanapp/models-types": "*",
     "@keymanapp/keyman-version": "*",
     "@keymanapp/web-utils": "*",
@@ -46,12 +47,17 @@
   "main": "./build/obj/index.js",
   "types": "./build/obj/index.d.ts",
   "exports": {
-    ".": "./build/obj/index.js",
+    ".": {
+      "es6-bundling": "./src/index.ts",
+      "default": "./build/obj/index.js"
+    },
     "./node-keyboard-loader": {
+      "es6-bundling": "./src/keyboards/loaders/node-keyboard-loader.ts",
       "types": "./build/obj/keyboards/loaders/node-keyboard-loader.d.ts",
       "import": "./build/obj/keyboards/loaders/node-keyboard-loader.js"
     },
     "./dom-keyboard-loader": {
+      "es6-bundling": "./src/keyboards/loaders/dom-keyboard-loader.ts",
       "types": "./build/obj/keyboards/loaders/dom-keyboard-loader.d.ts",
       "import": "./build/obj/keyboards/loaders/dom-keyboard-loader.js"
     },

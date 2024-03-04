@@ -4,7 +4,7 @@
 @@keys: [K_Q][K_W][K_Q]
 @@expected: \u0127\u1790\u17B6\u0127
 -->
-<!DOCTYPE keyboard3 SYSTEM "../../../../../resources/standards-data/ldml-keyboards/techpreview/dtd/ldmlKeyboard3.dtd">
+<!DOCTYPE keyboard3 SYSTEM "../../../../../../../resources/standards-data/ldml-keyboards/techpreview/dtd/ldmlKeyboard3.dtd">
 <keyboard3 locale="mt" conformsTo="techpreview">
   <version number="1.0.0" />
 
@@ -47,7 +47,7 @@
 
     <transformGroup>
       <!-- Northern Thai example from spec -->
-      <reorder before="\u{1A6B}" from="\u{1A60}[\u1A75-\u1A79]\u{1A45}" order="10 55 10" />
+      <reorder before="\u{1A6B}" from="\u{1A60}[\u{1A75}-\u{1A79}]\u{1A45}" order="10 55 10" />
     </transformGroup>
   </transforms>
 

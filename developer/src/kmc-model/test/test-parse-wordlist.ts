@@ -2,7 +2,7 @@ import {parseWordListFromContents, parseWordListFromFilename, WordList} from '..
 import {assert} from 'chai';
 import 'mocha';
 import { makePathToFixture } from './helpers/index.js';
-import { ModelCompilerMessages } from '../src/model-compiler-errors.js';
+import { ModelCompilerMessages } from '../src/model-compiler-messages.js';
 import { setCompilerCallbacks } from '../src/compiler-callbacks.js';
 import { TestCompilerCallbacks } from '@keymanapp/developer-test-helpers';
 

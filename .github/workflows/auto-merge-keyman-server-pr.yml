@@ -14,7 +14,7 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    if: ${{ github.actor == 'keyman-server' && startsWith(github.event.pull_request.title, 'auto:') }}
+    if: ${{ github.repository == 'keymanapp/keyman' && github.actor == 'keyman-server' && startsWith(github.event.pull_request.title, 'auto:') }}
     steps:
     - name: auto approve PR from keyman-server
       uses: hmarr/auto-approve-action@v3

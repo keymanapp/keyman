@@ -27,21 +27,6 @@ builder_describe "Runs the Keyman Engine for Web unit-testing suites" \
 
 builder_parse "$@"
 
-if builder_start_action test:libraries; then
-  HEADLESS_FLAGS=
-
-  if builder_has_option --ci; then
-    HEADLESS_FLAGS=--ci
-  fi
-
-  # No --reporter option exists yet for the headless modules.
-
-  $KEYMAN_ROOT/common/web/keyboard-processor/build.sh test $HEADLESS_FLAGS
-  $KEYMAN_ROOT/common/web/input-processor/build.sh test $HEADLESS_FLAGS
-
-  builder_finish_action success test:libraries
-fi
-
 # Browser-based tests: common configs & kill-switches
 
 DO_BROWSER_TEST_SUITE=true
@@ -100,7 +85,7 @@ fi
 
 # End common configs.
 
-builder_run_action test:dom karma start $KARMA_FLAGS "${KEYMAN_ROOT}/web/src/test/auto/dom/$CONFIG"
+builder_run_action test:dom karma start ${KARMA_FLAGS} "${KEYMAN_ROOT}/web/src/test/auto/dom/${CONFIG}"
 
 # The multi-browser test suite, which uses BrowserStack when run by our CI.
 if builder_start_action test:integrated; then

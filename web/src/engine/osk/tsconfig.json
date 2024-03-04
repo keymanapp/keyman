@@ -3,6 +3,7 @@
 
   "compilerOptions": {
     "baseUrl": "./",
+    "downlevelIteration": true,
     "outDir": "../../../build/engine/osk/obj/",
     "tsBuildInfoFile": "../../../build/engine/osk/obj/tsconfig.tsbuildinfo",
     "rootDir": "./src"
@@ -12,6 +13,7 @@
 
   "references": [
     { "path": "../../../../common/web/input-processor" },
+    { "path": "../../../../common/web/gesture-recognizer" },
     { "path": "../dom-utils" },
     { "path": "../events" }
   ]

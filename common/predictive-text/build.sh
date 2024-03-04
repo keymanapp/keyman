@@ -20,6 +20,8 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 # This script runs from its own folder
 cd "$(dirname "$THIS_SCRIPT")"
 
+BUNDLE_CMD="node $KEYMAN_ROOT/common/web/es-bundling/build/common-bundle.mjs"
+
 ################################ Main script ################################
 
 #  "@../models/types" \ # is just a .d.ts, so there's nothing to actually BUILD.
@@ -45,7 +47,9 @@ function do_build() {
   tsc -b ./tsconfig.all.json
 
   # esbuild-bundled products at this level are not intended to be used for anything but testing.
-  node build-bundler.js
+  $BUNDLE_CMD    "${KEYMAN_ROOT}/common/predictive-text/build/obj/web/index.js" \
+    --out        "${KEYMAN_ROOT}/common/predictive-text/build/lib/web/index.mjs" \
+    --format esm
 }
 
 # Note - the actual test setup is done in a separate test script, but it's easy

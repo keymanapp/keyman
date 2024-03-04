@@ -110,11 +110,13 @@ KmxTestSource::load_source(
     const km::core::path &path,
     std::string &keys,
     std::u16string &expected,
+    std::u16string &expected_context,
     std::u16string &context,
     kmx_options &options,
     bool &expected_beep) {
   const std::string s_keys = "c keys: ";
   const std::string s_expected = "c expected: ";
+  const std::string s_expected_context = "c expected context: ";
   const std::string s_context = "c context: ";
   const std::string s_option = "c option: ";
   const std::string s_option_expected = "c expected option: ";
@@ -143,6 +145,8 @@ KmxTestSource::load_source(
       } else {
         expected = parse_source_string(line);
       }
+    } else if (is_token(s_expected_context, line)) {
+      expected_context = parse_source_string(line);
     } else if (is_token(s_context, line)) {
       context = parse_source_string(line);
     } else if (is_token(s_option, line)) {

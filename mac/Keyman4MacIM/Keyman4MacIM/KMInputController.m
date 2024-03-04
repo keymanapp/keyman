@@ -58,13 +58,12 @@ NSMutableArray *servers;
 }
 
 // Passthrough from the app delegate low level event hook
-// to the input method event handler for Delete Back. 
-- (BOOL)handleDeleteBackLowLevel:(NSEvent *)event {
+// to the input method event handler for handleBackspace.
+- (void)handleBackspace:(NSEvent *)event {
+    [self.AppDelegate logDebugMessage:@"KMInputController handleBackspace, event = %@", event];
     if(_eventHandler != nil) {
-        return [_eventHandler handleDeleteBackLowLevel:event];
+        [_eventHandler handleBackspace:event];
     }
-
-    return NO;
 }
 
 - (void)activateServer:(id)sender {

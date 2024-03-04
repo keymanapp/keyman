@@ -306,7 +306,6 @@ const
   SRegKey_IDE_CU                 = SRegKey_KeymanDeveloper_CU     + '\IDE';                // CU
   SRegKey_IDEDock_CU             = SRegKey_IDE_CU                 + '\Dock';              // CU
   SRegKey_IDEFiles_CU            = SRegKey_IDE_CU                 + '\Files';               // CU
-  SRegKey_IDEOptions_CU          = SRegKey_IDE_CU                 + '\Options';             // CU
   SRegKey_IDECharacterMap_CU     = SRegKey_IDE_CU                 + '\Character Map';             // CU
   SRegKey_IDEColours_CU          = SRegKey_IDE_CU                 + '\Colours';             // CU
   SRegKey_IDEEditFonts_CU        = SRegKey_IDE_CU                 + '\EditFonts';           // CU
@@ -360,54 +359,6 @@ const
   SRegValue_IDEVKbd_ExportBMPANSI    = 'export bmp ansi';                          // CU
   SRegValue_IDEVKbd_ExportBMPUnicode = 'export bmp unicode';                       // CU
   SRegValue_IDEVKbd_ExportBMPPixelWidth = 'export bmp pixel width';                // CU
-
-  { SRegKey_IDEOptions values }
-
-  SRegValue_IDEOptLinkFontSizes    = 'link font sizes';                            // CU
-  SRegValue_IDEOptUseTabCharacter  = 'use tab char';                               // CU
-  SRegValue_IDEOptIndentSize       = 'indent size';                                // CU
-  SRegValue_IDEOptDocVirusCheck    = 'warn if packaging doc files';                // CU
-  SRegValue_IDEOptUseSyntaxHighlighting = 'use syntax highlighting';               // CU
-  SRegValue_IDEOptToolbarVisible   = 'toolbar visible';                            // CU
-  SRegValue_IDEOptUseOldDebugger   = 'use old debugger';                           // CU
-  SRegValue_IDEOptEditorTheme      = 'editor theme';                               // CU
-
-  SRegValue_IDEOptDebuggerBreakWhenExitingLine = 'debugger break when exiting line';    // CU
-  SRegValue_IDEOptDebuggerSingleStepAfterBreak = 'debugger single step after break';    // CU
-  SRegValue_IDEOptDebuggerShowStoreOffset      = 'debugger show store offset';          // CU
-  SRegValue_IDEOptDebuggerAutoRecompileWithDebugInfo = 'debugger recompile with debug info'; // CU
-
-  SRegValue_IDEOptDebuggerAutoResetBeforeCompiling = 'debugger auto reset before compilng'; // CU
-  SRegValue_IDEOptAutoSaveBeforeCompiling = 'auto save before compiling'; // CU
-  SRegValue_IDEOptOSKAutoSaveBeforeImporting = 'osk auto save before importing'; // CU
-
-  // Note: keeping 'web host port' reg value name to ensure settings maintained
-  //       from version 14.0 and earlier of Keyman Developer. Other values are
-  //       new with Keyman Developer 15.0
-  SRegValue_IDEOptServerPort = 'web host port';   // I4021
-  SRegValue_IDEOptServerKeepAlive = 'server keep alive';
-  SRegValue_IDEOptServerNgrokToken = 'server ngrok token';
-  SRegValue_IDEOptServerNgrokRegion = 'server ngrok region';
-  SRegValue_IDEOptServerUseLocalAddresses = 'server use local addresses';
-  SRegValue_IDEOptServerUseNgrok = 'server use ngrok';
-  SRegValue_IDEOptServerShowConsoleWindow = 'server show console window';
-
-  SRegValue_IDEOptCharMapDisableDatabaseLookups = 'char map disable database lookups';  // CU
-  SRegValue_IDEOptCharMapAutoLookup             = 'char map auto lookup';               // CU
-
-  SRegValue_IDEOptOpenKeyboardFilesInSourceView = 'open keyboard files in source view';  // CU   // I4751
-
-  SRegValue_IDEDisplayTheme = 'display theme';   // I4796
-
-  SRegValue_IDEOptExternalEditorPath = 'external editor path';                      // CU
-
-  SRegValue_IDEOptSMTPServer = 'smtp server';                                       // CU   // I4506
-  SRegValue_IDEOptTestEmailAddresses = 'test email addresses';                      // CU   // I4506
-
-  SRegValue_IDEOpt_WebLadderLength = 'web ladder length';                           // CU
-  CRegValue_IDEOpt_WebLadderLength_Default = 100;
-
-  SRegValue_IDEOpt_DefaultProjectPath = 'default project path';
 
 {-------------------------------------------------------------------------------
  - Shared keys and values                                                      -

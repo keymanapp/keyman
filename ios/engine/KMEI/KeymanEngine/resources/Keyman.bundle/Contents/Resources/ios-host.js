@@ -81,6 +81,14 @@ function showBanner(flag) {
 
 function setBannerImage(path) {
     bannerImgPath = path;
+
+    var bc = keyman && keyman.osk && keyman.osk.bannerController;
+    if(!bc) {
+      return;
+    }
+
+    // If an inactive banner is set, update its image.
+    bc.inactiveBanner = bc.inactiveBanner ? new bc.ImageBanner(bannerImgPath) : null;
 }
 
 function setBannerHeight(h) {

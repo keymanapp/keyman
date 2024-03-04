@@ -33,14 +33,17 @@ tests_without_testdata = [
 
 # These tests have a k_001_tiny-test.xml file as well.
 tests_with_testdata = [
+  'ldml_test',
   'k_001_tiny',
   'k_006_backspace',
   'k_007_transform_rgx',
   'k_008_transform_norm',
+  'k_009_transform_nfc',
   'k_020_fr', # TODO-LDML: move to cldr above (fix vkey)
   'k_200_reorder_nod_Lana',
   'k_201_reorder_esk',
   'k_210_marker',
+  'k_211_marker_escape',
 ]
 
 tests =  tests_without_testdata

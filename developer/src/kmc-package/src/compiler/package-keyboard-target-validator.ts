@@ -1,5 +1,5 @@
 import { KeymanTargets, CompilerCallbacks, KmpJsonFile } from "@keymanapp/common-types";
-import { CompilerMessages } from "./messages.js";
+import { CompilerMessages } from "./package-compiler-messages.js";
 import { KeyboardMetadataCollection } from "./package-metadata-collector.js";
 
 

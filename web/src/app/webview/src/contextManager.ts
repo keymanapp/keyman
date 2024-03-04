@@ -22,11 +22,25 @@ class ContextHost extends Mock {
     }
   }
 
+  restoreTo(original: OutputTarget): void {
+    const reversionTransform = original.buildTransformFrom(this);
+
+    super.restoreTo(original);
+
+    if(this.oninserttext) {
+      this.oninserttext(reversionTransform.deleteLeft, reversionTransform.insert, reversionTransform.deleteRight);
+    }
+  }
+
   // In app/webview, apps are expected to immediately update the selection range AFTER
   // changing the context's text.
   setText(text: string): void {
     this.text = text;
-    this.setSelection(this.text._kmwLength());
+    // Regardless of keyboard, we should check the SMP-aware length of the string.
+    // Our host app will not know whether or not the keyboard uses SMP chars,
+    // and we want a consistent interface for context synchronization between
+    // host app + app/webview KMW.
+    this.setSelection(this.text.kmwLength());
   }
 }
 

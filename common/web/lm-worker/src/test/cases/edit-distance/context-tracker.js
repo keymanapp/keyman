@@ -21,7 +21,7 @@ describe('ContextTracker', function() {
         insert: '',
         deleteLeft: 0
       }
-      let newContext = Array.from(existingContext);
+      let newContext = existingContext.slice(0);
       newContext.splice(0, 1);
       let rawTokens = ["apple", null, "a", null, "day", null, "keeps", null, "the", null, "doctor"];
 
@@ -37,7 +37,7 @@ describe('ContextTracker', function() {
         insert: 'r',
         deleteLeft: 0
       }
-      let newContext = Array.from(existingContext);
+      let newContext = existingContext.slice(0);
       newContext[newContext.length - 1] = 'doctor';
       let rawTokens = ["an", null, "apple", null, "a", null, "day", null, "keeps", null, "the", null, "doctor"];
 
@@ -53,7 +53,7 @@ describe('ContextTracker', function() {
         insert: ' ',
         deleteLeft: 0
       }
-      let newContext = Array.from(existingContext);
+      let newContext = existingContext.slice(0);
       newContext.push('');
       let rawTokens = ["an", null, "apple", null, "a", null, "day", null, "keeps", null, "the", null, "doctor", null, ""];
 
@@ -73,7 +73,7 @@ describe('ContextTracker', function() {
         insert: 'a',
         deleteLeft: 0
       }
-      let newContext = Array.from(existingContext);
+      let newContext = existingContext.slice(0);
       newContext.push('a'); // The incoming transform should produce a new token WITH TEXT.
       let rawTokens = ["'", null, "a"];
 
@@ -93,7 +93,7 @@ describe('ContextTracker', function() {
         insert: ' ',
         deleteLeft: 0
       }
-      let newContext = Array.from(existingContext);
+      let newContext = existingContext.slice(0);
       newContext.splice(0, 1);
       newContext.push('');
       let rawTokens = ["apple", null, "a", null, "day", null, "keeps", null, "the", null, "doctor", null, ""];
@@ -177,13 +177,7 @@ describe('ContextTracker', function() {
 
       // Next step - on the followup context, is the replacement still active?
       let postContext = models.applyTransform(baseSuggestion.transform, baseContext);
-
       let postContextState = compositor.contextTracker.analyzeState(model, postContext);
-
-      // The non-wordbreak token before the tail in the newer TrackedContextState should deep-equal
-      // the tail token of the original TrackedContextState, but the two tokens should be different instances.
-      assert.notEqual(postContextState.tokens[postContextState.tokens.length - 3], baseContextState.tail);
-      assert.deepEqual(postContextState.tokens[postContextState.tokens.length - 3], baseContextState.tail);
 
       // Penultimate token corresponds to whitespace, which does not have a 'raw' representation.
       assert.isNull(postContextState.tokens[postContextState.tokens.length - 2].raw);

@@ -3,13 +3,15 @@ import { assert } from 'chai';
 import { TranCompiler, BkspCompiler } from '../src/compiler/tran.js';
 import { BASIC_DEPENDENCIES, UsetCompiler } from '../src/compiler/empty-compiler.js';
 import { CompilerMessages } from '../src/compiler/messages.js';
-import { compilerTestCallbacks, testCompilationCases } from './helpers/index.js';
-import { KMXPlus } from '@keymanapp/common-types';
+import { CompilerMessages as KmnOtherCompilerMessages } from '@keymanapp/kmc-kmn';
+import { assertCodePoints, compilerTestCallbacks, testCompilationCases } from './helpers/index.js';
+import { KMXPlus, MarkerParser } from '@keymanapp/common-types';
 
 import Tran = KMXPlus.Tran;// for tests…
 import Bksp = KMXPlus.Bksp;// for tests…
 import { constants } from '@keymanapp/ldml-keyboard-constants';
-const tranDependencies = [ ...BASIC_DEPENDENCIES, UsetCompiler ];
+import { MetaCompiler } from '../src/compiler/meta.js';
+const tranDependencies = [ ...BASIC_DEPENDENCIES, UsetCompiler, MetaCompiler ];
 const bkspDependencies = tranDependencies;
 
 describe('tran', function () {
@@ -41,14 +43,15 @@ describe('tran', function () {
     {
       subpath: 'sections/tran/tran-vars.xml',
       callback(sect) {
+        const m = MarkerParser.markerOutput;
         const tran = <Tran> sect;
         assert.ok(tran);
         assert.lengthOf(compilerTestCallbacks.messages, 0);
         // cautiously destructure
         assert.lengthOf(tran.groups, 1);
         const [ g0 ]  = tran.groups;
-        assert.lengthOf(g0.transforms, 4);
-        const [ g0t0, g0t1, g0t2, g0t3 ] = g0.transforms;
+        assert.lengthOf(g0.transforms, 6);
+        const [ g0t0, g0t1, g0t2, g0t3, g0t4, g0t5 ] = g0.transforms;
         assert.strictEqual(g0t0.from.value, "yes");
         assert.strictEqual(g0t0.to.value, "no");
 
@@ -65,9 +68,61 @@ describe('tran', function () {
         assert.strictEqual(g0t3.from.value, "((?:A|B|C|D|FF|E))");
         assert.equal(g0t3.mapFrom?.value, "upper");
         assert.equal(g0t3.mapTo?.value, "lower");
+
+        assertCodePoints(g0t4.from.value,
+          `\u{03b9}${m(1, true)}\u{0308}\u{0301}`);
+        assertCodePoints(g0t4.to.value,
+          `\u{03b9}\u{0313}\u{301}`);
+
+        assertCodePoints(g0t5.from.value,
+          `\u{03b9}${MarkerParser.ANY_MARKER_MATCH}\u{033c}\u{0301}`);
+        assertCodePoints(g0t5.to.value,
+          `\u{03b9}${m(1,false)}\u{033c}\u{0300}`);
       }
     },
     {
+      subpath: 'sections/tran/tran-vars-nfc.xml',
+      callback(sect) {
+        const m = MarkerParser.markerOutput;
+        const tran = <Tran> sect;
+        assert.ok(tran);
+        assert.lengthOf(compilerTestCallbacks.messages, 0);
+        // cautiously destructure
+        assert.lengthOf(tran.groups, 1);
+        const [ g0 ]  = tran.groups;
+        assert.lengthOf(g0.transforms, 6);
+        const [ g0t0, g0t1, g0t2, g0t3, g0t4, g0t5 ] = g0.transforms;
+        assert.strictEqual(g0t0.from.value, "yes");
+        assert.strictEqual(g0t0.to.value, "no");
+
+        assert.strictEqual(g0t1.from.value, "q(?:A|B|C|D|FF|E)x");
+        const g0t1r = new RegExp(g0t1.from.value);
+        assert.ok(g0t1r.test('qFFx'));
+        assert.notOk(g0t1r.test('qZZx'));
+
+        assert.strictEqual(g0t2.from.value, "[b-df-hj-np-tv-z]");
+        const g0t2r = new RegExp(g0t2.from.value);
+        assert.ok(g0t2r.test('k'));
+        assert.notOk(g0t2r.test('e'));
+
+        assert.strictEqual(g0t3.from.value, "((?:A|B|C|D|FF|E))");
+        assert.equal(g0t3.mapFrom?.value, "upper");
+        assert.equal(g0t3.mapTo?.value, "lower");
+
+        assertCodePoints(g0t4.from.value,
+          `\u{03b9}${m(1, true)}\u{0344}`);
+        assertCodePoints(g0t4.to.value,
+          `\u{1f34}`);
+
+        assertCodePoints(g0t5.from.value,
+          `\u{03af}${MarkerParser.ANY_MARKER_MATCH}\u{033c}`);
+        assertCodePoints(g0t5.to.value,
+          `\u{1f76}${m(1,false)}\u{033c}`);
+      },
+      warnings: [
+        CompilerMessages.Hint_NormalizationDisabled()
+      ],
+    },    {
       subpath: 'sections/tran/fail-invalid-type.xml',
       errors: true, // XML error
     },
@@ -191,6 +246,57 @@ describe('tran', function () {
         assert.strictEqual(transforms[0].to.value, "x");
       }
     },
+    {
+      subpath: 'sections/tran/tran-warn-range.xml',
+      warnings: [
+        CompilerMessages.Warn_CharClassExplicitDenorm({lowestCh: 0xE1}),
+      ],
+    },
+    {
+      subpath: 'sections/tran/tran-hint-range.xml',
+      warnings: [
+        CompilerMessages.Hint_CharClassImplicitDenorm({lowestCh: 0xc0}),
+      ],
+    },
+    {
+      subpath: 'sections/tran/tran-hint-range2.xml',
+      warnings: [
+        CompilerMessages.Hint_CharClassImplicitDenorm({lowestCh: 0xC0}),
+      ],
+    },
+    {
+      subpath: 'sections/tran/fail-bad-reorder-1.xml',
+      errors: [
+        KmnOtherCompilerMessages.Error_UnicodeSetSyntaxError()
+      ],
+    },
+    {
+      subpath: 'sections/tran/fail-bad-reorder-2.xml',
+      errors: [
+        CompilerMessages.Error_InvalidQuadEscape({ cp: 0x1a6b }),
+      ],
+    },
+    {
+      subpath: 'sections/tran/fail-bad-reorder-3.xml',
+      errors: [
+        CompilerMessages.Error_InvalidQuadEscape({ cp: 0x1a60 }),
+      ],
+    },
+    // error due to bad regex
+    {
+      subpath: `sections/tran/fail-bad-tran-1.xml`,
+      errors: [
+        CompilerMessages.Error_UnparseableTransformFrom({ from: 'AB(now if only I would terminate this group..',
+        // this message is dependent on v8, so this test could be a little brittle.
+        message: 'Invalid regular expression: /AB(now if only I would terminate this group../: Unterminated group' }),
+      ],
+    },
+    {
+      subpath: `sections/tran/fail-bad-tran-2.xml`,
+      errors: [
+        CompilerMessages.Error_InvalidQuadEscape({ cp: 295 }),
+      ],
+    },
   ], tranDependencies);
 });
 
@@ -208,6 +314,22 @@ describe('bksp', function () {
         assert.strictEqual(transforms[0].from.value, "្ម");
         assert.strictEqual(transforms[0].to.value, "");
       }
+    },
+    {
+      // this would fail with a dependency issue if
+      // we tried to initialize the bksp compiler, because
+      // vars isn't initialized.
+      subpath: 'sections/vars/fail-markers-badref-0.xml',
+      strictErrors: true,
+      errors: [
+        CompilerMessages.Error_MissingMarkers({
+          ids: [
+            'doesnt_exist_1',
+            'doesnt_exist_2',
+            'doesnt_exist_3',
+          ]
+        }),
+      ],
     },
   ], bkspDependencies);
 });

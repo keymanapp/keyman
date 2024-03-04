@@ -79,8 +79,8 @@ function findVersion() {
         VERSION_TAG=
     fi
 
-    if [ -z "${TEAMCITY_VERSION-}" ] && [ -z "${GITHUB_ACTIONS-}" ]; then
-        # Local dev machine, not TeamCity or GitHub Action
+    if [[ -z "${TEAMCITY_VERSION-}" && -z "${GITHUB_ACTIONS-}" && -z "${KEYMAN_PKG_BUILD-}" ]]; then
+        # Local dev machine, not TeamCity or GitHub Action and not .deb package build
         VERSION_TAG="$VERSION_TAG-local"
         VERSION_ENVIRONMENT=local
     elif [ -n "${TEAMCITY_PR_NUMBER-}" ]; then

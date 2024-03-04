@@ -115,7 +115,6 @@ typedef uint32_t    km_core_status;      // Status return code.
 
 // Opaque object types.
 //
-typedef struct km_core_context     km_core_context;
 typedef struct km_core_keyboard    km_core_keyboard;
 typedef struct km_core_state       km_core_state;
 typedef struct km_core_options     km_core_options;
@@ -146,6 +145,7 @@ enum km_core_status_codes {
   KM_CORE_STATUS_INSUFFICENT_BUFFER = 5,
   KM_CORE_STATUS_INVALID_UTF = 6,
   KM_CORE_STATUS_INVALID_KEYBOARD = 7,
+  KM_CORE_STATUS_NOT_IMPLEMENTED = 8,
   KM_CORE_STATUS_OS_ERROR = 0x80000000
 };
 
@@ -155,408 +155,7 @@ The final status code KM_CORE_STATUS_OS_ERROR is intended to allow encapsulating
 a platform error code; the remaining 31 low bits are the error code returned by
 the OS for cases where the failure mode is platform specific. For HRESULT codes
 this only permits failure codes to be passed.
-
-
-### Context
-The context is the text prior to the insertion point (caret, cursor).
-The context is constructed by the Platform layer, typically by interrogating the
-Client Application.  The context will be updated by the engine for keystroke
-events.  If the Platform layer code caches the context, the context should be
-reset when a context state change is detected. Context state changes can occur
-when the user uses the mouse to move the insertion point, uses cursor keys,
-switches applications or input fields, or presses hotkeys such as Ctrl+N to
-start a new document. The full set of context state change triggers is up to the
-Platform layer.
-
-Context can also contain positional Markers (also known as 'deadkeys' in kmn
-keyboards), which are transitory state flags that are erased whenever a context
-state change is detected. Markers are always controlled by the Engine.
-
-Contexts are always owned by their state.  They may be set to a list of
-context_items or interrogated for their current list of context items.
-```c
 */
-enum km_core_context_type {
-  KM_CORE_CT_END,
-  KM_CORE_CT_CHAR,
-  KM_CORE_CT_MARKER
-};
-
-typedef struct {
-  uint8_t   type;
-  uint8_t   _reserved[3];
-  union {
-    km_core_usv  character;
-    uint32_t    marker;
-  };
-} km_core_context_item;
-
-#define KM_CORE_CONTEXT_ITEM_END {KM_CORE_CT_END, {0,}, {0,}}
-/*
-```
-### `km_core_context_items_from_utf16`
-##### Description:
-Convert a UTF16 encoded Unicode string into an array of `km_core_context_item`
-structures. Allocates memory as needed.
-##### Return status:
-- `KM_CORE_STATUS_OK`: On success.
-- `KM_CORE_STATUS_INVALID_ARGUMENT`: If non-optional parameters are null.
-- `KM_CORE_STATUS_NO_MEM`: In the event not enough memory can be allocated for the
-  output buffer.
-- `KM_CORE_STATUS_INVALID_UTF`: In the event the UTF16 string cannot be decoded
-  because it contains unpaired surrogate codeunits.
-##### Parameters:
-- __text__: a pointer to a null terminated array of utf16 encoded data.
-- __out_ptr__: a pointer to the result variable:
-    A pointer to the start of the `km_core_context_item` array containing the
-    representation of the input string.
-    Terminated with a type of `KM_CORE_CT_END`. Must be disposed of with
-    `km_core_context_items_dispose`.
-
-```c
-*/
-KMN_API
-km_core_status
-km_core_context_items_from_utf16(km_core_cp const *text,
-                                km_core_context_item **out_ptr);
-
-/*
-```
-### `km_core_context_items_from_utf8`
-##### Description:
-Convert an UTF8 encoded Unicode string into an array of `km_core_context_item`
-structures. Allocates memory as needed.
-##### Status:
-- `KM_CORE_STATUS_INVALID_ARGUMENT`: If non-optional parameters are null.
-- `KM_CORE_STATUS_NO_MEM`: In the event it cannot allocate enough memory for the
-  output buffer.
-- `KM_CORE_STATUS_INVALID_UTF`: In the event the UTF8 string cannot be
-decoded.
-##### Parameters:
-- __text__: a pointer to a null terminated array of utf8 encoded data.
-- __out_ptr__: a pointer to the result variable:
-    A pointer to the  start of the `km_core_context_item` array containing the
-    representation of the input string.
-    Terminated with a type of `KM_CORE_CT_END`.
-
-```c
-*/
-KMN_API
-km_core_status
-km_core_context_items_from_utf8(char const *text,
-                                km_core_context_item **out_ptr);
-
-/*
-```
-### `km_core_context_items_to_utf16`
-##### Description:
-Convert a context item array into a UTF-16 encoded string placing it into
-the supplied buffer of specified size, and return the number of code units
-actually used in the conversion. If null is passed as the buffer the
-number of codeunits required is returned. Any markers in the context will
-not be included in the output buffer.
-##### Return status:
-- `KM_CORE_STATUS_OK`: On success.
-- `KM_CORE_STATUS_INVALID_ARGUMENT`: If non-optional parameters are null.
-- `KM_CORE_STATUS_INSUFFICENT_BUFFER`: If the buffer is not large enough.
-  `buf_size` will contain the space required. The contents of the buffer are
-  undefined.
-##### Parameters:
-- __context_items__: A pointer to the start of an array `km_core_context_item`.
-    Must be terminated with a type of `KM_CORE_CT_END`.
-- __buf__: A pointer to the buffer to place the UTF-16 string into.
-    May be null to request size calculation.
-- __buf_size__: a pointer to the result variable:
-    The size of the supplied buffer in codeunits if `buf` is given.
-    On return will be the size required if `buf` is null.
-
-```c
-*/
-KMN_API
-km_core_status
-km_core_context_items_to_utf16(km_core_context_item const *item,
-                              km_core_cp *buf,
-                              size_t *buf_size);
-
-/*
-```
-### `km_core_context_items_to_utf8`
-##### Description:
-Convert a context item array into a UTF-8 encoded string placing it into
-the supplied buffer of specified size, and return the number of code units
-actually used in the conversion. If null is passed as the buffer the
-number of codeunits required is returned. Any markers in the context will
-not be included in the output buffer.
-##### Return status:
-- `KM_CORE_STATUS_OK`: On success.
-- `KM_CORE_STATUS_INVALID_ARGUMENT`: If non-optional parameters are null.
-- `KM_CORE_STATUS_INSUFFICENT_BUFFER`: If the buffer is not large enough.
-  `buf_size` will contain the space required. The contents of the buffer are
-  undefined.
-##### Parameters:
-- __context_items__: A pointer to the start of an array `km_core_context_item`.
-    Must be terminated with a type of `KM_CORE_CT_END`.
-- __buf__: A pointer to the buffer to place the UTF-8 string into.
-    May be null to request size calculation.
-- __buf_size__: a pointer to the result variable:
-    The size of the supplied buffer in codeunits if `buf` is given.
-    On return will be the size required if `buf` is null.
-
-```c
-*/
-KMN_API
-km_core_status
-km_core_context_items_to_utf8(km_core_context_item const *item,
-                              char *buf,
-                              size_t *buf_size);
-
-/*
-```
-### `km_core_context_items_to_utf32`
-##### Description:
-Convert a context item array into a UTF-32 encoded string placing it into
-the supplied buffer of specified size, and return the number of codepoints
-actually used in the conversion. If null is passed as the buffer the
-number of codepoints required is returned. Any markers in the context will
-not be included in the output buffer.
-##### Return status:
-- `KM_CORE_STATUS_OK`: On success.
-- `KM_CORE_STATUS_INVALID_ARGUMENT`: If non-optional parameters are null.
-- `KM_CORE_STATUS_INSUFFICENT_BUFFER`: If the buffer is not large enough.
-  `buf_size` will contain the space required. The contents of the buffer are
-  undefined.
-##### Parameters:
-- __context_items__: A pointer to the start of an array `km_core_context_item`.
-    Must be terminated with a type of `KM_CORE_CT_END`.
-- __buf__: A pointer to the buffer to place the UTF-32 string into.
-    May be null to request size calculation.
-- __buf_size__: a pointer to the result variable:
-    The size of the supplied buffer in codepoints if `buf` is given.
-    On return will be the size required if `buf` is null.
-
-```c
-*/
-KMN_API
-km_core_status
-km_core_context_items_to_utf32(km_core_context_item const *item,
-                              km_core_usv *buf,
-                              size_t *buf_size);
-
-/*
-```
-### `km_core_context_items_dispose`
-##### Description:
-Free the allocated memory belonging to a `km_core_context_item` array previously
-returned by `km_core_context_items_from_utf16` or `km_core_context_get`
-##### Parameters:
-- __context_items__: A pointer to the start of the `km_core_context_item` array
-    to be disposed of.
-
-```c
-*/
-KMN_API
-void
-km_core_context_items_dispose(km_core_context_item *context_items);
-
-/*
-```
-### `km_core_context_set`
-##### Description:
-Replace the contents of the current context with a new sequence of
-`km_core_context_item` entries.
-##### Return status:
-- `KM_CORE_STATUS_OK`: On success.
-- `KM_CORE_STATUS_INVALID_ARGUMENT`: If non-optional parameters are null.
-- `KM_CORE_STATUS_NO_MEM`: In the event not enough memory can be allocated to
-  grow the context buffer internally.
-##### Parameters:
-- __context__: A pointer to an opaque context object
-- __context_items__: A pointer to the start of the `km_core_context_item`
-    array containing the new context. It must be terminated with an item
-    of type `KM_CORE_CT_END`.
-
-```c
-*/
-KMN_API
-km_core_status
-km_core_context_set(km_core_context *context,
-                   km_core_context_item const *context_items);
-
-/*
-```
-### `km_core_context_get`
-##### Description:
-Copies all items in the context into a new array and returns the new array.
-This must be disposed of by caller using `km_core_context_items_dispose`.
-##### Return status:
-- `KM_CORE_STATUS_OK`: On success.
-- `KM_CORE_STATUS_INVALID_ARGUMENT`: If non-optional parameters are null.
-- `KM_CORE_STATUS_NO_MEM`: In the event not enough memory can be allocated for the
-  output buffer.
-##### Parameters:
-- __context_items__: A pointer to the start of an array `km_core_context_item`.
-- __out__: a pointer to the result variable:
-    A pointer to the start of the `km_core_context_item` array containing a
-    copy of the context. Terminated with a type of `KM_CORE_CT_END`. Must be
-    disposed of with `km_core_context_items_dispose`.
-
-```c
-*/
-KMN_API
-km_core_status
-km_core_context_get(km_core_context const *context_items,
-                   km_core_context_item **out);
-
-/*
-```
-### `km_core_context_clear`
-##### Description:
-Removes all context_items from the internal array. If `context` is
-null, has no effect.
-##### Parameters:
-- __context__: A pointer to an opaque context object
-
-```c
-*/
-KMN_API
-void
-km_core_context_clear(km_core_context *);
-
-/*
-```
-### `km_core_context_length`
-##### Description:
-Return the number of items in the context.
-##### Return:
-The number of items in the context, and will return 0 if passed a null `context`
-pointer.
-##### Parameters:
-- __context__: A pointer to an opaque context object
-
-```c
-*/
-KMN_API
-size_t
-km_core_context_length(km_core_context *);
-
-/*
-```
-### `km_core_context_append`
-##### Description:
-Add more items to the end (insertion point) of the context. If these exceed the
-maximum context length the same number of items will be dropped from the
-beginning of the context.
-##### Return status:
-- `KM_CORE_STATUS_OK`: On success.
-- `KM_CORE_STATUS_INVALID_ARGUMENT`: If non-optional parameters are null.
-- `KM_CORE_STATUS_NO_MEM`: In the event not enough memory can be allocated to
-  grow the context buffer internally.
-##### Parameters:
-- __context__: A pointer to an opaque context object.
-- __context_items__: A pointer to the start of the `KM_CORE_CT_END` terminated
-    array of `km_core_context_item` to append.
-
-```c
-*/
-KMN_API
-km_core_status
-km_core_context_append(km_core_context *context,
-                      km_core_context_item const *context_items);
-
-/*
-```
-### `km_core_context_shrink`
-##### Description:
-Remove a specified number of items from the end of the context, optionally
-add up to the same number of the supplied items to the front of the context.
-##### Return status:
-- `KM_CORE_STATUS_OK`: On success.
-- `KM_CORE_STATUS_INVALID_ARGUMENT`: If non-optional parameters are null.
-- `KM_CORE_STATUS_NO_MEM`: in the event it cannot allocated enough memory to grow
-  the context internally.
-##### Parameters:
-- __context__: A pointer to an opaque context object.
-- __num__: The number of items to remove from the end of context.
-- __context_items__: Pointer to the start of the `KM_CORE_CT_END` terminated
-    array of `km_core_context_item` to add to the front. Up to `num` items will
-    be prepended. This may be null if not required.
-
-```c
-*/
-KMN_API
-km_core_status
-km_core_context_shrink(km_core_context *context,
-                      size_t num,
-                      km_core_context_item const *prefix);
-
-/*
-```
-### `km_core_context_item_list_size`
-##### Description:
-Return the length of a terminated `km_core_context_item` array.
-##### Return:
-The number of items in the list, not including terminating item,
-or 0 if `context_items` is null.
-##### Parameters:
-- __context_items__: A pointer to a `KM_CORE_CT_END` terminated array of
-    `km_core_context_item` values.
-
-```c
-*/
-KMN_API
-size_t
-km_core_context_item_list_size(km_core_context_item const *context_items);
-
-/*
-```
-### Action Items
-These provide the results of processing a key event to the Platform layer and
-should be processed by the Platform layer to issue commands to the os text
-services framework to transform the text store in the Client Application, among
-other actions.
-```c
-*/
-
-typedef struct {
-  uint8_t expected_type;     // km_core_backspace_type
-  uintptr_t expected_value;  // used mainly in unit tests
-} km_core_backspace_item;
-
-enum km_core_backspace_type {
-  KM_CORE_BT_UNKNOWN    = 0,  // Used at beginning of context; user-initiated backspace
-  KM_CORE_BT_CHAR       = 1,  // Deleting a character prior to insertion point
-  KM_CORE_BT_MARKER     = 2,  // Deleting a marker prior to insertion point
-  KM_CORE_BT_MAX_TYPE_ID
-};
-
-typedef struct {
-  uint8_t   type;
-  uint8_t   _reserved[sizeof(void*)-sizeof(uint8_t)];
-  union {
-    uint32_t               marker;          // MARKER type
-    km_core_option_item    const * option;  // OPT types
-    km_core_usv            character;       // CHAR type
-    uint8_t                capsLock;        // CAPSLOCK type, 1 to turn on, 0 to turn off; re name see #9833
-    km_core_backspace_item backspace;       // BACKSPACE type
-  };
-} km_core_action_item;
-
-enum km_core_action_type {
-  KM_CORE_IT_END         = 0,  // Marks end of action items list.
-  KM_CORE_IT_CHAR        = 1,  // A Unicode character has been generated.
-  KM_CORE_IT_MARKER      = 2,  // Correlates to kmn's "deadkey" markers.
-  KM_CORE_IT_ALERT       = 3,  // The keyboard has triggered a alert/beep/bell.
-  KM_CORE_IT_BACK        = 4,  // Delete the codepoint preceding the insertion point.
-  KM_CORE_IT_PERSIST_OPT = 5,  // The indicated option needs to be stored.
-  KM_CORE_IT_EMIT_KEYSTROKE = 6,  // Emit the current keystroke to the application
-  KM_CORE_IT_INVALIDATE_CONTEXT = 7,
-          // The processor requests that the context buffer be cleared;
-          // for applications where context is cached, this clears the context;
-          // for applications where context is read from the focused text store,
-          // the context is just re-read and markers flushed.
-  KM_CORE_IT_CAPSLOCK    = 8,  // Enable or disable capsLock
-  KM_CORE_IT_MAX_TYPE_ID
-};
 
 /*
 ```
@@ -579,10 +178,10 @@ typedef struct {
   unsigned int code_points_to_delete;
 
   // null-term string of characters to insert into document
-  km_core_usv* output;
+  const km_core_usv* output;
 
   // list of options to persist, terminated with KM_CORE_OPTIONS_END
-  km_core_option_item* persist_options;
+  km_core_option_item * persist_options;
 
   // issue a beep, 0 = no, 1 = yes
   km_core_bool do_alert;
@@ -592,6 +191,12 @@ typedef struct {
 
   // -1=unchanged, 0=off, 1=on
   km_core_caps_state new_caps_lock_state;
+
+  // reference copy of actual UTF32 codepoints deleted from end of context
+  // (closest to caret) exactly code_points_to_delete in length (plus null
+  // terminator). Used to determine encoding conversion differences when
+  // deleting; only set when using km_core_state_get_actions, otherwise nullptr.
+  const km_core_usv* deleted_context;
 } km_core_actions;
 
 /*
@@ -603,34 +208,18 @@ that the Platform layer must take after a keystroke. The `code_points_to_delete`
 action must be performed before the `output` action, but the other
 actions may be performed in any order.
 ##### Return:
-A pointer to a `km_core_actions` object, which must be freed with
-`km_core_actions_dispose`.
+A pointer to a `km_core_actions` object. This data becomes invalid
+when the state object is destroyed, or after a call to
+`km_core_process_event`. Do not modify the contents of this data.
 ##### Parameters:
 - __state__: An opaque pointer to a state object.
 
 ```c
 */
 KMN_API
-km_core_actions*
+km_core_actions const *
 km_core_state_get_actions(
   km_core_state const *state
-);
-
-/*
-```
-### `km_core_actions_dispose`
-##### Description:
-Free the allocated memory belonging to an actions object previously
-returned by `km_core_state_get_actions`.
-##### Parameters:
-- __actions__: A pointer to the actions object to be disposed of.
-
-```c
-*/
-KMN_API
-km_core_status
-km_core_actions_dispose(
-  km_core_actions* actions
 );
 
 /*
@@ -669,8 +258,9 @@ will replace most uses of the existing Core context APIs.
 
 ##### Parameters:
 - __state__: An opaque pointer to a state object.
-- __application_context__: A pointer to an null-terminated `km_core_cp`
-    string representing the current context from the application.
+- __application_context__: A pointer to an null-terminated array of
+    utf16 encoded data representing the current context from the
+    application.
 ##### Return status:
 - `KM_CORE_CONTEXT_STATUS_UNCHANGED`: Cached context change was not needed
 - `KM_CORE_CONTEXT_STATUS_UPDATED`: Cached context was set to application
@@ -1105,86 +695,71 @@ km_core_state_dispose(km_core_state *state);
 
 /*
 ```
-### `km_core_state_context`
+### Context Debug Reporting
+As of version 17, the cached context is an internal property of the
+state, not exposed to the consumer of the API -- apart from the
+Keyman Developer Keyboard Debugger. However, for other debug
+purposes, it is helpful to be able to examine the cached context, so
+a debug-formatted version of the context is made available with
+`km_core_state_context_debug`. This is not intended to be parsed for
+reading the context for other purposes, and the format may change.
+
+The three context types are:
+* cached: the internal context used by Core, which may be normalized
+       and may contain markers. This is set via
+       km_core_state_context_set_if_needed, and will be modified
+       during keystroke event processing.
+* intermediate: internal context used by IMX, only valid during
+       keystroke event processing.
+* app: an exact copy of the current context passed in to
+       km_core_state_context_set_if_needed, which is used to verify
+       the precise text manipulations required when emitted changes.
+       This input context is in "NFU" -- normalization form unknown,
+       and may be mixed normalization so may require fixups when
+       it is manipulated by keyboard processors that support
+       normalization, such as the LDML keyboard processor.
+```c
+*/
+typedef enum {
+  KM_CORE_DEBUG_CONTEXT_CACHED        = 0,
+  KM_CORE_DEBUG_CONTEXT_INTERMEDIATE  = 1,
+  KM_CORE_DEBUG_CONTEXT_APP           = 2
+} km_core_debug_context_type;
+
+/*
+```
+### `km_core_state_context_debug`
 ##### Description:
-Get access to the state object's context.
+Returns a debug formatted string of the context from the state.
 ##### Return:
-A pointer to an opaque state object. This pointer is valid for the lifetime
-of the state object. If null is passed in, then null is returned.
+A pointer to a km_core_cp UTF-16 string. Must be disposed of by a call
+to `km_core_cp_dispose`.
 ##### Parameters:
 - __state__: A pointer to the opaque state object to be queried.
+- __context_type__: the type of context to retrieve from the state
 
 ```c
 */
 KMN_API
-km_core_context *
-km_core_state_context(km_core_state *state);
-
+km_core_cp *
+km_core_state_context_debug(km_core_state *state, km_core_debug_context_type context_type);
 
 /*
 ```
-### `km_core_state_get_intermediate_context`
+### `km_core_cp_dispose`
 ##### Description:
-Get access to the state object's keyboard processor's intermediate context. This context
-is used during an IMX callback, part way through processing a keystroke.
-##### Return:
-A pointer to an context item array. Must be disposed of by a call
-to `km_core_context_items_dispose`.
+Free the allocated memory belonging to a `km_core_cp` array previously
+returned by `km_core_state_context_debug`. May be `nullptr`.
 ##### Parameters:
-- __state__: A pointer to the opaque state object to be queried.
+- __cp__: A pointer to the start of the `km_core_cp` array
+    to be disposed of.
 
 ```c
 */
 KMN_API
-km_core_status
-km_core_state_get_intermediate_context(km_core_state *state, km_core_context_item ** context_items);
+void
+km_core_cp_dispose(km_core_cp *cp);
 
-/*
-```
-### `km_core_state_action_items`
-##### Description:
-Get the list of action items generated by the last call to
-`km_core_process_event`.
-##### Return:
-A pointer to a `km_core_action_item` list, of `*num_items` in length. This data
-becomes invalid when the state object is destroyed, or after a call to
-`km_core_process_event`. Do not modify the contents of this data. The returned
-array is terminated with a `KM_CORE_IT_END` entry.
-##### Parameters:
-- __state__: A pointer to the opaque `km_core_state` object to be queried.
-- __num_items__:
-A pointer to a result variable: The number of items in the action item list
-including the `KM_CORE_IT_END` terminator. May be null if not that
-information is required.
-
-```c
-*/
-KMN_API
-km_core_action_item const *
-km_core_state_action_items(km_core_state const *state,
-                          size_t *num_items);
-
-/*
-```
-### `km_core_state_queue_action_items`
-##### Description:
-Queue actions for the current keyboard processor state; normally
-used in IMX callbacks called during `km_core_process_event`.
-##### Return:
-- `KM_CORE_STATUS_OK`: On success.
-- `KM_CORE_STATUS_INVALID_ARGUMENT`:
-In the event the `state` or `action_items` pointer are null.
-##### Parameters:
-- __state__:        A pointer to the opaque `km_core_state` object to be queried.
-- __action_items__: The action items to be added to the core
-                    queue. Must be terminated with a `KM_CORE_IT_END` entry.
-
-```c
-*/
-KMN_API
-km_core_status
-km_core_state_queue_action_items(km_core_state *state,
-                         km_core_action_item const *action_items);
 
 /*
 ```
@@ -1272,9 +847,10 @@ km_core_get_engine_attrs(km_core_state const *state);
 ### `km_core_process_event`
 ##### Description:
 Run the keyboard on an opaque state object with the provided virtual key and modifer
-key state. Updates the state object as appropriate and fills out its action list.
+key state. Updates the state object as appropriate and fills out its internal set
+of actions, which can be retrieved with `km_core_state_get_actions()`.
 
-The action list will be cleared at the start of this call; options and context in
+The state's actions will be cleared at the start of this call; options and context in
 the state may also be modified.
 ##### Return status:
 - `KM_CORE_STATUS_OK`: On success.
@@ -1304,33 +880,6 @@ km_core_process_event(km_core_state *state,
 
 /*
 ```
-### `km_core_process_queued_actions`
-##### Description:
-Process the keyboard processors queued actions for the opaque state object.
-Updates the state object as appropriate and fills out its action list.
-The client can add actions externally via the `km_core_state_queue_action_items` and
-then request the processing of the actions with this method.
-
-The state action list will be cleared at the start of this call; options and context in
-the state may also be modified.
-##### Return status:
-- `KM_CORE_STATUS_OK`: On success.
-- `KM_CORE_STATUS_NO_MEM`:
-In the event memory is unavailable to allocate internal buffers.
-- `KM_CORE_STATUS_INVALID_ARGUMENT`:
-In the event the `state` pointer is null
-
-##### Parameters:
-- __state__: A pointer to the opaque state object.
-
-```c
-*/
-KMN_API
-km_core_status
-km_core_process_queued_actions(km_core_state *state);
-
-/*
-```
 ### `km_core_event`
 ##### Description:
 Tell the keyboard processor that an external event has occurred, such as a keyboard
@@ -1345,7 +894,7 @@ In the event the `state` pointer is null or an invalid event or data is passed.
 The keyboard processor may generate actions which should be processed by the
 consumer of the API.
 
-The action list will be cleared at the start of this call; options and context in
+The actions will be cleared at the start of this call; options and context in
 the state may also be modified.
 
 ##### Parameters:
