@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 18.0.8 alpha 2024-03-04
+
+* chore(linux): Update debian changelog (#10898)
+
 ## 18.0.7 alpha 2024-02-29
 
 * chore: Merge 17.0.270 beta back to master (#10886)
