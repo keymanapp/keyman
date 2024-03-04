@@ -306,7 +306,7 @@ export class KeyboardInfoCompiler implements KeymanCompiler {
 
     keyboard_info.minKeymanVersion = minVersion;
     keyboard_info.sourcePath = sources.sourcePath;
-    keyboard_info.helpLink = KeymanUrls.HELP_KEYBOARD_ROOT() + keyboard_info.id;
+    keyboard_info.helpLink = KeymanUrls.HELP_KEYBOARD(keyboard_info.id);
 
     // Related packages
     if(kmpJsonData.relatedPackages?.length) {

@@ -183,7 +183,7 @@ export class ModelInfoCompiler implements KeymanCompiler {
     model_info.packageIncludes = sources.kmpJsonData.files.filter((e) => !!e.name.match(/.[ot]tf$/i)).length ? ['fonts'] : [];
     model_info.version = sources.kmpJsonData.info.version.description;
     model_info.minKeymanVersion = minKeymanVersion;
-    model_info.helpLink = KeymanUrls.HELP_MODEL_ROOT() + model_info.id;
+    model_info.helpLink = KeymanUrls.HELP_MODEL(model_info.id);
 
     if(sources.sourcePath) {
       model_info.sourcePath = sources.sourcePath;
