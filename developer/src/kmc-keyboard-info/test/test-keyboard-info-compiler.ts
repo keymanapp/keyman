@@ -71,7 +71,8 @@ describe('keyboard-info-compiler', function () {
 
     const compiler = new KeyboardInfoCompiler();
     assert.isTrue(await compiler.init(callbacks, {sources}));
-    compiler['fillLanguages'] = stubFillLanguages;
+    // stubbing fillLanguages internal function to avoid pulling in font resources in fixture
+    compiler.fillLanguages. = async (_kpsFilename: string, _keyboard_info: KeyboardInfoFile, _kmpJsonData:  KmpJsonFile.KmpJsonFile): Promise<boolean> => true;
     let result: KeyboardInfoCompilerResult = null;
     try {
       result = await compiler.run(kmpFilename, null);
