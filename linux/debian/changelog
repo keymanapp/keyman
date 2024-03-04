@@ -1,3 +1,18 @@
+keyman (17.0.274-1) unstable; urgency=medium
+
+  * Fix autopkg tests
+  * New upstream release.
+  * Re-release to Debian
+
+ -- Eberhard Beilharz <eb1@sil.org>  Fri, 23 Feb 2024 15:45:13 +0100
+
+keyman (17.0.272-1) unstable; urgency=medium
+
+  * New upstream release.
+  * Re-release to Debian
+
+ -- Eberhard Beilharz <eb1@sil.org>  Wed, 21 Feb 2024 16:36:14 +0100
+
 keyman (16.0.145-1) unstable; urgency=medium
 
   [Jeremy Bicha]
