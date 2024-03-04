@@ -85,7 +85,7 @@ describe('keyboard-info-compiler', function () {
       KeymanFileTypes.Binary.WebKeyboard+' not found in the message');
   });
 
-  // ERROR_FileDoesNotExist (font file in package)
+  // ERROR_FileDoesNotExist (font file not in package)
 
   it('should generate FileDoesNotExist error if font file is missing from package', async function() {
     const jsFilename = makePathToFixture('khmer_angkor', 'build', 'khmer_angkor.js');
@@ -111,6 +111,38 @@ describe('keyboard-info-compiler', function () {
 
     assert.isTrue(callbacks.hasMessage(KeyboardInfoCompilerMessages.ERROR_FileDoesNotExist),
       `ERROR_FileDoesNotExist not generated, instead got: `+JSON.stringify(callbacks.messages,null,2));
+    assert.isTrue(nodeCompilerMessage(callbacks, KeyboardInfoCompilerMessages.ERROR_FileDoesNotExist).includes(source[0]),
+      source[0]+' not found in the message');
+  });
+
+  // ERROR_FileDoesNotExist (font file not on disk)
+
+  it('should generate FileDoesNotExist error if font file is missing from disk', async function() {
+    const jsFilename = makePathToFixture('khmer_angkor', 'build', 'khmer_angkor.js');
+    const kpsFilename = makePathToFixture('khmer_angkor', 'source', 'khmer_angkor.kps');
+    const kmpFilename = makePathToFixture('khmer_angkor', 'build', 'khmer_angkor.kmp');
+
+    const sources = {
+      kmpFilename,
+      sourcePath: 'release/k/khmer_angkor',
+      kpsFilename,
+      jsFilename: jsFilename,
+      forPublishing: true,
+    };
+
+    const compiler = new KeyboardInfoCompiler();
+    assert.isTrue(await compiler.init(callbacks, {sources}));
+    const kmpJsonData: KmpJsonFile.KmpJsonFile = {system: {fileVersion: "7.0", keymanDeveloperVersion: "17.0.204"},
+      options: {},
+      files: [{name: "../shared/fonts/khmer/mondulkiri/xxx.ttf", description: "Font not on disk"}]}
+    const source = ["xxx.ttf"]
+    const result = await compiler['fontSourceToKeyboardInfoFont'](kpsFilename, kmpJsonData, source)
+    assert.isNull(result);
+
+    assert.isTrue(callbacks.hasMessage(KeyboardInfoCompilerMessages.ERROR_FileDoesNotExist),
+      `ERROR_FileDoesNotExist not generated, instead got: `+JSON.stringify(callbacks.messages,null,2));
+    assert.isTrue(nodeCompilerMessage(callbacks, KeyboardInfoCompilerMessages.ERROR_FileDoesNotExist).includes(kmpJsonData.files[0].name),
+    kmpJsonData.files[0].name+' not found in the message');
   });
 });
 
