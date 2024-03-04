@@ -176,7 +176,10 @@ uses
   TaskScheduler_TLB in '..\..\global\delphi\winapi\TaskScheduler_TLB.pas',
   Keyman.Configuration.System.HttpServer.App.TextEditorFonts in 'startup\help\Keyman.Configuration.System.HttpServer.App.TextEditorFonts.pas',
   Keyman.Configuration.System.HttpServer.App.Locale in 'web\Keyman.Configuration.System.HttpServer.App.Locale.pas',
-  Keyman.System.AndroidStringToKeymanLocaleString in '..\..\..\..\common\windows\delphi\general\Keyman.System.AndroidStringToKeymanLocaleString.pas';
+  Keyman.System.AndroidStringToKeymanLocaleString in '..\..\..\..\common\windows\delphi\general\Keyman.System.AndroidStringToKeymanLocaleString.pas',
+  UpdateXMLRenderer in 'render\UpdateXMLRenderer.pas',
+  Keyman.System.UpdateCheckStorage in 'main\Keyman.System.UpdateCheckStorage.pas',
+  Keyman.System.RemoteUpdateCheck in 'main\Keyman.System.RemoteUpdateCheck.pas';
 
 {$R VERSION.RES}
 {$R manifest.res}
@@ -198,7 +201,7 @@ begin
         Application.Initialize;
         Application.Title := 'Keyman Configuration';
         Application.CreateForm(TmodWebHttpServer, modWebHttpServer);
-        try
+  try
           Run;
         finally
           FreeAndNil(modWebHttpServer);
