@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<keyboard3 xmlns="https://schemas.unicode.org/cldr/45/keyboard3" locale="mt" >
+<keyboard3 conformsTo="45" xmlns="https://schemas.unicode.org/cldr/45/keyboard3" locale="mt" >
   <info name="fail-missing-var-1"/>
 
   <keys />
