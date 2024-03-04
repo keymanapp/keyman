@@ -13,8 +13,8 @@ export class KeymanUrls {
   static readonly VIRTUAL_KEYS = ()         => `${KeymanUrls.HELP_KEYMAN_COM}/developer/language/guide/virtual-keys#common-virtual-key-codes`;
   static readonly FILE_TYPE = (ext: string) => `${KeymanUrls.HELP_KEYMAN_COM}/developer/current-version/reference/file-types/${ext}`;
   static readonly KMN_REF = (topic: string) => `${KeymanUrls.HELP_KEYMAN_COM}/developer/language/reference/${topic}`;
-  static readonly HELP_KEYBOARD_ROOT = (id: string)   => `${KeymanUrls.HELP_KEYMAN_COM}/keyboard/${id}`;
-  static readonly HELP_MODEL_ROOT = (id: string)      => `${KeymanUrls.HELP_KEYMAN_COM}/model/${id}`;
+  static readonly HELP_KEYBOARD = (id: string)   => `${KeymanUrls.HELP_KEYMAN_COM}/keyboard/${id}`;
+  static readonly HELP_MODEL = (id: string)      => `${KeymanUrls.HELP_KEYMAN_COM}/model/${id}`;
 
 
   // keyman.com
