@@ -133,7 +133,7 @@ class KeymanWebViewController: UIViewController {
 
     // Disable WKWebView default layout-constraint manipulations. We ensure
     // safe-area boundaries are respected via InputView / InputViewController
-    // contraints.
+    // constraints.
     //
     // Fixes #10859.
     // Ref: https://stackoverflow.com/a/63741514
