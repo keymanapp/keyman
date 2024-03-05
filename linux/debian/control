@@ -113,6 +113,7 @@ Package: libkeymancore-dev
 Architecture: amd64 arm64 armel armhf i386 loong64 mipsel mips64el ppc64el riscv64
 Section: libdevel
 Depends:
+ libicu-dev,
  libkeymancore1 (= ${binary:Version}),
  ${misc:Depends},
 Conflicts: libkmnkbp-dev

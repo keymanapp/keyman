@@ -4,7 +4,7 @@ import { JavaScript_Key } from "./javascript-strings.js";
 import { TRequiredKey, CRequiredKeys, CSpecialText, CSpecialText14Map, CSpecialText17Map, CSpecialTextMinVer, CSpecialTextMaxVer } from "./constants.js";
 import { KeymanWebTouchStandardKeyNames, KMWAdditionalKeyNames, VKeyNames } from "./keymanweb-key-codes.js";
 import { KmwCompilerMessages } from "./kmw-compiler-messages.js";
-import { Osk } from '@keymanapp/developer-utils';
+import * as Osk from '../compiler/osk.js';
 
 interface VLFOutput {
   output: string;

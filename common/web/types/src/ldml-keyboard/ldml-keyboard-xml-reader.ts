@@ -87,7 +87,7 @@ export class LDMLKeyboardXMLSourceFileReader {
     if(source?.keyboard3?.variables) {
       boxXmlArray(source?.keyboard3?.variables, 'set');
       boxXmlArray(source?.keyboard3?.variables, 'string');
-      boxXmlArray(source?.keyboard3?.variables, 'unicodeSet');
+      boxXmlArray(source?.keyboard3?.variables, 'uset');
     }
     if(source?.keyboard3?.transforms) {
       for(let transforms of source.keyboard3.transforms)  {

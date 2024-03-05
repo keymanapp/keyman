@@ -32,7 +32,7 @@
     <string id="a" value="\m{a}"/>
     <string id="vst" value="abc pua:\u{E010}"/>
     <set id="vse" value="a b \u{04FFFE} \u{5FFFF}"/>
-    <unicodeSet id="vus" value="[abc]"/>
+    <uset id="vus" value="[abc]"/>
   </variables>
 
   <transforms type="simple">

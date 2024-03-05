@@ -1,5 +1,48 @@
 # Keyman Version History
 
+## 17.0.281 beta 2024-03-04
+
+* chore(linux): Update debian changelog (#10897)
+* fix(ios): cross-paragraph keyboard rules (#10905)
+* chore(developer): deploy compiler messages to help site (#10906)
+
+## 17.0.280 beta 2024-03-01
+
+* fix(developer): make sure scroll bar appears when needed in global welcome (#10818)
+* chore(common): loosen .keyman-touch-layout schema layer id requirements (#10819)
+* docs(developer): kmc-kmn api documentation and some message documentation (#10856)
+* refactor(developer): cleanup kmn compiler message namespaces (#10867)
+* refactor(developer): reorganize messages for adding details (#10878)
+* fix(ios): context-initial diacritic handling (#10589)
+* feat(developer): adds kmc message command (#10888)
+* test(developer): kmc unit test infrastructure messages (#10825)
+* fix(android): handle surrogate pairs in selection range indexing (#10885)
+* feat(windows): move the code kmshell.dpr to unit so that only the includes are in dpr (#10871)
+
+## 17.0.279 beta 2024-02-29
+
+* fix(linux): Fix libkeymancore-dev dependencies (#10880)
+* chore(resources): update to latest ldml: xmlns, uset (#10865)
+
+## 17.0.278 beta 2024-02-28
+
+* docs(linux): Updated whatsnew for Keyman for Linux 17 (#10858)
+*  (#10869)
+* chore(android/engine): Reduce toast notifications after installations (#10868)
+* fix(android/engine): Check selection indexes (#10857)
+
+## 17.0.277 beta 2024-02-27
+
+* fix(developer): exit kmc test data if any failure messages occurred (#10805)
+* docs(windows): add whats new Keyman for Windows  17.0 (#10783)
+* feat(developer): add api-extractor and api-documenter, config, and build integration (#10839)
+* feat(developer): publish api documentation to help.keyman.com (#10841)
+* docs(developer): npm package readme files (#10842)
+* refactor(developer): move osk module from common-types to developer-utils (#10845)
+* chore(linux): Update debian changelog (#10828)
+* fix(developer): repeated options in kmc must now be fully specified (#10821)
+* docs(developer): add documentation for kmc-analyze (#10854)
+
 ## 17.0.276 beta 2024-02-26
 
 * chore(linux): Fix autopkg tests (#10824)
