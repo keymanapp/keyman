@@ -271,7 +271,7 @@ title: Compiler Messages Reference for @keymanapp/${ms.module}
     fs.writeFileSync(path.join(outPath, filename + '.md'), content, 'utf-8');
   }
 
-  fs.writeFileSync(path.join(outPath, moduleName + '.md'), index, 'utf-8');
+  fs.writeFileSync(path.join(outPath, moduleName.toLowerCase() + '.md'), index, 'utf-8');
 }
 
 function formatMessageAsMarkdown(moduleName: string, id: string, message: CompilerEvent) {
