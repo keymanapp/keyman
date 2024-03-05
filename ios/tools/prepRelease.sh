@@ -56,27 +56,56 @@ LC_ALL=UTF-8 sed -e "s/[$(printf $emoji)]//g" < "$CHANGELOG_PATH" > "$CHANGELOG_
 mv -f "$CHANGELOG_PATH.1" "$CHANGELOG_PATH"
 assertFileExists "${CHANGELOG_PATH}"
 
-#
-# Keyman Engine
-#
-
 KMEI_DST_NAME="keyman-engine-ios-${BUILD_NUMBER}.zip"
 KMEI_DST="${WORK_DIR}/${UPLOAD_DIR}/${KMEI_DST_NAME}"
 
-KMEI_FRAMEWORK_BASE="build/Build/Products/Release/"
-FRAMEWORK="KeymanEngine.xcframework"
+#
+# Copy xcframeworks from Carthage to upload directory and add to zip
+#
+
+CARTHAGE_DIR="Carthage"
+KEYMAN_FRAMEWORKS="Carthage/Build/"
+#KEYMAN_FRAMEWORK_BASE="Carthage"
+
+cd $UPLOAD_DIR
+mkdir -p "${CARTHAGE_DIR}"
+
+cd $WORK_DIR
+echo "Copying frameworks into ${CARTHAGE_DIR} and adding to zip file..."
+cp -rf "${KEYMAN_FRAMEWORKS}" "${UPLOAD_DIR}/${CARTHAGE_DIR}"
+zip -qrX ${KMEI_DST} "${KEYMAN_FRAMEWORKS}"
+cd $UPLOAD_DIR
+rm -rf "${CARTHAGE_DIR}"
+cd $WORK_DIR
+
+#
+# Samples - copy source to temporary folder
+#
 
 KEYMAN_SAMPLES="samples"
+echo "Copying Keyman Engine samples into ${UPLOAD_DIR}/${KMEI_DST_NAME}..."
+cd $WORK_DIR
+cp -rf "${KEYMAN_SAMPLES}" "${UPLOAD_DIR}/samples"
+
+
+#
+# Copy Keyman Engine xcframework to the root of each sample project
+#
+
+KMEI_FRAMEWORK_BASE="build/Build/Products/Release/"
+KEYMAN_ENGINE_FRAMEWORK="KeymanEngine.xcframework"
 
 echo "engine dest: $KMEI_DST"
 
-echo "Zipping ${UNI_FRAMEWORK} => ${UPLOAD_DIR}/${KMEI_DST}..."
-cd "${KMEI_FRAMEWORK_BASE}"
-zip -qrX ${KMEI_DST} ${FRAMEWORK}
+echo "Copying ${UNI_FRAMEWORK} => ${UPLOAD_DIR}/samples..."
 cd $WORK_DIR
+cp -rf "${KMEI_FRAMEWORK_BASE}/${KEYMAN_ENGINE_FRAMEWORK}" "${UPLOAD_DIR}/samples/KMSample1/"
+cp -rf "${KMEI_FRAMEWORK_BASE}/${KEYMAN_ENGINE_FRAMEWORK}" "${UPLOAD_DIR}/samples/KMSample2/"
+#zip -qrX ${KMEI_DST} ${FRAMEWORK}
 
-echo "Copying Keyman Engine samples into ${UPLOAD_DIR}/${KMEI_DST_NAME}..."
-cp -rf "${KEYMAN_SAMPLES}" "${UPLOAD_DIR}/samples"
+#
+#  Add samples directory to zip and remove temporary folder
+#
 cd "${UPLOAD_DIR}"
 zip -qr "${KMEI_DST_NAME}" "samples"
 rm -rf "samples"
