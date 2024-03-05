@@ -59,11 +59,23 @@ export interface KmnCompilerResultExtra {
 
 /**
  * @public
- * Internal in-memory result from a successful compilation
+ * Internal in-memory build artifacts from a successful compilation
  */
 export interface KmnCompilerArtifacts extends KeymanCompilerArtifacts {
+  /**
+   * Binary keyboard filedata and filename - installable into Keyman desktop
+   * projects
+   */
   kmx?: KeymanCompilerArtifactOptional;
+  /**
+   * Binary on screen keyboard filedata and filename - installable into Keyman
+   * desktop projects alongside .kmx
+   */
   kvk?: KeymanCompilerArtifactOptional;
+  /**
+   * Javascript keyboard filedata and filename - installable into KeymanWeb,
+   * Keyman mobile products
+   */
   js?: KeymanCompilerArtifactOptional;
 };
 
@@ -72,8 +84,19 @@ export interface KmnCompilerArtifacts extends KeymanCompilerArtifacts {
  * Build artifacts from the .kmn compiler
  */
 export interface KmnCompilerResult extends KeymanCompilerResult {
+  /**
+   * Internal in-memory build artifacts from a successful compilation. Caller
+   * can write these to disk with {@link KmnCompiler.write}
+   */
   artifacts: KmnCompilerArtifacts;
+  /**
+   * Internal additional metadata used by secondary compile phases such as
+   * KmwCompiler, not intended for external use
+   */
   extra: KmnCompilerResultExtra;
+  /**
+   * Mapping data for `&displayMap`, intended for use by kmc-analyze
+   */
   displayMap?: Osk.PuaMap;
 };
 
@@ -129,7 +152,8 @@ export class KmnCompiler implements KeymanCompiler, UnicodeSetParser {
   /**
    * Initialize the compiler, including loading the WASM host for kmcmplib.
    * Copies options.
-   * @param callbacks - Callbacks for external interfaces, including message reporting and file io
+   * @param callbacks - Callbacks for external interfaces, including message
+   *                    reporting and file io
    * @param options   - Compiler options
    * @returns false if initialization fails
    */
