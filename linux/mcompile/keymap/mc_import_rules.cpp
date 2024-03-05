@@ -629,12 +629,10 @@ bool KMX_ImportRules(LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, GdkKeymap **keymap,
 
   //KMX_HKL hkl = NULL;
 
-  std::vector<KMX_VirtualKey*> rgKey; //= new VirtualKey[256];
   std::vector<KMX_VirtualKey_16*> rgKey_16; //= new VirtualKey[256];
   std::vector<DeadKey*> alDead;
   std::vector<DeadKey*> alDead_cpl = create_alDead();
 
-  rgKey.resize(256);
   rgKey_16.resize(256);
 
   // Scroll through the Scan Code (SC) values and get the valid Virtual Key (VK)
@@ -649,14 +647,8 @@ bool KMX_ImportRules(LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, GdkKeymap **keymap,
     // this "connection" is possible only when using All_Vector
 
     //KMX_VirtualKey *key = new KMX_VirtualKey(sc, hkl);
-    KMX_VirtualKey *key = new KMX_VirtualKey(sc);
     KMX_VirtualKey_16 *key_16 = new KMX_VirtualKey_16(sc);
 
-   if((key->VK() != 0) ) {
-        rgKey[key->VK()] = key;
-    } else {
-        delete key;
-    }
 
    if((key_16->VK() != 0) ) {
         rgKey_16[key_16->VK()] = key_16;
@@ -671,9 +663,9 @@ bool KMX_ImportRules(LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, GdkKeymap **keymap,
   rgKey[VK_DECIMAL] = new KMX_VirtualKey(hkl, VK_DECIMAL);*/
 
     // in this part we skip shiftstates 4, 5, 8, 9
-    for(UINT iKey = 0; iKey < rgKey.size(); iKey++) {
+    for(UINT iKey = 0; iKey < rgKey_16.size(); iKey++) {
 
-      if(rgKey[iKey] != NULL) {
+      if(rgKey_16[iKey] != NULL) {
         KMX_WCHAR sbBuffer[256];     // Scratchpad we use many places
 
         for(ShiftState ss = Base; ss <= loader.KMX_MaxShiftState(); ss = (ShiftState)((int)ss + 1)) {
@@ -694,24 +686,18 @@ bool KMX_ImportRules(LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, GdkKeymap **keymap,
 
             if(rc > 0) {
               if(*sbBuffer == 0) {
-                //rgKey[iKey]->KMX_SetShiftState(ss, L"", false, (caps == 0));  // different to windows since behavior on Linux is different
-                rgKey[iKey]->KMX_SetShiftState(ss, u"", false, (caps));
-                rgKey_16[iKey]->KMX_SetShiftState_16(ss, u"", false, (caps));
+                rgKey_16[iKey]->KMX_SetShiftState_16(ss, u"", false, (caps));  // different to windows since behavior on Linux is different
               }
               else {
                 if( (ss == Ctrl || ss == ShftCtrl) ) {
                 continue;
               }
               sbBuffer[rc] = 0;
-              //rgKey[iKey]->KMX_SetShiftState(ss, sbBuffer, false, (caps==0));
-              rgKey[iKey]->KMX_SetShiftState(ss, sbBuffer, false, (caps));      // different to windows since behavior on Linux is different
-             rgKey_16[iKey]->KMX_SetShiftState_16(ss, sbBuffer, false, (caps));      // different to windows since behavior on Linux is different
+              rgKey_16[iKey]->KMX_SetShiftState_16(ss, sbBuffer, false, (caps));      // different to windows since behavior on Linux is different
             }
           }
           else if(rc < 0) {
             sbBuffer[2] = 0;
-            //rgKey[iKey]->SetShiftState(ss, sbBuffer, true, (caps == 0));
-            rgKey[iKey]->KMX_SetShiftState(ss, sbBuffer, true, (caps ));      // different to windows since behavior on Linux is different
             rgKey_16[iKey]->KMX_SetShiftState_16(ss, sbBuffer, true, (caps ));      // different to windows since behavior on Linux is different
 
             refine_alDead(sbBuffer[0], alDead, &alDead_cpl);
@@ -753,15 +739,6 @@ bool KMX_ImportRules(LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, GdkKeymap **keymap,
 
   kp->cxGroupArray++;
   gp = &kp->dpGroupArray[kp->cxGroupArray-1];
-  UINT nKeys = 0;
-  for (UINT iKey = 0; iKey < rgKey.size(); iKey++) {
-    // _S2 TOP_7
-    if ((rgKey[iKey] != NULL) && rgKey[iKey]->KMX_IsKeymanUsedKey() && (!rgKey[iKey]->KMX_IsEmpty())) {
-      nKeys+= rgKey[iKey]->KMX_GetKeyCount(loader.KMX_MaxShiftState());
-    }
-  }
-
-
 
   UINT nKeys_16 = 0;
   for (UINT iKey_16 = 0; iKey_16 < rgKey_16.size(); iKey_16++) {
@@ -778,9 +755,8 @@ bool KMX_ImportRules(LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, GdkKeymap **keymap,
   gp->dpMatch = NULL;
   gp->dpName = NULL;
   gp->dpNoMatch = NULL;
-  gp->cxKeyArray = nKeys;
+  gp->cxKeyArray = nKeys_16;
   gp->dpKeyArray = new KMX_KEY[gp->cxKeyArray];
-  nKeys = 0;
   nKeys_16 = 0;
 
 
