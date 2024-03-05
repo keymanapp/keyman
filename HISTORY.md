@@ -1,5 +1,13 @@
 # Keyman Version History
 
+## 17.0.282 beta 2024-03-05
+
+* fix(developer): move osk.ts from developer-utils to kmc-kmn (#10903)
+* fix(developer): hint text special characters (#10927)
+* docs(developer): kmc-ldml api documentation (#10917)
+* chore(developer): consolidate external links in Developer messages (#10918)
+* fix(developer): message export filename was title case (#10941)
+
 ## 17.0.281 beta 2024-03-04
 
 * chore(linux): Update debian changelog (#10897)
