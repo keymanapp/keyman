@@ -8,7 +8,7 @@ import { KeyboardInfoFile, KeyboardInfoFileIncludes, KeyboardInfoFileLanguageFon
 import { KeymanFileTypes, CompilerCallbacks, KmpJsonFile, KmxFileReader, KMX, KeymanTargets, KeymanCompiler, CompilerOptions, KeymanCompilerResult, KeymanCompilerArtifacts, KeymanCompilerArtifact } from "@keymanapp/common-types";
 import { KeyboardInfoCompilerMessages } from "./keyboard-info-compiler-messages.js";
 import langtags from "./imports/langtags.js";
-import { validateMITLicense } from "@keymanapp/developer-utils";
+import { KeymanUrls, validateMITLicense } from "@keymanapp/developer-utils";
 import { KmpCompiler } from "@keymanapp/kmc-package";
 
 import { SchemaValidators } from "@keymanapp/common-types";
@@ -17,8 +17,6 @@ import { getFontFamily } from "./font-family.js";
 const regionNames = new Intl.DisplayNames(['en'], { type: "region" });
 const scriptNames = new Intl.DisplayNames(['en'], { type: "script" });
 const langtagsByTag = {};
-
-const HelpRoot = 'https://help.keyman.com/keyboard/';
 
 /**
  * Build a dictionary of language tags from langtags.json
@@ -308,7 +306,7 @@ export class KeyboardInfoCompiler implements KeymanCompiler {
 
     keyboard_info.minKeymanVersion = minVersion;
     keyboard_info.sourcePath = sources.sourcePath;
-    keyboard_info.helpLink = HelpRoot + keyboard_info.id;
+    keyboard_info.helpLink = KeymanUrls.HELP_KEYBOARD(keyboard_info.id);
 
     // Related packages
     if(kmpJsonData.relatedPackages?.length) {

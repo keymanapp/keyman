@@ -8,7 +8,7 @@ import { NodeCompilerCallbacks } from '../util/NodeCompilerCallbacks.js';
 import { exitProcess } from '../util/sysexits.js';
 import { InfrastructureMessages } from '../messages/infrastructureMessages.js';
 import { CompilerMessageDetail, findMessageDetails } from '../util/extendedCompilerOptions.js';
-import { escapeMarkdownChar } from '@keymanapp/developer-utils';
+import { escapeMarkdownChar, KeymanUrls } from '@keymanapp/developer-utils';
 
 type MessageFormat = 'text'|'markdown'|'json';
 
@@ -90,10 +90,10 @@ async function messageCommand(messages: string[], _options: any, commander: any)
   }
 }
 
-// We have a redirect pattern for https://help.keyman.com/go/km<#####> to
+// We have a redirect pattern for kmn.sh/km<#####> to
 // the corresponding compiler message reference document in
-// /developer/latest-version/reference/errors/km<#####>
-const helpUrl = (code:any) => `https://help.keyman.com/go/${CompilerError.formatCode(code).toLowerCase()}`;
+// help.keyman.com/developer/latest-version/reference/errors/km<#####>
+const helpUrl = (code:any) => KeymanUrls.COMPILER_ERROR_CODE(CompilerError.formatCode(code).toLowerCase());
 const getModuleName = (ms: CompilerMessageSource) => `${ms.module}.${ms.class.name}`;
 
 function translateMessageInputToCode(message: string, callbacks: CompilerCallbacks): CompilerMessageDetail {
@@ -271,7 +271,7 @@ title: Compiler Messages Reference for @keymanapp/${ms.module}
     fs.writeFileSync(path.join(outPath, filename + '.md'), content, 'utf-8');
   }
 
-  fs.writeFileSync(path.join(outPath, moduleName + '.md'), index, 'utf-8');
+  fs.writeFileSync(path.join(outPath, moduleName.toLowerCase() + '.md'), index, 'utf-8');
 }
 
 function formatMessageAsMarkdown(moduleName: string, id: string, message: CompilerEvent) {
