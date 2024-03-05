@@ -10,77 +10,6 @@ int map_VKShiftState_to_LinModifier(int VKShiftState) {
   else return VKShiftState;
 }
 
-// _S2 TOP_7 ok
-/*KMX_DWORD convertNamesTo_DWORD_Value(std::wstring tok_wstr) {
-  // more on https://manpages.ubuntu.com/manpages/jammy/man3/keysyms.3tk.html
-  std::map<std::wstring, KMX_DWORD > first;
-
-  first[L"ampersand"]         =  38;
-  first[L"apostrophe"]        =  39;
-  first[L"asciicircum"]       = 136;
-  first[L"asciitilde"]        = 126;
-  first[L"asterisk"]          =  42;
-  first[L"at"]                =  64;
-  first[L"backslash"]         =  92;
-  first[L"BackSpace"]         = 65288;
-  first[L"bar"]               = 124;
-  first[L"braceleft"]         = 123;
-  first[L"braceright"]        = 125;
-  first[L"bracketleft"]       =  91;
-  first[L"bracketright"]      =  93;
-  first[L"colon"]             =  58;
-  first[L"comma"]             =  44;
-  first[L"diaeresis"]         = 168;
-  first[L"dollar"]            =  36;
-  first[L"equal"]             =  61;
-  first[L"exclam"]            =  33;
-  first[L"grave"]             =  96;
-  first[L"greater"]           =  62;
-  first[L"less"]              =  60;
-  first[L"minus"]             =  45;
-  first[L"numbersign"]        =  35;
-  first[L"parenleft"]         =  40;
-  first[L"parenright"]        =  41;
-  first[L"percent"]           =  37;
-  first[L"period"]            =  46;
-  first[L"plus"]              =  43;
-  first[L"question"]          =  63;
-  first[L"quotedbl"]          =  34;
-  first[L"semicolon"]         =  59;
-  first[L"slash"]             =  47;
-  first[L"space"]             =  32;
-  first[L"ssharp"]            = 223;
-  first[L"underscore"]        =  95;
-
-  first[L"dead_abovedot"]     = 729;
-  first[L"dead_abovering"]    = 730;
-  first[L"dead_acute"]        = 180;
-  first[L"dead_breve"]        = 728;
-  first[L"dead_caron"]        = 711;
-  first[L"dead_cedilla"]      = 184;
-  first[L"dead_circumflex"]   =  94;
-  first[L"dead_diaeresis"]    = 168;
-  first[L"dead_doubleacute"]  = 733;
-  first[L"dead_grave"]        =  96;
-  first[L"dead_ogonek"]       = 731;
-  first[L"dead_perispomeni"]  = 126;
-  first[L"dead_tilde"]        = 126;
-
-  first[L"acute accent"]      = 0xB4;
-
-  if ( tok_wstr.size() == 1) {
-    return (KMX_DWORD) ( *tok_wstr.c_str() );
-  }
-  else {
-		std::map<std::wstring, KMX_DWORD > ::iterator it;
-		for (it = first.begin(); it != first.end(); ++it) {
-			if (it->first == tok_wstr)
-				return it->second;
-		}
-  }
-  return returnIfCharInvalid;
-}
-*/
 KMX_DWORD convertNamesTo_DWORD_Value(std::string tok_str) {
   // more on https://manpages.ubuntu.com/manpages/jammy/man3/keysyms.3tk.html
   std::map<std::string, KMX_DWORD > first;
@@ -561,7 +490,6 @@ int split_US_To_3D_Vector(v_dw_3D &all_US,v_str_1D completeList) {
       for ( int i = 1; i< (int) tokens.size();i++) {
 
         // replace a name with a single character ( a -> a  ; equal -> = )
-        // _S2 TOP_7 ok
         tokens_int = convertNamesTo_DWORD_Value(tokens[i]);
         //tokens_int = convertNamesTo_DWORD_Value( wstring_from_string(tokens[i]));
 
@@ -652,29 +580,7 @@ bool IsKeymanUsedChar(int KV) {
   else
     return false;
 }
-// _S2 TOP_7 ok
-std::wstring convert_DeadkeyValues_ToWstr(int in) {
 
-  if (in == 0 )
-    return L"\0";
-
-  std::string long_name((const char*) gdk_keyval_name (in));                      // e.g. "dead_circumflex" , "U+017F" , "t"
-
-  if ( long_name.substr (0,2) == "U+" )                                           // U+... Unicode value
-    return  CodePointToWString(in-0x1000000);
-
-  if (in < (int) deadkey_min) {                                                   // no deadkey; no Unicode
-    return  std::wstring(1, in);
-  }
-  KMX_DWORD lname = convertNamesTo_DWORD_Value( long_name);                       // 65106 => "dead_circumflex" => 94 => "^"
-  //KMX_DWORD lname = convertNamesTo_DWORD_Value( wstring_from_string(long_name));  // 65106 => "dead_circumflex" => 94 => "^"
-
-  if (lname != returnIfCharInvalid) {
-    return std::wstring(1, lname );
-  }
-  else
-    return L"\0";
-}
 std::u16string convert_DeadkeyValues_To_U16str(int in) {
 
   if (in == 0 )
@@ -683,7 +589,7 @@ std::u16string convert_DeadkeyValues_To_U16str(int in) {
   std::string long_name((const char*) gdk_keyval_name (in));                      // e.g. "dead_circumflex" , "U+017F" , "t"
 
   if ( long_name.substr (0,2) == "U+" )                                           // U+... Unicode value
-    return  CodePointToString_16(in-0x1000000);
+    return  CodePointToU16String(in-0x1000000);
 
   if (in < (int) deadkey_min) {                                                   // no deadkey; no Unicode
     return  std::u16string(1, in);
@@ -858,7 +764,6 @@ KMX_WCHAR KMX_get_KeyValUnderlying_From_KeyValUS(v_dw_3D & All_Vector, KMX_DWORD
 KMX_DWORD KMX_get_KeyCodeUnderlying_From_KeyCodeUS(GdkKeymap *keymap, v_dw_3D &All_Vector, KMX_DWORD KC_US, ShiftState ss, int caps) {
   KMX_DWORD KC_underlying;
   std::u16string u16str = convert_DeadkeyValues_To_U16str(KMX_get_KeyVal_From_KeyCode(keymap, KC_US, ss, caps));
- // std::wstring ws = convert_DeadkeyValues_ToWstr(KMX_get_KeyVal_From_KeyCode(keymap, KC_US, ss, caps));
 
   //Find KC_underlying character
   for( int i=0; i< (int)All_Vector[1].size()-1 ;i++) {
@@ -884,26 +789,7 @@ KMX_DWORD KMX_get_VKUS_From_KeyCodeUnderlying(KMX_DWORD keycode) {
   return 0;
 }
 
-// _S2 TOP_7 ok
-std::wstring CodePointToWString(unsigned int codepoint) {
-  std::wstring str;
-
-  if constexpr (sizeof(wchar_t) > 2) {
-      str = static_cast<wchar_t>(codepoint);
-  }
-  else if (codepoint <= 0xFFFF) {
-      str = static_cast<wchar_t>(codepoint);
-  }
-  else {
-      codepoint -= 0x10000;
-      str.resize(2);
-      str[0] = static_cast<wchar_t>(0xD800 + ((codepoint >> 10) & 0x3FF));
-      str[1] = static_cast<wchar_t>(0xDC00 + (codepoint & 0x3FF));
-  }
-
-  return str;
-}
-std::u16string CodePointToString_16(unsigned int codepoint) {
+std::u16string CodePointToU16String(unsigned int codepoint) {
   std::u16string str;
 
   if constexpr (sizeof(wchar_t) > 2) {

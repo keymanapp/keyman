@@ -1,15 +1,6 @@
 #include "keymap.h"
 #include "deadkey.h"
 
-// _S2 TOP_7 ok
-/*v_dw_1D createLine(std::wstring  first, std::wstring second, KMX_DWORD number, std::wstring nameresult) {
-	v_dw_1D line;
-	line.push_back(convertNamesTo_DWORD_Value(first));
-	line.push_back(convertNamesTo_DWORD_Value(second));
-	//line.push_back(convertNamesTo_DWORD_Value(nameresult));
-	line.push_back(number);
-	return line;
-}*/
 v_dw_1D createLine(std::string  first, std::string second, KMX_DWORD number, std::string nameresult) {
 	v_dw_1D line;
 	line.push_back(convertNamesTo_DWORD_Value(first));
