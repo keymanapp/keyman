@@ -425,11 +425,11 @@ extension KeymanWebViewController {
     }
   }
 
-  func showBanner(_ display: Bool) {
-    let message = "Changing banner's alwaysShow property to \(display)"
+  func setUpBanner() {
+    let message = "Changing banner's alwaysShow property to true"
     os_log("%{public}s", log: KeymanEngineLogger.settings, type: .debug, message)
     SentryManager.breadcrumb(message, category: "engine", sentryLevel: .debug)
-    webView?.evaluateJavaScript("showBanner(\(display ? "true" : "false"))", completionHandler: nil)
+    webView?.evaluateJavaScript("showBanner(true)", completionHandler: nil)
   }
 
   func setBannerImage(to path: String) {
@@ -737,7 +737,7 @@ extension KeymanWebViewController: KeymanWebDelegate {
     }
 
     updateSpacebarText()
-    updateShowBannerSetting()
+    setUpBanner()
     setBannerImage(to: bannerImgPath)
     // Reset the keyboard's size.
     keyboardSize = kbSize
@@ -754,16 +754,6 @@ extension KeymanWebViewController: KeymanWebDelegate {
       NSObject.cancelPreviousPerformRequests(withTarget: self, selector: #selector(self.resetKeyboard), object: nil)
       perform(#selector(self.resetKeyboard), with: nil, afterDelay: 0.25)
       shouldReload = false
-    }
-  }
-
-  func updateShowBannerSetting() {
-    let userData = Storage.active.userDefaults
-    let alwaysShow = userData.bool(forKey: Key.optShouldShowBanner)
-    if !Manager.shared.isSystemKeyboard {
-      showBanner(false)
-    } else {
-      showBanner(alwaysShow)
     }
   }
 
@@ -1128,8 +1118,6 @@ extension KeymanWebViewController {
     isLoading = true
 
     updateSpacebarText()
-    // Check for a change of "always show banner" state
-    updateShowBannerSetting()
   }
 
   /*

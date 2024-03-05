@@ -427,20 +427,11 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
       case .doNothing:
         break
       }
-
-      // If we allow the system keyboard to show no banners, this line is needed
-      // for variable system keyboard height.
-      updateShowBannerSetting()
     } else { // Use in-app keyboard behavior instead.
       if !(Manager.shared.currentResponder?.showKeyboardPicker() ?? false) {
         _ = Manager.shared.switchToNextKeyboard
       }
     }
-  }
-
-  // Needed due to protection level on the `keymanWeb` property
-  func updateShowBannerSetting() {
-    keymanWeb.updateShowBannerSetting()
   }
 
   func updateSpacebarText() {
@@ -469,14 +460,7 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
   }
 
   public var isTopBarActive: Bool {
-    let userData = Storage.active.userDefaults
-    let alwaysShow = userData.bool(forKey: Key.optShouldShowBanner)
-
-    if alwaysShow || Manager.shared.isSystemKeyboard || keymanWeb.activeModel {
-      return true
-    }
-
-    return false
+    return true
   }
 
   public var activeTopBarHeight: CGFloat {
