@@ -8,3 +8,6 @@ containing helper functions such as:
 * MIT license text validation
 
 It is not intended for separate use.
+
+**Note:** developer/server depends on this module; adding extra dependencies may
+impact the bundling for that module too (#10872).

@@ -51,7 +51,14 @@ function singleToArray(o) {
 if (data.title.endsWith('ldmlKeyboard3.xsd')) {
     if (data?.properties?.keyboard3) {
         data.properties.keyboard3.type = 'object';
+
+        // add the xmlns property as allowed
+        if (!data.properties.keyboard3?.properties?.xmlns) {
+          data.properties.keyboard3.properties.xmlns = { type: 'string' };
+        }
     }
+
+
 
     arrayToSingle(data?.properties?.keyboard3?.properties?.vkeys);
     singleToArray(data?.definitions?.keys?.properties?.key);
@@ -83,6 +90,11 @@ if (data.title.endsWith('ldmlKeyboard3.xsd')) {
 if (data.title.endsWith('ldmlKeyboardTest3.xsd')) {
   if (data?.properties?.keyboardTest3) {
       data.properties.keyboardTest3.type = 'object';
+
+      // support this proactively
+      if (!data.properties.keyboardTest3?.properties?.xmlns) {
+        data.properties.keyboardTest3.properties.xmlns = { type: 'string' };
+      }
   }
 }
 

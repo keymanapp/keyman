@@ -33,16 +33,20 @@ export class AnalyzeOskRewritePua {
     };
 }
 
-// @public
+// Warning: (ae-internal-missing-underscore) The name "AnalyzerMessages" should be prefixed with an underscore because the declaration is marked as @internal
+//
+// @internal
 export class AnalyzerMessages {
+    // (undocumented)
     static readonly FATAL_UnexpectedException: number;
-    // @internal (undocumented)
-    static Fatal_UnexpectedException: (o: {
+    // (undocumented)
+    static readonly Fatal_UnexpectedException: (o: {
         e: any;
     }) => CompilerEvent;
+    // (undocumented)
     static readonly INFO_ScanningFile: number;
-    // @internal (undocumented)
-    static Info_ScanningFile: (o: {
+    // (undocumented)
+    static readonly Info_ScanningFile: (o: {
         type: string;
         name: string;
     }) => CompilerEvent;

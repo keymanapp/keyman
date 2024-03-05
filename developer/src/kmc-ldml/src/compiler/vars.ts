@@ -95,7 +95,7 @@ export class VarsCompiler extends SectionCompiler {
         }
       }
       // UnicodeSets
-      for (const { id, value } of variables.unicodeSet) {
+      for (const { id, value } of variables.uset) {
         addId(id);
         allUnicodeSets.add(id);
         const stringrefs = VariableParser.allStringReferences(value);
@@ -210,7 +210,7 @@ export class VarsCompiler extends SectionCompiler {
       this.addString(result, e, sections));
     variables?.set?.forEach((e) =>
       this.addSet(result, e, sections));
-    variables?.unicodeSet?.forEach((e) =>
+    variables?.uset?.forEach((e) =>
       this.addUnicodeSet(result, e, sections));
 
     // reload markers - TODO-LDML: double work!
@@ -243,12 +243,12 @@ export class VarsCompiler extends SectionCompiler {
     const items : string[] = VariableParser.setSplitter(value);
     result.sets.push(new SetVarItem(id, items, sections));
   }
-  addUnicodeSet(result: Vars, e: LDMLKeyboard.LKUnicodeSet, sections: DependencySections): void {
+  addUnicodeSet(result: Vars, e: LDMLKeyboard.LKUSet, sections: DependencySections): void {
     const { id } = e;
     let { value } = e;
     value = result.substituteStrings(value, sections);
     value = result.substituteUnicodeSets(value, sections);
-    result.unicodeSets.push(new UnicodeSetItem(id, value, sections, sections.usetparser));
+    result.usets.push(new UnicodeSetItem(id, value, sections, sections.usetparser));
   }
   // routines for using/substituting variables have been moved to the Vars class and its
   // properties
