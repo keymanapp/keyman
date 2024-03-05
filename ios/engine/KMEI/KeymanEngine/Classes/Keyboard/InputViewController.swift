@@ -73,7 +73,6 @@ private class CustomInputView: UIInputView, UIInputViewAudioFeedback {
 
   func setConstraints() {
     let innerView = keymanWeb.view!
-
     let guide = self.safeAreaLayoutGuide
 
     // Fallback on earlier versions
@@ -89,11 +88,13 @@ private class CustomInputView: UIInputView, UIInputViewAudioFeedback {
     kbdWidthConstraint.priority = .defaultHigh
     kbdWidthConstraint.isActive = true
 
+    let bannerHeight = InputViewController.topBarHeight
+
     // Cannot be met by the in-app keyboard, but helps to 'force' height for the system keyboard.
-    let portraitHeight = innerView.heightAnchor.constraint(equalToConstant: keymanWeb.constraintTargetHeight(isPortrait: true))
+    let portraitHeight = innerView.heightAnchor.constraint(equalToConstant: bannerHeight +  keymanWeb.constraintTargetHeight(isPortrait: true))
     portraitHeight.identifier = "Height constraint for portrait mode"
     portraitHeight.priority = .defaultHigh
-    let landscapeHeight = innerView.heightAnchor.constraint(equalToConstant: keymanWeb.constraintTargetHeight(isPortrait: false))
+    let landscapeHeight = innerView.heightAnchor.constraint(equalToConstant: bannerHeight + keymanWeb.constraintTargetHeight(isPortrait: false))
     landscapeHeight.identifier = "Height constraint for landscape mode"
     landscapeHeight.priority = .defaultHigh
 
@@ -104,22 +105,6 @@ private class CustomInputView: UIInputView, UIInputViewAudioFeedback {
 
   override func updateConstraints() {
     super.updateConstraints()
-
-    // Keep the constraints up-to-date!  They should vary based upon the selected keyboard.
-    let userData = Storage.active.userDefaults
-    let alwaysShow = userData.bool(forKey: Key.optShouldShowBanner)
-
-    var hideBanner = true
-    if alwaysShow || Manager.shared.isSystemKeyboard || keymanWeb.activeModel {
-      hideBanner = false
-    }
-    let topBarDelta = hideBanner ? 0 : InputViewController.topBarHeight
-
-    // Sets height before the constraints, as it's the height constraint that triggers OSK resizing.
-    keymanWeb.setBannerHeight(to: Int(InputViewController.topBarHeight))
-
-    portraitConstraint?.constant = topBarDelta + keymanWeb.constraintTargetHeight(isPortrait: true)
-    landscapeConstraint?.constant = topBarDelta + keymanWeb.constraintTargetHeight(isPortrait: false)
 
     // Activate / deactivate layout-specific constraints.
     if InputViewController.isPortrait {

@@ -131,6 +131,14 @@ class KeymanWebViewController: UIViewController {
     webView!.navigationDelegate = self
     webView!.scrollView.isScrollEnabled = false
 
+    // Disable WKWebView default layout-constraint manipulations. We ensure
+    // safe-area boundaries are respected via InputView / InputViewController
+    // contraints.
+    //
+    // Fixes #10859.
+    // Ref: https://stackoverflow.com/a/63741514
+    webView!.scrollView.contentInsetAdjustmentBehavior = .never
+
     view = webView
 
     // Set UILongPressGestureRecognizer to show sub keys
