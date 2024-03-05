@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 18.0.9 alpha 2024-03-05
+
+* chore: B17S2 merge beta to master (#10909)
+
 ## 18.0.8 alpha 2024-03-04
 
 * chore(linux): Update debian changelog (#10898)
