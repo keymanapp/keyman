@@ -60,9 +60,7 @@ export function defaultCasedSearchTermToKey(wordform: string, applyCasing: Casin
         // Remove any combining diacritics (if input is in NFKD)
         .replace(/[\u0300-\u036F]/g, '')
       ) // end of `Array.from`
-      .map(function(c) {
-        return applyCasing('lower', c)
-      })
+      .map(function(c) { return applyCasing('lower', c)})
       .join('')
       // Replace directional quotation marks with plain apostrophes
       .replace(/[‘’]/g, "'")
