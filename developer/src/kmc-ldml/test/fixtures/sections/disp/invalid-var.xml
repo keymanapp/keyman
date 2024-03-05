@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE keyboard3 SYSTEM "../../../../../../../resources/standards-data/ldml-keyboards/techpreview/dtd/ldmlKeyboard3.dtd">
+<keyboard3 locale="mt" conformsTo="techpreview">
+  <info name="disp-missing-vars"/>
+
+  <displays>
+    <display keyId="g" display="${missingdisplay}"/>
+    <display output="${missingoutput}" display="eee"/>
+  </displays>
+
+  <keys>
+    <key id="g" output="Something"/>
+  </keys>
+
+</keyboard3>

@@ -24,7 +24,7 @@ const struct CompilerError CompilerErrors[] = {
     { CERR_IndexInVirtualKeySection                      , "'index' command is illegal in virtual key section"},
     { CERR_BadCallParams                                 , "CompileKeyboardFile was called with bad parameters"},
     { CERR_InfileNotExist                                , "Cannot find the input file"},
-    { CERR_CannotCreateOutfile                           , "Cannot open output file for writing"},
+    // { CERR_CannotCreateOutfile                           , "Cannot open output file for writing"}, unused
     { CERR_UnableToWriteFully                            , "Unable to write the file completely"},
     { CERR_CannotReadInfile                              , "Cannot read the input file"},
     { CERR_SomewhereIGotItWrong                          , "Internal error: contact Keyman"},

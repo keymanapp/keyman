@@ -15,6 +15,7 @@ builder_describe "Build Keyman Developer web utility module" \
   "clean" \
   "configure" \
   "build" \
+  "api                       analyze API and prepare API documentation (no-op for now)" \
   "test" \
   publish \
   pack \

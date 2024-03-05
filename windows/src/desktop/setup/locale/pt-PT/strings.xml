@@ -72,9 +72,7 @@ Reiniciar agora?</string>
   <string name="ssDownloadingTitle">Baixando %0:s</string>
   <!-- Parameters: %0:s: filename -->
   <string name="ssDownloadingText">Baixando %0:s</string>
-  <string name="ssOffline">A configuração do $APPNAME não pôde se conectar a keyman.com para baixar recursos adicionais.
-
-Por favor, verifique se você está online e dê ao $APPNAME permissão de configuração para acessar a Internet nas suas configurações de firewall.
-
-Clique em Abortar para sair da instalação, tente tentar baixar os recursos novamente ou Ignorar para continuar offline.</string>
+  <string name="ssOffline">A configuração do $APPNAME não pôde se conectar a keyman.com para baixar recursos adicionais.</string>
+  <string name="ssOffline2">Por favor, verifique se você está online e dê ao $APPNAME permissão de configuração para acessar a Internet nas suas configurações de firewall.</string>
+  <string name="ssOffline3">Clique em Abortar para sair da instalação, tente tentar baixar os recursos novamente ou Ignorar para continuar offline.</string>
 </resources>
