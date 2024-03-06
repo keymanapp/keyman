@@ -3,6 +3,7 @@
 import datetime
 import logging
 import os
+import tempfile
 import time
 
 import requests
@@ -120,7 +121,11 @@ def keyman_cache_dir():
     cachebase = os.environ.get('XDG_CACHE_HOME', os.path.join(home, '.cache'))
     km_cache = os.path.join(cachebase, 'keyman')
     if not os.path.isdir(km_cache):
-        os.mkdir(km_cache)
+        try:
+            os.makedirs(km_cache)
+        except:
+            km_cache = tempfile.TemporaryDirectory().name
+            os.makedirs(km_cache)
     return km_cache
 
 

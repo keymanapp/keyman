@@ -18,6 +18,7 @@ builder_describe "Build Keyman kmc Lexical Model Compiler module" \
   "clean" \
   "configure" \
   "build" \
+  "api                       analyze API and prepare API documentation" \
   "test" \
   "pack                      build a local .tgz pack for testing" \
   "publish                   publish to npm" \
@@ -25,7 +26,8 @@ builder_describe "Build Keyman kmc Lexical Model Compiler module" \
 
 builder_describe_outputs \
   configure     /node_modules \
-  build         /developer/src/kmc-model/build/src/main.js
+  build         /developer/src/kmc-model/build/src/main.js \
+  api           /developer/build/api/kmc-model.api.json
 
 builder_parse "$@"
 
@@ -38,6 +40,7 @@ function do_build() {
 builder_run_action clean        rm -rf ./build/ ./tsconfig.tsbuildinfo
 builder_run_action configure    verify_npm_setup
 builder_run_action build        do_build
+builder_run_action api          api-extractor run --local --verbose
 builder_run_action test         npm test
 builder_run_action publish      builder_publish_to_npm
 builder_run_action pack         builder_publish_to_pack

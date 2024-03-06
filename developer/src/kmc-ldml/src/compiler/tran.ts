@@ -15,19 +15,33 @@ import LKTransform = LDMLKeyboard.LKTransform;
 import LKTransforms = LDMLKeyboard.LKTransforms;
 import { verifyValidAndUnique } from "../util/util.js";
 import { CompilerMessages } from "./messages.js";
-import { MarkerTracker, MarkerUse } from "./marker-tracker.js";
+import { Substitutions, SubstitutionUse } from "./substitution-tracker.js";
 
 type TransformCompilerType = 'simple' | 'backspace';
 
 export abstract class TransformCompiler<T extends TransformCompilerType, TranBase extends Tran> extends SectionCompiler {
 
-  static validateMarkers(keyboard: LDMLKeyboard.LKKeyboard, mt : MarkerTracker): boolean {
+  static validateSubstitutions(keyboard: LDMLKeyboard.LKKeyboard, st: Substitutions): boolean {
     keyboard?.transforms?.forEach(transforms =>
       transforms.transformGroup.forEach(transformGroup => {
         transformGroup.transform?.forEach(({ to, from }) => {
-          mt.add(MarkerUse.emit, MarkerParser.allReferences(to));
-          mt.add(MarkerUse.consume, MarkerParser.allReferences(from));
-        })}));
+          st.addSetAndStringSubtitution(SubstitutionUse.consume, from);
+          st.addSetAndStringSubtitution(SubstitutionUse.emit, to);
+          const mapFrom = VariableParser.CAPTURE_SET_REFERENCE.exec(from);
+          const mapTo = VariableParser.MAPPED_SET_REFERENCE.exec(to || '');
+          if (mapFrom) {
+            // add the 'from' as a match
+            st.set.add(SubstitutionUse.consume, [mapFrom[1]]);
+          }
+          if (mapTo) {
+            // add the 'from' as a match
+            st.set.add(SubstitutionUse.emit, [mapTo[1]]);
+          }
+        });
+        transformGroup.reorder?.forEach(({ before }) => {
+          st.addStringSubstitution(SubstitutionUse.consume, before);
+        });
+      }));
     return true;
   }
 
@@ -88,7 +102,9 @@ export abstract class TransformCompiler<T extends TransformCompilerType, TranBas
 
     if (transforms?.transformGroup) {
       for (let transformGroup of transforms.transformGroup) {
-        result.groups.push(this.compileTransformGroup(sections, transformGroup));
+        const tg = this.compileTransformGroup(sections, transformGroup);
+        if (!tg) return null; //error
+        result.groups.push(tg);
       }
     }
     return result;
@@ -115,6 +131,7 @@ export abstract class TransformCompiler<T extends TransformCompilerType, TranBas
       transforms: transforms.map(transform => this.compileTransform(sections, transform)),
       reorders: [],
     }
+    if (result.transforms.includes(null)) return null;
     return result;
   }
 
@@ -123,7 +140,6 @@ export abstract class TransformCompiler<T extends TransformCompilerType, TranBas
     let cookedFrom = transform.from;
 
     cookedFrom = sections.vars.substituteStrings(cookedFrom, sections);
-    // TODO: handle 'map' case
     const mapFrom = VariableParser.CAPTURE_SET_REFERENCE.exec(cookedFrom);
     const mapTo = VariableParser.MAPPED_SET_REFERENCE.exec(transform.to || '');
     if (mapFrom && mapTo) { // TODO-LDML: error cases
@@ -138,14 +154,27 @@ export abstract class TransformCompiler<T extends TransformCompilerType, TranBas
     // add in markers. idempotent if no markers.
     cookedFrom = sections.vars.substituteMarkerString(cookedFrom, true);
 
-    // don't unescape literals here, because we are going to pass them through into the regex
+    // check for incorrect \uXXXX escapes
+    cookedFrom = this.checkEscapes(cookedFrom); // check for \uXXXX escapes before normalizing
+    if (cookedFrom === null) return null; // error
+
+    // unescape from \u{} form to plain, or in some cases \uXXXX / \UXXXXXXXX for core
     cookedFrom = util.unescapeStringToRegex(cookedFrom);
 
-    this.checkRanges(cookedFrom); // check before normalizing
+    // check for denormalized ranges
+    cookedFrom = this.checkRanges(cookedFrom); // check before normalizing
 
     if (!sections?.meta?.normalizationDisabled) {
       // nfd here.
       cookedFrom = MarkerParser.nfd_markers(cookedFrom, true);
+    }
+
+    // Verify that the regex is syntactically valid
+    try {
+      new RegExp(cookedFrom, 'ug');
+    } catch (e) {
+      this.callbacks.reportMessage(CompilerMessages.Error_UnparseableTransformFrom({ from: transform.from, message: e.message }));
+      return null; // error
     }
 
     // cookedFrom is cooked above, since there's some special treatment
@@ -168,14 +197,25 @@ export abstract class TransformCompiler<T extends TransformCompilerType, TranBas
       transforms: [],
       reorders: reorders.map(reorder => this.compileReorder(sections, reorder)),
     }
+    if (result.reorders.includes(null)) return null; // if any of the reorders returned null, fail the entire group.
     return result;
   }
 
   private compileReorder(sections: DependencySections, reorder: LKReorder): TranReorder {
     let result = new TranReorder();
+    if (reorder.from && this.checkEscapes(reorder.from) === null) {
+      return null; // error'ed
+    }
+    if (reorder.before && this.checkEscapes(reorder.before) === null) {
+      return null; // error'ed
+    }
     result.elements = sections.elem.allocElementString(sections, reorder.from, reorder.order, reorder.tertiary, reorder.tertiaryBase, reorder.preBase);
     result.before = sections.elem.allocElementString(sections, reorder.before);
-    return result;
+    if (!result.elements || !result.before) {
+      return null; // already error'ed
+    } else {
+      return result;
+    }
   }
 
   public compile(sections: DependencySections): TranBase {
@@ -200,15 +240,45 @@ export abstract class TransformCompiler<T extends TransformCompilerType, TranBas
     return defaults;
   }
 
-  private checkRanges(cookedFrom: string) {
+  /**
+   * Analyze reorders and regexes for \uXXXX escapes.
+   * The LDML spec requires \u{XXXX} format.
+   * @param cookedFrom the original string
+   * @returns the original string, or null if an error was reported
+   */
+  private checkEscapes(cookedFrom: string): string | null {
+    if (!cookedFrom) return cookedFrom;
+
+    // should not follow marker prefix, nor marker prefix with range
+    const anyQuad = /(?<!\\uffff\\u0008(?:\[[0-9a-fA-F\\u-]*)?)\\u([0-9a-fA-F]{4})/g;
+
+    for (const [, sub] of cookedFrom.matchAll(anyQuad)) {
+      const s = util.unescapeOne(sub);
+      if (s !== '\uffff' && s !== '\u0008') { // markers
+        this.callbacks.reportMessage(CompilerMessages.Error_InvalidQuadEscape({ cp: s.codePointAt(0) }));
+        return null; // exit on the first error
+      }
+    }
+    return cookedFrom;
+  }
+
+  /**
+   * Analyze character classes such as '[a-z]' for denormalized characters.
+   * Escapes non-NFD characters as hex escapes.
+   * @param cookedFrom input regex string
+   * @returns updated 'from' string
+   */
+  private checkRanges(cookedFrom: string): string {
+    if (!cookedFrom) return cookedFrom;
+
     // extract all of the potential ranges - but don't match any-markers!
     const anyRange = /(?<!\\uffff\\u0008)\[([^\]]+)\]/g;
     const ranges = cookedFrom.matchAll(anyRange);
 
-    if (!ranges) return;
+    if (!ranges) return cookedFrom;
 
     // extract inner members of a range (inside the [])
-    const rangeRegex = /(\\u[0-9a-fA-F]{4}|.)-(\\u[0-9a-fA-F]{4}|.)|./g;
+    const rangeRegex = /(\\u\{[0-9a-fA-F]\}{1,6}|.)-(\\u\{[0-9a-fA-F]\}{1,6}|.)|./g;
 
     const rangeExplicit = new util.NFDAnalyzer();
     const rangeImplicit = new util.NFDAnalyzer();
@@ -217,8 +287,6 @@ export abstract class TransformCompiler<T extends TransformCompilerType, TranBas
     function processExplicit(s: string) {
       if (s.startsWith('\\u{')) {
         s = util.unescapeString(s);
-      } else if(s.startsWith('\\u')) {
-        s = util.unescapeOneQuadString(s);
       }
       rangeExplicit.add(s);
       return s;
@@ -246,16 +314,46 @@ export abstract class TransformCompiler<T extends TransformCompilerType, TranBas
     }
 
     // analyze ranges
+    let needCooking = false;
     const explicitSet = rangeExplicit.analyze()?.get(util.BadStringType.denormalized);
     if (explicitSet) {
       this.callbacks.reportMessage(CompilerMessages.Warn_CharClassExplicitDenorm({ lowestCh: explicitSet.values().next().value }));
+      needCooking = true;
     } else {
       // don't analyze the implicit set of THIS range, if explicit is already problematic
       const implicitSet = rangeImplicit.analyze()?.get(util.BadStringType.denormalized);
       if (implicitSet) {
         this.callbacks.reportMessage(CompilerMessages.Hint_CharClassImplicitDenorm({ lowestCh: implicitSet.values().next().value }));
+        needCooking = true;
       }
     }
+
+    // do we need to fixup the ranges?
+    // don't do this unless we flagged issues above
+    if (needCooking) {
+      // if we get here, there are some ranges with troublesome chars.
+      // we work around this by escaping all chars
+      function cookOne(s: string) {
+        if (s === '^') {
+          return s; // syntax
+        } else if (s.startsWith('\\u{') || s.startsWith('\\u')) {
+          return s; // already escaped
+        } else {
+          return util.escapeRegexChar(s);
+        }
+      }
+      return cookedFrom.replaceAll(anyRange, (ignored1: any, sub: string) => {
+        return '[' + sub.replaceAll(rangeRegex, (all: any, start: string, end: string) => {
+          if (!start && !end) {
+            // explicit single char
+            return cookOne(all); // matched one char
+          } else {
+            return cookOne(start) + '-' + cookOne(end);
+          }
+        }) + ']';
+      });
+    }
+    return cookedFrom; // no change
   }
 }
 

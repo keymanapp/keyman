@@ -5,13 +5,13 @@
 #
 
 
-# keyboards in resources/standards-data/ldml-keyboards/techpreview/3.0/
-# tests     in resources/standards-data/ldml-keyboards/techpreview/test/
+# keyboards in resources/standards-data/ldml-keyboards/45/3.0/
+# tests     in resources/standards-data/ldml-keyboards/45/test/
 tests_from_cldr = [
   'ja-Latn',
   'pt-t-k0-abnt2',
   # 'fr-t-k0-optimise', (not yet)
-  # 'fr-t-k0-test',
+  'fr-t-k0-azerty',
   'pcm',
   'bn',
 ]
@@ -33,6 +33,7 @@ tests_without_testdata = [
 
 # These tests have a k_001_tiny-test.xml file as well.
 tests_with_testdata = [
+  'ldml_test',
   'k_001_tiny',
   'k_006_backspace',
   'k_007_transform_rgx',
@@ -54,7 +55,7 @@ tests += tests_from_cldr
 # Setup kmc
 
 kmc_root = join_paths(meson.source_root(),'..','developer','src','kmc')
-ldml_root = join_paths(meson.source_root(),'..','resources','standards-data','ldml-keyboards','techpreview')
+ldml_root = join_paths(meson.source_root(),'..','resources','standards-data','ldml-keyboards','45')
 ldml_data = join_paths(ldml_root, '3.0')
 ldml_testdata = join_paths(ldml_root, 'test')
 kmc_cmd = [node, '--enable-source-maps', kmc_root]

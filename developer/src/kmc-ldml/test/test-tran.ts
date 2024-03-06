@@ -3,6 +3,7 @@ import { assert } from 'chai';
 import { TranCompiler, BkspCompiler } from '../src/compiler/tran.js';
 import { BASIC_DEPENDENCIES, UsetCompiler } from '../src/compiler/empty-compiler.js';
 import { CompilerMessages } from '../src/compiler/messages.js';
+import { CompilerMessages as KmnOtherCompilerMessages } from '@keymanapp/kmc-kmn';
 import { assertCodePoints, compilerTestCallbacks, testCompilationCases } from './helpers/index.js';
 import { KMXPlus, MarkerParser } from '@keymanapp/common-types';
 
@@ -263,6 +264,84 @@ describe('tran', function () {
         CompilerMessages.Hint_CharClassImplicitDenorm({lowestCh: 0xC0}),
       ],
     },
+    {
+      subpath: 'sections/tran/fail-bad-reorder-1.xml',
+      errors: [
+        KmnOtherCompilerMessages.Error_UnicodeSetSyntaxError()
+      ],
+    },
+    {
+      subpath: 'sections/tran/fail-bad-reorder-2.xml',
+      errors: [
+        CompilerMessages.Error_InvalidQuadEscape({ cp: 0x1a6b }),
+      ],
+    },
+    {
+      subpath: 'sections/tran/fail-bad-reorder-3.xml',
+      errors: [
+        CompilerMessages.Error_InvalidQuadEscape({ cp: 0x1a60 }),
+      ],
+    },
+    // error due to bad regex
+    {
+      subpath: `sections/tran/fail-bad-tran-1.xml`,
+      errors: [
+        { code: CompilerMessages.ERROR_UnparseableTransformFrom,
+          matchMessage: /Invalid regular expression.*Unterminated group/,
+        }
+      ],
+    },
+    {
+      subpath: `sections/tran/fail-bad-tran-2.xml`,
+      errors: [
+        CompilerMessages.Error_InvalidQuadEscape({ cp: 295 }),
+      ],
+    },
+    {
+      subpath: `sections/tran/fail-missing-var-1.xml`,
+      errors: [
+        CompilerMessages.Error_MissingStringVariable({ id: "missingfrom" }),
+      ],
+    },
+    {
+      subpath: `sections/tran/fail-missing-var-2.xml`,
+      errors: [
+        CompilerMessages.Error_MissingStringVariable({ id: "missingto" }),
+      ],
+    },
+    {
+      subpath: `sections/tran/fail-missing-var-3.xml`,
+      errors: [
+        CompilerMessages.Error_MissingSetVariable({ id: "missingset" }),
+      ],
+    },
+    {
+      subpath: `sections/tran/fail-missing-var-4.xml`,
+      errors: [
+        CompilerMessages.Error_MissingSetVariable({ id: "missingset" }),
+      ],
+    },
+    {
+      subpath: `sections/tran/fail-missing-var-5.xml`,
+      errors: [
+        CompilerMessages.Error_MissingSetVariable({ id: "missingset" }),
+      ],
+    },
+    {
+      subpath: `sections/tran/fail-missing-var-6.xml`,
+      errors: [
+        CompilerMessages.Error_MissingStringVariable({ id: "missingstr" }),
+      ],
+    },
+    // escaping
+    {
+      subpath: `sections/tran/tran-escape.xml`,
+      callback(sect) {
+        const tran = <Tran>sect;
+        assert.ok(tran);
+      },
+    }
+
   ], tranDependencies);
 });
 

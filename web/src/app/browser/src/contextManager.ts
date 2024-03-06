@@ -1,7 +1,7 @@
 import { type Keyboard, KeyboardScriptError } from '@keymanapp/keyboard-processor';
 import { type KeyboardStub } from 'keyman/engine/package-cache';
 import { CookieSerializer } from 'keyman/engine/dom-utils';
-import { eventOutputTarget, PageContextAttachment } from 'keyman/engine/attachment';
+import { eventOutputTarget, outputTargetForElement, PageContextAttachment } from 'keyman/engine/attachment';
 import { DomEventTracker, LegacyEventEmitter } from 'keyman/engine/events';
 import { DesignIFrame, OutputTarget, nestedInstanceOf } from 'keyman/engine/element-wrappers';
 import {
@@ -121,6 +121,10 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
             this.domEventTracker.attachDOMEvent(Lelem.body,'focus', this._ControlFocus);
             this.domEventTracker.attachDOMEvent(Lelem.body,'blur', this._ControlBlur);
           }
+        }
+
+        if(elem.ownerDocument.activeElement == elem) {
+          this.setActiveTarget(outputTargetForElement(elem), true);
         }
       });
 

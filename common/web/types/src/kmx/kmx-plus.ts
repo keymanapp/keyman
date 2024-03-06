@@ -43,6 +43,7 @@ export class Elem extends Section {
    */
   allocElementString(sections: DependencySections, source: string | string[], order?: string, tertiary?: string, tertiary_base?: string, prebase?: string): ElementString {
     let s = ElementString.fromStrings(sections, source, order, tertiary, tertiary_base, prebase);
+    if (!s) return s;
     let result = this.strings.find(item => item.isEqual(s));
     if(result === undefined) {
       result = s;
@@ -227,19 +228,19 @@ export class Strs extends Section {
  */
 export class Vars extends Section {
   totalCount() : number {
-    return this.strings.length + this.sets.length + this.unicodeSets.length;
+    return this.strings.length + this.sets.length + this.usets.length;
   }
   markers: ListItem;
   strings: StringVarItem[] = []; // ≠ StrsItem
   sets: SetVarItem[] = [];
-  unicodeSets: UnicodeSetItem[] = [];
+  usets: UnicodeSetItem[] = [];
 
   /**
    *
    * @returns false if any invalid variables
    */
   valid() : boolean {
-    for (const t of [this.sets, this.strings, this.unicodeSets]) {
+    for (const t of [this.sets, this.strings, this.usets]) {
       for (const i of t) {
         if (!i.valid()) {
           return false;
@@ -263,7 +264,7 @@ export class Vars extends Section {
   }
   substituteUnicodeSets(value: string, sections: DependencySections): string {
     return value.replaceAll(VariableParser.SET_REFERENCE, (_entire, id) => {
-      const v = Vars.findVariable(this.unicodeSets, id);
+      const v = Vars.findVariable(this.usets, id);
       if (v === null) {
         // Should have been caught during validation.
         throw Error(`Internal Error: reference to missing UnicodeSet variable ${id}`);
@@ -296,7 +297,7 @@ export class Vars extends Section {
       }
 
       // try as unicodeset
-      const uset = Vars.findVariable(this.unicodeSets, id);
+      const uset = Vars.findVariable(this.usets, id);
       if (uset !== null) {
         const { unicodeSet } = uset;
         const inner = unicodeSet.ranges.map(([start, end]) => {

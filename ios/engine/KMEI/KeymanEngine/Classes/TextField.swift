@@ -19,7 +19,6 @@ public class TextField: UITextField, KeymanResponder {
   public var isInputClickSoundEnabled = true
 
   private var delegateProxy: TextFieldDelegateProxy!
-  private var shouldUpdateKMText = false
 
   private var keyboardChangedObserver: NotificationObserver?
 
@@ -52,8 +51,6 @@ public class TextField: UITextField, KeymanResponder {
 
     self.inputView = Manager.shared.inputViewController.view
 
-    NotificationCenter.default.addObserver(self, selector: #selector(self.textFieldTextDidChange),
-                                           name: UITextField.textDidChangeNotification, object: self)
     keyboardChangedObserver = NotificationCenter.default.addObserver(forName: Notifications.keyboardChanged,
                                                                      observer: self,
                                                                      function: TextField.keyboardChanged)
@@ -155,19 +152,6 @@ public class TextField: UITextField, KeymanResponder {
   @objc func enableInputClickSound() {
     isInputClickSoundEnabled = true
   }
-
-  @objc func textFieldTextDidChange(_ notification: Notification) {
-    if shouldUpdateKMText {
-      // Catches copy/paste operations
-      let textRange = selectedTextRange!
-      let newRange = NSRange(location: offset(from: beginningOfDocument, to: textRange.start),
-                             length: offset(from: textRange.start, to: textRange.end))
-
-      Manager.shared.setContextState(text: text, range: newRange)
-      // This is called when editing in-app; do not reset context here.
-      shouldUpdateKMText = false
-    }
-  }
 }
 
 extension KeymanResponder where Self: TextField {
@@ -196,12 +180,6 @@ extension KeymanResponder where Self: TextField {
 
 // MARK: - UITextFieldDelegate
 extension TextField: UITextFieldDelegate {
-  public func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange,
-                        replacementString string: String) -> Bool {
-    shouldUpdateKMText = true // Enable text update to catch copy/paste operations
-    return true
-  }
-
   public func textFieldShouldClear(_ textField: UITextField) -> Bool {
     if textField == self {
       Manager.shared.clearText()

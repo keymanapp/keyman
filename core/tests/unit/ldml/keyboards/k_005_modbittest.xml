@@ -6,8 +6,7 @@
 @@expected: \u0061\u0041\u0062\u0063\u0064\u0064\u0065\u0066\u0067\u0067
 
 -->
-<!DOCTYPE keyboard3 SYSTEM "../../../../../resources/standards-data/ldml-keyboards/techpreview/dtd/ldmlKeyboard3.dtd">
-<keyboard3 locale="mt" conformsTo="techpreview">
+<keyboard3 xmlns="https://schemas.unicode.org/cldr/45/keyboard3" locale="mt" conformsTo="45">
   <info author="srl295" indicator="🙀" layout="qwerty"  name="TestKbd"/>
 
   <keys/> <!-- implied only -->

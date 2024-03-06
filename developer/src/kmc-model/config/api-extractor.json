@@ -1,0 +1,12 @@
+/**
+ * Config file for API Extractor.  For more info, please visit: https://api-extractor.com
+ */
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/api-extractor/v7/api-extractor.schema.json",
+  "extends": "../../../config/api-extractor.base.json",
+  "mainEntryPointFilePath": "<projectFolder>/build/src/main.d.ts",
+  "docModel": {
+    "enabled": true,
+    "projectFolderUrl": "http://github.com/keymanapp/keyman/tree/master/developer/src/kmc-model"
+  }
+}

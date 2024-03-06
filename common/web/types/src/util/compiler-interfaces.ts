@@ -7,6 +7,11 @@ export interface CompilerEvent {
   code: number;
   message: string;
   /**
+   * detailed Markdown-formatted description of the error including
+   * references to documentation, remediation options.
+   */
+  detail?: string;
+  /**
    * an internal error occurred that should be captured with a stack trace
    * e.g. to the Keyman sentry instance by kmc
    */
@@ -89,7 +94,7 @@ export class CompilerError {
    * ```
    */
   static formatCode(code: number): string {
-    return 'KM' + CompilerError.error(code).toString(16).toUpperCase().padStart(5, '0');
+    return Number.isInteger(code) ? 'KM' + CompilerError.error(code).toString(16).toUpperCase().padStart(5, '0') : 'KM?????';
   }
 
   /**
@@ -524,24 +529,28 @@ export const defaultCompilerOptions: CompilerOptions = {
 
 /**
  * Convenience function for constructing CompilerEvents
- * @param code
- * @param message
+ * @param code     Unique numeric value of the event
+ * @param message  A short description of the error presented to the user
+ * @param detail   Detailed Markdown-formatted description of the error
+ *                 including references to documentation, remediation options.
  * @returns
  */
-export const CompilerMessageSpec = (code: number, message: string, exceptionVar?: any) : CompilerEvent => ({
+export const CompilerMessageSpec = (code: number, message: string, detail?: string) : CompilerEvent => ({
+  code,
+  message,
+  detail,
+});
+
+export const CompilerMessageDef = (param: any) => String(param ?? `<param>`);
+
+export const CompilerMessageSpecWithException = (code: number, message: string, exceptionVar: any, detail?: string) : CompilerEvent => ({
   code,
   message: exceptionVar
     ? (message ?? `Unexpected exception`) + `: ${exceptionVar.toString()}\n\nCall stack:\n${(exceptionVar instanceof Error ? exceptionVar.stack : (new Error()).stack)}` :
     message,
-  exceptionVar
+  detail,
+  exceptionVar,
 });
-
-/**
- * @deprecated use `CompilerError.exceptionToString` instead
- */
-export function compilerExceptionToString(e?: any) : string {
-  return CompilerError.exceptionToString(e);
-}
 
 /**
  * Compiler logging level and correspondence to severity
