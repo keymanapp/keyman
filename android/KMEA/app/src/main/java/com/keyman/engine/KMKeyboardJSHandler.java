@@ -297,12 +297,13 @@ public class KMKeyboardJSHandler {
       expectedChars = "";
     }
     ic.deleteSurroundingText(dn + numPairs, 0);
-    CharSequence newContext = getCharacterSequence(ic, originalBufferLength - 2*dn);
+    // Shorten the retrieved context by exactly as many characters as were just deleted.
+    CharSequence newContext = getCharacterSequence(ic, originalBufferLength - dn - numPairs);
 
     CharSequence charsToRestore = CharSequenceUtil.restoreChars(expectedChars, newContext);
     if (charsToRestore.length() > 0) {
       // Restore expectedChars that Chromium deleted.
-      // Use newCusorPosition 1 so cursor will be after the inserted string
+      // Use newCursorPosition 1 so cursor will be after the inserted string
       ic.commitText(charsToRestore, 1);
     }
   }
