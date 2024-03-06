@@ -153,7 +153,7 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
   }
 
   var expandedHeight: CGFloat {
-    return keymanWeb.keyboardHeight + activeTopBarHeight
+    return keymanWeb.keyboardHeight + InputViewController.topBarHeight
   }
 
   public convenience init() {
@@ -457,15 +457,6 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
     baseWidthConstraint = self.inputView!.widthAnchor.constraint(equalTo: parent!.view.safeAreaLayoutGuide.widthAnchor)
     baseWidthConstraint.priority = UILayoutPriority(rawValue: 999)
     baseWidthConstraint.isActive = true
-  }
-
-  public var isTopBarActive: Bool {
-    return true
-  }
-
-  public var activeTopBarHeight: CGFloat {
-    // If 'isSystemKeyboard' is true, always show the top bar.
-    return isTopBarActive ? CGFloat(InputViewController.topBarHeight) : 0
   }
 
   public var kmwHeight: CGFloat {
