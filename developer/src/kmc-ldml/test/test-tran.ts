@@ -333,6 +333,15 @@ describe('tran', function () {
         CompilerMessages.Error_MissingStringVariable({ id: "missingstr" }),
       ],
     },
+    // escaping
+    {
+      subpath: `sections/tran/tran-escape.xml`,
+      callback(sect) {
+        const tran = <Tran>sect;
+        assert.ok(tran);
+      },
+    }
+
   ], tranDependencies);
 });
 
