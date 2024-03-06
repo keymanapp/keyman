@@ -1,5 +1,16 @@
 # Keyman Version History
 
+## 17.0.283 beta 2024-03-06
+
+* fix(android): fixes context-change detection for repeated-char cases (#10873)
+* fix(developer): search-term quote replacement was not global (#10934)
+*  (#10913)
+* fix(developer): fix for errant \uXXXX error (#10946)
+*  (#10948)
+* refactor(oem/fv/android): Install fallback keyboard (#10907)
+* refactor(android/app): Move storage permission checks (#10904)
+* fix(common): missing script exec bit (#10951)
+
 ## 17.0.282 beta 2024-03-05
 
 * fix(developer): move osk.ts from developer-utils to kmc-kmn (#10903)
