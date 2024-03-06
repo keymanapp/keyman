@@ -425,13 +425,6 @@ extension KeymanWebViewController {
     }
   }
 
-  func setUpBanner() {
-    let message = "Changing banner's alwaysShow property to true"
-    os_log("%{public}s", log: KeymanEngineLogger.settings, type: .debug, message)
-    SentryManager.breadcrumb(message, category: "engine", sentryLevel: .debug)
-    webView?.evaluateJavaScript("showBanner(true)", completionHandler: nil)
-  }
-
   func setBannerImage(to path: String) {
     bannerImgPath = path // Save the path in case delayed initializaiton is needed.
     var logString: String
@@ -737,7 +730,6 @@ extension KeymanWebViewController: KeymanWebDelegate {
     }
 
     updateSpacebarText()
-    setUpBanner()
     setBannerImage(to: bannerImgPath)
     // Reset the keyboard's size.
     keyboardSize = kbSize
