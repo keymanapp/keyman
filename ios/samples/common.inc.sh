@@ -36,9 +36,13 @@ function execute_sample_build() {
   builder_parse "$@"
 
   local CONFIG=Release
-  if builder_is_debug_build; then
+  # `builder_is_debug_build` appears to fail here, while referring to the option does not?
+  # Perhaps it's due to being within a function?
+  if builder_has_option --debug; then
     CONFIG="Debug"
   fi
+
+  echo "CONFIG = ${CONFIG}"
 
   local BUILD_FOLDER="ios/samples/$TARGET/build"
 
