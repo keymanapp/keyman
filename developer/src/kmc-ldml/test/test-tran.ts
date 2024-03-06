@@ -286,9 +286,9 @@ describe('tran', function () {
     {
       subpath: `sections/tran/fail-bad-tran-1.xml`,
       errors: [
-        CompilerMessages.Error_UnparseableTransformFrom({ from: 'AB(now if only I would terminate this group..',
-        // this message is dependent on v8, so this test could be a little brittle.
-        message: 'Invalid regular expression: /AB(now if only I would terminate this group../: Unterminated group' }),
+        { code: CompilerMessages.ERROR_UnparseableTransformFrom,
+          matchMessage: /Invalid regular expression.*Unterminated group/,
+        }
       ],
     },
     {
@@ -333,6 +333,15 @@ describe('tran', function () {
         CompilerMessages.Error_MissingStringVariable({ id: "missingstr" }),
       ],
     },
+    // escaping
+    {
+      subpath: `sections/tran/tran-escape.xml`,
+      callback(sect) {
+        const tran = <Tran>sect;
+        assert.ok(tran);
+      },
+    }
+
   ], tranDependencies);
 });
 
