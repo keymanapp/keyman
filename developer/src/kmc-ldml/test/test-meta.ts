@@ -16,7 +16,7 @@ describe('meta', function () {
     assert.equal(compilerTestCallbacks.messages.length, 0);
 
     assert.isEmpty(meta.author.value);        // TODO-LDML: default author string "unknown"?
-    assert.equal(meta.conform.value, 'techpreview');
+    assert.equal(meta.conform.value, '45');
     assert.isEmpty(meta.layout.value);        // TODO-LDML: assumed layout?
     assert.isEmpty(meta.indicator.value);     // TODO-LDML: synthesize an indicator?
     assert.equal(meta.settings, KeyboardSettings.none);
@@ -28,7 +28,7 @@ describe('meta', function () {
     assert.equal(compilerTestCallbacks.messages.length, 0);
 
     assert.equal(meta.author.value, 'The Keyman Team');
-    assert.equal(meta.conform.value, 'techpreview');
+    assert.equal(meta.conform.value, '45');
     assert.equal(meta.layout.value, 'QWIRKY');
     assert.equal(meta.indicator.value, 'QW');
     assert.equal(meta.version.value, "1.2.3");

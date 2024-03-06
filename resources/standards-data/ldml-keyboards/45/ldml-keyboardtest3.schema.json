@@ -220,6 +220,6 @@
   "required": [
     "keyboardTest3"
   ],
-  "title": "techpreview/dtd/ldmlKeyboardTest3.xsd",
+  "title": "45/dtd/ldmlKeyboardTest3.xsd",
   "type": "object"
 }

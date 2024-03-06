@@ -57,13 +57,13 @@ class Constants {
    */
   readonly version = '1.0';
   /**
-   * The techpreview CLDR version
+   * The current CLDR version
    */
-  readonly cldr_version_techpreview = 'techpreview';
+  readonly cldr_version_latest = '45';
   /**
-   * The latest CLDR version
+   * The version for testdata files
    */
-  readonly cldr_version_latest = this.cldr_version_techpreview;
+  readonly cldr_test_version_latest = 'techpreview';
   /**
    * import base
    */
@@ -71,11 +71,11 @@ class Constants {
   /**
    * implied keys file
    */
-  readonly cldr_implied_keys_import = `${this.cldr_version_techpreview}/keys-Latn-implied.xml`;
+  readonly cldr_implied_keys_import = `${this.cldr_version_latest}/keys-Latn-implied.xml`;
   /**
    * implied scancodes file
    */
-  readonly cldr_implied_forms_import = `${this.cldr_version_techpreview}/scanCodes-implied.xml`;
+  readonly cldr_implied_forms_import = `${this.cldr_version_latest}/scanCodes-implied.xml`;
   /**
    * Length of a raw section header, in bytes
    */
