@@ -42,8 +42,6 @@ function execute_sample_build() {
     CONFIG="Debug"
   fi
 
-  echo "CONFIG = ${CONFIG}"
-
   local BUILD_FOLDER="ios/samples/$TARGET/build"
 
   builder_describe_outputs \
