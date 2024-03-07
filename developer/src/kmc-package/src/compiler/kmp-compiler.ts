@@ -199,6 +199,8 @@ export class KmpCompiler implements KeymanCompiler {
     return kps;
   }
 
+  readonly normalizePath = (path: string) => path || path === '' ? path.trim().replaceAll('\\','/') : undefined;
+
   /**
    * @internal
    */
@@ -230,13 +232,13 @@ export class KmpCompiler implements KeymanCompiler {
     //
 
     if(kps.Options) {
-      kmp.options.executeProgram = kps.Options.ExecuteProgram || undefined;
-      kmp.options.graphicFile = kps.Options.GraphicFile || undefined;
-      kmp.options.msiFilename = kps.Options.MsiFileName || undefined;
-      kmp.options.msiOptions = kps.Options.MsiOptions || undefined;
-      kmp.options.readmeFile = kps.Options.ReadMeFile || undefined;
-      kmp.options.licenseFile = kps.Options.LicenseFile || undefined;
-      kmp.options.welcomeFile = kps.Options.WelcomeFile || undefined;
+      kmp.options.executeProgram = this.normalizePath(kps.Options.ExecuteProgram || undefined);
+      kmp.options.graphicFile = this.normalizePath(kps.Options.GraphicFile || undefined);
+      kmp.options.msiFilename = this.normalizePath(kps.Options.MSIFileName || undefined);
+      kmp.options.msiOptions = kps.Options.MSIOptions || undefined;
+      kmp.options.readmeFile = this.normalizePath(kps.Options.ReadMeFile || undefined);
+      kmp.options.licenseFile = this.normalizePath(kps.Options.LicenseFile || undefined);
+      kmp.options.welcomeFile = this.normalizePath(kps.Options.WelcomeFile || undefined);
     }
 
     //
@@ -266,7 +268,7 @@ export class KmpCompiler implements KeymanCompiler {
     if(kps.Files && kps.Files.File) {
       kmp.files = this.arrayWrap(kps.Files.File).map((file: KpsFile.KpsFileContentFile) => {
         return {
-          name: file.Name.trim().replaceAll('\\','/'),
+          name: this.normalizePath(file.Name),
           description: file.Description.trim(),
           copyLocation: parseInt(file.CopyLocation, 10) || undefined
           // note: we don't emit fileType as that is not permitted in kmp.json
@@ -296,8 +298,8 @@ export class KmpCompiler implements KeymanCompiler {
 
     if(kps.Keyboards && kps.Keyboards.Keyboard) {
       kmp.keyboards = this.arrayWrap(kps.Keyboards.Keyboard).map((keyboard: KpsFile.KpsFileKeyboard) => ({
-        displayFont: keyboard.DisplayFont ? this.callbacks.path.basename(keyboard.DisplayFont) : undefined,
-        oskFont: keyboard.OSKFont ? this.callbacks.path.basename(keyboard.OSKFont) : undefined,
+        displayFont: keyboard.DisplayFont ? this.callbacks.path.basename(this.normalizePath(keyboard.DisplayFont)) : undefined,
+        oskFont: keyboard.OSKFont ? this.callbacks.path.basename(this.normalizePath(keyboard.OSKFont)) : undefined,
         name:keyboard.Name.trim(),
         id:keyboard.ID.trim(),
         version:keyboard.Version.trim(),
@@ -312,12 +314,12 @@ export class KmpCompiler implements KeymanCompiler {
           undefined,
         webDisplayFonts: keyboard.WebDisplayFonts ?
           (this.arrayWrap(keyboard.WebDisplayFonts.Font) as KpsFile.KpsFileFont[]).map(
-            e => (this.callbacks.path.basename(e.$.Filename))
+            e => (this.callbacks.path.basename(this.normalizePath(e.$.Filename)))
           ) :
           undefined,
         webOskFonts: keyboard.WebOSKFonts ?
           (this.arrayWrap(keyboard.WebOSKFonts.Font) as KpsFile.KpsFileFont[]).map(
-            e => (this.callbacks.path.basename(e.$.Filename))
+            e => (this.callbacks.path.basename(this.normalizePath(e.$.Filename)))
           ) :
           undefined,
       }));
