@@ -21,29 +21,76 @@ const KMP_INF_FILENAME = 'kmp.inf';
 // this filename for existing keyboard packages.
 const WELCOME_HTM_FILENAME = 'welcome.htm';
 
+/**
+ * @public
+ * Options for the .kps compiler
+ */
 export interface KmpCompilerOptions extends CompilerOptions {
   // Note: WindowsPackageInstallerCompilerOptions extends KmpCompilerOptions, so
   // be careful when modifying this interface
 };
 
+/**
+ * @public
+ * Internal in-memory build artifacts from a successful compilation
+ */
 export interface KmpCompilerArtifacts extends KeymanCompilerArtifacts {
+  /**
+   * Binary keyboard package filedata and filename - installable into Keyman
+   * desktop and mobile projects
+   */
   kmp: KeymanCompilerArtifact;
 };
 
+/**
+ * @public
+ * Build artifacts from the .kps compiler
+ */
 export interface KmpCompilerResult extends KeymanCompilerResult {
+  /**
+   * Internal in-memory build artifacts from a successful compilation. Caller
+   * can write these to disk with {@link KmpCompiler.write}
+   */
   artifacts: KmpCompilerArtifacts;
 };
 
+/**
+ * @public
+ * Compiles a .kps file to a .kmp archive. The compiler does not read or write
+ * from filesystem or network directly, but relies on callbacks for all external
+ * IO.
+ */
 export class KmpCompiler implements KeymanCompiler {
   private callbacks: CompilerCallbacks;
   private options: KmpCompilerOptions;
 
+  /**
+   * Initialize the compiler.
+   * Copies options.
+   * @param callbacks - Callbacks for external interfaces, including message
+   *                    reporting and file io
+   * @param options   - Compiler options
+   * @returns false if initialization fails
+   */
   public async init(callbacks: CompilerCallbacks, options: KmpCompilerOptions): Promise<boolean> {
     this.callbacks = callbacks;
     this.options = options ? {...options} : {};
     return true;
   }
 
+  /**
+   * Compiles a .kps file to .kmp file. Returns an object containing binary
+   * artifacts on success. The files are passed in by name, and the compiler
+   * will use callbacks as passed to the {@link KmpCompiler.init} function
+   * to read any input files by disk.
+   * @param infile  - Path to source file. Path will be parsed to find relative
+   *                  references in the .kmn file, such as icon or On Screen
+   *                  Keyboard file
+   * @param outfile - Path to output file. The file will not be written to, but
+   *                  will be included in the result for use by
+   *                  {@link KmpCompiler.write}.
+   * @returns         Binary artifacts on success, null on failure.
+   */
   public async run(inputFilename: string, outputFilename?: string): Promise<KmpCompilerResult> {
     const kmpJsonData = this.transformKpsToKmpObject(inputFilename);
     if(!kmpJsonData) {
@@ -80,11 +127,24 @@ export class KmpCompiler implements KeymanCompiler {
     return result;
   }
 
+  /**
+   * Write artifacts from a successful compile to disk, via callbacks methods.
+   * The artifacts written may include:
+   *
+   * - .kmp file - binary keyboard package used by Keyman on desktop and touch
+   *   platforms
+   *
+   * @param artifacts - object containing artifact binary data to write out
+   * @returns true on success
+   */
   public async write(artifacts: KmpCompilerArtifacts): Promise<boolean> {
     this.callbacks.fs.writeFileSync(artifacts.kmp.filename, artifacts.kmp.data);
     return true;
   }
 
+  /**
+   * @internal
+   */
   public transformKpsToKmpObject(kpsFilename: string): KmpJsonFile.KmpJsonFile {
     const kps = this.loadKpsFile(kpsFilename);
     if(!kps) {
@@ -105,6 +165,9 @@ export class KmpCompiler implements KeymanCompiler {
     return kmp;
   }
 
+  /**
+   * @internal
+   */
   public loadKpsFile(kpsFilename: string): KpsFile.KpsFile {
     // Load the KPS data from XML as JS structured data.
     const buffer = this.callbacks.loadFile(kpsFilename);
@@ -138,6 +201,9 @@ export class KmpCompiler implements KeymanCompiler {
 
   readonly normalizePath = (path: string) => path || path === '' ? path.trim().replaceAll('\\','/') : undefined;
 
+  /**
+   * @internal
+   */
   public transformKpsFileToKmpObject(kpsFilename: string, kps: KpsFile.KpsFile): KmpJsonFile.KmpJsonFile {
 
     //
@@ -403,6 +469,7 @@ export class KmpCompiler implements KeymanCompiler {
   }
 
   /**
+   * @internal
    * Returns a Promise to the serialized data which can then be written to a .kmp file.
    *
    * @param kpsFilename - Filename of the kps, not read, used only for calculating relative paths

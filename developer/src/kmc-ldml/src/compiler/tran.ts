@@ -154,12 +154,12 @@ export abstract class TransformCompiler<T extends TransformCompilerType, TranBas
     // add in markers. idempotent if no markers.
     cookedFrom = sections.vars.substituteMarkerString(cookedFrom, true);
 
-    // don't unescape literals here, because we are going to pass them through into the regex
-    cookedFrom = util.unescapeStringToRegex(cookedFrom);
-
     // check for incorrect \uXXXX escapes
     cookedFrom = this.checkEscapes(cookedFrom); // check for \uXXXX escapes before normalizing
     if (cookedFrom === null) return null; // error
+
+    // unescape from \u{} form to plain, or in some cases \uXXXX / \UXXXXXXXX for core
+    cookedFrom = util.unescapeStringToRegex(cookedFrom);
 
     // check for denormalized ranges
     cookedFrom = this.checkRanges(cookedFrom); // check before normalizing
