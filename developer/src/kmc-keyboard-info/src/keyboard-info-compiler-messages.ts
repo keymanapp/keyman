@@ -7,6 +7,9 @@ const SevWarn = CompilerErrorSeverity.Warn | Namespace;
 const SevError = CompilerErrorSeverity.Error | Namespace;
 const SevFatal = CompilerErrorSeverity.Fatal | Namespace;
 
+/**
+ * @internal
+ */
 export class KeyboardInfoCompilerMessages {
   static FATAL_UnexpectedException = SevFatal | 0x0001;
   static Fatal_UnexpectedException = (o:{e: any}) => CompilerMessageSpecWithException(this.FATAL_UnexpectedException, null, o.e ?? 'unknown error');
