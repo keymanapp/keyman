@@ -88,7 +88,7 @@ describe('keyboard-info-compiler', function () {
   
   // ERROR_FileDoesNotExist (.kmp fileSize)
 
-  it('should generate FileDoesNotExist error if .kmp file does not exist', async function() {
+  it('should generate ERROR_FileDoesNotExist error if .kmp file does not exist', async function() {
     const jsFilename = makePathToFixture('no-kmp', 'build', 'khmer_angkor.js');
     const kpsFilename = makePathToFixture('no-kmp', 'source', 'khmer_angkor.kps');
     const kmpFilename = makePathToFixture('no-kmp', 'build', 'khmer_angkor.kmp');
