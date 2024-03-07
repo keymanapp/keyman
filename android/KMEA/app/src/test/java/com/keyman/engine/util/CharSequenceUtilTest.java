@@ -151,5 +151,12 @@ public class CharSequenceUtilTest {
     Assert.assertEquals("p" + COMPOSING_CIRCUMFLEX_ACCENT + "p" + COMPOSING_CIRCUMFLEX_ACCENT, charsToRestore);
   }
 
+  @Test
+  public void test_repeated_char_backspace() {
+    CharSequence currentContext = "----------------";
+    CharSequence expectedChars  = "-----------------";
+    CharSequence charsToRestore = CharSequenceUtil.restoreChars(expectedChars, currentContext);
+    Assert.assertEquals("", charsToRestore);
+  }
   //endregion
 }

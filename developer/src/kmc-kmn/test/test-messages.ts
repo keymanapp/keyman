@@ -6,11 +6,11 @@ import { makePathToFixture } from './helpers/index.js';
 import { KmnCompiler } from '../src/main.js';
 import { CompilerErrorNamespace } from '@keymanapp/common-types';
 
-describe('CompilerMessages', function () {
+describe('KmnCompilerMessages', function () {
   const callbacks = new TestCompilerCallbacks();
 
-  it('should have a valid CompilerMessages object', function() {
-    return verifyCompilerMessagesObject(CompilerMessages, CompilerErrorNamespace.KmnCompiler);
+  it('should have a valid KmnCompilerMessages object', function() {
+    return verifyCompilerMessagesObject(KmnCompilerMessages, CompilerErrorNamespace.KmnCompiler);
   });
 
   //

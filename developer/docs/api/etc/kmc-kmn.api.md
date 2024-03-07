@@ -11,12 +11,214 @@ import { KeymanCompiler } from '@keymanapp/common-types';
 import { KeymanCompilerArtifactOptional } from '@keymanapp/common-types';
 import { KeymanCompilerArtifacts } from '@keymanapp/common-types';
 import { KeymanCompilerResult } from '@keymanapp/common-types';
-import { Osk } from '@keymanapp/common-types';
+import { Osk } from '@keymanapp/developer-utils';
 import { UnicodeSet } from '@keymanapp/common-types';
 import { UnicodeSetParser } from '@keymanapp/common-types';
 
-// @public (undocumented)
-export class CompilerMessages {
+// Warning: (ae-internal-missing-underscore) The name "CompilerMessages" should be prefixed with an underscore because the declaration is marked as @internal
+//
+// @internal
+export class CompilerMessages extends KmnCompilerMessages {
+}
+
+// Warning: (ae-internal-missing-underscore) The name "CompilerResultExtraGroup" should be prefixed with an underscore because the declaration is marked as @internal
+//
+// @internal (undocumented)
+export interface CompilerResultExtraGroup {
+    // (undocumented)
+    isReadOnly: boolean;
+    // (undocumented)
+    name: string;
+}
+
+// Warning: (ae-internal-missing-underscore) The name "CompilerResultExtraStore" should be prefixed with an underscore because the declaration is marked as @internal
+//
+// @internal (undocumented)
+export interface CompilerResultExtraStore {
+    // (undocumented)
+    line: number;
+    // (undocumented)
+    name: string;
+    // (undocumented)
+    storeType: number;
+}
+
+// @public
+export class KmnCompiler implements KeymanCompiler, UnicodeSetParser {
+    constructor();
+    // @internal
+    static fixNewPattern(pattern: string): string;
+    init(callbacks: CompilerCallbacks, options: KmnCompilerOptions): Promise<boolean>;
+    // @internal (undocumented)
+    parseUnicodeSet(pattern: string, rangeCount: number): UnicodeSet | null;
+    run(infile: string, outfile: string): Promise<KmnCompilerResult>;
+    // @internal (undocumented)
+    sizeUnicodeSet(pattern: string): number;
+    // @internal
+    testSentry(): any;
+    verifyInitialized(): boolean;
+    write(artifacts: KmnCompilerArtifacts): Promise<boolean>;
+}
+
+// @public
+export interface KmnCompilerArtifacts extends KeymanCompilerArtifacts {
+    js?: KeymanCompilerArtifactOptional;
+    kmx?: KeymanCompilerArtifactOptional;
+    kvk?: KeymanCompilerArtifactOptional;
+}
+
+// Warning: (ae-internal-missing-underscore) The name "KmnCompilerMessages" should be prefixed with an underscore because the declaration is marked as @internal
+//
+// @internal
+export class KmnCompilerMessages {
+    // (undocumented)
+    static ERROR_140FeatureOnlyContextAndNotAnyWeb: number;
+    // (undocumented)
+    static Error_140FeatureOnlyContextAndNotAnyWeb: () => CompilerEvent;
+    // (undocumented)
+    static ERROR_501FeatureOnly_Call: number;
+    // (undocumented)
+    static Error_501FeatureOnly_Call: () => CompilerEvent;
+    // (undocumented)
+    static ERROR_60FeatureOnly_Contextn: number;
+    // (undocumented)
+    static Error_60FeatureOnly_Contextn: () => CompilerEvent;
+    // (undocumented)
+    static ERROR_60FeatureOnly_EthnologueCode: number;
+    // (undocumented)
+    static Error_60FeatureOnly_EthnologueCode: () => CompilerEvent;
+    // (undocumented)
+    static ERROR_60FeatureOnly_MnemonicLayout: number;
+    // (undocumented)
+    static Error_60FeatureOnly_MnemonicLayout: () => CompilerEvent;
+    // (undocumented)
+    static ERROR_60FeatureOnly_NamedCodes: number;
+    // (undocumented)
+    static Error_60FeatureOnly_NamedCodes: () => CompilerEvent;
+    // (undocumented)
+    static ERROR_60FeatureOnly_OldCharPosMatching: number;
+    // (undocumented)
+    static Error_60FeatureOnly_OldCharPosMatching: () => CompilerEvent;
+    // (undocumented)
+    static ERROR_60FeatureOnly_VirtualCharKey: number;
+    // (undocumented)
+    static Error_60FeatureOnly_VirtualCharKey: () => CompilerEvent;
+    // (undocumented)
+    static ERROR_70FeatureOnly: number;
+    // (undocumented)
+    static Error_70FeatureOnly: () => CompilerEvent;
+    // (undocumented)
+    static ERROR_80FeatureOnly: number;
+    // (undocumented)
+    static Error_80FeatureOnly: () => CompilerEvent;
+    // (undocumented)
+    static ERROR_90FeatureOnly_IfSystemStores: number;
+    // (undocumented)
+    static Error_90FeatureOnly_IfSystemStores: () => CompilerEvent;
+    // (undocumented)
+    static ERROR_90FeatureOnly_SetSystemStores: number;
+    // (undocumented)
+    static Error_90FeatureOnly_SetSystemStores: () => CompilerEvent;
+    // (undocumented)
+    static ERROR_90FeatureOnlyEmbedCSS: number;
+    // (undocumented)
+    static Error_90FeatureOnlyEmbedCSS: () => CompilerEvent;
+    // (undocumented)
+    static ERROR_90FeatureOnlyKeyboardVersion: number;
+    // (undocumented)
+    static Error_90FeatureOnlyKeyboardVersion: () => CompilerEvent;
+    // (undocumented)
+    static ERROR_90FeatureOnlyLayoutFile: number;
+    // (undocumented)
+    static Error_90FeatureOnlyLayoutFile: () => CompilerEvent;
+    // (undocumented)
+    static ERROR_90FeatureOnlyTargets: number;
+    // (undocumented)
+    static Error_90FeatureOnlyTargets: () => CompilerEvent;
+    // (undocumented)
+    static ERROR_90FeatureOnlyVirtualKeyDictionary: number;
+    // (undocumented)
+    static Error_90FeatureOnlyVirtualKeyDictionary: () => CompilerEvent;
+    // (undocumented)
+    static ERROR_AnyInVirtualKeySection: number;
+    // (undocumented)
+    static Error_AnyInVirtualKeySection: () => CompilerEvent;
+    // (undocumented)
+    static ERROR_BeepInVirtualKeySection: number;
+    // (undocumented)
+    static Error_BeepInVirtualKeySection: () => CompilerEvent;
+    // (undocumented)
+    static ERROR_CallInVirtualKeySection: number;
+    // (undocumented)
+    static Error_CallInVirtualKeySection: () => CompilerEvent;
+    // (undocumented)
+    static ERROR_CannotLoadIncludeFile: number;
+    // (undocumented)
+    static Error_CannotLoadIncludeFile: () => CompilerEvent;
+    // (undocumented)
+    static ERROR_CannotReadBitmapFile: number;
+    // (undocumented)
+    static Error_CannotReadBitmapFile: () => CompilerEvent;
+    // (undocumented)
+    static ERROR_CannotReadInfile: number;
+    // (undocumented)
+    static Error_CannotReadInfile: () => CompilerEvent;
+    // (undocumented)
+    static ERROR_CannotUseReadWriteGroupFromReadonlyGroup: number;
+    // (undocumented)
+    static Error_CannotUseReadWriteGroupFromReadonlyGroup: () => CompilerEvent;
+    // (undocumented)
+    static ERROR_CasedKeysMustContainOnlyVirtualKeys: number;
+    // (undocumented)
+    static Error_CasedKeysMustContainOnlyVirtualKeys: () => CompilerEvent;
+    // (undocumented)
+    static ERROR_CasedKeysMustNotIncludeShiftStates: number;
+    // (undocumented)
+    static Error_CasedKeysMustNotIncludeShiftStates: () => CompilerEvent;
+    // (undocumented)
+    static ERROR_CasedKeysNotSupportedWithMnemonicLayout: number;
+    // (undocumented)
+    static Error_CasedKeysNotSupportedWithMnemonicLayout: () => CompilerEvent;
+    // (undocumented)
+    static ERROR_CharacterExpansionMustBeFollowedByCharacter: number;
+    // (undocumented)
+    static Error_CharacterExpansionMustBeFollowedByCharacter: () => CompilerEvent;
+    // (undocumented)
+    static ERROR_CodeInvalidInKeyStore: number;
+    // (undocumented)
+    static Error_CodeInvalidInKeyStore: () => CompilerEvent;
+    // (undocumented)
+    static ERROR_CodeInvalidInThisSection: number;
+    // (undocumented)
+    static Error_CodeInvalidInThisSection: () => CompilerEvent;
+    // (undocumented)
+    static ERROR_ContextAndIndexInvalidInMatchNomatch: number;
+    // (undocumented)
+    static Error_ContextAndIndexInvalidInMatchNomatch: () => CompilerEvent;
+    // (undocumented)
+    static ERROR_ContextExHasInvalidOffset: number;
+    // (undocumented)
+    static Error_ContextExHasInvalidOffset: () => CompilerEvent;
+    // (undocumented)
+    static ERROR_ContextInVirtualKeySection: number;
+    // (undocumented)
+    static Error_ContextInVirtualKeySection: () => CompilerEvent;
+    // (undocumented)
+    static ERROR_DuplicateGroup: number;
+    // (undocumented)
+    static Error_DuplicateGroup: () => CompilerEvent;
+    // (undocumented)
+    static ERROR_DuplicateStore: number;
+    // (undocumented)
+    static Error_DuplicateStore: () => CompilerEvent;
+    // (undocumented)
+    static ERROR_ExpansionMustBePositive: number;
+    // (undocumented)
+    static Error_ExpansionMustBePositive: () => CompilerEvent;
+    // (undocumented)
+    static ERROR_ExpansionMustFollowCharacterOrVKey: number;
+    // (undocumented)
+    static Error_ExpansionMustFollowCharacterOrVKey: () => CompilerEvent;
     // (undocumented)
     static ERROR_FileNotFound: number;
     // (undocumented)
@@ -24,11 +226,89 @@ export class CompilerMessages {
         filename: string;
     }) => CompilerEvent;
     // (undocumented)
+    static ERROR_GroupDoesNotExist: number;
+    // (undocumented)
+    static Error_GroupDoesNotExist: () => CompilerEvent;
+    // (undocumented)
+    static ERROR_IfSystemStore_NotFound: number;
+    // (undocumented)
+    static Error_IfSystemStore_NotFound: () => CompilerEvent;
+    // (undocumented)
+    static ERROR_IndexDoesNotPointToAny: number;
+    // (undocumented)
+    static Error_IndexDoesNotPointToAny: () => CompilerEvent;
+    // (undocumented)
+    static ERROR_IndexInVirtualKeySection: number;
+    // (undocumented)
+    static Error_IndexInVirtualKeySection: () => CompilerEvent;
+    // (undocumented)
+    static ERROR_InfileNotExist: number;
+    // (undocumented)
+    static Error_InfileNotExist: () => CompilerEvent;
+    // (undocumented)
+    static ERROR_InvalidAny: number;
+    // (undocumented)
+    static Error_InvalidAny: () => CompilerEvent;
+    // (undocumented)
+    static ERROR_InvalidBegin: number;
+    // (undocumented)
+    static Error_InvalidBegin: () => CompilerEvent;
+    // (undocumented)
+    static ERROR_InvalidBitmapLine: number;
+    // (undocumented)
+    static Error_InvalidBitmapLine: () => CompilerEvent;
+    // (undocumented)
+    static ERROR_InvalidCall: number;
+    // (undocumented)
+    static Error_InvalidCall: () => CompilerEvent;
+    // (undocumented)
+    static ERROR_InvalidCharacter: number;
+    // (undocumented)
+    static Error_InvalidCharacter: () => CompilerEvent;
+    // (undocumented)
+    static ERROR_InvalidCodeInKeyPartOfRule: number;
+    // (undocumented)
+    static Error_InvalidCodeInKeyPartOfRule: () => CompilerEvent;
+    // (undocumented)
+    static ERROR_InvalidCopyright: number;
+    // (undocumented)
+    static Error_InvalidCopyright: () => CompilerEvent;
+    // (undocumented)
+    static ERROR_InvalidDeadkey: number;
+    // (undocumented)
+    static Error_InvalidDeadkey: () => CompilerEvent;
+    // (undocumented)
     static ERROR_InvalidDisplayMapFile: number;
     // (undocumented)
     static Error_InvalidDisplayMapFile: (o: {
         filename: string;
         e: any;
+    }) => CompilerEvent;
+    // (undocumented)
+    static ERROR_InvalidEthnologueCode: number;
+    // (undocumented)
+    static Error_InvalidEthnologueCode: () => CompilerEvent;
+    // (undocumented)
+    static ERROR_InvalidGroupLine: number;
+    // (undocumented)
+    static Error_InvalidGroupLine: () => CompilerEvent;
+    // (undocumented)
+    static ERROR_InvalidIf: number;
+    // (undocumented)
+    static Error_InvalidIf: () => CompilerEvent;
+    // (undocumented)
+    static ERROR_InvalidIndex: number;
+    // (undocumented)
+    static Error_InvalidIndex: () => CompilerEvent;
+    // (undocumented)
+    static ERROR_InvalidInVirtualKeySection: number;
+    // (undocumented)
+    static Error_InvalidInVirtualKeySection: () => CompilerEvent;
+    // (undocumented)
+    static ERROR_InvalidKeyCode: number;
+    // (undocumented)
+    static Error_InvalidKeyCode: (o: {
+        keyId: string;
     }) => CompilerEvent;
     // (undocumented)
     static ERROR_InvalidKvkFile: number;
@@ -45,6 +325,177 @@ export class CompilerMessages {
         e: any;
     }) => CompilerEvent;
     // (undocumented)
+    static ERROR_InvalidLanguageLine: number;
+    // (undocumented)
+    static Error_InvalidLanguageLine: () => CompilerEvent;
+    // (undocumented)
+    static ERROR_InvalidLanguageName: number;
+    // (undocumented)
+    static Error_InvalidLanguageName: () => CompilerEvent;
+    // (undocumented)
+    static ERROR_InvalidLayoutLine: number;
+    // (undocumented)
+    static Error_InvalidLayoutLine: () => CompilerEvent;
+    // (undocumented)
+    static ERROR_InvalidLineContinuation: number;
+    // (undocumented)
+    static Error_InvalidLineContinuation: () => CompilerEvent;
+    // (undocumented)
+    static ERROR_InvalidMessage: number;
+    // (undocumented)
+    static Error_InvalidMessage: () => CompilerEvent;
+    // (undocumented)
+    static ERROR_InvalidName: number;
+    // (undocumented)
+    static Error_InvalidName: () => CompilerEvent;
+    // (undocumented)
+    static ERROR_InvalidNamedCode: number;
+    // (undocumented)
+    static Error_InvalidNamedCode: () => CompilerEvent;
+    // (undocumented)
+    static ERROR_InvalidOuts: number;
+    // (undocumented)
+    static Error_InvalidOuts: () => CompilerEvent;
+    // (undocumented)
+    static ERROR_InvalidReset: number;
+    // (undocumented)
+    static Error_InvalidReset: () => CompilerEvent;
+    // (undocumented)
+    static ERROR_InvalidSave: number;
+    // (undocumented)
+    static Error_InvalidSave: () => CompilerEvent;
+    // (undocumented)
+    static ERROR_InvalidSet: number;
+    // (undocumented)
+    static Error_InvalidSet: () => CompilerEvent;
+    // (undocumented)
+    static ERROR_InvalidStoreLine: number;
+    // (undocumented)
+    static Error_InvalidStoreLine: () => CompilerEvent;
+    // (undocumented)
+    static ERROR_InvalidSwitch: number;
+    // (undocumented)
+    static Error_InvalidSwitch: () => CompilerEvent;
+    // (undocumented)
+    static ERROR_InvalidSystemStore: number;
+    // (undocumented)
+    static Error_InvalidSystemStore: () => CompilerEvent;
+    // (undocumented)
+    static ERROR_InvalidToken: number;
+    // (undocumented)
+    static Error_InvalidToken: () => CompilerEvent;
+    // (undocumented)
+    static ERROR_InvalidTouchLayoutFile: number;
+    // (undocumented)
+    static Error_InvalidTouchLayoutFile: (o: {
+        filename: string;
+    }) => CompilerEvent;
+    // (undocumented)
+    static ERROR_InvalidUse: number;
+    // (undocumented)
+    static Error_InvalidUse: () => CompilerEvent;
+    // (undocumented)
+    static ERROR_InvalidValue: number;
+    // (undocumented)
+    static Error_InvalidValue: () => CompilerEvent;
+    // (undocumented)
+    static ERROR_InvalidVersion: number;
+    // (undocumented)
+    static Error_InvalidVersion: () => CompilerEvent;
+    // (undocumented)
+    static ERROR_KeyboardVersionFormatInvalid: number;
+    // (undocumented)
+    static Error_KeyboardVersionFormatInvalid: () => CompilerEvent;
+    // (undocumented)
+    static ERROR_LayoutButNoLanguage: number;
+    // (undocumented)
+    static Error_LayoutButNoLanguage: () => CompilerEvent;
+    // (undocumented)
+    static ERROR_LineTooLong: number;
+    // (undocumented)
+    static Error_LineTooLong: () => CompilerEvent;
+    // (undocumented)
+    static ERROR_NewContextGroupMustBeReadonly: number;
+    // (undocumented)
+    static Error_NewContextGroupMustBeReadonly: () => CompilerEvent;
+    // (undocumented)
+    static ERROR_NoTokensFound: number;
+    // (undocumented)
+    static Error_NoTokensFound: () => CompilerEvent;
+    // (undocumented)
+    static ERROR_NotSupportedInKeymanWebContext: number;
+    // (undocumented)
+    static Error_NotSupportedInKeymanWebContext: (o: {
+        line: number;
+        code: String;
+    }) => CompilerEvent;
+    // (undocumented)
+    static ERROR_NotSupportedInKeymanWebOutput: number;
+    // (undocumented)
+    static Error_NotSupportedInKeymanWebOutput: (o: {
+        line: number;
+        code: string;
+    }) => CompilerEvent;
+    // (undocumented)
+    static ERROR_NotSupportedInKeymanWebStore: number;
+    // (undocumented)
+    static Error_NotSupportedInKeymanWebStore: (o: {
+        code: string;
+        store: string;
+    }) => CompilerEvent;
+    // (undocumented)
+    static ERROR_NoVersionLine: number;
+    // (undocumented)
+    static Error_NoVersionLine: () => CompilerEvent;
+    // (undocumented)
+    static ERROR_OutputInReadonlyGroup: number;
+    // (undocumented)
+    static Error_OutputInReadonlyGroup: () => CompilerEvent;
+    // (undocumented)
+    static ERROR_OutsInVirtualKeySection: number;
+    // (undocumented)
+    static Error_OutsInVirtualKeySection: () => CompilerEvent;
+    // (undocumented)
+    static ERROR_PostKeystrokeGroupMustBeReadonly: number;
+    // (undocumented)
+    static Error_PostKeystrokeGroupMustBeReadonly: () => CompilerEvent;
+    // (undocumented)
+    static ERROR_RepeatedBegin: number;
+    // (undocumented)
+    static Error_RepeatedBegin: () => CompilerEvent;
+    // (undocumented)
+    static ERROR_ReservedCharacter: number;
+    // (undocumented)
+    static Error_ReservedCharacter: () => CompilerEvent;
+    // (undocumented)
+    static ERROR_SetSystemStore_NotFound: number;
+    // (undocumented)
+    static Error_SetSystemStore_NotFound: () => CompilerEvent;
+    // (undocumented)
+    static ERROR_StatementNotPermittedInReadonlyGroup: number;
+    // (undocumented)
+    static Error_StatementNotPermittedInReadonlyGroup: () => CompilerEvent;
+    // (undocumented)
+    static ERROR_StoreDoesNotExist: number;
+    // (undocumented)
+    static Error_StoreDoesNotExist: () => CompilerEvent;
+    // (undocumented)
+    static ERROR_StringInVirtualKeySection: number;
+    // (undocumented)
+    static Error_StringInVirtualKeySection: () => CompilerEvent;
+    // (undocumented)
+    static ERROR_TooManyIndexToKeyRefs: number;
+    // (undocumented)
+    static Error_TooManyIndexToKeyRefs: () => CompilerEvent;
+    // (undocumented)
+    static ERROR_TouchLayoutInvalidIdentifier: number;
+    // (undocumented)
+    static Error_TouchLayoutInvalidIdentifier: (o: {
+        keyId: string;
+        platformName: string;
+        layerId: string;
+    }) => CompilerEvent;
+    // (undocumented)
     static ERROR_UnicodeSetHasProperties: number;
     // (undocumented)
     static Error_UnicodeSetHasProperties: () => CompilerEvent;
@@ -57,9 +508,69 @@ export class CompilerMessages {
     // (undocumented)
     static Error_UnicodeSetSyntaxError: () => CompilerEvent;
     // (undocumented)
+    static ERROR_UnterminatedString: number;
+    // (undocumented)
+    static Error_UnterminatedString: () => CompilerEvent;
+    // (undocumented)
+    static ERROR_VersionAlreadyIncluded: number;
+    // (undocumented)
+    static Error_VersionAlreadyIncluded: () => CompilerEvent;
+    // (undocumented)
+    static ERROR_VirtualCharacterKeysNotSupportedInKeymanWeb: number;
+    // (undocumented)
+    static Error_VirtualCharacterKeysNotSupportedInKeymanWeb: (o: {
+        line: number;
+    }) => CompilerEvent;
+    // (undocumented)
+    static ERROR_VirtualKeyInContext: number;
+    // (undocumented)
+    static Error_VirtualKeyInContext: () => CompilerEvent;
+    // (undocumented)
+    static ERROR_VirtualKeyNotAllowedHere: number;
+    // (undocumented)
+    static Error_VirtualKeyNotAllowedHere: () => CompilerEvent;
+    // (undocumented)
+    static ERROR_VirtualKeysNotValidForMnemonicLayouts: number;
+    // (undocumented)
+    static Error_VirtualKeysNotValidForMnemonicLayouts: (o: {
+        line: number;
+    }) => CompilerEvent;
+    // (undocumented)
+    static ERROR_VKeyExpansionMustBeFollowedByVKey: number;
+    // (undocumented)
+    static Error_VKeyExpansionMustBeFollowedByVKey: () => CompilerEvent;
+    // (undocumented)
+    static ERROR_VKeyExpansionMustUseConsistentShift: number;
+    // (undocumented)
+    static Error_VKeyExpansionMustUseConsistentShift: () => CompilerEvent;
+    // (undocumented)
+    static ERROR_ZeroLengthString: number;
+    // (undocumented)
+    static Error_ZeroLengthString: () => CompilerEvent;
+    // (undocumented)
+    static FATAL_BadCallParams: number;
+    // (undocumented)
+    static Fatal_BadCallParams: () => CompilerEvent;
+    // (undocumented)
+    static FATAL_Break: number;
+    // (undocumented)
+    static Fatal_Break: () => CompilerEvent;
+    // (undocumented)
+    static FATAL_BufferOverflow: number;
+    // (undocumented)
+    static Fatal_BufferOverflow: () => CompilerEvent;
+    // (undocumented)
     static FATAL_CallbacksNotSet: number;
     // (undocumented)
     static Fatal_CallbacksNotSet: () => CompilerEvent;
+    // (undocumented)
+    static FATAL_CannotAllocateMemory: number;
+    // (undocumented)
+    static Fatal_CannotAllocateMemory: () => CompilerEvent;
+    // (undocumented)
+    static FATAL_CannotCreateTempfile: number;
+    // (undocumented)
+    static Fatal_CannotCreateTempfile: () => CompilerEvent;
     // (undocumented)
     static FATAL_MissingWasmModule: number;
     // (undocumented)
@@ -67,9 +578,13 @@ export class CompilerMessages {
         e?: any;
     }) => CompilerEvent;
     // (undocumented)
-    static FATAL_UnableToSetCompilerOptions: number;
+    static FATAL_SomewhereIGotItWrong: number;
     // (undocumented)
-    static Fatal_UnableToSetCompilerOptions: () => CompilerEvent;
+    static Fatal_SomewhereIGotItWrong: () => CompilerEvent;
+    // (undocumented)
+    static FATAL_UnableToWriteFully: number;
+    // (undocumented)
+    static Fatal_UnableToWriteFully: () => CompilerEvent;
     // (undocumented)
     static FATAL_UnexpectedException: number;
     // (undocumented)
@@ -81,377 +596,253 @@ export class CompilerMessages {
     // (undocumented)
     static Fatal_UnicodeSetOutOfRange: () => CompilerEvent;
     // (undocumented)
+    static HINT_NonUnicodeFile: number;
+    // (undocumented)
+    static Hint_NonUnicodeFile: () => CompilerEvent;
+    // (undocumented)
+    static HINT_UnreachableKeyCode: number;
+    // (undocumented)
+    static Hint_UnreachableKeyCode: (o: {
+        line: number;
+        key: string;
+    }) => CompilerEvent;
+    // (undocumented)
+    static HINT_UnreachableRule: number;
+    // (undocumented)
+    static Hint_UnreachableRule: () => CompilerEvent;
+    // (undocumented)
+    static INFO_EndOfFile: number;
+    // (undocumented)
+    static Info_EndOfFile: () => CompilerEvent;
+    // (undocumented)
+    static INFO_Info: number;
+    // (undocumented)
+    static Info_Info: () => CompilerEvent;
+    // (undocumented)
+    static WARN_ANSIInUnicodeGroup: number;
+    // (undocumented)
+    static Warn_ANSIInUnicodeGroup: () => CompilerEvent;
+    // (undocumented)
+    static WARN_BitmapNotUsed: number;
+    // (undocumented)
+    static Warn_BitmapNotUsed: () => CompilerEvent;
+    // (undocumented)
+    static WARN_CustomLanguagesNotSupported: number;
+    // (undocumented)
+    static Warn_CustomLanguagesNotSupported: () => CompilerEvent;
+    // (undocumented)
+    static WARN_DontMixChiralAndNonChiralModifiers: number;
+    // (undocumented)
+    static Warn_DontMixChiralAndNonChiralModifiers: () => CompilerEvent;
+    // (undocumented)
+    static WARN_EmbedJsFileMissing: number;
+    // (undocumented)
+    static Warn_EmbedJsFileMissing: (o: {
+        line: number;
+        jsFilename: string;
+        e: any;
+    }) => CompilerEvent;
+    // (undocumented)
+    static WARN_ExtendedShiftFlagsNotSupportedInKeymanWeb: number;
+    // (undocumented)
+    static Warn_ExtendedShiftFlagsNotSupportedInKeymanWeb: (o: {
+        line: number;
+        flags: string;
+    }) => CompilerEvent;
+    // (undocumented)
+    static WARN_HeaderStatementIsDeprecated: number;
+    // (undocumented)
+    static Warn_HeaderStatementIsDeprecated: () => CompilerEvent;
+    // (undocumented)
+    static WARN_HelpFileMissing: number;
+    // (undocumented)
+    static Warn_HelpFileMissing: (o: {
+        line: number;
+        helpFilename: string;
+        e: any;
+    }) => CompilerEvent;
+    // (undocumented)
+    static WARN_HotkeyHasInvalidModifier: number;
+    // (undocumented)
+    static Warn_HotkeyHasInvalidModifier: () => CompilerEvent;
+    // (undocumented)
+    static WARN_IfShouldBeAtStartOfContext: number;
+    // (undocumented)
+    static Warn_IfShouldBeAtStartOfContext: () => CompilerEvent;
+    // (undocumented)
+    static WARN_IndexStoreShort: number;
+    // (undocumented)
+    static Warn_IndexStoreShort: () => CompilerEvent;
+    // (undocumented)
     static WARN_InvalidVkeyInKvksFile: number;
     // (undocumented)
     static Warn_InvalidVkeyInKvksFile: (o: {
         filename: string;
         invalidVkey: string;
     }) => CompilerEvent;
-}
-
-// @public (undocumented)
-export class KmnCompiler implements KeymanCompiler, UnicodeSetParser {
-    constructor();
-    static fixNewPattern(pattern: string): string;
-    // Warning: (ae-forgotten-export) The symbol "KmnCompilerOptions" needs to be exported by the entry point main.d.ts
-    //
-    // (undocumented)
-    init(callbacks: CompilerCallbacks, options: KmnCompilerOptions): Promise<boolean>;
-    // (undocumented)
-    parseUnicodeSet(pattern: string, rangeCount: number): UnicodeSet | null;
-    // Warning: (ae-forgotten-export) The symbol "KmnCompilerResult" needs to be exported by the entry point main.d.ts
-    //
-    // (undocumented)
-    run(infile: string, outfile: string): Promise<KmnCompilerResult>;
-    // (undocumented)
-    sizeUnicodeSet(pattern: string): number;
-    // (undocumented)
-    testSentry(): any;
-    verifyInitialized(): boolean;
-    // Warning: (ae-forgotten-export) The symbol "KmnCompilerArtifacts" needs to be exported by the entry point main.d.ts
-    //
-    // (undocumented)
-    write(artifacts: KmnCompilerArtifacts): Promise<boolean>;
-}
-
-// @public
-export class KmnCompilerMessages {
-    // (undocumented)
-    static ERROR_140FeatureOnlyContextAndNotAnyWeb: number;
-    // (undocumented)
-    static ERROR_501FeatureOnly_Call: number;
-    // (undocumented)
-    static ERROR_60FeatureOnly_Contextn: number;
-    // (undocumented)
-    static ERROR_60FeatureOnly_EthnologueCode: number;
-    // (undocumented)
-    static ERROR_60FeatureOnly_MnemonicLayout: number;
-    // (undocumented)
-    static ERROR_60FeatureOnly_NamedCodes: number;
-    // (undocumented)
-    static ERROR_60FeatureOnly_OldCharPosMatching: number;
-    // (undocumented)
-    static ERROR_60FeatureOnly_VirtualCharKey: number;
-    // (undocumented)
-    static ERROR_70FeatureOnly: number;
-    // (undocumented)
-    static ERROR_80FeatureOnly: number;
-    // (undocumented)
-    static ERROR_90FeatureOnly_IfSystemStores: number;
-    // (undocumented)
-    static ERROR_90FeatureOnly_SetSystemStores: number;
-    // (undocumented)
-    static ERROR_90FeatureOnlyEmbedCSS: number;
-    // (undocumented)
-    static ERROR_90FeatureOnlyKeyboardVersion: number;
-    // (undocumented)
-    static ERROR_90FeatureOnlyLayoutFile: number;
-    // (undocumented)
-    static ERROR_90FeatureOnlyTargets: number;
-    // (undocumented)
-    static ERROR_90FeatureOnlyVirtualKeyDictionary: number;
-    // (undocumented)
-    static ERROR_AnyInVirtualKeySection: number;
-    // (undocumented)
-    static ERROR_BeepInVirtualKeySection: number;
-    // (undocumented)
-    static ERROR_CallInVirtualKeySection: number;
-    // (undocumented)
-    static ERROR_CannotLoadIncludeFile: number;
-    // (undocumented)
-    static ERROR_CannotReadBitmapFile: number;
-    // (undocumented)
-    static ERROR_CannotReadInfile: number;
-    // (undocumented)
-    static ERROR_CannotUseReadWriteGroupFromReadonlyGroup: number;
-    // (undocumented)
-    static ERROR_CasedKeysMustContainOnlyVirtualKeys: number;
-    // (undocumented)
-    static ERROR_CasedKeysMustNotIncludeShiftStates: number;
-    // (undocumented)
-    static ERROR_CasedKeysNotSupportedWithMnemonicLayout: number;
-    // (undocumented)
-    static ERROR_CharacterExpansionMustBeFollowedByCharacter: number;
-    // (undocumented)
-    static ERROR_CodeInvalidInKeyStore: number;
-    // (undocumented)
-    static ERROR_CodeInvalidInThisSection: number;
-    // (undocumented)
-    static ERROR_ContextAndIndexInvalidInMatchNomatch: number;
-    // (undocumented)
-    static ERROR_ContextExHasInvalidOffset: number;
-    // (undocumented)
-    static ERROR_ContextInVirtualKeySection: number;
-    // (undocumented)
-    static ERROR_DuplicateGroup: number;
-    // (undocumented)
-    static ERROR_DuplicateStore: number;
-    // (undocumented)
-    static ERROR_ExpansionMustBePositive: number;
-    // (undocumented)
-    static ERROR_ExpansionMustFollowCharacterOrVKey: number;
-    // (undocumented)
-    static ERROR_GroupDoesNotExist: number;
-    // (undocumented)
-    static ERROR_IfSystemStore_NotFound: number;
-    // (undocumented)
-    static ERROR_IndexDoesNotPointToAny: number;
-    // (undocumented)
-    static ERROR_IndexInVirtualKeySection: number;
-    // (undocumented)
-    static ERROR_InfileNotExist: number;
-    // (undocumented)
-    static ERROR_InvalidAny: number;
-    // (undocumented)
-    static ERROR_InvalidBegin: number;
-    // (undocumented)
-    static ERROR_InvalidBitmapLine: number;
-    // (undocumented)
-    static ERROR_InvalidCall: number;
-    // (undocumented)
-    static ERROR_InvalidCharacter: number;
-    // (undocumented)
-    static ERROR_InvalidCodeInKeyPartOfRule: number;
-    // (undocumented)
-    static ERROR_InvalidCopyright: number;
-    // (undocumented)
-    static ERROR_InvalidDeadkey: number;
-    // (undocumented)
-    static ERROR_InvalidEthnologueCode: number;
-    // (undocumented)
-    static ERROR_InvalidGroupLine: number;
-    // (undocumented)
-    static ERROR_InvalidIf: number;
-    // (undocumented)
-    static ERROR_InvalidIndex: number;
-    // (undocumented)
-    static ERROR_InvalidInVirtualKeySection: number;
-    // (undocumented)
-    static ERROR_InvalidKeyCode: number;
-    // (undocumented)
-    static ERROR_InvalidLanguageLine: number;
-    // (undocumented)
-    static ERROR_InvalidLanguageName: number;
-    // (undocumented)
-    static ERROR_InvalidLayoutLine: number;
-    // (undocumented)
-    static ERROR_InvalidLineContinuation: number;
-    // (undocumented)
-    static ERROR_InvalidMessage: number;
-    // (undocumented)
-    static ERROR_InvalidName: number;
-    // (undocumented)
-    static ERROR_InvalidNamedCode: number;
-    // (undocumented)
-    static ERROR_InvalidOuts: number;
-    // (undocumented)
-    static ERROR_InvalidReset: number;
-    // (undocumented)
-    static ERROR_InvalidSave: number;
-    // (undocumented)
-    static ERROR_InvalidSet: number;
-    // (undocumented)
-    static ERROR_InvalidStoreLine: number;
-    // (undocumented)
-    static ERROR_InvalidSwitch: number;
-    // (undocumented)
-    static ERROR_InvalidSystemStore: number;
-    // (undocumented)
-    static ERROR_InvalidToken: number;
-    // (undocumented)
-    static ERROR_InvalidTouchLayoutFile: number;
-    // (undocumented)
-    static ERROR_InvalidUse: number;
-    // (undocumented)
-    static ERROR_InvalidValue: number;
-    // (undocumented)
-    static ERROR_InvalidVersion: number;
-    // (undocumented)
-    static ERROR_KeyboardVersionFormatInvalid: number;
-    // (undocumented)
-    static ERROR_LayoutButNoLanguage: number;
-    // (undocumented)
-    static ERROR_LineTooLong: number;
-    // (undocumented)
-    static ERROR_NewContextGroupMustBeReadonly: number;
-    // (undocumented)
-    static ERROR_NoTokensFound: number;
-    // (undocumented)
-    static ERROR_NotSupportedInKeymanWebContext: number;
-    // (undocumented)
-    static ERROR_NotSupportedInKeymanWebOutput: number;
-    // (undocumented)
-    static ERROR_NotSupportedInKeymanWebStore: number;
-    // (undocumented)
-    static ERROR_NoVersionLine: number;
-    // (undocumented)
-    static ERROR_OutputInReadonlyGroup: number;
-    // (undocumented)
-    static ERROR_OutsInVirtualKeySection: number;
-    // (undocumented)
-    static ERROR_PostKeystrokeGroupMustBeReadonly: number;
-    // (undocumented)
-    static ERROR_RepeatedBegin: number;
-    // (undocumented)
-    static ERROR_ReservedCharacter: number;
-    // (undocumented)
-    static ERROR_SetSystemStore_NotFound: number;
-    // (undocumented)
-    static ERROR_StatementNotPermittedInReadonlyGroup: number;
-    // (undocumented)
-    static ERROR_StoreDoesNotExist: number;
-    // (undocumented)
-    static ERROR_StringInVirtualKeySection: number;
-    // (undocumented)
-    static ERROR_TooManyIndexToKeyRefs: number;
-    // (undocumented)
-    static ERROR_TouchLayoutInvalidIdentifier: number;
-    // (undocumented)
-    static ERROR_UnterminatedString: number;
-    // (undocumented)
-    static ERROR_VersionAlreadyIncluded: number;
-    // (undocumented)
-    static ERROR_VirtualCharacterKeysNotSupportedInKeymanWeb: number;
-    // (undocumented)
-    static ERROR_VirtualKeyInContext: number;
-    // (undocumented)
-    static ERROR_VirtualKeyNotAllowedHere: number;
-    // (undocumented)
-    static ERROR_VirtualKeysNotValidForMnemonicLayouts: number;
-    // (undocumented)
-    static ERROR_VKeyExpansionMustBeFollowedByVKey: number;
-    // (undocumented)
-    static ERROR_VKeyExpansionMustUseConsistentShift: number;
-    // (undocumented)
-    static ERROR_ZeroLengthString: number;
-    // (undocumented)
-    static FATAL_BadCallParams: number;
-    // (undocumented)
-    static FATAL_Break: number;
-    // (undocumented)
-    static FATAL_BufferOverflow: number;
-    // (undocumented)
-    static FATAL_CannotAllocateMemory: number;
-    // (undocumented)
-    static FATAL_CannotCreateTempfile: number;
-    // (undocumented)
-    static FATAL_SomewhereIGotItWrong: number;
-    // (undocumented)
-    static FATAL_UnableToWriteFully: number;
-    // (undocumented)
-    static HINT_NonUnicodeFile: number;
-    // (undocumented)
-    static HINT_UnreachableKeyCode: number;
-    // (undocumented)
-    static HINT_UnreachableRule: number;
-    // (undocumented)
-    static INFO_EndOfFile: number;
-    // (undocumented)
-    static INFO_Info: number;
-    // (undocumented)
-    static INFO_None: number;
-    // (undocumented)
-    static WARN_ANSIInUnicodeGroup: number;
-    // (undocumented)
-    static WARN_BitmapNotUsed: number;
-    // (undocumented)
-    static WARN_CouldNotCopyJsonFile: number;
-    // (undocumented)
-    static WARN_CustomLanguagesNotSupported: number;
-    // (undocumented)
-    static WARN_DontMixChiralAndNonChiralModifiers: number;
-    // (undocumented)
-    static WARN_EmbedJsFileMissing: number;
-    // (undocumented)
-    static WARN_ExtendedShiftFlagsNotSupportedInKeymanWeb: number;
-    // (undocumented)
-    static WARN_HeaderStatementIsDeprecated: number;
-    // (undocumented)
-    static WARN_HelpFileMissing: number;
-    // (undocumented)
-    static WARN_HotkeyHasInvalidModifier: number;
-    // (undocumented)
-    static WARN_IfShouldBeAtStartOfContext: number;
-    // (undocumented)
-    static WARN_IndexStoreShort: number;
-    // (undocumented)
-    static WARN_InvalidJSONMetadataFile: number;
-    // (undocumented)
-    static WARN_JSONMetadataOSKFontShouldMatchTouchFont: number;
     // (undocumented)
     static WARN_KeyBadLength: number;
     // (undocumented)
+    static Warn_KeyBadLength: () => CompilerEvent;
+    // (undocumented)
     static WARN_KeyShouldIncludeNCaps: number;
+    // (undocumented)
+    static Warn_KeyShouldIncludeNCaps: () => CompilerEvent;
     // (undocumented)
     static WARN_KVKFileIsInSourceFormat: number;
     // (undocumented)
+    static Warn_KVKFileIsInSourceFormat: () => CompilerEvent;
+    // (undocumented)
     static WARN_LanguageHeadersDeprecatedInKeyman10: number;
+    // (undocumented)
+    static Warn_LanguageHeadersDeprecatedInKeyman10: () => CompilerEvent;
     // (undocumented)
     static WARN_MixingLeftAndRightModifiers: number;
     // (undocumented)
+    static Warn_MixingLeftAndRightModifiers: () => CompilerEvent;
+    // (undocumented)
     static WARN_NulNotFirstStatementInContext: number;
+    // (undocumented)
+    static Warn_NulNotFirstStatementInContext: () => CompilerEvent;
     // (undocumented)
     static WARN_OldVersion: number;
     // (undocumented)
+    static Warn_OldVersion: () => CompilerEvent;
+    // (undocumented)
     static WARN_OptionStoreNameInvalid: number;
+    // (undocumented)
+    static Warn_OptionStoreNameInvalid: (o: {
+        name: string;
+    }) => CompilerEvent;
     // (undocumented)
     static WARN_PlatformNotInTargets: number;
     // (undocumented)
+    static Warn_PlatformNotInTargets: () => CompilerEvent;
+    // (undocumented)
     static WARN_PunctuationInEthnologueCode: number;
+    // (undocumented)
+    static Warn_PunctuationInEthnologueCode: () => CompilerEvent;
     // (undocumented)
     static WARN_ReservedCharacter: number;
     // (undocumented)
+    static Warn_ReservedCharacter: () => CompilerEvent;
+    // (undocumented)
     static WARN_StoreAlreadyUsedAsOptionOrCall: number;
+    // (undocumented)
+    static Warn_StoreAlreadyUsedAsOptionOrCall: () => CompilerEvent;
     // (undocumented)
     static WARN_StoreAlreadyUsedAsStoreOrCall: number;
     // (undocumented)
+    static Warn_StoreAlreadyUsedAsStoreOrCall: () => CompilerEvent;
+    // (undocumented)
     static WARN_StoreAlreadyUsedAsStoreOrOption: number;
     // (undocumented)
-    static WARN_TooManyErrorsOrWarnings: number;
+    static Warn_StoreAlreadyUsedAsStoreOrOption: () => CompilerEvent;
     // (undocumented)
     static WARN_TooManyWarnings: number;
     // (undocumented)
+    static Warn_TooManyWarnings: () => CompilerEvent;
+    // (undocumented)
     static WARN_TouchLayoutCustomKeyNotDefined: number;
     // (undocumented)
-    static WARN_TouchLayoutFileMissing: number;
+    static Warn_TouchLayoutCustomKeyNotDefined: (o: {
+        keyId: string;
+        platformName: string;
+        layerId: string;
+    }) => CompilerEvent;
     // (undocumented)
     static WARN_TouchLayoutFontShouldBeSameForAllPlatforms: number;
     // (undocumented)
+    static Warn_TouchLayoutFontShouldBeSameForAllPlatforms: () => CompilerEvent;
+    // (undocumented)
     static WARN_TouchLayoutMissingLayer: number;
+    // (undocumented)
+    static Warn_TouchLayoutMissingLayer: (o: {
+        keyId: string;
+        platformName: string;
+        layerId: string;
+        nextLayer: string;
+    }) => CompilerEvent;
     // (undocumented)
     static WARN_TouchLayoutMissingRequiredKeys: number;
     // (undocumented)
+    static Warn_TouchLayoutMissingRequiredKeys: (o: {
+        layerId: string;
+        platformName: string;
+        missingKeys: string;
+    }) => CompilerEvent;
+    // (undocumented)
     static WARN_TouchLayoutSpecialLabelOnNormalKey: number;
+    // (undocumented)
+    static Warn_TouchLayoutSpecialLabelOnNormalKey: (o: {
+        keyId: string;
+        platformName: string;
+        layerId: string;
+        label: string;
+    }) => CompilerEvent;
     // (undocumented)
     static WARN_TouchLayoutUnidentifiedKey: number;
     // (undocumented)
+    static Warn_TouchLayoutUnidentifiedKey: (o: {
+        layerId: string;
+    }) => CompilerEvent;
+    // (undocumented)
     static WARN_UnicodeInANSIGroup: number;
+    // (undocumented)
+    static Warn_UnicodeInANSIGroup: () => CompilerEvent;
     // (undocumented)
     static WARN_UnicodeSurrogateUsed: number;
     // (undocumented)
+    static Warn_UnicodeSurrogateUsed: () => CompilerEvent;
+    // (undocumented)
     static WARN_UseNotLastStatementInRule: number;
+    // (undocumented)
+    static Warn_UseNotLastStatementInRule: () => CompilerEvent;
     // (undocumented)
     static WARN_VirtualCharKeyWithPositionalLayout: number;
     // (undocumented)
+    static Warn_VirtualCharKeyWithPositionalLayout: () => CompilerEvent;
+    // (undocumented)
     static WARN_VirtualKeyInOutput: number;
+    // (undocumented)
+    static Warn_VirtualKeyInOutput: () => CompilerEvent;
     // (undocumented)
     static WARN_VirtualKeyWithMnemonicLayout: number;
     // (undocumented)
-    static WARN_VisualKeyboardFileMissing: number;
+    static Warn_VirtualKeyWithMnemonicLayout: () => CompilerEvent;
 }
 
-// @public (undocumented)
+// @public
+export interface KmnCompilerOptions extends CompilerOptions {
+}
+
+// @public
+export interface KmnCompilerResult extends KeymanCompilerResult {
+    artifacts: KmnCompilerArtifacts;
+    displayMap?: Osk.PuaMap;
+    // Warning: (ae-incompatible-release-tags) The symbol "extra" is marked as @public, but its signature references "KmnCompilerResultExtra" which is marked as @internal
+    extra: KmnCompilerResultExtra;
+}
+
+// Warning: (ae-internal-missing-underscore) The name "KmnCompilerResultExtra" should be prefixed with an underscore because the declaration is marked as @internal
+//
+// @internal
+export interface KmnCompilerResultExtra {
+    // (undocumented)
+    displayMapFilename?: string;
+    // (undocumented)
+    groups: CompilerResultExtraGroup[];
+    // (undocumented)
+    kvksFilename?: string;
+    // (undocumented)
+    stores: CompilerResultExtraStore[];
+    targets: number;
+}
+
+// Warning: (ae-internal-missing-underscore) The name "KmwCompilerMessages" should be prefixed with an underscore because the declaration is marked as @internal
+//
+// @internal
 export class KmwCompilerMessages extends KmnCompilerMessages {
-    // (undocumented)
-    static Error_InvalidBegin: () => CompilerEvent;
-    // (undocumented)
-    static Error_InvalidKeyCode: (o: {
-        keyId: string;
-    }) => CompilerEvent;
-    // (undocumented)
-    static Error_InvalidTouchLayoutFile: (o: {
-        filename: string;
-    }) => CompilerEvent;
     // (undocumented)
     static ERROR_InvalidTouchLayoutFileFormat: number;
     // (undocumented)
@@ -463,21 +854,6 @@ export class KmwCompilerMessages extends KmnCompilerMessages {
     // (undocumented)
     static Error_NotAnyRequiresVersion14: (o: {
         line: number;
-    }) => CompilerEvent;
-    // (undocumented)
-    static Error_NotSupportedInKeymanWebContext: (o: {
-        line: number;
-        code: String;
-    }) => CompilerEvent;
-    // (undocumented)
-    static Error_NotSupportedInKeymanWebOutput: (o: {
-        line: number;
-        code: string;
-    }) => CompilerEvent;
-    // (undocumented)
-    static Error_NotSupportedInKeymanWebStore: (o: {
-        code: string;
-        store: string;
     }) => CompilerEvent;
     // (undocumented)
     static ERROR_TouchLayoutFileDoesNotExist: number;
@@ -494,87 +870,11 @@ export class KmwCompilerMessages extends KmnCompilerMessages {
         layerId: string;
     }) => CompilerEvent;
     // (undocumented)
-    static Error_TouchLayoutInvalidIdentifier: (o: {
-        keyId: string;
-        platformName: string;
-        layerId: string;
-    }) => CompilerEvent;
-    // (undocumented)
-    static Error_VirtualCharacterKeysNotSupportedInKeymanWeb: (o: {
-        line: number;
-    }) => CompilerEvent;
-    // (undocumented)
-    static Error_VirtualKeysNotValidForMnemonicLayouts: (o: {
-        line: number;
-    }) => CompilerEvent;
-    // (undocumented)
     static HINT_TouchLayoutUsesUnsupportedGesturesDownlevel: number;
     // (undocumented)
     static Hint_TouchLayoutUsesUnsupportedGesturesDownlevel: (o: {
         keyId: string;
     }) => CompilerEvent;
-    // (undocumented)
-    static Hint_UnreachableKeyCode: (o: {
-        line: number;
-        key: string;
-    }) => CompilerEvent;
-    // (undocumented)
-    static Warn_DontMixChiralAndNonChiralModifiers: () => CompilerEvent;
-    // (undocumented)
-    static Warn_EmbedJsFileMissing: (o: {
-        line: number;
-        jsFilename: string;
-        e: any;
-    }) => CompilerEvent;
-    // (undocumented)
-    static Warn_ExtendedShiftFlagsNotSupportedInKeymanWeb: (o: {
-        line: number;
-        flags: string;
-    }) => CompilerEvent;
-    // (undocumented)
-    static Warn_HelpFileMissing: (o: {
-        line: number;
-        helpFilename: string;
-        e: any;
-    }) => CompilerEvent;
-    // (undocumented)
-    static Warn_OptionStoreNameInvalid: (o: {
-        name: string;
-    }) => CompilerEvent;
-    // (undocumented)
-    static Warn_TouchLayoutCustomKeyNotDefined: (o: {
-        keyId: string;
-        platformName: string;
-        layerId: string;
-    }) => CompilerEvent;
-    // (undocumented)
-    static Warn_TouchLayoutFontShouldBeSameForAllPlatforms: () => CompilerEvent;
-    // (undocumented)
-    static Warn_TouchLayoutMissingLayer: (o: {
-        keyId: string;
-        platformName: string;
-        layerId: string;
-        nextLayer: string;
-    }) => CompilerEvent;
-    // (undocumented)
-    static Warn_TouchLayoutMissingRequiredKeys: (o: {
-        layerId: string;
-        platformName: string;
-        missingKeys: string;
-    }) => CompilerEvent;
-    // (undocumented)
-    static Warn_TouchLayoutSpecialLabelOnNormalKey: (o: {
-        keyId: string;
-        platformName: string;
-        layerId: string;
-        label: string;
-    }) => CompilerEvent;
-    // (undocumented)
-    static Warn_TouchLayoutUnidentifiedKey: (o: {
-        layerId: string;
-    }) => CompilerEvent;
 }
-
-// (No @packageDocumentation comment for this package)
 
 ```
