@@ -114,13 +114,20 @@ export class TouchEventEngine<ItemType, StateToken = any> extends InputEventEngi
     // during a touchstart.)
     const allTouches = touchListToArray(event.touches);
     const newTouches = touchListToArray(event.changedTouches);
+    const oldTouches = allTouches.filter((touch1) => {
+      return newTouches.findIndex(touch2 => touch1.identifier == touch2.identifier) == -1;
+    });
 
-    this.eventDispatcher.runAsync(() => {
+    // Any 'old touches' should have pre-existing entries in our promise-map that are still current, as
+    // the promise-map is maintained 100% synchronously with incoming events.
+    const oldSourcePromises = oldTouches.map((touch) => this.pendingSourcePromises.get(touch.identifier));
+
+    this.eventDispatcher.runAsync(async () => {
+      const oldSources = await Promise.all(oldSourcePromises);
       // Maintain all touches in the `.touches` array that are NOT marked as `.changedTouches` (and therefore, new)
-      this.maintainTouchpointsWithIds(allTouches
-        .filter((touch1) => newTouches.findIndex(touch2 => touch1.identifier == touch2.identifier) == -1)
-        .map((touch) => touch.identifier)
-      );
+      this.maintainTouchpoints(oldSources);
+
+      return this.eventDispatcher.defaultWait;
     });
 
     /*
@@ -242,10 +249,11 @@ export class TouchEventEngine<ItemType, StateToken = any> extends InputEventEngi
       capturedSourcePromises.set(touchId, this.pendingSourcePromises.get(touchId).corePromise);
     }
 
-    this.eventDispatcher.runAsync(() => {
-      this.maintainTouchpointsWithIds(touchListToArray(event.touches)
-        .map((touch) => touch.identifier)
-      );
+    this.eventDispatcher.runAsync(async () => {
+      const touches = await Promise.all(capturedSourcePromises.values());
+      this.maintainTouchpoints(touches);
+
+      return this.eventDispatcher.defaultWait;
     });
 
     /*
