@@ -76,7 +76,9 @@ function showBanner(flag) {
     console.log("Setting banner display for dictionaryless keyboards to " + flag);
 
     var bc = keyman.osk.bannerController;
-    bc.inactiveBanner = flag ? new bc.ImageBanner(bannerImgPath) : null;
+    if(bannerImgPath) {
+      bc.inactiveBanner = new bc.ImageBanner(bannerImgPath);
+    }
 }
 
 function setBannerImage(path) {
@@ -88,7 +90,7 @@ function setBannerImage(path) {
     }
 
     // If an inactive banner is set, update its image.
-    bc.inactiveBanner = bc.inactiveBanner ? new bc.ImageBanner(bannerImgPath) : null;
+    bc.inactiveBanner = new bc.ImageBanner(bannerImgPath);
 }
 
 function setBannerHeight(h) {

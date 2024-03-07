@@ -423,8 +423,6 @@ extension KeymanWebViewController {
     } else {  // We're registering a model in the background - don't change settings.
       webView!.evaluateJavaScript("keyman.addModel(\(stubString));", completionHandler: nil)
     }
-
-    setBannerHeight(to: Int(InputViewController.topBarHeight))
   }
 
   func showBanner(_ display: Bool) {
@@ -743,6 +741,8 @@ extension KeymanWebViewController: KeymanWebDelegate {
     setBannerImage(to: bannerImgPath)
     // Reset the keyboard's size.
     keyboardSize = kbSize
+
+    setBannerHeight(to: Int(InputViewController.topBarHeight))
 
     fixLayout()
 
