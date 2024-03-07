@@ -6,7 +6,6 @@
 //  Copyright © 2017-2018 SIL International. All rights reserved.
 //
 #import "KMInputMethodEventHandler.h"
-#import "KMInputMethodEventHandlerProtected.h"
 #import <KeymanEngine4Mac/KeymanEngine4Mac.h>
 #import <Carbon/Carbon.h> /* For kVK_ constants. */
 #import "KeySender.h"

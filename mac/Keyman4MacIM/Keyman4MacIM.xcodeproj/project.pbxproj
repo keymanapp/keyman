@@ -356,7 +356,6 @@
 		E23380FA21407AA100B90591 /* SILInBlue76.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = SILInBlue76.png; path = Keyman4MacIM/Images/SILInBlue76.png; sourceTree = SOURCE_ROOT; };
 		E240F597202DED300000067D /* KMPackage.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = KMPackage.h; sourceTree = "<group>"; };
 		E240F598202DED740000067D /* KMPackage.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = KMPackage.m; sourceTree = "<group>"; };
-		E24C79EC1FFFEA6B00D8E46F /* KMInputMethodEventHandlerProtected.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = KMInputMethodEventHandlerProtected.h; sourceTree = "<group>"; };
 		E2585A7E20DD6C3C00CBB994 /* KMMethodEventHandlerTests.kmx */ = {isa = PBXFileReference; lastKnownFileType = file; path = KMMethodEventHandlerTests.kmx; sourceTree = "<group>"; };
 		E2585A8020DD7CF100CBB994 /* TestAppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TestAppDelegate.m; sourceTree = "<group>"; };
 		E2585A8220DD7D3F00CBB994 /* TestAppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TestAppDelegate.h; sourceTree = "<group>"; };
@@ -558,7 +557,6 @@
 				E21799041FC5B7BC00F2D66A /* KMInputMethodEventHandler.m */,
 				298D09F62A1F4533006B9DFE /* TextApiCompliance.h */,
 				298D09F52A1F4533006B9DFE /* TextApiCompliance.m */,
-				E24C79EC1FFFEA6B00D8E46F /* KMInputMethodEventHandlerProtected.h */,
 				98E672961B532DE000DBDE2F /* KMKeyboardHelpWindow */,
 				989C9C141A7876DE00A20425 /* MainMenu.xib */,
 				984B8F3E1AF1C2F400E096A8 /* OnScreenKeyboard */,
