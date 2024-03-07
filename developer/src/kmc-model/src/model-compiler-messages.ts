@@ -19,12 +19,18 @@ const m_e = (code: number, message: string, exceptionVar: any) : CompilerEvent =
   filename: ModelCompilerMessageContext.filename,
 });
 
+/**
+ * @internal
+ */
 export class ModelCompilerMessageContext {
   // Context added to all messages
   static line: number;
   static filename: string;
 }
 
+/**
+ * @internal
+ */
 export class ModelCompilerMessages {
 
   static FATAL_UnexpectedException = SevFatal | 0x0001;
