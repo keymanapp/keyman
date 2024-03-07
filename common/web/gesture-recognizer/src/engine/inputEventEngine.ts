@@ -14,12 +14,12 @@ export function processSampleClientCoords<Type, StateToken>(config: GestureRecog
   } as InputSample<Type, StateToken>;
 }
 
-export abstract class InputEventEngine<HoveredItemType, StateToken> extends InputEngineBase<HoveredItemType, StateToken> {
+export abstract class InputEventEngine<ItemType, StateToken> extends InputEngineBase<ItemType, StateToken> {
   abstract registerEventHandlers(): void;
   abstract unregisterEventHandlers(): void;
 
-  protected buildSampleFor(clientX: number, clientY: number, target: EventTarget, timestamp: number, source: GestureSource<HoveredItemType, StateToken>): InputSample<HoveredItemType, StateToken> {
-    const sample: InputSample<HoveredItemType, StateToken> = {
+  protected buildSampleFor(clientX: number, clientY: number, target: EventTarget, timestamp: number, source: GestureSource<ItemType, StateToken>): InputSample<ItemType, StateToken> {
+    const sample: InputSample<ItemType, StateToken> = {
       ...processSampleClientCoords(this.config, clientX, clientY),
       t: timestamp,
       stateToken: source?.stateToken ?? this.stateToken
@@ -32,7 +32,7 @@ export abstract class InputEventEngine<HoveredItemType, StateToken> extends Inpu
     return sample;
   }
 
-  protected onInputStart(identifier: number, sample: InputSample<HoveredItemType, StateToken>, target: EventTarget, isFromTouch: boolean) {
+  protected onInputStart(identifier: number, sample: InputSample<ItemType, StateToken>, target: EventTarget, isFromTouch: boolean) {
     const touchpoint = this.createTouchpoint(identifier, isFromTouch);
     touchpoint.update(sample);
 
@@ -57,46 +57,40 @@ export abstract class InputEventEngine<HoveredItemType, StateToken> extends Inpu
     return touchpoint;
   }
 
-  protected onInputMove(identifier: number, sample: InputSample<HoveredItemType, StateToken>, target: EventTarget) {
-    const activePoint = this.getTouchpointWithId(identifier);
-    if(!activePoint) {
-      return;
-    }
-
-    activePoint.update(sample);
-  }
-
-  protected onInputMoveCancel(identifier: number, sample: InputSample<HoveredItemType, StateToken>, target: EventTarget) {
-    const touchpoint = this.getTouchpointWithId(identifier);
+  protected onInputMove(touchpoint: GestureSource<ItemType, StateToken>, sample: InputSample<ItemType, StateToken>, target: EventTarget) {
     if(!touchpoint) {
       return;
     }
 
-    touchpoint.update(sample);
-    touchpoint.path.terminate(true);
-  }
-
-  protected onInputEnd(identifier: number, target: EventTarget) {
-    const touchpoint = this.getTouchpointWithId(identifier);
-    if(!touchpoint) {
-      return;
-    }
-
-    const lastEntry = touchpoint.path.stats.lastSample;
-    const sample = this.buildSampleFor(lastEntry.clientX, lastEntry.clientY, target, lastEntry.t, touchpoint);
-
-    /* While an 'end' event immediately follows a 'move' if it occurred simultaneously,
-     * this is decidedly _not_ the case if the touchpoint was held for a while without
-     * moving, even at the point of its release.
-     *
-     * We'll never need to worry about the touchpoint moving here, and thus we don't
-     * need to worry about `currentHoveredItem` changing.  We're only concerned with
-     * recording the _timing_ of the touchpoint's release.
-     */
-    if(sample.t != lastEntry.t) {
+    try {
       touchpoint.update(sample);
+    } catch(err) {
+      reportError('Error occurred while updating source', err);
+    }
+  }
+
+  protected onInputMoveCancel(touchpoint: GestureSource<ItemType, StateToken>, sample: InputSample<ItemType, StateToken>, target: EventTarget) {
+    if(!touchpoint) {
+      return;
     }
 
-    this.getTouchpointWithId(identifier)?.path.terminate(false);
+    try {
+      touchpoint.update(sample);
+      touchpoint.path.terminate(true);
+    } catch(err) {
+      reportError('Error occurred while cancelling further input for source', err);
+    }
+  }
+
+  protected onInputEnd(touchpoint: GestureSource<ItemType, StateToken>, target: EventTarget) {
+    if(!touchpoint) {
+      return;
+    }
+
+    try {
+      touchpoint.path.terminate(false);
+    } catch(err) {
+      reportError('Error occurred while finalizing input for source', err);
+    }
   }
 }
