@@ -257,7 +257,37 @@ describe('KeyboardInfoCompilerMessages', function () {
       `ERROR_LicenseIsNotValid not generated, instead got: `+JSON.stringify(callbacks.messages,null,2));
     assert.isTrue(nodeCompilerMessage(callbacks, KeyboardInfoCompilerMessages.ERROR_LicenseIsNotValid).includes(licenseFilename),
       licenseFilename+' not found in the message');
-  });    
+  });
+  
+  // ERROR_CannotBuildWithoutKmpFile
+
+  it('should generate ERROR_CannotBuildWithoutKmpFile error if .kmp file is not in sources', async function() {
+    const jsFilename = makePathToFixture('no-kmp', 'build', 'khmer_angkor.js');
+    const kpsFilename = makePathToFixture('no-kmp', 'source', 'khmer_angkor.kps');
+    const kmpFilename = makePathToFixture('no-kmp', 'build', 'khmer_angkor.kmp');
+
+    const sources = {
+      kmpFilename: '',
+      sourcePath: 'release/k/no-kmp',
+      kpsFilename,
+      jsFilename: jsFilename,
+      forPublishing: true,
+    };
+
+    const compiler = new KeyboardInfoCompiler();
+    assert.isTrue(await compiler.init(callbacks, {sources}));
+    let result: KeyboardInfoCompilerResult = null;
+    try {
+      result = await compiler.run(kmpFilename, null);
+    } catch(e) {
+      callbacks.printMessages();
+      throw e;
+    }
+    assert.isNull(result);
+
+    assert.isTrue(callbacks.hasMessage(KeyboardInfoCompilerMessages.ERROR_CannotBuildWithoutKmpFile),
+      `ERROR_CannotBuildWithoutKmpFile not generated, instead got: `+JSON.stringify(callbacks.messages,null,2));
+  });  
 });
 
 function nodeCompilerMessage(ncb: TestCompilerCallbacks, code: number): string {
