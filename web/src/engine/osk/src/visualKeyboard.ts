@@ -634,10 +634,17 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
             // handle everything that remains for the backspace from here.
             handlers = [new HeldRepeater(gestureSequence, () => this.modelKeyClick(gestureKey, coord))];
           } else if(gestureKey.key.spec.baseKeyID == "K_LOPT") { // globe key
-            gestureSequence.on('complete', () => this.emit('globekey', gestureKey, false));
+            gestureSequence.on('complete', () => {
+              gestureKey.key.highlight(false);
+              this.emit('globekey', gestureKey, false);
+            });
+
             // Cancel all other gesture sources; a language-menu interaction voids all previously-active
             // gestures that haven't completed.
             clearActiveGestures(coordSource.identifier);
+
+            // Re-highlight the key - it was auto de-highlighted upon stage-select.
+            gestureKey.key.highlight(true);
           }
         } else if(gestureStage.matchedId.indexOf('longpress') > -1) {
           existingPreviewHost?.cancel();

@@ -19,9 +19,6 @@
   "scripts": {
     "build": "tsc -b"
   },
-  "dependencies": {
-    "@keymanapp/common-types": "*"
-  },
   "mocha": {
     "spec": "build/test/**/test-*.js",
     "require": [

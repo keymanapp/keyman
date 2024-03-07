@@ -1,11 +1,11 @@
 <?xml version="1.0"?>
-<keyboard3 locale="en" conformsTo="techpreview">
+<keyboard3 locale="en" conformsTo="45">
   <info author="Steven R. Loomis" name="LDML Test"/>
   <version number="1.0.0"/>
   <keys>
     <!-- keep the base items -->
-    <import base="cldr" path="techpreview/keys-Zyyy-punctuation.xml"/>
-    <import base="cldr" path="techpreview/keys-Zyyy-currency.xml"/>
+    <import base="cldr" path="45/keys-Zyyy-punctuation.xml"/>
+    <import base="cldr" path="45/keys-Zyyy-currency.xml"/>
     <!-- redefine the number keys -->
     <key id="1" output="1:basic:OK" />
     <key id="2" output="2:simple_transform:FAIL" />
@@ -61,8 +61,8 @@
     <set id="alpha" value="$[alpha1] $[alpha2]"/>
     <set id="nycun" value="$[alpha2] $[alpha1]"/> <!-- 'nycun' in rot13 -->
     <!-- 7: uset -->
-    <unicodeSet id="7ok" value="[[A_LIFE]-[E]]" /> <!-- = the chars [FAIL]-->
-    <unicodeSet id="7notok" value="[[A-Z]-$[7ok]]"/> <!-- everything not in [FAIL]-->
+    <uset id="7ok" value="[[A_LIFE]-[E]]" /> <!-- = the chars [FAIL]-->
+    <uset id="7notok" value="[[A-Z]-$[7ok]]"/> <!-- everything not in [FAIL]-->
   </variables>
 
   <transforms type="simple">

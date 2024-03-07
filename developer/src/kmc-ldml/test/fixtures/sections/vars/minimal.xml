@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<!DOCTYPE keyboard3 SYSTEM "../../../../../../../resources/standards-data/ldml-keyboards/techpreview/dtd/ldmlKeyboard3.dtd">
-<keyboard3 locale="mt" conformsTo="techpreview">
+<keyboard3 xmlns="https://schemas.unicode.org/cldr/45/keyboard3" locale="mt" conformsTo="45">
   <info name="vars-minimal"/>
 
   <keys />
@@ -10,7 +9,7 @@
   <variables>
     <string id="y" value="yes" /> <!-- a simple string-->
     <set id="upper" value="A B C D E FF" /> <!-- a set with 6 items -->
-    <unicodeSet id="consonants" value="[कसतनमह]" /> <!-- a UnicodeSet -->
+    <uset id="consonants" value="[कसतनमह]" /> <!-- a UnicodeSet -->
   </variables>
 
 

@@ -7,9 +7,7 @@ import { minKeymanVersion } from "./min-keyman-version.js";
 import { ModelInfoFile } from "./model-info-file.js";
 import { CompilerCallbacks, CompilerOptions, KeymanCompiler, KeymanCompilerArtifact, KeymanCompilerArtifacts, KeymanCompilerResult, KmpJsonFile } from "@keymanapp/common-types";
 import { ModelInfoCompilerMessages } from "./model-info-compiler-messages.js";
-import { validateMITLicense } from "@keymanapp/developer-utils";
-
-const HelpRoot = 'https://help.keyman.com/model/';
+import { KeymanUrls, validateMITLicense } from "@keymanapp/developer-utils";
 
 /* c8 ignore start */
 export class ModelInfoSources {
@@ -185,7 +183,7 @@ export class ModelInfoCompiler implements KeymanCompiler {
     model_info.packageIncludes = sources.kmpJsonData.files.filter((e) => !!e.name.match(/.[ot]tf$/i)).length ? ['fonts'] : [];
     model_info.version = sources.kmpJsonData.info.version.description;
     model_info.minKeymanVersion = minKeymanVersion;
-    model_info.helpLink = HelpRoot + model_info.id;
+    model_info.helpLink = KeymanUrls.HELP_MODEL(model_info.id);
 
     if(sources.sourcePath) {
       model_info.sourcePath = sources.sourcePath;
@@ -213,7 +211,7 @@ export class ModelInfoCompiler implements KeymanCompiler {
   private isLicenseMIT(filename: string) {
     const data = this.callbacks.loadFile(filename);
     if(!data) {
-      this.callbacks.reportMessage(ModelInfoCompilerMessages.Error_LicenseFileDoesNotExist({filename}));
+      this.callbacks.reportMessage(ModelInfoCompilerMessages.Error_LicenseFileIsMissing({filename}));
       return false;
     }
 

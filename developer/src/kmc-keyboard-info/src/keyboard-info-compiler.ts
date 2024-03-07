@@ -8,7 +8,7 @@ import { KeyboardInfoFile, KeyboardInfoFileIncludes, KeyboardInfoFileLanguageFon
 import { KeymanFileTypes, CompilerCallbacks, KmpJsonFile, KmxFileReader, KMX, KeymanTargets, KeymanCompiler, CompilerOptions, KeymanCompilerResult, KeymanCompilerArtifacts, KeymanCompilerArtifact } from "@keymanapp/common-types";
 import { KeyboardInfoCompilerMessages } from "./keyboard-info-compiler-messages.js";
 import langtags from "./imports/langtags.js";
-import { validateMITLicense } from "@keymanapp/developer-utils";
+import { KeymanUrls, validateMITLicense } from "@keymanapp/developer-utils";
 import { KmpCompiler } from "@keymanapp/kmc-package";
 
 import { SchemaValidators } from "@keymanapp/common-types";
@@ -17,8 +17,6 @@ import { getFontFamily } from "./font-family.js";
 const regionNames = new Intl.DisplayNames(['en'], { type: "region" });
 const scriptNames = new Intl.DisplayNames(['en'], { type: "script" });
 const langtagsByTag = {};
-
-const HelpRoot = 'https://help.keyman.com/keyboard/';
 
 /**
  * Build a dictionary of language tags from langtags.json
@@ -213,11 +211,11 @@ export class KeyboardInfoCompiler implements KeymanCompiler {
     keyboard_info.packageFilename = this.callbacks.path.basename(sources.kmpFilename);
 
     // Always overwrite with actual file size
-    keyboard_info.packageFileSize = this.callbacks.fileSize(sources.kmpFilename);
-    if(keyboard_info.packageFileSize === undefined) {
+    if(!this.callbacks.fs.existsSync(sources.kmpFilename)) {
       this.callbacks.reportMessage(KeyboardInfoCompilerMessages.Error_FileDoesNotExist({filename:sources.kmpFilename}));
       return null;
     }
+    keyboard_info.packageFileSize = this.callbacks.fileSize(sources.kmpFilename);
 
     if(sources.jsFilename) {
       keyboard_info.jsFilename = this.callbacks.path.basename(sources.jsFilename);
@@ -309,7 +307,7 @@ export class KeyboardInfoCompiler implements KeymanCompiler {
 
     keyboard_info.minKeymanVersion = minVersion;
     keyboard_info.sourcePath = sources.sourcePath;
-    keyboard_info.helpLink = HelpRoot + keyboard_info.id;
+    keyboard_info.helpLink = KeymanUrls.HELP_KEYBOARD(keyboard_info.id);
 
     // Related packages
     if(kmpJsonData.relatedPackages?.length) {
@@ -375,7 +373,7 @@ export class KeyboardInfoCompiler implements KeymanCompiler {
   private isLicenseMIT(filename: string) {
     const data = this.callbacks.loadFile(filename);
     if(!data) {
-      this.callbacks.reportMessage(KeyboardInfoCompilerMessages.Error_LicenseFileDoesNotExist({filename}));
+      this.callbacks.reportMessage(KeyboardInfoCompilerMessages.Error_LicenseFileIsMissing({filename}));
       return false;
     }
 
