@@ -434,6 +434,13 @@ begin
   // mapping; the best way to do this is to extract the scan code from
   // the message data and work from that
   vkey := MapScanCodeToUSVK((Message.LParam and $FF0000) shr 16);
+
+  // We don't support the Right Shift modifier in Keyman;
+  // we treat it as Left Shift, even though MapScanCodeToUSVK
+  // recognizes it
+  if vkey = VK_RSHIFT then
+    vkey := VK_SHIFT;
+
   modifier := 0;
 
   if GetKeyState(VK_LCONTROL) < 0 then modifier := modifier or KM_CORE_MODIFIER_LCTRL;
