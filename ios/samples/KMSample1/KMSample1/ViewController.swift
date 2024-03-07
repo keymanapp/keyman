@@ -19,10 +19,13 @@ class ViewController: UIViewController, TextViewDelegate {
     let keyboardID = FullKeyboardID(keyboardID: "ekwtamil99uni", languageID: "ta")
 
     do {
-      let package = try ResourceFileManager.shared.prepareKMPInstall(from: kmpFileURL) as! KeyboardKeymanPackage
-      try ResourceFileManager.shared.install(resourceWithID: keyboardID, from: package)
-
-      _ = Manager.shared.setKeyboard(withFullID: keyboardID)
+      let resource = try ResourceFileManager.shared.prepareKMPInstall(from: kmpFileURL)
+      if let package = resource as? KeyboardKeymanPackage {
+        try ResourceFileManager.shared.install(resourceWithID: keyboardID, from: package)
+        _ = Manager.shared.setKeyboard(withFullID: keyboardID)
+      } else {
+        print("Error installing: \(keyboardID) is not a keyboard package")
+      }
     } catch {
       print("Error preloading: \(error)")
     }
