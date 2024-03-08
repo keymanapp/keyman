@@ -115,7 +115,8 @@ enum RestoreLBResult { rsSUCCESS, rsNO_LB, rsERROR};
 
 /**
  * Normalizes line breaks in a wide-character string to LF (line feed) and
- * identifies the original line break type.
+ * identifies the original line break type. Testing has shown WORD and
+ * WordPad have just "\r" in the context. Whereas Firefox has just "\n"
  *
  * @param  windows_context       The wide-character string to be normalized.
  * @param[in,out]  core_context  The buffer to store the normalized string.
