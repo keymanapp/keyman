@@ -317,9 +317,11 @@ export class TouchEventEngine<ItemType, StateToken = any> extends InputEventEngi
       to this event and closure-capture it for the closure queued below.
     */
     const capturedSourcePromises = new Map<number, Promise<GestureSource<ItemType, StateToken>>>();
-    for(let i = 0; i < event.touches.length; i++) {
-      const touchId = event.touches.item(i).identifier;
-      capturedSourcePromises.set(touchId, this.pendingSourcePromises.get(touchId).corePromise);
+    // Any ending touches don't show up in event.touches - only in event.changedTouches!
+    for(let i = 0; i < event.changedTouches.length; i++) {
+      const touchId = event.changedTouches.item(i).identifier;
+      const promiseToCapture = this.pendingSourcePromises.get(touchId).corePromise;
+      capturedSourcePromises.set(touchId, promiseToCapture);
     }
 
     this.eventDispatcher.runAsync(async () => {
