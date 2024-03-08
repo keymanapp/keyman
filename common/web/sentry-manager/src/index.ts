@@ -25,12 +25,14 @@ export class KeymanSentryManager {
   _enabled: boolean = true;
 
   static STANDARD_ALIASABLE_FILES = {
-    'keymanweb.js':     'keymanweb.js',
-    'keymanweb-webview.js': 'keymanweb-webview.js',
-    'kmwuibutton.js':   'kmwuibutton.js',
-    'kmwuifloat.js':    'kmwuifloat.js',
-    'kmwuitoggle.js':   'kmwuitoggle.js',
-    'kmwuitoolbar.js':  'kmwuitoolbar.js'
+    'keymanweb.js':             'keymanweb.js',
+    'keymanweb-webview.js':     'keymanweb-webview.js',
+    'keymanweb.es5.js':         'keymanweb.es5.js',
+    'keymanweb-webview.es5.js': 'keymanweb-webview.es5.js',
+    'kmwuibutton.js':           'kmwuibutton.js',
+    'kmwuifloat.js':            'kmwuifloat.js',
+    'kmwuitoggle.js':           'kmwuitoggle.js',
+    'kmwuitoolbar.js':          'kmwuitoolbar.js'
     // Also add entries for the naming system used by Android and iOS - and map them to the EMBEDDED upload, not the std 'native' one.
   }
 

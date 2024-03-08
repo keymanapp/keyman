@@ -35,6 +35,7 @@ type
   public
     procedure StartDebugging;
     procedure StopDebugging;
+    function PrepareForBuild(var DebugReset: Boolean): Boolean;
     property DebugForm: TfrmLdmlKeyboardDebug read FDebugForm;
     property IsDebugVisible: Boolean read GetIsDebugVisible;
   end;
@@ -43,10 +44,12 @@ implementation
 
 uses
   keymanstrings,
+  KeymanDeveloperOptions,
   Keyman.System.Debug.DebugUIStatus,
   Keyman.Developer.System.Project.xmlLdmlProjectFile,
   Keyman.Developer.UI.Project.ProjectFileUI,
   Keyman.Developer.UI.Project.xmlLdmlProjectFileUI,
+  Keyman.Developer.UI.UfrmMessageDlgWithSave,
   KeymanDeveloperUtils,
   TextFileFormat,
   UfrmMessages;
@@ -144,5 +147,33 @@ begin
 
   inherited;
 end;
+
+function TfrmLdmlKeyboardEditor.PrepareForBuild(var DebugReset: Boolean): Boolean;
+var
+  FSave: Boolean;
+begin
+  if IsDebugVisible then
+  begin
+    if not FKeymanDeveloperOptions.DebuggerAutoResetBeforeCompiling then
+    begin
+      if TfrmMessageDlgWithSave.Execute(
+          'You must reset the debugger before recompiling your keyboard.  Reset the debugger and recompile?',
+          'Always reset the debugger automatically before compiling',
+          '', True, FSave) in [mrNo, mrCancel] then
+        Exit(False);
+      if FSave then
+      begin
+        FKeymanDeveloperOptions.DebuggerAutoResetBeforeCompiling := True;
+        FKeymanDeveloperOptions.Write;
+      end;
+    end;
+
+    DebugReset := True;
+    StopDebugging;
+  end;
+
+  Result := True;
+end;
+
 
 end.
