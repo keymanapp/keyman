@@ -32,7 +32,7 @@ describe('vars', function () {
         const vars = <Vars> sect;
         assert.equal(1, vars.sets?.length);
         assert.equal(1, vars.strings?.length);
-        assert.equal(1, vars.unicodeSets?.length);
+        assert.equal(1, vars.usets?.length);
         const set0 = vars.sets[0];
         assert.equal(set0.id.value, "upper");
         assert.equal(set0.value.value, "A B C D E FF");
@@ -42,7 +42,7 @@ describe('vars', function () {
         const string0 = vars.strings[0];
         assert.equal(string0.id.value, "y");
         assert.equal(string0.value.value, "yes");
-        const unicodeSet0 = vars.unicodeSets[0];
+        const unicodeSet0 = vars.usets[0];
         assert.equal(unicodeSet0.id.value, "consonants");
         assert.equal(unicodeSet0.value.value, "[कसतनमह]");
         assert.sameDeepOrderedMembers(unicodeSet0.unicodeSet.ranges, [
@@ -84,8 +84,8 @@ describe('vars', function () {
             "A", "B", "C", "D", "E", "FF", "Yes", "a", "b", "c", "Z",
           ]);
 
-        assert.equal(2, vars.unicodeSets?.length);
-        const unicodeSet0 = vars.unicodeSets[0];
+        assert.equal(2, vars.usets?.length);
+        const unicodeSet0 = vars.usets[0];
         assert.equal(unicodeSet0.id.value, "consonants");
         assert.equal(unicodeSet0.value.value, "[कसतनमह]");
         assert.sameDeepOrderedMembers(unicodeSet0.unicodeSet.ranges, [
@@ -96,7 +96,7 @@ describe('vars', function () {
           [cp('स'), cp('ह')], // range of 2
         ]);
 
-        const unicodeSet1 = vars.unicodeSets[1];
+        const unicodeSet1 = vars.usets[1];
         assert.equal(unicodeSet1.id.value, "mixture");
         assert.equal(unicodeSet1.value.value, "[[abc][कसतनमह]]"); // not canonicalized, just the raw expansion
         assert.sameDeepOrderedMembers(unicodeSet1.unicodeSet.ranges, [

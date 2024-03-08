@@ -23,6 +23,7 @@ builder_describe "Build Keyman kmc Keyboard Compiler module" \
   "@/developer/src/common/web/test-helpers" \
   "configure" \
   "build" \
+  "api                       analyze API and prepare API documentation" \
   "clean" \
   "test" \
   "build-fixtures            builds test fixtures for manual examination" \
@@ -31,7 +32,8 @@ builder_describe "Build Keyman kmc Keyboard Compiler module" \
   "--dry-run,-n              don't actually publish, just dry run"
 builder_describe_outputs \
   configure     /node_modules \
-  build         /developer/src/kmc-ldml/build/src/main.js
+  build         /developer/src/kmc-ldml/build/src/main.js \
+  api           /developer/build/api/kmc-ldml.api.json
 
 builder_parse "$@"
 
@@ -70,6 +72,8 @@ if builder_start_action build-fixtures; then
 
   builder_finish_action success build-fixtures
 fi
+
+builder_run_action api        api-extractor run --local --verbose
 
 #-------------------------------------------------------------------------------------------------------------------
 
