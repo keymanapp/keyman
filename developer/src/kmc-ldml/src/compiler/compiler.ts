@@ -100,8 +100,8 @@ export class LdmlKeyboardCompiler implements KeymanCompiler {
 
   /**
    * Compiles a LDML keyboard .xml file to .kmx, .kvk, and/or .js files. Returns
-   * an object containing binary artifacts on succes. The files are passed in by
-   * name, and the compiler will use callbacks as passed to the
+   * an object containing binary artifacts on success. The files are passed in
+   * by name, and the compiler will use callbacks as passed to the
    * {@link LdmlKeyboardCompiler.init} function to read any input files by disk.
    * @param infile  - Path to source file.
    * @param outfile - Path to output file. The file will not be written to, but
