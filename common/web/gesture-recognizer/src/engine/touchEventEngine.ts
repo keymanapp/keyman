@@ -246,7 +246,9 @@ export class TouchEventEngine<ItemType, StateToken = any> extends InputEventEngi
     const capturedSourcePromises = new Map<number, Promise<GestureSource<ItemType, StateToken>>>();
     for(let i = 0; i < event.touches.length; i++) {
       const touchId = event.touches.item(i).identifier;
-      capturedSourcePromises.set(touchId, this.pendingSourcePromises.get(touchId).corePromise);
+      // If the source's gesture is finalized or cancelled but touch events are ongoing,
+      // with no delay between event and its processing, the map entry here will be cleared.
+      capturedSourcePromises.set(touchId, this.pendingSourcePromises.get(touchId)?.corePromise);
     }
 
     this.eventDispatcher.runAsync(async () => {
@@ -279,6 +281,12 @@ export class TouchEventEngine<ItemType, StateToken = any> extends InputEventEngi
         const touch = event.touches.item(i);
         const touchId = touch.identifier;
 
+
+        // Only lists touch contact points that have been lifted; touchmove is
+        // raised separately if any movement occurred.
+        //
+        // If the promise object could not be assigned, we `await undefined` -
+        // which JS converts to `await Promise.resolve(undefined)`.  It's safe.
         const source = await capturedSourcePromises.get(touchId);
         if(!source || source.isPathComplete) {
           continue;
@@ -320,12 +328,18 @@ export class TouchEventEngine<ItemType, StateToken = any> extends InputEventEngi
     // Any ending touches don't show up in event.touches - only in event.changedTouches!
     for(let i = 0; i < event.changedTouches.length; i++) {
       const touchId = event.changedTouches.item(i).identifier;
-      const promiseToCapture = this.pendingSourcePromises.get(touchId).corePromise;
+      // If the source's gesture is finalized or cancelled but touch events are ongoing,
+      // with no delay between event and its processing, the map entry here will be cleared.
+      const promiseToCapture = this.pendingSourcePromises.get(touchId)?.corePromise;
       capturedSourcePromises.set(touchId, promiseToCapture);
     }
 
     this.eventDispatcher.runAsync(async () => {
-      // Only lists touch contact points that have been lifted; touchmove is raised separately if any movement occurred.
+      // Only lists touch contact points that have been lifted; touchmove is
+      // raised separately if any movement occurred.
+      //
+      // If the promise object could not be assigned, we `await undefined` -
+      // which JS converts to `await Promise.resolve(undefined)`.  It's safe.
       for(let i=0; i < event.changedTouches.length; i++) {
         const touch = event.changedTouches.item(i);
 
