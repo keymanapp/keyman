@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 17.0.285 beta 2024-03-08
+
+* fix(windows): GetKeyboardLanguage exits early on an invalid keyboard ID (#10936)
+
 ## 17.0.284 beta 2024-03-07
 
 * fix(web): globe key highlighting (#10932)
