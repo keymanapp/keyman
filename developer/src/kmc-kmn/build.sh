@@ -24,6 +24,7 @@ builder_describe "Build Keyman Developer Compiler Module for .kmn to .kmx" \
   "configure" \
   "build" \
   "clean" \
+  "api                       analyze API and prepare API documentation" \
   "test" \
   "pack                      build a local .tgz pack for testing" \
   "publish                   publish to npm" \
@@ -31,7 +32,8 @@ builder_describe "Build Keyman Developer Compiler Module for .kmn to .kmx" \
 
 builder_describe_outputs \
   configure     /node_modules \
-  build         /developer/src/kmc-kmn/build/src/main.js
+  build         /developer/src/kmc-kmn/build/src/main.js \
+  api           /developer/build/api/kmc-kmn.api.json
 
 builder_parse "$@"
 
@@ -63,6 +65,8 @@ if builder_start_action build; then
   tsc --build
   builder_finish_action success build
 fi
+
+builder_run_action api        api-extractor run --local --verbose
 
 #-------------------------------------------------------------------------------------------------------------------
 

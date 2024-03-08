@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<!DOCTYPE keyboard3 SYSTEM "../../../../../../../resources/standards-data/ldml-keyboards/techpreview/dtd/ldmlKeyboard3.dtd">
-<keyboard3 locale="mt" conformsTo="techpreview">
+<keyboard3 xmlns="https://schemas.unicode.org/cldr/45/keyboard3" locale="mt" conformsTo="45">
   <info name="vars-maximal"/>
 
   <keys />
@@ -13,7 +12,7 @@
     <set id="upper" value="A B C D E FF ${affirmative}"/>
     <set id="lower" value="a b c" />
     <set id="lowupp" value="$[upper] $[lower] Z"/>
-    <unicodeSet id="consonants" value="[कसतनमह]" />
-    <unicodeSet id="mixture" value="[[abc]$[consonants]]" />
+    <uset id="consonants" value="[कसतनमह]" />
+    <uset id="mixture" value="[[abc]$[consonants]]" />
   </variables>
 </keyboard3>

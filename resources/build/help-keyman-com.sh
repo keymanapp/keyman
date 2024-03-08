@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# TODO: rewrite this script to builder reqs
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
@@ -28,57 +29,42 @@ shopt -s nullglob
 #
 
 if [ -z ${HELP_KEYMAN_COM+x} ]; then
-  >&2 echo "Not uploading documentation: must set HELP_KEYMAN_COM in environment."
-  exit 1
+  builder_die "Not uploading documentation: must set HELP_KEYMAN_COM in environment."
 fi
 
 if [ ! -d "$HELP_KEYMAN_COM/products/" ]; then
-  >&2 echo "HELP_KEYMAN_COM path ($HELP_KEYMAN_COM) does not appear to be valid."
-  exit 1
+  builder_die "HELP_KEYMAN_COM path ($HELP_KEYMAN_COM) does not appear to be valid."
 fi
 
 function display_usage {
   echo "Usage: $0 [platform]"
   echo "       $0 --help"
   echo
-  echo "  platform should be one of: android, ios, linux, mac, windows."
+  echo "  platform should be one of: android, ios, linux, mac, windows, developer."
   echo "  --help               displays this screen and exits"
 }
-
-#
-# Define terminal colours
-#
-
-if [ -t 2 ]; then
-  t_red=$'\e[1;31m'
-  t_grn=$'\e[1;32m'
-  t_yel=$'\e[1;33m'
-  t_blu=$'\e[1;34m'
-  t_mag=$'\e[1;35m'
-  t_cyn=$'\e[1;36m'
-  t_end=$'\e[0m'
-fi
 
 #
 # Uploading Keyman documentation
 #
 
-## Determine the help.keyman.com product path based on $platform
-function help_product_path {
-  if [ $platform == 'ios' ]; then
-    echo "products/iphone-and-ipad/$VERSION_RELEASE"
-  else
-    echo "products/$platform/$VERSION_RELEASE"
-  fi
-}
+function upload {
+  local srcpath="$KEYMAN_ROOT/$1"
+  local dstpath="$HELP_KEYMAN_COM/$2"
 
-# Generate markdown help files
-function generate_markdown_help {
-  if [ $platform == 'linux' ]; then
-    pushd $KEYMAN_ROOT/linux/keyman-config > /dev/null
-    ./build.sh build
-    popd
+  #
+  # Look for help source folder.
+  #
+
+  if [[ ! -d "$srcpath" ]]; then
+    builder_die "Error: The source path $srcpath does not exist"
+    exit 1
   fi
+
+  rm -rf "$dstpath"
+  mkdir -p "$dstpath"
+
+  cp -rv "$srcpath"/* "$dstpath/"
 }
 
 ##
@@ -86,46 +72,34 @@ function generate_markdown_help {
 ## Paths depend on $platform
 ##
 function upload_keyman_help {
-
-  local helppath
-  local dstpath
-
   case $platform in
     android)
-      helppath=$KEYMAN_ROOT/android/help
+      upload android/help products/android/$VERSION_RELEASE
       ;;
     ios)
-      helppath=$KEYMAN_ROOT/ios/help
+      upload ios/help products/iphone-and-ipad/$VERSION_RELEASE
       ;;
     linux)
-      helppath=$KEYMAN_ROOT/linux/help
+      pushd "$KEYMAN_ROOT/linux/keyman-config" > /dev/null
+      ./build.sh build
+      popd > /dev/null
+      upload linux/help products/linux/$VERSION_RELEASE
       ;;
     mac)
-      helppath=$KEYMAN_ROOT/mac/help
+      upload mac/help products/mac/$VERSION_RELEASE
       ;;
     windows)
       # Note: `/windows/src/desktop/help/build.sh web` must be run first
-      helppath=$KEYMAN_ROOT/windows/bin/help/md/desktop
+      upload windows/bin/help/md/desktop products/windows/$VERSION_RELEASE
+      ;;
+    developer)
+      # Note: `/developer/build.sh api` must be run first - covers both uploads
+      upload developer/build/docs developer/$VERSION_RELEASE/reference/api
+      upload developer/src/kmc/build/messages developer/$VERSION_RELEASE/reference/messages
       ;;
     *)
       display_usage
     esac
-
-    dstpath="$HELP_KEYMAN_COM/$(help_product_path)"
-
-  #
-  # Look for help source folder.
-  #
-
-  if [[ ! -d "$helppath" ]]; then
-    echo "${t_yel}Warning: The source path $helppath does not exist${t_end}"
-    exit 1
-  fi
-
-  rm -rf "$dstpath"
-  mkdir -p "$dstpath"
-
-  cp -rv "$helppath"/* "$dstpath/"
 }
 
 #
@@ -142,7 +116,7 @@ while [[ $# -gt 0 ]] ; do
       display_usage
       exit 0
       ;;
-    android | ios | linux | mac | windows)
+    android | ios | linux | mac | windows | developer)
       platform=$key
       ;;
     *)
@@ -158,13 +132,11 @@ if [ -z ${platform} ]; then
   exit 1
 fi
 
-generate_markdown_help || exit 1
-
 echo "Uploading Keyman for $platform documentation to help.keyman.com"
 
 upload_keyman_help || exit 1
 
-ci_add_files "$HELP_KEYMAN_COM" "$(help_product_path)"
+ci_add_files "$HELP_KEYMAN_COM" .
 if ! ci_repo_has_cached_changes "$HELP_KEYMAN_COM"; then
   echo "No changes to commit"
   exit 0

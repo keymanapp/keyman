@@ -246,11 +246,10 @@ export class MatcherSelector<Type, StateToken = any> extends EventEmitter<EventM
 
       await parentLockPromise;
 
-      childLock.resolve(); // allow the next matchGesture call through.
-
       if(this.pendingMatchSetup == childLock.corePromise) {
         this.pendingMatchSetup = null;
       }
+      childLock.resolve(); // allow the next matchGesture call through.
     }
 
     if(sourceNotYetStaged) {
@@ -334,11 +333,12 @@ export class MatcherSelector<Type, StateToken = any> extends EventEmitter<EventM
         // (which itself needs a macroqueue wait)
         await timedPromise(0);
 
-        matchingLock.resolve();
         // Only clear the promise if no extra entries were added to the implied `matchGesture` queue.
         if(this.pendingMatchSetup == matchingLock.corePromise) {
           this.pendingMatchSetup = null;
         }
+
+        matchingLock.resolve();
 
         // stateToken may have shifted by the time we regain control here.
         const incomingStateToken = this.stateToken;
