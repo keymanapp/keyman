@@ -1,10 +1,10 @@
-import { KMX, Osk, TouchLayout, TouchLayoutFileReader, TouchLayoutFileWriter } from "@keymanapp/common-types";
+import { KMX, TouchLayout, TouchLayoutFileReader, TouchLayoutFileWriter } from "@keymanapp/common-types";
 import { callbacks, fk, IsKeyboardVersion14OrLater, IsKeyboardVersion15OrLater, IsKeyboardVersion17OrLater } from "./compiler-globals.js";
 import { JavaScript_Key } from "./javascript-strings.js";
 import { TRequiredKey, CRequiredKeys, CSpecialText, CSpecialText14Map, CSpecialText17Map, CSpecialTextMinVer, CSpecialTextMaxVer } from "./constants.js";
 import { KeymanWebTouchStandardKeyNames, KMWAdditionalKeyNames, VKeyNames } from "./keymanweb-key-codes.js";
 import { KmwCompilerMessages } from "./kmw-compiler-messages.js";
-
+import * as Osk from '../compiler/osk.js';
 
 interface VLFOutput {
   output: string;
@@ -241,7 +241,7 @@ export function ValidateLayoutFile(fk: KMX.KEYBOARD, FDebug: boolean, sLayoutFil
   const warnGesturesIfNeeded = function(keyId: string) {
     if(!hasWarnedOfGestureUseDownlevel && !IsKeyboardVersion17OrLater()) {
       hasWarnedOfGestureUseDownlevel = true;
-      callbacks.reportMessage(KmwCompilerMessages.Warn_TouchLayoutUsesUnsupportedGesturesDownlevel({keyId}));
+      callbacks.reportMessage(KmwCompilerMessages.Hint_TouchLayoutUsesUnsupportedGesturesDownlevel({keyId}));
     }
   }
 

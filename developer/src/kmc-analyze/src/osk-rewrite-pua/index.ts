@@ -1,14 +1,24 @@
-import { CompilerCallbacks, KeymanFileTypes, KvksFile, KvksFileReader, KvksFileWriter, Osk, TouchLayoutFileReader, TouchLayoutFileWriter } from "@keymanapp/common-types";
-import { CompilerMessages } from '@keymanapp/kmc-kmn';
+import { CompilerCallbacks, KeymanFileTypes, KvksFile, KvksFileReader, KvksFileWriter, TouchLayoutFileReader, TouchLayoutFileWriter } from "@keymanapp/common-types";
+import { CompilerMessages, Osk } from '@keymanapp/kmc-kmn';
 import { getOskFromKmnFile } from "../util/get-osk-from-kmn-file.js";
 import { AnalyzerMessages } from "../messages.js";
 
+/**
+ * @public
+ * Rewrite On Screen Keyboard files (.kvks, .keyman-touch-layout) with PUA
+ * codepoints, based on analysis provided by {@link AnalyzeOskCharacterUse}
+ * class.
+ */
 export class AnalyzeOskRewritePua {
   private _data: {[index:string]: Uint8Array} = {};
 
   constructor(private callbacks: CompilerCallbacks) {
   }
 
+  /**
+   * Clears data collected from previous calls to
+   * {@link AnalyzeOskRewritePua.analyze}
+   */
   public clear() {
     this._data = {};
   }
@@ -17,6 +27,17 @@ export class AnalyzeOskRewritePua {
   // Analyze a single file
   //
 
+  /**
+   * Analyze a keyboard file or files, and provide a remapped output. Accepts a
+   * .kmn, .kvks, .keyman-touch-layout file formats. For .kmn, will rewrite
+   * associated On Screen Keyboard file formats. Can be called multiple times to
+   * rewrite multiple files. Use the {@link AnalyzeOskRewritePua.data} property
+   * to retrieve the output file content for writing. This does not modify the
+   * source file.
+   * @param file    - relative or absolute path to a Keyman source file
+   * @param mapping - OSK keycap map provided by {@link AnalyzeOskCharacterUse}
+   * @returns       true if the file is successfully loaded and rewritten
+   */
   public async analyze(file: string, mapping: Osk.StringResult[]): Promise<boolean> {
     let map: Osk.PuaMap = Osk.parseMapping(mapping);
 
@@ -49,6 +70,10 @@ export class AnalyzeOskRewritePua {
     return true;
   }
 
+  /**
+   * Returns the file data for OSK files rewritten with PUA characters, for use
+   * with `&displayMap`.
+   */
   public get data() {
     return this._data;
   }

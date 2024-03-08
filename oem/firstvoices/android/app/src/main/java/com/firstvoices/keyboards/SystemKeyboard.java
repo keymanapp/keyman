@@ -61,29 +61,7 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
         KMManager.setShouldCheckKeyboardUpdates(false);
         KMManager.setKeyboardPickerFont(Typeface.createFromAsset(getAssets(), "fonts/NotoSansCanadianAboriginal.ttf"));
         KMManager.initialize(getApplicationContext(), KeyboardType.KEYBOARD_TYPE_SYSTEM);
-
-        /**
-         * We need to set the default (fallback) keyboard to sil_euro_latin inside the fv_all package
-         * rather than the normal default of sil_euro_latin inside the sil_euro_latin package.
-         * Fallback keyboard needed in case the user never selects a FV keyboard to add
-         * as a system keyboard.
-         */
-        String version = KMManager.getLatestKeyboardFileVersion(
-          this, FVShared.FVDefault_PackageID, KMManager.KMDefault_KeyboardID);
-        KMManager.setDefaultKeyboard(
-          new Keyboard(
-            FVShared.FVDefault_PackageID,
-            KMManager.KMDefault_KeyboardID,
-            KMManager.KMDefault_KeyboardName,
-            KMManager.KMDefault_LanguageID,
-            KMManager.KMDefault_LanguageName,
-            version,
-            null, // will use help.keyman.com link because context required to determine local welcome.htm path,
-            "",
-            false,
-            KMManager.KMDefault_KeyboardFont,
-            KMManager.KMDefault_KeyboardFont)
-        );
+        DefaultLanguageResource.install(this);
 
         interpreter = new KMHardwareKeyboardInterpreter(getApplicationContext(), KeyboardType.KEYBOARD_TYPE_SYSTEM);
         KMManager.setInputMethodService(this); // for HW interface

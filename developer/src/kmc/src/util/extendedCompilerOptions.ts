@@ -1,6 +1,6 @@
 import { CompilerCallbacks, CompilerError, CompilerErrorSeverity, CompilerMessageOverride, CompilerMessageOverrideMap, CompilerOptions } from '@keymanapp/common-types';
 import { InfrastructureMessages } from '../messages/infrastructureMessages.js';
-import { messageNamespaceKeys, messageNamespaces } from '../messages/messageNamespaces.js';
+import { messageNamespaceKeys, messageSources } from '../messages/messageNamespaces.js';
 
 export interface ExtendedCompilerOptions extends CompilerOptions {
   /**
@@ -66,6 +66,37 @@ function commandOptionsMessagesToCompilerOptionsMessages(messages: any, callback
   return result;
 }
 
+export interface CompilerMessageDetail {
+  code: number;
+  id: any;
+  module: string;
+  class: any;
+}
+
+export function findMessageDetails(code: number, callbacks: CompilerCallbacks): CompilerMessageDetail {
+  const namespace = CompilerError.namespace(code);
+  if(!messageNamespaceKeys.includes(namespace)) {
+    callbacks.reportMessage(InfrastructureMessages.Error_MessageNamespaceNotFound({code}));
+    return null;
+  }
+
+  const source = messageSources[namespace];
+  if(!source) {
+    throw new Error(`Unexpected missing namespace for code ${code.toString(16)}`);
+  }
+
+  // For the given namespace object, iterate through the members to find the matching value
+
+  const keys = Object.keys(source.class);
+  const m = source.class as Record<string,any>;
+  const id = keys.find(key => typeof m[key] == 'number' && CompilerError.error(m[key]) === code);
+  if(!id) {
+    callbacks.reportMessage(InfrastructureMessages.Error_MessageCodeNotFound({code}));
+    return null;
+  }
+  return {code: m[id], id, module: source.module, class: source.class};
+}
+
 /**
  * Verifies that a given message is valid and that the severity is allowed to be
  * modified (Info, Hint and Warn only -- Error and Fatal cannot be modified)
@@ -74,29 +105,13 @@ function commandOptionsMessagesToCompilerOptionsMessages(messages: any, callback
  * @returns true if the message can be overridden
  */
 function checkMessageOverride(override: CompilerMessageOverride, callbacks: CompilerCallbacks) {
-  const namespace = CompilerError.namespace(override.code);
-  if(!messageNamespaceKeys.includes(namespace)) {
-    callbacks.reportMessage(InfrastructureMessages.Error_MessageNamespaceNotFound({code:override.code}));
-    return false;
-  }
-
-  const source = messageNamespaces[namespace];
-  if(!source) {
-    throw new Error(`Unexpected missing namespace for code ${override.code.toString(16)}`);
-  }
-
-  // For the given namespace object, iterate through the members to find the matching value
-
-  const keys = Object.keys(source);
-  const m = source as Record<string,any>;
-  const key = keys.find(key => typeof m[key] == 'number' && CompilerError.error(m[key]) === override.code);
-  if(!key) {
-    callbacks.reportMessage(InfrastructureMessages.Error_MessageCodeNotFound({code:override.code}));
+  const details = findMessageDetails(override.code, callbacks);
+  if(!details) {
     return false;
   }
 
   const validSeverityMasks = [CompilerErrorSeverity.Info,CompilerErrorSeverity.Hint,CompilerErrorSeverity.Warn];
-  if(!validSeverityMasks.includes(CompilerError.severity(m[key]))) {
+  if(!validSeverityMasks.includes(CompilerError.severity(details.code))) {
     callbacks.reportMessage(InfrastructureMessages.Error_MessageCannotBeCoerced({code:override.code}));
     return false;
   }

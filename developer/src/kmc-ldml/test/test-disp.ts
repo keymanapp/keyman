@@ -1,7 +1,7 @@
 import 'mocha';
 import {assert} from 'chai';
 import { DispCompiler } from '../src/compiler/disp.js';
-import { compilerTestCallbacks, loadSectionFixture } from './helpers/index.js';
+import { compilerTestCallbacks, loadSectionFixture, testCompilationCases } from './helpers/index.js';
 import { KMXPlus } from '@keymanapp/common-types';
 import { CompilerMessages } from '../src/compiler/messages.js';
 
@@ -81,6 +81,14 @@ describe('disp', function () {
     assert.equal(compilerTestCallbacks.messages.length, 1);
     assert.deepEqual(compilerTestCallbacks.messages[0], CompilerMessages.Error_DisplayNeedsToOrId({ output: 'e', keyId: 'e' }));
   });
-
+  testCompilationCases(DispCompiler, [
+    {
+      subpath: 'sections/disp/invalid-var.xml',
+      errors: [
+        CompilerMessages.Error_MissingStringVariable({id: "missingdisplay"}),
+        CompilerMessages.Error_MissingStringVariable({id: "missingoutput"}),
+      ],
+    },
+  ]);
 });
 

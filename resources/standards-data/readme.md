@@ -12,7 +12,7 @@ the version data in this file also.
 | iso639-3                   | 2023        |
 | langtags                   | 2023-05-04  |
 | langtags-subtag-registry   | 2023-05-11  |
-| ldml-keyboards             | techpreview |
+| ldml-keyboards             | 45          |
 | unicode-character-database | 15          |
 | windows-lcid-to-bcp-47     | ?           |
 

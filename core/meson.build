@@ -11,7 +11,8 @@ project('keyman_core', 'cpp', 'c',
         default_options : ['buildtype=release',
                            'cpp_std=c++14',
                            'b_vscrt=static_from_buildtype',
-                           'warning_level=2'],
+                           'warning_level=2',
+                           'debug=true'],
         meson_version: '>=0.57.0')
 
 # Import our standard compiler defines; this is copied from
