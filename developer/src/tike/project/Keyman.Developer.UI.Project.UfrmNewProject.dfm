@@ -51,6 +51,7 @@ inherited frmNewProject: TfrmNewProject
       FFFFFFFFFFFF00000000FFFFFFFF000000001657006F00720064006C00690073
       00740020004C00650078006900630061006C0020004D006F00640065006C00}
     LargeImages = ilLarge
+    ReadOnly = True
     SmallImages = ilSmall
     TabOrder = 0
     OnDblClick = lvItemsDblClick

@@ -5,8 +5,8 @@
 package com.keyman.android;
 
 import com.tavultesoft.kmapro.BuildConfig;
+import com.tavultesoft.kmapro.DefaultLanguageResource;
 import com.tavultesoft.kmapro.KeymanSettingsActivity;
-import com.keyman.android.BannerController;
 import com.keyman.engine.KMManager;
 import com.keyman.engine.KMManager.KeyboardType;
 import com.keyman.engine.KMHardwareKeyboardInterpreter;
@@ -64,11 +64,13 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
       KMManager.setDebugMode(true);
     }
     KMManager.addKeyboardEventListener(this);
-    KMManager.initialize(getApplicationContext(), KeyboardType.KEYBOARD_TYPE_SYSTEM);
-    interpreter = new KMHardwareKeyboardInterpreter(getApplicationContext(), KeyboardType.KEYBOARD_TYPE_SYSTEM);
+    Context context = getApplicationContext();
+    KMManager.initialize(context, KeyboardType.KEYBOARD_TYPE_SYSTEM);
+    DefaultLanguageResource.install(context);
+    interpreter = new KMHardwareKeyboardInterpreter(context, KeyboardType.KEYBOARD_TYPE_SYSTEM);
     KMManager.setInputMethodService(this); // for HW interface
 
-    SharedPreferences prefs = getApplicationContext().getSharedPreferences(getApplicationContext().getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
+    SharedPreferences prefs = context.getSharedPreferences(context.getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
     KMManager.SpacebarText spacebarText = KMManager.SpacebarText.fromString(prefs.getString(KeymanSettingsActivity.spacebarTextKey, KMManager.SpacebarText.LANGUAGE_KEYBOARD.toString()));
     KMManager.setSpacebarText(spacebarText);
 

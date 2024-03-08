@@ -9,6 +9,7 @@ export interface LexicalModelDeclaration {
 }
 
 /**
+ * @public
  * Keyman 14.0+ word breaker specification:
  *
  * Can support all old word breaking specification,
@@ -39,6 +40,7 @@ export interface LexicalModelDeclaration {
 }
 
 /**
+ * @public
  * Simplified word breaker specification.
  *
  * @since 11.0
@@ -46,6 +48,7 @@ export interface LexicalModelDeclaration {
  export type SimpleWordBreakerSpec = 'default' | 'ascii' | WordBreakingFunction;
 
 /**
+ * @public
  * Simplifies input text to facilitate finding entries within a lexical model's
  * lexicon.
  * @since 11.0
@@ -53,6 +56,7 @@ export interface LexicalModelDeclaration {
  export type SimpleWordformToKeySpec = (term: string) => string;
 
 /**
+ * @public
  * Simplifies input text to facilitate finding entries within a lexical model's
  * lexicon, using the model's `applyCasing` function to assist in the keying process.
  * @since 14.0
@@ -60,6 +64,7 @@ export interface LexicalModelDeclaration {
 export type CasedWordformToKeySpec = (term: string, applyCasing?: CasingFunction) => string;
 
 /**
+ * @public
  * Simplifies input text to facilitate finding entries within a lexical model's
  * lexicon.
  */
@@ -92,6 +97,10 @@ export type CasedWordformToKeySpec = (term: string, applyCasing?: CasingFunction
 export type OverrideScriptDefaults = 'break-words-at-spaces';
 
 
+/**
+ * @public
+ * Base interface for a lexical model source definition
+ */
 export interface LexicalModelSource extends LexicalModelDeclaration {
   readonly sources: Array<string>;
   /**

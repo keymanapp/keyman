@@ -26,7 +26,8 @@ export function declareBuild(program: Command) {
     .option('-d, --debug', 'Include debug information in output')
     .option('-w, --compiler-warnings-as-errors', 'Causes warnings to fail the build; overrides project-level warnings-as-errors option')
     .option('-W, --no-compiler-warnings-as-errors', 'Warnings do not fail the build; overrides project-level warnings-as-errors option')
-    .option('-m, --message <numbers...>', 'Adjust severity of info, hint or warning message to Disable (default), Info, Hint, Warn or Error')
+    .option('-m, --message <number>', 'Adjust severity of info, hint or warning message to Disable (default), Info, Hint, Warn or Error (option can be repeated)',
+      (value, previous) => previous.concat([value]), [])
     .option('--no-compiler-version', 'Exclude compiler version metadata from output')
     .option('--no-warn-deprecated-code', 'Turn off warnings for deprecated code styles');
 
@@ -91,6 +92,8 @@ async function buildFile(filenames: string[], _options: any, commander: any)  {
     filenames.push('.');
   }
 
+  /* c8 ignore next 6 */
+  // full test on console log of error message not justified; check with user test recommended
   if(filenames.length > 1 && commanderOptions.outFile) {
     // -o can only be specified with a single input file
     callbacks.reportMessage(InfrastructureMessages.Error_OutFileCanOnlyBeSpecifiedWithSingleInfile());

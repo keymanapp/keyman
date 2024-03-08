@@ -286,9 +286,9 @@ describe('tran', function () {
     {
       subpath: `sections/tran/fail-bad-tran-1.xml`,
       errors: [
-        CompilerMessages.Error_UnparseableTransformFrom({ from: 'AB(now if only I would terminate this group..',
-        // this message is dependent on v8, so this test could be a little brittle.
-        message: 'Invalid regular expression: /AB(now if only I would terminate this group../: Unterminated group' }),
+        { code: CompilerMessages.ERROR_UnparseableTransformFrom,
+          matchMessage: /Invalid regular expression.*Unterminated group/,
+        }
       ],
     },
     {
@@ -297,6 +297,51 @@ describe('tran', function () {
         CompilerMessages.Error_InvalidQuadEscape({ cp: 295 }),
       ],
     },
+    {
+      subpath: `sections/tran/fail-missing-var-1.xml`,
+      errors: [
+        CompilerMessages.Error_MissingStringVariable({ id: "missingfrom" }),
+      ],
+    },
+    {
+      subpath: `sections/tran/fail-missing-var-2.xml`,
+      errors: [
+        CompilerMessages.Error_MissingStringVariable({ id: "missingto" }),
+      ],
+    },
+    {
+      subpath: `sections/tran/fail-missing-var-3.xml`,
+      errors: [
+        CompilerMessages.Error_MissingSetVariable({ id: "missingset" }),
+      ],
+    },
+    {
+      subpath: `sections/tran/fail-missing-var-4.xml`,
+      errors: [
+        CompilerMessages.Error_MissingSetVariable({ id: "missingset" }),
+      ],
+    },
+    {
+      subpath: `sections/tran/fail-missing-var-5.xml`,
+      errors: [
+        CompilerMessages.Error_MissingSetVariable({ id: "missingset" }),
+      ],
+    },
+    {
+      subpath: `sections/tran/fail-missing-var-6.xml`,
+      errors: [
+        CompilerMessages.Error_MissingStringVariable({ id: "missingstr" }),
+      ],
+    },
+    // escaping
+    {
+      subpath: `sections/tran/tran-escape.xml`,
+      callback(sect) {
+        const tran = <Tran>sect;
+        assert.ok(tran);
+      },
+    }
+
   ], tranDependencies);
 });
 

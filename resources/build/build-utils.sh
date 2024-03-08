@@ -299,7 +299,6 @@ replaceVersionStrings_Mkver() {
     s/\$Environment/$VERSION_ENVIRONMENT/g;
     s/\$Version/$VERSION/g;
     s/\$VERSIONNUM/$VERSION_MAJOR,$VERSION_MINOR,$VERSION_PATCH,0/g;
-    s/\$VERSION/$VERSION_WIN/g;
     s/\$RELEASE_MAJOR/$VERSION_MAJOR/g;
     s/\$RELEASE_MINOR/$VERSION_MINOR/g;
     s/\$RELEASE/$VERSION_RELEASE/g;
@@ -314,6 +313,8 @@ replaceVersionStrings_Mkver() {
     s/\$VERSION_WITH_TAG/$VERSION_WITH_TAG/g;
     s/\$VERSION_GIT_TAG/$VERSION_GIT_TAG/g;
     s/\$VERSION_ENVIRONMENT/$VERSION_ENVIRONMENT/g;
+
+    s/\$VERSION/$VERSION_WIN/g;
 
     " "$infile" > "$outfile"
 }
