@@ -1,5 +1,28 @@
 # Keyman Version History
 
+## 17.0.284 beta 2024-03-07
+
+* fix(web): globe key highlighting (#10932)
+* chore(web): updates mtnt model used by test page (#10935)
+* fix(developer): kmc keyboard info compiler no kmp error (#10893)
+* fix(developer): Treat Right Shift as Shift in debugger (#10919)
+* docs(developer): kmc-model api documentation (#10921)
+* docs(developer): kmc-model-info api documentation (#10922)
+* docs(developer): kmc-keyboard-info api documentation (#10923)
+* docs(developer): kmc-package api documentation (#10924)
+* fix(developer): normalize all input paths in .kps compiler (#10950)
+
+## 17.0.283 beta 2024-03-06
+
+* fix(android): fixes context-change detection for repeated-char cases (#10873)
+* fix(developer): search-term quote replacement was not global (#10934)
+*  (#10913)
+* fix(developer): fix for errant \uXXXX error (#10946)
+*  (#10948)
+* refactor(oem/fv/android): Install fallback keyboard (#10907)
+* refactor(android/app): Move storage permission checks (#10904)
+* fix(common): missing script exec bit (#10951)
+
 ## 17.0.282 beta 2024-03-05
 
 * fix(developer): move osk.ts from developer-utils to kmc-kmn (#10903)

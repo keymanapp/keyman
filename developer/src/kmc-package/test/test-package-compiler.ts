@@ -216,4 +216,49 @@ describe('KmpCompiler', function () {
     assert.deepEqual(callbacks.messages[0].code, CompilerMessages.WARN_AbsolutePath);
     assert.deepEqual(callbacks.messages[1].code, CompilerMessages.ERROR_FileDoesNotExist);
   });
+
+  // Testing path normalization
+
+  it('should normalize DOS pathnames from \\ to /', async function() {
+    // this.timeout(10000); // building a zip file can sometimes be slow
+
+    callbacks.clear();
+
+    const kpsPath = makePathToFixture('normalize_paths', 'source', 'khmer_angkor.kps');
+    const kmpCompiler = new KmpCompiler();
+    assert.isTrue(await kmpCompiler.init(callbacks, null));
+
+    let kmpJson: KmpJsonFile.KmpJsonFile = null;
+
+    assert.doesNotThrow(() => {
+      kmpJson = kmpCompiler.transformKpsToKmpObject(kpsPath);
+    });
+
+    callbacks.printMessages();
+    assert.lengthOf(callbacks.messages, 0);
+    /*
+    <ExecuteProgram>exe\myprogram.exe</ExecuteProgram>
+    <ReadMeFile>..\source\readme.htm</ReadMeFile>
+    <GraphicFile>..\source\splash.gif</GraphicFile>
+    <WelcomeFile>..\source\welcome.htm</WelcomeFile>
+    <MSIFileName>msi\myprogram.msi</MSIFileName>
+    */
+    assert.equal(kmpJson.options.executeProgram, 'exe/myprogram.exe');
+    assert.equal(kmpJson.options.readmeFile, '../source/readme.htm');
+    assert.equal(kmpJson.options.graphicFile, '../source/splash.gif');
+    assert.equal(kmpJson.options.welcomeFile, '../source/welcome.htm');
+    assert.equal(kmpJson.options.msiFilename, 'msi/myprogram.msi');
+    assert.equal(kmpJson.files[0].name, '../build/khmer_angkor.js');
+
+    /*
+      <OSKFont>..\shared\fonts\khmer\busrakbd\khmer_busra_kbd.ttf</OSKFont>
+      <DisplayFont>..\shared\fonts\khmer\mondulkiri\Mondulkiri-R.ttf</DisplayFont>
+    */
+
+    // These are stripped to basename; note that there may be platform
+    // differences
+    assert.equal(kmpJson.keyboards[0].oskFont, 'khmer_busra_kbd.ttf');
+    assert.equal(kmpJson.keyboards[0].displayFont, 'Mondulkiri-R.ttf');
+  });
+
 });
