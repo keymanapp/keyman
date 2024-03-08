@@ -391,6 +391,18 @@ describe('keys.kmap', function () {
         CompilerMessages.Error_InvalidScanCode({ form: "zzz", codes: ['ff'] }),
       ],
     },
+    {
+      subpath: 'sections/keys/invalid-undefined-var-1.xml',
+      errors: [
+        CompilerMessages.Error_MissingStringVariable({id: "varsok"}),
+      ],
+    },
+    {
+      subpath: 'sections/keys/invalid-undefined-var-1b.xml',
+      errors: [
+        CompilerMessages.Error_MissingStringVariable({id: "varsok"}),
+      ],
+    },
   ], keysDependencies);
 
   it('should reject layouts with too many hardware rows', async function() {

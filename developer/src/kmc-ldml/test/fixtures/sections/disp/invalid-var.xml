@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<keyboard3 conformsTo="45" xmlns="https://schemas.unicode.org/cldr/45/keyboard3" locale="mt" >
+  <info name="disp-missing-vars"/>
+
+  <displays>
+    <display keyId="g" display="${missingdisplay}"/>
+    <display output="${missingoutput}" display="eee"/>
+  </displays>
+
+  <keys>
+    <key id="g" output="Something"/>
+  </keys>
+
+</keyboard3>

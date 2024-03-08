@@ -43,20 +43,20 @@ While running, kmcompxtest extracts those 4 characters from the Filename (e.g. 4
 ### Tests are available for the following CERR_:
 <font size="1">
 
-|     | Error Number | CERR_                               
+|     | Error Number | CERR_
 | :-: | :-----------:| :-------------------------------------
-|     | 00000800     |  CERR_LEXICAL_MODEL_MIN  
+|     | 00000800     |  CERR_LEXICAL_MODEL_MIN
 |     | 000008FF     |  CERR_LEXICAL_MODEL_MAX
 |     | 00000800     |  CERR_LEXICAL_MODEL_MIN
 |     | 000008FF     |  CERR_LEXICAL_MODEL_MAX
 |     | 00000000     |  CERR_None
-|     | 00000001     |  CERR_EndOfFile 
+|     | 00000001     |  CERR_EndOfFile
 |     | 00008002     |  CERR_BadCallParams
 |     | 00008004     |  CERR_CannotAllocateMemory
-|     | 00008005     |  CERR_InfileNotExist
-|     | 00008006     |  CERR_CannotCreateOutfile
+|     | 00004005     |  CERR_InfileNotExist
+|     | 00004006     |  // CERR_CannotCreateOutfile
 |     | 00008007     |  CERR_UnableToWriteFully
-|     | 00008008     |  CERR_CannotReadInfile
+|     | 00004008     |  CERR_CannotReadInfile
 |     | 00008009     |  CERR_SomewhereIGotItWrong
 |**X**| 0000400A     |  CERR_InvalidToken
 |     | 0000400B     |  CERR_InvalidBegin

@@ -91,7 +91,7 @@ public class CheckInstallReferrer {
     }
     
     if (!installerInfo.equalsIgnoreCase(GOOGLE_PLAY)) {
-      KMLog.LogInfo(TAG, "Skipping install referrer. Installed from " + installerInfo);
+      // Don't log install referrer #10762
       return;
     }
 
