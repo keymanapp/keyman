@@ -94,13 +94,21 @@ class Traversal implements LexiconTraversal {
    */
   root: Node;
 
-  constructor(root: Node, prefix: string) {
+  /**
+   * The max weight for the Trie being 'traversed'.  Needed for probability
+   * calculations.
+   */
+  totalWeight: number;
+
+  constructor(root: Node, prefix: string, maxWeight: number) {
     this.root = root;
     this.prefix = prefix;
+    this.totalWeight = maxWeight;
   }
 
   *children(): Generator<{char: string, traversal: () => LexiconTraversal}> {
     let root = this.root;
+    const totalWeight = this.totalWeight;
 
     if(root.type == 'internal') {
       for(let entry of root.values) {
@@ -119,7 +127,7 @@ class Traversal implements LexiconTraversal {
               let prefix = this.prefix + entry + lowSurrogate;
               yield {
                 char: entry + lowSurrogate,
-                traversal: function() { return new Traversal(internalNode.children[lowSurrogate], prefix) }
+                traversal: function() { return new Traversal(internalNode.children[lowSurrogate], prefix, totalWeight) }
               }
             }
           } else {
@@ -130,7 +138,7 @@ class Traversal implements LexiconTraversal {
 
             yield {
               char: entry,
-              traversal: function () {return new Traversal(entryNode, prefix)}
+              traversal: function () {return new Traversal(entryNode, prefix, totalWeight)}
             }
           }
         } else if(isSentinel(entry)) {
@@ -142,7 +150,7 @@ class Traversal implements LexiconTraversal {
           let prefix = this.prefix + entry;
           yield {
             char: entry,
-            traversal: function() { return new Traversal(entryNode, prefix)}
+            traversal: function() { return new Traversal(entryNode, prefix, totalWeight)}
           }
         }
       }
@@ -164,29 +172,41 @@ class Traversal implements LexiconTraversal {
         }
         yield {
           char: nodeKey,
-          traversal: function() { return new Traversal(root, prefix + nodeKey)}
+          traversal: function() { return new Traversal(root, prefix + nodeKey, totalWeight)}
         }
       };
       return;
     }
   }
 
-  get entries(): string[] {
+  get entries() {
+    const totalWeight = this.totalWeight;
+    const entryMapper = function(value: Entry) {
+      return {
+        text: value.content,
+        p: value.weight / totalWeight
+      }
+    }
+
     if(this.root.type == 'leaf') {
       let prefix = this.prefix;
       let matches = this.root.entries.filter(function(entry) {
         return entry.key == prefix;
       });
 
-      return matches.map(function(value) { return value.content });
+      return matches.map(entryMapper);
     } else {
       let matchingLeaf = this.root.children[SENTINEL_CODE_UNIT];
       if(matchingLeaf && matchingLeaf.type == 'leaf') {
-        return matchingLeaf.entries.map(function(value) { return value.content });
+        return matchingLeaf.entries.map(entryMapper);
       } else {
         return [];
       }
     }
+  }
+
+  get maxP(): number {
+    return this.root.weight / this.totalWeight;
   }
 }
 
@@ -285,7 +305,7 @@ export default class TrieModel implements LexicalModel {
   }
 
   public traverseFromRoot(): LexiconTraversal {
-    return new Traversal(this._trie['root'], '');
+    return new Traversal(this._trie['root'], '', this._trie.totalWeight);
   }
 };
 
@@ -368,7 +388,7 @@ interface Entry {
 class Trie {
   private root: Node;
   /** The total weight of the entire trie. */
-  private totalWeight: number;
+  readonly totalWeight: number;
   /**
    * Converts arbitrary strings to a search key. The trie is built up of
    * search keys; not each entry's word form!
