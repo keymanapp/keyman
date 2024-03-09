@@ -214,7 +214,6 @@ describe('Trie traversal abstractions', function() {
     assert.isTrue(eSuccess);
   });
 
-
   it('traversal with SMP entries', function() {
     // Two entries, both of which read "apple" to native English speakers.
     // One solely uses SMP characters, the other of which uses a mix of SMP and standard.
@@ -319,5 +318,53 @@ describe('Trie traversal abstractions', function() {
     assert.isTrue(eSuccess);
 
     assert.isEmpty(pKeys);
+  });
+
+  it('direct traversal with SMP entries', function() {
+    // Two entries, both of which read "apple" to native English speakers.
+    // One solely uses SMP characters, the other of which uses a mix of SMP and standard.
+    var model = new TrieModel(jsonFixture('tries/smp-apple'));
+
+    let rootTraversal = model.traverseFromRoot();
+    assert.isDefined(rootTraversal);
+
+    let smpA = smpForUnicode(0x1d5ba);
+    let smpP = smpForUnicode(0x1d5c9);
+    let smpL = smpForUnicode(0x1d5c5);
+    let smpE = smpForUnicode(0x1d5be);
+
+    // Just to be sure our utility function is working right.
+    assert.equal(smpA + smpP + 'pl' + smpE, "𝖺𝗉pl𝖾");
+
+    let pKeys = ['p', smpP];
+    let leafChildSequence = ['l', smpE];
+
+    const aNode = rootTraversal.child(smpA);
+    assert.isOk(aNode);
+    assert.isNotOk(rootTraversal.child('a'));
+
+    const pNode1 = aNode.child(smpP);
+    assert.isOk(pNode1);
+    assert.isNotOk(aNode.child('p'));
+
+    const pNode2 = pNode1.child('p');
+    assert.isOk(pNode2);
+    assert.isOk(pNode1.child(smpP)); // Both exist for this step.
+
+    const lNode = pNode2.child('l');
+    assert.isOk(lNode);
+    assert.isNotOk(pNode2.child(smpL));
+
+    const eNode = lNode.child(smpE);
+    assert.isOk(eNode);
+    assert.isNotOk(lNode.child('e'));
+
+    assert.deepEqual(eNode.entries, [
+      {
+        text: smpA + smpP + 'pl' + smpE,
+        p: 1/2
+      }
+    ]);
+    assert.equal(eNode.maxP, 0.5);
   });
 });
