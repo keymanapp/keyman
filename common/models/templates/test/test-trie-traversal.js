@@ -23,6 +23,10 @@ describe('Trie traversal abstractions', function() {
     let rootKeys = ['t', 'o', 'a', 'i', 'w', 'h', 'f', 'b', 'n', 'y', 's', 'm',
                     'u', 'c', 'd', 'l', 'e', 'j', 'p', 'g', 'v', 'k', 'r', 'q'];
 
+    rootKeys.forEach((entry) => assert.isOk(rootTraversal.child(entry)));
+    assert.isNotOk(rootTraversal.child('x'));
+    assert.isNotOk(rootTraversal.child('z'));
+
     for(let child of rootTraversal.children()) {
       let keyIndex = rootKeys.indexOf(child.char);
       assert.notEqual(keyIndex, -1);
@@ -99,6 +103,38 @@ describe('Trie traversal abstractions', function() {
     assert.isTrue(eSuccess);
 
     assert.isEmpty(eKeys);
+  });
+
+  it('direct traversal with simple internal nodes', function() {
+    var model = new TrieModel(jsonFixture('tries/english-1000'));
+
+    let rootTraversal = model.traverseFromRoot();
+    assert.isDefined(rootTraversal);
+
+    let eKeys = ['y', 'r', 'i', 'm', 's', 'n', 'o'];
+
+    const tNode = rootTraversal.child('t');
+    assert.isOk(tNode);
+    assert.isDefined(tNode);
+    assert.isArray(tNode.entries);
+    assert.isEmpty(tNode.entries);
+
+    const hNode = tNode.child('h');
+    assert.isOk(hNode);
+    assert.isDefined(hNode);
+    assert.isArray(hNode.entries);
+    assert.isEmpty(hNode.entries);
+
+    const eNode = hNode.child('e');
+    assert.isOk(eNode);
+    assert.isDefined(eNode);
+    assert.isArray(eNode.entries);
+    assert.isNotEmpty(eNode.entries);
+    assert.equal(eNode.entries[0].text, "the");
+
+    for(let key of eKeys) {
+      assert.isOk(eNode.child(key));
+    }
   });
 
   it('traversal over compact leaf node', function() {
