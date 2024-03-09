@@ -21,7 +21,7 @@ describe('Trie traversal abstractions', function() {
     assert.isDefined(rootTraversal);
 
     let rootKeys = ['t', 'o', 'a', 'i', 'w', 'h', 'f', 'b', 'n', 'y', 's', 'm',
-                    'u', 'c', 'd', 'l', 'e', 'j', 'p', 'g', 'v', 'k', 'r', 'q']
+                    'u', 'c', 'd', 'l', 'e', 'j', 'p', 'g', 'v', 'k', 'r', 'q'];
 
     for(let child of rootTraversal.children()) {
       let keyIndex = rootKeys.indexOf(child.char);
@@ -66,7 +66,7 @@ describe('Trie traversal abstractions', function() {
                 assert.isDefined(traversalInner3);
 
                 assert.isDefined(traversalInner3.entries);
-                assert.equal(traversalInner3.entries[0], "the");
+                assert.equal(traversalInner3.entries[0].text, "the");
 
                 for(let eChild of traversalInner3.children()) {
                   let keyIndex = eKeys.indexOf(eChild.char);
@@ -140,7 +140,7 @@ describe('Trie traversal abstractions', function() {
                   } else {
                     let finalTraversal = curChild.traversal();
                     assert.isDefined(finalTraversal.entries);
-                    assert.equal(finalTraversal.entries[0], 'trouble');
+                    assert.equal(finalTraversal.entries[0].text, 'trouble');
                     eSuccess = true;
                   }
                 } while (leafChildSequence.length > 0);
@@ -232,7 +232,7 @@ describe('Trie traversal abstractions', function() {
                   } else {
                     let finalTraversal = curChild.traversal();
                     assert.isDefined(finalTraversal.entries);
-                    assert.equal(finalTraversal.entries[0], smpA + smpP + 'pl' + smpE);
+                    assert.equal(finalTraversal.entries[0].text, smpA + smpP + 'pl' + smpE);
                     eSuccess = true;
                   }
                 } while (leafChildSequence.length > 0);
