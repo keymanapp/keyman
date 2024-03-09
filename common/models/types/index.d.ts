@@ -70,7 +70,13 @@ declare interface LexiconTraversal {
    * - prefix of 'crepe': ['crêpe', 'crêpé']
    * - other examples:  https://www.thoughtco.com/french-accent-homographs-1371072
    */
-  entries: USVString[];
+  entries: { text: USVString, p: number }[];
+
+  /**
+   * Gives the probability of the highest-frequency lexical entry that is either a member or
+   * descendent of the represented trie `Node`.
+   */
+  maxP: number;
 }
 
 /**
