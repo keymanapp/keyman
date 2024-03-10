@@ -7,7 +7,23 @@
  */
 
 import { assert } from 'chai';
-import { splitOnCodepoints, splitOnWhitespace } from '@keymanapp/models-wordbreakers/obj/dict/index.js';
+import { default as dict, splitOnCodepoints, splitOnWhitespace } from '@keymanapp/models-wordbreakers/obj/dict/index.js';
+import { fixture as fixture1 } from './fixtures/mocked-traversals/apples-and-ale.js';
+
+function assertSpanSplit(text, actualSplitSpans, expectedSplitStr) {
+  assert.deepEqual(actualSplitSpans.map((entry) => entry.text), expectedSplitStr);
+
+  let index = 0;
+  for(let i=0; i < expectedSplitStr.length; i++) {
+    const start = text.indexOf(expectedSplitStr[i], index);
+
+    assert.equal(actualSplitSpans[i].start, start);
+    assert.equal(actualSplitSpans[i].end, start + expectedSplitStr[i].length);
+    assert.equal(actualSplitSpans[i].length, expectedSplitStr[i].length);
+
+    index = start + actualSplitSpans[i].length;
+  }
+}
 
 describe('dictionary-based wordbreaker', () => {
   describe('helpers', () => {
@@ -39,18 +55,7 @@ describe('dictionary-based wordbreaker', () => {
         const expectedSplit = [text];
 
         const actualSplit = splitOnWhitespace(text);
-        assert.deepEqual(actualSplit.map((entry) => entry.text), expectedSplit);
-
-        let index = 0;
-        for(let i=0; i < expectedSplit.length; i++) {
-          const start = text.indexOf(expectedSplit[i], index);
-
-          assert.equal(actualSplit[i].start, start);
-          assert.equal(actualSplit[i].end, start + expectedSplit[i].length);
-          assert.equal(actualSplit[i].length, expectedSplit[i].length);
-
-          index = start + actualSplit[i].length;
-        }
+        assertSpanSplit(text, actualSplit, expectedSplit);
       })
 
       it('handles simple-space cases', () => {
@@ -58,18 +63,7 @@ describe('dictionary-based wordbreaker', () => {
         const expectedSplit = ['this', 'is', 'a', 'test'];
 
         const actualSplit = splitOnWhitespace(text);
-        assert.deepEqual(actualSplit.map((entry) => entry.text), expectedSplit);
-
-        let index = 0;
-        for(let i=0; i < expectedSplit.length; i++) {
-          const start = text.indexOf(expectedSplit[i], index);
-
-          assert.equal(actualSplit[i].start, start);
-          assert.equal(actualSplit[i].end, start + expectedSplit[i].length);
-          assert.equal(actualSplit[i].length, expectedSplit[i].length);
-
-          index = start + actualSplit[i].length;
-        }
+        assertSpanSplit(text, actualSplit, expectedSplit);
       });
 
       it('properly indexes text with non-BMP chars', () => {
@@ -106,18 +100,47 @@ describe('dictionary-based wordbreaker', () => {
         const expectedSplit = ['this', 'is', 'a', 'more', 'intense', 'test.'];
 
         const actualSplit = splitOnWhitespace(text);
-        assert.deepEqual(actualSplit.map((entry) => entry.text), expectedSplit);
+        assertSpanSplit(text, actualSplit, expectedSplit);
+      });
+    });
+  });
 
-        let index = 0;
-        for(let i=0; i < expectedSplit.length; i++) {
-          const start = text.indexOf(expectedSplit[i], index);
+  describe('main breaker', () => {
+    describe('simple cases with a toy, mocked Traversal setup', () => {
+      it('single section, all words in dict', () => {
+        const text = "appleandanale"
+        const expectedSplit = ['apple', 'and', 'an', 'ale'];
 
-          assert.equal(actualSplit[i].start, start);
-          assert.equal(actualSplit[i].end, start + expectedSplit[i].length);
-          assert.equal(actualSplit[i].length, expectedSplit[i].length);
+        const actualSplit = dict(text, fixture1);
+        assertSpanSplit(text, actualSplit, expectedSplit);
+      });
 
-          index = start + actualSplit[i].length;
-        }
+      it('three sections, all words in dict', () => {
+        const text = "applyanapple appandale anyaleapp";
+        const expectedSplit = ['apply', 'an', 'apple', 'app', 'and', 'ale', 'any', 'ale', 'app'];
+
+        const actualSplit = dict(text, fixture1);
+        assertSpanSplit(text, actualSplit, expectedSplit);
+      });
+
+      it('two sections, unexpected words', () => {
+        const text = "bobsapple applesforale";
+        const expectedSplit = [
+          // As all words in this dict start with 'a', any other words get split into individual letters.
+          'b', 'o', 'b', 's',
+          'apple',
+          'apple',
+          // 'apples' does not exist while 'apple' does - the 's' gets split off because of this.
+          's',
+          // As all words in this dict start with 'a', any other words get split into individual letters.
+          'f',
+          'o',
+          'r',
+          'ale'
+        ];
+
+        const actualSplit = dict(text, fixture1);
+        assertSpanSplit(text, actualSplit, expectedSplit);
       });
     });
   });
