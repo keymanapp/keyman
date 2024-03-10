@@ -12,6 +12,7 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 
 builder_describe "Builds the Keyman Engine for Web's sample page setups." \
   "@/common/web/sentry-manager build" \
+  "@/common/models/templates build" \
   "@/web/src/app/browser build" \
   "@/web/src/app/ui build" \
   "@/web/src/tools build" \
@@ -32,6 +33,13 @@ builder_describe_outputs \
   build       "/$DEST/sentry-manager.js"
 
 #### Resource paths ####
+
+BUNDLE_CMD="node $KEYMAN_ROOT/common/web/es-bundling/build/common-bundle.mjs"
+
+TEMPLATES_SRC="$KEYMAN_ROOT/common/models/templates/build/lib/index.mjs"
+TEMPLATES_MAP="$KEYMAN_ROOT/common/models/templates/build/lib/index.mjs"
+WORDBREAKING_SRC="$KEYMAN_ROOT/common/models/wordbreakers/build/lib/index.mjs"
+WORDBREAKING_MAP="$KEYMAN_ROOT/common/models/wordbreakers/build/lib/index.mjs"
 
 SENTRY_MANAGER_SRC="$KEYMAN_ROOT/common/web/sentry-manager/build/lib/index.js"
 SENTRY_MANAGER_MAP="$KEYMAN_ROOT/common/web/sentry-manager/build/lib/index.js.map"
@@ -54,6 +62,32 @@ function do_copy() {
 
   mkdir -p "$GESTURE_RECOGNIZER_TARGET"
   cp -a "$GESTURE_RECOGNIZER_BUILD" "$GESTURE_RECOGNIZER_TARGET"
+
+  WORDBREAK_DEMO_TARGET="$KEYMAN_ROOT/web/build/demos/wordbreaker-libs/"
+
+  mkdir -p "$WORDBREAK_DEMO_TARGET"
+
+  # pushd "$KEYMAN_ROOT/common/models/templates" > /dev/null
+
+  $BUNDLE_CMD    "${KEYMAN_ROOT}/common/models/templates/build/obj/index.js" \
+    --out        "${WORDBREAK_DEMO_TARGET}/templates.mjs" \
+    --format esm
+
+  # popd
+  # pushd "$KEYMAN_ROOT/common/models/wordbreakers" > /dev/null
+
+  # One of the functions (timedPromise) is quite helpful for automated testing, even in the DOM.
+  # So, to make sure it's easily-accessible for the DOM-based tests...
+  $BUNDLE_CMD    "${KEYMAN_ROOT}/common/models/wordbreakers/build/obj/index.js" \
+    --out        "${WORDBREAK_DEMO_TARGET}/wordbreakers.mjs" \
+    --format esm
+
+  # popd
+
+  # cp "$TEMPLATES_SRC" "$WORDBREAK_DEMO_TARGET"
+  # cp "$TEMPLATES_MAP" "$WORDBREAK_DEMO_TARGET"
+  # cp "$WORDBREAKING_SRC" "$WORDBREAK_DEMO_TARGET"
+  # cp "$WORDBREAKING_MAP" "$WORDBREAK_DEMO_TARGET"
 }
 
 builder_run_action clean rm -rf "$KEYMAN_ROOT/$DEST"
