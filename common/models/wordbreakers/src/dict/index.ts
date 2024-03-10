@@ -169,14 +169,17 @@ export function _dict_break(span: Span, dictRoot: LexiconTraversal): Span[] {
     // If the traversal has entries, it's a legal path-end; else it isn't.
     const boundingPaths = paths.filter((path) => !!path.traversal.entries.length);
     // If none exist, this is the fallback.
-    const penaltyPath: DictBreakerPath = {
-      boundaryIndex: i,
-      traversal: dictRoot,
+    const penaltyParent: DictBreakerPath = {
+      boundaryIndex: i-1,  // successor will cover one codepoint
+      traversal: dictRoot.child(codepoint), // no `entries`, but... it's fine.
+      // bestBoundingPath is currently a root-level traversal.  Its parent corresponds
+      // to the previous token.
       cost: bestBoundingPath.cost + CHAR_SKIP_PENALTY,
-      parent: bestBoundingPath
+      parent: bestBoundingPath.parent,
+      wasUnmatchedChar: true
     };
 
-    boundingPaths.push(penaltyPath);
+    boundingPaths.push(penaltyParent);
     // Sort in cost-ascending order.
     // As we're using negative log likelihood, smaller is better.
     // (The closer to log_2(1) = 0, the better.)
@@ -185,20 +188,11 @@ export function _dict_break(span: Span, dictRoot: LexiconTraversal): Span[] {
     // We build a new path starting from this specific path; we're modeling a word-end.
     // If it's the "penalty path", we already built it.
     const bestBound = boundingPaths[0];
-    let successorPath: DictBreakerPath;
-    if(bestBound != penaltyPath) {
-      successorPath = {
-        boundaryIndex: i,
-        traversal: dictRoot,
-        cost: bestBound.cost,
-        parent: bestBound
-      }
-    } else {
-      // We just completed this one via penalty - it's the unmatched one.
-      bestBoundingPath.wasUnmatchedChar = true;
-      // We pre-built the penalty path in full in order to have its cost at the ready
-      // for comparisons.
-      successorPath = bestBound;
+    const successorPath: DictBreakerPath = {
+      boundaryIndex: i,
+      traversal: dictRoot,
+      cost: bestBound.cost,
+      parent: bestBound
     }
 
     bestBoundingPath = successorPath;
