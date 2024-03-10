@@ -186,12 +186,36 @@ describe('dictionary-based wordbreaker', () => {
 
       // Uses the original lexical-model's backing data, but swaps in the
       // dictionary-based wordbreaker.
-      const model = new TrieModel(fixture, {
-        wordBreaker: dict
-      });
+      const model = new TrieModel(fixture);
+      // Note:  to initialize it as needed for the model at this time... we
+      // need to be able to build this object _before_ the `Trie` is constructed!
+      //
+      // A "hurdle to cross" / we'll "have to cross that bridge when we come to it."
+      const root = model.traverseFromRoot();
 
-      it.skip('case 1', () => {
-        const text = '';
+      it('text with out-of-dict name and number', () => {
+        const text = 'ខ្ញុំឃ្មោះយុសវេអាយុ៣៨ឆ្នាំហើយ';
+        const expectedResults = [
+          'ខ្ញុំ',
+          'ឃ្មោះ',
+          // So, my name (as transliterated into Khmer) doesn't have anything even CLOSE.
+          // Each letter ended up spun off as its own thing.
+          "យ",
+          "ុ",
+          "ស",
+          "វ",
+          "េ",
+          'អាយុ',
+          // Numbers aren't words in the dictionary.
+          '៣',
+          '៨',
+          // And back to normal.
+          'ឆ្នាំ',
+          'ហើយ'
+        ];
+
+        const actualResults = dict(text, root);
+        assertSpanSplit(text, actualResults, expectedResults);
       });
     });
   });
