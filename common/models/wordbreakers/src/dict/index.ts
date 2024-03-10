@@ -1,4 +1,4 @@
-import { positionAfter } from "../default/index.js";
+import { LazySpan, positionAfter } from "../default/index.js";
 
 // Based on the MIN_KEYSTROKE_PROBABILITY penalty used by the lm-worker.
 const CHAR_SKIP_PENALTY = -Math.log2(.0001);
@@ -6,6 +6,28 @@ const CHAR_SKIP_PENALTY = -Math.log2(.0001);
 // const DEFAULT_PARAMS = {
 
 // }
+
+export function splitOnWhitespace(text: string): Span[] {
+  const sections: Span[] = [];
+
+  let start = 0;
+
+  // Surrogate pairs will never overlap \u002, so we don't need to be
+  // surrogate-pair aware here.
+  for(let index = 0; index < text.length + 1; index++) {
+    let char = (index == text.length ? ' ' : text.charAt(index));
+    if(char == ' ' || char == '\u200c') {
+      if(start !== undefined) {
+        sections.push(new LazySpan(text, start, index));
+        start = undefined; // we do not emit whitespace tokens here.
+      }
+    } else if(start === undefined) {
+      start = index;
+    }
+  }
+
+  return sections;
+}
 
 /**
  * Splits a string into its constituent codepoints.
@@ -58,19 +80,40 @@ export type DictBreakerPath = {
 /**
  * Provides dictionary-based wordbreaking assuming a LexiconTraversal can be specified for
  * the dictionary.
- * @param fullText
- * @param dictRoot
+ * @param fullText The full context to be tokenized.
+ * @param dictRoot A LexiconTraversal interface from the active LexicalModel,
+ * allowing efficient dictionary lookups of encountered words.
  * @returns
  */
-export default function dict(fullText: string, dictRoot?: LexiconTraversal): Span[] {
-  // const params = DEFAULT_PARAMS;
+export default function dict(fullText: string, dictRoot: LexiconTraversal): Span[] {
+  // Whenever we have a space or a ZWNJ (U+200C), we'll assume a 100%-confirmed wordbreak
+  // at that location.  We only need to "guess" at anything between 'em.
+  const sections = splitOnWhitespace(fullText);
+  let allSpans: Span[] = [];
 
-  // NOTE: not currently written to wordbreak the full context!
+  for(const section of sections) {
+    // Technically, this may give us a 'partial' wordbreak at the section's end, which
+    // may be slightly significant for earlier sections.  Probably not worth worrying
+    // about, though.
+    allSpans = allSpans.concat(_dict_break(section, dictRoot));
+  }
 
-  // If we have a space or a ZWNJ (U+200C), we'll assume a 100%-confirmed wordbreak
-  // at that location.  We only need to "guess" at anything since.
-  const splitIndex = Math.max(fullText.lastIndexOf(' '), fullText.lastIndexOf('\u200C'));
-  const text = splitIndex > -1 ? fullText.substring(splitIndex+1): fullText;
+  return allSpans;
+}
+
+// Exposed for testing reasons.
+/**
+ * Given a section of text without whitespaces and ZWNJs, uses the active lexical-model's
+ * entries to detect optimal word-breaking locations.
+ * @param span A span representing the section and its position within the context.
+ * @param dictRoot A LexiconTraversal interface from the active LexicalModel,
+ * allowing efficient dictionary lookups of encountered words.
+ * @returns An array of `Span`s representing each tokenized word, indexed according to their
+ * location in the section's original context.
+ */
+export function _dict_break(span: Span, dictRoot: LexiconTraversal): Span[] {
+  const text = span.text;
+  const splitIndex = span.start;
 
   // 1.  Splay the string into individual codepoints.
   const codepointArr = splitOnCodepoints(text);
