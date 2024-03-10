@@ -205,6 +205,7 @@ describe('dictionary-based wordbreaker', () => {
           "ស",
           "វ",
           "េ",
+          // And back to normal (for a bit)
           'អាយុ',
           // Numbers aren't words in the dictionary.
           '៣',
