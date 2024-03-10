@@ -12,11 +12,11 @@ export function splitOnWhitespace(text: string): Span[] {
 
   let start = 0;
 
-  // Surrogate pairs will never overlap \u002, so we don't need to be
+  // Surrogate pairs will never overlap \u0020, so we don't need to be
   // surrogate-pair aware here.
   for(let index = 0; index < text.length + 1; index++) {
     let char = (index == text.length ? ' ' : text.charAt(index));
-    if(char == ' ' || char == '\u200c') {
+    if(char.match(/\s/) || char == '\u200c') {
       if(start !== undefined) {
         sections.push(new LazySpan(text, start, index));
         start = undefined; // we do not emit whitespace tokens here.
@@ -86,6 +86,10 @@ export type DictBreakerPath = {
  * @returns
  */
 export default function dict(fullText: string, dictRoot: LexiconTraversal): Span[] {
+  if(!dictRoot) {
+    throw new Error("Cannot use dictionary-based wordbreaker without `LexiconTraversal` dictionary access");
+  }
+
   // Whenever we have a space or a ZWNJ (U+200C), we'll assume a 100%-confirmed wordbreak
   // at that location.  We only need to "guess" at anything between 'em.
   const sections = splitOnWhitespace(fullText);
@@ -125,7 +129,7 @@ export function _dict_break(span: Span, dictRoot: LexiconTraversal): Span[] {
     cost: 0
   };
 
-  // Optimization TODO:  convert to priority queue.
+  // Optimization TODO:  convert to priority queue?
   let activePaths: DictBreakerPath[] = [bestBoundingPath];
 
   // 3. Run the master loop.
