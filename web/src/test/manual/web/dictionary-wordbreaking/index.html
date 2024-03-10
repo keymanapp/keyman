@@ -52,7 +52,7 @@
   <body>
     <h2>KeymanWeb Sample Page - Dictionary-based wordbreaking demo / host-page</h2>
     <p>This page allows live inspection of what the predictive-text wordbreaker gets for
-      word boundaries when using the specialized wordbreaker.
+      word boundaries when using the specialized wordbreaker instead of its normal one.
 
       Note:  unexpected stuff may happen if very short words have been trimmed from a
       lexical model.  See:  'a' in English (when using MTNT).
@@ -65,7 +65,7 @@
     -->
     <div id='KeymanWebControl'></div>
 
-    <h3>Select a pre-built Trie-based model.js file to use as the lexicon:</h3>
+    <h3>Select a pre-built Trie-based .model.js file to use as the lexicon:</h3>
     <input id='model-select' type="file" onchange="fetchModelLexicon()">
 
     <h3>Wordbreaking results here:</h3>
