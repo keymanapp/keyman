@@ -72,6 +72,12 @@ export type DictBreakerPath = {
   cost: number;
 
   /**
+   * Indicates if this path's most recent traversal enforces a boundary without matching
+   * a word in the lexicon.
+   */
+  wasUnmatchedChar?: boolean;
+
+  /**
    * The path object used to reach the previous boundary.
    */
   parent?: DictBreakerPath;
@@ -178,29 +184,42 @@ export function _dict_break(span: Span, dictRoot: LexiconTraversal): Span[] {
 
     // We build a new path starting from this specific path; we're modeling a word-end.
     // If it's the "penalty path", we already built it.
-    bestBoundingPath = boundingPaths[0];
-    if(bestBoundingPath != penaltyPath) {
-      bestBoundingPath = {
+    const bestBound = boundingPaths[0];
+    let successorPath: DictBreakerPath;
+    if(bestBound != penaltyPath) {
+      successorPath = {
         boundaryIndex: i,
         traversal: dictRoot,
-        cost: bestBoundingPath.cost,
-        parent: bestBoundingPath
+        cost: bestBound.cost,
+        parent: bestBound
       }
+    } else {
+      // We just completed this one via penalty - it's the unmatched one.
+      bestBoundingPath.wasUnmatchedChar = true;
+      // We pre-built the penalty path in full in order to have its cost at the ready
+      // for comparisons.
+      successorPath = bestBound;
     }
 
-    paths.push(bestBoundingPath);
+    bestBoundingPath = successorPath;
+    paths.push(successorPath);
 
     // 3d. We now shift to the next loop iteration; we use the descendant `paths` set.
     activePaths = paths;
   }
 
-  // 4. When all iterations are done, determine the lowest-cost path that remains,
-  // without regard to if it supports a word-boundary.
-  activePaths.sort((a, b) => a.cost - b.cost);
+  // 4. When all iterations are done, determine the lowest-cost path that
+  //    remains, without regard to if it supports a word-boundary.
+  //
+  // If we happen to end on a potential word-boundary, opt for that one.  If two
+  // match aside from boundaryIndex, take the lesser.  It comes first, BTW, so
+  // stable-sorts auto-resolve this.
+  activePaths.sort((a, b) => (a.cost - b.cost));
   const winningPath = activePaths[0];
 
   // 5. Build the spans.
-  const spans: Span[] = [];
+  const spans: (Span & { codepointLength: number, unmatched: boolean })[] = [];
+  const pathAsArray: DictBreakerPath[] = [];
 
   let rewindPath = winningPath;
   while(rewindPath) {
@@ -208,11 +227,14 @@ export function _dict_break(span: Span, dictRoot: LexiconTraversal): Span[] {
     const end = codepointArr.length; // consistent because of the effects from the splice below
     const text = codepointArr.splice(start, end - start).join('');
 
+    pathAsArray.unshift(rewindPath);
     spans.unshift({
       start: start,  // currently in code points; we'll correct it on the next pass.
       end: end, // same.
       length: text.length, // Span spec:  in code units
-      text: text
+      text: text,
+      codepointLength: end - start,
+      unmatched: !!rewindPath.wasUnmatchedChar
     });
     rewindPath = rewindPath.parent;
   }
@@ -226,7 +248,7 @@ export function _dict_break(span: Span, dictRoot: LexiconTraversal): Span[] {
     const start = totalLength;
     totalLength += baseSpan.length;
 
-    const trueSpan: Span = {
+    const trueSpan: typeof spans[0] = {
       ...baseSpan,
       start: start,
       end: totalLength
@@ -235,8 +257,48 @@ export function _dict_break(span: Span, dictRoot: LexiconTraversal): Span[] {
     spans[i] = trueSpan;
   }
 
+  // If all we had was whitespace, hence no spans, return.
+  if(spans.length == 0) {
+    return spans;
+  }
+
+  // 7. Span pass 3:  identify continuous penalty spans.  Why split into separate spans
+  // when we can merge all the bits we can't recognize as a big lump instead?
+  // - Looks nicer in the unit tests, if nothing else.
+  // - Has _far_ better potential for 'learning' down the line.
+
+  let spanBucket: Span[] = [];
+  const finalSpans: Span[] = [];
+
+  function mergeBucket(spanBucket: Span[]) {
+    if(spanBucket.length > 0) {
+      const startSpan = spanBucket[0];
+      const endSpan = spanBucket[spanBucket.length - 1];
+      //
+
+      finalSpans.push({
+        start: startSpan.start,
+        end: endSpan.end,
+        length: endSpan.end - startSpan.start,
+        text: spanBucket.map((entry) => entry.text).join('')
+      });
+    }
+  }
+
+  for(const span of spans) {
+    if(span.codepointLength == 1 && span.unmatched) {
+      spanBucket.push(span);
+    } else {
+      mergeBucket(spanBucket);
+      spanBucket = [];
+      finalSpans.push(span);
+    }
+  }
+
+  mergeBucket(spanBucket);
+
   // ... and done!
-  return spans;
+  return finalSpans;
 
   /*
     Important questions:
