@@ -354,9 +354,14 @@
   visibility: visible;
   right: 4%;
   top: 1%;
+  font-size: 0.5em;
+  color: #aaa;
+  line-height: initial;
+}
+
+.android .kmw-key-popup-icon{
   font-size: 0.75em;
   color: #ccc;
-  line-height: initial;
 }
 
 /* For certain form-factors, #aaa blends in with the special-key background-color _way_ too well. */
