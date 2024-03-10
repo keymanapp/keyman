@@ -1,8 +1,11 @@
 import { positionAfter } from "../default/index.js";
 
-const DEFAULT_PARAMS = {
+// Based on the MIN_KEYSTROKE_PROBABILITY penalty used by the lm-worker.
+const CHAR_SKIP_PENALTY = -Math.log2(.0001);
 
-}
+// const DEFAULT_PARAMS = {
+
+// }
 
 /**
  * Splits a string into its constituent codepoints.
@@ -25,6 +28,33 @@ export function splitOnCodepoints(text: string): string[] {
   return splayed;
 }
 
+export type DictBreakerPath = {
+  /**
+   * The index of the character immediately before the most recently-available word boundary.
+   * Is set to -1 if no such boundary exists.
+   */
+  boundaryIndex: number;
+
+  // Could add a 'reference' if we create objects for each char in the context - such as for
+  // caching & reusing boundary info with future inputs.
+
+  /**
+   * An active traversal representing potential words that may become completed, starting
+   * immediately after the boundary indicated by `boundaryIndex`.
+   */
+  traversal: LexiconTraversal;
+
+  /**
+   * cost:  measured in -log(p) of each decision.
+   */
+  cost: number;
+
+  /**
+   * The path object used to reach the previous boundary.
+   */
+  parent?: DictBreakerPath;
+}
+
 /**
  * Provides dictionary-based wordbreaking assuming a LexiconTraversal can be specified for
  * the dictionary.
@@ -33,7 +63,9 @@ export function splitOnCodepoints(text: string): string[] {
  * @returns
  */
 export default function dict(fullText: string, dictRoot?: LexiconTraversal): Span[] {
-  const params = DEFAULT_PARAMS;
+  // const params = DEFAULT_PARAMS;
+
+  // NOTE: not currently written to wordbreak the full context!
 
   // If we have a space or a ZWNJ (U+200C), we'll assume a 100%-confirmed wordbreak
   // at that location.  We only need to "guess" at anything since.
@@ -42,6 +74,118 @@ export default function dict(fullText: string, dictRoot?: LexiconTraversal): Spa
 
   // 1.  Splay the string into individual codepoints.
   const codepointArr = splitOnCodepoints(text);
+
+  // 2.  Initialize tracking vars and prep the loop.
+  let bestBoundingPath: DictBreakerPath = {
+    boundaryIndex: -1,
+    traversal: dictRoot,
+    cost: 0
+  };
+
+  // Optimization TODO:  convert to priority queue.
+  let activePaths: DictBreakerPath[] = [bestBoundingPath];
+
+  // 3. Run the master loop.
+  // 3a. For each codepoint in the string...
+  for(let i=0; i < codepointArr.length; i++) {
+    const codepoint = codepointArr[i];
+    let paths: DictBreakerPath[] = [];
+
+    // 3b. compute all viable paths to continue words & start new ones.
+    for(const path of activePaths) {
+      let traversal = path.traversal.child(codepoint);
+      if(!traversal) {
+        continue;
+      }
+
+      const pathCtd: DictBreakerPath = {
+        boundaryIndex: path.boundaryIndex,
+        traversal: traversal,
+        cost: (path.parent?.cost ?? 0) - Math.log2(traversal.maxP),
+        parent: path.parent
+      }
+
+      paths.push(pathCtd);
+    }
+
+    // 3c. Find the minimal-cost new path with a word boundary, if any exist.
+    // If the traversal has entries, it's a legal path-end; else it isn't.
+    const boundingPaths = paths.filter((path) => !!path.traversal.entries.length);
+    // If none exist, this is the fallback.
+    const penaltyPath: DictBreakerPath = {
+      boundaryIndex: i,
+      traversal: dictRoot,
+      cost: bestBoundingPath.cost + CHAR_SKIP_PENALTY,
+      parent: bestBoundingPath
+    };
+
+    boundingPaths.push(penaltyPath);
+    // Sort in cost-ascending order.
+    // As we're using negative log likelihood, smaller is better.
+    // (The closer to log_2(1) = 0, the better.)
+    boundingPaths.sort((a, b) => a.cost - b.cost);
+
+    // We build a new path starting from this specific path; we're modeling a word-end.
+    // If it's the "penalty path", we already built it.
+    bestBoundingPath = boundingPaths[0];
+    if(bestBoundingPath != penaltyPath) {
+      bestBoundingPath = {
+        boundaryIndex: i,
+        traversal: dictRoot,
+        cost: bestBoundingPath.cost,
+        parent: bestBoundingPath
+      }
+    }
+
+    paths.push(bestBoundingPath);
+
+    // 3d. We now shift to the next loop iteration; we use the descendant `paths` set.
+    activePaths = paths;
+  }
+
+  // 4. When all iterations are done, determine the lowest-cost path that remains,
+  // without regard to if it supports a word-boundary.
+  activePaths.sort((a, b) => a.cost - b.cost);
+  const winningPath = activePaths[0];
+
+  // 5. Build the spans.
+  const spans: Span[] = [];
+
+  let rewindPath = winningPath;
+  while(rewindPath) {
+    const start = rewindPath.boundaryIndex+1;
+    const end = codepointArr.length; // consistent because of the effects from the splice below
+    const text = codepointArr.splice(start, end - start).join('');
+
+    spans.unshift({
+      start: start,  // currently in code points; we'll correct it on the next pass.
+      end: end, // same.
+      length: text.length, // Span spec:  in code units
+      text: text
+    });
+    rewindPath = rewindPath.parent;
+  }
+
+  // 6. Span pass 2 - index finalization.
+  // - Remember, split-index is our offset!
+  // - We currently have codepoint `start` and `end`, but need code-unit values.
+  let totalLength = splitIndex;
+  for(let i = 0; i < spans.length; i++) {
+    const baseSpan = spans[i];
+    const start = totalLength;
+    totalLength += baseSpan.length;
+
+    const trueSpan: Span = {
+      ...baseSpan,
+      start: start,
+      end: totalLength
+    };
+
+    spans[i] = trueSpan;
+  }
+
+  // ... and done!
+  return spans;
 
   /*
     Important questions:
@@ -96,12 +240,6 @@ export default function dict(fullText: string, dictRoot?: LexiconTraversal): Spa
     - One to dramatically trim down the number of needed loop-iterations / branches for the search update indexing.
       - See:  O(A) => O(1).
   */
-
-  // for(let branch of dictRoot.children()) {
-
-  // }
-
-  // dictRoot.entries[0]
 
   // 2.  Initial state:  one traversal @ root pointing to 'no ancestor'.
   // 2b. Could prep to build a 'memo' of calcs reusable by later runs?
