@@ -163,16 +163,14 @@ describe('dictionary-based wordbreaker', () => {
       it('two sections, unexpected words', () => {
         const text = "bobsapple applesforale";
         const expectedSplit = [
-          // As all words in this dict start with 'a', any other words get split into individual letters.
-          'b', 'o', 'b', 's',
+          // All contiguous chars not comprising a recognized word on the wordbreak path are
+          // fused into one unit.
+          'bobs',
           'apple',
           'apple',
           // 'apples' does not exist while 'apple' does - the 's' gets split off because of this.
-          's',
-          // As all words in this dict start with 'a', any other words get split into individual letters.
-          'f',
-          'o',
-          'r',
+          // Past that, same bit about 'all contiguous chars'.
+          'sfor',
           'ale'
         ];
 
@@ -199,17 +197,12 @@ describe('dictionary-based wordbreaker', () => {
           'ខ្ញុំ',
           'ឃ្មោះ',
           // So, my name (as transliterated into Khmer) doesn't have anything even CLOSE.
-          // Each letter ended up spun off as its own thing.
-          "យ",
-          "ុ",
-          "ស",
-          "វ",
-          "េ",
+          // The "fuse together" rule rejoins them.
+          "យុសវេ",
           // And back to normal (for a bit)
           'អាយុ',
-          // Numbers aren't words in the dictionary.
-          '៣',
-          '៨',
+          // Numbers aren't words in the dictionary, but can be rejoined as an "unrecognized" glob.
+          '៣៨',
           // And back to normal.
           'ឆ្នាំ',
           'ហើយ'
