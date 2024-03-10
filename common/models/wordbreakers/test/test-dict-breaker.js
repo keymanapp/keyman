@@ -28,6 +28,14 @@ function assertSpanSplit(text, actualSplitSpans, expectedSplitStr) {
 describe('dictionary-based wordbreaker', () => {
   describe('helpers', () => {
     describe('splitOnCodepoints', () => {
+      it('handles empty text', () => {
+        const text = "";
+        const expectedSplit = [];
+
+        const actualSplit = splitOnCodepoints(text);
+        assert.deepEqual(actualSplit, expectedSplit);
+      });
+
       it('handles BMP text properly', () => {
         const text = 'apple';
         const expectedSplit = text.split('');
@@ -107,6 +115,14 @@ describe('dictionary-based wordbreaker', () => {
 
   describe('main breaker', () => {
     describe('simple cases with a toy, mocked Traversal setup', () => {
+      it('handles empty context', () => {
+        const text = "";
+        const expectedSplit = [];
+
+        const actualSplit = dict(text, fixture1);
+        assertSpanSplit(text, actualSplit, expectedSplit);
+      });
+
       it('single section, all words in dict', () => {
         const text = "appleandanale"
         const expectedSplit = ['apple', 'and', 'an', 'ale'];

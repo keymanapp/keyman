@@ -116,6 +116,10 @@ export default function dict(fullText: string, dictRoot: LexiconTraversal): Span
  * location in the section's original context.
  */
 export function _dict_break(span: Span, dictRoot: LexiconTraversal): Span[] {
+  if(span.length == 0) {
+    return [];
+  }
+
   const text = span.text;
   const splitIndex = span.start;
 
