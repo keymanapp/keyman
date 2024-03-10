@@ -18,6 +18,7 @@ cd "$(dirname "$THIS_SCRIPT")"
 ################################ Main script ################################
 
 builder_describe "Builds the predictive-text wordbreaker implementation module" \
+  "@/common/models/templates test" \
   "clean" \
   "configure" \
   "build" \
