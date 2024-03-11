@@ -36,7 +36,7 @@ export default class KMXBuilder {
 
     this.comp_header = {
       dwIdentifier: KMXFile.FILEID_COMPILED,
-      dwFileVersion: KMXFile.VERSION_160,
+      dwFileVersion: KMXFile.VERSION_170,
       dwCheckSum: 0,  // Deprecated in Keyman 16.0
       KeyboardID: 0,
       IsRegistered: 1,
