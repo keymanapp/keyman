@@ -34,7 +34,11 @@
     -->
     <script src="../../../../../build/publish/debug/kmwuitoggle.js"></script>
 
-    <script src="./model-hacker.mjs" type="module"></script>
+    <script type="module">
+      import { install, fetchModelLexicon } from './model-hacker.mjs';
+      window.fetchModelLexicon = fetchModelLexicon;
+      window.installHelper = install;
+    </script>
 
     <!-- Add keyboard management script for local selection of keyboards to use -->
     <script src="../commonHeader.js"></script>
@@ -45,6 +49,7 @@
       kmw.init({
 		    attachType:'auto'
       }).then(function() {
+        window.installHelper();
         kmw.addKeyboards({id:'us',name:'English',languages:{id:'en',name:'English'}, filename:'../us-1.0.js'});
         kmw.addKeyboards('khmer_angkor')
       });
