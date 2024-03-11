@@ -60,13 +60,13 @@ function do_copy() {
   mkdir -p "$WORDBREAK_DEMO_TARGET"
 
   $BUNDLE_CMD    "${KEYMAN_ROOT}/web/src/predictive-text/templates/build/obj/index.js" \
-    --out        "${WORDBREAK_DEMO_TARGET}/templates.mjs" \
+    --out        "${WORDBREAK_DEMO_TARGET}/templates.js" \
     --format esm
 
   # One of the functions (timedPromise) is quite helpful for automated testing, even in the DOM.
   # So, to make sure it's easily-accessible for the DOM-based tests...
   $BUNDLE_CMD    "${KEYMAN_ROOT}/web/src/predictive-text/wordbreakers/build/obj/index.js" \
-    --out        "${WORDBREAK_DEMO_TARGET}/wordbreakers.mjs" \
+    --out        "${WORDBREAK_DEMO_TARGET}/wordbreakers.js" \
     --format esm
 }
 
