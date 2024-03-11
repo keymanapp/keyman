@@ -5,7 +5,7 @@ import * as models from "../../../../../build/demos/wordbreaker-libs/templates.m
 window.models = models;
 window.wordBreakers = wordbreakers;
 
-async function fetchModelLexicon() {
+export async function fetchModelLexicon() {
   const files = document.getElementById('model-select').files;
   if(files.length == 0) {
     return;
@@ -19,28 +19,29 @@ async function fetchModelLexicon() {
   document.head.appendChild(script);
 }
 
-const HackedWordbreaker = {
-  loadModel: function (model) {
-    const dictRoot = model.traverseFromRoot();
-    this.dictBreaker = (text) => wordbreakers.dict(text, dictRoot);
-  }
-}
-
-const output = document.getElementById('output');
-const ta1 = document.getElementById('ta1');
-ta1.addEventListener('input', updateWordbreak);
-
-function updateWordbreak() {
-  if(!HackedWordbreaker.dictBreaker) {
-    return;
+export function install() {
+  const HackedWordbreaker = {
+    loadModel: function (model) {
+      const dictRoot = model.traverseFromRoot();
+      this.dictBreaker = (text) => wordbreakers.dict(text, dictRoot);
+    }
   }
 
-  const text = ta1.value;
-  const breaks = HackedWordbreaker.dictBreaker(text).map((entry) => entry.text);
+  const output = document.getElementById('output');
+  const ta1 = document.getElementById('ta1');
 
-  output.value = breaks.join(' | ');
+  const updateWordbreak = () => {
+    if(!HackedWordbreaker.dictBreaker) {
+      return;
+    }
+
+    const text = ta1.value;
+    const breaks = HackedWordbreaker.dictBreaker(text).map((entry) => entry.text);
+
+    output.value = breaks.join(' | ');
+  }
+
+  ta1.addEventListener('input', updateWordbreak);
+
+  window['LMLayerWorker'] = HackedWordbreaker;
 }
-
-window.fetchModelLexicon = fetchModelLexicon;
-
-window['LMLayerWorker'] = HackedWordbreaker;
