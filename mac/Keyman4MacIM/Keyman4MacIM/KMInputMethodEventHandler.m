@@ -359,6 +359,7 @@ NSString* const kEasterEggKmxName = @"EnglishSpanish.kmx";
       [self sendEvents:event forOutput:output];
     }
   } else if (output.isDeleteAndInsertScenario) {
+    // TODO: fix issue #10246
     /*
     // needs further testing to fix backspace bug in google docs (without breaking other apps)
     // assume that all non-compliant apps which require backspaces apply an extra backspace if the original event is a backspace
