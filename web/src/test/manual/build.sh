@@ -69,17 +69,17 @@ function do_copy() {
 
   # pushd "$KEYMAN_ROOT/common/models/templates" > /dev/null
 
+  # Output as .js due to TC page-serving limitations.
   $BUNDLE_CMD    "${KEYMAN_ROOT}/common/models/templates/build/obj/index.js" \
-    --out        "${WORDBREAK_DEMO_TARGET}/templates.mjs" \
+    --out        "${WORDBREAK_DEMO_TARGET}/templates.js" \
     --format esm
 
   # popd
   # pushd "$KEYMAN_ROOT/common/models/wordbreakers" > /dev/null
 
-  # One of the functions (timedPromise) is quite helpful for automated testing, even in the DOM.
-  # So, to make sure it's easily-accessible for the DOM-based tests...
+  # Output as .js due to TC page-serving limitations.
   $BUNDLE_CMD    "${KEYMAN_ROOT}/common/models/wordbreakers/build/obj/index.js" \
-    --out        "${WORDBREAK_DEMO_TARGET}/wordbreakers.mjs" \
+    --out        "${WORDBREAK_DEMO_TARGET}/wordbreakers.js" \
     --format esm
 
   # popd

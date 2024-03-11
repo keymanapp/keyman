@@ -1,6 +1,7 @@
-// TODO:  imports of lexical-model packages.  (Add to relevant build.sh / test.sh.)
-import * as wordbreakers from "../../../../../build/demos/wordbreaker-libs/wordbreakers.mjs";
-import * as models from "../../../../../build/demos/wordbreaker-libs/templates.mjs";
+// Would be `.mjs`, but TC doesn't seem to serve those correctly for live browser use when they're artifacts.
+
+import * as wordbreakers from "../../../../../build/demos/wordbreaker-libs/wordbreakers.js";
+import * as models from "../../../../../build/demos/wordbreaker-libs/templates.js";
 
 window.models = models;
 window.wordBreakers = wordbreakers;
