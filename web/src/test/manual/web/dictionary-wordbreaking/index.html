@@ -69,10 +69,10 @@
     <div id='KeymanWebControl'></div>
 
     <h3>Select a pre-built Trie-based .model.js file to use as the lexicon:</h3>
-    <input id='model-select' type="file" onchange="fetchModelLexicon()">
+    <input id='model-select' type="file" onchange="fetchModelLexicon()" accept=".model.js">
 
     <h3>Wordbreaking results here:</h3>
-    <textarea id='output' class='test' readonly></textarea>
+    <textarea id='output' class='test' readonly placeholder="Readonly - wordbreaking results appear here"></textarea>
 
     <h3>Type in your language in this text area:</h3>
     <textarea id='ta1' class='test' placeholder='Type here'></textarea>
