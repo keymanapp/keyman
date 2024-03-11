@@ -1,5 +1,12 @@
 # Keyman Version History
 
+## 16.0.146 stable 2024-03-11
+
+* chore(linux): Update debian changelog (#10595)
+* chore(oem/fv): Update versions in keyboards.csv (#10638)
+* fix(web): fixes content-editable error that occurred on focus changes (#10747)
+* fix(ios): changed build script prepRelease to fix sample builds (#10940)
+
 ## 16.0.145 stable 2024-02-01
 
 * chore(linux): Add support for loong64 architecture (#10108)
