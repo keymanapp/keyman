@@ -36,6 +36,9 @@
 
     <script src="./model-hacker.mjs" type="module"></script>
 
+    <!-- Add keyboard management script for local selection of keyboards to use -->
+    <script src="../commonHeader.js"></script>
+
     <!-- Initialization: set paths to keyboards, resources and fonts as required -->
     <script>
       var kmw=window.keyman;
@@ -73,6 +76,21 @@
 
     <h3>Type in your language in this text area:</h3>
     <textarea id='ta1' class='test' placeholder='Type here'></textarea>
+
+    <hr>
+
+    <!--  The following elements show how the language menu can be dynamically extended at any time -->
+    <h3>Add a keyboard by keyboard name:</h3>
+    <input type='input' id='kbd_id1' class='kmw-disabled' onkeypress="clickOnEnter(event,1);"/>
+    <input type='button' id='btn1' onclick='addKeyboard(1);' value='Add' />
+
+    <h3>Add a keyboard by BCP-47 language code:</h3>
+    <input type='input' id='kbd_id2' class='kmw-disabled' onkeypress="clickOnEnter(event,2);"/>
+    <input type='button' id='btn2' onclick='addKeyboard(2);' value='Add' />
+
+    <h3>Add a keyboard by language name(s):</h3>
+    <input type='input' id='kbd_id3' class='kmw-disabled' onkeypress="clickOnEnter(event,3);"/>
+    <input type='button' id='btn3' onclick='addKeyboard(3);' value='Add' />
 
     <h3><a href="./">Return to testing home page</a></h3>
   </div>
