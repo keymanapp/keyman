@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 17.0.286 beta 2024-03-11
+
+* chore(web): improve the clarity of hints on OSK for Android (#10971)
+
 ## 17.0.285 beta 2024-03-08
 
 * fix(windows): GetKeyboardLanguage exits early on an invalid keyboard ID (#10936)
