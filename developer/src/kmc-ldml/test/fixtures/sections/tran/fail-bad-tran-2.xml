@@ -5,6 +5,13 @@
 
   <keys />
 
+  <!-- this is here because this test is used by test-compiler-e2e -->
+  <layers formId="us">
+    <layer id="base">
+      <row keys="a b c" />
+    </layer>
+  </layers>
+
   <transforms type="simple">
     <transformGroup>
       <transform from="\u0127" to="x"/> <!-- fail: use \u{1234} instead -->

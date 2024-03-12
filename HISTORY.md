@@ -1,5 +1,25 @@
 # Keyman Version History
 
+## 17.0.286 beta 2024-03-11
+
+* chore(web): improve the clarity of hints on OSK for Android (#10971)
+
+## 17.0.285 beta 2024-03-08
+
+* fix(windows): GetKeyboardLanguage exits early on an invalid keyboard ID (#10936)
+
+## 17.0.284 beta 2024-03-07
+
+* fix(web): globe key highlighting (#10932)
+* chore(web): updates mtnt model used by test page (#10935)
+* fix(developer): kmc keyboard info compiler no kmp error (#10893)
+* fix(developer): Treat Right Shift as Shift in debugger (#10919)
+* docs(developer): kmc-model api documentation (#10921)
+* docs(developer): kmc-model-info api documentation (#10922)
+* docs(developer): kmc-keyboard-info api documentation (#10923)
+* docs(developer): kmc-package api documentation (#10924)
+* fix(developer): normalize all input paths in .kps compiler (#10950)
+
 ## 17.0.283 beta 2024-03-06
 
 * fix(android): fixes context-change detection for repeated-char cases (#10873)

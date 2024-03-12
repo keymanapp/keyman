@@ -144,8 +144,8 @@ Depends:
  ${shlibs:Depends},
 Suggests:
  keyman,
-Conflicts: libkmnkbp0-0
-Replaces: libkmnkbp0-0
+Conflicts: libkmnkbp0-0, libkeymancore
+Replaces: libkmnkbp0-0, libkeymancore
 Multi-Arch: same
 Description: Keyman keyboard processing library
  Originally created in 1993 to type Lao on Windows, Keyman is now a free and

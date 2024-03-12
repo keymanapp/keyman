@@ -100,8 +100,8 @@ export class LdmlKeyboardCompiler implements KeymanCompiler {
 
   /**
    * Compiles a LDML keyboard .xml file to .kmx, .kvk, and/or .js files. Returns
-   * an object containing binary artifacts on succes. The files are passed in by
-   * name, and the compiler will use callbacks as passed to the
+   * an object containing binary artifacts on success. The files are passed in
+   * by name, and the compiler will use callbacks as passed to the
    * {@link LdmlKeyboardCompiler.init} function to read any input files by disk.
    * @param infile  - Path to source file.
    * @param outfile - Path to output file. The file will not be written to, but
@@ -343,11 +343,7 @@ export class LdmlKeyboardCompiler implements KeymanCompiler {
       }
       const sect = section.compile(globalSections);
 
-      /* c8 ignore next 7 */
       if(!sect) {
-        // This should not happen -- validate() should have told us
-        // if something is going to fail to compile
-        this.callbacks.reportMessage(CompilerMessages.Fatal_SectionCompilerFailed({sect:section.id}));
         passed = false;
         continue;
       }

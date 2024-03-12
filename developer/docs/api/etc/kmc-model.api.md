@@ -14,26 +14,49 @@ import { KeymanCompilerArtifact } from '@keymanapp/common-types';
 import { KeymanCompilerArtifacts } from '@keymanapp/common-types';
 import { KeymanCompilerResult } from '@keymanapp/common-types';
 
-// @public (undocumented)
+// @public
+export type CasedWordformToKeySpec = (term: string, applyCasing?: CasingFunction) => string;
+
+// @public
 export class LexicalModelCompiler implements KeymanCompiler {
+    // @internal
     generateLexicalModelCode(model_id: string, modelSource: LexicalModelSource, sourcePath: string): string;
-    // (undocumented)
     init(callbacks: CompilerCallbacks, _options: CompilerOptions): Promise<boolean>;
-    // Warning: (ae-forgotten-export) The symbol "LexicalModelSource" needs to be exported by the entry point main.d.ts
+    // @internal
     loadFromFilename(filename: string): LexicalModelSource;
-    // Warning: (ae-forgotten-export) The symbol "LexicalModelCompilerResult" needs to be exported by the entry point main.d.ts
-    //
-    // (undocumented)
     run(inputFilename: string, outputFilename?: string): Promise<LexicalModelCompilerResult>;
-    // (undocumented)
+    // @internal (undocumented)
     transpileSources(sources: Array<string>): Array<string>;
-    // Warning: (ae-forgotten-export) The symbol "LexicalModelCompilerArtifacts" needs to be exported by the entry point main.d.ts
-    //
-    // (undocumented)
     write(artifacts: LexicalModelCompilerArtifacts): Promise<boolean>;
 }
 
-// @public (undocumented)
+// @public
+export interface LexicalModelCompilerArtifacts extends KeymanCompilerArtifacts {
+    js: KeymanCompilerArtifact;
+}
+
+// @public
+export interface LexicalModelCompilerResult extends KeymanCompilerResult {
+    artifacts: LexicalModelCompilerArtifacts;
+}
+
+// Warning: (ae-forgotten-export) The symbol "LexicalModelDeclaration" needs to be exported by the entry point main.d.ts
+//
+// @public
+export interface LexicalModelSource extends LexicalModelDeclaration {
+    readonly applyCasing?: CasingFunction;
+    readonly languageUsesCasing?: boolean;
+    readonly punctuation?: LexicalModelPunctuation;
+    readonly rootClass?: string;
+    readonly searchTermToKey?: WordformToKeySpec;
+    // (undocumented)
+    readonly sources: Array<string>;
+    readonly wordBreaker?: WordBreakerSpec | SimpleWordBreakerSpec;
+}
+
+// Warning: (ae-internal-missing-underscore) The name "ModelCompilerMessages" should be prefixed with an underscore because the declaration is marked as @internal
+//
+// @internal (undocumented)
 export class ModelCompilerMessages {
     // (undocumented)
     static ERROR_NoDefaultExport: number;
@@ -90,6 +113,24 @@ export class ModelCompilerMessages {
         wordform: string;
     }) => CompilerEvent;
 }
+
+// @public
+export type SimpleWordBreakerSpec = 'default' | 'ascii' | WordBreakingFunction;
+
+// @public
+export type SimpleWordformToKeySpec = (term: string) => string;
+
+// @public
+export interface WordBreakerSpec {
+    readonly joinWordsAt?: string[];
+    // Warning: (ae-forgotten-export) The symbol "OverrideScriptDefaults" needs to be exported by the entry point main.d.ts
+    readonly overrideScriptDefaults?: OverrideScriptDefaults;
+    // (undocumented)
+    readonly use: SimpleWordBreakerSpec;
+}
+
+// @public
+export type WordformToKeySpec = SimpleWordformToKeySpec | CasedWordformToKeySpec;
 
 // (No @packageDocumentation comment for this package)
 
