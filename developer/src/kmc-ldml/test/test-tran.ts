@@ -292,6 +292,7 @@ describe('tran', function () {
       ],
     },
     {
+      // also used in test-compiler-e2e.ts
       subpath: `sections/tran/fail-bad-tran-2.xml`,
       errors: [
         CompilerMessages.Error_InvalidQuadEscape({ cp: 295 }),
