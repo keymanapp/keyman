@@ -287,9 +287,16 @@ function setKeymanContext(text, doSync, selStart, selLength) {
     let selEnd = selStart + selLength;
     selEnd = isNaN(selEnd) ? undefined : selEnd;
 
-    const shouldReset = keyman.context.updateContext(text, selStart, selEnd);
-    if(!doSync || shouldReset) {
+    if(doSync) {
+      const shouldReset = keyman.context.updateContext(text, selStart, selEnd);
+      if(shouldReset) {
         keyman.resetContext();
+      }
+    } else {
+      // if not in "sync" mode, we have a hard context reset; just full-reset it.
+      keyman.context.setText(text);
+      keyman.context.setSelection(selStart, selStart+selLength);
+      keyman.resetContext();
     }
 }
 
