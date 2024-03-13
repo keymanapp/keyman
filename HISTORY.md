@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 17.0.287 beta 2024-03-12
+
+* chore(developer): resolve excessive-fatal-exception issue (#10949)
+* fix(linux): Remove `ibus-keyman.post{inst,rm}` and verify that `ibus-daemon` is running when we start km-config (#10788)
+
 ## 17.0.286 beta 2024-03-11
 
 * chore(web): improve the clarity of hints on OSK for Android (#10971)
