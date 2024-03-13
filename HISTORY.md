@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 16.0.147 stable 2024-03-13
+
+* docs(android/app): Add data privacy policy page (#10987)
+
 ## 16.0.146 stable 2024-03-11
 
 * chore(linux): Update debian changelog (#10595)
