@@ -1,5 +1,12 @@
 # Keyman Version History
 
+## 17.0.288 beta 2024-03-13
+
+* test(developer): kmc keyboard info compiler messages unit tests (#10848)
+* fix(developer): getFontFamily now returns null if ttfMeta.promise errors (#10983)
+* docs(android/app): Add data privacy policy page (#10985)
+* fix(developer): min Keyman version for LDML is 17.0 (#10977)
+
 ## 17.0.287 beta 2024-03-12
 
 * chore(developer): resolve excessive-fatal-exception issue (#10949)
