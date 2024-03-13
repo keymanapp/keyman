@@ -96,8 +96,7 @@ returned if `nullptr` or `0`.
 
 All dispose calls are designed to accept null as a valid value and will do
 nothing in that event.
-```c
-*/
+```c */
 #include <stdint.h>
 #include <stdlib.h>
 #include <keyman/keyman_core_api_bits.h>
@@ -128,14 +127,14 @@ typedef struct km_core_option_item  km_core_option_item;
 //
 typedef uint8_t (*km_core_keyboard_imx_platform)(km_core_state*, uint32_t, void*);
 
-/*```
+/*
+```
 ### Error Handling
 Error handling and success failure notification are communicated through a
 general mechanism similar to COM’s `HRESULT` scheme (unlike COM, any non-zero
 value is an error). Any functions that can fail will always return a status
 value and all results are returned via outparams passed to the function.
-```c
-*/
+```c */
 enum km_core_status_codes {
   KM_CORE_STATUS_OK = 0,
   KM_CORE_STATUS_NO_MEM = 1,
@@ -151,14 +150,11 @@ enum km_core_status_codes {
 
 /*
 ```
-The final status code KM_CORE_STATUS_OS_ERROR is intended to allow encapsulating
-a platform error code; the remaining 31 low bits are the error code returned by
-the OS for cases where the failure mode is platform specific. For HRESULT codes
-this only permits failure codes to be passed.
-*/
+The final status code `KM_CORE_STATUS_OS_ERROR` is intended to allow
+encapsulating a platform error code; the remaining 31 low bits are the error
+code returned by the OS for cases where the failure mode is platform specific.
+For HRESULT codes this only permits failure codes to be passed.
 
-/*
-```
 ### Actions
 This structure provides the results of processing a key event to the Platform layer and
 should be processed by the Platform layer to issue commands to the os text
@@ -167,8 +163,7 @@ other actions.
 
 This API replaces the Action items APIs, which is now deprecated and will be
 removed in the future.
-```c
-*/
+```c */
 
 typedef enum { KM_CORE_FALSE = 0, KM_CORE_TRUE = 1 } km_core_bool;
 typedef enum { KM_CORE_CAPS_UNCHANGED = -1, KM_CORE_CAPS_OFF = 0, KM_CORE_CAPS_ON = 1 } km_core_caps_state;
@@ -214,8 +209,7 @@ when the state object is destroyed, or after a call to
 ##### Parameters:
 - __state__: An opaque pointer to a state object.
 
-```c
-*/
+```c */
 KMN_API
 km_core_actions const *
 km_core_state_get_actions(
@@ -228,8 +222,7 @@ km_core_state_get_actions(
 ##### Description:
 Return values for `km_core_state_context_set_if_needed`.
 
-```c
-*/
+```c */
 
 typedef enum {
   KM_CORE_CONTEXT_STATUS_UNCHANGED = 0,  // Cached context change was not needed
@@ -336,7 +329,6 @@ struct km_core_option_item {
 };
 
 #define KM_CORE_OPTIONS_END { 0, 0, 0 }
-
 
 /*
 ```
@@ -550,13 +542,14 @@ keyboard. The matching dispose call needs to be called to free the memory.
 
 ```c
 */
+
 KMN_API
 km_core_status
 km_core_keyboard_get_key_list(km_core_keyboard const *keyboard,
                             km_core_keyboard_key **out);
 
 
-/**
+/*
 ```
 ### `km_core_keyboard_key_list_dispose`
 ##### Description:
@@ -568,45 +561,71 @@ returned by `km_core_keyboard_get_key_list`.
 
 ```c
 */
+
 KMN_API
 void km_core_keyboard_key_list_dispose(km_core_keyboard_key *key_list);
 
-/**
- * km_core_keyboard_get_imx_list:
- *
- * Returns: the list of IMX libraries and function names that are referenced by
- * the keyboard.The matching dispose call needs to be called to free the memory.
- */
+/*
+```
+### `km_core_keyboard_get_imx_list`
+##### Description:
+Returns the list of IMX libraries and function names that are referenced by
+the keyboard. The matching dispose call needs to be called to free the memory.
+##### Parameters:
+- __keyboard__: A pointer to the keyboard
+- __imx_list__: A pointer to a variable that will contain a pointer to the IMX
+                list.
+##### Return status:
+- `KM_CORE_STATUS_OK`: On success.
+- `KM_CORE_STATUS_INVALID_ARGUMENT`: If non-optional parameters are null.
+
+```c
+*/
+
 KMN_API
 km_core_status km_core_keyboard_get_imx_list(km_core_keyboard const *keyboard, km_core_keyboard_imx **imx_list);
 
-/**
- * km_core_keyboard_imx_list_dispose:
- *
- * Disposes of the IMX list
- *
- * Returns: --
- */
+/*
+```
+### `km_core_keyboard_imx_list_dispose`
+##### Description:
+Disposes of the IMX list
+##### Parameters:
+- __imx_list__: A pointer to the IMX list.
+
+```c
+*/
+
 KMN_API
 void km_core_keyboard_imx_list_dispose(km_core_keyboard_imx *imx_list);
 
-/**
- * km_core_state_imx_register_callback:
- *
- * Register the IMX callback endpoint for the client.
- *
- * Returns: --
- */
+/*
+```
+### `km_core_state_imx_register_callback`
+##### Description:
+Register the IMX callback endpoint for the client.
+##### Parameters:
+- __state__: A pointer to the opaque state object
+- __imx_callback__: pointer to a function that implements the IMX callback
+- __callback_object__: TODO
+
+```c
+*/
+
 KMN_API
 void km_core_state_imx_register_callback(km_core_state *state, km_core_keyboard_imx_platform imx_callback, void *callback_object);
 
-/**
- *  km_core_state_imx_deregister_callback:
- *
- * De-register IMX callback endpoint for the client.
- *
- * Returns: --
- */
+/*
+```
+### `km_core_state_imx_deregister_callback`
+##### Description:
+De-register IMX callback endpoint for the client.
+##### Parameters:
+- __state__: A pointer to the opaque state object
+
+```c
+*/
+
 KMN_API
 void km_core_state_imx_deregister_callback(km_core_state *state);
 
@@ -616,11 +635,6 @@ void km_core_state_imx_deregister_callback(km_core_state *state);
 A State object maintains all per keyboard related state including context
 and dynamic options ("option stores" in kmn format).
 
-```c
-*/
-
-/*
-```
 ### `km_core_state_create`
 ##### Description:
 Create a keyboard processor state object, maintaining state for the keyboard in
@@ -922,5 +936,6 @@ enum km_core_event_code {
 #if defined(__cplusplus)
 } // extern "C"
 #endif
-/*```
+/*
+```
 */
