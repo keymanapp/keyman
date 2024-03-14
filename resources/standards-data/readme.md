@@ -9,11 +9,11 @@ the version data in this file also.
 | data                       | version     |
 |----------------------------|-------------|
 | ethnologue                 | ?           |
-| iso639-3                   | 2023        |
-| langtags                   | 2023-05-04  |
-| langtags-subtag-registry   | 2023-05-11  |
+| iso639-3                   | 2024-03-14  |
+| langtags                   | 2023-08-03  |
+| langtags-subtag-registry   | 2024-03-07  |
 | ldml-keyboards             | 45          |
-| unicode-character-database | 15          |
+| unicode-character-database | 15.1        |
 | windows-lcid-to-bcp-47     | ?           |
 
 ## File Sources
@@ -61,7 +61,7 @@ See also [ldml-keyboards/readme.md](ldml-keyboards/readme.md).
 Data from <https://www.unicode.org/Public/15.0.0/ucd/>:
 
 ```bash
-UNICODE_VERSION=15.0.0
+UNICODE_VERSION=15.1.0
 wget https://www.unicode.org/Public/${UNICODE_VERSION}/ucd/Blocks.txt -O unicode-character-database/Blocks.txt
 wget https://www.unicode.org/Public/${UNICODE_VERSION}/ucd/UnicodeData.txt -O unicode-character-database/UnicodeData.txt
 ```
