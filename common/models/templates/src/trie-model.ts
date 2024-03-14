@@ -205,7 +205,7 @@ class Traversal implements LexiconTraversal {
     }
   }
 
-  get maxP(): number {
+  get p(): number {
     return this.root.weight / this.totalWeight;
   }
 }
