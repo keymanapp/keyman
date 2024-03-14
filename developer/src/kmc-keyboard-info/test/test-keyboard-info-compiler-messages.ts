@@ -321,13 +321,13 @@ describe('KeyboardInfoCompilerMessages', function () {
   // ERROR_FontFileMetaDataIsInvalid
 
   it('should generate ERROR_FontFileMetaDataIsInvalid error if font file meta data throws an error', async function() {
-    const jsFilename = makePathToFixture('font-file-cannot-be-read', 'build', 'khmer_angkor.js');
-    const kpsFilename = makePathToFixture('font-file-cannot-be-read', 'source', 'khmer_angkor.kps');
-    const kmpFilename = makePathToFixture('font-file-cannot-be-read', 'build', 'khmer_angkor.kmp');
+    const jsFilename = makePathToFixture('font-meta-data-is-invalid', 'build', 'khmer_angkor.js');
+    const kpsFilename = makePathToFixture('font-meta-data-is-invalid', 'source', 'khmer_angkor.kps');
+    const kmpFilename = makePathToFixture('font-meta-data-is-invalid', 'build', 'khmer_angkor.kmp');
 
     const sources = {
       kmpFilename,
-      sourcePath: 'release/k/font-file-cannot-be-read',
+      sourcePath: 'release/k/font-meta-data-is-invalid',
       kpsFilename,
       jsFilename: jsFilename,
       forPublishing: true,
@@ -337,8 +337,8 @@ describe('KeyboardInfoCompilerMessages', function () {
     assert.isTrue(await compiler.init(callbacks, {sources}));
     const kmpJsonData: KmpJsonFile.KmpJsonFile = {system: {fileVersion: "7.0", keymanDeveloperVersion: "17.0.204"},
       options: {},
-      files: [{name: "../shared/fonts/khmer/mondulkiri/font_file_cannot_be_read.ttf", description: ""}]}
-    const source = ["font_file_cannot_be_read.ttf"]
+      files: [{name: "../shared/fonts/khmer/mondulkiri/font-meta-data-is-invalid.ttf", description: ""}]}
+    const source = ["font-meta-data-is-invalid.ttf"]
     const result = await compiler['fontSourceToKeyboardInfoFont'](kpsFilename, kmpJsonData, source)
     assert.isNull(result);
     assert.isTrue(callbacks.hasMessage(KeyboardInfoCompilerMessages.ERROR_FontFileMetaDataIsInvalid),
