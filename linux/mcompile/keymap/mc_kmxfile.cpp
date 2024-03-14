@@ -1,5 +1,4 @@
 #include "mc_kmxfile.h"
-//#include "u16.h"
 #include <typeinfo>
 
 #define CERR_None                                          0x00000000
@@ -230,8 +229,7 @@ PKMX_WCHAR KMX_StringOffset(PKMX_BYTE base, KMX_DWORD offset) {
     we don't copy the strings
   This method is used on 64-bit architectures.
 */
-LPKMX_KEYBOARD KMX_CopyKeyboard(PKMX_BYTE bufp, PKMX_BYTE base)
-{
+LPKMX_KEYBOARD KMX_CopyKeyboard(PKMX_BYTE bufp, PKMX_BYTE base) {
   PKMX_COMP_KEYBOARD ckbp = (PKMX_COMP_KEYBOARD) base;
 
   /* Copy keyboard structure */

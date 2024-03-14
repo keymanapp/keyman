@@ -42,10 +42,10 @@ typedef struct KMX_tagKEYBOARD {
 
 	KMX_DWORD dwFileVersion;	// Version of the file - Keyman 4.0 is 0x0400
 
-	KMX_DWORD dwCheckSum;		// As stored in keyboard. DEPRECATED as of 16.0
-	KMX_DWORD xxkbdlayout;    	// as stored in HKEY_LOCAL_MACHINE//system//currentcontrolset//control//keyboard layouts
+	KMX_DWORD dwCheckSum;			// As stored in keyboard. DEPRECATED as of 16.0
+	KMX_DWORD xxkbdlayout;    // as stored in HKEY_LOCAL_MACHINE//system//currentcontrolset//control//keyboard layouts
 	KMX_DWORD IsRegistered;		// layout id, from same registry key
-	KMX_DWORD version;			// keyboard version
+	KMX_DWORD version;				// keyboard version
 
 	KMX_DWORD cxStoreArray;		// in array entries
 	KMX_DWORD cxGroupArray;		// in array entries
@@ -54,22 +54,21 @@ typedef struct KMX_tagKEYBOARD {
 	LPKMX_GROUP dpGroupArray;	// [LPGROUP] address of first item in group array, from start of file
 
 	KMX_DWORD StartGroup[2];	// index of starting groups [2 of them]
-							// Ansi=0, Unicode=1
+														// Ansi=0, Unicode=1
 
-	KMX_DWORD dwFlags;			// Flags for the keyboard file
+	KMX_DWORD dwFlags;				// Flags for the keyboard file
 
-	KMX_DWORD dwHotKey;			// standard windows hotkey (hiword=shift/ctrl/alt stuff, loword=vkey)
+	KMX_DWORD dwHotKey;				// standard windows hotkey (hiword=shift/ctrl/alt stuff, loword=vkey)
 
-	//PWSTR dpName;			// offset of name
-	//PWSTR dpLanguageName;	// offset of language name;
-	//PWSTR dpCopyright;		// offset of copyright
-	//PWSTR dpMessage;		// offset of message in Keyboard About box
+	//PWSTR dpName;						// offset of name
+	//PWSTR dpLanguageName;		// offset of language name;
+	//PWSTR dpCopyright;			// offset of copyright
+	//PWSTR dpMessage;				// offset of message in Keyboard About box
 
 	KMX_DWORD dpBitmapOffset;	// 0038 offset of the bitmaps in the file
 	KMX_DWORD dwBitmapSize;		// 003C size in bytes of the bitmaps
-	//HBITMAP	hBitmap;		// handle to the bitmap in the file;
+	//HBITMAP	hBitmap;				// handle to the bitmap in the file;
 } KMX_KEYBOARD, *LPKMX_KEYBOARD;
-
 
 KMX_BOOL KMX_LoadKeyboard(char16_t* fileName, LPKMX_KEYBOARD *lpKeyboard);
 

@@ -5,22 +5,3 @@ Ideally, we'd rewrite mcompile to be cross-platform (Windows, Linux, macOS), so 
 Sample program that reads US basic keyboard and compares to key value group
 
 # Keymap
-
-_S2 TODO Check/find use of wchar_t/wstring and replace with char16_t/u16string
-_S2 TODO check call by reference/value
-_S2 TODO what is wrong with kp->dpBitmapOffset/BitmapSize ?
-_s2 INFO idee spanish keyboard has dk on altgr !!
-_S2 TODO new Problem: RALT-dk(4): Why do we havea RALT in dk 4? It makes sense but how do we handle this??
-
-_   S2 TOP_1 NCAPS/capslock-> we need capslock-equation. ---> new Problem: RALT-dk(4)  RALT+Ä
-_S2 TOP_2 Shiftflags
-   _S2 TOP_3 dk-table from file->from functions -> ask EB, MD in TX to setup gtk
-   _S2 TOP_4 HKL
-   _S2 TOP_5 use files/functions from other places
-_S2 TOP_6 remaining
-_S2 TOP_7 wchar_t->char16_t
-
-
-./mcompile -d /Projects/keyman/keyman/linux/mcompile/keymap/mcompile_test.kmx bla.dll 0407 /Projects/keyman/keyman/linux/mcompile/keymap/mcompile_test_out.kmx
-
-./mcompile -d     /home/mcompileTest/Source/mcompile_test.kmx bla.dll 0407 /home/mcompileTest/Source_after_run_mcompile/mcompile_test_out.kmx

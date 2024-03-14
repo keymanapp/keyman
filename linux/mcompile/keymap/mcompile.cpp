@@ -75,7 +75,7 @@ int run(int argc, std::vector<std::u16string> str_argv, char* argv_ch[] = NULL){
 
     return 1;
   }
-  // -u option not available for Linux
+  // -u option is not available for Linux
 
   int bDeadkeyConversion = u16cmp(argv[1], u"-d") == 0; // I4552
   int n = (bDeadkeyConversion ? 2 : 1);
@@ -129,8 +129,8 @@ int run(int argc, std::vector<std::u16string> str_argv, char* argv_ch[] = NULL){
 }
 
 #endif
-  //DeleteReallocatedPointers(kmxfile); :TODO   // _S2 TOP_6 not my ToDo :-)
-wprintf(L"mmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm end\n");
+  //DeleteReallocatedPointers(kmxfile); :TODO   // _S2 not my ToDo :-)
+wprintf(L"mmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmxxxmmmmmmmmmmmmmmmmmmmmm _S2 end\n");
   delete kmxfile;
   return 0;
 }
@@ -436,7 +436,7 @@ KMX_BOOL KMX_DoConvert(LPKMX_KEYBOARD kbd, KMX_BOOL bDeadkeyConversion, gint arg
           ch = DeadKey;
         }
       }
-// _S2 group1 writes using keys here
+
       switch(ch) {
         case 0x0000: break;
         case 0xFFFF: KMX_ConvertDeadkey(kbd, KMX_VKMap[i], VKShiftState[j], DeadKey, All_Vector, keymap , dk_Table); break;
@@ -447,7 +447,6 @@ KMX_BOOL KMX_DoConvert(LPKMX_KEYBOARD kbd, KMX_BOOL bDeadkeyConversion, gint arg
 
   KMX_ReportUnconvertedKeyboardRules(kbd);
 
-// _S2 add everything after dk-section group1
   if(!KMX_ImportRules(kbd, All_Vector, &keymap, &KMX_FDeadkeys, bDeadkeyConversion)) {   // I4353   // I4552
     return FALSE;
   }
@@ -460,7 +459,7 @@ int KMX_GetDeadkeys(v_dw_2D & dk_Table, KMX_WORD DeadKey, KMX_WORD *OutputPairs,
   KMX_DWORD shift;
 
   v_dw_2D  dk_SingleTable;
-  find_dk_combinations_for_specific_dk(&dk_Table, dk_SingleTable, DeadKey);
+  query_dk_combinations_for_specific_dk(&dk_Table, dk_SingleTable, DeadKey);
   for ( int i=0; i< (int) dk_SingleTable.size();i++) {
     KMX_WORD vk = KMX_changeKeynameToCapital(dk_SingleTable[i][1], shift, keymap);
     if(vk != 0) {

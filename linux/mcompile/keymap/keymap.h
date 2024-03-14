@@ -14,7 +14,6 @@
 #include <iostream>
 #include <string>
 #include <vector>
-//#include "kmx_file.h"
 #include "u16.h"
 
 
@@ -46,8 +45,8 @@ const KMX_DWORD KMX_VKMap[] = {
   VK_RBRKT,     /* ] 221 VK_OEM_6 */
   VK_BKSLASH,   /* \ 220 VK_OEM_5 */
 
-  VK_COLON,     /* ; 186 VK_OEM_1  or ö */
-  VK_QUOTE,     /* ' 222 VK_OEM_7  or Ä */
+  VK_COLON,     /* ; 186 VK_OEM_1  */
+  VK_QUOTE,     /* ' 222 VK_OEM_7  */
 
   VK_COMMA,     /* , 188 VK_OEM_COMMA */
   VK_PERIOD,    /* . 190 VK_OEM_PERIOD */
@@ -67,33 +66,34 @@ typedef std::vector<std::vector<std::vector<KMX_DWORD> > > v_dw_3D;
 static KMX_DWORD returnIfCharInvalid = 0;
 static KMX_DWORD keycode_max = 94;
 static KMX_DWORD deadkey_min = 0xfe50;
-//static KMX_DWORD deadkey_max = 0xfe93;
-static KMX_DWORD deadkey_max = 0xfe52;  // _S2 TOP_6 TODO This has to go! my test: to only return 3 dk
+static KMX_DWORD deadkey_max = 0xfe93;
+//static KMX_DWORD deadkey_max = 0xfe52;  // _S2 TOP_6 TODO This has to go! my test: to only return 3 dk
 
+// map Shiftstate to modifier (e.g. 0->0; 16-1; 9->2; 25->3)
 int map_VKShiftState_to_LinModifier(int VKShiftState);
 
-// take a std::wstring (=contents of line symbols-file ) and returns the (int) value of the character
+// take a std::string (=contents of line symbols-file ) and returns the (int) value of the character
 KMX_DWORD convertNamesTo_DWORD_Value(std::string tok_str);
 
-// create a Vector with all entries of both keymaps+ keymap
+// create a Vector with all entries of both keymaps
 int createOneVectorFromBothKeyboards(v_dw_3D &All_Vector,GdkKeymap *keymap);
 
-// read configuration file, split and write to 3D-Vector (Data for US on [0][ ][ ]  )
+// read configuration file, split and write to 3D-Vector (Data for US on Vector[0][ ][ ]  )
 int write_US_ToVector(v_dw_3D &vec, std::string language, const char *text);
 
 // 1. step: read complete Row of Configuration file US
 bool createCompleteRow_US(v_str_1D &complete_List, FILE *fpp, const char *text, std::string language);
 
-// replace Name of Key (e.g. <AD06>)  wih Keycode ( e.g. 0x15 )
+// replace Name of Key (e.g. <AD06>)  wih Keycode ( e.g. 15 )
 int replace_KeyName_with_Keycode(std::string  in);
 
-// 2nd step: write contents to 3D vector
+// 2. step: write contents to 3D vector
 int split_US_To_3D_Vector(v_dw_3D &all_US, v_str_1D completeList);
 
-// create an empty 2D vector containing "--" in all fields
+// create an empty 2D vector containing 0 in all fields
 v_dw_2D create_empty_2D_Vector(int dim_rows, int dim_shifts);
 
-// append characters using GDK to 3D-Vector (Data for underlying Language on [1][ ][ ]  )
+// append characters to 3D-Vector using GDK (Data for underlying Language on Vector[1][ ][ ]  )
 int append_underlying_ToVector(v_dw_3D &All_Vector, GdkKeymap *keymap);
 
 // initialize GDK
@@ -103,44 +103,44 @@ bool InitializeGDK(GdkKeymap **keymap,int argc, gchar *argv[]);
 
 const UINT USVirtualKeyToScanCode[256] = {
 	0x00, // L"K_?00",				// &H0
-	0x00, // L"K_LBUTTON",			// &H1
-	0x00, // L"K_RBUTTON",			// &H2
-	0x46, // L"K_CANCEL",		   	// &H3
-	0x00, // L"K_MBUTTON",			// &H4
+	0x00, // L"K_LBUTTON",		// &H1
+	0x00, // L"K_RBUTTON",		// &H2
+	0x46, // L"K_CANCEL",	   	// &H3
+	0x00, // L"K_MBUTTON",		// &H4
 	0x00, // L"K_?05",				// &H5
 	0x00, // L"K_?06",				// &H6
 	0x00, // L"K_?07",				// &H7
-	0x0E, // L"K_BKSP",	    		// &H8
-	0x0F, // L"K_TAB",	    		// &H9
+	0x0E, // L"K_BKSP",	    	// &H8
+	0x0F, // L"K_TAB",	   		// &H9
 	0x00, // L"K_?0A",				// &HA
 	0x00, // L"K_?0B",				// &HB
-	0x4C, // L"K_KP5",		    	// &HC
+	0x4C, // L"K_KP5",		   	// &HC
 	0x1C, // L"K_ENTER",			// &HD
 	0x00, // L"K_?0E",				// &HE
 	0x00, // L"K_?0F",				// &HF
 	0x2A, // L"K_SHIFT",			// &H10
-	0x1D, // L"K_CONTRO0x00, // L",	// &H11
+	0x1D, // L"K_CONTRO0x00,	// L",	// &H11
 	0x38, // L"K_ALT",				// &H12
 	0x00, // L"K_PAUSE",			// &H13
 	0x3A, // L"K_CAPS",				// &H14
-	0x00, // L"K_KANJI?15",			// &H15
-	0x00, // L"K_KANJI?16",			// &H16
-	0x00, // L"K_KANJI?17",			// &H17
-	0x00, // L"K_KANJI?18",			// &H18
-	0x00, // L"K_KANJI?19",			// &H19
+	0x00, // L"K_KANJI?15",		// &H15
+	0x00, // L"K_KANJI?16",		// &H16
+	0x00, // L"K_KANJI?17",		// &H17
+	0x00, // L"K_KANJI?18",		// &H18
+	0x00, // L"K_KANJI?19",		// &H19
 	0x00, // L"K_?1A",				// &H1A
 	0x01, // L"K_ESC",				// &H1B
-	0x00, // L"K_KANJI?1C",			// &H1C
-	0x00, // L"K_KANJI?1D",			// &H1D
-	0x00, // L"K_KANJI?1E",			// &H1E
-	0x00, // L"K_KANJI?1F",			// &H1F
+	0x00, // L"K_KANJI?1C",		// &H1C
+	0x00, // L"K_KANJI?1D",		// &H1D
+	0x00, // L"K_KANJI?1E",		// &H1E
+	0x00, // L"K_KANJI?1F",		// &H1F
 	0x39, // L"K_SPACE",			// &H20
 	0x49, // L"K_PGUP",				// &H21
 	0x51, // L"K_PGDN",				// &H22
 	0x4F, // L"K_END",				// &H23
 	0x47, // L"K_HOME",				// &H24
 	0x4B, // L"K_LEFT",				// &H25
-	0x48, // L"K_UP",				// &H26
+	0x48, // L"K_UP",					// &H26
 	0x4D, // L"K_RIGHT",			// &H27
 	0x50, // L"K_DOWN",				// &H28
 	0x00, // L"K_SEL",				// &H29
@@ -150,16 +150,16 @@ const UINT USVirtualKeyToScanCode[256] = {
 	0x52, // L"K_INS",				// &H2D
 	0x53, // L"K_DEL",				// &H2E
 	0x63, // L"K_HELP",				// &H2F
-	0x0B, // L"K_0",				// &H30
-	0x02, // L"K_1",				// &H31
-	0x03, // L"K_2",				// &H32
-	0x04, // L"K_3",				// &H33
-	0x05, // L"K_4",				// &H34
-	0x06, // L"K_5",				// &H35
-	0x07, // L"K_6",				// &H36
-	0x08, // L"K_7",				// &H37
-	0x09, // L"K_8",				// &H38
-	0x0A, // L"K_9",				// &H39
+	0x0B, // L"K_0",					// &H30
+	0x02, // L"K_1",					// &H31
+	0x03, // L"K_2",					// &H32
+	0x04, // L"K_3",					// &H33
+	0x05, // L"K_4",					// &H34
+	0x06, // L"K_5",					// &H35
+	0x07, // L"K_6",					// &H36
+	0x08, // L"K_7",					// &H37
+	0x09, // L"K_8",					// &H38
+	0x0A, // L"K_9",					// &H39
 	0x00, // L"K_?3A",				// &H3A
 	0x00, // L"K_?3B",				// &H3B
 	0x00, // L"K_?3C",				// &H3C
@@ -167,32 +167,32 @@ const UINT USVirtualKeyToScanCode[256] = {
 	0x00, // L"K_?3E",				// &H3E
 	0x00, // L"K_?3F",				// &H3F
 	0x00, // L"K_?40",				// &H40
-	0x1E, // L"K_A",				// &H41
-	0x30, // L"K_B",				// &H42
-	0x2E, // L"K_C",				// &H43
-	0x20, // L"K_D",				// &H44
-	0x12, // L"K_E",				// &H45
-	0x21, // L"K_F",				// &H46
-	0x22, // L"K_G",				// &H47
-	0x23, // L"K_H",				// &H48
-	0x17, // L"K_I",				// &H49
-	0x24, // L"K_J",				// &H4A
-	0x25, // L"K_K",				// &H4B
-	0x26, // L"K_L",				// &H4C
-	0x32, // L"K_M",				// &H4D
-	0x31, // L"K_N",				// &H4E
-	0x18, // L"K_O",				// &H4F
-	0x19, // L"K_P",				// &H50
-	0x10, // L"K_Q",				// &H51
-	0x13, // L"K_R",				// &H52
-	0x1F, // L"K_S",				// &H53
-	0x14, // L"K_T",				// &H54
-	0x16, // L"K_U",				// &H55
-	0x2F, // L"K_V",				// &H56
-	0x11, // L"K_W",				// &H57
-	0x2D, // L"K_X",				// &H58
-	0x15, // L"K_Y",				// &H59
-	0x2C, // L"K_Z",				// &H5A
+	0x1E, // L"K_A",					// &H41
+	0x30, // L"K_B",					// &H42
+	0x2E, // L"K_C",					// &H43
+	0x20, // L"K_D",					// &H44
+	0x12, // L"K_E",					// &H45
+	0x21, // L"K_F",					// &H46
+	0x22, // L"K_G",					// &H47
+	0x23, // L"K_H",					// &H48
+	0x17, // L"K_I",					// &H49
+	0x24, // L"K_J",					// &H4A
+	0x25, // L"K_K",					// &H4B
+	0x26, // L"K_L",					// &H4C
+	0x32, // L"K_M",					// &H4D
+	0x31, // L"K_N",					// &H4E
+	0x18, // L"K_O",					// &H4F
+	0x19, // L"K_P",					// &H50
+	0x10, // L"K_Q",					// &H51
+	0x13, // L"K_R",					// &H52
+	0x1F, // L"K_S",					// &H53
+	0x14, // L"K_T",					// &H54
+	0x16, // L"K_U",					// &H55
+	0x2F, // L"K_V",					// &H56
+	0x11, // L"K_W",					// &H57
+	0x2D, // L"K_X",					// &H58
+	0x15, // L"K_Y",					// &H59
+	0x2C, // L"K_Z",					// &H5A
 	0x5B, // L"K_?5B",				// &H5B
 	0x5C, // L"K_?5C",				// &H5C
 	0x5D, // L"K_?5D",				// &H5D
@@ -210,19 +210,19 @@ const UINT USVirtualKeyToScanCode[256] = {
 	0x49, // L"K_NP9",				// &H69
 	0x37, // L"K_NPSTAR",			// &H6A
 	0x4E, // L"K_NPPLUS",			// &H6B
-	0x7E, // L"K_SEPARATOR",		// &H6C		// MCD 01-11-02: Brazilian Fix, 00 -> 7E
-	0x4A, // L"K_NPMINUS",			// &H6D
+	0x7E, // L"K_SEPARATOR",	// &H6C		// MCD 01-11-02: Brazilian Fix, 00 -> 7E
+	0x4A, // L"K_NPMINUS",		// &H6D
 	0x53, // L"K_NPDOT",			// &H6E
-	0x135, // L"K_NPSLASH",			// &H6F
-	0x3B, // L"K_F1",				// &H70
-	0x3C, // L"K_F2",				// &H71
-	0x3D, // L"K_F3",				// &H72
-	0x3E, // L"K_F4",				// &H73
-	0x3F, // L"K_F5",				// &H74
-	0x40, // L"K_F6",				// &H75
-	0x41, // L"K_F7",				// &H76
-	0x42, // L"K_F8",				// &H77
-	0x43, // L"K_F9",				// &H78
+	0x135, // L"K_NPSLASH",		// &H6F
+	0x3B, // L"K_F1",					// &H70
+	0x3C, // L"K_F2",					// &H71
+	0x3D, // L"K_F3",					// &H72
+	0x3E, // L"K_F4",					// &H73
+	0x3F, // L"K_F5",					// &H74
+	0x40, // L"K_F6",					// &H75
+	0x41, // L"K_F7",					// &H76
+	0x42, // L"K_F8",					// &H77
+	0x43, // L"K_F9",					// &H78
 	0x44, // L"K_F10",				// &H79
 	0x57, // L"K_F11",				// &H7A
 	0x58, // L"K_F12",				// &H7B
@@ -248,8 +248,8 @@ const UINT USVirtualKeyToScanCode[256] = {
 	0x00, // L"K_?8E",				// &H8E
 	0x00, // L"K_?8F",				// &H8F
 
-	0x45, // L"K_NUMLOCK",			// &H90
-	0x46, // L"K_SCROL0x00, // L",	// &H91
+	0x45, // L"K_NUMLOCK",		// &H90
+	0x46, // L"K_SCROL0x00, 	// &H91
 
 	0x00, // L"K_?92",				// &H92
 	0x00, // L"K_?93",				// &H93
@@ -502,7 +502,7 @@ const UINT ScanCodeToUSVirtualKey[128] = {
 
 bool IsKeymanUsedChar(int KV);
 //------------------------------
-// take deadkey-value (e.g.65106) and return wstring (e.g. '^' )
+// take deadkey-value (e.g.65106) and return u16string (e.g. '^' )
 std::u16string convert_DeadkeyValues_To_U16str(int in);
 
 // use gdk_keymap_translate_keyboard_state to get keyval - base function to get keyvals
@@ -526,7 +526,7 @@ UINT KMX_get_KeyCodeUnderlying_From_VKUS(KMX_DWORD VirtualKeyUS);
 // return the VirtualKey of the US Keyboard for a given Keyode using GDK
 KMX_DWORD KMX_get_VKUS_From_KeyCodeUnderlying(KMX_DWORD keycode);
 
-// convert codePoint to wstring
+// convert codePoint to u16string
 std::u16string CodePointToU16String(unsigned int codepoint);
 
 # endif /*KEYMAP_H*/

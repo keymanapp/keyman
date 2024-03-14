@@ -304,7 +304,6 @@ int createOneVectorFromBothKeyboards(v_dw_3D &All_Vector,GdkKeymap *keymap) {
 
   std::string US_language    = "us";
   const char* text_us        = "xkb_symbols \"basic\"";
-  //const char* text_us        = "xkb_symbols \"intl\"";
 
   if(write_US_ToVector(All_Vector,US_language, text_us)) {
     wprintf(L"ERROR: can't write US to Vector \n");
@@ -352,7 +351,7 @@ bool createCompleteRow_US(v_str_1D &complete_List, FILE* fp, const char* text, s
 
   int buffer_size = 512;
   char buffer[buffer_size];
-  bool print_OK   = false;
+  bool create_row   = false;
   const char* key = "key <";
   std::string str_txt(text);
   std::string xbk_mark = "xkb_symbol";
@@ -363,14 +362,14 @@ bool createCompleteRow_US(v_str_1D &complete_List, FILE* fp, const char* text, s
 
       // stop when finding the mark xkb_symbol
       if (std::string(str_buf).find(xbk_mark) != std::string::npos)
-        print_OK = false;
+        create_row = false;
 
       // start when finding the mark xkb_symbol + correct layout
       if (std::string(str_buf).find(str_txt) != std::string::npos)
-        print_OK = true;
+        create_row = true;
 
       // as long as we are in the same xkb_symbol layout block and find "key <" we push the whole line into a 1D-vector
-      if (print_OK && (std::string(str_buf).find(key) != std::string::npos)) {
+      if (create_row && (std::string(str_buf).find(key) != std::string::npos)) {
         complete_List.push_back(buffer);
       }
     }
@@ -387,7 +386,6 @@ bool createCompleteRow_US(v_str_1D &complete_List, FILE* fp, const char* text, s
 int replace_KeyName_with_Keycode(std::string  in) {
   int out = returnIfCharInvalid;
 
-  //  these are the keycode-Values we use in Keyman (= windows scancodes+8 )
   if      ( in == "key<TLDE>")    out = 49;    /* VK_ BKQUOTE         */
   else if ( in == "key<AE01>")    out = 10;    /* VK_1                */
   else if ( in == "key<AE02>")    out = 11;    /* VK_2                */
@@ -399,8 +397,8 @@ int replace_KeyName_with_Keycode(std::string  in) {
   else if ( in == "key<AE08>")    out = 17;    /* VK_8                */
   else if ( in == "key<AE09>")    out = 18;    /* VK_9                */
   else if ( in == "key<AE10>")    out = 19;    /* VK_0                */
-  else if ( in == "key<AE11>")    out = 20;    /* VK_MINUS K_HYPHEN  de ẞ     */
-  else if ( in == "key<AE12>")    out = 21;    /* VK_EQUAL   DE '     */
+  else if ( in == "key<AE11>")    out = 20;    /* VK_MINUS K_HYPHEN   */
+  else if ( in == "key<AE12>")    out = 21;    /* VK_EQUAL            */
 
   else if ( in == "key<AD01>")    out = 24;    /* VK_Q                */
   else if ( in == "key<AD02>")    out = 25;    /* VK_W                */
@@ -412,8 +410,8 @@ int replace_KeyName_with_Keycode(std::string  in) {
   else if ( in == "key<AD08>")    out = 31;    /* VK_I                */
   else if ( in == "key<AD09>")    out = 32;    /* VK_O                */
   else if ( in == "key<AD10>")    out = 33;    /* VK_P                */
-  else if ( in == "key<AD11>")    out = 34;    /* VK_LEFTBRACE   DE Ü */
-  else if ( in == "key<AD12>")    out = 35;    /* VK_RIGHTBRACE  DE + */
+  else if ( in == "key<AD11>")    out = 34;    /* VK_LEFTBRACE        */
+  else if ( in == "key<AD12>")    out = 35;    /* VK_RIGHTBRACE       */
 
   else if ( in == "key<AC01>")    out = 38;    /* VK_A                */
   else if ( in == "key<AC02>")    out = 39;    /* VK_S                */
@@ -424,8 +422,8 @@ int replace_KeyName_with_Keycode(std::string  in) {
   else if ( in == "key<AC07>")    out = 44;    /* VK_J                */
   else if ( in == "key<AC08>")    out = 45;    /* VK_K                */
   else if ( in == "key<AC09>")    out = 46;    /* VK_L                */
-  else if ( in == "key<AC10>")    out = 47;    /* VK_SEMICOLON  DE Ö  */
-  else if ( in == "key<AC11>")    out = 48;    /* VK_APOSTROPHE DE Ä  */
+  else if ( in == "key<AC10>")    out = 47;    /* VK_SEMICOLON        */
+  else if ( in == "key<AC11>")    out = 48;    /* VK_APOSTROPHE       */
 
   else if ( in == "key<AB01>")    out = 52;    /* VK_Z                */
   else if ( in == "key<AB02>")    out = 53;    /* VK_X                */
@@ -436,7 +434,7 @@ int replace_KeyName_with_Keycode(std::string  in) {
   else if ( in == "key<AB07>")    out = 58;    /* VK_M                */
   else if ( in == "key<AB08>")    out = 59;    /* VK_ COMMA           */
   else if ( in == "key<AB09>")    out = 60;    /* VK_DOT              */
-  else if ( in == "key<AB10>")    out = 61;    /* VK_SLASH  DE -      */
+  else if ( in == "key<AB10>")    out = 61;    /* VK_SLASH            */
   else if ( in == "key<BKSL>")    out = 51;    /* VK_BKSLASH          */
   else if ( in == "key<LSGT>")    out = 63;    /* VK_RIGHTSHIFT       */
   else if ( in == "key<SPCE>")    out = 65;    /* VK_SPACE            */
@@ -452,7 +450,7 @@ int split_US_To_3D_Vector(v_dw_3D &all_US,v_str_1D completeList) {
 
   std::vector<char> delim{' ', '[', ']', '}', ';', '\t', '\n'};
   char split_bracel = '{';
-  char split_char_komma  = ',';
+  char split_comma  = ',';
   int Keycde;
   v_str_1D tokens;
   v_dw_1D tokens_dw;
@@ -482,17 +480,14 @@ int split_US_To_3D_Vector(v_dw_3D &all_US,v_str_1D completeList) {
       std::istringstream split(tokens[1]);
       tokens.pop_back();
 
-      for (std::string each; std::getline(split, each, split_char_komma); tokens.push_back(each));
+      for (std::string each; std::getline(split, each, split_comma); tokens.push_back(each));
 
       // now convert all to KMX_DWORD and fill tokens
       tokens_dw.push_back((KMX_DWORD) Keycde);
 
       for ( int i = 1; i< (int) tokens.size();i++) {
-
         // replace a name with a single character ( a -> a  ; equal -> = )
         tokens_int = convertNamesTo_DWORD_Value(tokens[i]);
-        //tokens_int = convertNamesTo_DWORD_Value( wstring_from_string(tokens[i]));
-
         tokens_dw.push_back(tokens_int);
       }
 
@@ -555,7 +550,7 @@ int append_underlying_ToVector(v_dw_3D &All_Vector,GdkKeymap *keymap) {
 }
 
 bool InitializeGDK(GdkKeymap **keymap,int argc, gchar *argv[]) {
-// get keymap of keyboard layout in use
+// get keymap of underlying keyboard
 
   gdk_init(&argc, &argv);
   GdkDisplay *display = gdk_display_get_default();
@@ -595,8 +590,7 @@ std::u16string convert_DeadkeyValues_To_U16str(int in) {
     return  std::u16string(1, in);
   }
 
-  //KMX_DWORD lname_old = convertNamesTo_DWORD_Value( wstring_from_string(long_name));  // 65106 => "dead_circumflex" => 94 => "^"
-  KMX_DWORD lname = convertNamesTo_DWORD_Value(long_name);  // 65106 => "dead_circumflex" => 94 => "^"
+  KMX_DWORD lname = convertNamesTo_DWORD_Value(long_name);                        // 65106 => "dead_circumflex" => 94 => "^"
 
   if (lname != returnIfCharInvalid) {
     return std::u16string(1, lname );
@@ -765,10 +759,8 @@ KMX_DWORD KMX_get_KeyCodeUnderlying_From_KeyCodeUS(GdkKeymap *keymap, v_dw_3D &A
   KMX_DWORD KC_underlying;
   std::u16string u16str = convert_DeadkeyValues_To_U16str(KMX_get_KeyVal_From_KeyCode(keymap, KC_US, ss, caps));
 
-  //Find KC_underlying character
   for( int i=0; i< (int)All_Vector[1].size()-1 ;i++) {
     for( int j=1; j< (int)All_Vector[1][0].size();j++) {
-      //if ( ( All_Vector[1][i][j] == (KMX_DWORD)  *ws.c_str() ) ) {
       if ( ( All_Vector[1][i][j] == (KMX_DWORD)  *u16str.c_str() ) ) {
         KC_underlying = All_Vector[1][i][0];
         return KC_underlying;

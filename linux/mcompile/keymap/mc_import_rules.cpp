@@ -88,7 +88,7 @@ int KMX_ToUnicodeEx(guint keycode, PKMX_WCHAR pwszBuff, int shift_state_pos, int
     return -1;
   else if(gdk_keyval_to_unicode(KeyVal)  == 0)                      // NO UNICODE
     return 0;
-  else                                                              /// usable char
+  else                                                              // usable char
     return 1;
 }
 
@@ -140,39 +140,39 @@ public:
   }
 
   bool KMX_IsSGCAPS() {
-        std::u16string stBase = this->KMX_GetShiftState(Base, false);     // 0,0  a 4 ß
-        std::u16string stShift = this->KMX_GetShiftState(Shft, false);    // 1,0  A $ ?
-        std::u16string stCaps = this->KMX_GetShiftState(Base, true);      // 0,1  A 4 ẞ
-        std::u16string stShiftCaps = this->KMX_GetShiftState(Shft, true); // 1,1  a $ ?
+        std::u16string stBase = this->KMX_GetShiftState(Base, false);
+        std::u16string stShift = this->KMX_GetShiftState(Shft, false);
+        std::u16string stCaps = this->KMX_GetShiftState(Base, true);
+        std::u16string stShiftCaps = this->KMX_GetShiftState(Shft, true);
         return (
             ((stCaps.size() > 0) &&
-            (stBase.compare(stCaps) != 0) &&                            // stBase != stCaps
-            (stShift.compare(stCaps) != 0)) ||                          // stShift!= stCaps
+            (stBase.compare(stCaps) != 0) &&
+            (stShift.compare(stCaps) != 0)) ||
             ((stShiftCaps.size() > 0) &&
-            (stBase.compare(stShiftCaps) != 0) &&                       // stBase != stShiftCaps
-            (stShift.compare(stShiftCaps) != 0)));                      // stShift!= stShiftCaps
+            (stBase.compare(stShiftCaps) != 0) &&
+            (stShift.compare(stShiftCaps) != 0)));
       }
 
   bool KMX_IsCapsEqualToShift() {
-        std::u16string stBase = this->KMX_GetShiftState(Base, false);     // 0,0  a 4 ß
-        std::u16string stShift = this->KMX_GetShiftState(Shft, false);    // 1,0  A $ ?
-        std::u16string stCaps = this->KMX_GetShiftState(Base, true);      // 0,1  A 4 ẞ
+        std::u16string stBase = this->KMX_GetShiftState(Base, false);
+        std::u16string stShift = this->KMX_GetShiftState(Shft, false);
+        std::u16string stCaps = this->KMX_GetShiftState(Base, true);
         return (
-            (stBase.size() > 0) &&                                      // unshifted char inside
-            (stShift.size() > 0) &&                                     // shifted   char inside
-            (stBase.compare(stShift) != 0) &&                           // stBase != stShft
-            (stShift.compare(stCaps) == 0));                            // stShft == stCaps
+            (stBase.size() > 0) &&
+            (stShift.size() > 0) &&
+            (stBase.compare(stShift) != 0) &&
+            (stShift.compare(stCaps) == 0));
       }
 
   bool KMX_IsAltGrCapsEqualToAltGrShift() {
-      std::u16string stBase = this->KMX_GetShiftState(MenuCtrl, false);       // 0,0
-      std::u16string stShift = this->KMX_GetShiftState(ShftMenuCtrl, false);  // 1,0
-      std::u16string stCaps = this->KMX_GetShiftState(MenuCtrl, true);        // 0,1
+      std::u16string stBase = this->KMX_GetShiftState(MenuCtrl, false);
+      std::u16string stShift = this->KMX_GetShiftState(ShftMenuCtrl, false);
+      std::u16string stCaps = this->KMX_GetShiftState(MenuCtrl, true);
       return (
-          (stBase.size() > 0) &&                                     // unshifted MenuCtrl/AltGr  char inside
-          (stShift.size() > 0) &&                                    // shifted   MenuCtrl/AltGr  char inside
-          (stBase.compare(stShift) != 0) &&                          // stBase != stShft
-          (stShift.compare(stCaps) == 0));                           // stShft == stCaps
+          (stBase.size() > 0) &&
+          (stShift.size() > 0) &&
+          (stBase.compare(stShift) != 0) &&
+          (stShift.compare(stCaps) == 0));
     }
 
   bool KMX_IsXxxxGrCapsEqualToXxxxShift() {
@@ -209,13 +209,6 @@ public:
     int nkeys = 0;
 
     // Get the CAPSLOCK value
-    //_S2 TOP_6 INFO not used in original code; can be deleted
-    /*int capslock =
-        (this->KMX_IsCapsEqualToShift() ? 1 : 0) |
-        (this->KMX_IsSGCAPS() ? 2 : 0) |
-        (this->KMX_IsAltGrCapsEqualToAltGrShift() ? 4 : 0) |
-        (this->KMX_IsXxxxGrCapsEqualToXxxxShift() ? 8 : 0);*/
-
     for (int ss = 0; ss <= MaxShiftState; ss++) {
       if (ss == Menu || ss == ShftMenu) {
         // Alt and Shift+Alt don't work, so skip them
@@ -255,8 +248,6 @@ public:
         (this->KMX_IsSGCAPS() ? 2 : 0) |
         (this->KMX_IsAltGrCapsEqualToAltGrShift() ? 4 : 0) |
         (this->KMX_IsXxxxGrCapsEqualToXxxxShift() ? 8 : 0);
-    // _S2 we need this capslock calculation
-    //capslock=1;*/
 
     for (int ss = 0; ss <= MaxShiftState; ss++) {
       if (ss == Menu || ss == ShftMenu) {
@@ -374,8 +365,6 @@ int KMX_GetMaxDeadkeyIndex(KMX_WCHAR *p) {
 bool KMX_ImportRules(LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, GdkKeymap **keymap, std::vector<KMX_DeadkeyMapping> *FDeadkeys, KMX_BOOL bDeadkeyConversion) {   // I4353   // I4552
   KMX_Loader loader;
 
-  //KMX_HKL hkl = NULL;
-
   std::vector<KMX_VirtualKey*> rgKey; //= new VirtualKey[256];
   std::vector<DeadKey*> alDead;
   std::vector<DeadKey*> alDead_cpl = create_alDead();
@@ -395,7 +384,7 @@ bool KMX_ImportRules(LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, GdkKeymap **keymap,
 
     KMX_VirtualKey *key = new KMX_VirtualKey(sc);
 
-   if((key->VK() != 0) ) {
+    if((key->VK() != 0) ) {
         rgKey[key->VK()] = key;
     } else {
         delete key;
@@ -431,14 +420,14 @@ bool KMX_ImportRules(LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, GdkKeymap **keymap,
 
             if(rc > 0) {
               if(*sbBuffer == 0) {
-                rgKey[iKey]->KMX_SetShiftState(ss, u"", false, (caps));  // different to windows since behavior on Linux is different
+                rgKey[iKey]->KMX_SetShiftState(ss, u"", false, (caps));       // different to windows since behavior on Linux is different
               }
               else {
                 if( (ss == Ctrl || ss == ShftCtrl) ) {
                 continue;
               }
               sbBuffer[rc] = 0;
-              rgKey[iKey]->KMX_SetShiftState(ss, sbBuffer, false, (caps));      // different to windows since behavior on Linux is different
+              rgKey[iKey]->KMX_SetShiftState(ss, sbBuffer, false, (caps));    // different to windows since behavior on Linux is different
             }
           }
           else if(rc < 0) {
@@ -507,7 +496,6 @@ bool KMX_ImportRules(LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, GdkKeymap **keymap,
   //
   // Fill in the new rules
   //
- //fills group3: group(group3) using keys
   for (UINT iKey = 0; iKey < rgKey.size(); iKey++) {
     if ((rgKey[iKey] != NULL) && rgKey[iKey]->KMX_IsKeymanUsedKey() && (!rgKey[iKey]->KMX_IsEmpty())) {
       if(rgKey[iKey]->KMX_LayoutRow(loader.KMX_MaxShiftState(), &gp->dpKeyArray[nkeys], &alDead, nDeadkey, bDeadkeyConversion, All_Vector,*keymap)) {   // I4552
@@ -521,10 +509,6 @@ bool KMX_ImportRules(LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, GdkKeymap **keymap,
   //
   // Add nomatch control to each terminating 'using keys' group   // I4550
   //
-  // _adds    + [CTRL NCAPS K_QUOTE] > use(group2)  c line(0)
- //  + [CTRL CAPS K_QUOTE] > use(group2)  c line(0)
-  //nomatch > use(group2)    nomatch > use(group3)
-  // after dk-section
   LPKMX_GROUP gp2 = kp->dpGroupArray;
   for(UINT i = 0; i < kp->cxGroupArray - 1; i++, gp2++) {
     if(gp2->fUsingKeys && gp2->dpNoMatch == NULL) {
@@ -565,9 +549,6 @@ bool KMX_ImportRules(LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, GdkKeymap **keymap,
   // If we have deadkeys, then add a new group to translate the deadkeys per the deadkey tables
   // We only do this if not in deadkey conversion mode
   //
-  // _S2 writes âêîôû^for dk at the beginning +
-  // _S2 writes deadkey(1) at the end
-
 
   if (alDead.size() > 0 && !bDeadkeyConversion) {   // I4552
     kp->cxGroupArray++;

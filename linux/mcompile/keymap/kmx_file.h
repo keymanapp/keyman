@@ -7,8 +7,6 @@
 #ifndef KMX_FILE_H
 #define KMX_FILE_H
 
-//#include <km_types.h>
-
 #define UNREFERENCED_PARAMETER(P)   (P)
 #define TRUNCATE ((size_t)-1)
 #ifdef KMN_KBP
@@ -19,7 +17,6 @@ namespace kmx {
 #endif
 
 #define KMX_MAX_ALLOWED_FILE_SIZE (128 * 1024 * 1024)  /* 128MB */
-/* */
 
 #define KEYMAN_LAYOUT_DEFAULT 0x000005FE
 

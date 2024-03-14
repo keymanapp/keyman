@@ -57,9 +57,6 @@ typedef KMX_BYTE*     PKMX_BYTE;
 typedef KMX_DWORD*    PKMX_DWORD;
 typedef int           BOOL;
 
-//typedef void* KMX_HKL;                  // _S2 QUESTION what is the equivalent to HKL and do I need it?? I assume a void*
-
-
 #ifndef FALSE
 #define FALSE               0
 #endif
