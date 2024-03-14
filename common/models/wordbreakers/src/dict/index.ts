@@ -152,7 +152,7 @@ export function _dict_break(span: Span, dictRoot: LexiconTraversal): Span[] {
       const pathCtd: DictBreakerPath = {
         boundaryIndex: path.boundaryIndex,
         traversal: traversal,
-        cost: (path.parent?.cost ?? 0) - Math.log2(traversal.maxP),
+        cost: (path.parent?.cost ?? 0) - Math.log2(traversal.p),
         parent: path.parent
       }
 
