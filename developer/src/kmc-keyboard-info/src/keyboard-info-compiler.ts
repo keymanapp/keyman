@@ -16,7 +16,7 @@ import { getFontFamily } from "./font-family.js";
 
 const regionNames = new Intl.DisplayNames(['en'], { type: "region" });
 const scriptNames = new Intl.DisplayNames(['en'], { type: "script" });
-export const langtagsByTag = {};
+const langtagsByTag = {};
 
 /**
  * Build a dictionary of language tags from langtags.json
@@ -608,3 +608,10 @@ export class KeyboardInfoCompiler implements KeymanCompiler {
   }
 
 }
+
+/**
+ * these are exported only for unit tests, do not use
+ */
+export const unitTestEndpoints = {
+  langtagsByTag,
+};

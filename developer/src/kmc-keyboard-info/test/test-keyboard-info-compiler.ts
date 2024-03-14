@@ -3,7 +3,7 @@ import { assert } from 'chai';
 import 'mocha';
 import { TestCompilerCallbacks } from '@keymanapp/developer-test-helpers';
 import { makePathToFixture } from './helpers/index.js';
-import { KeyboardInfoCompiler, KeyboardInfoCompilerResult, langtagsByTag } from '../src/keyboard-info-compiler.js';
+import { KeyboardInfoCompiler, KeyboardInfoCompilerResult, unitTestEndpoints } from '../src/keyboard-info-compiler.js';
 import langtags from "../src/imports/langtags.js";
 
 const callbacks = new TestCompilerCallbacks();
@@ -75,9 +75,9 @@ describe('keyboard-info-compiler', function () {
   it('check preinit creates langtagsByTag correctly', async function() {
     const enLangTag = langtags.find(({ tag }) => tag === 'en');
     assert.deepEqual(enLangTag, ENLANGTAG);
-    assert.deepEqual((<any>langtagsByTag)['en'], ENLANGTAG);
-    assert.deepEqual((<any>langtagsByTag)['en-Latn-US'], ENLANGTAG);
-    assert.deepEqual((<any>langtagsByTag)['en-Latn'], ENLANGTAG);
-    assert.deepEqual((<any>langtagsByTag)['en-US'], ENLANGTAG);
+    assert.deepEqual((<any>unitTestEndpoints.langtagsByTag)['en'], ENLANGTAG);
+    assert.deepEqual((<any>unitTestEndpoints.langtagsByTag)['en-Latn-US'], ENLANGTAG);
+    assert.deepEqual((<any>unitTestEndpoints.langtagsByTag)['en-Latn'], ENLANGTAG);
+    assert.deepEqual((<any>unitTestEndpoints.langtagsByTag)['en-US'], ENLANGTAG);
   });
 });
