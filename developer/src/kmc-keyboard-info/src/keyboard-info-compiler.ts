@@ -16,7 +16,7 @@ import { getFontFamily } from "./font-family.js";
 
 const regionNames = new Intl.DisplayNames(['en'], { type: "region" });
 const scriptNames = new Intl.DisplayNames(['en'], { type: "script" });
-const langtagsByTag = {};
+export const langtagsByTag = {};
 
 /**
  * Build a dictionary of language tags from langtags.json
@@ -608,4 +608,3 @@ export class KeyboardInfoCompiler implements KeymanCompiler {
   }
 
 }
-
