@@ -365,6 +365,6 @@ describe('Trie traversal abstractions', function() {
         p: 1/2
       }
     ]);
-    assert.equal(eNode.maxP, 0.5);
+    assert.equal(eNode.p, 0.5);
   });
 });
