@@ -16,12 +16,7 @@ export async function getFontFamily(source: Uint8Array) {
   }
 
   const buffer = Buffer.from(source);
-  let font = null;
-  try {
-    font = await ttfMeta.promise(buffer);
-  } catch(e) {
-    return null;
-  }
+  const font = await ttfMeta.promise(buffer);
   /* c8 ignore next 3 */
   if(!font) {
     return null;

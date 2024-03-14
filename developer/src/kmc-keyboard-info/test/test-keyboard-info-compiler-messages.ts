@@ -318,9 +318,9 @@ describe('KeyboardInfoCompilerMessages', function () {
       `ERROR_NoLicenseFound not generated, instead got: `+JSON.stringify(callbacks.messages,null,2));
   });
   
-  // ERROR_FontFileCannotBeRead
+  // ERROR_FontFileMetaDataIsInvalid
 
-  it('should generate ERROR_FontFileCannotBeRead error if font family cannot be obtained from file', async function() {
+  it('should generate ERROR_FontFileMetaDataIsInvalid error if font file meta data throws an error', async function() {
     const jsFilename = makePathToFixture('font-file-cannot-be-read', 'build', 'khmer_angkor.js');
     const kpsFilename = makePathToFixture('font-file-cannot-be-read', 'source', 'khmer_angkor.kps');
     const kmpFilename = makePathToFixture('font-file-cannot-be-read', 'build', 'khmer_angkor.kmp');
@@ -341,9 +341,9 @@ describe('KeyboardInfoCompilerMessages', function () {
     const source = ["font_file_cannot_be_read.ttf"]
     const result = await compiler['fontSourceToKeyboardInfoFont'](kpsFilename, kmpJsonData, source)
     assert.isNull(result);
-    assert.isTrue(callbacks.hasMessage(KeyboardInfoCompilerMessages.ERROR_FontFileCannotBeRead),
-      `ERROR_FontFileCannotBeRead not generated, instead got: `+JSON.stringify(callbacks.messages,null,2));
-    assert.isTrue(nodeCompilerMessage(callbacks, KeyboardInfoCompilerMessages.ERROR_FontFileCannotBeRead).includes(kmpJsonData.files[0].name),
+    assert.isTrue(callbacks.hasMessage(KeyboardInfoCompilerMessages.ERROR_FontFileMetaDataIsInvalid),
+      `ERROR_FontFileMetaDataIsInvalid not generated, instead got: `+JSON.stringify(callbacks.messages,null,2));
+    assert.isTrue(nodeCompilerMessage(callbacks, KeyboardInfoCompilerMessages.ERROR_FontFileMetaDataIsInvalid).includes(kmpJsonData.files[0].name),
       kmpJsonData.files[0].name+' not found in the message');
   });      
 });
