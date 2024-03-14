@@ -54,7 +54,7 @@ describe('Trie traversal abstractions', function() {
         assert.isDefined(traversalInner1);
         assert.isArray(child.traversal().entries);
         assert.isEmpty(child.traversal().entries);
-        assert.equal(traversalInner1.maxP, PROB_OF_THE);
+        assert.equal(traversalInner1.p, PROB_OF_THE);
 
         for(let tChild of traversalInner1.children()) {
           if(tChild.char == 'h') {
@@ -63,7 +63,7 @@ describe('Trie traversal abstractions', function() {
             assert.isDefined(traversalInner2);
             assert.isEmpty(tChild.traversal().entries);
             assert.isArray(tChild.traversal().entries);
-            assert.equal(traversalInner2.maxP, PROB_OF_THE);
+            assert.equal(traversalInner2.p, PROB_OF_THE);
 
             for(let hChild of traversalInner2.children()) {
               if(hChild.char == 'e') {
@@ -77,14 +77,14 @@ describe('Trie traversal abstractions', function() {
                     p: PROB_OF_THE
                   }
                 ]);
-                assert.equal(traversalInner3.maxP, PROB_OF_THE);
+                assert.equal(traversalInner3.p, PROB_OF_THE);
 
                 for(let eChild of traversalInner3.children()) {
                   let keyIndex = eKeys.indexOf(eChild.char);
                   assert.notEqual(keyIndex, -1, "Did not find char '" + eChild.char + "' in array!");
 
                   // THE is not accessible if any of the sub-tries of our 'e' node (traversalInner3).
-                  assert.isBelow(eChild.traversal().maxP, PROB_OF_THE);
+                  assert.isBelow(eChild.traversal().p, PROB_OF_THE);
                   eKeys.splice(keyIndex, 1);
                 }
               }
@@ -117,7 +117,7 @@ describe('Trie traversal abstractions', function() {
         assert.isDefined(traversalInner1);
         assert.isArray(child.traversal().entries);
         assert.isEmpty(child.traversal().entries);
-        assert.equal(traversalInner1.maxP, 1000 / 500500 /* prob of 'the' */);
+        assert.equal(traversalInner1.p, 1000 / 500500 /* prob of 'the' */);
 
         for(let tChild of traversalInner1.children()) {
           if(tChild.char == 'r') {
@@ -125,7 +125,7 @@ describe('Trie traversal abstractions', function() {
             assert.isDefined(traversalInner2);
             assert.isArray(tChild.traversal().entries);
             assert.isEmpty(tChild.traversal().entries);
-            assert.equal(traversalInner2.maxP, 607 / 500500 /* prob of 'true', the best 'tr-' entry */);
+            assert.equal(traversalInner2.p, 607 / 500500 /* prob of 'true', the best 'tr-' entry */);
 
             for(let rChild of traversalInner2.children()) {
               if(rChild.char == 'o') {
@@ -154,10 +154,10 @@ describe('Trie traversal abstractions', function() {
                   if(leafChildSequence.length > 0) {
                     assert.isArray(curChild.traversal().entries);
                     assert.isEmpty(curChild.traversal().entries);
-                    assert.equal(curChild.traversal().maxP, PROB_OF_TROUBLE);
+                    assert.equal(curChild.traversal().p, PROB_OF_TROUBLE);
                   } else {
                     let finalTraversal = curChild.traversal();
-                    assert.equal(finalTraversal.maxP, PROB_OF_TROUBLE);
+                    assert.equal(finalTraversal.p, PROB_OF_TROUBLE);
                     assert.isDefined(finalTraversal.entries);
                     assert.deepEqual(finalTraversal.entries, [
                       {
@@ -207,7 +207,7 @@ describe('Trie traversal abstractions', function() {
         assert.isDefined(traversalInner1);
         assert.isArray(traversalInner1.entries);
         assert.isEmpty(traversalInner1.entries);
-        assert.equal(traversalInner1.maxP, 0.5); // The two entries are equally weighted.
+        assert.equal(traversalInner1.p, 0.5); // The two entries are equally weighted.
 
         for(let aChild of traversalInner1.children()) {
           if(aChild.char == smpP) {
@@ -216,7 +216,7 @@ describe('Trie traversal abstractions', function() {
             assert.isDefined(traversalInner2);
             assert.isArray(traversalInner2.entries);
             assert.isEmpty(traversalInner2.entries);
-            assert.equal(traversalInner2.maxP, 0.5);
+            assert.equal(traversalInner2.p, 0.5);
 
             for(let pChild of traversalInner2.children()) {
               let keyIndex = pKeys.indexOf(pChild.char);
@@ -228,7 +228,7 @@ describe('Trie traversal abstractions', function() {
                 assert.isDefined(traversalInner3);
                 assert.isArray(traversalInner3.entries);
                 assert.isEmpty(traversalInner3.entries);
-                assert.equal(traversalInner3.maxP, 0.5);
+                assert.equal(traversalInner3.p, 0.5);
 
                 // Now to handle the rest, knowing it's backed by a leaf node.
                 let curChild = pChild;
@@ -257,7 +257,7 @@ describe('Trie traversal abstractions', function() {
                     const nextTraversal = curChild.traversal()
                     assert.isArray(nextTraversal.entries);
                     assert.isEmpty(nextTraversal.entries);
-                    assert.equal(nextTraversal.maxP, 0.5);
+                    assert.equal(nextTraversal.p, 0.5);
                   } else {
                     let finalTraversal = curChild.traversal();
                     assert.isDefined(finalTraversal.entries);
@@ -267,7 +267,7 @@ describe('Trie traversal abstractions', function() {
                         p: 1/2
                       }
                     ]);
-                    assert.equal(finalTraversal.maxP, 0.5);
+                    assert.equal(finalTraversal.p, 0.5);
                     eSuccess = true;
                   }
                 } while (leafChildSequence.length > 0);
