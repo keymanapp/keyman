@@ -608,6 +608,7 @@ export class KeyboardInfoCompiler implements KeymanCompiler {
       source
     };
 
+    /* c8 ignore next 4 */
     if(!result.family) {
       this.callbacks.reportMessage(KeyboardInfoCompilerMessages.Error_FontFileCannotBeRead({filename: sourcePath}));
       return null;
