@@ -73,8 +73,9 @@ describe('keyboard-info-compiler', function () {
   });
 
   it('check preinit creates langtagsByTag correctly', async function() {
-    const enLangTag = langtags.find(({ tag }) => tag === 'en');
-    assert.deepEqual(enLangTag, ENLANGTAG);
+    const compiler = new KeyboardInfoCompiler(); // indirectly call preinit()
+    assert.isNotNull(compiler);
+    assert.deepEqual(langtags.find(({ tag }) => tag === 'en'), ENLANGTAG);
     assert.deepEqual((<any>unitTestEndpoints.langtagsByTag)['en'], ENLANGTAG);
     assert.deepEqual((<any>unitTestEndpoints.langtagsByTag)['en-Latn-US'], ENLANGTAG);
     assert.deepEqual((<any>unitTestEndpoints.langtagsByTag)['en-Latn'], ENLANGTAG);
