@@ -354,7 +354,7 @@ export default class TrieModel implements LexicalModel {
   }
 
   public traverseFromRoot(): LexiconTraversal {
-    return new Traversal(this._trie['root'], '', this._trie.totalWeight);
+    return this._trie.traverseFromRoot();
   }
 };
 
@@ -448,6 +448,10 @@ class Trie {
     this.root = root;
     this.toKey = wordform2key;
     this.totalWeight = totalWeight;
+  }
+
+  public traverseFromRoot(): LexiconTraversal {
+    return new Traversal(this.root, '', this.totalWeight);
   }
 
   /**
