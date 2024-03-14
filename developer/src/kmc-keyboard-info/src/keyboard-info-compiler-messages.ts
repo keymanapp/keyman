@@ -2,8 +2,8 @@ import { CompilerErrorNamespace, CompilerErrorSeverity, CompilerMessageSpec as m
 
 const Namespace = CompilerErrorNamespace.KeyboardInfoCompiler;
 // const SevInfo = CompilerErrorSeverity.Info | Namespace;
-const SevHint = CompilerErrorSeverity.Hint | Namespace;
-const SevWarn = CompilerErrorSeverity.Warn | Namespace;
+// const SevHint = CompilerErrorSeverity.Hint | Namespace;
+// const SevWarn = CompilerErrorSeverity.Warn | Namespace;
 const SevError = CompilerErrorSeverity.Error | Namespace;
 const SevFatal = CompilerErrorSeverity.Fatal | Namespace;
 
@@ -16,14 +16,6 @@ export class KeyboardInfoCompilerMessages {
 
   static ERROR_FileDoesNotExist = SevError | 0x0002;
   static Error_FileDoesNotExist = (o:{filename: string}) => m(this.ERROR_FileDoesNotExist, `File ${def(o.filename)} does not exist.`);
-
-  static ERROR_FileIsNotValid = SevError | 0x0003;
-  static Error_FileIsNotValid = (o:{filename: string; e: any}) => m(this.ERROR_FileIsNotValid,
-    `File ${def(o.filename)} could not be parsed: ${(o.e ?? 'unknown error').toString()}.`);
-
-  static WARN_MetadataFieldInconsistent = SevWarn | 0x0004;
-  static Warn_MetadataFieldInconsistent = (o:{field:string, value:any, expected:any}) => m(this.WARN_MetadataFieldInconsistent,
-    `Warning: field ${def(o.field)} value "${def(o.value)}" does not match "${def(o.expected)}" found in source file metadata.`);
 
   static ERROR_InvalidAuthorEmail = SevError | 0x0005;
   static Error_InvalidAuthorEmail = (o:{email:string}) => m(this.ERROR_InvalidAuthorEmail,
@@ -48,18 +40,6 @@ export class KeyboardInfoCompilerMessages {
   static ERROR_NoLicenseFound = SevError | 0x000A;
   static Error_NoLicenseFound = () => m(this.ERROR_NoLicenseFound,
     `No license for the keyboard was found. MIT license is required for publication to Keyman keyboards repository.`);
-
-  static HINT_OutputValidation = SevHint | 0x000B;
-  static Hint_OutputValidation = (o:{message: any}) => m(this.HINT_OutputValidation,
-    `Validating output: ${def(o.message)}.`);
-
-  static WARN_OutputValidation = SevWarn | 0x000C;
-  static Warn_OutputValidation = (o:{message: any}) => m(this.WARN_OutputValidation,
-    `Validating output: ${def(o.message)}.`);
-
-  static ERROR_OutputValidation = SevError | 0x000D;
-  static Error_OutputValidation = (o:{message: any}) => m(this.ERROR_OutputValidation,
-    `Validating output: ${def(o.message)}.`);
 
   static ERROR_FontFileCannotBeRead = SevError | 0x000E;
   static Error_FontFileCannotBeRead = (o:{filename: string}) => m(this.ERROR_FontFileCannotBeRead,
