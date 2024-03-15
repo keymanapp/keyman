@@ -144,7 +144,7 @@ class Traversal implements LexiconTraversal {
     } else {
       // root.type == 'leaf';
       const legalChildren = root.entries.filter(function(entry) {
-        return entry.content.indexOf(nextPrefix) == 0;
+        return entry.key.indexOf(nextPrefix) == 0;
       });
 
       if(!legalChildren.length) {
