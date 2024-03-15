@@ -2,7 +2,7 @@
 title: What's New
 ---
 
-Here are some of the new features we have added to Keyman for Linux 17.0:
+Here are some of the new features we have added to Keyman for Linux 18.0:
 
 - Keyman for Linux now fully works with the Wayland compositor
   ([#4273](https://github.com/keymanapp/keyman/issues/4273)).
