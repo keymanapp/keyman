@@ -753,7 +753,7 @@ int LdmlJsonTestSourceFactory::load(const km::core::path &compiled, const km::co
   }
 
   auto conformsTo = data["/keyboardTest3/conformsTo"_json_pointer].get<std::string>();
-  assert_or_return(std::string(LDML_CLDR_VERSION_LATEST) == conformsTo);
+  assert_or_return(std::string(LDML_CLDR_TEST_VERSION_LATEST) == conformsTo);
   auto info_keyboard = data["/keyboardTest3/info/keyboard"_json_pointer].get<std::string>();
   auto info_author = data["/keyboardTest3/info/author"_json_pointer].get<std::string>();
   auto info_name = data["/keyboardTest3/info/name"_json_pointer].get<std::string>();

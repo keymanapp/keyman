@@ -14,30 +14,38 @@ import { KeymanCompilerResult } from '@keymanapp/common-types';
 import { KmpJsonFile } from '@keymanapp/common-types';
 import { KpsFile } from '@keymanapp/common-types';
 
-// @public (undocumented)
+// @public
 export class KmpCompiler implements KeymanCompiler {
+    // @internal
     buildKmpFile(kpsFilename: string, kmpJsonData: KmpJsonFile.KmpJsonFile): Promise<Uint8Array>;
-    // Warning: (ae-forgotten-export) The symbol "KmpCompilerOptions" needs to be exported by the entry point main.d.ts
-    //
-    // (undocumented)
     init(callbacks: CompilerCallbacks, options: KmpCompilerOptions): Promise<boolean>;
-    // (undocumented)
+    // @internal (undocumented)
     loadKpsFile(kpsFilename: string): KpsFile.KpsFile;
-    // Warning: (ae-forgotten-export) The symbol "KmpCompilerResult" needs to be exported by the entry point main.d.ts
-    //
-    // (undocumented)
     run(inputFilename: string, outputFilename?: string): Promise<KmpCompilerResult>;
-    // (undocumented)
+    // @internal (undocumented)
     transformKpsFileToKmpObject(kpsFilename: string, kps: KpsFile.KpsFile): KmpJsonFile.KmpJsonFile;
-    // (undocumented)
+    // @internal (undocumented)
     transformKpsToKmpObject(kpsFilename: string): KmpJsonFile.KmpJsonFile;
-    // Warning: (ae-forgotten-export) The symbol "KmpCompilerArtifacts" needs to be exported by the entry point main.d.ts
-    //
-    // (undocumented)
     write(artifacts: KmpCompilerArtifacts): Promise<boolean>;
 }
 
-// @public (undocumented)
+// @public
+export interface KmpCompilerArtifacts extends KeymanCompilerArtifacts {
+    kmp: KeymanCompilerArtifact;
+}
+
+// @public
+export interface KmpCompilerOptions extends CompilerOptions {
+}
+
+// @public
+export interface KmpCompilerResult extends KeymanCompilerResult {
+    artifacts: KmpCompilerArtifacts;
+}
+
+// Warning: (ae-internal-missing-underscore) The name "PackageCompilerMessages" should be prefixed with an underscore because the declaration is marked as @internal
+//
+// @internal (undocumented)
 export class PackageCompilerMessages {
     // (undocumented)
     static ERROR_FileCouldNotBeRead: number;
@@ -220,30 +228,38 @@ export class PackageCompilerMessages {
     }) => CompilerEvent;
 }
 
-// @public (undocumented)
+// Warning: (ae-internal-missing-underscore) The name "PackageValidation" should be prefixed with an underscore because the declaration is marked as @internal
+//
+// @internal (undocumented)
 export class PackageValidation {
     constructor(callbacks: CompilerCallbacks, options: CompilerOptions);
     // (undocumented)
     validate(filename: string, kmpJson: KmpJsonFile.KmpJsonFile): boolean;
 }
 
-// @public (undocumented)
+// @public
 export class WindowsPackageInstallerCompiler implements KeymanCompiler {
-    // Warning: (ae-forgotten-export) The symbol "WindowsPackageInstallerCompilerOptions" needs to be exported by the entry point main.d.ts
-    //
-    // (undocumented)
     init(callbacks: CompilerCallbacks, options: WindowsPackageInstallerCompilerOptions): Promise<boolean>;
-    // Warning: (ae-forgotten-export) The symbol "WindowsPackageInstallerCompilerResult" needs to be exported by the entry point main.d.ts
-    //
-    // (undocumented)
     run(inputFilename: string, outputFilename?: string): Promise<WindowsPackageInstallerCompilerResult>;
-    // Warning: (ae-forgotten-export) The symbol "WindowsPackageInstallerCompilerArtifacts" needs to be exported by the entry point main.d.ts
-    //
-    // (undocumented)
     write(artifacts: WindowsPackageInstallerCompilerArtifacts): Promise<boolean>;
 }
 
-// @public (undocumented)
+// @public
+export interface WindowsPackageInstallerCompilerArtifacts extends KeymanCompilerArtifacts {
+    exe: KeymanCompilerArtifact;
+}
+
+// @public
+export interface WindowsPackageInstallerCompilerOptions extends KmpCompilerOptions {
+    sources: WindowsPackageInstallerSources;
+}
+
+// @public
+export interface WindowsPackageInstallerCompilerResult extends KeymanCompilerResult {
+    artifacts: WindowsPackageInstallerCompilerArtifacts;
+}
+
+// @public
 export interface WindowsPackageInstallerSources {
     // (undocumented)
     appName?: string;

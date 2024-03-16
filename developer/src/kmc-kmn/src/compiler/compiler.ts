@@ -8,7 +8,7 @@ TODO: implement additional interfaces:
 // TODO: rename wasm-host?
 import { UnicodeSetParser, UnicodeSet, VisualKeyboard, KvkFileReader, KeymanCompiler, KeymanCompilerArtifacts, KeymanCompilerArtifactOptional, KeymanCompilerResult, KeymanCompilerArtifact } from '@keymanapp/common-types';
 import { CompilerCallbacks, CompilerEvent, CompilerOptions, KeymanFileTypes, KvkFileWriter, KvksFileReader } from '@keymanapp/common-types';
-import { Osk } from '@keymanapp/developer-utils';
+import * as Osk from './osk.js';
 import loadWasmHost from '../import/kmcmplib/wasm-host.js';
 import { CompilerMessages, mapErrorFromKmcmplib } from './kmn-compiler-messages.js';
 import { WriteCompiledKeyboard } from '../kmw-compiler/kmw-compiler.js';
@@ -59,11 +59,23 @@ export interface KmnCompilerResultExtra {
 
 /**
  * @public
- * Internal in-memory result from a successful compilation
+ * Internal in-memory build artifacts from a successful compilation
  */
 export interface KmnCompilerArtifacts extends KeymanCompilerArtifacts {
+  /**
+   * Binary keyboard filedata and filename - installable into Keyman desktop
+   * projects
+   */
   kmx?: KeymanCompilerArtifactOptional;
+  /**
+   * Binary on screen keyboard filedata and filename - installable into Keyman
+   * desktop projects alongside .kmx
+   */
   kvk?: KeymanCompilerArtifactOptional;
+  /**
+   * Javascript keyboard filedata and filename - installable into KeymanWeb,
+   * Keyman mobile products
+   */
   js?: KeymanCompilerArtifactOptional;
 };
 
@@ -72,8 +84,19 @@ export interface KmnCompilerArtifacts extends KeymanCompilerArtifacts {
  * Build artifacts from the .kmn compiler
  */
 export interface KmnCompilerResult extends KeymanCompilerResult {
+  /**
+   * Internal in-memory build artifacts from a successful compilation. Caller
+   * can write these to disk with {@link KmnCompiler.write}
+   */
   artifacts: KmnCompilerArtifacts;
+  /**
+   * Internal additional metadata used by secondary compile phases such as
+   * KmwCompiler, not intended for external use
+   */
   extra: KmnCompilerResultExtra;
+  /**
+   * Mapping data for `&displayMap`, intended for use by kmc-analyze
+   */
   displayMap?: Osk.PuaMap;
 };
 
@@ -129,7 +152,8 @@ export class KmnCompiler implements KeymanCompiler, UnicodeSetParser {
   /**
    * Initialize the compiler, including loading the WASM host for kmcmplib.
    * Copies options.
-   * @param callbacks - Callbacks for external interfaces, including message reporting and file io
+   * @param callbacks - Callbacks for external interfaces, including message
+   *                    reporting and file io
    * @param options   - Compiler options
    * @returns false if initialization fails
    */
@@ -277,9 +301,9 @@ export class KmnCompiler implements KeymanCompiler, UnicodeSetParser {
 
   /**
    * Compiles a .kmn file to .kmx, .kvk, and/or .js files. Returns an object
-   * containing binary artifacts on succes. The files are passed in by name, and
-   * the compiler will use callbacks as passed to the {@link KmnCompiler.init}
-   * function to read any input files by disk.
+   * containing binary artifacts on success. The files are passed in by name,
+   * and the compiler will use callbacks as passed to the
+   * {@link KmnCompiler.init} function to read any input files by disk.
    * @param infile  - Path to source file. Path will be parsed to find relative
    *                  references in the .kmn file, such as icon or On Screen
    *                  Keyboard file

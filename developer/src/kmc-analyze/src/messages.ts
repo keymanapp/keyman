@@ -1,4 +1,5 @@
 import { CompilerErrorNamespace, CompilerErrorSeverity, CompilerMessageSpec as m, CompilerMessageDef as def, CompilerMessageSpecWithException } from "@keymanapp/common-types";
+import { KeymanUrls } from "@keymanapp/developer-utils";
 
 const Namespace = CompilerErrorNamespace.Analyzer;
 const SevInfo = CompilerErrorSeverity.Info | Namespace;
@@ -19,7 +20,7 @@ export class AnalyzerMessages {
     o.e ?? 'unknown error',
     `Raised when an analysis components has an internal error. If you
     experience this error, it should be reported to the Keyman team for
-    resolution via https://github.com/keymanapp/keyman/issues/new`
+    resolution via ${KeymanUrls.NEW_KEYMAN_ISSUE()}`
   );
 
   static readonly INFO_ScanningFile = SevInfo | 0x0002;

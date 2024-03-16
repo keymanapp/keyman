@@ -16,7 +16,7 @@ const m = (code: number, message: string, o?: {filename?: string, line?: number}
 });
 
 /**
- * @public
+ * @internal
  * Error messages reported by the KeymanWeb .kmn compiler.
  */
 export class KmwCompilerMessages extends KmnCompilerMessages {

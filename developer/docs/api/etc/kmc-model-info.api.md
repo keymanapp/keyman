@@ -13,23 +13,22 @@ import { KeymanCompilerArtifacts } from '@keymanapp/common-types';
 import { KeymanCompilerResult } from '@keymanapp/common-types';
 import { KmpJsonFile } from '@keymanapp/common-types';
 
-// @public (undocumented)
+// @public
 export class ModelInfoCompiler implements KeymanCompiler {
     constructor();
-    // (undocumented)
     init(callbacks: CompilerCallbacks, options: ModelInfoCompilerOptions): Promise<boolean>;
     run(inputFilename: string, outputFilename?: string): Promise<ModelInfoCompilerResult>;
-    // (undocumented)
     write(artifacts: ModelInfoCompilerArtifacts): Promise<boolean>;
 }
 
-// @public (undocumented)
+// @public
 export interface ModelInfoCompilerArtifacts extends KeymanCompilerArtifacts {
-    // (undocumented)
     model_info: KeymanCompilerArtifact;
 }
 
-// @public (undocumented)
+// Warning: (ae-internal-missing-underscore) The name "ModelInfoCompilerMessages" should be prefixed with an underscore because the declaration is marked as @internal
+//
+// @internal (undocumented)
 export class ModelInfoCompilerMessages {
     // (undocumented)
     static ERROR_FileDoesNotExist: number;
@@ -51,10 +50,6 @@ export class ModelInfoCompilerMessages {
         email: string;
     }) => CompilerEvent;
     // (undocumented)
-    static Error_LicenseFileDoesNotExist: (o: {
-        filename: string;
-    }) => CompilerEvent;
-    // (undocumented)
     static ERROR_LicenseFileIsDamaged: number;
     // (undocumented)
     static Error_LicenseFileIsDamaged: (o: {
@@ -62,6 +57,10 @@ export class ModelInfoCompilerMessages {
     }) => CompilerEvent;
     // (undocumented)
     static ERROR_LicenseFileIsMissing: number;
+    // (undocumented)
+    static Error_LicenseFileIsMissing: (o: {
+        filename: string;
+    }) => CompilerEvent;
     // (undocumented)
     static ERROR_LicenseIsNotValid: number;
     // (undocumented)
@@ -89,19 +88,17 @@ export class ModelInfoCompilerMessages {
     }) => CompilerEvent;
 }
 
-// @public (undocumented)
+// @public
 export interface ModelInfoCompilerOptions extends CompilerOptions {
-    // (undocumented)
     sources: ModelInfoSources;
 }
 
-// @public (undocumented)
+// @public
 export interface ModelInfoCompilerResult extends KeymanCompilerResult {
-    // (undocumented)
     artifacts: ModelInfoCompilerArtifacts;
 }
 
-// @public (undocumented)
+// @public
 export class ModelInfoSources {
     forPublishing: boolean;
     kmpFileName: string;

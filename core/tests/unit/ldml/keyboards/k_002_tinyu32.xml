@@ -6,8 +6,7 @@
 @@expected: \u0127\u1790\u17B6\u0127\uD83D\uDE40\u0127
 
 -->
-<!DOCTYPE keyboard3 SYSTEM "../../../../../resources/standards-data/ldml-keyboards/techpreview/dtd/ldmlKeyboard3.dtd">
-<keyboard3 locale="mt" conformsTo="techpreview">
+<keyboard3 xmlns="https://schemas.unicode.org/cldr/45/keyboard3" locale="mt" conformsTo="45">
   <info author="srl295" indicator="🙀" layout="qwerty"  name="TestKbd-UTF32"/>
 
   <keys>

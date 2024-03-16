@@ -1,5 +1,6 @@
 import { CompilerErrorNamespace, CompilerErrorSeverity, CompilerEvent, CompilerMessageSpec as m, CompilerMessageDef as def, CompilerMessageSpecWithException } from "@keymanapp/common-types";
 import { kmnfile } from "../kmw-compiler/compiler-globals.js";
+import { KeymanUrls } from "@keymanapp/developer-utils";
 
 const Namespace = CompilerErrorNamespace.KmnCompiler;
 const SevInfo = CompilerErrorSeverity.Info | Namespace;
@@ -86,7 +87,7 @@ export class KmnCompilerMessages {
     o.e ?? 'unknown error',
     `Raised when KmnCompiler or one of its components has an internal
     error. If you experience this error, it should be reported to the Keyman
-    team for resolution via https://github.com/keymanapp/keyman/issues/new.`
+    team for resolution via ${KeymanUrls.NEW_KEYMAN_ISSUE()}.`
   );
 
   static FATAL_MissingWasmModule = SevFatal | 0x901;
@@ -110,7 +111,7 @@ export class KmnCompilerMessages {
     `Callbacks were not set with init`,
     `Raised when KmnCompiler or one of its components experiences an internal
     error. If you experience this error, it should be reported to the Keyman
-    team for resolution via https://github.com/keymanapp/keyman/issues/new.`
+    team for resolution via ${KeymanUrls.NEW_KEYMAN_ISSUE()}.`
   );
 
   static FATAL_UnicodeSetOutOfRange = SevFatal | 0x904;
@@ -120,7 +121,7 @@ export class KmnCompilerMessages {
     `UnicodeSet buffer was too small`,
     `Raised when caller to UnicodeSet functions provides an invalid buffer. If
     you experience this error, it should be reported to the Keyman team for
-    resolution via https://github.com/keymanapp/keyman/issues/new.`
+    resolution via ${KeymanUrls.NEW_KEYMAN_ISSUE()}.`
   );
 
   // TODO: rename the following functions to Error_UsetHasStrings etc
@@ -134,7 +135,7 @@ export class KmnCompilerMessages {
     keyboards do not support multi-character strings in usets. To resolve this,
     reformat the uset to avoid the use of multi-character strings.
 
-    More on uset: https://www.unicode.org/reports/tr35/tr35-keyboards.html#element-uset`
+    More on uset: ${KeymanUrls.LDML_SPEC('element-uset')}`
   );
 
   static ERROR_UnicodeSetHasProperties = SevError | 0x906;
@@ -146,7 +147,7 @@ export class KmnCompilerMessages {
     make implementations dependent on a particular version of Unicode. To
     resolve this, reformat the uset to avoid the use of properties.
 
-    More on uset: https://www.unicode.org/reports/tr35/tr35-keyboards.html#element-uset`
+    More on uset: ${KeymanUrls.LDML_SPEC('element-uset')}`
   );
 
   static ERROR_UnicodeSetSyntaxError = SevError | 0x907;
@@ -156,7 +157,7 @@ export class KmnCompilerMessages {
     `The provided uset has a syntax error and could not be parsed. Verify the
     format of the uset against the specification.
 
-    More on uset: https://www.unicode.org/reports/tr35/tr35-keyboards.html#element-uset`
+    More on uset: ${KeymanUrls.LDML_SPEC('element-uset')}`
   );
 
   static ERROR_InvalidKvksFile = SevError | 0x908;
@@ -167,7 +168,7 @@ export class KmnCompilerMessages {
     There may be additional information in the error message to help you
     resolve the error.
 
-    More on .kvks file format: https://help.keyman.com/developer/current-version/reference/file-types/kvks`
+    More on .kvks file format: ${KeymanUrls.FILE_TYPE('kvks')}`
   );
 
   static WARN_InvalidVkeyInKvksFile = SevWarn | 0x909;
@@ -177,7 +178,7 @@ export class KmnCompilerMessages {
     `The .kvks file contained a virtual key that was not supported by
     Keyman. Remove this virtual key from the .kvks file.
 
-    Supported virtual keys: https://help.keyman.com/developer/language/guide/virtual-keys#common-virtual-key-codes`
+    Supported virtual keys: ${KeymanUrls.VIRTUAL_KEYS()}`
   );
 
   static ERROR_InvalidDisplayMapFile = SevError | 0x90A;
@@ -188,7 +189,7 @@ export class KmnCompilerMessages {
     file. There may be additional information in the error message to help you
     resolve the error.
 
-    More on displayMap: https://help.keyman.com/developer/language/reference/displaymap`
+    More on displayMap: ${KeymanUrls.KMN_REF('displaymap')}`
   );
 
   static ERROR_InvalidKvkFile = SevError | 0x90B;
@@ -199,7 +200,7 @@ export class KmnCompilerMessages {
     may be additional information in the error message to help you resolve the
     error.
 
-    More on .kvk files: https://help.keyman.com/developer/current-version/reference/file-types/kvk`
+    More on .kvk files: ${KeymanUrls.FILE_TYPE('kvk')}`
   );
 
   static ERROR_FileNotFound = SevError | 0x90C;

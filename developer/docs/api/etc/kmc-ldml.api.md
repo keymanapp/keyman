@@ -11,52 +11,40 @@ import { KeymanCompiler } from '@keymanapp/common-types';
 import { KeymanCompilerArtifactOptional } from '@keymanapp/common-types';
 import { KeymanCompilerArtifacts } from '@keymanapp/common-types';
 import { KeymanCompilerResult } from '@keymanapp/common-types';
-import { KMXBuilder } from '@keymanapp/common-types';
 import { KMXPlus } from '@keymanapp/common-types';
-import { LDMLKeyboard } from '@keymanapp/common-types';
 import { LDMLKeyboardTestDataXMLSourceFile } from '@keymanapp/common-types';
 import { LDMLKeyboardXMLSourceFileReaderOptions } from '@keymanapp/common-types';
-import { SectionIdent } from '@keymanapp/ldml-keyboard-constants';
-import { TouchLayout } from '@keymanapp/common-types';
-import { UnicodeSet } from '@keymanapp/common-types';
 import { UnicodeSetParser } from '@keymanapp/common-types';
-import { VisualKeyboard } from '@keymanapp/common-types';
 
-export { KMXBuilder }
-
-// @public (undocumented)
-export class KMXPlusMetadataCompiler {
-    // Warning: (ae-forgotten-export) The symbol "KMXPlusData" needs to be exported by the entry point main.d.ts
-    // Warning: (ae-forgotten-export) The symbol "KEYBOARD" needs to be exported by the entry point main.d.ts
-    static addKmxMetadata(kmxplus: KMXPlusData, keyboard: KEYBOARD, options: LdmlCompilerOptions): void;
-}
-
-// @public (undocumented)
+// @public
 export interface LdmlCompilerOptions extends CompilerOptions {
     readerOptions: LDMLKeyboardXMLSourceFileReaderOptions;
 }
 
-// @public (undocumented)
+// @public
 export class LdmlKeyboardCompiler implements KeymanCompiler {
+    // @internal
     compile(source: LDMLKeyboardXMLSourceFile, postValidate?: boolean): Promise<KMXPlus.KMXPlusFile>;
+    // @internal
     getUsetParser(): Promise<UnicodeSetParser>;
-    // (undocumented)
     init(callbacks: CompilerCallbacks, options: LdmlCompilerOptions): Promise<boolean>;
     // Warning: (ae-forgotten-export) The symbol "LDMLKeyboardXMLSourceFile" needs to be exported by the entry point main.d.ts
+    //
+    // @internal
     load(filename: string): LDMLKeyboardXMLSourceFile | null;
+    // @internal
     loadTestData(filename: string): LDMLKeyboardTestDataXMLSourceFile | null;
     // Warning: (ae-forgotten-export) The symbol "LdmlKeyboardCompilerResult" needs to be exported by the entry point main.d.ts
-    //
-    // (undocumented)
     run(inputFilename: string, outputFilename?: string): Promise<LdmlKeyboardCompilerResult>;
+    // @internal
     validate(source: LDMLKeyboardXMLSourceFile): Promise<boolean>;
     // Warning: (ae-forgotten-export) The symbol "LdmlKeyboardCompilerArtifacts" needs to be exported by the entry point main.d.ts
-    //
-    // (undocumented)
     write(artifacts: LdmlKeyboardCompilerArtifacts): Promise<boolean>;
 }
 
-// @public (undocumented)
+// Warning: (ae-internal-missing-underscore) The name "LdmlKeyboardCompilerMessages" should be prefixed with an underscore because the declaration is marked as @internal
+//
+// @internal (undocumented)
 export class LdmlKeyboardCompilerMessages {
     // (undocumented)
     static ERROR_CantReferenceSetFromUnicodeSet: number;
@@ -305,30 +293,6 @@ export class LdmlKeyboardCompilerMessages {
         count: number;
         lowestCh: number;
     }) => CompilerEvent;
-}
-
-// @public (undocumented)
-export class LdmlKeyboardKeymanWebCompiler {
-    constructor(callbacks: CompilerCallbacks, options?: LdmlCompilerOptions);
-    // (undocumented)
-    compile(name: string, source: LDMLKeyboard.LDMLKeyboardXMLSourceFile): string;
-    // (undocumented)
-    compileTouchLayout(source: LDMLKeyboard.LDMLKeyboardXMLSourceFile): string;
-    // (undocumented)
-    compileVisualKeyboard(source: LDMLKeyboard.LDMLKeyboardXMLSourceFile): string;
-}
-
-// @public (undocumented)
-export class LdmlKeyboardVisualKeyboardCompiler {
-    constructor(callbacks: CompilerCallbacks);
-    // (undocumented)
-    compile(source: LDMLKeyboard.LDMLKeyboardXMLSourceFile): VisualKeyboard.VisualKeyboard;
-}
-
-// @public (undocumented)
-export class TouchLayoutCompiler {
-    // (undocumented)
-    compileToJavascript(source: LDMLKeyboard.LDMLKeyboardXMLSourceFile): TouchLayout.TouchLayoutFile;
 }
 
 // (No @packageDocumentation comment for this package)
