@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 17.0.289 beta 2024-03-16
+
+* fix(common): add unit test for --debug flag for builder (#10974)
+
 ## 17.0.288 beta 2024-03-13
 
 * test(developer): kmc keyboard info compiler messages unit tests (#10848)
