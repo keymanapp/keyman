@@ -28,6 +28,8 @@
     { "path": "./developer/src/kmc/test/tsconfig.json" },
     { "path": "./developer/src/kmc-analyze/tsconfig.json" },
     // { "path": "./developer/src/kmc-analyze/test/tsconfig.json" },
+    { "path": "./developer/src/kmc-generate/tsconfig.json" },
+    { "path": "./developer/src/kmc-generate/test/tsconfig.json" },
     { "path": "./developer/src/kmc-kmn/test/tsconfig.json" },
     { "path": "./developer/src/kmc-kmn/tsconfig.json" },
     { "path": "./developer/src/kmc-keyboard-info/test/tsconfig.json" },

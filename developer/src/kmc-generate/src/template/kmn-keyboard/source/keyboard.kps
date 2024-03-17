@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Package>
+  <System>
+    <KeymanDeveloperVersion>$KEYMANVERSION</KeymanDeveloperVersion>
+    <FileVersion>7.0</FileVersion>
+  </System>
+  <Options>
+    <ReadMeFile>readme.htm</ReadMeFile>
+    <LicenseFile>..\LICENSE.md</LicenseFile>
+    <WelcomeFile>welcome.htm</WelcomeFile>
+    <FollowKeyboardVersion/>
+  </Options>
+  <Info>
+    <Name URL="">$NAME</Name>
+    <Copyright URL="">$COPYRIGHT</Copyright>
+    <Author URL="">$AUTHOR</Author>
+    <Description URL="">$DESCRIPTION</Description>
+  </Info>
+  <Files>
+$KMX:    <File>
+$KMX:      <Name>..\build\$ID.kmx</Name>
+$KMX:      <Description></Description>
+$KMX:      <CopyLocation>0</CopyLocation>
+$KMX:      <FileType>.kmx</FileType>
+$KMX:    </File>
+$Web:    <File>
+$Web:      <Name>..\build\$ID.js</Name>
+$Web:      <Description></Description>
+$Web:      <CopyLocation>0</CopyLocation>
+$Web:      <FileType>.js</FileType>
+$Web:    </File>
+$KVKS:    <File>
+$KVKS:      <Name>..\build\$ID.kvk</Name>
+$KVKS:      <Description></Description>
+$KVKS:      <CopyLocation>0</CopyLocation>
+$KVKS:      <FileType>.kvk</FileType>
+$KVKS:    </File>
+    <File>
+      <Name>welcome.htm</Name>
+      <Description></Description>
+      <CopyLocation>0</CopyLocation>
+      <FileType>.htm</FileType>
+    </File>
+    <File>
+      <Name>readme.htm</Name>
+      <Description></Description>
+      <CopyLocation>0</CopyLocation>
+      <FileType>.htm</FileType>
+    </File>
+    <File>
+      <Name>..\LICENSE.md</Name>
+      <Description></Description>
+      <CopyLocation>0</CopyLocation>
+      <FileType>.md</FileType>
+    </File>
+  </Files>
+  <Keyboards>
+    <Keyboard>
+      <Name>$NAME</Name>
+      <ID>$ID</ID>
+      <Version>$VERSION</Version>
+$PACKAGE_LANGUAGES
+    </Keyboard>
+  </Keyboards>
+</Package>
