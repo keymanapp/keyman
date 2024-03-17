@@ -1,5 +1,6 @@
 import { CommonTypesMessages, CompilerErrorNamespace } from '@keymanapp/developer-utils';
 import { AnalyzerMessages } from '@keymanapp/kmc-analyze';
+import { GeneratorMessages } from '@keymanapp/kmc-generate';
 import { KeyboardInfoCompilerMessages } from '@keymanapp/kmc-keyboard-info';
 import { KmnCompilerMessages, KmwCompilerMessages } from '@keymanapp/kmc-kmn';
 import { LdmlCompilerMessages } from '@keymanapp/kmc-ldml';
@@ -20,6 +21,7 @@ const messageNamespaces: Record<CompilerErrorNamespace, any> = {
   [CompilerErrorNamespace.KmwCompiler]: KmwCompilerMessages,
   [CompilerErrorNamespace.ModelInfoCompiler]: ModelInfoCompilerMessages,
   [CompilerErrorNamespace.KeyboardInfoCompiler]: KeyboardInfoCompilerMessages,
+  [CompilerErrorNamespace.Generator]: GeneratorMessages,
 };
 
 // This works around pain points in enumerating enum members in Typescript
