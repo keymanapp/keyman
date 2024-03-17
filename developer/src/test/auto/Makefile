@@ -23,6 +23,7 @@ developer-tests: \
   package-info \
   kmc \
   kmc-analyze \
+  kmc-generate \
   kmc-keyboard-info \
   kmc-kmn \
   kmc-ldml \
@@ -72,6 +73,10 @@ kmc: .virtual
 
 kmc-analyze: .virtual
   cd $(DEVELOPER_ROOT)\src\kmc-analyze
+  $(MAKE) $(TARGET)
+
+kmc-generate: .virtual
+  cd $(DEVELOPER_ROOT)\src\kmc-generate
   $(MAKE) $(TARGET)
 
 kmc-keyboard-info: .virtual

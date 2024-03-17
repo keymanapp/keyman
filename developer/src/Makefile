@@ -64,12 +64,16 @@ server: .virtual
     cd $(DEVELOPER_ROOT)\src\server
     $(MAKE) $(TARGET)
 
-kmc: kmc-analyze kmc-ldml kmc-keyboard-info kmc-kmn kmc-model kmc-model-info kmc-package
+kmc: kmc-analyze kmc-generate kmc-ldml kmc-keyboard-info kmc-kmn kmc-model kmc-model-info kmc-package
     cd $(DEVELOPER_ROOT)\src\kmc
     $(MAKE) $(TARGET)
 
 kmc-analyze: .virtual
     cd $(DEVELOPER_ROOT)\src\kmc-analyze
+    $(MAKE) $(TARGET)
+
+kmc-generate: .virtual
+    cd $(DEVELOPER_ROOT)\src\kmc-generate
     $(MAKE) $(TARGET)
 
 kmc-keyboard-info: .virtual

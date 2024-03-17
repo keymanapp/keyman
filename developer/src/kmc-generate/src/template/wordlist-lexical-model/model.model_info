@@ -1,0 +1,7 @@
+{
+    "license": "mit",
+    "languages": [
+        $LANGUAGES_MODEL_INFO
+    ],
+	  "description": "$DESCRIPTION"
+}

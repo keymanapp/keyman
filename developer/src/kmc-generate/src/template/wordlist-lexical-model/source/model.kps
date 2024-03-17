@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Package>
+  <System>
+    <KeymanDeveloperVersion>$KEYMANVERSION</KeymanDeveloperVersion>
+    <FileVersion>12.0</FileVersion>
+  </System>
+  <Options>
+    <ExecuteProgram></ExecuteProgram>
+    <ReadMeFile>readme.htm</ReadMeFile>
+    <LicenseFile>..\LICENSE.md</LicenseFile>
+  </Options>
+  <Info>
+    <Name URL="">$NAME</Name>
+    <Copyright URL="">$COPYRIGHT</Copyright>
+    <Author URL="">$AUTHOR</Author>
+    <Version URL="">$VERSION</Version>
+    <Description URL="">$DESCRIPTION</Description>
+  </Info>
+  <Files>
+    <File>
+      <Name>..\build\$ID.model.js</Name>
+      <Description></Description>
+      <CopyLocation>0</CopyLocation>
+      <FileType>.js</FileType>
+    </File>
+    <File>
+      <Name>welcome.htm</Name>
+      <Description></Description>
+      <CopyLocation>0</CopyLocation>
+      <FileType>.htm</FileType>
+    </File>
+    <File>
+      <Name>readme.htm</Name>
+      <Description></Description>
+      <CopyLocation>0</CopyLocation>
+      <FileType>.htm</FileType>
+    </File>
+    <File>
+      <Name>..\LICENSE.md</Name>
+      <Description></Description>
+      <CopyLocation>0</CopyLocation>
+      <FileType>.md</FileType>
+    </File>
+  </Files>
+  <Keyboards/>
+  <LexicalModels>
+    <LexicalModel>
+      <Name>$NAME</Name>
+      <ID>$ID</ID>
+      $PACKAGE_LANGUAGES
+    </LexicalModel>
+  </LexicalModels>
+  <RelatedPackages/>
+</Package>

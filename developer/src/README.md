@@ -57,6 +57,10 @@ node-based next generation compiler, hosts kmc, (and legacy kmlmc, kmlmp)
 
 File analysis tools for Keyman files.
 
+### src/kmc-generate - Generation tools
+
+Project generation tools for Keyman.
+
 ### src/kmc-keyboard-info - Keyboard Info Compiler
 
 Builds .keyboard_info files for use on the Keyman Cloud keyboard repository
