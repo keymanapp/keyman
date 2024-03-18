@@ -38,7 +38,6 @@ help/reference/
 
 # Debian watch file - we generate it from watch.in
 watch
-
 # Debian quilt metadata
 .pc/
 # Debian patch files will be re-generated
