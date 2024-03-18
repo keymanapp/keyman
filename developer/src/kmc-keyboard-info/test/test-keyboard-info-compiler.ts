@@ -81,4 +81,23 @@ describe('keyboard-info-compiler', function () {
     assert.deepEqual((<any>unitTestEndpoints.langtagsByTag)['en-Latn'], ENLANGTAG);
     assert.deepEqual((<any>unitTestEndpoints.langtagsByTag)['en-US'], ENLANGTAG);
   });
+
+  it('check init initialises KeyboardInfoCompiler correctly', async function() {
+    const jsFilename = makePathToFixture('khmer_angkor', 'build', 'khmer_angkor.js');
+    const kpsFilename = makePathToFixture('khmer_angkor', 'source', 'khmer_angkor.kps');
+    const kmpFilename = makePathToFixture('khmer_angkor', 'build', 'khmer_angkor.kmp');
+
+    const sources = {
+      kmpFilename,
+      sourcePath: 'release/k/khmer_angkor',
+      kpsFilename,
+      jsFilename: jsFilename,
+      forPublishing: true,
+    };
+
+    const compiler = new KeyboardInfoCompiler();
+    assert.isTrue(await compiler.init(callbacks, {sources}));
+    assert.deepEqual(compiler['callbacks'], callbacks);
+    assert.deepEqual(compiler['options'], {sources});
+  });  
 });
