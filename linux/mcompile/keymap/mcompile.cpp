@@ -77,6 +77,7 @@ int run(int argc, std::vector<std::u16string> str_argv, char* argv_ch[] = NULL){
   }
   // -u option is not available for Linux
 
+
   int bDeadkeyConversion = u16cmp(argv[1], u"-d") == 0; // I4552
   int n = (bDeadkeyConversion ? 2 : 1);
 
@@ -130,7 +131,6 @@ int run(int argc, std::vector<std::u16string> str_argv, char* argv_ch[] = NULL){
 
 #endif
   //DeleteReallocatedPointers(kmxfile); :TODO   // _S2 not my ToDo :-)
-wprintf(L"mmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmxxxmmmmmmmmmmmmmmmmmmmmm _S2 end\n");
   delete kmxfile;
   return 0;
 }
