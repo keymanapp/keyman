@@ -124,5 +124,28 @@ describe('keyboard-info-compiler', function () {
     const result = await compiler.run(kpjFilename, null);
     KmpCompiler.prototype.init = origKmpCompilerInit;
     assert.isNull(result);
-  });  
+  });
+  
+  it('check run returns null if KmpCompiler.transformKpsToKmpObject fails', async function() {
+    const kpjFilename = makePathToFixture('khmer_angkor', 'khmer_angkor.kpj');
+    const jsFilename = makePathToFixture('khmer_angkor', 'build', 'khmer_angkor.js');
+    const kpsFilename = makePathToFixture('khmer_angkor', 'source', 'khmer_angkor.kps');
+    const kmpFilename = makePathToFixture('khmer_angkor', 'build', 'khmer_angkor.kmp');
+
+    const sources = {
+      kmpFilename,
+      sourcePath: 'release/k/khmer_angkor',
+      kpsFilename,
+      jsFilename: jsFilename,
+      forPublishing: true,
+    };
+
+    const compiler = new KeyboardInfoCompiler();
+    assert.isTrue(await compiler.init(callbacks, {sources}));
+    const origKmpCompilerTransformKpsToKmpObject = KmpCompiler.prototype.transformKpsToKmpObject;
+    KmpCompiler.prototype.transformKpsToKmpObject = (kpsFilename: string) => { return null; }
+    const result = await compiler.run(kpjFilename, null);
+    KmpCompiler.prototype.transformKpsToKmpObject = origKmpCompilerTransformKpsToKmpObject;
+    assert.isNull(result);
+  }); 
 });
