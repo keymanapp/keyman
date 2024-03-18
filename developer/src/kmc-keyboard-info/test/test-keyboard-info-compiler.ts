@@ -5,6 +5,8 @@ import { TestCompilerCallbacks } from '@keymanapp/developer-test-helpers';
 import { makePathToFixture } from './helpers/index.js';
 import { KeyboardInfoCompiler, KeyboardInfoCompilerResult, unitTestEndpoints } from '../src/keyboard-info-compiler.js';
 import langtags from "../src/imports/langtags.js";
+import { KmpCompiler, KmpCompilerOptions } from '@keymanapp/kmc-package';
+import { CompilerCallbacks } from '@keymanapp/common-types';
 
 const callbacks = new TestCompilerCallbacks();
 
@@ -99,5 +101,28 @@ describe('keyboard-info-compiler', function () {
     assert.isTrue(await compiler.init(callbacks, {sources}));
     assert.deepEqual(compiler['callbacks'], callbacks);
     assert.deepEqual(compiler['options'], {sources});
+  });  
+
+  it('check run returns null if KmpCompiler.init fails', async function() {
+    const kpjFilename = makePathToFixture('khmer_angkor', 'khmer_angkor.kpj');
+    const jsFilename = makePathToFixture('khmer_angkor', 'build', 'khmer_angkor.js');
+    const kpsFilename = makePathToFixture('khmer_angkor', 'source', 'khmer_angkor.kps');
+    const kmpFilename = makePathToFixture('khmer_angkor', 'build', 'khmer_angkor.kmp');
+
+    const sources = {
+      kmpFilename,
+      sourcePath: 'release/k/khmer_angkor',
+      kpsFilename,
+      jsFilename: jsFilename,
+      forPublishing: true,
+    };
+
+    const compiler = new KeyboardInfoCompiler();
+    assert.isTrue(await compiler.init(callbacks, {sources}));
+    const origKmpCompilerInit = KmpCompiler.prototype.init;
+    KmpCompiler.prototype.init = (callbacks: CompilerCallbacks, options: KmpCompilerOptions) => { return null; }
+    const result = await compiler.run(kpjFilename, null);
+    KmpCompiler.prototype.init = origKmpCompilerInit;
+    assert.isNull(result);
   });  
 });
