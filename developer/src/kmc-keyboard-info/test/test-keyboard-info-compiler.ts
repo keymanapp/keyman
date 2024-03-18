@@ -169,4 +169,25 @@ describe('keyboard-info-compiler', function () {
     const result = await compiler.run(kpjFilename, null);
     assert.isNull(result);
   }); 
+
+  it('check run returns null if license is not MIT', async function() {
+    const kpjFilename = makePathToFixture('khmer_angkor', 'khmer_angkor.kpj');
+    const jsFilename = makePathToFixture('khmer_angkor', 'build', 'khmer_angkor.js');
+    const kpsFilename = makePathToFixture('khmer_angkor', 'source', 'khmer_angkor.kps');
+    const kmpFilename = makePathToFixture('khmer_angkor', 'build', 'khmer_angkor.kmp');
+
+    const sources = {
+      kmpFilename,
+      sourcePath: 'release/k/khmer_angkor',
+      kpsFilename,
+      jsFilename: jsFilename,
+      forPublishing: true,
+    };
+
+    const compiler = new KeyboardInfoCompiler();
+    assert.isTrue(await compiler.init(callbacks, {sources}));
+    compiler['isLicenseMIT'] = (filename: string): boolean => { return false; }
+    const result = await compiler.run(kpjFilename, null);
+    assert.isNull(result);
+  }); 
 });
