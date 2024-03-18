@@ -121,7 +121,7 @@ describe('keyboard-info-compiler', function () {
     const compiler = new KeyboardInfoCompiler();
     assert.isTrue(await compiler.init(callbacks, {sources}));
     const origKmpCompilerInit = KmpCompiler.prototype.init;
-    KmpCompiler.prototype.init = (callbacks: CompilerCallbacks, options: KmpCompilerOptions) => { return null; }
+    KmpCompiler.prototype.init = async (_callbacks: CompilerCallbacks, _options: KmpCompilerOptions): Promise<boolean> => false;
     const result = await compiler.run(kpjFilename, null);
     KmpCompiler.prototype.init = origKmpCompilerInit;
     assert.isNull(result);
@@ -144,7 +144,7 @@ describe('keyboard-info-compiler', function () {
     const compiler = new KeyboardInfoCompiler();
     assert.isTrue(await compiler.init(callbacks, {sources}));
     const origKmpCompilerTransformKpsToKmpObject = KmpCompiler.prototype.transformKpsToKmpObject;
-    KmpCompiler.prototype.transformKpsToKmpObject = (kpsFilename: string) => { return null; }
+    KmpCompiler.prototype.transformKpsToKmpObject = (_kpsFilename: string): KmpJsonFile.KmpJsonFile => null;
     const result = await compiler.run(kpjFilename, null);
     KmpCompiler.prototype.transformKpsToKmpObject = origKmpCompilerTransformKpsToKmpObject;
     assert.isNull(result);
@@ -166,7 +166,7 @@ describe('keyboard-info-compiler', function () {
 
     const compiler = new KeyboardInfoCompiler();
     assert.isTrue(await compiler.init(callbacks, {sources}));
-    compiler['loadJsFile'] = (filename: string): string => { return null; }
+    compiler['loadJsFile'] = (_filename: string): string => null;
     const result = await compiler.run(kpjFilename, null);
     assert.isNull(result);
   }); 
@@ -187,7 +187,7 @@ describe('keyboard-info-compiler', function () {
 
     const compiler = new KeyboardInfoCompiler();
     assert.isTrue(await compiler.init(callbacks, {sources}));
-    compiler['isLicenseMIT'] = (filename: string): boolean => { return false; }
+    compiler['isLicenseMIT'] = (_filename: string): boolean => false;
     const result = await compiler.run(kpjFilename, null);
     assert.isNull(result);
   });
@@ -208,7 +208,7 @@ describe('keyboard-info-compiler', function () {
 
     const compiler = new KeyboardInfoCompiler();
     assert.isTrue(await compiler.init(callbacks, {sources}));
-    compiler['fillLanguages'] = (kpsFilename: string, keyboard_info: KeyboardInfoFile, kmpJsonData:  KmpJsonFile.KmpJsonFile): Promise<boolean> => { return null; }
+    compiler['fillLanguages'] = async (_kpsFilename: string, _keyboard_info: KeyboardInfoFile, _kmpJsonData:  KmpJsonFile.KmpJsonFile): Promise<boolean> => false;
     const result = await compiler.run(kpjFilename, null);
     assert.isNull(result);
   }); 
