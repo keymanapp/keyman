@@ -6,8 +6,8 @@ import { makePathToFixture } from './helpers/index.js';
 import { KeyboardInfoCompiler, KeyboardInfoCompilerResult, unitTestEndpoints } from '../src/keyboard-info-compiler.js';
 import langtags from "../src/imports/langtags.js";
 import { KmpCompiler, KmpCompilerOptions } from '@keymanapp/kmc-package';
-import { CompilerCallbacks, KmpJsonFile } from '@keymanapp/common-types';
-import { KeyboardInfoFile } from './keyboard-info-file.js';
+import { CompilerCallbacks, KeymanTargets, KmpJsonFile } from '@keymanapp/common-types';
+import { KeyboardInfoFile, KeyboardInfoFilePlatform } from './keyboard-info-file.js';
 
 const callbacks = new TestCompilerCallbacks();
 
@@ -251,4 +251,25 @@ describe('keyboard-info-compiler', function () {
 
     assert.deepEqual(actual, expected);
   });
+
+  it('check mapKeymanTargetToPlatform returns correct platforms', async function() {
+    const compiler = new KeyboardInfoCompiler();
+    const map: {[index in KeymanTargets.KeymanTarget]: KeyboardInfoFilePlatform[]} = {
+      any: [], 
+      androidphone: ['android'],
+      androidtablet: ['android'],
+      desktop: [], 
+      ipad: ['ios'],
+      iphone: ['ios'],
+      linux: ['linux'],
+      macosx: ['macos'],
+      mobile: [], 
+      tablet: [], 
+      web: ['desktopWeb'],  
+      windows: ['windows']
+    }
+    for (const [target, platform] of Object.entries(map)) {
+      assert.deepEqual(compiler['mapKeymanTargetToPlatform'](<KeymanTargets.KeymanTarget>target), platform);
+    }
+  }); 
 });
