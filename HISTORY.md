@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 17.0.290 beta 2024-03-19
+
+*  (#10956)
+
 ## 17.0.289 beta 2024-03-16
 
 * fix(common): add unit test for --debug flag for builder (#10974)
