@@ -272,4 +272,18 @@ describe('keyboard-info-compiler', function () {
       assert.deepEqual(compiler['mapKeymanTargetToPlatform'](<KeymanTargets.KeymanTarget>target), platform);
     }
   }); 
+
+  it('check kmxFileVersionToString returns correct strings', async function() {
+    const compiler = new KeyboardInfoCompiler();
+    const convs = [
+      {num: 0x0000, str: '0.0'},
+      {num: 0x0001, str: '0.1'},
+      {num: 0x0100, str: '1.0'},
+      {num: 0x0101, str: '1.1'},
+      {num: 0x0A0A, str: '10.10'},
+    ];
+    convs.forEach((conv) => {
+      assert.equal(compiler['kmxFileVersionToString'](conv.num), conv.str);
+    });
+  });   
 });
