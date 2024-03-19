@@ -212,4 +212,43 @@ describe('keyboard-info-compiler', function () {
     const result = await compiler.run(kpjFilename, null);
     assert.isNull(result);
   }); 
+
+  it('should write artifacts to disk', async function() {
+    const kpjFilename = makePathToFixture('khmer_angkor', 'khmer_angkor.kpj');
+    const jsFilename = makePathToFixture('khmer_angkor', 'build', 'khmer_angkor.js');
+    const kpsFilename = makePathToFixture('khmer_angkor', 'source', 'khmer_angkor.kps');
+    const kmpFilename = makePathToFixture('khmer_angkor', 'build', 'khmer_angkor.kmp');
+    const actualFilename = makePathToFixture('khmer_angkor', 'build', 'actual.keyboard_info');
+    const expectedFilename = makePathToFixture('khmer_angkor', 'build', 'khmer_angkor.keyboard_info');
+
+    const sources = {
+      kmpFilename,
+      sourcePath: 'release/k/khmer_angkor',
+      kpsFilename,
+      jsFilename: jsFilename,
+      forPublishing: true,
+    };
+
+    const compiler = new KeyboardInfoCompiler();
+    assert.isTrue(await compiler.init(callbacks, {sources}));
+    const result = await compiler.run(kpjFilename, null);
+    assert.isNotNull(result);
+
+    if(fs.existsSync(actualFilename)) {
+      fs.rmSync(actualFilename);
+    }
+
+    result.artifacts.keyboard_info.filename = actualFilename;
+    assert.isTrue(await compiler.write(result.artifacts));
+    assert(fs.existsSync(actualFilename))
+
+    const actual = JSON.parse(fs.readFileSync(actualFilename, 'utf-8'));
+    const expected = JSON.parse(fs.readFileSync(expectedFilename, 'utf-8'));
+
+    // `lastModifiedDate` is dependent on time of run (not worth mocking)
+    delete actual['lastModifiedDate'];
+    delete expected['lastModifiedDate'];
+
+    assert.deepEqual(actual, expected);
+  });
 });
