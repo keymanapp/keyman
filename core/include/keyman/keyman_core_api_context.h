@@ -107,8 +107,8 @@ typedef struct {
     uint32_t    marker;
   };
 } km_core_context_item;
-```
 /*
+```
 ## Members
 
 `type`
