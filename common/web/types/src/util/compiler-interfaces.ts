@@ -294,6 +294,7 @@ export interface CompilerFileSystemCallbacks {
   readFileSync(path: string, options: { encoding: string; flag?: string; } | string): string;
   readFileSync(path: string, options?: { encoding?: string | null; flag?: string; } | string | null): string | Uint8Array;
   writeFileSync(path: string, data: Uint8Array): void;
+  mkdirSync(path: string, options?: {recursive?: boolean}): string;
 
   existsSync(name: string): boolean;
 }
@@ -379,6 +380,8 @@ export interface CompilerCallbacks {
   reportMessage(event: CompilerEvent): void;
 
   debug(msg: string): void;
+
+  fileURLToPath(url: string | URL): string;
 };
 
 /**
@@ -474,6 +477,10 @@ export class CompilerFileCallbacks implements CompilerCallbacks {
 
   debug(msg: string): void {
     return this.parent.debug(msg);
+  }
+
+  fileURLToPath(url: string | URL): string {
+    return this.parent.fileURLToPath(url);
   }
 }
 

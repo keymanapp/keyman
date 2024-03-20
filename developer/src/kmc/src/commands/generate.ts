@@ -4,7 +4,8 @@ import { NodeCompilerCallbacks } from '../util/NodeCompilerCallbacks.js';
 import { InfrastructureMessages } from '../messages/infrastructureMessages.js';
 import { BaseOptions } from '../util/baseOptions.js';
 import { exitProcess } from '../util/sysexits.js';
-import { AbstractGenerator, GeneratorOptions, KeymanKeyboardGenerator, LdmlKeyboardGenerator, LexicalModelGenerator } from '@keymanapp/kmc-generate';
+import { GeneratorOptions, KeymanKeyboardGenerator, LdmlKeyboardGenerator, LexicalModelGenerator } from '@keymanapp/kmc-generate';
+import { KeymanCompiler } from '@keymanapp/common-types';
 
 
 export function declareGenerate(program: Command) {
@@ -22,7 +23,7 @@ function declareGenerateKmnKeyboard(command: Command) {
     .option('--targets, -t <targets...>', 'Target platforms', ['any'])
     .option('--out-path, -o <path>', 'Output path (may exist)')
     .option('--name, -n <name>', 'Keyboard descriptive name')
-    .option('--copyright, -c <copyright-name>', 'Copyright holder') /* © yyyy <copyright-name> */
+    .option('--copyright, -c <copyright-name>', 'Copyright holder')
     .option('--version, -v <version-string>', 'Keyboard version', '1.0')
     .option('--language-tags, -l <bcp-47 tag...>', 'BCP-47 language tags')
     .option('--author, -a <author-name>', 'Name of keyboard author')
@@ -66,6 +67,7 @@ function declareGenerateLexicalModel(command: Command) {
 function commanderOptionsToGeneratorOptions(id: string, options: any): GeneratorOptions {
   const result: GeneratorOptions = {
     icon: options.icon ?? true,
+    id,
     languageTags: options.languageTags ?? [],
     name: options.name ?? id,
     outPath: options.outPath ?? '.',
@@ -80,14 +82,14 @@ function commanderOptionsToGeneratorOptions(id: string, options: any): Generator
 }
 
 const generateKmnKeyboard = async (ids: string[], _options: any, commander: any) =>
-  generate(KeymanKeyboardGenerator, ids, commander);
+  generate(new KeymanKeyboardGenerator(), ids, commander);
 const generateLdmlKeyboard = async (ids: string[], _options: any, commander: any) =>
-  generate(LdmlKeyboardGenerator, ids, commander);
+  generate(new LdmlKeyboardGenerator(), ids, commander);
 const generateLexicalModel = async (ids: string[], _options: any, commander: any) =>
-  generate(LexicalModelGenerator, ids, commander);
+  generate(new LexicalModelGenerator(), ids, commander);
 
 async function generate(
-  generatorClass: typeof AbstractGenerator,
+  generator: KeymanCompiler,
   ids: string | string[],
   commander: any
 ): Promise<never|void> {
@@ -108,11 +110,14 @@ async function generate(
 
   let callbacks = new NodeCompilerCallbacks({logLevel: options.logLevel});
   try {
-    const generator = new generatorClass(callbacks, options);
-    if(!await generator.init(id)) {
+    if(!await generator.init(callbacks, options)) {
       return await exitProcess(1);
     }
-    if(!await generator.run()) {
+    const result = await generator.run(id); // note: id is currently ignored here
+    if(!result) {
+      return await exitProcess(1);
+    }
+    if(!await generator.write(result.artifacts)) {
       return await exitProcess(1);
     }
   } catch(e) {
