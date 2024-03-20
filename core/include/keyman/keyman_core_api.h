@@ -40,8 +40,8 @@ This is an internal API intended for use only within Keyman Engine.
 * [Options](options)
 * [Processor](processor)
 * [State and Actions](state)
-* [JSON introspection Schema][json-schema]
-* [Building Keyman Core][building]
+* [JSON introspection Schema](json-schema)
+* [Building Keyman Core](building)
 
 ## Requirements
 1. Cross platform.
