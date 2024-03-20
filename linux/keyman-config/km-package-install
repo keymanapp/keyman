@@ -11,7 +11,7 @@ import time
 from pkg_resources import parse_version
 from zipfile import is_zipfile
 
-from keyman_config import KeymanApiUrl, add_standard_arguments, initialize_logging, initialize_sentry, secure_lookup
+from keyman_config import KeymanApiUrl, add_standard_arguments, initialize_logging, initialize_sentry, secure_lookup, verify_dbus_running
 from keyman_config.get_kmp import get_keyboard_data, get_kmp, keyman_cache_dir
 from keyman_config.install_kmp import extract_kmp, InstallError, InstallStatus, install_kmp
 from keyman_config.kmpmetadata import get_metadata
@@ -124,6 +124,7 @@ def main():
 
     initialize_logging(args)
     initialize_sentry()
+    verify_dbus_running()
 
     if args.package and args.file:
         parser.print_usage()
