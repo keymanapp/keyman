@@ -11,6 +11,7 @@ import { InfrastructureMessages } from '../messages/infrastructureMessages.js';
 import chalk from 'chalk';
 import supportsColor from 'supports-color';
 import { KeymanSentry } from '@keymanapp/developer-utils';
+import { fileURLToPath } from 'url';
 
 const color = chalk.default;
 const severityColors: {[value in CompilerErrorSeverity]: chalk.Chalk} = {
@@ -117,6 +118,10 @@ export class NodeCompilerCallbacks implements CompilerCallbacks {
 
   get fs(): CompilerFileSystemCallbacks {
     return fs;
+  }
+
+  fileURLToPath(url: string | URL): string {
+    return fileURLToPath(url);
   }
 
   reportMessage(event: CompilerEvent): void {
