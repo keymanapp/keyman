@@ -104,11 +104,11 @@ title: Changes - Keyman Core API
 ## Changes between 16.0 and 17.0
 
 * The namespace identifier has changed from `km_kbp_` to `km_core_`.
-* Most context APIs are now private, and `km_core_context_set_if_needed` is the
+* Most context APIs are now private, and [km_core_state_context_set_if_needed] is the
   primary context function. Private APIs are available in
   `keyman_core_api_context.h`.
 * The action queue APIs are now private and deprecated. Instead, use
-  `km_core_state_get_actions`. Private APIs are available in
+  [km_core_state_get_actions]. Private APIs are available in
   `keyman_core_api_actions.h`.
 * Debug APIs are available in `keyman_core_api_debug.h`.
 
@@ -192,7 +192,7 @@ interface such as bug fixes and optimisations.
 For Linux and other OS which support this scheme the dynamic linker will
 automatically choose the most updated version if more than one implementation is
 available. For Windows or dynamic loaded shared objects on Linux you can use the
-[`km_core_get_engine_attrs`](#km_core_get_engine_attrs) call and [Library version
+[km_core_get_engine_attrs] call and [Library version
 macros](#lib-version-macros) to check the loaded DLL supplies the correct
 interface.
 
@@ -200,27 +200,68 @@ interface.
 
 # Common functions, types, and macros
 
-## Basic types {#basic_types}
+
+## Basic types
 
 Fundamental types for representing data passed across the API.
 
-| Type | C/C++ type | Purpose |
-|:------|:----------|:--------|
-| `km_core_cp` | `uint16_t/char16_t` | Represents a UTF16 codepoint, most strings are passed as UTF16. |
-|`km_core_usv`|`uint32_t/char32_t`| An integral type capable of holding a single Unicode Scalar Value, a decoded UTF codepoint.|
-|`km_core_virtual_key`|`uint16_t`|An integral type capable of holding a platform specific virtual key code.|
-|`km_core_status`|`uint32_t`|An integral 32 bit wide type capable of holding any valid status code as defined by the `enum` [km\_core\_status\_codes](#km_core_status_codes).|
-|`km_core_modifier_state`|`uint16_t`|An integral type bitmask representing the state of each modifier key. |
+### km_core_cp type
+
+`uint16_t/char16_t`
+
+Represents a UTF16 codepoint, most strings are passed as UTF16.
+
+### km_core_usv type
+
+`uint32_t/char32_t`
+
+An integral type capable of holding a single Unicode Scalar Value, a decoded UTF
+codepoint.
+
+### km_core_virtual_key type
+
+`uint16_t`
+
+An integral type capable of holding a platform specific virtual key code.
+
+### km_core_status type
+
+`uint32_t`
+
+An integral 32 bit wide type capable of holding any valid status code as defined
+by the `enum` [km_core_status_codes].
+
+### km_core_modifier_state type
+
+`uint16_t`
+
+An integral type bitmask representing the state of each modifier key.
+
+
 
 ## Resource types
 
-Opaque types for representing resources provided or created by the keyboard processor implementation.
+Opaque types for representing resources provided or created by the keyboard
+processor implementation.
 
-| Type | Purpose |
-|:-----|:--------|
-|`km_core_keyboard`|Represents a keyboard loaded from disk, that can be executed by the keyboard processor to consume events, update state associated with an insertion point and produce action items. A keyboard object may be referenced by any number of state objects but must be disposed of after all state objects referencing it have first been disposed of.|
-|`km_core_state`|Represents all state associated with an insertion point using a keyboard. This tracks context, and current action items resulting from a processed keyboard event. There can be many state objects using the same keyboard. A state object may not live longer than the keyboard it manages state for.|
-|`km_core_options`|Represents a set of option items for environmental state and keyboard state.|
+### km_core_keyboard struct
+
+Represents a keyboard loaded from disk, that can be executed by the keyboard
+processor to consume events, update state associated with an insertion point and
+produce action items. A keyboard object may be referenced by any number of state
+objects but must be disposed of after all state objects referencing it have
+first been disposed of.
+
+### km_core_state struct
+
+Represents all state associated with an insertion point using a keyboard. This
+tracks context, and current action items resulting from a processed keyboard
+event. There can be many state objects using the same keyboard. A state object
+may not live longer than the keyboard it manages state for.
+
+### km_core_options struct
+
+Represents a set of option items for environmental state and keyboard state.
 
 <!--
 ```c */
@@ -257,7 +298,7 @@ typedef uint8_t (*km_core_keyboard_imx_platform)(km_core_state*, uint32_t, void*
 
 -------------------------------------------------------------------------------
 
-# km\_core\_status\_codes enum {#km_core_status_codes}
+# km_core_status_codes enum
 
 ## Description
 
@@ -283,7 +324,7 @@ enum km_core_status_codes {
 /*
 ```
 
-## Values {#km_core_status_type_values}
+## Values
 
 `KM_CORE_STATUS_OK`
 
@@ -328,7 +369,7 @@ success codes.
 
 -------------------------------------------------------------------------------
 
-# km\_core\_attr struct {#km_core_attr}
+# km_core_attr struct
 
 ## Description
 
@@ -364,7 +405,7 @@ typedef struct {
 : current - age == Oldest API number supported.
 
 `technology`
-: A bit field of [`km_core_tech_value`](#km_core_tech_value) values,
+: A bit field of [km_core_tech_value] values,
 specifiying which Keyboard technologies the engine supports.
 
 `vendor`
@@ -372,7 +413,7 @@ specifiying which Keyboard technologies the engine supports.
 
 -------------------------------------------------------------------------------
 
-# km\_core\_tech\_value enum {#km_core_tech_value}
+# km_core_tech_value enum
 
 ## Description
 
@@ -429,10 +470,10 @@ km_core_get_engine_attrs(km_core_state const *state);
 ## Parameters
 
 `state`
-: An opaque pointer to a [`km_core_state`].
+: An opaque pointer to a [km_core_state].
 
 ## Returns
-A pointer to a `km_core_attr` structure. Do not modify the contents of this
+A pointer to a [km_core_attr] structure. Do not modify the contents of this
 structure.
 
 -------------------------------------------------------------------------------
@@ -469,7 +510,8 @@ owned by the state object.
 
 ## Description
 
-Describes the
+Describes a change to the hardware caps lock indicator state requested by
+Keyman Core to the Platform layer.
 
 ## Specification
 ```c */
@@ -542,7 +584,7 @@ typedef struct {
 : Reference copy of actual UTF32 codepoints deleted from end of context
   (closest to caret) exactly code_points_to_delete in length (plus null
   terminator). Used to determine encoding conversion differences when
-  deleting; only set when using `km_core_state_get_actions`, otherwise nullptr.
+  deleting; only set when using [km_core_state_get_actions], otherwise nullptr.
 
 -------------------------------------------------------------------------------
 
@@ -572,9 +614,9 @@ km_core_state_get_actions(
 
 ## Returns
 
-A pointer to a `km_core_actions` object. This data becomes invalid
+A pointer to a [km_core_actions] object. This data becomes invalid
 when the state object is destroyed, or after a call to
-`km_core_process_event`. Do not modify the contents of this data.
+[km_core_process_event]. Do not modify the contents of this data.
 
 -------------------------------------------------------------------------------
 
@@ -582,7 +624,7 @@ when the state object is destroyed, or after a call to
 
 ## Description
 
-Return values for `km_core_state_context_set_if_needed()`.
+Return values for [km_core_state_context_set_if_needed].
 
 ## Specification
 
@@ -632,7 +674,7 @@ longer, then it is considered different.
 If a difference is found, then the cached context will be set to the
 application context, and thus any cached markers will be cleared.
 
-`km_core_state_context_set_if_needed` and `km_core_state_context_clear`
+[km_core_state_context_set_if_needed] and [km_core_state_context_clear]
 will replace most uses of the existing Core context APIs.
 
 ## Specification
@@ -657,7 +699,7 @@ km_core_state_context_set_if_needed(
 
 ## Returns
 
-A value from the `km_core_context_status` enum.
+A value from the [km_core_context_status] enum.
 
 -------------------------------------------------------------------------------
 
@@ -668,7 +710,7 @@ A value from the `km_core_context_status` enum.
 Clears the internal cached context for the state. This is the same as
 `km_core_context_clear(km_core_state_context(&state))`.
 
-`km_core_state_context_set_if_needed` and `km_core_state_context_clear`
+[km_core_state_context_set_if_needed] and [km_core_state_context_clear]
 will replace most uses of the existing Core context APIs.
 
 ## Specification
@@ -704,9 +746,9 @@ title: Options - Keyman Core API
 A state’s default options are set from the keyboard at creation time and the
 environment. The Platform layer is then is expected to apply any persisted
 options it is maintaining.  Options are passed into and out of API functions as
-simple C arrays of `km_core_option_item` terminated with a `KM_CORE_OPTIONS_END`
+simple C arrays of [km_core_option_item] terminated with a `KM_CORE_OPTIONS_END`
 sentinel value. A state's options are exposed and manipulatable via the
-`km_core_options` API. All option values are of type C string.
+[km_core_options] API. All option values are of type C string.
 
 During processing when the Platform layer finds a PERSIST action type it should
 store the updated option in the appropriate place, based on its scope.
@@ -775,14 +817,14 @@ struct km_core_option_item {
 : Null-terminated string value for the option
 
 `scope`
-: Scope which an option belongs to, from `km_core_option_scope`.
+: Scope which an option belongs to, from [km_core_option_scope].
 
 -------------------------------------------------------------------------------
 
 # km_core_options_list_size()
 
 ## Description
-Return the length of a terminated `km_core_option_item` array (options
+Return the length of a terminated [km_core_option_item] array (options
 list).
 
 ## Specification
@@ -797,7 +839,7 @@ km_core_options_list_size(km_core_option_item const *opts);
 
 `opts`
 : A pointer to a `KM_CORE_OPTIONS_END` terminated array of
-  `km_core_option_item` values.
+  [km_core_option_item] values.
 
 ## Returns
 
@@ -832,7 +874,7 @@ km_core_state_option_lookup(km_core_state const *state,
 : Which key-value store to interrogate.
 
 `key`
-: A UTF-16 string that matches the key in the target `km_core_option_item`.
+: A UTF-16 string that matches the key in the target [km_core_option_item].
 
 `value`
 : A pointer to the result variable: A pointer to a UTF-16 string value owned
@@ -857,7 +899,7 @@ km_core_state_option_lookup(km_core_state const *state,
 
 ## Description
 
-Adds or updates one or more options from a list of `km_core_option_item`s.
+Adds or updates one or more options from a list of [km_core_option_item]s.
 
 ## Specification
 ``` */
@@ -873,7 +915,7 @@ km_core_state_options_update(km_core_state *state,
 : An opaque pointer to a state object.
 
 `new_opts`
-: An array of `km_core_option_item` objects to update or add. Must be
+: An array of [km_core_option_item] objects to update or add. Must be
   terminated with `KM_CORE_OPTIONS_END`.
 
 ## Returns
@@ -896,7 +938,7 @@ km_core_state_options_update(km_core_state *state,
 
 ## Description
 
-Export the contents of a `km_core_options` array to a JSON formatted document and
+Export the contents of a [km_core_options] array to a JSON formatted document and
 place it in the supplied buffer, reporting how much space was used. If null is
 passed as the buffer the number of bytes required is returned in `space`. If
 there is insufficent space to hold the document the contents of the buffer is
@@ -1014,7 +1056,7 @@ typedef struct {
 : A virtual key.
 
 `modifier_flag`
-: A `km_core_modifier_state` bitmask.
+: A [km_core_modifier_state] bitmask.
 
 -------------------------------------------------------------------------------
 
@@ -1077,7 +1119,7 @@ km_core_keyboard_load(km_core_path_name kb_path,
 `keyboard`
 : A pointer to result variable: A pointer to the opaque keyboard
   object returned by the Processor. This memory must be freed with a
-  call to `km_core_keyboard_dispose`.
+  call to [km_core_keyboard_dispose].
 
 ## Returns
 
@@ -1103,7 +1145,7 @@ km_core_keyboard_load(km_core_path_name kb_path,
 ## Description
 
 Free the allocated memory belonging to an opaque keyboard object previously
-returned by `km_core_keyboard_load`.
+returned by [km_core_keyboard_load].
 
 ## Specification
 
@@ -1143,7 +1185,7 @@ km_core_keyboard_get_attrs(km_core_keyboard const *keyboard,
 : A pointer to the opaque keyboard object to be queried.
 
 `out`
-: A pointer to the result: A pointer to a `km_core_keyboard_attrs` structure.
+: A pointer to the result: A pointer to a [km_core_keyboard_attrs] structure.
 
 ## Returns
 
@@ -1178,7 +1220,7 @@ km_core_keyboard_get_key_list(km_core_keyboard const *keyboard,
 : A pointer to the opaque keyboard object to be queried.
 
 `out`
-: A pointer to an array of `km_core_keyboard_key` structures,
+: A pointer to an array of [km_core_keyboard_key] structures,
   terminated by `KM_CORE_KEYBOARD_KEY_LIST_END`.
 
 ## Returns
@@ -1196,7 +1238,7 @@ km_core_keyboard_get_key_list(km_core_keyboard const *keyboard,
 ## Description
 
 Free the allocated memory belonging to a keyboard key list previously
-returned by `km_core_keyboard_get_key_list`.
+returned by [km_core_keyboard_get_key_list].
 
 ## Specification
 
@@ -1339,13 +1381,13 @@ km_core_state_create(km_core_keyboard *keyboard,
 : A pointer to the opaque keyboard object this object will hold state for.
 
 `env`
-: The array of `km_core_option_item` key/value pairs used to initialise the
+: The array of [km_core_option_item] key/value pairs used to initialise the
   environment, terminated by `KM_CORE_OPTIONS_END`.
 
 `out`
 : A pointer to result variable: A pointer to the opaque state object
   returned by the Processor, initalised to maintain state for `keyboard`.
-  This must be disposed of by a call to `km_core_state_dispose`.
+  This must be disposed of by a call to [km_core_state_dispose].
 
 ## Returns
 
@@ -1384,7 +1426,7 @@ km_core_state_clone(km_core_state const *state,
 `out`
 : A pointer to result variable: A pointer to the opaque state object
   returned by the Processor, cloned from the existing object `state`. This
-  must be disposed of by a call to `km_core_state_dispose`.
+  must be disposed of by a call to [km_core_state_dispose].
 
 ## Returns
 
@@ -1403,9 +1445,9 @@ km_core_state_clone(km_core_state const *state,
 
 ## Description
 
-Free the allocated resources belonging to a `km_core_state` object previously
-returned by `km_core_state_create` or `km_core_state_clone`. After this all
-pointers previously returned by any km_core_state family of calls will become
+Free the allocated resources belonging to a [km_core_state] object previously
+returned by [km_core_state_create] or [km_core_state_clone]. After this all
+pointers previously returned by any [km_core_state] family of calls will become
 invalid.
 
 ## Specification
@@ -1431,7 +1473,7 @@ state, not exposed to the consumer of the API -- apart from the
 Keyman Developer Keyboard Debugger. However, for other debug
 purposes, it is helpful to be able to examine the cached context, so
 a debug-formatted version of the context is made available with
-`km_core_state_context_debug`. This is not intended to be parsed for
+[km_core_state_context_debug]. This is not intended to be parsed for
 reading the context for other purposes, and the format may change.
 
 The three context types are: cached, intermediate, and app.
@@ -1452,7 +1494,7 @@ typedef enum {
 `KM_CORE_DEBUG_CONTEXT_CACHED`
 : the internal context used by Core, which may be normalized
   and may contain markers. This is set via
-  `km_core_state_context_set_if_needed`, and will be modified
+  [km_core_state_context_set_if_needed], and will be modified
   during keystroke event processing.
 
 `KM_CORE_DEBUG_CONTEXT_INTERMEDIATE`
@@ -1461,7 +1503,7 @@ typedef enum {
 
 `KM_CORE_DEBUG_CONTEXT_APP`
 : an exact copy of the current context passed in to
-  `km_core_state_context_set_if_needed`, which is used to verify
+  [km_core_state_context_set_if_needed], which is used to verify
   the precise text manipulations required when emitted changes.
   This input context is in "NFU" -- normalization form unknown,
   and may be mixed normalization so may require fixups when
@@ -1495,8 +1537,8 @@ km_core_state_context_debug(km_core_state *state, km_core_debug_context_type con
 
 ## Returns
 
-A pointer to a km_core_cp UTF-16 string. Must be disposed of by a call
-to `km_core_cp_dispose`.
+A pointer to a [km_core_cp] UTF-16 string. Must be disposed of by a call
+to [km_core_cp_dispose].
 
 -------------------------------------------------------------------------------
 
@@ -1504,8 +1546,8 @@ to `km_core_cp_dispose`.
 
 ## Description
 
-Free the allocated memory belonging to a `km_core_cp` array previously
-returned by `km_core_state_context_debug`. May be `nullptr`.
+Free the allocated memory belonging to a [km_core_cp] array previously
+returned by [km_core_state_context_debug]. May be `nullptr`.
 
 ## Specification
 
@@ -1519,7 +1561,7 @@ km_core_cp_dispose(km_core_cp *cp);
 ## Parameters
 
 `cp`
-: A pointer to the start of the `km_core_cp` array to be disposed of.
+: A pointer to the start of the [km_core_cp] array to be disposed of.
 
 -------------------------------------------------------------------------------
 
@@ -1527,7 +1569,7 @@ km_core_cp_dispose(km_core_cp *cp);
 
 ## Description
 
-Export the internal state of a `km_core_state` object to a JSON format document
+Export the internal state of a [km_core_state] object to a JSON format document
 and place it in the supplied buffer, reporting how much space was used. If null
 is passed as the buffer the number of bytes required is returned. If there is
 insufficent space to hold the document, the contents of the buffer is undefined.
@@ -1582,7 +1624,7 @@ title: Processor - Keyman Core API
 
 ## Description
 
-Bit flags to be used with the `event_flags` parameter of `km_core_process_event`
+Bit flags to be used with the `event_flags` parameter of [km_core_process_event]
 
 ## Specification
 
@@ -1610,7 +1652,7 @@ enum km_core_event_flags {
 
 Run the keyboard on an opaque state object with the provided virtual key and modifer
 key state. Updates the state object as appropriate and fills out its internal set
-of actions, which can be retrieved with `km_core_state_get_actions()`.
+of actions, which can be retrieved with [km_core_state_get_actions].
 
 The state's actions will be cleared at the start of this call; options and context in
 the state may also be modified.
@@ -1638,10 +1680,10 @@ km_core_process_event(km_core_state *state,
 
 `modifier_state`
 : The combinations of modifier keys set at the time key `vk` was pressed, bitmask
-  from the `km_core_modifier_state` enum.
+  from the [km_core_modifier_state] enum.
 
 `event_flags`
-: Event level flags, see km_core_event_flags
+: Event level flags, see [km_core_event_flags]
 
 ## Returns
 
@@ -1689,7 +1731,7 @@ km_core_event(
 : A pointer to the opaque state object.
 
 `event`
-: The event to be processed, from km_core_event_code enumeration
+: The event to be processed, from [km_core_event_code] enumeration
 
 `data`
 : Additional event-specific data. Currently unused, must be nullptr.
