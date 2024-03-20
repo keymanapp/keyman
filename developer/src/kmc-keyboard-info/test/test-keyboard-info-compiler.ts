@@ -294,11 +294,26 @@ describe('keyboard-info-compiler', function () {
     assert.isTrue(await kmpCompiler.init(callbacks, {}));
     const kmpJsonData = kmpCompiler.transformKpsToKmpObject(kpsFilename);
     assert.isNotNull(kmpJsonData);
+    // remove .kps file
     kmpJsonData.files = kmpJsonData.files.filter(file => !KeymanFileTypes.filenameIs(file.name, KeymanFileTypes.Binary.Keyboard));
     const kmxFiles: {
       filename: string,
       data: KMX.KEYBOARD
     }[] = compiler['loadKmxFiles'](kpsFilename, kmpJsonData);
     assert.deepEqual(kmxFiles, []);
-  });    
+  });
+
+  it('check loadKmxFiles throws error if .kmx file is missing from disk', async function() {
+    const kpsFilename =    makePathToFixture('khmer_angkor', 'source', 'khmer_angkor.kps');
+    const compiler = new KeyboardInfoCompiler();
+    const kmpCompiler = new KmpCompiler();
+    assert.isTrue(await kmpCompiler.init(callbacks, {}));
+    const kmpJsonData = kmpCompiler.transformKpsToKmpObject(kpsFilename);
+    assert.isNotNull(kmpJsonData);
+    // rename .kmx file in files list so it cannot be loaded from disk
+    const kmpIndex = kmpJsonData.files.findIndex(file => KeymanFileTypes.filenameIs(file.name, KeymanFileTypes.Binary.Keyboard));
+    kmpJsonData.files[kmpIndex].name = '../build/throw_error.kmx';
+    assert.throws(() => compiler['loadKmxFiles'](kpsFilename, kmpJsonData));
+    //assert.deepEqual(kmxFiles, []);
+  });  
 });
