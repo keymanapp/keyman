@@ -8,7 +8,7 @@ import DummyModel from '#./models/dummy-model.js';
 import ModelCompositor from '#./model-compositor.js';
 
 describe('Custom Punctuation', function () {
-  it('appears in the keep suggestion', function () {
+  it('appears in the keep suggestion', async function () {
     let dummySuggestions = [{
         transform: {
           insert: 'Hello',
@@ -37,7 +37,7 @@ describe('Custom Punctuation', function () {
     // The model compositor is responsible for adding this to the display as
     // string.
     var composite = new ModelCompositor(model, true);
-    var suggestions =  composite.predict([{ sample: { insert: 'o', deleteLeft: 0 }, p: 1.00 }], {
+    var suggestions = await composite.predict([{ sample: { insert: 'o', deleteLeft: 0 }, p: 1.00 }], {
       left: 'Hrll', startOfBuffer: false, endOfBuffer: true
     });
     assert.lengthOf(suggestions, 3);
@@ -54,7 +54,7 @@ describe('Custom Punctuation', function () {
   });
 
   describe("insertAfterWord", function () {
-    it('appears after "word" suggestion', function () {
+    it('appears after "word" suggestion', async function () {
       let dummySuggestions = [
         {
           transform: { insert: 'ᚈᚑᚋ', deleteLeft: 0, },
@@ -82,7 +82,7 @@ describe('Custom Punctuation', function () {
       // The model compositor is responsible for adding this to the display as
       // string.
       var composite = new ModelCompositor(model, true);
-      var suggestions =  composite.predict([{ sample: { insert: 'ᚋ', deleteLeft: 0 }, p: 1.00 }], {
+      var suggestions = await composite.predict([{ sample: { insert: 'ᚋ', deleteLeft: 0 }, p: 1.00 }], {
         left: '᚛ᚈᚑ', startOfBuffer: false, endOfBuffer: true
       });
       assert.lengthOf(suggestions, dummySuggestions.length);
