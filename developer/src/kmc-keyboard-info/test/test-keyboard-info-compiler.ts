@@ -6,7 +6,7 @@ import { makePathToFixture } from './helpers/index.js';
 import { KeyboardInfoCompiler, KeyboardInfoCompilerResult, unitTestEndpoints } from '../src/keyboard-info-compiler.js';
 import langtags from "../src/imports/langtags.js";
 import { KmpCompiler, KmpCompilerOptions } from '@keymanapp/kmc-package';
-import { CompilerCallbacks, KeymanTargets, KmpJsonFile } from '@keymanapp/common-types';
+import { CompilerCallbacks, KMX, KeymanFileTypes, KeymanTargets, KmpJsonFile } from '@keymanapp/common-types';
 import { KeyboardInfoFile, KeyboardInfoFilePlatform } from './keyboard-info-file.js';
 
 const callbacks = new TestCompilerCallbacks();
@@ -285,5 +285,20 @@ describe('keyboard-info-compiler', function () {
     convs.forEach((conv) => {
       assert.equal(compiler['kmxFileVersionToString'](conv.num), conv.str);
     });
-  });   
+  });
+  
+  it('check loadKmxFiles returns empty array if .kmx file is missing from .kmp', async function() {
+    const kpsFilename = makePathToFixture('khmer_angkor', 'source', 'khmer_angkor.kps');
+    const compiler = new KeyboardInfoCompiler();
+    const kmpCompiler = new KmpCompiler();
+    assert.isTrue(await kmpCompiler.init(callbacks, {}));
+    const kmpJsonData = kmpCompiler.transformKpsToKmpObject(kpsFilename);
+    assert.isNotNull(kmpJsonData);
+    kmpJsonData.files = kmpJsonData.files.filter(file => !KeymanFileTypes.filenameIs(file.name, KeymanFileTypes.Binary.Keyboard));
+    const kmxFiles: {
+      filename: string,
+      data: KMX.KEYBOARD
+    }[] = compiler['loadKmxFiles'](kpsFilename, kmpJsonData);
+    assert.deepEqual(kmxFiles, []);
+  });    
 });
