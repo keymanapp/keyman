@@ -42,6 +42,7 @@ export const messageSources: Record<CompilerErrorNamespace, CompilerMessageSourc
   [CompilerErrorNamespace.PackageCompiler]:      { module: 'kmc-package',       class: PackageCompilerMessages },
   [CompilerErrorNamespace.Infrastructure]:       { module: 'kmc',               class: InfrastructureMessages },
   [CompilerErrorNamespace.Analyzer]:             { module: 'kmc-analyze',       class: AnalyzerMessages },
+  [CompilerErrorNamespace.Generator]:            { module: 'kmc-generate',      class: GeneratorMessages },
   [CompilerErrorNamespace.KmwCompiler]:          { module: 'kmc-kmn',           class: KmwCompilerMessages },
   [CompilerErrorNamespace.ModelInfoCompiler]:    { module: 'kmc-model-info',    class: ModelInfoCompilerMessages },
   [CompilerErrorNamespace.KeyboardInfoCompiler]: { module: 'kmc-keyboard-info', class: KeyboardInfoCompilerMessages },
