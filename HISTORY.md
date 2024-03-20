@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 17.0.291 beta 2024-03-20
+
+* chore(mac): clean up code obsoleted by core (#10877)
+* fix(linux): Replace deprecated `pkg_resources` module with `packaging.version` (#10860)
+
 ## 17.0.290 beta 2024-03-19
 
 *  (#10956)
