@@ -31,6 +31,7 @@ builder_describe \
   ":utils=src/common/web/utils              Developer utils" \
   ":kmcmplib=src/kmcmplib                   Compiler - .kmn compiler" \
   ":kmc-analyze=src/kmc-analyze             Compiler - Analysis Tools" \
+  ":kmc-generate=src/kmc-generate           Compiler - Generation Tools" \
   ":kmc-keyboard-info=src/kmc-keyboard-info Compiler - .keyboard_info Module" \
   ":kmc-kmn=src/kmc-kmn                     Compiler - .kmn to .kmx and .js Keyboard Module" \
   ":kmc-ldml=src/kmc-ldml                   Compiler - LDML Keyboard Module" \
