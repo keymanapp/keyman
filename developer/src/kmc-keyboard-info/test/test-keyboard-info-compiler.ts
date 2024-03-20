@@ -314,9 +314,5 @@ describe('keyboard-info-compiler', function () {
     const kmpIndex = kmpJsonData.files.findIndex(file => KeymanFileTypes.filenameIs(file.name, KeymanFileTypes.Binary.Keyboard));
     kmpJsonData.files[kmpIndex].name = '../build/throw_error.kmx';
     assert.throws(() => compiler['loadKmxFiles'](kpsFilename, kmpJsonData));
-<<<<<<< HEAD
-=======
-    //assert.deepEqual(kmxFiles, []);
->>>>>>> 7353c3049aedc1ac495f90b4829c8ecd821acac7
   });  
 });
