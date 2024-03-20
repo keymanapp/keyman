@@ -101,7 +101,14 @@ title: Changes - Keyman Core API
 
 ## Changes between 16.0 and 17.0
 
-...TODO
+* The namespace identifier has changed from `km_kbp_` to `km_core_`.
+* Most context APIs are now private, and `km_core_context_set_if_needed` is the
+  primary context function. Private APIs are available in
+  `keyman_core_api_context.h`.
+* The action queue APIs are now private and deprecated. Instead, use
+  `km_core_state_get_actions`. Private APIs are available in
+  `keyman_core_api_actions.h`.
+* Debug APIs are available in `keyman_core_api_debug.h`.
 
 -------------------------------------------------------------------------------
 
