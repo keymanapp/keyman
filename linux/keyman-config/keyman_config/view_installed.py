@@ -18,8 +18,10 @@ from keyman_config import _
 from keyman_config.accelerators import bind_accelerator, init_accel
 from keyman_config.dbus_util import get_keyman_config_service
 from keyman_config.downloadkeyboard import DownloadKmpWindow
+from keyman_config.fcitx_util import is_fcitx_running
 from keyman_config.get_kmp import (InstallLocation, get_keyboard_dir,
                                    get_install_area_string)
+from keyman_config.ibus_util import IbusDaemon, verify_ibus_daemon
 from keyman_config.install_window import InstallKmpWindow, find_keyman_image
 from keyman_config.keyboard_layouts_model import create_kbd_layouts_model
 from keyman_config.keyboard_layouts_widget import KeyboardLayoutsWidget
@@ -96,6 +98,26 @@ class ViewInstalledWindowBase(Gtk.Window):
         self.resize(776, 424)
         self.connect("destroy", Gtk.main_quit)
         self.show_all()
+
+        if (not is_fcitx_running()) and (verify_ibus_daemon(False) != IbusDaemon.RUNNING):
+            dialog = Gtk.MessageDialog(
+                self, 0, Gtk.MessageType.WARNING,
+                Gtk.ButtonsType.YES_NO, _("ibus-daemon is not running. Try to start ibus-daemon now?"))
+            dialog.format_secondary_text(
+                _("If you just recently installed Keyman you might have to reboot or logout and login again."))
+            response = dialog.run()
+            dialog.destroy()
+            if response == Gtk.ResponseType.YES:
+                if verify_ibus_daemon(True) != IbusDaemon.RUNNING:
+                    dialog = Gtk.MessageDialog(
+                        self, 0, Gtk.MessageType.WARNING,
+                        Gtk.ButtonsType.OK,
+                        _("Unable to start ibus-daemon. Please reboot or logout and login again."))
+                    dialog.run()
+                    dialog.destroy()
+                    self.close()
+            else:
+                self.close()
         Gtk.main()
 
 

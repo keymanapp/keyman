@@ -13,27 +13,26 @@ import { KeymanCompilerArtifacts } from '@keymanapp/common-types';
 import { KeymanCompilerResult } from '@keymanapp/common-types';
 import { KmpJsonFile } from '@keymanapp/common-types';
 
-// @public (undocumented)
+// @public
 export class KeyboardInfoCompiler implements KeymanCompiler {
     constructor();
     // Warning: (ae-forgotten-export) The symbol "KeyboardInfoFileLanguageFont" needs to be exported by the entry point index.d.ts
     //
-    // (undocumented)
+    // @internal (undocumented)
     fontSourceToKeyboardInfoFont(kpsFilename: string, kmpJsonData: KmpJsonFile.KmpJsonFile, source: string[]): Promise<KeyboardInfoFileLanguageFont>;
-    // (undocumented)
     init(callbacks: CompilerCallbacks, options: KeyboardInfoCompilerOptions): Promise<boolean>;
     run(inputFilename: string, outputFilename?: string): Promise<KeyboardInfoCompilerResult>;
-    // (undocumented)
     write(artifacts: KeyboardInfoCompilerArtifacts): Promise<boolean>;
 }
 
-// @public (undocumented)
+// @public
 export interface KeyboardInfoCompilerArtifacts extends KeymanCompilerArtifacts {
-    // (undocumented)
     keyboard_info: KeymanCompilerArtifact;
 }
 
-// @public (undocumented)
+// Warning: (ae-internal-missing-underscore) The name "KeyboardInfoCompilerMessages" should be prefixed with an underscore because the declaration is marked as @internal
+//
+// @internal (undocumented)
 export class KeyboardInfoCompilerMessages {
     // (undocumented)
     static ERROR_CannotBuildWithoutKmpFile: number;
@@ -65,10 +64,6 @@ export class KeyboardInfoCompilerMessages {
         email: string;
     }) => CompilerEvent;
     // (undocumented)
-    static Error_LicenseFileDoesNotExist: (o: {
-        filename: string;
-    }) => CompilerEvent;
-    // (undocumented)
     static ERROR_LicenseFileIsDamaged: number;
     // (undocumented)
     static Error_LicenseFileIsDamaged: (o: {
@@ -76,6 +71,10 @@ export class KeyboardInfoCompilerMessages {
     }) => CompilerEvent;
     // (undocumented)
     static ERROR_LicenseFileIsMissing: number;
+    // (undocumented)
+    static Error_LicenseFileIsMissing: (o: {
+        filename: string;
+    }) => CompilerEvent;
     // (undocumented)
     static ERROR_LicenseIsNotValid: number;
     // (undocumented)
@@ -121,19 +120,17 @@ export class KeyboardInfoCompilerMessages {
     }) => CompilerEvent;
 }
 
-// @public (undocumented)
+// @public
 export interface KeyboardInfoCompilerOptions extends CompilerOptions {
-    // (undocumented)
     sources: KeyboardInfoSources;
 }
 
-// @public (undocumented)
+// @public
 export interface KeyboardInfoCompilerResult extends KeymanCompilerResult {
-    // (undocumented)
     artifacts: KeyboardInfoCompilerArtifacts;
 }
 
-// @public (undocumented)
+// @public
 export interface KeyboardInfoSources {
     forPublishing: boolean;
     jsFilename?: string;

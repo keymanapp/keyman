@@ -22,7 +22,7 @@
 block(kmxheader)  #  struct COMP_KEYBOARD {
   4b 58 54 53      #    KMX_DWORD dwIdentifier;   // 0000 Keyman compiled keyboard id
 
-  00 10 00 00      #    KMX_DWORD dwFileVersion;  // 0004 Version of the file - Keyman 4.0 is 0x0400
+  00 11 00 00      #    KMX_DWORD dwFileVersion;  // 0004 Version of the file - Keyman 4.0 is 0x0400
 
   00 00 00 00      #    KMX_DWORD dwCheckSum;     // 0008 deprecated in 16.0, always 0
   00 00 00 00      #    KMX_DWORD KeyboardID;     // 000C as stored in HKEY_LOCAL_MACHINE//system//currentcontrolset//control//keyboard layouts
@@ -489,6 +489,7 @@ block(strs)                         #  struct COMP_KMXPLUS_STRS {
 
   diff(strs,strNull)       sizeof(strNull,2)
   diff(strs,strVersion)    sizeof(strVersion,2)
+  diff(strs,strConformsTo) sizeof(strConformsTo,2)
   diff(strs,strName)       sizeof(strName,2)
   diff(strs,strFromSet)     sizeof(strFromSet,2)
   diff(strs,strUSet)       sizeof(strUSet,2)
@@ -508,7 +509,6 @@ block(strs)                         #  struct COMP_KMXPLUS_STRS {
   diff(strs,strLocale)     sizeof(strLocale,2)
   diff(strs,strLayout)     sizeof(strLayout,2)
   diff(strs,strAuthor)     sizeof(strAuthor,2)
-  diff(strs,strConformsTo) sizeof(strConformsTo,2)
   diff(strs,strThat)   sizeof(strThat,2)
   diff(strs,strUs)    sizeof(strUs,2)
   diff(strs,strVse)   sizeof(strVse,2)
@@ -524,6 +524,7 @@ block(strs)                         #  struct COMP_KMXPLUS_STRS {
 #str #00
   block(strNull)             block(x) 00 00                                             # the zero-length string
   block(strVersion)          31 00 2e 00 30 00 2e 00 30 00   block(x) 00 00             # '1.0.0'
+  block(strConformsTo)       34 00 35 00 block(x) 00 00                         # '45'
   block(strName)             54 00 65 00 73 00 74 00 4b 00 62 00 64 00   block(x) 00 00 # 'TestKbd'
   block(strFromSet)          5B 00 5C 00 75 00 31 00 41 00 37 00 35 00 2D 00 5C 00 75 00 31 00 41 00 37 00 39 00 5D 00 block(x) 00 00 # [\u1a75-\u1a79]
   block(strUSet)             5b 00 61 00 62 00 63 00 5d 00 block(x) 00 00               # '[abc]'
@@ -545,8 +546,6 @@ block(strs)                         #  struct COMP_KMXPLUS_STRS {
   block(strLocale)           6d 00 74 00   block(x) 00 00                               # 'mt'
   block(strLayout)           71 00 77 00 65 00 72 00 74 00 79 00   block(x) 00 00       # 'qwerty'
   block(strAuthor)           73 00 72 00 6c 00 32 00 39 00 35 00   block(x) 00 00       # 'srl295'
-  block(strConformsTo)       74 00 65 00 63 00 68 00 70 00 72 00 65 00 76 00
-                             69 00 65 00 77 00 block(x) 00 00                         # 'techpreview'
   block(strThat)             74 00 68 00 61 00 74 00 block(x) 00 00                     # 'that'
   block(strUs)               75 00 73 00 block(x) 00 00                           # 'us' (layout)
   block(strVse)              76 00 73 00 65 00 block(x) 00 00                     # 'vse'

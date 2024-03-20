@@ -77,10 +77,10 @@ const
     '<?xml version="1.0" encoding="UTF-8"?>'#13#10+
     // We won't inject the DOCTYPE because of pathing challenges, CLDR-15505
     //  '<!DOCTYPE keyboard3 SYSTEM "ldmlKeyboard3.dtd">'#13#10+
-    '<keyboard3>'#13#10+
+    '<keyboard3 xmlns="https://schemas.unicode.org/cldr/45/keyboard3">'#13#10+
     '  <keys>'#13#10+
-    '    <import base="cldr" path="techpreview/keys-Zyyy-punctuation.xml"/>'#13#10+
-    '    <import base="cldr" path="techpreview/keys-Zyyy-currency.xml"/>  '#13#10+
+    '    <import base="cldr" path="45/keys-Zyyy-punctuation.xml"/>'#13#10+
+    '    <import base="cldr" path="45/keys-Zyyy-currency.xml"/>  '#13#10+
     '  </keys>'#13#10+
     '  <layers formId="us">'#13#10+
     '    <layer modifiers="none">'#13#10+
@@ -130,7 +130,7 @@ begin
 
   root := doc.DocumentElement;
   root.Attributes['locale'] := tag;
-  root.Attributes['conformsTo'] := 'techpreview';
+  root.Attributes['conformsTo'] := '45';
 
   doc.DocumentElement := root;
 

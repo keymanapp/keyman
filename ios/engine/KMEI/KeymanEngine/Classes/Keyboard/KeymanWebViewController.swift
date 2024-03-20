@@ -224,19 +224,17 @@ extension KeymanWebViewController {
   }
 
   func setContext(text: String?, range: NSRange?, doSync: Bool = false) {
-    var text = text ?? ""
-
-    // Remove any system-added LTR/RTL marks.
-    text = text.replacingOccurrences(of: "\u{200e}", with: "") // Unicode's LTR codepoint
-    text = text.replacingOccurrences(of: "\u{200f}", with: "") // Unicode's RTL codepoint (v1)
-    text = text.replacingOccurrences(of: "\u{202e}", with: "") // Unicode's RTL codepoint (v2)
+    // Remove any LTR / RTL marks we added within TextView and TextField.
+    let context = trimDirectionalMarkPrefix(text ?? "")
 
     do {
-      let encodingArray = [ text ];
+      let encodingArray = [ context ];
       let jsonString = try String(data: JSONSerialization.data(withJSONObject: encodingArray), encoding: .utf8)!
-      let start = jsonString.index(jsonString.startIndex, offsetBy: 2)
-      let end = jsonString.index(jsonString.endIndex, offsetBy: -2)
-      let jsonText = jsonString[start..<end]
+      // Must use utf16-mode - default Swift string handling will include a leading U+0300 with the opening double-quote
+      // being removed by the substring op below.
+      let start = jsonString.utf16.index(jsonString.utf16.startIndex, offsetBy: 2)
+      let end = jsonString.utf16.index(jsonString.utf16.endIndex, offsetBy: -2)
+      let jsonText = String(jsonString.utf16[start..<end])!
 
       self.currentText = String(jsonText)
 

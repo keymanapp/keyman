@@ -14,7 +14,7 @@ describe('ldml keyboard xml reader tests', function () {
       callback: (data, source) => {
         assert.ok(source);
         assert.ok(source.keyboardTest3);
-        assert.equal(source.keyboardTest3.conformsTo, constants.cldr_version_latest);
+        assert.equal(source.keyboardTest3.conformsTo, constants.cldr_test_version_latest);
 
         assert.deepEqual(source.keyboardTest3.info, {
           keyboard: 'fr-t-k0-azerty.xml',

@@ -32,7 +32,7 @@ builder_describe "Build Keyman Keyboard Compiler kmc" \
   "build                     (default) builds kmc to build/" \
   "clean                     cleans build/ folder" \
   "bundle                    creates a bundled version of kmc" \
-  "api                       analyze API and prepare API documentation (no-op for kmc)" \
+  "api                       prepare compiler error documentation" \
   "test                      run automated tests for kmc" \
   "pack                      build a local .tgz pack for testing (note: all npm modules in the repo will be packed by this script)" \
   "publish                   publish to npm (note: all npm modules in the repo will be published by this script)" \
@@ -70,6 +70,15 @@ if builder_start_action build; then
   tsc -b
   cp "$KEYMAN_ROOT/resources/standards-data/ldml-keyboards/unicode-license.txt" ./build/unicode-license.txt
   builder_finish_action success build
+fi
+
+#-------------------------------------------------------------------------------------------------------------------
+
+if builder_start_action api; then
+  rm -rf ./build/messages
+  mkdir -p ./build/messages
+  node . message --format markdown --out-path build/messages
+  builder_finish_action success api
 fi
 
 #-------------------------------------------------------------------------------------------------------------------

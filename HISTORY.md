@@ -1,5 +1,88 @@
 # Keyman Version History
 
+## 17.0.290 beta 2024-03-19
+
+*  (#10956)
+
+## 17.0.289 beta 2024-03-16
+
+* fix(common): add unit test for --debug flag for builder (#10974)
+
+## 17.0.288 beta 2024-03-13
+
+* test(developer): kmc keyboard info compiler messages unit tests (#10848)
+* fix(developer): getFontFamily now returns null if ttfMeta.promise errors (#10983)
+* docs(android/app): Add data privacy policy page (#10985)
+* fix(developer): min Keyman version for LDML is 17.0 (#10977)
+
+## 17.0.287 beta 2024-03-12
+
+* chore(developer): resolve excessive-fatal-exception issue (#10949)
+* fix(linux): Remove `ibus-keyman.post{inst,rm}` and verify that `ibus-daemon` is running when we start km-config (#10788)
+
+## 17.0.286 beta 2024-03-11
+
+* chore(web): improve the clarity of hints on OSK for Android (#10971)
+
+## 17.0.285 beta 2024-03-08
+
+* fix(windows): GetKeyboardLanguage exits early on an invalid keyboard ID (#10936)
+
+## 17.0.284 beta 2024-03-07
+
+* fix(web): globe key highlighting (#10932)
+* chore(web): updates mtnt model used by test page (#10935)
+* fix(developer): kmc keyboard info compiler no kmp error (#10893)
+* fix(developer): Treat Right Shift as Shift in debugger (#10919)
+* docs(developer): kmc-model api documentation (#10921)
+* docs(developer): kmc-model-info api documentation (#10922)
+* docs(developer): kmc-keyboard-info api documentation (#10923)
+* docs(developer): kmc-package api documentation (#10924)
+* fix(developer): normalize all input paths in .kps compiler (#10950)
+
+## 17.0.283 beta 2024-03-06
+
+* fix(android): fixes context-change detection for repeated-char cases (#10873)
+* fix(developer): search-term quote replacement was not global (#10934)
+*  (#10913)
+* fix(developer): fix for errant \uXXXX error (#10946)
+*  (#10948)
+* refactor(oem/fv/android): Install fallback keyboard (#10907)
+* refactor(android/app): Move storage permission checks (#10904)
+* fix(common): missing script exec bit (#10951)
+
+## 17.0.282 beta 2024-03-05
+
+* fix(developer): move osk.ts from developer-utils to kmc-kmn (#10903)
+* fix(developer): hint text special characters (#10927)
+* docs(developer): kmc-ldml api documentation (#10917)
+* chore(developer): consolidate external links in Developer messages (#10918)
+* fix(developer): message export filename was title case (#10941)
+
+## 17.0.281 beta 2024-03-04
+
+* chore(linux): Update debian changelog (#10897)
+* fix(ios): cross-paragraph keyboard rules (#10905)
+* chore(developer): deploy compiler messages to help site (#10906)
+
+## 17.0.280 beta 2024-03-01
+
+* fix(developer): make sure scroll bar appears when needed in global welcome (#10818)
+* chore(common): loosen .keyman-touch-layout schema layer id requirements (#10819)
+* docs(developer): kmc-kmn api documentation and some message documentation (#10856)
+* refactor(developer): cleanup kmn compiler message namespaces (#10867)
+* refactor(developer): reorganize messages for adding details (#10878)
+* fix(ios): context-initial diacritic handling (#10589)
+* feat(developer): adds kmc message command (#10888)
+* test(developer): kmc unit test infrastructure messages (#10825)
+* fix(android): handle surrogate pairs in selection range indexing (#10885)
+* feat(windows): move the code kmshell.dpr to unit so that only the includes are in dpr (#10871)
+
+## 17.0.279 beta 2024-02-29
+
+* fix(linux): Fix libkeymancore-dev dependencies (#10880)
+* chore(resources): update to latest ldml: xmlns, uset (#10865)
+
 ## 17.0.278 beta 2024-02-28
 
 * docs(linux): Updated whatsnew for Keyman for Linux 17 (#10858)
