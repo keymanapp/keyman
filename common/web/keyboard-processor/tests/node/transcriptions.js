@@ -449,7 +449,7 @@ but not himself.`;  // Sheev Palpatine, in the Star Wars prequels.
         insert: '',
         deleteLeft: 0,
         deleteRight: 0,
-        erasedSelection: false
+        erasedSelection: true
       });
     });
 
@@ -461,7 +461,7 @@ but not himself.`;  // Sheev Palpatine, in the Star Wars prequels.
         insert: '',
         deleteLeft: 0,
         deleteRight: 0,
-        erasedSelection: false
+        erasedSelection: true
       };
 
       target.apply(transform);
