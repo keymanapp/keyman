@@ -51,5 +51,9 @@ export class KeyboardInfoCompilerMessages {
   static ERROR_FontFileCannotBeRead = SevError | 0x000E;
   static Error_FontFileCannotBeRead = (o:{filename: string}) => m(this.ERROR_FontFileCannotBeRead,
     `Font ${def(o.filename)} could not be parsed to extract a font family.`);
+
+static ERROR_FontFileMetaDataIsInvalid = SevError | 0x000F;
+static Error_FontFileMetaDataIsInvalid = (o:{filename: string,message:string}) => m(this.ERROR_FontFileMetaDataIsInvalid,
+    `Font ${def(o.filename)} meta data invalid: ${def(o.message)}.`);
 }
 
