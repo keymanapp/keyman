@@ -11,7 +11,6 @@
 
 #import <XCTest/XCTest.h>
 #import "KMInputMethodEventHandler.h"
-#import "KMInputMethodEventHandlerProtected.h"
 #import "LegacyTestClient.h"
 #import "AppleCompliantTestClient.h"
 #import "TextApiCompliance.h"
