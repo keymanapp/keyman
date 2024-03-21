@@ -3,8 +3,8 @@
 import json
 import logging
 import os
+import packaging.version
 import zipfile
-from pkg_resources import parse_version
 from enum import Enum
 from shutil import rmtree
 
@@ -149,7 +149,7 @@ class InstallKmp():
         fileVersion = secure_lookup(system, 'fileVersion')
         if not fileVersion:
             fileVersion = '7.0'
-        if parse_version(fileVersion) > parse_version(__version__):
+        if packaging.version.parse(fileVersion) > packaging.version.parse(__version__):
             logging.error("install_kmp.py: error: %s requires a newer version of Keyman (%s)",
                           inputfile, fileVersion)
             rmtree(self.packageDir)

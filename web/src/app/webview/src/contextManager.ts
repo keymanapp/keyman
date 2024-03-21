@@ -60,18 +60,24 @@ export class ContextHost extends Mock {
 
   updateContext(text: string, selStart: number, selEnd: number): boolean {
     let shouldResetContext = false;
+    let tempMock = new Mock(text, selStart ?? text._kmwLength(), selEnd ?? text._kmwLength());
+    let newLeft = tempMock.getTextBeforeCaret();
+    let oldLeft = this.getTextBeforeCaret();
+
     if(text != this.text) {
-      let tempMock = new Mock(text, selStart ?? text._kmwLength(), selEnd ?? text._kmwLength());
-
-      let newLeft = tempMock.getTextBeforeCaret();
-      let oldLeft = this.getTextBeforeCaret();
-
       let unexpectedBeforeCharCount = findCommonSubstringEndIndex(newLeft, oldLeft, true) + 1;
       shouldResetContext = !!unexpectedBeforeCharCount;
     }
 
     if(shouldResetContext) {
       this.text = text;
+      this.selStart = selStart;
+      this.selEnd = selEnd;
+    } else {
+      // Transform selection coordinates to their location within the longform context window.
+      let delta = oldLeft._kmwLength() - newLeft._kmwLength();
+      this.selStart = selStart - delta;
+      this.selEnd = selEnd - delta;
     }
 
     if(selStart === undefined || selEnd === undefined) {
