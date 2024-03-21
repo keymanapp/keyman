@@ -6,6 +6,8 @@ import ttfMeta from 'ttfmeta';
  *
  * @param source   In-memory TTF or WOFF font blob
  *
+ * @throws Uncaught exceptions from ttfMeta.promise.
+ * 
  * @returns If the file is invalid or cannot be parsed, returns `null`,
  *          otherwise returns the font family as a string.
  */
