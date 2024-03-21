@@ -17,6 +17,9 @@ export class KeyboardInfoCompilerMessages {
   static ERROR_FileDoesNotExist = SevError | 0x0002;
   static Error_FileDoesNotExist = (o:{filename: string}) => m(this.ERROR_FileDoesNotExist, `File ${def(o.filename)} does not exist.`);
 
+  // 0x0003 unused, available for future messages
+  // 0x0004 unused, available for future messages
+
   static ERROR_InvalidAuthorEmail = SevError | 0x0005;
   static Error_InvalidAuthorEmail = (o:{email:string}) => m(this.ERROR_InvalidAuthorEmail,
     `Invalid author email: ${def(o.email)}`);
@@ -40,6 +43,10 @@ export class KeyboardInfoCompilerMessages {
   static ERROR_NoLicenseFound = SevError | 0x000A;
   static Error_NoLicenseFound = () => m(this.ERROR_NoLicenseFound,
     `No license for the keyboard was found. MIT license is required for publication to Keyman keyboards repository.`);
+
+  // 0x000B unused, available for future messages
+  // 0x000C unused, available for future messages
+  // 0x000D unused, available for future messages
 
   static ERROR_FontFileCannotBeRead = SevError | 0x000E;
   static Error_FontFileCannotBeRead = (o:{filename: string}) => m(this.ERROR_FontFileCannotBeRead,
