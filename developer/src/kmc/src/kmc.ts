@@ -11,10 +11,11 @@ import KEYMAN_VERSION from "@keymanapp/keyman-version";
 import { TestKeymanSentry } from './util/TestKeymanSentry.js';
 import { exitProcess } from './util/sysexits.js';
 import { declareMessage } from './commands/messageCommand.js';
+import { rewriteFramesIntegration } from '@sentry/integrations';
 
 await TestKeymanSentry.runTestIfCLRequested();
 if(KeymanSentry.isEnabled()) {
-  KeymanSentry.init();
+  KeymanSentry.init([rewriteFramesIntegration({prefix: '~/'})]);
 }
 try {
   await run();

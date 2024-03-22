@@ -23,11 +23,12 @@ export class KeymanSentry {
     return getOption('automatically report errors', true);
   }
 
-  static init() {
+  static init(integrations?: any) {
     Sentry.init({
       dsn: 'https://39b25a09410349a58fe12aaf721565af@o1005580.ingest.sentry.io/5983519',  // Keyman Developer
       environment: KEYMAN_VERSION.VERSION_ENVIRONMENT,
       release: KEYMAN_VERSION.VERSION_GIT_TAG,
+      integrations: integrations ?? []
     });
     isInit = true;
   }
