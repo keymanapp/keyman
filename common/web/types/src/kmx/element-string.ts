@@ -74,6 +74,9 @@ export class ElementString extends Array<ElemElement> {
         typeFlag |= constants.elem_flags_type_uset;
         // TODO-LDML: err on max buffer size
         const needRanges = sections.usetparser.sizeUnicodeSet(item.segment);
+        if (needRanges < 0) {
+          return null; // UnicodeSet error
+        }
         const uset = sections.usetparser.parseUnicodeSet(item.segment, needRanges);
         if (!uset) {
           return null; // UnicodeSet error already thrown
