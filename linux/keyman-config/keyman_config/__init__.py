@@ -1,6 +1,7 @@
 import gettext
 import logging
 import os
+import pathlib
 import subprocess
 
 from keyman_config.sentry_handling import SentryErrorHandling
@@ -51,6 +52,53 @@ def initialize_sentry():
     SentryErrorHandling().initialize_sentry()
 
 
+class FileCleanup():
+    """
+    Allow to register files that will be deleted when module gets unloaded
+    """
+    def __init__(self):
+        self._files_to_delete = {}
+
+    def __del__(self):
+        for key in self._files_to_delete:
+            self._delete_file(self._files_to_delete[key])
+        self._files_to_delete = {}
+
+    def _delete_file(self, file):
+        try:
+            pathlib.Path(file).unlink()
+        except Exception:
+            return
+
+    def register(self, key, file):
+        if key in self._files_to_delete and self._files_to_delete[key] != file:
+            self._delete_file(self._files_to_delete[key])
+        self._files_to_delete[key] = file
+
+    def unregister(self, key):
+        if key in self._files_to_delete:
+            self._delete_file(self._files_to_delete[key])
+            self._files_to_delete.pop(key)
+
+    def get(self, key):
+        if key in self._files_to_delete:
+            return self._files_to_delete[key]
+        return None
+
+
+file_cleanup = FileCleanup()
+__DBUS_STARTED_FOR_SESSION = False
+
+
+def get_dbus_started_for_session():
+    return __DBUS_STARTED_FOR_SESSION
+
+
+def _set_dbus_started_for_session(value):
+    global __DBUS_STARTED_FOR_SESSION
+    __DBUS_STARTED_FOR_SESSION = value
+
+
 def verify_dbus_running():
     if (not 'DBUS_SESSION_BUS_ADDRESS' in os.environ or
         not 'DBUS_SESSION_BUS_PID' in os.environ):
@@ -61,6 +109,7 @@ def verify_dbus_running():
             stdout = subprocess.run(
                 ('dbus-launch', '--exit-with-session'),
                 stdout=subprocess.PIPE, check=False).stdout
+            _set_dbus_started_for_session(True)
             lines = stdout.decode('utf-8').splitlines()
             for line in lines:
                 equal_sign = line.find('=')
