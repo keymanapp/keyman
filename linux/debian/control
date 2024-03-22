@@ -93,6 +93,7 @@ Depends:
  python3-gi,
  python3-packaging,
  python3-sentry-sdk (>= 1.1),
+ python3-xdg,
  ${misc:Depends},
  ${python3:Depends},
 Description: Keyman for Linux configuration
