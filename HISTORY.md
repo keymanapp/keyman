@@ -1,5 +1,15 @@
 # Keyman Version History
 
+## 17.0.292 beta 2024-03-21
+
+* fix(developer): remove unused keyboard info compiler messages (#10991)
+* fix(developer): font file meta data is invalid error (#10995)
+
+## 17.0.291 beta 2024-03-20
+
+* chore(mac): clean up code obsoleted by core (#10877)
+* fix(linux): Replace deprecated `pkg_resources` module with `packaging.version` (#10860)
+
 ## 17.0.290 beta 2024-03-19
 
 *  (#10956)
