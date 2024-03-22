@@ -28,8 +28,16 @@
     </layer>
   </layers>
 
+  <variables>
+    <!-- for regression  #11045 -->
+    <set id="mark_accent" value="\m{acute} \m{grave}"/>
+    <set id="spacing_accent" value="´ `"/>
+  </variables>
+
   <transforms type="simple">
     <transformGroup>
+      <!-- for regression  #11045 -->
+      <transform from="($[mark_accent])x" to="$[1:spacing_accent]" />
       <transform from="\m{.}z" to="Z" />
     </transformGroup>
     <transformGroup>
