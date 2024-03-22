@@ -1,5 +1,12 @@
 # Keyman Version History
 
+## 17.0.293 beta 2024-03-22
+
+* chore(oem/fv): Update keyboard versions in keyboards.csv (#11013)
+* fix(developer): suppress emission of new empty fields in package editor (#11009)
+* fix(developer): return after calling await exitProcess (#11016)
+* chore(core): refresh API docs for 17.0 (#10986)
+
 ## 17.0.292 beta 2024-03-21
 
 * fix(developer): remove unused keyboard info compiler messages (#10991)
