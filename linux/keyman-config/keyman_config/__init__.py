@@ -100,8 +100,7 @@ def _set_dbus_started_for_session(value):
 
 
 def verify_dbus_running():
-    if (not 'DBUS_SESSION_BUS_ADDRESS' in os.environ or
-        not 'DBUS_SESSION_BUS_PID' in os.environ):
+    if not 'DBUS_SESSION_BUS_ADDRESS' in os.environ:
         try:
             # Seems dbus isn't running for the current user. Try to start it
             # and set these environment variables
