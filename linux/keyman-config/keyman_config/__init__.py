@@ -1,3 +1,4 @@
+import atexit
 import gettext
 import logging
 import os
@@ -54,15 +55,15 @@ def initialize_sentry():
 
 class FileCleanup():
     """
-    Allow to register files that will be deleted when module gets unloaded
+    Allow to register files that will be deleted when the process exits
     """
     def __init__(self):
         self._files_to_delete = {}
+        atexit.register(self.__cleanup)
 
-    def __del__(self):
+    def __cleanup(self):
         for key in self._files_to_delete:
             self._delete_file(self._files_to_delete[key])
-        self._files_to_delete = {}
 
     def _delete_file(self, file):
         try:
