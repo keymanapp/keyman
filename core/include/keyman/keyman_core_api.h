@@ -1332,7 +1332,8 @@ void km_core_state_imx_register_callback(km_core_state *state, km_core_keyboard_
 : pointer to a function that implements the IMX callback
 
 `callback_object`
-: TODO
+: An opaque pointer that can be used to pass context information to the callback function, 
+  usually it is a user-defined data structure.
 
 -------------------------------------------------------------------------------
 
@@ -1421,7 +1422,7 @@ km_core_state_clone(km_core_state const *state,
 ## Parameters
 
 `state`
-: A pointer to the opaque statea object to be cloned.
+: A pointer to the opaque state object to be cloned.
 
 `out`
 : A pointer to result variable: A pointer to the opaque state object
