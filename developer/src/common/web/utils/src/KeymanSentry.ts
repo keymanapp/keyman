@@ -23,12 +23,25 @@ export class KeymanSentry {
     return getOption('automatically report errors', true);
   }
 
-  static init(integrations?: any) {
+  static init() {
     Sentry.init({
       dsn: 'https://39b25a09410349a58fe12aaf721565af@o1005580.ingest.sentry.io/5983519',  // Keyman Developer
       environment: KEYMAN_VERSION.VERSION_ENVIRONMENT,
       release: KEYMAN_VERSION.VERSION_GIT_TAG,
-      integrations: integrations ?? []
+      beforeSend: function(event, hint) {
+        // console.error(hint.originalException || hint.syntheticException);
+        // TEMPORARY TEST PATCH ONLY:
+        let stacktrace = event?.exception && event?.exception?.values?.[0]?.stacktrace;
+        if (stacktrace?.frames) {
+          stacktrace.frames.forEach(function(frame) {
+            const filename = frame.filename.match(/[^/]+$/)[0]; //path.basename(frame.filename);
+            if(filename.endsWith('.mjs')) {
+              frame.filename = `~/${filename}`;
+            }
+          });
+        }
+        return event;
+      }
     });
     isInit = true;
   }
