@@ -36,7 +36,7 @@ export class KeymanSentry {
           stacktrace.frames.forEach(function(frame) {
             const filename = frame.filename.match(/[^/]+$/)[0]; //path.basename(frame.filename);
             if(filename.endsWith('.mjs')) {
-              frame.filename = `~/${filename}`;
+              frame.filename = `/dist/${filename}`;
             }
           });
         }

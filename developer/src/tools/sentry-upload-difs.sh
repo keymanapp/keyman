@@ -88,9 +88,9 @@ upload_sourcemap .
 cd "$KEYMAN_ROOT/developer"
 
 # Separate sourcemap upload for kmc to avoid pathing
-cd "$KEYMAN_ROOT/developer/src/kmc/build/dist"
-upload_sourcemap .
-cd "$KEYMAN_ROOT/developer"
+# cd "$KEYMAN_ROOT/developer/src/kmc/build/dist"
+# upload_sourcemap .
+# cd "$KEYMAN_ROOT/developer"
 
 # Upload all other sourcemaps
 for sourcemap_path in "${sourcemap_paths[@]}"; do
