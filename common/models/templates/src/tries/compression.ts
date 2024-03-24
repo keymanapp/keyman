@@ -200,6 +200,10 @@ function compressInternal(node: InternalNode): string {
     // for _some_ cases!  '﷐' shows up for 'most', but not _all_, places where it belongs.
     // Approx 20% error rate!?
     //
+    // STRONG SUSPICION: addItemToInternalNode
+    // - current line 376:  let char = item.key[index];
+    //   - does not validate that the char exists!
+    //
     // detected via `sil.km.gcc - 1.0`.
     if(value === null) {
       value = "undefined"; // yes, really.
