@@ -209,4 +209,30 @@ describe('Trie decompression', function () {
       });
     });
   });
+
+  it('compresses fixture successfully: english-1000', () => {
+    const trie = jsonFixture('tries/english-1000');
+    // The test:  does it throw?
+    const compressedTrie = compressNode(trie.root);
+    const compression = {
+      // Achieves FAR better compression than JSON.stringify, which \u-escapes most chars.
+      // As of the commit when this was written...
+      // - length of encoding below: 26097
+      // - JSON-encoding length:  69122
+      // - Source fixture's filesize: 141309 bytes
+      root: `"${compressedTrie.replace(/"/g, '\"')}"`,
+      totalWeight: trie.totalWeight
+    }
+
+    // We could easily get even better savings (with some cost) by using the search-term-to-key function
+    // as part of decompression, avoiding the near-duplicating key/content effect we currently have.
+    // - if we didn't save the keys: 20490 (estimation)  (~21.4% savings)
+
+    // // TODO:  Temp code for diagnostics & exploration.
+    // console.log(`Compressed length: ${compression.root.length}`);
+    // console.log(`Result: ${compression.root}`);
+
+    // Note: a naive round-tripping test won't work.  We only partly decompress
+    // at each step, after all.
+  });
 });
