@@ -197,6 +197,13 @@ function compressInternal(node: InternalNode): string {
 
   const compressedChildren = values.map((value) => {
     const child = node.children[value];
+
+    // c8 ignore start
+    if(!child) {
+      throw new Error("unexpected empty reference for child");
+    }
+    // c8 ignore end
+
     // No need to recompress it if it's already compressed.
     return typeof child == 'string' ? child : compressNode(child);
   });
