@@ -1,0 +1,212 @@
+/*
+ * Unit tests for the Trie prediction model.
+ */
+
+import { assert } from 'chai';
+import {
+  compressEntry, decompressEntry,
+  compressNode, decompressNode,
+  compressNumber, decompressNumber
+} from '@keymanapp/models-templates/obj/tries/compression.js';
+
+const TEST_DATA = {};
+TEST_DATA.ENTRIES = {
+  four: {
+    // total length: header = 5, text = 8 -> 13.  (Made with weight-width 2)
+    //            -totalLen-    -weight- -keylen-
+    compressed: '\u0000\u000d\u0000\u0008\u0004fourfour',
+    decompressed: {
+      key: 'four',
+      content: 'four',
+      weight: 8
+    },
+    original: {
+      key: 'four',
+      content: 'four',
+      weight: 8
+    }
+  }
+};
+
+TEST_DATA.LEAVES = {
+  four: {
+    // expected width difference: 5 (2: total size, 2: weight, 1: entry count)
+    //             -totalLen-  -weight- -type/size-
+    compressed: `\u0000\u0012\u0000\u0008\u8001${TEST_DATA.ENTRIES.four.compressed}`,
+    decompressed: {
+      type: 'leaf',
+      weight: 8,
+      entries: [TEST_DATA.ENTRIES.four.compressed]
+    },
+    original: {
+      type: 'leaf',
+      weight: 8,
+      entries: [{
+        key: 'four',
+        content: 'four',
+        weight: 8
+      }]
+    }
+  }
+}
+
+TEST_DATA.NODES = {
+  four: {
+    // expected width difference: 6 (2: total size, 2: weight, 1: entry count, 1: value count)
+    //             -totalLen-  -weight- -type/size-
+    compressed: `\u0000\u0018\u0000\u0008\u0001r${TEST_DATA.LEAVES.four.compressed}`,
+    decompressed: {
+      type: 'internal',
+      weight: 8,
+      values: ['r'],
+      children: {r: TEST_DATA.LEAVES.four.compressed}
+    },
+    original: {
+      type: 'internal',
+      weight: 8,
+      values: ['r'],
+      children: {r: TEST_DATA.LEAVES.four.decompressed}
+    }
+  }
+}
+
+describe('Trie compression', function() {
+  describe('`number`s', () => {
+    it('uses single-char compression by default', () => {
+      assert.equal(compressNumber(0x0020).length, 1);
+    });
+
+    it('width 1:  compresses properly', () => {
+      assert.equal(compressNumber(0x0020, 1), ' ');
+      assert.equal(compressNumber('"'.charCodeAt(0), 1), '"');
+      assert.equal(compressNumber(0xfffe, 1), '\ufffe');
+    });
+
+    it('width 2:  compresses properly', () => {
+      assert.equal(compressNumber(0x00200020, 2), '  ');
+      assert.equal(
+        compressNumber(0x0321fd20, 2), String.fromCharCode(0x0321, 0xfd20)
+      );
+    });
+
+    it('width 2: compressing values one-char wide', () => {
+      assert.equal(compressNumber(0x0020, 2), '\u0000 ');
+    });
+
+    it('throws when numbers are too large for the specified width', () => {
+      assert.throws(() => compressNumber(0x00200020, 1));
+      assert.throws(() => compressNumber(0x002000200020, 2));
+    })
+  });
+
+  describe('`Entry`s', () => {
+    it('compresses properly', () => {
+      const entry = {
+        key: 'four',
+        content: 'four',
+        weight: 8
+      };
+
+      assert.equal(compressEntry(TEST_DATA.ENTRIES.four.original), TEST_DATA.ENTRIES.four.compressed);
+    });
+  });
+
+  describe('Leaf nodes', () => {
+    it('compresses (mocked Entry)', () => {
+      // Should not attempt to recompress the mock-compressed entry.
+      assert.equal(compressNode(TEST_DATA.LEAVES.four.decompressed), TEST_DATA.LEAVES.four.compressed);
+    });
+
+    it('compresses (unmocked Entry)', () => {
+      assert.equal(compressNode(TEST_DATA.LEAVES.four.original), TEST_DATA.LEAVES.four.compressed);
+    });
+  });
+
+  describe('Internal nodes', () => {
+    it('compresses (mocked Leaf)', () => {
+      // Should not attempt to recompress the mock-compressed leaf.
+      assert.equal(compressNode(TEST_DATA.NODES.four.decompressed), TEST_DATA.NODES.four.compressed);
+    });
+
+    it('compresses (unmocked Leaf)', () => {
+      assert.equal(compressNode(TEST_DATA.NODES.four.original), TEST_DATA.NODES.four.compressed);
+    });
+  });
+});
+
+describe('Trie decompression', function () {
+  describe('`number`s', () => {
+    describe('not inlined', () => {
+      it('decompresses single-char strings', () => {
+        assert.equal(decompressNumber(' ', 0), 0x0020);
+        assert.equal(decompressNumber('"', 0), '"'.charCodeAt(0));
+        assert.equal(decompressNumber('\ufffe', 0), 0xfffe);
+      });
+
+      it('decompresses two-char strings', () => {
+        assert.equal(decompressNumber('  ', 0), 0x00200020);
+        assert.equal(decompressNumber(String.fromCharCode(0x0321, 0xfd20), 0), 0x0321fd20);
+      });
+
+      it('decompresses two-char strings of one-char value width', () => {
+        assert.equal(decompressNumber('\u0000 ', 0), 0x0020);
+      });
+    });
+
+    describe('with mock-inlining', () => {
+      it('decompresses single-char strings', () => {
+        assert.equal(decompressNumber('xxx xx', 3, 4), 0x0020);
+        assert.equal(decompressNumber('xx"x', 2, 3), '"'.charCodeAt(0));
+        assert.equal(decompressNumber('\uffff\ufffe', 1), 0xfffe);
+      });
+
+      it('decompresses two-char strings', () => {
+        assert.equal(decompressNumber('xxxx  xx', 4, 6), 0x00200020);
+      });
+    });
+  });
+
+  describe('`Entry`s', () => {
+    it('not inlined', () => {
+      const mockedDecompression = TEST_DATA.ENTRIES.four.decompressed;
+      const compressionSrc = TEST_DATA.ENTRIES.four.compressed;
+      assert.deepEqual(decompressEntry(compressionSrc), mockedDecompression);
+    });
+
+    it('inlined', () => {
+      const mockedDecompression = TEST_DATA.ENTRIES.four.decompressed;
+
+      // total length: header = 5, text = 8 -> 13.
+      const compressionSrc = `xxxxx${TEST_DATA.ENTRIES.four.compressed}xx`;
+      assert.deepEqual(decompressEntry(compressionSrc, /* start index */ 5), mockedDecompression);
+    });
+  });
+
+  describe('Leaf nodes', () => {
+    describe('bootstrapping cases', () => {
+      it('not inlined', () => {
+        const encodedLeaf = TEST_DATA.LEAVES.four.compressed;
+        assert.deepEqual(decompressNode(encodedLeaf, 0), TEST_DATA.LEAVES.four.decompressed);
+      });
+
+      it('inlined', () => {
+        const encodedLeaf = TEST_DATA.LEAVES.four.compressed;
+        assert.deepEqual(decompressNode(`xxxxxxxxx${encodedLeaf}xx`, 9), TEST_DATA.LEAVES.four.decompressed);
+      });
+    });
+  });
+
+  describe('Internal nodes', () => {
+    describe('bootstrapping cases', () => {
+      it('not inlined', () => {
+        const encodedNode = TEST_DATA.NODES.four.compressed;
+        assert.deepEqual(decompressNode(encodedNode, 0), TEST_DATA.NODES.four.decompressed);
+      });
+
+      it('inlined', () => {
+        const encodedNode = TEST_DATA.NODES.four.compressed;
+        assert.deepEqual(decompressNode(`xxxxxxx${encodedNode}xx`, 7), TEST_DATA.NODES.four.decompressed);
+      });
+    });
+  });
+});
