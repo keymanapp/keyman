@@ -384,14 +384,18 @@ interface Wordform2Key {
 // trie-ing is copyright (C) 2015–2017 Conrad Irwin.
 // Distributed under the terms of the MIT license:
 // https://github.com/ConradIrwin/trie-ing/blob/df55d7af7068d357829db9e0a7faa8a38add1d1d/LICENSE
+//
+// Trie compression / decompression seen here is fully custom.
 
-type Node = InternalNode | Leaf;
+type CompressedNode = string;
+
+export type Node = InternalNode | Leaf;
 /**
  * An internal node in the trie. Internal nodes NEVER contain entries; if an
  * internal node should contain an entry, then it has a dummy leaf node (see
  * below), that can be accessed by node.children["\uFDD0"].
  */
-interface InternalNode {
+export interface InternalNode {
   type: 'internal';
   weight: number;
   /** Maintains the keys of children in descending order of weight. */
@@ -404,7 +408,7 @@ interface InternalNode {
   children: { [codeunit: string]: Node };
 }
 /** Only leaf nodes actually contain entries (i.e., the words proper). */
-interface Leaf {
+export interface Leaf {
   type: 'leaf';
   weight: number;
   entries: Entry[];
@@ -413,7 +417,7 @@ interface Leaf {
 /**
  * An entry in the prefix trie (stored in leaf nodes exclusively!)
  */
-interface Entry {
+export interface Entry {
   /** The actual word form, stored in the trie. */
   content: string;
   /** A search key that usually simplifies the word form, for ease of search. */
