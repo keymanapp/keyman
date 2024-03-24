@@ -187,7 +187,7 @@ function decompressLeaf(str: string, baseIndex: number): Omit<Leaf, 'entries'> &
 //     encoding start.
 
 function compressInternal(node: InternalNode): string {
-  const values = node.values;
+  let values = node.values;
   const valueCntAndType = values.length;
   // c8 ignore start
   if(valueCntAndType >= 0x8000) {
@@ -196,6 +196,14 @@ function compressInternal(node: InternalNode): string {
   // c8 ignore end
 
   const compressedChildren = values.map((value) => {
+    // BIG ERROR DETECTED:  lexical-model compiler is not emitting SENTINEL chars correctly
+    // for _some_ cases!  '﷐' shows up for 'most', but not _all_, places where it belongs.
+    // Approx 20% error rate!?
+    //
+    // detected via `sil.km.gcc - 1.0`.
+    if(value === null) {
+      value = "undefined"; // yes, really.
+    }
     const child = node.children[value];
 
     // c8 ignore start
@@ -207,6 +215,9 @@ function compressInternal(node: InternalNode): string {
     // No need to recompress it if it's already compressed.
     return typeof child == 'string' ? child : compressNode(child);
   });
+
+  // Properly fix the sentinel-value issue.
+  values = values.map((value) => value === null ? '\ufdd0' : value);
 
   const totalArr = [compressNumber(valueCntAndType)].concat(values).concat(compressedChildren);
   return totalArr.join('');
