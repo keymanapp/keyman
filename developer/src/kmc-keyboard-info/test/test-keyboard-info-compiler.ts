@@ -319,9 +319,9 @@ describe('keyboard-info-compiler', function () {
   });  
 
   it('check loadKmxFiles can handle two .kmx files', async function() {
-    const jsFilename = makePathToFixture('two-kmx', 'build', 'two-kmx.js');
-    const kpsFilename = makePathToFixture('two-kmx', 'source', 'two-kmx.kps');
-    const kmpFilename = makePathToFixture('two-kmx', 'build', 'two-kmx.kmp');
+    const jsFilename = makePathToFixture('two-kmx', 'build', 'two_kmx.js');
+    const kpsFilename = makePathToFixture('two-kmx', 'source', 'two_kmx.kps');
+    const kmpFilename = makePathToFixture('two-kmx', 'build', 'two_kmx.kmp');
 
     const sources = {
       kmpFilename,
@@ -354,4 +354,25 @@ describe('keyboard-info-compiler', function () {
     assert.isNotNull(kmxFiles[0].data);
     assert.isNotNull(kmxFiles[1].data);
   });    
+
+  it('check loadJsFile throws error if .js file is invalid', async function() {
+    const jsFilename = makePathToFixture('invalid-js-file', 'build', 'invalid_js_file.js');
+    const kpsFilename = makePathToFixture('invalid-js-file', 'source', 'invalid_js_file.kps');
+    const kmpFilename = makePathToFixture('invalid-js-file', 'build', 'invalid_js_file.kmp');
+
+    const sources = {
+      kmpFilename,
+      sourcePath: 'release/k/invalid-js-file',
+      kpsFilename,
+      jsFilename: jsFilename,
+      forPublishing: true,
+    };
+
+    const compiler = new KeyboardInfoCompiler();
+    assert.isTrue(await compiler.init(callbacks, {sources}));
+    const origTextDecoderDecode = TextDecoder.prototype.decode;
+    TextDecoder.prototype.decode = () => { throw new TypeError(); }
+    assert.throws(() => compiler['loadJsFile'](jsFilename));
+    TextDecoder.prototype.decode = origTextDecoderDecode;
+  });
 });
