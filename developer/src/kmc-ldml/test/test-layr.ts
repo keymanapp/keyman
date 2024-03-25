@@ -110,5 +110,13 @@ describe('layr', function () {
       subpath: 'sections/layr/invalid-missing-layer.xml',
       errors: [CompilerMessages.Error_MustBeAtLeastOneLayerElement()],
     },
+    {
+      subpath: 'sections/keys/many-modifiers.xml',
+      callback(sect) {
+        const layr = <Layr> sect;
+        assert.ok(layr);
+        console.dir(layr);
+      },
+    },
   ]);
 });

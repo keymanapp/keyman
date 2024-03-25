@@ -174,29 +174,33 @@ describe('test of util/util.ts', () => {
   });
   describe('translateLayerAttrToModifier', () => {
     it('should map from layer info to modifier number', () => {
-      assert.equal(translateLayerAttrToModifier({
+      assert.sameDeepMembers(translateLayerAttrToModifier({
         id: 'base',
-      }), constants.keys_mod_none);
-      assert.equal(translateLayerAttrToModifier({
+      }), [constants.keys_mod_none]);
+      assert.sameDeepMembers(translateLayerAttrToModifier({
         id: 'base',
         modifiers: '',
-      }), constants.keys_mod_none);
-      assert.equal(translateLayerAttrToModifier({
+      }), [constants.keys_mod_none]);
+      assert.sameDeepMembers(translateLayerAttrToModifier({
         id: 'base',
         modifiers: 'none',
-      }), constants.keys_mod_none);
-      assert.equal(translateLayerAttrToModifier({
+      }), [constants.keys_mod_none]);
+      assert.sameDeepMembers(translateLayerAttrToModifier({
         id: 'shift',
         modifiers: 'shift',
-      }), constants.keys_mod_shift);
-      assert.equal(translateLayerAttrToModifier({
+      }), [constants.keys_mod_shift]);
+      assert.sameDeepMembers(translateLayerAttrToModifier({
         id: 'shift',
         modifiers: 'shift',
-      }), constants.keys_mod_shift);
-      assert.equal(translateLayerAttrToModifier({
+      }), [constants.keys_mod_shift]);
+      assert.sameDeepMembers(translateLayerAttrToModifier({
+        id: 'shiftOrCtrl',
+        modifiers: 'shift,ctrlL',
+      }), [constants.keys_mod_shift,constants.keys_mod_ctrlL]);
+      assert.sameDeepMembers(translateLayerAttrToModifier({
         id: 'altshift',
         modifiers: 'alt shift',
-      }), constants.keys_mod_alt | constants.keys_mod_shift);
+      }), [constants.keys_mod_alt | constants.keys_mod_shift]);
     });
     it('should round trip each possible modifier', () => {
       for(let str of constants.keys_mod_map.keys()) {
@@ -204,8 +208,8 @@ describe('test of util/util.ts', () => {
           id: str,
           modifiers: `${str}`,
         };
-        assert.equal(translateLayerAttrToModifier(layer),
-          constants.keys_mod_map.get(str), str);
+        assert.sameDeepMembers(translateLayerAttrToModifier(layer),
+          [constants.keys_mod_map.get(str)], str);
       }
     });
     it('should round trip each possible modifier with altL', () => {
@@ -214,8 +218,8 @@ describe('test of util/util.ts', () => {
           id: str,
           modifiers: `${str} altL`,
         };
-        assert.equal(translateLayerAttrToModifier(layer),
-          constants.keys_mod_map.get(str) | constants.keys_mod_altL, str);
+        assert.sameDeepMembers(translateLayerAttrToModifier(layer),
+          [constants.keys_mod_map.get(str) | constants.keys_mod_altL], str);
       }
     });
   });

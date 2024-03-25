@@ -403,6 +403,15 @@ describe('keys.kmap', function () {
         CompilerMessages.Error_MissingStringVariable({id: "varsok"}),
       ],
     },
+    // modifiers test
+    {
+      subpath: 'sections/keys/many-modifiers.xml',
+      callback(sect) {
+        const keys = <Keys> sect;
+        assert.ok(keys);
+        console.dir(keys);
+      },
+    },
   ], keysDependencies);
 
   it('should reject layouts with too many hardware rows', async function() {

@@ -156,14 +156,19 @@ export function verifyValidAndUnique(
 /**
  * Determine modifier from layer info
  * @param layer layer obj
- * @returns modifier
+ * @returns modifier array
  */
-export function translateLayerAttrToModifier(layer: LDMLKeyboard.LKLayer) : number {
+export function translateLayerAttrToModifier(layer: LDMLKeyboard.LKLayer) : number[] {
   const { modifiers } = layer;
+  if (!modifiers) return [constants.keys_mod_none];
+  return modifiers.split(',').map(m => translateModifierSubsetToLayer(m)).sort();
+}
+
+function translateModifierSubsetToLayer(modifiers: string) : number {
+  // TODO-LDML: Default #11072
   if (modifiers) {
-    // TODO-LDML
     if (modifiers.indexOf(',') !== -1) {
-      throw Error(`TODO-LDML #9838: ”,” in modifiers not supported yet.`);
+      throw Error(`This function only takes a single subset of the modifiers`);
     }
     let mod = constants.keys_mod_none;
     for (let str of modifiers.split(' ')) {
