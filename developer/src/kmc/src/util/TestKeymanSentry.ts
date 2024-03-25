@@ -1,6 +1,6 @@
 import { KmnCompiler } from "@keymanapp/kmc-kmn";
 import { NodeCompilerCallbacks } from "./NodeCompilerCallbacks.js";
-import { KeymanSentry } from '@keymanapp/developer-utils';
+import { KeymanSentry, SentryNodeOptions } from '@keymanapp/developer-utils';
 
 const cli = process.argv.join(' ');
 
@@ -13,16 +13,16 @@ export class TestKeymanSentry {
     return cli.includes('-sentry-client-test-exception');
   }
 
-  static async runTestIfCLRequested() {
+  static async runTestIfCLRequested(options?: SentryNodeOptions) {
     if(TestKeymanSentry.isTestCL()) {
-      await TestKeymanSentry.test();
+      await TestKeymanSentry.test(options);
       console.error('Unexpected return from KeymanSentry.test');
       process.exit(1);
     }
   }
 
-  static async test() {
-    KeymanSentry.init();
+  static async test(options?: SentryNodeOptions) {
+    KeymanSentry.init(options);
     if(cli.includes('kmcmplib')) {
       const compiler = new KmnCompiler();
       const callbacks = new NodeCompilerCallbacks({});
