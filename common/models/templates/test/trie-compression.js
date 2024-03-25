@@ -253,6 +253,9 @@ describe('Trie decompression', function () {
     // at each step, after all.
 
 //     // Chrome parses it safely, but VS Code complains about the encoding.
+//     // > "The file is not displayed in the text editor because it is either binary or uses an unsupported text encoding."
+//     // - likely b/c the "binary" angle.
+//     //
 //     // Complaints are dropped if all encoded numbers are offset by +0x0020.
 //     // - This does narrow the range of representable values a bit, though.
 //     // - It -also- brings manual encoding and JSON encoding into near-parity;
