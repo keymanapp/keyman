@@ -2,7 +2,7 @@ import { constants } from '@keymanapp/ldml-keyboard-constants';
 import * as r from 'restructure';
 import { ElementString } from './element-string.js';
 import { ListItem } from './string-list.js';
-import { isOneChar, toOneChar, unescapeString } from '../util/util.js';
+import { isOneChar, toOneChar, unescapeString, escapeStringForRegex } from '../util/util.js';
 import { KMXFile } from './kmx.js';
 import { UnicodeSetParser, UnicodeSet } from '@keymanapp/common-types';
 import { VariableParser } from '../ldml-keyboard/pattern-parser.js';
@@ -291,9 +291,9 @@ export class Vars extends Section {
       // try as set
       const set = Vars.findVariable(this.sets, id);
       if (set !== null) {
-        const items = set.rawItems;
-        const inner = items.join('|');
-        // TODO-LDML: string substitution here, #11037
+        const { items } = set;
+        const escapedStrings = items.map(v => escapeStringForRegex(v.value.value));
+        const inner = escapedStrings.join('|');
         return `(?:${inner})`;
       }
 

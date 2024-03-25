@@ -248,6 +248,8 @@ export class VarsCompiler extends SectionCompiler {
     // raw items - without marker substitution
     const rawItems: string[] = VariableParser.setSplitter(value);
     // cooked items - has substutition of markers
+    // this is not 'forMatch', all variables are to be assumed as string literals, not regex
+    // content.
     const cookedItems: string[] = rawItems.map(v => result.substituteMarkerString(v, false));
     result.sets.push(new SetVarItem(id, cookedItems, sections, rawItems));
   }

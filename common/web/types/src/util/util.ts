@@ -149,6 +149,13 @@ function regexOne(hex: string): string {
   return Array.from(unescaped).map(ch => escapeRegexCharIfSyntax(ch)).join('');
 }
 /**
+ * Escape a string (\uxxxx form) if there are any problematic codepoints
+ */
+export function escapeStringForRegex(s: string) : string {
+  return s.split('').map(ch => escapeRegexCharIfSyntax(ch)).join('');
+}
+
+/**
  * Unescapes a string according to UTS#18§1.1, see <https://www.unicode.org/reports/tr18/#Hex_notation>
  * @param s escaped string
  * @returns

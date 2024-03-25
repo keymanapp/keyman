@@ -146,9 +146,10 @@ export abstract class TransformCompiler<T extends TransformCompilerType, TranBas
       result.mapFrom = sections.strs.allocString(mapFrom[1]); // var name
       result.mapTo = sections.strs.allocString(mapTo[1]); // var name
     } else {
-      result.mapFrom = sections.strs.allocString(''); // TODO-LDML
-      result.mapTo = sections.strs.allocString(''); // TODO-LDML
+      result.mapFrom = sections.strs.allocString('');
+      result.mapTo = sections.strs.allocString('');
     }
+    // the set substution will not produce raw markers `\m{...}` but they will already be in sentinel form.
     cookedFrom = sections.vars.substituteSetRegex(cookedFrom, sections);
 
     // add in markers. idempotent if no markers.
