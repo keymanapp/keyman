@@ -377,6 +377,10 @@ ldml_event_state::emit_difference(const std::u32string &old_ctxt, const std::u32
   // So the BBBBB needs to be removed and then CCC added.
   auto ctxt_prefix = mismatch(old_ctxt.begin(), old_ctxt.end(), new_ctxt.begin(), new_ctxt.end());
 
+  if(ctxt_prefix.first == old_ctxt.end() && ctxt_prefix.second == new_ctxt.end()) {
+    return; // No mismatch. We can just exit, there's nothing to do.
+  }
+
   // handle a special case where we're simply changing from one marker to another.
   // Example:
   // 0. old_ctxtstr_changed ends with  … U+FFFF U+0008 | U+0001 …
@@ -390,14 +394,14 @@ ldml_event_state::emit_difference(const std::u32string &old_ctxt, const std::u32
   // marker change.
   // We can detect this because the unchanged_prefix will end with u+FFFF U+0008
   //
-  // Oh, and yes, test case 'regex-test-8a-0' hits this.
+  // k_212* and k_213* hit this case.
   std::u32string common_prefix(old_ctxt.begin(), ctxt_prefix.first);
   if (common_prefix.length() >= 2) {
     auto iter = common_prefix.rbegin();
     if (*(iter++) == LDML_MARKER_CODE && *(iter++) == UC_SENTINEL) {
       // adjust the iterator so that the "U+FFFF U+0008" is not a part of the common prefix.
-      ctxt_prefix.first -= 2;
-      ctxt_prefix.second += 2;
+      ctxt_prefix.first -= 2;  // backup the 'mismatch' point to before the FFFF
+      ctxt_prefix.second -= 2; // backup the 'mismatch' point to before the FFFF
       // Now, old_ctxtstr_changed and new_ctxtstr_changed will start with U+FFFF U+0008 …
     }
   }

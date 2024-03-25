@@ -28,10 +28,10 @@ tests_without_testdata = [
   'k_100_keytest',
   'k_101_keytest',
   'k_102_keytest',
-
+  'k_213_marker_11057',
 ]
 
-# These tests have a k_001_tiny-test.xml file as well.
+# These tests have a *-test.xml file as well.
 tests_with_testdata = [
   'ldml_test',
   'k_001_tiny',
@@ -44,6 +44,7 @@ tests_with_testdata = [
   'k_201_reorder_esk',
   'k_210_marker',
   'k_211_marker_escape',
+  'k_212_marker_11057',
 ]
 
 tests =  tests_without_testdata
