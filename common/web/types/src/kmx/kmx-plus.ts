@@ -272,7 +272,7 @@ export class Vars extends Section {
       return v.value.value; // string value
     });
   }
-  substituteStrings(str: string, sections: DependencySections): string {
+  substituteStrings(str: string, sections: DependencySections, forMatch?: boolean): string {
     if (!str) return str;
     return str.replaceAll(VariableParser.STRING_REFERENCE, (_entire, id) => {
       const val = this.findStringVariableValue(id);
@@ -280,6 +280,7 @@ export class Vars extends Section {
         // Should have been caught during validation.
         throw Error(`Internal Error: reference to missing string variable ${id}`);
       }
+      if (forMatch) return escapeStringForRegex(val);
       return val;
     });
   }
