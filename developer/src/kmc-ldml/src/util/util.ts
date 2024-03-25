@@ -188,8 +188,8 @@ function translateModifierSubsetToLayer(modifiers: string) : number {
 export function validModifier(modifier?: string) : boolean {
   if (!modifier) return true;  // valid to have no modifier, == none
   // TODO-LDML: enforce illegal combinations per spec.
-  for (let sub of modifier.split(',')) {
-    for (let str of sub.split(' ')) {
+  for (let sub of modifier.trim().split(',')) {
+    for (let str of sub.trim().split(' ')) {
       if (!constants.keys_mod_map.has(str)) {
         return false;
       }

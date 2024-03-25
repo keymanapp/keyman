@@ -10,7 +10,7 @@
     <layer id="base" modifiers="none">
       <row keys="a" />
     </layer>
-    <layer modifiers="altR shift, ctrl alt shift">
+    <layer modifiers="altR, ctrl shift">
       <row keys="c" />
     </layer>
     <!--
