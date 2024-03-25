@@ -2,6 +2,8 @@ import Sentry from "@sentry/node";
 import KEYMAN_VERSION from "@keymanapp/keyman-version";
 import { getOption } from "./options.js";
 
+export type SentryNodeOptions = Sentry.NodeOptions;
+
 /**
  * Maximum delay on shutdown of process to send pending events
  * to Sentry, in msec
@@ -23,25 +25,13 @@ export class KeymanSentry {
     return getOption('automatically report errors', true);
   }
 
-  static init() {
+  static init(options?: SentryNodeOptions) {
+    options = options ?? {};
     Sentry.init({
+      ...options,
       dsn: 'https://39b25a09410349a58fe12aaf721565af@o1005580.ingest.sentry.io/5983519',  // Keyman Developer
       environment: KEYMAN_VERSION.VERSION_ENVIRONMENT,
       release: KEYMAN_VERSION.VERSION_GIT_TAG,
-      beforeSend: function(event, hint) {
-        // console.error(hint.originalException || hint.syntheticException);
-        // TEMPORARY TEST PATCH ONLY:
-        let stacktrace = event?.exception && event?.exception?.values?.[0]?.stacktrace;
-        if (stacktrace?.frames) {
-          stacktrace.frames.forEach(function(frame) {
-            const filename = frame.filename.match(/[^/]+$/)[0]; //path.basename(frame.filename);
-            if(filename.endsWith('.mjs')) {
-              frame.filename = `/dist/${filename}`;
-            }
-          });
-        }
-        return event;
-      }
     });
     isInit = true;
   }
