@@ -74,9 +74,6 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
     KMManager.SpacebarText spacebarText = KMManager.SpacebarText.fromString(prefs.getString(KeymanSettingsActivity.spacebarTextKey, KMManager.SpacebarText.LANGUAGE_KEYBOARD.toString()));
     KMManager.setSpacebarText(spacebarText);
 
-    // Set the system keyboard HTML banner
-    BannerController.setHTMLBanner(this, KeyboardType.KEYBOARD_TYPE_SYSTEM);
-
     boolean mayHaveHapticFeedback = prefs.getBoolean(KeymanSettingsActivity.hapticFeedbackKey, false);
     KMManager.setHapticFeedback(mayHaveHapticFeedback);
 
@@ -99,9 +96,6 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
   @Override
   public void onInitializeInterface() {
     super.onInitializeInterface();
-
-    // KeymanWeb reloaded, so we have to pass the banner again
-    BannerController.setHTMLBanner(this, KeyboardType.KEYBOARD_TYPE_SYSTEM);
   }
 
   /**
@@ -119,6 +113,9 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
     ViewGroup parent = (ViewGroup) inputView.getParent();
     if (parent != null)
       parent.removeView(inputView);
+
+    // KeymanWeb reloaded, so we have to pass the banner again
+    BannerController.setHTMLBanner(this, KeyboardType.KEYBOARD_TYPE_SYSTEM);
 
     return inputView;
   }
