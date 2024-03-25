@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<keyboard3 conformsTo="45" xmlns="https://schemas.unicode.org/cldr/45/keyboard3" locale="mt" >
+  <info name="fail-matches-nothing"/>
+
+  <keys />
+
+  <transforms type="simple">
+    <transformGroup>
+      <transform from="X{0,1}Y{0,1}"/>
+    </transformGroup>
+  </transforms>
+</keyboard3>

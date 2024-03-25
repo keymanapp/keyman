@@ -174,7 +174,12 @@ export abstract class TransformCompiler<T extends TransformCompilerType, TranBas
 
     // Verify that the regex is syntactically valid
     try {
-      new RegExp(cookedFrom, 'ug');
+      const rg = new RegExp(cookedFrom + '$', 'ug');
+      // does it match an empty string?
+      if (rg.test('')) {
+        this.callbacks.reportMessage(CompilerMessages.Error_TransformFromMatchesNothing({ from: transform.from }));
+        return null;
+      }
     } catch (e) {
       this.callbacks.reportMessage(CompilerMessages.Error_UnparseableTransformFrom({ from: transform.from, message: e.message }));
       return null; // error
