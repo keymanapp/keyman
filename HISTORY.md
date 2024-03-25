@@ -1,5 +1,13 @@
 # Keyman Version History
 
+## 17.0.294 beta 2024-03-25
+
+* chore(android,windows): Update crowdin strings for French (#11063)
+* chore(common): Fix missing entries in HISTORY.md (#11064)
+* fix(developer): catch sharing violation when saving mru (#11047)
+* fix(developer): capture alt shortcuts in LDML keyboard debugger (#11049)
+* fix(developer): correct path for kmc sourcemaps in sentry upload (#11051)
+
 ## 17.0.293 beta 2024-03-22
 
 * chore(oem/fv): Update keyboard versions in keyboards.csv (#11013)
