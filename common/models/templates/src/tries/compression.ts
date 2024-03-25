@@ -1,6 +1,12 @@
 import { Entry, InternalNode, Leaf, Node } from "../trie-model.js";
 
-const SINGLE_CHAR_RANGE = Math.pow(2, 16);
+// const SINGLE_CHAR_RANGE = Math.pow(2, 16) - 64;
+// const ENCODED_NUM_BASE = 64;
+
+// Offsetting by even just 0x0020 avoids control-code chars + avoids VS Code not liking the encoding.
+const ENCODED_NUM_BASE = 0x0020;
+const SINGLE_CHAR_RANGE = Math.pow(2, 16) - ENCODED_NUM_BASE;
+
 const WEIGHT_WIDTH = 2;
 const NODE_SIZE_WIDTH = 2;
 
@@ -10,7 +16,7 @@ export function decompressNumber(str: string, start: number, end: number) {
 
   for(let i = start; i < end; i++) {
     let val = str.charCodeAt(i);
-    num = num * SINGLE_CHAR_RANGE + val;
+    num = num * SINGLE_CHAR_RANGE + val - ENCODED_NUM_BASE;
   }
 
   return num;
@@ -23,7 +29,7 @@ export function compressNumber(num: number, width?: number) {
   // Note:  JS bit-shift operators assume 32-bit signed ints.
   // JS numbers can easily represent larger ints, though.
   while(width > 0) {
-    const piece = num % SINGLE_CHAR_RANGE;
+    const piece = num % SINGLE_CHAR_RANGE + ENCODED_NUM_BASE;
     num = Math.floor(num / SINGLE_CHAR_RANGE);
 
     compressed = String.fromCharCode(piece) + compressed;

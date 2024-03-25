@@ -9,6 +9,14 @@ import {
   compressNumber, decompressNumber
 } from '@keymanapp/models-templates/obj/tries/compression.js';
 
+import fs from 'fs';
+
+// Written with:
+// const ENCODED_NUM_BASE = 0; // 0x0020;
+// const SINGLE_CHAR_RANGE = Math.pow(2, 16) - ENCODED_NUM_BASE;
+//
+// Will need manual re-encoding for \u-sequences if ENCODED_NUM_BASE is changed.
+
 const TEST_DATA = {};
 TEST_DATA.ENTRIES = {
   four: {
@@ -214,13 +222,22 @@ describe('Trie decompression', function () {
     const trie = jsonFixture('tries/english-1000');
     // The test:  does it throw?
     const compressedTrie = compressNode(trie.root);
+
+    const encodedSerializableString = `${
+      compressedTrie
+        .replace(/\\/g, '\\\\') // preservation - escape char as literal
+        .replace(/`/g, '\\`') // escape the primary quote
+        .replace(/\n/g, '\\n') // prevent CRLF shenanigans
+        .replace(/\r/g, '\\r')
+    }`;
+
     const compression = {
       // Achieves FAR better compression than JSON.stringify, which \u-escapes most chars.
       // As of the commit when this was written...
       // - length of encoding below: 26097
       // - JSON-encoding length:  69122
       // - Source fixture's filesize: 141309 bytes
-      root: `"${compressedTrie.replace(/"/g, '\"')}"`,
+      root: `\`${encodedSerializableString}\``,
       totalWeight: trie.totalWeight
     }
 
@@ -228,11 +245,77 @@ describe('Trie decompression', function () {
     // as part of decompression, avoiding the near-duplicating key/content effect we currently have.
     // - if we didn't save the keys: 20490 (estimation)  (~21.4% savings)
 
-    // // TODO:  Temp code for diagnostics & exploration.
-    // console.log(`Compressed length: ${compression.root.length}`);
-    // console.log(`Result: ${compression.root}`);
+    // TODO:  Temp code for diagnostics & exploration.
+    console.log(`Compressed length: ${compression.root.length}`);
+    console.log(`Result: ${compression.root}`);
 
     // Note: a naive round-tripping test won't work.  We only partly decompress
     // at each step, after all.
+
+//     // Chrome parses it safely, but VS Code complains about the encoding.
+//     // Complaints are dropped if all encoded numbers are offset by +0x0020.
+//     // - This does narrow the range of representable values a bit, though.
+//     // - It -also- brings manual encoding and JSON encoding into near-parity;
+//     //   control char escapes were using a lot of space.
+//     //
+//     fs.writeFileSync('temptemp.js', `let trieData = {
+//   "root": ${compression.root},
+//   "totalWeight": ${compression.totalWeight}
+// }`
+//     );
+
+//     fs.writeFileSync('temptemp.json', `{
+//   "root": ${JSON.stringify(compressedTrie)},
+//   "totalWeight": ${compression.totalWeight}
+// }`
+//     );
   });
+
+//   it('compresses fixture successfully: sil.km.gcc - 1.0', () => {
+//     const trie = jsonFixture('tries/sil.km.gcc - 1.0');
+//     // The test:  does it throw?
+//     const compressedTrie = compressNode(trie.root);
+
+//     const encodedSerializableString = `${
+//       compressedTrie
+//         .replace(/\\/g, '\\\\') // preservation - escape char as literal
+//         .replace(/`/g, '\\`') // escape the primary quote
+//         .replace(/\n/g, '\\n') // prevent CRLF shenanigans
+//         .replace(/\r/g, '\\r')
+//     }`;
+
+//     const compression = {
+//       // Achieves FAR better compression than JSON.stringify, which \u-escapes most chars.
+//       // As of the commit when this was written...
+//       // - length of encoding below: 405468
+//       // - JSON-encoding length:  1145955
+//       // - Source fixture's filesize: 2491696 bytes
+//       //
+//       // As is... it compressed in 99ms on my personal development machine.
+//       root: `"${encodedSerializableString}"`,
+//       totalWeight: trie.totalWeight
+//     }
+
+//     // We could easily get even better savings (with some cost) by using the search-term-to-key function
+//     // as part of decompression, avoiding the near-duplicating key/content effect we currently have.
+
+//     // TODO:  Temp code for diagnostics & exploration.
+//     console.log(`Compressed length: ${compression.root.length}`);
+//     // console.log(`Result: ${compression.root}`);
+
+//     // Note: a naive round-tripping test won't work.  We only partly decompress
+//     // at each step, after all.
+
+//     fs.writeFileSync('temptemp.js', `let trieData = {
+//   "root": ${compression.root},
+//   "totalWeight": ${compression.totalWeight}
+// }`
+//     );
+
+//     fs.writeFileSync('temptemp.json', `{
+//   "root": ${JSON.stringify(compressedTrie)},
+//   "totalWeight": ${compression.totalWeight}
+// }`
+//     );
+//   });
 });
