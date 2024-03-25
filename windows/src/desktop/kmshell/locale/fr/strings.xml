@@ -449,7 +449,7 @@
   <!-- Context: Download Keyboard Dialog -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="S_DownloadKeyboard_Title" comment="Download keyboard layout from keyman.com dialog title">Télécharger le clavier à partir du site Tavultesoft</string>
+  <string name="S_DownloadKeyboard_Title" comment="Download keyboard layout from keyman.com dialog title">Télécharger un clavier à partir du site keyman.com</string>
   <!-- Context: Download Keyboard Dialog -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
