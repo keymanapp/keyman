@@ -126,7 +126,9 @@ bool LdmlTestSource::get_expected_beep() const {
 // trim from start (in place)
 static inline void
 ltrim(std::string &s) {
-  s.erase(s.begin(), std::find_if(s.begin(), s.end(), [](int ch) { return !std::isspace(ch); }));
+  // std::isspace chokes on negative (!) ints here, so spare it the trouble if ch is negative
+  // (possibly unsigned char to integer cast?)
+  s.erase(s.begin(), std::find_if(s.begin(), s.end(), [](int ch) { return (ch < 0) || !std::isspace(ch); }));
 }
 
 // trim from end (in place)
