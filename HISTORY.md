@@ -19,7 +19,7 @@
 
 ## 17.0.290 beta 2024-03-19
 
-*  (#10956)
+* fix(ios): Sync selection range for long contexts (#10956)
 
 ## 17.0.289 beta 2024-03-16
 
@@ -61,9 +61,9 @@
 
 * fix(android): fixes context-change detection for repeated-char cases (#10873)
 * fix(developer): search-term quote replacement was not global (#10934)
-*  (#10913)
+* chore(common): Update ldml out of techpreview (#10913)
 * fix(developer): fix for errant \uXXXX error (#10946)
-*  (#10948)
+* fix(developer): suppport loose match for CompilerEvents (#10948)
 * refactor(oem/fv/android): Install fallback keyboard (#10907)
 * refactor(android/app): Move storage permission checks (#10904)
 * fix(common): missing script exec bit (#10951)
@@ -103,7 +103,7 @@
 ## 17.0.278 beta 2024-02-28
 
 * docs(linux): Updated whatsnew for Keyman for Linux 17 (#10858)
-*  (#10869)
+* fix(web): Save context state on reset (#10869)
 * chore(android/engine): Reduce toast notifications after installations (#10868)
 * fix(android/engine): Check selection indexes (#10857)
 
@@ -125,7 +125,7 @@
 
 ## 17.0.275 beta 2024-02-23
 
-*  (#10791)
+* chore(core): Update sample ldml keyboard (#10791)
 * fix(developer): publish keymancore-1.dll symbols (#10797)
 * fix(developer): improve uploading of sourcemaps to sentry (#10798)
 * fix(android/engine): Fix how keyboard picker menu exits (#10806)
@@ -160,7 +160,7 @@
 * fix(core): fix output append logic in any_group::apply_transform (#10758)
 * fix(android): Match phone suggestion banner styling on tablet (#10760)
 * docs(mac): Document What's New for version 17.0 (#10764)
-*  (#10773)
+* fix(developer): Rename missing variables in tests (#10773)
 * chore(developer): reduce WARN_TouchLayoutUsesUnsupportedGesturesDownlevel to HINT (#10766)
 * fix(developer): prevent renaming of new project types in New Project dialog (#10767)
 * fix(developer): return an error code if build-test-data fails (#10765)
@@ -178,14 +178,14 @@
 * fix(web): sticky special-key highlighting (#10729)
 * fix(web): disables modipress for layer-switch keys with subkeys (#10745)
 * fix(web): missing null-guard for hardware keystrokes without active Keyman keyboard (#10740)
-* docs(ios): what's new in 17.0 (#10748)
+* docs(ios): add what's new in 17.0 (#10748)
 * fix(web): handling of page-elements focused before engine initialization (#10744)
 * fix(ios): multitap consistency after new-lines (#10728)
 * docs(common): Update website README (#10738)
 
 ## 17.0.270 beta 2024-02-17
 
-*  (#10735)
+* fix(core): Update more tests and fix ldml_transforms (#10735)
 
 ## 17.0.269 beta 2024-02-15
 
