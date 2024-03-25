@@ -8,6 +8,8 @@ import langtags from "../src/imports/langtags.js";
 import { KmpCompiler, KmpCompilerOptions } from '@keymanapp/kmc-package';
 import { CompilerCallbacks, KMX, KeymanFileTypes, KeymanTargets, KmpJsonFile } from '@keymanapp/common-types';
 import { KeyboardInfoFile, KeyboardInfoFilePlatform } from './keyboard-info-file.js';
+//import { PackageVersionValidator } from '../../kmc-package/src/compiler/package-version-validator.js';
+//import { KeyboardMetadataCollection } from '../../kmc-package/src/compiler/package-metadata-collector.js';
 
 const callbacks = new TestCompilerCallbacks();
 
@@ -304,7 +306,7 @@ describe('keyboard-info-compiler', function () {
   });
 
   it('check loadKmxFiles throws error if .kmx file is missing from disk', async function() {
-    const kpsFilename =    makePathToFixture('khmer_angkor', 'source', 'khmer_angkor.kps');
+    const kpsFilename = makePathToFixture('khmer_angkor', 'source', 'khmer_angkor.kps');
     const compiler = new KeyboardInfoCompiler();
     const kmpCompiler = new KmpCompiler();
     assert.isTrue(await kmpCompiler.init(callbacks, {}));
@@ -315,4 +317,41 @@ describe('keyboard-info-compiler', function () {
     kmpJsonData.files[kmpIndex].name = '../build/throw_error.kmx';
     assert.throws(() => compiler['loadKmxFiles'](kpsFilename, kmpJsonData));
   });  
+
+  it('check loadKmxFiles can handle two .kmx files', async function() {
+    const jsFilename = makePathToFixture('two-kmx', 'build', 'two-kmx.js');
+    const kpsFilename = makePathToFixture('two-kmx', 'source', 'two-kmx.kps');
+    const kmpFilename = makePathToFixture('two-kmx', 'build', 'two-kmx.kmp');
+
+    const sources = {
+      kmpFilename,
+      sourcePath: 'release/k/two-kmx',
+      kpsFilename,
+      jsFilename: jsFilename,
+      forPublishing: true,
+    };
+
+    const kmx_filename_001 = 'k_001___basic_input_unicodei.kmx';
+    const kmx_filename_002 = 'k_002___basic_input_unicode.kmx';
+    
+    const compiler = new KeyboardInfoCompiler();
+    assert.isTrue(await compiler.init(callbacks, {sources}));
+    const kmpJsonData: KmpJsonFile.KmpJsonFile = {
+      system: { fileVersion: '', keymanDeveloperVersion: '' },
+      options: null,
+      files: [
+        { name: '../build/' + kmx_filename_001, description: 'Keyboard 001' },
+        { name: '../build/' + kmx_filename_002, description: 'Keyboard 002' },
+      ]
+    };
+    const kmxFiles: {
+      filename: string,
+      data: KMX.KEYBOARD
+    }[] = compiler['loadKmxFiles'](kpsFilename, kmpJsonData);
+    assert.equal(kmxFiles.length, 2);
+    assert.deepEqual(kmxFiles[0].filename, kmx_filename_001);
+    assert.deepEqual(kmxFiles[1].filename, kmx_filename_002);
+    assert.isNotNull(kmxFiles[0].data);
+    assert.isNotNull(kmxFiles[1].data);
+  });    
 });
