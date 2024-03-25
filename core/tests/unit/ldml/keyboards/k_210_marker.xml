@@ -24,7 +24,7 @@
       <row keys="grave acute caret hacek" />
       <row keys="q w e" /> <!-- etc -->
       <row keys="a s d" /> <!-- etc -->
-      <row keys="z x c" /> <!-- etc -->
+      <row keys="z x c v" /> <!-- etc -->
     </layer>
   </layers>
 
@@ -37,7 +37,7 @@
   <transforms type="simple">
     <transformGroup>
       <!-- for regression  #11045 -->
-      <transform from="($[mark_accent])x" to="$[1:spacing_accent]" />
+      <transform from="v($[mark_accent])" to="$[1:spacing_accent]" />
       <transform from="\m{.}z" to="Z" />
     </transformGroup>
     <transformGroup>

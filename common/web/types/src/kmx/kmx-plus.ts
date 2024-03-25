@@ -291,9 +291,10 @@ export class Vars extends Section {
       // try as set
       const set = Vars.findVariable(this.sets, id);
       if (set !== null) {
-        const { items } = set;
-        const inner = items.map(i => i.value.value).join('|');
-        return `(?:${inner})`; // TODO-LDML: need to escape here
+        const items = set.rawItems;
+        const inner = items.join('|');
+        // TODO-LDML: string substitution here, #11037
+        return `(?:${inner})`;
       }
 
       // try as unicodeset
@@ -372,11 +373,15 @@ export class UnicodeSetItem extends VarsItem {
 };
 
 export class SetVarItem extends VarsItem {
-  constructor(id: string, value: string[], sections: DependencySections) {
+  constructor(id: string, value: string[], sections: DependencySections, rawItems: string[]) {
     super(id, value.join(' '), sections);
     this.items = sections.elem.allocElementString(sections, value);
+    this.rawItems = rawItems;
   }
+  // element string array
   items: ElementString;
+  // like items, but with unprocessed marker strings
+  rawItems: string[];
   valid() : boolean {
     return !!this.items;
   }
