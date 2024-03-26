@@ -1,5 +1,11 @@
 # Keyman Version History
 
+## 17.0.295 beta 2024-03-26
+
+* docs(developer): add help site links (#10939)
+* chore(common): Update keymanweb-osk.ttf to 4.1 (#11035)
+* feat(linux): Start dbus if not running (#10863)
+
 ## 17.0.294 beta 2024-03-25
 
 * chore(android,windows): Update crowdin strings for French (#11063)
