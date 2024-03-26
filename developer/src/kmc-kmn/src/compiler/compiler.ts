@@ -551,18 +551,18 @@ export class KmnCompiler implements KeymanCompiler, UnicodeSetParser {
       return null;
     }
 
-    // TODO-LDML: Catch OOM
-    const buf = this.wasmExports.malloc(rangeCount * 2 * Module.HEAPU32.BYTES_PER_ELEMENT);
-    // fix \u1234 pattern format
-    pattern = KmnCompiler.fixNewPattern(pattern);
-    /** If <= 0: return code. If positive: range count */
-    if (buf < 0) {
-      throw new RangeError(`Internal error: wasm malloc() returned ${buf}`);
-    }
-    if ((rangeCount*2) < 0) {
+    if ((rangeCount * 2) < 0) {
       throw new RangeError(`Internal error: negative rangeCount * 2 = ${rangeCount * 2}`);
     }
+    const buf = this.wasmExports.malloc(rangeCount * 2 * Module.HEAPU32.BYTES_PER_ELEMENT);
+    if (buf <= 0) {
+      // out of memory will return zero.
+      throw new RangeError(`Internal error: wasm malloc() returned ${buf}`);
+    }
+    // fix \u1234 pattern format
+    pattern = KmnCompiler.fixNewPattern(pattern);
     const rc = Module.kmcmp_parseUnicodeSet(pattern, buf, rangeCount * 2);
+    /** If <= 0: error return code. If positive: it's a range count */
     if (rc >= 0) {
       const ranges = [];
       const startu = (buf / Module.HEAPU32.BYTES_PER_ELEMENT);
