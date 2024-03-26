@@ -1346,7 +1346,7 @@ public final class KMManager {
         }
 
         File file = new File(fontFilename);
-        if (file.exists()) {
+        if (file != null && file.exists() && file.length() > 0) {
           return Typeface.createFromFile(file);
         }
       }
