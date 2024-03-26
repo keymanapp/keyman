@@ -159,7 +159,7 @@ def _start_ibus_daemon(realuser):
         if parse_version(_get_ibus_version()) >= parse_version('1.5.28'):
             # IBus ~1.5.28 added the `start` command, so we use that if possible
             # and let IBus deal with the necessary parameters
-            args = ['ibus', 'start']
+            args = ['ibus', 'start', '-d']
         else:
             # If IBus is too old we have to start ibus-daemon directly and pass
             # what we think are the correct parameters
