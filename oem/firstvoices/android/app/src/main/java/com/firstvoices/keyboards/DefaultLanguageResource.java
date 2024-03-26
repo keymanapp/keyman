@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 
 import com.keyman.engine.KMManager;
 import com.keyman.engine.data.Keyboard;
+import com.keyman.engine.data.KeyboardController;
 import com.keyman.engine.data.LexicalModel;
 
 import java.util.HashMap;
@@ -43,10 +44,10 @@ public class DefaultLanguageResource {
 
     SharedPreferences prefs = context.getSharedPreferences(context.getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
 
-    // Add default keyboard
+    // Add default keyboard if no keyboards exist
     if (!prefs.getBoolean(defaultKeyboardInstalled, false)) {
       if (!KMManager.keyboardExists(context, FVShared.FVDefault_PackageID, KMManager.KMDefault_KeyboardID,
-        KMManager.KMDefault_LanguageID)) {
+        KMManager.KMDefault_LanguageID) && KeyboardController.getInstance().get().size() < 1) {
 
         KMManager.addKeyboard(context, KMManager.getDefaultKeyboard(context.getApplicationContext()));
       }
