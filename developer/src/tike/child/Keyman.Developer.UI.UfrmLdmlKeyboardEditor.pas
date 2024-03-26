@@ -32,6 +32,7 @@ type
   protected
     procedure LoadSettings; override;
     procedure SaveSettings(SaveProject: Boolean); override;
+    function GetHelpTopic: string; override;
   public
     procedure StartDebugging;
     procedure StopDebugging;
@@ -45,6 +46,7 @@ implementation
 uses
   keymanstrings,
   KeymanDeveloperOptions,
+  Keyman.Developer.System.HelpTopics,
   Keyman.System.Debug.DebugUIStatus,
   Keyman.Developer.System.Project.xmlLdmlProjectFile,
   Keyman.Developer.UI.Project.ProjectFileUI,
@@ -63,6 +65,11 @@ begin
   inherited;
   EditorFormat := efXML;
   SetupDebugForm;
+end;
+
+function TfrmLdmlKeyboardEditor.GetHelpTopic: string;
+begin
+  Result := SHelpTopic_Context_LdmlEditor;
 end;
 
 function TfrmLdmlKeyboardEditor.GetIsDebugVisible: Boolean;
