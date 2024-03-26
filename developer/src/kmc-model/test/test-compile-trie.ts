@@ -168,7 +168,5 @@ describe('createTrieDataStructure()', function () {
     let sourceCode = createTrieDataStructure([WORDLIST_FILENAME], (wf) => wf);
     assert.notMatch(sourceCode, /"undefined"/);
     assert.notMatch(sourceCode, /null/);
-
-    console.log(sourceCode);
   })
 });

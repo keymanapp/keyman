@@ -376,7 +376,7 @@ namespace Trie {
     let char = item.key[index];
     // If an internal node is the proper site for item, it belongs under the
     // corresponding (sentinel, internal-use) child node signifying this.
-    if(char === null || char === undefined) {
+    if(char == undefined) {
       char = INTERNAL_VALUE;
     }
     if (!node.children[char]) {
