@@ -271,6 +271,7 @@ export class KeyboardInfoCompiler implements KeymanCompiler {
     if(sources.jsFilename) {
       keyboard_info.jsFilename = this.callbacks.path.basename(sources.jsFilename);
       // Always overwrite with actual file size
+      /* c8 ignore next 5 */
       keyboard_info.jsFileSize = this.callbacks.fileSize(sources.jsFilename);
       if(keyboard_info.jsFileSize === undefined) {
         this.callbacks.reportMessage(KeyboardInfoCompilerMessages.Error_FileDoesNotExist({filename:sources.jsFilename}));
@@ -594,11 +595,20 @@ export class KeyboardInfoCompiler implements KeymanCompiler {
       return null;
     }
 
+    let fontFamily = null;
+    try {
+      fontFamily = await getFontFamily(fontData)
+    } catch(e) {
+      this.callbacks.reportMessage(KeyboardInfoCompilerMessages.Error_FontFileMetaDataIsInvalid({filename: sourcePath,message: e}));
+      return null;
+    }
+
     const result = {
-      family: await getFontFamily(fontData),
+      family: fontFamily,
       source
     };
 
+    /* c8 ignore next 4 */
     if(!result.family) {
       this.callbacks.reportMessage(KeyboardInfoCompilerMessages.Error_FontFileCannotBeRead({filename: sourcePath}));
       return null;
