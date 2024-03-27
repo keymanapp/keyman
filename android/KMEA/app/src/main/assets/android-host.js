@@ -70,7 +70,7 @@ function showBanner(flag) {
     if (bannerHTMLContents != '') {
       bc.inactiveBanner = flag ? new bc.HTMLBanner(bannerHTMLContents) : null;
     } else {
-      bc.inactiveBanner = flag ? new bc.ImageBanner(bannerImagePath) : null;
+      bc.inactiveBanner = flag ? new bc.BlankBanner() : null;
     }
   }
 }
