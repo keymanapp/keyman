@@ -11,11 +11,11 @@
  * - value > 0 if `b` should come before `a`
  * - 0 if they should be treated equally.
  */
-export type Comparator<Type> = (a: Type, b: Type) => number;
+export type QueueComparator<Type> = (a: Type, b: Type) => number;
 
 export default class PriorityQueue<Type> {
 
-  private comparator: Comparator<Type>;
+  private comparator: QueueComparator<Type>;
   private heap: Type[];
 
   /**
@@ -29,8 +29,8 @@ export default class PriorityQueue<Type> {
    * the first parameter should precede the second parameter.
    * @param initialEntries
    */
-  constructor(comparator: Comparator<Type>, initialEntries?: Type[]);
-  constructor(arg1: Comparator<Type> | PriorityQueue<Type>, initialEntries?: Type[]) {
+  constructor(comparator: QueueComparator<Type>, initialEntries?: Type[]);
+  constructor(arg1: QueueComparator<Type> | PriorityQueue<Type>, initialEntries?: Type[]) {
     if(typeof arg1 != 'function') {
       this.comparator = arg1.comparator;
       // Shallow-copies are fine.
