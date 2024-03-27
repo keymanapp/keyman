@@ -1,8 +1,8 @@
 #!/usr/bin/python3
 import unittest
-from unittest.mock import patch
+from unittest.mock import Mock, patch
 
-from keyman_config.ibus_util import get_ibus_bus, install_to_ibus, uninstall_from_ibus
+from keyman_config.ibus_util import _get_ibus_version, get_ibus_bus, install_to_ibus, uninstall_from_ibus
 
 
 @patch('keyman_config.ibus_util.IBus.Bus')
@@ -91,6 +91,19 @@ class IbusUtilTests(unittest.TestCase):
         mock_ibusBusInstance.preload_engines.assert_called_once_with(
             ['k1', 'k2', 'k3'])
 
+    @patch('subprocess.run')
+    def test_get_ibus_version(self, patched_subprocess_run, patched_time_sleep, MockIbusBusClass):
+        # Setup
+        patched_subprocess_run.return_value = Mock(
+            stdout=b'IBus 1.5.28\n',  # Simulating the output of the subprocess command
+            returncode=0  # Simulating a successful execution
+        )
+
+        # Execute
+        ibus_version = _get_ibus_version()
+
+        # Verify
+        self.assertEqual(ibus_version, '1.5.28')
 
 if __name__ == '__main__':
     unittest.main()

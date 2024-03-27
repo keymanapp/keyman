@@ -293,7 +293,7 @@ end;
 
 function TfrmNewLDMLKeyboardProjectParameters.GetHelpTopic: string;
 begin
-  Result := SHelpTopic_Context_NewProjectParameters;
+  Result := SHelpTopic_Context_NewLdmlProjectParameters;
 end;
 
 function TfrmNewLDMLKeyboardProjectParameters.GetKeyboardID: string;
