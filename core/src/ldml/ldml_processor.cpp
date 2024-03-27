@@ -377,10 +377,6 @@ ldml_event_state::emit_difference(const std::u32string &old_ctxt, const std::u32
   // So the BBBBB needs to be removed and then CCC added.
   auto ctxt_prefix = mismatch(old_ctxt.begin(), old_ctxt.end(), new_ctxt.begin(), new_ctxt.end());
 
-  if(ctxt_prefix.first == old_ctxt.end() && ctxt_prefix.second == new_ctxt.end()) {
-    return; // No mismatch. We can just exit, there's nothing to do.
-  }
-
   // handle a special case where we're simply changing from one marker to another.
   // Example:
   // 0. old_ctxtstr_changed ends with  … U+FFFF U+0008 | U+0001 …
