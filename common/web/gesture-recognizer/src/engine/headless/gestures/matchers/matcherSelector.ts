@@ -234,10 +234,22 @@ export class MatcherSelector<Type, StateToken = any> extends EventEmitter<EventM
     const unmatchedSource = sourceNotYetStaged ? source : null;
     const priorMatcher = sourceNotYetStaged ? null: source;
 
+    // matchGesture calls should be queued and act atomically, in sequence.
     if(this.pendingMatchSetup) {
+      const parentLockPromise = this.pendingMatchSetup;
+      const childLock = new ManagedPromise<void>();
+
+      this.pendingMatchSetup = childLock.corePromise;
+
       // If a prior call is still waiting on the `await` below, wait for it to clear
       // entirely before proceeding; there could be effects for how the next part below is processed.
-      await this.pendingMatchSetup;
+
+      await parentLockPromise;
+
+      if(this.pendingMatchSetup == childLock.corePromise) {
+        this.pendingMatchSetup = null;
+      }
+      childLock.resolve(); // allow the next matchGesture call through.
     }
 
     if(sourceNotYetStaged) {
@@ -313,14 +325,20 @@ export class MatcherSelector<Type, StateToken = any> extends EventEmitter<EventM
          * Reference: https://javascript.info/event-loop
          */
 
-        const pendingMatchGesture = new ManagedPromise<void>();
-        this.pendingMatchSetup = pendingMatchGesture.corePromise;
+        const matchingLock = new ManagedPromise<void>();
+        this.pendingMatchSetup = matchingLock.corePromise;
+
         await timedPromise(0);
         // A second one, in case of a deferred modipress completion (via awaitNested)
         // (which itself needs a macroqueue wait)
         await timedPromise(0);
-        this.pendingMatchSetup = null;
-        pendingMatchGesture.resolve();
+
+        // Only clear the promise if no extra entries were added to the implied `matchGesture` queue.
+        if(this.pendingMatchSetup == matchingLock.corePromise) {
+          this.pendingMatchSetup = null;
+        }
+
+        matchingLock.resolve();
 
         // stateToken may have shifted by the time we regain control here.
         const incomingStateToken = this.stateToken;
