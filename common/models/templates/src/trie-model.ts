@@ -26,12 +26,11 @@
 // Should probably make a 'lm-utils' submodule.
 
 // Allows the kmwstring bindings to resolve.
-import { extendString } from "@keymanapp/web-utils";
+import { extendString, PriorityQueue } from "@keymanapp/web-utils";
 import { default as defaultWordBreaker } from "@keymanapp/models-wordbreakers";
 
 import { applyTransform, isHighSurrogate, isSentinel, SENTINEL_CODE_UNIT, transformToSuggestion } from "./common.js";
 import { getLastPreCaretToken } from "./tokenization.js";
-import PriorityQueue from "./priority-queue.js";
 
 extendString();
 
@@ -95,13 +94,70 @@ class Traversal implements LexiconTraversal {
    */
   root: Node;
 
-  constructor(root: Node, prefix: string) {
+  /**
+   * The max weight for the Trie being 'traversed'.  Needed for probability
+   * calculations.
+   */
+  totalWeight: number;
+
+  constructor(root: Node, prefix: string, totalWeight: number) {
     this.root = root;
     this.prefix = prefix;
+    this.totalWeight = totalWeight;
   }
 
-  *children(): Generator<{char: string, traversal: () => LexiconTraversal}> {
+  child(char: USVString): LexiconTraversal | undefined {
+    /*
+      Note: would otherwise return the current instance if `char == ''`.  If
+      such a call is happening, it's probably indicative of an implementation
+      issue elsewhere - let's signal now in order to catch such stuff early.
+    */
+    if(char == '') {
+      return undefined;
+    }
+
+    // Split into individual code units.
+    let steps = char.split('');
+    let traversal: ReturnType<Traversal["_child"]> = this;
+
+    while(steps.length > 0 && traversal) {
+      const step: string = steps.shift()!;
+      traversal = traversal._child(step);
+    }
+
+    return traversal;
+  }
+
+  // Handles one code unit at a time.
+  private _child(char: USVString): Traversal | undefined {
+    const root = this.root;
+    const totalWeight = this.totalWeight;
+    const nextPrefix = this.prefix + char;
+
+    if(root.type == 'internal') {
+      let childNode = root.children[char];
+      if(!childNode) {
+        return undefined;
+      }
+
+      return new Traversal(childNode, nextPrefix, totalWeight);
+    } else {
+      // root.type == 'leaf';
+      const legalChildren = root.entries.filter(function(entry) {
+        return entry.key.indexOf(nextPrefix) == 0;
+      });
+
+      if(!legalChildren.length) {
+        return undefined;
+      }
+
+      return new Traversal(root, nextPrefix, totalWeight);
+    }
+  }
+
+  *children(): Generator<{char: USVString, traversal: () => LexiconTraversal}> {
     let root = this.root;
+    const totalWeight = this.totalWeight;
 
     if(root.type == 'internal') {
       for(let entry of root.values) {
@@ -120,7 +176,7 @@ class Traversal implements LexiconTraversal {
               let prefix = this.prefix + entry + lowSurrogate;
               yield {
                 char: entry + lowSurrogate,
-                traversal: function() { return new Traversal(internalNode.children[lowSurrogate], prefix) }
+                traversal: function() { return new Traversal(internalNode.children[lowSurrogate], prefix, totalWeight) }
               }
             }
           } else {
@@ -131,7 +187,7 @@ class Traversal implements LexiconTraversal {
 
             yield {
               char: entry,
-              traversal: function () {return new Traversal(entryNode, prefix)}
+              traversal: function () {return new Traversal(entryNode, prefix, totalWeight)}
             }
           }
         } else if(isSentinel(entry)) {
@@ -143,7 +199,7 @@ class Traversal implements LexiconTraversal {
           let prefix = this.prefix + entry;
           yield {
             char: entry,
-            traversal: function() { return new Traversal(entryNode, prefix)}
+            traversal: function() { return new Traversal(entryNode, prefix, totalWeight)}
           }
         }
       }
@@ -165,29 +221,41 @@ class Traversal implements LexiconTraversal {
         }
         yield {
           char: nodeKey,
-          traversal: function() { return new Traversal(root, prefix + nodeKey)}
+          traversal: function() { return new Traversal(root, prefix + nodeKey, totalWeight)}
         }
       };
       return;
     }
   }
 
-  get entries(): string[] {
+  get entries() {
+    const totalWeight = this.totalWeight;
+    const entryMapper = function(value: Entry) {
+      return {
+        text: value.content,
+        p: value.weight / totalWeight
+      }
+    }
+
     if(this.root.type == 'leaf') {
       let prefix = this.prefix;
       let matches = this.root.entries.filter(function(entry) {
         return entry.key == prefix;
       });
 
-      return matches.map(function(value) { return value.content });
+      return matches.map(entryMapper);
     } else {
       let matchingLeaf = this.root.children[SENTINEL_CODE_UNIT];
       if(matchingLeaf && matchingLeaf.type == 'leaf') {
-        return matchingLeaf.entries.map(function(value) { return value.content });
+        return matchingLeaf.entries.map(entryMapper);
       } else {
         return [];
       }
     }
+  }
+
+  get p(): number {
+    return this.root.weight / this.totalWeight;
   }
 }
 
@@ -286,7 +354,7 @@ export default class TrieModel implements LexicalModel {
   }
 
   public traverseFromRoot(): LexiconTraversal {
-    return new Traversal(this._trie['root'], '');
+    return this._trie.traverseFromRoot();
   }
 };
 
@@ -369,7 +437,7 @@ interface Entry {
 class Trie {
   private root: Node;
   /** The total weight of the entire trie. */
-  private totalWeight: number;
+  readonly totalWeight: number;
   /**
    * Converts arbitrary strings to a search key. The trie is built up of
    * search keys; not each entry's word form!
@@ -380,6 +448,10 @@ class Trie {
     this.root = root;
     this.toKey = wordform2key;
     this.totalWeight = totalWeight;
+  }
+
+  public traverseFromRoot(): LexiconTraversal {
+    return new Traversal(this.root, '', this.totalWeight);
   }
 
   /**
