@@ -10,6 +10,7 @@ import subprocess
 import sys
 import tempfile
 import webbrowser
+import packaging.version
 
 import gi
 
@@ -19,8 +20,6 @@ try:
 except ValueError:
     # TODO: Remove once we drop support for Ubuntu 20.04 Focal
     gi.require_version('WebKit2', '4.0')
-
-from pkg_resources import parse_version
 
 from gi.repository import Gtk, WebKit2
 
@@ -134,11 +133,12 @@ class InstallKmpWindow(Gtk.Dialog):
         self.checkcontinue = False
 
     def _uninstall_prev_version_if_necessary(self, keyboardid, viewkmp, installed_kmp_ver, info):
-        if not installed_kmp_ver or not secure_lookup(info, 'version', 'description'):
+        new_kmp_version = secure_lookup(info, 'version', 'description')
+        if not installed_kmp_ver or not new_kmp_version:
             return True
-        logging.info("package version %s", secure_lookup(info, 'version', 'description'))
+        logging.info("package version %s", new_kmp_version)
         logging.info("installed kmp version %s", installed_kmp_ver)
-        if parse_version(secure_lookup(info, 'version', 'description')) >= parse_version(installed_kmp_ver):
+        if packaging.version.parse(new_kmp_version) >= packaging.version.parse(installed_kmp_ver):
             return True
         response = self._show_version_message_dlg(
           viewkmp,
