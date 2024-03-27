@@ -107,7 +107,7 @@
     <string name="dictionary_download_start_in_background" comment="Notification that a dictionary download has started">Le téléchargement du dictionnaire a commencé en arrière-plan</string>
     <!-- Context: Background download messages-->
     <string name="dictionary_download_is_running_in_background" comment="Notification that a dictionary download is still running">Le dictionnaire sélectionné est déjà en cours de téléchargement ; veuillez réessayer dans un instant !</string>
-    <!-- Context: Background download messages-->
+    <!-- Context: Background download messages. Removed in Keyman 17-->
     <string name="dictionary_download_finished" comment="Notification that a dictionary download has finished">Téléchargement du dictionnaire terminé.</string>
     <!-- Context: Background download messages -->
     <string name="download_failed" comment="Notification that a download failed">Échec du téléchargement</string>
@@ -119,7 +119,7 @@
     <string name="update_check_current" comment="Notification that all resources are up to date">"Toutes les ressources sont à jour !"</string>
     <!-- Context: General Updates -->
     <string name="update_failed" comment="Notification that a resource update failed">Une ou plusieurs ressources n\'ont pas pu être mises à jour !</string>
-    <!-- Context: General Updates -->
+    <!-- Context: General Updates. Removed in Keyman 17 -->
     <string name="update_success" comment="Notification that a resource update successfully updated">Ressources mises à jour avec succès !</string>
     <!-- Context: Model Info -->
     <string name="model_version" comment="Title for a dictionary version">Version du dictionnaire</string>

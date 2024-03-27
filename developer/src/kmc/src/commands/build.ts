@@ -77,11 +77,11 @@ function initialize(commanderOptions: any) {
   return options;
 }
 
-async function buildFile(filenames: string[], _options: any, commander: any)  {
+async function buildFile(filenames: string[], _options: any, commander: any): Promise<never|void> {
   const commanderOptions/*:{TODO?} CommandLineCompilerOptions*/ = commander.optsWithGlobals();
   const options = initialize(commanderOptions);
   if(!options) {
-    await exitProcess(1);
+    return await exitProcess(1);
   }
 
   const callbacks = new NodeCompilerCallbacks(options);
@@ -97,17 +97,17 @@ async function buildFile(filenames: string[], _options: any, commander: any)  {
   if(filenames.length > 1 && commanderOptions.outFile) {
     // -o can only be specified with a single input file
     callbacks.reportMessage(InfrastructureMessages.Error_OutFileCanOnlyBeSpecifiedWithSingleInfile());
-    await exitProcess(1);
+    return await exitProcess(1);
   }
 
   if(!expandFileLists(filenames, callbacks)) {
-    await exitProcess(1);
+    return await exitProcess(1);
   }
 
   for(let filename of filenames) {
     if(!await build(filename, commanderOptions.outFile, callbacks, options)) {
       // Once a file fails to build, we bail on subsequent builds
-      await exitProcess(1);
+      return await exitProcess(1);
     }
   }
 }

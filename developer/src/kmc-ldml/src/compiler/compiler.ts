@@ -343,11 +343,7 @@ export class LdmlKeyboardCompiler implements KeymanCompiler {
       }
       const sect = section.compile(globalSections);
 
-      /* c8 ignore next 7 */
       if(!sect) {
-        // This should not happen -- validate() should have told us
-        // if something is going to fail to compile
-        this.callbacks.reportMessage(CompilerMessages.Fatal_SectionCompilerFailed({sect:section.id}));
         passed = false;
         continue;
       }
