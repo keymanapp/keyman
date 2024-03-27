@@ -60,6 +60,11 @@ function init() {
         kmw.osk.bannerView.activeBannerHeight = bannerHeight;
         keyman.refreshOskLayout();
       }
+
+      var bc = keyman.osk.bannerController;
+      if(bannerImgPath) {
+        bc.inactiveBanner = new bc.ImageBanner(bannerImgPath);
+      }
     });
 }
 
@@ -69,15 +74,6 @@ function verifyLoaded() {
     // against the stub count.
     if(!keyman.core.activeKeyboard && !keyman.keyboardRequisitioner.cache.defaultStub) {
     location.reload();
-    }
-}
-
-function showBanner(flag) {
-    console.log("Setting banner display for dictionaryless keyboards to " + flag);
-
-    var bc = keyman.osk.bannerController;
-    if(bannerImgPath) {
-      bc.inactiveBanner = new bc.ImageBanner(bannerImgPath);
     }
 }
 
