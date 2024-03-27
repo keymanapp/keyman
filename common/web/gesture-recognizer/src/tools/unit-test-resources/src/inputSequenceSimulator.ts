@@ -111,7 +111,8 @@ export class InputSequenceSimulator<HoveredItemType> {
 
     let touchEventDict: TouchEventInit = {
       bubbles: true,
-      touches: changedTouches.concat(otherTouches),
+      // Ending touchpoints should NOT show up in `touches`.
+      touches: state == 'end' ? otherTouches : changedTouches.concat(otherTouches),
       changedTouches: changedTouches,
     }
 

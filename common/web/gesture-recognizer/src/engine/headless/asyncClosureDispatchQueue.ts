@@ -28,6 +28,10 @@ export class AsyncClosureDispatchQueue {
     this.defaultWaitFactory = defaultWaitFactory || (() => { return timedPromise(0) });
   }
 
+  get defaultWait() {
+    return this.defaultWaitFactory();
+  }
+
   get ready() {
     return this.queue.length == 0 && !this.waitLock;
   }

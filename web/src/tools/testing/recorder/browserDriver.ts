@@ -100,8 +100,10 @@ export class BrowserDriver {
         downEvent = new Event(BrowserDriver.oskDownTouchType);
         upEvent = new Event(BrowserDriver.oskUpTouchType);
         downEvent['touches'] = asTouchList([{"target": oskKeyElement, ...center}]);
-        upEvent['touches'] = asTouchList([{"target": oskKeyElement, ...center}]);
+        // The touch should NOT show up in event.touches when a touch ends.
+        upEvent['touches'] = asTouchList([]);
         downEvent['changedTouches'] = asTouchList([{"target": oskKeyElement, ...center}]);
+        // It should still show up in .changedTouches, though.
         upEvent['changedTouches'] = asTouchList([{"target": oskKeyElement, ...center}]);
       } else {
         downEvent = new Event(BrowserDriver.oskDownMouseType);
