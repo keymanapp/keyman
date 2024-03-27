@@ -41,7 +41,7 @@ export class ContextHost extends Mock {
 
       // Signal the necessary text changes to the embedding app, if it exists.
       if(this.oninserttext) {
-        if(transform.deleteLeft > 0 || transform.insert != '' || transform.deleteRight > 0 || transform.erasedSelection) {
+        if(!isEmptyTransform(transform) || transform.erasedSelection) {
           this.oninserttext(transform.deleteLeft, transform.insert, transform.deleteRight);
         }
       }
