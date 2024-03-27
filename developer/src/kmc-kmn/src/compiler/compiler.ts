@@ -562,8 +562,8 @@ export class KmnCompiler implements KeymanCompiler, UnicodeSetParser {
     // fix \u1234 pattern format
     pattern = KmnCompiler.fixNewPattern(pattern);
     const rc = Module.kmcmp_parseUnicodeSet(pattern, buf, rangeCount * 2);
-    /** If <= 0: error return code. If positive: it's a range count */
     if (rc >= 0) {
+      // If >= 0: it's a range count (which could be zero, an empty set).
       const ranges = [];
       const startu = (buf / Module.HEAPU32.BYTES_PER_ELEMENT);
       for (let i = 0; i < rc; i++) {
@@ -574,6 +574,7 @@ export class KmnCompiler implements KeymanCompiler, UnicodeSetParser {
       this.wasmExports.free(buf);
       return new UnicodeSet(pattern, ranges);
     } else {
+      // rc is negative: it's an error code.
       this.wasmExports.free(buf);
       // translate error code into callback
       this.callbacks.reportMessage(getUnicodeSetError(rc));
