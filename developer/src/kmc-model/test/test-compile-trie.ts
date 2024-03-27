@@ -195,7 +195,7 @@ describe('createTrieDataStructure()', function () {
       }
     }).filter((entry) => entry !== undefined);
 
-    // We'll tracked all _observed_ words from the model here.
+    // We'll track all _observed_ words from the model here.
     const set = new Set<string>();
     const contextFromWord = (word: string) => {
       return {left: word, startOfBuffer: true, endOfBuffer: true};
