@@ -130,7 +130,7 @@ if builder_start_action bundle; then
     --org keyman \
     --project keyman-developer \
     --release "$VERSION_GIT_TAG"  \
-    build/ "${SOURCEMAP_PATHS[@]}"
+    build/dist/ "${SOURCEMAP_PATHS[@]}"
 
   # Manually copy over kmcmplib module
   cp ../kmc-kmn/build/src/import/kmcmplib/wasm-host.wasm build/dist/

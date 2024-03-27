@@ -1,11 +1,15 @@
 #!/usr/bin/python3
+import configparser
 import logging
 import os
 import subprocess
 import sys
 
+from xdg.BaseDirectory import xdg_config_home
 from gi.repository import Gio  # needs to come before gi.overrides.GLib!
 from gi.overrides.GLib import Variant
+
+from keyman_config import file_cleanup, get_dbus_started_for_session
 
 class GSettings():
     def __init__(self, schema_id):
@@ -41,18 +45,18 @@ class GSettings():
             values.append((typeVariant.get_string(), idVariant.get_string()))
         return values
 
-    def _convert_array_to_variant(self, array, type):
+    def _convert_array_to_variant(self, array, type_string):
         if len(array) == 0:
-            return Variant(type, None)
+            return Variant(type_string, None)
 
-        if type == 'as':
+        if type_string == 'as':
             return Variant('as', array)
 
-        assert type == 'a(ss)'
+        assert type_string == 'a(ss)'
 
         children = []
-        for (type, id) in array:
-            typeVariant = Variant.new_string(type)
+        for (type_string, id) in array:
+            typeVariant = Variant.new_string(type_string)
             idVariant = Variant.new_string(id)
             child = Variant.new_tuple(typeVariant, idVariant)
             children.append(child)
@@ -86,14 +90,39 @@ class GSettings():
             value = self._convert_variant_to_array(variant)
         return value
 
-    def set(self, key, value, type) -> None:
+    def _get_schema_path(self):
+        return self.schema_id.replace('.', '/')
+
+    def _set_key_file(self, key, value, type_string):
+        dconf_config_dir = os.path.join(xdg_config_home, 'dconf')
+        os.makedirs(os.path.join(dconf_config_dir, 'user.d'), exist_ok=True)
+        keyfile = file_cleanup.get('keyfile')
+        if not keyfile:
+            keyfile = os.path.join(dconf_config_dir, 'user.d', 'keyman-settings')
+            file_cleanup.register('keyfile', keyfile)
+        keyman_settings = configparser.ConfigParser()
+        keyman_settings.read(keyfile, encoding='utf-8')
+        keyman_settings[self._get_schema_path()] = {}
+        keyman_settings[self._get_schema_path()][key] = f'@{type_string} {value}'
+        with open(keyfile, mode='w', encoding='utf-8') as configfile:
+            keyman_settings.write(configfile)
+        # Update dconf database immediately for current dbus session, i.e.
+        # current process, so that further reads and writes will work.
+        # Cleanup, i.e. removal of the settings file, will be done when
+        # the process exits. With the next login the user will see the
+        # updated values.
+        subprocess.run(['dconf', 'update', dconf_config_dir], check=False)
+
+    def set(self, key, value, type_string) -> None:
         if self.is_sudo:
             variant = str(value)
             subprocess.run(
               ['sudo', '-H', '-u', os.environ.get('SUDO_USER'),
                f"DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/{os.environ.get('SUDO_UID')}/bus",
-               'gsettings', 'set', self.schema_id, key, variant])
+               'gsettings', 'set', self.schema_id, key, variant], check=False)
+        elif get_dbus_started_for_session():
+            self._set_key_file(key, value, type_string)
         else:
-            variant = self._convert_array_to_variant(value, type)
+            variant = self._convert_array_to_variant(value, type_string)
             self.schema.set_value(key, variant)
             self.schema.sync()

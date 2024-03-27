@@ -1,9 +1,9 @@
-import { util, CompilerErrorNamespace, CompilerErrorSeverity, CompilerMessageSpec as m, CompilerMessageDef as def, CompilerMessageSpecWithException } from "@keymanapp/common-types";
+import { util, CompilerErrorNamespace, CompilerErrorSeverity, CompilerMessageSpec as m, CompilerMessageDef as def } from "@keymanapp/common-types";
 // const SevInfo = CompilerErrorSeverity.Info | CompilerErrorNamespace.LdmlKeyboardCompiler;
 const SevHint = CompilerErrorSeverity.Hint | CompilerErrorNamespace.LdmlKeyboardCompiler;
 const SevWarn = CompilerErrorSeverity.Warn | CompilerErrorNamespace.LdmlKeyboardCompiler;
 const SevError = CompilerErrorSeverity.Error | CompilerErrorNamespace.LdmlKeyboardCompiler;
-const SevFatal = CompilerErrorSeverity.Fatal | CompilerErrorNamespace.LdmlKeyboardCompiler;
+// const SevFatal = CompilerErrorSeverity.Fatal | CompilerErrorNamespace.LdmlKeyboardCompiler;
 
 /**
  * @internal
@@ -59,9 +59,7 @@ export class CompilerMessages {
   static Error_MustBeAtLeastOneLayerElement = () =>
     m(this.ERROR_MustBeAtLeastOneLayerElement, `The source file must contain at least one layer element.`);
 
-  static FATAL_SectionCompilerFailed = SevFatal | 0x000F;
-  static Fatal_SectionCompilerFailed = (o:{sect: string}) =>
-  CompilerMessageSpecWithException(this.FATAL_SectionCompilerFailed, null, `The compiler for '${def(o.sect)}' failed unexpectedly.`);
+  // 0x000F - available
 
   /** annotate the to= or id= entry */
   private static outputOrKeyId(o:{output?: string, keyId?: string}) {
