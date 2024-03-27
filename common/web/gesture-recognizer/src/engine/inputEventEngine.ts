@@ -2,6 +2,7 @@ import { InputEngineBase } from "./headless/inputEngineBase.js";
 import { InputSample } from "./headless/inputSample.js";
 import { GestureSource } from "./headless/gestureSource.js";
 import { GestureRecognizerConfiguration } from "./index.js";
+import { reportError } from "./reportError.js";
 
 export function processSampleClientCoords<Type, StateToken>(config: GestureRecognizerConfiguration<Type>, clientX: number, clientY: number) {
   const targetRect = config.targetRoot.getBoundingClientRect();
@@ -47,7 +48,13 @@ export abstract class InputEventEngine<HoveredItemType, StateToken> extends Inpu
       this.dropTouchpoint(touchpoint);
     });
 
-    this.emit('pointstart', touchpoint);
+    try {
+      this.emit('pointstart', touchpoint);
+    } catch(err) {
+      reportError('Engine-internal error while initializing gesture matching for new source', err);
+    }
+
+    return touchpoint;
   }
 
   protected onInputMove(identifier: number, sample: InputSample<HoveredItemType, StateToken>, target: EventTarget) {

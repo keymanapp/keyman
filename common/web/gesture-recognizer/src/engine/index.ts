@@ -1,5 +1,6 @@
 import { validateModelDefs } from './headless/gestures/specs/modelDefValidator.js';
 
+export { AsyncClosureDispatchQueue, QueueClosure } from './headless/asyncClosureDispatchQueue.js';
 export { CumulativePathStats } from './headless/cumulativePathStats.js';
 export { GestureModelDefs } from './headless/gestures/specs/gestureModelDefs.js';
 export { GestureRecognizer } from "./gestureRecognizer.js";
