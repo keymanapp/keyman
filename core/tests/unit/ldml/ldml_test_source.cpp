@@ -367,13 +367,17 @@ LdmlEmbeddedTestSource::vkey_to_event(std::string const &vk_event) {
       modifier_state |= modifier;
     } else {
       vk = get_vk(s);
-      break;
+      if (vk == 0) {
+        std::cerr << "Error parsing [" << vk_event << "] - could not find vkey or modifier: " << s << std::endl;
+      }
+      assert(vk != 0);
+      break; // only one vkey allowed
     }
   }
 
   // The string should be empty at this point
   if (std::getline(f, s, ' ')) {
-    std::cerr << "Error parsing vkey ["<<vk_event<<"] - unexpected: " << s << std::endl;
+    std::cerr << "Error parsing vkey ["<<vk_event<<"] - excess string after key: " << s << std::endl;
     assert(false);
   }
   assert(vk != 0);
