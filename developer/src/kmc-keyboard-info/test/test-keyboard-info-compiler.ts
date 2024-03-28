@@ -8,8 +8,6 @@ import langtags from "../src/imports/langtags.js";
 import { KmpCompiler, KmpCompilerOptions } from '@keymanapp/kmc-package';
 import { CompilerCallbacks, KMX, KeymanFileTypes, KeymanTargets, KmpJsonFile } from '@keymanapp/common-types';
 import { KeyboardInfoFile, KeyboardInfoFilePlatform } from './keyboard-info-file.js';
-//import { PackageVersionValidator } from '../../kmc-package/src/compiler/package-version-validator.js';
-//import { KeyboardMetadataCollection } from '../../kmc-package/src/compiler/package-metadata-collector.js';
 
 const callbacks = new TestCompilerCallbacks();
 
