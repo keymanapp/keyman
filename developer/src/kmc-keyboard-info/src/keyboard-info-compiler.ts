@@ -618,3 +618,9 @@ export class KeyboardInfoCompiler implements KeymanCompiler {
 
 }
 
+/**
+ * these are exported only for unit tests, do not use
+ */
+export const unitTestEndpoints = {
+  langtagsByTag,
+};

@@ -1,0 +1,1 @@
+// This is a file used to test the loadJsFile throws error if .js file is invalid error (see keyboard-info-compiler.ts)
