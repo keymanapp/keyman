@@ -48,6 +48,28 @@ const EN_LANGTAG = {
   "windows": "en-US"
 };
 
+const KHMER_ANGKOR_KEYBOARD = {
+  displayFont: "Mondulkiri-R.ttf",
+  oskFont: "khmer_busra_kbd.ttf",
+  name: "Khmer Angkor",
+  id: "khmer_angkor",
+  version: "1.3",
+  languages: [
+    {
+       name: "Central Khmer (Khmer, Cambodia)",
+       id: "km",
+    },
+  ],
+  examples: [
+    {
+      id: "km",
+      keys: "x j m E r",
+      text: "ខ្មែរ",
+      note: "Name of language",
+    },
+  ],
+};
+
 describe('keyboard-info-compiler', function () {
   it('compile a .keyboard_info file correctly', async function() {
     const kpjFilename = KHMER_ANGKOR_KPJ;
@@ -303,5 +325,22 @@ describe('keyboard-info-compiler', function () {
     TextDecoder.prototype.decode = () => { throw new TypeError(); }
     assert.throws(() => compiler['loadJsFile'](jsFilename));
     TextDecoder.prototype.decode = origTextDecoderDecode;
+  });
+
+  it('check fillLanguages returns false if fontSourceToKeyboardInfoFont fails for display font', async function() {
+    const kpsFilename = KHMER_ANGKOR_KPS;
+    const keyboard_info: KeyboardInfoFile = {};
+    const kmpJsonData: KmpJsonFile.KmpJsonFile = {
+      system: { fileVersion: '', keymanDeveloperVersion: '' },
+      options: null,
+      keyboards: [KHMER_ANGKOR_KEYBOARD],
+    };
+
+    const sources = KHMER_ANGKOR_SOURCES;
+    const compiler = new KeyboardInfoCompiler();
+    assert.isTrue(await compiler.init(callbacks, {sources}));
+    compiler['fontSourceToKeyboardInfoFont'] = async (_kpsFilename: string, _kmpJsonData: KmpJsonFile.KmpJsonFile, _source: string[]) => null;
+    const result = await compiler['fillLanguages'](kpsFilename, keyboard_info, kmpJsonData);
+    assert.isFalse(result);
   });
 });
