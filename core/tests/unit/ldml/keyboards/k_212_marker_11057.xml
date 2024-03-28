@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<keyboard3 xmlns="https://schemas.unicode.org/cldr/45/keyboard3" locale="en" conformsTo="45">
+  <info author="srl295" indicator="🙀" layout="qwerty" name="k_212_regression test" />
+
+  <keys>
+    <key id="caret" output="\m{caret}" />
+    <key id="umlaut" output="\m{umlaut}" />
+  </keys>
+
+  <layers formId="us">
+    <layer modifiers="none" id="base">
+      <row keys="caret umlaut" />
+      <row keys="q w e r t y" />
+      <row keys="a" />
+      <row keys="z" />
+      <row keys="space" />
+    </layer>
+  </layers>
+
+  <transforms type="simple">
+    <transformGroup>
+      <transform from="\m{caret}a" to="A"/>
+      <transform from="\m{umlaut}e" to="E"/>
+      <!-- catch-all: drop any marker that didn't otherwise match before a char -->
+      <transform from="\m{.}(.)" to="$1" />
+      <!-- also drop any doubled marker -->
+      <transform from="\m{.}(\m{.})" to="$1" />
+    </transformGroup>
+  </transforms>
+</keyboard3>
