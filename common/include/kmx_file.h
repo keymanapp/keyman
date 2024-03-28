@@ -302,6 +302,7 @@ namespace kmx {
 
 #define K_MODIFIERFLAG  0x007F
 #define K_NOTMODIFIERFLAG 0xFF00   // I4548
+#define K_DEFAULTMODFLAG  0x10000  // used by KMX+ for the default modifier
 
 struct COMP_STORE {
   KMX_DWORD_unaligned dwSystemID;
