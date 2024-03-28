@@ -168,7 +168,7 @@ function translateModifierSubsetToLayer(modifiers: string) : number {
   // TODO-LDML: Default #11072
   if (modifiers) {
     if (modifiers.indexOf(',') !== -1) {
-      throw Error(`This function only takes a single subset of the modifiers`);
+      throw Error(`translateModifierSubsetToLayer only takes a single subset of the modifiers`);
     }
     let mod = constants.keys_mod_none;
     for (let str of modifiers.split(' ')) {
