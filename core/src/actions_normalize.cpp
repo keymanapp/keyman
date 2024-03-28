@@ -119,25 +119,22 @@ bool km::core::actions_normalize(
     normalization in our output, we now need to look for a normalization
     boundary prior to the intersection of the cached_context and the output.
   */
+  if(!output.isEmpty()) {
+    while(n > 0 && !nfd->hasBoundaryBefore(output[0])) {
+      // The output may interact with the context further in normalization. We
+      // need to copy characters back further until we reach a normalization
+      // boundary.
 
-  while(n > 0 && output[0] && !nfd->hasBoundaryBefore(output[0])) {
-    // The output may interact with the context further in normalization. We
-    // need to copy characters back further until we reach a normalization
-    // boundary.
+      // Remove last code point from the context ...
 
-    // Remove last code point from the context ...
+      n = cached_context_string.moveIndex32(n, -1);
+      UChar32 chr = cached_context_string.char32At(n);
+      cached_context_string.remove(n);
 
-    n = cached_context_string.moveIndex32(n, -1);
-    UChar32 chr = cached_context_string.char32At(n);
-    cached_context_string.remove(n);
+      // And prepend it to the output ...
 
-    // And prepend it to the output ...
-
-    output.insert(0, chr);
-
-    // And finally remember that we now need to delete an additional NFD codepoint
-
-    actions.code_points_to_delete++;
+      output.insert(0, chr);
+    }
   }
 
   /*
