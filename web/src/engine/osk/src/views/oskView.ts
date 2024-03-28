@@ -713,9 +713,6 @@ export default abstract class OSKView
   private loadActiveKeyboard() {
     this.setBoxStyling();
     this.needsLayout = true;
-
-    this.bannerController?.configureForKeyboard(this.keyboardData?.keyboard, this.keyboardData?.metadata);
-
     // Save references to the old kbd & its styles for shutdown after replacement.
     const oldKbd = this.keyboardView;
     const oldKbdStyleManager = this.kbdStyleSheetManager;
@@ -727,6 +724,7 @@ export default abstract class OSKView
     // Perform the replacement.
     this._Box.replaceChild(kbdView.element, oldKbd.element);
     kbdView.postInsert();
+    this.bannerController?.configureForKeyboard(this.keyboardData?.keyboard, this.keyboardData?.metadata);
 
     // Now that the swap has occurred, it's safe to shutdown the old VisualKeyboard and any related stylesheets.
     if(oldKbd instanceof VisualKeyboard) {
