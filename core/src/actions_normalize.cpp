@@ -141,10 +141,10 @@ bool km::core::actions_normalize(
     At this point, our output and cached_context are coherent and normalization
     will be complete at the edit boundary.
 
-    Now, we need to adjust the delete_back to match the number of code units
+    Now, we need to adjust the delete_back to match the number of codepoints
     that must actually be deleted from the applications's NFU context
 
-    To adjust, we remove one code unit at a time from the app_context until
+    To adjust, we remove one codepoint at a time from the app_context until
     its normalized form matches the cached_context normalized form.
   */
 
