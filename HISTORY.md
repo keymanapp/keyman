@@ -1,5 +1,18 @@
 # Keyman Version History
 
+## 17.0.297 beta 2024-03-28
+
+* fix(common): properly handle illegal UnicodeSets to prevent crash in kmc-ldml compiler (#11065)
+* fix(core,developer): variable/marker substitution in sets and strings (#11059)
+* fix(developer):  in ldml compiler, generate compiler error if `from=` regex matches empty string (#11070)
+* fix(core): calculate offset correctly when replacing marker in transform (fixes crash) (#11071)
+* feat(developer): support comma in modifiers (#11075)
+* fix(core): actions_normalize() length and dead store fix (#11100)
+* chore(core): optimize ldml_event_state::emit_difference() when no diff (#11094)
+* fix(ios): bad initial in-app layout, delayed banner, deprecated banner toggle (#10929)
+* feat(developer/compilers): better unit test for suggestion accessibility (#11085)
+* fix(core): fix pointer math in actions_normalize() (#11101)
+
 ## 17.0.296 beta 2024-03-27
 
 * fix(developer): in model compiler, give correct key to shorter prefix words when a longer, higher-frequency word is also present (#11074)
