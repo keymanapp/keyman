@@ -64,6 +64,7 @@ export default class FloatingOSKView extends OSKView {
     this.resizeBar.on('showbuild', () => this.emit('showbuild'));
 
     this.headerView = this.titleBar;
+    this._Box.insertBefore(this.headerView.element, this._Box.firstChild);
 
     const onListenedEvent = (eventName: keyof EventMap | keyof LegacyOSKEventMap) => {
       // As the following title bar buttons (for desktop / FloatingOSKView) do nothing unless a site
