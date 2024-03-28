@@ -15,6 +15,7 @@ cd "$THIS_SCRIPT_PATH"
 builder_describe "Build Keyman kmc Lexical Model Compiler module" \
   "@/common/web/keyman-version" \
   "@/developer/src/common/web/test-helpers" \
+  "@/common/models/templates test" \
   "clean" \
   "configure" \
   "build" \
