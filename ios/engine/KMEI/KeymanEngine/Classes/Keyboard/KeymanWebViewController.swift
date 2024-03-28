@@ -131,6 +131,14 @@ class KeymanWebViewController: UIViewController {
     webView!.navigationDelegate = self
     webView!.scrollView.isScrollEnabled = false
 
+    // Disable WKWebView default layout-constraint manipulations. We ensure
+    // safe-area boundaries are respected via InputView / InputViewController
+    // constraints.
+    //
+    // Fixes #10859.
+    // Ref: https://stackoverflow.com/a/63741514
+    webView!.scrollView.contentInsetAdjustmentBehavior = .never
+
     view = webView
 
     // Set UILongPressGestureRecognizer to show sub keys
@@ -415,15 +423,6 @@ extension KeymanWebViewController {
     } else {  // We're registering a model in the background - don't change settings.
       webView!.evaluateJavaScript("keyman.addModel(\(stubString));", completionHandler: nil)
     }
-
-    setBannerHeight(to: Int(InputViewController.topBarHeight))
-  }
-
-  func showBanner(_ display: Bool) {
-    let message = "Changing banner's alwaysShow property to \(display)"
-    os_log("%{public}s", log: KeymanEngineLogger.settings, type: .debug, message)
-    SentryManager.breadcrumb(message, category: "engine", sentryLevel: .debug)
-    webView?.evaluateJavaScript("showBanner(\(display ? "true" : "false"))", completionHandler: nil)
   }
 
   func setBannerImage(to path: String) {
@@ -731,10 +730,11 @@ extension KeymanWebViewController: KeymanWebDelegate {
     }
 
     updateSpacebarText()
-    updateShowBannerSetting()
     setBannerImage(to: bannerImgPath)
     // Reset the keyboard's size.
     keyboardSize = kbSize
+
+    setBannerHeight(to: Int(InputViewController.topBarHeight))
 
     fixLayout()
 
@@ -746,16 +746,6 @@ extension KeymanWebViewController: KeymanWebDelegate {
       NSObject.cancelPreviousPerformRequests(withTarget: self, selector: #selector(self.resetKeyboard), object: nil)
       perform(#selector(self.resetKeyboard), with: nil, afterDelay: 0.25)
       shouldReload = false
-    }
-  }
-
-  func updateShowBannerSetting() {
-    let userData = Storage.active.userDefaults
-    let alwaysShow = userData.bool(forKey: Key.optShouldShowBanner)
-    if !Manager.shared.isSystemKeyboard {
-      showBanner(false)
-    } else {
-      showBanner(alwaysShow)
     }
   }
 
@@ -1120,8 +1110,6 @@ extension KeymanWebViewController {
     isLoading = true
 
     updateSpacebarText()
-    // Check for a change of "always show banner" state
-    updateShowBannerSetting()
   }
 
   /*

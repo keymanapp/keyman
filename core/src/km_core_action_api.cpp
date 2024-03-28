@@ -56,7 +56,9 @@ void km::core::actions_dispose(
 
 km_core_usv const *km::core::get_deleted_context(context const &app_context, unsigned int code_points_to_delete) {
   auto p = app_context.end();
-  for(size_t i = code_points_to_delete; i > 0; i--, p--);
+  for(size_t i = code_points_to_delete; i > 0; i--, p--) {
+    assert(p != app_context.begin());
+  }
 
   auto deleted_context = new km_core_usv[code_points_to_delete + 1];
   for(size_t i = 0; i < code_points_to_delete; i++) {
