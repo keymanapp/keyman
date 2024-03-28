@@ -17,7 +17,12 @@ beforeEach(function() {
   callbacks.clear();
 });
 
-const ENLANGTAG = {
+const KHMER_ANGKOR_KPJ = makePathToFixture('khmer_angkor', 'khmer_angkor.kpj');
+const KHMER_ANGKOR_JS  = makePathToFixture('khmer_angkor', 'build', 'khmer_angkor.js');
+const KHMER_ANGKOR_KPS = makePathToFixture('khmer_angkor', 'source', 'khmer_angkor.kps');
+const KHMER_ANGKOR_KMP = makePathToFixture('khmer_angkor', 'build', 'khmer_angkor.kmp');
+
+const EN_LANGTAG = {
   "full": "en-Latn-US",
   "iana": [ "English" ],
   "iso639_3": "eng",
@@ -39,10 +44,10 @@ const ENLANGTAG = {
 
 describe('keyboard-info-compiler', function () {
   it('compile a .keyboard_info file correctly', async function() {
-    const kpjFilename = makePathToFixture('khmer_angkor', 'khmer_angkor.kpj');
-    const jsFilename = makePathToFixture('khmer_angkor', 'build', 'khmer_angkor.js');
-    const kpsFilename = makePathToFixture('khmer_angkor', 'source', 'khmer_angkor.kps');
-    const kmpFilename = makePathToFixture('khmer_angkor', 'build', 'khmer_angkor.kmp');
+    const kpjFilename = KHMER_ANGKOR_KPJ;
+    const jsFilename = KHMER_ANGKOR_JS;
+    const kpsFilename = KHMER_ANGKOR_KPS;
+    const kmpFilename = KHMER_ANGKOR_KMP;
     const buildKeyboardInfoFilename = makePathToFixture('khmer_angkor', 'build', 'khmer_angkor.keyboard_info');
 
     const sources = {
@@ -80,17 +85,17 @@ describe('keyboard-info-compiler', function () {
   it('check preinit creates langtagsByTag correctly', async function() {
     const compiler = new KeyboardInfoCompiler(); // indirectly call preinit()
     assert.isNotNull(compiler);
-    assert.deepEqual(langtags.find(({ tag }) => tag === 'en'), ENLANGTAG);
-    assert.deepEqual((<any>unitTestEndpoints.langtagsByTag)['en'], ENLANGTAG);
-    assert.deepEqual((<any>unitTestEndpoints.langtagsByTag)['en-Latn-US'], ENLANGTAG);
-    assert.deepEqual((<any>unitTestEndpoints.langtagsByTag)['en-Latn'], ENLANGTAG);
-    assert.deepEqual((<any>unitTestEndpoints.langtagsByTag)['en-US'], ENLANGTAG);
+    assert.deepEqual(langtags.find(({ tag }) => tag === 'en'), EN_LANGTAG);
+    assert.deepEqual((<any>unitTestEndpoints.langtagsByTag)['en'], EN_LANGTAG);
+    assert.deepEqual((<any>unitTestEndpoints.langtagsByTag)['en-Latn-US'], EN_LANGTAG);
+    assert.deepEqual((<any>unitTestEndpoints.langtagsByTag)['en-Latn'], EN_LANGTAG);
+    assert.deepEqual((<any>unitTestEndpoints.langtagsByTag)['en-US'], EN_LANGTAG);
   });
 
   it('check init initialises KeyboardInfoCompiler correctly', async function() {
-    const jsFilename = makePathToFixture('khmer_angkor', 'build', 'khmer_angkor.js');
-    const kpsFilename = makePathToFixture('khmer_angkor', 'source', 'khmer_angkor.kps');
-    const kmpFilename = makePathToFixture('khmer_angkor', 'build', 'khmer_angkor.kmp');
+    const jsFilename = KHMER_ANGKOR_JS;
+    const kpsFilename = KHMER_ANGKOR_KPS;
+    const kmpFilename = KHMER_ANGKOR_KMP;
 
     const sources = {
       kmpFilename,
@@ -107,10 +112,10 @@ describe('keyboard-info-compiler', function () {
   });  
 
   it('check run returns null if KmpCompiler.init fails', async function() {
-    const kpjFilename = makePathToFixture('khmer_angkor', 'khmer_angkor.kpj');
-    const jsFilename = makePathToFixture('khmer_angkor', 'build', 'khmer_angkor.js');
-    const kpsFilename = makePathToFixture('khmer_angkor', 'source', 'khmer_angkor.kps');
-    const kmpFilename = makePathToFixture('khmer_angkor', 'build', 'khmer_angkor.kmp');
+    const kpjFilename = KHMER_ANGKOR_KPJ;
+    const jsFilename = KHMER_ANGKOR_JS;
+    const kpsFilename = KHMER_ANGKOR_KPS;
+    const kmpFilename = KHMER_ANGKOR_KMP;
 
     const sources = {
       kmpFilename,
@@ -130,10 +135,10 @@ describe('keyboard-info-compiler', function () {
   });
   
   it('check run returns null if KmpCompiler.transformKpsToKmpObject fails', async function() {
-    const kpjFilename = makePathToFixture('khmer_angkor', 'khmer_angkor.kpj');
-    const jsFilename = makePathToFixture('khmer_angkor', 'build', 'khmer_angkor.js');
-    const kpsFilename = makePathToFixture('khmer_angkor', 'source', 'khmer_angkor.kps');
-    const kmpFilename = makePathToFixture('khmer_angkor', 'build', 'khmer_angkor.kmp');
+    const kpjFilename = KHMER_ANGKOR_KPJ;
+    const jsFilename = KHMER_ANGKOR_JS;
+    const kpsFilename = KHMER_ANGKOR_KPS;
+    const kmpFilename = KHMER_ANGKOR_KMP;
 
     const sources = {
       kmpFilename,
@@ -153,10 +158,10 @@ describe('keyboard-info-compiler', function () {
   });
   
   it('check run returns null if loadJsFile fails', async function() {
-    const kpjFilename = makePathToFixture('khmer_angkor', 'khmer_angkor.kpj');
-    const jsFilename = makePathToFixture('khmer_angkor', 'build', 'khmer_angkor.js');
-    const kpsFilename = makePathToFixture('khmer_angkor', 'source', 'khmer_angkor.kps');
-    const kmpFilename = makePathToFixture('khmer_angkor', 'build', 'khmer_angkor.kmp');
+    const kpjFilename = KHMER_ANGKOR_KPJ;
+    const jsFilename = KHMER_ANGKOR_JS;
+    const kpsFilename = KHMER_ANGKOR_KPS;
+    const kmpFilename = KHMER_ANGKOR_KMP;
 
     const sources = {
       kmpFilename,
@@ -174,10 +179,10 @@ describe('keyboard-info-compiler', function () {
   }); 
 
   it('check run returns null if license is not MIT', async function() {
-    const kpjFilename = makePathToFixture('khmer_angkor', 'khmer_angkor.kpj');
-    const jsFilename = makePathToFixture('khmer_angkor', 'build', 'khmer_angkor.js');
-    const kpsFilename = makePathToFixture('khmer_angkor', 'source', 'khmer_angkor.kps');
-    const kmpFilename = makePathToFixture('khmer_angkor', 'build', 'khmer_angkor.kmp');
+    const kpjFilename = KHMER_ANGKOR_KPJ;
+    const jsFilename = KHMER_ANGKOR_JS;
+    const kpsFilename = KHMER_ANGKOR_KPS;
+    const kmpFilename = KHMER_ANGKOR_KMP;
 
     const sources = {
       kmpFilename,
@@ -195,10 +200,10 @@ describe('keyboard-info-compiler', function () {
   });
 
   it('check run returns null if fillLanguages fails', async function() {
-    const kpjFilename = makePathToFixture('khmer_angkor', 'khmer_angkor.kpj');
-    const jsFilename = makePathToFixture('khmer_angkor', 'build', 'khmer_angkor.js');
-    const kpsFilename = makePathToFixture('khmer_angkor', 'source', 'khmer_angkor.kps');
-    const kmpFilename = makePathToFixture('khmer_angkor', 'build', 'khmer_angkor.kmp');
+    const kpjFilename = KHMER_ANGKOR_KPJ;
+    const jsFilename = KHMER_ANGKOR_JS;
+    const kpsFilename = KHMER_ANGKOR_KPS;
+    const kmpFilename = KHMER_ANGKOR_KMP;
 
     const sources = {
       kmpFilename,
@@ -216,10 +221,10 @@ describe('keyboard-info-compiler', function () {
   }); 
 
   it('should write artifacts to disk', async function() {
-    const kpjFilename = makePathToFixture('khmer_angkor', 'khmer_angkor.kpj');
-    const jsFilename = makePathToFixture('khmer_angkor', 'build', 'khmer_angkor.js');
-    const kpsFilename = makePathToFixture('khmer_angkor', 'source', 'khmer_angkor.kps');
-    const kmpFilename = makePathToFixture('khmer_angkor', 'build', 'khmer_angkor.kmp');
+    const kpjFilename = KHMER_ANGKOR_KPJ;
+    const jsFilename = KHMER_ANGKOR_JS;
+    const kpsFilename = KHMER_ANGKOR_KPS;
+    const kmpFilename = KHMER_ANGKOR_KMP;
     const actualFilename = makePathToFixture('khmer_angkor', 'build', 'actual.keyboard_info');
     const expectedFilename = makePathToFixture('khmer_angkor', 'build', 'khmer_angkor.keyboard_info');
 
@@ -290,7 +295,7 @@ describe('keyboard-info-compiler', function () {
   });
   
   it('check loadKmxFiles returns empty array if .kmx file is missing from .kmp', async function() {
-    const kpsFilename = makePathToFixture('khmer_angkor', 'source', 'khmer_angkor.kps');
+    const kpsFilename = KHMER_ANGKOR_KPS;
     const compiler = new KeyboardInfoCompiler();
     const kmpCompiler = new KmpCompiler();
     assert.isTrue(await kmpCompiler.init(callbacks, {}));
@@ -306,7 +311,7 @@ describe('keyboard-info-compiler', function () {
   });
 
   it('check loadKmxFiles throws error if .kmx file is missing from disk', async function() {
-    const kpsFilename = makePathToFixture('khmer_angkor', 'source', 'khmer_angkor.kps');
+    const kpsFilename = KHMER_ANGKOR_KPS;
     const compiler = new KeyboardInfoCompiler();
     const kmpCompiler = new KmpCompiler();
     assert.isTrue(await kmpCompiler.init(callbacks, {}));
