@@ -18,8 +18,8 @@ $(function() {
   this.saveSelection = function() {
     let key = builder.selectedKey(), subKey = builder.selectedSubKey();
     return {
-      id: key ? $(key).data('id') : null,
-      subId: subKey ? $(subKey).data('id') : null
+      id: key.length ? $(key).data('id') : null,
+      subId: subKey.length ? $(subKey).data('id') : null
     };
   }
 
@@ -971,7 +971,7 @@ $(function() {
 
   $('#kbd-scroll-container').on('scroll', function () {
     const key = builder.selectedKey();
-    if(key) {
+    if(key.length) {
       builder.moveWedgesAround(key[0]);
     }
   });
