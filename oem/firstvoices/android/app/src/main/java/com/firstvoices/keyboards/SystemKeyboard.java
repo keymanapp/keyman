@@ -65,9 +65,6 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
 
         interpreter = new KMHardwareKeyboardInterpreter(getApplicationContext(), KeyboardType.KEYBOARD_TYPE_SYSTEM);
         KMManager.setInputMethodService(this); // for HW interface
-
-        // Set the system keyboard HTML banner
-        BannerController.setHTMLBanner(this, KeyboardType.KEYBOARD_TYPE_SYSTEM);
     }
 
     @Override
@@ -84,9 +81,6 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
     @Override
     public void onInitializeInterface() {
       super.onInitializeInterface();
-
-      // KeymanWeb reloaded, so we have to pass the banner again
-      BannerController.setHTMLBanner(this, KeyboardType.KEYBOARD_TYPE_SYSTEM);
     }
 
     /** Called by the framework when your view for creating input needs to
@@ -103,6 +97,9 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
         ViewGroup parent = (ViewGroup) inputView.getParent();
         if (parent != null)
             parent.removeView(inputView);
+
+        // KeymanWeb reloaded, so we have to pass the banner again
+        BannerController.setHTMLBanner(this, KeyboardType.KEYBOARD_TYPE_SYSTEM);
 
         return inputView;
     }
