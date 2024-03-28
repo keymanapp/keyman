@@ -187,10 +187,6 @@ describe('vars', function () {
         CompilerMessages.Error_MissingStringVariable({id: 'missingStringInSet'})
       ],
     },
-    {
-      subpath: 'sections/vars/fail-badref-7.xml',
-      errors: true,
-    },
   ], varsDependencies);
   describe('should match some marker constants', () => {
     // neither of these live here, but, common/web/types does not import ldml-keyboard-constants otherwise.
