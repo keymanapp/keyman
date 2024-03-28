@@ -73,7 +73,6 @@ private class CustomInputView: UIInputView, UIInputViewAudioFeedback {
 
   func setConstraints() {
     let innerView = keymanWeb.view!
-
     let guide = self.safeAreaLayoutGuide
 
     // Fallback on earlier versions
@@ -89,11 +88,13 @@ private class CustomInputView: UIInputView, UIInputViewAudioFeedback {
     kbdWidthConstraint.priority = .defaultHigh
     kbdWidthConstraint.isActive = true
 
+    let bannerHeight = InputViewController.topBarHeight
+
     // Cannot be met by the in-app keyboard, but helps to 'force' height for the system keyboard.
-    let portraitHeight = innerView.heightAnchor.constraint(equalToConstant: keymanWeb.constraintTargetHeight(isPortrait: true))
+    let portraitHeight = innerView.heightAnchor.constraint(equalToConstant: bannerHeight +  keymanWeb.constraintTargetHeight(isPortrait: true))
     portraitHeight.identifier = "Height constraint for portrait mode"
     portraitHeight.priority = .defaultHigh
-    let landscapeHeight = innerView.heightAnchor.constraint(equalToConstant: keymanWeb.constraintTargetHeight(isPortrait: false))
+    let landscapeHeight = innerView.heightAnchor.constraint(equalToConstant: bannerHeight + keymanWeb.constraintTargetHeight(isPortrait: false))
     landscapeHeight.identifier = "Height constraint for landscape mode"
     landscapeHeight.priority = .defaultHigh
 
@@ -104,22 +105,6 @@ private class CustomInputView: UIInputView, UIInputViewAudioFeedback {
 
   override func updateConstraints() {
     super.updateConstraints()
-
-    // Keep the constraints up-to-date!  They should vary based upon the selected keyboard.
-    let userData = Storage.active.userDefaults
-    let alwaysShow = userData.bool(forKey: Key.optShouldShowBanner)
-
-    var hideBanner = true
-    if alwaysShow || Manager.shared.isSystemKeyboard || keymanWeb.activeModel {
-      hideBanner = false
-    }
-    let topBarDelta = hideBanner ? 0 : InputViewController.topBarHeight
-
-    // Sets height before the constraints, as it's the height constraint that triggers OSK resizing.
-    keymanWeb.setBannerHeight(to: Int(InputViewController.topBarHeight))
-
-    portraitConstraint?.constant = topBarDelta + keymanWeb.constraintTargetHeight(isPortrait: true)
-    landscapeConstraint?.constant = topBarDelta + keymanWeb.constraintTargetHeight(isPortrait: false)
 
     // Activate / deactivate layout-specific constraints.
     if InputViewController.isPortrait {
@@ -168,7 +153,7 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
   }
 
   var expandedHeight: CGFloat {
-    return keymanWeb.keyboardHeight + activeTopBarHeight
+    return keymanWeb.keyboardHeight + InputViewController.topBarHeight
   }
 
   public convenience init() {
@@ -442,20 +427,11 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
       case .doNothing:
         break
       }
-
-      // If we allow the system keyboard to show no banners, this line is needed
-      // for variable system keyboard height.
-      updateShowBannerSetting()
     } else { // Use in-app keyboard behavior instead.
       if !(Manager.shared.currentResponder?.showKeyboardPicker() ?? false) {
         _ = Manager.shared.switchToNextKeyboard
       }
     }
-  }
-
-  // Needed due to protection level on the `keymanWeb` property
-  func updateShowBannerSetting() {
-    keymanWeb.updateShowBannerSetting()
   }
 
   func updateSpacebarText() {
@@ -481,22 +457,6 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
     baseWidthConstraint = self.inputView!.widthAnchor.constraint(equalTo: parent!.view.safeAreaLayoutGuide.widthAnchor)
     baseWidthConstraint.priority = UILayoutPriority(rawValue: 999)
     baseWidthConstraint.isActive = true
-  }
-
-  public var isTopBarActive: Bool {
-    let userData = Storage.active.userDefaults
-    let alwaysShow = userData.bool(forKey: Key.optShouldShowBanner)
-
-    if alwaysShow || Manager.shared.isSystemKeyboard || keymanWeb.activeModel {
-      return true
-    }
-
-    return false
-  }
-
-  public var activeTopBarHeight: CGFloat {
-    // If 'isSystemKeyboard' is true, always show the top bar.
-    return isTopBarActive ? CGFloat(InputViewController.topBarHeight) : 0
   }
 
   public var kmwHeight: CGFloat {

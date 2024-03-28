@@ -61,6 +61,7 @@ public enum Key {
 
   // Settings-related keys
   static let optShouldReportErrors = "ShouldReportErrors"
+  // Deprecated - no longer used
   static let optShouldShowBanner = "ShouldShowBanner"
   static let optSpacebarText = "SpacebarText"
   // This one SHOULD be app-only, but is needed by the currently
