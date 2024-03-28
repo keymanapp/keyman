@@ -372,7 +372,10 @@ LdmlEmbeddedTestSource::vkey_to_event(std::string const &vk_event) {
   }
 
   // The string should be empty at this point
-  assert(!std::getline(f, s, ' '));
+  if (std::getline(f, s, ' ')) {
+    std::cerr << "Error parsing vkey ["<<vk_event<<"] - unexpected: " << s << std::endl;
+    assert(false);
+  }
   assert(vk != 0);
 
   return {vk, modifier_state};
