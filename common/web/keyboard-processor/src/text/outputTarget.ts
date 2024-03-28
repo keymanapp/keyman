@@ -13,7 +13,7 @@ import { Deadkey, DeadkeyTracker } from "./deadkeys.js";
 
 export function isEmptyTransform(transform: Transform) {
   if(!transform) {
-    return false;
+    return true;
   }
   return transform.insert === '' && transform.deleteLeft === 0 && (transform.deleteRight ?? 0) === 0;
 }
