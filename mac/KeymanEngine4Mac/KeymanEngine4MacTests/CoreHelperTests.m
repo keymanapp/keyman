@@ -115,6 +115,18 @@
   XCTAssertTrue([dataFromLiteral isEqualToData:dataFromConversion], @"Converted unichar string is not equal to literal unichar string.");
 }
 
+- (void)testConversionToUnicharString_brahmiAndLatinString_matchesLiteral {
+  NSString *mixedString = @"𑀧a𑀫";
+  unichar const * mixedUnicharString = u"𑀧a𑀫";
+  
+  NSUInteger stringLength = [mixedString lengthOfBytesUsingEncoding:NSUTF16StringEncoding];
+  
+  unichar const *  convertedString = [[CoreTestStaticHelperMethods helper] createUnicharStringFromNSString: mixedString];
+  NSData *dataFromConversion = [NSData dataWithBytes:convertedString length:stringLength];
+  NSData *dataFromLiteral = [NSData dataWithBytes:mixedUnicharString length:stringLength];
+  XCTAssertTrue([dataFromLiteral isEqualToData:dataFromConversion], @"Converted unichar string is not equal to literal unichar string.");
+}
+
 - (void)testConversionFromUnicharString_optionName_matchesLiteral {
   unichar const * unicharString = u"option_ligature_ew";
   NSString *optionNameString = @"option_ligature_ew";

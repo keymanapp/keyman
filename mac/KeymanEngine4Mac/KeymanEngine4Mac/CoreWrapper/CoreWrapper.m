@@ -181,9 +181,10 @@ const int CORE_ENVIRONMENT_ARRAY_LENGTH = 6;
   NSString* text = [self.coreHelper utf32CStringToString:actions->output];
   NSDictionary* options = [self convertOptionsArray:actions->persist_options];
   CapsLockState capsLock = [self convertCapsLockState:actions->new_caps_lock_state];
+  NSString* deletedText = [self.coreHelper utf32CStringToString:actions->deleted_context];
 
-  CoreKeyOutput* coreKeyOutput = [[CoreKeyOutput alloc] init: actions->code_points_to_delete textToInsert:text optionsToPersist:options alert:actions->do_alert emitKeystroke:actions->emit_keystroke capsLockState:capsLock];
-
+  CoreKeyOutput* coreKeyOutput = [[CoreKeyOutput alloc] init: actions->code_points_to_delete textToDelete:deletedText textToInsert:text optionsToPersist:options alert:actions->do_alert emitKeystroke:actions->emit_keystroke capsLockState:capsLock];
+  
   return coreKeyOutput;
 }
 

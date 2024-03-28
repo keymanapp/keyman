@@ -106,6 +106,16 @@
                </Test>
             </SkippedTests>
          </TestableReference>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "E29F22F0201A59B1005EA234"
+               BuildableName = "KeymanTests.xctest"
+               BlueprintName = "KeymanTests"
+               ReferencedContainer = "container:../Keyman4MacIM/Keyman4MacIM.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
       </Testables>
    </TestAction>
    <LaunchAction

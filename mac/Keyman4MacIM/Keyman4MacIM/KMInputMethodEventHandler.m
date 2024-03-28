@@ -427,7 +427,7 @@ NSString* const kEasterEggKmxName = @"EnglishSpanish.kmx";
 }
 
 -(void)insertAndReplaceTextForOutput:(CoreKeyOutput*)output client:(id) client {
-  [self insertAndReplaceText:output.textToInsert deleteCount:(int)output.codePointsToDeleteBeforeInsert client:client];
+  [self insertAndReplaceText:output.textToInsert deleteCount:(int)output.codePointsToDeleteBeforeInsert toReplace:output.textToDelete client:client];
 }
 
 /**
@@ -435,40 +435,37 @@ NSString* const kEasterEggKmxName = @"EnglishSpanish.kmx";
  * Because this method depends on the selectedRange API which is not implemented correctly for some client applications,
  * this method can only be used if approved by TextApiCompliance
  */
--(void)insertAndReplaceText:(NSString *)text deleteCount:(int) replacementCount client:(id) client {
-
+-(void)insertAndReplaceText:(NSString *)text deleteCount:(int) replacementCount toReplace:(NSString*)textToDelete client:(id) client {
   [self.appDelegate logDebugMessage:@"KXMInputMethodHandler insertAndReplaceText: %@ replacementCount: %d", text, replacementCount];
-  int actualReplacementCount = 0;
-  NSRange replacementRange;
-  NSRange notFoundRange = NSMakeRange(NSNotFound, NSNotFound);
-  
-  if (replacementCount > 0) {
-    NSRange selectionRange = [client selectedRange];
-    
-    // make sure we have room to apply backspaces from current location
-    actualReplacementCount = MIN(replacementCount, (int)selectionRange.location);
-    
-    // log this: it is a sign that we are out of sync
-    if (actualReplacementCount < replacementCount) {
-      [self.appDelegate logDebugMessage:@"KXMInputMethodHandler insertAndReplaceText, replacement of %d characters limited by start of context to actual count: %d", replacementCount, actualReplacementCount];
-    }
-    
-    if (actualReplacementCount > 0) {
-      [self.appDelegate logDebugMessage:@"KXMInputMethodHandler insertAndReplaceText, actualReplacementCount=%d, selectionRange.location=%lu", actualReplacementCount, selectionRange.location];
-      
-      replacementRange = NSMakeRange(selectionRange.location-actualReplacementCount, replacementCount);
-      [self.appDelegate logDebugMessage:@"KXMInputMethodHandler insertAndReplaceText, insertText %@ in replacementRange.start=%lu, replacementRange.length=%lu", text, replacementRange.location, replacementRange.length];
-    } else {
-      replacementRange = notFoundRange;
-    }
-  } else {
-    replacementRange = notFoundRange;
-  }
+  NSRange selectionRange = [client selectedRange];
+  NSRange replacementRange = [self calculateInsertRangeForDeletedText:textToDelete selectionRange:selectionRange];
   
   [client insertText:text replacementRange:replacementRange];
   if (self.apiCompliance.isComplianceUncertain) {
     [self.apiCompliance testComplianceAfterInsert:client];
   }
+}
+
+/*
+ * Calculates the range where text will be inserted and replace existing text.
+ * Returning {NSNotFound, NSNotFound} for range signifies to insert at current location without replacement.
+ */
+-(NSRange) calculateInsertRangeForDeletedText:(NSString*)textToDelete selectionRange:(NSRange) selection {
+  NSRange notFoundRange = NSMakeRange(NSNotFound, NSNotFound);
+  NSRange resultingReplacementRange = NSMakeRange(0, 0);
+  
+  // range = current location if either
+  // 1. no text has been designated to be deleted, or
+  // 2. the length of the text to delete is impossible (greater than the location)
+  if ((textToDelete.length == 0) || (textToDelete.length > selection.location)) {
+    // magic value of {NSNotFound, NSNotFound} passed to insertText means "do not replace, insert in current location"
+    return notFoundRange;
+  } else {
+    resultingReplacementRange.length = textToDelete.length + selection.length;
+    resultingReplacementRange.location = selection.location - textToDelete.length;
+  }
+
+  return resultingReplacementRange;
 }
 
 -(void)sendEvents:(NSEvent *)event forOutput:(CoreKeyOutput*)output {
@@ -496,7 +493,7 @@ NSString* const kEasterEggKmxName = @"EnglishSpanish.kmx";
 -(void)insertQueuedText: (NSEvent *)event client:(id) client  {
   if (self.queuedText.length> 0) {
     [self.appDelegate logDebugMessage:@"insertQueuedText, inserting %@", self.queuedText];
-    [self insertAndReplaceText:self.queuedText deleteCount:0 client:client];
+    [self insertAndReplaceText:self.queuedText deleteCount:0 toReplace:nil client:client];
     self.queuedText = nil;
   } else {
     [self.appDelegate logDebugMessage:@"insertQueuedText called but no text to insert"];
