@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 18.0.12 alpha 2024-03-28
+
+* chore(common): Merge beta to master for Sprint B17S4 (#11105)
+
 ## 18.0.11 alpha 2024-03-20
 
 * chore(deps-dev): bump follow-redirects from 1.15.4 to 1.15.6 (#11010)
