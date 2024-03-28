@@ -42,6 +42,7 @@ static_assert(LALTFLAG == LDML_KEYS_MOD_ALTL, "LDML modifier bitfield vs. kmx_fi
 static_assert(K_ALTFLAG == LDML_KEYS_MOD_ALT, "LDML modifier bitfield vs. kmx_file.h #define mismatch");
 static_assert(CAPITALFLAG == LDML_KEYS_MOD_CAPS, "LDML modifier bitfield vs. kmx_file.h #define mismatch");
 static_assert(K_SHIFTFLAG == LDML_KEYS_MOD_SHIFT, "LDML modifier bitfield vs. kmx_file.h #define mismatch"); // "either" shift
+static_assert(K_DEFAULTMODFLAG == LDML_KEYS_MOD_DEFAULT, "LDML modifier bitfield vs. kmx_file.h #define mismatch");
 
 /**
  * \def LDML_IS_VALID_MODIFIER_BITS test whether x is a valid modifier bitfield

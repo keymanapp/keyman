@@ -65,6 +65,16 @@ vkeys::lookup(km_core_virtual_key vk, uint16_t modifier_state, bool &found) cons
       return ret;
     }
   }
+
+  // look for a layer with "default"
+  {
+    const vkey_id id_default(vk, (K_DEFAULTMODFLAG));
+    ret = lookup(id_default, found);
+    if (found) {
+      return ret;
+    }
+  }
+
   // default: return failure. found=false.
   return ret;
 }
