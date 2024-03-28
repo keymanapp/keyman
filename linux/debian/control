@@ -30,6 +30,7 @@ Build-Depends:
  python3-lxml,
  python3-magic,
  python3-numpy,
+ python3-packaging,
  python3-pil,
  python3-pip,
  python3-qrcode,
@@ -37,6 +38,7 @@ Build-Depends:
  python3-requests,
  python3-sentry-sdk (>= 1.1),
  python3-setuptools,
+ python3-xdg,
  xserver-xephyr,
  xvfb,
 Standards-Version: 4.6.2
@@ -83,13 +85,15 @@ Package: python3-keyman-config
 Section: python
 Architecture: all
 Depends:
+ dbus-x11,
  dconf-cli,
  gir1.2-webkit2-4.1 | gir1.2-webkit2-4.0,
  keyman-engine,
  python3-bs4,
  python3-gi,
+ python3-packaging,
  python3-sentry-sdk (>= 1.1),
- dbus-x11,
+ python3-xdg,
  ${misc:Depends},
  ${python3:Depends},
 Description: Keyman for Linux configuration

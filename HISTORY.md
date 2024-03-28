@@ -48,6 +48,53 @@
 * chore(common): move to 18.0 alpha (#10713)
 * chore: move to 18.0 alpha
 
+## 17.0.296 beta 2024-03-27
+
+* fix(developer): in model compiler, give correct key to shorter prefix words when a longer, higher-frequency word is also present (#11074)
+* fix(oem/fv/android): Only add default keyboard if no keyboards exist (#11080)
+*  (#11068)
+* chore(android): Update crowdin strings for Mon (#11089)
+* chore(android): Update crowdin strings for Khmer (#11090)
+
+## 17.0.295 beta 2024-03-26
+
+* docs(developer): add help site links (#10939)
+* chore(common): Update keymanweb-osk.ttf to 4.1 (#11035)
+* feat(linux): Start dbus if not running (#10863)
+
+## 17.0.294 beta 2024-03-25
+
+* chore(android,windows): Update crowdin strings for French (#11063)
+* chore(common): Fix missing entries in HISTORY.md (#11064)
+* fix(developer): catch sharing violation when saving mru (#11047)
+* fix(developer): capture alt shortcuts in LDML keyboard debugger (#11049)
+* fix(developer): correct path for kmc sourcemaps in sentry upload (#11051)
+
+## 17.0.293 beta 2024-03-22
+
+* chore(oem/fv): Update keyboard versions in keyboards.csv (#11013)
+* fix(developer): suppress emission of new empty fields in package editor (#11009)
+* fix(developer): return after calling await exitProcess (#11016)
+* chore(core): refresh API docs for 17.0 (#10986)
+
+## 17.0.292 beta 2024-03-21
+
+* fix(developer): remove unused keyboard info compiler messages (#10991)
+* fix(developer): font file meta data is invalid error (#10995)
+
+## 17.0.291 beta 2024-03-20
+
+* chore(mac): clean up code obsoleted by core (#10877)
+* fix(linux): Replace deprecated `pkg_resources` module with `packaging.version` (#10860)
+
+## 17.0.290 beta 2024-03-19
+
+* fix(ios): Sync selection range for long contexts (#10956)
+
+## 17.0.289 beta 2024-03-16
+
+* fix(common): add unit test for --debug flag for builder (#10974)
+
 ## 17.0.288 beta 2024-03-13
 
 * test(developer): kmc keyboard info compiler messages unit tests (#10848)
@@ -84,9 +131,9 @@
 
 * fix(android): fixes context-change detection for repeated-char cases (#10873)
 * fix(developer): search-term quote replacement was not global (#10934)
-*  (#10913)
+* chore(common): Update ldml out of techpreview (#10913)
 * fix(developer): fix for errant \uXXXX error (#10946)
-*  (#10948)
+* fix(developer): suppport loose match for CompilerEvents (#10948)
 * refactor(oem/fv/android): Install fallback keyboard (#10907)
 * refactor(android/app): Move storage permission checks (#10904)
 * fix(common): missing script exec bit (#10951)
@@ -126,7 +173,7 @@
 ## 17.0.278 beta 2024-02-28
 
 * docs(linux): Updated whatsnew for Keyman for Linux 17 (#10858)
-*  (#10869)
+* fix(web): Save context state on reset (#10869)
 * chore(android/engine): Reduce toast notifications after installations (#10868)
 * fix(android/engine): Check selection indexes (#10857)
 
@@ -148,7 +195,7 @@
 
 ## 17.0.275 beta 2024-02-23
 
-*  (#10791)
+* chore(core): Update sample ldml keyboard (#10791)
 * fix(developer): publish keymancore-1.dll symbols (#10797)
 * fix(developer): improve uploading of sourcemaps to sentry (#10798)
 * fix(android/engine): Fix how keyboard picker menu exits (#10806)
@@ -183,7 +230,7 @@
 * fix(core): fix output append logic in any_group::apply_transform (#10758)
 * fix(android): Match phone suggestion banner styling on tablet (#10760)
 * docs(mac): Document What's New for version 17.0 (#10764)
-*  (#10773)
+* fix(developer): Rename missing variables in tests (#10773)
 * chore(developer): reduce WARN_TouchLayoutUsesUnsupportedGesturesDownlevel to HINT (#10766)
 * fix(developer): prevent renaming of new project types in New Project dialog (#10767)
 * fix(developer): return an error code if build-test-data fails (#10765)
@@ -201,14 +248,14 @@
 * fix(web): sticky special-key highlighting (#10729)
 * fix(web): disables modipress for layer-switch keys with subkeys (#10745)
 * fix(web): missing null-guard for hardware keystrokes without active Keyman keyboard (#10740)
-* docs(ios): what's new in 17.0 (#10748)
+* docs(ios): add what's new in 17.0 (#10748)
 * fix(web): handling of page-elements focused before engine initialization (#10744)
 * fix(ios): multitap consistency after new-lines (#10728)
 * docs(common): Update website README (#10738)
 
 ## 17.0.270 beta 2024-02-17
 
-*  (#10735)
+* fix(core): Update more tests and fix ldml_transforms (#10735)
 
 ## 17.0.269 beta 2024-02-15
 

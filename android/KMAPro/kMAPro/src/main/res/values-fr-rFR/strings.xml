@@ -53,6 +53,7 @@
   <string name="request_storage_permission" comment="Request storage permission to access keyboard packages">    Pour installer des packages du clavier, autoriser Keyman à lire le stockage externe.</string>
   <!-- Context: Android Storage Permission -->
   <string name="storage_permission_denied" comment="Keyboard package installation may fail since Android storage permission not granted">    La demande de permission de stockage a été refusée. Peut ne pas installer le package clavier</string>
+  <string name="storage_permission_denied2" comment="Keyboard package installation failed. Recommend install from local file">    Storage permission request failed. Try Keyman Settings - Install from local file</string>
   <!-- Context: Keyman Settings menu -->
   <string name="keyman_settings" comment="Settings menu title">Paramètres</string>
   <!-- Context: Keyman Settings menu -->

@@ -6,19 +6,17 @@
 //  Copyright © 2017-2018 SIL International. All rights reserved.
 //
 #import "KMInputMethodEventHandler.h"
-#import "KMInputMethodEventHandlerProtected.h"
 #import <KeymanEngine4Mac/KeymanEngine4Mac.h>
 #import <Carbon/Carbon.h> /* For kVK_ constants. */
 #import "KeySender.h"
 #import "TextApiCompliance.h"
-
 @import Sentry;
 
 @interface KMInputMethodEventHandler ()
 @property (nonatomic, retain) KeySender* keySender;
 @property (nonatomic, retain) TextApiCompliance* apiCompliance;
 @property NSUInteger generatedBackspaceCount;
-@property BOOL backspaceHandledLowLevel;
+@property NSUInteger lowLevelBackspaceCount;
 @property (nonatomic, retain) NSString* clientApplicationId;
 @property NSString *queuedText;
 @property BOOL contextChanged;
@@ -30,8 +28,6 @@ const CGKeyCode kProcessPendingBuffer = 0xFF;
 const NSUInteger kMaxContext = 80;
 const NSTimeInterval kQueuedTextEventDelayInSeconds = 0.1;
 
-//_pendingBuffer contains text that is ready to be sent to the client when all delete-backs are finished.
-NSMutableString* _pendingBuffer;
 CGKeyCode _keyCodeOfOriginalEvent;
 CGEventSourceRef _sourceFromOriginalEvent = nil;
 CGEventSourceRef _sourceForGeneratedEvent = nil;
@@ -39,32 +35,13 @@ NSMutableString* _easterEggForSentry = nil;
 NSString* const kEasterEggText = @"Sentry force now";
 NSString* const kEasterEggKmxName = @"EnglishSpanish.kmx";
 
-NSRange _previousSelRange;
-
-// Protected initializer for use by subclasses
-- (instancetype)initWithLegacyMode:(BOOL)legacy clientSelectionCanChangeUnexpectedly:(BOOL) flagClientSelectionCanChangeUnexpectedly {
-    self = [super init];
-    if (self) {
-        _previousSelRange = NSMakeRange(NSNotFound, NSNotFound);
-        _clientSelectionCanChangeUnexpectedly = flagClientSelectionCanChangeUnexpectedly;
-        _clientCanProvideSelectionInfo = Unknown;
-        _legacyMode = NO;
-        _contextOutOfDate = YES;
-        if (legacy) {
-            [self switchToLegacyMode];
-        }
-    }
-    return self;
-}
-
 // This is the public initializer.
 - (instancetype)initWithClient:(NSString *)clientAppId client:(id) sender {
-    self.senderForDeleteBack = sender;
     _keySender = [[KeySender alloc] init];
     _clientApplicationId = clientAppId;
     _generatedBackspaceCount = 0;
-    
-    //BOOL legacy = [self isClientAppLegacy:clientAppId];
+    _lowLevelBackspaceCount = 0;
+    _queuedText = nil;
 
     // In Xcode, if Keyman is the active IM and is in "debugMode" and "English plus Spanish" is 
     // the current keyboard and you type "Sentry force now", it will force a simulated crash to 
@@ -76,16 +53,7 @@ NSRange _previousSelRange;
     else
         _easterEggForSentry = nil;
 
-    // For the Atom editor, this isn't really true (the context CAN change unexpectedly), but we can't get
-    // the context, so we pretend/hope it won't.
-    BOOL selectionCanChangeUnexpectedly = (![clientAppId isEqual: @"com.github.atom"]);
-    return [self initWithLegacyMode:self.apiCompliance.mustBackspaceUsingEvents clientSelectionCanChangeUnexpectedly:selectionCanChangeUnexpectedly];
-}
-
-- (void)switchToLegacyMode {
-    _legacyMode = YES;
-    if ([self.appDelegate debugMode])
-        NSLog(@"Using legacy mode for this app.");
+  return self;
 }
 
 - (void)deactivate {
@@ -121,37 +89,10 @@ NSRange _previousSelRange;
     // situation where a user could reasonably hope that any dead-keys typed before using a
     // command shortcut would be remembered, so other than an insignificant performance penalty,
     // the only downside to treating all commands as having the potential to change the selection
-    // is that some "legacy" apps can't get their context at all. This can be overridden so that
-    // legacy apps can mitigate this problem as appropriate.
+    // is that some non-compliant apps can't get their context at all. This can be overridden so that
+    // non-compliant apps can mitigate this problem as appropriate.
     [self.appDelegate logDebugMessage:@"KMInputMethodEventHandler handleCommand, event type=%@, must refresh context", event.type];
     self.contextChanged = YES;
-}
-
-- (void)checkContextIn:(id)client {
-    // Base implementation is no-op
-}
-
-- (void)replaceExistingSelectionIn:(id)client with:(NSString *) text {
-    [client insertText:text replacementRange:NSMakeRange(NSNotFound, NSNotFound)];
-    _previousSelRange.location += text.length;
-    _previousSelRange.length = 0;
-}
-
-- (void)insertPendingBufferTextIn:(id)client {
-    NSUInteger length = [self pendingBuffer].length;
-    if (!length) {
-        [self.appDelegate logDebugMessage:@"Error - expected text in pending buffer!"];
-        return;
-    }
-    NSString* text = [self pendingBuffer];
-
-    [self.appDelegate logDebugMessage:@"Inserting text from pending buffer: \"%@\"", text];
-
-    [client insertText:text replacementRange:NSMakeRange(NSNotFound, NSNotFound)];
-    _previousSelRange.location += text.length;
-    _previousSelRange.length = 0;
-
-    [self setPendingBuffer:@""];
 }
 
 - (KMInputMethodAppDelegate *)appDelegate {
@@ -160,54 +101,6 @@ NSRange _previousSelRange;
 
 - (KMEngine *)kme {
     return self.appDelegate.kme;
-}
-
-- (NSMutableString *)contextBuffer {
-    if (_contextOutOfDate) {
-        NSException* exception = [NSException
-                                  exceptionWithName:@"InvalidOperationException"
-                                  reason:@"Attempt to access out-of-date context."
-                                  userInfo:nil];
-        @throw exception;
-    }
-    return self.appDelegate.contextBuffer;
-}
-
--(NSString *)getLimitedContextFrom:(id)sender at:(NSUInteger) len {
-    if (![sender respondsToSelector:@selector(attributedSubstringFromRange:)])
-        return nil;
-
-    NSUInteger start = 0;
-    if (len > kMaxContext) {
-        [self.appDelegate logDebugMessage:@"Limiting context to %lu characters", kMaxContext];
-        start = len - kMaxContext;
-        len = kMaxContext;
-    }
-
-    NSString *preBuffer = [[sender attributedSubstringFromRange:NSMakeRange(start, len)] string];
-    [self.appDelegate logDebugMessage:@"preBuffer = \"%@\"", preBuffer ? preBuffer : @"nil"];
-    if (preBuffer.length)
-      [self.appDelegate logDebugMessage:@"First character: '%x'", [preBuffer characterAtIndex:0]];
-    else
-      [self.appDelegate logDebugMessage:@"preBuffer has a length of 0"];
-
-    return preBuffer;
-}
-
-// Return the pending buffer.  If it is NIL create it.
--(NSMutableString*)pendingBuffer;
-{
-    if ( _pendingBuffer == nil ) {
-        _pendingBuffer = [[NSMutableString alloc] init];
-    }
-    return _pendingBuffer;
-}
-
-// Change the pending buffer.
--(void)setPendingBuffer:(NSString*)string
-{
-    NSMutableString*        buffer = [self pendingBuffer];
-    [buffer setString:string];
 }
 
 - (BOOL) handleEventWithKeymanEngine:(NSEvent *)event in:(id) sender {
@@ -265,7 +158,7 @@ NSRange _previousSelRange;
 }
 
 /**
- handleBackspace: handles generated for a subset of non-compliant apps (such as Adobe apps) that do
+ handleBackspace: handles generated backspaces for a subset of non-compliant apps (such as Adobe apps) that do
  not support replacing text with the insertText API but also intercept events so that we do not see them in handleEvent.
  Other apps, such as Word, show the event both in the low
  level EventTap and in the normal IM handleEvent. Thus, we set a flag after
@@ -275,16 +168,14 @@ NSRange _previousSelRange;
 */
 - (void)handleBackspace:(NSEvent *)event {
   [self.appDelegate logDebugMessage:@"KMInputMethodEventHandler handleBackspace, event = %@", event];
-  NSLog(@"  backspaceHandledLowLevel: %d, generatedBackspaceCount: %lu", _backspaceHandledLowLevel, (unsigned long)_generatedBackspaceCount);
-  self.backspaceHandledLowLevel = NO;
-
+  
   if (self.generatedBackspaceCount > 0) {
     self.generatedBackspaceCount--;
-    self.backspaceHandledLowLevel = YES;
+    self.lowLevelBackspaceCount++;
     
     // if we just encountered the last backspace, then send event to insert queued text
-    if (self.generatedBackspaceCount == 0) {
-      [self performSelector:@selector(triggerInsertQueuedText:) withObject:event afterDelay:kQueuedTextEventDelayInSeconds];
+    if ((self.generatedBackspaceCount == 0) && (self.queuedText.length > 0)) {
+     [self performSelector:@selector(triggerInsertQueuedText:) withObject:event afterDelay:kQueuedTextEventDelayInSeconds];
     }
   }
 }
@@ -292,28 +183,6 @@ NSRange _previousSelRange;
 - (void)triggerInsertQueuedText:(NSEvent *)event {
   [self.appDelegate logDebugMessage:@"KMInputMethodEventHandler triggerInsertQueuedText"];
   [self.keySender sendKeymanKeyCodeForEvent:event];
-}
-
-- (void)initiatePendingBufferProcessing:(id)sender {
-    [self postKeyPressToFrontProcess:kProcessPendingBuffer from:NULL];
-}
-
-- (void)postKeyPressToFrontProcess:(CGKeyCode)code from:(CGEventSourceRef) source {
-    ProcessSerialNumber psn;
-    GetFrontProcess(&psn);
-
-    if ([self.appDelegate debugMode]) {
-        if (code == kProcessPendingBuffer) {
-            NSLog(@"Posting code to tell Keyman to process characters in pending buffer.");
-        }
-        else {
-            NSLog(@"Posting a keypress (down/up) to the 'front process' for the %hu key.", code);
-        }
-    }
-
-    [self.appDelegate postKeyboardEventWithSource:source code:code postCallback:^(CGEventRef eventToPost) {
-        CGEventPostToPSN((ProcessSerialNumberPtr)&psn, eventToPost);
-    }];
 }
 
 //MARK: Core-related key processing
@@ -358,16 +227,17 @@ NSRange _previousSelRange;
     // indicates that our generated backspace event(s) are consumed
     // and we can insert text that followed the backspace(s)
     if (event.keyCode == kKeymanEventKeyCode) {
-      [self.appDelegate logDebugMessage:@"handleEvent, handling kKeymanEventKeyCode"];
+     [self.appDelegate logDebugMessage:@"handleEvent, handling kKeymanEventKeyCode"];
       [self insertQueuedText: event client:sender];
       return YES;
     }
-
+    
     // for some apps, handleEvent will not be called for the generated backspace
     // but if it is, we need to let it pass through rather than process again in core
-    if((event.keyCode == kVK_Delete) && (self.backspaceHandledLowLevel)) {
+    if((event.keyCode == kVK_Delete) && (self.lowLevelBackspaceCount > 0)) {
       [self.appDelegate logDebugMessage:@"handleEvent, allowing generated backspace to pass through"];
-      self.backspaceHandledLowLevel = NO;
+      self.lowLevelBackspaceCount--;
+      
       // return NO to pass through to client app
       return NO;
     }
@@ -482,18 +352,35 @@ NSRange _previousSelRange;
   } else if (output.isDeleteOnlyScenario) {
     if ((event.keyCode == kVK_Delete) && output.codePointsToDeleteBeforeInsert == 1) {
       // let the delete pass through in the original event rather than sending a new delete
-      [self.appDelegate logDebugMessage:@"KXMInputMethodHandler applyOutputToTextInputClient, delete only scenario"];
+      [self.appDelegate logDebugMessage:@"KXMInputMethodHandler applyOutputToTextInputClient, delete only scenario with passthrough"];
       handledEvent = NO;
     } else {
       [self.appDelegate logDebugMessage:@"KXMInputMethodHandler applyOutputToTextInputClient, delete only scenario"];
       [self sendEvents:event forOutput:output];
     }
   } else if (output.isDeleteAndInsertScenario) {
+    // TODO: fix issue #10246
+    /*
+    // needs further testing to fix backspace bug in google docs (without breaking other apps)
+    // assume that all non-compliant apps which require backspaces apply an extra backspace if the original event is a backspace
+    if ((self.apiCompliance.mustBackspaceUsingEvents) && (event.keyCode == kVK_Delete)) {
+      output.codePointsToDeleteBeforeInsert--;
+      os_log_with_type(keymanLog, OS_LOG_TYPE_INFO, "isDeleteAndInsertScenario, after delete pressed subtracting one backspace to reach %d and insert text '%{public}@'", output.codePointsToDeleteBeforeInsert, output.textToInsert);
+      if (output.codePointsToDeleteBeforeInsert == 0) {
+        // no backspace events needed
+        [self insertAndReplaceTextForOutput:output client:client];
+      } else {
+        // still need at least one backspace event
+      [self sendEvents:event forOutput:output];
+      }
+    }
+     */
+
     if (self.apiCompliance.mustBackspaceUsingEvents) {
       [self.appDelegate logDebugMessage:@"KXMInputMethodHandler applyOutputToTextInputClient, delete and insert scenario with events"];
       [self sendEvents:event forOutput:output];
     } else {
-      [self.appDelegate logDebugMessage:@"KXMInputMethodHandler applyOutputToTextInputClient, delete and insert scenario with insert API"];
+     [self.appDelegate logDebugMessage:@"KXMInputMethodHandler applyOutputToTextInputClient, delete and insert scenario with insert API"];
       // directly insert text and handle backspaces by using replace
       [self insertAndReplaceTextForOutput:output client:client];
     }
@@ -585,15 +472,16 @@ NSRange _previousSelRange;
 }
 
 -(void)sendEvents:(NSEvent *)event forOutput:(CoreKeyOutput*)output {
-  [self.appDelegate logDebugMessage:@"sendEvents called"];
-  
+  [self.appDelegate logDebugMessage:@"sendEvents called, output = %@", output];
+
   _sourceForGeneratedEvent = CGEventCreateSourceFromEvent([event CGEvent]);
 
   self.generatedBackspaceCount = output.codePointsToDeleteBeforeInsert;
   
+
   if (output.hasCodePointsToDelete) {
     for (int i = 0; i < output.codePointsToDeleteBeforeInsert; i++) {
-      [self.appDelegate logDebugMessage:@"sendEvents queueing backspace"];
+      [self.appDelegate logDebugMessage:@"sendEvents sending backspace key event"];
       [self.keySender sendBackspaceforEventSource:_sourceForGeneratedEvent];
     }
   }
@@ -611,7 +499,7 @@ NSRange _previousSelRange;
     [self insertAndReplaceText:self.queuedText deleteCount:0 client:client];
     self.queuedText = nil;
   } else {
-    [self.appDelegate logDebugMessage:@"handleQueuedText called but no text to insert"];
+    [self.appDelegate logDebugMessage:@"insertQueuedText called but no text to insert"];
   }
 }
 
