@@ -334,6 +334,16 @@ describe('tran', function () {
         CompilerMessages.Error_MissingStringVariable({ id: "missingstr" }),
       ],
     },
+    // three cases that share the same error message
+    ...[1, 2, 3].map(n => ({
+      subpath: `sections/tran/fail-matches-nothing-${n}.xml`,
+      errors: [
+        {
+          code: CompilerMessages.ERROR_TransformFromMatchesNothing,
+          matchMessage: /.*/,
+        }
+      ],
+    })),
     // escaping
     {
       subpath: `sections/tran/tran-escape.xml`,
