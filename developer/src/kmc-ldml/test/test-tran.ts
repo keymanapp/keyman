@@ -334,7 +334,17 @@ describe('tran', function () {
         CompilerMessages.Error_MissingStringVariable({ id: "missingstr" }),
       ],
     },
-    // three cases that share the same error message
+    // cases that share the same error code
+    ...[1].map(n => ({
+      subpath: `sections/tran/fail-bad-from-${n}.xml`,
+      errors: [
+        {
+          code: CompilerMessages.ERROR_UnparseableTransformFrom,
+          matchMessage: /.*/,
+        }
+      ],
+    })),
+    // cases that share the same error code
     ...[1, 2, 3].map(n => ({
       subpath: `sections/tran/fail-matches-nothing-${n}.xml`,
       errors: [

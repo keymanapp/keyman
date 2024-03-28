@@ -172,17 +172,9 @@ export abstract class TransformCompiler<T extends TransformCompilerType, TranBas
       cookedFrom = MarkerParser.nfd_markers(cookedFrom, true);
     }
 
-    // Verify that the regex is syntactically valid
-    try {
-      const rg = new RegExp(cookedFrom + '$', 'ug');
-      // does it match an empty string?
-      if (rg.test('')) {
-        this.callbacks.reportMessage(CompilerMessages.Error_TransformFromMatchesNothing({ from: transform.from }));
-        return null;
-      }
-    } catch (e) {
-      this.callbacks.reportMessage(CompilerMessages.Error_UnparseableTransformFrom({ from: transform.from, message: e.message }));
-      return null; // error
+    // perform regex validation
+    if (!this.isValidRegex(cookedFrom, transform.from)) {
+      return null;
     }
 
     // cookedFrom is cooked above, since there's some special treatment
@@ -197,6 +189,33 @@ export abstract class TransformCompiler<T extends TransformCompilerType, TranBas
       nfd: true,
     }, sections);
     return result;
+  }
+
+  /**
+   * Validate the final regex
+   * @param cookedFrom the regex to use, missing the trailing '$'
+   * @param from the original from - for error reporting
+   * @returns true if OK
+   */
+  private isValidRegex(cookedFrom: string, from: string) : boolean {
+    // check for any unescaped dollar sign here
+    if (/(?<!\\)\$/.test(cookedFrom)) {
+      this.callbacks.reportMessage(CompilerMessages.Error_UnparseableTransformFrom({ from, message: `Transform contains '$' but did not match any variable substitution. '$' is not valid in transform syntax.` }));
+      return false;
+    }
+    // Verify that the regex is syntactically valid
+    try {
+      const rg = new RegExp(cookedFrom + '$', 'ug');
+      // does it match an empty string?
+      if (rg.test('')) {
+        this.callbacks.reportMessage(CompilerMessages.Error_TransformFromMatchesNothing({ from }));
+        return false;
+      }
+    } catch (e) {
+      this.callbacks.reportMessage(CompilerMessages.Error_UnparseableTransformFrom({ from, message: e.message }));
+      return false;
+    }
+    return true;
   }
 
   private compileReorderTranGroup(sections: DependencySections, reorders: LKReorder[]): TranGroup {
