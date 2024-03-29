@@ -1,5 +1,12 @@
 # Keyman Version History
 
+## 17.0.298 beta 2024-03-29
+
+* chore(linux): Update debian changelog (#11096)
+* fix(web): prevent layer switch key from erasing selection (#11032)
+* fix(developer): prevent error when scrolling touch layout editor with no selected key (#11109)
+* fix(common): make `isEmptyTransform` return true if passed a nullish transform (#11110)
+
 ## 17.0.297 beta 2024-03-28
 
 * fix(common): properly handle illegal UnicodeSets to prevent crash in kmc-ldml compiler (#11065)
