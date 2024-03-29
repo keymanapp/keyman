@@ -7,6 +7,7 @@
 
 #include "ldml_vkeys.hpp"
 #include "kmx_file.h"
+#include <ldml/keyman_core_ldml.h>
 
 namespace km {
 namespace core {
@@ -68,7 +69,7 @@ vkeys::lookup(km_core_virtual_key vk, uint16_t modifier_state, bool &found) cons
 
   // look for a layer with "default"
   {
-    const vkey_id id_default(vk, (K_DEFAULTMODFLAG));
+    const vkey_id id_default(vk, (LDML_KEYS_MOD_DEFAULT));
     ret = lookup(id_default, found);
     if (found) {
       return ret;
