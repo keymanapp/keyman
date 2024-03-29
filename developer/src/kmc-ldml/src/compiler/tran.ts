@@ -199,19 +199,24 @@ export abstract class TransformCompiler<T extends TransformCompilerType, TranBas
    */
   private isValidRegex(cookedFrom: string, from: string) : boolean {
     // check for any unescaped dollar sign here
-    if (/(?<!\\)\$/.test(cookedFrom)) {
-      this.callbacks.reportMessage(CompilerMessages.Error_UnparseableTransformFrom({ from, message: `Transform contains '$' but did not match any variable substitution. '$' is not valid in transform syntax.` }));
+    if (/(?<!\\)(?:\\\\)*\$/.test(cookedFrom)) {
+      this.callbacks.reportMessage(CompilerMessages.Error_IllegalTransformDollarsign({ from }));
       return false;
     }
     // Verify that the regex is syntactically valid
     try {
       const rg = new RegExp(cookedFrom + '$', 'ug');
+      // Tests against the regex:
+
       // does it match an empty string?
       if (rg.test('')) {
         this.callbacks.reportMessage(CompilerMessages.Error_TransformFromMatchesNothing({ from }));
         return false;
       }
     } catch (e) {
+      // We're exposing the internal regex error message here.
+      // In the future, CLDR plans to expose the EBNF for the transform,
+      // at which point we would have more precise validation prior to getting to this point.
       this.callbacks.reportMessage(CompilerMessages.Error_UnparseableTransformFrom({ from, message: e.message }));
       return false;
     }

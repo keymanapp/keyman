@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <keyboard3 xmlns="https://schemas.unicode.org/cldr/45/keyboard3" locale="mt" conformsTo="45">
-  <info name="vars-fail-7" />
+  <info name="dollarsign-fail-1" />
 
   <keys />
 
