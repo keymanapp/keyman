@@ -139,24 +139,27 @@ export abstract class TransformCompiler<T extends TransformCompilerType, TranBas
     let result = new TranTransform();
     let cookedFrom = transform.from;
 
-    cookedFrom = sections.vars.substituteStrings(cookedFrom, sections);
+    // check for incorrect \uXXXX escapes. Do this before substituting markers or sets.
+    cookedFrom = this.checkEscapes(cookedFrom); // check for \uXXXX escapes before normalizing
+
+    cookedFrom = sections.vars.substituteStrings(cookedFrom, sections, true);
     const mapFrom = VariableParser.CAPTURE_SET_REFERENCE.exec(cookedFrom);
     const mapTo = VariableParser.MAPPED_SET_REFERENCE.exec(transform.to || '');
     if (mapFrom && mapTo) { // TODO-LDML: error cases
       result.mapFrom = sections.strs.allocString(mapFrom[1]); // var name
       result.mapTo = sections.strs.allocString(mapTo[1]); // var name
     } else {
-      result.mapFrom = sections.strs.allocString(''); // TODO-LDML
-      result.mapTo = sections.strs.allocString(''); // TODO-LDML
+      result.mapFrom = sections.strs.allocString('');
+      result.mapTo = sections.strs.allocString('');
     }
+
+    if (cookedFrom === null) return null; // error
+
+    // the set substution will not produce raw markers `\m{...}` but they will already be in sentinel form.
     cookedFrom = sections.vars.substituteSetRegex(cookedFrom, sections);
 
     // add in markers. idempotent if no markers.
     cookedFrom = sections.vars.substituteMarkerString(cookedFrom, true);
-
-    // check for incorrect \uXXXX escapes
-    cookedFrom = this.checkEscapes(cookedFrom); // check for \uXXXX escapes before normalizing
-    if (cookedFrom === null) return null; // error
 
     // unescape from \u{} form to plain, or in some cases \uXXXX / \UXXXXXXXX for core
     cookedFrom = util.unescapeStringToRegex(cookedFrom);
@@ -171,7 +174,12 @@ export abstract class TransformCompiler<T extends TransformCompilerType, TranBas
 
     // Verify that the regex is syntactically valid
     try {
-      new RegExp(cookedFrom, 'ug');
+      const rg = new RegExp(cookedFrom + '$', 'ug');
+      // does it match an empty string?
+      if (rg.test('')) {
+        this.callbacks.reportMessage(CompilerMessages.Error_TransformFromMatchesNothing({ from: transform.from }));
+        return null;
+      }
     } catch (e) {
       this.callbacks.reportMessage(CompilerMessages.Error_UnparseableTransformFrom({ from: transform.from, message: e.message }));
       return null; // error

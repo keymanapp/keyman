@@ -49,7 +49,9 @@ export class CompilerMessages {
   static Error_GestureKeyNotFoundInKeyBag = (o:{keyId: string, parentKeyId: string, attribute: string}) =>
   m(this.ERROR_GestureKeyNotFoundInKeyBag, `Key '${def(o.keyId)}' not found in key bag, referenced from other '${def(o.parentKeyId)}' in ${def(o.attribute)}`);
 
-  // 0x000C - available
+  static ERROR_TransformFromMatchesNothing = SevError | 0x000C;
+  static Error_TransformFromMatchesNothing = (o: { from: string }) =>
+  m(this.ERROR_TransformFromMatchesNothing, `Invalid transfom from="${def(o.from)}": Matches an empty string.`);
 
   static ERROR_InvalidVersion = SevError | 0x000D;
   static Error_InvalidVersion = (o:{version: string}) =>
@@ -178,6 +180,7 @@ export class CompilerMessages {
   static ERROR_InvalidQuadEscape = SevError | 0x0030;
   static Error_InvalidQuadEscape = (o: { cp: number }) =>
   m(this.ERROR_InvalidQuadEscape, `Invalid escape "\\u${util.hexQuad(o?.cp || 0)}", use "\\u{${def(o?.cp?.toString(16))}}" instead.`);
+
 }
 
 

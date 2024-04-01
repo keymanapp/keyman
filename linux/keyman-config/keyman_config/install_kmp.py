@@ -20,7 +20,6 @@ from keyman_config.get_kmp import (InstallLocation, get_keyboard_data,
 from keyman_config.gnome_keyboards_util import (GnomeKeyboardsUtil,
                                                 get_ibus_keyboard_id,
                                                 is_gnome_shell)
-from keyman_config.gsettings import GSettings
 from keyman_config.ibus_util import get_ibus_bus, install_to_ibus, restart_ibus
 from keyman_config.kmpmetadata import KMFileTypes, get_metadata
 from keyman_config.kvk2ldml import convert_kvk_to_ldml, output_ldml

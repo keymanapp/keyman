@@ -31,7 +31,7 @@ class CustomKeyboards():
             custom_keyboards.append(keyboard)
         else:
             custom_keyboards = [keyboard]
-        self.gsettings.set('additional-keyboards', custom_keyboards, 'as')
+        self.gsettings.set(GSETTINGS_ADDITIONAL_KEYBOARDS_KEY, custom_keyboards, 'as')
 
     def remove(self, keyboard_path):
         if not keyboard_path:
@@ -49,4 +49,4 @@ class CustomKeyboards():
         else:
             custom_keyboards = []
 
-        self.gsettings.set('additional-keyboards', custom_keyboards, 'as')
+        self.gsettings.set(GSETTINGS_ADDITIONAL_KEYBOARDS_KEY, custom_keyboards, 'as')

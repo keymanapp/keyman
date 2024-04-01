@@ -24,6 +24,7 @@ setup(
         'pillow',
         'PyGObject',
         'python-magic',
+        'pyxdg',
         'qrcode',
         'requests-cache',
         'requests',
