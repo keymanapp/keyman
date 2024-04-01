@@ -397,7 +397,7 @@ describe('keyboard-info-compiler', function () {
       regionName: undefined,
       scriptName: undefined,
       displayName: "Khmer",
-    },en: {
+    }, en: {
       examples: [ SECOND_EXAMPLES_NO_ID ],
       font: SECOND_DISPLAY_FONT_INFO,
       oskFont: SECOND_OSK_FONT_INFO,
