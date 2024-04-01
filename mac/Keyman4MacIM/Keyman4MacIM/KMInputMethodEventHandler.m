@@ -306,21 +306,33 @@ NSString* const kEasterEggKmxName = @"EnglishSpanish.kmx";
 }
 
 -(NSString*)readContext:(NSEvent *)event forClient:(id) client {
-  NSString *contextString = nil;
+  NSString *contextString = @"";
   NSAttributedString *attributedString = nil;
   
-  // if we can read the text, then get the context
+  // if we can read the text, then get the context for up to kMaxContent characters
   if (self.apiCompliance.canReadText) {
     NSRange selectionRange = [client selectedRange];
-    NSRange contextRange = NSMakeRange(0, selectionRange.location);
-    attributedString = [client attributedSubstringFromRange:contextRange];
+    NSUInteger contextLength = MIN(kMaxContext, selectionRange.location);
+    NSUInteger contextStart = selectionRange.location - contextLength;
+    
+    if (contextLength > 0) {
+      [self.appDelegate logDebugMessage:@"   *** InputMethodEventHandler readContext, %d characters", contextLength];
+      NSRange contextRange = NSMakeRange(contextStart, contextLength);
+      attributedString = [client attributedSubstringFromRange:contextRange];
+
+      // adjust string in case that we receive half of a surrogate pair at context start
+      // the API appears to always return a full code point, but this could vary by app
+      if (attributedString.length > 0) {
+        if (CFStringIsSurrogateLowCharacter([attributedString.string characterAtIndex:0])) {
+          [self.appDelegate logDebugMessage:@"   *** InputMethodEventHandler readContext, first char is low surrogate, reducing context by one character"];
+          contextString = [attributedString.string substringFromIndex:1];
+        } else {
+          contextString = attributedString.string;
+        }
+      }
+    }
   }
   
-  if(attributedString == nil) {
-    contextString = @"";
-  } else {
-    contextString = attributedString.string;
-  }
   return contextString;
 }
 
