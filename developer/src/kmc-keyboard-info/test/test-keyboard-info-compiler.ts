@@ -380,29 +380,32 @@ describe('keyboard-info-compiler', function () {
     const sources = KHMER_ANGKOR_SOURCES;
     const compiler = new KeyboardInfoCompiler();
     assert.isTrue(await compiler.init(callbacks, {sources}));
+    let callCount = 0;
     compiler['fontSourceToKeyboardInfoFont'] = async (_kpsFilename: string, _kmpJsonData: KmpJsonFile.KmpJsonFile, _source: string[]) => {
-      if (_source[0] == KHMER_ANGKOR_DISPLAY_FONT) {
-        return KHMER_ANGKOR_DISPLAY_FONT_INFO;
-      } else if (_source[0] == KHMER_ANGKOR_OSK_FONT) {
-        return KHMER_ANGKOR_OSK_FONT_INFO;
-      } else if (_source[0] == SECOND_DISPLAY_FONT) {
-        return SECOND_DISPLAY_FONT_INFO;
-      }else { // second osk font
-        return SECOND_OSK_FONT_INFO;
-      }
-    }
+      callCount++;
+      const info = [KHMER_ANGKOR_DISPLAY_FONT_INFO, KHMER_ANGKOR_OSK_FONT_INFO, SECOND_DISPLAY_FONT_INFO, SECOND_OSK_FONT_INFO];
+      return info[callCount-1];
+    };
     const keyboard_info: KeyboardInfoFile = {};
     const result = await compiler['fillLanguages'](KHMER_ANGKOR_KPS, keyboard_info, kmpJsonData);
     assert.isTrue(result);
-    // assert.deepEqual(keyboard_info.languages, {km: {
-    //   examples: [ KHMER_ANGKOR_EXAMPLES_NO_ID ],
-    //   font: KHMER_ANGKOR_DISPLAY_FONT_INFO,
-    //   oskFont: KHMER_ANGKOR_OSK_FONT_INFO,
-    //   languageName: "Khmer",
-    //   regionName: undefined,
-    //   scriptName: undefined,
-    //   displayName: "Khmer",
-    // }});
+    assert.deepEqual(keyboard_info.languages, {km: {
+      examples: [ KHMER_ANGKOR_EXAMPLES_NO_ID ],
+      font: KHMER_ANGKOR_DISPLAY_FONT_INFO,
+      oskFont: KHMER_ANGKOR_OSK_FONT_INFO,
+      languageName: "Khmer",
+      regionName: undefined,
+      scriptName: undefined,
+      displayName: "Khmer",
+    },en: {
+      examples: [ SECOND_EXAMPLES_NO_ID ],
+      font: SECOND_DISPLAY_FONT_INFO,
+      oskFont: SECOND_OSK_FONT_INFO,
+      languageName: "English",
+      regionName: undefined,
+      scriptName: undefined,
+      displayName: "English",
+    }});
   });
 
   it('check fillLanguages returns false if fontSourceToKeyboardInfoFont fails for display font', async function() {
