@@ -82,6 +82,23 @@ const SECOND_KEYBOARD = {
 const SECOND_DISPLAY_FONT_INFO = { family: "Second", source: [ SECOND_DISPLAY_FONT ] };
 const SECOND_OSK_FONT_INFO = { family: "Second Kbd", source: [ SECOND_OSK_FONT ] };
 
+const JAVA_DISPLAY_FONT = "java.ttf";
+const JAVA_OSK_FONT = "java_osk.ttf";
+const JAVA_EXAMPLES_NO_ID = { keys: "j a v a", text: "java", note: "Java" };
+
+const JAVA_KEYBOARD = {
+  displayFont: JAVA_DISPLAY_FONT,
+  oskFont: JAVA_OSK_FONT,
+  name: "Java Lang",
+  id: "Java_lang",
+  version: "0.1",
+  languages: [ { name: "Java Language", id: "jv-Arab-ID" } ],
+  examples: [ { id: "jv-Arab-ID", ...JAVA_EXAMPLES_NO_ID } ]
+};
+
+const JAVA_DISPLAY_FONT_INFO = { family: "Java", source: [ JAVA_DISPLAY_FONT ] };
+const JAVA_OSK_FONT_INFO = { family: "Java Kbd", source: [ JAVA_OSK_FONT ] };
+
 describe('keyboard-info-compiler', function () {
   it('compile a .keyboard_info file correctly', async function() {
     const kpjFilename = KHMER_ANGKOR_KPJ;
@@ -405,6 +422,37 @@ describe('keyboard-info-compiler', function () {
       regionName: undefined,
       scriptName: undefined,
       displayName: "English",
+    }});
+  });
+
+  it('check fillLanguages handles regions and scripts correctly', async function() {
+    const kmpJsonData: KmpJsonFile.KmpJsonFile = {
+      system: { fileVersion: '', keymanDeveloperVersion: '' },
+      options: null,
+      keyboards: [JAVA_KEYBOARD],
+    };
+
+    const sources = KHMER_ANGKOR_SOURCES;
+    const compiler = new KeyboardInfoCompiler();
+    assert.isTrue(await compiler.init(callbacks, {sources}));
+    compiler['fontSourceToKeyboardInfoFont'] = async (_kpsFilename: string, _kmpJsonData: KmpJsonFile.KmpJsonFile, _source: string[]) => {
+      if (_source[0] == JAVA_DISPLAY_FONT) {
+        return JAVA_DISPLAY_FONT_INFO;
+      } else { // osk font
+        return JAVA_OSK_FONT_INFO;
+      }
+    }
+    const keyboard_info: KeyboardInfoFile = {};
+    const result = await compiler['fillLanguages'](KHMER_ANGKOR_KPS, keyboard_info, kmpJsonData);
+    assert.isTrue(result);
+    assert.deepEqual(keyboard_info.languages, {'jv-Arab-ID': {
+      examples: [ JAVA_EXAMPLES_NO_ID ],
+      font: JAVA_DISPLAY_FONT_INFO,
+      oskFont: JAVA_OSK_FONT_INFO,
+      languageName: "Javanese",
+      regionName: "Indonesia",
+      scriptName: "Arabic",
+      displayName: "Javanese (Arabic, Indonesia)",
     }});
   });
 
