@@ -50,6 +50,7 @@ const EN_LANGTAG = {
 
 const KHMER_ANGKOR_DISPLAY_FONT = "Mondulkiri-R.ttf";
 const KHMER_ANGKOR_OSK_FONT = "khmer_busra_kbd.ttf";
+const KHMER_ANGKOR_EXAMPLES_NO_ID = { keys: "x j m E r", text: "ខ្មែរ", note: "Name of language" };
 
 const KHMER_ANGKOR_KEYBOARD = {
   displayFont: KHMER_ANGKOR_DISPLAY_FONT,
@@ -57,20 +58,8 @@ const KHMER_ANGKOR_KEYBOARD = {
   name: "Khmer Angkor",
   id: "khmer_angkor",
   version: "1.3",
-  languages: [
-    {
-       name: "Central Khmer (Khmer, Cambodia)",
-       id: "km",
-    },
-  ],
-  examples: [
-    {
-      id: "km",
-      keys: "x j m E r",
-      text: "ខ្មែរ",
-      note: "Name of language",
-    },
-  ],
+  languages: [ { name: "Central Khmer (Khmer, Cambodia)", id: "km" } ],
+  examples: [ { id: "km", ...KHMER_ANGKOR_EXAMPLES_NO_ID } ]
 };
 
 const KHMER_ANGKOR_DISPLAY_FONT_INFO = { family: "Khmer Mondulkiri", source: [ KHMER_ANGKOR_DISPLAY_FONT ] };
@@ -350,8 +339,18 @@ describe('keyboard-info-compiler', function () {
         return KHMER_ANGKOR_OSK_FONT_INFO;
       }
     }
-    const result = await compiler['fillLanguages'](KHMER_ANGKOR_KPS, {}, kmpJsonData);
+    const keyboard_info: KeyboardInfoFile = {};
+    const result = await compiler['fillLanguages'](KHMER_ANGKOR_KPS, keyboard_info, kmpJsonData);
     assert.isTrue(result);
+    assert.deepEqual(keyboard_info.languages, {km: {
+      examples: [ KHMER_ANGKOR_EXAMPLES_NO_ID ],
+      font: KHMER_ANGKOR_DISPLAY_FONT_INFO,
+      oskFont: KHMER_ANGKOR_OSK_FONT_INFO,
+      languageName: "Khmer",
+      regionName: undefined,
+      scriptName: undefined,
+      displayName: "Khmer",
+    }});
   });
 
   it('check fillLanguages returns false if fontSourceToKeyboardInfoFont fails for display font', async function() {
