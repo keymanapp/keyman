@@ -335,14 +335,19 @@ describe('tran', function () {
       ],
     },
     // cases that share the same error code
-    ...[1].map(n => ({
-      subpath: `sections/tran/fail-bad-from-${n}.xml`,
+    ...[1, 2].map(n => ({
+      subpath: `sections/tran/fail-IllegalTransformDollarsign-${n}.xml`,
       errors: [
         {
-          code: CompilerMessages.ERROR_UnparseableTransformFrom,
+          code: CompilerMessages.ERROR_IllegalTransformDollarsign,
           matchMessage: /.*/,
         }
       ],
+    })),
+    // successful compile
+    ...[1].map(n => ({
+      subpath: `sections/tran/ok-${n}.xml`,
+      errors: false,
     })),
     // cases that share the same error code
     ...[1, 2, 3].map(n => ({
