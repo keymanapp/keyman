@@ -65,6 +65,23 @@ const KHMER_ANGKOR_KEYBOARD = {
 const KHMER_ANGKOR_DISPLAY_FONT_INFO = { family: "Khmer Mondulkiri", source: [ KHMER_ANGKOR_DISPLAY_FONT ] };
 const KHMER_ANGKOR_OSK_FONT_INFO = { family: "Khmer Busra Kbd", source: [ KHMER_ANGKOR_OSK_FONT ] };
 
+const SECOND_DISPLAY_FONT = "second.ttf";
+const SECOND_OSK_FONT = "second_osk.ttf";
+const SECOND_EXAMPLES_NO_ID = { keys: "t w o", text: "two", note: "The number 2" };
+
+const SECOND_KEYBOARD = {
+  displayFont: SECOND_DISPLAY_FONT,
+  oskFont: SECOND_OSK_FONT,
+  name: "Second Lang",
+  id: "second_lang",
+  version: "0.1",
+  languages: [ { name: "Second Language", id: "en" } ],
+  examples: [ { id: "en", ...SECOND_EXAMPLES_NO_ID } ]
+};
+
+const SECOND_DISPLAY_FONT_INFO = { family: "Second", source: [ SECOND_DISPLAY_FONT ] };
+const SECOND_OSK_FONT_INFO = { family: "Second Kbd", source: [ SECOND_OSK_FONT ] };
+
 describe('keyboard-info-compiler', function () {
   it('compile a .keyboard_info file correctly', async function() {
     const kpjFilename = KHMER_ANGKOR_KPJ;
@@ -353,6 +370,41 @@ describe('keyboard-info-compiler', function () {
     }});
   });
 
+  it('check fillLanguages can handle two keyboards correctly', async function() {
+    const kmpJsonData: KmpJsonFile.KmpJsonFile = {
+      system: { fileVersion: '', keymanDeveloperVersion: '' },
+      options: null,
+      keyboards: [KHMER_ANGKOR_KEYBOARD, SECOND_KEYBOARD],
+    };
+
+    const sources = KHMER_ANGKOR_SOURCES;
+    const compiler = new KeyboardInfoCompiler();
+    assert.isTrue(await compiler.init(callbacks, {sources}));
+    compiler['fontSourceToKeyboardInfoFont'] = async (_kpsFilename: string, _kmpJsonData: KmpJsonFile.KmpJsonFile, _source: string[]) => {
+      if (_source[0] == KHMER_ANGKOR_DISPLAY_FONT) {
+        return KHMER_ANGKOR_DISPLAY_FONT_INFO;
+      } else if (_source[0] == KHMER_ANGKOR_OSK_FONT) {
+        return KHMER_ANGKOR_OSK_FONT_INFO;
+      } else if (_source[0] == SECOND_DISPLAY_FONT) {
+        return SECOND_DISPLAY_FONT_INFO;
+      }else { // second osk font
+        return SECOND_OSK_FONT_INFO;
+      }
+    }
+    const keyboard_info: KeyboardInfoFile = {};
+    const result = await compiler['fillLanguages'](KHMER_ANGKOR_KPS, keyboard_info, kmpJsonData);
+    assert.isTrue(result);
+    // assert.deepEqual(keyboard_info.languages, {km: {
+    //   examples: [ KHMER_ANGKOR_EXAMPLES_NO_ID ],
+    //   font: KHMER_ANGKOR_DISPLAY_FONT_INFO,
+    //   oskFont: KHMER_ANGKOR_OSK_FONT_INFO,
+    //   languageName: "Khmer",
+    //   regionName: undefined,
+    //   scriptName: undefined,
+    //   displayName: "Khmer",
+    // }});
+  });
+
   it('check fillLanguages returns false if fontSourceToKeyboardInfoFont fails for display font', async function() {
     const kmpJsonData: KmpJsonFile.KmpJsonFile = {
       system: { fileVersion: '', keymanDeveloperVersion: '' },
@@ -395,29 +447,3 @@ describe('keyboard-info-compiler', function () {
     assert.isFalse(result);
   });
 });
-
-// {
-//   examples: [
-//     {
-//       keys: "x j m E r",
-//       note: "Name of language",
-//       text: "ខ្មែរ",
-//     },
-//   ],
-//   font: {
-//     family: "Khmer Mondulkiri",
-//     source: [
-//       "Mondulkiri-R.ttf",
-//     ],
-//   },
-//   oskFont: {
-//     family: "Khmer Busra Kbd",
-//     source: [
-//       "khmer_busra_kbd.ttf",
-//     ],
-//   },
-//   languageName: "Khmer",
-//   regionName: undefined,
-//   scriptName: undefined,
-//   displayName: "Khmer",
-// }
