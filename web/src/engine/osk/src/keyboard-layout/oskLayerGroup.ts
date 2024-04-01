@@ -1,4 +1,4 @@
-import { ActiveLayer, type DeviceSpec, Keyboard, LayoutLayer, ActiveLayout } from '@keymanapp/keyboard-processor';
+import { ActiveLayer, type DeviceSpec, Keyboard, LayoutLayer, ActiveLayout, ButtonClasses } from '@keymanapp/keyboard-processor';
 import { ManagedPromise } from '@keymanapp/web-utils';
 
 import { InputSample } from '@keymanapp/gesture-recognizer';
@@ -7,11 +7,19 @@ import { KeyElement } from '../keyElement.js';
 import OSKLayer from './oskLayer.js';
 import VisualKeyboard from '../visualKeyboard.js';
 import OSKRow from './oskRow.js';
+import OSKBaseKey from './oskBaseKey.js';
+
+const NEAREST_KEY_HORIZ_FUDGE_FACTOR = 0.6;
+const NEAREST_KEY_MIN_HORIZONTAL_FUDGE_PIXELS = 24;
 
 export default class OSKLayerGroup {
   public readonly element: HTMLDivElement;
   public readonly layers: {[layerID: string]: OSKLayer} = {};
   public readonly spec: ActiveLayout;
+
+  // Exist as local copies of the VisualKeyboard values, updated via refreshLayout.
+  private computedWidth: number;
+  private computedHeight: number;
 
   private _activeLayerId: string = 'default';
 
@@ -107,8 +115,6 @@ export default class OSKLayerGroup {
       throw new Error(`Layer id ${layerId} could not be found`);
     }
 
-    this.blinkLayer(layer);
-
     return this.nearestKey(coord, layer);
   }
 
@@ -165,86 +171,97 @@ export default class OSKLayerGroup {
   }
 
   private nearestKey(coord: Omit<InputSample<KeyElement>, 'item'>, layer: OSKLayer): KeyElement {
-    const baseRect = this.element.getBoundingClientRect();
+    // If there are no rows, there are no keys; return instantly.
+    if(layer.rows.length == 0) {
+      return null;
+    }
 
+    // Our pre-processed layout info maps whatever shape the keyboard is in into a unit square.
+    // So, we map our coord to find its location within that square.
+    const proportionalCoords = {
+      // Note:  need to cache these two values in some manner; if the keyboard is swapped,
+      // we need them if any keypresses are registered before the swap completes.
+      x: coord.targetX / this.computedWidth,
+      y: coord.targetY / this.computedHeight
+    };
+
+    // If our computed width and/or height are 0, it's best to abort; key distance
+    // calculations are not viable.
+    if(!isFinite(proportionalCoords.x) || !isFinite(proportionalCoords.y)) {
+      return null;
+    }
+
+    // Step 1:  find the nearest row.
     let row: OSKRow = null;
     let bestMatchDistance = Number.MAX_VALUE;
 
+    // Max distance from the key's center to consider, vertically.
+    // Rows aren't variable-height - this value is "one size fits all."
+    const rowRadius = layer.rows[0].heightFraction / 2;
+
     // Find the row that the touch-coordinate lies within.
     for(const r of layer.rows) {
-      const rowRect = r.element.getBoundingClientRect();
-      if(rowRect.top <= coord.clientY && coord.clientY < rowRect.bottom) {
+      const distance = Math.abs(proportionalCoords.y - r.spec.proportionalY);
+      if(distance <= rowRadius) {
         row = r;
         break;
-      } else {
-        const distance = rowRect.top > coord.clientY ? rowRect.top - coord.clientY : coord.clientY - rowRect.bottom;
+      } else if(distance < bestMatchDistance) {
+        bestMatchDistance = distance;
+        row = r;
+      }
+    }
+    // Assertion:  row no longer `null`.
+    // (We already prevented the no-rows available scenario, anyway.)
 
-        if(distance < bestMatchDistance) {
-          bestMatchDistance = distance;
-          row = r;
+    // Step 2: Find minimum distance from any key
+    // - If the coord is within a key's square, go ahead and return it.
+    let closestKey: OSKBaseKey = null;
+    let minDistance = Number.MAX_VALUE;
+
+    for (let key of row.keys) {
+      const keySpec = key.spec;
+      if(keySpec.sp == ButtonClasses.blank || keySpec.sp == ButtonClasses.spacer) {
+        continue;
+      }
+
+      // Max distance from the key's center to consider, horizontally.
+      const keyRadius = keySpec.proportionalWidth / 2;
+      const distanceFromCenter = Math.abs(proportionalCoords.x - keySpec.proportionalX);
+
+      // Find the actual key element.
+      if(distanceFromCenter - keyRadius <= 0) {
+        // As noted above:  if we land within a key's square, match instantly!
+        return key.btn;
+      } else {
+        const distance = distanceFromCenter - keyRadius;
+        if(distance < minDistance) {
+          minDistance = distance;
+          closestKey = key;
         }
       }
     }
 
-    // Assertion:  row no longer `null`.
+    // Step 3:  If the input coordinate wasn't within any valid key's "square",
+    // determine if the nearest valid key is acceptable.
+    const minHorizFudge = NEAREST_KEY_MIN_HORIZONTAL_FUDGE_PIXELS / this.element.offsetWidth;
 
-    // Warning: am not 100% sure that what follows is actually fully correct.
+    // If the condition is not met, there are no valid keys within this row.
+    if (minDistance < Number.MAX_VALUE) {
+      let fudgeFactor = closestKey.spec.proportionalWidth * NEAREST_KEY_HORIZ_FUDGE_FACTOR;
+      fudgeFactor = fudgeFactor > minHorizFudge ? fudgeFactor : minHorizFudge;
 
-    // Find minimum distance from any key
-    let closestKeyIndex = 0;
-    let dx: number;
-    let dxMax = 24;
-    let dxMin = 100000;
-
-    const x = coord.clientX;
-
-    for (let k = 0; k < row.keys.length; k++) {
-      // Second-biggest, though documentation suggests this is probably right.
-      const keySquare = row.keys[k].square as HTMLElement; // gets the .kmw-key-square containing a key
-      const squareRect = keySquare.getBoundingClientRect();
-
-      // Find the actual key element.
-      let childNode = keySquare.firstChild ? keySquare.firstChild as HTMLElement : keySquare;
-
-      if (childNode.className !== undefined
-        && (childNode.className.indexOf('key-hidden') >= 0
-          || childNode.className.indexOf('key-blank') >= 0)) {
-        continue;
-      }
-      const x1 = squareRect.left;
-      const x2 = squareRect.right;
-      if (x >= x1 && x <= x2) {
-        // Within the key square
-        return <KeyElement>childNode;
-      }
-      dx = x1 - x;
-      if (dx >= 0 && dx < dxMin) {
-        // To right of key
-        closestKeyIndex = k; dxMin = dx;
-      }
-      dx = x - x2;
-      if (dx >= 0 && dx < dxMin) {
-        // To left of key
-        closestKeyIndex = k; dxMin = dx;
+      if(minDistance <= fudgeFactor) {
+        return closestKey.btn;
       }
     }
 
-    if (dxMin < 100000) {
-      const t = <HTMLElement>row.keys[closestKeyIndex].square;
-      const squareRect = t.getBoundingClientRect();
-
-      const x1 = squareRect.left;
-      const x2 = squareRect.right;
-
-      // Limit extended touch area to the larger of 0.6 of key width and 24 px
-      if (squareRect.width > 40) {
-        dxMax = 0.6 * squareRect.width;
-      }
-
-      if (((x1 - x) >= 0 && (x1 - x) < dxMax) || ((x - x2) >= 0 && (x - x2) < dxMax)) {
-        return <KeyElement>t.firstChild;
-      }
-    }
+    // Step 4:  no matches => return null.  The caller should be able to handle such cases,
+    // anyway.
     return null;
+  }
+
+  public refreshLayout(computedWidth: number, computedHeight: number) {
+    this.computedWidth = computedWidth;
+    this.computedHeight = computedHeight;
   }
 }

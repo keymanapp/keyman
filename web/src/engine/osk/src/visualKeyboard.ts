@@ -1288,6 +1288,10 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
       return;
     }
 
+    // Set layer-group copies of the computed-size values; they are used by nearest-key
+    // detection.
+    this.layerGroup.refreshLayout(this._computedWidth, this._computedHeight);
+
     // Step 3: recalculate gesture parameter values
     // Skip for doc-keyboards, since they don't do gestures.
     if(!this.isStatic) {
