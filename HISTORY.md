@@ -1,5 +1,11 @@
 # Keyman Version History
 
+## 17.0.300 beta 2024-04-02
+
+* change(web): keyboard swaps keep original keyboards active until fully ready (#11108)
+* fix(android/engine): Swap selection range if reversed (#11127)
+* test(developer): keyboard info compiler unit tests (#11000)
+
 ## 17.0.299 beta 2024-04-01
 
 * fix(ios):  address crash by reading full code point rather than code unit when trimming initial directional-mark (#11113)
