@@ -472,7 +472,7 @@ For each key:
 |  0x0020  | `ctrl`    | `K_CTRLFLAG`       | Either Control                                |
 |  0x0040  | `alt`     | `K_ALTFLAG`        | Either Alt                                    |
 |  0x0100  | `caps`    | `CAPITALFLAG`      | Caps lock                                     |
-|  0x10000 | `default` | n/a                | Default (not used in conjunction with others) |
+|  0x10000 | `other` | n/a                  | Other (not used in conjunction with others)   |
 
 TODO-LDML: Note that conforming to other keyman values, left versus right shift
 cannot be distinguished.

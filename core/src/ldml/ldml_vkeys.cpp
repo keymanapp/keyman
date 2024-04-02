@@ -67,9 +67,9 @@ vkeys::lookup(km_core_virtual_key vk, uint16_t modifier_state, bool &found) cons
     }
   }
 
-  // look for a layer with "default"
+  // look for a layer with "other"
   {
-    const vkey_id id_default(vk, (LDML_KEYS_MOD_DEFAULT));
+    const vkey_id id_default(vk, (LDML_KEYS_MOD_OTHER));
     ret = lookup(id_default, found);
     if (found) {
       return ret;

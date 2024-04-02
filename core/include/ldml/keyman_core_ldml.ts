@@ -271,9 +271,9 @@ class Constants {
   readonly keys_mod_shift = 0x0010;
 
   /**
-   * bitmask for 'default'.
+   * bitmask for 'other'.
    */
-  readonly keys_mod_default = 0x10000;
+  readonly keys_mod_other = 0x10000;
 
   /**
    * Convenience map for modifiers
@@ -289,7 +289,7 @@ class Constants {
       ["ctrlL", this.keys_mod_ctrlL],
       ["ctrlR", this.keys_mod_ctrlR],
       ["shift", this.keys_mod_shift],
-      ["default", this.keys_mod_default],
+      ["other", this.keys_mod_other],
     ]
   );
 

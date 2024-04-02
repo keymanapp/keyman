@@ -20,7 +20,7 @@ will match the default layer
     <layer id="shift" modifiers="shift">
       <row keys="s" /> <!-- number row -->
     </layer>
-    <layer id="default" modifiers="default">
+    <layer id="other" modifiers="other">
       <row keys="d" /> <!-- number row -->
     </layer>
   </layers>

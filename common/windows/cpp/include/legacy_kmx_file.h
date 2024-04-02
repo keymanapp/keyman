@@ -303,7 +303,7 @@
 #define RALTFLAG		0x0008		// Right Alt flag
 #define K_SHIFTFLAG		0x0010		// Either shift flag
 #define K_CTRLFLAG		0x0020		// Either ctrl flag
-#define K_ALTFLAG		0x0040		// Either alt lag
+#define K_ALTFLAG		0x0040		// Either alt flag
 //#define K_METAFLAG  0x0080    // Either Meta-key flag (tentative).  Not usable in keyboard rules;
                                 // Used internally (currently, only by KMW) to ensure Meta-key
                                 // shortcuts safely bypass rules
@@ -320,9 +320,9 @@
 #define K_MODIFIERFLAG  0x007F
 #define K_NOTMODIFIERFLAG 0xFF00   // I4548
 
-// Note: DEFAULT_MODIFIER = 0x10000, used by KMX+ for the
-// default modifier flag in layers, > 16 bit so not available here.
-// See keys_mod_default in keyman_core_ldml.ts
+// Note: OTHER_MODIFIER = 0x10000, used by KMX+ for the
+// other modifier flag in layers, > 16 bit so not available here.
+// See keys_mod_other in keyman_core_ldml.ts
 
 /*
   These sanity checks help ensure we don't

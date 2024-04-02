@@ -26,9 +26,9 @@ const Codes = {
     "VIRTUAL_KEY":0x4000,     // ISVIRTUALKEY
     "VIRTUAL_CHAR_KEY":0x8000 // VIRTUALCHARKEY // Unused by KMW, but reserved for use by other Keyman engines.
 
-    // Note: keys_mod_default = 0x10000, used by KMX+ for the
-    // default modifier flag in layers, > 16 bit so not available here.
-    // See keys_mod_default in keyman_core_ldml.ts
+    // Note: keys_mod_other = 0x10000, used by KMX+ for the
+    // other modifier flag in layers, > 16 bit so not available here.
+    // See keys_mod_other in keyman_core_ldml.ts
   },
 
   modifierBitmasks: {
