@@ -461,17 +461,18 @@ For each key:
   by the compiler.
 - `mod`: 32-bit bitfield defined as below. Little endian values.
 
-|  Value   | Meaning  |`kmx_file.h`   | Comment                                     |
-|----------|----------|---------------|---------------------------------------------|
-|  0x0000  | `none`   |               | All zeros = no modifiers                    |
-|  0x0001  | `ctrlL`  | `LCTRLFLAG`   | Left Control                                |
-|  0x0002  | `ctrlR`  | `RCTRLFLAG`   | Right Control                               |
-|  0x0004  | `altL`   | `LALTFLAG`    | Left Alt                                    |
-|  0x0008  | `altR`   | `RALTFLAG`    | Right Alt                                   |
-|  0x0010  | `shift`  | `K_SHIFTFLAG` | Either Shift                                |
-|  0x0020  | `ctrl`   | `K_CTRLFLAG`  | Either Control                              |
-|  0x0040  | `alt`    | `K_ALTFLAG`   | Either Alt                                  |
-|  0x0100  | `caps`   | `CAPITALFLAG` | Caps lock                                   |
+|  Value   | Meaning   |`kmx_file.h`        | Comment                                       |
+|----------|-----------|--------------------|-----------------------------------------------|
+|  0x0000  | `none`    |                    | All zeros = no modifiers                      |
+|  0x0001  | `ctrlL`   | `LCTRLFLAG`        | Left Control                                  |
+|  0x0002  | `ctrlR`   | `RCTRLFLAG`        | Right Control                                 |
+|  0x0004  | `altL`    | `LALTFLAG`         | Left Alt                                      |
+|  0x0008  | `altR`    | `RALTFLAG`         | Right Alt                                     |
+|  0x0010  | `shift`   | `K_SHIFTFLAG`      | Either Shift                                  |
+|  0x0020  | `ctrl`    | `K_CTRLFLAG`       | Either Control                                |
+|  0x0040  | `alt`     | `K_ALTFLAG`        | Either Alt                                    |
+|  0x0100  | `caps`    | `CAPITALFLAG`      | Caps lock                                     |
+|  0x10000 | `other` | n/a                  | Other (not used in conjunction with others)   |
 
 TODO-LDML: Note that conforming to other keyman values, left versus right shift
 cannot be distinguished.
