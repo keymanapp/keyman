@@ -255,6 +255,7 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
 
     if(changedLayer) {
       this.updateState();
+      // We changed the active layer, but not any layout property of the keyboard as a whole.
       this.layerGroup.refreshLayout(this.constructLayoutParams());
     }
   }
