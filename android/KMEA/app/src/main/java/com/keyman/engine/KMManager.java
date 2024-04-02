@@ -2139,15 +2139,21 @@ public final class KMManager {
 
   public static boolean updateSelectionRange(KeyboardType kbType, int selStart, int selEnd) {
     boolean result = false;
+    int selMin = selStart, selMax = selEnd;
+    if (selStart > selEnd) {
+      // Selection is reversed so "swap"
+      selMin = selEnd;
+      selMax = selStart;
+    }
     if (kbType == KeyboardType.KEYBOARD_TYPE_INAPP) {
       if (isKeyboardLoaded(KeyboardType.KEYBOARD_TYPE_INAPP) && !InAppKeyboard.shouldIgnoreSelectionChange()) {
-        result = InAppKeyboard.updateSelectionRange(selStart, selEnd);
+        result = InAppKeyboard.updateSelectionRange(selMin, selMax);
       }
 
       InAppKeyboard.setShouldIgnoreSelectionChange(false);
     } else if (kbType == KeyboardType.KEYBOARD_TYPE_SYSTEM) {
       if (isKeyboardLoaded(KeyboardType.KEYBOARD_TYPE_SYSTEM) && !SystemKeyboard.shouldIgnoreSelectionChange()) {
-        result = SystemKeyboard.updateSelectionRange(selStart, selEnd);
+        result = SystemKeyboard.updateSelectionRange(selMin, selMax);
       }
 
       SystemKeyboard.setShouldIgnoreSelectionChange(false);
