@@ -334,7 +334,22 @@ describe('tran', function () {
         CompilerMessages.Error_MissingStringVariable({ id: "missingstr" }),
       ],
     },
-    // three cases that share the same error message
+    // cases that share the same error code
+    ...[1, 2].map(n => ({
+      subpath: `sections/tran/fail-IllegalTransformDollarsign-${n}.xml`,
+      errors: [
+        {
+          code: CompilerMessages.ERROR_IllegalTransformDollarsign,
+          matchMessage: /.*/,
+        }
+      ],
+    })),
+    // successful compile
+    ...[1].map(n => ({
+      subpath: `sections/tran/ok-${n}.xml`,
+      errors: false,
+    })),
+    // cases that share the same error code
     ...[1, 2, 3].map(n => ({
       subpath: `sections/tran/fail-matches-nothing-${n}.xml`,
       errors: [
