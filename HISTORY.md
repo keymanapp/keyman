@@ -1,5 +1,11 @@
 # Keyman Version History
 
+## 17.0.299 beta 2024-04-01
+
+* fix(ios):  address crash by reading full code point rather than code unit when trimming initial directional-mark (#11113)
+* fix(mac): delete correct number of characters from current context when processing BMP or SMP deletes (#11086)
+* feat(developer): disallow stray dollarsign in from pattern (#11117)
+
 ## 17.0.298 beta 2024-03-29
 
 * chore(linux): Update debian changelog (#11096)
