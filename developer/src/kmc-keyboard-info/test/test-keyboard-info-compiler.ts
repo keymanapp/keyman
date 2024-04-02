@@ -251,7 +251,7 @@ describe('keyboard-info-compiler', function () {
     assert.isTrue(await kmpCompiler.init(callbacks, {}));
     const kmpJsonData = kmpCompiler.transformKpsToKmpObject(kpsFilename);
     assert.isNotNull(kmpJsonData);
-    // remove .kps file
+    // remove .kmx file
     kmpJsonData.files = kmpJsonData.files.filter(file => !KeymanFileTypes.filenameIs(file.name, KeymanFileTypes.Binary.Keyboard));
     const kmxFiles: {
       filename: string,
