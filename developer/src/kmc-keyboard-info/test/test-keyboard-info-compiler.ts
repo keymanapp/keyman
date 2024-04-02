@@ -28,26 +28,6 @@ const KHMER_ANGKOR_SOURCES = {
   forPublishing: true,
 };
 
-const EN_LANGTAG = {
-  "full": "en-Latn-US",
-  "iana": [ "English" ],
-  "iso639_3": "eng",
-  "localname": "American English",
-  "localnames": [ "English" ],
- "name": "English",
-  "names": [ "Anglais", "Angleščina", "Anglisy", "Angličtina", "Anglų", "Angol", "Angļu", "Engels", "Engelsk", "Engelska", "Engelski", "Englaisa", "Englanti", "Englesch", "Engleză", "Englisch", "Ingilizce", "Inglese", "Ingliż", "Inglés", "Inglês", "Język angielski", "Kiingereza", "anglais" ],
-  "region": "US",
-  "regionname": "United States",
-  "regions": [ "AD", "AF", "AR", "AS", "AW", "BD", "BG", "BH", "BL", "BN", "BQ", "BT", "BY", "CL", "CN", "CO", "CR", "CW", "CY", "CZ", "DO", "EC", "EE", "ES", "ET", "FM", "FR", "GQ", "GR", "GW", "HN", "HR", "HU", "ID", "IS", "IT", "JP", "KH", "KR", "KW", "LB", "LK", "LT", "LU", "LV", "LY", "MC", "ME", "MF", "MX", "NO", "NP", "OM", "PA", "PL", "PM", "PR", "PT", "RO", "RS", "RU", "SA", "SK", "SO", "SR", "ST", "SV", "TC", "TH", "TN", "TW", "UA", "UM", "UY", "VE", "VG", "VI" ],
-  "script": "Latn",
-  "sldr": true,
-  "suppress": true,
-  "tag": "en",
-  "tags": [ "en-Latn", "en-US" ],
-  "variants": [ "basiceng", "boont", "cornu", "emodeng", "oxendict", "scotland", "scouse", "spanglis", "unifon" ],
-  "windows": "en-US"
-};
-
 const KHMER_ANGKOR_DISPLAY_FONT = "Mondulkiri-R.ttf";
 const KHMER_ANGKOR_OSK_FONT = "khmer_busra_kbd.ttf";
 const KHMER_ANGKOR_EXAMPLES_NO_ID = { keys: "x j m E r", text: "ខ្មែរ", note: "Name of language" };
@@ -115,11 +95,11 @@ describe('keyboard-info-compiler', function () {
   it('check preinit creates langtagsByTag correctly', async function() {
     const compiler = new KeyboardInfoCompiler(); // indirectly call preinit()
     assert.isNotNull(compiler);
-    assert.deepEqual(langtags.find(({ tag }) => tag === 'en'), EN_LANGTAG);
-    assert.deepEqual((<any>unitTestEndpoints.langtagsByTag)['en'], EN_LANGTAG);
-    assert.deepEqual((<any>unitTestEndpoints.langtagsByTag)['en-Latn-US'], EN_LANGTAG);
-    assert.deepEqual((<any>unitTestEndpoints.langtagsByTag)['en-Latn'], EN_LANGTAG);
-    assert.deepEqual((<any>unitTestEndpoints.langtagsByTag)['en-US'], EN_LANGTAG);
+    const en_langtag = langtags.find(({ tag }) => tag === 'en');
+    assert.deepEqual((<any>unitTestEndpoints.langtagsByTag)['en'], en_langtag);
+    assert.deepEqual((<any>unitTestEndpoints.langtagsByTag)['en-Latn-US'], en_langtag);
+    assert.deepEqual((<any>unitTestEndpoints.langtagsByTag)['en-Latn'], en_langtag);
+    assert.deepEqual((<any>unitTestEndpoints.langtagsByTag)['en-US'], en_langtag);
   });
 
   it('check init initialises KeyboardInfoCompiler correctly', async function() {
