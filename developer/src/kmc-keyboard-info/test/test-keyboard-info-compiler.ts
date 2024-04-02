@@ -116,9 +116,15 @@ describe('keyboard-info-compiler', function () {
     const compiler = new KeyboardInfoCompiler();
     assert.isTrue(await compiler.init(callbacks, {sources}));
     const origKmpCompilerInit = KmpCompiler.prototype.init;
-    KmpCompiler.prototype.init = async (_callbacks: CompilerCallbacks, _options: KmpCompilerOptions): Promise<boolean> => false;
-    const result = await compiler.run(kpjFilename, null);
-    KmpCompiler.prototype.init = origKmpCompilerInit;
+    let result: KeyboardInfoCompilerResult;
+    try {
+      KmpCompiler.prototype.init = async (_callbacks: CompilerCallbacks, _options: KmpCompilerOptions): Promise<boolean> => false;
+      result = await compiler.run(kpjFilename, null);
+    } catch(e) {
+      assert.fail(e);
+    } finally {
+      KmpCompiler.prototype.init = origKmpCompilerInit;
+    }
     assert.isNull(result);
   });
   
@@ -128,9 +134,15 @@ describe('keyboard-info-compiler', function () {
     const compiler = new KeyboardInfoCompiler();
     assert.isTrue(await compiler.init(callbacks, {sources}));
     const origKmpCompilerTransformKpsToKmpObject = KmpCompiler.prototype.transformKpsToKmpObject;
-    KmpCompiler.prototype.transformKpsToKmpObject = (_kpsFilename: string): KmpJsonFile.KmpJsonFile => null;
-    const result = await compiler.run(kpjFilename, null);
-    KmpCompiler.prototype.transformKpsToKmpObject = origKmpCompilerTransformKpsToKmpObject;
+    let result: KeyboardInfoCompilerResult;
+    try {
+      KmpCompiler.prototype.transformKpsToKmpObject = (_kpsFilename: string): KmpJsonFile.KmpJsonFile => null;
+      result = await compiler.run(kpjFilename, null);
+    } catch(e) {
+      assert.fail(e);
+    } finally {
+      KmpCompiler.prototype.transformKpsToKmpObject = origKmpCompilerTransformKpsToKmpObject;
+    }
     assert.isNull(result);
   });
   
