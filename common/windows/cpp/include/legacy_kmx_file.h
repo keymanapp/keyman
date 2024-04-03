@@ -320,6 +320,10 @@
 #define K_MODIFIERFLAG  0x007F
 #define K_NOTMODIFIERFLAG 0xFF00   // I4548
 
+// Note: OTHER_MODIFIER = 0x10000, used by KMX+ for the
+// other modifier flag in layers, > 16 bit so not available here.
+// See keys_mod_other in keyman_core_ldml.ts
+
 /*
   These sanity checks help ensure we don't
   break on-disk struct sizes when we cross

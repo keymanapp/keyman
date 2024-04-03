@@ -15,6 +15,15 @@ interface GestureSourceTracker<Type, StateToken> {
    */
   source: GestureSource<Type>;
   matchPromise: ManagedPromise<MatcherSelection<Type, StateToken>>;
+  /**
+   * Set to `true` during the timeout period needed to complete existing trackers &
+   * initialize new ones.  Once that process is complete, set to false.
+   *
+   * This is needed to ensure that failure to extend an existing gesture doesn't
+   * result in outright selection-failure before attempting to match as a
+   * newly-started gesture.
+   */
+  preserve: boolean;
 }
 
 export interface MatcherSelection<Type, StateToken = any> {
@@ -225,10 +234,22 @@ export class MatcherSelector<Type, StateToken = any> extends EventEmitter<EventM
     const unmatchedSource = sourceNotYetStaged ? source : null;
     const priorMatcher = sourceNotYetStaged ? null: source;
 
+    // matchGesture calls should be queued and act atomically, in sequence.
     if(this.pendingMatchSetup) {
+      const parentLockPromise = this.pendingMatchSetup;
+      const childLock = new ManagedPromise<void>();
+
+      this.pendingMatchSetup = childLock.corePromise;
+
       // If a prior call is still waiting on the `await` below, wait for it to clear
       // entirely before proceeding; there could be effects for how the next part below is processed.
-      await this.pendingMatchSetup;
+
+      await parentLockPromise;
+
+      if(this.pendingMatchSetup == childLock.corePromise) {
+        this.pendingMatchSetup = null;
+      }
+      childLock.resolve(); // allow the next matchGesture call through.
     }
 
     if(sourceNotYetStaged) {
@@ -257,7 +278,8 @@ export class MatcherSelector<Type, StateToken = any> extends EventEmitter<EventM
       // Promises only resolve once, after all - once called, a "selection" has been made.
       const sourceSelectors: GestureSourceTracker<Type, StateToken> = {
         source: src,
-        matchPromise: matchPromise
+        matchPromise: matchPromise,
+        preserve: true
       };
       this._sourceSelector.push(sourceSelectors);
 
@@ -303,14 +325,20 @@ export class MatcherSelector<Type, StateToken = any> extends EventEmitter<EventM
          * Reference: https://javascript.info/event-loop
          */
 
-        const pendingMatchGesture = new ManagedPromise<void>();
-        this.pendingMatchSetup = pendingMatchGesture.corePromise;
+        const matchingLock = new ManagedPromise<void>();
+        this.pendingMatchSetup = matchingLock.corePromise;
+
         await timedPromise(0);
         // A second one, in case of a deferred modipress completion (via awaitNested)
         // (which itself needs a macroqueue wait)
         await timedPromise(0);
-        this.pendingMatchSetup = null;
-        pendingMatchGesture.resolve();
+
+        // Only clear the promise if no extra entries were added to the implied `matchGesture` queue.
+        if(this.pendingMatchSetup == matchingLock.corePromise) {
+          this.pendingMatchSetup = null;
+        }
+
+        matchingLock.resolve();
 
         // stateToken may have shifted by the time we regain control here.
         const incomingStateToken = this.stateToken;
@@ -358,6 +386,10 @@ export class MatcherSelector<Type, StateToken = any> extends EventEmitter<EventM
         }
       }
     }
+
+    sourceTrackers.forEach((tracker) => {
+      tracker.preserve = false;
+    })
 
     // If in a sustain mode, no models for new sources may launch;
     // only existing sequences are allowed to continue.
@@ -653,7 +685,7 @@ export class MatcherSelector<Type, StateToken = any> extends EventEmitter<EventM
     // If we just rejected the last possible matcher for a tracked gesture-source...
     // then, for each such affected source...
     for(const stat of remainingMatcherStats) {
-      if(stat.pendingCount == 0) {
+      if(stat.pendingCount == 0 && !stat.tracker.preserve) {
         // ... report the failure and signal to close-out that source / stop tracking it.
         stat.tracker.matchPromise.resolve({
           matcher: null,
