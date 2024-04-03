@@ -53,6 +53,7 @@
   <string name="request_storage_permission" comment="Request storage permission to access keyboard packages">သွက်ဂွံစုတ်ပက်ကေကဳဗုဒ်ဂမၠိုၚ်ကီု, သွက်ဂွံဗှ်အရာမစွံပ္တန်လဝ်မ္ၚးတအ်မာန်ကီုဂှ် ပံက်ကဵုအခေါၚ် ကဳမာန်ညိ</string>
   <!-- Context: Android Storage Permission -->
   <string name="storage_permission_denied" comment="Keyboard package installation may fail since Android storage permission not granted">အခေါၚ်သွက်ဂွံစွံပ္တန်ဂှ် တးပါဲလဝ်ရ။ သွက်ဂွံစုတ်ပက်ကုက်ကဳဗုဒ်လေဝ် လီုအာမာန်ရ။</string>
+  <string name="storage_permission_denied2" comment="Keyboard package installation failed. Recommend install from local file">ကေတ်အခေါၚ် ဒၞါဲဂိုၚ်စွံဟွံအံၚ်ဇၞး။ စမ်ရံၚ်ဒၞါဲပလေဝ်ပလေတ်ကဳမာန် - ပ္တိုန်စုတ်နူဝှါၚ် လဵုဂေဝ်</string>
   <!-- Context: Keyman Settings menu -->
   <string name="keyman_settings" comment="Settings menu title">ဒၞါဲပလေဝ်နာနာ</string>
   <!-- Context: Keyman Settings menu -->

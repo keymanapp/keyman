@@ -10,10 +10,12 @@ import { KeymanSentry, loadOptions } from '@keymanapp/developer-utils';
 import KEYMAN_VERSION from "@keymanapp/keyman-version";
 import { TestKeymanSentry } from './util/TestKeymanSentry.js';
 import { exitProcess } from './util/sysexits.js';
+import { declareMessage } from './commands/messageCommand.js';
+import { kmcSentryOptions } from './util/kmcSentryOptions.js';
 
-await TestKeymanSentry.runTestIfCLRequested();
+await TestKeymanSentry.runTestIfCLRequested(kmcSentryOptions);
 if(KeymanSentry.isEnabled()) {
-  KeymanSentry.init();
+  KeymanSentry.init(kmcSentryOptions);
 }
 try {
   await run();
@@ -47,6 +49,7 @@ async function run() {
 
   declareBuild(program);
   declareAnalyze(program);
+  declareMessage(program);
 
   /* Future commands:
   declareClean(program);

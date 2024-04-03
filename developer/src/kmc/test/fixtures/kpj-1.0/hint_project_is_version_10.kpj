@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<KeymanDeveloperProject>
+  <Options>
+    <BuildPath>$PROJECTPATH</BuildPath>
+    <CompilerWarningsAsErrors>False</CompilerWarningsAsErrors>
+    <WarnDeprecatedCode>False</WarnDeprecatedCode>
+    <CheckFilenameConventions>False</CheckFilenameConventions>
+    <ProjectType>keyboard</ProjectType>
+  </Options>
+  <Files>
+    <File>
+      <ID>hint_project_is_version_10_1</ID>
+      <Filename>hint_project_is_version_10.kmn</Filename>
+      <Filepath>hint_project_is_version_10.kmn</Filepath>
+      <FileVersion>1.0</FileVersion>
+      <FileType>.kmn</FileType>
+      <Details>
+        <Name>hint_project_is_version_10</Name>
+        <Copyright>Copyright (C) Keyman Team</Copyright>
+      </Details>
+    </File>
+    <File>
+      <ID>hint_project_is_version_10_2</ID>
+      <Filename>hint_project_is_version_10.kps</Filename>
+      <Filepath>hint_project_is_version_10.kps</Filepath>
+      <FileVersion></FileVersion>
+      <FileType>.kps</FileType>
+      <Details>
+        <Name>hint_project_is_version_10</Name>
+        <Copyright>Copyright (C) Keyman Team</Copyright>
+      </Details>
+    </File>
+  </Files>
+</KeymanDeveloperProject>

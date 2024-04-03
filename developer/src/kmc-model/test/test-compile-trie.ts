@@ -160,5 +160,13 @@ describe('createTrieDataStructure()', function () {
     })
     assert.match(uppercaseSourceCode, /"key":\s*"TURTLES"/);
     assert.notMatch(uppercaseSourceCode, /"key":\s*"turtles"/);
+  });
+
+  it('does not create `null`/"undefined"-keyed children', function () {
+    const WORDLIST_FILENAME = makePathToFixture('example.qaa.wordlist-ordering', 'wordlist.tsv');
+    // check to ensure the Trie is fully well-formed.
+    let sourceCode = createTrieDataStructure([WORDLIST_FILENAME], (wf) => wf);
+    assert.notMatch(sourceCode, /"undefined"/);
+    assert.notMatch(sourceCode, /null/);
   })
 });

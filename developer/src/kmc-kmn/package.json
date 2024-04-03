@@ -27,6 +27,7 @@
   },
   "dependencies": {
     "@keymanapp/keyman-version": "*",
+    "@keymanapp/developer-utils": "*",
     "@keymanapp/kmc-kmn": "*"
   },
   "devDependencies": {

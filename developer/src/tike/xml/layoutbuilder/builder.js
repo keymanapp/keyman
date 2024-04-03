@@ -333,7 +333,7 @@ $(function() {
     }
 
     if(hint == null) return '';
-    return hint;
+    return builder.renameSpecialKey(hint);
   }
 
   this.prepareLayer = function () {
@@ -418,7 +418,8 @@ $(function() {
         builder.addKeyAnnotations(nkey);
 
         $('.text', nkey).text(this.renameSpecialKey(text));
-        $('.hint', nkey).text(this.inferKeyHintText(key.hint, key.sk, key.flick, key.multitap));
+        builder.updateHint($(nkey));
+
         if(KVKL[builder.lastPlatform].displayUnderlying) $('.underlying', nkey).text(this.getStandardKeyCap(key.id, key.layer ? builder.isLayerIdShifted(key.layer) : isLayerShifted));
 
 
@@ -744,15 +745,27 @@ $(function() {
     builder.keyCapChange(val);
   }, {saveOnce: true});
 
+  builder.updateHint = function(key) {
+    const val = key.data('hint');
+    const hintElement = $('.hint', key);
+    hintElement.text(builder.inferKeyHintText(val, $(key).data('longpress'), $(key).data('flick'), $(key).data('multitap')));
+    if(val && val.length) {
+      hintElement.addClass('custom-hint');
+    } else {
+      hintElement.removeClass('custom-hint');
+    }
+    if(builder.specialCharacters[val]) {
+      hintElement.addClass('key-special-text');
+    } else {
+      hintElement.removeClass('key-special-text');
+    }
+
+  }
+
   builder.keyHintChange = function(val) {
     const key = builder.selectedKey();
     key.data('hint', val);
-    $('.hint', key).text(builder.inferKeyHintText(val, $(key).data('longpress'), $(key).data('flick'), $(key).data('multitap')));
-    if(val && val.length) {
-      $('.hint', key).addClass('custom-hint');
-    } else {
-      $('.hint', key).removeClass('custom-hint');
-    }
+    builder.updateHint(key);
   }
 
   const inpKeyHintChange = builder.wrapChange(function (e) {

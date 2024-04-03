@@ -232,6 +232,11 @@ public:
   any_group_type type;  // transform or reorder
   transform_group transform;
   reorder_group reorder;
+  size_t apply(std::u32string &input, std::u32string &output, size_t matched) const;
+
+private:
+  size_t apply_transform(std::u32string &input, std::u32string &output, size_t matched) const;
+  size_t apply_reorder(std::u32string &input, std::u32string &output, size_t matched) const;
 };
 
 /**

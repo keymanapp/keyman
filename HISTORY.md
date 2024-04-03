@@ -1,5 +1,33 @@
 # Keyman Version History
 
+## 18.0.14 alpha 2024-04-02
+
+* chore(linux): Update debian changelog (#11097)
+
+## 18.0.13 alpha 2024-03-29
+
+* chore(deps): bump express from 4.17.3 to 4.19.2 (#11103)
+
+## 18.0.12 alpha 2024-03-28
+
+* chore(common): Merge beta to master for Sprint B17S4 (#11105)
+
+## 18.0.11 alpha 2024-03-20
+
+* chore(deps-dev): bump follow-redirects from 1.15.4 to 1.15.6 (#11010)
+
+## 18.0.10 alpha 2024-03-16
+
+* chore: Merge beta to master for Sprint B17S3 (#11008)
+
+## 18.0.9 alpha 2024-03-05
+
+* chore: B17S2 merge beta to master (#10909)
+
+## 18.0.8 alpha 2024-03-04
+
+* chore(linux): Update debian changelog (#10898)
+
 ## 18.0.7 alpha 2024-02-29
 
 * chore: Merge 17.0.270 beta back to master (#10886)
@@ -31,6 +59,215 @@
 
 * chore(common): move to 18.0 alpha (#10713)
 * chore: move to 18.0 alpha
+
+## 17.0.296 beta 2024-03-27
+
+* fix(developer): in model compiler, give correct key to shorter prefix words when a longer, higher-frequency word is also present (#11074)
+* fix(oem/fv/android): Only add default keyboard if no keyboards exist (#11080)
+*  (#11068)
+* chore(android): Update crowdin strings for Mon (#11089)
+* chore(android): Update crowdin strings for Khmer (#11090)
+
+## 17.0.295 beta 2024-03-26
+
+* docs(developer): add help site links (#10939)
+* chore(common): Update keymanweb-osk.ttf to 4.1 (#11035)
+* feat(linux): Start dbus if not running (#10863)
+
+## 17.0.294 beta 2024-03-25
+
+* chore(android,windows): Update crowdin strings for French (#11063)
+* chore(common): Fix missing entries in HISTORY.md (#11064)
+* fix(developer): catch sharing violation when saving mru (#11047)
+* fix(developer): capture alt shortcuts in LDML keyboard debugger (#11049)
+* fix(developer): correct path for kmc sourcemaps in sentry upload (#11051)
+
+## 17.0.293 beta 2024-03-22
+
+* chore(oem/fv): Update keyboard versions in keyboards.csv (#11013)
+* fix(developer): suppress emission of new empty fields in package editor (#11009)
+* fix(developer): return after calling await exitProcess (#11016)
+* chore(core): refresh API docs for 17.0 (#10986)
+
+## 17.0.292 beta 2024-03-21
+
+* fix(developer): remove unused keyboard info compiler messages (#10991)
+* fix(developer): font file meta data is invalid error (#10995)
+
+## 17.0.291 beta 2024-03-20
+
+* chore(mac): clean up code obsoleted by core (#10877)
+* fix(linux): Replace deprecated `pkg_resources` module with `packaging.version` (#10860)
+
+## 17.0.290 beta 2024-03-19
+
+* fix(ios): Sync selection range for long contexts (#10956)
+
+## 17.0.289 beta 2024-03-16
+
+* fix(common): add unit test for --debug flag for builder (#10974)
+
+## 17.0.288 beta 2024-03-13
+
+* test(developer): kmc keyboard info compiler messages unit tests (#10848)
+* fix(developer): getFontFamily now returns null if ttfMeta.promise errors (#10983)
+* docs(android/app): Add data privacy policy page (#10985)
+* fix(developer): min Keyman version for LDML is 17.0 (#10977)
+
+## 17.0.287 beta 2024-03-12
+
+* chore(developer): resolve excessive-fatal-exception issue (#10949)
+* fix(linux): Remove `ibus-keyman.post{inst,rm}` and verify that `ibus-daemon` is running when we start km-config (#10788)
+
+## 17.0.286 beta 2024-03-11
+
+* chore(web): improve the clarity of hints on OSK for Android (#10971)
+
+## 17.0.285 beta 2024-03-08
+
+* fix(windows): GetKeyboardLanguage exits early on an invalid keyboard ID (#10936)
+
+## 17.0.284 beta 2024-03-07
+
+* fix(web): globe key highlighting (#10932)
+* chore(web): updates mtnt model used by test page (#10935)
+* fix(developer): kmc keyboard info compiler no kmp error (#10893)
+* fix(developer): Treat Right Shift as Shift in debugger (#10919)
+* docs(developer): kmc-model api documentation (#10921)
+* docs(developer): kmc-model-info api documentation (#10922)
+* docs(developer): kmc-keyboard-info api documentation (#10923)
+* docs(developer): kmc-package api documentation (#10924)
+* fix(developer): normalize all input paths in .kps compiler (#10950)
+
+## 17.0.283 beta 2024-03-06
+
+* fix(android): fixes context-change detection for repeated-char cases (#10873)
+* fix(developer): search-term quote replacement was not global (#10934)
+* chore(common): Update ldml out of techpreview (#10913)
+* fix(developer): fix for errant \uXXXX error (#10946)
+* fix(developer): suppport loose match for CompilerEvents (#10948)
+* refactor(oem/fv/android): Install fallback keyboard (#10907)
+* refactor(android/app): Move storage permission checks (#10904)
+* fix(common): missing script exec bit (#10951)
+
+## 17.0.282 beta 2024-03-05
+
+* fix(developer): move osk.ts from developer-utils to kmc-kmn (#10903)
+* fix(developer): hint text special characters (#10927)
+* docs(developer): kmc-ldml api documentation (#10917)
+* chore(developer): consolidate external links in Developer messages (#10918)
+* fix(developer): message export filename was title case (#10941)
+
+## 17.0.281 beta 2024-03-04
+
+* chore(linux): Update debian changelog (#10897)
+* fix(ios): cross-paragraph keyboard rules (#10905)
+* chore(developer): deploy compiler messages to help site (#10906)
+
+## 17.0.280 beta 2024-03-01
+
+* fix(developer): make sure scroll bar appears when needed in global welcome (#10818)
+* chore(common): loosen .keyman-touch-layout schema layer id requirements (#10819)
+* docs(developer): kmc-kmn api documentation and some message documentation (#10856)
+* refactor(developer): cleanup kmn compiler message namespaces (#10867)
+* refactor(developer): reorganize messages for adding details (#10878)
+* fix(ios): context-initial diacritic handling (#10589)
+* feat(developer): adds kmc message command (#10888)
+* test(developer): kmc unit test infrastructure messages (#10825)
+* fix(android): handle surrogate pairs in selection range indexing (#10885)
+* feat(windows): move the code kmshell.dpr to unit so that only the includes are in dpr (#10871)
+
+## 17.0.279 beta 2024-02-29
+
+* fix(linux): Fix libkeymancore-dev dependencies (#10880)
+* chore(resources): update to latest ldml: xmlns, uset (#10865)
+
+## 17.0.278 beta 2024-02-28
+
+* docs(linux): Updated whatsnew for Keyman for Linux 17 (#10858)
+* fix(web): Save context state on reset (#10869)
+* chore(android/engine): Reduce toast notifications after installations (#10868)
+* fix(android/engine): Check selection indexes (#10857)
+
+## 17.0.277 beta 2024-02-27
+
+* fix(developer): exit kmc test data if any failure messages occurred (#10805)
+* docs(windows): add whats new Keyman for Windows  17.0 (#10783)
+* feat(developer): add api-extractor and api-documenter, config, and build integration (#10839)
+* feat(developer): publish api documentation to help.keyman.com (#10841)
+* docs(developer): npm package readme files (#10842)
+* refactor(developer): move osk module from common-types to developer-utils (#10845)
+* chore(linux): Update debian changelog (#10828)
+* fix(developer): repeated options in kmc must now be fully specified (#10821)
+* docs(developer): add documentation for kmc-analyze (#10854)
+
+## 17.0.276 beta 2024-02-26
+
+* chore(linux): Fix autopkg tests (#10824)
+
+## 17.0.275 beta 2024-02-23
+
+* chore(core): Update sample ldml keyboard (#10791)
+* fix(developer): publish keymancore-1.dll symbols (#10797)
+* fix(developer): improve uploading of sourcemaps to sentry (#10798)
+* fix(android/engine): Fix how keyboard picker menu exits (#10806)
+* chore(linux): Fix `upload-to-debian.sh` script for beta releases (#10784)
+* chore(linux): Fix API verification after adding SONAME (#10813)
+* chore(linux): Address comments from Debian mailing list (#10800)
+* docs(linux): Update how to build binary package with docker (#10814)
+* chore(linux): Update debian changelog (#10785)
+
+## 17.0.274 beta 2024-02-22
+
+* fix(android/engine): Remove logs for uninitialized default keyboard (#10782)
+* refactor(android/app): Allow SystemKeyboard to install default keyboard and dictionary (#10794)
+* chore(android/app): Remove logging for install referrer details (#10795)
+* docs(android/app): Update tablet screenshots (again) (#10796)
+* docs(android): Update screenshots for help (#10808)
+* chore(web): proper reporting of errors from es5 KMW (#10807)
+* fix(android): first keystroke when context is empty (#10809)
+* chore(linux): Update Debian `control` file (#10787)
+
+## 17.0.273 beta 2024-02-21
+
+* fix(developer): match kmc console formatting for messages in IDE (#10775)
+* fix(developer): ensure fatal errors report message or made non-fatal (#10777)
+* chore(developer): add LDML specific text to Project view (#10779)
+* fix(developer): reset debugger after ldml keyboard compile (#10780)
+* fix(developer): crash opening invalid project (#10781)
+* docs(ios): document gestures (#10763)
+
+## 17.0.272 beta 2024-02-20
+
+* fix(core): fix output append logic in any_group::apply_transform (#10758)
+* fix(android): Match phone suggestion banner styling on tablet (#10760)
+* docs(mac): Document What's New for version 17.0 (#10764)
+* fix(developer): Rename missing variables in tests (#10773)
+* chore(developer): reduce WARN_TouchLayoutUsesUnsupportedGesturesDownlevel to HINT (#10766)
+* fix(developer): prevent renaming of new project types in New Project dialog (#10767)
+* fix(developer): return an error code if build-test-data fails (#10765)
+* fix(developer): allow more parameters in kmc.cmd (#10759)
+* chore(linux): Ignore missing .symbols file in stable branch (#10674)
+* chore(linux): Update symbols file with current version (#10575)
+* docs(linux): Update screenshots and FAQ (#10768)
+* chore(linux): Fix `debian.sh` by removing quotes (#10772)
+
+## 17.0.271 beta 2024-02-19
+
+* chore(developer): add infrastructure messages tests (#10756)
+* chore(windows): Update more PT strings (#10718)
+* docs(android/app): Update tablet screenshots (#10726)
+* fix(web): sticky special-key highlighting (#10729)
+* fix(web): disables modipress for layer-switch keys with subkeys (#10745)
+* fix(web): missing null-guard for hardware keystrokes without active Keyman keyboard (#10740)
+* docs(ios): add what's new in 17.0 (#10748)
+* fix(web): handling of page-elements focused before engine initialization (#10744)
+* fix(ios): multitap consistency after new-lines (#10728)
+* docs(common): Update website README (#10738)
+
+## 17.0.270 beta 2024-02-17
+
+* fix(core): Update more tests and fix ldml_transforms (#10735)
 
 ## 17.0.269 beta 2024-02-15
 

@@ -9,7 +9,7 @@ import { PackageCompilerMessages } from '@keymanapp/kmc-package';
 import { InfrastructureMessages } from './infrastructureMessages.js';
 
 // Maps every compiler error namespace to the corresponding implementation
-export const messageNamespaces: Record<CompilerErrorNamespace, any> = {
+const messageNamespaces: Record<CompilerErrorNamespace, any> = {
   [CompilerErrorNamespace.LdmlKeyboardCompiler]: LdmlKeyboardCompilerMessages,
   [CompilerErrorNamespace.CommonTypes]: CommonTypesMessages,
   [CompilerErrorNamespace.KmnCompiler]: KmnCompilerMessages,
@@ -25,3 +25,22 @@ export const messageNamespaces: Record<CompilerErrorNamespace, any> = {
 // This works around pain points in enumerating enum members in Typescript
 // ref https://www.totaltypescript.com/iterate-over-object-keys-in-typescript
 export const messageNamespaceKeys = Object.keys(messageNamespaces).map(v => Number.parseInt(v));
+
+export type CompilerMessageSource = {
+  module: string;
+  class: any;
+};
+
+// TODO: consolidate with messageNamespaces above
+export const messageSources: Record<CompilerErrorNamespace, CompilerMessageSource> = {
+  [CompilerErrorNamespace.LdmlKeyboardCompiler]: { module: 'kmc-ldml',          class: LdmlKeyboardCompilerMessages },
+  [CompilerErrorNamespace.CommonTypes]:          { module: 'common-types',      class: CommonTypesMessages },
+  [CompilerErrorNamespace.KmnCompiler]:          { module: 'kmc-kmn',           class: KmnCompilerMessages },
+  [CompilerErrorNamespace.ModelCompiler]:        { module: 'kmc-model',         class: ModelCompilerMessages },
+  [CompilerErrorNamespace.PackageCompiler]:      { module: 'kmc-package',       class: PackageCompilerMessages },
+  [CompilerErrorNamespace.Infrastructure]:       { module: 'kmc',               class: InfrastructureMessages },
+  [CompilerErrorNamespace.Analyzer]:             { module: 'kmc-analyze',       class: AnalyzerMessages },
+  [CompilerErrorNamespace.KmwCompiler]:          { module: 'kmc-kmn',           class: KmwCompilerMessages },
+  [CompilerErrorNamespace.ModelInfoCompiler]:    { module: 'kmc-model-info',    class: ModelInfoCompilerMessages },
+  [CompilerErrorNamespace.KeyboardInfoCompiler]: { module: 'kmc-keyboard-info', class: KeyboardInfoCompilerMessages },
+};

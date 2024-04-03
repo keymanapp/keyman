@@ -36,7 +36,7 @@ function declareOskCharUse(command: Command) {
     .option('--include-counts', 'Include number of times each character is referenced', false)
     .option('--strip-dotted-circle', 'Strip U+25CC (dotted circle base) from results', false)
     .addOption(new Option('-m, --mapping-file <filename>', 'Result file to write to (.json, .md, or .txt)').makeOptionMandatory())
-    .action(async (filenames: string[], _options: any, commander: any) => {
+    .action(async (filenames: string[], _options: any, commander: any): Promise<never|void> => {
       const options = commander.optsWithGlobals();
       if(!filenames.length) {
         // If there are no filenames provided, then we are building the current
@@ -46,7 +46,7 @@ function declareOskCharUse(command: Command) {
 
       if(!await analyze(analyzeOskCharUse, filenames, options)) {
         // Once a file fails to build, we bail on subsequent builds
-        await exitProcess(1);
+        return await exitProcess(1);
       }
     });
 
@@ -66,8 +66,10 @@ function declareOskRewrite(command: Command) {
 
       if(!await analyze(analyzeOskRewritePua, filenames, options)) {
         // Once a file fails to build, we bail on subsequent builds
-        await exitProcess(1);
+        return await exitProcess(1);
       }
+
+      return null;
     });
 }
 
@@ -121,3 +123,10 @@ async function analyzeOskRewritePua(callbacks: CompilerCallbacks, filenames: str
     return true;
   });
 }
+
+/**
+ * these are exported only for unit tests, do not use
+ */
+export const analyzeUnitTestEndpoints = {
+  analyzeOskCharUse
+};

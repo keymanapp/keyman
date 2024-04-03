@@ -28,7 +28,7 @@ describe('ldml keyboard xml reader tests', function () {
         instancePath: '/keyboard3/conformsTo',
         keyword: 'enum',
         message: `must be equal to one of the allowed values`,
-        params: 'allowedValues="techpreview"',
+        params: 'allowedValues="45"',
       })],
     },
     {
@@ -113,7 +113,7 @@ describe('ldml keyboard xml reader tests', function () {
       errors: [
         CommonTypesMessages.Error_ImportInvalidPath({
           base: null,
-          path: 'techpreview/too/many/slashes/leading/to/nothing-Zxxx-does-not-exist.xml',
+          path: '45/too/many/slashes/leading/to/nothing-Zxxx-does-not-exist.xml',
           subtag: null,
         }),
       ],
@@ -124,7 +124,7 @@ describe('ldml keyboard xml reader tests', function () {
       errors: [
         CommonTypesMessages.Error_ImportReadFail({
           base: null,
-          path: 'techpreview/none-Zxxx-does-not-exist.xml',
+          path: '45/none-Zxxx-does-not-exist.xml',
           subtag: null,
         }),
       ],
@@ -135,7 +135,7 @@ describe('ldml keyboard xml reader tests', function () {
       errors: [
         CommonTypesMessages.Error_ImportWrongRoot({
           base: null,
-          path: 'techpreview/keys-Zyyy-punctuation.xml',
+          path: '45/keys-Zyyy-punctuation.xml',
           subtag: 'flicks',
         }),
       ],
