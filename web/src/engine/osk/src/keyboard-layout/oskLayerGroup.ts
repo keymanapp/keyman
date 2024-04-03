@@ -9,8 +9,7 @@ import VisualKeyboard from '../visualKeyboard.js';
 import OSKRow from './oskRow.js';
 import OSKBaseKey from './oskBaseKey.js';
 
-const NEAREST_KEY_HORIZ_FUDGE_FACTOR = 0.6;
-const NEAREST_KEY_MIN_HORIZONTAL_FUDGE_PIXELS = 24;
+const NEAREST_KEY_TOUCH_MARGIN_PERCENT = 0.06;
 
 export default class OSKLayerGroup {
   public readonly element: HTMLDivElement;
@@ -179,8 +178,6 @@ export default class OSKLayerGroup {
     // Our pre-processed layout info maps whatever shape the keyboard is in into a unit square.
     // So, we map our coord to find its location within that square.
     const proportionalCoords = {
-      // Note:  need to cache these two values in some manner; if the keyboard is swapped,
-      // we need them if any keypresses are registered before the swap completes.
       x: coord.targetX / this.computedWidth,
       y: coord.targetY / this.computedHeight
     };
@@ -192,30 +189,25 @@ export default class OSKLayerGroup {
     }
 
     // Step 1:  find the nearest row.
-    let row: OSKRow = null;
-    let bestMatchDistance = Number.MAX_VALUE;
-
-    // Max distance from the key's center to consider, vertically.
     // Rows aren't variable-height - this value is "one size fits all."
-    const rowRadius = layer.rows[0].heightFraction / 2;
 
-    // Find the row that the touch-coordinate lies within.
-    for(const r of layer.rows) {
-      const distance = Math.abs(proportionalCoords.y - r.spec.proportionalY);
-      if(distance <= rowRadius) {
-        row = r;
-        break;
-      } else if(distance < bestMatchDistance) {
-        bestMatchDistance = distance;
-        row = r;
-      }
-    }
+    /*
+      If 4 rows, y = .2 x 4 = .8 - still within the row with index 0 (spanning from 0 to .25)
+                 y = .6 x 4 = 2.4 - within row with index 2 (third row, spanning .5 to .75)
+
+      Assumes there is no fine-tuning of the row ranges to be done - each takes a perfect
+      fraction of the overall layer height without any padding above or below.
+    */
+    const rowIndex = Math.floor(proportionalCoords.y * layer.rows.length);
+    const row = layer.rows[rowIndex];
+
     // Assertion:  row no longer `null`.
     // (We already prevented the no-rows available scenario, anyway.)
 
     // Step 2: Find minimum distance from any key
     // - If the coord is within a key's square, go ahead and return it.
     let closestKey: OSKBaseKey = null;
+    // Is percentage-based!
     let minDistance = Number.MAX_VALUE;
 
     for (let key of row.keys) {
@@ -241,18 +233,16 @@ export default class OSKLayerGroup {
       }
     }
 
-    // Step 3:  If the input coordinate wasn't within any valid key's "square",
-    // determine if the nearest valid key is acceptable.
-    const minHorizFudge = NEAREST_KEY_MIN_HORIZONTAL_FUDGE_PIXELS / this.element.offsetWidth;
+    /*
+      Step 3:  If the input coordinate wasn't within any valid key's "square",
+      determine if the nearest valid key is acceptable - if it's within 60% of
+      a standard key's width from the touch location.
+    */
+    const keyTouchMarginPc = NEAREST_KEY_TOUCH_MARGIN_PERCENT;
 
     // If the condition is not met, there are no valid keys within this row.
-    if (minDistance < Number.MAX_VALUE) {
-      let fudgeFactor = closestKey.spec.proportionalWidth * NEAREST_KEY_HORIZ_FUDGE_FACTOR;
-      fudgeFactor = fudgeFactor > minHorizFudge ? fudgeFactor : minHorizFudge;
-
-      if(minDistance <= fudgeFactor) {
-        return closestKey.btn;
-      }
+    if (minDistance /* %age-based! */ <= keyTouchMarginPc) {
+      return closestKey.btn;
     }
 
     // Step 4:  no matches => return null.  The caller should be able to handle such cases,
