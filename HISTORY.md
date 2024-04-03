@@ -1,5 +1,21 @@
 # Keyman Version History
 
+## 17.0.301 beta 2024-04-03
+
+* feat(core): support modifiers=other (#11118)
+* chore(core): dx better err message on embedded test vkeys (#11119)
+* fix(web): key preview stickiness 🪠 (#10778)
+* fix(web): early gesture-match abort when unable to extend existing gestures 🪠 (#10836)
+* fix(web): infinite model-match replacement looping 🪠 (#10838)
+* fix(web): proper gesture-match sequencing 🪠 (#10840)
+* change(web): input-event sequentialization 🪠 (#10843)
+* fix(web): proper linkage of sources to events 🪠 (#10960)
+* fix(developer): handle buffer boundaries in four cases (#11137)
+* chore(linux): Build packages for next Ubuntu version separately :cherries: (#11153)
+* fix(common): upgrade sentry-cli to 2.31.0 (#11151)
+* fix(android/app): Track previous device orientation for SystemKeyboard (#11134)
+*  (#11129)
+
 ## 17.0.300 beta 2024-04-02
 
 * change(web): keyboard swaps keep original keyboards active until fully ready (#11108)
