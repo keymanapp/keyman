@@ -120,7 +120,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Build
-      uses: ./.github/actions/build-binary-package
+      uses: ./.github/actions/build-binary-packages
       with:
         dist: ${{ matrix.dist }}
         version: ${{ needs.sourcepackage.outputs.VERSION }}
@@ -140,7 +140,7 @@ jobs:
     steps:
     - name: Build
       continue-on-error: true
-      uses: ./.github/actions/build-binary-package
+      uses: ./.github/actions/build-binary-packages
       with:
         dist: ${{ matrix.dist }}
         version: ${{ needs.sourcepackage.outputs.VERSION }}
