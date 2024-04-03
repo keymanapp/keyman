@@ -354,6 +354,9 @@
         <DCCReference Include="web\Keyman.Configuration.System.HttpServer.App.Locale.pas"/>
         <DCCReference Include="..\..\..\..\common\windows\delphi\general\Keyman.System.AndroidStringToKeymanLocaleString.pas"/>
         <DCCReference Include="main\Keyman.Configuration.System.Main.pas"/>
+        <DCCReference Include="render\UpdateXMLRenderer.pas"/>
+        <DCCReference Include="main\Keyman.System.UpdateCheckStorage.pas"/>
+        <DCCReference Include="main\Keyman.System.RemoteUpdateCheck.pas"/>
         <None Include="Profiling\AQtimeModule1.aqt"/>
         <BuildConfiguration Include="Debug">
             <Key>Cfg_2</Key>
@@ -415,9 +418,9 @@
                 <Platform value="Win64">False</Platform>
             </Platforms>
             <Deployment Version="3">
-                <DeployFile LocalName="kmshell.rsm" Configuration="Debug" Class="DebugSymbols">
+                <DeployFile LocalName="bin\Win32\Debug\kmshell.exe" Configuration="Debug" Class="ProjectOutput">
                     <Platform Name="Win32">
-                        <RemoteName>kmshell.rsm</RemoteName>
+                        <RemoteName>kmshell.exe</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
@@ -427,9 +430,9 @@
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
-                <DeployFile LocalName="Profiling\AQtimeModule1.aqt" Configuration="Debug" Class="ProjectFile">
+                <DeployFile LocalName="bin\Win32\Debug\kmshell.rsm" Configuration="Debug" Class="DebugSymbols">
                     <Platform Name="Win32">
-                        <RemoteDir>.\</RemoteDir>
+                        <RemoteName>kmshell.rsm</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
