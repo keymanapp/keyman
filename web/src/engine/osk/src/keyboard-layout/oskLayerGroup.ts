@@ -237,11 +237,10 @@ export default class OSKLayerGroup {
       Step 3:  If the input coordinate wasn't within any valid key's "square",
       determine if the nearest valid key is acceptable - if it's within 60% of
       a standard key's width from the touch location.
-    */
-    const keyTouchMarginPc = NEAREST_KEY_TOUCH_MARGIN_PERCENT;
 
-    // If the condition is not met, there are no valid keys within this row.
-    if (minDistance /* %age-based! */ <= keyTouchMarginPc) {
+      If the condition is not met, there are no valid keys within this row.
+    */
+    if (minDistance /* %age-based! */ <= NEAREST_KEY_TOUCH_MARGIN_PERCENT) {
       return closestKey.btn;
     }
 
