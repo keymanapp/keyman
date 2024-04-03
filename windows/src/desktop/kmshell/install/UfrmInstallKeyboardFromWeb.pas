@@ -91,6 +91,7 @@ uses
   Upload_Settings,
   utilfiletypes,
   utildir,
+  IdURI,
   utilexecute,
   VersionInfo;
 
@@ -215,7 +216,7 @@ var
 begin
   FTempDir := IncludeTrailingPathDelimiter(CreateTempPath);  // I1679
   try
-    FDownloadFilename := FTempDir + PackageID + Ext_PackageFile;
+    FDownloadFilename := FTempDir + TIdURI.URLDecode(PackageID) + Ext_PackageFile;
     FDownloadURL := KeymanCom_Protocol_Server + URLPath_PackageDownload(PackageID, BCP47, False);
 
     frmDownloadProgress := TfrmDownloadProgress.Create(Self);
