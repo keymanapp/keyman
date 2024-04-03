@@ -119,6 +119,12 @@ jobs:
 
     runs-on: ubuntu-latest
     steps:
+    - name: Checkout
+      uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c #v3.3.0
+      with:
+        ref: '${{ github.event.client_payload.buildSha }}'
+        sparse-checkout: '.github/actions/'
+
     - name: Build
       uses: ./.github/actions/build-binary-packages
       with:
@@ -138,6 +144,12 @@ jobs:
 
     runs-on: ubuntu-latest
     steps:
+    - name: Checkout
+      uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c #v3.3.0
+      with:
+        ref: '${{ github.event.client_payload.buildSha }}'
+        sparse-checkout: '.github/actions/'
+
     - name: Build
       continue-on-error: true
       uses: ./.github/actions/build-binary-packages
