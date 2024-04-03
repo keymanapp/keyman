@@ -597,6 +597,15 @@ export default abstract class OSKView
   }
 
   public batchLayoutAfter(closure: () => void) {
+    /*
+      Is there already an ongoing batch?  If so, just run the closure and don't
+      adjust the tracking variables.  The outermost call will finalize layout.
+    */
+    if(this.deferLayout) {
+      closure();
+      return;
+    }
+
     try {
       this.deferLayout = true;
       if(this.vkbd) {
