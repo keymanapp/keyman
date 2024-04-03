@@ -309,7 +309,7 @@ NSString* const kEasterEggKmxName = @"EnglishSpanish.kmx";
   NSString *contextString = @"";
   NSAttributedString *attributedString = nil;
   
-  // if we can read the text, then get the context for up to kMaxContent characters
+  // if we can read the text, then get the context for up to kMaxContext characters
   if (self.apiCompliance.canReadText) {
     NSRange selectionRange = [client selectedRange];
     NSUInteger contextLength = MIN(kMaxContext, selectionRange.location);
