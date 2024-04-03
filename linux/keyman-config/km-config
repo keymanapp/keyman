@@ -9,7 +9,7 @@ gi.require_version('Gtk', '3.0')
 
 from gi.repository import Gtk
 
-from keyman_config import __versionwithtag__, __pkgversion__, add_standard_arguments, initialize_logging, initialize_sentry
+from keyman_config import __versionwithtag__, __pkgversion__, add_standard_arguments, initialize_logging, initialize_sentry, verify_dbus_running
 from keyman_config.handle_install import download_and_install_package
 from keyman_config.ibus_util import verify_ibus_daemon
 from keyman_config.view_installed import ViewInstalledWindow
@@ -40,6 +40,7 @@ if __name__ == '__main__':
 
     initialize_logging(args)
     initialize_sentry()
+    verify_dbus_running()
 
     logging.info('Keyman version %s %s', __versionwithtag__, __pkgversion__)
 

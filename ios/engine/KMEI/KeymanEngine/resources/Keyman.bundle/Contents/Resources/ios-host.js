@@ -276,33 +276,28 @@ function doResetContext() {
     keyman.resetContext();
 }
 
-function setCursorRange(pos, length) {
-    var context = keyman.context;
-
-    //console.log('setCursorRange('+pos+', '+length+')');
-
-    var start = pos;
-    var end = pos + length;
-
-    if(context.selStart != start || context.selEnd != end) {
-      keyman.context.setSelection(start, end);
-      keyman.resetContext();
-    }
-}
-
-function setKeymanVal(text) {
-    //console.log('setKeymanVal('+JSON.stringify(text)+')');
-
+function setKeymanContext(text, doSync, selStart, selLength) {
+    // console.log(`setKeymanContext(${JSON.stringify(text)}, ${doSync}, ${pos}, ${length})`);
     if(text == undefined) {
         text = '';
     }
 
-    if(keyman.context.getText() != text) {
-        keyman.context.setText(text);
-        keyman.resetContext();
-    }
+    // Both pos + length are optional parameters.
+    // undefined + <number> => NaN; undefined + undefined => NaN.
+    let selEnd = selStart + selLength;
+    selEnd = isNaN(selEnd) ? undefined : selEnd;
 
-    return keyman.context.getText();
+    if(doSync) {
+      const shouldReset = keyman.context.updateContext(text, selStart, selEnd);
+      if(shouldReset) {
+        keyman.resetContext();
+      }
+    } else {
+      // if not in "sync" mode, we have a hard context reset; just full-reset it.
+      keyman.context.setText(text);
+      keyman.context.setSelection(selStart, selStart+selLength);
+      keyman.resetContext();
+    }
 }
 
 function executePopupKey(keyID, keyText) {

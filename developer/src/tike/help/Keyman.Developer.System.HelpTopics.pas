@@ -8,6 +8,8 @@ const
   SHelpTopic_Context_CharacterMap = 'context/character-map';
   SHelpTopic_Context_CharacterIdentifier = 'context/character-identifier';
   SHelpTopic_Context_Debug = 'context/debug';
+  SHelpTopic_Context_LdmlDebug = 'context/ldml-debug';
+  SHelpTopic_Context_LdmlEditor = 'context/ldml-editor';
   SHelpTopic_Context_DebugStatus = 'context/debug#toc-state';
   SHelpTopic_Context_DebugStatus_CallStack = 'context/debug#toc-call-stack';
   SHelpTopic_Context_DebugStatus_DeadKeys = 'context/debug#toc-deadkeys';
@@ -25,6 +27,7 @@ const
   SHelpTopic_Context_NewProject = 'context/new-project';
   SHelpTopic_Context_NewProjectParameters = 'context/new-project-parameters';
   SHelpTopic_Context_NewModelProjectParameters = 'context/new-model-project-parameters';
+  SHelpTopic_Context_NewLdmlProjectParameters = 'context/new-ldml-project-parameters';
   SHelpTopic_Context_NewFileDetails = 'context/new-file-details';
   SHelpTopic_Context_OnScreenKeyboardEditor = 'context/keyboard-editor#toc-on-screen-tab';
   SHelpTopic_Context_Options = 'context/options';

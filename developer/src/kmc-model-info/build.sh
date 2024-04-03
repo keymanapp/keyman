@@ -15,6 +15,7 @@ builder_describe "Build Keyman kmc Lexical Model model-info Compiler module" \
   "clean" \
   "configure" \
   "build" \
+  "api                       analyze API and prepare API documentation" \
   "test" \
   "pack                      build a local .tgz pack for testing" \
   "publish                   publish to npm" \
@@ -22,7 +23,8 @@ builder_describe "Build Keyman kmc Lexical Model model-info Compiler module" \
 
 builder_describe_outputs \
   configure     /node_modules \
-  build         /developer/src/kmc-model-info/build/src/model-info-compiler.js
+  build         /developer/src/kmc-model-info/build/src/model-info-compiler.js \
+  api           /developer/build/api/kmc-model-info.api.json
 
 builder_parse "$@"
 
@@ -46,6 +48,8 @@ if builder_start_action build; then
   npm run build
   builder_finish_action success build
 fi
+
+builder_run_action api        api-extractor run --local --verbose
 
 #-------------------------------------------------------------------------------------------------------------------
 

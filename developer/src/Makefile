@@ -9,7 +9,7 @@ DELPHI_TARGETS=
 DELPHI_TARGETS=kmconvert tike setup inst
 !endif
 
-TARGETS=build-tools kmcmplib kmanalyze $(DELPHI_TARGETS) kmdecomp samples server kmc
+TARGETS=build-tools kmcmplib kmanalyze $(DELPHI_TARGETS) kmdecomp samples server kmc api
 
 EXCLUDEPATHDEFINES=1
 MANIFESTS=tike setup
@@ -95,6 +95,10 @@ kmc-model-info: .virtual
 kmc-package: .virtual
     cd $(DEVELOPER_ROOT)\src\kmc-package
     $(MAKE) $(TARGET)
+
+api: .virtual
+    cd $(DEVELOPER_ROOT)
+    if $(TARGET) == build $(GIT_BASH_FOR_KEYMAN) build.sh api --no-deps
 
 # ----------------------------------------------------------------------
 

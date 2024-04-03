@@ -58,13 +58,6 @@ export class WebviewConfiguration extends EngineConfiguration {
 
     return baseReport;
   }
-
-  onRuleFinalization(ruleBehavior: RuleBehavior) {
-    if(!isEmptyTransform(ruleBehavior.transcription?.transform)) {
-      const transform = ruleBehavior.transcription.transform;
-      this.oninserttext(transform.deleteLeft, transform.insert, transform.deleteRight ?? 0);
-    }
-  }
 }
 
 export interface WebviewInitOptionSpec extends InitOptionSpec {

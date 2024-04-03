@@ -204,7 +204,8 @@
 
 .phone.android.kmw-osk-frame { background-color: #222;}
 
-.phone.android .kmw-banner-bar {
+.phone.android .kmw-banner-bar,
+.tablet.android .kmw-banner-bar {
   background-color: #222;
   position: relative;
   margin-top: 4px;
@@ -294,20 +295,12 @@
 .tablet.android .kmw-spacebar-caption {color: #aaa;}
 .tablet.android .kmw-key-deadkey{color:#0d0;background-color:#777;}
 
-.tablet.android .kmw-banner-bar {
-  background-color: #b4b4b8;
-  position: relative;
-  margin-top: 4px;
-  height: 100%;
-  width: 100%;
-}
-
 .tablet.android .kmw-suggest-option::before {
-  background: linear-gradient(90deg, #b4b4b8 0px, transparent 100%);
+  background: linear-gradient(90deg, #222 0px, transparent 100%);
 }
 
 .tablet.android .kmw-suggest-option::after {
-  background: linear-gradient(90deg, transparent 0%, #b4b4b8 100%);
+  background: linear-gradient(90deg, transparent 0%, #222 100%);
 }
 
 .tablet.android .kmw-banner-bar .kmw-suggest-option {
@@ -317,17 +310,17 @@
 }
 
 .tablet.android .kmw-suggestion-text {
-  color:#77f;
+  color:#fff;
 }
 
-.tablet.android .kmw-suggest-option.kmw-suggest-touched {background-color:#447;}
+.tablet.android .kmw-suggest-option.kmw-suggest-touched {background-color:#bbb;}
 
 .tablet.android .kmw-suggest-option.kmw-suggest-touched::before {
-  background: linear-gradient(90deg, #447 0px, transparent 100%);
+  background: linear-gradient(90deg, #bbb 0px, transparent 100%);
 }
 
 .tablet.android .kmw-suggest-option.kmw-suggest-touched::after {
-  background: linear-gradient(90deg, transparent 0%, #447 100%);
+  background: linear-gradient(90deg, transparent 0%, #bbb 100%);
 }
 
 /* Vertical centering of text labels on keys */
@@ -355,8 +348,21 @@
 .desktop .kmw-key-label{position:absolute;left:2px;top:2px;font:0.5em Arial;color:#888;background-color:transparent;}
 
 /* Popup icon style (and content)*/
-.kmw-key-popup-icon{position:absolute;display:block;visibility:visible;right:4%;top:1%;/*width:8px;height:8px;*/
-      font-size:0.5em;color:#aaa; line-height:initial}
+.kmw-key-popup-icon{
+  position: absolute;
+  display: block;
+  visibility: visible;
+  right: 4%;
+  top: 1%;
+  font-size: 0.5em;
+  color: #aaa;
+  line-height: initial;
+}
+
+.android .kmw-key-popup-icon{
+  font-size: 0.5em;
+  color: #eee;
+}
 
 /* For certain form-factors, #aaa blends in with the special-key background-color _way_ too well. */
 /* e.g: .phone.ios .kmw-key.kmw-key-special {background-color:#b2b9c5;} */

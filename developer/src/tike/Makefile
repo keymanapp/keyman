@@ -16,6 +16,8 @@ build: version.res manifest.res icons dirs xml xsd pull-core
     $(COPY) kmc.cmd $(DEVELOPER_PROGRAM)
     $(COPY) $(KEYMAN_ROOT)\core\build\x86\$(TARGET_PATH)\src\keymancore-1.dll $(DEVELOPER_PROGRAM)
     if exist $(WIN32_TARGET_PATH)\tike.dbg $(COPY) $(WIN32_TARGET_PATH)\tike.dbg $(DEVELOPER_DEBUGPATH)
+    $(COPY) $(KEYMAN_ROOT)\core\build\x86\$(TARGET_PATH)\src\keymancore-1.dll $(WIN32_TARGET_PATH)
+    $(COPY) $(KEYMAN_ROOT)\core\build\x86\$(TARGET_PATH)\src\keymancore-1.pdb $(WIN32_TARGET_PATH)
 
 xsd:
     $(COPY) $(KEYMAN_ROOT)\common\schemas\kps\kps.xsd $(DEVELOPER_PROGRAM)

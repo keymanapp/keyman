@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<!DOCTYPE keyboard3 SYSTEM "../../../../../../../resources/standards-data/ldml-keyboards/techpreview/dtd/ldmlKeyboard3.dtd">
-<keyboard3 locale="mt" conformsTo="techpreview">
+<keyboard3 xmlns="https://schemas.unicode.org/cldr/45/keyboard3" locale="mt" conformsTo="45">
   <info name="hardware-minimal"/>
 
   <keys>
-    <import base="cldr" path="techpreview/keys-Zyyy-punctuation.xml"/>
+    <import base="cldr" path="45/keys-Zyyy-punctuation.xml"/>
   </keys>
 
   <layers formId="us">

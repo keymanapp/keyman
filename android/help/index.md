@@ -6,6 +6,7 @@ title: Keyman for Android 18.0 Help
 * [Welcome to Keyman](about/welcome)
 * [What's New](about/whatsnew)
 * [System Requirements](about/system-requirements)
+* [Data Privacy Policy](about/privacy)
 * [Version History](about/history)
 
 ## [Getting Started](start/)

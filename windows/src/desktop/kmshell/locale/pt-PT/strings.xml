@@ -341,7 +341,7 @@
   <!-- Context: Configuration Dialog - Hotkeys tab -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="S_Hotkey_None" comment="Hotkey - text used when no hotkey set for an option">(nenhuma)</string>
+  <string name="S_Hotkey_None" comment="Hotkey - text used when no hotkey set">(nenhuma)</string>
   <!-- Context: Configuration Dialog - Hotkeys tab -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->

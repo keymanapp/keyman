@@ -15,6 +15,7 @@ builder_describe "Build Keyman kmc keyboard-info Compiler module" \
   "clean" \
   "configure" \
   "build" \
+  "api                       analyze API and prepare API documentation" \
   "test" \
   "pack                      build a local .tgz pack for testing" \
   "publish                   publish to npm" \
@@ -22,7 +23,8 @@ builder_describe "Build Keyman kmc keyboard-info Compiler module" \
 
 builder_describe_outputs \
   configure     /developer/src/kmc-keyboard-info/src/imports/langtags.js \
-  build         /developer/src/kmc-keyboard-info/build/src/index.js
+  build         /developer/src/kmc-keyboard-info/build/src/index.js \
+  api           /developer/build/api/kmc-keyboard-info.api.json
 
 builder_parse "$@"
 
@@ -38,6 +40,7 @@ function do_configure() {
 builder_run_action clean       rm -rf ./build/ ./tsconfig.tsbuildinfo
 builder_run_action configure   do_configure
 builder_run_action build       tsc --build
+builder_run_action api         api-extractor run --local --verbose
 
 #-------------------------------------------------------------------------------------------------------------------
 
