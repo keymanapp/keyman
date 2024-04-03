@@ -193,10 +193,16 @@ export class GestureMatcher<Type, StateToken = any> implements PredecessorMatch<
         // Easy peasy - resolutions only need & have the one defined action type.
         action = this.model.resolutionAction;
       } else {
-        // Some gesture types may wish to restart with a new base item if they fail due to
-        // it changing during its lifetime or due to characteristics of the contact-point's
-        // path.
-        if(this.model.rejectionActions?.[cause]) {
+        /*
+          Some gesture types may wish to restart with a new base item if they fail due to
+          it changing during its lifetime or due to characteristics of the contact-point's
+          path.
+
+          If a gesture model match is outright-cancelled, matcher restarts should be completely
+          blocked.  One notable reason:  if a model-match is _immediately_ cancelled due to
+          initial conditions, reattempting it can cause an infinite (async) loop!
+        */
+        if(cause != 'cancelled' && this.model.rejectionActions?.[cause]) {
           action = this.model.rejectionActions[cause];
           action.item = 'none';
         }
@@ -437,6 +443,7 @@ export class GestureMatcher<Type, StateToken = any> implements PredecessorMatch<
       }
     }
 
+    // Check that initial "item" and "state" properties are legal for this type of gesture.
     if(contactSpec.model.allowsInitialState) {
       const initialStateCheck = contactSpec.model.allowsInitialState(
         simpleSource.currentSample,
@@ -450,13 +457,53 @@ export class GestureMatcher<Type, StateToken = any> implements PredecessorMatch<
         // pathMatcher for a source that failed to meet initial conditions.
         this.pathMatchers.pop();
 
-        this.finalize(false, 'path');
+        /*
+          To prevent any further retries for the model (via rejectionActions), we list the
+          cause as 'cancelled'.  'Cancelled' match attempts will never be retried, and we
+          wish to prevent an infinite (async) loop from retrying something we know will
+          auto-cancel.  (That loop would automatically end upon a different model's match
+          or upon all possible models failing to match at the same time, but it's still
+          far from ideal.)
+
+          The rejection-action mechanism in MatcherSelector's `replacer` method (refer to
+          https://github.com/keymanapp/keyman/blob/be867604e4b2650a60e69dc6bbe0b6115315efff/common/web/gesture-recognizer/src/engine/headless/gestures/matchers/matcherSelector.ts#L559-L575)
+          already blocks paths that are rejected synchronously by this method.  Use of
+          'cancelled' is thus not necessary for avoiding the loop-scenario, but it does
+          add an extra layer of protection.  Also, it's more explicit about the fact that
+          we _are_ permanently cancelling any and all future attempts to match against
+          it in the future for the affected `GestureSource`(s).
+
+          If we weren't using 'cancelled', 'item' would correspond best with a rejection
+          here, as the decision is made due to a validation check against the initial item.
+        */
+        this.finalize(false, 'cancelled');
       }
     }
 
-    contactModel.update();
-    // Now that we've done the initial-state check, we can check for instantly-matching path models.
+    /*
+      Now that we've done the initial-state check, we can check for instantly-matching and
+      instantly-rejecting path models... particularly from from causes other than initial-item
+      and state, such as rejection due to an extra touch.
 
+      KMW example:  longpresses cancel when a new touch comes in during the longpress timer;
+      they should never become valid again for that base touch.
+    */
+    const result = contactModel.update();
+    if(result?.type == 'reject') {
+      /*
+        Refer to the earlier comment in this method re: use of 'cancelled'; we need to
+        prevent any and all further attempts to match against this model  We'd
+        instantly reject it anyway due to its rejected initial state.  Failing to do so
+        can cause an infinite async loop.
+
+        If we weren't using 'cancelled', 'path' would correspond best with a rejection
+        here, as the decision is made due to the GestureSource's current path being
+        rejected by one of the `PathModel`s comprising the `GestureModel`.
+      */
+      this.finalize(false, 'cancelled');
+    }
+
+    // Standard path:  trigger either resolution or rejection when the contact model signals either.
     contactModel.promise.then((resolution) => {
       this.finalize(resolution.type == 'resolve', resolution.cause);
     });
