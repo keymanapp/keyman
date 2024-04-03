@@ -83,7 +83,9 @@ describe("'Canary' checks", function() {
 
       await new Promise((resolve) => {
         window.setTimeout(resolve, 0);
-      });
+      }).then(() => new Promise((resolve) => {
+        window.setTimeout(resolve, 0);
+      }));
 
       assert.isTrue(fakeHandler.called, "Unit test attempt failed:  handler was not called successfully.");
     });

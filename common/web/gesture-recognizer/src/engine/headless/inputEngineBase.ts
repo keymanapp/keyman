@@ -63,10 +63,10 @@ export abstract class InputEngineBase<HoveredItemType, StateToken = any> extends
    * Designed to facilitate recovery from error cases and peculiar states that sometimes arise when debugging.
    * @param identifiers
    */
-  maintainTouchpointsWithIds(identifiers: number[]) {
-    const identifiersToMaintain = identifiers.map((internal_id) => this.identifierMap[internal_id]);
+  maintainTouchpoints(touchpoints: GestureSource<HoveredItemType, StateToken>[]) {
+    touchpoints ||= [];
     this._activeTouchpoints
-      .filter((source) => !identifiersToMaintain.includes(source.rawIdentifier))
+      .filter((source) => !touchpoints.includes(source))
       // Will trigger `.dropTouchpoint` later in the event chain.
       .forEach((source) => source.terminate(true));
   }
