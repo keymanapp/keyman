@@ -152,16 +152,32 @@ export default class KeymanEngine<
         this.osk.startHide(false);
       }
 
-      if(this.osk) {
-        this.osk.setNeedsLayout();
-        this.osk.activeKeyboard = kbd;
-        this.osk.present();
-      }
-
       // Needed to ensure the correct layer is displayed.
       // Needs to be after the OSK has loaded for the keyboard in case the default
       // layer should be something other than "default" for the current context.
-      this.core.resetContext(this.contextManager.activeTarget);
+      const doContextReset = () => {
+        this.contextManager.resetContext();
+      }
+
+      /*
+        This pattern is designed to minimize layout reflow during the keyboard-swap process.
+        The 'default' layer is loaded by default, but some keyboards will start on different
+        layers depending on the current state of the context.
+
+        If possible, we want to only perform layout operations once the correct layer is
+        set to active.
+      */
+      if(this.osk) {
+        this.osk.batchLayoutAfter(() => {
+          this.osk.activeKeyboard = kbd;
+          // Note:  when embedded within the mobile apps, the keyboard will still be visible
+          // at this time.
+          doContextReset();
+          this.osk.present();
+        });
+      } else {
+        doContextReset();
+      }
     });
 
     this.contextManager.on('keyboardasyncload', (metadata) => {
@@ -216,7 +232,15 @@ export default class KeymanEngine<
       resetContext: (target) => {
         // Could reset the target's deadkeys here, but it's really more of a 'core' task.
         // So we delegate that to keyboard-processor.
-        this.core.resetContext(target);
+        const doReset = () => this.core.resetContext(target);
+
+        if(this.osk) {
+          this.osk.batchLayoutAfter(() => {
+            doReset();
+          })
+        } else {
+          doReset();
+        }
       },
       predictionContext: new PredictionContext(this.core.languageProcessor, this.core.keyboardProcessor),
       keyboardCache: this.keyboardRequisitioner.cache
