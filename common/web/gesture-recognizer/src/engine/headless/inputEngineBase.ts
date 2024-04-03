@@ -56,6 +56,8 @@ export abstract class InputEngineBase<HoveredItemType, StateToken = any> extends
     return source;
   }
 
+  public fulfillInputStart(touchpoint: GestureSource<HoveredItemType, StateToken>) {}
+
   /**
    * Calls to this method will cancel any touchpoints whose internal IDs are _not_ included in the parameter.
    * Designed to facilitate recovery from error cases and peculiar states that sometimes arise when debugging.

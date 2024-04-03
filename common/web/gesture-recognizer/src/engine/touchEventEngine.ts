@@ -4,6 +4,9 @@ import { InputSample } from "./headless/inputSample.js";
 import { Nonoptional } from "./nonoptional.js";
 import { ZoneBoundaryChecker } from "./configuration/zoneBoundaryChecker.js";
 import { GestureSource } from "./headless/gestureSource.js";
+import { ManagedPromise } from "@keymanapp/web-utils";
+import { AsyncClosureDispatchQueue } from "./headless/asyncClosureDispatchQueue.js";
+import { GesturePath } from "./index.js";
 
 function touchListToArray(list: TouchList) {
   const arr: Touch[] = [];
@@ -19,7 +22,11 @@ export class TouchEventEngine<HoveredItemType, StateToken = any> extends InputEv
   private readonly _touchMove:  typeof TouchEventEngine.prototype.onTouchMove;
   private readonly _touchEnd:   typeof TouchEventEngine.prototype.onTouchEnd;
 
+  protected readonly eventDispatcher = new AsyncClosureDispatchQueue();
+
   private safeBoundMaskMap: {[id: number]: number} = {};
+  private pendingSourceIdentifiers: Map<number, Object> = new Map();
+  private inputStartSignalMap: Map<GestureSource<HoveredItemType, StateToken>, ManagedPromise<void>> = new Map();
 
   public constructor(config: Nonoptional<GestureRecognizerConfiguration<HoveredItemType, StateToken>>) {
     super(config);
@@ -34,17 +41,6 @@ export class TouchEventEngine<HoveredItemType, StateToken = any> extends InputEv
   private get eventRoot(): HTMLElement {
     return this.config.touchEventRoot;
   }
-
-  // public static forPredictiveBanner(banner: SuggestionBanner, handlerRoot: SuggestionManager) {
-  //   const config: GestureRecognizerConfiguration = {
-  //     targetRoot: banner.getDiv(),
-  //     // document.body is the event root b/c we need to track the mouse if it leaves
-  //     // the VisualKeyboard's hierarchy.
-  //     eventRoot: banner.getDiv(),
-  //   };
-
-  //   return new TouchEventEngine(config);
-  // }
 
   registerEventHandlers() {
     // The 'passive' property ensures we can prevent MouseEvent followups from TouchEvents.
@@ -86,6 +82,19 @@ export class TouchEventEngine<HoveredItemType, StateToken = any> extends InputEv
     }
   }
 
+  public fulfillInputStart(touchpoint: GestureSource<HoveredItemType, StateToken, GesturePath<HoveredItemType, StateToken>>) {
+    const lock = this.inputStartSignalMap.get(touchpoint);
+    if(lock) {
+      this.inputStartSignalMap.delete(touchpoint);
+      lock.resolve();
+    }
+  };
+
+  public hasActiveTouchpoint(identifier: number): boolean {
+    const baseResult = super.hasActiveTouchpoint(identifier);
+    return baseResult || !!this.pendingSourceIdentifiers.has(identifier);
+  }
+
   private buildSampleFromTouch(touch: Touch, timestamp: number) {
     // WILL be null for newly-starting `GestureSource`s / contact points.
     const source = this.getTouchpointWithId(touch.identifier);
@@ -106,89 +115,135 @@ export class TouchEventEngine<HoveredItemType, StateToken = any> extends InputEv
     // during a touchstart.)
     const allTouches = touchListToArray(event.touches);
     const newTouches = touchListToArray(event.changedTouches);
-    // Maintain all touches in the `.touches` array that are NOT marked as `.changedTouches` (and therefore, new)
-    this.maintainTouchpointsWithIds(allTouches
-      .filter((touch1) => newTouches.findIndex(touch2 => touch1.identifier == touch2.identifier) == -1)
-      .map((touch) => touch.identifier)
-    );
 
-    // Ensure the same timestamp is used for all touches being updated.
-    const timestamp = performance.now();
+    this.eventDispatcher.runAsync(() => {
+      // Maintain all touches in the `.touches` array that are NOT marked as `.changedTouches` (and therefore, new)
+      this.maintainTouchpointsWithIds(allTouches
+        .filter((touch1) => newTouches.findIndex(touch2 => touch1.identifier == touch2.identifier) == -1)
+        .map((touch) => touch.identifier)
+      );
+    });
 
-    // During a touch-start, only _new_ touch contact points are listed here;
-    // we shouldn't signal "input start" for any previously-existing touch points,
-    // so `.changedTouches` is the best way forward.
-    for(let i=0; i < event.changedTouches.length; i++) {
-      const touch = event.changedTouches.item(i);
-      const sample = this.buildSampleFromTouch(touch, timestamp);
+    this.eventDispatcher.runAsync(() => {
+      // Ensure the same timestamp is used for all touches being updated.
+      const timestamp = performance.now();
+      let touchpoint: GestureSource<HoveredItemType, StateToken> = null;
+      const uniqueObject = {};
 
-      if(!ZoneBoundaryChecker.inputStartOutOfBoundsCheck(sample, this.config)) {
-        // If we started very close to a safe zone border, remember which one(s).
-        // This is important for input-sequence cancellation check logic.
-        this.safeBoundMaskMap[touch.identifier] = ZoneBoundaryChecker.inputStartSafeBoundProximityCheck(sample, this.config);
-      } else {
-        // This touchpoint shouldn't be considered; do not signal a touchstart for it.
-        continue;
+      // During a touch-start, only _new_ touch contact points are listed here;
+      // we shouldn't signal "input start" for any previously-existing touch points,
+      // so `.changedTouches` is the best way forward.
+      for(let i=0; i < event.changedTouches.length; i++) {
+        const touch = event.changedTouches.item(i);
+        const touchId = touch.identifier;
+        const sample = this.buildSampleFromTouch(touch, timestamp);
+
+        this.pendingSourceIdentifiers.set(touchId, uniqueObject);
+
+        if(!ZoneBoundaryChecker.inputStartOutOfBoundsCheck(sample, this.config)) {
+          // If we started very close to a safe zone border, remember which one(s).
+          // This is important for input-sequence cancellation check logic.
+          this.safeBoundMaskMap[touchId] = ZoneBoundaryChecker.inputStartSafeBoundProximityCheck(sample, this.config);
+        } else {
+          // This touchpoint shouldn't be considered; do not signal a touchstart for it.
+          continue;
+        }
+
+        touchpoint = this.onInputStart(touchId, sample, event.target, true);
+
+        // Ensure we only do the cleanup if and when it hasn't already been replaced by new events later.
+        //
+        // Must be done for EACH source - we can't risk leaving a lingering entry once we've dismissed
+        // processing for the source.
+        const cleanup = () => {
+          if(this.pendingSourceIdentifiers.get(touchId) == uniqueObject) {
+            this.pendingSourceIdentifiers.delete(touchId);
+          }
+        }
+
+        touchpoint.path.on('complete', cleanup);
+        touchpoint.path.on('invalidated', cleanup);
       }
 
-      this.onInputStart(touch.identifier, sample, event.target, true);
-    }
+      if(touchpoint) {
+        // This 'lock' should only be released when the last simultaneously-registered touch is published via
+        // gesture-recognizer event.
+        let eventSignalPromise = new ManagedPromise<void>();
+        this.inputStartSignalMap.set(touchpoint, eventSignalPromise);
+
+        return eventSignalPromise.corePromise;
+      }
+    });
   }
 
   onTouchMove(event: TouchEvent) {
-    let propagationActive = true;
-    // Ensure the same timestamp is used for all touches being updated.
-    const timestamp = performance.now();
-
-    this.maintainTouchpointsWithIds(touchListToArray(event.touches)
-      .map((touch) => touch.identifier)
-    );
-
-    // Do not change to `changedTouches` - we need a sample for all active touches in order
-    // to facilitate path-update synchronization for multi-touch gestures.
-    //
-    // May be worth doing changedTouches _first_ though.
-    for(let i=0; i < event.touches.length; i++) {
+    for(let i = 0; i < event.touches.length; i++) {
       const touch = event.touches.item(i);
-
-      if(!this.hasActiveTouchpoint(touch.identifier)) {
-        continue;
-      }
-
-      if(propagationActive) {
+      if(this.hasActiveTouchpoint(touch.identifier)) {
         this.preventPropagation(event);
-        propagationActive = false;
-      }
-
-      const config = this.getConfigForId(touch.identifier);
-
-      const sample = this.buildSampleFromTouch(touch, timestamp);
-
-      if(!ZoneBoundaryChecker.inputMoveCancellationCheck(sample, config, this.safeBoundMaskMap[touch.identifier])) {
-        this.onInputMove(touch.identifier, sample, touch.target);
-      } else {
-        this.onInputMoveCancel(touch.identifier, sample, touch.target);
+        break;
       }
     }
+
+    this.eventDispatcher.runAsync(() => {
+      this.maintainTouchpointsWithIds(touchListToArray(event.touches)
+        .map((touch) => touch.identifier)
+      );
+    });
+
+    this.eventDispatcher.runAsync(() => {
+      // Ensure the same timestamp is used for all touches being updated.
+      const timestamp = performance.now();
+
+      // Do not change to `changedTouches` - we need a sample for all active touches in order
+      // to facilitate path-update synchronization for multi-touch gestures.
+      //
+      // May be worth doing changedTouches _first_ though.
+      for(let i=0; i < event.touches.length; i++) {
+        const touch = event.touches.item(i);
+
+        // Requires that the `pendingSourceIdentifiers` map is properly maintained;
+        // any lingering entries from a completed source could prevent this guard
+        // from blocking further processing.
+        if(!this.hasActiveTouchpoint(touch.identifier)) {
+          continue;
+        }
+
+        // This method expects that processing for the corresponding source is
+        // NOT completed.
+        const config = this.getConfigForId(touch.identifier);
+        const sample = this.buildSampleFromTouch(touch, timestamp);
+
+        if(!ZoneBoundaryChecker.inputMoveCancellationCheck(sample, config, this.safeBoundMaskMap[touch.identifier])) {
+          this.onInputMove(touch.identifier, sample, touch.target);
+        } else {
+          this.onInputMoveCancel(touch.identifier, sample, touch.target);
+        }
+      }
+    })
+
   }
 
   onTouchEnd(event: TouchEvent) {
-    let propagationActive = true;
-
-    // Only lists touch contact points that have been lifted; touchmove is raised separately if any movement occurred.
-    for(let i=0; i < event.changedTouches.length; i++) {
+    for(let i = 0; i < event.changedTouches.length; i++) {
       const touch = event.changedTouches.item(i);
-
-      if(!this.hasActiveTouchpoint(touch.identifier)) {
-        continue;
-      }
-
-      if(propagationActive) {
+      if(this.hasActiveTouchpoint(touch.identifier)) {
         this.preventPropagation(event);
-        propagationActive = false;
+        break;
       }
-
-      this.onInputEnd(touch.identifier, event.target);
     }
+
+    this.eventDispatcher.runAsync(() => {
+      // Only lists touch contact points that have been lifted; touchmove is raised separately if any movement occurred.
+      for(let i=0; i < event.changedTouches.length; i++) {
+        const touch = event.changedTouches.item(i);
+
+        if(!this.hasActiveTouchpoint(touch.identifier)) {
+          continue;
+        }
+
+        this.onInputEnd(touch.identifier, event.target);
+      }
+    });
   }
 }

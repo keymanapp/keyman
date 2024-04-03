@@ -4,6 +4,7 @@ import { InputSample } from "./headless/inputSample.js";
 import { Nonoptional } from "./nonoptional.js";
 import { ZoneBoundaryChecker } from "./configuration/zoneBoundaryChecker.js";
 
+// Does NOT use the AsyncClosureDispatchQueue... simply because there can only ever be one mouse touchpoint.
 export class MouseEventEngine<HoveredItemType, StateToken = any> extends InputEventEngine<HoveredItemType, StateToken> {
   private readonly _mouseStart: typeof MouseEventEngine.prototype.onMouseStart;
   private readonly _mouseMove:  typeof MouseEventEngine.prototype.onMouseMove;
