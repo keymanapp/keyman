@@ -75,7 +75,7 @@ begin
   if not m.Success then
     Exit(False);
 
-  PackageID := m.Groups[1].Value;
+  PackageID := TIdURI.URLDecode(m.Groups[1].Value);
   if m.Groups.Count > 2
     then BCP47 := m.Groups[2].Value
     else BCP47 := '';
@@ -85,7 +85,7 @@ begin
   // TODO: refactor into separate unit together with code from UfrmInstallKeyboardFromWeb
   FTempDir := IncludeTrailingPathDelimiter(CreateTempPath);  // I1679
   try
-    FDownloadFilename := FTempDir + TIdURI.URLDecode(PackageID) + Ext_PackageFile;
+    FDownloadFilename := FTempDir + PackageID + Ext_PackageFile;
     FDownloadURL := KeymanCom_Protocol_Server + URLPath_PackageDownload(PackageID, BCP47, False);
 
     frmDownloadProgress := TfrmDownloadProgress.Create(nil);

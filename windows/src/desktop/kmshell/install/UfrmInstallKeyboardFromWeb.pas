@@ -191,7 +191,7 @@ begin
   if m.Success then
   begin
     // We want to install the keyboard found in the path.
-    PackageID := m.Groups[1].Value;
+    PackageID := TIdURI.URLDecode(m.Groups[1].Value);
     uri := TURI.Create(url);
 
     try
@@ -216,7 +216,7 @@ var
 begin
   FTempDir := IncludeTrailingPathDelimiter(CreateTempPath);  // I1679
   try
-    FDownloadFilename := FTempDir + TIdURI.URLDecode(PackageID) + Ext_PackageFile;
+    FDownloadFilename := FTempDir + PackageID + Ext_PackageFile;
     FDownloadURL := KeymanCom_Protocol_Server + URLPath_PackageDownload(PackageID, BCP47, False);
 
     frmDownloadProgress := TfrmDownloadProgress.Create(Self);

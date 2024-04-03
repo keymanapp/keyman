@@ -94,6 +94,7 @@ uses
   DebugPaths,
   ErrorControlledRegistry,
   RegistryKeys,
+  IdURI,
   VersionInfo;
 
 const
@@ -169,7 +170,7 @@ var
 begin
   if IsUpdate then IsUpdateInt := 1 else IsUpdateInt := 0;
 
-  Result := Format(URLPath_PackageDownload_Format, [PackageID, CKeymanVersionInfo.Tier, BCP47, IsUpdateInt]);
+  Result := Format(URLPath_PackageDownload_Format, [TIdURI.URLEncode(PackageID), CKeymanVersionInfo.Tier, BCP47, IsUpdateInt]);
 end;
 
 end.
