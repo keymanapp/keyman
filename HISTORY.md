@@ -1,5 +1,11 @@
 # Keyman Version History
 
+## 18.0.15 alpha 2024-04-03
+
+* chore(linux): Build packages for next Ubuntu version separately (#11145)
+* chore(linux): Fix typo in path of `build-binary-packages` action (#11154)
+* chore(linux): More fixes for workaround for failing linux builds (#11156)
+
 ## 18.0.14 alpha 2024-04-02
 
 * chore(linux): Update debian changelog (#11097)
