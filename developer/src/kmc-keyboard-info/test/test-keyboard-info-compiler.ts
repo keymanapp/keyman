@@ -7,7 +7,7 @@ import { KeyboardInfoCompiler, KeyboardInfoCompilerResult, unitTestEndpoints } f
 import langtags from "../src/imports/langtags.js";
 import { KmpCompiler, KmpCompilerOptions } from '@keymanapp/kmc-package';
 import { CompilerCallbacks, KMX, KeymanFileTypes, KeymanTargets, KmpJsonFile } from '@keymanapp/common-types';
-import { KeyboardInfoFile, KeyboardInfoFilePlatform } from './keyboard-info-file.js';
+import { KeyboardInfoFile, KeyboardInfoFileLanguage, KeyboardInfoFilePlatform } from './keyboard-info-file.js';
 
 const callbacks = new TestCompilerCallbacks();
 
@@ -446,6 +446,26 @@ describe('keyboard-info-compiler', function () {
       scriptName: "Arabic",
       displayName: "Javanese (Arabic, Indonesia)",
     }});
+  });
+
+  it('check fillLanguages handles displayName correctly with no region', async function() {
+    const keyboard = {...KHMER_ANGKOR_KEYBOARD, languages: [ { name: '', id: 'aaf-Arab' } ] };
+    const kmpJsonData: KmpJsonFile.KmpJsonFile = {
+      system: { fileVersion: '', keymanDeveloperVersion: '' },
+      options: null,
+      keyboards: [keyboard],
+    };
+    const sources = KHMER_ANGKOR_SOURCES;
+    const compiler = new KeyboardInfoCompiler();
+    assert.isTrue(await compiler.init(callbacks, {sources}));
+    compiler['fontSourceToKeyboardInfoFont'] = async (_kpsFilename: string, _kmpJsonData: KmpJsonFile.KmpJsonFile, _source: string[]) => {
+      return (_source[0] == KHMER_ANGKOR_DISPLAY_FONT) ? KHMER_ANGKOR_DISPLAY_FONT_INFO : KHMER_ANGKOR_OSK_FONT_INFO;
+    }
+    const keyboard_info: KeyboardInfoFile = {};
+    const result = await compiler['fillLanguages'](KHMER_ANGKOR_KPS, keyboard_info, kmpJsonData);
+    assert.isTrue(result);
+    const displayName = (<{[bcp47: string]: KeyboardInfoFileLanguage}>keyboard_info.languages)['aaf-Arab'].displayName;
+    assert.isTrue(displayName =="Aranadan (Arabic)");
   });
 
   it('check fillLanguages returns false if fontSourceToKeyboardInfoFont fails for display font', async function() {
