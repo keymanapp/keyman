@@ -239,7 +239,7 @@ verify_context(std::u16string& text_store, km_core_state* &test_state, std::vect
     // Verify that both our local test_context and the core's test_state.context have
     // not diverged
     auto ci = citems;
-    for (auto test_ci = test_context.begin(); ci->type != KM_CORE_CT_END || test_ci != test_context.end(); ci++, test_ci++) {
+    for (auto test_ci = test_context.begin(); ; ci++, test_ci++) {
       // skip over markers, they won't be in test_context
       while (ci->type == KM_CORE_CT_MARKER) {
         ci++;
@@ -254,13 +254,13 @@ verify_context(std::u16string& text_store, km_core_state* &test_state, std::vect
       assert(test_ci->type == ci->type && test_ci->marker == ci->marker);
     }
 
-  km_core_context_items_dispose(citems);
-  if (text_store != buf) {
-    std::cerr << "text store has diverged from buf" << std::endl;
-    std::cerr << "text store: " << string_to_hex(text_store) << " [" << text_store << "]" << std::endl;
-    assert(false);
-  }
-  delete[] buf;
+    km_core_context_items_dispose(citems);
+    if (text_store != buf) {
+      std::cerr << "text store has diverged from buf" << std::endl;
+      std::cerr << "text store: " << string_to_hex(text_store) << " [" << text_store << "]" << std::endl;
+      assert(false);
+    }
+    delete[] buf;
 }
 
 int
@@ -329,6 +329,11 @@ run_test(const km::core::path &source, const km::core::path &compiled, km::tests
             test_state, p.vk, p.modifier_state | test_source.caps_lock_state(), key_down,
             KM_CORE_EVENT_FLAG_DEFAULT));  // TODO-LDML: for now. Should send touch and hardware events.
 
+        if (km_core_state_should_clear_context(test_state, p.vk, p.modifier_state | test_source.caps_lock_state(), key_down,
+            KM_CORE_EVENT_FLAG_DEFAULT)) {
+              test_context.clear();
+              text_store.clear();
+        }
         for (auto act = km_core_state_action_items(test_state, nullptr); act->type != KM_CORE_IT_END; act++) {
           apply_action(test_state, *act, text_store, test_context, test_source, test_context);
         }
