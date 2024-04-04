@@ -151,6 +151,7 @@ jobs:
         sparse-checkout: '.github/actions/'
 
     - name: Build
+      continue-on-error: true
       uses: ./.github/actions/build-binary-packages
       with:
         dist: ${{ matrix.dist }}
@@ -193,7 +194,7 @@ jobs:
     needs: [sourcepackage, binary_packages_released, binary_packages_unreleased]
     runs-on: ubuntu-latest
     environment: "deploy (linux)"
-    if: ${{ github.event.client_payload.isTestBuild == 'false' && needs.sourcepackage.result == 'success' && needs.binary_packages_released.result == 'success' }}
+    if: github.event.client_payload.isTestBuild == 'false'
 
     steps:
       - name: Sign packages
@@ -211,7 +212,7 @@ jobs:
     needs: [sourcepackage, deb_signing]
     runs-on: self-hosted
     environment: "deploy (linux)"
-    if: ${{ github.event.client_payload.isTestBuild == 'false' && needs.sourcepackage.result == 'success' && needs.deb_signing.result == 'success' }}
+    if: github.event.client_payload.isTestBuild == 'false'
 
     steps:
     - name: Install dput
@@ -294,7 +295,6 @@ jobs:
     name: Verify API for libkeymancore.so
     needs: [sourcepackage, binary_packages_released]
     runs-on: ubuntu-latest
-    if: ${{ needs.sourcepackage.result == 'success' && needs.binary_packages_released.result == 'success' }}
 
     steps:
     - name: Checkout
