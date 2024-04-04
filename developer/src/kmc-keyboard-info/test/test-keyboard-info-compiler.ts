@@ -441,7 +441,8 @@ describe('keyboard-info-compiler', function () {
   });
 
   it('check fillLanguages handles displayName correctly with no region', async function() {
-    const keyboard = {...KHMER_ANGKOR_KEYBOARD, languages: [ { name: '', id: 'aaf-Arab' } ] };
+    const bcp47_tag = 'aaf-Arab';
+    const keyboard = {...KHMER_ANGKOR_KEYBOARD, languages: [ { name: '', id: bcp47_tag } ] };
     const kmpJsonData: KmpJsonFile.KmpJsonFile = {
       system: { fileVersion: '', keymanDeveloperVersion: '' },
       options: null,
@@ -456,12 +457,13 @@ describe('keyboard-info-compiler', function () {
     const keyboard_info: KeyboardInfoFile = {};
     const result = await compiler['fillLanguages'](KHMER_ANGKOR_KPS, keyboard_info, kmpJsonData);
     assert.isTrue(result);
-    const displayName = (<{[bcp47: string]: KeyboardInfoFileLanguage}>keyboard_info.languages)['aaf-Arab'].displayName;
-    assert.isTrue(displayName =="Aranadan (Arabic)");
+    const languages = <{[bcp47: string]: KeyboardInfoFileLanguage}>keyboard_info.languages;
+    assert.isTrue(languages[bcp47_tag].displayName == "Aranadan (Arabic)");
   });
 
   it('check fillLanguages handles displayName correctly with no script', async function() {
-    const keyboard = {...KHMER_ANGKOR_KEYBOARD, languages: [ { name: '', id: 'aa-DJ' } ] };
+    const bcp47_tag = 'aa-DJ';
+    const keyboard = {...KHMER_ANGKOR_KEYBOARD, languages: [ { name: '', id: bcp47_tag } ] };
     const kmpJsonData: KmpJsonFile.KmpJsonFile = {
       system: { fileVersion: '', keymanDeveloperVersion: '' },
       options: null,
@@ -476,9 +478,32 @@ describe('keyboard-info-compiler', function () {
     const keyboard_info: KeyboardInfoFile = {};
     const result = await compiler['fillLanguages'](KHMER_ANGKOR_KPS, keyboard_info, kmpJsonData);
     assert.isTrue(result);
-    const displayName = (<{[bcp47: string]: KeyboardInfoFileLanguage}>keyboard_info.languages)['aa-DJ'].displayName;
-    assert.isTrue(displayName =="Afar (Djibouti)");
-  });  
+    const languages = <{[bcp47: string]: KeyboardInfoFileLanguage}>keyboard_info.languages;
+    assert.isTrue(languages[bcp47_tag].displayName == "Afar (Djibouti)");
+  });
+
+  it('check fillLanguages handles displayName, region and script correctly with private-use subtag', async function() {
+    const bcp47_tag = 'aae-x-sub84';
+    const keyboard = {...KHMER_ANGKOR_KEYBOARD, languages: [ { name: '', id: bcp47_tag } ] };
+    const kmpJsonData: KmpJsonFile.KmpJsonFile = {
+      system: { fileVersion: '', keymanDeveloperVersion: '' },
+      options: null,
+      keyboards: [keyboard],
+    };
+    const sources = KHMER_ANGKOR_SOURCES;
+    const compiler = new KeyboardInfoCompiler();
+    assert.isTrue(await compiler.init(callbacks, {sources}));
+    compiler['fontSourceToKeyboardInfoFont'] = async (_kpsFilename: string, _kmpJsonData: KmpJsonFile.KmpJsonFile, _source: string[]) => {
+      return (_source[0] == KHMER_ANGKOR_DISPLAY_FONT) ? KHMER_ANGKOR_DISPLAY_FONT_INFO : KHMER_ANGKOR_OSK_FONT_INFO;
+    }
+    const keyboard_info: KeyboardInfoFile = {};
+    const result = await compiler['fillLanguages'](KHMER_ANGKOR_KPS, keyboard_info, kmpJsonData);
+    assert.isTrue(result);
+    const languages = <{[bcp47: string]: KeyboardInfoFileLanguage}>keyboard_info.languages;
+    assert.isTrue(languages[bcp47_tag].displayName == "Albanian, Arbëreshë");
+    assert.isUndefined(languages[bcp47_tag].regionName);
+    assert.isUndefined(languages[bcp47_tag].scriptName);
+  });
 
   it('check fillLanguages returns false if fontSourceToKeyboardInfoFont fails for display font', async function() {
     const kmpJsonData: KmpJsonFile.KmpJsonFile = {
