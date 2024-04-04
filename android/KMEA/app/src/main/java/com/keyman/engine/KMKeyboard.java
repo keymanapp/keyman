@@ -166,7 +166,7 @@ final class KMKeyboard extends WebView {
   protected boolean updateSelectionRange(int selStart, int selEnd) {
     boolean result = false;
     InputConnection ic = KMManager.getInputConnection(this.keyboardType);
-    int adjustedSelStart = selStart, adjustedSelEnd = selEnd;
+    int[] adjustedIndex = null;
 
     if (ic != null) {
       ExtractedText icText = ic.getExtractedText(new ExtractedTextRequest(), 0);
@@ -186,56 +186,69 @@ final class KMKeyboard extends WebView {
         References:
         - https://stackoverflow.com/a/23980211
         - https://android.googlesource.com/platform/frameworks/base/+/152944f/core/java/android/view/inputmethod/InputConnection.java#326
-
-        We need to ensure that:
-        a) selStart <= selEnd (so "reverse" selection if needed)
-        b) selStart >= 0 and selEnd >= 0
-        c) selStart <= string.length() and selEnd <= string.length()
-        Log if we need to make any adjustments
       */
-      boolean adjustedValues = false;
-      if (selStart > selEnd) {
-        adjustedSelStart = selEnd;
-        adjustedSelEnd = selStart;
-        adjustedValues = true;
-      }
-      if (adjustedSelStart < 0) {
-        adjustedSelStart = 0;
-        adjustedValues = true;
-      }
-      if (adjustedSelEnd < 0) {
-        adjustedSelEnd = 0;
-        adjustedValues = true;
-      }
-      if (adjustedSelStart > rawText.length()) {
-        adjustedSelStart = rawText.length();
-        adjustedValues = true;
-      }
-      if (adjustedSelEnd > rawText.length()) {
-        adjustedSelEnd = rawText.length();
-        adjustedValues = true;
-      }
-      if (adjustedValues) {
-        // Log when we have to adjust selStart / selEnd
-        KMLog.LogInfo(TAG, KMString.format("Constrained selStart: %d, selEnd: %d to adjustedSelStart: %d, adjustedSelEnd %d",
-          selStart, selEnd, adjustedSelStart, adjustedSelEnd));
-      }
 
       // Count the number of characters which are surrogate pairs.
-      int pairsAtStart = CharSequenceUtil.countSurrogatePairs(rawText.substring(0, adjustedSelStart), rawText.length());
-      String selectedText = rawText.substring(adjustedSelStart, adjustedSelEnd);
+      adjustedIndex = constrain(selStart, selEnd, rawText.length());
+      int pairsAtStart = CharSequenceUtil.countSurrogatePairs(rawText.substring(0, adjustedIndex[0]), rawText.length());
+
+      String selectedText = rawText.substring(adjustedIndex[0], adjustedIndex[1]);
       int pairsSelected = CharSequenceUtil.countSurrogatePairs(selectedText, selectedText.length());
 
-      adjustedSelStart -= pairsAtStart;
-      adjustedSelEnd -= (pairsAtStart + pairsSelected);
+      adjustedIndex[0] -= pairsAtStart;
+      adjustedIndex[1] -= (pairsAtStart + pairsSelected);
     }
-    this.loadJavascript(KMString.format("updateKMSelectionRange(%d,%d)", adjustedSelStart, adjustedSelEnd));
+    if (adjustedIndex == null) {
+      return result;
+    }
+    this.loadJavascript(KMString.format("updateKMSelectionRange(%d,%d)", adjustedIndex[0], adjustedIndex[1]));
     result = true;
 
     return result;
   }
 
+  /**
+   * We need to ensure that:
+   * a) selStart <= selEnd (so "reverse" selection if needed)
+   * b) selStart >= 0 and selEnd >= 0
+   * c) selStart <= string.length() and selEnd <= string.length()
+   * Log if we need to make any adjustments
+   * @param selStart - int of starting index
+   * @param selEnd - int of end index
+   * @param length - int length of a string
+   */
+  protected static int[] constrain(int selStart, int selEnd, int length) {
+    int adjustedSelStart = selStart, adjustedSelEnd = selEnd;
+    boolean adjustedValues = false;
+    if (selStart > selEnd) {
+      adjustedSelStart = selEnd;
+      adjustedSelEnd = selStart;
+      adjustedValues = true;
+    }
+    if (adjustedSelStart < 0) {
+      adjustedSelStart = 0;
+      adjustedValues = true;
+    }
+    if (adjustedSelEnd < 0) {
+      adjustedSelEnd = 0;
+      adjustedValues = true;
+    }
+    if (adjustedSelStart > length) {
+      adjustedSelStart = length;
+      adjustedValues = true;
+    }
+    if (adjustedSelEnd > length) {
+      adjustedSelEnd = length;
+      adjustedValues = true;
+    }
+    if (adjustedValues) {
+      // Log when we have to adjust selStart / selEnd
+      KMLog.LogInfo(TAG, KMString.format("Constrained selStart: %d, selEnd: %d to adjustedSelStart: %d, adjustedSelEnd %d",
+        selStart, selEnd, adjustedSelStart, adjustedSelEnd));
+    }
 
+    return new int[]{adjustedSelStart, adjustedSelEnd};
+  }
 
   @SuppressWarnings("deprecation")
   @SuppressLint("SetJavaScriptEnabled")
