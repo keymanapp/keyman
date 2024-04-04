@@ -210,7 +210,7 @@
                 <Platform value="Win64">False</Platform>
             </Platforms>
             <Deployment Version="3">
-                <DeployFile LocalName="bin\Win32\Debug\setup.exe" Configuration="Debug" Class="ProjectOutput">
+                <DeployFile LocalName="setup.exe" Configuration="Debug" Class="ProjectOutput">
                     <Platform Name="Win32">
                         <RemoteName>setup.exe</RemoteName>
                         <Overwrite>true</Overwrite>
