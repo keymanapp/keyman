@@ -149,6 +149,7 @@
         <DCCReference Include="Keyman.Setup.System.Locales.pas"/>
         <DCCReference Include="..\..\global\delphi\general\Keyman.System.UILanguageManager.pas"/>
         <DCCReference Include="Keyman.Setup.System.SetupUILanguageManager.pas"/>
+        <DCCReference Include="..\..\..\..\common\windows\delphi\general\utilhttp.pas"/>
         <BuildConfiguration Include="Debug">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>
@@ -209,7 +210,7 @@
                 <Platform value="Win64">False</Platform>
             </Platforms>
             <Deployment Version="3">
-                <DeployFile LocalName="setup.exe" Configuration="Debug" Class="ProjectOutput">
+                <DeployFile LocalName="bin\Win32\Debug\setup.exe" Configuration="Debug" Class="ProjectOutput">
                     <Platform Name="Win32">
                         <RemoteName>setup.exe</RemoteName>
                         <Overwrite>true</Overwrite>

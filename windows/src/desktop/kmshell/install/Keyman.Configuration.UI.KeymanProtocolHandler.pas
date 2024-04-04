@@ -39,7 +39,7 @@ uses
   UfrmInstallKeyboard,
   Upload_Settings,
   utildir,
-  IdURI,
+  utilhttp,
   utilfiletypes;
 
 { TKeymanProtocolHandler }
@@ -75,7 +75,7 @@ begin
   if not m.Success then
     Exit(False);
 
-  PackageID := TIdURI.URLDecode(m.Groups[1].Value);
+  PackageID := URLDecode(m.Groups[1].Value);
   if m.Groups.Count > 2
     then BCP47 := m.Groups[2].Value
     else BCP47 := '';
