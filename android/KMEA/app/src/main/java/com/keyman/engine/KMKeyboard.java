@@ -166,6 +166,8 @@ final class KMKeyboard extends WebView {
   protected boolean updateSelectionRange(int selStart, int selEnd) {
     boolean result = false;
     InputConnection ic = KMManager.getInputConnection(this.keyboardType);
+    int adjustedSelStart = selStart, adjustedSelEnd = selEnd;
+
     if (ic != null) {
       ExtractedText icText = ic.getExtractedText(new ExtractedTextRequest(), 0);
       if (icText == null) {
@@ -184,17 +186,50 @@ final class KMKeyboard extends WebView {
         References:
         - https://stackoverflow.com/a/23980211
         - https://android.googlesource.com/platform/frameworks/base/+/152944f/core/java/android/view/inputmethod/InputConnection.java#326
-       */
+
+        We need to ensure that:
+        a) selStart <= selEnd (so "reverse" selection if needed)
+        b) selStart >= 0 and selEnd >= 0
+        c) selStart <= string.length() and selEnd <= string.length()
+        Log if we need to make any adjustments
+      */
+      boolean adjustedValues = false;
+      if (selStart > selEnd) {
+        adjustedSelStart = selEnd;
+        adjustedSelEnd = selStart;
+        adjustedValues = true;
+      }
+      if (adjustedSelStart < 0) {
+        adjustedSelStart = 0;
+        adjustedValues = true;
+      }
+      if (adjustedSelEnd < 0) {
+        adjustedSelEnd = 0;
+        adjustedValues = true;
+      }
+      if (adjustedSelStart > rawText.length()) {
+        adjustedSelStart = rawText.length();
+        adjustedValues = true;
+      }
+      if (adjustedSelEnd > rawText.length()) {
+        adjustedSelEnd = rawText.length();
+        adjustedValues = true;
+      }
+      if (adjustedValues) {
+        // Log when we have to adjust selStart / selEnd
+        KMLog.LogInfo(TAG, KMString.format("Constrained selStart: %d, selEnd: %d to adjustedSelStart: %d, adjustedSelEnd %d",
+          selStart, selEnd, adjustedSelStart, adjustedSelEnd));
+      }
 
       // Count the number of characters which are surrogate pairs.
-      int pairsAtStart = CharSequenceUtil.countSurrogatePairs(rawText.substring(0, selStart), rawText.length());
-      String selectedText = rawText.substring(selStart, selEnd);
+      int pairsAtStart = CharSequenceUtil.countSurrogatePairs(rawText.substring(0, adjustedSelStart), rawText.length());
+      String selectedText = rawText.substring(adjustedSelStart, adjustedSelEnd);
       int pairsSelected = CharSequenceUtil.countSurrogatePairs(selectedText, selectedText.length());
 
-      selStart -= pairsAtStart;
-      selEnd -= (pairsAtStart + pairsSelected);
+      adjustedSelStart -= pairsAtStart;
+      adjustedSelEnd -= (pairsAtStart + pairsSelected);
     }
-    this.loadJavascript(KMString.format("updateKMSelectionRange(%d,%d)", selStart, selEnd));
+    this.loadJavascript(KMString.format("updateKMSelectionRange(%d,%d)", adjustedSelStart, adjustedSelEnd));
     result = true;
 
     return result;
