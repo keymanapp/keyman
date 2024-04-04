@@ -109,12 +109,12 @@ void test_context_normalization_hefty() {
 }
 
 void test_context_normalization_invalid_unicode() {
-                                          // unpaired surrogate     illegal
-  km_core_cp const application_context[] = { 0xDC01, 0x0020, 0x0020, 0xFFFF, 0x0000 };
-  km_core_cp const cached_context[] =      { 0xDC01, 0x0020, 0x0020, 0xFFFF, 0x0000 };
+                                      // unpaired surrogate             illegal
+  km_core_cp const application_context[] = {    0xDC01, 0x0020, 0x0020, 0xFFFF, 0x0000 };
+  km_core_cp const cached_context[] =      {/*skipped*/ 0x0020, 0x0020, 0xFFFF, 0x0000 };
   setup("k_001_tiny.kmx");
   assert(km_core_state_context_set_if_needed(test_state, application_context) == KM_CORE_CONTEXT_STATUS_UPDATED);
-  assert(is_identical_context(application_context, KM_CORE_DEBUG_CONTEXT_APP));
+  assert(is_identical_context(application_context+1, KM_CORE_DEBUG_CONTEXT_APP)); // skip first char
   assert(is_identical_context(cached_context, KM_CORE_DEBUG_CONTEXT_CACHED));
   teardown();
 }
@@ -123,7 +123,7 @@ void test_context_normalization() {
   test_context_normalization_already_nfd();
   test_context_normalization_basic();
   test_context_normalization_hefty();
-  // TODO: we need to strip illegal chars: test_context_normalization_invalid_unicode(); // -- unpaired surrogate, illegals
+  test_context_normalization_invalid_unicode(); // -- unpaired surrogate, illegals
 }
 
 //-------------------------------------------------------------------------------------
