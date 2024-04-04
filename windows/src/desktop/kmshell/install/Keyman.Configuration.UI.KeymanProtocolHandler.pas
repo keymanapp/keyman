@@ -77,7 +77,7 @@ begin
 
   PackageID := URLDecode(m.Groups[1].Value);
   if m.Groups.Count > 2
-    then BCP47 := m.Groups[2].Value
+    then BCP47 := URLDecode(m.Groups[2].Value)
     else BCP47 := '';
 
   // Download the package
