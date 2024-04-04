@@ -538,4 +538,18 @@ describe('keyboard-info-compiler', function () {
     const result = await compiler['fillLanguages'](KHMER_ANGKOR_KPS, {}, kmpJsonData);
     assert.isFalse(result);
   });
+
+  it('check fontSourceToKeyboardInfoFont returns first font if none of those supplied is a valid type', async function() {
+    const kmpJsonData: KmpJsonFile.KmpJsonFile = {
+      system: { fileVersion: '', keymanDeveloperVersion: '' },
+      options: null,
+    };
+
+    const sources = KHMER_ANGKOR_SOURCES;
+    const compiler = new KeyboardInfoCompiler();
+    assert.isTrue(await compiler.init(callbacks, {sources}));
+    const fonts = ['shared/font.xxx', 'shared/second.xxx'];
+    const result = await compiler['fontSourceToKeyboardInfoFont'](KHMER_ANGKOR_KPS, kmpJsonData, fonts);
+    assert.deepEqual(result, { family: 'font.xxx', source: fonts });
+  });
 });
