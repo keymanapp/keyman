@@ -2,7 +2,7 @@ import { type Keyboard, KeyboardKeymanGlobal, ProcessorInitOptions } from "@keym
 import { DOMKeyboardLoader as KeyboardLoader } from "@keymanapp/keyboard-processor/dom-keyboard-loader";
 import { InputProcessor, PredictionContext } from "@keymanapp/input-processor";
 import { OSKView } from "keyman/engine/osk";
-import { KeyboardRequisitioner, ModelCache, ModelSpec, toUnprefixedKeyboardId as unprefixed } from "keyman/engine/package-cache";
+import { KeyboardRequisitioner, KeyboardStub, ModelCache, ModelSpec, toUnprefixedKeyboardId as unprefixed } from "keyman/engine/package-cache";
 
 import { EngineConfiguration, InitOptionSpec } from "./engineConfiguration.js";
 import KeyboardInterface from "./keyboardInterface.js";
@@ -137,14 +137,6 @@ export default class KeymanEngine<
     });
 
     this.contextManager.on('keyboardchange', (kbd) => {
-      this.refreshModel();
-      this.core.activeKeyboard = kbd?.keyboard;
-
-      this.legacyAPIEvents.callEvent('keyboardchange', {
-        internalName: kbd?.metadata.id ?? '',
-        languageCode: kbd?.metadata.langId ?? ''
-      });
-
       // Hide OSK and do not update keyboard list if using internal keyboard (desktops).
       // Condition will not be met for touch form-factors; they force selection of a
       // default keyboard.
@@ -152,9 +144,25 @@ export default class KeymanEngine<
         this.osk.startHide(false);
       }
 
-      // Needed to ensure the correct layer is displayed.
-      // Needs to be after the OSK has loaded for the keyboard in case the default
-      // layer should be something other than "default" for the current context.
+      const earlyBatchClosure = () => {
+        this.refreshModel();
+        // Triggers context resets that can trigger layout stuff.
+        // It's not the final such context-reset, though.
+        this.core.activeKeyboard = kbd?.keyboard;
+
+        this.legacyAPIEvents.callEvent('keyboardchange', {
+          internalName: kbd?.metadata.id ?? '',
+          languageCode: kbd?.metadata.langId ?? ''
+        });
+      }
+
+      /*
+        Needed to ensure the correct layer is displayed AND that deadkeys from
+        the old keyboard have been wiped.
+
+        Needs to be after the OSK has loaded for the keyboard in case the default
+        layer should be something other than "default" for the current context.
+      */
       const doContextReset = () => {
         this.contextManager.resetContext();
       }
@@ -169,6 +177,7 @@ export default class KeymanEngine<
       */
       if(this.osk) {
         this.osk.batchLayoutAfter(() => {
+          earlyBatchClosure();
           this.osk.activeKeyboard = kbd;
           // Note:  when embedded within the mobile apps, the keyboard will still be visible
           // at this time.
@@ -176,6 +185,7 @@ export default class KeymanEngine<
           this.osk.present();
         });
       } else {
+        earlyBatchClosure();
         doContextReset();
       }
     });
