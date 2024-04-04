@@ -194,7 +194,7 @@ jobs:
     needs: [sourcepackage, binary_packages_released, binary_packages_unreleased]
     runs-on: ubuntu-latest
     environment: "deploy (linux)"
-    if: github.event.client_payload.isTestBuild == 'false'
+    if: ${{always() && needs.sourcepackage.result == 'success' && needs.binary_packages_released.result == 'success' && github.event.client_payload.isTestBuild == 'false'}}
 
     steps:
       - name: Sign packages
