@@ -359,11 +359,7 @@ describe('keyboard-info-compiler', function () {
     const compiler = new KeyboardInfoCompiler();
     assert.isTrue(await compiler.init(callbacks, {sources}));
     compiler['fontSourceToKeyboardInfoFont'] = async (_kpsFilename: string, _kmpJsonData: KmpJsonFile.KmpJsonFile, _source: string[]) => {
-      if (_source[0] == KHMER_ANGKOR_DISPLAY_FONT) {
-        return KHMER_ANGKOR_DISPLAY_FONT_INFO;
-      } else { // osk font
-        return KHMER_ANGKOR_OSK_FONT_INFO;
-      }
+      return (_source[0] == KHMER_ANGKOR_DISPLAY_FONT) ? KHMER_ANGKOR_DISPLAY_FONT_INFO : KHMER_ANGKOR_OSK_FONT_INFO;
     }
     const keyboard_info: KeyboardInfoFile = {};
     const result = await compiler['fillLanguages'](KHMER_ANGKOR_KPS, keyboard_info, kmpJsonData);
@@ -428,11 +424,7 @@ describe('keyboard-info-compiler', function () {
     const compiler = new KeyboardInfoCompiler();
     assert.isTrue(await compiler.init(callbacks, {sources}));
     compiler['fontSourceToKeyboardInfoFont'] = async (_kpsFilename: string, _kmpJsonData: KmpJsonFile.KmpJsonFile, _source: string[]) => {
-      if (_source[0] == JAVA_DISPLAY_FONT) {
-        return JAVA_DISPLAY_FONT_INFO;
-      } else { // osk font
-        return JAVA_OSK_FONT_INFO;
-      }
+      return (_source[0] == JAVA_DISPLAY_FONT) ? JAVA_DISPLAY_FONT_INFO : JAVA_OSK_FONT_INFO;
     }
     const keyboard_info: KeyboardInfoFile = {};
     const result = await compiler['fillLanguages'](KHMER_ANGKOR_KPS, keyboard_info, kmpJsonData);
@@ -479,11 +471,7 @@ describe('keyboard-info-compiler', function () {
     const compiler = new KeyboardInfoCompiler();
     assert.isTrue(await compiler.init(callbacks, {sources}));
     compiler['fontSourceToKeyboardInfoFont'] = async (_kpsFilename: string, _kmpJsonData: KmpJsonFile.KmpJsonFile, _source: string[]) => {
-      if (_source[0] == KHMER_ANGKOR_DISPLAY_FONT) {
-        return null;
-      } else { // osk font
-        return KHMER_ANGKOR_OSK_FONT_INFO;
-      }
+      return (_source[0] == KHMER_ANGKOR_DISPLAY_FONT) ? null : KHMER_ANGKOR_OSK_FONT_INFO;
     }
     const result = await compiler['fillLanguages'](KHMER_ANGKOR_KPS, {}, kmpJsonData);
     assert.isFalse(result);
@@ -500,11 +488,7 @@ describe('keyboard-info-compiler', function () {
     const compiler = new KeyboardInfoCompiler();
     assert.isTrue(await compiler.init(callbacks, {sources}));
     compiler['fontSourceToKeyboardInfoFont'] = async (_kpsFilename: string, _kmpJsonData: KmpJsonFile.KmpJsonFile, _source: string[]) => {
-      if (_source[0] == KHMER_ANGKOR_DISPLAY_FONT) {
-        return KHMER_ANGKOR_DISPLAY_FONT_INFO;
-      } else { // osk font
-        return null;
-      }
+      return (_source[0] == KHMER_ANGKOR_DISPLAY_FONT) ? KHMER_ANGKOR_DISPLAY_FONT_INFO : null;
     }
     const result = await compiler['fillLanguages'](KHMER_ANGKOR_KPS, {}, kmpJsonData);
     assert.isFalse(result);
