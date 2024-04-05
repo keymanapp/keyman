@@ -373,15 +373,17 @@ state_has_action_type(km_core_state *state, uint8_t type) {
 }
 
 bool
-state_should_clear_context(km_core_state *state,
+state_should_invalidate_context(km_core_state *state,
                      km_core_virtual_key vk,
                      uint16_t modifier_state,
                      uint8_t is_key_down,
                      uint16_t event_flags) {
   // if emit_keystroke is present, check if a context reset is needed
   if (state_has_action_type(state, KM_CORE_IT_EMIT_KEYSTROKE)) {
-    if (vk == KM_CORE_VKEY_BKSP && state_has_action_type(state, KM_CORE_IT_BACK)) {
-      return true;
+    if (vk == KM_CORE_VKEY_BKSP) {
+      if (!state_has_action_type(state, KM_CORE_IT_BACK)) {
+        return true;
+      }
     } else if (vkey_to_contextreset[vk]) {
       return true;
     }

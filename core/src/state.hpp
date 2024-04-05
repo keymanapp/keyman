@@ -188,7 +188,7 @@ struct km_core_state : public km::core::state
 
 /**
  * Evaluate the state and vkey used.
- * Determine whether the context should be cleared.
+ * Determine whether the context should be invalidated.
  * @param state A pointer to the opaque state object.
  * @param vk A virtual key that was processed.
  * @param modifier_state The combinations of modifier keys set at the time key `vk` was pressed, bitmask
@@ -198,7 +198,7 @@ struct km_core_state : public km::core::state
  * @return true if this is a state which should clear the context
  */
 bool
-state_should_clear_context(km_core_state *state,
+state_should_invalidate_context(km_core_state *state,
                      km_core_virtual_key vk,
                      uint16_t modifier_state,
                      uint8_t is_key_down,

@@ -329,7 +329,7 @@ run_test(const km::core::path &source, const km::core::path &compiled, km::tests
             test_state, p.vk, p.modifier_state | test_source.caps_lock_state(), key_down,
             KM_CORE_EVENT_FLAG_DEFAULT));  // TODO-LDML: for now. Should send touch and hardware events.
 
-        if (state_should_clear_context(test_state, p.vk, p.modifier_state | test_source.caps_lock_state(), key_down,
+        if (state_should_invalidate_context(test_state, p.vk, p.modifier_state | test_source.caps_lock_state(), key_down,
             KM_CORE_EVENT_FLAG_DEFAULT)) {
               test_context.clear();
               text_store.clear();

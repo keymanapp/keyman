@@ -303,7 +303,7 @@ LdmlEmbeddedTestSource::load_source( const km::core::path &path ) {
     // We must at least have a key sequence to run the test
     std::cerr << "Need at least one key sequence." << std::endl;
     return __LINE__;
-  } else if(keys.size() != expected.size()) {
+  } else if(!expected_error && (keys.size() != expected.size())) {
     std::cerr << "Need the same number of " << s_keys << " and " << s_expected << " lines." << std::endl;
     return __LINE__;
   }

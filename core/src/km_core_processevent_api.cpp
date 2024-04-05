@@ -52,8 +52,14 @@ km_core_process_event(km_core_state *state,
   }
   km_core_status status = state->processor().process_event(state, vk, modifier_state, is_key_down, event_flags);
 
-  if (state_should_clear_context(state, vk, modifier_state, is_key_down, event_flags)) {
+  if (state_should_invalidate_context(state, vk, modifier_state, is_key_down, event_flags)) {
     state->context().clear();
+    // we are already committed. So we need to un-commit (remove the end of the vector)
+    if (state->actions().back().type == KM_CORE_IT_END) {
+      state->actions().pop_back();
+    }
+    state->actions().push_invalidate_context();
+    state->actions().commit();
   }
 
   state->apply_actions_and_merge_app_context();
