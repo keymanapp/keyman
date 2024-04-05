@@ -3,6 +3,8 @@ import { ActiveKey, ActiveLayer, ActiveRow } from '@keymanapp/keyboard-processor
 import OSKBaseKey from './oskBaseKey.js';
 import { ParsedLengthStyle } from '../lengthStyle.js';
 import VisualKeyboard from '../visualKeyboard.js';
+import { KeyLayoutParams } from './oskKey.js';
+import { LayerLayoutParams } from './oskLayer.js';
 
 /**
  * Models one row of one layer of the OSK (`VisualKeyboard`) for a keyboard.
@@ -57,34 +59,79 @@ export default class OSKRow {
     }
   }
 
-  public refreshLayout(vkbd: VisualKeyboard) {
+  public refreshLayout(layoutParams: LayerLayoutParams) {
     const rs = this.element.style;
 
-    const rowHeight = vkbd.internalHeight.scaledBy(this.heightFraction);
-    rs.maxHeight=rs.lineHeight=rs.height=rowHeight.styleString;
+    const rowHeight = layoutParams.heightStyle.scaledBy(this.heightFraction);
+    const executeRowStyleUpdates = () => {
+      rs.maxHeight=rs.lineHeight=rs.height=rowHeight.styleString;
+    }
 
     // Only used for fixed-height scales at present.
     const padRatio = 0.15;
 
-    const keyHeightBase = vkbd.usesFixedHeightScaling ? rowHeight : ParsedLengthStyle.forScalar(1);
+    const keyHeightBase = layoutParams.widthStyle.absolute ? rowHeight : ParsedLengthStyle.forScalar(1);
     const padTop = keyHeightBase.scaledBy(padRatio / 2);
     const keyHeight = keyHeightBase.scaledBy(1 - padRatio);
 
-    for(const key of this.keys) {
-      const keySquare  = key.btn.parentElement;
+    // Update all key-square layouts.
+    const keyStyleUpdates = this.keys.map((key) => {
+      return () => {
+        const keySquare  = key.btn.parentElement;
+        const keyElement = key.btn;
+
+        // Set the kmw-key-square position
+        const kss = keySquare.style;
+        kss.height=kss.minHeight=keyHeightBase.styleString;
+
+        const kes = keyElement.style;
+        kes.top = padTop.styleString;
+        kes.height=kes.lineHeight=kes.minHeight=keyHeight.styleString;
+      }
+    })
+
+    return () => {
+      executeRowStyleUpdates();
+      keyStyleUpdates.forEach((closure) => closure());
+    }
+  }
+
+  public refreshKeyLayouts(layoutParams: LayerLayoutParams) {
+    const updateClosures = this.keys.map((key) => {
+      // Calculate changes to be made...
       const keyElement = key.btn;
 
-      // Set the kmw-key-square position
-      const kss = keySquare.style;
-      kss.height=kss.minHeight=keyHeightBase.styleString;
+      const widthStyle = layoutParams.widthStyle;
+      const heightStyle = layoutParams.heightStyle;
 
-      const kes = keyElement.style;
-      kes.top = padTop.styleString;
-      kes.height=kes.lineHeight=kes.minHeight=keyHeight.styleString;
+      const keyWidth = widthStyle.scaledBy(key.spec.proportionalWidth);
+      const keyPad =   widthStyle.scaledBy(key.spec.proportionalPad);
 
-      if(keyElement.key) {
-        keyElement.key.refreshLayout(vkbd);
+      const keyHeight = heightStyle.scaledBy(this.heightFraction);
+
+      // Match the row height (if fixed-height) or use full row height (if percent-based)
+      const styleHeight = widthStyle.absolute ? keyHeight.styleString : '100%';
+
+      const keyStyle: KeyLayoutParams = {
+        keyWidth:  keyWidth.val  * (keyWidth.absolute ? 1 : layoutParams.keyboardWidth),
+        keyHeight: keyHeight.val * (keyWidth.absolute ? 1 : layoutParams.keyboardHeight),
+        baseEmFontSize: layoutParams.baseEmFontSize,
+        layoutFontSize: layoutParams.layoutFontSize
+      };
+      //return keyElement.key ? keyElement.key.refreshLayout(keyStyle) : () => {};
+      const keyFontClosure = keyElement.key ? keyElement.key.refreshLayout(keyStyle) : () => {};
+
+      // And queue them to be run in a single batch later.  This helps us avoid layout reflow thrashing.
+      return () => {
+        key.square.style.width = keyWidth.styleString;
+        key.square.style.marginLeft = keyPad.styleString;
+
+        key.btn.style.width = widthStyle.absolute ? keyWidth.styleString : '100%';
+        key.square.style.height = styleHeight;
+        keyFontClosure();
       }
-    }
+    });
+
+    return () => updateClosures.forEach((closure) => closure());
   }
 }

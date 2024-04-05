@@ -40,11 +40,11 @@ import KeyboardView from './components/keyboardView.interface.js';
 import { type KeyElement, getKeyFrom } from './keyElement.js';
 import KeyTip from './keytip.interface.js';
 import OSKKey from './keyboard-layout/oskKey.js';
-import OSKLayer from './keyboard-layout/oskLayer.js';
+import OSKLayer, { LayerLayoutParams } from './keyboard-layout/oskLayer.js';
 import OSKLayerGroup from './keyboard-layout/oskLayerGroup.js';
 import OSKView from './views/oskView.js';
 import { LengthStyle, ParsedLengthStyle } from './lengthStyle.js';
-import { defaultFontSize, getFontSizeStyle } from './fontSizeUtils.js';
+import { defaultFontSize } from './fontSizeUtils.js';
 import PhoneKeyTip from './input/gestures/browser/keytip.js';
 import { TabletKeyTip } from './input/gestures/browser/tabletPreview.js';
 import CommonConfiguration from './config/commonConfiguration.js';
@@ -158,7 +158,6 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
 
   readonly config: VisualKeyboardConfiguration;
 
-  private _layerId: string = "default";
   layerLocked: boolean = false;
   layerIndex: number = 0; // the index of the default layer
   readonly isRTL: boolean;
@@ -182,6 +181,13 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
    * to allow automatic height scaling.
    */
   private _height: number;
+
+  /**
+   * The main VisualKeyboard element's border-width styling.
+   *
+   * Assumption:  is a fixed, uniform length that doesn't vary between refreshLayout() calls.
+   */
+  private _borderWidth: number = 0;
 
   /**
    * The computed width for this VisualKeyboard.  May be null if auto sizing
@@ -239,7 +245,6 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
     if(!this.layerGroup.layers[value]) {
       throw new Error(`Keyboard ${this.layoutKeyboard.id} does not have a layer with id ${value}`);
     } else {
-      this._layerId = value;
       this.layerGroup.activeLayerId = value;
 
       // Does not exist for documentation keyboards!
@@ -250,7 +255,7 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
 
     if(changedLayer) {
       this.updateState();
-      this.refreshLayout();
+      this.currentLayer.refreshLayout(this.constructLayoutParams());
     }
   }
 
@@ -783,11 +788,7 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
   get layoutWidth(): ParsedLengthStyle {
     if (this.usesFixedWidthScaling) {
       let baseWidth = this.width;
-      let cs = getComputedStyle(this.element);
-      if (cs.border) {
-        let borderWidth = new ParsedLengthStyle(cs.borderWidth).val;
-        baseWidth -= borderWidth * 2;
-      }
+      baseWidth -= this._borderWidth * 2;
       return ParsedLengthStyle.inPixels(baseWidth);
     } else {
       return ParsedLengthStyle.forScalar(1);
@@ -797,11 +798,7 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
   get layoutHeight(): ParsedLengthStyle {
     if (this.usesFixedHeightScaling) {
       let baseHeight = this.height;
-      let cs = getComputedStyle(this.element);
-      if (cs.border) {
-        let borderHeight = new ParsedLengthStyle(cs.borderWidth).val;
-        baseHeight -= borderHeight * 2;
-      }
+      baseHeight -= this._borderWidth * 2;
       return ParsedLengthStyle.inPixels(baseHeight);
     } else {
       return ParsedLengthStyle.forScalar(1);
@@ -811,7 +808,9 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
   get internalHeight(): ParsedLengthStyle {
     if (this.usesFixedHeightScaling) {
       // Touch OSKs may apply internal padding to prevent row cropping at the edges.
-      return ParsedLengthStyle.inPixels(this.layoutHeight.val - this.layerGroup.verticalPadding);
+      // ... why not precompute both, rather than recalculate each time?
+      // - appears to contribute to layout reflow costs on layer swaps!
+      return ParsedLengthStyle.inPixels(this.layoutHeight.val - this._borderWidth * 2 - this.layerGroup.verticalPadding);
     } else {
       return ParsedLengthStyle.forScalar(1);
     }
@@ -1154,28 +1153,28 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
    * Use of `getComputedStyle` is ideal, but in many of our use cases its preconditions are not met.
    * This function allows us to calculate the font size in those situations.
    */
-  getKeyEmFontSize(): number {
+  getKeyEmFontSize(): ParsedLengthStyle {
     if (!this.fontSize) {
-      return 0;
+      return new ParsedLengthStyle('0px');
     }
 
     if (this.device.formFactor == 'desktop') {
       let keySquareScale = 0.8; // Set in kmwosk.css, is relative.
-      return this.fontSize.scaledBy(keySquareScale).val;
+      return this.fontSize.scaledBy(keySquareScale);
     } else {
-      let emSizeStr = getComputedStyle(document.body).fontSize;
-      let emSize = getFontSizeStyle(emSizeStr).val;
+      const emSizeStr = getComputedStyle(document.body).fontSize;
+      const emSize = new ParsedLengthStyle(emSizeStr);
 
-      var emScale = 1;
+      let emScale = 1;
       if (!this.isStatic) {
         // Double-check against the font scaling applied to the _Box element.
         if (this.fontSize.absolute) {
-          return this.fontSize.val;
+          return this.fontSize;
         } else {
           emScale = this.fontSize.val;
         }
       }
-      return emSize * emScale;
+      return emSize.scaledBy(emScale);
     }
   }
 
@@ -1187,7 +1186,6 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
       return;
     }
 
-    var n, b = this.kbdDiv.childNodes[0].childNodes;
     this.nextLayer = this.layerId;
 
     if (this.currentLayer.nextlayer) {
@@ -1207,7 +1205,11 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
    * when needed.
    */
   refreshLayout() {
-    //let keyman = com.keyman.singleton;
+    /*
+      Phase 1:  calculations possible at the start without triggering _any_ additional layout reflow.
+      (A single, initial reflow may happen depending on DOM manipulations before this method...,
+      but no extras until phase 2.)
+    */
     let device = this.device;
 
     var fs = 1.0;
@@ -1216,11 +1218,9 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
       fs = fs / getViewportScale(this.device.formFactor);
     }
 
-    let paddedHeight: number;
-    if (this.height) {
-      paddedHeight = this.computedAdjustedOskHeight(this.height);
-    }
-
+    /*
+      Phase 2:  first self-triggered reflow - locking in the keyboard's base property styling.
+    */
     let gs = this.kbdDiv.style;
     if (this.usesFixedHeightScaling && this.height) {
       // Sets the layer group to the correct height.
@@ -1231,10 +1231,18 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
     // Layer-group font-scaling is applied separately.
     gs.fontSize = this.fontSize.scaledBy(fs).styleString;
 
+    // Phase 3:  reflow from top-level getComputedStyle calls
+
     // Step 1:  have the necessary conditions been met?
     const fixedSize = this.width && this.height;
     const computedStyle = getComputedStyle(this.kbdDiv);
+    const groupStyle = getComputedStyle(this.kbdDiv.firstElementChild);
+
     const isInDOM = computedStyle.height != '' && computedStyle.height != 'auto';
+
+    if (computedStyle.border) {
+      this._borderWidth = new ParsedLengthStyle(computedStyle.borderWidth).val;
+    }
 
     // Step 2:  determine basic layout geometry, refresh things that might update.
 
@@ -1244,9 +1252,6 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
     } else if (isInDOM) {
       this._computedWidth = parseInt(computedStyle.width, 10);
       if (!this._computedWidth) {
-        // For touch keyboards, the width _was_ specified on the layer group,
-        // not the root element (`kbdDiv`).
-        const groupStyle = getComputedStyle(this.kbdDiv.firstElementChild);
         this._computedWidth = parseInt(groupStyle.width, 10);
       }
       this._computedHeight = parseInt(computedStyle.height, 10);
@@ -1267,15 +1272,23 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
       this.gestureParams.flick.triggerDist   = 0.75 * this.currentLayer.rowHeight;
     }
 
-    // Step 4:  perform layout operations.
-    // Needs the refreshed layout info to work correctly.
-    this.layerGroup.refreshLayout(this, {
-      keyboardWidth: this._computedWidth,
-      keyboardHeight: this._computedHeight - this.layerGroup.verticalPadding,
-      spacebarText: this.layoutKeyboardProperties?.displayName ?? '(System keyboard)'
-    });
+    // Phase 4:  Refresh the layout of the layer-group and active layer.
+    this.layerGroup.refreshLayout(this.constructLayoutParams());
   }
 
+  private constructLayoutParams(): LayerLayoutParams {
+    return {
+      keyboardWidth: this._computedWidth - 2 * this._borderWidth,
+      keyboardHeight: this._computedHeight - 2 * this._borderWidth - this.layerGroup.verticalPadding,
+      widthStyle: this.layoutWidth,
+      heightStyle: this.internalHeight,
+      baseEmFontSize: this.getKeyEmFontSize(),
+      layoutFontSize: new ParsedLengthStyle(this.layerGroup.element.style.fontSize),
+      spacebarText: this.layoutKeyboardProperties?.displayName ?? '(System keyboard)'
+    };
+  }
+
+  // Appears to be abandoned now - candidate for removal in future.
   /*private*/ computedAdjustedOskHeight(allottedHeight: number): number {
     if (!this.layerGroup) {
       return allottedHeight;
@@ -1348,7 +1361,12 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
     }
 
     // Once any related fonts are loaded, we can re-adjust key-cap scaling.
-    this.styleSheetManager.allLoadedPromise().then(() => this.refreshLayout());
+    this.styleSheetManager.allLoadedPromise().then(() => {
+      // All existing font-precalculations will need to be reset, as the font
+      // was previously unavailable.
+      this.layerGroup.resetPrecalcFontSizes();
+      this.refreshLayout()
+    });
   }
 
   /**
@@ -1585,10 +1603,10 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
   showGesturePreview(key: KeyElement) {
     const tip = this.keytip;
 
-    const keyCS = getComputedStyle(key);
-    const parsedHeight = Number.parseInt(keyCS.height, 10);
-    const parsedWidth  = Number.parseInt(keyCS.width,  10);
-    const previewHost = new GesturePreviewHost(key, this.device.formFactor == 'phone', parsedWidth, parsedHeight);
+    const layoutParams = this.constructLayoutParams();
+    const keyWidth = layoutParams.keyboardWidth * key.key.spec.proportionalWidth;
+    const keyHeight = layoutParams.keyboardHeight / this.currentLayer.rows.length;
+    const previewHost = new GesturePreviewHost(key, this.device.formFactor == 'phone', keyWidth, keyHeight);
 
     if (tip == null) {
       const baseKey = key.key as OSKBaseKey;
