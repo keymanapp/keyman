@@ -4,6 +4,11 @@ import OSKRow from './oskRow.js';
 import OSKBaseKey from './oskBaseKey.js';
 import VisualKeyboard from '../visualKeyboard.js';
 
+export interface LayerLayoutParams {
+  keyboardHeight: number;
+  spacebarText: string;
+}
+
 export default class OSKLayer {
   public readonly element: HTMLDivElement;
   public readonly rows: OSKRow[];
@@ -76,6 +81,21 @@ export default class OSKLayer {
     this.capsKey     = this.findKey('K_CAPS');
     this.numKey      = this.findKey('K_NUMLOCK');
     this.scrollKey   = this.findKey('K_SCROLL');
+
+    if(this.spaceBarKey) {
+      const spacebarLabel = this.spaceBarKey.label;
+      let tParent = <HTMLElement>spacebarLabel.parentNode;
+
+      if (typeof (tParent.className) == 'undefined' || tParent.className == '') {
+        tParent.className = 'kmw-spacebar';
+      } else if (tParent.className.indexOf('kmw-spacebar') == -1) {
+        tParent.className += ' kmw-spacebar';
+      }
+
+      if (spacebarLabel.className != 'kmw-spacebar-caption') {
+        spacebarLabel.className = 'kmw-spacebar-caption';
+      }
+    }
   }
 
   /**
@@ -96,7 +116,35 @@ export default class OSKLayer {
     return null;
   }
 
-  public refreshLayout(vkbd: VisualKeyboard, layerHeight: number) {
+  /**
+   * Indicate the current language and keyboard on the space bar
+   **/
+  showLanguage(displayName: string) {
+    if(!this.spaceBarKey) {
+      return () => {};
+    }
+
+    try {
+      const spacebarLabel = this.spaceBarKey.label;
+
+      // The key can read the text from here during the display update without us
+      // needing to trigger a reflow by running the closure below early.
+      this.spaceBarKey.spec.text = displayName;
+
+      // It sounds redundant, but this dramatically cuts down on browser DOM processing;
+      // but sometimes innerText is reported empty when it actually isn't, so set it
+      // anyway in that case (Safari, iOS 14.4)
+      if (spacebarLabel.innerText != displayName || displayName == '') {
+        spacebarLabel.innerText = displayName;
+      }
+    }
+    catch (ex) { }
+  }
+
+  public refreshLayout(vkbd: VisualKeyboard, layoutParams: LayerLayoutParams) {
+    const layerHeight = layoutParams.keyboardHeight;
+    this.showLanguage(layoutParams.spacebarText);
+
     // Check the heights of each row, in case different layers have different row counts.
     const nRows = this.rows.length;
     const rowHeight = this._rowHeight = Math.floor(layerHeight/(nRows == 0 ? 1 : nRows));
