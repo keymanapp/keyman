@@ -343,7 +343,7 @@ describe('keyboard-info-compiler', function () {
     const compiler = new KeyboardInfoCompiler();
     assert.isTrue(await compiler.init(callbacks, {sources}));
     const origTextDecoderDecode = TextDecoder.prototype.decode;
-    TextDecoder.prototype.decode = () => { throw new TypeError(); }
+    TextDecoder.prototype.decode = () => { throw new TypeError(); };
     assert.throws(() => compiler['loadJsFile'](jsFilename));
     TextDecoder.prototype.decode = origTextDecoderDecode;
   });
@@ -503,6 +503,36 @@ describe('keyboard-info-compiler', function () {
     assert.isTrue(languages[bcp47_tag].displayName == "Albanian, Arbëreshë");
     assert.isUndefined(languages[bcp47_tag].regionName);
     assert.isUndefined(languages[bcp47_tag].scriptName);
+  });
+
+  it('check fillLanguages gives region/script from tag if Intl.DisplayNames.of throws RangeError', async function() {
+    const kmpJsonData: KmpJsonFile.KmpJsonFile = {
+      system: { fileVersion: '', keymanDeveloperVersion: '' },
+      options: null,
+      keyboards: [JAVA_KEYBOARD],
+    };
+
+    const sources = KHMER_ANGKOR_SOURCES;
+    const compiler = new KeyboardInfoCompiler();
+    assert.isTrue(await compiler.init(callbacks, {sources}));
+    compiler['fontSourceToKeyboardInfoFont'] = async (_kpsFilename: string, _kmpJsonData: KmpJsonFile.KmpJsonFile, _source: string[]) => {
+      return (_source[0] == JAVA_DISPLAY_FONT) ? JAVA_DISPLAY_FONT_INFO : JAVA_OSK_FONT_INFO;
+    }
+    const keyboard_info: KeyboardInfoFile = {};
+    const origIntlDisplayNamesOf = Intl.DisplayNames.prototype.of;
+    let result: boolean;
+    try {
+      Intl.DisplayNames.prototype.of = (code: string) => { throw new RangeError() };
+      result = await compiler['fillLanguages'](KHMER_ANGKOR_KPS, keyboard_info, kmpJsonData);
+    } catch(e) {
+      assert.fail(e);
+    } finally {
+      Intl.DisplayNames.prototype.of = origIntlDisplayNamesOf;
+    }
+    assert.isTrue(result);
+    const languages = <{[bcp47: string]: KeyboardInfoFileLanguage}>keyboard_info.languages;
+    assert.isTrue(languages["jv-Arab-ID"].regionName == "ID");
+    assert.isTrue(languages["jv-Arab-ID"].scriptName == "Arab");
   });
 
   it('check fillLanguages returns false if fontSourceToKeyboardInfoFont fails for display font', async function() {
