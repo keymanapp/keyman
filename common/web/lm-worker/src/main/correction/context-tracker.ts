@@ -406,6 +406,22 @@ export class ContextTracker extends CircularArray<TrackedContextState> {
       *     - For languages using whitespace to word-break, said keystroke would have to include said whitespace to break the assumption.
       */
 
+    function maintainLastToken() {
+      if(isWhitespace && editPath[tailIndex] == 'match') {
+        /*
+          We can land here if there are multiple whitespaces in a row.
+          There's already an implied whitespace to the left, so we conceptually
+          merge the new whitespace with that one.
+        */
+        return state;
+      } else if(isBackspace) {
+        // Consider backspace entry for this case?
+        state.replaceTailForBackspace(finalToken, primaryInput.id);
+      } else {
+        state.updateTail(primaryInput ? transformDistribution : null, finalToken);
+      }
+    }
+
     // If there is/was more than one context token available...
     if(editPath.length > 1) {
       // We're removing a context token, but at least one remains.
@@ -438,14 +454,11 @@ export class ContextTracker extends CircularArray<TrackedContextState> {
         }
 
         state.pushTail(pushedToken);
-      } else { // We're editing the final context token.
+      } else {
+        // We're editing the final context token.
         // TODO:  Assumption:  we didn't 'miss' any inputs somehow.
         //        As is, may be prone to fragility should the lm-layer's tracked context 'desync' from its host's.
-        if(isBackspace) {
-          state.replaceTailForBackspace(finalToken, primaryInput.id);
-        } else {
-          state.updateTail(primaryInput ? transformDistribution : null, finalToken);
-        }
+        maintainLastToken();
       }
       // There is only one word in the context.
     } else {
@@ -458,13 +471,9 @@ export class ContextTracker extends CircularArray<TrackedContextState> {
         token.raw = tokenizedContext[0];
         token.transformDistributions = [transformDistribution];
         state.pushTail(token);
-      } else { // Edit the lone context token.
-        // Consider backspace entry for this case?
-        if(isBackspace) {
-          state.replaceTailForBackspace(finalToken, primaryInput.id);
-        } else {
-          state.updateTail(primaryInput ? transformDistribution : null, finalToken);
-        }
+      } else {
+        // Edit the lone context token.
+        maintainLastToken();
       }
     }
     return state;
