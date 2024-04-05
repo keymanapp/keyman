@@ -201,6 +201,7 @@ export default abstract class OSKView
   private _baseFontSize: ParsedLengthStyle;
 
   private needsLayout: boolean = true;
+  private initialized: boolean;
 
   private _animatedHideTimeout: number;
 
@@ -257,6 +258,8 @@ export default abstract class OSKView
     if(this.hostDevice.touchable) {
       this.setBaseTouchEventListeners();
     }
+
+    this.initialized = true;
   }
 
   protected get configuration(): Configuration {
@@ -546,7 +549,7 @@ export default abstract class OSKView
     //
     // Note:  ensures that the _instances_ are the same; it's possible to make new instances
     // to force a refresh.  Does not perform a deep-equals.
-    if(this.keyboardData?.keyboard == keyboardData?.keyboard && this.keyboardData?.metadata == keyboardData?.metadata) {
+    if(this.initialized && this.keyboardData?.keyboard == keyboardData?.keyboard && this.keyboardData?.metadata == keyboardData?.metadata) {
       return;
     }
     this.keyboardData = keyboardData;
