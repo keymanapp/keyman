@@ -110,11 +110,11 @@ export default class OSKRow {
       const keyHeight = heightStyle.scaledBy(this.heightFraction);
 
       // Match the row height (if fixed-height) or use full row height (if percent-based)
-      const styleHeight = widthStyle.absolute ? keyHeight.styleString : '100%';
+      const styleHeight = heightStyle.absolute ? keyHeight.styleString : '100%';
 
       const keyStyle: KeyLayoutParams = {
         keyWidth:  keyWidth.val  * (keyWidth.absolute ? 1 : layoutParams.keyboardWidth),
-        keyHeight: keyHeight.val * (keyWidth.absolute ? 1 : layoutParams.keyboardHeight),
+        keyHeight: keyHeight.val * (heightStyle.absolute ? 1 : layoutParams.keyboardHeight),
         baseEmFontSize: layoutParams.baseEmFontSize,
         layoutFontSize: layoutParams.layoutFontSize
       };
