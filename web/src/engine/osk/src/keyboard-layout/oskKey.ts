@@ -330,7 +330,7 @@ export default abstract class OSKKey {
 
       // Abort if the element is not currently in the DOM; we can't get any info this way.
       if(!lblStyle.fontFamily) {
-        return;
+        return () => {};
       }
       this._fontFamily = lblStyle.fontFamily;
 
