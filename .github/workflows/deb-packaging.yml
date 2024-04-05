@@ -112,12 +112,12 @@ jobs:
   binary_packages_released:
     name: Build binary packages for released versions
     needs: sourcepackage
+    runs-on: ubuntu-latest
     strategy:
       fail-fast: true
       matrix:
         dist: [focal, jammy, mantic]
 
-    runs-on: ubuntu-latest
     steps:
     - name: Checkout
       uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 #v4.1.1
@@ -137,12 +137,13 @@ jobs:
   binary_packages_unreleased:
     name: Build binary packages for next Ubuntu version
     needs: sourcepackage
+    continue-on-error: true
+    runs-on: ubuntu-latest
     strategy:
       fail-fast: true
       matrix:
         dist: [noble]
 
-    runs-on: ubuntu-latest
     steps:
     - name: Checkout
       uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 #v4.1.1
@@ -151,7 +152,6 @@ jobs:
         sparse-checkout: '.github/actions/'
 
     - name: Build
-      continue-on-error: true
       uses: ./.github/actions/build-binary-packages
       with:
         dist: ${{ matrix.dist }}
