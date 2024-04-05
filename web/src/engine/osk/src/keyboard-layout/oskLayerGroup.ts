@@ -198,7 +198,7 @@ export default class OSKLayerGroup {
       Assumes there is no fine-tuning of the row ranges to be done - each takes a perfect
       fraction of the overall layer height without any padding above or below.
     */
-    const rowIndex = Math.floor(proportionalCoords.y * layer.rows.length);
+    const rowIndex = Math.max(0, Math.min(layer.rows.length-1, Math.floor(proportionalCoords.y * layer.rows.length)));
     const row = layer.rows[rowIndex];
 
     // Assertion:  row no longer `null`.
