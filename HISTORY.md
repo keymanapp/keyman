@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 18.0.17 alpha 2024-04-05
+
+* chore(linux): Show failed job for next Ubuntu version as failed (#11168)
+
 ## 18.0.16 alpha 2024-04-04
 
 * chore(linux): Revert "Ignore failed package builds differently" (#11157)
