@@ -381,14 +381,13 @@ state_should_invalidate_context(km_core_state *state,
                      uint16_t event_flags) {
   // if emit_keystroke is present, check if a context reset is needed
   if (state_has_action_type(state, KM_CORE_IT_EMIT_KEYSTROKE)) {
-    if (vk == KM_CORE_VKEY_BKSP) {
-      if (!state_has_action_type(state, KM_CORE_IT_BACK)) {
-        return true;
-      }
-      if (state->context().empty()) {
+    if (vk == KM_CORE_VKEY_BKSP && state->context().empty()) {
         return true; // context is empty - so pass back
-      }
-    } else if (is_key_down && ((modifier_state & (K_CTRLFLAG | K_ALTFLAG | LCTRLFLAG | RCTRLFLAG | LALTFLAG | RALTFLAG)) || vkey_to_contextreset[vk])) {
+    } else if (is_key_down &&
+              // either a ctrl or alt modifier
+                ((modifier_state & (K_CTRLFLAG | K_ALTFLAG | LCTRLFLAG | RCTRLFLAG | LALTFLAG | RALTFLAG))
+              // or a frame key
+              || vkey_to_contextreset[vk])) {
       return true;
     }
   }
