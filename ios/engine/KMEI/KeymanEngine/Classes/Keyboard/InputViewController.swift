@@ -351,7 +351,7 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
 
     if let selected = textDocumentProxy.selectedText {
       if selected.count > 0 {
-        textDocumentProxy.deleteBackward()
+        textDocumentProxy.insertText("");
         hasDeletedSelection = true
       }
     }
