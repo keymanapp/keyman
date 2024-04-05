@@ -384,6 +384,9 @@ state_should_invalidate_context(km_core_state *state,
       if (!state_has_action_type(state, KM_CORE_IT_BACK)) {
         return true;
       }
+      if (state->context().empty()) {
+        return true; // context is empty - so pass back
+      }
     } else if (vkey_to_contextreset[vk]) {
       return true;
     }

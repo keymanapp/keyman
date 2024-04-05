@@ -58,7 +58,18 @@ km_core_process_event(km_core_state *state,
     if (state->actions().back().type == KM_CORE_IT_END) {
       state->actions().pop_back();
     }
+    bool foundEmit = false;
+    km::core::action oldAction;
+    // try to put the invalidate item before the emit keystroke
+    if (state->actions().back().type == KM_CORE_IT_EMIT_KEYSTROKE) {
+      oldAction = state->actions().back();
+      state->actions().pop_back();
+      foundEmit = true;
+    }
     state->actions().push_invalidate_context();
+    if (foundEmit) {
+      state->actions().push_back(oldAction);
+    }
     state->actions().commit();
   }
 
