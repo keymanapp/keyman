@@ -380,9 +380,9 @@ state_should_clear_context(km_core_state *state,
                      uint16_t event_flags) {
   // if emit_keystroke is present, check if a context reset is needed
   if (state_has_action_type(state, KM_CORE_IT_EMIT_KEYSTROKE)) {
-    if (vkey_to_contextreset[vk]) {
+    if (vk == KM_CORE_VKEY_BKSP && state_has_action_type(state, KM_CORE_IT_BACK)) {
       return true;
-    } else if (vk == KM_CORE_VKEY_BKSP && state_has_action_type(state, KM_CORE_IT_BACK)) {
+    } else if (vkey_to_contextreset[vk]) {
       return true;
     }
   }
