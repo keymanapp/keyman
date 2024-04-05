@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 17.0.302 beta 2024-04-04
+
+* fix(mac): load only 80 characters from context when processing keystrokes (#11141)
+
 ## 17.0.301 beta 2024-04-03
 
 * feat(core): support modifiers=other (#11118)
