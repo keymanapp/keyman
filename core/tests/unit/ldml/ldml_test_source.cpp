@@ -299,7 +299,10 @@ LdmlEmbeddedTestSource::load_source( const km::core::path &path ) {
     }
   }
 
-  if (keys.empty()) {
+  if (keys.empty() && expected.empty() && !expected_error) {
+    // don't note this, the parent will complain if there's neither json nor embedded
+    return __LINE__;
+  } else if (keys.empty()) {
     // We must at least have a key sequence to run the test
     std::cerr << "Need at least one key sequence." << std::endl;
     return __LINE__;
