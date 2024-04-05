@@ -186,14 +186,13 @@ struct km_core_state : public km::core::state
 };
 
 
-/** @return true if this is a state which should clear the context */
+/**
+ * Evaluate the
+ * @return true if this is a state which should clear the context
+ */
 bool
-km_core_state_should_clear_context(km_core_state *state,
+state_should_clear_context(km_core_state *state,
                      km_core_virtual_key vk,
                      uint16_t modifier_state,
                      uint8_t is_key_down,
                      uint16_t event_flags);
-
-/** @return true if there are any actions of the type */
-bool
-km_core_state_has_type(km_core_state *state, uint8_t type);

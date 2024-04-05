@@ -1,9 +1,9 @@
-#pragma once
+#include "vkey_to_contextreset.hpp"
 
 namespace km {
 namespace core {
 
-static bool vkey_to_contextreset[256] = {
+bool vkey_to_contextreset[256] = {
 	true,   //L"K_?00",				// &H0
 	true,   //L"K_LBUTTON",			// &H1
 	true,   //L"K_RBUTTON",			// &H2

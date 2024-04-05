@@ -20,12 +20,9 @@
 
 #include "processor.hpp"
 #include "state.hpp"
-
+#include "vkey_to_contextreset.hpp"
 
 using namespace km::core;
-
-// pull in the reset table
-#include "km_vkey_to_contextreset.hpp"
 
 // Forward declarations
 class context;
@@ -368,24 +365,24 @@ km_core_cp * km_core_state_context_debug(
   return result;
 }
 
-bool
-km_core_state_has_type(km_core_state *state, uint8_t type) {
+static bool
+state_has_action_type(km_core_state *state, uint8_t type) {
   return std::any_of(
       state->actions().begin(), state->actions().end(),
         [type](const km::core::action &a) { return a.type == type; });
 }
 
 bool
-km_core_state_should_clear_context(km_core_state *state,
+state_should_clear_context(km_core_state *state,
                      km_core_virtual_key vk,
                      uint16_t modifier_state,
                      uint8_t is_key_down,
                      uint16_t event_flags) {
   // if emit_keystroke is present, check if a context reset is needed
-  if (km_core_state_has_type(state, KM_CORE_IT_EMIT_KEYSTROKE)) {
-    if (km::core::vkey_to_contextreset[vk]) {
+  if (state_has_action_type(state, KM_CORE_IT_EMIT_KEYSTROKE)) {
+    if (vkey_to_contextreset[vk]) {
       return true;
-    } else if (vk == KM_CORE_VKEY_BKSP && km_core_state_has_type(state, KM_CORE_IT_BACK)) {
+    } else if (vk == KM_CORE_VKEY_BKSP && state_has_action_type(state, KM_CORE_IT_BACK)) {
       return true;
     }
   }
