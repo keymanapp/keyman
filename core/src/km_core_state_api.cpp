@@ -21,6 +21,7 @@
 #include "processor.hpp"
 #include "state.hpp"
 #include "vkey_to_contextreset.hpp"
+#include "kmx_file.h"
 
 using namespace km::core;
 
@@ -387,7 +388,7 @@ state_should_invalidate_context(km_core_state *state,
       if (state->context().empty()) {
         return true; // context is empty - so pass back
       }
-    } else if (vkey_to_contextreset[vk]) {
+    } else if (is_key_down && ((modifier_state & (K_CTRLFLAG | K_ALTFLAG | LCTRLFLAG | RCTRLFLAG | LALTFLAG | RALTFLAG)) || vkey_to_contextreset[vk])) {
       return true;
     }
   }
