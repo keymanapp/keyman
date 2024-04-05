@@ -535,6 +535,30 @@ describe('keyboard-info-compiler', function () {
     assert.isTrue(languages["jv-Arab-ID"].scriptName == "Arab");
   });
 
+  it('check fillLanguages throws error if Intl.DisplayNames.of throws error that is not RangeError', async function() {
+    const kmpJsonData: KmpJsonFile.KmpJsonFile = {
+      system: { fileVersion: '', keymanDeveloperVersion: '' },
+      options: null,
+      keyboards: [JAVA_KEYBOARD],
+    };
+
+    const sources = KHMER_ANGKOR_SOURCES;
+    const compiler = new KeyboardInfoCompiler();
+    assert.isTrue(await compiler.init(callbacks, {sources}));
+    compiler['fontSourceToKeyboardInfoFont'] = async (_kpsFilename: string, _kmpJsonData: KmpJsonFile.KmpJsonFile, _source: string[]) => {
+      return (_source[0] == JAVA_DISPLAY_FONT) ? JAVA_DISPLAY_FONT_INFO : JAVA_OSK_FONT_INFO;
+    }
+    const origIntlDisplayNamesOf = Intl.DisplayNames.prototype.of;
+    try {
+      Intl.DisplayNames.prototype.of = (code: string) => { throw new Error() }; // not RangeError
+      await compiler['fillLanguages'](KHMER_ANGKOR_KPS, {}, kmpJsonData);
+    } catch(e) {
+      assert.instanceOf(e, Error);
+    } finally {
+      Intl.DisplayNames.prototype.of = origIntlDisplayNamesOf;
+    }
+  });  
+
   it('check fillLanguages returns false if fontSourceToKeyboardInfoFont fails for display font', async function() {
     const kmpJsonData: KmpJsonFile.KmpJsonFile = {
       system: { fileVersion: '', keymanDeveloperVersion: '' },
