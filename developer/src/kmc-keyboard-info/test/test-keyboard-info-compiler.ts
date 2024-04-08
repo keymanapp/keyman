@@ -183,6 +183,21 @@ describe('keyboard-info-compiler', function () {
     assert.isNull(result);
   });
 
+  // additional run tests
+
+  it('check run leaves keyboard_info.isRTL undefined if not set in jsFile', async function() {
+    const kpjFilename = KHMER_ANGKOR_KPJ;
+    const sources = KHMER_ANGKOR_SOURCES;
+    const compiler = new KeyboardInfoCompiler();
+    assert.isTrue(await compiler.init(callbacks, {sources}));
+    const jsFile = compiler['loadJsFile'](sources.jsFilename);
+    assert.isNull(jsFile.match(/this\.KRTL=1/));
+    const result = await compiler.run(kpjFilename, null);
+    assert.isNotNull(result);
+    const keyboard_info = JSON.parse(new TextDecoder().decode(result.artifacts.keyboard_info.data));
+    assert.isUndefined(keyboard_info.isRTL);
+  });
+
   it('check run returns null if fillLanguages fails', async function() {
     const kpjFilename = KHMER_ANGKOR_KPJ;
     const sources = KHMER_ANGKOR_SOURCES;
