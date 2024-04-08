@@ -71,7 +71,9 @@ export default class KeymanEngine extends KeymanEngineBase<BrowserConfiguration,
     // Scrolls the document-body to ensure that a focused element remains visible after the OSK appears.
     this.contextManager.on('targetchange', (target: OutputTarget<any>) => {
       const e = target?.getElement();
-      (this.osk.activationModel as TwoStateActivator<HTMLElement>).activationTrigger = e;
+      if(this.osk) {
+        (this.osk.activationModel as TwoStateActivator<HTMLElement>).activationTrigger = e;
+      }
 
       if(this.config.hostDevice.touchable) {
         if(!e || !target || !this.osk) {
