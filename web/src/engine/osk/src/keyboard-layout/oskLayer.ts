@@ -84,12 +84,12 @@ export default class OSKLayer {
 
     if(this.spaceBarKey) {
       const spacebarLabel = this.spaceBarKey.label;
-      let tParent = <HTMLElement>spacebarLabel.parentNode;
+      let tButton = this.spaceBarKey.btn;
 
-      if (typeof (tParent.className) == 'undefined' || tParent.className == '') {
-        tParent.className = 'kmw-spacebar';
-      } else if (tParent.className.indexOf('kmw-spacebar') == -1) {
-        tParent.className += ' kmw-spacebar';
+      if (typeof (tButton.className) == 'undefined' || tButton.className == '') {
+        tButton.className = 'kmw-spacebar';
+      } else if (tButton.className.indexOf('kmw-spacebar') == -1) {
+        tButton.className += ' kmw-spacebar';
       }
 
       if (spacebarLabel.className != 'kmw-spacebar-caption') {
