@@ -163,7 +163,7 @@ final class KMKeyboard extends WebView {
     return result;
   }
 
-  protected boolean updateSelectionRange(int selStart, int selEnd) {
+  protected boolean updateSelectionRange() {
     boolean result = false;
     InputConnection ic = KMManager.getInputConnection(this.keyboardType);
     if (ic != null) {
@@ -174,6 +174,17 @@ final class KMKeyboard extends WebView {
 
       String rawText = icText.text.toString();
       updateText(rawText.toString());
+
+      // To determine:  may need `icText.startOffset +`?
+      int selStart = icText.selectionStart;
+      int selEnd = icText.selectionEnd;
+
+      int selMin = selStart, selMax = selEnd;
+      if (selStart > selEnd) {
+        // Selection is reversed so "swap"
+        selMin = selEnd;
+        selMax = selStart;
+      }
 
       /*
         The values of selStart & selEnd provided by the system are in code units,
@@ -187,14 +198,16 @@ final class KMKeyboard extends WebView {
        */
 
       // Count the number of characters which are surrogate pairs.
+      int stringLen = rawText.length();
+
       int pairsAtStart = CharSequenceUtil.countSurrogatePairs(rawText.substring(0, selStart), rawText.length());
       String selectedText = rawText.substring(selStart, selEnd);
       int pairsSelected = CharSequenceUtil.countSurrogatePairs(selectedText, selectedText.length());
 
       selStart -= pairsAtStart;
       selEnd -= (pairsAtStart + pairsSelected);
+      this.loadJavascript(KMString.format("updateKMSelectionRange(%d,%d)", selStart, selEnd));
     }
-    this.loadJavascript(KMString.format("updateKMSelectionRange(%d,%d)", selStart, selEnd));
     result = true;
 
     return result;
