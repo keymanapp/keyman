@@ -214,6 +214,45 @@ describe('keyboard-info-compiler', function () {
     assert.isTrue(keyboard_info.isRTL);
   });
 
+  it('check run sets author.url correctly if mailto provided', async function() {
+    const kpjFilename = KHMER_ANGKOR_KPJ;
+    const sources = KHMER_ANGKOR_SOURCES;
+    const compiler = new KeyboardInfoCompiler();
+    assert.isTrue(await compiler.init(callbacks, {sources}));
+    const kmpCompiler = new KmpCompiler();
+    await kmpCompiler.init(callbacks, {});
+    const kmpJsonData = kmpCompiler.transformKpsToKmpObject(sources.kpsFilename);
+    assert.isNotNull(kmpJsonData.info.author.url.match(/^mailto\:/));
+    const result = await compiler.run(kpjFilename, null);
+    assert.isNotNull(result);
+    const keyboard_info = JSON.parse(new TextDecoder().decode(result.artifacts.keyboard_info.data));
+    assert.deepEqual(keyboard_info.authorEmail, 'makara_sok@sil.org');
+  });
+
+  it('check run sets author.url correctly if just email provided', async function() {
+    const kpjFilename = KHMER_ANGKOR_KPJ;
+    const sources = KHMER_ANGKOR_SOURCES;
+    const compiler = new KeyboardInfoCompiler();
+    assert.isTrue(await compiler.init(callbacks, {sources}));
+    const kmpCompiler = new KmpCompiler();
+    await kmpCompiler.init(callbacks, {});
+    const kmpJsonData = kmpCompiler.transformKpsToKmpObject(sources.kpsFilename);
+    kmpJsonData.info.author.url = "makara_sok@sil.org"; // remove 'mailto:'
+    const origKmpCompilerTransformKpsToKmpObject = KmpCompiler.prototype.transformKpsToKmpObject;
+    let result: KeyboardInfoCompilerResult;
+    try {
+      KmpCompiler.prototype.transformKpsToKmpObject = (_kpsFilename: string): KmpJsonFile.KmpJsonFile => kmpJsonData;
+      result = await compiler.run(kpjFilename, null);
+    } catch(e) {
+      assert.fail(e);
+    } finally {
+      KmpCompiler.prototype.transformKpsToKmpObject = origKmpCompilerTransformKpsToKmpObject;
+    }
+    assert.isNotNull(result);
+    const keyboard_info = JSON.parse(new TextDecoder().decode(result.artifacts.keyboard_info.data));
+    assert.deepEqual(keyboard_info.authorEmail, 'makara_sok@sil.org');
+  });
+
   it('check run returns null if fillLanguages fails', async function() {
     const kpjFilename = KHMER_ANGKOR_KPJ;
     const sources = KHMER_ANGKOR_SOURCES;
