@@ -157,14 +157,14 @@ export class GestureMatcher<Type, StateToken = any> implements PredecessorMatch<
           return;
         case 'full':
           contact = srcContact.constructSubview(false, true);
-          this.addContactInternal(contact, srcContact.path.stats);
+          this.addContactInternal(contact, srcContact.path.stats, true);
           continue;
         case 'partial':
           preserveBaseItem = true;
           // Intentional fall-through
         case 'chop':
           contact = srcContact.constructSubview(true, preserveBaseItem);
-          this.addContactInternal(contact, srcContact.path.stats);
+          this.addContactInternal(contact, srcContact.path.stats, true);
           break;
       }
     }
@@ -367,7 +367,7 @@ export class GestureMatcher<Type, StateToken = any> implements PredecessorMatch<
     return this._result;
   }
 
-  private addContactInternal(simpleSource: GestureSourceSubview<Type>, basePathStats: CumulativePathStats<Type>) {
+  private addContactInternal(simpleSource: GestureSourceSubview<Type>, basePathStats: CumulativePathStats<Type>, whileInitializing?: boolean) {
     // The number of already-active contacts tracked for this gesture
     const existingContacts = this.pathMatchers.length;
 
@@ -491,16 +491,22 @@ export class GestureMatcher<Type, StateToken = any> implements PredecessorMatch<
     const result = contactModel.update();
     if(result?.type == 'reject') {
       /*
-        Refer to the earlier comment in this method re: use of 'cancelled'; we need to
-        prevent any and all further attempts to match against this model  We'd
-        instantly reject it anyway due to its rejected initial state.  Failing to do so
-        can cause an infinite async loop.
+        Refer to the earlier comment in this method re: use of 'cancelled'; we
+        need to prevent any and all further attempts to match against this model
+        We'd instantly reject it anyway due to its rejected initial state.
+        Failing to do so can cause an infinite async loop.
 
-        If we weren't using 'cancelled', 'path' would correspond best with a rejection
-        here, as the decision is made due to the GestureSource's current path being
-        rejected by one of the `PathModel`s comprising the `GestureModel`.
+        If we weren't using 'cancelled', 'path' would correspond best with a
+        rejection here, as the decision is made due to the GestureSource's
+        current path being rejected by one of the `PathModel`s comprising the
+        `GestureModel`.
+
+        If the model's already been initialized, it's possible that a _new_
+        incoming touch needs special handling.  We'll allow one reset.  In the
+        case that it would try to restart itself, the restarted model will
+        instantly fail and thus cancel.
       */
-      this.finalize(false, 'cancelled');
+      this.finalize(false, whileInitializing ? 'cancelled' : 'path');
     }
 
     // Standard path:  trigger either resolution or rejection when the contact model signals either.
