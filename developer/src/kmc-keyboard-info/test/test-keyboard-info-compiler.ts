@@ -602,8 +602,26 @@ describe('keyboard-info-compiler', function () {
     const sources = KHMER_ANGKOR_SOURCES;
     const compiler = new KeyboardInfoCompiler();
     assert.isTrue(await compiler.init(callbacks, {sources}));
-    const fonts = ['shared/font.xxx', 'shared/second.xxx'];
+    const fonts = ['../shared/fonts/font.xxx', '../shared/fonts/second.xxx'];
     const result = await compiler['fontSourceToKeyboardInfoFont'](KHMER_ANGKOR_KPS, kmpJsonData, fonts);
     assert.deepEqual(result, { family: 'font.xxx', source: fonts });
   });
+
+  it('check fontSourceToKeyboardInfoFont handles font file names with backslashes', async function() {
+    const kmpJsonData: KmpJsonFile.KmpJsonFile = {
+      system: { fileVersion: '', keymanDeveloperVersion: '' },
+      options: null,
+      files: [{
+        name: "..\\shared\\fonts\\khmer\\mondulkiri\\" + KHMER_ANGKOR_DISPLAY_FONT, // backslashes
+        description: "Font Khmer Mondulkiri",
+      }],
+    };
+
+    const sources = KHMER_ANGKOR_SOURCES;
+    const compiler = new KeyboardInfoCompiler();
+    assert.isTrue(await compiler.init(callbacks, {sources}));
+    const fonts = [KHMER_ANGKOR_DISPLAY_FONT];
+    const result = await compiler['fontSourceToKeyboardInfoFont'](KHMER_ANGKOR_KPS, kmpJsonData, fonts);
+    assert.deepEqual(result, KHMER_ANGKOR_DISPLAY_FONT_INFO);
+  });  
 });
