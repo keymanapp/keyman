@@ -175,7 +175,6 @@ final class KMKeyboard extends WebView {
       String rawText = icText.text.toString();
       updateText(rawText.toString());
 
-      // To determine:  may need `icText.startOffset +`?
       int selStart = icText.selectionStart;
       int selEnd = icText.selectionEnd;
 
