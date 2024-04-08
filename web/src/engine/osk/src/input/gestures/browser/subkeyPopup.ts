@@ -126,7 +126,6 @@ export default class SubkeyPopup implements GestureHandler {
     // position:static and display:inline-block
     const elements = this.element = document.createElement('div');
 
-    var i;
     elements.id='kmw-popup-keys';
 
     // #3718: No longer prepend base key to popup array
@@ -143,20 +142,20 @@ export default class SubkeyPopup implements GestureHandler {
     ss.fontSize=computedStyle.fontSize;
     ss.visibility='hidden';
 
-    var nKeys=subKeySpec.length,nRows,nCols;
-    nRows=Math.min(Math.ceil(nKeys/9),2);
-    nCols=Math.ceil(nKeys/nRows);
-
-    this.menuWidth = (nCols*e.offsetWidth + nCols*SUBKEY_DEFAULT_MARGIN_LEFT);
-    ss.width = this.menuWidth+'px';
+    const nKeys = subKeySpec.length;
+    // If we have more than 9 keys we put them in (at least) two rows.
+    const nRows=Math.min(Math.ceil(nKeys/9),2);
+    const nCols=Math.ceil(nKeys/nRows);
 
     // Add nested button elements for each sub-key
     this.subkeys = [];
-    for(i=0; i<nKeys; i++) {
-      var needsTopMargin = false;
-      let nRow=Math.floor(i/nCols);
-      if(nRows > 1 && nRow > 0) {
-        needsTopMargin = true;
+    let thisRowWidth = 0;
+    let iRow = 0;
+    for(let i=0, iCol=0; i<nKeys; i++, iCol++) {
+      if (iCol >= nCols) {
+        iRow++;
+        iCol = 0;
+        thisRowWidth = 0;
       }
 
       let layer = e['key'].layer;
@@ -164,12 +163,34 @@ export default class SubkeyPopup implements GestureHandler {
         // Use the currently-active layer.
         layer = vkbd.layerId;
       }
-      let keyGenerator = new OSKSubKey(subKeySpec[i], layer);
-      let kDiv = keyGenerator.construct(vkbd, <KeyElement> e, needsTopMargin);
+
+      let subkeyWidth = (typeof subKeySpec[i]['width'] != 'undefined') ?
+        subKeySpec[i]['width'] * e.offsetWidth / 100 :
+        e.offsetWidth;
+
+      if (subkeyWidth > vkbd.width - 2 * SUBKEY_DEFAULT_MARGIN_LEFT) {
+        subkeyWidth = vkbd.width - 2 * SUBKEY_DEFAULT_MARGIN_LEFT;
+      }
+
+      if (thisRowWidth + subkeyWidth + SUBKEY_DEFAULT_MARGIN_LEFT > vkbd.width) {
+        // New subkey doesn't fit in the current row. Start a new row.
+        // TODO: currently we don't check that the rows fit vertically,
+        // so it's possible that the top or bottom of the subkey menu
+        // is not visible.
+        iRow++;
+        iCol = 0;
+        thisRowWidth = 0;
+      }
+      const keyGenerator = new OSKSubKey(subKeySpec[i], layer);
+      const kDiv = keyGenerator.construct(vkbd, <KeyElement>e, subkeyWidth, iRow > 0);
+      thisRowWidth += subkeyWidth + SUBKEY_DEFAULT_MARGIN_LEFT;
+      this.menuWidth = Math.max(this.menuWidth ?? 0, thisRowWidth);
       this.subkeys.push(kDiv.firstChild as KeyElement);
 
       elements.appendChild(kDiv);
     }
+
+    ss.width = this.menuWidth + 'px';
 
     // And add a filter to fade main keyboard
     this.shim = document.createElement('div');
