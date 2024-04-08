@@ -2137,6 +2137,28 @@ public final class KMManager {
     return result;
   }
 
+  /**
+   * Updates the active range for selected text.
+   * @deprecated
+   * This method no longer needs the `selStart` and `selEnd` parameters.
+   * <p>Use {@link KMManager#updateSelectionRange(KeyboardType)} instead.</p>
+   *
+   * @param kbType    A value indicating if this request is for the in-app keyboard or the system keyboard
+   * @param selStart  (deprecated) the start index for the range
+   * @param selEnd  (deprecated) the end index for the selected range
+   * @return
+   */
+  @Deprecated
+  public static boolean updateSelectionRange(KeyboardType kbType, int selStart, int selEnd) {
+    return updateSelectionRange(kbType);
+  }
+
+  /**
+   * Performs a synchronization check for the active range for selected text,
+   * ensuring it matches the text-editor's current state.
+   * @param kbType  A value indicating if this request is for the in-app or system keyboard.
+   * @return
+   */
   public static boolean updateSelectionRange(KeyboardType kbType) {
     boolean result = false;
 
