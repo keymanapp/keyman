@@ -6,6 +6,13 @@ import VisualKeyboard from '../visualKeyboard.js';
 import { KeyLayoutParams } from './oskKey.js';
 import { LayerLayoutParams } from './oskLayer.js';
 
+/*
+  The total proportion of key-square height used as key-button padding.
+  The 'padding' is visible to users as the vertical space between keys
+  and exists both in "fixed" and "absolute" sizing modes.
+*/
+export const KEY_BTN_Y_PAD_RATIO = 0.15;
+
 /**
  * Models one row of one layer of the OSK (`VisualKeyboard`) for a keyboard.
  */
@@ -67,17 +74,14 @@ export default class OSKRow {
       rs.maxHeight=rs.lineHeight=rs.height=rowHeight.styleString;
     }
 
-    // Only used for fixed-height scales at present.
-    const padRatio = 0.15;
-
-    const keyHeightBase = layoutParams.widthStyle.absolute ? rowHeight : ParsedLengthStyle.forScalar(1);
-    const padTop = keyHeightBase.scaledBy(padRatio / 2);
-    const keyHeight = keyHeightBase.scaledBy(1 - padRatio);
+    const keyHeightBase = layoutParams.heightStyle.absolute ? rowHeight : ParsedLengthStyle.forScalar(1);
+    const padTop = keyHeightBase.scaledBy(KEY_BTN_Y_PAD_RATIO / 2);
+    const keyHeight = keyHeightBase.scaledBy(1 - KEY_BTN_Y_PAD_RATIO);
 
     // Update all key-square layouts.
     const keyStyleUpdates = this.keys.map((key) => {
       return () => {
-        const keySquare  = key.btn.parentElement;
+        const keySquare  = key.square;
         const keyElement = key.btn;
 
         // Set the kmw-key-square position
@@ -107,7 +111,9 @@ export default class OSKRow {
       const keyWidth = widthStyle.scaledBy(key.spec.proportionalWidth);
       const keyPad =   widthStyle.scaledBy(key.spec.proportionalPad);
 
-      const keyHeight = heightStyle.scaledBy(this.heightFraction);
+      // We maintain key-btn padding within the key-square - the latter `scaledBy`
+      // adjusts for that, providing the final key-btn height.
+      const keyHeight = heightStyle.scaledBy(this.heightFraction).scaledBy(1 - KEY_BTN_Y_PAD_RATIO);
 
       // Match the row height (if fixed-height) or use full row height (if percent-based)
       const styleHeight = heightStyle.absolute ? keyHeight.styleString : '100%';

@@ -188,12 +188,6 @@ export default abstract class OSKKey {
 
     scale ??= 1;
 
-    /*
-      Properties needed:
-      - this.btn.style.width  (computed & set in this.refreshLayout)
-      - this.btn.style.height (likewise / in parent row element - is available either way)
-      - baseEmFontSize (vkbd.getKeyEmFontSize()) - obtainable once, prob at layer-group level
-    */
     const keyWidth = layoutParams.keyWidth;
     const keyHeight = layoutParams.keyHeight;
     const emScale = layoutParams.baseEmFontSize.scaledBy(layoutParams.layoutFontSize.val);
