@@ -198,6 +198,22 @@ describe('keyboard-info-compiler', function () {
     assert.isUndefined(keyboard_info.isRTL);
   });
 
+  it('check run sets keyboard_info.isRTL if set in jsFile', async function() {
+    const kpjFilename = KHMER_ANGKOR_KPJ;
+    const sources = KHMER_ANGKOR_SOURCES;
+    const compiler = new KeyboardInfoCompiler();
+    assert.isTrue(await compiler.init(callbacks, {sources}));
+    let jsFile = compiler['loadJsFile'](sources.jsFilename);
+    jsFile = jsFile.replace('this\.KN="Khmer Angkor";', '$&\n  this\.KRTL=1;'); // insert this.KRTL=1
+    const origCompilerLoadJsFile = compiler['loadJsFile'];
+    compiler['loadJsFile'] = (_filename: string) => jsFile;
+    const result = await compiler.run(kpjFilename, null);
+    compiler['loadJsFile'] = origCompilerLoadJsFile;
+    assert.isNotNull(result);
+    const keyboard_info = JSON.parse(new TextDecoder().decode(result.artifacts.keyboard_info.data));
+    assert.isTrue(keyboard_info.isRTL);
+  });
+
   it('check run returns null if fillLanguages fails', async function() {
     const kpjFilename = KHMER_ANGKOR_KPJ;
     const sources = KHMER_ANGKOR_SOURCES;
