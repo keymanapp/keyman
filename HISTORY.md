@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 17.0.304 beta 2024-04-09
+
+* fix(android): atomically updates selection with text (#11188)
+*  (#11178)
+
 ## 17.0.303 beta 2024-04-05
 
 * fix(windows): decode uri for Package ID and filename (#11152)
