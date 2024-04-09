@@ -197,8 +197,6 @@ final class KMKeyboard extends WebView {
        */
 
       // Count the number of characters which are surrogate pairs.
-      int stringLen = rawText.length();
-
       int pairsAtStart = CharSequenceUtil.countSurrogatePairs(rawText.substring(0, selStart), rawText.length());
       String selectedText = rawText.substring(selStart, selEnd);
       int pairsSelected = CharSequenceUtil.countSurrogatePairs(selectedText, selectedText.length());
