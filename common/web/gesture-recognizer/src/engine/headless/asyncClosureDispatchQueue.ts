@@ -36,49 +36,51 @@ export class AsyncClosureDispatchQueue {
     return this.queue.length == 0 && !this.waitLock;
   }
 
-  private async setWaitLock(promise: Promise<any>) {
-    this.waitLock = promise;
+  private async triggerNextClosure() {
+    if(this.queue.length == 0) {
+      return;
+    }
+
+    const functor = this.queue.shift();
+
+    // A stand-in so that `ready` doesn't report true while the closure runs.
+    this.waitLock = Promise.resolve();
+
+    /*
+      It is imperative that any errors triggered by the functor do not prevent this method from setting
+      the wait lock that will trigger the following event (if it exists).  Failure to do so will
+      result in all further queued closures never getting the opportunity to run!
+    */
+    let result: undefined | Promise<any>;
+    try {
+      // Is either undefined (return type: void) or is a Promise.
+      result = functor() as undefined | Promise<any>;
+      /* c8 ignore start */
+    } catch (err) {
+      reportError('Error from queued closure', err);
+    }
+    /* c8 ignore end */
+
+    /*
+      Replace the stand-in with the _true_ post-closure wait.
+
+      If the closure returns a Promise, the implication is that the further processing of queued
+      functions should be blocked until that Promise is fulfilled.
+
+      If not, we just add a default delay.
+    */
+    result = result ?? this.defaultWaitFactory();
+    this.waitLock = result;
 
     try {
-      await promise;
+      await result;
     } catch(err) {
       reportError('Async error from queued closure', err);
     }
 
     this.waitLock = null;
+    // if queue is length zero, auto-returns.
     this.triggerNextClosure();
-  }
-
-  private async triggerNextClosure() {
-    if(this.queue.length > 0) {
-      const functor = this.queue.shift();
-
-      // A stand-in so that `ready` doesn't report true while the closure runs.
-      this.waitLock = Promise.resolve();
-
-      /*
-        It is imperative that any errors triggered by the functor do not prevent this method from setting
-        the wait lock that will trigger the following event (if it exists).  Failure to do so will
-        result in all further queued closures never getting the opportunity to run!
-      */
-     let result: undefined | Promise<any>;
-      try {
-        // Is either undefined (return type: void) or is a Promise.
-        result = functor() as undefined | Promise<any>;
-        /* c8 ignore start */
-      } catch (err) {
-        reportError('Error from queued closure', err);
-      }
-      /* c8 ignore end */
-
-      /*
-        If the closure returns a Promise, the implication is that the further processing of queued
-        functions should be blocked until that Promise is fulfilled.
-
-        If not, we still add a delay according to the specified default.
-      */
-      this.setWaitLock(result ?? this.defaultWaitFactory());
-    }
   }
 
   runAsync(closure: QueueClosure) {
