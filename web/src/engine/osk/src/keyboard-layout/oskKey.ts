@@ -198,7 +198,7 @@ export default abstract class OSKKey {
     // Also helps ensure that the stub's font-family name is used for keys, should
     // that mismatch the font-family name specified within the keyboard's touch layout.
 
-    let originalSize = this._fontSize.scaledBy(scale);
+    let originalSize = this._fontSize;
     if(!originalSize.absolute) {
       originalSize = emScale.scaledBy(originalSize.val);
     }
@@ -209,7 +209,7 @@ export default abstract class OSKKey {
       height: layoutParams.keyHeight
     }
 
-    let metrics = getTextMetrics(text, emScale.val, style);
+    let metrics = getTextMetrics(text, emScale.scaledBy(scale).val, style);
 
     const MAX_X_PROPORTION = 0.90;
     const MAX_Y_PROPORTION = 0.90;
@@ -231,10 +231,10 @@ export default abstract class OSKKey {
       proportion = yProportion;
     }
 
-    // Never upscale keys past the default - only downscale them.
+    // Never upscale keys past the default * the specified scale - only downscale them.
     // Proportion < 1:  ratio of key width to (padded [loosely speaking]) text width
     //                  maxProportion determines the 'padding' involved.
-    return ParsedLengthStyle.forScalar(Math.min(proportion, 1));
+    return ParsedLengthStyle.forScalar(scale * Math.min(proportion, 1));
   }
 
   public get keyText(): string {
