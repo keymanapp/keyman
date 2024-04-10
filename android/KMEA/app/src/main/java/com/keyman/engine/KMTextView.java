@@ -63,10 +63,8 @@ public final class KMTextView extends AppCompatEditText {
    */
   public static void updateTextContext() {
     KMTextView textView = (KMTextView) activeView;
-    int selStart = textView.getSelectionStart();
-    int selEnd = textView.getSelectionEnd();
     KMManager.updateText(KeyboardType.KEYBOARD_TYPE_INAPP, textView.getText().toString());
-    if (KMManager.updateSelectionRange(KeyboardType.KEYBOARD_TYPE_INAPP, selStart, selEnd)) {
+    if (KMManager.updateSelectionRange(KeyboardType.KEYBOARD_TYPE_INAPP)) {
       KMManager.resetContext(KeyboardType.KEYBOARD_TYPE_INAPP);
     }
   }
@@ -167,7 +165,7 @@ public final class KMTextView extends AppCompatEditText {
   protected void onSelectionChanged(int selStart, int selEnd) {
     super.onSelectionChanged(selStart, selEnd);
     if (activeView != null && activeView.equals(this)) {
-      if (KMManager.updateSelectionRange(KMManager.KeyboardType.KEYBOARD_TYPE_INAPP, selStart, selEnd)) {
+      if (KMManager.updateSelectionRange(KMManager.KeyboardType.KEYBOARD_TYPE_INAPP)) {
         KMManager.resetContext(KeyboardType.KEYBOARD_TYPE_INAPP);
       }
     }
