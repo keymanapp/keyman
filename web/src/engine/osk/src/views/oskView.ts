@@ -658,6 +658,7 @@ export default abstract class OSKView
       if(this.bannerView.height > 0) {
         availableHeight -= this.bannerView.height + 5;
       }
+      // Triggers the VisualKeyboard.refreshLayout() method, which includes a showLanguage() call.
       this.vkbd.setSize(this.computedWidth, availableHeight, pending);
 
       const bs = this._Box.style;
@@ -665,9 +666,6 @@ export default abstract class OSKView
       // visualizations, not to help text or empty views.
       bs.width  = bs.maxWidth  = this.computedWidth + 'px';
       bs.height = bs.maxHeight = this.computedHeight + 'px';
-
-      // Ensure that the layer's spacebar is properly captioned.
-      this.vkbd.showLanguage();
     } else {
       const bs = this._Box.style;
       bs.width  = 'auto';
@@ -855,9 +853,8 @@ export default abstract class OSKView
       // Also, only change the layer ID itself if there is an actual corresponding layer
       // in the OSK.
       if(this.vkbd?.layerGroup.layers[newValue] && !this.vkbd?.layerLocked) {
+        // triggers state-update + layer refresh automatically.
         this.vkbd.layerId = newValue;
-        // Ensure that the layer's spacebar is properly captioned.
-        this.vkbd.showLanguage();
       }
 
       // Ensure the keyboard view is modeling the correct state.  (Correct layer, etc.)
@@ -891,10 +888,6 @@ export default abstract class OSKView
 
     // First thing after it's made visible.
     this.refreshLayoutIfNeeded();
-
-    if(this.keyboardView instanceof VisualKeyboard) {
-      this.keyboardView.showLanguage();
-    }
 
     this._Visible=true;
 
