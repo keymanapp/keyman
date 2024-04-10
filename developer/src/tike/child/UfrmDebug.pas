@@ -191,8 +191,6 @@ type
 
     procedure ListBreakpoints;
 
-    function ShortcutDisabled(Key: Word): Boolean;
-
     property CurrentEvent: TDebugEvent read GetCurrentEvent;
 
     property OnSetBreakpoint: TDebugLineEvent read FOnSetBreakpoint write FOnSetBreakpoint;
@@ -434,6 +432,13 @@ begin
   // mapping; the best way to do this is to extract the scan code from
   // the message data and work from that
   vkey := MapScanCodeToUSVK((Message.LParam and $FF0000) shr 16);
+
+  // We don't support the Right Shift modifier in Keyman;
+  // we treat it as Left Shift, even though MapScanCodeToUSVK
+  // recognizes it
+  if vkey = VK_RSHIFT then
+    vkey := VK_SHIFT;
+
   modifier := 0;
 
   if GetKeyState(VK_LCONTROL) < 0 then modifier := modifier or KM_CORE_MODIFIER_LCTRL;
@@ -1315,23 +1320,6 @@ end;
 procedure TfrmDebug.memoClick(Sender: TObject);
 begin
   memoSelMove(memo);
-end;
-
-{-------------------------------------------------------------------------------
- - Control captions                                                            -
- ------------------------------------------------------------------------------}
-
-function TfrmDebug.ShortcutDisabled(Key: Word): Boolean;
-begin
-  Result := False;
-  if not FUIDisabled then Exit;
-  if Key in [VK_F1..VK_F12] then
-    Result := True
-  else if GetKeyState(VK_CONTROL) < 0 then
-  begin
-    if Key in [Ord('A')..Ord('Z'), Ord('0')..Ord('9')] then
-      Result := True;
-  end;
 end;
 
 procedure TfrmDebug.memoSelMove(Sender: TObject);

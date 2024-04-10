@@ -286,12 +286,13 @@ describe('tran', function () {
     {
       subpath: `sections/tran/fail-bad-tran-1.xml`,
       errors: [
-        CompilerMessages.Error_UnparseableTransformFrom({ from: 'AB(now if only I would terminate this group..',
-        // this message is dependent on v8, so this test could be a little brittle.
-        message: 'Invalid regular expression: /AB(now if only I would terminate this group../: Unterminated group' }),
+        { code: CompilerMessages.ERROR_UnparseableTransformFrom,
+          matchMessage: /Invalid regular expression.*Unterminated group/,
+        }
       ],
     },
     {
+      // also used in test-compiler-e2e.ts
       subpath: `sections/tran/fail-bad-tran-2.xml`,
       errors: [
         CompilerMessages.Error_InvalidQuadEscape({ cp: 295 }),
@@ -333,6 +334,40 @@ describe('tran', function () {
         CompilerMessages.Error_MissingStringVariable({ id: "missingstr" }),
       ],
     },
+    // cases that share the same error code
+    ...[1, 2].map(n => ({
+      subpath: `sections/tran/fail-IllegalTransformDollarsign-${n}.xml`,
+      errors: [
+        {
+          code: CompilerMessages.ERROR_IllegalTransformDollarsign,
+          matchMessage: /.*/,
+        }
+      ],
+    })),
+    // successful compile
+    ...[1].map(n => ({
+      subpath: `sections/tran/ok-${n}.xml`,
+      errors: false,
+    })),
+    // cases that share the same error code
+    ...[1, 2, 3].map(n => ({
+      subpath: `sections/tran/fail-matches-nothing-${n}.xml`,
+      errors: [
+        {
+          code: CompilerMessages.ERROR_TransformFromMatchesNothing,
+          matchMessage: /.*/,
+        }
+      ],
+    })),
+    // escaping
+    {
+      subpath: `sections/tran/tran-escape.xml`,
+      callback(sect) {
+        const tran = <Tran>sect;
+        assert.ok(tran);
+      },
+    }
+
   ], tranDependencies);
 });
 

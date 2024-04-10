@@ -301,9 +301,9 @@ export class KmnCompiler implements KeymanCompiler, UnicodeSetParser {
 
   /**
    * Compiles a .kmn file to .kmx, .kvk, and/or .js files. Returns an object
-   * containing binary artifacts on succes. The files are passed in by name, and
-   * the compiler will use callbacks as passed to the {@link KmnCompiler.init}
-   * function to read any input files by disk.
+   * containing binary artifacts on success. The files are passed in by name,
+   * and the compiler will use callbacks as passed to the
+   * {@link KmnCompiler.init} function to read any input files by disk.
    * @param infile  - Path to source file. Path will be parsed to find relative
    *                  references in the .kmn file, such as icon or On Screen
    *                  Keyboard file
@@ -551,13 +551,19 @@ export class KmnCompiler implements KeymanCompiler, UnicodeSetParser {
       return null;
     }
 
-    // TODO-LDML: Catch OOM
+    if ((rangeCount * 2) < 0) {
+      throw new RangeError(`Internal error: negative rangeCount * 2 = ${rangeCount * 2}`);
+    }
     const buf = this.wasmExports.malloc(rangeCount * 2 * Module.HEAPU32.BYTES_PER_ELEMENT);
+    if (buf <= 0) {
+      // out of memory will return zero.
+      throw new RangeError(`Internal error: wasm malloc() returned ${buf}`);
+    }
     // fix \u1234 pattern format
     pattern = KmnCompiler.fixNewPattern(pattern);
-    /** If <= 0: return code. If positive: range count */
     const rc = Module.kmcmp_parseUnicodeSet(pattern, buf, rangeCount * 2);
     if (rc >= 0) {
+      // If >= 0: it's a range count (which could be zero, an empty set).
       const ranges = [];
       const startu = (buf / Module.HEAPU32.BYTES_PER_ELEMENT);
       for (let i = 0; i < rc; i++) {
@@ -568,6 +574,7 @@ export class KmnCompiler implements KeymanCompiler, UnicodeSetParser {
       this.wasmExports.free(buf);
       return new UnicodeSet(pattern, ranges);
     } else {
+      // rc is negative: it's an error code.
       this.wasmExports.free(buf);
       // translate error code into callback
       this.callbacks.reportMessage(getUnicodeSetError(rc));

@@ -16,6 +16,7 @@ tests_from_cldr = [
   'bn',
 ]
 
+# these have 'embedded' (@@) testdata instead of a separate file
 tests_without_testdata = [
 # disabling 000 until we have updates to core or to the keyboard so that it passes
 #  'k_000_null_keyboard',
@@ -25,13 +26,13 @@ tests_without_testdata = [
   'k_005_modbittest',
   'k_010_mt',
   'k_011_mt_iso',
+  'k_012_other',
   'k_100_keytest',
   'k_101_keytest',
   'k_102_keytest',
-
 ]
 
-# These tests have a k_001_tiny-test.xml file as well.
+# These tests have a *-test.xml file as well.
 tests_with_testdata = [
   'ldml_test',
   'k_001_tiny',
@@ -44,6 +45,7 @@ tests_with_testdata = [
   'k_201_reorder_esk',
   'k_210_marker',
   'k_211_marker_escape',
+  'k_212_marker_11057',
 ]
 
 tests =  tests_without_testdata

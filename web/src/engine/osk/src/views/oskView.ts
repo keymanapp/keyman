@@ -233,10 +233,22 @@ export default abstract class OSKView
     // Initializes the two constant OSKComponentView fields.
     this.bannerView   = new BannerView();
     this.bannerView.events.on('bannerchange', () => this.refreshLayout());
+    this._Box.appendChild(this.bannerView.element);
 
     this._bannerController = new BannerController(this.bannerView, this.hostDevice, this.config.predictionContextManager);
 
-    this.keyboardView = null;
+    this.keyboardView = this._GenerateKeyboardView(null, null);
+    this._Box.appendChild(this.keyboardView.element);
+
+    // Install the default OSK stylesheets - but don't have it managed by the keyboard-specific stylesheet manager.
+    // We wish to maintain kmwosk.css whenever keyboard-specific styles are reset/removed.
+    // Temp-hack:  embedded products prefer their stylesheet, etc linkages without the /osk path component.
+    const resourcePath = getResourcePath(this.config);
+
+    for(let sheetFile of OSKView.STYLESHEET_FILES) {
+      const sheetHref = `${resourcePath}${sheetFile}`;
+      this.uiStyleSheetManager.linkExternalSheet(sheetHref);
+    }
 
     this.setBaseMouseEventListeners();
     if(this.hostDevice.touchable) {
@@ -646,6 +658,7 @@ export default abstract class OSKView
       if(this.bannerView.height > 0) {
         availableHeight -= this.bannerView.height + 5;
       }
+      // Triggers the VisualKeyboard.refreshLayout() method, which includes a showLanguage() call.
       this.vkbd.setSize(this.computedWidth, availableHeight, pending);
 
       const bs = this._Box.style;
@@ -653,9 +666,6 @@ export default abstract class OSKView
       // visualizations, not to help text or empty views.
       bs.width  = bs.maxWidth  = this.computedWidth + 'px';
       bs.height = bs.maxHeight = this.computedHeight + 'px';
-
-      // Ensure that the layer's spacebar is properly captioned.
-      this.vkbd.showLanguage();
     } else {
       const bs = this._Box.style;
       bs.width  = 'auto';
@@ -700,52 +710,28 @@ export default abstract class OSKView
 
   private loadActiveKeyboard() {
     this.setBoxStyling();
-
-    // Do not erase / 'shutdown' the banner-controller; we simply re-use its elements.
-    if(this.vkbd) {
-      this.vkbd.shutdown();
-    }
-    this.keyboardView = null;
     this.needsLayout = true;
+    // Save references to the old kbd & its styles for shutdown after replacement.
+    const oldKbd = this.keyboardView;
+    const oldKbdStyleManager = this.kbdStyleSheetManager;
 
-    // Instantly resets the OSK container, erasing / delinking the previously-loaded keyboard.
-    this._Box.innerHTML = '';
+    // Create new ones for the new, incoming kbd.
+    this.kbdStyleSheetManager = new StylesheetManager(this._Box, this.config.doCacheBusting || false);
+    const kbdView = this.keyboardView = this._GenerateKeyboardView(this.keyboardData?.keyboard, this.keyboardData?.metadata);
 
-    // Since we cleared all inner HTML, that means we cleared the stylesheets, too.
-    this.uiStyleSheetManager.unlinkAll();
-    this.kbdStyleSheetManager.unlinkAll();
-
-    // Install the default OSK stylesheets - but don't have it managed by the keyboard-specific stylesheet manager.
-    // We wish to maintain kmwosk.css whenever keyboard-specific styles are reset/removed.
-    // Temp-hack:  embedded products prefer their stylesheet, etc linkages without the /osk path component.
-    const resourcePath = getResourcePath(this.config);
-
-    for(let sheetFile of OSKView.STYLESHEET_FILES) {
-      const sheetHref = `${resourcePath}${sheetFile}`;
-      this.uiStyleSheetManager.linkExternalSheet(sheetHref);
-    }
-
-    // Any event-cancelers would go here, after the innerHTML reset.
-
-    // Add header element to OSK only for desktop browsers
-    if(this.headerView) {
-      this._Box.appendChild(this.headerView.element);
-    }
-
-    // Add suggestion banner bar to OSK
-    this._Box.appendChild(this.banner.element);
-
+    // Perform the replacement.
+    this._Box.replaceChild(kbdView.element, oldKbd.element);
+    kbdView.postInsert();
     this.bannerController?.configureForKeyboard(this.keyboardData?.keyboard, this.keyboardData?.metadata);
 
-    let kbdView: KeyboardView = this.keyboardView = this._GenerateKeyboardView(this.keyboardData?.keyboard, this.keyboardData?.metadata);
-    this._Box.appendChild(kbdView.element);
-    kbdView.postInsert();
-
-    // Add footer element to OSK only for desktop browsers
-    if(this.footerView) {
-      this._Box.appendChild(this.footerView.element);
+    // Now that the swap has occurred, it's safe to shutdown the old VisualKeyboard and any related stylesheets.
+    if(oldKbd instanceof VisualKeyboard) {
+      oldKbd.shutdown();
     }
+    oldKbdStyleManager.unlinkAll();
+
     // END:  construction of the actual internal layout for the overall OSK
+    // Footer element management is handled within FloatingOSKView.
 
     this.banner.appendStyles();
 
@@ -769,10 +755,6 @@ export default abstract class OSKView
 
   private _GenerateKeyboardView(keyboard: Keyboard, keyboardMetadata: KeyboardProperties): KeyboardView {
     let device = this.targetDevice;
-
-    if(this.vkbd) {
-      this.vkbd.shutdown();
-    }
 
     this._Box.className = "";
 
@@ -871,9 +853,8 @@ export default abstract class OSKView
       // Also, only change the layer ID itself if there is an actual corresponding layer
       // in the OSK.
       if(this.vkbd?.layerGroup.layers[newValue] && !this.vkbd?.layerLocked) {
+        // triggers state-update + layer refresh automatically.
         this.vkbd.layerId = newValue;
-        // Ensure that the layer's spacebar is properly captioned.
-        this.vkbd.showLanguage();
       }
 
       // Ensure the keyboard view is modeling the correct state.  (Correct layer, etc.)
@@ -907,10 +888,6 @@ export default abstract class OSKView
 
     // First thing after it's made visible.
     this.refreshLayoutIfNeeded();
-
-    if(this.keyboardView instanceof VisualKeyboard) {
-      this.keyboardView.showLanguage();
-    }
 
     this._Visible=true;
 

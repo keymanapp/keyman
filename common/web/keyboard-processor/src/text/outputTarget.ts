@@ -13,7 +13,7 @@ import { Deadkey, DeadkeyTracker } from "./deadkeys.js";
 
 export function isEmptyTransform(transform: Transform) {
   if(!transform) {
-    return false;
+    return true;
   }
   return transform.insert === '' && transform.deleteLeft === 0 && (transform.deleteRight ?? 0) === 0;
 }
@@ -21,15 +21,17 @@ export function isEmptyTransform(transform: Transform) {
 export class TextTransform implements Transform {
   readonly insert: string;
   readonly deleteLeft: number;
-  readonly deleteRight?: number;
+  readonly deleteRight: number;
+  readonly erasedSelection: boolean;
 
-  constructor(insert: string, deleteLeft: number, deleteRight?: number) {
+  constructor(insert: string, deleteLeft: number, deleteRight: number, erasedSelection: boolean) {
     this.insert = insert;
     this.deleteLeft = deleteLeft;
-    this.deleteRight = deleteRight || 0;
+    this.deleteRight = deleteRight;
+    this.erasedSelection = erasedSelection;
   }
 
-  public static readonly nil = new TextTransform('', 0, 0);
+  public static readonly nil = new TextTransform('', 0, 0, false);
 }
 
 export class Transcription {
@@ -138,7 +140,7 @@ export default abstract class OutputTarget {
     // caret mid-word..
     const deletedRight = fromRight.substring(0, rightDivergenceIndex + 1)._kmwLength();
 
-    return new TextTransform(insertedText, deletedLeft, deletedRight);
+    return new TextTransform(insertedText, deletedLeft, deletedRight, original.getSelectedText() && !this.getSelectedText());
   }
 
   buildTranscriptionFrom(original: OutputTarget, keyEvent: KeyEvent, readonly: boolean, alternates?: Alternate[]): Transcription {

@@ -1,9 +1,12 @@
-import { util, CompilerErrorNamespace, CompilerErrorSeverity, CompilerMessageSpec as m, CompilerMessageDef as def, CompilerMessageSpecWithException } from "@keymanapp/common-types";
+import { util, CompilerErrorNamespace, CompilerErrorSeverity, CompilerMessageSpec as m, CompilerMessageDef as def } from "@keymanapp/common-types";
 // const SevInfo = CompilerErrorSeverity.Info | CompilerErrorNamespace.LdmlKeyboardCompiler;
 const SevHint = CompilerErrorSeverity.Hint | CompilerErrorNamespace.LdmlKeyboardCompiler;
 const SevWarn = CompilerErrorSeverity.Warn | CompilerErrorNamespace.LdmlKeyboardCompiler;
 const SevError = CompilerErrorSeverity.Error | CompilerErrorNamespace.LdmlKeyboardCompiler;
-const SevFatal = CompilerErrorSeverity.Fatal | CompilerErrorNamespace.LdmlKeyboardCompiler;
+// const SevFatal = CompilerErrorSeverity.Fatal | CompilerErrorNamespace.LdmlKeyboardCompiler;
+
+// sub-numberspace for transform errors
+const SevErrorTransform = SevError | 0xF00;
 
 /**
  * @internal
@@ -59,9 +62,7 @@ export class CompilerMessages {
   static Error_MustBeAtLeastOneLayerElement = () =>
     m(this.ERROR_MustBeAtLeastOneLayerElement, `The source file must contain at least one layer element.`);
 
-  static FATAL_SectionCompilerFailed = SevFatal | 0x000F;
-  static Fatal_SectionCompilerFailed = (o:{sect: string}) =>
-  CompilerMessageSpecWithException(this.FATAL_SectionCompilerFailed, null, `The compiler for '${def(o.sect)}' failed unexpectedly.`);
+  // 0x000F - available
 
   /** annotate the to= or id= entry */
   private static outputOrKeyId(o:{output?: string, keyId?: string}) {
@@ -173,13 +174,27 @@ export class CompilerMessages {
   static Error_UnparseableReorderSet = (o: { from: string, set: string }) =>
   m(this.ERROR_UnparseableReorderSet, `Illegal UnicodeSet "${def(o.set)}" in reorder "${def(o.from)}`);
 
-  static ERROR_UnparseableTransformFrom = SevError | 0x0029;
-  static Error_UnparseableTransformFrom = (o: { from: string, message: string }) =>
-  m(this.ERROR_UnparseableTransformFrom, `Invalid transfom from "${def(o.from)}": "${def(o.message)}"`);
+  // Available: 0x029
 
   static ERROR_InvalidQuadEscape = SevError | 0x0030;
   static Error_InvalidQuadEscape = (o: { cp: number }) =>
-  m(this.ERROR_InvalidQuadEscape, `Invalid escape "\\u${util.hexQuad(o?.cp || 0)}", use "\\u{${def(o?.cp?.toString(16))}}" instead.`);
+  m(this.ERROR_InvalidQuadEscape, `Invalid escape "\\u${util.hexQuad(o?.cp || 0)}". Hint: Use "\\u{${def(o?.cp?.toString(16))}}"`);
+
+  //
+  // Transform syntax errors begin at ...F00 (SevErrorTransform)
+
+  // This is a bit of a catch-all and represents messages bubbling up from the underlying regex engine
+  static ERROR_UnparseableTransformFrom   = SevErrorTransform | 0x00;
+  static Error_UnparseableTransformFrom   = (o: { from: string, message: string }) =>
+  m(this.ERROR_UnparseableTransformFrom,    `Invalid transform from="${def(o.from)}": "${def(o.message)}"`);
+
+  static ERROR_IllegalTransformDollarsign = SevErrorTransform | 0x01;
+  static Error_IllegalTransformDollarsign = (o: { from: string }) =>
+  m(this.ERROR_IllegalTransformDollarsign,  `Invalid transform from="${def(o.from)}": Unescaped dollar-sign ($) is not valid transform syntax.`,
+                                            '**Hint**: Use `\\$` to match a literal dollar-sign.');
+
+  static ERROR_TransformFromMatchesNothing = SevErrorTransform | 0x02;
+  static Error_TransformFromMatchesNothing = (o: { from: string }) =>
+  m(this.ERROR_TransformFromMatchesNothing, `Invalid transfom from="${def(o.from)}": Matches an empty string.`);
+
 }
-
-
