@@ -347,18 +347,40 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
       perform(#selector(self.enableInputClickSound), with: nil, afterDelay: 0.1)
     }
 
-    var hasDeletedSelection = false
+    var deleteSelection = false
 
     if let selected = textDocumentProxy.selectedText {
       if selected.count > 0 {
-        textDocumentProxy.insertText("");
-        hasDeletedSelection = true
+        deleteSelection = true
       }
     }
 
-    if numCharsToDelete <= 0 || hasDeletedSelection {
-      textDocumentProxy.insertText(newText)
+    if deleteSelection && newText == "" {
+      /*
+        if deleteSelection && newText == "", we have a backspace on
+        selected text.  Sadly, .insertText("")... does nothing.  Why, Apple!?
+       
+        The one silver lining:  Apple makes it impossible for users to select text
+        in a way that splits character clusters.
+       
+        So, we can just insert something that won't combine, like a ZWNJ, and then delete it.
+      */
+      let beforeManipulation = textDocumentProxy.documentContextBeforeInput ?? ""
 
+      textDocumentProxy.insertText("\u{200c}")
+      textDocumentProxy.deleteBackward()
+      
+      let afterManipulation = textDocumentProxy.documentContextBeforeInput ?? ""
+      
+      // For good measure, a canary to signal if our selected-text backspace handling
+      // goes awry.
+      if beforeManipulation != afterManipulation {
+        os_log(.error, log: KeymanEngineLogger.engine, "Could not cleanly execute backspace for selected text")
+      }
+      sendContextUpdate()
+      return
+    } else if numCharsToDelete <= 0 || deleteSelection {
+      textDocumentProxy.insertText(newText)
       sendContextUpdate()
       return
     }
