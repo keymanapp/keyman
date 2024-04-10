@@ -15,6 +15,7 @@
 #include "state.hpp"
 #include "debuglog.h"
 #include "core_icu.h"
+#include "kmx/kmx_xstring.h" // for Unicode routines
 
 using namespace km::core;
 
@@ -57,6 +58,12 @@ km_core_state_context_set_if_needed(
   assert(new_app_context != nullptr);
   if (state == nullptr || new_app_context == nullptr) {
     return KM_CORE_CONTEXT_STATUS_INVALID_ARGUMENT;
+  }
+
+  // if the app context begins with a trailing surrogate,
+  // skip over it.
+  if (Uni_IsSurrogate2(*new_app_context)) {
+    new_app_context++;
   }
 
   auto app_context    = km_core_state_app_context(state);
