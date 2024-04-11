@@ -484,6 +484,7 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
           this.highlightKey(oldKey, false);
           this.gesturePreviewHost?.cancel();
           this.gesturePreviewHost = null;
+          trackingEntry.previewHost = null;
 
           const previewHost = this.highlightKey(key, true);
           if(previewHost) {
@@ -530,6 +531,13 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
         const existingPreviewHost = gestureSequence.allSourceIds.map((id) => {
           return sourceTrackingMap[id]?.previewHost;
         }).find((obj) => !!obj);
+
+        const clearPreviewHost = () => {
+          if(existingPreviewHost) {
+            existingPreviewHost.cancel();
+            this.gesturePreviewHost = null;
+          }
+        }
 
         let handlers: GestureHandler[] = gestureHandlerMap.get(gestureSequence);
         if(!handlers && existingPreviewHost && !gestureStage.matchedId.includes('flick')) {
@@ -625,7 +633,7 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
         if(gestureStage.matchedId == 'special-key-start') {
           if(gestureKey.key.spec.baseKeyID == 'K_BKSP') {
             // There shouldn't be a preview host for special keys... but it doesn't hurt to add the check.
-            existingPreviewHost?.cancel();
+            clearPreviewHost();
 
             // Possible enhancement:  maybe update the held location for the backspace if there's movement?
             // But... that seems pretty low-priority.
@@ -647,7 +655,7 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
             gestureKey.key.highlight(true);
           }
         } else if(gestureStage.matchedId.indexOf('longpress') > -1) {
-          existingPreviewHost?.cancel();
+          clearPreviewHost();
 
           // Matches:  'longpress', 'longpress-reset'.
           // Likewise.
@@ -666,8 +674,7 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
           trackingEntry.previewHost = null;
 
           gestureSequence.on('complete', () => {
-            existingPreviewHost?.cancel();
-            this.gesturePreviewHost = null;
+            clearPreviewHost();
           })
 
           // Past that, mere construction of the class for delegation is enough.
@@ -683,7 +690,7 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
           )];
         } else if(gestureStage.matchedId.includes('modipress') && gestureStage.matchedId.includes('-start')) {
           // There shouldn't be a preview host for modipress keys... but it doesn't hurt to add the check.
-          existingPreviewHost?.cancel();
+          clearPreviewHost();
 
           if(this.layerLocked) {
             console.warn("Unexpected state:  modipress start attempt during an active modipress");
@@ -703,7 +710,7 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
           }
         } else {
           // Probably an initial-tap or a simple-tap.
-          existingPreviewHost?.cancel();
+          clearPreviewHost();
         }
 
         if(handlers) {
@@ -1109,38 +1116,6 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
   //#endregion
 
   /**
-   * Indicate the current language and keyboard on the space bar
-   **/
-  showLanguage() {
-    let activeStub = this.layoutKeyboardProperties;
-    let displayName: string = activeStub?.displayName ?? '(System keyboard)';
-
-    try {
-      var t = <HTMLElement>this.spaceBar.key.label;
-      let tParent = <HTMLElement>t.parentNode;
-      if (typeof (tParent.className) == 'undefined' || tParent.className == '') {
-        tParent.className = 'kmw-spacebar';
-      } else if (tParent.className.indexOf('kmw-spacebar') == -1) {
-        tParent.className += ' kmw-spacebar';
-      }
-
-      if (t.className != 'kmw-spacebar-caption') {
-        t.className = 'kmw-spacebar-caption';
-      }
-
-      // It sounds redundant, but this dramatically cuts down on browser DOM processing;
-      // but sometimes innerText is reported empty when it actually isn't, so set it
-      // anyway in that case (Safari, iOS 14.4)
-      if (t.innerText != displayName || displayName == '') {
-        t.innerText = displayName;
-      }
-
-      this.spaceBar.key.refreshLayout(this);
-    }
-    catch (ex) { }
-  }
-
-  /**
    *  Add or remove a class from a keyboard key (when touched or clicked)
    *  or add a key preview for phone devices
    *
@@ -1262,7 +1237,6 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
     const isInDOM = computedStyle.height != '' && computedStyle.height != 'auto';
 
     // Step 2:  determine basic layout geometry, refresh things that might update.
-    this.showLanguage(); // In case the spacebar-text mode setting has changed.
 
     if (fixedSize) {
       this._computedWidth = this.width;
@@ -1281,6 +1255,10 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
       return;
     }
 
+    // Set layer-group copies of the computed-size values; they are used by nearest-key
+    // detection.
+    this.layerGroup.refreshLayout(this._computedWidth, this._computedHeight);
+
     // Step 3: recalculate gesture parameter values
     // Skip for doc-keyboards, since they don't do gestures.
     if(!this.isStatic) {
@@ -1296,7 +1274,10 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
     // Step 4:  perform layout operations.
     // Needs the refreshed layout info to work correctly.
     if(this.currentLayer) {
-      this.currentLayer.refreshLayout(this, this._computedHeight - this.getVerticalLayerGroupPadding());
+      this.currentLayer.refreshLayout(this, {
+        keyboardHeight: this._computedHeight - this.getVerticalLayerGroupPadding(),
+        spacebarText: this.layoutKeyboardProperties?.displayName ?? '(System keyboard)'
+      });
     }
   }
 

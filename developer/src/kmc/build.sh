@@ -126,7 +126,7 @@ if builder_start_action bundle; then
   mkdir -p build/dist
   node build-bundler.js
 
-  ./node_modules/.bin/sentry-cli sourcemaps inject \
+  sentry-cli sourcemaps inject \
     --org keyman \
     --project keyman-developer \
     --release "$VERSION_GIT_TAG"  \

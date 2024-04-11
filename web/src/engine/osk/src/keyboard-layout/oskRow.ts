@@ -11,6 +11,7 @@ export default class OSKRow {
   public readonly element: HTMLDivElement;
   public readonly keys: OSKBaseKey[];
   public readonly heightFraction: number;
+  public readonly spec: ActiveRow;
 
   public constructor(vkbd: VisualKeyboard,
                       layerSpec: ActiveLayer,
@@ -23,6 +24,7 @@ export default class OSKRow {
 
     // Apply defaults, setting the width and other undefined properties for each key
     const keys=rowSpec.key;
+    this.spec = rowSpec;
     this.keys = [];
 
     // Calculate actual key widths by multiplying by the OSK's width and rounding appropriately,

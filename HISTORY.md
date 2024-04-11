@@ -1,5 +1,48 @@
 # Keyman Version History
 
+## 17.0.305 beta 2024-04-10
+
+*  (#11169)
+* change(web): merges split async method in gesture engine 🪠 (#11142)
+* fix(web): blocks nextLayer for keys quickly typed when multitapping to new layer when final tap is held (#11189)
+* refactor(web): OSK spacebar-label updates now managed by layer object 🪠 (#11175)
+
+## 17.0.304 beta 2024-04-09
+
+* fix(android): atomically updates selection with text (#11188)
+*  (#11178)
+
+## 17.0.303 beta 2024-04-05
+
+* fix(windows): decode uri for Package ID and filename (#11152)
+* fix(common/models): suggestion stability after multiple whitespaces (#11164)
+
+## 17.0.302 beta 2024-04-04
+
+* fix(mac): load only 80 characters from context when processing keystrokes (#11141)
+
+## 17.0.301 beta 2024-04-03
+
+* feat(core): support modifiers=other (#11118)
+* chore(core): dx better err message on embedded test vkeys (#11119)
+* fix(web): key preview stickiness 🪠 (#10778)
+* fix(web): early gesture-match abort when unable to extend existing gestures 🪠 (#10836)
+* fix(web): infinite model-match replacement looping 🪠 (#10838)
+* fix(web): proper gesture-match sequencing 🪠 (#10840)
+* change(web): input-event sequentialization 🪠 (#10843)
+* fix(web): proper linkage of sources to events 🪠 (#10960)
+* fix(developer): handle buffer boundaries in four cases (#11137)
+* chore(linux): Build packages for next Ubuntu version separately :cherries: (#11153)
+* fix(common): upgrade sentry-cli to 2.31.0 (#11151)
+* fix(android/app): Track previous device orientation for SystemKeyboard (#11134)
+*  (#11129)
+
+## 17.0.300 beta 2024-04-02
+
+* change(web): keyboard swaps keep original keyboards active until fully ready (#11108)
+* fix(android/engine): Swap selection range if reversed (#11127)
+* test(developer): keyboard info compiler unit tests (#11000)
+
 ## 17.0.299 beta 2024-04-01
 
 * fix(ios):  address crash by reading full code point rather than code unit when trimming initial directional-mark (#11113)
