@@ -288,22 +288,15 @@ describe('keyboard-info-compiler', function () {
         ],
         packageIncludes: ["fonts","welcome","visualKeyboard", "documentation"]
       },
-      {
-        files: [{ name: "font.ttf", description: ''}],
-        packageIncludes: ["fonts"]
-      },
-      {
-        files: [{ name: "welcome.htm", description: ''}],
-        packageIncludes: ["welcome"]
-      },
-      {
-        files: [{ name: "font.kvk", description: ''}],
-        packageIncludes: ["visualKeyboard"]
-      },
-      {
-        files: [{ name: "doc.pdf", description: ''}],
-        packageIncludes: ["documentation"]
-      },
+      { files: [{ name: "font.ttf", description: ''}], packageIncludes: ["fonts"] },
+      { files: [{ name: "font.otf", description: ''}], packageIncludes: ["fonts"] },
+      { files: [{ name: "font.ttc", description: ''}], packageIncludes: ["fonts"] },
+      { files: [{ name: "welcome.htm", description: ''}], packageIncludes: ["welcome"] },
+      { files: [{ name: "font.kvk", description: ''}], packageIncludes: ["visualKeyboard"] },
+      { files: [{ name: "doc.rtf", description: ''}], packageIncludes: ["documentation"] },
+      { files: [{ name: "doc.html", description: ''}], packageIncludes: ["documentation"] },
+      { files: [{ name: "doc.htm", description: ''}], packageIncludes: ["documentation"] },
+      { files: [{ name: "doc.pdf", description: ''}], packageIncludes: ["documentation"] },
     ];
     testCases.forEach(async function (testCase) {
       kmpJsonData.files = testCase.files;
