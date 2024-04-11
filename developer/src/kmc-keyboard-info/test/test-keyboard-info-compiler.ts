@@ -315,6 +315,35 @@ describe('keyboard-info-compiler', function () {
     });
   });
 
+  it('check run sets minKeymanVersion correctly', async function() {
+    const kpjFilename = KHMER_ANGKOR_KPJ;
+    const sources = KHMER_ANGKOR_SOURCES;
+    const compiler = new KeyboardInfoCompiler();
+    assert.isTrue(await compiler.init(callbacks, {sources}));
+    const origCompilerLoadJsFile = compiler['loadJsFile'];
+    const origKmxFileVersionToString = compiler['kmxFileVersionToString'];
+    const testCases = [
+      { js:  '4.0', omitJs:  true, kmx:  '4.0', expected:  '5.0' },
+      { js:  '4.0', omitJs: false, kmx:  '4.0', expected:  '5.0' },
+      { js: '10.0', omitJs: false, kmx:  '4.0', expected: '10.0' },
+      { js:  '4.0', omitJs: false, kmx: '10.0', expected: '10.0' },
+      { js: '10.0', omitJs: false, kmx: '10.0', expected: '10.0' },
+    ];
+    testCases.forEach(async function (testCase) {
+      let jsFile = compiler['loadJsFile'](sources.jsFilename);
+      const insert = testCase.omitJs ? '' : `this.KMINVER=${testCase.js};`;
+      jsFile = jsFile.replace('this.KMINVER="10.0";', insert);
+      compiler['loadJsFile'] = (_filename: string) => jsFile;
+      compiler['kmxFileVersionToString'] = (_version: number) => testCase.kmx;
+      const result = await compiler.run(kpjFilename, null);
+      compiler['loadJsFile'] = origCompilerLoadJsFile;
+      compiler['kmxFileVersionToString'] = origKmxFileVersionToString;
+      assert.isNotNull(result);
+      const keyboard_info = JSON.parse(new TextDecoder().decode(result.artifacts.keyboard_info.data));
+      assert.deepEqual(keyboard_info.minKeymanVersion, testCase.expected);
+    });
+  });
+
   it('should write artifacts to disk', async function() {
     const kpjFilename = KHMER_ANGKOR_KPJ;
     const actualFilename = makePathToFixture('khmer_angkor', 'build', 'actual.keyboard_info');
