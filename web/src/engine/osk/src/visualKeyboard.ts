@@ -1116,38 +1116,6 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
   //#endregion
 
   /**
-   * Indicate the current language and keyboard on the space bar
-   **/
-  showLanguage() {
-    let activeStub = this.layoutKeyboardProperties;
-    let displayName: string = activeStub?.displayName ?? '(System keyboard)';
-
-    try {
-      var t = <HTMLElement>this.spaceBar.key.label;
-      let tParent = <HTMLElement>t.parentNode;
-      if (typeof (tParent.className) == 'undefined' || tParent.className == '') {
-        tParent.className = 'kmw-spacebar';
-      } else if (tParent.className.indexOf('kmw-spacebar') == -1) {
-        tParent.className += ' kmw-spacebar';
-      }
-
-      if (t.className != 'kmw-spacebar-caption') {
-        t.className = 'kmw-spacebar-caption';
-      }
-
-      // It sounds redundant, but this dramatically cuts down on browser DOM processing;
-      // but sometimes innerText is reported empty when it actually isn't, so set it
-      // anyway in that case (Safari, iOS 14.4)
-      if (t.innerText != displayName || displayName == '') {
-        t.innerText = displayName;
-      }
-
-      this.spaceBar.key.refreshLayout(this);
-    }
-    catch (ex) { }
-  }
-
-  /**
    *  Add or remove a class from a keyboard key (when touched or clicked)
    *  or add a key preview for phone devices
    *
@@ -1269,7 +1237,6 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
     const isInDOM = computedStyle.height != '' && computedStyle.height != 'auto';
 
     // Step 2:  determine basic layout geometry, refresh things that might update.
-    this.showLanguage(); // In case the spacebar-text mode setting has changed.
 
     if (fixedSize) {
       this._computedWidth = this.width;
@@ -1307,7 +1274,10 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
     // Step 4:  perform layout operations.
     // Needs the refreshed layout info to work correctly.
     if(this.currentLayer) {
-      this.currentLayer.refreshLayout(this, this._computedHeight - this.getVerticalLayerGroupPadding());
+      this.currentLayer.refreshLayout(this, {
+        keyboardHeight: this._computedHeight - this.getVerticalLayerGroupPadding(),
+        spacebarText: this.layoutKeyboardProperties?.displayName ?? '(System keyboard)'
+      });
     }
   }
 
