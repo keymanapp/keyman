@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 17.0.306 beta 2024-04-11
+
+* docs(ios): updates iOS app help for 17.0 banner changes (#11200)
+* chore(oem/fv): Add fv sguuxs and update keyboard versions (#11198)
+
 ## 17.0.305 beta 2024-04-10
 
 *  (#11169)
