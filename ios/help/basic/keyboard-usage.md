@@ -22,5 +22,7 @@ The Gestures:
 
 * **Flick:** hold and slide in various directions on a key to reach alternate outputs. The key will animate to show you the expected output. For example, a keyboard could support sliding down on keys in the top row to output numerals.
 
+![](../ios_images/down-flick-i.gif)
+
 * **Multitap:** some keys produce alternate outputs with rapid, repeated taps. For example, tapping rapidly twice on <kbd>shift</kbd> will activate <kbd>caps lock</kbd> on many keyboards.
 
