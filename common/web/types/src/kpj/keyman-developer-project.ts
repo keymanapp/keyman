@@ -40,7 +40,7 @@ export class KeymanDeveloperProject {
         try {
           const data = this.callbacks.loadFile(fullPath);
           const text = new TextDecoder().decode(data);
-          if(!text?.match(/ldmlKeyboard3\.dtd/)) {
+          if(!text?.match(/<keyboard3/)) {
             // Skip this .xml because we assume it isn't really a keyboard .xml
             continue;
           }
