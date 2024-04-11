@@ -263,7 +263,28 @@ describe('keyboard-info-compiler', function () {
     assert.isNull(result);
   }); 
 
-  it('check run sets packageIncludes correctly', async function() {
+  const packageIncludesTestCases = [
+    {
+      files: [
+        { name: "font.ttf", description: ''},
+        { name: "welcome.htm", description: ''},
+        { name: "font.kvk", description: ''},
+        { name: "doc.pdf", description: ''},
+      ],
+      packageIncludes: ["fonts","welcome","visualKeyboard", "documentation"]
+    },
+    { files: [{ name: "font.ttf", description: ''}], packageIncludes: ["fonts"] },
+    { files: [{ name: "font.otf", description: ''}], packageIncludes: ["fonts"] },
+    { files: [{ name: "font.ttc", description: ''}], packageIncludes: ["fonts"] },
+    { files: [{ name: "welcome.htm", description: ''}], packageIncludes: ["welcome"] },
+    { files: [{ name: "font.kvk", description: ''}], packageIncludes: ["visualKeyboard"] },
+    { files: [{ name: "doc.rtf", description: ''}], packageIncludes: ["documentation"] },
+    { files: [{ name: "doc.html", description: ''}], packageIncludes: ["documentation"] },
+    { files: [{ name: "doc.htm", description: ''}], packageIncludes: ["documentation"] },
+    { files: [{ name: "doc.pdf", description: ''}], packageIncludes: ["documentation"] },
+  ];
+
+  packageIncludesTestCases.forEach((testCase) => it('check run sets packageIncludes correctly', async function() {
     const kpjFilename = KHMER_ANGKOR_KPJ;
     const sources = KHMER_ANGKOR_SOURCES;
     const compiler = new KeyboardInfoCompiler();
@@ -278,71 +299,48 @@ describe('keyboard-info-compiler', function () {
     const kmpJsonData = kmpCompiler.transformKpsToKmpObject(kpsFilename);
     assert.isNotNull(kmpJsonData);
     const origKmpCompilerTransformKpsToKmpObject = KmpCompiler.prototype.transformKpsToKmpObject;
-    const testCases = [
-      {
-        files: [
-          { name: "font.ttf", description: ''},
-          { name: "welcome.htm", description: ''},
-          { name: "font.kvk", description: ''},
-          { name: "doc.pdf", description: ''},
-        ],
-        packageIncludes: ["fonts","welcome","visualKeyboard", "documentation"]
-      },
-      { files: [{ name: "font.ttf", description: ''}], packageIncludes: ["fonts"] },
-      { files: [{ name: "font.otf", description: ''}], packageIncludes: ["fonts"] },
-      { files: [{ name: "font.ttc", description: ''}], packageIncludes: ["fonts"] },
-      { files: [{ name: "welcome.htm", description: ''}], packageIncludes: ["welcome"] },
-      { files: [{ name: "font.kvk", description: ''}], packageIncludes: ["visualKeyboard"] },
-      { files: [{ name: "doc.rtf", description: ''}], packageIncludes: ["documentation"] },
-      { files: [{ name: "doc.html", description: ''}], packageIncludes: ["documentation"] },
-      { files: [{ name: "doc.htm", description: ''}], packageIncludes: ["documentation"] },
-      { files: [{ name: "doc.pdf", description: ''}], packageIncludes: ["documentation"] },
-    ];
-    testCases.forEach(async function (testCase) {
-      kmpJsonData.files = testCase.files;
-      let result: KeyboardInfoCompilerResult;
-      try {
-        KmpCompiler.prototype.transformKpsToKmpObject = (_kpsFilename: string): KmpJsonFile.KmpJsonFile => kmpJsonData;
-        result = await compiler.run(kpjFilename, null);
-      } catch(e) {
-        assert.fail(e);
-      } finally {
-        KmpCompiler.prototype.transformKpsToKmpObject = origKmpCompilerTransformKpsToKmpObject;
-      }
-      assert.isNotNull(result);
-      const keyboard_info = JSON.parse(new TextDecoder().decode(result.artifacts.keyboard_info.data));
-      assert.deepEqual(keyboard_info.packageIncludes.sort(), testCase.packageIncludes.sort());
-    });
-  });
+    kmpJsonData.files = testCase.files;
+    let result: KeyboardInfoCompilerResult;
+    try {
+      KmpCompiler.prototype.transformKpsToKmpObject = (_kpsFilename: string): KmpJsonFile.KmpJsonFile => kmpJsonData;
+      result = await compiler.run(kpjFilename, null);
+    } catch(e) {
+      assert.fail(e);
+    } finally {
+      KmpCompiler.prototype.transformKpsToKmpObject = origKmpCompilerTransformKpsToKmpObject;
+    }
+    assert.isNotNull(result);
+    const keyboard_info = JSON.parse(new TextDecoder().decode(result.artifacts.keyboard_info.data));
+    assert.deepEqual(keyboard_info.packageIncludes.sort(), testCase.packageIncludes.sort());
+  }));
 
-  it('check run sets minKeymanVersion correctly', async function() {
+  const minKeymanVersionTestCases = [
+    { js:  '4.0', omitJs:  true, kmx:  '4.0', expected:  '5.0' },
+    { js:  '4.0', omitJs: false, kmx:  '4.0', expected:  '5.0' },
+    { js: '10.0', omitJs: false, kmx:  '4.0', expected: '10.0' },
+    { js:  '4.0', omitJs: false, kmx: '10.0', expected: '10.0' },
+    { js: '10.0', omitJs: false, kmx: '10.0', expected: '10.0' },
+  ];
+
+  minKeymanVersionTestCases.forEach((testCase) => it('check run sets minKeymanVersion correctly', async function() {
     const kpjFilename = KHMER_ANGKOR_KPJ;
     const sources = KHMER_ANGKOR_SOURCES;
     const compiler = new KeyboardInfoCompiler();
     assert.isTrue(await compiler.init(callbacks, {sources}));
     const origCompilerLoadJsFile = compiler['loadJsFile'];
     const origKmxFileVersionToString = compiler['kmxFileVersionToString'];
-    const testCases = [
-      { js:  '4.0', omitJs:  true, kmx:  '4.0', expected:  '5.0' },
-      { js:  '4.0', omitJs: false, kmx:  '4.0', expected:  '5.0' },
-      { js: '10.0', omitJs: false, kmx:  '4.0', expected: '10.0' },
-      { js:  '4.0', omitJs: false, kmx: '10.0', expected: '10.0' },
-      { js: '10.0', omitJs: false, kmx: '10.0', expected: '10.0' },
-    ];
-    testCases.forEach(async function (testCase) {
-      let jsFile = compiler['loadJsFile'](sources.jsFilename);
-      const insert = testCase.omitJs ? '' : `this.KMINVER=${testCase.js};`;
-      jsFile = jsFile.replace('this.KMINVER="10.0";', insert);
-      compiler['loadJsFile'] = (_filename: string) => jsFile;
-      compiler['kmxFileVersionToString'] = (_version: number) => testCase.kmx;
-      const result = await compiler.run(kpjFilename, null);
-      compiler['loadJsFile'] = origCompilerLoadJsFile;
-      compiler['kmxFileVersionToString'] = origKmxFileVersionToString;
-      assert.isNotNull(result);
-      const keyboard_info = JSON.parse(new TextDecoder().decode(result.artifacts.keyboard_info.data));
-      assert.deepEqual(keyboard_info.minKeymanVersion, testCase.expected);
-    });
-  });
+    let jsFile = compiler['loadJsFile'](sources.jsFilename);
+    const insert = testCase.omitJs ? '' : `this.KMINVER="${testCase.js}";`;
+    jsFile = jsFile.replace('this.KMINVER="10.0";', insert);
+    compiler['loadJsFile'] = (_filename: string) => jsFile;
+    compiler['kmxFileVersionToString'] = (_version: number) => testCase.kmx;
+    const result = await compiler.run(kpjFilename, null);
+    compiler['loadJsFile'] = origCompilerLoadJsFile;
+    compiler['kmxFileVersionToString'] = origKmxFileVersionToString;
+    assert.isNotNull(result);
+    const keyboard_info = JSON.parse(new TextDecoder().decode(result.artifacts.keyboard_info.data));
+    assert.deepEqual(keyboard_info.minKeymanVersion, testCase.expected);
+  }));
 
   it('should write artifacts to disk', async function() {
     const kpjFilename = KHMER_ANGKOR_KPJ;
