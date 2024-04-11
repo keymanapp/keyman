@@ -229,7 +229,7 @@ final class KMKeyboard extends WebView {
 
     getSettings().setCacheMode(WebSettings.LOAD_NO_CACHE);
     getSettings().setSupportZoom(false);
-
+    getSettings().setMinimumFontSize(4);
     getSettings().setUseWideViewPort(true);
     getSettings().setLoadWithOverviewMode(true);
     if (0 != (context.getApplicationInfo().flags & ApplicationInfo.FLAG_DEBUGGABLE)) {

@@ -231,10 +231,16 @@ export default abstract class OSKKey {
       proportion = yProportion;
     }
 
-    // Never upscale keys past the default * the specified scale - only downscale them.
-    // Proportion < 1:  ratio of key width to (padded [loosely speaking]) text width
-    //                  maxProportion determines the 'padding' involved.
-    return ParsedLengthStyle.forScalar(scale * Math.min(proportion, 1));
+    /*
+      Never upscale keys past the default - only downscale them.  Proportion <
+      1:  ratio of key width to (padded [loosely speaking]) text width
+      maxProportion determines the 'padding' involved.
+
+      Due to behaviors noted with #11203, we use fixed-size scaling based on the
+      relative font-size specifications; this forces font-size scaling even when
+      the resulting text becomes smaller than WebView-default thresholds.
+    */
+    return originalSize.scaledBy(Math.min(proportion, 1));
   }
 
   public get keyText(): string {
