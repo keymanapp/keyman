@@ -151,7 +151,11 @@ final class KMKeyboard extends WebView {
     boolean result = false;
     String kmText = "";
     if (text != null) {
-      kmText = text.toString().replace("\\", "\\u005C").replace("'", "\\u0027").replace("\n", "\\n");
+      // Replace special literal characters to pass to Javascript
+      kmText = text.toString().replace("\\", "\\u005C")
+                              .replace("%", "\\u0025")
+                              .replace("'", "\\u0027")
+                              .replace("\n", "\\n");
     }
 
     if (KMManager.isKeyboardLoaded(this.keyboardType) && !shouldIgnoreTextChange) {
