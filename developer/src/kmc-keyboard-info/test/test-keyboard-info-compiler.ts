@@ -263,6 +263,65 @@ describe('keyboard-info-compiler', function () {
     assert.isNull(result);
   }); 
 
+  it('check run sets packageIncludes correctly', async function() {
+    const kpjFilename = KHMER_ANGKOR_KPJ;
+    const sources = KHMER_ANGKOR_SOURCES;
+    const compiler = new KeyboardInfoCompiler();
+    assert.isTrue(await compiler.init(callbacks, {sources}));
+    // stubbed to avoid problems with missing font files
+    compiler['fontSourceToKeyboardInfoFont'] = async (_kpsFilename: string, _kmpJsonData: KmpJsonFile.KmpJsonFile, _source: string[]) => {
+      return (_source[0] == KHMER_ANGKOR_DISPLAY_FONT) ? KHMER_ANGKOR_DISPLAY_FONT_INFO : KHMER_ANGKOR_OSK_FONT_INFO;
+    }
+    const kpsFilename = KHMER_ANGKOR_KPS;
+    const kmpCompiler = new KmpCompiler();
+    assert.isTrue(await kmpCompiler.init(callbacks, {}));
+    const kmpJsonData = kmpCompiler.transformKpsToKmpObject(kpsFilename);
+    assert.isNotNull(kmpJsonData);
+    const origKmpCompilerTransformKpsToKmpObject = KmpCompiler.prototype.transformKpsToKmpObject;
+    const testCases = [
+      {
+        files: [
+          { name: "font.ttf", description: ''},
+          { name: "welcome.htm", description: ''},
+          { name: "font.kvk", description: ''},
+          { name: "doc.pdf", description: ''},
+        ],
+        packageIncludes: ["fonts","welcome","visualKeyboard", "documentation"]
+      },
+      {
+        files: [{ name: "font.ttf", description: ''}],
+        packageIncludes: ["fonts"]
+      },
+      {
+        files: [{ name: "welcome.htm", description: ''}],
+        packageIncludes: ["welcome"]
+      },
+      {
+        files: [{ name: "font.kvk", description: ''}],
+        packageIncludes: ["visualKeyboard"]
+      },
+      {
+        files: [{ name: "doc.pdf", description: ''}],
+        packageIncludes: ["documentation"]
+      },
+    ];
+    testCases.forEach(async function (testCase) {
+      kmpJsonData.files = testCase.files;
+      let result: KeyboardInfoCompilerResult;
+      try {
+        KmpCompiler.prototype.transformKpsToKmpObject = (_kpsFilename: string): KmpJsonFile.KmpJsonFile => kmpJsonData;
+        result = await compiler.run(kpjFilename, null);
+      } catch(e) {
+        assert.fail(e);
+      } finally {
+        KmpCompiler.prototype.transformKpsToKmpObject = origKmpCompilerTransformKpsToKmpObject;
+      }
+      assert.isNotNull(result);
+      const keyboard_info = JSON.parse(new TextDecoder().decode(result.artifacts.keyboard_info.data));
+      assert.deepEqual(keyboard_info.packageIncludes.sort(), testCase.packageIncludes.sort());
+    });
+  });
+
   it('should write artifacts to disk', async function() {
     const kpjFilename = KHMER_ANGKOR_KPJ;
     const actualFilename = makePathToFixture('khmer_angkor', 'build', 'actual.keyboard_info');
