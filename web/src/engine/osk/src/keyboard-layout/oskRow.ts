@@ -3,6 +3,15 @@ import { ActiveKey, ActiveLayer, ActiveRow } from '@keymanapp/keyboard-processor
 import OSKBaseKey from './oskBaseKey.js';
 import { ParsedLengthStyle } from '../lengthStyle.js';
 import VisualKeyboard from '../visualKeyboard.js';
+import { KeyLayoutParams } from './oskKey.js';
+import { LayerLayoutParams } from './oskLayer.js';
+
+/*
+  The total proportion of key-square height used as key-button padding.
+  The 'padding' is visible to users as the vertical space between keys
+  and exists both in "fixed" and "absolute" sizing modes.
+*/
+export const KEY_BTN_Y_PAD_RATIO = 0.15;
 
 /**
  * Models one row of one layer of the OSK (`VisualKeyboard`) for a keyboard.
@@ -57,34 +66,78 @@ export default class OSKRow {
     }
   }
 
-  public refreshLayout(vkbd: VisualKeyboard) {
+  public refreshLayout(layoutParams: LayerLayoutParams) {
     const rs = this.element.style;
 
-    const rowHeight = vkbd.internalHeight.scaledBy(this.heightFraction);
-    rs.maxHeight=rs.lineHeight=rs.height=rowHeight.styleString;
+    const rowHeight = layoutParams.heightStyle.scaledBy(this.heightFraction);
+    const executeRowStyleUpdates = () => {
+      rs.maxHeight=rs.lineHeight=rs.height=rowHeight.styleString;
+    }
 
-    // Only used for fixed-height scales at present.
-    const padRatio = 0.15;
+    const keyHeightBase = layoutParams.heightStyle.absolute ? rowHeight : ParsedLengthStyle.forScalar(1);
+    const padTop = keyHeightBase.scaledBy(KEY_BTN_Y_PAD_RATIO / 2);
+    const keyHeight = keyHeightBase.scaledBy(1 - KEY_BTN_Y_PAD_RATIO);
 
-    const keyHeightBase = vkbd.usesFixedHeightScaling ? rowHeight : ParsedLengthStyle.forScalar(1);
-    const padTop = keyHeightBase.scaledBy(padRatio / 2);
-    const keyHeight = keyHeightBase.scaledBy(1 - padRatio);
+    // Update all key-square layouts.
+    const keyStyleUpdates = this.keys.map((key) => {
+      return () => {
+        const keySquare  = key.square;
+        const keyElement = key.btn;
 
-    for(const key of this.keys) {
-      const keySquare  = key.btn.parentElement;
+        // Set the kmw-key-square position
+        const kss = keySquare.style;
+        kss.height=kss.minHeight=keyHeightBase.styleString;
+
+        const kes = keyElement.style;
+        kes.top = padTop.styleString;
+        kes.height=kes.lineHeight=kes.minHeight=keyHeight.styleString;
+      }
+    })
+
+    return () => {
+      executeRowStyleUpdates();
+      keyStyleUpdates.forEach((closure) => closure());
+    }
+  }
+
+  public refreshKeyLayouts(layoutParams: LayerLayoutParams) {
+    const updateClosures = this.keys.map((key) => {
+      // Calculate changes to be made...
       const keyElement = key.btn;
 
-      // Set the kmw-key-square position
-      const kss = keySquare.style;
-      kss.height=kss.minHeight=keyHeightBase.styleString;
+      const widthStyle = layoutParams.widthStyle;
+      const heightStyle = layoutParams.heightStyle;
 
-      const kes = keyElement.style;
-      kes.top = padTop.styleString;
-      kes.height=kes.lineHeight=kes.minHeight=keyHeight.styleString;
+      const keyWidth = widthStyle.scaledBy(key.spec.proportionalWidth);
+      const keyPad =   widthStyle.scaledBy(key.spec.proportionalPad);
 
-      if(keyElement.key) {
-        keyElement.key.refreshLayout(vkbd);
+      // We maintain key-btn padding within the key-square - the latter `scaledBy`
+      // adjusts for that, providing the final key-btn height.
+      const keyHeight = heightStyle.scaledBy(this.heightFraction).scaledBy(1 - KEY_BTN_Y_PAD_RATIO);
+
+      // Match the row height (if fixed-height) or use full row height (if percent-based)
+      const styleHeight = heightStyle.absolute ? keyHeight.styleString : '100%';
+
+      const keyStyle: KeyLayoutParams = {
+        keyWidth:  keyWidth.val  * (keyWidth.absolute ? 1 : layoutParams.keyboardWidth),
+        keyHeight: keyHeight.val * (heightStyle.absolute ? 1 : layoutParams.keyboardHeight),
+        baseEmFontSize: layoutParams.baseEmFontSize,
+        layoutFontSize: layoutParams.layoutFontSize
+      };
+      //return keyElement.key ? keyElement.key.refreshLayout(keyStyle) : () => {};
+      const keyFontClosure = keyElement.key ? keyElement.key.refreshLayout(keyStyle) : () => {};
+
+      // And queue them to be run in a single batch later.  This helps us avoid layout reflow thrashing.
+      return () => {
+        key.square.style.width = keyWidth.styleString;
+        key.square.style.marginLeft = keyPad.styleString;
+
+        key.btn.style.width = widthStyle.absolute ? keyWidth.styleString : '100%';
+        key.square.style.height = styleHeight;
+        keyFontClosure();
       }
-    }
+    });
+
+    return () => updateClosures.forEach((closure) => closure());
   }
 }
