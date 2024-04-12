@@ -231,11 +231,11 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
   public readonly layoutKeyboardProperties: KeyboardProperties;
 
   get layerId(): string {
-    return this._layerId;
+    return this.layerGroup?.activeLayerId ?? 'default';
   }
 
   set layerId(value: string) {
-    const changedLayer = value != this._layerId;
+    const changedLayer = value != this.layerId;
     if(!this.layerGroup.layers[value]) {
       throw new Error(`Keyboard ${this.layoutKeyboard.id} does not have a layer with id ${value}`);
     } else {
@@ -255,7 +255,7 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
   }
 
   get currentLayer(): OSKLayer {
-    return this.layerId ? this.layerGroup?.layers[this.layerId] : null;
+    return this.layerGroup?.activeLayer;
   }
 
   // Special keys (for the currently-visible layer)
@@ -811,7 +811,7 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
   get internalHeight(): ParsedLengthStyle {
     if (this.usesFixedHeightScaling) {
       // Touch OSKs may apply internal padding to prevent row cropping at the edges.
-      return ParsedLengthStyle.inPixels(this.layoutHeight.val - this.getVerticalLayerGroupPadding());
+      return ParsedLengthStyle.inPixels(this.layoutHeight.val - this.layerGroup.verticalPadding);
     } else {
       return ParsedLengthStyle.forScalar(1);
     }
@@ -1255,10 +1255,6 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
       return;
     }
 
-    // Set layer-group copies of the computed-size values; they are used by nearest-key
-    // detection.
-    this.layerGroup.refreshLayout(this._computedWidth, this._computedHeight);
-
     // Step 3: recalculate gesture parameter values
     // Skip for doc-keyboards, since they don't do gestures.
     if(!this.isStatic) {
@@ -1273,22 +1269,11 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
 
     // Step 4:  perform layout operations.
     // Needs the refreshed layout info to work correctly.
-    if(this.currentLayer) {
-      this.currentLayer.refreshLayout(this, {
-        keyboardHeight: this._computedHeight - this.getVerticalLayerGroupPadding(),
-        spacebarText: this.layoutKeyboardProperties?.displayName ?? '(System keyboard)'
-      });
-    }
-  }
-
-  private getVerticalLayerGroupPadding(): number {
-    // For touch-based OSK layouts, kmwosk.css may include top & bottom padding on the layer-group element.
-    const computedGroupStyle = getComputedStyle(this.layerGroup.element);
-
-    // parseInt('') => NaN, which is falsy; we want to fallback to zero.
-    let pt = parseInt(computedGroupStyle.paddingTop, 10) || 0;
-    let pb = parseInt(computedGroupStyle.paddingBottom, 10) || 0;
-    return pt + pb;
+    this.layerGroup.refreshLayout(this, {
+      keyboardWidth: this._computedWidth,
+      keyboardHeight: this._computedHeight - this.layerGroup.verticalPadding,
+      spacebarText: this.layoutKeyboardProperties?.displayName ?? '(System keyboard)'
+    });
   }
 
   /*private*/ computedAdjustedOskHeight(allottedHeight: number): number {

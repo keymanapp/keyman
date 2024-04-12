@@ -5,6 +5,7 @@ import OSKBaseKey from './oskBaseKey.js';
 import VisualKeyboard from '../visualKeyboard.js';
 
 export interface LayerLayoutParams {
+  keyboardWidth: number;
   keyboardHeight: number;
   spacebarText: string;
 }
