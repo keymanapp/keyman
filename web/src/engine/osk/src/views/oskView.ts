@@ -856,12 +856,6 @@ export default abstract class OSKView
         // triggers state-update + layer refresh automatically.
         this.vkbd.layerId = newValue;
       }
-
-      // Ensure the keyboard view is modeling the correct state.  (Correct layer, etc.)
-      this.keyboardView.updateState(); // will also need the stateKeys.
-      // We need to recalc the font size here because the layer did not have
-      // calculated dimensions available before it was visible
-      this.refreshLayout();
     }
 
     return false;

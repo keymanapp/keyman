@@ -6,6 +6,7 @@ import { KeyElement } from '../keyElement.js';
 import OSKLayer, { LayerLayoutParams } from './oskLayer.js';
 import VisualKeyboard from '../visualKeyboard.js';
 import OSKBaseKey from './oskBaseKey.js';
+import { ParsedLengthStyle } from '../lengthStyle.js';
 
 const NEAREST_KEY_TOUCH_MARGIN_PERCENT = 0.06;
 
@@ -256,8 +257,21 @@ export default class OSKLayerGroup {
     return null;
   }
 
+  public resetPrecalcFontSizes() {
+    for(const layer of Object.values(this.layers)) {
+      for(const row of layer.rows) {
+        for(const key of row.keys) {
+          key.resetFontPrecalc();
+        }
+      }
+    }
 
-  public refreshLayout(vkbd: VisualKeyboard, layoutParams: LayerLayoutParams) {
+    // This method is called whenever all related stylesheets are fully loaded and applied.
+    // The actual padding data may not have been available until now.
+    this._heightPadding = undefined;
+  }
+
+  public refreshLayout(layoutParams: LayerLayoutParams) {
     // Set layer-group copies of relevant computed-size values; they are used by nearest-key
     // detection.
     this.computedWidth = layoutParams.keyboardWidth;
@@ -266,8 +280,8 @@ export default class OSKLayerGroup {
     // Assumption:  this styling value will not change once the keyboard and
     // related stylesheets are loaded and applied.
     if(this._heightPadding === undefined) {
-      // Should not trigger a new layout reflow; VisualKeyboard should have made
-      // no further DOM style changes since the last one.
+      // Should not trigger a new layout reflow; VisualKeyboard should have made no further DOM
+      // style changes since the last one.
 
       // For touch-based OSK layouts, kmwosk.css may include top & bottom
       // padding on the layer-group element.
@@ -280,7 +294,7 @@ export default class OSKLayerGroup {
     }
 
     if(this.activeLayer) {
-      this.activeLayer.refreshLayout(vkbd, layoutParams);
+      this.activeLayer.refreshLayout(layoutParams);
     }
   }
 
