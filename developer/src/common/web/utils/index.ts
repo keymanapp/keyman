@@ -4,3 +4,4 @@ export { getOption, loadOptions, clearOptions } from './src/options.js';
 export { escapeMarkdownChar } from './src/markdown.js';
 export { KeymanUrls } from './src/keyman-urls.js';
 export { isValidEmail } from './src/is-valid-email.js';
+export * as SourceFilenamePatterns from './src/source-filename-patterns.js';

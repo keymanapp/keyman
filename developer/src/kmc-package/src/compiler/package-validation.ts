@@ -1,21 +1,8 @@
 import { KmpJsonFile, CompilerCallbacks, CompilerOptions, KeymanFileTypes } from '@keymanapp/common-types';
+import { SourceFilenamePatterns } from '@keymanapp/developer-utils';
 import { CompilerMessages } from './package-compiler-messages.js';
 import { keymanEngineForWindowsFiles, keymanForWindowsInstallerFiles, keymanForWindowsRedistFiles } from './redist-files.js';
 import { isValidEmail } from '@keymanapp/developer-utils';
-
-// The keyboard ID SHOULD adhere to this pattern:
-const KEYBOARD_ID_PATTERN_PACKAGE = /^[a-z_][a-z0-9_]*\.(kps|kmp)$/;
-
-// The model ID SHOULD adhere to this pattern:
-//                                 author           .bcp47             .uniq
-const MODEL_ID_PATTERN_PACKAGE = /^[a-z_][a-z0-9_]*\.[a-z_][a-z0-9_-]*\.[a-z_][a-z0-9_]*\.model\.(kps|kmp)$/;
-// const MODEL_ID_PATTERN_JS      = /^[a-z_][a-z0-9_]*\.[a-z_][a-z0-9_-]*\.[a-z_][a-z0-9_]*\.model\.js$/;
-// const MODEL_ID_PATTERN_TS      = /^[a-z_][a-z0-9_]*\.[a-z_][a-z0-9_-]*\.[a-z_][a-z0-9_]*\.model\.ts$/;
-// const MODEL_ID_PATTERN_PROJECT = /^[a-z_][a-z0-9_]*\.[a-z_][a-z0-9_-]*\.[a-z_][a-z0-9_]*\.model\.kpj$/;
-
-// "Content files" within the package should adhere to these pattern:
-const CONTENT_FILE_BASENAME_PATTERN = /^[a-z0-9_+.-]+$/i; // base names can be case insensitive
-const CONTENT_FILE_EXTENSION_PATTERN = /^(\.[a-z0-9_-]+)?$/;  // extensions should be lower-case or empty
 
 /**
  * @internal
@@ -108,7 +95,7 @@ export class PackageValidation {
 
     filename = this.callbacks.path.basename(filename);
 
-    if(!MODEL_ID_PATTERN_PACKAGE.test(filename)) {
+    if(!SourceFilenamePatterns.MODEL_ID_PATTERN_PACKAGE.test(filename)) {
       this.callbacks.reportMessage(CompilerMessages.Warn_PackageNameDoesNotFollowLexicalModelConventions({filename}));
     }
 
@@ -128,7 +115,7 @@ export class PackageValidation {
 
     filename = this.callbacks.path.basename(filename);
 
-    if(!KEYBOARD_ID_PATTERN_PACKAGE.test(filename)) {
+    if(!SourceFilenamePatterns.KEYBOARD_ID_PATTERN_PACKAGE.test(filename)) {
       this.callbacks.reportMessage(CompilerMessages.Warn_PackageNameDoesNotFollowKeyboardConventions({filename}));
     }
 
@@ -158,7 +145,8 @@ export class PackageValidation {
     const ext = this.callbacks.path.extname(filename);
     const base = filename.substring(0, filename.length-ext.length);
     if(this.options.checkFilenameConventions) {
-      if(!CONTENT_FILE_BASENAME_PATTERN.test(base) || !CONTENT_FILE_EXTENSION_PATTERN.test(ext)) {
+      if(!SourceFilenamePatterns.CONTENT_FILE_BASENAME_PATTERN.test(base) ||
+          !SourceFilenamePatterns.CONTENT_FILE_EXTENSION_PATTERN.test(ext)) {
         this.callbacks.reportMessage(CompilerMessages.Warn_FileInPackageDoesNotFollowFilenameConventions({filename}));
       }
     }

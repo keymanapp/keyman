@@ -21,6 +21,8 @@ export class LdmlKeyboardGenerator extends BasicGenerator implements KeymanCompi
    * @returns         Binary artifacts on success, null on failure.
    */
   async run(): Promise<GeneratorResult> {
+    this.preGenerate();
+
     const artifacts: GeneratorArtifacts = {};
     this.templatePath = 'ldml-keyboard';
     this.filenameMap[LdmlKeyboardGenerator.SFile_Project] =
@@ -40,6 +42,17 @@ export class LdmlKeyboardGenerator extends BasicGenerator implements KeymanCompi
     return {artifacts};
   }
 
-  private readonly generateFirstLangTag = () => '???'; //TODO
-  private readonly generateAlternateLangTags = () => '???'; //TODO
+  private readonly generateFirstLangTag = () => this.languageTags?.[0] ?? this.DEFAULT_LOCALE;
+  private readonly generateAlternateLangTags = () => {
+    if(this.languageTags.length < 2) {
+      return '';
+    }
+
+    const result =
+      `  <locales>\n` +
+      this.languageTags.slice(1).map(tag => `    <locale id="${tag}" />`).join('\n')+
+      `\n  </locales>`;
+
+    return result;
+  }
 }

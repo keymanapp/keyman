@@ -3,7 +3,7 @@ import { CompilerErrorNamespace, CompilerErrorSeverity, CompilerMessageSpec as m
 const Namespace = CompilerErrorNamespace.Generator;
 const SevInfo = CompilerErrorSeverity.Info | Namespace;
 // const SevHint = CompilerErrorSeverity.Hint | Namespace;
-// const SevWarn = CompilerErrorSeverity.Warn | Namespace;
+const SevWarn = CompilerErrorSeverity.Warn | Namespace;
 const SevError = CompilerErrorSeverity.Error | Namespace;
 const SevFatal = CompilerErrorSeverity.Fatal | Namespace;
 
@@ -30,4 +30,11 @@ export class GeneratorMessages {
   static ERROR_CannotWriteOutputFile = SevError | 0x0005;
   static Error_CannotWriteOutputFile = (o:{filename:string, e: any}) => CompilerMessageSpecWithException(this.ERROR_CannotWriteOutputFile, null,
     `Unable to write file ${def(o.filename)}: ${o.e ?? 'unknown error'}`);
+
+  // See also PackageCompilerMessages.WARN_PackageNameDoesNotFollowLexicalModelConventions
+  static WARN_ModelIdDoesNotFollowLexicalModelConventions = SevWarn | 0x0006;
+  static Warn_ModelIdDoesNotFollowLexicalModelConventions = (o:{id: string}) => m(this.WARN_ModelIdDoesNotFollowLexicalModelConventions,
+    `The id ${def(o.id)} does not follow the recommended model id conventions. The id should be all lower case, `+
+    `include only alphanumeric characters and underscore (_), not start with a digit, and should have the structure `+
+    `<author>.<bcp47>.<uniq>`);
 };

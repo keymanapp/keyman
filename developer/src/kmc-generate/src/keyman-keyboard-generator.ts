@@ -32,6 +32,8 @@ export class KeymanKeyboardGenerator extends BasicGenerator implements KeymanCom
    * @returns         Binary artifacts on success, null on failure.
    */
   async run(): Promise<GeneratorResult> {
+    this.preGenerate();
+
     const artifacts: GeneratorArtifacts = {};
 
     this.templatePath = 'kmn-keyboard';
@@ -97,5 +99,6 @@ export class KeymanKeyboardGenerator extends BasicGenerator implements KeymanCom
   private writeIcon(artifacts: GeneratorArtifacts) {
     // TODO: this will require some effort
     // proposal: generate 16x16 icon with 2-3 letters. Following TKeyboardIconGenerator.GenerateIcon
+    // research for .ico writer in node
   }
 }
