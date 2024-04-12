@@ -1,5 +1,80 @@
 # Keyman Version History
 
+## 18.0.17 alpha 2024-04-05
+
+* chore(linux): Show failed job for next Ubuntu version as failed (#11168)
+
+## 18.0.16 alpha 2024-04-04
+
+* chore(linux): Revert "Ignore failed package builds differently" (#11157)
+* chore(linux): Sign packages even if build for next Ubuntu fails (#11163)
+
+## 18.0.15 alpha 2024-04-03
+
+* chore(linux): Build packages for next Ubuntu version separately (#11145)
+* chore(linux): Fix typo in path of `build-binary-packages` action (#11154)
+* chore(linux): More fixes for workaround for failing linux builds (#11156)
+
+## 18.0.14 alpha 2024-04-02
+
+* chore(linux): Update debian changelog (#11097)
+
+## 18.0.13 alpha 2024-03-29
+
+* chore(deps): bump express from 4.17.3 to 4.19.2 (#11103)
+
+## 18.0.12 alpha 2024-03-28
+
+* chore(common): Merge beta to master for Sprint B17S4 (#11105)
+
+## 18.0.11 alpha 2024-03-20
+
+* chore(deps-dev): bump follow-redirects from 1.15.4 to 1.15.6 (#11010)
+
+## 18.0.10 alpha 2024-03-16
+
+* chore: Merge beta to master for Sprint B17S3 (#11008)
+
+## 18.0.9 alpha 2024-03-05
+
+* chore: B17S2 merge beta to master (#10909)
+
+## 18.0.8 alpha 2024-03-04
+
+* chore(linux): Update debian changelog (#10898)
+
+## 18.0.7 alpha 2024-02-29
+
+* chore: Merge 17.0.270 beta back to master (#10886)
+
+## 18.0.6 alpha 2024-02-27
+
+* chore(linux): Temporarily disable autopkgtests gha (#10853)
+* chore(linux): Update debian changelog (#10827)
+
+## 18.0.5 alpha 2024-02-26
+
+* fix(linux): Dynamically get package name (#10826)
+* chore(linux): Add running autopkgtests on GHA (#10823)
+* fix(linux): Fix autopkgtest gha (#10849)
+
+## 18.0.4 alpha 2024-02-23
+
+* chore(linux): Update debian changelog (#10786)
+
+## 18.0.3 alpha 2024-02-21
+
+* chore(deps): bump ip from 2.0.0 to 2.0.1 (#10792)
+
+## 18.0.2 alpha 2024-02-20
+
+* chore(linux): Add testbuild info to workflow title (#10771)
+
+## 18.0.1 alpha 2024-02-15
+
+* chore(common): move to 18.0 alpha (#10713)
+* chore: move to 18.0 alpha
+
 ## 17.0.306 beta 2024-04-11
 
 * docs(ios): updates iOS app help for 17.0 banner changes (#11200)
@@ -8,9 +83,9 @@
 ## 17.0.305 beta 2024-04-10
 
 *  (#11169)
-* change(web): merges split async method in gesture engine 🪠 (#11142)
+* change(web): merges split async method in gesture engine (#11142)
 * fix(web): blocks nextLayer for keys quickly typed when multitapping to new layer when final tap is held (#11189)
-* refactor(web): OSK spacebar-label updates now managed by layer object 🪠 (#11175)
+* refactor(web): OSK spacebar-label updates now managed by layer object (#11175)
 
 ## 17.0.304 beta 2024-04-09
 
@@ -37,7 +112,7 @@
 * change(web): input-event sequentialization 🪠 (#10843)
 * fix(web): proper linkage of sources to events 🪠 (#10960)
 * fix(developer): handle buffer boundaries in four cases (#11137)
-* chore(linux): Build packages for next Ubuntu version separately :cherries: (#11153)
+* chore(linux): Build packages for next Ubuntu version separately (#11153)
 * fix(common): upgrade sentry-cli to 2.31.0 (#11151)
 * fix(android/app): Track previous device orientation for SystemKeyboard (#11134)
 *  (#11129)
@@ -73,6 +148,7 @@
 * fix(ios): bad initial in-app layout, delayed banner, deprecated banner toggle (#10929)
 * feat(developer/compilers): better unit test for suggestion accessibility (#11085)
 * fix(core): fix pointer math in actions_normalize() (#11101)
+
 
 ## 17.0.296 beta 2024-03-27
 
