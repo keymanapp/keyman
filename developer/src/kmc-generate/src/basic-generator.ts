@@ -7,16 +7,18 @@ import { AbstractGenerator, GeneratorArtifacts } from "./abstract-generator.js";
  */
 export class BasicGenerator extends AbstractGenerator {
 
+  // We'll generate a keyboard with a default 'en' locale if none is passed in
+  protected readonly DEFAULT_LOCALE = 'en';
+
   protected templatePath: string;
   protected languageTags: string[];
 
-  protected generate(artifacts: GeneratorArtifacts): boolean {
-
+  protected preGenerate() {
     const dt = new Date();
 
     this.languageTags = this.options.languageTags.length
       ? this.options.languageTags.map(tag => new Intl.Locale(tag).minimize().toString())
-      : ['en'];
+      : [this.DEFAULT_LOCALE];
 
     this.tokenMap['$NAME'] = this.options.name;
     this.tokenMap['$ID'] = this.options.id;
@@ -33,6 +35,10 @@ export class BasicGenerator extends AbstractGenerator {
       dt.getDate().toString().padStart(2, '0');
     this.tokenMap['$PACKAGE_LANGUAGES'] = this.generateLanguageListForPackage();
     this.tokenMap['$PLATFORMS_DOTLIST_README'] = this.getPlatformDotListForReadme();
+  }
+
+  protected generate(artifacts: GeneratorArtifacts): boolean {
+
 
     return this.transformAll(artifacts);
   }
@@ -49,7 +55,7 @@ export class BasicGenerator extends AbstractGenerator {
     const result =
       `      <Languages>\n`+
       this.languageTags.map(tag => `        <Language ID="${tag}">${this.getLanguageName(tag)}</Language>`).join('\n')+
-      `      </Languages>`;
+      `\n      </Languages>`;
     return result;
   }
 

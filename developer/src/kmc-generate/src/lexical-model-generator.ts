@@ -1,6 +1,8 @@
 import { KeymanCompiler, KeymanFileTypes } from '@keymanapp/common-types';
+import { SourceFilenamePatterns } from '@keymanapp/developer-utils';
 import { GeneratorArtifacts, GeneratorResult } from './abstract-generator.js';
 import { BasicGenerator } from './basic-generator.js';
+import { GeneratorMessages } from './generator-messages.js';
 
 /**
  * @public
@@ -24,6 +26,8 @@ export class LexicalModelGenerator extends BasicGenerator implements KeymanCompi
    * @returns         Binary artifacts on success, null on failure.
    */
   async run(): Promise<GeneratorResult> {
+    this.preGenerate();
+
     const artifacts: GeneratorArtifacts = {};
 
     this.templatePath = 'wordlist-lexical-model';
@@ -35,8 +39,14 @@ export class LexicalModelGenerator extends BasicGenerator implements KeymanCompi
       LexicalModelGenerator.SPath_Source+this.options.id+KeymanFileTypes.Source.Model;
     this.filenameMap[LexicalModelGenerator.SFile_WordlistTsv] =
       LexicalModelGenerator.SFile_WordlistTsv;
-    this.filenameMap[LexicalModelGenerator.SFile_Package] =
-      LexicalModelGenerator.SPath_Source+this.options.id+KeymanFileTypes.Source.Package;
+
+    // Note: lexical models use .model.kps for package extension
+    const packageFilename = this.options.id+'.model'+KeymanFileTypes.Source.Package;
+    if(!SourceFilenamePatterns.MODEL_ID_PATTERN_PACKAGE.test(packageFilename)) {
+      this.callbacks.reportMessage(GeneratorMessages.Warn_ModelIdDoesNotFollowLexicalModelConventions({id: this.options.id}));
+    }
+
+    this.filenameMap[LexicalModelGenerator.SFile_Package] = LexicalModelGenerator.SPath_Source+packageFilename;
     this.tokenMap['$LANGUAGES_MODEL_INFO'] = this.generateLanguageTagListForModelInfo();
 
     if(!this.generate(artifacts)) {

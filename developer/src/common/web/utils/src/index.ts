@@ -45,3 +45,5 @@ export { defaultCompilerOptions, CompilerBaseOptions, CompilerCallbacks, Compile
 export { CommonTypesMessages } from './common-events.js';
 
 export * as xml2js from './deps/xml2js/xml2js.js';
+
+export * as SourceFilenamePatterns from './source-filename-patterns.js';

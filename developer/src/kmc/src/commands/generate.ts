@@ -20,12 +20,14 @@ function declareGenerateKmnKeyboard(command: Command) {
   BaseOptions.addLogLevel(subCommand);
   subCommand
     .description('Generate a .kmn keyboard project')
-    .option('--targets, -t <targets...>', 'Target platforms', ['any'])
+    .option('-t, --target <target>', 'Target platforms',
+      (value, previous) => previous.concat([value]), ['any'])
     .option('--out-path, -o <path>', 'Output path (may exist)')
     .option('--name, -n <name>', 'Keyboard descriptive name')
     .option('--copyright, -c <copyright-name>', 'Copyright holder')
     .option('--version, -v <version-string>', 'Keyboard version', '1.0')
-    .option('--language-tags, -l <bcp-47 tag...>', 'BCP-47 language tags')
+    .option('--language-tag, -L <bcp-47 tag>', 'BCP-47 language tag',
+      (value, previous) => previous.concat([value]), [])
     .option('--author, -a <author-name>', 'Name of keyboard author')
     .option('--icon', 'Include a generated icon', true)
     .option('--description', 'Short description of the project, Markdown')
@@ -37,12 +39,13 @@ function declareGenerateLdmlKeyboard(command: Command) {
   BaseOptions.addLogLevel(ldmlSubCommand);
   ldmlSubCommand
     .description('Generate an LDML .xml keyboard project')
-    .option('--out-path, -o <path>', 'Output path (may exist)')
-    .option('--name, -n <name>', 'Keyboard descriptive name')
-    .option('--copyright, -c <copyright-name>', 'Copyright holder') /* © yyyy <copyright-name> */
-    .option('--version, -v <version-string>', 'Keyboard version', '1.0')
-    .option('--language-tags, -l <bcp-47 tag...>', 'BCP-47 language tags')
-    .option('--author, -a <author-name>', 'Name of keyboard author')
+    .option('-o, --out-path <path>', 'Output path (may exist)')
+    .option('-n, --name <name>', 'Keyboard descriptive name')
+    .option('-c, --copyright <copyright-name>', 'Copyright holder') /* © yyyy <copyright-name> */
+    .option('-v, --version <version-string>', 'Keyboard version', '1.0')
+    .option('-L, --language-tag <bcp-47 tag>', 'BCP-47 language tag',
+      (value, previous) => previous.concat([value]), [])
+    .option('-a, --author <author-name>', 'Name of keyboard author')
     .option('--description', 'Short description of the project, Markdown')
     .action(generateLdmlKeyboard);
 }
@@ -52,11 +55,12 @@ function declareGenerateLexicalModel(command: Command) {
   BaseOptions.addLogLevel(modelSubCommand);
   modelSubCommand
     .description('Generate a wordlist lexical model project')
-    .option('--out-path, -o <path>', 'Output path (may exist)')
-    .option('--name, -n <name>', 'Keyboard descriptive name')
-    .option('--copyright, -c <copyright-name>', 'Copyright holder') /* © yyyy <copyright-name> */
-    .option('--version, -v <version-string>', 'Keyboard version', '1.0')
-    .option('--language-tags, -l <bcp-47 tag...>', 'BCP-47 language tags')
+    .option('-o, --out-path <path>', 'Output path (may exist)')
+    .option('-n, --name <name>', 'Keyboard descriptive name')
+    .option('-c, --copyright <copyright-name>', 'Copyright holder') /* © yyyy <copyright-name> */
+    .option('-v, --version <version-string>', 'Keyboard version', '1.0')
+    .option('-L, --language-tag <bcp-47 tag>', 'BCP-47 language tag',
+      (value, previous) => previous.concat([value]), [])
     .option('--author, -a <author-name>', 'Name of keyboard author')
     .option('--description', 'Short description of the project, Markdown')
     .action(generateLexicalModel);
@@ -68,10 +72,10 @@ function commanderOptionsToGeneratorOptions(id: string, options: any): Generator
   const result: GeneratorOptions = {
     icon: options.icon ?? true,
     id,
-    languageTags: options.languageTags ?? [],
+    languageTags: options.languageTag ?? [],
     name: options.name ?? id,
     outPath: options.outPath ?? '.',
-    targets: options.targets ?? ['any'],
+    targets: options.target ?? ['any'],
     version: options.version ?? '1.0',
     author: options.author ?? id,
     copyright: options.copyright ?? options.author ?? id,
