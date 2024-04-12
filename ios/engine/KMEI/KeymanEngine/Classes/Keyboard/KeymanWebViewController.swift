@@ -130,8 +130,11 @@ class KeymanWebViewController: UIViewController {
     webView!.backgroundColor = UIColor.clear
     webView!.navigationDelegate = self
     webView!.scrollView.isScrollEnabled = false
+    
     if #available(iOSApplicationExtension 16.4, *) {
-      webView!.isInspectable = true
+      if(Version.current.tier != .stable) {
+        webView!.isInspectable = true
+      }
     }
 
     // Disable WKWebView default layout-constraint manipulations. We ensure
