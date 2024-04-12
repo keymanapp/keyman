@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 18.0.18 alpha 2024-04-12
+
+* chore(common): Merge beta to master for Sprint B17S5 (#11217)
+
 ## 18.0.17 alpha 2024-04-05
 
 * chore(linux): Show failed job for next Ubuntu version as failed (#11168)
