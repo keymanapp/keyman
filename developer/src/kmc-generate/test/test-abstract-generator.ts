@@ -3,21 +3,9 @@ import * as path from 'path';
 import * as fs from 'fs';
 import { fileURLToPath } from 'url';
 import { assert } from 'chai';
-import { AbstractGenerator, GeneratorArtifacts, GeneratorOptions } from '../src/abstract-generator.js';
+import { AbstractGenerator, GeneratorArtifacts } from '../src/abstract-generator.js';
 import { TestCompilerCallbacks } from '@keymanapp/developer-test-helpers';
-
-const options: GeneratorOptions = {
-  icon: false,
-  id: 'sample',
-  languageTags: ['en'],
-  name: 'Sample Project',
-  outPath: '.',
-  targets: ['windows'],
-  version: '1.0',
-  author: 'Sample Author',
-  copyright: 'TheAuthor',
-  description: '# A mighty description',
-};
+import { options } from './shared-options.js';
 
 describe('AbstractGenerator', function () {
   it('should have a valid targetPath', async function() {

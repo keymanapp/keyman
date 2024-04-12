@@ -1,0 +1,16 @@
+#
+# Sample Project 1.0 generated from template.
+#
+# This is an example tab-separated wordlist file that can be edited in a spreadsheet
+# program or regenerated from a wordlist tool. See lexical model documentation at 
+# https://help.keyman.com/developer/ for tools.
+#
+# Columns
+# =======
+# WORD	FREQUENCY	(Optional)NOTES
+#
+the	100
+example	5
+hello	10
+world	8
+wordlist	3

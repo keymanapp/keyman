@@ -38,8 +38,6 @@ export class BasicGenerator extends AbstractGenerator {
   }
 
   protected generate(artifacts: GeneratorArtifacts): boolean {
-
-
     return this.transformAll(artifacts);
   }
 
@@ -112,4 +110,20 @@ export class BasicGenerator extends AbstractGenerator {
 
     return true;
   }
+
+  /**
+   * @internal
+   * these are exported only for unit tests, do not use
+   */
+  public readonly test_templatePath = () => this.templatePath;
+  public readonly test_languageTags = () => this.languageTags;
+
+  public readonly test_preGenerate = () => this.preGenerate();
+  public readonly test_generate = (artifacts: GeneratorArtifacts) => this.generate(artifacts);
+  public readonly test_getLanguageName = (tag: string)  => this.getLanguageName(tag);
+  public readonly test_generateLanguageListForPackage = () => this.generateLanguageListForPackage();
+  public readonly test_getPlatformDotListForReadme = () => this.getPlatformDotListForReadme();
+  public readonly test_transformAll = (artifacts: GeneratorArtifacts) => this.transformAll(artifacts);
+  public readonly test_transform = (sourceFile: string, destFile: string, artifacts: GeneratorArtifacts) =>
+    this.transform(sourceFile, destFile, artifacts);
 }
