@@ -75,6 +75,81 @@
 * chore(common): move to 18.0 alpha (#10713)
 * chore: move to 18.0 alpha
 
+## 17.0.306 beta 2024-04-11
+
+* docs(ios): updates iOS app help for 17.0 banner changes (#11200)
+* chore(oem/fv): Add fv sguuxs and update keyboard versions (#11198)
+
+## 17.0.305 beta 2024-04-10
+
+*  fix(core): skip leading trail surrogate char in km_core_state_context_set_if_needed() (#11169)
+* change(web): merges split async method in gesture engine (#11142)
+* fix(web): blocks nextLayer for keys quickly typed when multitapping to new layer when final tap is held (#11189)
+* refactor(web): OSK spacebar-label updates now managed by layer object (#11175)
+
+## 17.0.304 beta 2024-04-09
+
+* fix(android): atomically updates selection with text (#11188)
+*  fix(web): fix crash in nearest-key row lookup when touch moves out-of-bounds (#11178)
+
+## 17.0.303 beta 2024-04-05
+
+* fix(windows): decode uri for Package ID and filename (#11152)
+* fix(common/models): suggestion stability after multiple whitespaces (#11164)
+
+## 17.0.302 beta 2024-04-04
+
+* fix(mac): load only 80 characters from context when processing keystrokes (#11141)
+
+## 17.0.301 beta 2024-04-03
+
+* feat(core): support modifiers=other (#11118)
+* chore(core): dx better err message on embedded test vkeys (#11119)
+* fix(web): key preview stickiness 🪠 (#10778)
+* fix(web): early gesture-match abort when unable to extend existing gestures 🪠 (#10836)
+* fix(web): infinite model-match replacement looping 🪠 (#10838)
+* fix(web): proper gesture-match sequencing 🪠 (#10840)
+* change(web): input-event sequentialization 🪠 (#10843)
+* fix(web): proper linkage of sources to events 🪠 (#10960)
+* fix(developer): handle buffer boundaries in four cases (#11137)
+* chore(linux): Build packages for next Ubuntu version separately (#11153)
+* fix(common): upgrade sentry-cli to 2.31.0 (#11151)
+* fix(android/app): Track previous device orientation for SystemKeyboard (#11134)
+* change(web): reworks nearest-key detection to avoid layout reflow (#11129)
+
+## 17.0.300 beta 2024-04-02
+
+* change(web): keyboard swaps keep original keyboards active until fully ready (#11108)
+* fix(android/engine): Swap selection range if reversed (#11127)
+* test(developer): keyboard info compiler unit tests (#11000)
+
+## 17.0.299 beta 2024-04-01
+
+* fix(ios):  address crash by reading full code point rather than code unit when trimming initial directional-mark (#11113)
+* fix(mac): delete correct number of characters from current context when processing BMP or SMP deletes (#11086)
+* feat(developer): disallow stray dollarsign in from pattern (#11117)
+
+## 17.0.298 beta 2024-03-29
+
+* chore(linux): Update debian changelog (#11096)
+* fix(web): prevent layer switch key from erasing selection (#11032)
+* fix(developer): prevent error when scrolling touch layout editor with no selected key (#11109)
+* fix(common): make `isEmptyTransform` return true if passed a nullish transform (#11110)
+
+## 17.0.297 beta 2024-03-28
+
+* fix(common): properly handle illegal UnicodeSets to prevent crash in kmc-ldml compiler (#11065)
+* fix(core,developer): variable/marker substitution in sets and strings (#11059)
+* fix(developer):  in ldml compiler, generate compiler error if `from=` regex matches empty string (#11070)
+* fix(core): calculate offset correctly when replacing marker in transform (fixes crash) (#11071)
+* feat(developer): support comma in modifiers (#11075)
+* fix(core): actions_normalize() length and dead store fix (#11100)
+* chore(core): optimize ldml_event_state::emit_difference() when no diff (#11094)
+* fix(ios): bad initial in-app layout, delayed banner, deprecated banner toggle (#10929)
+* feat(developer/compilers): better unit test for suggestion accessibility (#11085)
+* fix(core): fix pointer math in actions_normalize() (#11101)
+
+
 ## 17.0.296 beta 2024-03-27
 
 * fix(developer): in model compiler, give correct key to shorter prefix words when a longer, higher-frequency word is also present (#11074)

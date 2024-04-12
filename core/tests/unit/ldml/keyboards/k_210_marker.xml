@@ -24,12 +24,20 @@
       <row keys="grave acute caret hacek" />
       <row keys="q w e" /> <!-- etc -->
       <row keys="a s d" /> <!-- etc -->
-      <row keys="z x c" /> <!-- etc -->
+      <row keys="z x c v" /> <!-- etc -->
     </layer>
   </layers>
 
+  <variables>
+    <!-- for regression  #11045 -->
+    <set id="mark_accent" value="\m{acute} \m{grave}"/>
+    <set id="spacing_accent" value="´ `"/>
+  </variables>
+
   <transforms type="simple">
     <transformGroup>
+      <!-- for regression  #11045 -->
+      <transform from="v($[mark_accent])" to="$[1:spacing_accent]" />
       <transform from="\m{.}z" to="Z" />
     </transformGroup>
     <transformGroup>

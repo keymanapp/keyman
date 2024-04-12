@@ -42,6 +42,7 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
   private static View inputView = null;
   private static ExtractedText exText = null;
   private KMHardwareKeyboardInterpreter interpreter = null;
+  private int lastOrientation = Configuration.ORIENTATION_UNDEFINED;
 
   private static final String TAG = "SystemKeyboard";
 
@@ -129,7 +130,7 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
   @Override
   public void onUpdateSelection(int oldSelStart, int oldSelEnd, int newSelStart, int newSelEnd, int candidatesStart, int candidatesEnd) {
     super.onUpdateSelection(oldSelStart, oldSelEnd, newSelStart, newSelEnd, candidatesStart, candidatesEnd);
-    KMManager.updateSelectionRange(KMManager.KeyboardType.KEYBOARD_TYPE_SYSTEM, newSelStart, newSelEnd);
+    KMManager.updateSelectionRange(KMManager.KeyboardType.KEYBOARD_TYPE_SYSTEM);
   }
 
   /**
@@ -169,9 +170,7 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
       ExtractedText icText = ic.getExtractedText(new ExtractedTextRequest(), 0);
       if (icText != null) {
         boolean didUpdateText = KMManager.updateText(KeyboardType.KEYBOARD_TYPE_SYSTEM, icText.text.toString());
-        int selStart = icText.startOffset + icText.selectionStart;
-        int selEnd = icText.startOffset + icText.selectionEnd;
-        boolean didUpdateSelection = KMManager.updateSelectionRange(KeyboardType.KEYBOARD_TYPE_SYSTEM, selStart, selEnd);
+        boolean didUpdateSelection = KMManager.updateSelectionRange(KeyboardType.KEYBOARD_TYPE_SYSTEM);
         if (!didUpdateText || !didUpdateSelection)
           exText = icText;
       }
@@ -197,7 +196,10 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
   @Override
   public void onConfigurationChanged(Configuration newConfig) {
     super.onConfigurationChanged(newConfig);
-    KMManager.onConfigurationChanged(newConfig);
+    if (newConfig.orientation != lastOrientation) {
+      lastOrientation = newConfig.orientation;
+      KMManager.onConfigurationChanged(newConfig);
+    }
   }
 
   @Override
@@ -220,8 +222,9 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
     wm.getDefaultDisplay().getSize(size);
 
     int inputViewHeight = 0;
-    if (inputView != null)
+    if (inputView != null) {
       inputViewHeight = inputView.getHeight();
+    }
 
     int bannerHeight = KMManager.getBannerHeight(this);
     int kbHeight = KMManager.getKeyboardHeight(this);

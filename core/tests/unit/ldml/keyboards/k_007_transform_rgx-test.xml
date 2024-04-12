@@ -88,4 +88,56 @@
       <check result="E"/>
     </test>
   </tests>
+  <tests name="regression-11037">
+    <test name="caret">
+      <keystroke key="caret" />
+      <keystroke key="a" />
+      <check result="â"/>
+    </test>
+    <test name="pipe">
+      <keystroke key="pipe" />
+      <keystroke key="a" />
+      <check result="ą"/>
+    </test>
+  </tests>
+  <tests name="regression-11045-d">
+    <test name="caret">
+      <keystroke key="d" />
+      <keystroke key="name" />
+      <keystroke key="caret" />
+      <check result="caret" />
+    </test>
+    <test name="pipe">
+      <keystroke key="d" />
+      <keystroke key="name" />
+      <keystroke key="pipe" />
+      <check result="pipe" />
+    </test>
+    <test name="grave">
+      <keystroke key="d" />
+      <keystroke key="name" />
+      <keystroke key="grave" />
+      <check result="grave" />
+    </test>
+  </tests>
+  <tests name="regression-11045-i">
+    <test name="caret">
+      <keystroke key="i" />
+      <keystroke key="name" />
+      <keystroke key="caret" />
+      <check result="caret" />
+    </test>
+    <test name="pipe">
+      <keystroke key="i" />
+      <keystroke key="name" />
+      <keystroke key="pipe" />
+      <check result="pipe" />
+    </test>
+    <test name="grave">
+      <keystroke key="i" />
+      <keystroke key="name" />
+      <keystroke key="grave" />
+      <check result="grave" />
+    </test>
+  </tests>
 </keyboardTest3>

@@ -39,6 +39,7 @@ uses
   UfrmInstallKeyboard,
   Upload_Settings,
   utildir,
+  utilhttp,
   utilfiletypes;
 
 { TKeymanProtocolHandler }
@@ -74,9 +75,9 @@ begin
   if not m.Success then
     Exit(False);
 
-  PackageID := m.Groups[1].Value;
+  PackageID := URLDecode(m.Groups[1].Value);
   if m.Groups.Count > 2
-    then BCP47 := m.Groups[2].Value
+    then BCP47 := URLDecode(m.Groups[2].Value)
     else BCP47 := '';
 
   // Download the package

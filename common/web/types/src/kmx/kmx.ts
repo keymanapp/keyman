@@ -345,6 +345,10 @@ export class KMXFile {
   public static readonly ISVIRTUALKEY   = 0x4000;    // It is a Virtual Key Sequence
   public static readonly VIRTUALCHARKEY = 0x8000;    // Keyman 6.0: Virtual Key Cap Sequence NOT YET
 
+  // Note: OTHER_MODIFIER = 0x10000, used by KMX+ for the
+  // other modifier flag in layers, > 16 bit so not available here.
+  // See keys_mod_other in keyman_core_ldml.ts
+
   public static readonly MASK_MODIFIER_CHIRAL = KMXFile.LCTRLFLAG | KMXFile.RCTRLFLAG | KMXFile.LALTFLAG | KMXFile.RALTFLAG;
   public static readonly MASK_MODIFIER_SHIFT = KMXFile.K_SHIFTFLAG;
   public static readonly MASK_MODIFIER_NONCHIRAL = KMXFile.K_CTRLFLAG | KMXFile.K_ALTFLAG;

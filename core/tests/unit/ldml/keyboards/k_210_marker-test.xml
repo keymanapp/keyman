@@ -50,4 +50,16 @@
       <check result="x" />
     </test>
   </tests>
+  <tests name="regression-11045">
+    <test name="regression-11045-grave">
+      <keystroke key="v" />
+      <keystroke key="grave"/>
+      <check result="`"/>
+    </test>
+    <test name="regression-11045-acute">
+      <keystroke key="v" />
+      <keystroke key="acute"/>
+      <check result="´"/>
+    </test>
+  </tests>
 </keyboardTest3>

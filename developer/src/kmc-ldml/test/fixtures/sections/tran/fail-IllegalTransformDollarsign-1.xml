@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<keyboard3 xmlns="https://schemas.unicode.org/cldr/45/keyboard3" locale="mt" conformsTo="45">
+  <info name="dollarsign-fail-1" />
+
+  <keys />
+
+  <variables>
+    <string id="markcaret" value="✔🥕" />
+    <set id="vowel" value="a i o"/>
+    <set id="caretVowel" value="🥕a 🥕i 🥕o"/>
+  </variables>
+
+  <transforms type="simple">
+    <transformGroup>
+      <transform from="${mark-caret}($[vowel])" to="$[1:caretVowel]" />
+    </transformGroup>
+  </transforms>
+
+</keyboard3>

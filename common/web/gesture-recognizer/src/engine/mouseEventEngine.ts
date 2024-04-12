@@ -1,10 +1,11 @@
 import { GestureRecognizerConfiguration } from "./configuration/gestureRecognizerConfiguration.js";
 import { InputEventEngine } from "./inputEventEngine.js";
-import { InputSample } from "./headless/inputSample.js";
 import { Nonoptional } from "./nonoptional.js";
 import { ZoneBoundaryChecker } from "./configuration/zoneBoundaryChecker.js";
+import { GestureSource } from "./headless/gestureSource.js";
 
-export class MouseEventEngine<HoveredItemType, StateToken = any> extends InputEventEngine<HoveredItemType, StateToken> {
+// Does NOT use the AsyncClosureDispatchQueue... simply because there can only ever be one mouse touchpoint.
+export class MouseEventEngine<ItemType, StateToken = any> extends InputEventEngine<ItemType, StateToken> {
   private readonly _mouseStart: typeof MouseEventEngine.prototype.onMouseStart;
   private readonly _mouseMove:  typeof MouseEventEngine.prototype.onMouseMove;
   private readonly _mouseEnd:   typeof MouseEventEngine.prototype.onMouseEnd;
@@ -12,7 +13,10 @@ export class MouseEventEngine<HoveredItemType, StateToken = any> extends InputEv
   private hasActiveClick: boolean = false;
   private disabledSafeBounds: number = 0;
 
-  public constructor(config: Nonoptional<GestureRecognizerConfiguration<HoveredItemType, StateToken>>) {
+  private currentSource: GestureSource<ItemType, StateToken> = null;
+  private readonly activeIdentifier = 0;
+
+  public constructor(config: Nonoptional<GestureRecognizerConfiguration<ItemType, StateToken>>) {
     super(config);
 
     // We use this approach, rather than .bind, because _this_ version allows hook
@@ -25,20 +29,6 @@ export class MouseEventEngine<HoveredItemType, StateToken = any> extends InputEv
   private get eventRoot(): HTMLElement {
     return this.config.mouseEventRoot;
   }
-  private get activeIdentifier(): number {
-    return 0;
-  }
-
-  // public static forPredictiveBanner(banner: SuggestionBanner, handlerRoot: SuggestionManager) {
-  //   const config: GestureRecognizerConfiguration = {
-  //     targetRoot: banner.getDiv(),
-  //     // document.body is the event root b/c we need to track the mouse if it leaves
-  //     // the VisualKeyboard's hierarchy.
-  //     eventRoot: document.body,
-  //   };
-
-  //   return new MouseEventEngine(config);
-  // }
 
   registerEventHandlers() {
     this.eventRoot.addEventListener('mousedown', this._mouseStart, true);
@@ -66,10 +56,9 @@ export class MouseEventEngine<HoveredItemType, StateToken = any> extends InputEv
     }
   }
 
-  private buildSampleFromEvent(event: MouseEvent, identifier: number) {
+  private buildSampleFromEvent(event: MouseEvent) {
     // WILL be null for newly-starting `GestureSource`s / contact points.
-    const source = this.getTouchpointWithId(identifier);
-    return this.buildSampleFor(event.clientX, event.clientY, event.target, performance.now(), source);
+    return this.buildSampleFor(event.clientX, event.clientY, event.target, performance.now(), this.currentSource);
   }
 
   onMouseStart(event: MouseEvent) {
@@ -81,8 +70,7 @@ export class MouseEventEngine<HoveredItemType, StateToken = any> extends InputEv
 
     this.preventPropagation(event);
 
-    const identifier = this.activeIdentifier;
-    const sample = this.buildSampleFromEvent(event, identifier);
+    const sample = this.buildSampleFromEvent(event);
 
     if(!ZoneBoundaryChecker.inputStartOutOfBoundsCheck(sample, this.config)) {
       // If we started very close to a safe zone border, remember which one(s).
@@ -90,36 +78,46 @@ export class MouseEventEngine<HoveredItemType, StateToken = any> extends InputEv
       this.disabledSafeBounds = ZoneBoundaryChecker.inputStartSafeBoundProximityCheck(sample, this.config);
     }
 
-    this.onInputStart(identifier, sample, event.target, false);
+    const touchpoint = this.onInputStart(this.activeIdentifier, sample, event.target, false);
+    this.currentSource = touchpoint;
+
+    const cleanup = () => {
+      this.currentSource = null;
+    }
+
+    touchpoint.path.on('complete', cleanup);
+    touchpoint.path.on('invalidated', cleanup);
   }
 
   onMouseMove(event: MouseEvent) {
-    if(!this.hasActiveTouchpoint(this.activeIdentifier)) {
+    const source = this.currentSource;
+    if(!source) {
       return;
     }
 
-    const sample = this.buildSampleFromEvent(event, this.activeIdentifier);
+    const sample = this.buildSampleFromEvent(event);
 
     if(!event.buttons) {
       if(this.hasActiveClick) {
         this.hasActiveClick = false;
-        this.onInputMoveCancel(this.activeIdentifier, sample, event.target);
+        this.onInputMoveCancel(source, sample, event.target);
       }
       return;
     }
 
     this.preventPropagation(event);
-    const config = this.getConfigForId(this.activeIdentifier);
+    const config = source.currentRecognizerConfig;
 
     if(!ZoneBoundaryChecker.inputMoveCancellationCheck(sample, config, this.disabledSafeBounds)) {
-      this.onInputMove(this.activeIdentifier, sample, event.target);
+      this.onInputMove(source, sample, event.target);
     } else {
-      this.onInputMoveCancel(this.activeIdentifier, sample, event.target);
+      this.onInputMoveCancel(source, sample, event.target);
     }
   }
 
   onMouseEnd(event: MouseEvent) {
-    if(!this.hasActiveTouchpoint(this.activeIdentifier)) {
+    const source = this.currentSource;
+    if(!source) {
       return;
     }
 
@@ -127,6 +125,6 @@ export class MouseEventEngine<HoveredItemType, StateToken = any> extends InputEv
       this.hasActiveClick = false;
     }
 
-    this.onInputEnd(this.activeIdentifier, event.target);
+    this.onInputEnd(source, event.target);
   }
 }
