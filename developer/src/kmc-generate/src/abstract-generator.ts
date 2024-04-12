@@ -212,5 +212,9 @@ export class AbstractGenerator {
   public readonly unitTestEndpoints = {
     targetPath: this.targetPath
   }
+  /**
+   * @internal
+   */
+  public get test_tokenMap() { return this._tokenMap; }
 }
 
