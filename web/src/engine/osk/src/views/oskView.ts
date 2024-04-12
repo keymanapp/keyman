@@ -159,6 +159,7 @@ export default abstract class OSKView
   private uiStyleSheetManager: StylesheetManager;
 
   private config: Configuration;
+  private deferLayout: boolean;
 
   private _boxBaseMouseDown:        (e: MouseEvent) => boolean;
   private _boxBaseTouchStart:       (e: TouchEvent) => boolean;
@@ -595,8 +596,33 @@ export default abstract class OSKView
     this.needsLayout = true;
   }
 
+  public batchLayoutAfter(closure: () => void) {
+    /*
+      Is there already an ongoing batch?  If so, just run the closure and don't
+      adjust the tracking variables.  The outermost call will finalize layout.
+    */
+    if(this.deferLayout) {
+      closure();
+      return;
+    }
+
+    try {
+      this.deferLayout = true;
+      if(this.vkbd) {
+        this.vkbd.deferLayout = true;
+      }
+      closure();
+    } finally {
+      this.deferLayout = false;
+      if(this.vkbd) {
+        this.vkbd.deferLayout = false;
+      }
+      this.refreshLayout();
+    }
+  }
+
   public refreshLayout(pending?: boolean): void {
-    if(!this.keyboardView) {
+    if(!this.keyboardView || this.deferLayout) {
       return;
     }
 
@@ -856,12 +882,6 @@ export default abstract class OSKView
         // triggers state-update + layer refresh automatically.
         this.vkbd.layerId = newValue;
       }
-
-      // Ensure the keyboard view is modeling the correct state.  (Correct layer, etc.)
-      this.keyboardView.updateState(); // will also need the stateKeys.
-      // We need to recalc the font size here because the layer did not have
-      // calculated dimensions available before it was visible
-      this.refreshLayout();
     }
 
     return false;

@@ -1,13 +1,12 @@
 import { ActiveLayer, type DeviceSpec, Keyboard, LayoutLayer, ActiveLayout, ButtonClasses } from '@keymanapp/keyboard-processor';
-import { ManagedPromise } from '@keymanapp/web-utils';
 
 import { InputSample } from '@keymanapp/gesture-recognizer';
 
 import { KeyElement } from '../keyElement.js';
-import OSKLayer from './oskLayer.js';
+import OSKLayer, { LayerLayoutParams } from './oskLayer.js';
 import VisualKeyboard from '../visualKeyboard.js';
-import OSKRow from './oskRow.js';
 import OSKBaseKey from './oskBaseKey.js';
+import { ParsedLengthStyle } from '../lengthStyle.js';
 
 const NEAREST_KEY_TOUCH_MARGIN_PERCENT = 0.06;
 
@@ -21,6 +20,7 @@ export default class OSKLayerGroup {
   private computedHeight: number;
 
   private _activeLayerId: string = 'default';
+  private _heightPadding: number;
 
   public constructor(vkbd: VisualKeyboard, keyboard: Keyboard, formFactor: DeviceSpec.FormFactor) {
     let layout = keyboard.layout(formFactor);
@@ -69,6 +69,14 @@ export default class OSKLayerGroup {
       // Add layer to group
       lDiv.appendChild(layerObj.element);
     }
+  }
+
+  public get activeLayer(): OSKLayer {
+    if(!this.activeLayerId) {
+      return null;
+    }
+
+    return this.layers[this.activeLayerId];
   }
 
   public get activeLayerId(): string {
@@ -249,8 +257,48 @@ export default class OSKLayerGroup {
     return null;
   }
 
-  public refreshLayout(computedWidth: number, computedHeight: number) {
-    this.computedWidth = computedWidth;
-    this.computedHeight = computedHeight;
+  public resetPrecalcFontSizes() {
+    for(const layer of Object.values(this.layers)) {
+      for(const row of layer.rows) {
+        for(const key of row.keys) {
+          key.resetFontPrecalc();
+        }
+      }
+    }
+
+    // This method is called whenever all related stylesheets are fully loaded and applied.
+    // The actual padding data may not have been available until now.
+    this._heightPadding = undefined;
+  }
+
+  public refreshLayout(layoutParams: LayerLayoutParams) {
+    // Set layer-group copies of relevant computed-size values; they are used by nearest-key
+    // detection.
+    this.computedWidth = layoutParams.keyboardWidth;
+    this.computedHeight = layoutParams.keyboardHeight;
+
+    // Assumption:  this styling value will not change once the keyboard and
+    // related stylesheets are loaded and applied.
+    if(this._heightPadding === undefined) {
+      // Should not trigger a new layout reflow; VisualKeyboard should have made no further DOM
+      // style changes since the last one.
+
+      // For touch-based OSK layouts, kmwosk.css may include top & bottom
+      // padding on the layer-group element.
+      const computedGroupStyle = getComputedStyle(this.element);
+
+      // parseInt('') => NaN, which is falsy; we want to fallback to zero.
+      let pt = parseInt(computedGroupStyle.paddingTop, 10) || 0;
+      let pb = parseInt(computedGroupStyle.paddingBottom, 10) || 0;
+      this._heightPadding = pt + pb;
+    }
+
+    if(this.activeLayer) {
+      this.activeLayer.refreshLayout(layoutParams);
+    }
+  }
+
+  public get verticalPadding() {
+    return this._heightPadding ?? 0;
   }
 }
