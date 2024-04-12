@@ -231,10 +231,19 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
 
   activeGestures: GestureHandler[] = [];
   activeModipress: Modipress = null;
+  private _deferLayout: boolean;
 
   // The keyboard object corresponding to this VisualKeyboard.
   public readonly layoutKeyboard: Keyboard;
   public readonly layoutKeyboardProperties: KeyboardProperties;
+
+  get deferLayout(): boolean {
+    return this._deferLayout;
+  }
+
+  set deferLayout(value: boolean) {
+    this._deferLayout = value;
+  }
 
   get layerId(): string {
     return this.layerGroup?.activeLayerId ?? 'default';
@@ -253,7 +262,7 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
       }
     }
 
-    if(changedLayer) {
+    if(changedLayer && !this._deferLayout) {
       this.updateState();
       // We changed the active layer, but not any layout property of the keyboard as a whole.
       this.layerGroup.refreshLayout(this.constructLayoutParams());
@@ -1206,6 +1215,10 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
    * when needed.
    */
   refreshLayout() {
+    if(this._deferLayout) {
+      return;
+    }
+
     /*
       Phase 1:  calculations possible at the start without triggering _any_ additional layout reflow.
       (A single, initial reflow may happen depending on DOM manipulations before this method...,
