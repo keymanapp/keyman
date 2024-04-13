@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 17.0.308 beta 2024-04-13
+
+* chore(developer): use keyboard3 tag rather than DTD to identify LDML keyboard xml files (#11214)
+
 ## 17.0.307 beta 2024-04-12
 
 * fix(common): specify title explicitly when opening PR with hub (#11173)
