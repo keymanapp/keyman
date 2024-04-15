@@ -151,16 +151,6 @@ jobs:
         ref: '${{ github.event.client_payload.buildSha }}'
         sparse-checkout: '.github/actions/'
 
-  binary_packages_unreleased:
-    name: Build binary packages for next Ubuntu version
-    needs: sourcepackage
-    strategy:
-      fail-fast: true
-      matrix:
-        dist: [noble]
-
-    runs-on: ubuntu-latest
-    steps:
     - name: Build
       uses: ./.github/actions/build-binary-packages
       with:
