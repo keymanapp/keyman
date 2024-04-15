@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 18.0.19 alpha 2024-04-15
+
+* chore(linux): Fix wrong merge (#11224)
+
 ## 18.0.18 alpha 2024-04-12
 
 * chore(common): Merge beta to master for Sprint B17S5 (#11217)
