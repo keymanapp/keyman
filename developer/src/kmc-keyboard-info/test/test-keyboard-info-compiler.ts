@@ -347,7 +347,20 @@ describe('keyboard-info-compiler', function () {
     const sources = KHMER_ANGKOR_SOURCES;
     const compiler = new KeyboardInfoCompiler();
     assert.isTrue(await compiler.init(callbacks, {sources}));
+    const kpsFilename = KHMER_ANGKOR_KPS;
+    const kmpCompiler = new KmpCompiler();
+    assert.isTrue(await kmpCompiler.init(callbacks, {}));
+    const kmpJsonData = kmpCompiler.transformKpsToKmpObject(kpsFilename);
+    assert.isNotNull(kmpJsonData);
+    const kmxFiles: {
+      filename: string,
+      data: KMX.KEYBOARD
+    }[] = compiler['loadKmxFiles'](kpsFilename, kmpJsonData);
+    assert.deepEqual(kmxFiles[0].data.targets, 'any');
+    //const origLoadKmxFiles = compiler['loadKmxFiles'];
+    //compiler['loadKmxFiles'] = (_kpsFilename: string, _kmpJsonData: KmpJsonFile.KmpJsonFile) => kmxFiles;
     const result = await compiler.run(kpjFilename, null);
+    //compiler['loadKmxFiles'] = origLoadKmxFiles;
     assert.isNotNull(result);
     const keyboard_info = JSON.parse(new TextDecoder().decode(result.artifacts.keyboard_info.data));
     assert.deepEqual(keyboard_info.platformSupport, {
