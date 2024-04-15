@@ -284,7 +284,7 @@ describe('keyboard-info-compiler', function () {
     { files: [{ name: "doc.pdf", description: ''}], packageIncludes: ["documentation"] },
   ];
 
-  packageIncludesTestCases.forEach((testCase) => it('check run sets packageIncludes correctly', async function() {
+  packageIncludesTestCases.forEach((testCase, idx) => it(`check run sets packageIncludes correctly (test case #${idx})`, async function() {
     const kpjFilename = KHMER_ANGKOR_KPJ;
     const sources = KHMER_ANGKOR_SOURCES;
     const compiler = new KeyboardInfoCompiler();
@@ -322,7 +322,7 @@ describe('keyboard-info-compiler', function () {
     { js: '10.0', omitJs: false, kmx: '10.0', expected: '10.0' },
   ];
 
-  minKeymanVersionTestCases.forEach((testCase) => it('check run sets minKeymanVersion correctly', async function() {
+  minKeymanVersionTestCases.forEach((testCase, idx) => it(`check run sets minKeymanVersion correctly (test case #${idx})`, async function() {
     const kpjFilename = KHMER_ANGKOR_KPJ;
     const sources = KHMER_ANGKOR_SOURCES;
     const compiler = new KeyboardInfoCompiler();
