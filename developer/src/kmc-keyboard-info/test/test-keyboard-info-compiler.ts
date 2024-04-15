@@ -342,6 +342,25 @@ describe('keyboard-info-compiler', function () {
     assert.deepEqual(keyboard_info.minKeymanVersion, testCase.expected);
   }));
 
+  it('check run sets platforms correctly if kmx file provided', async function() {
+    const kpjFilename = KHMER_ANGKOR_KPJ;
+    const sources = KHMER_ANGKOR_SOURCES;
+    const compiler = new KeyboardInfoCompiler();
+    assert.isTrue(await compiler.init(callbacks, {sources}));
+    const result = await compiler.run(kpjFilename, null);
+    assert.isNotNull(result);
+    const keyboard_info = JSON.parse(new TextDecoder().decode(result.artifacts.keyboard_info.data));
+    assert.deepEqual(keyboard_info.platformSupport, {
+      windows: "full",
+      macos: "full",
+      linux: "full",
+      desktopWeb: "full",
+      ios: "full",
+      android: "full",
+      mobileWeb: "full",
+    });
+  });
+
   it('should write artifacts to disk', async function() {
     const kpjFilename = KHMER_ANGKOR_KPJ;
     const actualFilename = makePathToFixture('khmer_angkor', 'build', 'actual.keyboard_info');
