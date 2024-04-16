@@ -342,39 +342,13 @@ describe('keyboard-info-compiler', function () {
     assert.deepEqual(keyboard_info.minKeymanVersion, testCase.expected);
   }));
 
-  it('check run sets platforms correctly if kmx file provided', async function() {
-    const kpjFilename = KHMER_ANGKOR_KPJ;
-    const sources = KHMER_ANGKOR_SOURCES;
-    const compiler = new KeyboardInfoCompiler();
-    assert.isTrue(await compiler.init(callbacks, {sources}));
-    const kpsFilename = KHMER_ANGKOR_KPS;
-    const kmpCompiler = new KmpCompiler();
-    assert.isTrue(await kmpCompiler.init(callbacks, {}));
-    const kmpJsonData = kmpCompiler.transformKpsToKmpObject(kpsFilename);
-    assert.isNotNull(kmpJsonData);
-    const kmxFiles: {
-      filename: string,
-      data: KMX.KEYBOARD
-    }[] = compiler['loadKmxFiles'](kpsFilename, kmpJsonData);
-    assert.deepEqual(kmxFiles[0].data.targets, 'any');
-    //const origLoadKmxFiles = compiler['loadKmxFiles'];
-    //compiler['loadKmxFiles'] = (_kpsFilename: string, _kmpJsonData: KmpJsonFile.KmpJsonFile) => kmxFiles;
-    const result = await compiler.run(kpjFilename, null);
-    //compiler['loadKmxFiles'] = origLoadKmxFiles;
-    assert.isNotNull(result);
-    const keyboard_info = JSON.parse(new TextDecoder().decode(result.artifacts.keyboard_info.data));
-    assert.deepEqual(keyboard_info.platformSupport, {
-      windows: "full",
-      macos: "full",
-      linux: "full",
-      desktopWeb: "full",
-      ios: "full",
-      android: "full",
-      mobileWeb: "full",
-    });
-  });
+  const platformsTestCases = [
+    { hasJsFile: true, targets: 'any', expected: { windows: "full",macos: "full",linux: "full",desktopWeb: "full",ios: "full",android: "full",mobileWeb: "full" } },
+    { hasJsFile: false, targets: '',   expected: { desktopWeb: "full",mobileWeb: "full" } },
+    { hasJsFile: true,  targets: '',   expected: { desktopWeb: "full",ios: "full",android: "full",mobileWeb: "full" } },
+  ];
 
-  it('check run sets platforms correctly if no targets provided (with .js file in sources and .kps)', async function() {
+  platformsTestCases.forEach((testCase, idx) => it(`check run sets platforms correctly (test case #${idx})`, async function() {
     const kpjFilename = KHMER_ANGKOR_KPJ;
     const sources = KHMER_ANGKOR_SOURCES;
     const compiler = new KeyboardInfoCompiler();
@@ -384,43 +358,16 @@ describe('keyboard-info-compiler', function () {
     assert.isTrue(await kmpCompiler.init(callbacks, {}));
     const kmpJsonData = kmpCompiler.transformKpsToKmpObject(kpsFilename);
     assert.isNotNull(kmpJsonData);
-    assert.isNotNull(kmpJsonData.files.find(file => file.name.match(/\.js$/)));
+    if (!testCase.hasJsFile) {
+      // remove .js file
+      kmpJsonData.files = kmpJsonData.files.filter(file => !KeymanFileTypes.filenameIs(file.name, KeymanFileTypes.Binary.WebKeyboard));
+    }
     const kmxFiles: {
       filename: string,
       data: KMX.KEYBOARD
     }[] = compiler['loadKmxFiles'](kpsFilename, kmpJsonData);
-    kmxFiles[0].data.targets = ''; // no targets
-    const origLoadKmxFiles = compiler['loadKmxFiles'];
-    compiler['loadKmxFiles'] = (_kpsFilename: string, _kmpJsonData: KmpJsonFile.KmpJsonFile) => kmxFiles;
-    const result = await compiler.run(kpjFilename, null);
-    compiler['loadKmxFiles'] = origLoadKmxFiles;
-    assert.isNotNull(result);
-    const keyboard_info = JSON.parse(new TextDecoder().decode(result.artifacts.keyboard_info.data));
-    assert.deepEqual(keyboard_info.platformSupport, {
-      desktopWeb: "full",
-      ios: "full",
-      android: "full",
-      mobileWeb: "full",
-    });
-  });
-
-  it('check run sets platforms correctly if no targets provided (with .js file in sources but not .kps)', async function() {
-    const kpjFilename = KHMER_ANGKOR_KPJ;
-    const sources = KHMER_ANGKOR_SOURCES;
-    const compiler = new KeyboardInfoCompiler();
-    assert.isTrue(await compiler.init(callbacks, {sources}));
-    const kpsFilename = KHMER_ANGKOR_KPS;
-    const kmpCompiler = new KmpCompiler();
-    assert.isTrue(await kmpCompiler.init(callbacks, {}));
-    const kmpJsonData = kmpCompiler.transformKpsToKmpObject(kpsFilename);
-    assert.isNotNull(kmpJsonData);
-    // remove .js file
-    kmpJsonData.files = kmpJsonData.files.filter(file => !KeymanFileTypes.filenameIs(file.name, KeymanFileTypes.Binary.WebKeyboard));
-    const kmxFiles: {
-      filename: string,
-      data: KMX.KEYBOARD
-    }[] = compiler['loadKmxFiles'](kpsFilename, kmpJsonData);
-    kmxFiles[0].data.targets = ''; // no targets
+    // set targets
+    kmxFiles[0].data.targets = testCase.targets;
     const origLoadKmxFiles = compiler['loadKmxFiles'];
     const origKmpCompilerTransformKpsToKmpObject = KmpCompiler.prototype.transformKpsToKmpObject;
     let result: KeyboardInfoCompilerResult;
@@ -436,11 +383,8 @@ describe('keyboard-info-compiler', function () {
     }
     assert.isNotNull(result);
     const keyboard_info = JSON.parse(new TextDecoder().decode(result.artifacts.keyboard_info.data));
-    assert.deepEqual(keyboard_info.platformSupport, {
-      desktopWeb: "full",
-      mobileWeb: "full",
-    });
-  });
+    assert.deepEqual(keyboard_info.platformSupport, testCase.expected);
+  }));
 
   it('should write artifacts to disk', async function() {
     const kpjFilename = KHMER_ANGKOR_KPJ;
