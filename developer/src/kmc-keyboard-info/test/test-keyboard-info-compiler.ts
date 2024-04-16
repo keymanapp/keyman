@@ -343,9 +343,15 @@ describe('keyboard-info-compiler', function () {
   }));
 
   const platformsTestCases = [
-    { hasJsFile: true, targets: 'any', expected: { windows: "full",macos: "full",linux: "full",desktopWeb: "full",ios: "full",android: "full",mobileWeb: "full" } },
-    { hasJsFile: false, targets: '',   expected: { desktopWeb: "full",mobileWeb: "full" } },
-    { hasJsFile: true,  targets: '',   expected: { desktopWeb: "full",ios: "full",android: "full",mobileWeb: "full" } },
+    { hasJsFile: true, targets: 'any',                  expected: { windows: "full",macos: "full",linux: "full",desktopWeb: "full",ios: "full",android: "full",mobileWeb: "full" } },
+    { hasJsFile: false, targets: '',                    expected: { desktopWeb: "full",mobileWeb: "full" } },
+    { hasJsFile: true,  targets: '',                    expected: { desktopWeb: "full",ios: "full",android: "full",mobileWeb: "full" } },
+    { hasJsFile: true,  targets: 'androidphone',        expected: { android: "full",mobileWeb: "full" } },
+    { hasJsFile: true,  targets: 'iphone',              expected: { ios: "full",mobileWeb: "full" } },
+    { hasJsFile: true,  targets: 'linux',               expected: { linux: "full",desktopWeb: "full" } },
+    { hasJsFile: true,  targets: 'macosx',              expected: { macos: "full",desktopWeb: "full" } },
+    { hasJsFile: true,  targets: 'windows',             expected: { windows: "full",desktopWeb: "full" } },
+    { hasJsFile: true,  targets: 'androidphone iphone', expected: { android: "full",ios: "full",mobileWeb: "full" } },
   ];
 
   platformsTestCases.forEach((testCase, idx) => it(`check run sets platforms correctly (test case #${idx})`, async function() {
