@@ -404,6 +404,44 @@ describe('keyboard-info-compiler', function () {
     });
   });
 
+  it('check run sets platforms correctly if no targets provided (with .js file in sources but not .kps)', async function() {
+    const kpjFilename = KHMER_ANGKOR_KPJ;
+    const sources = KHMER_ANGKOR_SOURCES;
+    const compiler = new KeyboardInfoCompiler();
+    assert.isTrue(await compiler.init(callbacks, {sources}));
+    const kpsFilename = KHMER_ANGKOR_KPS;
+    const kmpCompiler = new KmpCompiler();
+    assert.isTrue(await kmpCompiler.init(callbacks, {}));
+    const kmpJsonData = kmpCompiler.transformKpsToKmpObject(kpsFilename);
+    assert.isNotNull(kmpJsonData);
+    // remove .js file
+    kmpJsonData.files = kmpJsonData.files.filter(file => !KeymanFileTypes.filenameIs(file.name, KeymanFileTypes.Binary.WebKeyboard));
+    const kmxFiles: {
+      filename: string,
+      data: KMX.KEYBOARD
+    }[] = compiler['loadKmxFiles'](kpsFilename, kmpJsonData);
+    kmxFiles[0].data.targets = ''; // no targets
+    const origLoadKmxFiles = compiler['loadKmxFiles'];
+    const origKmpCompilerTransformKpsToKmpObject = KmpCompiler.prototype.transformKpsToKmpObject;
+    let result: KeyboardInfoCompilerResult;
+    try {
+      KmpCompiler.prototype.transformKpsToKmpObject = (_kpsFilename: string): KmpJsonFile.KmpJsonFile => kmpJsonData;
+      compiler['loadKmxFiles'] = (_kpsFilename: string, _kmpJsonData: KmpJsonFile.KmpJsonFile) => kmxFiles;
+      result = await compiler.run(kpjFilename, null);
+    } catch(e) {
+      assert.fail(e);
+    } finally {
+      KmpCompiler.prototype.transformKpsToKmpObject = origKmpCompilerTransformKpsToKmpObject;
+      compiler['loadKmxFiles'] = origLoadKmxFiles;
+    }
+    assert.isNotNull(result);
+    const keyboard_info = JSON.parse(new TextDecoder().decode(result.artifacts.keyboard_info.data));
+    assert.deepEqual(keyboard_info.platformSupport, {
+      desktopWeb: "full",
+      mobileWeb: "full",
+    });
+  });
+
   it('should write artifacts to disk', async function() {
     const kpjFilename = KHMER_ANGKOR_KPJ;
     const actualFilename = makePathToFixture('khmer_angkor', 'build', 'actual.keyboard_info');
