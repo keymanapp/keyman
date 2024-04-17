@@ -1,5 +1,17 @@
 # Keyman Version History
 
+## 17.0.308 beta 2024-04-13
+
+* chore(developer): use keyboard3 tag rather than DTD to identify LDML keyboard xml files (#11214)
+
+## 17.0.307 beta 2024-04-12
+
+* fix(common): specify title explicitly when opening PR with hub (#11173)
+* refactor(web): better centralizes OSK layout internals to prepare for optimization efforts 🪠 (#11176)
+* feat(web): VisualKeyboard layout-reflow optimization 🪠 (#11177)
+* change(web):  OSK optimization, improved responsiveness 🪠 (#11140)
+*  (#11216)
+
 ## 17.0.306 beta 2024-04-11
 
 * docs(ios): updates iOS app help for 17.0 banner changes (#11200)

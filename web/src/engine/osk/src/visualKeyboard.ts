@@ -1280,8 +1280,13 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
       const paddingZone = this.gestureEngine.config.maxRoamingBounds as PaddedZoneSource;
       paddingZone.updatePadding([-0.333 * this.currentLayer.rowHeight]);
 
+      /*
+        Note:  longpress.flickDist needs to be no greater than flick.startDist.
+        Otherwise, the longpress up-flick shortcut will not work on keys that
+        support flick gestures.  (Such as sil_euro_latin 3.0+)
+      */
       this.gestureParams.longpress.flickDist = 0.25 * this.currentLayer.rowHeight;
-      this.gestureParams.flick.startDist     = 0.15 * this.currentLayer.rowHeight;
+      this.gestureParams.flick.startDist     = 0.25 * this.currentLayer.rowHeight;
       this.gestureParams.flick.dirLockDist   = 0.35 * this.currentLayer.rowHeight;
       this.gestureParams.flick.triggerDist   = 0.75 * this.currentLayer.rowHeight;
     }
