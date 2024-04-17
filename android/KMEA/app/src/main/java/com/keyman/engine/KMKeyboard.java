@@ -236,8 +236,8 @@ final class KMKeyboard extends WebView {
     // When `.isTestMode() == true`, the setWebContentsDebuggingEnabled method is not available
     // and thus will trigger unit-test failures.
     if (!KMManager.isTestMode() && (
-      0 != (context.getApplicationInfo().flags & ApplicationInfo.FLAG_DEBUGGABLE)
-      || KMManager.getTier(null) != KMManager.Tier.STABLE
+      (context.getApplicationInfo().flags & ApplicationInfo.FLAG_DEBUGGABLE) != 0 || 
+      KMManager.getTier(null) != KMManager.Tier.STABLE
     )) {
       // Enable debugging of WebView via adb. Not used during unit tests
       // Refer: https://developer.chrome.com/docs/devtools/remote-debugging/webviews/#configure_webviews_for_debugging
