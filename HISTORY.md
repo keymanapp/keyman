@@ -1,5 +1,13 @@
 # Keyman Version History
 
+## 17.0.309 beta 2024-04-17
+
+* fix(ios): sample build script --debug detection (#10953)
+* chore(web): simple layout reflow polish 🪠 (#11237)
+* chore(android): enables debugging and inspection of mobile app internal webviews (#11215)
+*  (#11232)
+*  (#11238)
+
 ## 17.0.308 beta 2024-04-13
 
 * chore(developer): use keyboard3 tag rather than DTD to identify LDML keyboard xml files (#11214)
