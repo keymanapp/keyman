@@ -1302,7 +1302,7 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
       widthStyle: this.layoutWidth,
       heightStyle: this.internalHeight,
       baseEmFontSize: this.getKeyEmFontSize(),
-      layoutFontSize: new ParsedLengthStyle(this.layerGroup.element.style.fontSize || '1em'),
+      layoutFontSize: new ParsedLengthStyle(this.layerGroup.element.style.fontSize),
       spacebarText: this.layoutKeyboardProperties?.displayName ?? '(System keyboard)'
     };
   }
