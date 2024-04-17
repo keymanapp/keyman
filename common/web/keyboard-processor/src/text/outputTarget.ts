@@ -446,6 +446,17 @@ export class Mock extends OutputTarget {
     this.text = this.getTextBeforeCaret() + s;
   }
 
+  /**
+   * Indicates if this Mock represents an identical context to that of another Mock.
+   *
+   * Does not currently validate a match for deadkeys.
+   * @param other
+   * @returns
+   */
+  isEqual(other: Mock) {
+    return this.text == other.text && this.selStart == other.selStart && this.selEnd == other.selEnd;
+  }
+
   doInputEvent() {
     // Mock isn't backed by an element, so it won't have any event listeners.
   }
