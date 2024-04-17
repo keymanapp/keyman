@@ -344,34 +344,29 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
       let beforeManipulation = textDocumentProxy.documentContextBeforeInput ?? ""
 
       /*
-        Apple has some special nuances to its text deletion that our internal
-        Web engine does not emulate.
+        We have a problem to resolve here: we cannot simply delete the selection
+        with either .deleteBackward() or .insertText(""):
        
-        .deleteBackward() behaviors:
         - If there is selected text immediately following a space (U+0020),
-          it will delete that space IN ADDITION to the selected text.
-        - If there is selected text that starts mid-word, it will NOT delete
-          the preceding character.
+          .deleteBackward() will delete that space IN ADDITION to the selected text.
+        - Unlike .insertText("-any-string-here"), .insertText("") does nothing;
+          it does not replace the selection with the new string.
        
-        Compare to Web:  Web states an exact number of characters to delete
-        before the start of the currently-selected range... and it does this
-        completely unaware of the nuances listed above for .deleteBackward().
-        Keyman keyboard rules are likewise unaware of Apple's nuances.
+        Our policy (#9073) on handling the backspace key when there is a
+        text selection is to just delete the selection. We have to override
+        the special case of space being deleted by .deleteBackward() ourselves.
+        Additionally, the internal Web engine cannot anticipate the special
+        case and requires precise and consistent backspace handling in line
+        with our policy in order to keep the context on both sides synchronized.
        
-        In order to maintain proper synchronization between app context and
-        internal Web-engine context, we need to force selected-text deletion
-        to NEVER delete preceding spaces.  Any attempts to adjust and include
-        the aforementioned nuance will need considerable design work to "get
-        right" due to the risk for adverse affects with Keyman keyboard rules.
+        As .insertText() does not delete the selection if the string to
+        be inserted is empty, we insert something that won't combine,
+        like a ZWNJ, and then delete it.
        
-        .insertText() is great for this... when the string isn't empty.  If
-        it is, well, "sorry, out of luck."  That said, we can just insert
-        something that won't combine, like a ZWNJ, and then delete it.
-       
-        The silver lining:  Apple makes it impossible for users to select text
-        in a way that splits character clusters.  This implies that it's
-        impossible for an inserted ZWNJ to combine with existing context, 
-        making this operation safe.
+        iOS does not allow users to select text in a way that splits
+        character clusters.  This implies that it's impossible for an
+        inserted ZWNJ to combine with existing context, making this
+        operation safe.
       */
       textDocumentProxy.insertText("\u{200c}")
       textDocumentProxy.deleteBackward()
@@ -404,6 +399,8 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
     // `true` if there was selected text to be deleted
     let deletedSelection = self.deleteSelection()
 
+    // If text was selected, we generally act as if the context is nil - no back
+    // deletions allowed, so we skip that section.
     if numCharsToDelete <= 0 || deletedSelection {
       textDocumentProxy.insertText(newText)
       sendContextUpdate()
