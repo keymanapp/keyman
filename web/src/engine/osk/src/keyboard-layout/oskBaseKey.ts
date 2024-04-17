@@ -203,7 +203,7 @@ export default class OSKBaseKey extends OSKKey {
       // part 2:  key internals - these do depend on recalculating internal layout.
 
       // Ideally, the rest would be in yet another calculation layer... need to figure out a good design for this.
-      keyTextClosure(); // we're already in that phase, so go ahead and run it.
+      keyTextClosure?.(); // we're already in that phase, so go ahead and run it.
 
       const emFont = layoutParams.baseEmFontSize;
       // Rescale keycap labels on small phones

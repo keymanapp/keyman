@@ -314,7 +314,7 @@ export default abstract class OSKKey {
   public refreshLayout(layoutParams: KeyLayoutParams) {
     // Avoid doing any font-size related calculations if there's no text to display.
     if(this.spec.sp == ButtonClasses.spacer || this.spec.sp == ButtonClasses.blank) {
-      return () => {};
+      return null;
     }
 
     // Attempt to detect static but key-specific style properties if they haven't yet
@@ -324,7 +324,7 @@ export default abstract class OSKKey {
 
       // Abort if the element is not currently in the DOM; we can't get any info this way.
       if(!lblStyle.fontFamily) {
-        return () => {};
+        return null;
       }
       this._fontFamily = lblStyle.fontFamily;
 
