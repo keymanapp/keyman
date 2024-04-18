@@ -1,5 +1,13 @@
 # Keyman Version History
 
+## 17.0.310 beta 2024-04-18
+
+* fix(web): now auto-scrolls if target element would be hidden after device rotation (#11210)
+* fix(ios): deletion of selected text (#11179)
+* fix(common): update emoji stripping for Unicode 15.1 (#11242)
+* change(web): adjusts multitap timings (#11246)
+*  (#11245)
+
 ## 17.0.309 beta 2024-04-17
 
 * fix(ios): sample build script --debug detection (#10953)
