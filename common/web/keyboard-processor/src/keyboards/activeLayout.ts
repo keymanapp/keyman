@@ -94,7 +94,7 @@ export class ActiveKeyBase {
   nextlayer: string;
   sp?: ButtonClass;
 
-  private _baseKeyEvent: KeyEvent;
+  private _baseKeyEvent: KeyEvent | (() => KeyEvent);
   isMnemonic: boolean = false;
 
   /**
@@ -207,7 +207,11 @@ export class ActiveKeyBase {
 
   @Enumerable
   public get baseKeyEvent(): KeyEvent {
-    return new KeyEvent(this._baseKeyEvent);
+    let val = this._baseKeyEvent;
+    if(typeof val == 'function') {
+      val = val();
+    }
+    return new KeyEvent(val);
   }
 
   /**
@@ -372,7 +376,8 @@ export class ActiveKeyBase {
     ActiveKeyBase.determineHint(aKey, layout.defaultHint);
 
     // Compute the key's base KeyEvent properties for use in future event generation
-    aKey.constructBaseKeyEvent(keyboard, layout, displayLayer);
+    // It's actually somewhat expensive to do this at the start, so we do a lazy-init.
+    aKey._baseKeyEvent = () => aKey.constructBaseKeyEvent(layout, displayLayer);
   }
 
   private static determineHint(spec: ActiveKey, defaultHint: TouchLayout.TouchLayoutDefaultHint): void {
@@ -430,7 +435,7 @@ export class ActiveKeyBase {
   }
 
   @Enumerable
-  private constructBaseKeyEvent(keyboard: Keyboard, layout: ActiveLayout, displayLayer: string) {
+  private constructBaseKeyEvent(layout: ActiveLayout, displayLayer: string) {
     // Get key name and keyboard shift state (needed only for default layouts and physical keyboard handling)
     // Note - virtual keys should be treated case-insensitive, so we force uppercasing here.
     let layer = this.layer || displayLayer || '';
@@ -478,7 +483,7 @@ export class ActiveKeyBase {
       }
     }
 
-    this._baseKeyEvent = Lkc;
+    return Lkc;
   }
 }
 
