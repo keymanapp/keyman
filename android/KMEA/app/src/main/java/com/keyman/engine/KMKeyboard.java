@@ -163,7 +163,7 @@ final class KMKeyboard extends WebView {
     return result;
   }
 
-  protected boolean updateSelectionRange(int selStart, int selEnd) {
+  protected boolean updateSelectionRange() {
     boolean result = false;
     InputConnection ic = KMManager.getInputConnection(this.keyboardType);
     if (ic != null) {
@@ -174,6 +174,16 @@ final class KMKeyboard extends WebView {
 
       String rawText = icText.text.toString();
       updateText(rawText.toString());
+
+      int selStart = icText.selectionStart;
+      int selEnd = icText.selectionEnd;
+
+      int selMin = selStart, selMax = selEnd;
+      if (selStart > selEnd) {
+        // Selection is reversed so "swap"
+        selMin = selEnd;
+        selMax = selStart;
+      }
 
       /*
         The values of selStart & selEnd provided by the system are in code units,
@@ -193,8 +203,8 @@ final class KMKeyboard extends WebView {
 
       selStart -= pairsAtStart;
       selEnd -= (pairsAtStart + pairsSelected);
+      this.loadJavascript(KMString.format("updateKMSelectionRange(%d,%d)", selStart, selEnd));
     }
-    this.loadJavascript(KMString.format("updateKMSelectionRange(%d,%d)", selStart, selEnd));
     result = true;
 
     return result;
@@ -222,7 +232,13 @@ final class KMKeyboard extends WebView {
 
     getSettings().setUseWideViewPort(true);
     getSettings().setLoadWithOverviewMode(true);
-    if (0 != (context.getApplicationInfo().flags & ApplicationInfo.FLAG_DEBUGGABLE)) {
+
+    // When `.isTestMode() == true`, the setWebContentsDebuggingEnabled method is not available
+    // and thus will trigger unit-test failures.
+    if (!KMManager.isTestMode() && (
+      (context.getApplicationInfo().flags & ApplicationInfo.FLAG_DEBUGGABLE) != 0 || 
+      KMManager.getTier(null) != KMManager.Tier.STABLE
+    )) {
       // Enable debugging of WebView via adb. Not used during unit tests
       // Refer: https://developer.chrome.com/docs/devtools/remote-debugging/webviews/#configure_webviews_for_debugging
       setWebContentsDebuggingEnabled(true);

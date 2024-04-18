@@ -75,27 +75,31 @@ export default class KeymanEngine extends KeymanEngineBase<BrowserConfiguration,
         (this.osk.activationModel as TwoStateActivator<HTMLElement>).activationTrigger = e;
       }
 
-      if(this.config.hostDevice.touchable) {
-        if(!e || !target || !this.osk) {
-          return;
-        }
-
-        // Get the absolute position of the caret
-        const y = getAbsoluteY(e);
-        const t = window.pageYOffset;
-        let dy = y-t;
-        if(y >= t) {
-          dy -= (window.innerHeight - this.osk._Box.offsetHeight - e.offsetHeight - 2);
-          if(dy < 0) {
-            dy=0;
-          }
-        }
-        // Hide OSK, then scroll, then re-anchor OSK with absolute position (on end of scroll event)
-        if(dy != 0) {
-          window.scrollTo(0, dy + t);
-        }
+      if(this.config.hostDevice.touchable && target) {
+        this.ensureElementVisibility(e);
       }
     });
+  }
+
+  public ensureElementVisibility(e: HTMLElement) {
+    if(!e || !this.osk) {
+      return;
+    }
+
+    // Get the absolute position of the caret
+    const y = getAbsoluteY(e);
+    const t = window.pageYOffset;
+    let dy = y-t;
+    if(y >= t) {
+      dy -= (window.innerHeight - this.osk._Box.offsetHeight - e.offsetHeight - 2);
+      if(dy < 0) {
+        dy=0;
+      }
+    }
+    // Hide OSK, then scroll, then re-anchor OSK with absolute position (on end of scroll event)
+    if(dy != 0) {
+      window.scrollTo(0, dy + t);
+    }
   }
 
   public get util() {

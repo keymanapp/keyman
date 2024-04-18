@@ -632,7 +632,8 @@ export function specialKeyEndModel(params: GestureParams): GestureModel<any> {
 export function longpressModel(params: GestureParams, allowShortcut: boolean, allowRoaming: boolean): GestureModel<any> {
   const base: GestureModel<any> = {
     id: 'longpress',
-    resolutionPriority: 0,
+    // Needs to beat flick-start priority.
+    resolutionPriority: 4,
     contacts: [
       {
         model: {
