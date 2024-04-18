@@ -109,8 +109,8 @@ export const DEFAULT_GESTURE_PARAMS: GestureParams = {
     noiseTolerance: 10
   },
   multitap: {
-    waitLength: 500,
-    holdLength: 500
+    waitLength: 300,
+    holdLength: 150
   },
   // Note:  all actual runtime values are determined at runtime based upon row height.
   // See `VisualKeyboard.refreshLayout`, CTRL-F "Step 3".
