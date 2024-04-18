@@ -30,7 +30,7 @@ if builder_is_debug_build; then
 fi
 
 builder_describe_outputs \
-  build     /ios/build/Build/Products/Release-iphoneos/Keyman.xcarchive
+  build     /ios/build/Build/Products/${CONFIG}-iphoneos/Keyman.xcarchive
 
 # Base definitions (must be before do_clean call)
 DERIVED_DATA="$KEYMAN_ROOT/ios/build"

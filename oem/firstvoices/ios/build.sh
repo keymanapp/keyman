@@ -22,7 +22,6 @@ builder_describe "Builds the $TARGET app for use on iOS devices - iPhone and iPa
   "clean" \
   "configure" \
   "build" \
-  "--debug         Avoids codesigning and adds full sourcemaps for the embedded predictive-text engine" \
   "--sim-artifact  Also outputs a simulator-friendly test artifact corresponding to the build"
 
 builder_parse "$@"
