@@ -13,6 +13,10 @@ beforeEach(function() {
   callbacks.clear();
 });
 
+const KHMER_ANGKOR_JS  = makePathToFixture('khmer_angkor', 'build', 'khmer_angkor.js');
+const KHMER_ANGKOR_KPS = makePathToFixture('khmer_angkor', 'source', 'khmer_angkor.kps');
+const KHMER_ANGKOR_KMP = makePathToFixture('khmer_angkor', 'build', 'khmer_angkor.kmp');
+
 describe('KeyboardInfoCompilerMessages', function () {
   it('should have a valid KeyboardInfoCompilerMessages object', function() {
     return verifyCompilerMessagesObject(KeyboardInfoCompilerMessages, CompilerErrorNamespace.KeyboardInfoCompiler);
@@ -22,8 +26,8 @@ describe('KeyboardInfoCompilerMessages', function () {
 
   it('should generate ERROR_FileDoesNotExist error if .js file does not exist', async function() {
     const jsFilename = makePathToFixture('khmer_angkor', 'build', 'xxx.js');
-    const kpsFilename = makePathToFixture('khmer_angkor', 'source', 'khmer_angkor.kps');
-    const kmpFilename = makePathToFixture('khmer_angkor', 'build', 'khmer_angkor.kmp');
+    const kpsFilename = KHMER_ANGKOR_KPS;
+    const kmpFilename = KHMER_ANGKOR_KMP;
 
     const sources = {
       kmpFilename,
@@ -87,9 +91,9 @@ describe('KeyboardInfoCompilerMessages', function () {
   // ERROR_FileDoesNotExist (font file not in package)
 
   it('should generate ERROR_FileDoesNotExist error if font file is missing from package', async function() {
-    const jsFilename = makePathToFixture('khmer_angkor', 'build', 'khmer_angkor.js');
-    const kpsFilename = makePathToFixture('khmer_angkor', 'source', 'khmer_angkor.kps');
-    const kmpFilename = makePathToFixture('khmer_angkor', 'build', 'khmer_angkor.kmp');
+    const jsFilename = KHMER_ANGKOR_JS;
+    const kpsFilename = KHMER_ANGKOR_KPS;
+    const kmpFilename = KHMER_ANGKOR_KMP;
 
     const sources = {
       kmpFilename,
@@ -117,9 +121,9 @@ describe('KeyboardInfoCompilerMessages', function () {
   // ERROR_FileDoesNotExist (font file not on disk)
 
   it('should generate ERROR_FileDoesNotExist error if font file is missing from disk', async function() {
-    const jsFilename = makePathToFixture('khmer_angkor', 'build', 'khmer_angkor.js');
-    const kpsFilename = makePathToFixture('khmer_angkor', 'source', 'khmer_angkor.kps');
-    const kmpFilename = makePathToFixture('khmer_angkor', 'build', 'khmer_angkor.kmp');
+    const jsFilename = KHMER_ANGKOR_JS;
+    const kpsFilename = KHMER_ANGKOR_KPS;
+    const kmpFilename = KHMER_ANGKOR_KMP;
 
     const sources = {
       kmpFilename,
@@ -147,9 +151,9 @@ describe('KeyboardInfoCompilerMessages', function () {
   // ERROR_LicenseFileIsMissing
 
   it('should generate ERROR_LicenseFileIsMissing error if license file is missing from disk', async function() {
-    const jsFilename = makePathToFixture('khmer_angkor', 'build', 'khmer_angkor.js');
-    const kpsFilename = makePathToFixture('khmer_angkor', 'source', 'khmer_angkor.kps');
-    const kmpFilename = makePathToFixture('khmer_angkor', 'build', 'khmer_angkor.kmp');
+    const jsFilename = KHMER_ANGKOR_JS;
+    const kpsFilename = KHMER_ANGKOR_KPS;
+    const kmpFilename = KHMER_ANGKOR_KMP;
 
     const sources = {
       kmpFilename,
@@ -174,9 +178,9 @@ describe('KeyboardInfoCompilerMessages', function () {
   // ERROR_LicenseFileIsDamaged (error on decode)
 
   it('should generate ERROR_LicenseFileIsDamaged error if license file throws error on decode', async function() {
-    const jsFilename = makePathToFixture('khmer_angkor', 'build', 'khmer_angkor.js');
-    const kpsFilename = makePathToFixture('khmer_angkor', 'source', 'khmer_angkor.kps');
-    const kmpFilename = makePathToFixture('khmer_angkor', 'build', 'khmer_angkor.kmp');
+    const jsFilename = KHMER_ANGKOR_JS;
+    const kpsFilename = KHMER_ANGKOR_KPS;
+    const kmpFilename = KHMER_ANGKOR_KMP;
 
     const sources = {
       kmpFilename,
@@ -204,9 +208,9 @@ describe('KeyboardInfoCompilerMessages', function () {
   // ERROR_LicenseFileIsDamaged (null on decode)
 
   it('should generate ERROR_LicenseFileIsDamaged error if license file returns null on decode', async function() {
-    const jsFilename = makePathToFixture('khmer_angkor', 'build', 'khmer_angkor.js');
-    const kpsFilename = makePathToFixture('khmer_angkor', 'source', 'khmer_angkor.kps');
-    const kmpFilename = makePathToFixture('khmer_angkor', 'build', 'khmer_angkor.kmp');
+    const jsFilename = KHMER_ANGKOR_JS;
+    const kpsFilename = KHMER_ANGKOR_KPS;
+    const kmpFilename = KHMER_ANGKOR_KMP;
 
     const sources = {
       kmpFilename,
@@ -234,9 +238,9 @@ describe('KeyboardInfoCompilerMessages', function () {
   // ERROR_LicenseIsNotValid
 
   it('should generate ERROR_LicenseIsNotValid error if license file is invalid', async function() {
-    const jsFilename = makePathToFixture('khmer_angkor', 'build', 'khmer_angkor.js');
-    const kpsFilename = makePathToFixture('khmer_angkor', 'source', 'khmer_angkor.kps');
-    const kmpFilename = makePathToFixture('khmer_angkor', 'build', 'khmer_angkor.kmp');
+    const jsFilename = KHMER_ANGKOR_JS;
+    const kpsFilename = KHMER_ANGKOR_KPS;
+    const kmpFilename = KHMER_ANGKOR_KMP;
 
     const sources = {
       kmpFilename,
