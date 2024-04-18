@@ -48,6 +48,10 @@ heat-xml:
     -rmdir /s/q $(KEYMAN_WIX_TEMP_XML)
     mkdir $(KEYMAN_WIX_TEMP_XML)
     xcopy $(DEVELOPER_ROOT)\src\tike\xml\* $(KEYMAN_WIX_TEMP_XML)\ /s
+
+# We also copy over the OSK files from Keyman Engine (#11199)
+    xcopy $(KEYMAN_ROOT)\windows\src\engine\osk $(KEYMAN_WIX_TEMP_XML)\ /s
+
     -del /f /s /q $(KEYMAN_WIX_TEMP_XML)\Thumbs.db
     -rmdir /s/q $(KEYMAN_WIX_TEMP_XML)\app\node_modules
     -for /f %i in ('dir /a:d /s /b $(KEYMAN_WIX_TEMP_XML)\.vs') do rd /s /q %i
