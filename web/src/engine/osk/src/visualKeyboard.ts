@@ -902,18 +902,6 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
       }
     }
   }
-
-  /**
-   * Returns the default properties for a key object, used to construct
-   * both a base keyboard key and popup keys
-   *
-   * @return    {Object}    An object that contains default key properties
-   */
-  getDefaultKeyObject(): ActiveKey {
-    const baseKeyObject: LayoutKey = {...ActiveKey.DEFAULT_KEY};
-    ActiveKey.polyfill(baseKeyObject, this.layoutKeyboard, this.kbdLayout, this.layerId);
-    return baseKeyObject as ActiveKey;
-  };
   //#endregion
 
   //#region OSK touch handlers
