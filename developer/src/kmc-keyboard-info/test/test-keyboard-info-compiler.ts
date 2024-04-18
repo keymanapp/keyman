@@ -183,8 +183,6 @@ describe('keyboard-info-compiler', function () {
     assert.isNull(result);
   });
 
-  // additional run tests
-
   it('check run leaves keyboard_info.isRTL undefined if not set in jsFile', async function() {
     const kpjFilename = KHMER_ANGKOR_KPJ;
     const sources = KHMER_ANGKOR_SOURCES;
