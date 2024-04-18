@@ -379,12 +379,18 @@ state_should_invalidate_context(km_core_state *state,
                      uint16_t modifier_state,
                      uint8_t is_key_down,
                      uint16_t _kmn_unused(event_flags)) {
+  if (!is_key_down) {
+    return false;  // don't invalidate on keyup
+  }
   // if emit_keystroke is present, check if a context reset is needed
   if (state_has_action_type(state, KM_CORE_IT_EMIT_KEYSTROKE)) {
-    if (vk == KM_CORE_VKEY_BKSP && state->context().empty()) {
-        return true; // context is empty - so pass back
-    } else if (is_key_down &&
-          (modifier_should_contextreset(modifier_state) || vkey_should_contextreset(vk))) {
+    if (
+        // always reset on backspace
+        vk == KM_CORE_VKEY_BKSP ||
+        // certain modifiers reset
+        modifier_should_contextreset(modifier_state) ||
+        // reset on frame keys
+        vkey_should_contextreset(vk)) {
       return true;
     }
   }
