@@ -420,8 +420,6 @@ describe('keyboard-info-compiler', function () {
     assert.deepEqual(keyboard_info.related['rel1'], {deprecates: false});
   });
 
-  // [ { id: "khmer10", relationship: "deprecates"} ]
-
   it('should write artifacts to disk', async function() {
     const kpjFilename = KHMER_ANGKOR_KPJ;
     const actualFilename = makePathToFixture('khmer_angkor', 'build', 'actual.keyboard_info');
