@@ -1,4 +1,8 @@
 
+#pragma once
+#ifndef KMX_FILE_H
+#define KMX_FILE_H
+
 //################################################################################################################################################
 //################################# Code beyond these lines needs to be included in mcompile #####################################################
 //################################################################################################################################################
@@ -8,9 +12,6 @@
   Authors:          mcdurdin
 */
 /*
-#pragma once
-#ifndef KMX_FILE_H
-#define KMX_FILE_H
 
 #define UNREFERENCED_PARAMETER(P)   (P)
 #define TRUNCATE ((size_t)-1)
@@ -389,5 +390,5 @@ static_assert(sizeof(KMX_COMP_KEYBOARD) == KEYBOARDFILEHEADER_SIZE, "COMP_KEYBOA
 } // namespace kmx
 } // namespace kbp
 } // namespace km
-#endif
-#endif*/ /*KMX_FILE_H*/
+#endif*/
+#endif //KMX_FILE_H

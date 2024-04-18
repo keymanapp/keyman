@@ -1,11 +1,12 @@
+#pragma once
+#ifndef MC_IMPORT_RULES_H
+#define MC_IMPORT_RULES_H
 
 //################################################################################################################################################
 //################################# Code beyond these lines needs to be included in mcompile #####################################################
 //################################################################################################################################################
 /*
-#pragma once
-#ifndef MC_IMPORT_RULES_H
-#define MC_IMPORT_RULES_H
+
 
 class DeadKey {
 private:
@@ -38,5 +39,5 @@ public:
 
   bool KMX_ContainsBaseCharacter(KMX_WCHAR baseCharacter);
 };
-
-# endif *//*MC_IMPORT_RULES_H*/
+*/
+# endif //MC_IMPORT_RULES_H

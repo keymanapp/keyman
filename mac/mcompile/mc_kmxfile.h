@@ -9,15 +9,15 @@
 #include "filesystem.h"
 #include "mcompile.h"
 
+
+#ifndef _KMXFILE_H
+#define _KMXFILE_H
 //################################################################################################################################################
 //################################# Code beyond these lines needs to be included in mcompile #####################################################
 //################################################################################################################################################
 
 /*
 
-
-#ifndef _KMXFILE_H
-#define _KMXFILE_H
 
 
 typedef struct KMX_tagSTORE {
@@ -84,7 +84,7 @@ KMX_BOOL KMX_LoadKeyboard(char16_t* fileName, LPKMX_KEYBOARD *lpKeyboard);
 KMX_BOOL KMX_SaveKeyboard(LPKMX_KEYBOARD kbd, PKMX_WCHAR filename);
 
 KMX_DWORD KMX_WriteCompiledKeyboard(LPKMX_KEYBOARD fk, FILE* hOutfile, KMX_BOOL FSaveDebug);
-
-#endif // _KMXFILE_H
 */
-#endif /*MC_KMXFILE_H*/
+#endif // _KMXFILE_H
+
+#endif //MC_KMXFILE_H
