@@ -173,7 +173,7 @@ describe('KeyboardInfoCompilerMessages', function () {
     assert.isTrue(await compiler.init(callbacks, {sources}));
     const licenseFilename = makePathToFixture('khmer_angkor', 'LICENSE.md');
     const originalDecode = TextDecoder.prototype.decode
-    TextDecoder.prototype.decode = () => { return null }
+    TextDecoder.prototype.decode = () => null;
     const result = compiler['isLicenseMIT'](licenseFilename)
     TextDecoder.prototype.decode = originalDecode
     assert.isFalse(result);
