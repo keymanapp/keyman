@@ -46,10 +46,24 @@ function JSONToString(obj: TJSONAncestor; ReplaceSlashes: Boolean = False): stri
 var
   bytes: TBytes;
   len: Integer;
+  builder: TStringBuilder;
 begin
-  SetLength(bytes, obj.EstimatedByteSize);
-  len := obj.ToBytes(bytes, 0);
-  Result := TEncoding.UTF8.GetString(bytes, 0, len);
+  if obj is TJSONString then
+  begin
+    builder := TStringBuilder.Create;
+    try
+      obj.ToChars(builder);
+      Result := builder.ToString;
+    finally
+      builder.Free;
+    end;
+  end
+  else
+  begin
+    SetLength(bytes, obj.EstimatedByteSize);
+    len := obj.ToBytes(bytes, 0);
+    Result := TEncoding.UTF8.GetString(bytes, 0, len);
+  end;
   if ReplaceSlashes then
     Result := ReplaceStr(Result, '\/', '/');
 end;
