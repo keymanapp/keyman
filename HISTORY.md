@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 18.0.20 alpha 2024-04-19
+
+* chore(deps): bump tar from 6.1.13 to 6.2.1 (#11211)
+
 ## 18.0.19 alpha 2024-04-15
 
 * chore(linux): Fix wrong merge (#11224)
