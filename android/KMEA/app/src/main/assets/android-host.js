@@ -36,7 +36,11 @@ function init() {
   keyman.beepKeyboard = beepKeyboard;
 
   // Readies the keyboard stub for instant loading during the init process.
-  KeymanWeb.registerStub(JSON.parse(jsInterface.initialKeyboard()));
+  try {
+    KeymanWeb.registerStub(JSON.parse(jsInterface.initialKeyboard()));
+  } catch(error) {
+    console.error(error);
+  }
 
   keyman.init({
     'embeddingApp':device,
