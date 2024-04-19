@@ -6,7 +6,7 @@
 import { Version, deepCopy } from "@keymanapp/web-utils";
 import { TouchLayout } from "@keymanapp/common-types";
 
-import LayoutFormFactorBase = TouchLayout.TouchLayoutPlatform;
+import LayoutFormFactorSpec = TouchLayout.TouchLayoutPlatform;
 import LayoutLayerBase = TouchLayout.TouchLayoutLayer;
 export type LayoutRow = TouchLayout.TouchLayoutRow;
 export type LayoutKey = TouchLayout.TouchLayoutKey;
@@ -33,15 +33,13 @@ export interface LayoutLayer extends LayoutLayerBase {
   aligned?: boolean
 };
 
-export interface LayoutFormFactor extends LayoutFormFactorBase {
-  // To facilitate those post-processing elements.
-  layer: LayoutLayer[]
+export interface LayoutFormFactor extends Omit<LayoutFormFactorSpec, 'layer'> {
 };
 
 export type LayoutSpec = {
-  "desktop"?: LayoutFormFactor,
-  "phone"?: LayoutFormFactor,
-  "tablet"?: LayoutFormFactor
+  "desktop"?: LayoutFormFactorSpec,
+  "phone"?: LayoutFormFactorSpec,
+  "tablet"?: LayoutFormFactorSpec
 }
 
 const KEY_102_WIDTH = 200;
@@ -93,7 +91,7 @@ export class Layouts {
   * @param   {string} formFactor   (really utils.FormFactor)
   * @return  {LayoutFormFactor}
   */
-  static buildDefaultLayout(PVK, keyboard: Keyboard, formFactor: string): LayoutFormFactor {
+  static buildDefaultLayout(PVK, keyboard: Keyboard, formFactor: string): LayoutFormFactorSpec {
     // Build a layout using the default for the device
     var layoutType=formFactor;
 
@@ -114,7 +112,7 @@ export class Layouts {
     }
 
     // Clone the default layout object for this device
-    var layout: LayoutFormFactor = deepCopy(Layouts.dfltLayout[layoutType]);
+    var layout: LayoutFormFactorSpec = deepCopy(Layouts.dfltLayout[layoutType]);
 
     var n,layers=layout['layer'], keyLabels: KLS=PVK['KLS'], key102=PVK['K102'];
     var i, j, k, m, row, rows: LayoutRow[], key: LayoutKey, keys: LayoutKey[];
@@ -236,7 +234,7 @@ export class Layouts {
 
     // *** Step 2: Layer objects now exist; time to fill them with the appropriate key labels and key styles ***
     for(n=0; n<layers.length; n++) {
-      var layer=layers[n], kx, shiftKey: LayoutKey = null, nextKey=null, allText='';
+      var layer=layers[n] as LayoutLayer, kx, shiftKey: LayoutKey = null, nextKey=null, allText='';
       var capsKey: LayoutKey = null, numKey: LayoutKey = null, scrollKey: LayoutKey = null;  // null if not in the OSK layout.
       var layerSpec = keyLabels[layer['id']];
       var isShift = layer['id'] == 'shift' ? 1 : 0;

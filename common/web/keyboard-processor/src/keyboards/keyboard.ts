@@ -3,6 +3,8 @@ import { Layouts, type LayoutFormFactor } from "./defaultLayouts.js";
 import { ActiveKey, ActiveLayout, ActiveSubKey } from "./activeLayout.js";
 import KeyEvent from "../text/keyEvent.js";
 import type OutputTarget from "../text/outputTarget.js";
+import { TouchLayout } from "@keymanapp/common-types";
+import TouchLayoutSpec = TouchLayout.TouchLayoutPlatform;
 
 import type { ComplexKeyboardStore } from "../text/kbdInterface.js";
 
@@ -147,7 +149,7 @@ export default class Keyboard {
   }
 
   // May return null if no layouts exist or have been initialized.
-  private get _layouts(): {[formFactor: string]: LayoutFormFactor} {
+  private get _layouts(): {[formFactor: string]: TouchLayoutSpec } {
     return this.scriptObject['KVKL'];  // This one is compiled by Developer's visual keyboard layout editor.
   }
 
@@ -357,7 +359,7 @@ export default class Keyboard {
     }
   }
 
-  private findOrConstructLayout(formFactor: DeviceSpec.FormFactor): LayoutFormFactor {
+  private findOrConstructLayout(formFactor: DeviceSpec.FormFactor): TouchLayoutSpec {
     if(this._layouts) {
       // Search for viable layouts.  `null` is allowed for desktop form factors when help text is available,
       // so we check explicitly against `undefined`.

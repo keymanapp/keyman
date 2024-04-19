@@ -9,6 +9,8 @@ import type Keyboard from "./keyboard.js";
 import { TouchLayout } from "@keymanapp/common-types";
 import TouchLayoutDefaultHint = TouchLayout.TouchLayoutDefaultHint;
 import TouchLayoutFlick = TouchLayout.TouchLayoutFlick;
+import TouchLayoutSpec = TouchLayout.TouchLayoutPlatform;
+import TouchLayerSpec = TouchLayout.TouchLayoutLayer;
 import { type DeviceSpec } from "@keymanapp/web-utils";
 
 // TS 3.9 changed behavior of getters to make them
@@ -806,7 +808,7 @@ export class ActiveLayout implements LayoutFormFactor{
     }
   }
 
-  static sanitize(rawLayout: LayoutFormFactor) {
+  static sanitize(rawLayout: TouchLayoutSpec) {
     ActiveLayout.correctLayerEmptyRowBug(rawLayout.layer);
 
     for(const layer of rawLayout.layer) {
@@ -819,7 +821,7 @@ export class ActiveLayout implements LayoutFormFactor{
    * @param layout
    * @param formFactor
    */
-  static polyfill(layout: LayoutFormFactor, keyboard: Keyboard, formFactor: DeviceSpec.FormFactor): ActiveLayout {
+  static polyfill(layout: TouchLayoutSpec, keyboard: Keyboard, formFactor: DeviceSpec.FormFactor): ActiveLayout {
     /* c8 ignore start */
     if(layout == null) {
       throw new Error("Cannot build an ActiveLayout for a null specification.");
