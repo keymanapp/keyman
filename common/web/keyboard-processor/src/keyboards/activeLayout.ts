@@ -530,12 +530,10 @@ export class ActiveRow implements LayoutRow {
 
   static polyfill(
     row: LayoutRow,
-    keyboard: Keyboard,
     layout: ActiveLayout,
     displayLayer: string,
     totalWidth: number,
-    proportionalY: number,
-    analysisFlagObj: AnalysisMetadata
+    proportionalY: number
   ) {
     // Apply defaults, setting the width and other undefined properties for each key
     let keys=row['key'];
@@ -565,16 +563,6 @@ export class ActiveRow implements LayoutRow {
 
       const processedKey = new ActiveKey(key, layout, displayLayer);
       keys[j] = processedKey;
-
-      if(processedKey.sk) {
-        analysisFlagObj.hasLongpresses = true;
-      }
-      if(processedKey.multitap) {
-        analysisFlagObj.hasMultitaps = true;
-      }
-      if(processedKey.flick) {
-        analysisFlagObj.hasFlicks = true;
-      }
     }
 
     /* The calculations here are effectively 'virtualized'.  When used with the OSK, the VisualKeyboard
@@ -678,7 +666,7 @@ export class ActiveLayer implements LayoutLayer {
     }
   }
 
-  static polyfill(layer: LayoutLayer, keyboard: Keyboard, layout: ActiveLayout, analysisFlagObj: AnalysisMetadata) {
+  static polyfill(layer: LayoutLayer, layout: ActiveLayout) {
     layer.aligned=false;
 
     // Create a DIV for each row of the group
@@ -711,7 +699,7 @@ export class ActiveLayer implements LayoutLayer {
     for(let i=0; i<rowCount; i++) {
       // Calculate proportional y-coord of row.  0 is at top with highest y-coord.
       let rowProportionalY = (i + 0.5) / rowCount;
-      ActiveRow.polyfill(layer.row[i], keyboard, layout, layer.id, totalWidth, rowProportionalY, analysisFlagObj);
+      ActiveRow.polyfill(layer.row[i], layout, layer.id, totalWidth, rowProportionalY);
     }
 
     // Add class functions and properties to the existing layout object, allowing it to act as an ActiveLayout.
@@ -842,6 +830,18 @@ export class ActiveLayout implements LayoutFormFactor{
       */
     this.sanitize(layout);
 
+    // This bit of preprocessing is a must; we need to know what gestures are available
+    // across all layers, "out of the gate".
+    for(let layer of layout.layer) {
+      for(let row of layer.row) {
+        for(let key of row.key) {
+          analysisMetadata.hasLongpresses ||= !!key.sp;
+          analysisMetadata.hasFlicks      ||= !!key.flick;
+          analysisMetadata.hasMultitaps   ||= !!key.multitap;
+        }
+      }
+    }
+
     // Create a separate OSK div for each OSK layer, only one of which will ever be visible
     var n: number;
     let layerMap: {[layerId: string]: ActiveLayer} = {};
@@ -861,7 +861,7 @@ export class ActiveLayout implements LayoutFormFactor{
     aLayout.formFactor = formFactor;
 
     for(n=0; n<layers.length; n++) {
-      ActiveLayer.polyfill(layers[n], keyboard, aLayout, analysisMetadata);
+      ActiveLayer.polyfill(layers[n], aLayout);
       layerMap[layers[n].id] = layers[n] as ActiveLayer;
     }
 
