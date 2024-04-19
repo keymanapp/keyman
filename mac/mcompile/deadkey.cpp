@@ -5,18 +5,16 @@
 //################################################################################################################################################
 
 
-/*
-
-v_dw_1D createLine(std::string  first, std::string second, KMX_DWORD number, std::string nameresult) {
+/* v_dw_1D createLine(std::string  first, std::string second, KMX_DWORD number, std::string nameresult) {
 	v_dw_1D line;
 	line.push_back(convertNamesTo_DWORD_Value(first));
 	line.push_back(convertNamesTo_DWORD_Value(second));
 	//line.push_back(convertNamesTo_DWORD_Value(nameresult));
 	line.push_back(number);
 	return line;
-}
+}*/
 
-std::vector<DeadKey*> create_alDead() {
+/*std::vector<DeadKey*> create_alDead() {
 	std::vector<DeadKey*> alDead;
 	v_dw_2D dk_ComposeTable;
 
@@ -31,9 +29,9 @@ std::vector<DeadKey*> create_alDead() {
 		alDead.push_back(dk2);
 	}
 	return alDead;
-}
+}*/
 
-void refine_alDead(KMX_WCHAR dk, std::vector<DeadKey*> &dkVec, std::vector<DeadKey*> *p_All_Vec) {
+/*void refine_alDead(KMX_WCHAR dk, std::vector<DeadKey*> &dkVec, std::vector<DeadKey*> *p_All_Vec) {
 	if( dk == 0)
 		return;
 
@@ -58,9 +56,9 @@ bool found_dk_inVector(KMX_WCHAR dk, std::vector<DeadKey*> &dkVec) {
 		} while (i < (int) dkVec.size());
 	}
 	return false;
-}
+}*/
 
-bool query_dk_combinations_for_specific_dk(v_dw_2D * p_dk_ComposeTable, v_dw_2D  &dk_SingleTable, KMX_DWORD dk) {
+/*bool query_dk_combinations_for_specific_dk(v_dw_2D * p_dk_ComposeTable, v_dw_2D  &dk_SingleTable, KMX_DWORD dk) {
 	v_dw_1D line;
 
 	for ( int i =0; i< (int) (*p_dk_ComposeTable).size(); i++) {
@@ -77,9 +75,9 @@ bool query_dk_combinations_for_specific_dk(v_dw_2D * p_dk_ComposeTable, v_dw_2D 
 		return true;
 	else
 		return false;
-}
+}*/
 
-KMX_DWORD KMX_changeKeynameToCapital(KMX_DWORD KVal, KMX_DWORD &shift, GdkKeymap* keymap) {
+/*KMX_DWORD KMX_changeKeynameToCapital(KMX_DWORD KVal, KMX_DWORD &shift, GdkKeymap* keymap) {
   guint Keyval = (guint) KVal;
   GdkKeymapKey* keys;
   gint n_keys;
@@ -95,9 +93,9 @@ KMX_DWORD KMX_changeKeynameToCapital(KMX_DWORD KVal, KMX_DWORD &shift, GdkKeymap
 		}
 	}
 	return Cap;
-}	
+}*/
 
-void create_DKTable(v_dw_2D & dk_ComposeTable) {
+/*void create_DKTable(v_dw_2D & dk_ComposeTable) {
   //create a 2D-Vector which contains data for ALL existing deadkey combinations on a Linux Keyboard:
   //dk_ComposeTable[i][0] : First    (e.g. dead_circumflex)
   //dk_ComposeTable[i][1] : Second   (e.g. a)

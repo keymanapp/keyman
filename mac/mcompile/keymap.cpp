@@ -16,9 +16,9 @@ int map_VKShiftState_to_LinModifier(int VKShiftState) {
   else if (VKShiftState == 9 )      return 2;		// 0000 1001 //
   else if (VKShiftState == 25)      return 3; 	// 0001 1001 //
   else return VKShiftState;
-}
+}*/
 
-KMX_DWORD convertNamesTo_DWORD_Value(std::string tok_str) {
+/* KMX_DWORD convertNamesTo_DWORD_Value(std::string tok_str) {
   // more on https://manpages.ubuntu.com/manpages/jammy/man3/keysyms.3tk.html
   std::map<std::string, KMX_DWORD > first;
 
@@ -297,9 +297,9 @@ KMX_DWORD convertNamesTo_DWORD_Value(std::string tok_str) {
 		}
   }
   return returnIfCharInvalid;
-}
+}*/
 
-int createOneVectorFromBothKeyboards(v_dw_3D &All_Vector,GdkKeymap *keymap) {
+/* int createOneVectorFromBothKeyboards(v_dw_3D &All_Vector,GdkKeymap *keymap) {
   // create a 3D-Vector which contains data of the US keyboard and the underlying Keyboard:
   //    All_Vector[  US_Keyboard ]
   //                     [KeyCode_US        ]
@@ -324,9 +324,9 @@ int createOneVectorFromBothKeyboards(v_dw_3D &All_Vector,GdkKeymap *keymap) {
     return 2;
   }
   return 0;
-}
+}*/
 
-int write_US_ToVector( v_dw_3D &vec,std::string language, const char* text) {
+/*int write_US_ToVector( v_dw_3D &vec,std::string language, const char* text) {
 
   std::string FullPathName = "/usr/share/X11/xkb/symbols/" + language;
 
@@ -351,9 +351,9 @@ int write_US_ToVector( v_dw_3D &vec,std::string language, const char* text) {
 
   fclose(fp);
   return 0;
-}
+}*/
 
-bool createCompleteRow_US(v_str_1D &complete_List, FILE* fp, const char* text, std::string language) {
+/*bool createCompleteRow_US(v_str_1D &complete_List, FILE* fp, const char* text, std::string language) {
   // in the Configuration file we find the appopriate paragraph between "xkb_symbol <text>" and the next xkb_symbol
   // and then copy all rows starting with "key <" to a 1D-Vector
 
@@ -389,9 +389,9 @@ bool createCompleteRow_US(v_str_1D &complete_List, FILE* fp, const char* text, s
     return 1;
   }
   return 0;
-}
+}*/
 
-int replace_KeyName_with_Keycode(std::string  in) {
+/*int replace_KeyName_with_Keycode(std::string  in) {
   int out = returnIfCharInvalid;
 
   if      ( in == "key<TLDE>")    out = 49;    // VK_ BKQUOTE         //
@@ -448,9 +448,9 @@ int replace_KeyName_with_Keycode(std::string  in) {
   else if ( in == "key<SPCE>")    out = 65;    // VK_SPACE            //
 
   return out;
-}
+}*/
 
-int split_US_To_3D_Vector(v_dw_3D &all_US,v_str_1D completeList) {
+/*int split_US_To_3D_Vector(v_dw_3D &all_US,v_str_1D completeList) {
   // 1: take the whole line of the 1D-Vector and remove unwanted characters.
   // 2: seperate the name e.g. key<AD06> from the shiftstates
   // 3: convert to KMX_DWORD
@@ -511,9 +511,9 @@ int split_US_To_3D_Vector(v_dw_3D &all_US,v_str_1D completeList) {
     return 1;
   }
   return 0;
-}
+}*/
 
-v_dw_2D create_empty_2D_Vector( int dim_rows,int dim_ss) {
+/*v_dw_2D create_empty_2D_Vector( int dim_rows,int dim_ss) {
 
   v_dw_1D shifts;
   v_dw_2D Vector_2D;
@@ -526,9 +526,9 @@ v_dw_2D create_empty_2D_Vector( int dim_rows,int dim_ss) {
     shifts.clear();
   }
   return Vector_2D;
-}
+}*/
 
-int append_underlying_ToVector(v_dw_3D &All_Vector,GdkKeymap *keymap) {
+/*int append_underlying_ToVector(v_dw_3D &All_Vector,GdkKeymap *keymap) {
 
   // create a 2D vector all filled with " " and push to 3D-Vector
   v_dw_2D underlying_Vector2D = create_empty_2D_Vector(All_Vector[0].size(),All_Vector[0][0].size());
@@ -574,17 +574,17 @@ bool InitializeGDK(GdkKeymap **keymap,int argc, gchar *argv[]) {
     return 2;
   }
   return 0;
-}
+}*/
 
-bool IsKeymanUsedChar(int KV) {
+/*bool IsKeymanUsedChar(int KV) {
   //         32            A-Z                      a-z
   if  ((KV == 0x20 ) || (KV >= 65 && KV <= 90) || (KV >= 97 && KV <= 122) )
     return true;
   else
     return false;
-}
+}*/
 
-std::u16string convert_DeadkeyValues_To_U16str(int in) {
+/*std::u16string convert_DeadkeyValues_To_U16str(int in) {
 
   if (in == 0 )
     return u"\0";
@@ -605,9 +605,9 @@ std::u16string convert_DeadkeyValues_To_U16str(int in) {
   }
   else
     return u"\0";
-}
+}*/
 
-int KMX_get_KeyVal_From_KeyCode(GdkKeymap *keymap, guint keycode, ShiftState ss, int caps) {
+/*int KMX_get_KeyVal_From_KeyCode(GdkKeymap *keymap, guint keycode, ShiftState ss, int caps) {
 
   GdkModifierType consumed;
   GdkKeymapKey *maps;
@@ -692,9 +692,9 @@ int KMX_get_KeyVal_From_KeyCode(GdkKeymap *keymap, guint keycode, ShiftState ss,
     return 0;
 
   return (int) *keyvals;
-}
+}*/
 
-KMX_DWORD KMX_get_KeyValUnderlying_From_KeyCodeUnderlying(GdkKeymap *keymap, guint keycode, int shift_state_pos) {
+/*KMX_DWORD KMX_get_KeyValUnderlying_From_KeyCodeUnderlying(GdkKeymap *keymap, guint keycode, int shift_state_pos) {
   GdkKeymapKey *maps;
   guint *keyvals;
   gint count;
@@ -715,9 +715,9 @@ KMX_DWORD KMX_get_KeyValUnderlying_From_KeyCodeUnderlying(GdkKeymap *keymap, gui
   g_free(maps);
 
   return KVal;
-}
+}*/
 
-KMX_DWORD KMX_get_KeyValUnderlying_From_KeyCodeUnderlying(GdkKeymap *keymap, UINT VKShiftState, UINT KC_underlying, PKMX_WCHAR DeadKey) {
+/*KMX_DWORD KMX_get_KeyValUnderlying_From_KeyCodeUnderlying(GdkKeymap *keymap, UINT VKShiftState, UINT KC_underlying, PKMX_WCHAR DeadKey) {
 
   GdkKeymapKey *maps;
   guint *keyvals;
@@ -748,9 +748,9 @@ KMX_DWORD KMX_get_KeyValUnderlying_From_KeyCodeUnderlying(GdkKeymap *keymap, UIN
     return 0xFFFE;
   else                                                                                      // usable char
     return KeyV;
-}
+}*/
 
-KMX_WCHAR KMX_get_KeyValUnderlying_From_KeyValUS(v_dw_3D & All_Vector, KMX_DWORD VK_US) {
+/*KMX_WCHAR KMX_get_KeyValUnderlying_From_KeyValUS(v_dw_3D & All_Vector, KMX_DWORD VK_US) {
   KMX_DWORD VK_underlying;
   for( int i=0; i< (int)All_Vector[0].size()-1 ;i++) {
     for( int j=1; j< (int)All_Vector[0][0].size();j++) {
@@ -761,9 +761,9 @@ KMX_WCHAR KMX_get_KeyValUnderlying_From_KeyValUS(v_dw_3D & All_Vector, KMX_DWORD
     }
   }
   return VK_US;
-}
+}*/
 
-KMX_DWORD KMX_get_KeyCodeUnderlying_From_KeyCodeUS(GdkKeymap *keymap, v_dw_3D &All_Vector, KMX_DWORD KC_US, ShiftState ss, int caps) {
+/*KMX_DWORD KMX_get_KeyCodeUnderlying_From_KeyCodeUS(GdkKeymap *keymap, v_dw_3D &All_Vector, KMX_DWORD KC_US, ShiftState ss, int caps) {
   KMX_DWORD KC_underlying;
   std::u16string u16str = convert_DeadkeyValues_To_U16str(KMX_get_KeyVal_From_KeyCode(keymap, KC_US, ss, caps));
 
@@ -776,20 +776,20 @@ KMX_DWORD KMX_get_KeyCodeUnderlying_From_KeyCodeUS(GdkKeymap *keymap, v_dw_3D &A
     }
   }
   return KC_US;
-}
+}*/
 
-UINT  KMX_get_KeyCodeUnderlying_From_VKUS(KMX_DWORD VirtualKeyUS) {
+/*UINT  KMX_get_KeyCodeUnderlying_From_VKUS(KMX_DWORD VirtualKeyUS) {
   return (8 + USVirtualKeyToScanCode[VirtualKeyUS]);
-}
+}*/
 
-KMX_DWORD KMX_get_VKUS_From_KeyCodeUnderlying(KMX_DWORD keycode) {
+/*KMX_DWORD KMX_get_VKUS_From_KeyCodeUnderlying(KMX_DWORD keycode) {
   if ( keycode >7)
     return  (KMX_DWORD) ScanCodeToUSVirtualKey[keycode-8];
 
   return 0;
-}
+}*/
 
-std::u16string CodePointToU16String(unsigned int codepoint) {
+/*std::u16string CodePointToU16String(unsigned int codepoint) {
   std::u16string str;
 
   if constexpr (sizeof(wchar_t) > 2) {
@@ -892,6 +892,5 @@ KMX_DWORD get_keyval_From_Keycode(std::vector<int> keyval, int shiftstate,const 
   returnint = in_array[0]*1000 +(int) in_array[1];
   return returnint;
 }
-
 
 void fun3() {std::cout << "Hier ist fun3 von keymap.cpp...\n";}

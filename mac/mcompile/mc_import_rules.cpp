@@ -97,9 +97,9 @@ int KMX_ToUnicodeEx(guint keycode, PKMX_WCHAR pwszBuff, int shift_state_pos, int
     return 0;
   else                                                              // usable char
     return 1;
-}
+}*/
 
-int KMX_DeadKeyMap(int index, std::vector<DeadKey *> *deadkeys, int deadkeyBase, std::vector<KMX_DeadkeyMapping> *deadkeyMappings) {   // I4327   // I4353
+/*int KMX_DeadKeyMap(int index, std::vector<DeadKey *> *deadkeys, int deadkeyBase, std::vector<KMX_DeadkeyMapping> *deadkeyMappings) {   // I4327   // I4353
   for(size_t i = 0; i < deadkeyMappings->size(); i++) {
     if((*deadkeyMappings)[i].deadkey == index) {
       return (*deadkeyMappings)[i].dkid;
@@ -112,9 +112,9 @@ int KMX_DeadKeyMap(int index, std::vector<DeadKey *> *deadkeys, int deadkeyBase,
     }
   }
   return 0xFFFF;
-}
+}*/
 
-class KMX_VirtualKey {
+/*class KMX_VirtualKey {
 private:
   UINT m_vk;
   UINT m_sc;
@@ -329,8 +329,9 @@ public:
     return true;
   }
 };
+*/
 
-class KMX_Loader {
+/*  class KMX_Loader {
 private:
   KMX_BYTE lpKeyStateNull[256];
   UINT m_XxxxVk;
@@ -358,8 +359,9 @@ public:
   }
 
 };
+*/
 
-int KMX_GetMaxDeadkeyIndex(KMX_WCHAR *p) {
+/* int KMX_GetMaxDeadkeyIndex(KMX_WCHAR *p) {
   int n = 0;
   while(p && *p) {
     if(*p == UC_SENTINEL && *(p+1) == CODE_DEADKEY)
@@ -367,9 +369,9 @@ int KMX_GetMaxDeadkeyIndex(KMX_WCHAR *p) {
     p = KMX_incxstr(p);
   }
   return n;
-}
+}*/
 
-bool KMX_ImportRules(LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, GdkKeymap **keymap, std::vector<KMX_DeadkeyMapping> *FDeadkeys, KMX_BOOL bDeadkeyConversion) {   // I4353   // I4552
+/*bool KMX_ImportRules(LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, GdkKeymap **keymap, std::vector<KMX_DeadkeyMapping> *FDeadkeys, KMX_BOOL bDeadkeyConversion) {   // I4353   // I4552
   KMX_Loader loader;
 
   std::vector<KMX_VirtualKey*> rgKey; //= new VirtualKey[256];
@@ -627,9 +629,9 @@ bool KMX_ImportRules(LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, GdkKeymap **keymap,
   }
 
 return true;
-}
+}*/
 
-const int CODE__SIZE[] = {
+/*const int CODE__SIZE[] = {
    -1,   // undefined                0x00
     1,   // CODE_ANY                 0x01
     2,   // CODE_INDEX               0x02
