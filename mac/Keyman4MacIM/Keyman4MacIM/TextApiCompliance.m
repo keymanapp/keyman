@@ -86,10 +86,10 @@ return [NSString stringWithFormat:@"complianceUncertain: %d, hasCompliantSelecti
   else {
     // if API exists, call it and see if it works as expected
     self.initialSelection = [client selectedRange];
-    [self.appDelegate logDebugMessage:@"TextApiCompliance testCompliance, location = %lu, length = %lu", self.initialSelection.location, self.initialSelection.length];
+    [self.appDelegate logDebugMessage:@"TextApiCompliance checkCompliance, location = %lu, length = %lu", self.initialSelection.location, self.initialSelection.length];
     [self checkComplianceUsingInitialSelection];
   }
-  [self.appDelegate logDebugMessage:@"TextApiCompliance testCompliance workingSelectionApi for app %@: set to %@", self.clientApplicationId, self.complianceUncertain?@"YES":@"NO"];
+  [self.appDelegate logDebugMessage:@"TextApiCompliance checkCompliance workingSelectionApi for app %@: set to %@", self.clientApplicationId, self.complianceUncertain?@"YES":@"NO"];
 }
 
 -(void) checkComplianceUsingInitialSelection {
@@ -100,7 +100,7 @@ return [NSString stringWithFormat:@"complianceUncertain: %d, hasCompliantSelecti
      */
     self.hasCompliantSelectionApi = NO;
     self.complianceUncertain = YES;
-    [self.appDelegate logDebugMessage:@"TextApiCompliance testCompliance not compliant but uncertain, range is NSNotFound"];
+    [self.appDelegate logDebugMessage:@"TextApiCompliance checkComplianceUsingInitialSelection not compliant but uncertain, range is NSNotFound"];
   } else if (self.initialSelection.location >= 0) {
     /**
      * location greater than or equal to zero may just mean that the client
@@ -109,7 +109,7 @@ return [NSString stringWithFormat:@"complianceUncertain: %d, hasCompliantSelecti
      */
     self.hasCompliantSelectionApi = YES;
     self.complianceUncertain = YES;
-    [self.appDelegate logDebugMessage:@"TextApiCompliance testCompliance compliant but uncertain, location >= 0"];
+    [self.appDelegate logDebugMessage:@"TextApiCompliance checkComplianceUsingInitialSelection compliant but uncertain, location >= 0"];
   }
 }
 
@@ -122,7 +122,7 @@ return [NSString stringWithFormat:@"complianceUncertain: %d, hasCompliantSelecti
   
   // return if compliance is already certain
   if(!self.complianceUncertain) {
-    [self.appDelegate logDebugMessage:@"TextApiCompliance testSelectionApiAfterInsert, compliance is already known"];
+    [self.appDelegate logDebugMessage:@"TextApiCompliance checkComplianceAfterInsert, compliance is already known"];
     return;
   }
   
@@ -133,7 +133,7 @@ return [NSString stringWithFormat:@"complianceUncertain: %d, hasCompliantSelecti
     [self validateLocationChange:changeExpected hasLocationChanged:locationChanged];
   }
 
-  [self.appDelegate logDebugMessage:@"TextApiCompliance testComplianceAfterInsert, self.hasWorkingSelectionApi = %@ for app %@", self.hasCompliantSelectionApi?@"YES":@"NO", self.clientApplicationId];
+  [self.appDelegate logDebugMessage:@"TextApiCompliance checkComplianceAfterInsert, self.hasWorkingSelectionApi = %@ for app %@", self.hasCompliantSelectionApi?@"YES":@"NO", self.clientApplicationId];
 }
 
 - (BOOL)validateNewLocation:(NSUInteger)location delete:(NSString *)textToDelete  {
@@ -198,7 +198,7 @@ return [NSString stringWithFormat:@"complianceUncertain: %d, hasCompliantSelecti
     isAppNonCompliant = [self containedInUserManagedNoncompliantAppList:clientAppId];
   }
   
-  [self.appDelegate logDebugMessage:@"containedInNoncompliantAppLists: for app %@: %@", clientAppId, isAppNonCompliant?@"yes":@"no"];
+  [self.appDelegate logDebugMessage:@"applyNoncompliantAppLists: for app %@: %@", clientAppId, isAppNonCompliant?@"YES":@"NO"];
   
   if (isAppNonCompliant) {
     self.complianceUncertain = NO;
