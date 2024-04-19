@@ -127,7 +127,7 @@ export function escapeRegexChar(ch: string) {
 }
 
 /** chars that must be escaped: syntax, C0 + C1 controls */
-const REGEX_SYNTAX_CHAR = /^[\u0000-\u001F\u007F-\u009F{}\[\]\\?|.^$*()/-]$/;
+const REGEX_SYNTAX_CHAR = /^[\u0000-\u001F\u007F-\u009F{}\[\]\\?|.^$*()/+-]$/;
 
 function escapeRegexCharIfSyntax(ch: string) {
   // escape if syntax or not valid
