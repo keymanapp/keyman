@@ -60,6 +60,11 @@ function init() {
         kmw.osk.bannerView.activeBannerHeight = bannerHeight;
         keyman.refreshOskLayout();
       }
+
+      var bc = keyman.osk.bannerController;
+      if(bannerImgPath) {
+        bc.inactiveBanner = new bc.ImageBanner(bannerImgPath);
+      }
     });
 }
 
@@ -72,13 +77,6 @@ function verifyLoaded() {
     }
 }
 
-function showBanner(flag) {
-    console.log("Setting banner display for dictionaryless keyboards to " + flag);
-
-    var bc = keyman.osk.bannerController;
-    bc.inactiveBanner = flag ? new bc.ImageBanner(bannerImgPath) : null;
-}
-
 function setBannerImage(path) {
     bannerImgPath = path;
 
@@ -88,7 +86,7 @@ function setBannerImage(path) {
     }
 
     // If an inactive banner is set, update its image.
-    bc.inactiveBanner = bc.inactiveBanner ? new bc.ImageBanner(bannerImgPath) : null;
+    bc.inactiveBanner = new bc.ImageBanner(bannerImgPath);
 }
 
 function setBannerHeight(h) {
@@ -133,8 +131,10 @@ function getOskWidth() {
 
 function getOskHeight() {
     var height = oskHeight;
-    if(keyman.osk.banner._activeType != 'blank') {
+    if(keyman.osk && keyman.osk.banner._activeType != 'blank') {
         height = height - keyman.osk.banner.height;
+    } else {
+        height = height - (bannerHeight ? bannerHeight : 0);
     }
     return height;
 }
@@ -287,9 +287,16 @@ function setKeymanContext(text, doSync, selStart, selLength) {
     let selEnd = selStart + selLength;
     selEnd = isNaN(selEnd) ? undefined : selEnd;
 
-    const shouldReset = keyman.context.updateContext(text, selStart, selEnd);
-    if(!doSync || shouldReset) {
+    if(doSync) {
+      const shouldReset = keyman.context.updateContext(text, selStart, selEnd);
+      if(shouldReset) {
         keyman.resetContext();
+      }
+    } else {
+      // if not in "sync" mode, we have a hard context reset; just full-reset it.
+      keyman.context.setText(text);
+      keyman.context.setSelection(selStart, selStart+selLength);
+      keyman.resetContext();
     }
 }
 

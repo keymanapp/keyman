@@ -191,8 +191,6 @@ type
 
     procedure ListBreakpoints;
 
-    function ShortcutDisabled(Key: Word): Boolean;
-
     property CurrentEvent: TDebugEvent read GetCurrentEvent;
 
     property OnSetBreakpoint: TDebugLineEvent read FOnSetBreakpoint write FOnSetBreakpoint;
@@ -1322,23 +1320,6 @@ end;
 procedure TfrmDebug.memoClick(Sender: TObject);
 begin
   memoSelMove(memo);
-end;
-
-{-------------------------------------------------------------------------------
- - Control captions                                                            -
- ------------------------------------------------------------------------------}
-
-function TfrmDebug.ShortcutDisabled(Key: Word): Boolean;
-begin
-  Result := False;
-  if not FUIDisabled then Exit;
-  if Key in [VK_F1..VK_F12] then
-    Result := True
-  else if GetKeyState(VK_CONTROL) < 0 then
-  begin
-    if Key in [Ord('A')..Ord('Z'), Ord('0')..Ord('9')] then
-      Result := True;
-  end;
 end;
 
 procedure TfrmDebug.memoSelMove(Sender: TObject);

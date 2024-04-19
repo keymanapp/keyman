@@ -5,9 +5,9 @@ import { MatcherSelection, MatcherSelector } from "./gestures/matchers/matcherSe
 import { GestureSequence } from "./gestures/matchers/gestureSequence.js";
 import { GestureModelDefs, getGestureModel, getGestureModelSet } from "./gestures/specs/gestureModelDefs.js";
 import { GestureModel } from "./gestures/specs/gestureModel.js";
-import { timedPromise } from "@keymanapp/web-utils";
 import { InputSample } from "./inputSample.js";
 import { GestureDebugPath } from "./gestureDebugPath.js";
+import { reportError } from "../reportError.js";
 
 interface EventMap<HoveredItemType, StateToken> {
   /**
@@ -223,8 +223,35 @@ export class TouchpointCoordinator<HoveredItemType, StateToken=any> extends Even
     const selector = this.currentSelector;
 
     touchpoint.setGestureMatchInspector(this.buildGestureMatchInspector(selector));
-    this.emit('inputstart', touchpoint);
 
+    /*
+      If there's an error in code receiving this event, we must not let that break the flow of
+      event input processing - we may still have a locking Promise corresponding to our active
+      GestureSource.  (See: next comment)
+    */
+    try {
+      this.emit('inputstart', touchpoint);
+    } catch (err) {
+      reportError("Error from 'inputstart' event listener", err);
+    }
+
+    /*
+      If an `InputEventEngine` internally utilizes the `AsyncClosureDispatchQueue`, this is the point
+      at which we are now safe to process further events.  The correct 'stateToken' has been identified
+      and all GestureMatcher possibilities for the source have been launched; path updates may resume _and_
+      new incoming paths may now be safely handled.  As such, we can now fulfill any Promise returned by
+      a closure defined within its `inputStart` method for the `GestureSource` under consideration.
+
+      It is quite important that we _do_ fulfill the `Promise` if it exists - further event processing will
+      be blocked for such engines until this is done!  (Hence the try-catch above)
+    */
+    this.inputEngines.forEach((engine) => {
+      engine.fulfillInputStart(touchpoint);
+    });
+
+    // ----------------------------------------
+
+    // All gesture-matching is prepared; now we await the source's first gesture model match.
     const selection = await selectionPromise;
 
     // Any related 'push' mechanics that may still be lingering are currently handled by GestureSequence
@@ -255,6 +282,7 @@ export class TouchpointCoordinator<HoveredItemType, StateToken=any> extends Even
 
     // Could track sequences easily enough; the question is how to tell when to 'let go'.
 
+    // No try-catch because only there's no critical code after it.
     this.emit('recognizedgesture', gestureSequence);
   }
 

@@ -6,6 +6,8 @@ import ttfMeta from 'ttfmeta';
  *
  * @param source   In-memory TTF or WOFF font blob
  *
+ * @throws Uncaught exceptions from ttfMeta.promise if the font file is invalid.
+ * 
  * @returns If the file is invalid or cannot be parsed, returns `null`,
  *          otherwise returns the font family as a string.
  */
@@ -16,12 +18,7 @@ export async function getFontFamily(source: Uint8Array) {
   }
 
   const buffer = Buffer.from(source);
-  let font = null;
-  try {
-    font = await ttfMeta.promise(buffer);
-  } catch(e) {
-    return null;
-  }
+  const font = await ttfMeta.promise(buffer);
   /* c8 ignore next 3 */
   if(!font) {
     return null;

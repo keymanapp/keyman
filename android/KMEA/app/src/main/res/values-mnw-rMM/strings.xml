@@ -105,7 +105,7 @@
     <string name="dictionary_download_start_in_background" comment="Notification that a dictionary download has started">ပွမဂြဲ​ဂၠောၚ်ဖျေံဒၟံၚ် အဘိဓာန်ဂှ် ​ဍေံပ္တံလဝ်ပ္ဍဲလက်ကရဴတေံ</string>
     <!-- Context: Background download messages-->
     <string name="dictionary_download_is_running_in_background" comment="Notification that a dictionary download is still running">အဘိဓာန်ရုဲစှ်လဝ်ဂှ် အဃောဂၠောၚ်ဂြဲ​ဖျေံဒၟံၚ်ရောင်။ မၚ်မွဲချိုန်ခဏတုဲ ဆက်ဂစာန်ပၠန်ညိ!</string>
-    <!-- Context: Background download messages-->
+    <!-- Context: Background download messages. Removed in Keyman 17-->
     <string name="dictionary_download_finished" comment="Notification that a dictionary download has finished">​​​​ဂၠောၚ်ဂြဲဖျေံအဘိဓာန်အာစိုပ်ဒတုဲ။</string>
     <!-- Context: Background download messages -->
     <string name="download_failed" comment="Notification that a download failed">​တံၚ်ဂြဲဖျေံဟွံအံၚ်ဇၞး</string>
@@ -117,7 +117,7 @@
     <string name="update_check_current" comment="Notification that all resources are up to date">"တံရိုဟ်ဖအိုတ်ဂှ် ဒှ်တၟိရ!"</string>
     <!-- Context: General Updates -->
     <string name="update_failed" comment="Notification that a resource update failed">သၠုၚ်ပ္တိုန်ကဆံၚ် တံရိုဟ် မွဲဟွံသေၚ်မွဲ ဟွံအံၚ်ဇၞး!</string>
-    <!-- Context: General Updates -->
+    <!-- Context: General Updates. Removed in Keyman 17 -->
     <string name="update_success" comment="Notification that a resource update successfully updated">သမၠုၚ်ပ္တိုန်ကဆံၚ်တံရိုဟ်အံၚ်ဇၞး!</string>
     <!-- Context: Model Info -->
     <string name="model_version" comment="Title for a dictionary version">ပါယှေန်အဘိဓာန်</string>

@@ -139,24 +139,27 @@ export abstract class TransformCompiler<T extends TransformCompilerType, TranBas
     let result = new TranTransform();
     let cookedFrom = transform.from;
 
-    cookedFrom = sections.vars.substituteStrings(cookedFrom, sections);
+    // check for incorrect \uXXXX escapes. Do this before substituting markers or sets.
+    cookedFrom = this.checkEscapes(cookedFrom); // check for \uXXXX escapes before normalizing
+
+    cookedFrom = sections.vars.substituteStrings(cookedFrom, sections, true);
     const mapFrom = VariableParser.CAPTURE_SET_REFERENCE.exec(cookedFrom);
     const mapTo = VariableParser.MAPPED_SET_REFERENCE.exec(transform.to || '');
     if (mapFrom && mapTo) { // TODO-LDML: error cases
       result.mapFrom = sections.strs.allocString(mapFrom[1]); // var name
       result.mapTo = sections.strs.allocString(mapTo[1]); // var name
     } else {
-      result.mapFrom = sections.strs.allocString(''); // TODO-LDML
-      result.mapTo = sections.strs.allocString(''); // TODO-LDML
+      result.mapFrom = sections.strs.allocString('');
+      result.mapTo = sections.strs.allocString('');
     }
+
+    if (cookedFrom === null) return null; // error
+
+    // the set substution will not produce raw markers `\m{...}` but they will already be in sentinel form.
     cookedFrom = sections.vars.substituteSetRegex(cookedFrom, sections);
 
     // add in markers. idempotent if no markers.
     cookedFrom = sections.vars.substituteMarkerString(cookedFrom, true);
-
-    // check for incorrect \uXXXX escapes
-    cookedFrom = this.checkEscapes(cookedFrom); // check for \uXXXX escapes before normalizing
-    if (cookedFrom === null) return null; // error
 
     // unescape from \u{} form to plain, or in some cases \uXXXX / \UXXXXXXXX for core
     cookedFrom = util.unescapeStringToRegex(cookedFrom);
@@ -169,12 +172,9 @@ export abstract class TransformCompiler<T extends TransformCompilerType, TranBas
       cookedFrom = MarkerParser.nfd_markers(cookedFrom, true);
     }
 
-    // Verify that the regex is syntactically valid
-    try {
-      new RegExp(cookedFrom, 'ug');
-    } catch (e) {
-      this.callbacks.reportMessage(CompilerMessages.Error_UnparseableTransformFrom({ from: transform.from, message: e.message }));
-      return null; // error
+    // perform regex validation
+    if (!this.isValidRegex(cookedFrom, transform.from)) {
+      return null;
     }
 
     // cookedFrom is cooked above, since there's some special treatment
@@ -189,6 +189,46 @@ export abstract class TransformCompiler<T extends TransformCompilerType, TranBas
       nfd: true,
     }, sections);
     return result;
+  }
+
+  /**
+   * Validate the final regex
+   * @param cookedFrom the regex to use, missing the trailing '$'
+   * @param from the original from - for error reporting
+   * @returns true if OK
+   */
+  private isValidRegex(cookedFrom: string, from: string) : boolean {
+    // check for any unescaped dollar sign here
+    if (/(?<!\\)(?:\\\\)*\$/.test(cookedFrom)) {
+      this.callbacks.reportMessage(CompilerMessages.Error_IllegalTransformDollarsign({ from }));
+      return false;
+    }
+    if (/(?<!\\)(?:\\\\)*\*/.test(cookedFrom)) {
+      this.callbacks.reportMessage(CompilerMessages.Error_IllegalTransformAsterisk({ from }));
+      return false;
+    }
+    if (/(?<!\\)(?:\\\\)*\+/.test(cookedFrom)) {
+      this.callbacks.reportMessage(CompilerMessages.Error_IllegalTransformPlus({ from }));
+      return false;
+    }
+    // Verify that the regex is syntactically valid
+    try {
+      const rg = new RegExp(cookedFrom + '$', 'ug');
+      // Tests against the regex:
+
+      // does it match an empty string?
+      if (rg.test('')) {
+        this.callbacks.reportMessage(CompilerMessages.Error_TransformFromMatchesNothing({ from }));
+        return false;
+      }
+    } catch (e) {
+      // We're exposing the internal regex error message here.
+      // In the future, CLDR plans to expose the EBNF for the transform,
+      // at which point we would have more precise validation prior to getting to this point.
+      this.callbacks.reportMessage(CompilerMessages.Error_UnparseableTransformFrom({ from, message: e.message }));
+      return false;
+    }
+    return true;
   }
 
   private compileReorderTranGroup(sections: DependencySections, reorders: LKReorder[]): TranGroup {

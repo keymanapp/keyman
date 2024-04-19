@@ -127,7 +127,7 @@ export function escapeRegexChar(ch: string) {
 }
 
 /** chars that must be escaped: syntax, C0 + C1 controls */
-const REGEX_SYNTAX_CHAR = /^[\u0000-\u001F\u007F-\u009F{}\[\]\\?.^$*()/-]$/;
+const REGEX_SYNTAX_CHAR = /^[\u0000-\u001F\u007F-\u009F{}\[\]\\?|.^$*()/+-]$/;
 
 function escapeRegexCharIfSyntax(ch: string) {
   // escape if syntax or not valid
@@ -148,6 +148,13 @@ function regexOne(hex: string): string {
   // re-escape as 16 or 32 bit code units
   return Array.from(unescaped).map(ch => escapeRegexCharIfSyntax(ch)).join('');
 }
+/**
+ * Escape a string (\uxxxx form) if there are any problematic codepoints
+ */
+export function escapeStringForRegex(s: string) : string {
+  return s.split('').map(ch => escapeRegexCharIfSyntax(ch)).join('');
+}
+
 /**
  * Unescapes a string according to UTS#18§1.1, see <https://www.unicode.org/reports/tr18/#Hex_notation>
  * @param s escaped string

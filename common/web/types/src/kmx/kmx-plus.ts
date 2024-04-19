@@ -2,7 +2,7 @@ import { constants } from '@keymanapp/ldml-keyboard-constants';
 import * as r from 'restructure';
 import { ElementString } from './element-string.js';
 import { ListItem } from './string-list.js';
-import { isOneChar, toOneChar, unescapeString } from '../util/util.js';
+import { isOneChar, toOneChar, unescapeString, escapeStringForRegex } from '../util/util.js';
 import { KMXFile } from './kmx.js';
 import { UnicodeSetParser, UnicodeSet } from '@keymanapp/common-types';
 import { VariableParser } from '../ldml-keyboard/pattern-parser.js';
@@ -272,7 +272,7 @@ export class Vars extends Section {
       return v.value.value; // string value
     });
   }
-  substituteStrings(str: string, sections: DependencySections): string {
+  substituteStrings(str: string, sections: DependencySections, forMatch?: boolean): string {
     if (!str) return str;
     return str.replaceAll(VariableParser.STRING_REFERENCE, (_entire, id) => {
       const val = this.findStringVariableValue(id);
@@ -280,6 +280,7 @@ export class Vars extends Section {
         // Should have been caught during validation.
         throw Error(`Internal Error: reference to missing string variable ${id}`);
       }
+      if (forMatch) return escapeStringForRegex(val);
       return val;
     });
   }
@@ -292,8 +293,9 @@ export class Vars extends Section {
       const set = Vars.findVariable(this.sets, id);
       if (set !== null) {
         const { items } = set;
-        const inner = items.map(i => i.value.value).join('|');
-        return `(?:${inner})`; // TODO-LDML: need to escape here
+        const escapedStrings = items.map(v => escapeStringForRegex(v.value.value));
+        const inner = escapedStrings.join('|');
+        return `(?:${inner})`;
       }
 
       // try as unicodeset
@@ -372,11 +374,15 @@ export class UnicodeSetItem extends VarsItem {
 };
 
 export class SetVarItem extends VarsItem {
-  constructor(id: string, value: string[], sections: DependencySections) {
+  constructor(id: string, value: string[], sections: DependencySections, rawItems: string[]) {
     super(id, value.join(' '), sections);
     this.items = sections.elem.allocElementString(sections, value);
+    this.rawItems = rawItems;
   }
+  // element string array
   items: ElementString;
+  // like items, but with unprocessed marker strings
+  rawItems: string[];
   valid() : boolean {
     return !!this.items;
   }

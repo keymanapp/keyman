@@ -595,11 +595,20 @@ export class KeyboardInfoCompiler implements KeymanCompiler {
       return null;
     }
 
+    let fontFamily = null;
+    try {
+      fontFamily = await getFontFamily(fontData)
+    } catch(e) {
+      this.callbacks.reportMessage(KeyboardInfoCompilerMessages.Error_FontFileMetaDataIsInvalid({filename: sourcePath,message: e}));
+      return null;
+    }
+
     const result = {
-      family: await getFontFamily(fontData),
+      family: fontFamily,
       source
     };
 
+    /* c8 ignore next 4 */
     if(!result.family) {
       this.callbacks.reportMessage(KeyboardInfoCompilerMessages.Error_FontFileCannotBeRead({filename: sourcePath}));
       return null;
@@ -609,3 +618,9 @@ export class KeyboardInfoCompiler implements KeymanCompiler {
 
 }
 
+/**
+ * these are exported only for unit tests, do not use
+ */
+export const unitTestEndpoints = {
+  langtagsByTag,
+};

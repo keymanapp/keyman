@@ -116,7 +116,7 @@ export interface GestureModel<Type, StateToken = any> {
      * Only takes effect if a model instantly resolves or rejects upon being considered for
      * inclusion in the model.
      */
-    resetOnResolve?: boolean,
+    resetOnInstantFulfill?: boolean,
     /**
      * Indicates that the corresponding GestureSource should be terminated whenever this GestureModel
      * is successfully matched.
@@ -142,7 +142,28 @@ export interface GestureModel<Type, StateToken = any> {
 
   readonly resolutionAction: GestureResolutionSpec;
 
-  readonly rejectionActions?: Partial<Record<FulfillmentCause, RejectionReplace>>;
+  /*
+    Do NOT allow 'cancelled' rejection-actions.  If 'cancelled', the corresponding `GestureSource`s
+    can no longer be valid matches for the GestureModel under any condition.
+
+    Generally, this is due to the underlying sources themselves being cancelled, but this can also
+    arise under the following combination of conditions:
+    - a model instantly rejects...
+      - whenever a new `GestureSource` starts and matches an instantly-rejecting `PathModel` for this
+        `GestureModel` (cause: 'path')
+      - when it fails initial-state validation (cause: 'item')
+    - a corresponding rejection action has been defined.
+      - For example, it also rejects under certain path conditions (for its original `GestureSource`)
+        that are recoverable.
+
+    Upon receiving an incoming extra GestureSource, the model would instantly reject (cause: 'path')
+    and could attempt to restart if specified to do so by a 'path' rejection action.  In such a case,
+    it would instantly reject again due to the same reason.  Instant rejection of a replacement model
+    during a rejection action is reported as 'cancellation'.
+  */
+
+  readonly rejectionActions?: Partial<Record<Exclude<FulfillmentCause, 'cancelled'>, RejectionReplace>>;
+
   // If there is a 'gesture stack' associated with the gesture chain, it's auto-popped
   // upon completion of the chain.  Optional-chaining can sustain the chain while the
   // potential child gesture is still a possibility.

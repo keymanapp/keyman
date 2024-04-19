@@ -1,4 +1,4 @@
-import { type Keyboard, Mock, OutputTarget, Transcription, findCommonSubstringEndIndex } from '@keymanapp/keyboard-processor';
+import { type Keyboard, Mock, OutputTarget, Transcription, findCommonSubstringEndIndex, isEmptyTransform } from '@keymanapp/keyboard-processor';
 import { KeyboardStub } from 'keyman/engine/package-cache';
 import { ContextManagerBase, ContextManagerConfiguration } from 'keyman/engine/main';
 import { WebviewConfiguration } from './configuration.js';
@@ -41,7 +41,9 @@ export class ContextHost extends Mock {
 
       // Signal the necessary text changes to the embedding app, if it exists.
       if(this.oninserttext) {
-        this.oninserttext(transform.deleteLeft, transform.insert, transform.deleteRight);
+        if(!isEmptyTransform(transform) || transform.erasedSelection) {
+          this.oninserttext(transform.deleteLeft, transform.insert, transform.deleteRight);
+        }
       }
     }
 
@@ -60,18 +62,24 @@ export class ContextHost extends Mock {
 
   updateContext(text: string, selStart: number, selEnd: number): boolean {
     let shouldResetContext = false;
+    let tempMock = new Mock(text, selStart ?? text._kmwLength(), selEnd ?? text._kmwLength());
+    let newLeft = tempMock.getTextBeforeCaret();
+    let oldLeft = this.getTextBeforeCaret();
+
     if(text != this.text) {
-      let tempMock = new Mock(text, selStart ?? text._kmwLength(), selEnd ?? text._kmwLength());
-
-      let newLeft = tempMock.getTextBeforeCaret();
-      let oldLeft = this.getTextBeforeCaret();
-
       let unexpectedBeforeCharCount = findCommonSubstringEndIndex(newLeft, oldLeft, true) + 1;
       shouldResetContext = !!unexpectedBeforeCharCount;
     }
 
     if(shouldResetContext) {
       this.text = text;
+      this.selStart = selStart;
+      this.selEnd = selEnd;
+    } else {
+      // Transform selection coordinates to their location within the longform context window.
+      let delta = oldLeft._kmwLength() - newLeft._kmwLength();
+      this.selStart = selStart - delta;
+      this.selEnd = selEnd - delta;
     }
 
     if(selStart === undefined || selEnd === undefined) {

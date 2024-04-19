@@ -5,6 +5,9 @@ const SevWarn = CompilerErrorSeverity.Warn | CompilerErrorNamespace.LdmlKeyboard
 const SevError = CompilerErrorSeverity.Error | CompilerErrorNamespace.LdmlKeyboardCompiler;
 // const SevFatal = CompilerErrorSeverity.Fatal | CompilerErrorNamespace.LdmlKeyboardCompiler;
 
+// sub-numberspace for transform errors
+const SevErrorTransform = SevError | 0xF00;
+
 /**
  * @internal
  */
@@ -171,13 +174,37 @@ export class CompilerMessages {
   static Error_UnparseableReorderSet = (o: { from: string, set: string }) =>
   m(this.ERROR_UnparseableReorderSet, `Illegal UnicodeSet "${def(o.set)}" in reorder "${def(o.from)}`);
 
-  static ERROR_UnparseableTransformFrom = SevError | 0x0029;
-  static Error_UnparseableTransformFrom = (o: { from: string, message: string }) =>
-  m(this.ERROR_UnparseableTransformFrom, `Invalid transfom from "${def(o.from)}": "${def(o.message)}"`);
+  // Available: 0x029
 
   static ERROR_InvalidQuadEscape = SevError | 0x0030;
   static Error_InvalidQuadEscape = (o: { cp: number }) =>
-  m(this.ERROR_InvalidQuadEscape, `Invalid escape "\\u${util.hexQuad(o?.cp || 0)}", use "\\u{${def(o?.cp?.toString(16))}}" instead.`);
+  m(this.ERROR_InvalidQuadEscape, `Invalid escape "\\u${util.hexQuad(o?.cp || 0)}". Hint: Use "\\u{${def(o?.cp?.toString(16))}}"`);
+
+  //
+  // Transform syntax errors begin at ...F00 (SevErrorTransform)
+
+  // This is a bit of a catch-all and represents messages bubbling up from the underlying regex engine
+  static ERROR_UnparseableTransformFrom   = SevErrorTransform | 0x00;
+  static Error_UnparseableTransformFrom   = (o: { from: string, message: string }) =>
+  m(this.ERROR_UnparseableTransformFrom,    `Invalid transform from="${def(o.from)}": "${def(o.message)}"`);
+
+  static ERROR_IllegalTransformDollarsign = SevErrorTransform | 0x01;
+  static Error_IllegalTransformDollarsign = (o: { from: string }) =>
+  m(this.ERROR_IllegalTransformDollarsign,  `Invalid transform from="${def(o.from)}": Unescaped dollar-sign ($) is not valid transform syntax.`,
+                                            '**Hint**: Use `\\$` to match a literal dollar-sign.');
+
+  static ERROR_TransformFromMatchesNothing = SevErrorTransform | 0x02;
+  static Error_TransformFromMatchesNothing = (o: { from: string }) =>
+  m(this.ERROR_TransformFromMatchesNothing, `Invalid transfom from="${def(o.from)}": Matches an empty string.`);
+
+  static ERROR_IllegalTransformPlus = SevErrorTransform | 0x03;
+  static Error_IllegalTransformPlus = (o: { from: string }) =>
+  m(this.ERROR_IllegalTransformPlus,  `Invalid transform from="${def(o.from)}": Unescaped plus (+) is not valid transform syntax.`,
+                                            '**Hint**: Use `\\+` to match a literal plus.');
+
+  static ERROR_IllegalTransformAsterisk = SevErrorTransform | 0x04;
+  static Error_IllegalTransformAsterisk = (o: { from: string }) =>
+  m(this.ERROR_IllegalTransformAsterisk,  `Invalid transform from="${def(o.from)}": Unescaped asterisk (*) is not valid transform syntax.`,
+                                            '**Hint**: Use `\\*` to match a literal asterisk.');
+
 }
-
-

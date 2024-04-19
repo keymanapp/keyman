@@ -45,7 +45,8 @@ uses
   Keyman.System.MITLicense in '..\..\global\delphi\general\Keyman.System.MITLicense.pas',
   Keyman.Setup.System.Locales in 'Keyman.Setup.System.Locales.pas',
   Keyman.System.UILanguageManager in '..\..\global\delphi\general\Keyman.System.UILanguageManager.pas',
-  Keyman.Setup.System.SetupUILanguageManager in 'Keyman.Setup.System.SetupUILanguageManager.pas';
+  Keyman.Setup.System.SetupUILanguageManager in 'Keyman.Setup.System.SetupUILanguageManager.pas',
+  utilhttp in '..\..\..\..\common\windows\delphi\general\utilhttp.pas';
 
 {$R icons.res}
 {$R version.res}

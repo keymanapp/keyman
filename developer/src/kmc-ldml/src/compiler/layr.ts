@@ -7,7 +7,6 @@ import { translateLayerAttrToModifier, validModifier } from '../util/util.js';
 
 import DependencySections = KMXPlus.DependencySections;
 import Layr = KMXPlus.Layr;
-import LayrEntry = KMXPlus.LayrEntry;
 import LayrList = KMXPlus.LayrList;
 import LayrRow = KMXPlus.LayrRow;
 
@@ -41,7 +40,7 @@ export class LayrCompiler extends SectionCompiler {
         const { modifiers, id } = layer;
         totalLayerCount++;
         if (!validModifier(modifiers)) {
-          this.callbacks.reportMessage(CompilerMessages.Error_InvalidModifier({ modifiers, layer: id }));
+          this.callbacks.reportMessage(CompilerMessages.Error_InvalidModifier({ modifiers, layer: id || '' }));
           valid = false;
         }
       });
@@ -60,22 +59,28 @@ export class LayrCompiler extends SectionCompiler {
     sect.lists = this.keyboard3.layers.map((layers) => {
       const hardware = sections.strs.allocString(layers.formId);
       // Already validated in validate
+      const layerEntries = [];
+      for (const layer of layers.layer) {
+        const rows = layer.row.map((row) => {
+          const erow: LayrRow = {
+            keys: row.keys.split(' ').map((id) => sections.strs.allocString(id)),
+          };
+          return erow;
+        });
+        const mods = translateLayerAttrToModifier(layer);
+        // push a layer entry for each modifier set
+        for (const mod of mods) {
+          layerEntries.push({
+            id: sections.strs.allocString(layer.id),
+            mod,
+            rows,
+          });
+        }
+      }
       const list: LayrList = {
         hardware,
         minDeviceWidth: layers.minDeviceWidth || 0,
-        layers: layers.layer.map((layer) => {
-          const entry: LayrEntry = {
-            id: sections.strs.allocString(layer.id),
-            mod: translateLayerAttrToModifier(layer),
-            rows: layer.row.map((row) => {
-              const erow: LayrRow = {
-                keys: row.keys.split(' ').map((id) => sections.strs.allocString(id)),
-              };
-              return erow;
-            }),
-          };
-          return entry;
-        }),
+        layers: layerEntries,
       };
       return list;
     });

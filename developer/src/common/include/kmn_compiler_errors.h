@@ -175,6 +175,11 @@
 #define CERR_RepeatedBegin                                 0x00004073
 #define CERR_VirtualKeyInContext                           0x00004074
 
+#define CERR_OutsTooLong                                   0x00004075
+#define CERR_ExtendedStringTooLong                         0x00004076
+#define CERR_VirtualKeyExpansionTooLong                    0x00004077
+#define CERR_CharacterRangeTooLong                         0x00004078
+
 #define CWARN_TooManyWarnings                              0x00002080
 #define CWARN_OldVersion                                   0x00002081
 #define CWARN_BitmapNotUsed                                0x00002082

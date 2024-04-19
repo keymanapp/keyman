@@ -152,7 +152,7 @@ void test_actions_normalize(
  *                                      this is initial_cached_context -
  *                                      actions_code_points_to_delete +
  *                                      actions_output) - no markers supported.
- *                                      If specified, final_cached_context_items 
+ *                                      If specified, final_cached_context_items
  *                                      must be nullptr.
  * @param final_cached_context_items    cached context _after_ actions have been
  *                                      applied -- NFU (essentially,
@@ -440,6 +440,23 @@ void run_actions_normalize_tests() {
     /* app_context: */                   u"a\U0001F607bca\U0001F60E"
   );
 
+  km_core_context_item items_11067[] = {
+    { KM_CORE_CT_CHAR,   {0,}, { U'𐒻' } },
+    { KM_CORE_CT_CHAR,   {0,}, { U'𐒷' } },
+    KM_CORE_CONTEXT_ITEM_END
+  };
+
+  // regression #11067
+  test_actions_normalize(
+    "A non-BMP char in context (#11067)",
+    /* app context pre transform: */     u"𐒻",
+    /* cached context post transform: */ u"𐒻𐒷",
+    /* cached context post transform: */ &items_11067[0],
+    /* action del, output: */            0, U"𐒻𐒷",
+    // ---- results ----
+    /* action del, output: */            1, U"𐒻𐒷",
+    /* app_context: */                   u"𐒻𐒷"
+  );
 }
 
 void run_actions_update_app_context_nfu_tests() {

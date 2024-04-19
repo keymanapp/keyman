@@ -335,9 +335,14 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
                 // of events)
                 if(sysEvent.keyCode == kVK_Delete && appDelegate.inputController != nil) {
                     NSLog(@"Event tap handling kVK_Delete.");
-                    [appDelegate.inputController handleBackspace:sysEvent];
+                  [appDelegate.inputController handleBackspace:sysEvent];
+                } else if(sysEvent.keyCode == kVK_Delete) {
+                    NSLog(@"Event tap not handling kVK_Delete, appDelegate.inputController = %@", appDelegate.inputController);
+                }
+                if(sysEvent.keyCode == 255) {
+                  NSLog(@"*** kKeymanEventKeyCode = 0xFF");
                 } else {
-                  NSLog(@"Event tap not handling kVK_Delete, appDelegate.inputController = %@", appDelegate.inputController);
+                  NSLog(@"*** other: %d(%x)", (char) sysEvent.keyCode, sysEvent.keyCode);
                 }
 
                 switch(sysEvent.keyCode) {
@@ -443,7 +448,7 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
         return;
     }
 
-  // TODO pass array instead of making repeated calls
+  // TODO: pass array instead of making repeated calls
     for (NSString *key in persistedOptionsForSelectedKeyboard) {
         NSString *value = [persistedOptionsForSelectedKeyboard objectForKey:key];
         NSLog(@"persisted options found in UserDefaults for keyboard %@, key: %@, value: %@", _selectedKeyboard, key, value);

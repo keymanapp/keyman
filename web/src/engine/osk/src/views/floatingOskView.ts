@@ -31,7 +31,7 @@ export default class FloatingOSKView extends OSKView {
   dfltX: string;
   dfltY: string;
 
-  layoutSerializer = new FloatingOSKCookieSerializer();
+  private layoutSerializer = new FloatingOSKCookieSerializer();
 
   private titleBar: TitleBar;
   private resizeBar: ResizeBar;
@@ -64,6 +64,7 @@ export default class FloatingOSKView extends OSKView {
     this.resizeBar.on('showbuild', () => this.emit('showbuild'));
 
     this.headerView = this.titleBar;
+    this._Box.insertBefore(this.headerView.element, this._Box.firstChild);
 
     const onListenedEvent = (eventName: keyof EventMap | keyof LegacyOSKEventMap) => {
       // As the following title bar buttons (for desktop / FloatingOSKView) do nothing unless a site
@@ -219,6 +220,15 @@ export default class FloatingOSKView extends OSKView {
    *  @return {boolean}
    */
   private loadPersistedLayout(): void {
+    /*
+      If a keyboard is available during OSK construction, it is possible
+      for this field to be `undefined`.  `loadPersistedLayout` will be called
+      later in construction, so it's safe to skip.
+    */
+    if(!this.layoutSerializer) {
+      return;
+    }
+
     let c = this.layoutSerializer.loadWithDefaults({
       visible: 1,
       userSet: 0,

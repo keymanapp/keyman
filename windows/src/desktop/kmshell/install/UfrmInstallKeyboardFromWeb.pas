@@ -91,6 +91,7 @@ uses
   Upload_Settings,
   utilfiletypes,
   utildir,
+  utilhttp,
   utilexecute,
   VersionInfo;
 
@@ -190,7 +191,7 @@ begin
   if m.Success then
   begin
     // We want to install the keyboard found in the path.
-    PackageID := m.Groups[1].Value;
+    PackageID := URLDecode(m.Groups[1].Value);
     uri := TURI.Create(url);
 
     try
