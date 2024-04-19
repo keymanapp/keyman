@@ -7,11 +7,6 @@
 #define CERR_UnableToWriteFully                            0x00008007
 #define CERR_SomewhereIGotItWrong                          0x00008009
 
-//################################################################################################################################################
-//################################# Code beyond these lines needs to be included in mcompile #####################################################
-//################################################################################################################################################
-
-
 KMX_BOOL KMX_VerifyKeyboard(LPKMX_BYTE filebase, KMX_DWORD sz);
 
 LPKMX_KEYBOARD KMX_FixupKeyboard(PKMX_BYTE bufp, PKMX_BYTE base, KMX_DWORD dwFileSize);
@@ -23,7 +18,7 @@ KMX_BOOL KMX_SaveKeyboard(LPKMX_KEYBOARD kbd, PKMX_WCHAR filename) {
 
   if(fp == NULL)
   {
-    KMX_LogError(L"Failed to create output file (%d)", errno);
+    mac_KMX_LogError(L"Failed to create output file (%d)", errno);
     return FALSE;
   }
 
@@ -31,7 +26,7 @@ KMX_BOOL KMX_SaveKeyboard(LPKMX_KEYBOARD kbd, PKMX_WCHAR filename) {
   fclose(fp);
 
   if(err != CERR_None) {
-    KMX_LogError(L"Failed to write compiled keyboard with error %d", err);
+    mac_KMX_LogError(L"Failed to write compiled keyboard with error %d", err);
 
     std::u16string u16_filname(filename);
     std::string s = string_from_u16string(u16_filname);
@@ -227,7 +222,6 @@ PKMX_WCHAR KMX_StringOffset(PKMX_BYTE base, KMX_DWORD offset) {
   return (PKMX_WCHAR)(base + offset);
 }
 
-
 #ifdef KMX_64BIT
 
 /**  CopyKeyboard will copy the data read into bufp from x86-sized structures into
@@ -317,7 +311,7 @@ LPKMX_KEYBOARD KMX_CopyKeyboard(PKMX_BYTE bufp, PKMX_BYTE base) {
  beginning of the file, but we need real pointers. This method is used on 32-bit architectures.
 */
 
-/* LPKMX_KEYBOARD KMX_FixupKeyboard(PKMX_BYTE bufp, PKMX_BYTE base, KMX_DWORD dwFileSize) {
+LPKMX_KEYBOARD KMX_FixupKeyboard(PKMX_BYTE bufp, PKMX_BYTE base, KMX_DWORD dwFileSize) {
 
   UNREFERENCED_PARAMETER(dwFileSize);
 
@@ -352,7 +346,7 @@ LPKMX_KEYBOARD KMX_CopyKeyboard(PKMX_BYTE bufp, PKMX_BYTE base) {
 	}
 
   return kbp;
-}*/
+}
 
 #endif
 
@@ -364,20 +358,20 @@ KMX_BOOL KMX_LoadKeyboard(char16_t* fileName, LPKMX_KEYBOARD* lpKeyboard) {
   PKMX_BYTE filebase;
 
   if(!fileName || !lpKeyboard) {
-    KMX_LogError(L"Bad Filename\n" );
+    mac_KMX_LogError(L"Bad Filename\n" );
     return FALSE;
   }
 
   fp = Open_File((const KMX_WCHAR*)fileName, u"rb");
 
   if(fp == NULL) {
-    KMX_LogError(L"Could not open file\n" );
+    mac_KMX_LogError(L"Could not open file\n" );
     return FALSE;
   }
 
   if (fseek(fp, 0, SEEK_END) != 0) {
     fclose(fp);
-    KMX_LogError(L"Could not fseek file\n" );
+    mac_KMX_LogError(L"Could not fseek file\n" );
     return FALSE;
   }
 
@@ -389,7 +383,7 @@ KMX_BOOL KMX_LoadKeyboard(char16_t* fileName, LPKMX_KEYBOARD* lpKeyboard) {
 
   if (fseek(fp, 0, SEEK_SET) != 0) {
     fclose(fp);
-    KMX_LogError(L"Could not fseek(set) file\n" );
+    mac_KMX_LogError(L"Could not fseek(set) file\n" );
     return FALSE;
   }
 
@@ -407,7 +401,7 @@ KMX_BOOL KMX_LoadKeyboard(char16_t* fileName, LPKMX_KEYBOARD* lpKeyboard) {
 
   if (!buf) {
     fclose(fp);
-    KMX_LogError(L"Not allocmem\n" );
+    mac_KMX_LogError(L"Not allocmem\n" );
     return FALSE;
   }
 
@@ -418,7 +412,7 @@ KMX_BOOL KMX_LoadKeyboard(char16_t* fileName, LPKMX_KEYBOARD* lpKeyboard) {
   #endif
 
   if (fread(filebase, 1, sz, fp) < (size_t)sz) {
-    KMX_LogError(L"Could not read file\n" );
+    mac_KMX_LogError(L"Could not read file\n" );
     fclose(fp);
     return FALSE;
   }
@@ -428,12 +422,12 @@ KMX_BOOL KMX_LoadKeyboard(char16_t* fileName, LPKMX_KEYBOARD* lpKeyboard) {
   if(*PKMX_DWORD(filebase) != KMX_DWORD(FILEID_COMPILED))
   {
     delete [] buf;
-    KMX_LogError(L"Invalid file - signature is invalid\n");
+    mac_KMX_LogError(L"Invalid file - signature is invalid\n");
     return FALSE;
   }
 
   if (!KMX_VerifyKeyboard(filebase, sz)) {
-    KMX_LogError(L"errVerifyKeyboard\n" );
+    mac_KMX_LogError(L"errVerifyKeyboard\n" );
     return FALSE;
   }
 
@@ -445,13 +439,13 @@ KMX_BOOL KMX_LoadKeyboard(char16_t* fileName, LPKMX_KEYBOARD* lpKeyboard) {
 
 
   if (!kbp) {
-    KMX_LogError(L"errFixupKeyboard\n" );
+    mac_KMX_LogError(L"errFixupKeyboard\n" );
     return FALSE;
   }
 
   if (kbp->dwIdentifier != FILEID_COMPILED) {
     delete[] buf;
-    KMX_LogError(L"errNotFileID\n" );
+    mac_KMX_LogError(L"errNotFileID\n" );
     return FALSE;
   }
   *lpKeyboard = kbp;
@@ -459,7 +453,7 @@ KMX_BOOL KMX_LoadKeyboard(char16_t* fileName, LPKMX_KEYBOARD* lpKeyboard) {
 }
 
 KMX_BOOL KMX_VerifyKeyboard(LPKMX_BYTE filebase, KMX_DWORD sz){
-/* 
+
  KMX_DWORD i;
   PKMX_COMP_KEYBOARD ckbp = (PKMX_COMP_KEYBOARD)filebase;
   PKMX_COMP_STORE csp;
@@ -471,20 +465,20 @@ KMX_BOOL KMX_VerifyKeyboard(LPKMX_BYTE filebase, KMX_DWORD sz){
     for (csp = (PKMX_COMP_STORE)(filebase + ckbp->dpStoreArray), i = 0; i < ckbp->cxStoreArray; i++, csp++) {
       if (csp->dwSystemID == TSS_COMPILEDVERSION) {
         if (csp->dpString == 0) {
-          KMX_LogError(L"errWrongFileVersion:NULL");
+          mac_KMX_LogError(L"errWrongFileVersion:NULL");
         } else {
-          KMX_LogError(L"errWrongFileVersion:%10.10ls",(const PKMX_WCHAR) KMX_StringOffset((PKMX_BYTE)filebase, csp->dpString));
+          mac_KMX_LogError(L"errWrongFileVersion:%10.10ls",(const PKMX_WCHAR) KMX_StringOffset((PKMX_BYTE)filebase, csp->dpString));
         }
         return FALSE;
       }
     }
-    KMX_LogError(L"errWrongFileVersion");
+    mac_KMX_LogError(L"errWrongFileVersion");
     return FALSE;
-  }*/
+  }
   return TRUE;
 }
 
-/* PKMX_WCHAR KMX_incxstr(PKMX_WCHAR p) {
+PKMX_WCHAR KMX_incxstr(PKMX_WCHAR p) {
 
   if (*p == 0)
     return p;
@@ -518,4 +512,7 @@ KMX_BOOL KMX_VerifyKeyboard(LPKMX_BYTE filebase, KMX_DWORD sz){
   return p;
 }
 
-*/
+//################################################################################################################################################
+//################################# Code beyond these lines needs to be included in mcompile #####################################################
+//################################################################################################################################################
+

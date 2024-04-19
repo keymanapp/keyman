@@ -63,13 +63,13 @@ bool DeadKey::KMX_ContainsBaseCharacter(KMX_WCHAR baseCharacter) {
   return false;
 }
 
-/*//################################################################################################################################################
+//################################################################################################################################################
 //################################# Code beyond these lines needs to be included in mcompile #####################################################
 //################################################################################################################################################
 
 
 
-int KMX_ToUnicodeEx(guint keycode, PKMX_WCHAR pwszBuff, int shift_state_pos, int caps,GdkKeymap *keymap) {
+/*int KMX_ToUnicodeEx(guint keycode, PKMX_WCHAR pwszBuff, int shift_state_pos, int caps,GdkKeymap *keymap) {
   GdkKeymapKey *maps;
   guint *keyvals;
   gint count;
@@ -83,8 +83,8 @@ int KMX_ToUnicodeEx(guint keycode, PKMX_WCHAR pwszBuff, int shift_state_pos, int
   if (!(keycode <= keycode_max))
     return 0;
 
-  KMX_DWORD KeyVal= (KMX_DWORD) KMX_get_KeyVal_From_KeyCode(keymap, keycode, ShiftState(shift_state_pos), caps);
-  std::u16string str = convert_DeadkeyValues_To_U16str(KeyVal);
+  KMX_DWORD KeyVal= (KMX_DWORD) mac_KMX_get_KeyVal_From_KeyCode(keymap, keycode, ShiftState(shift_state_pos), caps);
+  std::u16string str = mac_convert_DeadkeyValues_To_U16str(KeyVal);
   pwszBuff[0]= * (PKMX_WCHAR)  str.c_str();
 
 
@@ -124,7 +124,7 @@ private:
 public:
 
   KMX_VirtualKey(UINT scanCode) {
-    this->m_vk = KMX_get_VKUS_From_KeyCodeUnderlying(scanCode);
+    this->m_vk = mac_KMX_get_VKUS_From_KeyCodeUnderlying(scanCode);
     this->m_sc = scanCode;
     memset(this->m_rgfDeadKey,0,sizeof(this->m_rgfDeadKey));
   }
@@ -308,8 +308,8 @@ public:
             // key->Key      stores VK-US ( not underlying !!)
             // key->dpOutput stores character Underlying
 
-            KMX_DWORD SC_Underlying = KMX_get_KeyCodeUnderlying_From_KeyCodeUS(keymap, All_Vector, this->SC(), (ShiftState) ss, caps);
-            key->Key = KMX_get_VKUS_From_KeyCodeUnderlying( SC_Underlying);
+            KMX_DWORD SC_Underlying = mac_KMX_get_KeyCodeUnderlying_From_KeyCodeUS(keymap, All_Vector, this->SC(), (ShiftState) ss, caps);
+            key->Key = mac_KMX_get_VKUS_From_KeyCodeUnderlying( SC_Underlying);
 
             key->Line = 0;
             key->ShiftFlags = this->KMX_GetShiftStateValue(capslock, caps, (ShiftState) ss);
@@ -376,7 +376,7 @@ public:
 
   std::vector<KMX_VirtualKey*> rgKey; //= new VirtualKey[256];
   std::vector<DeadKey*> alDead;
-  std::vector<DeadKey*> alDead_cpl = create_alDead();
+  std::vector<DeadKey*> alDead_cpl = mac_create_alDead();
 
   rgKey.resize(256);
 
@@ -422,7 +422,7 @@ public:
      //       continue;
      //     }
 
-          KMX_DWORD KC_US = (KMX_DWORD) KMX_get_KeyCodeUnderlying_From_VKUS(iKey);
+          KMX_DWORD KC_US = (KMX_DWORD) mac_KMX_get_KeyCodeUnderlying_From_VKUS(iKey);
 
           for(int caps = 0; caps <= 1; caps++) {
             int rc = KMX_ToUnicodeEx(KC_US, sbBuffer, ss, caps, *keymap);
@@ -443,7 +443,7 @@ public:
             sbBuffer[2] = 0;
             rgKey[iKey]->KMX_SetShiftState(ss, sbBuffer, true, (caps ));      // different to windows since behavior on Linux is different
 
-            refine_alDead(sbBuffer[0], alDead, &alDead_cpl);
+            mac_refine_alDead(sbBuffer[0], alDead, &alDead_cpl);
           }
         }
       }
@@ -631,7 +631,7 @@ public:
 return true;
 }*/
 
-/*const int CODE__SIZE[] = {
+const int CODE__SIZE[] = {
    -1,   // undefined                0x00
     1,   // CODE_ANY                 0x01
     2,   // CODE_INDEX               0x02
@@ -658,4 +658,3 @@ return true;
     3,   // CODE_IFSYSTEMSTORE       0x17
     2    // CODE_SETSYSTEMSTORE      0x18
 };
-*/

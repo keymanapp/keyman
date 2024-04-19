@@ -41,13 +41,13 @@ struct KMX_DeadkeyMapping {   // I4353
 
 extern std::vector<KMX_DeadkeyMapping> KMX_FDeadkeys;   // I4353
 
-int run(int argc, std::vector<std::u16string>  str_argv, char* argv[]);
+int mac_run(int argc, std::vector<std::u16string>  str_argv, char* argv[]);
 
 PKMX_WCHAR KMX_incxstr(PKMX_WCHAR p);
 
-//int KMX_GetDeadkeys(v_dw_2D & dk_Table, KMX_WORD DeadKey, KMX_WORD *OutputPairs, GdkKeymap* keymap);
+//int mac_KMX_GetDeadkeys(v_dw_2D & dk_Table, KMX_WORD DeadKey, KMX_WORD *OutputPairs, GdkKeymap* keymap);
 
-void KMX_LogError(const wchar_t* fmt, ...);
+void mac_KMX_LogError(const wchar_t* fmt, ...);
 
 
 

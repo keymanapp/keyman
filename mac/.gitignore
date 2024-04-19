@@ -19,3 +19,4 @@ setup/Install Keyman.app
 //Sabine
 **/mcompile/executable/*.*
 **/mcompile/*.kmx
+**/mcompile/X*.cpp
