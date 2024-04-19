@@ -57,8 +57,6 @@ const KeyTypesOfKeyMap = {
   default: 'boolean'
 } as const;
 
-const KeySpecKeys = Object.keys(KeyTypesOfKeyMap) as (keyof typeof KeyTypesOfKeyMap)[];
-
 // Keep in this specific order: it's the ordering of priority for default hint selection when
 // based on available hints.  (i.e., `layout.defaultHint == 'flick'`)
 const KeyTypesOfFlickList = ['n', 'ne', 'e', 'se', 's', 'sw', 'w', 'nw'] as const;
@@ -288,7 +286,7 @@ export class ActiveKeyBase {
     // is NOT available within the Android app in extremely early APIs.
     // Object.entries requires Android 54.
 
-    for(const key of KeySpecKeys) {
+    for(const key of Object.keys(KeyTypesOfKeyMap)) {
       const value = KeyTypesOfKeyMap[key as keyof typeof KeyTypesOfKeyMap];
       switch(value) {
         case 'subkeys':
@@ -310,7 +308,9 @@ export class ActiveKeyBase {
           break;
         case 'flicks':
           const flickObj = rawKey[key];
-          if(typeof flickObj != 'object') {
+          if(flickObj === undefined) {
+            break;
+          } else if(typeof flickObj != 'object') {
             delete rawKey[key];
           } else {
             for(const flickKey of KeyTypesOfFlickList) {
