@@ -8,6 +8,12 @@ describe('Length style processing', () => {
     let length = new ParsedLengthStyle('');
     assert.equal(length.val, 1);
     assert.equal(length.absolute, false);
+  });
+
+  it("constructs from garbage", () => {
+    let length = new ParsedLengthStyle('garbage');
+    assert.equal(length.val, 1);
+    assert.equal(length.absolute, false);
   })
 
   it("constructs from 'px' styling", () => {
