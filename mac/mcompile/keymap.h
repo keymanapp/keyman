@@ -39,7 +39,7 @@ KMX_DWORD get_keyval_From_Keycode(std::vector<int> keyval, int shiftstate,const 
 #include <iostream>
 #include <string>
 #include <vector>
-
+*/
 
 enum ShiftState {
     Base = 0,                           // 0
@@ -100,7 +100,7 @@ int map_VKShiftState_to_LinModifier(int VKShiftState);
 KMX_DWORD convertNamesTo_DWORD_Value(std::string tok_str);
 
 // create a Vector with all entries of both keymaps
-int createOneVectorFromBothKeyboards(v_dw_3D &All_Vector,GdkKeymap *keymap);
+//int createOneVectorFromBothKeyboards(v_dw_3D &All_Vector,GdkKeymap *keymap);
 
 // read configuration file, split and write to 3D-Vector (Data for US on Vector[0][ ][ ]  )
 int write_US_ToVector(v_dw_3D &vec, std::string language, const char *text);
@@ -118,10 +118,10 @@ int split_US_To_3D_Vector(v_dw_3D &all_US, v_str_1D completeList);
 v_dw_2D create_empty_2D_Vector(int dim_rows, int dim_shifts);
 
 // append characters to 3D-Vector using GDK (Data for underlying Language on Vector[1][ ][ ]  )
-int append_underlying_ToVector(v_dw_3D &All_Vector, GdkKeymap *keymap);
+//int append_underlying_ToVector(v_dw_3D &All_Vector, GdkKeymap *keymap);
 
 // initialize GDK
-bool InitializeGDK(GdkKeymap **keymap,int argc, gchar *argv[]);
+//bool InitializeGDK(GdkKeymap **keymap,int argc, gchar *argv[]);
 
 //------------------------------
 
@@ -530,19 +530,19 @@ bool IsKeymanUsedChar(int KV);
 std::u16string convert_DeadkeyValues_To_U16str(int in);
 
 // use gdk_keymap_translate_keyboard_state to get keyval - base function to get keyvals
-int KMX_get_KeyVal_From_KeyCode(GdkKeymap *keymap, guint keycode, ShiftState ss, int caps);
+//int KMX_get_KeyVal_From_KeyCode(GdkKeymap *keymap, guint keycode, ShiftState ss, int caps);
 
 // use KMX_get_KeyVal_From_KeyCode and prevent use of certain keycodes
-KMX_DWORD KMX_get_KeyValUnderlying_From_KeyCodeUnderlying(GdkKeymap *keymap, guint keycode, int shift_state_pos);
+//KMX_DWORD KMX_get_KeyValUnderlying_From_KeyCodeUnderlying(GdkKeymap *keymap, guint keycode, int shift_state_pos);
 
 // fill Deadkey with dk and return CATEGORY
-KMX_DWORD KMX_get_KeyValUnderlying_From_KeyCodeUnderlying(GdkKeymap *keymap, UINT VKShiftState, UINT KC_underlying, PKMX_WCHAR DeadKey);
+//KMX_DWORD KMX_get_KeyValUnderlying_From_KeyCodeUnderlying(GdkKeymap *keymap, UINT VKShiftState, UINT KC_underlying, PKMX_WCHAR DeadKey);
 
 // use Vector to return the Keyval of underlying Keyboard
 KMX_WCHAR KMX_get_KeyValUnderlying_From_KeyValUS(v_dw_3D &All_Vector,KMX_DWORD VK_underlying);
 
 // use Vector to return the Keycode of the underlying Keyboard for given VK_US using GDK
-KMX_DWORD KMX_get_KeyCodeUnderlying_From_KeyCodeUS(GdkKeymap *keymap, v_dw_3D &All_Vector,KMX_DWORD KC_US, ShiftState ss, int caps);
+//KMX_DWORD KMX_get_KeyCodeUnderlying_From_KeyCodeUS(GdkKeymap *keymap, v_dw_3D &All_Vector,KMX_DWORD KC_US, ShiftState ss, int caps);
 
 // return the Keycode of the underlying Keyboard for given VK_US
 UINT KMX_get_KeyCodeUnderlying_From_VKUS(KMX_DWORD VirtualKeyUS);
@@ -553,7 +553,6 @@ KMX_DWORD KMX_get_VKUS_From_KeyCodeUnderlying(KMX_DWORD keycode);
 // convert codePoint to u16string
 std::u16string CodePointToU16String(unsigned int codepoint);
 
-# endif// //KEYMAP_H*/
 
 
 

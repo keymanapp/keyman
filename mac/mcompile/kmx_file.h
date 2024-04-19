@@ -11,7 +11,7 @@
   Copyright:        Copyright (C) 2003-2018 SIL International.
   Authors:          mcdurdin
 */
-/*
+
 
 #define UNREFERENCED_PARAMETER(P)   (P)
 #define TRUNCATE ((size_t)-1)
@@ -183,9 +183,9 @@ namespace kmx {
 
 #define U_UC_SENTINEL u"\uFFFF"
 
-//
- * VK__MAX defines the highest virtual key code defined in the system = 0xFF.  Custom VK codes start at 256
- //
+/*
+ VK__MAX defines the highest virtual key code defined in the system = 0xFF.  Custom VK codes start at 256
+*/
 #define VK__MAX 255
 
 #define CODE_ANY      0x01
@@ -360,7 +360,7 @@ struct KMX_COMP_KEYBOARD_KMXPLUSINFO {
 };
 
 //
- * Only valid if comp_keyboard.dwFlags&KF_KMXPLUS
+ //* Only valid if comp_keyboard.dwFlags&KF_KMXPLUS
  //
 struct KMX_COMP_KEYBOARD_EX {
   KMX_COMP_KEYBOARD             header;    // 0000 see COMP_KEYBOARD
@@ -390,5 +390,5 @@ static_assert(sizeof(KMX_COMP_KEYBOARD) == KEYBOARDFILEHEADER_SIZE, "COMP_KEYBOA
 } // namespace kmx
 } // namespace kbp
 } // namespace km
-#endif*/
+#endif
 #endif //KMX_FILE_H

@@ -17,4 +17,4 @@ setup/textinputsource/textinputsource.x86_64
 setup/Install Keyman.app
 
 //Sabine
-**/*.exe
+**/mcompile/executable/*.*

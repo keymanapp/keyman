@@ -11,11 +11,11 @@
 //################################# Code beyond these lines needs to be included in mcompile #####################################################
 //################################################################################################################################################
 
-/*
+
 KMX_BOOL KMX_VerifyKeyboard(LPKMX_BYTE filebase, KMX_DWORD sz);
 
 LPKMX_KEYBOARD KMX_FixupKeyboard(PKMX_BYTE bufp, PKMX_BYTE base, KMX_DWORD dwFileSize);
-
+/*
 KMX_BOOL KMX_SaveKeyboard(LPKMX_KEYBOARD kbd, PKMX_WCHAR filename) {
 
   FILE *fp;
@@ -41,7 +41,7 @@ KMX_BOOL KMX_SaveKeyboard(LPKMX_KEYBOARD kbd, PKMX_WCHAR filename) {
   }
 
   return TRUE;
-}
+}*/
 
 KMX_DWORD KMX_WriteCompiledKeyboard(LPKMX_KEYBOARD fk, FILE* hOutfile, KMX_BOOL FSaveDebug) {
 
@@ -227,6 +227,8 @@ PKMX_WCHAR KMX_StringOffset(PKMX_BYTE base, KMX_DWORD offset) {
   return (PKMX_WCHAR)(base + offset);
 }
 
+
+/*
 #ifdef KMX_64BIT
 */
 /**  CopyKeyboard will copy the data read into bufp from x86-sized structures into
@@ -235,7 +237,6 @@ PKMX_WCHAR KMX_StringOffset(PKMX_BYTE base, KMX_DWORD offset) {
     we don't copy the strings
   This method is used on 64-bit architectures.
 */
-/*
 LPKMX_KEYBOARD KMX_CopyKeyboard(PKMX_BYTE bufp, PKMX_BYTE base) {
   PKMX_COMP_KEYBOARD ckbp = (PKMX_COMP_KEYBOARD) base;
 
@@ -311,7 +312,7 @@ LPKMX_KEYBOARD KMX_CopyKeyboard(PKMX_BYTE bufp, PKMX_BYTE base) {
   }
   return kbp;
 }
-*/
+
 // else KMX_FixupKeyboard
 //#else  /*  Fixup the keyboard by expanding pointers. On disk the pointers are stored relative to the
 // beginning of the file, but we need real pointers. This method is used on 32-bit architectures.

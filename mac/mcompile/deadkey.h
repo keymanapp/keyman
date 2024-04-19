@@ -8,7 +8,7 @@
 //################################# Code beyond these lines needs to be included in mcompile #####################################################
 //################################################################################################################################################
 
-/*
+
 
 // create a vector for a dk combination ( ` + a  ->  à )
 v_dw_1D createLine(std::string  first, std::string second, KMX_DWORD number, std::string nameresult);
@@ -28,6 +28,6 @@ bool found_dk_inVector(KMX_WCHAR dk, std::vector<DeadKey*> &myVec);
 bool query_dk_combinations_for_specific_dk(v_dw_2D * dk_ComposeTable, v_dw_2D & dk_SingleTable, KMX_DWORD dk);
 
 // get the shifted character of a key and write shiftstate of KVal to shift
-KMX_DWORD KMX_changeKeynameToCapital(KMX_DWORD KVal, KMX_DWORD &shift, GdkKeymap* keymap);
-*/ 
-# endif //DEADKEY_H
+//KMX_DWORD KMX_changeKeynameToCapital(KMX_DWORD KVal, KMX_DWORD &shift, GdkKeymap* keymap);
+
+# endif//DEADKEY_H

@@ -1,5 +1,4 @@
 
-
 /*
   Name:             mc_import_rules
   Copyright:        Copyright (C) SIL International.
@@ -27,10 +26,6 @@
 //#include "km_types.h"
 #include "mc_kmxfile.h"
 #include "keymap.h"
-
-/*//################################################################################################################################################
-//################################# Code beyond these lines needs to be included in mcompile #####################################################
-//################################################################################################################################################
 
 const int KMX_ShiftStateMap[] = {
   ISVIRTUALKEY,
@@ -67,6 +62,12 @@ bool DeadKey::KMX_ContainsBaseCharacter(KMX_WCHAR baseCharacter) {
   }
   return false;
 }
+
+/*//################################################################################################################################################
+//################################# Code beyond these lines needs to be included in mcompile #####################################################
+//################################################################################################################################################
+
+
 
 int KMX_ToUnicodeEx(guint keycode, PKMX_WCHAR pwszBuff, int shift_state_pos, int caps,GdkKeymap *keymap) {
   GdkKeymapKey *maps;

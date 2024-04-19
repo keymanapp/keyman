@@ -3,6 +3,8 @@
 
 #include "keymap.h"
 #include <vector>
+#include "deadkey.h"
+#include "mc_kmxfile.h"
 
 /*
   Name:             mcompile
@@ -29,9 +31,7 @@
 //################################################################################################################################################
 
 
-/*
-#include "deadkey.h"
-#include "mc_kmxfile.h"
+
 
 struct KMX_DeadkeyMapping {   // I4353
   KMX_WCHAR deadkey, dkid;
@@ -45,11 +45,10 @@ int run(int argc, std::vector<std::u16string>  str_argv, char* argv[]);
 
 PKMX_WCHAR KMX_incxstr(PKMX_WCHAR p);
 
-int KMX_GetDeadkeys(v_dw_2D & dk_Table, KMX_WORD DeadKey, KMX_WORD *OutputPairs, GdkKeymap* keymap);
+//int KMX_GetDeadkeys(v_dw_2D & dk_Table, KMX_WORD DeadKey, KMX_WORD *OutputPairs, GdkKeymap* keymap);
 
 void KMX_LogError(const wchar_t* fmt, ...);
 
-#endif*/ /*MCOMPILE_H*/
 
 
 
