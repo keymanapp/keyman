@@ -1,4 +1,4 @@
-import { ActiveLayer, type DeviceSpec, Keyboard, LayoutLayer, ActiveLayout, ButtonClasses } from '@keymanapp/keyboard-processor';
+import { type DeviceSpec, Keyboard, ActiveLayout, ButtonClasses } from '@keymanapp/keyboard-processor';
 
 import { InputSample } from '@keymanapp/gesture-recognizer';
 
@@ -6,14 +6,16 @@ import { KeyElement } from '../keyElement.js';
 import OSKLayer, { LayerLayoutParams } from './oskLayer.js';
 import VisualKeyboard from '../visualKeyboard.js';
 import OSKBaseKey from './oskBaseKey.js';
-import { ParsedLengthStyle } from '../lengthStyle.js';
 
 const NEAREST_KEY_TOUCH_MARGIN_PERCENT = 0.06;
 
 export default class OSKLayerGroup {
   public readonly element: HTMLDivElement;
-  public readonly layers: {[layerID: string]: OSKLayer} = {};
+  private readonly layers: {[layerID: string]: OSKLayer} = {};
   public readonly spec: ActiveLayout;
+
+  // Currently stored to facilitate lazy layer construction.
+  private vkbd: VisualKeyboard;
 
   // Exist as local copies of the VisualKeyboard values, updated via refreshLayout.
   private computedWidth: number;
@@ -23,8 +25,9 @@ export default class OSKLayerGroup {
   private _heightPadding: number;
 
   public constructor(vkbd: VisualKeyboard, keyboard: Keyboard, formFactor: DeviceSpec.FormFactor) {
-    let layout = keyboard.layout(formFactor);
+    const layout = keyboard.layout(formFactor);
     this.spec = layout;
+    this.vkbd = vkbd;
 
     const lDiv = this.element = document.createElement('div');
     const ls=lDiv.style;
@@ -48,23 +51,35 @@ export default class OSKLayerGroup {
     ls.width = '100%';
     ls.height = '100%';
 
-    // Create a separate OSK div for each OSK layer, only one of which will ever be visible
-    var n: number, i: number, j: number;
-    var layers: LayoutLayer[];
+    this.activeLayerId = 'default';
+  }
 
-    layers=layout['layer'];
+  private buildLayer(layerId: string) {
+    const layout = this.spec;
 
-    for(n=0; n<layers.length; n++) {
-      let layer=layers[n] as ActiveLayer;
-      const layerObj = new OSKLayer(vkbd, layout, layer);
-      this.layers[layer.id] = layerObj;
-
-      // Always make the 'default' layer visible by default.
-      layerObj.element.style.display = (layer.id == 'default' ? 'block' : 'none');
-
-      // Add layer to group
-      lDiv.appendChild(layerObj.element);
+    const layerSpec = layout.getLayer(layerId);
+    if(!layerSpec) {
+      return null;
     }
+
+    const layer = new OSKLayer(this.vkbd, layout, layerSpec);
+    this.layers[layerId] = layer;
+
+    // Add layer to group
+    this.element.appendChild(layer.element);
+  }
+
+  public getLayer(id: string) {
+    let layer = this.layers[id];
+    if(!layer) {
+      layer = this.buildLayer(id);
+      if(layer) {
+        this.layers[id] = layer;
+        layer.element.style.display = 'none';
+      }
+    }
+
+    return layer;
   }
 
   public get activeLayer(): OSKLayer {
@@ -81,6 +96,9 @@ export default class OSKLayerGroup {
 
   public set activeLayerId(id: string) {
     this._activeLayerId = id;
+
+    // Trigger construction of the layer if it does not already exist.
+    this.getLayer(id);
 
     for (let key of Object.keys(this.layers)) {
       const layer = this.layers[key];
@@ -130,7 +148,7 @@ export default class OSKLayerGroup {
   public blinkLayer(arg: OSKLayer | string) {
     if(typeof arg === 'string') {
       const layerId = arg;
-      arg = this.layers[layerId];
+      arg = this.getLayer(layerId);
       if(!arg) {
         throw new Error(`Layer id ${layerId} could not be found`);
       }
