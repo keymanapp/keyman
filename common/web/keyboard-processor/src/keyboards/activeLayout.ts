@@ -770,7 +770,7 @@ export class ActiveLayout implements LayoutFormFactor{
   /**
    * Facilitates mapping layer id strings to their specification objects.
    */
-  layerMap: {[layerId: string]: ActiveLayer};
+  private layerMap: {[layerId: string]: ActiveLayer};
 
   private constructor() {
 
@@ -887,8 +887,8 @@ export class ActiveLayout implements LayoutFormFactor{
         defaultShift.multitap = [{...Layouts.dfltShiftToCaps}, {...Layouts.dfltShiftToDefault}] as ActiveSubKey[];
         shiftShift.multitap   = [{...Layouts.dfltShiftToCaps}, {...Layouts.dfltShiftToShift}] as ActiveSubKey[];
 
-        defaultShift.multitap.forEach((sk, index) => defaultShift[index] = new ActiveSubKey(sk, aLayout, 'default'));
-        shiftShift  .multitap.forEach((sk, index) => shiftShift[index]   = new ActiveSubKey(sk, aLayout, 'shift'));
+        defaultShift.multitap.forEach((sk, index) => defaultShift.multitap[index] = new ActiveSubKey(sk, aLayout, 'default'));
+        shiftShift  .multitap.forEach((sk, index) => shiftShift.multitap[index]   = new ActiveSubKey(sk, aLayout, 'shift'));
       } // else no default shift -> caps multitaps.
     }
 

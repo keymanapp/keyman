@@ -385,8 +385,6 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
   }
 
   private constructGestureEngine(): GestureRecognizer<KeyElement, string> {
-    const rowCount = this.kbdLayout.layerMap['default'].row.length;
-
     const config: GestureRecognizerConfiguration<KeyElement, string> = {
       targetRoot: this.element,
       // document.body is the event root for mouse interactions b/c we need to track
