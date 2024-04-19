@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <!--
-@@keys: [K_A][K_B][K_A][K_BKQUOTE][K_B][K_Q][K_BKQUOTE][K_B][K_W][K_BKQUOTE][K_E][K_B][K_E][K_1][K_B][K_D][K_1][K_B][K_C][K_1]
-@@expected: abplusbPlusbPLUSebasteriskbAsteriskbASTERISK
+@@keys: [K_A][K_B][K_A][K_BKQUOTE][K_B][K_Q][K_BKQUOTE][K_B][K_W][K_BKQUOTE][K_E][K_B][K_E][K_1][K_B][K_D][K_1][K_B][K_C][K_1][K_SPACE][SHIFT K_A][K_BKQUOTE][K_B][SHIFT K_E][K_1]
+@@expected: abplusbPlusbPLUSebasteriskbAsteriskbASTERISK tardbstar
 -->
 
 
@@ -22,6 +22,13 @@
       <row keys="z x c v b n m" />
       <row keys="space" />
     </layer>
+    <layer modifiers="shift" id="base">
+      <row keys="gap" />
+      <row keys="Q W E R T Y U I O P" />
+      <row keys="A S D F G H J K L" />
+      <row keys="Z X C V B N M" />
+      <row keys="space" />
+    </layer>
   </layers>
 
   <variables>
@@ -35,9 +42,11 @@
     <transformGroup>
       <!-- these three should all be the same -->
       <transform from="a\u{002B}" to="plus" />
+      <transform from="A\+" to="tard" />
       <transform from="q${plus}" to="Plus" />
       <transform from="w${plusescaped}" to="PLUS" />
       <transform from="e\u{002A}" to="asterisk" />
+      <transform from="E\*" to="star" />
       <transform from="d${asterisk}" to="Asterisk" />
       <transform from="c${asteriskescaped}" to="ASTERISK" />
     </transformGroup>
