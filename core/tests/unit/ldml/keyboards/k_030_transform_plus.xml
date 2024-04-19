@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <!--
-@@keys: [K_A][K_B][K_A][K_BKQUOTE]
-@@expected: abplus
+@@keys: [K_A][K_B][K_A][K_BKQUOTE][K_B][K_Q][K_BKQUOTE][K_B][K_W][K_BKQUOTE]
+@@expected: abplusbPlusbPLUS
 -->
 
 
@@ -23,10 +23,17 @@
     </layer>
   </layers>
 
+  <variables>
+    <string id="plus" value="+"/>
+    <string id="plusescaped" value="\u{002B}"/>
+  </variables>
 
   <transforms type="simple">
     <transformGroup>
-      <transform from="a\u{002B}" to="plus"/>
+      <!-- these three should all be the same -->
+      <transform from="a\u{002B}" to="plus" />
+      <transform from="q${plus}" to="Plus" />
+      <transform from="w${plusescaped}" to="PLUS" />
     </transformGroup>
   </transforms>
 </keyboard3>
