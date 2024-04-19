@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <!--
-@@keys: [K_A][K_B][K_A][K_BKQUOTE][K_B][K_Q][K_BKQUOTE][K_B][K_W][K_BKQUOTE]
-@@expected: abplusbPlusbPLUS
+@@keys: [K_A][K_B][K_A][K_BKQUOTE][K_B][K_Q][K_BKQUOTE][K_B][K_W][K_BKQUOTE][K_E][K_B][K_E][K_1][K_B][K_D][K_1][K_B][K_C][K_1]
+@@expected: abplusbPlusbPLUSebasteriskbAsteriskbASTERISK
 -->
 
 
@@ -11,11 +11,12 @@
 
   <keys>
     <key id="plus" output="+" />
+    <key id="asterisk" output="*" />
   </keys>
 
   <layers formId="us">
     <layer modifiers="none" id="base">
-      <row keys="plus 1 2 3 4 5 6 7 8 9 0" />
+      <row keys="plus asterisk 2 3 4 5 6 7 8 9 0" />
       <row keys="q w e r t y u i o p" />
       <row keys="a s d f g h j k l" />
       <row keys="z x c v b n m" />
@@ -26,6 +27,8 @@
   <variables>
     <string id="plus" value="+"/>
     <string id="plusescaped" value="\u{002B}"/>
+    <string id="asterisk" value="*"/>
+    <string id="asteriskescaped" value="\u{002A}"/>
   </variables>
 
   <transforms type="simple">
@@ -34,6 +37,9 @@
       <transform from="a\u{002B}" to="plus" />
       <transform from="q${plus}" to="Plus" />
       <transform from="w${plusescaped}" to="PLUS" />
+      <transform from="e\u{002A}" to="asterisk" />
+      <transform from="d${asterisk}" to="Asterisk" />
+      <transform from="c${asteriskescaped}" to="ASTERISK" />
     </transformGroup>
   </transforms>
 </keyboard3>
