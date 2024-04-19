@@ -33,7 +33,7 @@ export interface LayoutLayer extends LayoutLayerBase {
   aligned?: boolean
 };
 
-export interface LayoutFormFactor extends Omit<LayoutFormFactorSpec, 'layer'> {
+export interface LayoutFormFactor extends LayoutFormFactorSpec {
 };
 
 export type LayoutSpec = {

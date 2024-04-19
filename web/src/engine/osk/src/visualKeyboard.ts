@@ -1294,6 +1294,12 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
       return allottedHeight;
     }
 
+    /*
+      Note:  these may not be fully preprocessed yet!
+
+      However, any "empty row bug" preprocessing has been applied, and that's
+      what we care about here.
+    */
     const layers = this.layerGroup.spec.layer;
     let oskHeight = 0;
 

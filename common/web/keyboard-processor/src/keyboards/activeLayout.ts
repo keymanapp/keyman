@@ -745,7 +745,11 @@ export class ActiveLayer implements LayoutLayer {
 }
 
 export class ActiveLayout implements LayoutFormFactor{
-  layer: ActiveLayer[];
+  /**
+   * Holds all layer specifications for the layout.  There is no guarantee that they
+   * have been fully preprocessed.
+   */
+  layer: TouchLayerSpec[];
   font: string;
   keyLabels: boolean;
   isDefault?: boolean;
@@ -766,8 +770,25 @@ export class ActiveLayout implements LayoutFormFactor{
 
   }
 
+  /**
+   * Returns a fully preprocessed version of the specified layer spec.
+   * @param layerId
+   * @returns
+   */
   @Enumerable
   getLayer(layerId: string): ActiveLayer {
+    if(!this.layerMap[layerId]) {
+      const spec = this.layer.find((layerSpec) => layerSpec.id == layerId);
+      if(!spec) {
+        return null;
+      }
+
+      // Prepare the layer-spec for actual use.
+      ActiveLayer.sanitize(spec);
+      ActiveLayer.polyfill(spec, this);
+      this.layerMap[layerId] = spec as ActiveLayer;
+    }
+
     return this.layerMap[layerId];
   }
 
@@ -786,10 +807,10 @@ export class ActiveLayout implements LayoutFormFactor{
   static correctLayerEmptyRowBug(layers: LayoutLayer[]) {
     for(let n=0; n<layers.length; n++) {
       let layer=layers[n];
-      let rows=layer['row'];
+      let rows=layer.row;
       let i: number;
       for(i=rows.length-1; i>=0; i--) {
-        if(!Array.isArray(rows[i]['key']) || rows[i]['key'].length == 0) {
+        if(!Array.isArray(rows[i].key) || rows[i].key.length == 0) {
           rows.splice(i, 1)
         }
       }
@@ -798,10 +819,6 @@ export class ActiveLayout implements LayoutFormFactor{
 
   static sanitize(rawLayout: TouchLayoutSpec) {
     ActiveLayout.correctLayerEmptyRowBug(rawLayout.layer);
-
-    for(const layer of rawLayout.layer) {
-      ActiveLayer.sanitize(layer);
-    }
   }
 
   /**
@@ -843,10 +860,7 @@ export class ActiveLayout implements LayoutFormFactor{
     }
 
     // Create a separate OSK div for each OSK layer, only one of which will ever be visible
-    var n: number;
     let layerMap: {[layerId: string]: ActiveLayer} = {};
-
-    let layers=layout.layer;
 
     // Add class functions to the existing layout object, allowing it to act as an ActiveLayout.
     let dummy = new ActiveLayout();
@@ -856,24 +870,20 @@ export class ActiveLayout implements LayoutFormFactor{
       }
     }
 
-    let aLayout = layout as ActiveLayout;
+    let aLayout = layout as unknown as ActiveLayout;
     aLayout.keyboard = keyboard;
     aLayout.formFactor = formFactor;
-
-    for(n=0; n<layers.length; n++) {
-      ActiveLayer.polyfill(layers[n], aLayout);
-      layerMap[layers[n].id] = layers[n] as ActiveLayer;
-    }
-
-    // After all layers are preprocessed...
+    aLayout.layerMap = layerMap;
 
     // The default-layer shift key & shift-layer shift key on mobile platforms should have a
     //  default multitap re: a 'caps' layer under select conditions.
     //
     // Note:  whether or not any other keys have multitaps doesn't matter here.  Just THESE.
     if(formFactor != 'desktop' && !!layout.layer.find((entry) => entry.id == 'caps')) {
-      const defaultLayer = layout.layer.find((entry) => entry.id == 'default') as ActiveLayer;
-      const shiftLayer   = layout.layer.find((entry) => entry.id == 'shift') as ActiveLayer;
+      // Triggers preprocessing for both default and shift layers.  They're the
+      // most-frequently referenced, at least.
+      const defaultLayer = aLayout.getLayer('default') as ActiveLayer;
+      const shiftLayer   = aLayout.getLayer('shift') as ActiveLayer;
 
       const defaultShift = defaultLayer.getKey('K_SHIFT');
       const shiftShift   = shiftLayer ?.getKey('K_SHIFT');
@@ -898,7 +908,7 @@ export class ActiveLayout implements LayoutFormFactor{
     aLayout.hasLongpresses = analysisMetadata.hasLongpresses;
     aLayout.hasMultitaps = analysisMetadata.hasMultitaps;
 
-    aLayout.layerMap = layerMap;
+    // All layers are lazy-processed, with the usual processing applied when first referenced.
 
     return aLayout;
   }
