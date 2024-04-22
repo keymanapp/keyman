@@ -799,7 +799,9 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
 
     // Sets the default stub (as specified with the `getSavedKeyboard` call) as active.
     if(stub) {
-      this.activateKeyboard(t[0], t[1]);
+      return this.activateKeyboard(stub.id, stub.langId);
+    } else {
+      return null;
     }
   }
 

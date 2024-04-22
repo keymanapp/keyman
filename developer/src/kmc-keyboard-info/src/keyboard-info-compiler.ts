@@ -232,7 +232,7 @@ export class KeyboardInfoCompiler implements KeymanCompiler {
       if (author.url) {
         // we strip the mailto: from the .kps file for the .keyboard_info
         const match = author.url.match(/^(mailto\:)?(.+)$/);
-        /* c8 ignore next 3 */
+        /* c8 ignore next 4 */
         if (match === null) {
           this.callbacks.reportMessage(KeyboardInfoCompilerMessages.Error_InvalidAuthorEmail({email:author.url}));
           return null;
