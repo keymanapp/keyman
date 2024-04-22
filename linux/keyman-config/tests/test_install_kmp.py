@@ -32,7 +32,7 @@ class InstallKmpBase(unittest.TestCase):
         patcher7 = patch('keyman_config.install_kmp.extractico')
         self.mockExtractIco = patcher7.start()
         self.addCleanup(patcher7.stop)
-        patcher8 = patch('keyman_config.install_kmp.is_gnome_shell')
+        patcher8 = patch('keyman_config.install_kmp.is_gnome_desktop')
         self.mockIsGnomeShell = patcher8.start()
         self.addCleanup(patcher8.stop)
         self.mockIsGnomeShell.return_value = False
