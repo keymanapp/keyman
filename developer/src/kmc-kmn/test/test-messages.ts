@@ -96,9 +96,9 @@ describe('KmnCompilerMessages', function () {
 
   // ERROR_OutsTooLong
 
-  it('should generate ERROR_OutsTooLong if a store referenced in outs() is too long (more than GLOBAL_BUFSIZE elements)', async function() {
+  it('should generate ERROR_OutsTooLong if a store referenced in outs() is too long and would overflow the buffer', async function() {
     await testForMessage(this, ['invalid-keyboards', 'error_outs_too_long.kmn'], KmnCompilerMessages.ERROR_OutsTooLong);
-    // callbacks.printMessages();
+    assert.equal(callbacks.messages[0].message, "Store cannot be inserted with outs() as it makes the extended string too long character offset: 5");
   });
 
   // ERROR_ExtendedStringTooLong
