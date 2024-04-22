@@ -59,28 +59,53 @@ extern "C" __declspec(dllexport) unsigned int EnginePostInstall(MSIHANDLE hInsta
     ea.Trustee.TrusteeForm  = TRUSTEE_IS_SID;
     ea.Trustee.ptstrName    = (LPWCH)L"ALL APPLICATION PACKAGES";
 
+    // Get a pointer to the existing DACL
     PACL pOldDACL = NULL;
+    PACL pNewDACL = NULL;
+    SE_OBJECT_TYPE objectType = SE_FILE_OBJECT;
 
-    DWORD result = SetEntriesInAcl(1, &ea, NULL, &pOldDACL);
+    DWORD dwRes = GetSecurityInfo(hFile, objectType, DACL_SECURITY_INFORMATION, nullptr, nullptr, &pOldDACL, nullptr, nullptr);
+    if (dwRes != ERROR_SUCCESS) {
+      if (!CreateDirectory(path, NULL)) {
+        DWORD errorCode = GetLastError();
+        std::wstring error =
+            L"Keyman Engine failed to point to existing DACL";
+        MsiSetProperty(hInstall, TEXT("EnginePostInstall_Error"), error.c_str());
+        return errorCode;
+      }
+    }
+
+    // Set entries in ACL
+    dwRes = SetEntriesInAcl(1, &ea, pOldDACL, &pNewDACL);
+    if (dwRes != ERROR_SUCCESS) {
+      if (!CreateDirectory(path, NULL)) {
+        DWORD errorCode    = GetLastError();
+        std::wstring error = L"Keyman Engine failed to set new DACL";
+        MsiSetProperty(hInstall, TEXT("EnginePostInstall_Error"), error.c_str());
+        return errorCode;
+      }
+    }
+
+    DWORD result = SetEntriesInAcl(1, &ea, NULL, &pNewDACL);
     if (result != ERROR_SUCCESS) {
       CloseHandle(hFile);
       std::wstring error =
           L"Keyman Engine failed to set permissions on shared data in GrantPermission: " + std::to_wstring(result);
       MsiSetProperty(hInstall, TEXT("EnginePostInstall_Error"), error.c_str());
-      if (pOldDACL) {
-        LocalFree(pOldDACL);
+      if (pNewDACL) {
+        LocalFree(pNewDACL);
       }
       return result;
     }
 
-    result = SetNamedSecurityInfo(path, SE_FILE_OBJECT, DACL_SECURITY_INFORMATION, NULL, NULL, pOldDACL, NULL);
+    result = SetNamedSecurityInfo(path, SE_FILE_OBJECT, DACL_SECURITY_INFORMATION, NULL, NULL, pNewDACL, NULL);
     if (result != ERROR_SUCCESS) {
       std::wstring error = L"Keyman Engine failed to apply DACL to shared data folder: " + std::to_wstring(result);
       MsiSetProperty(hInstall, TEXT("EnginePostInstall_Error"), error.c_str());
     }
 
-    if (pOldDACL) {
-      LocalFree(pOldDACL);
+    if (pNewDACL) {
+      LocalFree(pNewDACL);
     }
 
     CloseHandle(hFile);
