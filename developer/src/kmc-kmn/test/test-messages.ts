@@ -103,9 +103,9 @@ describe('KmnCompilerMessages', function () {
 
   // ERROR_ExtendedStringTooLong
 
-  it('should generate ERROR_ExtendedStringTooLong if an extended string is too long (more than GLOBAL_BUFSIZE elements)', async function() {
+  it('should generate ERROR_ExtendedStringTooLong if an extended string is too long and would overflow the buffer', async function() {
     await testForMessage(this, ['invalid-keyboards', 'error_extended_string_too_long.kmn'], KmnCompilerMessages.ERROR_ExtendedStringTooLong);
-    // callbacks.printMessages();
+    assert.equal(callbacks.messages[0].message, "Extended string is too long character offset: 9");
   });
 
   // ERROR_VirtualKeyExpansionTooLong
