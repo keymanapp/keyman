@@ -117,9 +117,9 @@ describe('KmnCompilerMessages', function () {
 
   // ERROR_CharacterRangeTooLong
 
-  it('should generate ERROR_CharacterRangeTooLong if a character range would expand to be too long (more than GLOBAL_BUFSIZE elements)', async function() {
+  it('should generate ERROR_CharacterRangeTooLong if a character range would expand to be too long and would overflow the buffer', async function() {
     await testForMessage(this, ['invalid-keyboards', 'error_character_range_too_long.kmn'], KmnCompilerMessages.ERROR_CharacterRangeTooLong);
-    // callbacks.printMessages();
+    assert.equal(callbacks.messages[0].message, "Character range is too large and cannot be expanded");
   });
 
 });
