@@ -9,6 +9,7 @@ import { GesturePath } from "./gesturePath.js";
 export type SerializedGesturePath<Type, StateToken> = {
   coords: Mutable<InputSample<Type, StateToken>>[]; // ensures type match with public class property.
   wasCancelled?: boolean;
+  stats?: CumulativePathStats
 }
 
 interface EventMap<Type, StateToken> {
@@ -121,7 +122,8 @@ export class GestureDebugPath<Type, StateToken = any> extends GesturePath<Type, 
         t:       obj.t,
         item:    obj.item
       }))),
-      wasCancelled: this.wasCancelled
+      wasCancelled: this.wasCancelled,
+      stats: this.stats
     }
 
     // Removes components of each sample that we don't want serialized.

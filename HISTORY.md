@@ -1,5 +1,20 @@
 # Keyman Version History
 
+## 17.0.311 beta 2024-04-19
+
+* fix(web): default parse of length styling for empty string (#11235)
+* change(web): initializes OSK with keyboard if available during init (#11174)
+* fix(ios): prevents post-restore kbd issues by refreshing kbd (#10952)
+* fix(mac): handle text replacement cases during compliance detection (#11190)
+
+## 17.0.310 beta 2024-04-18
+
+* fix(web): now auto-scrolls if target element would be hidden after device rotation (#11210)
+* fix(ios): deletion of selected text (#11179)
+* fix(common): update emoji stripping for Unicode 15.1 (#11242)
+* change(web): adjusts multitap timings (#11246)
+*  (#11245)
+
 ## 17.0.309 beta 2024-04-17
 
 * fix(ios): sample build script --debug detection (#10953)

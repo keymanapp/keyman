@@ -199,7 +199,7 @@ NSString* const kEasterEggKmxName = @"EnglishSpanish.kmx";
     [self.appDelegate logDebugMessage:@"KMInputMethodHandler initWithClient checkTextApiCompliance: %@", _apiCompliance];
   } else if (self.apiCompliance.isComplianceUncertain) {
     // We have a valid TextApiCompliance object, but compliance is uncertain, so test it
-    [self.apiCompliance testCompliance:client];
+    [self.apiCompliance checkCompliance:client];
   }
 }
 
@@ -454,7 +454,7 @@ NSString* const kEasterEggKmxName = @"EnglishSpanish.kmx";
   
   [client insertText:text replacementRange:replacementRange];
   if (self.apiCompliance.isComplianceUncertain) {
-    [self.apiCompliance testComplianceAfterInsert:client];
+    [self.apiCompliance checkComplianceAfterInsert:client delete:textToDelete insert:text];
   }
 }
 
