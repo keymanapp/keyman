@@ -1,5 +1,20 @@
 # Keyman Version History
 
+## 17.0.312 beta 2024-04-22
+
+* fix(developer): emit JSON strings as characters, not surrogate pairs (#11243)
+* fix(developer): prevent xmlns for LDML keyboard template child elements (#11251)
+* fix(developer): test that MRU project exists before attempting to reference on startup (#11252)
+* fix(developer): handle invalid Unicode values in touch layout builder (#11270)
+* fix(developer): handle multiple instances of Server starting (#11272)
+* fix(developer): lazy initialization of test window (#11275)
+* chore(web): drops redundant builder-dependency from early gesture dev (#11278)
+* feat(web): add recent-history log to gesture engine (#11277)
+* test(developer): keyboard info compiler unit tests 2 (#11130)
+*  (#11283)
+* fix(developer): keep escaped plus-sign escaped (#11269)
+* chore(resources): sync up with CLDR v45 release (#11004)
+
 ## 17.0.311 beta 2024-04-19
 
 * fix(web): default parse of length styling for empty string (#11235)
