@@ -650,10 +650,13 @@ end;
 
 procedure TCustomKeymanTrayIcon.SetDefaultIcon;
 begin
+(* Changing the tray icon to Application Icon always. https://github.com/keymanapp/keyman/issues/859
   if not FIcon.Empty then
     FCurrentIcon.Assign(FIcon)
   else
     FCurrentIcon.Assign(Application.Icon);
+  *)
+  FCurrentIcon.Assign(Application.Icon);
   Refresh;
 end;
 
@@ -679,7 +682,10 @@ end;
 
 procedure TCustomKeymanTrayIcon.IconChange(Sender: TObject);
 begin
+(* Changing the tray icon to Application Icon always. https://github.com/keymanapp/keyman/issues/859
   FCurrentIcon.Assign(FIcon);
+*)
+  FCurrentIcon.Assign(Application.Icon);
   Refresh;
 end;
 
