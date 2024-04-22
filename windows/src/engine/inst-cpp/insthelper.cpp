@@ -56,7 +56,7 @@ extern "C" __declspec(dllexport) unsigned int EnginePostInstall(MSIHANDLE hInsta
     ea.grfAccessPermissions = GENERIC_READ | GENERIC_EXECUTE;
     ea.grfAccessMode        = SET_ACCESS;
     ea.grfInheritance       = SUB_CONTAINERS_AND_OBJECTS_INHERIT;
-    ea.Trustee.TrusteeForm  = TRUSTEE_IS_NAME;
+    ea.Trustee.TrusteeForm  = TRUSTEE_IS_SID;
     ea.Trustee.ptstrName    = (LPWCH)L"ALL APPLICATION PACKAGES";
 
     PACL pOldDACL = NULL;
