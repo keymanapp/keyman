@@ -110,9 +110,9 @@ describe('KmnCompilerMessages', function () {
 
   // ERROR_VirtualKeyExpansionTooLong
 
-  it('should generate ERROR_VirtualKeyExpansionTooLong if a virtual key expansion is too long (more than GLOBAL_BUFSIZE elements)', async function() {
+  it('should generate ERROR_VirtualKeyExpansionTooLong if a virtual key expansion is too long and would overflow the buffer', async function() {
     await testForMessage(this, ['invalid-keyboards', 'error_virtual_key_expansion_too_long.kmn'], KmnCompilerMessages.ERROR_VirtualKeyExpansionTooLong);
-    // callbacks.printMessages();
+    assert.equal(callbacks.messages[0].message, "Virtual key expansion is too large");
   });
 
   // ERROR_CharacterRangeTooLong
