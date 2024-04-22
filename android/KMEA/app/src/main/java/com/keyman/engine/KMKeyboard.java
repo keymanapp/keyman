@@ -351,7 +351,7 @@ final class KMKeyboard extends WebView {
             allCalls.append(";");
           }
 
-          // Ensure strings save for Javascript. TBD: Spacebartext, font
+          // Ensure strings safe for Javascript. TODO: font strings
           loadUrl("javascript:" + Uri.encode(allCalls.toString()));
 
           if(javascriptAfterLoad.size() > 0 && keyboardSet) {
