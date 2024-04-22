@@ -61,6 +61,21 @@ import Flick, { buildFlickScroller } from './input/gestures/browser/flick.js';
 import { GesturePreviewHost } from './keyboard-layout/gesturePreviewHost.js';
 import OSKBaseKey from './keyboard-layout/oskBaseKey.js';
 import { OSKResourcePathConfiguration } from './index.js';
+import KEYMAN_VERSION from '@keymanapp/keyman-version';
+
+/**
+ * Gesture history data will include each touchpath sample observed during its
+ * lifetime in addition to its lifetime stats.
+ */
+// @ts-ignore
+const DEBUG_GESTURES: boolean = KEYMAN_VERSION.TIER != 'stable' || KEYMAN_VERSION.VERSION_ENVIRONMENT != '';
+
+/**
+ * If greater than zero, `this.gestureEngine.history` & `this.gestureEngine.historyJSON`
+ * will contain report-data this many of the most-recently completed gesture inputs in
+ * order of their time of completion.
+ */
+const DEBUG_HISTORY_COUNT: number = DEBUG_GESTURES ? 10 : 0;
 
 interface KeyRuleEffects {
   contextToken?: number,
@@ -403,7 +418,14 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
          */
 
         return this.layerGroup.findNearestKey(sample);
-      }
+      },
+      /* When enabled, facilitates investigation of perceived odd behaviors observed on Android devices
+        in association with issues like #11221 and #11183.  "Recordings" are only accessible within
+        the mobile apps via WebView inspection and outside the apps via Developer mode in the browser;
+        they are not transmitted or uploaded automatically.
+      */
+      recordingMode: DEBUG_GESTURES,
+      historyLength: DEBUG_HISTORY_COUNT
     };
 
     this.gestureParams.longpress.permitsFlick = (key) => {

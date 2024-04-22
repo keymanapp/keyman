@@ -268,6 +268,20 @@ $(function() {
     }
   }
 
+  this.hexToCodePoint = function(codePoint) {
+    const codePointValue = parseInt(codePoint, 16);
+    if (
+      isNaN(codePointValue) ||
+      codePointValue < 0 ||
+      codePointValue > 0x10FFFF ||
+      (0x0 <= codePointValue && codePointValue <= 0x1F) ||
+      (0x80 <= codePointValue && codePointValue <= 0x9F)
+    ) {
+      return null;
+    }
+    return String.fromCodePoint(codePointValue);
+  }
+
   this.unicodeKeyIdToString = function(id) {
     // duplicated from oskKey.ts
     if(!id || id.substr(0,2) != 'U_') {
@@ -277,13 +291,9 @@ $(function() {
     let result = '';
     const codePoints = id.substr(2).split('_');
     for(let codePoint of codePoints) {
-      const codePointValue = parseInt(codePoint, 16);
-      if (((0x0 <= codePointValue) && (codePointValue <= 0x1F)) ||
-          ((0x80 <= codePointValue) && (codePointValue <= 0x9F)) ||
-          isNaN(codePointValue)) {
-        continue;
-      } else {
-        result += String.fromCodePoint(codePointValue);
+      const codePointValue = this.hexToCodePoint(codePoint);
+      if(codePointValue) {
+        result += codePointValue;
       }
     }
     return result ? result : null;
@@ -715,7 +725,10 @@ $(function() {
     let chars = s.split(' '), r = '';
     for(let ch of chars) {
       if(!ch.match(/^u\+[0-9a-f]{1,6}$/i)) continue;
-      r += String.fromCodePoint(parseInt(ch.substring(2), 16));
+      const codePointValue = this.hexToCodePoint(ch.substring(2));
+      if(codePointValue) {
+        r += codePointValue;
+      }
     }
     return r;
   }

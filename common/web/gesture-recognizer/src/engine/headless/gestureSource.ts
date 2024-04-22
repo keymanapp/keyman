@@ -3,12 +3,25 @@ import { GesturePath } from "./gesturePath.js";
 import { GestureRecognizerConfiguration, preprocessRecognizerConfig } from "../configuration/gestureRecognizerConfiguration.js";
 import { Nonoptional } from "../nonoptional.js";
 import { MatcherSelector } from "./gestures/matchers/matcherSelector.js";
+import { SerializedGesturePath } from "./gestureDebugPath.js";
 
 export function buildGestureMatchInspector<Type, StateToken>(selector: MatcherSelector<Type, StateToken>) {
   return (source: GestureSource<Type, StateToken>) => {
     return selector.potentialMatchersForSource(source).map((matcher) => matcher.model.id);
   };
 }
+
+/**
+ * Documents the expected typing of serialized versions of the `GestureSource` class.
+ */
+export type SerializedGestureSource<HoveredItemType = any, StateToken = any> = {
+  isFromTouch: boolean;
+  path: SerializedGesturePath<HoveredItemType, StateToken>;
+  stateToken?: StateToken;
+  identifier?: string;
+  // identifier is not included b/c it's only needed during live processing.
+}
+
 
 /**
  * Represents all metadata needed internally for tracking a single "touch contact point" / "touchpoint"
@@ -215,6 +228,25 @@ export class GestureSource<
   public get currentRecognizerConfig() {
     return this.recognizerConfigStack[this.recognizerConfigStack.length-1];
   }
+
+ /**
+  * Creates a serialization-friendly version of this instance for use by
+  * `JSON.stringify`.
+  */
+ /* c8 ignore start */
+ toJSON(): SerializedGestureSource {
+   let jsonClone: SerializedGestureSource = {
+     identifier: this.identifier,
+     isFromTouch: this.isFromTouch,
+     path: this.path.toJSON(),
+     stateToken: this.stateToken
+   };
+
+   return jsonClone;
+   /* c8 ignore stop */
+   /* c8 ignore next 2 */
+   // esbuild or tsc seems to mangle the 'ignore stop' if put outside the ending brace.
+ }
 }
 
 export class GestureSourceSubview<
