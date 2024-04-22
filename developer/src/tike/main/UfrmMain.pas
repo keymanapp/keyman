@@ -1300,7 +1300,7 @@ begin
 
       if ext = Ext_ProjectSource then
       begin
-        if SameFileName(GetGlobalProjectUI.FileName, FFileName) then
+        if IsGlobalProjectUIReady and SameFileName(GetGlobalProjectUI.FileName, FFileName) then
         begin
           ShowProject;
           Exit;
