@@ -11,7 +11,7 @@ const NEAREST_KEY_TOUCH_MARGIN_PERCENT = 0.06;
 
 export default class OSKLayerGroup {
   public readonly element: HTMLDivElement;
-  private readonly layers: {[layerID: string]: OSKLayer} = {};
+  private readonly _layers: {[layerID: string]: OSKLayer} = {};
   public readonly spec: ActiveLayout;
 
   // Currently stored to facilitate lazy layer construction.
@@ -63,18 +63,19 @@ export default class OSKLayerGroup {
     }
 
     const layer = new OSKLayer(this.vkbd, layout, layerSpec);
-    this.layers[layerId] = layer;
+    this._layers[layerId] = layer;
 
     // Add layer to group
     this.element.appendChild(layer.element);
+    return layer;
   }
 
   public getLayer(id: string) {
-    let layer = this.layers[id];
+    let layer = this._layers[id];
     if(!layer) {
       layer = this.buildLayer(id);
       if(layer) {
-        this.layers[id] = layer;
+        this._layers[id] = layer;
         layer.element.style.display = 'none';
       }
     }
@@ -87,7 +88,18 @@ export default class OSKLayerGroup {
       return null;
     }
 
-    return this.layers[this.activeLayerId];
+    return this._layers[this.activeLayerId];
+  }
+
+  public get layers() {
+    const layerSpecs = this.spec.layer;
+    const layerIds = layerSpecs.map((spec) => spec.id);
+
+    for(const id of layerIds) {
+      this.buildLayer(id);
+    }
+
+    return this._layers;
   }
 
   public get activeLayerId(): string {
@@ -100,8 +112,8 @@ export default class OSKLayerGroup {
     // Trigger construction of the layer if it does not already exist.
     this.getLayer(id);
 
-    for (let key of Object.keys(this.layers)) {
-      const layer = this.layers[key];
+    for (let key of Object.keys(this._layers)) {
+      const layer = this._layers[key];
       const layerElement = layer.element;
       if (layer.id == id) {
         layerElement.style.display = 'block';
@@ -131,7 +143,7 @@ export default class OSKLayerGroup {
       throw new Error(`Layer id not set for input coordinate`);
     }
 
-    const layer = this.layers[layerId];
+    const layer = this._layers[layerId];
     if(!layer) {
       throw new Error(`Layer id ${layerId} could not be found`);
     }
@@ -154,17 +166,17 @@ export default class OSKLayerGroup {
       }
     }
 
-    const layer = arg;
+    const layer = arg as OSKLayer;
 
     // Note:  we do NOT manipulate `._activeLayerId` here!  This is designed
     // explicitly to be temporary.
     if(layer.element.style.display != 'block') {
-      for(let id in this.layers) {
-        if(this.layers[id].element.style.display == 'block') {
-          const priorLayer = this.layers[id];
+      for(let id in this._layers) {
+        if(this._layers[id].element.style.display == 'block') {
+          const priorLayer = this._layers[id];
           priorLayer.element.style.display = 'none';
         }
-        this.layers[id].element.style.display = 'none';
+        this._layers[id].element.style.display = 'none';
       }
     }
     layer.element.style.display = 'block';
@@ -181,7 +193,7 @@ export default class OSKLayerGroup {
      * On "layout thrashing": https://webperf.tips/tip/layout-thrashing/
      */
     Promise.resolve().then(() => {
-      const trueLayer = this.layers[this._activeLayerId];
+      const trueLayer = this._layers[this._activeLayerId];
       // If either condition holds, we have to trigger a layout reflow; it's the same cost
       // whether one changes or both do.
       if(layer.element.style.display == 'block' || trueLayer.element.style.display != 'block') {
@@ -272,7 +284,7 @@ export default class OSKLayerGroup {
   }
 
   public resetPrecalcFontSizes() {
-    for(const layer of Object.values(this.layers)) {
+    for(const layer of Object.values(this._layers)) {
       for(const row of layer.rows) {
         for(const key of row.keys) {
           key.resetFontPrecalc();
