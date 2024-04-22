@@ -230,10 +230,8 @@ function setNumericLayer() {
   }
 }
 
-function updateKMText(text) {
-  if(text == undefined) {
-      text = '';
-  }
+function updateKMText(k) {
+  var text = (k == undefined) || !k.text ? '' : k.text;
 
   console_debug('updateKMText(text=' + text + ') with: \n' + build_context_string(keyman.context));
 

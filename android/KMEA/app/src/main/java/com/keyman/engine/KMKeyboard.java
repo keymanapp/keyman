@@ -29,6 +29,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
 import android.content.res.Configuration;
+import android.net.Uri;
 import android.os.Handler;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -149,17 +150,19 @@ final class KMKeyboard extends WebView {
 
   protected boolean updateText(String text) {
     boolean result = false;
+    JSONObject reg = new JSONObject();
     String kmText = "";
     if (text != null) {
-      // Replace special literal characters to pass to Javascript
-      kmText = text.toString().replace("\\", "\\u005C")
-                              .replace("%", "\\u0025")
-                              .replace("'", "\\u0027")
-                              .replace("\n", "\\n");
+      // Use JSON to handle passing string to Javascript
+      try {
+        reg.put("text", text.toString());
+      } catch (JSONException e) {
+        KMLog.LogException(TAG, "", e);
+      }
     }
 
     if (KMManager.isKeyboardLoaded(this.keyboardType) && !shouldIgnoreTextChange) {
-      this.loadJavascript(KMString.format("updateKMText('%s')", kmText));
+      this.loadJavascript(KMString.format("updateKMText(%s)", reg.toString()));
       result = true;
     }
 
@@ -348,7 +351,8 @@ final class KMKeyboard extends WebView {
             allCalls.append(";");
           }
 
-          loadUrl("javascript:" + allCalls.toString());
+          // Ensure strings save for Javascript. TBD: Spacebartext, font
+          loadUrl("javascript:" + Uri.encode(allCalls.toString()));
 
           if(javascriptAfterLoad.size() > 0 && keyboardSet) {
             callJavascriptAfterLoad();
