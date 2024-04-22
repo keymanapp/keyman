@@ -17,7 +17,6 @@ cd "$THIS_SCRIPT_PATH"
 
 builder_set_child_base src
 builder_describe "Builds engine modules for Keyman Engine for Web (KMW)." \
-  "@/common/web/gesture-recognizer build:engine/gestures" \
   "clean" \
   "configure" \
   "build" \
