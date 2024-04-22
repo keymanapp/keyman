@@ -413,6 +413,11 @@ var
   i: Integer;
   m: Integer;
 begin
+  if FSelectedKeyboard.Fonts.Count = 0 then
+  begin
+    Exit;   // Exit as grid needs at least one font
+  end;
+
   grid.DefaultColWidth := tbSize.Position;
   grid.DefaultRowHeight := tbSize.Position;
 
