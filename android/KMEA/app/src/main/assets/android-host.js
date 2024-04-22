@@ -172,7 +172,8 @@ function setKeymanLanguage(k) {
 }
 
 function setSpacebarText(mode) {
-  keyman.config.spacebarText = mode;
+  var text = (mode == undefined) || !mode.text ? '' : mode.text;
+  keyman.config.spacebarText = text;
 }
 
 // #6665: we need to know when the user has pressed a hardware key so we don't

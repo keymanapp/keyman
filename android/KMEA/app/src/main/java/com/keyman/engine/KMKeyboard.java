@@ -1100,8 +1100,17 @@ final class KMKeyboard extends WebView {
   }
 
   public void setSpacebarText(KMManager.SpacebarText mode) {
-    String jsString = KMString.format("setSpacebarText('%s')", mode.toString());
-    loadJavascript(jsString);
+    JSONObject reg = new JSONObject();
+    if (mode != null) {
+      // Use JSON to handle passing string to Javascript
+      try {
+        reg.put("text", mode.toString());
+      } catch (JSONException e) {
+        KMLog.LogException(TAG, "", e);
+      }
+    }
+
+    this.loadJavascript(KMString.format("setSpacebarText(%s)", reg.toString()));
   }
 
   /* Implement handleTouchEvent to catch long press gesture without using Android system default time
