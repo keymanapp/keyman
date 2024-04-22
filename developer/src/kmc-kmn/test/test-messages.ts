@@ -53,14 +53,14 @@ describe('KmnCompilerMessages', function () {
 
   // ERROR_DuplicateGroup
 
-  it('should generate CERR_DuplicateGroup if the kmn contains two groups with the same name', async function() {
+  it('should generate ERROR_DuplicateGroup if the kmn contains two groups with the same name', async function() {
     await testForMessage(this, ['invalid-keyboards', 'error_duplicate_group.kmn'], KmnCompilerMessages.ERROR_DuplicateGroup);
     assert.equal(callbacks.messages[0].message, "A group with this name has already been defined. Group 'ខ្មែរ' declared on line 9");
   });
 
   // ERROR_DuplicateStore
 
-  it('should generate CERR_DuplicateStore if the kmn contains two stores with the same name', async function() {
+  it('should generate ERROR_DuplicateStore if the kmn contains two stores with the same name', async function() {
     await testForMessage(this, ['invalid-keyboards', 'error_duplicate_store.kmn'], KmnCompilerMessages.ERROR_DuplicateStore);
     assert.equal(callbacks.messages[0].message, "A store with this name has already been defined. Store 'ខ្មែរ' declared on line 11");
   });
