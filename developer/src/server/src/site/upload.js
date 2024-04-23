@@ -1,3 +1,5 @@
+"use strict";
+
 /* File upload via browser */
 
 const HIGHLIGHT_DELAY = 5000;

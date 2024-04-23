@@ -1,5 +1,20 @@
 # Keyman Version History
 
+## 17.0.312 beta 2024-04-22
+
+* fix(developer): emit JSON strings as characters, not surrogate pairs (#11243)
+* fix(developer): prevent xmlns for LDML keyboard template child elements (#11251)
+* fix(developer): test that MRU project exists before attempting to reference on startup (#11252)
+* fix(developer): handle invalid Unicode values in touch layout builder (#11270)
+* fix(developer): handle multiple instances of Server starting (#11272)
+* fix(developer): lazy initialization of test window (#11275)
+* chore(web): drops redundant builder-dependency from early gesture dev (#11278)
+* feat(web): add recent-history log to gesture engine (#11277)
+* test(developer): keyboard info compiler unit tests 2 (#11130)
+* fix(web): fixes pred-text unit test instability (#11283)
+* fix(developer): keep escaped plus-sign escaped (#11269)
+* chore(resources): sync up with CLDR v45 release (#11004)
+
 ## 17.0.311 beta 2024-04-19
 
 * fix(web): default parse of length styling for empty string (#11235)
@@ -13,15 +28,15 @@
 * fix(ios): deletion of selected text (#11179)
 * fix(common): update emoji stripping for Unicode 15.1 (#11242)
 * change(web): adjusts multitap timings (#11246)
-*  (#11245)
+* fix(web): prevents dropping of input during rapid multitouch typing (#11245)
 
 ## 17.0.309 beta 2024-04-17
 
 * fix(ios): sample build script --debug detection (#10953)
-* chore(web): simple layout reflow polish 🪠 (#11237)
+* chore(web): simple layout reflow polish (#11237)
 * chore(android): enables debugging and inspection of mobile app internal webviews (#11215)
-*  (#11232)
-*  (#11238)
+* fix(web): prevents selection-clear for pure layer-switching multitaps (#11232)
+* change(web): drops need for closures to optimize layout-reflow (#11238)
 
 ## 17.0.308 beta 2024-04-13
 
@@ -33,7 +48,7 @@
 * refactor(web): better centralizes OSK layout internals to prepare for optimization efforts  (#11176)
 * feat(web): VisualKeyboard layout-reflow optimization  (#11177)
 * change(web):  OSK optimization, improved responsiveness  (#11140)
-*  (#11216)
+* fix(web): fixes up-flick shortcut issue for longpress when keys support downflicks (#11216)
 
 ## 17.0.306 beta 2024-04-11
 
@@ -42,7 +57,7 @@
 
 ## 17.0.305 beta 2024-04-10
 
-*  (#11169)
+* fix(core): skip leading trail surrogate char in km_core_state_context_set_if_needed() (#11169)
 * change(web): merges split async method in gesture engine  (#11142)
 * fix(web): blocks nextLayer for keys quickly typed when multitapping to new layer when final tap is held (#11189)
 * refactor(web): OSK spacebar-label updates now managed by layer object  (#11175)
@@ -50,7 +65,7 @@
 ## 17.0.304 beta 2024-04-09
 
 * fix(android): atomically updates selection with text (#11188)
-*  (#11178)
+* fix(web): fix crash in nearest-key row lookup when touch moves out-of-bounds (#11178)
 
 ## 17.0.303 beta 2024-04-05
 
@@ -75,7 +90,7 @@
 * chore(linux): Build packages for next Ubuntu version separately  (#11153)
 * fix(common): upgrade sentry-cli to 2.31.0 (#11151)
 * fix(android/app): Track previous device orientation for SystemKeyboard (#11134)
-*  (#11129)
+* change(web): reworks nearest-key detection to avoid layout reflow (#11129)
 
 ## 17.0.300 beta 2024-04-02
 
@@ -113,7 +128,7 @@
 
 * fix(developer): in model compiler, give correct key to shorter prefix words when a longer, higher-frequency word is also present (#11074)
 * fix(oem/fv/android): Only add default keyboard if no keyboards exist (#11080)
-*  (#11068)
+* fix(core): correct typo in LDML test DTD reference (#11068)
 * chore(android): Update crowdin strings for Mon (#11089)
 * chore(android): Update crowdin strings for Khmer (#11090)
 

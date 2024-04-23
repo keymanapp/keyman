@@ -1,3 +1,5 @@
+"use strict";
+
 /* Global Variables */
 
 let helpUrl = ''; // Will be updated when we retrieve the server API version
