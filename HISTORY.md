@@ -11,7 +11,7 @@
 * chore(web): drops redundant builder-dependency from early gesture dev (#11278)
 * feat(web): add recent-history log to gesture engine (#11277)
 * test(developer): keyboard info compiler unit tests 2 (#11130)
-*  (#11283)
+* fix(web): fixes pred-text unit test instability (#11283)
 * fix(developer): keep escaped plus-sign escaped (#11269)
 * chore(resources): sync up with CLDR v45 release (#11004)
 
@@ -28,15 +28,15 @@
 * fix(ios): deletion of selected text (#11179)
 * fix(common): update emoji stripping for Unicode 15.1 (#11242)
 * change(web): adjusts multitap timings (#11246)
-*  (#11245)
+* fix(web): prevents dropping of input during rapid multitouch typing (#11245)
 
 ## 17.0.309 beta 2024-04-17
 
 * fix(ios): sample build script --debug detection (#10953)
 * chore(web): simple layout reflow polish 🪠 (#11237)
 * chore(android): enables debugging and inspection of mobile app internal webviews (#11215)
-*  (#11232)
-*  (#11238)
+* fix(web): prevents selection-clear for pure layer-switching multitaps (#11232)
+* change(web): drops need for closures to optimize layout-reflow (#11238)
 
 ## 17.0.308 beta 2024-04-13
 
@@ -48,7 +48,7 @@
 * refactor(web): better centralizes OSK layout internals to prepare for optimization efforts  (#11176)
 * feat(web): VisualKeyboard layout-reflow optimization  (#11177)
 * change(web):  OSK optimization, improved responsiveness  (#11140)
-*  (#11216)
+* fix(web): fixes up-flick shortcut issue for longpress when keys support downflicks (#11216)
 
 ## 17.0.306 beta 2024-04-11
 
@@ -128,7 +128,7 @@
 
 * fix(developer): in model compiler, give correct key to shorter prefix words when a longer, higher-frequency word is also present (#11074)
 * fix(oem/fv/android): Only add default keyboard if no keyboards exist (#11080)
-*  (#11068)
+* fix(core): correct typo in LDML test DTD reference (#11068)
 * chore(android): Update crowdin strings for Mon (#11089)
 * chore(android): Update crowdin strings for Khmer (#11090)
 
