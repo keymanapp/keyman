@@ -1354,7 +1354,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = "/usr/bin/env bash";
-			shellScript = "\"$KEYMAN_ROOT/resources/build/xcode-wrap.sh\" \"$KEYMAN_ROOT/resources/build/set-bundle-versions.sh\"\n";
+			shellScript = "\"$KEYMAN_ROOT/resources/build/xcode-wrap.sh\" \"$KEYMAN_ROOT/resources/build/set-bundle-versions-tagged.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 		CEC0C66F2410B005003E1BCD /* Run Script - upload dsyms to Sentry */ = {

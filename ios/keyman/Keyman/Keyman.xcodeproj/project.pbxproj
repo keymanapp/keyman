@@ -1020,7 +1020,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = "/usr/bin/env bash";
-			shellScript = ". \"$KEYMAN_ROOT/resources/build/xcode-utils.sh\"\n\n# Calls resource script to update build products' versioning.\nphaseSetBundleVersions\n";
+			shellScript = "\"$KEYMAN_ROOT/resources/build/xcode-wrap.sh\" \"$KEYMAN_ROOT/resources/build/set-bundle-versions-untagged.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */
