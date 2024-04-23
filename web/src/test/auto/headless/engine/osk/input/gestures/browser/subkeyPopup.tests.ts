@@ -3,15 +3,14 @@ import { JSDOM } from 'jsdom';
 import sinon from 'sinon';
 
 import { GesturePath, GestureSequence, GestureSource, GestureSourceSubview } from '@keymanapp/gesture-recognizer';
+import { ActiveSubKey, DeviceSpec } from '@keymanapp/keyboard-processor';
+import { DEFAULT_GESTURE_PARAMS, KeyElement, VisualKeyboard } from 'keyman/engine/osk';
 
-import { ActiveSubKey } from '@keymanapp/keyboard-processor';
-import { DeviceSpec } from '../../../../../../../../../../common/web/utils/build/obj/deviceSpec.js';
-import OSKSubKey from '../../../../../../../../../build/engine/osk/obj/input/gestures/browser/oskSubKey.js';
+// the following imports are not exported in keyman/engine/osk:
 import OSKBaseKey from '../../../../../../../../../build/engine/osk/obj/keyboard-layout/oskBaseKey.js';
 import OSKRow from '../../../../../../../../../build/engine/osk/obj/keyboard-layout/oskRow.js';
 import { default as SubkeyPopup } from '../../../../../../../../../build/engine/osk/obj/input/gestures/browser/subkeyPopup.js'
 import { link } from '../../../../../../../../../build/engine/osk/obj/keyElement.js'
-import { DEFAULT_GESTURE_PARAMS, KeyElement, VisualKeyboard } from 'keyman/engine/osk';
 
 // Tests for #10126
 describe('subkey menu width', () => {
