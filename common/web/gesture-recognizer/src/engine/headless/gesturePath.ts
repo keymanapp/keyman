@@ -138,4 +138,13 @@ export class GesturePath<Type, StateToken = any> extends EventEmitter<EventMap<T
 
     this.removeAllListeners();
   }
+
+  public toJSON(): any {
+    return {
+      // Replicate array and its entries, but with certain fields of each entry missing.
+      // No .clientX, no .clientY.
+      stats: this.stats,
+      wasCancelled: this.wasCancelled
+    }
+  }
 }

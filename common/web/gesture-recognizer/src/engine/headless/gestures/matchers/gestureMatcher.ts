@@ -49,7 +49,7 @@ export class GestureMatcher<Type, StateToken = any> implements PredecessorMatch<
 
   public get sources(): GestureSource<Type>[] {
     return this.pathMatchers.map((pathMatch, index) => {
-      if(this.model.contacts[index].resetOnResolve) {
+      if(this.model.contacts[index].resetOnInstantFulfill) {
         return undefined;
       } else {
         return pathMatch.source;
@@ -106,7 +106,7 @@ export class GestureMatcher<Type, StateToken = any> implements PredecessorMatch<
       if(source && entry == source) {
         // Due to internal delays that can occur when an incoming tap triggers
         // completion of a previously-existing gesture but is not included in it
-        // (`resetOnResolve` mechanics), it is technically possible for a very
+        // (`resetOnInstantFulfill` mechanics), it is technically possible for a very
         // quick tap to be 'complete' by the time we start trying to match
         // against it on some devices.  We should still try in such cases.
         return source;

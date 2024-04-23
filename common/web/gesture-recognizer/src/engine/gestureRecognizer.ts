@@ -19,7 +19,7 @@ export class GestureRecognizer<HoveredItemType, StateToken = any> extends Touchp
     // overhead.
     gestureModelDefinitions = gestureModelDefinitions || EMPTY_GESTURE_DEFS;
 
-    super(gestureModelDefinitions);
+    super(gestureModelDefinitions, null, preprocessedConfig.historyLength);
     this.config = preprocessedConfig;
 
     this.mouseEngine = new MouseEventEngine<HoveredItemType>(this.config);
