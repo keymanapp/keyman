@@ -1,5 +1,5 @@
 name: "Ubuntu packaging"
-run-name: "Ubuntu packaging - ${{ github.event.client_payload.branch }} (branch ${{ github.event.client_payload.baseBranch }}), by @${{ github.event.client_payload.user }}"
+run-name: "Ubuntu packaging - ${{ github.event.client_payload.branch }} (branch ${{ github.event.client_payload.baseBranch }}), by @${{ github.event.client_payload.user }}, testbuild: ${{ github.event.client_payload.isTestBuild }}"
 on:
   repository_dispatch:
     types: ['deb-release-packaging:*', 'deb-pr-packaging:*']
@@ -30,7 +30,7 @@ jobs:
       PRERELEASE_TAG: ${{ steps.prerelease_tag.outputs.PRERELEASE_TAG }}
     steps:
     - name: Checkout
-      uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c #v3.3.0
+      uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 #v4.1.1
       with:
         ref: '${{ github.event.client_payload.buildSha }}'
 
@@ -112,13 +112,19 @@ jobs:
   binary_packages_released:
     name: Build binary packages for released versions
     needs: sourcepackage
+    runs-on: ubuntu-latest
     strategy:
       fail-fast: true
       matrix:
         dist: [focal, jammy, mantic]
 
-    runs-on: ubuntu-latest
     steps:
+    - name: Checkout
+      uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 #v4.1.1
+      with:
+        ref: '${{ github.event.client_payload.buildSha }}'
+        sparse-checkout: '.github/actions/'
+
     - name: Build
       uses: ./.github/actions/build-binary-packages
       with:
@@ -131,15 +137,21 @@ jobs:
   binary_packages_unreleased:
     name: Build binary packages for next Ubuntu version
     needs: sourcepackage
+    continue-on-error: true
+    runs-on: ubuntu-latest
     strategy:
       fail-fast: true
       matrix:
         dist: [noble]
 
-    runs-on: ubuntu-latest
     steps:
+    - name: Checkout
+      uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 #v4.1.1
+      with:
+        ref: '${{ github.event.client_payload.buildSha }}'
+        sparse-checkout: '.github/actions/'
+
     - name: Build
-      continue-on-error: true
       uses: ./.github/actions/build-binary-packages
       with:
         dist: ${{ matrix.dist }}
@@ -182,7 +194,7 @@ jobs:
     needs: [sourcepackage, binary_packages_released, binary_packages_unreleased]
     runs-on: ubuntu-latest
     environment: "deploy (linux)"
-    if: github.event.client_payload.isTestBuild == 'false'
+    if: ${{always() && needs.sourcepackage.result == 'success' && needs.binary_packages_released.result == 'success' && github.event.client_payload.isTestBuild == 'false'}}
 
     steps:
       - name: Sign packages
@@ -305,7 +317,9 @@ jobs:
     - name: Verify API
       run: |
         cd linux
-        PKG_NAME=libkeymancore
+        # Extract line containing "Package: libkeymancore1" and then strip "Package: "
+        PKG_NAME=$(grep -E 'Package: libkeymancore([0-9]+|$)' debian/control)
+        PKG_NAME="${PKG_NAME#Package: }"
         ./scripts/deb-packaging.sh \
           --gha \
           --bin-pkg "${GITHUB_WORKSPACE}/artifacts/${PKG_NAME}_${{ needs.sourcepackage.outputs.VERSION }}-1${{ needs.sourcepackage.outputs.PRERELEASE_TAG }}+jammy1_amd64.deb" \
