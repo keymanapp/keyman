@@ -34,22 +34,17 @@ describe('KeyboardInfoCompilerMessages', function () {
 
   it('should generate ERROR_FileDoesNotExist error if .js file does not exist', async function() {
     const jsFilename = makePathToFixture('khmer_angkor', 'build', 'xxx.js');
-    const kpsFilename = KHMER_ANGKOR_KPS;
-    const kmpFilename = KHMER_ANGKOR_KMP;
 
     const sources = {
-      kmpFilename,
-      sourcePath: 'release/k/khmer_angkor',
-      kpsFilename,
+      ...KHMER_ANGKOR_SOURCES,
       jsFilename,
-      forPublishing: true,
     };
 
     const compiler = new KeyboardInfoCompiler();
     assert.isTrue(await compiler.init(callbacks, {sources}));
     let result: KeyboardInfoCompilerResult = null;
     try {
-      result = await compiler.run(kmpFilename, null);
+      result = await compiler.run(KHMER_ANGKOR_KMP, null);
     } catch(e) {
       callbacks.printMessages();
       throw e;
@@ -186,16 +181,9 @@ describe('KeyboardInfoCompilerMessages', function () {
   // ERROR_LicenseIsNotValid
 
   it('should generate ERROR_LicenseIsNotValid error if license file is invalid', async function() {
-    const jsFilename = KHMER_ANGKOR_JS;
-    const kpsFilename = KHMER_ANGKOR_KPS;
-    const kmpFilename = KHMER_ANGKOR_KMP;
-
     const sources = {
-      kmpFilename,
+      ...KHMER_ANGKOR_SOURCES,
       sourcePath: 'release/k/invalid-license',
-      kpsFilename,
-      jsFilename: jsFilename,
-      forPublishing: true,
     };
 
     const compiler = new KeyboardInfoCompiler();
@@ -281,7 +269,7 @@ describe('KeyboardInfoCompilerMessages', function () {
       kmpFilename,
       sourcePath: 'release/k/font-meta-data-is-invalid',
       kpsFilename,
-      jsFilename: jsFilename,
+      jsFilename,
       forPublishing: true,
     };
 
