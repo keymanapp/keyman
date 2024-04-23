@@ -33,7 +33,7 @@
 ## 17.0.309 beta 2024-04-17
 
 * fix(ios): sample build script --debug detection (#10953)
-* chore(web): simple layout reflow polish 🪠 (#11237)
+* chore(web): simple layout reflow polish (#11237)
 * chore(android): enables debugging and inspection of mobile app internal webviews (#11215)
 * fix(web): prevents selection-clear for pure layer-switching multitaps (#11232)
 * change(web): drops need for closures to optimize layout-reflow (#11238)
