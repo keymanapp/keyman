@@ -341,15 +341,15 @@ describe('keyboard-info-compiler', function () {
   }));
 
   const platformsTestCases = [
-    { hasJsFile: true, targets: 'any',                  expected: { windows: "full",macos: "full",linux: "full",desktopWeb: "full",ios: "full",android: "full",mobileWeb: "full" } },
-    { hasJsFile: false, targets: '',                    expected: { desktopWeb: "full",mobileWeb: "full" } },
-    { hasJsFile: true,  targets: '',                    expected: { desktopWeb: "full",ios: "full",android: "full",mobileWeb: "full" } },
-    { hasJsFile: true,  targets: 'androidphone',        expected: { android: "full",mobileWeb: "full" } },
-    { hasJsFile: true,  targets: 'iphone',              expected: { ios: "full",mobileWeb: "full" } },
-    { hasJsFile: true,  targets: 'linux',               expected: { linux: "full",desktopWeb: "full" } },
-    { hasJsFile: true,  targets: 'macosx',              expected: { macos: "full",desktopWeb: "full" } },
-    { hasJsFile: true,  targets: 'windows',             expected: { windows: "full",desktopWeb: "full" } },
-    { hasJsFile: true,  targets: 'androidphone iphone', expected: { android: "full",ios: "full",mobileWeb: "full" } },
+    { hasJsFileInKps: true,  targets: 'any',                 expected: { windows: "full",macos: "full",linux: "full",desktopWeb: "full",ios: "full",android: "full",mobileWeb: "full" } },
+    { hasJsFileInKps: false, targets: '',                    expected: { desktopWeb: "full",mobileWeb: "full" } },
+    { hasJsFileInKps: true,  targets: '',                    expected: { desktopWeb: "full",ios: "full",android: "full",mobileWeb: "full" } },
+    { hasJsFileInKps: true,  targets: 'androidphone',        expected: { android: "full",mobileWeb: "full" } },
+    { hasJsFileInKps: true,  targets: 'iphone',              expected: { ios: "full",mobileWeb: "full" } },
+    { hasJsFileInKps: true,  targets: 'linux',               expected: { linux: "full",desktopWeb: "full" } },
+    { hasJsFileInKps: true,  targets: 'macosx',              expected: { macos: "full",desktopWeb: "full" } },
+    { hasJsFileInKps: true,  targets: 'windows',             expected: { windows: "full",desktopWeb: "full" } },
+    { hasJsFileInKps: true,  targets: 'androidphone iphone', expected: { android: "full",ios: "full",mobileWeb: "full" } },
   ];
 
   platformsTestCases.forEach((testCase, idx) => it(`check run sets platforms correctly (test case #${idx})`, async function() {
@@ -362,7 +362,7 @@ describe('keyboard-info-compiler', function () {
     assert.isTrue(await kmpCompiler.init(callbacks, {}));
     const kmpJsonData = kmpCompiler.transformKpsToKmpObject(kpsFilename);
     assert.isNotNull(kmpJsonData);
-    if (!testCase.hasJsFile) {
+    if (!testCase.hasJsFileInKps) {
       // remove .js file
       kmpJsonData.files = kmpJsonData.files.filter(file => !KeymanFileTypes.filenameIs(file.name, KeymanFileTypes.Binary.WebKeyboard));
     }
