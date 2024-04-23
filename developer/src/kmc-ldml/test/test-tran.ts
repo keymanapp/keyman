@@ -335,11 +335,29 @@ describe('tran', function () {
       ],
     },
     // cases that share the same error code
-    ...[1, 2].map(n => ({
+    ...[1, 2, 3].map(n => ({
       subpath: `sections/tran/fail-IllegalTransformDollarsign-${n}.xml`,
       errors: [
         {
           code: CompilerMessages.ERROR_IllegalTransformDollarsign,
+          matchMessage: /.*/,
+        }
+      ],
+    })),
+    ...[1, 2].map(n => ({
+      subpath: `sections/tran/fail-IllegalTransformAsterisk-${n}.xml`,
+      errors: [
+        {
+          code: CompilerMessages.ERROR_IllegalTransformAsterisk,
+          matchMessage: /.*/,
+        }
+      ],
+    })),
+    ...[1, 2].map(n => ({
+      subpath: `sections/tran/fail-IllegalTransformPlus-${n}.xml`,
+      errors: [
+        {
+          code: CompilerMessages.ERROR_IllegalTransformPlus,
           matchMessage: /.*/,
         }
       ],

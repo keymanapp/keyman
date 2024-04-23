@@ -98,6 +98,12 @@ export interface GestureRecognizerConfiguration<HoveredItemType, StateToken = an
    * use in automated testing.
    */
   readonly recordingMode?: boolean;
+
+  /**
+   * If greater than zero, preserves this amount of previously-seen touches and gestures before
+   * permanently clearing them.
+   */
+  readonly historyLength?: number;
 }
 
 export function preprocessRecognizerConfig<HoveredItemType, StateToken = any>(
@@ -116,6 +122,7 @@ export function preprocessRecognizerConfig<HoveredItemType, StateToken = any>(
 
   processingConfig.itemIdentifier   = processingConfig.itemIdentifier   ?? (() => null);
   processingConfig.recordingMode = !!processingConfig.recordingMode;
+  processingConfig.historyLength = (processingConfig.historyLength ?? 0) > 0 ? processingConfig.historyLength : 0;
 
   if(!config.paddedSafeBounds) {
     let paddingArray = config.safeBoundPadding;

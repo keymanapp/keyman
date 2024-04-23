@@ -4,6 +4,18 @@ import sinon from 'sinon';
 import { ParsedLengthStyle } from 'keyman/engine/osk';
 
 describe('Length style processing', () => {
+  it("constructs from empty-string", () => {
+    let length = new ParsedLengthStyle('');
+    assert.equal(length.val, 1);
+    assert.equal(length.absolute, false);
+  });
+
+  it("constructs from garbage", () => {
+    let length = new ParsedLengthStyle('garbage');
+    assert.equal(length.val, 1);
+    assert.equal(length.absolute, false);
+  })
+
   it("constructs from 'px' styling", () => {
     let length = new ParsedLengthStyle("20px");
 

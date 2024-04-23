@@ -311,10 +311,17 @@ export default abstract class OSKKey {
     this.label.style.fontSize = '';
   }
 
-  public refreshLayout(layoutParams: KeyLayoutParams) {
+  /**
+   * Any style-caching behavior needed for use in layout manipulation should be
+   * computed within this method, not within refreshLayout.  This is to prevent
+   * unnecessary layout-reflow.
+   * @param layoutParams
+   * @returns
+   */
+  public detectStyles(layoutParams: KeyLayoutParams): void {
     // Avoid doing any font-size related calculations if there's no text to display.
     if(this.spec.sp == ButtonClasses.spacer || this.spec.sp == ButtonClasses.blank) {
-      return () => {};
+      return;
     }
 
     // Attempt to detect static but key-specific style properties if they haven't yet
@@ -324,7 +331,7 @@ export default abstract class OSKKey {
 
       // Abort if the element is not currently in the DOM; we can't get any info this way.
       if(!lblStyle.fontFamily) {
-        return () => {};
+        return;
       }
       this._fontFamily = lblStyle.fontFamily;
 
@@ -341,26 +348,26 @@ export default abstract class OSKKey {
         this._fontSize = ParsedLengthStyle.forScalar(localFontScaling);
       }
     }
+  }
 
+  // Avoid any references to getComputedStyle, offset_, or other layout-reflow
+  // dependent values.  Refer to https://gist.github.com/paulirish/5d52fb081b3570c81e3a.
+  public refreshLayout(layoutParams: KeyLayoutParams) {
     // space bar may not define the text span!
     if(this.label) {
       if(!this.label.classList.contains('kmw-spacebar-caption')) {
         // Do not use `this.keyText` - it holds *___* codes for special keys, not the actual glyph!
         const keyCapText = this.label.textContent;
         const fontSize = this.getIdealFontSize(keyCapText, layoutParams);
-        return () => {
-          this.label.style.fontSize = fontSize.styleString;
-        };
+        this.label.style.fontSize = fontSize.styleString;
       } else {
         // Spacebar text, on the other hand, is available via this.keyText.
         // Using this field helps prevent layout reflow during updates.
         const fontSize = this.getIdealFontSize(this.keyText, layoutParams);
 
-        return () => {
-          // Since the kmw-spacebar-caption version uses !important, we must specify
-          // it directly on the element too; otherwise, scaling gets ignored.
-          this.label.style.setProperty("font-size", fontSize.styleString, "important");
-        };
+        // Since the kmw-spacebar-caption version uses !important, we must specify
+        // it directly on the element too; otherwise, scaling gets ignored.
+        this.label.style.setProperty("font-size", fontSize.styleString, "important");
       }
     }
   }

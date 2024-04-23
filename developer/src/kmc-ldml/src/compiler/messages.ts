@@ -197,4 +197,14 @@ export class CompilerMessages {
   static Error_TransformFromMatchesNothing = (o: { from: string }) =>
   m(this.ERROR_TransformFromMatchesNothing, `Invalid transfom from="${def(o.from)}": Matches an empty string.`);
 
+  static ERROR_IllegalTransformPlus = SevErrorTransform | 0x03;
+  static Error_IllegalTransformPlus = (o: { from: string }) =>
+  m(this.ERROR_IllegalTransformPlus,  `Invalid transform from="${def(o.from)}": Unescaped plus (+) is not valid transform syntax.`,
+                                            '**Hint**: Use `\\+` to match a literal plus.');
+
+  static ERROR_IllegalTransformAsterisk = SevErrorTransform | 0x04;
+  static Error_IllegalTransformAsterisk = (o: { from: string }) =>
+  m(this.ERROR_IllegalTransformAsterisk,  `Invalid transform from="${def(o.from)}": Unescaped asterisk (*) is not valid transform syntax.`,
+                                            '**Hint**: Use `\\*` to match a literal asterisk.');
+
 }

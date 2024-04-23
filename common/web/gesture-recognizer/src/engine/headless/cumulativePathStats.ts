@@ -435,7 +435,7 @@ export class CumulativePathStats<Type = any> {
    * Provides a JSON.stringify()-friendly object with the properties most useful for
    * debugger-based inspection and/or console-logging statements.
    */
-  public get summaryObject() {
+  public toJSON() {
     return {
       angle: this.angle,
       cardinal: this.cardinalDirection,

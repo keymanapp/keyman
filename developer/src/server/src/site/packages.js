@@ -1,3 +1,5 @@
+"use strict";
+
 const menuDropdown = new DropdownMenu('menu');
 let packages = null;
 let packagesJSON = null;

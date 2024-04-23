@@ -109,8 +109,8 @@ export const DEFAULT_GESTURE_PARAMS: GestureParams = {
     noiseTolerance: 10
   },
   multitap: {
-    waitLength: 500,
-    holdLength: 500
+    waitLength: 300,
+    holdLength: 150
   },
   // Note:  all actual runtime values are determined at runtime based upon row height.
   // See `VisualKeyboard.refreshLayout`, CTRL-F "Step 3".
@@ -632,7 +632,8 @@ export function specialKeyEndModel(params: GestureParams): GestureModel<any> {
 export function longpressModel(params: GestureParams, allowShortcut: boolean, allowRoaming: boolean): GestureModel<any> {
   const base: GestureModel<any> = {
     id: 'longpress',
-    resolutionPriority: 0,
+    // Needs to beat flick-start priority.
+    resolutionPriority: 4,
     contacts: [
       {
         model: {
@@ -642,7 +643,8 @@ export function longpressModel(params: GestureParams, allowShortcut: boolean, al
         },
         endOnResolve: false
       }, {
-        model: instantContactRejectionModel()
+        model: instantContactRejectionModel(),
+        resetOnInstantFulfill: true
       }
     ],
     resolutionAction: {
@@ -814,7 +816,7 @@ export function flickMidModel(params: GestureParams): GestureModel<any> {
         endOnReject: true,
       }, {
         model: instantContactRejectionModel(),
-        resetOnResolve: true,
+        resetOnInstantFulfill: true,
       }
     ],
     rejectionActions: {
@@ -916,7 +918,7 @@ export function flickEndModel(params: GestureParams): GestureModel<any> {
       },
       {
         model: instantContactResolutionModel(),
-        resetOnResolve: true
+        resetOnInstantFulfill: true
       }
     ],
     rejectionActions: {
@@ -979,7 +981,7 @@ export function multitapEndModel(params: GestureParams): GestureModel<any> {
         endOnResolve: true
       }, {
         model: instantContactResolutionModel(),
-        resetOnResolve: true
+        resetOnInstantFulfill: true
       }
     ],
     rejectionActions: {
@@ -1014,7 +1016,7 @@ export function initialTapModel(params: GestureParams): GestureModel<any> {
         endOnResolve: true
       }, {
         model: instantContactResolutionModel(),
-        resetOnResolve: true
+        resetOnInstantFulfill: true
       }
     ],
     sustainWhenNested: true,
@@ -1045,7 +1047,7 @@ export function simpleTapModel(params: GestureParams): GestureModel<any> {
         endOnResolve: true
       }, {
         model: instantContactResolutionModel(),
-        resetOnResolve: true
+        resetOnInstantFulfill: true
       }
     ],
     sustainWhenNested: true,
@@ -1159,7 +1161,7 @@ export function modipressHoldModel(params: GestureParams): GestureModel<any> {
         },
         // The incoming tap belongs to a different gesture; we just care to know that it
         // happened.
-        resetOnResolve: true
+        resetOnInstantFulfill: true
       }
     ],
     // To be clear:  any time modipress-hold is triggered and the timer duration elapses,
@@ -1283,7 +1285,7 @@ export function modipressMultitapEndModel(params: GestureParams): GestureModel<a
         },
         // The incoming tap belongs to a different gesture; we just care to know that it
         // happened.
-        resetOnResolve: true
+        resetOnInstantFulfill: true
       }
     ],
     resolutionAction: {

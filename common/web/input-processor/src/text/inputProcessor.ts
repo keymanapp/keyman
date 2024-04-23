@@ -107,8 +107,20 @@ export default class InputProcessor {
       if(keyEvent.baseTranscriptionToken) {
         const transcription = this.contextCache.get(keyEvent.baseTranscriptionToken);
         if(transcription) {
-          // Restores full context, including deadkeys in their exact pre-keystroke state.
-          outputTarget.restoreTo(transcription.preInput);
+          // Has there been a context change at any point during the multitap?  If so, we need
+          // to revert it.  If not, we assume it's a layer-change multitap, in which case
+          // no such reset is needed.
+          if(!isEmptyTransform(transcription.transform) || !transcription.preInput.isEqual(Mock.from(outputTarget))) {
+            // Restores full context, including deadkeys in their exact pre-keystroke state.
+            outputTarget.restoreTo(transcription.preInput);
+          }
+          /*
+            else:
+            1. We don't need to restore the original context, as it's already
+               in-place.
+            2. Restoring anyway would obliterate any selected text, which is bad
+               if this is a purely-layer-switching multitap.  (#11230)
+          */
         } else {
           console.warn('The base context for the multitap could not be found');
         }
