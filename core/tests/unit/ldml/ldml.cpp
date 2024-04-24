@@ -331,8 +331,8 @@ run_test(const km::core::path &source, const km::core::path &compiled, km::tests
 
         if (state_should_invalidate_context(test_state, p.vk, p.modifier_state | test_source.caps_lock_state(), key_down,
             KM_CORE_EVENT_FLAG_DEFAULT)) {
-              test_context.clear();
-              text_store.clear();
+          test_context.clear();
+          text_store.clear();
         }
         for (auto act = km_core_state_action_items(test_state, nullptr); act->type != KM_CORE_IT_END; act++) {
           apply_action(test_state, *act, text_store, test_context, test_source, test_context);

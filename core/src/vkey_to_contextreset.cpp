@@ -3,7 +3,7 @@
 namespace km {
 namespace core {
 
-bool vkey_to_contextreset[vkey_to_contextreset_count] = {
+bool vkey_should_invalidate_context[vkey_should_invalidate_context_count] = {
 	true,   //L"K_?00",				// &H0
 	true,   //L"K_LBUTTON",			// &H1
 	true,   //L"K_RBUTTON",			// &H2

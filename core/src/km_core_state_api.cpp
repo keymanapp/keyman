@@ -385,11 +385,16 @@ state_should_invalidate_context(km_core_state *state,
   // if emit_keystroke is present, check if a context reset is needed
   if (state_has_action_type(state, KM_CORE_IT_EMIT_KEYSTROKE)) {
     if (
-        // always reset on backspace
+        // when a backspace keystroke is emitted, it is because we are at the start of 
+        // context, and we want to give the application the chance to process it, e.g. 
+        // by moving to previous field. Note that context manipulation does not result 
+        // in an emit_keystroke backspace action, as this is handled through the 
+        // `code_points_to_delete` field. So we always invalidate context when a 
+        // processor emits a backspace.
         vk == KM_CORE_VKEY_BKSP ||
-        // certain modifiers reset
+        // certain modifiers invalidate context
         modifier_should_contextreset(modifier_state) ||
-        // reset on frame keys
+        // most frame keys invalidate context
         vkey_should_contextreset(vk)) {
       return true;
     }
