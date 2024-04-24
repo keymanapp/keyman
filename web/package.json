@@ -62,6 +62,10 @@
       "es6-bundling": "./src/engine/osk/src/index.ts",
       "types": "./build/engine/osk/obj/index.d.ts",
       "import": "./build/engine/osk/obj/index.js"
+    },
+    "./engine/osk/internals": {
+      "types": "./build/engine/osk/obj/test-index.d.ts",
+      "import": "./build/engine/osk/obj/test-index.js"
     }
   },
   "repository": {
