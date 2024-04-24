@@ -142,28 +142,22 @@ export default class SubkeyPopup implements GestureHandler {
     ss.fontSize=computedStyle.fontSize;
     ss.visibility='hidden';
 
+    let layer = e['key'].layer;
+    if (typeof (layer) != 'string' || layer == '') {
+      // Use the currently-active layer.
+      layer = vkbd.layerId;
+    }
+
     const nKeys = subKeySpec.length;
-    // If we have more than 9 keys we put them in (at least) two rows.
-    const nRows=Math.min(Math.ceil(nKeys/9),2);
+    // Put a maximum of 9 keys in a row to reduce travel distance
+    const nRows=Math.ceil(nKeys/9);
     const nCols=Math.ceil(nKeys/nRows);
 
     // Add nested button elements for each sub-key
     this.subkeys = [];
-    let thisRowWidth = 0;
+    let thisRowWidth = SUBKEY_DEFAULT_MARGIN_LEFT;
     let iRow = 0;
     for(let i=0, iCol=0; i<nKeys; i++, iCol++) {
-      if (iCol >= nCols) {
-        iRow++;
-        iCol = 0;
-        thisRowWidth = 0;
-      }
-
-      let layer = e['key'].layer;
-      if(typeof(layer) != 'string' || layer == '') {
-        // Use the currently-active layer.
-        layer = vkbd.layerId;
-      }
-
       let subkeyWidth = (typeof subKeySpec[i]['width'] != 'undefined') ?
         subKeySpec[i]['width'] * e.offsetWidth / 100 :
         e.offsetWidth;
@@ -172,14 +166,14 @@ export default class SubkeyPopup implements GestureHandler {
         subkeyWidth = vkbd.width - 2 * SUBKEY_DEFAULT_MARGIN_LEFT;
       }
 
-      if (thisRowWidth + subkeyWidth + SUBKEY_DEFAULT_MARGIN_LEFT > vkbd.width) {
+      if (thisRowWidth + subkeyWidth + SUBKEY_DEFAULT_MARGIN_LEFT > vkbd.width || iCol >= nCols) {
         // New subkey doesn't fit in the current row. Start a new row.
         // TODO: currently we don't check that the rows fit vertically,
         // so it's possible that the top or bottom of the subkey menu
         // is not visible.
         iRow++;
         iCol = 0;
-        thisRowWidth = 0;
+        thisRowWidth = SUBKEY_DEFAULT_MARGIN_LEFT;
       }
       const keyGenerator = new OSKSubKey(subKeySpec[i], layer);
       const kDiv = keyGenerator.construct(vkbd, <KeyElement>e, subkeyWidth, iRow > 0);

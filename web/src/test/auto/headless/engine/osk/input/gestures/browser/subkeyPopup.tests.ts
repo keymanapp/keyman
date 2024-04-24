@@ -78,7 +78,7 @@ describe('subkey menu width', () => {
       DEFAULT_GESTURE_PARAMS
     );
 
-    assert.equal(sut.element.style.width, '30px' /* 25 + SUBKEY_DEFAULT_MARGIN_LEFT */);
+    assert.equal(sut.element.style.width, '35px' /* 25 + 2 * SUBKEY_DEFAULT_MARGIN_LEFT */);
     assert.equal((sut.element.children[0] as HTMLDivElement).style.marginTop, '');
   });
 
@@ -92,7 +92,7 @@ describe('subkey menu width', () => {
     );
 
     // should be 2 rows with 5 keys each
-    assert.equal(sut.element.style.width, '150px' /* 5 * (25 + SUBKEY_DEFAULT_MARGIN_LEFT) */);
+    assert.equal(sut.element.style.width, '155px' /* 5 * (25 + SUBKEY_DEFAULT_MARGIN_LEFT) + SUBKEY_DEFAULT_MARGIN_LEFT */);
     assert.equal((sut.element.children[0] as HTMLDivElement).style.marginTop, '');
     assert.equal((sut.element.children[4] as HTMLDivElement).style.marginTop, '');
     assert.equal((sut.element.children[5] as HTMLDivElement).style.marginTop, '5px');
@@ -108,7 +108,7 @@ describe('subkey menu width', () => {
     );
 
     // should be 2 rows with 3 keys each
-    assert.equal(sut.element.style.width, '315px' /* 3 * (100 + SUBKEY_DEFAULT_MARGIN_LEFT) */);
+    assert.equal(sut.element.style.width, '320px' /* 3 * (100 + SUBKEY_DEFAULT_MARGIN_LEFT) + SUBKEY_DEFAULT_MARGIN_LEFT*/);
     assert.equal((sut.element.children[0] as HTMLDivElement).style.marginTop, '');
     assert.equal((sut.element.children[2] as HTMLDivElement).style.marginTop, '');
     assert.equal((sut.element.children[3] as HTMLDivElement).style.marginTop, '5px');
@@ -124,9 +124,9 @@ describe('subkey menu width', () => {
     );
 
     // should be 2 rows with 5 keys each
-    // First row: 4 * (25 + SUBKEY_DEFAULT_MARGIN_LEFT) + 1 * (100 + SUBKEY_DEFAULT_MARGIN_LEFT) = 225
-    // Second row: 5 * (25 + SUBKEY_DEFAULT_MARGIN_LEFT) = 150
-    assert.equal(sut.element.style.width, '225px');
+    // First row: 4 * (25 + SUBKEY_DEFAULT_MARGIN_LEFT) + 1 * (100 + SUBKEY_DEFAULT_MARGIN_LEFT) + SUBKEY_DEFAULT_MARGIN_LEFT = 230
+    // Second row: 5 * (25 + SUBKEY_DEFAULT_MARGIN_LEFT) + SUBKEY_DEFAULT_MARGIN_LEFT = 155
+    assert.equal(sut.element.style.width, '230px');
     assert.equal((sut.element.children[0] as HTMLDivElement).style.marginTop, '');
     assert.equal((sut.element.children[4] as HTMLDivElement).style.marginTop, '');
     assert.equal((sut.element.children[5] as HTMLDivElement).style.marginTop, '5px');
@@ -142,12 +142,45 @@ describe('subkey menu width', () => {
     );
 
     // should be 2 rows
-    // First row: 6 * (25 + SUBKEY_DEFAULT_MARGIN_LEFT) + 1 * (100 + SUBKEY_DEFAULT_MARGIN_LEFT) = 285
-    // Second row: 2 * (25 + SUBKEY_DEFAULT_MARGIN_LEFT) = 60
-    assert.equal(sut.element.style.width, '285px');
+    // First row: 6 * (25 + SUBKEY_DEFAULT_MARGIN_LEFT) + 1 * (100 + SUBKEY_DEFAULT_MARGIN_LEFT) + SUBKEY_DEFAULT_MARGIN_LEFT = 290
+    // Second row: 2 * (25 + SUBKEY_DEFAULT_MARGIN_LEFT) + SUBKEY_DEFAULT_MARGIN_LEFT = 65
+    assert.equal(sut.element.style.width, '290px');
     assert.equal((sut.element.children[0] as HTMLDivElement).style.marginTop, '');
     assert.equal((sut.element.children[6] as HTMLDivElement).style.marginTop, '');
     assert.equal((sut.element.children[7] as HTMLDivElement).style.marginTop, '5px');
+  });
+
+  it('3 subkeys same widths fitting in row', () => {
+    const sut = new SubkeyPopup(
+      mockSource(),
+      sinon.stub(),
+      mockVisualKeyboard(95 /*px*/),
+      mockKeys(25, 30, [DEFAULT_KEY, DEFAULT_KEY, DEFAULT_KEY]),
+      DEFAULT_GESTURE_PARAMS
+    );
+
+    // should be 1 row
+    assert.equal(sut.element.style.width, '95px');
+    assert.equal((sut.element.children[0] as HTMLDivElement).style.marginTop, '');
+    assert.equal((sut.element.children[2] as HTMLDivElement).style.marginTop, '');
+  });
+
+  it('3 subkeys same widths not fitting in row', () => {
+    const sut = new SubkeyPopup(
+      mockSource(),
+      sinon.stub(),
+      mockVisualKeyboard(94 /*px*/),
+      mockKeys(25, 30, [DEFAULT_KEY, DEFAULT_KEY, DEFAULT_KEY]),
+      DEFAULT_GESTURE_PARAMS
+    );
+
+    // should be 2 rows
+    // First row: 2 * (25 + SUBKEY_DEFAULT_MARGIN_LEFT) + SUBKEY_DEFAULT_MARGIN_LEFT = 65
+    // Second row: 1 * (25 + SUBKEY_DEFAULT_MARGIN_LEFT) + SUBKEY_DEFAULT_MARGIN_LEFT = 35
+    assert.equal(sut.element.style.width, '65px');
+    assert.equal((sut.element.children[0] as HTMLDivElement).style.marginTop, '');
+    assert.equal((sut.element.children[1] as HTMLDivElement).style.marginTop, '');
+    assert.equal((sut.element.children[2] as HTMLDivElement).style.marginTop, '5px');
   });
 
   it('One monster subkey that does not fit in a row', () => {
@@ -159,7 +192,7 @@ describe('subkey menu width', () => {
       DEFAULT_GESTURE_PARAMS
     );
 
-    assert.equal(sut.element.style.width, '145px');
+    assert.equal(sut.element.style.width, '150px');
     assert.equal((sut.element.children[0] as HTMLDivElement).style.marginTop, '');
   });
 
