@@ -195,72 +195,72 @@ apply_action(
 
 /**
  * verify the current context
-*/
+ */
 void
-verify_context(std::u16string& text_store, km_core_state* &test_state, std::vector<km_core_context_item> &test_context) {
-      // Compare context and text store at each step - should be identical
-    size_t n = 0;
-    km_core_context_item* citems = nullptr;
-    try_status(km_core_context_get(km_core_state_context(test_state), &citems));
-    try_status(context_items_to_utf16(citems, nullptr, &n));
-    km_core_cp *buf = new km_core_cp[n];
-    try_status(context_items_to_utf16(citems, buf, &n));
-    std::cout << "context (raw): "; // output including markers (which aren't in 'buf' here)
-    for (auto ci = citems; ci->type != KM_CORE_CT_END; ci++) {
-      switch(ci->type) {
-        case KM_CORE_CT_CHAR:
-          std::cout << "U+" << std::setw(4) << std::hex << ci->character << std::dec << " ";
-          break;
-        case KM_CORE_CT_MARKER:
-          std::cout << "\\m{" << ci->character << "} ";
-          break;
-        default:
-          std::cout << "type#" << ci->type << " ";
-      }
+verify_context(std::u16string &text_store, km_core_state *&test_state, std::vector<km_core_context_item> &test_context) {
+  // Compare context and text store at each step - should be identical
+  size_t n                     = 0;
+  km_core_context_item *citems = nullptr;
+  try_status(km_core_context_get(km_core_state_context(test_state), &citems));
+  try_status(context_items_to_utf16(citems, nullptr, &n));
+  km_core_cp *buf = new km_core_cp[n];
+  try_status(context_items_to_utf16(citems, buf, &n));
+  std::cout << "context (raw): ";  // output including markers (which aren't in 'buf' here)
+  for (auto ci = citems; ci->type != KM_CORE_CT_END; ci++) {
+    switch (ci->type) {
+    case KM_CORE_CT_CHAR:
+      std::cout << "U+" << std::setw(4) << std::hex << ci->character << std::dec << " ";
+      break;
+    case KM_CORE_CT_MARKER:
+      std::cout << "\\m{" << ci->character << "} ";
+      break;
+    default:
+      std::cout << "type#" << ci->type << " ";
     }
-    std::cout << std::endl;
-    std::cout << "context   : " << string_to_hex(buf) << " [" << buf << "]" << std::endl;
-    std::cout << "testcontext ";
-    std::cout.fill('0');
-    for (auto i = test_context.begin(); i < test_context.end(); i++) {
-      switch(i->type) {
-        case KM_CORE_CT_CHAR:
-          std::cout << "U+" << std::setw(4) << std::hex << i->character << std::dec << " ";
-          break;
-        case KM_CORE_CT_MARKER:
-          std::cout << "\\m{" << i->character << "} ";
-          break;
-        default:
-          std::cout << "type#" << i->type << " ";
-      }
+  }
+  std::cout << std::endl;
+  std::cout << "context   : " << string_to_hex(buf) << " [" << buf << "]" << std::endl;
+  std::cout << "testcontext ";
+  std::cout.fill('0');
+  for (auto i = test_context.begin(); i < test_context.end(); i++) {
+    switch (i->type) {
+    case KM_CORE_CT_CHAR:
+      std::cout << "U+" << std::setw(4) << std::hex << i->character << std::dec << " ";
+      break;
+    case KM_CORE_CT_MARKER:
+      std::cout << "\\m{" << i->character << "} ";
+      break;
+    default:
+      std::cout << "type#" << i->type << " ";
     }
-    std::cout << std::endl;
+  }
+  std::cout << std::endl;
 
-    // Verify that both our local test_context and the core's test_state.context have
-    // not diverged
-    auto ci = citems;
-    for (auto test_ci = test_context.begin(); ; ci++, test_ci++) {
-      // skip over markers, they won't be in test_context
-      while (ci->type == KM_CORE_CT_MARKER) {
-        ci++;
-      }
-      // exit if BOTH are at end.
-      if (ci->type == KM_CORE_CT_END && test_ci == test_context.end()) {
-        break;  // success
-      }
-      // fail if only ONE is at end
-      assert(ci->type != KM_CORE_CT_END && test_ci != test_context.end());
-      // fail if type and marker don't match.
-      assert(test_ci->type == ci->type && test_ci->marker == ci->marker);
+  // Verify that both our local test_context and the core's test_state.context have
+  // not diverged
+  auto ci = citems;
+  for (auto test_ci = test_context.begin();; ci++, test_ci++) {
+    // skip over markers, they won't be in test_context
+    while (ci->type == KM_CORE_CT_MARKER) {
+      ci++;
     }
+    // exit if BOTH are at end.
+    if (ci->type == KM_CORE_CT_END && test_ci == test_context.end()) {
+      break;  // success
+    }
+    // fail if only ONE is at end
+    assert(ci->type != KM_CORE_CT_END && test_ci != test_context.end());
+    // fail if type and marker don't match.
+    assert(test_ci->type == ci->type && test_ci->marker == ci->marker);
+  }
 
-    km_core_context_items_dispose(citems);
-    if (text_store != buf) {
-      std::cerr << "text store has diverged from buf" << std::endl;
-      std::cerr << "text store: " << string_to_hex(text_store) << " [" << text_store << "]" << std::endl;
-      assert(false);
-    }
-    delete[] buf;
+  km_core_context_items_dispose(citems);
+  if (text_store != buf) {
+    std::cerr << "text store has diverged from buf" << std::endl;
+    std::cerr << "text store: " << string_to_hex(text_store) << " [" << text_store << "]" << std::endl;
+    assert(false);
+  }
+  delete[] buf;
 }
 
 int
