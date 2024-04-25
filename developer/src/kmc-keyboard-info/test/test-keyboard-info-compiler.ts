@@ -283,7 +283,6 @@ describe('keyboard-info-compiler', function () {
   ];
 
   packageIncludesTestCases.forEach((testCase, idx) => it(`check run sets packageIncludes correctly (test case #${idx})`, async function() {
-    const kpjFilename = KHMER_ANGKOR_KPJ;
     const sources = KHMER_ANGKOR_SOURCES;
     const compiler = new KeyboardInfoCompiler();
     assert.isTrue(await compiler.init(callbacks, {sources}));
@@ -301,7 +300,7 @@ describe('keyboard-info-compiler', function () {
     let result: KeyboardInfoCompilerResult;
     try {
       KmpCompiler.prototype.transformKpsToKmpObject = (_kpsFilename: string): KmpJsonFile.KmpJsonFile => kmpJsonData;
-      result = await compiler.run(kpjFilename, null);
+      result = await compiler.run(KHMER_ANGKOR_KPJ, null);
     } catch(e) {
       assert.fail(e);
     } finally {
@@ -321,7 +320,6 @@ describe('keyboard-info-compiler', function () {
   ];
 
   minKeymanVersionTestCases.forEach((testCase, idx) => it(`check run sets minKeymanVersion correctly (test case #${idx})`, async function() {
-    const kpjFilename = KHMER_ANGKOR_KPJ;
     const sources = KHMER_ANGKOR_SOURCES;
     const compiler = new KeyboardInfoCompiler();
     assert.isTrue(await compiler.init(callbacks, {sources}));
@@ -332,7 +330,7 @@ describe('keyboard-info-compiler', function () {
     jsFile = jsFile.replace('this.KMINVER="10.0";', insert);
     compiler['loadJsFile'] = (_filename: string) => jsFile;
     compiler['kmxFileVersionToString'] = (_version: number) => testCase.kmx;
-    const result = await compiler.run(kpjFilename, null);
+    const result = await compiler.run(KHMER_ANGKOR_KPJ, null);
     compiler['loadJsFile'] = origCompilerLoadJsFile;
     compiler['kmxFileVersionToString'] = origKmxFileVersionToString;
     assert.isNotNull(result);
@@ -353,7 +351,6 @@ describe('keyboard-info-compiler', function () {
   ];
 
   platformsTestCases.forEach((testCase, idx) => it(`check run sets platforms correctly (test case #${idx})`, async function() {
-    const kpjFilename = KHMER_ANGKOR_KPJ;
     const sources = KHMER_ANGKOR_SOURCES;
     const compiler = new KeyboardInfoCompiler();
     assert.isTrue(await compiler.init(callbacks, {sources}));
@@ -378,7 +375,7 @@ describe('keyboard-info-compiler', function () {
     try {
       KmpCompiler.prototype.transformKpsToKmpObject = (_kpsFilename: string): KmpJsonFile.KmpJsonFile => kmpJsonData;
       compiler['loadKmxFiles'] = (_kpsFilename: string, _kmpJsonData: KmpJsonFile.KmpJsonFile) => kmxFiles;
-      result = await compiler.run(kpjFilename, null);
+      result = await compiler.run(KHMER_ANGKOR_KPJ, null);
     } catch(e) {
       assert.fail(e);
     } finally {
@@ -391,7 +388,6 @@ describe('keyboard-info-compiler', function () {
   }));
 
   it('check run sets related packages correctly', async function() {
-    const kpjFilename = KHMER_ANGKOR_KPJ;
     const sources = KHMER_ANGKOR_SOURCES;
     const compiler = new KeyboardInfoCompiler();
     assert.isTrue(await compiler.init(callbacks, {sources}));
@@ -407,7 +403,7 @@ describe('keyboard-info-compiler', function () {
     let result: KeyboardInfoCompilerResult;
     try {
       KmpCompiler.prototype.transformKpsToKmpObject = (_kpsFilename: string): KmpJsonFile.KmpJsonFile => kmpJsonData;
-      result = await compiler.run(kpjFilename, null);
+      result = await compiler.run(KHMER_ANGKOR_KPJ, null);
     } catch(e) {
       assert.fail(e);
     } finally {
@@ -421,14 +417,13 @@ describe('keyboard-info-compiler', function () {
   });
 
   it('should write artifacts to disk', async function() {
-    const kpjFilename = KHMER_ANGKOR_KPJ;
     const actualFilename = makePathToFixture('khmer_angkor', 'build', 'actual.keyboard_info');
     const expectedFilename = makePathToFixture('khmer_angkor', 'build', 'khmer_angkor.keyboard_info');
     const sources = KHMER_ANGKOR_SOURCES;
 
     const compiler = new KeyboardInfoCompiler();
     assert.isTrue(await compiler.init(callbacks, {sources}));
-    const result = await compiler.run(kpjFilename, null);
+    const result = await compiler.run(KHMER_ANGKOR_KPJ, null);
     assert.isNotNull(result);
 
     if(fs.existsSync(actualFilename)) {
@@ -489,32 +484,30 @@ describe('keyboard-info-compiler', function () {
   });
   
   it('check loadKmxFiles returns empty array if .kmx file is missing from .kmp', async function() {
-    const kpsFilename = KHMER_ANGKOR_KPS;
     const compiler = new KeyboardInfoCompiler();
     const kmpCompiler = new KmpCompiler();
     assert.isTrue(await kmpCompiler.init(callbacks, {}));
-    const kmpJsonData = kmpCompiler.transformKpsToKmpObject(kpsFilename);
+    const kmpJsonData = kmpCompiler.transformKpsToKmpObject(KHMER_ANGKOR_KPS);
     assert.isNotNull(kmpJsonData);
     // remove .kmx file
     kmpJsonData.files = kmpJsonData.files.filter(file => !KeymanFileTypes.filenameIs(file.name, KeymanFileTypes.Binary.Keyboard));
     const kmxFiles: {
       filename: string,
       data: KMX.KEYBOARD
-    }[] = compiler['loadKmxFiles'](kpsFilename, kmpJsonData);
+    }[] = compiler['loadKmxFiles'](KHMER_ANGKOR_KPS, kmpJsonData);
     assert.deepEqual(kmxFiles, []);
   });
 
   it('check loadKmxFiles throws error if .kmx file is missing from disk', async function() {
-    const kpsFilename = KHMER_ANGKOR_KPS;
     const compiler = new KeyboardInfoCompiler();
     const kmpCompiler = new KmpCompiler();
     assert.isTrue(await kmpCompiler.init(callbacks, {}));
-    const kmpJsonData = kmpCompiler.transformKpsToKmpObject(kpsFilename);
+    const kmpJsonData = kmpCompiler.transformKpsToKmpObject(KHMER_ANGKOR_KPS);
     assert.isNotNull(kmpJsonData);
     // rename .kmx file in files list so it cannot be loaded from disk
     const kmpIndex = kmpJsonData.files.findIndex(file => KeymanFileTypes.filenameIs(file.name, KeymanFileTypes.Binary.Keyboard));
     kmpJsonData.files[kmpIndex].name = '../build/throw_error.kmx';
-    assert.throws(() => compiler['loadKmxFiles'](kpsFilename, kmpJsonData));
+    assert.throws(() => compiler['loadKmxFiles'](KHMER_ANGKOR_KPS, kmpJsonData));
   });  
 
   it('check loadKmxFiles can handle two .kmx files', async function() {
