@@ -39,8 +39,6 @@ namespace {
 
 bool g_beep_found = false;
 
-bool g_already_complained = false;
-
 km_core_option_item test_env_opts[] =
 {
   KM_CORE_OPTIONS_END
@@ -115,49 +113,54 @@ apply_action(
         {(uint32_t)act.marker}});
     break;
   case KM_CORE_IT_BACK:
+  {
+    // single char removed in context
+    km_core_usv ch = 0;
+    bool matched_text = false;
+    // assume the backspace came from set_action() and there's no further info.
+    assert(act.backspace.expected_type == KM_CORE_BT_CHAR);
+    assert(act.backspace.expected_value == 0);
     // It is valid for a backspace to be received with an empty text store
     // as the user can press backspace with no text in the store and Keyman
     // will pass that back to the client, as the client may do additional
     // processing at start of a text store, e.g. delete from a previous cell
     // in a table. Or, if Keyman has a cached context, then there may be
     // additional text in the text store that Keyman can't see.
-    if (act.backspace.expected_type == KM_CORE_BT_MARKER) {
-      assert(!context.empty());
-      assert(context.back().type == KM_CORE_CT_MARKER);
-      context.pop_back();
-      // no change to text store.
-    } else if (text_store.length() > 0) {
+    // If there's anything in the text store, pop it off.  Two if a pair.
+    if (text_store.length() > 0) {
       assert(!context.empty() && !text_store.empty());
-      km_core_usv ch = text_store.back();
+      const auto ch1 = text_store.back();
       text_store.pop_back();
-      if (text_store.length() > 0 && Uni_IsSurrogate2(ch)) {
-        auto ch1 = text_store.back();
-        if (Uni_IsSurrogate1(ch1)) {
+      if (text_store.length() > 0 && Uni_IsSurrogate2(ch1)) {
+        const auto ch2 = text_store.back();
+        if (Uni_IsSurrogate1(ch2)) {
           // We'll only pop the next character off it is actually a
           // surrogate pair
-          ch = Uni_SurrogateToUTF32(ch1, ch);
+          ch = Uni_SurrogateToUTF32(ch2, ch1); // reverse order
           text_store.pop_back();
-        }
-      }
-      if (act.backspace.expected_type == KM_CORE_BT_CHAR) {
-        if (act.backspace.expected_value == 0) {
-          // using set_action() doesn't provide for expected backspaces, so can't validate here
-          // only complain once.
-          if (!g_already_complained) {
-            std::cerr << "Note: TODO-LDML:  not validating backspace.expected_value nor ch - no information available." << std::endl;
-            g_already_complained = true;
-          }
         } else {
-          assert(ch == act.backspace.expected_value);
-          assert(context.back().character == ch);
+          ch = 0xFFFF; // unpaired
         }
-        assert(context.back().type == KM_CORE_CT_CHAR);
-        context.pop_back();
       } else {
-        // assume it's otherwise KM_CORE_BT_UNKNOWN
-        assert(act.backspace.expected_type == KM_CORE_BT_UNKNOWN);
-        assert(context.empty()); // if KM_CORE_BT_UNKNOWN, context should be empty.
+        ch = ch1; // single char
       }
+    } else {
+      matched_text = true; // no text to match as context is empty.
+    }
+    // now, we need to simulate what ldml_processor::emit_backspace() is going to do.
+      auto end = context.rbegin();
+      while (end != context.rend()) {
+        if (end->type == KM_CORE_CT_CHAR) {
+          assert(!matched_text);
+          assert_equal(end->character, ch); // expect popped char to be same as what's in context
+          matched_text = true;
+          context.pop_back();
+          break;  // exit on first real char
+        }
+        assert(end->type != KM_CORE_CT_END);  // inappropriate here.
+        context.pop_back();
+      }
+      assert(matched_text);
     }
     break;
   case KM_CORE_IT_PERSIST_OPT:

@@ -246,17 +246,15 @@ void ldml_event_state::emit_backspace() {
   // TODO-LDML: emoji backspace
   auto end = state->context().rbegin();
   while (end != state->context().rend()) {
-    if ((*end).type == KM_CORE_CT_CHAR) {
+    if (end->type == KM_CORE_CT_CHAR) {
       actions.code_points_to_delete++;
       state->context().pop_back();
       return;
-    } else if ((*end).type == KM_CORE_BT_MARKER) {
-      // remove any markers before char
-      state->context().pop_back();
-      end++;
-      // loop again
     }
-  }
+    // else loop again
+    assert(end->type != KM_CORE_CT_END);  // inappropriate here.
+    state->context().pop_back();
+ }
   /*
     We couldn't find a character at end of context (context is empty),
     so we'll pass the backspace keystroke on to the app to process; the
