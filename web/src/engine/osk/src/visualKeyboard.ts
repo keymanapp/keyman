@@ -231,19 +231,11 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
 
   activeGestures: GestureHandler[] = [];
   activeModipress: Modipress = null;
-  private _deferLayout: boolean;
+  public deferLayout: boolean;
 
   // The keyboard object corresponding to this VisualKeyboard.
   public readonly layoutKeyboard: Keyboard;
   public readonly layoutKeyboardProperties: KeyboardProperties;
-
-  get deferLayout(): boolean {
-    return this._deferLayout;
-  }
-
-  set deferLayout(value: boolean) {
-    this._deferLayout = value;
-  }
 
   get layerId(): string {
     return this.layerGroup?.activeLayerId ?? 'default';
@@ -262,7 +254,7 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
       }
     }
 
-    if(changedLayer && !this._deferLayout) {
+    if(changedLayer && !this.deferLayout) {
       this.updateState();
       // We changed the active layer, but not any layout property of the keyboard as a whole.
       this.layerGroup.refreshLayout(this.constructLayoutParams());
@@ -1215,7 +1207,7 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
    * when needed.
    */
   refreshLayout() {
-    if(this._deferLayout) {
+    if(this.deferLayout) {
       return;
     }
 
