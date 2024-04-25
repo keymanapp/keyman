@@ -27,10 +27,11 @@ module.exports = {
 
   // frameworks to use
   // available frameworks: https://npmjs.org/browse/keyword/karma-adapter
-  frameworks: ['mocha', 'chai', 'fixture'],
+  frameworks: ['mocha', 'fixture'],
 
   // list of files / patterns to load in the browser
   files: [
+    { pattern: 'node_modules/chai/chai.js', served: true, watched: false, included: false, type: 'module'},
     // { pattern: 'node_modules/**/*.js', served: true, watched: false, included: false },
     // { pattern: 'node_modules/**/*.mjs', served: true, watched: false, included: false, type: "module" },
     // { pattern: 'node_modules/**/*.cjs', served: true, watched: false, included: false },
@@ -81,6 +82,9 @@ module.exports = {
 
   // enable / disable colors in the output (reporters and logs)
   colors: true,
+
+  // TEMP ENTRY!
+  reporters: ['teamcity'],
 
   // enable / disable watching file and executing tests whenever any file changes
   autoWatch: true,
