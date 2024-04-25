@@ -119,7 +119,7 @@ function do_test() {
     MOCHA_FLAGS="$MOCHA_FLAGS --reporter mocha-teamcity-reporter"
   fi
 
-  c8 mocha --recursive $MOCHA_FLAGS ./src/test/cases/
+  c8 mocha --recursive $MOCHA_FLAGS ./src/test/mocha/cases/
 }
 
 builder_run_action configure  verify_npm_setup

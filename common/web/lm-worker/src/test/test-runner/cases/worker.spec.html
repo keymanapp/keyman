@@ -1,0 +1,13 @@
+<html>
+  <head>
+    <script type="module">
+      import { runTests } from '@web/test-runner-mocha';
+
+      runTests(async() => {
+        await import('./worker.def.js');
+      });
+    </script>
+  </head>
+  <body>
+  </body>
+</html>
