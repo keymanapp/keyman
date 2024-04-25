@@ -1,5 +1,12 @@
 # Keyman Version History
 
+## 17.0.313 beta 2024-04-23
+
+* chore(common): Set fetch-latest-cldr.sh executable (#11289)
+* chore(common): Fix missing entries in HISTORY.md (#11290)
+* fix(developer): report missing help to sentry instead of local xml (#11271)
+* fix(developer): "use strict" for downlevel browsers in Server (#11276)
+
 ## 17.0.312 beta 2024-04-22
 
 * fix(developer): emit JSON strings as characters, not surrogate pairs (#11243)
