@@ -95,6 +95,19 @@
 * chore(common): move to 18.0 alpha (#10713)
 * chore: move to 18.0 alpha
 
+## 17.0.314 beta 2024-04-25
+
+* fix(android/engine): URIEncode strings passed to Javascript (#11206)
+* fix(android/app): Update storage permissions for Android 12.0+ (#11299)
+* test(developer): keyboard info compiler messages unit tests 2 (#11253)
+
+## 17.0.313 beta 2024-04-23
+
+* chore(common): Set fetch-latest-cldr.sh executable (#11289)
+* chore(common): Fix missing entries in HISTORY.md (#11290)
+* fix(developer): report missing help to sentry instead of local xml (#11271)
+* fix(developer): "use strict" for downlevel browsers in Server (#11276)
+
 ## 17.0.312 beta 2024-04-22
 
 * fix(developer): emit JSON strings as characters, not surrogate pairs (#11243)
