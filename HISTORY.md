@@ -1,5 +1,11 @@
 # Keyman Version History
 
+## 17.0.314 beta 2024-04-25
+
+* fix(android/engine): URIEncode strings passed to Javascript (#11206)
+* fix(android/app): Update storage permissions for Android 12.0+ (#11299)
+* test(developer): keyboard info compiler messages unit tests 2 (#11253)
+
 ## 17.0.313 beta 2024-04-23
 
 * chore(common): Set fetch-latest-cldr.sh executable (#11289)
