@@ -30,7 +30,6 @@
     "@keymanapp/resources-gosh": "*",
     "@types/node": "^10.17.21",
     "c8": "^7.12.0",
-    "chai": "^5.1.0",
     "combine-source-map": "^0.8.0",
     "karma": "^6.4.1",
     "karma-browserstack-launcher": "^1.6.0",
