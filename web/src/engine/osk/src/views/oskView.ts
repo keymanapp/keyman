@@ -266,6 +266,7 @@ export default abstract class OSKView
       this.setBaseTouchEventListeners();
     }
 
+    this._Box.style.display = 'none';
     this.initialized = true;
   }
 
