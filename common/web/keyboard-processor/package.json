@@ -39,8 +39,7 @@
     "@keymanapp/common-types": "*",
     "@keymanapp/models-types": "*",
     "@keymanapp/keyman-version": "*",
-    "@keymanapp/web-utils": "*",
-    "@types/node": "^11.9.4"
+    "@keymanapp/web-utils": "*"
   },
   "type": "module",
   "main": "./build/obj/index.js",

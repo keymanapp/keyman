@@ -120,7 +120,6 @@
     "@keymanapp/recorder-core": "*",
     "@keymanapp/tslib": "*",
     "@keymanapp/web-utils": "*",
-    "@types/node": "^18.19.3",
     "core-js": "^3.34.0",
     "eventemitter3": "^4.0.0",
     "tslib": "^2.5.2"

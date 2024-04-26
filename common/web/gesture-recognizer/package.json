@@ -3,7 +3,6 @@
   "description": "The core gesture-recognition engine used by Keyman's Web-based OSKs.",
   "devDependencies": {
     "@keymanapp/resources-gosh": "*",
-    "@types/node": "^11.9.4",
     "@types/sinon": "^10.0.13",
     "karma": "^6.4.1",
     "karma-browserstack-launcher": "^1.6.0",
