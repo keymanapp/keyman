@@ -227,7 +227,7 @@ ldml_processor::process_key_up(ldml_event_state &ldml_state)
 void
 ldml_processor::process_backspace(ldml_event_state &ldml_state) const {
   if (!!bksp_transforms) {
-    // process with an empty string voa the bksp transforms
+    // process with an empty string via the bksp transforms
     auto matchedContext = process_output(ldml_state, std::u32string(), bksp_transforms.get());
 
     if (matchedContext > 0) {
@@ -245,17 +245,16 @@ void ldml_event_state::emit_backspace() {
   // attempt to get the last char
   // TODO-LDML: emoji backspace
   auto end = state->context().rbegin();
-  if (end != state->context().rend()) {
-    if ((*end).type == KM_CORE_CT_CHAR) {
+  while (end != state->context().rend()) {
+    if (end->type == KM_CORE_CT_CHAR) {
       actions.code_points_to_delete++;
       state->context().pop_back();
       return;
-    } else if ((*end).type == KM_CORE_BT_MARKER) {
-      // nothing in actions
-      state->context().pop_back();
-      // falls through - end wasn't a character
     }
-  }
+    // else loop again
+    assert(end->type != KM_CORE_CT_END);  // inappropriate here.
+    state->context().pop_back();
+ }
   /*
     We couldn't find a character at end of context (context is empty),
     so we'll pass the backspace keystroke on to the app to process; the
