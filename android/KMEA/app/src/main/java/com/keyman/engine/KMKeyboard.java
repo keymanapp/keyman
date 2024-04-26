@@ -236,6 +236,7 @@ final class KMKeyboard extends WebView {
 
     getSettings().setCacheMode(WebSettings.LOAD_NO_CACHE);
     getSettings().setSupportZoom(false);
+    getSettings().setTextZoom(100);
 
     getSettings().setUseWideViewPort(true);
     getSettings().setLoadWithOverviewMode(true);
