@@ -232,7 +232,14 @@
               {
                 "id": "K_1",
                 "text": "1",
-                "hint": "pqrs",
+                "hint": "• pqrs",
+                "sk": [
+                  {
+                    "text": "Monster",
+                    "id": "T_new_71",
+                    "width": 600
+                  }
+                ],
                 "multitap": [
                   {
                     "text": "p",
@@ -279,7 +286,115 @@
               {
                 "id": "K_2",
                 "text": "2",
-                "hint": "tuv",
+                "hint": "• tuv",
+                "sk": [
+                  {
+                    "text": "A",
+                    "id": "U_0041"
+                  },
+                  {
+                    "text": "B",
+                    "id": "U_0042",
+                    "width": 205
+                  },
+                  {
+                    "text": "C",
+                    "id": "U_0043"
+                  },
+                  {
+                    "text": "D",
+                    "id": "U_0044"
+                  },
+                  {
+                    "text": "E",
+                    "id": "U_0045"
+                  },
+                  {
+                    "text": "F",
+                    "id": "U_0046"
+                  },
+                  {
+                    "text": "G",
+                    "id": "U_0047"
+                  },
+                  {
+                    "text": "H",
+                    "id": "U_0048"
+                  },
+                  {
+                    "text": "I",
+                    "id": "U_0049"
+                  },
+                  {
+                    "text": "J",
+                    "id": "U_004A"
+                  },
+                  {
+                    "text": "K",
+                    "id": "U_004B"
+                  },
+                  {
+                    "text": "L",
+                    "id": "U_004C"
+                  },
+                  {
+                    "text": "M",
+                    "id": "U_004D"
+                  },
+                  {
+                    "text": "N",
+                    "id": "U_004E"
+                  },
+                  {
+                    "text": "O",
+                    "id": "U_004F"
+                  },
+                  {
+                    "text": "P",
+                    "id": "U_0050"
+                  },
+                  {
+                    "text": "Q",
+                    "id": "U_0051"
+                  },
+                  {
+                    "text": "R",
+                    "id": "U_0052"
+                  },
+                  {
+                    "text": "S",
+                    "id": "U_0053"
+                  },
+                  {
+                    "text": "T",
+                    "id": "U_0054"
+                  },
+                  {
+                    "text": "U",
+                    "id": "U_0055"
+                  },
+                  {
+                    "text": "V",
+                    "id": "U_0056"
+                  },
+                  {
+                    "text": "W",
+                    "id": "U_0057"
+                  },
+                  {
+                    "text": "X",
+                    "id": "U_0058"
+                  },
+                  {
+                    "text": "Y",
+                    "id": "U_0059",
+                    "width": 205
+                  },
+                  {
+                    "text": "Z",
+                    "id": "U_005A"
+                  }
+                ],
                 "multitap": [
                   {
                     "text": "t",
@@ -376,7 +491,8 @@
                 "text": "*Shift*",
                 "width": 100,
                 "sp": 1,
-                "nextlayer": "shift"
+                "nextlayer": "shift",
+                "hint": ""
               },
               {
                 "id": "K_0",
