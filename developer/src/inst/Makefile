@@ -61,6 +61,7 @@ clean:
     -del /Q cef.wxs
     -del /Q templates.wxs
     -del /Q kmc.wxs
+    -rd /s /q $(DEVELOPER_ROOT)\src\tike\xml\osk
 
 test-releaseexists:
     cd $(DEVELOPER_ROOT)\src\inst
