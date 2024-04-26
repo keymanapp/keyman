@@ -13,7 +13,7 @@ import { loadKeyboardsFromStubs } from '../../kbdLoader.mjs';
 import { timedPromise } from '/@keymanapp/web-utils/build/lib/index.mjs';
 import sinon from '/node_modules/sinon/pkg/sinon-esm.js';
 
-const assert = chai.assert;
+import { assert } from '/node_modules/chai/chai.js';
 
 const TEST_PHYSICAL_DEVICE = {
   formFactor: 'desktop',

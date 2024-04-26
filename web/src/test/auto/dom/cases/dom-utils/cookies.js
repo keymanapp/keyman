@@ -1,7 +1,7 @@
 import Device from '/@keymanapp/keyman/build/engine/device-detect/lib/index.mjs';
 import { default as CookieSerializer } from '/@keymanapp/keyman/build/engine/dom-utils/obj/cookieSerializer.js';
 
-let assert = chai.assert;
+import { assert } from '/node_modules/chai/chai.js';
 
 const device = new Device();
 device.detect();

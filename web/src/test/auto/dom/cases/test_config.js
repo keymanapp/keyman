@@ -1,4 +1,4 @@
-var assert = chai.assert;
+import { assert } from '/node_modules/chai/chai.js';
 
 /*
  * A canary test to ensure our timeout configurations are working correctly for our CI.

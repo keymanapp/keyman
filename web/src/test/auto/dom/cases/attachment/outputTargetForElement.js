@@ -13,7 +13,7 @@ import {
 import { timedPromise } from '/@keymanapp/web-utils/build/lib/index.mjs';
 import sinon from '/node_modules/sinon/pkg/sinon-esm.js';
 
-let assert = chai.assert;
+import { assert } from '/node_modules/chai/chai.js';
 
 let STANDARD_OPTIONS = {
   owner: null,
