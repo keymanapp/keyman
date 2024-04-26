@@ -120,6 +120,8 @@ function do_test() {
   fi
 
   c8 mocha --recursive $MOCHA_FLAGS ./src/test/mocha/cases/
+
+  web-test-runner --config ./src/test/test-runner/web-test-runner.config.mjs
 }
 
 builder_run_action configure  verify_npm_setup
