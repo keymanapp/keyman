@@ -1,18 +1,18 @@
 (*
   Name:             VisualKeyboardExportHTML
   Copyright:        Copyright (C) SIL International.
-  Documentation:    
-  Description:      
+  Documentation:
+  Description:
   Create Date:      20 Jun 2006
 
   Modified Date:    8 Jun 2012
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
+  Bugs:
+  Todo:
+  Notes:
   History:          20 Jun 2006 - mcdurdin - Initial version
                     23 Aug 2006 - mcdurdin - Initial refactor for new visual keyboard
                     04 Dec 2006 - mcdurdin - Support new XML+XSLT OSK export
@@ -162,7 +162,14 @@ begin
       try
         doc.async := False;
         doc.validateOnParse := False;
-        doc.load(stemp);
+        if not doc.load(stemp) then
+        begin
+          if doc.parseError <> nil then
+          begin
+            ShowMessage('Could not load XML: '+doc.parseError.reason);
+            Exit;
+          end;
+        end;
         xsldoc := ComsFreeThreadedDOMDocument.Create;
         try
           xsldoc.async := False;
