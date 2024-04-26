@@ -20,13 +20,13 @@
   </Info>
   <Files>
     <File>
-      <Name>..\..\..\..\..\..\..\web\testing\chirality\chirality.js</Name>
+      <Name>..\..\..\..\..\..\..\web\src\test\manual\web\chirality\chirality.js</Name>
       <Description>File chirality.js</Description>
       <CopyLocation>0</CopyLocation>
       <FileType>.js</FileType>
     </File>
     <File>
-      <Name>..\..\..\..\..\..\..\web\testing\platform\platformtest.js</Name>
+      <Name>..\..\..\..\..\..\..\web\src\test\manual\web\platform\platformtest.js</Name>
       <Description>File platformtest.js</Description>
       <CopyLocation>0</CopyLocation>
       <FileType>.js</FileType>
@@ -62,7 +62,7 @@
       </Languages>
     </Keyboard>
     <Keyboard>
-      <Name>longpress</Name>
+      <Name>longpress '"\|5% +</Name>
       <ID>longpress</ID>
       <Version>1.0</Version>
       <OSKFont>code2001.ttf</OSKFont>
