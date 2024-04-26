@@ -464,7 +464,10 @@ export function longpressContactModel(params: GestureParams, enabledFlicks: bool
          * each side of due N in total.
          */
         if((enabledFlicks && spec.permitsFlick(stats.lastSample.item)) && (stats.cardinalDirection?.indexOf('n') != -1 ?? false)) {
-          if(stats.netDistance > spec.flickDist) {
+          const baseDistance = stats.netDistance;
+          const angle = stats.angle; // from <0, -1> (straight up) going clockwise.
+          const verticalDistance = baseDistance * Math.cos(angle);
+          if(verticalDistance > spec.flickDist) {
             return 'resolve';
           }
         } else if(resetForRoaming) {
