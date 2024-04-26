@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 18.0.23 alpha 2024-04-26
+
+* chore(common): Merge beta to master for Sprint B17S6 (part 2) (#11305)
+* fix(web): Fix layout for subkey menus with unusually-sized keys (#11266)
+
 ## 18.0.22 alpha 2024-04-25
 
 * chore(linux): Install python3-dev (#11296)
