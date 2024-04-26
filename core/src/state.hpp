@@ -184,3 +184,23 @@ struct km_core_state : public km::core::state
   km_core_state(Args&&... args) : km::core::state(std::forward<Args>(args)...)
   {}
 };
+
+
+/**
+ * Evaluate the state and vkey used.
+ * Determine whether the context should be invalidated.
+ * @param  state          A pointer to the opaque state object.
+ * @param  vk             A virtual key that was processed.
+ * @param  modifier_state The combinations of modifier keys set at the time key
+ *                        `vk` was pressed, bitmask from the
+ *                        km_core_modifier_state enum.
+ * @param  is_key_down    1 if it was a key-down event
+ * @param  event_flags    Event level flags, see km_core_event_flags
+ * @return true if this is a state which should clear the context
+ */
+bool
+state_should_invalidate_context(km_core_state *state,
+                     km_core_virtual_key vk,
+                     uint16_t modifier_state,
+                     uint8_t is_key_down,
+                     uint16_t event_flags);

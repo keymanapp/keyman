@@ -276,7 +276,6 @@ KMX_BOOL KMX_ProcessEvent::ProcessGroup(LPGROUP gp, KMX_BOOL *pOutputKeystroke)
         // If there is now no character in the context, we want to
         // emit the backspace for application to use
         if(!pdeletecontext || *pdeletecontext == 0) {   // I4933
-          m_actions.QueueAction(QIT_INVALIDATECONTEXT, 0);
           if(m_debug_items) {
             m_debug_items->push_group_exit(m_actions.Length(), KM_CORE_DEBUG_FLAG_NOMATCH, gp);
           }
@@ -301,7 +300,6 @@ KMX_BOOL KMX_ProcessEvent::ProcessGroup(LPGROUP gp, KMX_BOOL *pOutputKeystroke)
         return FALSE;
       } else {   // I4024   // I4128   // I4287   // I4290
         DebugLog(" ... IsLegacy = FALSE; IsTIP = TRUE");   // I4128
-        m_actions.QueueAction(QIT_INVALIDATECONTEXT, 0);
         if(m_debug_items) {
           m_debug_items->push_group_exit(m_actions.Length(), KM_CORE_DEBUG_FLAG_NOMATCH, gp);
         }

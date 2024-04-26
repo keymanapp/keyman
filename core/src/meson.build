@@ -49,6 +49,7 @@ kmx_files = files(
   'keyboard.cpp',
   'state.cpp',
   'debuglog.cpp',
+  'vkey_to_contextreset.cpp',
   'km_core_action_api.cpp',
   'km_core_context_api.cpp',
   'km_core_keyboard_api.cpp',

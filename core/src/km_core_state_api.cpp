@@ -20,7 +20,8 @@
 
 #include "processor.hpp"
 #include "state.hpp"
-
+#include "vkey_to_contextreset.hpp"
+#include "kmx_file.h"
 
 using namespace km::core;
 
@@ -363,4 +364,40 @@ km_core_cp * km_core_state_context_debug(
   result[s.size()] = 0;
 
   return result;
+}
+
+static bool
+state_has_action_type(km_core_state *state, uint8_t type) {
+  return std::any_of(
+      state->actions().begin(), state->actions().end(),
+        [type](const km::core::action &a) { return a.type == type; });
+}
+
+bool
+state_should_invalidate_context(km_core_state *state,
+                     km_core_virtual_key vk,
+                     uint16_t modifier_state,
+                     uint8_t is_key_down,
+                     uint16_t _kmn_unused(event_flags)) {
+  if (!is_key_down) {
+    return false;  // don't invalidate on keyup
+  }
+  // if emit_keystroke is present, check if a context reset is needed
+  if (state_has_action_type(state, KM_CORE_IT_EMIT_KEYSTROKE)) {
+    if (
+        // when a backspace keystroke is emitted, it is because we are at the start of 
+        // context, and we want to give the application the chance to process it, e.g. 
+        // by moving to previous field. Note that context manipulation does not result 
+        // in an emit_keystroke backspace action, as this is handled through the 
+        // `code_points_to_delete` field. So we always invalidate context when a 
+        // processor emits a backspace.
+        vk == KM_CORE_VKEY_BKSP ||
+        // certain modifiers invalidate context
+        modifier_should_contextreset(modifier_state) ||
+        // most frame keys invalidate context
+        vkey_should_contextreset(vk)) {
+      return true;
+    }
+  }
+  return false;
 }

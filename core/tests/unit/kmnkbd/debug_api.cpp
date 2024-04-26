@@ -120,8 +120,8 @@ void test_debugging_function_key() {
   assert(debug_items(test_state, {
     km_core_state_debug_item{KM_CORE_DEBUG_BEGIN, KM_CORE_DEBUG_FLAG_UNICODE, {KM_CORE_VKEY_F1, 0, 0}},
     km_core_state_debug_item{KM_CORE_DEBUG_GROUP_ENTER, 0, {}, {u"", &gp}},
-    km_core_state_debug_item{KM_CORE_DEBUG_GROUP_EXIT, KM_CORE_DEBUG_FLAG_NOMATCH, {}, {u"", &gp, nullptr, {}, 1}},
-    km_core_state_debug_item{KM_CORE_DEBUG_END, KM_CORE_DEBUG_FLAG_OUTPUTKEYSTROKE, {}, {u"", nullptr, nullptr, {}, 1}}
+    km_core_state_debug_item{KM_CORE_DEBUG_GROUP_EXIT, KM_CORE_DEBUG_FLAG_NOMATCH, {}, {u"", &gp, nullptr, {}, 0}},
+    km_core_state_debug_item{KM_CORE_DEBUG_END, KM_CORE_DEBUG_FLAG_OUTPUTKEYSTROKE, {}, {u"", nullptr, nullptr, {}, 0}}
   }));
 
   assert(action_items(test_state, {
@@ -439,8 +439,8 @@ void test_backspace_markers() {
   assert(debug_items(test_state, {
     km_core_state_debug_item{KM_CORE_DEBUG_BEGIN, KM_CORE_DEBUG_FLAG_UNICODE, {KM_CORE_VKEY_BKSP, 0, 0}},
     km_core_state_debug_item{KM_CORE_DEBUG_GROUP_ENTER, 0, {}, {u"", &gp}},
-    km_core_state_debug_item{KM_CORE_DEBUG_GROUP_EXIT, 2, {}, {u"", &gp, nullptr, {}, 3}},
-    km_core_state_debug_item{KM_CORE_DEBUG_END, 1, {}, {u"", nullptr, nullptr, {}, 3}},
+    km_core_state_debug_item{KM_CORE_DEBUG_GROUP_EXIT, 2, {}, {u"", &gp, nullptr, {}, 2}},
+    km_core_state_debug_item{KM_CORE_DEBUG_END, 1, {}, {u"", nullptr, nullptr, {}, 2}},
   }));
 
   km_core_action_item bksp = {KM_CORE_IT_BACK};
