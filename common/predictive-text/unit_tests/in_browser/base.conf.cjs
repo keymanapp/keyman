@@ -83,9 +83,6 @@ module.exports = {
   // enable / disable colors in the output (reporters and logs)
   colors: true,
 
-  // TEMP ENTRY!
-  reporters: ['teamcity'],
-
   // enable / disable watching file and executing tests whenever any file changes
   autoWatch: true,
 
