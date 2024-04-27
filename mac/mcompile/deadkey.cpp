@@ -14,9 +14,9 @@
 	return line;
 }*/
 
-/*std::vector<DeadKey*> mac_create_alDead() {
+std::vector<DeadKey*> mac_create_alDead() {
 	std::vector<DeadKey*> alDead;
-	v_dw_2D dk_ComposeTable;
+	/*v_dw_2D dk_ComposeTable;
 
   mac_create_DKTable(dk_ComposeTable);
 
@@ -27,12 +27,12 @@
 				dk2->KMX_AddDeadKeyRow(dk_ComposeTable[j][1],dk_ComposeTable[j][2]);
 		}
 		alDead.push_back(dk2);
-	}
+	}*/
 	return alDead;
-}*/
+}
 
-/*void mac_refine_alDead(KMX_WCHAR dk, std::vector<DeadKey*> &dkVec, std::vector<DeadKey*> *p_All_Vec) {
-	if( dk == 0)
+void mac_refine_alDead(KMX_WCHAR dk, std::vector<DeadKey*> &dkVec, std::vector<DeadKey*> *p_All_Vec) {
+	/*if( dk == 0)
 		return;
 
 	for (int j=0; j < (int) (*p_All_Vec).size()-1;j++) {
@@ -43,10 +43,10 @@
 			}
 			else return;
 		}
-	}
+	}*/
 }
 
-bool found_dk_inVector(KMX_WCHAR dk, std::vector<DeadKey*> &dkVec) {
+/* bool found_dk_inVector(KMX_WCHAR dk, std::vector<DeadKey*> &dkVec) {
 	int i=0;
 	if( dkVec.size() > 0) {
 		do {

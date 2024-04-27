@@ -117,7 +117,6 @@ v_dw_2D mac_create_empty_2D_Vector(int dim_rows, int dim_shifts);
 int mac_append_underlying_ToVector(v_dw_3D &All_Vector, const UCKeyboardLayout * keykeyboard_layout);
 
 // initialize UCHR
-//bool InitializeGDK(GdkKeymap **keymap,int argc, gchar *argv[]);
 bool mac_InitializeUCHR(const UCKeyboardLayout **keyboard_layout);
 //------------------------------
 
@@ -924,11 +923,11 @@ const UINT mac_USVirtualKeyToScanCode[256] = {
 		0x999,      //0x00  // L"K_?FF"				// &HFF
 };
 
-
 bool mac_IsKeymanUsedChar(int KV);
 //------------------------------
 
 std::vector<KMX_DWORD> mac_createVectorOfKeyboard( int shiftstate, const UCKeyboardLayout * keyboard_layout);
+
 // take deadkey-value (e.g.65106) and return u16string (e.g. '^' )
 std::u16string mac_convert_DeadkeyValues_To_U16str(int in);
 
@@ -939,14 +938,13 @@ int mac_KMX_get_KeyVal_From_KeyCode(const UCKeyboardLayout * keyboard_layout, in
 KMX_DWORD mac_KMX_get_KeyValUnderlying_From_KeyCodeUnderlying(const UCKeyboardLayout * keyboard_layout, int keycode, int shift_state_pos);
 
 // fill Deadkey with dk and return CATEGORY
-//KMX_DWORD mac_KMX_get_KeyValUnderlying_From_KeyCodeUnderlying(GdkKeymap *keymap, UINT VKShiftState, UINT KC_underlying, PKMX_WCHAR DeadKey);
 KMX_DWORD mac_KMX_get_KeyValUnderlying_From_KeyCodeUnderlying(const UCKeyboardLayout * keyboard_layout, UINT VKShiftState, UINT KC_underlying, PKMX_WCHAR DeadKey);
 
 // use Vector to return the Keyval of underlying Keyboard
 KMX_WCHAR mac_KMX_get_KeyValUnderlying_From_KeyValUS(v_dw_3D &All_Vector,KMX_DWORD VK_underlying);
 
 // use Vector to return the Keycode of the underlying Keyboard for given VK_US using GDK
-//KMX_DWORD mac_KMX_get_KeyCodeUnderlying_From_KeyCodeUS(GdkKeymap *keymap, v_dw_3D &All_Vector,KMX_DWORD KC_US, ShiftState ss, int caps);
+KMX_DWORD mac_KMX_get_KeyCodeUnderlying_From_KeyCodeUS(const UCKeyboardLayout * keyboard_layout, v_dw_3D &All_Vector,KMX_DWORD KC_US, ShiftState ss, int caps);
 
 // return the Keycode of the underlying Keyboard for given VK_US
 UINT mac_KMX_get_KeyCodeUnderlying_From_VKUS(KMX_DWORD VirtualKeyUS);

@@ -121,6 +121,15 @@ bool mac_InitializeUCHR(const UCKeyboardLayout **keyboard_layout) {
     return 2;
   }
 
+    // _S2 can go later
+    char layout[128];
+    memset(layout, '\0', sizeof(layout));
+    // get input source id - kTISPropertyInputSourceID
+    // get layout name - kTISPropertyLocalizedName
+    CFStringRef layoutID =static_cast<CFStringRef>( TISGetInputSourceProperty(source, kTISPropertyInputSourceID));
+    CFStringGetCString(layoutID, layout, sizeof(layout), kCFStringEncodingUTF8);
+    printf("++++++++++++++++++  we use keyboardLayout *** %s *** as underlying keyboard ++++++++++++++++++\n", layout);
+
   return 0;
 }
 
@@ -136,8 +145,9 @@ bool mac_InitializeUCHR(const UCKeyboardLayout **keyboard_layout) {
     return false;
 }*/
 
-/*std::u16string mac_convert_DeadkeyValues_To_U16str(int in) {
-
+std::u16string mac_convert_DeadkeyValues_To_U16str(int in) {
+// _S2 not finished yet - needs deadkeys...
+/*
   if (in == 0 )
     return u"\0";
 
@@ -156,8 +166,10 @@ bool mac_InitializeUCHR(const UCKeyboardLayout **keyboard_layout) {
     return std::u16string(1, lname );
   }
   else
-    return u"\0";
-}*/
+    return u"\0";*/
+
+    return std::u16string(1, in );
+}
 
 int mac_KMX_get_KeyVal_From_KeyCode(const UCKeyboardLayout * keyboard_layout, int keycode, int shiftstate, int caps) {
   // _S2 not finished yet - needs deadkeys...
@@ -169,15 +181,39 @@ int mac_KMX_get_KeyVal_From_KeyCode(const UCKeyboardLayout * keyboard_layout, in
   OSStatus status;
   int returnint=0;
 
-    status = UCKeyTranslate(keyboard_layout, keycode ,kUCKeyActionDown, shiftstate, LMGetKbdType(), 0, &deadkeystate, maxStringlength, &actualStringlength, unicodeString );
-    // no deadkey yet
-    if( shiftstate %2 == 1)
-      return 0;       // _S2 what to return if deadkeys are used??
-    else {
-      in_array[0] = (int) unicodeString[0];   // even:    combine char -> è
-      returnint = in_array[0];
-      return returnint;
-    }
+  status = UCKeyTranslate(keyboard_layout, keycode ,kUCKeyActionDown, shiftstate, LMGetKbdType(), 0, &deadkeystate, maxStringlength, &actualStringlength, unicodeString );
+
+  // _S2 no deadkeys yet
+  if( shiftstate %2 == 1)
+    return 0;       // _S2 what to return if deadkeys are used??
+  else {
+    in_array[0] = (int) unicodeString[0];   // even:    combine char -> è
+    returnint = in_array[0];
+    return returnint;
+  }
+  return returnint;
+}
+
+int mac_KMX_get_KeyVal_underlying_From_KeyCode(const UCKeyboardLayout * keyboard_layout, int keycode, int shiftstate, int caps) {
+  // _S2 not finished yet - needs deadkeys...
+  KMX_DWORD in_array[2] = {0,0};
+  UInt32 deadkeystate             = 0;
+  UniCharCount maxStringlength    = 5;
+  UniCharCount actualStringlength = 0;
+  UniChar unicodeString[maxStringlength];
+  OSStatus status;
+  int returnint=0;
+
+  status = UCKeyTranslate(keyboard_layout, keycode ,kUCKeyActionDown, shiftstate, LMGetKbdType(), 0, &deadkeystate, maxStringlength, &actualStringlength, unicodeString );
+
+  // no deadkey yet
+  if( shiftstate %2 == 1)
+    return 0;       // _S2 what to return if deadkeys are used??
+  else {
+    in_array[0] = (int) unicodeString[0];   // even:    combine char -> è
+    returnint = in_array[0];
+    return returnint;
+  }
 
   return returnint;
 }
@@ -269,7 +305,6 @@ int mac_KMX_get_KeyVal_From_KeyCode(const UCKeyboardLayout * keyboard_layout, in
   return (int) *keyvals;
 }*/
 
-//KMX_DWORD mac_KMX_get_KeyValUnderlying_From_KeyCodeUnderlying(GdkKeymap *keymap, guint keycode, int shift_state_pos) {
 KMX_DWORD mac_KMX_get_KeyValUnderlying_From_KeyCodeUnderlying(const UCKeyboardLayout * keyboard_layout, int keycode, int shift_state_pos) {
 
   KMX_DWORD KVal  = mac_get_keyval_From_Keycode(keycode, shift_state_pos*2 , keyboard_layout );
@@ -284,11 +319,8 @@ KMX_DWORD mac_KMX_get_KeyValUnderlying_From_KeyCodeUnderlying(const UCKeyboardLa
   return KVal;
 }
 
-//KMX_DWORD mac_KMX_get_KeyValUnderlying_From_KeyCodeUnderlying(GdkKeymap *keymap, UINT VKShiftState, UINT KC_underlying, PKMX_WCHAR DeadKey) {
 KMX_DWORD mac_KMX_get_KeyValUnderlying_From_KeyCodeUnderlying(const UCKeyboardLayout * keyboard_layout, UINT VKShiftState, UINT KC_underlying, PKMX_WCHAR DeadKey) {
-
-  /*GdkKeymapKey *maps;
-  guint *keyvals;*/
+  // _S2 not finished yet - needs deadkeys...
   int count;
   PKMX_WCHAR dky=NULL;
 
@@ -331,31 +363,36 @@ KMX_DWORD mac_KMX_get_KeyValUnderlying_From_KeyCodeUnderlying(const UCKeyboardLa
   return VK_US;
 }*/
 
-/*KMX_DWORD mac_KMX_get_KeyCodeUnderlying_From_KeyCodeUS(GdkKeymap *keymap, v_dw_3D &All_Vector, KMX_DWORD KC_US, ShiftState ss, int caps) {
+KMX_DWORD mac_KMX_get_KeyCodeUnderlying_From_KeyCodeUS(const UCKeyboardLayout * keyboard_layout, v_dw_3D &All_Vector, KMX_DWORD KC_US, ShiftState ss, int caps) {
   KMX_DWORD KC_underlying;
-  std::u16string u16str = mac_convert_DeadkeyValues_To_U16str(mac_KMX_get_KeyVal_From_KeyCode(keymap, KC_US, ss, caps));
+  std::u16string u16str = mac_convert_DeadkeyValues_To_U16str(mac_KMX_get_KeyVal_From_KeyCode(keyboard_layout, KC_US, ss, caps));
 
   for( int i=0; i< (int)All_Vector[1].size()-1 ;i++) {
     for( int j=1; j< (int)All_Vector[1][0].size();j++) {
-      if ( ( All_Vector[1][i][j] == (KMX_DWORD)  *u16str.c_str() ) ) {
+      if ( ((KMX_DWORD) All_Vector[1][i][j] == (KMX_DWORD)  *u16str.c_str() ) ) {
         KC_underlying = All_Vector[1][i][0];
         return KC_underlying;
       }
     }
   }
   return KC_US;
-}*/
+}
 
 UINT  mac_KMX_get_KeyCodeUnderlying_From_VKUS(KMX_DWORD VirtualKeyUS) {
+  uint ret=  (mac_USVirtualKeyToScanCode[VirtualKeyUS]);
   return (mac_USVirtualKeyToScanCode[VirtualKeyUS]);
 }
 
-/*KMX_DWORD mac_KMX_get_VKUS_From_KeyCodeUnderlying(KMX_DWORD keycode) {
-  if ( keycode >7)
+// _S2 OK??
+KMX_DWORD mac_KMX_get_VKUS_From_KeyCodeUnderlying(KMX_DWORD keycode) {
+  /*if ( keycode >7)
     return  (KMX_DWORD) ScanCodeToUSVirtualKey[keycode-8];
 
+  return 0;*/
+
+  return  (KMX_DWORD) mac_ScanCodeToUSVirtualKey[keycode];
   return 0;
-}*/
+}
 
 /*std::u16string mac_CodePointToU16String(unsigned int codepoint) {
   std::u16string str;

@@ -69,8 +69,9 @@ bool DeadKey::KMX_ContainsBaseCharacter(KMX_WCHAR baseCharacter) {
 
 
 
-/*int KMX_ToUnicodeEx(guint keycode, PKMX_WCHAR pwszBuff, int shift_state_pos, int caps,GdkKeymap *keymap) {
-  GdkKeymapKey *maps;
+int mac_KMX_ToUnicodeEx(int keycode, PKMX_WCHAR pwszBuff, int shift_state_pos, int caps,const UCKeyboardLayout * keyboard_layout) {
+
+  /*GdkKeymapKey *maps;
   guint *keyvals;
   gint count;
 
@@ -82,11 +83,12 @@ bool DeadKey::KMX_ContainsBaseCharacter(KMX_WCHAR baseCharacter) {
 
   if (!(keycode <= keycode_max))
     return 0;
-
-  KMX_DWORD KeyVal= (KMX_DWORD) mac_KMX_get_KeyVal_From_KeyCode(keymap, keycode, ShiftState(shift_state_pos), caps);
+  */
+  // _S2 is it shift_state_pos or shift_state_pos*2 ???
+  KMX_DWORD KeyVal= (KMX_DWORD) mac_KMX_get_KeyVal_From_KeyCode(keyboard_layout, keycode, ShiftState(2*shift_state_pos), caps);
   std::u16string str = mac_convert_DeadkeyValues_To_U16str(KeyVal);
   pwszBuff[0]= * (PKMX_WCHAR)  str.c_str();
-
+  /*
 
   g_free(keyvals);
   g_free(maps);
@@ -95,11 +97,11 @@ bool DeadKey::KMX_ContainsBaseCharacter(KMX_WCHAR baseCharacter) {
     return -1;
   else if(gdk_keyval_to_unicode(KeyVal)  == 0)                      // NO UNICODE
     return 0;
-  else                                                              // usable char
+  else   */                                                           // usable char
     return 1;
-}*/
+}
 
-/*int KMX_DeadKeyMap(int index, std::vector<DeadKey *> *deadkeys, int deadkeyBase, std::vector<KMX_DeadkeyMapping> *deadkeyMappings) {   // I4327   // I4353
+int mac_KMX_DeadKeyMap(int index, std::vector<DeadKey *> *deadkeys, int deadkeyBase, std::vector<KMX_DeadkeyMapping> *deadkeyMappings) {   // I4327   // I4353
   for(size_t i = 0; i < deadkeyMappings->size(); i++) {
     if((*deadkeyMappings)[i].deadkey == index) {
       return (*deadkeyMappings)[i].dkid;
@@ -112,9 +114,9 @@ bool DeadKey::KMX_ContainsBaseCharacter(KMX_WCHAR baseCharacter) {
     }
   }
   return 0xFFFF;
-}*/
+}
 
-/*class KMX_VirtualKey {
+class mac_KMX_VirtualKey {
 private:
   UINT m_vk;
   UINT m_sc;
@@ -123,7 +125,7 @@ private:
 
 public:
 
-  KMX_VirtualKey(UINT scanCode) {
+  mac_KMX_VirtualKey(UINT scanCode) {
     this->m_vk = mac_KMX_get_VKUS_From_KeyCodeUnderlying(scanCode);
     this->m_sc = scanCode;
     memset(this->m_rgfDeadKey,0,sizeof(this->m_rgfDeadKey));
@@ -137,20 +139,20 @@ public:
     return this->m_sc;
   }
 
-  std::u16string KMX_GetShiftState(ShiftState shiftState, bool capsLock) {
+  std::u16string mac_KMX_GetShiftState(ShiftState shiftState, bool capsLock) {
     return this->m_rgss[(UINT)shiftState][(capsLock ? 1 : 0)];
   }
 
-  void KMX_SetShiftState(ShiftState shiftState, std::u16string value, bool isDeadKey, bool capsLock) {
+  void mac_KMX_SetShiftState(ShiftState shiftState, std::u16string value, bool isDeadKey, bool capsLock) {
     this->m_rgfDeadKey[(UINT)shiftState][(capsLock ? 1 : 0)] = isDeadKey;
     this->m_rgss[(UINT)shiftState][(capsLock ? 1 : 0)] = value;
   }
 
-  bool KMX_IsSGCAPS() {
-        std::u16string stBase = this->KMX_GetShiftState(Base, false);
-        std::u16string stShift = this->KMX_GetShiftState(Shft, false);
-        std::u16string stCaps = this->KMX_GetShiftState(Base, true);
-        std::u16string stShiftCaps = this->KMX_GetShiftState(Shft, true);
+  bool mac_KMX_IsSGCAPS() {
+        std::u16string stBase = this->mac_KMX_GetShiftState(Base, false);
+        std::u16string stShift = this->mac_KMX_GetShiftState(Shft, false);
+        std::u16string stCaps = this->mac_KMX_GetShiftState(Base, true);
+        std::u16string stShiftCaps = this->mac_KMX_GetShiftState(Shft, true);
         return (
             ((stCaps.size() > 0) &&
             (stBase.compare(stCaps) != 0) &&
@@ -160,10 +162,10 @@ public:
             (stShift.compare(stShiftCaps) != 0)));
       }
 
-  bool KMX_IsCapsEqualToShift() {
-        std::u16string stBase = this->KMX_GetShiftState(Base, false);
-        std::u16string stShift = this->KMX_GetShiftState(Shft, false);
-        std::u16string stCaps = this->KMX_GetShiftState(Base, true);
+  bool mac_KMX_IsCapsEqualToShift() {
+        std::u16string stBase = this->mac_KMX_GetShiftState(Base, false);
+        std::u16string stShift = this->mac_KMX_GetShiftState(Shft, false);
+        std::u16string stCaps = this->mac_KMX_GetShiftState(Base, true);
         return (
             (stBase.size() > 0) &&
             (stShift.size() > 0) &&
@@ -171,10 +173,10 @@ public:
             (stShift.compare(stCaps) == 0));
       }
 
-  bool KMX_IsAltGrCapsEqualToAltGrShift() {
-      std::u16string stBase = this->KMX_GetShiftState(MenuCtrl, false);
-      std::u16string stShift = this->KMX_GetShiftState(ShftMenuCtrl, false);
-      std::u16string stCaps = this->KMX_GetShiftState(MenuCtrl, true);
+  bool mac_KMX_IsAltGrCapsEqualToAltGrShift() {
+      std::u16string stBase = this->mac_KMX_GetShiftState(MenuCtrl, false);
+      std::u16string stShift = this->mac_KMX_GetShiftState(ShftMenuCtrl, false);
+      std::u16string stCaps = this->mac_KMX_GetShiftState(MenuCtrl, true);
       return (
           (stBase.size() > 0) &&
           (stShift.size() > 0) &&
@@ -182,10 +184,10 @@ public:
           (stShift.compare(stCaps) == 0));
     }
 
-  bool KMX_IsXxxxGrCapsEqualToXxxxShift() {
-  std::u16string stBase = this->KMX_GetShiftState(Xxxx, false);
-  std::u16string stShift = this->KMX_GetShiftState(ShftXxxx, false);
-  std::u16string stCaps = this->KMX_GetShiftState(Xxxx, true);
+  bool mac_KMX_IsXxxxGrCapsEqualToXxxxShift() {
+  std::u16string stBase = this->mac_KMX_GetShiftState(Xxxx, false);
+  std::u16string stShift = this->mac_KMX_GetShiftState(ShftXxxx, false);
+  std::u16string stCaps = this->mac_KMX_GetShiftState(Xxxx, true);
   return (
       (stBase.size() > 0) &&
       (stShift.size() > 0) &&
@@ -193,10 +195,10 @@ public:
       (stShift.compare(stCaps) == 0));
   }
 
-  bool KMX_IsEmpty() {
+  bool mac_KMX_IsEmpty() {
     for (int i = 0; i < 10; i++) {
       for (int j = 0; j <= 1; j++) {
-        if (this->KMX_GetShiftState((ShiftState)i, (j == 1)).size() > 0) {
+        if (this->mac_KMX_GetShiftState((ShiftState)i, (j == 1)).size() > 0) {
           return (false);
         }
       }
@@ -204,7 +206,7 @@ public:
     return true;
   }
 
-  bool KMX_IsKeymanUsedKey() {
+  bool mac_KMX_IsKeymanUsedKey() {
     return (this->m_vk >= 0x20 && this->m_vk <= 0x5F) || (this->m_vk >= 0x88);
   }
 
@@ -212,7 +214,7 @@ public:
     return KMX_ShiftStateMap[(int)ss] | (capslock ? (caps ? CAPITALFLAG : NOTCAPITALFLAG) : 0);
   }
 
-  int KMX_GetKeyCount(int MaxShiftState) {
+  int mac_KMX_GetKeyCount(int MaxShiftState) {
     int nkeys = 0;
 
     // Get the CAPSLOCK value
@@ -223,7 +225,7 @@ public:
       }
       for (int caps = 0; caps <= 1; caps++) {
 
-        std::u16string st = this->KMX_GetShiftState((ShiftState) ss, (caps == 1));
+        std::u16string st = this->mac_KMX_GetShiftState((ShiftState) ss, (caps == 1));
 
         if (st.size() == 0) {
           // No character assigned here
@@ -248,13 +250,13 @@ public:
     return nkeys;
   }
 
-  bool KMX_LayoutRow(int MaxShiftState, LPKMX_KEY key, std::vector<DeadKey*> *deadkeys, int deadkeyBase, BOOL bDeadkeyConversion,v_dw_3D &All_Vector, GdkKeymap *keymap) {   // I4552
+  bool mac_KMX_LayoutRow(int MaxShiftState, LPKMX_KEY key, std::vector<DeadKey*> *deadkeys, int deadkeyBase, BOOL bDeadkeyConversion,v_dw_3D &All_Vector, const UCKeyboardLayout *keyboard_layout ) {   // I4552
     // Get the CAPSLOCK value
    int capslock =
-        (this->KMX_IsCapsEqualToShift() ? 1 : 0) |
-        (this->KMX_IsSGCAPS() ? 2 : 0) |
-        (this->KMX_IsAltGrCapsEqualToAltGrShift() ? 4 : 0) |
-        (this->KMX_IsXxxxGrCapsEqualToXxxxShift() ? 8 : 0);
+        (this->mac_KMX_IsCapsEqualToShift() ? 1 : 0) |
+        (this->mac_KMX_IsSGCAPS() ? 2 : 0) |
+        (this->mac_KMX_IsAltGrCapsEqualToAltGrShift() ? 4 : 0) |
+        (this->mac_KMX_IsXxxxGrCapsEqualToXxxxShift() ? 8 : 0);
 
     for (int ss = 0; ss <= MaxShiftState; ss++) {
       if (ss == Menu || ss == ShftMenu) {
@@ -262,7 +264,7 @@ public:
         continue;
       }
       for (int caps = 0; caps <= 1; caps++) {
-        std::u16string st = this->KMX_GetShiftState((ShiftState) ss, (caps == 1));
+        std::u16string st = this->mac_KMX_GetShiftState((ShiftState) ss, (caps == 1));
 
         PKMX_WCHAR p;
 
@@ -288,7 +290,7 @@ public:
             p = key->dpOutput = new KMX_WCHAR[4];
             *p++ = UC_SENTINEL;
             *p++ = CODE_DEADKEY;
-            *p++ = KMX_DeadKeyMap(st[0], deadkeys, deadkeyBase, &KMX_FDeadkeys);   // I4353
+            *p++ = mac_KMX_DeadKeyMap(st[0], deadkeys, deadkeyBase, &KMX_FDeadkeys);   // I4353
             *p = 0;
           }
           key++;
@@ -308,7 +310,7 @@ public:
             // key->Key      stores VK-US ( not underlying !!)
             // key->dpOutput stores character Underlying
 
-            KMX_DWORD SC_Underlying = mac_KMX_get_KeyCodeUnderlying_From_KeyCodeUS(keymap, All_Vector, this->SC(), (ShiftState) ss, caps);
+            KMX_DWORD SC_Underlying = mac_KMX_get_KeyCodeUnderlying_From_KeyCodeUS(keyboard_layout, All_Vector, this->SC(), (ShiftState) ss, caps);
             key->Key = mac_KMX_get_VKUS_From_KeyCodeUnderlying( SC_Underlying);
 
             key->Line = 0;
@@ -329,15 +331,15 @@ public:
     return true;
   }
 };
-*/
 
-/*  class KMX_Loader {
+
+ class mac_KMX_Loader {
 private:
   KMX_BYTE lpKeyStateNull[256];
   UINT m_XxxxVk;
 
 public:
-  KMX_Loader() {
+  mac_KMX_Loader() {
     m_XxxxVk = 0;
     memset(lpKeyStateNull, 0, sizeof(lpKeyStateNull));
   }
@@ -357,9 +359,8 @@ public:
   bool KMX_IsControlChar(char16_t ch) {
     return (ch < 0x0020) || (ch >= 0x007F && ch <= 0x009F);
   }
-
 };
-*/
+
 
 /* int KMX_GetMaxDeadkeyIndex(KMX_WCHAR *p) {
   int n = 0;
@@ -371,10 +372,10 @@ public:
   return n;
 }*/
 
-/*bool KMX_ImportRules(LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, GdkKeymap **keymap, std::vector<KMX_DeadkeyMapping> *FDeadkeys, KMX_BOOL bDeadkeyConversion) {   // I4353   // I4552
-  KMX_Loader loader;
+bool mac_KMX_ImportRules( LPKMX_KEYBOARD kp,v_dw_3D &All_Vector, const UCKeyboardLayout **keyboard_layout,std::vector<KMX_DeadkeyMapping> *KMX_FDeadkeys, KMX_BOOL bDeadkeyConversion) { // I4353   // I4327
+ mac_KMX_Loader loader;
 
-  std::vector<KMX_VirtualKey*> rgKey; //= new VirtualKey[256];
+  std::vector<mac_KMX_VirtualKey*> rgKey; //= new VirtualKey[256];
   std::vector<DeadKey*> alDead;
   std::vector<DeadKey*> alDead_cpl = mac_create_alDead();
 
@@ -384,14 +385,19 @@ public:
   // values in it. Then, store the SC in each valid VK so it can act as both a
   // flag that the VK is valid, and it can store the SC value.
 
-  for(UINT sc = 0x01; sc <= 0x7f; sc++) {
-    // fills m_vk with the VK of the US keyboard
-    // ( mcompile win uses MapVirtualKeyEx() to fill m_vk with the VK of the Underlying keyboard)
-    // Linux can get a VK for the US Keyboard using USVirtualKeyToScanCode/ScanCodeToUSVirtualKey
-    // Linux cannot get a VK for the underling Keyboard
-    // this "connection" is possible only when using All_Vector
+  //for(UINT sc = 0x01; sc <= 0x7f; sc++) {   _S2 winL lin keycode start with 1; mac with 0
+  for(UINT sc = 0x00; sc <= 0x7f; sc++) {
 
-    KMX_VirtualKey *key = new KMX_VirtualKey(sc);
+    // HERE IS A BIG DIFFERENCE COMPARED TO MCOMPILE FOR WINDOWS:
+    // mcompile on Windows fills rgkey.m_vk with the VK of the Underlying keyboard
+    // mcompile for macOS  fills rgkey.m_vk with the VK of the US keyboard
+    // this results in a different sorting order in rgkey[] !
+
+    // macOS cannot get a VK for the underling Keyboard since this does not exist
+    // macOS can only get a VK for the US Keyboard (by using USVirtualKeyToScanCode/ScanCodeToUSVirtualKey)
+    // therefore in rgkey[ ] we use VK_US which we get from All_Vector
+
+    mac_KMX_VirtualKey *key = new mac_KMX_VirtualKey(sc);
 
     if((key->VK() != 0) ) {
         rgKey[key->VK()] = key;
@@ -401,9 +407,9 @@ public:
   }
 
 //  // _S2 TODO I assume we do not need those...
-//  rgKey[VK_DIVIDE] = new KMX_VirtualKey(hkl, VK_DIVIDE);
-//  rgKey[VK_CANCEL] = new KMX_VirtualKey(hkl, VK_CANCEL);
-//  rgKey[VK_DECIMAL] = new KMX_VirtualKey(hkl, VK_DECIMAL);
+//  rgKey[VK_DIVIDE] = new mac_KMX_VirtualKey(hkl, VK_DIVIDE);
+//  rgKey[VK_CANCEL] = new mac_KMX_VirtualKey(hkl, VK_CANCEL);
+//  rgKey[VK_DECIMAL] = new mac_KMX_VirtualKey(hkl, VK_DECIMAL);
 
     // in this part we skip shiftstates 4, 5, 8, 9
     for(UINT iKey = 0; iKey < rgKey.size(); iKey++) {
@@ -425,23 +431,23 @@ public:
           KMX_DWORD KC_US = (KMX_DWORD) mac_KMX_get_KeyCodeUnderlying_From_VKUS(iKey);
 
           for(int caps = 0; caps <= 1; caps++) {
-            int rc = KMX_ToUnicodeEx(KC_US, sbBuffer, ss, caps, *keymap);
+            int rc = mac_KMX_ToUnicodeEx(KC_US, sbBuffer, ss, caps, *keyboard_layout);
 
             if(rc > 0) {
               if(*sbBuffer == 0) {
-                rgKey[iKey]->KMX_SetShiftState(ss, u"", false, (caps));       // different to windows since behavior on Linux is different
+                rgKey[iKey]->mac_KMX_SetShiftState(ss, u"", false, (caps));       // different to windows since behavior on Linux is different
               }
               else {
                 if( (ss == Ctrl || ss == ShftCtrl) ) {
                 continue;
               }
               sbBuffer[rc] = 0;
-              rgKey[iKey]->KMX_SetShiftState(ss, sbBuffer, false, (caps));    // different to windows since behavior on Linux is different
+              rgKey[iKey]->mac_KMX_SetShiftState(ss, sbBuffer, false, (caps));    // different to windows since behavior on Linux is different
             }
           }
           else if(rc < 0) {
             sbBuffer[2] = 0;
-            rgKey[iKey]->KMX_SetShiftState(ss, sbBuffer, true, (caps ));      // different to windows since behavior on Linux is different
+            rgKey[iKey]->mac_KMX_SetShiftState(ss, sbBuffer, true, (caps ));      // different to windows since behavior on Linux is different
 
             mac_refine_alDead(sbBuffer[0], alDead, &alDead_cpl);
           }
@@ -474,22 +480,23 @@ public:
     //}
     LPKMX_KEY kkp = gp->dpKeyArray;
 
-    for(UINT j = 0; j < gp->cxKeyArray; j++, kkp++) {
+    //_S2
+    /*for(UINT j = 0; j < gp->cxKeyArray; j++, kkp++) {
       nDeadkey = std::max(nDeadkey, KMX_GetMaxDeadkeyIndex(kkp->dpContext));
       nDeadkey = std::max(nDeadkey, KMX_GetMaxDeadkeyIndex(kkp->dpOutput));
-    }
+    }*/
   }
+
 
   kp->cxGroupArray++;
   gp = &kp->dpGroupArray[kp->cxGroupArray-1];
 
   UINT nkeys = 0;
   for (UINT iKey = 0; iKey < rgKey.size(); iKey++) {
-    if ((rgKey[iKey] != NULL) && rgKey[iKey]->KMX_IsKeymanUsedKey() && (!rgKey[iKey]->KMX_IsEmpty())) {
-      nkeys+= rgKey[iKey]->KMX_GetKeyCount(loader.KMX_MaxShiftState());
+    if ((rgKey[iKey] != NULL) && rgKey[iKey]->mac_KMX_IsKeymanUsedKey() && (!rgKey[iKey]->mac_KMX_IsEmpty())) {
+      nkeys+= rgKey[iKey]->mac_KMX_GetKeyCount(loader.KMX_MaxShiftState());
     }
   }
-
 
   nDeadkey++; // ensure a 1-based index above the max deadkey value already in the keyboard
 
@@ -501,17 +508,17 @@ public:
   gp->dpKeyArray = new KMX_KEY[gp->cxKeyArray];
   nkeys = 0;
 
-
   //
   // Fill in the new rules
   //
   for (UINT iKey = 0; iKey < rgKey.size(); iKey++) {
-    if ((rgKey[iKey] != NULL) && rgKey[iKey]->KMX_IsKeymanUsedKey() && (!rgKey[iKey]->KMX_IsEmpty())) {
-      if(rgKey[iKey]->KMX_LayoutRow(loader.KMX_MaxShiftState(), &gp->dpKeyArray[nkeys], &alDead, nDeadkey, bDeadkeyConversion, All_Vector,*keymap)) {   // I4552
-        nkeys+=rgKey[iKey]->KMX_GetKeyCount(loader.KMX_MaxShiftState());
+    if ((rgKey[iKey] != NULL) && rgKey[iKey]->mac_KMX_IsKeymanUsedKey() && (!rgKey[iKey]->mac_KMX_IsEmpty())) {
+      if(rgKey[iKey]->mac_KMX_LayoutRow(loader.KMX_MaxShiftState(), &gp->dpKeyArray[nkeys], &alDead, nDeadkey, bDeadkeyConversion, All_Vector,*keyboard_layout)) {   // I4552
+        nkeys+=rgKey[iKey]->mac_KMX_GetKeyCount(loader.KMX_MaxShiftState());
       }
     }
   }
+
 
   gp->cxKeyArray = nkeys;
 
@@ -559,6 +566,8 @@ public:
   // We only do this if not in deadkey conversion mode
   //
 
+  int STOP=0;   // _S2 up to here
+/*
   if (alDead.size() > 0 && !bDeadkeyConversion) {   // I4552
     kp->cxGroupArray++;
 
@@ -611,7 +620,7 @@ public:
       KMX_WCHAR *p = kkp->dpContext = new KMX_WCHAR[8];
       *p++ = UC_SENTINEL;
       *p++ = CODE_DEADKEY;
-      *p++ = KMX_DeadKeyMap(dk->KMX_DeadCharacter(), &alDead, nDeadkey, FDeadkeys);   // I4353
+      *p++ = mac_KMX_DeadKeyMap(dk->KMX_DeadCharacter(), &alDead, nDeadkey, FDeadkeys);   // I4353
       // *p++ = nDeadkey+i;
       *p++ = UC_SENTINEL;
       *p++ = CODE_ANY;
@@ -627,9 +636,9 @@ public:
       kkp++;
     }
   }
-
+*/
 return true;
-}*/
+}
 
 const int CODE__SIZE[] = {
    -1,   // undefined                0x00
