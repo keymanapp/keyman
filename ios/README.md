@@ -77,5 +77,3 @@ The KeymanEngine project contains a demo app that demonstrates usage of the fram
 create a system keyboard.
 
 To build the samples, `cd` into the project directory and run `./build.sh`.
-
-.
