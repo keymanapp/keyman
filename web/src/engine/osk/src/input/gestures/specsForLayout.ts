@@ -32,9 +32,15 @@ export interface GestureParams<Item = any> {
     permitsFlick: (item?: Item) => boolean,
 
     /**
+     * The minimum _net_ distance traveled before a longpress flick-shortcut will cancel any
+     * conflicting flick models.
+     */
+    flickDistStart: number,
+
+    /**
      * The minimum _net_ distance traveled before a longpress flick-shortcut will trigger.
      */
-    flickDist: number,
+    flickDistFinal: number,
 
     /**
      * The maximum amount of raw-distance movement allowed for a longpress before it is
@@ -104,7 +110,8 @@ export const DEFAULT_GESTURE_PARAMS: GestureParams = {
     permitsFlick: () => true,
     // Note:  actual runtime value is determined at runtime based upon row height.
     // See `VisualKeyboard.refreshLayout`, CTRL-F "Step 3".
-    flickDist: 5,
+    flickDistStart: 8,
+    flickDistFinal: 40,
     waitLength: 500,
     noiseTolerance: 10
   },
@@ -349,11 +356,34 @@ export function instantContactResolutionModel(): ContactModel {
   };
 }
 
-export function flickStartContactModel(params: GestureParams): ContactModel {
+export function flickStartContactModel(params: GestureParams): gestures.specs.ContactModel<KeyElement, any> {
+  const flickParams = params.flick;
+
   return {
     itemPriority: 1,
     pathModel: {
-      evaluate: (path) => path.stats.netDistance > params.flick.startDist ? 'resolve' : null
+      evaluate: (path, _, item) => {
+        const stats = path.stats;
+        const keySpec = item?.key.spec;
+
+        if(keySpec && keySpec.sk) {
+          const flickSpec = keySpec.flick;
+          const hasUpFlick = flickSpec.nw || flickSpec.n || flickSpec.ne;
+
+          if(!hasUpFlick) {
+            // Check for possible conflict with the longpress up-flick shortcut;
+            // it's supported on this key, as there is no true northish flick.
+            const baseDistance = stats.netDistance;
+            const angle = stats.angle; // from <0, -1> (straight up) going clockwise.
+            const verticalDistance = baseDistance * Math.cos(angle);
+            if(verticalDistance > params.longpress.flickDistStart) {
+              return 'reject';
+            }
+          }
+        }
+
+        return stats.netDistance > flickParams.startDist ? 'resolve' : null;
+      }
     },
     pathResolutionAction: 'resolve',
     pathInheritance: 'partial'
@@ -467,7 +497,7 @@ export function longpressContactModel(params: GestureParams, enabledFlicks: bool
           const baseDistance = stats.netDistance;
           const angle = stats.angle; // from <0, -1> (straight up) going clockwise.
           const verticalDistance = baseDistance * Math.cos(angle);
-          if(verticalDistance > spec.flickDist) {
+          if(verticalDistance > spec.flickDistFinal) {
             return 'resolve';
           }
         } else if(resetForRoaming) {

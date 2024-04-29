@@ -1307,10 +1307,11 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
         (The range _will_ be notably tighter on keys with both longpresses and
         flicks as a result.)
       */
-      this.gestureParams.longpress.flickDist = 0.24 * this.currentLayer.rowHeight;
-      this.gestureParams.flick.startDist     = 0.30 * this.currentLayer.rowHeight;
-      this.gestureParams.flick.dirLockDist   = 0.35 * this.currentLayer.rowHeight;
-      this.gestureParams.flick.triggerDist   = 0.75 * this.currentLayer.rowHeight;
+      this.gestureParams.longpress.flickDistStart = 0.24 * this.currentLayer.rowHeight;
+      this.gestureParams.flick.startDist          = 0.30 * this.currentLayer.rowHeight;
+      this.gestureParams.flick.dirLockDist        = 0.35 * this.currentLayer.rowHeight;
+      this.gestureParams.flick.triggerDist        = 0.75 * this.currentLayer.rowHeight;
+      this.gestureParams.longpress.flickDistFinal = 0.75 * this.currentLayer.rowHeight;
     }
 
     // Phase 4:  Refresh the layout of the layer-group and active layer.
