@@ -34,7 +34,7 @@ function downloadKeyboardPackage() {
   local RETRY_DELAY=5 # Make curl sleep this amount of time before each retry when a transfer has failed
 
   echo "Downloading ${ID}.kmp from downloads.keyman.com up to ${RETRY} attempts"
-  local URL_DOWNLOAD_FILE=`curl --silent "$URL_API_KEYBOARD_VERSION/${ID}" | "$JQ" -r .kmp`
+  local URL_DOWNLOAD_FILE=`curl --retry "$RETRY" --retry-delay "$RETRY_DELAY" --silent "$URL_API_KEYBOARD_VERSION/${ID}" | "$JQ" -r .kmp`
   curl --fail --retry "$RETRY" --retry-delay "$RETRY_DELAY" --silent "$URL_DOWNLOAD_FILE" --output "$KEYBOARDS_TARGET" || {
       builder_die "Downloading $KEYBOARDS_TARGET failed with error $?"
   }
@@ -55,7 +55,7 @@ function downloadModelPackage() {
   local RETRY_DELAY=5 # Make curl sleep this amount of time before each retry when a transfer has failed
 
   echo "Downloading ${ID}.model.kmp from downloads.keyman.com up to ${RETRY} attempts"
-  local URL_DOWNLOAD_FILE=`curl --silent "$URL_API_MODEL_VERSION/${ID}" | "$JQ" -r .kmp`
+  local URL_DOWNLOAD_FILE=`curl --retry "$RETRY" --retry-delay "$RETRY_DELAY" --silent "$URL_API_MODEL_VERSION/${ID}" | "$JQ" -r .kmp`
   curl --fail --retry "$RETRY" --retry-delay "$RETRY_DELAY" --silent "$URL_DOWNLOAD_FILE" --output "$MODELS_TARGET" || {
       builder_die "Downloading $MODELS_TARGET failed with error $?"
   }
