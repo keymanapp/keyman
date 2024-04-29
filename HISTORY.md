@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 18.0.24 alpha 2024-04-29
+
+* fix(common): Retry curl downloads up to 5 times (#11314)
+
 ## 18.0.23 alpha 2024-04-26
 
 * chore(common): Merge beta to master for Sprint B17S6 (part 2) (#11305)
