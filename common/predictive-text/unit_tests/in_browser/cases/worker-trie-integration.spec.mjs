@@ -1,31 +1,42 @@
-import { assert } from '../../../../../node_modules/chai/chai.js';
+import { assert } from 'chai';
 
-import { LMLayer, Worker }   from "../../../build/lib/web/index.mjs";
-import * as helpers from "../helpers.mjs";
+import { LMLayer, Worker }   from "@keymanapp/lexical-model-layer/web";
+import { defaultCapabilities } from '../helpers.mjs';
+
+// Import assertions, even using 'with', aren't yet supported in Firefox's engine.
+// import hazelModel from '@keymanapp/common-test-resources/json/models/future_suggestions/i_got_distracted_by_hazel.json' with { type: 'json' };
+
+/** @type {string} */
+let domain;
 
 /*
  * How to run the worlist
  */
 describe('LMLayer using the trie model', function () {
-  this.timeout(testconfig.timeouts.standard);
+  this.timeout(5000);
+
+  before(async () => {
+    let loc = document.location;
+    domain = `${loc.protocol}/${loc.host}`;
+
+    // Test-config setups will take care of the rest; the server-path will be rooted at the repo root.
+    // With aliasing for resources/.
+  });
 
   describe('Prediction', function () {
     var EXPECTED_SUGGESTIONS = 3;
     it('will predict an empty buffer', function () {
-      this.timeout(testconfig.timeouts.standard * 3); // This one makes multiple subsequent calls across
-                                                  // the WebWorker boundary, so we should be generous here.
-
       // Parameter 3 = true:  enables 'test mode', disables correction-search timeout.
       // This helps prevent the correction-search timeout from flaking out periodically during unit tests in
       // CI, since remote servers / devices are involved.
-      var lmLayer = new LMLayer(helpers.defaultCapabilities, Worker.constructInstance(), true);
+      var lmLayer = new LMLayer(defaultCapabilities, Worker.constructInstance(), true);
 
       // We're testing many as asynchronous messages in a row.
       // this would be cleaner using async/await syntax, but
       // alas some of our browsers don't support it.
       return lmLayer.loadModel(
         // We need to provide an absolute path since the worker is based within a blob.
-        document.location.protocol + '//' + document.location.host + "/resources/models/simple-trie.js"
+        `${domain}/resources/models/simple-trie.js`
       ).then(function (_actualConfiguration) {
         return Promise.resolve();
       }).then(function () {
@@ -60,11 +71,12 @@ describe('LMLayer using the trie model', function () {
     //
     // https://community.software.sil.org/t/search-term-to-key-in-lexical-model-not-working-both-ways-by-default/3133
     it('should use the default searchTermToKey()', function () {
-      var lmLayer = new LMLayer(helpers.defaultCapabilities, Worker.constructInstance(), /* testMode */ true);
+      var lmLayer = new LMLayer(defaultCapabilities, Worker.constructInstance(), /* testMode */ true);
 
+      let loc = document.location;
       return lmLayer.loadModel(
         // We need to provide an absolute path since the worker is based within a blob.
-        document.location.protocol + '//' + document.location.host + "/resources/models/naive-trie.js"
+        `${domain}/resources/models/naive-trie.js`
       ).then(function (_actualConfiguration) {
         return Promise.resolve();
       }).then(function () {
