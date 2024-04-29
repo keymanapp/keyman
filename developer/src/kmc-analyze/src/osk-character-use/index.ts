@@ -2,7 +2,7 @@ import { CompilerCallbacks, KeymanFileTypes, KvksFile, KvksFileReader, TouchLayo
 import { CompilerMessages, Osk } from '@keymanapp/kmc-kmn';
 import { escapeMarkdownChar } from '@keymanapp/developer-utils';
 import { getOskFromKmnFile } from "../util/get-osk-from-kmn-file.js";
-import { AnalyzerMessages } from "../messages.js";
+import { AnalyzerMessages } from "../analyzer-messages.js";
 
 
 type StringRefUsageMap = {[index:string]: Osk.StringRefUsage[]};
