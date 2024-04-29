@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 echo "wrap script for arch $(arch)"
 if [[ $(arch) == i386 ]] && [[ -f /usr/local/bin/bash ]]; then
