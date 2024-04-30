@@ -38,11 +38,12 @@ function do_build() {
   if [[ -f "$WIN32_TARGET_PATH/setup.dbg" ]]; then
     mv "$WIN32_TARGET_PATH/setup.dbg" "$WIN32_TARGET_PATH/devsetup.dbg"
   fi
-  # SIGNCODE /d "Keyman Developer Setup" $(DEVELOPER_PROGRAM)\setup.exe
 }
 
 # TODO
 function do_publish() {
+  # SIGNCODE /d "Keyman Developer Setup" $(DEVELOPER_PROGRAM)\setup.exe
+
   "$SYMSTORE" "$DEVELOPER_PROGRAM"/setup.exe //t keyman-developer
   "$SYMSTORE" "$DEVELOPER_ROOT"/src/setup/setup.dbg //t keyman-developer
 }
