@@ -92,8 +92,8 @@ static KMX_DWORD deadkey_min = 0xfe50;
 static KMX_DWORD deadkey_max = 0xfe93;
 //static KMX_DWORD deadkey_max = 0xfe52;  // _S2 TOP_6 TODO This has to go! my test: to only return 3 dk
 
-// map Shiftstate to modifier (e.g. 0->0; 16-1; 9->2; 25->3)
-int mac_map_VKShiftState_to_LinModifier(int VKShiftState);
+// map Shiftstate to modifier (e.g. 0->0; )
+int mac_map_VKShiftState_to_MacModifier(int VKShiftState);
 
 // take a std::string (=contents of line symbols-file ) and returns the (int) value of the character
 KMX_DWORD mac_convertNamesTo_DWORD_Value(std::string tok_str);
@@ -652,6 +652,7 @@ const UINT mac_ScanCodeToUSVirtualKey[128] = {
 	115	//	L"K_?00",	//	&H73
 };
 
+// _S2 what instead x999?
 const UINT mac_USVirtualKeyToScanCode[256] = {
 		0x999, // L"K_?00",				// &H0 ................................................... 0 ...........................................
 		0x999, // L"K_LBUTTON",			// &H1
@@ -964,5 +965,6 @@ void printoutKeyboards(v_dw_3D &All_Vector);
 //################################################################################################################################################
 //################################################################################################################################################
 
+KMX_DWORD X_find_Shiftstates(int shiftstate,const UCKeyboardLayout* keyboard_layout , KMX_DWORD charVal=0);
 
 #endif  // KEYMAP_H

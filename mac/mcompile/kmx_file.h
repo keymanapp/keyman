@@ -27,7 +27,7 @@ namespace kmx {
 #define KEYMANID_INVALID    0xFFFFFFFD
 
 // Shift flags for hotkeys (version 1.0) //
-
+//_S2 here values for mac
 #define SHIFTFLAG 0x2000
 #define CTRLFLAG 0x4000
 #define ALTFLAG 0x8000

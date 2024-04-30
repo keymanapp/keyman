@@ -137,7 +137,7 @@ int mac_run(int argc, std::vector<std::u16string> str_argv, char* argv_ch[] = NU
     if(mac_KMX_DoConvert( kmxfile, bDeadkeyConversion, argc, (gchar**) argv_ch)) { // I4552F
       KMX_SaveKeyboard(kmxfile, outfile);
   }
-/* _S2 WORK FROM HERE   */
+
   #elif (__APPLE__ && TARGET_OS_MAC  ) //macOS
     if(mac_KMX_DoConvert( kmxfile, bDeadkeyConversion, argc, (char**) argv_ch)) { // I4552F
       KMX_SaveKeyboard(kmxfile, outfile);
@@ -161,6 +161,7 @@ int mac_run(int argc, std::vector<std::u16string> str_argv, char* argv_ch[] = NU
 // Map of all shift states that we will work with
 const UINT VKShiftState[] = {0, K_SHIFTFLAG, LCTRLFLAG|RALTFLAG, K_SHIFTFLAG|LCTRLFLAG|RALTFLAG, 0xFFFF};
 //const UINT VKShiftState[] = {0, 2, 4,6, 0xFFFF};
+//const UINT VKShiftState[] = {0, 2, 8,10, 0xFFFF};
 
 
 //
@@ -445,6 +446,7 @@ KMX_BOOL mac_KMX_DoConvert(LPKMX_KEYBOARD kbd, KMX_BOOL bDeadkeyConversion, int 
 
   // _S2 printoutKeyboards(All_Vector);
 
+  // _S2 ToDo
   v_dw_2D  dk_Table;
   mac_create_DKTable(dk_Table);
 
@@ -455,8 +457,9 @@ KMX_BOOL mac_KMX_DoConvert(LPKMX_KEYBOARD kbd, KMX_BOOL bDeadkeyConversion, int 
     for (int i = 0;KMX_VKMap[i]; i++) { // I4651
 
       // windows uses  VK, Linux, mac use SC/Keycode
+      // _S2 ToDo unused vk`s ??
       UINT scUnderlying =  mac_KMX_get_KeyCodeUnderlying_From_VKUS(KMX_VKMap[i]);
-
+      // _S2 ToDo non-dk OK, but all others not
       KMX_WCHAR ch = mac_KMX_get_KeyValUnderlying_From_KeyCodeUnderlying(keyboard_layout, VKShiftState[j], scUnderlying, &DeadKey);
 
       //wprintf(L"--- VK_%d -> SC_ [%c] dk=%d  ( ss %i) \n", KMX_VKMap[i], ch == 0 ? 32 : ch, DeadKey, VKShiftState[j]);
@@ -468,15 +471,19 @@ KMX_BOOL mac_KMX_DoConvert(LPKMX_KEYBOARD kbd, KMX_BOOL bDeadkeyConversion, int 
       }
       switch(ch) {
         case 0x0000: break;
+        // _S2 ToDo
         case 0xFFFF: mac_KMX_ConvertDeadkey(kbd, KMX_VKMap[i], VKShiftState[j], DeadKey, All_Vector, keyboard_layout , dk_Table); break;
+        // _S2 ToDo non-dk OK, but all others not
         default: mac_KMX_TranslateKeyboard(kbd, KMX_VKMap[i], VKShiftState[j], ch);
       }
     }
   }
+  // _S2 ToDo non-dk OK, but all others are not
   mac_KMX_ReportUnconvertedKeyboardRules(kbd);
 
-
-
+  // _S2 has to go later
+  /*KMX_DWORD out = X_find_Shiftstates(0, keyboard_layout,12) ;*/
+  //KMX_DWORD out2= X_find_Shiftstates(0, keyboard_layout,0) ;
 
   if(!mac_KMX_ImportRules(kbd, All_Vector, &keyboard_layout, &KMX_FDeadkeys, bDeadkeyConversion)) {   // I4353   // I4552
     return FALSE;
