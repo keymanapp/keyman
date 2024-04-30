@@ -970,7 +970,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = "/usr/bin/env bash";
-			shellScript = ". \"$KEYMAN_ROOT/resources/build/xcode-utils.sh\"\n\nif [ ${UPLOAD_SENTRY:-false} = true ]; then\n  # Calls resource script to perform the dSYM upload\n  phaseSentryDsymUpload \"keyman-ios\"\nfi\n";
+			shellScript = ". \"$KEYMAN_ROOT/resources/build/xcode-utils.sh\"\n\nif [ ${UPLOAD_SENTRY:-false} = true ]; then\n  # Calls resource script to perform the dSYM upload\n  \"$KEYMAN_ROOT/resources/build/xcode-wrap.sh\" \"$KEYMAN_ROOT/resources/build/sentry-dsym-upload.sh\"\nfi\n";
 		};
 		CE06AA671F161422006D91C3 /* Run Script */ = {
 			isa = PBXShellScriptBuildPhase;
