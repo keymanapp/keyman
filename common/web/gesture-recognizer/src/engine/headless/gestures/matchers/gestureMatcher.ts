@@ -477,6 +477,13 @@ export class GestureMatcher<Type, StateToken = any> implements PredecessorMatch<
           here, as the decision is made due to a validation check against the initial item.
         */
         this.finalize(false, 'cancelled');
+
+        /*
+         * There's no need to process the gesture-model any further... and the
+         * invalid state may correspond to assumptions in the path-model that
+         * will be invalidated if we continue.
+         */
+        return;
       }
     }
 
@@ -507,6 +514,7 @@ export class GestureMatcher<Type, StateToken = any> implements PredecessorMatch<
         instantly fail and thus cancel.
       */
       this.finalize(false, whileInitializing ? 'cancelled' : 'path');
+      return;
     }
 
     // Standard path:  trigger either resolution or rejection when the contact model signals either.
