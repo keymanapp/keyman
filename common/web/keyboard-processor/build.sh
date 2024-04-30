@@ -68,7 +68,7 @@ function do_test() {
   fi
 
   c8 mocha --recursive $MOCHA_FLAGS ./tests/node/
-  karma start ./tests/dom/$KARMA_CONFIG
+  web-test-runner --config tests/dom/web-test-runner.config.mjs
 }
 
 builder_run_action configure  verify_npm_setup

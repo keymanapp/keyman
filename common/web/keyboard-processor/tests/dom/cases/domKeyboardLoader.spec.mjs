@@ -1,7 +1,7 @@
-import { assert } from '../../../../../../node_modules/chai/chai.js';
+import { assert } from 'chai';
 
-import { DOMKeyboardLoader } from '../../../build/lib/dom-keyboard-loader.mjs';
-import { extendString, KeyboardHarness, KeyboardInterface, MinimalKeymanGlobal, Mock } from '../../../build/lib/index.mjs';
+import { DOMKeyboardLoader } from '@keymanapp/keyboard-processor/dom-keyboard-loader';
+import { extendString, KeyboardHarness, KeyboardInterface, MinimalKeymanGlobal, Mock } from '@keymanapp/keyboard-processor';
 
 // Note:  rule processing tests will fail if string extensions are not established beforehand.
 extendString();
