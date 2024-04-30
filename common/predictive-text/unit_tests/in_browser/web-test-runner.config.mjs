@@ -36,7 +36,7 @@ export default {
     }
   ],
   reporters: [
-    summaryReporter(), /* local-dev mocha-style */
+    summaryReporter({}), /* local-dev mocha-style */
     teamcityReporter() /* custom-written, for CI-friendly reports */
   ],
   /*
