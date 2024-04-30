@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 18.0.25 alpha 2024-04-30
+
+* fix(linux): Improve detection of Gnome environment (#11292)
+
 ## 18.0.24 alpha 2024-04-29
 
 * fix(common): Retry curl downloads up to 5 times (#11314)
