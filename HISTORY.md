@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 17.0.316 beta 2024-04-30
+
+* fix(windows): check font count display none found (#11282)
+
 ## 17.0.315 beta 2024-04-26
 
 * fix(web): osk-view hidden by default on construction (#11258)
