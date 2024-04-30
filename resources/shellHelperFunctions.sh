@@ -201,5 +201,9 @@ verify_npm_setup() {
 
   pushd "$KEYMAN_ROOT" > /dev/null
   npm ci
+
+  # Configure Web browser-engine testing environments.  As is, this should only
+  # make changes when we update the dependency, even on our CI build agents.
+  playwright install
   popd > /dev/null
 }
