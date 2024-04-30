@@ -12,6 +12,27 @@ export default function teamcityReporter({ name="Web Test Runner JavaScript test
   /** @type {string} */
   let rootDir;
 
+  function tcReportEscaping(data) {
+    /** @type{string} */
+    let text;
+
+    if(typeof data == 'string') {
+      text = data;
+    } else if(data) {
+      text = data.toString();
+    } else {
+      text = '';
+    }
+
+    return text
+      .replace(/\|/g, '||')
+      .replace(/\[/g, '|[')
+      .replace(/]/g, '|]')
+      .replace(/\'/g, '|\'');
+  }
+
+  const e = tcReportEscaping;
+
   /**
    * @param {import('@web/test-runner').Logger} logger
    * @param {import('@web/test-runner').TestSuiteResult} suiteResult
@@ -23,30 +44,30 @@ export default function teamcityReporter({ name="Web Test Runner JavaScript test
     // Also need to check \n.
 
     if(suiteResult.name) {
-      logger.log(`##teamcity[testSuiteStarted name='${suiteResult.name}']`);
+      logger.log(`##teamcity[testSuiteStarted name='${e(suiteResult.name)}']`);
     }
     for(const test of suiteResult?.tests ?? []) {
       if(test.skipped) {
-        logger.log(`##teamcity[testIgnored name='${test.name}']`);
+        logger.log(`##teamcity[testIgnored name='${e(test.name)}']`);
       } else {
-        logger.log(`##teamcity[testStarted name='${test.name}' captureStandardOutput='true']`);
+        logger.log(`##teamcity[testStarted name='${e(test.name)}' captureStandardOutput='true']`);
         if(!test.passed) {
-          const message = test.error ? `message='${test.error.message}'` : '';
-          const details = test.error ? `\ndetails='${test.error.stack}\n`: '';
+          const message = test.error ? `message='${e(test.error.message)}'` : '';
+          const details = test.error ? `\ndetails='${e(test.error.stack)}\n`: '';
 
           if(test.error?.actual !== undefined && test.error?.expected !== undefined) {
-            logger.log(`##teamcity[testFailed type='comparisonFailure' name='${test.name}' ${message}] ${details} expected='${test.error?.expected}' actual='${test.error?.actual}']`);
+            logger.log(`##teamcity[testFailed type='comparisonFailure' name='${e(test.name)}' ${e(message)}] ${e(details)} expected='${e(test.error?.expected)}' actual='${e(test.error?.actual)}']`);
           }
-          logger.log(`##teamcity[testFailed name='${test.name}' ${message}] ${details}']`);
+          logger.log(`##teamcity[testFailed name='${e(test.name)}' ${e(message)}] ${e(details)}']`);
         }
-        logger.log(`##teamcity[testFinished name='${test.name}' duration='${test.duration}']`);
+        logger.log(`##teamcity[testFinished name='${e(test.name)}' duration='${e(test.duration)}']`);
       }
     }
     for(const suite of suiteResult?.suites ?? []) {
       generateSuiteReport(logger, suite, flowId);
     }
     if(suiteResult.name) {
-      logger.log(`##teamcity[testSuiteFinished name='${suiteResult.name}']`);
+      logger.log(`##teamcity[testSuiteFinished name='${e(suiteResult.name)}']`);
     }
   }
 
@@ -67,10 +88,10 @@ export default function teamcityReporter({ name="Web Test Runner JavaScript test
       }
 
       logger = config.logger;
-      logger.log(`##teamcity[blockOpened name='${name}']`);
+      logger.log(`##teamcity[blockOpened name='${e(name)}']`);
     },
     stop({testCoverage}) {
-      logger.log(`##teamcity[blockClosed name='${name}']`);
+      logger.log(`##teamcity[blockClosed name='${e(name)}']`);
 
       // To consider:  could link in coverage reports via
       // https://www.jetbrains.com/help/teamcity/service-messages.html#Reporting+Build+Statistics
@@ -95,19 +116,19 @@ export default function teamcityReporter({ name="Web Test Runner JavaScript test
 
       const repoPath = path.relative(rootDir, testFile);
 
-      logger.log(`##teamcity[testSuiteStarted name='${repoPath}']`);
+      logger.log(`##teamcity[testSuiteStarted name='${e(repoPath)}']`);
       for(let session of sessionsForTestFile) {
         const sessionName = `${session.group.name} - ${session.browser.name}`;
-        logger.log(`##teamcity[testSuiteStarted name='${sessionName}']`);
+        logger.log(`##teamcity[testSuiteStarted name='${e(sessionName)}']`);
 
         const results = session.testResults;
         if(results) {
           generateSuiteReport(logger, results, browserFlowIdMap.get(session.browser));
         }
 
-        logger.log(`##teamcity[testSuiteFinished name='${sessionName}']`);
+        logger.log(`##teamcity[testSuiteFinished name='${e(sessionName)}']`);
       }
-      logger.log(`##teamcity[testSuiteFinished name='file ${repoPath}']`);
+      logger.log(`##teamcity[testSuiteFinished name='file ${e(repoPath)}']`);
     }
   };
 
