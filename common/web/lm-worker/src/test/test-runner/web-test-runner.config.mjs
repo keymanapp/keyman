@@ -16,5 +16,5 @@ export default {
   ],
   // open: true,
   // manual: true,
-  rootDir: '../../../../../../' // b/c that's where node_modules is,
+  rootDir: KEYMAN_ROOT // b/c that's where node_modules is,
 }
