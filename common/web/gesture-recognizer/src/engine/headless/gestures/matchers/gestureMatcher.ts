@@ -524,6 +524,13 @@ export class GestureMatcher<Type, StateToken = any> implements PredecessorMatch<
   }
 
   update() {
-    this.pathMatchers.forEach((matcher) => matcher.update());
+    this.pathMatchers.forEach((matcher) => {
+      try {
+        matcher.update();
+      } catch(err) {
+        console.error(err);
+        this.finalize(false, 'cancelled');
+      }
+    });
   }
 }
