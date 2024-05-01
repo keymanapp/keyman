@@ -409,10 +409,30 @@ export class MatcherSelector<Type, StateToken = any> extends EventEmitter<EventM
     }
 
     /**
-     * In either case, time to spin up gesture models limited to new sources, that don't combine with
-     * already-active ones.  This could be the first stage in a sequence or a followup to a prior stage.
+     * In either case, time to spin up gesture models limited to new sources,
+     * that don't combine with already-active ones.  This could be the first
+     * stage in a sequence or a followup to a prior stage.
      */
-    let newMatchers = gestureModelSet.map((model) => new GestureMatcher(model, unmatchedSource || priorMatcher));
+    let newMatchers = gestureModelSet.map((model) => {
+      try {
+        /*
+          Spinning up a new gesture model means running code for that model and
+          path, which are defined outside of the engine.  We should not allow
+          errors from engine-external code to prevent us from continuing with
+          unaffected models.
+
+          It's also important to keep the overall flow going; this code is run
+          during touch-start spinup.  An abrupt stop due to an unhandled error
+          here can lock up the AsyncDispatchQueue for touch events, locking up
+          the engine!
+         */
+        return new GestureMatcher(model, unmatchedSource || priorMatcher)
+      } catch (err) {
+        console.error(err);
+        return null;
+      }
+      // Filter out any models that failed to 'spin-up' due to exceptions.
+    }).filter((entry) => !!entry);
 
     // If any newly-activating models are disqualified due to initial conditions, don't add them.
     newMatchers = newMatchers.filter((matcher) => !matcher.result || matcher.result.matched !== false);
