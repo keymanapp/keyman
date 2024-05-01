@@ -58,3 +58,4 @@ TDS2DBG="$KEYMAN_ROOT/common/windows/bin/tools/tds2dbg"
 #   -NSVcl;Vcl.Imaging;Vcl.Touch;Vcl.Samples;Vcl.Shell;System;Xml;Web;Soap;Winapi;System.Win \
 #   "-NU./obj/Win32/$TARGET_PATH" "-E./bin/Win32/$TARGET_PATH")
 
+DEVTOOLS="$COMMON_ROOT/tools/devtools/$WIN32_TARGET_PATH/devtools.exe"

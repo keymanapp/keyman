@@ -3,6 +3,7 @@
 
 source "$KEYMAN_ROOT/resources/build/win/configure_environment.inc.sh"
 source "$KEYMAN_ROOT/resources/build/win/delphi_flags.inc.sh"
+source "$KEYMAN_ROOT/resources/build/win/vs_flags.inc.sh"
 
 run_in_vs_env() {
   (
@@ -36,6 +37,10 @@ tds2dbg() {
 
 delphi_msbuild() {
   run_in_delphi_env msbuild.exe "$@" "$DELPHI_MSBUILD_FLAG_DEBUG"
+}
+
+vs_msbuild() {
+  run_in_vs_env msbuild.exe "$@" "$VS_MSBUILD_FLAG_DEBUG"
 }
 
 build_version.res() {

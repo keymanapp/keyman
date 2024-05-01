@@ -132,6 +132,13 @@ function test_server() {
   mocha
 }
 
+function publish_server() {
+  "$SIGNCODE" //d "Keyman Developer" "$DEVELOPER_PROGRAM/server/build/src/win32/console/node-hide-console-window.node"
+  "$SIGNCODE" //d "Keyman Developer" "$DEVELOPER_PROGRAM/server/build/src/win32/console/node-hide-console-window.x64.node"
+  "$SIGNCODE" //d "Keyman Developer" "$DEVELOPER_PROGRAM/server/build/src/win32/trayicon/addon.node"
+  "$SIGNCODE" //d "Keyman Developer" "$DEVELOPER_PROGRAM/server/build/src/win32/trayicon/addon.x64.node"
+}
+
 builder_run_action clean:server        clean_server
 builder_run_action configure:server    configure_server
 builder_run_action build:server        build_server
@@ -139,6 +146,7 @@ builder_run_action build:addins        build_addins
 builder_run_action test:server         test_server
 # builder_run_action test:addins       # no op
 builder_run_action installer:server    installer_server
+builder_run_action publish:server      publish_server
 
 # TODO: consider 'watch'
 # function watch_server() {
