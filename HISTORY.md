@@ -1,5 +1,11 @@
 # Keyman Version History
 
+## 17.0.317 beta 2024-05-01
+
+*  (#11322)
+*  (#11321)
+* fix(linux): Fix icon for .kmp files (#11295)
+
 ## 17.0.316 beta 2024-04-30
 
 * fix(windows): check font count display none found (#11282)
