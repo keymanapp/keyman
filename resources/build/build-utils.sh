@@ -185,7 +185,9 @@ function findShouldSentryRelease() {
     esac
 }
 
-findKeymanRoot
+if [[ -z ${KEYMAN_ROOT+x} ]]; then
+  findKeymanRoot
+fi
 
 # Source builder_script
 . "$KEYMAN_ROOT/resources/builder.inc.sh"
