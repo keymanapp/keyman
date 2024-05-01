@@ -8,8 +8,6 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 . "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
 . "$KEYMAN_ROOT/resources/build/build-utils-ci.inc.sh"
 
-cd "$THIS_SCRIPT_PATH"
-
 builder_describe "Build Keyman Developer Compiler Analysis Tools" \
   "@/common/web/types" \
   "@/developer/src/kmc-kmn" \

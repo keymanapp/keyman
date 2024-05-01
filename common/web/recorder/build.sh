@@ -4,8 +4,6 @@
 #   - the Recorder module (for engine tests)
 #   - the DOM module (for touch-alias and element-interface tests)
 
-set -eu
-
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"

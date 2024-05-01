@@ -40,6 +40,9 @@ function _builder_init() {
   else
     builder_use_color false
   fi
+
+  # All build scripts start in their own folder
+  cd "$THIS_SCRIPT_PATH"
 }
 
 function _builder_findRepoRoot() {

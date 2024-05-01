@@ -12,9 +12,6 @@ SUBPROJECT_NAME=tools/testing/recorder
 . "$KEYMAN_ROOT/web/common.inc.sh"
 . "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
 
-# This script runs from its own folder
-cd "$THIS_SCRIPT_PATH"
-
 ################################ Main script ################################
 
 builder_describe "Builds the Keyman Engine for Web's test-sequence recording tool" \

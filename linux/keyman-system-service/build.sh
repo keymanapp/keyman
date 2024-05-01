@@ -23,8 +23,6 @@ builder_describe \
 
 builder_parse "$@"
 
-cd "$THIS_SCRIPT_PATH/"
-
 if builder_is_debug_build; then
   MESON_TARGET=debug
   export CPPFLAGS=-DG_MESSAGES_DEBUG

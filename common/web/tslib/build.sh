@@ -8,8 +8,6 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 
 . "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
 
-cd "$THIS_SCRIPT_PATH"
-
 ################################ Main script ################################
 
 builder_describe \

@@ -8,9 +8,6 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 
 . "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
 
-# This script runs from its own folder
-cd "$THIS_SCRIPT_PATH"
-
 # Imports common Web build-script definitions & functions
 . "$KEYMAN_ROOT/web/common.inc.sh"
 

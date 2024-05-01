@@ -11,9 +11,6 @@ SUBPROJECT_NAME=engine/attachment
 . "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
 . "$KEYMAN_ROOT/web/common.inc.sh"
 
-# This script runs from its own folder
-cd "$THIS_SCRIPT_PATH"
-
 # ################################ Main script ################################
 
 builder_describe "Builds the Keyman Engine for Web (KMW) attachment engine." \

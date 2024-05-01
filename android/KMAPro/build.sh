@@ -1,9 +1,5 @@
 #!/usr/bin/env bash
 # Build Keyman for Android app (KMAPro)
-
-# set -x
-set -eu
-
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
@@ -13,9 +9,6 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 . "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
 . "$KEYMAN_ROOT/resources/build/build-help.inc.sh"
 . "$KEYMAN_ROOT/resources/build/build-download-resources.sh"
-
-# This script runs from its own folder
-cd "$THIS_SCRIPT_PATH"
 
 # ################################ Main script ################################
 

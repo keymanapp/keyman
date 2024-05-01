@@ -2,10 +2,6 @@
 #
 # Compiles and tests the common web modules
 #
-
-# Exit on command failure and when using unset variables:
-set -eu
-
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"

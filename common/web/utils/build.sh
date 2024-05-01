@@ -1,9 +1,7 @@
 #!/usr/bin/env bash
 #
 # Compiles common TS-based utility functions for use among Keyman's codebase
-
-set -eu
-
+#
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
@@ -11,8 +9,6 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 . "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
-
-cd "$THIS_SCRIPT_PATH"
 
 BUNDLE_CMD="node $KEYMAN_ROOT/common/web/es-bundling/build/common-bundle.mjs"
 

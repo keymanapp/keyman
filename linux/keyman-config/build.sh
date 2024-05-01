@@ -22,8 +22,6 @@ builder_describe \
 
 builder_parse "$@"
 
-cd "$THIS_SCRIPT_PATH"
-
 builder_describe_outputs \
   build "/linux/keyman-config/keyman_config/standards/lang_tags_map.py"
 

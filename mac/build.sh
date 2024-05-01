@@ -12,9 +12,6 @@ KEYMAN_MAC_BASE_PATH="$KEYMAN_ROOT/mac"
 . "$KEYMAN_ROOT/resources/build/build-help.inc.sh"
 . "$KEYMAN_ROOT/mac/mac-utils.inc.sh"
 
-# This script runs from its own folder
-cd "$(dirname "$THIS_SCRIPT")"
-
 
 # Please note that this build script (understandably) assumes that it is running on Mac OS X.
 verify_on_mac

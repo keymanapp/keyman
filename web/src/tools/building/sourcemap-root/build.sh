@@ -10,9 +10,6 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 
 . "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
 
-# This script runs from its own folder
-cd "$THIS_SCRIPT_PATH"
-
 ################################ Main script ################################
 
 builder_describe "Builds the sourcemap-sanitizing script used for Keyman Engine for Web builds" \

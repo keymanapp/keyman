@@ -5,8 +5,6 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 . "${THIS_SCRIPT%/*}/../../../resources/build/build-utils.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
-cd "$THIS_SCRIPT_PATH"
-
 targets=()
 # Build list of available targets from subfolders, if none specified
 for d in */; do

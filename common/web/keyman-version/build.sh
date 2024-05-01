@@ -8,9 +8,6 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 . "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
 . "$KEYMAN_ROOT/resources/build/build-utils-ci.inc.sh"
 
-# This script runs from its own folder
-cd "$THIS_SCRIPT_PATH"
-
 ################################ Main script ################################
 
 builder_describe "Build the include script for current Keyman version" \

@@ -9,9 +9,6 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 # Include our resource functions; they're pretty useful!
 . "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
 
-# This script runs from its own folder
-cd "$THIS_SCRIPT_PATH"
-
 # Please note that this build script (understandably) assumes that it is running on Mac OS X.
 verify_on_mac
 

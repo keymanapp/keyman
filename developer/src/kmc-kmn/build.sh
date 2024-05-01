@@ -2,17 +2,11 @@
 #
 # Compiles the kmc-kmn keyboard compiler.
 #
-
-# Exit on command failure and when using unset variables:
-set -eu
-
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 . "${THIS_SCRIPT%/*}/../../../resources/build/build-utils.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
-
-cd "$THIS_SCRIPT_PATH"
 
 . "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
 

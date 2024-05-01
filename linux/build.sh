@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
 
-set -eu
-
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
@@ -9,8 +7,6 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 ################################ Main script ################################
-
-cd "$THIS_SCRIPT_PATH"
 
 builder_describe \
   "Build Keyman for Linux." \

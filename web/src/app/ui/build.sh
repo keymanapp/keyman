@@ -10,9 +10,6 @@ SUBPROJECT_NAME=app/ui
 . "$KEYMAN_ROOT/web/common.inc.sh"
 . "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
 
-# This script runs from its own folder
-cd "$THIS_SCRIPT_PATH"
-
 # ################################ Main script ################################
 
 builder_describe "Builds the Keyman Engine for Web's desktop form-factor keyboard selection modules." \

@@ -10,9 +10,6 @@ SUBPROJECT_NAME=engine/paths
 . "$KEYMAN_ROOT/web/common.inc.sh"
 . "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
 
-# This script runs from its own folder
-cd "$THIS_SCRIPT_PATH"
-
 # ################################ Main script ################################
 
 builder_describe "Builds configuration subclasses used by the Keyman Engine for Web (KMW)." \

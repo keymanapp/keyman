@@ -2,8 +2,6 @@
 #
 # Compile KeymanWeb's dev & test tool modules
 #
-set -eu
-
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
@@ -11,9 +9,6 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 . "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
-
-# This script runs from its own folder
-cd "$THIS_SCRIPT_PATH"
 
 ################################ Main script ################################
 

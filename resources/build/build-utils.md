@@ -110,9 +110,8 @@ available, so other include scripts should be sourced accordingly, for example:
 
 ## Setting path
 
-Many scripts will be easier to code if they run from a consistent path. Because
-build scripts should be invokable from any directory, you may wish to add the
-following line here:
+All build scripts start in their own folder, but can be invokable from any
+directory, as builder.inc.sh executes the following line when it is `source`d:
 
 ```bash
 cd "$THIS_SCRIPT_PATH"

@@ -3,12 +3,6 @@
 # Compiles the Language Modeling Layer for common use in predictive text and autocorrective applications.
 # Designed for optimal compatibility with the Keyman Suite.
 #
-
-# Exit on command failure and when using unset variables:
-set -eu
-
-# Include some helper functions from resources
-
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
@@ -16,9 +10,6 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 . "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
-
-# This script runs from its own folder
-cd "$THIS_SCRIPT_PATH"
 
 WORKER_OUTPUT=build/obj
 WORKER_OUTPUT_FILENAME=build/lib/worker-main.js
