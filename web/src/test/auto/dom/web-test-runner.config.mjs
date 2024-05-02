@@ -46,6 +46,11 @@ export default {
       name: 'engine/element-wrappers',
       // Relative, from the containing package.json
       files: ['src/test/auto/dom/cases/element-wrappers/**/*.spec.mjs']
+    },
+    {
+      name: 'engine/package-cache',
+      // Relative, from the containing package.json
+      files: ['src/test/auto/dom/cases/packages/**/*.spec.mjs']
     }
   ],
   middleware: [

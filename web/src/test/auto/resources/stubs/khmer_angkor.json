@@ -1,0 +1,10 @@
+{
+  "id": "khmer_angkor",
+  "name":"Khmer Angkor",
+  "languages":{
+    "id":"km",
+    "name": "Khmer",
+    "region": "Asia"
+  },
+  "filename":"common/test/resources/keyboards/khmer_angkor.js"
+}

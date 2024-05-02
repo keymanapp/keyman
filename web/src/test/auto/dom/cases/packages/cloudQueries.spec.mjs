@@ -1,9 +1,9 @@
-import { assert } from '/node_modules/chai/chai.js';
-import sinon from '/node_modules/sinon/pkg/sinon-esm.js';
+import { assert } from 'chai';
+import sinon from 'sinon';
 
-import { CloudQueryEngine } from '/@keymanapp/keyman/build/engine/package-cache/lib/index.mjs';
-import { PathConfiguration } from '/@keymanapp/keyman/build/engine/paths/lib/index.mjs';
-import DOMCloudRequester from '/@keymanapp/keyman/build/engine/package-cache/lib/dom-cloud-requester.mjs';
+import { CloudQueryEngine } from 'keyman/engine/package-cache';
+import { PathConfiguration } from 'keyman/engine/paths';
+import DOMCloudRequester from 'keyman/engine/package-cache/dom-requester';
 
 const pathConfig = new PathConfiguration({
   root: '',
@@ -114,7 +114,7 @@ describe("Cloud-query interface", () => {
     }
 
     it('sil_euro_latin@no,sv', async () => {
-      const querier = mockQuery(`base/web/src/test/auto/resources/query-mock-results/sil_euro_latin@no_sv.js.fixture`);
+      const querier = mockQuery(`resources/query-mock-results/sil_euro_latin@no_sv.js.fixture`);
       const promise = querier.fetchCloudStubs(['sil_euro_latin@no','sil_euro_latin@sv']);
 
       const stubs = await promise;
@@ -131,7 +131,7 @@ describe("Cloud-query interface", () => {
     });
 
     it('sil_cameroon_azerty', async () => {
-      const querier = mockQuery(`base/web/src/test/auto/resources/query-mock-results/sil_cameroon_azerty.js.fixture`);
+      const querier = mockQuery('resources/query-mock-results/sil_cameroon_azerty.js.fixture');
       const promise = querier.fetchCloudStubs(['sil_cameroon_azerty']);
 
       const stubs = await promise;
@@ -147,7 +147,7 @@ describe("Cloud-query interface", () => {
     });
 
     it('@dz', async () => {
-      const querier = mockQuery(`base/web/src/test/auto/resources/query-mock-results/@dz.js.fixture`);
+      const querier = mockQuery(`resources/query-mock-results/@dz.js.fixture`);
       const promise = querier.fetchCloudStubs(['@dz']);
 
       const stubs = await promise;

@@ -1,7 +1,7 @@
-import { assert } from '/node_modules/chai/chai.js';
-import sinon from '/node_modules/sinon/pkg/sinon-esm.js';
+import { assert } from 'chai';
+import sinon from 'sinon';
 
-import DOMCloudRequester from '/@keymanapp/keyman/build/engine/package-cache/lib/dom-cloud-requester.mjs';
+import DOMCloudRequester from 'keyman/engine/package-cache/dom-requester';
 
 describe("Mocked cloud query results ('canary' testing)", () => {
   function performMockedRequest(mockedResultsPath) {
@@ -33,7 +33,7 @@ describe("Mocked cloud query results ('canary' testing)", () => {
   }
 
   it('sil_euro_latin@no,sv', async () => {
-    const query = performMockedRequest('base/web/src/test/auto/resources/query-mock-results/sil_euro_latin@no_sv.js.fixture');
+    const query = performMockedRequest('resources/query-mock-results/sil_euro_latin@no_sv.js.fixture');
     await query.promise;
 
     assert.isTrue(query.mockedRegister.called);
@@ -53,7 +53,7 @@ describe("Mocked cloud query results ('canary' testing)", () => {
   });
 
   it('sil_cameroon_azerty', async () => {
-    const query = performMockedRequest('base/web/src/test/auto/resources/query-mock-results/sil_cameroon_azerty.js.fixture');
+    const query = performMockedRequest('resources/query-mock-results/sil_cameroon_azerty.js.fixture');
     await query.promise;
 
     assert.isTrue(query.mockedRegister.called);
@@ -70,7 +70,7 @@ describe("Mocked cloud query results ('canary' testing)", () => {
   });
 
   it('@dz', async () => {
-    const query = performMockedRequest('base/web/src/test/auto/resources/query-mock-results/@dz.js.fixture');
+    const query = performMockedRequest('resources/query-mock-results/@dz.js.fixture');
     await query.promise;
 
     assert.isTrue(query.mockedRegister.called);
