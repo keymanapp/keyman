@@ -1,4 +1,4 @@
-import EventEmitter from 'eventemitter3';
+import { EventEmitter } from 'eventemitter3';
 
 import OSKViewComponent from './oskViewComponent.interface.js';
 import { ParsedLengthStyle } from '../lengthStyle.js';

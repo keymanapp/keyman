@@ -1,4 +1,4 @@
-import EventEmitter from "eventemitter3";
+import { EventEmitter } from "eventemitter3";
 import { InputSample } from "./inputSample.js";
 import { CumulativePathStats } from "./cumulativePathStats.js";
 import { Mutable } from "../mutable.js";

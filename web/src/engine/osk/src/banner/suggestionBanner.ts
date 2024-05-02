@@ -15,7 +15,7 @@ import { BANNER_GESTURE_SET } from './bannerGestureSet.js';
 
 import { DeviceSpec, Keyboard, KeyboardProperties } from '@keymanapp/keyboard-processor';
 import { Banner } from './banner.js';
-import EventEmitter from 'eventemitter3';
+import { EventEmitter } from 'eventemitter3';
 import { ParsedLengthStyle } from '../lengthStyle.js';
 import { getFontSizeStyle } from '../fontSizeUtils.js';
 import { getTextMetrics } from '../keyboard-layout/getTextMetrics.js';
