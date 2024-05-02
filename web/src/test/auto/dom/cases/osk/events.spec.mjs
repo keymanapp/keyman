@@ -1,12 +1,12 @@
-import * as KeymanOSK from '/@keymanapp/keyman/build/engine/osk/lib/index.mjs';
-import Device from '/@keymanapp/keyman/build/engine/device-detect/lib/index.mjs';
+import * as KeymanOSK from 'keyman/engine/osk';
+import Device from 'keyman/engine/device-detect';
 
 import { loadKeyboardsFromStubs } from '../../kbdLoader.mjs';
-import { timedPromise } from '/@keymanapp/web-utils/build/lib/index.mjs';
+import { timedPromise } from '@keymanapp/web-utils';
 
-import sinon from '/node_modules/sinon/pkg/sinon-esm.js';
+import sinon from 'sinon';
 
-import { assert } from '/node_modules/chai/chai.js';
+import { assert } from 'chai';
 
 const device = new Device();
 device.detect();
@@ -16,27 +16,31 @@ const TestResources = {
     isEmbedded: false,
     pathConfig: {
       fonts: '',
-      resources: '/@keymanapp/keyman/src/resources'
+      resources: '/web/build/publish/debug'
     },
     hostDevice: device.coreSpec,
     allowHideAnimations: false // shortens timings.
   }
 }
 
+const host = document.createElement('div');
+document.body.appendChild(host);
+
 describe('OSK events', function () {
-  this.timeout(__karma__.config.args.find((arg) => arg.type == "timeouts").standard);
+  this.timeout(5000);
 
   before(async () => {
-    const stubs = [__json__['/keyboards/khmer_angkor']];
-    TestResources.Keyboards = await loadKeyboardsFromStubs(stubs, '/');
+    const fixture = await fetch('resources/stubs/khmer_angkor.json');
+    const stubJSON = await fixture.json();
+    TestResources.Keyboards = await loadKeyboardsFromStubs([stubJSON], '/');
   });
 
   beforeEach(() => {
-    fixture.set('<div id="osk-container" style="width: fit-content"></div>');
+    host.innerHTML = '<div id="osk-container" style="width: fit-content"></div>';
   });
 
   afterEach(() => {
-    fixture.cleanup();
+    host.innerHTML = '';
   });
 
   it('InlinedOSK - onHide / onShow', async () => {

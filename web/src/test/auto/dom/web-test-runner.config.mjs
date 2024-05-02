@@ -48,6 +48,11 @@ export default {
       files: ['src/test/auto/dom/cases/element-wrappers/**/*.spec.mjs']
     },
     {
+      name: 'engine/osk',
+      // Relative, from the containing package.json
+      files: ['src/test/auto/dom/cases/osk/**/*.spec.mjs']
+    },
+    {
       name: 'engine/package-cache',
       // Relative, from the containing package.json
       files: ['src/test/auto/dom/cases/packages/**/*.spec.mjs']
