@@ -59,7 +59,7 @@ test-browser ( ) {
     KARMA_CONFIG="CI.conf.cjs"
   fi
 
-  karma start src/test/auto/browser/$KARMA_CONFIG "$KARMA_FLAGS"
+  web-test-runner --config src/test/auto/browser/web-test-runner.config.mjs
 }
 
 if builder_start_action test:headless; then

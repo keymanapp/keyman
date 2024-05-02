@@ -1,32 +1,36 @@
-import { assert, expect } from '../../../../../../../../node_modules/chai/chai.js';
+import { assert, expect } from 'chai';
+import sinon from 'sinon';
 
 import {
   HostFixtureLayoutController,
   InputSequenceSimulator
-} from '../../../../../build/tools/lib/index.mjs';
+} from '#tools';
 
 function isOnAndroid() {
   const agent=navigator.userAgent;
   return agent.indexOf('Android' >= 0);
 }
 
-describe("Layer one - DOM -> InputSequence", function() {
-  this.timeout(testconfig.timeouts.standard);
+let loc = document.location;
+// config.testFile generally starts with a '/', with the path resembling the actual full local
+// filesystem for the drive.
+const domain = `${loc.protocol}/${loc.host}`
 
-  before(function() {
-    fixture.setBase('');
-  });
+async function fetchRecording(jsonFilename) {
+  const jsonResponse = await fetch(new URL(`${domain}/resources/json/${jsonFilename}.json`));
+  return await jsonResponse.json();
+}
+
+describe("Layer one - DOM -> InputSequence", function() {
+  this.timeout(20000);
 
   beforeEach(function(done) {
-    fixture.load('host-fixture.html');
     this.controller = new HostFixtureLayoutController();
     this.controller.connect().then(() => done());
   });
 
   afterEach(function() {
     this.controller.destroy();
-    fixture.cleanup();
-    fixture.cleanup();
   });
 
   describe('recorded input sequences', function() {
@@ -140,9 +144,8 @@ describe("Layer one - DOM -> InputSequence", function() {
     ];
 
     for(let recordingID of testRecordings) {
-      it(`${recordingID}.json`, function() {
-        this.timeout(2 * testconfig.timeouts.standard);
-        let testObj = __json__['receiver/' + recordingID];
+      it(`${recordingID}.json`, async function() {
+        let testObj = await fetchRecording('receiver/' + recordingID);
 
         // 'describe' has a notably different `this` reference than `it`, `before`, etc,
         // hence the `.call` construction.

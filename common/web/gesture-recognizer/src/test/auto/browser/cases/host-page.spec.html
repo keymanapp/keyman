@@ -1,4 +1,6 @@
 <html>
+  <!-- Note:  this is the host page under src/tools/host-fixture, just with manual
+  imports for the .def.js test suites. -->
   <head>
     <meta http-equiv="content-type" content="text/html; charset=utf-8" />
 
@@ -8,11 +10,19 @@
     <!-- Allow KeymanWeb to be saved to the iPhone home screen -->
     <meta name="apple-mobile-web-app-capable" content="yes" />
 
-    <title>Gesture Recognizer - Fixture Host Page</title>
+    <title>Gesture Recognizer Testing Page</title>
 
     <link rel="stylesheet" href="gestureHost.css">
 
-    <!-- INSERT_SPEC_IMPORTS -->
+    <script type="module">
+      import { runTests } from '@web/test-runner-mocha';
+
+      runTests(async() => {
+        await import('./canary.def.mjs');
+        await import('./ignoredInputs.def.mjs');
+        await import('./recordedCoordSequences.def.mjs');
+      });
+    </script>
   </head>
   <!--
     To facilitate fixture extraction & insertion, the ONLY contents of the document's body

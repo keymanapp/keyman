@@ -1,28 +1,23 @@
-import { assert } from '../../../../../../../../node_modules/chai/chai.js';
+import { assert } from 'chai';
+import sinon from 'sinon';
 
 import {
   FixtureLayoutConfiguration,
   HostFixtureLayoutController,
   InputSequenceSimulator,
   SequenceRecorder
-} from '../../../../../build/tools/lib/index.mjs';
+} from '#tools';
 
 describe("Layer one - DOM -> InputSequence", function() {
-  this.timeout(testconfig.timeouts.standard);
-
-  before(function() {
-    fixture.setBase('');
-  });
+  this.timeout(5000);
 
   beforeEach(function(done) {
-    fixture.load('host-fixture.html');
     this.controller = new HostFixtureLayoutController();
     this.controller.connect().then(() => done());
   });
 
   afterEach(function() {
     this.controller.destroy();
-    fixture.cleanup();
   });
 
   describe('other tests', function() {
