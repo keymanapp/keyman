@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 17.0.318 beta 2024-05-02
+
+* fix(web): longpress shortcut activation should only consider northward part (#11306)
+* chore(ios,mac): support build on Apple Silicon using Xcode 15.3 (#11302)
+
 ## 17.0.317 beta 2024-05-01
 
 *  (#11322)
