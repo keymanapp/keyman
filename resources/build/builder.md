@@ -110,13 +110,8 @@ available, so other include scripts should be sourced accordingly, for example:
 
 ## Setting path
 
-Many scripts will be easier to code if they run from a consistent path. Because
-build scripts should be invokable from any directory, you may wish to add the
-following line here:
-
-```bash
-cd "$THIS_SCRIPT_PATH"
-```
+Builder will `cd` to the folder of the builder script, so there is no need
+to `cd` at the start of your script.
 
 ## Standard environment
 
