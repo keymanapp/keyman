@@ -1,19 +1,18 @@
-import { ContextManager } from '/@keymanapp/keyman/build/app/browser/lib/index.mjs';
+import { ContextManager } from 'keyman/app/browser';
 import {
-  eventOutputTarget,
   outputTargetForElement
-} from '/@keymanapp/keyman/build/engine/attachment/lib/index.mjs';
-import { LegacyEventEmitter } from '/@keymanapp/keyman/build/engine/events/lib/index.mjs';
-import { StubAndKeyboardCache, toPrefixedKeyboardId as prefixed } from '/@keymanapp/keyman/build/engine/package-cache/lib/index.mjs';
+} from 'keyman/engine/attachment';
+import { LegacyEventEmitter } from 'keyman/engine/events';
+import { StubAndKeyboardCache, toPrefixedKeyboardId as prefixed } from 'keyman/engine/package-cache';
 
-import { KeyboardHarness, MinimalKeymanGlobal } from '/@keymanapp/keyboard-processor/build/lib/index.mjs';
-import { DOMKeyboardLoader } from '/@keymanapp/keyboard-processor/build/lib/dom-keyboard-loader.mjs';
+import { KeyboardHarness, MinimalKeymanGlobal } from '@keymanapp/keyboard-processor';
+import { DOMKeyboardLoader } from '@keymanapp/keyboard-processor/dom-keyboard-loader';
 import { loadKeyboardsFromStubs } from '../../kbdLoader.mjs';
 
-import { timedPromise } from '/@keymanapp/web-utils/build/lib/index.mjs';
-import sinon from '/node_modules/sinon/pkg/sinon-esm.js';
+import { timedPromise } from '@keymanapp/web-utils';
+import sinon from 'sinon';
 
-import { assert } from '/node_modules/chai/chai.js';
+import { assert } from 'chai';
 
 const TEST_PHYSICAL_DEVICE = {
   formFactor: 'desktop',
@@ -21,6 +20,9 @@ const TEST_PHYSICAL_DEVICE = {
   browser: 'native',
   touchable: false
 };
+
+const host = document.createElement('div');
+document.body.appendChild(host);
 
 function assertPromiseResolved(promise, timeout) {
   // Ensure timeout is initialized to a numeric value.
@@ -123,7 +125,7 @@ async function withDelayedFetching(keyboardLoader, time, closure) {
 }
 
 describe('app/browser:  ContextManager', function () {
-  this.timeout(__karma__.config.args.find((arg) => arg.type == "timeouts").standard);
+  this.timeout(5000);
 
   /**
    * Holds a test-specific instance of ContextManager.
@@ -144,8 +146,8 @@ describe('app/browser:  ContextManager', function () {
 
   beforeEach(async () => {
     // Loads a common fixture and ensures all relevant elements are attached.
-    fixture.setBase('fixtures');
-    fixture.load("a-bit-of-everything.html");
+    const fixture = await fetch('/resources/fixtures/a-bit-of-everything.html');
+    host.innerHTML = await fixture.text();
 
     // Note:  iframes require additional time to resolve.
     await promiseForIframeLoad(document.getElementById('iframe'));
@@ -211,7 +213,7 @@ describe('app/browser:  ContextManager', function () {
     contextManager = null;
     keyboardCache = null;
 
-    fixture.cleanup();
+    host.innerHTML = '';
   });
 
   // ---------------------------- Start of suite 1 -------------------------------
@@ -487,17 +489,28 @@ describe('app/browser:  ContextManager', function () {
      */
     let KEYBOARDS;
 
+    // const fixture = await fetch('/resources/fixtures/a-bit-of-everything.html');
+    // host.innerHTML = await fixture.text();
+
     before(async () => {
       // Defined here just in case they move later; it'll trigger a failed test on 'before', rather
       // than crashing while setting up the tests.
       apiStubs = [
-        __json__['/keyboards/khmer_angkor'],
-        __json__['/keyboards/lao_2008_basic'],
-        __json__['/keyboards/test_chirality'],
-        __json__['/keyboards/test_deadkeys']
+        '/keyboards/khmer_angkor',
+        '/keyboards/lao_2008_basic',
+        '/keyboards/test_chirality',
+        '/keyboards/test_deadkeys'
       ];
 
-      KEYBOARDS = await loadKeyboardsFromStubs(apiStubs, '/');
+      const kbdStubPromises = apiStubs.map((file) => {
+        return fetch(`common/test/resources/json/${file}.json`).then((response) => {
+          return response.json();
+        });
+      });
+
+      const kbdStubs = await Promise.all(kbdStubPromises);
+
+      KEYBOARDS = await loadKeyboardsFromStubs(kbdStubs, 'common/test/');
     });
 
     beforeEach(() => {

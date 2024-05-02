@@ -1,12 +1,12 @@
 import {
   DOMKeyboardLoader
-} from '/@keymanapp/keyboard-processor/build/lib/dom-keyboard-loader.mjs';
+} from '@keymanapp/keyboard-processor/dom-keyboard-loader';
 
 import {
   KeyboardInterface,
   KeyboardProperties,
   MinimalKeymanGlobal
-} from '/@keymanapp/keyboard-processor/build/lib/index.mjs';
+} from '@keymanapp/keyboard-processor';
 
 const loader = new DOMKeyboardLoader(new KeyboardInterface(window, MinimalKeymanGlobal));
 

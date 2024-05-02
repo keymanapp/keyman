@@ -28,6 +28,11 @@ export default {
   // ],
   groups: [
     {
+      name: 'app/browser',
+      // Relative, from the containing package.json
+      files: ['src/test/auto/dom/cases/browser/**/*.spec.js']
+    },
+    {
       name: 'engine/attachment',
       // Relative, from the containing package.json
       files: ['src/test/auto/dom/cases/attachment/**/*.spec.html']
