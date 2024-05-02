@@ -1298,11 +1298,20 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
         Note:  longpress.flickDist needs to be no greater than flick.startDist.
         Otherwise, the longpress up-flick shortcut will not work on keys that
         support flick gestures.  (Such as sil_euro_latin 3.0+)
+
+        Since it's also based on the purely northward component, it's best to
+        have it be slightly lower.  80% of flick.startDist gives a range of
+        about 37 degrees to each side before a flick-start would win, while
+        70.7% gives 45 degrees.
+
+        (The range _will_ be notably tighter on keys with both longpresses and
+        flicks as a result.)
       */
-      this.gestureParams.longpress.flickDist = 0.25 * this.currentLayer.rowHeight;
-      this.gestureParams.flick.startDist     = 0.25 * this.currentLayer.rowHeight;
-      this.gestureParams.flick.dirLockDist   = 0.35 * this.currentLayer.rowHeight;
-      this.gestureParams.flick.triggerDist   = 0.75 * this.currentLayer.rowHeight;
+      this.gestureParams.longpress.flickDistStart = 0.24 * this.currentLayer.rowHeight;
+      this.gestureParams.flick.startDist          = 0.30 * this.currentLayer.rowHeight;
+      this.gestureParams.flick.dirLockDist        = 0.35 * this.currentLayer.rowHeight;
+      this.gestureParams.flick.triggerDist        = 0.75 * this.currentLayer.rowHeight;
+      this.gestureParams.longpress.flickDistFinal = 0.75 * this.currentLayer.rowHeight;
     }
 
     // Phase 4:  Refresh the layout of the layer-group and active layer.
