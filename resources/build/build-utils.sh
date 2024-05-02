@@ -44,11 +44,16 @@ SHLVL=0
 
 function findKeymanRoot() {
   # We don't need readlink here because our standard script prolog does a
-  # readlink -f already so we will have already escaped from any symlinks
-  # But we still need to canonicalize paths to remove ../../..
-  KEYMAN_ROOT="${BASH_SOURCE[0]%/*/*/*}"
-  KEYMAN_ROOT="$( cd "$KEYMAN_ROOT" && echo "$PWD" )"
-  readonly KEYMAN_ROOT
+  # readlink -f already so we will have already escaped from any symlinks but we
+  # still need to canonicalize paths to remove ../../..
+  #
+  # We only want to set KEYMAN_ROOT if it isn't already set and readonly
+  # (https://stackoverflow.com/a/4441178/1836776)
+  if (unset KEYMAN_ROOT 2>/dev/null); then
+    KEYMAN_ROOT="${BASH_SOURCE[0]%/*/*/*}"
+    KEYMAN_ROOT="$( cd "$KEYMAN_ROOT" && echo "$PWD" )"
+    readonly KEYMAN_ROOT
+  fi
 }
 
 function findVersion() {
@@ -185,9 +190,7 @@ function findShouldSentryRelease() {
     esac
 }
 
-if [[ -z ${KEYMAN_ROOT+x} ]]; then
-  findKeymanRoot
-fi
+findKeymanRoot
 
 # Source builder_script
 . "$KEYMAN_ROOT/resources/builder.inc.sh"

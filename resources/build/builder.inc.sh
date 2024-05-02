@@ -18,16 +18,17 @@ function __builder_find_keyman_root() {
   # We don't need readlink here because our standard script prolog does a
   # readlink -f already so we will have already escaped from any symlinks
   # But we still need to canonicalize paths to remove ../../..
-  KEYMAN_ROOT="${BASH_SOURCE[0]%/*/*/*}"
-  KEYMAN_ROOT="$( cd "$KEYMAN_ROOT" && echo "$PWD" )"
-  readonly KEYMAN_ROOT
+  #
+  # We only want to set KEYMAN_ROOT if it isn't already set and readonly
+  # (https://stackoverflow.com/a/4441178/1836776)
+  if (unset KEYMAN_ROOT 2>/dev/null); then
+    KEYMAN_ROOT="${BASH_SOURCE[0]%/*/*/*}"
+    KEYMAN_ROOT="$( cd "$KEYMAN_ROOT" && echo "$PWD" )"
+    readonly KEYMAN_ROOT
+  fi
 }
 
-if [[ -z ${KEYMAN_ROOT+x} ]]; then
-  __builder_find_keyman_root
-fi
-
-__builder_not_a_builder_script() {
+function __builder_not_a_builder_script() {
   if ! _builder_has_function_been_called builder_describe; then
     builder_echo warning "builder_describe was never called; script is not a valid builder script"
     exit 1
@@ -38,12 +39,12 @@ __builder_not_a_builder_script() {
   fi
 }
 
+__builder_find_keyman_root
+
 trap __builder_not_a_builder_script exit
 
 # This will also import /resources/builder.inc.sh
-
 # TODO: rename build-utils.sh to utils.sh
-
 . "$KEYMAN_ROOT/resources/build/build-utils.sh"
 
 # All builder scripts start in their own folder
