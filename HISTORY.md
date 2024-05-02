@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 18.0.26 alpha 2024-05-02
+
+* chore: merge beta into master A18S1 (#11332)
+
 ## 18.0.25 alpha 2024-04-30
 
 * fix(linux): Improve detection of Gnome environment (#11292)
