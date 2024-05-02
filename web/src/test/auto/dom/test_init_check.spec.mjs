@@ -1,8 +1,8 @@
 // A simple "does device detection work properly" unit test.
 // We'll let things break after this reports, since this will likely signal a LOT of other failures.
-import { assert } from '/node_modules/chai/chai.js';
+import { assert } from 'chai';
 
-import Device from '/@keymanapp/keyman/build/engine/device-detect/lib/index.mjs';
+import Device from 'keyman/engine/device-detect';
 
 /* Note - we still have to prevent errors setting up test resources;
  * Karma will fail to report errors for affected browsers otherwise.

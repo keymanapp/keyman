@@ -22,10 +22,10 @@ export default {
   concurrency: 10,
   nodeResolve: true,
   // // Top-level, implicit 'default' group
-  // files: [
-  //   '**/*.spec.mjs',
-  //   // '**/*.spec.html'
-  // ],
+  files: [
+    'src/test/auto/dom/test_init_check.spec.mjs',
+    // '**/*.spec.html'
+  ],
   groups: [
     {
       name: 'app/browser',
@@ -83,7 +83,7 @@ export default {
   ],
   reporters: [
     summaryReporter({}), /* local-dev mocha-style */
-    teamcityReporter() /* custom-written, for CI-friendly reports */ // TEMP DISABLED.
+    teamcityReporter() /* custom-written, for CI-friendly reports */
   ],
   /*
     Un-comment the next two lines for easy interactive debugging; it'll launch the
