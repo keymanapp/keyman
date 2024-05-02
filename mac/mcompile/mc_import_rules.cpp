@@ -386,6 +386,8 @@ public:
   return n;
 }*/
 
+bool run_verify_S2(std::vector<mac_KMX_VirtualKey*> rgKey);
+
 bool mac_KMX_ImportRules( LPKMX_KEYBOARD kp,v_dw_3D &All_Vector, const UCKeyboardLayout **keyboard_layout,std::vector<KMX_DeadkeyMapping> *KMX_FDeadkeys, KMX_BOOL bDeadkeyConversion) { // I4353   // I4327
  mac_KMX_Loader loader;
 
@@ -478,6 +480,11 @@ bool mac_KMX_ImportRules( LPKMX_KEYBOARD kp,v_dw_3D &All_Vector, const UCKeyboar
   // Now that we've collected the key data, we need to
   // translate it to kmx and append to the existing keyboard
   //-------------------------------------------------------------
+
+  if ( ! run_verify_S2(rgKey))
+    printf(" ::::::::::::::::::::::::::::::::::::::::::::::::::: THERE ARE SOME WRONG ENTRIES ::::::::::::::::::::::::::::::::::::::::::::::::::: \n");
+  else
+    printf(" ::::::::::::::::::::::::::::::::::::::::::::::::::::::::: :) :) :) ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: \n");
 
   int nDeadkey = 0;
   LPKMX_GROUP gp = new KMX_GROUP[kp->cxGroupArray+4];  // leave space for old
@@ -684,3 +691,73 @@ const int CODE__SIZE[] = {
     3,   // CODE_IFSYSTEMSTORE       0x17
     2    // CODE_SETSYSTEMSTORE      0x18
 };
+
+
+
+
+bool verify_entries_S2(int i, std::vector<mac_KMX_VirtualKey*> rgKey, int res1,int res2,int res3,int res4 ,int res5=0, int res6=0, int res7=0, int res8=0 ) {
+    std::vector <std::u16string> st_vec;
+    std::vector <int> r_vec;
+    bool all_OK=true;;
+
+    r_vec.push_back(res1);         r_vec.push_back(res2);
+    r_vec.push_back(res3);         r_vec.push_back(res4);
+    r_vec.push_back(res5);         r_vec.push_back(res6);
+    r_vec.push_back(res7);         r_vec.push_back(res8);
+
+    st_vec.push_back(rgKey[i]->mac_KMX_GetShiftState(Base,0));
+    st_vec.push_back(rgKey[i]->mac_KMX_GetShiftState(Base,1));
+    st_vec.push_back(rgKey[i]->mac_KMX_GetShiftState(Shft,0));
+    st_vec.push_back(rgKey[i]->mac_KMX_GetShiftState(Shft,1));
+    st_vec.push_back(rgKey[i]->mac_KMX_GetShiftState(MenuCtrl,0));
+    st_vec.push_back(rgKey[i]->mac_KMX_GetShiftState(MenuCtrl,1));
+    st_vec.push_back(rgKey[i]->mac_KMX_GetShiftState(ShftMenuCtrl,0));
+    st_vec.push_back(rgKey[i]->mac_KMX_GetShiftState(ShftMenuCtrl,1));
+
+    for ( int k=0; k< st_vec.size();k++)
+      if (r_vec[k] !=0 )   all_OK = (  *st_vec[k].c_str()  == r_vec[k]  ) && all_OK;
+
+    if( !all_OK)
+      printf(" ERROR FOR i= Nr:%i, %i(%c) - %i (%c) - %i (%c) - %i (%c) \n",i, *st_vec[0].c_str(),*st_vec[1].c_str(),*st_vec[2].c_str(),*st_vec[3].c_str(),*st_vec[4].c_str(),*st_vec[5].c_str(),*st_vec[6].c_str(),*st_vec[7].c_str());
+    return all_OK;
+}
+
+bool run_verify_S2(std::vector<mac_KMX_VirtualKey*> rgKey) {
+
+  bool allOK= true;
+  allOK =  verify_entries_S2(48, rgKey, 48,48,61,61)                           && allOK;
+  allOK =  verify_entries_S2(48, rgKey, 48,48,61,61)                           && allOK;
+  allOK =  verify_entries_S2(49, rgKey, 49,49,33,33)                           && allOK;
+  allOK =  verify_entries_S2(50, rgKey, 50,50,34,34)                           && allOK;
+  allOK =  verify_entries_S2(51, rgKey, 51,51,167,167)                         && allOK;
+  allOK =  verify_entries_S2(52, rgKey, 52,52,36,36)                           && allOK;
+  allOK =  verify_entries_S2(53, rgKey, 53,53,37,37)                           && allOK;
+  allOK =  verify_entries_S2(54, rgKey, 54,54,38,38)                           && allOK;
+  allOK =  verify_entries_S2(55, rgKey, 55,55,47,47)                           && allOK;
+  allOK =  verify_entries_S2(56, rgKey, 56,56,40,40)                           && allOK;
+  allOK =  verify_entries_S2(57, rgKey, 57,57,41,41)                           && allOK;
+
+  allOK =  verify_entries_S2(65, rgKey,97,65,65,65,     0x263A, 0xC5, 0, 0)    && allOK;
+
+  for( int i=65; i<89;i++)
+    allOK =  verify_entries_S2(i, rgKey,i+32,i,i,i)                            && allOK;
+
+  allOK =  verify_entries_S2(89, rgKey, 90+32,90,90,90)                        && allOK;
+  allOK =  verify_entries_S2(90, rgKey, 89+32,89,89,89)                        && allOK;
+
+  allOK =  verify_entries_S2(186, rgKey, 246,214,214,214)                      && allOK;
+  //allOK =  verify_entries_S2(187, rgKey, 48,48,61,61)                        && allOK;      // dk   ´ `
+  allOK =  verify_entries_S2(188, rgKey,44,44,59,59)                           && allOK;
+  allOK =  verify_entries_S2(189, rgKey, 223,223,63,63)                        && allOK;
+  allOK =  verify_entries_S2(190, rgKey, 46,46,58,58)                          && allOK;
+  allOK =  verify_entries_S2(191, rgKey, 45,45,95,95)                          && allOK;
+
+  //allOK =  verify_entries_S2(192, rgKey, 48,48,61,61)                         && allOK;      // dk ^ °
+  allOK =  verify_entries_S2(219, rgKey, 252,220,220,220)                       && allOK;
+  allOK =  verify_entries_S2(220, rgKey, 35,35,39,39)                           && allOK;
+  allOK =  verify_entries_S2(221, rgKey, 43,43,42,42)                           && allOK;
+  allOK =  verify_entries_S2(222, rgKey, 228,196,196,196)                       && allOK;
+  //allOK =  verify_entries_S2(226, rgKey, 48,48,61,61)                         && allOK;      // < >
+
+  return allOK;
+}
