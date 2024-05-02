@@ -301,7 +301,7 @@
 				9889E8B31BFA9CEC00019560 /* Frameworks */,
 				9889E8B41BFA9CEC00019560 /* Resources */,
 				98C9A8C81BFBF23C009E9A4F /* Embed App Extensions */,
-				37DF007C24595F6F00C73128 /* ShellScript */,
+				37DF007C24595F6F00C73128 /* Run Script */,
 				9800EC5D1C029FCD00BF0FB5 /* ShellScript */,
 				371C855D2288F3A50076612A /* Embed Frameworks */,
 			);
@@ -443,7 +443,7 @@
 			shellScript = "\"$KEYMAN_ROOT/resources/build/xcode-wrap.sh\" \"$KEYMAN_ROOT/resources/build/set-bundle-versions-untagged.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
-		37DF007C24595F6F00C73128 /* ShellScript */ = {
+		37DF007C24595F6F00C73128 /* Run Script */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -452,13 +452,14 @@
 			);
 			inputPaths = (
 			);
+			name = "Run Script";
 			outputFileListPaths = (
 			);
 			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = "/usr/bin/env bash";
-			shellScript = "\"$KEYMAN_ROOT/resources/build/xcode-wrap.sh\" \"$KEYMAN_ROOT/resources/build/set-bundle-versions-and-settings-untagged.sh\"\n";
+			shellScript = "exit 1\n\"$KEYMAN_ROOT/resources/build/xcode-wrap.sh\" \"$KEYMAN_ROOT/resources/build/set-bundle-versions-and-settings-untagged.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 		9800EC5D1C029FCD00BF0FB5 /* ShellScript */ = {
