@@ -1,7 +1,9 @@
-import { PageContextAttachment } from '/@keymanapp/keyman/build/engine/attachment/lib/index.mjs';
-import { timedPromise } from '/@keymanapp/web-utils/build/lib/index.mjs';
+import { PageContextAttachment } from 'keyman/engine/attachment';
+import { timedPromise } from '@keymanapp/web-utils';
 
-import { assert } from '/node_modules/chai/chai.js';
+import { assert } from 'chai';
+
+const host = document.getElementById('host');
 
 let STANDARD_OPTIONS = {
   owner: null,
@@ -13,12 +15,15 @@ let STANDARD_OPTIONS = {
   }
 };
 
-function promiseForIframeLoad(iframe) {
+async function promiseForIframeLoad(iframe) {
+  // Falling back to the macrotask queue allows an unset iframe.src to re-enter loading state.
+  await Promise.resolve();
+
   // Chrome makes this first case tricky - it initializes all iframes with a 'complete' about:blank
   // before loading the actual href.  (https://stackoverflow.com/a/36155560)
   if(iframe.contentDocument
     && iframe.contentDocument.readyState === 'complete'
-    && iframe.contentDocument.body.innerHTML) {
+    && iframe.contentDocument.body?.innerHTML) {
     return Promise.resolve();
   } else {
     return new Promise((resolve, reject) => {
@@ -29,24 +34,25 @@ function promiseForIframeLoad(iframe) {
 }
 
 describe('KMW element-attachment logic', function () {
-  this.timeout(__karma__.config.args.find((arg) => arg.type == "timeouts").standard);
+  this.timeout(5000);
 
   describe('attachMode: auto', () => {
     beforeEach(function() {
       this.attacher = new PageContextAttachment(window.document, STANDARD_OPTIONS);
-      fixture.setBase('fixtures');
     });
 
     afterEach(function() {
-      fixture.cleanup();
+      host.innerHTML = '';
       this.attacher?.shutdown();
       this.attacher = null;
     });
 
     describe('for static elements', function () {
 
-      it('input and textarea', function () {
-        fixture.load("input-and-text.html");
+      it('input and textarea', async function () {
+        const fixture = await fetch('/resources/fixtures/input-and-text.html');
+        host.innerHTML = await fixture.text();
+
         const attacher = this.attacher;
         let attached = [];
 
@@ -58,8 +64,10 @@ describe('KMW element-attachment logic', function () {
         attacher.shutdown();
       });
 
-      it('input and (kmw-disabled) textarea', function () {
-        fixture.load("input-and-disabled-text.html");
+      it('input and (kmw-disabled) textarea', async function () {
+        const fixture = await fetch('/resources/fixtures/input-and-disabled-text.html');
+        host.innerHTML = await fixture.text();
+
         const attacher = this.attacher;
         let attached = [];
         let detached = [];
@@ -75,7 +83,9 @@ describe('KMW element-attachment logic', function () {
       });
 
       it('disablement: of input', async function () {
-        fixture.load("input-and-disabled-text.html");
+        const fixture = await fetch('/resources/fixtures/input-and-disabled-text.html');
+        host.innerHTML = await fixture.text();
+
         const attacher = this.attacher;
         attacher.install(false);
 
@@ -99,7 +109,9 @@ describe('KMW element-attachment logic', function () {
         //
         // Ideally, we could pre-attach in a disabled state - using "input-and-disabled-text.html",
         // but KMW isn't there yet.
-        fixture.load("input-and-text.html");
+        const fixture = await fetch('/resources/fixtures/input-and-text.html');
+        host.innerHTML = await fixture.text();
+
         const attacher = this.attacher;
         attacher.install(false);
 
@@ -133,8 +145,10 @@ describe('KMW element-attachment logic', function () {
         attacher.shutdown();
       });
 
-      it('detachment:  from auto-attached control', function () {
-        fixture.load("input-and-text.html");
+      it('detachment:  from auto-attached control', async function () {
+        const fixture = await fetch('/resources/fixtures/input-and-text.html');
+        host.innerHTML = await fixture.text();
+
         const attacher = this.attacher;
         let attached = [];
 
@@ -153,8 +167,10 @@ describe('KMW element-attachment logic', function () {
         attacher.shutdown();
       });
 
-      it('content-editable div', function () {
-        fixture.load("simple-editable-div.html");
+      it('content-editable div', async function () {
+        const fixture = await fetch('/resources/fixtures/simple-editable-div.html');
+        host.innerHTML = await fixture.text();
+
         const attacher = this.attacher;
         let attached = [];
 
@@ -166,8 +182,9 @@ describe('KMW element-attachment logic', function () {
         attacher.shutdown();
       });
 
-      it('detachment: content-editable div', function () {
-        fixture.load("simple-editable-div.html");
+      it('detachment: content-editable div', async function () {
+        const fixture = await fetch('/resources/fixtures/simple-editable-div.html');
+        host.innerHTML = await fixture.text();
 
         const attacher = this.attacher;
         let detached = [];
@@ -185,7 +202,8 @@ describe('KMW element-attachment logic', function () {
       });
 
       it('simple iframe with input', async function () {
-        fixture.load("simple-iframe-with-input.html");
+        const fixture = await fetch('/resources/fixtures/simple-iframe-with-input.html');
+        host.innerHTML = await fixture.text();
 
         // Note:  iframes require additional time to resolve.
         await promiseForIframeLoad(document.getElementById('iframe'));
@@ -202,7 +220,8 @@ describe('KMW element-attachment logic', function () {
       });
 
       it('detachment: simple iframe with input', async function () {
-        fixture.load("simple-iframe-with-input.html");
+        const fixture = await fetch('/resources/fixtures/simple-iframe-with-input.html');
+        host.innerHTML = await fixture.text();
 
         // Note:  iframes require additional time to resolve.
         await promiseForIframeLoad(document.getElementById('iframe'));
@@ -224,7 +243,8 @@ describe('KMW element-attachment logic', function () {
       });
 
       it('design-mode iframe', async function () {
-        fixture.load("simple-design-iframe.html");
+        const fixture = await fetch('/resources/fixtures/simple-design-iframe.html');
+        host.innerHTML = await fixture.text();
 
         // Note:  iframes require additional time to resolve.
         await promiseForIframeLoad(document.getElementById('iframe'));
@@ -241,7 +261,8 @@ describe('KMW element-attachment logic', function () {
       });
 
       it('detachment: design-mode iframe', async function () {
-        fixture.load("simple-design-iframe.html");
+        const fixture = await fetch('/resources/fixtures/simple-design-iframe.html');
+        host.innerHTML = await fixture.text();
 
         // Note:  iframes require additional time to resolve.
         await promiseForIframeLoad(document.getElementById('iframe'));
@@ -262,7 +283,9 @@ describe('KMW element-attachment logic', function () {
       });
 
       it('one of each supported element', async function () {
-        fixture.load("a-bit-of-everything.html");
+        const fixture = await fetch('/resources/fixtures/a-bit-of-everything.html');
+        host.innerHTML = await fixture.text();
+
         const attacher = this.attacher;
         let attached = [];
 
@@ -284,7 +307,9 @@ describe('KMW element-attachment logic', function () {
       });
 
       it('complex: nested iframe', async function() {
-        fixture.load("nested-iframe.html");
+        const fixture = await fetch('/resources/fixtures/nested-iframe.html');
+        host.innerHTML = await fixture.text();
+
         const attacher = this.attacher;
         let attached = [];
 
@@ -314,7 +339,8 @@ describe('KMW element-attachment logic', function () {
 
         assert.sameMembers(attached.map((elem) => elem.id), []);
 
-        fixture.load("input-and-text.html");
+        const fixture = await fetch('/resources/fixtures/input-and-text.html');
+        host.innerHTML = await fixture.text();
 
         // This gives the mutation observers a moment to 'kick in' and is required for test success.
         await Promise.resolve();
@@ -339,7 +365,8 @@ describe('KMW element-attachment logic', function () {
 
         // Okay, detachment test components done - now for the alternative attachment.
 
-        fixture.load("input-and-disabled-text.html");
+        const fixture = await fetch('/resources/fixtures/input-and-disabled-text.html');
+        host.innerHTML = await fixture.text();
 
         // This gives the mutation observers a moment to 'kick in' and is required for test success.
         await Promise.resolve();
@@ -352,7 +379,9 @@ describe('KMW element-attachment logic', function () {
       });
 
       it('detachment: input and textarea', async function () {
-        fixture.load("input-and-text.html");
+        const fixture = await fetch('/resources/fixtures/input-and-text.html');
+        host.innerHTML = await fixture.text();
+
         const attacher = this.attacher;
         let attached = [];
 
@@ -366,7 +395,7 @@ describe('KMW element-attachment logic', function () {
         let detached = [];
         attacher.on('disabled', (elem) => detached.push(elem));
 
-        fixture.cleanup("input-and-text.html");
+        host.innerHTML = '';
 
         // This gives the mutation observers a moment to 'kick in' and is required for test success.
         await Promise.resolve();
@@ -385,7 +414,8 @@ describe('KMW element-attachment logic', function () {
         attacher.install(false);
         assert.sameMembers(attached.map((elem) => elem.id), []);
 
-        fixture.load("simple-editable-div.html");
+        const fixture = await fetch('/resources/fixtures/simple-editable-div.html');
+        host.innerHTML = await fixture.text();
 
         // This gives the mutation observers a moment to 'kick in' and is required for test success.
         await Promise.resolve();
@@ -402,7 +432,8 @@ describe('KMW element-attachment logic', function () {
         attacher.on('enabled', (elem) => attached.push(elem));
         attacher.install(false);
 
-        fixture.load("simple-iframe-with-input.html");
+        const fixture = await fetch('/resources/fixtures/simple-iframe-with-input.html');
+        host.innerHTML = await fixture.text();
 
         // Note:  iframes require additional time to resolve.
         await promiseForIframeLoad(document.getElementById('iframe'));
@@ -417,7 +448,8 @@ describe('KMW element-attachment logic', function () {
       });
 
       it('detachment: simple iframe with input', async function () {
-        fixture.load("simple-iframe-with-input.html");
+        const fixture = await fetch('/resources/fixtures/simple-iframe-with-input.html');
+        host.innerHTML = await fixture.text();
 
         // Note:  iframes require additional time to resolve.
         await promiseForIframeLoad(document.getElementById('iframe'));
@@ -430,7 +462,7 @@ describe('KMW element-attachment logic', function () {
 
         attacher.install(false);
 
-        fixture.cleanup();
+        host.innerHTML = '';
 
         await Promise.resolve();
 
@@ -447,7 +479,8 @@ describe('KMW element-attachment logic', function () {
         attacher.on('enabled', (elem) => attached.push(elem));
         attacher.install(false);
 
-        fixture.load("simple-design-iframe.html");
+        const fixture = await fetch('/resources/fixtures/simple-design-iframe.html');
+        host.innerHTML = await fixture.text();
 
         // Note:  iframes require additional time to resolve.
         await promiseForIframeLoad(document.getElementById('iframe'));
@@ -462,7 +495,8 @@ describe('KMW element-attachment logic', function () {
       });
 
       it('detachment: design iframe', async function () {
-        fixture.load("simple-design-iframe.html");
+        const fixture = await fetch('/resources/fixtures/simple-design-iframe.html');
+        host.innerHTML = await fixture.text();
 
         // Note:  iframes require additional time to resolve.
         await promiseForIframeLoad(document.getElementById('iframe'));
@@ -475,7 +509,7 @@ describe('KMW element-attachment logic', function () {
 
         attacher.install(false);
 
-        fixture.cleanup();
+        host.innerHTML = '';
 
         await Promise.resolve();
 
@@ -492,7 +526,8 @@ describe('KMW element-attachment logic', function () {
         attacher.on('enabled', (elem) => attached.push(elem));
         attacher.install(false);
 
-        fixture.load("a-bit-of-everything.html");
+        const fixture = await fetch('/resources/fixtures/a-bit-of-everything.html');
+        host.innerHTML = await fixture.text();
 
         // Note:  iframes require additional time to resolve.
         await promiseForIframeLoad(document.getElementById('iframe'));
@@ -514,7 +549,8 @@ describe('KMW element-attachment logic', function () {
         attacher.on('enabled', (elem) => attached.push(elem));
         attacher.install(false);
 
-        fixture.load("nested-iframe.html");
+        const fixture = await fetch('/resources/fixtures/nested-iframe.html');
+        host.innerHTML = await fixture.text();
 
         // Note:  iframes require additional time to resolve.
         const outerIframe = document.getElementById('outer-iframe')
@@ -531,7 +567,8 @@ describe('KMW element-attachment logic', function () {
       });
 
       it('complex detachment: nested iframe', async function() {
-        fixture.load("nested-iframe.html");
+        const fixture = await fetch('/resources/fixtures/nested-iframe.html');
+        host.innerHTML = await fixture.text();
         // Note:  iframes require additional time to resolve.
 
         const outerIframe = document.getElementById('outer-iframe')
@@ -546,7 +583,7 @@ describe('KMW element-attachment logic', function () {
         // The test setup is complete; now to do the actual test.
         let detached = [];
         attacher.on('disabled', (elem) => detached.push(elem));
-        fixture.cleanup();
+        host.innerHTML = '';
 
         // And now to trigger the MutationObserver.
         await Promise.resolve();
@@ -561,17 +598,18 @@ describe('KMW element-attachment logic', function () {
   describe('attachMode: manual', () => {
     beforeEach(function() {
       this.attacher = new PageContextAttachment(window.document, STANDARD_OPTIONS);
-      fixture.setBase('fixtures');
     });
 
     afterEach(function() {
-      fixture.cleanup();
+      host.innerHTML = '';
       this.attacher?.shutdown();
       this.attacher = null;
     });
 
-    it('input and textarea', function () {
-      fixture.load("input-and-text.html");
+    it('input and textarea', async function () {
+      const fixture = await fetch('/resources/fixtures/input-and-text.html');
+      host.innerHTML = await fixture.text();
+
       const attacher = this.attacher;
 
       let attached = [];
@@ -594,8 +632,10 @@ describe('KMW element-attachment logic', function () {
       attacher.shutdown();
     });
 
-    it('input and (kmw-disabled) textarea', function () {
-      fixture.load("input-and-disabled-text.html");
+    it('input and (kmw-disabled) textarea', async function () {
+      const fixture = await fetch('/resources/fixtures/input-and-disabled-text.html');
+      host.innerHTML = await fixture.text();
+
       const attacher = this.attacher;
 
       let attached = [];
@@ -625,17 +665,18 @@ describe('KMW element-attachment logic', function () {
   describe(".sortedList: KMW-managed tab-to-next ordering", () => {
     beforeEach(function() {
       this.attacher = new PageContextAttachment(window.document, STANDARD_OPTIONS);
-      fixture.setBase('fixtures');
     });
 
     afterEach(function() {
-      fixture.cleanup();
+      host.innerHTML = '';
       this.attacher?.shutdown();
       this.attacher = null;
     });
 
     it('straightforward, standard layout', async function () {
-      fixture.load("a-bit-of-everything.html");
+      const fixture = await fetch('/resources/fixtures/a-bit-of-everything.html');
+      host.innerHTML = await fixture.text();
+
       const attacher = this.attacher;
       let attached = [];
 
@@ -656,8 +697,9 @@ describe('KMW element-attachment logic', function () {
       attacher.shutdown();
     });
 
-    it('five inputs with absolute positioning', function () {
-      fixture.load("wild-absolute-positioning.html");
+    it('five inputs with absolute positioning', async function () {
+      const fixture = await fetch('/resources/fixtures/wild-absolute-positioning.html');
+      host.innerHTML = await fixture.text();
 
       const attacher = this.attacher;
       let attached = [];
@@ -688,7 +730,8 @@ describe('KMW element-attachment logic', function () {
     });
 
     it('seven inputs with absolute positioning, two added dynamically', async function () {
-      fixture.load("wild-absolute-positioning.html");
+      const fixture = await fetch('/resources/fixtures/wild-absolute-positioning.html');
+      host.innerHTML = await fixture.text();
 
       const attacher = this.attacher;
       let attached = [];
@@ -716,7 +759,10 @@ describe('KMW element-attachment logic', function () {
         "input5-bottom-right"
       ]);
 
-      fixture.load("wild-absolute-positioning-extras.html", /* append = */ true );
+      const fixture2 = await fetch('/resources/fixtures/wild-absolute-positioning-extras.html');
+      const wrapper = document.createElement('div');
+      wrapper.innerHTML = await fixture2.text();
+      host.appendChild(wrapper);
 
       // Let the MutationObservers handle things
       await Promise.resolve();
@@ -752,17 +798,18 @@ describe('KMW element-attachment logic', function () {
           touchable: true
         }
       });
-      fixture.setBase('fixtures');
     });
 
     afterEach(function() {
-      fixture.cleanup();
+      host.innerHTML = '';
       this.attacher?.shutdown();
       this.attacher = null;
     });
 
-    it('maintains original intents: numeric, none, (kmw-disabled) email', function () {
-      fixture.load("inputs-numeric-none-disabled_email.html");
+    it('maintains original intents: numeric, none, (kmw-disabled) email', async function () {
+      const fixture = await fetch('/resources/fixtures/inputs-numeric-none-disabled_email.html');
+      host.innerHTML = await fixture.text();
+
       const attacher = this.attacher;
       attacher.install(false);
 
@@ -786,7 +833,9 @@ describe('KMW element-attachment logic', function () {
     });
 
     it('updates mutated intents: numeric => email', async function() {
-      fixture.load("inputs-numeric-none-disabled_email.html");
+      const fixture = await fetch('/resources/fixtures/inputs-numeric-none-disabled_email.html');
+      host.innerHTML = await fixture.text();
+
       const attacher = this.attacher;
       attacher.install(false);
 

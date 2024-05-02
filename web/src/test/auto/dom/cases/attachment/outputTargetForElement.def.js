@@ -8,12 +8,12 @@ import {
   eventOutputTarget,
   outputTargetForElement,
   PageContextAttachment
-} from '/@keymanapp/keyman/build/engine/attachment/lib/index.mjs';
+} from 'keyman/engine/attachment';
 
-import { timedPromise } from '/@keymanapp/web-utils/build/lib/index.mjs';
-import sinon from '/node_modules/sinon/pkg/sinon-esm.js';
+import { timedPromise } from '@keymanapp/web-utils';
+import sinon from 'sinon';
 
-import { assert } from '/node_modules/chai/chai.js';
+import { assert } from 'chai';
 
 let STANDARD_OPTIONS = {
   owner: null,
@@ -41,12 +41,9 @@ function promiseForIframeLoad(iframe) {
 }
 
 describe('outputTargetForElement()', function () {
-  this.timeout(__karma__.config.args.find((arg) => arg.type == "timeouts").standard);
+  this.timeout(5000);
 
   before(async function() {
-    fixture.setBase('fixtures');
-    fixture.load("a-bit-of-everything.html");
-
     const attacher = this.attacher = new PageContextAttachment(window.document, STANDARD_OPTIONS);
 
     const iframe = document.getElementById('iframe');
@@ -58,7 +55,6 @@ describe('outputTargetForElement()', function () {
   });
 
   after(function() {
-    fixture.cleanup();
     this.attacher?.shutdown();
     this.attacher = null;
   });
@@ -143,12 +139,9 @@ describe('outputTargetForElement()', function () {
 });
 
 describe('eventOutputTarget()', function () {
-  this.timeout(__karma__.config.args.find((arg) => arg.type == "timeouts").standard);
+  this.timeout(5000);
 
   before(async function() {
-    fixture.setBase('fixtures');
-    fixture.load("a-bit-of-everything.html");
-
     const attacher = this.attacher = new PageContextAttachment(window.document, STANDARD_OPTIONS);
 
     const iframe = document.getElementById('iframe');
@@ -159,7 +152,6 @@ describe('eventOutputTarget()', function () {
   });
 
   after(function() {
-    fixture.cleanup();
     this.attacher?.shutdown();
     this.attacher = null;
   });

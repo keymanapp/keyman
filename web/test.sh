@@ -86,7 +86,7 @@ fi
 # End common configs.
 
 # shellcheck disable=SC2086
-builder_run_action test:dom karma start ${KARMA_FLAGS} "${KEYMAN_ROOT}/web/src/test/auto/dom/${CONFIG}"
+builder_run_action test:dom web-test-runner --config "${KEYMAN_ROOT}/src/test/auto/dom/web-test-runner.config.mjs"
 
 # The multi-browser test suite, which uses BrowserStack when run by our CI.
 if builder_start_action test:integrated; then

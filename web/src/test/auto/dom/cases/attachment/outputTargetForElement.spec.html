@@ -1,0 +1,18 @@
+<html>
+  <head>
+    <script type="module">
+      import { runTests } from '@web/test-runner-mocha';
+
+      runTests(async() => {
+        await import('./outputTargetForElement.def.js');
+      });
+    </script>
+  </head>
+  <body>
+    <div>Iframe: <iframe id="iframe" style="height: 100px" src="/resources/html/iframe.html"></iframe>
+    <div>Design Iframe: <iframe id="design-iframe" style="height: 100px" src="/resources/html/designIframe.html"></iframe>
+    <div>Content-editable div: <div id="editable" contenteditable="true" style="width: 500px">Edit me!</div></div>
+    <div>Input: <input id="input"/></div>
+    <div>Textarea: <textarea id="textarea"></textarea></div>
+  </body>
+</html>

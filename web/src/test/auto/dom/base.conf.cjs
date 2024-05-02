@@ -44,6 +44,7 @@ module.exports = {
     'common/test/resources/timeout-adapter.js',  // Handles configuration timeout setup at runtime.
     {pattern: 'web/src/test/auto/dom/test_utils.js', type: 'module'},              // A basic utility script useful for constructing tests
 
+    {pattern: 'web/src/test/auto/dom/cases/**/*.def.js', watched: false, served: false, included: false},
     {pattern: 'web/src/test/auto/dom/cases/**/*.js', type: 'module'},              // Where the tests actually reside.
     'common/test/resources/json/**/*.json',      // Where pre-loaded JSON resides.
     {pattern: 'web/src/test/auto/resources/**/*.js.fixture', watched: true, served: true, included: false},
