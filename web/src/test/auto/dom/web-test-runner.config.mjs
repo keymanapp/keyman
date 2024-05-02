@@ -30,7 +30,7 @@ export default {
     {
       name: 'app/browser',
       // Relative, from the containing package.json
-      files: ['src/test/auto/dom/cases/browser/**/*.spec.js']
+      files: ['src/test/auto/dom/cases/browser/**/*.spec.mjs']
     },
     {
       name: 'engine/attachment',
@@ -41,6 +41,11 @@ export default {
       name: 'engine/dom',
       // Relative, from the containing package.json
       files: ['src/test/auto/dom/cases/dom-utils/**/*.spec.mjs']
+    },
+    {
+      name: 'engine/element-wrappers',
+      // Relative, from the containing package.json
+      files: ['src/test/auto/dom/cases/element-wrappers/**/*.spec.mjs']
     }
   ],
   middleware: [
