@@ -108,6 +108,25 @@
 * chore(common): move to 18.0 alpha (#10713)
 * chore: move to 18.0 alpha
 
+## 17.0.317 beta 2024-05-01
+
+*  (#11322)
+*  (#11321)
+* fix(linux): Fix icon for .kmp files (#11295)
+
+## 17.0.316 beta 2024-04-30
+
+* fix(windows): check font count display none found (#11282)
+
+## 17.0.315 beta 2024-04-26
+
+* fix(web): osk-view hidden by default on construction (#11258)
+* fix(android): fixes kbd text zoom to prevent accessibility cross-effects (#11281)
+* fix(developer): support export of visual keyboard when Keyman for Windows not installed (#11244)
+* chore(linux): Prepare for stable release (#11301)
+* fix(core): reset on frame keys (#11172)
+* fix(core): ldml backspace processing should delete all markers (#11254)
+
 ## 17.0.314 beta 2024-04-25
 
 * fix(android/engine): URIEncode strings passed to Javascript (#11206)

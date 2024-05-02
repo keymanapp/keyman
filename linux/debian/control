@@ -23,7 +23,7 @@ Build-Depends:
  metacity,
  ninja-build,
  perl,
- pkg-config,
+ pkgconf,
  python3-all (>= 3.5),
  python3-dbus,
  python3-gi,
@@ -41,9 +41,9 @@ Build-Depends:
  python3-xdg,
  xserver-xephyr,
  xvfb,
-Standards-Version: 4.6.2
-Vcs-Git: https://github.com/keymanapp/keyman.git -b beta [linux/debian]
-Vcs-Browser: https://github.com/keymanapp/keyman/tree/beta/linux/debian
+Standards-Version: 4.7.0
+Vcs-Git: https://github.com/keymanapp/keyman.git -b stable-17.0 [linux/debian]
+Vcs-Browser: https://github.com/keymanapp/keyman/tree/stable-17.0/linux/debian
 Homepage: https://www.keyman.com
 Rules-Requires-Root: binary-targets
 
