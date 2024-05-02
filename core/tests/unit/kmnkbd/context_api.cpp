@@ -52,14 +52,14 @@ int main(int, char * [])
   // Check context_item to UTF16 conversion, roundtrip test.
   char16_t ctxt_buffer[512] ={0,};
   // First call measure space 2nd call do conversion.
-  size_t ctxt_size = sizeof ctxt_buffer/sizeof(km_core_cp);
+  size_t ctxt_size = sizeof ctxt_buffer/sizeof(km_core_cu);
   try_status(context_items_to_utf16(ctxt1, nullptr, &ctxt_size));
-  if (ctxt_size > sizeof ctxt_buffer/sizeof(km_core_cp))  return __LINE__;
+  if (ctxt_size > sizeof ctxt_buffer/sizeof(km_core_cu))  return __LINE__;
   try_status(context_items_to_utf16(ctxt1, ctxt_buffer, &ctxt_size));
   if (initial_bmp_context != ctxt_buffer) return __LINE__;
 
   // Test roundtripping SMP characters in surrogate pairs.
-  ctxt_size=sizeof ctxt_buffer/sizeof(km_core_cp);
+  ctxt_size=sizeof ctxt_buffer/sizeof(km_core_cu);
   try_status(context_items_to_utf16(ctxt2, ctxt_buffer, &ctxt_size));
   if (initial_smp_context != ctxt_buffer) return __LINE__;
   // Test buffer overrun protection.
@@ -85,14 +85,14 @@ int main(int, char * [])
   // retrieve bmp context and check it's okay.
   km_core_context_item *tmp_ctxt;
   try_status(km_core_context_get(&mock_ctxt1, &tmp_ctxt));
-  ctxt_size=sizeof ctxt_buffer/sizeof(km_core_cp);
+  ctxt_size=sizeof ctxt_buffer/sizeof(km_core_cu);
   try_status(context_items_to_utf16(tmp_ctxt, ctxt_buffer, &ctxt_size));
   km_core_context_items_dispose(tmp_ctxt);
   if (initial_bmp_context != ctxt_buffer) return __LINE__;
 
   // retrieve smp context and check it's okay.
   try_status(km_core_context_get(&mock_ctxt2, &tmp_ctxt));
-  ctxt_size=sizeof ctxt_buffer/sizeof(km_core_cp);
+  ctxt_size=sizeof ctxt_buffer/sizeof(km_core_cu);
   try_status(context_items_to_utf16(tmp_ctxt, ctxt_buffer, &ctxt_size));
   km_core_context_items_dispose(tmp_ctxt);
   if (initial_smp_context != ctxt_buffer) return __LINE__;
@@ -116,7 +116,7 @@ int main(int, char * [])
   km_core_context_items_dispose(ctxt2);
 
   // Check it matches. The marker will be elided during the conversion.
-  ctxt_size=sizeof ctxt_buffer/sizeof(km_core_cp);
+  ctxt_size=sizeof ctxt_buffer/sizeof(km_core_cu);
   try_status(km_core_context_get(&mock_ctxt1, &tmp_ctxt));
   try_status(context_items_to_utf16(tmp_ctxt, ctxt_buffer, &ctxt_size));
   if (std::u16string(u"Hello World!") != ctxt_buffer) return __LINE__;
@@ -128,7 +128,7 @@ int main(int, char * [])
   //  expected if you go by the test string above.
   try_status(context_shrink(&mock_ctxt1, 8));
   try_status(context_prepend(&mock_ctxt1, ctxt1, 8));
-  ctxt_size=sizeof ctxt_buffer/sizeof(km_core_cp);
+  ctxt_size=sizeof ctxt_buffer/sizeof(km_core_cu);
   try_status(km_core_context_get(&mock_ctxt1, &tmp_ctxt));
   try_status(context_items_to_utf16(tmp_ctxt, ctxt_buffer, &ctxt_size));
   if (std::u16string(u"Bye, Hello") != ctxt_buffer) return __LINE__;

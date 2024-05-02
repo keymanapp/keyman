@@ -11,7 +11,7 @@ using namespace km::core;
 using namespace kmx;
 
 namespace {
-  km_core_cp const
+  km_core_cu const
     *DEFAULT_PLATFORM                       = u"windows hardware desktop native",
     *DEFAULT_BASELAYOUT                     = u"kbdus.dll",
     *DEFAULT_BASELAYOUTALT                  = u"en-US",

@@ -21,8 +21,8 @@ type
 
   km_core_usv = uint32_t;  // UTF-32
   pkm_core_usv = ^km_core_usv;
-  km_core_cp = WideChar;
-  pkm_core_cp = ^km_core_cp;
+  km_core_cu = WideChar;
+  pkm_core_cu = ^km_core_cu;
 
   km_core_context = record end;
   pkm_core_context = ^km_core_context;
@@ -114,8 +114,8 @@ type
   );
 
   km_core_option_item = record
-    key: pkm_core_cp;
-    value: pkm_core_cp;
+    key: pkm_core_cu;
+    value: pkm_core_cu;
     scope: km_core_option_scope;
   end;
 
@@ -220,8 +220,8 @@ function km_core_options_list_size(
 function km_core_state_option_lookup(
   state: pkm_core_state;
   scope: km_core_option_scope;
-  key: pkm_core_cp;
-  var value: pkm_core_cp
+  key: pkm_core_cu;
+  var value: pkm_core_cu
 ): km_core_status; cdecl; external keymancore delayed;
 
 function km_core_state_options_update(
@@ -237,8 +237,8 @@ function km_core_state_options_to_json(
 
 type
   km_core_keyboard_attrs = record
-    version_string: pkm_core_cp;
-    id: pkm_core_cp;
+    version_string: pkm_core_cu;
+    id: pkm_core_cu;
     folder_path: km_core_path_name;
     default_optons: pkm_core_option_item
   end;
