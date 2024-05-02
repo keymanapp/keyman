@@ -6,10 +6,9 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 builder_describe \
-  "Build Keyman Developer common web files" \
+  "Build Keyman Developer common tools" \
   clean configure build test \
-  ":test-helpers    Unit test helper modules" \
-  ":utils           Utility modules"
+  :build_standards_data :buildunidata :devtools :sentrytool :test-klog :verify_signatures
 
 builder_parse "$@"
 builder_run_child_actions clean configure build test

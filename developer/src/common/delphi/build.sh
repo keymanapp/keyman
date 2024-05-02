@@ -5,15 +5,12 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 . "${THIS_SCRIPT%/*}/../../../../resources/build/build-utils.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
-cd "$THIS_SCRIPT_PATH"
-
 builder_describe "Build Keyman Developer Delphi components" clean configure build test
 builder_parse "$@"
 
 #-------------------------------------------------------------------------------------------------------------------
 
 source "$KEYMAN_ROOT/resources/build/win/environment.inc.sh"
-WIN32_TARGET="$WIN32_TARGET_PATH/kmconvert.exe"
 
 builder_describe_outputs \
   configure:project    /resources/build/win/delphi_environment_generated.inc.sh \

@@ -2,10 +2,10 @@
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
-. "${THIS_SCRIPT%/*}/../../../../resources/build/build-utils.sh"
+. "${THIS_SCRIPT%/*}/../../../../../resources/build/build-utils.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
-builder_describe "Build scfontcombobox component" clean configure build test
+builder_describe "Build verify_signatures tool" clean configure build test verify
 builder_parse "$@"
 
 #-------------------------------------------------------------------------------------------------------------------
@@ -14,7 +14,7 @@ source "$KEYMAN_ROOT/resources/build/win/environment.inc.sh"
 
 builder_describe_outputs \
   configure:project    /resources/build/win/delphi_environment_generated.inc.sh \
-  build:project        /developer/lib/scFontCombo.bpl
+  build:project        /common/windows/delphi/tools/verify_signatures/$WIN32_TARGET_PATH/verify_signatures.exe
 
 #-------------------------------------------------------------------------------------------------------------------
 
@@ -23,9 +23,8 @@ function do_clean() {
 }
 
 function do_build() {
-  "$DEVTOOLS" -ai "$DEVELOPER_ROOT/src/ext/scfontcombobox"
-  delphi_msbuild scFontCombo.dproj "//p:Platform=Win32"
-  "$DEVTOOLS" -ip "$DEVELOPER_OUTLIB/scFontCombo.bpl"
+  delphi_msbuild verify_signatures.dproj "//p:Platform=Win32"
+  cp sigcheck.bin "$WIN32_TARGET_PATH/sigcheck.exe"
 }
 
 builder_run_action clean:project        do_clean

@@ -5,7 +5,7 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 . "${THIS_SCRIPT%/*}/../../../../resources/build/build-utils.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
-builder_describe "Build scfontcombobox component" clean configure build test
+builder_describe "Build Keyman common Delphi components" clean configure build test
 builder_parse "$@"
 
 #-------------------------------------------------------------------------------------------------------------------
@@ -14,7 +14,7 @@ source "$KEYMAN_ROOT/resources/build/win/environment.inc.sh"
 
 builder_describe_outputs \
   configure:project    /resources/build/win/delphi_environment_generated.inc.sh \
-  build:project        /developer/lib/scFontCombo.bpl
+  build:project        /common/windows/lib/common_components.bpl
 
 #-------------------------------------------------------------------------------------------------------------------
 
@@ -23,9 +23,9 @@ function do_clean() {
 }
 
 function do_build() {
-  "$DEVTOOLS" -ai "$DEVELOPER_ROOT/src/ext/scfontcombobox"
-  delphi_msbuild scFontCombo.dproj "//p:Platform=Win32"
-  "$DEVTOOLS" -ip "$DEVELOPER_OUTLIB/scFontCombo.bpl"
+  mkdir -p obj/Win32/$TARGET_PATH
+  delphi_msbuild common_components.dproj "//p:Platform=Win32"
+  "$DEVTOOLS" -ip "$COMMON_OUTLIB/common_components.bpl"
 }
 
 builder_run_action clean:project        do_clean

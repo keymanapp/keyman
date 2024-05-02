@@ -2,10 +2,10 @@
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
-. "${THIS_SCRIPT%/*}/../../../../resources/build/build-utils.sh"
+. "${THIS_SCRIPT%/*}/../../../../../resources/build/build-utils.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
-builder_describe "Build scfontcombobox component" clean configure build test
+builder_describe "Build jwa component" clean configure build test
 builder_parse "$@"
 
 #-------------------------------------------------------------------------------------------------------------------
@@ -13,8 +13,7 @@ builder_parse "$@"
 source "$KEYMAN_ROOT/resources/build/win/environment.inc.sh"
 
 builder_describe_outputs \
-  configure:project    /resources/build/win/delphi_environment_generated.inc.sh \
-  build:project        /developer/lib/scFontCombo.bpl
+  configure:project    /resources/build/win/delphi_environment_generated.inc.sh
 
 #-------------------------------------------------------------------------------------------------------------------
 
@@ -23,9 +22,7 @@ function do_clean() {
 }
 
 function do_build() {
-  "$DEVTOOLS" -ai "$DEVELOPER_ROOT/src/ext/scfontcombobox"
-  delphi_msbuild scFontCombo.dproj "//p:Platform=Win32"
-  "$DEVTOOLS" -ip "$DEVELOPER_OUTLIB/scFontCombo.bpl"
+  "$DEVTOOLS" -ai "$THIS_SCRIPT_PATH/Win32API"
 }
 
 builder_run_action clean:project        do_clean
