@@ -35,19 +35,45 @@ if node.found()
   subdir('invalid-keyboards')
 endif
 
-
 # Build ldml test executable
+
+keyboard_build_path = join_paths(meson.current_build_dir(),'keyboards')
 
 if cpp_compiler.get_id() == 'emscripten'
   tests_flags = ['--embed-file', join_paths(meson.current_build_dir(),'keyboards','@')]
   tests_flags += ['--embed-file', join_paths(meson.current_build_dir(),'invalid-keyboards','@')]
+  tests_flags += ['--embed-file', join_paths(meson.current_build_dir(),'nodeversions.json') + '@nodeversions.json']
+  tests_flags += ['--embed-file', join_paths(meson.current_build_dir(),'package.json') + '@package.json']
+  tests_flags += ['--embed-file', join_paths(meson.current_build_dir(),'Blocks.txt') + '@Blocks.txt']
   test_path = '/'
+  test_unicode_path = '/'
   invalid_test_path = '/'
+  tests_flags += ['-lnodefs.js',
+                  '-sNO_DISABLE_EXCEPTION_CATCHING', # for test exceptions
+                  '-sEXPORTED_RUNTIME_METHODS=[\'UTF8ToString\']']
 else
   tests_flags = []
   test_path = join_paths(meson.current_build_dir(),'keyboards')
+  test_unicode_path = join_paths(meson.current_build_dir())
   invalid_test_path = join_paths(meson.current_build_dir(),'invalid-keyboards')
 endif
+
+# copy package.json into build dir for test use
+configure_file(
+  copy: true,
+  input: '../../../../package.json',
+  output: 'package.json',
+)
+configure_file(
+  copy: true,
+  input: '../../../../resources/standards-data/unicode-character-database/Blocks.txt',
+  output: 'Blocks.txt',
+)
+
+configure_file(
+  command: [node, join_paths(meson.current_source_dir(), 'write_node_versions.js'),'@OUTPUT@'],
+  output: 'nodeversions.json',
+)
 
 ldml = executable('ldml',
     ['ldml.cpp',
@@ -94,14 +120,34 @@ if cpp_compiler.get_id() == 'emscripten'
   normalization_tests_flags += ['-lnodefs.js', '-sEXPORTED_RUNTIME_METHODS=[\'UTF8ToString\']']
 endif
 
-t = executable('test_context_normalization',
+tc = executable('test_context_normalization',
     ['test_context_normalization.cpp', common_test_files],
     cpp_args: defns + warns,
     include_directories: [inc, libsrc, '../../../../developer/src/ext/json'],
     link_args: links + normalization_tests_flags,
     dependencies: [icu_uc, icu_i18n],
     objects: lib.extract_all_objects(recursive: false))
-test('test_context_normalization', t, suite: 'ldml')
+test('test_context_normalization', tc, suite: 'ldml')
+
+# Build and run additional test_unicode test
+
+u = executable('test_unicode', 'test_unicode.cpp',
+    ['test_unicode.cpp', '../emscripten_filesystem.cpp'],
+    cpp_args: defns + warns,
+    include_directories: [inc, libsrc, '../../../../developer/src/ext/json'],
+    link_args: links + tests_flags,
+    dependencies: [icu_uc, icu_i18n],
+    objects: lib.extract_all_objects(recursive: false),
+
+)
+
+test('test_unicode', u, suite: 'ldml',
+  args: [
+    join_paths(test_unicode_path, 'nodeversions.json'),
+    join_paths(test_unicode_path, 'package.json'),
+    join_paths(test_unicode_path, 'Blocks.txt'),
+  ],
+)
 
 # Run tests on all keyboards (`tests` defined in keyboards/meson.build)
 
