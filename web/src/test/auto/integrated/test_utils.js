@@ -1,9 +1,14 @@
 // // KeymanWeb test suite - processing of the Karma configuration's client.args parameter.
 
-import Device from '/@keymanapp/keyman/build/engine/device-detect/lib/index.mjs';
-import * as KMWRecorder from '/@keymanapp/keyman/build/tools/testing/recorder/lib/index.mjs';
+import Device from 'keyman/engine/device-detect';
+import * as KMWRecorder from '#recorder';
 
 export let DEVICE_DETECT_FAILURE = false;
+
+const loc = document.location;
+// config.testFile generally starts with a '/', with the path resembling the actual full local
+// filesystem for the drive.
+const domain = `${loc.protocol}/${loc.host}`
 
 // If we've set things up to support Device dection without loading KMW...
 try {
@@ -25,7 +30,8 @@ export function setupKMW(kmwOptions, timeout) {
     var kmwOptions = {
       attachType:'auto',
       root:'/',
-      resources:'/build/app/resources'
+      // up from 'browser/debug'
+      resources:'../../resources'
     };
 
     if(ui) {
@@ -33,23 +39,23 @@ export function setupKMW(kmwOptions, timeout) {
     }
   }
 
-  const kmwPromise = setupScript('build/app/browser/keymanweb.js', timeout);
+  const kmwPromise = setupScript('web/build/app/browser/debug/keymanweb.js', timeout);
 
   ui = kmwOptions.ui;
 
   kmwOptions.attachType = kmwOptions.attachType ? kmwOptions.attachType : 'auto';
 
   if(!kmwOptions.root) {
-    kmwOptions.root = '/build/app/browser';
+    kmwOptions.root = 'web/build/app/browser/debug';
   }
 
   if(!kmwOptions.resources) {
-    kmwOptions.resources = '/build/resources';
+    kmwOptions.resources = 'web/build/app/resources';
   }
 
   let uiPromise;
   if(ui) {
-    uiPromise = setupScript('build/app/ui/kmwui' + ui + '.js', timeout);
+    uiPromise = setupScript('web/build/app/ui/debug/kmwui' + ui + '.js', timeout);
     kmwOptions.ui=ui;
   }
 
@@ -140,7 +146,7 @@ function setupScriptInternal(src, timeout, attemptCount, existingTimer) {
     }
 
     Lscript.src = src;
-    fixture.el.appendChild(Lscript);
+    document.body.appendChild(Lscript);
   });
 
   return promise;
@@ -196,7 +202,8 @@ export async function loadKeyboardStub(stub, timeout, params) {
 }
 
 export async function loadKeyboardFromJSON(jsonPath, timeout, params) {
-  var stub = fixture.load(jsonPath, true);
+  const jsonResponse = await fetch(new URL(`${domain}/${jsonPath}`));
+  const stub = await jsonResponse.json();
 
   return loadKeyboardStub(stub, timeout, params);
 }
@@ -209,7 +216,10 @@ async function runLoadedKeyboardTest(testDef, device, usingOSK, assertCallback) 
 }
 
 export async function runKeyboardTestFromJSON(jsonPath, params, assertCallback, timeout) {
-  var testSpec = new KMWRecorder.KeyboardTest(fixture.load(jsonPath, true));
+  const jsonResponse = await fetch(new URL(`${domain}/${jsonPath}`));
+  const testJSON = await jsonResponse.json();
+
+  var testSpec = new KMWRecorder.KeyboardTest(testJSON);
   let device = new Device();
   device.detect();
 
@@ -288,7 +298,7 @@ if(typeof(DynamicElements) == 'undefined') {
     if(loadCallback) {
       frame.addEventListener('load', function() {
         // Give KMW's attachment events a chance to run first.
-        window.setTimeout(loadCallback, Math.max(100, testconfig.timeouts.scriptLoad));
+        window.setTimeout(loadCallback, Math.max(100, 5000));
       });
     }
     frame.setAttribute("src", "resources/html/iframe.html");
@@ -338,7 +348,7 @@ if(typeof(DynamicElements) == 'undefined') {
       window.setTimeout(function() {
         assertion();
         done();
-      }, testconfig.timeouts.eventDelay);
+      }, 5000);
     } else {
       assertion();
     }
@@ -352,7 +362,7 @@ if(typeof(DynamicElements) == 'undefined') {
       window.setTimeout(function() {
         assertion();
         done();
-      }, testconfig.timeouts.eventDelay);
+      }, 5000);
     } else {
       assertion();
     }

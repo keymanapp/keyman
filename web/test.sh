@@ -85,10 +85,6 @@ if builder_start_action test:integrated; then
     KARMA_EXT_FLAGS="${BROWSERS}"
   fi
 
-  # Build modernizr module
-  modernizr -c src/test/auto/integrated/modernizr.config.json -d src/test/auto/integrated/modernizr.js
-  # shellcheck disable=SC2086
-  karma start ${KARMA_FLAGS} ${KARMA_EXT_FLAGS} "${KEYMAN_ROOT}/web/src/test/auto/integrated/${CONFIG}"
-
+  web-test-runner --config src/test/auto/integrated/web-test-runner.config.mjs
   builder_finish_action success test:integrated
 fi

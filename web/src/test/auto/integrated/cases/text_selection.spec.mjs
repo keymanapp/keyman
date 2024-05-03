@@ -1,4 +1,4 @@
-import { assert } from '/node_modules/chai/chai.js';
+import { assert } from 'chai';
 
 import {
   DEVICE_DETECT_FAILURE,
@@ -6,10 +6,16 @@ import {
   setupKMW,
   teardownKMW
 } from "../test_utils.js";
-import * as KMWRecorder from '/@keymanapp/keyman/build/tools/testing/recorder/lib/index.mjs';
+import * as KMWRecorder from '#recorder';
+import { timedPromise } from '@keymanapp/web-utils';
+
+const baseTimeout = 5000;
+const attachmentTimeout = 500;
+const host = document.createElement('div');
+document.body.appendChild(host);
 
 describe('Text Selection', function() {
-  this.timeout(testconfig.timeouts.standard);
+  this.timeout(baseTimeout);
 
   /* Utility functions */
 
@@ -55,28 +61,31 @@ describe('Text Selection', function() {
       before(function() {
         // These tests require use of KMW's device-detection functionality.
         assert.isFalse(DEVICE_DETECT_FAILURE, "Cannot run due to device detection failure.");
-        fixture.setBase('fixtures');
-        fixture.load("single"+inputType+".html");
 
-        this.timeout(testconfig.timeouts.scriptLoad*2);
-        return setupKMW(null, testconfig.timeouts.scriptLoad).then(() => {
-          return loadKeyboardFromJSON("/keyboards/web_context_tests.json", testconfig.timeouts.scriptLoad).then(() => {
+        return setupKMW(null, baseTimeout).then(() => {
+          return loadKeyboardFromJSON("resources/json/keyboards/web_context_tests.json", baseTimeout).then(() => {
             return keyman.setActiveKeyboard("web_context_tests");
           });
         });
       });
 
+      beforeEach(async function() {
+        const ele = document.createElement(inputType);
+        ele.id = 'singleton';
+        host.appendChild(ele);
+
+        await timedPromise(attachmentTimeout);
+      });
+
       after(function() {
-        fixture.cleanup();
         window.keyman?.removeKeyboards('web_context_tests');
         teardownKMW();
       });
 
-      afterEach(function(done) {
-        fixture.load("single"+inputType+".html");
-        window.setTimeout(function(){
-          done();
-        }, testconfig.timeouts.eventDelay);
+      afterEach(async function() {
+        host.innerHTML = '';
+
+        Promise.resolve();
       });
 
       /*

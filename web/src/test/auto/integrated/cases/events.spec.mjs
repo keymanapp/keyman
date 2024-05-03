@@ -1,4 +1,4 @@
-import { assert } from '/node_modules/chai/chai.js';
+import { assert } from 'chai';
 
 import {
   loadKeyboardFromJSON,
@@ -6,21 +6,40 @@ import {
   setupKMW,
   teardownKMW
 } from "../test_utils.js";
-import * as KMWRecorder from '/@keymanapp/keyman/build/tools/testing/recorder/lib/index.mjs';
+import * as KMWRecorder from '#recorder';
+import { timedPromise } from '@keymanapp/web-utils';
+
+const host = document.createElement('div');
+document.body.appendChild(host);
+
+const attachmentTimeout = 500;
 
 describe('Event Management', function() {
-  this.timeout(testconfig.timeouts.standard);
+  this.timeout(5000);
 
   before(function() {
-    this.timeout(testconfig.timeouts.scriptLoad * 2);
-    fixture.setBase('fixtures');
-    fixture.load("eventTestConfig.html");
-
-    return setupKMW(null, testconfig.timeouts.scriptLoad).then(() => {
+    return setupKMW(null, 5000).then(() => {
       // We use this keyboard since we only need minimal input functionality for these tests.
       // Smaller is better when dealing with net latency.
-      return loadKeyboardFromJSON("/keyboards/test_simple_deadkeys.json", testconfig.timeouts.scriptLoad);
+      return loadKeyboardFromJSON("resources/json/keyboards/test_simple_deadkeys.json", 5000);
     });
+  });
+
+  // Async, to give the mutation observers a chance to fire first.
+  beforeEach(async function() {
+    const input = document.createElement('input');
+    input.id = 'input';
+    const textarea = document.createElement('textarea');
+    textarea.id = 'textarea';
+
+    host.appendChild(input);
+    host.appendChild(textarea);
+
+    await timedPromise(attachmentTimeout);
+  });
+
+  afterEach(function() {
+    host.innerHTML = ''
   });
 
   after(function() {
@@ -31,7 +50,7 @@ describe('Event Management', function() {
     var simple_A = {"type":"key","key":"a","code":"KeyA","keyCode":65,"modifierSet":0,"location":0};
     var event = new KMWRecorder.PhysicalInputEventSpec(simple_A);
 
-    var ele = document.getElementById("input");
+    var ele = document.getElementById('input');
 
     ele.onchange = function() {
       ele.onchange = null;
@@ -54,7 +73,7 @@ describe('Event Management', function() {
     var simple_A = {"type":"osk","keyID":"default-K_A"};
     var event = new KMWRecorder.OSKInputEventSpec(simple_A);
 
-    var ele = document.getElementById("input");
+    var ele = document.getElementById('input');
 
     ele.onchange = function() {
       ele.onchange = null;
@@ -82,7 +101,7 @@ describe('Event Management', function() {
     var simple_A = {"type":"key","key":"a","code":"KeyA","keyCode":65,"modifierSet":0,"location":0};
     var event = new KMWRecorder.PhysicalInputEventSpec(simple_A);
 
-    var ele = document.getElementById("input");
+    var ele = document.getElementById('input');
     keyman.setActiveElement(ele);
 
     var counterObj = {i:0};
@@ -104,7 +123,7 @@ describe('Event Management', function() {
     var simple_A = {"type":"osk","keyID":"default-K_A"};
     var event = new KMWRecorder.OSKInputEventSpec(simple_A);
 
-    var ele = document.getElementById("input");
+    var ele = document.getElementById('input');
     keyman.setActiveElement(ele);
 
     var counterObj = {i:0};
