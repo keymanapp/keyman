@@ -386,6 +386,7 @@ public:
   return n;
 }*/
 
+void print_All_Entries(std::vector<mac_KMX_VirtualKey*> rgKey);
 bool run_verify_S2(std::vector<mac_KMX_VirtualKey*> rgKey);
 
 bool mac_KMX_ImportRules( LPKMX_KEYBOARD kp,v_dw_3D &All_Vector, const UCKeyboardLayout **keyboard_layout,std::vector<KMX_DeadkeyMapping> *KMX_FDeadkeys, KMX_BOOL bDeadkeyConversion) { // I4353   // I4327
@@ -480,11 +481,12 @@ bool mac_KMX_ImportRules( LPKMX_KEYBOARD kp,v_dw_3D &All_Vector, const UCKeyboar
   // Now that we've collected the key data, we need to
   // translate it to kmx and append to the existing keyboard
   //-------------------------------------------------------------
+  print_All_Entries(rgKey);
 
   if ( ! run_verify_S2(rgKey))
-    printf(" ::::::::::::::::::::::::::::::::::::::::::::::::::: THERE ARE SOME WRONG ENTRIES ::::::::::::::::::::::::::::::::::::::::::::::::::: \n");
+    printf(" \n::::::::::::::::::::::::::::::::::::::::::::::::::: THERE ARE SOME WRONG ENTRIES ::::::::::::::::::::::::::::::::::::::::::::::::::: \n");
   else
-    printf(" ::::::::::::::::::::::::::::::::::::::::::::::::::::::::: :) :) :) ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: \n");
+    printf("\n ::::::::::::::::::::::::::::::::::::::::::::::::::::::::: :) :) :) ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: \n");
 
   int nDeadkey = 0;
   LPKMX_GROUP gp = new KMX_GROUP[kp->cxGroupArray+4];  // leave space for old
@@ -695,6 +697,14 @@ const int CODE__SIZE[] = {
 
 
 
+void print_entries_S2(int i, std::vector<mac_KMX_VirtualKey*> rgKey , std::string comp1,std::string comp2,std::string erg) {
+  std::string b0 =string_from_u16string(rgKey[i]->mac_KMX_GetShiftState(Base,  0 ));
+  std::string b1 =string_from_u16string(rgKey[i]->mac_KMX_GetShiftState(Base,  1 ));
+  std::string s0 =string_from_u16string(rgKey[i]->mac_KMX_GetShiftState(Shft,  0 ));
+  std::string s1 =string_from_u16string(rgKey[i]->mac_KMX_GetShiftState(Shft,  1 ));
+  printf("\n entry nr %i has characters %-30s:(%s|%s|%s|%s)",i, erg.c_str(), (const char * ) b0.c_str(),(const char * ) b1.c_str(),(const char * ) s0.c_str(),(const char * ) s1.c_str());
+}
+
 bool verify_entries_S2(int i, std::vector<mac_KMX_VirtualKey*> rgKey, int res1,int res2,int res3,int res4 ,int res5=0, int res6=0, int res7=0, int res8=0 ) {
     std::vector <std::u16string> st_vec;
     std::vector <int> r_vec;
@@ -722,6 +732,28 @@ bool verify_entries_S2(int i, std::vector<mac_KMX_VirtualKey*> rgKey, int res1,i
     return all_OK;
 }
 
+void print_All_Entries( std::vector<mac_KMX_VirtualKey*> rgKey) {
+  for ( int i=48; i<58; i++)
+    print_entries_S2(i, rgKey," ","","");
+
+  for ( int i=65; i<91; i++)
+    print_entries_S2(i, rgKey, " ","", "" );
+
+    print_entries_S2(186, rgKey, "ö", "Ö", "xc3 xb6");
+    print_entries_S2(187, rgKey, "´", ";", "´ ´ ` `");
+    print_entries_S2(188, rgKey, ".", ":", ", , ; ;");
+    print_entries_S2(189, rgKey, "ß", "?", "ß ß ? ?");
+    print_entries_S2(190, rgKey, ".", ":", ". . : :");
+    print_entries_S2(191, rgKey, "-", "_", "- - _ _");
+    print_entries_S2(192, rgKey, "^", "°", "^ ^ ° °");
+
+    print_entries_S2(219, rgKey, "ü", "Ü", "ü,Ü;Ü;Ü");
+    print_entries_S2(220, rgKey, "#", "'", "# # ' '");
+    print_entries_S2(221, rgKey, "+", "*", "+ + * *");
+    print_entries_S2(222, rgKey, "ä", "Ä", "ä Ä Ä Ä");
+    print_entries_S2(226, rgKey, "<", ">", "< < > >");
+}
+
 bool run_verify_S2(std::vector<mac_KMX_VirtualKey*> rgKey) {
 
   bool allOK= true;
@@ -737,8 +769,6 @@ bool run_verify_S2(std::vector<mac_KMX_VirtualKey*> rgKey) {
   allOK =  verify_entries_S2(56, rgKey, 56,56,40,40)                           && allOK;
   allOK =  verify_entries_S2(57, rgKey, 57,57,41,41)                           && allOK;
 
-  allOK =  verify_entries_S2(65, rgKey,97,65,65,65,     0x263A, 0xC5, 0, 0)    && allOK;
-
   for( int i=65; i<89;i++)
     allOK =  verify_entries_S2(i, rgKey,i+32,i,i,i)                            && allOK;
 
@@ -746,18 +776,31 @@ bool run_verify_S2(std::vector<mac_KMX_VirtualKey*> rgKey) {
   allOK =  verify_entries_S2(90, rgKey, 89+32,89,89,89)                        && allOK;
 
   allOK =  verify_entries_S2(186, rgKey, 246,214,214,214)                      && allOK;
-  //allOK =  verify_entries_S2(187, rgKey, 48,48,61,61)                        && allOK;      // dk   ´ `
-  allOK =  verify_entries_S2(188, rgKey,44,44,59,59)                           && allOK;
+  //allOK =  verify_entries_S2(187, rgKey, 180,180,96,96)                      && allOK;      // dk ´ `
+  allOK =  verify_entries_S2(187, rgKey, 0,0,0,0)                              && allOK;      // dk ´ `
+  allOK =  verify_entries_S2(188, rgKey, 44,44,59,59)                          && allOK;
   allOK =  verify_entries_S2(189, rgKey, 223,223,63,63)                        && allOK;
   allOK =  verify_entries_S2(190, rgKey, 46,46,58,58)                          && allOK;
   allOK =  verify_entries_S2(191, rgKey, 45,45,95,95)                          && allOK;
 
-  //allOK =  verify_entries_S2(192, rgKey, 48,48,61,61)                         && allOK;      // dk ^ °
-  allOK =  verify_entries_S2(219, rgKey, 252,220,220,220)                       && allOK;
-  allOK =  verify_entries_S2(220, rgKey, 35,35,39,39)                           && allOK;
-  allOK =  verify_entries_S2(221, rgKey, 43,43,42,42)                           && allOK;
-  allOK =  verify_entries_S2(222, rgKey, 228,196,196,196)                       && allOK;
-  //allOK =  verify_entries_S2(226, rgKey, 48,48,61,61)                         && allOK;      // < >
+  //allOK =  verify_entries_S2(192, rgKey, 94,94,176,176)                      && allOK;      // dk ^ °
+  allOK =  verify_entries_S2(192, rgKey, 0,0,176,176)                          && allOK;      // dk ^ °
+  allOK =  verify_entries_S2(219, rgKey, 252,220,220,220)                      && allOK;
+  allOK =  verify_entries_S2(220, rgKey, 35,35,39,39)                          && allOK;
+  allOK =  verify_entries_S2(221, rgKey, 43,43,42,42)                          && allOK;
+  allOK =  verify_entries_S2(222, rgKey, 228,196,196,196)                      && allOK;
+  allOK =  verify_entries_S2(226, rgKey, 60,60,62,62)                          && allOK;      // < >
+// -------------------------------------------
+  allOK =  verify_entries_S2(48, rgKey, 48,48,61,61,L'}',0,0,0)                && allOK;
+  allOK =  verify_entries_S2(49, rgKey, 49,49,33,33,L'’',0,0,0)                && allOK;
+  allOK =  verify_entries_S2(50, rgKey, 50,50,34,34,L'²',0,0,0)                && allOK;
+  allOK =  verify_entries_S2(51, rgKey, 51,51,167,167,L'³',0,0,0)              && allOK;
+  allOK =  verify_entries_S2(52, rgKey, 52,52,36,36,L'—',0,0,0)                && allOK;
+  allOK =  verify_entries_S2(53, rgKey, 53,53,37,37,L'¡',0,0,0)                && allOK;
+  allOK =  verify_entries_S2(54, rgKey, 54,54,38,38,L'¿',0,0,0)                && allOK;
+  allOK =  verify_entries_S2(55, rgKey, 55,55,47,47,L'{',0,0,0)                && allOK;
+  allOK =  verify_entries_S2(56, rgKey, 56,56,40,40,L'[',0,0,0)                && allOK;
+  allOK =  verify_entries_S2(57, rgKey, 57,57,41,41,L']',0,0,0)                && allOK;
 
   return allOK;
 }
