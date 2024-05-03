@@ -204,13 +204,13 @@ final class KMKeyboard extends WebView {
        */
 
       // Count the number of characters which are surrogate pairs.
-      int pairsAtStart = CharSequenceUtil.countSurrogatePairs(rawText.substring(0, selStart), rawText.length());
-      String selectedText = rawText.substring(selStart, selEnd);
+      int pairsAtStart = CharSequenceUtil.countSurrogatePairs(rawText.substring(0, selMin), rawText.length());
+      String selectedText = rawText.substring(selMin, selMax);
       int pairsSelected = CharSequenceUtil.countSurrogatePairs(selectedText, selectedText.length());
 
-      selStart -= pairsAtStart;
-      selEnd -= (pairsAtStart + pairsSelected);
-      this.loadJavascript(KMString.format("updateKMSelectionRange(%d,%d)", selStart, selEnd));
+      selMin -= pairsAtStart;
+      selMax -= (pairsAtStart + pairsSelected);
+      this.loadJavascript(KMString.format("updateKMSelectionRange(%d,%d)", selMin, selMax));
     }
     result = true;
 
