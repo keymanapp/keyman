@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 18.0.27 alpha 2024-05-03
+
+* chore(linux): Adjust distros for GHA (#11333)
+* fix(common): Fix colorization of help output of builder script (#11336)
+
 ## 18.0.26 alpha 2024-05-02
 
 * chore: merge beta into master A18S1 (#11332)
