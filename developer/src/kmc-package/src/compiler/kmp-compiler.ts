@@ -269,7 +269,7 @@ export class KmpCompiler implements KeymanCompiler {
       kmp.files = this.arrayWrap(kps.Files.File).map((file: KpsFile.KpsFileContentFile) => {
         return {
           name: this.normalizePath(file.Name),
-          description: file.Description.trim(),
+          description: (file.Description ?? '').trim(),
           copyLocation: parseInt(file.CopyLocation, 10) || undefined
           // note: we don't emit fileType as that is not permitted in kmp.json
         };
