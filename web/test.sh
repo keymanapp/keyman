@@ -76,15 +76,16 @@ fi
 KARMA_FLAGS=
 
 if builder_is_debug_build; then
-  KARMA_FLAGS="$KARMA_FLAGS --no-single-run"
+  KARMA_FLAGS="${KARMA_FLAGS} --no-single-run"
 fi
 
 if builder_has_option --reporters; then
-  KARMA_FLAGS="$KARMA_FLAGS --reporters $REPORTERS"
+  KARMA_FLAGS="${KARMA_FLAGS} --reporters ${REPORTERS}"
 fi
 
 # End common configs.
 
+# shellcheck disable=SC2086
 builder_run_action test:dom karma start ${KARMA_FLAGS} "${KEYMAN_ROOT}/web/src/test/auto/dom/${CONFIG}"
 
 # The multi-browser test suite, which uses BrowserStack when run by our CI.
@@ -100,12 +101,13 @@ if builder_start_action test:integrated; then
 
   KARMA_EXT_FLAGS=
   if ! builder_has_option --ci; then
-    KARMA_EXT_FLAGS="$KARMA_FLAGS --browsers $BROWSERS"
+    KARMA_EXT_FLAGS="${BROWSERS}"
   fi
 
   # Build modernizr module
   modernizr -c src/test/auto/integrated/modernizr.config.json -d src/test/auto/integrated/modernizr.js
-  karma start $KARMA_FLAGS $KARMA_EXT_FLAGS "${KEYMAN_ROOT}/web/src/test/auto/integrated/$CONFIG"
+  # shellcheck disable=SC2086
+  karma start ${KARMA_FLAGS} ${KARMA_EXT_FLAGS} "${KEYMAN_ROOT}/web/src/test/auto/integrated/${CONFIG}"
 
   builder_finish_action success test:integrated
 fi
