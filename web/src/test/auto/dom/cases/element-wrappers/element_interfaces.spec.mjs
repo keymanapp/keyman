@@ -1,12 +1,15 @@
-import { assert } from '/node_modules/chai/chai.js';
+import { assert } from 'chai';
 
-import { extendString, Mock } from '/@keymanapp/keyboard-processor/build/lib/index.mjs';
-import * as wrappers from '/@keymanapp/keyman/build/engine/element-wrappers/lib/index.mjs';
-import Device from '/@keymanapp/keyman/build/engine/device-detect/lib/index.mjs';
+import { extendString, Mock } from '@keymanapp/keyboard-processor';
+import * as wrappers from 'keyman/engine/element-wrappers';
 
-import { toSupplementaryPairString, DynamicElements, DEVICE_DETECT_FAILURE } from '../test_utils.js';
+import { DynamicElements } from '../../test_utils.js';
 
 extendString();
+
+const host = document.createElement('div');
+host.id = 'DynamicElements';
+document.body.appendChild(host);
 
 var InterfaceTests;
 
@@ -16,7 +19,7 @@ if(typeof InterfaceTests == 'undefined') {
 
   (function(){
     // Makes a nice Unicode shortcut.
-    var u = toSupplementaryPairString;
+    var u = (code) => String.fromCodePoint(code);
 
     InterfaceTests.Strings = {};
 
@@ -163,9 +166,6 @@ if(typeof InterfaceTests == 'undefined') {
     }
 
     InterfaceTests.ContentEditable.setSelectionRange = function(pair, start, end) {
-      var device = new Device();
-      device.detect();
-
       var node = pair.elem.childNodes[0];
       var sel = document.getSelection();
 
@@ -186,19 +186,15 @@ if(typeof InterfaceTests == 'undefined') {
       }
 
       if(node.nodeType == 3) {
-        if(device.browser == 'ie') {
+        sel.removeAllRanges();
+        // Does not work on IE!
+        try {
+          sel.setPosition(node, start);
+          sel.extend(node, end);
+        } catch (e) {
+          // Sometimes fails in Firefox during CI.  Not sure why.
+          console.warn("Error occurred while setting Selection via setPosition/extend: " + e.toString());
           setIESelection(node, sel, start, end);
-        } else {
-          sel.removeAllRanges();
-          // Does not work on IE!
-          try {
-            sel.setPosition(node, start);
-            sel.extend(node, end);
-          } catch (e) {
-            // Sometimes fails in Firefox during CI.  Not sure why.
-            console.warn("Error occurred while setting Selection via setPosition/extend: " + e.toString());
-            setIESelection(node, sel, start, end);
-          }
         }
       } else {
         console.warn("Problem detected when setting up a selection range for content-editables!");
@@ -270,9 +266,6 @@ if(typeof InterfaceTests == 'undefined') {
     }
 
     InterfaceTests.DesignIFrame.setSelectionRange = function(pair, start, end) {
-      var device = new Device();
-      device.detect();
-
       var node = pair.document.documentElement.childNodes[0];
       var sel = pair.document.getSelection();
       var range;
@@ -294,19 +287,15 @@ if(typeof InterfaceTests == 'undefined') {
       }
 
       if(node.nodeType == 3) {
-        if(device.browser == 'ie') {
+        sel.removeAllRanges();
+        // Does not work on IE!
+        try {
+          sel.setPosition(node, start);
+          sel.extend(node, end);
+        } catch (e) {
+          // Sometimes fails in Firefox during CI.  Not sure why.
+          console.warn("Error occurred while setting Selection via setPosition/extend: " + e.toString());
           setIESelection(node, sel, start, end);
-        } else {
-          sel.removeAllRanges();
-          // Does not work on IE!
-          try {
-            sel.setPosition(node, start);
-            sel.extend(node, end);
-          } catch (e) {
-            // Sometimes fails in Firefox during CI.  Not sure why.
-            console.warn("Error occurred while setting Selection via setPosition/extend: " + e.toString());
-            setIESelection(node, sel, start, end);
-          }
         }
       } else {
         console.warn("Problem detected when setting up a selection range!");
@@ -969,21 +958,14 @@ if(typeof InterfaceTests == 'undefined') {
 }
 
 describe('Element Input/Output Interfacing', function() {
-  this.timeout(testconfig.timeouts.standard);
+  this.timeout(5000);
 
   before(function() {
-    fixture.setBase('fixtures');
-
     // Make sure the basic SMP extension hooks exist to prevent errors later.
     String.kmwEnableSupplementaryPlane(false);
   });
-
-  beforeEach(function() {
-    fixture.load("robustAttachment.html");
-  })
-
   afterEach(function() {
-    fixture.cleanup();
+    host.innerHTML = '';
   });
 
   describe('Wrapper: HTMLInputElement', function() {
@@ -1185,11 +1167,6 @@ describe('Element Input/Output Interfacing', function() {
    * TODO:  Design and implement some 'complex', cross-Node selection tests.
    */
   describe('Wrapper: Content-Editable Elements (using DIVs)', function() {
-    before(function() {
-      // These tests require use of KMW's device-detection functionality.
-      assert.isFalse(DEVICE_DETECT_FAILURE, "Cannot run due to device detection failure.");
-    })
-
     describe('Caret Handling', function() {
       describe('hasSelection', function() {
         it('correctly recognizes Selection ownership', function () {
@@ -1279,12 +1256,7 @@ describe('Element Input/Output Interfacing', function() {
   describe('Wrapper: Design-Mode IFrames', function() {
     // We're asynchronously loading IFrames, and sequentially at that.
     // We'll need a larger timeout.
-    this.timeout(testconfig.timeouts.scriptLoad);
-
-    before(function() {
-      // These tests require use of KMW's device-detection functionality.
-      assert.isFalse(DEVICE_DETECT_FAILURE, "Cannot run due to device detection failure.");
-    })
+    this.timeout(5000);
 
     beforeEach(function(done) {
       // Per-test creation of reg. pair and dummy elements, since IFrames are async.

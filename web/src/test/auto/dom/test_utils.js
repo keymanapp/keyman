@@ -1,6 +1,6 @@
 // // KeymanWeb test suite - processing of the Karma configuration's client.args parameter.
 
-import Device from '/@keymanapp/keyman/build/engine/device-detect/lib/index.mjs';
+import Device from 'keyman/engine/device-detect';
 
 export let DEVICE_DETECT_FAILURE = false;
 
@@ -73,7 +73,7 @@ if(typeof(DynamicElements) == 'undefined') {
     if(loadCallback) {
       frame.addEventListener('load', function() {
         // Give KMW's attachment events a chance to run first.
-        window.setTimeout(loadCallback, Math.max(100, testconfig.timeouts.scriptLoad));
+        window.setTimeout(loadCallback, Math.max(100, 5000));
       });
     }
     frame.setAttribute("src", "resources/html/iframe.html");
@@ -89,7 +89,7 @@ if(typeof(DynamicElements) == 'undefined') {
 
     frame.height = "100";
     frame.id = 'designIFrame' + i;
-    frame.src = "resources/html/editableFrame.html";
+    frame.src = "resources/html/designIframe.html";
 
     if(loadCallback) {
       frame.addEventListener('load', function() {
@@ -123,7 +123,7 @@ if(typeof(DynamicElements) == 'undefined') {
       window.setTimeout(function() {
         assertion();
         done();
-      }, testconfig.timeouts.eventDelay);
+      }, 5000);
     } else {
       assertion();
     }
