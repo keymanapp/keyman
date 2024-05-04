@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 18.0.28 alpha 2024-05-04
+
+* chore(common): maintenance on build scripts - cd (#11329)
+
 ## 18.0.27 alpha 2024-05-03
 
 * chore(linux): Adjust distros for GHA (#11333)
