@@ -1,5 +1,11 @@
 # Keyman Version History
 
+## 17.0.319 beta 2024-05-04
+
+* fix(android): inverting a selection range would crash Keyman (#11345)
+* fix(developer): handle missing Name element for File element in package compiler (#11352)
+* fix(developer): handle missing Description element for File element in package compiler (#11354)
+
 ## 17.0.318 beta 2024-05-02
 
 * fix(web): longpress shortcut activation should only consider northward part (#11306)
