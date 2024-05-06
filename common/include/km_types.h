@@ -31,7 +31,7 @@ typedef uint16_t   KMX_WORD;
 typedef char16_t   km_core_cu;
 typedef char32_t   km_core_usv;
 #else
-typedef uint16_t   km_core_cu;          // code point
+typedef uint16_t   km_core_cu;          // code unit
 typedef uint32_t   km_core_usv;         // Unicode Scalar Value
 #endif
 
