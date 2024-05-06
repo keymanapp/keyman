@@ -88,7 +88,7 @@ int mac_KMX_ToUnicodeEx(int keycode, PKMX_WCHAR pwszBuff, int shift_state_pos, i
             //rc>0:  character
             //rc==0:  no translation
             //rc<0:  dk
-
+// _S2 can I use mac_KMX_get_KeyVal_From_KeyCode_dk ?
   KMX_DWORD KeyVal= (KMX_DWORD) mac_KMX_get_KeyVal_From_KeyCode(keyboard_layout, keycode, mac_map_VKShiftState_to_MacModifier(ShiftState(shift_state_pos)), caps);
 
   // _S2 ToDo non-dk OK, but all others not
@@ -386,6 +386,7 @@ public:
   return n;
 }*/
 
+// _S2 need to go
 void print_All_Entries(std::vector<mac_KMX_VirtualKey*> rgKey);
 bool run_verify_S2(std::vector<mac_KMX_VirtualKey*> rgKey);
 

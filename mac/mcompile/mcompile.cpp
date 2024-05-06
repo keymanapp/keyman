@@ -45,12 +45,12 @@ std::vector<KMX_DeadkeyMapping> KMX_FDeadkeys; // I4353
 #if defined(_WIN32) || defined(_WIN64)
   int wmain(int argc, wchar_t* argv[]) {
     std::vector<std::u16string> str_argv_16 = convert_argvW_to_Vector_u16str( argc, argv);
-    mac_run(argc, str_argv_16);
+    run(argc, str_argv_16);
 
 #elif ((__linux__) ||  (__unix__ )) // LINUX, UNIX
   int main(int argc, char* argv[]) {
     std::vector<std::u16string> str_argv_16 = convert_argv_to_Vector_u16str(argc, argv);
-    mac_run(argc, str_argv_16, argv);
+    run(argc, str_argv_16, argv);
 
 #elif (__APPLE__ && TARGET_OS_MAC)
   #include <TargetConditionals.h>
@@ -160,9 +160,9 @@ int mac_run(int argc, std::vector<std::u16string> str_argv, char* argv_ch[] = NU
 
 // _S2 is this correct?? which SS ???
 // Map of all shift states that we will work with
-const UINT VKShiftState[] = {0, K_SHIFTFLAG, LCTRLFLAG|RALTFLAG, K_SHIFTFLAG|LCTRLFLAG|RALTFLAG, 0xFFFF};
+//const UINT VKShiftState[] = {0, K_SHIFTFLAG, LCTRLFLAG|RALTFLAG, K_SHIFTFLAG|LCTRLFLAG|RALTFLAG, 0xFFFF};
 //const UINT VKShiftState[] = {0, 2, 4,6, 0xFFFF};
-//const UINT VKShiftState[] = {0, 2, 8,10, 0xFFFF};
+const UINT VKShiftState[] = {0, 2, 8,10, 0xFFFF};
 
 
 //
@@ -172,6 +172,7 @@ const UINT VKShiftState[] = {0, K_SHIFTFLAG, LCTRLFLAG|RALTFLAG, K_SHIFTFLAG|LCT
 // correct shift state and key.  Adjust the LCTRL+RALT -> RALT if necessary
 //
 void mac_KMX_TranslateKey(LPKMX_KEY key, KMX_WORD vk, UINT shift, KMX_WCHAR ch) {
+  //_S2 do we translate here or is this the reason for Shift + K_A  <-> Shift 'a' ???
   // The weird LCTRL+RALT is Windows' way of mapping the AltGr key.
   // We store that as just RALT, and use the option "Simulate RAlt with Ctrl+Alt"
   // to provide an alternate..
@@ -233,7 +234,7 @@ void mac_KMX_ReportUnconvertedKeyboardRules(LPKMX_KEYBOARD kbd) {
   }
 }
 
-/*void mac_KMX_TranslateDeadkeyKey(LPKMX_KEY key, KMX_WCHAR deadkey, KMX_WORD vk, UINT shift, KMX_WORD ch) {
+void mac_KMX_TranslateDeadkeyKey(LPKMX_KEY key, KMX_WCHAR deadkey, KMX_WORD vk, UINT shift, KMX_WORD ch) {
 // _S2 TOP_2 INFO this produces  a different output due to different layouts for Lin<-> win ( for the same language!!)
 
    if((key->ShiftFlags == 0 || key->ShiftFlags & VIRTUALCHARKEY) && key->Key == ch) {
@@ -262,23 +263,23 @@ void mac_KMX_ReportUnconvertedKeyboardRules(LPKMX_KEYBOARD kbd) {
     key->dpContext = context;
     key->Key = vk;
   }
-}*/
+}
 
-/*void mac_KMX_TranslateDeadkeyGroup(LPKMX_GROUP group,KMX_WCHAR deadkey, KMX_WORD vk, UINT shift, KMX_WORD ch) {
+void mac_KMX_TranslateDeadkeyGroup(LPKMX_GROUP group,KMX_WCHAR deadkey, KMX_WORD vk, UINT shift, KMX_WORD ch) {
   for(unsigned int i = 0; i < group->cxKeyArray; i++) {
     mac_KMX_TranslateDeadkeyKey(&group->dpKeyArray[i], deadkey, vk, shift, ch);
   }
-}*/
+}
 
-/*void mac_KMX_TranslateDeadkeyKeyboard(LPKMX_KEYBOARD kbd, KMX_WCHAR deadkey, KMX_WORD vk, UINT shift, KMX_WORD ch) {
+void mac_KMX_TranslateDeadkeyKeyboard(LPKMX_KEYBOARD kbd, KMX_WCHAR deadkey, KMX_WORD vk, UINT shift, KMX_WORD ch) {
   for(unsigned int i = 0; i < kbd->cxGroupArray; i++) {
     if(kbd->dpGroupArray[i].fUsingKeys) {
       mac_KMX_TranslateDeadkeyGroup(&kbd->dpGroupArray[i], deadkey, vk, shift, ch);
     }
   }
-}*/
+}
 
-/*void mac_KMX_AddDeadkeyRule(LPKMX_KEYBOARD kbd, KMX_WCHAR deadkey, KMX_WORD vk, UINT shift) {
+void mac_KMX_AddDeadkeyRule(LPKMX_KEYBOARD kbd, KMX_WCHAR deadkey, KMX_WORD vk, UINT shift) {
   // The weird LCTRL+RALT is Windows' way of mapping the AltGr key.
   // We store that as just RALT, and use the option "Simulate RAlt with Ctrl+Alt"
   // to provide an alternate..
@@ -306,7 +307,7 @@ void mac_KMX_ReportUnconvertedKeyboardRules(LPKMX_KEYBOARD kbd) {
       if(i == kbd->StartGroup[1]) break;  // If this is the initial group, that's all we need to do.
     }
   }
-}*/
+}
 
 KMX_WCHAR mac_KMX_ScanXStringForMaxDeadkeyID(PKMX_WCHAR str) {
   KMX_WCHAR dkid = 0;
@@ -382,21 +383,23 @@ void mac_KMX_ConvertDeadkey(LPKMX_KEYBOARD kbd, KMX_WORD vk_US, UINT shift, KMX_
   // Lookup the deadkey table for the deadkey in the physical keyboard
   // Then for each character, go through and map it through
   KMX_WCHAR dkid = mac_KMX_GetUniqueDeadkeyID(kbd, deadkey);
-/* 
+
   // Add the deadkey to the mapping table for use in the import rules phase
   KMX_DeadkeyMapping KMX_deadkeyMapping = { deadkey, dkid, shift, vk_US};    // I4353
 
   KMX_FDeadkeys.push_back(KMX_deadkeyMapping); //dkid, vk, shift);   // I4353
   mac_KMX_AddDeadkeyRule(kbd, dkid, vk_US, shift);
 
-  mac_KMX_GetDeadkeys(dk_Table, deadkey, pdk = deadkeys, keymap);  // returns array of [usvk, ch_out] pairs
+  // creates array [a,e,i,o,u][shiftstate][combined for a+dk e.g. â  ]
+  KMX_DWORD sc_dk = mac_KMX_get_KeyCodeUnderlying_From_KeyValUnderlying( All_Vector, (KMX_DWORD) deadkey);
+  mac_KMX_GetDeadkeys( sc_dk, pdk = deadkeys, keyboard_layout);  // returns array of [usvk, ch_out] pairs
 
   while(*pdk) {
     // Look up the ch
     UINT KeyValUnderlying = mac_KMX_get_KeyValUnderlying_From_KeyValUS(All_Vector, *pdk);
     mac_KMX_TranslateDeadkeyKeyboard(kbd, dkid, KeyValUnderlying, *(pdk+1), *(pdk+2));
     pdk+=3;
-  }*/
+  } 
 }
 
 KMX_BOOL mac_KMX_SetKeyboardToPositional(LPKMX_KEYBOARD kbd) {
@@ -437,7 +440,6 @@ KMX_BOOL mac_KMX_DoConvert(LPKMX_KEYBOARD kbd, KMX_BOOL bDeadkeyConversion, int 
       wprintf(L"ERROR: can't Initialize GDK\n");
       return FALSE;
   }
-  // _S2 deadkeys do not work yet - some result in 24(x18) ( this is key 10; key 24)
   // create vector that contains Keycode, base, shift for US-Keyboard and underlying keyboard
   v_dw_3D All_Vector;
   if(mac_createOneVectorFromBothKeyboards(All_Vector, keyboard_layout)){
@@ -457,10 +459,9 @@ KMX_BOOL mac_KMX_DoConvert(LPKMX_KEYBOARD kbd, KMX_BOOL bDeadkeyConversion, int 
     // Loop through each possible key on the keyboard
     for (int i = 0;KMX_VKMap[i]; i++) { // I4651
 
-      // windows uses  VK, Linux, mac use SC/Keycode
+      // windows uses VK, Linux and macOS use SC/Keycode
       // _S2 ToDo unused vk`s ??
       UINT scUnderlying =  mac_KMX_get_KeyCodeUnderlying_From_VKUS(KMX_VKMap[i]);
-      // _S2 ToDo non-dk OK, but all others not
       KMX_WCHAR ch = mac_KMX_get_KeyValUnderlying_From_KeyCodeUnderlying(keyboard_layout, VKShiftState[j], scUnderlying, &DeadKey);
 
       //wprintf(L"--- VK_%d -> SC_ [%c] dk=%d  ( ss %i) \n", KMX_VKMap[i], ch == 0 ? 32 : ch, DeadKey, VKShiftState[j]);
@@ -473,19 +474,16 @@ KMX_BOOL mac_KMX_DoConvert(LPKMX_KEYBOARD kbd, KMX_BOOL bDeadkeyConversion, int 
       switch(ch) {
         case 0x0000: break;
         // _S2 ToDo
-        case 0xFFFF:
-        mac_KMX_ConvertDeadkey(kbd, KMX_VKMap[i], VKShiftState[j], DeadKey, All_Vector, keyboard_layout , dk_Table); break;
-        // _S2 ToDo non-dk OK, but all others not
-        default:
-        mac_KMX_TranslateKeyboard(kbd, KMX_VKMap[i], VKShiftState[j], ch);
+        case 0xFFFF: mac_KMX_ConvertDeadkey(kbd, KMX_VKMap[i], VKShiftState[j], DeadKey, All_Vector, keyboard_layout , dk_Table); break;
+        default: mac_KMX_TranslateKeyboard(kbd, KMX_VKMap[i], VKShiftState[j], ch);
       }
     }
   }
   // _S2 ToDo non-dk OK, but all others are not
   mac_KMX_ReportUnconvertedKeyboardRules(kbd);
 
-  // _S2 has to go later
-  /*KMX_DWORD out = X_find_Shiftstates(0, keyboard_layout,12) ;*/
+  /*// _S2 has to go later
+  KMX_DWORD out = X_find_Shiftstates(0, keyboard_layout,12) ;
   //KMX_DWORD out2= X_find_Shiftstates(0, keyboard_layout,0) ;
   //KMX_DWORD out4= X_compare_Shiftstates(0, keyboard_layout,0) ;
   //KMX_DWORD out3 =  printout_dk(keyboard_layout);
@@ -498,7 +496,7 @@ KMX_BOOL mac_KMX_DoConvert(LPKMX_KEYBOARD kbd, KMX_BOOL bDeadkeyConversion, int 
   for ( int i= 0; i<16;i++) {
     out6= X_playWithDK_one(24, keyboard_layout,i) ;
     printf( " key-nr : 24 ss %i gives char: %i(%c)\n",i,  out6,out6);
-  }
+  }*/
 
   if(!mac_KMX_ImportRules(kbd, All_Vector, &keyboard_layout, &KMX_FDeadkeys, bDeadkeyConversion)) {   // I4353   // I4552
     return FALSE;
@@ -507,28 +505,32 @@ KMX_BOOL mac_KMX_DoConvert(LPKMX_KEYBOARD kbd, KMX_BOOL bDeadkeyConversion, int 
   return TRUE;
 }
 
-/* int mac_KMX_GetDeadkeys(v_dw_2D & dk_Table, KMX_WORD DeadKey, KMX_WORD *OutputPairs, GdkKeymap* keymap) {
+int mac_KMX_GetDeadkeys( KMX_WORD DeadKey, KMX_WORD *OutputPairs, const UCKeyboardLayout * keyboard_layout) {
 
+  UniCharCount maxStringlength    = 5;
+  UniCharCount actualStringlength = 0;
+  UniChar unicodeString[maxStringlength];
   KMX_WORD *p = OutputPairs;
-  KMX_DWORD shift;
+  UInt32 deadkeystate = 0;
+  OSStatus status;
+  KMX_DWORD shift=0;
 
-  v_dw_2D  dk_SingleTable;
-  mac_query_dk_combinations_for_specific_dk(&dk_Table, dk_SingleTable, DeadKey);
-  for ( int i=0; i< (int) dk_SingleTable.size();i++) {
-    KMX_WORD vk = mac_KMX_changeKeynameToCapital(dk_SingleTable[i][1], shift, keymap);
-    if(vk != 0) {
-      *p++ = vk;
-      *p++ = shift;
-      *p++ = dk_SingleTable[i][2];
-    }
-    else {
-      mac_KMX_LogError(L"Warning: complex deadkey not supported.");
+  for ( int i=0; i< 50;i++) {
+    status = UCKeyTranslate(keyboard_layout, DeadKey ,kUCKeyActionDown, shift, LMGetKbdType(), 0, &deadkeystate, maxStringlength, &actualStringlength, unicodeString );
+    if(deadkeystate !=0) {
+      status = UCKeyTranslate(keyboard_layout, i ,kUCKeyActionDown, shift, LMGetKbdType(), 0, &deadkeystate, maxStringlength, &actualStringlength, unicodeString );
+      if(deadkeystate !=0) {
+        KMX_WORD vk = mac_KMX_get_KeyValUnderlying_From_KeyCodeUnderlying(keyboard_layout, i, 1);
+        *p++ = vk;
+        *p++ = shift;
+        *p++ =unicodeString[0];;
+      }
     }
   }
   *p = 0;
   return (p-OutputPairs);
 }
-*/
+
 
 void mac_KMX_LogError(const wchar_t* fmt, ...) {
   WCHAR fmtbuf[256];

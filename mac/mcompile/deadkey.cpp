@@ -78,7 +78,7 @@ void mac_refine_alDead(KMX_WCHAR dk, std::vector<DeadKey*> &dkVec, std::vector<D
 		return false;
 }*/
 
-/*KMX_DWORD mac_KMX_changeKeynameToCapital(KMX_DWORD KVal, KMX_DWORD &shift, GdkKeymap* keymap) {
+/*KMX_DWORD mac_KMX_changeKeynameToCapital(KMX_DWORD KVal, KMX_DWORD &shift, const UCKeyboardLayout * keyboard_layout) {
   guint Keyval = (guint) KVal;
   GdkKeymapKey* keys;
   gint n_keys;
@@ -94,6 +94,8 @@ void mac_refine_alDead(KMX_WCHAR dk, std::vector<DeadKey*> &dkVec, std::vector<D
 		}
 	}
 	return Cap;
+	KMX_DWORD out_S2 =0;
+	return out_S2;
 }*/
 
 void mac_create_DKTable(v_dw_2D & dk_ComposeTable) {

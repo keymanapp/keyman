@@ -27,6 +27,6 @@ bool mac_query_dk_combinations_for_specific_dk(v_dw_2D * dk_ComposeTable, v_dw_2
 //################################################################################################################################################
 
 // get the shifted character of a key and write shiftstate of KVal to shift
-//KMX_DWORD mac_KMX_changeKeynameToCapital(KMX_DWORD KVal, KMX_DWORD &shift, GdkKeymap* keymap);
+KMX_DWORD mac_KMX_changeKeynameToCapital(KMX_DWORD KVal, KMX_DWORD &shift, const UCKeyboardLayout * keyboard_layout);
 
 # endif//DEADKEY_H

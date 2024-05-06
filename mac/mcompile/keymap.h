@@ -85,9 +85,9 @@ typedef std::vector<std::vector<std::vector<KMX_DWORD> > > v_dw_3D;
 
 static KMX_DWORD returnIfCharInvalid = 0;
 static KMX_DWORD max_shiftstate = 2;		// _S2 only base+Shift
-static KMX_DWORD keycode_max = 94;
-static KMX_DWORD deadkey_min = 0xfe50;
-static KMX_DWORD deadkey_max = 0xfe93;
+static KMX_DWORD keycode_max = 94;			// _S2 needed??
+static KMX_DWORD deadkey_min = 0xfe50;	// _S2 needed??
+static KMX_DWORD deadkey_max = 0xfe93;	// _S2 needed??
 //static KMX_DWORD deadkey_max = 0xfe52;  // _S2 TOP_6 TODO This has to go! my test: to only return 3 dk
 
 // map Shiftstate to modifier (e.g. 0->0; )
@@ -652,10 +652,6 @@ const UINT mac_ScanCodeToUSVirtualKey[128] = {
 	115	//	L"K_?00",	//	&H73
 };
 
-
-
-
-
 // _S2 what instead x999?
 //( on character-.st index we find the keycode e.g.
 // for character A  (65) we look at pos  65 and find keycode 0
@@ -928,7 +924,9 @@ bool mac_IsKeymanUsedChar(int KV);
 std::u16string mac_convert_DeadkeyValues_To_U16str(int in);
 
 // use gdk_keymap_translate_keyboard_state to get keyval - base function to get keyvals
+// _S2 can I use mac_KMX_get_KeyVal_From_KeyCode_dk only?
 int mac_KMX_get_KeyVal_From_KeyCode(const UCKeyboardLayout * keyboard_layout, int keycode, int ss, int caps);
+int mac_KMX_get_KeyVal_From_KeyCode_dk(const UCKeyboardLayout * keyboard_layout, int keycode, int shiftstate, int caps, UInt32 &deadkeystate_ret);
 
 // use mac_KMX_get_KeyVal_From_KeyCode and prevent use of certain keycodes
 KMX_DWORD mac_KMX_get_KeyValUnderlying_From_KeyCodeUnderlying(const UCKeyboardLayout * keyboard_layout, int keycode, int shift_state_pos);
@@ -938,6 +936,9 @@ KMX_DWORD mac_KMX_get_KeyValUnderlying_From_KeyCodeUnderlying(const UCKeyboardLa
 
 // use Vector to return the Keyval of underlying Keyboard
 KMX_WCHAR mac_KMX_get_KeyValUnderlying_From_KeyValUS(v_dw_3D &All_Vector,KMX_DWORD VK_underlying);
+
+// use Vector to return the Scancode of underlying Keyboard
+KMX_WCHAR mac_KMX_get_KeyCodeUnderlying_From_KeyValUnderlying(v_dw_3D & All_Vector, KMX_DWORD KV_Underlying);
 
 // use Vector to return the Keycode of the underlying Keyboard for given VK_US using GDK
 KMX_DWORD mac_KMX_get_KeyCodeUnderlying_From_KeyCodeUS(const UCKeyboardLayout * keyboard_layout, v_dw_3D &All_Vector,KMX_DWORD KC_US, ShiftState ss, int caps);
@@ -951,16 +952,12 @@ KMX_DWORD mac_KMX_get_VKUS_From_KeyCodeUnderlying(KMX_DWORD keycode);
 // convert codePoint to u16string
 std::u16string mac_CodePointToU16String(unsigned int codepoint);
 
-
-void printoutKeyboards(v_dw_3D &All_Vector);
-
-
-
-
 //################################################################################################################################################
 //################################################################################################################################################
 
 // _S2 need to go
+
+void printoutKeyboards(v_dw_3D &All_Vector);
 KMX_DWORD  X_playWithDK(int shiftstate,const UCKeyboardLayout* keyboard_layout , KMX_DWORD charVal) ;
 KMX_DWORD  X_playWithDK_one(int shiftstate,const UCKeyboardLayout* keyboard_layout , KMX_DWORD charVal);
 KMX_DWORD X_compare_Shiftstates(int shiftstate,const UCKeyboardLayout* keyboard_layout , KMX_DWORD charVal=0);
