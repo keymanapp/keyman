@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 18.0.29 alpha 2024-05-06
+
+* chore(web): Improve web/test.sh script (#11355)
+* chore(linux): Fix typo (#11356)
+
 ## 18.0.28 alpha 2024-05-04
 
 * chore(common): maintenance on build scripts - cd (#11329)
