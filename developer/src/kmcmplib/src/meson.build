@@ -116,3 +116,7 @@ if cpp_compiler.get_id() == 'emscripten'
   endif
 endif
 
+
+gtest = subproject('gtest')
+gtest_dep = gtest.get_variable('gtest_main_dep')
+gmock_dep = gtest.get_variable('gmock_dep')
