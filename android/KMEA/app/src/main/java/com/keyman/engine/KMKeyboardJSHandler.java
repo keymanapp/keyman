@@ -135,13 +135,13 @@ public class KMKeyboardJSHandler {
             end = temp;
           }
           if (end > start) {
+            k.setShouldIgnoreSelectionChange(true);
             if (s.length() == 0) {
               ic.setSelection(start, start);
               ic.deleteSurroundingText(0, end - start);
               ic.endBatchEdit();
               return;
             } else {
-              k.setShouldIgnoreSelectionChange(true);
               ic.setSelection(start, start);
               ic.deleteSurroundingText(0, end - start);
             }
