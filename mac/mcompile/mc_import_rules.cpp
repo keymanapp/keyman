@@ -481,8 +481,9 @@ bool mac_KMX_ImportRules( LPKMX_KEYBOARD kp,v_dw_3D &All_Vector, const UCKeyboar
   // Now that we've collected the key data, we need to
   // translate it to kmx and append to the existing keyboard
   //-------------------------------------------------------------
-  print_All_Entries(rgKey);
 
+  // _S2 needs to go
+  //print_All_Entries(rgKey);
   if ( ! run_verify_S2(rgKey))
     printf(" \n::::::::::::::::::::::::::::::::::::::::::::::::::: THERE ARE SOME WRONG ENTRIES ::::::::::::::::::::::::::::::::::::::::::::::::::: \n");
   else
@@ -507,7 +508,7 @@ bool mac_KMX_ImportRules( LPKMX_KEYBOARD kp,v_dw_3D &All_Vector, const UCKeyboar
     //}
     LPKMX_KEY kkp = gp->dpKeyArray;
 
-    //_S2
+    //_S2 deadkeys
     /*for(UINT j = 0; j < gp->cxKeyArray; j++, kkp++) {
       nDeadkey = std::max(nDeadkey, KMX_GetMaxDeadkeyIndex(kkp->dpContext));
       nDeadkey = std::max(nDeadkey, KMX_GetMaxDeadkeyIndex(kkp->dpOutput));
@@ -695,7 +696,7 @@ const int CODE__SIZE[] = {
 };
 
 
-
+// _S2 need to go
 
 void print_entries_S2(int i, std::vector<mac_KMX_VirtualKey*> rgKey , std::string comp1,std::string comp2,std::string erg) {
   std::string b0 =string_from_u16string(rgKey[i]->mac_KMX_GetShiftState(Base,  0 ));
@@ -776,15 +777,13 @@ bool run_verify_S2(std::vector<mac_KMX_VirtualKey*> rgKey) {
   allOK =  verify_entries_S2(90, rgKey, 89+32,89,89,89)                        && allOK;
 
   allOK =  verify_entries_S2(186, rgKey, 246,214,214,214)                      && allOK;
-  //allOK =  verify_entries_S2(187, rgKey, 180,180,96,96)                      && allOK;      // dk ´ `
-  allOK =  verify_entries_S2(187, rgKey, 0,0,0,0)                              && allOK;      // dk ´ `
+  allOK =  verify_entries_S2(187, rgKey, 180,180,96,96)                      && allOK;      // dk ´ `
   allOK =  verify_entries_S2(188, rgKey, 44,44,59,59)                          && allOK;
   allOK =  verify_entries_S2(189, rgKey, 223,223,63,63)                        && allOK;
   allOK =  verify_entries_S2(190, rgKey, 46,46,58,58)                          && allOK;
   allOK =  verify_entries_S2(191, rgKey, 45,45,95,95)                          && allOK;
 
-  //allOK =  verify_entries_S2(192, rgKey, 94,94,176,176)                      && allOK;      // dk ^ °
-  allOK =  verify_entries_S2(192, rgKey, 0,0,176,176)                          && allOK;      // dk ^ °
+  allOK =  verify_entries_S2(192, rgKey, 94,94,176,176)                      && allOK;      // dk ^ °
   allOK =  verify_entries_S2(219, rgKey, 252,220,220,220)                      && allOK;
   allOK =  verify_entries_S2(220, rgKey, 35,35,39,39)                          && allOK;
   allOK =  verify_entries_S2(221, rgKey, 43,43,42,42)                          && allOK;

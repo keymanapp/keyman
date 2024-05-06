@@ -15,9 +15,7 @@
 
 std::u16string mac_get_character_From_Keycode(std::vector<int> keyval, int shiftstate,const UCKeyboardLayout* keyboard_layout);
 
-KMX_DWORD mac_get_keyval_From_Keycode(int dk, int ch , int shiftstate);
-KMX_DWORD mac_get_keyval_From_Keycode(std::vector<int> keyval, int shiftstate,const UCKeyboardLayout* keyboard_layout);
-KMX_DWORD mac_get_keyval_From_Keycode(int keyval, int shiftstate,const UCKeyboardLayout* keyboard_layout );
+KMX_DWORD  mac_get_keyval_From_Keycode_new(int charVal,const UCKeyboardLayout* keyboard_layout , KMX_DWORD shiftstate);
 
 //################################################################################################################################################
 //################################# Code beyond these lines needs to be included in mcompile #####################################################
@@ -926,8 +924,6 @@ const UINT mac_USVirtualKeyToScanCode[256] = {
 bool mac_IsKeymanUsedChar(int KV);
 //------------------------------
 
-std::vector<KMX_DWORD> mac_createVectorOfKeyboard( int shiftstate, const UCKeyboardLayout * keyboard_layout);
-
 // take deadkey-value (e.g.65106) and return u16string (e.g. '^' )
 std::u16string mac_convert_DeadkeyValues_To_U16str(int in);
 
@@ -964,6 +960,10 @@ void printoutKeyboards(v_dw_3D &All_Vector);
 //################################################################################################################################################
 //################################################################################################################################################
 
+// _S2 need to go
+KMX_DWORD  X_playWithDK(int shiftstate,const UCKeyboardLayout* keyboard_layout , KMX_DWORD charVal) ;
+KMX_DWORD  X_playWithDK_one(int shiftstate,const UCKeyboardLayout* keyboard_layout , KMX_DWORD charVal);
+KMX_DWORD X_compare_Shiftstates(int shiftstate,const UCKeyboardLayout* keyboard_layout , KMX_DWORD charVal=0);
 KMX_DWORD X_find_Shiftstates(int shiftstate,const UCKeyboardLayout* keyboard_layout , KMX_DWORD charVal=0);
-
+KMX_DWORD  printout_dk(const UCKeyboardLayout* keyboard_layout);/**/
 #endif  // KEYMAP_H
