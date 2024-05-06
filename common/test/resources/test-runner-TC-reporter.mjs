@@ -91,6 +91,11 @@ export default function teamcityReporter({ name="Web Test Runner JavaScript test
     return summary;
   }
 
+  /**
+   * @param {import('@web/test-runner').BasicTestSession} session
+   */
+  const buildSessionName = (session) => `${session.group.name} - ${session.browser.name}`;
+
   /** @type {import('@web/test-runner').Reporter} */
   const reporter = {
     start({browsers, config, sessions}) {
@@ -114,7 +119,7 @@ export default function teamcityReporter({ name="Web Test Runner JavaScript test
       logger = config.logger;
       logger.log(`##teamcity[blockOpened name='${e(name)}']`);
     },
-    stop({testCoverage}) {
+    stop(args) {
       logger.log(`##teamcity[blockClosed name='${e(name)}']`);
 
       // If there are failures, what can we report about the cause of failures?
@@ -172,6 +177,7 @@ export default function teamcityReporter({ name="Web Test Runner JavaScript test
       // There are other ways to at least "attach" the coverage map if desired, I think.
       // https://www.jetbrains.com/help/teamcity/including-third-party-reports-in-the-build-results.html
       // (ooh, custom tab!?  ... via artifact HTML)
+      const testCoverage = args.testCoverage;
       if(testCoverage) {
         console.log(testCoverage?.coverageMap.toJSON());
       }
@@ -190,7 +196,7 @@ export default function teamcityReporter({ name="Web Test Runner JavaScript test
 
       logger.log(`##teamcity[testSuiteStarted name='${e(repoPath)}']`);
       for(let session of sessionsForTestFile) {
-        const sessionName = `${session.group.name} - ${session.browser.name}`;
+        const sessionName = buildSessionName(session);
         logger.log(`##teamcity[testSuiteStarted name='${e(sessionName)}']`);
 
         const results = session.testResults;
