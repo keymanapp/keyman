@@ -86,13 +86,12 @@ This somewhat unwieldy incantation handles all our build environments.
 The intent is to get a good solid consistent path for the script so that we can
 safely include the build script, no matter what `pwd` is when the script is run.
 
-
 The only modification permissible in this block is the
 `<relative-path-to-repo-root>` text which will be a series of `../` paths taking
 us to the repository root from the location of the script itself.
 
 It is essential to make the include relative to the repo root, even for scripts
-under the resources/ folder.  Doing this gives us significant performance
+under the `resources/` folder.  Doing this gives us significant performance
 benefits.
 
 Inclusion of other scripts should be kept outside this standard build script
