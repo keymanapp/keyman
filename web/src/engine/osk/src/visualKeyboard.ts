@@ -77,11 +77,14 @@ const DEBUG_GESTURES: boolean = KEYMAN_VERSION.TIER != 'stable' || KEYMAN_VERSIO
  */
 const DEBUG_HISTORY_COUNT: number = DEBUG_GESTURES ? 10 : 0;
 
+// #region KeyRuleEffects
 interface KeyRuleEffects {
   contextToken?: number,
   alteredText?: boolean
 };
+// #endregion
 
+// #region VisualKeyboardConfiguration
 export interface VisualKeyboardConfiguration extends CommonConfiguration {
   /**
    * The Keyman keyboard on which to base the on-screen keyboard being represented.
@@ -121,6 +124,7 @@ export interface VisualKeyboardConfiguration extends CommonConfiguration {
    */
   specialFont?: InternalKeyboardFont;
 }
+// #endregion
 
 interface BoundingRect {
   left: number,
@@ -143,6 +147,7 @@ interface EventMap {
   'globekey': (keyElement: KeyElement, on: boolean) => void
 }
 
+// #region VisualKeyboard
 export default class VisualKeyboard extends EventEmitter<EventMap> implements KeyboardView {
   /**
    * The gesture-engine used to support user interaction with this keyboard.
@@ -293,7 +298,7 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
     return this.currentLayer?.spaceBarKey?.btn;
   }
 
-  //#region OSK constructor and helpers
+  //#region VisualKeyboard - constructor and helpers
 
   /**
    * @param       {Object}      PVK         Visual keyboard name
@@ -930,7 +935,7 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
   };
   //#endregion
 
-  //#region OSK touch handlers
+  //#region VisualKeyboard - OSK touch handlers
   getTouchCoordinatesOnKeyboard(input: InputSample<KeyElement, string>) {
     // `input` is already in keyboard-local coordinates.  It's not scaled, though.
     let offsetCoords = { x: input.targetX, y: input.targetY };
@@ -1136,8 +1141,6 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
     this._UpdateVKShiftStyle();
   }
 
-  //#endregion
-
   /**
    *  Add or remove a class from a keyboard key (when touched or clicked)
    *  or add a key preview for phone devices
@@ -1298,11 +1301,20 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
         Note:  longpress.flickDist needs to be no greater than flick.startDist.
         Otherwise, the longpress up-flick shortcut will not work on keys that
         support flick gestures.  (Such as sil_euro_latin 3.0+)
+
+        Since it's also based on the purely northward component, it's best to
+        have it be slightly lower.  80% of flick.startDist gives a range of
+        about 37 degrees to each side before a flick-start would win, while
+        70.7% gives 45 degrees.
+
+        (The range _will_ be notably tighter on keys with both longpresses and
+        flicks as a result.)
       */
-      this.gestureParams.longpress.flickDist = 0.25 * this.currentLayer.rowHeight;
-      this.gestureParams.flick.startDist     = 0.25 * this.currentLayer.rowHeight;
-      this.gestureParams.flick.dirLockDist   = 0.35 * this.currentLayer.rowHeight;
-      this.gestureParams.flick.triggerDist   = 0.75 * this.currentLayer.rowHeight;
+      this.gestureParams.longpress.flickDistStart = 0.24 * this.currentLayer.rowHeight;
+      this.gestureParams.flick.startDist          = 0.30 * this.currentLayer.rowHeight;
+      this.gestureParams.flick.dirLockDist        = 0.35 * this.currentLayer.rowHeight;
+      this.gestureParams.flick.triggerDist        = 0.75 * this.currentLayer.rowHeight;
+      this.gestureParams.longpress.flickDistFinal = 0.75 * this.currentLayer.rowHeight;
     }
 
     // Phase 4:  Refresh the layout of the layer-group and active layer.
@@ -1727,4 +1739,5 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
 
     return callbackData;
   }
+  // #endregion VisualKeyboard
 }

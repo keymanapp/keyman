@@ -29,6 +29,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
 import android.content.res.Configuration;
+import android.net.Uri;
 import android.os.Handler;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -149,13 +150,19 @@ final class KMKeyboard extends WebView {
 
   protected boolean updateText(String text) {
     boolean result = false;
+    JSONObject reg = new JSONObject();
     String kmText = "";
     if (text != null) {
-      kmText = text.toString().replace("\\", "\\u005C").replace("'", "\\u0027").replace("\n", "\\n");
+      // Use JSON to handle passing string to Javascript
+      try {
+        reg.put("text", text.toString());
+      } catch (JSONException e) {
+        KMLog.LogException(TAG, "", e);
+      }
     }
 
     if (KMManager.isKeyboardLoaded(this.keyboardType) && !shouldIgnoreTextChange) {
-      this.loadJavascript(KMString.format("updateKMText('%s')", kmText));
+      this.loadJavascript(KMString.format("updateKMText(%s)", reg.toString()));
       result = true;
     }
 
@@ -229,6 +236,7 @@ final class KMKeyboard extends WebView {
 
     getSettings().setCacheMode(WebSettings.LOAD_NO_CACHE);
     getSettings().setSupportZoom(false);
+    getSettings().setTextZoom(100);
 
     getSettings().setUseWideViewPort(true);
     getSettings().setLoadWithOverviewMode(true);
@@ -350,7 +358,8 @@ final class KMKeyboard extends WebView {
             allCalls.append(";");
           }
 
-          loadUrl("javascript:" + allCalls.toString());
+          // Ensure strings safe for Javascript. TODO: font strings
+          loadUrl("javascript:" + Uri.encode(allCalls.toString()));
 
           if(javascriptAfterLoad.size() > 0 && keyboardSet) {
             callJavascriptAfterLoad();
@@ -1098,8 +1107,17 @@ final class KMKeyboard extends WebView {
   }
 
   public void setSpacebarText(KMManager.SpacebarText mode) {
-    String jsString = KMString.format("setSpacebarText('%s')", mode.toString());
-    loadJavascript(jsString);
+    JSONObject reg = new JSONObject();
+    if (mode != null) {
+      // Use JSON to handle passing string to Javascript
+      try {
+        reg.put("text", mode.toString());
+      } catch (JSONException e) {
+        KMLog.LogException(TAG, "", e);
+      }
+    }
+
+    this.loadJavascript(KMString.format("setSpacebarText(%s)", reg.toString()));
   }
 
   /* Implement handleTouchEvent to catch long press gesture without using Android system default time

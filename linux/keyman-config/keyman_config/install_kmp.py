@@ -19,7 +19,7 @@ from keyman_config.get_kmp import (InstallLocation, get_keyboard_data,
                                    get_keyman_font_dir)
 from keyman_config.gnome_keyboards_util import (GnomeKeyboardsUtil,
                                                 get_ibus_keyboard_id,
-                                                is_gnome_shell)
+                                                is_gnome_desktop)
 from keyman_config.ibus_util import get_ibus_bus, install_to_ibus, restart_ibus
 from keyman_config.kmpmetadata import KMFileTypes, get_metadata
 from keyman_config.kvk2ldml import convert_kvk_to_ldml, output_ldml
@@ -261,7 +261,7 @@ class InstallKmp():
             return self._install_keyboards_to_fcitx()
 
         restart_ibus()
-        if is_gnome_shell():
+        if is_gnome_desktop():
             return self._install_keyboards_to_gnome(keyboards, packageDir, language)
         else:
             return self._install_keyboards_to_ibus(keyboards, packageDir, language)
