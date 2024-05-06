@@ -4,7 +4,7 @@
 
 #include <map>
 #include "mc_import_rules.h"
-
+// _S2 TODO dk
 // create a vector for a dk combination ( ` + a  ->  à )
 v_dw_1D mac_createLine(std::string  first, std::string second, KMX_DWORD number, std::string nameresult);
 

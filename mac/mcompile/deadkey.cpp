@@ -4,6 +4,7 @@
 //################################# Code beyond these lines needs to be included in mcompile #####################################################
 //################################################################################################################################################
 
+// _S2 TODO dk
 
 /* v_dw_1D mac_createLine(std::string  first, std::string second, KMX_DWORD number, std::string nameresult) {
 	v_dw_1D line;
