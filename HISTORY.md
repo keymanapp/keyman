@@ -1,5 +1,11 @@
 # Keyman Version History
 
+## 17.0.320 beta 2024-05-07
+
+* fix(android): prevents mid-keystroke desynchronization when deleting selected text (#11367)
+* fix(web): support SVG elements when checking className (#11365)
+* fix(developer): define `lastSelLength` variable (#11366)
+
 ## 17.0.319 beta 2024-05-04
 
 * fix(android): inverting a selection range would crash Keyman (#11345)
