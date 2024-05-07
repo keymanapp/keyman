@@ -1,7 +1,6 @@
 // @ts-check
 import { devices, playwrightLauncher } from '@web/test-runner-playwright';
 import { summaryReporter } from '@web/test-runner';
-import teamcityReporter from '@keymanapp/common-test-resources/test-runner-TC-reporter.mjs';
 import { importMapsPlugin } from '@web/dev-server-import-maps';
 import { dirname, resolve } from 'path';
 import { fileURLToPath } from 'url';
@@ -53,7 +52,6 @@ export default {
   ],
   reporters: [
     summaryReporter({}), /* local-dev mocha-style */
-    teamcityReporter() /* custom-written, for CI-friendly reports */
   ],
   /*
     Un-comment the next two lines for easy interactive debugging; it'll launch the
