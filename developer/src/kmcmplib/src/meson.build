@@ -54,6 +54,10 @@ if cpp_compiler.get_id() == 'emscripten'
     # emscripten < 3.1.44 does not include `wasmExports`
     links += ['-sEXPORTED_RUNTIME_METHODS=[\'UTF8ToString\']']
   endif
+
+  # For Google Test
+  add_global_arguments('-pthread', language: [ 'cpp', 'c' ] )
+
 endif
 
 icu = subproject('icu-for-uset', default_options: [ 'default_library=static', 'cpp_std=c++17', 'warning_level=0', 'werror=false'])
