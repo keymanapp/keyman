@@ -185,6 +185,12 @@ final class KMKeyboard extends WebView {
       int selStart = icText.selectionStart;
       int selEnd = icText.selectionEnd;
 
+      if (selStart < 0 || selEnd < 0) {
+        // There is no selection or cursor
+        // Reference https://developer.android.com/reference/android/text/Selection#getSelectionEnd(java.lang.CharSequence)
+        return false;
+      }
+
       int selMin = selStart, selMax = selEnd;
       if (selStart > selEnd) {
         // Selection is reversed so "swap"
