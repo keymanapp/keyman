@@ -43,7 +43,7 @@
         _helpButton = helpBtn;
         [_helpButton setTitle:@""];
         [_helpButton setBezelStyle:NSHelpButtonBezelStyle];
-        [_helpButton setControlSize:NSMiniControlSize];
+        [_helpButton setControlSize:NSControlSizeMini];
         [_helpButton setAction:@selector(helpAction:)];
         [_helpButton setEnabled:[self hasHelpDocumentation]];
         [self.window addViewToTitleBar:_helpButton positionX:NSWidth(self.window.frame) - NSWidth(_helpButton.frame) -10];

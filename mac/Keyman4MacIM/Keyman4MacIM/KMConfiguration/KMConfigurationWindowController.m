@@ -216,7 +216,7 @@
         [textField setEditable:NO];
         [textField setBordered:NO];
         [textField setBackgroundColor:[NSColor clearColor]];
-        [textField setAlignment:NSLeftTextAlignment];
+      [textField setAlignment:NSTextAlignmentLeft];
         [textField setFont:[NSFont systemFontOfSize:tableView.rowHeight*0.5]];
         [textField setTextColor:[NSColor colorWithSRGBRed:0.0 green:0.0 blue:0.1 alpha:1.0]];
         [textField setStringValue:[info objectForKey:@"HeaderTitle"]];

@@ -403,8 +403,8 @@
     KeyView *keyView = (KeyView *)sender;
     NSUInteger keyCode = [keyView.key keyCode];
     if (keyCode < 0x100) {
-        ProcessSerialNumber psn;
-        GetFrontProcess(&psn);
+        NSRunningApplication *app = NSWorkspace.sharedWorkspace.frontmostApplication;
+        pid_t processId = app.processIdentifier;
         CGEventSourceRef source = CGEventSourceCreate(kCGEventSourceStatePrivate);
         CGEventRef keyDownEvent = CGEventCreateKeyboardEvent(source, (CGKeyCode)keyCode, true);
         CGEventRef keyUpEvent = CGEventCreateKeyboardEvent(source, (CGKeyCode)keyCode, false);
@@ -420,8 +420,8 @@
             CGEventSetFlags(keyDownEvent, CGEventGetFlags(keyDownEvent) | kCGEventFlagMaskControl);
             CGEventSetFlags(keyUpEvent, CGEventGetFlags(keyUpEvent) | kCGEventFlagMaskControl);
         }
-        CGEventPostToPSN(&psn, keyDownEvent);
-        CGEventPostToPSN(&psn, keyUpEvent);
+        CGEventPostToPid(processId, keyDownEvent);
+        CGEventPostToPid(processId, keyUpEvent);
         CFRelease(source);
         CFRelease(keyDownEvent);
         CFRelease(keyUpEvent);
@@ -445,7 +445,7 @@
         return;
     
     KeyView *keyView = (KeyView *)view;
-    if (event.type == NSKeyDown)
+    if (event.type == NSEventTypeKeyDown)
         [keyView setKeyPressed:YES];
     [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(setKeyPressedOff:) object:keyView];
     [self performSelector:@selector(setKeyPressedOff:) withObject:keyView afterDelay:0.1];

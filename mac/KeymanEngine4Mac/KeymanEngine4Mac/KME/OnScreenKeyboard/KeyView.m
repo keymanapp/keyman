@@ -48,7 +48,7 @@ static CGFloat const kRelativeModifierLabelHeight = 0.30f;
         [_label setEditable:NO];
         [_label setBordered:NO];
         [_label setDrawsBackground:NO];
-        [_label setAlignment:NSCenterTextAlignment];
+        [_label setAlignment:NSTextAlignmentCenter];
         if ([_caption respondsToSelector:@selector(setLineBreakMode:)]) {
             [_label setLineBreakMode:NSLineBreakByClipping];
         } // There might be some problem not calling this, but it seems to be okay as far as I can tell
@@ -69,7 +69,7 @@ static CGFloat const kRelativeModifierLabelHeight = 0.30f;
 
 - (void)drawRect:(NSRect)rect {
     [[self getOpaqueColorWithRed:241 green:242 blue:242] setFill];
-    NSRectFillUsingOperation(rect, NSCompositeSourceOver);
+    NSRectFillUsingOperation(rect, NSCompositingOperationSourceOver);
 
     // Drawing code here.
     CGContextRef context = (CGContextRef)[[NSGraphicsContext currentContext] graphicsPort];
@@ -238,7 +238,7 @@ static CGFloat const kRelativeModifierLabelHeight = 0.30f;
         [_caption setBordered:NO];
         [_caption setDrawsBackground:NO];
         //[_caption setBackgroundColor:[NSColor yellowColor]];
-        [_caption setAlignment:NSLeftTextAlignment];
+        [_caption setAlignment:NSTextAlignmentLeft];
         if ([_caption respondsToSelector:@selector(setLineBreakMode:)]) {
             [_caption setLineBreakMode:NSLineBreakByClipping];
         } // There might be some problem not calling this, but it seems to be okay as far as I can tell

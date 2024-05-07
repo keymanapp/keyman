@@ -119,7 +119,7 @@ NSString* const kEasterEggKmxName = @"EnglishSpanish.kmx";
 - (CoreKeyOutput*) processEventWithKeymanEngine:(NSEvent *)event in:(id) sender {
   CoreKeyOutput* coreKeyOutput = nil;
   if (self.appDelegate.lowLevelEventTap != nil) {
-      NSEvent *eventWithOriginalModifierFlags = [NSEvent keyEventWithType:event.type location:event.locationInWindow modifierFlags:self.appDelegate.currentModifierFlags timestamp:event.timestamp windowNumber:event.windowNumber context:event.context characters:event.characters charactersIgnoringModifiers:event.charactersIgnoringModifiers isARepeat:event.isARepeat keyCode:event.keyCode];
+      NSEvent *eventWithOriginalModifierFlags = [NSEvent keyEventWithType:event.type location:event.locationInWindow modifierFlags:self.appDelegate.currentModifierFlags timestamp:event.timestamp windowNumber:event.windowNumber context:[NSGraphicsContext currentContext] characters:event.characters charactersIgnoringModifiers:event.charactersIgnoringModifiers isARepeat:event.isARepeat keyCode:event.keyCode];
       coreKeyOutput = [self.kme processEvent:eventWithOriginalModifierFlags];
       [self.appDelegate logDebugMessage:@"processEventWithKeymanEngine, using AppDelegate.currentModifierFlags %lu, instead of event.modifiers = %lu", (unsigned long)self.appDelegate.currentModifierFlags, (unsigned long)event.modifierFlags];
   }
@@ -223,7 +223,7 @@ NSString* const kEasterEggKmxName = @"EnglishSpanish.kmx";
   // mouse movement requires that the context be invalidated
   [self handleContextChangedByLowLevelEvent];
 
-  if (event.type == NSKeyDown) {
+  if (event.type == NSEventTypeKeyDown) {
     // indicates that our generated backspace event(s) are consumed
     // and we can insert text that followed the backspace(s)
     if (event.keyCode == kKeymanEventKeyCode) {
@@ -253,7 +253,7 @@ NSString* const kEasterEggKmxName = @"EnglishSpanish.kmx";
     return NO; // let the client app handle all Command-key events.
   }
 
-  if (event.type == NSKeyDown) {
+  if (event.type == NSEventTypeKeyDown) {
     [self reportContext:event forClient:sender];
     handled = [self handleEventWithKeymanEngine:event in: sender];
   }
