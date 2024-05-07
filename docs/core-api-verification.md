@@ -49,7 +49,7 @@ work particularly well with C++, so it might flag some C++ symbols even though
 they aren't part of the API. This happens particularly with C++ template
 instantiations.
 
-To work around this, we list the C++ symbols as `optional` that get flaged:
+To work around this, we list the C++ symbols as `optional` that get flagged:
 
 ```
  (c++|optional)"typeinfo name for std::codecvt_utf8_utf16<char16_t, 1114111ul, (std::codecvt_mode)0>@Base" 17.0.244

@@ -1,4 +1,4 @@
-libkeymancore.so.1 libkeymancore1 #MINVER#
+libkeymancore.so.2 libkeymancore2 #MINVER#
 * Build-Depends-Package: libkeymancore-dev
 
  (c++|optional)"typeinfo name for std::codecvt_utf8_utf16<char16_t, 1114111ul, (std::codecvt_mode)0>@Base" 17.0.244
