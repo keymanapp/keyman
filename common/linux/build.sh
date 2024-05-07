@@ -2,13 +2,8 @@
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
-. "${THIS_SCRIPT%/*}/../../resources/build/build-utils.sh"
+. "${THIS_SCRIPT%/*}/../../resources/build/builder.inc.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
-
-if [[ $BUILDER_OS != linux ]]; then
-  builder_echo grey "Platform is not linux; skipping common/linux"
-  exit 0
-fi
 
 #
 # TODO: when we have linux-specific tests, add them here
@@ -22,6 +17,11 @@ builder_describe "Keyman common Linux modules" \
   test
 
 builder_parse "$@"
+
+if [[ $BUILDER_OS != linux ]]; then
+  builder_echo grey "Platform is not linux; skipping common/linux"
+  exit 0
+fi
 
 #-------------------------------------------------------------------------------------------------------------------
 

@@ -317,4 +317,4 @@ class UninstallKmpCommonTests(unittest.TestCase):
         # Verify
         self.mockUninstallKeyboardsFromIbus.assert_called_once_with(keyboards, '/tmp/foo')
         self.mockUninstallDir.assert_called()
-        self.assertEquals(mockCustomKeyboardsInstance.remove.call_count, 2)
+        self.assertEqual(mockCustomKeyboardsInstance.remove.call_count, 2)
