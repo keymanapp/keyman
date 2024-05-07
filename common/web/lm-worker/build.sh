@@ -115,15 +115,20 @@ function do_build() {
 function do_test() {
   local MOCHA_FLAGS=
   local WTR_CONFIG=
+  local WTR_DEBUG=
 
   if builder_has_option --ci; then
     MOCHA_FLAGS="$MOCHA_FLAGS --reporter mocha-teamcity-reporter"
     WTR_CONFIG=.ci
   fi
 
+  if builder_has_option --debug; then
+    WTR_DEBUG=" --manual"
+  fi
+
   c8 mocha --recursive $MOCHA_FLAGS ./src/test/mocha/cases/
 
-  web-test-runner --config ./src/test/test-runner/web-test-runner${WTR_CONFIG}.config.mjs
+  web-test-runner --config ./src/test/test-runner/web-test-runner${WTR_CONFIG}.config.mjs ${WTR_DEBUG}
 }
 
 builder_run_action configure  verify_npm_setup
