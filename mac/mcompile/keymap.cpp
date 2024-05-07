@@ -239,7 +239,6 @@ int mac_KMX_get_KeyVal_From_KeyCode_dk(const UCKeyboardLayout * keyboard_layout,
   return (int) unicodeString[0];
 }
 
-
 // _S2 TODO dk/non-dk
 int mac_KMX_get_KeyVal_underlying_From_KeyCode(const UCKeyboardLayout * keyboard_layout, int keycode, int shiftstate, int caps) {
   // _S2 not finished yet - needs deadkeys...
@@ -264,7 +263,6 @@ int mac_KMX_get_KeyVal_underlying_From_KeyCode(const UCKeyboardLayout * keyboard
 
   return returnint;
 }
-
 
 // _S2 can I use mac_KMX_get_KeyVal_From_KeyCode_dk?
 /*int mac_KMX_get_KeyVal_From_KeyCode(GdkKeymap *keymap, guint keycode, ShiftState ss, int caps) {

@@ -197,20 +197,19 @@ void mac_KMX_TranslateKey(LPKMX_KEY key, KMX_WORD vk, UINT shift, KMX_WCHAR ch) 
   }
 }
 
- void mac_KMX_TranslateGroup(LPKMX_GROUP group, KMX_WORD vk, UINT shift, KMX_WCHAR ch) {
+void mac_KMX_TranslateGroup(LPKMX_GROUP group, KMX_WORD vk, UINT shift, KMX_WCHAR ch) {
   for(unsigned int i = 0; i < group->cxKeyArray; i++) {
     mac_KMX_TranslateKey(&group->dpKeyArray[i], vk, shift, ch);
   }
 }
 
- void mac_KMX_TranslateKeyboard(LPKMX_KEYBOARD kbd, KMX_WORD vk, UINT shift, KMX_WCHAR ch) {
+void mac_KMX_TranslateKeyboard(LPKMX_KEYBOARD kbd, KMX_WORD vk, UINT shift, KMX_WCHAR ch) {
   for(unsigned int i = 0; i < kbd->cxGroupArray; i++) {
     if(kbd->dpGroupArray[i].fUsingKeys) {
       mac_KMX_TranslateGroup(&kbd->dpGroupArray[i], vk, shift, ch);
     }
   }
 }
-
 
 void mac_KMX_ReportUnconvertedKeyRule(LPKMX_KEY key) {
   if(key->ShiftFlags == 0) {
@@ -473,7 +472,7 @@ KMX_BOOL mac_KMX_DoConvert(LPKMX_KEYBOARD kbd, KMX_BOOL bDeadkeyConversion, int 
       }
       switch(ch) {
         case 0x0000: break;
-        // _S2 ToDo
+        // _S2 ToDo  for all shiftstates...
         case 0xFFFF: mac_KMX_ConvertDeadkey(kbd, KMX_VKMap[i], VKShiftState[j], DeadKey, All_Vector, keyboard_layout , dk_Table); break;
         default: mac_KMX_TranslateKeyboard(kbd, KMX_VKMap[i], VKShiftState[j], ch);
       }
@@ -530,7 +529,6 @@ int mac_KMX_GetDeadkeys( KMX_WORD DeadKey, KMX_WORD *OutputPairs, const UCKeyboa
   *p = 0;
   return (p-OutputPairs);
 }
-
 
 void mac_KMX_LogError(const wchar_t* fmt, ...) {
   WCHAR fmtbuf[256];
