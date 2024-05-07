@@ -33,6 +33,9 @@ export default function teamcityReporter({ name="Web Test Runner JavaScript test
 
   const e = tcReportEscaping;
 
+  /** @type {Map<string, Map<string, {passed: number, failed: number, skipped: number}>>} */
+  const testDefMap = new Map();
+
   /**
    * @param {import('@web/test-runner').Logger} logger
    * @param {import('@web/test-runner').TestSuiteResult} suiteResult
@@ -46,12 +49,23 @@ export default function teamcityReporter({ name="Web Test Runner JavaScript test
     if(suiteResult.name) {
       logger.log(`##teamcity[testSuiteStarted name='${e(suiteResult.name)}']`);
     }
+
+    const summary = {
+      passed: 0,
+      failed: 0,
+      skipped: 0
+    }
+
     for(const test of suiteResult?.tests ?? []) {
       if(test.skipped) {
         logger.log(`##teamcity[testIgnored name='${e(test.name)}']`);
+        summary.skipped++;
       } else {
         logger.log(`##teamcity[testStarted name='${e(test.name)}' captureStandardOutput='true']`);
-        if(!test.passed) {
+        if(test.passed) {
+          summary.passed++;
+        } else {
+          summary.failed++;
           const message = test.error ? `message='${e(test.error.message)}'` : '';
           const details = test.error ? `\ndetails='${e(test.error.stack)}\n`: '';
 
@@ -60,20 +74,26 @@ export default function teamcityReporter({ name="Web Test Runner JavaScript test
           }
           logger.log(`##teamcity[testFailed name='${e(test.name)}' ${e(message)}] ${e(details)}']`);
         }
+
         logger.log(`##teamcity[testFinished name='${e(test.name)}' duration='${e(test.duration)}']`);
       }
     }
     for(const suite of suiteResult?.suites ?? []) {
-      generateSuiteReport(logger, suite, flowId);
+      const subSummary = generateSuiteReport(logger, suite, flowId);
+      summary.passed += subSummary.passed;
+      summary.failed += subSummary.failed;
+      summary.skipped += subSummary.skipped;
     }
     if(suiteResult.name) {
       logger.log(`##teamcity[testSuiteFinished name='${e(suiteResult.name)}']`);
     }
+
+    return summary;
   }
 
   /** @type {import('@web/test-runner').Reporter} */
   const reporter = {
-    start({browsers, config}) {
+    start({browsers, config, sessions}) {
       rootDir = config.rootDir;
       const existingIds = Array.from(browserFlowIdMap.values());
 
@@ -87,11 +107,63 @@ export default function teamcityReporter({ name="Web Test Runner JavaScript test
         browserFlowIdMap.set(browser, flowId);
       }
 
+      for(const session of sessions.all()) {
+        testDefMap.set(buildSessionName(session), new Map());
+      }
+
       logger = config.logger;
       logger.log(`##teamcity[blockOpened name='${e(name)}']`);
     },
     stop({testCoverage}) {
       logger.log(`##teamcity[blockClosed name='${e(name)}']`);
+
+      // If there are failures, what can we report about the cause of failures?
+      // Step 1: collate per test-group & platform, as it makes a nicer summary.
+      /** @type {Map<string, import('@web/test-runner').BasicTestSession[]} */
+      let sessionFailureMap = new Map();
+
+      for(const session of args.sessions) {
+        if(!session.passed) {
+          const sessionName = buildSessionName(session);
+          const failureList = sessionFailureMap.get(sessionName) || [];
+          if(!failureList.length) {
+            sessionFailureMap.set(sessionName, failureList)
+          }
+
+          failureList.push(session);
+        }
+      }
+
+      for(const sessionName of sessionFailureMap.keys()) {
+        const sessionTestData = testDefMap.get(sessionName);
+
+        logger.log('');
+        logger.log(`Failure data for '${sessionName}'`);
+        for(const sessionFile of sessionFailureMap.get(sessionName)) {
+          const testFile = sessionFile.testFile;
+          const fileTestData = sessionTestData.get(testFile);
+
+          logger.log(`  Failed test-file: ${testFile}`);
+          if(fileTestData) {
+            logger.log(`    Test result summary: ${JSON.stringify(fileTestData)}`);
+          } else {
+            logger.log(`    Tests failed to load and run`);
+          }
+
+          // None of these showed anything useful for a mystery WebKit failure.
+          const request404s = sessionFile.request404s;
+          if(request404s?.length) {
+            logger.log(`    404s observed: ${JSON.stringify(request404s)}`);
+          }
+          if(sessionFile.logs.length > 0) {
+            logger.log(`    Logs:`);
+            for(const log of sessionFile.logs) {
+              // Note:  Is not connected to `logger.log`.  So... what data DO we get?
+              logger.log(`    ${JSON.stringify(log)}`);
+            }
+          }
+        }
+      }
 
       // To consider:  could link in coverage reports via
       // https://www.jetbrains.com/help/teamcity/service-messages.html#Reporting+Build+Statistics
@@ -123,7 +195,8 @@ export default function teamcityReporter({ name="Web Test Runner JavaScript test
 
         const results = session.testResults;
         if(results) {
-          generateSuiteReport(logger, results, browserFlowIdMap.get(session.browser));
+          const summary = generateSuiteReport(logger, results, browserFlowIdMap.get(session.browser));
+          testDefMap.get(sessionName).set(testFile, summary);
         }
 
         logger.log(`##teamcity[testSuiteFinished name='${e(sessionName)}']`);
