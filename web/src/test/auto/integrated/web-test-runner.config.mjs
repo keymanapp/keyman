@@ -16,13 +16,13 @@ export default {
     // Probably a helpful fact to resolve name disambiguation.
     playwrightLauncher({ product: 'chromium' }),
     playwrightLauncher({ product: 'firefox' }),
-    playwrightLauncher({ product: 'webkit' })
+    playwrightLauncher({ product: 'webkit', concurrency: 1 })
   ],
   // Setting it higher makes things faster... but Webkit experiences stability
   // issues for some of the tests if this is set higher than 1.  Notably,
   // engine.spec.mjs, events.spec.mjs, and text_selection.spec.mjs.  All the
   // text-simulation ones.
-  concurrency: 1,
+  concurrency: 10,
   nodeResolve: true,
   files: [
     'src/test/auto/integrated/**/*.spec.mjs',
