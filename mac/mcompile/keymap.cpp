@@ -396,6 +396,7 @@ KMX_DWORD mac_KMX_get_KeyValUnderlying_From_KeyCodeUnderlying(const UCKeyboardLa
     *DeadKey = *dky;
     return 0xFFFF;
   }
+  *DeadKey= 0;
   return KeyV;
 }
 
