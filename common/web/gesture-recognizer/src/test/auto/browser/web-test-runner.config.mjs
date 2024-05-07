@@ -1,7 +1,7 @@
 // @ts-check
 import { devices, playwrightLauncher } from '@web/test-runner-playwright';
 import { summaryReporter } from '@web/test-runner';
-import teamcityReporter from '@keymanapp/common-test-resources/test-runner-TC-reporter.mjs';
+import { esbuildPlugin } from '@web/dev-server-esbuild';
 import { importMapsPlugin } from '@web/dev-server-import-maps';
 import { dirname, resolve } from 'path';
 import { fileURLToPath } from 'url';
@@ -35,6 +35,7 @@ export default {
     }
   ],
   plugins: [
+    esbuildPlugin({ ts: true, target: 'auto'}),
     importMapsPlugin({
       inject: {
         importMap: {

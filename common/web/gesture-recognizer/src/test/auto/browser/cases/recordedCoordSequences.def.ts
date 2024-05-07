@@ -1,6 +1,8 @@
 import { assert, expect } from 'chai';
 import sinon from 'sinon';
 
+import type { GestureDebugSource, InputSample, SerializedGestureSource } from '@keymanapp/gesture-recognizer';
+
 import {
   HostFixtureLayoutController,
   InputSequenceSimulator
@@ -11,7 +13,7 @@ function isOnAndroid() {
   return agent.indexOf('Android' >= 0);
 }
 
-let loc = document.location;
+const loc = document.location;
 // config.testFile generally starts with a '/', with the path resembling the actual full local
 // filesystem for the drive.
 const domain = `${loc.protocol}/${loc.host}`
@@ -24,13 +26,15 @@ async function fetchRecording(jsonFilename) {
 describe("Layer one - DOM -> InputSequence", function() {
   this.timeout(20000);
 
+  let controller: HostFixtureLayoutController;
+
   beforeEach(function(done) {
-    this.controller = new HostFixtureLayoutController();
-    this.controller.connect().then(() => done());
+    controller = new HostFixtureLayoutController();
+    controller.connect().then(() => done());
   });
 
   afterEach(function() {
-    this.controller.destroy();
+    controller.destroy();
   });
 
   describe('recorded input sequences', function() {
@@ -44,9 +48,7 @@ describe("Layer one - DOM -> InputSequence", function() {
 
     // We rely on this function to have the same context as `it` - the test-definition function.
     let replayAndCompare = function(testObj) {
-      let resultPromise;
-
-      let playbackEngine = new InputSequenceSimulator(this.controller);
+      let playbackEngine = new InputSequenceSimulator(controller);
 
       // **********************************
       // Android-Chrome sequence simulation does not allow fractional values in MouseEvent clientX/clientY...
@@ -62,7 +64,7 @@ describe("Layer one - DOM -> InputSequence", function() {
         }
       }
 
-      resultPromise = playbackEngine.replayAsync(testObj);
+      let resultPromise = playbackEngine.replayAsync(testObj);
 
       // replayAsync sets up timeouts against the `clock` object.
       // This will run through the simulated timeout queue asynchronously.
@@ -106,8 +108,8 @@ describe("Layer one - DOM -> InputSequence", function() {
         // Now to compare just the timestamp elements.  We'll tolerate a difference of up to 1.
         // Note:  if using the `replaySync` function instead, disable this section!
         // (Through to the nested for-loop `assert.closeTo`)
-        let sampleTimeExtractor = (sample) => sample.t;
-        let inputTimeExtractor = (input) => {
+        let sampleTimeExtractor = (sample: InputSample<any>) => sample.t;
+        let inputTimeExtractor = (input: GestureDebugSource<any> | SerializedGestureSource) => {
           return input.path.coords.map(sampleTimeExtractor);
         }
 

@@ -10,8 +10,7 @@ import {
 describe("'Canary' checks", function() {
   this.timeout(5000);
 
-  /** @type {string} */
-  let domain;
+  let domain: string;
 
   before(async () => {
     let loc = document.location;
