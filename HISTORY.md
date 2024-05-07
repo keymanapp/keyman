@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 18.0.30 alpha 2024-05-07
+
+* chore(web): Improve dependencies (#11377)
+* test(developer) keyboard info compiler unit tests 3 (#11255)
+
 ## 18.0.29 alpha 2024-05-06
 
 * chore(web): Improve web/test.sh script (#11355)
