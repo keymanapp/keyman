@@ -106,33 +106,18 @@ get_browser_set_for_OS ( ) {
 }
 
 if builder_start_action test:browser; then
-  KARMA_FLAGS=$FLAGS
-  KARMA_INFO_LEVEL="--log-level=warn"
+  WTR_CONFIG=
+  WTR_DEBUG=
 
-  # if builder_has_option --ci; then
-  #   KARMA_FLAGS="$KARMA_FLAGS --reporters teamcity,BrowserStack"
-  #   KARMA_CONFIG="CI.conf.cjs"
-  #   KARMA_INFO_LEVEL="--log-level=debug"
-  # else
-  #   KARMA_CONFIG="manual.conf.cjs"
-  #   if builder_is_debug_build; then
-  #     KARMA_FLAGS="$KARMA_FLAGS --no-single-run"
-  #     KARMA_CONFIG="manual.conf.cjs"
-  #     KARMA_INFO_LEVEL="--log-level=debug"
-
-  #     echo
-  #     echo "${COLOR_YELLOW}You must manually terminate this mode (CTRL-C) for the script to exit.${COLOR_RESET}"
-  #     sleep 2
-  #   fi
-  # fi
-
-  if [[ KARMA_CONFIG == "manual.conf.cjs" ]]; then
-    get_browser_set_for_OS
-  else
-    BROWSERS=
+  if builder_has_option --ci; then
+    WTR_CONFIG=.CI
   fi
-  # karma start $KARMA_INFO_LEVEL $KARMA_FLAGS $BROWSERS ./in_browser/$KARMA_CONFIG
-  web-test-runner --config in_browser/web-test-runner.config.mjs
+
+  if builder_has_option --debug; then
+    WTR_DEBUG=" --manual"
+  fi
+
+  web-test-runner --config in_browser/web-test-runner${WTR_CONFIG}.config.mjs ${WTR_DEBUG}
 
   builder_finish_action success test:browser
 fi
