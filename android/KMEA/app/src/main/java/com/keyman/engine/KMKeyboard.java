@@ -170,57 +170,63 @@ final class KMKeyboard extends WebView {
     return result;
   }
 
+  /**
+   * Updates the selection range of the current context.
+   * Returns boolean - true if the selection range was updated successfully
+   */
   protected boolean updateSelectionRange() {
-    boolean result = false;
+
     InputConnection ic = KMManager.getInputConnection(this.keyboardType);
-    if (ic != null) {
-      ExtractedText icText = ic.getExtractedText(new ExtractedTextRequest(), 0);
-      if (icText == null) {
-        return false;
-      }
-
-      String rawText = icText.text.toString();
-      updateText(rawText.toString());
-
-      int selStart = icText.selectionStart;
-      int selEnd = icText.selectionEnd;
-
-      if (selStart < 0 || selEnd < 0) {
-        // There is no selection or cursor
-        // Reference https://developer.android.com/reference/android/text/Selection#getSelectionEnd(java.lang.CharSequence)
-        return false;
-      }
-
-      int selMin = selStart, selMax = selEnd;
-      if (selStart > selEnd) {
-        // Selection is reversed so "swap"
-        selMin = selEnd;
-        selMax = selStart;
-      }
-
-      /*
-        The values of selStart & selEnd provided by the system are in code units,
-        not code-points.  We need to account for surrogate pairs here.
-
-        Fortunately, it uses UCS-2 encoding... just like JS.
-
-        References:
-        - https://stackoverflow.com/a/23980211
-        - https://android.googlesource.com/platform/frameworks/base/+/152944f/core/java/android/view/inputmethod/InputConnection.java#326
-       */
-
-      // Count the number of characters which are surrogate pairs.
-      int pairsAtStart = CharSequenceUtil.countSurrogatePairs(rawText.substring(0, selMin), rawText.length());
-      String selectedText = rawText.substring(selMin, selMax);
-      int pairsSelected = CharSequenceUtil.countSurrogatePairs(selectedText, selectedText.length());
-
-      selMin -= pairsAtStart;
-      selMax -= (pairsAtStart + pairsSelected);
-      this.loadJavascript(KMString.format("updateKMSelectionRange(%d,%d)", selMin, selMax));
+    if (ic == null) {
+      // Unable to get connection to the text
+      return false;
     }
-    result = true;
 
-    return result;
+    ExtractedText icText = ic.getExtractedText(new ExtractedTextRequest(), 0);
+    if (icText == null) {
+      // Failed to get text becausee either input connection became invalid or client is taking too long to respond
+      // https://developer.android.com/reference/android/view/inputmethod/InputConnection#getExtractedText(android.view.inputmethod.ExtractedTextRequest,%20int)
+      return false;
+    }
+
+    String rawText = icText.text.toString();
+    updateText(rawText.toString());
+
+    int selMin = icText.selectionStart, selMax = icText.selectionEnd;
+
+    if (selMin < 0 || selMax < 0) {
+      // There is no selection or cursor
+      // Reference https://developer.android.com/reference/android/text/Selection#getSelectionEnd(java.lang.CharSequence)
+      return false;
+    }
+
+    if (selMin > selMax) {
+      // Selection is reversed so "swap"
+      selMin = icText.selectionEnd;
+      selMax = icText.selectionStart;
+    }
+
+    /*
+      The values of selStart & selEnd provided by the system are in code units,
+      not code-points.  We need to account for surrogate pairs here.
+
+      Fortunately, it uses UCS-2 encoding... just like JS.
+
+      References:
+      - https://stackoverflow.com/a/23980211
+      - https://android.googlesource.com/platform/frameworks/base/+/152944f/core/java/android/view/inputmethod/InputConnection.java#326
+      */
+
+    // Count the number of characters which are surrogate pairs.
+    int pairsAtStart = CharSequenceUtil.countSurrogatePairs(rawText.substring(0, selMin), rawText.length());
+    String selectedText = rawText.substring(selMin, selMax);
+    int pairsSelected = CharSequenceUtil.countSurrogatePairs(selectedText, selectedText.length());
+
+    selMin -= pairsAtStart;
+    selMax -= (pairsAtStart + pairsSelected);
+    this.loadJavascript(KMString.format("updateKMSelectionRange(%d,%d)", selMin, selMax));
+  
+    return true;
   }
 
 
