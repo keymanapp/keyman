@@ -299,12 +299,28 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
       this.emit('targetchange', target);
     }
 
+    //Execute external (UI) code needed on focus if required
     if(sendEvents) {
-      // //Execute external (UI) code needed on focus if required
-      this.apiEvents.callEvent('controlfocused', {
-        target: target?.getElement() || null,
-        activeControl: previousTarget?.getElement()
-      });
+      const blurredElement = previousTarget?.getElement();
+      const focusedElement = target?.getElement();
+
+      if(!focusedElement) {
+        if(blurredElement) {
+          this.apiEvents.callEvent('controlblurred', {
+            target: blurredElement,
+            event: null,
+            isActivating: this.focusAssistant.maintainingFocus
+          });
+        }
+      } else {
+        // Note:  indicates the previous control being blurred (as
+        // `activeControl`), so 'controlfocused' and 'controlblurred' are
+        // mutually exclusive.
+        this.apiEvents.callEvent('controlfocused', {
+          target: focusedElement,
+          activeControl: blurredElement
+        });
+      }
     }
   }
 
