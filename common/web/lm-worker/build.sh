@@ -114,14 +114,16 @@ function do_build() {
 
 function do_test() {
   local MOCHA_FLAGS=
+  local WTR_CONFIG=
 
   if builder_has_option --ci; then
     MOCHA_FLAGS="$MOCHA_FLAGS --reporter mocha-teamcity-reporter"
+    WTR_CONFIG=.ci
   fi
 
   c8 mocha --recursive $MOCHA_FLAGS ./src/test/mocha/cases/
 
-  web-test-runner --config ./src/test/test-runner/web-test-runner.config.mjs
+  web-test-runner --config ./src/test/test-runner/web-test-runner${WTR_CONFIG}.config.mjs
 }
 
 builder_run_action configure  verify_npm_setup
