@@ -12,7 +12,7 @@ export default {
   concurrency: 10,
   nodeResolve: true,
   files: [
-    '**/*.spec.html'
+    '**/*.spec.mjs'
   ],
   // open: true,
   // manual: true,
