@@ -60,15 +60,15 @@ function do_build() {
 
 function do_test() {
   local MOCHA_FLAGS=
-  local KARMA_CONFIG=manual.conf.cjs
+  local WTR_CONFIG=
   if builder_has_option --ci; then
     echo "Replacing user-friendly test reports with CI-friendly versions."
     MOCHA_FLAGS="$MOCHA_FLAGS --reporter mocha-teamcity-reporter"
-    KARMA_CONFIG=CI.conf.cjs
+    WTR_CONFIG=.CI
   fi
 
   c8 mocha --recursive $MOCHA_FLAGS ./tests/node/
-  web-test-runner --config tests/dom/web-test-runner.config.mjs
+  web-test-runner --config tests/dom/web-test-runner${WTR_CONFIG}.config.mjs
 }
 
 builder_run_action configure  verify_npm_setup

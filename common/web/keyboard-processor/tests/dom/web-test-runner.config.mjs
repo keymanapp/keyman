@@ -52,7 +52,6 @@ export default {
   ],
   reporters: [
     summaryReporter({}), /* local-dev mocha-style */
-    teamcityReporter() /* custom-written, for CI-friendly reports */
   ],
   /*
     Un-comment the next two lines for easy interactive debugging; it'll launch the
