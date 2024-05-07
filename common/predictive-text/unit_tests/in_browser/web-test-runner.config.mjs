@@ -1,7 +1,7 @@
 // @ts-check
 import { devices, playwrightLauncher } from '@web/test-runner-playwright';
 import { summaryReporter } from '@web/test-runner';
-import teamcityReporter from '@keymanapp/common-test-resources/test-runner-TC-reporter.mjs';
+import { esbuildPlugin } from '@web/dev-server-esbuild';
 import { fileURLToPath } from 'url';
 import { dirname, resolve } from 'path';
 
@@ -23,7 +23,7 @@ export default {
   concurrency: 1,
   nodeResolve: true,
   files: [
-    '**/*.spec.mjs'
+    '**/*.spec.ts'
   ],
   middleware: [
     // Rewrites short-hand paths for test resources, making them fully relative to the repo root.
@@ -34,6 +34,9 @@ export default {
 
       return next();
     }
+  ],
+  plugins: [
+    esbuildPlugin({ ts: true, target: 'auto'})
   ],
   reporters: [
     summaryReporter({}), /* local-dev mocha-style */

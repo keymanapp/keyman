@@ -6,8 +6,7 @@ import { defaultCapabilities } from '../helpers.mjs';
 // Import assertions, even using 'with', aren't yet supported in Firefox's engine.
 // import hazelModel from '@keymanapp/common-test-resources/json/models/future_suggestions/i_got_distracted_by_hazel.json' with { type: 'json' };
 
-/** @type {string} */
-let domain;
+let domain: string;
 
 /*
  * How to run the worlist
