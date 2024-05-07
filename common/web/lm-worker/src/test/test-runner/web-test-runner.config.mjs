@@ -1,6 +1,7 @@
 // @ts-check
 import { devices, playwrightLauncher } from '@web/test-runner-playwright';
 import { defaultReporter, summaryReporter } from '@web/test-runner';
+import { esbuildPlugin } from '@web/dev-server-esbuild';
 import named from '@keymanapp/common-test-resources/test-runner-rename-browser.mjs'
 import { fileURLToPath } from 'url';
 import { dirname, resolve } from 'path';
@@ -26,7 +27,10 @@ export default {
   concurrency: 10,
   nodeResolve: true,
   files: [
-    '**/*.spec.mjs'
+    '**/*.spec.ts'
+  ],
+  plugins: [
+    esbuildPlugin({ts: true, target: 'auto'})
   ],
   reporters: [
     summaryReporter({}), /* local-dev mocha-style */
