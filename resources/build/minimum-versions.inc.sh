@@ -4,21 +4,26 @@
 
 # shellcheck shell=bash disable=SC2034 # SC2034: X appears unused.
 
-MIN_NODE_MAJOR_VERSION=18
-MIN_EMSCRIPTEN_VERSION=3.1.44    # 3.1.45 has problems, newer versions will work
+# Target operating system and platform versions
+KEYMAN_MIN_TARGET_VERSION_ANDROID=5       # Lollipop
+KEYMAN_MIN_TARGET_VERSION_IOS=12.2        # iOS 12.2
+KEYMAN_MIN_TARGET_VERSION_WINDOWS=10      # Windows 10
+KEYMAN_MIN_TARGET_VERSION_MAC=10.13       # MacOS 10.13 (High Sierra)
+KEYMAN_MIN_TARGET_VERSION_UBUNTU=20.04    # Ubuntu 20.04 Focal
+KEYMAN_MIN_TARGET_VERSION_CHROME=95.0     # Final version that runs on Android 5.0
 
-MIN_VISUAL_STUDIO_VERSION=2019
-MIN_MESON_VERSION=1.0.0
-MIN_CHROME_VERSION=95.0
+# Dependency versions
+KEYMAN_MIN_VERSION_NODE_MAJOR=18
+KEYMAN_MIN_VERSION_NPM=10.5.1             # 10.5.0 has bug, discussed in #10350
+KEYMAN_MIN_VERSION_EMSCRIPTEN=3.1.44      # Warning: 3.1.45 is bad (#9529); newer versions work
+KEYMAN_MAX_VERSION_EMSCRIPTEN=3.1.58      # See #9529
+KEYMAN_MIN_VERSION_VISUAL_STUDIO=2019
+KEYMAN_MIN_VERSION_MESON=1.0.0
 
-MIN_ANDROID_VERSION=5
-MIN_ANDROID_SDK_VERSION=21
-MIN_IOS_VERSION=12.2
-MIN_WINDOWS_VERSION=10   # Windows 10
-MIN_MACOS_VERSION=10.13  # MacOS 10.13 (High Sierra)
-MIN_UBUNTU_VERSION=20.04 # Ubuntu 20.04 Focal
+# Language and runtime versions
+KEYMAN_MIN_VERSION_JAVA=11                # We're using Java/OpenJDK 11
+KEYMAN_MIN_VERSION_CPP=17                 # C++17
+KEYMAN_MIN_VERSION_ANDROID_SDK=21
 
-# We're using Java/OpenJDK 11
-KEYMAN_JAVA_VERSION=11
-
-DEFAULT_UBUNTU_VERSION=noble
+# Default version used in Docker containers
+KEYMAN_DEFAULT_VERSION_CONTAINER=noble    # Ubuntu 24.04 Noble
