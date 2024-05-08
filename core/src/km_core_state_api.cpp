@@ -13,7 +13,6 @@
 #include <sstream>
 #include <memory>
 #include <iomanip>
-#include <codecvt>
 
 #include "keyman_core.h"
 #include "jsonpp.hpp"
@@ -22,6 +21,7 @@
 #include "state.hpp"
 #include "vkey_to_contextreset.hpp"
 #include "kmx_file.h"
+#include "utfcodec.hpp"
 
 using namespace km::core;
 
@@ -357,7 +357,7 @@ km_core_cu * km_core_state_context_debug(
 
   km_core_context_items_dispose(context_items);
 
-  std::u16string s = std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t>{}.from_bytes(buffer.str());
+  std::u16string s = convert<char, char16_t>(buffer.str());
 
   km_core_cu* result = new km_core_cu[s.size() + 1];
   s.copy(result, s.size());
