@@ -27,20 +27,20 @@ function generate_table {
   echo "|-----------------------------------|--------------|"
 
   # Parameter expansion all the KEYMAN_MIN_* variable names into strarr array
-  readarray -d ' ' -t strarr <<< ${!KEYMAN_MIN*}
-  for((n=0; n<${#strarr[*]}; n++ )) do
+  readarray -d ' ' -t strarr <<< ${!KEYMAN_MIN_*}
+  for n in ${!strarr[@]}; do
     echo "| ${strarr[n]} | ${!strarr[n]} |"
   done
 
   # Parameter expansion all the KEYMAN_MAX_* variable names into strarr array
   readarray -d ' ' -t strarr <<< ${!KEYMAN_MAX*}
-  for((n=0; n<${#strarr[*]}; n++ )) do
+  for n in ${#strarr[@]}; do
     echo "| ${strarr[n]} | ${!strarr[n]} |"
   done
 
   # Parameter expansion all the KEYMAN_DEFAULT_* variable names into strarr array
   readarray -d ' ' -t strarr <<< ${!KEYMAN_DEFAULT*}
-  for((n=0; n<${#strarr[*]}; n++ )) do
+  for n in ${#strarr[@]}; do
     echo "| ${strarr[n]} | ${!strarr[n]} |"
   done
 
