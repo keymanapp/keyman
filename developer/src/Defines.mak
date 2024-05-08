@@ -18,3 +18,5 @@ DEVELOPER_DCC32DPK=cmd /c "$(DCC32PATH)\dcc32.exe" $(DEVELOPER_DELPHIDPKPARAMS)
 # Temporary import of windows/src/Defines.mak
 # TODO: include COMMON_ROOT's defines.mak instead
 !include $(WINDOWS_ROOT)\src\Defines.mak
+
+KEYMANCORE=keymancore-2

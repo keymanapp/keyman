@@ -81,7 +81,7 @@ const
   );
 
 const
-  keymancore = 'keymancore-1.dll';
+  keymancore = 'keymancore-2.dll';
 
 procedure km_core_context_items_dispose(
   context_items: pkm_core_context_item
