@@ -8,7 +8,7 @@ libkeymancore.so.2 libkeymancore2 #MINVER#
  km_core_context_items_dispose@Base 17.0.195
  km_core_context_length@Base 17.0.195
  km_core_context_set@Base 17.0.195
- km_core_cu_dispose@Base 18.0.28
+ km_core_cu_dispose@Base 18.0.30
  km_core_event@Base 17.0.195
  km_core_get_engine_attrs@Base 17.0.195
  km_core_keyboard_dispose@Base 17.0.195
