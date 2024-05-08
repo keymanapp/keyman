@@ -109,7 +109,7 @@ describe('keyboard-info-compiler', function () {
     assert.deepEqual(actual, expected);
   });
 
-  it('check preinit creates langtagsByTag correctly', async function() {
+  it('check preinit creates langtagsByTag correctly', function() {
     const compiler = new KeyboardInfoCompiler(); // indirectly call preinit()
     assert.isNotNull(compiler);
     const en_langtag = langtags.find(({ tag }) => tag === 'en');
@@ -146,7 +146,6 @@ describe('keyboard-info-compiler', function () {
   });
   
   it('check run returns null if KmpCompiler.transformKpsToKmpObject fails', async function() {
-    const kpjFilename = KHMER_ANGKOR_KPJ;
     const sources = KHMER_ANGKOR_SOURCES;
     const compiler = new KeyboardInfoCompiler();
     assert.isTrue(await compiler.init(callbacks, {sources}));
@@ -154,7 +153,7 @@ describe('keyboard-info-compiler', function () {
     let result: KeyboardInfoCompilerResult;
     try {
       KmpCompiler.prototype.transformKpsToKmpObject = (_kpsFilename: string): KmpJsonFile.KmpJsonFile => null;
-      result = await compiler.run(kpjFilename, null);
+      result = await compiler.run(KHMER_ANGKOR_KPJ, null);
     } catch(e) {
       assert.fail(e);
     } finally {
@@ -164,40 +163,36 @@ describe('keyboard-info-compiler', function () {
   });
   
   it('check run returns null if loadJsFile fails', async function() {
-    const kpjFilename = KHMER_ANGKOR_KPJ;
     const sources = KHMER_ANGKOR_SOURCES
     const compiler = new KeyboardInfoCompiler();
     assert.isTrue(await compiler.init(callbacks, {sources}));
     compiler['loadJsFile'] = (_filename: string): string => null;
-    const result = await compiler.run(kpjFilename, null);
+    const result = await compiler.run(KHMER_ANGKOR_KPJ, null);
     assert.isNull(result);
   }); 
 
   it('check run returns null if license is not MIT', async function() {
-    const kpjFilename = KHMER_ANGKOR_KPJ;
     const sources = KHMER_ANGKOR_SOURCES;
     const compiler = new KeyboardInfoCompiler();
     assert.isTrue(await compiler.init(callbacks, {sources}));
     compiler['isLicenseMIT'] = (_filename: string): boolean => false;
-    const result = await compiler.run(kpjFilename, null);
+    const result = await compiler.run(KHMER_ANGKOR_KPJ, null);
     assert.isNull(result);
   });
 
   it('check run leaves keyboard_info.isRTL undefined if not set in jsFile', async function() {
-    const kpjFilename = KHMER_ANGKOR_KPJ;
     const sources = KHMER_ANGKOR_SOURCES;
     const compiler = new KeyboardInfoCompiler();
     assert.isTrue(await compiler.init(callbacks, {sources}));
     const jsFile = compiler['loadJsFile'](sources.jsFilename);
     assert.isNull(jsFile.match(/this\.KRTL=1/));
-    const result = await compiler.run(kpjFilename, null);
+    const result = await compiler.run(KHMER_ANGKOR_KPJ, null);
     assert.isNotNull(result);
     const keyboard_info = JSON.parse(new TextDecoder().decode(result.artifacts.keyboard_info.data));
     assert.isUndefined(keyboard_info.isRTL);
   });
 
   it('check run sets keyboard_info.isRTL if set in jsFile', async function() {
-    const kpjFilename = KHMER_ANGKOR_KPJ;
     const sources = KHMER_ANGKOR_SOURCES;
     const compiler = new KeyboardInfoCompiler();
     assert.isTrue(await compiler.init(callbacks, {sources}));
@@ -205,7 +200,7 @@ describe('keyboard-info-compiler', function () {
     jsFile = jsFile.replace('this\.KN="Khmer Angkor";', '$&\n  this\.KRTL=1;'); // insert this.KRTL=1
     const origCompilerLoadJsFile = compiler['loadJsFile'];
     compiler['loadJsFile'] = (_filename: string) => jsFile;
-    const result = await compiler.run(kpjFilename, null);
+    const result = await compiler.run(KHMER_ANGKOR_KPJ, null);
     compiler['loadJsFile'] = origCompilerLoadJsFile;
     assert.isNotNull(result);
     const keyboard_info = JSON.parse(new TextDecoder().decode(result.artifacts.keyboard_info.data));
@@ -213,7 +208,6 @@ describe('keyboard-info-compiler', function () {
   });
 
   it('check run sets author.url correctly if mailto provided', async function() {
-    const kpjFilename = KHMER_ANGKOR_KPJ;
     const sources = KHMER_ANGKOR_SOURCES;
     const compiler = new KeyboardInfoCompiler();
     assert.isTrue(await compiler.init(callbacks, {sources}));
@@ -221,14 +215,13 @@ describe('keyboard-info-compiler', function () {
     await kmpCompiler.init(callbacks, {});
     const kmpJsonData = kmpCompiler.transformKpsToKmpObject(sources.kpsFilename);
     assert.isNotNull(kmpJsonData.info.author.url.match(/^mailto\:/));
-    const result = await compiler.run(kpjFilename, null);
+    const result = await compiler.run(KHMER_ANGKOR_KPJ, null);
     assert.isNotNull(result);
     const keyboard_info = JSON.parse(new TextDecoder().decode(result.artifacts.keyboard_info.data));
     assert.deepEqual(keyboard_info.authorEmail, 'makara_sok@sil.org');
   });
 
   it('check run sets author.url correctly if just email provided', async function() {
-    const kpjFilename = KHMER_ANGKOR_KPJ;
     const sources = KHMER_ANGKOR_SOURCES;
     const compiler = new KeyboardInfoCompiler();
     assert.isTrue(await compiler.init(callbacks, {sources}));
@@ -240,7 +233,7 @@ describe('keyboard-info-compiler', function () {
     let result: KeyboardInfoCompilerResult;
     try {
       KmpCompiler.prototype.transformKpsToKmpObject = (_kpsFilename: string): KmpJsonFile.KmpJsonFile => kmpJsonData;
-      result = await compiler.run(kpjFilename, null);
+      result = await compiler.run(KHMER_ANGKOR_KPJ, null);
     } catch(e) {
       assert.fail(e);
     } finally {
@@ -252,12 +245,11 @@ describe('keyboard-info-compiler', function () {
   });
 
   it('check run returns null if fillLanguages fails', async function() {
-    const kpjFilename = KHMER_ANGKOR_KPJ;
     const sources = KHMER_ANGKOR_SOURCES;
     const compiler = new KeyboardInfoCompiler();
     assert.isTrue(await compiler.init(callbacks, {sources}));
     compiler['fillLanguages'] = async (_kpsFilename: string, _keyboard_info: KeyboardInfoFile, _kmpJsonData:  KmpJsonFile.KmpJsonFile): Promise<boolean> => false;
-    const result = await compiler.run(kpjFilename, null);
+    const result = await compiler.run(KHMER_ANGKOR_KPJ, null);
     assert.isNull(result);
   }); 
 
@@ -283,7 +275,6 @@ describe('keyboard-info-compiler', function () {
   ];
 
   packageIncludesTestCases.forEach((testCase, idx) => it(`check run sets packageIncludes correctly (test case #${idx})`, async function() {
-    const kpjFilename = KHMER_ANGKOR_KPJ;
     const sources = KHMER_ANGKOR_SOURCES;
     const compiler = new KeyboardInfoCompiler();
     assert.isTrue(await compiler.init(callbacks, {sources}));
@@ -291,17 +282,16 @@ describe('keyboard-info-compiler', function () {
     compiler['fontSourceToKeyboardInfoFont'] = async (_kpsFilename: string, _kmpJsonData: KmpJsonFile.KmpJsonFile, _source: string[]) => {
       return (_source[0] == KHMER_ANGKOR_DISPLAY_FONT) ? KHMER_ANGKOR_DISPLAY_FONT_INFO : KHMER_ANGKOR_OSK_FONT_INFO;
     }
-    const kpsFilename = KHMER_ANGKOR_KPS;
     const kmpCompiler = new KmpCompiler();
     assert.isTrue(await kmpCompiler.init(callbacks, {}));
-    const kmpJsonData = kmpCompiler.transformKpsToKmpObject(kpsFilename);
+    const kmpJsonData = kmpCompiler.transformKpsToKmpObject(KHMER_ANGKOR_KPS);
     assert.isNotNull(kmpJsonData);
     const origKmpCompilerTransformKpsToKmpObject = KmpCompiler.prototype.transformKpsToKmpObject;
     kmpJsonData.files = testCase.files;
     let result: KeyboardInfoCompilerResult;
     try {
       KmpCompiler.prototype.transformKpsToKmpObject = (_kpsFilename: string): KmpJsonFile.KmpJsonFile => kmpJsonData;
-      result = await compiler.run(kpjFilename, null);
+      result = await compiler.run(KHMER_ANGKOR_KPJ, null);
     } catch(e) {
       assert.fail(e);
     } finally {
@@ -321,7 +311,6 @@ describe('keyboard-info-compiler', function () {
   ];
 
   minKeymanVersionTestCases.forEach((testCase, idx) => it(`check run sets minKeymanVersion correctly (test case #${idx})`, async function() {
-    const kpjFilename = KHMER_ANGKOR_KPJ;
     const sources = KHMER_ANGKOR_SOURCES;
     const compiler = new KeyboardInfoCompiler();
     assert.isTrue(await compiler.init(callbacks, {sources}));
@@ -332,7 +321,7 @@ describe('keyboard-info-compiler', function () {
     jsFile = jsFile.replace('this.KMINVER="10.0";', insert);
     compiler['loadJsFile'] = (_filename: string) => jsFile;
     compiler['kmxFileVersionToString'] = (_version: number) => testCase.kmx;
-    const result = await compiler.run(kpjFilename, null);
+    const result = await compiler.run(KHMER_ANGKOR_KPJ, null);
     compiler['loadJsFile'] = origCompilerLoadJsFile;
     compiler['kmxFileVersionToString'] = origKmxFileVersionToString;
     assert.isNotNull(result);
@@ -341,35 +330,33 @@ describe('keyboard-info-compiler', function () {
   }));
 
   const platformsTestCases = [
-    { hasJsFile: true, targets: 'any',                  expected: { windows: "full",macos: "full",linux: "full",desktopWeb: "full",ios: "full",android: "full",mobileWeb: "full" } },
-    { hasJsFile: false, targets: '',                    expected: { desktopWeb: "full",mobileWeb: "full" } },
-    { hasJsFile: true,  targets: '',                    expected: { desktopWeb: "full",ios: "full",android: "full",mobileWeb: "full" } },
-    { hasJsFile: true,  targets: 'androidphone',        expected: { android: "full",mobileWeb: "full" } },
-    { hasJsFile: true,  targets: 'iphone',              expected: { ios: "full",mobileWeb: "full" } },
-    { hasJsFile: true,  targets: 'linux',               expected: { linux: "full",desktopWeb: "full" } },
-    { hasJsFile: true,  targets: 'macosx',              expected: { macos: "full",desktopWeb: "full" } },
-    { hasJsFile: true,  targets: 'windows',             expected: { windows: "full",desktopWeb: "full" } },
-    { hasJsFile: true,  targets: 'androidphone iphone', expected: { android: "full",ios: "full",mobileWeb: "full" } },
+    { hasJsFileInKps: true,  targets: 'any',                 expected: { windows: "full",macos: "full",linux: "full",desktopWeb: "full",ios: "full",android: "full",mobileWeb: "full" } },
+    { hasJsFileInKps: false, targets: '',                    expected: { desktopWeb: "full",mobileWeb: "full" } },
+    { hasJsFileInKps: true,  targets: '',                    expected: { desktopWeb: "full",ios: "full",android: "full",mobileWeb: "full" } },
+    { hasJsFileInKps: true,  targets: 'androidphone',        expected: { android: "full",mobileWeb: "full" } },
+    { hasJsFileInKps: true,  targets: 'iphone',              expected: { ios: "full",mobileWeb: "full" } },
+    { hasJsFileInKps: true,  targets: 'linux',               expected: { linux: "full",desktopWeb: "full" } },
+    { hasJsFileInKps: true,  targets: 'macosx',              expected: { macos: "full",desktopWeb: "full" } },
+    { hasJsFileInKps: true,  targets: 'windows',             expected: { windows: "full",desktopWeb: "full" } },
+    { hasJsFileInKps: true,  targets: 'androidphone iphone', expected: { android: "full",ios: "full",mobileWeb: "full" } },
   ];
 
   platformsTestCases.forEach((testCase, idx) => it(`check run sets platforms correctly (test case #${idx})`, async function() {
-    const kpjFilename = KHMER_ANGKOR_KPJ;
     const sources = KHMER_ANGKOR_SOURCES;
     const compiler = new KeyboardInfoCompiler();
     assert.isTrue(await compiler.init(callbacks, {sources}));
-    const kpsFilename = KHMER_ANGKOR_KPS;
     const kmpCompiler = new KmpCompiler();
     assert.isTrue(await kmpCompiler.init(callbacks, {}));
-    const kmpJsonData = kmpCompiler.transformKpsToKmpObject(kpsFilename);
+    const kmpJsonData = kmpCompiler.transformKpsToKmpObject(KHMER_ANGKOR_KPS);
     assert.isNotNull(kmpJsonData);
-    if (!testCase.hasJsFile) {
+    if (!testCase.hasJsFileInKps) {
       // remove .js file
       kmpJsonData.files = kmpJsonData.files.filter(file => !KeymanFileTypes.filenameIs(file.name, KeymanFileTypes.Binary.WebKeyboard));
     }
     const kmxFiles: {
       filename: string,
       data: KMX.KEYBOARD
-    }[] = compiler['loadKmxFiles'](kpsFilename, kmpJsonData);
+    }[] = compiler['loadKmxFiles'](KHMER_ANGKOR_KPS, kmpJsonData);
     // set targets
     kmxFiles[0].data.targets = testCase.targets;
     const origLoadKmxFiles = compiler['loadKmxFiles'];
@@ -378,7 +365,7 @@ describe('keyboard-info-compiler', function () {
     try {
       KmpCompiler.prototype.transformKpsToKmpObject = (_kpsFilename: string): KmpJsonFile.KmpJsonFile => kmpJsonData;
       compiler['loadKmxFiles'] = (_kpsFilename: string, _kmpJsonData: KmpJsonFile.KmpJsonFile) => kmxFiles;
-      result = await compiler.run(kpjFilename, null);
+      result = await compiler.run(KHMER_ANGKOR_KPJ, null);
     } catch(e) {
       assert.fail(e);
     } finally {
@@ -390,15 +377,43 @@ describe('keyboard-info-compiler', function () {
     assert.deepEqual(keyboard_info.platformSupport, testCase.expected);
   }));
 
+  it('check run sets related packages correctly', async function() {
+    const sources = KHMER_ANGKOR_SOURCES;
+    const compiler = new KeyboardInfoCompiler();
+    assert.isTrue(await compiler.init(callbacks, {sources}));
+    const kmpCompiler = new KmpCompiler();
+    await kmpCompiler.init(callbacks, {});
+    const kmpJsonData = kmpCompiler.transformKpsToKmpObject(sources.kpsFilename);
+    kmpJsonData.relatedPackages = [
+      { id: "dep1", relationship: "deprecates" },
+      { id: "dep2", relationship: "deprecates" },
+      { id: "rel1", relationship: "related" },
+     ];
+    const origKmpCompilerTransformKpsToKmpObject = KmpCompiler.prototype.transformKpsToKmpObject;
+    let result: KeyboardInfoCompilerResult;
+    try {
+      KmpCompiler.prototype.transformKpsToKmpObject = (_kpsFilename: string): KmpJsonFile.KmpJsonFile => kmpJsonData;
+      result = await compiler.run(KHMER_ANGKOR_KPJ, null);
+    } catch(e) {
+      assert.fail(e);
+    } finally {
+      KmpCompiler.prototype.transformKpsToKmpObject = origKmpCompilerTransformKpsToKmpObject;
+    }
+    assert.isNotNull(result);
+    const keyboard_info = JSON.parse(new TextDecoder().decode(result.artifacts.keyboard_info.data));
+    assert.deepEqual(keyboard_info.related['dep1'], {deprecates: true});
+    assert.deepEqual(keyboard_info.related['dep2'], {deprecates: true});
+    assert.deepEqual(keyboard_info.related['rel1'], {deprecates: false});
+  });
+
   it('should write artifacts to disk', async function() {
-    const kpjFilename = KHMER_ANGKOR_KPJ;
     const actualFilename = makePathToFixture('khmer_angkor', 'build', 'actual.keyboard_info');
     const expectedFilename = makePathToFixture('khmer_angkor', 'build', 'khmer_angkor.keyboard_info');
     const sources = KHMER_ANGKOR_SOURCES;
 
     const compiler = new KeyboardInfoCompiler();
     assert.isTrue(await compiler.init(callbacks, {sources}));
-    const result = await compiler.run(kpjFilename, null);
+    const result = await compiler.run(KHMER_ANGKOR_KPJ, null);
     assert.isNotNull(result);
 
     if(fs.existsSync(actualFilename)) {
@@ -459,32 +474,30 @@ describe('keyboard-info-compiler', function () {
   });
   
   it('check loadKmxFiles returns empty array if .kmx file is missing from .kmp', async function() {
-    const kpsFilename = KHMER_ANGKOR_KPS;
     const compiler = new KeyboardInfoCompiler();
     const kmpCompiler = new KmpCompiler();
     assert.isTrue(await kmpCompiler.init(callbacks, {}));
-    const kmpJsonData = kmpCompiler.transformKpsToKmpObject(kpsFilename);
+    const kmpJsonData = kmpCompiler.transformKpsToKmpObject(KHMER_ANGKOR_KPS);
     assert.isNotNull(kmpJsonData);
     // remove .kmx file
     kmpJsonData.files = kmpJsonData.files.filter(file => !KeymanFileTypes.filenameIs(file.name, KeymanFileTypes.Binary.Keyboard));
     const kmxFiles: {
       filename: string,
       data: KMX.KEYBOARD
-    }[] = compiler['loadKmxFiles'](kpsFilename, kmpJsonData);
+    }[] = compiler['loadKmxFiles'](KHMER_ANGKOR_KPS, kmpJsonData);
     assert.deepEqual(kmxFiles, []);
   });
 
   it('check loadKmxFiles throws error if .kmx file is missing from disk', async function() {
-    const kpsFilename = KHMER_ANGKOR_KPS;
     const compiler = new KeyboardInfoCompiler();
     const kmpCompiler = new KmpCompiler();
     assert.isTrue(await kmpCompiler.init(callbacks, {}));
-    const kmpJsonData = kmpCompiler.transformKpsToKmpObject(kpsFilename);
+    const kmpJsonData = kmpCompiler.transformKpsToKmpObject(KHMER_ANGKOR_KPS);
     assert.isNotNull(kmpJsonData);
     // rename .kmx file in files list so it cannot be loaded from disk
     const kmpIndex = kmpJsonData.files.findIndex(file => KeymanFileTypes.filenameIs(file.name, KeymanFileTypes.Binary.Keyboard));
     kmpJsonData.files[kmpIndex].name = '../build/throw_error.kmx';
-    assert.throws(() => compiler['loadKmxFiles'](kpsFilename, kmpJsonData));
+    assert.throws(() => compiler['loadKmxFiles'](KHMER_ANGKOR_KPS, kmpJsonData));
   });  
 
   it('check loadKmxFiles can handle two .kmx files', async function() {

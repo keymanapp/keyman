@@ -1,21 +1,14 @@
 #!/usr/bin/env bash
 # Build FirstVoices for Android app
 
-# set -x
-set -eu
-
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
-. "${THIS_SCRIPT%/*}/../../../resources/build/build-utils.sh"
+. "${THIS_SCRIPT%/*}/../../../resources/build/builder.inc.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 . "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
-
 . "$KEYMAN_ROOT/resources/build/build-download-resources.sh"
-
-# This script runs from its own folder
-cd "$THIS_SCRIPT_PATH"
 
 # ################################ Main script ################################
 
@@ -43,7 +36,7 @@ if builder_is_debug_build; then
   CONFIG="debug"
   BUILD_FLAGS="assembleDebug -x lint -x test"
   TEST_FLAGS="-x assembleDebug lintDebug testDebug"
-fi  
+fi
 
 ARTIFACT="firstvoices-$VERSION.apk"
 

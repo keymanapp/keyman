@@ -372,6 +372,7 @@ export class KeyboardInfoCompiler implements KeymanCompiler {
 
     const jsonOutput = JSON.stringify(keyboard_info, null, 2);
 
+    /* c8 ignore next 8 */
     if(!SchemaValidators.default.keyboard_info(keyboard_info)) {
       // This is an internal fatal error; we should not be capable of producing
       // invalid output, so it is best to throw and die
