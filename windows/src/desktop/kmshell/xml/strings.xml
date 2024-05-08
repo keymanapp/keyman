@@ -1189,7 +1189,7 @@ keyboard that you use in Windows.  Keyman keyboards will adapt automatically to 
   <!-- Context: OSK Font Helper -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 17.0.312.0 -->
-  <string name="S_OSK_FontHelper_NoFonts" comment="OSK Font helper no fonts found for keyboard">No fonts have been found as suggestions for Keyboard %1$s.</string>
+  <string name="S_OSK_FontHelper_NoFonts" comment="OSK Font helper no fonts found for keyboard">No fonts have been found as suggestions for keyboard %1$s.</string>
 
   <!-- Context: Text Editor -->
   <!-- String Type: FormatString -->
