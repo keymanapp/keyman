@@ -21,7 +21,7 @@ KEYMAN_MIN_VERSION_VISUAL_STUDIO=2019
 KEYMAN_MIN_VERSION_MESON=1.0.0
 
 # Language and runtime versions
-KEYMAN_MIN_VERSION_JAVA=11                    # We're using Java/OpenJDK 11
+KEYMAN_VERSION_JAVA=11                        # We're using Java/OpenJDK 11
 KEYMAN_MIN_VERSION_CPP=17                     # C++17
 KEYMAN_MIN_VERSION_ANDROID_SDK=21
 
