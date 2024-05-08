@@ -1,9 +1,10 @@
 // @ts-check
 import { devices, playwrightLauncher } from '@web/test-runner-playwright';
-import { summaryReporter } from '@web/test-runner';
+import { defaultReporter, summaryReporter } from '@web/test-runner';
 import named from '@keymanapp/common-test-resources/test-runner-rename-browser.mjs'
 import { fileURLToPath } from 'url';
 import { dirname, resolve } from 'path';
+import { LauncherWrapper, sessionStabilityReporter } from '@keymanapp/common-test-resources/test-runner-stability-reporter.mjs';
 
 const dir = dirname(fileURLToPath(import.meta.url));
 const KEYMAN_ROOT = resolve(dir, '../../../../../../');
@@ -12,9 +13,15 @@ const KEYMAN_ROOT = resolve(dir, '../../../../../../');
 export default {
   // debug: true,
   browsers: [
-    playwrightLauncher({ product: 'chromium' }),
-    playwrightLauncher({ product: 'firefox' }),
-    playwrightLauncher({ product: 'webkit' })
+    new LauncherWrapper(playwrightLauncher({ product: 'chromium' })),
+    new LauncherWrapper(playwrightLauncher({ product: 'firefox' })),
+    new LauncherWrapper(playwrightLauncher({ product: 'webkit', concurrency: 1 })),
+    named(new LauncherWrapper(playwrightLauncher({ product: 'webkit', concurrency: 1, createBrowserContext({browser}) {
+      return browser.newContext({...devices['iPhone X'] });
+    }})), 'iOS Phone (emulated)'),
+    named(new LauncherWrapper(playwrightLauncher({ product: 'chromium' , createBrowserContext({browser}) {
+      return browser.newContext({...devices['Pixel 4'] })
+    }})), 'Android Phone (emulated)'),
   ],
   concurrency: 10,
   nodeResolve: true,
@@ -23,6 +30,8 @@ export default {
   ],
   reporters: [
     summaryReporter({}), /* local-dev mocha-style */
+    sessionStabilityReporter({}),
+    defaultReporter({})
   ],
   /*
     Un-comment the next two lines for easy interactive debugging; it'll launch the
