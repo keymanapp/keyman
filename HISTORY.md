@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 18.0.31 alpha 2024-05-08
+
+* fix(windows): "Keyboard" should be lower case in UI string for font helper tool (#11392)
+
 ## 18.0.30 alpha 2024-05-07
 
 * chore(web): Improve dependencies (#11377)
