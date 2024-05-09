@@ -9,64 +9,37 @@ KMX_BOOL IsValidKeyboardVersion(KMX_WCHAR *dpString);
 
 class CompilerTest : public testing::Test {
     protected:
-        const KMX_WCHAR WCHAR_NULL           = 0x0000;
-        const KMX_WCHAR FULL_STOP            = 0x002E;
-        const KMX_WCHAR DIGIT_ZERO           = 0x0030;
-        const KMX_WCHAR DIGIT_ONE            = 0x0031;
-        const KMX_WCHAR DIGIT_TWO            = 0x0032;
-        const KMX_WCHAR DIGIT_THREE          = 0x0033;
-        const KMX_WCHAR LATIN_SMALL_LETTER_A = 0x0061;
-        const KMX_WCHAR LATIN_SMALL_LETTER_E = 0x0065;
-        const KMX_WCHAR LATIN_SMALL_LETTER_H = 0x0068;
-        const KMX_WCHAR LATIN_SMALL_LETTER_L = 0x006C;
-        const KMX_WCHAR LATIN_SMALL_LETTER_O = 0x006F;
+    	CompilerTest() {}
+	    ~CompilerTest() override {}
+	    void SetUp() override {}
+	    void TearDown() override {}
 };
 
 TEST_F(CompilerTest, strtowstr_test) {
-    const KMX_CHAR in_hello[] = "hello";
-    const KMX_WCHAR out_hello[] = {
-        LATIN_SMALL_LETTER_H,
-        LATIN_SMALL_LETTER_E,
-        LATIN_SMALL_LETTER_L,
-        LATIN_SMALL_LETTER_L,
-        LATIN_SMALL_LETTER_O,
-        WCHAR_NULL
-    };
-    EXPECT_EQ(0, u16cmp(out_hello, strtowstr((PKMX_STR)in_hello)));
-    const KMX_CHAR in_empty[] = "";
-    const KMX_WCHAR out_empty[] = { WCHAR_NULL };
-    EXPECT_EQ(0, u16cmp(out_empty, strtowstr((PKMX_STR)in_empty)));
+    EXPECT_EQ(0, u16cmp(u"hello", strtowstr((PKMX_STR)"hello")));
+    EXPECT_EQ(0, u16cmp(u"", strtowstr((PKMX_STR)"")));
 };
 
 TEST_F(CompilerTest, wstrtostr_test) {
-    const KMX_WCHAR in_hello[] = {
-        LATIN_SMALL_LETTER_H,
-        LATIN_SMALL_LETTER_E,
-        LATIN_SMALL_LETTER_L,
-        LATIN_SMALL_LETTER_L,
-        LATIN_SMALL_LETTER_O,
-        WCHAR_NULL
-    };
-    const KMX_CHAR out_hello[] = "hello";
-    EXPECT_EQ(0, strcmp(out_hello, wstrtostr((PKMX_WCHAR)in_hello)));
-    const KMX_WCHAR in_empty[] = { WCHAR_NULL };
-    const KMX_CHAR out_empty[] = "";
-    EXPECT_EQ(0, strcmp(out_empty, wstrtostr((PKMX_WCHAR)in_empty)));
+    EXPECT_EQ(0, strcmp("hello", wstrtostr((PKMX_WCHAR)u"hello")));
+    EXPECT_EQ(0, strcmp("", wstrtostr((PKMX_WCHAR)u"")));
 };
 
+// KMX_BOOL kmcmp::AddCompileWarning(PKMX_CHAR buf)
+// KMX_BOOL AddCompileError(KMX_DWORD msg)
+// KMX_DWORD ProcessBeginLine(PFILE_KEYBOARD fk, PKMX_WCHAR p)
+
+TEST_F(CompilerTest, ValidateMatchNomatchOutput_test) {
+}
+
 TEST_F(CompilerTest, IsValidKeyboardVersion_test) {
-    KMX_WCHAR ver_empty[] = { WCHAR_NULL };
-    EXPECT_FALSE(IsValidKeyboardVersion(ver_empty));
-    KMX_WCHAR ver_valid[] = { DIGIT_ONE, FULL_STOP, DIGIT_ONE, WCHAR_NULL }; // 1.1
-    EXPECT_TRUE(IsValidKeyboardVersion(ver_valid));
-    KMX_WCHAR ver_extra_zero[] = { DIGIT_ONE, FULL_STOP, DIGIT_ZERO, WCHAR_NULL }; // 1.0, should fail but doesn't
-    EXPECT_TRUE(IsValidKeyboardVersion(ver_extra_zero));
-    KMX_WCHAR ver_trailing_point[] = { DIGIT_ONE, FULL_STOP, WCHAR_NULL }; // 1.
-    EXPECT_FALSE(IsValidKeyboardVersion(ver_trailing_point));
-    KMX_WCHAR ver_three_level[] = { DIGIT_ONE, FULL_STOP, DIGIT_TWO, FULL_STOP, DIGIT_THREE, WCHAR_NULL }; // 1.2.3, should fail but doesn't
-    EXPECT_TRUE(IsValidKeyboardVersion(ver_three_level));
-    KMX_WCHAR ver_letter[] = { LATIN_SMALL_LETTER_A, WCHAR_NULL }; // a
-    EXPECT_FALSE(IsValidKeyboardVersion(ver_letter));
-    KMX_WCHAR ver_trailing_letter[] = { DIGIT_ONE, FULL_STOP, LATIN_SMALL_LETTER_A, WCHAR_NULL }; // 1.a
-    EXPECT_FALSE(IsValidKeyboardVersion(ver_trailing_letter));
+    EXPECT_FALSE(IsValidKeyboardVersion((KMX_WCHAR *)u""));
+    EXPECT_FALSE(IsValidKeyboardVersion((KMX_WCHAR *)u" "));
+    EXPECT_FALSE(IsValidKeyboardVersion((KMX_WCHAR *)u"\t"));
+    EXPECT_TRUE(IsValidKeyboardVersion((KMX_WCHAR *)u"1.1"));
+    EXPECT_TRUE(IsValidKeyboardVersion((KMX_WCHAR *)u"1.0"));
+    EXPECT_FALSE(IsValidKeyboardVersion((KMX_WCHAR *)u"1."));
+    EXPECT_TRUE(IsValidKeyboardVersion((KMX_WCHAR *)u"1.2.3"));
+    EXPECT_FALSE(IsValidKeyboardVersion((KMX_WCHAR *)u"a"));
+    EXPECT_FALSE(IsValidKeyboardVersion((KMX_WCHAR *)u"1.a"));
 };
