@@ -2,9 +2,12 @@
 #include "..\include\kmcompx.h"
 #include "..\src\kmx_u16.h"
 #include "..\..\..\..\common\include\km_types.h"
+#include "..\..\..\..\common\include\kmx_file.h"
+#include "..\..\..\..\common\include\kmn_compiler_errors.h"
 
 PKMX_WCHAR strtowstr(PKMX_STR in);
 PKMX_STR wstrtostr(PKMX_WCHAR in);
+KMX_DWORD ValidateMatchNomatchOutput(PKMX_WCHAR p);
 KMX_BOOL IsValidKeyboardVersion(KMX_WCHAR *dpString);
 
 class CompilerTest : public testing::Test {
@@ -30,7 +33,17 @@ TEST_F(CompilerTest, wstrtostr_test) {
 // KMX_DWORD ProcessBeginLine(PFILE_KEYBOARD fk, PKMX_WCHAR p)
 
 TEST_F(CompilerTest, ValidateMatchNomatchOutput_test) {
-}
+    EXPECT_EQ(CERR_None, ValidateMatchNomatchOutput(NULL));
+    EXPECT_EQ(CERR_None, ValidateMatchNomatchOutput((PKMX_WCHAR)u""));
+    const KMX_WCHAR context[] = { 'a', 'b', 'c', UC_SENTINEL, CODE_CONTEXT, 'd', 'e', 'f' };
+    EXPECT_EQ(CERR_ContextAndIndexInvalidInMatchNomatch, ValidateMatchNomatchOutput((PKMX_WCHAR)context));
+    const KMX_WCHAR contextex[] = { 'a', 'b', 'c', UC_SENTINEL, CODE_CONTEXTEX, 'd', 'e', 'f' };
+    EXPECT_EQ(CERR_ContextAndIndexInvalidInMatchNomatch, ValidateMatchNomatchOutput((PKMX_WCHAR)contextex));
+    const KMX_WCHAR index[] = { 'a', 'b', 'c', UC_SENTINEL, CODE_INDEX, 'd', 'e', 'f' };
+    EXPECT_EQ(CERR_ContextAndIndexInvalidInMatchNomatch, ValidateMatchNomatchOutput((PKMX_WCHAR)index));
+    const KMX_WCHAR sentinel[] = { 'a', 'b', 'c', UC_SENTINEL, 'd', 'e', 'f' };
+    EXPECT_EQ(CERR_None, ValidateMatchNomatchOutput((PKMX_WCHAR)sentinel));
+};
 
 TEST_F(CompilerTest, IsValidKeyboardVersion_test) {
     EXPECT_FALSE(IsValidKeyboardVersion((KMX_WCHAR *)u""));
