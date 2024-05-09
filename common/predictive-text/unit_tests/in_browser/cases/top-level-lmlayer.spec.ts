@@ -1,6 +1,6 @@
 import { assert } from 'chai';
 
-import { LMLayer, Worker as WorkerBuilder }   from "@keymanapp/lexical-model-layer/web";
+import { LMLayer, Worker as WorkerBuilder }  from "@keymanapp/lexical-model-layer/web";
 import { defaultCapabilities } from '../helpers.mjs';
 
 describe('LMLayer', function () {

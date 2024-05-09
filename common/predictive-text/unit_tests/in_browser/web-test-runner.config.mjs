@@ -1,9 +1,10 @@
 // @ts-check
 import { devices, playwrightLauncher } from '@web/test-runner-playwright';
-import { summaryReporter } from '@web/test-runner';
+import { defaultReporter, summaryReporter } from '@web/test-runner';
 import { esbuildPlugin } from '@web/dev-server-esbuild';
 import { fileURLToPath } from 'url';
 import { dirname, resolve } from 'path';
+import { sessionStabilityReporter } from '@keymanapp/common-test-resources/test-runner-stability-reporter.mjs';
 
 const dir = dirname(fileURLToPath(import.meta.url));
 const KEYMAN_ROOT = resolve(dir, '../../../../');
@@ -40,6 +41,8 @@ export default {
   ],
   reporters: [
     summaryReporter({}), /* local-dev mocha-style */
+    sessionStabilityReporter({}),
+    defaultReporter({})
   ],
   /*
     Un-comment the next two lines for easy interactive debugging; it'll launch the
