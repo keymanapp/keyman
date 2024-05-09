@@ -1,6 +1,9 @@
 #include <gtest/gtest.h>
+#include "..\include\kmcompx.h"
+#include "..\src\kmx_u16.h"
 #include "..\..\..\..\common\include\km_types.h"
 
+PKMX_WCHAR strtowstr(PKMX_STR in);
 KMX_BOOL IsValidKeyboardVersion(KMX_WCHAR *dpString);
 
 class CompilerTest : public testing::Test {
@@ -12,6 +15,26 @@ class CompilerTest : public testing::Test {
         const KMX_WCHAR DIGIT_TWO            = 0x0032;
         const KMX_WCHAR DIGIT_THREE          = 0x0033;
         const KMX_WCHAR LATIN_SMALL_LETTER_A = 0x0061;
+        const KMX_WCHAR LATIN_SMALL_LETTER_E = 0x0065;
+        const KMX_WCHAR LATIN_SMALL_LETTER_H = 0x0068;
+        const KMX_WCHAR LATIN_SMALL_LETTER_L = 0x006C;
+        const KMX_WCHAR LATIN_SMALL_LETTER_O = 0x006F;
+};
+
+TEST_F(CompilerTest, strtowstr_test) {
+    const KMX_CHAR in_hello[] = "hello";
+    const KMX_WCHAR out_hello[] = {
+        LATIN_SMALL_LETTER_H,
+        LATIN_SMALL_LETTER_E,
+        LATIN_SMALL_LETTER_L,
+        LATIN_SMALL_LETTER_L,
+        LATIN_SMALL_LETTER_O,
+        WCHAR_NULL
+    };
+    EXPECT_EQ(0, u16cmp(out_hello, strtowstr((PKMX_STR)in_hello)));
+    const KMX_CHAR in_empty[] = "";
+    const KMX_WCHAR out_empty[] = { WCHAR_NULL };
+    EXPECT_EQ(0, u16cmp(out_empty, strtowstr((PKMX_STR)in_empty)));
 };
 
 TEST_F(CompilerTest, IsValidKeyboardVersion_test) {
@@ -29,4 +52,4 @@ TEST_F(CompilerTest, IsValidKeyboardVersion_test) {
     EXPECT_FALSE(IsValidKeyboardVersion(ver_letter));
     KMX_WCHAR ver_trailing_letter[] = { DIGIT_ONE, FULL_STOP, LATIN_SMALL_LETTER_A, WCHAR_NULL }; // 1.a
     EXPECT_FALSE(IsValidKeyboardVersion(ver_trailing_letter));
-}
+};
