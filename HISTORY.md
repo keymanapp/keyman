@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 18.0.32 alpha 2024-05-09
+
+* chore(common): Add `minimum-versions.inc.sh` (#11380)
+* chore(core): km_core_cp -> km_core_cu (#11341)
+
 ## 18.0.31 alpha 2024-05-08
 
 * fix(windows): "Keyboard" should be lower case in UI string for font helper tool (#11392)
