@@ -1208,7 +1208,11 @@ int GetCompileTargetsFromTargetsStore(const KMX_WCHAR* store) {
 }
 
 KMX_BOOL IsValidKeyboardVersion(KMX_WCHAR *dpString) {   // I4140
-  /* version format \d+(\.\d+)*  e.g. 9.0.3, 1.0, 1.2.3.4, 6.2.1.4.6.4, blank is not allowed */
+  /**
+    version format: /^\d+(\.\d+)*$/
+    e.g. 9.0.3, 1.0, 1.2.3.4, 6.2.1.4.6.4, 11.22.3 are all ok; 
+    empty string is not permitted; whitespace is not permitted
+  */
 
   do {
     if (!iswdigit(*dpString)) {
