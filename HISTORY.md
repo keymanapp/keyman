@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 17.0.321 beta 2024-05-09
+
+* fix(android/engine): Skip updating selection range if invalid (#11384)
+* refactor(android/engine): Refactor updateSelection (#11389)
+
 ## 17.0.320 beta 2024-05-07
 
 * fix(android): prevents mid-keystroke desynchronization when deleting selected text (#11367)
