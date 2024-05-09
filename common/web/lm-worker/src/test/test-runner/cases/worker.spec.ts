@@ -1,6 +1,4 @@
 import { assert } from 'chai';
-// Importing directly from the package we're in seems to break web-test-runner, but an import map?
-// Yeah, it's fine with import maps.  *shrug*
 import { LMLayerWorkerCode } from "@keymanapp/lm-worker/worker-main.wrapped.js";
 
 describe('LMLayerWorker', function () {
