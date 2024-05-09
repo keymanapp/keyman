@@ -29,6 +29,16 @@ export default {
   files: [
     '**/*.spec.ts'
   ],
+  middleware: [
+    // Rewrites short-hand paths for test resources, making them fully relative to the repo root.
+    function rewriteResourcePath(context, next) {
+      if(context.url.startsWith('/resources/')) {
+        context.url = '/common/test' + context.url;
+      }
+
+      return next();
+    }
+  ],
   plugins: [
     esbuildPlugin({ts: true, target: 'auto'})
   ],
