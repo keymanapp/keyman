@@ -2,19 +2,15 @@
 #
 # Compile the KeymanWeb bulk-renderer module for use with developing/running engine tests.
 
-
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
-. "${THIS_SCRIPT%/*}/../../../../../resources/build/build-utils.sh"
+. "${THIS_SCRIPT%/*}/../../../../../resources/build/builder.inc.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 SUBPROJECT_NAME=tools/testing/bulk_rendering
 . "$KEYMAN_ROOT/web/common.inc.sh"
 . "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
-
-# This script runs from its own folder
-cd "$THIS_SCRIPT_PATH"
 
 ################################ Main script ################################
 

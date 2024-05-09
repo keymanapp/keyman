@@ -67,7 +67,7 @@ This also works fine on Linux, git bash on Windows, and WSL.
 
 ## Bash options (`set -eu`)
 
-We use `set -eu` throughout:
+Builder scripts will inherit `set -eu` from builder.inc.sh:
 
 * `-e` to exit on any statement failure
 * `-u` to abort on unset variable use (usually coming from typos)
@@ -110,13 +110,8 @@ available, so other include scripts should be sourced accordingly, for example:
 
 ## Setting path
 
-Many scripts will be easier to code if they run from a consistent path. Because
-build scripts should be invokable from any directory, you may wish to add the
-following line here:
-
-```bash
-cd "$THIS_SCRIPT_PATH"
-```
+Builder will `cd` to the folder of the builder script, so there is no need
+to `cd` at the start of your script.
 
 ## Standard environment
 

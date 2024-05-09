@@ -15,8 +15,8 @@ private:
   std::u16string _platform;
   void InitOption(
     std::vector<option> & default_env,
-    km_core_cp const * key,
-    km_core_cp const * default_value);
+    km_core_cu const * key,
+    km_core_cu const * default_value);
 public:
   KMX_Environment();
   void Set(std::u16string const & key, std::u16string const & value);

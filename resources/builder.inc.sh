@@ -132,7 +132,7 @@ builder_use_color() {
 # $BUILDER_TERM_END
 #
 function builder_term() {
-  echo "${BUILDER_TERM_START}$*${BUILDER_TERM_END}"
+  echo -e "${BUILDER_TERM_START}$*${BUILDER_TERM_END}"
 }
 
 function builder_die() {
