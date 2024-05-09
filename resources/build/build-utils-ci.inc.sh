@@ -98,6 +98,11 @@ function _builder_publish_npm_package() {
 
   if builder_has_option --dry-run; then
     dry_run=--dry-run
+  else
+    # Require --dry-run if local to avoid accidentally clobbering npm packages
+    if [[ $VERSION_ENVIRONMENT == local ]]; then
+      builder_die "publish must use --dry-run flag for local builds"
+    fi
   fi
 
   _builder_publish_cache_package_json

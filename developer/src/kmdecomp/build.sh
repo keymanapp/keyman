@@ -2,10 +2,11 @@
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
-. "${THIS_SCRIPT%/*}/../../../resources/build/build-utils.sh"
+. "${THIS_SCRIPT%/*}/../../../resources/build/builder.inc.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 builder_describe "Build kmdecomp" clean configure build test publish install
+
 builder_parse "$@"
 
 #-------------------------------------------------------------------------------------------------------------------
@@ -31,12 +32,10 @@ function do_build() {
   cp "$WIN32_TARGET_PATH/kmdecomp.pdb" "$DEVELOPER_DEBUGPATH"
 }
 
-# TODO
 function do_publish() {
-  "$SIGNCODE" //d "Keyman Developer Decompiler" "$DEVELOPER_PROGRAM/kmdecomp.exe"
-
-  "$SYMSTORE" "$DEVELOPER_PROGRAM"/kmdecomp.exe //t keyman-developer
-  "$SYMSTORE" "$DEVELOPER_DEBUGPATH"/kmdecomp.pdb //t keyman-developer
+  wrap-signcode //d "Keyman Developer Decompiler" "$DEVELOPER_PROGRAM/kmdecomp.exe"
+  wrap-symstore "$DEVELOPER_PROGRAM/kmdecomp.exe" //t keyman-developer
+  wrap-symstore "$DEVELOPER_DEBUGPATH/kmdecomp.pdb" //t keyman-developer
 }
 
 function do_install() {

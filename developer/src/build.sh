@@ -2,17 +2,22 @@
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
-. "${THIS_SCRIPT%/*}/../../resources/build/build-utils.sh"
+. "${THIS_SCRIPT%/*}/../../resources/build/builder.inc.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
+. "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
+. "$KEYMAN_ROOT/resources/build/build-utils-ci.inc.sh"
+. "$KEYMAN_ROOT/developer/src/packages.inc.sh"
+
 builder_describe \
-  "Build Keyman Developer" \
+  "Keyman Developer" \
   clean \
   configure \
   build \
-  "api                          Analyze API and prepare API documentation" \
   test \
-  "publish                      Prepare files for distribution and publish symbols" \
+  "api                          Analyze API and prepare API documentation" \
+  "pack                         Build local .tgz pack for testing" \
+  "publish                      Prepare files for distribution, publish symbols, publish to npm, and build installer" \
   "install                      Install built programs locally" \
   ":common                      Developer common files" \
   ":ext                         Third party components" \
@@ -31,20 +36,54 @@ builder_describe \
   ":samples                     Sample projects" \
   ":server                      Keyman Developer Server" \
   ":setup                       Keyman Developer setup bootstrap" \
+  ":test=test/auto              Various older tests (others in each module)" \
   ":tike                        Keyman Developer IDE" \
-  ":inst                        Bundled installers"
+  ":inst                        Bundled installers" \
+  "--dry-run,-n+                Don't actually publish anything to external endpoints, just dry run"
 
 builder_parse "$@"
+
+
+if builder_has_option --dry-run; then
+  DRY_RUN=--dry-run
+else
+  DRY_RUN=
+fi
 
 # builder_describe_outputs \
 #   configure  /developer/src/tike/xml/layoutbuilder/keymanweb-osk.ttf
 # builder_run_action configure cp "$KEYMAN_ROOT/common/resources/fonts/keymanweb-osk.ttf" "$KEYMAN_ROOT/developer/src/tike/xml/layoutbuilder/"
 
-builder_run_child_actions clean configure build test api publish install
+if builder_has_action pack || builder_has_action publish; then
+  # Make sure that package*.json have not been modified before
+  pushd "$KEYMAN_ROOT" >/dev/null
+  if git status --porcelain | grep -qP 'package(-lock)?\.json'; then
+    builder_echo "The following package.json files have been modified:"
+    git status --porcelain | grep -P 'package(-lock)?\.json'
+    builder_die "Publish/pack will not run until these files are checked in or reverted."
+  fi
+  popd
 
-function build_api() {
+  # To ensure that we cache the top-level package.json, we must call this before
+  # the global publish
+  builder_publish_cleanup
+fi
+
+builder_run_child_actions clean configure build test api pack publish install
+
+if builder_has_action pack || builder_has_action publish; then
+  # And then cleanup the mess
+  builder_publish_cleanup
+  # Restore all the package.json files and package-lock.json files that
+  # were clobbered by 'npm version'
+  pushd "$KEYMAN_ROOT" >/dev/null
+  git checkout package.json package-lock.json '**/package.json'
+  popd
+fi
+
+function do_api() {
   api-documenter markdown -i ../build/api -o ../build/docs
   # TODO: Copy to help.keyman.com and open PR
 }
 
-builder_run_action api build_api
+builder_run_action api do_api

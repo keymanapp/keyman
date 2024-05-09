@@ -46,7 +46,6 @@ Libraries will be built in 'build/<target>/<configuration>/src'.
   "clean" \
   "configure" \
   "build" \
-  "api" \
   "test" \
   "${archtargets[@]}" \
   "--full-test                     also run expensive tests that rely on keyboards repo" \

@@ -6,17 +6,18 @@ DELPHI_VERSION=20.0
 DCC32PATH="$(cygpath -u "$ProgramFilesx86\\Embarcadero\\Studio\\$DELPHI_VERSION\\bin")"
 # RSVars_path="$DCC32PATH/rsvars.bat"
 
-GO_FAST=0
+if builder_is_debug_build || [[ $VERSION_ENVIRONMENT == local ]] || [[ ! -z ${TEAMCITY_PR_NUMBER+x} ]]; then
+  # We do a fast build for debug builds, local builds, test PR builds but not for master/beta/stable release builds
+  GO_FAST=1
+else
+  GO_FAST=0
+fi
 
 if builder_is_debug_build; then
-  GO_FAST=1
-  MAKEFLAG_DEBUG="DEBUG=$(DEBUG)"
+  MAKEFLAG_DEBUG="DEBUG=$DEBUG"
   TARGET_PATH=Debug
 else
-  if [[ ! -z ${TEAMCITY_PR_NUMBER+x} ]]; then
-    # We do a fast build for test PR builds but not for master/beta/stable
-    GO_FAST=1
-  fi
+  MAKEFLAG_DEBUG=
   TARGET_PATH=Release
 fi
 

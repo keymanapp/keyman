@@ -2,10 +2,13 @@
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
-. "${THIS_SCRIPT%/*}/../../../resources/build/build-utils.sh"
+. "${THIS_SCRIPT%/*}/../../../resources/build/builder.inc.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
-builder_describe "Build Keyman Developer IDE" @/core:x86 clean configure build test publish install
+builder_describe "Build Keyman Developer IDE" \
+  @/core:x86 \
+  clean configure build test publish install
+
 builder_parse "$@"
 
 #-------------------------------------------------------------------------------------------------------------------
@@ -47,9 +50,6 @@ function do_monaco_copy() {
   cp -R "$DEVELOPER_ROOT/src/tike/xml/app/node_modules/monaco-editor/min" "$DEVELOPER_ROOT/src/tike/xml/app/lib/monaco/min"
   cp -R "$DEVELOPER_ROOT/src/tike/xml/app/node_modules/monaco-editor/min-maps" "$DEVELOPER_ROOT/src/tike/xml/app/lib/monaco/min-maps"
 
-  build_version.res
-  build_manifest.res
-
   pushd "$DEVELOPER_ROOT/src/tike/xml/app/lib/sentry"
   "$KEYMAN_ROOT/common/windows/mkver.sh" init.js.in init.js
   popd
@@ -58,9 +58,12 @@ function do_monaco_copy() {
 }
 
 function do_build() {
+  build_version.res
+  build_manifest.res
+
   rm -rf "$DEVELOPER_PROGRAM/xml"
   mkdir -p "$DEVELOPER_PROGRAM/xml"
-  cp -R "$DEVELOPER_ROOT/src/tike/xml/" "$DEVELOPER_PROGRAM/xml/"
+  cp -R "$DEVELOPER_ROOT/src/tike/xml/"* "$DEVELOPER_PROGRAM/xml/"
 
   delphi_msbuild tike.dproj "//p:Platform=Win32"
   sentrytool_delphiprep "$WIN32_TARGET" tike.dpr
@@ -79,27 +82,22 @@ function do_build() {
 }
 
 function do_publish() {
-  "$SIGNCODE" //d "Keyman Developer" "$DEVELOPER_PROGRAM/tike.exe"
-  "$SIGNCODE" //d "Keyman Core" "$DEVELOPER_PROGRAM/keymancore-1.dll"
-  # Sign the Sentry executables and libraries here
-  "$SIGNCODE" //d "Keyman Developer" "$DEVELOPER_PROGRAM/sentry.dll"
-  "$SIGNCODE" //d "Keyman Developer" "$DEVELOPER_PROGRAM/sentry.x64.dll"
-  "$SIGNCODE" //d "Keyman Developer" "$DEVELOPER_PROGRAM/crashpad_handler.exe"
+  # test that (a) linked manifest exists and correct
+  wrap-mt -nologo -inputresource:"$DEVELOPER_PROGRAM"/tike.exe -validate_manifest
 
-  "$SYMSTORE" "$DEVELOPER_PROGRAM)/tike.exe" //t keyman-developer
-  "$SYMSTORE" "$DEVELOPER_DEBUGPATH)/tike.dbg" //t keyman-developer
+  wrap-signcode //d "Keyman Developer" "$DEVELOPER_PROGRAM/tike.exe"
+  wrap-signcode //d "Keyman Core" "$DEVELOPER_PROGRAM/keymancore-1.dll"
+  # Sign the Sentry executables and libraries here
+  wrap-signcode //d "Keyman Developer" "$DEVELOPER_PROGRAM/sentry.dll"
+  wrap-signcode //d "Keyman Developer" "$DEVELOPER_PROGRAM/sentry.x64.dll"
+  wrap-signcode //d "Keyman Developer" "$DEVELOPER_PROGRAM/crashpad_handler.exe"
+  wrap-symstore "$DEVELOPER_PROGRAM/tike.exe" //t keyman-developer
+  wrap-symstore "$DEVELOPER_DEBUGPATH/tike.dbg" //t keyman-developer
 }
 
-# TODO
 function do_install() {
   cp "$DEVELOPER_PROGRAM/tike.exe" "$INSTALLPATH_KEYMANDEVELOPER/tike.exe"
   cp "$DEVELOPER_PROGRAM/keymancore-1.dll" "$INSTALLPATH_KEYMANDEVELOPER/keymancore-1.dll"
-}
-
-# TODO
-function do_pre_release_build() {
-  # test that (a) linked manifest exists and correct
-  "$MT" -nologo -inputresource:"$DEVELOPER_PROGRAM"/tike.exe -validate_manifest
 }
 
 builder_run_action clean:project        do_clean

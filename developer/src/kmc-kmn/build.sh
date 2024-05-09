@@ -9,6 +9,7 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 . "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
+. "$KEYMAN_ROOT/resources/build/build-utils-ci.inc.sh"
 
 builder_describe "Build Keyman Developer Compiler Module for .kmn to .kmx" \
   "@/common/web/keyman-version" \
@@ -78,12 +79,6 @@ fi
 
 #-------------------------------------------------------------------------------------------------------------------
 
-if builder_start_action publish; then
-  . "$KEYMAN_ROOT/resources/build/build-utils-ci.inc.sh"
-  builder_publish_to_npm
-  builder_finish_action success publish
-elif builder_start_action pack; then
-  . "$KEYMAN_ROOT/resources/build/build-utils-ci.inc.sh"
-  builder_publish_to_pack
-  builder_finish_action success pack
-fi
+builder_run_action publish  builder_publish_to_npm
+builder_run_action pack     builder_publish_to_pack
+

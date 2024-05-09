@@ -2,10 +2,10 @@
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
-. "${THIS_SCRIPT%/*}/../../../../resources/build/build-utils.sh"
+. "${THIS_SCRIPT%/*}/../../../../resources/build/builder.inc.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
-builder_describe "Build imsample" clean configure build api test publish install
+builder_describe "Build imsample" clean configure build test publish
 builder_parse "$@"
 
 #-------------------------------------------------------------------------------------------------------------------
@@ -38,13 +38,12 @@ function do_build() {
 
 # TODO
 function do_publish() {
-  "$SIGNCODE" //d "Keyman IMX Sample" "$DEVELOPER_PROGRAM/imsample.dll"
-  "$SIGNCODE" //d "Keyman IMX Sample" "$DEVELOPER_PROGRAM/imsample.x64.dll"
-
-  "$SYMSTORE" "$DEVELOPER_PROGRAM/imsample.dll" //t keyman-developer
-  "$SYMSTORE" "$DEVELOPER_PROGRAM/imsample.x64.dll" //t keyman-developer
-  "$SYMSTORE" "$DEVELOPER_DEBUGPATH/imsample.pdb" //t keyman-developer
-  "$SYMSTORE" "$DEVELOPER_DEBUGPATH/imsample.x64.pdb" //t keyman-developer
+  wrap-signcode //d "Keyman IMX Sample" "$DEVELOPER_PROGRAM/imsample.dll"
+  wrap-signcode //d "Keyman IMX Sample" "$DEVELOPER_PROGRAM/imsample.x64.dll"
+  wrap-symstore "$DEVELOPER_PROGRAM/imsample.dll" //t keyman-developer
+  wrap-symstore "$DEVELOPER_PROGRAM/imsample.x64.dll" //t keyman-developer
+  wrap-symstore "$DEVELOPER_DEBUGPATH/imsample.pdb" //t keyman-developer
+  wrap-symstore "$DEVELOPER_DEBUGPATH/imsample.x64.pdb" //t keyman-developer
 }
 
 builder_run_action clean:project        do_clean

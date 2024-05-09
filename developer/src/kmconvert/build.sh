@@ -2,10 +2,11 @@
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
-. "${THIS_SCRIPT%/*}/../../../resources/build/build-utils.sh"
+. "${THIS_SCRIPT%/*}/../../../resources/build/builder.inc.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 builder_describe "Build kmconvert" clean configure build test publish install
+
 builder_parse "$@"
 
 #-------------------------------------------------------------------------------------------------------------------
@@ -19,11 +20,9 @@ builder_describe_outputs \
 
 #-------------------------------------------------------------------------------------------------------------------
 
-function do_clean() {
-  rm -rf bin obj manifest.res manifest.xml *.dproj.local version.res icons.RES icons.res *.identcache
-}
-
 function do_build() {
+  build_version.res
+  build_manifest.res
   run_in_vs_env rc icons.rc
   delphi_msbuild kmconvert.dproj "//p:Platform=Win32"
   sentrytool_delphiprep "$WIN32_TARGET" kmconvert.dpr
@@ -39,23 +38,25 @@ function do_build() {
   cp -R data/* "$DEVELOPER_PROGRAM/projects/templates"
 }
 
+function do_test() {
+  cd test
+  delphi_msbuild kmconverttest.dproj "//p:Platform=Win32" "//p:CI=CI"
+  $WIN32_TARGET_PATH/kmconverttest.exe -b -exit:continue
+  cd ..
+}
+
 function do_publish() {
   # test that (a) linked manifest exists and correct
-  "$MT" -nologo -inputresource:"$DEVELOPER_PROGRAM/kmconvert.exe" -validate_manifest
+  wrap-mt -nologo -inputresource:"$DEVELOPER_PROGRAM/kmconvert.exe" -validate_manifest
 
-  "$SIGNCODE" //d "Keyman Developer" "$DEVELOPER_PROGRAM/kmconvert.exe"
-
-  "$SYMSTORE" "$DEVELOPER_PROGRAM)/kmconvert.exe" //t keyman-developer
-  "$SYMSTORE" "$DEVELOPER_DEBUGPATH)/kmconvert.dbg" //t keyman-developer
+  wrap-signcode //d "Keyman Developer" "$DEVELOPER_PROGRAM/kmconvert.exe"
+  wrap-symstore "$DEVELOPER_PROGRAM/kmconvert.exe" //t keyman-developer
+  wrap-symstore "$DEVELOPER_DEBUGPATH/kmconvert.dbg" //t keyman-developer
 }
 
-function do_install() {
-  cp "$DEVELOPER_PROGRAM/kmconvert.exe" "$INSTALLPATH_KEYMANDEVELOPER/kmconvert.exe"
-}
-
-builder_run_action clean:project        do_clean
+builder_run_action clean:project        clean_windows_project_files
 builder_run_action configure:project    configure_windows_build_environment
 builder_run_action build:project        do_build
-# builder_run_action test:project         do_test
+builder_run_action test:project         do_test
 builder_run_action publish:project      do_publish
-builder_run_action install:project      do_install
+builder_run_action install:project      cp "$DEVELOPER_PROGRAM/kmconvert.exe" "$INSTALLPATH_KEYMANDEVELOPER/kmconvert.exe"
