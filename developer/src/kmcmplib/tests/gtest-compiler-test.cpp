@@ -4,6 +4,7 @@
 #include "..\..\..\..\common\include\km_types.h"
 
 PKMX_WCHAR strtowstr(PKMX_STR in);
+PKMX_STR wstrtostr(PKMX_WCHAR in);
 KMX_BOOL IsValidKeyboardVersion(KMX_WCHAR *dpString);
 
 class CompilerTest : public testing::Test {
@@ -35,6 +36,22 @@ TEST_F(CompilerTest, strtowstr_test) {
     const KMX_CHAR in_empty[] = "";
     const KMX_WCHAR out_empty[] = { WCHAR_NULL };
     EXPECT_EQ(0, u16cmp(out_empty, strtowstr((PKMX_STR)in_empty)));
+};
+
+TEST_F(CompilerTest, wstrtostr_test) {
+    const KMX_WCHAR in_hello[] = {
+        LATIN_SMALL_LETTER_H,
+        LATIN_SMALL_LETTER_E,
+        LATIN_SMALL_LETTER_L,
+        LATIN_SMALL_LETTER_L,
+        LATIN_SMALL_LETTER_O,
+        WCHAR_NULL
+    };
+    const KMX_CHAR out_hello[] = "hello";
+    EXPECT_EQ(0, strcmp(out_hello, wstrtostr((PKMX_WCHAR)in_hello)));
+    const KMX_WCHAR in_empty[] = { WCHAR_NULL };
+    const KMX_CHAR out_empty[] = "";
+    EXPECT_EQ(0, strcmp(out_empty, wstrtostr((PKMX_WCHAR)in_empty)));
 };
 
 TEST_F(CompilerTest, IsValidKeyboardVersion_test) {
