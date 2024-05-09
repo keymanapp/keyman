@@ -37,7 +37,7 @@ teardown() {
 }
 
 void
-setup(const char *keyboard, const km_core_cp *context, bool setup_app_context = true) {
+setup(const char *keyboard, const km_core_cu *context, bool setup_app_context = true) {
   teardown();
 
   km::core::path path = km::core::path::join(arg_path, keyboard);
@@ -51,11 +51,11 @@ setup(const char *keyboard, const km_core_cp *context, bool setup_app_context = 
 }
 
 bool
-is_identical_context(km_core_cp const *cached_context) {
+is_identical_context(km_core_cu const *cached_context) {
   size_t buf_size;
   try_status(km_core_context_get(km_core_state_context(test_state), &citems));
   try_status(context_items_to_utf16(citems, nullptr, &buf_size));
-  km_core_cp *new_cached_context = new km_core_cp[buf_size];
+  km_core_cu *new_cached_context = new km_core_cu[buf_size];
   try_status(context_items_to_utf16(citems, new_cached_context, &buf_size));
   bool result = std::u16string(cached_context) == new_cached_context;
   delete[] new_cached_context;
@@ -122,8 +122,8 @@ is_identical_context(km_core_cp const *cached_context) {
 
 void
 test_context_set_if_needed__identical_context() {
-  km_core_cp const *cached_context  = u"This is a test";
-  km_core_cp const *new_app_context = u"This is a test";
+  km_core_cu const *cached_context  = u"This is a test";
+  km_core_cu const *new_app_context = u"This is a test";
   setup("k_000___null_keyboard.kmx", cached_context, false);
   assert_equal_status(km_core_state_context_set_if_needed(test_state, new_app_context), KM_CORE_CONTEXT_STATUS_UNCHANGED);
   assert(is_identical_context(cached_context));
@@ -132,8 +132,8 @@ test_context_set_if_needed__identical_context() {
 
 void
 test_context_set_if_needed__different_context() {
-  km_core_cp const *cached_context  = u"This isn't a test";
-  km_core_cp const *new_app_context = u"This is a    test";
+  km_core_cu const *cached_context  = u"This isn't a test";
+  km_core_cu const *new_app_context = u"This is a    test";
   setup("k_000___null_keyboard.kmx", cached_context);
   assert_equal_status(km_core_state_context_set_if_needed(test_state, new_app_context), KM_CORE_CONTEXT_STATUS_UPDATED);
   assert(!is_identical_context(cached_context));
@@ -143,8 +143,8 @@ test_context_set_if_needed__different_context() {
 
 void
 test_context_set_if_needed__cached_context_cleared() {
-  km_core_cp const *cached_context  = u"";
-  km_core_cp const *new_app_context = u"This is a test";
+  km_core_cu const *cached_context  = u"";
+  km_core_cu const *new_app_context = u"This is a test";
   setup("k_000___null_keyboard.kmx", cached_context);
   km_core_state_context_clear(test_state);
   assert_equal_status(km_core_state_context_set_if_needed(test_state, new_app_context), KM_CORE_CONTEXT_STATUS_UPDATED);
@@ -155,8 +155,8 @@ test_context_set_if_needed__cached_context_cleared() {
 
 void
 test_context_set_if_needed__application_context_empty() {
-  km_core_cp const *cached_context  = u"This is a test";
-  km_core_cp const *new_app_context = u"";
+  km_core_cu const *cached_context  = u"This is a test";
+  km_core_cu const *new_app_context = u"";
   setup("k_000___null_keyboard.kmx", cached_context);
   assert_equal_status(km_core_state_context_set_if_needed(test_state, new_app_context), KM_CORE_CONTEXT_STATUS_UPDATED);
   assert(!is_identical_context(cached_context));
@@ -166,8 +166,8 @@ test_context_set_if_needed__application_context_empty() {
 
 void
 test_context_set_if_needed__app_context_is_longer() {
-  km_core_cp const *cached_context  = u"This is a test";
-  km_core_cp const *new_app_context = u"Longer This is a test";
+  km_core_cu const *cached_context  = u"This is a test";
+  km_core_cu const *new_app_context = u"Longer This is a test";
   setup("k_000___null_keyboard.kmx", cached_context);
   assert_equal_status(km_core_state_context_set_if_needed(test_state, new_app_context), KM_CORE_CONTEXT_STATUS_UPDATED);
   assert(!is_identical_context(cached_context));
@@ -177,8 +177,8 @@ test_context_set_if_needed__app_context_is_longer() {
 
 void
 test_context_set_if_needed__app_context_is_shorter() {
-  km_core_cp const *cached_context  = u"This is a test";
-  km_core_cp const *new_app_context = u"is a test";
+  km_core_cu const *cached_context  = u"This is a test";
+  km_core_cu const *new_app_context = u"is a test";
   setup("k_000___null_keyboard.kmx", cached_context);
   assert_equal_status(km_core_state_context_set_if_needed(test_state, new_app_context), KM_CORE_CONTEXT_STATUS_UPDATED);
   assert(!is_identical_context(cached_context));
@@ -188,8 +188,8 @@ test_context_set_if_needed__app_context_is_shorter() {
 
 void
 test_context_set_if_needed__identical_context_and_markers() {
-  km_core_cp const *cached_context  = u"123";
-  km_core_cp const *new_app_context = u"123";
+  km_core_cu const *cached_context  = u"123";
+  km_core_cu const *new_app_context = u"123";
   setup("k_000___null_keyboard.kmx", cached_context);
 
   km_core_context_item const citems[] = {
@@ -209,8 +209,8 @@ test_context_set_if_needed__identical_context_and_markers() {
 
 void
 test_context_set_if_needed__cached_context_shorter_and_markers() {
-  km_core_cp const *cached_context  = u"123";
-  km_core_cp const *new_app_context = u"0123";
+  km_core_cu const *cached_context  = u"123";
+  km_core_cu const *new_app_context = u"0123";
   setup("k_000___null_keyboard.kmx", cached_context);
 
   km_core_context_item const citems[] = {
@@ -235,8 +235,8 @@ test_context_set_if_needed__cached_context_shorter_and_markers() {
 
 void
 test_context_set_if_needed__cached_context_shorter_and_markers_nfu() {
-  km_core_cp const *cached_context  = u"bce\u0323\u0302";
-  km_core_cp const *new_app_context = u"abcệ";
+  km_core_cu const *cached_context  = u"bce\u0323\u0302";
+  km_core_cu const *new_app_context = u"abcệ";
   setup("/a/dummy/keyboard.mock", cached_context);
 
   km_core_context_item const citems[] = {
@@ -268,8 +268,8 @@ test_context_set_if_needed__cached_context_shorter_and_markers_nfu() {
 
 void
 test_context_set_if_needed__cached_context_longer_and_markers() {
-  km_core_cp const *cached_context  = u"0123";
-  km_core_cp const *new_app_context = u"123";
+  km_core_cu const *cached_context  = u"0123";
+  km_core_cu const *new_app_context = u"123";
   setup("k_000___null_keyboard.kmx", cached_context);
 
   km_core_context_item const citems[] = {
@@ -293,8 +293,8 @@ test_context_set_if_needed__cached_context_longer_and_markers() {
 
 void
 test_context_set_if_needed__cached_context_longer_and_markers_nfu() {
-  km_core_cp const *cached_context  = u"abce\u0323\u0302";
-  km_core_cp const *new_app_context = u"bcệ";
+  km_core_cu const *cached_context  = u"abce\u0323\u0302";
+  km_core_cu const *new_app_context = u"bcệ";
   setup("/a/dummy/keyboard.mock", cached_context);
 
   km_core_context_item const citems[] = {
@@ -326,8 +326,8 @@ test_context_set_if_needed__cached_context_longer_and_markers_nfu() {
 
 void
 test_context_set_if_needed__surrogate_pairs_unchanged() {
-  km_core_cp const *cached_context  = u"a\U00010100";
-  km_core_cp const *new_app_context = u"a\U00010100";
+  km_core_cu const *cached_context  = u"a\U00010100";
+  km_core_cu const *new_app_context = u"a\U00010100";
   setup("k_000___null_keyboard.kmx", cached_context);
   assert_equal_status(km_core_state_context_set_if_needed(test_state, new_app_context), KM_CORE_CONTEXT_STATUS_UNCHANGED);
   assert(is_identical_context(new_app_context));
@@ -336,8 +336,8 @@ test_context_set_if_needed__surrogate_pairs_unchanged() {
 
 void
 test_context_set_if_needed__surrogate_pairs_app_context_longer() {
-  km_core_cp const *cached_context  = u"a\U00010100";
-  km_core_cp const *new_app_context = u"xa\U00010100";
+  km_core_cu const *cached_context  = u"a\U00010100";
+  km_core_cu const *new_app_context = u"xa\U00010100";
   setup("k_000___null_keyboard.kmx", cached_context);
   assert_equal_status(km_core_state_context_set_if_needed(test_state, new_app_context), KM_CORE_CONTEXT_STATUS_UPDATED);
   assert(is_identical_context(new_app_context));
@@ -346,8 +346,8 @@ test_context_set_if_needed__surrogate_pairs_app_context_longer() {
 
 void
 test_context_set_if_needed__surrogate_pairs_cached_context_longer() {
-  km_core_cp const *cached_context  = u"xa\U00010100";
-  km_core_cp const *new_app_context = u"a\U00010100";
+  km_core_cu const *cached_context  = u"xa\U00010100";
+  km_core_cu const *new_app_context = u"a\U00010100";
   setup("k_000___null_keyboard.kmx", cached_context);
   assert_equal_status(km_core_state_context_set_if_needed(test_state, new_app_context), KM_CORE_CONTEXT_STATUS_UPDATED);
   assert(is_identical_context(new_app_context));
@@ -356,8 +356,8 @@ test_context_set_if_needed__surrogate_pairs_cached_context_longer() {
 
 void
 test_context_set_if_needed__surrogate_pairs_unchanged_and_markers() {
-  km_core_cp const *cached_context  = u"a\U00010100";
-  km_core_cp const *new_app_context = u"a\U00010100";
+  km_core_cu const *cached_context  = u"a\U00010100";
+  km_core_cu const *new_app_context = u"a\U00010100";
   setup("k_000___null_keyboard.kmx", cached_context);
 
   km_core_context_item const citems[] = {
@@ -376,8 +376,8 @@ test_context_set_if_needed__surrogate_pairs_unchanged_and_markers() {
 
 void
 test_context_set_if_needed__surrogate_pairs_app_context_longer_and_markers() {
-  km_core_cp const *cached_context  = u"a\U00010100";
-  km_core_cp const *new_app_context = u"\U00010200a\U00010100";
+  km_core_cu const *cached_context  = u"a\U00010100";
+  km_core_cu const *new_app_context = u"\U00010200a\U00010100";
   setup("k_000___null_keyboard.kmx", cached_context);
 
   km_core_context_item const citems[] = {
@@ -403,8 +403,8 @@ test_context_set_if_needed__surrogate_pairs_app_context_longer_and_markers() {
 
 void
 test_context_set_if_needed__surrogate_pairs_cached_context_longer_and_markers() {
-  km_core_cp const *cached_context  = u"\U00010200a\U00010100";
-  km_core_cp const *new_app_context = u"a\U00010100";
+  km_core_cu const *cached_context  = u"\U00010200a\U00010100";
+  km_core_cu const *new_app_context = u"a\U00010100";
   setup("k_000___null_keyboard.kmx", cached_context);
 
   km_core_context_item const citems[] = {
@@ -464,7 +464,7 @@ test_context_set_if_needed() {
 
 void
 test_context_clear() {
-  km_core_cp const *cached_context = u"This is a test";
+  km_core_cu const *cached_context = u"This is a test";
   setup("k_000___null_keyboard.kmx", cached_context);
   try_status(km_core_state_context_clear(test_state));
   assert(!is_identical_context(cached_context));
@@ -475,16 +475,16 @@ test_context_clear() {
 //-------------------------------------------------------------------------------------
 
 void test_context_debug_empty() {
-  km_core_cp const *cached_context =      u"";
+  km_core_cu const *cached_context =      u"";
   setup("k_000___null_keyboard.kmx", cached_context);
   auto str = km_core_state_context_debug(test_state, KM_CORE_DEBUG_CONTEXT_CACHED);
   // std::cout << str << std::endl;
   assert(std::u16string(str) == u"|| (len: 0) [ ]");
-  km_core_cp_dispose(str);
+  km_core_cu_dispose(str);
 }
 
 void test_context_debug_various() {
-  km_core_cp const *cached_context =      u"123\U0001F923";
+  km_core_cu const *cached_context =      u"123\U0001F923";
   setup("k_000___null_keyboard.kmx", cached_context);
 
   km_core_context_item const citems[] = {
@@ -505,7 +505,7 @@ void test_context_debug_various() {
   auto str = km_core_state_context_debug(test_state, KM_CORE_DEBUG_CONTEXT_CACHED);
   // std::cout << str << std::endl;
   assert(std::u16string(str) == u"|123🤣| (len: 9) [ M(5) U+0031 M(1) U+0032 M(2) U+0033 M(3) M(4) U+1f923 ]");
-  km_core_cp_dispose(str);
+  km_core_cu_dispose(str);
 }
 
 void test_context_debug() {

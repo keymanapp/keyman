@@ -174,10 +174,10 @@ LdmlTestSource::parse_source_string(std::string const &s) {
         assert(v >= 0x0001 && v <= 0x10FFFF);
         p += n - 1;
         if (v < 0x10000) {
-          t += km_core_cp(v);
+          t += km_core_cu(v);
         } else {
-          t += km_core_cp(Uni_UTF32ToSurrogate1(v));
-          t += km_core_cp(Uni_UTF32ToSurrogate2(v));
+          t += km_core_cu(Uni_UTF32ToSurrogate1(v));
+          t += km_core_cu(Uni_UTF32ToSurrogate2(v));
         }
         if (had_open_curly) {
           p++;
@@ -225,10 +225,10 @@ LdmlTestSource::parse_u8_source_string(std::string const &u8s) {
         assert(v >= 0x0001 && v <= 0x10FFFF);
         p += n - 1;
         if (v < 0x10000) {
-          t += km_core_cp(v);
+          t += km_core_cu(v);
         } else {
-          t += km_core_cp(Uni_UTF32ToSurrogate1(v));
-          t += km_core_cp(Uni_UTF32ToSurrogate2(v));
+          t += km_core_cu(Uni_UTF32ToSurrogate1(v));
+          t += km_core_cu(Uni_UTF32ToSurrogate2(v));
         }
         if (had_open_curly) {
           p++;

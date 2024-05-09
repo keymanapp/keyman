@@ -44,7 +44,7 @@ void teardown() {
 
 
 
-void setup(const km_core_cp *app_context, const km_core_cp *cached_context, int actions_code_points_to_delete, const std::u32string actions_output) {
+void setup(const km_core_cu *app_context, const km_core_cu *cached_context, int actions_code_points_to_delete, const std::u32string actions_output) {
   teardown();
 
   km::core::path path = km::core::path::join(arg_path, "..", "ldml", "keyboards", "k_001_tiny.kmx");
@@ -107,14 +107,14 @@ void setup(const km_core_cp *app_context, const km_core_cp *cached_context, int 
  */
 void test(
   const char *name,
-  const km_core_cp *initial_app_context,
-  const km_core_cp *final_cached_context,
+  const km_core_cu *initial_app_context,
+  const km_core_cu *final_cached_context,
   int actions_code_points_to_delete,
   const std::u32string actions_output,
 
   const unsigned int expected_delete,
   const std::u32string expected_output,
-  const km_core_cp *expected_final_app_context,
+  const km_core_cu *expected_final_app_context,
   const std::u32string expected_deleted_context
 ) {
   std::cout << "test: " << name << std::endl;

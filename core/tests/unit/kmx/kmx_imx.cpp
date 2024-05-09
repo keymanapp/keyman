@@ -78,7 +78,7 @@ uint8_t test_imx_callback(km_core_state *state, uint32_t imx_id, void *callback_
 
   size_t n = 0;
   try_status(context_items_to_utf16(entry_context, nullptr, &n))
-  km_core_cp *buf = new km_core_cp[n];
+  km_core_cu *buf = new km_core_cu[n];
   try_status(context_items_to_utf16(entry_context, buf, &n));
 
   std::cout << "imx entry context   : "  << " [" << buf << "]" << std::endl;
@@ -146,7 +146,7 @@ uint8_t test_imx_callback(km_core_state *state, uint32_t imx_id, void *callback_
 
   n = 0;
   try_status(context_items_to_utf16(exit_context, nullptr, &n))
-  km_core_cp *tmp_buf = new km_core_cp[n];
+  km_core_cu *tmp_buf = new km_core_cu[n];
   try_status(context_items_to_utf16(exit_context, tmp_buf, &n));
 
   std::cout << "imx exit context   : "  << " [" << tmp_buf << "]" << std::endl;

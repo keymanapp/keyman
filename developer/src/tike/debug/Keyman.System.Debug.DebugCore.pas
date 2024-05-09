@@ -98,13 +98,13 @@ end;
 
 function TDebugCore.GetKMXPlatform: string;
 var
-  p: pkm_core_cp;
+  p: pkm_core_cu;
   status: km_core_status;
 begin
   status := km_core_state_option_lookup(
     FState,
     KM_CORE_OPT_ENVIRONMENT,
-    pkm_core_cp(PWideChar(KM_CORE_KMX_ENV_PLATFORM)),
+    pkm_core_cu(PWideChar(KM_CORE_KMX_ENV_PLATFORM)),
     p
   );
   if status <> KM_CORE_STATUS_OK then
@@ -117,8 +117,8 @@ var
   options: array[0..1] of km_core_option_item;
   status: km_core_status;
 begin
-  options[0].key := pkm_core_cp(PWideChar(KM_CORE_KMX_ENV_PLATFORM));
-  options[0].value := pkm_core_cp(PWideChar(Value));
+  options[0].key := pkm_core_cu(PWideChar(KM_CORE_KMX_ENV_PLATFORM));
+  options[0].value := pkm_core_cu(PWideChar(Value));
   options[0].scope := KM_CORE_OPT_ENVIRONMENT;
   options[1] := KM_CORE_OPTIONS_END;
   status := km_core_state_options_update(FState, @options[0]);
@@ -128,13 +128,13 @@ end;
 
 function TDebugCore.GetOption(const name: string): string;
 var
-  p: pkm_core_cp;
+  p: pkm_core_cu;
   status: km_core_status;
 begin
   status := km_core_state_option_lookup(
     FState,
     KM_CORE_OPT_KEYBOARD,
-    pkm_core_cp(PWideChar(name)),
+    pkm_core_cu(PWideChar(name)),
     p
   );
   if status <> KM_CORE_STATUS_OK then
@@ -147,8 +147,8 @@ var
   options: array[0..1] of km_core_option_item;
   status: km_core_status;
 begin
-  options[0].key := pkm_core_cp(PWideChar(Name));
-  options[0].value := pkm_core_cp(PWideChar(Value));
+  options[0].key := pkm_core_cu(PWideChar(Name));
+  options[0].value := pkm_core_cu(PWideChar(Value));
   options[0].scope := KM_CORE_OPT_KEYBOARD;
   options[1] := KM_CORE_OPTIONS_END;
   status := km_core_state_options_update(FState, @options[0]);

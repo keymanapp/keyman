@@ -39,12 +39,12 @@ typedef struct {
 
 // Forward declarations
 
-bool replace_context(context_change_result context_change, km_core_context *context, km_core_cp const *new_context);
+bool replace_context(context_change_result context_change, km_core_context *context, km_core_cu const *new_context);
 bool should_normalize(km_core_state *state);
-context_change_result get_context_change(km_core_cp const *new_context, km_core_context *context);
+context_change_result get_context_change(km_core_cu const *new_context, km_core_context *context);
 context_change_result get_context_items_change(km_core_context_item *new_context_items, km_core_context_item *context_items);
 
-bool do_normalize_nfd(km_core_cp const * src, std::u16string &dst);
+bool do_normalize_nfd(km_core_cu const * src, std::u16string &dst);
 km_core_context_status do_fail(km_core_context *app_context, km_core_context *cached_context, const char* error);
 
 // ---------------------------------------------------------------------------
@@ -52,7 +52,7 @@ km_core_context_status do_fail(km_core_context *app_context, km_core_context *ca
 km_core_context_status
 km_core_state_context_set_if_needed(
   km_core_state *state,
-  km_core_cp const *new_app_context
+  km_core_cu const *new_app_context
 ) {
   assert(state != nullptr);
   assert(new_app_context != nullptr);
@@ -91,7 +91,7 @@ km_core_state_context_set_if_needed(
   // Finally, we normalize and replace the cached context
 
   std::u16string normalized_buffer;
-  km_core_cp const *new_cached_context = nullptr;
+  km_core_cu const *new_cached_context = nullptr;
 
   if (should_normalize(state)) {
     if (!do_normalize_nfd(new_app_context, normalized_buffer)) {
@@ -128,7 +128,7 @@ bool
 replace_context(
   context_change_result context_change,
   km_core_context *context,
-  km_core_cp const *new_context
+  km_core_cu const *new_context
 ) {
   if (context_change.type == CONTEXT_DIFFERENT) {
     if (set_context_from_string(context, new_context) != KM_CORE_STATUS_OK) {
@@ -189,7 +189,7 @@ context_previous_char(
  */
 context_change_result
 get_context_change(
-  km_core_cp const *new_context_string,
+  km_core_cu const *new_context_string,
   km_core_context *context
 ) {
   context_change_result change_type({CONTEXT_DIFFERENT, 0});
@@ -286,7 +286,7 @@ get_context_items_change(
 /**
  * Normalize the input string using ICU
  */
-bool do_normalize_nfd(km_core_cp const * src, std::u16string &dst) {
+bool do_normalize_nfd(km_core_cu const * src, std::u16string &dst) {
   UErrorCode icu_status = U_ZERO_ERROR;
   const icu::Normalizer2 *nfd = icu::Normalizer2::getNFDInstance(icu_status);
   assert(U_SUCCESS(icu_status));
