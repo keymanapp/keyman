@@ -7,7 +7,10 @@ import {
   teardownKMW
 } from "../test_utils.js";
 import * as KMWRecorder from '#recorder';
+import OSKInputEventSpec = KMWRecorder.OSKInputEventSpec;
+
 import { timedPromise } from '@keymanapp/web-utils';
+import { type KeymanEngine } from 'keyman/app/browser';
 
 const host = document.createElement('div');
 document.body.appendChild(host);
@@ -47,6 +50,8 @@ describe('Event Management', function() {
   });
 
   it('Keystroke-based onChange event generation', async function() {
+    const keyman: KeymanEngine = window['keyman'];
+
     var simple_A = {"type":"key","key":"a","code":"KeyA","keyCode":65,"modifierSet":0,"location":0};
     var event = new KMWRecorder.PhysicalInputEventSpec(simple_A);
 
@@ -70,8 +75,9 @@ describe('Event Management', function() {
   });
 
   it('OSK-based onChange event generation', async function() {
+    const keyman: KeymanEngine = window['keyman'];
     var simple_A = {"type":"osk","keyID":"default-K_A"};
-    var event = new KMWRecorder.OSKInputEventSpec(simple_A);
+    var event = new KMWRecorder.OSKInputEventSpec(simple_A as OSKInputEventSpec);
 
     var ele = document.getElementById('input');
 
@@ -98,6 +104,7 @@ describe('Event Management', function() {
   });
 
   it('Keystroke-based onInput event generation', async function() {
+    const keyman: KeymanEngine = window['keyman'];
     var simple_A = {"type":"key","key":"a","code":"KeyA","keyCode":65,"modifierSet":0,"location":0};
     var event = new KMWRecorder.PhysicalInputEventSpec(simple_A);
 
@@ -120,8 +127,9 @@ describe('Event Management', function() {
   });
 
   it('OSK-based onInput event generation', async function() {
+    const keyman: KeymanEngine = window['keyman'];
     var simple_A = {"type":"osk","keyID":"default-K_A"};
-    var event = new KMWRecorder.OSKInputEventSpec(simple_A);
+    var event = new KMWRecorder.OSKInputEventSpec(simple_A as OSKInputEventSpec);
 
     var ele = document.getElementById('input');
     keyman.setActiveElement(ele);

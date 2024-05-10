@@ -8,6 +8,7 @@ import {
 } from "../test_utils.js";
 import * as KMWRecorder from '#recorder';
 import { timedPromise } from '@keymanapp/web-utils';
+import { type KeymanEngine } from 'keyman/app/browser';
 
 const baseTimeout = 5000;
 const attachmentTimeout = 500;
@@ -20,12 +21,13 @@ describe('Text Selection', function() {
   /* Utility functions */
 
   function setupElement(ele) {
+    const keyman: KeymanEngine = window['keyman'];
     keyman.setActiveElement(ele);
     return ele;
   }
 
   function assertInputSteps(ele, count, setup) {
-    return new Promise((resolve, reject) => {
+    return new Promise<void>((resolve, reject) => {
       var i = 0;
       var listener = function() {
         i++;
@@ -45,7 +47,7 @@ describe('Text Selection', function() {
 
   /* Define key event specs */
 
-  var keys = {};
+  let keys: {[id: string]: KMWRecorder.PhysicalInputEventSpec} = {};
   for (var i = 0; i < 26; i++) {
     var simple = {"type":"key","key":String.fromCharCode(i+97),"code":"Key"+String.fromCharCode(i+65),"keyCode":i+65,"modifierSet":0,"location":0};
     var key = new KMWRecorder.PhysicalInputEventSpec(simple);
@@ -64,6 +66,7 @@ describe('Text Selection', function() {
 
         return setupKMW(null, baseTimeout).then(() => {
           return loadKeyboardFromJSON("resources/json/keyboards/web_context_tests.json", baseTimeout).then(() => {
+            const keyman: KeymanEngine = window['keyman'];
             return keyman.setActiveKeyboard("web_context_tests");
           });
         });
@@ -78,7 +81,8 @@ describe('Text Selection', function() {
       });
 
       after(function() {
-        window.keyman?.removeKeyboards('web_context_tests');
+        const keyman: KeymanEngine = window['keyman'];
+        keyman?.removeKeyboards('web_context_tests');
         teardownKMW();
       });
 
@@ -103,7 +107,7 @@ describe('Text Selection', function() {
        * Using the web_context_tests keyboard, type abcd. The output after the final key should be '!'.
        */
       it('Should do a basic transform without selection involved', async () => {
-        var ele = document.getElementById("singleton");
+        var ele = document.getElementById("singleton") as HTMLInputElement | HTMLTextAreaElement;
         var eventDriver = instantiateBrowserDriver(ele);
 
         await assertInputSteps(ele, 5, () => {
@@ -119,7 +123,7 @@ describe('Text Selection', function() {
       });
 
       it('Should do a basic transform without selection involved - SMP', async () => {
-        var ele = document.getElementById("singleton");
+        var ele = document.getElementById("singleton") as HTMLInputElement | HTMLTextAreaElement;
         var eventDriver = instantiateBrowserDriver(ele);
 
         await assertInputSteps(ele, 5, () => {
@@ -134,7 +138,8 @@ describe('Text Selection', function() {
         assert.deepEqual([ele.selectionStart, ele.selectionEnd], [4,4], "Expected caret to be at end of text");
       });
 
-      for(var direction of ['forward', 'backward']) {
+      // `as const` allows TS to lock in on the specific strings, rather than just saying 'string' as the type.
+      for(let direction of ['forward', 'backward'] as const) {
 
         /**
          * TEST_SELECTION
@@ -143,7 +148,7 @@ describe('Text Selection', function() {
          * The output after the final key should be aqx.
          */
         it('Should do a basic selection replacement, in '+direction+' direction', async () => {
-          var ele = document.getElementById("singleton");
+          var ele = document.getElementById("singleton") as HTMLInputElement | HTMLTextAreaElement;
           var eventDriver = instantiateBrowserDriver(ele);
 
           // Step 1: 'abcx'
@@ -173,7 +178,7 @@ describe('Text Selection', function() {
         });
 
         it('Should do a basic selection replacement, with a matching rule, in '+direction+' direction', async () => {
-          var ele = document.getElementById("singleton");
+          var ele = document.getElementById("singleton") as HTMLInputElement | HTMLTextAreaElement;
           var eventDriver = instantiateBrowserDriver(ele);
 
           // Step 1: 'abcx'
@@ -203,7 +208,7 @@ describe('Text Selection', function() {
         });
 
         it('Should do a basic selection replacement, in '+direction+' direction - SMP', async () => {
-          var ele = document.getElementById("singleton");
+          var ele = document.getElementById("singleton") as HTMLInputElement | HTMLTextAreaElement;
           var eventDriver = instantiateBrowserDriver(ele);
 
           // Step 1: 'fghj'
@@ -239,7 +244,7 @@ describe('Text Selection', function() {
          * The output after the final key should be 'abcd'.
          */
         it('Should ignore context when a selection, in '+direction+' direction, is made', async () => {
-          var ele = document.getElementById("singleton");
+          var ele = document.getElementById("singleton") as HTMLInputElement | HTMLTextAreaElement;
           var eventDriver = instantiateBrowserDriver(ele);
 
           // Step 1: 'abcx'
@@ -269,7 +274,7 @@ describe('Text Selection', function() {
         });
 
         it('Should ignore context when a selection, in '+direction+' direction, is made - SMP', async () => {
-          var ele = document.getElementById("singleton");
+          var ele = document.getElementById("singleton") as HTMLInputElement | HTMLTextAreaElement;
           var eventDriver = instantiateBrowserDriver(ele);
 
           // Step 1: 'fghj'
@@ -305,7 +310,7 @@ describe('Text Selection', function() {
          * delete it with Backspace. Type d. The output after the final key should be !.
          */
         it('Should correctly delete selection, in '+direction+' direction, with backspace and not lose sync', async () => {
-          var ele = document.getElementById("singleton");
+          var ele = document.getElementById("singleton") as HTMLInputElement | HTMLTextAreaElement;
           var eventDriver = instantiateBrowserDriver(ele);
 
           // Step 1: 'abcx'
@@ -345,7 +350,7 @@ describe('Text Selection', function() {
         });
 
         it('Should correctly delete selection, in '+direction+' direction, with backspace and not lose sync - SMP', async () => {
-          var ele = document.getElementById("singleton");
+          var ele = document.getElementById("singleton") as HTMLInputElement | HTMLTextAreaElement;
           var eventDriver = instantiateBrowserDriver(ele);
 
           // Step 1: 'abcx'
@@ -391,7 +396,7 @@ describe('Text Selection', function() {
          * Press Backspace, and type d. The output after the final key should be !.
          */
         it('Should correctly replace selection, in '+direction+' direction, and not lose sync', async () => {
-          var ele = document.getElementById("singleton");
+          var ele = document.getElementById("singleton") as HTMLInputElement | HTMLTextAreaElement;
           var eventDriver = instantiateBrowserDriver(ele);
 
           // Step 1: 'abcx'
@@ -439,7 +444,7 @@ describe('Text Selection', function() {
         });
 
         it('Should correctly replace selection, in '+direction+' direction, and not lose sync - SMP', async () => {
-          var ele = document.getElementById("singleton");
+          var ele = document.getElementById("singleton") as HTMLInputElement | HTMLTextAreaElement;
           var eventDriver = instantiateBrowserDriver(ele);
 
           // Step 1: 'abcx'
@@ -493,7 +498,7 @@ describe('Text Selection', function() {
          * Select the abc characters, and type d. The output after the final key should be xdx.
          */
         it('Should not treat the selection, in '+direction+' direction, as context', async () => {
-          var ele = document.getElementById("singleton");
+          var ele = document.getElementById("singleton") as HTMLInputElement | HTMLTextAreaElement;
           var eventDriver = instantiateBrowserDriver(ele);
 
           // Step 1: 'xabcx'
@@ -524,7 +529,7 @@ describe('Text Selection', function() {
         });
 
         it('Should not treat the selection, in '+direction+' direction, as context - SMP', async () => {
-          var ele = document.getElementById("singleton");
+          var ele = document.getElementById("singleton") as HTMLInputElement | HTMLTextAreaElement;
           var eventDriver = instantiateBrowserDriver(ele);
 
           // Step 1: [k][f][g][h][k]

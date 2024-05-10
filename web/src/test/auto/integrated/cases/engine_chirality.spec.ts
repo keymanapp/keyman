@@ -1,7 +1,6 @@
 import { assert } from 'chai';
 
 import {
-  loadKeyboardFromJSON,
   runKeyboardTestFromJSON,
   setupKMW,
   teardownKMW

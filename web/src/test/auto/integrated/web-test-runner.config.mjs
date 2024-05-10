@@ -1,9 +1,11 @@
 // @ts-check
 import { devices, playwrightLauncher } from '@web/test-runner-playwright';
-import { summaryReporter } from '@web/test-runner';
+import { defaultReporter, summaryReporter } from '@web/test-runner';
+import { esbuildPlugin } from '@web/dev-server-esbuild';
 import { importMapsPlugin } from '@web/dev-server-import-maps';
 import { dirname, resolve } from 'path';
 import { fileURLToPath } from 'url';
+import { LauncherWrapper, sessionStabilityReporter } from '@keymanapp/common-test-resources/test-runner-stability-reporter.mjs';
 
 const dir = dirname(fileURLToPath(import.meta.url));
 const KEYMAN_ROOT = resolve(dir, '../../../../../');
@@ -11,20 +13,18 @@ const KEYMAN_ROOT = resolve(dir, '../../../../../');
 /** @type {import('@web/test-runner').TestRunnerConfig} */
 export default {
   browsers: [
-    // These are the same type - and probably the same _instances_ - as are visible within the reporter!
-    // Probably a helpful fact to resolve name disambiguation.
-    playwrightLauncher({ product: 'chromium' }),
-    playwrightLauncher({ product: 'firefox' }),
-    playwrightLauncher({ product: 'webkit', concurrency: 1 })
+    new LauncherWrapper(playwrightLauncher({ product: 'chromium' })),
+    new LauncherWrapper(playwrightLauncher({ product: 'firefox' })),
+    // Setting it higher makes things faster... but Webkit experiences stability
+    // issues for some of the tests if this is set higher than 1.  Notably,
+    // engine.spec.mjs, events.spec.mjs, and text_selection.spec.mjs.  All the
+    // text-simulation ones.
+    new LauncherWrapper(playwrightLauncher({ product: 'webkit', concurrency: 1}))
   ],
-  // Setting it higher makes things faster... but Webkit experiences stability
-  // issues for some of the tests if this is set higher than 1.  Notably,
-  // engine.spec.mjs, events.spec.mjs, and text_selection.spec.mjs.  All the
-  // text-simulation ones.
   concurrency: 10,
   nodeResolve: true,
   files: [
-    'src/test/auto/integrated/**/*.spec.mjs',
+    'src/test/auto/integrated/**/*.spec.ts',
     // '**/*.spec.html'
   ],
   middleware: [
@@ -38,6 +38,7 @@ export default {
     }
   ],
   plugins: [
+    esbuildPlugin({ts: true}),
     importMapsPlugin({
       inject: {
         importMap: {
@@ -52,6 +53,8 @@ export default {
   ],
   reporters: [
     summaryReporter({}), /* local-dev mocha-style */
+    sessionStabilityReporter({}),
+    defaultReporter()
   ],
   /*
     Un-comment the next two lines for easy interactive debugging; it'll launch the

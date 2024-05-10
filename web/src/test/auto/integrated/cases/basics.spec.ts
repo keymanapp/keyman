@@ -2,6 +2,7 @@ import { assert } from 'chai';
 
 import { DEVICE_DETECT_FAILURE, setupKMW, teardownKMW } from "../test_utils.js";
 import { Device } from "keyman/engine/device-detect";
+import { KeymanEngine } from "keyman/app/browser";
 
 const baseTimeout = 5000;
 
@@ -33,10 +34,13 @@ describe('Basic KeymanWeb', function() {
 
   describe('Initialization', function() {
     it('KMW should attach to the input element.', function() {
+      const keyman = window['keyman'] as KeymanEngine;
       var singleton = document.getElementById('singleton');
       assert.isTrue(keyman.isAttached(singleton), "KeymanWeb did not automatically attach to the element!");
     });
+
     it('KMW\'s initialization variable should indicate completion.', function() {
+      const keyman = window['keyman'] as KeymanEngine;
       assert(keyman.initialized == 2, 'Keyman indicates incomplete initialization!');
     });
   });
@@ -65,15 +69,19 @@ if(!device.touchable) {
     });
 
     it('The Toggle UI initializes correctly.', function() {
-      assert(keyman.ui.initialized, 'Initialization flag is set to false!');
+      const keyman = window['keyman'] as KeymanEngine;
 
-      assert.isNotNull(keyman.ui.controller, 'Failed to create the controller element!');
+      // UI-module specific typings are currently not available.
+      const ui = keyman.ui as any;
+
+      assert(ui.initialized, 'Initialization flag is set to false!');
+      assert.isNotNull(ui.controller, 'Failed to create the controller element!');
 
       var divs = document.getElementsByTagName("div");
       var match = false;
 
       for(var i=0; i < divs.length; i++) {
-        if(divs[i] == keyman.ui.controller) {
+        if(divs[i] == ui.controller) {
           match = true;
         }
       }
@@ -101,7 +109,12 @@ if(!device.touchable) {
     });
 
     it('The Button UI initializes correctly.', function() {
-      assert(keyman.ui.init, 'Initialization flag is set to false!');
+      const keyman = window['keyman'] as KeymanEngine;
+
+      // UI-module specific typings are currently not available.
+      const ui = keyman.ui as any;
+
+      assert(ui.init, 'Initialization flag is set to false!');
     })
   });
 
@@ -124,15 +137,20 @@ if(!device.touchable) {
     });
 
     it('The Float UI initializes correctly.', function() {
-      assert(keyman.ui.initialized, 'Initialization flag is set to false!');
+      const keyman = window['keyman'] as KeymanEngine;
 
-      assert.isNotNull(keyman.ui.outerDiv, 'Failed to create the floating controller element!');
+      // UI-module specific typings are currently not available.
+      const ui = keyman.ui as any;
+
+      assert(ui.initialized, 'Initialization flag is set to false!');
+
+      assert.isNotNull(ui.outerDiv, 'Failed to create the floating controller element!');
 
       var divs = document.getElementsByTagName("div");
       var match = false;
 
       for(var i=0; i < divs.length; i++) {
-        if(divs[i] == keyman.ui.outerDiv) {
+        if(divs[i] == ui.outerDiv) {
           match = true;
         }
       }
@@ -160,7 +178,12 @@ if(!device.touchable) {
     });
 
     it('The Toolbar UI initializes correctly.', function() {
-      assert(keyman.ui.init, 'Initialization flag is set to false!');
+      const keyman = window['keyman'] as KeymanEngine;
+
+      // UI-module specific typings are currently not available.
+      const ui = keyman.ui as any;
+
+      assert(ui.init, 'Initialization flag is set to false!');
 
       var kwc = document.getElementById('KeymanWebControl');
       assert.isNotNull(kwc, 'Toolbar DIV was not added to the page!');

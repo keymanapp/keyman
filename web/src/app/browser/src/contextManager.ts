@@ -227,7 +227,7 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
     }
   }
 
-  public setActiveTarget(target: OutputTarget<any>, sendEvents: boolean) {
+  public setActiveTarget(target: OutputTarget<any>, sendEvents?: boolean) {
     const previousTarget = this.mostRecentTarget;
     const originalTarget = this.activeTarget; // may differ, depending on focus state.
 
