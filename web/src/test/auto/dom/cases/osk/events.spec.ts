@@ -1,8 +1,9 @@
 import * as KeymanOSK from 'keyman/engine/osk';
 import Device from 'keyman/engine/device-detect';
 
-import { loadKeyboardsFromStubs } from '../../kbdLoader.mjs';
+import { loadKeyboardsFromStubs } from '../../kbdLoader.js';
 import { timedPromise } from '@keymanapp/web-utils';
+import { type Keyboard } from '@keymanapp/keyboard-processor';
 
 import sinon from 'sinon';
 
@@ -20,7 +21,8 @@ const TestResources = {
     },
     hostDevice: device.coreSpec,
     allowHideAnimations: false // shortens timings.
-  }
+  },
+  Keyboards: {} as Awaited<ReturnType<typeof loadKeyboardsFromStubs>>
 }
 
 const host = document.createElement('div');

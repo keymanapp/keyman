@@ -7,9 +7,9 @@ import { StubAndKeyboardCache, toPrefixedKeyboardId as prefixed } from 'keyman/e
 
 import { KeyboardHarness, MinimalKeymanGlobal } from '@keymanapp/keyboard-processor';
 import { DOMKeyboardLoader } from '@keymanapp/keyboard-processor/dom-keyboard-loader';
-import { loadKeyboardsFromStubs } from '../../kbdLoader.mjs';
+import { loadKeyboardsFromStubs } from '../../kbdLoader.js';
 
-import { timedPromise } from '@keymanapp/web-utils';
+import { DeviceSpec, ManagedPromise, timedPromise } from '@keymanapp/web-utils';
 import sinon from 'sinon';
 
 import { assert } from 'chai';
@@ -19,18 +19,18 @@ const TEST_PHYSICAL_DEVICE = {
   OS: 'windows',
   browser: 'native',
   touchable: false
-};
+} as DeviceSpec;
 
 const host = document.createElement('div');
 document.body.appendChild(host);
 
-function assertPromiseResolved(promise, timeout) {
+function assertPromiseResolved(promise: Promise<any>, timeout?: number) {
   // Ensure timeout is initialized to a numeric value.
   // If undefined or 0, expects instant resolution.
   timeout ||= 0;
   timeout >= 0 ? timeout : 0;
 
-  return new Promise((resolve, reject) => {
+  return new Promise<void>((resolve, reject) => {
     let fulfilled = false;
 
     promise.then(() => {
@@ -83,13 +83,15 @@ function upgradeFocus(elem) {
   }
 
   elem.focus = () => {
-    document.activeElement?.blur();
+    const activeElement = document.activeElement as HTMLElement;
+    activeElement?.blur();
     dispatchFocus('focus', elem);
   }
 }
 
 async function blockConsoleAndAwait(asyncClosure) {
   const originalConsole = window.console;
+  /* @ts-ignore */
   window.console = {
     log: sinon.fake(),
     warn: sinon.fake(),
@@ -160,12 +162,15 @@ describe('app/browser:  ContextManager', function () {
 
     // Load the page fully before we init ContextManager.
     // Note:  we provide an incomplete 'mock' of BrowserConfiguration here.
+    const preResolved = new ManagedPromise<void>();
+    preResolved.resolve();
     contextManager = new ContextManager({
       // Needed during keyboard-loading.
-      deferForInitialization: Promise.resolve(),
+      deferForInitialization: preResolved,
       hostDevice: {... TEST_PHYSICAL_DEVICE},
       attachType: 'auto',
       // Used when setting keyboard-specific fonts to attached controls
+      /* @ts-ignore - we're mocking the setup here. */
       paths: {
         // We don't care if the font actually exists at the location for these tests;
         // a simple placeholder will do.
@@ -256,7 +261,7 @@ describe('app/browser:  ContextManager', function () {
       const targetchange = sinon.fake();
       contextManager.on('targetchange', targetchange);
 
-      const iframe = document.getElementById('design-iframe');
+      const iframe = document.getElementById('design-iframe') as HTMLIFrameElement;
 
       // Assumes we're testing with Chrome, not Firefox - the latter needs to be
       // against the contentDocument, not its .body, I think.

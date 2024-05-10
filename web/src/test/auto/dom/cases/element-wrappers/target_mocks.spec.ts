@@ -16,7 +16,7 @@ if(typeof MockTests == 'undefined') {
 
   (function(){
     // Makes a nice Unicode shortcut.
-    const u = (val) => String.fromCodePoint(val); //toSupplementaryPairString;
+    const u = (val) => String.fromCodePoint(val);
 
     MockTests.Apple = {};
     MockTests.Apple.normal = 'apple';

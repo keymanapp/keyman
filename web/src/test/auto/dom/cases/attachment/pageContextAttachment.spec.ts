@@ -1,9 +1,10 @@
 import { PageContextAttachment } from 'keyman/engine/attachment';
-import { timedPromise } from '@keymanapp/web-utils';
+import { DeviceSpec, timedPromise } from '@keymanapp/web-utils';
 
 import { assert } from 'chai';
 
-const host = document.getElementById('host');
+const host = document.createElement('div');
+document.body.appendChild(host);
 
 let STANDARD_OPTIONS = {
   owner: null,
@@ -12,7 +13,7 @@ let STANDARD_OPTIONS = {
     OS: 'windows',
     browser: 'native',
     touchable: false
-  }
+  } as DeviceSpec
 };
 
 async function promiseForIframeLoad(iframe) {
@@ -314,7 +315,7 @@ describe('KMW element-attachment logic', function () {
         let attached = [];
 
         // Note:  iframes require additional time to resolve.
-        const outerIframe = document.getElementById('outer-iframe')
+        const outerIframe = document.getElementById('outer-iframe') as HTMLIFrameElement;
         await promiseForIframeLoad(outerIframe);
 
         const innerIframe = outerIframe.contentDocument.getElementById('inner-iframe');
@@ -553,7 +554,7 @@ describe('KMW element-attachment logic', function () {
         host.innerHTML = await fixture.text();
 
         // Note:  iframes require additional time to resolve.
-        const outerIframe = document.getElementById('outer-iframe')
+        const outerIframe = document.getElementById('outer-iframe') as HTMLIFrameElement;
         await promiseForIframeLoad(outerIframe);
         await timedPromise(20);
 
@@ -571,7 +572,7 @@ describe('KMW element-attachment logic', function () {
         host.innerHTML = await fixture.text();
         // Note:  iframes require additional time to resolve.
 
-        const outerIframe = document.getElementById('outer-iframe')
+        const outerIframe = document.getElementById('outer-iframe') as HTMLIFrameElement;
         await promiseForIframeLoad(outerIframe);
 
         const innerIframe = outerIframe.contentDocument.getElementById('inner-iframe');
@@ -796,7 +797,7 @@ describe('KMW element-attachment logic', function () {
           // Special inputMode handling is only activated for touch devices.
           // Yay for being able to "mock" it!
           touchable: true
-        }
+        } as DeviceSpec
       });
     });
 

@@ -1,9 +1,10 @@
 import { assert } from 'chai';
 import sinon from 'sinon';
 
-import { CloudQueryEngine } from 'keyman/engine/package-cache';
+import { CloudQueryEngine, type KeyboardStub } from 'keyman/engine/package-cache';
 import { PathConfiguration } from 'keyman/engine/paths';
 import DOMCloudRequester from 'keyman/engine/package-cache/dom-requester';
+import { ManagedPromise } from '@keymanapp/web-utils';
 
 const pathConfig = new PathConfiguration({
   root: '',
@@ -12,11 +13,15 @@ const pathConfig = new PathConfiguration({
   fonts: '',
 }, window.location.href);
 
+const preResolved = new ManagedPromise<void>();
+preResolved.resolve();
+
 describe("Cloud-query interface", () => {
   describe("Query URI construction", () => {
     it('sil_euro_latin@no,sv', () => {
       const requester = new DOMCloudRequester();
-      const mockedMethod = requester.request = sinon.fake(() => { return {promise: Promise.resolve()} });
+      const mockedMethod = sinon.stub(requester, 'request');
+      mockedMethod.returns({promise: preResolved, queryId: 0});
 
       const querier = new CloudQueryEngine(requester, pathConfig);
       querier.fetchCloudStubs(['sil_euro_latin@no', 'sil_euro_latin@sv']);
@@ -29,7 +34,8 @@ describe("Cloud-query interface", () => {
 
     it('sil_cameroon_azerty', () => {
       const requester = new DOMCloudRequester();
-      const mockedMethod = requester.request = sinon.fake(() => { return {promise: Promise.resolve()} });
+      const mockedMethod = sinon.stub(requester, 'request');
+      mockedMethod.returns({promise: preResolved, queryId: 0});
 
       const querier = new CloudQueryEngine(requester, pathConfig);
       querier.fetchCloudStubs(['sil_cameroon_azerty']);
@@ -42,7 +48,8 @@ describe("Cloud-query interface", () => {
 
     it('@dz', () => {
       const requester = new DOMCloudRequester();
-      const mockedMethod = requester.request = sinon.fake(() => { return {promise: Promise.resolve()} });
+      const mockedMethod = sinon.stub(requester, 'request');
+      mockedMethod.returns({promise: preResolved, queryId: 0});
 
       const querier = new CloudQueryEngine(requester, pathConfig);
       querier.fetchCloudStubs(['@dz']);
@@ -55,7 +62,8 @@ describe("Cloud-query interface", () => {
 
     it('sil_euro_latin@no,sv + @dz', () => {
       const requester = new DOMCloudRequester();
-      const mockedMethod = requester.request = sinon.fake(() => { return {promise: Promise.resolve()} });
+      const mockedMethod = sinon.stub(requester, 'request');
+      mockedMethod.returns({promise: preResolved, queryId: 0});
 
       const querier = new CloudQueryEngine(requester, pathConfig);
       querier.fetchCloudStubs(['sil_euro_latin@no','sil_euro_latin@sv', '@dz']);
@@ -87,7 +95,8 @@ describe("Cloud-query interface", () => {
           x.timerid = idInjector.injectionId;
 
           querier.registerFromCloud(x);
-        }
+        },
+        injectionId: undefined as undefined | number
       }
 
       /*
@@ -97,7 +106,8 @@ describe("Cloud-query interface", () => {
        *    as seen above.
        * 2. Forwards the local-request (mocked) query's Promise as if it were produced by the https-based requester.
        */
-      mockedRequester.request = sinon.fake(() => {
+      const stub = sinon.stub(mockedRequester, 'request');
+      stub.callsFake(() => {
         let retObj = mockingRequester.request(queryResultsFile);
 
         // We need to capture + inject that timerId into the returned results!
@@ -106,7 +116,7 @@ describe("Cloud-query interface", () => {
       });
 
       // Install the queryId-injection register as the global registration point for returned queries.
-      window.keyman = {
+      window['keyman'] = {
         register: idInjector.registerFromCloud
       };
 
@@ -117,7 +127,7 @@ describe("Cloud-query interface", () => {
       const querier = mockQuery(`resources/query-mock-results/sil_euro_latin@no_sv.js.fixture`);
       const promise = querier.fetchCloudStubs(['sil_euro_latin@no','sil_euro_latin@sv']);
 
-      const stubs = await promise;
+      const stubs = await promise as KeyboardStub[];
 
       assert.equal(stubs.length, 2);
       for(let stub of stubs) {
@@ -134,7 +144,7 @@ describe("Cloud-query interface", () => {
       const querier = mockQuery('resources/query-mock-results/sil_cameroon_azerty.js.fixture');
       const promise = querier.fetchCloudStubs(['sil_cameroon_azerty']);
 
-      const stubs = await promise;
+      const stubs = await promise as KeyboardStub[];
 
       assert.equal(stubs.length, 278);
       for(let stub of stubs) {
@@ -150,7 +160,7 @@ describe("Cloud-query interface", () => {
       const querier = mockQuery(`resources/query-mock-results/@dz.js.fixture`);
       const promise = querier.fetchCloudStubs(['@dz']);
 
-      const stubs = await promise;
+      const stubs = await promise as KeyboardStub[];
 
       // `CloudQueryEngine` returns only a single stub.
       //

@@ -6,6 +6,7 @@ import { LauncherWrapper, sessionStabilityReporter } from '@keymanapp/common-tes
 import { importMapsPlugin } from '@web/dev-server-import-maps';
 import { dirname, resolve } from 'path';
 import { fileURLToPath } from 'url';
+import { esbuildPlugin } from '@web/dev-server-esbuild';
 
 const dir = dirname(fileURLToPath(import.meta.url));
 const KEYMAN_ROOT = resolve(dir, '../../../../../');
@@ -24,39 +25,42 @@ export default {
   nodeResolve: true,
   // // Top-level, implicit 'default' group
   files: [
-    'src/test/auto/dom/test_init_check.spec.mjs',
+    'src/test/auto/dom/test_init_check.spec.ts',
     // '**/*.spec.html'
   ],
   groups: [
     {
-      name: 'app/browser',
-      // Relative, from the containing package.json
-      files: ['src/test/auto/dom/cases/browser/**/*.spec.mjs']
-    },
-    {
       name: 'engine/attachment',
       // Relative, from the containing package.json
-      files: ['src/test/auto/dom/cases/attachment/**/*.spec.html']
+      files: [
+        'src/test/auto/dom/cases/attachment/**/*.spec.html',
+        'src/test/auto/dom/cases/attachment/**/*.spec.ts'
+      ]
     },
     {
-      name: 'engine/dom',
+      name: 'app/browser',
       // Relative, from the containing package.json
-      files: ['src/test/auto/dom/cases/dom-utils/**/*.spec.mjs']
+      files: ['src/test/auto/dom/cases/browser/**/*.spec.ts']
+    },
+    {
+      name: 'engine/dom-utils',
+      // Relative, from the containing package.json
+      files: ['src/test/auto/dom/cases/dom-utils/**/*.spec.ts']
     },
     {
       name: 'engine/element-wrappers',
       // Relative, from the containing package.json
-      files: ['src/test/auto/dom/cases/element-wrappers/**/*.spec.mjs']
+      files: ['src/test/auto/dom/cases/element-wrappers/**/*.spec.ts']
     },
     {
       name: 'engine/osk',
       // Relative, from the containing package.json
-      files: ['src/test/auto/dom/cases/osk/**/*.spec.mjs']
+      files: ['src/test/auto/dom/cases/osk/**/*.spec.ts']
     },
     {
       name: 'engine/package-cache',
       // Relative, from the containing package.json
-      files: ['src/test/auto/dom/cases/packages/**/*.spec.mjs']
+      files: ['src/test/auto/dom/cases/packages/**/*.spec.ts']
     }
   ],
   middleware: [
@@ -70,6 +74,7 @@ export default {
     }
   ],
   plugins: [
+    esbuildPlugin({ts: true}),
     importMapsPlugin({
       inject: {
         importMap: {

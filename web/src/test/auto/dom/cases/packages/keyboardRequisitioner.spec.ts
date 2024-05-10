@@ -4,7 +4,7 @@ import sinon from 'sinon';
 import { KeyboardHarness, MinimalKeymanGlobal } from '@keymanapp/keyboard-processor';
 import { DOMKeyboardLoader } from '@keymanapp/keyboard-processor/dom-keyboard-loader';
 import { PathConfiguration } from 'keyman/engine/paths';
-import { KeyboardRequisitioner } from 'keyman/engine/package-cache';
+import { KeyboardRequisitioner, type KeyboardStub } from 'keyman/engine/package-cache';
 import DOMCloudRequester from 'keyman/engine/package-cache/dom-requester';
 
 const pathConfig = new PathConfiguration({
@@ -34,7 +34,8 @@ function mockQuery(querier, queryResultsFile) {
       x.timerid = idInjector.injectionId;
 
       querier.registerFromCloud(x);
-    }
+    },
+    injectionId: undefined as undefined | number
   }
 
   /*
@@ -53,7 +54,7 @@ function mockQuery(querier, queryResultsFile) {
   });
 
   // Install the queryId-injection register as the global registration point for returned queries.
-  window.keyman = {
+  window['keyman'] = {
     register: idInjector.registerFromCloud
   };
 }
@@ -70,7 +71,7 @@ describe("KeyboardRequisitioner", function () {
     // The edits are minimal and notated within the fixture file.
     // Path becomes /resources/keyboards/khmer_angkor.js.
     mockQuery(keyboardRequisitioner.cloudQueryEngine, `resources/query-mock-results/khmer_angkor.hand-edited.js.fixture`);
-    const [stub] = await keyboardRequisitioner.addKeyboardArray(['khmer_angkor']);
+    const [stub] = await keyboardRequisitioner.addKeyboardArray(['khmer_angkor']) as KeyboardStub[];
     assert.strictEqual(cache.getStub(stub.KI, stub.KLC), stub);
 
     const kbd_promise = cache.fetchKeyboard('khmer_angkor');
@@ -97,7 +98,7 @@ describe("KeyboardRequisitioner", function () {
 
     // The `pathConfig` setup + internal logic should ensure that the filepath points to the correct location
     // with no additional effort required here.
-    const [stub] = await keyboardRequisitioner.addKeyboardArray([stubJSON]);
+    const [stub] = await keyboardRequisitioner.addKeyboardArray([stubJSON]) as KeyboardStub[];
     assert.strictEqual(cache.getStub(stub.KI, stub.KLC), stub);
 
     const kbd_promise = cache.fetchKeyboard('khmer_angkor');

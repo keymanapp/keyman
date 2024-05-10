@@ -18,7 +18,7 @@ describe("Mocked cloud query results ('canary' testing)", () => {
       register: sinon.spy(() => mockedRegisterOwner.promise.resolve())
     };
     // Must be available via keyman.register().
-    window.keyman = mockedRegisterOwner;
+    window['keyman'] = mockedRegisterOwner;
 
     const queryString = mockedResultsPath;
     const queryHandle = requester.request(queryString).promise;

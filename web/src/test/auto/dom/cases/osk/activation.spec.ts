@@ -1,8 +1,9 @@
 import * as KeymanOSK from 'keyman/engine/osk';
 import Device from 'keyman/engine/device-detect';
 
-import { loadKeyboardsFromStubs } from '../../kbdLoader.mjs';
+import { loadKeyboardsFromStubs } from '../../kbdLoader.js';
 import { timedPromise } from '@keymanapp/web-utils';
+import { type Keyboard } from '@keymanapp/keyboard-processor';
 
 import { assert } from 'chai';
 
@@ -18,7 +19,8 @@ const TestResources = {
     },
     hostDevice: device.coreSpec,
     allowHideAnimations: false // shortens timings.
-  }
+  },
+  Keyboards: null as Awaited<ReturnType<typeof loadKeyboardsFromStubs>>
 }
 
 const host = document.createElement('div');
@@ -58,6 +60,7 @@ describe('OSK activation', function () {
     assert.equal(container.offsetWidth, 600);
     assert.equal(container.offsetHeight, 400);
 
+    // @ts-ignore // mayHide is protected.
     assert.equal(osk.mayHide(false), true);
 
     osk.activationModel.enabled = false;
@@ -101,6 +104,7 @@ describe('OSK activation', function () {
       // An error should have been thrown - .enabled is an unsettable property here.
     }
 
+    // @ts-ignore // mayHide is protected.
     assert.equal(osk.mayHide(false), false);
 
     // Must not throw an error!

@@ -16,9 +16,8 @@ describe('Test Initialization', function() {
   this.timeout(15000);
 
   it("Detects device without JS errors", function() {
-    var device;
     try {
-      device = new Device();
+      const device = new Device();
       device.detect();
 
       console.log("Detected platform: " + device.browser + " on " + device.OS + " with form factor " + device.formFactor);

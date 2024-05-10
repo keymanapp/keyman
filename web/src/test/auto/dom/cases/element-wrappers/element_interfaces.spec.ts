@@ -34,7 +34,7 @@ if(typeof InterfaceTests == 'undefined') {
 
     InterfaceTests.Input.setupElement = function() {
       var id = DynamicElements.addInput();
-      var elem = document.getElementById(id);
+      var elem = document.getElementById(id) as HTMLInputElement;
       var wrapper = new wrappers.Input(elem);
 
       return {elem: elem, wrapper: wrapper};
@@ -80,7 +80,7 @@ if(typeof InterfaceTests == 'undefined') {
 
     InterfaceTests.TextArea.setupElement = function() {
       var id = DynamicElements.addText();
-      var elem = document.getElementById(id);
+      var elem = document.getElementById(id) as HTMLTextAreaElement;
       var wrapper = new wrappers.TextArea(elem);
 
       return {elem: elem, wrapper: wrapper};
@@ -225,8 +225,8 @@ if(typeof InterfaceTests == 'undefined') {
 
       var id1 = DynamicElements.addDesignIFrame(function() {
         var id2 = DynamicElements.addDesignIFrame(function() {
-          let elem1 = document.getElementById(id1);
-          let elem2 = document.getElementById(id2);
+          let elem1 = document.getElementById(id1) as HTMLIFrameElement;
+          let elem2 = document.getElementById(id2) as HTMLIFrameElement;
 
           obj.mainPair =  {elem: elem1, wrapper: new wrappers.DesignIFrame(elem1), document: elem1.contentWindow.document};
           obj.dummyPair = {elem: elem2, wrapper: new wrappers.DesignIFrame(elem2), document: elem1.contentWindow.document};
