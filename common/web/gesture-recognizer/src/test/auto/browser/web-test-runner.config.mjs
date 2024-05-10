@@ -1,6 +1,7 @@
 // @ts-check
 import { devices, playwrightLauncher } from '@web/test-runner-playwright';
-import { summaryReporter } from '@web/test-runner';
+import { defaultReporter, summaryReporter } from '@web/test-runner';
+import { LauncherWrapper, sessionStabilityReporter } from '@keymanapp/common-test-resources/test-runner-stability-reporter.mjs'
 import { esbuildPlugin } from '@web/dev-server-esbuild';
 import { importMapsPlugin } from '@web/dev-server-import-maps';
 import { dirname, resolve } from 'path';
@@ -15,9 +16,9 @@ export default {
   browsers: [
     // These are the same type - and probably the same _instances_ - as are visible within the reporter!
     // Probably a helpful fact to resolve name disambiguation.
-    playwrightLauncher({ product: 'chromium' }),
-    playwrightLauncher({ product: 'firefox' }),
-    playwrightLauncher({ product: 'webkit' })
+    new LauncherWrapper(playwrightLauncher({ product: 'chromium' })),
+    new LauncherWrapper(playwrightLauncher({ product: 'firefox' })),
+    new LauncherWrapper(playwrightLauncher({ product: 'webkit', concurrency: 1 }))
   ],
   concurrency: 10,
   nodeResolve: true,
@@ -50,6 +51,8 @@ export default {
   ],
   reporters: [
     summaryReporter({}), /* local-dev mocha-style */
+    sessionStabilityReporter({}),
+    defaultReporter({})
   ],
   /*
     Un-comment the next two lines for easy interactive debugging; it'll launch the
