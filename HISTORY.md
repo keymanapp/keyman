@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 17.0.322 beta 2024-05-10
+
+*  (#11385)
+
 ## 17.0.321 beta 2024-05-09
 
 * fix(android/engine): Skip updating selection range if invalid (#11384)
