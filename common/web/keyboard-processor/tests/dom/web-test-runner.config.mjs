@@ -1,5 +1,6 @@
 // @ts-check
 import { devices, playwrightLauncher } from '@web/test-runner-playwright';
+import { esbuildPlugin } from '@web/dev-server-esbuild';
 import { defaultReporter, summaryReporter } from '@web/test-runner';
 import { LauncherWrapper, sessionStabilityReporter } from '@keymanapp/common-test-resources/test-runner-stability-reporter.mjs';
 import { importMapsPlugin } from '@web/dev-server-import-maps';
@@ -25,7 +26,7 @@ export default {
   concurrency: 10,
   nodeResolve: true,
   files: [
-    '**/*.spec.mjs'
+    '**/*.spec.ts'
   ],
   middleware: [
     // Rewrites short-hand paths for test resources, making them fully relative to the repo root.
@@ -38,6 +39,7 @@ export default {
     }
   ],
   plugins: [
+    esbuildPlugin({ts: true, target: 'auto'}),
     importMapsPlugin({
       inject: {
         importMap: {
