@@ -205,7 +205,5 @@ verify_npm_setup() {
   # Configure Web browser-engine testing environments.  As is, this should only
   # make changes when we update the dependency, even on our CI build agents.
   playwright install
-  # Needed for tests to work on our Linux BAs
-  playwright install-deps
   popd > /dev/null
 }
