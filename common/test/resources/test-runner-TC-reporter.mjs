@@ -27,7 +27,7 @@ export default function teamcityReporter({ name="Web Test Runner JavaScript test
     return text
       .replace(/\|/g, '||')
       .replace(/\[/g, '|[')
-      .replace(/]/g, '|]')
+      .replace(/\]/g, '|]')
       .replace(/\'/g, '|\'');
   }
 
@@ -75,7 +75,7 @@ export default function teamcityReporter({ name="Web Test Runner JavaScript test
           logger.log(`##teamcity[testFailed name='${e(test.name)}' ${e(message)}] ${e(details)}']`);
         }
 
-        logger.log(`##teamcity[testFinished name='${e(test.name)}' duration='${e(test.duration)}']`);
+        logger.log(`##teamcity[testFinished name='${e(test.name)}' duration='${e(test.duration ?? 0)}']`);
       }
     }
     for(const suite of suiteResult?.suites ?? []) {
@@ -169,18 +169,6 @@ export default function teamcityReporter({ name="Web Test Runner JavaScript test
           }
         }
       }
-
-      // To consider:  could link in coverage reports via
-      // https://www.jetbrains.com/help/teamcity/service-messages.html#Reporting+Build+Statistics
-      // (is what my sources narrow down to)
-      // Can hard-link in the statistics numbers.
-      // There are other ways to at least "attach" the coverage map if desired, I think.
-      // https://www.jetbrains.com/help/teamcity/including-third-party-reports-in-the-build-results.html
-      // (ooh, custom tab!?  ... via artifact HTML)
-      const testCoverage = args.testCoverage;
-      if(testCoverage) {
-        console.log(testCoverage?.coverageMap.toJSON());
-      }
     },
     reportTestFileResults({logger, sessionsForTestFile, testFile}) {
       if(!reportResults) {
@@ -194,7 +182,7 @@ export default function teamcityReporter({ name="Web Test Runner JavaScript test
 
       const repoPath = path.relative(rootDir, testFile);
 
-      logger.log(`##teamcity[testSuiteStarted name='${e(repoPath)}']`);
+      logger.log(`##teamcity[testSuiteStarted name='file ${e(repoPath)}']`);
       for(let session of sessionsForTestFile) {
         const sessionName = buildSessionName(session);
         logger.log(`##teamcity[testSuiteStarted name='${e(sessionName)}']`);
