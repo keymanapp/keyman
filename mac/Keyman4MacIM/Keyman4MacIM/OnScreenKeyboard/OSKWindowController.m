@@ -8,6 +8,7 @@
 
 #import "OSKWindowController.h"
 #import "KMInputMethodAppDelegate.h"
+#import <os/log.h>
 
 @interface OSKWindowController ()
 @property (nonatomic, strong) NSButton *helpButton;
@@ -29,6 +30,8 @@
 }
 
 - (void)awakeFromNib {
+    os_log_t oskLog = os_log_create("org.sil.keyman", "osk");
+    os_log_with_type(oskLog, OS_LOG_TYPE_DEBUG, "OSKWC awakeFromNib");
     // Keep the aspect ratio constant at its current value
     [self.window setAspectRatio:self.window.frame.size];
     NSSize size = self.window.frame.size;
@@ -51,6 +54,8 @@
 }
 
 - (void)windowDidLoad {
+    os_log_t oskLog = os_log_create("org.sil.keyman", "osk");
+    os_log_with_type(oskLog, OS_LOG_TYPE_DEBUG, "OSKWC windowDidLoad");
     [super windowDidLoad];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(windowDidResize:) name:NSWindowDidResizeNotification object:self.window];
     [self.oskView setKvk:[self.AppDelegate kvk]];
@@ -59,6 +64,8 @@
 }
 
 - (void)windowDidResize:(NSNotification *)notification {
+    os_log_t oskLog = os_log_create("org.sil.keyman", "osk");
+    os_log_with_type(oskLog, OS_LOG_TYPE_DEBUG, "OSKWC windowDidResize");
     [self.oskView resizeOSKLayout];
 }
 
@@ -80,6 +87,8 @@
 }
 
 - (void)resetOSK {
+    os_log_t oskLog = os_log_create("org.sil.keyman", "osk");
+    os_log_with_type(oskLog, OS_LOG_TYPE_DEBUG, "OSKWC windowDidLoad");
     [self.oskView setKvk:[self.AppDelegate kvk]];
     [self.oskView resetOSK];
     if (_helpButton) {

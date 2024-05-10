@@ -16,6 +16,7 @@
 #import "CoreHelper.h"
 
 #include <Carbon/Carbon.h>
+#import <os/log.h>
 
 @interface OSKView()
 @property (nonatomic, strong) NSArray *oskLayout;
@@ -32,6 +33,8 @@
 @synthesize tag;
 
 - (id)initWithFrame:(NSRect)frame {
+    os_log_t oskLog = os_log_create("org.sil.keyman", "osk");
+    os_log_with_type(oskLog, OS_LOG_TYPE_DEBUG, "OSKView initWithFrame: %{public}@", NSStringFromRect(frame));
     self = [super initWithFrame:frame];
     if (self) {
         // Custom initialization
@@ -42,7 +45,10 @@
 }
 
 - (void)drawRect:(NSRect)rect {
-    CGContextRef context = (CGContextRef)[[NSGraphicsContext currentContext] graphicsPort];
+    os_log_t oskLog = os_log_create("org.sil.keyman", "osk");
+    os_log_with_type(oskLog, OS_LOG_TYPE_DEBUG, "OSKView drawRect: %{public}@", NSStringFromRect(rect));
+
+    CGContextRef context = (CGContextRef)[[NSGraphicsContext currentContext] CGContext];
     CGContextSetLineJoin(context, kCGLineJoinRound);
     CGContextSetLineWidth(context, 1.0);
     CGColorRef cgClearColor = CGColorGetConstantColor(kCGColorClear);
@@ -57,9 +63,10 @@
     CGContextAddRect(context, CGRectMake(1.0, 1.0, rect.size.width-1.0, rect.size.height-1.0));
     CGContextClip(context);
     
+    //TODO: gradient from clear to clear -- what does this do?
     NSColor *bgColor = [NSColor clearColor]; //[NSColor colorWithWhite:0.7 alpha:1.0];
     NSColor *bgColor2 = [NSColor clearColor]; //[NSColor colorWithWhite:0.5 alpha:1.0];
-    
+
     CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
     NSArray *gradientColors = [NSArray arrayWithObjects:(id)bgColor.CGColor, bgColor2.CGColor, nil];
     CGFloat gradientLocations[] = {0, 1};
@@ -97,6 +104,8 @@
 }
 
 - (void)setKvk:(KVKFile *)kvk {
+    os_log_t oskLog = os_log_create("org.sil.keyman", "osk");
+    os_log_with_type(oskLog, OS_LOG_TYPE_DEBUG, "OSKView setKvk, forces keyboard to re-layout");
     _kvk = kvk;
 
     // Force the keyboard to re-layout
@@ -107,6 +116,8 @@
 }
 
 - (void)initOSKKeys {
+    os_log_t oskLog = os_log_create("org.sil.keyman", "osk");
+    os_log_with_type(oskLog, OS_LOG_TYPE_DEBUG, "OSKView initOSKKeys");
     CGFloat viewWidth = self.frame.size.width;
     CGFloat viewHeight = self.frame.size.height;
     CGFloat margin = 2.0;
@@ -141,6 +152,8 @@
 
 - (NSArray *)oskLayout {
     if (_oskLayout == nil) {
+        os_log_t oskLog = os_log_create("org.sil.keyman", "osk");
+        os_log_with_type(oskLog, OS_LOG_TYPE_DEBUG, "oskLayout -> creating new arrays of OSKKey objects");
         NSArray *row1 = [NSArray arrayWithObjects:
                          [[OSKKey alloc] initWithKeyCode:MVK_GRAVE caption:@"`" scale:1.0],
                          [[OSKKey alloc] initWithKeyCode:MVK_1 caption:@"1" scale:1.0],
@@ -225,6 +238,8 @@
 
 - (NSArray *)oskDefaultNKeys {
     if (_oskDefaultNKeys == nil) {
+        os_log_t oskLog = os_log_create("org.sil.keyman", "osk");
+        os_log_with_type(oskLog, OS_LOG_TYPE_DEBUG, "oskDefaultNKeys -> creating new arrays of default number OSKKey objects");
         NSMutableArray *defNKeys = [[NSMutableArray alloc] initWithCapacity:0];
         
         // row 1
@@ -395,6 +410,8 @@
 }
 
 - (void)resizeOSKLayout {
+    os_log_t oskLog = os_log_create("org.sil.keyman", "osk");
+    os_log_with_type(oskLog, OS_LOG_TYPE_DEBUG, "OSKView resizeOSKLayout, removing all superviews");
     [self.subviews makeObjectsPerformSelector:@selector(removeFromSuperview)];
     [self initOSKKeys];
 }
@@ -402,6 +419,8 @@
 - (void)keyAction:(id)sender {
     KeyView *keyView = (KeyView *)sender;
     NSUInteger keyCode = [keyView.key keyCode];
+    os_log_t oskLog = os_log_create("org.sil.keyman", "osk");
+    os_log_with_type(oskLog, OS_LOG_TYPE_DEBUG, "OSKView keyAction keyCode: 0x%lx", keyCode);
     if (keyCode < 0x100) {
         NSRunningApplication *app = NSWorkspace.sharedWorkspace.frontmostApplication;
         pid_t processId = app.processIdentifier;
@@ -440,6 +459,8 @@
 }
 
 - (void)handleKeyEvent:(NSEvent *)event {
+    os_log_t oskLog = os_log_create("org.sil.keyman", "osk");
+    os_log_with_type(oskLog, OS_LOG_TYPE_DEBUG, "OSKView handleKeyEvent event.type: %lu", event.type);
     NSView *view = [self viewWithTag:event.keyCode|0x1000];
     if (view == nil || ![view isKindOfClass:[KeyView class]])
         return;
@@ -624,7 +645,7 @@
 }
 
 - (void)setOskCtrlState:(BOOL)oskCtrlState {
-    if (_oskCtrlState != oskCtrlState && !self.ctrlState) {
+   if (_oskCtrlState != oskCtrlState && !self.ctrlState) {
         _oskCtrlState = oskCtrlState;
         KeyView *ctrlKeyL = (KeyView *)[self viewWithTag:MVK_LEFT_CTRL|0x1000];
         KeyView *ctrlKeyR = (KeyView *)[self viewWithTag:MVK_RIGHT_CTRL|0x1000];
