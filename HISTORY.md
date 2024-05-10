@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 18.0.33 alpha 2024-05-10
+
+* chore(common): Merge beta to master for Sprint A18S1 (part 2) (#11413)
+
 ## 18.0.32 alpha 2024-05-09
 
 * chore(common): Add `minimum-versions.inc.sh` (#11380)
