@@ -140,6 +140,28 @@
 * chore(common): move to 18.0 alpha (#10713)
 * chore: move to 18.0 alpha
 
+## 17.0.321 beta 2024-05-09
+
+* fix(android/engine): Skip updating selection range if invalid (#11384)
+* refactor(android/engine): Refactor updateSelection (#11389)
+
+## 17.0.320 beta 2024-05-07
+
+* fix(android): prevents mid-keystroke desynchronization when deleting selected text (#11367)
+* fix(web): support SVG elements when checking className (#11365)
+* fix(developer): define `lastSelLength` variable (#11366)
+
+## 17.0.319 beta 2024-05-04
+
+* fix(android): inverting a selection range would crash Keyman (#11345)
+* fix(developer): handle missing Name element for File element in package compiler (#11352)
+* fix(developer): handle missing Description element for File element in package compiler (#11354)
+
+## 17.0.318 beta 2024-05-02
+
+* fix(web): longpress shortcut activation should only consider northward part (#11306)
+* chore(ios,mac): support build on Apple Silicon using Xcode 15.3 (#11302)
+
 ## 17.0.317 beta 2024-05-01
 
 *  (#11322)

@@ -57,7 +57,7 @@
     lastContent = ta1.value;
   }
 
-  var lastSelStart = -1;
+  var lastSelStart = -1, lastSelLength = -1;
 
   function calculateLengthByCodepoint(text, base, x)  {
     var stop = base + x;
