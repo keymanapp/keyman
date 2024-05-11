@@ -7,6 +7,7 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 
 builder_describe "Build Keyman Developer IDE" \
   @/core:x86 \
+  @/common/windows/delphi \
   clean configure build test publish install
 
 builder_parse "$@"
@@ -30,6 +31,7 @@ function do_configure() {
   configure_windows_build_environment
   do_monaco_copy
 
+  mkdir -p "$DEVELOPER_PROGRAM"
   cp "$KEYMAN_ROOT/common/schemas/kps/kps.xsd" "$DEVELOPER_PROGRAM"
   cp "$KEYMAN_ROOT/common/resources/fonts/keymanweb-osk.ttf" "$DEVELOPER_ROOT/src/tike/xml/layoutbuilder/keymanweb-osk.ttf"
 }
@@ -47,8 +49,8 @@ function do_monaco_copy() {
   rm -rf "$DEVELOPER_ROOT/src/tike/xml/app/lib/monaco"
   mkdir -p "$DEVELOPER_ROOT/src/tike/xml/app/lib/monaco/min"
   mkdir -p "$DEVELOPER_ROOT/src/tike/xml/app/lib/monaco/min-maps"
-  cp -R "$DEVELOPER_ROOT/src/tike/xml/app/node_modules/monaco-editor/min" "$DEVELOPER_ROOT/src/tike/xml/app/lib/monaco/min"
-  cp -R "$DEVELOPER_ROOT/src/tike/xml/app/node_modules/monaco-editor/min-maps" "$DEVELOPER_ROOT/src/tike/xml/app/lib/monaco/min-maps"
+  cp -R "$DEVELOPER_ROOT/src/tike/xml/app/node_modules/monaco-editor/min"/* "$DEVELOPER_ROOT/src/tike/xml/app/lib/monaco/min"
+  cp -R "$DEVELOPER_ROOT/src/tike/xml/app/node_modules/monaco-editor/min-maps"/* "$DEVELOPER_ROOT/src/tike/xml/app/lib/monaco/min-maps"
 
   pushd "$DEVELOPER_ROOT/src/tike/xml/app/lib/sentry"
   "$KEYMAN_ROOT/common/windows/mkver.sh" init.js.in init.js
@@ -58,6 +60,7 @@ function do_monaco_copy() {
 }
 
 function do_build() {
+  create-developer-output-folders
   build_version.res
   build_manifest.res
 
@@ -79,6 +82,11 @@ function do_build() {
   fi
   cp "$KEYMAN_ROOT/core/build/x86/$TARGET_PATH/src/keymancore-1.dll" "$WIN32_TARGET_PATH"
   cp "$KEYMAN_ROOT/core/build/x86/$TARGET_PATH/src/keymancore-1.pdb" "$WIN32_TARGET_PATH"
+
+  cp "$KEYMAN_ROOT/common/windows/delphi/ext/sentry/sentry.dll" "$DEVELOPER_PROGRAM/"
+  cp "$KEYMAN_ROOT/common/windows/delphi/ext/sentry/sentry.x64.dll" "$DEVELOPER_PROGRAM/"
+  cp "$KEYMAN_ROOT/common/windows/delphi/ext/sentry/crashpad_handler.exe" "$DEVELOPER_PROGRAM/"
+
 }
 
 function do_publish() {

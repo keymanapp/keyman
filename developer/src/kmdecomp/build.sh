@@ -26,6 +26,7 @@ function do_clean() {
 }
 
 function do_build() {
+  create-developer-output-folders
   build_version.res
   vs_msbuild kmdecomp.sln //t:Build "//p:Platform=Win32"
   cp "$WIN32_TARGET" "$DEVELOPER_PROGRAM"

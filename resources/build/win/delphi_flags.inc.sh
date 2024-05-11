@@ -1,6 +1,7 @@
 # Delphi Flags
 
-ProgramFilesx86="$(cygpath -w -F 42)"  # 42 = CSIDL_PROGRAM_FILESX86
+# This may need to be updated if any Delphi library paths change
+DELPHIINCLUDES="$KEYMAN_ROOT/common/windows/delphi/ext/cef4delphi/source;$KEYMAN_ROOT/common/windows/delphi/ext/dcpcrypt;$KEYMAN_ROOT/common/windows/delphi/ext/jwa/Win32API;$KEYMAN_ROOT/common/windows/delphi/ext/sentry;$KEYMAN_ROOT/developer/src/ext/mbcolor;$KEYMAN_ROOT/developer/src/ext/scfontcombobox"
 
 DELPHI_VERSION=20.0
 DCC32PATH="$(cygpath -u "$ProgramFilesx86\\Embarcadero\\Studio\\$DELPHI_VERSION\\bin")"
@@ -34,8 +35,8 @@ WINDOWS_PROGRAM="$WINDOWS_ROOT/bin"
 
 COMMON_ROOT="$KEYMAN_ROOT/common/windows/delphi"
 OUTLIB="$WINDOWS_ROOT/lib"
-COMMON_OUTLIB="$KEYMAN_ROOT/windows/lib"
-COMMON_BIN="$KEYMAN_ROOT/windows/bin"
+COMMON_OUTLIB="$KEYMAN_ROOT/common/windows/lib"
+# COMMON_BIN="$KEYMAN_ROOT/common/windows/bin"
 
 # Visual C++ x86, x64
 WIN32_TARGET_PATH=bin/Win32/$TARGET_PATH

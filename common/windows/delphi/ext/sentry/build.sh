@@ -23,7 +23,8 @@ function do_clean() {
 }
 
 function do_build() {
-  "$DEVTOOLS" -ai "$THIS_SCRIPT_PATH/source"
+  # TODO: WHAA why does this pass?
+  "$DEVTOOLS" -ai "$THIS_SCRIPT_PATH"
   delphi_msbuild packages/CEF4Delphi.dproj "//p:Platform=Win32"
   "$DEVTOOLS" -ip "$OUTLIB/CEF4Delphi.bpl"
 }

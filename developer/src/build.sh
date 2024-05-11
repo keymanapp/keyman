@@ -31,6 +31,7 @@ builder_describe \
   ":kmc-package                 Compiler - Package Module" \
   ":kmc                         Compiler - Command Line Interface" \
   ":kmanalyze                   Legacy keyboard analysis tool" \
+  ":kmdbrowserhost              Keyman Developer Browser Host" \
   ":kmdecomp                    Unsupported decompiler" \
   ":kmconvert                   Legacy keyboard generation and conversion tool" \
   ":samples                     Sample projects" \

@@ -5,7 +5,7 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 . "${THIS_SCRIPT%/*}/../../../../resources/build/builder.inc.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
-builder_describe "Build Keyman common Delphi components" clean configure build test
+builder_describe "Common Delphi components" clean configure build test
 builder_parse "$@"
 
 #-------------------------------------------------------------------------------------------------------------------

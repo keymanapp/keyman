@@ -5,7 +5,9 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 . "${THIS_SCRIPT%/*}/../../../resources/build/builder.inc.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
-builder_describe "Build Keyman Developer Setup" clean configure build test publish
+builder_describe "Build Keyman Developer Setup" \
+  @/common/windows/delphi \
+  clean configure build test publish
 
 builder_parse "$@"
 
@@ -21,6 +23,7 @@ builder_describe_outputs \
 #-------------------------------------------------------------------------------------------------------------------
 
 function do_build() {
+  create-developer-output-folders
   run_in_vs_env rc icons.rc
   build_version.res
   build_manifest.res

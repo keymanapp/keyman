@@ -8,8 +8,6 @@ We do not have 100% clean separation between Keyman Developer and Keyman for
 Windows. Shared units are intended to live in common, however the following
 projects will need to be updated in the future.
 
-* kmbrowserhost in Windows is included as part of Keyman Developer.
-
 # Folders
 
 ## src/common
@@ -48,6 +46,11 @@ folder. Also used to generate new projects from templates.
 Unsupported utility decompiles a Keyman .kmx keyboard. It will produce a .kmn
 source file and optionally a .ico or .bmp image. see kmdecomp/kmdecomp.md for
 details.
+
+## src/kmdbrowserhost - kmdbrowserhost.exe
+
+Hosts Chromium components for Keyman Developer; similar to kmbrowserhost.exe
+in Keyman for Windows.
 
 ## src/kmc
 

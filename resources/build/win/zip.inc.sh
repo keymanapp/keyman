@@ -1,6 +1,5 @@
 
-
-WZZIPPATH="/c/Program Files/7-zip/7z.exe"
+WZZIPPATH="$ProgramFiles/7-zip/7z.exe"
 
 wzzip() {
   if [[ $GO_FAST == 1 ]]; then

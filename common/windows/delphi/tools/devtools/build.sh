@@ -5,7 +5,10 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 . "${THIS_SCRIPT%/*}/../../../../../resources/build/builder.inc.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
-builder_describe "Build devtools tool" clean configure build test
+builder_describe \
+  "Development and build utilities for Delphi" \
+  @/common/windows/delphi:keymanversion \
+  clean configure build test
 builder_parse "$@"
 
 #-------------------------------------------------------------------------------------------------------------------

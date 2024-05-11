@@ -7,9 +7,9 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 
 builder_describe \
   "Keyman Developer third party components" \
+  @/common/windows/delphi \
   clean configure build test \
   :browse4folder :jedi :mbcolor :scfontcombobox
-  # TODO: @/common/windows/ext
 
 builder_parse "$@"
 builder_run_child_actions clean configure build test

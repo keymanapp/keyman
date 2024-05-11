@@ -25,7 +25,7 @@ function do_clean() {
 function do_build() {
   "$DEVTOOLS" -ai "$THIS_SCRIPT_PATH/source"
   delphi_msbuild packages/CEF4Delphi.dproj "//p:Platform=Win32"
-  "$DEVTOOLS" -ip "$OUTLIB/CEF4Delphi.bpl"
+  "$DEVTOOLS" -ip "$COMMON_OUTLIB/CEF4Delphi.bpl"
 }
 
 builder_run_action clean:project        do_clean

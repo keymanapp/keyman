@@ -2,14 +2,25 @@
 # launch a Delphi build environment and a Visual Studio build environment
 
 if ! _builder_has_function_been_called builder_parse; then
-  builder_die "environment.inc.sh must be sourced after builder_parse is called"
+  builder_die "environment.inc.sh must be sourced after builder_parse is called (for debug flags)"
 fi
 
 source "$KEYMAN_ROOT/resources/build/win/configure_environment.inc.sh"
+
+# We always build the generated enviroment files, even in a non-configure step,
+# because e.g. clean may require visual studio environment to run
+if [[ ! -f "$KEYMAN_ROOT/resources/build/win/environment_generated.inc.sh" ]] ||
+  [[ ! -f "$KEYMAN_ROOT/resources/build/win/delphi_environment_generated.inc.sh" ]] ||
+  [[ ! -f "$KEYMAN_ROOT/resources/build/win/visualstudio_environment_generated.inc.sh" ]]; then
+  configure_windows_build_environment
+fi
+
+# We always source the global generated environment but not the compiler-specific generated environments
+source "$KEYMAN_ROOT/resources/build/win/environment_generated.inc.sh"
+
 source "$KEYMAN_ROOT/resources/build/win/delphi_flags.inc.sh"
 source "$KEYMAN_ROOT/resources/build/win/vs_flags.inc.sh"
 source "$KEYMAN_ROOT/resources/build/win/signtime.inc.sh"
-source "$KEYMAN_ROOT/resources/build/win/zip.inc.sh"
 
 VERIFY_SIGNATURES_PATH="$KEYMAN_ROOT/common/windows/delphi/tools/verify_signatures"
 VERIFY_SIGNATURES="$VERIFY_SIGNATURES_PATH/$WIN32_TARGET_PATH/verify_signatures.exe"
@@ -76,7 +87,7 @@ wrap-symstore() {
     return 0
   fi
 
-  "/c/Program Files \(x86\)/Windows Kits/10/Debuggers/x64/symstore.exe" \
+  "$ProgramFilesx86/Windows Kits/10/Debuggers/x64/symstore.exe" \
     add \
     //s "$KEYMAN_SYMSTOREPATH" \
     //v "$VERSION_WIN" \
@@ -86,4 +97,9 @@ wrap-symstore() {
 
 wrap-mt() {
   run_in_vs_env mt.exe "$@"
+}
+
+create-developer-output-folders() {
+  mkdir -p "$DEVELOPER_PROGRAM/xml"
+  mkdir -p "$DEVELOPER_DEBUGPATH"
 }

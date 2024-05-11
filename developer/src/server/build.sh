@@ -135,6 +135,7 @@ function test_server() {
 }
 
 function publish_server() {
+  installer_server
   wrap-signcode //d "Keyman Developer" "$DEVELOPER_PROGRAM/server/build/src/win32/console/node-hide-console-window.node"
   wrap-signcode //d "Keyman Developer" "$DEVELOPER_PROGRAM/server/build/src/win32/console/node-hide-console-window.x64.node"
   wrap-signcode //d "Keyman Developer" "$DEVELOPER_PROGRAM/server/build/src/win32/trayicon/addon.node"
