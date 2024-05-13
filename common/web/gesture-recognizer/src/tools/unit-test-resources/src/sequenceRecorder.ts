@@ -1,4 +1,4 @@
-import { GestureDebugSource } from "@keymanapp/gesture-recognizer";
+import { GestureDebugSource, GestureSource } from "@keymanapp/gesture-recognizer";
 import { HostFixtureLayoutController } from "./hostFixtureLayoutController.js";
 import { RecordedCoordSequenceSet } from "./inputRecording.js";
 
@@ -32,9 +32,9 @@ export class SequenceRecorder {
   }
 
   private _attachRecognizerHooks() {
-    this.controller.recognizer.on('inputstart', (wrappedSequence: WrappedInputSequence) => {
+    this.controller.recognizer.on('inputstart', (wrappedSequence: GestureSource<any>) => {
       const id = wrappedSequence.identifier;
-      this.records[id]  = wrappedSequence;
+      this.records[id]  = wrappedSequence as WrappedInputSequence;
 
       this.startOrder.push(id);
     });

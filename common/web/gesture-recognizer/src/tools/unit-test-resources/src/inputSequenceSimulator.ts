@@ -57,6 +57,7 @@ export class InputSequenceSimulator<HoveredItemType> {
       return {
         _arr: arr, // Obviously, this isn't a standard member of TouchList.
         length: arr.length,
+        //@ts-ignore
         item: function(i: number) { return this._arr[i]; }
       }
     }
