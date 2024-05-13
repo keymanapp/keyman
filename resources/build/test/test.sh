@@ -175,6 +175,7 @@ echo -e "${COLOR_BLUE}## Running dependency tests${COLOR_RESET}"
 "$THIS_SCRIPT_PATH/dependencies/test.sh"
 "$THIS_SCRIPT_PATH/trees/test.sh"
 "$THIS_SCRIPT_PATH/debug-deps/test.sh"
+"$THIS_SCRIPT_PATH/dep-child/test.sh"
 "$THIS_SCRIPT_PATH/ignored-flags/test.sh"
 
 echo -e "${COLOR_BLUE}## Test builder.inc.sh 'builder-style' script${COLOR_RESET}"
