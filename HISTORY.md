@@ -144,6 +144,10 @@
 * chore(common): move to 18.0 alpha (#10713)
 * chore: move to 18.0 alpha
 
+## 17.0.322 beta 2024-05-10
+
+* fix(web): fixes illegal KMW event state - can't focus a null element (#11385)
+
 ## 17.0.321 beta 2024-05-09
 
 * fix(android/engine): Skip updating selection range if invalid (#11384)
