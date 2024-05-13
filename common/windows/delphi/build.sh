@@ -8,10 +8,10 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 builder_describe \
   "Build Keyman Developer common files" \
   clean configure build test \
-  :tools :components :ext :keymanversion
+  :keymanversion :tools :components :ext
 
 builder_parse "$@"
-builder_run_child_actions clean configure build test
+builder_run_child_actions clean configure
 
 function do_build() {
   "$KEYMAN_ROOT/common/windows/mkver.sh" "$KEYMAN_ROOT/common/windows/delphi/general/keymanversion_build.in" "$KEYMAN_ROOT/common/windows/delphi/general/keymanversion_build.inc"
@@ -19,3 +19,4 @@ function do_build() {
 }
 
 builder_run_action build:keymanversion do_build
+builder_run_child_actions build test
