@@ -443,7 +443,7 @@ export default class KeyboardProcessor extends EventEmitter<EventMap> {
 
     // Do not change layer unless needed (27/08/2015)
     if(id == activeLayer && keyEvent.device.formFactor != DeviceSpec.FormFactor.Desktop) {
-      return false;
+      return;
     }
 
     var idx=id;

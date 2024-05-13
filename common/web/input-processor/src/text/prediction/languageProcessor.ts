@@ -167,6 +167,8 @@ export default class LanguageProcessor extends EventEmitter<LanguageProcessorEve
     } else if(outputTarget) {
       let transcription = outputTarget.buildTranscriptionFrom(outputTarget, null, false);
       return this.predict_internal(transcription, true, layerId);
+    } else {
+      return Promise.resolve([]);
     }
   }
 
@@ -284,7 +286,6 @@ export default class LanguageProcessor extends EventEmitter<LanguageProcessorEve
     let original = this.getPredictionState(-reversion.transformId);
     if(!original) {
       console.warn("Could not apply the Suggestion!");
-      return;
     }
 
     // Apply the Reversion!

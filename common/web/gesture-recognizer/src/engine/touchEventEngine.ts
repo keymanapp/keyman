@@ -227,6 +227,8 @@ export class TouchEventEngine<ItemType, StateToken = any> extends InputEventEngi
         this.inputStartSignalMap.set(touchpoint, eventSignalPromise);
 
         return eventSignalPromise.corePromise;
+      } else {
+        return Promise.resolve();
       }
     });
   }

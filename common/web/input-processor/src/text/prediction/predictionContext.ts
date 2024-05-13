@@ -80,6 +80,8 @@ export default class PredictionContext extends EventEmitter<PredictionContextEve
     this.suggestionApplier = (suggestion) => {
       if(validSuggestionState()) {
         return langProcessor.applySuggestion(suggestion, this.currentTarget, () => kbdProcessor.layerId);
+      } else {
+        return Promise.resolve(null);
       }
     }
 
@@ -243,7 +245,7 @@ export default class PredictionContext extends EventEmitter<PredictionContextEve
    * Should return 'false' if the current state allows reverting a recently-applied suggestion and act accordingly.
    * Otherwise, return true.
    */
-  private doTryRevert = (/*returnObj: {shouldSwallow: boolean}*/): boolean => {
+  private doTryRevert = (/*returnObj: {shouldSwallow: boolean}*/): void => {
     // Has the revert keystroke (BKSP) already been sent once since the last accept?
     if(this.doRevert) {
       // If so, clear the 'revert' option and start doing normal predictions again.
