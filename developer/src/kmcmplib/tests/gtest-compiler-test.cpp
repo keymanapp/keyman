@@ -9,6 +9,7 @@ PKMX_WCHAR strtowstr(PKMX_STR in);
 PKMX_STR wstrtostr(PKMX_WCHAR in);
 KMX_DWORD ValidateMatchNomatchOutput(PKMX_WCHAR p);
 KMX_BOOL IsValidKeyboardVersion(KMX_WCHAR *dpString);
+bool hasPreamble(std::u16string result);
 
 class CompilerTest : public testing::Test {
     protected:
@@ -121,6 +122,12 @@ TEST_F(CompilerTest, IsValidKeyboardVersion_test) {
 // int GetDeadKey(PFILE_KEYBOARD fk, PKMX_WCHAR p)
 // void kmcmp::RecordDeadkeyNames(PFILE_KEYBOARD fk)
 // KMX_BOOL kmcmp::IsValidCallStore(PFILE_STORE fs)
-// bool hasPreamble(std::u16string result)
+
+TEST_F(CompilerTest, hasPreamble_test) {
+    EXPECT_FALSE(hasPreamble(u""));
+    EXPECT_FALSE(hasPreamble(u"\uFEFE")); // not \uFEFF
+    EXPECT_TRUE(hasPreamble(u"\uFEFF"));
+}
+
 // bool UTF16TempFromUTF8(KMX_BYTE* infile, int sz, KMX_BYTE** tempfile, int *sz16)
 // PFILE_STORE FindSystemStore(PFILE_KEYBOARD fk, KMX_DWORD dwSystemID)
