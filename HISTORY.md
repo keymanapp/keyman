@@ -1,5 +1,25 @@
 # Keyman Version History
 
+## 18.0.34 alpha 2024-05-13
+
+* feat(windows): Don't install desktop shortcut for Keyman for windows on installation (#11401)
+* feat(common): improve builder parameter passing for child and dep builds (#11410)
+* chore: merge 17.0 beta into master A17S2 (#11431)
+* chore(android): Update dependencies (#11393)
+
+## 18.0.33 alpha 2024-05-10
+
+* chore(common): Merge beta to master for Sprint A18S1 (part 2) (#11413)
+
+## 18.0.32 alpha 2024-05-09
+
+* chore(common): Add `minimum-versions.inc.sh` (#11380)
+* chore(core): km_core_cp -> km_core_cu (#11341)
+
+## 18.0.31 alpha 2024-05-08
+
+* fix(windows): "Keyboard" should be lower case in UI string for font helper tool (#11392)
+
 ## 18.0.30 alpha 2024-05-07
 
 * chore(web): Improve dependencies (#11377)
@@ -130,6 +150,32 @@
 
 * chore(common): move to 18.0 alpha (#10713)
 * chore: move to 18.0 alpha
+
+## 17.0.322 beta 2024-05-10
+
+* fix(web): fixes illegal KMW event state - can't focus a null element (#11385)
+
+## 17.0.321 beta 2024-05-09
+
+* fix(android/engine): Skip updating selection range if invalid (#11384)
+* refactor(android/engine): Refactor updateSelection (#11389)
+
+## 17.0.320 beta 2024-05-07
+
+* fix(android): prevents mid-keystroke desynchronization when deleting selected text (#11367)
+* fix(web): support SVG elements when checking className (#11365)
+* fix(developer): define `lastSelLength` variable (#11366)
+
+## 17.0.319 beta 2024-05-04
+
+* fix(android): inverting a selection range would crash Keyman (#11345)
+* fix(developer): handle missing Name element for File element in package compiler (#11352)
+* fix(developer): handle missing Description element for File element in package compiler (#11354)
+
+## 17.0.318 beta 2024-05-02
+
+* fix(web): longpress shortcut activation should only consider northward part (#11306)
+* chore(ios,mac): support build on Apple Silicon using Xcode 15.3 (#11302)
 
 ## 17.0.317 beta 2024-05-01
 

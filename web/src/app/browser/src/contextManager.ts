@@ -287,24 +287,43 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
     };
 
     // Set element directionality (but only if element is empty)
-    let Ltarg = target?.getElement();
+    let focusedElement = target?.getElement();
     if(target instanceof DesignIFrame) {
-      Ltarg = target.docRoot;
+      focusedElement = target.docRoot;
     }
-    if(Ltarg && Ltarg.ownerDocument && Ltarg instanceof Ltarg.ownerDocument.defaultView.HTMLElement) {
-      _SetTargDir(Ltarg, this.activeKeyboard?.keyboard);
+    if(focusedElement && focusedElement.ownerDocument && focusedElement instanceof focusedElement.ownerDocument.defaultView.HTMLElement) {
+      _SetTargDir(focusedElement, this.activeKeyboard?.keyboard);
     }
 
     if(target != originalTarget) {
       this.emit('targetchange', target);
     }
 
+    //Execute external (UI) code needed on focus if required
     if(sendEvents) {
-      // //Execute external (UI) code needed on focus if required
-      this.apiEvents.callEvent('controlfocused', {
-        target: target?.getElement() || null,
-        activeControl: previousTarget?.getElement()
-      });
+      let blurredElement = previousTarget?.getElement();
+      if(previousTarget instanceof DesignIFrame) {
+        blurredElement = previousTarget.docRoot;
+      }
+
+      if(!focusedElement) {
+        if(blurredElement) {
+          this.apiEvents.callEvent('controlblurred', {
+            target: blurredElement,
+            event: null,
+            isActivating: this.focusAssistant.maintainingFocus
+          });
+        }
+      } else {
+        // Note:  indicates the previous control being blurred (as
+        // `activeControl`). 'controlfocused' and 'controlblurred' are
+        // treated as mutually exclusive, with the latter only happening
+        // when nothing KMW-related is focused.
+        this.apiEvents.callEvent('controlfocused', {
+          target: focusedElement,
+          activeControl: blurredElement
+        });
+      }
     }
   }
 
