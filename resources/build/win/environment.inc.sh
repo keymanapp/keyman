@@ -78,7 +78,12 @@ clean_windows_project_files() {
 }
 
 wrap-signcode() {
-  signtime signtool.exe "$SC_PFX_SHA1" "$SC_PFX_SHA256" "$SC_URL" "$SC_PWD" "$@"
+  # CI will usually pass in a full path for signtool.exe; for local builds we
+  # will hopefully find what we want on the path already
+  if [[ -z "${SIGNTOOL+x}" ]]; then
+    local SIGNTOOL=signtool.exe
+  fi
+  signtime "$SIGNTOOL" "$SC_PFX_SHA1" "$SC_PFX_SHA256" "$SC_URL" "$SC_PWD" "$@"
 }
 
 wrap-symstore() {

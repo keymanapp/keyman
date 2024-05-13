@@ -44,28 +44,60 @@ builder_describe \
 
 builder_parse "$@"
 
+#-------------------------------------------------------------------------------------------------------------------
+
 # builder_describe_outputs \
 #   configure  /developer/src/tike/xml/layoutbuilder/keymanweb-osk.ttf
 # builder_run_action configure cp "$KEYMAN_ROOT/common/resources/fonts/keymanweb-osk.ttf" "$KEYMAN_ROOT/developer/src/tike/xml/layoutbuilder/"
 
-if builder_has_action publish; then
-  # Make sure that package*.json have not been modified before
-  pushd "$KEYMAN_ROOT" >/dev/null
-  if git status --porcelain | grep -qP 'package(-lock)?\.json'; then
-    builder_echo "The following package.json files have been modified:"
-    git status --porcelain | grep -P 'package(-lock)?\.json'
-    builder_die "The publish action will not run until these files are checked in or reverted."
+function verify_package_json_clean_before_publish() {
+  if builder_has_action publish; then
+    # Make sure that package*.json have not been modified before
+    pushd "$KEYMAN_ROOT" >/dev/null
+    if git status --porcelain | grep -qP 'package(-lock)?\.json'; then
+      builder_echo "The following package.json files have been modified:"
+      git status --porcelain | grep -P 'package(-lock)?\.json'
+      builder_die "The publish action will not run until these files are checked in or reverted."
+    fi
+    popd
+
+    # To ensure that we cache the top-level package.json, we must call this before
+    # the global publish
+    builder_publish_cleanup
   fi
-  popd
+}
 
-  # To ensure that we cache the top-level package.json, we must call this before
-  # the global publish
-  builder_publish_cleanup
-fi
+verify_package_json_clean_before_publish
 
-builder_run_child_actions clean configure build test api publish install
+#-------------------------------------------------------------------------------------------------------------------
 
-if builder_has_action publish; then
+builder_run_child_actions  clean configure build test
+
+#-------------------------------------------------------------------------------------------------------------------
+
+builder_run_child_actions  api
+builder_run_action         api     api-documenter markdown -i ../build/api -o ../build/docs
+
+#-------------------------------------------------------------------------------------------------------------------
+
+function do_publish() {
+  #--------------------------------------------------------
+  # TODO: Hard-coded calls to /common packages which need
+  # publishing; this should be able to be removed once we
+  # move the publish call to the top-level
+  if builder_has_option --npm-publish; then
+    NPM_PUBLISH=--npm-publish
+  else
+    NPM_PUBLISH=
+  fi
+
+  ../../common/web/keyman-version/build.sh publish
+  ../../common/web/types/build.sh publish
+  ../../common/models/types/build.sh publish
+  ../../core/include/ldml/build.sh publish
+  # end TODO
+  #--------------------------------------------------------
+
   builder_echo info "Cleaning up package.json after 'npm version'"
   # And then cleanup the mess
   builder_publish_cleanup
@@ -74,11 +106,13 @@ if builder_has_action publish; then
   pushd "$KEYMAN_ROOT" >/dev/null
   git checkout package.json package-lock.json '**/package.json'
   popd
-fi
 
-function do_api() {
-  api-documenter markdown -i ../build/api -o ../build/docs
-  # TODO: Copy to help.keyman.com and open PR {in publish step}
+  # TODO: Copy ../build/docs {from api action} to help.keyman.com and open PR
 }
 
-builder_run_action api do_api
+builder_run_child_actions  publish
+builder_run_action         publish do_publish
+
+#-------------------------------------------------------------------------------------------------------------------
+
+builder_run_child_actions  install
