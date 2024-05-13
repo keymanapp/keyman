@@ -5,7 +5,7 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 . "${THIS_SCRIPT%/*}/../../../../resources/build/builder.inc.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
-builder_describe "Build mbcolor component" clean configure build test
+builder_describe "mbcolor component" clean configure build test
 builder_parse "$@"
 
 #-------------------------------------------------------------------------------------------------------------------
@@ -18,17 +18,13 @@ builder_describe_outputs \
 
 #-------------------------------------------------------------------------------------------------------------------
 
-function do_clean() {
-  rm -rf obj manifest.res manifest.xml *.dproj.local version.res icons.RES icons.res *.identcache
-}
-
 function do_build() {
   "$DEVTOOLS" -ai "$DEVELOPER_ROOT/src/ext/mbcolor"
   delphi_msbuild mbColorLibD10.dproj "//p:Platform=Win32"
   "$DEVTOOLS" -ip "$DEVELOPER_OUTLIB/mbColorLibD10.bpl"
 }
 
-builder_run_action clean:project        do_clean
+builder_run_action clean:project        clean_windows_project_files
 builder_run_action configure:project    configure_windows_build_environment
 builder_run_action build:project        do_build
 # builder_run_action test:project         do_test

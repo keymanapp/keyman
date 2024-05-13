@@ -6,7 +6,7 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 builder_describe \
-  "Build shared data" \
+  "Shared data -- Unicode Character Database" \
   clean configure build test \
   "@../delphi/tools/buildunidata"
 

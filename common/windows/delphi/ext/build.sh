@@ -6,15 +6,12 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 builder_describe \
-  "Build Keyman Developer third party components" \
+  "Keyman common third party Delphi components" \
   clean configure build test reset \
   :cef4delphi :dcpcrypt :jwa :sentry :tds2dbg
 
 builder_parse "$@"
 builder_run_child_actions clean configure build test
-
-# Note: 'api', 'publish', 'install' actions are defined here for commonality with
-# sibling projects but are no-ops
 
 function do_reset() {
   "$DEVTOOLS" -rp

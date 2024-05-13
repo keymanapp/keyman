@@ -11,12 +11,11 @@ builder_describe \
   :keymanversion :tools :components :ext
 
 builder_parse "$@"
-builder_run_child_actions clean configure
 
-function do_build() {
-  "$KEYMAN_ROOT/common/windows/mkver.sh" "$KEYMAN_ROOT/common/windows/delphi/general/keymanversion_build.in" "$KEYMAN_ROOT/common/windows/delphi/general/keymanversion_build.inc"
-  # $(GIT_BASH_FOR_KEYMAN) $(KEYMAN_ROOT)/common/include/build.sh clean configure build
-}
+builder_run_child_actions clean
+builder_run_action        clean                  rm -f general/keymanversion_build.inc
 
-builder_run_action build:keymanversion do_build
+builder_run_child_actions configure
+
+builder_run_action        build:keymanversion    replaceVersionStrings_Mkver general/keymanversion_build.in general/keymanversion_build.inc
 builder_run_child_actions build test

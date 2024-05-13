@@ -6,7 +6,7 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 builder_describe \
-  "Build Keyman Developer common files" \
+  "Keyman Developer common files" \
   clean configure build test \
   ":delphi                      Delphi components" \
   ":web                         Web components"

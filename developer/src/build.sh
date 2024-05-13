@@ -46,28 +46,61 @@ builder_parse "$@"
 
 #-------------------------------------------------------------------------------------------------------------------
 
-# builder_describe_outputs \
-#   configure  /developer/src/tike/xml/layoutbuilder/keymanweb-osk.ttf
-# builder_run_action configure cp "$KEYMAN_ROOT/common/resources/fonts/keymanweb-osk.ttf" "$KEYMAN_ROOT/developer/src/tike/xml/layoutbuilder/"
+source "$KEYMAN_ROOT/resources/build/win/environment.inc.sh"
 
-function verify_package_json_clean_before_publish() {
-  if builder_has_action publish; then
-    # Make sure that package*.json have not been modified before
-    pushd "$KEYMAN_ROOT" >/dev/null
-    if git status --porcelain | grep -qP 'package(-lock)?\.json'; then
-      builder_echo "The following package.json files have been modified:"
-      git status --porcelain | grep -P 'package(-lock)?\.json'
-      builder_die "The publish action will not run until these files are checked in or reverted."
-    fi
-    popd
+#
+# We want to do some checks before we head down the long publish path
+#
+function do_prepublish() {
+  builder_heading "prepublish - verify environment before build"
 
-    # To ensure that we cache the top-level package.json, we must call this before
-    # the global publish
-    builder_publish_cleanup
+  #
+  # Make sure that package*.json have not been modified before
+  #
+
+  pushd "$KEYMAN_ROOT" >/dev/null
+  if git status --porcelain | grep -qP 'package(-lock)?\.json'; then
+    builder_echo "The following package.json files have been modified:"
+    git status --porcelain | grep -P 'package(-lock)?\.json'
+    builder_die "The publish action will not run until these files are checked in or reverted."
   fi
+  popd
+
+  #
+  # To ensure that we cache the top-level package.json, we must call this before
+  # the global publish
+  #
+
+  builder_publish_cleanup
+
+  #
+  # Verify that the Delphi environment is correct for a release build
+  #
+
+  if [[ ! -f "$DEVTOOLS" ]]; then
+    # We'll build devtools here directly because we are before the configure /
+    # build steps which would trigger it in via dependencies
+    "$KEYMAN_ROOT"/common/windows/delphi/tools/devtools/build.sh configure build prepublish
+  fi
+
+  #
+  # Verify that klog is disabled
+  #
+
+  if [[ ! -f /common/windows/delphi/tools/test-klog/$WIN32_TARGET_PATH/test_klog.exe ]]; then
+    # We'll build devtools here directly because we are before the configure /
+    # build steps which would trigger it in via dependencies
+    "$KEYMAN_ROOT"/common/windows/delphi/tools/test-klog/build.sh configure build prepublish
+  fi
+
+  "$DEVTOOLS" -rt
+
+  # All prepublish steps finished
 }
 
-verify_package_json_clean_before_publish
+if builder_has_action publish; then
+  do_prepublish
+fi
 
 #-------------------------------------------------------------------------------------------------------------------
 
@@ -85,16 +118,21 @@ function do_publish() {
   # TODO: Hard-coded calls to /common packages which need
   # publishing; this should be able to be removed once we
   # move the publish call to the top-level
+
+  local DRY_RUN= NPM_PUBLISH=
+
   if builder_has_option --npm-publish; then
     NPM_PUBLISH=--npm-publish
-  else
-    NPM_PUBLISH=
   fi
 
-  ../../common/web/keyman-version/build.sh publish
-  ../../common/web/types/build.sh publish
-  ../../common/models/types/build.sh publish
-  ../../core/include/ldml/build.sh publish
+  if builder_has_option --dry-run; then
+    DRY_RUN=--dry-run
+  fi
+
+  ../../common/web/keyman-version/build.sh publish $DRY_RUN $NPM_PUBLISH
+  ../../common/web/types/build.sh publish $DRY_RUN $NPM_PUBLISH
+  ../../common/models/types/build.sh publish $DRY_RUN $NPM_PUBLISH
+  ../../core/include/ldml/build.sh publish $DRY_RUN $NPM_PUBLISH
   # end TODO
   #--------------------------------------------------------
 

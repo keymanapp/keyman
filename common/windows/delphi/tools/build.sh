@@ -6,7 +6,7 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 builder_describe \
-  "Build Keyman Developer common tools" \
+  "Keyman Developer build tools" \
   clean configure build test \
   :build_standards_data :buildunidata :devtools :sentrytool :test-klog :verify_signatures
 

@@ -6,7 +6,7 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 builder_describe \
-  "Build Keyman Developer Samples" \
+  "Keyman Developer Samples" \
   clean configure build test publish install \
   :imsample
 

@@ -45,16 +45,11 @@ KEYMAN_DEVELOPER_TEMPLATES_ROOT="$DEVELOPER_ROOT/src/kmconvert/data"
 function do_clean() {
   rm -f *.msi *.wixobj *.log setup.inf setup.zip *.exe *.wixpdb xml.wxs cef.wxs templates.wxs kmc.wxs
   rm -rf "$DEVELOPER_ROOT/src/tike/xml/osk"
-  clean-heat
-}
-
-function clean-heat() {
-  clean-heat-kmc
 }
 
 #-------------------------------------------------------------------------------------------------------------------
 
-function do_build() {
+function do_publish() {
   verify-program-signatures
 
   #
@@ -68,7 +63,7 @@ function do_build() {
     -out keymandeveloper.msi -ext WixUIExtension \
     kmdev.wixobj xml.wixobj cef.wixobj templates.wixobj server.wixobj kmc.wixobj
 
-  clean-heat
+  clean-heat-kmc
 
   #
   # Sign the installation archive
@@ -276,4 +271,5 @@ function copy-schemas() {
 builder_run_action clean     do_clean
 # builder_run_action configure do_configure
 # builder_run_action build     do_build
-builder_run_action publish   do_build
+# builder_run_action test      do_test
+builder_run_action publish   do_publish

@@ -5,7 +5,7 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 . "${THIS_SCRIPT%/*}/../../../../../resources/build/builder.inc.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
-builder_describe "Build verify_signatures tool" clean configure build test verify
+builder_describe "Tool to verify all Windows executable signatures and manifests" clean configure build test verify
 builder_parse "$@"
 
 #-------------------------------------------------------------------------------------------------------------------
@@ -18,16 +18,12 @@ builder_describe_outputs \
 
 #-------------------------------------------------------------------------------------------------------------------
 
-function do_clean() {
-  rm -rf obj manifest.res manifest.xml *.dproj.local version.res icons.RES icons.res *.identcache
-}
-
 function do_build() {
   delphi_msbuild verify_signatures.dproj "//p:Platform=Win32"
   cp sigcheck.bin "$WIN32_TARGET_PATH/sigcheck.exe"
 }
 
-builder_run_action clean:project        do_clean
+builder_run_action clean:project        clean_windows_project_files
 builder_run_action configure:project    configure_windows_build_environment
 builder_run_action build:project        do_build
 # builder_run_action test:project         do_test

@@ -18,6 +18,24 @@ fi
 # We always source the global generated environment but not the compiler-specific generated environments
 source "$KEYMAN_ROOT/resources/build/win/environment_generated.inc.sh"
 
+# Windows common environment variables
+
+WINDOWS_ROOT="$KEYMAN_ROOT/windows"
+WINDOWS_PROGRAM="$WINDOWS_ROOT/bin"
+
+COMMON_ROOT="$KEYMAN_ROOT/common/windows/delphi"
+OUTLIB="$WINDOWS_ROOT/lib"
+COMMON_OUTLIB="$KEYMAN_ROOT/common/windows/lib"
+
+if builder_is_debug_build || [[ $VERSION_ENVIRONMENT == local ]] || [[ ! -z ${TEAMCITY_PR_NUMBER+x} ]]; then
+  # We do a fast build for debug builds, local builds, test PR builds but not for master/beta/stable release builds
+  GO_FAST=1
+else
+  GO_FAST=0
+fi
+
+# Import additional tool-specific variables
+
 source "$KEYMAN_ROOT/resources/build/win/delphi_flags.inc.sh"
 source "$KEYMAN_ROOT/resources/build/win/vs_flags.inc.sh"
 source "$KEYMAN_ROOT/resources/build/win/signtime.inc.sh"
@@ -69,7 +87,7 @@ build_version.res() {
 }
 
 build_manifest.res() {
-  "$KEYMAN_ROOT/common/windows/mkver.sh" manifest.in manifest.xml
+  replaceVersionStrings_Mkver manifest.in manifest.xml
   run_in_vs_env rc manifest.rc
 }
 

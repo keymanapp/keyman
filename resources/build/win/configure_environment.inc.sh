@@ -1,3 +1,14 @@
+#
+# Functions for building three include scripts:
+#
+#   * environment_generated.inc.sh
+#   * delphi_environment_generated.inc.sh
+#   * visualstudio_environment_generated.inc.sh
+#
+# These include scripts define variables that may change from machine to
+# machine. This script should not be directly sourced, as environment.inc.sh
+# will source this script as required.
+#
 
 _locate_programFilesX86() {
   # ProgramFilesx86="$(cygpath -u "`printenv 'ProgramFiles(x86)'`")"
@@ -96,9 +107,3 @@ configure_windows_build_environment() {
   _locate_rsvars
   _build_delphi_environment
 }
-
-# echo "$VSInstallationPath"
-
-# for /f "usebackq delims=#" %%a in (`"%programfiles(x86)%\Microsoft Visual Studio\Installer\vswhere" -latest -property installationPath`) do (
-#   set VsDevCmd_Path=%%a\Common7\Tools\VsDevCmd.bat
-# )

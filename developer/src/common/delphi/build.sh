@@ -21,10 +21,6 @@ builder_describe_outputs \
 
 #-------------------------------------------------------------------------------------------------------------------
 
-function do_clean() {
-  rm -rf obj manifest.res manifest.xml *.dproj.local version.res icons.RES icons.res *.identcache
-}
-
 function do_build() {
   pushd components
   mkdir -p obj/Win32/$TARGET_PATH
@@ -33,7 +29,7 @@ function do_build() {
   popd
 }
 
-builder_run_action clean:project        do_clean
+builder_run_action clean:project        clean_windows_project_files
 builder_run_action configure:project    configure_windows_build_environment
 builder_run_action build:project        do_build
 # builder_run_action test:project         do_test

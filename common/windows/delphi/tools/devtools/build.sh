@@ -8,7 +8,8 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 builder_describe \
   "Development and build utilities for Delphi" \
   @/common/windows/delphi:keymanversion \
-  clean configure build test
+  clean configure build test prepublish
+
 builder_parse "$@"
 
 #-------------------------------------------------------------------------------------------------------------------
@@ -19,22 +20,13 @@ builder_describe_outputs \
   configure:project    /resources/build/win/delphi_environment_generated.inc.sh \
   build:project        /common/windows/delphi/tools/devtools/$WIN32_TARGET_PATH/devtools.exe
 
+builder_describe_internal_dependency \
+  prepublish:project   build:project
+
 #-------------------------------------------------------------------------------------------------------------------
 
-function do_clean() {
-  rm -rf obj manifest.res manifest.xml *.dproj.local version.res icons.RES icons.res *.identcache
-}
-
-function do_build() {
-  delphi_msbuild devtools.dproj "//p:Platform=Win32"
-  # "$WIN32_TARGET_PATH/buildunidata.exe" "$KEYMAN_ROOT/common/windows/data" "$KEYMAN_ROOT/common/windows/bin/data/unicodedata.mdb"
-}
-
-builder_run_action clean:project        do_clean
+builder_run_action clean:project        clean_windows_project_files
 builder_run_action configure:project    configure_windows_build_environment
-builder_run_action build:project        do_build
+builder_run_action build:project        delphi_msbuild devtools.dproj "//p:Platform=Win32"
 # builder_run_action test:project         do_test
-
-# TODO
-#: test-releasebuildcheck: build
-#    $(DEVTOOLS) -rt
+builder_run_action prepublish:project   "$DEVTOOLS" -rt

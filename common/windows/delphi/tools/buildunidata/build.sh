@@ -20,16 +20,13 @@ builder_describe_outputs \
 
 #-------------------------------------------------------------------------------------------------------------------
 
-function do_clean() {
-  rm -rf obj manifest.res manifest.xml *.dproj.local version.res icons.RES icons.res *.identcache
-}
-
 function do_build() {
   delphi_msbuild buildunidata.dproj "//p:Platform=Win32"
+  # The data transform step is done in common/windows/data/build.sh
   # "$WIN32_TARGET_PATH/buildunidata.exe" "$KEYMAN_ROOT/common/windows/data" "$KEYMAN_ROOT/common/windows/bin/data/unicodedata.mdb"
 }
 
-builder_run_action clean:project        do_clean
+builder_run_action clean:project        clean_windows_project_files
 builder_run_action configure:project    configure_windows_build_environment
 builder_run_action build:project        do_build
 # builder_run_action test:project         do_test

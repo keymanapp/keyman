@@ -18,10 +18,6 @@ builder_describe_outputs \
 
 #-------------------------------------------------------------------------------------------------------------------
 
-function do_clean() {
-  rm -rf obj manifest.res manifest.xml *.dproj.local version.res icons.RES icons.res *.identcache
-}
-
 STANDARDS_DATA_PATH="$KEYMAN_ROOT/resources/standards-data"
 STANDARDS_OUT_PATH="$KEYMAN_ROOT/common/windows/delphi/standards"
 
@@ -49,7 +45,7 @@ function do_build() {
   "$WIN32_TARGET_PATH/build_standards_data.exe" langtags "$LANGTAGS_DATA" "$LANGTAGS_PAS"
 }
 
-builder_run_action clean:project        do_clean
+builder_run_action clean:project        clean_windows_project_files
 builder_run_action configure:project    configure_windows_build_environment
 builder_run_action build:project        do_build
 # builder_run_action test:project         do_test

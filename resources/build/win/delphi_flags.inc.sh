@@ -1,44 +1,21 @@
-# Delphi Flags
+# Delphi Flags: these flags may be imported into build scripts via the
+# environment.inc.sh import.
+#
+# Note: there are probably some overlaps in usage for some of these
+# macros, and we may wish to reorganize them later.
 
 # This may need to be updated if any Delphi library paths change
 DELPHIINCLUDES="$KEYMAN_ROOT/common/windows/delphi/ext/cef4delphi/source;$KEYMAN_ROOT/common/windows/delphi/ext/dcpcrypt;$KEYMAN_ROOT/common/windows/delphi/ext/jwa/Win32API;$KEYMAN_ROOT/common/windows/delphi/ext/sentry;$KEYMAN_ROOT/developer/src/ext/mbcolor;$KEYMAN_ROOT/developer/src/ext/scfontcombobox"
 
-DELPHI_VERSION=20.0
-DCC32PATH="$(cygpath -u "$ProgramFilesx86\\Embarcadero\\Studio\\$DELPHI_VERSION\\bin")"
-# RSVars_path="$DCC32PATH/rsvars.bat"
-
-if builder_is_debug_build || [[ $VERSION_ENVIRONMENT == local ]] || [[ ! -z ${TEAMCITY_PR_NUMBER+x} ]]; then
-  # We do a fast build for debug builds, local builds, test PR builds but not for master/beta/stable release builds
-  GO_FAST=1
-else
-  GO_FAST=0
-fi
-
 if builder_is_debug_build; then
-  MAKEFLAG_DEBUG="DEBUG=$DEBUG"
   TARGET_PATH=Debug
 else
-  MAKEFLAG_DEBUG=
   TARGET_PATH=Release
 fi
 
 DELPHI_MSBUILD_FLAG_DEBUG="//p:Config=$TARGET_PATH"
 
-# !IFDEF LINT
-# DELPHIWARNINGS=-W+MESSAGE_DIRECTIVE -W+IMPLICIT_STRING_CAST -W+IMPLICIT_STRING_CAST_LOSS -W+EXPLICIT_STRING_CAST -W+EXPLICIT_STRING_CAST_LOSS -W+CVT_WCHAR_TO_ACHAR -W+CVT_NARROWING_STRING_LOST -W+CVT_ACHAR_TO_WCHAR -W+CVT_WIDENING_STRING_LOST -W+UNICODE_TO_LOCALE -W+LOCALE_TO_UNICODE -W+IMPLICIT_VARIANTS
-# !ELSE
-DELPHIWARNINGS=(-W-MESSAGE_DIRECTIVE -W-IMPLICIT_STRING_CAST -W-IMPLICIT_STRING_CAST_LOSS -W-EXPLICIT_STRING_CAST -W-EXPLICIT_STRING_CAST_LOSS -W-CVT_WCHAR_TO_ACHAR -W-CVT_NARROWING_STRING_LOST -W-CVT_ACHAR_TO_WCHAR -W-CVT_WIDENING_STRING_LOST -W-UNICODE_TO_LOCALE -W-LOCALE_TO_UNICODE -W-IMPLICIT_VARIANTS -W-IMPLICIT_INTEGER_CAST_LOSS -W-IMPLICIT_CONVERSION_LOSS -W-COMBINING_SIGNED_UNSIGNED64 -W-COMBINING_SIGNED_UNSIGNED64)
-# !ENDIF
-
-WINDOWS_ROOT="$KEYMAN_ROOT/windows"
-WINDOWS_PROGRAM="$WINDOWS_ROOT/bin"
-
-COMMON_ROOT="$KEYMAN_ROOT/common/windows/delphi"
-OUTLIB="$WINDOWS_ROOT/lib"
-COMMON_OUTLIB="$KEYMAN_ROOT/common/windows/lib"
-# COMMON_BIN="$KEYMAN_ROOT/common/windows/bin"
-
-# Visual C++ x86, x64
+# Visual C++ x86, x64; Delphi x86
 WIN32_TARGET_PATH=bin/Win32/$TARGET_PATH
 X64_TARGET_PATH=bin/x64/$TARGET_PATH
 
@@ -50,14 +27,8 @@ DEVELOPER_PROGRAM="$DEVELOPER_ROOT/bin"
 DEVELOPER_OUTLIB="$DEVELOPER_ROOT/lib"
 DEVELOPER_DEBUGPATH="$DEVELOPER_ROOT/debug"
 
+# Delphi build tool macros
 
 SENTRYTOOL="$COMMON_ROOT/tools/sentrytool/$WIN32_TARGET_PATH/sentrytool.exe"
-# SENTRYTOOL_DELPHIPREP=("$SENTRYTOOL" delphiprep -r "$KEYMAN_ROOT" -i "$DELPHIINCLUDES")
 TDS2DBG="$KEYMAN_ROOT/common/windows/bin/tools/tds2dbg"
-
-# DELPHIDPRPARAMS=(-Q -B -GD -H -VT -\$C+ -\$D+ -\$J+ -\$L+ -\$O+ -\$Q- -\$R- -\$W+ -\$Y+ -E. \
-#   "${DELPHIWARNINGS[@]}" "-I$DELPHIINCLUDES" "-U$DELPHIINCLUDES" "-R$DELPHIINCLUDES" \
-#   -NSVcl;Vcl.Imaging;Vcl.Touch;Vcl.Samples;Vcl.Shell;System;Xml;Web;Soap;Winapi;System.Win \
-#   "-NU./obj/Win32/$TARGET_PATH" "-E./bin/Win32/$TARGET_PATH")
-
 DEVTOOLS="$COMMON_ROOT/tools/devtools/$WIN32_TARGET_PATH/devtools.exe"

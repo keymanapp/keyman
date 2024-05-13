@@ -53,7 +53,7 @@ function do_monaco_copy() {
   cp -R "$DEVELOPER_ROOT/src/tike/xml/app/node_modules/monaco-editor/min-maps"/* "$DEVELOPER_ROOT/src/tike/xml/app/lib/monaco/min-maps"
 
   pushd "$DEVELOPER_ROOT/src/tike/xml/app/lib/sentry"
-  "$KEYMAN_ROOT/common/windows/mkver.sh" init.js.in init.js
+  replaceVersionStrings_Mkver init.js.in init.js
   popd
 
   run_in_vs_env rc icons.rc
