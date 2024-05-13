@@ -1,22 +1,48 @@
 #include <gtest/gtest.h>
 #include "..\include\kmcompx.h"
+#include "..\include\kmcmplibapi.h"
 #include "..\src\kmx_u16.h"
+#include "..\src\compfile.h"
 #include "..\..\..\..\common\include\km_types.h"
 #include "..\..\..\..\common\include\kmx_file.h"
 #include "..\..\..\..\common\include\kmn_compiler_errors.h"
 
 PKMX_WCHAR strtowstr(PKMX_STR in);
 PKMX_STR wstrtostr(PKMX_WCHAR in);
+KMX_BOOL AddCompileError(KMX_DWORD msg);
 KMX_DWORD ValidateMatchNomatchOutput(PKMX_WCHAR p);
 KMX_BOOL IsValidKeyboardVersion(KMX_WCHAR *dpString);
 bool hasPreamble(std::u16string result);
+
+extern kmcmp_CompilerMessageProc msgproc;
+
+#define COMPILE_ERROR_MAX_LEN (SZMAX_ERRORTEXT + 1 + 280)
+KMX_CHAR szText_stub[COMPILE_ERROR_MAX_LEN];
+
+int msgproc_stub(int line, uint32_t dwMsgCode, const char* szText, void* context) {
+    strcpy(szText_stub, szText);
+    return 1;
+}
+
+namespace kmcmp {
+    extern int nErrors;
+    extern int ErrChr;
+}
+
+#define ERR_EXTRA_LIB_LEN 256
+extern char ErrExtraLIB[ERR_EXTRA_LIB_LEN];
 
 class CompilerTest : public testing::Test {
     protected:
     	CompilerTest() {}
 	    ~CompilerTest() override {}
 	    void SetUp() override {}
-	    void TearDown() override {}
+	    void TearDown() override {
+            msgproc = NULL;
+            szText_stub[0] = '\0';
+            kmcmp::nErrors = 0;
+            kmcmp::ErrChr = 0;
+        }
 };
 
 TEST_F(CompilerTest, strtowstr_test) {
@@ -30,7 +56,31 @@ TEST_F(CompilerTest, wstrtostr_test) {
 };
 
 // KMX_BOOL kmcmp::AddCompileWarning(PKMX_CHAR buf)
-// KMX_BOOL AddCompileError(KMX_DWORD msg)
+
+TEST_F(CompilerTest, AddCompileError_test) {
+    msgproc = msgproc_stub;
+    kmcmp::ErrChr = 0;
+
+    // CERR_FATAL
+    EXPECT_EQ(0, kmcmp::nErrors);
+    EXPECT_EQ(CERR_FATAL, CERR_CannotCreateTempfile & CERR_FATAL);
+    EXPECT_TRUE(AddCompileError(CERR_CannotCreateTempfile));
+    EXPECT_EQ(0, strcmp("Cannot create temp file", szText_stub));
+    EXPECT_EQ(1, kmcmp::nErrors);
+
+    // CERR_ERROR
+    EXPECT_EQ(CERR_ERROR, CERR_InvalidLayoutLine & CERR_ERROR);
+    EXPECT_FALSE(AddCompileError(CERR_InvalidLayoutLine));
+    EXPECT_EQ(0, strcmp("Invalid 'layout' command", szText_stub));
+    EXPECT_EQ(2, kmcmp::nErrors);
+
+    // Unknown
+    EXPECT_EQ(CERR_ERROR, 0x00004FFF & CERR_ERROR);
+    EXPECT_FALSE(AddCompileError(0x00004FFF)); // top of range ERROR
+    EXPECT_EQ(0, strcmp("Unknown error 4fff", szText_stub));
+    EXPECT_EQ(3, kmcmp::nErrors);
+};
+
 // KMX_DWORD ProcessBeginLine(PFILE_KEYBOARD fk, PKMX_WCHAR p)
 
 TEST_F(CompilerTest, ValidateMatchNomatchOutput_test) {
