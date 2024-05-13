@@ -1,5 +1,12 @@
 # Keyman Version History
 
+## 18.0.34 alpha 2024-05-13
+
+* feat(windows): Don't install desktop shortcut for Keyman for windows on installation (#11401)
+* feat(common): improve builder parameter passing for child and dep builds (#11410)
+* chore: merge 17.0 beta into master A17S2 (#11431)
+* chore(android): Update dependencies (#11393)
+
 ## 18.0.33 alpha 2024-05-10
 
 * chore(common): Merge beta to master for Sprint A18S1 (part 2) (#11413)
