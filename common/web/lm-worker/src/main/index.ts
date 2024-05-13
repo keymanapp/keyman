@@ -87,13 +87,13 @@ export default class LMLayerWorker {
    */
   private _importScripts: ImportScripts;
 
+  // @ts-ignore // We don't reference it directly here, but it's worth noting
+  // during debug sessions, especially for unit tests.
   private self: any;
 
   private _platformCapabilities: Capabilities;
 
   private _testMode: boolean = false;
-
-  private _hostURL: string;
 
   private _currentModelSource: ModelSourceSpec;
 

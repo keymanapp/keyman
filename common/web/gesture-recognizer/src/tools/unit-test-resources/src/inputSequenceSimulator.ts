@@ -1,7 +1,6 @@
 import {
   GestureDebugPath,
   GestureDebugSource,
-  GestureSource,
   type InputSample
 } from "@keymanapp/gesture-recognizer";
 
