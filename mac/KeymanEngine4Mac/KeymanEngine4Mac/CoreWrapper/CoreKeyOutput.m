@@ -33,7 +33,7 @@
 -(NSString *)description
 {
   NSData* data = [self.textToInsert dataUsingEncoding:NSUTF16LittleEndianStringEncoding];
-
+  
   return [[NSString alloc] initWithFormat: @"codePointsToDeleteBeforeInsert: %li, textToInsert: '%@', optionsToPersist: %@, alert: %d, emitKeystroke: %d, capsLockState: %d ", self.codePointsToDeleteBeforeInsert, data, self.optionsToPersist, self.alert, self.emitKeystroke, self.capsLockState];
 }
 
