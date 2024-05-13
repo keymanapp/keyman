@@ -216,7 +216,7 @@
         [textField setEditable:NO];
         [textField setBordered:NO];
         [textField setBackgroundColor:[NSColor clearColor]];
-        [textField setAlignment:NSLeftTextAlignment];
+      [textField setAlignment:NSTextAlignmentLeft];
         [textField setFont:[NSFont systemFontOfSize:tableView.rowHeight*0.5]];
         [textField setTextColor:[NSColor colorWithSRGBRed:0.0 green:0.0 blue:0.1 alpha:1.0]];
         [textField setStringValue:[info objectForKey:@"HeaderTitle"]];
@@ -471,7 +471,7 @@
         [failure setMessageText:[NSString localizedStringWithFormat:errorString, kmpFile.lastPathComponent]];
 
         [failure setIcon:[[NSBundle mainBundle] imageForResource:@"logo.png"]];
-        [failure setAlertStyle:NSWarningAlertStyle];
+        [failure setAlertStyle:NSAlertStyleWarning];
         [failure beginSheetModalForWindow:self.window
                             modalDelegate:self
                            didEndSelector:@selector(alertDidEnd:returnCode:contextInfo:)
@@ -534,7 +534,7 @@
         [_deleteAlertView setInformativeText:NSLocalizedString(@"info-cannot-undo-delete-keyboard", nil)];
         [_deleteAlertView addButtonWithTitle:NSLocalizedString(@"button-delete-keyboard", nil)];
         [_deleteAlertView addButtonWithTitle:NSLocalizedString(@"button-cancel-delete-keyboard", nil)];
-        [_deleteAlertView setAlertStyle:NSWarningAlertStyle];
+        [_deleteAlertView setAlertStyle:NSAlertStyleWarning];
         [_deleteAlertView setIcon:[[NSBundle mainBundle] imageForResource:@"logo.png"]];
     }
     
@@ -547,7 +547,7 @@
         [_confirmKmpInstallAlertView addButtonWithTitle:NSLocalizedString(@"button-install-keyboard", nil)];
         [_confirmKmpInstallAlertView addButtonWithTitle:NSLocalizedString(@"button-cancel-install-keyboard", nil)];
         [_confirmKmpInstallAlertView setMessageText:NSLocalizedString(@"message-confirm-install-keyboard", nil)];
-        [_confirmKmpInstallAlertView setAlertStyle:NSInformationalAlertStyle];
+        [_confirmKmpInstallAlertView setAlertStyle:NSAlertStyleInformational];
         [_confirmKmpInstallAlertView setIcon:[[NSBundle mainBundle] imageForResource:@"logo.png"]];
     }
     

@@ -11,7 +11,7 @@
 @implementation KMBarView
 
 - (void)drawRect:(NSRect)rect {
-    CGContextRef context = (CGContextRef)[[NSGraphicsContext currentContext] graphicsPort];
+    CGContextRef context = (CGContextRef)[[NSGraphicsContext currentContext] CGContext];
     
     NSRect rect1 = NSMakeRect(0, 0, rect.size.width*0.56, rect.size.height);
     NSRect rect2 = NSMakeRect(rect1.size.width, 0, rect.size.width*0.23, rect.size.height);
