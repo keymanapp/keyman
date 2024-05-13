@@ -26,7 +26,7 @@
 }
 
 - (void)tearDown {
-    // Put teardown code here. This method is called after the invocation of each test method in the class.
+  // Put teardown code here. This method is called after the invocation of each test method in the class.
 }
 
 - (void)testKeycodeConversion_MacA_ReturnsWindowsA {
@@ -130,17 +130,17 @@
 - (void)testConversionFromUnicharString_optionName_matchesLiteral {
   unichar const * unicharString = u"option_ligature_ew";
   NSString *optionNameString = @"option_ligature_ew";
-
+  
   NSString *convertedString = [[CoreTestStaticHelperMethods helper] createNSStringFromUnicharString:unicharString];
-
+  
   XCTAssertTrue([convertedString isEqual:optionNameString], @"Converted unichar string is not equal to literal string.");
 }
 
 - (void)testHelperCreationPerformance {
-    // This is an example of a performance test case.
-    [self measureBlock:^{
-      CoreHelper *helper = [[CoreHelper alloc] init];
-    }];
+  // This is an example of a performance test case.
+  [self measureBlock:^{
+    CoreHelper *helper = [[CoreHelper alloc] init];
+  }];
 }
 
 @end

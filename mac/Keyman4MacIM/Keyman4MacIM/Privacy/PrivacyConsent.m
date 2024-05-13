@@ -33,12 +33,12 @@
 
 + (PrivacyConsent *)shared
 {
-    static PrivacyConsent *shared = nil;
-    static dispatch_once_t onceToken;
-    dispatch_once(&onceToken, ^{
-      shared = [[PrivacyConsent alloc] init];
-    });
-    return shared;
+  static PrivacyConsent *shared = nil;
+  static dispatch_once_t onceToken;
+  dispatch_once(&onceToken, ^{
+    shared = [[PrivacyConsent alloc] init];
+  });
+  return shared;
 }
 
 /**
@@ -99,11 +99,11 @@
  */
 - (NSWindowController *)privacyDialog {
   if (!_privacyDialog) {
-        _privacyDialog = [[PrivacyWindowController alloc] initWithWindowNibName:@"PrivacyWindowController"];
+    _privacyDialog = [[PrivacyWindowController alloc] initWithWindowNibName:@"PrivacyWindowController"];
     NSLog(@"privacyDialog created");
     [self configureDialogForOsVersion];
   }
-
+  
   return _privacyDialog;
 }
 
@@ -111,7 +111,7 @@
  * Initialize privacy alert appropriately as determined by macOS version.
  */
 - (void)configureDialogForOsVersion {
-
+  
   if (@available(macOS 10.15, *)) {
     [self configureDialogForCatalinaAndLater];
   } else {
@@ -153,8 +153,8 @@
  * Present the PrivacyDialog alert to the user.
  */
 - (void)showPrivacyDialog {
-    [[self.privacyDialog window] setLevel:NSModalPanelWindowLevel];
-    [[self.privacyDialog window] makeKeyAndOrderFront:nil];
+  [[self.privacyDialog window] setLevel:NSModalPanelWindowLevel];
+  [[self.privacyDialog window] makeKeyAndOrderFront:nil];
 }
 
 /**
