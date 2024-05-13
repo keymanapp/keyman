@@ -88,8 +88,9 @@ int mac_KMX_ToUnicodeEx(int keycode, PKMX_WCHAR pwszBuff, int shift_state_pos, i
             //rc>0:  character
             //rc==0:  no translation
             //rc<0:  dk
-// _S2 can I use mac_KMX_get_KeyVal_From_KeyCode_dk ?
-  KMX_DWORD KeyVal= (KMX_DWORD) mac_KMX_get_KeyVal_From_KeyCode(keyboard_layout, keycode, mac_map_VKShiftState_to_MacModifier(ShiftState(shift_state_pos)), caps);
+
+  // _S2 can I use mac_KMX_get_KeyVal_From_KeyCode_dk ?
+  KMX_DWORD KeyVal= (KMX_DWORD) mac_KMX_get_KeyVal_From_KeyCode(keyboard_layout, keycode, mac_map_ShiftState_to_MacModifier(ShiftState(shift_state_pos)), caps);
 
   // _S2 ToDo non-dk OK, but all others not
   std::u16string str = mac_convert_DeadkeyValues_To_U16str(KeyVal);
@@ -387,10 +388,10 @@ public:
 }*/
 
 // _S2 need to go
-void print_All_Entries(std::vector<mac_KMX_VirtualKey*> rgKey);
+void print_All_Entries_S2(std::vector<mac_KMX_VirtualKey*> rgKey);
 bool run_verify_S2(std::vector<mac_KMX_VirtualKey*> rgKey);
 
-bool mac_KMX_ImportRules( LPKMX_KEYBOARD kp,v_dw_3D &All_Vector, const UCKeyboardLayout **keyboard_layout,std::vector<KMX_DeadkeyMapping> *KMX_FDeadkeys, KMX_BOOL bDeadkeyConversion) { // I4353   // I4327
+bool mac_KMX_ImportRules( LPKMX_KEYBOARD kp,v_dw_3D &All_Vector, const UCKeyboardLayout **keyboard_layout,std::vector<KMX_DeadkeyMapping> *FDeadkeys, KMX_BOOL bDeadkeyConversion) { // I4353   // I4327
  mac_KMX_Loader loader;
 
   std::vector<mac_KMX_VirtualKey*> rgKey; //= new VirtualKey[256];
@@ -449,8 +450,7 @@ bool mac_KMX_ImportRules( LPKMX_KEYBOARD kp,v_dw_3D &All_Vector, const UCKeyboar
           KMX_DWORD KC_US = (KMX_DWORD) mac_KMX_get_KeyCodeUnderlying_From_VKUS(iKey);
 
           for(int caps = 0; caps <= 1; caps++) {
-            // _S2 shiftstates
-            // _S2 what is rc for mac?
+
             int rc = mac_KMX_ToUnicodeEx(KC_US, sbBuffer, ss, caps, *keyboard_layout);
             //rc>0:  character
             //rc==0:  no translation
@@ -480,11 +480,11 @@ bool mac_KMX_ImportRules( LPKMX_KEYBOARD kp,v_dw_3D &All_Vector, const UCKeyboar
 
   //-------------------------------------------------------------
   // Now that we've collected the key data, we need to
-  // translate it to kmx and append to the existing keyboard
+  // translate it to kmx and append to the existing keyboar
   //-------------------------------------------------------------
 
   // _S2 needs to go
-  //print_All_Entries(rgKey);
+  //print_All_Entries_S2(rgKey);
   if ( ! run_verify_S2(rgKey))
     printf(" \n::::::::::::::::::::::::::::::::::::::::::::::::::: THERE ARE SOME WRONG ENTRIES ::::::::::::::::::::::::::::::::::::::::::::::::::: \n");
   else
@@ -649,7 +649,8 @@ bool mac_KMX_ImportRules( LPKMX_KEYBOARD kp,v_dw_3D &All_Vector, const UCKeyboar
       KMX_WCHAR *p = kkp->dpContext = new KMX_WCHAR[8];
       *p++ = UC_SENTINEL;
       *p++ = CODE_DEADKEY;
- // _S2 needs to be in     *p++ = mac_KMX_DeadKeyMap(dk->KMX_DeadCharacter(), &alDead, nDeadkey, FDeadkeys);   // I4353
+
+      *p++ = mac_KMX_DeadKeyMap(dk->KMX_DeadCharacter(), &alDead, nDeadkey, FDeadkeys);   // I4353
       // *p++ = nDeadkey+i;
       *p++ = UC_SENTINEL;
       *p++ = CODE_ANY;
@@ -734,7 +735,7 @@ bool verify_entries_S2(int i, std::vector<mac_KMX_VirtualKey*> rgKey, int res1,i
     return all_OK;
 }
 
-void print_All_Entries( std::vector<mac_KMX_VirtualKey*> rgKey) {
+void print_All_Entries_S2( std::vector<mac_KMX_VirtualKey*> rgKey) {
   for ( int i=48; i<58; i++)
     print_entries_S2(i, rgKey," ","","");
 

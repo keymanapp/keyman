@@ -90,24 +90,17 @@ static KMX_DWORD deadkey_min = 0xfe50;	// _S2 needed??
 static KMX_DWORD deadkey_max = 0xfe93;	// _S2 needed??
 //static KMX_DWORD deadkey_max = 0xfe52;  // _S2 TOP_6 TODO This has to go! my test: to only return 3 dk
 
-// map Shiftstate to modifier (e.g. 0->0; )
+// map VKShiftstate to modifier (use 0,2,4,8,10 instead of 0,16,9,25 )
 int mac_map_VKShiftState_to_MacModifier(int VKShiftState);
 
-// take a std::string (=contents of line symbols-file ) and returns the (int) value of the character
-KMX_DWORD mac_convertNamesTo_DWORD_Value(std::string tok_str);
+// map ShiftState to modifier (use 0,2,4,8,10 instead of Base, Shft, Opt, Sh+Opt )
+int mac_map_ShiftState_to_MacModifier(int ShiftState);
 
 // create a Vector with all entries of both keymaps
 int mac_createOneVectorFromBothKeyboards(v_dw_3D &All_Vector, const UCKeyboardLayout * keykeyboard_layout);
 
 // read configuration file, split and write to 3D-Vector (Data for US on Vector[0][ ][ ]  )
 int mac_write_US_ToVector(v_dw_3D &vec);
-
-// 1. step: read complete Row of Configuration file US
-bool mac_createCompleteRow_US(v_str_1D &complete_List, FILE *fpp, const char *text, std::string language);
-
-// replace Name of Key (e.g. <AD06>)  wih Keycode ( e.g. 15 )
-int mac_replace_KeyName_with_Keycode(std::string  in);
-
 // create an empty 2D vector containing 0 in all fields
 v_dw_2D mac_create_empty_2D_Vector(int dim_rows, int dim_shifts);
 
@@ -956,6 +949,15 @@ std::u16string mac_CodePointToU16String(unsigned int codepoint);
 //################################################################################################################################################
 
 // _S2 need to go
+
+// replace Name of Key (e.g. <AD06>)  wih Keycode ( e.g. 15 )
+int mac_replace_KeyName_with_Keycode(std::string  in);
+
+// take a std::string (=contents of line symbols-file ) and returns the (int) value of the character
+KMX_DWORD mac_convertNamesTo_DWORD_Value(std::string tok_str);
+
+// 1. step: read complete Row of Configuration file US
+bool mac_createCompleteRow_US(v_str_1D &complete_List, FILE *fpp, const char *text, std::string language);
 
 void printoutKeyboards(v_dw_3D &All_Vector);
 KMX_DWORD  X_playWithDK(int shiftstate,const UCKeyboardLayout* keyboard_layout , KMX_DWORD charVal) ;

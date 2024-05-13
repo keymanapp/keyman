@@ -45,15 +45,15 @@ PKMX_WCHAR KMX_incxstr(PKMX_WCHAR p);
 
 
 
-int mac_KMX_GetDeadkeys( KMX_WORD DeadKey, KMX_WORD *OutputPairs, const UCKeyboardLayout * keyboard_layout);
+int mac_KMX_GetDeadkeys( KMX_WCHAR deadkey, UINT shift, KMX_WORD *OutputPairs, v_dw_3D &All_Vector, const UCKeyboardLayout * keyboard_layout);  // returns array of [usvk, ch_out] pairs
 
 void mac_KMX_LogError(const wchar_t* fmt, ...);
 
 
-
 //################################################################################################################################################
 //################################################################################################################################################
 
+bool test_dk_S2(KMX_WORD deadkeys[512], KMX_WORD deadkeys1[512]);
 void fun2();
 void testmyFunctions_S2();
 #endif // MCOMPILE_H

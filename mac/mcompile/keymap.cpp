@@ -1,24 +1,21 @@
 #include "keymap.h"
 
-// _S2 why not have 0,2,8,10 directly in VKShiftState ??
-// base, shift, OPT, shift+OPT, FF
+// Base, Shift, OPT, Shift+OPT
 int mac_map_VKShiftState_to_MacModifier(int VKShiftState) {
-  if      (VKShiftState == 0 )        return 0;		// 0000 0000
-  else if (VKShiftState == 1)         return 2;		// 0000 0010
- // else if (VKShiftState == 3)       return 3;		// 0000 0011
- // else if (VKShiftState == 4)       return 4;		// 0000 0100
- // else if (VKShiftState == 5)       return 4;		// 0000 0101
-  else if (VKShiftState == 6 )        return 8;		// 0000 0110
-  else if (VKShiftState == 7)         return 10; 	// 0000 0111
- // else if (VKShiftState == 8)       return 4;		// 0000 1000
- // else if (VKShiftState == 9)       return 4;		// 0000 1001
+  if      (VKShiftState == 0 )    return 0;	 // 0000 0000
+  else if (VKShiftState == 16)    return 2;  // 0000 0111
+  else if (VKShiftState == 9)     return 8;  // 0000 0111
+  else if (VKShiftState == 25)    return 10; // 0000 0111
+  else return VKShiftState;               // _S2 what to return if no match??
+}
 
-
-  else if (VKShiftState == 16)        return 10; 	// 0000 0111
-  else if (VKShiftState == 9)         return 2; 	// 0000 0111
-  else if (VKShiftState == 25)        return 8; 	// 0000 0111
-
-  else return 99;     // _S2 what to return if no match??
+// Base, Shift, OPT, Shift+OPT
+int mac_map_ShiftState_to_MacModifier(int ShiftState) {
+  if      (ShiftState == 0 )        return 0;		// 0000 0000
+  else if (ShiftState == 1)         return 2;		// 0000 0010
+  else if (ShiftState == 6 )        return 8;		// 0000 0110
+  else if (ShiftState == 7)         return 10; 	// 0000 0111
+  else return ShiftState;  //;return 999;     // _S2 what to return if no match??
 }
 
 int mac_createOneVectorFromBothKeyboards(v_dw_3D &All_Vector, const UCKeyboardLayout * keyboard_layout) {
@@ -387,8 +384,7 @@ KMX_DWORD mac_KMX_get_KeyValUnderlying_From_KeyCodeUnderlying(const UCKeyboardLa
     return 0;
   */
 
- // _S2 VKShiftstate!!!!
-  KMX_DWORD KeyV = mac_KMX_get_KeyVal_From_KeyCode_dk(keyboard_layout, KC_underlying, ShiftState(mac_map_VKShiftState_to_MacModifier(VKShiftState)), 0, isdk);
+  KMX_DWORD KeyV = mac_KMX_get_KeyVal_From_KeyCode_dk(keyboard_layout, KC_underlying, (mac_map_VKShiftState_to_MacModifier(VKShiftState)), 0, isdk);
 
   // if there was a dk return 0xFFFF and copy dk into dky
   if( isdk !=0) {
