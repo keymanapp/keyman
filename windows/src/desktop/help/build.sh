@@ -10,9 +10,6 @@ QUIET=0
 
 . "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
 
-set -e
-set -u
-
 THIS_DIR="$(dirname "$THIS_SCRIPT")"
 
 display_usage() {

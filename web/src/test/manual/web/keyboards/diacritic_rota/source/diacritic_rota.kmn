@@ -39,6 +39,8 @@ group(main) using keys
 + [ SHIFT T_DK_DIA_ACUTE  ]  > U+0301 dk(2)
 + [ SHIFT T_DK_DIA_CIRCUM ]  > U+0302 dk(3)
 
++ [T_NEW_71] > 'Monster'
+
 + any(basekeys) > index(basealpha, 1)
 + any(bigkeys)  > index(bigalpha, 1)
 

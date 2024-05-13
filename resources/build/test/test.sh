@@ -175,6 +175,10 @@ echo -e "${COLOR_BLUE}## Running dependency tests${COLOR_RESET}"
 "$THIS_SCRIPT_PATH/dependencies/test.sh"
 "$THIS_SCRIPT_PATH/trees/test.sh"
 "$THIS_SCRIPT_PATH/debug-deps/test.sh"
+"$THIS_SCRIPT_PATH/ignored-flags/test.sh"
+
+echo -e "${COLOR_BLUE}## Test builder.inc.sh 'builder-style' script${COLOR_RESET}"
+./builder-invalid-script.test.sh || builder_die "FAIL: builder-invalid-script.test.sh returned failure code $?"
 
 echo -e "${COLOR_BLUE}## End external tests${COLOR_RESET}"
 echo
@@ -184,7 +188,7 @@ echo
   # builder_parse calls `exit 0` on a --help run, so running in a subshell
   echo -e "${COLOR_BLUE}## Testing --help${COLOR_RESET}"
   builder_parse --no-color --help
-) || builder_die "FAIL: builder-parse returned failure code $? unexpectedly"
+) || builder_die "FAIL: builder-parse unexpectedly returned failure code $?"
 
 echo -e "${COLOR_GREEN}======================================================${COLOR_RESET}"
 echo -e "${COLOR_GREEN}All tests passed successfully${COLOR_RESET}"

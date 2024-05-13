@@ -14,7 +14,7 @@ uses
 {$ALIGN 8}
 
 ///
-/// The maximum size of context in km_core_cp units for a single debug
+/// The maximum size of context in km_core_cu units for a single debug
 /// event. This is taken from MAXCONTEXT in keyman32 (Windows) and is purely
 /// a convenience value. We can increase it if there is a demonstrated need.
 ///
@@ -54,7 +54,7 @@ pkm_core_state_debug_key_info = ^km_core_state_debug_key_info;
 
 km_core_state_debug_kmx_option_info = record
   store: Pointer;       // LPSTORE
-  value: array[0..DEBUG_MAX_CONTEXT-1] of km_core_cp;  // value to be saved into the store
+  value: array[0..DEBUG_MAX_CONTEXT-1] of km_core_cu;  // value to be saved into the store
 end;
 
 pkm_core_state_debug_kmx_option_info = ^km_core_state_debug_kmx_option_info;
@@ -71,7 +71,7 @@ pkm_core_state_debug_kmx_option_info = ^km_core_state_debug_kmx_option_info;
 ///
 
 km_core_state_debug_kmx_info = record
-  context: array [0..DEBUG_MAX_CONTEXT-1] of km_core_cp;     // The context matched by the rule (? may not need this?) // TODO: rename to context_matched
+  context: array [0..DEBUG_MAX_CONTEXT-1] of km_core_cu;     // The context matched by the rule (? may not need this?) // TODO: rename to context_matched
   group: Pointer;  // LPGROUP
   rule: Pointer;   // LPKEY
   store_offsets: array [0..DEBUG_STORE_OFFSETS_SIZE-1] of uint16_t;	// pairs--store, char position, terminated by 0xFFFF // TODO use a better structure here
