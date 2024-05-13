@@ -19,7 +19,14 @@ export { ButtonClasses };
 import Codes from "../text/codes.js";
 import type Keyboard from "./keyboard.js";
 
-export type KLS = {[layerName: string]: string[]};
+export interface EncodedVisualKeyboard {
+  /** Represents CSS font styling to use for VisualKeyboard text */
+  F: string;
+  /** Should there be a 102nd key? */
+  K102?: boolean,
+  KLS?: {[layerName: string]: string[]},
+  BK?: string[];
+}
 
 // The following types provide type definitions for the full JSON format we use for visual keyboard definitions.
 export type ButtonClass       =  0 | 1 | 2 | 3 | 4 | /*5 | 6 | 7 |*/ 8 | 9 | 10;
@@ -30,9 +37,9 @@ export interface LayoutLayer extends LayoutLayerBase {
   capsKey?: LayoutKey,
   numKey?: LayoutKey,
   scrollKey?: LayoutKey,
-  aligned?: boolean
+  aligned?: boolean,
+  nextlayer?: string
 };
-
 export interface LayoutFormFactor extends LayoutFormFactorBase {
   // To facilitate those post-processing elements.
   layer: LayoutLayer[]
@@ -96,9 +103,9 @@ export class Layouts {
   * @param   {string} formFactor   (really utils.FormFactor)
   * @return  {LayoutFormFactor}
   */
-  static buildDefaultLayout(PVK, keyboard: Keyboard, formFactor: string): LayoutFormFactor {
+  static buildDefaultLayout(PVK: EncodedVisualKeyboard, keyboard: Keyboard, formFactor: string): LayoutFormFactor {
     // Build a layout using the default for the device
-    var layoutType=formFactor;
+    let layoutType = formFactor as keyof TouchLayout.TouchLayoutFile;
 
     if(typeof Layouts.dfltLayout[layoutType] != 'object') {
       layoutType = 'desktop';
@@ -119,7 +126,7 @@ export class Layouts {
     // Clone the default layout object for this device
     var layout: LayoutFormFactor = deepCopy(Layouts.dfltLayout[layoutType]);
 
-    var n,layers=layout['layer'], keyLabels: KLS=PVK['KLS'], key102=PVK['K102'];
+    var n,layers=layout['layer'], keyLabels: EncodedVisualKeyboard['KLS'] = PVK['KLS'], key102=PVK['K102'];
     var i, j, k, rows: LayoutRow[], key: LayoutKey, keys: LayoutKey[];
     var chiral: boolean = (kbdBitmask & Codes.modifierBitmasks.IS_CHIRAL) != 0;
 
@@ -142,7 +149,7 @@ export class Layouts {
     // *** Step 1:  instantiate the layer objects. ***
 
     // Get the list of valid layers, enforcing that the 'default' layer must be the first one processed.
-    var validIdList = Object.getOwnPropertyNames(keyLabels), invalidIdList = [];
+    var validIdList = Object.getOwnPropertyNames(keyLabels), invalidIdList: string[] = [];
     validIdList.splice(validIdList.indexOf('default'), 1);
     validIdList = [ 'default' ].concat(validIdList);
 
@@ -200,14 +207,14 @@ export class Layouts {
         // Erase the legacy shifted subkey array.
         shiftKey['sk'] = [];
 
-        for(var layerID in keyLabels) {
+        for(let layerID in keyLabels) {
           if(layerID == 'default' || layerID == 'shift') {
             // These two are accessible from the layer without subkeys.
             continue;
           }
 
           // Create a new subkey for the specified layer so that it will be accessible via OSK.
-          var specialChar = Layouts.modifierSpecials[layerID];
+          var specialChar = Layouts.modifierSpecials[(layerID as keyof typeof Layouts.modifierSpecials)];
           let subkey: LayoutSubKey = {
             id: `K_${specialChar}`,
             text: specialChar,
@@ -307,12 +314,14 @@ export class Layouts {
       layer.numKey=numKey;
       layer.scrollKey=scrollKey;
 
+      const layerId = layers[n].id as keyof typeof Layouts.modifierSpecials;
+
       // Set modifier key appearance and behaviour for non-desktop devices using the default layout
       if(formFactor != 'desktop') {
         if(n > 0 && shiftKey != null) {
           shiftKey['sp']=ButtonClasses.specialActive;
           shiftKey['sk']=null;
-          shiftKey['text'] = Layouts.modifierSpecials[layers[n].id] ? Layouts.modifierSpecials[layers[n].id] : "*Shift*";
+          shiftKey['text'] = Layouts.modifierSpecials[layerId] ?? "*Shift*";
         }
       }
     }
@@ -482,11 +491,11 @@ export class Layouts {
    * @param   {Array}   BK      keyboard object (as loaded)
    * @return  {Object}
    */
-  static processLegacyDefinitions(BK: string[]): KLS {
+  static processLegacyDefinitions(BK: string[]): EncodedVisualKeyboard['KLS'] {
     //['default','shift','ctrl','shiftctrl','alt','shiftalt','ctrlalt','shiftctrlalt'];
     var idList=Layouts.generateLayerIds(false); // Non-chiral.
 
-    var KLS: KLS = {};
+    var KLS: EncodedVisualKeyboard['KLS'] = {};
 
     // The old default:  eight auto-managed layers...
     for(var n=0; n<idList.length; n++) {
@@ -851,6 +860,6 @@ export class Layouts {
               }
           ]
       }
-  };
+  } as TouchLayout.TouchLayoutFile;
   /* c8 ignore end */
 }

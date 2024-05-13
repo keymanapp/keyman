@@ -2,6 +2,7 @@
 {
   "extends": "../tsconfig.base.json",
   "compilerOptions": {
-    "lib": [ "DOM", "ES6"]
+    "lib": [ "DOM", "ES6"],
+    "noImplicitAny": false,
   }
 }

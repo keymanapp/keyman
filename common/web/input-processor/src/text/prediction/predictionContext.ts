@@ -131,7 +131,7 @@ export default class PredictionContext extends EventEmitter<PredictionContextEve
   }
 
   public get currentSuggestions(): Suggestion[] {
-    let suggestions = [];
+    let suggestions: Suggestion[] = [];
     // Insert 'current text' if/when valid as the leading option.
     // Since we don't yet do auto-corrections, we only show 'keep' whenever it's
     // a valid word (according to the model).

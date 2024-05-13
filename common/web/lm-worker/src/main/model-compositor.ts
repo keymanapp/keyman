@@ -434,18 +434,24 @@ export default class ModelCompositor {
     });
 
     let suggestions = suggestionDistribution.splice(0, ModelCompositor.MAX_SUGGESTIONS).map(function(value) {
-      if(value.sample['p']) {
+      let sample: Suggestion & {
+        p?: number,
+        "lexical-p"?: number,
+        "correction-p"?: number
+      } = value.sample;
+
+      if(sample['p']) {
         // For analysis / debugging
-        value.sample['lexical-p'] =  value.sample['p'];
-        value.sample['correction-p'] = value.p / value.sample['p'];
+        sample['lexical-p'] =  sample['p'];
+        sample['correction-p'] = value.p / sample['p'];
         // Use of the Trie model always exposed the lexical model's probability for a word to KMW.
         // It's useful for debugging right now, so may as well repurpose it as the posterior.
         //
         // We still condition on 'p' existing so that test cases aren't broken.
-        value.sample['p'] = value.p;
+        sample['p'] = value.p;
       }
       //
-      return value.sample;
+      return sample;
     });
 
     if(keepOption) {

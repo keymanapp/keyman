@@ -5,10 +5,12 @@
   "exports": {
     "./worker-main.wrapped.js": {
       "es6-bundling": "./build/lib/worker-main.wrapped.js",
+      "types": "./build/lib/worker-main.wrapped.d.ts",
       "default": "./build/lib/worker-main.wrapped.es5.js"
     },
     "./worker-main.wrapped.min.js": {
       "es6-bundling": "./build/lib/worker-main.wrapped.min.js",
+      "types": "./build/lib/worker-main.wrapped.d.ts",
       "default": "./build/lib/worker-main.wrapped.es5.min.js"
     }
   },

@@ -29,7 +29,7 @@ const Codes = {
     // Note: keys_mod_other = 0x10000, used by KMX+ for the
     // other modifier flag in layers, > 16 bit so not available here.
     // See keys_mod_other in keyman_core_ldml.ts
-  },
+  } as {[name: string]: number},
 
   modifierBitmasks: {
     "ALL":0x007F,
@@ -39,14 +39,14 @@ const Codes = {
     "NON_CHIRAL":0x0070, // The default bitmask, for non-chiral keyboards,
     // Represents all modifier codes not supported by KMW 1.0 legacy keyboards.
     "NON_LEGACY": 0x006F // ALL, but without the SHIFT bit
-  },
+  } as {[name: string]: number},
 
   stateBitmasks: {
     "ALL":0x3F00,
     "CAPS":0x0300,
     "NUM_LOCK":0x0C00,
     "SCROLL_LOCK":0x3000
-  },
+  } as {[name: string]: number},
 
   // Define standard keycode numbers (exposed for use by other modules)
   keyCodes: {
@@ -79,7 +79,7 @@ const Codes = {
     "K_UPPER":50006,"K_LOWER":50007,"K_ALPHA":50008,
     "K_SHIFTED":50009,"K_ALTGR":50010,
     "K_TABBACK":50011,"K_TABFWD":50012
-  },
+  } as {[name: string]: number},
 
   codesUS: [
     ['0123456789',';=,-./`', '[\\]\''],

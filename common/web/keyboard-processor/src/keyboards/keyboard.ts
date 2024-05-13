@@ -1,5 +1,5 @@
 import Codes from "../text/codes.js";
-import { Layouts, type LayoutFormFactor } from "./defaultLayouts.js";
+import { EncodedVisualKeyboard, LayoutSpec, Layouts, type LayoutFormFactor } from "./defaultLayouts.js";
 import { ActiveKey, ActiveLayout, ActiveSubKey } from "./activeLayout.js";
 import KeyEvent from "../text/keyEvent.js";
 import type OutputTarget from "../text/outputTarget.js";
@@ -30,6 +30,33 @@ export interface VariableStoreDictionary {
   [name: string]: string;
 };
 
+export type KeyboardObject = {
+  _kmw?: CacheTag;
+  gs(outputTarget: OutputTarget, keystroke: KeyEvent): boolean;
+  gn?(outputTarget: OutputTarget, keystroke: KeyEvent): boolean;
+  gpk?(outputTarget: OutputTarget, keystroke: KeyEvent): boolean;
+  KI: string;
+  KN: string;
+  KV: EncodedVisualKeyboard;
+  KLC?: string;
+  LanguageCode?: string;
+  KCSS?: string;
+  KRTL?: boolean;
+  KMBM?: number;
+  KS?: number;
+  KVKL?: LayoutSpec;
+  KM?: number;
+  KBVER?: string;
+  KVER?: string;
+  KVS?: (`s${number}`)[];
+  KH?: string;
+  KVKD?: string;
+  KDU?: number;
+  VKDictionary?: Record<string, number>,
+  KHF?: (e: any) => string;
+  KNS?: (_PCommand: number, _PTarget: OutputTarget, _PData: number) => void;
+} & Record<`s${number}`, string>
+
 
 /**
  * Acts as a wrapper class for Keyman keyboards compiled to JS, providing type information
@@ -37,8 +64,8 @@ export interface VariableStoreDictionary {
  * wrapped keyboard itself.
  */
 export default class Keyboard {
-  public static DEFAULT_SCRIPT_OBJECT = {
-    'gs': function(outputTarget, keystroke) { return false; }, // no matching rules; rely on defaultRuleOutput entirely
+  public static DEFAULT_SCRIPT_OBJECT: KeyboardObject = {
+    'gs': function(outputTarget: OutputTarget, keystroke: KeyEvent) { return false; }, // no matching rules; rely on defaultRuleOutput entirely
     'KI': '', // The currently-existing default keyboard ID; we already have checks that focus against this.
     'KN': '',
     'KV': Layouts.DEFAULT_RAW_SPEC,
@@ -51,7 +78,7 @@ export default class Keyboard {
    *
    * TODO:  Make this private instead.  But there are a LOT of references that must be rooted out first.
    */
-  public readonly scriptObject: any;
+  public readonly scriptObject: KeyboardObject;
   private layoutStates: {[layout: string]: LayoutState};
 
   constructor(keyboardScript: any) {
@@ -109,7 +136,7 @@ export default class Keyboard {
    */
   get variableStores(): VariableStoreDictionary {
     const storeNames = this.scriptObject['KVS'];
-    let values = {};
+    let values: VariableStoreDictionary = {};
     if(Array.isArray(storeNames)) {
       for(let store of storeNames) {
         values[store] = this.scriptObject[store];
@@ -147,11 +174,11 @@ export default class Keyboard {
   }
 
   // May return null if no layouts exist or have been initialized.
-  private get _layouts(): {[formFactor: string]: LayoutFormFactor} {
+  private get _layouts(): LayoutSpec {
     return this.scriptObject['KVKL'];  // This one is compiled by Developer's visual keyboard layout editor.
   }
 
-  private set _layouts(value) {
+  private set _layouts(value: LayoutSpec) {
     this.scriptObject['KVKL'] = value;
   }
 
@@ -488,7 +515,7 @@ export default class Keyboard {
       'K_NUMLOCK': Codes.stateBitmasks.NUM_LOCK,
       'K_SCROLL': Codes.stateBitmasks.SCROLL_LOCK
     };
-    const bitmask = bitmap[Lkc.kName];
+    const bitmask = bitmap[Lkc.kName as keyof typeof bitmap];
 
     if(bitmask) {
       Lkc.Lstates ^= bitmask;
@@ -558,8 +585,8 @@ export default class Keyboard {
    * @return      {number}                key code > 255 on success, or 0 if not found
    */
   getVKDictionaryCode(keyName: string) {
+    const dict = this.scriptObject['VKDictionary'] || {} as KeyboardObject['VKDictionary'];
     if(!this.scriptObject['VKDictionary']) {
-      const a=[];
       if(typeof this.scriptObject['KVKD'] == 'string') {
         // Build the VK dictionary
         // TODO: Move the dictionary build into the compiler -- so compiler generates code such as following.
@@ -567,10 +594,10 @@ export default class Keyboard {
         //       this.KVKD={"K_ABC":256,"K_DEF":257,...};
         const s=this.scriptObject['KVKD'].split(' ');
         for(var i=0; i<s.length; i++) {
-          a[s[i].toUpperCase()]=i+256; // We force upper-case since virtual keys should be case-insensitive.
+          dict[s[i].toUpperCase()]=i+256; // We force upper-case since virtual keys should be case-insensitive.
         }
       }
-      this.scriptObject['VKDictionary']=a;
+      this.scriptObject['VKDictionary']=dict;
     }
 
     const res=this.scriptObject['VKDictionary'][keyName.toUpperCase()];

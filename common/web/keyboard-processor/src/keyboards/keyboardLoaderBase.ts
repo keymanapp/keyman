@@ -5,8 +5,8 @@ import KeyboardProperties from "./keyboardProperties.js";
 type KeyboardStub = KeyboardProperties & { filename: string };
 
 export interface KeyboardLoadErrorBuilder {
-  scriptError(err?: Error);
-  missingError(err: Error);
+  scriptError(err?: Error): void;
+  missingError(err: Error): void;
 }
 
 export class KeyboardScriptError extends Error {
