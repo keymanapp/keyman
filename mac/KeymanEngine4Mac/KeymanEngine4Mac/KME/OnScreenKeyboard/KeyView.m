@@ -10,6 +10,7 @@
 #import "KeyLabel.h"
 #import "MacVKCodes.h"
 #import "TimerTarget.h"
+#import <os/log.h>
 
 CGFloat lw = 1.0;
 CGFloat r = 7.0;
@@ -27,20 +28,22 @@ static CGFloat const kRelativeModifierLabelHeight = 0.30f;
 @property (nonatomic, assign) BOOL isCharacterKey;
 @property (nonatomic, strong) KeyLabel *label;
 @property (nonatomic, strong) NSTextField *caption;
-@property (nonatomic, strong) NSImageView *bitmapView;
-@property (nonatomic, strong) NSColor *bgColor1;
-@property (nonatomic, strong) NSColor *bgColor2;
+@property (nonatomic, strong) NSColor *bgColorRegularKey;
+@property (nonatomic, strong) NSColor *bgColorSpecialKey;
 @property (nonatomic, strong) NSTimer *keyEventTimer;
 @property (readwrite) NSInteger tag;
 @end
 
 @implementation KeyView
 @synthesize tag;
-@synthesize bgColor1, bgColor2;
+@synthesize bgColorRegularKey, bgColorSpecialKey;
 
 - (id)initWithFrame:(NSRect)frame {
+    os_log_t oskKeyLog = os_log_create("org.sil.keyman", "osk-key");
     self = [super initWithFrame:frame];
     if (self) {
+        os_log_with_type(oskKeyLog, OS_LOG_TYPE_DEBUG, "KeyView initWithFrame: %{public}@, bounds: %{public}@, default clipsToBounds %{public}@", NSStringFromRect(frame), NSStringFromRect(self.bounds), self.clipsToBounds?@"YES":@"NO");
+        self.clipsToBounds = true;
         CGSize size = frame.size;
         CGFloat x = size.width*0.05;
         NSRect labelFrame = NSMakeRect(x, 0, size.width -lw -2*x, size.height);
@@ -48,7 +51,7 @@ static CGFloat const kRelativeModifierLabelHeight = 0.30f;
         [_label setEditable:NO];
         [_label setBordered:NO];
         [_label setDrawsBackground:NO];
-        [_label setAlignment:NSCenterTextAlignment];
+        [_label setAlignment:NSTextAlignmentCenter];
         if ([_caption respondsToSelector:@selector(setLineBreakMode:)]) {
             [_label setLineBreakMode:NSLineBreakByClipping];
         } // There might be some problem not calling this, but it seems to be okay as far as I can tell
@@ -60,22 +63,26 @@ static CGFloat const kRelativeModifierLabelHeight = 0.30f;
         [_label setLineBreakMode:NSLineBreakByClipping];
         [self addSubview:_label];
 
-        bgColor1 = [self getOpaqueColorWithRed:209 green:211 blue:212];
-        bgColor2 = [self getOpaqueColorWithRed:166 green:169 blue:172];
+        bgColorRegularKey = [self getOpaqueColorWithRed:209 green:211 blue:212];
+        bgColorSpecialKey = [self getOpaqueColorWithRed:166 green:169 blue:172];
     }
 
     return self;
 }
 
 - (void)drawRect:(NSRect)rect {
+    os_log_t oskKeyLog = os_log_create("org.sil.keyman", "osk-key");
+    os_log_with_type(oskKeyLog, OS_LOG_TYPE_DEBUG, "KeyView drawRect: %{public}@, bounds: %{public}@, keyCode: 0x%lx, caption: %{public}@, label: %{public}@", NSStringFromRect(rect), NSStringFromRect(self.bounds), self.keyCode, self.caption.stringValue, self.label.stringValue);
+  
     [[self getOpaqueColorWithRed:241 green:242 blue:242] setFill];
-    NSRectFillUsingOperation(rect, NSCompositeSourceOver);
+    NSRectFillUsingOperation(rect, NSCompositingOperationSourceOver);
 
     // Drawing code here.
-    CGContextRef context = (CGContextRef)[[NSGraphicsContext currentContext] graphicsPort];
+    CGContextRef context = (CGContextRef)[[NSGraphicsContext currentContext] CGContext];
+
     CGContextSetLineJoin(context, kCGLineJoinRound);
     CGContextSetLineWidth(context, lw);
-    CGContextSetStrokeColorWithColor(context, bgColor1.CGColor);
+    CGContextSetStrokeColorWithColor(context, bgColorRegularKey.CGColor);
 
     CGFloat x = rect.origin.x + lw;
     CGFloat y = rect.origin.y + lw;
@@ -100,10 +107,10 @@ static CGFloat const kRelativeModifierLabelHeight = 0.30f;
     CGContextClosePath(context);
     CGContextClip(context);
 
-    NSColor *bgColor = bgColor1;
+    NSColor *bgColor = bgColorRegularKey;
 
     if ([self isSpecialKey])
-        bgColor = bgColor2;
+        bgColor = bgColorSpecialKey;
 
     CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
     CGFloat gradientLocations[] = {0, 1};
@@ -238,7 +245,7 @@ static CGFloat const kRelativeModifierLabelHeight = 0.30f;
         [_caption setBordered:NO];
         [_caption setDrawsBackground:NO];
         //[_caption setBackgroundColor:[NSColor yellowColor]];
-        [_caption setAlignment:NSLeftTextAlignment];
+        [_caption setAlignment:NSTextAlignmentLeft];
         if ([_caption respondsToSelector:@selector(setLineBreakMode:)]) {
             [_caption setLineBreakMode:NSLineBreakByClipping];
         } // There might be some problem not calling this, but it seems to be okay as far as I can tell
@@ -325,26 +332,18 @@ static CGFloat const kRelativeModifierLabelHeight = 0.30f;
 - (void)setKeyPressed:(BOOL)keyPressed {
     _keyPressed = keyPressed;
     if (keyPressed) {
-        bgColor1 = [self getOpaqueColorWithRed:109 green:111 blue:112];
-        bgColor2 = [self getOpaqueColorWithRed:236 green:239 blue:242];
+        bgColorRegularKey = [self getOpaqueColorWithRed:109 green:111 blue:112];
+        bgColorSpecialKey = [self getOpaqueColorWithRed:236 green:239 blue:242];
         [self setNeedsDisplay:YES];
     }
     else {
-        bgColor1 = [self getOpaqueColorWithRed:209 green:211 blue:212];
-        bgColor2 = [self getOpaqueColorWithRed:166 green:169 blue:172];
+        bgColorRegularKey = [self getOpaqueColorWithRed:209 green:211 blue:212];
+        bgColorSpecialKey = [self getOpaqueColorWithRed:166 green:169 blue:172];
         [self setNeedsDisplay:YES];
     }
 }
 
 - (NSColor *)getOpaqueColorWithRed:(NSUInteger) red green: (NSUInteger) green blue: (NSUInteger) blue {
-    // RGB is what was in the code originally I can't tell any difference between that and SRGB for the
-    // colors we're using in the OSK, but at the risk of causing an unintended change, I'm leaving it as
-    // it was for versions of macOS that support colorWithRed:green:blue:
-    if ([NSColor respondsToSelector:@selector(colorWithRed:green:blue:alpha:)]) {
-        return [NSColor colorWithRed:red/255.0 green:green/255.0 blue:blue/255.0 alpha:1.0];
-    }
-    else {
         return [NSColor colorWithSRGBRed:red/255.0 green:green/255.0 blue:blue/255.0 alpha:1.0];
-    }
 }
 @end
