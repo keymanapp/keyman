@@ -49,6 +49,7 @@ TEST_F(CompilerTest, IsValidKeyboardVersion_test) {
     EXPECT_FALSE(IsValidKeyboardVersion((KMX_WCHAR *)u""));
     EXPECT_FALSE(IsValidKeyboardVersion((KMX_WCHAR *)u" "));
     EXPECT_FALSE(IsValidKeyboardVersion((KMX_WCHAR *)u"\t"));
+    EXPECT_FALSE(IsValidKeyboardVersion((KMX_WCHAR *)u" 1.1"));    
     EXPECT_TRUE(IsValidKeyboardVersion((KMX_WCHAR *)u"1.1"));
     EXPECT_TRUE(IsValidKeyboardVersion((KMX_WCHAR *)u"1.0"));
     EXPECT_FALSE(IsValidKeyboardVersion((KMX_WCHAR *)u"1."));
