@@ -69,14 +69,13 @@ const CGKeyCode kKeymanEventKeyCode = 0xFF;
   NSRunningApplication *app = NSWorkspace.sharedWorkspace.frontmostApplication;
   pid_t processId = app.processIdentifier;
   NSString *bundleId = app.bundleIdentifier;
-  GetProcessForPID(processId, &psn);
   
   [self.appDelegate logDebugMessage:@"sendKeymanKeyCodeForEvent keyCode %lu to app %@ with pid %d", (unsigned long)kKeymanEventKeyCode, bundleId, processId];
   
   // use nil as source, as this generated event is not directly tied to the originating event
   CGEventRef keyDownEvent = CGEventCreateKeyboardEvent(nil, kKeymanEventKeyCode, true);
 
-  CGEventPostToPSN(&psn, keyDownEvent);
+  CGEventPostToPid(processId, keyDownEvent);
   CFRelease(keyDownEvent);
   
   // this is not a real keycode, so we do not need a key up event

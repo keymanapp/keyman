@@ -22,15 +22,15 @@
 BOOL IntLoadKeyboardOptionsRegistrytoCore(LPCSTR key, LPINTKEYBOARDINFO kp, km_core_state* const state);
 void IntSaveKeyboardOptionCoretoRegistry(LPCSTR REGKey, LPINTKEYBOARDINFO kp, LPCWSTR key, LPCWSTR value);
 
-static km_core_cp* CloneKeymanCoreCP(const km_core_cp* cp) {
+static km_core_cu* CloneKeymanCoreCP(const km_core_cu* cp) {
   LPCWSTR buf      = reinterpret_cast<LPCWSTR>(cp);
-  km_core_cp* clone = new km_core_cp[wcslen(buf) + 1];
+  km_core_cu* clone = new km_core_cu[wcslen(buf) + 1];
   wcscpy_s(reinterpret_cast<LPWSTR>(clone), wcslen(buf) + 1, buf);
   return clone;
 }
 
-static km_core_cp* CloneKeymanCoreCPFromWSTR(LPWSTR buf) {
-  km_core_cp* clone = new km_core_cp[wcslen(buf) + 1];
+static km_core_cu* CloneKeymanCoreCPFromWSTR(LPWSTR buf) {
+  km_core_cu* clone = new km_core_cu[wcslen(buf) + 1];
   wcscpy_s(reinterpret_cast<LPWSTR>(clone), wcslen(buf) + 1, buf);
   return clone;
 }

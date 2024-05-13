@@ -174,10 +174,10 @@ LdmlTestSource::parse_source_string(std::string const &s) {
         assert(v >= 0x0001 && v <= 0x10FFFF);
         p += n - 1;
         if (v < 0x10000) {
-          t += km_core_cp(v);
+          t += km_core_cu(v);
         } else {
-          t += km_core_cp(Uni_UTF32ToSurrogate1(v));
-          t += km_core_cp(Uni_UTF32ToSurrogate2(v));
+          t += km_core_cu(Uni_UTF32ToSurrogate1(v));
+          t += km_core_cu(Uni_UTF32ToSurrogate2(v));
         }
         if (had_open_curly) {
           p++;
@@ -225,10 +225,10 @@ LdmlTestSource::parse_u8_source_string(std::string const &u8s) {
         assert(v >= 0x0001 && v <= 0x10FFFF);
         p += n - 1;
         if (v < 0x10000) {
-          t += km_core_cp(v);
+          t += km_core_cu(v);
         } else {
-          t += km_core_cp(Uni_UTF32ToSurrogate1(v));
-          t += km_core_cp(Uni_UTF32ToSurrogate2(v));
+          t += km_core_cu(Uni_UTF32ToSurrogate1(v));
+          t += km_core_cu(Uni_UTF32ToSurrogate2(v));
         }
         if (had_open_curly) {
           p++;
@@ -280,13 +280,15 @@ LdmlEmbeddedTestSource::load_source( const km::core::path &path ) {
     if (!line.length())
       continue;
     if (line.compare(0, s_keys.length(), s_keys) == 0) {
-      keys = line.substr(s_keys.length());
-      trim(keys);
+      auto k = line.substr(s_keys.length());
+      trim(k);
+      keys.emplace_back(k);
     } else if (is_token(s_expected, line)) {
       if (line == "\\b") {
         expected_beep = true;
       } else {
-        expected = parse_source_string(line);
+        // allow multiple expected lines
+        expected.emplace_back(parse_source_string(line));
       }
     } else if (is_token(s_expecterror, line)) {
       expected_error = true;
@@ -297,8 +299,15 @@ LdmlEmbeddedTestSource::load_source( const km::core::path &path ) {
     }
   }
 
-  if (keys == "") {
+  if (keys.empty() && expected.empty() && !expected_error) {
+    // don't note this, the parent will complain if there's neither json nor embedded
+    return __LINE__;
+  } else if (keys.empty()) {
     // We must at least have a key sequence to run the test
+    std::cerr << "Need at least one key sequence." << std::endl;
+    return __LINE__;
+  } else if(!expected_error && (keys.size() != expected.size())) {
+    std::cerr << "Need the same number of " << s_keys << " and " << s_expected << " lines." << std::endl;
     return __LINE__;
   }
 
@@ -387,15 +396,19 @@ LdmlEmbeddedTestSource::vkey_to_event(std::string const &vk_event) {
 
 void
 LdmlEmbeddedTestSource::next_action(ldml_action &fillin) {
-  if (is_done) {
+  if (is_done || keys.empty()) {
     // We were already done. return done.
     fillin.type = LDML_ACTION_DONE;
     return;
-  } else if(keys.empty()) {
-    // Got to the end of the keys. time to check
+  } else if(keys[0].empty()) {
+    // Got to the end of a key set. time to check
     fillin.type = LDML_ACTION_CHECK_EXPECTED;
-    fillin.string = expected; // copy expected
-    is_done = true; // so we get DONE next time
+    fillin.string = expected[0]; // copy expected
+    expected.pop_front();
+    keys.pop_front();
+    if (keys.empty()) {
+      is_done = true; // so we get DONE next time
+    }
   } else {
     fillin.type = LDML_ACTION_KEY_EVENT;
     fillin.k = next_key();
@@ -406,7 +419,7 @@ LdmlEmbeddedTestSource::next_action(ldml_action &fillin) {
 key_event
 LdmlEmbeddedTestSource::next_key() {
   // mutate this->keys
-  return next_key(keys);
+  return next_key(keys[0]);
 }
 
 key_event

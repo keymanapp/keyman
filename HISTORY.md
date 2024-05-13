@@ -1,5 +1,222 @@
 # Keyman Version History
 
+## 18.0.33 alpha 2024-05-10
+
+* chore(common): Merge beta to master for Sprint A18S1 (part 2) (#11413)
+
+## 18.0.32 alpha 2024-05-09
+
+* chore(common): Add `minimum-versions.inc.sh` (#11380)
+* chore(core): km_core_cp -> km_core_cu (#11341)
+
+## 18.0.31 alpha 2024-05-08
+
+* fix(windows): "Keyboard" should be lower case in UI string for font helper tool (#11392)
+
+## 18.0.30 alpha 2024-05-07
+
+* chore(web): Improve dependencies (#11377)
+* test(developer) keyboard info compiler unit tests 3 (#11255)
+
+## 18.0.29 alpha 2024-05-06
+
+* chore(web): Improve web/test.sh script (#11355)
+* chore(linux): Fix typo (#11356)
+
+## 18.0.28 alpha 2024-05-04
+
+* chore(common): maintenance on build scripts - cd (#11329)
+
+## 18.0.27 alpha 2024-05-03
+
+* chore(linux): Adjust distros for GHA (#11333)
+* fix(common): Fix colorization of help output of builder script (#11336)
+
+## 18.0.26 alpha 2024-05-02
+
+* chore: merge beta into master A18S1 (#11332)
+
+## 18.0.25 alpha 2024-04-30
+
+* fix(linux): Improve detection of Gnome environment (#11292)
+
+## 18.0.24 alpha 2024-04-29
+
+* fix(common): Retry curl downloads up to 5 times (#11314)
+
+## 18.0.23 alpha 2024-04-26
+
+* chore(common): Merge beta to master for Sprint B17S6 (part 2) (#11305)
+* fix(web): Fix layout for subkey menus with unusually-sized keys (#11266)
+
+## 18.0.22 alpha 2024-04-25
+
+* chore(linux): Install python3-dev (#11296)
+
+## 18.0.21 alpha 2024-04-24
+
+* chore: merge beta into master B17S6 (#11291)
+
+## 18.0.20 alpha 2024-04-19
+
+* chore(deps): bump tar from 6.1.13 to 6.2.1 (#11211)
+
+## 18.0.19 alpha 2024-04-15
+
+* chore(linux): Fix wrong merge (#11224)
+
+## 18.0.18 alpha 2024-04-12
+
+* chore(common): Merge beta to master for Sprint B17S5 (#11217)
+
+## 18.0.17 alpha 2024-04-05
+
+* chore(linux): Show failed job for next Ubuntu version as failed (#11168)
+
+## 18.0.16 alpha 2024-04-04
+
+* chore(linux): Revert "Ignore failed package builds differently" (#11157)
+* chore(linux): Sign packages even if build for next Ubuntu fails (#11163)
+
+## 18.0.15 alpha 2024-04-03
+
+* chore(linux): Build packages for next Ubuntu version separately (#11145)
+* chore(linux): Fix typo in path of `build-binary-packages` action (#11154)
+* chore(linux): More fixes for workaround for failing linux builds (#11156)
+
+## 18.0.14 alpha 2024-04-02
+
+* chore(linux): Update debian changelog (#11097)
+
+## 18.0.13 alpha 2024-03-29
+
+* chore(deps): bump express from 4.17.3 to 4.19.2 (#11103)
+
+## 18.0.12 alpha 2024-03-28
+
+* chore(common): Merge beta to master for Sprint B17S4 (#11105)
+
+## 18.0.11 alpha 2024-03-20
+
+* chore(deps-dev): bump follow-redirects from 1.15.4 to 1.15.6 (#11010)
+
+## 18.0.10 alpha 2024-03-16
+
+* chore: Merge beta to master for Sprint B17S3 (#11008)
+
+## 18.0.9 alpha 2024-03-05
+
+* chore: B17S2 merge beta to master (#10909)
+
+## 18.0.8 alpha 2024-03-04
+
+* chore(linux): Update debian changelog (#10898)
+
+## 18.0.7 alpha 2024-02-29
+
+* chore: Merge 17.0.270 beta back to master (#10886)
+
+## 18.0.6 alpha 2024-02-27
+
+* chore(linux): Temporarily disable autopkgtests gha (#10853)
+* chore(linux): Update debian changelog (#10827)
+
+## 18.0.5 alpha 2024-02-26
+
+* fix(linux): Dynamically get package name (#10826)
+* chore(linux): Add running autopkgtests on GHA (#10823)
+* fix(linux): Fix autopkgtest gha (#10849)
+
+## 18.0.4 alpha 2024-02-23
+
+* chore(linux): Update debian changelog (#10786)
+
+## 18.0.3 alpha 2024-02-21
+
+* chore(deps): bump ip from 2.0.0 to 2.0.1 (#10792)
+
+## 18.0.2 alpha 2024-02-20
+
+* chore(linux): Add testbuild info to workflow title (#10771)
+
+## 18.0.1 alpha 2024-02-15
+
+* chore(common): move to 18.0 alpha (#10713)
+* chore: move to 18.0 alpha
+
+## 17.0.322 beta 2024-05-10
+
+* fix(web): fixes illegal KMW event state - can't focus a null element (#11385)
+
+## 17.0.321 beta 2024-05-09
+
+* fix(android/engine): Skip updating selection range if invalid (#11384)
+* refactor(android/engine): Refactor updateSelection (#11389)
+
+## 17.0.320 beta 2024-05-07
+
+* fix(android): prevents mid-keystroke desynchronization when deleting selected text (#11367)
+* fix(web): support SVG elements when checking className (#11365)
+* fix(developer): define `lastSelLength` variable (#11366)
+
+## 17.0.319 beta 2024-05-04
+
+* fix(android): inverting a selection range would crash Keyman (#11345)
+* fix(developer): handle missing Name element for File element in package compiler (#11352)
+* fix(developer): handle missing Description element for File element in package compiler (#11354)
+
+## 17.0.318 beta 2024-05-02
+
+* fix(web): longpress shortcut activation should only consider northward part (#11306)
+* chore(ios,mac): support build on Apple Silicon using Xcode 15.3 (#11302)
+
+## 17.0.317 beta 2024-05-01
+
+*  (#11322)
+*  (#11321)
+* fix(linux): Fix icon for .kmp files (#11295)
+
+## 17.0.316 beta 2024-04-30
+
+* fix(windows): check font count display none found (#11282)
+
+## 17.0.315 beta 2024-04-26
+
+* fix(web): osk-view hidden by default on construction (#11258)
+* fix(android): fixes kbd text zoom to prevent accessibility cross-effects (#11281)
+* fix(developer): support export of visual keyboard when Keyman for Windows not installed (#11244)
+* chore(linux): Prepare for stable release (#11301)
+* fix(core): reset on frame keys (#11172)
+* fix(core): ldml backspace processing should delete all markers (#11254)
+
+## 17.0.314 beta 2024-04-25
+
+* fix(android/engine): URIEncode strings passed to Javascript (#11206)
+* fix(android/app): Update storage permissions for Android 12.0+ (#11299)
+* test(developer): keyboard info compiler messages unit tests 2 (#11253)
+
+## 17.0.313 beta 2024-04-23
+
+* chore(common): Set fetch-latest-cldr.sh executable (#11289)
+* chore(common): Fix missing entries in HISTORY.md (#11290)
+* fix(developer): report missing help to sentry instead of local xml (#11271)
+* fix(developer): "use strict" for downlevel browsers in Server (#11276)
+
+## 17.0.312 beta 2024-04-22
+
+* fix(developer): emit JSON strings as characters, not surrogate pairs (#11243)
+* fix(developer): prevent xmlns for LDML keyboard template child elements (#11251)
+* fix(developer): test that MRU project exists before attempting to reference on startup (#11252)
+* fix(developer): handle invalid Unicode values in touch layout builder (#11270)
+* fix(developer): handle multiple instances of Server starting (#11272)
+* fix(developer): lazy initialization of test window (#11275)
+* chore(web): drops redundant builder-dependency from early gesture dev (#11278)
+* feat(web): add recent-history log to gesture engine (#11277)
+* test(developer): keyboard info compiler unit tests 2 (#11130)
+* fix(web): fixes pred-text unit test instability (#11283)
+* fix(developer): keep escaped plus-sign escaped (#11269)
+* chore(resources): sync up with CLDR v45 release (#11004)
+
 ## 17.0.311 beta 2024-04-19
 
 * fix(web): default parse of length styling for empty string (#11235)
@@ -13,15 +230,15 @@
 * fix(ios): deletion of selected text (#11179)
 * fix(common): update emoji stripping for Unicode 15.1 (#11242)
 * change(web): adjusts multitap timings (#11246)
-*  (#11245)
+* fix(web): prevents dropping of input during rapid multitouch typing (#11245)
 
 ## 17.0.309 beta 2024-04-17
 
 * fix(ios): sample build script --debug detection (#10953)
-* chore(web): simple layout reflow polish 🪠 (#11237)
+* chore(web): simple layout reflow polish (#11237)
 * chore(android): enables debugging and inspection of mobile app internal webviews (#11215)
-*  (#11232)
-*  (#11238)
+* fix(web): prevents selection-clear for pure layer-switching multitaps (#11232)
+* change(web): drops need for closures to optimize layout-reflow (#11238)
 
 ## 17.0.308 beta 2024-04-13
 
@@ -33,7 +250,7 @@
 * refactor(web): better centralizes OSK layout internals to prepare for optimization efforts  (#11176)
 * feat(web): VisualKeyboard layout-reflow optimization  (#11177)
 * change(web):  OSK optimization, improved responsiveness  (#11140)
-*  (#11216)
+* fix(web): fixes up-flick shortcut issue for longpress when keys support downflicks (#11216)
 
 ## 17.0.306 beta 2024-04-11
 
@@ -42,7 +259,7 @@
 
 ## 17.0.305 beta 2024-04-10
 
-*  (#11169)
+* fix(core): skip leading trail surrogate char in km_core_state_context_set_if_needed() (#11169)
 * change(web): merges split async method in gesture engine  (#11142)
 * fix(web): blocks nextLayer for keys quickly typed when multitapping to new layer when final tap is held (#11189)
 * refactor(web): OSK spacebar-label updates now managed by layer object  (#11175)
@@ -50,7 +267,7 @@
 ## 17.0.304 beta 2024-04-09
 
 * fix(android): atomically updates selection with text (#11188)
-*  (#11178)
+* fix(web): fix crash in nearest-key row lookup when touch moves out-of-bounds (#11178)
 
 ## 17.0.303 beta 2024-04-05
 
@@ -72,10 +289,10 @@
 * change(web): input-event sequentialization  (#10843)
 * fix(web): proper linkage of sources to events  (#10960)
 * fix(developer): handle buffer boundaries in four cases (#11137)
-* chore(linux): Build packages for next Ubuntu version separately  (#11153)
+* chore(linux): Build packages for next Ubuntu version separately (#11153)
 * fix(common): upgrade sentry-cli to 2.31.0 (#11151)
 * fix(android/app): Track previous device orientation for SystemKeyboard (#11134)
-*  (#11129)
+* change(web): reworks nearest-key detection to avoid layout reflow (#11129)
 
 ## 17.0.300 beta 2024-04-02
 
@@ -109,11 +326,12 @@
 * feat(developer/compilers): better unit test for suggestion accessibility (#11085)
 * fix(core): fix pointer math in actions_normalize() (#11101)
 
+
 ## 17.0.296 beta 2024-03-27
 
 * fix(developer): in model compiler, give correct key to shorter prefix words when a longer, higher-frequency word is also present (#11074)
 * fix(oem/fv/android): Only add default keyboard if no keyboards exist (#11080)
-*  (#11068)
+* fix(core): correct typo in LDML test DTD reference (#11068)
 * chore(android): Update crowdin strings for Mon (#11089)
 * chore(android): Update crowdin strings for Khmer (#11090)
 
