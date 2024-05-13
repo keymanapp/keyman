@@ -275,7 +275,7 @@ export default class HardwareEventKeyboard extends HardKeyboard {
 
     // Prevent mapping element is readonly or tagged as kmw-disabled
     const el = target.getElement();
-    if(el?.className?.indexOf('kmw-disabled') >= 0) {
+    if(el?.getAttribute('class')?.indexOf('kmw-disabled') >= 0) {
       return true;
     }
 

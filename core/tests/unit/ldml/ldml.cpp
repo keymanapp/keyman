@@ -206,7 +206,7 @@ verify_context(std::u16string &text_store, km_core_state *&test_state, std::vect
   km_core_context_item *citems = nullptr;
   try_status(km_core_context_get(km_core_state_context(test_state), &citems));
   try_status(context_items_to_utf16(citems, nullptr, &n));
-  km_core_cp *buf = new km_core_cp[n];
+  km_core_cu *buf = new km_core_cu[n];
   try_status(context_items_to_utf16(citems, buf, &n));
   std::cout << "context (raw): ";  // output including markers (which aren't in 'buf' here)
   for (auto ci = citems; ci->type != KM_CORE_CT_END; ci++) {

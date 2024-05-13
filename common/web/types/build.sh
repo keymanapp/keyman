@@ -8,6 +8,7 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 . "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
 
 builder_describe "Build Keyman common file types module" \
+  "@/core/include/ldml" \
   "@/common/web/keyman-version" \
   "configure" \
   "build" \

@@ -141,6 +141,7 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
     checkSendCrashReport();
     if (KMManager.getMaySendCrashReport()) {
       SentryAndroid.init(context, options -> {
+        options.setEnableAutoSessionTracking(false);
         options.setRelease(com.tavultesoft.kmapro.BuildConfig.VERSION_GIT_TAG);
         options.setEnvironment(com.tavultesoft.kmapro.BuildConfig.VERSION_ENVIRONMENT);
       });

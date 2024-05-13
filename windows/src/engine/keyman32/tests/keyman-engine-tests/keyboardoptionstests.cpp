@@ -23,11 +23,11 @@ TEST(KEYBOARDOPTIONS, SetupCoreEnvironment) {
   // These are taken from SetupCoreEnvironment in CoreEnvironment.cpp
   expected_items[0].scope = KM_CORE_OPT_ENVIRONMENT;
   expected_items[0].key   = KM_CORE_KMX_ENV_BASELAYOUT;
-  expected_items[0].value = reinterpret_cast<km_core_cp *>(Globals::get_BaseKeyboardName());
+  expected_items[0].value = reinterpret_cast<km_core_cu *>(Globals::get_BaseKeyboardName());
 
   expected_items[1].scope = KM_CORE_OPT_ENVIRONMENT;
   expected_items[1].key   = KM_CORE_KMX_ENV_BASELAYOUTALT;
-  expected_items[1].value = reinterpret_cast<km_core_cp *>(Globals::get_BaseKeyboardNameAlt());
+  expected_items[1].value = reinterpret_cast<km_core_cu *>(Globals::get_BaseKeyboardNameAlt());
 
   expected_items[2].scope = KM_CORE_OPT_ENVIRONMENT;
   expected_items[2].key   = KM_CORE_KMX_ENV_SIMULATEALTGR;
@@ -38,7 +38,7 @@ TEST(KEYBOARDOPTIONS, SetupCoreEnvironment) {
   expected_items[3].value = KeyboardGivesCtrlRAltForRAlt() ? u"1" : u"0";
 
   expected_items[4] = KM_CORE_OPTIONS_END;
-  km_core_cp const* retValue = nullptr;
+  km_core_cu const* retValue = nullptr;
   std::u16string value      = u"";
   std::u16string expectedValue = u"";
 

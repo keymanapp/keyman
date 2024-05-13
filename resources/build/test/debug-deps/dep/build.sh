@@ -7,6 +7,7 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 
 builder_describe \
   "Tests dependency builds debug flag" \
+  :child \
   configure build
 
 function do_build() {
@@ -25,3 +26,5 @@ builder_is_dep_build || builder_die "FAIL: dep: builder_is_dep_build should be t
 ! builder_is_child_build || builder_die "FAIL: dep: builder_is_child_build should be false"
 
 builder_run_action build do_build
+
+builder_run_child_actions configure build
