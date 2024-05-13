@@ -30,9 +30,9 @@ builder_describe "Build Keyman Keyboard Compiler kmc" \
   "bundle                    creates a bundled version of kmc" \
   "api                       prepare compiler error documentation" \
   "test                      run automated tests for kmc" \
-  pack \
   publish \
   "--build-path=BUILD_PATH   build directory for bundle" \
+  "--npm-publish+            For publish, do a npm publish, not npm pack (only for CI)" \
   "--dry-run,-n              don't actually publish, just dry run"
 
 builder_describe_outputs \
@@ -106,5 +106,4 @@ builder_run_action configure  verify_npm_setup
 builder_run_action build      do_build
 builder_run_action api        do_api
 builder_run_action bundle     do_bundle
-builder_run_action publish    builder_publish_to_npm
-builder_run_action pack       builder_publish_to_pack
+builder_run_action publish    builder_publish_npm

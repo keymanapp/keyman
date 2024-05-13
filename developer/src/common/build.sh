@@ -13,6 +13,3 @@ builder_describe \
 
 builder_parse "$@"
 builder_run_child_actions clean configure build test
-
-# Note: 'api', 'publish', 'install' actions are defined here for commonality with
-# sibling projects but are no-ops
