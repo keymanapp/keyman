@@ -127,6 +127,7 @@ TEST_F(CompilerTest, hasPreamble_test) {
     EXPECT_FALSE(hasPreamble(u""));
     EXPECT_FALSE(hasPreamble(u"\uFEFE")); // not \uFEFF
     EXPECT_TRUE(hasPreamble(u"\uFEFF"));
+    EXPECT_FALSE(hasPreamble(u"a\uFEFF"));
 }
 
 // bool UTF16TempFromUTF8(KMX_BYTE* infile, int sz, KMX_BYTE** tempfile, int *sz16)
