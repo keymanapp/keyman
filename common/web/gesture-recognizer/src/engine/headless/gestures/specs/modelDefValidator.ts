@@ -1,3 +1,4 @@
+import { FulfillmentCause } from "../matchers/pathMatcher.js";
 import { GestureResolutionSpec, RejectionReplace } from "./gestureModel.js";
 import { GestureModelDefs } from "./gestureModelDefs.js";
 
@@ -99,6 +100,7 @@ export function validateModelDefs(definitions: GestureModelDefs<any, any>): Mode
     processAction(entry.resolutionAction, `model: ${entry.id}`);
 
     Object.keys(entry.rejectionActions ?? {}).forEach((key) => {
+      // @ts-ignore
       processAction(entry.rejectionActions[key], `model: ${entry.id}`);
     });
   });

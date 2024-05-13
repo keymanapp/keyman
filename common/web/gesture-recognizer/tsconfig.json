@@ -5,7 +5,10 @@
     "lib": [ "dom", "es6" ],
     "outDir": "./build/obj/",
     "rootDir": "./src/engine",
-    "tsBuildInfoFile": "./build/obj/tsconfig.tsbuildinfo"
+    "tsBuildInfoFile": "./build/obj/tsconfig.tsbuildinfo",
+    // The TS tests appear to reference this value, despite not being the tsconfig the tests are
+    // supposed to reference.  So, can't drop it -quite- yet.
+    "noImplicitAny": false
   },
   "include": ["./src/engine/**/*.ts"],
   "exclude": ["./src/test/**/*.ts", "./src/tools/**/*.ts"],
