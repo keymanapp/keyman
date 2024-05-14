@@ -30,7 +30,7 @@ HandleError(const MSIHANDLE& hInstall, const std::wstring& messagePrefix) {
   return errorCode;
 }
 
-__declspec(dllexport) unsigned int EnginePostInstall(MSIHANDLE hInstall) {
+__declspec(dllexport) DWORD EnginePostInstall(MSIHANDLE hInstall) {
   HANDLE hFile;
 
   // Find %appdata% path
