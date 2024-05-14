@@ -36,7 +36,9 @@ __declspec(dllexport) unsigned int EnginePostInstall(MSIHANDLE hInstall) {
   // Find %appdata% path
   PWSTR path = new wchar_t[MAX_PATH];
 
-  if (SUCCEEDED(SHGetKnownFolderPath(FOLDERID_ProgramData, 0, NULL, &path))) {
+  if (!SUCCEEDED(SHGetKnownFolderPath(FOLDERID_ProgramData, 0, NULL, &path))) {
+    HandleError(hInstall, L"Keyman Engine failed to get known folder path");
+  } else {
     wcscat_s(path, MAX_PATH, SFolderKeymanRoot);
 
     // Create directory if it does not exist
