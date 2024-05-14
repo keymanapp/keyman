@@ -24,6 +24,11 @@ int msgproc_stub(int line, uint32_t dwMsgCode, const char* szText, void* context
     return 1;
 }
 
+int msgproc_false_stub(int line, uint32_t dwMsgCode, const char* szText, void* context) {
+    strcpy(szText_stub, szText);
+    return 0;
+}
+
 namespace kmcmp {
     extern int nErrors;
     extern int ErrChr;
@@ -42,6 +47,7 @@ class CompilerTest : public testing::Test {
             szText_stub[0] = '\0';
             kmcmp::nErrors = 0;
             kmcmp::ErrChr = 0;
+            ErrExtraLIB[0] = '\0';
         }
 };
 
@@ -60,6 +66,7 @@ TEST_F(CompilerTest, wstrtostr_test) {
 TEST_F(CompilerTest, AddCompileError_test) {
     msgproc = msgproc_stub;
     kmcmp::ErrChr = 0;
+    ErrExtraLIB[0] = '\0';
 
     // CERR_FATAL
     EXPECT_EQ(0, kmcmp::nErrors);
@@ -79,6 +86,29 @@ TEST_F(CompilerTest, AddCompileError_test) {
     EXPECT_FALSE(AddCompileError(0x00004FFF)); // top of range ERROR
     EXPECT_EQ(0, strcmp("Unknown error 4fff", szText_stub));
     EXPECT_EQ(3, kmcmp::nErrors);
+
+    // ErrChr
+    kmcmp::ErrChr = 42;
+    EXPECT_EQ(CERR_ERROR, CERR_InvalidLayoutLine & CERR_ERROR);
+    EXPECT_FALSE(AddCompileError(CERR_InvalidLayoutLine));
+    EXPECT_EQ(0, strcmp("Invalid 'layout' command character offset: 42", szText_stub));
+    kmcmp::ErrChr = 0;
+    EXPECT_EQ(4, kmcmp::nErrors);
+
+    // ErrExtraLIB
+    strcpy(ErrExtraLIB, " extra lib");
+    EXPECT_EQ(CERR_ERROR, CERR_InvalidLayoutLine & CERR_ERROR);
+    EXPECT_FALSE(AddCompileError(CERR_InvalidLayoutLine));
+    EXPECT_EQ(0, strcmp("Invalid 'layout' command extra lib", szText_stub));
+    ErrExtraLIB[0] = '\0';
+    EXPECT_EQ(5, kmcmp::nErrors);
+    
+    // msgproc returns FALSE
+    msgproc = msgproc_false_stub;
+    EXPECT_EQ(CERR_ERROR, CERR_InvalidLayoutLine & CERR_ERROR);
+    EXPECT_TRUE(AddCompileError(CERR_InvalidLayoutLine));
+    EXPECT_EQ(0, strcmp("Invalid 'layout' command", szText_stub));
+    EXPECT_EQ(6, kmcmp::nErrors);
 };
 
 // KMX_DWORD ProcessBeginLine(PFILE_KEYBOARD fk, PKMX_WCHAR p)
