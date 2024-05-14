@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 18.0.35 alpha 2024-05-14
+
+*  (#11340)
+
 ## 18.0.34 alpha 2024-05-13
 
 * feat(windows): Don't install desktop shortcut for Keyman for windows on installation (#11401)
