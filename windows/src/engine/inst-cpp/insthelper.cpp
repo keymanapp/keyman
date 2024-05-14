@@ -82,12 +82,9 @@ __declspec(dllexport) unsigned int EnginePostInstall(MSIHANDLE hInstall) {
 
     DWORD result = SetEntriesInAcl(1, &ea, NULL, &pNewDACL);
     if (result != ERROR_SUCCESS) {
+      LocalFree(pNewDACL);
       CloseHandle(hFile);
       return HandleError(hInstall, L"Keyman Engine failed to set permissions on shared data in GrantPermission: ");
-      if (pNewDACL) {
-        LocalFree(pNewDACL);
-      }
-      return result;
     }
 
     result = SetNamedSecurityInfo(path, SE_FILE_OBJECT, DACL_SECURITY_INFORMATION, NULL, NULL, pNewDACL, NULL);
@@ -95,10 +92,7 @@ __declspec(dllexport) unsigned int EnginePostInstall(MSIHANDLE hInstall) {
       return HandleError(hInstall, L"Keyman Engine failed to apply DACL to shared data folder: ");
     }
 
-    if (pNewDACL) {
-      LocalFree(pNewDACL);
-    }
-
+    LocalFree(pNewDACL);
     CloseHandle(hFile);
   }
 
