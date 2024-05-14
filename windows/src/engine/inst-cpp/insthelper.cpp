@@ -22,7 +22,15 @@
 
 const LPCTSTR SFolderKeymanRoot = TEXT("\\Keyman");
 
-extern "C" __declspec(dllexport) unsigned int EnginePostInstall(MSIHANDLE hInstall) {
+extern "C" unsigned int
+HandleError(const MSIHANDLE& hInstall, const std::wstring& messagePrefix) {
+  DWORD errorCode    = GetLastError();
+  std::wstring error = messagePrefix + std::to_wstring(errorCode);
+  MsiSetProperty(hInstall, TEXT("EnginePostInstall_Error"), error.c_str());
+  return errorCode;
+}
+
+__declspec(dllexport) unsigned int EnginePostInstall(MSIHANDLE hInstall) {
   HANDLE hFile;
 
   // Find %appdata% path
@@ -34,21 +42,14 @@ extern "C" __declspec(dllexport) unsigned int EnginePostInstall(MSIHANDLE hInsta
     // Create directory if it does not exist
     if (GetFileAttributes(path) == INVALID_FILE_ATTRIBUTES) {
       if (!CreateDirectory(path, NULL)) {
-        DWORD errorCode = GetLastError();
-        std::wstring error =
-            L"Keyman Engine failed to set permissions on shared data in CreateDir: " + std::to_wstring(errorCode);
-        MsiSetProperty(hInstall, TEXT("EnginePostInstall_Error"), error.c_str());
-        return errorCode;
+        return HandleError(hInstall, L"Keyman Engine failed to set permissions on shared data in CreateDir: ");
       }
     }
 
     // Create file handle
     hFile = CreateFile(path, READ_CONTROL | WRITE_DAC, 0, NULL, OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS, NULL);
     if (hFile == INVALID_HANDLE_VALUE) {
-      DWORD errorCode    = GetLastError();
-      std::wstring error = L"Keyman Engine failed to set permissions on shared data in CreateFile: " + std::to_wstring(errorCode);
-      MsiSetProperty(hInstall, TEXT("EnginePostInstall_Error"), error.c_str());
-      return errorCode;
+      return HandleError(hInstall, L"Keyman Engine failed to set permissions on shared data in CreateFile: ");
     }
 
     // Set permission on shared data
@@ -67,11 +68,7 @@ extern "C" __declspec(dllexport) unsigned int EnginePostInstall(MSIHANDLE hInsta
     DWORD dwRes = GetSecurityInfo(hFile, objectType, DACL_SECURITY_INFORMATION, nullptr, nullptr, &pOldDACL, nullptr, nullptr);
     if (dwRes != ERROR_SUCCESS) {
       if (!CreateDirectory(path, NULL)) {
-        DWORD errorCode = GetLastError();
-        std::wstring error =
-            L"Keyman Engine failed to point to existing DACL";
-        MsiSetProperty(hInstall, TEXT("EnginePostInstall_Error"), error.c_str());
-        return errorCode;
+        return HandleError(hInstall, L"Keyman Engine failed to point to existing DACL");
       }
     }
 
@@ -79,19 +76,14 @@ extern "C" __declspec(dllexport) unsigned int EnginePostInstall(MSIHANDLE hInsta
     dwRes = SetEntriesInAcl(1, &ea, pOldDACL, &pNewDACL);
     if (dwRes != ERROR_SUCCESS) {
       if (!CreateDirectory(path, NULL)) {
-        DWORD errorCode    = GetLastError();
-        std::wstring error = L"Keyman Engine failed to set new DACL";
-        MsiSetProperty(hInstall, TEXT("EnginePostInstall_Error"), error.c_str());
-        return errorCode;
+        return HandleError(hInstall, L"Keyman Engine failed to set new DACL");
       }
     }
 
     DWORD result = SetEntriesInAcl(1, &ea, NULL, &pNewDACL);
     if (result != ERROR_SUCCESS) {
       CloseHandle(hFile);
-      std::wstring error =
-          L"Keyman Engine failed to set permissions on shared data in GrantPermission: " + std::to_wstring(result);
-      MsiSetProperty(hInstall, TEXT("EnginePostInstall_Error"), error.c_str());
+      return HandleError(hInstall, L"Keyman Engine failed to set permissions on shared data in GrantPermission: ");
       if (pNewDACL) {
         LocalFree(pNewDACL);
       }
@@ -100,8 +92,7 @@ extern "C" __declspec(dllexport) unsigned int EnginePostInstall(MSIHANDLE hInsta
 
     result = SetNamedSecurityInfo(path, SE_FILE_OBJECT, DACL_SECURITY_INFORMATION, NULL, NULL, pNewDACL, NULL);
     if (result != ERROR_SUCCESS) {
-      std::wstring error = L"Keyman Engine failed to apply DACL to shared data folder: " + std::to_wstring(result);
-      MsiSetProperty(hInstall, TEXT("EnginePostInstall_Error"), error.c_str());
+      return HandleError(hInstall, L"Keyman Engine failed to apply DACL to shared data folder: ");
     }
 
     if (pNewDACL) {
