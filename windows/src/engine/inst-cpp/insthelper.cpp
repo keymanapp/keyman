@@ -214,6 +214,9 @@ void UnregisterTIPAndItsProfiles(const CLSID& AClsid) {
       pInputProcessorProfileMgr->UnregisterProfile(AClsid, profile.langid, profile.guidProfile, 0);
     }
   }
+
+  // Unregister the entire input processor
+  pInputProcessorProfiles->Unregister(AClsid);
 }
 
 extern "C" __declspec(dllexport) unsigned int PreUninstall() {
