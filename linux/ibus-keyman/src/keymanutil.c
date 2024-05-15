@@ -487,7 +487,7 @@ keyman_get_options_queue_fromdconf(gchar *package_id,
                 g_message("Keyboard Option [%d], %s=%s", index, option_tokens[0], option_tokens[1]);
                 km_core_option_item *opt = g_new0(km_core_option_item, 1);
                 opt[0].scope = KM_CORE_OPT_KEYBOARD;
-                km_core_cp *ocp = g_utf8_to_utf16(option_tokens[0], -1, NULL, NULL, NULL);
+                km_core_cu *ocp = g_utf8_to_utf16(option_tokens[0], -1, NULL, NULL, NULL);
                 opt[0].key = ocp;
                 ocp = g_utf8_to_utf16 (option_tokens[1], -1, NULL, NULL, NULL);
                 opt[0].value = ocp;

@@ -67,7 +67,7 @@ This also works fine on Linux, git bash on Windows, and WSL.
 
 ## Bash options (`set -eu`)
 
-We use `set -eu` throughout:
+Builder scripts will inherit `set -eu` from builder.inc.sh:
 
 * `-e` to exit on any statement failure
 * `-u` to abort on unset variable use (usually coming from typos)
@@ -110,13 +110,8 @@ available, so other include scripts should be sourced accordingly, for example:
 
 ## Setting path
 
-Many scripts will be easier to code if they run from a consistent path. Because
-build scripts should be invokable from any directory, you may wish to add the
-following line here:
-
-```bash
-cd "$THIS_SCRIPT_PATH"
-```
+Builder will `cd` to the folder of the builder script, so there is no need
+to `cd` at the start of your script.
 
 ## Standard environment
 
@@ -143,7 +138,8 @@ but makes the script easy to scan!
 # Defining build script parameters
 
 The build script should use the `builder` functions and variables to process its
-command line and control its run.
+command line and control its run. See [`builder_describe`] for full details on
+how these parameters are defined.
 
 Build scripts can define **targets**, **actions**, **options**, and
 **dependencies**, which are parameters passed in to the script when it is run by
@@ -183,6 +179,9 @@ a user or called by another script:
 
   Options can be used to provide additional data, by including `=<varname>` in
   their definition. Otherwise, they are treated as a boolean.
+
+  An option will be inherited by child scripts if you append a `+` to the option
+  name.
 
 * **dependencies**: these are other builder scripts which must be configured and
   built before the actions in this script can continue. Only `configure` and
@@ -429,6 +428,10 @@ a definition:
 builder_describe "Testing script" clean test+
 ```
 
+If an action is passed to a child script, but the child script does not support
+it, it will be ignored, although a builder debug message will be issued for
+safety.
+
 **Options** are defined by including a `--` prefix.
 
 Specification of options: `"--option[,-o][+][=var]   [One line description]"`
@@ -445,10 +448,11 @@ may not be combined when invoking the script -- each must be passed separately.
 Ensure that you do not include a space after the comma.
 
 If a `+` is appended (after the optional shorthand form, but before the
-default), then the option will be passed to child scripts. All child scripts
-_must_ accept this option, or they will fail. It is acceptable for the child
-script to declare the option but ignore it. However, the option will _not_ be
-passed to dependencies.
+variable), then the option will be passed to child scripts. Child scripts do not
+need to declare the option if they do not use it, but this will be noted as a
+builder debug message for safety; it is also acceptable for the child script to
+declare the option but ignore it. However, the option will _not_ be passed to
+dependencies.
 
 By default, an option will be treated as a boolean. It can be tested with
 [`builder_has_option`]. If you need to pass additional data, then the

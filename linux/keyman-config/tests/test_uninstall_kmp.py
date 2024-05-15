@@ -246,7 +246,7 @@ class UninstallKmpCommonTests(unittest.TestCase):
         patcher3 = patch('keyman_config.uninstall_kmp.get_keyman_font_dir')
         self.mockGetKeymanFontDir = patcher3.start()
         self.addCleanup(patcher3.stop)
-        patcher4 = patch('keyman_config.uninstall_kmp.is_gnome_shell')
+        patcher4 = patch('keyman_config.uninstall_kmp.is_gnome_desktop')
         self.mockIsGnomeShell = patcher4.start()
         self.addCleanup(patcher4.stop)
         self.mockIsGnomeShell.return_value = False
@@ -317,4 +317,4 @@ class UninstallKmpCommonTests(unittest.TestCase):
         # Verify
         self.mockUninstallKeyboardsFromIbus.assert_called_once_with(keyboards, '/tmp/foo')
         self.mockUninstallDir.assert_called()
-        self.assertEquals(mockCustomKeyboardsInstance.remove.call_count, 2)
+        self.assertEqual(mockCustomKeyboardsInstance.remove.call_count, 2)

@@ -77,11 +77,14 @@ const DEBUG_GESTURES: boolean = KEYMAN_VERSION.TIER != 'stable' || KEYMAN_VERSIO
  */
 const DEBUG_HISTORY_COUNT: number = DEBUG_GESTURES ? 10 : 0;
 
+// #region KeyRuleEffects
 interface KeyRuleEffects {
   contextToken?: number,
   alteredText?: boolean
 };
+// #endregion
 
+// #region VisualKeyboardConfiguration
 export interface VisualKeyboardConfiguration extends CommonConfiguration {
   /**
    * The Keyman keyboard on which to base the on-screen keyboard being represented.
@@ -121,6 +124,7 @@ export interface VisualKeyboardConfiguration extends CommonConfiguration {
    */
   specialFont?: InternalKeyboardFont;
 }
+// #endregion
 
 interface BoundingRect {
   left: number,
@@ -143,6 +147,7 @@ interface EventMap {
   'globekey': (keyElement: KeyElement, on: boolean) => void
 }
 
+// #region VisualKeyboard
 export default class VisualKeyboard extends EventEmitter<EventMap> implements KeyboardView {
   /**
    * The gesture-engine used to support user interaction with this keyboard.
@@ -293,7 +298,7 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
     return this.currentLayer?.spaceBarKey?.btn;
   }
 
-  //#region OSK constructor and helpers
+  //#region VisualKeyboard - constructor and helpers
 
   /**
    * @param       {Object}      PVK         Visual keyboard name
@@ -930,7 +935,7 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
   };
   //#endregion
 
-  //#region OSK touch handlers
+  //#region VisualKeyboard - OSK touch handlers
   getTouchCoordinatesOnKeyboard(input: InputSample<KeyElement, string>) {
     // `input` is already in keyboard-local coordinates.  It's not scaled, though.
     let offsetCoords = { x: input.targetX, y: input.targetY };
@@ -1135,8 +1140,6 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
 
     this._UpdateVKShiftStyle();
   }
-
-  //#endregion
 
   /**
    *  Add or remove a class from a keyboard key (when touched or clicked)
@@ -1736,4 +1739,5 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
 
     return callbackData;
   }
+  // #endregion VisualKeyboard
 }

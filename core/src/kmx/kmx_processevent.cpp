@@ -535,8 +535,8 @@ int KMX_ProcessEvent::PostString(PKMX_WCHAR str, LPKEYBOARD lpkb, PKMX_WCHAR end
 
 KMX_BOOL KMX_ProcessEvent::IsMatchingBaseLayout(PKMX_WCHAR layoutName)  // I3432
 {
-  KMX_BOOL bEqual = u16icmp(layoutName, static_cast<const km_core_cp *>(m_environment.baseLayout().c_str())) == 0 ||   // I4583
-                u16icmp(layoutName, static_cast<const km_core_cp*>(m_environment.baseLayoutAlt().c_str())) == 0;   // I4583
+  KMX_BOOL bEqual = u16icmp(layoutName, static_cast<const km_core_cu *>(m_environment.baseLayout().c_str())) == 0 ||   // I4583
+                u16icmp(layoutName, static_cast<const km_core_cu*>(m_environment.baseLayoutAlt().c_str())) == 0;   // I4583
 
   return bEqual;
 }
