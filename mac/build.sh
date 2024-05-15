@@ -45,12 +45,6 @@ if builder_verbose; then
   QUIET=false
 fi
 
-PODS_FOLDER="/mac/Keyman4MacIM/Pods/Target Support Files/Pods-Keyman"
-
-builder_describe_outputs \
-  configure    "$PODS_FOLDER/$CONFIG_TARGET" \
-  build        ""
-
 ### SET PATHS ###
 
 ENGINE_NAME="KeymanEngine4Mac"
@@ -66,6 +60,14 @@ KM4MIM_BASE_PATH="$KEYMAN_MAC_BASE_PATH/$IM_NAME"
 KME4M_PROJECT_PATH="$KME4M_BASE_PATH/$ENGINE_NAME$XCODE_PROJ_EXT"
 KMTESTAPP_PROJECT_PATH="$KMTESTAPP_BASE_PATH/$TESTAPP_NAME$XCODE_PROJ_EXT"
 KMIM_WORKSPACE_PATH="$KM4MIM_BASE_PATH/$IM_NAME.xcworkspace"
+
+PODS_FOLDER="/mac/Keyman4MacIM/Pods/Target Support Files/Pods-Keyman"
+
+builder_describe_outputs \
+  configure     "$PODS_FOLDER/$CONFIG_TARGET" \
+  build:engine  "/mac/$ENGINE_NAME/build/$CONFIG" \
+  build:im      "/mac/$IM_NAME/build/$CONFIG" \
+  build:testapp "/mac/$TESTAPP_NAME/build/$CONFIG"
 
 ### DEFINE HELPER FUNCTIONS ###
 
