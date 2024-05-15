@@ -116,6 +116,30 @@ execBuildCommand() {
     fi
 }
 
+do_clean ( ) {
+  rm -rf "$KME4M_BASE_PATH/build"
+  rm -rf "$KM4MIM_BASE_PATH/build"
+  rm -rf "$KMTESTAPP_BASE_PATH/build"
+  rm -rf "$KEYMAN_ROOT/mac/setup/Install Keyman.app"
+  
+  builder_heading "Cleaning pods folder (CocoaPods)"
+  rm -rf "$PODS_FOLDER"
+  builder_heading "Cleaning source (Carthage)"
+  rm -rf "$KEYMAN_MAC_BASE_PATH/Carthage"
+
+  # To consider: also mark for xcodebuild to do a clean build?
+  # Though, shouldn't the above trigger this anyway?
+}
+
+do_configure ( ) {
+  carthage bootstrap --use-xcframeworks
+
+  pushd "$KM4MIM_BASE_PATH" > /dev/null
+  pod update
+  pod install
+  popd > /dev/null
+}
+
 updatePlist() {
     if $UPDATE_VERSION_IN_PLIST ; then
         KM_PLIST="$1"
@@ -136,6 +160,47 @@ updatePlist() {
         /usr/libexec/Plistbuddy -c "Set CFBundleGetInfoString $APPNAME $VERSION_WITH_TAG for macOS, Copyright © 2017-$YEAR SIL International." "$KM_PLIST"
         /usr/libexec/Plistbuddy -c "Set NSHumanReadableCopyright Copyright © 2017-$YEAR SIL International." "$KM_PLIST"
     fi
+}
+
+do_build_engine ( ) {
+  ### Build Keyman Engine (kmx, ldml processor) ###
+
+  execBuildCommand $ENGINE_NAME "xcodebuild -project \"$KME4M_PROJECT_PATH\" $BUILD_OPTIONS $BUILD_ACTIONS -scheme $ENGINE_NAME"
+  execBuildCommand "$ENGINE_NAME dSYM file" "dsymutil \"$KME4M_BASE_PATH/build/$CONFIG/$ENGINE_NAME.framework/Versions/A/$ENGINE_NAME\" -o \"$KME4M_BASE_PATH/build/$CONFIG/$ENGINE_NAME.framework.dSYM\""
+  updatePlist "$KME4M_BASE_PATH/build/$CONFIG/$ENGINE_NAME.framework/Resources/Info.plist" "Keyman Engine"
+}
+
+do_build_im ( ) {
+  ### Build Keyman.app (Input Method and Configuration app) ###
+  builder_heading "Building help"
+  build_help_html mac Keyman4MacIM/Keyman4MacIM/Help
+
+  builder_heading "Building Keyman.app"
+
+  execBuildCommand $IM_NAME "xcodebuild -workspace \"$KMIM_WORKSPACE_PATH\" $CODESIGNING_SUPPRESSION $BUILD_OPTIONS $BUILD_ACTIONS -scheme Keyman SYMROOT=\"$KM4MIM_BASE_PATH/build\""
+  updatePlist "$KM4MIM_BASE_PATH/build/$CONFIG/Keyman.app/Contents/Info.plist" "Keyman"
+
+  if builder_is_debug_build; then
+    ENTITLEMENTS_FILE=Keyman.Debug.entitlements
+  else
+    ENTITLEMENTS_FILE=Keyman.entitlements
+
+    # We need to re-sign the app after updating the plist file
+    execCodeSign eval --force --sign $CERTIFICATE_ID --timestamp --verbose --preserve-metadata=identifier,entitlements "$KM4MIM_BASE_PATH/build/$CONFIG/Keyman.app/Contents/Frameworks/Sentry.framework"
+
+    execCodeSign eval --force --sign $CERTIFICATE_ID --timestamp --verbose --preserve-metadata=identifier,entitlements "$KM4MIM_BASE_PATH/build/$CONFIG/Keyman.app/Contents/Frameworks/KeymanEngine4Mac.framework"
+
+    execCodeSign eval --force --sign $CERTIFICATE_ID --timestamp --verbose -o runtime \
+      --entitlements "$KM4MIM_BASE_PATH/$ENTITLEMENTS_FILE" \
+      --requirements "'=designated => anchor apple generic and identifier \"\$self.identifier\" and ((cert leaf[field.1.2.840.113635.100.6.1.9] exists) or ( certificate 1[field.1.2.840.113635.100.6.2.6] exists and certificate leaf[field.1.2.840.113635.100.6.1.13] exists and certificate leaf[subject.OU] = \"$DEVELOPMENT_TEAM\" ))'" \
+      "$KM4MIM_BASE_PATH/build/$CONFIG/Keyman.app"
+  fi
+}
+
+do_build_testapp() {
+  ### Build test app / harness ###
+  execBuildCommand $TESTAPP_NAME "xcodebuild -project \"$KMTESTAPP_PROJECT_PATH\" $BUILD_OPTIONS $BUILD_ACTIONS"
+  updatePlist "$KMTESTAPP_BASE_PATH/build/$CONFIG/$TESTAPP_NAME.app/Contents/Info.plist" "Keyman Test App"
 }
 
 # In case both install & publish actions are specified, we should still only notarize once.
@@ -196,71 +261,6 @@ do_sentry() {
   fi
 
   builder_finish_action success publish
-}
-
-do_clean ( ) {
-  rm -rf "$KME4M_BASE_PATH/build"
-  rm -rf "$KM4MIM_BASE_PATH/build"
-  rm -rf "$KMTESTAPP_BASE_PATH/build"
-  rm -rf "$KEYMAN_ROOT/mac/setup/Install Keyman.app"
-  
-  builder_heading "Cleaning pods folder (CocoaPods)"
-  rm -rf "$PODS_FOLDER"
-  builder_heading "Cleaning source (Carthage)"
-  rm -rf "$KEYMAN_MAC_BASE_PATH/Carthage"
-
-  # To consider: also mark for xcodebuild to do a clean build?
-  # Though, shouldn't the above trigger this anyway?
-}
-
-do_configure ( ) {
-  carthage bootstrap --use-xcframeworks
-
-  pushd "$KM4MIM_BASE_PATH" > /dev/null
-  pod update
-  pod install
-  popd > /dev/null
-}
-
-do_build_engine ( ) {
-  ### Build Keyman Engine (kmx, ldml processor) ###
-
-  execBuildCommand $ENGINE_NAME "xcodebuild -project \"$KME4M_PROJECT_PATH\" $BUILD_OPTIONS $BUILD_ACTIONS -scheme $ENGINE_NAME"
-  execBuildCommand "$ENGINE_NAME dSYM file" "dsymutil \"$KME4M_BASE_PATH/build/$CONFIG/$ENGINE_NAME.framework/Versions/A/$ENGINE_NAME\" -o \"$KME4M_BASE_PATH/build/$CONFIG/$ENGINE_NAME.framework.dSYM\""
-  updatePlist "$KME4M_BASE_PATH/build/$CONFIG/$ENGINE_NAME.framework/Resources/Info.plist" "Keyman Engine"
-}
-
-do_build_im ( ) {
-  ### Build Keyman.app (Input Method and Configuration app) ###
-  builder_heading "Building help"
-  build_help_html mac Keyman4MacIM/Keyman4MacIM/Help
-
-  builder_heading "Building Keyman.app"
-
-  execBuildCommand $IM_NAME "xcodebuild -workspace \"$KMIM_WORKSPACE_PATH\" $CODESIGNING_SUPPRESSION $BUILD_OPTIONS $BUILD_ACTIONS -scheme Keyman SYMROOT=\"$KM4MIM_BASE_PATH/build\""
-  updatePlist "$KM4MIM_BASE_PATH/build/$CONFIG/Keyman.app/Contents/Info.plist" "Keyman"
-
-  if builder_is_debug_build; then
-    ENTITLEMENTS_FILE=Keyman.Debug.entitlements
-  else
-    ENTITLEMENTS_FILE=Keyman.entitlements
-
-    # We need to re-sign the app after updating the plist file
-    execCodeSign eval --force --sign $CERTIFICATE_ID --timestamp --verbose --preserve-metadata=identifier,entitlements "$KM4MIM_BASE_PATH/build/$CONFIG/Keyman.app/Contents/Frameworks/Sentry.framework"
-
-    execCodeSign eval --force --sign $CERTIFICATE_ID --timestamp --verbose --preserve-metadata=identifier,entitlements "$KM4MIM_BASE_PATH/build/$CONFIG/Keyman.app/Contents/Frameworks/KeymanEngine4Mac.framework"
-
-    execCodeSign eval --force --sign $CERTIFICATE_ID --timestamp --verbose -o runtime \
-      --entitlements "$KM4MIM_BASE_PATH/$ENTITLEMENTS_FILE" \
-      --requirements "'=designated => anchor apple generic and identifier \"\$self.identifier\" and ((cert leaf[field.1.2.840.113635.100.6.1.9] exists) or ( certificate 1[field.1.2.840.113635.100.6.2.6] exists and certificate leaf[field.1.2.840.113635.100.6.1.13] exists and certificate leaf[subject.OU] = \"$DEVELOPMENT_TEAM\" ))'" \
-      "$KM4MIM_BASE_PATH/build/$CONFIG/Keyman.app"
-  fi
-}
-
-do_build_testapp() {
-  ### Build test app / harness ###
-  execBuildCommand $TESTAPP_NAME "xcodebuild -project \"$KMTESTAPP_PROJECT_PATH\" $BUILD_OPTIONS $BUILD_ACTIONS"
-  updatePlist "$KMTESTAPP_BASE_PATH/build/$CONFIG/$TESTAPP_NAME.app/Contents/Info.plist" "Keyman Test App"
 }
 
 do_install() {
