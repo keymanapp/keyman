@@ -2,7 +2,7 @@
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
-. "${THIS_SCRIPT%/*}/../resources/build/build-utils.sh"
+. "${THIS_SCRIPT%/*}/../resources/build/builder.inc.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 KEYMAN_MAC_BASE_PATH="$KEYMAN_ROOT/mac"
@@ -12,80 +12,44 @@ KEYMAN_MAC_BASE_PATH="$KEYMAN_ROOT/mac"
 . "$KEYMAN_ROOT/resources/build/build-help.inc.sh"
 . "$KEYMAN_ROOT/mac/mac-utils.inc.sh"
 
-# This script runs from its own folder
-cd "$(dirname "$THIS_SCRIPT")"
-
+builder_describe "Builds Keyman for macOS." \
+  "@/core:mac" \
+  "clean" \
+  "configure" \
+  "build" \
+  "publish   Publishes debug info to Sentry and builds DMG, .download_info for distribution" \
+  "test" \
+  "install   Installs result of Keyman4MacIM locally." \
+  ":engine   KeymanEngine4Mac" \
+  ":im   Keyman4MacIM" \
+  ":testapp   Keyman4Mac (test harness)" \
+  "--quick,-q  Bypasses notarization for $(builder_term install)" 
 
 # Please note that this build script (understandably) assumes that it is running on Mac OS X.
 verify_on_mac
 
+builder_parse "$@"
 
-display_usage() {
-    echo "usage: build.sh [build options] [targets]"
-    echo
-    echo "Build options:"
-    echo "  -deploy DEST    Deploys result of Keyman4MacIM. DEST options:"
-    echo "                  n|none (default) Not deployed."
-    echo "                  l|local          $HOME/Library/Input Methods (kills running process if needed)"
-    echo "                  q|quicklocal     Same as local but does not notarize the build (see README.md)"
-    echo "                  p|preprelease    Builds a DMG and download_info file in output\upload."
-    echo "  -deploy-only    Suppresses build/clean/test for all targets."
-    echo "  -config NAME    NAME is passed to xcodebuild as -configuration parameter. Defaults to Debug, unless"
-    echo "                  the -deploy option is used, in which configuration will be Release (i.e., -config option"
-    echo "                  is ignored)."
-    echo "  -clean          Removes all previously-existing build products for anything to be built before building."
-    echo "  -test           Runs unit tests (not applicable to 'testapp' target)"
-    echo "  -no-codesign    Disables code-signing (e.g. when testing offline)"
-    echo "  -quiet          Do not display any output except for warnings and errors."
-    echo "  -upload-sentry  Force upload of symbols to Sentry even on test or local environments."
-    echo "  -no-pods        Skip updating, installing and rebuilding pods"
-    echo
-    echo "Targets (to be built and, optionally, cleaned and tested):"
-    echo "  engine          KeymanEngine4Mac (engine)"
-    echo "  im              Keyman4MacIM (input method)."
-    echo "  testapp         Keyman4Mac (test harness)"
-    echo "  If no targets are specified, the default targets are 'engine' and 'im'."
-    echo
-    echo "For deployment, even locally, the app must be code-signed and notarized by Apple (see README.md for more"
-    echo "options). This requires a valid code certificate and an active Appstoreconnect Apple ID. These must be"
-    echo "supplied in environment variables or in localenv.sh in this folder"
-    echo
-    echo "  * CERTIFICATE_ID: Specifies a certificate from your keychain (e.g. use sha1 or name of certificate)"
-    echo "          Use with -no-codesign if you don't have access to the core developer certificates."
-    echo "          Core development team members should not need to specify this as the certificate reference is"
-    echo "          already configured in the project."
-    echo "  * APPSTORECONNECT_PROVIDER: The shortname of the preferred provider in your Apple Developer account"
-    echo "          To find this, run:"
-    echo "          /Applications/Xcode.app/Contents/Developer/usr/bin/iTMSTransporter \\"
-    echo "            -m provider -u 'USERNAME' -p 'PASSWORD' -account_type itunes_connect -v off"
-    echo "  * APPSTORECONNECT_USERNAME: Your Apple ID login name."
-    echo "  * APPSTORECONNECT_PASSWORD: Your Apple ID password (may need to be a app-specific password)."
-    echo "  * DEVELOPMENT_TEAM: Your development team ID; if unspecified uses the default Keyman development team."
-    exit 1
-}
+# Default is release build of Engine and (code-signed) Input Method
+if builder_is_debug_build; then
+  CONFIG="Debug"
+  CONFIG_TARGET=Pods-Keyman.debug.xcconfig
+else
+  CONFIG="Release"
+  CONFIG_TARGET=Pods-Keyman.release.xcconfig
+fi
 
-### DEFINE HELPER FUNCTIONS ###
+QUIET=true
 
-assertOptionsPrecedeTargets() {
-    if [[ "$1" =~ ^\- ]]; then
-        if $PROCESSING_TARGETS ; then
-            builder_die "Options must be specified before build targets"
-        fi
-    elif ! $PROCESSING_TARGETS ; then
-        PROCESSING_TARGETS=true
-        # Since caller is specifying targets explicitly, turn them all off.
-        displayInfo "Processing explicit command-line targets..."
-        DO_KEYMANENGINE=false
-        DO_KEYMANIM=false
-    fi
-}
+if builder_verbose; then
+  QUIET=false
+fi
 
-do_clean ( ) {
-  builder_heading "Cleaning source (Carthage)"
-#  rm -rf $KME4M_BUILD_PATH
-#  rm -rf $APP_BUILD_PATH
-  rm -rf $KEYMAN_MAC_BASE_PATH/Carthage
-}
+PODS_FOLDER="/mac/Keyman4MacIM/Pods/Target Support Files/Pods-Keyman"
+
+builder_describe_outputs \
+  configure    "$PODS_FOLDER/$CONFIG_TARGET" \
+  build        ""
 
 ### SET PATHS ###
 
@@ -103,195 +67,35 @@ KME4M_PROJECT_PATH="$KME4M_BASE_PATH/$ENGINE_NAME$XCODE_PROJ_EXT"
 KMTESTAPP_PROJECT_PATH="$KMTESTAPP_BASE_PATH/$TESTAPP_NAME$XCODE_PROJ_EXT"
 KMIM_WORKSPACE_PATH="$KM4MIM_BASE_PATH/$IM_NAME.xcworkspace"
 
-# KME4M_BUILD_PATH=engine/KME4M/build
-# APP_RESOURCES=keyman/Keyman/Keyman/libKeyman
-# APP_BUNDLE_PATH=$APP_RESOURCES/Keyman.bundle
-# APP_BUILD_PATH=keyman/Keyman/build/
+### DEFINE HELPER FUNCTIONS ###
 
-### PROCESS COMMAND-LINE ARGUMENTS ###
-
-# Default is debug build of Engine and (code-signed) Input Method
-PROCESSING_TARGETS=false
-CONFIG="Debug"
 LOCALDEPLOY=false
 PREPRELEASE=false
 UPDATE_VERSION_IN_PLIST=true
-DO_KEYMANENGINE=true
-DO_KEYMANIM=true
-DO_KEYMANTESTAPP=false
 DO_CODESIGN=true
-DO_PODS=true
-DO_HELP=true
 CODESIGNING_SUPPRESSION="CODE_SIGN_IDENTITY=\"\" CODE_SIGNING_REQUIRED=NO"
-BUILD_OPTIONS=""
+
+if builder_verbose; then
+  BUILD_OPTIONS=""
+  QUIET_FLAG=
+else
+  BUILD_OPTIONS="-quiet"
+  QUIET_FLAG="-quiet"
+fi
+
 BUILD_ACTIONS="build"
-TEST_ACTION=""
-CLEAN=false
-QUIET=false
-NOTARIZE=false
+
 SKIP_BUILD=false
 UPLOAD_SENTRY=false
-QUIET_FLAG=
 
 # Import local environment variables for build
 if [[ -f $(dirname "$THIS_SCRIPT")/localenv.sh ]]; then
     . $(dirname "$THIS_SCRIPT")/localenv.sh
 fi
 
-# Parse args
-shopt -s nocasematch
-
-while [[ $# -gt 0 ]] ; do
-    key="$1"
-    assertOptionsPrecedeTargets "$key"
-    case $key in
-        -deploy)
-            # Deployment requires hardening which only happens in Release configuration;
-            # the deployed version cannot be run in the debugger.
-            if [[ "$2" =~ ^(l(ocal)?)$ ]]; then
-                LOCALDEPLOY=true
-                NOTARIZE=true
-                CONFIG="Release"
-            elif [[ "$2" =~ ^(q(uick(local)?)?)$ ]]; then
-                LOCALDEPLOY=true
-            elif [[ "$2" =~ ^(p(rep(release)?)?)$ ]]; then
-                PREPRELEASE=true
-                NOTARIZE=true
-                CONFIG="Release"
-            elif ! [[ "$2" =~ ^(n(one)?)$ ]]; then
-                builder_die "Invalid deploy option. Must be 'none', 'local', 'quicklocal' or 'preprelease'."
-            fi
-            shift # past argument
-            ;;
-        -deploy-only)
-            SKIP_BUILD=true
-            #shift # past argument
-            ;;
-        -config)
-            if [[ "$2" == "" || "$2" =~ ^\- ]]; then
-                builder_warn "Missing config name on command line. Using 'Debug' as default..."
-            else
-                if $PREPRELEASE && [[ "$2" != "Release" ]]; then
-                    echo "Deployment option 'preprelease' supersedes $2 configuration."
-                else
-                    if [[ "$2" == "r" || "$2" == "R" ]]; then
-                        CONFIG="Release"
-                    elif [[ "$2" == "d" || "$2" == "D" ]]; then
-                        CONFIG="Debug"
-                    else
-                        CONFIG="$2"
-                    fi
-                fi
-                shift # past argument
-            fi
-            ;;
-        -no-pods)
-            DO_PODS=false
-            ;;
-        -clean)
-            CLEAN=true
-            BUILD_ACTIONS="clean $BUILD_ACTIONS"
-            ;;
-        -test)
-            TEST_ACTION="test"
-            ;;
-        -no-codesign)
-            DO_CODESIGN=false
-            ;;
-        -no-help)
-            DO_HELP=false
-            ;;
-        -quiet)
-            QUIET_FLAG=$1
-            BUILD_OPTIONS="$BUILD_OPTIONS $QUIET_FLAG"
-            QUIET=true
-            ;;
-        -upload-sentry)
-            UPLOAD_SENTRY=true
-            ;;
-        -h|-\?|-help|--help)
-            display_usage
-            ;;
-        engine)
-            DO_KEYMANENGINE=true
-            ;;
-        im)
-            DO_KEYMANIM=true
-            ;;
-        testapp)
-            DO_KEYMANTESTAPP=true
-            ;;
-        *)
-            if $PROCESSING_TARGETS ; then
-                builder_die "Unexpected target: $1. Run with --help for help."
-            else
-                builder_die "Unexpected option: $1. Run with --help for help."
-            fi
-            ;;
-    esac
-    shift # past argument
-done
-if $SKIP_BUILD ; then
-    DO_KEYMANENGINE=false
-    DO_KEYMANIM=false
-    DO_KEYMANTESTAPP=false
-    DO_HELP=false
-    BUILD_ACTIONS=""
-    TEST_ACTION=""
-    BUILD_OPTIONS=""
-fi
-
 BUILD_OPTIONS="-configuration $CONFIG $BUILD_OPTIONS PRODUCT_VERSION=$VERSION"
 
-displayInfo "" \
-    "VERSION: $VERSION" \
-    "TIER: $TIER" \
-    "LOCALDEPLOY: $LOCALDEPLOY" \
-    "PREPRELEASE: $PREPRELEASE" \
-    "CLEAN: $CLEAN" \
-    "DO_KEYMANENGINE: $DO_KEYMANENGINE" \
-    "DO_KEYMANIM: $DO_KEYMANIM" \
-    "DO_KEYMANTESTAPP: $DO_KEYMANTESTAPP" \
-    "DO_CODESIGN: $DO_CODESIGN" \
-    "DO_PODS: $DO_PODS" \
-    "DO_HELP: $DO_HELP" \
-    "BUILD_OPTIONS: $BUILD_OPTIONS" \
-    "BUILD_ACTIONS: $BUILD_ACTIONS" \
-    "TEST_ACTION: $TEST_ACTION" \
-    "UPLOAD_SENTRY: $UPLOAD_SENTRY" \
-    "QUIET_FLAG: $QUIET_FLAG" \
-    ""
-
-### Validate notarization environment variables ###
-
-if $LOCALDEPLOY && ! $NOTARIZE ; then
-    if [ "$(spctl --status)" == "assessments enabled" ]; then
-      echo
-      builder_warn "WARNING: Notarization is disabled but SecAssessment security policy is still active. Keyman will not run correctly."
-      builder_warn "         Disable SecAssessment with 'sudo spctl --master-disable' (or do notarized builds)"
-      builder_die "Re-run with '-deploy local' or disable SecAssessment."
-    fi
-fi
-
-if $PREPRELEASE || $NOTARIZE ; then
-  if [ ! $DO_CODESIGN ] || [ -z "${CERTIFICATE_ID+x}" ]; then
-    builder_die "Code signing must be configured for deployment. See build.sh -help for details."
-  fi
-
-  if [ -z "${APPSTORECONNECT_PROVIDER+x}" ] || [ -z "${APPSTORECONNECT_USERNAME+x}" ] || [ -z "${APPSTORECONNECT_PASSWORD+x}" ]; then
-    builder_die "Appstoreconnect Apple ID credentials must be configured in environment. See build.sh -help for details."
-  fi
-fi
-
 ### START OF THE BUILD ###
-
-if $CLEAN ; then
-    do_clean
-fi
-
-if [ "$TEST_ACTION" == "test" ]; then
-    carthage bootstrap --use-xcframeworks
-fi
 
 execBuildCommand() {
     typeset component="$1"
@@ -334,95 +138,23 @@ updatePlist() {
     fi
 }
 
-### Build Keyman Engine (kmx processor) ###
+# In case both install & publish actions are specified, we should still only notarize once.
+DID_NOTARIZE=false
 
-if $DO_KEYMANENGINE ; then
-    builder_heading "Building Keyman Engine"
-    if [ "$CONFIG" == "Debug" ]; then
-        $KEYMAN_ROOT/core/build.sh configure:mac --debug --no-tests
-        $KEYMAN_ROOT/core/build.sh build:mac --debug --no-tests
-    else
-        $KEYMAN_ROOT/core/build.sh configure:mac --no-tests
-        $KEYMAN_ROOT/core/build.sh build:mac --no-tests
-    fi
-    execBuildCommand $ENGINE_NAME "xcodebuild -project \"$KME4M_PROJECT_PATH\" $BUILD_OPTIONS $BUILD_ACTIONS $TEST_ACTION -scheme $ENGINE_NAME"
-    execBuildCommand "$ENGINE_NAME dSYM file" "dsymutil \"$KME4M_BASE_PATH/build/$CONFIG/$ENGINE_NAME.framework/Versions/A/$ENGINE_NAME\" -o \"$KME4M_BASE_PATH/build/$CONFIG/$ENGINE_NAME.framework.dSYM\""
-    updatePlist "$KME4M_BASE_PATH/build/$CONFIG/$ENGINE_NAME.framework/Resources/Info.plist" "Keyman Engine"
-fi
+do_notarize() {
+  if [[ $DID_NOTARIZE == false ]]; then
+    ### Validate notarization environment variables ###
 
-### Build Keyman.app (Input Method and Configuration app) ###
+    builder_heading "Notarizing app"
 
-if $DO_KEYMANIM ; then
-    if $DO_HELP ; then
-        echo "Building help"
-        build_help_html mac Keyman4MacIM/Keyman4MacIM/Help
+    if [ "${CODESIGNING_SUPPRESSION}" != "" ] && [ -z "${CERTIFICATE_ID+x}" ]; then
+      builder_die "Notarization and signed executable is required for deployment, even locally. Specify CERTIFICATE_ID environment variable for custom certificate."
     fi
 
-    builder_heading "Building Keyman.app"
-    cd "$KM4MIM_BASE_PATH"
-    if $DO_PODS ; then
-        pod update
-        pod install
+    if [ -z "${APPSTORECONNECT_PROVIDER+x}" ] || [ -z "${APPSTORECONNECT_USERNAME+x}" ] || [ -z "${APPSTORECONNECT_PASSWORD+x}" ]; then
+      builder_die "Appstoreconnect Apple ID credentials must be configured in environment. See README.md for details."
     fi
 
-    cd "$KEYMAN_MAC_BASE_PATH"
-    execBuildCommand $IM_NAME "xcodebuild -workspace \"$KMIM_WORKSPACE_PATH\" $CODESIGNING_SUPPRESSION $BUILD_OPTIONS $BUILD_ACTIONS -scheme Keyman SYMROOT=\"$KM4MIM_BASE_PATH/build\""
-    if [ "$TEST_ACTION" == "test" ]; then
-        if [ "$CONFIG" == "Debug" ]; then
-            execBuildCommand "$IM_NAME tests" "xcodebuild $TEST_ACTION -workspace \"$KMIM_WORKSPACE_PATH\" $CODESIGNING_SUPPRESSION $BUILD_OPTIONS -scheme Keyman SYMROOT=\"$KM4MIM_BASE_PATH/build\""
-        fi
-    fi
-    updatePlist "$KM4MIM_BASE_PATH/build/$CONFIG/Keyman.app/Contents/Info.plist" "Keyman"
-
-    if [ "$CONFIG" == "Debug" ]; then
-        ENTITLEMENTS_FILE=Keyman.Debug.entitlements
-    else
-        ENTITLEMENTS_FILE=Keyman.entitlements
-    fi
-
-    # We need to re-sign the app after updating the plist file
-    if $DO_CODESIGN ; then
-        execCodeSign eval --force --sign $CERTIFICATE_ID --timestamp --verbose --preserve-metadata=identifier,entitlements "$KM4MIM_BASE_PATH/build/$CONFIG/Keyman.app/Contents/Frameworks/Sentry.framework"
-
-        execCodeSign eval --force --sign $CERTIFICATE_ID --timestamp --verbose --preserve-metadata=identifier,entitlements "$KM4MIM_BASE_PATH/build/$CONFIG/Keyman.app/Contents/Frameworks/KeymanEngine4Mac.framework"
-
-        execCodeSign eval --force --sign $CERTIFICATE_ID --timestamp --verbose -o runtime \
-            --entitlements "$KM4MIM_BASE_PATH/$ENTITLEMENTS_FILE" \
-            --requirements "'=designated => anchor apple generic and identifier \"\$self.identifier\" and ((cert leaf[field.1.2.840.113635.100.6.1.9] exists) or ( certificate 1[field.1.2.840.113635.100.6.2.6] exists and certificate leaf[field.1.2.840.113635.100.6.1.13] exists and certificate leaf[subject.OU] = \"$DEVELOPMENT_TEAM\" ))'" \
-            "$KM4MIM_BASE_PATH/build/$CONFIG/Keyman.app"
-    fi
-
-    # Upload symbols
-
-    if $UPLOAD_SENTRY ; then
-        echo "Uploading symbols to sentry.keyman.com"
-
-        if which sentry-cli >/dev/null; then
-            cd "$KM4MIM_BASE_PATH"
-            sentry-cli upload-dif "build/$CONFIG"
-        else
-            builder_die "Error: sentry-cli not installed, download from https://github.com/getsentry/sentry-cli/releases"
-        fi
-    fi
-
-    cd "$KEYMAN_MAC_BASE_PATH"
-fi
-
-### Build test app ###
-
-if $DO_KEYMANTESTAPP ; then
-    builder_heading "Building test app"
-    execBuildCommand $TESTAPP_NAME "xcodebuild -project \"$KMTESTAPP_PROJECT_PATH\" $BUILD_OPTIONS $BUILD_ACTIONS"
-    updatePlist "$KMTESTAPP_BASE_PATH/build/$CONFIG/$TESTAPP_NAME.app/Contents/Info.plist" "Keyman Test App"
-fi
-
-### Notarize the app for preprelease ###
-
-if $PREPRELEASE || $NOTARIZE; then
-  builder_heading "Notarizing app"
-  if [ "${CODESIGNING_SUPPRESSION}" != "" ] && [ -z "${CERTIFICATE_ID+x}" ]; then
-    builder_die "Notarization and signed executable is required for deployment, even locally. Specify CERTIFICATE_ID environment variable for custom certificate."
-  else
     TARGET_PATH="$KM4MIM_BASE_PATH/build/$CONFIG"
     TARGET_APP_PATH="$TARGET_PATH/$PRODUCT_NAME.app"
     TARGET_ZIP_PATH="$TARGET_PATH/$PRODUCT_NAME.zip"
@@ -445,43 +177,155 @@ if $PREPRELEASE || $NOTARIZE; then
     echo
     builder_heading "Attempting to staple notarization to Keyman.app"
     xcrun stapler staple "$TARGET_APP_PATH" || builder_die "stapler failed"
+
+    DID_NOTARIZE=true
   fi
-fi
+}
 
-### Deploy as requested ###
+do_sentry() {
+  # Upload symbols
+  builder_heading "Uploading symbols to sentry.keyman.com"
 
-if $LOCALDEPLOY ; then
-    builder_heading "Attempting local deployment with command:"
-    KM4MIM_APP_BASE_PATH="$KM4MIM_BASE_PATH/build/$CONFIG"
-    displayInfo "$KM4MIM_BASE_PATH/localdeploy.sh \"$KM4MIM_APP_BASE_PATH\""
-    eval "$KM4MIM_BASE_PATH/localdeploy.sh" "$KM4MIM_APP_BASE_PATH"
-    if [ $? == 0 ]; then
-        displayInfo "Local deployment succeeded!" ""
-    else
-        builder_die "Local deployment failed!"
+  if which sentry-cli >/dev/null; then
+    pushd "$KM4MIM_BASE_PATH" > /dev/null
+    sentry-cli upload-dif "build/$CONFIG"
+
+    popd > /dev/null
+  else
+    builder_die "Error: sentry-cli not installed, download from https://github.com/getsentry/sentry-cli/releases"
+  fi
+
+  builder_finish_action success publish
+}
+
+do_clean ( ) {
+  rm -rf "$KME4M_BASE_PATH/build"
+  rm -rf "$KM4MIM_BASE_PATH/build"
+  rm -rf "$KMTESTAPP_BASE_PATH/build"
+  
+  builder_heading "Cleaning pods folder (CocoaPods)"
+  rm -rf "$PODS_FOLDER"
+  builder_heading "Cleaning source (Carthage)"
+  rm -rf "$KEYMAN_MAC_BASE_PATH/Carthage"
+
+  # To consider: also mark for xcodebuild to do a clean build?
+  # Though, shouldn't the above trigger this anyway?
+}
+
+do_configure ( ) {
+  carthage bootstrap --use-xcframeworks
+
+  pushd "$KM4MIM_BASE_PATH" > /dev/null
+  pod update
+  pod install
+  popd > /dev/null
+}
+
+do_build_engine ( ) {
+  ### Build Keyman Engine (kmx, ldml processor) ###
+
+  execBuildCommand $ENGINE_NAME "xcodebuild -project \"$KME4M_PROJECT_PATH\" $BUILD_OPTIONS $BUILD_ACTIONS -scheme $ENGINE_NAME"
+  execBuildCommand "$ENGINE_NAME dSYM file" "dsymutil \"$KME4M_BASE_PATH/build/$CONFIG/$ENGINE_NAME.framework/Versions/A/$ENGINE_NAME\" -o \"$KME4M_BASE_PATH/build/$CONFIG/$ENGINE_NAME.framework.dSYM\""
+  updatePlist "$KME4M_BASE_PATH/build/$CONFIG/$ENGINE_NAME.framework/Resources/Info.plist" "Keyman Engine"
+}
+
+do_build_im ( ) {
+  ### Build Keyman.app (Input Method and Configuration app) ###
+  builder_heading "Building help"
+  build_help_html mac Keyman4MacIM/Keyman4MacIM/Help
+
+  builder_heading "Building Keyman.app"
+
+  execBuildCommand $IM_NAME "xcodebuild -workspace \"$KMIM_WORKSPACE_PATH\" $CODESIGNING_SUPPRESSION $BUILD_OPTIONS $BUILD_ACTIONS -scheme Keyman SYMROOT=\"$KM4MIM_BASE_PATH/build\""
+  updatePlist "$KM4MIM_BASE_PATH/build/$CONFIG/Keyman.app/Contents/Info.plist" "Keyman"
+
+  if builder_is_debug_build; then
+    ENTITLEMENTS_FILE=Keyman.Debug.entitlements
+  else
+    ENTITLEMENTS_FILE=Keyman.entitlements
+
+    # We need to re-sign the app after updating the plist file
+    execCodeSign eval --force --sign $CERTIFICATE_ID --timestamp --verbose --preserve-metadata=identifier,entitlements "$KM4MIM_BASE_PATH/build/$CONFIG/Keyman.app/Contents/Frameworks/Sentry.framework"
+
+    execCodeSign eval --force --sign $CERTIFICATE_ID --timestamp --verbose --preserve-metadata=identifier,entitlements "$KM4MIM_BASE_PATH/build/$CONFIG/Keyman.app/Contents/Frameworks/KeymanEngine4Mac.framework"
+
+    execCodeSign eval --force --sign $CERTIFICATE_ID --timestamp --verbose -o runtime \
+      --entitlements "$KM4MIM_BASE_PATH/$ENTITLEMENTS_FILE" \
+      --requirements "'=designated => anchor apple generic and identifier \"\$self.identifier\" and ((cert leaf[field.1.2.840.113635.100.6.1.9] exists) or ( certificate 1[field.1.2.840.113635.100.6.2.6] exists and certificate leaf[field.1.2.840.113635.100.6.1.13] exists and certificate leaf[subject.OU] = \"$DEVELOPMENT_TEAM\" ))'" \
+      "$KM4MIM_BASE_PATH/build/$CONFIG/Keyman.app"
+  fi
+}
+
+do_build_testapp() {
+  ### Build test app / harness ###
+  execBuildCommand $TESTAPP_NAME "xcodebuild -project \"$KMTESTAPP_PROJECT_PATH\" $BUILD_OPTIONS $BUILD_ACTIONS"
+  updatePlist "$KMTESTAPP_BASE_PATH/build/$CONFIG/$TESTAPP_NAME.app/Contents/Info.plist" "Keyman Test App"
+}
+
+do_install() {
+  if ! builder_has_option --quick; then
+    do_notarize
+  else
+    if [ "$(spctl --status)" == "assessments enabled" ]; then
+      echo
+      builder_warn "WARNING: Notarization is disabled but SecAssessment security policy is still active. Keyman will not run correctly."
+      builder_warn "         Disable SecAssessment with 'sudo spctl --master-disable' (or do notarized builds)"
+      builder_die  "Re-run without $(builder_term --quick) or disable SecAssessment."
     fi
-elif $PREPRELEASE ; then
-    builder_heading "Preparing files for release deployment..."
-    # Create the disk image
-    pushd setup
-    eval "./build.sh"
-    popd
+  fi
 
-    eval "$KM4MIM_BASE_PATH/make-km-dmg.sh" $QUIET_FLAG
-    if [ $? == 0 ]; then
-        displayInfo "Creating disk image succeeded!" ""
-    else
-        builder_die "Creating disk image failed!"
-    fi
+  builder_heading "Attempting local deployment with command:"
+  KM4MIM_APP_BASE_PATH="$KM4MIM_BASE_PATH/build/$CONFIG"
+  displayInfo "$KM4MIM_BASE_PATH/localdeploy.sh \"$KM4MIM_APP_BASE_PATH\""
+  eval "$KM4MIM_BASE_PATH/localdeploy.sh" "$KM4MIM_APP_BASE_PATH"
+  
+  # TODO:  Consider removal?  Or can we not auto-crash if the prior line fails?
+  if [ $? == 0 ]; then
+      displayInfo "Local deployment succeeded!"
+  else
+      builder_die "Local deployment failed!"
+  fi
+}
 
-    # Create download info
-    eval "$KM4MIM_BASE_PATH/write-download_info.sh"
-    if [ $? == 0 ]; then
-        displayInfo "Writing download_info file succeeded!" ""
-    else
-        builder_die "Writing download_info file failed!"
-    fi
-fi
+do_publish() {
+  do_notarize
 
-builder_heading "Build Succeeded!"
-exit 0
+  builder_heading "Preparing files for release deployment..."
+  # Create the disk image
+  pushd setup
+  eval "./build.sh"
+  popd
+
+  eval "$KM4MIM_BASE_PATH/make-km-dmg.sh" $BUILD_OPTIONS
+  if [ $? == 0 ]; then
+      displayInfo "Creating disk image succeeded!" ""
+  else
+      builder_die "Creating disk image failed!"
+  fi
+
+  # Create download info
+  eval "$KM4MIM_BASE_PATH/write-download_info.sh"
+  if [ $? == 0 ]; then
+      displayInfo "Writing download_info file succeeded!" ""
+  else
+      builder_die "Writing download_info file failed!"
+  fi
+
+  do_sentry
+}
+
+### PROCESS COMMAND-LINE ARGUMENTS ###
+
+builder_run_action clean          do_clean
+builder_run_action configure      do_configure 
+
+builder_run_action build:engine   do_build_engine
+builder_run_action build:im       do_build_im
+builder_run_action build:testapp  do_build_testapp
+
+builder_run_action test:engine execBuildCommand $ENGINE_NAME "xcodebuild -project \"$KME4M_PROJECT_PATH\" $QUIET_FLAG test -scheme $ENGINE_NAME"
+builder_run_action test:im execBuildCommand "$IM_NAME-tests" "xcodebuild test -workspace \"$KMIM_WORKSPACE_PATH\" $CODESIGNING_SUPPRESSION $BUILD_OPTIONS -scheme Keyman SYMROOT=\"$KM4MIM_BASE_PATH/build\""
+
+builder_run_action install do_install
+
+builder_run_action publish do_publish
